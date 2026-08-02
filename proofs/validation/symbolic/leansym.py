@@ -83,7 +83,8 @@ class Converter:
     MAX_DEPTH = 12
 
     def __init__(self, table: dict[str, tuple[list[str], str]] | None = None,
-                 opaque_defs: bool = False):
+                 opaque_defs: bool = False, opaque_fallback: bool = False,
+                 must_inline: frozenset | None = None):
         """`opaque_defs` turns every user definition into an uninterpreted
         function symbol instead of inlining its body.  A theorem whose two
         sides are still equal under that reading uses nothing about the
@@ -91,6 +92,20 @@ class Converter:
         name."""
         self.table = table or {}
         self.opaque_defs = opaque_defs
+        # A definition this converter cannot inline -- wrong arity, recursive,
+        # unsupported body -- used to abort the WHOLE statement, so one
+        # unreachable subterm made every theorem containing it unusable. Reading
+        # the failure reasons showed that is where most of my "converter limit"
+        # bucket came from: `Phi expects 0 args`, the recursion index of every
+        # equation-compiler definition, and structure field access. With
+        # opaque_fallback such a term becomes an uninterpreted function and the
+        # rest of the statement still converts.
+        #
+        # `must_inline` is the guard that keeps this honest: the definition
+        # being MUTATED must never go opaque, or its perturbation would be
+        # invisible and the definition would be filed as unconstrained.
+        self.opaque_fallback = opaque_fallback
+        self.must_inline = must_inline or frozenset()
 
     # -- entry point
     def convert(self, text: str, env: dict[str, sp.Expr] | None = None,
@@ -183,6 +198,8 @@ class Converter:
                 raise Unsupported(f"partial/bare application of {atom.name}")
             return atom
         if not isinstance(atom, _Callable):
+            if self.opaque_fallback and getattr(atom, "is_Symbol", False):
+                return sp.Function(str(atom))(*args)
             raise Unsupported(f"applied non-function {atom}")
         return atom.apply(args, self)
 
@@ -237,6 +254,11 @@ class Converter:
         # a plain variable
         if re.fullmatch(r"[A-Za-z_" + GREEK + r"][A-Za-z0-9_'₀-₉ₐ-ₜ" + GREEK + r"]*", name):
             return sp.Symbol(name, real=True)
+        if self.opaque_fallback and re.fullmatch(r"[A-Za-z_][A-Za-z0-9_'₀-₉]*"
+                                                 r"(\.[A-Za-z_][A-Za-z0-9_'₀-₉]*)+",
+                                                 name):
+            # a structure field access such as `g.Ne`: opaque, but a value
+            return sp.Symbol(name.replace(".", "_"), real=True)
         raise Unsupported(f"unresolved name {name}")
 
 
@@ -259,22 +281,34 @@ class _Def(_Callable):
         self.arity = len(self.binders)
         self.fn = None
 
+    def _opaque(self, args):
+        return sp.Function(self.name)(*args)
+
     def apply(self, args, conv):
         if conv.opaque_defs:
             if len(args) != self.arity:
                 raise Unsupported(
                     f"{self.name} expects {self.arity} args, got {len(args)}")
             return sp.Function(self.name)(*args)
+        def bail(msg):
+            if conv.opaque_fallback and self.name not in conv.must_inline:
+                return self._opaque(args)
+            raise Unsupported(msg)
+
         if conv.depth >= Converter.MAX_DEPTH:
-            raise Unsupported(f"inlining depth exceeded at {self.name}")
+            return bail(f"inlining depth exceeded at {self.name}")
         if self.name in conv.stack:
-            raise Unsupported(f"recursive definition {self.name}")
+            return bail(f"recursive definition {self.name}")
         if len(args) != self.arity:
-            raise Unsupported(
+            return bail(
                 f"{self.name} expects {self.arity} args {self.binders}, got {len(args)}")
         env = dict(zip(self.binders, args))
-        sub = Converter(conv.table)
-        return sub.convert(self.body, env, conv.depth + 1, conv.stack + (self.name,))
+        sub = Converter(conv.table, opaque_fallback=conv.opaque_fallback,
+                        must_inline=conv.must_inline)
+        try:
+            return sub.convert(self.body, env, conv.depth + 1, conv.stack + (self.name,))
+        except Unsupported as e:
+            return bail(f"{self.name} body unsupported: {e}")
 
 
 # ---------------------------------------------------------------- table
