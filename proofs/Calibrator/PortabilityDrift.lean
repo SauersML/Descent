@@ -1915,7 +1915,9 @@ construction of transported Brier. -/
     unfold TransportedMetrics.r2FromSignalVariance residualVarianceFromSourceWeights
       r2FromSourceWeights
     field_simp [h_eff_ne]
-    ring
+    -- `ring` cannot finish here: it treats `x⁻¹` as an atom, so it has no way
+    -- to cancel `Y * Y⁻¹` without the nonzero hypothesis. Cancel explicitly.
+    exact mul_inv_cancel_right₀ h_eff_ne _
   rw [hr2]
 
 /-- The target score variance is exactly the target quadratic form
@@ -3561,7 +3563,7 @@ theorem equalVarianceGaussianAUCFromExplainedR2_eq_presentDayAUC
   have hv_pos : 0 < presentDayPGSVariance V_A fst := by
     unfold presentDayPGSVariance pgsVarianceFromHet
     have h_one_minus : 0 < 1 - fst := by linarith
-    exact mul_pos h_one_minus hVA
+    exact mul_pos hVA h_one_minus
   have hsum_ne : presentDayPGSVariance V_A fst + V_E ≠ 0 := by
     linarith
   have hve_ne : V_E ≠ 0 := ne_of_gt hVE
