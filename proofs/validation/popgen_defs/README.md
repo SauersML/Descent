@@ -42,6 +42,9 @@ theory at a null or control point in the same run.
 | `ldCorrelationSq` | `CovarianceStructure.lean:91` | equals r²/4 when fed haplotype `D`, which is exactly what `admixtureLDTwoLocus` in the same file produces |
 | `ldsrExpectedChi2` | `CovarianceStructure.lean:308` | confounding term divided by M; at N=8×10⁵, M=9×10⁵ it reports χ²=1.32 where the truth is 420.8 |
 
+| `discoveryNCP` | `GeneticArchitectureDiscovery.lean:51` | uses `tagGenotypeVariance`, but the NCP at a tag carries the *causal* variant's genotype variance; −24%…+33% whenever the MAFs differ |
+| `r2ScalingModel` | `PowerAnalysis.lean:346` | same missing `h²` prefactor as `expectedR2FromN`; the fix was applied to one of the pair and not the other |
+
 ### The composition hazard
 
 `ldCorrelationSq` is the first bug found that is not local to one definition.
