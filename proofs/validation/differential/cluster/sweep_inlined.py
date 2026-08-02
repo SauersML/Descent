@@ -137,28 +137,101 @@ REFERENCES = [
 ]
 
 
+SCALAR_TYPES = ("R", "N", "ℝ", "ℕ")
+
+
 def load_table():
+    """Return {fully_qualified_name: entry}, whatever shape defs.json is in.
+
+    The first version of this assumed defs.json was already keyed by name. It
+    is not: the top level is a dict with keys collisions / theorems /
+    definitions / structures / parse_failures, and `definitions` is a LIST.
+    Iterating the top level therefore yielded the five section names and handed
+    a list to code expecting a dict.
+
+    Rather than swap one assumption for another, this accepts every plausible
+    shape and REPORTS which one it found, so the next schema change is a
+    one-line diagnosis instead of an AttributeError inside a loop.
+    """
     fh = open(os.path.join(EXTRACT, "defs.json"))
-    tbl = json.load(fh)
+    raw = json.load(fh)
     fh.close()
-    return tbl
+
+    shape = None
+    entries = None
+    if isinstance(raw, dict) and "definitions" in raw:
+        entries = raw["definitions"]
+        shape = "dict with 'definitions' section"
+    elif isinstance(raw, list):
+        entries = raw
+        shape = "bare list"
+    elif isinstance(raw, dict):
+        vals = list(raw.values())
+        if vals and isinstance(vals[0], dict) and "body" in vals[0]:
+            print("  defs.json shape: dict already keyed by name")
+            return raw
+        raise SystemExit(
+            "defs.json is a dict whose values are %s, not definition entries. "
+            "Top-level keys: %s" % (type(vals[0]).__name__ if vals else "empty",
+                                    sorted(raw.keys())))
+    else:
+        raise SystemExit("defs.json is a %s, which this script cannot read"
+                         % type(raw).__name__)
+
+    if isinstance(entries, dict):
+        print("  defs.json shape: %s (already keyed)" % shape)
+        return entries
+    table = {}
+    for e in entries:
+        if not isinstance(e, dict):
+            raise SystemExit(
+                "defs.json '%s' contains a %s where a definition entry was "
+                "expected" % (shape, type(e).__name__))
+        key = e.get("name") or e.get("decl_name") or e.get("short")
+        if key:
+            table[key] = e
+    print("  defs.json shape: %s -> %d definitions" % (shape, len(table)))
+    return table
 
 
 def arg_names(entry):
-    """Ordered explicit scalar argument names, or None if not scalar-only."""
+    """Explicit scalar argument names IN ORDER, or None if not scalar-only.
+
+    `args` is a list of BINDER GROUPS, not of arguments: `(x y z : R)` is ONE
+    group carrying three names. Taking one name per group would under-count
+    arity and then call every such definition with the wrong number of
+    arguments -- the same class of mistake as dropping a binder.
+    """
+    args = entry.get("args")
+    if not isinstance(args, list):
+        return None
     names = []
-    for grp in entry.get("args", []):
+    for grp in args:
+        if not isinstance(grp, dict):
+            return None
         if grp.get("implicit"):
             continue
-        if grp.get("type") != "R" and grp.get("type") not in ("ℝ", "ℕ"):
+        if grp.get("type") not in SCALAR_TYPES:
+            return None                      # structure/vector/function typed
+        group_names = grp.get("names") or []
+        if not isinstance(group_names, list):
             return None
-        for nm in grp.get("names", []):
+        for nm in group_names:
             names.append(nm)
     return names or None
 
 
-def resolve_callable(fq, short):
-    for cand in (short, fq.replace(".", "_")):
+def resolve_callable(entry):
+    """The generated callable for an entry, or None.
+
+    Ambiguous short names are emitted fully qualified with dots replaced by
+    underscores, so both spellings are tried.
+    """
+    fq = entry.get("name") or ""
+    cands = [entry.get("short"), fq.replace(".", "_"), fq.split(".")[-1]]
+    for cand in cands:
+        if not cand:
+            continue
         fn = getattr(lean_defs, cand, None)
         if fn is not None:
             return fn
@@ -170,7 +243,6 @@ def sweep(ref, table):
     excluded = 0
     for fq in sorted(table.keys()):
         entry = table[fq]
-        short = fq.split(".")[-1]
         names = arg_names(entry)
         if not names:
             continue
@@ -183,7 +255,7 @@ def sweep(ref, table):
                 a2 = nm
         if a1 is None or a2 is None or a1 == a2:
             continue
-        fn = resolve_callable(fq, short)
+        fn = resolve_callable(entry)
         if fn is None:
             continue
 
@@ -246,8 +318,73 @@ def sweep(ref, table):
     return members, excluded
 
 
+def schema_selfcheck(table):
+    """Fail before sweeping if the table is not what the sweep assumes.
+
+    A schema mismatch that surfaces mid-loop produces a stack trace from deep
+    inside the sweep; one that surfaces here names the problem. More important,
+    a mismatch that does NOT crash -- an `args` shape that silently yields zero
+    scalar definitions -- would make every reference return no members, and
+    "no members for three suspect forms" reads as good news. This check exists
+    so that outcome cannot be reached quietly.
+    """
+    problems = []
+    if len(table) < 500:
+        problems.append("only %d definitions loaded; expected ~1000" % len(table))
+
+    n_scalar = 0
+    for fq in table:
+        if arg_names(table[fq]):
+            n_scalar += 1
+    print("  %d definitions have scalar-only explicit arguments" % n_scalar)
+    if n_scalar < 100:
+        problems.append(
+            "only %d scalar-argument definitions found; `args` is probably not "
+            "being parsed as binder groups, and every reference would return "
+            "no members" % n_scalar)
+
+    # coalFst is the anchor: two real arguments named t and Ne, and it
+    # evaluates to t/(t+2Ne).
+    anchor = None
+    for fq in table:
+        if fq.split(".")[-1] == "coalFst":
+            anchor = table[fq]
+            break
+    if anchor is None:
+        problems.append("coalFst not present in the table")
+    else:
+        names = arg_names(anchor)
+        if names != ["t", "Ne"]:
+            problems.append("coalFst args parsed as %r, expected ['t','Ne']" % names)
+        fn = resolve_callable(anchor)
+        if fn is None:
+            problems.append("no callable resolved for coalFst")
+        else:
+            try:
+                got = fn(100.0, 1000.0)
+                if abs(got - 100.0 / 2100.0) > 1e-12:
+                    problems.append("coalFst(100,1000) = %r, expected 1/21" % got)
+            except Exception as exc:
+                problems.append("coalFst raised: %s" % exc)
+
+    if problems:
+        print("")
+        print("SCHEMA SELF-CHECK FAILED -- not sweeping:")
+        for p in problems:
+            print("  * " + p)
+        print("")
+        print("Send this output back. Do NOT read an empty member list as a")
+        print("clean corpus; it would mean the table was not parsed.")
+        return False
+    print("  schema self-check passed (coalFst resolves and evaluates)")
+    return True
+
+
 def main():
+    print("LOADING")
     table = load_table()
+    if not schema_selfcheck(table):
+        return 2
     report = {"n_definitions_in_table": len(table), "references": {}}
     control_ok = True
 

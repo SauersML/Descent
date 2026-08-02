@@ -93,15 +93,43 @@ def phase1():
             rec["callable_error"] = "%s: %s" % (type(exc).__name__, str(exc)[:120])
         rows.append(rec)
 
+    # `api.structures` may be a function or an already-built mapping, and its
+    # value shape is not documented. Both are accepted and the shape actually
+    # found is REPORTED, because the sweep's schema bug came from assuming a
+    # shape instead of checking it.
     structs = {}
+    struct_shape = None
     try:
-        s = api.structures()
-        for name in s:
-            structs[name] = s[name]
+        s = getattr(api, "structures", None)
+        if callable(s):
+            s = s()
+            struct_shape = "api.structures() -> %s" % type(s).__name__
+        else:
+            struct_shape = "api.structures attribute -> %s" % type(s).__name__
+        if isinstance(s, dict):
+            for name in s:
+                structs[name] = s[name]
+        elif isinstance(s, list):
+            for item in s:
+                if isinstance(item, dict) and "name" in item:
+                    structs[item["name"]] = item
+            struct_shape += " (list keyed by 'name')"
+        else:
+            struct_shape += " -- UNRECOGNISED, phase 2 will find no fields"
     except Exception as exc:
-        structs = {"__error__": "%s: %s" % (type(exc).__name__, exc)}
+        struct_shape = "ERROR %s: %s" % (type(exc).__name__, exc)
 
-    return {"definitions": rows, "structures": structs}
+    sample = None
+    for k in sorted(structs):
+        sample = {"name": k, "value_type": type(structs[k]).__name__,
+                  "keys": sorted(structs[k].keys())
+                          if isinstance(structs[k], dict) else None,
+                  "repr_head": repr(structs[k])[:300]}
+        break
+
+    return {"definitions": rows, "structures": structs,
+            "structures_shape": struct_shape, "structures_sample": sample,
+            "n_structures": len(structs)}
 
 
 def _numeric_fields(struct_spec):
@@ -249,6 +277,16 @@ def main():
     print("  explicit argument types seen:")
     for t in sorted(types, key=lambda x: -types[x]):
         print("    %-44s %d" % (t, types[t]))
+    print("  structures: %d, discovered via %s"
+          % (recon.get("n_structures", 0), recon.get("structures_shape")))
+    if recon.get("structures_sample"):
+        s = recon["structures_sample"]
+        print("    sample %-28s value=%s keys=%s"
+              % (s["name"], s["value_type"], s["keys"]))
+        print("    repr: %s" % s["repr_head"])
+    if not recon.get("n_structures"):
+        print("  NOTE: no structures resolved, so phase 2 will attempt nothing.")
+        print("        Phase 1 output is still what I need -- send it.")
 
     try:
         res = phase2(recon)
