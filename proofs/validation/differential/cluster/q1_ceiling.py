@@ -139,6 +139,36 @@ def simulate(v, n=N_PRED, reps=REPS, kappa_gauss=True, rng=None):
             float(np.mean(null_r2)), float(np.std(null_r2) / np.sqrt(reps)))
 
 
+def ceiling_with_bias(B, s2=1.0, kappa=3.0):
+    """Ceiling when the residual MEAN also moves with x.
+
+    The pure-variance derivation assumes E[r|x] = 0. If the score is
+    miscalibrated in a distance-dependent way then E[r|x] = b(x) != 0 and
+
+        E[r^2|x]   = b(x)^2 + s2
+        Var(r^2|x) = 2 s2^2 + 4 b(x)^2 s2        (Gaussian r with mean b)
+
+    so the EXPLAINABLE part gains Var(b^2), which is quartic in the bias and
+    can dwarf the heteroscedastic channel. b(x) is taken with mean 0 and
+    standard deviation B, uniform in x, so Var(b^2) = 0.8 B^4.
+    """
+    explainable = 0.8 * B ** 4
+    irreducible = (kappa - 1.0) * s2 ** 2 + 4.0 * B ** 2 * s2
+    return explainable / (irreducible + explainable)
+
+
+def bias_needed_for(target, s2=1.0, kappa=3.0):
+    """Bisect for the residual-mean spread B that reproduces `target` R^2."""
+    lo, hi = 0.0, 5.0
+    for _ in range(200):
+        mid = 0.5 * (lo + hi)
+        if ceiling_with_bias(mid, s2, kappa) < target:
+            lo = mid
+        else:
+            hi = mid
+    return 0.5 * (lo + hi)
+
+
 def main():
     rng = np.random.default_rng(SEED)
     out = {"paper": {"reported_spline_r2_height": 0.0051,
@@ -180,6 +210,32 @@ def main():
               % (name, v, c, rep,
                  ("%.2f" % (rep / c)) if c > 0 else "n/a"))
     out["scenarios"] = rows
+
+    # --- the reported value exceeds the pure-variance ceiling -------------
+    print("")
+    print("THE REPORTED 0.51% EXCEEDS THE PURE-VARIANCE CEILING")
+    print("  Under the most generous plausible decline (0.30 -> 0.05) the")
+    print("  ceiling is 0.378%%, and the reported figure is 0.51%%. A spline")
+    print("  cannot explain more of the squared residual than the conditional")
+    print("  variance channel allows, so a second channel must be carrying it.")
+    print("")
+    print("  If the residual MEAN moves with distance -- a distance-dependent")
+    print("  calibration bias rather than an accuracy loss -- the explainable")
+    print("  part gains Var(b^2), quartic in the bias:")
+    print("")
+    print("  %-12s %-14s %-14s" % ("bias SD B", "ceiling", "(units of sd(y))"))
+    bias_rows = []
+    for B in (0.0, 0.05, 0.10, 0.20, 0.30, 0.40, 0.50):
+        c = ceiling_with_bias(B)
+        bias_rows.append({"bias_sd": B, "ceiling": c})
+        print("  %-12.2f %-14.5f" % (B, c))
+    B_needed = bias_needed_for(0.0051)
+    print("")
+    print("  Residual-mean spread required to produce R^2 = 0.51%%: B = %.4f"
+          % B_needed)
+    print("  i.e. a distance-dependent bias of about %.2f outcome SDs." % B_needed)
+    out["bias_channel"] = {"rows": bias_rows,
+                           "bias_sd_needed_for_reported": B_needed}
 
     # --- controls -----------------------------------------------------------
     print("")
