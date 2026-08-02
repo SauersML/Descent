@@ -134,16 +134,18 @@ noncomputable def meanAlleleFreq (p₁ p₂ : ℝ) : ℝ := (p₁ + p₂) / 2
 
 /-! ### The arithmetic mean of two, shared with the migration rates
 
-`meanAlleleFreq` averages two subgroup allele frequencies;
-`PopulationGeneticsFoundations.effectiveMigration` and
-`PortabilityDrift.effectiveSymmetricMigration` average two directional
-migration rates. Three different quantities, one map, and an equal-weight
-convention that has to be the same equal-weight convention in all three or the
-`F_ST` these feed disagrees with itself. -/
+`meanAlleleFreq` averages two subgroup allele frequencies and
+`effectiveSymmetricMigration` averages two directional migration rates: two different
+quantities sharing one map, with an equal-weight convention that has to be the same
+convention in both or the `F_ST` they feed disagrees with itself.
 
-theorem effectiveMigration_eq_meanAlleleFreq_map (m₁₂ m₂₁ : ℝ) :
-    effectiveSymmetricMigration m₁₂ m₂₁ = meanAlleleFreq m₁₂ m₂₁ := by
-  unfold effectiveSymmetricMigration meanAlleleFreq; ring
+They are deliberately *not* collapsed into one definition. The bodies coincide, but an
+allele frequency and a migration rate are not the same quantity, and a single name would
+let a proof about one be applied to the other without anything failing. The theorem below
+records the coincidence, which is what a shared convention deserves — as against the
+island-model `F_ST`, where four names really did denote one quantity and are now one.
+
+There used to be two copies of this theorem, one per copy of the migration average. -/
 
 theorem effectiveSymmetricMigration_eq_meanAlleleFreq_map (m₁₂ m₂₁ : ℝ) :
     effectiveSymmetricMigration m₁₂ m₂₁ = meanAlleleFreq m₁₂ m₂₁ := by
@@ -672,7 +674,7 @@ theorem hetMutationDriftRecurrence_step_uses_timeScale
 /-- Equilibrium heterozygosity under mutation-drift balance, `θ/(1 + θ)`,
 written out with its own four. This is the last inline restatement of the
 ploidy convention in the development. -/
-theorem hetEquilibrium_eq_scaled (Ne mu : ℝ) :
+theorem hetMutationFloor_eq_scaled (Ne mu : ℝ) :
     hetMutationFloor Ne mu
       = scaledMutationRate Ne mu / (1 + scaledMutationRate Ne mu) := by
   unfold hetMutationFloor
