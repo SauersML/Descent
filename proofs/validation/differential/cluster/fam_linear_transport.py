@@ -75,8 +75,12 @@ CONTROLS -- every one is shown firing on a deliberately broken input
   P1 POSITIVE CONTROL. A deliberately mis-signed weight vector must drive
      calibrationSlopeFromSourceWeights negative. Proves the slope check can
      fire at all.
-  P2 SCALE CONTROL. y -> k*y multiplies every measured second moment by k^2 and
-     leaves R^2 invariant. Any corpus R^2 that moves under this is not an R^2.
+  P2 SCALE CONTROL. Genotype coding: g -> c*g with beta -> beta/c. The
+     phenotype, the fitted weights' predictions and EVERY measured moment are
+     unchanged -- this is the free choice between raw dosages and standardised
+     genotypes. Any corpus quantity that moves under it depends on an arbitrary
+     unit. FIRES ON: r2FromSourceWeights, and it is exact arithmetic, so the
+     control cannot be passed by luck.
 
 CAN-FAIL CLAUSE
   The p/n grid must reach p comparable to n. sourceSpecificOverfitResidual is
@@ -319,7 +323,8 @@ def ldMismatchFrobenius(Sig_S, Sig_T):
 # building a model from the process
 # ---------------------------------------------------------------------------
 def build_world(rng, fst, ar_source, ar_target, ntag, effect_shift=0.0,
-                novel_frac=0.0, pheno_scale=1.0, overfit_n=0):
+                novel_frac=0.0, pheno_scale=1.0, overfit_n=0,
+                n_ref=N_REF, n_eval=N_EVAL):
     """Simulate two populations and instantiate CrossPopulationMetricModel."""
     anc = rng.uniform(0.1, 0.9, size=L)
     tag_idx = np.arange(0, L, 2)[:ntag]
@@ -341,10 +346,10 @@ def build_world(rng, fst, ar_source, ar_target, ntag, effect_shift=0.0,
         novel_t[who] = rng.standard_normal(k) * pheno_scale
         fS[causal_idx[who]] = 0.01
 
-    gS_ref = draw_genotypes(N_REF, fS, ar_source, rng)
-    gT_ref = draw_genotypes(N_REF, fT, ar_target, rng)
-    gT_ev = draw_genotypes(N_EVAL, fT, ar_target, rng)
-    gS_ev = draw_genotypes(N_EVAL, fS, ar_source, rng)
+    gS_ref = draw_genotypes(n_ref, fS, ar_source, rng)
+    gT_ref = draw_genotypes(n_ref, fT, ar_target, rng)
+    gT_ev = draw_genotypes(n_eval, fT, ar_target, rng)
+    gS_ev = draw_genotypes(n_eval, fS, ar_source, rng)
 
     def moments(g):
         t = g[:, tag_idx]
@@ -362,10 +367,10 @@ def build_world(rng, fst, ar_source, ar_target, ntag, effect_shift=0.0,
         c = g[:, causal_idx]
         return c.dot(beta + novel) + rng.standard_normal(n) * sig_e
 
-    yS_ref = pheno(gS_ref, beta_s, np.zeros(q), N_REF)
-    yT_ref = pheno(gT_ref, beta_t, novel_t, N_REF)
-    yS_ev = pheno(gS_ev, beta_s, np.zeros(q), N_EVAL)
-    yT_ev = pheno(gT_ev, beta_t, novel_t, N_EVAL)
+    yS_ref = pheno(gS_ref, beta_s, np.zeros(q), n_ref)
+    yT_ref = pheno(gT_ref, beta_t, novel_t, n_ref)
+    yS_ev = pheno(gS_ev, beta_s, np.zeros(q), n_eval)
+    yT_ev = pheno(gT_ev, beta_t, novel_t, n_eval)
 
     ctxS = np.zeros(ntag)
     ctxT = np.zeros(ntag)
@@ -374,8 +379,8 @@ def build_world(rng, fst, ar_source, ar_target, ntag, effect_shift=0.0,
         # tag-outcome cross-covariance in a sample of `overfit_n` individuals,
         # minus the population-level Sigma_tc . beta. This is what
         # sourceSpecificOverfitResidual is for, and it is O(p/n).
-        iS = rng.choice(N_REF, size=overfit_n, replace=False)
-        iT = rng.choice(N_REF, size=overfit_n, replace=False)
+        iS = rng.choice(n_ref, size=overfit_n, replace=False)
+        iT = rng.choice(n_ref, size=overfit_n, replace=False)
         empS = centred_cov(gS_ref[iS][:, tag_idx], yS_ref[iS].reshape(-1, 1))[:, 0]
         empT = centred_cov(gT_ref[iT][:, tag_idx], yT_ref[iT].reshape(-1, 1))[:, 0]
         ctxS = empS - XcS.dot(beta_s)
@@ -410,6 +415,30 @@ def make_identical(m):
     m2["novelCausalEffect"] = {"source": m["novelCausalEffect"]["source"],
                                "target": m["novelCausalEffect"]["source"]}
     return m2
+
+
+def rescale_genotype_units(m, ev, c):
+    """g -> c*g with beta -> beta/c. The PHENOTYPE, the fitted score and every
+    measured moment are unchanged bit-for-bit: w picks up a factor 1/c and the
+    score w.(c g) is identical. This is exactly the free choice every PGS
+    pipeline makes between raw dosages and standardised genotypes.
+
+    Under it the four residual terms are all quadratic in the genotype scale
+    while outcomeVariance is invariant, so any definition that ADDS them to a
+    variance cannot be scale-covariant. That is the falsifier, and it is exact
+    arithmetic -- no sampling enters it."""
+    m2 = {}
+    for k in m:
+        m2[k] = m[k]
+    for k in ("sigmaTag",):
+        m2[k] = {P: m[k][P] * c * c for P in ("source", "target")}
+    for k in ("directCausal", "proxyTagging", "novelDirectCausal", "novelProxyTagging"):
+        m2[k] = {P: m[k][P] * c * c for P in ("source", "target")}
+    for k in ("beta", "novelCausalEffect"):
+        m2[k] = {P: m[k][P] / c for P in ("source", "target")}
+    m2["contextCross"] = {P: m["contextCross"][P] * c for P in ("source", "target")}
+    ev2 = {P: (ev[P][0] * c, ev[P][1]) for P in ev}
+    return m2, ev2
 
 
 def measure(m, ev, P):
@@ -569,30 +598,79 @@ def main():
 
     # =====================================================================
     print("")
-    print("P2 SCALE CONTROL: y -> k*y. Measured R^2 is invariant. Is the corpus R^2?")
+    print("P2 SCALE CONTROL: genotype units. g -> c*g, beta -> beta/c.")
+    print("   The phenotype, the score and every measured moment are UNCHANGED.")
     rowsP2 = []
-    base = None
-    for k in (1.0, 2.0, 4.0):
-        mk, ek = build_world(rng, 0.15, 0.90, 0.55, 60, pheno_scale=k)
-        mek = measure(mk, ek, "target")
-        r2c = r2FromSourceWeights(mk, "target")
-        r2m = mek["r2"]
-        burden = irreducibleTargetResidualBurden(mk)
-        ov = mk["outcomeVariance"]["target"]
-        rowsP2.append({"k": k, "corpus_r2FromSourceWeights": r2c, "measured_r2": r2m,
-                       "burden": burden, "outcomeVariance": ov,
-                       "burden_over_outcomeVariance": burden / ov,
-                       "rel_err": rel(r2c, r2m)})
-        print("   k=%-4.1f corpus r2 = %-10.6g measured r2 = %-10.6g "
-              "burden/Var(y) = %-12.4g rel err %+.4f"
-              % (k, r2c, r2m, burden / ov, rel(r2c, r2m)))
-    out["P2_scale"] = rowsP2
-    ratios = [r["burden_over_outcomeVariance"] for r in rowsP2]
-    p2_fires = max(ratios) / max(min(ratios), 1e-30) > 4.0
-    print("   burden/Var(y) grows by %.4g x over k=1..4 -> %s"
-          % (max(ratios) / max(min(ratios), 1e-30),
-             "P2 FIRES (burden is not a variance)" if p2_fires else "no scale defect"))
-    out["P2_fires"] = bool(p2_fires)
+    mS, eS = build_world(rng, 0.15, 0.90, 0.55, 60, overfit_n=400)
+    for c in (1.0, 2.0, 4.0):
+        mc, ec = rescale_genotype_units(mS, eS, c)
+        mm = measure(mc, ec, "target")
+        rowsP2.append({
+            "c": c,
+            "measured_r2": mm["r2"],
+            "measured_slope": mm["slope"],
+            "measured_scoreVariance": mm["scoreVariance"],
+            "corpus_r2FromSourceWeights": r2FromSourceWeights(mc, "target"),
+            "corpus_residualVariance": residualVarianceFromSourceWeights(mc, "target"),
+            "corpus_effectiveOutcomeVariance": effectiveOutcomeVariance(mc, "target"),
+            "burden": irreducibleTargetResidualBurden(mc),
+            "brokenTagging": brokenTaggingResidual(mc),
+            "ancestryLD": ancestrySpecificLDResidual(mc),
+            "overfit": sourceSpecificOverfitResidual(mc),
+            "outcomeVariance": mc["outcomeVariance"]["target"],
+        })
+        print("   c=%-4.1f measured r2 = %-12.8g slope = %-10.6g | corpus r2 = %-12.8g "
+              "burden = %-12.6g Var(y) = %-10.6g"
+              % (c, rowsP2[-1]["measured_r2"], rowsP2[-1]["measured_slope"],
+                 rowsP2[-1]["corpus_r2FromSourceWeights"], rowsP2[-1]["burden"],
+                 rowsP2[-1]["outcomeVariance"]))
+    meas_inv = max(abs(r["measured_r2"] / rowsP2[0]["measured_r2"] - 1.0) for r in rowsP2)
+    burden_growth = rowsP2[-1]["burden"] / rowsP2[0]["burden"]
+    corpus_move = abs(rowsP2[-1]["corpus_r2FromSourceWeights"]
+                      / rowsP2[0]["corpus_r2FromSourceWeights"] - 1.0)
+    p2_fires = meas_inv < 1e-12 and corpus_move > 0.01
+    print("   measured R^2 max relative move over c=1..4: %.3e  (must be 0)" % meas_inv)
+    print("   burden grows %.4g x = c^%.3f   corpus r2 moves %.4f relative"
+          % (burden_growth, math.log(burden_growth) / math.log(4.0), corpus_move))
+    print("   P2 -> %s"
+          % ("FIRES: r2FromSourceWeights / residualVarianceFromSourceWeights / "
+             "effectiveOutcomeVariance are NOT invariant to genotype coding"
+             if p2_fires else "no scale defect"))
+    out["P2_genotype_scale"] = {"rows": rowsP2, "measured_r2_move": meas_inv,
+                                "burden_growth_c1_to_c4": burden_growth,
+                                "corpus_r2_relative_move": corpus_move,
+                                "fires": bool(p2_fires)}
+
+    # =====================================================================
+    print("")
+    print("B. IS THE r2FromSourceWeights GAP NOISE OR BIAS?  N-convergence.")
+    print("   Sampling error falls as 1/sqrt(N); a bias does not.")
+    print("   %-8s %-12s %-12s %-12s %-12s"
+          % ("N", "measured r2", "transportMom", "fromSrcWts", "burden/Var(y)"))
+    rowsB = []
+    for n in (6000, 24000, 96000):
+        mb, eb = build_world(rng, 0.15, 0.90, 0.55, 60, n_ref=n, n_eval=n)
+        meb = measure(mb, eb, "target")
+        tm = explainedR2FromTransportMoments(
+            predictiveCovarianceFromSourceWeights(mb, "target"),
+            scoreVarianceFromSourceWeights(mb, "target"),
+            mb["outcomeVariance"]["target"])
+        fs = r2FromSourceWeights(mb, "target")
+        bd = irreducibleTargetResidualBurden(mb) / mb["outcomeVariance"]["target"]
+        rowsB.append({"N": n, "measured_r2": meb["r2"],
+                      "explainedR2FromTransportMoments": tm,
+                      "r2FromSourceWeights": fs,
+                      "rel_err_transportMoments": rel(tm, meb["r2"]),
+                      "rel_err_fromSourceWeights": rel(fs, meb["r2"]),
+                      "burden_over_outcomeVariance": bd})
+        print("   %-8d %-12.6g %-12.6g %-12.6g %-12.6g   rel err %+.4f / %+.4f"
+              % (n, meb["r2"], tm, fs, bd, rel(tm, meb["r2"]), rel(fs, meb["r2"])))
+    b_ok = (abs(rowsB[-1]["rel_err_transportMoments"])
+            < abs(rowsB[0]["rel_err_transportMoments"])
+            and abs(rowsB[-1]["rel_err_fromSourceWeights"]) > 0.05)
+    print("   -> transport-moment R^2 converges; r2FromSourceWeights keeps a floor "
+          "of -burden/(Var(y)+burden): %s" % ("CONFIRMED" if b_ok else "not seen"))
+    out["B_convergence"] = {"rows": rowsB, "bias_floor_confirmed": bool(b_ok)}
 
     # =====================================================================
     print("")
@@ -637,7 +715,7 @@ def main():
 
     # =====================================================================
     ok = bool(ppf_err < 1e-8 and s1 and s1_fires and s2 and s2_fires and s3
-              and s3_fires and p1 and d_ok and c_ok and c_ok2)
+              and s3_fires and p1 and d_ok and c_ok and c_ok2 and p2_fires)
     out["READ_THE_TEST"] = ok
     print("")
     print("READ_THE_TEST: %s" % ok)
