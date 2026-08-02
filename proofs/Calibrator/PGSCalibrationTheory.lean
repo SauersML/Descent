@@ -1092,7 +1092,7 @@ theorem targetMetricAndCalibrationProfilesAtGeneration_exact_mechanistic_popgen_
             (scoreVarianceFromSourceWeights (m.metric.toMetricModelAt t) Pop.target *
               effectiveOutcomeVariance (m.metric.toMetricModelAt t) Pop.target)
       , auc :=
-          equalVarianceGaussianAUCFromVariances
+          gaussianAUCFromSignalVariance
             ((predictiveCovarianceFromSourceWeights (m.metric.toMetricModelAt t) Pop.target) ^ 2 /
               scoreVarianceFromSourceWeights (m.metric.toMetricModelAt t) Pop.target)
             (effectiveOutcomeVariance (m.metric.toMetricModelAt t) Pop.target -

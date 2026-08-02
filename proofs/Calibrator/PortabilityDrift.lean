@@ -2987,33 +2987,18 @@ theorem targetAUC_lt_source_of_neutralAF_benchmark
 noncomputable def equalVarianceGaussianAUCFromSNR (snr : ℝ) : ℝ :=
   Phi (Real.sqrt (snr / 2))
 
-/-- AUC of the equal-variance Gaussian model from signal and environmental
-    variances.
-
-    Renamed with its siblings: this is exact for two equal-variance normals and
-    is not the liability-threshold AUC, which depends on prevalence and which
-    none of these signatures can express.
-
-    Empirical status: VALIDATED for the equal-variance Gaussian model;
-    FALSIFIED as the liability-threshold AUC. -/
-noncomputable def equalVarianceGaussianAUCFromVariances (vSignal vEnv : ℝ) : ℝ :=
-  Phi (Real.sqrt (vSignal / (2 * vEnv)))
-
-/-- **One body, two names, tied.** `DGP.gaussianAUCFromSignalVariance` holds
-the same formula and now carries the measured boundary defect and the
-Monte-Carlo validation. The two had drifted to opposite claims about which
-quantity this is -- that copy called it the liability AUC, which this one
-records as falsified -- so the identity is what keeps the corrected label
-attached to both. -/
-theorem equalVarianceGaussianAUCFromVariances_eq_gaussianAUCFromSignalVariance
-    (vSignal vEnv : ℝ) :
-    equalVarianceGaussianAUCFromVariances vSignal vEnv =
-      gaussianAUCFromSignalVariance vSignal vEnv := rfl
+/-! The variance form of the equal-variance Gaussian AUC used to be written out again here
+under a second name, tied to `DGP.gaussianAUCFromSignalVariance` by a theorem. The tie
+recorded a real incident: the two copies had drifted to *opposite* claims about which
+quantity they computed — one called it the liability-threshold AUC, which the other
+records as falsified — and the identity existed to keep the corrected label attached to
+both. One definition cannot drift from itself, and it is the one carrying
+`GaussianLiabilityRegime`, so the obligation now reaches every use. -/
 
 /-- With `vEnv = 1`, variance form equals SNR form exactly. -/
 theorem equalVarianceGaussianAUCFromVariances_scaleOne (vSignal : ℝ) :
-    equalVarianceGaussianAUCFromVariances vSignal 1 = equalVarianceGaussianAUCFromSNR vSignal := by
-  unfold equalVarianceGaussianAUCFromVariances equalVarianceGaussianAUCFromSNR
+    gaussianAUCFromSignalVariance vSignal 1 = equalVarianceGaussianAUCFromSNR vSignal := by
+  unfold gaussianAUCFromSignalVariance equalVarianceGaussianAUCFromSNR
   ring_nf
 
 /-- On nonnegative SNR, the liability-threshold AUC map is strictly increasing
@@ -3165,7 +3150,7 @@ equation.
     Empirical status: UNTESTED. -/
 noncomputable def equalVarianceGaussianAUCFromSourceWeights {p q : ℕ}
     (m : CrossPopulationMetricModel p q) (P : Pop) : ℝ :=
-  equalVarianceGaussianAUCFromVariances
+  gaussianAUCFromSignalVariance
     (explainedSignalVarianceFromSourceWeights m P)
     (residualVarianceFromSourceWeights m P)
 
@@ -3174,7 +3159,7 @@ applied to source explained signal and source residual variance. -/
 theorem sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explicit_source_variances
     {p q : ℕ} (m : CrossPopulationMetricModel p q) :
     equalVarianceGaussianAUCFromSourceWeights m Pop.source =
-      equalVarianceGaussianAUCFromVariances
+      gaussianAUCFromSignalVariance
         (explainedSignalVarianceFromSourceWeights m Pop.source)
         (residualVarianceFromSourceWeights m Pop.source) := by
   rfl
@@ -3190,7 +3175,7 @@ theorem sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart {p 
       equalVarianceGaussianAUCFromExplainedR2 (r2FromSourceWeights m Pop.source) := by
   have h_source_ne : (m.outcomeVariance Pop.source) ≠ 0 := by
     exact ne_of_gt (m.outcomeVariance_pos Pop.source)
-  unfold equalVarianceGaussianAUCFromSourceWeights equalVarianceGaussianAUCFromVariances Pop.source
+  unfold equalVarianceGaussianAUCFromSourceWeights gaussianAUCFromSignalVariance Pop.source
     residualVarianceFromSourceWeights equalVarianceGaussianAUCFromExplainedR2 Pop.source
     r2FromSourceWeights
   congr 1
@@ -3202,7 +3187,7 @@ applied to target explained signal and target residual variance. -/
 theorem targetEqualVarianceGaussianAUCFromSourceWeights_eq_explicit_target_variances {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
     equalVarianceGaussianAUCFromSourceWeights m Pop.target =
-      equalVarianceGaussianAUCFromVariances
+      gaussianAUCFromSignalVariance
         (explainedSignalVarianceFromSourceWeights m Pop.target)
         (residualVarianceFromSourceWeights m Pop.target) := by
   rfl
@@ -3213,7 +3198,7 @@ explicit SNP-level transport model. -/
 theorem targetEqualVarianceGaussianAUCFromSourceWeights_exact_metric_portability_law
     {p q : ℕ} (m : CrossPopulationMetricModel p q) :
     equalVarianceGaussianAUCFromSourceWeights m Pop.target =
-      equalVarianceGaussianAUCFromVariances
+      gaussianAUCFromSignalVariance
         ((predictiveCovarianceFromSourceWeights m Pop.target) ^ 2 /
           scoreVarianceFromSourceWeights m Pop.target)
         (effectiveOutcomeVariance m Pop.target -
@@ -3228,7 +3213,7 @@ biological loss budget made explicit in the residual term. -/
 theorem targetEqualVarianceGaussianAUCFromSourceWeights_exact_loss_budget_law
     {p q : ℕ} (m : CrossPopulationMetricModel p q) :
     equalVarianceGaussianAUCFromSourceWeights m Pop.target =
-      equalVarianceGaussianAUCFromVariances
+      gaussianAUCFromSignalVariance
         ((predictiveCovarianceFromSourceWeights m Pop.target) ^ 2 /
           scoreVarianceFromSourceWeights m Pop.target)
         ((m.outcomeVariance Pop.target) +
@@ -3252,7 +3237,7 @@ theorem targetEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart {p 
       equalVarianceGaussianAUCFromExplainedR2 (r2FromSourceWeights m Pop.target) := by
   have h_eff_ne : effectiveOutcomeVariance m Pop.target ≠ 0 := by
     exact ne_of_gt (effectiveTargetOutcomeVariance_pos m)
-  unfold equalVarianceGaussianAUCFromSourceWeights equalVarianceGaussianAUCFromVariances Pop.target
+  unfold equalVarianceGaussianAUCFromSourceWeights gaussianAUCFromSignalVariance Pop.target
     residualVarianceFromSourceWeights equalVarianceGaussianAUCFromExplainedR2 Pop.target
     r2FromSourceWeights
   congr 1
@@ -3361,7 +3346,7 @@ theorem targetMetricProfileFromSourceWeights_exact_mechanistic_portability_law
           (predictiveCovarianceFromSourceWeights m Pop.target) ^ 2 /
             (scoreVarianceFromSourceWeights m Pop.target * effectiveOutcomeVariance m Pop.target)
       , auc :=
-          equalVarianceGaussianAUCFromVariances
+          gaussianAUCFromSignalVariance
             ((predictiveCovarianceFromSourceWeights m Pop.target) ^ 2 /
               scoreVarianceFromSourceWeights m Pop.target)
             (effectiveOutcomeVariance m Pop.target -
@@ -3436,7 +3421,7 @@ theorem targetMetricProfileAtGeneration_exact_mechanistic_popgen_portability_law
             (scoreVarianceFromSourceWeights (m.toMetricModelAt t) Pop.target *
               effectiveOutcomeVariance (m.toMetricModelAt t) Pop.target)
       , auc :=
-          equalVarianceGaussianAUCFromVariances
+          gaussianAUCFromSignalVariance
             ((predictiveCovarianceFromSourceWeights (m.toMetricModelAt t) Pop.target) ^ 2 /
               scoreVarianceFromSourceWeights (m.toMetricModelAt t) Pop.target)
             (effectiveOutcomeVariance (m.toMetricModelAt t) Pop.target -

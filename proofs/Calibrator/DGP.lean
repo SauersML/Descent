@@ -2230,7 +2230,7 @@ theorem r2FromSignalVariance_eq_rsquared {k : ℕ} [Fintype (Fin k)]
     **Not the liability-threshold AUC.** The docstring here used to call it
     that. The liability-threshold AUC depends on prevalence, which this
     signature cannot express, and its sibling
-    `equalVarianceGaussianAUCFromVariances` -- which now calls this body --
+    `gaussianAUCFromSignalVariance` -- which now calls this body --
     carries the marker recording that the liability reading is falsified. Two
     copies of one formula had drifted to opposite claims about which quantity
     it is; that is why they are one definition now.

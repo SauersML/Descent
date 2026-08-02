@@ -467,9 +467,9 @@ liability-threshold AUCs and both are exact for the equal-variance model, so
 they must agree. -/
 theorem equalVarianceGaussianAUCFromVariances_eq_aucFromSignalVariance
     (vSignal vNoise : ℝ) :
-    equalVarianceGaussianAUCFromVariances vSignal vNoise =
+    gaussianAUCFromSignalVariance vSignal vNoise =
       TransportedMetrics.gaussianAUCFromSignalVariance vSignal vNoise := by
-  unfold equalVarianceGaussianAUCFromVariances
+  unfold gaussianAUCFromSignalVariance
     TransportedMetrics.gaussianAUCFromSignalVariance
   ring_nf
 
