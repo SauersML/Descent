@@ -33,7 +33,7 @@ TOKEN_RE = re.compile(
   | (?P<num>\d+\.\d+|\d+)
   | (?P<ident>[A-Za-z_Ͱ-Ͽᵪ-ᵿ][A-Za-z_0-9'Ͱ-Ͽ₀-₉ᵢ-ᵪ.]*)
   | (?P<inv>⁻¹)
-  | (?P<op>\*\*|<=|>=|==|≤|≥|≠|∧|∨|[-+*/^()<>,|])
+  | (?P<op>\*\*|<=|>=|==|≤|≥|≠|∧|∨|↔|[-+*/^()<>,|=])
     """,
     re.X,
 )
@@ -159,8 +159,14 @@ class Parser:
         b = self.expr()
         return f"_b.ite({c}, {a}, {b})"
 
+    # `=` is Lean's equality and it was ABSENT from the tokenizer's operator
+    # set, so every equality statement in the corpus failed with "bad char
+    # '='" -- 326 of 482 unusable theorem conclusions, the single largest gap
+    # in the theorem tier.  `==` precedes `=` in the alternation so the
+    # two-character form still wins; `:=` never reaches here, being rewritten
+    # before tokenisation.
     CMPS = {"<": "<", ">": ">", "≤": "<=", "≥": ">=", "=": "==", "≠": "!=",
-            "<=": "<=", ">=": ">=", "==": "=="}
+            "<=": "<=", ">=": ">=", "==": "==", "↔": "=="}
 
     def cmp_(self):
         """Conjunction/disjunction of comparisons.
