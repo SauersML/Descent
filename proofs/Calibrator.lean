@@ -50,6 +50,13 @@ import Calibrator.HaplotypeTheory
 import Calibrator.AncestrySpecificArchitecture
 import Calibrator.AncestrySpecificPower
 import Calibrator.PGSCalibrationTheory
+import Calibrator.Condensation
+import Calibrator.CumulantBlindness
+import Calibrator.JetBarrier
+import Calibrator.LocalToGlobalCoherence
+import Calibrator.HiddenConeAmbiguity
+import Calibrator.LatentMechanismCollapse
+import Calibrator.PolygenicSpectroscopy
 
 namespace Calibrator
 

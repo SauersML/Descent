@@ -640,8 +640,12 @@ theorem ldKernelSymbol_ge_hardEdge {decay angle : ℝ} (hd : |decay| < 1)
       0 ≤ (1 - decay) * (2 * decay * (1 + Real.cos angle)) := by
     exact mul_nonneg hminus
       (mul_nonneg (mul_nonneg (by norm_num) hnonneg) (by linarith))
-  rw [div_le_div_iff₀ hplus hden]
-  nlinarith [hfactor]
+  rw [div_le_div_iff₀ hplus hden, ← sub_nonneg]
+  have hgap : (1 - decay ^ 2) * (1 + decay) -
+      (1 - decay) * (1 - 2 * decay * Real.cos angle + decay ^ 2) =
+      (1 - decay) * (2 * decay * (1 + Real.cos angle)) := by ring
+  rw [hgap]
+  exact hfactor
 
 /-- **The whitening gain is the harmonic mean of the LD spectrum.** This is the
 Szegő value of `tr K⁻¹` per variant, computed in closed form: the quantity that
@@ -667,7 +671,6 @@ theorem ldKernelSymbol_harmonicMean {decay : ℝ} (hd : |decay| < 1) :
   rw [Real.sin_two_pi, Real.sin_zero]
   unfold ldWhiteningGain
   field_simp
-  simp [smul_eq_mul]
 
 theorem ldWhiteningGain_ge_one {decay : ℝ} (hd : |decay| < 1) :
     1 ≤ ldWhiteningGain decay := by
@@ -756,8 +759,7 @@ theorem stationaryLD_boundary_stencil (decay : ℝ) (separation : ℕ) :
       simp [adjacentBoundarySeparation, stationaryLDEntry]
       ring
   | succ d =>
-      simp [adjacentBoundarySeparation, stationaryLDEntry, pow_succ]
-      ring
+      simp [adjacentBoundarySeparation, stationaryLDEntry, pow_succ, mul_comm]
 
 /-- **Interior three-term identity.** Away from the ends of the chromosome the
 geometric LD sequence is annihilated by the tridiagonal AR(1) precision
@@ -792,7 +794,10 @@ theorem stationaryLD_interior_stencil (decay : ℝ) (separation : ℕ) :
       if separation = 0 then 1 - decay ^ 2 else 0 := by
   cases separation with
   | zero =>
-      simpa using stationaryLD_three_term_diagonal decay
+      have hif : (if (0 : ℕ) = 0 then 1 - decay ^ 2 else 0) = 1 - decay ^ 2 :=
+        if_pos rfl
+      rw [hif]
+      exact stationaryLD_three_term_diagonal decay
   | succ d =>
       have hpos : 1 ≤ d + 1 := Nat.succ_le_succ (Nat.zero_le d)
       simpa using stationaryLD_three_term decay (d + 1) hpos
@@ -821,8 +826,8 @@ theorem ldPrecisionTrace_div_sites_tendsto {decay : ℝ} (hd : |decay| < 1) :
   have hne : (1 : ℝ) - decay ^ 2 ≠ 0 := by
     have := sq_abs decay
     nlinarith [abs_nonneg decay, hd]
-  have heq : ∀ᶠ nSites : ℕ in Filter.atTop,
-      ldPrecisionTrace decay nSites / (nSites : ℝ) =
+  have heq : (fun nSites : ℕ => ldPrecisionTrace decay nSites / (nSites : ℝ))
+      =ᶠ[Filter.atTop] fun nSites : ℕ =>
         ldWhiteningGain decay + (1 - ldWhiteningGain decay) / (nSites : ℝ) := by
     filter_upwards [Filter.eventually_ge_atTop 1] with nSites hsites
     have hpos : (0 : ℝ) < (nSites : ℝ) := by
@@ -1070,8 +1075,8 @@ theorem sqrt_alleleLoss_derivative_sq {initial time : ℝ} (htime : 0 < time) :
       absorptionInformation initial time := by
   unfold absorptionInformation
   have hsq : Real.sqrt (alleleLossProbability initial time) ^ 2 =
-      alleleLossProbability initial time :=
-    Real.sq_sqrt (le_of_lt (alleleLossProbability_pos initial time))
+      alleleLossProbability initial time := by
+    rw [sq, Real.mul_self_sqrt (alleleLossProbability_pos initial time).le]
   have hne : time ≠ 0 := ne_of_gt htime
   calc
     4 * (-(1 / (4 * time)) * Real.sqrt (alleleLossProbability initial time)) ^ 2 =

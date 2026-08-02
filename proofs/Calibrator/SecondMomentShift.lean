@@ -36,11 +36,8 @@ theorem dot_rawCrossMoment
       (fun ω => (∑ i, u i * X ω i) * Y ω) =
         ∑ i, (u i) • (fun ω => X ω i * Y ω) := by
     funext ω
-    simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul]
-    rw [Finset.sum_mul]
-    apply Finset.sum_congr rfl
-    intro i _
-    ring
+    simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Finset.sum_mul,
+      mul_assoc]
   rw [hexpand, E.eval_sum]
   apply Finset.sum_congr rfl
   intro i _
