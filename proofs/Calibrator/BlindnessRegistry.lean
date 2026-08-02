@@ -1,5 +1,6 @@
 import Calibrator.ObservationalCeiling
 import Calibrator.DriftRegime
+import Calibrator.EpistaticChaos
 
 namespace Calibrator
 
@@ -333,6 +334,55 @@ theorem averageEffect_separation (a d d' p : ℝ) :
   have h : a + d * (1 - 2 * p) - (a + d' * (1 - 2 * p)) = (1 - 2 * p) * (d - d') := by ring
   simp only
   rw [h, abs_mul]
+
+/-! ### Three facts, one fact
+
+`q = 1/2` occurs three times in this development, proved separately each time:
+
+* `EpistaticChaos.hweThirdCentralMoment_eq` gives the third central moment as
+  `2q(1-q)(1-2q)`, which vanishes there;
+* `EpistaticChaos.standardizedGenotype_symmetric_iff` shows a sign-symmetric coding exists
+  exactly there;
+* instance 8 above shows the average effect loses `d` exactly there.
+
+They are the same fact. The Hardy-Weinberg dosage has one odd degree of freedom about its
+mean; the third moment is its size, sign-symmetry is its vanishing, and the average effect's
+sensitivity to dominance is what it carries. When it collapses, all three collapse together,
+and none of the three is evidence for the others — they are one statement counted thrice.
+
+The theorem below is that identification for the two ends of the chain that had not been
+connected: the moment and the blindness. It matters because the corpus treats
+`hweThirdCentralMoment ≠ 0` as a *hypothesis* in the epistasis arguments, and this says what
+that hypothesis buys — precisely the visibility of dominance to a dosage regression. -/
+
+/-- **The third central moment vanishes exactly when dominance is invisible.** -/
+theorem thirdCentralMoment_zero_iff_dominance_invisible
+    (h : HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
+    hweThirdCentralMoment h = 0 ↔
+      ∀ a d d' : ℝ,
+        (OneLocusArchitecture.mk a d h.altFreq).averageEffect =
+          (OneLocusArchitecture.mk a d' h.altFreq).averageEffect := by
+  have hne : h.altFreq * (1 - h.altFreq) ≠ 0 :=
+    ne_of_gt (mul_pos hq0 (by linarith))
+  rw [hweThirdCentralMoment_eq]
+  constructor
+  · intro hzero a d d'
+    have hfac : 1 - 2 * h.altFreq = 0 := by
+      rcases mul_eq_zero.mp (by linarith [hzero] :
+          (2 * (h.altFreq * (1 - h.altFreq))) * (1 - 2 * h.altFreq) = 0) with hl | hr
+      · exact absurd (by linarith : h.altFreq * (1 - h.altFreq) = 0) hne
+      · exact hr
+    unfold OneLocusArchitecture.averageEffect
+    simp only
+    rw [hfac]
+    ring
+  · intro hall
+    have h1 := hall 0 1 0
+    unfold OneLocusArchitecture.averageEffect at h1
+    simp only at h1
+    have hfac : 1 - 2 * h.altFreq = 0 := by linarith
+    rw [hfac]
+    ring
 
 /-- **Dominance is pinned only to `δ / |1 - 2p|`.**
 

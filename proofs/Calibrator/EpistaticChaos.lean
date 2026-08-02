@@ -381,7 +381,6 @@ frequency-by-frequency applicability verdict is recorded in the module docstring
 and repeated on each symmetry-carrying theorem.
 -/
 
-/-- Expand a sum over the three diploid genotypes. -/
 /-- Third central moment of the hard-called dosage at a Hardy–Weinberg locus.
 
 Empirical status: DERIVED from `HardyWeinbergModel.genotypeProb` and
