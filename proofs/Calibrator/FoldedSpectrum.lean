@@ -942,6 +942,140 @@ structure TwoPointIdentification where
   /-- Markov consistency cuts the tensor kernel. -/
   freedomShrinks : jointFreedom ≤ marginalFreedom
 
+/-! ## 9. The effective-independence dimension `D`, and why it is the effective marker count
+
+Everything above threshold-like is controlled by the same scalar, and it is defined for an
+**arbitrary** coupling — no conditional independence, no regeneration.
+
+*Sequential freshness.* Order the coordinates. The freshness `εᵢ` of coordinate `i` is the
+largest `ε` with `Law(Xᵢ | earlier coordinates) ≥ ε ·` (fiber reference), almost surely.
+Then `D = max over orderings of Σᵢ εᵢ`.
+
+Evaluations, all computable from the coupling data:
+
+| coupling | `D` |
+|---|---|
+| independent | `n` |
+| Harris chain, correlation length `ℓ` | `≈ n/ℓ`, the regeneration count |
+| block-copy, blocks of size `ℓ` | `n/ℓ` **exactly** — one fresh unit per block |
+| Gaussian copula, precision `J` | `≥ c Σᵢ 1/(Jᵢᵢ σᵢ²)` |
+| Gibbs density `e^{-H}` | `≥ Σᵢ e^{-2 osc_i(H)}` |
+
+**The Gaussian-copula line is the one that matters here**: `D` is a spectral functional of
+the *precision matrix*, so it is computable directly from a marker correlation matrix. It
+is a defined invariant with a formula, not a rule of thumb.
+
+**The claim of this section.** The effective number of independent markers is `D`; it is
+computable from the correlation structure; and the effective-test-count estimators
+currently in use do not compute it. The second half is measured, not asserted: two marker
+panels that the standard estimators rated at ratio `0.995`–`1.000` had true separation
+`1.84`, `1.97` and `1.99`, against a certificate demanding a factor of two. The estimators
+were tracking something other than the quantity the theory needs.
+
+What `D` has that those estimators do not is three theorems attached to it: the decay
+exponent is `γ(s)·D` with a matched lower bound; the transfer threshold is `D` against
+`log N`; and the usable slot count in `k`-point data is `min(k, D)`.
+-/
+
+/-- **The effective-independence dimension**, with its consequences as named fields.
+
+`D` is defined for an arbitrary coupling via sequential freshness, so this structure
+carries no independence or regeneration hypothesis at all — which is the point of it. The
+three consequences are fields rather than theorems because their proofs are the upstream
+analytic work, not reproduced here. -/
+structure EffectiveIndependence (n : ℕ) where
+  /-- The dimension `D = max over orderings of Σ εᵢ`. -/
+  D : ℝ
+  D_nonneg : 0 ≤ D
+  /-- `D` never exceeds the coordinate count, with equality exactly for independence. -/
+  D_le_count : D ≤ (n : ℝ)
+  /-- Whether the coordinates are independent. -/
+  independent : Prop
+  independent_iff : independent ↔ D = (n : ℝ)
+  /-- The number of usable slots in `k`-point data. -/
+  usableSlots : ℕ → ℝ
+  /-- **Slot count.** Coupled `k`-point data carries `min(k, D)` usable slots, not `k`. -/
+  usableSlots_eq : ∀ k : ℕ, usableSlots k = min (k : ℝ) D
+
+namespace EffectiveIndependence
+
+variable {n : ℕ} (E : EffectiveIndependence n)
+
+/-- **Adding perfectly correlated markers adds no usable slots.** Once `k` exceeds `D`, the
+slot count stops growing: it is pinned at `D` however many more coordinates are added. -/
+theorem usableSlots_saturates (k : ℕ) (hk : E.D ≤ (k : ℝ)) : E.usableSlots k = E.D := by
+  rw [E.usableSlots_eq k]
+  exact min_eq_right hk
+
+end EffectiveIndependence
+
+/-- **THE MERGED THRESHOLD.** The panel-design condition of §7b and the dependence
+condition of §8 are one condition:
+
+> local theory applies `↔ min(panel dimension, D) ≳ log N`.
+
+The panel needs enough distinct frequencies **and** enough effective independence, and it
+is the *minimum* that binds. Both faces are attained by explicit constructions, so neither
+half is slack: a panel can fail by having too few distinct frequencies at full independence,
+or by having ample frequency diversity in one correlated block. -/
+structure MergedThreshold (n : ℕ) where
+  /-- The panel's dimension — its count of distinct marker frequencies. -/
+  panelDimension : ℝ
+  /-- The effective-independence dimension of the coupling. -/
+  effective : EffectiveIndependence n
+  /-- Score length. -/
+  scoreLength : ℝ
+  scoreLength_pos : 1 < scoreLength
+  constant : ℝ
+  constant_pos : 0 < constant
+  /-- Whether local-limit and expansion theory transfers. -/
+  transfers : Prop
+  /-- **The merged criterion.** -/
+  criterion : transfers ↔
+    constant * Real.log scoreLength < min panelDimension effective.D
+
+namespace MergedThreshold
+
+variable {n : ℕ} (M : MergedThreshold n)
+
+/-- **Either face alone can fail the criterion.** Frequency diversity does not rescue a
+correlated panel, and independence does not rescue a monotonous one. -/
+theorem transfers_needs_both (h : M.transfers) :
+    M.constant * Real.log M.scoreLength < M.panelDimension ∧
+      M.constant * Real.log M.scoreLength < M.effective.D := by
+  have hmin := (M.criterion).mp h
+  exact ⟨lt_of_lt_of_le hmin (min_le_left _ _), lt_of_lt_of_le hmin (min_le_right _ _)⟩
+
+end MergedThreshold
+
+/-- **THE FALSIFIER, AND THE DESIGN CONSEQUENCE: modulus-copy coupling.**
+
+Take two slots at equal fibers with the second an **exact modulus copy** of the first. The
+two-point modulus law collapses onto a diagonal, and its kernel then contains *every*
+perturbation that fixes the first marginal — an infinite-dimensional kernel, present even
+when the one-point map is injective.
+
+So **coupled `k`-point data can be strictly blinder than `k` independent one-point
+observations**, and the deficit is exactly the freshness deficit `k - D`.
+
+In panel terms, and this is the useful sentence: **perfectly correlated markers contribute
+nothing, and adding them does not merely fail to help — it can destroy identifiability that
+the same markers would have had independently.** That is why adding correlated markers adds
+no information, stated with a mechanism rather than as folklore, and it is what makes `D` a
+design criterion rather than a diagnostic. -/
+structure ModulusCopyCoupling (K : ℕ) where
+  /-- The bundle family the two slots draw from. -/
+  family : BundleFamily K
+  /-- The shared fiber parameter of the two slots. -/
+  fiber : ℝ
+  /-- The one-point modulus map is injective — the copy blindness is not inherited from a
+  defect at one point. -/
+  oneSiteInjective : Prop
+  /-- The two-point kernel contains every perturbation fixing the first marginal. -/
+  kernelContainsMarginalFixing : Prop
+  /-- **The collapse.** -/
+  collapse : oneSiteInjective → kernelContainsMarginalFixing
+
 /-!
 ## What is left open, plainly
 
@@ -954,16 +1088,39 @@ structure TwoPointIdentification where
   and declines the interesting ones.
 * **The slice-map step** in `TwoPointIdentification` is unproved and is carried as a
   hypothesis field.
-* **The continuum spectrum.** The diploid family's core is full — coverage multiplicity is
-  four on `(0,1)` and two above, never one — so the peeling criterion says nothing about a
-  continuously distributed spectrum. Whether the folded continuum spectrum is identifiable
-  from modulus data is **open**, and it is open as a sharp dichotomy: if the family's trip
-  semigroup is *free* (with subexponential overlap growth) the folded spectrum is
-  identifiable; if it satisfies any *relation* there is an explicit infinite-dimensional
-  family of distinct spectra with identical modulus data. Which of the two holds is under
-  computation elsewhere and **nothing in this file assumes either answer**.
+* **The continuum spectrum — open, and the gap with the finite case is total.** The finite
+  theorem of §7b is unconditional; the continuum statement is not proved, and the evidence
+  in its favour (free semigroup, no relations to word length five, no `M5` mechanism) does
+  **not** settle it. Three reasons, the third being the informative one:
 
-  A superseded form of that criterion should not be quoted: it was conjectured that
+  1. Exhaustiveness of the mechanism list is proved only for **atomic** flows, so the
+     negative result establishes only that no *atomic* kernel exists.
+  2. Peeling needs a minimum to exist. A continuous measure with `inf supp = 0` has none
+     and the argument does not start.
+  3. **Restricted to the doubly-covered band alone, the family is not rigid.** The kernel
+     recursion `w(ψ(s)) = -2s·w(s)` has nonzero, rapidly summable solutions along any
+     `ψ`-orbit. What kills them is the *reference* branch, injective on each of `(0,1/3)`
+     and `(1/3,1/2)`, which forces singly-covered values — and that was verified only for
+     atomic supports. So it is the third branch of the genotype coding, not the band, that
+     makes the family rigid. That identifies which feature of the coding does the work.
+
+  For the record, `M5` cannot arise **in this family** for two independent reasons: image
+  containment is total, so the image-free region where the mechanism would have to live is
+  empty; and the band has exactly two sheets, hence one return generator, so the composition
+  `M5` needs is not formable. This is a statement about the genotype family only. The
+  general claim that `M5` is unrealizable in any analytic family is **withdrawn**: an
+  explicit eight-atom recipe realizes it. The reason the earlier obstruction looked general
+  is worth keeping, because the principle is: *continuation kills identities, not
+  inequalities.* It forbids exact operator identities across sheets of one analytic curve,
+  while `M5` needs only open conditions — strict containment, a fixed point in an open gap,
+  a strict inequality — and open conditions survive continuation.
+
+  Relatedly, the operator classification behind these negatives is **closed for atomic
+  kernels and only partial for continuous ones**: an exact criterion in the atomic case,
+  classification open off the smooth and translation strata. Every negative result quoted
+  here therefore covers atomic kernels only.
+
+  A superseded form of the criterion should not be quoted: it was conjectured that
   non-identifiability additionally requires a relation whose weight product equals one.
   **That is refuted** — a counterexample has a kernel with weight product `98/27`.
   Relations alone suffice, with no condition on weights.
