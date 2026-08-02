@@ -42,6 +42,32 @@ def _finite(v):
     return v
 
 
+# The representable range of the exponential in double precision. Outside it
+# `math.exp` either raises OverflowError or returns exactly 0.0.
+EXP_HI = 709.0
+EXP_LO = -745.0
+
+
+def _exp_range(x):
+    """Flag an exponent argument outside what double precision can represent.
+
+    UNDERFLOW IS THE SAME BUG AS OVERFLOW AND I FIXED ONLY ONE OF THEM.
+    `exp(-800)` returns exactly 0.0 -- a finite, innocuous-looking value that
+    passes every non-finiteness check while having lost the entire quantity.
+    `gradeCertifiedRisk` at eps = 6.5, c = 3.2e-06 raises eps to the -3925,
+    underflows to 0.0, and then compares unequal to eps with both sides
+    finite: precisely the collapse-back shape, arrived at from below instead
+    of from above.
+
+    Checking the ARGUMENT rather than the result catches both directions at
+    once, because both are the same event -- a value leaving the range the
+    format can hold.
+    """
+    if x > EXP_HI or x < EXP_LO:
+        OVERFLOWED[0] = True
+    return x
+
+
 # --------------------------------------------------------------- float
 
 
@@ -61,7 +87,7 @@ class FloatBackend:
     @staticmethod
     def exp(x):
         try:
-            return _finite(math.exp(x))
+            return _finite(math.exp(_exp_range(x)))
         except OverflowError:
             OVERFLOWED[0] = True
             return math.inf
@@ -141,8 +167,9 @@ class FloatBackend:
             return 1.0 if b == 0 else 0.0
         try:
             if a > 0:
-                return _finite(math.exp(b * math.log(a)))
-            return _finite(math.exp(b * math.log(-a)) * math.cos(b * math.pi))
+                return _finite(math.exp(_exp_range(b * math.log(a))))
+            return _finite(math.exp(_exp_range(b * math.log(-a)))
+                           * math.cos(b * math.pi))
         except OverflowError:
             OVERFLOWED[0] = True
             return math.inf
