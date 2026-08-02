@@ -517,7 +517,7 @@
   "file": "Calibrator/DemographicHistory.lean",
   "line": 271,
   "state": "COVERED",
-  "why": "admixedFst-ratio-not-numerator",
+  "why": "analytic admixedFst-ratio-not-numerator",
   "empirical_status": "UNTESTED",
   "extractable": true
  },
@@ -553,7 +553,7 @@
   "file": "Calibrator/PopulationGeneticsFoundations.lean",
   "line": 1050,
   "state": "COVERED",
-  "why": "alleleFreqAfterMigration",
+  "why": "analytic alleleFreqAfterMigration",
   "empirical_status": "UNTESTED",
   "extractable": true
  },
@@ -688,7 +688,7 @@
   "file": "Calibrator/PopulationGeneticsFoundations.lean",
   "line": 127,
   "state": "COVERED",
-  "why": "coalFst-exact-split,coalFst-asymmetric-sizes",
+  "why": "analytic coalFst-exact-split,coalFst-asymmetric-sizes",
   "empirical_status": "UNTESTED",
   "extractable": true
  },
@@ -751,7 +751,7 @@
   "file": "Calibrator/PopulationGeneticsFoundations.lean",
   "line": 1003,
   "state": "COVERED",
-  "why": "steppingStone-cross-file-contradiction",
+  "why": "analytic steppingStone-cross-file-contradiction",
   "empirical_status": "UNTESTED",
   "extractable": true
  },
@@ -823,7 +823,7 @@
   "file": "Calibrator/DemographicHistory.lean",
   "line": 506,
   "state": "COVERED",
-  "why": "cumulativeDrift-first-order",
+  "why": "SIMULATION heavy/h0_heterozygosity_cluster.py + analytic cumulativeDrift-first-order",
   "empirical_status": "UNTESTED",
   "extractable": true
  },
@@ -841,7 +841,7 @@
   "file": "Calibrator/DemographicHistory.lean",
   "line": 134,
   "state": "COVERED",
-  "why": "demoSteppingStoneFst-exact",
+  "why": "analytic demoSteppingStoneFst-exact",
   "empirical_status": "CONDITIONALLY VALID",
   "extractable": true
  },
@@ -922,7 +922,7 @@
   "file": "Calibrator/LDDecayTheory.lean",
   "line": 300,
   "state": "COVERED",
-  "why": "driftLDEquilibrium-exact-fixedpoint,driftLDEquilibrium-vs-ohta-kimura",
+  "why": "analytic driftLDEquilibrium-exact-fixedpoint,driftLDEquilibrium-vs-ohta-kimura",
   "empirical_status": "UNTESTED",
   "extractable": true
  },
@@ -949,7 +949,7 @@
   "file": "Calibrator/LDDecayTheory.lean",
   "line": 495,
   "state": "COVERED",
-  "why": "driftLDTrajectory-converges",
+  "why": "analytic driftLDTrajectory-converges",
   "empirical_status": "UNTESTED",
   "extractable": true
  },
@@ -1129,7 +1129,7 @@
   "file": "Calibrator/PopulationGeneticsFoundations.lean",
   "line": 1227,
   "state": "COVERED",
-  "why": "fstDerived-is-not-split-fst,fstDerived-is-coalescence-prob",
+  "why": "SIMULATION heavy/h0_heterozygosity_cluster.py + analytic fstDerived-is-not-split-fst,fstDerived-is-coalescence-prob",
   "empirical_status": "FALSIFIED",
   "extractable": true
  },
@@ -1183,7 +1183,7 @@
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 41,
   "state": "COVERED",
-  "why": "fstFromGenerations-equals-coalFst",
+  "why": "analytic fstFromGenerations-equals-coalFst",
   "empirical_status": "",
   "extractable": true
  },
@@ -1210,7 +1210,7 @@
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 4803,
   "state": "COVERED",
-  "why": "fstIslandMultiplicative-exact-fixedpoint",
+  "why": "analytic fstIslandMultiplicative-exact-fixedpoint",
   "empirical_status": "UNTESTED",
   "extractable": true
  },
@@ -1273,7 +1273,7 @@
   "file": "Calibrator/PopulationGeneticsFoundations.lean",
   "line": 1533,
   "state": "COVERED",
-  "why": "transient-discrete-vs-continuous",
+  "why": "analytic transient-discrete-vs-continuous",
   "empirical_status": "UNTESTED",
   "extractable": true
  },
@@ -1282,7 +1282,7 @@
   "file": "Calibrator/DemographicHistory.lean",
   "line": 510,
   "state": "COVERED",
-  "why": "fstVariableNe-vs-exact-product",
+  "why": "SIMULATION heavy/h0_heterozygosity_cluster.py + analytic fstVariableNe-vs-exact-product",
   "empirical_status": "",
   "extractable": true
  },
@@ -1291,7 +1291,7 @@
   "file": "Calibrator/LDDecayTheory.lean",
   "line": 578,
   "state": "COVERED",
-  "why": "harmonicMeanNe-is-harmonic-mean",
+  "why": "analytic harmonicMeanNe-is-harmonic-mean",
   "empirical_status": "",
   "extractable": true
  },
@@ -1309,7 +1309,7 @@
   "file": "Calibrator/PopulationGeneticsFoundations.lean",
   "line": 1460,
   "state": "COVERED",
-  "why": "hetDecayFactor-vs-exact-eigenvalue",
+  "why": "analytic hetDecayFactor-vs-exact-eigenvalue",
   "empirical_status": "UNTESTED",
   "extractable": true
  },
@@ -1318,7 +1318,7 @@
   "file": "Calibrator/PopulationGeneticsFoundations.lean",
   "line": 1310,
   "state": "COVERED",
-  "why": "hetEquilibrium-vs-exact-iam",
+  "why": "analytic hetEquilibrium-vs-exact-iam",
   "empirical_status": "",
   "extractable": true
  },
@@ -1327,7 +1327,7 @@
   "file": "Calibrator/PopulationGeneticsFoundations.lean",
   "line": 1303,
   "state": "COVERED",
-  "why": "hetMutationDriftRecurrence-trajectory",
+  "why": "analytic hetMutationDriftRecurrence-trajectory",
   "empirical_status": "UNTESTED",
   "extractable": true
  },
@@ -1363,7 +1363,7 @@
   "file": "Calibrator/PopulationGeneticsFoundations.lean",
   "line": 1186,
   "state": "COVERED",
-  "why": "hetRecurrence-at-mutation-drift-balance",
+  "why": "SIMULATION heavy/h0_heterozygosity_cluster.py + analytic hetRecurrence-at-mutation-drift-balance",
   "empirical_status": "",
   "extractable": true
  },
@@ -1381,7 +1381,7 @@
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 443,
   "state": "COVERED",
-  "why": "hetTrajectory-vs-exact-iam",
+  "why": "analytic hetTrajectory-vs-exact-iam",
   "empirical_status": "UNTESTED",
   "extractable": true
  },
@@ -1390,7 +1390,7 @@
   "file": "Calibrator/PopulationGeneticsFoundations.lean",
   "line": 454,
   "state": "COVERED",
-  "why": "hetLossFromDrift-duplicates-fstDerived",
+  "why": "SIMULATION heavy/h0_heterozygosity_cluster.py + analytic hetLossFromDrift-duplicates-fstDerived",
   "empirical_status": "VALIDATED",
   "extractable": true
  },
@@ -1480,7 +1480,7 @@
   "file": "Calibrator/PopulationGeneticsFoundations.lean",
   "line": 869,
   "state": "COVERED",
-  "why": "islandModelFst-finite-demes,islandModelFst-vs-exact-in-m",
+  "why": "analytic islandModelFst-finite-demes,islandModelFst-vs-exact-in-m",
   "empirical_status": "CONDITIONALLY VALID",
   "extractable": true
  },
@@ -1561,7 +1561,7 @@
   "file": "Calibrator/PopulationGeneticsFoundations.lean",
   "line": 1117,
   "state": "COVERED",
-  "why": "ldCorrelationFromMigration-vs-sharedLD-squared",
+  "why": "analytic ldCorrelationFromMigration-vs-sharedLD-squared",
   "empirical_status": "UNTESTED",
   "extractable": true
  },
@@ -1579,7 +1579,7 @@
   "file": "Calibrator/LDDecayTheory.lean",
   "line": 828,
   "state": "COVERED",
-  "why": "ldHalfLife-drops-recombination",
+  "why": "analytic ldHalfLife-drops-recombination",
   "empirical_status": "UNTESTED",
   "extractable": true
  },
@@ -1588,7 +1588,7 @@
   "file": "Calibrator/LDDecayTheory.lean",
   "line": 545,
   "state": "COVERED",
-  "why": "ldMismatchFrobenius-exact",
+  "why": "analytic ldMismatchFrobenius-exact",
   "empirical_status": "UNTESTED",
   "extractable": true
  },
@@ -1606,7 +1606,7 @@
   "file": "Calibrator/LDDecayTheory.lean",
   "line": 948,
   "state": "COVERED",
-  "why": "ldRecurrence-drops-drift",
+  "why": "analytic ldRecurrence-drops-drift",
   "empirical_status": "UNTESTED",
   "extractable": true
  },
@@ -1615,7 +1615,7 @@
   "file": "Calibrator/LDDecayTheory.lean",
   "line": 884,
   "state": "COVERED",
-  "why": "ldRetainedFraction-inconsistent-with-retention",
+  "why": "analytic ldRetainedFraction-inconsistent-with-retention",
   "empirical_status": "FALSIFIED",
   "extractable": true
  },
@@ -1624,7 +1624,7 @@
   "file": "Calibrator/LDDecayTheory.lean",
   "line": 45,
   "state": "COVERED",
-  "why": "ldRetentionPerGen-exact",
+  "why": "analytic ldRetentionPerGen-exact",
   "empirical_status": "VALIDATED",
   "extractable": true
  },
@@ -1777,7 +1777,7 @@
   "file": "Calibrator/PopulationGeneticsFoundations.lean",
   "line": 42,
   "state": "COVERED",
-  "why": "neiFst-identity",
+  "why": "analytic neiFst-identity",
   "empirical_status": "UNTESTED",
   "extractable": true
  },
@@ -1804,7 +1804,7 @@
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 2977,
   "state": "COVERED",
-  "why": "neutralAFBenchmarkRatio-bounded",
+  "why": "analytic neutralAFBenchmarkRatio-bounded",
   "empirical_status": "FALSIFIED",
   "extractable": true
  },
@@ -1903,7 +1903,7 @@
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 92,
   "state": "COVERED",
-  "why": "pairwiseFstFromBranchTaus-correct-composition",
+  "why": "analytic pairwiseFstFromBranchTaus-correct-composition",
   "empirical_status": "UNTESTED",
   "extractable": true
  },
@@ -1912,7 +1912,7 @@
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 73,
   "state": "COVERED",
-  "why": "pairwiseFstFromBranches",
+  "why": "analytic pairwiseFstFromBranches",
   "empirical_status": "CONDITIONALLY VALID",
   "extractable": true
  },
@@ -2092,7 +2092,7 @@
   "file": "Calibrator/PopulationGeneticsFoundations.lean",
   "line": 243,
   "state": "COVERED",
-  "why": "selectionMigrationEquilibrium",
+  "why": "analytic selectionMigrationEquilibrium",
   "empirical_status": "VALIDATED",
   "extractable": true
  },
@@ -2200,7 +2200,7 @@
   "file": "Calibrator/PopulationGeneticsFoundations.lean",
   "line": 60,
   "state": "COVERED",
-  "why": "simpleFst-is-nei,simpleFst-vs-hudson",
+  "why": "analytic simpleFst-is-nei,simpleFst-vs-hudson",
   "empirical_status": "UNTESTED",
   "extractable": true
  },
@@ -2371,7 +2371,7 @@
   "file": "Calibrator/PopulationGeneticsFoundations.lean",
   "line": 989,
   "state": "COVERED",
-  "why": "steppingStoneLength-missing-mutation",
+  "why": "analytic steppingStoneLength-missing-mutation",
   "empirical_status": "UNTESTED",
   "extractable": true
  },
@@ -2875,7 +2875,7 @@
   "file": "Calibrator/PopulationGeneticsFoundations.lean",
   "line": 422,
   "state": "COVERED",
-  "why": "wrightFIT-composition",
+  "why": "analytic wrightFIT-composition",
   "empirical_status": "",
   "extractable": true
  },
@@ -2883,8 +2883,8 @@
   "definition": "Calibrator.wrightFisherDriftRetention",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 710,
-  "state": "UNACCOUNTED",
-  "why": "",
+  "state": "COVERED",
+  "why": "SIMULATION heavy/h0_heterozygosity_cluster.py",
   "empirical_status": "UNTESTED",
   "extractable": true
  },
@@ -2892,8 +2892,8 @@
   "definition": "Calibrator.wrightFisherHeterozygosityLoss",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 730,
-  "state": "UNACCOUNTED",
-  "why": "",
+  "state": "COVERED",
+  "why": "SIMULATION heavy/h0_heterozygosity_cluster.py",
   "empirical_status": "FALSIFIED",
   "extractable": true
  }

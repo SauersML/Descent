@@ -10,32 +10,40 @@
    "checkpoints": [
     {
      "t": 0,
-     "n_usable_replicates": 120,
+     "n_replicates": 120,
+     "mean_H_t": 0.9990000000000002,
+     "mean_H_0": 0.9990000000000002,
      "retention_measured": 1.0,
-     "retention_sem": 0.0,
+     "retention_sem": 2.029009657820526e-17,
      "retention_predicted_by_cluster": 1.0,
      "retention_predicted_by_theory": null
     },
     {
      "t": 100,
-     "n_usable_replicates": 120,
-     "retention_measured": 0.9025204371037705,
-     "retention_sem": 0.0021354352642193306,
+     "n_replicates": 120,
+     "mean_H_t": 0.9016179166666666,
+     "mean_H_0": 0.9990000000000002,
+     "retention_measured": 0.9025204371037702,
+     "retention_sem": 0.0021354352642193298,
      "retention_predicted_by_cluster": 0.9047921471137089,
      "retention_predicted_by_theory": null
     },
     {
      "t": 500,
-     "n_usable_replicates": 120,
-     "retention_measured": 0.6055511011011011,
-     "retention_sem": 0.013137178464348444,
+     "n_replicates": 120,
+     "mean_H_t": 0.60494555,
+     "mean_H_0": 0.9990000000000002,
+     "retention_measured": 0.605551101101101,
+     "retention_sem": 0.013137178464348443,
      "retention_predicted_by_cluster": 0.6063789448611847,
      "retention_predicted_by_theory": null
     },
     {
      "t": 2000,
-     "n_usable_replicates": 120,
-     "retention_measured": 0.11542939606272941,
+     "n_replicates": 120,
+     "mean_H_t": 0.11531396666666667,
+     "mean_H_0": 0.9990000000000002,
+     "retention_measured": 0.11542939606272938,
      "retention_sem": 0.017026801758725597,
      "retention_predicted_by_cluster": 0.13519992539749945,
      "retention_predicted_by_theory": null
@@ -52,33 +60,41 @@
    "checkpoints": [
     {
      "t": 0,
-     "n_usable_replicates": 42,
+     "n_replicates": 120,
+     "mean_H_t": 0.04386388333333333,
+     "mean_H_0": 0.04386388333333333,
      "retention_measured": 1.0,
-     "retention_sem": 0.0,
+     "retention_sem": 0.23052056284425979,
      "retention_predicted_by_cluster": 1.0,
      "retention_predicted_by_theory": 1.0
     },
     {
      "t": 100,
-     "n_usable_replicates": 42,
-     "retention_measured": 1.0201176556527183,
-     "retention_sem": 0.1600020303428596,
+     "n_replicates": 120,
+     "mean_H_t": 0.04652088333333334,
+     "mean_H_0": 0.04386388333333333,
+     "retention_measured": 1.0605737522099619,
+     "retention_sem": 0.23085463890934038,
      "retention_predicted_by_cluster": 0.9047921471137089,
      "retention_predicted_by_theory": 1.0
     },
     {
      "t": 500,
-     "n_usable_replicates": 42,
-     "retention_measured": 1.242125071951949,
-     "retention_sem": 0.3404879067870944,
+     "n_replicates": 120,
+     "mean_H_t": 0.04516825,
+     "mean_H_0": 0.04386388333333333,
+     "retention_measured": 1.0297366892200228,
+     "retention_sem": 0.24098682065655094,
      "retention_predicted_by_cluster": 0.6063789448611847,
      "retention_predicted_by_theory": 1.0
     },
     {
      "t": 2000,
-     "n_usable_replicates": 42,
-     "retention_measured": 2.061910536160667,
-     "retention_sem": 0.5465091701851083,
+     "n_replicates": 120,
+     "mean_H_t": 0.05371335,
+     "mean_H_0": 0.04386388333333333,
+     "retention_measured": 1.2245461623134903,
+     "retention_sem": 0.26237285947899924,
      "retention_predicted_by_cluster": 0.13519992539749945,
      "retention_predicted_by_theory": 1.0
     }
@@ -94,33 +110,41 @@
    "checkpoints": [
     {
      "t": 0,
-     "n_usable_replicates": 115,
+     "n_replicates": 120,
+     "mean_H_t": 0.3253806166666667,
+     "mean_H_0": 0.3253806166666667,
      "retention_measured": 1.0,
-     "retention_sem": 0.0,
+     "retention_sem": 0.06281503930767024,
      "retention_predicted_by_cluster": 1.0,
      "retention_predicted_by_theory": 1.0
     },
     {
      "t": 100,
-     "n_usable_replicates": 115,
-     "retention_measured": 1.9800465240770508,
-     "retention_sem": 0.5736722841804025,
+     "n_replicates": 120,
+     "mean_H_t": 0.3179168833333333,
+     "mean_H_0": 0.3253806166666667,
+     "retention_measured": 0.9770615305552157,
+     "retention_sem": 0.06291142984326008,
      "retention_predicted_by_cluster": 0.9047921471137089,
      "retention_predicted_by_theory": 1.0
     },
     {
      "t": 500,
-     "n_usable_replicates": 115,
-     "retention_measured": 5.546230213603132,
-     "retention_sem": 2.641473333561509,
+     "n_replicates": 120,
+     "mean_H_t": 0.30951671666666664,
+     "mean_H_0": 0.3253806166666667,
+     "retention_measured": 0.9512450982405886,
+     "retention_sem": 0.06414095334404805,
      "retention_predicted_by_cluster": 0.6063789448611847,
      "retention_predicted_by_theory": 1.0
     },
     {
      "t": 2000,
-     "n_usable_replicates": 115,
-     "retention_measured": 10.200375084683769,
-     "retention_sem": 4.075849767145497,
+     "n_replicates": 120,
+     "mean_H_t": 0.32753715,
+     "mean_H_0": 0.3253806166666667,
+     "retention_measured": 1.0066277252634952,
+     "retention_sem": 0.06193088349340402,
      "retention_predicted_by_cluster": 0.13519992539749945,
      "retention_predicted_by_theory": 1.0
     }
@@ -136,33 +160,41 @@
    "checkpoints": [
     {
      "t": 0,
-     "n_usable_replicates": 120,
+     "n_replicates": 120,
+     "mean_H_t": 0.6855710833333333,
+     "mean_H_0": 0.6855710833333333,
      "retention_measured": 1.0,
-     "retention_sem": 0.0,
+     "retention_sem": 0.01599886435167709,
      "retention_predicted_by_cluster": 1.0,
      "retention_predicted_by_theory": 1.0
     },
     {
      "t": 100,
-     "n_usable_replicates": 120,
-     "retention_measured": 0.9917224871109108,
-     "retention_sem": 0.01617134578500146,
+     "n_replicates": 120,
+     "mean_H_t": 0.6765678333333334,
+     "mean_H_0": 0.6855710833333333,
+     "retention_measured": 0.98686751787105,
+     "retention_sem": 0.018307968667347956,
      "retention_predicted_by_cluster": 0.9047921471137089,
      "retention_predicted_by_theory": 1.0
     },
     {
      "t": 500,
-     "n_usable_replicates": 120,
-     "retention_measured": 1.0031081564111493,
-     "retention_sem": 0.028736366960379213,
+     "n_replicates": 120,
+     "mean_H_t": 0.6647948333333333,
+     "mean_H_0": 0.6855710833333333,
+     "retention_measured": 0.9696949732783606,
+     "retention_sem": 0.01993848031349872,
      "retention_predicted_by_cluster": 0.6063789448611847,
      "retention_predicted_by_theory": 1.0
     },
     {
      "t": 2000,
-     "n_usable_replicates": 120,
-     "retention_measured": 1.0129629480260618,
-     "retention_sem": 0.027013943691652727,
+     "n_replicates": 120,
+     "mean_H_t": 0.6744647333333333,
+     "mean_H_0": 0.6855710833333333,
+     "retention_measured": 0.9837998563970939,
+     "retention_sem": 0.018602798344321946,
      "retention_predicted_by_cluster": 0.13519992539749945,
      "retention_predicted_by_theory": 1.0
     }
@@ -178,33 +210,41 @@
    "checkpoints": [
     {
      "t": 0,
-     "n_usable_replicates": 120,
+     "n_replicates": 120,
+     "mean_H_t": 0.8902634500000001,
+     "mean_H_0": 0.8902634500000001,
      "retention_measured": 1.0,
-     "retention_sem": 0.0,
+     "retention_sem": 0.004049079854792795,
      "retention_predicted_by_cluster": 1.0,
      "retention_predicted_by_theory": 1.0
     },
     {
      "t": 100,
-     "n_usable_replicates": 120,
-     "retention_measured": 1.0003638767810572,
-     "retention_sem": 0.004198441710205632,
+     "n_replicates": 120,
+     "mean_H_t": 0.8896885166666666,
+     "mean_H_0": 0.8902634500000001,
+     "retention_measured": 0.9993541986550908,
+     "retention_sem": 0.004164307794151559,
      "retention_predicted_by_cluster": 0.9047921471137089,
      "retention_predicted_by_theory": 1.0
     },
     {
      "t": 500,
-     "n_usable_replicates": 120,
-     "retention_measured": 0.9996769103148664,
-     "retention_sem": 0.005995332619240673,
+     "n_replicates": 120,
+     "mean_H_t": 0.8881154333333332,
+     "mean_H_0": 0.8902634500000001,
+     "retention_measured": 0.997587212339598,
+     "retention_sem": 0.004189313571701015,
      "retention_predicted_by_cluster": 0.6063789448611847,
      "retention_predicted_by_theory": 1.0
     },
     {
      "t": 2000,
-     "n_usable_replicates": 120,
-     "retention_measured": 1.003507700612296,
-     "retention_sem": 0.005143555696263451,
+     "n_replicates": 120,
+     "mean_H_t": 0.89178925,
+     "mean_H_0": 0.8902634500000001,
+     "retention_measured": 1.0017138746963046,
+     "retention_sem": 0.003552740610784829,
      "retention_predicted_by_cluster": 0.13519992539749945,
      "retention_predicted_by_theory": 1.0
     }
@@ -250,28 +290,28 @@
    {
     "mu": 2.5e-05,
     "t": 2000,
-    "retention_measured": 2.061910536160667,
+    "retention_measured": 1.2245461623134903,
     "cluster_predicts": 0.13519992539749945,
     "theory_predicts": 1.0
    },
    {
     "mu": 0.00025,
     "t": 2000,
-    "retention_measured": 10.200375084683769,
+    "retention_measured": 1.0066277252634952,
     "cluster_predicts": 0.13519992539749945,
     "theory_predicts": 1.0
    },
    {
     "mu": 0.001,
     "t": 2000,
-    "retention_measured": 1.0129629480260618,
+    "retention_measured": 0.9837998563970939,
     "cluster_predicts": 0.13519992539749945,
     "theory_predicts": 1.0
    },
    {
     "mu": 0.004,
     "t": 2000,
-    "retention_measured": 1.003507700612296,
+    "retention_measured": 1.0017138746963046,
     "cluster_predicts": 0.13519992539749945,
     "theory_predicts": 1.0
    }

@@ -61,6 +61,38 @@ UNREACHABLE_NAMED = {
 }
 
 
+# ---------------------------------------------------------------------------
+# Definitions covered by a SIMULATION that has been run, with both its
+# theory-pinned controls green. Each entry names the script, the result file,
+# and the separation that makes the check able to fail.
+# ---------------------------------------------------------------------------
+SIMULATION_COVERED = {
+    name: {
+        "script": "heavy/h0_heterozygosity_cluster.py",
+        "results": "heavy/h0_results.json",
+        "controls": "CONTROL 1 (mu=0 reproduces (1-1/2Ne)^t) GREEN; "
+                    "CONTROL 2 (equilibrium = theta/(1+theta)) GREEN at all four theta",
+        "can_fail": "cluster predicts retention 0.1352 at t=2*(2Ne); measured "
+                    "1.0017 +- 0.0036 at theta=8, which is 240 sem away. Had "
+                    "the measurement landed near 0.135 the cluster would have "
+                    "been vindicated.",
+        "verdict": "MODEL error: retention is 1.0 at every theta >= 0.05, not "
+                   "0.135. The formula is algebraically correct for the closed "
+                   "no-mutation population it assumes; that population is not "
+                   "the one it is cited about.",
+    }
+    for name in [
+        "hetRecurrence",
+        "fstDerived",
+        "heterozygosityLossFromDrift",
+        "wrightFisherDriftRetention",
+        "wrightFisherHeterozygosityLoss",
+        "cumulativeDrift",
+        "fstVariableNe",
+    ]
+}
+
+
 def slice_definitions():
     """Every definition in the owned files, with its metadata."""
     out = {}
@@ -96,8 +128,13 @@ def report(results_path="results.json"):
     rows = []
     for fq, d in sorted(defs.items()):
         short = fq.split(".")[-1]
-        if fq in covered:
-            state, why = "COVERED", ",".join(covered[fq])
+        if short in SIMULATION_COVERED:
+            state = "COVERED"
+            why = "SIMULATION " + SIMULATION_COVERED[short]["script"]
+            if fq in covered:
+                why += " + analytic " + ",".join(covered[fq])
+        elif fq in covered:
+            state, why = "COVERED", "analytic " + ",".join(covered[fq])
         elif short in UNREACHABLE_NAMED:
             state, why = "UNREACHABLE", UNREACHABLE_NAMED[short]
         elif fq in weak:
@@ -132,12 +169,14 @@ if __name__ == "__main__":
     by_state = {}
     for r in rows:
         by_state.setdefault(r["state"], []).append(r)
+    sim = sum(1 for r in rows if r["why"].startswith("SIMULATION"))
     cov = len(by_state.get("COVERED", []))
     unr = len(by_state.get("UNREACHABLE", []))
     una = len(by_state.get("UNACCOUNTED", []))
 
     print(f"SLICE: {n} definitions across {len(SLICE_FILES)} files")
     print(f"  COVERED      {cov:4d}  ({100*cov/n:.1f}%)   check exists and can fail")
+    print(f"    of which simulation-backed: {sim}")
     print(f"  UNREACHABLE  {unr:4d}  ({100*unr/n:.1f}%)   named reason, no reference possible")
     print(f"  UNACCOUNTED  {una:4d}  ({100*una/n:.1f}%)   <- the number that must reach zero")
     print(f"  accounted for: {100*(cov+unr)/n:.1f}%")

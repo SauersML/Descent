@@ -247,15 +247,27 @@ def main():
                 cur, next_label = evolve(cur, mu, t - prev_t, rng, next_label)
                 prev_t = t
             h = heterozygosity(cur)
-            # A replicate with no variation at t=0 has no retention ratio. Drop
-            # it rather than let 0/0 or a huge quotient enter the mean.
-            usable = h0 > 1e-3
-            ratio = np.where(usable, h / np.where(usable, h0, 1.0), np.nan)
+            # RATIO OF MEANS, not mean of ratios.
+            #
+            # Taking a per-replicate ratio and averaging requires dropping
+            # replicates that are monomorphic at t=0, and that conditioning is
+            # not innocent: it keeps exactly the replicates that happened to be
+            # unusually variable, which then regress upward. It produced
+            # retention of 10.2 at theta=0.5 -- above the theoretical maximum
+            # of 1.0, which is how the bias announced itself.
+            #
+            # E[H(t)] / E[H(0)] needs no conditioning, uses every replicate,
+            # and is exactly 1 at equilibrium.
+            ratio = np.array([h.mean() / h0.mean()]) if h0.mean() > 0 else np.array([np.nan])
             row["checkpoints"].append({
                 "t": t,
-                "n_usable_replicates": int(np.sum(h0 > 1e-3)),
+                "n_replicates": int(len(h0)),
+                "mean_H_t": float(h.mean()),
+                "mean_H_0": float(h0.mean()),
                 "retention_measured": float(np.nanmean(ratio)),
-                "retention_sem": float(np.nanstd(ratio) / np.sqrt(REPS)),
+                "retention_sem": float(
+                    h.std() / np.sqrt(len(h)) / h0.mean() if h0.mean() > 0 else np.nan
+                ),
                 # What the cluster predicts. No mu term: identical across rows.
                 "retention_predicted_by_cluster": float((1.0 - 1.0 / (2.0 * NE)) ** t),
                 # What equilibrium theory predicts for mu > 0.
