@@ -105,7 +105,10 @@ theorem tagGenotypeVariance_strictMono_left_half
   unfold tagGenotypeVariance
   have h_maf₂_half : maf₂ < 1 / 2 := lt_of_lt_of_le h_order h_maf₁_half
   have h_maf₂_nonneg : 0 ≤ maf₂ := le_of_lt h_maf₂_pos
-  nlinarith
+  -- 2p(1-p) is a genotype variance, so the gap factors as (maf₁ - maf₂)(1 - maf₁ - maf₂),
+  -- and both factors are positive below the 1/2 turning point.
+  nlinarith [mul_pos (sub_pos.mpr h_order)
+    (show (0:ℝ) < 1 - maf₁ - maf₂ by linarith)]
 
 /-- **Different LD and MAF can produce population-specific GWAS hits.**
     This theorem now proves the biologically relevant part explicitly:
@@ -137,7 +140,7 @@ theorem different_populations_different_hits
     have h_maf₂_lt_one : maf₂ < 1 := by
       have h_maf₂_lt_half : maf₂ < 1 / 2 := lt_of_lt_of_le h_maf_order h_maf₁_half
       linarith
-    nlinarith
+    nlinarith [mul_pos h_maf₂_pos (sub_pos.mpr h_maf₂_lt_one)]
   have h_ld_sq_nn : 0 ≤ ld₁ ^ 2 := sq_nonneg ld₁
   have h_prod_lt :
       ld₂ ^ 2 * tagGenotypeVariance maf₂ <
@@ -612,7 +615,7 @@ theorem multi_trait_increases_effective_n
     have h_ld_sq : 0 < ld ^ 2 := sq_pos_of_ne_zero h_ld
     have h_var : 0 < tagGenotypeVariance maf := by
       unfold tagGenotypeVariance
-      nlinarith
+      nlinarith [mul_pos h_maf (sub_pos.mpr h_maf_lt_one)]
     exact mul_pos (mul_pos h_beta_sq h_ld_sq) h_var
   constructor
   · exact h_n

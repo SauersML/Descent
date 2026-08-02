@@ -36,10 +36,10 @@ theorem dot_rawCrossMoment
       (fun ω => (∑ i, u i * X ω i) * Y ω) =
         ∑ i, (u i) • (fun ω => X ω i * Y ω) := by
     funext ω
+    simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul]
     rw [Finset.sum_mul]
     apply Finset.sum_congr rfl
     intro i _
-    simp only [Pi.smul_apply, smul_eq_mul]
     ring
   rw [hexpand, E.eval_sum]
   apply Finset.sum_congr rfl
@@ -62,6 +62,24 @@ theorem rawCrossMoment_annihilates_secondMoment_kernel
   apply hzeroProduct
   rw [secondMoment_quadratic_form, hkernel]
   simp [dot]
+
+/-- Cauchy--Schwarz supplies the zero-product premise above.  Consequently the
+range-compatibility statement holds for any expectation model with its usual
+`L²` inequality, including ordinary probability measures. -/
+theorem rawCrossMoment_annihilates_secondMoment_kernel_of_cauchySchwarz
+    (E : ExpFunctional Ω) (X : Ω → ι → ℝ)
+    (Y : Ω → ℝ) (kernelDirection : ι → ℝ)
+    (hkernel : (secondMomentMatrix E X).mulVec kernelDirection = 0)
+    (hCauchySchwarz : ∀ f g : Ω → ℝ,
+      E (fun ω => f ω * g ω) ^ 2 ≤
+        E (fun ω => f ω ^ 2) * E (fun ω => g ω ^ 2)) :
+    dot kernelDirection (rawCrossMoment E X Y) = 0 := by
+  apply rawCrossMoment_annihilates_secondMoment_kernel
+    E X Y kernelDirection hkernel
+  intro f g hf
+  have hbound := hCauchySchwarz f g
+  rw [hf, zero_mul] at hbound
+  exact sq_eq_zero_iff.mp (le_antisymm hbound (sq_nonneg _))
 
 /-- Observable covariance between each coordinate and the residual of a
 deployed linear coefficient. -/

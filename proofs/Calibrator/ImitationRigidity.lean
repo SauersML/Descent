@@ -633,9 +633,15 @@ theorem ldKernelSymbol_ge_hardEdge {decay angle : ℝ} (hd : |decay| < 1)
     have : -1 < decay := by cases abs_lt.mp hd with | intro hlo _ => exact hlo
     linarith
   have hcos_ge : -1 ≤ Real.cos angle := Real.neg_one_le_cos angle
+  have hminus : 0 ≤ 1 - decay := by
+    have hlt : decay < 1 := (abs_lt.mp hd).2
+    linarith
+  have hfactor :
+      0 ≤ (1 - decay) * (2 * decay * (1 + Real.cos angle)) := by
+    exact mul_nonneg hminus
+      (mul_nonneg (mul_nonneg (by norm_num) hnonneg) (by linarith))
   rw [div_le_div_iff₀ hplus hden]
-  nlinarith [mul_nonneg hnonneg (by linarith : (0:ℝ) ≤ 1 + Real.cos angle),
-    sq_nonneg decay, hnonneg]
+  nlinarith [hfactor]
 
 /-- **The whitening gain is the harmonic mean of the LD spectrum.** This is the
 Szegő value of `tr K⁻¹` per variant, computed in closed form: the quantity that
@@ -662,7 +668,6 @@ theorem ldKernelSymbol_harmonicMean {decay : ℝ} (hd : |decay| < 1) :
   unfold ldWhiteningGain
   field_simp
   simp [smul_eq_mul]
-  ring
 
 theorem ldWhiteningGain_ge_one {decay : ℝ} (hd : |decay| < 1) :
     1 ≤ ldWhiteningGain decay := by
@@ -752,6 +757,7 @@ theorem stationaryLD_boundary_stencil (decay : ℝ) (separation : ℕ) :
       ring
   | succ d =>
       simp [adjacentBoundarySeparation, stationaryLDEntry, pow_succ]
+      ring
 
 /-- **Interior three-term identity.** Away from the ends of the chromosome the
 geometric LD sequence is annihilated by the tridiagonal AR(1) precision
@@ -763,7 +769,7 @@ theorem stationaryLD_three_term (decay : ℝ) (separation : ℕ) (h : 1 ≤ sepa
       - decay * stationaryLDEntry decay (separation + 1) = 0 := by
   obtain ⟨e, rfl⟩ := Nat.exists_eq_add_of_le h
   unfold stationaryLDEntry
-  simp only [Nat.add_sub_cancel_left, pow_add, pow_succ, pow_one]
+  simp only [Nat.add_sub_cancel_left, pow_add, pow_succ]
   ring
 
 /-- The same stencil applied at zero separation returns the whitening constant
@@ -781,7 +787,7 @@ arbitrary kernel column.  It equals `(1-ρ²)I` pointwise, with no unproved
 boundary or distance case left over. -/
 theorem stationaryLD_interior_stencil (decay : ℝ) (separation : ℕ) :
     (1 + decay ^ 2) * stationaryLDEntry decay separation
-        - decay * stationaryLDEntry decay (separation - 1)
+        - decay * stationaryLDEntry decay (adjacentBoundarySeparation separation)
         - decay * stationaryLDEntry decay (separation + 1) =
       if separation = 0 then 1 - decay ^ 2 else 0 := by
   cases separation with
@@ -796,7 +802,7 @@ variants.** Each interior variant contributes exactly the whitening gain; the
 first variant, having no left neighbour to be whitened against, contributes
 one. This is the finite-chromosome correction that the limit hides. -/
 theorem ldPrecisionTrace_eq_boundary_add_interior {decay : ℝ} (hd : |decay| < 1)
-    (nSites : ℕ) (hsites : 1 ≤ nSites) :
+    (nSites : ℕ) (_hsites : 1 ≤ nSites) :
     ldPrecisionTrace decay nSites =
       1 + ((nSites : ℝ) - 1) * ldWhiteningGain decay := by
   have hne : (1 : ℝ) - decay ^ 2 ≠ 0 := by
@@ -824,10 +830,10 @@ theorem ldPrecisionTrace_div_sites_tendsto {decay : ℝ} (hd : |decay| < 1) :
     rw [ldPrecisionTrace_eq_boundary_add_interior hd nSites hsites]
     field_simp
     ring
-  refine Filter.Tendsto.congr' heq.symm ?_
   have hzero : Filter.Tendsto
       (fun nSites : ℕ => (1 - ldWhiteningGain decay) / (nSites : ℝ))
       Filter.atTop (nhds 0) := tendsto_const_div_atTop_nhds_zero_nat _
+  apply (Filter.tendsto_congr' heq).mpr
   simpa using tendsto_const_nhds.add hzero
 
 end StationaryLD
@@ -1027,7 +1033,7 @@ theorem alleleLossProbability_le_one {initial time : ℝ}
 
 /-- The absorbed mass is differentiable in the ancestral frequency: the atom is
 not an irregularity. -/
-theorem hasDerivAt_alleleLossProbability {time : ℝ} (htime : time ≠ 0) (initial : ℝ) :
+theorem hasDerivAt_alleleLossProbability (time initial : ℝ) :
     HasDerivAt (fun x => alleleLossProbability x time)
       (-(1 / (2 * time)) * alleleLossProbability initial time) initial := by
   have hbase : HasDerivAt (fun x : ℝ => -(x / (2 * time))) (-(1 / (2 * time))) initial := by
@@ -1044,7 +1050,7 @@ theorem hasDerivAt_sqrt_alleleLossProbability {time : ℝ}
       (-(1 / (4 * time)) * Real.sqrt (alleleLossProbability initial time)) initial := by
   have hp : 0 < alleleLossProbability initial time :=
     alleleLossProbability_pos initial time
-  have hsqrt := (hasDerivAt_alleleLossProbability htime initial).sqrt hp.ne'
+  have hsqrt := (hasDerivAt_alleleLossProbability time initial).sqrt hp.ne'
   convert hsqrt using 1
   have hsqrtPos : 0 < Real.sqrt (alleleLossProbability initial time) :=
     Real.sqrt_pos.2 hp
@@ -1071,7 +1077,6 @@ theorem sqrt_alleleLoss_derivative_sq {initial time : ℝ} (htime : 0 < time) :
     4 * (-(1 / (4 * time)) * Real.sqrt (alleleLossProbability initial time)) ^ 2 =
         Real.sqrt (alleleLossProbability initial time) ^ 2 / (4 * time ^ 2) := by
           field_simp [hne]
-          ring
     _ = alleleLossProbability initial time / (4 * time ^ 2) := by rw [hsq]
 
 /-- Relative weight of the absorption channel against the diffusion channel,
@@ -1101,9 +1106,9 @@ theorem hasDerivAt_absorptionChannelWeight {initial time : ℝ} (htime : 0 < tim
       have hdiv : HasDerivAt (fun t : ℝ => initial / (2 * t))
           (-(initial * 2) / (2 * time) ^ 2) time := by
         have := (hasDerivAt_const time (2 : ℝ)).mul (hasDerivAt_id time)
+        have hdenNe : (2 * time : ℝ) ≠ 0 := mul_ne_zero (by norm_num) hne
         simpa using
-          ((hasDerivAt_const time initial).div (by simpa using this)
-            (by simpa [hne] using (by positivity : (0 : ℝ) < 2 * time).ne'))
+          ((hasDerivAt_const time initial).div (by simpa using this) hdenNe)
       have : HasDerivAt (fun t : ℝ => -(initial / (2 * t)))
           (-(-(initial * 2) / (2 * time) ^ 2)) time := hdiv.neg
       convert this using 1
