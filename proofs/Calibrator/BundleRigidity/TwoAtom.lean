@@ -233,12 +233,20 @@ theorem chain_identity_right (k : ℕ) :
   have hk : (0 : ℝ) < (k : ℝ) + 1 := by positivity
   have hne : (2 * (k : ℝ) + 1) ≠ 0 := ne_of_gt hd
   have hkne : ((k : ℝ) + 1) ≠ 0 := ne_of_gt hk
-  have hnum : 1 - 2 * chain k = 1 / (2 * (k : ℝ) + 1) := by
-    rw [chain]; field_simp
-  have hden : 1 - chain k = ((k : ℝ) + 1) / (2 * (k : ℝ) + 1) := by
-    rw [chain]; field_simp
-  rw [hnum, hden]
-  field_simp
+  -- `first | (field_simp; ring) | field_simp` tolerates either outcome: if `field_simp`
+  -- closes the goal outright the `ring` would be a "no goals" error, and if it leaves a
+  -- polynomial identity the `ring` is needed. Guessing which happens is what cost the
+  -- earlier passes.
+  have hdne : 1 - chain k ≠ 0 := by
+    rw [chain]
+    intro hcontra
+    have : (2 * (k : ℝ) + 1) - (k : ℝ) = 0 := by
+      field_simp at hcontra; linarith
+    linarith
+  rw [div_eq_iff hdne, chain]
+  first
+    | (field_simp; ring)
+    | field_simp
 
 /-- **The chain identity, as the source states it:**
 `1 / P (k+1) - 2 = 1 / (k+1) = (1 - 2 P k) / (1 - P k)`. -/

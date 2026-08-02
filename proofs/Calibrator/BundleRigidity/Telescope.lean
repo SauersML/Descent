@@ -130,8 +130,11 @@ theorem altSum_eq (P Q : ι → ℝ) (Φ A : ι → R)
         (Q i • Φ i + P i • (1 : R)) * (prodWeight Q u • prodOp Φ u)
           = (Q i * prodWeight Q u) • (Φ i * prodOp Φ u)
             + (P i * prodWeight Q u) • prodOp Φ u := by
-      simp only [add_mul, smul_mul_assoc, mul_smul_comm, smul_smul, one_mul]
-      try abel
+      -- Explicit and ordered, rather than a `simp only` set: each step is named where it
+      -- fires, so a failure points at the step that failed instead of silently leaving
+      -- the goal untouched for a later tactic to trip over.
+      rw [add_mul, smul_mul_assoc, smul_mul_assoc, one_mul, mul_smul_comm, smul_smul,
+        smul_smul]
     rw [hexpand]
     have hsplit :
         P i • (prodWeight Q u • prodOp Φ u
@@ -165,8 +168,8 @@ theorem altSum_pair (P Q : ι → ℝ) (Φ A : ι → R)
     (hA : ∀ i, A i = Q i • Φ i + P i • (1 : R)) (i j : ι) :
     A i * (Q j • Φ j) - P i • A j
       = (Q i * Q j) • (Φ i * Φ j) - (P i * P j) • (1 : R) := by
-  rw [hA i, hA j]
-  simp only [add_mul, smul_mul_assoc, mul_smul_comm, smul_smul, one_mul, smul_add]
-  try abel
+  rw [hA i, hA j, add_mul, smul_mul_assoc, smul_mul_assoc, one_mul, mul_smul_comm,
+    smul_smul, smul_smul, smul_add, smul_smul, smul_smul]
+  abel
 
 end Calibrator.BundleRigidity
