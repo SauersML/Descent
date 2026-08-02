@@ -27,7 +27,7 @@ from collections import Counter, defaultdict
 from pathlib import Path
 
 import shared
-from paths import ARTIFACTS as ART
+from paths import ARTIFACTS as ART, HERE
 
 HERE = Path(__file__).parent
 
@@ -59,9 +59,30 @@ def in_slice(d) -> tuple[bool, str]:
     return False, ""
 
 
-def load(path):
-    p = HERE / path
-    return json.loads(p.read_text()) if p.exists() else None
+REQUIRED = {"results_check1.json", "results_check2.json", "results_check7.json"}
+
+
+def load(path, required=False):
+    """Missing results must FAIL, not silently yield an empty ledger.
+
+    Two bugs met here. The path was still HERE while the writes had moved to
+    ARTIFACTS, so this read a directory the checks no longer populate; and a
+    missing file returned None and the ledger carried on, reporting "0
+    VERIFIED, 556 UNREACHABLE". That is a plausible number meaning only that
+    the inputs were absent -- indistinguishable from a corpus with nothing
+    verified, in a ledger other tiers join against.
+    """
+    p = ART / path
+    if p.exists():
+        return json.loads(p.read_text())
+    if required or path in REQUIRED:
+        raise SystemExit(
+            "FATAL: %s is missing. The ledger's verdicts depend on it, and\n"
+            "reporting 0 VERIFIED from absent results would be\n"
+            "indistinguishable from a corpus with nothing verified.\n"
+            "Run the checks first:  bash %s"
+            % (p, HERE / "cluster_run.sh"))
+    return None
 
 
 def run():

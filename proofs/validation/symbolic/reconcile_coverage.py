@@ -133,6 +133,12 @@ def tier_extract(uni, by_short):
 def tier_symbolic(uni, by_short):
     out, unmapped = set(), set()
     p = ART / "slice_ledger.json"
+    if not p.exists():
+        # Never report 0.0% for a tier whose ledger has not been built: a zero
+        # from a missing input reads exactly like a zero from a tier that
+        # verified nothing, and this table is what other tiers join against.
+        raise SystemExit("FATAL: %s is missing; run slice_ledger.py first. "
+                         "Reporting this tier as 0 would be a false zero." % p)
     if p.exists():
         for fq, r in json.loads(p.read_text()).items():
             if r.get("status") == "VERIFIED":
