@@ -395,8 +395,27 @@ def definition_expected_new_mutations():
 # ===========================================================================
 
 def definition_expected_freq_diff_sq():
+    """SAMPLING VARIANCE IS SUBTRACTED, NOT LEFT IN THE ANSWER.
+
+    The uncorrected version of this measurement reported D2a off by -24.4% and
+    the two-population/one-population ratio at 1.70 instead of 2 at the
+    shortest divergence, and BOTH were my estimator rather than the corpus.
+    Frequencies are estimated from finite samples, so
+
+        E[(p1_hat - p2_hat)^2] = Var_drift(p1 - p2) + p1q1/(n1-1) + p2q2/(n2-1)
+
+    and the sampling terms do not cancel in the ratio: the two-population
+    contrast carries two of them and the ancestor contrast carries two as well
+    while having only HALF the drift, so the ratio is dragged toward 1 exactly
+    when drift is small. That is why the deviation shrank monotonically as t
+    grew -- the signature of a sample-size artefact, not of a formula.
+
+    Every second moment below is therefore the unbiased estimator with its
+    sampling term removed, and the sample sizes are doubled so the residual
+    correction is small compared with the quantity being corrected.
+    """
     out = []
-    Ne, n, n_anc = 2000, 100, 100
+    Ne, n, n_anc = 2000, 200, 200
     for tfrac in (0.05, 0.2, 0.8):
         t = tfrac * 2.0 * Ne
         p1s, p2s, p0s = [], [], []
@@ -434,13 +453,24 @@ def definition_expected_freq_diff_sq():
         # the descendants would condition on the very drift being measured.
         keep = (p0 > 0.05) & (p0 < 0.95)
         p1, p2, p0 = p1[keep], p2[keep], p0[keep]
-        het0 = float(np.mean(p0 * (1.0 - p0)))
-        d2 = float(np.mean((p1 - p2) ** 2))
+        # UNBIASED SAMPLING-VARIANCE CORRECTIONS. n, n and n_anc are numbers of
+        # HAPLOTYPES, so the per-site sampling variance of a frequency estimate
+        # is p(1-p)/(n-1) and E[p_hat(1-p_hat)] = p(1-p)(n-1)/n.
+        s1 = p1 * (1 - p1) / (n - 1.0)
+        s2 = p2 * (1 - p2) / (n - 1.0)
+        s0 = p0 * (1 - p0) / (n_anc - 1.0)
+        het0 = float(np.mean(p0 * (1.0 - p0)) * n_anc / (n_anc - 1.0))
+        het0_raw = float(np.mean(p0 * (1.0 - p0)))
+        d2 = float(np.mean((p1 - p2) ** 2 - s1 - s2))
+        d2_raw = float(np.mean((p1 - p2) ** 2))
         # D2a: single-population drift variance, averaged over the two
         # daughters so the two are not treated as one observation.
-        var1 = float(np.mean((p1 - p0) ** 2))
-        var2 = float(np.mean((p2 - p0) ** 2))
+        var1 = float(np.mean((p1 - p0) ** 2 - s1 - s0))
+        var2 = float(np.mean((p2 - p0) ** 2 - s2 - s0))
+        var1_raw = float(np.mean((p1 - p0) ** 2))
+        var2_raw = float(np.mean((p2 - p0) ** 2))
         fst_drift_measured = 0.5 * (var1 + var2) / het0
+        fst_drift_uncorrected = 0.5 * (var1_raw + var2_raw) / het0_raw
         fst_theory = 1.0 - np.exp(-t / (2.0 * Ne))
         # D2b: the corpus definition, fed the THEORETICAL drift F_ST.
         # p0 enters as p0(1-p0), and E[p0(1-p0)] is NOT E[p0](1-E[p0]), so the

@@ -553,6 +553,47 @@ theorem ProbeSeparation.no_blindness (S : ProbeSeparation probe) {P : Object →
     (B : ProbeBlindness probe P) : False :=
   B.fails ((S.witness_collapses B) ▸ B.holds)
 
+/-! ### Reading a coordinate twice is reading it once
+
+The separation modulus answers "how well does this probe resolve objects". The next
+question is what *more coordinates* buy, and the answer is not "more", because coordinates
+can repeat each other.
+
+`duplicate_dist` is the degenerate case in full: a probe that reports the same channel
+twice moves exactly as far as the single channel. The pair carries the information of one.
+Nothing here is deep — the content is that the corpus's separation machinery already
+measures this, so the count that matters downstream is not the number of channels but the
+number of *fresh* ones.
+
+The genotypic instance is linkage. Two markers in complete linkage disequilibrium have
+identical dosage in every individual, so a score reading both is the duplicated probe, and
+`duplicate_separation` says its modulus is that of a single marker. A panel of `k` markers
+in perfect LD blocks of size `ℓ` separates like `k / ℓ` markers, and it is the effective
+count rather than `k` that appears in any resolution bound obtained from `recovery`.
+
+This is why the independence assumptions elsewhere in the development are load-bearing
+rather than decorative: results that count markers are counting fresh ones, and LD is
+exactly the gap between the two counts. -/
+
+/-- A probe reporting one channel twice moves exactly as far as that channel. -/
+@[simp] theorem duplicate_dist {Object : Type*} (f : Object → ℝ) (o o' : Object) :
+    dist ((f o, f o) : ℝ × ℝ) (f o', f o') = dist (f o) (f o') := by
+  rw [Prod.dist_eq]
+  exact max_self _
+
+/-- **Duplicating a channel buys no separation.** The modulus of the doubled probe is the
+modulus of the original, so a perfectly redundant coordinate contributes nothing to
+resolving objects. -/
+theorem duplicate_separation {Object : Type*} [MetricSpace Object] (f : Object → ℝ)
+    (S : ProbeSeparation f) :
+    ProbeSeparation (fun o => ((f o, f o) : ℝ × ℝ)) where
+  sigma := S.sigma
+  sigma_pos := S.sigma_pos
+  separates := by
+    intro o o'
+    rw [duplicate_dist]
+    exact S.separates o o'
+
 end EffectiveSeparation
 
 end Calibrator

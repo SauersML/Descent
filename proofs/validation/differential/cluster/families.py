@@ -585,7 +585,16 @@ FAMILIES = [
                  "variance and the error of the Gaussian approximation to its "
                  "distribution",
         "simulator": "cluster/fam_metrics.py (hwe arm)",
-        "status": "SIMULATED (this tier). Cheapest simulator in the inventory "
+        "status": "SIMULATED AND GREEN. Run on the node: H1 (m=1) within 0.04, "
+                  "1.41 and 0.04 analytic standard errors at p = 0.5, 0.1, "
+                  "0.01; H2 (equal beta and p) 2.065 measured against 2.058 "
+                  "predicted at m=10 and 41.11 against 41.16 at m=200; "
+                  "heterogeneous m=150 variance 55.66 against 56.10 and "
+                  "cross-covariance -7.98 against -8.21. The "
+                  "approximation-error grid spans KS 0.536 at m=1, p=0.01 down "
+                  "to 0.010 at m=1000, p=0.5, so it reaches the regime where "
+                  "the Gaussian approximation is refutable. Cheapest simulator "
+
                   "and the only one whose reference is exact rather than "
                   "asymptotic, which is what makes it a usable control for the "
                   "families downstream of it.",

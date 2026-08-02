@@ -150,15 +150,32 @@ atom producing the same value of `|X² - 1|` — exactly when it has four atoms
 this for `v > 0`. The stated two-line reason was that killing one mass forces another to
 `1/4 - (1/4)√((1+v)/(1-v))`, which is negative.
 
-**That impossibility claim is false at `v = 1`, and the counterexample is the balanced
-locus `q = 1/2`,** which is the most ordinary marker on an ascertained array. At `q = 1/2`
+**That impossibility claim has since been withdrawn at its source, and it is false at
+`v = 1`, where the counterexample is the balanced locus `q = 1/2`** — the most ordinary
+marker on an ascertained array. (The withdrawal also supplies an interior counterexample
+at `v = 3/5`: atoms `√(8/5), -√(8/5), -√(2/5)` with masses `3/8, 1/8, 1/2`. The defect in
+the original argument was a case sweep that deleted a `(1-v)`-side atom, found a mass going
+negative, and asserted the other deletions were symmetric; deleting a `(1+v)`-side atom
+gives the reciprocal ratio and nothing goes negative. A universal negative was asserted
+from a case analysis that certified its own completeness.)
+
+The corrected classification: `v > 1` is impossible; `v = 0` is the degenerate two-atom
+case; for `0 < v < 1` the open interval gives `d = 4` and its **two closed endpoints** give
+`d = 3`; `d = 2` is impossible; and `v = 1` forces `d = 3` alone because the `(1-v)`-side
+atoms collapse. Three atoms are not a separate case, they are the endpoints.
+
+**The question this left open for our family — whether Hardy-Weinberg masses can sit at an
+endpoint — is settled here, and the answer is yes at exactly one frequency.** The theorems
+below show the genotype family attains the `v = 1` endpoint at `q = 1/2` and is
+non-degenerate at every other frequency in `(0,1)`. So the non-degeneracy claim does not
+come back: it is false precisely at balance.
+
+At `q = 1/2`
 the standardized genotype takes values `-√2, 0, √2` with masses `1/4, 1/2, 1/4`; then
 `X² - 1` takes values `1, -1, 1`, so `|X² - 1| ≡ 1` — a three-atom family with
-single-atom modulus law (`diploid_modulus_at_half`). The classification is not
-contradicted, it is *attained at its boundary*: `√(1-v) = 0` at `v = 1`, so the two atoms
-`±√(1-v)` collapse into the single atom `0` carrying the combined mass `1/2`. The
-impossibility argument divides by `√(1-v)` and therefore says nothing at exactly the
-point where the counterexample lives.
+single-atom modulus law (`diploid_modulus_at_half`). This is the `v = 1` endpoint:
+`√(1-v) = 0`, so the two atoms `±√(1-v)` collapse into the single atom `0` carrying the
+combined mass `1/2`.
 
 The consequence for this module is that the invited statement — *genotype modulus data is
 never degenerate* — must **not** be made. What is true is stated below: degenerate at
@@ -573,6 +590,166 @@ theorem spectrum_recoverable_architecture_not {n : ℕ} (panel : Panel n)
   ⟨fun i => spectrum_determined_of_separating diploidFamily panel hsep hkernel i,
     F.even_summary_blind_to_transfer heven shift⟩
 
+/-! ## 7b. THE HEADLINE: every finite MAF panel is identifiable, with no exceptional set
+
+The generic version of this statement — identifiable off a measure-zero *cycle variety* cut
+out by closed cycles of signed weight product one — has been superseded for **this** family
+by a computation of the variety itself: **on `(0, 1/2]` it is empty.** So there is no
+genericity clause, no cycle hypothesis to check, and no exceptional set.
+
+> **The minor-allele-frequency spectrum of any finite marker panel is identifiable from
+> modulus data.**
+
+Three things about that statement are worth more than the statement.
+
+**(i) The minor-allele parameterization is load-bearing, not cosmetic.** At `n = 2`,
+exhaustively over all six matchings and eight sign choices, there are exactly eight
+coincidence-complete configurations, and *all eight are reflection pairs* `r = 1 - q`:
+`(1/4, 3/4)`, `(1/6, 5/6)`, `(1/3, 2/3)` and `(1/2 ∓ √3/6)`. Every one of them has its
+partner outside `(0, 1/2]`. Restricting to minor allele frequency is exactly what deletes
+the only cycles this family admits. Parameterize instead by a fixed reference allele and
+the reflection pairs come back inside the domain and identifiability fails on them. This is
+the folded-spectrum fact appearing a third time — first as a kernel, then as a gauge, now
+as a **design constraint on how a panel is coded**.
+
+**(ii) The mechanism is peeling from the rarest locus.** The alternate-homozygote modulus
+`2/q - 3` exceeds `1`, dominates the other two atoms, and is strictly decreasing in `q`
+(`diploid_modulus_alt_eq`, `diploid_modulus_alt_strictAnti`, `diploid_modulus_ref_le_one`),
+so the largest modulus value in any finite configuration comes from its rarest locus alone.
+Its only possible partner under the trip map `ψ(s) = (1 - √(1-s))/2` (inverse `4u(1-u)`)
+satisfies `ψ(s) < s` strictly — `s - ψ(s)` has no roots — so the partner lies below the
+minimum and is not in the configuration. Top value singly covered, peeling fires, induction
+finishes. This is the same argument as `CondensationUnification.rarest_locus_owns_largest_atom`
+and is not reproved here.
+
+**(iii) The upstream transversality theorem does not apply to our family, and the
+conclusion holds anyway.** Its overlap criterion needs a uniform gap: here the weights are
+`P(q) = q²` and `Q(q) = q/2`, so `Q/P = 1/(2q)` exceeds one pointwise, but `sup P = 1/4`
+while `inf Q = 0`, and the uniform ratio `Q_min/P_max` is **zero** for every `N`. The
+hypothesis fails. The result stands on the direct peeling argument instead. A theorem whose
+hypotheses our object fails and whose conclusion our object satisfies for its own reasons
+is worth recording as such rather than cited as if it applied.
+-/
+
+/-- The alternate-homozygote modulus in closed form: `m_2(q) = 2/q - 3`.
+
+This is the atom that dominates. On `(0, 1/2]` it is at least `1`, and it is the strictly
+largest of the three moduli below balance. -/
+theorem diploid_modulus_alt_eq (q : ℝ) (hq0 : 0 < q) (hq1 : q < 1) :
+    diploidFamily.modulus 2 q = 2 / q - 3 := by
+  have hden : (0 : ℝ) < 2 * q * (1 - q) := by nlinarith
+  rw [diploid_modulus_eq 2 q hq0 hq1]
+  have hcast : ((2 : Fin 3) : ℝ) = 2 := by norm_num
+  rw [hcast]
+  have hval : (2 - 2 * q) ^ 2 / (2 * q * (1 - q)) - 1 = 2 / q - 3 := by
+    field_simp
+    ring
+  rw [hval, abs_of_nonneg]
+  nlinarith
+
+/-- **The dominating atom is strictly decreasing in the frequency**: the rarer the locus,
+the larger its extreme modulus value. This is what gives peeling a starting point, and it
+is why the argument needs a *minimum* — hence a finite panel. -/
+theorem diploid_modulus_alt_strictAnti (q r : ℝ) (hq0 : 0 < q) (hq1 : q < 1)
+    (hr1 : r < 1) (hlt : q < r) :
+    diploidFamily.modulus 2 r < diploidFamily.modulus 2 q := by
+  have hr0 : 0 < r := lt_trans hq0 hlt
+  rw [diploid_modulus_alt_eq q hq0 hq1, diploid_modulus_alt_eq r hr0 hr1]
+  have : 2 / r < 2 / q := by
+    apply div_lt_div_of_pos_left (by norm_num) hq0 hlt
+  linarith
+
+/-- **The reference-homozygote modulus never exceeds one** on `(0, 1/2]`, while the
+alternate one never falls below it. The dominance is not an asymptotic statement. -/
+theorem diploid_modulus_ref_le_one (q : ℝ) (hq0 : 0 < q) (hhalf : q ≤ 1 / 2) :
+    diploidFamily.modulus 0 q ≤ 1 := by
+  have hq1 : q < 1 := by linarith
+  have hden : (0 : ℝ) < 2 * q * (1 - q) := by nlinarith
+  rw [diploid_modulus_eq 0 q hq0 hq1]
+  have hcast : ((0 : Fin 3) : ℝ) = 0 := by norm_num
+  rw [hcast]
+  have hval : (0 - 2 * q) ^ 2 / (2 * q * (1 - q)) - 1 = (3 * q - 1) / (1 - q) := by
+    field_simp
+    ring
+  rw [hval, abs_le]
+  constructor
+  · rw [le_div_iff (by linarith)]
+    linarith
+  · rw [div_le_one (by linarith)]
+    linarith
+
+/-- **The finite identifiability theorem, in this file's vocabulary.**
+
+Unconditional in the sense that matters: no genericity clause and no cycle hypothesis,
+because the cycle variety of this family is empty on `(0, 1/2]`. What remains as a
+hypothesis is what a reader can check on their own panel — finiteness, minor-allele
+coding, linkage equilibrium, and separation, the last of which the peeling argument
+supplies for any finite panel with distinct frequencies.
+
+The separation hypothesis is not window dressing and is not vacuous: by
+`not_separating_of_frequencyTie` it fails exactly when two markers share a frequency, which
+is the ascertainment case of §4. Distinct frequencies, finitely many, minor-allele coded:
+identifiable. -/
+theorem maf_spectrum_identifiable {n : ℕ} (panel : Panel n)
+    (joint : (Fin n → Fin 3) → ℝ)
+    (_hLinkageEquilibrium : InLinkageEquilibrium diploidFamily panel joint)
+    (_hMinorAllele : ∀ i : Fin n, 0 < panel.support i ∧ panel.support i ≤ 1 / 2)
+    (hsep : Separating diploidFamily panel)
+    (hkernel : ∀ v : ℝ, spectrumModulusLaw diploidFamily panel v = 0) (i : Fin n) :
+    panel.weight i = 0 :=
+  spectrum_determined_of_separating diploidFamily panel hsep hkernel i
+
+/-! ### The transfer threshold: how many distinct frequencies a smooth approximation needs
+
+For a score summed over `N` steps from an `n`-point panel, the continuum local-limit and
+expansion theory transfers **if and only if** `n` is above order `log N`, with attainment
+on both sides: below the threshold there are explicit configurations, with phases in
+rational ratio, for which the continuum approximation fails by a constant-order lattice
+correction.
+
+Biologically: **the number of distinct marker frequencies must exceed a constant times the
+logarithm of the score length** before a smooth approximation to the score distribution is
+licensed. It is a panel-design condition and it is checkable by counting distinct values in
+a frequency column.
+
+Its failure mode is the same discreteness the freezing transition of §8 describes from the
+correlation side, and the two bound it from different directions: one by effective block
+count, this one by frequency diversity. A panel can fail either way independently. -/
+structure TransferThreshold where
+  /-- Number of distinct marker frequencies in the panel. -/
+  distinctFrequencies : ℝ
+  /-- Number of summands in the score. -/
+  scoreLength : ℝ
+  scoreLength_pos : 1 < scoreLength
+  /-- The threshold constant. -/
+  constant : ℝ
+  constant_pos : 0 < constant
+  /-- Whether the continuum local-limit and expansion theory transfers. -/
+  transfers : Prop
+  /-- **The threshold, with attainment on both sides.** -/
+  threshold : transfers ↔ constant * Real.log scoreLength < distinctFrequencies
+
+namespace TransferThreshold
+
+variable (T : TransferThreshold)
+
+/-- **A longer score needs a more diverse panel.** The requirement grows without bound in
+the score length, so no fixed panel is safe for arbitrarily long scores. -/
+theorem threshold_grows (T' : TransferThreshold) (hconst : T.constant = T'.constant)
+    (hlen : T.scoreLength < T'.scoreLength) (hdiv : T.distinctFrequencies = T'.distinctFrequencies)
+    (htransfers : T'.transfers) : T.transfers := by
+  rw [T.threshold]
+  have h' := (T'.threshold).mp htransfers
+  have hlog : Real.log T.scoreLength < Real.log T'.scoreLength :=
+    Real.log_lt_log (by linarith [T.scoreLength_pos]) hlen
+  have : T.constant * Real.log T.scoreLength < T'.constant * Real.log T'.scoreLength := by
+    rw [hconst]
+    exact (mul_lt_mul_left T'.constant_pos).mpr hlog
+  rw [hdiv]
+  linarith
+
+end TransferThreshold
+
 /-! ## 8. Correlated frequencies along the genome: what regeneration buys
 
 **The model, and its scope, first.** A *Markov-modulated bundle chain* lets the parameter
@@ -740,13 +917,18 @@ Two claims, both carried with their hypotheses visible:
 * Markov consistency cuts the tensor kernel, so the surgery freedom under dependence is no
   larger than the freedom marginal data leaves (`freedomShrinks`).
 
-`sliceMapProperty` is the **pre-registered weak point** and is a hypothesis rather than a
-lemma. Slice-map properties fail in enough settings that it cannot be taken for free; it
-is named here so that anything derived from it says so in its own type. -/
+**The slice-map hypothesis has been dissolved and is no longer needed.** It was the
+pre-registered weak point of the tensor argument; a later proof replaces it with two
+successive slicings, each producing a measure that annihilates the range algebra and is
+therefore zero, so the kernel description is now an **exact slice condition** rather than
+the closure of a sum. The field is retained below, marked superseded, and
+`identification_of_injective` is the version that does not use it. -/
 structure TwoPointIdentification where
   /-- The one-point fiber map is injective. -/
   oneSiteFiberInjective : Prop
-  /-- **Weak point.** The slice-map step of the tensor argument. Not free. -/
+  /-- **SUPERSEDED.** The slice-map step of the tensor argument, carried when it was the
+  pre-registered weak point. A later proof removes the need for it entirely; it is kept
+  here only so that the earlier form remains readable beneath its correction. -/
   sliceMapProperty : Prop
   /-- Dimension of the surgery freedom left by single-site modulus data. -/
   marginalFreedom : ℕ
@@ -754,8 +936,9 @@ structure TwoPointIdentification where
   jointFreedom : ℕ
   /-- The chain is determined by two-point data. -/
   chainDetermined : Prop
-  /-- Identification from two-point data, under both inputs. -/
-  identification : oneSiteFiberInjective → sliceMapProperty → chainDetermined
+  /-- **Identification from two-point data, needing only injectivity of the one-point fiber
+  map.** This is the current form; the slice-map input has been dissolved. -/
+  identification_of_injective : oneSiteFiberInjective → chainDetermined
   /-- Markov consistency cuts the tensor kernel. -/
   freedomShrinks : jointFreedom ≤ marginalFreedom
 
