@@ -919,6 +919,18 @@ theorem fstDerived_eq_closedPopulation_measuredLoss
   rw [measuredLoss_closedPopulation]
   unfold fstDerived
 
+/-- **The Wright-Fisher loss is the same regime again**, at an integer effective size.
+
+Third copy of the body, third reading of it. `DriftRegime` counted five members in the
+cluster; this attaches the one that states the recurrence over `ℕ` generations, so that
+all three now name the same trajectory rather than three formulas that happen to agree. -/
+theorem wrightFisherHeterozygosityLoss_eq_closedPopulation_measuredLoss
+    (N t : ℕ) (H₀ : ℝ) (hH : 0 < H₀) :
+    wrightFisherHeterozygosityLoss N t
+      = (closedPopulation (N : ℝ) H₀ hH).measuredLoss t := by
+  rw [measuredLoss_closedPopulation]
+  unfold wrightFisherHeterozygosityLoss wrightFisherDriftRetention
+
 end EquilibriumAgreements
 
 end Calibrator

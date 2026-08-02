@@ -2987,6 +2987,22 @@ theorem targetAUC_lt_source_of_neutralAF_benchmark
 noncomputable def equalVarianceGaussianAUCFromSNR (snr : ℝ) : ℝ :=
   Phi (Real.sqrt (snr / 2))
 
+/-- **The signal-to-noise reading of the AUC, under the same obligation.**
+
+`gaussianAUCFromSignalVariance` earns the name "AUC" only through
+`GaussianLiabilityRegime`, whose `equalVarianceGaussian` field someone must discharge.
+This form is that one at the signal-to-noise ratio, so it inherits the obligation rather
+than needing a second one — which is the point of routing the chart forms through a single
+closed form. -/
+theorem equalVarianceGaussianAUCFromSNR_eq_processAUC {k : ℕ} [Fintype (Fin k)]
+    {dgp : DataGeneratingProcess k} {signal : Predictor k}
+    (G : GaussianLiabilityRegime dgp signal) :
+    equalVarianceGaussianAUCFromSNR (G.moments.vSignal / G.vEnv) = G.processAUC := by
+  rw [← gaussianAUCFromSignalVariance_eq_processAUC G]
+  unfold equalVarianceGaussianAUCFromSNR gaussianAUCFromSignalVariance
+  congr 2
+  rw [div_div, mul_comm]
+
 /-! The variance form of the equal-variance Gaussian AUC used to be written out again here
 under a second name, tied to `DGP.gaussianAUCFromSignalVariance` by a theorem. The tie
 recorded a real incident: the two copies had drifted to *opposite* claims about which
@@ -3041,6 +3057,32 @@ docstring named the right model out loud.
     express the observable it was named for. -/
 noncomputable def equalVarianceGaussianAUCFromExplainedR2 (r2 : ℝ) : ℝ :=
   Phi (Real.sqrt (r2 / (2 * (1 - r2))))
+
+/-- **The `R²` reading of the AUC, under the same obligation and one more hypothesis.**
+
+Reading the AUC off an `R²` needs the variance split as well as the Gaussian regime: `r2`
+determines a signal-to-noise ratio only once the outcome variance is known to be signal
+plus environment. With `h_split` supplied, `r2 / (1 - r2)` *is* that ratio, and this form
+reduces to the one already discharged.
+
+Stating it this way is what stops the chart from being read as a general conversion. It
+is not: outside the split it converts nothing, which is exactly the sort of claim the
+`Empirical status: FALSIFIED` note on these forms was recording in prose. -/
+theorem equalVarianceGaussianAUCFromExplainedR2_eq_processAUC {k : ℕ} [Fintype (Fin k)]
+    {dgp : DataGeneratingProcess k} {signal : Predictor k}
+    (G : GaussianLiabilityRegime dgp signal)
+    (h_split : G.moments.vOutcome = G.moments.vSignal + G.vEnv) :
+    equalVarianceGaussianAUCFromExplainedR2
+        (r2FromSignalVariance G.moments.vSignal G.vEnv) = G.processAUC := by
+  rw [← equalVarianceGaussianAUCFromSNR_eq_processAUC G]
+  unfold equalVarianceGaussianAUCFromExplainedR2 equalVarianceGaussianAUCFromSNR
+    r2FromSignalVariance
+  have hv : G.moments.vSignal + G.vEnv ≠ 0 := by
+    rw [← h_split]; exact ne_of_gt G.moments.vOutcome_pos
+  have he : G.vEnv ≠ 0 := ne_of_gt G.vEnv_pos
+  congr 2
+  field_simp
+  ring
 
 /-- **The boundary escape, exhibited.**  At perfect prediction the chart
 returns `Phi 0`, which for the standard normal `Phi` of
