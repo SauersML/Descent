@@ -1,5 +1,9 @@
 import Calibrator.Probability
 import Calibrator.TransportIdentities
+-- Step 4b below needs `FiniteSpectralModel.degradation_eq_zero_iff`, which supplies a
+-- positivity certificate for excess target risk that does not read an F_ST difference.
+-- See the discussion above `excess_target_risk_pos_of_bandwise_readout_mismatch`.
+import Calibrator.SpectralDegradation
 
 namespace Calibrator
 
@@ -327,7 +331,19 @@ mismatch in observable tag space. It includes an explicit recombination/array sp
 noncomputable def taggingMismatchScale (recombRate arraySparsity : ℝ) : ℝ :=
   recombRate * arraySparsity
 
-/-- Demography-to-LD lower bound template used in portability theorems. -/
+/-- Demography-to-LD lower bound template used in portability theorems.
+
+**Vacuous in the generic split, and this is measured, not suspected.** The bound is
+proportional to `fstTarget - fstSource`, so it is identically zero whenever the two
+populations are equally diverged from a common ancestor — which is the ordinary case and
+the one ancestry-specific LD results are about. Over simulated configurations of that
+kind the squared Frobenius LD mismatch it is supposed to bound ranged from 2.554 to
+7.346 while the bound sat at zero.
+
+It is also never *proved* anywhere: it appears only as a hypothesis
+(`covariance_mismatch_pos_of_fst_and_sparse_array`, `target_r2_drop_of_fst_and_sparse_array`),
+so those two theorems rest on a quantity that vanishes exactly where they would be
+applied. Step 4b below is the non-vacuous replacement and does not read this definition. -/
 noncomputable def demographicCovarianceGapLowerBound
     (fstSource fstTarget recombRate arraySparsity kappa : ℝ) : ℝ :=
   kappa * taggingMismatchScale recombRate arraySparsity * (fstTarget - fstSource)
@@ -603,6 +619,96 @@ theorem target_r2_drop_of_fst_and_sparse_array
   exact target_r2_strictly_decreases_of_covariance_mismatch
     mseSource mseTarget varY lam sigmaSource sigmaTarget
     h_mse_gap_lb h_lam_pos h_mismatch h_varY_pos
+
+/-! ### Step 4b: the same conclusion without an `F_ST` difference
+
+**The defect in Step 4, measured rather than suspected.**
+`demographicCovarianceGapLowerBound` is `kappa * recombRate * arraySparsity *
+(fstTarget - fstSource)`. It reads the *difference* of two divergences. For two
+populations that split from one ancestor and drifted equally — the generic split, and
+exactly the configuration ancestry-specific LD results are about — `fstSource =
+fstTarget`, so the bound is identically zero and the hypothesis `h_fst : fstSource <
+fstTarget` of both theorems above is **false**. Over simulated configurations of that
+kind the squared Frobenius LD mismatch ranged from 2.554 to 7.346 while this bound sat
+at zero. The two theorems are true and inapplicable in the case that matters: they can
+certify a portability drop only when one population is *more* diverged than the other,
+which is not what equal drift from a shared ancestor produces.
+
+**What replaces it.** The missing ingredient is a positivity certificate that reads the
+correlation structure rather than a divergence difference.
+`Calibrator.SpectralDegradation.FiniteSpectralModel.degradation_eq_zero_iff` is exactly
+that: transport costs nothing **if and only if** the source and target optimal readouts
+`c/sigma` agree in every frequency band. So a single band of readout disagreement forces
+strictly positive excess target risk, with no reference to `F_ST`, to array sparsity, or
+to any recombination scale — and in particular the certificate is available at
+`fstSource = fstTarget`, where Step 4 has nothing to say.
+
+Note precisely what has and has not been transferred. Step 4 bounds
+`frobeniusNormSq (sigmaSource - sigmaTarget)`, a distance between covariance matrices,
+and then converts it to risk through the *assumed* inequality `h_mse_gap_lb`. Step 4b
+does not need that assumed conversion, because `degradation` is already defined as excess
+target risk: `risk target (optimalReadout source) - risk target (optimalReadout target)`.
+The price is that the object is a finite band model rather than a covariance matrix, so
+this is not a strengthening of Step 4 in Step 4's own coordinates — it is a different and
+non-vacuous route to the same biological conclusion.
+-/
+
+/-- **Excess target risk is strictly positive as soon as one band's optimal readout
+disagrees** — no `F_ST` difference, no tagging scale, no sparsity.
+
+This is the equal-divergence replacement for `covariance_mismatch_pos_of_fst_and_sparse_array`.
+It is not provable in this file: its content is
+`FiniteSpectralModel.degradation_eq_zero_iff`, whose proof is the bandwise sum identity
+`degradation = sum_b (readout gap)^2 * targetSpectrum`, and nothing in the demographic
+machinery here produces it. -/
+theorem excess_target_risk_pos_of_bandwise_readout_mismatch
+    {Band : Type*} [Fintype Band] (source target : FiniteSpectralModel Band) (b : Band)
+    (hb : FiniteSpectralModel.optimalReadout source b ≠
+      FiniteSpectralModel.optimalReadout target b) :
+    0 < FiniteSpectralModel.degradation source target := by
+  rcases lt_or_eq_of_le (FiniteSpectralModel.degradation_nonneg source target) with hlt | heq
+  · exact hlt
+  · exact absurd ((FiniteSpectralModel.degradation_eq_zero_iff source target).mp heq.symm b) hb
+
+/-- **End-to-end `R²` drop from a single band of readout mismatch.**
+
+The Step 4 conclusion — `R²_target < R²_source` — reached with the `F_ST`-difference
+hypothesis deleted rather than assumed. The comparison is between the transported
+source-optimal readout and the refitted target-optimal readout, both evaluated on the
+target, which is the transfer comparison a deployment actually makes.
+
+Deleting `Calibrator.SpectralDegradation` breaks this theorem: `excess_target_risk_pos_of_bandwise_readout_mismatch`
+is its only source of strict positivity, and that in turn is
+`degradation_eq_zero_iff`. -/
+theorem target_r2_drop_of_bandwise_readout_mismatch
+    {Band : Type*} [Fintype Band] (source target : FiniteSpectralModel Band) (b : Band)
+    (varY : ℝ)
+    (hb : FiniteSpectralModel.optimalReadout source b ≠
+      FiniteSpectralModel.optimalReadout target b)
+    (h_varY_pos : 0 < varY) :
+    r2FromMSE
+        (FiniteSpectralModel.risk target (FiniteSpectralModel.optimalReadout source)) varY <
+      r2FromMSE
+        (FiniteSpectralModel.risk target (FiniteSpectralModel.optimalReadout target)) varY := by
+  have hpos := excess_target_risk_pos_of_bandwise_readout_mismatch source target b hb
+  unfold FiniteSpectralModel.degradation at hpos
+  have hlt :
+      FiniteSpectralModel.risk target (FiniteSpectralModel.optimalReadout target) <
+        FiniteSpectralModel.risk target (FiniteSpectralModel.optimalReadout source) := by
+    linarith
+  unfold r2FromMSE
+  have h_inv_pos : 0 < (1 / varY) := one_div_pos.mpr h_varY_pos
+  have hdiv :
+      FiniteSpectralModel.risk target (FiniteSpectralModel.optimalReadout target) / varY <
+        FiniteSpectralModel.risk target (FiniteSpectralModel.optimalReadout source) / varY := by
+    have hmul :
+        FiniteSpectralModel.risk target (FiniteSpectralModel.optimalReadout target) *
+            (1 / varY) <
+          FiniteSpectralModel.risk target (FiniteSpectralModel.optimalReadout source) *
+            (1 / varY) :=
+      mul_lt_mul_of_pos_right hlt h_inv_pos
+    simpa [div_eq_mul_inv] using hmul
+  linarith
 
 /-! ### Example Scenario DGPs (Specific Instantiations)
 
