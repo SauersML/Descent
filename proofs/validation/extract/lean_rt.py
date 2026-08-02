@@ -67,10 +67,24 @@ def lpow(a, b):
     return math.exp(math.log(-a) * b) * math.cos(b * math.pi)
 
 
+# Mathlib matrix/vector methods reachable by dot notation.  Populated below,
+# after the functions exist.
+_MATRIX_METHODS = {}
+
+
 def _proj(obj, fld):
     """Structure projection `x.fld` / anonymous-constructor projection `x.1`."""
     if fld.isdigit():
         return obj[int(fld) - 1]
+    if isinstance(obj, (list, tuple)) and fld in _MATRIX_METHODS:
+        # `(m.sigmaTag P).mulVec wS`: the base is an EXPRESSION, not a binder,
+        # so the translator could not tell at parse time that it is a matrix and
+        # emitted a projection.  At runtime the value is right here and it is a
+        # sequence, so the method is Mathlib's, not a field lookup.  This is a
+        # dispatch on an observed value, not a guess: a dict-valued structure
+        # still takes the field path below.
+        fn = _MATRIX_METHODS[fld]
+        return lambda *a: fn(obj, *a)
     if isinstance(obj, dict):
         if fld not in obj:
             why = (obj.get("__uninhabited__") or {}).get(fld)
@@ -233,6 +247,12 @@ class VecFn(list):
         return f"VecFn({list.__repr__(self)})"
 
 
+def _register_matrix_methods():
+    _MATRIX_METHODS.update({"mulVec": mulVec, "vecMul": vecMul,
+                            "trace": lambda M: trace(M), "transpose": transpose,
+                            "dotProduct": dotProduct})
+
+
 def sumdim(idx, *lens):
     """The length a `∑` with an unannotated index ranges over.
 
@@ -310,3 +330,6 @@ def trace(M):
         if len(r) != len(M):
             raise ValueError(f"trace: matrix is {len(M)}x{len(r)}, not square")
     return sum(M[i][i] for i in range(len(M)))
+
+
+_register_matrix_methods()

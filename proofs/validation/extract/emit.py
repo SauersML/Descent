@@ -65,7 +65,15 @@ def classify(d, struct_names, def_names, translated):
 
     if ret in PROP_RETS or ret.endswith("→ Prop") or ret.startswith("Set "):
         return "STRUCTURAL", "Prop-valued / set-valued"
-    if ret in struct_names or ret.split()[0] in struct_names if ret else False:
+    # A RETURN TYPE WITH AN ARROW IS NOT A STRUCTURE VALUE.  `Pop.pair : Pop →
+    # α` and `HardyWeinbergModel.genotypeProb : DiploidGenotype → ℝ` were being
+    # called structure-valued because the first word of the return type named an
+    # inductive -- so a definition that translates perfectly (the enum-match
+    # compiler turns it into a dispatch table taking the constructor as its last
+    # argument) was filed as STRUCTURAL and never became callable, and the ten
+    # definitions calling `Pop.pair` failed with NameError in turn.
+    if ret and "→" not in ret and (ret in struct_names
+                                   or ret.split()[0] in struct_names):
         return "STRUCTURAL", f"builds a structure value ({ret})"
 
     if d["name"] in translated:

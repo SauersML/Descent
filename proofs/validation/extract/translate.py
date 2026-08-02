@@ -577,9 +577,13 @@ def _enum_of(patterns, enums):
         got = []
         for pat in patterns:
             base, _, ctor = pat.rpartition(".")
-            if base and base.split(".")[-1] != ty:
-                return None
-            if ctor not in ctors:
+            # `continue to the next enum`, NOT `return None`: `enums` holds each
+            # enumeration twice, under its short and its fully-qualified name,
+            # so the first key tried is often `Calibrator.Pop` while the pattern
+            # says `Pop.source`.  Bailing out on that mismatch rejected every
+            # enum-defined function in the corpus.
+            if (base and base.split(".")[-1] != ty.split(".")[-1]) \
+                    or ctor not in ctors:
                 got = None
                 break
             got.append(ctors[ctor])
@@ -612,7 +616,7 @@ def translate_enum_match(d, enums, struct_arg_names=(), fname=None,
     for e in d["equations"]:
         _base, _, ctor = e["pattern"].strip().rpartition(".")
         stmts, ret = translate_body(e["rhs"], struct_arg_names, binders,
-                                    resolver, **kw)
+                                    resolver, enums=enums, **kw)
         if stmts:
             raise Untranslatable("enum branch needs `let`, not supported here")
         branches[ctors[ctor]] = ret
@@ -722,7 +726,7 @@ def translate_def(d, struct_arg_names=(), fname=None, resolver=None,
         pats = [e["pattern"].strip() for e in d.get("equations") or []]
         if enums and _enum_of(pats, enums):
             return translate_enum_match(d, enums, struct_arg_names, fname,
-                                        resolver, enums=enums,
+                                        resolver,
                                         qualified_resolver=qualified_resolver)
         return translate_recursion(d, struct_arg_names, fname, resolver)
     argnames = [pyname(n) for a in d["args"] if not a["implicit"] for n in a["names"]]
