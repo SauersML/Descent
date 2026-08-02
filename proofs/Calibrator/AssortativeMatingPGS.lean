@@ -26,8 +26,11 @@ Key results:
 We define an `AssortativeMatingModel` structure that captures the
 covariance structure under AM. The key parameters are:
 - `r`: spousal phenotypic correlation (0 < r < 1)
-- `h2`: narrow-sense heritability under random mating (0 < h2 < 1)
 - `V_A`: additive genetic variance under random mating
+- `V_P`: total phenotypic variance, with `V_A < V_P`
+
+The heritability `h2` is not among them. It is `V_A / V_P`, so it is computed rather than
+supplied, and `0 < h2 < 1` is a theorem rather than an assumption.
 
 At AM equilibrium, the additive variance inflates to V_A / (1 - r*h2),
 the observed heritability inflates to h2 / (1 - r*h2), and PGS R²
@@ -52,22 +55,40 @@ All downstream theorems derive from this structure.
 structure AssortativeMatingModel where
   /-- Spousal phenotypic correlation -/
   r : ℝ
-  /-- Narrow-sense heritability under random mating -/
-  h2 : ℝ
   /-- Additive genetic variance under random mating -/
   V_A : ℝ
-  /-- Total phenotypic variance (V_P = V_A / h2 under random mating) -/
+  /-- Total phenotypic variance -/
   V_P : ℝ
   r_pos : 0 < r
   r_lt_one : r < 1
-  h2_pos : 0 < h2
-  h2_lt_one : h2 < 1
   V_A_pos : 0 < V_A
-  V_P_pos : 0 < V_P
-  /-- Heritability is ratio of additive to total variance -/
-  h2_def : h2 = V_A / V_P
+  /-- Additive variance is a strict part of the total, which is what makes the
+  heritability a proper fraction. This replaces the free `h2 < 1`. -/
+  V_A_lt_V_P : V_A < V_P
   /-- Stability: ensures geometric series converges -/
-  stability : r * h2 < 1
+  stability : r * (V_A / V_P) < 1
+
+/-- **Narrow-sense heritability**, the ratio of additive to total variance.
+
+This used to be a field of the structure carrying a hypothesis `h2_def : h2 = V_A / V_P`
+that pinned it. A parameter fixed by an equation is not a parameter: it could be supplied
+inconsistently only by supplying a false proof, and every model had to carry the equation
+around. It is now computed, so `h2_def` is `rfl` and the positivity and upper bound are
+theorems rather than assumptions. -/
+noncomputable def AssortativeMatingModel.h2 (m : AssortativeMatingModel) : ℝ :=
+  m.V_A / m.V_P
+
+theorem AssortativeMatingModel.V_P_pos (m : AssortativeMatingModel) : 0 < m.V_P :=
+  lt_trans m.V_A_pos m.V_A_lt_V_P
+
+theorem AssortativeMatingModel.h2_def (m : AssortativeMatingModel) : m.h2 = m.V_A / m.V_P :=
+  rfl
+
+theorem AssortativeMatingModel.h2_pos (m : AssortativeMatingModel) : 0 < m.h2 :=
+  div_pos m.V_A_pos m.V_P_pos
+
+theorem AssortativeMatingModel.h2_lt_one (m : AssortativeMatingModel) : m.h2 < 1 :=
+  (div_lt_one m.V_P_pos).mpr m.V_A_lt_V_P
 
 /-- The product r*h2 is strictly positive in any AM model. -/
 theorem AssortativeMatingModel.rh2_pos (m : AssortativeMatingModel) : 0 < m.r * m.h2 :=
@@ -360,9 +381,17 @@ structure DifferentialAMModel where
   h2_pos : 0 < h2
   h2_lt_one : h2 < 1
   stability_s : r_s * h2 < 1
-  stability_t : r_t * h2 < 1
   /-- Source has more AM than target -/
   more_am_in_source : r_t < r_s
+
+/-- **Target stability follows from source stability.** It used to be assumed separately.
+With less assortative mating in the target and a positive heritability, `r_t * h2` is
+strictly below `r_s * h2`, which is already below one — so assuming it again was a free
+parameter that a model could only have set inconsistently by assuming something false. -/
+theorem DifferentialAMModel.stability_t (d : DifferentialAMModel) : d.r_t * d.h2 < 1 := by
+  have h : d.r_t * d.h2 < d.r_s * d.h2 :=
+    mul_lt_mul_of_pos_right d.more_am_in_source d.h2_pos
+  linarith [d.stability_s]
 
 /-- Source denominator is positive. -/
 theorem DifferentialAMModel.denom_s_pos (d : DifferentialAMModel) : 0 < 1 - d.r_s * d.h2 := by

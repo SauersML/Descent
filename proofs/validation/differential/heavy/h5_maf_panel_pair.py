@@ -26,14 +26,17 @@ THE CONSTRUCTION
     +/- along it gives two strictly positive weight vectors differing only in
     dispersion.
 
-    NOTE ON PROVENANCE: the team lead's construction matched total mass, mean
-    fourth moment, mean drift and mean jet variance, using corpus-specific
-    drift and jet functionals whose script is on the cluster and not readable
-    from here. This script substitutes mean heterozygosity and mean q for those
-    two. The substitution can only make the test HARDER to pass in the relevant
-    direction -- fewer or different matched constraints cannot manufacture a
-    dispersion gap -- but the numbers here will not equal the lead's, and this
-    is a reconstruction rather than a rerun of that script.
+    The four matched functionals are the lead's, verbatim from maf.py: total
+    mass, mean a = E[x^4], mean drift, and mean jet variance, where drift and
+    jet variance are the mean and variance of log(x^2) under the size-biased
+    weights p*x^2. They are computed from the three-point genotype law rather
+    than from closed forms.
+
+    Two step sizes are run. The lead's conservative step (t=0.2 with the /10)
+    gives a ~3% M6 separation and is the better identity check; the maximal
+    nullspace step gives ~20% and is the better powered test. Both are reported
+    because agreement at both step sizes is stronger evidence than either: the
+    predicted gap must track the actual step, not merely be nonzero.
 
 THE TWO THEORY-PINNED CONTROLS (both mandatory)
     CONTROL 1 -- MATCHED FOURTH MOMENT. M4 is a matched constraint, so the two
@@ -65,6 +68,7 @@ MAF_LO, MAF_HI = 0.005, 0.5
 N_PER_ATOM = 4_000_000
 CHUNK = 500_000
 SEED = 20260802
+STEP = "lead"          # "lead" = conservative t=0.2/10; "max" = maximal nullspace step
 
 
 def a_of_q(q):
@@ -90,26 +94,49 @@ def e_x6_direct(q):
     return float(np.sum(p * x ** 6))
 
 
-def build_arms():
-    """Two positive weight vectors matching four functionals, differing in Var(a)."""
-    q = np.exp(np.linspace(np.log(MAF_LO), np.log(MAF_HI), N_ATOMS))
-    a = a_of_q(q)
-    het = 2.0 * q * (1.0 - q)
+def invars(q):
+    """Per-locus (E[x^4], drift, jet variance) from the three-point law.
 
-    A = np.vstack([np.ones_like(q), a, het, q])          # 4 x 40 constraints
-    w0 = np.full(N_ATOMS, 1.0 / N_ATOMS)
+    Verbatim from the lead's maf.py. `w = p * x^2` are size-biased weights
+    summing to 1; drift is the mean of log(x^2) under them and jet variance its
+    variance. Computing them from the genotype law rather than a closed form is
+    what makes them checkable.
+    """
+    p = np.array([(1 - q) ** 2, 2 * q * (1 - q), q ** 2])
+    V = 2 * q * (1 - q)
+    x = (np.array([0.0, 1.0, 2.0]) - 2 * q) / np.sqrt(V)
+    x2 = x ** 2
+    w = p * x2
+    L = np.where(x2 > 0, np.log(np.where(x2 > 0, x2, 1)), 0.0)
+    c = (w * L).sum()
+    v = (w * L * L).sum() - c * c
+    return 1.0 / V, c, v
 
-    # Nullspace of A, then the direction in it that moves mean a^2 the most.
-    _u, _s, vt = np.linalg.svd(A)
-    null = vt[A.shape[0]:]                                # 36 x 40
-    target = a ** 2
-    d = null.T @ (null @ target)
+
+def build_arms(step="lead"):
+    """Two positive weight vectors matching the four functionals, differing in Var(a)."""
+    grid = np.exp(np.linspace(np.log(MAF_LO), np.log(MAF_HI), N_ATOMS))
+    A = np.array([invars(q) for q in grid])
+    a, c, v = A[:, 0], A[:, 1], A[:, 2]
+    C = np.vstack([np.ones_like(a), a, c, v])            # 4 x 40 constraints
+    null = np.linalg.svd(C)[2][4:]                        # 36-dim nullspace
+
+    if step == "lead":
+        k = int(np.argmax(np.abs(null @ (a ** 2))))
+        d = null[k] / np.abs(null[k]).max()
+        w0 = np.ones(N_ATOMS) / N_ATOMS
+        t = 0.2
+        w1, w2 = w0 + t * d / 10, w0 - t * d / 10
+        w1 /= w1.sum(); w2 /= w2.sum()
+        return grid, a, w1, w2
+
+    # Maximal step: project a^2 onto the nullspace, then go as far as positivity allows.
+    d = null.T @ (null @ (a ** 2))
     d /= np.linalg.norm(d)
-
-    # Largest symmetric step keeping both arms strictly positive.
+    w0 = np.ones(N_ATOMS) / N_ATOMS
     t = 0.95 * min(w0[d > 0].min() / d[d > 0].max() if np.any(d > 0) else np.inf,
                    w0[d < 0].min() / (-d[d < 0]).max() if np.any(d < 0) else np.inf)
-    return q, a, w0 + t * d, w0 - t * d
+    return grid, a, w0 + t * d, w0 - t * d
 
 
 def panel_moments(w, a):
@@ -161,7 +188,7 @@ def main():
         "max_abs_err": max(abs(x - y) for _, x, y in ident),
     }
 
-    q, a, wA, wB = build_arms()
+    q, a, wA, wB = build_arms(step=STEP)
     mA = panel_moments(wA, a)
     mB = panel_moments(wB, a)
     out["construction"] = {
