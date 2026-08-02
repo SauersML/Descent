@@ -94,7 +94,7 @@ def independentHistory (amplitude : ℝ) : SpectralHistory where
   phase := 0
 
 /-- A persistent two-state driving mode with the same marginal signal amplitude. -/
-def persistentHalfHistory (amplitude : ℝ) : SpectralHistory where
+noncomputable def persistentHalfHistory (amplitude : ℝ) : SpectralHistory where
   amplitude := amplitude
   memory := 1 / 2
   phase := 0
@@ -104,7 +104,7 @@ the same one-locus marginal amplitude, but at unit amplitude their exact history
 degradation is `2/3`. This is a realizable reversible two-state witness; no complex
 eigenvalue or compact spectral bump is needed.
 
-Biologically, two populations can have the same allele-/feature-frequency marginal while
+Biologically, two populations can have the same allele-frequency or feature-frequency marginal while
 differing in ancestry-tract or haplotype persistence. A deployment radius containing that
 memory direction cannot be inferred from target marginals alone. -/
 theorem same_marginal_different_memory_degradation :
