@@ -2259,6 +2259,47 @@ theorem r2FromSignalVariance_eq_rsquared {k : ℕ} [Fintype (Fin k)]
 noncomputable def gaussianAUCFromSignalVariance (vSignal vNoise : ℝ) : ℝ :=
   Phi (Real.sqrt (vSignal / (2 * vNoise)))
 
+/-- **The equal-variance Gaussian liability regime, carried as an obligation.**
+
+`R²` and Brier could be tied to a process through its second moments, because they *are*
+functions of second moments. AUC is not. Recovering it needs the full conditional law of
+the liability, and this development has no such derivation — so a definition named for the
+AUC of a process, justified by second moments alone, would be the `singletonProportion`
+failure exactly: a name claiming something its signature cannot express.
+
+The device is therefore the one `PowerAnalysis.PowerAgreement` already uses for
+non-central chi-squared power. The AUC the process actually has is a *field*, supplied by
+whoever instantiates this, and the regime is the hypothesis that it agrees with the closed
+form. A caller who cannot discharge `equalVarianceGaussian` does not get to call
+`gaussianAUCFromSignalVariance` an AUC — which is the whole point, because that
+assumption was previously nowhere at all. -/
+structure GaussianLiabilityRegime {k : ℕ} [Fintype (Fin k)]
+    (dgp : DataGeneratingProcess k) (signal : Predictor k) where
+  /-- The second-moment reading the signal-to-noise ratio is computed from. -/
+  moments : MomentReading dgp signal
+  /-- Residual (environmental) variance on the liability scale. -/
+  vEnv : ℝ
+  vEnv_pos : 0 < vEnv
+  /-- The AUC the process actually has, supplied externally rather than derived. -/
+  processAUC : ℝ
+  /-- **The regime.** Under an equal-variance Gaussian liability the process AUC is the
+  closed form at this signal-to-noise ratio. This is the assumption, and it is the
+  instantiator's to justify. -/
+  equalVarianceGaussian :
+    processAUC = Phi (Real.sqrt (moments.vSignal / (2 * vEnv)))
+
+/-- **Under the stated regime the closed form is the process's AUC.**
+
+Deliberately a one-line consequence. The content is not the proof but the obligation:
+before this, "`gaussianAUCFromSignalVariance` is the AUC" was asserted by a name; now it
+is discharged by whoever supplies `equalVarianceGaussian`, and cannot be assumed by
+anyone who cannot. -/
+theorem gaussianAUCFromSignalVariance_eq_processAUC {k : ℕ} [Fintype (Fin k)]
+    {dgp : DataGeneratingProcess k} {signal : Predictor k}
+    (G : GaussianLiabilityRegime dgp signal) :
+    gaussianAUCFromSignalVariance G.moments.vSignal G.vEnv = G.processAUC :=
+  G.equalVarianceGaussian.symm
+
 /-- Exact calibrated Bernoulli Brier risk from prevalence and explained-risk fraction. -/
 def calibratedBrier (π r2 : ℝ) : ℝ :=
   π * (1 - π) * (1 - r2)
