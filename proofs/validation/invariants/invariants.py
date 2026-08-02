@@ -129,7 +129,7 @@ def _rel(a, b):
 # --------------------------------------------------------------------------
 
 
-def derive(c, feasible=None, seed=0, n=400):
+def derive(c, feasible=None, seed=None, n=400):
     """Return (checks, skipped) for one compiled definition.
 
     Each check is a dict with `kind`, `why` (the evidence that it applies) and
@@ -139,7 +139,8 @@ def derive(c, feasible=None, seed=0, n=400):
     names = c.names
     box, _ = admissible_box(d)
     blind = [nm for nm in names if box[nm]["source"] == "none"]
-    rng = random.Random(seed)
+    import seeds as _s
+    rng = random.Random(_s.sub("invariants") if seed is None else seed)
     pts = _sample(box, names, rng, n)
     if feasible is not None:
         pts = [p for p in pts if _safe(feasible, p)]

@@ -19,6 +19,7 @@ import sys
 
 import compile_defs as C
 import invariants as INV
+import seeds
 import totality
 from semantics import admissible_box, required_range
 
@@ -49,7 +50,7 @@ def check_one(c, defs):
 
         from invariants import _sample
 
-        pts = _sample(box, c.names, random.Random(0), 40)
+        pts = _sample(box, c.names, random.Random(seeds.sub("totality")), 40)
         try:
             rr = required_range(d)
             tf = totality.scan(c, box, c.names, pts,

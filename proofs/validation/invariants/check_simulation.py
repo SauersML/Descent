@@ -27,6 +27,8 @@ import random
 import sys
 import zlib
 
+import seeds
+
 import backends
 import compile_defs as C
 import sim_engines as S
@@ -368,7 +370,7 @@ def main(argv):
         # how it was found.  A simulation tier whose answers are not
         # reproducible cannot be used to adjudicate anything.
         pts = _grid(sp["domain"], sp["reps"],
-                    seed=zlib.crc32(k.encode()) % 10000)
+                    seed=seeds.sub(k))
         orc = oracle_values(sp, pts)
         rows, worst = compare(c.fn, sp, pts, orc)
         agrees = worst <= 1.0
@@ -391,7 +393,7 @@ def main(argv):
         # and two of these specs were reporting agreement on a lucky one.
         stab = []
         for sd in range(STABILITY_SEEDS):
-            p2 = _grid(sp["domain"], sp["reps"], seed=4242 + sd * 97)
+            p2 = _grid(sp["domain"], sp["reps"], seed=seeds.sub(k, 1000 + sd))
             o2 = oracle_values(sp, p2)
             _, w2 = compare(c.fn, sp, p2, o2)
             stab.append(w2 <= 1.0)
@@ -440,7 +442,70 @@ def main(argv):
         print(f"      {k}: agrees on {st['seeds_agreeing']}/{st['seeds_tried']}")
     for k in dis:
         v = results[k]
-        w = v["worst_point"]
+        w = v["worst_point"
+    # ---- third batch --------------------------------------------------
+    spec("PortabilityDrift.freqCorrFromFst",
+         lambda fst, seed=0: S.sim_freq_correlation_after_split(fst, seed=seed),
+         [(0.02, 0.25)],
+         "correlation of allele frequencies across loci between two "
+         "populations drifted apart to the requested F_ST, measured across "
+         "loci rather than computed",
+         tol=0.05),
+
+    spec("PortabilityDrift.targetHetFromFst",
+         lambda h, fst, seed=0: S.sim_target_het_after_split(h, fst, seed=seed),
+         [(0.05, 0.49), (0.02, 0.25)],
+         "mean heterozygosity in a daughter population after drifting to the "
+         "requested F_ST, from an explicit Wright-Fisher run",
+         tol=0.06),
+
+    spec("RareVariantPortability.mutationSelectionStepRare",
+         lambda mu, s, h, p, seed=0: S.sim_mutation_selection_step(mu, s, h, p, seed=seed),
+         [(1e-4, 1e-2), (0.02, 0.4), (0.05, 0.5), (0.01, 0.3)],
+         "one generation of viability selection then mutation, counted from "
+         "explicit diploid genotypes",
+         tol=0.03),
+
+    spec("RareVariantPortability.mutationSelectionStepRecessive",
+         lambda mu, s, p, seed=0: S.sim_mutation_selection_step(mu, s, 0.0, p, seed=seed),
+         [(1e-4, 1e-2), (0.02, 0.4), (0.01, 0.3)],
+         "one generation with fitnesses 1, 1, 1-s (fully recessive), counted "
+         "from explicit diploid genotypes",
+         tol=0.03),
+
+    spec("PortabilityDrift.twoDemeIMEquilibriumETss",
+         lambda M, seed=0: S.sim_two_deme_coalescence(M, within=True, seed=seed),
+         [(0.05, 5.0)],
+         "expected WITHIN-deme coalescence time for two lineages, from an "
+         "exact structured-coalescent simulation in units of 2N",
+         tol=0.04),
+
+    spec("PortabilityDrift.twoDemeIMEquilibriumETst",
+         lambda M, seed=0: S.sim_two_deme_coalescence(M, within=False, seed=seed),
+         [(0.1, 5.0)],
+         "expected BETWEEN-deme coalescence time for two lineages, from an "
+         "exact structured-coalescent simulation in units of 2N",
+         tol=0.05),
+
+    spec("SelectionArchitecture.optimumOUVariance",
+         lambda st, tau, seed=0: S.sim_ou_stationary_variance(st, tau, seed=seed),
+         [(0.2, 2.0), (0.5, 5.0)],
+         "stationary variance of the Ornstein-Uhlenbeck process, from "
+         "integrating the SDE forward rather than from its closed form",
+         tol=0.08),
+
+    spec("Conventions.hweGenotypeVariance",
+         lambda p, seed=0: S.sim_genotype_variance(p, seed=seed),
+         [(0.05, 0.95)],
+         "variance of a diploid dosage drawn Binomial(2, p)"),
+
+    spec("Conventions.hudsonFst",
+         lambda p1, p2, seed=0: S.sim_hudson_fst(p1, p2, seed=seed),
+         [(0.1, 0.9), (0.1, 0.9)],
+         "1 - within/total pairwise difference, with both diversities "
+         "measured by drawing pairs of alleles and counting mismatches",
+         tol=0.06),
+]
         print(f"\n  DISAGREES {k} ({v['module']}:{v['line']})")
         print(f"    oracle: {v['oracle']}")
         print(f"    at {w['point']}: lean {w['lean']:.6g} vs simulated "

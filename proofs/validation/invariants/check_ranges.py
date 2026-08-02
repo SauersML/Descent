@@ -26,6 +26,7 @@ import sys
 import backends
 import compile_defs as C
 from backends import FLOAT, INTERVAL, Iv
+import seeds
 import z3backend
 from search import maximize, prove_contained
 import re
@@ -175,7 +176,8 @@ def check_one(c, defs, budget=8000, bnb=1500, use_z3=True):
     # the region -- shrinking is what makes a definition pass vacuously.
     guards, dropped = theorem_guards(c, defs)
     pb = PROVED.get((d["module"], d["name"]), {})
-    best, x = maximize(f, box, names, budget=budget)
+    best, x = maximize(f, box, names, budget=budget,
+                       seed=seeds.sub("range", 0))
     out = dict(range=[lo, hi], range_why=why,
                range_source="name-or-docstring-implied; NOT a theorem-proved "
                             "bound, so a violation is a lead, not a proof of "

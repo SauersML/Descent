@@ -448,3 +448,143 @@ def sim_am_equilibrium_variance(V_A, r, h2, gens=40, n=60000, seed=0):
         off = 0.5 * (partner + mate) + rng.normal(0.0, np.sqrt(va / 2.0), n)
         va = float(np.var(off))
     return va
+
+
+# --------------------------------------------------------------------------
+# third batch: divergence, structured coalescent, mutation-selection, OU
+
+
+def sim_freq_correlation_after_split(fst, Ne=500, loci=20000, seed=0):
+    """corr(p1, p2) across loci for two populations diverged to `fst`.
+
+    Ancestral frequencies are drawn per locus and both populations then drift
+    independently.  The correlation is measured across loci, which is what the
+    name refers to; nothing here evaluates 1 - fst.
+    """
+    rng = np.random.default_rng(seed)
+    t = fst_to_generations(fst, Ne)
+    p0 = rng.uniform(0.05, 0.95, loci)
+    n = int(round(2 * Ne))
+    p1, p2 = p0.copy(), p0.copy()
+    for _ in range(t):
+        p1 = rng.binomial(n, np.clip(p1, 0, 1)) / n
+        p2 = rng.binomial(n, np.clip(p2, 0, 1)) / n
+    if np.std(p1) == 0 or np.std(p2) == 0:
+        return None
+    return float(np.corrcoef(p1, p2)[0, 1])
+
+
+def sim_target_het_after_split(het_source, fst, Ne=500, loci=20000, seed=0):
+    """Mean heterozygosity in a daughter population diverged to `fst`.
+
+    The source is set to the frequency giving `het_source`; the daughter drifts
+    for as long as the requested F_ST takes.
+    """
+    rng = np.random.default_rng(seed)
+    disc = 1.0 - 2.0 * het_source
+    if disc < 0:
+        return None
+    p0 = 0.5 * (1.0 - np.sqrt(disc))
+    t = fst_to_generations(fst, Ne)
+    p = wf_trajectory(p0, Ne, t, loci, rng)
+    return float(np.mean(2 * p * (1 - p)))
+
+
+def sim_mutation_selection_step(mu, s, h, p, N=200000, seed=0):
+    """One generation of selection then mutation, from explicit genotype counts.
+
+    Diploid Hardy-Weinberg sampling of N individuals, viability selection with
+    fitnesses 1, 1-h*s, 1-s for the three genotypes, then mutation from the
+    wild-type allele at rate `mu`.  The new allele frequency is COUNTED.
+    """
+    rng = np.random.default_rng(seed)
+    if not (0.0 <= p <= 1.0):
+        return None
+    g = rng.binomial(2, p, size=N)
+    w = np.where(g == 0, 1.0, np.where(g == 1, 1.0 - h * s, 1.0 - s))
+    w = np.clip(w, 0.0, None)
+    if w.sum() <= 0:
+        return None
+    keep = rng.random(N) < (w / w.max())
+    g = g[keep]
+    if g.size == 0:
+        return None
+    alleles = np.repeat([0, 1], 0)  # build the post-selection gamete pool
+    alleles = np.concatenate([np.ones(int(g.sum()), dtype=np.int8),
+                              np.zeros(int(2 * g.size - g.sum()), dtype=np.int8)])
+    mutate = (alleles == 0) & (rng.random(alleles.size) < mu)
+    alleles = np.where(mutate, 1, alleles)
+    return float(alleles.mean())
+
+
+def sim_two_deme_coalescence(M, within=True, reps=200000, seed=0):
+    """Expected coalescence time for two lineages in a two-deme island model.
+
+    Exact structured-coalescent simulation of the two-lineage Markov chain, in
+    units of 2N generations: while together, coalescence at rate 1 and each
+    lineage migrates at rate M/2; while apart, only migration.  Waiting times
+    are sampled, so neither 2 nor (2M+1)/M is ever evaluated.
+    """
+    rng = np.random.default_rng(seed)
+    if M <= 0:
+        return None
+    tot = 0.0
+    for _ in range(reps):
+        same = bool(within)
+        t = 0.0
+        while True:
+            if same:
+                rate = 1.0 + M          # coalesce (1) or one lineage leaves (M)
+                t += rng.exponential(1.0 / rate)
+                if rng.random() < 1.0 / rate:
+                    break
+                same = False
+            else:
+                rate = M                # either lineage migrates to the other
+                t += rng.exponential(1.0 / rate)
+                same = True
+        tot += t
+    return float(tot / reps)
+
+
+def sim_ou_stationary_variance(sigma_theta, tau, reps=20000, seed=0):
+    """Stationary variance of dX = -(X/tau) dt + sigma_theta dW, by simulation.
+
+    Euler-Maruyama on purpose.  The EXACT discrete transition for an
+    Ornstein-Uhlenbeck process has the stationary variance built into its noise
+    term, so integrating with it would be assuming the answer.  The cost is a
+    known O(dt/tau) discretisation bias in the variance, held to about a
+    quarter of a percent by dt = tau/200 -- well inside the spec's tolerance
+    and in a direction stated here rather than discovered later.
+
+    Burn-in is 12 relaxation times, so the initial condition is forgotten.
+    """
+    rng = np.random.default_rng(seed)
+    dt = tau / 200.0
+    steps = int(12 * tau / dt)
+    x = np.zeros(reps)
+    sq = np.sqrt(dt)
+    for _ in range(steps):
+        x += -(x / tau) * dt + sigma_theta * sq * rng.standard_normal(reps)
+    return float(np.var(x))
+
+
+def sim_hudson_fst(p1, p2, n=200000, seed=0):
+    """Hudson's F_ST as 1 - (mean within-pop diversity)/(total diversity).
+
+    Diversity is measured by DRAWING PAIRS of alleles and counting the fraction
+    that differ, which is what pi means, rather than evaluating 2p(1-p).
+    """
+    rng = np.random.default_rng(seed)
+    a1 = rng.random(n) < p1
+    b1 = rng.random(n) < p1
+    a2 = rng.random(n) < p2
+    b2 = rng.random(n) < p2
+    within = 0.5 * (np.mean(a1 != b1) + np.mean(a2 != b2))
+    # total: draw one allele from each population's pooled sample
+    pool_a = np.where(rng.random(n) < 0.5, a1, a2)
+    pool_b = np.where(rng.random(n) < 0.5, b1, b2)
+    total = np.mean(pool_a != pool_b)
+    if total <= 0:
+        return None
+    return float(1.0 - within / total)

@@ -101,12 +101,13 @@ def build(st, defs, arity, rename, ambiguous, ns, emitted):
                 hyps=hyps, concl=concl)
 
 
-def evaluate(prop, ns_globals, seed=0, want=40, tries=8000):
+def evaluate(prop, ns_globals, seed=None, want=40, tries=8000):
     """Sample points satisfying the hypotheses; check the conclusion.
 
     Returns (n_accepted, n_failed, first_failure).
     """
-    rng = random.Random(seed)
+    import seeds as _s
+    rng = random.Random(_s.sub("theorems") if seed is None else seed)
     ok = fail = 0
     first = None
     for _ in range(tries):
