@@ -216,6 +216,79 @@ structure OneLocusArchitecture where
 noncomputable def OneLocusArchitecture.averageEffect (m : OneLocusArchitecture) : ℝ :=
   m.a + m.d * (1 - 2 * m.p)
 
+/-! ### Wiring to the genotype core
+
+The claim that the average effect is "what a dosage regression recovers" was carried by
+the docstring above, which is the failure mode `Conventions` exists to prevent: a name
+asserting a relationship to an observable that nothing connects it to. The architecture is
+a triple of reals until it is attached to genotypes with frequencies.
+
+`averageEffect_eq_regression_slope` is that attachment. It says the covariance of genotypic
+value with allele dosage, under this development's own `HardyWeinbergModel` and its own
+`genotypeProb`, is the genotype variance times the average effect — so the least-squares
+slope of value on dosage *is* `α`. This is Fisher (1918) in one locus, and with it the
+blindness instance below stops being about an abstract probe and becomes a statement about
+regression on genotypes: the quantity a PGS fits.
+
+Note what the wiring exposes. `d` enters the covariance only through the factor
+`1 - 2 q`, and `genotypeVariance = 2 q (1 - q)` is symmetric about `q = 1/2` while
+`1 - 2 q` vanishes there. The blindness is therefore not an artifact of the parameterisation
+`(a, d)`; it is a property of the Hardy-Weinberg design matrix, which has no column that
+separates the heterozygote from the homozygote midpoint when the two homozygotes are
+equally frequent. -/
+
+/-- Genotypic values: homozygotes at `∓a`, heterozygote displaced by `d` from their
+midpoint. -/
+def OneLocusArchitecture.genotypicValue (m : OneLocusArchitecture) : DiploidGenotype → ℝ
+  | .homRef => -m.a
+  | .het => m.d
+  | .homAlt => m.a
+
+/-- Mean genotypic value under Hardy-Weinberg proportions. -/
+noncomputable def OneLocusArchitecture.meanValue
+    (m : OneLocusArchitecture) (h : HardyWeinbergModel) : ℝ :=
+  ∑ g : DiploidGenotype, h.genotypeProb g * m.genotypicValue g
+
+/-- Covariance of genotypic value with allele dosage under Hardy-Weinberg. -/
+noncomputable def OneLocusArchitecture.valueDosageCovariance
+    (m : OneLocusArchitecture) (h : HardyWeinbergModel) : ℝ :=
+  ∑ g : DiploidGenotype,
+    h.genotypeProb g * (m.genotypicValue g - m.meanValue h) * h.centeredAltAlleleCount g
+
+/-- **Fisher's theorem, one locus: the average effect is the dosage-regression slope.**
+
+`Cov(value, dosage) = Var(dosage) · α`. Since `Var(dosage) = 2q(1-q)` is nonzero away from
+fixation, the least-squares slope is exactly `α = a + d(1 - 2q)`, which is what makes the
+average effect the observable rather than a definition. -/
+theorem averageEffect_eq_regression_slope
+    (m : OneLocusArchitecture) (h : HardyWeinbergModel) (hq : h.altFreq = m.p) :
+    m.valueDosageCovariance h = h.genotypeVariance * m.averageEffect := by
+  have hsum : h.refFreq + h.altFreq = 1 := by
+    unfold HardyWeinbergModel.refFreq; ring
+  unfold OneLocusArchitecture.valueDosageCovariance OneLocusArchitecture.meanValue
+    HardyWeinbergModel.centeredAltAlleleCount OneLocusArchitecture.averageEffect
+  rw [h.expectedAltAlleleCount_eq, h.genotypeVariance_eq]
+  rw [Fintype.sum_equiv DiploidGenotype.equivFin3 _
+      (fun i : Fin 3 =>
+        h.genotypeProb (DiploidGenotype.equivFin3.symm i) *
+          m.genotypicValue (DiploidGenotype.equivFin3.symm i))
+      (by intro x; rw [DiploidGenotype.equivFin3_symm_apply_apply])]
+  rw [Fintype.sum_equiv DiploidGenotype.equivFin3 _
+      (fun i : Fin 3 =>
+        h.genotypeProb (DiploidGenotype.equivFin3.symm i) *
+          (m.genotypicValue (DiploidGenotype.equivFin3.symm i) -
+            ∑ j : Fin 3,
+              h.genotypeProb (DiploidGenotype.equivFin3.symm j) *
+                m.genotypicValue (DiploidGenotype.equivFin3.symm j)) *
+          (altAlleleCount (DiploidGenotype.equivFin3.symm i) - 2 * h.altFreq))
+      (by intro x; rw [DiploidGenotype.equivFin3_symm_apply_apply])]
+  rw [Fin.sum_univ_three, Fin.sum_univ_three]
+  simp [DiploidGenotype.equivFin3, HardyWeinbergModel.genotypeProb, altAlleleCount,
+    OneLocusArchitecture.genotypicValue]
+  unfold HardyWeinbergModel.refFreq
+  rw [← hq]
+  ring_nf
+
 /-- **The average effect is blind to dominance at equal allele frequency.**
 
 Instance 8 of the registry. Probe: the average effect. Witness pair: two loci with the same
@@ -224,7 +297,13 @@ homozygote contrast at `p = 1/2`, one additive and one not. Kind: genotypic.
 The consequence, via `ProbeBlindness.no_criterion_of_factors`, is that *no* rule reading the
 average effect — no significance threshold, no effect-size filter, no combination of them —
 decides whether a locus is additive. A score fit on dosages is not approximately blind to
-dominance at equal frequency; it is exactly blind. -/
+dominance at equal frequency; it is exactly blind.
+
+The probe is the observable and not merely a named quantity:
+`averageEffect_eq_regression_slope` identifies it with the least-squares slope of genotypic
+value on allele dosage under this development's own `HardyWeinbergModel`. So the object
+this instance proves undecidable is the coefficient a polygenic score fits, not an
+abstraction standing in for it. -/
 noncomputable def averageEffect_blind_to_dominance {δ : ℝ} (hδ : δ ≠ 0) (a : ℝ) :
     ProbeBlindness OneLocusArchitecture.averageEffect (fun m => m.d = 0) where
   positive := ⟨a, 0, 1 / 2⟩
