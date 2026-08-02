@@ -1,4 +1,5 @@
 import Calibrator.ReversibleMarkovSpectrum
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
 
 namespace Calibrator
 

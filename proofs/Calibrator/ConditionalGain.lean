@@ -98,12 +98,12 @@ end FiniteCoupledPhaseLaw
 
 /-- Joint expectation for two copied binary phase factors `Y,Y`, with `Y = ±1` equally
 likely.  The product is identically one. -/
-def copiedBinaryJointExpectation : ℝ :=
+noncomputable def copiedBinaryJointExpectation : ℝ :=
   ((1 : ℝ) * 1 + (-1 : ℝ) * (-1)) / 2
 
 /-- The proposed product of conditional factors for the same model.  The first factor is
 `E Y = 0`; the second is `Y`, so their product has expectation zero. -/
-def copiedBinaryConditionalProductExpectation : ℝ :=
+noncomputable def copiedBinaryConditionalProductExpectation : ℝ :=
   ((((1 : ℝ) + (-1 : ℝ)) / 2) * 1 +
     (((1 : ℝ) + (-1 : ℝ)) / 2) * (-1)) / 2
 

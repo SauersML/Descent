@@ -223,12 +223,12 @@ theorem diploid_modulus_degenerate_only_at_half (q : ℝ) (hq0 : 0 < q) (hq1 : q
   have hne : (2 * q * (1 - q)) ≠ 0 := ne_of_gt hden
   have hpoly : ((0 - 2 * q) ^ 2 - 2 * q * (1 - q)) ^ 2
       = ((2 - 2 * q) ^ 2 - 2 * q * (1 - q)) ^ 2 := by
+    have hD2 : ((2 * q * (1 - q)) ^ 2) ≠ 0 := pow_ne_zero 2 hne
     have hexp : ∀ x : ℝ, x / (2 * q * (1 - q)) - 1
         = (x - 2 * q * (1 - q)) / (2 * q * (1 - q)) := by
       intro x
       field_simp
-    rw [hexp, hexp, div_pow, div_pow, div_eq_div_iff (by positivity) (by positivity)] at hsq
-    have hD2 : ((2 * q * (1 - q)) ^ 2) ≠ 0 := pow_ne_zero 2 hne
+    rw [hexp, hexp, div_pow, div_pow, div_eq_div_iff hD2 hD2] at hsq
     exact mul_right_cancel₀ hD2 hsq
   have hfac : (2 * q - 1) * (3 * q ^ 2 - 3 * q + 1) = 0 := by
     linear_combination hpoly / 16
@@ -271,10 +271,7 @@ theorem diploidAtomValue_reflect (j : Fin 3) (q : ℝ) :
 /-- **Reflection swaps the two homozygote masses and fixes the heterozygote.** -/
 theorem diploidAtomMass_reflect (j : Fin 3) (q : ℝ) :
     diploidAtomMass j (1 - q) = diploidAtomMass (genotypeFlip3 j) q := by
-  fin_cases j <;> · simp only [diploidAtomMass, genotypeFlip3, Matrix.cons_val_zero,
-      Matrix.cons_val_one, Matrix.head_cons, Matrix.cons_val_two, Matrix.tail_cons]
-                   norm_num
-                   ring
+  fin_cases j <;> simp [diploidAtomMass, genotypeFlip3] <;> ring
 
 /-- **The modulus curve is reflection-invariant up to relabelling**: `m_j(1-q) = m_{2-j}(q)`.
 
@@ -413,7 +410,10 @@ theorem not_separating_of_frequencyTie {k n : ℕ} (family : BundleFamily k)
     ¬ Separating family panel := by
   intro hsep
   obtain ⟨v, hcover, hothers⟩ := hsep i
-  exact hcover (by rw [htie]; exact hothers l hne)
+  have hzero : family.massAt (panel.support i) v = 0 := by
+    rw [htie]
+    exact hothers l hne
+  exact hcover hzero
 
 /-- **A tie is not merely an obstruction to the proof: it is a genuine non-identifiability.**
 

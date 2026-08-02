@@ -1,4 +1,5 @@
 import Calibrator.Condensation
+import Calibrator.CramerStratum
 import Calibrator.CumulantBlindness
 import Calibrator.JetBarrier
 import Calibrator.LocalToGlobalCoherence
@@ -961,6 +962,139 @@ intensities differ and the compound-Poisson limits differ. -/
 theorem hardCall_intensity_inflated :
     1 < latticeInflation hardCallLatticeSpan :=
   one_lt_latticeInflation hardCallLatticeSpan_pos
+
+/-!
+## 4a. The lattice frequency is outside the Cramér stratum
+
+`Calibrator.CramerStratum` proves that a lattice coordinate law violates Cramér's
+condition (C) outright — `not_cramer_of_lattice`, no Diophantine input — and its
+`hwe_not_cramer_of_lattice` specialises that to a Hardy-Weinberg locus. But that
+specialisation carries the **gap condition** as a hypothesis, and its docstring says in
+so many words that deriving the hypothesis for the coordinate `log x ^ 2` at `q*` "is
+*not* done here ... the connection is a route, not a discharged hypothesis".
+
+This section discharges it. The reason it was left open is a real gap and not an
+oversight: `hardCall_arithmeticProgression_at_critical_maf` is an identity among the
+three *squared standardized values*, while (C) is a condition on the three *logarithms*,
+and `CramerStratum` deliberately does not compute logarithms of genotype quantities.
+The passage between them is the computation below, and it needs the closed forms
+`standardizedSquare_values`, which live here.
+
+At `q*` the lattice identity `(1 - 2q) ^ 2 = 4 q (1 - q)` forces the heterozygote's
+squared standardized value to be exactly `2` — the geometric mean of the two homozygote
+values `2q/(1-q)` and `2(1-q)/q`, whose product is `4`. Writing
+`h = hardCallLatticeSpan = log ((1 - q*) / q*)`, the three logarithms are therefore
+
+  `log 2 - h`,  `log 2`,  `log 2 + h`,
+
+so every gap `log x_u ^ 2 - log x_v ^ 2` lies in `h ℤ` with index difference in
+`{-2, -1, 0, 1, 2}`. That is exactly the hypothesis `not_cramer_of_lattice` consumes,
+and the conclusion is the scope statement `CramerStratum` was written to support:
+**at `q*` a hard-called locus is outside the Cramér stratum**, so every Edgeworth /
+Insertion-Lemma result in this development scoped to (C) is unavailable for hard calls
+and available for imputed dosages, which are continuous per locus.
+
+Note what is and is not proved. The lattice route gives the failure of (C) at *this*
+frequency, unconditionally. The claim that a hard call is outside the stratum at *every*
+polymorphic frequency is stronger, and it still needs the Kronecker field
+`AtomicCramerFailure.recurrence`; it is not obtained here.
+-/
+
+/-- The integer position of each genotype in the arithmetic progression that
+`log x ^ 2` forms at a lattice frequency. The heterozygote sits at the centre, because
+the lattice condition says exactly that its squared standardized value is the geometric
+mean of the two homozygotes'. -/
+def hardCallLatticeIndex : DiploidGenotype → ℤ
+  | DiploidGenotype.homRef => -1
+  | DiploidGenotype.het => 0
+  | DiploidGenotype.homAlt => 1
+
+/-- **The three logarithms, in closed form, at any lattice frequency.**
+
+`log x_g ^ 2 = log 2 + log ((1 - q) / q) * index g`, whenever `hweLatticeCondition q`
+holds. Stated for a general `q` satisfying the condition rather than only at `q*`,
+because the proof uses the condition and nothing else about `q*`; the `q*` instance is
+below and is obtained by discharging the hypothesis with
+`hardCall_arithmeticProgression_at_critical_maf`. -/
+theorem hardCall_logSquare_eq_of_latticeCondition (h : HardyWeinbergModel)
+    (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1)
+    (hlat : hweLatticeCondition h.altFreq) (g : DiploidGenotype) :
+    Real.log (h.standardizedSquare g)
+      = Real.log 2 + Real.log ((1 - h.altFreq) / h.altFreq)
+          * (hardCallLatticeIndex g : ℝ) := by
+  have hqne : h.altFreq ≠ 0 := ne_of_gt hq0
+  have hppos : (0 : ℝ) < 1 - h.altFreq := by linarith
+  have hpne : (1 : ℝ) - h.altFreq ≠ 0 := ne_of_gt hppos
+  have h2q : (2 : ℝ) * h.altFreq ≠ 0 := by positivity
+  have h2p : (2 : ℝ) * (1 - h.altFreq) ≠ 0 := by positivity
+  have hlat' : (1 - 2 * h.altFreq) ^ 2 = 4 * h.altFreq * (1 - h.altFreq) := hlat
+  obtain ⟨hX0, hX1, hX2⟩ := standardizedSquare_values h hq0 hq1
+  have hspan : Real.log ((1 - h.altFreq) / h.altFreq)
+      = Real.log (1 - h.altFreq) - Real.log h.altFreq := Real.log_div hpne hqne
+  cases g with
+  | homRef =>
+    rw [hX0, Real.log_div h2q hpne, Real.log_mul two_ne_zero hqne, hspan]
+    simp only [hardCallLatticeIndex]
+    push_cast
+    ring
+  | het =>
+    -- The lattice condition is precisely `x_het ^ 2 = 2`: the numerator becomes
+    -- `4 q (1 - q)` and the denominator is `2 q (1 - q)`.
+    have hval : h.standardizedSquare DiploidGenotype.het = 2 := by
+      rw [hX1, hlat']
+      first
+        | (field_simp; ring)
+        | field_simp
+    rw [hval]
+    simp only [hardCallLatticeIndex]
+    push_cast
+    ring
+  | homAlt =>
+    rw [hX2, Real.log_div h2p hqne, Real.log_mul two_ne_zero hpne, hspan]
+    simp only [hardCallLatticeIndex]
+    push_cast
+    ring
+
+/-- **The gap condition of `CramerStratum.not_cramer_of_lattice`, discharged at `q*`.**
+
+Every difference of two log-squared-standardized values is an integer multiple of
+`hardCallLatticeSpan`. This is the hypothesis that `hwe_not_cramer_of_lattice` carries
+abstractly; supplying it here is what turns that theorem from a conditional into a
+statement about genotypes. -/
+theorem hardCall_logSquare_lattice_at_critical_maf (h : HardyWeinbergModel)
+    (hq : h.altFreq = latticeCriticalMaf) (u v : DiploidGenotype) :
+    ∃ k : ℤ, Real.log (h.standardizedSquare u) - Real.log (h.standardizedSquare v)
+      = hardCallLatticeSpan * k := by
+  have hq0 : 0 < h.altFreq := by rw [hq]; exact latticeCriticalMaf_pos
+  have hq1 : h.altFreq < 1 := by rw [hq]; exact latticeCriticalMaf_lt_one
+  have hlat : hweLatticeCondition h.altFreq := by
+    rw [hq]; exact hardCall_arithmeticProgression_at_critical_maf
+  have hspan : hardCallLatticeSpan = Real.log ((1 - h.altFreq) / h.altFreq) := by
+    unfold hardCallLatticeSpan; rw [hq]
+  refine ⟨hardCallLatticeIndex u - hardCallLatticeIndex v, ?_⟩
+  rw [hardCall_logSquare_eq_of_latticeCondition h hq0 hq1 hlat u,
+    hardCall_logSquare_eq_of_latticeCondition h hq0 hq1 hlat v, hspan]
+  push_cast
+  ring
+
+/-- **A hard-called locus at `q*` is outside the Cramér stratum.**
+
+The load-bearing consequence, and the reason `Calibrator.CramerStratum` is imported by
+this file rather than merely cited by it: this statement is *not provable here*. Its
+content is `CramerStratum.not_cramer_of_lattice`, an argument about characteristic
+functions returning to modulus one at the lattice frequencies `2 pi n / h`, which has no
+counterpart anywhere in the spectroscopy machinery. What this file supplies is the
+genotype input — the three logarithms and their common span.
+
+Scope consequence, stated plainly because it constrains the rest of the corpus: results
+proved on the Cramér stratum transfer to imputed dosages and **do not** transfer to hard
+calls at this frequency. -/
+theorem hardCall_not_cramer_at_critical_maf (h : HardyWeinbergModel)
+    (hq : h.altFreq = latticeCriticalMaf) :
+    ¬ CramerCondition h.genotypeProb (fun g => Real.log (h.standardizedSquare g)) :=
+  hwe_not_cramer_of_lattice h (fun g => Real.log (h.standardizedSquare g))
+    hardCallLatticeSpan hardCallLatticeSpan_pos
+    (hardCall_logSquare_lattice_at_critical_maf h hq)
 
 /-!
 ## 4b. The complete invariant list of a genotype coding

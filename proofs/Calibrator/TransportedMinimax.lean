@@ -57,7 +57,6 @@ theorem robustRidgeCandidate_eq (S τ a r : ℝ) (ha : 0 < a) (hr : 0 ≤ r)
   have har : a + r ≠ 0 := ne_of_gt (by linarith)
   unfold robustRidgeCandidate transportedRidgeParameter
   field_simp [har, hS]
-  ring
 
 /-- The candidate satisfies the scalar first-order stationarity equation. -/
 theorem robustRidgeCandidate_stationary (S τ a r : ℝ) (ha : 0 < a) (hr : 0 ≤ r)

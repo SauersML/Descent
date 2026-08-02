@@ -48,8 +48,8 @@ If the modulus of the expectation is bounded by `ρ^n` with `0 < ρ < 1`, then t
 
 The result is agnostic about the source of the bound. In a symbolic dynamical application,
 decodability and a genuine partial-expectation contraction must be proved first. -/
-theorem linear_gain_of_uniform_factor (ρ E : ℝ) (hρ0 : 0 < ρ) (hρ1 : ρ < 1)
-    (n : ℕ) (hE : 0 < E) (hbound : E ≤ ρ ^ n) :
+theorem linear_gain_of_uniform_factor (ρ E : ℝ) (n : ℕ)
+    (hE : 0 < E) (hbound : E ≤ ρ ^ n) :
     (n : ℝ) * Real.log (1 / ρ) ≤ -Real.log E := by
   have hlog : Real.log E ≤ Real.log (ρ ^ n) := Real.log_le_log hE hbound
   rw [Real.log_pow] at hlog
