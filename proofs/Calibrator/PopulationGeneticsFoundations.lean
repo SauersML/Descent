@@ -243,9 +243,48 @@ lost outright and the equilibrium is the boundary value `0`, which
 noncomputable def selectionMigrationEquilibrium (s m : ℝ) : ℝ :=
   max 0 ((s - m - m * s) / s)
 
-/-- The equilibrium under the migration-first convention. -/
+/-- The equilibrium under the migration-first convention.
+
+Derived, not stipulated, in the same way as its companion:
+`selectionMigrationEquilibriumMigrationFirst_isFixedPoint` proves it is the
+nonzero solution of `continentIslandStepMigrationFirst s m p = p`, and the
+`max 0` carries the same absorbing boundary, since migration swamps selection
+under either ordering.
+
+    Empirical status: VALIDATED (iteration gives 0.47368 at s = 0.1, m = 0.05,
+    matching this closed form; the selection-first convention rests at 0.45000
+    on the same parameters, which is the composition convention showing up in
+    the fourth decimal). -/
 noncomputable def selectionMigrationEquilibriumMigrationFirst (s m : ℝ) : ℝ :=
   max 0 ((s - m - m * s) / (s * (1 - m)))
+
+/-- **The migration-first equilibrium is a fixed point of the migration-first
+map.**  Neither ordering is more correct, but each must be pinned by its own
+dynamic; without this theorem the two closed forms could be swapped and nothing
+would fail to compile. -/
+theorem selectionMigrationEquilibriumMigrationFirst_isFixedPoint (s m : ℝ)
+    (h_s : 0 < s) (h_m : m < 1) (h_maintained : m * (1 + s) < s) :
+    continentIslandStepMigrationFirst s m
+        (selectionMigrationEquilibriumMigrationFirst s m) =
+      selectionMigrationEquilibriumMigrationFirst s m := by
+  have hs' : s ≠ 0 := ne_of_gt h_s
+  have hm : (0 : ℝ) < 1 - m := by linarith
+  have hm' : (1 : ℝ) - m ≠ 0 := ne_of_gt hm
+  have hsm : (1 : ℝ) + s ≠ 0 := by positivity
+  have hx : 0 < (s - m - m * s) / (s * (1 - m)) := by
+    apply div_pos _ (mul_pos h_s hm)
+    nlinarith
+  have heq : selectionMigrationEquilibriumMigrationFirst s m =
+      (s - m - m * s) / (s * (1 - m)) := max_eq_right hx.le
+  rw [heq]
+  unfold continentIslandStepMigrationFirst
+  have hden : 1 + s * ((1 - m) * ((s - m - m * s) / (s * (1 - m)))) =
+      (1 + s) * (1 - m) := by
+    field_simp
+    ring
+  rw [hden]
+  field_simp
+  ring
 
 /-- Loss is absorbing: an allele absent from the island stays absent. -/
 @[simp] theorem continentIslandStep_zero (s m : ℝ) :
@@ -461,13 +500,52 @@ theorem scaledMutationRate_pos (Ne μ : ℝ) (hNe : 0 < Ne) (hμ : 0 < μ) :
   unfold scaledMutationRate
   positivity
 
+/-- **One coalescent time unit of the identity balance, in scaled units.**
+
+Time in units of `2 Nₑ` generations. On that timescale a lineage pair coalesces
+at rate one, so identity is regenerated in full over a unit of scaled time,
+while the homogenising force removes identity at the scaled rate `scaledRate`:
+`θ = 4 Nₑ μ` for mutation, `M = 4 Nₑ m` for migration, and the *sum* when both
+act, which is the reason the two scaled rates add rather than compose.
+
+Composition convention: the balance is written in scaled time, so no
+within-generation ordering enters and the map is the same under either. The
+per-generation maps, where the ordering does matter, are `ibdFlowStep` and
+`ibdRecurrenceStep` in `Calibrator.PortabilityDrift`; this one is their
+scaled-time limit and is stated here because the definitions it pins are
+parameterised by `θ` and `M` rather than by `Nₑ` and a rate.
+
+    Empirical status: UNTESTED. -/
+noncomputable def scaledIdentityStep (scaledRate F : ℝ) : ℝ :=
+  1 - scaledRate * F
+
+/-- **`1/(1 + scaledRate)` is the fixed point of the scaled identity balance.**
+Setting `F = 1 - scaledRate * F` gives `F (1 + scaledRate) = 1`. Every
+`1/(1 + θ)` and `1/(1 + M)` below is this lemma at a particular scaled rate. -/
+theorem scaledIdentityStep_fixedPoint (scaledRate : ℝ) (h : 0 ≤ scaledRate) :
+    scaledIdentityStep scaledRate (1 / (1 + scaledRate)) = 1 / (1 + scaledRate) := by
+  have hd : (0 : ℝ) < 1 + scaledRate := by linarith
+  have hd' : (1 : ℝ) + scaledRate ≠ 0 := ne_of_gt hd
+  unfold scaledIdentityStep
+  rw [mul_one_div, sub_eq_iff_eq_add, div_add_div_same, div_self hd']
+
 /-- **Wright's Fst under mutation-drift balance (island model).**
     Fst_eq = 1 / (1 + 4Neμ) = 1 / (1 + θ).
     This is the equilibrium Fst when mutation counteracts drift.
 
+    Not stipulated: `fstMutationDriftEquilibrium_isFixedPoint` derives it as the
+    rest point of `scaledIdentityStep` at scaled rate `θ`.
+
     Empirical status: UNTESTED. -/
 noncomputable def fstMutationDriftEquilibrium (θ : ℝ) : ℝ :=
   1 / (1 + θ)
+
+/-- **The mutation-drift equilibrium is the rest point of the scaled identity
+balance** driven by mutation alone. -/
+theorem fstMutationDriftEquilibrium_isFixedPoint (θ : ℝ) (hθ : 0 ≤ θ) :
+    scaledIdentityStep θ (fstMutationDriftEquilibrium θ) =
+      fstMutationDriftEquilibrium θ :=
+  scaledIdentityStep_fixedPoint θ hθ
 
 /-- Equilibrium Fst is positive for nonneg θ. -/
 theorem fstMutationDriftEquilibrium_pos (θ : ℝ) (hθ : 0 ≤ θ) :
@@ -867,6 +945,24 @@ theorem islandModelFst_eq_mutationForm (Ne m : ℝ) :
 noncomputable def fstMigrationMutationEquilibrium (Ne m μ : ℝ) : ℝ :=
   1 / (1 + 4 * Ne * m + 4 * Ne * μ)
 
+/-- **The combined equilibrium is the rest point of the scaled identity balance
+at the summed scaled rate.**  This is where the additivity of `θ` and `M` comes
+from: one balance, one rate, and that rate is `4 Nₑ (m + μ)`. -/
+theorem fstMigrationMutationEquilibrium_isFixedPoint (Ne m μ : ℝ)
+    (hNe : 0 < Ne) (hm : 0 ≤ m) (hμ : 0 ≤ μ) :
+    scaledIdentityStep (4 * Ne * m + 4 * Ne * μ)
+        (fstMigrationMutationEquilibrium Ne m μ) =
+      fstMigrationMutationEquilibrium Ne m μ := by
+  have h4 : (0 : ℝ) ≤ 4 * Ne := by linarith
+  have h : (0 : ℝ) ≤ 4 * Ne * m + 4 * Ne * μ :=
+    add_nonneg (mul_nonneg h4 hm) (mul_nonneg h4 hμ)
+  have hbody : fstMigrationMutationEquilibrium Ne m μ =
+      1 / (1 + (4 * Ne * m + 4 * Ne * μ)) := by
+    unfold fstMigrationMutationEquilibrium
+    rw [add_assoc]
+  rw [hbody]
+  exact scaledIdentityStep_fixedPoint _ h
+
 /-- Combined Fst is below migration-only Fst. -/
 theorem fstMigrationMutation_lt_migrationOnly (Ne m μ : ℝ)
     (hNe : 0 < Ne) (hm : 0 < m) (hμ : 0 < μ) :
@@ -1214,6 +1310,14 @@ theorem hetMutationDrift_fixed_point (Ne mu : ℝ)
   have hNe2 : (2 * Ne) ≠ 0 := by linarith
   field_simp
   ring_nf
+
+/-- **The equilibrium heterozygosity is a fixed point of the recurrence.**
+    The same statement as `hetMutationDrift_fixed_point`, under the name that
+    ties it to the definition it pins. -/
+theorem hetEquilibrium_isFixedPoint (Ne mu : ℝ) (hNe : 0 < Ne) (hmu : 0 < mu) :
+    hetMutationDriftRecurrence Ne mu (hetEquilibrium Ne mu) 1 =
+      hetEquilibrium Ne mu :=
+  hetMutationDrift_fixed_point Ne mu hNe hmu
 
 /-- **The fixed point is unique in [0,1].**
     For any H in [0,1] satisfying f(H) = H, we must have H = θ/(1+θ).

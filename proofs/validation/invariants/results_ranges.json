@@ -6,8 +6,21 @@
   ],
   "range_why": "`epistaticVariancePairwise` names a variance",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
-  "bounding_theorems": [],
-  "bounding_theorem_hyps": {},
+  "proved_bound": [
+   null,
+   null
+  ],
+  "bounding_theorems": [
+   "epistatic_variance_pairwise_nonneg"
+  ],
+  "bounding_theorem_hyps": {
+   "epistatic_variance_pairwise_nonneg": [
+    "0 \u2264 p\u2081",
+    "p\u2081 \u2264 1",
+    "0 \u2264 p\u2082",
+    "p\u2082 \u2264 1"
+   ]
+  },
   "unmodelled_hypotheses": [],
   "box": {
    "\u03b3": [
@@ -71,6 +84,10 @@
   ],
   "range_why": "`equilibriumFst` names a fixation index / F-statistic",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -126,6 +143,10 @@
   ],
   "range_why": "`geneFlowFstStep` names a fixation index / F-statistic",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -189,6 +210,10 @@
   ],
   "range_why": "`gwasHeritability` names a heritability",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -233,8 +258,21 @@
   ],
   "range_why": "`portability` names a portability / retention factor -- a fraction of what transfers",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
-  "bounding_theorems": [],
-  "bounding_theorem_hyps": {},
+  "proved_bound": [
+   null,
+   null
+  ],
+  "bounding_theorems": [
+   "portability_bounded_by_rg_sq"
+  ],
+  "bounding_theorem_hyps": {
+   "portability_bounded_by_rg_sq": [
+    "0 \u2264 fst",
+    "fst \u2264 1",
+    "0 \u2264 tagging_ratio",
+    "tagging_ratio \u2264 1"
+   ]
+  },
   "unmodelled_hypotheses": [],
   "box": {
    "rg": [
@@ -270,7 +308,7 @@
     "no theorem hypothesis and no recognised meaning for parameter `tagging_ratio` : \u211d"
    ]
   },
-  "verdict": "escape-unguarded",
+  "verdict": "escape-outside-theorem",
   "witness": {
    "rg": -1.0,
    "fst": 0.0,
@@ -281,14 +319,16 @@
   "blind_coordinates": [
    "tagging_ratio"
   ],
-  "escapes_only_where_violated": [],
+  "escapes_only_where_violated": [
+   "portability_bounded_by_rg_sq"
+  ],
   "side": "below",
   "name": "portabilityFromArchitecture",
   "module": "AncestrySpecificArchitecture",
   "line": 478,
   "family": "range",
   "py": "((_b.pow(rg, 2.0) * ((1.0 - fst))) * tagging_ratio)",
-  "severity": 35.00434077479319
+  "severity": 45.00434077479319
  },
  "AncestrySpecificArchitecture.twoPopDriftVariance": {
   "verdict": "no-range",
@@ -337,8 +377,32 @@
   ],
   "range_why": "`genotypeVarianceHWE` names a variance",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
-  "bounding_theorems": [],
-  "bounding_theorem_hyps": {},
+  "proved_bound": [
+   0,
+   null
+  ],
+  "bounding_theorems": [
+   "genotypeVariance_nonneg",
+   "genotypeVariance_pos",
+   "allelic_variance_nonneg"
+  ],
+  "bounding_theorem_hyps": {
+   "genotypeVariance_nonneg": [
+    "\u211d",
+    "0 \u2264 p",
+    "p \u2264 1"
+   ],
+   "genotypeVariance_pos": [
+    "\u211d",
+    "0 < p",
+    "p < 1"
+   ],
+   "allelic_variance_nonneg": [
+    "\u211d",
+    "0 \u2264 p",
+    "p \u2264 1"
+   ]
+  },
   "unmodelled_hypotheses": [],
   "box": {
    "p": [
@@ -383,8 +447,20 @@
   ],
   "range_why": "`hweHeterozygosity` names a heterozygosity",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
-  "bounding_theorems": [],
-  "bounding_theorem_hyps": {},
+  "proved_bound": [
+   0,
+   null
+  ],
+  "bounding_theorems": [
+   "hweHeterozygosity_pos"
+  ],
+  "bounding_theorem_hyps": {
+   "hweHeterozygosity_pos": [
+    "\u211d",
+    "0 < p",
+    "p < 1"
+   ]
+  },
   "unmodelled_hypotheses": [],
   "box": {
    "p": [
@@ -420,6 +496,10 @@
   ],
   "range_why": "`ncp` names a noncentrality parameter",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -464,12 +544,17 @@
   ],
   "range_why": "`portableFraction` names a proportion",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   1
+  ],
   "bounding_theorems": [
    "portable_fraction_le_one"
   ],
   "bounding_theorem_hyps": {
    "portable_fraction_le_one": [
-    "r2_causal \u2264 r2_total"
+    "r2_causal \u2264 r2_total",
+    "0 < r2_total"
    ]
   },
   "unmodelled_hypotheses": [],
@@ -523,6 +608,10 @@
   ],
   "range_why": "`proportionalAllocation` names a proportion",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -586,6 +675,10 @@
   ],
   "range_why": "`standardErrorSq` names a standard deviation / standard error",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -639,6 +732,10 @@
   ],
   "range_why": "`amCorrectedPortability` names a portability / retention factor -- a fraction of what transfers",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -734,6 +831,10 @@
   ],
   "range_why": "`amVarianceStep` names a variance",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -796,8 +897,26 @@
   ],
   "range_why": "`ibdFst` names a fixation index / F-statistic",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
-  "bounding_theorems": [],
-  "bounding_theorem_hyps": {},
+  "proved_bound": [
+   0,
+   1
+  ],
+  "bounding_theorems": [
+   "ibd_fst_nonneg",
+   "ibd_fst_lt_one"
+  ],
+  "bounding_theorem_hyps": {
+   "ibd_fst_nonneg": [
+    "0 \u2264 d",
+    "0 < N",
+    "0 < sigma_sq"
+   ],
+   "ibd_fst_lt_one": [
+    "0 \u2264 d",
+    "0 < N",
+    "0 < sigma_sq"
+   ]
+  },
   "unmodelled_hypotheses": [],
   "box": {
    "d": [
@@ -858,8 +977,19 @@
   ],
   "range_why": "`gaussianPosteriorShrinkage` names a portability / retention factor -- a fraction of what transfers",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
-  "bounding_theorems": [],
-  "bounding_theorem_hyps": {},
+  "proved_bound": [
+   0,
+   1
+  ],
+  "bounding_theorems": [
+   "gaussian_shrinkage_in_unit"
+  ],
+  "bounding_theorem_hyps": {
+   "gaussian_shrinkage_in_unit": [
+    "0 < n",
+    "0 < h"
+   ]
+  },
   "unmodelled_hypotheses": [],
   "box": {
    "n": [
@@ -888,7 +1018,7 @@
     "no theorem hypothesis and no recognised meaning for parameter `h` : \u211d"
    ]
   },
-  "verdict": "escape-unguarded",
+  "verdict": "escape-outside-theorem",
   "witness": {
    "n": 23.350490984154057,
    "h": -0.04288886564220264
@@ -898,14 +1028,16 @@
   "blind_coordinates": [
    "h"
   ],
-  "escapes_only_where_violated": [],
+  "escapes_only_where_violated": [
+   "gaussian_shrinkage_in_unit"
+  ],
   "side": "above",
   "name": "gaussianPosteriorShrinkage",
   "module": "BayesianPGSTheory",
   "line": 138,
   "family": "range",
   "py": "_b.div((n * h), (((n * h) + 1.0)))",
-  "severity": 23.315334762276173
+  "severity": 33.31533476227617
  },
  "BayesianPGSTheory.jamesSteinMSE": {
   "verdict": "no-range",
@@ -944,8 +1076,19 @@
   ],
   "range_why": "`optimalShrinkage` names a portability / retention factor -- a fraction of what transfers",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
-  "bounding_theorems": [],
-  "bounding_theorem_hyps": {},
+  "proved_bound": [
+   null,
+   null
+  ],
+  "bounding_theorems": [
+   "optimal_shrinkage_in_unit"
+  ],
+  "bounding_theorem_hyps": {
+   "optimal_shrinkage_in_unit": [
+    "0 < \u03c3_sq",
+    "0 < \u03b2_sq"
+   ]
+  },
   "unmodelled_hypotheses": [],
   "box": {
    "\u03c3_sq": [
@@ -1000,6 +1143,10 @@
   ],
   "range_why": "`snpShrinkage` names a portability / retention factor -- a fraction of what transfers",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -1075,12 +1222,18 @@
   ],
   "range_why": "`proportionMediated` names a proportion",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   0,
+   1
+  ],
   "bounding_theorems": [
    "proportion_mediated_in_unit"
   ],
   "bounding_theorem_hyps": {
    "proportion_mediated_in_unit": [
-    "indirect_effect \u2264 total_effect"
+    "0 \u2264 ie",
+    "0 < te",
+    "ie \u2264 te"
    ]
   },
   "unmodelled_hypotheses": [],
@@ -1153,6 +1306,10 @@
   ],
   "range_why": "`populationAttributableFraction` names a proportion",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -1207,6 +1364,10 @@
   ],
   "range_why": "`ppv` names a classification rate",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -1261,9 +1422,44 @@
   ],
   "range_why": "`proportionCorrectlyClassified` names a proportion",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
-  "unmodelled_hypotheses": [],
+  "unmodelled_hypotheses": [
+   {
+    "thm": "pcc_lower_bound",
+    "hyp": "0 \u2264 sens",
+    "reason": "unknown identifier sens"
+   },
+   {
+    "thm": "pcc_lower_bound",
+    "hyp": "sens \u2264 1",
+    "reason": "unknown identifier sens"
+   },
+   {
+    "thm": "pcc_lower_bound",
+    "hyp": "0 \u2264 spec",
+    "reason": "unknown identifier spec"
+   },
+   {
+    "thm": "pcc_lower_bound",
+    "hyp": "spec \u2264 1",
+    "reason": "unknown identifier spec"
+   },
+   {
+    "thm": "pcc_lower_bound",
+    "hyp": "0 < \u03c0",
+    "reason": "unknown identifier \u03c0"
+   },
+   {
+    "thm": "pcc_lower_bound",
+    "hyp": "\u03c0 < 1",
+    "reason": "unknown identifier \u03c0"
+   }
+  ],
   "box": {
    "sensitivity": [
     0.0,
@@ -1345,6 +1541,10 @@
   ],
   "range_why": "`brierScore` names a Brier score for a binary outcome",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -1398,6 +1598,10 @@
   ],
   "range_why": "`expectedBrierScore` names a Brier score for a binary outcome",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -1522,6 +1726,10 @@
   ],
   "range_why": "`meanAlleleFreq` names a probability or allele frequency",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -1586,6 +1794,10 @@
   ],
   "range_why": "`retainedFraction` names a proportion",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -1680,8 +1892,21 @@
   ],
   "range_why": "`ldCorrelationSq` names a squared correlation -- a proportion of variance",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
-  "bounding_theorems": [],
-  "bounding_theorem_hyps": {},
+  "proved_bound": [
+   0,
+   null
+  ],
+  "bounding_theorems": [
+   "ld_correlation_sq_nonneg"
+  ],
+  "bounding_theorem_hyps": {
+   "ld_correlation_sq_nonneg": [
+    "0 < p_i",
+    "p_i < 1",
+    "0 < p_j",
+    "p_j < 1"
+   ]
+  },
   "unmodelled_hypotheses": [],
   "box": {
    "D": [
@@ -1743,6 +1968,10 @@
   ],
   "range_why": "`ldCorrelationSqOfHaplotypeD` names a squared correlation -- a proportion of variance",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -1824,6 +2053,10 @@
   ],
   "range_why": "`numBlocks` names a count",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -1867,6 +2100,10 @@
   ],
   "range_why": "`alleleFreqDivergenceRate` names a probability or allele frequency",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -1919,6 +2156,10 @@
   ],
   "range_why": "`calibratedBrier` names a Brier score for a binary outcome",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -1963,6 +2204,10 @@
   ],
   "range_why": "`calibratedBrier` names a Brier score for a binary outcome",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -2017,6 +2262,10 @@
   ],
   "range_why": "`demographicCovarianceGapLowerBound` names a variance",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -2121,6 +2370,10 @@
   ],
   "range_why": "`gaussianAUC` names an AUC / c-statistic",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -2235,6 +2488,10 @@
   ],
   "range_why": "`admixedAlleleFreq` names a probability or allele frequency",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -2289,6 +2546,10 @@
   ],
   "range_why": "`admixedFst` names a fixation index / F-statistic",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -2333,6 +2594,10 @@
   ],
   "range_why": "`demoSteppingStoneFst` names a fixation index / F-statistic",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -2412,6 +2677,10 @@
   ],
   "range_why": "`founderFst` names a fixation index / F-statistic",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -2555,6 +2824,10 @@
   ],
   "range_why": "`driftRetention` names a portability / retention factor -- a fraction of what transfers",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -2599,6 +2872,10 @@
   ],
   "range_why": "`lossOfRetention` names a portability / retention factor -- a fraction of what transfers",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -2634,6 +2911,10 @@
   ],
   "range_why": "`targetHetOfRetention` names a portability / retention factor -- a fraction of what transfers",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -2678,6 +2959,10 @@
   ],
   "range_why": "`targetPgsVarOfRetention` names a portability / retention factor -- a fraction of what transfers",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -2829,9 +3114,24 @@
   ],
   "range_why": "`linearNormOfReaction` names a distance or norm",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   0,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
-  "unmodelled_hypotheses": [],
+  "unmodelled_hypotheses": [
+   {
+    "thm": "crossover_gxe_possible",
+    "hyp": "a\u2082 < a",
+    "reason": "unknown identifier a\u2082"
+   },
+   {
+    "thm": "crossover_gxe_possible",
+    "hyp": "b < b\u2082",
+    "reason": "unknown identifier b\u2082"
+   }
+  ],
   "box": {
    "a": [
     -1000.0,
@@ -2865,7 +3165,8 @@
     "no theorem hypothesis and no recognised meaning for parameter `E` : \u211d"
    ]
   },
-  "verdict": "escape-unguarded",
+  "guard_not_modelled": "a theorem proves this bound but its hypotheses are outside the arithmetic fragment, so the exclusion could not be checked directly; graded conservatively",
+  "verdict": "escape-outside-theorem",
   "witness": {
    "a": -1000.0,
    "b": -5.0,
@@ -2884,7 +3185,7 @@
   "line": 258,
   "family": "range",
   "py": "(a + (b * E))",
-  "severity": 42.78223626766096
+  "severity": 52.78223626766096
  },
  "GeneticArchitectureDiscovery.discoveryNCP": {
   "verdict": "no-range",
@@ -2913,12 +3214,18 @@
   ],
   "range_why": "`geneticCorrelation` names a correlation coefficient",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [
    "genetic_correlation_bounded"
   ],
   "bounding_theorem_hyps": {
    "genetic_correlation_bounded": [
-    "cov_g ^ 2 \u2264 vg\u2081 * vg\u2082"
+    "cov_g ^ 2 \u2264 vg\u2081 * vg\u2082",
+    "0 < vg\u2081",
+    "0 < vg\u2082"
    ]
   },
   "unmodelled_hypotheses": [],
@@ -3136,11 +3443,17 @@
   ],
   "range_why": "`phaseAttenuation` names a portability / retention factor -- a fraction of what transfers",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   0,
+   1
+  ],
   "bounding_theorems": [
    "phase_attenuation_bounded"
   ],
   "bounding_theorem_hyps": {
    "phase_attenuation_bounded": [
+    "\u211d",
+    "0 \u2264 s",
     "s \u2264 1 / 2"
    ]
   },
@@ -3246,8 +3559,19 @@
   ],
   "range_why": "`alleleLossProbability` names a probability or allele frequency",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
-  "bounding_theorems": [],
-  "bounding_theorem_hyps": {},
+  "proved_bound": [
+   0,
+   1
+  ],
+  "bounding_theorems": [
+   "alleleLossProbability_le_one"
+  ],
+  "bounding_theorem_hyps": {
+   "alleleLossProbability_le_one": [
+    "0 \u2264 initial",
+    "0 < time"
+   ]
+  },
   "unmodelled_hypotheses": [],
   "box": {
    "initial": [
@@ -3275,7 +3599,7 @@
     "hasDerivAt_absorptionChannelWeight: 0 < time"
    ]
   },
-  "verdict": "escape-unguarded",
+  "verdict": "escape-outside-theorem",
   "witness": {
    "initial": -1000.0,
    "time": 1e-05
@@ -3285,14 +3609,16 @@
   "blind_coordinates": [
    "initial"
   ],
-  "escapes_only_where_violated": [],
+  "escapes_only_where_violated": [
+   "alleleLossProbability_le_one"
+  ],
   "side": "above",
   "name": "alleleLossProbability",
   "module": "ImitationRigidity",
   "line": 1218,
   "family": "range",
   "py": "_b.exp(((- (_b.div(initial, ((2.0 * time)))))))",
-  "severity": 55.000004342942646
+  "severity": 65.00000434294265
  },
  "ImitationRigidity.fairTwoPointVariance": {
   "verdict": "no-range",
@@ -3491,8 +3817,37 @@
   ],
   "range_why": "`driftLDRetention` names a portability / retention factor -- a fraction of what transfers",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
-  "bounding_theorems": [],
-  "bounding_theorem_hyps": {},
+  "proved_bound": [
+   0,
+   1
+  ],
+  "bounding_theorems": [
+   "driftLDRetention_mem_unit",
+   "driftLDRetention_lt_one",
+   "driftLDRetention_pos",
+   "driftLD_one_sub_retention_pos"
+  ],
+  "bounding_theorem_hyps": {
+   "driftLDRetention_mem_unit": [
+    "1 \u2264 Ne",
+    "0 \u2264 c",
+    "c \u2264 1"
+   ],
+   "driftLDRetention_lt_one": [
+    "1 \u2264 Ne",
+    "0 < c",
+    "c \u2264 1"
+   ],
+   "driftLDRetention_pos": [
+    "1 \u2264 Ne",
+    "c < 1"
+   ],
+   "driftLD_one_sub_retention_pos": [
+    "1 \u2264 Ne",
+    "0 \u2264 c",
+    "c \u2264 1"
+   ]
+  },
   "unmodelled_hypotheses": [],
   "box": {
    "Ne": [
@@ -3585,6 +3940,10 @@
   ],
   "range_why": "`ldRetainedFraction` names a proportion",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -3631,8 +3990,32 @@
   ],
   "range_why": "`ldRetentionPerGen` names a portability / retention factor -- a fraction of what transfers",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
-  "bounding_theorems": [],
-  "bounding_theorem_hyps": {},
+  "proved_bound": [
+   0,
+   1
+  ],
+  "bounding_theorems": [
+   "ld_retention_lt_one",
+   "ld_retention_nonneg",
+   "ldRetentionPerGen_abs_lt_one"
+  ],
+  "bounding_theorem_hyps": {
+   "ld_retention_lt_one": [
+    "0 < r",
+    "r < 1",
+    "1 < Ne"
+   ],
+   "ld_retention_nonneg": [
+    "0 \u2264 r",
+    "r \u2264 1",
+    "1 \u2264 Ne"
+   ],
+   "ldRetentionPerGen_abs_lt_one": [
+    "0 \u2264 recomb",
+    "recomb \u2264 1",
+    "1 < Ne"
+   ]
+  },
   "unmodelled_hypotheses": [],
   "box": {
    "r": [
@@ -3756,8 +4139,18 @@
   ],
   "range_why": "`portabilityAtTime` names a portability / retention factor -- a fraction of what transfers",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
-  "bounding_theorems": [],
-  "bounding_theorem_hyps": {},
+  "proved_bound": [
+   0,
+   null
+  ],
+  "bounding_theorems": [
+   "portability_nonneg"
+  ],
+  "bounding_theorem_hyps": {
+   "portability_nonneg": [
+    "0 \u2264 r2_initial"
+   ]
+  },
   "unmodelled_hypotheses": [],
   "box": {
    "r2_initial": [
@@ -3810,6 +4203,10 @@
   ],
   "range_why": "`secularTrendBias` names a standard deviation / standard error",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -3884,6 +4281,10 @@
   ],
   "range_why": "`ldBandDetectionShare` names a proportion",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -3938,6 +4339,10 @@
   ],
   "range_why": "`ldBlockDetectionShare` names a proportion",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -4024,8 +4429,19 @@
   ],
   "range_why": "`ldPanelRetentionFraction` names a proportion",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
-  "bounding_theorems": [],
-  "bounding_theorem_hyps": {},
+  "proved_bound": [
+   0,
+   1
+  ],
+  "bounding_theorems": [
+   "ldPanelRetentionFraction_mem"
+  ],
+  "bounding_theorem_hyps": {
+   "ldPanelRetentionFraction_mem": [
+    "0 < retainedMarkers",
+    "retainedMarkers < totalMarkers"
+   ]
+  },
   "unmodelled_hypotheses": [],
   "box": {
    "retainedMarkers": [
@@ -4053,7 +4469,7 @@
     "a \u2115 argument is a nonnegative integer"
    ]
   },
-  "verdict": "escape",
+  "verdict": "escape-outside-theorem",
   "witness": {
    "retainedMarkers": 1000.0,
    "totalMarkers": 1.0
@@ -4061,14 +4477,16 @@
   "value": 1000.0,
   "overshoot": 999.0,
   "blind_coordinates": [],
-  "escapes_only_where_violated": [],
+  "escapes_only_where_violated": [
+   "ldPanelRetentionFraction_mem"
+  ],
   "side": "above",
   "name": "ldPanelRetentionFraction",
   "module": "MetricSpecificPortability",
   "line": 1394,
   "family": "range",
   "py": "_b.div(retainedMarkers, totalMarkers)",
-  "severity": 50.0
+  "severity": 35.0
  },
  "MetricSpecificPortability.ldPruningDetectionDeficit": {
   "verdict": "no-range",
@@ -4087,6 +4505,10 @@
   ],
   "range_why": "`ldTightLinkageDetectionShare` names a proportion",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -4138,6 +4560,10 @@
   ],
   "range_why": "`metricPPV` names a classification rate",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -4196,6 +4622,10 @@
   ],
   "range_why": "`ppvPortabilityGap` names a classification rate",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -4274,6 +4704,10 @@
   ],
   "range_why": "`sensitivityPortabilityGap` names a classification rate",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -4319,8 +4753,26 @@
   ],
   "range_why": "`effectMutualInformation` names an information-theoretic divergence",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
-  "bounding_theorems": [],
-  "bounding_theorem_hyps": {},
+  "proved_bound": [
+   null,
+   null
+  ],
+  "bounding_theorems": [
+   "effectMutualInformation_nonneg",
+   "effectMutualInformation_unbounded_near_perfect"
+  ],
+  "bounding_theorem_hyps": {
+   "effectMutualInformation_nonneg": [
+    "\u2115",
+    "\u211d",
+    "\u03c1 ^ 2 < 1"
+   ],
+   "effectMutualInformation_unbounded_near_perfect": [
+    "\u2115",
+    "0 < m",
+    "\u211d"
+   ]
+  },
   "unmodelled_hypotheses": [],
   "box": {
    "m": [
@@ -4364,9 +4816,34 @@
   ],
   "range_why": "`portabilityGap` names a portability / retention factor -- a fraction of what transfers",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   0,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
-  "unmodelled_hypotheses": [],
+  "unmodelled_hypotheses": [
+   {
+    "thm": "portability_gap_nonneg",
+    "hyp": "0 < V_A",
+    "reason": "unknown identifier V_A"
+   },
+   {
+    "thm": "portability_gap_nonneg",
+    "hyp": "0 < V_E",
+    "reason": "unknown identifier V_E"
+   },
+   {
+    "thm": "portability_gap_nonneg",
+    "hyp": "fstS \u2264 fstT",
+    "reason": "unknown identifier fstS"
+   },
+   {
+    "thm": "portability_gap_nonneg",
+    "hyp": "fstT \u2264 1",
+    "reason": "unknown identifier fstT"
+   }
+  ],
   "box": {
    "r2_source": [
     0.0001,
@@ -4391,7 +4868,8 @@
     "an R\u00b2 / variance-explained lies in (0,1]"
    ]
   },
-  "verdict": "escape",
+  "guard_not_modelled": "a theorem proves this bound but its hypotheses are outside the arithmetic fragment, so the exclusion could not be checked directly; graded conservatively",
+  "verdict": "escape-outside-theorem",
   "witness": {
    "r2_source": 0.0001,
    "r2_target": 1.0
@@ -4406,7 +4884,7 @@
   "line": 428,
   "family": "range",
   "py": "(r2_source - r2_target)",
-  "severity": 33.01008280397
+  "severity": 18.01008280397
  },
  "OpenQuestions.combinedPortability": {
   "range": [
@@ -4415,6 +4893,10 @@
   ],
   "range_why": "`combinedPortability` names a portability / retention factor -- a fraction of what transfers",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -4531,8 +5013,20 @@
   ],
   "range_why": "`samplePCResidualAxisFraction` names a proportion",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
-  "bounding_theorems": [],
-  "bounding_theorem_hyps": {},
+  "proved_bound": [
+   0,
+   1
+  ],
+  "bounding_theorems": [
+   "samplePCResidualAxisFraction_pos_and_lt_one"
+  ],
+  "bounding_theorem_hyps": {
+   "samplePCResidualAxisFraction_pos_and_lt_one": [
+    "0 < n",
+    "0 < M",
+    "bbpProxyThreshold n M < spike"
+   ]
+  },
   "unmodelled_hypotheses": [],
   "box": {
    "n": [
@@ -4649,8 +5143,20 @@
   ],
   "range_why": "`prevalenceCITLShift` names a probability or allele frequency",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
-  "bounding_theorems": [],
-  "bounding_theorem_hyps": {},
+  "proved_bound": [
+   0,
+   null
+  ],
+  "bounding_theorems": [
+   "citl_shift_positive_higher_prevalence"
+  ],
+  "bounding_theorem_hyps": {
+   "citl_shift_positive_higher_prevalence": [
+    "0 < pi_s",
+    "pi_s < pi_t",
+    "pi_t < 1"
+   ]
+  },
   "unmodelled_hypotheses": [],
   "box": {
    "pi_source": [
@@ -4676,7 +5182,7 @@
     "no theorem hypothesis and no recognised meaning for parameter `pi_target` : \u211d"
    ]
   },
-  "verdict": "escape-unguarded",
+  "verdict": "escape-outside-theorem",
   "witness": {
    "pi_source": 1.000074706696589,
    "pi_target": -1.1188724040584299e-05
@@ -4687,14 +5193,16 @@
    "pi_source",
    "pi_target"
   ],
-  "escapes_only_where_violated": [],
+  "escapes_only_where_violated": [
+   "citl_shift_positive_higher_prevalence"
+  ],
   "side": "below",
   "name": "prevalenceCITLShift",
   "module": "PGSCalibrationTheory",
   "line": 259,
   "family": "range",
   "py": "(PGSCalibrationTheory_prevalenceLogit(pi_target) - PGSCalibrationTheory_prevalenceLogit(pi_source))",
-  "severity": 18.40496282270888
+  "severity": 28.40496282270888
  },
  "PGSCalibrationTheory.prevalenceLogit": {
   "verdict": "no-range",
@@ -4763,8 +5271,20 @@
   ],
   "range_why": "`fst` names a fixation index / F-statistic",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
-  "bounding_theorems": [],
-  "bounding_theorem_hyps": {},
+  "proved_bound": [
+   0,
+   1
+  ],
+  "bounding_theorems": [
+   "fstFromDriftFactor_mem_unit"
+  ],
+  "bounding_theorem_hyps": {
+   "fstFromDriftFactor_mem_unit": [
+    "\u211d",
+    "0 < driftFactor",
+    "driftFactor \u2264 1"
+   ]
+  },
   "unmodelled_hypotheses": [],
   "box": {
    "driftFactor": [
@@ -4781,21 +5301,23 @@
     "fstFromDriftFactor_mem_unit: driftFactor \u2264 1"
    ]
   },
-  "verdict": "escape",
+  "verdict": "escape-outside-theorem",
   "witness": {
    "driftFactor": 100.0
   },
   "value": -99.0,
   "overshoot": 99.0,
   "blind_coordinates": [],
-  "escapes_only_where_violated": [],
+  "escapes_only_where_violated": [
+   "fstFromDriftFactor_mem_unit"
+  ],
   "side": "below",
   "name": "fstFromDriftFactor",
   "module": "PhenomeWidePortability",
   "line": 154,
   "family": "range",
   "py": "(1.0 - driftFactor)",
-  "severity": 50.0
+  "severity": 35.0
  },
  "PhenomeWidePortability.neutralDriftFactor": {
   "verdict": "no-range",
@@ -4814,8 +5336,21 @@
   ],
   "range_why": "`neutralPortabilityRatioLD` names a portability / retention factor -- a fraction of what transfers",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
-  "bounding_theorems": [],
-  "bounding_theorem_hyps": {},
+  "proved_bound": [
+   0,
+   1
+  ],
+  "bounding_theorems": [
+   "neutral_ratio_in_unit"
+  ],
+  "bounding_theorem_hyps": {
+   "neutral_ratio_in_unit": [
+    "0 \u2264 fst",
+    "fst \u2264 1",
+    "0 \u2264 ld",
+    "ld \u2264 1"
+   ]
+  },
   "unmodelled_hypotheses": [],
   "box": {
    "fst_additional": [
@@ -4842,7 +5377,7 @@
     "neutral_ratio_in_unit: ld \u2264 1"
    ]
   },
-  "verdict": "escape",
+  "verdict": "escape-outside-theorem",
   "witness": {
    "fst_additional": 0.0,
    "ld_factor": 100.0
@@ -4850,14 +5385,16 @@
   "value": 100.0,
   "overshoot": 99.0,
   "blind_coordinates": [],
-  "escapes_only_where_violated": [],
+  "escapes_only_where_violated": [
+   "neutral_ratio_in_unit"
+  ],
   "side": "above",
   "name": "neutralPortabilityRatioLD",
   "module": "PhenomeWidePortability",
   "line": 37,
   "family": "range",
   "py": "(((1.0 - fst_additional)) * ld_factor)",
-  "severity": 40.0
+  "severity": 25.0
  },
  "PhenomeWidePortability.selectedDriftFactor": {
   "range": [
@@ -4866,8 +5403,23 @@
   ],
   "range_why": "`selectedDriftFactor` names a standard deviation / standard error",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
-  "bounding_theorems": [],
-  "bounding_theorem_hyps": {},
+  "proved_bound": [
+   0,
+   1
+  ],
+  "bounding_theorems": [
+   "selectedDriftFactor_mem_unit"
+  ],
+  "bounding_theorem_hyps": {
+   "selectedDriftFactor_mem_unit": [
+    "\u211d",
+    "\u2115",
+    "\u211d",
+    "0 < s_correction",
+    "s_correction < 1 / (2 * Ne)",
+    "0 < 1 - 1 / (2 * Ne)"
+   ]
+  },
   "unmodelled_hypotheses": [],
   "box": {
    "Ne": [
@@ -4925,6 +5477,10 @@
   ],
   "range_why": "`effectCorrelationFluctuating` names a correlation coefficient",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   -1,
+   1
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [
@@ -4970,7 +5526,8 @@
     "fluctuating_selection_worst_portability: 0 < N"
    ]
   },
-  "verdict": "escape-unguarded",
+  "guard_not_modelled": "a theorem proves this bound but its hypotheses are outside the arithmetic fragment, so the exclusion could not be checked directly; graded conservatively",
+  "verdict": "escape-outside-theorem",
   "witness": {
    "d": 1000.0,
    "f": -1000.0,
@@ -4988,7 +5545,7 @@
   "line": 297,
   "family": "range",
   "py": "_b.mx(((- 1.0)), ((1.0 - (d * ((1.0 + (f * N)))))))",
-  "severity": 55.000004342942646
+  "severity": 65.00000434294265
  },
  "PolygenicAdaptation.effectCorrelationStabilizing": {
   "range": [
@@ -4997,13 +5554,34 @@
   ],
   "range_why": "`effectCorrelationStabilizing` names a correlation coefficient",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": null,
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [
    {
     "thm": "effectCorrelation_mem_range",
+    "hyp": "0 \u2264 Ns",
+    "reason": "unknown identifier Ns"
+   },
+   {
+    "thm": "effectCorrelation_mem_range",
+    "hyp": "Ns \u2264 1",
+    "reason": "unknown identifier Ns"
+   },
+   {
+    "thm": "effectCorrelation_mem_range",
     "hyp": "0 \u2264 f * N",
     "reason": "unknown identifier f"
+   },
+   {
+    "thm": "effectCorrelationStabilizing_pos",
+    "hyp": "1 < Ns",
+    "reason": "unknown identifier Ns"
+   },
+   {
+    "thm": "effectCorrelationStabilizing_lt_one",
+    "hyp": "1 < Ns",
+    "reason": "unknown identifier Ns"
    }
   ],
   "box": {
@@ -5076,6 +5654,10 @@
   ],
   "range_why": "`pgsDiffVariance_two_pop` names a variance",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -5120,8 +5702,19 @@
   ],
   "range_why": "`pgsDriftVariance_one_pop` names a variance",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
-  "bounding_theorems": [],
-  "bounding_theorem_hyps": {},
+  "proved_bound": [
+   0,
+   null
+  ],
+  "bounding_theorems": [
+   "pgsDriftVariance_one_pop_nonneg"
+  ],
+  "bounding_theorem_hyps": {
+   "pgsDriftVariance_one_pop_nonneg": [
+    "0 \u2264 V_A",
+    "0 \u2264 fst"
+   ]
+  },
   "unmodelled_hypotheses": [],
   "box": {
    "V_A": [
@@ -5289,6 +5882,10 @@
   ],
   "range_why": "`alleleFreqAfterMigration` names a probability or allele frequency",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -5353,8 +5950,24 @@
   ],
   "range_why": "`coalFst` names a fixation index / F-statistic",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
-  "bounding_theorems": [],
-  "bounding_theorem_hyps": {},
+  "proved_bound": [
+   0,
+   1
+  ],
+  "bounding_theorems": [
+   "fstFromCoalescenceTime_in_unit",
+   "coal_fst_nonneg"
+  ],
+  "bounding_theorem_hyps": {
+   "fstFromCoalescenceTime_in_unit": [
+    "0 < T",
+    "0 < Ne"
+   ],
+   "coal_fst_nonneg": [
+    "0 \u2264 t",
+    "0 < Ne"
+   ]
+  },
   "unmodelled_hypotheses": [],
   "box": {
    "t": [
@@ -5426,8 +6039,19 @@
   ],
   "range_why": "`continuousSteppingStoneFst` names a fixation index / F-statistic",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
-  "bounding_theorems": [],
-  "bounding_theorem_hyps": {},
+  "proved_bound": [
+   0,
+   null
+  ],
+  "bounding_theorems": [
+   "continuousSteppingStoneFst_nonneg"
+  ],
+  "bounding_theorem_hyps": {
+   "continuousSteppingStoneFst_nonneg": [
+    "0 < L",
+    "0 \u2264 d"
+   ]
+  },
   "unmodelled_hypotheses": [],
   "box": {
    "L": [
@@ -5483,8 +6107,19 @@
   ],
   "range_why": "`expectedHeterozygosity` names a heterozygosity",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
-  "bounding_theorems": [],
-  "bounding_theorem_hyps": {},
+  "proved_bound": [
+   null,
+   null
+  ],
+  "bounding_theorems": [
+   "expected_het_in_unit"
+  ],
+  "bounding_theorem_hyps": {
+   "expected_het_in_unit": [
+    "\u211d",
+    "0 \u2264 \u03b8"
+   ]
+  },
   "unmodelled_hypotheses": [],
   "box": {
    "\u03b8": [
@@ -5532,8 +6167,26 @@
   ],
   "range_why": "`fstDerived` names a fixation index / F-statistic",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
-  "bounding_theorems": [],
-  "bounding_theorem_hyps": {},
+  "proved_bound": [
+   0,
+   1
+  ],
+  "bounding_theorems": [
+   "fstDerived_nonneg",
+   "fstDerived_lt_one"
+  ],
+  "bounding_theorem_hyps": {
+   "fstDerived_nonneg": [
+    "\u211d",
+    "\u2115",
+    "2 \u2264 Ne"
+   ],
+   "fstDerived_lt_one": [
+    "\u211d",
+    "\u2115",
+    "2 \u2264 Ne"
+   ]
+  },
   "unmodelled_hypotheses": [],
   "box": {
    "Ne": [
@@ -5578,6 +6231,10 @@
   ],
   "range_why": "`fst` names a fixation index / F-statistic",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -5631,6 +6288,10 @@
   ],
   "range_why": "`fstMigrationMutationEquilibrium` names a fixation index / F-statistic",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -5686,8 +6347,29 @@
   ],
   "range_why": "`fstMutationDriftEquilibrium` names a fixation index / F-statistic",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
-  "bounding_theorems": [],
-  "bounding_theorem_hyps": {},
+  "proved_bound": [
+   null,
+   null
+  ],
+  "bounding_theorems": [
+   "fstMutationDriftEquilibrium_pos",
+   "fstMutationDriftEquilibrium_le_one",
+   "fstMutationDriftEquilibrium_lt_one"
+  ],
+  "bounding_theorem_hyps": {
+   "fstMutationDriftEquilibrium_pos": [
+    "\u211d",
+    "0 \u2264 \u03b8"
+   ],
+   "fstMutationDriftEquilibrium_le_one": [
+    "\u211d",
+    "0 \u2264 \u03b8"
+   ],
+   "fstMutationDriftEquilibrium_lt_one": [
+    "\u211d",
+    "0 < \u03b8"
+   ]
+  },
   "unmodelled_hypotheses": [],
   "box": {
    "\u03b8": [
@@ -5730,8 +6412,20 @@
   ],
   "range_why": "`fstMutationDriftTransient` names a fixation index / F-statistic",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
-  "bounding_theorems": [],
-  "bounding_theorem_hyps": {},
+  "proved_bound": [
+   null,
+   null
+  ],
+  "bounding_theorems": [
+   "fstMutationDriftTransient_nonneg"
+  ],
+  "bounding_theorem_hyps": {
+   "fstMutationDriftTransient_nonneg": [
+    "0 \u2264 \u03b8",
+    "0 \u2264 t",
+    "0 < Ne"
+   ]
+  },
   "unmodelled_hypotheses": [],
   "box": {
    "\u03b8": [
@@ -5787,11 +6481,18 @@
   ],
   "range_why": "`fstMutationDriftTransientDiscrete` names a fixation index / F-statistic",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [
    "fstTransientDiscrete_nonneg"
   ],
   "bounding_theorem_hyps": {
    "fstTransientDiscrete_nonneg": [
+    "\u2115",
+    "0 \u2264 \u03b8",
+    "2 \u2264 Ne",
     "\u03b8 \u2264 2 * Ne"
    ]
   },
@@ -5849,6 +6550,10 @@
   ],
   "range_why": "`hetDecayFactor` names a heterozygosity",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -5894,8 +6599,34 @@
   ],
   "range_why": "`hetEquilibrium` names a heterozygosity",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
-  "bounding_theorems": [],
-  "bounding_theorem_hyps": {},
+  "proved_bound": [
+   0,
+   1
+  ],
+  "bounding_theorems": [
+   "hetEquilibrium_pos",
+   "hetEquilibrium_lt_one",
+   "fstEquilibrium_derived_pos",
+   "fstEquilibrium_derived_lt_one"
+  ],
+  "bounding_theorem_hyps": {
+   "hetEquilibrium_pos": [
+    "0 < Ne",
+    "0 < mu"
+   ],
+   "hetEquilibrium_lt_one": [
+    "0 < Ne",
+    "0 < mu"
+   ],
+   "fstEquilibrium_derived_pos": [
+    "0 < Ne",
+    "0 < mu"
+   ],
+   "fstEquilibrium_derived_lt_one": [
+    "0 < Ne",
+    "0 < mu"
+   ]
+  },
   "unmodelled_hypotheses": [],
   "box": {
    "Ne": [
@@ -5964,8 +6695,29 @@
   ],
   "range_why": "`islandModelFst` names a fixation index / F-statistic",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
-  "bounding_theorems": [],
-  "bounding_theorem_hyps": {},
+  "proved_bound": [
+   0,
+   1
+  ],
+  "bounding_theorems": [
+   "island_fst_in_unit_interval",
+   "islandModelFst_pos",
+   "islandModelFst_lt_one"
+  ],
+  "bounding_theorem_hyps": {
+   "island_fst_in_unit_interval": [
+    "0 < Ne",
+    "0 < m"
+   ],
+   "islandModelFst_pos": [
+    "0 < Ne",
+    "0 \u2264 m"
+   ],
+   "islandModelFst_lt_one": [
+    "0 < Ne",
+    "0 < m"
+   ]
+  },
   "unmodelled_hypotheses": [],
   "box": {
    "Ne": [
@@ -6022,8 +6774,19 @@
   ],
   "range_why": "`ldCorrelation` names a correlation coefficient",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
-  "bounding_theorems": [],
-  "bounding_theorem_hyps": {},
+  "proved_bound": [
+   0,
+   1
+  ],
+  "bounding_theorems": [
+   "ldCorrelationFromMigration_le_one"
+  ],
+  "bounding_theorem_hyps": {
+   "ldCorrelationFromMigration_le_one": [
+    "\u211d",
+    "0 \u2264 M"
+   ]
+  },
   "unmodelled_hypotheses": [],
   "box": {
    "M": [
@@ -6057,11 +6820,17 @@
   ],
   "range_why": "`neiFst` names a fixation index / F-statistic",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   0,
+   1
+  ],
   "bounding_theorems": [
    "nei_fst_in_unit"
   ],
   "bounding_theorem_hyps": {
    "nei_fst_in_unit": [
+    "0 < H_T",
+    "0 \u2264 H_S",
     "H_S \u2264 H_T"
    ]
   },
@@ -6125,8 +6894,23 @@
   ],
   "range_why": "`selectionMigrationEquilibrium` names a standard deviation / standard error",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
-  "bounding_theorems": [],
-  "bounding_theorem_hyps": {},
+  "proved_bound": [
+   10,
+   1
+  ],
+  "bounding_theorems": [
+   "selectionMigrationEquilibrium_ge_of_strong_selection",
+   "selectionMigrationEquilibrium_lt_one"
+  ],
+  "bounding_theorem_hyps": {
+   "selectionMigrationEquilibrium_ge_of_strong_selection": [
+    "0 < s"
+   ],
+   "selectionMigrationEquilibrium_lt_one": [
+    "0 < s",
+    "0 < m"
+   ]
+  },
   "unmodelled_hypotheses": [],
   "box": {
    "s": [
@@ -6174,6 +6958,10 @@
   ],
   "range_why": "`selectionMigrationEquilibriumMigrationFirst` names a standard deviation / standard error",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -6217,8 +7005,19 @@
   ],
   "range_why": "`sharedLDFraction` names a proportion",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
-  "bounding_theorems": [],
-  "bounding_theorem_hyps": {},
+  "proved_bound": [
+   null,
+   null
+  ],
+  "bounding_theorems": [
+   "sharedLDFraction_le_one"
+  ],
+  "bounding_theorem_hyps": {
+   "sharedLDFraction_le_one": [
+    "0 \u2264 \u03b8",
+    "0 \u2264 t"
+   ]
+  },
   "unmodelled_hypotheses": [],
   "box": {
    "\u03b8": [
@@ -6261,8 +7060,21 @@
   ],
   "range_why": "`simpleFst` names a fixation index / F-statistic",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
-  "bounding_theorems": [],
-  "bounding_theorem_hyps": {},
+  "proved_bound": [
+   0,
+   null
+  ],
+  "bounding_theorems": [
+   "simple_fst_nonneg"
+  ],
+  "bounding_theorem_hyps": {
+   "simple_fst_nonneg": [
+    "0 < p\u2081",
+    "p\u2081 < 1",
+    "0 < p\u2082",
+    "p\u2082 < 1"
+   ]
+  },
   "unmodelled_hypotheses": [],
   "box": {
    "p\u2081": [
@@ -6318,6 +7130,10 @@
   ],
   "range_why": "`wrightFIT` names a fixation index / F-statistic",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -6371,8 +7187,18 @@
   ],
   "range_why": "`diversifyingPortability` names a portability / retention factor -- a fraction of what transfers",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
-  "bounding_theorems": [],
-  "bounding_theorem_hyps": {},
+  "proved_bound": [
+   0,
+   null
+  ],
+  "bounding_theorems": [
+   "diversifyingPortability_nonneg"
+  ],
+  "bounding_theorem_hyps": {
+   "diversifyingPortability_nonneg": [
+    "0 \u2264 r2_0"
+   ]
+  },
   "unmodelled_hypotheses": [],
   "box": {
    "r2_0": [
@@ -6435,8 +7261,24 @@
   ],
   "range_why": "`neutralPortability` names a portability / retention factor -- a fraction of what transfers",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
-  "bounding_theorems": [],
-  "bounding_theorem_hyps": {},
+  "proved_bound": [
+   0,
+   1
+  ],
+  "bounding_theorems": [
+   "neutralPortability_nonneg",
+   "neutralPortability_mem_unit"
+  ],
+  "bounding_theorem_hyps": {
+   "neutralPortability_nonneg": [
+    "0 \u2264 r2_0"
+   ],
+   "neutralPortability_mem_unit": [
+    "0 \u2264 r2_0",
+    "r2_0 \u2264 1",
+    "0 \u2264 fst"
+   ]
+  },
   "unmodelled_hypotheses": [],
   "box": {
    "r2_0": [
@@ -6487,8 +7329,18 @@
   ],
   "range_why": "`stabilizingPortability` names a portability / retention factor -- a fraction of what transfers",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
-  "bounding_theorems": [],
-  "bounding_theorem_hyps": {},
+  "proved_bound": [
+   0,
+   null
+  ],
+  "bounding_theorems": [
+   "stabilizingPortability_nonneg"
+  ],
+  "bounding_theorem_hyps": {
+   "stabilizingPortability_nonneg": [
+    "0 \u2264 r2_0"
+   ]
+  },
   "unmodelled_hypotheses": [],
   "box": {
    "r2_0": [
@@ -6563,6 +7415,10 @@
   ],
   "range_why": "`Var_Delta_Mu` names a variance",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -6627,6 +7483,10 @@
   ],
   "range_why": "`alleleFreqMismatchPenalty` names a probability or allele frequency",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -6671,6 +7531,10 @@
   ],
   "range_why": "`asymmetricFst` names a fixation index / F-statistic",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -6755,6 +7619,10 @@
   ],
   "range_why": "`covarianceDivergence` names a variance",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -6799,8 +7667,21 @@
   ],
   "range_why": "`covarianceDivergenceMutationDrift` names a variance",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
-  "bounding_theorems": [],
-  "bounding_theorem_hyps": {},
+  "proved_bound": [
+   null,
+   1
+  ],
+  "bounding_theorems": [
+   "covarianceDivergence_le_one"
+  ],
+  "bounding_theorem_hyps": {
+   "covarianceDivergence_le_one": [
+    "0 \u2264 fst_drift",
+    "fst_drift \u2264 1",
+    "0 \u2264 shared_ld",
+    "shared_ld \u2264 1"
+   ]
+  },
   "unmodelled_hypotheses": [],
   "box": {
    "fst_drift": [
@@ -6847,6 +7728,10 @@
   ],
   "range_why": "`covarianceRetention` names a portability / retention factor -- a fraction of what transfers",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -6908,6 +7793,10 @@
   ],
   "range_why": "`equalVarianceGaussianAUC` names an AUC / c-statistic",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -6942,6 +7831,10 @@
   ],
   "range_why": "`equalVarianceGaussianAUC` names an AUC / c-statistic",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -6977,6 +7870,10 @@
   ],
   "range_why": "`equalVarianceGaussianAUC` names an AUC / c-statistic",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -7071,6 +7968,10 @@
   ],
   "range_why": "`fst` names a fixation index / F-statistic",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -7117,8 +8018,24 @@
   ],
   "range_why": "`fst` names a fixation index / F-statistic",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
-  "bounding_theorems": [],
-  "bounding_theorem_hyps": {},
+  "proved_bound": [
+   0,
+   1
+  ],
+  "bounding_theorems": [
+   "fst_from_tau_nonneg_of_nonneg",
+   "fst_from_tau_lt_one"
+  ],
+  "bounding_theorem_hyps": {
+   "fst_from_tau_nonneg_of_nonneg": [
+    "\u211d",
+    "0 \u2264 tau"
+   ],
+   "fst_from_tau_lt_one": [
+    "\u211d",
+    "0 \u2264 tau"
+   ]
+  },
   "unmodelled_hypotheses": [],
   "box": {
    "tau": [
@@ -7157,6 +8074,10 @@
   ],
   "range_why": "`fstIslandMultiplicativeEquilibrium` names a fixation index / F-statistic",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -7202,8 +8123,29 @@
   ],
   "range_why": "`fstMigDriftEquil` names a fixation index / F-statistic",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
-  "bounding_theorems": [],
-  "bounding_theorem_hyps": {},
+  "proved_bound": [
+   0,
+   1
+  ],
+  "bounding_theorems": [
+   "fstMigDriftEquil_pos",
+   "fstMigDriftEquil_le_one",
+   "fstMigDriftEquil_lt_one"
+  ],
+  "bounding_theorem_hyps": {
+   "fstMigDriftEquil_pos": [
+    "0 < Ne",
+    "0 \u2264 m"
+   ],
+   "fstMigDriftEquil_le_one": [
+    "0 < Ne",
+    "0 \u2264 m"
+   ],
+   "fstMigDriftEquil_lt_one": [
+    "0 < Ne",
+    "0 < m"
+   ]
+  },
   "unmodelled_hypotheses": [],
   "box": {
    "Ne": [
@@ -7257,6 +8199,10 @@
   ],
   "range_why": "`fstMigDriftNext` names a fixation index / F-statistic",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -7311,8 +8257,34 @@
   ],
   "range_why": "`fstMigrationDriftEquilibrium` names a fixation index / F-statistic",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
-  "bounding_theorems": [],
-  "bounding_theorem_hyps": {},
+  "proved_bound": [
+   0,
+   1
+  ],
+  "bounding_theorems": [
+   "fstMigrationDriftEquilibrium_pos",
+   "fstMigrationDriftEquilibrium_le_one",
+   "fstMigrationDriftEquilibrium_lt_one",
+   "fstMigrationDriftEquilibrium_in_unit"
+  ],
+  "bounding_theorem_hyps": {
+   "fstMigrationDriftEquilibrium_pos": [
+    "0 < Ne",
+    "0 \u2264 m"
+   ],
+   "fstMigrationDriftEquilibrium_le_one": [
+    "0 < Ne",
+    "0 \u2264 m"
+   ],
+   "fstMigrationDriftEquilibrium_lt_one": [
+    "0 < Ne",
+    "0 < m"
+   ],
+   "fstMigrationDriftEquilibrium_in_unit": [
+    "0 < Ne",
+    "0 < m"
+   ]
+  },
   "unmodelled_hypotheses": [
    {
     "thm": "migration_bounds_fst_below_one",
@@ -7380,6 +8352,10 @@
   ],
   "range_why": "`hetMutationFloor` names a heterozygosity",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -7430,6 +8406,10 @@
   ],
   "range_why": "`hetStepWithMutation` names a heterozygosity",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -7495,6 +8475,10 @@
   ],
   "range_why": "`hudsonFst` names a fixation index / F-statistic",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -7579,6 +8563,10 @@
   ],
   "range_why": "`islandFstMultiplicativeStep` names a fixation index / F-statistic",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -7643,6 +8631,10 @@
   ],
   "range_why": "`ldCorrelationDecay` names a correlation coefficient",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -7756,6 +8748,10 @@
   ],
   "range_why": "`pairwiseFst` names a fixation index / F-statistic",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -7802,9 +8798,19 @@
   ],
   "range_why": "`pairwiseFst` names a fixation index / F-statistic",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
-  "unmodelled_hypotheses": [],
+  "unmodelled_hypotheses": [
+   {
+    "thm": "pairwise_fst_mutationDrift_bound",
+    "hyp": "0 < \u03b8",
+    "reason": "unknown identifier \u03b8"
+   }
+  ],
   "box": {
    "fstS": [
     0.0,
@@ -7856,6 +8862,10 @@
   ],
   "range_why": "`presentDayEqualVarianceGaussianAUC` names an AUC / c-statistic",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -7914,6 +8924,10 @@
   ],
   "range_why": "`presentDayGaussianAUC` names an AUC / c-statistic",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -7981,8 +8995,21 @@
   ],
   "range_why": "`presentDayPGSVarianceMutationDrift` names a variance",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
-  "bounding_theorems": [],
-  "bounding_theorem_hyps": {},
+  "proved_bound": [
+   0,
+   null
+  ],
+  "bounding_theorems": [
+   "presentDayPGSVarianceMutationDrift_nonneg"
+  ],
+  "bounding_theorem_hyps": {
+   "presentDayPGSVarianceMutationDrift_nonneg": [
+    "0 \u2264 V_A",
+    "0 \u2264 fst_drift",
+    "fst_drift \u2264 1",
+    "0 \u2264 shared_ld"
+   ]
+  },
   "unmodelled_hypotheses": [],
   "box": {
    "V_A": [
@@ -8103,8 +9130,24 @@
   ],
   "range_why": "`sharedLD` names a proportion",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
-  "bounding_theorems": [],
-  "bounding_theorem_hyps": {},
+  "proved_bound": [
+   0,
+   1
+  ],
+  "bounding_theorems": [
+   "sharedLDFromMigration_nonneg",
+   "sharedLDFromMigration_lt_one"
+  ],
+  "bounding_theorem_hyps": {
+   "sharedLDFromMigration_nonneg": [
+    "\u211d",
+    "0 \u2264 M"
+   ],
+   "sharedLDFromMigration_lt_one": [
+    "\u211d",
+    "0 \u2264 M"
+   ]
+  },
   "unmodelled_hypotheses": [],
   "box": {
    "M": [
@@ -8139,6 +9182,10 @@
   ],
   "range_why": "`sharedLD_from_equilibrium` names a proportion",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -8184,8 +9231,20 @@
   ],
   "range_why": "`signalRetentionMigrationDrift` names a portability / retention factor -- a fraction of what transfers",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
-  "bounding_theorems": [],
-  "bounding_theorem_hyps": {},
+  "proved_bound": [
+   0,
+   1
+  ],
+  "bounding_theorems": [
+   "signalRetentionMigrationDrift_pos"
+  ],
+  "bounding_theorem_hyps": {
+   "signalRetentionMigrationDrift_pos": [
+    "0 < V_A",
+    "0 < Ne",
+    "0 < m"
+   ]
+  },
   "unmodelled_hypotheses": [],
   "box": {
    "V_A": [
@@ -8224,7 +9283,8 @@
     "signalRetention_increases_with_migration: 0 < m\u2081"
    ]
   },
-  "verdict": "escape",
+  "guard_not_modelled": "a theorem proves this bound but its hypotheses are outside the arithmetic fragment, so the exclusion could not be checked directly; graded conservatively",
+  "verdict": "escape-outside-theorem",
   "witness": {
    "V_A": 1000.0,
    "Ne": 10000000.0,
@@ -8240,7 +9300,7 @@
   "line": 5017,
   "family": "range",
   "py": "(lambda fst: (lambda M: (lambda shared_ld: ((((1.0 - fst)) * shared_ld) * V_A))(PortabilityDrift_sharedLDFromMigration(M)))(PortabilityDrift_scaledMigrationRate(Ne, m)))(PortabilityDrift_fstMigrationDriftEquilibrium(Ne, m))",
-  "severity": 49.99999956570553
+  "severity": 34.99999956570553
  },
  "PortabilityDrift.sourceBrierFromR2": {
   "range": [
@@ -8249,6 +9309,10 @@
   ],
   "range_why": "`sourceBrier` names a Brier score for a binary outcome",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -8296,8 +9360,21 @@
   ],
   "range_why": "`steppingStoneFst` names a fixation index / F-statistic",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
-  "bounding_theorems": [],
-  "bounding_theorem_hyps": {},
+  "proved_bound": [
+   null,
+   null
+  ],
+  "bounding_theorems": [
+   "steppingStoneFst_nonneg"
+  ],
+  "bounding_theorem_hyps": {
+   "steppingStoneFst_nonneg": [
+    "\u2115",
+    "0 < fst_neighbor",
+    "0 \u2264 \u03b1",
+    "1 \u2264 d"
+   ]
+  },
   "unmodelled_hypotheses": [],
   "box": {
    "fst_neighbor": [
@@ -8361,6 +9438,10 @@
   ],
   "range_why": "`targetBrier` names a Brier score for a binary outcome",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -8437,6 +9518,10 @@
   ],
   "range_why": "`targetExactGaussianAUC` names an AUC / c-statistic",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -8494,6 +9579,10 @@
   ],
   "range_why": "`targetGaussianAUC` names an AUC / c-statistic",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -8627,6 +9716,10 @@
   ],
   "range_why": "`wrightFisherDriftRetention` names a fixation index / F-statistic",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -8701,8 +9794,20 @@
   ],
   "range_why": "`noncentralityParam` names a noncentrality parameter",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
-  "bounding_theorems": [],
-  "bounding_theorem_hyps": {},
+  "proved_bound": [
+   0,
+   null
+  ],
+  "bounding_theorems": [
+   "ncp_nonneg"
+  ],
+  "bounding_theorem_hyps": {
+   "ncp_nonneg": [
+    "\u2115",
+    "0 \u2264 p",
+    "p \u2264 1"
+   ]
+  },
   "unmodelled_hypotheses": [],
   "box": {
    "n": [
@@ -8758,6 +9863,10 @@
   ],
   "range_why": "`powerAtThreshold` names a statistical power",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -8802,8 +9911,19 @@
   ],
   "range_why": "`r2ScalingModel` names a proportion of variance explained",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
-  "bounding_theorems": [],
-  "bounding_theorem_hyps": {},
+  "proved_bound": [
+   null,
+   1
+  ],
+  "bounding_theorems": [
+   "r2_scaling_bounded"
+  ],
+  "bounding_theorem_hyps": {
+   "r2_scaling_bounded": [
+    "0 < C",
+    "0 \u2264 n"
+   ]
+  },
   "unmodelled_hypotheses": [],
   "box": {
    "n": [
@@ -8923,8 +10043,19 @@
   ],
   "range_why": "the docstring states nonnegativity",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
-  "bounding_theorems": [],
-  "bounding_theorem_hyps": {},
+  "proved_bound": [
+   0,
+   null
+  ],
+  "bounding_theorems": [
+   "mutationSelectionBalanceRecessive_sq_le"
+  ],
+  "bounding_theorem_hyps": {
+   "mutationSelectionBalanceRecessive_sq_le": [
+    "0 \u2264 mu",
+    "0 < s"
+   ]
+  },
   "unmodelled_hypotheses": [],
   "box": {
    "mu": [
@@ -9069,9 +10200,36 @@
   ],
   "range_why": "`effectCorrelationStabilizing` names a correlation coefficient",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
-  "bounding_theorems": [],
-  "bounding_theorem_hyps": {},
-  "unmodelled_hypotheses": [],
+  "proved_bound": [
+   -1,
+   1
+  ],
+  "bounding_theorems": [
+   "effectCorrelationStabilizing_pos",
+   "effectCorrelationStabilizing_lt_one"
+  ],
+  "bounding_theorem_hyps": {
+   "effectCorrelationStabilizing_pos": [
+    "\u211d",
+    "1 < Ns"
+   ],
+   "effectCorrelationStabilizing_lt_one": [
+    "\u211d",
+    "1 < Ns"
+   ]
+  },
+  "unmodelled_hypotheses": [
+   {
+    "thm": "effectCorrelation_mem_range",
+    "hyp": "0 \u2264 s * N",
+    "reason": "unknown identifier s"
+   },
+   {
+    "thm": "effectCorrelation_mem_range",
+    "hyp": "0 \u2264 f * N",
+    "reason": "unknown identifier f"
+   }
+  ],
   "box": {
    "Ns": [
     1.0,
@@ -9112,6 +10270,10 @@
   ],
   "range_why": "`effectVarianceRecurrence` names a variance",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -9175,6 +10337,10 @@
   ],
   "range_why": "`fluctuatingEffectCorrelation` names a correlation coefficient",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -9292,8 +10458,19 @@
   ],
   "range_why": "`effectiveSampleSizeSE` names an effective sample size",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
-  "bounding_theorems": [],
-  "bounding_theorem_hyps": {},
+  "proved_bound": [
+   0,
+   null
+  ],
+  "bounding_theorems": [
+   "effective_n_pos"
+  ],
+  "bounding_theorem_hyps": {
+   "effective_n_pos": [
+    "\u211d",
+    "0 < se"
+   ]
+  },
   "unmodelled_hypotheses": [],
   "box": {
    "se": [
@@ -9348,6 +10525,10 @@
   ],
   "range_why": "`pgsAttenuationFactor` names a portability / retention factor -- a fraction of what transfers",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -9522,8 +10703,20 @@
   ],
   "range_why": "`optimalSourceShrinkageWeight` names a portability / retention factor -- a fraction of what transfers",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
-  "bounding_theorems": [],
-  "bounding_theorem_hyps": {},
+  "proved_bound": [
+   null,
+   1
+  ],
+  "bounding_theorems": [
+   "optimalSourceShrinkageWeight_le_half_iff_target_samples_dominate_gap"
+  ],
+  "bounding_theorem_hyps": {
+   "optimalSourceShrinkageWeight_le_half_iff_target_samples_dominate_gap": [
+    "0 < gapSq",
+    "0 < noiseVar",
+    "0 < nTarget"
+   ]
+  },
   "unmodelled_hypotheses": [],
   "box": {
    "gapSq": [
@@ -9631,6 +10824,10 @@
   ],
   "range_why": "`pinskerAncestryDivergenceCap` names an information-theoretic divergence",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [],
@@ -9736,13 +10933,102 @@
   ],
   "range_why": "`explainableFraction` names a proportion",
   "range_source": "name-or-docstring-implied; NOT a theorem-proved bound, so a violation is a lead, not a proof of a defect",
+  "proved_bound": [
+   null,
+   null
+  ],
   "bounding_theorems": [],
   "bounding_theorem_hyps": {},
   "unmodelled_hypotheses": [
    {
+    "thm": "explainable_fraction_bound_of_conditional_noise_floor_exact",
+    "hyp": "m \u2264 m\u03a9",
+    "reason": "unknown identifier m"
+   },
+   {
+    "thm": "explainable_fraction_bound_of_conditional_noise_floor_exact",
+    "hyp": "0 < Var[L; \u03bc]",
+    "reason": "bad char '['"
+   },
+   {
+    "thm": "explainable_fraction_bound_of_conditional_noise_floor_exact",
+    "hyp": "0 \u2264 \u03bc[noiseFloor]",
+    "reason": "bad char '['"
+   },
+   {
+    "thm": "explainable_fraction_bound_of_conditional_noise_floor_exact",
+    "hyp": "noiseFloor \u2264\u1d50[\u03bc] conditionalVariance \u03bc m L",
+    "reason": "bad char '\u1d50'"
+   },
+   {
+    "thm": "explainable_fraction_bound_of_conditional_gaussian_floor_exact",
+    "hyp": "m \u2264 m\u03a9",
+    "reason": "unknown identifier m"
+   },
+   {
+    "thm": "explainable_fraction_bound_of_conditional_gaussian_floor_exact",
+    "hyp": "0 < Var[L; \u03bc]",
+    "reason": "bad char '['"
+   },
+   {
+    "thm": "explainable_fraction_bound_of_conditional_gaussian_floor_exact",
+    "hyp": "0 \u2264 \u03bc[sigma4]",
+    "reason": "bad char '['"
+   },
+   {
     "thm": "explainable_fraction_bound_of_noise_floor",
-    "hyp": "total = between + within",
-    "reason": "bad char '='"
+    "hyp": "0 \u2264 noiseFloor",
+    "reason": "unknown identifier noiseFloor"
+   },
+   {
+    "thm": "explainable_fraction_bound_of_noise_floor",
+    "hyp": "noiseFloor \u2264 within",
+    "reason": "unknown identifier noiseFloor"
+   },
+   {
+    "thm": "explainable_fraction_bound_of_gaussian_floor",
+    "hyp": "0 \u2264 sigma4",
+    "reason": "unknown identifier sigma4"
+   },
+   {
+    "thm": "explainable_fraction_bound_of_gaussian_floor",
+    "hyp": "2 * sigma4 \u2264 within",
+    "reason": "unknown identifier sigma4"
+   },
+   {
+    "thm": "explainable_fraction_bound_of_conditional_noise_floor",
+    "hyp": "m \u2264 m\u03a9",
+    "reason": "unknown identifier m"
+   },
+   {
+    "thm": "explainable_fraction_bound_of_conditional_noise_floor",
+    "hyp": "0 < Var[L; \u03bc]",
+    "reason": "bad char '['"
+   },
+   {
+    "thm": "explainable_fraction_bound_of_conditional_noise_floor",
+    "hyp": "0 \u2264 \u03bc[noiseFloor]",
+    "reason": "bad char '['"
+   },
+   {
+    "thm": "explainable_fraction_bound_of_conditional_noise_floor",
+    "hyp": "noiseFloor \u2264\u1d50[\u03bc] conditionalVariance \u03bc m L",
+    "reason": "bad char '\u1d50'"
+   },
+   {
+    "thm": "explainable_fraction_bound_of_conditional_gaussian_floor",
+    "hyp": "m \u2264 m\u03a9",
+    "reason": "unknown identifier m"
+   },
+   {
+    "thm": "explainable_fraction_bound_of_conditional_gaussian_floor",
+    "hyp": "0 < Var[L; \u03bc]",
+    "reason": "bad char '['"
+   },
+   {
+    "thm": "explainable_fraction_bound_of_conditional_gaussian_floor",
+    "hyp": "0 \u2264 \u03bc[sigma4]",
+    "reason": "bad char '['"
    }
   ],
   "box": {

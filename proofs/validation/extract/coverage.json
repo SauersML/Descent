@@ -1452,6 +1452,24 @@
   "killed": [],
   "reason": "could not compile body: Untranslatable('recursion with 3 branches, expected 2')"
  },
+ "Calibrator.guard_stack_blind_to_retention": {
+  "class": "STRUCTURAL",
+  "file": "Calibrator/BlindnessRegistry.lean",
+  "line": 108,
+  "status": "UNCOVERED",
+  "check": null,
+  "killed": [],
+  "reason": "could not compile body: Untranslatable('qualified name ProbeBlindness.ofWitnessFamily')"
+ },
+ "Calibrator.extra_algebraic_guard_adds_nothing": {
+  "class": "STRUCTURAL",
+  "file": "Calibrator/BlindnessRegistry.lean",
+  "line": 128,
+  "status": "UNCOVERED",
+  "check": null,
+  "killed": [],
+  "reason": "could not compile body: Untranslatable('trailing tokens after expression: op::=')"
+ },
  "Calibrator.proportionMediated": {
   "class": "NUMERIC",
   "file": "Calibrator/CausalInference.lean",
@@ -1601,22 +1619,99 @@
   "mutants_tried": 3
  },
  "Calibrator.sensFromR2": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/ClinicalUtilityFairness.lean",
   "line": 408,
-  "status": "UNCOVERED",
-  "check": null,
-  "killed": [],
-  "reason": "self-check: calls untranslated definition Phi"
+  "status": "COVERED",
+  "check": {
+   "kind": "range",
+   "lo": 0.0,
+   "hi": 1.0,
+   "quantity": "probability",
+   "source_lo": "docstring/name",
+   "source_hi": "docstring/name",
+   "hypotheses": [],
+   "hypotheses_not_enforced": [
+    "0 \u2264 Real.sqrt R2\u2081 * Real.sqrt m.h_sq * m.case_mean - T'",
+    "0 \u2264 Real.sqrt r2_old * Real.sqrt m.h_sq * m.case_mean - T'",
+    "0 \u2264 T' - Real.sqrt r2_old * Real.sqrt m.h_sq * \u03bc_control",
+    "0 \u2264 Real.sqrt r2_target * Real.sqrt m.h_sq * m.case_mean - T'",
+    "0 \u2264 T' - Real.sqrt r2_target * Real.sqrt m.h_sq * \u03bc_control",
+    "0 \u2264 sensFromR2 m r2_target T'",
+    "0 \u2264 specFromR2 m r2_target T' \u03bc_control",
+    "specFromR2 m r2_source T' \u03bc_control \u2264 1",
+    "0 \u2264 Real.sqrt r2_unvalidated * Real.sqrt m.h_sq * m.case_mean - T'",
+    "0 \u2264 T' - Real.sqrt r2_unvalidated * Real.sqrt m.h_sq * \u03bc_control"
+   ],
+   "thm_lo": null,
+   "thm_hi": null,
+   "n_points": 40,
+   "box": {
+    "r2": [
+     0.02,
+     0.98
+    ],
+    "T'": [
+     0.05,
+     3.0
+    ]
+   }
+  },
+  "killed": [
+   "negate body"
+  ],
+  "reason": "",
+  "mutants_tried": 1
  },
  "Calibrator.specFromR2": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/ClinicalUtilityFairness.lean",
   "line": 413,
-  "status": "UNCOVERED",
-  "check": null,
-  "killed": [],
-  "reason": "self-check: calls untranslated definition Phi"
+  "status": "COVERED",
+  "check": {
+   "kind": "range",
+   "lo": 0.0,
+   "hi": 1.0,
+   "quantity": "probability",
+   "source_lo": "docstring/name",
+   "source_hi": "docstring/name",
+   "hypotheses": [],
+   "hypotheses_not_enforced": [
+    "\u03bc_control < 0",
+    "0 \u2264 T' - Real.sqrt R2\u2081 * Real.sqrt m.h_sq * \u03bc_control",
+    "0 \u2264 Real.sqrt r2_old * Real.sqrt m.h_sq * m.case_mean - T'",
+    "0 \u2264 T' - Real.sqrt r2_old * Real.sqrt m.h_sq * \u03bc_control",
+    "0 \u2264 Real.sqrt r2_target * Real.sqrt m.h_sq * m.case_mean - T'",
+    "0 \u2264 T' - Real.sqrt r2_target * Real.sqrt m.h_sq * \u03bc_control",
+    "0 \u2264 sensFromR2 m r2_target T'",
+    "0 \u2264 specFromR2 m r2_target T' \u03bc_control",
+    "specFromR2 m r2_source T' \u03bc_control \u2264 1",
+    "0 \u2264 Real.sqrt r2_unvalidated * Real.sqrt m.h_sq * m.case_mean - T'",
+    "0 \u2264 T' - Real.sqrt r2_unvalidated * Real.sqrt m.h_sq * \u03bc_control"
+   ],
+   "thm_lo": null,
+   "thm_hi": null,
+   "n_points": 40,
+   "box": {
+    "r2": [
+     0.02,
+     0.98
+    ],
+    "T'": [
+     0.05,
+     3.0
+    ],
+    "\u03bc_control": [
+     0.05,
+     1.05
+    ]
+   }
+  },
+  "killed": [
+   "negate body"
+  ],
+  "reason": "",
+  "mutants_tried": 1
  },
  "Calibrator.ppv": {
   "class": "NUMERIC",
@@ -2019,7 +2114,7 @@
  "Calibrator.gaussianJetVariance": {
   "class": "NUMERIC",
   "file": "Calibrator/Condensation.lean",
-  "line": 254,
+  "line": 262,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -2048,7 +2143,7 @@
  "Calibrator.criticalDegree": {
   "class": "NUMERIC",
   "file": "Calibrator/Condensation.lean",
-  "line": 279,
+  "line": 287,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -2086,20 +2181,51 @@
  "Calibrator.gaussianCriticalMultiplier": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/Condensation.lean",
-  "line": 295,
+  "line": 303,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
   "reason": "self-check: calls untranslated definition condensationConstant"
  },
  "Calibrator.windowVariance": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/Condensation.lean",
-  "line": 342,
-  "status": "UNCOVERED",
-  "check": null,
-  "killed": [],
-  "reason": "self-check: calls untranslated definition Phi"
+  "line": 350,
+  "status": "COVERED",
+  "check": {
+   "kind": "range",
+   "lo": 0,
+   "hi": 1,
+   "quantity": "nonnegative",
+   "source_lo": "theorem",
+   "source_hi": "theorem",
+   "hypotheses": [],
+   "hypotheses_not_enforced": [],
+   "thm_lo": [
+    "Calibrator.windowVariance_mem_unitInterval",
+    0
+   ],
+   "thm_hi": [
+    "Calibrator.windowVariance_mem_unitInterval",
+    0
+   ],
+   "n_points": 40,
+   "box": {
+    "w": [
+     0.05,
+     3.0
+    ],
+    "v": [
+     0.05,
+     3.0
+    ]
+   }
+  },
+  "killed": [
+   "negate body"
+  ],
+  "reason": "",
+  "mutants_tried": 3
  },
  "Calibrator.hweObservableContent": {
   "class": "STRUCTURAL",
@@ -2113,7 +2239,7 @@
  "Calibrator.GenotypeDesign.reModel": {
   "class": "STRUCTURAL",
   "file": "Calibrator/CondensationUnification.lean",
-  "line": 515,
+  "line": 519,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -2932,13 +3058,13 @@
   "reason": "self-check: structure projection unavailable (KeyError('sigmaTagSource'))"
  },
  "Calibrator.frobeniusNormSq": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/DGP.lean",
   "line": 146,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "could not compile body: Untranslatable('\u2211 over Fin t: not a `Fin n` index set')"
  },
  "Calibrator.r2FromMSE": {
   "class": "NUMERIC",
@@ -3363,7 +3489,7 @@
    "point": {
     "p": 0.020001
    },
-   "value": 1.055379466274582,
+   "value": 1.5193794936858533,
    "why": "above 1.0"
   }
  },
@@ -3753,13 +3879,38 @@
   "mutants_tried": 5
  },
  "Calibrator.TransportedMetrics.gaussianAUCFromSignalVariance": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/DGP.lean",
   "line": 2104,
-  "status": "UNCOVERED",
-  "check": null,
-  "killed": [],
-  "reason": "self-check: calls untranslated definition Phi"
+  "status": "COVERED",
+  "check": {
+   "kind": "range",
+   "lo": 0.0,
+   "hi": 1.0,
+   "quantity": "probability",
+   "source_lo": "docstring/name",
+   "source_hi": "docstring/name",
+   "hypotheses": [],
+   "hypotheses_not_enforced": [],
+   "thm_lo": null,
+   "thm_hi": null,
+   "n_points": 40,
+   "box": {
+    "vSignal": [
+     0.05,
+     3.0
+    ],
+    "vNoise": [
+     0.05,
+     3.0
+    ]
+   }
+  },
+  "killed": [
+   "negate body"
+  ],
+  "reason": "",
+  "mutants_tried": 6
  },
  "Calibrator.TransportedMetrics.calibratedBrier": {
   "class": "NUMERIC",
@@ -4263,22 +4414,22 @@
   "mutants_tried": 9
  },
  "Calibrator.cumulativeDrift": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/DemographicHistory.lean",
   "line": 506,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "could not compile body: Untranslatable('\u2211 with an unannotated index and 0 candidate dimensions: cannot tell which')"
  },
  "Calibrator.fstVariableNe": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/DemographicHistory.lean",
   "line": 510,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: calls untranslated definition cumulativeDrift"
+  "reason": "mined hypotheses admit no sampled point; constraints: ['0 < T']"
  },
  "Calibrator.driftLDCreationRate": {
   "class": "NUMERIC",
@@ -4799,13 +4950,13 @@
   "mutants_tried": 8
  },
  "Calibrator.dominanceVariance": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/EpistasisAndNonAdditivity.lean",
   "line": 189,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "could not compile body: Untranslatable('\u2211 with an unannotated index and 0 candidate dimensions: cannot tell which')"
  },
  "Calibrator.configurationWeight": {
   "class": "NOT-EXTRACTABLE",
@@ -4850,7 +5001,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "\u2211 over DiploidGenotype: not a `Fin n` index set"
  },
  "Calibrator.genotypeFlip": {
   "class": "STRUCTURAL",
@@ -4882,7 +5033,7 @@
  "Calibrator.GenotypeDesign.interactionOrder": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 792,
+  "line": 859,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -4891,16 +5042,16 @@
  "Calibrator.GenotypeDesign.statistic": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 800,
+  "line": 867,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "\u2211 over \u03b9: not a `Fin n` index set"
  },
  "Calibrator.GenotypeDesign.InLinkageEquilibrium": {
   "class": "STRUCTURAL",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 821,
+  "line": 888,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -4909,7 +5060,7 @@
  "Calibrator.GenotypeDesign.Polymorphic": {
   "class": "STRUCTURAL",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 829,
+  "line": 896,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -4918,7 +5069,7 @@
  "Calibrator.GenotypeDesign.VariantDisjoint": {
   "class": "STRUCTURAL",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 844,
+  "line": 911,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -4927,7 +5078,7 @@
  "Calibrator.GenotypeDesign.variantRecurrence": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 853,
+  "line": 920,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -4936,16 +5087,16 @@
  "Calibrator.GenotypeDesign.locusInfluence": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 862,
+  "line": 929,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "\u2211 over the Finset `Finset.univ.filter ( fun s => i \u2208 design.locusSet s )`, not `Finset.univ`"
  },
  "Calibrator.GenotypeDesign.IsTwoPoolInteraction": {
   "class": "STRUCTURAL",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 877,
+  "line": 944,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -4954,7 +5105,7 @@
  "Calibrator.geneBurdenDesign": {
   "class": "STRUCTURAL",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 943,
+  "line": 1010,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -4963,7 +5114,7 @@
  "Calibrator.slidingWindowDesign": {
   "class": "STRUCTURAL",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 970,
+  "line": 1037,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -4972,7 +5123,7 @@
  "Calibrator.fourthCumulantFromMoments": {
   "class": "NUMERIC",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 1229,
+  "line": 1296,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -4981,7 +5132,7 @@
  "Calibrator.circulantSpectrumA": {
   "class": "NUMERIC",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 1359,
+  "line": 1426,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -4990,7 +5141,7 @@
  "Calibrator.circulantSpectrumB": {
   "class": "NUMERIC",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 1366,
+  "line": 1433,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -4999,7 +5150,7 @@
  "Calibrator.GenotypeDesign.overlapMatrix": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 1462,
+  "line": 1529,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -5008,7 +5159,7 @@
  "Calibrator.GenotypeDesign.cycleDensity": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 1481,
+  "line": 1548,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -5017,7 +5168,7 @@
  "Calibrator.GenotypeDesign.Tempered": {
   "class": "STRUCTURAL",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 1515,
+  "line": 1586,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -5026,7 +5177,7 @@
  "Calibrator.GenotypeDesign.BoundedHubRecurrence": {
   "class": "STRUCTURAL",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 1524,
+  "line": 1595,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -5035,7 +5186,7 @@
  "Calibrator.palindromicCycleDensityA": {
   "class": "NUMERIC",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 1694,
+  "line": 1765,
   "status": "RANGE-MISMATCH",
   "check": {
    "kind": "range",
@@ -5078,7 +5229,7 @@
  "Calibrator.palindromicCycleDensityB": {
   "class": "NUMERIC",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 1703,
+  "line": 1774,
   "status": "RANGE-MISMATCH",
   "check": {
    "kind": "range",
@@ -5294,13 +5445,13 @@
   "reason": "Prop-valued / set-valued"
  },
  "Calibrator.taggedScoreEstimationRisk": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/GeneticArchitectureDiscovery.lean",
   "line": 211,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "could not compile body: Untranslatable('\u2211 with an unannotated index and 0 candidate dimensions: cannot tell which')"
  },
  "Calibrator.ctMissedTargetSignal": {
   "class": "NOT-EXTRACTABLE",
@@ -5652,7 +5803,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "\u2211 with an unannotated index and 0 candidate dimensions: cannot tell which"
  },
  "Calibrator.effectiveHaplotypeNumber": {
   "class": "NOT-EXTRACTABLE",
@@ -6298,7 +6449,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "\u2211 with an unannotated index and 0 candidate dimensions: cannot tell which"
  },
  "Calibrator.quadForm": {
   "class": "NOT-EXTRACTABLE",
@@ -6563,7 +6714,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "\u2211 with an unannotated index and 0 candidate dimensions: cannot tell which"
  },
  "Calibrator.ridgeSelfConsistentStep": {
   "class": "NOT-EXTRACTABLE",
@@ -6572,7 +6723,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "\u2211 with an unannotated index and 0 candidate dimensions: cannot tell which"
  },
  "Calibrator.alleleLossProbability": {
   "class": "NUMERIC",
@@ -7317,7 +7468,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: calls untranslated definition frobeniusNormSq"
+  "reason": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for -: 'list' and 'li)"
  },
  "Calibrator.harmonicMeanNe": {
   "class": "NOT-EXTRACTABLE",
@@ -7326,7 +7477,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "self-check: calls untranslated definition T"
  },
  "Calibrator.excessLDAfterBottleneck": {
   "class": "NUMERIC",
@@ -8830,7 +8981,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "\u2211 over Fin m.p: not a `Fin n` index set"
  },
  "Calibrator.PCCorrectionModel.uncorrectedBias": {
   "class": "NOT-EXTRACTABLE",
@@ -8839,7 +8990,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "\u2211 over Fin m.p: not a `Fin n` index set"
  },
  "Calibrator.PCCorrectionModel.topPCSpan": {
   "class": "STRUCTURAL",
@@ -8875,25 +9026,25 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "\u2211 with an unannotated index and 0 candidate dimensions: cannot tell which"
  },
  "Calibrator.spectralResidualBiasEnergy": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/PCCorrectability/Core.lean",
   "line": 201,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "could not compile body: Untranslatable('\u2211 with an unannotated index and 0 candidate dimensions: cannot tell which')"
  },
  "Calibrator.pgsTestAxisBias": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/PCCorrectability/Diagnostic.lean",
   "line": 25,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "could not compile body: Untranslatable('\u2211 with an unannotated index and 0 candidate dimensions: cannot tell which')"
  },
  "Calibrator.ancestryGradientSusceptibility": {
   "class": "NUMERIC",
@@ -9107,34 +9258,34 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "\u2211 with an unannotated index and 0 candidate dimensions: cannot tell which"
  },
  "Calibrator.FrequencyResolvedCohort.weightedSignal": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/PCCorrectability/Frequency.lean",
   "line": 80,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "could not compile body: Untranslatable('\u2211 with an unannotated index and 0 candidate dimensions: cannot tell which')"
  },
  "Calibrator.FrequencyResolvedCohort.weightedNoise": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/PCCorrectability/Frequency.lean",
   "line": 84,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "could not compile body: Untranslatable('\u2211 with an unannotated index and 0 candidate dimensions: cannot tell which')"
  },
  "Calibrator.FrequencyResolvedCohort.weightedInformation": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/PCCorrectability/Frequency.lean",
   "line": 88,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: calls untranslated definition weightedSignal"
+  "reason": "no admissible point evaluates"
  },
  "Calibrator.spikeOuter": {
   "class": "NOT-EXTRACTABLE",
@@ -9224,7 +9375,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "\u2211 with an unannotated index and 0 candidate dimensions: cannot tell which"
  },
  "Calibrator.traceForm": {
   "class": "NOT-EXTRACTABLE",
@@ -9233,7 +9384,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "\u2211 with an unannotated index and 0 candidate dimensions: cannot tell which"
  },
  "Calibrator.traceWindowBudgetClass": {
   "class": "STRUCTURAL",
@@ -9382,7 +9533,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "\u2211 over the Finset `Finset.range m`, not `Finset.univ`"
  },
  "Calibrator.inverseTraceCertificate": {
   "class": "NOT-EXTRACTABLE",
@@ -9391,7 +9542,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "\u2211 over the Finset `Finset.range m`, not `Finset.univ`"
  },
  "Calibrator.meffPerturbed": {
   "class": "NOT-EXTRACTABLE",
@@ -9532,7 +9683,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "\u2211 with an unannotated index and 0 candidate dimensions: cannot tell which"
  },
  "Calibrator.markerDangerIndex": {
   "class": "NUMERIC",
@@ -10868,13 +11019,13 @@
   "mutants_tried": 5
  },
  "Calibrator.causalPortabilityFromLocalFst": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/PhenomeWidePortability.lean",
   "line": 269,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "could not compile body: Untranslatable('\u2211 with an unannotated index and 0 candidate dimensions: cannot tell which')"
  },
  "Calibrator.qst": {
   "class": "NUMERIC",
@@ -10966,13 +11117,13 @@
   }
  },
  "Calibrator.pgsDriftVarianceFromLoci": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/PolygenicAdaptation.lean",
   "line": 119,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "could not compile body: Untranslatable('\u2211 over Fin n: not a `Fin n` index set')"
  },
  "Calibrator.pgsDiffVariance_two_pop": {
   "class": "NUMERIC",
@@ -11293,13 +11444,13 @@
   }
  },
  "Calibrator.effectivePolygenicityOfEffects": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/PolygenicArchitecture.lean",
   "line": 198,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "could not compile body: Untranslatable('\u2211 with an unannotated index and 0 candidate dimensions: cannot tell which')"
  },
  "Calibrator.SNPArchitecturePortabilityModel.sourceEffectMass": {
   "class": "NOT-EXTRACTABLE",
@@ -11308,7 +11459,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "\u2211 with an unannotated index and 0 candidate dimensions: cannot tell which"
  },
  "Calibrator.SNPArchitecturePortabilityModel.targetRetainedEffectMass": {
   "class": "NOT-EXTRACTABLE",
@@ -11317,7 +11468,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "\u2211 with an unannotated index and 0 candidate dimensions: cannot tell which"
  },
  "Calibrator.SNPArchitecturePortabilityModel.lostEffectMass": {
   "class": "NOT-EXTRACTABLE",
@@ -11362,7 +11513,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "self-check: calls untranslated definition q"
  },
  "Calibrator.nonsmoothSummaryRisk": {
   "class": "NUMERIC",
@@ -11530,7 +11681,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "self-check: calls untranslated definition sourceEffectMass"
  },
  "Calibrator.rgFstWeightedUpperBound": {
   "class": "NOT-EXTRACTABLE",
@@ -11539,7 +11690,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: calls untranslated definition weightedRetentionUpperBound"
+  "reason": "self-check: arity/type mismatch (TypeError(\"object of type 'function' has no len()\"))"
  },
  "Calibrator.HardyWeinbergModel.standardizedSquare": {
   "class": "NOT-EXTRACTABLE",
@@ -11557,7 +11708,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "\u2211 over DiploidGenotype: not a `Fin n` index set"
  },
  "Calibrator.hweMellinDrift": {
   "class": "NUMERIC",
@@ -11694,7 +11845,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "\u2211 over DiploidGenotype: not a `Fin n` index set"
  },
  "Calibrator.hweMellinJetVariance": {
   "class": "NUMERIC",
@@ -14015,22 +14166,87 @@
   "mutants_tried": 5
  },
  "Calibrator.presentDayGaussianAUC": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 943,
-  "status": "UNCOVERED",
-  "check": null,
-  "killed": [],
-  "reason": "self-check: calls untranslated definition Phi"
+  "status": "COVERED",
+  "check": {
+   "kind": "range",
+   "lo": 0.0,
+   "hi": 1.0,
+   "quantity": "probability",
+   "source_lo": "docstring/name",
+   "source_hi": "docstring/name",
+   "hypotheses": [
+    "0 < V_A",
+    "0 < V_E",
+    "fst < 1"
+   ],
+   "hypotheses_not_enforced": [],
+   "thm_lo": null,
+   "thm_hi": null,
+   "n_points": 40,
+   "box": {
+    "V_A": [
+     0.05,
+     3.0
+    ],
+    "V_E": [
+     0.05,
+     3.0
+    ],
+    "fst": [
+     0.02,
+     0.98
+    ]
+   }
+  },
+  "killed": [
+   "negate body"
+  ],
+  "reason": "",
+  "mutants_tried": 4
  },
  "Calibrator.presentDayEqualVarianceGaussianAUC": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "WRAPPER",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 952,
-  "status": "UNCOVERED",
-  "check": null,
-  "killed": [],
-  "reason": "self-check: calls untranslated definition Phi"
+  "status": "COVERED",
+  "check": {
+   "kind": "range",
+   "lo": 0.0,
+   "hi": 1.0,
+   "quantity": "probability",
+   "source_lo": "docstring/name",
+   "source_hi": "docstring/name",
+   "hypotheses": [
+    "0 < V_A",
+    "0 < V_E"
+   ],
+   "hypotheses_not_enforced": [],
+   "thm_lo": null,
+   "thm_hi": null,
+   "n_points": 40,
+   "box": {
+    "V_A": [
+     0.05,
+     3.0
+    ],
+    "V_E": [
+     0.05,
+     3.0
+    ],
+    "fst": [
+     0.02,
+     0.98
+    ]
+   }
+  },
+  "killed": [
+   "negate body"
+  ],
+  "reason": "delegates to presentDayGaussianAUC",
+  "mutants_tried": 1
  },
  "Calibrator.realWorldPGSVariance": {
   "class": "NUMERIC",
@@ -14079,7 +14295,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: structure projection unavailable (AttributeError(\"'float' object has no attribute 'mulVec'\"))"
+  "reason": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'l)"
  },
  "Calibrator.sigmaTagCausalSource": {
   "class": "NOT-EXTRACTABLE",
@@ -15176,13 +15392,48 @@
   }
  },
  "Calibrator.targetGaussianAUCFromNeutralAFBenchmark": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "WRAPPER",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 3074,
-  "status": "UNCOVERED",
-  "check": null,
-  "killed": [],
-  "reason": "self-check: calls untranslated definition Phi"
+  "status": "COVERED",
+  "check": {
+   "kind": "range",
+   "lo": 0.0,
+   "hi": 1.0,
+   "quantity": "probability",
+   "source_lo": "docstring/name",
+   "source_hi": "docstring/name",
+   "hypotheses": [
+    "0 < V_A",
+    "0 < V_E"
+   ],
+   "hypotheses_not_enforced": [
+    "fstSource < fstTarget",
+    "0 \u2264 fstSource \u2227 fstTarget < 1"
+   ],
+   "thm_lo": null,
+   "thm_hi": null,
+   "n_points": 40,
+   "box": {
+    "V_A": [
+     0.05,
+     3.0
+    ],
+    "V_E": [
+     0.05,
+     3.0
+    ],
+    "fstTarget": [
+     0.02,
+     0.98
+    ]
+   }
+  },
+  "killed": [
+   "negate body"
+  ],
+  "reason": "delegates to presentDayGaussianAUC",
+  "mutants_tried": 1
  },
  "Calibrator.sourceBrierFromR2": {
   "class": "WRAPPER",
@@ -15304,31 +15555,98 @@
   "reason": "qualified name TransportedMetrics.profileFromSignalVariance"
  },
  "Calibrator.equalVarianceGaussianAUCFromSNR": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 3181,
-  "status": "UNCOVERED",
-  "check": null,
-  "killed": [],
-  "reason": "self-check: calls untranslated definition Phi"
+  "status": "COVERED",
+  "check": {
+   "kind": "range",
+   "lo": 0.0,
+   "hi": 1.0,
+   "quantity": "probability",
+   "source_lo": "docstring/name",
+   "source_hi": "docstring/name",
+   "hypotheses": [],
+   "hypotheses_not_enforced": [],
+   "thm_lo": null,
+   "thm_hi": null,
+   "n_points": 40,
+   "box": {
+    "snr": [
+     0.05,
+     3.0
+    ]
+   }
+  },
+  "killed": [
+   "negate body"
+  ],
+  "reason": "",
+  "mutants_tried": 4
  },
  "Calibrator.equalVarianceGaussianAUCFromVariances": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 3193,
-  "status": "UNCOVERED",
-  "check": null,
-  "killed": [],
-  "reason": "self-check: calls untranslated definition Phi"
+  "status": "COVERED",
+  "check": {
+   "kind": "range",
+   "lo": 0.0,
+   "hi": 1.0,
+   "quantity": "probability",
+   "source_lo": "docstring/name",
+   "source_hi": "docstring/name",
+   "hypotheses": [],
+   "hypotheses_not_enforced": [],
+   "thm_lo": null,
+   "thm_hi": null,
+   "n_points": 40,
+   "box": {
+    "vSignal": [
+     0.05,
+     3.0
+    ],
+    "vEnv": [
+     0.05,
+     3.0
+    ]
+   }
+  },
+  "killed": [
+   "negate body"
+  ],
+  "reason": "",
+  "mutants_tried": 6
  },
  "Calibrator.equalVarianceGaussianAUCFromExplainedR2": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 3226,
-  "status": "UNCOVERED",
-  "check": null,
-  "killed": [],
-  "reason": "self-check: calls untranslated definition Phi"
+  "status": "COVERED",
+  "check": {
+   "kind": "range",
+   "lo": 0.0,
+   "hi": 1.0,
+   "quantity": "probability",
+   "source_lo": "docstring/name",
+   "source_hi": "docstring/name",
+   "hypotheses": [],
+   "hypotheses_not_enforced": [],
+   "thm_lo": null,
+   "thm_hi": null,
+   "n_points": 40,
+   "box": {
+    "r2": [
+     0.02,
+     0.98
+    ]
+   }
+  },
+  "killed": [
+   "negate body"
+  ],
+  "reason": "",
+  "mutants_tried": 9
  },
  "Calibrator.sourceEqualVarianceGaussianAUCFromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
@@ -15448,13 +15766,48 @@
   "reason": "self-check: calls untranslated definition toMetricModelAt"
  },
  "Calibrator.targetExactGaussianAUCFromNeutralAFBenchmark": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "WRAPPER",
   "file": "Calibrator/PortabilityDrift.lean",
   "line": 3755,
-  "status": "UNCOVERED",
-  "check": null,
-  "killed": [],
-  "reason": "self-check: calls untranslated definition Phi"
+  "status": "COVERED",
+  "check": {
+   "kind": "range",
+   "lo": 0.0,
+   "hi": 1.0,
+   "quantity": "probability",
+   "source_lo": "docstring/name",
+   "source_hi": "docstring/name",
+   "hypotheses": [
+    "0 < V_A",
+    "0 < V_E"
+   ],
+   "hypotheses_not_enforced": [
+    "fstSource < fstTarget",
+    "0 \u2264 fstSource \u2227 fstTarget < 1"
+   ],
+   "thm_lo": null,
+   "thm_hi": null,
+   "n_points": 40,
+   "box": {
+    "V_A": [
+     0.05,
+     3.0
+    ],
+    "V_E": [
+     0.05,
+     3.0
+    ],
+    "fstTarget": [
+     0.02,
+     0.98
+    ]
+   }
+  },
+  "killed": [
+   "negate body"
+  ],
+  "reason": "delegates to targetGaussianAUCFromNeutralAFBenchmark",
+  "mutants_tried": 1
  },
  "Calibrator.brierRegretPoint": {
   "class": "NUMERIC",
@@ -16227,8 +16580,8 @@
  "Calibrator.steppingStoneFst": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 4878,
-  "status": "RANGE-MISMATCH",
+  "line": 4895,
+  "status": "COVERED",
   "check": {
    "kind": "range",
    "lo": 0.0,
@@ -16237,12 +16590,16 @@
    "source_lo": "docstring/name",
    "source_hi": "docstring/name",
    "hypotheses": [
+    "fst_neighbor \u2264 1",
     "0 < fst_neighbor",
     "1 < d",
     "1 \u2264 d"
    ],
    "hypotheses_not_enforced": [
+    "1 \u2264 fst_neighbor * (1 + \u03b1 * ((d : \u211d",
     "0 < \u03b1",
+    "fst_neighbor * (1 + \u03b1 * ((d\u2082 : \u211d",
+    "fst_neighbor * (1 + \u03b1 * ((d : \u211d",
     "0 \u2264 \u03b1"
    ],
    "thm_lo": null,
@@ -16263,22 +16620,19 @@
     ]
    }
   },
-  "killed": [],
+  "killed": [
+   "first '+'->'-'",
+   "last '+'->'-'",
+   "negate body",
+   "literal 1->2"
+  ],
   "reason": "",
-  "violation": {
-   "point": {
-    "fst_neighbor": 0.979999,
-    "\u03b1": 0.050003,
-    "d": 19.999981
-   },
-   "value": 1.911052125941178,
-   "why": "above 1.0"
-  }
+  "mutants_tried": 8
  },
  "Calibrator.sharedLD_from_equilibrium": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 4940,
+  "line": 4980,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -16319,7 +16673,7 @@
  "Calibrator.sharedLDFromMigration": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 4966,
+  "line": 5006,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -16361,13 +16715,57 @@
  "Calibrator.signalRetentionMigrationDrift": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 5017,
+  "line": 5070,
+  "status": "COVERED",
+  "check": {
+   "kind": "range",
+   "lo": 0,
+   "hi": 1,
+   "quantity": "F_ST",
+   "source_lo": "theorem",
+   "source_hi": "theorem",
+   "hypotheses": [
+    "0 < Ne",
+    "0 \u2264 m"
+   ],
+   "hypotheses_not_enforced": [],
+   "thm_lo": [
+    "Calibrator.signalRetentionMigrationDrift_nonneg",
+    2
+   ],
+   "thm_hi": [
+    "Calibrator.signalRetentionMigrationDrift_lt_one",
+    2
+   ],
+   "n_points": 40,
+   "box": {
+    "Ne": [
+     1.0,
+     1000.0
+    ],
+    "m": [
+     1.0,
+     1000.0
+    ]
+   }
+  },
+  "killed": [
+   "negate body",
+   "literal 1->2"
+  ],
+  "reason": "",
+  "mutants_tried": 5
+ },
+ "Calibrator.retainedSignalVarianceMigrationDrift": {
+  "class": "NUMERIC",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 5081,
   "status": "RANGE-MISMATCH",
   "check": {
    "kind": "range",
    "lo": 0,
    "hi": 1.0,
-   "quantity": "frequency",
+   "quantity": "ratio",
    "source_lo": "theorem",
    "source_hi": "docstring/name",
    "hypotheses": [
@@ -16377,7 +16775,7 @@
    ],
    "hypotheses_not_enforced": [],
    "thm_lo": [
-    "Calibrator.signalRetentionMigrationDrift_pos",
+    "Calibrator.retainedSignalVarianceMigrationDrift_pos",
     3
    ],
    "thm_hi": null,
@@ -16412,7 +16810,7 @@
  "Calibrator.asymmetricFst": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 5098,
+  "line": 5192,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -16453,7 +16851,7 @@
  "Calibrator.effectiveSymmetricMigration": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 5139,
+  "line": 5233,
   "status": "RANGE-MISMATCH",
   "check": {
    "kind": "range",
@@ -16494,7 +16892,7 @@
  "Calibrator.admixtureLDDecay": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 5160,
+  "line": 5254,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -16540,7 +16938,7 @@
  "Calibrator.admixtureLDBoost": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 5207,
+  "line": 5301,
   "status": "RANGE-MISMATCH",
   "check": {
    "kind": "range",
@@ -16591,7 +16989,7 @@
  "Calibrator.fstMigDriftNext": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 5269,
+  "line": 5363,
   "status": "RANGE-MISMATCH",
   "check": {
    "kind": "range",
@@ -16637,7 +17035,7 @@
  "Calibrator.fstMigDriftEquil": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 5304,
+  "line": 5398,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -16682,7 +17080,7 @@
  "Calibrator.neutralAFBenchmarkFromRecurrence": {
   "class": "NUMERIC",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 5386,
+  "line": 5480,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -16777,13 +17175,38 @@
   }
  },
  "Calibrator.powerAtThreshold": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/PowerAnalysis.lean",
   "line": 90,
-  "status": "UNCOVERED",
-  "check": null,
-  "killed": [],
-  "reason": "self-check: calls untranslated definition Phi"
+  "status": "COVERED",
+  "check": {
+   "kind": "range",
+   "lo": 0.0,
+   "hi": 1.0,
+   "quantity": "probability",
+   "source_lo": "docstring/name",
+   "source_hi": "docstring/name",
+   "hypotheses": [],
+   "hypotheses_not_enforced": [],
+   "thm_lo": null,
+   "thm_hi": null,
+   "n_points": 40,
+   "box": {
+    "ncp": [
+     0.05,
+     3.0
+    ],
+    "z_alpha": [
+     0.05,
+     3.0
+    ]
+   }
+  },
+  "killed": [
+   "negate body"
+  ],
+  "reason": "",
+  "mutants_tried": 3
  },
  "Calibrator.GWASObservationModel.standardError": {
   "class": "NUMERIC",
@@ -17108,7 +17531,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "\u2211 over DiploidGenotype: not a `Fin n` index set"
  },
  "Calibrator.HardyWeinbergModel.centeredAltAlleleCount": {
   "class": "NOT-EXTRACTABLE",
@@ -17126,7 +17549,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "\u2211 over DiploidGenotype: not a `Fin n` index set"
  },
  "Calibrator.HardyWeinbergModel.genotypeThirdAbsMoment": {
   "class": "NOT-EXTRACTABLE",
@@ -17135,7 +17558,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "\u2211 over DiploidGenotype: not a `Fin n` index set"
  },
  "Calibrator.HWEScoreModel.scoreMean": {
   "class": "NOT-EXTRACTABLE",
@@ -17144,7 +17567,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "\u2211 over Fin m: not a `Fin n` index set"
  },
  "Calibrator.HWEScoreModel.scoreVariance": {
   "class": "NOT-EXTRACTABLE",
@@ -17153,7 +17576,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "\u2211 over Fin m: not a `Fin n` index set"
  },
  "Calibrator.HWEScoreModel.scoreThirdAbsMomentBound": {
   "class": "NOT-EXTRACTABLE",
@@ -17162,7 +17585,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "\u2211 over Fin m: not a `Fin n` index set"
  },
  "Calibrator.berryEsseenErrorBound": {
   "class": "NUMERIC",
@@ -17255,13 +17678,13 @@
   "reason": "qualified name ProbabilityTheory.gaussianReal"
  },
  "Calibrator.Phi": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/Probability.lean",
   "line": 487,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "qualified name ProbabilityTheory.cdf"
+  "reason": "could not compile body: Untranslatable('qualified name ProbabilityTheory.cdf')"
  },
  "Calibrator.noiseMeasureGivenX": {
   "class": "NOT-EXTRACTABLE",
@@ -17476,7 +17899,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "\u2211 with an unannotated index and 0 candidate dimensions: cannot tell which"
  },
  "Calibrator.spectralTotal": {
   "class": "NOT-EXTRACTABLE",
@@ -17485,7 +17908,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "\u2211 with an unannotated index and 0 candidate dimensions: cannot tell which"
  },
  "Calibrator.reconstructionEfficiency": {
   "class": "NOT-EXTRACTABLE",
@@ -17955,31 +18378,31 @@
   "mutants_tried": 5
  },
  "Calibrator.pgsMean": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/ScoreDistribution.lean",
   "line": 39,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "could not compile body: Untranslatable('\u2211 with an unannotated index and 0 candidate dimensions: cannot tell which')"
  },
  "Calibrator.pgsVariance": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/ScoreDistribution.lean",
   "line": 44,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "could not compile body: Untranslatable('\u2211 with an unannotated index and 0 candidate dimensions: cannot tell which')"
  },
  "Calibrator.pgsMeanShift": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/ScoreDistribution.lean",
   "line": 61,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "could not compile body: Untranslatable('\u2211 with an unannotated index and 0 candidate dimensions: cannot tell which')"
  },
  "Calibrator.thresholdStandardizedCoordinate": {
   "class": "NUMERIC",
@@ -17991,13 +18414,13 @@
   "reason": "no invariant available: neither the theorems mentioning it nor its docstring state a range"
  },
  "Calibrator.benchmarkHighScoreRate": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/ScoreDistribution.lean",
   "line": 110,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: calls untranslated definition Phi"
+  "reason": "no invariant available: neither the theorems mentioning it nor its docstring state a range"
  },
  "Calibrator.externallyStandardized": {
   "class": "NUMERIC",
@@ -18417,13 +18840,13 @@
   "mutants_tried": 6
  },
  "Calibrator.polygenicAdaptationShift": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/SelectionArchitecture.lean",
   "line": 445,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "could not compile body: Untranslatable('\u2211 with an unannotated index and 0 candidate dimensions: cannot tell which')"
  },
  "Calibrator.gwasNCP": {
   "class": "NUMERIC",
@@ -18576,13 +18999,13 @@
   "reason": "self-check: structure projection unavailable (KeyError('sigmaTagSource'))"
  },
  "Calibrator.sourceSquaredEffectMass": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/SimulationValidation.lean",
   "line": 36,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "could not compile body: Untranslatable('\u2211 with an unannotated index and 0 candidate dimensions: cannot tell which')"
  },
  "Calibrator.identityDirectMetricModel": {
   "class": "STRUCTURAL",
@@ -18910,7 +19333,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "\u2211 with an unannotated index and 0 candidate dimensions: cannot tell which"
  },
  "Calibrator.random_se_sq": {
   "class": "NOT-EXTRACTABLE",
@@ -18919,7 +19342,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "\u2211 with an unannotated index and 0 candidate dimensions: cannot tell which"
  },
  "Calibrator.geneticCorrelationLDSC": {
   "class": "NOT-EXTRACTABLE",
@@ -18928,16 +19351,16 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "\u2211 with an unannotated index and 0 candidate dimensions: cannot tell which"
  },
  "Calibrator.disjointWindowLimitVariance": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/StatisticalGeneticsMethodology.lean",
   "line": 429,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "could not compile body: Untranslatable('\u2211 with an unannotated index and 0 candidate dimensions: cannot tell which')"
  },
  "Calibrator.StratificationModel.varTrue": {
   "class": "NOT-EXTRACTABLE",
@@ -18955,7 +19378,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "\u2211 over Fin p: not a `Fin n` index set"
  },
  "Calibrator.TwoPopBiasModel.varBiasTarget": {
   "class": "NOT-EXTRACTABLE",
@@ -19187,7 +19610,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "self-check: arity/type mismatch (TypeError(\"'float' object is not callable\"))"
  },
  "Calibrator.sharedLDGeneticVariance": {
   "class": "NOT-EXTRACTABLE",
@@ -19196,7 +19619,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: calls untranslated definition pgsPhenoCov"
+  "reason": "self-check: arity/type mismatch (TypeError(\"'float' object is not callable\"))"
  },
  "Calibrator.sharedLDHeritability": {
   "class": "NOT-EXTRACTABLE",
@@ -19205,7 +19628,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: calls untranslated definition pgsPhenoCov"
+  "reason": "self-check: arity/type mismatch (TypeError(\"'float' object is not callable\"))"
  },
  "Calibrator.pgsR2": {
   "class": "NUMERIC",
@@ -19260,7 +19683,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: calls untranslated definition pgsPhenoCov"
+  "reason": "self-check: arity/type mismatch (TypeError(\"'float' object is not callable\"))"
  },
  "Calibrator.transportedTargetR2SharedLD": {
   "class": "NOT-EXTRACTABLE",
@@ -19269,7 +19692,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: calls untranslated definition pgsPhenoCov"
+  "reason": "self-check: arity/type mismatch (TypeError(\"'float' object is not callable\"))"
  },
  "Calibrator.ldEffectGeneticCorrelation": {
   "class": "NOT-EXTRACTABLE",
@@ -19278,16 +19701,16 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: calls untranslated definition pgsPhenoCov"
+  "reason": "self-check: arity/type mismatch (TypeError(\"'float' object is not callable\"))"
  },
  "Calibrator.effectGeneticCorrelation": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/TransferLearningPGS.lean",
   "line": 105,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "could not compile body: Untranslatable('\u2211 over Fin m: not a `Fin n` index set')"
  },
  "Calibrator.standardizedDiagonalLD": {
   "class": "NOT-EXTRACTABLE",
@@ -19299,22 +19722,52 @@
   "reason": "self-check: value is not a real number: function (vector- or function-valued)"
  },
  "Calibrator.additiveGeneticVariance": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/TransferLearningPGS.lean",
   "line": 114,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "could not compile body: Untranslatable('\u2211 over Fin m: not a `Fin n` index set')"
  },
  "Calibrator.additiveHeritability": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/TransferLearningPGS.lean",
   "line": 120,
-  "status": "UNCOVERED",
-  "check": null,
+  "status": "RANGE-MISMATCH",
+  "check": {
+   "kind": "range",
+   "lo": 0.0,
+   "hi": 1.0,
+   "quantity": "heritability",
+   "source_lo": "docstring/name",
+   "source_hi": "docstring/name",
+   "hypotheses": [
+    "0 < var_y"
+   ],
+   "hypotheses_not_enforced": [
+    "0 < additiveGeneticVariance \u03b2",
+    "additiveHeritability \u03b2_t var_y \u2264 additiveHeritability \u03b2_s var_y"
+   ],
+   "thm_lo": null,
+   "thm_hi": null,
+   "n_points": 40,
+   "box": {
+    "var_y": [
+     0.05,
+     3.0
+    ]
+   }
+  },
   "killed": [],
-  "reason": "self-check: calls untranslated definition additiveGeneticVariance"
+  "reason": "",
+  "violation": {
+   "point": {
+    "var_y": 0.050003
+   },
+   "value": 33.443076534376814,
+   "why": "above 1.0"
+  }
  },
  "Calibrator.sourceSelfR2DiagonalLD": {
   "class": "NOT-EXTRACTABLE",
@@ -19323,7 +19776,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: calls untranslated definition pgsPhenoCov"
+  "reason": "self-check: arity/type mismatch (TypeError('standardizedDiagonalLD() takes 0 positional argum)"
  },
  "Calibrator.transportedTargetR2DiagonalLD": {
   "class": "NOT-EXTRACTABLE",
@@ -19332,7 +19785,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: calls untranslated definition pgsPhenoCov"
+  "reason": "self-check: arity/type mismatch (TypeError('standardizedDiagonalLD() takes 0 positional argum)"
  },
  "Calibrator.benDavidUpperBound": {
   "class": "NUMERIC",
@@ -19679,7 +20132,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "self-check: calls untranslated definition pgsPhenoCov"
+  "reason": "self-check: arity/type mismatch (TypeError('standardizedDiagonalLD() takes 0 positional argum)"
  },
  "Calibrator.sampleLimitedScratchTargetR2": {
   "class": "NUMERIC",
@@ -19956,7 +20409,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "self-check: value is not a real number: function (vector- or function-valued)"
  },
  "Calibrator.weightedMetaSourceWeights": {
   "class": "NOT-EXTRACTABLE",
@@ -19992,7 +20445,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "self-check: value is not a real number: function (vector- or function-valued)"
  },
  "Calibrator.centeredPopulationEffectDeviationFin": {
   "class": "NOT-EXTRACTABLE",
@@ -20211,7 +20664,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "\u2211 with an unannotated index and 0 candidate dimensions: cannot tell which"
  },
  "Calibrator.linScore": {
   "class": "NOT-EXTRACTABLE",
@@ -20292,7 +20745,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "\u2211 with an unannotated index and 0 candidate dimensions: cannot tell which"
  },
  "Calibrator.locusTerm": {
   "class": "NOT-EXTRACTABLE",
@@ -20301,7 +20754,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "\u2211 with an unannotated index and 0 candidate dimensions: cannot tell which"
  },
  "Calibrator.baselineWeight": {
   "class": "NOT-EXTRACTABLE",
@@ -20310,7 +20763,7 @@
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "\u2211 with an unannotated index and 0 candidate dimensions: cannot tell which"
  },
  "Calibrator.transportFactor": {
   "class": "NOT-EXTRACTABLE",
@@ -20616,13 +21069,13 @@
   }
  },
  "Calibrator.additiveVariance": {
-  "class": "NOT-EXTRACTABLE",
+  "class": "NUMERIC",
   "file": "Calibrator/VarianceComponents.lean",
   "line": 139,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
-  "reason": "Finset/indexed sum"
+  "reason": "could not compile body: Untranslatable('\u2211 with an unannotated index and 0 candidate dimensions: cannot tell which')"
  },
  "Calibrator.liabilityScaleH2": {
   "class": "NUMERIC",

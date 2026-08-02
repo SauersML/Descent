@@ -3220,11 +3220,92 @@ from source `R²`; it is just the closed-form coordinate map induced by the
 equal-variance Gaussian model, which the previous name obscured while the
 docstring named the right model out loud.
 
-    Empirical status: VALIDATED for the equal-variance Gaussian model;
-    FALSIFIED as the liability-threshold AUC. Takes no prevalence, so it
-    cannot express the observable it was named for. -/
+    Regime: `r2 ∈ [0, 1)`. The boundary `r2 = 1` is attainable, has a defined
+    limit -- a score explaining all the variance discriminates perfectly, so
+    AUC tends to `1` -- and is NOT in this function's domain. There the body
+    divides by zero, Lean's division returns `0`, `Real.sqrt 0 = 0`, and the
+    value collapses to `Phi 0 = 1/2`: chance discrimination assigned to a
+    perfect predictor, the opposite extreme from the limit, silently and with
+    no type error. `equalVarianceGaussianAUCFromExplainedR2_at_one` exhibits
+    it, and `equalVarianceGaussianAUCFromExplainedR2_endpoint_lt_interior`
+    proves the endpoint value is strictly below *every* interior value, so the
+    map is not monotone on `[0, 1]` although it is on `[0, 1)`.
+    `equalVarianceGaussianAUCChart` is the continuous extension and is what a
+    caller who can reach the boundary should use.
+
+    Empirical status: VALIDATED for the equal-variance Gaussian model on
+    `[0, 1)`; FALSIFIED at `r2 = 1`, where it returns `1/2` and the AUC is `1`.
+    FALSIFIED as the liability-threshold AUC: takes no prevalence, so it cannot
+    express the observable it was named for. -/
 noncomputable def equalVarianceGaussianAUCFromExplainedR2 (r2 : ℝ) : ℝ :=
   Phi (Real.sqrt (r2 / (2 * (1 - r2))))
+
+/-- **The boundary escape, exhibited.**  At perfect prediction the chart
+returns `Phi 0`, which for the standard normal `Phi` of
+`Calibrator.Probability` is `1/2`. Stated so that the value at the endpoint is
+a proved fact of the development rather than an accident of how `ℝ` division
+is totalised. -/
+theorem equalVarianceGaussianAUCFromExplainedR2_at_one :
+    equalVarianceGaussianAUCFromExplainedR2 1 = Phi 0 := by
+  unfold equalVarianceGaussianAUCFromExplainedR2
+  norm_num
+
+/-- **The endpoint value is strictly below every interior value.**
+
+This is the defect in its sharpest provable form: the chart is strictly
+increasing on `[0, 1)` and then drops, at `r2 = 1`, to a value below everything
+it has already taken. A quantity whose maximum is at the endpoint is here
+attaining its minimum there. No range guard on `[0, 1]` would catch this --
+`Phi 0` is a perfectly legal AUC -- which is why it needed exhibiting rather
+than bounding. -/
+theorem equalVarianceGaussianAUCFromExplainedR2_endpoint_lt_interior
+    (hPhiStrict : StrictMono Phi) (x : ℝ) (hx0 : 0 < x) (hx1 : x < 1) :
+    equalVarianceGaussianAUCFromExplainedR2 1 <
+      equalVarianceGaussianAUCFromExplainedR2 x := by
+  rw [equalVarianceGaussianAUCFromExplainedR2_at_one]
+  unfold equalVarianceGaussianAUCFromExplainedR2
+  apply hPhiStrict
+  have hden : (0 : ℝ) < 2 * (1 - x) := by linarith
+  have harg : 0 < x / (2 * (1 - x)) := div_pos hx0 hden
+  exact Real.sqrt_pos.mpr harg
+
+/-- **The equal-variance Gaussian AUC chart, extended to the closed interval.**
+
+Identical to `equalVarianceGaussianAUCFromExplainedR2` on `[0, 1)` and equal to
+the limit `1` at and beyond `r2 = 1`, so the boundary that the underlying chart
+cannot represent is given the value the quantity actually takes there. The
+extension is the honest one for the standard normal: `Phi` tends to `1` at
+`+∞`, and `r2/(2(1-r2))` tends to `+∞` as `r2 → 1⁻`.
+
+    Regime: `r2 ∈ [0, 1]`; values above `1` are outside the model and are
+    clamped rather than extrapolated.
+
+    Empirical status: UNTESTED as an extension. On `[0, 1)` it inherits
+    whatever `equalVarianceGaussianAUCFromExplainedR2` has, by
+    `equalVarianceGaussianAUCChart_eq_of_lt_one`. -/
+noncomputable def equalVarianceGaussianAUCChart (r2 : ℝ) : ℝ :=
+  if 1 ≤ r2 then 1 else equalVarianceGaussianAUCFromExplainedR2 r2
+
+/-- On the interior the extension is the original chart, so nothing downstream
+changes meaning. -/
+theorem equalVarianceGaussianAUCChart_eq_of_lt_one (r2 : ℝ) (h : r2 < 1) :
+    equalVarianceGaussianAUCChart r2 = equalVarianceGaussianAUCFromExplainedR2 r2 := by
+  unfold equalVarianceGaussianAUCChart
+  rw [if_neg (not_le.mpr h)]
+
+/-- **Perfect prediction gives perfect discrimination**, which is the value the
+unextended chart could not return. -/
+@[simp] theorem equalVarianceGaussianAUCChart_at_one :
+    equalVarianceGaussianAUCChart 1 = 1 := by
+  unfold equalVarianceGaussianAUCChart
+  norm_num
+
+/-- The extension and the original disagree exactly at the boundary, for the
+standard normal: `1` against `Phi 0`. -/
+theorem equalVarianceGaussianAUCChart_ne_chart_at_one (hPhi0 : Phi 0 ≠ 1) :
+    equalVarianceGaussianAUCChart 1 ≠ equalVarianceGaussianAUCFromExplainedR2 1 := by
+  rw [equalVarianceGaussianAUCChart_at_one, equalVarianceGaussianAUCFromExplainedR2_at_one]
+  exact fun h => hPhi0 h.symm
 
 /-- **Cross-check: the `R²` form and the SNR form are the same map.**
 
@@ -5050,32 +5131,85 @@ theorem fst_plus_sharedLD_eq_one (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 ≤ m) :
 /-! ### 5. Portability under migration-drift: R² improves with gene flow -/
 
 /-- **Signal retention under migration-drift balance.**
-    The retained signal variance accounts for both allele frequency drift
-    and LD sharing determined by migration rate.
+
+The fraction of additive signal that survives, accounting for both allele
+frequency drift and LD sharing at the migration-drift equilibrium. It is
+`(1 - F_ST) * shared_LD = M²/(1 + M)²` with `M = 4 Nₑ m`, and it lies in
+`[0, 1)`.
+
+The previous body of this name multiplied by `V_A` and so returned a variance,
+not a fraction: it was unbounded and grew without limit as the additive variance
+grew. A retention that scales with an additive variance is not a retention. The
+name now denotes the fraction and `retainedSignalVarianceMigrationDrift` denotes
+the variance; `retainedSignalVarianceMigrationDrift_eq_retention_mul_VA` relates
+them. This corpus has already lost a factor of four to just this kind of
+name/quantity mismatch, so the two are separated rather than bounded.
+
+    Denotes: a dimensionless fraction in `[0, 1)`, never a variance.
 
     Empirical status: UNTESTED. -/
-noncomputable def signalRetentionMigrationDrift (V_A Ne m : ℝ) : ℝ :=
-  let fst := fstMigrationDriftEquilibrium Ne m
-  let M := scaledMigrationRate Ne m
-  let shared_ld := sharedLDFromMigration M
-  (1 - fst) * shared_ld * V_A
+noncomputable def signalRetentionMigrationDrift (Ne m : ℝ) : ℝ :=
+  (1 - fstMigrationDriftEquilibrium Ne m) *
+    sharedLDFromMigration (scaledMigrationRate Ne m)
 
-/-- Signal retention under migration-drift equals M²/((1+M)² × V_A). -/
-theorem signalRetentionMigrationDrift_eq (V_A Ne m : ℝ)
+/-- **Retained signal variance under migration-drift balance.**
+    The additive variance that survives: the retention fraction times `V_A`.
+    This is the quantity the previous `signalRetentionMigrationDrift` computed.
+
+    Denotes: a variance, in the units of `V_A`.
+
+    Empirical status: UNTESTED. -/
+noncomputable def retainedSignalVarianceMigrationDrift (V_A Ne m : ℝ) : ℝ :=
+  signalRetentionMigrationDrift Ne m * V_A
+
+/-- The variance is the fraction times `V_A`; this is the theorem that keeps the
+two names from drifting apart again. -/
+theorem retainedSignalVarianceMigrationDrift_eq_retention_mul_VA (V_A Ne m : ℝ) :
+    retainedSignalVarianceMigrationDrift V_A Ne m =
+      signalRetentionMigrationDrift Ne m * V_A := rfl
+
+/-- The retention fraction equals `M²/(1 + M)²`. -/
+theorem signalRetentionMigrationDrift_eq_ratio (Ne m : ℝ)
     (hNe : 0 < Ne) (hm : 0 ≤ m) :
-    signalRetentionMigrationDrift V_A Ne m =
-      (scaledMigrationRate Ne m) ^ 2 / (1 + scaledMigrationRate Ne m) ^ 2 * V_A := by
+    signalRetentionMigrationDrift Ne m =
+      (scaledMigrationRate Ne m) ^ 2 / (1 + scaledMigrationRate Ne m) ^ 2 := by
   unfold signalRetentionMigrationDrift fstMigrationDriftEquilibrium sharedLDFromMigration
     scaledMigrationRate
   have hden : (1 + 4 * Ne * m) ≠ 0 := by nlinarith
   field_simp [hden]
   ring
 
-/-- **Signal retention is positive with positive migration.** -/
-theorem signalRetentionMigrationDrift_pos (V_A Ne m : ℝ)
+/-- **The retention is a fraction: it never reaches `1`.**  This is the range
+property the name asserts, and the property the old body did not have. -/
+theorem signalRetentionMigrationDrift_lt_one (Ne m : ℝ)
+    (hNe : 0 < Ne) (hm : 0 < m) :
+    signalRetentionMigrationDrift Ne m < 1 := by
+  rw [signalRetentionMigrationDrift_eq_ratio Ne m hNe (le_of_lt hm)]
+  have hM : 0 < scaledMigrationRate Ne m := scaledMigrationRate_pos Ne m hNe hm
+  have h1M : 0 < (1 + scaledMigrationRate Ne m) ^ 2 := by positivity
+  rw [div_lt_one h1M]
+  nlinarith
+
+/-- **The retention is nonneg.** -/
+theorem signalRetentionMigrationDrift_nonneg (Ne m : ℝ)
+    (hNe : 0 < Ne) (hm : 0 ≤ m) :
+    0 ≤ signalRetentionMigrationDrift Ne m := by
+  rw [signalRetentionMigrationDrift_eq_ratio Ne m hNe hm]
+  positivity
+
+/-- Retained signal variance under migration-drift equals M²/((1+M)²) × V_A. -/
+theorem retainedSignalVarianceMigrationDrift_eq (V_A Ne m : ℝ)
+    (hNe : 0 < Ne) (hm : 0 ≤ m) :
+    retainedSignalVarianceMigrationDrift V_A Ne m =
+      (scaledMigrationRate Ne m) ^ 2 / (1 + scaledMigrationRate Ne m) ^ 2 * V_A := by
+  unfold retainedSignalVarianceMigrationDrift
+  rw [signalRetentionMigrationDrift_eq_ratio Ne m hNe hm]
+
+/-- **Retained signal variance is positive with positive migration.** -/
+theorem retainedSignalVarianceMigrationDrift_pos (V_A Ne m : ℝ)
     (hVA : 0 < V_A) (hNe : 0 < Ne) (hm : 0 < m) :
-    0 < signalRetentionMigrationDrift V_A Ne m := by
-  rw [signalRetentionMigrationDrift_eq V_A Ne m hNe (le_of_lt hm)]
+    0 < retainedSignalVarianceMigrationDrift V_A Ne m := by
+  rw [retainedSignalVarianceMigrationDrift_eq V_A Ne m hNe (le_of_lt hm)]
   apply mul_pos
   · apply div_pos
     · exact sq_pos_of_pos (scaledMigrationRate_pos Ne m hNe hm)
@@ -5087,9 +5221,10 @@ theorem signalRetentionMigrationDrift_pos (V_A Ne m : ℝ)
 theorem signalRetention_increases_with_migration (V_A Ne m₁ m₂ : ℝ)
     (hVA : 0 < V_A) (hNe : 0 < Ne) (hm₁ : 0 < m₁) (hm₂ : 0 < m₂)
     (h_more : m₁ < m₂) :
-    signalRetentionMigrationDrift V_A Ne m₁ < signalRetentionMigrationDrift V_A Ne m₂ := by
-  rw [signalRetentionMigrationDrift_eq V_A Ne m₁ hNe (le_of_lt hm₁),
-      signalRetentionMigrationDrift_eq V_A Ne m₂ hNe (le_of_lt hm₂)]
+    retainedSignalVarianceMigrationDrift V_A Ne m₁ <
+      retainedSignalVarianceMigrationDrift V_A Ne m₂ := by
+  rw [retainedSignalVarianceMigrationDrift_eq V_A Ne m₁ hNe (le_of_lt hm₁),
+      retainedSignalVarianceMigrationDrift_eq V_A Ne m₂ hNe (le_of_lt hm₂)]
   apply mul_lt_mul_of_pos_right _ hVA
   -- Need: M₁²/(1+M₁)² < M₂²/(1+M₂)²  i.e. (M₁/(1+M₁))² < (M₂/(1+M₂))²
   -- which follows from M₁/(1+M₁) < M₂/(1+M₂), a monotone function.

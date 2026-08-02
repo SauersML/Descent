@@ -118,6 +118,22 @@ def classify(chk: checks.Check, res: dict) -> str:
     }.get(chk.kind, "FORMULA")
 
 
+def _standin(fq):
+    """Flag definitions whose numeric form was NOT derived from the Lean body.
+
+    `Calibrator.Phi` is Mathlib's Gaussian CDF with no arithmetic body; extract
+    evaluates it via the erf form. Mathematically identical, but it is the one
+    place in the pipeline where the callable does not come from the Lean
+    source. A disagreement in anything routing through it could be a defect in
+    the definition OR a mismatch with the intended Phi, and a report that does
+    not say so is overclaiming.
+    """
+    try:
+        return corpus.api.numeric_standins(fq)
+    except Exception:
+        return None
+
+
 def _actual_args(chk, D, bare, params):
     """The exact positional arguments the check passes to the definition under
     test at one grid point, keyed by the DEFINITION's own argument names.
@@ -256,6 +272,7 @@ def main() -> int:
             "definition_source": prov.get(bare, {}).get("source"),
             "definition_checksum": prov.get(bare, {}).get("checksum"),
             "translator": prov.get(bare, {}).get("translator"),
+            "numeric_standin": _standin(prov.get(bare, {}).get("fq", chk.fqn)),
             "claim": chk.claim,
             "model_definition": chk.model_lean,
             "model_reference": chk.model_ref,
@@ -322,6 +339,18 @@ def main() -> int:
         f"{len(tot['value_mismatches'])} value mismatches -> "
         f"{'CLEAN' if tot['clean'] else 'REVIEW'}"
     )
+    standins = [
+        (cid, c["definition"]) for cid, c in out["checks"].items()
+        if c.get("numeric_standin") and c["verdict"] != "AGREE"
+    ]
+    print(
+        f"numeric stand-ins: {len(standins)} disagreeing checks route through a "
+        f"non-Lean-derived numeric form"
+        + ("" if not standins else " -- CANNOT be reported as definition defects "
+           "without ruling out the stand-in")
+    )
+    for cid, fq in standins:
+        print(f"    {cid}  ({fq})")
     n_unresolved = len(out["cross_validation"]["unresolved_disagreements"])
     if n_unresolved:
         print(

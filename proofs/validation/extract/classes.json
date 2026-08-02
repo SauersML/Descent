@@ -6291,19 +6291,30 @@
   "constraints": {}
  },
  "Calibrator.frobeniusNormSq": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "∑ over Fin t: not a `Fin n` index set",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Calibrator/DGP.lean",
   "line": 146,
   "short": "frobeniusNormSq",
   "ret_type": "ℝ",
   "empirical_status": "",
-  "python": null,
-  "args": [],
+  "python": "frobeniusNormSq",
+  "args": [
+   "A"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
   "numeric_standins": null,
-  "vector_args": null,
+  "vector_args": {
+   "A": {
+    "dim": "t",
+    "rank": 2
+   }
+  },
   "mentioned_by": [
    "Calibrator.covariance_mismatch_pos_of_fst_and_sparse_array",
    "Calibrator.covariance_mismatch_pos_of_fst_and_sparse_array_proved",
@@ -9678,19 +9689,30 @@
   }
  },
  "Calibrator.cumulativeDrift": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "∑ with an unannotated index and 0 candidate dimensions: cannot tell which",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Calibrator/DemographicHistory.lean",
   "line": 506,
   "short": "cumulativeDrift",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
-  "python": null,
-  "args": [],
+  "python": "cumulativeDrift",
+  "args": [
+   "Ne"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
   "numeric_standins": null,
-  "vector_args": null,
+  "vector_args": {
+   "Ne": {
+    "dim": "T",
+    "rank": 1
+   }
+  },
   "mentioned_by": [
    "Calibrator.cumulativeDrift_uses_timeScale",
    "Calibrator.fst_variable_ne_lt_one",
@@ -9721,8 +9743,8 @@
   }
  },
  "Calibrator.fstVariableNe": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition cumulativeDrift",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Calibrator/DemographicHistory.lean",
   "line": 510,
   "short": "fstVariableNe",
@@ -9734,9 +9756,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "NameError(\"name 'cumulativeDrift' is not defined\")"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": {
@@ -10615,19 +10637,35 @@
   }
  },
  "Calibrator.dominanceVariance": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "∑ with an unannotated index and 0 candidate dimensions: cannot tell which",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Calibrator/EpistasisAndNonAdditivity.lean",
   "line": 189,
   "short": "dominanceVariance",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
-  "python": null,
-  "args": [],
+  "python": "dominanceVariance",
+  "args": [
+   "p",
+   "d"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
   "numeric_standins": null,
-  "vector_args": null,
+  "vector_args": {
+   "p": {
+    "dim": "m",
+    "rank": 1
+   },
+   "d": {
+    "dim": "m",
+    "rank": 1
+   }
+  },
   "mentioned_by": [
    "Calibrator.dominanceVariance_uses_hwe",
    "Calibrator.dominance_variance_nonneg"
@@ -10961,8 +10999,10 @@
   "mentioned_by": [
    "Calibrator.hweObservableContent_symmetry",
    "Calibrator.standardizedGenotype_expectation_zero",
+   "Calibrator.standardizedGenotype_fourth_moment",
    "Calibrator.standardizedGenotype_second_moment_one",
-   "Calibrator.standardizedGenotype_symmetric_iff"
+   "Calibrator.standardizedGenotype_symmetric_iff",
+   "Calibrator.standardizedSquare_second_cumulant"
   ],
   "constraints": {
    "declared_kind": "nonnegative",
@@ -10985,6 +11025,14 @@
     "Calibrator.standardizedGenotype_second_moment_one": [
      "0 < h.altFreq",
      "h.altFreq < 1"
+    ],
+    "Calibrator.standardizedGenotype_fourth_moment": [
+     "0 < h.altFreq",
+     "h.altFreq < 1"
+    ],
+    "Calibrator.standardizedSquare_second_cumulant": [
+     "0 < h.altFreq",
+     "h.altFreq < 1"
     ]
    }
   }
@@ -10993,7 +11041,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "qualified name design.locusSet",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 792,
+  "line": 859,
   "short": "interactionOrder",
   "ret_type": "ℕ",
   "empirical_status": "UNTESTED",
@@ -11030,7 +11078,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "∑ over ι: not a `Fin n` index set",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 800,
+  "line": 867,
   "short": "statistic",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -11051,7 +11099,7 @@
   "class": "STRUCTURAL",
   "note": "Prop-valued / set-valued",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 821,
+  "line": 888,
   "short": "InLinkageEquilibrium",
   "ret_type": "Prop",
   "empirical_status": "UNTESTED",
@@ -11087,7 +11135,7 @@
   "class": "STRUCTURAL",
   "note": "Prop-valued / set-valued",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 829,
+  "line": 896,
   "short": "Polymorphic",
   "ret_type": "Prop",
   "empirical_status": "UNTESTED",
@@ -11124,7 +11172,7 @@
   "class": "STRUCTURAL",
   "note": "Prop-valued / set-valued",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 844,
+  "line": 911,
   "short": "VariantDisjoint",
   "ret_type": "Prop",
   "empirical_status": "UNTESTED",
@@ -11173,7 +11221,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "qualified name Finset.univ.filter",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 853,
+  "line": 920,
   "short": "variantRecurrence",
   "ret_type": "ℕ",
   "empirical_status": "UNTESTED",
@@ -11217,7 +11265,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "∑ over the Finset `Finset.univ.filter ( fun s => i ∈ design.locusSet s )`, not `Finset.univ`",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 862,
+  "line": 929,
   "short": "locusInfluence",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -11250,7 +11298,7 @@
   "class": "STRUCTURAL",
   "note": "Prop-valued / set-valued",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 877,
+  "line": 944,
   "short": "IsTwoPoolInteraction",
   "ret_type": "Prop",
   "empirical_status": "UNTESTED",
@@ -11296,7 +11344,7 @@
   "class": "STRUCTURAL",
   "note": "structure literal",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 943,
+  "line": 1010,
   "short": "geneBurdenDesign",
   "ret_type": "GenotypeDesign n γ where model",
   "empirical_status": "UNTESTED",
@@ -11331,7 +11379,7 @@
   "class": "STRUCTURAL",
   "note": "structure literal",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 970,
+  "line": 1037,
   "short": "slidingWindowDesign",
   "ret_type": "GenotypeDesign n (Fin n) where model",
   "empirical_status": "UNTESTED",
@@ -11364,7 +11412,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 1229,
+  "line": 1296,
   "short": "fourthCumulantFromMoments",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -11406,7 +11454,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 1359,
+  "line": 1426,
   "short": "circulantSpectrumA",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -11453,7 +11501,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 1366,
+  "line": 1433,
   "short": "circulantSpectrumB",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -11502,7 +11550,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "expected ')', found op:∩",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 1462,
+  "line": 1529,
   "short": "overlapMatrix",
   "ret_type": "Matrix ιx ιx ℝ",
   "empirical_status": "UNTESTED",
@@ -11529,7 +11577,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "qualified name Matrix.trace",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 1481,
+  "line": 1548,
   "short": "cycleDensity",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -11576,7 +11624,7 @@
   "class": "STRUCTURAL",
   "note": "Prop-valued / set-valued",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 1519,
+  "line": 1586,
   "short": "Tempered",
   "ret_type": "Prop",
   "empirical_status": "UNTESTED",
@@ -11605,7 +11653,7 @@
   "class": "STRUCTURAL",
   "note": "Prop-valued / set-valued",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 1528,
+  "line": 1595,
   "short": "BoundedHubRecurrence",
   "ret_type": "Prop",
   "empirical_status": "UNTESTED",
@@ -11653,7 +11701,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 1698,
+  "line": 1765,
   "short": "palindromicCycleDensityA",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -11720,7 +11768,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 1707,
+  "line": 1774,
   "short": "palindromicCycleDensityB",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -12113,19 +12161,35 @@
   }
  },
  "Calibrator.taggedScoreEstimationRisk": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "∑ with an unannotated index and 0 candidate dimensions: cannot tell which",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Calibrator/GeneticArchitectureDiscovery.lean",
   "line": 211,
   "short": "taggedScoreEstimationRisk",
   "ret_type": "ℝ",
   "empirical_status": "",
-  "python": null,
-  "args": [],
+  "python": "taggedScoreEstimationRisk",
+  "args": [
+   "targetTagVariance",
+   "estimatorMSE"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
   "numeric_standins": null,
-  "vector_args": null,
+  "vector_args": {
+   "targetTagVariance": {
+    "dim": "m",
+    "rank": 1
+   },
+   "estimatorMSE": {
+    "dim": "m",
+    "rank": 1
+   }
+  },
   "mentioned_by": [
    "Calibrator.ct_more_variable_than_bayesian"
   ],
@@ -16670,7 +16734,7 @@
  },
  "Calibrator.ldMismatchFrobenius": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition frobeniusNormSq",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for -: 'list' and 'li)",
   "file": "Calibrator/LDDecayTheory.lean",
   "line": 545,
   "short": "ldMismatchFrobenius",
@@ -16685,7 +16749,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'frobeniusNormSq' is not defined\")"
+   "error": "TypeError(\"unsupported operand type(s) for -: 'list' and 'list'\")"
   },
   "numeric_standins": null,
   "vector_args": {
@@ -16721,18 +16785,29 @@
  },
  "Calibrator.harmonicMeanNe": {
   "class": "NOT-EXTRACTABLE",
-  "note": "∑ with an unannotated index and 0 candidate dimensions: cannot tell which",
+  "note": "self-check: calls untranslated definition T",
   "file": "Calibrator/LDDecayTheory.lean",
   "line": 578,
   "short": "harmonicMeanNe",
   "ret_type": "ℝ",
   "empirical_status": "",
-  "python": null,
-  "args": [],
+  "python": "harmonicMeanNe",
+  "args": [
+   "Ne"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "NameError(\"name 'T' is not defined\")"
+  },
   "numeric_standins": null,
-  "vector_args": null,
+  "vector_args": {
+   "Ne": {
+    "dim": "T",
+    "rank": 1
+   }
+  },
   "mentioned_by": [
    "Calibrator.bottleneck_dominates_harmonic_mean",
    "Calibrator.harmonic_mean_reciprocal"
@@ -19644,19 +19719,35 @@
   }
  },
  "Calibrator.spectralResidualBiasEnergy": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "∑ with an unannotated index and 0 candidate dimensions: cannot tell which",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Calibrator/PCCorrectability/Core.lean",
   "line": 201,
   "short": "spectralResidualBiasEnergy",
   "ret_type": "ℝ",
   "empirical_status": "",
-  "python": null,
-  "args": [],
+  "python": "spectralResidualBiasEnergy",
+  "args": [
+   "retention",
+   "bias"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
   "numeric_standins": null,
-  "vector_args": null,
+  "vector_args": {
+   "retention": {
+    "dim": "p",
+    "rank": 1
+   },
+   "bias": {
+    "dim": "p",
+    "rank": 1
+   }
+  },
   "mentioned_by": [
    "Calibrator.spectral_correction_residual_bias_lower_bound"
   ],
@@ -19682,24 +19773,41 @@
   }
  },
  "Calibrator.pgsTestAxisBias": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "∑ with an unannotated index and 0 candidate dimensions: cannot tell which",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Calibrator/PCCorrectability/Diagnostic.lean",
   "line": 25,
   "short": "pgsTestAxisBias",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
-  "python": null,
-  "args": [],
+  "python": "pgsTestAxisBias",
+  "args": [
+   "scale",
+   "expectedPhenotype",
+   "residualTargetAxis"
+  ],
   "box": {
    "scale": [
     0.05,
     3.0
    ]
   },
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
   "numeric_standins": null,
-  "vector_args": null,
+  "vector_args": {
+   "expectedPhenotype": {
+    "dim": "d",
+    "rank": 1
+   },
+   "residualTargetAxis": {
+    "dim": "d",
+    "rank": 1
+   }
+  },
   "mentioned_by": [
    "Calibrator.target_axis_control_iff_uniformly_unbiased"
   ],
@@ -20267,19 +20375,31 @@
   }
  },
  "Calibrator.FrequencyResolvedCohort.weightedSignal": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "∑ with an unannotated index and 0 candidate dimensions: cannot tell which",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Calibrator/PCCorrectability/Frequency.lean",
   "line": 80,
   "short": "weightedSignal",
   "ret_type": "ℝ",
   "empirical_status": "",
-  "python": null,
-  "args": [],
+  "python": "weightedSignal",
+  "args": [
+   "cohort",
+   "weight"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
   "numeric_standins": null,
-  "vector_args": null,
+  "vector_args": {
+   "weight": {
+    "dim": "classes",
+    "rank": 1
+   }
+  },
   "mentioned_by": [
    "Calibrator.FrequencyResolvedCohort.matched_weight_signal_and_noise",
    "Calibrator.FrequencyResolvedCohort.weightedSignal_sq_le_information_mul_noise"
@@ -20296,19 +20416,31 @@
   }
  },
  "Calibrator.FrequencyResolvedCohort.weightedNoise": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "∑ with an unannotated index and 0 candidate dimensions: cannot tell which",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Calibrator/PCCorrectability/Frequency.lean",
   "line": 84,
   "short": "weightedNoise",
   "ret_type": "ℝ",
   "empirical_status": "",
-  "python": null,
-  "args": [],
+  "python": "weightedNoise",
+  "args": [
+   "cohort",
+   "weight"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
   "numeric_standins": null,
-  "vector_args": null,
+  "vector_args": {
+   "weight": {
+    "dim": "classes",
+    "rank": 1
+   }
+  },
   "mentioned_by": [
    "Calibrator.FrequencyResolvedCohort.informationMatchedWeight_optimal",
    "Calibrator.FrequencyResolvedCohort.matched_weight_signal_and_noise",
@@ -20333,8 +20465,8 @@
   }
  },
  "Calibrator.FrequencyResolvedCohort.weightedInformation": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition weightedSignal",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Calibrator/PCCorrectability/Frequency.lean",
   "line": 88,
   "short": "weightedInformation",
@@ -20347,9 +20479,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "NameError(\"name 'weightedSignal' is not defined\")"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": {
@@ -26971,19 +27103,35 @@
   }
  },
  "Calibrator.causalPortabilityFromLocalFst": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "∑ with an unannotated index and 0 candidate dimensions: cannot tell which",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Calibrator/PhenomeWidePortability.lean",
   "line": 269,
   "short": "causalPortabilityFromLocalFst",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
-  "python": null,
-  "args": [],
+  "python": "causalPortabilityFromLocalFst",
+  "args": [
+   "sourceSquaredEffect",
+   "fstCausal"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
   "numeric_standins": null,
-  "vector_args": null,
+  "vector_args": {
+   "sourceSquaredEffect": {
+    "dim": "m",
+    "rank": 1
+   },
+   "fstCausal": {
+    "dim": "m",
+    "rank": 1
+   }
+  },
   "mentioned_by": [
    "Calibrator.better_than_neutral_implies_stabilizing_selection",
    "Calibrator.causalPortabilityFromLocalFst_eq_one_sub_weightedLocalFst",
@@ -27141,24 +27289,36 @@
   }
  },
  "Calibrator.pgsDriftVarianceFromLoci": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "∑ over Fin n: not a `Fin n` index set",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Calibrator/PolygenicAdaptation.lean",
   "line": 119,
   "short": "pgsDriftVarianceFromLoci",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
-  "python": null,
-  "args": [],
+  "python": "pgsDriftVarianceFromLoci",
+  "args": [
+   "fst",
+   "β"
+  ],
   "box": {
    "fst": [
     0.02,
     0.98
    ]
   },
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
   "numeric_standins": null,
-  "vector_args": null,
+  "vector_args": {
+   "β": {
+    "dim": "n",
+    "rank": 1
+   }
+  },
   "mentioned_by": [
    "Calibrator.pgsDiffVariance_two_pop_eq_lociSum",
    "Calibrator.pgsDriftVarianceFromLoci_eq_closedForm"
@@ -27624,19 +27784,30 @@
   }
  },
  "Calibrator.effectivePolygenicityOfEffects": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "∑ with an unannotated index and 0 candidate dimensions: cannot tell which",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Calibrator/PolygenicArchitecture.lean",
   "line": 198,
   "short": "effectivePolygenicityOfEffects",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
-  "python": null,
-  "args": [],
+  "python": "effectivePolygenicityOfEffects",
+  "args": [
+   "beta"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
   "numeric_standins": null,
-  "vector_args": null,
+  "vector_args": {
+   "beta": {
+    "dim": "q",
+    "rank": 1
+   }
+  },
   "mentioned_by": [
    "Calibrator.effectivePolygenicityOfEffects_mem_Icc"
   ],
@@ -27923,18 +28094,29 @@
  },
  "Calibrator.meanAbsoluteEffect": {
   "class": "NOT-EXTRACTABLE",
-  "note": "∑ with an unannotated index and 0 candidate dimensions: cannot tell which",
+  "note": "self-check: calls untranslated definition q",
   "file": "Calibrator/PolygenicArchitecture.lean",
   "line": 470,
   "short": "meanAbsoluteEffect",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
-  "python": null,
-  "args": [],
+  "python": "meanAbsoluteEffect",
+  "args": [
+   "beta"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "NameError(\"name 'q' is not defined\")"
+  },
   "numeric_standins": null,
-  "vector_args": null,
+  "vector_args": {
+   "beta": {
+    "dim": "q",
+    "rank": 1
+   }
+  },
   "mentioned_by": [
    "Calibrator.meanAbsoluteEffect_nonneg",
    "Calibrator.meanAbsoluteEffect_sq_le_meanSquaredEffect"
@@ -28271,18 +28453,30 @@
  },
  "Calibrator.weightedRetentionUpperBound": {
   "class": "NOT-EXTRACTABLE",
-  "note": "∑ with an unannotated index and 0 candidate dimensions: cannot tell which",
+  "note": "self-check: calls untranslated definition sourceEffectMass",
   "file": "Calibrator/PolygenicArchitecture.lean",
   "line": 733,
   "short": "weightedRetentionUpperBound",
   "ret_type": "ℝ",
   "empirical_status": "",
-  "python": null,
-  "args": [],
+  "python": "weightedRetentionUpperBound",
+  "args": [
+   "model",
+   "retentionUpper"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "NameError(\"name 'sourceEffectMass' is not defined\")"
+  },
   "numeric_standins": null,
-  "vector_args": null,
+  "vector_args": {
+   "retentionUpper": {
+    "dim": "q",
+    "rank": 1
+   }
+  },
   "mentioned_by": [
    "Calibrator.predicted_eq_weightedRetentionUpperBound_of_active",
    "Calibrator.predicted_le_weightedRetentionUpperBound",
@@ -28316,7 +28510,7 @@
  },
  "Calibrator.rgFstWeightedUpperBound": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition weightedRetentionUpperBound",
+  "note": "self-check: arity/type mismatch (TypeError(\"object of type 'function' has no len()\"))",
   "file": "Calibrator/PolygenicArchitecture.lean",
   "line": 876,
   "short": "rgFstWeightedUpperBound",
@@ -28332,7 +28526,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'weightedRetentionUpperBound' is not defined\")"
+   "error": "TypeError(\"object of type 'function' has no len()\")"
   },
   "numeric_standins": null,
   "vector_args": {
@@ -40543,7 +40737,7 @@
    "Calibrator.migration_reduces_fst_vs_pure_drift",
    "Calibrator.recurrence_derived_R2_increases_with_m",
    "Calibrator.sharedLD_from_equilibrium_eq",
-   "Calibrator.signalRetentionMigrationDrift_eq"
+   "Calibrator.signalRetentionMigrationDrift_eq_ratio"
   ],
   "constraints": {
    "declared_kind": "F_ST",
@@ -40606,7 +40800,7 @@
      "0 < Ne",
      "0 ≤ m"
     ],
-    "Calibrator.signalRetentionMigrationDrift_eq": [
+    "Calibrator.signalRetentionMigrationDrift_eq_ratio": [
      "0 < Ne",
      "0 ≤ m"
     ],
@@ -40918,11 +41112,13 @@
    "Calibrator.fst_plus_sharedLD_eq_one",
    "Calibrator.islandModelFst_eq_from_scaledMigration",
    "Calibrator.islandModelFst_eq_scaled",
+   "Calibrator.retainedSignalVarianceMigrationDrift_eq",
    "Calibrator.scaledMigrationRate_eq_ploidy_form",
    "Calibrator.scaledMigrationRate_pos",
    "Calibrator.sharedLD_from_equilibrium_eq",
    "Calibrator.sharedLD_from_equilibrium_eq_sharedLDFromMigration",
-   "Calibrator.signalRetentionMigrationDrift_eq",
+   "Calibrator.signalRetentionMigrationDrift_eq_ratio",
+   "Calibrator.signalRetentionMigrationDrift_lt_one",
    "Calibrator.signalRetention_increases_with_migration"
   ],
   "constraints": {
@@ -40959,7 +41155,15 @@
      "0 < Ne",
      "0 ≤ m"
     ],
-    "Calibrator.signalRetentionMigrationDrift_eq": [
+    "Calibrator.signalRetentionMigrationDrift_eq_ratio": [
+     "0 < Ne",
+     "0 ≤ m"
+    ],
+    "Calibrator.signalRetentionMigrationDrift_lt_one": [
+     "0 < Ne",
+     "0 < m"
+    ],
+    "Calibrator.retainedSignalVarianceMigrationDrift_eq": [
      "0 < Ne",
      "0 ≤ m"
     ],
@@ -41013,7 +41217,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 4878,
+  "line": 4895,
   "short": "steppingStoneFst",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -41046,7 +41250,9 @@
   "vector_args": null,
   "mentioned_by": [
    "Calibrator.steppingStoneFst_at_one",
+   "Calibrator.steppingStoneFst_eq_one_of_saturated",
    "Calibrator.steppingStoneFst_increases_with_distance",
+   "Calibrator.steppingStoneFst_le_one",
    "Calibrator.steppingStoneFst_neighbor_lt_distant",
    "Calibrator.steppingStoneFst_nonneg"
   ],
@@ -41055,22 +41261,34 @@
    "declared_lo": 0.0,
    "declared_hi": 1.0,
    "hypotheses": [
+    "1 ≤ fst_neighbor * (1 + α * ((d : ℝ",
+    "fst_neighbor ≤ 1",
     "0 < fst_neighbor",
     "0 < α",
+    "fst_neighbor * (1 + α * ((d₂ : ℝ",
     "1 < d",
+    "fst_neighbor * (1 + α * ((d : ℝ",
     "0 ≤ α",
     "1 ≤ d"
    ],
    "hypotheses_by_theorem": {
-    "Calibrator.steppingStoneFst_at_one": [],
+    "Calibrator.steppingStoneFst_le_one": [],
+    "Calibrator.steppingStoneFst_eq_one_of_saturated": [
+     "1 ≤ fst_neighbor * (1 + α * ((d : ℝ"
+    ],
+    "Calibrator.steppingStoneFst_at_one": [
+     "fst_neighbor ≤ 1"
+    ],
     "Calibrator.steppingStoneFst_increases_with_distance": [
      "0 < fst_neighbor",
-     "0 < α"
+     "0 < α",
+     "fst_neighbor * (1 + α * ((d₂ : ℝ"
     ],
     "Calibrator.steppingStoneFst_neighbor_lt_distant": [
      "0 < fst_neighbor",
      "0 < α",
-     "1 < d"
+     "1 < d",
+     "fst_neighbor * (1 + α * ((d : ℝ"
     ],
     "Calibrator.steppingStoneFst_nonneg": [
      "0 < fst_neighbor",
@@ -41084,7 +41302,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 4940,
+  "line": 4980,
   "short": "sharedLD_from_equilibrium",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -41138,7 +41356,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 4966,
+  "line": 5006,
   "short": "sharedLDFromMigration",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -41166,7 +41384,7 @@
    "Calibrator.sharedLDFromMigration_lt_one",
    "Calibrator.sharedLDFromMigration_nonneg",
    "Calibrator.sharedLD_from_equilibrium_eq_sharedLDFromMigration",
-   "Calibrator.signalRetentionMigrationDrift_eq"
+   "Calibrator.signalRetentionMigrationDrift_eq_ratio"
   ],
   "constraints": {
    "declared_kind": "F_ST",
@@ -41187,7 +41405,7 @@
     ],
     "Calibrator.sharedLDFromMigration_increases": [],
     "Calibrator.fst_plus_sharedLD_eq_one": [],
-    "Calibrator.signalRetentionMigrationDrift_eq": [],
+    "Calibrator.signalRetentionMigrationDrift_eq_ratio": [],
     "Calibrator.private_causal_fraction_lowers_transfer_ceiling": [
      "r2_target ≤ privateArchitectureTransferCeiling h2_target f_private M",
      "0 < M"
@@ -41209,11 +41427,83 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 5017,
+  "line": 5070,
   "short": "signalRetentionMigrationDrift",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
   "python": "signalRetentionMigrationDrift",
+  "args": [
+   "Ne",
+   "m"
+  ],
+  "box": {
+   "Ne": [
+    1.0,
+    1000.0
+   ],
+   "m": [
+    1.0,
+    1000.0
+   ]
+  },
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Calibrator.retainedSignalVarianceMigrationDrift_eq_retention_mul_VA",
+   "Calibrator.signalRetentionMigrationDrift_eq_ratio",
+   "Calibrator.signalRetentionMigrationDrift_lt_one",
+   "Calibrator.signalRetentionMigrationDrift_nonneg"
+  ],
+  "constraints": {
+   "declared_kind": "F_ST",
+   "declared_lo": 0.0,
+   "declared_hi": 1.0,
+   "hypotheses": [
+    "0 < Ne",
+    "0 ≤ m",
+    "0 < m"
+   ],
+   "hypotheses_by_theorem": {
+    "Calibrator.retainedSignalVarianceMigrationDrift_eq_retention_mul_VA": [],
+    "Calibrator.signalRetentionMigrationDrift_eq_ratio": [
+     "0 < Ne",
+     "0 ≤ m"
+    ],
+    "Calibrator.signalRetentionMigrationDrift_lt_one": [
+     "0 < Ne",
+     "0 < m"
+    ],
+    "Calibrator.signalRetentionMigrationDrift_nonneg": [
+     "0 < Ne",
+     "0 ≤ m"
+    ]
+   },
+   "range_hi_thm": [
+    "Calibrator.signalRetentionMigrationDrift_lt_one",
+    2
+   ],
+   "range_hi": 1,
+   "range_lo_thm": [
+    "Calibrator.signalRetentionMigrationDrift_nonneg",
+    2
+   ],
+   "range_lo": 0
+  }
+ },
+ "Calibrator.retainedSignalVarianceMigrationDrift": {
+  "class": "NUMERIC",
+  "note": "",
+  "file": "Calibrator/PortabilityDrift.lean",
+  "line": 5081,
+  "short": "retainedSignalVarianceMigrationDrift",
+  "ret_type": "ℝ",
+  "empirical_status": "UNTESTED",
+  "python": "retainedSignalVarianceMigrationDrift",
   "args": [
    "V_A",
    "Ne",
@@ -41241,12 +41531,13 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
-   "Calibrator.signalRetentionMigrationDrift_eq",
-   "Calibrator.signalRetentionMigrationDrift_pos",
+   "Calibrator.retainedSignalVarianceMigrationDrift_eq",
+   "Calibrator.retainedSignalVarianceMigrationDrift_eq_retention_mul_VA",
+   "Calibrator.retainedSignalVarianceMigrationDrift_pos",
    "Calibrator.signalRetention_increases_with_migration"
   ],
   "constraints": {
-   "declared_kind": "frequency",
+   "declared_kind": "ratio",
    "declared_lo": 0.0,
    "declared_hi": 1.0,
    "hypotheses": [
@@ -41256,11 +41547,12 @@
     "0 < m"
    ],
    "hypotheses_by_theorem": {
-    "Calibrator.signalRetentionMigrationDrift_eq": [
+    "Calibrator.retainedSignalVarianceMigrationDrift_eq_retention_mul_VA": [],
+    "Calibrator.retainedSignalVarianceMigrationDrift_eq": [
      "0 < Ne",
      "0 ≤ m"
     ],
-    "Calibrator.signalRetentionMigrationDrift_pos": [
+    "Calibrator.retainedSignalVarianceMigrationDrift_pos": [
      "0 < V_A",
      "0 < Ne",
      "0 < m"
@@ -41271,7 +41563,7 @@
     ]
    },
    "range_lo_thm": [
-    "Calibrator.signalRetentionMigrationDrift_pos",
+    "Calibrator.retainedSignalVarianceMigrationDrift_pos",
     3
    ],
    "range_lo": 0
@@ -41281,7 +41573,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 5098,
+  "line": 5192,
   "short": "asymmetricFst",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -41336,7 +41628,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 5139,
+  "line": 5233,
   "short": "effectiveSymmetricMigration",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -41387,7 +41679,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 5160,
+  "line": 5254,
   "short": "admixtureLDDecay",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -41475,7 +41767,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 5207,
+  "line": 5301,
   "short": "admixtureLDBoost",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -41534,7 +41826,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 5269,
+  "line": 5363,
   "short": "fstMigDriftNext",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -41593,7 +41885,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 5304,
+  "line": 5398,
   "short": "fstMigDriftEquil",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -41689,7 +41981,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PortabilityDrift.lean",
-  "line": 5386,
+  "line": 5480,
   "short": "neutralAFBenchmarkFromRecurrence",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -42568,6 +42860,7 @@
    "Calibrator.hweThirdCentralMoment_eq",
    "Calibrator.hwe_centered",
    "Calibrator.standardizedGenotype_expectation_zero",
+   "Calibrator.standardizedGenotype_fourth_moment",
    "Calibrator.standardizedSquare_values"
   ],
   "constraints": {
@@ -42576,6 +42869,7 @@
     "Calibrator.hweThirdCentralMoment_eq": [],
     "Calibrator.centeredDosageSquare_two_valued_at_half": [],
     "Calibrator.standardizedGenotype_expectation_zero": [],
+    "Calibrator.standardizedGenotype_fourth_moment": [],
     "Calibrator.hwe_centered": [],
     "Calibrator.standardizedSquare_values": [],
     "Calibrator.HardyWeinbergModel.expectedAltAlleleCount_eq": [],
@@ -42614,8 +42908,10 @@
    "Calibrator.hwe_variance_eq",
    "Calibrator.mellinDrift_uses_ploidy",
    "Calibrator.standardizedGenotype_expectation_zero",
+   "Calibrator.standardizedGenotype_fourth_moment",
    "Calibrator.standardizedGenotype_second_moment_one",
-   "Calibrator.standardizedGenotype_symmetric_iff"
+   "Calibrator.standardizedGenotype_symmetric_iff",
+   "Calibrator.standardizedSquare_second_cumulant"
   ],
   "constraints": {
    "declared_kind": "frequency",
@@ -42634,6 +42930,14 @@
     ],
     "Calibrator.standardizedGenotype_expectation_zero": [],
     "Calibrator.standardizedGenotype_second_moment_one": [
+     "0 < h.altFreq",
+     "h.altFreq < 1"
+    ],
+    "Calibrator.standardizedGenotype_fourth_moment": [
+     "0 < h.altFreq",
+     "h.altFreq < 1"
+    ],
+    "Calibrator.standardizedSquare_second_cumulant": [
      "0 < h.altFreq",
      "h.altFreq < 1"
     ],
@@ -42678,8 +42982,10 @@
    "Calibrator.hwe_symmetricCoding_iff_half",
    "Calibrator.no_signSymmetric_nondegenerate_locus",
    "Calibrator.standardizedGenotype_expectation_zero",
+   "Calibrator.standardizedGenotype_fourth_moment",
    "Calibrator.standardizedGenotype_second_moment_one",
-   "Calibrator.standardizedGenotype_symmetric_iff"
+   "Calibrator.standardizedGenotype_symmetric_iff",
+   "Calibrator.standardizedSquare_second_cumulant"
   ],
   "constraints": {
    "declared_kind": "probability",
@@ -42717,6 +43023,14 @@
     ],
     "Calibrator.standardizedGenotype_expectation_zero": [],
     "Calibrator.standardizedGenotype_second_moment_one": [
+     "0 < h.altFreq",
+     "h.altFreq < 1"
+    ],
+    "Calibrator.standardizedGenotype_fourth_moment": [
+     "0 < h.altFreq",
+     "h.altFreq < 1"
+    ],
+    "Calibrator.standardizedSquare_second_cumulant": [
      "0 < h.altFreq",
      "h.altFreq < 1"
     ],
@@ -42783,6 +43097,7 @@
    "Calibrator.hwe_symmetricCoding_iff_half",
    "Calibrator.no_signSymmetric_nondegenerate_locus",
    "Calibrator.standardizedGenotype_expectation_zero",
+   "Calibrator.standardizedGenotype_fourth_moment",
    "Calibrator.standardizedGenotype_second_moment_one",
    "Calibrator.standardizedGenotype_symmetric_iff",
    "Calibrator.standardizedSquare_eq_over_hweGenotypeVariance"
@@ -42828,6 +43143,10 @@
      "0 < h.altFreq",
      "h.altFreq < 1"
     ],
+    "Calibrator.standardizedGenotype_fourth_moment": [
+     "0 < h.altFreq",
+     "h.altFreq < 1"
+    ],
     "Calibrator.hwe_centered": [],
     "Calibrator.HardyWeinbergModel.genotypeVariance_eq": []
    }
@@ -42853,8 +43172,10 @@
    "Calibrator.hwe_variance_eq",
    "Calibrator.mellinDrift_uses_ploidy",
    "Calibrator.standardizedGenotype_expectation_zero",
+   "Calibrator.standardizedGenotype_fourth_moment",
    "Calibrator.standardizedGenotype_second_moment_one",
-   "Calibrator.standardizedGenotype_symmetric_iff"
+   "Calibrator.standardizedGenotype_symmetric_iff",
+   "Calibrator.standardizedSquare_second_cumulant"
   ],
   "constraints": {
    "declared_kind": "nonnegative",
@@ -42872,6 +43193,14 @@
     ],
     "Calibrator.standardizedGenotype_expectation_zero": [],
     "Calibrator.standardizedGenotype_second_moment_one": [
+     "0 < h.altFreq",
+     "h.altFreq < 1"
+    ],
+    "Calibrator.standardizedGenotype_fourth_moment": [
+     "0 < h.altFreq",
+     "h.altFreq < 1"
+    ],
+    "Calibrator.standardizedSquare_second_cumulant": [
      "0 < h.altFreq",
      "h.altFreq < 1"
     ],
@@ -45065,19 +45394,35 @@
   }
  },
  "Calibrator.pgsMean": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "∑ with an unannotated index and 0 candidate dimensions: cannot tell which",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Calibrator/ScoreDistribution.lean",
   "line": 39,
   "short": "pgsMean",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
-  "python": null,
-  "args": [],
+  "python": "pgsMean",
+  "args": [
+   "β",
+   "p"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
   "numeric_standins": null,
-  "vector_args": null,
+  "vector_args": {
+   "β": {
+    "dim": "m",
+    "rank": 1
+   },
+   "p": {
+    "dim": "m",
+    "rank": 1
+   }
+  },
   "mentioned_by": [
    "Calibrator.identity_citl_changes_of_nonzero_pgsMeanShift",
    "Calibrator.identity_citl_shift_eq_neg_pgsMeanShift",
@@ -45105,19 +45450,35 @@
   }
  },
  "Calibrator.pgsVariance": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "∑ with an unannotated index and 0 candidate dimensions: cannot tell which",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Calibrator/ScoreDistribution.lean",
   "line": 44,
   "short": "pgsVariance",
   "ret_type": "ℝ",
   "empirical_status": "",
-  "python": null,
-  "args": [],
+  "python": "pgsVariance",
+  "args": [
+   "β",
+   "p"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
   "numeric_standins": null,
-  "vector_args": null,
+  "vector_args": {
+   "β": {
+    "dim": "m",
+    "rank": 1
+   },
+   "p": {
+    "dim": "m",
+    "rank": 1
+   }
+  },
   "mentioned_by": [
    "Calibrator.pgsVariance_uses_hwe",
    "Calibrator.pgs_variance_nonneg"
@@ -45140,19 +45501,40 @@
   }
  },
  "Calibrator.pgsMeanShift": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "∑ with an unannotated index and 0 candidate dimensions: cannot tell which",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Calibrator/ScoreDistribution.lean",
   "line": 61,
   "short": "pgsMeanShift",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
-  "python": null,
-  "args": [],
+  "python": "pgsMeanShift",
+  "args": [
+   "β",
+   "p_source",
+   "p_target"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
   "numeric_standins": null,
-  "vector_args": null,
+  "vector_args": {
+   "β": {
+    "dim": "m",
+    "rank": 1
+   },
+   "p_source": {
+    "dim": "m",
+    "rank": 1
+   },
+   "p_target": {
+    "dim": "m",
+    "rank": 1
+   }
+  },
   "mentioned_by": [
    "Calibrator.identity_citl_changes_of_nonzero_pgsMeanShift",
    "Calibrator.identity_citl_shift_eq_neg_pgsMeanShift",
@@ -46135,19 +46517,35 @@
   }
  },
  "Calibrator.polygenicAdaptationShift": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "∑ with an unannotated index and 0 candidate dimensions: cannot tell which",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Calibrator/SelectionArchitecture.lean",
   "line": 445,
   "short": "polygenicAdaptationShift",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
-  "python": null,
-  "args": [],
+  "python": "polygenicAdaptationShift",
+  "args": [
+   "β",
+   "Δp"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
   "numeric_standins": null,
-  "vector_args": null,
+  "vector_args": {
+   "β": {
+    "dim": "m",
+    "rank": 1
+   },
+   "Δp": {
+    "dim": "m",
+    "rank": 1
+   }
+  },
   "mentioned_by": [
    "Calibrator.neutral_expected_shift_zero",
    "Calibrator.selected_shift_positive"
@@ -46505,19 +46903,30 @@
   }
  },
  "Calibrator.sourceSquaredEffectMass": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "∑ with an unannotated index and 0 candidate dimensions: cannot tell which",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Calibrator/SimulationValidation.lean",
   "line": 36,
   "short": "sourceSquaredEffectMass",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
-  "python": null,
-  "args": [],
+  "python": "sourceSquaredEffectMass",
+  "args": [
+   "β"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
   "numeric_standins": null,
-  "vector_args": null,
+  "vector_args": {
+   "β": {
+    "dim": "q",
+    "rank": 1
+   }
+  },
   "mentioned_by": [
    "Calibrator.identityDirectMetricModel_metrics"
   ],
@@ -47353,19 +47762,30 @@
   }
  },
  "Calibrator.disjointWindowLimitVariance": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "∑ with an unannotated index and 0 candidate dimensions: cannot tell which",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Calibrator/StatisticalGeneticsMethodology.lean",
   "line": 429,
   "short": "disjointWindowLimitVariance",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
-  "python": null,
-  "args": [],
+  "python": "disjointWindowLimitVariance",
+  "args": [
+   "share"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
   "numeric_standins": null,
-  "vector_args": null,
+  "vector_args": {
+   "share": {
+    "dim": "w",
+    "rank": 1
+   }
+  },
   "mentioned_by": [
    "Calibrator.disjointWindowLimitVariance_attains",
    "Calibrator.disjointWindowLimitVariance_mem_segment",
@@ -47962,18 +48382,35 @@
  },
  "Calibrator.pgsPhenoCov": {
   "class": "NOT-EXTRACTABLE",
-  "note": "∑ over Fin m: not a `Fin n` index set",
+  "note": "self-check: arity/type mismatch (TypeError(\"'float' object is not callable\"))",
   "file": "Calibrator/TransferLearningPGS.lean",
   "line": 59,
   "short": "pgsPhenoCov",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
-  "python": null,
-  "args": [],
+  "python": "pgsPhenoCov",
+  "args": [
+   "β_weights",
+   "β_causal",
+   "ld"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "TypeError(\"'float' object is not callable\")"
+  },
   "numeric_standins": null,
-  "vector_args": null,
+  "vector_args": {
+   "β_weights": {
+    "dim": "m",
+    "rank": 1
+   },
+   "β_causal": {
+    "dim": "m",
+    "rank": 1
+   }
+  },
   "mentioned_by": [
    "Calibrator.pgsPhenoCov_self_standardizedDiagonalLD",
    "Calibrator.pgsPhenoCov_standardizedDiagonalLD",
@@ -47999,7 +48436,7 @@
  },
  "Calibrator.sharedLDGeneticVariance": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition pgsPhenoCov",
+  "note": "self-check: arity/type mismatch (TypeError(\"'float' object is not callable\"))",
   "file": "Calibrator/TransferLearningPGS.lean",
   "line": 64,
   "short": "sharedLDGeneticVariance",
@@ -48014,7 +48451,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'pgsPhenoCov' is not defined\")"
+   "error": "TypeError(\"'float' object is not callable\")"
   },
   "numeric_standins": null,
   "vector_args": {
@@ -48068,7 +48505,7 @@
  },
  "Calibrator.sharedLDHeritability": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition pgsPhenoCov",
+  "note": "self-check: arity/type mismatch (TypeError(\"'float' object is not callable\"))",
   "file": "Calibrator/TransferLearningPGS.lean",
   "line": 69,
   "short": "sharedLDHeritability",
@@ -48089,7 +48526,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'pgsPhenoCov' is not defined\")"
+   "error": "TypeError(\"'float' object is not callable\")"
   },
   "numeric_standins": null,
   "vector_args": {
@@ -48207,7 +48644,7 @@
  },
  "Calibrator.sourceTruthR2SharedLD": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition pgsPhenoCov",
+  "note": "self-check: arity/type mismatch (TypeError(\"'float' object is not callable\"))",
   "file": "Calibrator/TransferLearningPGS.lean",
   "line": 82,
   "short": "sourceTruthR2SharedLD",
@@ -48228,7 +48665,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'pgsPhenoCov' is not defined\")"
+   "error": "TypeError(\"'float' object is not callable\")"
   },
   "numeric_standins": null,
   "vector_args": {
@@ -48268,7 +48705,7 @@
  },
  "Calibrator.transportedTargetR2SharedLD": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition pgsPhenoCov",
+  "note": "self-check: arity/type mismatch (TypeError(\"'float' object is not callable\"))",
   "file": "Calibrator/TransferLearningPGS.lean",
   "line": 89,
   "short": "transportedTargetR2SharedLD",
@@ -48290,7 +48727,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'pgsPhenoCov' is not defined\")"
+   "error": "TypeError(\"'float' object is not callable\")"
   },
   "numeric_standins": null,
   "vector_args": {
@@ -48343,7 +48780,7 @@
  },
  "Calibrator.ldEffectGeneticCorrelation": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition pgsPhenoCov",
+  "note": "self-check: arity/type mismatch (TypeError(\"'float' object is not callable\"))",
   "file": "Calibrator/TransferLearningPGS.lean",
   "line": 97,
   "short": "ldEffectGeneticCorrelation",
@@ -48359,7 +48796,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'pgsPhenoCov' is not defined\")"
+   "error": "TypeError(\"'float' object is not callable\")"
   },
   "numeric_standins": null,
   "vector_args": {
@@ -48401,19 +48838,35 @@
   }
  },
  "Calibrator.effectGeneticCorrelation": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "∑ over Fin m: not a `Fin n` index set",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Calibrator/TransferLearningPGS.lean",
   "line": 105,
   "short": "effectGeneticCorrelation",
   "ret_type": "ℝ",
   "empirical_status": "",
-  "python": null,
-  "args": [],
+  "python": "effectGeneticCorrelation",
+  "args": [
+   "β_source",
+   "β_target"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
   "numeric_standins": null,
-  "vector_args": null,
+  "vector_args": {
+   "β_source": {
+    "dim": "m",
+    "rank": 1
+   },
+   "β_target": {
+    "dim": "m",
+    "rank": 1
+   }
+  },
   "mentioned_by": [
    "Calibrator.effectGeneticCorrelation_sq_one_of_proportional",
    "Calibrator.effect_genetic_correlation_bounded",
@@ -48487,19 +48940,30 @@
   }
  },
  "Calibrator.additiveGeneticVariance": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "∑ over Fin m: not a `Fin n` index set",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Calibrator/TransferLearningPGS.lean",
   "line": 114,
   "short": "additiveGeneticVariance",
   "ret_type": "ℝ",
   "empirical_status": "",
-  "python": null,
-  "args": [],
+  "python": "additiveGeneticVariance",
+  "args": [
+   "β"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
   "numeric_standins": null,
-  "vector_args": null,
+  "vector_args": {
+   "β": {
+    "dim": "m",
+    "rank": 1
+   }
+  },
   "mentioned_by": [
    "Calibrator.additiveGeneticVariance_add_of_orthogonal",
    "Calibrator.additiveGeneticVariance_eq_dotProduct",
@@ -48556,8 +49020,8 @@
   }
  },
  "Calibrator.additiveHeritability": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition additiveGeneticVariance",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Calibrator/TransferLearningPGS.lean",
   "line": 120,
   "short": "additiveHeritability",
@@ -48575,9 +49039,9 @@
    ]
   },
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "NameError(\"name 'additiveGeneticVariance' is not defined\")"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": {
@@ -48646,7 +49110,7 @@
  },
  "Calibrator.sourceSelfR2DiagonalLD": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition pgsPhenoCov",
+  "note": "self-check: arity/type mismatch (TypeError('standardizedDiagonalLD() takes 0 positional argum)",
   "file": "Calibrator/TransferLearningPGS.lean",
   "line": 125,
   "short": "sourceSelfR2DiagonalLD",
@@ -48666,7 +49130,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'pgsPhenoCov' is not defined\")"
+   "error": "TypeError('standardizedDiagonalLD() takes 0 positional arguments but 2 were given')"
   },
   "numeric_standins": null,
   "vector_args": {
@@ -48712,7 +49176,7 @@
  },
  "Calibrator.transportedTargetR2DiagonalLD": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition pgsPhenoCov",
+  "note": "self-check: arity/type mismatch (TypeError('standardizedDiagonalLD() takes 0 positional argum)",
   "file": "Calibrator/TransferLearningPGS.lean",
   "line": 130,
   "short": "transportedTargetR2DiagonalLD",
@@ -48733,7 +49197,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'pgsPhenoCov' is not defined\")"
+   "error": "TypeError('standardizedDiagonalLD() takes 0 positional arguments but 2 were given')"
   },
   "numeric_standins": null,
   "vector_args": {
@@ -49678,7 +50142,7 @@
  },
  "Calibrator.targetOracleR2DiagonalLD": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition pgsPhenoCov",
+  "note": "self-check: arity/type mismatch (TypeError('standardizedDiagonalLD() takes 0 positional argum)",
   "file": "Calibrator/TransferLearningPGS.lean",
   "line": 1158,
   "short": "targetOracleR2DiagonalLD",
@@ -49698,7 +50162,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'pgsPhenoCov' is not defined\")"
+   "error": "TypeError('standardizedDiagonalLD() takes 0 positional arguments but 2 were given')"
   },
   "numeric_standins": null,
   "vector_args": {
@@ -50537,18 +51001,30 @@
  },
  "Calibrator.weightedPopulationDeviation": {
   "class": "NOT-EXTRACTABLE",
-  "note": "∑ over Fin k: not a `Fin n` index set",
+  "note": "self-check: value is not a real number: function (vector- or function-valued)",
   "file": "Calibrator/TransferLearningPGS.lean",
   "line": 2008,
   "short": "weightedPopulationDeviation",
   "ret_type": "Fin p → ℝ",
   "empirical_status": "",
-  "python": null,
-  "args": [],
+  "python": "weightedPopulationDeviation",
+  "args": [
+   "deviation",
+   "weight"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "value is not a real number: function"
+  },
   "numeric_standins": null,
-  "vector_args": null,
+  "vector_args": {
+   "weight": {
+    "dim": "k",
+    "rank": 1
+   }
+  },
   "mentioned_by": [
    "Calibrator.weightedMetaSourceWeights_eq_weightedPopulationEffectAverage",
    "Calibrator.weightedMetaTransferGapSq_eq_irreducible_plus_populationSpecificGap_mul_sum_sq",
@@ -50757,18 +51233,30 @@
  },
  "Calibrator.weightedPopulationEffectAverage": {
   "class": "NOT-EXTRACTABLE",
-  "note": "∑ over Fin k: not a `Fin n` index set",
+  "note": "self-check: value is not a real number: function (vector- or function-valued)",
   "file": "Calibrator/TransferLearningPGS.lean",
   "line": 2035,
   "short": "weightedPopulationEffectAverage",
   "ret_type": "Fin p → ℝ",
   "empirical_status": "UNTESTED",
-  "python": null,
-  "args": [],
+  "python": "weightedPopulationEffectAverage",
+  "args": [
+   "wSource",
+   "weight"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "value is not a real number: function"
+  },
   "numeric_standins": null,
-  "vector_args": null,
+  "vector_args": {
+   "weight": {
+    "dim": "k",
+    "rank": 1
+   }
+  },
   "mentioned_by": [
    "Calibrator.weightedMetaSourceWeights_eq_weightedPopulationEffectAverage",
    "Calibrator.weightedMetaTransferGapSq_eq_weightedPopulationEffectAverageGapSq"
@@ -52743,19 +53231,35 @@
   }
  },
  "Calibrator.additiveVariance": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "∑ with an unannotated index and 0 candidate dimensions: cannot tell which",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Calibrator/VarianceComponents.lean",
   "line": 139,
   "short": "additiveVariance",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
-  "python": null,
-  "args": [],
+  "python": "additiveVariance",
+  "args": [
+   "p",
+   "α"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
   "numeric_standins": null,
-  "vector_args": null,
+  "vector_args": {
+   "p": {
+    "dim": "m",
+    "rank": 1
+   },
+   "α": {
+    "dim": "m",
+    "rank": 1
+   }
+  },
   "mentioned_by": [
    "Calibrator.additiveVariance_uses_hwe",
    "Calibrator.additive_variance_nonneg"

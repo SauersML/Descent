@@ -9,6 +9,8 @@ Import it; do not re-parse Lean.
     api.definition_table()                 -> dict[str, Definition]
     api.definition("Calibrator.coalFst")   -> Definition
     api.callable_for("Calibrator.coalFst") -> (fn, ["t", "Ne"])
+    api.vector_args(name)                  -> sequence-valued args, or None
+    api.numeric_standins(name)             -> provenance caveat, or None
     api.satisfies("Calibrator.coalFst", {"t": 10.0, "Ne": 100.0})
     api.body_checksum("Calibrator.coalFst")-> "sha256:..."
     api.stamp()                            -> corpus-wide fingerprint
@@ -84,7 +86,12 @@ CLASSES_JSON = HERE / "classes.json"
 
 __all__ = ["definition_table", "definition", "structures", "resolve",
            "callable_for", "classification", "body_checksum", "stamp",
-           "admissible_box", "hypotheses", "satisfies", "refresh"]
+           "admissible_box", "hypotheses", "satisfies", "vector_args",
+           "numeric_standins", "refresh", "ARG_CONVENTION"]
+
+# Bumped whenever the calling convention changes.  Consumers should assert on
+# this rather than discovering a convention change from a TypeError.
+ARG_CONVENTION = 2      # 1 = scalars only; 2 = adds sequence-valued arguments
 
 
 # --------------------------------------------------------------- the table
@@ -187,6 +194,30 @@ def callable_for(name: str):
     return fn, list(entry["args"])
 
 
+def vector_args(name: str):
+    """{argname: {"dim": str, "rank": 1|2}} for sequence-valued arguments, or None.
+
+    Rank 1 arguments (`Fin n → ℝ`) are passed as a flat Python sequence of
+    floats; rank 2 (`Matrix (Fin p) (Fin q) ℝ`) as a sequence of sequences.  The
+    finite dimension is whatever length you pass -- `∑ i, …` ranges over it.
+    Definitions with only scalar arguments return None and are unaffected by
+    this convention; ask here rather than inferring from a crash.
+    """
+    return classification(name).get("vector_args")
+
+
+def numeric_standins(name: str):
+    """Why this definition is NOT purely derived from the Lean body, or None.
+
+    Non-None means some part of it was substituted with a numerically
+    equivalent implementation (currently only `Calibrator.Phi`, Mathlib's
+    Gaussian CDF).  A disagreement in such a definition can be a defect in the
+    definition OR a mismatch with the intended stand-in; the reader needs to
+    know which is possible.
+    """
+    return classification(name).get("numeric_standins")
+
+
 def admissible_box(name: str):
     """{argname: (lo, hi)} mined from theorem hypotheses and quantity kinds.
 
@@ -254,7 +285,8 @@ def stamp() -> dict:
     h = hashlib.sha256()
     for n in names:
         h.update(body_checksum(n).encode())
-    return {"n_definitions": len(names),
+    return {"arg_convention": ARG_CONVENTION,
+            "n_definitions": len(names),
             "n_structures": len(structures()),
             "n_parse_failures": len(parse_failures()),
             "corpus_digest": "sha256:" + h.hexdigest()[:32]}

@@ -283,3 +283,37 @@ def stepping_stone_fst_hudson(d: float, ne: float, m: float, sigma_sq: float) ->
     """
     delta = d / (2.0 * sigma_sq * m)
     return delta / (2.0 * ne + delta)
+
+
+# ===========================================================================
+# 8. Variable population size over T generations
+# ===========================================================================
+
+def harmonic_mean(xs) -> float:
+    """Harmonic mean, by definition.  MODEL: none -- this is arithmetic."""
+    return len(xs) / sum(1.0 / x for x in xs)
+
+
+def cumulative_inbreeding_exact(nes) -> float:
+    """Exact F after a sequence of generations with sizes nes.
+
+    MODEL: Wright-Fisher, no mutation, size Ne_i in generation i.  Two lineages
+    fail to coalesce in generation i with probability (1 - 1/(2 Ne_i)), so
+        F = 1 - prod_i (1 - 1/(2 Ne_i)).
+    This is exact.  The corpus's `sum_i 1/(2 Ne_i)` is its first-order
+    expansion and `1 - exp(-sum)` its exponential approximation.
+    """
+    p = 1.0
+    for ne in nes:
+        p *= 1.0 - 1.0 / (2.0 * ne)
+    return 1.0 - p
+
+
+def cumulative_drift_log_exact(nes) -> float:
+    """Exact cumulative drift in log units: -sum_i log(1 - 1/(2 Ne_i))."""
+    return -sum(math.log(1.0 - 1.0 / (2.0 * ne)) for ne in nes)
+
+
+def frobenius_norm_sq(a, b) -> float:
+    """||A - B||_F^2, computed directly.  MODEL: none -- linear algebra."""
+    return sum((x - y) ** 2 for ra, rb in zip(a, b) for x, y in zip(ra, rb))

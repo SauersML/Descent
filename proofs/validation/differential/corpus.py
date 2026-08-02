@@ -31,6 +31,17 @@ if EXTRACT not in sys.path:
 
 import api  # noqa: E402
 
+# Pin the argument convention rather than discovering a change from a
+# TypeError. 1 = scalars only; 2 = sequence-valued (Fin n -> R) arguments also
+# supported. A bump means signatures may have changed shape underneath us.
+EXPECTED_ARG_CONVENTION = 2
+if getattr(api, "ARG_CONVENTION", 1) != EXPECTED_ARG_CONVENTION:
+    raise RuntimeError(
+        f"extract api.ARG_CONVENTION is {getattr(api, 'ARG_CONVENTION', 1)}, "
+        f"this battery was written against {EXPECTED_ARG_CONVENTION}. "
+        "Re-check every vector-valued call site before bumping."
+    )
+
 MODULES = [
     "PopulationGeneticsFoundations",
     "LDDecayTheory",

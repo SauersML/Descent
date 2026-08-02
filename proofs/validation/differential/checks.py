@@ -851,3 +851,119 @@ check(
         "check and cannot see a wrong eigenvalue."
     ),
 )
+
+
+# --- 12. Variable-Ne drift (callable since extract added sequence arguments) ---
+
+# Deliberately asymmetric size histories. A constant history makes the
+# harmonic mean trivially equal to Ne and the product equal to a power, so
+# several of these checks would be unable to fail on one.
+_BOTTLENECK = [1000.0] * 20 + [10.0] * 5 + [1000.0] * 20
+_MILD = [1000.0] * 50
+_RAMP = [float(n) for n in range(50, 550, 50)]
+_SEVERE = [2.0] * 6
+
+check(
+    id="harmonicMeanNe-is-harmonic-mean",
+    fqn="Calibrator.harmonicMeanNe",
+    claim="T / sum(1/Ne_i) is the harmonic mean, as named",
+    model_lean="none; arithmetic",
+    model_ref="same",
+    reference="refs.harmonic_mean",
+    grid=[{"nes": _BOTTLENECK}, {"nes": _RAMP}, {"nes": _MILD}, {"nes": _SEVERE}],
+    lean=lambda D, nes: D["harmonicMeanNe"](nes),
+    ref=lambda nes: refs.harmonic_mean(nes),
+    canfail_clause=(
+        "the histories MUST be non-constant. On a constant history the "
+        "harmonic mean equals Ne and so does almost any plausible average, so "
+        "an equal-size grid cannot distinguish harmonic from arithmetic or "
+        "geometric. _BOTTLENECK and _RAMP carry that asymmetry; _MILD is the "
+        "degenerate control and is expected to be uninformative."
+    ),
+)
+
+check(
+    id="cumulativeDrift-first-order",
+    fqn="Calibrator.cumulativeDrift",
+    claim="MODEL: sum 1/(2Ne_i) is the first-order expansion of the exact "
+          "cumulative drift, not the drift itself",
+    model_lean="sum_i 1/(2 Ne_i)",
+    model_ref="-sum_i log(1 - 1/(2 Ne_i)), exact in log units",
+    reference="refs.cumulative_drift_log_exact",
+    grid=[{"nes": _BOTTLENECK}, {"nes": _RAMP}, {"nes": _MILD}, {"nes": _SEVERE}],
+    lean=lambda D, nes: D["cumulativeDrift"](nes),
+    ref=lambda nes: refs.cumulative_drift_log_exact(nes),
+    tol=1e-3,
+    kind="model",
+    canfail_clause=(
+        "REQUIRES at least one generation with SMALL Ne. The expansion error "
+        "is O(1/Ne^2) per generation, so a history that never drops below "
+        "Ne=1000 agrees to 1e-7 and the check is vacuous. _SEVERE (Ne=2) and "
+        "_BOTTLENECK (Ne=10) supply the regime; _MILD is the control."
+    ),
+)
+
+check(
+    id="fstVariableNe-vs-exact-product",
+    fqn="Calibrator.fstVariableNe",
+    claim="1 - exp(-sum 1/(2Ne_i)) vs the exact 1 - prod(1 - 1/(2Ne_i))",
+    model_lean="exponential approximation of a product of survival terms",
+    model_ref="exact Wright-Fisher non-coalescence product",
+    reference="refs.cumulative_inbreeding_exact",
+    grid=[{"nes": _BOTTLENECK}, {"nes": _RAMP}, {"nes": _MILD}, {"nes": _SEVERE}],
+    lean=lambda D, nes: D["fstVariableNe"](nes),
+    ref=lambda nes: refs.cumulative_inbreeding_exact(nes),
+    tol=1e-3,
+    kind="model",
+    note=(
+        "shares the closed-population no-mutation model of the fstDerived "
+        "cluster; this check tests only the approximation, NOT whether the "
+        "quantity is a split F_ST -- see hetRecurrence-at-mutation-drift-balance "
+        "for that, which is the larger error"
+    ),
+    canfail_clause=(
+        "same as cumulativeDrift: needs a generation at small Ne. On _MILD the "
+        "two agree to 1e-5."
+    ),
+)
+
+check(
+    id="fstVariableNe-equals-harmonic-mean-substitution",
+    fqn="Calibrator.fstVariableNe",
+    claim="the variable-Ne F equals the constant-Ne exponential form evaluated "
+          "at the harmonic mean",
+    model_lean="1 - exp(-cumulativeDrift Ne)",
+    model_ref="1 - exp(-T/(2 * harmonicMeanNe Ne)), same file",
+    reference="Calibrator.harmonicMeanNe substituted into the exponential form",
+    grid=[{"nes": _BOTTLENECK}, {"nes": _RAMP}, {"nes": _MILD}, {"nes": _SEVERE}],
+    lean=lambda D, nes: D["fstVariableNe"](nes),
+    ref=lambda D, nes: 1.0 - math.exp(-len(nes) / (2.0 * D["harmonicMeanNe"](nes))),
+    kind="identity",
+    note=(
+        "exact by construction: T/N_harmonic = sum 1/Ne_i. Recorded so the "
+        "corpus's harmonic-mean claim is pinned rather than assumed."
+    ),
+    canfail_clause="identity by construction; reported as such, not as a validation",
+)
+
+check(
+    id="ldMismatchFrobenius-exact",
+    fqn="Calibrator.ldMismatchFrobenius",
+    claim="frobeniusNormSq (Sig_S - Sig_T) is the squared Frobenius distance",
+    model_lean="none; linear algebra",
+    model_ref="same, computed elementwise",
+    reference="refs.frobenius_norm_sq",
+    grid=[
+        {"a": [[1.0, 0.5], [0.5, 1.0]], "b": [[1.0, 0.1], [0.1, 1.0]]},
+        {"a": [[1.0, 0.9], [0.9, 1.0]], "b": [[1.0, -0.4], [-0.4, 1.0]]},
+        {"a": [[2.0, 0.0], [1.0, 3.0]], "b": [[0.0, 0.0], [0.0, 0.0]]},
+    ],
+    lean=lambda D, a, b: D["ldMismatchFrobenius"](a, b),
+    ref=lambda a, b: refs.frobenius_norm_sq(a, b),
+    canfail_clause=(
+        "at least one grid row must be ASYMMETRIC (row 3) and one must have "
+        "off-diagonals of opposite sign (row 2). On symmetric matrices with "
+        "matching diagonals a transposed or diagonal-only reading gives the "
+        "same number."
+    ),
+)

@@ -27,7 +27,10 @@ import backends
 import compile_defs as C
 from backends import FLOAT, INTERVAL, Iv
 from search import maximize, prove_contained
-from semantics import admissible_box, required_range, side_constraints
+import re
+
+from semantics import (RANGE_THM, _rename, admissible_box, required_range,
+                       side_constraints)
 from transpile import Untranspilable, build_arity, pyname, transpile
 
 HERE = pathlib.Path(__file__).resolve().parent
@@ -39,36 +42,75 @@ def _viol(v, lo, hi):
     return max(lo - v, v - hi)
 
 
+# Authoritative list of which theorem proves which bound, from the `extract`
+# agent's table.  Optional: without it we fall back to matching theorem NAMES,
+# which is what let twelve definitions with proved bounds be reported as
+# escapes.
+def _proved_bounds():
+    try:
+        import sys
+        sys.path.insert(0, str(HERE.parents[1] / "validation" / "extract"))
+        import api
+    except Exception:
+        return {}
+    out = {}
+    try:
+        for n, rec in api.definition_table().items():
+            c = rec.get("constraints") or {}
+            lo_t = c.get("range_lo_thm")
+            hi_t = c.get("range_hi_thm")
+            out[(rec["file"].split("/")[-1][:-5], rec["short"])] = dict(
+                lo_thms={lo_t[0].split(".")[-1]} if lo_t else set(),
+                hi_thms={hi_t[0].split(".")[-1]} if hi_t else set(),
+                lo=c.get("range_lo"), hi=c.get("range_hi"))
+    except Exception:
+        return {}
+    return out
+
+
+PROVED = _proved_bounds()
+
+
 def theorem_guards(c, defs):
     """Per-theorem hypothesis predicates for the theorems that BOUND `c`.
 
-    Two corrections over conjoining everything into one feasibility region,
-    both of which produced wrong verdicts here:
+    Three corrections over the first version, each of which was producing
+    wrong verdicts:
 
-    1.  Hypotheses must be grouped BY THEOREM and never conjoined across
-        theorems.  The union is not a domain.  `coalFst` carries
-        `100 * Ne < t` from one asymptotic lemma; conjoining it excludes
-        essentially every sensible F_ST evaluation and the definition then
-        passes vacuously.
-    2.  Only theorems that actually CLAIM a bound may excuse a range escape.
-        A precondition like `p < 1/2`, borrowed from a monotonicity lemma,
-        says nothing about where the quantity is a valid probability, and
-        using it as a guard silently shrank the searched region.
+    1.  Hypotheses are grouped BY THEOREM and never conjoined across
+        theorems.  The union of hypotheses is not a domain: `coalFst` carries
+        `100 * Ne < t` from one asymptotic lemma, and conjoining it excludes
+        every sensible F_ST evaluation so the definition passes vacuously.
+    2.  A theorem's guard uses ALL of its hypotheses.  Splitting them --
+        numeric bounds to the box, relational ones to the guard -- left the
+        guard incomplete, and a witness that violated only the numeric half
+        looked like an escape.  `neiFst` was reported broken at H_S > H_T even
+        though `nei_fst_in_unit` excludes exactly that.
+    3.  Which theorems bound the definition comes from the `extract` agent's
+        table where available, not from guessing at theorem names.  Names like
+        `fstFromDriftFactor_mem_unit` and `ldPanelRetentionFraction_mem` do not
+        match any reasonable regex.
 
-    Returns [{thm, hyps, pred}], one entry per range-claiming theorem whose
-    hypotheses are wholly expressible in the arithmetic fragment.
+    Returns [{thm, hyps, preds}], one per bounding theorem whose hypotheses
+    are wholly expressible in the arithmetic fragment.
     """
     d = c.d
     ar, rn = build_arity(defs, d["module"])
-    by_thm = {}
-    for co in side_constraints(d):
-        if not co["guards_range"]:
-            continue
-        by_thm.setdefault(co["thm"], []).append(co["hyp"])
+    proved = PROVED.get((d["module"], d["name"]), {})
+    lo_thms = proved.get("lo_thms", set())
+    hi_thms = proved.get("hi_thms", set())
+    named = lo_thms | hi_thms
     out, dropped = [], []
-    for thm, hyps in by_thm.items():
+    for t in d.get("theorem_hyps", []):
+        thm = t["thm"]
+        if thm not in named and not RANGE_THM.search(thm):
+            continue
+        argmap = t.get("argmap") or {}
         preds, ok = [], True
-        for h in hyps:
+        for h in t["hyps"]:
+            h = _rename(h.strip().rstrip(","), argmap)
+            if not re.search(r"[<>≤≥]", h):
+                continue  # a typing binder, not a constraint
             try:
                 src = transpile(h, d["params"], ar, d["name"], rn)
                 ns = {"_b": FLOAT}
@@ -78,8 +120,25 @@ def theorem_guards(c, defs):
             except Exception as e:
                 dropped.append(dict(thm=thm, hyp=h, reason=str(e)))
                 ok = False
+        # A theorem whose hypotheses we cannot fully model cannot excuse an
+        # escape, but it also cannot be ignored: an escape near it is reported
+        # with `unmodelled_hypotheses` so the reader can check by hand.
         if ok and preds:
-            out.append(dict(thm=thm, hyps=hyps, preds=preds))
+            # WHICH bound the theorem proves decides which escapes it can
+            # excuse.  `steppingStoneFst_nonneg` proves only `0 <= f`; a
+            # witness of 10000 satisfies its hypotheses AND its conclusion, so
+            # it says nothing about the escape above 1.  Treating any bounding
+            # theorem as excusing any escape reclassified five real findings
+            # as errors of mine.
+            bounds = set()
+            if thm in lo_thms or re.search(r"nonneg|_pos\b|in_unit|mem_unit|"
+                                           r"_mem\b|_range|bounded", thm, re.I):
+                bounds.add("below")
+            if thm in hi_thms or re.search(r"le_one|_lt_one|in_unit|mem_unit|"
+                                           r"_mem\b|_range|bounded", thm, re.I):
+                bounds.add("above")
+            out.append(dict(thm=thm, hyps=t["hyps"], preds=preds,
+                            bounds=sorted(bounds)))
     return out, dropped
 
 
@@ -114,11 +173,13 @@ def check_one(c, defs, budget=8000, bnb=1500):
     # applied afterwards, to classify the witness, never beforehand to shrink
     # the region -- shrinking is what makes a definition pass vacuously.
     guards, dropped = theorem_guards(c, defs)
+    pb = PROVED.get((d["module"], d["name"]), {})
     best, x = maximize(f, box, names, budget=budget)
     out = dict(range=[lo, hi], range_why=why,
                range_source="name-or-docstring-implied; NOT a theorem-proved "
                             "bound, so a violation is a lead, not a proof of "
                             "a defect",
+               proved_bound=[pb.get("lo"), pb.get("hi")] if pb else None,
                bounding_theorems=[g["thm"] for g in guards],
                bounding_theorem_hyps={g["thm"]: g["hyps"] for g in guards},
                unmodelled_hypotheses=dropped,
@@ -132,7 +193,9 @@ def check_one(c, defs, budget=8000, bnb=1500):
         # which is pinned by a theorem or by an unambiguous parameter name.
         # The two are reported as different verdicts and never pooled.
         blind = [n for n in names if box[n]["source"] == "none"]
-        satisfied = [g["thm"] for g in guards if _satisfies(g, x)]
+        side = "above" if val > hi else "below"
+        satisfied = [g["thm"] for g in guards
+                     if side in g["bounds"] and _satisfies(g, x)]
         if satisfied:
             # The witness sits inside the preconditions of a theorem that
             # proves the bound.  Lean has no `sorry`s, so the theorem is true
@@ -146,16 +209,32 @@ def check_one(c, defs, budget=8000, bnb=1500):
                             "this indicates an error in THIS checker, not in "
                             "the corpus, and needs manual inspection")
             return out
+        relevant = [g for g in guards if side in g["bounds"]]
+        # A theorem may PROVE the bound on this side while its hypotheses are
+        # beyond the arithmetic fragment, so no guard could be built for it.
+        # Silence from a guard we failed to construct is not evidence that no
+        # guard exists: if `extract` names a theorem proving this side, the
+        # claim is downgraded regardless.
+        proved_this_side = bool(
+            (pb.get("hi_thms") if side == "above" else pb.get("lo_thms")) or
+            (pb.get("hi") is not None if side == "above"
+             else pb.get("lo") is not None))
         verdict = "escape-unguarded" if blind else "escape"
-        if guards:
+        if relevant or proved_this_side:
             verdict = "escape-outside-theorem"
+        if proved_this_side and not relevant:
+            out["guard_not_modelled"] = (
+                "a theorem proves this bound but its hypotheses are outside "
+                "the arithmetic fragment, so the exclusion could not be "
+                "checked directly; graded conservatively")
         out.update(verdict=verdict,
                    witness={n: v for n, v in zip(names, x)},
                    value=val, overshoot=best,
                    blind_coordinates=blind,
                    escapes_only_where_violated=[
-                       g["thm"] for g in guards if not _satisfies(g, x)],
-                   side="above" if val > hi else "below")
+                       g["thm"] for g in guards
+                       if side in g["bounds"] and not _satisfies(g, x)],
+                   side=side)
         return out
 
     def fiv(*xs):

@@ -410,109 +410,263 @@ theorem recurrence_preserving_resampling_is_not_a_calibration
   exact hnull (hcomplete (resample start) start (fun i => hprofile start i))
 
 /-!
-## 5f. The Vertex-Weight Law: the observable content of a genotype coding is complete
+## 5f. The observable tower, and the fourth channel in closed form
 
 The results above say what a *design* can hide. The Vertex-Weight Law says what a
-*coding* can show, and for this corpus it is a completeness theorem about quantities
-that are already computed here.
+*coding* can show, and for genotypes it lands on a computation this corpus can do
+exactly.
 
 In the diagram expansion of any truncated joint cumulant of an admissible design, the
-coordinate law enters in exactly three places: window factors, whose admissible limits
-depend on the Mellin two-jet `(c, v)` and the arithmetic type of `log x²` alone; even
-vertex weights at shared-variable multiplicity `2j`, which are polynomials in the first
-`j` cumulants of `x²`; and odd vertex weights — the sign couplings — which vanish
-identically exactly when the law is symmetric. Nothing else about the law appears
-anywhere in any diagram, at any degree.
+coordinate law enters in three places: window factors, which see only the Mellin two-jet
+`(c, v)` and the arithmetic type of `log x²`; even vertex weights at shared-variable
+multiplicity `2j`, which are polynomials in the first `j` cumulants of `x²`; and odd
+vertex weights — the sign couplings — which vanish exactly when the law is symmetric.
 
-So the complete list of coordinate-law invariants that any admissible design can
-transmit is
+**A correction, which matters.** It does not follow that every cumulant of `x²` is
+observable. Appearing in the range of the formula is not the same as being exposed by
+some design, and the cumulants beyond the second are not: exposing the `j`-th for
+`j ≥ 3` forces the second hub energy to diverge, which drives the design out of the
+tempered class of `Calibrator.EpistaticChaos.GenotypeDesign.Tempered`, and in that phase
+the limit is governed by the conditional-variance array rather than by cumulant rates —
+an array that forgets them. So the naive list `{two-jet, arithmetic type, symmetry,
+cumulants of x²}` overstates what is observable, and this file no longer asserts it. The
+obstruction is exactly the hub-energy divergence already formalized here, which is why
+`ObservableTower` carries it as a field rather than as a remark.
 
-> two-jet, arithmetic type, symmetry, cumulant sequence of `x²`
+**The replacement is a recursion.** The conditional-variance array of an admissible
+design is itself a design — multilinear in the centered squares, with coordinate law the
+law of `x²` — so the observable algebra is self-similar:
 
-and this corpus has already computed the first three for the standardized genotype:
-`hweMellinDrift` is `c`, `hweMellinJetVariance` is `v`, `hweLatticeCondition` is the
-arithmetic type, and `Calibrator.EpistaticChaos.standardizedGenotype_symmetric_iff`
-settles symmetry — a single point, `q = 1/2`. The theorem below says those objects are
-not a convenient summary of a genotype coding. They are all of it.
+> `OA(ν) = { two-jet(ν), arithmetic type(ν), symmetry(ν) } ∪ OA(law of x²)`,
+
+to finite depth. The naive list is the shadow of the first two floors: `κ₂(x²)` is
+exposed precisely because it is the *variance* of level two, which is what a second floor
+reads. Whether the tower has a genuine second floor or truncates at depth one is **open
+upstream** — the reachability computation that decides it is outstanding — so `depth` is
+a parameter here and `TruncatesAtDepthOne` is a hypothesis, never an assertion.
+
+**The fourth channel, exactly.** For a standardized Hardy-Weinberg genotype the fourth
+moment is the reciprocal of the genotype variance,
+`Calibrator.EpistaticChaos.standardizedGenotype_fourth_moment`, and in the corpus's own
+primitive that reads `E[x⁴] = 1 / hweGenotypeVariance q`. Two consequences are stated
+below and both are checkable: the level-two coordinate is never symmetric, at any allele
+frequency, so that channel is always live one floor up; and the hub channel is blind at
+one specific frequency, `MAF = (3 - √3)/6 = 0.211324…`, where the standardized genotype
+has exactly Gaussian kurtosis.
 -/
 
-/-- **The complete observable content of a coordinate law**, per the Vertex-Weight Law:
-the Mellin two-jet, the arithmetic type of `log x²`, the symmetry verdict, and the
-cumulant sequence of `x²`. -/
-structure GenotypeObservableContent where
-  /-- The size-biased drift `c = E[x² log x²]`. -/
-  drift : ℝ
-  /-- The size-biased increment variance `v`. -/
-  jetVariance : ℝ
-  /-- The arithmetic type: whether `log x²` is supported on an arithmetic progression. -/
-  IsLattice : Prop
-  /-- Whether the coding admits a value-negating relabelling. -/
-  IsSignSymmetric : Prop
-  /-- The cumulant sequence of `x²`, which supplies the even vertex weights. -/
-  squareCumulant : ℕ → ℝ
+/-- **The fourth channel against the corpus primitive.** `E[x⁴] = 1 / hweGenotypeVariance q`.
 
-/-- The observable content of a Hardy-Weinberg locus at allele frequency `q`, assembled
-from the quantities this corpus already computes. The square-cumulant sequence is
-supplied as a parameter because it is a sequence rather than a closed form; every other
-component is a function of `q` already proved here.
+This is the over-determination tie for the new observable: the fourth moment is not a
+free constant but the reciprocal of the same `hweGenotypeVariance` that
+`mellinDrift_uses_ploidy` pins to `ploidy`. Change the ploidy convention and this stops
+compiling. -/
+theorem hweStandardizedFourthMoment_eq_inv_hweGenotypeVariance (h : HardyWeinbergModel)
+    (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
+    ∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4 =
+      1 / hweGenotypeVariance h.altFreq := by
+  rw [standardizedGenotype_fourth_moment h hq0 hq1, mellinDrift_uses_ploidy]
+
+/-- The squared standardized genotype is the corpus's `standardizedSquare`: the level-two
+coordinate of the tower is an object this development already had. -/
+theorem standardizedGenotype_sq_eq_standardizedSquare (h : HardyWeinbergModel)
+    (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) (g : DiploidGenotype) :
+    h.standardizedGenotype g ^ 2 = h.standardizedSquare g := by
+  have hvar : 0 < h.genotypeVariance := by
+    rw [h.genotypeVariance_eq]
+    unfold HardyWeinbergModel.refFreq
+    have hcomp : (0 : ℝ) < 1 - h.altFreq := by linarith
+    nlinarith [hq0, hcomp]
+  have hsq : Real.sqrt h.genotypeVariance ^ 2 = h.genotypeVariance :=
+    Real.sq_sqrt hvar.le
+  unfold HardyWeinbergModel.standardizedGenotype HardyWeinbergModel.standardizedSquare
+  rw [div_pow, hsq]
+
+/-- **The level-two coordinate is never symmetric.** `x²` takes the three values
+`2q/(1-q)`, `(1-2q)²/(2q(1-q))`, `2(1-q)/q`, all non-negative and not all zero, so no
+value-negating relabelling exists at *any* polymorphic allele frequency — including
+`q = 1/2`, where the level-one coordinate is symmetric.
+
+The proof is the third-moment detector of `symmetricCoding_third_moment_zero`: a
+symmetric coding has vanishing third moment, while `E[(x²)³]` is a sum of non-negative
+terms with a strictly positive one.
+
+So the sign-coupling channel, which at level one is live only away from `q = 1/2`
+(`standardizedGenotype_symmetric_iff`), is live at level two at every frequency. Symmetry
+fails one floor up, always. -/
+theorem standardizedSquare_never_symmetric (h : HardyWeinbergModel)
+    (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
+    ¬ ∃ coding : SymmetricCoding DiploidGenotype,
+        (∀ g, coding.weight g = h.genotypeProb g) ∧
+        (∀ g, coding.value g = h.standardizedSquare g) := by
+  rintro ⟨coding, hweight, hvalue⟩
+  have hzero : ∑ g : DiploidGenotype,
+      h.genotypeProb g * h.standardizedSquare g ^ 3 = 0 := by
+    have hterm : ∀ g : DiploidGenotype,
+        h.genotypeProb g * h.standardizedSquare g ^ 3 =
+          coding.weight g * coding.value g ^ 3 := by
+      intro g
+      rw [hweight, hvalue]
+    simp_rw [hterm]
+    exact symmetricCoding_third_moment_zero coding
+  obtain ⟨_, _, halt⟩ := standardizedSquare_values h hq0 hq1
+  have hprob := genotypeProb_values h
+  have hcomp : (0 : ℝ) < 1 - h.altFreq := by linarith
+  have hvar : 0 < h.genotypeVariance := by
+    rw [h.genotypeVariance_eq]
+    unfold HardyWeinbergModel.refFreq
+    nlinarith [hq0, hcomp]
+  have hnonneg : ∀ g : DiploidGenotype,
+      0 ≤ h.genotypeProb g * h.standardizedSquare g ^ 3 := by
+    intro g
+    have hp : 0 ≤ h.genotypeProb g := h.genotypeProb_nonneg g
+    have hs : 0 ≤ h.standardizedSquare g := by
+      have hdef : h.standardizedSquare g =
+          h.centeredAltAlleleCount g ^ 2 / h.genotypeVariance := rfl
+      rw [hdef]
+      exact div_nonneg (sq_nonneg _) hvar.le
+    exact mul_nonneg hp (pow_nonneg hs 3)
+  have hpos : 0 < h.genotypeProb DiploidGenotype.homAlt *
+      h.standardizedSquare DiploidGenotype.homAlt ^ 3 := by
+    rw [halt, hprob.2.2]
+    have hnum : (0 : ℝ) < 2 * (1 - h.altFreq) := by linarith
+    have hval : 0 < 2 * (1 - h.altFreq) / h.altFreq := div_pos hnum hq0
+    exact mul_pos (pow_pos hq0 2) (pow_pos hval 3)
+  rw [sum_diploidGenotype] at hzero
+  linarith [hzero, hnonneg DiploidGenotype.homRef, hnonneg DiploidGenotype.het, hpos]
+
+/-- **The allele frequency at which the hub channel is blind**, `(3 - √3)/6 = 0.211324…`.
+
+The fourth-cumulant channel separates a coordinate law from the Gaussian exactly when
+`E[x⁴] ≠ 3`. Since `E[x⁴] = 1 / (2q(1-q))`, the channel closes when `2q(1-q) = 1/3`, that
+is `6q² - 6q + 1 = 0`, whose polymorphic roots are `(3 ± √3)/6`. The minor-allele root is
+this constant.
+
+Empirical status: UNTESTED as a claim about any real scan. The arithmetic is derived —
+`gaussianKurtosisMaf_genotypeVariance` proves the variance identity and
+`standardizedGenotype_kurtosis_gaussian_at_blind_maf` proves the moment is `3` there — but
+the prediction that an interaction statistic relying on fourth-cumulant separation loses
+power near this frequency has not been checked in simulation. It is the most directly
+falsifiable number this development produces. -/
+noncomputable def gaussianKurtosisMaf : ℝ := (3 - Real.sqrt 3) / 6
+
+theorem sqrt_three_sq : Real.sqrt 3 ^ 2 = 3 := Real.sq_sqrt (by norm_num)
+
+theorem sqrt_three_lt_two : Real.sqrt 3 < 2 := by
+  nlinarith [sqrt_three_sq, Real.sqrt_nonneg 3]
+
+theorem sqrt_three_pos : 0 < Real.sqrt 3 := Real.sqrt_pos.mpr (by norm_num)
+
+theorem gaussianKurtosisMaf_pos : 0 < gaussianKurtosisMaf := by
+  unfold gaussianKurtosisMaf
+  have := sqrt_three_lt_two
+  linarith
+
+theorem gaussianKurtosisMaf_lt_one : gaussianKurtosisMaf < 1 := by
+  unfold gaussianKurtosisMaf
+  have := sqrt_three_pos
+  linarith
+
+/-- At the blind frequency the genotype variance is exactly `1/3`. -/
+theorem gaussianKurtosisMaf_genotypeVariance :
+    hweGenotypeVariance gaussianKurtosisMaf = 1 / 3 := by
+  unfold hweGenotypeVariance ploidy gaussianKurtosisMaf
+  nlinarith [sqrt_three_sq]
+
+/-- **The standardized genotype has exactly Gaussian kurtosis at `MAF = (3 - √3)/6`.**
+
+At that frequency `E[x⁴] = 3`, so the fourth-cumulant channel cannot separate a genotype
+coordinate from a Gaussian one, and an interaction statistic whose power comes from
+fourth-cumulant separation — the two-pool witness of `Calibrator.EpistaticChaos` is the
+model case, with its limiting fourth cumulant `6` — has no hub-channel signal there.
+
+Read alongside the other two channels this gives a frequency-by-frequency map: symmetry
+is available only at `MAF = 1/2` (`standardizedGenotype_symmetric_iff`), the drift grows
+like `log (1/2q)` for rare variants (`rare_variant_drift_lower_bound`), and the hub
+channel closes at this one interior frequency. No single frequency is blind in all
+channels, but each channel has its own blind set, and this one is a point. -/
+theorem standardizedGenotype_kurtosis_gaussian_at_blind_maf (h : HardyWeinbergModel)
+    (hmaf : h.altFreq = gaussianKurtosisMaf) :
+    ∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4 = 3 := by
+  have hq0 : 0 < h.altFreq := by
+    rw [hmaf]
+    exact gaussianKurtosisMaf_pos
+  have hq1 : h.altFreq < 1 := by
+    rw [hmaf]
+    exact gaussianKurtosisMaf_lt_one
+  rw [hweStandardizedFourthMoment_eq_inv_hweGenotypeVariance h hq0 hq1, hmaf,
+    gaussianKurtosisMaf_genotypeVariance]
+  norm_num
+
+/-!
+### The tower itself
+
+`LevelChannels` is one floor: the two-jet, the arithmetic type, the symmetry verdict.
+`ObservableTower` is the recursion, with the depth a parameter and the truncation a
+hypothesis.
+-/
+
+/-- The channels available at one floor of the observable tower. -/
+structure LevelChannels where
+  /-- The size-biased drift `c = E[x² log x²]` of that floor's coordinate. -/
+  drift : ℝ
+  /-- The size-biased increment variance `v` of that floor's coordinate. -/
+  jetVariance : ℝ
+  /-- Whether that floor's `log x²` is supported on an arithmetic progression. -/
+  IsLattice : Prop
+  /-- Whether that floor's coordinate admits a value-negating relabelling. -/
+  IsSignSymmetric : Prop
+
+/-- Floor one of the tower for a Hardy-Weinberg locus, assembled from quantities this
+corpus computes in closed form.
 
 Empirical status: DERIVED from `hweMellinDrift`, `hweMellinJetVariance` and
-`hweLatticeCondition`, each of which is derived elsewhere in the corpus; no free
-parameter beyond the supplied cumulant sequence, and nothing fitted. -/
-def hweObservableContent (squareCumulant : ℝ → ℕ → ℝ) (q : ℝ) : GenotypeObservableContent where
+`hweLatticeCondition`, each derived elsewhere in the corpus, together with the symmetry
+characterization `standardizedGenotype_symmetric_iff`; no free parameter and nothing
+fitted. -/
+noncomputable def hweLevelOne (q : ℝ) : LevelChannels where
   drift := hweMellinDrift q
   jetVariance := hweMellinJetVariance q
   IsLattice := hweLatticeCondition q
   IsSignSymmetric := q = 1 / 2
-  squareCumulant := squareCumulant q
 
-/-- **The observable content is built from the corpus's own quantities**, component by
-component. This is the over-determination guard for the completeness claim: if anyone
-changes what `hweMellinDrift` or `hweMellinJetVariance` or `hweLatticeCondition` means,
-this stops compiling rather than drifting. -/
-theorem hweObservableContent_components (squareCumulant : ℝ → ℕ → ℝ) (q : ℝ) :
-    (hweObservableContent squareCumulant q).drift = hweMellinDrift q ∧
-      (hweObservableContent squareCumulant q).jetVariance = hweMellinJetVariance q ∧
-      (hweObservableContent squareCumulant q).IsLattice = hweLatticeCondition q ∧
-      (hweObservableContent squareCumulant q).IsSignSymmetric = (q = 1 / 2) :=
+/-- **Floor one is built from the corpus's own quantities**, component by component: the
+over-determination guard for the completeness claim. If anyone changes what
+`hweMellinDrift`, `hweMellinJetVariance` or `hweLatticeCondition` means, this stops
+compiling rather than drifting. -/
+theorem hweLevelOne_components (q : ℝ) :
+    (hweLevelOne q).drift = hweMellinDrift q ∧
+      (hweLevelOne q).jetVariance = hweMellinJetVariance q ∧
+      (hweLevelOne q).IsLattice = hweLatticeCondition q ∧
+      (hweLevelOne q).IsSignSymmetric = (q = 1 / 2) :=
   ⟨rfl, rfl, rfl, rfl⟩
 
-/-- **The symmetry component is the corpus's proved characterization.** The
-`IsSignSymmetric` slot of the observable content holds exactly when the standardized
-genotype admits a value-negating relabelling, which
-`Calibrator.EpistaticChaos.standardizedGenotype_symmetric_iff` proves happens at
-`q = 1/2` and nowhere else in the polymorphic range.
-
-So the third of the four observable invariants is not a free slot to be filled later: it
-is already decided for genotypes, and it is decided negatively almost everywhere. -/
-theorem hweObservableContent_symmetry (squareCumulant : ℝ → ℕ → ℝ)
-    (h : HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
-    (hweObservableContent squareCumulant h.altFreq).IsSignSymmetric ↔
+/-- **The symmetry slot of floor one is the corpus's proved characterization**, so it is
+not a slot awaiting work: it is decided, and decided negatively away from `q = 1/2`. -/
+theorem hweLevelOne_symmetry (h : HardyWeinbergModel)
+    (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
+    (hweLevelOne h.altFreq).IsSignSymmetric ↔
       (∃ coding : SymmetricCoding DiploidGenotype,
         (∀ g, coding.weight g = h.genotypeProb g) ∧
         (∀ g, coding.value g = h.standardizedGenotype g)) := by
-  have hcomponent : (hweObservableContent squareCumulant h.altFreq).IsSignSymmetric =
-      (h.altFreq = 1 / 2) := rfl
+  have hcomponent : (hweLevelOne h.altFreq).IsSignSymmetric = (h.altFreq = 1 / 2) := rfl
   rw [hcomponent]
   exact (standardizedGenotype_symmetric_iff h hq0 hq1).symm
 
-/-- **The one frequency where symmetry is available is the one where the second
-observable dies.** If the symmetry component holds then the jet-variance component is
-zero, by `hweMellinJetVariance_half`. Two of the four invariants collapse together, so a
-genotype coding cannot be both sign-symmetric and Mellin-nondegenerate — the dichotomy
-of `no_signSymmetric_nondegenerate_locus`, now read off the observable content. -/
-theorem hweObservableContent_symmetric_jetVariance_zero (squareCumulant : ℝ → ℕ → ℝ)
-    (q : ℝ) (hsymmetric : (hweObservableContent squareCumulant q).IsSignSymmetric) :
-    (hweObservableContent squareCumulant q).jetVariance = 0 := by
-  have hcomponent : (hweObservableContent squareCumulant q).IsSignSymmetric = (q = 1 / 2) := rfl
+/-- Where floor one is symmetric its jet variance vanishes: two of its channels collapse
+together, which is `no_signSymmetric_nondegenerate_locus` read off the tower. -/
+theorem hweLevelOne_symmetric_jetVariance_zero (q : ℝ)
+    (hsymmetric : (hweLevelOne q).IsSignSymmetric) :
+    (hweLevelOne q).jetVariance = 0 := by
+  have hcomponent : (hweLevelOne q).IsSignSymmetric = (q = 1 / 2) := rfl
   rw [hcomponent] at hsymmetric
-  have hjet : (hweObservableContent squareCumulant q).jetVariance = hweMellinJetVariance q := rfl
+  have hjet : (hweLevelOne q).jetVariance = hweMellinJetVariance q := rfl
   rw [hjet, hsymmetric]
   exact hweMellinJetVariance_half
 
 /-- Re-model a design: the same tested locus-sets, coefficients and joint law, at a
 different allele-frequency family. This is what varying the coordinate law while holding
-the design fixed means, and it is the comparison the Vertex-Weight Law is about.
+the design fixed means.
 
 Empirical status: UNTESTED. A field update on a design; no modelling content and no free
 parameter. -/
@@ -520,81 +674,102 @@ def GenotypeDesign.reModel {ι : Type*} {n : ℕ} (design : GenotypeDesign n ι)
     (model : Fin n → HardyWeinbergModel) : GenotypeDesign n ι :=
   { design with model := model }
 
-/-- The Vertex-Weight Law over a genotype panel, carried as a field.
+/-- The observable tower over a genotype panel, with its depth a parameter.
 
-`limitLaw` is the limit of a design's statistic. The field says the limit depends on the
-allele-frequency family only through the observable content of each locus — the two-jet,
-the arithmetic type, the symmetry verdict, and the square-cumulant sequence — and
-through nothing else. -/
-structure VertexWeightLaw (n : ℕ) (ι : Type*) (Limit : Type*) where
+`levelChannels design floor i` is the channel data of locus `i` at that floor. The
+Vertex-Weight field says the limit depends on the allele-frequency family only through
+the channels, floor by floor, up to the tower's depth — and through nothing else.
+
+The `higher_cumulants_need_divergent_hub` field carries the correction: a design that
+exposes a cumulant of `x²` beyond the second cannot have bounded hub recurrence, so it
+sits outside the tempered class where cycle densities determine the limit. That is why
+the naive list is not the answer and the recursion is. -/
+structure ObservableTower (n : ℕ) (ι : Type*) (Limit : Type*) where
   /-- Minimum interaction order diverging, influence vanishing, unit variance. -/
   isAdmissible : GenotypeDesign n ι → Prop
   /-- The limit law of a design's statistic. -/
   limitLaw : GenotypeDesign n ι → Limit
-  /-- The cumulant sequence of the squared standardized genotype, as a function of the
-  allele frequency. -/
-  squareCumulant : ℝ → ℕ → ℝ
-  /-- **The Vertex-Weight Law (analytic input).** Two allele-frequency families with the
-  same per-locus observable content give the same limit, for every design. The proof is
-  the diagram expansion: window factors see only the two-jet and the arithmetic type,
-  even vertex weights only the square cumulants, odd vertex weights only the symmetry
-  verdict, and there is no fourth place for the law to enter. -/
+  /-- How many floors the tower is taken to. -/
+  depth : ℕ
+  /-- The channel data of one locus at one floor: floor `0` is `hweLevelOne`. -/
+  levelChannels : ℕ → ℝ → LevelChannels
+  /-- Floor zero is the level-one channel data of the corpus. -/
+  levelChannels_zero : ∀ q : ℝ, levelChannels 0 q = hweLevelOne q
+  /-- Which square-cumulant order a design exposes. -/
+  Exposes : GenotypeDesign n ι → ℕ → Prop
+  /-- **The Vertex-Weight Law (analytic input).** Two allele-frequency families whose
+  channels agree at every floor up to the depth give the same limit, for every design. -/
   vertex_weight : ∀ (design : GenotypeDesign n ι) (model model' : Fin n → HardyWeinbergModel),
     isAdmissible (design.reModel model) → isAdmissible (design.reModel model') →
-    (∀ i : Fin n, hweObservableContent squareCumulant (model i).altFreq =
-      hweObservableContent squareCumulant (model' i).altFreq) →
+    (∀ (floor : ℕ) (i : Fin n), floor ≤ depth →
+      levelChannels floor (model i).altFreq = levelChannels floor (model' i).altFreq) →
     limitLaw (design.reModel model) = limitLaw (design.reModel model')
+  /-- **The exposure correction (analytic input).** Exposing a square cumulant of order
+  three or more forces the second hub energy to diverge, so no hub bound survives. -/
+  higher_cumulants_need_divergent_hub : ∀ (design : GenotypeDesign n ι) (order : ℕ),
+    3 ≤ order → Exposes design order → ∀ bound : ℕ, ¬ design.BoundedHubRecurrence bound
 
-namespace VertexWeightLaw
+namespace ObservableTower
 
-variable {n : ℕ} {ι : Type*} {Limit : Type*} (VW : VertexWeightLaw n ι Limit)
+variable {n : ℕ} {ι : Type*} {Limit : Type*} (T : ObservableTower n ι Limit)
 
-/-- **Observability completeness for a genotype coding.** Any experiment reporting a
-function of a design's limit is a function of the observable content alone: two
-allele-frequency families agreeing in the two-jet, the arithmetic type, the symmetry
-verdict and the square cumulants at every locus are indistinguishable by every admissible
-design, at every interaction order, through every diagram.
-
-Nothing outside that list is observable. In particular no diagnostic, however elaborate,
-recovers any property of a genotype coding that is not a function of those four. -/
-theorem experiment_factors_through_observable_content
+/-- **Observability completeness, to the tower's depth.** Any experiment reporting a
+function of a design's limit is a function of the channel data alone: two panels agreeing
+floor by floor are indistinguishable by every admissible design, at every interaction
+order, through every diagram. -/
+theorem experiment_factors_through_channels
     {Report : Type*} (experiment : Limit → Report)
     (design : GenotypeDesign n ι) (model model' : Fin n → HardyWeinbergModel)
-    (hadmissible : VW.isAdmissible (design.reModel model))
-    (hadmissible' : VW.isAdmissible (design.reModel model'))
-    (hcontent : ∀ i : Fin n,
-      hweObservableContent VW.squareCumulant (model i).altFreq =
-        hweObservableContent VW.squareCumulant (model' i).altFreq) :
-    experiment (VW.limitLaw (design.reModel model)) =
-      experiment (VW.limitLaw (design.reModel model')) := by
-  rw [VW.vertex_weight design model model' hadmissible hadmissible' hcontent]
+    (hadmissible : T.isAdmissible (design.reModel model))
+    (hadmissible' : T.isAdmissible (design.reModel model'))
+    (hchannels : ∀ (floor : ℕ) (i : Fin n), floor ≤ T.depth →
+      T.levelChannels floor (model i).altFreq = T.levelChannels floor (model' i).altFreq) :
+    experiment (T.limitLaw (design.reModel model)) =
+      experiment (T.limitLaw (design.reModel model')) := by
+  rw [T.vertex_weight design model model' hadmissible hadmissible' hchannels]
 
-/-- **The corpus's computed quantities are the complete observable summary.** Stated in
-the form a reader can act on: if two panels agree locus by locus in `hweMellinDrift`,
-`hweMellinJetVariance`, `hweLatticeCondition`, the symmetry point and the square
-cumulants, then no admissible design distinguishes them.
+/-- **A design that reaches past the second square cumulant has left the tempered class.**
+The contrapositive of the exposure correction, in the form a practitioner meets it: if
+every variant is tested a bounded number of times, no cumulant of `x²` beyond the second
+is exposed, whatever the design does. -/
+theorem boundedHub_exposes_no_higher_cumulant
+    (design : GenotypeDesign n ι) (bound : ℕ)
+    (hhub : design.BoundedHubRecurrence bound) (order : ℕ) (horder : 3 ≤ order) :
+    ¬ T.Exposes design order := by
+  intro hexposes
+  exact T.higher_cumulants_need_divergent_hub design order horder hexposes bound hhub
 
-Every hypothesis here names a quantity this corpus already computes in closed form,
-which is what makes the completeness claim checkable rather than decorative. -/
-theorem indistinguishable_of_matching_computed_quantities
+/-- **If the tower truncates at depth one, the complete observable content of a genotype
+coding is a four-element list**: the drift, the jet variance, the arithmetic type and the
+symmetry verdict of floor one, together with the fourth moment `E[x⁴] = 1/(2q(1-q))`
+which is the variance of floor two.
+
+The truncation is the hypothesis `htruncates`, stated in the type rather than assumed in
+prose, because the reachability computation that decides it is open upstream. If the tower
+has a genuine second floor, this theorem is silent and the extra floors are given by
+`levelChannels 1`, `levelChannels 2`, … applied to the law of `x²`. -/
+theorem complete_content_of_truncation
+    (htruncates : T.depth = 0)
     (design : GenotypeDesign n ι) (model model' : Fin n → HardyWeinbergModel)
-    (hadmissible : VW.isAdmissible (design.reModel model))
-    (hadmissible' : VW.isAdmissible (design.reModel model'))
+    (hadmissible : T.isAdmissible (design.reModel model))
+    (hadmissible' : T.isAdmissible (design.reModel model'))
     (hdrift : ∀ i : Fin n, hweMellinDrift (model i).altFreq =
       hweMellinDrift (model' i).altFreq)
     (hjet : ∀ i : Fin n, hweMellinJetVariance (model i).altFreq =
       hweMellinJetVariance (model' i).altFreq)
     (hlattice : ∀ i : Fin n, hweLatticeCondition (model i).altFreq =
       hweLatticeCondition (model' i).altFreq)
-    (hsymmetry : ∀ i : Fin n, ((model i).altFreq = 1 / 2) = ((model' i).altFreq = 1 / 2))
-    (hcumulant : ∀ i : Fin n, VW.squareCumulant (model i).altFreq =
-      VW.squareCumulant (model' i).altFreq) :
-    VW.limitLaw (design.reModel model) = VW.limitLaw (design.reModel model') := by
-  refine VW.vertex_weight design model model' hadmissible hadmissible' (fun i => ?_)
-  unfold hweObservableContent
-  rw [hdrift i, hjet i, hlattice i, hsymmetry i, hcumulant i]
+    (hsymmetry : ∀ i : Fin n, ((model i).altFreq = 1 / 2) = ((model' i).altFreq = 1 / 2)) :
+    T.limitLaw (design.reModel model) = T.limitLaw (design.reModel model') := by
+  refine T.vertex_weight design model model' hadmissible hadmissible' ?_
+  intro floor i hfloor
+  rw [htruncates] at hfloor
+  have hzero : floor = 0 := Nat.le_zero.mp hfloor
+  rw [hzero, T.levelChannels_zero, T.levelChannels_zero]
+  unfold hweLevelOne
+  rw [hdrift i, hjet i, hlattice i, hsymmetry i]
 
-end VertexWeightLaw
+end ObservableTower
 
 /-!
 ## 6. Where the whole development now stands

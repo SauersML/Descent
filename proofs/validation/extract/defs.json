@@ -12443,14 +12443,24 @@
      "Calibrator.standardizedGenotype_second_moment_one": [
       "0 < h.altFreq",
       "h.altFreq < 1"
+     ],
+     "Calibrator.standardizedGenotype_fourth_moment": [
+      "0 < h.altFreq",
+      "h.altFreq < 1"
+     ],
+     "Calibrator.standardizedSquare_second_cumulant": [
+      "0 < h.altFreq",
+      "h.altFreq < 1"
      ]
     }
    },
    "mentioned_by": [
     "Calibrator.hweObservableContent_symmetry",
     "Calibrator.standardizedGenotype_expectation_zero",
+    "Calibrator.standardizedGenotype_fourth_moment",
     "Calibrator.standardizedGenotype_second_moment_one",
-    "Calibrator.standardizedGenotype_symmetric_iff"
+    "Calibrator.standardizedGenotype_symmetric_iff",
+    "Calibrator.standardizedSquare_second_cumulant"
    ]
   },
   {
@@ -12459,7 +12469,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/EpistaticChaos.lean",
-   "line": 792,
+   "line": 859,
    "signature": "(s : ι) : ℕ",
    "args": [
     {
@@ -12507,7 +12517,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/EpistaticChaos.lean",
-   "line": 800,
+   "line": 867,
    "signature": "(x : Fin n → DiploidGenotype) : ℝ",
    "args": [
     {
@@ -12539,7 +12549,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/EpistaticChaos.lean",
-   "line": 821,
+   "line": 888,
    "signature": ": Prop",
    "args": [],
    "ret_type": "Prop",
@@ -12577,7 +12587,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/EpistaticChaos.lean",
-   "line": 829,
+   "line": 896,
    "signature": ": Prop",
    "args": [],
    "ret_type": "Prop",
@@ -12616,7 +12626,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/EpistaticChaos.lean",
-   "line": 844,
+   "line": 911,
    "signature": ": Prop",
    "args": [],
    "ret_type": "Prop",
@@ -12667,7 +12677,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/EpistaticChaos.lean",
-   "line": 853,
+   "line": 920,
    "signature": "(i : Fin n) : ℕ",
    "args": [
     {
@@ -12722,7 +12732,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/EpistaticChaos.lean",
-   "line": 862,
+   "line": 929,
    "signature": "(i : Fin n) : ℝ",
    "args": [
     {
@@ -12766,7 +12776,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/EpistaticChaos.lean",
-   "line": 877,
+   "line": 944,
    "signature": "(poolOne poolTwo : Finset (Fin n)) : Prop",
    "args": [
     {
@@ -12824,7 +12834,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/EpistaticChaos.lean",
-   "line": 943,
+   "line": 1010,
    "signature": "{γ : Type*} [DecidableEq γ] (model : Fin n → HardyWeinbergModel) (geneOf : Fin n → γ) (coeff : γ → ℝ) (jointGenotypeProb : (Fin n → DiploidGenotype) → ℝ) : GenotypeDesign n γ where model",
    "args": [
     {
@@ -12911,7 +12921,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/EpistaticChaos.lean",
-   "line": 970,
+   "line": 1037,
    "signature": "(model : Fin n → HardyWeinbergModel) (width : ℕ) (coeff : Fin n → ℝ) (jointGenotypeProb : (Fin n → DiploidGenotype) → ℝ) : GenotypeDesign n (Fin n) where model",
    "args": [
     {
@@ -12974,7 +12984,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/EpistaticChaos.lean",
-   "line": 1229,
+   "line": 1296,
    "signature": "(secondMoment fourthMoment : ℝ) : ℝ",
    "args": [
     {
@@ -13012,7 +13022,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/EpistaticChaos.lean",
-   "line": 1359,
+   "line": 1426,
    "signature": "(c : ℝ) : ℝ",
    "args": [
     {
@@ -13059,7 +13069,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/EpistaticChaos.lean",
-   "line": 1366,
+   "line": 1433,
    "signature": "(c : ℝ) : ℝ",
    "args": [
     {
@@ -13108,7 +13118,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/EpistaticChaos.lean",
-   "line": 1462,
+   "line": 1529,
    "signature": "(design : GenotypeDesign nx ιx) : Matrix ιx ιx ℝ",
    "args": [
     {
@@ -13146,7 +13156,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/EpistaticChaos.lean",
-   "line": 1481,
+   "line": 1548,
    "signature": "(design : GenotypeDesign nx ιx) (p : ℕ) : ℝ",
    "args": [
     {
@@ -13207,7 +13217,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/EpistaticChaos.lean",
-   "line": 1519,
+   "line": 1586,
    "signature": "(design : GenotypeDesign nx ιx) (rate : ℝ) : Prop",
    "args": [
     {
@@ -13250,7 +13260,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/EpistaticChaos.lean",
-   "line": 1528,
+   "line": 1595,
    "signature": "(design : GenotypeDesign nx ιx) (bound : ℕ) : Prop",
    "args": [
     {
@@ -13312,7 +13322,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/EpistaticChaos.lean",
-   "line": 1698,
+   "line": 1765,
    "signature": "(s : ℝ) (p : ℕ) : ℝ",
    "args": [
     {
@@ -13382,7 +13392,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/EpistaticChaos.lean",
-   "line": 1707,
+   "line": 1774,
    "signature": "(s : ℝ) (p : ℕ) : ℝ",
    "args": [
     {
@@ -45034,7 +45044,7 @@
       "0 < Ne",
       "0 ≤ m"
      ],
-     "Calibrator.signalRetentionMigrationDrift_eq": [
+     "Calibrator.signalRetentionMigrationDrift_eq_ratio": [
       "0 < Ne",
       "0 ≤ m"
      ],
@@ -45080,7 +45090,7 @@
     "Calibrator.migration_reduces_fst_vs_pure_drift",
     "Calibrator.recurrence_derived_R2_increases_with_m",
     "Calibrator.sharedLD_from_equilibrium_eq",
-    "Calibrator.signalRetentionMigrationDrift_eq"
+    "Calibrator.signalRetentionMigrationDrift_eq_ratio"
    ]
   },
   {
@@ -45364,7 +45374,15 @@
       "0 < Ne",
       "0 ≤ m"
      ],
-     "Calibrator.signalRetentionMigrationDrift_eq": [
+     "Calibrator.signalRetentionMigrationDrift_eq_ratio": [
+      "0 < Ne",
+      "0 ≤ m"
+     ],
+     "Calibrator.signalRetentionMigrationDrift_lt_one": [
+      "0 < Ne",
+      "0 < m"
+     ],
+     "Calibrator.retainedSignalVarianceMigrationDrift_eq": [
       "0 < Ne",
       "0 ≤ m"
      ],
@@ -45390,11 +45408,13 @@
     "Calibrator.fst_plus_sharedLD_eq_one",
     "Calibrator.islandModelFst_eq_from_scaledMigration",
     "Calibrator.islandModelFst_eq_scaled",
+    "Calibrator.retainedSignalVarianceMigrationDrift_eq",
     "Calibrator.scaledMigrationRate_eq_ploidy_form",
     "Calibrator.scaledMigrationRate_pos",
     "Calibrator.sharedLD_from_equilibrium_eq",
     "Calibrator.sharedLD_from_equilibrium_eq_sharedLDFromMigration",
-    "Calibrator.signalRetentionMigrationDrift_eq",
+    "Calibrator.signalRetentionMigrationDrift_eq_ratio",
+    "Calibrator.signalRetentionMigrationDrift_lt_one",
     "Calibrator.signalRetention_increases_with_migration"
    ]
   },
@@ -45444,7 +45464,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4878,
+   "line": 4895,
    "signature": "(fst_neighbor α : ℝ) (d : ℕ) : ℝ",
    "args": [
     {
@@ -45466,8 +45486,8 @@
     }
    ],
    "ret_type": "ℝ",
-   "body": "  fst_neighbor * (1 + α * ((d : ℝ) - 1))",
-   "docstring": "**Stepping-stone Fst model.**\n    In the stepping-stone model, migration occurs only between adjacent demes.\n    Fst between demes separated by d steps is approximately:\n    Fst(d) ≈ Fst_neighbor × (1 + α × (d - 1))\n    where α controls the rate of increase with distance (isolation by distance).\n    This is a linear approximation to the closed-form result.\n\n    Empirical status: UNTESTED.",
+   "body": "  min 1 (fst_neighbor * (1 + α * ((d : ℝ) - 1)))",
+   "docstring": "**Stepping-stone Fst model.**\n    In the stepping-stone model, migration occurs only between adjacent demes.\n    Fst between demes separated by d steps is approximately:\n    Fst(d) ≈ min 1 (Fst_neighbor × (1 + α × (d - 1)))\n    where α controls the rate of increase with distance (isolation by distance).\n\n    The `min 1` is not cosmetic. An `F_ST` is a variance ratio and lies in\n    `[0, 1]`; the bare linear form returns `10000` at\n    `fst_neighbor = 1, α = 1, d = 10000`, which is not a value the quantity can\n    take. Clamping also makes the fixation boundary attainable rather than\n    merely approached: `steppingStoneFst_eq_one_of_saturated` exhibits the\n    regime where distant demes are completely differentiated, which is the\n    physically correct behaviour of isolation by distance at long range.\n\n    Regime: linear, valid below saturation. This is a first-order approximation\n    to the closed form, so it is trustworthy only while\n    `fst_neighbor * (1 + α (d - 1))` is well below `1`; the monotonicity results\n    below carry that condition as a hypothesis rather than assuming it. The\n    saturating closed forms are `demoSteppingStoneFst` in\n    `Calibrator.DemographicHistory`, which is derived from a coalescence time,\n    and `continuousSteppingStoneFst` in\n    `Calibrator.PopulationGeneticsFoundations`, which is `1 - exp (-d/L)`.\n    Neither is this function and neither is being replaced here.\n\n    Empirical status: UNTESTED.",
    "empirical_status": "UNTESTED",
    "namespace": "Calibrator",
    "fields": [],
@@ -45477,22 +45497,34 @@
     "declared_lo": 0.0,
     "declared_hi": 1.0,
     "hypotheses": [
+     "1 ≤ fst_neighbor * (1 + α * ((d : ℝ",
+     "fst_neighbor ≤ 1",
      "0 < fst_neighbor",
      "0 < α",
+     "fst_neighbor * (1 + α * ((d₂ : ℝ",
      "1 < d",
+     "fst_neighbor * (1 + α * ((d : ℝ",
      "0 ≤ α",
      "1 ≤ d"
     ],
     "hypotheses_by_theorem": {
-     "Calibrator.steppingStoneFst_at_one": [],
+     "Calibrator.steppingStoneFst_le_one": [],
+     "Calibrator.steppingStoneFst_eq_one_of_saturated": [
+      "1 ≤ fst_neighbor * (1 + α * ((d : ℝ"
+     ],
+     "Calibrator.steppingStoneFst_at_one": [
+      "fst_neighbor ≤ 1"
+     ],
      "Calibrator.steppingStoneFst_increases_with_distance": [
       "0 < fst_neighbor",
-      "0 < α"
+      "0 < α",
+      "fst_neighbor * (1 + α * ((d₂ : ℝ"
      ],
      "Calibrator.steppingStoneFst_neighbor_lt_distant": [
       "0 < fst_neighbor",
       "0 < α",
-      "1 < d"
+      "1 < d",
+      "fst_neighbor * (1 + α * ((d : ℝ"
      ],
      "Calibrator.steppingStoneFst_nonneg": [
       "0 < fst_neighbor",
@@ -45503,7 +45535,9 @@
    },
    "mentioned_by": [
     "Calibrator.steppingStoneFst_at_one",
+    "Calibrator.steppingStoneFst_eq_one_of_saturated",
     "Calibrator.steppingStoneFst_increases_with_distance",
+    "Calibrator.steppingStoneFst_le_one",
     "Calibrator.steppingStoneFst_neighbor_lt_distant",
     "Calibrator.steppingStoneFst_nonneg"
    ]
@@ -45514,7 +45548,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4940,
+   "line": 4980,
    "signature": "(Ne m : ℝ) : ℝ",
    "args": [
     {
@@ -45564,7 +45598,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 4966,
+   "line": 5006,
    "signature": "(M : ℝ) : ℝ",
    "args": [
     {
@@ -45602,7 +45636,7 @@
      ],
      "Calibrator.sharedLDFromMigration_increases": [],
      "Calibrator.fst_plus_sharedLD_eq_one": [],
-     "Calibrator.signalRetentionMigrationDrift_eq": [],
+     "Calibrator.signalRetentionMigrationDrift_eq_ratio": [],
      "Calibrator.private_causal_fraction_lowers_transfer_ceiling": [
       "r2_target ≤ privateArchitectureTransferCeiling h2_target f_private M",
       "0 < M"
@@ -45626,7 +45660,7 @@
     "Calibrator.sharedLDFromMigration_lt_one",
     "Calibrator.sharedLDFromMigration_nonneg",
     "Calibrator.sharedLD_from_equilibrium_eq_sharedLDFromMigration",
-    "Calibrator.signalRetentionMigrationDrift_eq"
+    "Calibrator.signalRetentionMigrationDrift_eq_ratio"
    ]
   },
   {
@@ -45635,7 +45669,75 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 5017,
+   "line": 5070,
+   "signature": "(Ne m : ℝ) : ℝ",
+   "args": [
+    {
+     "names": [
+      "Ne",
+      "m"
+     ],
+     "type": "ℝ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ℝ",
+   "body": "  (1 - fstMigrationDriftEquilibrium Ne m) *\n    sharedLDFromMigration (scaledMigrationRate Ne m)",
+   "docstring": "**Signal retention under migration-drift balance.**\n\nThe fraction of additive signal that survives, accounting for both allele\nfrequency drift and LD sharing at the migration-drift equilibrium. It is\n`(1 - F_ST) * shared_LD = M²/(1 + M)²` with `M = 4 Nₑ m`, and it lies in\n`[0, 1)`.\n\nThe previous body of this name multiplied by `V_A` and so returned a variance,\nnot a fraction: it was unbounded and grew without limit as the additive variance\ngrew. A retention that scales with an additive variance is not a retention. The\nname now denotes the fraction and `retainedSignalVarianceMigrationDrift` denotes\nthe variance; `retainedSignalVarianceMigrationDrift_eq_retention_mul_VA` relates\nthem. This corpus has already lost a factor of four to exactly this kind of\nname/quantity mismatch, so the two are separated rather than bounded.\n\n    Denotes: a dimensionless fraction in `[0, 1)`, never a variance.\n\n    Empirical status: UNTESTED.",
+   "empirical_status": "UNTESTED",
+   "namespace": "Calibrator",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "declared_kind": "F_ST",
+    "declared_lo": 0.0,
+    "declared_hi": 1.0,
+    "hypotheses": [
+     "0 < Ne",
+     "0 ≤ m",
+     "0 < m"
+    ],
+    "hypotheses_by_theorem": {
+     "Calibrator.retainedSignalVarianceMigrationDrift_eq_retention_mul_VA": [],
+     "Calibrator.signalRetentionMigrationDrift_eq_ratio": [
+      "0 < Ne",
+      "0 ≤ m"
+     ],
+     "Calibrator.signalRetentionMigrationDrift_lt_one": [
+      "0 < Ne",
+      "0 < m"
+     ],
+     "Calibrator.signalRetentionMigrationDrift_nonneg": [
+      "0 < Ne",
+      "0 ≤ m"
+     ]
+    },
+    "range_hi_thm": [
+     "Calibrator.signalRetentionMigrationDrift_lt_one",
+     2
+    ],
+    "range_hi": 1,
+    "range_lo_thm": [
+     "Calibrator.signalRetentionMigrationDrift_nonneg",
+     2
+    ],
+    "range_lo": 0
+   },
+   "mentioned_by": [
+    "Calibrator.retainedSignalVarianceMigrationDrift_eq_retention_mul_VA",
+    "Calibrator.signalRetentionMigrationDrift_eq_ratio",
+    "Calibrator.signalRetentionMigrationDrift_lt_one",
+    "Calibrator.signalRetentionMigrationDrift_nonneg"
+   ]
+  },
+  {
+   "name": "Calibrator.retainedSignalVarianceMigrationDrift",
+   "short": "retainedSignalVarianceMigrationDrift",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Calibrator/PortabilityDrift.lean",
+   "line": 5081,
    "signature": "(V_A Ne m : ℝ) : ℝ",
    "args": [
     {
@@ -45650,14 +45752,14 @@
     }
    ],
    "ret_type": "ℝ",
-   "body": "  let fst := fstMigrationDriftEquilibrium Ne m\n  let M := scaledMigrationRate Ne m\n  let shared_ld := sharedLDFromMigration M\n  (1 - fst) * shared_ld * V_A",
-   "docstring": "**Signal retention under migration-drift balance.**\n    The retained signal variance accounts for both allele frequency drift\n    and LD sharing determined by migration rate.\n\n    Empirical status: UNTESTED.",
+   "body": "  signalRetentionMigrationDrift Ne m * V_A",
+   "docstring": "**Retained signal variance under migration-drift balance.**\n    The additive variance that survives: the retention fraction times `V_A`.\n    This is the quantity the previous `signalRetentionMigrationDrift` computed.\n\n    Denotes: a variance, in the units of `V_A`.\n\n    Empirical status: UNTESTED.",
    "empirical_status": "UNTESTED",
    "namespace": "Calibrator",
    "fields": [],
    "equations": [],
    "constraints": {
-    "declared_kind": "frequency",
+    "declared_kind": "ratio",
     "declared_lo": 0.0,
     "declared_hi": 1.0,
     "hypotheses": [
@@ -45667,11 +45769,12 @@
      "0 < m"
     ],
     "hypotheses_by_theorem": {
-     "Calibrator.signalRetentionMigrationDrift_eq": [
+     "Calibrator.retainedSignalVarianceMigrationDrift_eq_retention_mul_VA": [],
+     "Calibrator.retainedSignalVarianceMigrationDrift_eq": [
       "0 < Ne",
       "0 ≤ m"
      ],
-     "Calibrator.signalRetentionMigrationDrift_pos": [
+     "Calibrator.retainedSignalVarianceMigrationDrift_pos": [
       "0 < V_A",
       "0 < Ne",
       "0 < m"
@@ -45682,14 +45785,15 @@
      ]
     },
     "range_lo_thm": [
-     "Calibrator.signalRetentionMigrationDrift_pos",
+     "Calibrator.retainedSignalVarianceMigrationDrift_pos",
      3
     ],
     "range_lo": 0
    },
    "mentioned_by": [
-    "Calibrator.signalRetentionMigrationDrift_eq",
-    "Calibrator.signalRetentionMigrationDrift_pos",
+    "Calibrator.retainedSignalVarianceMigrationDrift_eq",
+    "Calibrator.retainedSignalVarianceMigrationDrift_eq_retention_mul_VA",
+    "Calibrator.retainedSignalVarianceMigrationDrift_pos",
     "Calibrator.signalRetention_increases_with_migration"
    ]
   },
@@ -45699,7 +45803,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 5098,
+   "line": 5192,
    "signature": "(Ne m_into : ℝ) : ℝ",
    "args": [
     {
@@ -45750,7 +45854,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 5139,
+   "line": 5233,
    "signature": "(m₁₂ m₂₁ : ℝ) : ℝ",
    "args": [
     {
@@ -45797,7 +45901,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 5160,
+   "line": 5254,
    "signature": "(r : ℝ) (generations_since : ℕ) : ℝ",
    "args": [
     {
@@ -45888,7 +45992,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 5207,
+   "line": 5301,
    "signature": "(r : ℝ) (t_since : ℕ) (equilibrium_ld : ℝ) : ℝ",
    "args": [
     {
@@ -45953,7 +46057,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 5269,
+   "line": 5363,
    "signature": "(Ne m Fst : ℝ) : ℝ",
    "args": [
     {
@@ -46004,7 +46108,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 5304,
+   "line": 5398,
    "signature": "(Ne m : ℝ) : ℝ",
    "args": [
     {
@@ -46096,7 +46200,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Calibrator/PortabilityDrift.lean",
-   "line": 5386,
+   "line": 5480,
    "signature": "(Ne m : ℝ) : ℝ",
    "args": [
     {
@@ -47084,6 +47188,7 @@
      "Calibrator.hweThirdCentralMoment_eq": [],
      "Calibrator.centeredDosageSquare_two_valued_at_half": [],
      "Calibrator.standardizedGenotype_expectation_zero": [],
+     "Calibrator.standardizedGenotype_fourth_moment": [],
      "Calibrator.hwe_centered": [],
      "Calibrator.standardizedSquare_values": [],
      "Calibrator.HardyWeinbergModel.expectedAltAlleleCount_eq": [],
@@ -47097,6 +47202,7 @@
     "Calibrator.hweThirdCentralMoment_eq",
     "Calibrator.hwe_centered",
     "Calibrator.standardizedGenotype_expectation_zero",
+    "Calibrator.standardizedGenotype_fourth_moment",
     "Calibrator.standardizedSquare_values"
    ]
   },
@@ -47145,6 +47251,14 @@
       "0 < h.altFreq",
       "h.altFreq < 1"
      ],
+     "Calibrator.standardizedGenotype_fourth_moment": [
+      "0 < h.altFreq",
+      "h.altFreq < 1"
+     ],
+     "Calibrator.standardizedSquare_second_cumulant": [
+      "0 < h.altFreq",
+      "h.altFreq < 1"
+     ],
      "Calibrator.hwe_variance_eq": [],
      "Calibrator.genotypeProb_values": [],
      "Calibrator.HardyWeinbergModel.refFreq_nonneg": [],
@@ -47170,8 +47284,10 @@
     "Calibrator.hwe_variance_eq",
     "Calibrator.mellinDrift_uses_ploidy",
     "Calibrator.standardizedGenotype_expectation_zero",
+    "Calibrator.standardizedGenotype_fourth_moment",
     "Calibrator.standardizedGenotype_second_moment_one",
-    "Calibrator.standardizedGenotype_symmetric_iff"
+    "Calibrator.standardizedGenotype_symmetric_iff",
+    "Calibrator.standardizedSquare_second_cumulant"
    ]
   },
   {
@@ -47251,6 +47367,14 @@
       "0 < h.altFreq",
       "h.altFreq < 1"
      ],
+     "Calibrator.standardizedGenotype_fourth_moment": [
+      "0 < h.altFreq",
+      "h.altFreq < 1"
+     ],
+     "Calibrator.standardizedSquare_second_cumulant": [
+      "0 < h.altFreq",
+      "h.altFreq < 1"
+     ],
      "Calibrator.genotypeProb_values": [],
      "Calibrator.HardyWeinbergModel.genotypeProb_nonneg": [],
      "Calibrator.HardyWeinbergModel.genotypeProb_sum": [],
@@ -47270,8 +47394,10 @@
     "Calibrator.hwe_symmetricCoding_iff_half",
     "Calibrator.no_signSymmetric_nondegenerate_locus",
     "Calibrator.standardizedGenotype_expectation_zero",
+    "Calibrator.standardizedGenotype_fourth_moment",
     "Calibrator.standardizedGenotype_second_moment_one",
-    "Calibrator.standardizedGenotype_symmetric_iff"
+    "Calibrator.standardizedGenotype_symmetric_iff",
+    "Calibrator.standardizedSquare_second_cumulant"
    ]
   },
   {
@@ -47383,6 +47509,10 @@
       "0 < h.altFreq",
       "h.altFreq < 1"
      ],
+     "Calibrator.standardizedGenotype_fourth_moment": [
+      "0 < h.altFreq",
+      "h.altFreq < 1"
+     ],
      "Calibrator.hwe_centered": [],
      "Calibrator.HardyWeinbergModel.genotypeVariance_eq": []
     }
@@ -47397,6 +47527,7 @@
     "Calibrator.hwe_symmetricCoding_iff_half",
     "Calibrator.no_signSymmetric_nondegenerate_locus",
     "Calibrator.standardizedGenotype_expectation_zero",
+    "Calibrator.standardizedGenotype_fourth_moment",
     "Calibrator.standardizedGenotype_second_moment_one",
     "Calibrator.standardizedGenotype_symmetric_iff",
     "Calibrator.standardizedSquare_eq_over_hweGenotypeVariance"
@@ -47446,6 +47577,14 @@
       "0 < h.altFreq",
       "h.altFreq < 1"
      ],
+     "Calibrator.standardizedGenotype_fourth_moment": [
+      "0 < h.altFreq",
+      "h.altFreq < 1"
+     ],
+     "Calibrator.standardizedSquare_second_cumulant": [
+      "0 < h.altFreq",
+      "h.altFreq < 1"
+     ],
      "Calibrator.hwe_variance_eq": [],
      "Calibrator.HardyWeinbergModel.genotypeVariance_eq": [],
      "Calibrator.HWEScoreModel.scoreVariance_nonneg": []
@@ -47457,8 +47596,10 @@
     "Calibrator.hwe_variance_eq",
     "Calibrator.mellinDrift_uses_ploidy",
     "Calibrator.standardizedGenotype_expectation_zero",
+    "Calibrator.standardizedGenotype_fourth_moment",
     "Calibrator.standardizedGenotype_second_moment_one",
-    "Calibrator.standardizedGenotype_symmetric_iff"
+    "Calibrator.standardizedGenotype_symmetric_iff",
+    "Calibrator.standardizedSquare_second_cumulant"
    ]
   },
   {
@@ -60674,7 +60815,7 @@
    "kind": "structure",
    "noncomputable": false,
    "file": "Calibrator/EpistaticChaos.lean",
-   "line": 772,
+   "line": 839,
    "signature": "(n : ℕ) (ι : Type*) where model : Fin n → HardyWeinbergModel locusSet : ι → Finset (Fin n) coefficient : ι → ℝ jointGenotypeProb : (Fin n → DiploidGenotype) → ℝ",
    "args": [
     {
@@ -60729,7 +60870,7 @@
    "kind": "structure",
    "noncomputable": false,
    "file": "Calibrator/EpistaticChaos.lean",
-   "line": 1020,
+   "line": 1087,
    "signature": "(n : ℕ) (ι : Type*) (Limit : Type*) where isAdmissible : GenotypeDesign n ι → Prop limitLaw : GenotypeDesign n ι → Limit IsCenteredGaussian : Limit → ℝ → Prop fourthCumulant : Limit → ℝ weakDistance : Limit → Limit → ℝ InMomentBody : Limit → Prop disjoint_segment : ∀ design : GenotypeDesign n ι, isAdmissible design → design.Polymorphic → design.InLinkageEquilibrium → design.VariantDisjoint → ∃ s2 : ℝ, 0 ≤ s2 ∧ s2 ≤ 1 ∧ IsCenteredGaussian (limitLaw design) s2 gaussian_fourthCumulant : ∀ (L : Limit) (s2 : ℝ), IsCenteredGaussian L s2 → fourthCumulant L = 0 maximal_spectrum : ∀ model : Fin n → HardyWeinbergModel, (∀ i : Fin n, 0 < (model i).altFreq ∧ (model i).altFreq < 1) → ∀ target : Limit, InMomentBody target → ∀ ε : ℝ, 0 < ε → ∃ design : GenotypeDesign n ι, design.model = model ∧ design.InLinkageEquilibrium ∧ isAdmissible design ∧ weakDistance (limitLaw design) target < ε twoPool_witness : ∀ (design : GenotypeDesign n ι) (poolOne poolTwo : Finset (Fin n)), design.IsTwoPoolInteraction poolOne poolTwo → design.Polymorphic → design.InLinkageEquilibrium → fourthCumulant (limitLaw design) = 6",
    "args": [
     {
@@ -60816,7 +60957,7 @@
    "kind": "structure",
    "noncomputable": false,
    "file": "Calibrator/EpistaticChaos.lean",
-   "line": 1562,
+   "line": 1629,
    "signature": "(nx : ℕ) (ιx : Type*) [Fintype ιx] [DecidableEq ιx] (Limit : Type*) where isAdmissible : GenotypeDesign nx ιx → Prop limitLaw : GenotypeDesign nx ιx → Limit temperingRate : ℕ → ℝ cycles_determine : ∀ (rate : ℝ) (designOne designTwo : GenotypeDesign nx ιx), isAdmissible designOne → isAdmissible designTwo → designOne.Tempered rate → designTwo.Tempered rate → (∀ p : ℕ, designOne.cycleDensity p = designTwo.cycleDensity p) → limitLaw designOne = limitLaw designTwo tempered_of_boundedHub : ∀ (design : GenotypeDesign nx ιx) (bound : ℕ), isAdmissible design → design.BoundedHubRecurrence bound → design.Tempered (temperingRate bound) divergence_phase : ∀ (rate : ℝ) (truncation : ℕ), ∃ designOne designTwo : GenotypeDesign nx ιx, isAdmissible designOne ∧ isAdmissible designTwo ∧ ¬ designOne.Tempered rate ∧ (∀ p : ℕ, p ≤ truncation → designOne.cycleDensity p = designTwo.cycleDensity p) ∧ limitLaw designOne ≠ limitLaw designTwo",
    "args": [
     {

@@ -9,28 +9,9 @@
    "p\u2082"
   ],
   "ret": "\u211d",
-  "covered": true,
-  "demonstration": "mutant-rejected",
-  "falsifiability_evidence": [
-   {
-    "mutation": "negate",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "swap-args(\u03b3,p\u2081)",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "swap-args(\u03b3,p\u2082)",
-    "rejected_by": [
-     "range"
-    ]
-   }
-  ],
+  "covered": false,
+  "demonstration": null,
+  "falsifiability_evidence": null,
   "checks": [
    {
     "family": "range",
@@ -61,7 +42,22 @@
     "why": "`p\u2082` reaches 1e-06 and 0.999999 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
    }
   ],
-  "findings": []
+  "findings": [],
+  "uncovered_reason": {
+   "stage": "falsifiability",
+   "detail": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered",
+   "survived": [
+    "const-off-by-one",
+    "drop-a-one-minus",
+    "negate",
+    "swap-times-div",
+    "shift-by-half",
+    "scale-by-three",
+    "swap-args(\u03b3,p\u2081)",
+    "swap-args(\u03b3,p\u2082)",
+    "swap-args(p\u2081,p\u2082)"
+   ]
+  }
  },
  "AncestrySpecificArchitecture.driftVariance": {
   "module": "AncestrySpecificArchitecture",
@@ -365,7 +361,7 @@
    {
     "family": "range",
     "kind": "range",
-    "verdict": "escape-unguarded",
+    "verdict": "escape-outside-theorem",
     "required_range": [
      0.0,
      1.0
@@ -377,7 +373,7 @@
    {
     "family": "range",
     "kind": "range",
-    "verdict": "escape-unguarded",
+    "verdict": "escape-outside-theorem",
     "required_range": [
      0.0,
      1.0
@@ -432,16 +428,9 @@
    "p"
   ],
   "ret": "\u211d",
-  "covered": true,
-  "demonstration": "mutant-rejected",
-  "falsifiability_evidence": [
-   {
-    "mutation": "negate",
-    "rejected_by": [
-     "range"
-    ]
-   }
-  ],
+  "covered": false,
+  "demonstration": null,
+  "falsifiability_evidence": null,
   "checks": [
    {
     "family": "range",
@@ -460,7 +449,19 @@
     "why": "`p` reaches 1e-06 and 0.999999 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
    }
   ],
-  "findings": []
+  "findings": [],
+  "uncovered_reason": {
+   "stage": "falsifiability",
+   "detail": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered",
+   "survived": [
+    "const-off-by-one",
+    "drop-a-one-minus",
+    "negate",
+    "swap-times-div",
+    "shift-by-half",
+    "scale-by-three"
+   ]
+  }
  },
  "AncestrySpecificPower.effectiveFisherInformation": {
   "module": "AncestrySpecificPower",
@@ -678,15 +679,15 @@
     ]
    },
    {
-    "mutation": "negate",
+    "mutation": "swap-times-div",
     "rejected_by": [
      "range"
     ]
    },
    {
-    "mutation": "swap-times-div",
+    "mutation": "shift-by-half",
     "rejected_by": [
-     "range"
+     "limit"
     ]
    }
   ],
@@ -1264,7 +1265,7 @@
    {
     "family": "range",
     "kind": "range",
-    "verdict": "escape-unguarded",
+    "verdict": "escape-outside-theorem",
     "required_range": [
      0.0,
      1.0
@@ -1276,7 +1277,7 @@
    {
     "family": "range",
     "kind": "range",
-    "verdict": "escape-unguarded",
+    "verdict": "escape-outside-theorem",
     "required_range": [
      0.0,
      1.0
@@ -6995,7 +6996,7 @@
    {
     "family": "range",
     "kind": "range",
-    "verdict": "escape-unguarded",
+    "verdict": "escape-outside-theorem",
     "required_range": [
      0.0,
      Infinity
@@ -7007,7 +7008,7 @@
    {
     "family": "range",
     "kind": "range",
-    "verdict": "escape-unguarded",
+    "verdict": "escape-outside-theorem",
     "required_range": [
      0.0,
      Infinity
@@ -8569,7 +8570,7 @@
    {
     "family": "range",
     "kind": "range",
-    "verdict": "escape-unguarded",
+    "verdict": "escape-outside-theorem",
     "required_range": [
      0.0,
      1.0
@@ -8581,7 +8582,7 @@
    {
     "family": "range",
     "kind": "range",
-    "verdict": "escape-unguarded",
+    "verdict": "escape-outside-theorem",
     "required_range": [
      0.0,
      1.0
@@ -9006,18 +9007,6 @@
   "demonstration": "mutant-rejected",
   "falsifiability_evidence": [
    {
-    "mutation": "drop-a-one-minus",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "negate",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
     "mutation": "swap-times-div",
     "rejected_by": [
      "range"
@@ -9234,28 +9223,9 @@
    "c"
   ],
   "ret": "\u211d",
-  "covered": true,
-  "demonstration": "mutant-rejected",
-  "falsifiability_evidence": [
-   {
-    "mutation": "drop-a-one-minus",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "negate",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "swap-times-div",
-    "rejected_by": [
-     "range"
-    ]
-   }
-  ],
+  "covered": false,
+  "demonstration": null,
+  "falsifiability_evidence": null,
   "checks": [
    {
     "family": "range",
@@ -9280,7 +9250,20 @@
     "why": "`c` reaches 1e-08 and 0.5 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
    }
   ],
-  "findings": []
+  "findings": [],
+  "uncovered_reason": {
+   "stage": "falsifiability",
+   "detail": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered",
+   "survived": [
+    "const-off-by-one",
+    "drop-a-one-minus",
+    "negate",
+    "swap-times-div",
+    "shift-by-half",
+    "scale-by-three",
+    "swap-args(Ne,c)"
+   ]
+  }
  },
  "LDDecayTheory.driftLDEquilibrium": {
   "module": "LDDecayTheory",
@@ -9573,12 +9556,6 @@
   "demonstration": "mutant-rejected",
   "falsifiability_evidence": [
    {
-    "mutation": "negate",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
     "mutation": "swap-times-div",
     "rejected_by": [
      "range"
@@ -9586,6 +9563,12 @@
    },
    {
     "mutation": "shift-by-half",
+    "rejected_by": [
+     "range"
+    ]
+   },
+   {
+    "mutation": "scale-by-three",
     "rejected_by": [
      "range"
     ]
@@ -10363,7 +10346,7 @@
    {
     "family": "range",
     "kind": "range",
-    "verdict": "escape",
+    "verdict": "escape-outside-theorem",
     "required_range": [
      0.0,
      1.0
@@ -10387,7 +10370,7 @@
    {
     "family": "range",
     "kind": "range",
-    "verdict": "escape",
+    "verdict": "escape-outside-theorem",
     "required_range": [
      0.0,
      1.0
@@ -10592,22 +10575,9 @@
    "\u03c1"
   ],
   "ret": "\u211d",
-  "covered": true,
-  "demonstration": "mutant-rejected",
-  "falsifiability_evidence": [
-   {
-    "mutation": "drop-a-one-minus",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "negate",
-    "rejected_by": [
-     "range"
-    ]
-   }
-  ],
+  "covered": false,
+  "demonstration": null,
+  "falsifiability_evidence": null,
   "checks": [
    {
     "family": "range",
@@ -10632,7 +10602,19 @@
     "why": "`\u03c1` reaches -1 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
    }
   ],
-  "findings": []
+  "findings": [],
+  "uncovered_reason": {
+   "stage": "falsifiability",
+   "detail": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered",
+   "survived": [
+    "const-off-by-one",
+    "drop-a-one-minus",
+    "negate",
+    "swap-times-div",
+    "shift-by-half",
+    "scale-by-three"
+   ]
+  }
  },
  "MultiAncestryTheory.portabilityGap": {
   "module": "MultiAncestryTheory",
@@ -10652,7 +10634,7 @@
    {
     "family": "range",
     "kind": "range",
-    "verdict": "escape",
+    "verdict": "escape-outside-theorem",
     "required_range": [
      0.0,
      1.0
@@ -10676,7 +10658,7 @@
    {
     "family": "range",
     "kind": "range",
-    "verdict": "escape",
+    "verdict": "escape-outside-theorem",
     "required_range": [
      0.0,
      1.0
@@ -12512,7 +12494,7 @@
    {
     "family": "range",
     "kind": "range",
-    "verdict": "escape-unguarded",
+    "verdict": "escape-outside-theorem",
     "required_range": [
      0.0,
      1.0
@@ -12524,7 +12506,7 @@
    {
     "family": "range",
     "kind": "range",
-    "verdict": "escape-unguarded",
+    "verdict": "escape-outside-theorem",
     "required_range": [
      0.0,
      1.0
@@ -13883,7 +13865,7 @@
    {
     "family": "range",
     "kind": "range",
-    "verdict": "escape",
+    "verdict": "escape-outside-theorem",
     "required_range": [
      0.0,
      1.0
@@ -13907,7 +13889,7 @@
    {
     "family": "range",
     "kind": "range",
-    "verdict": "escape",
+    "verdict": "escape-outside-theorem",
     "required_range": [
      0.0,
      1.0
@@ -14037,7 +14019,7 @@
    {
     "family": "range",
     "kind": "range",
-    "verdict": "escape",
+    "verdict": "escape-outside-theorem",
     "required_range": [
      0.0,
      1.0
@@ -14055,7 +14037,7 @@
    {
     "family": "range",
     "kind": "range",
-    "verdict": "escape",
+    "verdict": "escape-outside-theorem",
     "required_range": [
      0.0,
      1.0
@@ -14133,16 +14115,9 @@
    "fst"
   ],
   "ret": "\u211d",
-  "covered": true,
-  "demonstration": "mutant-rejected",
-  "falsifiability_evidence": [
-   {
-    "mutation": "negate",
-    "rejected_by": [
-     "range"
-    ]
-   }
-  ],
+  "covered": false,
+  "demonstration": null,
+  "falsifiability_evidence": null,
   "checks": [
    {
     "family": "range",
@@ -14167,7 +14142,18 @@
     "why": "`fst` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
    }
   ],
-  "findings": []
+  "findings": [],
+  "uncovered_reason": {
+   "stage": "falsifiability",
+   "detail": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered",
+   "survived": [
+    "negate",
+    "swap-times-div",
+    "shift-by-half",
+    "scale-by-three",
+    "swap-args(V_A,fst)"
+   ]
+  }
  },
  "PolygenicAdaptation.pgsDriftVarianceFromLoci": {
   "module": "PolygenicAdaptation",
@@ -14350,7 +14336,7 @@
    {
     "family": "range",
     "kind": "range",
-    "verdict": "escape-unguarded",
+    "verdict": "escape-outside-theorem",
     "required_range": [
      -1.0,
      1.0
@@ -14362,7 +14348,7 @@
    {
     "family": "range",
     "kind": "range",
-    "verdict": "escape-unguarded",
+    "verdict": "escape-outside-theorem",
     "required_range": [
      -1.0,
      1.0
@@ -15141,7 +15127,6 @@
    {
     "mutation": "swap-plus-minus",
     "rejected_by": [
-     "range",
      "symmetry"
     ]
    }
@@ -15186,28 +15171,9 @@
    "\u03b8"
   ],
   "ret": "\u211d",
-  "covered": true,
-  "demonstration": "mutant-rejected",
-  "falsifiability_evidence": [
-   {
-    "mutation": "negate",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "swap-plus-minus",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "scale-by-three",
-    "rejected_by": [
-     "range"
-    ]
-   }
-  ],
+  "covered": false,
+  "demonstration": null,
+  "falsifiability_evidence": null,
   "checks": [
    {
     "family": "range",
@@ -15226,7 +15192,17 @@
     "why": "`\u03b8` reaches 1e-06 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
    }
   ],
-  "findings": []
+  "findings": [],
+  "uncovered_reason": {
+   "stage": "falsifiability",
+   "detail": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered",
+   "survived": [
+    "negate",
+    "swap-plus-minus",
+    "shift-by-half",
+    "scale-by-three"
+   ]
+  }
  },
  "PopulationGeneticsFoundations.coalFst": {
   "module": "PopulationGeneticsFoundations",
@@ -15420,22 +15396,9 @@
    "m"
   ],
   "ret": "\u211d",
-  "covered": true,
-  "demonstration": "mutant-rejected",
-  "falsifiability_evidence": [
-   {
-    "mutation": "negate",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "drop-max-guard",
-    "rejected_by": [
-     "range"
-    ]
-   }
-  ],
+  "covered": false,
+  "demonstration": null,
+  "falsifiability_evidence": null,
   "checks": [
    {
     "family": "range",
@@ -15460,7 +15423,19 @@
     "why": "`m` reaches 1e-09 and 0.5 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
    }
   ],
-  "findings": []
+  "findings": [],
+  "uncovered_reason": {
+   "stage": "falsifiability",
+   "detail": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered",
+   "survived": [
+    "negate",
+    "swap-times-div",
+    "drop-max-guard",
+    "shift-by-half",
+    "scale-by-three",
+    "swap-args(s,m)"
+   ]
+  }
  },
  "PopulationGeneticsFoundations.selectionMigrationEquilibriumMigrationFirst": {
   "module": "PopulationGeneticsFoundations",
@@ -15640,28 +15615,9 @@
    "\u03b8"
   ],
   "ret": "\u211d",
-  "covered": true,
-  "demonstration": "mutant-rejected",
-  "falsifiability_evidence": [
-   {
-    "mutation": "negate",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "swap-plus-minus",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "shift-by-half",
-    "rejected_by": [
-     "range"
-    ]
-   }
-  ],
+  "covered": false,
+  "demonstration": null,
+  "falsifiability_evidence": null,
   "checks": [
    {
     "family": "range",
@@ -15680,7 +15636,17 @@
     "why": "`\u03b8` reaches 1e-06 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
    }
   ],
-  "findings": []
+  "findings": [],
+  "uncovered_reason": {
+   "stage": "falsifiability",
+   "detail": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered",
+   "survived": [
+    "negate",
+    "swap-plus-minus",
+    "shift-by-half",
+    "scale-by-three"
+   ]
+  }
  },
  "PopulationGeneticsFoundations.fstMutationDriftTransient": {
   "module": "PopulationGeneticsFoundations",
@@ -15705,8 +15671,7 @@
    {
     "mutation": "negate",
     "rejected_by": [
-     "limit",
-     "range"
+     "limit"
     ]
    },
    {
@@ -15812,18 +15777,6 @@
     "rejected_by": [
      "range"
     ]
-   },
-   {
-    "mutation": "shift-by-half",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "scale-by-three",
-    "rejected_by": [
-     "range"
-    ]
    }
   ],
   "checks": [
@@ -15867,15 +15820,13 @@
    {
     "mutation": "negate",
     "rejected_by": [
-     "limit",
-     "range"
+     "limit"
     ]
    },
    {
     "mutation": "swap-plus-minus",
     "rejected_by": [
-     "limit",
-     "range"
+     "limit"
     ]
    },
    {
@@ -16051,8 +16002,7 @@
    {
     "mutation": "negate",
     "rejected_by": [
-     "monotone",
-     "range"
+     "monotone"
     ]
    },
    {
@@ -16277,22 +16227,19 @@
    {
     "mutation": "drop-a-one-minus",
     "rejected_by": [
-     "limit",
-     "range"
+     "limit"
     ]
    },
    {
     "mutation": "negate",
     "rejected_by": [
-     "limit",
-     "range"
+     "limit"
     ]
    },
    {
     "mutation": "swap-times-div",
     "rejected_by": [
-     "limit",
-     "range"
+     "limit"
     ]
    }
   ],
@@ -16531,7 +16478,8 @@
    {
     "mutation": "drop-a-one-minus",
     "rejected_by": [
-     "limit"
+     "limit",
+     "range"
     ]
    },
    {
@@ -16543,7 +16491,8 @@
    {
     "mutation": "swap-times-div",
     "rejected_by": [
-     "limit"
+     "limit",
+     "range"
     ]
    }
   ],
@@ -16594,28 +16543,9 @@
    "fst"
   ],
   "ret": "\u211d",
-  "covered": true,
-  "demonstration": "mutant-rejected",
-  "falsifiability_evidence": [
-   {
-    "mutation": "drop-a-one-minus",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "negate",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "swap-times-div",
-    "rejected_by": [
-     "range"
-    ]
-   }
-  ],
+  "covered": false,
+  "demonstration": null,
+  "falsifiability_evidence": null,
   "checks": [
    {
     "family": "range",
@@ -16640,7 +16570,21 @@
     "why": "`fst` reaches 0 and 1 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
    }
   ],
-  "findings": []
+  "findings": [],
+  "uncovered_reason": {
+   "stage": "falsifiability",
+   "detail": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered",
+   "survived": [
+    "const-off-by-one",
+    "drop-a-one-minus",
+    "negate",
+    "swap-times-div",
+    "drop-max-guard",
+    "shift-by-half",
+    "scale-by-three",
+    "swap-args(r2_0,fst)"
+   ]
+  }
  },
  "PortabilityBounds.stabilizingPortability": {
   "module": "PortabilityBounds",
@@ -21237,16 +21181,14 @@
     "mutation": "negate",
     "rejected_by": [
      "limit",
-     "monotone",
-     "range"
+     "monotone"
     ]
    },
    {
     "mutation": "swap-plus-minus",
     "rejected_by": [
      "limit",
-     "monotone",
-     "range"
+     "monotone"
     ]
    },
    {
@@ -21648,16 +21590,9 @@
    "M"
   ],
   "ret": "\u211d",
-  "covered": true,
-  "demonstration": "mutant-rejected",
-  "falsifiability_evidence": [
-   {
-    "mutation": "negate",
-    "rejected_by": [
-     "range"
-    ]
-   }
-  ],
+  "covered": false,
+  "demonstration": null,
+  "falsifiability_evidence": null,
   "checks": [
    {
     "family": "range",
@@ -21676,7 +21611,17 @@
     "why": "`M` reaches 1e-09 and 0.5 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
    }
   ],
-  "findings": []
+  "findings": [],
+  "uncovered_reason": {
+   "stage": "falsifiability",
+   "detail": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered",
+   "survived": [
+    "negate",
+    "swap-plus-minus",
+    "shift-by-half",
+    "scale-by-three"
+   ]
+  }
  },
  "PortabilityDrift.signalRetentionMigrationDrift": {
   "module": "PortabilityDrift",
@@ -21697,7 +21642,7 @@
    {
     "family": "range",
     "kind": "range",
-    "verdict": "escape",
+    "verdict": "escape-outside-theorem",
     "required_range": [
      0.0,
      1.0
@@ -21727,7 +21672,7 @@
    {
     "family": "range",
     "kind": "range",
-    "verdict": "escape",
+    "verdict": "escape-outside-theorem",
     "required_range": [
      0.0,
      1.0
@@ -21951,16 +21896,14 @@
     "mutation": "negate",
     "rejected_by": [
      "limit",
-     "monotone",
-     "range"
+     "monotone"
     ]
    },
    {
     "mutation": "swap-plus-minus",
     "rejected_by": [
      "limit",
-     "monotone",
-     "range"
+     "monotone"
     ]
    },
    {
@@ -22072,22 +22015,9 @@
    "p"
   ],
   "ret": "\u211d",
-  "covered": true,
-  "demonstration": "mutant-rejected",
-  "falsifiability_evidence": [
-   {
-    "mutation": "negate",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "swap-args(beta,p)",
-    "rejected_by": [
-     "range"
-    ]
-   }
-  ],
+  "covered": false,
+  "demonstration": null,
+  "falsifiability_evidence": null,
   "checks": [
    {
     "family": "range",
@@ -22118,7 +22048,20 @@
     "why": "`p` reaches 1e-06 and 0.999999 inside the admissible box, so the value there must agree with the limit from inside; a jump means a Lean junk value is being returned as if it were the quantity"
    }
   ],
-  "findings": []
+  "findings": [],
+  "uncovered_reason": {
+   "stage": "falsifiability",
+   "detail": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered",
+   "survived": [
+    "const-off-by-one",
+    "drop-a-one-minus",
+    "negate",
+    "swap-times-div",
+    "shift-by-half",
+    "scale-by-three",
+    "swap-args(beta,p)"
+   ]
+  }
  },
  "PowerAnalysis.powerAtThreshold": {
   "module": "PowerAnalysis",
@@ -24020,18 +23963,6 @@
   "falsifiability_evidence": [
    {
     "mutation": "drop-a-one-minus",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "swap-times-div",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "shift-by-half",
     "rejected_by": [
      "range"
     ]

@@ -8,41 +8,22 @@
    "range"
   ],
   "n_mutants": 9,
-  "covered": true,
-  "demonstration": "mutant-rejected",
-  "killed": [
-   {
-    "mutation": "negate",
-    "body": "-(\u03b3 ^ 2 * (2 * p\u2081 * (1 - p\u2081)) * (2 * p\u2082 * (1 - p\u2082)))",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "swap-args(\u03b3,p\u2081)",
-    "body": "p\u2081 ^ 2 * (2 * \u03b3 * (1 - \u03b3)) * (2 * p\u2082 * (1 - p\u2082))",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "swap-args(\u03b3,p\u2082)",
-    "body": "p\u2082 ^ 2 * (2 * p\u2081 * (1 - p\u2081)) * (2 * \u03b3 * (1 - \u03b3))",
-    "rejected_by": [
-     "range"
-    ]
-   }
-  ],
-  "n_killed": 3,
+  "covered": false,
+  "demonstration": null,
+  "killed": [],
+  "n_killed": 0,
   "survived": [
    "const-off-by-one",
    "drop-a-one-minus",
+   "negate",
    "swap-times-div",
    "shift-by-half",
    "scale-by-three",
+   "swap-args(\u03b3,p\u2081)",
+   "swap-args(\u03b3,p\u2082)",
    "swap-args(p\u2081,p\u2082)"
   ],
-  "reason": null
+  "reason": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered"
  },
  "AncestrySpecificArchitecture.driftVariance": {
   "name": "driftVariance",
@@ -311,26 +292,19 @@
    "range"
   ],
   "n_mutants": 6,
-  "covered": true,
-  "demonstration": "mutant-rejected",
-  "killed": [
-   {
-    "mutation": "negate",
-    "body": "-(2 * p * (1 - p))",
-    "rejected_by": [
-     "range"
-    ]
-   }
-  ],
-  "n_killed": 1,
+  "covered": false,
+  "demonstration": null,
+  "killed": [],
+  "n_killed": 0,
   "survived": [
    "const-off-by-one",
    "drop-a-one-minus",
+   "negate",
    "swap-times-div",
    "shift-by-half",
    "scale-by-three"
   ],
-  "reason": null
+  "reason": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered"
  },
  "AncestrySpecificPower.hweHeterozygosity": {
   "name": "hweHeterozygosity",
@@ -354,13 +328,6 @@
     ]
    },
    {
-    "mutation": "negate",
-    "body": "-(2 * p * (1 - p))",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
     "mutation": "swap-times-div",
     "body": "2 / p * (1 - p)",
     "rejected_by": [
@@ -373,11 +340,19 @@
     "rejected_by": [
      "limit"
     ]
+   },
+   {
+    "mutation": "scale-by-three",
+    "body": "3 * (2 * p * (1 - p))",
+    "rejected_by": [
+     "range"
+    ]
    }
   ],
-  "n_killed": 5,
+  "n_killed": 4,
   "survived": [
-   "const-off-by-one"
+   "const-off-by-one",
+   "negate"
   ],
   "reason": null
  },
@@ -3220,43 +3195,20 @@
    "range"
   ],
   "n_mutants": 7,
-  "covered": true,
-  "demonstration": "mutant-rejected",
-  "killed": [
-   {
-    "mutation": "drop-a-one-minus",
-    "body": "(1 + c) ^ 2 * (1 - 1 / (2 * Ne))",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "negate",
-    "body": "-((1 - c) ^ 2 * (1 - 1 / (2 * Ne)))",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "swap-times-div",
-    "body": "(1 - c) ^ 2 / (1 - 1 / (2 * Ne))",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "shift-by-half",
-    "body": "((1 - c) ^ 2 * (1 - 1 / (2 * Ne))) + 0.5",
-    "rejected_by": [
-     "range"
-    ]
-   }
-  ],
-  "n_killed": 6,
+  "covered": false,
+  "demonstration": null,
+  "killed": [],
+  "n_killed": 0,
   "survived": [
-   "const-off-by-one"
+   "const-off-by-one",
+   "drop-a-one-minus",
+   "negate",
+   "swap-times-div",
+   "shift-by-half",
+   "scale-by-three",
+   "swap-args(Ne,c)"
   ],
-  "reason": null
+  "reason": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered"
  },
  "LDDecayTheory.driftLDStep": {
   "name": "driftLDStep",
@@ -3409,37 +3361,21 @@
   "demonstration": "mutant-rejected",
   "killed": [
    {
-    "mutation": "drop-a-one-minus",
-    "body": "(1 + r) * (1 - 1 / (2 * Ne))",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "negate",
-    "body": "-((1 - r) * (1 - 1 / (2 * Ne)))",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
     "mutation": "swap-times-div",
     "body": "(1 - r) / (1 - 1 / (2 * Ne))",
     "rejected_by": [
      "range"
     ]
-   },
-   {
-    "mutation": "shift-by-half",
-    "body": "((1 - r) * (1 - 1 / (2 * Ne))) + 0.5",
-    "rejected_by": [
-     "range"
-    ]
    }
   ],
-  "n_killed": 6,
+  "n_killed": 1,
   "survived": [
-   "const-off-by-one"
+   "const-off-by-one",
+   "drop-a-one-minus",
+   "negate",
+   "shift-by-half",
+   "scale-by-three",
+   "swap-args(r,Ne)"
   ],
   "reason": null
  },
@@ -3552,13 +3488,6 @@
   "demonstration": "mutant-rejected",
   "killed": [
    {
-    "mutation": "negate",
-    "body": "-(r2_initial * Real.exp (-lambda_total * t))",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
     "mutation": "swap-times-div",
     "body": "r2_initial / Real.exp (-lambda_total * t)",
     "rejected_by": [
@@ -3578,10 +3507,18 @@
     "rejected_by": [
      "range"
     ]
+   },
+   {
+    "mutation": "swap-args(r2_initial,t)",
+    "body": "t * Real.exp (-lambda_total * r2_initial)",
+    "rejected_by": [
+     "range"
+    ]
    }
   ],
-  "n_killed": 5,
+  "n_killed": 4,
   "survived": [
+   "negate",
    "swap-args(r2_initial,lambda_total)",
    "swap-args(lambda_total,t)"
   ],
@@ -3842,32 +3779,19 @@
    "range"
   ],
   "n_mutants": 6,
-  "covered": true,
-  "demonstration": "mutant-rejected",
-  "killed": [
-   {
-    "mutation": "drop-a-one-minus",
-    "body": "-(m : \u211d) / 2 * Real.log (1 + \u03c1 ^ 2)",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "negate",
-    "body": "-(-(m : \u211d) / 2 * Real.log (1 - \u03c1 ^ 2))",
-    "rejected_by": [
-     "range"
-    ]
-   }
-  ],
-  "n_killed": 2,
+  "covered": false,
+  "demonstration": null,
+  "killed": [],
+  "n_killed": 0,
   "survived": [
    "const-off-by-one",
+   "drop-a-one-minus",
+   "negate",
    "swap-times-div",
    "shift-by-half",
    "scale-by-three"
   ],
-  "reason": null
+  "reason": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered"
  },
  "MultiAncestryTheory.portabilityGap": {
   "name": "portabilityGap",
@@ -4200,21 +4124,15 @@
     "rejected_by": [
      "range"
     ]
-   },
-   {
-    "mutation": "swap-args(Ne,s_correction)",
-    "body": "(1 - 1 / (2 * s_correction) + Ne) ^ t",
-    "rejected_by": [
-     "range"
-    ]
    }
   ],
-  "n_killed": 4,
+  "n_killed": 3,
   "survived": [
    "const-off-by-one",
    "drop-a-one-minus",
    "shift-by-half",
-   "scale-by-three"
+   "scale-by-three",
+   "swap-args(Ne,s_correction)"
   ],
   "reason": null
  },
@@ -4308,25 +4226,18 @@
    "range"
   ],
   "n_mutants": 5,
-  "covered": true,
-  "demonstration": "mutant-rejected",
-  "killed": [
-   {
-    "mutation": "negate",
-    "body": "-(fst * V_A)",
-    "rejected_by": [
-     "range"
-    ]
-   }
-  ],
-  "n_killed": 1,
+  "covered": false,
+  "demonstration": null,
+  "killed": [],
+  "n_killed": 0,
   "survived": [
+   "negate",
    "swap-times-div",
    "shift-by-half",
    "scale-by-three",
    "swap-args(V_A,fst)"
   ],
-  "reason": null
+  "reason": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered"
  },
  "PolygenicAdaptation.qst": {
   "name": "qst",
@@ -4744,8 +4655,7 @@
     "mutation": "negate",
     "body": "-(1 - Real.exp (-(d / L)))",
     "rejected_by": [
-     "monotone",
-     "range"
+     "monotone"
     ]
    },
    {
@@ -4798,36 +4708,17 @@
    "range"
   ],
   "n_mutants": 4,
-  "covered": true,
-  "demonstration": "mutant-rejected",
-  "killed": [
-   {
-    "mutation": "negate",
-    "body": "-(\u03b8 / (1 + \u03b8))",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "swap-plus-minus",
-    "body": "\u03b8 / (1 - \u03b8)",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "scale-by-three",
-    "body": "3 * (\u03b8 / (1 + \u03b8))",
-    "rejected_by": [
-     "range"
-    ]
-   }
-  ],
-  "n_killed": 3,
+  "covered": false,
+  "demonstration": null,
+  "killed": [],
+  "n_killed": 0,
   "survived": [
-   "shift-by-half"
+   "negate",
+   "swap-plus-minus",
+   "shift-by-half",
+   "scale-by-three"
   ],
-  "reason": null
+  "reason": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered"
  },
  "PopulationGeneticsFoundations.expectedNewMutations": {
   "name": "expectedNewMutations",
@@ -4868,38 +4759,35 @@
     "mutation": "drop-a-one-minus",
     "body": "1 + (1 - 1 / (2 * Ne)) ^ t",
     "rejected_by": [
-     "limit",
-     "range"
+     "limit"
     ]
    },
    {
     "mutation": "negate",
     "body": "-(1 - (1 - 1 / (2 * Ne)) ^ t)",
     "rejected_by": [
-     "limit",
-     "range"
+     "limit"
     ]
    },
    {
     "mutation": "swap-times-div",
     "body": "1 - (1 - 1 / (2 / Ne)) ^ t",
     "rejected_by": [
-     "limit",
-     "range"
+     "limit"
     ]
    },
    {
     "mutation": "shift-by-half",
     "body": "(1 - (1 - 1 / (2 * Ne)) ^ t) + 0.5",
     "rejected_by": [
-     "limit",
-     "range"
+     "limit"
     ]
    }
   ],
-  "n_killed": 5,
+  "n_killed": 4,
   "survived": [
-   "const-off-by-one"
+   "const-off-by-one",
+   "scale-by-three"
   ],
   "reason": null
  },
@@ -4979,41 +4867,17 @@
    "range"
   ],
   "n_mutants": 4,
-  "covered": true,
-  "demonstration": "mutant-rejected",
-  "killed": [
-   {
-    "mutation": "negate",
-    "body": "-(1 / (1 + \u03b8))",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "swap-plus-minus",
-    "body": "1 / (1 - \u03b8)",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "shift-by-half",
-    "body": "(1 / (1 + \u03b8)) + 0.5",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "scale-by-three",
-    "body": "3 * (1 / (1 + \u03b8))",
-    "rejected_by": [
-     "range"
-    ]
-   }
+  "covered": false,
+  "demonstration": null,
+  "killed": [],
+  "n_killed": 0,
+  "survived": [
+   "negate",
+   "swap-plus-minus",
+   "shift-by-half",
+   "scale-by-three"
   ],
-  "n_killed": 4,
-  "survived": [],
-  "reason": null
+  "reason": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered"
  },
  "PopulationGeneticsFoundations.fstMutationDriftTransient": {
   "name": "fstMutationDriftTransient",
@@ -5040,8 +4904,7 @@
     "mutation": "negate",
     "body": "-(fstMutationDriftEquilibrium \u03b8 * (1 - Real.exp (-(1 + \u03b8) * t / (2 * Ne))))",
     "rejected_by": [
-     "limit",
-     "range"
+     "limit"
     ]
    },
    {
@@ -5086,7 +4949,8 @@
     "mutation": "drop-a-one-minus",
     "body": "fstMutationDriftEquilibrium \u03b8 * (1 + hetDecayFactor Ne \u03b8 ^ t)",
     "rejected_by": [
-     "limit"
+     "limit",
+     "range"
     ]
    },
    {
@@ -5100,21 +4964,21 @@
     "mutation": "swap-times-div",
     "body": "fstMutationDriftEquilibrium \u03b8 / (1 - hetDecayFactor Ne \u03b8 ^ t)",
     "rejected_by": [
-     "limit"
+     "limit",
+     "range"
     ]
    },
    {
     "mutation": "shift-by-half",
     "body": "(fstMutationDriftEquilibrium \u03b8 * (1 - hetDecayFactor Ne \u03b8 ^ t)) + 0.5",
     "rejected_by": [
-     "limit"
+     "limit",
+     "range"
     ]
    }
   ],
-  "n_killed": 5,
-  "survived": [
-   "scale-by-three"
-  ],
+  "n_killed": 6,
+  "survived": [],
   "reason": null
  },
  "PopulationGeneticsFoundations.hetDecayFactor": {
@@ -5226,16 +5090,14 @@
     "mutation": "negate",
     "body": "-(1 / (1 + 4 * Ne * m))",
     "rejected_by": [
-     "limit",
-     "range"
+     "limit"
     ]
    },
    {
     "mutation": "swap-plus-minus",
     "body": "1 / (1 - 4 * Ne * m)",
     "rejected_by": [
-     "limit",
-     "range"
+     "limit"
     ]
    },
    {
@@ -5249,14 +5111,14 @@
     "mutation": "shift-by-half",
     "body": "(1 / (1 + 4 * Ne * m)) + 0.5",
     "rejected_by": [
-     "limit",
-     "range"
+     "limit"
     ]
    }
   ],
-  "n_killed": 5,
+  "n_killed": 4,
   "survived": [
    "const-off-by-one",
+   "scale-by-three",
    "swap-args(Ne,m)"
   ],
   "reason": null
@@ -5329,32 +5191,19 @@
    "range"
   ],
   "n_mutants": 6,
-  "covered": true,
-  "demonstration": "mutant-rejected",
-  "killed": [
-   {
-    "mutation": "negate",
-    "body": "-(max 0 ((s - m - m * s) / s))",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "drop-max-guard",
-    "body": "((s - m - m * s) / s)",
-    "rejected_by": [
-     "range"
-    ]
-   }
-  ],
-  "n_killed": 2,
+  "covered": false,
+  "demonstration": null,
+  "killed": [],
+  "n_killed": 0,
   "survived": [
+   "negate",
    "swap-times-div",
+   "drop-max-guard",
    "shift-by-half",
    "scale-by-three",
    "swap-args(s,m)"
   ],
-  "reason": null
+  "reason": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered"
  },
  "PopulationGeneticsFoundations.selectionMigrationEquilibriumMigrationFirst": {
   "name": "selectionMigrationEquilibriumMigrationFirst",
@@ -5411,24 +5260,12 @@
     "rejected_by": [
      "range"
     ]
-   },
-   {
-    "mutation": "shift-by-half",
-    "body": "(Real.exp (-(expectedNewMutations \u03b8 t))) + 0.5",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "scale-by-three",
-    "body": "3 * (Real.exp (-(expectedNewMutations \u03b8 t)))",
-    "rejected_by": [
-     "range"
-    ]
    }
   ],
-  "n_killed": 3,
+  "n_killed": 1,
   "survived": [
+   "shift-by-half",
+   "scale-by-three",
    "swap-args(\u03b8,t)"
   ],
   "reason": null
@@ -5457,7 +5294,6 @@
     "mutation": "swap-plus-minus",
     "body": "let p_bar := (p\u2081 - p\u2082) / 2\n(p\u2081 - p\u2082) ^ 2 / (4 * p_bar * (1 - p_bar))",
     "rejected_by": [
-     "range",
      "symmetry"
     ]
    }
@@ -5529,44 +5365,21 @@
    "range"
   ],
   "n_mutants": 8,
-  "covered": true,
-  "demonstration": "mutant-rejected",
-  "killed": [
-   {
-    "mutation": "drop-a-one-minus",
-    "body": "r2_0 * max 0 (1 + 2 * fst)",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "negate",
-    "body": "-(r2_0 * max 0 (1 - 2 * fst))",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "swap-times-div",
-    "body": "r2_0 / max 0 (1 - 2 * fst)",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "drop-max-guard",
-    "body": "r2_0 * (1 - 2 * fst)",
-    "rejected_by": [
-     "range"
-    ]
-   }
-  ],
-  "n_killed": 6,
+  "covered": false,
+  "demonstration": null,
+  "killed": [],
+  "n_killed": 0,
   "survived": [
    "const-off-by-one",
+   "drop-a-one-minus",
+   "negate",
+   "swap-times-div",
+   "drop-max-guard",
+   "shift-by-half",
+   "scale-by-three",
    "swap-args(r2_0,fst)"
   ],
-  "reason": null
+  "reason": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered"
  },
  "PortabilityBounds.stabilizingPortability": {
   "name": "stabilizingPortability",
@@ -6218,8 +6031,7 @@
     "body": "-(1 / (4 * Ne * m + 1))",
     "rejected_by": [
      "limit",
-     "monotone",
-     "range"
+     "monotone"
     ]
    },
    {
@@ -6227,8 +6039,7 @@
     "body": "1 / (4 * Ne * m - 1)",
     "rejected_by": [
      "limit",
-     "monotone",
-     "range"
+     "monotone"
     ]
    },
    {
@@ -6243,14 +6054,14 @@
     "mutation": "shift-by-half",
     "body": "(1 / (4 * Ne * m + 1)) + 0.5",
     "rejected_by": [
-     "limit",
-     "range"
+     "limit"
     ]
    }
   ],
-  "n_killed": 5,
+  "n_killed": 4,
   "survived": [
    "const-off-by-one",
+   "scale-by-three",
    "swap-args(Ne,m)"
   ],
   "reason": null
@@ -6300,8 +6111,7 @@
     "body": "-(1 / (1 + 4 * Ne * m))",
     "rejected_by": [
      "limit",
-     "monotone",
-     "range"
+     "monotone"
     ]
    },
    {
@@ -6309,8 +6119,7 @@
     "body": "1 / (1 - 4 * Ne * m)",
     "rejected_by": [
      "limit",
-     "monotone",
-     "range"
+     "monotone"
     ]
    },
    {
@@ -6325,14 +6134,14 @@
     "mutation": "shift-by-half",
     "body": "(1 / (1 + 4 * Ne * m)) + 0.5",
     "rejected_by": [
-     "limit",
-     "range"
+     "limit"
     ]
    }
   ],
-  "n_killed": 5,
+  "n_killed": 4,
   "survived": [
    "const-off-by-one",
+   "scale-by-three",
    "swap-args(Ne,m)"
   ],
   "reason": null
@@ -6981,24 +6790,17 @@
    "range"
   ],
   "n_mutants": 4,
-  "covered": true,
-  "demonstration": "mutant-rejected",
-  "killed": [
-   {
-    "mutation": "negate",
-    "body": "-(M / (1 + M))",
-    "rejected_by": [
-     "range"
-    ]
-   }
-  ],
-  "n_killed": 1,
+  "covered": false,
+  "demonstration": null,
+  "killed": [],
+  "n_killed": 0,
   "survived": [
+   "negate",
    "swap-plus-minus",
    "shift-by-half",
    "scale-by-three"
   ],
-  "reason": null
+  "reason": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered"
  },
  "PortabilityDrift.sharedLD_from_equilibrium": {
   "name": "sharedLD_from_equilibrium",
@@ -7475,33 +7277,20 @@
    "range"
   ],
   "n_mutants": 7,
-  "covered": true,
-  "demonstration": "mutant-rejected",
-  "killed": [
-   {
-    "mutation": "negate",
-    "body": "-(n * beta^2 * (2 * p * (1 - p)))",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "swap-args(beta,p)",
-    "body": "n * p^2 * (2 * beta * (1 - beta))",
-    "rejected_by": [
-     "range"
-    ]
-   }
-  ],
-  "n_killed": 2,
+  "covered": false,
+  "demonstration": null,
+  "killed": [],
+  "n_killed": 0,
   "survived": [
    "const-off-by-one",
    "drop-a-one-minus",
+   "negate",
    "swap-times-div",
    "shift-by-half",
-   "scale-by-three"
+   "scale-by-three",
+   "swap-args(beta,p)"
   ],
-  "reason": null
+  "reason": "every mutant of this body survived every registered check, so the checks do not discriminate and this definition is NOT covered"
  },
  "PowerAnalysis.powerAtThreshold": {
   "name": "powerAtThreshold",
@@ -7866,33 +7655,15 @@
     "rejected_by": [
      "range"
     ]
-   },
-   {
-    "mutation": "swap-times-div",
-    "body": "1 - 1 / (2 / Ns)",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "shift-by-half",
-    "body": "(1 - 1 / (2 * Ns)) + 0.5",
-    "rejected_by": [
-     "range"
-    ]
-   },
-   {
-    "mutation": "scale-by-three",
-    "body": "3 * (1 - 1 / (2 * Ns))",
-    "rejected_by": [
-     "range"
-    ]
    }
   ],
-  "n_killed": 4,
+  "n_killed": 1,
   "survived": [
    "const-off-by-one",
-   "negate"
+   "negate",
+   "swap-times-div",
+   "shift-by-half",
+   "scale-by-three"
   ],
   "reason": null
  },

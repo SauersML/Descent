@@ -167,6 +167,8 @@ class Parser:
         x = self._dot(x, nargs)
         if isinstance(x, tuple):                 # dot-call with no extra args
             return f"{x[0]}({x[1]})"
+        if isinstance(x, str) and x.startswith("_VEC:"):
+            return pyname(x[5:].split("|")[0])   # passed whole, not indexed
         if not isinstance(x, str) or not x.startswith("_DEP:"):
             return x
         short = x[5:]
@@ -428,7 +430,7 @@ def translate_body(body: str, struct_args=(), locals_=(), resolver=None,
         raise Untranslatable("empty body")
     stmts = []
     p = Parser(toks, set(struct_args), locals_, resolver,
-               struct_types, fields_of, dot_resolver)
+               struct_types, fields_of, dot_resolver, vector_args, dims)
     while p.at("let"):
         letcol = p.peek().col
         p.next()

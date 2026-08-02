@@ -814,15 +814,16 @@ what the second floor of the observable tower reads. It diverges as the allele
 frequency goes to zero. -/
 theorem standardizedSquare_second_cumulant (h : HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
-    (∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4) - 1 =
-      (1 - h.genotypeVariance) / h.genotypeVariance := by
+    h.genotypeVariance *
+        ((∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4) - 1) =
+      1 - h.genotypeVariance := by
   have hvar : 0 < h.genotypeVariance := by
     rw [h.genotypeVariance_eq]
     unfold HardyWeinbergModel.refFreq
     have hcomp : (0 : ℝ) < 1 - h.altFreq := by linarith
     nlinarith [hq0, hcomp]
-  rw [standardizedGenotype_fourth_moment h hq0 hq1]
-  rw [div_sub_div_eq_sub_div, one_mul]
+  rw [standardizedGenotype_fourth_moment h hq0 hq1, mul_sub, mul_one_div,
+    div_self (ne_of_gt hvar), mul_one]
 
 /-! ### The design: locus-sets over a Hardy-Weinberg panel -/
 

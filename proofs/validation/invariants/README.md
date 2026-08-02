@@ -52,7 +52,8 @@ counting it would convert an unknown into a false known.
 | `escape` | a concrete input point leaves the required range, and every coordinate of it is pinned by a theorem hypothesis or an unambiguous parameter name |
 | `escape-unguarded` | same, but the witness needs a coordinate whose admissible values could not be determined — a weaker claim, never pooled with the above |
 | `proved` | interval branch-and-bound covered the whole box. A proof, not a sample |
-| `guarded-by-side-condition` | no escape inside the relational hypotheses the author stated in adjacent theorems; the range is **not** implied by the definition alone |
+| `escape-outside-theorem` | escapes, but only where the hypotheses of a theorem that proves that bound are violated. The range does hold where the author proved it; the finding is that the definition itself does not carry the condition. A lead, not a defect |
+| `contradicts-theorem` | escapes at a point that satisfies the hypotheses of a theorem proving that bound. Lean has no `sorry`s, so this indicates an error in **this checker**, and it is never reported as a corpus defect |
 | `inconclusive` | search found nothing and the interval proof did not close. **Not** a pass |
 | `no-range` | the name and docstring commit the definition to no particular range |
 | `not-transpiled` | outside the arithmetic fragment; the reason is recorded |
@@ -61,11 +62,24 @@ counting it would convert an unknown into a false known.
 
 In priority order, recorded per coordinate in `box_provenance`:
 
-1. **Theorem hypotheses.** Numeric bounds (`0 < Ne`, `m ≤ 1`) become box edges;
-   *relational* ones (`H_S ≤ H_T`, `D_sq ≤ var_tag * var_causal`,
-   `total = between + within`) become side constraints on the search. Theorems
-   rename arguments freely, so the application site is read to map theorem-local
-   names back onto the definition's own parameters.
+1. **Theorem hypotheses.** Numeric bounds (`0 < Ne`, `m ≤ 1`) become box edges.
+   Theorems rename arguments freely, so the application site is read to map
+   theorem-local names back onto the definition's own parameters.
+
+   Theorem hypotheses are **never** used to shrink the searched region. They
+   are applied afterwards, to classify a witness, for three reasons learned the
+   hard way:
+
+   * hypotheses must be grouped **by theorem** and never conjoined across
+     theorems — the union is not a domain. `coalFst` carries `100 * Ne < t`
+     from one asymptotic lemma, and conjoining it excludes every sensible F_ST
+     evaluation, so the definition passes vacuously.
+   * a theorem's guard must use **all** of that theorem's hypotheses. Splitting
+     them between the box and the guard left guards incomplete and reported
+     `neiFst` as broken at `H_S > H_T`, which `nei_fst_in_unit` excludes.
+   * a guard only excuses an escape on the **side it bounds**.
+     `steppingStoneFst_nonneg` proves `0 ≤ f`; a witness of 10000 satisfies both
+     its hypotheses and its conclusion and says nothing about the escape above 1.
 2. **The meaning of the parameter name.** `h2_true` is a heritability,
    `fstTarget` is an F_ST, `v_noise_s` is a variance.
 3. **Nothing.** Then the definition is *unguarded* in that coordinate and it is
@@ -84,8 +98,17 @@ Read these before trusting a negative result.
   `backends.py` is written against an abstract backend for exactly this reason;
   the Z3 backend is the obvious next increment.
 * **Lean's junk values are reproduced, not repaired**: `x / 0 = 0`,
-  `Real.sqrt x = 0` for `x < 0`, `Real.log x = 0` for `x ≤ 0`. Testing what is
-  written is the whole point, and one finding here exists only because of them.
+  `x⁻¹ = 0` at 0, `Real.sqrt x = 0` for `x < 0`, `Real.log 0 = 0` and
+  `Real.log x = Real.log |x|`, and `Real.rpow` on a negative base via the
+  complex branch. Testing what is written is the whole point, and one finding
+  here exists only because of them. `backends.FloatBackend` agrees with
+  `extract/lean_rt.py` on 16000 randomised comparisons of these primitives;
+  that differential test is the only reason to believe either is right.
+* **The required range here is name-implied, not theorem-proved.** Violating a
+  bound a theorem proves would be a defect; violating one only implied by a
+  name is a **lead**. `results_ranges.json` records both — `range_source` for
+  the implied one and `proved_bound` / `bounding_theorems` for the proved one —
+  and they are never merged.
 * **Range inference is heuristic.** It reads names. `xFromY` returns an *x*;
   `scaled…Rate` is a compound parameter and not a probability; a calibration
   *slope* above one is under-dispersion rather than an error; a matrix *trace*
