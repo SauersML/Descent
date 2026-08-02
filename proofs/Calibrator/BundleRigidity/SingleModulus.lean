@@ -309,6 +309,77 @@ theorem two_atom_forces_v_zero (S : SingleModulus 2 v) : v = 0 := by
     have := same_side (by rw [e0, e1])
     rw [e0] at this; linarith
 
+/-! ## How many atoms there can be
+
+The atoms are confined to at most four values, and at `v = 1` to at most three, because
+the two `(1-v)`-side values collide at zero. That collision is the second defect in the
+upstream classification: its ratio `√((1+v)/(1-v))` divides by zero at `v = 1`, so the
+case was never reachable by its argument at all.
+-/
+
+/-- An injective map from `Fin d` into a finite set of reals bounds `d` by its size. -/
+theorem card_le_of_mapsTo {d : ℕ} {f : Fin d → ℝ} (hinj : Function.Injective f)
+    (s : Finset ℝ) (hs : ∀ j, f j ∈ s) : d ≤ s.card := by
+  classical
+  have h1 : (Finset.univ.image f).card = d := by
+    rw [Finset.card_image_of_injective _ hinj, Finset.card_univ, Fintype.card_fin]
+  have h2 : Finset.univ.image f ⊆ s := by
+    intro x hx
+    simp only [Finset.mem_image] at hx
+    obtain ⟨j, _, rfl⟩ := hx
+    exact hs j
+  calc d = (Finset.univ.image f).card := h1.symm
+    _ ≤ s.card := Finset.card_le_card h2
+
+/-- **Every atom is one of the four values `±√(1+v)`, `±√(1-v)`.** -/
+theorem atom_mem_four (S : SingleModulus d v) {A B : ℝ} (hA : A ^ 2 = 1 + v)
+    (hB : B ^ 2 = 1 - v) (j : Fin d) :
+    S.atom j ∈ ({A, -A, B, -B} : Finset ℝ) := by
+  classical
+  rcases S.sq_cases j with h | h
+  · have hfac : (S.atom j - A) * (S.atom j + A) = 0 := by
+      linear_combination h - hA
+    rcases mul_eq_zero.mp hfac with h0 | h0
+    · simp [show S.atom j = A by linarith]
+    · simp [show S.atom j = -A by linarith]
+  · have hfac : (S.atom j - B) * (S.atom j + B) = 0 := by
+      linear_combination h - hB
+    rcases mul_eq_zero.mp hfac with h0 | h0
+    · simp [show S.atom j = B by linarith]
+    · simp [show S.atom j = -B by linarith]
+
+/-- **At most four atoms.** -/
+theorem card_le_four (S : SingleModulus d v) {A B : ℝ} (hA : A ^ 2 = 1 + v)
+    (hB : B ^ 2 = 1 - v) : d ≤ 4 := by
+  classical
+  refine le_trans (card_le_of_mapsTo S.atom_inj _ (S.atom_mem_four hA hB)) ?_
+  refine le_trans (Finset.card_insert_le _ _) ?_
+  have h1 : ({-A, B, -B} : Finset ℝ).card ≤ 3 := by
+    refine le_trans (Finset.card_insert_le _ _) ?_
+    have h2 : ({B, -B} : Finset ℝ).card ≤ 2 := by
+      refine le_trans (Finset.card_insert_le _ _) ?_
+      simp
+    omega
+  omega
+
+/-- **At `v = 1` there are at most three atoms**, because `√(1-v) = 0` and the two
+`(1-v)`-side values collide. Consequently the upstream `d = 4` conclusion cannot hold at
+`v = 1`, and its argument could never have reached the case: the ratio
+`√((1+v)/(1-v))` it depends on is undefined there. -/
+theorem card_le_three_of_v_eq_one (S : SingleModulus d 1) {A : ℝ} (hA : A ^ 2 = 2) :
+    d ≤ 3 := by
+  classical
+  have hmem : ∀ j, S.atom j ∈ ({A, -A, (0 : ℝ)} : Finset ℝ) := by
+    intro j
+    have h := S.atom_mem_four (A := A) (B := 0) (by rw [hA]; norm_num) (by norm_num) j
+    simpa using h
+  refine le_trans (card_le_of_mapsTo S.atom_inj _ hmem) ?_
+  refine le_trans (Finset.card_insert_le _ _) ?_
+  have h1 : ({-A, (0 : ℝ)} : Finset ℝ).card ≤ 2 := by
+    refine le_trans (Finset.card_insert_le _ _) ?_
+    simp
+  omega
+
 end SingleModulus
 
 /-! ## The refutation: `d = 3` families exist for every `0 < v < 1`
@@ -378,6 +449,41 @@ noncomputable def threeAtomWitness_threeFifths (B : ℝ) (hB : B ^ 2 = 2 / 5)
   refine threeAtom (3 / 5) (2 * B) B (by norm_num) ?_ (by rw [hB]; norm_num)
     (by linarith) hBpos (by linarith)
   rw [show (2 * B) ^ 2 = 4 * B ^ 2 by ring, hB]; norm_num
+
+/-- **The `v = 1` family: atoms `(√2, -√2, 0)` with masses `(1/4, 1/4, 1/2)`.**
+
+At `v = 1` the value `√(1-v)` is zero, so the two `(1-v)`-side atoms of the upstream
+parameterization collide and `d = 4` becomes impossible
+(`SingleModulus.card_le_three_of_v_eq_one`). What remains is this single family, and it
+is genuinely a family: all three masses are positive, the mean is zero because the
+`±√2` atoms carry equal mass, and the variance is `(1/4)·2 + (1/4)·2 + 0 = 1`.
+
+This is a **second, independent** counterexample to the upstream `d ≤ 3` impossibility,
+and a sharper one: it is not a boundary point of the `c`-line but a case the upstream
+argument could not have reached at all, since the ratio `√((1+v)/(1-v))` on which that
+argument turns is undefined at `v = 1`. -/
+noncomputable def threeAtomAtOne (A : ℝ) (hA : A ^ 2 = 2) (hApos : 0 < A) :
+    SingleModulus 3 1 where
+  atom := ![A, -A, 0]
+  mass := ![1 / 4, 1 / 4, 1 / 2]
+  atom_inj := by
+    intro i j hij
+    fin_cases i <;> fin_cases j <;> simp_all <;> linarith
+  mass_pos := by intro j; fin_cases j <;> norm_num
+  mass_sum := by rw [Fin.sum_univ_three]; norm_num
+  mean_zero := by rw [Fin.sum_univ_three]; simp; ring
+  var_one := by
+    rw [Fin.sum_univ_three]
+    simp
+    have hkey : (1 / 4 : ℝ) * A ^ 2 + 1 / 4 * (-A) ^ 2 + 1 / 2 * (0 : ℝ) ^ 2
+        = (1 / 2) * A ^ 2 := by ring
+    rw [hkey, hA]; norm_num
+  modulus_eq := by
+    intro j
+    fin_cases j <;> simp
+    · rw [hA]; norm_num
+    · rw [show (-A) ^ 2 = A ^ 2 by ring, hA]; norm_num
+    · norm_num
 
 /-- **The upstream `d = 4` line, which is correct.**
 
