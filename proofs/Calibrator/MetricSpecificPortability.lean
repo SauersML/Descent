@@ -1299,38 +1299,56 @@ theorem ldBandReconstructionShare_of_no_ld {kappa : ℝ}
     Real.arctan_tan hx1 hx2]
   ring
 
-/-- **Closed form of the pruned detection share.**
+/-- **Identification of the closed forms with the band integrals they are named
+for.**
 
-`sorry` stands for the evaluation of one elementary integral,
-`∫₀^a (1 - 2ρ cos θ + ρ²) dθ = (1 + ρ²) a - 2ρ sin a`, followed by cancellation
-of the constant factor `(1 - ρ²)⁻¹` between numerator and denominator.  No
-genetics and no inequality is involved; the content is `intervalIntegral` API for
-`cos`.  Consistency of the resulting formula with the corpus is separately
-checked by `ldBandDetectionShare_one` (the `κ = 1` endpoint reproduces the full
-inverse-kernel trace of `ldWhiteningGain`) and `ldBandDetectionShare_zero`. -/
-theorem ldBandDetectionShare_eq_integral {decay kappa : ℝ}
-    (hd : |decay| < 1) (hk0 : 0 ≤ kappa) (hk1 : kappa ≤ 1) :
+`ldBandDetectionShare` and `ldBandReconstructionShare` are closed forms.  Naming
+them after integrals of the LD symbol is a *claim*, and this structure is that
+claim, carried as a hypothesis so that every result depending on the
+identification says so in its signature rather than relying on the reader to
+notice.
+
+The two obligations are:
+
+* `detection` — the evaluation of `∫₀^a (1 - 2ρ cos θ + ρ²) dθ =
+  (1 + ρ²)a - 2ρ sin a`, followed by cancellation of the constant `(1 - ρ²)⁻¹`
+  between numerator and denominator.  Elementary `intervalIntegral` API for
+  `cos`.
+* `reconstruction` — the harmonic-measure evaluation
+  `∫₀^a P_ρ(θ) dθ = 2 arctan( ((1+ρ)/(1-ρ)) tan(a/2) )` with the normalisation
+  `∫₀^π P_ρ = π`, the half-interval companion of
+  `ImitationRigidity.ldKernelSymbol_harmonicMean`.
+
+Neither is an empirical assumption and neither has genetic content: both are
+real-analysis evaluations of an explicit integrand.  Two independent internal
+checks on the `detection` formula are already proved without it —
+`ldBandDetectionShare_one` reproduces the full inverse-kernel trace of
+`ldWhiteningGain` at `κ = 1`, and `ldBandDetectionShare_zero` the empty band.
+
+Empirical status: UNTESTED. -/
+structure LDBandIntegralIdentification (decay : ℝ) : Prop where
+  detection : ∀ kappa : ℝ, 0 ≤ kappa → kappa ≤ 1 →
     (∫ angle in (0:ℝ)..(Real.pi * kappa), (ldKernelSymbol decay angle)⁻¹) /
         (∫ angle in (0:ℝ)..Real.pi, (ldKernelSymbol decay angle)⁻¹) =
-      ldBandDetectionShare decay kappa := by
-  sorry
-
-/-- **Closed form of the pruned reconstruction share.**
-
-`sorry` stands for the harmonic-measure evaluation of the Poisson-kernel
-integral, `∫₀^a P_ρ(θ) dθ = 2 arctan( ((1+ρ)/(1-ρ)) tan(a/2) )`, together with
-the normalisation `∫₀^π P_ρ = π` (which is the half-interval form of
-`Calibrator.ImitationRigidity.ldKernelSymbol_harmonicMean`'s companion identity
-for the kernel itself).  This is a standard complex-analysis computation; it is
-`sorry`ed rather than asserted because nothing else here depends on it, and the
-`κ = 1` endpoint of the formula is a junk value (see
-`ldBandReconstructionShare`). -/
-theorem ldBandReconstructionShare_eq_integral {decay kappa : ℝ}
-    (hd : |decay| < 1) (hd0 : 0 ≤ decay) (hk0 : 0 ≤ kappa) (hk1 : kappa < 1) :
+      ldBandDetectionShare decay kappa
+  reconstruction : ∀ kappa : ℝ, 0 ≤ kappa → kappa < 1 →
     (∫ angle in (0:ℝ)..(Real.pi * kappa), ldKernelSymbol decay angle) /
         (∫ angle in (0:ℝ)..Real.pi, ldKernelSymbol decay angle) =
-      ldBandReconstructionShare decay kappa := by
-  sorry
+      ldBandReconstructionShare decay kappa
+
+/-- **The band integral itself loses detection weight faster than markers.**
+
+The conclusion of `ldBandDetectionShare_le_retention` transported from the
+closed form to the quantity it names: under the identification, the fraction of
+the inverse-symbol integral retained by a low-frequency band of relative width
+`κ` is at most `κ`. -/
+theorem ldBand_detection_integral_ratio_le_retention {decay kappa : ℝ}
+    (hid : LDBandIntegralIdentification decay)
+    (hd0 : 0 ≤ decay) (hk0 : 0 ≤ kappa) (hk1 : kappa ≤ 1) :
+    (∫ angle in (0:ℝ)..(Real.pi * kappa), (ldKernelSymbol decay angle)⁻¹) /
+        (∫ angle in (0:ℝ)..Real.pi, (ldKernelSymbol decay angle)⁻¹) ≤ kappa := by
+  rw [hid.detection kappa hk0 hk1]
+  exact ldBandDetectionShare_le_retention hd0 hk0 hk1
 
 end ARoneFrontier
 
@@ -1709,6 +1727,31 @@ theorem clumping_maximizes_reconstruction_on_ld_kernel
     exact ldKernelSymbol_mono_in_cos habs hp0 (hin i hi)
   · intro i hi
     exact ldKernelSymbol_mono_in_cos habs hp0 (hout i hi)
+
+/-- **The whitened-weight integral of a clumped panel, at a named recombination
+rate and effective size.**
+
+The endpoint of the whole chain: under the named integral identification, the
+fraction of the inverse-LD-kernel integral that a clumped panel retains is at
+most the fraction of markers it retained, where the kernel is the Ohta–Kimura
+one with decay `ldRetentionPerGen recomb Ne`.  Every object in the statement is
+either an integral of the LD symbol or a marker count. -/
+theorem ldBlock_detection_integral_ratio_le_retention {recomb Ne : ℝ}
+    {retainedMarkers totalMarkers : ℕ}
+    (hid : LDBandIntegralIdentification (ldRetentionPerGen recomb Ne))
+    (hr0 : 0 ≤ recomb) (hr1 : recomb ≤ 1) (hNe : 1 < Ne)
+    (h0 : 0 < retainedMarkers) (h1 : retainedMarkers < totalMarkers) :
+    (∫ angle in (0:ℝ)..(Real.pi *
+        ldPanelRetentionFraction retainedMarkers totalMarkers),
+      (ldKernelSymbol (ldRetentionPerGen recomb Ne) angle)⁻¹) /
+        (∫ angle in (0:ℝ)..Real.pi,
+          (ldKernelSymbol (ldRetentionPerGen recomb Ne) angle)⁻¹) ≤
+      ldPanelRetentionFraction retainedMarkers totalMarkers := by
+  obtain ⟨hkpos, hklt⟩ := ldPanelRetentionFraction_mem h0 h1
+  have hp0 : 0 ≤ ldRetentionPerGen recomb Ne :=
+    ld_retention_nonneg recomb Ne hr0 hr1 (le_of_lt hNe)
+  exact ldBand_detection_integral_ratio_le_retention hid hp0
+    (le_of_lt hkpos) (le_of_lt hklt)
 
 end GeneticFrontier
 

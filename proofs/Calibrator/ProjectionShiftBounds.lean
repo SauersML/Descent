@@ -737,27 +737,59 @@ theorem twoCoordinate_pruning_corner_lt_one
   rw [div_lt_one (add_pos h₁ h₂)]
   linarith
 
-/-- **Existence of a threshold set of prescribed cardinality** for the combined
-score.
+/-- **A score profile admits threshold sets at every rank**: for each `k` there
+is a set of `k` indices, no more and no fewer, separated from its complement by
+a cut value.
 
-`sorry` stands for exactly one thing: sorting a finite family of reals and
-cutting it at rank `k`.  It is a statement about `Finset` combinatorics with no
-probabilistic or genetic content, and it is the only missing ingredient between
-`scalarized_optimum_is_coordinate_split` (proved, for a *given* threshold set)
-and the packaged claim "the achievable region is the hypograph of the concave
-envelope of the inversely-sorted allocation curve".
+This is the one ingredient the frontier packaging needs beyond what is proved
+here, and it is carried as a named hypothesis rather than discharged, so that
+every consumer states its dependence on it.  It is not an empirical assumption
+and not an external input: it holds for every score on a finite type, by sorting
+the values and cutting at rank `k`.  It is a hypothesis here only because that
+sorting argument is not written.
 
-What is proved without it: every threshold set is a scalarised optimum, so every
-supporting line of the achievable region is attained by a coordinate split, and
+What is proved without it: every threshold set is a scalarised optimum
+(`scalarized_optimum_is_coordinate_split`), so every supporting line of the
+achievable region that is attained at all is attained by a coordinate split, and
 the region is convex (`isRankAllocation_convex`, `spectralCapture_affine`).
-What is *not* proved without it: that a supporting line exists for every
-direction, i.e. that the frontier is exactly — rather than at most — the concave
-envelope of the split values. -/
-theorem exists_threshold_set
-    (score : ι → ℝ) (k : ℕ) (hk : k ≤ Fintype.card ι) :
+What needs it: that a supporting line exists in every direction, i.e. that the
+frontier is the concave envelope of the split values rather than merely bounded
+by it.
+
+Empirical status: UNTESTED — and untestable, being a finite-combinatorial
+statement rather than a claim about genotypes. -/
+def HasThresholdSetAtEveryRank (score : ι → ℝ) : Prop :=
+  ∀ k : ℕ, k ≤ Fintype.card ι →
     ∃ (S : Finset ι) (t : ℝ), S.card = k ∧
-      (∀ i ∈ S, t ≤ score i) ∧ (∀ i ∉ S, score i ≤ t) := by
-  sorry
+      (∀ i ∈ S, t ≤ score i) ∧ (∀ i ∉ S, score i ≤ t)
+
+/-- **The frontier is carried by coordinate splits of the prescribed rank.**
+
+Under the named threshold hypothesis, for every pair of task priorities there is
+a single set of exactly `k` retained directions whose scalarised value is at
+least that of *every* relaxed rank-`k` allocation.  Combined with convexity of
+the achievable region this is the statement that the Pareto frontier is the
+concave envelope of the coordinate-split values. -/
+theorem exists_split_attaining_scalarized_optimum
+    (spectrum : ι → ℝ) (k : ℕ) (lam mu : ℝ) (hk : k ≤ Fintype.card ι)
+    (hsplit : HasThresholdSetAtEveryRank
+      (fun i => lam * reconstructionWeight (spectrum i) +
+        mu * detectionWeight (spectrum i))) :
+    ∃ S : Finset ι, S.card = k ∧
+      ∀ M : ι → ℝ, IsRankAllocation (k : ℝ) M →
+        lam * spectralCapture (fun i => reconstructionWeight (spectrum i)) M +
+            mu * spectralCapture (fun i => detectionWeight (spectrum i)) M ≤
+          lam * spectralCapture (fun i => reconstructionWeight (spectrum i))
+              (pruneAllocation S) +
+            mu * spectralCapture (fun i => detectionWeight (spectrum i))
+              (pruneAllocation S) := by
+  obtain ⟨S, t, hcard, hin, hout⟩ := hsplit k hk
+  refine ⟨S, hcard, ?_⟩
+  intro M hM
+  have hM' : IsRankAllocation (S.card : ℝ) M := by
+    rw [hcard]
+    exact hM
+  exact scalarized_optimum_is_coordinate_split spectrum M S lam mu t hM' hin hout
 
 end DetectionReconstructionFrontier
 

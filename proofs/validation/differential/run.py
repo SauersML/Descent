@@ -113,6 +113,7 @@ def classify(chk: checks.Check, res: dict) -> str:
         "convention": "CONVENTION-DIFFERS",
         "internal": "INTERNAL-INCONSISTENT",
         "identity": "IDENTICAL-BODIES",
+        "selftest": "REFERENCE-SELFTEST-DIFFERS",
     }.get(chk.kind, "FORMULA")
 
 
@@ -184,11 +185,11 @@ def main() -> int:
         )
     n_vac = sum(
         1 for c in out["checks"].values()
-        if c["vacuous"] and c["kind"] != "identity"
+        if c["vacuous"] and c["kind"] not in ("identity", "selftest")
     )
     print(
         f"\n{len(out['checks'])} checks, {n_vac} vacuous "
-        f"(identity checks are vacuous by construction and excluded) -> {args.json}"
+        f"(identity and reference self-test checks are excluded) -> {args.json}"
     )
     return 1 if n_vac else 0
 

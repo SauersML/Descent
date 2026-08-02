@@ -44,6 +44,11 @@ def _corners(box, names, cap=4096):
         # just inside the boundary: open-interval domains escape near the edge
         w = hi - lo
         vals += [lo + 1e-9 * w, hi - 1e-9 * w, lo + 1e-4 * w, hi - 1e-4 * w]
+        if s["scale"] == "nat":
+            # a ℕ argument may only take integer values.  Without this a
+            # "witness" like `k = 1e-05` for a founder count is reported, and
+            # it is not a point Lean can even form.
+            vals = sorted({float(round(v)) for v in vals if v >= 0})
         nxt = []
         for p in pts:
             for v in vals:
@@ -54,8 +59,13 @@ def _corners(box, names, cap=4096):
     return pts
 
 
-def maximize(f, box, names, budget=20000, seed=0):
-    """Maximize f over the box.  Returns (best_value, best_point).
+def maximize(f, box, names, budget=20000, seed=0, feasible=None):
+    """Maximize f over the box, subject to `feasible(*x)`.
+
+    `feasible` carries the RELATIONAL hypotheses the author stated in adjacent
+    theorems (`H_S <= H_T`, Cauchy-Schwarz on an LD covariance, ...).  Without
+    it the search reports every such definition as broken at a point the author
+    already excluded.  Returns (best_value, best_point).
 
     Random draws on the declared measure, then boundary enumeration, then a
     shrinking pattern search from the incumbent.
@@ -64,6 +74,12 @@ def maximize(f, box, names, budget=20000, seed=0):
     best, bestx = -INF, None
 
     def ev(x):
+        if feasible is not None:
+            try:
+                if not feasible(*x):
+                    return None
+            except Exception:
+                return None
         try:
             v = f(*x)
         except (ValueError, OverflowError, ZeroDivisionError, TypeError):

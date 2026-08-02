@@ -1,0 +1,13 @@
+MUTATION TESTING: 202 definitions reached by a check
+  definitions with at least one check that provably can fail: 198
+    check3_duplicate_body      163
+    check2_derivation          51
+    check1_fixed_point         12
+  check/definition pairs where every mutation SURVIVED (vacuous): 7
+    Calibrator.Conclusions.bernoulliLogLoss  [check2_derivation]  survived: ['shift by 1']
+    Calibrator.PCCorrectability.Threshold.effectiveSubgroupSize  [check2_derivation]  survived: ['scale by 2', 'shift by 1']
+    Calibrator.DGP.twoLocusIBDCovariance  [check2_derivation]  survived: ['shift by 1']
+    Calibrator.DGP.discreteRecombinationSurvival  [check2_derivation]  survived: ['literal 1->2']
+    Calibrator.HaplotypeTheory.haplotypePhasePredictionError  [check2_derivation]  survived: ['literal 1->2']
+    Calibrator.PortabilityDrift.expectedR2  [check2_derivation]  survived: ['shift by 1']
+    Calibrator.SampleOverlapBias.partialOverlapR2  [check2_derivation]  survived: ['literal 1->2', 'shift by 1']

@@ -4628,10 +4628,10 @@
   "killed": [],
   "reason": "unrecognised character '.'"
  },
- "Calibrator.GenotypeDesign.LociIndependent": {
+ "Calibrator.GenotypeDesign.InLinkageEquilibrium": {
   "class": "STRUCTURAL",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 815,
+  "line": 821,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -4640,7 +4640,7 @@
  "Calibrator.GenotypeDesign.Polymorphic": {
   "class": "STRUCTURAL",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 823,
+  "line": 829,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -4649,7 +4649,7 @@
  "Calibrator.GenotypeDesign.VariantDisjoint": {
   "class": "STRUCTURAL",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 838,
+  "line": 844,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -4658,7 +4658,7 @@
  "Calibrator.GenotypeDesign.variantRecurrence": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 847,
+  "line": 853,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -4667,7 +4667,7 @@
  "Calibrator.GenotypeDesign.locusInfluence": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 856,
+  "line": 862,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -4676,7 +4676,7 @@
  "Calibrator.GenotypeDesign.IsTwoPoolInteraction": {
   "class": "STRUCTURAL",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 871,
+  "line": 877,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -4685,7 +4685,7 @@
  "Calibrator.geneBurdenDesign": {
   "class": "STRUCTURAL",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 937,
+  "line": 943,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -4694,7 +4694,7 @@
  "Calibrator.slidingWindowDesign": {
   "class": "STRUCTURAL",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 964,
+  "line": 970,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -4703,7 +4703,7 @@
  "Calibrator.fourthCumulantFromMoments": {
   "class": "NUMERIC",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 1219,
+  "line": 1225,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -4712,7 +4712,7 @@
  "Calibrator.circulantSpectrumA": {
   "class": "NUMERIC",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 1349,
+  "line": 1355,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -4721,7 +4721,7 @@
  "Calibrator.circulantSpectrumB": {
   "class": "NUMERIC",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 1356,
+  "line": 1362,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -6007,6 +6007,7 @@
    ],
    "hypotheses_not_enforced": [
     "|decay| < 1",
+    "LDBandIntegralIdentification decay",
     "\u2200 i \u2208 S, Real.cos cutAngle \u2264 Real.cos (angle i",
     "\u2200 i \u2209 S, Real.cos (angle i"
    ],
@@ -6643,7 +6644,8 @@
    ],
    "hypotheses_not_enforced": [
     "0 < spectralTotal (fun i => detectionWeight (ldKernelSymbol (ldRetentionPerGen recomb Ne",
-    "0 < spectralTotal (fun i => reconstructionWeight (ldKernelSymbol (ldRetentionPerGen recomb Ne"
+    "0 < spectralTotal (fun i => reconstructionWeight (ldKernelSymbol (ldRetentionPerGen recomb Ne",
+    "LDBandIntegralIdentification (ldRetentionPerGen recomb Ne"
    ],
    "thm_lo": [
     "Calibrator.ld_retention_nonneg",
@@ -7814,12 +7816,9 @@
    "source_hi": "docstring/name",
    "hypotheses": [
     "0 \u2264 kappa",
-    "kappa < 1",
-    "0 \u2264 decay"
+    "kappa < 1"
    ],
-   "hypotheses_not_enforced": [
-    "|decay| < 1"
-   ],
+   "hypotheses_not_enforced": [],
    "thm_lo": null,
    "thm_hi": null,
    "n_points": 40,
@@ -7865,9 +7864,7 @@
     "0 < kappa",
     "kappa < 1"
    ],
-   "hypotheses_not_enforced": [
-    "|decay| < 1"
-   ],
+   "hypotheses_not_enforced": [],
    "thm_lo": null,
    "thm_hi": null,
    "n_points": 40,
@@ -7947,7 +7944,7 @@
  "Calibrator.ldPanelRetentionFraction": {
   "class": "NUMERIC",
   "file": "Calibrator/MetricSpecificPortability.lean",
-  "line": 1375,
+  "line": 1393,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -7992,7 +7989,7 @@
  "Calibrator.ldBlockReconstructionShare": {
   "class": "NUMERIC",
   "file": "Calibrator/MetricSpecificPortability.lean",
-  "line": 1426,
+  "line": 1444,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -8001,7 +7998,7 @@
  "Calibrator.ldBlockDetectionShare": {
   "class": "NUMERIC",
   "file": "Calibrator/MetricSpecificPortability.lean",
-  "line": 1437,
+  "line": 1455,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -8049,7 +8046,7 @@
  "Calibrator.ldBlockPruningDeficit": {
   "class": "NUMERIC",
   "file": "Calibrator/MetricSpecificPortability.lean",
-  "line": 1447,
+  "line": 1465,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -8100,7 +8097,7 @@
  "Calibrator.ldTightLinkageDetectionShare": {
   "class": "NUMERIC",
   "file": "Calibrator/MetricSpecificPortability.lean",
-  "line": 1458,
+  "line": 1476,
   "status": "COVERED",
   "check": {
    "kind": "range",
@@ -8894,10 +8891,37 @@
   "killed": [],
   "reason": "no invariant available: neither the theorems mentioning it nor its docstring state a range"
  },
+ "Calibrator.subgroupContrast": {
+  "class": "NOT-EXTRACTABLE",
+  "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
+  "line": 985,
+  "status": "UNCOVERED",
+  "check": null,
+  "killed": [],
+  "reason": "self-check: value is not a real number: function (vector- or function-valued)"
+ },
+ "Calibrator.demographicSpikeDirection": {
+  "class": "NOT-EXTRACTABLE",
+  "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
+  "line": 991,
+  "status": "UNCOVERED",
+  "check": null,
+  "killed": [],
+  "reason": "qualified name i.val"
+ },
+ "Calibrator.stratificationCertificateMargin": {
+  "class": "NUMERIC",
+  "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
+  "line": 1068,
+  "status": "UNCOVERED",
+  "check": null,
+  "killed": [],
+  "reason": "no invariant available: neither the theorems mentioning it nor its docstring state a range"
+ },
  "Calibrator.blockSpectrum": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 952,
+  "line": 1208,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -8906,7 +8930,7 @@
  "Calibrator.normalizedMoment": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 960,
+  "line": 1216,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -8915,7 +8939,7 @@
  "Calibrator.inverseTraceCertificate": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 970,
+  "line": 1226,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -8924,7 +8948,7 @@
  "Calibrator.meffPerturbed": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1062,
+  "line": 1322,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -8933,7 +8957,7 @@
  "Calibrator.meffFlat": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1067,
+  "line": 1327,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -8942,7 +8966,7 @@
  "Calibrator.meffSize": {
   "class": "NUMERIC",
   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1072,
+  "line": 1332,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -9101,7 +9125,9 @@
     "0 < F",
     "0 \u2264 F"
    ],
-   "hypotheses_not_enforced": [],
+   "hypotheses_not_enforced": [
+    "m \u2264 N"
+   ],
    "thm_lo": null,
    "thm_hi": null,
    "n_points": 40,
@@ -9184,7 +9210,7 @@
   "class": "NUMERIC",
   "file": "Calibrator/PCCorrectability/Threshold.lean",
   "line": 48,
-  "status": "DEFECT",
+  "status": "DEFECT-CANDIDATE",
   "check": {
    "kind": "range",
    "lo": null,
@@ -9196,7 +9222,9 @@
     "0 < n",
     "0 \u2264 F"
    ],
-   "hypotheses_not_enforced": [],
+   "hypotheses_not_enforced": [
+    "m \u2264 N"
+   ],
    "thm_lo": null,
    "thm_hi": [
     "Calibrator.subthreshold_pc_residual_bias_floor",
@@ -16779,6 +16807,15 @@
   "killed": [],
   "reason": "expected 'then', found op:\u2208"
  },
+ "Calibrator.HasThresholdSetAtEveryRank": {
+  "class": "STRUCTURAL",
+  "file": "Calibrator/ProjectionShiftBounds.lean",
+  "line": 760,
+  "status": "UNCOVERED",
+  "check": null,
+  "killed": [],
+  "reason": "could not compile body: Untranslatable(\"unrecognised character '\u2200'\")"
+ },
  "Calibrator.quadraticRisk": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator/QuadraticShift.lean",
@@ -19980,7 +20017,7 @@
  "Calibrator.sigmaS": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator.lean",
-  "line": 116,
+  "line": 117,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -19989,7 +20026,7 @@
  "Calibrator.sigmaT": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator.lean",
-  "line": 119,
+  "line": 120,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -19998,7 +20035,7 @@
  "Calibrator.crossS": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator.lean",
-  "line": 122,
+  "line": 123,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],
@@ -20007,7 +20044,7 @@
  "Calibrator.sigmaT2": {
   "class": "NOT-EXTRACTABLE",
   "file": "Calibrator.lean",
-  "line": 129,
+  "line": 130,
   "status": "UNCOVERED",
   "check": null,
   "killed": [],

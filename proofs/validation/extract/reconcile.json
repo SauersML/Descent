@@ -1,0 +1,69 @@
+{
+ "ours": 958,
+ "stamp": {
+  "n_definitions": 983,
+  "n_structures": 96,
+  "n_parse_failures": 2,
+  "corpus_digest": "sha256:05d7227c4bc9537e79bbf4040bde6007"
+ },
+ "invariants/defs.json": {
+  "shared": 946,
+  "only_ours": 12,
+  "only_theirs": 1,
+  "body": 2,
+  "params": 21,
+  "order": 0,
+  "body_names": [
+   "driftLDTrajectory",
+   "twoLocusCoalescentCovarianceMatrix"
+  ],
+  "param_names": [
+   "brierBayesRisk",
+   "ctMissedTargetSignal",
+   "diseaseEvent",
+   "driftLDTrajectory",
+   "etaLiabilityThreshold",
+   "exactAdaptationGain",
+   "exitLevels",
+   "geneBurdenDesign",
+   "imitationCapacity",
+   "infRisk",
+   "interactionMonomial",
+   "logBayesRisk",
+   "mse",
+   "rsquared",
+   "slidingWindowDesign",
+   "sourceERMWeights",
+   "spikeIdentification",
+   "targetLinearExcessRisk",
+   "targetLinearRisk",
+   "uniformCatastrophicPortabilityScore",
+   "var"
+  ],
+  "order_names": [],
+  "only_theirs_names": [
+   "singletonProportion"
+  ]
+ },
+ "symbolic/decls.json": {
+  "shared": 940,
+  "only_ours": 18,
+  "only_theirs": 2,
+  "body": 2,
+  "params": 0,
+  "order": 0,
+  "body_names": [
+   "blockSpectrum",
+   "twoLocusCoalescentCovarianceMatrix"
+  ],
+  "param_names": [],
+  "order_names": [],
+  "only_theirs_names": [
+   "",
+   "singletonProportion"
+  ]
+ },
+ "differential/": {
+  "skipped": "results.json present but holds no definition table"
+ }
+}

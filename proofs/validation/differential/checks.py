@@ -140,8 +140,28 @@ check(
     ref=lambda p1, p2: refs.fst_hudson(p1, p2),
     tol=1e-5,
     atol=1e-6,   # p1 == p2 rows: the finite-n correction leaves a -1e-7 residue
-    note="guards the reference itself, not the corpus",
-    canfail_clause="fails if n is small; run at n=20 to see it break",
+    kind="selftest",
+    note="guards the reference itself, not the corpus; the corpus mutants do "
+         "not touch it, so its power is demonstrated by the companion check "
+         "hudson-sample-small-n rather than by mutation",
+    canfail_clause="see hudson-sample-small-n: the same comparison at n=20 fails",
+)
+
+check(
+    id="hudson-sample-small-n",
+    fqn="refs.fst_hudson_sample",
+    claim="DEMONSTRATION that the previous check has power: at n=20 it fails",
+    model_lean="n = 20 haploids per deme",
+    model_ref="parametric limit",
+    reference="refs.fst_hudson",
+    grid=_PQ,
+    lean=lambda D, p1, p2: refs.fst_hudson_sample(p1, p2, 20, 20),
+    ref=lambda p1, p2: refs.fst_hudson(p1, p2),
+    tol=1e-5,
+    atol=1e-6,
+    kind="selftest",
+    note="expected to DISAGREE; this is the can-fail evidence for hudson-sample-limit",
+    canfail_clause="self-evident: this check exists to fail",
 )
 
 # --- 2. Split coalescent ---------------------------------------------------

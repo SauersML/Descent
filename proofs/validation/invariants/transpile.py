@@ -277,7 +277,7 @@ def transpile(body: str, params, arity, name="", rename=None):
     src = re.sub(r"\(\s*([\d.]+)\s*:\s*ℝ\s*\)", r"\1", src)  # (2 : ℝ)
     src = re.sub(r"\(\s*([A-Za-z_][\w'₀-₉]*)\s*:\s*ℝ\s*\)", r"\1", src)
     src = src.replace("ℤ", "").replace("ℕ", "")
-    if re.search(r"[∫∑∏⟨⟩∀∃λ]|fun |match |\bby\b|\bwhere\b|\bdo\b|\|", src):
+    if re.search(r"[∫∑∏⟨⟩∀∃λ‖]|fun |match |\bby\b|\bwhere\b|\bdo\b", src):
         raise Untranspilable("non-arithmetic construct")
     if ":=" in src:
         # only `let x := e` is supported; mark the token explicitly

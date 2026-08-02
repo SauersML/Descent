@@ -830,6 +830,12 @@ def traceWindowSpikeLoad(decay, nSites):
 def whitenedCapacity(headroom, decay):
     return _rt.rdiv(headroom, ldWhiteningGain(decay))
 
+def subgroupContrast(n, m):
+    return twoBlock(m, (_rt.rdiv((((n) - (m))), (n))), ((-(_rt.rdiv((m), (n))))))
+
+def stratificationCertificateMargin(headroom, n, M, F, m):
+    return (demographicSpike(n, F, m) - ((headroom + bbpProxyThreshold(n, M))))
+
 def blockSpectrum(k, ε):
     return twoBlock(k, ε, 1.0)
 

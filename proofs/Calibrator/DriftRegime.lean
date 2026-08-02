@@ -139,7 +139,7 @@ theorem regimes_disagree {Ne H₀ : ℝ} (hNe : 1 / 2 < Ne) (hH : 0 < H₀) {t :
   have hnonneg : 0 ≤ 1 - 1 / (2 * Ne) := by
     rw [sub_nonneg, div_le_one (by positivity)]
     linarith
-  have hpow : (1 - 1 / (2 * Ne)) ^ t < 1 := pow_lt_one₀ hnonneg hlt (Nat.pos_iff.mp ht)
+  have hpow : (1 - 1 / (2 * Ne)) ^ t < 1 := pow_lt_one₀ hnonneg hlt ht.ne'
   rw [measuredLoss_mutationDriftBalance, measuredLoss_closedPopulation]
   linarith
 
@@ -175,7 +175,11 @@ the number. That is precisely the gap the simulation found. -/
 theorem cluster_identities_hold_at_every_retention (H₀ V_A r : ℝ) :
     targetHetOfRetention H₀ r = H₀ * (1 - lossOfRetention r) ∧
       targetPgsVarOfRetention V_A r = V_A * (1 - lossOfRetention r) := by
-  constructor <;> · unfold targetHetOfRetention targetPgsVarOfRetention lossOfRetention; ring
+  constructor
+  · unfold targetHetOfRetention lossOfRetention
+    ring
+  · unfold targetPgsVarOfRetention lossOfRetention
+    ring
 
 /-- The cluster's internal cross-check, as a probe: what an over-determination check
 actually observes about a candidate retention value. -/
@@ -193,8 +197,15 @@ This is the same law as every other impossibility in this development
 The consequence is not that over-determination is useless: it catches divergence, which
 is a real failure mode and was caught twice. The consequence is that it is **not a
 substitute for measuring the primitive against an observable**, and must never be
-reported as one. -/
-theorem crossChecks_blind_to_retention {trueRetention wrongRetention : ℝ}
+reported as one.
+
+`ProbeBlindness` carries its two witnesses as data, so this is a `def` and not a
+`theorem`: the proposition it supports is `no_crossCheck_criterion_for_retention`
+immediately below.
+
+    Empirical status: not an empirical claim. This is a witness construction; the
+    measurement it explains is recorded in `Calibrator.PortabilityDrift`. -/
+noncomputable def crossChecks_blind_to_retention {trueRetention wrongRetention : ℝ}
     (hne : wrongRetention ≠ trueRetention) :
     ProbeBlindness clusterCrossCheck (fun r => r = trueRetention) where
   positive := trueRetention
@@ -263,8 +274,13 @@ evidence — it was *no* evidence about the exponent, and the asymmetric design 
 followed found errors of `-37%` to `-74%`.
 
 The general obligation: a validation must report the spread of its prediction across the
-design. A prediction that is constant on the design tests nothing about shape. -/
-theorem symmetric_design_has_no_power :
+design. A prediction that is constant on the design tests nothing about shape.
+
+As above this is a `def`, since `ProbeBlindness` carries its witnesses as data; the
+proposition is `no_symmetric_design_criterion` immediately below.
+
+    Empirical status: not an empirical claim. This is a witness construction. -/
+noncomputable def symmetric_design_has_no_power :
     ProbeBlindness diagonalDesign (fun g => g = benchmarkRatio) where
   positive := benchmarkRatio
   negative := benchmarkRatioSquared

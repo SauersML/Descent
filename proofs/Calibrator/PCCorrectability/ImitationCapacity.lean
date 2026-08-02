@@ -1434,6 +1434,58 @@ theorem certificate_not_momentContinuous (Φ : MomentContinuousFunctional)
   rw [div_le_iff₀ hn1, hsimp] at hlip
   linarith
 
+/-- **The witness spectra are legal LD spectra.**  Every eigenvalue is strictly
+positive, so both are spectra a correlation matrix can have; the prohibition is
+not evaded by restricting attention to spectra a real LD matrix could
+produce. -/
+theorem meffWitness_spectrum_pos (n i : ℕ) :
+    0 < meffPerturbed n i ∧ 0 < meffFlat n i := by
+  have hn1 : (0 : ℝ) < (n : ℝ) + 1 := by positivity
+  constructor
+  · unfold meffPerturbed blockSpectrum twoBlock
+    split_ifs
+    · exact inv_pos.mpr hn1
+    · exact zero_lt_one
+  · unfold meffFlat blockSpectrum twoBlock
+    split_ifs
+    · exact zero_lt_one
+    · exact zero_lt_one
+
+/-- The two witness panels agree on the normalized trace — the `p = 1` moment,
+which is what fixes a correlation matrix's normalization — to within
+`1/(n+1)`. -/
+theorem meff_normalizedTrace_gap_le (n : ℕ) (hn : 0 < n) :
+    |normalizedMoment (meffSize n) (meffPerturbed n) 1 -
+      normalizedMoment (meffSize n) (meffFlat n) 1| ≤ 1 / ((n : ℝ) + 1) :=
+  meff_moment_gap_le n 1 hn
+
+/-- **Both halves, in one statement.**
+
+Negative half: no effective-marker count of the participation-ratio family — no
+functional continuous in the moments of the LD spectrum — equals the whitening
+certificate, so none can determine a detection threshold.
+
+Positive half: the certificate does determine one.  Its large-panel limit is
+the AR(1) whitening gain, and the threshold is headroom divided by that gain,
+in closed form.
+
+The two are consistent because the certificate is edge-sensitive and therefore
+outside the weakly continuous class, which is precisely the property that
+disqualifies `m_eff` and qualifies `tr K⁻¹`. -/
+theorem meff_prohibition_with_certificate {decay : ℝ} (hd : |decay| < 1)
+    (lam : ℕ → ℕ → ℝ)
+    (hspectrum : ∀ m : ℕ,
+      ∑ i ∈ Finset.range m, (lam m i)⁻¹ = ldPrecisionTrace decay m)
+    (Φ : MomentContinuousFunctional) :
+    Filter.Tendsto (fun m : ℕ => inverseTraceCertificate m (lam m)) Filter.atTop
+        (nhds (ldWhiteningGain decay)) ∧
+      (∀ headroom : ℝ, whitenedCapacity headroom decay =
+        headroom * (1 - decay ^ 2) / (1 + decay ^ 2)) ∧
+      ¬ (∀ (m : ℕ) (s : ℕ → ℝ), Φ.value m s = inverseTraceCertificate m s) :=
+  ⟨inverseTraceCertificate_tendsto_ldWhiteningGain hd lam hspectrum,
+    fun headroom => whitenedCapacity_closedForm headroom decay,
+    fun h => certificate_not_momentContinuous Φ h⟩
+
 end MeffProhibition
 
 end

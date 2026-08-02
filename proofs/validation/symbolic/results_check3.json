@@ -430,7 +430,7 @@
      "fqn": "Calibrator.PolygenicArchitecture.expectedSquaredEffect",
      "name": "expectedSquaredEffect",
      "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicArchitecture.lean",
-     "line": 43,
+     "line": 44,
      "binders": [
       "h2",
       "M"
@@ -951,7 +951,7 @@
      "fqn": "Calibrator.PolygenicArchitecture.spikeAndSlabVariance",
      "name": "spikeAndSlabVariance",
      "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicArchitecture.lean",
-     "line": 62,
+     "line": 63,
      "binders": [
       "pi",
       "sigma_sq_large",
@@ -1810,7 +1810,7 @@
      "fqn": "Calibrator.PolygenicArchitecture.effectivePolygenicity",
      "name": "effectivePolygenicity",
      "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicArchitecture.lean",
-     "line": 169,
+     "line": 170,
      "binders": [
       "sum_beta_sq",
       "sum_beta_fourth"
@@ -2520,7 +2520,7 @@
    "concept": "circulantspectrum",
    "a": {
     "fqn": "Calibrator.EpistaticChaos.circulantSpectrumA",
-    "line": 1328,
+    "line": 1355,
     "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
     "expr": "8*x0**2 + 2*x0 - 4",
     "binders": [
@@ -2530,7 +2530,7 @@
    },
    "b": {
     "fqn": "Calibrator.EpistaticChaos.circulantSpectrumB",
-    "line": 1335,
+    "line": 1362,
     "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
     "expr": "4*x0**2 + 4*x0 - 2",
     "binders": [
@@ -2704,7 +2704,7 @@
    "concept": "gradecertified",
    "a": {
     "fqn": "Calibrator.PolygenicArchitecture.gradeCertifiedRisk",
-    "line": 517,
+    "line": 518,
     "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicArchitecture.lean",
     "expr": "x0**(-x2/x1)",
     "binders": [
@@ -3060,15 +3060,19 @@
    ]
   }
  ],
- "parsed": 366,
- "opaque": 593,
+ "parsed": 368,
+ "opaque": 604,
  "opaque_reasons": [
   [
    "non-real binder",
-   475
+   478
   ],
   [
    "Phi expects 0 args [], got 1",
+   11
+  ],
+  [
+   "non-closed-form construct: then",
    11
   ],
   [
@@ -3076,12 +3080,12 @@
    10
   ],
   [
-   "non-closed-form construct: fun",
+   "non-closed-form construct: with",
    8
   ],
   [
-   "non-closed-form construct: with",
-   8
+   "lex error at 'ℝ) / (totalMarkers :'",
+   5
   ],
   [
    "lex error at 'ℝ'",
@@ -3096,19 +3100,15 @@
    4
   ],
   [
-   "non-closed-form construct: then",
-   4
-  ],
-  [
    "non-closed-form construct: Set",
    4
   ],
   [
-   "non-closed-form construct: ∑",
+   "lex error at 'ℝ))) ^ t'",
    3
   ],
   [
-   "lex error at 'ℝ))) ^ t'",
+   "non-closed-form construct: fun",
    3
   ],
   [
@@ -3120,7 +3120,7 @@
    2
   ],
   [
-   "applied non-function driftLDTrajectory",
+   "non-closed-form construct: ∑",
    2
   ]
  ]

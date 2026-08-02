@@ -3540,6 +3540,7 @@
   },
   "mentioned_by": [
    "Calibrator.demographicSpike_eq_contrastVariance_mul_effectiveSize",
+   "Calibrator.demographicSpike_eq_contrastVariance_mul_spikeLoad",
    "Calibrator.effectiveMigration_eq_meanAlleleFreq_map",
    "Calibrator.effectiveSymmetricMigration_eq_meanAlleleFreq_map",
    "Calibrator.four_hudsonFst_eq_standardizedContrastVariance",
@@ -3585,16 +3586,20 @@
   },
   "mentioned_by": [
    "Calibrator.demographicSpike_eq_contrastVariance_mul_effectiveSize",
+   "Calibrator.demographicSpike_eq_contrastVariance_mul_spikeLoad",
    "Calibrator.four_hudsonFst_eq_standardizedContrastVariance",
    "Calibrator.hudsonFst_eq_varianceRatio",
-   "Calibrator.simpleFst_eq_hudsonFst"
+   "Calibrator.rigid_pcCorrectabilityMargin_is_the_criterion",
+   "Calibrator.simpleFst_eq_hudsonFst",
+   "Calibrator.stratification_imitable_iff_within_budget"
   ],
   "constraints": {
    "declared_kind": "F_ST",
    "declared_lo": 0.0,
    "declared_hi": 1.0,
    "hypotheses": [
-    "meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂"
+    "meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂",
+    "0 ≤ hudsonFst p₁ p₂"
    ]
   }
  },
@@ -8161,12 +8166,12 @@
    "declared_hi": 1.0
   }
  },
- "Calibrator.GenotypeDesign.LociIndependent": {
+ "Calibrator.GenotypeDesign.InLinkageEquilibrium": {
   "class": "STRUCTURAL",
   "note": "Prop-valued / set-valued",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 815,
-  "short": "LociIndependent",
+  "line": 821,
+  "short": "InLinkageEquilibrium",
   "ret_type": "Prop",
   "empirical_status": "UNTESTED",
   "python": null,
@@ -8190,7 +8195,7 @@
   "class": "STRUCTURAL",
   "note": "Prop-valued / set-valued",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 823,
+  "line": 829,
   "short": "Polymorphic",
   "ret_type": "Prop",
   "empirical_status": "UNTESTED",
@@ -8217,7 +8222,7 @@
   "class": "STRUCTURAL",
   "note": "Prop-valued / set-valued",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 838,
+  "line": 844,
   "short": "VariantDisjoint",
   "ret_type": "Prop",
   "empirical_status": "UNTESTED",
@@ -8250,7 +8255,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "unrecognised character '.'",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 847,
+  "line": 853,
   "short": "variantRecurrence",
   "ret_type": "ℕ",
   "empirical_status": "UNTESTED",
@@ -8278,7 +8283,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "Finset/indexed sum",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 856,
+  "line": 862,
   "short": "locusInfluence",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -8303,7 +8308,7 @@
   "class": "STRUCTURAL",
   "note": "Prop-valued / set-valued",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 871,
+  "line": 877,
   "short": "IsTwoPoolInteraction",
   "ret_type": "Prop",
   "empirical_status": "UNTESTED",
@@ -8333,7 +8338,7 @@
   "class": "STRUCTURAL",
   "note": "structure literal",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 937,
+  "line": 943,
   "short": "geneBurdenDesign",
   "ret_type": "GenotypeDesign n γ where model",
   "empirical_status": "UNTESTED",
@@ -8359,7 +8364,7 @@
   "class": "STRUCTURAL",
   "note": "structure literal",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 964,
+  "line": 970,
   "short": "slidingWindowDesign",
   "ret_type": "GenotypeDesign n (Fin n) where model",
   "empirical_status": "UNTESTED",
@@ -8385,7 +8390,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 1219,
+  "line": 1225,
   "short": "fourthCumulantFromMoments",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -8421,7 +8426,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 1349,
+  "line": 1355,
   "short": "circulantSpectrumA",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -8453,7 +8458,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/EpistaticChaos.lean",
-  "line": 1356,
+  "line": 1362,
   "short": "circulantSpectrumB",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -10522,7 +10527,10 @@
   "mentioned_by": [
    "Calibrator.belowCeiling_add_rankOne_iff",
    "Calibrator.gramForm_sq_le",
+   "Calibrator.imitable_despite_positive_pcCorrectabilityMargin",
+   "Calibrator.positive_pc_margin_does_not_imply_detectable",
    "Calibrator.spiked_genotype_covariance_belowCeiling",
+   "Calibrator.stratification_imitable_iff_within_budget",
    "Calibrator.traceWindowClass_isNull_baseline",
    "Calibrator.traceWindow_rigid",
    "Calibrator.varianceNonneg_add",
@@ -10694,8 +10702,8 @@
   "mentioned_by": [
    "Calibrator.clumping_maximizes_reconstruction_on_ld_kernel",
    "Calibrator.clumping_minimizes_detection_on_ld_kernel",
-   "Calibrator.ldBandDetectionShare_eq_integral",
-   "Calibrator.ldBandReconstructionShare_eq_integral",
+   "Calibrator.ldBand_detection_integral_ratio_le_retention",
+   "Calibrator.ldBlock_detection_integral_ratio_le_retention",
    "Calibrator.ldKernelSymbol_ge_hardEdge",
    "Calibrator.ldKernelSymbol_harmonicMean",
    "Calibrator.ldKernelSymbol_mono_in_cos",
@@ -10714,6 +10722,7 @@
    "hypotheses": [
     "|decay| < 1",
     "0 ≤ decay",
+    "LDBandIntegralIdentification decay",
     "∀ i ∈ S, Real.cos cutAngle ≤ Real.cos (angle i",
     "∀ i ∉ S, Real.cos (angle i"
    ]
@@ -10781,6 +10790,7 @@
   },
   "mentioned_by": [
    "Calibrator.imitationCapacity_eq_whitenedCapacity",
+   "Calibrator.inverseTraceCertificate_tendsto_ldWhiteningGain",
    "Calibrator.ldKernelSymbol_harmonicMean",
    "Calibrator.ldPrecisionTrace_div_sites_tendsto",
    "Calibrator.ldPrecisionTrace_eq_boundary_add_interior",
@@ -10788,6 +10798,7 @@
    "Calibrator.ldWhiteningGain_of_ldRetention_antitone",
    "Calibrator.ldWhiteningGain_one_lt_iff",
    "Calibrator.ldWhiteningGain_strictMono",
+   "Calibrator.meff_prohibition_with_certificate",
    "Calibrator.pruning_loses_detection_iff_whiteningGain_exceeds_one",
    "Calibrator.traceWindowSpikeLoad_tendsto_ldWhiteningGain",
    "Calibrator.whitenedCapacity_closedForm",
@@ -10839,8 +10850,11 @@
    "error": null
   },
   "mentioned_by": [
+   "Calibrator.inverseTraceCertificate_eq_traceWindowSpikeLoad",
+   "Calibrator.inverseTraceCertificate_tendsto_ldWhiteningGain",
    "Calibrator.ldPrecisionTrace_div_sites_tendsto",
-   "Calibrator.ldPrecisionTrace_eq_boundary_add_interior"
+   "Calibrator.ldPrecisionTrace_eq_boundary_add_interior",
+   "Calibrator.meff_prohibition_with_certificate"
   ],
   "constraints": {
    "declared_kind": "nonnegative",
@@ -11634,6 +11648,7 @@
    "Calibrator.clumping_minimizes_detection_on_ld_kernel",
    "Calibrator.ldBlockDetectionShare_le_retention",
    "Calibrator.ldBlockPruningDeficit_antitone_in_recombination",
+   "Calibrator.ldBlock_detection_integral_ratio_le_retention",
    "Calibrator.ldRetentionPerGen_abs_lt_one",
    "Calibrator.ldRetentionPerGen_strictAnti_recomb",
    "Calibrator.ldRetentionPerGen_uses_timeScale",
@@ -11658,7 +11673,8 @@
     "r ≤ 1",
     "1 ≤ Ne",
     "0 < spectralTotal (fun i => detectionWeight (ldKernelSymbol (ldRetentionPerGen recomb Ne",
-    "0 < spectralTotal (fun i => reconstructionWeight (ldKernelSymbol (ldRetentionPerGen recomb Ne"
+    "0 < spectralTotal (fun i => reconstructionWeight (ldKernelSymbol (ldRetentionPerGen recomb Ne",
+    "LDBandIntegralIdentification (ldRetentionPerGen recomb Ne"
    ],
    "range_hi_thm": [
     "Calibrator.ld_retention_lt_one",
@@ -13459,7 +13475,6 @@
    "error": null
   },
   "mentioned_by": [
-   "Calibrator.ldBandReconstructionShare_eq_integral",
    "Calibrator.ldBandReconstructionShare_of_no_ld"
   ],
   "constraints": {
@@ -13468,9 +13483,7 @@
    "declared_hi": 1.0,
    "hypotheses": [
     "0 ≤ kappa",
-    "kappa < 1",
-    "|decay| < 1",
-    "0 ≤ decay"
+    "kappa < 1"
    ]
   }
  },
@@ -13503,7 +13516,6 @@
    "error": null
   },
   "mentioned_by": [
-   "Calibrator.ldBandDetectionShare_eq_integral",
    "Calibrator.ldBandDetectionShare_eq_sub_deficit",
    "Calibrator.ldBandDetectionShare_le_retention",
    "Calibrator.ldBandDetectionShare_lt_retention",
@@ -13523,8 +13535,7 @@
     "kappa ≤ 1",
     "0 < decay",
     "0 < kappa",
-    "kappa < 1",
-    "|decay| < 1"
+    "kappa < 1"
    ]
   }
  },
@@ -13585,7 +13596,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/MetricSpecificPortability.lean",
-  "line": 1375,
+  "line": 1393,
   "short": "ldPanelRetentionFraction",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -13612,6 +13623,7 @@
   "mentioned_by": [
    "Calibrator.ldBlockDetectionShare_add_deficit",
    "Calibrator.ldBlockDetectionShare_le_retention",
+   "Calibrator.ldBlock_detection_integral_ratio_le_retention",
    "Calibrator.ldPanelRetentionFraction_mem",
    "Calibrator.ldTightLinkage_le_ldBlockDetectionShare"
   ],
@@ -13639,7 +13651,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/MetricSpecificPortability.lean",
-  "line": 1426,
+  "line": 1444,
   "short": "ldBlockReconstructionShare",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -13680,7 +13692,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/MetricSpecificPortability.lean",
-  "line": 1437,
+  "line": 1455,
   "short": "ldBlockDetectionShare",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -13736,7 +13748,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/MetricSpecificPortability.lean",
-  "line": 1447,
+  "line": 1465,
   "short": "ldBlockPruningDeficit",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -13794,7 +13806,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/MetricSpecificPortability.lean",
-  "line": 1458,
+  "line": 1476,
   "short": "ldTightLinkageDetectionShare",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -15008,6 +15020,7 @@
   "mentioned_by": [
    "Calibrator.BackgroundClass.isNull_spiked_of_le_imitationCapacity",
    "Calibrator.frobeniusForm_spikeOuter",
+   "Calibrator.imitable_despite_positive_pcCorrectabilityMargin",
    "Calibrator.quadForm_spikeOuter",
    "Calibrator.spikeOuter_eq_rankOneCovarianceBump",
    "Calibrator.traceForm_spikeOuter",
@@ -15056,6 +15069,7 @@
    "error": "value is not a real number: function"
   },
   "mentioned_by": [
+   "Calibrator.meffWitness_spectrum_pos",
    "Calibrator.sum_inv_twoBlock",
    "Calibrator.sum_pow_twoBlock",
    "Calibrator.sum_twoBlock_apply"
@@ -15090,8 +15104,12 @@
    "Calibrator.EquiExit.margin_pos_of_gt_capacity",
    "Calibrator.active_budget_makes_stratification_detectable",
    "Calibrator.grm_absorbs_tested_association",
+   "Calibrator.imitable_despite_positive_pcCorrectabilityMargin",
    "Calibrator.imitationCapacity_eq_whitenedCapacity",
    "Calibrator.loco_lowers_imitation_wall",
+   "Calibrator.not_isNull_of_demographicSpike_gt_budget",
+   "Calibrator.positive_pc_margin_does_not_imply_detectable",
+   "Calibrator.stratification_imitable_iff_within_budget",
    "Calibrator.traceWindowClass_isNull_baseline",
    "Calibrator.traceWindow_every_level_detectable"
   ],
@@ -15124,8 +15142,11 @@
    "Calibrator.BackgroundClass.not_isNull_spiked_of_active",
    "Calibrator.EquiExit.exitLevels_nonempty",
    "Calibrator.EquiExit.imitationCapacity_eq",
+   "Calibrator.demographicSpike_eq_contrastVariance_mul_spikeLoad",
+   "Calibrator.demographicSpike_eq_level_mul_spikeLoad",
    "Calibrator.traceWindowBudgetClass_spikeLoad",
-   "Calibrator.traceWindowClass_spikeLoad"
+   "Calibrator.traceWindowClass_spikeLoad",
+   "Calibrator.traceWindow_spikeLoad_demographic"
   ],
   "constraints": {
    "hypotheses": [
@@ -15161,6 +15182,7 @@
    "Calibrator.EquiExit.form_spiked_eq_bound_add_margin",
    "Calibrator.EquiExit.imitationCapacity_eq",
    "Calibrator.imitationCapacity_eq_whitenedCapacity",
+   "Calibrator.meff_prohibition_with_certificate",
    "Calibrator.traceWindowBudgetClass_headroom",
    "Calibrator.whitenedCapacity_closedForm",
    "Calibrator.whitenedCapacity_strictAnti"
@@ -15233,6 +15255,12 @@
    "Calibrator.EquiExit.form_spiked_eq_bound_add_margin",
    "Calibrator.active_budget_makes_stratification_detectable",
    "Calibrator.grm_absorbs_tested_association",
+   "Calibrator.imitable_despite_positive_pcCorrectabilityMargin",
+   "Calibrator.not_isNull_of_demographicSpike_gt_budget",
+   "Calibrator.positive_pc_margin_does_not_imply_detectable",
+   "Calibrator.rigid_certificate_exceeds_ceiling_iff_pcCorrectabilityMargin_pos",
+   "Calibrator.rigid_pcCorrectabilityMargin_is_the_criterion",
+   "Calibrator.stratification_imitable_iff_within_budget",
    "Calibrator.traceWindow_every_level_detectable"
   ],
   "constraints": {
@@ -15240,6 +15268,8 @@
    "declared_lo": 0.0,
    "declared_hi": null,
    "hypotheses": [
+    "VarianceNonneg (S₀ - base",
+    "traceForm S₀ + demographicSpike (N : ℝ",
     "K.IsNull S₀",
     "0 ≤ t",
     "t ≤ K.imitationCapacity S₀ support",
@@ -15250,7 +15280,8 @@
     "ε < E.margin t / 2",
     "|empirical - K.form E.binding (K.spiked S₀ t v",
     "∀ v : ι → ℝ, v ≠ 0 → 0 < quadForm A v",
-    "v ≠ 0"
+    "v ≠ 0",
+    "budget < traceForm S₀ + demographicSpike (N : ℝ"
    ]
   }
  },
@@ -15357,9 +15388,16 @@
   "box": {},
   "selfcheck": null,
   "mentioned_by": [
+   "Calibrator.imitable_despite_positive_pcCorrectabilityMargin",
+   "Calibrator.not_isNull_of_demographicSpike_gt_budget",
+   "Calibrator.positive_pc_margin_does_not_imply_detectable",
+   "Calibrator.rigid_certificate_exceeds_ceiling_iff_pcCorrectabilityMargin_pos",
+   "Calibrator.rigid_pcCorrectabilityMargin_is_the_criterion",
+   "Calibrator.stratification_imitable_iff_within_budget",
    "Calibrator.traceForm_add",
    "Calibrator.traceForm_smul",
    "Calibrator.traceForm_spikeOuter",
+   "Calibrator.traceWindowBudgetClass_form",
    "Calibrator.traceWindowBudgetClass_headroom"
   ],
   "constraints": {
@@ -15387,14 +15425,28 @@
   },
   "selfcheck": null,
   "mentioned_by": [
+   "Calibrator.demographicSpike_eq_contrastVariance_mul_spikeLoad",
+   "Calibrator.demographicSpike_eq_level_mul_spikeLoad",
+   "Calibrator.imitable_despite_positive_pcCorrectabilityMargin",
+   "Calibrator.not_isNull_of_demographicSpike_gt_budget",
+   "Calibrator.positive_pc_margin_does_not_imply_detectable",
+   "Calibrator.rigid_certificate_exceeds_ceiling_iff_pcCorrectabilityMargin_pos",
+   "Calibrator.rigid_pcCorrectabilityMargin_is_the_criterion",
+   "Calibrator.stratification_imitable_iff_within_budget",
+   "Calibrator.traceWindowBudgetClass_bound",
+   "Calibrator.traceWindowBudgetClass_form",
    "Calibrator.traceWindowBudgetClass_headroom",
-   "Calibrator.traceWindowBudgetClass_spikeLoad"
+   "Calibrator.traceWindowBudgetClass_spikeLoad",
+   "Calibrator.traceWindow_spikeLoad_demographic"
   ],
   "constraints": {
    "declared_kind": "nonnegative",
    "declared_lo": 0.0,
    "declared_hi": null,
-   "hypotheses": []
+   "hypotheses": [
+    "VarianceNonneg (S₀ - base",
+    "budget < traceForm S₀ + demographicSpike (N : ℝ"
+   ]
   }
  },
  "Calibrator.EquiExit.margin": {
@@ -15516,6 +15568,8 @@
    "error": null
   },
   "mentioned_by": [
+   "Calibrator.inverseTraceCertificate_eq_traceWindowSpikeLoad",
+   "Calibrator.inverseTraceCertificate_tendsto_ldWhiteningGain",
    "Calibrator.traceWindowSpikeLoad_tendsto_ldWhiteningGain"
   ],
   "constraints": {
@@ -15557,21 +15611,155 @@
   },
   "mentioned_by": [
    "Calibrator.imitationCapacity_eq_whitenedCapacity",
+   "Calibrator.meff_prohibition_with_certificate",
    "Calibrator.whitenedCapacity_closedForm",
    "Calibrator.whitenedCapacity_strictAnti"
   ],
   "constraints": {
    "hypotheses": [
     "E.load = ldWhiteningGain decay",
-    "0 < headroom"
+    "0 < headroom",
+    "|decay| < 1"
    ]
+  }
+ },
+ "Calibrator.subgroupContrast": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
+  "line": 985,
+  "short": "subgroupContrast",
+  "ret_type": "ℕ → ℝ",
+  "empirical_status": "DERIVED",
+  "python": "subgroupContrast",
+  "args": [
+   "n",
+   "m"
+  ],
+  "box": {
+   "n": [
+    1.0,
+    20.0
+   ],
+   "m": [
+    1.0,
+    20.0
+   ]
+  },
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "value is not a real number: function"
+  },
+  "mentioned_by": [
+   "Calibrator.dot_demographicSpikeDirection"
+  ],
+  "constraints": {
+   "declared_kind": "nonnegative",
+   "declared_lo": 0.0,
+   "declared_hi": null,
+   "hypotheses": [
+    "m ≤ n",
+    "0 < n"
+   ]
+  }
+ },
+ "Calibrator.demographicSpikeDirection": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "qualified name i.val",
+  "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
+  "line": 991,
+  "short": "demographicSpikeDirection",
+  "ret_type": "Fin n → ℝ",
+  "empirical_status": "DERIVED",
+  "python": null,
+  "args": [],
+  "box": {
+   "n": [
+    1.0,
+    20.0
+   ],
+   "m": [
+    1.0,
+    20.0
+   ]
+  },
+  "selfcheck": null,
+  "mentioned_by": [
+   "Calibrator.demographicSpike_eq_contrastVariance_mul_spikeLoad",
+   "Calibrator.demographicSpike_eq_level_mul_spikeLoad",
+   "Calibrator.dot_demographicSpikeDirection",
+   "Calibrator.imitable_despite_positive_pcCorrectabilityMargin",
+   "Calibrator.not_isNull_of_demographicSpike_gt_budget",
+   "Calibrator.positive_pc_margin_does_not_imply_detectable",
+   "Calibrator.rigid_certificate_exceeds_ceiling_iff_pcCorrectabilityMargin_pos",
+   "Calibrator.rigid_pcCorrectabilityMargin_is_the_criterion",
+   "Calibrator.stratification_imitable_iff_within_budget",
+   "Calibrator.traceWindow_spikeLoad_demographic"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "m ≤ N",
+    "m ≤ n",
+    "0 < n"
+   ]
+  }
+ },
+ "Calibrator.stratificationCertificateMargin": {
+  "class": "NUMERIC",
+  "note": "",
+  "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
+  "line": 1068,
+  "short": "stratificationCertificateMargin",
+  "ret_type": "ℝ",
+  "empirical_status": "UNTESTED",
+  "python": "stratificationCertificateMargin",
+  "args": [
+   "headroom",
+   "n",
+   "M",
+   "F",
+   "m"
+  ],
+  "box": {
+   "headroom": [
+    0.05,
+    3.0
+   ],
+   "n": [
+    1.0,
+    1000.0
+   ],
+   "M": [
+    0.05,
+    3.0
+   ],
+   "F": [
+    0.05,
+    3.0
+   ],
+   "m": [
+    1.0,
+    1000.0
+   ]
+  },
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
+  "mentioned_by": [
+   "Calibrator.stratificationCertificateMargin_zero_headroom"
+  ],
+  "constraints": {
+   "hypotheses": []
   }
  },
  "Calibrator.blockSpectrum": {
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: value is not a real number: function (vector- or function-valued)",
   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 952,
+  "line": 1208,
   "short": "blockSpectrum",
   "ret_type": "ℕ → ℝ",
   "empirical_status": "DERIVED",
@@ -15598,8 +15786,8 @@
   "mentioned_by": [
    "Calibrator.blockSpectrum_moment_gap_le",
    "Calibrator.inverseTraceCertificate_blockSpectrum",
-   "Calibrator.normalizedMoment_blockSpectrum",
-   "Calibrator.sum_blockSpectrum"
+   "Calibrator.meffWitness_spectrum_pos",
+   "Calibrator.normalizedMoment_blockSpectrum"
   ],
   "constraints": {
    "hypotheses": [
@@ -15612,7 +15800,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "Finset/indexed sum",
   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 960,
+  "line": 1216,
   "short": "normalizedMoment",
   "ret_type": "ℝ",
   "empirical_status": "DERIVED",
@@ -15632,6 +15820,7 @@
   "mentioned_by": [
    "Calibrator.blockSpectrum_moment_gap_le",
    "Calibrator.meff_moment_gap_le",
+   "Calibrator.meff_normalizedTrace_gap_le",
    "Calibrator.normalizedMoment_blockSpectrum"
   ],
   "constraints": {
@@ -15642,7 +15831,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "Finset/indexed sum",
   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 970,
+  "line": 1226,
   "short": "inverseTraceCertificate",
   "ret_type": "ℝ",
   "empirical_status": "DERIVED",
@@ -15659,10 +15848,15 @@
    "Calibrator.certificate_not_momentContinuous",
    "Calibrator.effective_marker_count_cannot_set_threshold",
    "Calibrator.inverseTraceCertificate_blockSpectrum",
-   "Calibrator.meff_certificate_gap"
+   "Calibrator.inverseTraceCertificate_eq_traceWindowSpikeLoad",
+   "Calibrator.inverseTraceCertificate_tendsto_ldWhiteningGain",
+   "Calibrator.meff_certificate_gap",
+   "Calibrator.meff_prohibition_with_certificate"
   ],
   "constraints": {
    "hypotheses": [
+    "∑ i ∈ Finset.range m, (lam i",
+    "∀ m : ℕ, ∑ i ∈ Finset.range m, (lam m i",
     "∀ (m : ℕ"
    ]
   }
@@ -15671,7 +15865,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: value is not a real number: function (vector- or function-valued)",
   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1062,
+  "line": 1322,
   "short": "meffPerturbed",
   "ret_type": "ℕ → ℝ",
   "empirical_status": "DERIVED",
@@ -15692,20 +15886,27 @@
   },
   "mentioned_by": [
    "Calibrator.certificate_not_momentContinuous",
+   "Calibrator.meffWitness_spectrum_pos",
    "Calibrator.meff_certificate_gap",
-   "Calibrator.meff_moment_gap_le"
+   "Calibrator.meff_moment_gap_le",
+   "Calibrator.meff_normalizedTrace_gap_le"
   ],
   "constraints": {
    "hypotheses": [
     "0 < n"
-   ]
+   ],
+   "range_lo_thm": [
+    "Calibrator.meffWitness_spectrum_pos",
+    0
+   ],
+   "range_lo": 0
   }
  },
  "Calibrator.meffFlat": {
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: value is not a real number: function (vector- or function-valued)",
   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1067,
+  "line": 1327,
   "short": "meffFlat",
   "ret_type": "ℕ → ℝ",
   "empirical_status": "DERIVED",
@@ -15726,20 +15927,27 @@
   },
   "mentioned_by": [
    "Calibrator.certificate_not_momentContinuous",
+   "Calibrator.meffWitness_spectrum_pos",
    "Calibrator.meff_certificate_gap",
-   "Calibrator.meff_moment_gap_le"
+   "Calibrator.meff_moment_gap_le",
+   "Calibrator.meff_normalizedTrace_gap_le"
   ],
   "constraints": {
    "hypotheses": [
     "0 < n"
-   ]
+   ],
+   "range_lo_thm": [
+    "Calibrator.meffWitness_spectrum_pos",
+    0
+   ],
+   "range_lo": 0
   }
  },
  "Calibrator.meffSize": {
   "class": "NUMERIC",
   "note": "",
   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 1072,
+  "line": 1332,
   "short": "meffSize",
   "ret_type": "ℕ",
   "empirical_status": "DERIVED",
@@ -15761,7 +15969,8 @@
   "mentioned_by": [
    "Calibrator.certificate_not_momentContinuous",
    "Calibrator.meff_certificate_gap",
-   "Calibrator.meff_moment_gap_le"
+   "Calibrator.meff_moment_gap_le",
+   "Calibrator.meff_normalizedTrace_gap_le"
   ],
   "constraints": {
    "hypotheses": [
@@ -15989,13 +16198,17 @@
   "mentioned_by": [
    "Calibrator.demographicSpike_eq_contrastVariance_mul_effectiveSize",
    "Calibrator.demographicSpike_le_balanced",
+   "Calibrator.dot_demographicSpikeDirection",
    "Calibrator.effectiveSubgroupSize_balanced",
    "Calibrator.effectiveSubgroupSize_le_balanced",
-   "Calibrator.fst_does_not_determine_pc_correctability"
+   "Calibrator.fst_does_not_determine_pc_correctability",
+   "Calibrator.traceWindow_spikeLoad_demographic"
   ],
   "constraints": {
    "hypotheses": [
-    "0 < n"
+    "0 < n",
+    "m ≤ n",
+    "m ≤ N"
    ]
   }
  },
@@ -16034,19 +16247,26 @@
   },
   "mentioned_by": [
    "Calibrator.demographicSpike_eq_contrastVariance_mul_effectiveSize",
+   "Calibrator.demographicSpike_eq_contrastVariance_mul_spikeLoad",
+   "Calibrator.demographicSpike_eq_level_mul_spikeLoad",
    "Calibrator.demographicSpike_le_balanced",
    "Calibrator.exists_superthreshold_subgroup_iff_balanced",
    "Calibrator.exists_superthreshold_subgroup_iff_information",
    "Calibrator.exists_superthreshold_subgroup_iff_marker_requirement",
    "Calibrator.exists_superthreshold_subgroup_iff_sample_requirement",
    "Calibrator.fst_does_not_determine_pc_correctability",
-   "Calibrator.pcCorrectabilityMargin_le_balanced"
+   "Calibrator.imitable_despite_positive_pcCorrectabilityMargin",
+   "Calibrator.not_isNull_of_demographicSpike_gt_budget",
+   "Calibrator.pcCorrectabilityMargin_le_balanced",
+   "Calibrator.positive_pc_margin_does_not_imply_detectable",
+   "Calibrator.stratification_imitable_iff_within_budget"
   ],
   "constraints": {
    "declared_kind": "F_ST",
    "declared_lo": 0.0,
    "declared_hi": 1.0,
    "hypotheses": [
+    "m ≤ N",
     "0 < n",
     "0 < F",
     "0 ≤ F"
@@ -16083,6 +16303,7 @@
   },
   "mentioned_by": [
    "Calibrator.balanced_superthreshold_iff_information",
+   "Calibrator.bbpProxyThreshold_tendsto_zero",
    "Calibrator.exists_superthreshold_subgroup_iff_balanced",
    "Calibrator.exists_superthreshold_subgroup_iff_information",
    "Calibrator.exists_superthreshold_subgroup_iff_marker_requirement",
@@ -16090,6 +16311,8 @@
    "Calibrator.fst_does_not_determine_pc_correctability",
    "Calibrator.modeledPCResidualSusceptibility_eq_uncorrected_of_subthreshold",
    "Calibrator.modeledPCResidualSusceptibility_pos_and_lt_uncorrected",
+   "Calibrator.rigid_certificate_exceeds_ceiling_iff_pcCorrectabilityMargin_pos",
+   "Calibrator.rigid_pcCorrectabilityMargin_is_the_criterion",
    "Calibrator.samplePCOverlapSq_eq_of_superthreshold",
    "Calibrator.samplePCOverlapSq_eq_zero_of_subthreshold",
    "Calibrator.samplePCOverlapSq_pos_and_lt_one",
@@ -16153,11 +16376,18 @@
    "error": null
   },
   "mentioned_by": [
+   "Calibrator.imitable_despite_positive_pcCorrectabilityMargin",
    "Calibrator.pcCorrectabilityMargin_le_balanced",
+   "Calibrator.positive_pc_margin_does_not_imply_detectable",
+   "Calibrator.rigid_certificate_exceeds_ceiling_iff_pcCorrectabilityMargin_pos",
+   "Calibrator.rigid_pcCorrectabilityMargin_is_the_criterion",
+   "Calibrator.stratificationCertificateMargin_zero_headroom",
+   "Calibrator.stratification_imitable_iff_within_budget",
    "Calibrator.subthreshold_pc_residual_bias_floor"
   ],
   "constraints": {
    "hypotheses": [
+    "m ≤ N",
     "0 < n",
     "0 ≤ F"
    ],
@@ -31449,6 +31679,7 @@
    "Calibrator.clumping_minimizes_detection_on_ld_kernel",
    "Calibrator.detectionWeight_strictAnti",
    "Calibrator.detection_threshold_of_variance_threshold",
+   "Calibrator.exists_split_attaining_scalarized_optimum",
    "Calibrator.scalarized_optimum_is_coordinate_split",
    "Calibrator.topVariance_minimizes_detection",
    "Calibrator.weight_orders_reversed"
@@ -31485,6 +31716,7 @@
   },
   "mentioned_by": [
    "Calibrator.clumping_maximizes_reconstruction_on_ld_kernel",
+   "Calibrator.exists_split_attaining_scalarized_optimum",
    "Calibrator.reconstructionWeight_strictMono",
    "Calibrator.scalarized_optimum_is_coordinate_split",
    "Calibrator.topVariance_maximizes_reconstruction",
@@ -31550,6 +31782,7 @@
   "box": {},
   "selfcheck": null,
   "mentioned_by": [
+   "Calibrator.exists_split_attaining_scalarized_optimum",
    "Calibrator.pruneAllocation_isRankAllocation",
    "Calibrator.scalarized_optimum_is_coordinate_split",
    "Calibrator.spectralCapture_affine",
@@ -31676,6 +31909,7 @@
   "mentioned_by": [
    "Calibrator.clumping_maximizes_reconstruction_on_ld_kernel",
    "Calibrator.clumping_minimizes_detection_on_ld_kernel",
+   "Calibrator.exists_split_attaining_scalarized_optimum",
    "Calibrator.pruneAllocation_isRankAllocation",
    "Calibrator.scalarized_optimum_is_coordinate_split",
    "Calibrator.spectralCapture_pruneAllocation",
@@ -31695,6 +31929,25 @@
     "∀ i ∈ S, t ≤ lam * reconstructionWeight (spectrum i",
     "∀ i ∉ S, lam * reconstructionWeight (spectrum i"
    ]
+  }
+ },
+ "Calibrator.HasThresholdSetAtEveryRank": {
+  "class": "STRUCTURAL",
+  "note": "Prop-valued / set-valued",
+  "file": "Calibrator/ProjectionShiftBounds.lean",
+  "line": 760,
+  "short": "HasThresholdSetAtEveryRank",
+  "ret_type": "Prop",
+  "empirical_status": "UNTESTED",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "mentioned_by": [
+   "Calibrator.exists_split_attaining_scalarized_optimum"
+  ],
+  "constraints": {
+   "hypotheses": []
   }
  },
  "Calibrator.quadraticRisk": {
@@ -36884,6 +37137,7 @@
    "Calibrator.crossCovVector_decomposition",
    "Calibrator.dot_add_left",
    "Calibrator.dot_add_right_shift",
+   "Calibrator.dot_demographicSpikeDirection",
    "Calibrator.dot_rawCrossMoment",
    "Calibrator.dot_smul_left",
    "Calibrator.dot_smul_right",
@@ -37894,7 +38148,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "unrecognised character '!'",
   "file": "Calibrator.lean",
-  "line": 116,
+  "line": 117,
   "short": "sigmaS",
   "ret_type": "Matrix (Fin 2) (Fin 2) ℝ",
   "empirical_status": "",
@@ -37914,7 +38168,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "unrecognised character '!'",
   "file": "Calibrator.lean",
-  "line": 119,
+  "line": 120,
   "short": "sigmaT",
   "ret_type": "Matrix (Fin 2) (Fin 2) ℝ",
   "empirical_status": "",
@@ -37933,7 +38187,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "unrecognised character '!'",
   "file": "Calibrator.lean",
-  "line": 122,
+  "line": 123,
   "short": "crossS",
   "ret_type": "Fin 2 → ℝ",
   "empirical_status": "",
@@ -37956,7 +38210,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "unrecognised character '!'",
   "file": "Calibrator.lean",
-  "line": 129,
+  "line": 130,
   "short": "sigmaT2",
   "ret_type": "Matrix (Fin 2) (Fin 2) ℝ",
   "empirical_status": "",

@@ -4145,6 +4145,7 @@
    },
    "mentioned_by": [
     "Calibrator.demographicSpike_eq_contrastVariance_mul_effectiveSize",
+    "Calibrator.demographicSpike_eq_contrastVariance_mul_spikeLoad",
     "Calibrator.effectiveMigration_eq_meanAlleleFreq_map",
     "Calibrator.effectiveSymmetricMigration_eq_meanAlleleFreq_map",
     "Calibrator.four_hudsonFst_eq_standardizedContrastVariance",
@@ -4183,14 +4184,18 @@
     "declared_lo": 0.0,
     "declared_hi": 1.0,
     "hypotheses": [
-     "meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂"
+     "meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂",
+     "0 ≤ hudsonFst p₁ p₂"
     ]
    },
    "mentioned_by": [
     "Calibrator.demographicSpike_eq_contrastVariance_mul_effectiveSize",
+    "Calibrator.demographicSpike_eq_contrastVariance_mul_spikeLoad",
     "Calibrator.four_hudsonFst_eq_standardizedContrastVariance",
     "Calibrator.hudsonFst_eq_varianceRatio",
-    "Calibrator.simpleFst_eq_hudsonFst"
+    "Calibrator.rigid_pcCorrectabilityMargin_is_the_criterion",
+    "Calibrator.simpleFst_eq_hudsonFst",
+    "Calibrator.stratification_imitable_iff_within_budget"
    ]
   },
   {
@@ -9973,17 +9978,17 @@
    "mentioned_by": []
   },
   {
-   "name": "Calibrator.GenotypeDesign.LociIndependent",
-   "short": "LociIndependent",
+   "name": "Calibrator.GenotypeDesign.InLinkageEquilibrium",
+   "short": "InLinkageEquilibrium",
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/EpistaticChaos.lean",
-   "line": 815,
+   "line": 821,
    "signature": ": Prop",
    "args": [],
    "ret_type": "Prop",
    "body": "  ∀ x : Fin n → DiploidGenotype,\n    design.jointGenotypeProb x = ∏ i, (design.model i).genotypeProb (x i)",
-   "docstring": "**The panel loci are independent**: the joint genotype law factorizes into\nthe per-locus Hardy-Weinberg laws. This is linkage equilibrium across the tested\npanel, stated as the factorization it is; the dynamics that drive a population\ntowards it live in `Calibrator.LDDecayTheory`.\n\nIt is an assumption about the population, not about the coding, and it is what\nthe disjoint licence needs in place of symmetry. A design whose tested sets sit\ninside one LD block does not have it.\n\nEmpirical status: UNTESTED. A factorization condition on the joint law; testable\ndirectly as pairwise LD between panel loci.",
+   "docstring": "**Linkage equilibrium across the tested panel**: the joint genotype law\nfactorizes into the per-locus Hardy-Weinberg laws. It is stated as the\nfactorization it is; the dynamics that drive a population towards it live in\n`Calibrator.LDDecayTheory`.\n\nThis is an assumption about the population, not about the coding, and it is what\nthe disjoint licence needs in place of symmetry. A design whose tested sets sit\ninside one LD block does not have it, which makes the licence's applicability\ncheckable on a study's own panel rather than on an idealized coordinate law.\n\nNote for automated checking: this is a *predicate* on a design, not a stipulated\nequilibrium quantity. There is no one-step map here and nothing for a\n`_isFixedPoint` theorem to be about; the recombination dynamics that have a fixed\npoint live in `Calibrator.LDDecayTheory`.\n\nEmpirical status: UNTESTED. A factorization condition on the joint law; testable\ndirectly as pairwise LD between panel loci.",
    "empirical_status": "UNTESTED",
    "namespace": "Calibrator.GenotypeDesign",
    "fields": [],
@@ -10007,7 +10012,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/EpistaticChaos.lean",
-   "line": 823,
+   "line": 829,
    "signature": ": Prop",
    "args": [],
    "ret_type": "Prop",
@@ -10038,7 +10043,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/EpistaticChaos.lean",
-   "line": 838,
+   "line": 844,
    "signature": ": Prop",
    "args": [],
    "ret_type": "Prop",
@@ -10075,7 +10080,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/EpistaticChaos.lean",
-   "line": 847,
+   "line": 853,
    "signature": "(i : Fin n) : ℕ",
    "args": [
     {
@@ -10116,7 +10121,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/EpistaticChaos.lean",
-   "line": 856,
+   "line": 862,
    "signature": "(i : Fin n) : ℝ",
    "args": [
     {
@@ -10154,7 +10159,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/EpistaticChaos.lean",
-   "line": 871,
+   "line": 877,
    "signature": "(poolOne poolTwo : Finset (Fin n)) : Prop",
    "args": [
     {
@@ -10198,7 +10203,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/EpistaticChaos.lean",
-   "line": 937,
+   "line": 943,
    "signature": "{γ : Type*} [DecidableEq γ] (model : Fin n → HardyWeinbergModel) (geneOf : Fin n → γ) (coeff : γ → ℝ) (jointGenotypeProb : (Fin n → DiploidGenotype) → ℝ) : GenotypeDesign n γ where model",
    "args": [
     {
@@ -10278,7 +10283,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/EpistaticChaos.lean",
-   "line": 964,
+   "line": 970,
    "signature": "(model : Fin n → HardyWeinbergModel) (width : ℕ) (coeff : Fin n → ℝ) (jointGenotypeProb : (Fin n → DiploidGenotype) → ℝ) : GenotypeDesign n (Fin n) where model",
    "args": [
     {
@@ -10336,7 +10341,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/EpistaticChaos.lean",
-   "line": 1219,
+   "line": 1225,
    "signature": "(secondMoment fourthMoment : ℝ) : ℝ",
    "args": [
     {
@@ -10370,7 +10375,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/EpistaticChaos.lean",
-   "line": 1349,
+   "line": 1355,
    "signature": "(c : ℝ) : ℝ",
    "args": [
     {
@@ -10404,7 +10409,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/EpistaticChaos.lean",
-   "line": 1356,
+   "line": 1362,
    "signature": "(c : ℝ) : ℝ",
    "args": [
     {
@@ -12668,7 +12673,10 @@
    "mentioned_by": [
     "Calibrator.belowCeiling_add_rankOne_iff",
     "Calibrator.gramForm_sq_le",
+    "Calibrator.imitable_despite_positive_pcCorrectabilityMargin",
+    "Calibrator.positive_pc_margin_does_not_imply_detectable",
     "Calibrator.spiked_genotype_covariance_belowCeiling",
+    "Calibrator.stratification_imitable_iff_within_budget",
     "Calibrator.traceWindowClass_isNull_baseline",
     "Calibrator.traceWindow_rigid",
     "Calibrator.varianceNonneg_add",
@@ -12869,6 +12877,7 @@
     "hypotheses": [
      "|decay| < 1",
      "0 ≤ decay",
+     "LDBandIntegralIdentification decay",
      "∀ i ∈ S, Real.cos cutAngle ≤ Real.cos (angle i",
      "∀ i ∉ S, Real.cos (angle i"
     ]
@@ -12876,8 +12885,8 @@
    "mentioned_by": [
     "Calibrator.clumping_maximizes_reconstruction_on_ld_kernel",
     "Calibrator.clumping_minimizes_detection_on_ld_kernel",
-    "Calibrator.ldBandDetectionShare_eq_integral",
-    "Calibrator.ldBandReconstructionShare_eq_integral",
+    "Calibrator.ldBand_detection_integral_ratio_le_retention",
+    "Calibrator.ldBlock_detection_integral_ratio_le_retention",
     "Calibrator.ldKernelSymbol_ge_hardEdge",
     "Calibrator.ldKernelSymbol_harmonicMean",
     "Calibrator.ldKernelSymbol_mono_in_cos",
@@ -12967,6 +12976,7 @@
    },
    "mentioned_by": [
     "Calibrator.imitationCapacity_eq_whitenedCapacity",
+    "Calibrator.inverseTraceCertificate_tendsto_ldWhiteningGain",
     "Calibrator.ldKernelSymbol_harmonicMean",
     "Calibrator.ldPrecisionTrace_div_sites_tendsto",
     "Calibrator.ldPrecisionTrace_eq_boundary_add_interior",
@@ -12974,6 +12984,7 @@
     "Calibrator.ldWhiteningGain_of_ldRetention_antitone",
     "Calibrator.ldWhiteningGain_one_lt_iff",
     "Calibrator.ldWhiteningGain_strictMono",
+    "Calibrator.meff_prohibition_with_certificate",
     "Calibrator.pruning_loses_detection_iff_whiteningGain_exceeds_one",
     "Calibrator.traceWindowSpikeLoad_tendsto_ldWhiteningGain",
     "Calibrator.whitenedCapacity_closedForm",
@@ -13022,8 +13033,11 @@
     ]
    },
    "mentioned_by": [
+    "Calibrator.inverseTraceCertificate_eq_traceWindowSpikeLoad",
+    "Calibrator.inverseTraceCertificate_tendsto_ldWhiteningGain",
     "Calibrator.ldPrecisionTrace_div_sites_tendsto",
-    "Calibrator.ldPrecisionTrace_eq_boundary_add_interior"
+    "Calibrator.ldPrecisionTrace_eq_boundary_add_interior",
+    "Calibrator.meff_prohibition_with_certificate"
    ]
   },
   {
@@ -13880,7 +13894,8 @@
      "r ≤ 1",
      "1 ≤ Ne",
      "0 < spectralTotal (fun i => detectionWeight (ldKernelSymbol (ldRetentionPerGen recomb Ne",
-     "0 < spectralTotal (fun i => reconstructionWeight (ldKernelSymbol (ldRetentionPerGen recomb Ne"
+     "0 < spectralTotal (fun i => reconstructionWeight (ldKernelSymbol (ldRetentionPerGen recomb Ne",
+     "LDBandIntegralIdentification (ldRetentionPerGen recomb Ne"
     ],
     "range_hi_thm": [
      "Calibrator.ld_retention_lt_one",
@@ -13898,6 +13913,7 @@
     "Calibrator.clumping_minimizes_detection_on_ld_kernel",
     "Calibrator.ldBlockDetectionShare_le_retention",
     "Calibrator.ldBlockPruningDeficit_antitone_in_recombination",
+    "Calibrator.ldBlock_detection_integral_ratio_le_retention",
     "Calibrator.ldRetentionPerGen_abs_lt_one",
     "Calibrator.ldRetentionPerGen_strictAnti_recomb",
     "Calibrator.ldRetentionPerGen_uses_timeScale",
@@ -15730,13 +15746,10 @@
     "declared_hi": 1.0,
     "hypotheses": [
      "0 ≤ kappa",
-     "kappa < 1",
-     "|decay| < 1",
-     "0 ≤ decay"
+     "kappa < 1"
     ]
    },
    "mentioned_by": [
-    "Calibrator.ldBandReconstructionShare_eq_integral",
     "Calibrator.ldBandReconstructionShare_of_no_ld"
    ]
   },
@@ -15776,12 +15789,10 @@
      "kappa ≤ 1",
      "0 < decay",
      "0 < kappa",
-     "kappa < 1",
-     "|decay| < 1"
+     "kappa < 1"
     ]
    },
    "mentioned_by": [
-    "Calibrator.ldBandDetectionShare_eq_integral",
     "Calibrator.ldBandDetectionShare_eq_sub_deficit",
     "Calibrator.ldBandDetectionShare_le_retention",
     "Calibrator.ldBandDetectionShare_lt_retention",
@@ -15849,7 +15860,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/MetricSpecificPortability.lean",
-   "line": 1375,
+   "line": 1393,
    "signature": "(retainedMarkers totalMarkers : ℕ) : ℝ",
    "args": [
     {
@@ -15891,6 +15902,7 @@
    "mentioned_by": [
     "Calibrator.ldBlockDetectionShare_add_deficit",
     "Calibrator.ldBlockDetectionShare_le_retention",
+    "Calibrator.ldBlock_detection_integral_ratio_le_retention",
     "Calibrator.ldPanelRetentionFraction_mem",
     "Calibrator.ldTightLinkage_le_ldBlockDetectionShare"
    ]
@@ -15901,7 +15913,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/MetricSpecificPortability.lean",
-   "line": 1426,
+   "line": 1444,
    "signature": "(recomb Ne : ℝ) (retainedMarkers totalMarkers : ℕ) : ℝ",
    "args": [
     {
@@ -15939,7 +15951,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/MetricSpecificPortability.lean",
-   "line": 1437,
+   "line": 1455,
    "signature": "(recomb Ne : ℝ) (retainedMarkers totalMarkers : ℕ) : ℝ",
    "args": [
     {
@@ -15992,7 +16004,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/MetricSpecificPortability.lean",
-   "line": 1447,
+   "line": 1465,
    "signature": "(recomb Ne : ℝ) (retainedMarkers totalMarkers : ℕ) : ℝ",
    "args": [
     {
@@ -16047,7 +16059,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/MetricSpecificPortability.lean",
-   "line": 1458,
+   "line": 1476,
    "signature": "(retainedMarkers totalMarkers : ℕ) : ℝ",
    "args": [
     {
@@ -17871,6 +17883,7 @@
    "mentioned_by": [
     "Calibrator.BackgroundClass.isNull_spiked_of_le_imitationCapacity",
     "Calibrator.frobeniusForm_spikeOuter",
+    "Calibrator.imitable_despite_positive_pcCorrectabilityMargin",
     "Calibrator.quadForm_spikeOuter",
     "Calibrator.spikeOuter_eq_rankOneCovarianceBump",
     "Calibrator.traceForm_spikeOuter",
@@ -17915,6 +17928,7 @@
     "hypotheses": []
    },
    "mentioned_by": [
+    "Calibrator.meffWitness_spectrum_pos",
     "Calibrator.sum_inv_twoBlock",
     "Calibrator.sum_pow_twoBlock",
     "Calibrator.sum_twoBlock_apply"
@@ -17965,8 +17979,12 @@
     "Calibrator.EquiExit.margin_pos_of_gt_capacity",
     "Calibrator.active_budget_makes_stratification_detectable",
     "Calibrator.grm_absorbs_tested_association",
+    "Calibrator.imitable_despite_positive_pcCorrectabilityMargin",
     "Calibrator.imitationCapacity_eq_whitenedCapacity",
     "Calibrator.loco_lowers_imitation_wall",
+    "Calibrator.not_isNull_of_demographicSpike_gt_budget",
+    "Calibrator.positive_pc_margin_does_not_imply_detectable",
+    "Calibrator.stratification_imitable_iff_within_budget",
     "Calibrator.traceWindowClass_isNull_baseline",
     "Calibrator.traceWindow_every_level_detectable"
    ]
@@ -18024,8 +18042,11 @@
     "Calibrator.BackgroundClass.not_isNull_spiked_of_active",
     "Calibrator.EquiExit.exitLevels_nonempty",
     "Calibrator.EquiExit.imitationCapacity_eq",
+    "Calibrator.demographicSpike_eq_contrastVariance_mul_spikeLoad",
+    "Calibrator.demographicSpike_eq_level_mul_spikeLoad",
     "Calibrator.traceWindowBudgetClass_spikeLoad",
-    "Calibrator.traceWindowClass_spikeLoad"
+    "Calibrator.traceWindowClass_spikeLoad",
+    "Calibrator.traceWindow_spikeLoad_demographic"
    ]
   },
   {
@@ -18088,6 +18109,7 @@
     "Calibrator.EquiExit.form_spiked_eq_bound_add_margin",
     "Calibrator.EquiExit.imitationCapacity_eq",
     "Calibrator.imitationCapacity_eq_whitenedCapacity",
+    "Calibrator.meff_prohibition_with_certificate",
     "Calibrator.traceWindowBudgetClass_headroom",
     "Calibrator.whitenedCapacity_closedForm",
     "Calibrator.whitenedCapacity_strictAnti"
@@ -18186,6 +18208,8 @@
     "declared_lo": 0.0,
     "declared_hi": null,
     "hypotheses": [
+     "VarianceNonneg (S₀ - base",
+     "traceForm S₀ + demographicSpike (N : ℝ",
      "K.IsNull S₀",
      "0 ≤ t",
      "t ≤ K.imitationCapacity S₀ support",
@@ -18196,7 +18220,8 @@
      "ε < E.margin t / 2",
      "|empirical - K.form E.binding (K.spiked S₀ t v",
      "∀ v : ι → ℝ, v ≠ 0 → 0 < quadForm A v",
-     "v ≠ 0"
+     "v ≠ 0",
+     "budget < traceForm S₀ + demographicSpike (N : ℝ"
     ]
    },
    "mentioned_by": [
@@ -18207,6 +18232,12 @@
     "Calibrator.EquiExit.form_spiked_eq_bound_add_margin",
     "Calibrator.active_budget_makes_stratification_detectable",
     "Calibrator.grm_absorbs_tested_association",
+    "Calibrator.imitable_despite_positive_pcCorrectabilityMargin",
+    "Calibrator.not_isNull_of_demographicSpike_gt_budget",
+    "Calibrator.positive_pc_margin_does_not_imply_detectable",
+    "Calibrator.rigid_certificate_exceeds_ceiling_iff_pcCorrectabilityMargin_pos",
+    "Calibrator.rigid_pcCorrectabilityMargin_is_the_criterion",
+    "Calibrator.stratification_imitable_iff_within_budget",
     "Calibrator.traceWindow_every_level_detectable"
    ]
   },
@@ -18388,9 +18419,16 @@
     "hypotheses": []
    },
    "mentioned_by": [
+    "Calibrator.imitable_despite_positive_pcCorrectabilityMargin",
+    "Calibrator.not_isNull_of_demographicSpike_gt_budget",
+    "Calibrator.positive_pc_margin_does_not_imply_detectable",
+    "Calibrator.rigid_certificate_exceeds_ceiling_iff_pcCorrectabilityMargin_pos",
+    "Calibrator.rigid_pcCorrectabilityMargin_is_the_criterion",
+    "Calibrator.stratification_imitable_iff_within_budget",
     "Calibrator.traceForm_add",
     "Calibrator.traceForm_smul",
     "Calibrator.traceForm_spikeOuter",
+    "Calibrator.traceWindowBudgetClass_form",
     "Calibrator.traceWindowBudgetClass_headroom"
    ]
   },
@@ -18431,11 +18469,25 @@
     "declared_kind": "nonnegative",
     "declared_lo": 0.0,
     "declared_hi": null,
-    "hypotheses": []
+    "hypotheses": [
+     "VarianceNonneg (S₀ - base",
+     "budget < traceForm S₀ + demographicSpike (N : ℝ"
+    ]
    },
    "mentioned_by": [
+    "Calibrator.demographicSpike_eq_contrastVariance_mul_spikeLoad",
+    "Calibrator.demographicSpike_eq_level_mul_spikeLoad",
+    "Calibrator.imitable_despite_positive_pcCorrectabilityMargin",
+    "Calibrator.not_isNull_of_demographicSpike_gt_budget",
+    "Calibrator.positive_pc_margin_does_not_imply_detectable",
+    "Calibrator.rigid_certificate_exceeds_ceiling_iff_pcCorrectabilityMargin_pos",
+    "Calibrator.rigid_pcCorrectabilityMargin_is_the_criterion",
+    "Calibrator.stratification_imitable_iff_within_budget",
+    "Calibrator.traceWindowBudgetClass_bound",
+    "Calibrator.traceWindowBudgetClass_form",
     "Calibrator.traceWindowBudgetClass_headroom",
-    "Calibrator.traceWindowBudgetClass_spikeLoad"
+    "Calibrator.traceWindowBudgetClass_spikeLoad",
+    "Calibrator.traceWindow_spikeLoad_demographic"
    ]
   },
   {
@@ -18617,6 +18669,8 @@
     ]
    },
    "mentioned_by": [
+    "Calibrator.inverseTraceCertificate_eq_traceWindowSpikeLoad",
+    "Calibrator.inverseTraceCertificate_tendsto_ldWhiteningGain",
     "Calibrator.traceWindowSpikeLoad_tendsto_ldWhiteningGain"
    ]
   },
@@ -18649,13 +18703,136 @@
    "constraints": {
     "hypotheses": [
      "E.load = ldWhiteningGain decay",
-     "0 < headroom"
+     "0 < headroom",
+     "|decay| < 1"
     ]
    },
    "mentioned_by": [
     "Calibrator.imitationCapacity_eq_whitenedCapacity",
+    "Calibrator.meff_prohibition_with_certificate",
     "Calibrator.whitenedCapacity_closedForm",
     "Calibrator.whitenedCapacity_strictAnti"
+   ]
+  },
+  {
+   "name": "Calibrator.subgroupContrast",
+   "short": "subgroupContrast",
+   "kind": "def",
+   "noncomputable": false,
+   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
+   "line": 985,
+   "signature": "(n m : ℕ) : ℕ → ℝ",
+   "args": [
+    {
+     "names": [
+      "n",
+      "m"
+     ],
+     "type": "ℕ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ℕ → ℝ",
+   "body": "  twoBlock m (((n : ℝ) - (m : ℝ)) / (n : ℝ)) (-((m : ℝ) / (n : ℝ)))",
+   "docstring": "**The subgroup-contrast direction**: the centered indicator of a subgroup of\nsize `m` in a panel of `n` individuals.  Centering is forced rather than\nconventional — an uncentered indicator has a component along the all-ones\nvector, which is the grand mean and not a contrast, and its trace-window spike\nload is not `effectiveSubgroupSize`.\n\n    Empirical status: DERIVED. `dot_demographicSpikeDirection` proves its\n    squared length is `effectiveSubgroupSize`, which is what makes the latter a\n    certificate value rather than a stipulated formula.",
+   "empirical_status": "DERIVED",
+   "namespace": "Calibrator",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "declared_kind": "nonnegative",
+    "declared_lo": 0.0,
+    "declared_hi": null,
+    "hypotheses": [
+     "m ≤ n",
+     "0 < n"
+    ]
+   },
+   "mentioned_by": [
+    "Calibrator.dot_demographicSpikeDirection"
+   ]
+  },
+  {
+   "name": "Calibrator.demographicSpikeDirection",
+   "short": "demographicSpikeDirection",
+   "kind": "def",
+   "noncomputable": false,
+   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
+   "line": 991,
+   "signature": "(n m : ℕ) : Fin n → ℝ",
+   "args": [
+    {
+     "names": [
+      "n",
+      "m"
+     ],
+     "type": "ℕ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "Fin n → ℝ",
+   "body": "  fun i => subgroupContrast n m i.val",
+   "docstring": "The subgroup contrast as a vector on the panel's individuals.\n\n    Empirical status: DERIVED.",
+   "empirical_status": "DERIVED",
+   "namespace": "Calibrator",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [
+     "m ≤ N",
+     "m ≤ n",
+     "0 < n"
+    ]
+   },
+   "mentioned_by": [
+    "Calibrator.demographicSpike_eq_contrastVariance_mul_spikeLoad",
+    "Calibrator.demographicSpike_eq_level_mul_spikeLoad",
+    "Calibrator.dot_demographicSpikeDirection",
+    "Calibrator.imitable_despite_positive_pcCorrectabilityMargin",
+    "Calibrator.not_isNull_of_demographicSpike_gt_budget",
+    "Calibrator.positive_pc_margin_does_not_imply_detectable",
+    "Calibrator.rigid_certificate_exceeds_ceiling_iff_pcCorrectabilityMargin_pos",
+    "Calibrator.rigid_pcCorrectabilityMargin_is_the_criterion",
+    "Calibrator.stratification_imitable_iff_within_budget",
+    "Calibrator.traceWindow_spikeLoad_demographic"
+   ]
+  },
+  {
+   "name": "Calibrator.stratificationCertificateMargin",
+   "short": "stratificationCertificateMargin",
+   "kind": "def",
+   "noncomputable": false,
+   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
+   "line": 1068,
+   "signature": "(headroom n M F m : ℝ) : ℝ",
+   "args": [
+    {
+     "names": [
+      "headroom",
+      "n",
+      "M",
+      "F",
+      "m"
+     ],
+     "type": "ℝ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ℝ",
+   "body": "  demographicSpike n F m - (headroom + bbpProxyThreshold n M)",
+   "docstring": "**The certificate margin for a demographic spike**, with the class headroom\nand the estimation-error scale as separate arguments, because they are separate\nthings and the existing `pcCorrectabilityMargin` conflates them by omitting the\nfirst.\n\n    Empirical status: UNTESTED. Falsifiable against a simulation that varies\n    the trace-window budget at fixed `n`, `M`, `F`: the detection boundary must\n    move with `headroom`, which `pcCorrectabilityMargin` predicts it does\n    not.",
+   "empirical_status": "UNTESTED",
+   "namespace": "Calibrator",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": []
+   },
+   "mentioned_by": [
+    "Calibrator.stratificationCertificateMargin_zero_headroom"
    ]
   },
   {
@@ -18664,7 +18841,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-   "line": 952,
+   "line": 1208,
    "signature": "(k : ℕ) (ε : ℝ) : ℕ → ℝ",
    "args": [
     {
@@ -18700,8 +18877,8 @@
    "mentioned_by": [
     "Calibrator.blockSpectrum_moment_gap_le",
     "Calibrator.inverseTraceCertificate_blockSpectrum",
-    "Calibrator.normalizedMoment_blockSpectrum",
-    "Calibrator.sum_blockSpectrum"
+    "Calibrator.meffWitness_spectrum_pos",
+    "Calibrator.normalizedMoment_blockSpectrum"
    ]
   },
   {
@@ -18710,7 +18887,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-   "line": 960,
+   "line": 1216,
    "signature": "(m : ℕ) (lam : ℕ → ℝ) (p : ℕ) : ℝ",
    "args": [
     {
@@ -18751,6 +18928,7 @@
    "mentioned_by": [
     "Calibrator.blockSpectrum_moment_gap_le",
     "Calibrator.meff_moment_gap_le",
+    "Calibrator.meff_normalizedTrace_gap_le",
     "Calibrator.normalizedMoment_blockSpectrum"
    ]
   },
@@ -18760,7 +18938,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-   "line": 970,
+   "line": 1226,
    "signature": "(m : ℕ) (lam : ℕ → ℝ) : ℝ",
    "args": [
     {
@@ -18789,6 +18967,8 @@
    "equations": [],
    "constraints": {
     "hypotheses": [
+     "∑ i ∈ Finset.range m, (lam i",
+     "∀ m : ℕ, ∑ i ∈ Finset.range m, (lam m i",
      "∀ (m : ℕ"
     ]
    },
@@ -18796,7 +18976,10 @@
     "Calibrator.certificate_not_momentContinuous",
     "Calibrator.effective_marker_count_cannot_set_threshold",
     "Calibrator.inverseTraceCertificate_blockSpectrum",
-    "Calibrator.meff_certificate_gap"
+    "Calibrator.inverseTraceCertificate_eq_traceWindowSpikeLoad",
+    "Calibrator.inverseTraceCertificate_tendsto_ldWhiteningGain",
+    "Calibrator.meff_certificate_gap",
+    "Calibrator.meff_prohibition_with_certificate"
    ]
   },
   {
@@ -18805,7 +18988,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-   "line": 1062,
+   "line": 1322,
    "signature": "(n : ℕ) : ℕ → ℝ",
    "args": [
     {
@@ -18827,12 +19010,19 @@
    "constraints": {
     "hypotheses": [
      "0 < n"
-    ]
+    ],
+    "range_lo_thm": [
+     "Calibrator.meffWitness_spectrum_pos",
+     0
+    ],
+    "range_lo": 0
    },
    "mentioned_by": [
     "Calibrator.certificate_not_momentContinuous",
+    "Calibrator.meffWitness_spectrum_pos",
     "Calibrator.meff_certificate_gap",
-    "Calibrator.meff_moment_gap_le"
+    "Calibrator.meff_moment_gap_le",
+    "Calibrator.meff_normalizedTrace_gap_le"
    ]
   },
   {
@@ -18841,7 +19031,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-   "line": 1067,
+   "line": 1327,
    "signature": "(n : ℕ) : ℕ → ℝ",
    "args": [
     {
@@ -18863,12 +19053,19 @@
    "constraints": {
     "hypotheses": [
      "0 < n"
-    ]
+    ],
+    "range_lo_thm": [
+     "Calibrator.meffWitness_spectrum_pos",
+     0
+    ],
+    "range_lo": 0
    },
    "mentioned_by": [
     "Calibrator.certificate_not_momentContinuous",
+    "Calibrator.meffWitness_spectrum_pos",
     "Calibrator.meff_certificate_gap",
-    "Calibrator.meff_moment_gap_le"
+    "Calibrator.meff_moment_gap_le",
+    "Calibrator.meff_normalizedTrace_gap_le"
    ]
   },
   {
@@ -18877,7 +19074,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-   "line": 1072,
+   "line": 1332,
    "signature": "(n : ℕ) : ℕ",
    "args": [
     {
@@ -18904,7 +19101,8 @@
    "mentioned_by": [
     "Calibrator.certificate_not_momentContinuous",
     "Calibrator.meff_certificate_gap",
-    "Calibrator.meff_moment_gap_le"
+    "Calibrator.meff_moment_gap_le",
+    "Calibrator.meff_normalizedTrace_gap_le"
    ]
   },
   {
@@ -19119,15 +19317,19 @@
    "equations": [],
    "constraints": {
     "hypotheses": [
-     "0 < n"
+     "0 < n",
+     "m ≤ n",
+     "m ≤ N"
     ]
    },
    "mentioned_by": [
     "Calibrator.demographicSpike_eq_contrastVariance_mul_effectiveSize",
     "Calibrator.demographicSpike_le_balanced",
+    "Calibrator.dot_demographicSpikeDirection",
     "Calibrator.effectiveSubgroupSize_balanced",
     "Calibrator.effectiveSubgroupSize_le_balanced",
-    "Calibrator.fst_does_not_determine_pc_correctability"
+    "Calibrator.fst_does_not_determine_pc_correctability",
+    "Calibrator.traceWindow_spikeLoad_demographic"
    ]
   },
   {
@@ -19162,6 +19364,7 @@
     "declared_lo": 0.0,
     "declared_hi": 1.0,
     "hypotheses": [
+     "m ≤ N",
      "0 < n",
      "0 < F",
      "0 ≤ F"
@@ -19169,13 +19372,19 @@
    },
    "mentioned_by": [
     "Calibrator.demographicSpike_eq_contrastVariance_mul_effectiveSize",
+    "Calibrator.demographicSpike_eq_contrastVariance_mul_spikeLoad",
+    "Calibrator.demographicSpike_eq_level_mul_spikeLoad",
     "Calibrator.demographicSpike_le_balanced",
     "Calibrator.exists_superthreshold_subgroup_iff_balanced",
     "Calibrator.exists_superthreshold_subgroup_iff_information",
     "Calibrator.exists_superthreshold_subgroup_iff_marker_requirement",
     "Calibrator.exists_superthreshold_subgroup_iff_sample_requirement",
     "Calibrator.fst_does_not_determine_pc_correctability",
-    "Calibrator.pcCorrectabilityMargin_le_balanced"
+    "Calibrator.imitable_despite_positive_pcCorrectabilityMargin",
+    "Calibrator.not_isNull_of_demographicSpike_gt_budget",
+    "Calibrator.pcCorrectabilityMargin_le_balanced",
+    "Calibrator.positive_pc_margin_does_not_imply_detectable",
+    "Calibrator.stratification_imitable_iff_within_budget"
    ]
   },
   {
@@ -19220,6 +19429,7 @@
    },
    "mentioned_by": [
     "Calibrator.balanced_superthreshold_iff_information",
+    "Calibrator.bbpProxyThreshold_tendsto_zero",
     "Calibrator.exists_superthreshold_subgroup_iff_balanced",
     "Calibrator.exists_superthreshold_subgroup_iff_information",
     "Calibrator.exists_superthreshold_subgroup_iff_marker_requirement",
@@ -19227,6 +19437,8 @@
     "Calibrator.fst_does_not_determine_pc_correctability",
     "Calibrator.modeledPCResidualSusceptibility_eq_uncorrected_of_subthreshold",
     "Calibrator.modeledPCResidualSusceptibility_pos_and_lt_uncorrected",
+    "Calibrator.rigid_certificate_exceeds_ceiling_iff_pcCorrectabilityMargin_pos",
+    "Calibrator.rigid_pcCorrectabilityMargin_is_the_criterion",
     "Calibrator.samplePCOverlapSq_eq_of_superthreshold",
     "Calibrator.samplePCOverlapSq_eq_zero_of_subthreshold",
     "Calibrator.samplePCOverlapSq_pos_and_lt_one",
@@ -19267,6 +19479,7 @@
    "equations": [],
    "constraints": {
     "hypotheses": [
+     "m ≤ N",
      "0 < n",
      "0 ≤ F"
     ],
@@ -19277,7 +19490,13 @@
     "range_hi": 0
    },
    "mentioned_by": [
+    "Calibrator.imitable_despite_positive_pcCorrectabilityMargin",
     "Calibrator.pcCorrectabilityMargin_le_balanced",
+    "Calibrator.positive_pc_margin_does_not_imply_detectable",
+    "Calibrator.rigid_certificate_exceeds_ceiling_iff_pcCorrectabilityMargin_pos",
+    "Calibrator.rigid_pcCorrectabilityMargin_is_the_criterion",
+    "Calibrator.stratificationCertificateMargin_zero_headroom",
+    "Calibrator.stratification_imitable_iff_within_budget",
     "Calibrator.subthreshold_pc_residual_bias_floor"
    ]
   },
@@ -38032,6 +38251,7 @@
     "Calibrator.clumping_minimizes_detection_on_ld_kernel",
     "Calibrator.detectionWeight_strictAnti",
     "Calibrator.detection_threshold_of_variance_threshold",
+    "Calibrator.exists_split_attaining_scalarized_optimum",
     "Calibrator.scalarized_optimum_is_coordinate_split",
     "Calibrator.topVariance_minimizes_detection",
     "Calibrator.weight_orders_reversed"
@@ -38070,6 +38290,7 @@
    },
    "mentioned_by": [
     "Calibrator.clumping_maximizes_reconstruction_on_ld_kernel",
+    "Calibrator.exists_split_attaining_scalarized_optimum",
     "Calibrator.reconstructionWeight_strictMono",
     "Calibrator.scalarized_optimum_is_coordinate_split",
     "Calibrator.topVariance_maximizes_reconstruction",
@@ -38149,6 +38370,7 @@
     ]
    },
    "mentioned_by": [
+    "Calibrator.exists_split_attaining_scalarized_optimum",
     "Calibrator.pruneAllocation_isRankAllocation",
     "Calibrator.scalarized_optimum_is_coordinate_split",
     "Calibrator.spectralCapture_affine",
@@ -38321,11 +38543,44 @@
    "mentioned_by": [
     "Calibrator.clumping_maximizes_reconstruction_on_ld_kernel",
     "Calibrator.clumping_minimizes_detection_on_ld_kernel",
+    "Calibrator.exists_split_attaining_scalarized_optimum",
     "Calibrator.pruneAllocation_isRankAllocation",
     "Calibrator.scalarized_optimum_is_coordinate_split",
     "Calibrator.spectralCapture_pruneAllocation",
     "Calibrator.topVariance_maximizes_reconstruction",
     "Calibrator.topVariance_minimizes_detection"
+   ]
+  },
+  {
+   "name": "Calibrator.HasThresholdSetAtEveryRank",
+   "short": "HasThresholdSetAtEveryRank",
+   "kind": "def",
+   "noncomputable": false,
+   "file": "Calibrator/ProjectionShiftBounds.lean",
+   "line": 760,
+   "signature": "(score : ι → ℝ) : Prop",
+   "args": [
+    {
+     "names": [
+      "score"
+     ],
+     "type": "ι → ℝ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "Prop",
+   "body": "  ∀ k : ℕ, k ≤ Fintype.card ι →\n    ∃ (S : Finset ι) (t : ℝ), S.card = k ∧\n      (∀ i ∈ S, t ≤ score i) ∧ (∀ i ∉ S, score i ≤ t)",
+   "docstring": "**A score profile admits threshold sets at every rank**: for each `k` there\nis a set of exactly `k` indices separated from its complement by a cut value.\n\nThis is the one ingredient the frontier packaging needs beyond what is proved\nhere, and it is carried as a named hypothesis rather than discharged, so that\nevery consumer states its dependence on it.  It is not an empirical assumption\nand not an external input: it holds for every score on a finite type, by sorting\nthe values and cutting at rank `k`.  It is a hypothesis here only because that\nsorting argument is not written.\n\nWhat is proved without it: every threshold set is a scalarised optimum\n(`scalarized_optimum_is_coordinate_split`), so every supporting line of the\nachievable region that is attained at all is attained by a coordinate split, and\nthe region is convex (`isRankAllocation_convex`, `spectralCapture_affine`).\nWhat needs it: that a supporting line exists in every direction, i.e. that the\nfrontier is the concave envelope of the split values rather than merely bounded\nby it.\n\nEmpirical status: UNTESTED — and untestable, being a finite-combinatorial\nstatement rather than a claim about genotypes.",
+   "empirical_status": "UNTESTED",
+   "namespace": "Calibrator",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": []
+   },
+   "mentioned_by": [
+    "Calibrator.exists_split_attaining_scalarized_optimum"
    ]
   },
   {
@@ -44845,6 +45100,7 @@
     "Calibrator.crossCovVector_decomposition",
     "Calibrator.dot_add_left",
     "Calibrator.dot_add_right_shift",
+    "Calibrator.dot_demographicSpikeDirection",
     "Calibrator.dot_rawCrossMoment",
     "Calibrator.dot_smul_left",
     "Calibrator.dot_smul_right",
@@ -46262,7 +46518,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator.lean",
-   "line": 116,
+   "line": 117,
    "signature": ": Matrix (Fin 2) (Fin 2) ℝ",
    "args": [],
    "ret_type": "Matrix (Fin 2) (Fin 2) ℝ",
@@ -46286,7 +46542,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator.lean",
-   "line": 119,
+   "line": 120,
    "signature": ": Matrix (Fin 2) (Fin 2) ℝ",
    "args": [],
    "ret_type": "Matrix (Fin 2) (Fin 2) ℝ",
@@ -46309,7 +46565,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator.lean",
-   "line": 122,
+   "line": 123,
    "signature": ": Fin 2 → ℝ",
    "args": [],
    "ret_type": "Fin 2 → ℝ",
@@ -46336,7 +46592,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator.lean",
-   "line": 129,
+   "line": 130,
    "signature": ": Matrix (Fin 2) (Fin 2) ℝ",
    "args": [],
    "ret_type": "Matrix (Fin 2) (Fin 2) ℝ",
@@ -47606,7 +47862,7 @@
    ],
    "ret_type": "Fin n → HardyWeinbergModel locusSet : ι → Finset (Fin n) coefficient : ι → ℝ jointGenotypeProb : (Fin n → DiploidGenotype) → ℝ",
    "body": "",
-   "docstring": "A **design over a genotype panel**: the locus-sets a study tests, the\ncoefficient each contributes, the allele frequency of every locus, and the\npopulation's joint genotype law over the panel.\n\nThe joint law is carried alongside the per-locus models so that linkage\nequilibrium is a checkable relation between them\n(`GenotypeDesign.LociIndependent`) rather than a silent assumption; the\ndisjoint licence needs it, and a design whose tested sets sit inside one LD block\ndoes not have it.",
+   "docstring": "A **design over a genotype panel**: the locus-sets a study tests, the\ncoefficient each contributes, the allele frequency of every locus, and the\npopulation's joint genotype law over the panel.\n\nThe joint law is carried alongside the per-locus models so that linkage\nequilibrium is a checkable relation between them\n(`GenotypeDesign.InLinkageEquilibrium`) rather than a silent assumption; the\ndisjoint licence needs it, and a design whose tested sets sit inside one LD block\ndoes not have it.",
    "empirical_status": "",
    "namespace": "Calibrator",
    "fields": [
@@ -47639,8 +47895,8 @@
    "kind": "structure",
    "noncomputable": false,
    "file": "Calibrator/EpistaticChaos.lean",
-   "line": 1014,
-   "signature": "(n : ℕ) (ι : Type*) (Limit : Type*) where isAdmissible : GenotypeDesign n ι → Prop limitLaw : GenotypeDesign n ι → Limit IsCenteredGaussian : Limit → ℝ → Prop fourthCumulant : Limit → ℝ weakDistance : Limit → Limit → ℝ InMomentBody : Limit → Prop disjoint_segment : ∀ design : GenotypeDesign n ι, isAdmissible design → design.Polymorphic → design.LociIndependent → design.VariantDisjoint → ∃ s2 : ℝ, 0 ≤ s2 ∧ s2 ≤ 1 ∧ IsCenteredGaussian (limitLaw design) s2 gaussian_fourthCumulant : ∀ (L : Limit) (s2 : ℝ), IsCenteredGaussian L s2 → fourthCumulant L = 0 maximal_spectrum : ∀ model : Fin n → HardyWeinbergModel, (∀ i : Fin n, 0 < (model i).altFreq ∧ (model i).altFreq < 1) → ∀ target : Limit, InMomentBody target → ∀ ε : ℝ, 0 < ε → ∃ design : GenotypeDesign n ι, design.model = model ∧ design.LociIndependent ∧ isAdmissible design ∧ weakDistance (limitLaw design) target < ε twoPool_witness : ∀ (design : GenotypeDesign n ι) (poolOne poolTwo : Finset (Fin n)), design.IsTwoPoolInteraction poolOne poolTwo → design.Polymorphic → design.LociIndependent → fourthCumulant (limitLaw design) = 6",
+   "line": 1020,
+   "signature": "(n : ℕ) (ι : Type*) (Limit : Type*) where isAdmissible : GenotypeDesign n ι → Prop limitLaw : GenotypeDesign n ι → Limit IsCenteredGaussian : Limit → ℝ → Prop fourthCumulant : Limit → ℝ weakDistance : Limit → Limit → ℝ InMomentBody : Limit → Prop disjoint_segment : ∀ design : GenotypeDesign n ι, isAdmissible design → design.Polymorphic → design.InLinkageEquilibrium → design.VariantDisjoint → ∃ s2 : ℝ, 0 ≤ s2 ∧ s2 ≤ 1 ∧ IsCenteredGaussian (limitLaw design) s2 gaussian_fourthCumulant : ∀ (L : Limit) (s2 : ℝ), IsCenteredGaussian L s2 → fourthCumulant L = 0 maximal_spectrum : ∀ model : Fin n → HardyWeinbergModel, (∀ i : Fin n, 0 < (model i).altFreq ∧ (model i).altFreq < 1) → ∀ target : Limit, InMomentBody target → ∀ ε : ℝ, 0 < ε → ∃ design : GenotypeDesign n ι, design.model = model ∧ design.InLinkageEquilibrium ∧ isAdmissible design ∧ weakDistance (limitLaw design) target < ε twoPool_witness : ∀ (design : GenotypeDesign n ι) (poolOne poolTwo : Finset (Fin n)), design.IsTwoPoolInteraction poolOne poolTwo → design.Polymorphic → design.InLinkageEquilibrium → fourthCumulant (limitLaw design) = 6",
    "args": [
     {
      "names": [
@@ -47667,7 +47923,7 @@
      "implicit": false
     }
    ],
-   "ret_type": "GenotypeDesign n ι → Prop limitLaw : GenotypeDesign n ι → Limit IsCenteredGaussian : Limit → ℝ → Prop fourthCumulant : Limit → ℝ weakDistance : Limit → Limit → ℝ InMomentBody : Limit → Prop disjoint_segment : ∀ design : GenotypeDesign n ι, isAdmissible design → design.Polymorphic → design.LociIndependent → design.VariantDisjoint → ∃ s2 : ℝ, 0 ≤ s2 ∧ s2 ≤ 1 ∧ IsCenteredGaussian (limitLaw design) s2 gaussian_fourthCumulant : ∀ (L : Limit) (s2 : ℝ), IsCenteredGaussian L s2 → fourthCumulant L = 0 maximal_spectrum : ∀ model : Fin n → HardyWeinbergModel, (∀ i : Fin n, 0 < (model i).altFreq ∧ (model i).altFreq < 1) → ∀ target : Limit, InMomentBody target → ∀ ε : ℝ, 0 < ε → ∃ design : GenotypeDesign n ι, design.model = model ∧ design.LociIndependent ∧ isAdmissible design ∧ weakDistance (limitLaw design) target < ε twoPool_witness : ∀ (design : GenotypeDesign n ι) (poolOne poolTwo : Finset (Fin n)), design.IsTwoPoolInteraction poolOne poolTwo → design.Polymorphic → design.LociIndependent → fourthCumulant (limitLaw design) = 6",
+   "ret_type": "GenotypeDesign n ι → Prop limitLaw : GenotypeDesign n ι → Limit IsCenteredGaussian : Limit → ℝ → Prop fourthCumulant : Limit → ℝ weakDistance : Limit → Limit → ℝ InMomentBody : Limit → Prop disjoint_segment : ∀ design : GenotypeDesign n ι, isAdmissible design → design.Polymorphic → design.InLinkageEquilibrium → design.VariantDisjoint → ∃ s2 : ℝ, 0 ≤ s2 ∧ s2 ≤ 1 ∧ IsCenteredGaussian (limitLaw design) s2 gaussian_fourthCumulant : ∀ (L : Limit) (s2 : ℝ), IsCenteredGaussian L s2 → fourthCumulant L = 0 maximal_spectrum : ∀ model : Fin n → HardyWeinbergModel, (∀ i : Fin n, 0 < (model i).altFreq ∧ (model i).altFreq < 1) → ∀ target : Limit, InMomentBody target → ∀ ε : ℝ, 0 < ε → ∃ design : GenotypeDesign n ι, design.model = model ∧ design.InLinkageEquilibrium ∧ isAdmissible design ∧ weakDistance (limitLaw design) target < ε twoPool_witness : ∀ (design : GenotypeDesign n ι) (poolOne poolTwo : Finset (Fin n)), design.IsTwoPoolInteraction poolOne poolTwo → design.Polymorphic → design.InLinkageEquilibrium → fourthCumulant (limitLaw design) = 6",
    "body": "",
    "docstring": "The limit spectrum of admissible chaos designs over a Hardy-Weinberg panel,\npackaged so that the analytic inputs are fields.\n\nOnly `Limit` is abstract, because weak limits of laws are not objects of this\ncorpus; the designs, the coordinates and the allele frequencies are the corpus's\nown. `weakDistance` metrizes weak convergence, the topology the spectrum is\nclosed in, and `InMomentBody L` says `L` is centered with second moment at most\none.\n\nNo symmetry hypothesis appears anywhere, and none is needed: see the discussion\nat the head of this section.",
    "empirical_status": "",
@@ -48041,6 +48297,45 @@
    "equations": [],
    "constraints": {
     "raw_chunk_lines": 24
+   },
+   "mentioned_by": []
+  },
+  {
+   "name": "Calibrator.LDBandIntegralIdentification",
+   "short": "LDBandIntegralIdentification",
+   "kind": "structure",
+   "noncomputable": false,
+   "file": "Calibrator/MetricSpecificPortability.lean",
+   "line": 1329,
+   "signature": "(decay : ℝ) : Prop where detection : ∀ kappa : ℝ, 0 ≤ kappa → kappa ≤ 1 → (∫ angle in (0:ℝ)..(Real.pi * kappa), (ldKernelSymbol decay angle)⁻¹) / (∫ angle in (0:ℝ)..Real.pi, (ldKernelSymbol decay angle)⁻¹) = ldBandDetectionShare decay kappa reconstruction : ∀ kappa : ℝ, 0 ≤ kappa → kappa < 1 → (∫ angle in (0:ℝ)..(Real.pi * kappa), ldKernelSymbol decay angle) / (∫ angle in (0:ℝ)..Real.pi, ldKernelSymbol decay angle) = ldBandReconstructionShare decay kappa",
+   "args": [
+    {
+     "names": [
+      "decay"
+     ],
+     "type": "ℝ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "Prop where detection : ∀ kappa : ℝ, 0 ≤ kappa → kappa ≤ 1 → (∫ angle in (0:ℝ)..(Real.pi * kappa), (ldKernelSymbol decay angle)⁻¹) / (∫ angle in (0:ℝ)..Real.pi, (ldKernelSymbol decay angle)⁻¹) = ldBandDetectionShare decay kappa reconstruction : ∀ kappa : ℝ, 0 ≤ kappa → kappa < 1 → (∫ angle in (0:ℝ)..(Real.pi * kappa), ldKernelSymbol decay angle) / (∫ angle in (0:ℝ)..Real.pi, ldKernelSymbol decay angle) = ldBandReconstructionShare decay kappa",
+   "body": "",
+   "docstring": "**Identification of the closed forms with the band integrals they are named\nfor.**\n\n`ldBandDetectionShare` and `ldBandReconstructionShare` are closed forms.  Naming\nthem after integrals of the LD symbol is a *claim*, and this structure is that\nclaim, carried as a hypothesis so that every result depending on the\nidentification says so in its signature rather than relying on the reader to\nnotice.\n\nThe two obligations are:\n\n* `detection` — the evaluation of `∫₀^a (1 - 2ρ cos θ + ρ²) dθ =\n  (1 + ρ²)a - 2ρ sin a`, followed by cancellation of the constant `(1 - ρ²)⁻¹`\n  between numerator and denominator.  Elementary `intervalIntegral` API for\n  `cos`.\n* `reconstruction` — the harmonic-measure evaluation\n  `∫₀^a P_ρ(θ) dθ = 2 arctan( ((1+ρ)/(1-ρ)) tan(a/2) )` with the normalisation\n  `∫₀^π P_ρ = π`, the half-interval companion of\n  `ImitationRigidity.ldKernelSymbol_harmonicMean`.\n\nNeither is an empirical assumption and neither has genetic content: both are\nreal-analysis evaluations of an explicit integrand.  Two independent internal\nchecks on the `detection` formula are already proved without it —\n`ldBandDetectionShare_one` reproduces the full inverse-kernel trace of\n`ldWhiteningGain` at `κ = 1`, and `ldBandDetectionShare_zero` the empty band.\n\nEmpirical status: UNTESTED.",
+   "empirical_status": "UNTESTED",
+   "namespace": "Calibrator",
+   "fields": [
+    {
+     "name": "detection",
+     "type": "∀ kappa : ℝ, 0 ≤ kappa → kappa ≤ 1 →"
+    },
+    {
+     "name": "reconstruction",
+     "type": "∀ kappa : ℝ, 0 ≤ kappa → kappa < 1 →"
+    }
+   ],
+   "equations": [],
+   "constraints": {
+    "raw_chunk_lines": 16
    },
    "mentioned_by": []
   },
@@ -48655,7 +48950,7 @@
    "kind": "structure",
    "noncomputable": false,
    "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-   "line": 1127,
+   "line": 1387,
    "signature": "where value : ℕ → (ℕ → ℝ) → ℝ order : ℕ modulus : ℝ modulus_nonneg : 0 ≤ modulus moment_lipschitz : ∀ (m : ℕ) (lam mu : ℕ → ℝ) (δ : ℝ), 0 ≤ δ → (∀ p, p ≤ order → |normalizedMoment m lam p - normalizedMoment m mu p| ≤ δ) →",
    "args": [],
    "ret_type": "ℕ → (ℕ → ℝ) → ℝ order : ℕ modulus : ℝ modulus_nonneg : 0 ≤ modulus moment_lipschitz : ∀ (m : ℕ) (lam mu : ℕ → ℝ) (δ : ℝ), 0 ≤ δ → (∀ p, p ≤ order → |normalizedMoment m lam p - normalizedMoment m mu p| ≤ δ) →",
@@ -50971,7 +51266,7 @@
   },
   {
    "file": "Calibrator.lean",
-   "line": 68,
+   "line": 69,
    "reason": "no name in declaration header",
    "head": "local instance : Fact (2 ≤ 2) := ⟨by decide⟩"
   }

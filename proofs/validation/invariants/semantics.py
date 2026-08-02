@@ -38,7 +38,10 @@ POS = (1e-300, INF)
 
 NAME_RANGES = [
     # -- correlations: [-1, 1] --------------------------------------------
-    (r"(?i)genetic[_]?correlation|^r[_]?g$|(?i)correlation(?!.*squared)", CORR,
+    # a SQUARED correlation is a proportion; check it before the signed rule
+    (r"(?i)correlationsq|corrsq|rsq|(?i)correlation.*squared", UNIT,
+     "a squared correlation -- a proportion of variance"),
+    (r"(?i)genetic[_]?correlation|^r[_]?g$|(?i)correlation", CORR,
      "a correlation coefficient"),
     (r"(?i)(^|[^a-z])rho($|[^a-z])", CORR, "rho denotes a correlation"),
     (r"(?i)cosine|cossim", CORR, "a cosine similarity"),
@@ -124,8 +127,16 @@ FROM_SPLIT = re.compile(r"From[A-Z]")
 # Words that cancel a range rule: a SCALED rate (θ = 4Neμ, M = 4Nm) is a
 # compound parameter, not a per-generation probability, and a RATIO of two
 # such quantities is not confined to [0,1] by anything.
-RANGE_VETO = re.compile(r"scaled|ratio$|Ratio$|odds|logit|log[A-Z]|Sq$|"
-                        r"perGeneration|^inv|Inverse", re.I)
+RANGE_VETO = re.compile(
+    r"scaled|ratio$|odds|logit|log[A-Z]|perGeneration|^inv|Inverse|"
+    # a matrix trace / eigenvalue / determinant is not a rate, and a
+    # CALIBRATION SLOPE is not a proportion -- a slope above one is
+    # under-dispersion, a real and expected state, not an error.
+    r"trace|matrix|eigen|determinant|slope|enrichment|excess|surplus|"
+    r"inflation|amplification|regret|numberNeeded|required[A-Z]|"
+    # an MSE, a variance and a count are unbounded above whatever else the
+    # name says; `sourceShrinkageMSE` is an MSE, not a shrinkage factor.
+    r"mse$|rmse$|sse$|loss$|risk$|variance$|count$|size$", re.I)
 
 
 def result_name(d):
@@ -235,7 +246,8 @@ SUBSTRING_BOXES = [
     (("sensitivity", "specificity", "ppv", "npv", "auc", "concordance",
       "accuracy", "coverage", "power", "proportion", "fraction", "share",
       "percent", "sparsity", "overlap", "admixture", "ancestry", "purity",
-      "probability", "prob", "weight", "alpha", "sens", "spec", "prop", "frac"),
+      "probability", "prob", "weight", "alpha", "sens", "spec", "prop", "frac",
+      "tpr", "fpr", "tnr", "fnr", "recall", "precision"),
      (0.0, 1.0, "lin", "a proportion / probability lies in [0,1]")),
     (("popsize", "effectivesize", "effn", "neanc", "nesource", "netarget"),
      (1.0, 1e6, "log", "an effective population size is positive")),
@@ -335,8 +347,17 @@ def _lookup(name):
     return None
 
 
+# A name ending in `Sq` names a SQUARE, so it is nonnegative whatever the
+# unsquared quantity's range is: `rhoSq` is not a correlation in [-1,1].
+SQ_SUFFIX = re.compile(r"(sq|squared|_2|2)$", re.I)
+
+
 def _param_box_real(pname):
     box = _lookup(pname)
+    if box and SQ_SUFFIX.search(pname) and box[0] < 0:
+        lo, hi, sc, why = box
+        return (0.0, hi, sc, why + "; the `Sq` suffix makes it a square, so "
+                                  "nonnegative")
     if box:
         return box
     # retry after stripping role suffixes and separators: `r2_target` -> `r2`
@@ -387,6 +408,13 @@ def parse_hyp(h):
     return None
 
 
+def _rename(text, argmap):
+    if not argmap:
+        return text
+    return re.sub(r"[A-Za-z_][\w'₀-₉]*", lambda m: argmap.get(m.group(), m.group()),
+                  text)
+
+
 def theorem_box(d):
     """Intersect the numeric hypotheses of the theorems that mention `d`.
 
@@ -399,7 +427,7 @@ def theorem_box(d):
     seen = {p: [] for p in names}
     for t in d.get("theorem_hyps", []):
         for h in t["hyps"]:
-            r = parse_hyp(h)
+            r = parse_hyp(_rename(h, t.get("argmap") or {}))
             if not r:
                 continue
             p, lo, hi, kind = r
@@ -480,7 +508,7 @@ def side_constraints(d):
     out, seen = [], set()
     for t in d.get("theorem_hyps", []):
         for h in t["hyps"]:
-            h = h.strip().rstrip(",")
+            h = _rename(h.strip().rstrip(","), t.get("argmap") or {})
             if parse_hyp(h) is not None:
                 continue  # already a box constraint
             if not re.search(r"[<>≤≥=]", h):

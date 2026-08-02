@@ -148,6 +148,35 @@ THM_RE = re.compile(r"^\s*(?:@\[[^\]]*\]\s*)?(?:theorem|lemma)\s+([\w.'₀-₉]+
 HYP_RE = re.compile(r"\(\s*[\w'₀-₉]*\s*:\s*([^()]*(?:\([^()]*\)[^()]*)*)\)")
 
 
+APP_ARG = re.compile(r"[A-Za-z_][\w'₀-₉.]*|\(|[\d.]+")
+
+
+def _argmap(d, stmt):
+    """Theorem-local name -> the definition's own parameter name.
+
+    Theorems routinely rename: `proportion_mediated_in_unit (ie te : ℝ)` proves
+    a bound on `proportionMediated ie te`.  Read off the application site so
+    the hypothesis `ie ≤ te` can be translated into the definition's own
+    vocabulary; without this the hypothesis mentions no parameter of the
+    definition and is silently discarded, and every such definition is then
+    reported as unguarded.
+    """
+    k = len(d["params"])
+    if k == 0:
+        return {}
+    for m in re.finditer(r"\b" + re.escape(d["name"]) + r"\b((?:\s+[A-Za-z_][\w'₀-₉]*)+)",
+                         stmt):
+        args = m.group(1).split()
+        if len(args) < k:
+            continue
+        out = {}
+        for a, (p, _) in zip(args[:k], d["params"]):
+            if a != p:
+                out[a] = p
+        return out
+    return {}
+
+
 def harvest_hypotheses(defs):
     """For each def, gather the hypothesis atoms of theorems that name it.
 
@@ -169,8 +198,10 @@ def harvest_hypotheses(defs):
             stmt = b.split(":= by")[0].split(":=\n")[0]
             hyps = [h.strip() for h in HYP_RE.findall(stmt)]
             for nm in set(re.findall(r"\b([a-z][\w'₀-₉]*)\b", stmt)):
-                if nm in boxes:
-                    boxes[nm].append(dict(thm=m.group(1), hyps=hyps))
+                if nm not in boxes:
+                    continue
+                boxes[nm].append(dict(thm=m.group(1), hyps=hyps,
+                                      argmap=_argmap(by_name[nm], stmt)))
     for d in defs:
         d["theorem_hyps"] = boxes[d["name"]]
         d["n_theorems"] = len(boxes[d["name"]])

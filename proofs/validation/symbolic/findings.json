@@ -1,0 +1,3572 @@
+{
+ "Calibrator.AssortativeMatingPGS.AssortativeMatingModel.equilibriumVariance": [
+  {
+   "check": "check1_fixed_point",
+   "severity": "gap",
+   "status": "UNGUARDED_ARITY_MISMATCH",
+   "file": "/Users/user/gnomon/proofs/Calibrator/AssortativeMatingPGS.lean",
+   "line": 127,
+   "detail": {
+    "claimed": null,
+    "claimed_opaque": "unresolved name m.V_A",
+    "map": "amVarianceStep",
+    "map_binders": [
+     "V₀",
+     "r",
+     "h2",
+     "V"
+    ],
+    "eq_binders": []
+   }
+  }
+ ],
+ "Calibrator.DriftRegime.mutationDriftBalance": [
+  {
+   "check": "check1_fixed_point",
+   "severity": "gap",
+   "status": "UNGUARDED_NO_MAP",
+   "file": "/Users/user/gnomon/proofs/Calibrator/DriftRegime.lean",
+   "line": 106,
+   "detail": {
+    "claimed": null,
+    "claimed_opaque": "non-closed-form construct: fun"
+   }
+  }
+ ],
+ "Calibrator.EpistaticChaos.InLinkageEquilibrium": [
+  {
+   "check": "check1_fixed_point",
+   "severity": "gap",
+   "status": "UNGUARDED_NO_MAP",
+   "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
+   "line": 821,
+   "detail": {
+    "claimed": null,
+    "claimed_opaque": "non-closed-form construct: ∏"
+   }
+  }
+ ],
+ "Calibrator.ImitationRigidity.ridgeBalance": [
+  {
+   "check": "check1_fixed_point",
+   "severity": "gap",
+   "status": "UNGUARDED_NO_MAP",
+   "file": "/Users/user/gnomon/proofs/Calibrator/ImitationRigidity.lean",
+   "line": 974,
+   "detail": {
+    "claimed": null,
+    "claimed_opaque": "non-closed-form construct: ∑"
+   }
+  }
+ ],
+ "Calibrator.LocalToGlobalCoherence.expanderAgreementFloor": [
+  {
+   "check": "check1_fixed_point",
+   "severity": "gap",
+   "status": "UNGUARDED_NO_MAP",
+   "file": "/Users/user/gnomon/proofs/Calibrator/LocalToGlobalCoherence.lean",
+   "line": 93,
+   "detail": {
+    "claimed": "1/2 - sqrt(5)/6"
+   }
+  }
+ ],
+ "Calibrator.PopulationGeneticsFoundations.selectionMigrationEquilibriumMigrationFirst": [
+  {
+   "check": "check1_fixed_point",
+   "severity": "gap",
+   "status": "UNGUARDED_NO_MAP",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
+   "line": 247,
+   "detail": {
+    "claimed": "Max(0, (-m*s - m + s)/(s*(1 - m)))"
+   }
+  },
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
+   "line": 247,
+   "this_expr": "Max(0, (-x0*x1 + x0 - x1)/(x0*(1 - x1)))",
+   "other": "Calibrator.PopulationGeneticsFoundations.selectionMigrationEquilibrium",
+   "other_expr": "Max(0, (-x0*x1 + x0 - x1)/x0)"
+  }
+ ],
+ "Calibrator.PopulationGeneticsFoundations.fstMutationDriftEquilibrium": [
+  {
+   "check": "check1_fixed_point",
+   "severity": "gap",
+   "status": "UNGUARDED_NO_MAP",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
+   "line": 469,
+   "detail": {
+    "claimed": "1/(θ + 1)"
+   }
+  }
+ ],
+ "Calibrator.PopulationGeneticsFoundations.fstMigrationMutationEquilibrium": [
+  {
+   "check": "check1_fixed_point",
+   "severity": "gap",
+   "status": "UNGUARDED_NO_MAP",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
+   "line": 867,
+   "detail": {
+    "claimed": "1/(4*Ne*m + 4*Ne*μ + 1)"
+   }
+  }
+ ],
+ "Calibrator.PopulationGeneticsFoundations.hetEquilibrium": [
+  {
+   "check": "check1_fixed_point",
+   "severity": "gap",
+   "status": "UNGUARDED_NO_MAP",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
+   "line": 1199,
+   "detail": {
+    "claimed": "4*Ne*mu/(4*Ne*mu + 1)"
+   }
+  },
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
+   "line": 1199,
+   "expression": "4*x0*x1/(4*x0*x1 + 1)",
+   "other_members": [
+    "Calibrator.PortabilityDrift.hetMutationFloor",
+    "Calibrator.PortabilityDrift.sharedLD_from_equilibrium",
+    "Calibrator.PortabilityDrift.neutralAFBenchmarkFromRecurrence"
+   ]
+  }
+ ],
+ "Calibrator.PortabilityDrift.expectedSqMeanPGSDiff_IMEquilibrium": [
+  {
+   "check": "check1_fixed_point",
+   "severity": "gap",
+   "status": "UNGUARDED_NO_MAP",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+   "line": 3998,
+   "detail": {
+    "claimed": "4*V_A/(2*M + 1)"
+   }
+  }
+ ],
+ "Calibrator.PortabilityDrift.MutationDriftModelAssumptions.fstEquilibrium": [
+  {
+   "check": "check1_fixed_point",
+   "severity": "gap",
+   "status": "UNGUARDED_ARITY_MISMATCH",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+   "line": 4126,
+   "detail": {
+    "claimed": null,
+    "claimed_opaque": "unresolved name g.Ne",
+    "map": "ibdFlowStep",
+    "map_binders": [
+     "Ne",
+     "rate",
+     "F"
+    ],
+    "eq_binders": []
+   }
+  }
+ ],
+ "Calibrator.QuadraticShift.scalarCorrectionFloor": [
+  {
+   "check": "check1_fixed_point",
+   "severity": "gap",
+   "status": "UNGUARDED_NO_MAP",
+   "file": "/Users/user/gnomon/proofs/Calibrator/QuadraticShift.lean",
+   "line": 131,
+   "detail": {
+    "claimed": null,
+    "claimed_opaque": "unresolved name B.mulVec"
+   }
+  }
+ ],
+ "Calibrator.SelectionArchitecture.equilibriumEffectVariance": [
+  {
+   "check": "check1_fixed_point",
+   "severity": "gap",
+   "status": "UNGUARDED_NO_MAP",
+   "file": "/Users/user/gnomon/proofs/Calibrator/SelectionArchitecture.lean",
+   "line": 44,
+   "detail": {
+    "claimed": "v_mutation/s"
+   }
+  },
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/SelectionArchitecture.lean",
+   "line": 44,
+   "expression": "x0/x1",
+   "other_members": [
+    "Calibrator.AncestrySpecificPower.portableFraction",
+    "Calibrator.CausalInference.proportionMediated",
+    "Calibrator.CausalInference.costEffectiveness",
+    "Calibrator.CovarianceStructure.numBlocks",
+    "Calibrator.GeneticArchitectureDiscovery.perCausalLocusSignal",
+    "Calibrator.MetricSpecificPortability.adaptationDifficultyIndex",
+    "Calibrator.PGSCalibrationTheory.recalibratedCalibrationSlope",
+    "Calibrator.PolygenicArchitecture.expectedSquaredEffect",
+    "Calibrator.SelectionArchitecture.stabilizingSelectedArchitectureVariance",
+    "Calibrator.StatisticalGeneticsMethodology.portabilityRatio",
+    "Calibrator.TransportIdentities.explainableFraction",
+    "Calibrator.VarianceComponents.snpH2"
+   ]
+  }
+ ],
+ "Calibrator.AncestrySpecificPower.ncp_from_wald_test": [
+  {
+   "check": "check2_derivation",
+   "severity": "naming_gap",
+   "status": "not_an_equation",
+   "file": "/Users/user/gnomon/proofs/Calibrator/AncestrySpecificPower.lean",
+   "line": 173,
+   "statement": "β ^ 2 / standardErrorSq n p r2_ld = β ^ 2 * effectiveFisherInformation n p r2_ld",
+   "detail": {
+    "names_definition": "ncp",
+    "mentions_definition": false,
+    "MENTION_GAP": "theorem is named for `ncp` but its statement never mentions it"
+   }
+  }
+ ],
+ "Calibrator.DemographicHistory.steppingStoneFst_from_coalescence_time": [
+  {
+   "check": "check2_derivation",
+   "severity": "naming_gap",
+   "status": "derivation_verified",
+   "file": "/Users/user/gnomon/proofs/Calibrator/DemographicHistory.lean",
+   "line": 229,
+   "statement": "coalFst (steppingStoneCoalescenceTime d σ_sq m) Ne = demoSteppingStoneFst d Ne m σ_sq",
+   "detail": {
+    "names_definition": "steppingStoneFst",
+    "mentions_definition": false,
+    "MENTION_GAP": "theorem is named for `steppingStoneFst` but its statement never mentions it",
+    "lhs": "d/(2*m*σ_sq*(2*Ne + d/(2*m*σ_sq)))",
+    "rhs": "d/(4*Ne*m*σ_sq + d)",
+    "hypotheses": [
+     "0 < d",
+     "0 < Ne",
+     "0 < m",
+     "0 < σ_sq"
+    ],
+    "unparsed_hypotheses": [],
+    "method": "symbolic",
+    "opaque_lhs": "coalFst(steppingStoneCoalescenceTime(d, σ_sq, m), Ne)",
+    "opaque_rhs": "demoSteppingStoneFst(d, Ne, m, σ_sq)",
+    "mentions_any_definition": true
+   }
+  }
+ ],
+ "Calibrator.OpenQuestions.brier_uncertainty_formula": [
+  {
+   "check": "check2_derivation",
+   "severity": "vacuous",
+   "status": "VACUOUS_DERIVATION_NO_DEFS",
+   "file": "/Users/user/gnomon/proofs/Calibrator/OpenQuestions.lean",
+   "line": 379,
+   "statement": "π * (1 - π) = -(π - 1/2) ^ 2 + 1/4",
+   "detail": {
+    "lhs": "pi*(1 - pi)",
+    "rhs": "1/4 - (-1/2 + pi)**2",
+    "hypotheses": [],
+    "unparsed_hypotheses": [],
+    "method": "symbolic",
+    "opaque_lhs": "pi*(1 - pi)",
+    "opaque_rhs": "1/4 - (-1/2 + pi)**2",
+    "mentions_any_definition": false
+   }
+  }
+ ],
+ "Calibrator.PopulationGeneticsFoundations.fstEquilibrium_derived": [
+  {
+   "check": "check2_derivation",
+   "severity": "naming_gap",
+   "status": "derivation_verified",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
+   "line": 1254,
+   "statement": "1 - hetEquilibrium Ne mu = 1 / (1 + 4 * Ne * mu)",
+   "detail": {
+    "names_definition": "fstEquilibrium",
+    "mentions_definition": false,
+    "MENTION_GAP": "theorem is named for `fstEquilibrium` but its statement never mentions it",
+    "lhs": "-4*Ne*mu/(4*Ne*mu + 1) + 1",
+    "rhs": "1/(4*Ne*mu + 1)",
+    "hypotheses": [
+     "0 < Ne",
+     "0 < mu"
+    ],
+    "unparsed_hypotheses": [],
+    "method": "symbolic",
+    "opaque_lhs": "1 - hetEquilibrium(Ne, mu)",
+    "opaque_rhs": "1/(4*Ne*mu + 1)",
+    "mentions_any_definition": true
+   }
+  }
+ ],
+ "Calibrator.PortabilityDrift.neutralAFBenchmarkRatio_from_state": [
+  {
+   "check": "check2_derivation",
+   "severity": "naming_gap",
+   "status": "not_an_equation",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+   "line": 2914,
+   "statement": "targetR2FromNeutralAFBenchmark V_A V_E fstTarget / presentDayR2 V_A V_E fstSource < 1",
+   "detail": {
+    "names_definition": "neutralAFBenchmarkRatio",
+    "mentions_definition": false,
+    "MENTION_GAP": "theorem is named for `neutralAFBenchmarkRatio` but its statement never mentions it"
+   }
+  }
+ ],
+ "Calibrator.PortabilityDrift.targetBrierFromNeutralAFBenchmark_eq": [
+  {
+   "check": "check2_derivation",
+   "severity": "naming_gap",
+   "status": "opaque",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+   "line": 3801,
+   "statement": "targetExactCalibratedBrierRisk π V_A V_E fstTarget = exactCalibratedBrierRiskFromR2 π (targetR2FromNeutralAFBenchmark V_A V_E fstTarget)",
+   "detail": {
+    "names_definition": "targetBrierFromNeutralAFBenchmark",
+    "mentions_definition": false,
+    "MENTION_GAP": "theorem is named for `targetBrierFromNeutralAFBenchmark` but its statement never mentions it",
+    "reason": "non-closed-form construct: let"
+   }
+  }
+ ],
+ "Calibrator.TransportIdentities.mse_from_variance_ratio_corr_bias": [
+  {
+   "check": "check2_derivation",
+   "severity": "naming_gap",
+   "status": "opaque",
+   "file": "/Users/user/gnomon/proofs/Calibrator/TransportIdentities.lean",
+   "line": 788,
+   "statement": "expMse E Y S = variance E Y * (1 + lam - 2 * ρ * Real.sqrt lam) + (bias E Y S) ^ 2",
+   "detail": {
+    "names_definition": "mse",
+    "mentions_definition": false,
+    "MENTION_GAP": "theorem is named for `mse` but its statement never mentions it",
+    "reason": "expMse expects 0 args [], got 3"
+   }
+  }
+ ],
+ "Calibrator.AncestryCalibration.epistaticVariancePairwise": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/AncestryCalibration.lean",
+   "line": 296,
+   "expression": "4*x0**2*x1*x2*(1 - x1)*(1 - x2)",
+   "other_members": [
+    "Calibrator.EpistasisAndNonAdditivity.epistaticVariance"
+   ]
+  }
+ ],
+ "Calibrator.EpistasisAndNonAdditivity.epistaticVariance": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/EpistasisAndNonAdditivity.lean",
+   "line": 126,
+   "expression": "4*x0**2*x1*x2*(1 - x1)*(1 - x2)",
+   "other_members": [
+    "Calibrator.AncestryCalibration.epistaticVariancePairwise"
+   ]
+  }
+ ],
+ "Calibrator.AncestrySpecificArchitecture.driftVariance": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/AncestrySpecificArchitecture.lean",
+   "line": 74,
+   "expression": "x0*x1*(1 - x0)",
+   "other_members": [
+    "Calibrator.BayesianPGSTheory.misspecExcessRisk"
+   ]
+  }
+ ],
+ "Calibrator.BayesianPGSTheory.misspecExcessRisk": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/BayesianPGSTheory.lean",
+   "line": 386,
+   "expression": "x0*x1*(1 - x0)",
+   "other_members": [
+    "Calibrator.AncestrySpecificArchitecture.driftVariance"
+   ]
+  }
+ ],
+ "Calibrator.AncestrySpecificArchitecture.gwasHeritability": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/AncestrySpecificArchitecture.lean",
+   "line": 213,
+   "expression": "x0*x1",
+   "other_members": [
+    "Calibrator.AncestrySpecificPower.fisherInformation",
+    "Calibrator.DGP.taggingMismatchScale",
+    "Calibrator.DriftRegime.targetHetOfRetention",
+    "Calibrator.DriftRegime.targetPgsVarOfRetention",
+    "Calibrator.LongitudinalPortability.secularTrendBias",
+    "Calibrator.PCCorrectability.Diagnostic.ancestryGradientSusceptibility",
+    "Calibrator.PolygenicAdaptation.pgsDriftVariance_one_pop",
+    "Calibrator.PortabilityDrift.pgsVarianceFromHet",
+    "Calibrator.PortabilityDrift.covarianceRetention"
+   ]
+  }
+ ],
+ "Calibrator.AncestrySpecificPower.fisherInformation": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/AncestrySpecificPower.lean",
+   "line": 74,
+   "expression": "x0*x1",
+   "other_members": [
+    "Calibrator.AncestrySpecificArchitecture.gwasHeritability",
+    "Calibrator.DGP.taggingMismatchScale",
+    "Calibrator.DriftRegime.targetHetOfRetention",
+    "Calibrator.DriftRegime.targetPgsVarOfRetention",
+    "Calibrator.LongitudinalPortability.secularTrendBias",
+    "Calibrator.PCCorrectability.Diagnostic.ancestryGradientSusceptibility",
+    "Calibrator.PolygenicAdaptation.pgsDriftVariance_one_pop",
+    "Calibrator.PortabilityDrift.pgsVarianceFromHet",
+    "Calibrator.PortabilityDrift.covarianceRetention"
+   ]
+  }
+ ],
+ "Calibrator.DGP.taggingMismatchScale": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/DGP.lean",
+   "line": 289,
+   "expression": "x0*x1",
+   "other_members": [
+    "Calibrator.AncestrySpecificArchitecture.gwasHeritability",
+    "Calibrator.AncestrySpecificPower.fisherInformation",
+    "Calibrator.DriftRegime.targetHetOfRetention",
+    "Calibrator.DriftRegime.targetPgsVarOfRetention",
+    "Calibrator.LongitudinalPortability.secularTrendBias",
+    "Calibrator.PCCorrectability.Diagnostic.ancestryGradientSusceptibility",
+    "Calibrator.PolygenicAdaptation.pgsDriftVariance_one_pop",
+    "Calibrator.PortabilityDrift.pgsVarianceFromHet",
+    "Calibrator.PortabilityDrift.covarianceRetention"
+   ]
+  }
+ ],
+ "Calibrator.DriftRegime.targetHetOfRetention": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/DriftRegime.lean",
+   "line": 165,
+   "expression": "x0*x1",
+   "other_members": [
+    "Calibrator.AncestrySpecificArchitecture.gwasHeritability",
+    "Calibrator.AncestrySpecificPower.fisherInformation",
+    "Calibrator.DGP.taggingMismatchScale",
+    "Calibrator.DriftRegime.targetPgsVarOfRetention",
+    "Calibrator.LongitudinalPortability.secularTrendBias",
+    "Calibrator.PCCorrectability.Diagnostic.ancestryGradientSusceptibility",
+    "Calibrator.PolygenicAdaptation.pgsDriftVariance_one_pop",
+    "Calibrator.PortabilityDrift.pgsVarianceFromHet",
+    "Calibrator.PortabilityDrift.covarianceRetention"
+   ]
+  },
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/DriftRegime.lean",
+   "line": 165,
+   "this_expr": "x0*x1",
+   "other": "Calibrator.PortabilityDrift.targetHetFromFst",
+   "other_expr": "x0*(1 - x1)"
+  }
+ ],
+ "Calibrator.DriftRegime.targetPgsVarOfRetention": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/DriftRegime.lean",
+   "line": 168,
+   "expression": "x0*x1",
+   "other_members": [
+    "Calibrator.AncestrySpecificArchitecture.gwasHeritability",
+    "Calibrator.AncestrySpecificPower.fisherInformation",
+    "Calibrator.DGP.taggingMismatchScale",
+    "Calibrator.DriftRegime.targetHetOfRetention",
+    "Calibrator.LongitudinalPortability.secularTrendBias",
+    "Calibrator.PCCorrectability.Diagnostic.ancestryGradientSusceptibility",
+    "Calibrator.PolygenicAdaptation.pgsDriftVariance_one_pop",
+    "Calibrator.PortabilityDrift.pgsVarianceFromHet",
+    "Calibrator.PortabilityDrift.covarianceRetention"
+   ]
+  },
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/DriftRegime.lean",
+   "line": 168,
+   "this_expr": "x0*x1",
+   "other": "Calibrator.PortabilityDrift.targetPGSVariance",
+   "other_expr": "x0*(1 - x1)"
+  }
+ ],
+ "Calibrator.LongitudinalPortability.secularTrendBias": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/LongitudinalPortability.lean",
+   "line": 158,
+   "expression": "x0*x1",
+   "other_members": [
+    "Calibrator.AncestrySpecificArchitecture.gwasHeritability",
+    "Calibrator.AncestrySpecificPower.fisherInformation",
+    "Calibrator.DGP.taggingMismatchScale",
+    "Calibrator.DriftRegime.targetHetOfRetention",
+    "Calibrator.DriftRegime.targetPgsVarOfRetention",
+    "Calibrator.PCCorrectability.Diagnostic.ancestryGradientSusceptibility",
+    "Calibrator.PolygenicAdaptation.pgsDriftVariance_one_pop",
+    "Calibrator.PortabilityDrift.pgsVarianceFromHet",
+    "Calibrator.PortabilityDrift.covarianceRetention"
+   ]
+  }
+ ],
+ "Calibrator.PCCorrectability.Diagnostic.ancestryGradientSusceptibility": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/Diagnostic.lean",
+   "line": 74,
+   "expression": "x0*x1",
+   "other_members": [
+    "Calibrator.AncestrySpecificArchitecture.gwasHeritability",
+    "Calibrator.AncestrySpecificPower.fisherInformation",
+    "Calibrator.DGP.taggingMismatchScale",
+    "Calibrator.DriftRegime.targetHetOfRetention",
+    "Calibrator.DriftRegime.targetPgsVarOfRetention",
+    "Calibrator.LongitudinalPortability.secularTrendBias",
+    "Calibrator.PolygenicAdaptation.pgsDriftVariance_one_pop",
+    "Calibrator.PortabilityDrift.pgsVarianceFromHet",
+    "Calibrator.PortabilityDrift.covarianceRetention"
+   ]
+  }
+ ],
+ "Calibrator.PolygenicAdaptation.pgsDriftVariance_one_pop": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicAdaptation.lean",
+   "line": 95,
+   "expression": "x0*x1",
+   "other_members": [
+    "Calibrator.AncestrySpecificArchitecture.gwasHeritability",
+    "Calibrator.AncestrySpecificPower.fisherInformation",
+    "Calibrator.DGP.taggingMismatchScale",
+    "Calibrator.DriftRegime.targetHetOfRetention",
+    "Calibrator.DriftRegime.targetPgsVarOfRetention",
+    "Calibrator.LongitudinalPortability.secularTrendBias",
+    "Calibrator.PCCorrectability.Diagnostic.ancestryGradientSusceptibility",
+    "Calibrator.PortabilityDrift.pgsVarianceFromHet",
+    "Calibrator.PortabilityDrift.covarianceRetention"
+   ]
+  }
+ ],
+ "Calibrator.PortabilityDrift.pgsVarianceFromHet": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+   "line": 628,
+   "expression": "x0*x1",
+   "other_members": [
+    "Calibrator.AncestrySpecificArchitecture.gwasHeritability",
+    "Calibrator.AncestrySpecificPower.fisherInformation",
+    "Calibrator.DGP.taggingMismatchScale",
+    "Calibrator.DriftRegime.targetHetOfRetention",
+    "Calibrator.DriftRegime.targetPgsVarOfRetention",
+    "Calibrator.LongitudinalPortability.secularTrendBias",
+    "Calibrator.PCCorrectability.Diagnostic.ancestryGradientSusceptibility",
+    "Calibrator.PolygenicAdaptation.pgsDriftVariance_one_pop",
+    "Calibrator.PortabilityDrift.covarianceRetention"
+   ]
+  }
+ ],
+ "Calibrator.PortabilityDrift.covarianceRetention": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+   "line": 4248,
+   "expression": "x0*x1",
+   "other_members": [
+    "Calibrator.AncestrySpecificArchitecture.gwasHeritability",
+    "Calibrator.AncestrySpecificPower.fisherInformation",
+    "Calibrator.DGP.taggingMismatchScale",
+    "Calibrator.DriftRegime.targetHetOfRetention",
+    "Calibrator.DriftRegime.targetPgsVarOfRetention",
+    "Calibrator.LongitudinalPortability.secularTrendBias",
+    "Calibrator.PCCorrectability.Diagnostic.ancestryGradientSusceptibility",
+    "Calibrator.PolygenicAdaptation.pgsDriftVariance_one_pop",
+    "Calibrator.PortabilityDrift.pgsVarianceFromHet"
+   ]
+  }
+ ],
+ "Calibrator.AncestrySpecificArchitecture.equilibriumFst": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/AncestrySpecificArchitecture.lean",
+   "line": 353,
+   "expression": "1/(4*x0*x1 + 1)",
+   "other_members": [
+    "Calibrator.PopulationGeneticsFoundations.islandModelFst",
+    "Calibrator.PortabilityDrift.fstMigrationDriftEquilibrium",
+    "Calibrator.PortabilityDrift.asymmetricFst",
+    "Calibrator.PortabilityDrift.fstMigDriftEquil"
+   ]
+  }
+ ],
+ "Calibrator.PopulationGeneticsFoundations.islandModelFst": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
+   "line": 791,
+   "expression": "1/(4*x0*x1 + 1)",
+   "other_members": [
+    "Calibrator.AncestrySpecificArchitecture.equilibriumFst",
+    "Calibrator.PortabilityDrift.fstMigrationDriftEquilibrium",
+    "Calibrator.PortabilityDrift.asymmetricFst",
+    "Calibrator.PortabilityDrift.fstMigDriftEquil"
+   ]
+  }
+ ],
+ "Calibrator.PortabilityDrift.fstMigrationDriftEquilibrium": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+   "line": 4569,
+   "expression": "1/(4*x0*x1 + 1)",
+   "other_members": [
+    "Calibrator.AncestrySpecificArchitecture.equilibriumFst",
+    "Calibrator.PopulationGeneticsFoundations.islandModelFst",
+    "Calibrator.PortabilityDrift.asymmetricFst",
+    "Calibrator.PortabilityDrift.fstMigDriftEquil"
+   ]
+  }
+ ],
+ "Calibrator.PortabilityDrift.asymmetricFst": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+   "line": 5002,
+   "expression": "1/(4*x0*x1 + 1)",
+   "other_members": [
+    "Calibrator.AncestrySpecificArchitecture.equilibriumFst",
+    "Calibrator.PopulationGeneticsFoundations.islandModelFst",
+    "Calibrator.PortabilityDrift.fstMigrationDriftEquilibrium",
+    "Calibrator.PortabilityDrift.fstMigDriftEquil"
+   ]
+  }
+ ],
+ "Calibrator.PortabilityDrift.fstMigDriftEquil": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+   "line": 5208,
+   "expression": "1/(4*x0*x1 + 1)",
+   "other_members": [
+    "Calibrator.AncestrySpecificArchitecture.equilibriumFst",
+    "Calibrator.PopulationGeneticsFoundations.islandModelFst",
+    "Calibrator.PortabilityDrift.fstMigrationDriftEquilibrium",
+    "Calibrator.PortabilityDrift.asymmetricFst"
+   ]
+  }
+ ],
+ "Calibrator.AncestrySpecificPower.genotypeVarianceHWE": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/AncestrySpecificPower.lean",
+   "line": 95,
+   "expression": "2*x0*(1 - x0)",
+   "other_members": [
+    "Calibrator.AncestrySpecificPower.hweHeterozygosity",
+    "Calibrator.Conventions.hweGenotypeVariance"
+   ]
+  }
+ ],
+ "Calibrator.AncestrySpecificPower.hweHeterozygosity": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/AncestrySpecificPower.lean",
+   "line": 341,
+   "expression": "2*x0*(1 - x0)",
+   "other_members": [
+    "Calibrator.AncestrySpecificPower.genotypeVarianceHWE",
+    "Calibrator.Conventions.hweGenotypeVariance"
+   ]
+  }
+ ],
+ "Calibrator.Conventions.hweGenotypeVariance": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/Conventions.lean",
+   "line": 86,
+   "expression": "2*x0*(1 - x0)",
+   "other_members": [
+    "Calibrator.AncestrySpecificPower.genotypeVarianceHWE",
+    "Calibrator.AncestrySpecificPower.hweHeterozygosity"
+   ]
+  }
+ ],
+ "Calibrator.AncestrySpecificPower.ncp": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/AncestrySpecificPower.lean",
+   "line": 285,
+   "expression": "x0*x1**2",
+   "other_members": [
+    "Calibrator.BayesianPGSTheory.spikeAndSlabPriorVariance"
+   ]
+  }
+ ],
+ "Calibrator.BayesianPGSTheory.spikeAndSlabPriorVariance": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/BayesianPGSTheory.lean",
+   "line": 368,
+   "expression": "x0*x1**2",
+   "other_members": [
+    "Calibrator.AncestrySpecificPower.ncp"
+   ]
+  }
+ ],
+ "Calibrator.AncestrySpecificPower.portableFraction": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/AncestrySpecificPower.lean",
+   "line": 415,
+   "expression": "x0/x1",
+   "other_members": [
+    "Calibrator.CausalInference.proportionMediated",
+    "Calibrator.CausalInference.costEffectiveness",
+    "Calibrator.CovarianceStructure.numBlocks",
+    "Calibrator.GeneticArchitectureDiscovery.perCausalLocusSignal",
+    "Calibrator.MetricSpecificPortability.adaptationDifficultyIndex",
+    "Calibrator.PGSCalibrationTheory.recalibratedCalibrationSlope",
+    "Calibrator.PolygenicArchitecture.expectedSquaredEffect",
+    "Calibrator.SelectionArchitecture.equilibriumEffectVariance",
+    "Calibrator.SelectionArchitecture.stabilizingSelectedArchitectureVariance",
+    "Calibrator.StatisticalGeneticsMethodology.portabilityRatio",
+    "Calibrator.TransportIdentities.explainableFraction",
+    "Calibrator.VarianceComponents.snpH2"
+   ]
+  }
+ ],
+ "Calibrator.CausalInference.proportionMediated": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/CausalInference.lean",
+   "line": 116,
+   "expression": "x0/x1",
+   "other_members": [
+    "Calibrator.AncestrySpecificPower.portableFraction",
+    "Calibrator.CausalInference.costEffectiveness",
+    "Calibrator.CovarianceStructure.numBlocks",
+    "Calibrator.GeneticArchitectureDiscovery.perCausalLocusSignal",
+    "Calibrator.MetricSpecificPortability.adaptationDifficultyIndex",
+    "Calibrator.PGSCalibrationTheory.recalibratedCalibrationSlope",
+    "Calibrator.PolygenicArchitecture.expectedSquaredEffect",
+    "Calibrator.SelectionArchitecture.equilibriumEffectVariance",
+    "Calibrator.SelectionArchitecture.stabilizingSelectedArchitectureVariance",
+    "Calibrator.StatisticalGeneticsMethodology.portabilityRatio",
+    "Calibrator.TransportIdentities.explainableFraction",
+    "Calibrator.VarianceComponents.snpH2"
+   ]
+  }
+ ],
+ "Calibrator.CausalInference.costEffectiveness": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/CausalInference.lean",
+   "line": 355,
+   "expression": "x0/x1",
+   "other_members": [
+    "Calibrator.AncestrySpecificPower.portableFraction",
+    "Calibrator.CausalInference.proportionMediated",
+    "Calibrator.CovarianceStructure.numBlocks",
+    "Calibrator.GeneticArchitectureDiscovery.perCausalLocusSignal",
+    "Calibrator.MetricSpecificPortability.adaptationDifficultyIndex",
+    "Calibrator.PGSCalibrationTheory.recalibratedCalibrationSlope",
+    "Calibrator.PolygenicArchitecture.expectedSquaredEffect",
+    "Calibrator.SelectionArchitecture.equilibriumEffectVariance",
+    "Calibrator.SelectionArchitecture.stabilizingSelectedArchitectureVariance",
+    "Calibrator.StatisticalGeneticsMethodology.portabilityRatio",
+    "Calibrator.TransportIdentities.explainableFraction",
+    "Calibrator.VarianceComponents.snpH2"
+   ]
+  }
+ ],
+ "Calibrator.CovarianceStructure.numBlocks": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/CovarianceStructure.lean",
+   "line": 251,
+   "expression": "x0/x1",
+   "other_members": [
+    "Calibrator.AncestrySpecificPower.portableFraction",
+    "Calibrator.CausalInference.proportionMediated",
+    "Calibrator.CausalInference.costEffectiveness",
+    "Calibrator.GeneticArchitectureDiscovery.perCausalLocusSignal",
+    "Calibrator.MetricSpecificPortability.adaptationDifficultyIndex",
+    "Calibrator.PGSCalibrationTheory.recalibratedCalibrationSlope",
+    "Calibrator.PolygenicArchitecture.expectedSquaredEffect",
+    "Calibrator.SelectionArchitecture.equilibriumEffectVariance",
+    "Calibrator.SelectionArchitecture.stabilizingSelectedArchitectureVariance",
+    "Calibrator.StatisticalGeneticsMethodology.portabilityRatio",
+    "Calibrator.TransportIdentities.explainableFraction",
+    "Calibrator.VarianceComponents.snpH2"
+   ]
+  }
+ ],
+ "Calibrator.GeneticArchitectureDiscovery.perCausalLocusSignal": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/GeneticArchitectureDiscovery.lean",
+   "line": 358,
+   "expression": "x0/x1",
+   "other_members": [
+    "Calibrator.AncestrySpecificPower.portableFraction",
+    "Calibrator.CausalInference.proportionMediated",
+    "Calibrator.CausalInference.costEffectiveness",
+    "Calibrator.CovarianceStructure.numBlocks",
+    "Calibrator.MetricSpecificPortability.adaptationDifficultyIndex",
+    "Calibrator.PGSCalibrationTheory.recalibratedCalibrationSlope",
+    "Calibrator.PolygenicArchitecture.expectedSquaredEffect",
+    "Calibrator.SelectionArchitecture.equilibriumEffectVariance",
+    "Calibrator.SelectionArchitecture.stabilizingSelectedArchitectureVariance",
+    "Calibrator.StatisticalGeneticsMethodology.portabilityRatio",
+    "Calibrator.TransportIdentities.explainableFraction",
+    "Calibrator.VarianceComponents.snpH2"
+   ]
+  }
+ ],
+ "Calibrator.MetricSpecificPortability.adaptationDifficultyIndex": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/MetricSpecificPortability.lean",
+   "line": 527,
+   "expression": "x0/x1",
+   "other_members": [
+    "Calibrator.AncestrySpecificPower.portableFraction",
+    "Calibrator.CausalInference.proportionMediated",
+    "Calibrator.CausalInference.costEffectiveness",
+    "Calibrator.CovarianceStructure.numBlocks",
+    "Calibrator.GeneticArchitectureDiscovery.perCausalLocusSignal",
+    "Calibrator.PGSCalibrationTheory.recalibratedCalibrationSlope",
+    "Calibrator.PolygenicArchitecture.expectedSquaredEffect",
+    "Calibrator.SelectionArchitecture.equilibriumEffectVariance",
+    "Calibrator.SelectionArchitecture.stabilizingSelectedArchitectureVariance",
+    "Calibrator.StatisticalGeneticsMethodology.portabilityRatio",
+    "Calibrator.TransportIdentities.explainableFraction",
+    "Calibrator.VarianceComponents.snpH2"
+   ]
+  }
+ ],
+ "Calibrator.PGSCalibrationTheory.recalibratedCalibrationSlope": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PGSCalibrationTheory.lean",
+   "line": 1450,
+   "expression": "x0/x1",
+   "other_members": [
+    "Calibrator.AncestrySpecificPower.portableFraction",
+    "Calibrator.CausalInference.proportionMediated",
+    "Calibrator.CausalInference.costEffectiveness",
+    "Calibrator.CovarianceStructure.numBlocks",
+    "Calibrator.GeneticArchitectureDiscovery.perCausalLocusSignal",
+    "Calibrator.MetricSpecificPortability.adaptationDifficultyIndex",
+    "Calibrator.PolygenicArchitecture.expectedSquaredEffect",
+    "Calibrator.SelectionArchitecture.equilibriumEffectVariance",
+    "Calibrator.SelectionArchitecture.stabilizingSelectedArchitectureVariance",
+    "Calibrator.StatisticalGeneticsMethodology.portabilityRatio",
+    "Calibrator.TransportIdentities.explainableFraction",
+    "Calibrator.VarianceComponents.snpH2"
+   ]
+  }
+ ],
+ "Calibrator.PolygenicArchitecture.expectedSquaredEffect": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicArchitecture.lean",
+   "line": 44,
+   "expression": "x0/x1",
+   "other_members": [
+    "Calibrator.AncestrySpecificPower.portableFraction",
+    "Calibrator.CausalInference.proportionMediated",
+    "Calibrator.CausalInference.costEffectiveness",
+    "Calibrator.CovarianceStructure.numBlocks",
+    "Calibrator.GeneticArchitectureDiscovery.perCausalLocusSignal",
+    "Calibrator.MetricSpecificPortability.adaptationDifficultyIndex",
+    "Calibrator.PGSCalibrationTheory.recalibratedCalibrationSlope",
+    "Calibrator.SelectionArchitecture.equilibriumEffectVariance",
+    "Calibrator.SelectionArchitecture.stabilizingSelectedArchitectureVariance",
+    "Calibrator.StatisticalGeneticsMethodology.portabilityRatio",
+    "Calibrator.TransportIdentities.explainableFraction",
+    "Calibrator.VarianceComponents.snpH2"
+   ]
+  }
+ ],
+ "Calibrator.SelectionArchitecture.stabilizingSelectedArchitectureVariance": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/SelectionArchitecture.lean",
+   "line": 184,
+   "expression": "x0/x1",
+   "other_members": [
+    "Calibrator.AncestrySpecificPower.portableFraction",
+    "Calibrator.CausalInference.proportionMediated",
+    "Calibrator.CausalInference.costEffectiveness",
+    "Calibrator.CovarianceStructure.numBlocks",
+    "Calibrator.GeneticArchitectureDiscovery.perCausalLocusSignal",
+    "Calibrator.MetricSpecificPortability.adaptationDifficultyIndex",
+    "Calibrator.PGSCalibrationTheory.recalibratedCalibrationSlope",
+    "Calibrator.PolygenicArchitecture.expectedSquaredEffect",
+    "Calibrator.SelectionArchitecture.equilibriumEffectVariance",
+    "Calibrator.StatisticalGeneticsMethodology.portabilityRatio",
+    "Calibrator.TransportIdentities.explainableFraction",
+    "Calibrator.VarianceComponents.snpH2"
+   ]
+  }
+ ],
+ "Calibrator.StatisticalGeneticsMethodology.portabilityRatio": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/StatisticalGeneticsMethodology.lean",
+   "line": 74,
+   "expression": "x0/x1",
+   "other_members": [
+    "Calibrator.AncestrySpecificPower.portableFraction",
+    "Calibrator.CausalInference.proportionMediated",
+    "Calibrator.CausalInference.costEffectiveness",
+    "Calibrator.CovarianceStructure.numBlocks",
+    "Calibrator.GeneticArchitectureDiscovery.perCausalLocusSignal",
+    "Calibrator.MetricSpecificPortability.adaptationDifficultyIndex",
+    "Calibrator.PGSCalibrationTheory.recalibratedCalibrationSlope",
+    "Calibrator.PolygenicArchitecture.expectedSquaredEffect",
+    "Calibrator.SelectionArchitecture.equilibriumEffectVariance",
+    "Calibrator.SelectionArchitecture.stabilizingSelectedArchitectureVariance",
+    "Calibrator.TransportIdentities.explainableFraction",
+    "Calibrator.VarianceComponents.snpH2"
+   ]
+  }
+ ],
+ "Calibrator.TransportIdentities.explainableFraction": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/TransportIdentities.lean",
+   "line": 667,
+   "expression": "x0/x1",
+   "other_members": [
+    "Calibrator.AncestrySpecificPower.portableFraction",
+    "Calibrator.CausalInference.proportionMediated",
+    "Calibrator.CausalInference.costEffectiveness",
+    "Calibrator.CovarianceStructure.numBlocks",
+    "Calibrator.GeneticArchitectureDiscovery.perCausalLocusSignal",
+    "Calibrator.MetricSpecificPortability.adaptationDifficultyIndex",
+    "Calibrator.PGSCalibrationTheory.recalibratedCalibrationSlope",
+    "Calibrator.PolygenicArchitecture.expectedSquaredEffect",
+    "Calibrator.SelectionArchitecture.equilibriumEffectVariance",
+    "Calibrator.SelectionArchitecture.stabilizingSelectedArchitectureVariance",
+    "Calibrator.StatisticalGeneticsMethodology.portabilityRatio",
+    "Calibrator.VarianceComponents.snpH2"
+   ]
+  }
+ ],
+ "Calibrator.VarianceComponents.snpH2": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/VarianceComponents.lean",
+   "line": 55,
+   "expression": "x0/x1",
+   "other_members": [
+    "Calibrator.AncestrySpecificPower.portableFraction",
+    "Calibrator.CausalInference.proportionMediated",
+    "Calibrator.CausalInference.costEffectiveness",
+    "Calibrator.CovarianceStructure.numBlocks",
+    "Calibrator.GeneticArchitectureDiscovery.perCausalLocusSignal",
+    "Calibrator.MetricSpecificPortability.adaptationDifficultyIndex",
+    "Calibrator.PGSCalibrationTheory.recalibratedCalibrationSlope",
+    "Calibrator.PolygenicArchitecture.expectedSquaredEffect",
+    "Calibrator.SelectionArchitecture.equilibriumEffectVariance",
+    "Calibrator.SelectionArchitecture.stabilizingSelectedArchitectureVariance",
+    "Calibrator.StatisticalGeneticsMethodology.portabilityRatio",
+    "Calibrator.TransportIdentities.explainableFraction"
+   ]
+  }
+ ],
+ "Calibrator.BayesianPGSTheory.optimalShrinkage": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/BayesianPGSTheory.lean",
+   "line": 200,
+   "expression": "x1/(x0 + x1)",
+   "other_members": [
+    "Calibrator.ProjectionShiftBounds.wienerWeight"
+   ]
+  }
+ ],
+ "Calibrator.ProjectionShiftBounds.wienerWeight": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/ProjectionShiftBounds.lean",
+   "line": 276,
+   "expression": "x1/(x0 + x1)",
+   "other_members": [
+    "Calibrator.BayesianPGSTheory.optimalShrinkage"
+   ]
+  }
+ ],
+ "Calibrator.BayesianPGSTheory.snpShrinkage": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/BayesianPGSTheory.lean",
+   "line": 257,
+   "expression": "x0/(x0 + x1)",
+   "other_members": [
+    "Calibrator.DGP.r2FromSignalVariance",
+    "Calibrator.PortabilityDrift.expectedR2",
+    "Calibrator.PowerAnalysis.r2ScalingModel",
+    "Calibrator.StratificationConfounding.reliabilityRatio"
+   ]
+  }
+ ],
+ "Calibrator.DGP.r2FromSignalVariance": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/DGP.lean",
+   "line": 2100,
+   "expression": "x0/(x0 + x1)",
+   "other_members": [
+    "Calibrator.BayesianPGSTheory.snpShrinkage",
+    "Calibrator.PortabilityDrift.expectedR2",
+    "Calibrator.PowerAnalysis.r2ScalingModel",
+    "Calibrator.StratificationConfounding.reliabilityRatio"
+   ]
+  },
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/DGP.lean",
+   "line": 2100,
+   "this_expr": "x0/(x0 + x1)",
+   "other": "Calibrator.DGP.r2FromMSE",
+   "other_expr": "-x0/x1 + 1"
+  }
+ ],
+ "Calibrator.PortabilityDrift.expectedR2": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+   "line": 935,
+   "expression": "x0/(x0 + x1)",
+   "other_members": [
+    "Calibrator.BayesianPGSTheory.snpShrinkage",
+    "Calibrator.DGP.r2FromSignalVariance",
+    "Calibrator.PowerAnalysis.r2ScalingModel",
+    "Calibrator.StratificationConfounding.reliabilityRatio"
+   ]
+  },
+  {
+   "check": "check2_derivation",
+   "severity": "vacuous_coverage",
+   "status": "CHECK_CANNOT_FAIL_FOR_THIS_DEFINITION",
+   "detail": {
+    "covered": false,
+    "via_theorem": "Calibrator.MultiAncestryTheory.expectedR2_gain_eq",
+    "mutations_rejected": [
+     "scale by 2"
+    ],
+    "mutations_survived": [
+     "shift by 1"
+    ]
+   }
+  }
+ ],
+ "Calibrator.PowerAnalysis.r2ScalingModel": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PowerAnalysis.lean",
+   "line": 362,
+   "expression": "x0/(x0 + x1)",
+   "other_members": [
+    "Calibrator.BayesianPGSTheory.snpShrinkage",
+    "Calibrator.DGP.r2FromSignalVariance",
+    "Calibrator.PortabilityDrift.expectedR2",
+    "Calibrator.StratificationConfounding.reliabilityRatio"
+   ]
+  }
+ ],
+ "Calibrator.StratificationConfounding.reliabilityRatio": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/StratificationConfounding.lean",
+   "line": 469,
+   "expression": "x0/(x0 + x1)",
+   "other_members": [
+    "Calibrator.BayesianPGSTheory.snpShrinkage",
+    "Calibrator.DGP.r2FromSignalVariance",
+    "Calibrator.PortabilityDrift.expectedR2",
+    "Calibrator.PowerAnalysis.r2ScalingModel"
+   ]
+  }
+ ],
+ "Calibrator.BayesianPGSTheory.posteriorPredictiveVariance": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/BayesianPGSTheory.lean",
+   "line": 488,
+   "expression": "x0 + x1",
+   "other_members": [
+    "Calibrator.ClinicalUtilityFairness.netReclassificationImprovement",
+    "Calibrator.GeneticArchitectureDiscovery.expectedLinearEffectEstimate",
+    "Calibrator.ImputationPortability.total_portability_loss",
+    "Calibrator.PGSCalibrationTheory.interceptRecalibrated",
+    "Calibrator.Probability.latentLiability"
+   ]
+  }
+ ],
+ "Calibrator.ClinicalUtilityFairness.netReclassificationImprovement": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/ClinicalUtilityFairness.lean",
+   "line": 403,
+   "expression": "x0 + x1",
+   "other_members": [
+    "Calibrator.BayesianPGSTheory.posteriorPredictiveVariance",
+    "Calibrator.GeneticArchitectureDiscovery.expectedLinearEffectEstimate",
+    "Calibrator.ImputationPortability.total_portability_loss",
+    "Calibrator.PGSCalibrationTheory.interceptRecalibrated",
+    "Calibrator.Probability.latentLiability"
+   ]
+  }
+ ],
+ "Calibrator.GeneticArchitectureDiscovery.expectedLinearEffectEstimate": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/GeneticArchitectureDiscovery.lean",
+   "line": 326,
+   "expression": "x0 + x1",
+   "other_members": [
+    "Calibrator.BayesianPGSTheory.posteriorPredictiveVariance",
+    "Calibrator.ClinicalUtilityFairness.netReclassificationImprovement",
+    "Calibrator.ImputationPortability.total_portability_loss",
+    "Calibrator.PGSCalibrationTheory.interceptRecalibrated",
+    "Calibrator.Probability.latentLiability"
+   ]
+  }
+ ],
+ "Calibrator.ImputationPortability.total_portability_loss": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/ImputationPortability.lean",
+   "line": 294,
+   "expression": "x0 + x1",
+   "other_members": [
+    "Calibrator.BayesianPGSTheory.posteriorPredictiveVariance",
+    "Calibrator.ClinicalUtilityFairness.netReclassificationImprovement",
+    "Calibrator.GeneticArchitectureDiscovery.expectedLinearEffectEstimate",
+    "Calibrator.PGSCalibrationTheory.interceptRecalibrated",
+    "Calibrator.Probability.latentLiability"
+   ]
+  }
+ ],
+ "Calibrator.PGSCalibrationTheory.interceptRecalibrated": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PGSCalibrationTheory.lean",
+   "line": 1397,
+   "expression": "x0 + x1",
+   "other_members": [
+    "Calibrator.BayesianPGSTheory.posteriorPredictiveVariance",
+    "Calibrator.ClinicalUtilityFairness.netReclassificationImprovement",
+    "Calibrator.GeneticArchitectureDiscovery.expectedLinearEffectEstimate",
+    "Calibrator.ImputationPortability.total_portability_loss",
+    "Calibrator.Probability.latentLiability"
+   ]
+  }
+ ],
+ "Calibrator.Probability.latentLiability": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/Probability.lean",
+   "line": 538,
+   "expression": "x0 + x1",
+   "other_members": [
+    "Calibrator.BayesianPGSTheory.posteriorPredictiveVariance",
+    "Calibrator.ClinicalUtilityFairness.netReclassificationImprovement",
+    "Calibrator.GeneticArchitectureDiscovery.expectedLinearEffectEstimate",
+    "Calibrator.ImputationPortability.total_portability_loss",
+    "Calibrator.PGSCalibrationTheory.interceptRecalibrated"
+   ]
+  }
+ ],
+ "Calibrator.ClinicalUtilityFairness.proportionCorrectlyClassified": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/ClinicalUtilityFairness.lean",
+   "line": 809,
+   "expression": "x0*x2 + x1*(1 - x2)",
+   "other_members": [
+    "Calibrator.HaplotypeTheory.ancestrySpecificEffect",
+    "Calibrator.HaplotypeTheory.globalAncestryAveragedEffect"
+   ]
+  }
+ ],
+ "Calibrator.HaplotypeTheory.ancestrySpecificEffect": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/HaplotypeTheory.lean",
+   "line": 620,
+   "expression": "x0*x2 + x1*(1 - x2)",
+   "other_members": [
+    "Calibrator.ClinicalUtilityFairness.proportionCorrectlyClassified",
+    "Calibrator.HaplotypeTheory.globalAncestryAveragedEffect"
+   ]
+  }
+ ],
+ "Calibrator.HaplotypeTheory.globalAncestryAveragedEffect": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/HaplotypeTheory.lean",
+   "line": 636,
+   "expression": "x0*x2 + x1*(1 - x2)",
+   "other_members": [
+    "Calibrator.ClinicalUtilityFairness.proportionCorrectlyClassified",
+    "Calibrator.HaplotypeTheory.ancestrySpecificEffect"
+   ]
+  }
+ ],
+ "Calibrator.ClinicalUtilityFairness.numberNeededToScreen": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/ClinicalUtilityFairness.lean",
+   "line": 955,
+   "expression": "1/(x0*x1)",
+   "other_members": [
+    "Calibrator.HaplotypeTheory.expectedSegmentLength"
+   ]
+  }
+ ],
+ "Calibrator.HaplotypeTheory.expectedSegmentLength": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/HaplotypeTheory.lean",
+   "line": 680,
+   "expression": "1/(x0*x1)",
+   "other_members": [
+    "Calibrator.ClinicalUtilityFairness.numberNeededToScreen"
+   ]
+  }
+ ],
+ "Calibrator.Conclusions.brierScore": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/Conclusions.lean",
+   "line": 49,
+   "expression": "(-x0 + x1)**2",
+   "other_members": [
+    "Calibrator.MetricSpecificPortability.brierScoreMetric",
+    "Calibrator.PortabilityDrift.brierRegretPoint"
+   ]
+  }
+ ],
+ "Calibrator.MetricSpecificPortability.brierScoreMetric": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/MetricSpecificPortability.lean",
+   "line": 1021,
+   "expression": "(-x0 + x1)**2",
+   "other_members": [
+    "Calibrator.Conclusions.brierScore",
+    "Calibrator.PortabilityDrift.brierRegretPoint"
+   ]
+  }
+ ],
+ "Calibrator.PortabilityDrift.brierRegretPoint": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+   "line": 3879,
+   "expression": "(-x0 + x1)**2",
+   "other_members": [
+    "Calibrator.Conclusions.brierScore",
+    "Calibrator.MetricSpecificPortability.brierScoreMetric"
+   ]
+  }
+ ],
+ "Calibrator.Conventions.coalescentTimeScale": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/Conventions.lean",
+   "line": 90,
+   "expression": "2*x0",
+   "other_members": [
+    "Calibrator.DGP.ldBreakageRate"
+   ]
+  }
+ ],
+ "Calibrator.DGP.ldBreakageRate": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/DGP.lean",
+   "line": 2354,
+   "expression": "2*x0",
+   "other_members": [
+    "Calibrator.Conventions.coalescentTimeScale"
+   ]
+  }
+ ],
+ "Calibrator.Conventions.meanAlleleFreq": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/Conventions.lean",
+   "line": 133,
+   "expression": "x0/2 + x1/2",
+   "other_members": [
+    "Calibrator.PopulationGeneticsFoundations.effectiveMigration",
+    "Calibrator.PortabilityDrift.effectiveSymmetricMigration"
+   ]
+  }
+ ],
+ "Calibrator.PopulationGeneticsFoundations.effectiveMigration": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
+   "line": 988,
+   "expression": "x0/2 + x1/2",
+   "other_members": [
+    "Calibrator.Conventions.meanAlleleFreq",
+    "Calibrator.PortabilityDrift.effectiveSymmetricMigration"
+   ]
+  }
+ ],
+ "Calibrator.PortabilityDrift.effectiveSymmetricMigration": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+   "line": 5043,
+   "expression": "x0/2 + x1/2",
+   "other_members": [
+    "Calibrator.Conventions.meanAlleleFreq",
+    "Calibrator.PopulationGeneticsFoundations.effectiveMigration"
+   ]
+  }
+ ],
+ "Calibrator.Conventions.betweenSubgroupVariance": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/Conventions.lean",
+   "line": 167,
+   "expression": "(x0 - x1)**2/4",
+   "other_members": [
+    "Calibrator.ImitationRigidity.fairTwoPointVariance"
+   ]
+  }
+ ],
+ "Calibrator.ImitationRigidity.fairTwoPointVariance": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/ImitationRigidity.lean",
+   "line": 262,
+   "expression": "(x0 - x1)**2/4",
+   "other_members": [
+    "Calibrator.Conventions.betweenSubgroupVariance"
+   ]
+  }
+ ],
+ "Calibrator.Conventions.convexMix": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/Conventions.lean",
+   "line": 696,
+   "expression": "x0*x1 + x2*(1 - x0)",
+   "other_members": [
+    "Calibrator.DemographicHistory.admixedAlleleFreq",
+    "Calibrator.HaplotypeTheory.averagePhaseInteraction",
+    "Calibrator.PolygenicArchitecture.spikeAndSlabVariance"
+   ]
+  }
+ ],
+ "Calibrator.DemographicHistory.admixedAlleleFreq": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/DemographicHistory.lean",
+   "line": 351,
+   "expression": "x0*x1 + x2*(1 - x0)",
+   "other_members": [
+    "Calibrator.Conventions.convexMix",
+    "Calibrator.HaplotypeTheory.averagePhaseInteraction",
+    "Calibrator.PolygenicArchitecture.spikeAndSlabVariance"
+   ]
+  }
+ ],
+ "Calibrator.HaplotypeTheory.averagePhaseInteraction": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/HaplotypeTheory.lean",
+   "line": 201,
+   "expression": "x0*x1 + x2*(1 - x0)",
+   "other_members": [
+    "Calibrator.Conventions.convexMix",
+    "Calibrator.DemographicHistory.admixedAlleleFreq",
+    "Calibrator.PolygenicArchitecture.spikeAndSlabVariance"
+   ]
+  }
+ ],
+ "Calibrator.PolygenicArchitecture.spikeAndSlabVariance": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicArchitecture.lean",
+   "line": 63,
+   "expression": "x0*x1 + x2*(1 - x0)",
+   "other_members": [
+    "Calibrator.Conventions.convexMix",
+    "Calibrator.DemographicHistory.admixedAlleleFreq",
+    "Calibrator.HaplotypeTheory.averagePhaseInteraction"
+   ]
+  }
+ ],
+ "Calibrator.Conventions.geometricDecay": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/Conventions.lean",
+   "line": 716,
+   "expression": "(1 - x0)**x1",
+   "other_members": [
+    "Calibrator.DGP.discreteRecombinationSurvival",
+    "Calibrator.LongitudinalPortability.ldDecayPerGeneration",
+    "Calibrator.PortabilityDrift.admixtureLDDecay"
+   ]
+  }
+ ],
+ "Calibrator.DGP.discreteRecombinationSurvival": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/DGP.lean",
+   "line": 306,
+   "expression": "(1 - x0)**x1",
+   "other_members": [
+    "Calibrator.Conventions.geometricDecay",
+    "Calibrator.LongitudinalPortability.ldDecayPerGeneration",
+    "Calibrator.PortabilityDrift.admixtureLDDecay"
+   ]
+  },
+  {
+   "check": "check2_derivation",
+   "severity": "vacuous_coverage",
+   "status": "CHECK_CANNOT_FAIL_FOR_THIS_DEFINITION",
+   "detail": {
+    "covered": false,
+    "via_theorem": "Calibrator.DGP.twoLocusIBDCovariance_gap_eq",
+    "mutations_rejected": [
+     "scale by 2",
+     "shift by 1"
+    ],
+    "mutations_survived": [
+     "literal 1->2"
+    ]
+   }
+  }
+ ],
+ "Calibrator.LongitudinalPortability.ldDecayPerGeneration": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/LongitudinalPortability.lean",
+   "line": 108,
+   "expression": "(1 - x0)**x1",
+   "other_members": [
+    "Calibrator.Conventions.geometricDecay",
+    "Calibrator.DGP.discreteRecombinationSurvival",
+    "Calibrator.PortabilityDrift.admixtureLDDecay"
+   ]
+  }
+ ],
+ "Calibrator.PortabilityDrift.admixtureLDDecay": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+   "line": 5064,
+   "expression": "(1 - x0)**x1",
+   "other_members": [
+    "Calibrator.Conventions.geometricDecay",
+    "Calibrator.DGP.discreteRecombinationSurvival",
+    "Calibrator.LongitudinalPortability.ldDecayPerGeneration"
+   ]
+  }
+ ],
+ "Calibrator.Conventions.oneMinusRatio": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/Conventions.lean",
+   "line": 733,
+   "expression": "-x0/x1 + 1",
+   "other_members": [
+    "Calibrator.DGP.r2FromMSE",
+    "Calibrator.PopulationGeneticsFoundations.fstFromHetRatio",
+    "Calibrator.PortabilityDrift.hudsonFstFromCoalescenceTimes"
+   ]
+  }
+ ],
+ "Calibrator.DGP.r2FromMSE": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/DGP.lean",
+   "line": 176,
+   "expression": "-x0/x1 + 1",
+   "other_members": [
+    "Calibrator.Conventions.oneMinusRatio",
+    "Calibrator.PopulationGeneticsFoundations.fstFromHetRatio",
+    "Calibrator.PortabilityDrift.hudsonFstFromCoalescenceTimes"
+   ]
+  },
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/DGP.lean",
+   "line": 176,
+   "this_expr": "-x0/x1 + 1",
+   "other": "Calibrator.DGP.r2FromSignalVariance",
+   "other_expr": "x0/(x0 + x1)"
+  }
+ ],
+ "Calibrator.PopulationGeneticsFoundations.fstFromHetRatio": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
+   "line": 1378,
+   "expression": "-x0/x1 + 1",
+   "other_members": [
+    "Calibrator.Conventions.oneMinusRatio",
+    "Calibrator.DGP.r2FromMSE",
+    "Calibrator.PortabilityDrift.hudsonFstFromCoalescenceTimes"
+   ]
+  },
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
+   "line": 1378,
+   "this_expr": "-x0/x1 + 1",
+   "other": "Calibrator.PortabilityDrift.fstFromGenerations",
+   "other_expr": "x0/(2*x1*(x0/(2*x1) + 1))"
+  }
+ ],
+ "Calibrator.PortabilityDrift.hudsonFstFromCoalescenceTimes": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+   "line": 236,
+   "expression": "-x0/x1 + 1",
+   "other_members": [
+    "Calibrator.Conventions.oneMinusRatio",
+    "Calibrator.DGP.r2FromMSE",
+    "Calibrator.PopulationGeneticsFoundations.fstFromHetRatio"
+   ]
+  },
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+   "line": 236,
+   "this_expr": "-x0/x1 + 1",
+   "other": "Calibrator.Conventions.hudsonFst",
+   "other_expr": "1 - (x0*(1 - x0) + x1*(1 - x1))/((x0 + x1)*(-x0/2 - x1/2 + 1))"
+  }
+ ],
+ "Calibrator.Conventions.retainedFraction": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/Conventions.lean",
+   "line": 762,
+   "expression": "x1*(1 - x0)",
+   "other_members": [
+    "Calibrator.ImputationPortability.ascertainment_loss",
+    "Calibrator.PhenomeWidePortability.neutralPortabilityRatioLD"
+   ]
+  }
+ ],
+ "Calibrator.ImputationPortability.ascertainment_loss": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/ImputationPortability.lean",
+   "line": 258,
+   "expression": "x1*(1 - x0)",
+   "other_members": [
+    "Calibrator.Conventions.retainedFraction",
+    "Calibrator.PhenomeWidePortability.neutralPortabilityRatioLD"
+   ]
+  }
+ ],
+ "Calibrator.PhenomeWidePortability.neutralPortabilityRatioLD": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PhenomeWidePortability.lean",
+   "line": 37,
+   "expression": "x1*(1 - x0)",
+   "other_members": [
+    "Calibrator.Conventions.retainedFraction",
+    "Calibrator.ImputationPortability.ascertainment_loss"
+   ]
+  },
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PhenomeWidePortability.lean",
+   "line": 37,
+   "this_expr": "x1*(1 - x0)",
+   "other": "Calibrator.PortabilityBounds.neutralPortability",
+   "other_expr": "x0*Max(0, 1 - 2*x1)"
+  }
+ ],
+ "Calibrator.DGP.explainedR2FromTransportMoments": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/DGP.lean",
+   "line": 182,
+   "expression": "x0**2/(x1*x2)",
+   "other_members": [
+    "Calibrator.TransferLearningPGS.pgsR2"
+   ]
+  }
+ ],
+ "Calibrator.TransferLearningPGS.pgsR2": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/TransferLearningPGS.lean",
+   "line": 77,
+   "expression": "x0**2/(x1*x2)",
+   "other_members": [
+    "Calibrator.DGP.explainedR2FromTransportMoments"
+   ]
+  }
+ ],
+ "Calibrator.DGP.calibratedBrier": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/DGP.lean",
+   "line": 2108,
+   "expression": "x0*(1 - x0)*(1 - x1)",
+   "other_members": [
+    "Calibrator.PortabilityDrift.exactCalibratedBrierRiskFromR2",
+    "Calibrator.PortabilityDrift.brierFromR2",
+    "Calibrator.PortabilityDrift.sourceBrierFromR2"
+   ]
+  }
+ ],
+ "Calibrator.PortabilityDrift.exactCalibratedBrierRiskFromR2": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+   "line": 3065,
+   "expression": "x0*(1 - x0)*(1 - x1)",
+   "other_members": [
+    "Calibrator.DGP.calibratedBrier",
+    "Calibrator.PortabilityDrift.brierFromR2",
+    "Calibrator.PortabilityDrift.sourceBrierFromR2"
+   ]
+  }
+ ],
+ "Calibrator.PortabilityDrift.brierFromR2": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+   "line": 3070,
+   "expression": "x0*(1 - x0)*(1 - x1)",
+   "other_members": [
+    "Calibrator.DGP.calibratedBrier",
+    "Calibrator.PortabilityDrift.exactCalibratedBrierRiskFromR2",
+    "Calibrator.PortabilityDrift.sourceBrierFromR2"
+   ]
+  }
+ ],
+ "Calibrator.PortabilityDrift.sourceBrierFromR2": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+   "line": 3087,
+   "expression": "x0*(1 - x0)*(1 - x1)",
+   "other_members": [
+    "Calibrator.DGP.calibratedBrier",
+    "Calibrator.PortabilityDrift.exactCalibratedBrierRiskFromR2",
+    "Calibrator.PortabilityDrift.brierFromR2"
+   ]
+  }
+ ],
+ "Calibrator.DemographicHistory.driftLDCreationRate": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/DemographicHistory.lean",
+   "line": 636,
+   "expression": "1/(2*x0)",
+   "other_members": [
+    "Calibrator.LDDecayTheory.ldDecayRatePerGen"
+   ]
+  }
+ ],
+ "Calibrator.LDDecayTheory.ldDecayRatePerGen": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/LDDecayTheory.lean",
+   "line": 813,
+   "expression": "1/(2*x0)",
+   "other_members": [
+    "Calibrator.DemographicHistory.driftLDCreationRate"
+   ]
+  }
+ ],
+ "Calibrator.DriftRegime.driftRetention": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/DriftRegime.lean",
+   "line": 159,
+   "expression": "(1 - 1/(2*x0))**x1",
+   "other_members": [
+    "Calibrator.LDDecayTheory.ldRetainedFraction",
+    "Calibrator.PhenomeWidePortability.neutralDriftFactor"
+   ]
+  }
+ ],
+ "Calibrator.LDDecayTheory.ldRetainedFraction": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/LDDecayTheory.lean",
+   "line": 873,
+   "expression": "(1 - 1/(2*x0))**x1",
+   "other_members": [
+    "Calibrator.DriftRegime.driftRetention",
+    "Calibrator.PhenomeWidePortability.neutralDriftFactor"
+   ]
+  }
+ ],
+ "Calibrator.PhenomeWidePortability.neutralDriftFactor": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PhenomeWidePortability.lean",
+   "line": 106,
+   "expression": "(1 - 1/(2*x0))**x1",
+   "other_members": [
+    "Calibrator.DriftRegime.driftRetention",
+    "Calibrator.LDDecayTheory.ldRetainedFraction"
+   ]
+  }
+ ],
+ "Calibrator.DriftRegime.lossOfRetention": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/DriftRegime.lean",
+   "line": 162,
+   "expression": "1 - x0",
+   "other_members": [
+    "Calibrator.PhenomeWidePortability.fstFromDriftFactor",
+    "Calibrator.PortabilityDrift.freqCorrFromFst"
+   ]
+  }
+ ],
+ "Calibrator.PhenomeWidePortability.fstFromDriftFactor": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PhenomeWidePortability.lean",
+   "line": 154,
+   "expression": "1 - x0",
+   "other_members": [
+    "Calibrator.DriftRegime.lossOfRetention",
+    "Calibrator.PortabilityDrift.freqCorrFromFst"
+   ]
+  },
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PhenomeWidePortability.lean",
+   "line": 154,
+   "this_expr": "1 - x0",
+   "other": "Calibrator.PortabilityDrift.fstFromTau",
+   "other_expr": "x0/(x0 + 1)"
+  }
+ ],
+ "Calibrator.PortabilityDrift.freqCorrFromFst": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+   "line": 4258,
+   "expression": "1 - x0",
+   "other_members": [
+    "Calibrator.DriftRegime.lossOfRetention",
+    "Calibrator.PhenomeWidePortability.fstFromDriftFactor"
+   ]
+  }
+ ],
+ "Calibrator.DriftRegime.benchmarkRatio": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/DriftRegime.lean",
+   "line": 227,
+   "expression": "(1 - x1)/(1 - x0)",
+   "other_members": [
+    "Calibrator.PortabilityDrift.neutralAFBenchmarkRatio"
+   ]
+  },
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/DriftRegime.lean",
+   "line": 227,
+   "this_expr": "(1 - x1)/(1 - x0)",
+   "other": "Calibrator.DriftRegime.benchmarkRatioSquared",
+   "other_expr": "(1 - x1)**2/(1 - x0)**2"
+  }
+ ],
+ "Calibrator.PortabilityDrift.neutralAFBenchmarkRatio": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+   "line": 2982,
+   "expression": "(1 - x1)/(1 - x0)",
+   "other_members": [
+    "Calibrator.DriftRegime.benchmarkRatio"
+   ]
+  },
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+   "line": 2982,
+   "this_expr": "(1 - x1)/(1 - x0)",
+   "other": "Calibrator.PortabilityDrift.neutralAFBenchmarkFromRecurrence",
+   "other_expr": "1 - 1/(4*x0*x1 + 1)"
+  }
+ ],
+ "Calibrator.GeneEnvironmentInterplay.effectiveGeneticEffect": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/GeneEnvironmentInterplay.lean",
+   "line": 43,
+   "expression": "x0 + x1*x2",
+   "other_members": [
+    "Calibrator.GeneEnvironmentInterplay.linearNormOfReaction",
+    "Calibrator.SampleOverlapBias.kinshipInflation"
+   ]
+  }
+ ],
+ "Calibrator.GeneEnvironmentInterplay.linearNormOfReaction": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/GeneEnvironmentInterplay.lean",
+   "line": 258,
+   "expression": "x0 + x1*x2",
+   "other_members": [
+    "Calibrator.GeneEnvironmentInterplay.effectiveGeneticEffect",
+    "Calibrator.SampleOverlapBias.kinshipInflation"
+   ]
+  }
+ ],
+ "Calibrator.SampleOverlapBias.kinshipInflation": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/SampleOverlapBias.lean",
+   "line": 212,
+   "expression": "x0 + x1*x2",
+   "other_members": [
+    "Calibrator.GeneEnvironmentInterplay.effectiveGeneticEffect",
+    "Calibrator.GeneEnvironmentInterplay.linearNormOfReaction"
+   ]
+  }
+ ],
+ "Calibrator.GeneticArchitectureDiscovery.olsEffectEstimationVariance": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/GeneticArchitectureDiscovery.lean",
+   "line": 332,
+   "expression": "x0/(x1*x2)",
+   "other_members": [
+    "Calibrator.HaplotypeTheory.haplotypeEffectEstimationVariance",
+    "Calibrator.LDDecayTheory.tagR2",
+    "Calibrator.MetricSpecificPortability.requiredEffectiveSampleSizeForTraceMSE",
+    "Calibrator.PGSCalibrationTheory.requiredEventsForRecalibration"
+   ]
+  }
+ ],
+ "Calibrator.HaplotypeTheory.haplotypeEffectEstimationVariance": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/HaplotypeTheory.lean",
+   "line": 522,
+   "expression": "x0/(x1*x2)",
+   "other_members": [
+    "Calibrator.GeneticArchitectureDiscovery.olsEffectEstimationVariance",
+    "Calibrator.LDDecayTheory.tagR2",
+    "Calibrator.MetricSpecificPortability.requiredEffectiveSampleSizeForTraceMSE",
+    "Calibrator.PGSCalibrationTheory.requiredEventsForRecalibration"
+   ]
+  }
+ ],
+ "Calibrator.LDDecayTheory.tagR2": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/LDDecayTheory.lean",
+   "line": 117,
+   "expression": "x0/(x1*x2)",
+   "other_members": [
+    "Calibrator.GeneticArchitectureDiscovery.olsEffectEstimationVariance",
+    "Calibrator.HaplotypeTheory.haplotypeEffectEstimationVariance",
+    "Calibrator.MetricSpecificPortability.requiredEffectiveSampleSizeForTraceMSE",
+    "Calibrator.PGSCalibrationTheory.requiredEventsForRecalibration"
+   ]
+  }
+ ],
+ "Calibrator.MetricSpecificPortability.requiredEffectiveSampleSizeForTraceMSE": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/MetricSpecificPortability.lean",
+   "line": 544,
+   "expression": "x0/(x1*x2)",
+   "other_members": [
+    "Calibrator.GeneticArchitectureDiscovery.olsEffectEstimationVariance",
+    "Calibrator.HaplotypeTheory.haplotypeEffectEstimationVariance",
+    "Calibrator.LDDecayTheory.tagR2",
+    "Calibrator.PGSCalibrationTheory.requiredEventsForRecalibration"
+   ]
+  }
+ ],
+ "Calibrator.PGSCalibrationTheory.requiredEventsForRecalibration": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PGSCalibrationTheory.lean",
+   "line": 1539,
+   "expression": "x0/(x1*x2)",
+   "other_members": [
+    "Calibrator.GeneticArchitectureDiscovery.olsEffectEstimationVariance",
+    "Calibrator.HaplotypeTheory.haplotypeEffectEstimationVariance",
+    "Calibrator.LDDecayTheory.tagR2",
+    "Calibrator.MetricSpecificPortability.requiredEffectiveSampleSizeForTraceMSE"
+   ]
+  }
+ ],
+ "Calibrator.ImputationPortability.apparent_portability_loss": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/ImputationPortability.lean",
+   "line": 228,
+   "expression": "x0 - x1",
+   "other_members": [
+    "Calibrator.ImputationPortability.true_portability_loss",
+    "Calibrator.LongitudinalPortability.temporalCalibrationInTheLarge",
+    "Calibrator.MultiAncestryTheory.portabilityGap",
+    "Calibrator.PGSCalibrationTheory.calibrationInTheLarge",
+    "Calibrator.StatisticalGeneticsMethodology.incrementalR2",
+    "Calibrator.TransferLearningPGS.pcaBiasReduction",
+    "Calibrator.TransferLearningPGS.scratchTargetR2",
+    "Calibrator.TransferLearningPGS.transportPenalty"
+   ]
+  }
+ ],
+ "Calibrator.ImputationPortability.true_portability_loss": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/ImputationPortability.lean",
+   "line": 234,
+   "expression": "x0 - x1",
+   "other_members": [
+    "Calibrator.ImputationPortability.apparent_portability_loss",
+    "Calibrator.LongitudinalPortability.temporalCalibrationInTheLarge",
+    "Calibrator.MultiAncestryTheory.portabilityGap",
+    "Calibrator.PGSCalibrationTheory.calibrationInTheLarge",
+    "Calibrator.StatisticalGeneticsMethodology.incrementalR2",
+    "Calibrator.TransferLearningPGS.pcaBiasReduction",
+    "Calibrator.TransferLearningPGS.scratchTargetR2",
+    "Calibrator.TransferLearningPGS.transportPenalty"
+   ]
+  }
+ ],
+ "Calibrator.LongitudinalPortability.temporalCalibrationInTheLarge": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/LongitudinalPortability.lean",
+   "line": 352,
+   "expression": "x0 - x1",
+   "other_members": [
+    "Calibrator.ImputationPortability.apparent_portability_loss",
+    "Calibrator.ImputationPortability.true_portability_loss",
+    "Calibrator.MultiAncestryTheory.portabilityGap",
+    "Calibrator.PGSCalibrationTheory.calibrationInTheLarge",
+    "Calibrator.StatisticalGeneticsMethodology.incrementalR2",
+    "Calibrator.TransferLearningPGS.pcaBiasReduction",
+    "Calibrator.TransferLearningPGS.scratchTargetR2",
+    "Calibrator.TransferLearningPGS.transportPenalty"
+   ]
+  }
+ ],
+ "Calibrator.MultiAncestryTheory.portabilityGap": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/MultiAncestryTheory.lean",
+   "line": 428,
+   "expression": "x0 - x1",
+   "other_members": [
+    "Calibrator.ImputationPortability.apparent_portability_loss",
+    "Calibrator.ImputationPortability.true_portability_loss",
+    "Calibrator.LongitudinalPortability.temporalCalibrationInTheLarge",
+    "Calibrator.PGSCalibrationTheory.calibrationInTheLarge",
+    "Calibrator.StatisticalGeneticsMethodology.incrementalR2",
+    "Calibrator.TransferLearningPGS.pcaBiasReduction",
+    "Calibrator.TransferLearningPGS.scratchTargetR2",
+    "Calibrator.TransferLearningPGS.transportPenalty"
+   ]
+  }
+ ],
+ "Calibrator.PGSCalibrationTheory.calibrationInTheLarge": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PGSCalibrationTheory.lean",
+   "line": 62,
+   "expression": "x0 - x1",
+   "other_members": [
+    "Calibrator.ImputationPortability.apparent_portability_loss",
+    "Calibrator.ImputationPortability.true_portability_loss",
+    "Calibrator.LongitudinalPortability.temporalCalibrationInTheLarge",
+    "Calibrator.MultiAncestryTheory.portabilityGap",
+    "Calibrator.StatisticalGeneticsMethodology.incrementalR2",
+    "Calibrator.TransferLearningPGS.pcaBiasReduction",
+    "Calibrator.TransferLearningPGS.scratchTargetR2",
+    "Calibrator.TransferLearningPGS.transportPenalty"
+   ]
+  }
+ ],
+ "Calibrator.StatisticalGeneticsMethodology.incrementalR2": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/StatisticalGeneticsMethodology.lean",
+   "line": 42,
+   "expression": "x0 - x1",
+   "other_members": [
+    "Calibrator.ImputationPortability.apparent_portability_loss",
+    "Calibrator.ImputationPortability.true_portability_loss",
+    "Calibrator.LongitudinalPortability.temporalCalibrationInTheLarge",
+    "Calibrator.MultiAncestryTheory.portabilityGap",
+    "Calibrator.PGSCalibrationTheory.calibrationInTheLarge",
+    "Calibrator.TransferLearningPGS.pcaBiasReduction",
+    "Calibrator.TransferLearningPGS.scratchTargetR2",
+    "Calibrator.TransferLearningPGS.transportPenalty"
+   ]
+  }
+ ],
+ "Calibrator.TransferLearningPGS.pcaBiasReduction": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/TransferLearningPGS.lean",
+   "line": 764,
+   "expression": "x0 - x1",
+   "other_members": [
+    "Calibrator.ImputationPortability.apparent_portability_loss",
+    "Calibrator.ImputationPortability.true_portability_loss",
+    "Calibrator.LongitudinalPortability.temporalCalibrationInTheLarge",
+    "Calibrator.MultiAncestryTheory.portabilityGap",
+    "Calibrator.PGSCalibrationTheory.calibrationInTheLarge",
+    "Calibrator.StatisticalGeneticsMethodology.incrementalR2",
+    "Calibrator.TransferLearningPGS.scratchTargetR2",
+    "Calibrator.TransferLearningPGS.transportPenalty"
+   ]
+  }
+ ],
+ "Calibrator.TransferLearningPGS.scratchTargetR2": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/TransferLearningPGS.lean",
+   "line": 1107,
+   "expression": "x0 - x1",
+   "other_members": [
+    "Calibrator.ImputationPortability.apparent_portability_loss",
+    "Calibrator.ImputationPortability.true_portability_loss",
+    "Calibrator.LongitudinalPortability.temporalCalibrationInTheLarge",
+    "Calibrator.MultiAncestryTheory.portabilityGap",
+    "Calibrator.PGSCalibrationTheory.calibrationInTheLarge",
+    "Calibrator.StatisticalGeneticsMethodology.incrementalR2",
+    "Calibrator.TransferLearningPGS.pcaBiasReduction",
+    "Calibrator.TransferLearningPGS.transportPenalty"
+   ]
+  }
+ ],
+ "Calibrator.TransferLearningPGS.transportPenalty": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/TransferLearningPGS.lean",
+   "line": 1127,
+   "expression": "x0 - x1",
+   "other_members": [
+    "Calibrator.ImputationPortability.apparent_portability_loss",
+    "Calibrator.ImputationPortability.true_portability_loss",
+    "Calibrator.LongitudinalPortability.temporalCalibrationInTheLarge",
+    "Calibrator.MultiAncestryTheory.portabilityGap",
+    "Calibrator.PGSCalibrationTheory.calibrationInTheLarge",
+    "Calibrator.StatisticalGeneticsMethodology.incrementalR2",
+    "Calibrator.TransferLearningPGS.pcaBiasReduction",
+    "Calibrator.TransferLearningPGS.scratchTargetR2"
+   ]
+  }
+ ],
+ "Calibrator.LDDecayTheory.driftLDStep": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/LDDecayTheory.lean",
+   "line": 263,
+   "expression": "(1 - x1)**2*(x2*(1 - 1/(2*x0)) + 1/(2*x0))",
+   "other_members": [
+    "Calibrator.PortabilityDrift.islandFstMultiplicativeStep"
+   ]
+  }
+ ],
+ "Calibrator.PortabilityDrift.islandFstMultiplicativeStep": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+   "line": 4602,
+   "expression": "(1 - x1)**2*(x2*(1 - 1/(2*x0)) + 1/(2*x0))",
+   "other_members": [
+    "Calibrator.LDDecayTheory.driftLDStep"
+   ]
+  }
+ ],
+ "Calibrator.LDDecayTheory.driftLDEquilibrium": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/LDDecayTheory.lean",
+   "line": 300,
+   "expression": "(1 - x1)**2/(2*x0*(-(1 - 1/(2*x0))*(1 - x1)**2 + 1))",
+   "other_members": [
+    "Calibrator.PortabilityDrift.fstIslandMultiplicativeEquilibrium"
+   ]
+  },
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/LDDecayTheory.lean",
+   "line": 300,
+   "this_expr": "(1 - x1)**2/(2*x0*(-(1 - 1/(2*x0))*(1 - x1)**2 + 1))",
+   "other": "Calibrator.LDDecayTheory.driftLDRetention",
+   "other_expr": "(1 - 1/(2*x0))*(1 - x1)**2"
+  }
+ ],
+ "Calibrator.PortabilityDrift.fstIslandMultiplicativeEquilibrium": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+   "line": 4613,
+   "expression": "(1 - x1)**2/(2*x0*(-(1 - 1/(2*x0))*(1 - x1)**2 + 1))",
+   "other_members": [
+    "Calibrator.LDDecayTheory.driftLDEquilibrium"
+   ]
+  }
+ ],
+ "Calibrator.LongitudinalPortability.temporalR2": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/LongitudinalPortability.lean",
+   "line": 216,
+   "expression": "x0/(x0 + 1)",
+   "other_members": [
+    "Calibrator.PopulationGeneticsFoundations.expectedHeterozygosity",
+    "Calibrator.PortabilityDrift.fstFromTau",
+    "Calibrator.PortabilityDrift.sharedLDFromMigration"
+   ]
+  }
+ ],
+ "Calibrator.PopulationGeneticsFoundations.expectedHeterozygosity": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
+   "line": 100,
+   "expression": "x0/(x0 + 1)",
+   "other_members": [
+    "Calibrator.LongitudinalPortability.temporalR2",
+    "Calibrator.PortabilityDrift.fstFromTau",
+    "Calibrator.PortabilityDrift.sharedLDFromMigration"
+   ]
+  }
+ ],
+ "Calibrator.PortabilityDrift.fstFromTau": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+   "line": 38,
+   "expression": "x0/(x0 + 1)",
+   "other_members": [
+    "Calibrator.LongitudinalPortability.temporalR2",
+    "Calibrator.PopulationGeneticsFoundations.expectedHeterozygosity",
+    "Calibrator.PortabilityDrift.sharedLDFromMigration"
+   ]
+  },
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+   "line": 38,
+   "this_expr": "x0/(x0 + 1)",
+   "other": "Calibrator.PhenomeWidePortability.fstFromDriftFactor",
+   "other_expr": "1 - x0"
+  }
+ ],
+ "Calibrator.PortabilityDrift.sharedLDFromMigration": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+   "line": 4870,
+   "expression": "x0/(x0 + 1)",
+   "other_members": [
+    "Calibrator.LongitudinalPortability.temporalR2",
+    "Calibrator.PopulationGeneticsFoundations.expectedHeterozygosity",
+    "Calibrator.PortabilityDrift.fstFromTau"
+   ]
+  }
+ ],
+ "Calibrator.MetricSpecificPortability.fisherTraceMSELowerBound": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/MetricSpecificPortability.lean",
+   "line": 535,
+   "expression": "x1/(x0*x2)",
+   "other_members": [
+    "Calibrator.PGSCalibrationTheory.recalibrationTraceMSELowerBound"
+   ]
+  }
+ ],
+ "Calibrator.PGSCalibrationTheory.recalibrationTraceMSELowerBound": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PGSCalibrationTheory.lean",
+   "line": 1530,
+   "expression": "x1/(x0*x2)",
+   "other_members": [
+    "Calibrator.MetricSpecificPortability.fisherTraceMSELowerBound"
+   ]
+  }
+ ],
+ "Calibrator.PCCorrectability.Diagnostic.pcTargetAxisEfficacy": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/Diagnostic.lean",
+   "line": 107,
+   "expression": "1 - x1/x0",
+   "other_members": [
+    "Calibrator.PopulationGeneticsFoundations.neiFst"
+   ]
+  }
+ ],
+ "Calibrator.PopulationGeneticsFoundations.neiFst": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
+   "line": 42,
+   "expression": "1 - x1/x0",
+   "other_members": [
+    "Calibrator.PCCorrectability.Diagnostic.pcTargetAxisEfficacy"
+   ]
+  }
+ ],
+ "Calibrator.PolygenicAdaptation.qst": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicAdaptation.lean",
+   "line": 46,
+   "expression": "x0/(x0 + 2*x1)",
+   "other_members": [
+    "Calibrator.PopulationGeneticsFoundations.coalFst",
+    "Calibrator.PortabilityDrift.fstFromGenerations"
+   ]
+  }
+ ],
+ "Calibrator.PopulationGeneticsFoundations.coalFst": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
+   "line": 127,
+   "expression": "x0/(x0 + 2*x1)",
+   "other_members": [
+    "Calibrator.PolygenicAdaptation.qst",
+    "Calibrator.PortabilityDrift.fstFromGenerations"
+   ]
+  }
+ ],
+ "Calibrator.PortabilityDrift.fstFromGenerations": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+   "line": 41,
+   "expression": "x0/(x0 + 2*x1)",
+   "other_members": [
+    "Calibrator.PolygenicAdaptation.qst",
+    "Calibrator.PopulationGeneticsFoundations.coalFst"
+   ]
+  },
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+   "line": 41,
+   "this_expr": "x0/(2*x1*(x0/(2*x1) + 1))",
+   "other": "Calibrator.PopulationGeneticsFoundations.fstFromHetRatio",
+   "other_expr": "-x0/x1 + 1"
+  }
+ ],
+ "Calibrator.PolygenicAdaptation.pgsDiffVariance_two_pop": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicAdaptation.lean",
+   "line": 144,
+   "expression": "2*x0*x1",
+   "other_members": [
+    "Calibrator.PolygenicAdaptation.expectedPGSDiffVariance",
+    "Calibrator.PortabilityDrift.Var_Delta_Mu"
+   ]
+  }
+ ],
+ "Calibrator.PolygenicAdaptation.expectedPGSDiffVariance": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicAdaptation.lean",
+   "line": 160,
+   "expression": "2*x0*x1",
+   "other_members": [
+    "Calibrator.PolygenicAdaptation.pgsDiffVariance_two_pop",
+    "Calibrator.PortabilityDrift.Var_Delta_Mu"
+   ]
+  }
+ ],
+ "Calibrator.PortabilityDrift.Var_Delta_Mu": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+   "line": 773,
+   "expression": "2*x0*x1",
+   "other_members": [
+    "Calibrator.PolygenicAdaptation.pgsDiffVariance_two_pop",
+    "Calibrator.PolygenicAdaptation.expectedPGSDiffVariance"
+   ]
+  }
+ ],
+ "Calibrator.PolygenicArchitecture.effectivePolygenicity": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicArchitecture.lean",
+   "line": 170,
+   "expression": "x0**2/x1",
+   "other_members": [
+    "Calibrator.TransferLearningPGS.importanceWeightESS"
+   ]
+  }
+ ],
+ "Calibrator.TransferLearningPGS.importanceWeightESS": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/TransferLearningPGS.lean",
+   "line": 632,
+   "expression": "x0**2/x1",
+   "other_members": [
+    "Calibrator.PolygenicArchitecture.effectivePolygenicity"
+   ]
+  }
+ ],
+ "Calibrator.PopulationGeneticsFoundations.wrightFIT": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
+   "line": 383,
+   "expression": "-(1 - x0)*(1 - x1) + 1",
+   "other_members": [
+    "Calibrator.PortabilityDrift.pairwiseFstFromBranches"
+   ]
+  }
+ ],
+ "Calibrator.PortabilityDrift.pairwiseFstFromBranches": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+   "line": 73,
+   "expression": "-(1 - x0)*(1 - x1) + 1",
+   "other_members": [
+    "Calibrator.PopulationGeneticsFoundations.wrightFIT"
+   ]
+  },
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+   "line": 73,
+   "this_expr": "-(1 - x0)*(1 - x1) + 1",
+   "other": "Calibrator.PortabilityDrift.pairwiseFstFromBranchTaus",
+   "other_expr": "(x0 + x1)/(x0 + x1 + 1)"
+  }
+ ],
+ "Calibrator.PopulationGeneticsFoundations.scaledMutationRate": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
+   "line": 455,
+   "expression": "4*x0*x1",
+   "other_members": [
+    "Calibrator.PortabilityDrift.scaledMigrationRate"
+   ]
+  }
+ ],
+ "Calibrator.PortabilityDrift.scaledMigrationRate": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+   "line": 4663,
+   "expression": "4*x0*x1",
+   "other_members": [
+    "Calibrator.PopulationGeneticsFoundations.scaledMutationRate"
+   ]
+  }
+ ],
+ "Calibrator.PortabilityDrift.hetMutationFloor": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+   "line": 460,
+   "expression": "4*x0*x1/(4*x0*x1 + 1)",
+   "other_members": [
+    "Calibrator.PopulationGeneticsFoundations.hetEquilibrium",
+    "Calibrator.PortabilityDrift.sharedLD_from_equilibrium",
+    "Calibrator.PortabilityDrift.neutralAFBenchmarkFromRecurrence"
+   ]
+  }
+ ],
+ "Calibrator.PortabilityDrift.sharedLD_from_equilibrium": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+   "line": 4844,
+   "expression": "4*x0*x1/(4*x0*x1 + 1)",
+   "other_members": [
+    "Calibrator.PopulationGeneticsFoundations.hetEquilibrium",
+    "Calibrator.PortabilityDrift.hetMutationFloor",
+    "Calibrator.PortabilityDrift.neutralAFBenchmarkFromRecurrence"
+   ]
+  },
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+   "line": 4844,
+   "this_expr": "1 - 1/(4*x0*x1 + 1)",
+   "other": "Calibrator.PopulationGeneticsFoundations.sharedLDFractionFromMutation",
+   "other_expr": "exp(-x0*x1/2)"
+  }
+ ],
+ "Calibrator.PortabilityDrift.neutralAFBenchmarkFromRecurrence": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+   "line": 5290,
+   "expression": "4*x0*x1/(4*x0*x1 + 1)",
+   "other_members": [
+    "Calibrator.PopulationGeneticsFoundations.hetEquilibrium",
+    "Calibrator.PortabilityDrift.hetMutationFloor",
+    "Calibrator.PortabilityDrift.sharedLD_from_equilibrium"
+   ]
+  },
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+   "line": 5290,
+   "this_expr": "1 - 1/(4*x0*x1 + 1)",
+   "other": "Calibrator.PortabilityDrift.neutralAFBenchmarkRatio",
+   "other_expr": "(1 - x1)/(1 - x0)"
+  }
+ ],
+ "Calibrator.PortabilityDrift.ldOverlapFromSharedLD": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+   "line": 4262,
+   "expression": "x0",
+   "other_members": [
+    "Calibrator.ProjectionShiftBounds.reconstructionWeight"
+   ]
+  }
+ ],
+ "Calibrator.ProjectionShiftBounds.reconstructionWeight": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/ProjectionShiftBounds.lean",
+   "line": 267,
+   "expression": "x0",
+   "other_members": [
+    "Calibrator.PortabilityDrift.ldOverlapFromSharedLD"
+   ]
+  }
+ ],
+ "Calibrator.PowerAnalysis.noncentralityParam": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PowerAnalysis.lean",
+   "line": 42,
+   "expression": "2*x0*x1**2*x2*(1 - x2)",
+   "other_members": [
+    "Calibrator.SelectionArchitecture.gwasNCP"
+   ]
+  }
+ ],
+ "Calibrator.SelectionArchitecture.gwasNCP": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/SelectionArchitecture.lean",
+   "line": 544,
+   "expression": "2*x0*x1**2*x2*(1 - x2)",
+   "other_members": [
+    "Calibrator.PowerAnalysis.noncentralityParam"
+   ]
+  }
+ ],
+ "Calibrator.SampleOverlapBias.approxLOOPGS": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/SampleOverlapBias.lean",
+   "line": 173,
+   "expression": "x0 - x1*x2",
+   "other_members": [
+    "Calibrator.TransferLearningPGS.infoBottleneckObjective"
+   ]
+  }
+ ],
+ "Calibrator.TransferLearningPGS.infoBottleneckObjective": [
+  {
+   "check": "check3_duplicate_body",
+   "severity": "duplicate",
+   "status": "SYMBOLICALLY_IDENTICAL_ACROSS_FILES",
+   "file": "/Users/user/gnomon/proofs/Calibrator/TransferLearningPGS.lean",
+   "line": 953,
+   "expression": "x0 - x1*x2",
+   "other_members": [
+    "Calibrator.SampleOverlapBias.approxLOOPGS"
+   ]
+  }
+ ],
+ "Calibrator.Conventions.hudsonFst": [
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/Conventions.lean",
+   "line": 162,
+   "this_expr": "1 - (x0*(1 - x0) + x1*(1 - x1))/((x0 + x1)*(-x0/2 - x1/2 + 1))",
+   "other": "Calibrator.PortabilityDrift.hudsonFstFromCoalescenceTimes",
+   "other_expr": "-x0/x1 + 1"
+  }
+ ],
+ "Calibrator.CovarianceStructure.ldCorrelationSq": [
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/CovarianceStructure.lean",
+   "line": 110,
+   "this_expr": "x0**2/(4*x1*x2*(1 - x1)*(1 - x2))",
+   "other": "Calibrator.CovarianceStructure.ldCorrelationSqOfHaplotypeD",
+   "other_expr": "x0**2/(x1*x2*(1 - x1)*(1 - x2))"
+  },
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/CovarianceStructure.lean",
+   "line": 110,
+   "this_expr": "x0**2/(4*x1*x2*(1 - x1)*(1 - x2))",
+   "other": "Calibrator.PortabilityDrift.ldCorrelationDecay",
+   "other_expr": "exp(-x0*x1*x2)"
+  }
+ ],
+ "Calibrator.CovarianceStructure.ldCorrelationSqOfHaplotypeD": [
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/CovarianceStructure.lean",
+   "line": 139,
+   "this_expr": "x0**2/(x1*x2*(1 - x1)*(1 - x2))",
+   "other": "Calibrator.CovarianceStructure.ldCorrelationSq",
+   "other_expr": "x0**2/(4*x1*x2*(1 - x1)*(1 - x2))"
+  },
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/CovarianceStructure.lean",
+   "line": 139,
+   "this_expr": "x0**2/(x1*x2*(1 - x1)*(1 - x2))",
+   "other": "Calibrator.PortabilityDrift.ldCorrelationDecay",
+   "other_expr": "exp(-x0*x1*x2)"
+  }
+ ],
+ "Calibrator.PortabilityDrift.ldCorrelationDecay": [
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+   "line": 2106,
+   "this_expr": "exp(-x0*x1*x2)",
+   "other": "Calibrator.CovarianceStructure.ldCorrelationSq",
+   "other_expr": "x0**2/(4*x1*x2*(1 - x1)*(1 - x2))"
+  },
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+   "line": 2106,
+   "this_expr": "exp(-x0*x1*x2)",
+   "other": "Calibrator.CovarianceStructure.ldCorrelationSqOfHaplotypeD",
+   "other_expr": "x0**2/(x1*x2*(1 - x1)*(1 - x2))"
+  }
+ ],
+ "Calibrator.CovarianceStructure.admixtureLDTwoLocus": [
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/CovarianceStructure.lean",
+   "line": 520,
+   "this_expr": "x0*x1*x2 + x3*x4*(1 - x0) - (x0*x1 + x3*(1 - x0))*(x0*x2 + x4*(1 - x0))",
+   "other": "Calibrator.CovarianceStructure.admixtureLDMagnitude",
+   "other_expr": "x0*(1 - x0)*(1 - x3)**x4*(x1 - x2)**2"
+  }
+ ],
+ "Calibrator.CovarianceStructure.admixtureLDMagnitude": [
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/CovarianceStructure.lean",
+   "line": 569,
+   "this_expr": "x0*(1 - x0)*(1 - x3)**x4*(x1 - x2)**2",
+   "other": "Calibrator.CovarianceStructure.admixtureLDTwoLocus",
+   "other_expr": "x0*x1*x2 + x3*x4*(1 - x0) - (x0*x1 + x3*(1 - x0))*(x0*x2 + x4*(1 - x0))"
+  }
+ ],
+ "Calibrator.LDDecayTheory.admixtureLD": [
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/LDDecayTheory.lean",
+   "line": 169,
+   "this_expr": "x0*x1*x2*(1 - x0)",
+   "other": "Calibrator.PortabilityDrift.admixtureLDBoost",
+   "other_expr": "(1 - x0)**x1/x2"
+  }
+ ],
+ "Calibrator.PortabilityDrift.admixtureLDBoost": [
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+   "line": 5111,
+   "this_expr": "(1 - x0)**x1/x2",
+   "other": "Calibrator.LDDecayTheory.admixtureLD",
+   "other_expr": "x0*x1*x2*(1 - x0)"
+  }
+ ],
+ "Calibrator.LDDecayTheory.driftLDRetention": [
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/LDDecayTheory.lean",
+   "line": 284,
+   "this_expr": "(1 - 1/(2*x0))*(1 - x1)**2",
+   "other": "Calibrator.LDDecayTheory.driftLDEquilibrium",
+   "other_expr": "(1 - x1)**2/(2*x0*(-(1 - 1/(2*x0))*(1 - x1)**2 + 1))"
+  }
+ ],
+ "Calibrator.PortabilityDrift.targetHetFromFst": [
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+   "line": 653,
+   "this_expr": "x0*(1 - x1)",
+   "other": "Calibrator.DriftRegime.targetHetOfRetention",
+   "other_expr": "x0*x1"
+  }
+ ],
+ "Calibrator.PortabilityDrift.targetPGSVariance": [
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+   "line": 679,
+   "this_expr": "x0*(1 - x1)",
+   "other": "Calibrator.DriftRegime.targetPgsVarOfRetention",
+   "other_expr": "x0*x1"
+  }
+ ],
+ "Calibrator.DriftRegime.benchmarkRatioSquared": [
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/DriftRegime.lean",
+   "line": 231,
+   "this_expr": "(1 - x1)**2/(1 - x0)**2",
+   "other": "Calibrator.DriftRegime.benchmarkRatio",
+   "other_expr": "(1 - x1)/(1 - x0)"
+  }
+ ],
+ "Calibrator.EpistaticChaos.circulantSpectrumA": [
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
+   "line": 1355,
+   "this_expr": "8*x0**2 + 2*x0 - 4",
+   "other": "Calibrator.EpistaticChaos.circulantSpectrumB",
+   "other_expr": "4*x0**2 + 4*x0 - 2"
+  }
+ ],
+ "Calibrator.EpistaticChaos.circulantSpectrumB": [
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
+   "line": 1362,
+   "this_expr": "4*x0**2 + 4*x0 - 2",
+   "other": "Calibrator.EpistaticChaos.circulantSpectrumA",
+   "other_expr": "8*x0**2 + 2*x0 - 4"
+  }
+ ],
+ "Calibrator.LongitudinalPortability.ageDependentSignalVariance": [
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/LongitudinalPortability.lean",
+   "line": 245,
+   "this_expr": "x0*exp(-(x1 - x2)**2/(2*x3**2))",
+   "other": "Calibrator.LongitudinalPortability.ageDependentR2",
+   "other_expr": "x0*exp(-(x1 - x2)**2/(2*x3**2))/(x0*exp(-(x1 - x2)**2/(2*x3**2)) + 1)"
+  },
+  {
+   "check": "check4_unstated_regime",
+   "severity": "unstated_regime",
+   "status": "LINEARISATION_WITHOUT_STATED_REGIME",
+   "detail": {
+    "check": "check4_unstated_regime",
+    "status": "LINEARISATION_WITHOUT_STATED_REGIME",
+    "a": {
+     "fqn": "Calibrator.LongitudinalPortability.ageDependentSignalVariance",
+     "line": 245,
+     "file": "/Users/user/gnomon/proofs/Calibrator/LongitudinalPortability.lean",
+     "expr": "sourceSignalPeak*exp(-(age - age_peak)**2/(2*width**2))",
+     "regime_stated": false
+    },
+    "b": {
+     "fqn": "Calibrator.LongitudinalPortability.ageDependentR2",
+     "line": 275,
+     "file": "/Users/user/gnomon/proofs/Calibrator/LongitudinalPortability.lean",
+     "expr": "sourceSignalPeak*exp(-(age - age_peak)**2/(2*width**2))/(sourceSignalPeak*exp(-(age - age_peak)**2/(2*width**2)) + 1)",
+     "regime_stated": false
+    },
+    "regimes": [
+     {
+      "regime": "sourceSignalPeak -> 0",
+      "ratio_limit": "1",
+      "leading_difference": "-sourceSignalPeak**3*exp(age**2/(2*width**2))*exp(age_peak**2/(2*width**2))*exp(-2*(age - age_peak)**2/width**2)*exp(-age*age_peak/width**2) + sourceSignalPeak**2*exp(-(age - age_peak)**2/width**2)"
+     },
+     {
+      "regime": "age -> infinity",
+      "ratio_limit": "1",
+      "leading_difference": null
+     },
+     {
+      "regime": "age_peak -> infinity",
+      "ratio_limit": "1",
+      "leading_difference": null
+     }
+    ]
+   }
+  }
+ ],
+ "Calibrator.LongitudinalPortability.ageDependentR2": [
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/LongitudinalPortability.lean",
+   "line": 275,
+   "this_expr": "x0*exp(-(x1 - x2)**2/(2*x3**2))/(x0*exp(-(x1 - x2)**2/(2*x3**2)) + 1)",
+   "other": "Calibrator.LongitudinalPortability.ageDependentSignalVariance",
+   "other_expr": "x0*exp(-(x1 - x2)**2/(2*x3**2))"
+  }
+ ],
+ "Calibrator.MetricSpecificPortability.ldBandReconstructionShare": [
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/MetricSpecificPortability.lean",
+   "line": 1167,
+   "this_expr": "2*atan((x0 + 1)*tan(pi*x1/2)/(1 - x0))/pi",
+   "other": "Calibrator.MetricSpecificPortability.ldBandDetectionShare",
+   "other_expr": "-2*x0*sin(pi*x1)/(pi*(x0**2 + 1)) + x1"
+  }
+ ],
+ "Calibrator.MetricSpecificPortability.ldBandDetectionShare": [
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/MetricSpecificPortability.lean",
+   "line": 1182,
+   "this_expr": "-2*x0*sin(pi*x1)/(pi*(x0**2 + 1)) + x1",
+   "other": "Calibrator.MetricSpecificPortability.ldBandReconstructionShare",
+   "other_expr": "2*atan((x0 + 1)*tan(pi*x1/2)/(1 - x0))/pi"
+  }
+ ],
+ "Calibrator.PortabilityBounds.neutralPortability": [
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityBounds.lean",
+   "line": 246,
+   "this_expr": "x0*Max(0, 1 - 2*x1)",
+   "other": "Calibrator.PhenomeWidePortability.neutralPortabilityRatioLD",
+   "other_expr": "x1*(1 - x0)"
+  }
+ ],
+ "Calibrator.PolygenicAdaptation.effectCorrelationStabilizing": [
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicAdaptation.lean",
+   "line": 288,
+   "this_expr": "-x0/(x1*x2 + 1) + 1",
+   "other": "Calibrator.PolygenicAdaptation.effectCorrelationFluctuating",
+   "other_expr": "Max(-1, -x0*(x1*x2 + 1) + 1)"
+  }
+ ],
+ "Calibrator.PolygenicAdaptation.effectCorrelationFluctuating": [
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicAdaptation.lean",
+   "line": 297,
+   "this_expr": "Max(-1, -x0*(x1*x2 + 1) + 1)",
+   "other": "Calibrator.PolygenicAdaptation.effectCorrelationStabilizing",
+   "other_expr": "-x0/(x1*x2 + 1) + 1"
+  }
+ ],
+ "Calibrator.PolygenicArchitecture.gradeCertifiedRisk": [
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicArchitecture.lean",
+   "line": 518,
+   "this_expr": "x0**(-x2/x1)",
+   "other": "Calibrator.PowerAnalysis.gradeCertifiedSampleSize",
+   "other_expr": "x0**(-x1/x2)"
+  }
+ ],
+ "Calibrator.PowerAnalysis.gradeCertifiedSampleSize": [
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PowerAnalysis.lean",
+   "line": 559,
+   "this_expr": "x0**(-x1/x2)",
+   "other": "Calibrator.PolygenicArchitecture.gradeCertifiedRisk",
+   "other_expr": "x0**(-x2/x1)"
+  }
+ ],
+ "Calibrator.PolygenicSpectroscopy.hweMellinDrift": [
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicSpectroscopy.lean",
+   "line": 210,
+   "this_expr": "4*x0*(1 - x0)*log(2) + (1 - 2*x0)**2*log((1 - 2*x0)**2/(2*x0*(1 - x0)))",
+   "other": "Calibrator.PolygenicSpectroscopy.hweMellinJetVariance",
+   "other_expr": "2*x0*(1 - x0)*log((2 - 2*x0)/x0)**2 + 2*x0*(1 - x0)*log(2*x0/(1 - x0))**2 + (1 - 2*x0)**2*log((1 - 2*x0)**2/(2*x0*(1 - x0)))**2 - (4*x0*(1 - x0)*log(2) + (1 - 2*x0)**2*log((1 - 2*x0)**2/(2*x0*(1 - x0))))**2"
+  }
+ ],
+ "Calibrator.PolygenicSpectroscopy.hweMellinJetVariance": [
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicSpectroscopy.lean",
+   "line": 809,
+   "this_expr": "2*x0*(1 - x0)*log((2 - 2*x0)/x0)**2 + 2*x0*(1 - x0)*log(2*x0/(1 - x0))**2 + (1 - 2*x0)**2*log((1 - 2*x0)**2/(2*x0*(1 - x0)))**2 - (4*x0*(1 - x0)*log(2) + (1 - 2*x0)**2*log((1 - 2*x0)**2/(2*x0*(1 - x0))))**2",
+   "other": "Calibrator.PolygenicSpectroscopy.hweMellinDrift",
+   "other_expr": "4*x0*(1 - x0)*log(2) + (1 - 2*x0)**2*log((1 - 2*x0)**2/(2*x0*(1 - x0)))"
+  }
+ ],
+ "Calibrator.PopulationGeneticsFoundations.continentIslandStepSelectionFirst": [
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
+   "line": 219,
+   "this_expr": "x2*(1 - x1)*(x0 + 1)/(x0*x2 + 1)",
+   "other": "Calibrator.PopulationGeneticsFoundations.continentIslandStepMigrationFirst",
+   "other_expr": "x2*(1 - x1)*(x0 + 1)/(x0*x2*(1 - x1) + 1)"
+  },
+  {
+   "check": "check4_unstated_regime",
+   "severity": "unstated_regime",
+   "status": "LINEARISATION_WITHOUT_STATED_REGIME",
+   "detail": {
+    "check": "check4_unstated_regime",
+    "status": "LINEARISATION_WITHOUT_STATED_REGIME",
+    "a": {
+     "fqn": "Calibrator.PopulationGeneticsFoundations.continentIslandStepSelectionFirst",
+     "line": 219,
+     "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
+     "expr": "p*(1 - m)*(s + 1)/(p*s + 1)",
+     "regime_stated": false
+    },
+    "b": {
+     "fqn": "Calibrator.PopulationGeneticsFoundations.continentIslandStepMigrationFirst",
+     "line": 226,
+     "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
+     "expr": "p*(1 - m)*(s + 1)/(p*s*(1 - m) + 1)",
+     "regime_stated": false
+    },
+    "regimes": [
+     {
+      "regime": "s -> 0",
+      "ratio_limit": "1",
+      "leading_difference": "s**3*(m**2*p**4 + m**2*p**3*(-m*p + p) - m**2*p**3 + m**2*p**2*(-m*p + p)**2 - m**2*p**2*(-m*p + p) - m*p**4 - m*p**3*(-m*p + p) + m*p**3 - m*p**2*(-m*p + p)**2 + m*p**2*(-m*p + p)) + s**2*(-m**2*p**3 - m**2*p**2*(-m*p + p) + m**2*p**2 + m*p**3 + m*p**2*(-m*p + p) - m*p**2) + s*(m**2*p**2 - m*p**2)"
+     },
+     {
+      "regime": "m -> 0",
+      "ratio_limit": "1",
+      "leading_difference": "m**3*(p**4*s**4/((-p*s - 1)**3*(p*s + 1)) + p**4*s**3/((-p*s - 1)**3*(p*s + 1)) + p**3*s**3/((-p*s - 1)**2*(p*s + 1)) + p**3*s**2/((-p*s - 1)**2*(p*s + 1))) + m**2*(-p**3*s**3/((-p*s - 1)**2*(p*s + 1)) - p**3*s**2/((-p*s - 1)**2*(p*s + 1)) - p**2*s**2/((-p*s - 1)*(p*s + 1)) - p**2*s/((-p*s - 1)*(p*s + 1))) + m*(p**2*s**2/((-p*s - 1)*(p*s + 1)) + p**2*s/((-p*s - 1)*(p*s + 1)))"
+     },
+     {
+      "regime": "p -> 0",
+      "ratio_limit": "1",
+      "leading_difference": "p**3*(-m**2*s**3 - m**2*s**2*(-m*s + s) - m**2*s**2 - m**2*s*(-m*s + s) + m*s**3 + m*s**2*(-m*s + s) + m*s**2 + m*s*(-m*s + s)) + p**2*(m**2*s**2 + m**2*s - m*s**2 - m*s)"
+     }
+    ]
+   }
+  }
+ ],
+ "Calibrator.PopulationGeneticsFoundations.continentIslandStepMigrationFirst": [
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
+   "line": 226,
+   "this_expr": "x2*(1 - x1)*(x0 + 1)/(x0*x2*(1 - x1) + 1)",
+   "other": "Calibrator.PopulationGeneticsFoundations.continentIslandStepSelectionFirst",
+   "other_expr": "x2*(1 - x1)*(x0 + 1)/(x0*x2 + 1)"
+  }
+ ],
+ "Calibrator.PopulationGeneticsFoundations.selectionMigrationEquilibrium": [
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
+   "line": 243,
+   "this_expr": "Max(0, (-x0*x1 + x0 - x1)/x0)",
+   "other": "Calibrator.PopulationGeneticsFoundations.selectionMigrationEquilibriumMigrationFirst",
+   "other_expr": "Max(0, (-x0*x1 + x0 - x1)/(x0*(1 - x1)))"
+  }
+ ],
+ "Calibrator.PopulationGeneticsFoundations.sharedLDFractionFromMutation": [
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
+   "line": 725,
+   "this_expr": "exp(-x0*x1/2)",
+   "other": "Calibrator.PortabilityDrift.sharedLD_from_equilibrium",
+   "other_expr": "1 - 1/(4*x0*x1 + 1)"
+  }
+ ],
+ "Calibrator.PortabilityDrift.pairwiseFstFromBranchTaus": [
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+   "line": 92,
+   "this_expr": "(x0 + x1)/(x0 + x1 + 1)",
+   "other": "Calibrator.PortabilityDrift.pairwiseFstFromBranches",
+   "other_expr": "-(1 - x0)*(1 - x1) + 1"
+  }
+ ],
+ "Calibrator.PortabilityDrift.twoDemeIMFirstStepSame": [
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+   "line": 269,
+   "this_expr": "x0*x2/(x0 + 1) + 1/(x0 + 1)",
+   "other": "Calibrator.PortabilityDrift.twoDemeIMFirstStepDiff",
+   "other_expr": "x1 + 1/x0"
+  }
+ ],
+ "Calibrator.PortabilityDrift.twoDemeIMFirstStepDiff": [
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+   "line": 277,
+   "this_expr": "x1 + 1/x0",
+   "other": "Calibrator.PortabilityDrift.twoDemeIMFirstStepSame",
+   "other_expr": "x0*x2/(x0 + 1) + 1/(x0 + 1)"
+  }
+ ],
+ "Calibrator.PortabilityDrift.twoDemeIMEquilibriumETss": [
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+   "line": 289,
+   "this_expr": "2",
+   "other": "Calibrator.PortabilityDrift.twoDemeIMEquilibriumETst",
+   "other_expr": "(2*x0 + 1)/x0"
+  },
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+   "line": 289,
+   "this_expr": "2",
+   "other": "Calibrator.PortabilityDrift.twoDemeIMEquilibriumDelta",
+   "other_expr": "1/(2*x0 + 1)"
+  }
+ ],
+ "Calibrator.PortabilityDrift.twoDemeIMEquilibriumETst": [
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+   "line": 296,
+   "this_expr": "(2*x0 + 1)/x0",
+   "other": "Calibrator.PortabilityDrift.twoDemeIMEquilibriumETss",
+   "other_expr": "2"
+  },
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+   "line": 296,
+   "this_expr": "(2*x0 + 1)/x0",
+   "other": "Calibrator.PortabilityDrift.twoDemeIMEquilibriumDelta",
+   "other_expr": "1/(2*x0 + 1)"
+  }
+ ],
+ "Calibrator.PortabilityDrift.twoDemeIMEquilibriumDelta": [
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+   "line": 314,
+   "this_expr": "1/(2*x0 + 1)",
+   "other": "Calibrator.PortabilityDrift.twoDemeIMEquilibriumETss",
+   "other_expr": "2"
+  },
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+   "line": 314,
+   "this_expr": "1/(2*x0 + 1)",
+   "other": "Calibrator.PortabilityDrift.twoDemeIMEquilibriumETst",
+   "other_expr": "(2*x0 + 1)/x0"
+  }
+ ],
+ "Calibrator.PortabilityDrift.presentDaySignalToNoise": [
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+   "line": 876,
+   "this_expr": "x0*(1 - x2)/x1",
+   "other": "Calibrator.PortabilityDrift.presentDayPGSVarianceMutationDrift",
+   "other_expr": "x0*(-x1 - (1 - x1)*(1 - x2) + 1)"
+  }
+ ],
+ "Calibrator.PortabilityDrift.presentDayPGSVarianceMutationDrift": [
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+   "line": 4349,
+   "this_expr": "x0*(-x1 - (1 - x1)*(1 - x2) + 1)",
+   "other": "Calibrator.PortabilityDrift.presentDaySignalToNoise",
+   "other_expr": "x0*(1 - x2)/x1"
+  }
+ ],
+ "Calibrator.RareVariantPortability.mutationSelectionBalance": [
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/RareVariantPortability.lean",
+   "line": 286,
+   "this_expr": "x0/(x0 + x1*x2)",
+   "other": "Calibrator.RareVariantPortability.mutationSelectionStepRecessive",
+   "other_expr": "x0*(1 - x2) - x1*x2**2 + x2"
+  }
+ ],
+ "Calibrator.RareVariantPortability.mutationSelectionStepRecessive": [
+  {
+   "check": "check3_name_mate_disagreement",
+   "severity": "disagreement",
+   "status": "NAME_MATE_BODIES_DIFFER",
+   "file": "/Users/user/gnomon/proofs/Calibrator/RareVariantPortability.lean",
+   "line": 337,
+   "this_expr": "x0*(1 - x2) - x1*x2**2 + x2",
+   "other": "Calibrator.RareVariantPortability.mutationSelectionBalance",
+   "other_expr": "x0/(x0 + x1*x2)"
+  }
+ ],
+ "effectCorrelationStabilizing": [
+  {
+   "check": "check3_homonym",
+   "severity": "error",
+   "status": "ONE_NAME_TWO_FUNCTIONS",
+   "distinct_bodies": [
+    {
+     "expr": "-x0/(x1*x2 + 1) + 1",
+     "sites": [
+      "Calibrator.PolygenicAdaptation:288"
+     ]
+    },
+    {
+     "expr": "1 - 1/(2*x0)",
+     "sites": [
+      "Calibrator.SelectionArchitecture:90"
+     ]
+    }
+   ]
+  }
+ ],
+ "Calibrator.Conclusions.bernoulliLogLoss": [
+  {
+   "check": "check2_derivation",
+   "severity": "vacuous_coverage",
+   "status": "CHECK_CANNOT_FAIL_FOR_THIS_DEFINITION",
+   "detail": {
+    "covered": false,
+    "via_theorem": "Calibrator.Conclusions.logLoss_regret_eq_kl_pointwise",
+    "mutations_rejected": [
+     "literal 1->2",
+     "scale by 2"
+    ],
+    "mutations_survived": [
+     "shift by 1"
+    ]
+   }
+  }
+ ],
+ "Calibrator.PCCorrectability.Threshold.effectiveSubgroupSize": [
+  {
+   "check": "check2_derivation",
+   "severity": "vacuous_coverage",
+   "status": "CHECK_CANNOT_FAIL_FOR_THIS_DEFINITION",
+   "detail": {
+    "covered": false,
+    "via_theorem": "Calibrator.Conventions.demographicSpike_eq_contrastVariance_mul_effectiveSize",
+    "mutations_rejected": [],
+    "mutations_survived": [
+     "scale by 2",
+     "shift by 1"
+    ]
+   }
+  }
+ ],
+ "Calibrator.DGP.twoLocusIBDCovariance": [
+  {
+   "check": "check2_derivation",
+   "severity": "vacuous_coverage",
+   "status": "CHECK_CANNOT_FAIL_FOR_THIS_DEFINITION",
+   "detail": {
+    "covered": false,
+    "via_theorem": "Calibrator.DGP.twoLocusIBDCovariance_gap_eq",
+    "mutations_rejected": [
+     "scale by 2"
+    ],
+    "mutations_survived": [
+     "shift by 1"
+    ]
+   }
+  }
+ ],
+ "Calibrator.HaplotypeTheory.haplotypePhasePredictionError": [
+  {
+   "check": "check2_derivation",
+   "severity": "vacuous_coverage",
+   "status": "CHECK_CANNOT_FAIL_FOR_THIS_DEFINITION",
+   "detail": {
+    "covered": false,
+    "via_theorem": "Calibrator.HaplotypeTheory.haplotypePhasePredictionError_correctSpec_eq",
+    "mutations_rejected": [
+     "scale by 2",
+     "shift by 1"
+    ],
+    "mutations_survived": [
+     "literal 1->2"
+    ]
+   }
+  }
+ ],
+ "Calibrator.SampleOverlapBias.partialOverlapR2": [
+  {
+   "check": "check2_derivation",
+   "severity": "vacuous_coverage",
+   "status": "CHECK_CANNOT_FAIL_FOR_THIS_DEFINITION",
+   "detail": {
+    "covered": false,
+    "via_theorem": "Calibrator.SampleOverlapBias.gwas_subtraction_estimates_bias",
+    "mutations_rejected": [
+     "scale by 2"
+    ],
+    "mutations_survived": [
+     "literal 1->2",
+     "shift by 1"
+    ]
+   }
+  }
+ ]
+}

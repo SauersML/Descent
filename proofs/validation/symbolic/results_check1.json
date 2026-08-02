@@ -116,7 +116,7 @@
   "name": "InLinkageEquilibrium",
   "module": "Calibrator.EpistaticChaos",
   "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
-  "line": 812,
+  "line": 821,
   "check": "check1_fixed_point",
   "guard_theorem": null,
   "status": "UNGUARDED_NO_MAP",

@@ -7,6 +7,7 @@ import Calibrator.AdditiveInvariance
 import Calibrator.Identification
 import Calibrator.ImitationRigidity
 import Calibrator.Conventions
+import Calibrator.DemographicCapacity
 import Calibrator.DriftRegime
 import Calibrator.BlindnessRegistry
 import Calibrator.OpenQuestions

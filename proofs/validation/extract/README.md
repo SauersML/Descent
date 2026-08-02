@@ -29,8 +29,30 @@ python3 validation/extract/test_parser.py   # hand-verified ground truth
 
 ## Using the extracted definitions
 
+`api.py` is the stable, documented interface.  Import it; do not re-parse Lean.
+
 ```python
-import sys; sys.path.insert(0, "validation/extract")
+import sys; sys.path.insert(0, "proofs/validation/extract")
+import api
+
+api.definition_table()                  # dict[fully-qualified name -> Definition]
+api.definition("Calibrator.coalFst")    # one record (see api.py for the schema)
+fn, argnames = api.callable_for("Calibrator.coalFst")
+fn(100.0, 1000.0)                       # -> 0.0476...,  argnames == ["t", "Ne"]
+
+api.resolve("coalFst")                  # bare -> fully-qualified; raises if ambiguous
+api.classification("Calibrator.coalFst")# NUMERIC | STRUCTURAL | WRAPPER | NOT-EXTRACTABLE
+api.admissible_box("Calibrator.coalFst")# {arg: (lo, hi)} mined from theorem hypotheses
+api.hypotheses("Calibrator.coalFst")    # (predicates, source_text, NOT_ENFORCED)
+api.body_checksum("Calibrator.coalFst") # pin next to a result; changes if the Lean changes
+api.stamp()                             # corpus-wide fingerprint for a results file
+```
+
+`api.callable_for` raises `api.NotExtractable(name, reason)` rather than guessing.
+
+The lower-level module is also importable directly:
+
+```python
 import lean_defs
 lean_defs.neiFst(0.4, 0.3)        # (H_T - H_S) / H_T, straight from the Lean body
 ```
@@ -106,6 +128,14 @@ tracked with separate provenance and are never conflated. When two theorems
 bound a definition in contradictory directions, at least one of them is
 conditional on something not enforced; the definition is reported as needing a
 hand-written check rather than being accused.
+
+## Reconciliation with the other parsers
+
+`reconcile.py` diffs this table against `validation/invariants/defs.json` and
+`validation/symbolic/decls.json` on body text, parameter set, and parameter
+order, and writes `reconcile.json`.  Run it after any parser change.  A
+parameter-ORDER disagreement is the most dangerous kind: both parsers produce a
+callable, both callables run, and they compute different functions.
 
 ## Adding a stronger check
 

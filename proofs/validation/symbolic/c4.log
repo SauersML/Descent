@@ -1,0 +1,26 @@
+CHECK 4: 22 approximation/limit claims tested
+  skipped_binders_do_not_correspond      17
+  approximation_holds_in_regime          2
+  LINEARISATION_WITHOUT_STATED_REGIME    2
+  linearisation_regime_stated            1
+
+!! LINEARISATION, REGIME NOT STATED
+   Calibrator.LongitudinalPortability.ageDependentSignalVariance:245  = sourceSignalPeak*exp(-(age - age_peak)**2/(2*width**2))
+   Calibrator.LongitudinalPortability.ageDependentR2:275  = sourceSignalPeak*exp(-(age - age_peak)**2/(2*width**2))/(sourceSignalPeak*exp(-(age - age_peak)**2/(2*width**2)) + 1)
+      agree as sourceSignalPeak -> 0  (ratio -> 1)
+      agree as age -> infinity  (ratio -> 1)
+      agree as age_peak -> infinity  (ratio -> 1)
+
+!! LINEARISATION, REGIME NOT STATED
+   Calibrator.PopulationGeneticsFoundations.continentIslandStepSelectionFirst:219  = p*(1 - m)*(s + 1)/(p*s + 1)
+   Calibrator.PopulationGeneticsFoundations.continentIslandStepMigrationFirst:226  = p*(1 - m)*(s + 1)/(p*s*(1 - m) + 1)
+      agree as s -> 0  (ratio -> 1)
+      agree as m -> 0  (ratio -> 1)
+      agree as p -> 0  (ratio -> 1)
+
+!  approximation true only in a limit, regime not stated: Calibrator.AncestrySpecificArchitecture.geneFlowFstStep:371 vs Calibrator.PortabilityDrift.islandFstMultiplicativeStep
+      m -> 0
+!  approximation true only in a limit, regime not stated: Calibrator.PopulationGeneticsFoundations.continentIslandStepSelectionFirst:219 vs Calibrator.PopulationGeneticsFoundations.continentIslandStepMigrationFirst
+      s -> 0
+      m -> 0
+      p -> 0

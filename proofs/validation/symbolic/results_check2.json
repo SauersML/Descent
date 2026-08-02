@@ -1608,7 +1608,7 @@
   "statement": "let pred_raw := fun p c => β * p + hdgp.baseline c mse hdgp.toDGP pred_raw = ∫ pc, (hdgp.alpha pc.2 - β)^2 * pc.1^2 ∂hdgp.jointMeasure",
   "status": "opaque",
   "detail": {
-   "reason": "non-closed-form construct: fun"
+   "reason": "non-closed-form construct: let"
   }
  },
  {
@@ -1649,6 +1649,57 @@
   "status": "opaque",
   "detail": {
    "reason": "lex error at '.brier =\\n      calib'"
+  }
+ },
+ {
+  "check": "check2_derivation",
+  "fqn": "Calibrator.DemographicCapacity.contrastSpikeLevel_eq_four_hudsonFst",
+  "name": "contrastSpikeLevel_eq_four_hudsonFst",
+  "module": "Calibrator.DemographicCapacity",
+  "file": "/Users/user/gnomon/proofs/Calibrator/DemographicCapacity.lean",
+  "line": 50,
+  "claim_source": "name",
+  "statement": "contrastSpikeLevel p₁ p₂ = 4 * hudsonFst p₁ p₂",
+  "status": "derivation_verified",
+  "detail": {
+   "lhs": "(p₁ - p₂)**2/((p₁/2 + p₂/2)*(-p₁/2 - p₂/2 + 1))",
+   "rhs": "4 - 4*(p₁*(1 - p₁) + p₂*(1 - p₂))/((p₁ + p₂)*(-p₁/2 - p₂/2 + 1))",
+   "hypotheses": [
+    "Ne((p₁/2 + p₂/2)*(-p₁/2 - p₂/2 + 1), 0)"
+   ],
+   "unparsed_hypotheses": [],
+   "method": "symbolic",
+   "opaque_lhs": "contrastSpikeLevel(p₁, p₂)",
+   "opaque_rhs": "4*hudsonFst(p₁, p₂)",
+   "mentions_any_definition": true
+  }
+ },
+ {
+  "check": "check2_derivation",
+  "fqn": "Calibrator.DemographicCapacity.demographicSpike_eq_contrastSpikeLevel_mul_spikeLoad",
+  "name": "demographicSpike_eq_contrastSpikeLevel_mul_spikeLoad",
+  "module": "Calibrator.DemographicCapacity",
+  "file": "/Users/user/gnomon/proofs/Calibrator/DemographicCapacity.lean",
+  "line": 63,
+  "claim_source": "name",
+  "statement": "demographicSpike (N : ℝ) (hudsonFst p₁ p₂) (m : ℝ) = contrastSpikeLevel p₁ p₂ * (traceWindowBudgetClass base budget).spikeLoad a (demographicSpikeDirection N m)",
+  "status": "opaque",
+  "detail": {
+   "reason": "lex error at 'ℝ) (hudsonFst p₁ p₂)'"
+  }
+ },
+ {
+  "check": "check2_derivation",
+  "fqn": "Calibrator.DemographicCapacity.demographicSpike_eq_contrastVariance_mul_spikeLoad",
+  "name": "demographicSpike_eq_contrastVariance_mul_spikeLoad",
+  "module": "Calibrator.DemographicCapacity",
+  "file": "/Users/user/gnomon/proofs/Calibrator/DemographicCapacity.lean",
+  "line": 85,
+  "claim_source": "name",
+  "statement": "demographicSpike (N : ℝ) (hudsonFst p₁ p₂) (m : ℝ) = ((p₁ - p₂) ^ 2 / (meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂))) * (traceWindowBudgetClass base budget).spikeLoad a (demographicSpikeDirection N m)",
+  "status": "opaque",
+  "detail": {
+   "reason": "lex error at 'ℝ) (hudsonFst p₁ p₂)'"
   }
  },
  {
@@ -1821,7 +1872,7 @@
   "name": "locusInfluence_eq_of_disjoint",
   "module": "Calibrator.EpistaticChaos",
   "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
-  "line": 910,
+  "line": 919,
   "claim_source": "name",
   "statement": "design.locusInfluence i = design.coefficient s ^ 2",
   "status": "opaque",
@@ -1835,7 +1886,7 @@
   "name": "circulantSpectrumA_eq_cos",
   "module": "Calibrator.EpistaticChaos",
   "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
-  "line": 1338,
+  "line": 1365,
   "claim_source": "name",
   "statement": "2 * Real.cos θ + 4 * Real.cos (2 * θ) = circulantSpectrumA (Real.cos θ)",
   "status": "derivation_verified",
@@ -1856,7 +1907,7 @@
   "name": "circulantSpectrumB_eq_cos",
   "module": "Calibrator.EpistaticChaos",
   "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
-  "line": 1345,
+  "line": 1372,
   "claim_source": "name",
   "statement": "4 * Real.cos θ + 2 * Real.cos (2 * θ) = circulantSpectrumB (Real.cos θ)",
   "status": "derivation_verified",
@@ -2528,34 +2579,6 @@
  },
  {
   "check": "check2_derivation",
-  "fqn": "Calibrator.MetricSpecificPortability.ldBandDetectionShare_eq_integral",
-  "name": "ldBandDetectionShare_eq_integral",
-  "module": "Calibrator.MetricSpecificPortability",
-  "file": "/Users/user/gnomon/proofs/Calibrator/MetricSpecificPortability.lean",
-  "line": 1311,
-  "claim_source": "name",
-  "statement": "(∫ angle in (0:ℝ)..(Real.pi * kappa), (ldKernelSymbol decay angle)⁻¹) / (∫ angle in (0:ℝ)..Real.pi, (ldKernelSymbol decay angle)⁻¹) = ldBandDetectionShare decay kappa",
-  "status": "opaque",
-  "detail": {
-   "reason": "non-closed-form construct: ∫"
-  }
- },
- {
-  "check": "check2_derivation",
-  "fqn": "Calibrator.MetricSpecificPortability.ldBandReconstructionShare_eq_integral",
-  "name": "ldBandReconstructionShare_eq_integral",
-  "module": "Calibrator.MetricSpecificPortability",
-  "file": "/Users/user/gnomon/proofs/Calibrator/MetricSpecificPortability.lean",
-  "line": 1328,
-  "claim_source": "name+doc",
-  "statement": "(∫ angle in (0:ℝ)..(Real.pi * kappa), ldKernelSymbol decay angle) / (∫ angle in (0:ℝ)..Real.pi, ldKernelSymbol decay angle) = ldBandReconstructionShare decay kappa",
-  "status": "opaque",
-  "detail": {
-   "reason": "non-closed-form construct: ∫"
-  }
- },
- {
-  "check": "check2_derivation",
   "fqn": "Calibrator.MultiAncestryTheory.multi_ancestry_reduces_fst",
   "name": "multi_ancestry_reduces_fst",
   "module": "Calibrator.MultiAncestryTheory",
@@ -2744,7 +2767,7 @@
   "name": "headroom_eq_zero_of_active",
   "module": "Calibrator.PCCorrectability.ImitationCapacity",
   "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 220,
+  "line": 282,
   "claim_source": "name",
   "statement": "K.headroom a S₀ = 0",
   "status": "opaque",
@@ -2758,7 +2781,7 @@
   "name": "imitationCapacity_eq_zero_of_active",
   "module": "Calibrator.PCCorrectability.ImitationCapacity",
   "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 366,
+  "line": 428,
   "claim_source": "name",
   "statement": "K.imitationCapacity S₀ support = 0",
   "status": "opaque",
@@ -2772,7 +2795,7 @@
   "name": "imitationCapacity_eq",
   "module": "Calibrator.PCCorrectability.ImitationCapacity",
   "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 571,
+  "line": 668,
   "claim_source": "name",
   "statement": "K.imitationCapacity S₀ support = K.headroom E.binding S₀ / E.load",
   "status": "opaque",
@@ -2788,7 +2811,7 @@
   "name": "form_spiked_eq_bound_add_margin",
   "module": "Calibrator.PCCorrectability.ImitationCapacity",
   "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 603,
+  "line": 700,
   "claim_source": "name",
   "statement": "K.form E.binding (K.spiked S₀ t v) = K.bound E.binding + E.margin t",
   "status": "opaque",
@@ -2802,7 +2825,7 @@
   "name": "whitenedCapacity_closedForm",
   "module": "Calibrator.PCCorrectability.ImitationCapacity",
   "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 774,
+  "line": 871,
   "claim_source": "name",
   "statement": "whitenedCapacity headroom decay = headroom * (1 - decay ^ 2) / (1 + decay ^ 2)",
   "status": "opaque",
@@ -2818,12 +2841,40 @@
   "name": "imitationCapacity_eq_whitenedCapacity",
   "module": "Calibrator.PCCorrectability.ImitationCapacity",
   "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
-  "line": 785,
+  "line": 882,
   "claim_source": "name",
   "statement": "K.imitationCapacity S₀ support = whitenedCapacity (K.headroom E.binding S₀) decay",
   "status": "opaque",
   "detail": {
    "reason": "imitationCapacity expects 0 args [], got 2"
+  }
+ },
+ {
+  "check": "check2_derivation",
+  "fqn": "Calibrator.PCCorrectability.ImitationCapacity.demographicSpike_eq_level_mul_spikeLoad",
+  "name": "demographicSpike_eq_level_mul_spikeLoad",
+  "module": "Calibrator.PCCorrectability.ImitationCapacity",
+  "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
+  "line": 1048,
+  "claim_source": "name",
+  "statement": "demographicSpike (N : ℝ) F (m : ℝ) = (4 * F) * (traceWindowBudgetClass base budget).spikeLoad a (demographicSpikeDirection N m)",
+  "status": "opaque",
+  "detail": {
+   "reason": "lex error at 'ℝ) F (m : ℝ) =\\n     '"
+  }
+ },
+ {
+  "check": "check2_derivation",
+  "fqn": "Calibrator.PCCorrectability.ImitationCapacity.inverseTraceCertificate_eq_traceWindowSpikeLoad",
+  "name": "inverseTraceCertificate_eq_traceWindowSpikeLoad",
+  "module": "Calibrator.PCCorrectability.ImitationCapacity",
+  "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/ImitationCapacity.lean",
+  "line": 1245,
+  "claim_source": "name",
+  "statement": "inverseTraceCertificate m lam = traceWindowSpikeLoad decay m",
+  "status": "opaque",
+  "detail": {
+   "reason": "inverseTraceCertificate expects 1 args ['m'], got 2"
   }
  },
  {
@@ -2837,7 +2888,7 @@
   "statement": "samplePCOverlapSq n M spike = 0",
   "status": "opaque",
   "detail": {
-   "reason": "non-closed-form construct: else"
+   "reason": "non-closed-form construct: if"
   }
  },
  {
@@ -2851,7 +2902,7 @@
   "statement": "samplePCOverlapSq n M spike = (1 - (n / M) / spike ^ 2) / (1 + (n / M) / spike)",
   "status": "opaque",
   "detail": {
-   "reason": "non-closed-form construct: else"
+   "reason": "non-closed-form construct: if"
   }
  },
  {
@@ -2865,7 +2916,7 @@
   "statement": "samplePCResidualAxisFraction n M spike = (n / M) * (spike + 1) / (spike * (spike + n / M))",
   "status": "opaque",
   "detail": {
-   "reason": "non-closed-form construct: else"
+   "reason": "non-closed-form construct: if"
   }
  },
  {
@@ -2879,7 +2930,7 @@
   "statement": "modeledPCResidualSusceptibility markerAxisVariance ancestryVariance n markers spike = ancestryGradientSusceptibility markerAxisVariance ancestryVariance",
   "status": "opaque",
   "detail": {
-   "reason": "non-closed-form construct: else"
+   "reason": "non-closed-form construct: if"
   }
  },
  {
@@ -3342,7 +3393,7 @@
   "statement": "treatmentMargin model predictedPath - treatmentMargin model truePath = Finset.univ.sum (fun t => model.discount t * ((predictedPath.followupWeight t - truePath.followupWeight t) * (truePath.eventProb t * truePath.treatmentBenefit t - truePath.treatmentHarm t) + predictedPath.followupWeight t * ((predictedPath.eventProb t - truePath.eventProb t) * truePath.treatmentBenefit t + predictedPath.eventPr",
   "status": "opaque",
   "detail": {
-   "reason": "non-closed-form construct: fun"
+   "reason": "non-closed-form construct: Finset"
   }
  },
  {
@@ -3687,7 +3738,7 @@
   "name": "spikeAndSlabVariance_eq_averagePhaseInteraction",
   "module": "Calibrator.PolygenicArchitecture",
   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicArchitecture.lean",
-  "line": 75,
+  "line": 76,
   "claim_source": "name",
   "statement": "spikeAndSlabVariance pi a b = averagePhaseInteraction pi a b",
   "status": "not_an_equation",
@@ -3699,7 +3750,7 @@
   "name": "spikeAndSlabVariance_eq_ancestrySpecificEffect",
   "module": "Calibrator.PolygenicArchitecture",
   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicArchitecture.lean",
-  "line": 79,
+  "line": 80,
   "claim_source": "name",
   "statement": "spikeAndSlabVariance pi a b = ancestrySpecificEffect a b pi",
   "status": "not_an_equation",
@@ -3711,7 +3762,7 @@
   "name": "relativePortabilityLoss_eq_locuswise_loss_fraction",
   "module": "Calibrator.PolygenicArchitecture",
   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicArchitecture.lean",
-  "line": 311,
+  "line": 312,
   "claim_source": "name",
   "statement": "model.relativePortabilityLoss = (∑ j, (model.sourceSquaredEffect j - model.targetRetainedSquaredEffect j)) / model.sourceEffectMass",
   "status": "opaque",
@@ -3725,7 +3776,7 @@
   "name": "portabilityScore_eq_one_sub_relativePortabilityLoss",
   "module": "Calibrator.PolygenicArchitecture",
   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicArchitecture.lean",
-  "line": 320,
+  "line": 321,
   "claim_source": "name",
   "statement": "model.portabilityScore = 1 - model.relativePortabilityLoss",
   "status": "opaque",
@@ -3739,7 +3790,7 @@
   "name": "certificateDeficit_eq",
   "module": "Calibrator.PolygenicArchitecture",
   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicArchitecture.lean",
-  "line": 530,
+  "line": 531,
   "claim_source": "name",
   "statement": "certificateDeficit q K c = q ^ (c / K) / Real.log q",
   "status": "not_an_equation",
@@ -3754,7 +3805,7 @@
   "name": "predicted_eq_weightedRetentionUpperBound_of_active",
   "module": "Calibrator.PolygenicArchitecture",
   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicArchitecture.lean",
-  "line": 721,
+  "line": 783,
   "claim_source": "name",
   "statement": "predictedPortability model = weightedRetentionUpperBound model retentionUpper",
   "status": "opaque",
@@ -3768,7 +3819,7 @@
   "name": "weightedRetentionUpperBound_eq_predicted_iff_active",
   "module": "Calibrator.PolygenicArchitecture",
   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicArchitecture.lean",
-  "line": 741,
+  "line": 803,
   "claim_source": "name",
   "statement": "weightedRetentionUpperBound model retentionUpper = predictedPortability model ↔ ∀ j, model.targetRetainedSquaredEffect j = retentionUpper j * model.sourceSquaredEffect j",
   "status": "opaque",
@@ -3782,7 +3833,7 @@
   "name": "portability_upper_bound_from_rg_fst",
   "module": "Calibrator.PolygenicArchitecture",
   "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicArchitecture.lean",
-  "line": 826,
+  "line": 888,
   "claim_source": "name",
   "statement": "predictedPortability model ≤ rgFstWeightedUpperBound model rgUpper fstLower",
   "status": "not_an_equation",
@@ -5687,7 +5738,7 @@
   "statement": "∑ i, (A.mulVec u) i * v i = ∑ i, u i * ((Matrix.transpose A).mulVec v) i",
   "status": "opaque",
   "detail": {
-   "reason": "non-closed-form construct: ∑"
+   "reason": "non-closed-form construct: Matrix"
   }
  },
  {
@@ -6088,7 +6139,7 @@
   "name": "effective_marker_count_cannot_set_threshold",
   "module": "Calibrator.StratificationConfounding",
   "file": "/Users/user/gnomon/proofs/Calibrator/StratificationConfounding.lean",
-  "line": 777,
+  "line": 803,
   "claim_source": "+doc",
   "statement": "False",
   "status": "not_an_equation",

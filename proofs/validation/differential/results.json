@@ -1108,11 +1108,11 @@
    "reference": "refs.fst_hudson",
    "tol": 1e-05,
    "verdict": "AGREE",
-   "kind": "formula",
+   "kind": "selftest",
    "vacuous": true,
    "mutants_detected": [],
-   "canfail_clause": "fails if n is small; run at n=20 to see it break",
-   "note": "guards the reference itself, not the corpus",
+   "canfail_clause": "see hudson-sample-small-n: the same comparison at n=20 fails",
+   "note": "guards the reference itself, not the corpus; the corpus mutants do not touch it, so its power is demonstrated by the companion check hudson-sample-small-n rather than by mutation",
    "max_rel_err": 0.0,
    "min_rel_err": 0.0,
    "worst_point": {
@@ -1269,6 +1269,182 @@
      "lean": 0.17999991799999185,
      "ref": 0.18000000000000005,
      "rel_err": 0.0
+    }
+   ]
+  },
+  "hudson-sample-small-n": {
+   "definition": "refs.fst_hudson_sample",
+   "claim": "DEMONSTRATION that the previous check has power: at n=20 it fails",
+   "model_definition": "n = 20 haploids per deme",
+   "model_reference": "parametric limit",
+   "reference": "refs.fst_hudson",
+   "tol": 1e-05,
+   "verdict": "REFERENCE-SELFTEST-DIFFERS",
+   "kind": "selftest",
+   "vacuous": false,
+   "mutants_detected": [
+    "scale x1.05",
+    "scale x0.5",
+    "transpose first two args"
+   ],
+   "canfail_clause": "self-evident: this check exists to fail",
+   "note": "expected to DISAGREE; this is the can-fail evidence for hudson-sample-limit",
+   "max_rel_err": 1.9473684210526325,
+   "min_rel_err": 0.015536869787881864,
+   "worst_point": {
+    "params": {
+     "p1": 0.3,
+     "p2": 0.2
+    },
+    "lean": -0.02493074792243769,
+    "ref": 0.0263157894736842,
+    "rel_err": 1.9473684210526325
+   },
+   "n_grid": 16,
+   "rows": [
+    {
+     "params": {
+      "p1": 0.02,
+      "p2": 0.05
+     },
+     "lean": -0.03869969040247677,
+     "ref": 0.01323529411764706,
+     "rel_err": 1.342
+    },
+    {
+     "params": {
+      "p1": 0.02,
+      "p2": 0.2
+     },
+     "lean": 0.1082423038728898,
+     "ref": 0.1528301886792453,
+     "rel_err": 0.29174788823911624
+    },
+    {
+     "params": {
+      "p1": 0.02,
+      "p2": 0.5
+     },
+     "lean": 0.43242105263157893,
+     "ref": 0.4608,
+     "rel_err": 0.061586257309941536
+    },
+    {
+     "params": {
+      "p1": 0.02,
+      "p2": 0.8
+     },
+     "lean": 0.7600854929201176,
+     "ref": 0.7720812182741117,
+     "rel_err": 0.015536869787881864
+    },
+    {
+     "params": {
+      "p1": 0.1,
+      "p2": 0.05
+     },
+     "lean": -0.033834586466165405,
+     "ref": 0.01785714285714286,
+     "rel_err": 1.527777777777778
+    },
+    {
+     "params": {
+      "p1": 0.1,
+      "p2": 0.2
+     },
+     "lean": -0.012145748987854251,
+     "ref": 0.03846153846153847,
+     "rel_err": 1.3157894736842104
+    },
+    {
+     "params": {
+      "p1": 0.1,
+      "p2": 0.5
+     },
+     "lean": 0.2842105263157896,
+     "ref": 0.32000000000000006,
+     "rel_err": 0.11184210526315773
+    },
+    {
+     "params": {
+      "p1": 0.1,
+      "p2": 0.8
+     },
+     "lean": 0.6443812233285918,
+     "ref": 0.6621621621621622,
+     "rel_err": 0.026852846401718485
+    },
+    {
+     "params": {
+      "p1": 0.3,
+      "p2": 0.05
+     },
+     "lean": 0.1529605263157895,
+     "ref": 0.19531250000000003,
+     "rel_err": 0.21684210526315792
+    },
+    {
+     "params": {
+      "p1": 0.3,
+      "p2": 0.2
+     },
+     "lean": -0.02493074792243769,
+     "ref": 0.0263157894736842,
+     "rel_err": 1.9473684210526325
+    },
+    {
+     "params": {
+      "p1": 0.3,
+      "p2": 0.5
+     },
+     "lean": 0.03157894736842107,
+     "ref": 0.08000000000000002,
+     "rel_err": 0.6052631578947367
+    },
+    {
+     "params": {
+      "p1": 0.3,
+      "p2": 0.8
+     },
+     "lean": 0.3718166383701189,
+     "ref": 0.403225806451613,
+     "rel_err": 0.0778947368421053
+    },
+    {
+     "params": {
+      "p1": 0.5,
+      "p2": 0.05
+     },
+     "lean": 0.37368421052631584,
+     "ref": 0.405,
+     "rel_err": 0.07732293697205972
+    },
+    {
+     "params": {
+      "p1": 0.5,
+      "p2": 0.2
+     },
+     "lean": 0.13684210526315788,
+     "ref": 0.18,
+     "rel_err": 0.2397660818713451
+    },
+    {
+     "params": {
+      "p1": 0.5,
+      "p2": 0.5
+     },
+     "lean": -0.05263157894736842,
+     "ref": 0.0,
+     "rel_err": 1.0
+    },
+    {
+     "params": {
+      "p1": 0.5,
+      "p2": 0.8
+     },
+     "lean": 0.13684210526315796,
+     "ref": 0.18000000000000005,
+     "rel_err": 0.23976608187134488
     }
    ]
   },

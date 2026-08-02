@@ -27,7 +27,8 @@ import backends
 import compile_defs as C
 from backends import FLOAT, INTERVAL, Iv
 from search import maximize, prove_contained
-from semantics import admissible_box, required_range
+from semantics import admissible_box, required_range, side_constraints
+from transpile import Untranspilable, build_arity, pyname, transpile
 
 HERE = pathlib.Path(__file__).resolve().parent
 INF = math.inf
@@ -38,7 +39,44 @@ def _viol(v, lo, hi):
     return max(lo - v, v - hi)
 
 
-def check_one(c, budget=8000, bnb=1500):
+def build_feasible(c, defs):
+    """Compile the relational hypotheses into one predicate over the arguments.
+
+    Returns (predicate_or_None, [descriptions]).  Hypotheses that fall outside
+    the arithmetic fragment are dropped and reported, never silently ignored.
+    """
+    d = c.d
+    cons = side_constraints(d)
+    ar, rn = build_arity(defs, d["module"])
+    preds, kept, dropped = [], [], []
+    for co in cons:
+        try:
+            src = transpile(co["hyp"], d["params"], ar, d["name"], rn)
+        except Exception as e:
+            dropped.append(dict(hyp=co["hyp"], thm=co["thm"], reason=str(e)))
+            continue
+        args = ", ".join(pyname(p) for p, _ in d["params"])
+        ns = {"_b": FLOAT}
+        try:
+            exec(compile(f"def _p({args}):\n return {src}", "<hyp>", "exec"), ns)
+        except Exception as e:
+            dropped.append(dict(hyp=co["hyp"], thm=co["thm"], reason=str(e)))
+            continue
+        preds.append(ns["_p"])
+        kept.append(co)
+    if not preds:
+        return None, kept, dropped
+
+    def feasible(*x):
+        for p in preds:
+            if p(*x) is not True:
+                return False
+        return True
+
+    return feasible, kept, dropped
+
+
+def check_one(c, defs, budget=8000, bnb=1500):
     d = c.d
     rng = required_range(d)
     if rng is None:
@@ -55,8 +93,12 @@ def check_one(c, budget=8000, bnb=1500):
     def f(*xs):
         return _viol(c(FLOAT, *xs), lo, hi)
 
-    best, x = maximize(f, box, names, budget=budget)
+    feasible, kept, dropped = build_feasible(c, defs)
+    best, x = maximize(f, box, names, budget=budget, feasible=feasible)
     out = dict(range=[lo, hi], range_why=why,
+               side_constraints=[k["hyp"] for k in kept],
+               side_constraints_from=[k["thm"] for k in kept],
+               side_constraints_dropped=dropped,
                box={n: [box[n]["lo"], box[n]["hi"], box[n]["source"]] for n in names},
                unguarded=unguarded,
                box_provenance={n: box[n]["why"] for n in names})
@@ -76,6 +118,15 @@ def check_one(c, budget=8000, bnb=1500):
 
     def fiv(*xs):
         return c(INTERVAL, *xs)
+
+    if feasible is not None:
+        # The interval proof does not model the side conditions, so it can only
+        # PROVE containment on the unconstrained box.  Failing there says
+        # nothing once constraints exist.
+        out.update(verdict="guarded-by-side-condition", searched=budget,
+                   note="no escape inside the author's relational hypotheses; "
+                        "the range is not implied by the definition alone")
+        return out
 
     status, worst, used = prove_contained(fiv, box, names, lo, hi, max_boxes=bnb)
     out.update(verdict="proved" if status == "proved" else "inconclusive",
@@ -117,11 +168,12 @@ def severity(r):
 
 
 def main(argv):
-    cs, why_not, _ = C.compile_all()
+    defs = C.load_defs()
+    cs, why_not, _ = C.compile_all(defs)
     results = {}
     for k in sorted(cs):
         try:
-            r = check_one(cs[k])
+            r = check_one(cs[k], defs)
         except Exception as e:  # never let one definition abort the sweep
             r = dict(verdict="error", reason=f"{type(e).__name__}: {e}")
         r.update(name=cs[k].d["name"], module=cs[k].d["module"],
