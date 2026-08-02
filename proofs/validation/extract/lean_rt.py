@@ -233,6 +233,40 @@ class VecFn(list):
         return f"VecFn({list.__repr__(self)})"
 
 
+def sumdim(idx, *lens):
+    """The length a `∑` with an unannotated index ranges over.
+
+    `∑ i, freq i` carries no dimension in its syntax; Lean recovers one by
+    elaborating `i`'s type from `freq`'s domain.  The translator recovers it the
+    same way, from every place the index is applied -- and passes ALL of them
+    here so that they can be checked against each other at runtime.
+
+    Disagreement RAISES.  If two things the index runs over have different
+    lengths, then either the inference picked the wrong one or the caller passed
+    mismatched arguments; in both cases the sum would silently run over the
+    wrong range and return a number that looks fine.  That is exactly the
+    failure mode this whole package exists to avoid, so it must be loud.
+    """
+    if not lens:
+        raise ValueError(f"sum index {idx!r}: no dimension could be inferred")
+    if len(set(lens)) != 1:
+        raise ValueError(
+            f"sum index {idx!r} ranges over values of DIFFERENT lengths "
+            f"{lens}; the range is ambiguous and any choice would be a guess")
+    return lens[0]
+
+
+def transpose(M):
+    """Mathlib `Matrix.transpose`."""
+    M = [list(r) for r in M]
+    if not M:
+        return VecFn()
+    if len({len(r) for r in M}) != 1:
+        raise ValueError("transpose: rows have different lengths")
+    return VecFn(VecFn(M[i][j] for i in range(len(M)))
+                 for j in range(len(M[0])))
+
+
 def dotProduct(u, v):
     """Mathlib `dotProduct u v = ∑ i, u i * v i`.
 

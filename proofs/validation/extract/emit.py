@@ -192,6 +192,37 @@ def main():
             return pynames[cands[0]["name"]]
         return resolve
 
+    # Enumerations, read from the Lean declarations: {type: {ctor: ordinal}}.
+    # These are the corpus's finite INDEX types (`Pop`, `DiploidGenotype`), and
+    # the ordinal a constructor gets here is the same position that
+    # admissible.type_value keys a `Pop → …` table on.  If the two ever
+    # disagreed, `m.beta Pop.target` would read the source population's entry
+    # and return a number from the wrong population, so both derive the order
+    # from one place: the declaration order of the constructors.
+    enums = {}
+    for sdec in blob["structures"]:
+        if sdec["kind"] != "inductive":
+            continue
+        ctors = [ln.strip()[1:].strip() for ln in sdec["body"].splitlines()
+                 if ln.strip().startswith("|")]
+        if ctors and all(c and " " not in c.split("--")[0].strip() for c in ctors):
+            table = {c: i for i, c in enumerate(ctors)}
+            enums[sdec["short"]] = table
+            enums[sdec["name"]] = table
+
+    def qualified_resolver(dotted):
+        """A dotted name that IS a declaration of this corpus, or None.
+
+        Only answers when exactly one declaration bears the name, under the
+        namespace prefixes Lean would try.  Ambiguity returns None and the
+        caller refuses, because picking one would silently call a different
+        function than the Lean names.
+        """
+        for cand in (dotted, f"Calibrator.{dotted}"):
+            if cand in by_name:
+                return pynames[cand]
+        return None
+
     fields_of = {}
     for sdec in blob["structures"]:
         f = {x["name"] for x in sdec["fields"]}
@@ -258,7 +289,8 @@ def main():
             src, argnames = translate_def(
                 d, struct_args, fname=fname, resolver=make_resolver(d),
                 struct_types=struct_types, fields_of=fields_of,
-                dot_resolver=dot_resolver, vector_args=vector_args, dims=dims)
+                dot_resolver=dot_resolver, vector_args=vector_args, dims=dims,
+                enums=enums, qualified_resolver=qualified_resolver)
         except Untranslatable as e:
             reasons[d["name"]] = str(e)
             continue
