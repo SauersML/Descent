@@ -235,19 +235,41 @@ def pool_step(x, ne, r, rng):
 
 
 def ld_retention(alpha, p_a, q_a, p_b, q_b, ne, r, gens, reps, rng):
-    """Per-generation geometric retention of E[D], and the trajectory."""
+    """Per-generation geometric retention of E[D], and the trajectory.
+
+    The fit uses only the generations where E[D] is above its OWN Monte Carlo
+    noise floor, |E[D]| > 3 * sd(D)/sqrt(reps), measured from the replicates at
+    that generation rather than assumed. Without this, a fast decay (r = 0.5
+    halves D every generation) runs into the floor after ~25 generations and
+    the remaining points are drift-generated LD of random sign; fitting them
+    reports a retention near 0.84 for a process whose true retention is 0.5.
+    That is a defect in the measurement, not in `admixtureLDDecay`, and
+    trimming to the floor is the fix -- the grid, the replicate count and the
+    number of generations are unchanged, only the points that carry no signal
+    are excluded, and the count that survived is reported so the exclusion is
+    visible rather than silent.
+    """
     x = admixed_pool(alpha, p_a, q_a, p_b, q_b, reps)
     traj = [float(np.mean(d_of(x)))]
+    floor = [0.0]
     for _ in range(gens):
         x = pool_step(x, ne, r, rng)
-        traj.append(float(np.mean(d_of(x))))
+        d = d_of(x)
+        traj.append(float(np.mean(d)))
+        floor.append(3.0 * float(np.std(d)) / math.sqrt(reps))
     a = np.array(traj)
-    ok = a > 1e-12
+    f = np.array(floor)
+    ok = a > np.maximum(f, 1e-14)
+    # keep only the leading run, so a later noise excursion cannot re-enter
+    if ok[0]:
+        stop = int(np.argmin(ok)) if not ok.all() else len(ok)
+        ok = np.zeros_like(ok)
+        ok[:stop] = True
     if int(ok.sum()) < 3:
-        return None, traj
+        return None, traj, 0
     t = np.arange(len(a))[ok]
     slope = np.polyfit(t, np.log(a[ok]), 1)[0]
-    return math.exp(slope), traj
+    return math.exp(slope), traj, int(ok.sum())
 
 
 # ===========================================================================
@@ -389,13 +411,13 @@ def main():
     REPS_B, GENS_B = 4000, 40
     PA, QA, PB, QB, AL = 0.8, 0.7, 0.2, 0.15, 0.5
 
-    ret, _ = ld_retention(AL, PA, QA, PB, QB, None, 0.02, GENS_B, 50, rng)
+    ret, _, _ = ld_retention(AL, PA, QA, PB, QB, None, 0.02, GENS_B, 50, rng)
     b1 = ret is not None and abs(ret - 0.98) < 1e-9
     print("  B1 recombination only: retention %.9f vs (1-r) %.9f -> %s"
           % (ret, 0.98, "PASS" if b1 else "FAIL"))
 
     NE_B = 200
-    ret2, _ = ld_retention(AL, PA, QA, PB, QB, NE_B, 0.0, GENS_B, 30000, rng)
+    ret2, _, _ = ld_retention(AL, PA, QA, PB, QB, NE_B, 0.0, GENS_B, 30000, rng)
     want2 = 1.0 - 1.0 / (2.0 * NE_B)
     b2 = ret2 is not None and abs(ret2 - want2) < 0.004
     print("  B2 drift only        : retention %.6f vs (1-1/2Ne) %.6f -> %s"
@@ -433,9 +455,11 @@ def main():
     print("   r grid straddles 1/(2Ne) = %.5f" % (1.0 / (2.0 * NE_B)))
     print("   %-8s %-11s %-11s %-11s %-9s %-9s"
           % ("r", "measured", "corpus(1-r)", "(1-r)(1-1/2N)", "err_corp", "err_true"))
+    print("   n = generations that stayed above the Monte Carlo noise floor")
     rowsC = []
     for r in (0.0, 0.00125, 0.0025, 0.005, 0.02, 0.1, 0.5):
-        ret, traj = ld_retention(AL, PA, QA, PB, QB, NE_B, r, GENS_B, 30000, rng)
+        ret, traj, nfit = ld_retention(AL, PA, QA, PB, QB, NE_B, r, GENS_B, 30000,
+                                       rng)
         if ret is None:
             continue
         corpus = 1.0 - r
@@ -445,9 +469,11 @@ def main():
                       "retention_with_drift": truth,
                       "rel_err_corpus": (corpus - ret) / ret,
                       "rel_err_with_drift": (truth - ret) / ret,
+                      "generations_above_noise_floor": nfit,
                       "D_trajectory_head": traj[:6]})
-        print("   %-8.5f %-11.6f %-11.6f %-11.6f %-+9.4f %-+9.4f"
-              % (r, ret, corpus, truth, (corpus - ret) / ret, (truth - ret) / ret))
+        print("   %-8.5f %-11.6f %-11.6f %-11.6f %-+9.4f %-+9.4f  n=%d"
+              % (r, ret, corpus, truth, (corpus - ret) / ret, (truth - ret) / ret,
+                 nfit))
     out["C_ld_decay"] = rowsC
 
     # admixtureLDBoost: the quotient inherits the numerator's bias exactly
