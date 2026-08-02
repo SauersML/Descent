@@ -44,7 +44,10 @@ def _resolve_artifacts() -> Path:
         p = Path(override)
         p.mkdir(parents=True, exist_ok=True)
         return p
-    if SHARED_ARTIFACTS.parent.exists():
+    # Predicate is the shared PROJECT root, not the artifacts directory itself,
+    # which will not exist before the first run.  Testing the directory would
+    # make the fallback permanent and silently keep writing beside the source.
+    if SHARED_ARTIFACTS.parents[1].exists():
         SHARED_ARTIFACTS.mkdir(parents=True, exist_ok=True)
         return SHARED_ARTIFACTS
     return HERE
