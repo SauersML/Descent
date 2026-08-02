@@ -412,7 +412,7 @@ theorem not_separating_of_frequencyTie {k n : ℕ} (family : BundleFamily k)
   obtain ⟨v, hcover, hothers⟩ := hsep i
   have hzero : family.massAt (panel.support i) v = 0 := by
     rw [htie]
-    exact hothers l hne
+    exact hothers l (Ne.symm hne)
   unfold Covers at hcover
   exact hcover hzero
 
