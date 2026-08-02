@@ -14,6 +14,7 @@ import json
 import math
 import pathlib
 import random
+import re
 import sys
 
 HERE = pathlib.Path(__file__).resolve().parent
@@ -31,10 +32,20 @@ PROOFS = HERE.parent.parent
 PROP_RETS = {"Prop"}
 
 
+TYPE_RETS = {"Type", "Type*", "Type _", "Sort*"}
+
+
 def classify(d, struct_names, def_names, translated):
     """NUMERIC | STRUCTURAL | WRAPPER | NOT-EXTRACTABLE (+ reason)."""
     ret = d["ret_type"]
     body = d["body"].strip()
+
+    if ret in TYPE_RETS or (not ret and ("→" in body or "×" in body)
+                            and not any(ch.isdigit() for ch in body)
+                            and "(" not in body):
+        return "STRUCTURAL", "type alias"
+    if body.startswith("{") or re.search(r"^\s*\w[\w'.]*\s*:=", body, re.M):
+        return "STRUCTURAL", "structure literal"
 
     if ret in PROP_RETS or ret.endswith("→ Prop") or ret.startswith("Set "):
         return "STRUCTURAL", "Prop-valued / set-valued"
@@ -50,6 +61,21 @@ def classify(d, struct_names, def_names, translated):
             return "WRAPPER", f"delegates to {toks[0]}"
         return "NUMERIC", ""
     return "NOT-EXTRACTABLE", translated_reason(d)
+
+
+def selfcheck_reason(err):
+    err = err or ""
+    if err.startswith("NameError"):
+        import re as _re
+        m = _re.search(r"name '(\w+)'", err)
+        return f"self-check: calls untranslated definition {m.group(1) if m else '?'}"
+    if err.startswith("AttributeError") or err.startswith("KeyError"):
+        return f"self-check: structure projection unavailable ({err[:60]})"
+    if err.startswith("TypeError"):
+        return f"self-check: arity/type mismatch ({err[:60]})"
+    if err.startswith("value is not a real"):
+        return f"self-check: {err} (vector- or function-valued)"
+    return f"self-check: never finite ({err[:60]})"
 
 
 def translated_reason(d):
@@ -118,6 +144,7 @@ def main():
         print(f"GENERATED MODULE FAILED TO IMPORT: {e!r}", file=sys.stderr)
         return
 
+    by_struct = {s["short"]: s for s in blob["structures"]}
     rng = random.Random(20260801)
     selfcheck = {}
     for d in D:
@@ -126,22 +153,35 @@ def main():
         short, argnames = translated[d["name"]]
         fn = ns.get(short)
         box = admissible.box_for(d)
-        pts = [admissible.sample(box, rng) for _ in range(8)]
+        # structure-typed arguments get a sampled admissible inhabitant
+        structval = {}
+        for a in d["args"]:
+            if a["implicit"]:
+                continue
+            head = a["type"].split()[0] if a["type"].split() else ""
+            sd = by_struct.get(head.split(".")[-1])
+            if sd is not None:
+                for n in a["names"]:
+                    structval[pyname(n)] = sd
         ok, err = 0, None
+        pts = [admissible.sample(box, rng) for _ in range(8)]
         for pt in pts:
+            pt = {pyname(k): v for k, v in pt.items()}
             try:
-                v = fn(*[pt.get(a, 1.0) for a in argnames])
+                args = [admissible.struct_value(structval[a], rng)
+                        if a in structval else pt.get(a, 1.0) for a in argnames]
+                v = fn(*args)
             except Exception as e:                                # noqa: BLE001
                 err = repr(e)
                 continue
             if isinstance(v, bool) or (isinstance(v, (int, float)) and math.isfinite(v)):
                 ok += 1
             else:
-                err = err or f"non-finite value {v!r}"
+                err = err or f"value is not a real number: {type(v).__name__}"
         selfcheck[d["name"]] = {"finite_points": ok, "total_points": len(pts),
                                 "error": err}
         if ok == 0:
-            reasons.setdefault(d["name"], f"self-check: never finite ({err})")
+            reasons.setdefault(d["name"], selfcheck_reason(err))
 
     # ---- classification
     classes = {}

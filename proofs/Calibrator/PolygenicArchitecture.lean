@@ -569,7 +569,7 @@ The two statements above carry the crossing point as an explicit hypothesis,
 which is honest but leaves the reader to supply it. Both hypotheses hold
 eventually, for every exponent and every target factor, and the two theorems
 below say so. Their content is that a logarithm is negligible against every
-positive power, which is `Real.isLittleO_log_rpow_atTop`; nothing about
+positive power, which is `isLittleO_log_rpow_atTop`; nothing about
 genetics enters. -/
 
 /-- **No polynomial rate is attainable, unconditionally.**
@@ -582,7 +582,7 @@ genetics enters. -/
     law. -/
 theorem nonsmoothSummaryRisk_exceeds_polynomial_eventually (a : ℝ) (ha : 0 < a) :
     ∀ᶠ q : ℝ in Filter.atTop, q ^ (-a) ≤ nonsmoothSummaryRisk q := by
-  have hbound := (Real.isLittleO_log_rpow_atTop ha).bound one_pos
+  have hbound := (isLittleO_log_rpow_atTop ha).bound one_pos
   filter_upwards [hbound, Filter.eventually_ge_atTop (2 : ℝ)] with q hq hq2
   have hq0 : (0 : ℝ) < q := by linarith
   have hlog : 0 < Real.log q := Real.log_pos (by linarith)
@@ -609,7 +609,7 @@ theorem nonsmoothSummaryRisk_exceeds_polynomial_eventually (a : ℝ) (ha : 0 < a
 theorem gradeCertifiedRisk_deficit_eventually_ge (K c D : ℝ)
     (hr : 0 < c / K) (hD : 0 < D) :
     ∀ᶠ q : ℝ in Filter.atTop, D ≤ certificateDeficit q K c := by
-  have hbound := (Real.isLittleO_log_rpow_atTop hr).bound (inv_pos.mpr hD)
+  have hbound := (isLittleO_log_rpow_atTop hr).bound (inv_pos.mpr hD)
   filter_upwards [hbound, Filter.eventually_ge_atTop (2 : ℝ)] with q hq hq2
   have hq0 : (0 : ℝ) < q := by linarith
   have hlog : 0 < Real.log q := Real.log_pos (by linarith)

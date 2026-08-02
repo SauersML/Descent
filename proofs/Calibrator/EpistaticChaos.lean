@@ -685,7 +685,7 @@ it, and the reason is visible in the inputs its proof route uses:
    `standardizedGenotype_expectation_zero` and
    `standardizedGenotype_second_moment_one`;
 2. the coordinates are independent across loci — the linkage-equilibrium
-   hypothesis `GenotypeDesign.LociIndependent`, an argument of the licence,
+   hypothesis `GenotypeDesign.InLinkageEquilibrium`, an argument of the licence,
    not an assumption about the coding;
 3. no monomial is macroscopic — `no_macroscopic_interaction_term` of §`NoJump`,
    which carries no symmetry hypothesis and holds for any design and any coding.
@@ -766,7 +766,7 @@ population's joint genotype law over the panel.
 
 The joint law is carried alongside the per-locus models so that linkage
 equilibrium is a checkable relation between them
-(`GenotypeDesign.LociIndependent`) rather than a silent assumption; the
+(`GenotypeDesign.InLinkageEquilibrium`) rather than a silent assumption; the
 disjoint licence needs it, and a design whose tested sets sit inside one LD block
 does not have it. -/
 structure GenotypeDesign (n : ℕ) (ι : Type*) where
@@ -801,18 +801,24 @@ noncomputable def statistic (x : Fin n → DiploidGenotype) : ℝ :=
   ∑ s : ι, design.coefficient s *
     ∏ i ∈ design.locusSet s, (design.model i).standardizedGenotype (x i)
 
-/-- **The panel loci are independent**: the joint genotype law factorizes into
-the per-locus Hardy-Weinberg laws. This is linkage equilibrium across the tested
-panel, stated as the factorization it is; the dynamics that drive a population
-towards it live in `Calibrator.LDDecayTheory`.
+/-- **Linkage equilibrium across the tested panel**: the joint genotype law
+factorizes into the per-locus Hardy-Weinberg laws. It is stated as the
+factorization it is; the dynamics that drive a population towards it live in
+`Calibrator.LDDecayTheory`.
 
-It is an assumption about the population, not about the coding, and it is what
+This is an assumption about the population, not about the coding, and it is what
 the disjoint licence needs in place of symmetry. A design whose tested sets sit
-inside one LD block does not have it.
+inside one LD block does not have it, which makes the licence's applicability
+checkable on a study's own panel rather than on an idealized coordinate law.
+
+Note for automated checking: this is a *predicate* on a design, not a stipulated
+equilibrium quantity. There is no one-step map here and nothing for a
+`_isFixedPoint` theorem to be about; the recombination dynamics that have a fixed
+point live in `Calibrator.LDDecayTheory`.
 
 Empirical status: UNTESTED. A factorization condition on the joint law; testable
 directly as pairwise LD between panel loci. -/
-def LociIndependent : Prop :=
+def InLinkageEquilibrium : Prop :=
   ∀ x : Fin n → DiploidGenotype,
     design.jointGenotypeProb x = ∏ i, (design.model i).genotypeProb (x i)
 
@@ -1033,7 +1039,7 @@ structure GenotypeChaosLimits (n : ℕ) (ι : Type*) (Limit : Type*) where
   carries no symmetry hypothesis and is licensed at every polymorphic
   frequency. -/
   disjoint_segment : ∀ design : GenotypeDesign n ι, isAdmissible design →
-    design.Polymorphic → design.LociIndependent → design.VariantDisjoint →
+    design.Polymorphic → design.InLinkageEquilibrium → design.VariantDisjoint →
     ∃ s2 : ℝ, 0 ≤ s2 ∧ s2 ≤ 1 ∧ IsCenteredGaussian (limitLaw design) s2
   /-- The Gaussian moment identity `E[g⁴] = 3 (E[g²])²`, in cumulant form. -/
   gaussian_fourthCumulant : ∀ (L : Limit) (s2 : ℝ), IsCenteredGaussian L s2 →
@@ -1049,7 +1055,7 @@ structure GenotypeChaosLimits (n : ℕ) (ι : Type*) (Limit : Type*) where
     (∀ i : Fin n, 0 < (model i).altFreq ∧ (model i).altFreq < 1) →
     ∀ target : Limit, InMomentBody target → ∀ ε : ℝ, 0 < ε →
       ∃ design : GenotypeDesign n ι, design.model = model ∧
-        design.LociIndependent ∧ isAdmissible design ∧
+        design.InLinkageEquilibrium ∧ isAdmissible design ∧
         weakDistance (limitLaw design) target < ε
   /-- **The non-soficity witness (analytic input).** The two-pool interaction
   statistic has limiting fourth cumulant `6`, at every polymorphic
@@ -1060,7 +1066,7 @@ structure GenotypeChaosLimits (n : ℕ) (ι : Type*) (Limit : Type*) where
   `twoPool_interaction_fourthCumulant`. -/
   twoPool_witness : ∀ (design : GenotypeDesign n ι) (poolOne poolTwo : Finset (Fin n)),
     design.IsTwoPoolInteraction poolOne poolTwo → design.Polymorphic →
-    design.LociIndependent → fourthCumulant (limitLaw design) = 6
+    design.InLinkageEquilibrium → fourthCumulant (limitLaw design) = 6
 
 namespace GenotypeChaosLimits
 
@@ -1076,7 +1082,7 @@ sharpness but a total loss of the conclusion
 (`admissibility_alone_certifies_only_the_moment_body`). -/
 theorem gaussian_null_licensed_of_disjoint (design : GenotypeDesign n ι)
     (hadmissible : Sp.isAdmissible design) (hpolymorphic : design.Polymorphic)
-    (hequilibrium : design.LociIndependent)
+    (hequilibrium : design.InLinkageEquilibrium)
     (hdisjoint : design.VariantDisjoint) :
     ∃ s2 : ℝ, 0 ≤ s2 ∧ s2 ≤ 1 ∧ Sp.IsCenteredGaussian (Sp.limitLaw design) s2 :=
   Sp.disjoint_segment design hadmissible hpolymorphic hequilibrium hdisjoint
@@ -1095,7 +1101,7 @@ theorem geneBurden_gaussian_null {γ : Type*} [DecidableEq γ]
     (hadmissible : Sp'.isAdmissible (geneBurdenDesign model geneOf coeff jointGenotypeProb))
     (hpolymorphic : (geneBurdenDesign model geneOf coeff jointGenotypeProb).Polymorphic)
     (hequilibrium :
-      (geneBurdenDesign model geneOf coeff jointGenotypeProb).LociIndependent) :
+      (geneBurdenDesign model geneOf coeff jointGenotypeProb).InLinkageEquilibrium) :
     ∃ s2 : ℝ, 0 ≤ s2 ∧ s2 ≤ 1 ∧
       Sp'.IsCenteredGaussian
         (Sp'.limitLaw (geneBurdenDesign model geneOf coeff jointGenotypeProb)) s2 :=
@@ -1106,7 +1112,7 @@ theorem geneBurden_gaussian_null {γ : Type*} [DecidableEq γ]
 shadow of the licence, and the quantity the two-pool witness violates. -/
 theorem disjoint_limit_fourthCumulant_zero (design : GenotypeDesign n ι)
     (hadmissible : Sp.isAdmissible design) (hpolymorphic : design.Polymorphic)
-    (hequilibrium : design.LociIndependent)
+    (hequilibrium : design.InLinkageEquilibrium)
     (hdisjoint : design.VariantDisjoint) :
     Sp.fourthCumulant (Sp.limitLaw design) = 0 := by
   obtain ⟨s2, _, _, hgauss⟩ :=
@@ -1259,9 +1265,9 @@ theorem twoPool_witness_not_a_disjoint_limit {Limit : Type*}
     (Sp : GenotypeChaosLimits n ι Limit)
     (witness : GenotypeDesign n ι) (poolOne poolTwo : Finset (Fin n))
     (hwitness : witness.IsTwoPoolInteraction poolOne poolTwo)
-    (hwitnessPoly : witness.Polymorphic) (hwitnessLE : witness.LociIndependent)
+    (hwitnessPoly : witness.Polymorphic) (hwitnessLE : witness.InLinkageEquilibrium)
     (design : GenotypeDesign n ι) (hadmissible : Sp.isAdmissible design)
-    (hpolymorphic : design.Polymorphic) (hequilibrium : design.LociIndependent)
+    (hpolymorphic : design.Polymorphic) (hequilibrium : design.InLinkageEquilibrium)
     (hdisjoint : design.VariantDisjoint) :
     Sp.limitLaw design ≠ Sp.limitLaw witness := by
   intro heq
@@ -1290,10 +1296,10 @@ theorem sign_symmetry_does_not_license_disjoint_reduction {Limit : Type*}
     (Sp : GenotypeChaosLimits n ι Limit)
     (witness : GenotypeDesign n ι) (poolOne poolTwo : Finset (Fin n))
     (hwitness : witness.IsTwoPoolInteraction poolOne poolTwo)
-    (hwitnessPoly : witness.Polymorphic) (hwitnessLE : witness.LociIndependent)
+    (hwitnessPoly : witness.Polymorphic) (hwitnessLE : witness.InLinkageEquilibrium)
     (_hbalanced : ∀ i : Fin n, (witness.model i).altFreq = 1 / 2)
     (design : GenotypeDesign n ι) (hadmissible : Sp.isAdmissible design)
-    (hpolymorphic : design.Polymorphic) (hequilibrium : design.LociIndependent)
+    (hpolymorphic : design.Polymorphic) (hequilibrium : design.InLinkageEquilibrium)
     (hdisjoint : design.VariantDisjoint) :
     Sp.limitLaw design ≠ Sp.limitLaw witness :=
   twoPool_witness_not_a_disjoint_limit Sp witness poolOne poolTwo hwitness hwitnessPoly
@@ -1321,6 +1327,24 @@ roots of unity. Both offset vectors are palindromic, so the imaginary parts canc
 and `λ_k` is real; writing `θ = 2πk/8` and `c = cos θ`, and using
 `cos 2θ = 2c² - 1`, the eigenvalue functions are the quadratics below. Their
 ranges differ, and that is proved.
+
+**What the circulant hypothesis is and is not doing here.** It is a *computing*
+device: circulant structure is what diagonalizes the overlap operator in closed
+form, so the two spectra can be written down and separated by hand. It is not
+supplying a rigidity, identifiability or detectability conclusion, and no theorem
+in this file infers "nothing can imitate this design" from circulant, Toeplitz,
+stationary or exchangeable structure. The distinction matters because
+`BackgroundClass.not_isNull_spiked_of_active` of
+`Calibrator.PCCorrectability.ImitationCapacity` shows
+that resistance to imitation is a normal-cone condition — an active constraint
+with positive load on the spike direction — and needs no transitive symmetry at
+all, so a symmetry hypothesis carried for *that* purpose would be removable.
+Here there is nothing to remove: the methodological conclusion,
+`Calibrator.CondensationUnification.recurrence_preserving_resampling_is_not_a_calibration`,
+carries no symmetry hypothesis of any kind. It takes the change of null under
+resampling as an argument, and the circulant pair is one way to discharge that
+argument; any other pair of designs with equal recurrence profile and different
+overlap spectra discharges it equally.
 -/
 
 /-- Eigenvalue of the circulant with offsets `(0,1,2,0,0,0,2,1)` as a polynomial

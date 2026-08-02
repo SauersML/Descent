@@ -31,7 +31,6 @@
     "declared_kind": "frequency",
     "declared_lo": 0.0,
     "declared_hi": 1.0,
-    "range_lo": 0,
     "hypotheses": [
      "0 ≤ p₁",
      "p₁ ≤ 1",
@@ -74,6 +73,10 @@
     "declared_kind": "F_ST",
     "declared_lo": 0.0,
     "declared_hi": 1.0,
+    "range_lo_thm": [
+     "Calibrator.drift_variance_nonneg",
+     3
+    ],
     "range_lo": 0,
     "hypotheses": [
      "0 ≤ p0",
@@ -161,6 +164,10 @@
      "0 < p0",
      "p0 < 1",
      "0 < fst"
+    ],
+    "range_lo_thm": [
+     "Calibrator.expected_freq_diff_nonneg",
+     3
     ],
     "range_lo": 0
    },
@@ -415,6 +422,10 @@
     "declared_kind": "frequency",
     "declared_lo": 0.0,
     "declared_hi": 1.0,
+    "range_lo_thm": [
+     "Calibrator.genotypeVariance_nonneg",
+     2
+    ],
     "range_lo": 0,
     "hypotheses": [
      "0 ≤ p",
@@ -486,8 +497,7 @@
      "0 ≤ r2_ld",
      "r2_ld ≤ 1",
      "0 < effectiveFisherInformation n p r2_ld"
-    ],
-    "range_lo": 0
+    ]
    },
    "mentioned_by": [
     "Calibrator.effectiveFisherInfo_eq",
@@ -580,6 +590,10 @@
     "declared_kind": "R-squared",
     "declared_lo": 0.0,
     "declared_hi": 1.0,
+    "range_lo_thm": [
+     "Calibrator.effective_n_nonneg",
+     3
+    ],
     "range_lo": 0,
     "hypotheses": [
      "0 ≤ p",
@@ -633,8 +647,7 @@
     "declared_hi": 1.0,
     "hypotheses": [
      "β ≠ 0"
-    ],
-    "range_hi": 1
+    ]
    },
    "mentioned_by": [
     "Calibrator.PowerAgreement.close",
@@ -678,6 +691,10 @@
      "p < q",
      "p < 1"
     ],
+    "range_lo_thm": [
+     "Calibrator.hweHeterozygosity_pos",
+     2
+    ],
     "range_lo": 0
    },
    "mentioned_by": [
@@ -719,6 +736,10 @@
     "declared_kind": "R-squared",
     "declared_lo": 0.0,
     "declared_hi": 1.0,
+    "range_hi_thm": [
+     "Calibrator.portable_fraction_le_one",
+     2
+    ],
     "range_hi": 1,
     "hypotheses": [
      "r2_causal ≤ r2_total",
@@ -884,6 +905,10 @@
      "h2 < 1",
      "0 ≤ r * h2"
     ],
+    "range_lo_thm": [
+     "Calibrator.am_variance_finite",
+     3
+    ],
     "range_lo": 0
    },
    "mentioned_by": [
@@ -927,6 +952,10 @@
     "declared_kind": "heritability",
     "declared_lo": 0.0,
     "declared_hi": 1.0,
+    "range_lo_thm": [
+     "Calibrator.am_ld_sign",
+     5
+    ],
     "range_lo": 0,
     "hypotheses": [
      "0 < r",
@@ -1102,6 +1131,10 @@
     "declared_kind": "heritability",
     "declared_lo": 0.0,
     "declared_hi": 1.0,
+    "range_hi_thm": [
+     "Calibrator.DifferentialAMModel.differential_am_misleading",
+     0
+    ],
     "range_hi": 1,
     "hypotheses": []
    },
@@ -1192,7 +1225,15 @@
      "0 ≤ d",
      "0 < d"
     ],
+    "range_lo_thm": [
+     "Calibrator.ibd_fst_nonneg",
+     3
+    ],
     "range_lo": 0,
+    "range_hi_thm": [
+     "Calibrator.ibd_fst_lt_one",
+     3
+    ],
     "range_hi": 1
    },
    "mentioned_by": [
@@ -1386,6 +1427,14 @@
      "0 < n",
      "0 < h"
     ],
+    "range_lo_thm": [
+     "Calibrator.gaussian_shrinkage_in_unit",
+     2
+    ],
+    "range_hi_thm": [
+     "Calibrator.gaussian_shrinkage_in_unit",
+     2
+    ],
     "range_lo": 0,
     "range_hi": 1
    },
@@ -1469,8 +1518,6 @@
     "declared_kind": "nonnegative",
     "declared_lo": 0.0,
     "declared_hi": null,
-    "range_lo": 0,
-    "range_hi": 1,
     "hypotheses": [
      "0 < σ_sq",
      "0 < β_sq"
@@ -1547,7 +1594,6 @@
     "declared_kind": "nonnegative",
     "declared_lo": 0.0,
     "declared_hi": null,
-    "range_lo": 0,
     "hypotheses": [
      "0 ≤ π"
     ]
@@ -1588,7 +1634,6 @@
     "declared_lo": 0.0,
     "declared_hi": null,
     "units": "per snp",
-    "range_lo": 0,
     "hypotheses": [
      "0 ≤ π",
      "π ≤ 1",
@@ -1753,6 +1798,14 @@
    "fields": [],
    "equations": [],
    "constraints": {
+    "range_lo_thm": [
+     "Calibrator.proportion_mediated_in_unit",
+     3
+    ],
+    "range_hi_thm": [
+     "Calibrator.proportion_mediated_in_unit",
+     3
+    ],
     "range_lo": 0,
     "range_hi": 1,
     "hypotheses": []
@@ -1820,6 +1873,10 @@
    "fields": [],
    "equations": [],
    "constraints": {
+    "range_lo_thm": [
+     "Calibrator.e_value_ge_one",
+     1
+    ],
     "range_lo": 1,
     "hypotheses": [
      "1 ≤ rr"
@@ -1997,6 +2054,10 @@
    "fields": [],
    "equations": [],
    "constraints": {
+    "range_lo_thm": [
+     "Calibrator.nri_positive_when_pgs_adds_value",
+     7
+    ],
     "range_lo": 0,
     "hypotheses": []
    },
@@ -2055,8 +2116,7 @@
      "specFromR2 m r2_source T' μ_control ≤ 1",
      "0 ≤ Real.sqrt r2_unvalidated * Real.sqrt m.h_sq * m.case_mean - T'",
      "0 ≤ T' - Real.sqrt r2_unvalidated * Real.sqrt m.h_sq * μ_control"
-    ],
-    "range_lo": 0
+    ]
    },
    "mentioned_by": [
     "Calibrator.do_no_harm_principle",
@@ -2120,9 +2180,7 @@
      "specFromR2 m r2_source T' μ_control ≤ 1",
      "0 ≤ Real.sqrt r2_unvalidated * Real.sqrt m.h_sq * m.case_mean - T'",
      "0 ≤ T' - Real.sqrt r2_unvalidated * Real.sqrt m.h_sq * μ_control"
-    ],
-    "range_hi": 1,
-    "range_lo": 0
+    ]
    },
    "mentioned_by": [
     "Calibrator.do_no_harm_principle",
@@ -2199,7 +2257,6 @@
    "fields": [],
    "equations": [],
    "constraints": {
-    "range_lo": 0,
     "hypotheses": []
    },
    "mentioned_by": [
@@ -2275,8 +2332,7 @@
    "fields": [],
    "equations": [],
    "constraints": {
-    "hypotheses": [],
-    "range_lo": 0
+    "hypotheses": []
    },
    "mentioned_by": [
     "Calibrator.equity_gap_in_public_health",
@@ -2472,10 +2528,18 @@
    "fields": [],
    "equations": [],
    "constraints": {
+    "range_lo_thm": [
+     "Calibrator.sigmoid_pos",
+     0
+    ],
     "range_lo": 0,
     "hypotheses": [
      "x > 0",
      "x < 0"
+    ],
+    "range_hi_thm": [
+     "Calibrator.sigmoid_lt_one",
+     0
     ],
     "range_hi": 1
    },
@@ -2933,6 +2997,10 @@
    "fields": [],
    "equations": [],
    "constraints": {
+    "range_lo_thm": [
+     "Calibrator.bernoulliKLReal_nonneg",
+     4
+    ],
     "range_lo": 0,
     "hypotheses": [
      "0 < p",
@@ -3702,6 +3770,10 @@
     "declared_lo": 0.0,
     "declared_hi": null,
     "hypotheses": [],
+    "range_lo_thm": [
+     "Calibrator.condensationConstant_pos",
+     0
+    ],
     "range_lo": 0
    },
    "mentioned_by": [
@@ -3736,6 +3808,10 @@
     "declared_kind": "nonnegative",
     "declared_lo": 0.0,
     "declared_hi": null,
+    "range_lo_thm": [
+     "Calibrator.gaussianJetVariance_pos",
+     0
+    ],
     "range_lo": 0,
     "hypotheses": []
    },
@@ -3804,6 +3880,10 @@
    "fields": [],
    "equations": [],
    "constraints": {
+    "range_lo_thm": [
+     "Calibrator.gaussianCriticalMultiplier_pos",
+     0
+    ],
     "range_lo": 0,
     "hypotheses": []
    },
@@ -3843,6 +3923,14 @@
     "declared_kind": "nonnegative",
     "declared_lo": 0.0,
     "declared_hi": null,
+    "range_lo_thm": [
+     "Calibrator.windowVariance_mem_unitInterval",
+     0
+    ],
+    "range_hi_thm": [
+     "Calibrator.windowVariance_mem_unitInterval",
+     0
+    ],
     "range_lo": 0,
     "range_hi": 1,
     "hypotheses": [
@@ -4385,6 +4473,10 @@
      "0 < p_j",
      "p_j < 1"
     ],
+    "range_lo_thm": [
+     "Calibrator.ld_correlation_sq_nonneg",
+     4
+    ],
     "range_lo": 0
    },
    "mentioned_by": [
@@ -4733,6 +4825,10 @@
      "alpha < 1",
      "0 < r",
      "r < 1"
+    ],
+    "range_lo_thm": [
+     "Calibrator.admixture_ld_nonneg",
+     4
     ],
     "range_lo": 0
    },
@@ -5419,6 +5515,10 @@
     "declared_kind": "nonnegative",
     "declared_lo": 0.0,
     "declared_hi": null,
+    "range_lo_thm": [
+     "Calibrator.frobeniusNormSq_nonneg",
+     0
+    ],
     "range_lo": 0,
     "hypotheses": [
      "∃ i j, A i j ≠ 0"
@@ -5517,6 +5617,10 @@
     "declared_lo": 0.0,
     "declared_hi": null,
     "hypotheses": [],
+    "range_lo_thm": [
+     "Calibrator.target_ld_shift_changes_explainedR2_under_fixed_source_weights",
+     0
+    ],
     "range_lo": 4
    },
    "mentioned_by": [
@@ -7180,7 +7284,10 @@
      "(1 : Matrix (Fin p",
      "targetLinearExcessRisk (1 : Matrix (Fin p"
     ],
-    "range_lo": 0,
+    "range_hi_thm": [
+     "Calibrator.fst_from_tau_lt_one",
+     1
+    ],
     "range_hi": 1
    },
    "mentioned_by": [
@@ -7347,6 +7454,10 @@
     "hypotheses": [
      "0 < p.theta"
     ],
+    "range_hi_thm": [
+     "Calibrator.fst_ordering",
+     1
+    ],
     "range_hi": 1
    },
    "mentioned_by": [
@@ -7468,7 +7579,15 @@
      "0 < p.theta + p.bigM",
      "0 < p.theta"
     ],
+    "range_lo_thm": [
+     "Calibrator.fstEquilibrium_pos",
+     0
+    ],
     "range_lo": 0,
+    "range_hi_thm": [
+     "Calibrator.fstEquilibrium_lt_one",
+     1
+    ],
     "range_hi": 1
    },
    "mentioned_by": [
@@ -7521,7 +7640,15 @@
     "declared_lo": 0.0,
     "declared_hi": 1.0,
     "hypotheses": [],
+    "range_lo_thm": [
+     "Calibrator.sharedLDRetention_pos",
+     0
+    ],
     "range_lo": 0,
+    "range_hi_thm": [
+     "Calibrator.sharedLDRetention_le_one",
+     0
+    ],
     "range_hi": 1
    },
    "mentioned_by": [
@@ -7559,8 +7686,16 @@
    "fields": [],
    "equations": [],
    "constraints": {
+    "range_lo_thm": [
+     "Calibrator.mutationLDErosion_pos",
+     0
+    ],
     "range_lo": 0,
     "hypotheses": [],
+    "range_hi_thm": [
+     "Calibrator.mutationLDErosion_le_one",
+     0
+    ],
     "range_hi": 1
    },
    "mentioned_by": [
@@ -7596,6 +7731,10 @@
    "fields": [],
    "equations": [],
    "constraints": {
+    "range_lo_thm": [
+     "Calibrator.migrationLDBoost_ge_one",
+     0
+    ],
     "range_lo": 1,
     "hypotheses": []
    },
@@ -8065,8 +8204,7 @@
    "fields": [],
    "equations": [],
    "constraints": {
-    "hypotheses": [],
-    "range_lo": 0
+    "hypotheses": []
    },
    "mentioned_by": [
     "Calibrator.TransportedMetrics.IrreducibleTargetPenalty.total_nonneg",
@@ -8351,8 +8489,7 @@
      "0 < m",
      "0 < σ_sq",
      "0 < d"
-    ],
-    "range_hi": 1
+    ]
    },
    "mentioned_by": [
     "Calibrator.demoSteppingStoneFst_eq_scaled",
@@ -8396,8 +8533,7 @@
      "0 < d",
      "0 < m",
      "0 < σ_sq"
-    ],
-    "range_lo": 0
+    ]
    },
    "mentioned_by": [
     "Calibrator.steppingStoneCoalescenceTime_pos",
@@ -8660,10 +8796,18 @@
     "declared_kind": "F_ST",
     "declared_lo": 0.0,
     "declared_hi": 1.0,
+    "range_lo_thm": [
+     "Calibrator.fst_variable_ne_nonneg",
+     2
+    ],
     "range_lo": 0,
     "hypotheses": [
      "0 < T",
      "∀ i, 0 < Ne i"
+    ],
+    "range_hi_thm": [
+     "Calibrator.fst_variable_ne_lt_one",
+     0
     ],
     "range_hi": 1
    },
@@ -8759,8 +8903,11 @@
      "0 < t_b",
      "bottleneckExcessLD Ne_b Ne_stable c t_b < 1 - fst"
     ],
-    "range_lo": 0,
-    "range_hi": 1
+    "range_lo_thm": [
+     "Calibrator.bottleneck_excess_ld_pos",
+     5
+    ],
+    "range_lo": 0
    },
    "mentioned_by": [
     "Calibrator.bottleneckExcessLD_eq_closedForm",
@@ -9317,6 +9464,10 @@
     "declared_kind": "frequency",
     "declared_lo": 0.0,
     "declared_hi": 1.0,
+    "range_lo_thm": [
+     "Calibrator.epistatic_variance_nonneg",
+     4
+    ],
     "range_lo": 0,
     "hypotheses": [
      "0 ≤ p1",
@@ -9377,6 +9528,10 @@
     "declared_lo": 0.0,
     "declared_hi": 1.0,
     "hypotheses": [],
+    "range_lo_thm": [
+     "Calibrator.dominance_variance_nonneg",
+     0
+    ],
     "range_lo": 0
    },
    "mentioned_by": [
@@ -9570,9 +9725,7 @@
     "declared_kind": "nonnegative",
     "declared_lo": 0.0,
     "declared_hi": null,
-    "range_lo": 0,
-    "hypotheses": [],
-    "range_hi": 1
+    "hypotheses": []
    },
    "mentioned_by": [
     "Calibrator.add_rankOneBump_not_constantDiagonal",
@@ -9946,6 +10099,10 @@
     "declared_lo": 0.0,
     "declared_hi": null,
     "hypotheses": [],
+    "range_hi_thm": [
+     "Calibrator.GenotypeDesign.variantRecurrence_le_one_of_disjoint",
+     1
+    ],
     "range_hi": 1
    },
    "mentioned_by": [
@@ -10213,7 +10370,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/EpistaticChaos.lean",
-   "line": 1331,
+   "line": 1349,
    "signature": "(c : ℝ) : ℝ",
    "args": [
     {
@@ -10247,7 +10404,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/EpistaticChaos.lean",
-   "line": 1338,
+   "line": 1356,
    "signature": "(c : ℝ) : ℝ",
    "args": [
     {
@@ -10393,6 +10550,10 @@
     "declared_kind": "probability",
     "declared_lo": 0.0,
     "declared_hi": 1.0,
+    "range_lo_thm": [
+     "Calibrator.crossover_gxe_possible",
+     2
+    ],
     "range_lo": 0,
     "hypotheses": []
    },
@@ -10438,8 +10599,7 @@
      "ld ≠ 0",
      "0 < n",
      "discoveryNCP n β maf₂ ld₂ < z ^ 2 ∧ z ^ 2 ≤ discoveryNCP n β maf₁ ld₁"
-    ],
-    "range_lo": 2
+    ]
    },
    "mentioned_by": [
     "Calibrator.different_populations_different_hits",
@@ -10786,7 +10946,6 @@
     "declared_kind": "correlation",
     "declared_lo": -1.0,
     "declared_hi": 1.0,
-    "range_hi": 1,
     "hypotheses": [
      "cov_g ^ 2 ≤ vg₁ * vg₂",
      "0 < vg₁",
@@ -10924,6 +11083,10 @@
     "declared_kind": "nonnegative",
     "declared_lo": 0.0,
     "declared_hi": null,
+    "range_lo_thm": [
+     "Calibrator.CrossTraitBorrowingModel.borrowedTraitBCrossCov_nonneg",
+     3
+    ],
     "range_lo": 0,
     "hypotheses": [
      "∀ i j, 0 ≤ m.sigmaTagCausal i j",
@@ -10976,6 +11139,10 @@
     "declared_kind": "nonnegative",
     "declared_lo": 0.0,
     "declared_hi": null,
+    "range_lo_thm": [
+     "Calibrator.CrossTraitBorrowingModel.traitBSpecificCrossCov_nonneg",
+     2
+    ],
     "range_lo": 0,
     "hypotheses": [
      "∀ i j, 0 ≤ m.sigmaTagCausal i j",
@@ -11273,6 +11440,14 @@
     "declared_kind": "frequency",
     "declared_lo": 0.0,
     "declared_hi": 1.0,
+    "range_lo_thm": [
+     "Calibrator.homozygosity_bounded",
+     2
+    ],
+    "range_hi_thm": [
+     "Calibrator.homozygosity_bounded",
+     2
+    ],
     "range_lo": 0,
     "range_hi": 1,
     "hypotheses": [
@@ -11554,6 +11729,10 @@
      "freq_cis_source ≠ freq_cis_target",
      "interaction_cis ≠ interaction_trans"
     ],
+    "range_lo_thm": [
+     "Calibrator.haplotypeTransportBias_pos_of_effects_not_portable",
+     1
+    ],
     "range_lo": 0
    },
    "mentioned_by": [
@@ -11631,6 +11810,14 @@
    "fields": [],
    "equations": [],
    "constraints": {
+    "range_lo_thm": [
+     "Calibrator.phase_attenuation_bounded",
+     2
+    ],
+    "range_hi_thm": [
+     "Calibrator.phase_attenuation_bounded",
+     2
+    ],
     "range_lo": 0,
     "range_hi": 1,
     "hypotheses": [
@@ -11971,8 +12158,7 @@
      "fst < 1",
      "0 ≤ fst",
      "observedRatio < 1 - fst"
-    ],
-    "range_lo": 0
+    ]
    },
    "mentioned_by": [
     "Calibrator.neutralDriftR2Ratio_eq",
@@ -12272,8 +12458,7 @@
    "constraints": {
     "hypotheses": [
      "0 < quadraticForm"
-    ],
-    "range_hi": 1
+    ]
    },
    "mentioned_by": [
     "Calibrator.deadSensor_resolvent_variance_pos",
@@ -12311,6 +12496,10 @@
     "declared_lo": 0.0,
     "declared_hi": null,
     "hypotheses": [],
+    "range_lo_thm": [
+     "Calibrator.deadSensor_resolvent_variance_pos",
+     1
+    ],
     "range_lo": 0
    },
    "mentioned_by": [
@@ -12420,9 +12609,7 @@
      "VarianceNonneg A",
      "A.mulVec witness = loading",
      "∀ v : ι → ℝ, v ≠ 0 → 0 < quadForm A v"
-    ],
-    "range_lo": 0,
-    "range_hi": 1
+    ]
    },
    "mentioned_by": [
     "Calibrator.active_budget_makes_stratification_detectable",
@@ -12674,13 +12861,21 @@
     "declared_kind": "correlation",
     "declared_lo": -1.0,
     "declared_hi": 1.0,
+    "range_lo_thm": [
+     "Calibrator.ldKernelSymbol_pos",
+     1
+    ],
     "range_lo": 0,
     "hypotheses": [
      "|decay| < 1",
-     "0 ≤ decay"
+     "0 ≤ decay",
+     "∀ i ∈ S, Real.cos cutAngle ≤ Real.cos (angle i",
+     "∀ i ∉ S, Real.cos (angle i"
     ]
    },
    "mentioned_by": [
+    "Calibrator.clumping_maximizes_reconstruction_on_ld_kernel",
+    "Calibrator.clumping_minimizes_detection_on_ld_kernel",
     "Calibrator.ldBandDetectionShare_eq_integral",
     "Calibrator.ldBandReconstructionShare_eq_integral",
     "Calibrator.ldKernelSymbol_ge_hardEdge",
@@ -12760,7 +12955,13 @@
     "declared_hi": null,
     "hypotheses": [
      "|decay| < 1",
+     "0 ≤ decay",
+     "decay < 1",
      "E.load = ldWhiteningGain decay"
+    ],
+    "range_lo_thm": [
+     "Calibrator.ldWhiteningGain_ge_one",
+     1
     ],
     "range_lo": 1
    },
@@ -12771,7 +12972,9 @@
     "Calibrator.ldPrecisionTrace_eq_boundary_add_interior",
     "Calibrator.ldWhiteningGain_ge_one",
     "Calibrator.ldWhiteningGain_of_ldRetention_antitone",
+    "Calibrator.ldWhiteningGain_one_lt_iff",
     "Calibrator.ldWhiteningGain_strictMono",
+    "Calibrator.pruning_loses_detection_iff_whiteningGain_exceeds_one",
     "Calibrator.traceWindowSpikeLoad_tendsto_ldWhiteningGain",
     "Calibrator.whitenedCapacity_closedForm",
     "Calibrator.whitenedCapacity_strictAnti"
@@ -13034,12 +13237,20 @@
     "declared_kind": "probability",
     "declared_lo": 0.0,
     "declared_hi": 1.0,
+    "range_lo_thm": [
+     "Calibrator.alleleLossProbability_pos",
+     0
+    ],
     "range_lo": 0,
     "hypotheses": [
      "0 ≤ initial",
      "0 < time",
      "time ≠ 0",
      "0 < initial"
+    ],
+    "range_hi_thm": [
+     "Calibrator.alleleLossProbability_le_one",
+     2
     ],
     "range_hi": 1
    },
@@ -13239,6 +13450,10 @@
     "declared_kind": "R-squared",
     "declared_lo": 0.0,
     "declared_hi": 1.0,
+    "range_lo_thm": [
+     "Calibrator.imputation_error_nonneg",
+     4
+    ],
     "range_lo": 0,
     "hypotheses": [
      "0 ≤ beta_sq",
@@ -13282,6 +13497,14 @@
     "declared_kind": "R-squared",
     "declared_lo": 0.0,
     "declared_hi": 1.0,
+    "range_lo_thm": [
+     "Calibrator.meanImputationR2_mem_unit",
+     2
+    ],
+    "range_hi_thm": [
+     "Calibrator.meanImputationR2_mem_unit",
+     2
+    ],
     "range_lo": 0,
     "range_hi": 1,
     "hypotheses": [
@@ -13326,7 +13549,6 @@
     "declared_kind": "R-squared",
     "declared_lo": 0.0,
     "declared_hi": 1.0,
-    "range_lo": 0,
     "hypotheses": [
      "r2_target_array < r2_target_ideal"
     ]
@@ -13471,6 +13693,10 @@
    "fields": [],
    "equations": [],
    "constraints": {
+    "range_lo_thm": [
+     "Calibrator.imputation_rescaling_cannot_repair_lattice",
+     1
+    ],
     "range_lo": 1,
     "hypotheses": [
      "0 < h",
@@ -13652,17 +13878,35 @@
      "r < 1",
      "0 ≤ r",
      "r ≤ 1",
-     "1 ≤ Ne"
+     "1 ≤ Ne",
+     "0 < spectralTotal (fun i => detectionWeight (ldKernelSymbol (ldRetentionPerGen recomb Ne",
+     "0 < spectralTotal (fun i => reconstructionWeight (ldKernelSymbol (ldRetentionPerGen recomb Ne"
+    ],
+    "range_hi_thm": [
+     "Calibrator.ld_retention_lt_one",
+     3
     ],
     "range_hi": 1,
+    "range_lo_thm": [
+     "Calibrator.ld_retention_nonneg",
+     3
+    ],
     "range_lo": 0
    },
    "mentioned_by": [
+    "Calibrator.clumping_maximizes_reconstruction_on_ld_kernel",
+    "Calibrator.clumping_minimizes_detection_on_ld_kernel",
+    "Calibrator.ldBlockDetectionShare_le_retention",
+    "Calibrator.ldBlockPruningDeficit_antitone_in_recombination",
+    "Calibrator.ldRetentionPerGen_abs_lt_one",
+    "Calibrator.ldRetentionPerGen_strictAnti_recomb",
     "Calibrator.ldRetentionPerGen_uses_timeScale",
+    "Calibrator.ldTightLinkage_le_ldBlockDetectionShare",
     "Calibrator.ldWhiteningGain_of_ldRetention_antitone",
     "Calibrator.ld_decays_with_time",
     "Calibrator.ld_retention_lt_one",
     "Calibrator.ld_retention_nonneg",
+    "Calibrator.pruning_loses_detection_iff_whiteningGain_exceeds_one",
     "Calibrator.stationaryLDEntry_eq_ldAfterGenerations"
    ]
   },
@@ -13749,6 +13993,10 @@
     "declared_kind": "R-squared",
     "declared_lo": 0.0,
     "declared_hi": 1.0,
+    "range_hi_thm": [
+     "Calibrator.tag_r2_le_one",
+     3
+    ],
     "range_hi": 1,
     "hypotheses": [
      "D_sq ≤ var_tag * var_causal",
@@ -13886,6 +14134,14 @@
      "1 - driftLDRetention N_b c ≠ 0",
      "1 - driftLDRetention N_r c ≠ 0"
     ],
+    "range_lo_thm": [
+     "Calibrator.driftLDRetention_mem_unit",
+     3
+    ],
+    "range_hi_thm": [
+     "Calibrator.driftLDRetention_mem_unit",
+     3
+    ],
     "range_lo": 0,
     "range_hi": 1
    },
@@ -13955,7 +14211,15 @@
      "1 - driftLDRetention N_b c ≠ 0",
      "1 - driftLDRetention N_r c ≠ 0"
     ],
+    "range_lo_thm": [
+     "Calibrator.driftLDEquilibrium_nonneg",
+     3
+    ],
     "range_lo": 0,
+    "range_hi_thm": [
+     "Calibrator.driftLDEquilibrium_le_one",
+     3
+    ],
     "range_hi": 1
    },
    "mentioned_by": [
@@ -14056,6 +14320,10 @@
    "fields": [],
    "equations": [],
    "constraints": {
+    "range_lo_thm": [
+     "Calibrator.ld_mismatch_nonneg",
+     0
+    ],
     "range_lo": 0,
     "hypotheses": [
      "∃ i j, (Sig_S - Sig_T"
@@ -14168,6 +14436,10 @@
      "0 < t_b",
      "N_b < N_r"
     ],
+    "range_lo_thm": [
+     "Calibrator.excess_ld_nonneg",
+     4
+    ],
     "range_lo": 0
    },
    "mentioned_by": [
@@ -14211,6 +14483,10 @@
     "units": "per generation",
     "hypotheses": [
      "0 < Ne"
+    ],
+    "range_lo_thm": [
+     "Calibrator.drift_decay_rate_pos",
+     1
     ],
     "range_lo": 0
    },
@@ -14384,6 +14660,10 @@
     "declared_lo": 0.0,
     "declared_hi": 1.0,
     "hypotheses": [],
+    "range_lo_thm": [
+     "Calibrator.expanderAgreementFloor_pos",
+     0
+    ],
     "range_lo": 0
    },
    "mentioned_by": [
@@ -14430,6 +14710,10 @@
      "0 ≤ r2_initial",
      "0 < r2_initial",
      "0 < lambda_total"
+    ],
+    "range_lo_thm": [
+     "Calibrator.portability_nonneg",
+     1
     ],
     "range_lo": 0
    },
@@ -14481,6 +14765,14 @@
      "0 ≤ r",
      "r ≤ 1",
      "0 < t"
+    ],
+    "range_lo_thm": [
+     "Calibrator.ld_decay_in_unit",
+     2
+    ],
+    "range_hi_thm": [
+     "Calibrator.ld_decay_in_unit",
+     2
     ],
     "range_lo": 0,
     "range_hi": 1
@@ -14592,8 +14884,7 @@
     "declared_hi": 1.0,
     "hypotheses": [
      "temporalR2 signalAtTime < 1"
-    ],
-    "range_hi": 1
+    ]
    },
    "mentioned_by": [
     "Calibrator.brier_calibration_worsens_discrimination_stable",
@@ -14847,6 +15138,10 @@
      "0 ≤ t",
      "0 < lambda"
     ],
+    "range_lo_thm": [
+     "Calibrator.staleness_nonneg",
+     2
+    ],
     "range_lo": 0
    },
    "mentioned_by": [
@@ -14884,12 +15179,15 @@
     "declared_kind": "R-squared",
     "declared_lo": 0.0,
     "declared_hi": 1.0,
-    "range_lo": 0,
-    "range_hi": 1,
     "hypotheses": [
      "d.varCondE = d.varYhat",
      "d.varCondE < d.varYhat"
-    ]
+    ],
+    "range_hi_thm": [
+     "Calibrator.R2DecompositionData.r2_le_one",
+     0
+    ],
+    "range_hi": 1
    },
    "mentioned_by": [
     "Calibrator.R2DecompositionData.cal_loss_reduces_r2",
@@ -14950,6 +15248,10 @@
      "d.varCondE = d.varYhat",
      "d.varCondE < d.varYhat"
     ],
+    "range_hi_thm": [
+     "Calibrator.R2DecompositionData.disc_le_one",
+     0
+    ],
     "range_hi": 1
    },
    "mentioned_by": [
@@ -14993,6 +15295,10 @@
     "declared_lo": 0.0,
     "declared_hi": null,
     "hypotheses": [],
+    "range_hi_thm": [
+     "Calibrator.R2DecompositionData.cal_le_one",
+     0
+    ],
     "range_hi": 1
    },
    "mentioned_by": [
@@ -15164,6 +15470,10 @@
      "sourceR2FromSourceWeights m ∈ Set.Ico 0 1",
      "m.targetPrevalence * (1 - m.targetPrevalence"
     ],
+    "range_lo_thm": [
+     "Calibrator.brierDiscriminationLoss_pos_of_mechanistic_r2_drop",
+     1
+    ],
     "range_lo": 0
    },
    "mentioned_by": [
@@ -15225,8 +15535,7 @@
      "πSource * (1 - πSource",
      "targetR2FromSourceWeights m < sourceR2FromSourceWeights m",
      "m.targetPrevalence * (1 - m.targetPrevalence"
-    ],
-    "range_lo": 0
+    ]
    },
    "mentioned_by": [
     "Calibrator.brierCalibrationLoss_eq",
@@ -15378,6 +15687,10 @@
    "fields": [],
    "equations": [],
    "constraints": {
+    "range_lo_thm": [
+     "Calibrator.brier_nonneg",
+     0
+    ],
     "range_lo": 0,
     "hypotheses": []
    },
@@ -15474,7 +15787,9 @@
     "Calibrator.ldBandDetectionShare_lt_retention",
     "Calibrator.ldBandDetectionShare_of_no_ld",
     "Calibrator.ldBandDetectionShare_one",
-    "Calibrator.ldBandDetectionShare_zero"
+    "Calibrator.ldBandDetectionShare_zero",
+    "Calibrator.ldBlockDetectionShare_add_deficit",
+    "Calibrator.ldTightLinkage_le_ldBlockDetectionShare"
    ]
   },
   {
@@ -15505,14 +15820,264 @@
    "equations": [],
    "constraints": {
     "hypotheses": [
-     "0 ≤ decay"
+     "0 ≤ decay",
+     "0 < kappa",
+     "kappa < 1",
+     "0 ≤ kappa",
+     "kappa ≤ 1"
+    ],
+    "range_hi_thm": [
+     "Calibrator.ldPruningDetectionDeficit_le_half_retention",
+     1
     ],
     "range_hi": 2
    },
    "mentioned_by": [
     "Calibrator.ldBandDetectionShare_eq_sub_deficit",
+    "Calibrator.ldBlockDetectionShare_add_deficit",
     "Calibrator.ldPruningDetectionDeficit_half",
-    "Calibrator.ldPruningDetectionDeficit_le_half_retention"
+    "Calibrator.ldPruningDetectionDeficit_le_half_retention",
+    "Calibrator.ldPruningDetectionDeficit_le_sin_div_pi",
+    "Calibrator.ldPruningDetectionDeficit_pos_iff",
+    "Calibrator.ldPruningDetectionDeficit_strictMono",
+    "Calibrator.ldTightLinkage_le_ldBlockDetectionShare"
+   ]
+  },
+  {
+   "name": "Calibrator.ldPanelRetentionFraction",
+   "short": "ldPanelRetentionFraction",
+   "kind": "def",
+   "noncomputable": false,
+   "file": "Calibrator/MetricSpecificPortability.lean",
+   "line": 1375,
+   "signature": "(retainedMarkers totalMarkers : ℕ) : ℝ",
+   "args": [
+    {
+     "names": [
+      "retainedMarkers",
+      "totalMarkers"
+     ],
+     "type": "ℕ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ℝ",
+   "body": "  (retainedMarkers : ℝ) / (totalMarkers : ℝ)",
+   "docstring": "**Fraction of the marker panel retained** by a pruning or clumping pass:\n`retainedMarkers` of `totalMarkers` survive.  This is the rank budget of the\nreduction, expressed in the units a clumping tool reports.\n\nEmpirical status: UNTESTED.",
+   "empirical_status": "UNTESTED",
+   "namespace": "Calibrator",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "declared_kind": "ratio",
+    "declared_lo": 0.0,
+    "declared_hi": 1.0,
+    "range_lo_thm": [
+     "Calibrator.ldPanelRetentionFraction_mem",
+     2
+    ],
+    "range_hi_thm": [
+     "Calibrator.ldPanelRetentionFraction_mem",
+     2
+    ],
+    "range_lo": 0,
+    "range_hi": 1,
+    "hypotheses": [
+     "0 < retainedMarkers",
+     "retainedMarkers < totalMarkers"
+    ]
+   },
+   "mentioned_by": [
+    "Calibrator.ldBlockDetectionShare_add_deficit",
+    "Calibrator.ldBlockDetectionShare_le_retention",
+    "Calibrator.ldPanelRetentionFraction_mem",
+    "Calibrator.ldTightLinkage_le_ldBlockDetectionShare"
+   ]
+  },
+  {
+   "name": "Calibrator.ldBlockReconstructionShare",
+   "short": "ldBlockReconstructionShare",
+   "kind": "def",
+   "noncomputable": false,
+   "file": "Calibrator/MetricSpecificPortability.lean",
+   "line": 1426,
+   "signature": "(recomb Ne : ℝ) (retainedMarkers totalMarkers : ℕ) : ℝ",
+   "args": [
+    {
+     "names": [
+      "recomb",
+      "Ne"
+     ],
+     "type": "ℝ",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "retainedMarkers",
+      "totalMarkers"
+     ],
+     "type": "ℕ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ℝ",
+   "body": "  ldBandReconstructionShare (ldRetentionPerGen recomb Ne)\n    (ldPanelRetentionFraction retainedMarkers totalMarkers)",
+   "docstring": "**Reconstruction share of a clumped panel**, as a function of the\nrecombination rate between adjacent markers, the effective population size, and\nhow many markers survive clumping.\n\nEmpirical status: UNTESTED.",
+   "empirical_status": "UNTESTED",
+   "namespace": "Calibrator",
+   "fields": [],
+   "equations": [],
+   "constraints": {},
+   "mentioned_by": []
+  },
+  {
+   "name": "Calibrator.ldBlockDetectionShare",
+   "short": "ldBlockDetectionShare",
+   "kind": "def",
+   "noncomputable": false,
+   "file": "Calibrator/MetricSpecificPortability.lean",
+   "line": 1437,
+   "signature": "(recomb Ne : ℝ) (retainedMarkers totalMarkers : ℕ) : ℝ",
+   "args": [
+    {
+     "names": [
+      "recomb",
+      "Ne"
+     ],
+     "type": "ℝ",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "retainedMarkers",
+      "totalMarkers"
+     ],
+     "type": "ℕ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ℝ",
+   "body": "  ldBandDetectionShare (ldRetentionPerGen recomb Ne)\n    (ldPanelRetentionFraction retainedMarkers totalMarkers)",
+   "docstring": "**Detection share of a clumped panel**: the fraction of the whitened\ndetection weight — the inverse-LD-kernel trace whose per-variant limit is\n`ImitationRigidity.ldWhiteningGain` — that survives clumping, as a function of\nrecombination rate, effective size and marker counts.\n\nEmpirical status: UNTESTED.",
+   "empirical_status": "UNTESTED",
+   "namespace": "Calibrator",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "declared_kind": "nonnegative",
+    "declared_lo": 0.0,
+    "declared_hi": null,
+    "hypotheses": [
+     "0 ≤ recomb",
+     "recomb ≤ 1",
+     "1 < Ne",
+     "0 < retainedMarkers",
+     "retainedMarkers < totalMarkers"
+    ]
+   },
+   "mentioned_by": [
+    "Calibrator.ldBlockDetectionShare_add_deficit",
+    "Calibrator.ldBlockDetectionShare_le_retention",
+    "Calibrator.ldTightLinkage_le_ldBlockDetectionShare"
+   ]
+  },
+  {
+   "name": "Calibrator.ldBlockPruningDeficit",
+   "short": "ldBlockPruningDeficit",
+   "kind": "def",
+   "noncomputable": false,
+   "file": "Calibrator/MetricSpecificPortability.lean",
+   "line": 1447,
+   "signature": "(recomb Ne : ℝ) (retainedMarkers totalMarkers : ℕ) : ℝ",
+   "args": [
+    {
+     "names": [
+      "recomb",
+      "Ne"
+     ],
+     "type": "ℝ",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "retainedMarkers",
+      "totalMarkers"
+     ],
+     "type": "ℕ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ℝ",
+   "body": "  ldPruningDetectionDeficit (ldRetentionPerGen recomb Ne)\n    (ldPanelRetentionFraction retainedMarkers totalMarkers)",
+   "docstring": "**Detection weight surrendered to clumping**, over and above the fraction of\nmarkers discarded, as a function of recombination rate and effective size.  This\nis the price the frontier puts on the pruning convention.\n\nEmpirical status: UNTESTED.",
+   "empirical_status": "UNTESTED",
+   "namespace": "Calibrator",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [
+     "0 ≤ recomb",
+     "recomb ≤ 1",
+     "1 < Ne",
+     "0 < retainedMarkers",
+     "retainedMarkers < totalMarkers"
+    ],
+    "range_lo_thm": [
+     "Calibrator.pruning_loses_detection_iff_whiteningGain_exceeds_one",
+     5
+    ],
+    "range_lo": 0
+   },
+   "mentioned_by": [
+    "Calibrator.ldBlockDetectionShare_add_deficit",
+    "Calibrator.ldBlockPruningDeficit_antitone_in_recombination",
+    "Calibrator.pruning_loses_detection_iff_whiteningGain_exceeds_one"
+   ]
+  },
+  {
+   "name": "Calibrator.ldTightLinkageDetectionShare",
+   "short": "ldTightLinkageDetectionShare",
+   "kind": "def",
+   "noncomputable": false,
+   "file": "Calibrator/MetricSpecificPortability.lean",
+   "line": 1458,
+   "signature": "(retainedMarkers totalMarkers : ℕ) : ℝ",
+   "args": [
+    {
+     "names": [
+      "retainedMarkers",
+      "totalMarkers"
+     ],
+     "type": "ℕ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ℝ",
+   "body": "  ldPanelRetentionFraction retainedMarkers totalMarkers -\n    Real.sin (Real.pi *\n      ldPanelRetentionFraction retainedMarkers totalMarkers) / Real.pi",
+   "docstring": "**Tight-linkage floor on the detection share**, `κ - sin(πκ)/π`.  It carries\nno recombination rate because it is the value the frontier saturates to as the\nretention approaches one, and `ldTightLinkage_le_ldBlockDetectionShare` shows it\nbounds the detection share at every recombination rate and effective size.\n\nEmpirical status: UNTESTED.",
+   "empirical_status": "UNTESTED",
+   "namespace": "Calibrator",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "declared_kind": "ratio",
+    "declared_lo": 0.0,
+    "declared_hi": 1.0,
+    "hypotheses": [
+     "0 < retainedMarkers",
+     "retainedMarkers < totalMarkers"
+    ]
+   },
+   "mentioned_by": [
+    "Calibrator.ldTightLinkage_le_ldBlockDetectionShare"
    ]
   },
   {
@@ -15555,8 +16120,7 @@
     "hypotheses": [
      "ρ ^ 2 < 1",
      "0 < m"
-    ],
-    "range_lo": 0
+    ]
    },
    "mentioned_by": [
     "Calibrator.effectMutualInformation_at_perfect_correlation",
@@ -15597,6 +16161,10 @@
     "declared_kind": "R-squared",
     "declared_lo": 0.0,
     "declared_hi": 1.0,
+    "range_lo_thm": [
+     "Calibrator.portability_gap_nonneg",
+     4
+    ],
     "range_lo": 0,
     "hypotheses": []
    },
@@ -16263,6 +16831,10 @@
    "fields": [],
    "equations": [],
    "constraints": {
+    "range_hi_thm": [
+     "Calibrator.f1_le_one",
+     4
+    ],
     "range_hi": 1,
     "hypotheses": [
      "0 < precision",
@@ -16539,6 +17111,10 @@
     "declared_kind": "ratio",
     "declared_lo": 0.0,
     "declared_hi": 1.0,
+    "range_lo_thm": [
+     "Calibrator.spectral_correction_residual_bias_lower_bound",
+     4
+    ],
     "range_lo": 2,
     "hypotheses": [
      "ρ ≤ |retention j|",
@@ -16704,6 +17280,10 @@
    "fields": [],
    "equations": [],
    "constraints": {
+    "range_lo_thm": [
+     "Calibrator.ascertainmentAmplification_nonneg",
+     2
+    ],
     "range_lo": 0,
     "hypotheses": []
    },
@@ -16746,8 +17326,7 @@
      "pgsStratificationRiskCoefficient expectedSNPCount Hres effectSD Φ Λ ≠ 0",
      "0 < pgsStratificationRiskCoefficient expectedSNPCount Hres effectSD Φ Λ",
      "0 < effectSD"
-    ],
-    "range_lo": 0
+    ]
    },
    "mentioned_by": [
     "Calibrator.signal_exceeds_threshold_iff_confounding_exceeds_critical",
@@ -17294,7 +17873,51 @@
     "Calibrator.frobeniusForm_spikeOuter",
     "Calibrator.quadForm_spikeOuter",
     "Calibrator.spikeOuter_eq_rankOneCovarianceBump",
+    "Calibrator.traceForm_spikeOuter",
     "Calibrator.varianceNonneg_spikeOuter"
+   ]
+  },
+  {
+   "name": "Calibrator.twoBlock",
+   "short": "twoBlock",
+   "kind": "def",
+   "noncomputable": false,
+   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
+   "line": 168,
+   "signature": "(k : ℕ) (a b : ℝ) : ℕ → ℝ",
+   "args": [
+    {
+     "names": [
+      "k"
+     ],
+     "type": "ℕ",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "a",
+      "b"
+     ],
+     "type": "ℝ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ℕ → ℝ",
+   "body": " fun i => if i < k then a else b",
+   "docstring": "**A two-block sequence**: value `a` on the first `k` indices, `b` after.\n\n    Empirical status: DERIVED (an indexing device; the genotype content is in\n    `subgroupContrast`, which is an instance of it).",
+   "empirical_status": "DERIVED",
+   "namespace": "Calibrator",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": []
+   },
+   "mentioned_by": [
+    "Calibrator.sum_inv_twoBlock",
+    "Calibrator.sum_pow_twoBlock",
+    "Calibrator.sum_twoBlock_apply"
    ]
   },
   {
@@ -17303,7 +17926,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-   "line": 187,
+   "line": 249,
    "signature": "(S : Matrix ι ι ℝ) : Prop",
    "args": [
     {
@@ -17354,7 +17977,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-   "line": 194,
+   "line": 256,
    "signature": "(a : cidx) (v : ι → ℝ) : ℝ",
    "args": [
     {
@@ -17401,6 +18024,7 @@
     "Calibrator.BackgroundClass.not_isNull_spiked_of_active",
     "Calibrator.EquiExit.exitLevels_nonempty",
     "Calibrator.EquiExit.imitationCapacity_eq",
+    "Calibrator.traceWindowBudgetClass_spikeLoad",
     "Calibrator.traceWindowClass_spikeLoad"
    ]
   },
@@ -17410,7 +18034,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-   "line": 200,
+   "line": 262,
    "signature": "(a : cidx) (S₀ : Matrix ι ι ℝ) : ℝ",
    "args": [
     {
@@ -17451,9 +18075,7 @@
      "K'.IsNull S₀",
      "∀ a : cidx, K'.form (f a",
      "∀ a : cidx, K'.bound (f a"
-    ],
-    "range_lo": 0,
-    "range_hi": 1
+    ]
    },
    "mentioned_by": [
     "Calibrator.BackgroundClass.headroom_eq_zero_of_active",
@@ -17466,6 +18088,7 @@
     "Calibrator.EquiExit.form_spiked_eq_bound_add_margin",
     "Calibrator.EquiExit.imitationCapacity_eq",
     "Calibrator.imitationCapacity_eq_whitenedCapacity",
+    "Calibrator.traceWindowBudgetClass_headroom",
     "Calibrator.whitenedCapacity_closedForm",
     "Calibrator.whitenedCapacity_strictAnti"
    ]
@@ -17476,7 +18099,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-   "line": 206,
+   "line": 268,
    "signature": "(a : cidx) (S₀ : Matrix ι ι ℝ) : Prop",
    "args": [
     {
@@ -17523,7 +18146,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-   "line": 213,
+   "line": 275,
    "signature": "(S₀ : Matrix ι ι ℝ) (t : ℝ) (v : ι → ℝ) : Matrix ι ι ℝ",
    "args": [
     {
@@ -17593,7 +18216,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-   "line": 241,
+   "line": 303,
    "signature": "(S₀ : Matrix ι ι ℝ) (support : Set (ι → ℝ)) : Set ℝ",
    "args": [
     {
@@ -17644,7 +18267,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-   "line": 251,
+   "line": 313,
    "signature": "(S₀ : Matrix ι ι ℝ) (support : Set (ι → ℝ)) : ℝ",
    "args": [
     {
@@ -17703,7 +18326,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-   "line": 439,
+   "line": 501,
    "signature": "(A M : Matrix ι ι ℝ) : ℝ",
    "args": [
     {
@@ -17734,12 +18357,94 @@
    ]
   },
   {
+   "name": "Calibrator.traceForm",
+   "short": "traceForm",
+   "kind": "def",
+   "noncomputable": false,
+   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
+   "line": 567,
+   "signature": "(M : Matrix ι ι ℝ) : ℝ",
+   "args": [
+    {
+     "names": [
+      "M"
+     ],
+     "type": "Matrix ι ι ℝ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ℝ",
+   "body": " ∑ i, M i i",
+   "docstring": "**The trace-window functional**: total standardized variance.\n\n    Empirical status: DERIVED (the trace of a matrix; `traceForm_spikeOuter`\n    identifies its spike load with the squared length of the effect vector).",
+   "empirical_status": "DERIVED",
+   "namespace": "Calibrator",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "declared_kind": "nonnegative",
+    "declared_lo": 0.0,
+    "declared_hi": null,
+    "hypotheses": []
+   },
+   "mentioned_by": [
+    "Calibrator.traceForm_add",
+    "Calibrator.traceForm_smul",
+    "Calibrator.traceForm_spikeOuter",
+    "Calibrator.traceWindowBudgetClass_headroom"
+   ]
+  },
+  {
+   "name": "Calibrator.traceWindowBudgetClass",
+   "short": "traceWindowBudgetClass",
+   "kind": "def",
+   "noncomputable": false,
+   "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
+   "line": 594,
+   "signature": "(base : Matrix ι ι ℝ) (budget : ℝ) : BackgroundClass ι Unit where base",
+   "args": [
+    {
+     "names": [
+      "base"
+     ],
+     "type": "Matrix ι ι ℝ",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "budget"
+     ],
+     "type": "ℝ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "BackgroundClass ι Unit where base",
+   "body": " base\n  form := fun _ => traceForm\n  bound := fun _ => budget\n  form_add := fun _ M N => traceForm_add M N\n  form_smul := fun _ c M => traceForm_smul c M",
+   "docstring": "**The trace-window background class**: every legal background carries total\nstandardized variance at most `budget`.\n\n    Empirical status: UNTESTED. `budget` is measurable — it is the trace of the\n    standardized genotype covariance the panel admits as background.",
+   "empirical_status": "UNTESTED",
+   "namespace": "Calibrator",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "declared_kind": "nonnegative",
+    "declared_lo": 0.0,
+    "declared_hi": null,
+    "hypotheses": []
+   },
+   "mentioned_by": [
+    "Calibrator.traceWindowBudgetClass_headroom",
+    "Calibrator.traceWindowBudgetClass_spikeLoad"
+   ]
+  },
+  {
    "name": "Calibrator.EquiExit.margin",
    "short": "margin",
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-   "line": 590,
+   "line": 687,
    "signature": "(E : EquiExit K S₀ support) (t : ℝ) : ℝ",
    "args": [
     {
@@ -17761,7 +18466,7 @@
    ],
    "ret_type": "ℝ",
    "body": "  t * E.load - K.headroom E.binding S₀",
-   "docstring": "**The margin by which a level-`t` alternative overshoots the binding\nconstraint.**  Positive exactly above the capacity; this is the quantity the\nsynthesized test is calibrated against.\n\n    Empirical status: UNTESTED.",
+   "docstring": "**The margin by which a level-`t` alternative overshoots the binding\nconstraint.**  It is positive above the capacity and nonpositive at or below\nit, and it is the quantity the synthesized test is calibrated against.\n\n    Empirical status: UNTESTED.",
    "empirical_status": "UNTESTED",
    "namespace": "Calibrator.EquiExit",
    "fields": [],
@@ -17788,7 +18493,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-   "line": 616,
+   "line": 713,
    "signature": "(E : EquiExit K S₀ support) (t : ℝ) : ℝ",
    "args": [
     {
@@ -17834,7 +18539,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-   "line": 673,
+   "line": 770,
    "signature": "(base A S₀ : Matrix ι ι ℝ) : BackgroundClass ι Unit where base",
    "args": [
     {
@@ -17876,7 +18581,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-   "line": 751,
+   "line": 848,
    "signature": "(decay : ℝ) (nSites : ℕ) : ℝ",
    "args": [
     {
@@ -17921,7 +18626,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-   "line": 771,
+   "line": 868,
    "signature": "(headroom decay : ℝ) : ℝ",
    "args": [
     {
@@ -17959,7 +18664,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-   "line": 855,
+   "line": 952,
    "signature": "(k : ℕ) (ε : ℝ) : ℕ → ℝ",
    "args": [
     {
@@ -17980,7 +18685,7 @@
     }
    ],
    "ret_type": "ℕ → ℝ",
-   "body": " fun i => if i < k then ε else 1",
+   "body": " twoBlock k ε 1",
    "docstring": "**A two-block spectrum**: the first `k` eigenvalues equal `ε`, the rest\nequal `1`.\n\n    Empirical status: DERIVED. A witness construction, not a claim about any\n    real LD matrix; its only role is to be a legal spectrum.",
    "empirical_status": "DERIVED",
    "namespace": "Calibrator",
@@ -17990,8 +18695,7 @@
     "hypotheses": [
      "0 ≤ ε",
      "ε ≤ 1"
-    ],
-    "range_hi": 1
+    ]
    },
    "mentioned_by": [
     "Calibrator.blockSpectrum_moment_gap_le",
@@ -18006,7 +18710,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-   "line": 863,
+   "line": 960,
    "signature": "(m : ℕ) (lam : ℕ → ℝ) (p : ℕ) : ℝ",
    "args": [
     {
@@ -18042,8 +18746,7 @@
    "fields": [],
    "equations": [],
    "constraints": {
-    "hypotheses": [],
-    "range_hi": 1
+    "hypotheses": []
    },
    "mentioned_by": [
     "Calibrator.blockSpectrum_moment_gap_le",
@@ -18057,7 +18760,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-   "line": 873,
+   "line": 970,
    "signature": "(m : ℕ) (lam : ℕ → ℝ) : ℝ",
    "args": [
     {
@@ -18102,7 +18805,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-   "line": 965,
+   "line": 1062,
    "signature": "(n : ℕ) : ℕ → ℝ",
    "args": [
     {
@@ -18138,7 +18841,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-   "line": 970,
+   "line": 1067,
    "signature": "(n : ℕ) : ℕ → ℝ",
    "args": [
     {
@@ -18158,7 +18861,6 @@
    "fields": [],
    "equations": [],
    "constraints": {
-    "range_hi": 1,
     "hypotheses": [
      "0 < n"
     ]
@@ -18175,7 +18877,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-   "line": 975,
+   "line": 1072,
    "signature": "(n : ℕ) : ℕ",
    "args": [
     {
@@ -18195,7 +18897,6 @@
    "fields": [],
    "equations": [],
    "constraints": {
-    "range_hi": 1,
     "hypotheses": [
      "0 < n"
     ]
@@ -18243,6 +18944,14 @@
      "0 < n",
      "0 < M"
     ],
+    "range_lo_thm": [
+     "Calibrator.samplePCOverlapSq_pos_and_lt_one",
+     3
+    ],
+    "range_hi_thm": [
+     "Calibrator.samplePCOverlapSq_pos_and_lt_one",
+     3
+    ],
     "range_lo": 0,
     "range_hi": 1
    },
@@ -18287,6 +18996,14 @@
      "0 < M",
      "bbpProxyThreshold n M < spike₁",
      "bbpProxyThreshold n markers < spike"
+    ],
+    "range_lo_thm": [
+     "Calibrator.samplePCResidualAxisFraction_pos_and_lt_one",
+     3
+    ],
+    "range_hi_thm": [
+     "Calibrator.samplePCResidualAxisFraction_pos_and_lt_one",
+     3
     ],
     "range_lo": 0,
     "range_hi": 1
@@ -18553,6 +19270,10 @@
      "0 < n",
      "0 ≤ F"
     ],
+    "range_hi_thm": [
+     "Calibrator.subthreshold_pc_residual_bias_floor",
+     0
+    ],
     "range_hi": 0
    },
    "mentioned_by": [
@@ -18600,6 +19321,10 @@
      "0 < n",
      "0 < markers",
      "bbpProxyThreshold n markers < spike"
+    ],
+    "range_lo_thm": [
+     "Calibrator.modeledPCResidualSusceptibility_pos_and_lt_uncorrected",
+     5
     ],
     "range_lo": 0
    },
@@ -18956,6 +19681,10 @@
    "fields": [],
    "equations": [],
    "constraints": {
+    "range_lo_thm": [
+     "Calibrator.hl_contrib_nonneg",
+     3
+    ],
     "range_lo": 0,
     "hypotheses": []
    },
@@ -19029,6 +19758,10 @@
     "declared_lo": 0.0,
     "declared_hi": 1.0,
     "hypotheses": [],
+    "range_lo_thm": [
+     "Calibrator.citl_shift_positive_higher_prevalence",
+     3
+    ],
     "range_lo": 0
    },
    "mentioned_by": [
@@ -19442,8 +20175,7 @@
      "m.deploymentInterceptShift = 0",
      "m.prevalenceShift = 0",
      "((m.toMechanisticCalibrationModelAt t"
-    ],
-    "range_hi": 1
+    ]
    },
    "mentioned_by": [
     "Calibrator.CrossPopulationCalibrationShiftModel.target_citl_eq_source_citl_add_shift_budget",
@@ -20115,8 +20847,7 @@
      "m.deploymentInterceptShift = 0",
      "m.prevalenceShift = 0",
      "((m.toMechanisticCalibrationModelAt t"
-    ],
-    "range_hi": 1
+    ]
    },
    "mentioned_by": [
     "Calibrator.CrossPopulationCalibrationShiftModel.target_citl_eq_source_citl_add_shift_budget",
@@ -21208,8 +21939,7 @@
     "declared_hi": 1.0,
     "hypotheses": [
      "0 < π * thresholdBandRate μevent threshold δ + (1 - π"
-    ],
-    "range_lo": 0
+    ]
    },
    "mentioned_by": [
     "Calibrator.nriFromDownwardInterceptRecalibration_eq_band_difference",
@@ -21606,6 +22336,10 @@
      "Finset.univ.sum (fun t => model.discount t * (εWeight t * netBound t + weightBound t * (εEvent t * benefitBound t + eventBound t * εBenefit t + εHarm t",
      "∀ z, treatmentMargin model (predictedPath z"
     ],
+    "range_lo_thm": [
+     "Calibrator.qalyLoss_nonneg",
+     0
+    ],
     "range_lo": 0
    },
    "mentioned_by": [
@@ -21993,7 +22727,6 @@
    "fields": [],
    "equations": [],
    "constraints": {
-    "range_lo": 0,
     "hypotheses": [
      "0 < sens",
      "sens ≤ 1",
@@ -22007,8 +22740,7 @@
      "0 ≤ spec",
      "spec ≤ 1",
      "sens * π * benefit < (1 - spec"
-    ],
-    "range_hi": 0
+    ]
    },
    "mentioned_by": [
     "Calibrator.cost_effectiveness_threshold_exists",
@@ -22275,6 +23007,10 @@
      "model.threshold - trueRisk < c",
      "∀ z, predictedRisk z = trueRisk z"
     ],
+    "range_lo_thm": [
+     "Calibrator.thresholdQalyLoss_nonneg",
+     0
+    ],
     "range_lo": 0
    },
    "mentioned_by": [
@@ -22432,6 +23168,14 @@
     "declared_lo": 0.0,
     "declared_hi": 1.0,
     "hypotheses": [],
+    "range_lo_thm": [
+     "Calibrator.neutral_ratio_in_unit",
+     4
+    ],
+    "range_hi_thm": [
+     "Calibrator.neutral_ratio_in_unit",
+     4
+    ],
     "range_lo": 0,
     "range_hi": 1
    },
@@ -22485,6 +23229,14 @@
      "1 - 1 / (2 * Ne",
      "s_correction < 1 / (2 * Ne",
      "1 ≤ t"
+    ],
+    "range_lo_thm": [
+     "Calibrator.neutralDriftFactor_mem_unit",
+     2
+    ],
+    "range_hi_thm": [
+     "Calibrator.neutralDriftFactor_mem_unit",
+     2
     ],
     "range_lo": 0,
     "range_hi": 1
@@ -22549,6 +23301,14 @@
      "0 < 1 - 1 / (2 * Ne",
      "1 ≤ t"
     ],
+    "range_lo_thm": [
+     "Calibrator.selectedDriftFactor_mem_unit",
+     3
+    ],
+    "range_hi_thm": [
+     "Calibrator.selectedDriftFactor_mem_unit",
+     3
+    ],
     "range_lo": 0,
     "range_hi": 1
    },
@@ -22593,6 +23353,14 @@
     "hypotheses": [
      "0 < driftFactor",
      "driftFactor ≤ 1"
+    ],
+    "range_lo_thm": [
+     "Calibrator.fstFromDriftFactor_mem_unit",
+     2
+    ],
+    "range_hi_thm": [
+     "Calibrator.fstFromDriftFactor_mem_unit",
+     2
     ],
     "range_lo": 0,
     "range_hi": 1
@@ -22649,6 +23417,10 @@
      "∀ i, 0 < sourceSquaredEffect i → fst_neutral ≤ fstCausal i",
      "1 - fst_neutral < causalPortabilityFromLocalFst sourceSquaredEffect fstCausal"
     ],
+    "range_hi_thm": [
+     "Calibrator.causalPortabilityFromLocalFst_le_neutral_of_no_subneutral_effect_locus",
+     3
+    ],
     "range_hi": 1
    },
    "mentioned_by": [
@@ -22688,6 +23460,14 @@
     "declared_lo": 0.0,
     "declared_hi": null,
     "hypotheses": [],
+    "range_lo_thm": [
+     "Calibrator.qst_in_unit",
+     2
+    ],
+    "range_hi_thm": [
+     "Calibrator.qst_in_unit",
+     2
+    ],
     "range_lo": 0,
     "range_hi": 1
    },
@@ -22728,6 +23508,10 @@
     "declared_kind": "F_ST",
     "declared_lo": 0.0,
     "declared_hi": 1.0,
+    "range_lo_thm": [
+     "Calibrator.pgsDriftVariance_one_pop_nonneg",
+     2
+    ],
     "range_lo": 0,
     "hypotheses": [
      "0 ≤ V_A",
@@ -22865,6 +23649,10 @@
      "0 ≤ V_A",
      "0 ≤ fst"
     ],
+    "range_lo_thm": [
+     "Calibrator.expected_pgs_diff_var_nonneg",
+     2
+    ],
     "range_lo": 0
    },
    "mentioned_by": [
@@ -22914,6 +23702,14 @@
      "0 < s",
      "0 < N"
     ],
+    "range_lo_thm": [
+     "Calibrator.effectCorrelation_mem_range",
+     4
+    ],
+    "range_hi_thm": [
+     "Calibrator.effectCorrelation_mem_range",
+     4
+    ],
     "range_lo": -1,
     "range_hi": 1
    },
@@ -22961,6 +23757,14 @@
     "declared_kind": "correlation",
     "declared_lo": -1.0,
     "declared_hi": 1.0,
+    "range_lo_thm": [
+     "Calibrator.effectCorrelation_mem_range",
+     4
+    ],
+    "range_hi_thm": [
+     "Calibrator.effectCorrelation_mem_range",
+     4
+    ],
     "range_lo": -1,
     "range_hi": 1,
     "hypotheses": [
@@ -23056,7 +23860,15 @@
      "0 < sigma_sq_small",
      "sigma_sq_small < sigma_sq_large"
     ],
+    "range_lo_thm": [
+     "Calibrator.spikeAndSlabVariance_nonneg",
+     4
+    ],
     "range_lo": 0,
+    "range_hi_thm": [
+     "Calibrator.spikeAndSlabVariance_neg_off_interval",
+     1
+    ],
     "range_hi": 0
    },
    "mentioned_by": [
@@ -23099,6 +23911,10 @@
     "declared_kind": "nonnegative",
     "declared_lo": 0.0,
     "declared_hi": null,
+    "range_lo_thm": [
+     "Calibrator.effective_polygenicity_ge_one",
+     2
+    ],
     "range_lo": 1,
     "hypotheses": []
    },
@@ -23144,6 +23960,10 @@
     "declared_kind": "nonnegative",
     "declared_lo": 0.0,
     "declared_hi": null,
+    "range_lo_thm": [
+     "Calibrator.effectivePolygenicityOfEffects_mem_Icc",
+     1
+    ],
     "range_lo": 1,
     "hypotheses": [
      "0 < ∑ j, beta j ^ 4"
@@ -23374,6 +24194,10 @@
    "fields": [],
    "equations": [],
    "constraints": {
+    "range_hi_thm": [
+     "Calibrator.SNPArchitecturePortabilityModel.portabilityScore_le_one",
+     1
+    ],
     "range_hi": 1,
     "hypotheses": [
      "0 < model.sourceEffectMass",
@@ -23470,6 +24294,10 @@
     "declared_kind": "nonnegative",
     "declared_lo": 0.0,
     "declared_hi": null,
+    "range_lo_thm": [
+     "Calibrator.meanAbsoluteEffect_nonneg",
+     0
+    ],
     "range_lo": 0,
     "hypotheses": [
      "0 < q"
@@ -23637,6 +24465,10 @@
     "declared_kind": "heritability",
     "declared_lo": 0.0,
     "declared_hi": 1.0,
+    "range_lo_thm": [
+     "Calibrator.enrichment_interpretation",
+     3
+    ],
     "range_lo": 1,
     "hypotheses": [
      "M_region / M_total < α",
@@ -23686,6 +24518,10 @@
     "declared_kind": "F_ST",
     "declared_lo": 0.0,
     "declared_hi": 1.0,
+    "range_hi_thm": [
+     "Calibrator.predicted_le_source",
+     1
+    ],
     "range_hi": 1,
     "hypotheses": [
      "0 < model.sourceEffectMass",
@@ -23933,7 +24769,6 @@
     "declared_kind": "frequency",
     "declared_lo": 0.0,
     "declared_hi": 1.0,
-    "range_lo": 0,
     "hypotheses": [
      "0 < hweMellinDrift q",
      "hweMellinDrift q < Real.log N",
@@ -23941,7 +24776,12 @@
      "0 < q",
      "q ≤ 1 / 8",
      "condensationConstant < hweMellinDrift q"
-    ]
+    ],
+    "range_lo_thm": [
+     "Calibrator.disjoint_design_gaussian_null_below_condensation",
+     6
+    ],
+    "range_lo": 0
    },
    "mentioned_by": [
     "Calibrator.HardyWeinbergModel.mellinDrift_eq",
@@ -23998,6 +24838,10 @@
     "declared_kind": "frequency",
     "declared_lo": 0.0,
     "declared_hi": 1.0,
+    "range_lo_thm": [
+     "Calibrator.additive_score_is_subcritical",
+     2
+    ],
     "range_lo": 1,
     "hypotheses": [
      "0 < hweMellinDrift q",
@@ -24074,8 +24918,16 @@
     "declared_kind": "frequency",
     "declared_lo": 0.0,
     "declared_hi": 1.0,
+    "range_lo_thm": [
+     "Calibrator.latticeCriticalMaf_pos",
+     0
+    ],
     "range_lo": 0,
     "hypotheses": [],
+    "range_hi_thm": [
+     "Calibrator.latticeCriticalMaf_lt_one",
+     0
+    ],
     "range_hi": 1
    },
    "mentioned_by": [
@@ -24177,6 +25029,10 @@
    "equations": [],
    "constraints": {
     "hypotheses": [],
+    "range_lo_thm": [
+     "Calibrator.hardCallLatticeSpan_pos",
+     0
+    ],
     "range_lo": 0
    },
    "mentioned_by": [
@@ -24243,6 +25099,14 @@
     "declared_kind": "F_ST",
     "declared_lo": 0.0,
     "declared_hi": 1.0,
+    "range_lo_thm": [
+     "Calibrator.nei_fst_in_unit",
+     3
+    ],
+    "range_hi_thm": [
+     "Calibrator.nei_fst_in_unit",
+     3
+    ],
     "range_lo": 0,
     "range_hi": 1,
     "hypotheses": [
@@ -24295,6 +25159,10 @@
      "0 < p₂",
      "p₂ < 1"
     ],
+    "range_lo_thm": [
+     "Calibrator.simple_fst_nonneg",
+     4
+    ],
     "range_lo": 0
    },
    "mentioned_by": [
@@ -24333,8 +25201,6 @@
     "declared_kind": "heterozygosity",
     "declared_lo": 0.0,
     "declared_hi": 1.0,
-    "range_lo": 0,
-    "range_hi": 1,
     "hypotheses": [
      "0 ≤ θ"
     ]
@@ -24386,6 +25252,14 @@
      "0 ≤ t",
      "0 < t",
      "100 * Ne < t"
+    ],
+    "range_lo_thm": [
+     "Calibrator.fstFromCoalescenceTime_in_unit",
+     2
+    ],
+    "range_hi_thm": [
+     "Calibrator.fstFromCoalescenceTime_in_unit",
+     2
     ],
     "range_lo": 0,
     "range_hi": 1
@@ -24516,7 +25390,15 @@
      "10 * (m * (1 + s",
      "0 < m"
     ],
+    "range_lo_thm": [
+     "Calibrator.selectionMigrationEquilibrium_ge_of_strong_selection",
+     2
+    ],
     "range_lo": 10,
+    "range_hi_thm": [
+     "Calibrator.selectionMigrationEquilibrium_lt_one",
+     2
+    ],
     "range_hi": 1
    },
    "mentioned_by": [
@@ -24642,6 +25524,10 @@
      "2 ≤ Ne",
      "2 < Ne"
     ],
+    "range_lo_thm": [
+     "Calibrator.fst_drift_nonneg",
+     1
+    ],
     "range_lo": 0
    },
    "mentioned_by": [
@@ -24682,8 +25568,7 @@
      "0 < Ne",
      "0 < μ",
      "2 < scaledMutationRate Ne μ"
-    ],
-    "range_lo": 0
+    ]
    },
    "mentioned_by": [
     "Calibrator.alleleFreqDivergenceRate_eq_scaled",
@@ -24730,9 +25615,7 @@
      "0 < θ",
      "θ < 1",
      "θ ≤ 2 * Ne"
-    ],
-    "range_lo": 0,
-    "range_hi": 1
+    ]
    },
    "mentioned_by": [
     "Calibrator.asymmetricFst_eq_scaled",
@@ -24798,8 +25681,7 @@
      "0 ≤ t",
      "0 < Ne",
      "0 < θ"
-    ],
-    "range_lo": 0
+    ]
    },
    "mentioned_by": [
     "Calibrator.fstMutationDriftTransient_at_zero",
@@ -24840,7 +25722,6 @@
     "declared_lo": 0.0,
     "declared_hi": null,
     "units": "per generation",
-    "range_lo": 0,
     "hypotheses": [
      "0 ≤ θ",
      "0 ≤ t",
@@ -24884,13 +25765,11 @@
     "declared_kind": "nonnegative",
     "declared_lo": 0.0,
     "declared_hi": null,
-    "range_lo": 0,
     "hypotheses": [
      "0 ≤ θ",
      "0 ≤ t",
      "0 < θ"
-    ],
-    "range_hi": 1
+    ]
    },
    "mentioned_by": [
     "Calibrator.sharedLDFraction_decreases_with_time",
@@ -24935,6 +25814,14 @@
      "0 ≤ m",
      "1 < 4 * Ne * m",
      "k < 4 * Ne * m"
+    ],
+    "range_lo_thm": [
+     "Calibrator.island_fst_in_unit_interval",
+     2
+    ],
+    "range_hi_thm": [
+     "Calibrator.island_fst_in_unit_interval",
+     2
     ],
     "range_lo": 0,
     "range_hi": 1
@@ -25035,6 +25922,10 @@
      "0 < Ne",
      "0 < m"
     ],
+    "range_lo_thm": [
+     "Calibrator.steppingStoneCharacteristicLength_pos",
+     2
+    ],
     "range_lo": 0
    },
    "mentioned_by": [
@@ -25072,6 +25963,10 @@
     "declared_kind": "F_ST",
     "declared_lo": 0.0,
     "declared_hi": 1.0,
+    "range_lo_thm": [
+     "Calibrator.continuousSteppingStoneFst_nonneg",
+     2
+    ],
     "range_lo": 0,
     "hypotheses": [
      "0 < L",
@@ -25206,9 +26101,17 @@
     "declared_kind": "frequency",
     "declared_lo": 0.0,
     "declared_hi": 1.0,
+    "range_lo_thm": [
+     "Calibrator.ldCorrelationFromMigration_nonneg",
+     0
+    ],
     "range_lo": 0,
     "hypotheses": [
      "0 ≤ M"
+    ],
+    "range_hi_thm": [
+     "Calibrator.ldCorrelationFromMigration_le_one",
+     1
     ],
     "range_hi": 1
    },
@@ -25317,7 +26220,15 @@
      "2 ≤ Ne",
      "1 ≤ t"
     ],
+    "range_lo_thm": [
+     "Calibrator.fstDerived_nonneg",
+     1
+    ],
     "range_lo": 0,
+    "range_hi_thm": [
+     "Calibrator.fstDerived_lt_one",
+     1
+    ],
     "range_hi": 1
    },
    "mentioned_by": [
@@ -25423,7 +26334,15 @@
      "0 < mu",
      "(1 - 1 / (2 * Ne"
     ],
+    "range_lo_thm": [
+     "Calibrator.hetEquilibrium_pos",
+     2
+    ],
     "range_lo": 0,
+    "range_hi_thm": [
+     "Calibrator.hetEquilibrium_lt_one",
+     2
+    ],
     "range_hi": 1
    },
    "mentioned_by": [
@@ -25627,8 +26546,7 @@
      "0 ≤ θ",
      "2 ≤ Ne",
      "θ ≤ 2 * Ne"
-    ],
-    "range_lo": 0
+    ]
    },
    "mentioned_by": [
     "Calibrator.founderFst_eq_derived",
@@ -25677,7 +26595,15 @@
      "0 < fst",
      "2 * fst < 1"
     ],
+    "range_lo_thm": [
+     "Calibrator.neutralPortability_nonneg",
+     1
+    ],
     "range_lo": 0,
+    "range_hi_thm": [
+     "Calibrator.neutralPortability_mem_unit",
+     3
+    ],
     "range_hi": 1
    },
    "mentioned_by": [
@@ -25729,6 +26655,10 @@
      "0 < fst",
      "2 * fst < 1"
     ],
+    "range_lo_thm": [
+     "Calibrator.stabilizingPortability_nonneg",
+     1
+    ],
     "range_lo": 0
    },
    "mentioned_by": [
@@ -25775,6 +26705,10 @@
      "0 < fst",
      "2 * fst < 1",
      "2 * lam_turn > lam_stab"
+    ],
+    "range_lo_thm": [
+     "Calibrator.diversifyingPortability_nonneg",
+     1
     ],
     "range_lo": 0
    },
@@ -25964,7 +26898,15 @@
      "0 ≤ tau",
      "0 < tau"
     ],
+    "range_lo_thm": [
+     "Calibrator.fst_from_tau_nonneg_of_nonneg",
+     1
+    ],
     "range_lo": 0,
+    "range_hi_thm": [
+     "Calibrator.fst_from_tau_lt_one",
+     1
+    ],
     "range_hi": 1
    },
    "mentioned_by": [
@@ -26124,7 +27066,10 @@
     "hypotheses": [
      "m.t_div = (Nat.floor m.t_div : ℝ"
     ],
-    "range_lo": 0,
+    "range_hi_thm": [
+     "Calibrator.fst_from_tau_lt_one",
+     1
+    ],
     "range_hi": 1
    },
    "mentioned_by": [
@@ -26174,8 +27119,11 @@
     "declared_kind": "F_ST",
     "declared_lo": 0.0,
     "declared_hi": 1.0,
-    "range_lo": 0,
     "hypotheses": [],
+    "range_hi_thm": [
+     "Calibrator.neutral_ratio_in_unit",
+     4
+    ],
     "range_hi": 1
    },
    "mentioned_by": [
@@ -26371,9 +27319,7 @@
    "fields": [],
    "equations": [],
    "constraints": {
-    "hypotheses": [],
-    "range_lo": 0,
-    "range_hi": 4
+    "hypotheses": []
    },
    "mentioned_by": [
     "Calibrator.balanced_allocation_maximizes_total_utility",
@@ -26608,7 +27554,15 @@
      "0 < M",
      "2 * M + 1 ≠ 0"
     ],
+    "range_lo_thm": [
+     "Calibrator.twoDemeIMEquilibriumDelta_pos",
+     1
+    ],
     "range_lo": 0,
+    "range_hi_thm": [
+     "Calibrator.twoDemeIMEquilibriumDelta_lt_one",
+     1
+    ],
     "range_hi": 1
    },
    "mentioned_by": [
@@ -27127,7 +28081,15 @@
     "hypotheses": [
      "0 < N"
     ],
+    "range_lo_thm": [
+     "Calibrator.wrightFisherHeterozygosityLoss_nonneg",
+     1
+    ],
     "range_lo": 0,
+    "range_hi_thm": [
+     "Calibrator.wrightFisherHeterozygosityLoss_lt_one",
+     1
+    ],
     "range_hi": 1
    },
    "mentioned_by": [
@@ -27296,9 +28258,7 @@
      "fst < 1",
      "(1 - fst",
      "0 < presentDayR2 V_A V_E fstS"
-    ],
-    "range_lo": 0,
-    "range_hi": 1
+    ]
    },
    "mentioned_by": [
     "Calibrator.asymmetric_migration_portability_direction",
@@ -27361,6 +28321,10 @@
     "hypotheses": [
      "0 < V_E",
      "0 < vSignal"
+    ],
+    "range_hi_thm": [
+     "Calibrator.environment_mediates_portability",
+     2
     ],
     "range_hi": 1
    },
@@ -27462,7 +28426,6 @@
     "declared_kind": "probability",
     "declared_lo": 0.0,
     "declared_hi": 1.0,
-    "range_lo": 0,
     "hypotheses": [
      "0 < V_A",
      "0 < V_E"
@@ -29150,7 +30113,6 @@
    "fields": [],
    "equations": [],
    "constraints": {
-    "range_hi": 1,
     "hypotheses": []
    },
    "mentioned_by": [
@@ -29208,6 +30170,10 @@
      "m.proxyTaggingSource = 0",
      "m.proxyTaggingTarget = 0",
      "m.novelProxyTaggingTarget = 0"
+    ],
+    "range_lo_thm": [
+     "Calibrator.brokenTaggingResidual_nonneg",
+     0
     ],
     "range_lo": 0
    },
@@ -29274,6 +30240,10 @@
     "declared_lo": 0.0,
     "declared_hi": null,
     "hypotheses": [],
+    "range_lo_thm": [
+     "Calibrator.ancestrySpecificLDResidual_nonneg",
+     0
+    ],
     "range_lo": 0
    },
    "mentioned_by": [
@@ -29338,6 +30308,10 @@
     "declared_lo": 0.0,
     "declared_hi": null,
     "hypotheses": [],
+    "range_lo_thm": [
+     "Calibrator.sourceSpecificOverfitResidual_nonneg",
+     0
+    ],
     "range_lo": 0
    },
    "mentioned_by": [
@@ -29457,6 +30431,10 @@
     "declared_lo": 0.0,
     "declared_hi": 1.0,
     "hypotheses": [],
+    "range_lo_thm": [
+     "Calibrator.irreducibleTargetResidualBurden_nonneg",
+     0
+    ],
     "range_lo": 0
    },
    "mentioned_by": [
@@ -29555,6 +30533,10 @@
     "declared_lo": 0.0,
     "declared_hi": null,
     "hypotheses": [],
+    "range_lo_thm": [
+     "Calibrator.effectiveTargetOutcomeVariance_pos",
+     0
+    ],
     "range_lo": 0
    },
    "mentioned_by": [
@@ -31778,6 +32760,10 @@
     "declared_hi": 1.0,
     "units": "generations",
     "hypotheses": [],
+    "range_lo_thm": [
+     "Calibrator.popgenDrivenProxyGenerationalModel_target_r2_strictly_decreases_at_one",
+     0
+    ],
     "range_lo": 1
    },
    "mentioned_by": [
@@ -31873,7 +32859,6 @@
     "declared_kind": "F_ST",
     "declared_lo": 0.0,
     "declared_hi": 1.0,
-    "range_hi": 1,
     "hypotheses": [
      "0 < V_A",
      "0 < V_E",
@@ -31927,8 +32912,16 @@
      "fstSource < fstTarget",
      "fstTarget < 1"
     ],
+    "range_lo_thm": [
+     "Calibrator.neutral_af_benchmark_bounded_by_fst",
+     3
+    ],
     "range_lo": 0,
-    "range_hi": 3
+    "range_hi_thm": [
+     "Calibrator.neutral_af_benchmark_bounded_by_fst",
+     3
+    ],
+    "range_hi": 1
    },
    "mentioned_by": [
     "Calibrator.neutralAFBenchmarkRatio_cannot_reach_measured",
@@ -31987,6 +32980,10 @@
     "units": "generation",
     "hypotheses": [
      "hetTrajectory Ne mu H₀ t ≠ 0"
+    ],
+    "range_lo_thm": [
+     "Calibrator.hetRatioBetweenBranches_exceeds_benchmark_ceiling",
+     0
     ],
     "range_lo": 3
    },
@@ -32081,7 +33078,6 @@
     "declared_kind": "probability",
     "declared_lo": 0.0,
     "declared_hi": 1.0,
-    "range_lo": 2,
     "hypotheses": [
      "r2 < 1",
      "0 < π",
@@ -32091,8 +33087,7 @@
      "π ≤ 1",
      "0 ≤ r2",
      "r2 ≤ 1"
-    ],
-    "range_hi": 0.25
+    ]
    },
    "mentioned_by": [
     "Calibrator.brierFromR2_strictAnti",
@@ -33554,7 +34549,15 @@
     "declared_lo": 0.0,
     "declared_hi": 1.0,
     "hypotheses": [],
+    "range_lo_thm": [
+     "Calibrator.fstEquilibrium_pos",
+     0
+    ],
     "range_lo": 0,
+    "range_hi_thm": [
+     "Calibrator.fstEquilibrium_lt_one",
+     1
+    ],
     "range_hi": 1
    },
    "mentioned_by": [
@@ -33798,6 +34801,10 @@
      "shared_ld ≤ 1",
      "0 ≤ shared_ld"
     ],
+    "range_hi_thm": [
+     "Calibrator.covarianceDivergence_le_one",
+     2
+    ],
     "range_hi": 1
    },
    "mentioned_by": [
@@ -33849,6 +34856,10 @@
      "shared_ld < 1",
      "0 ≤ fst_drift",
      "0 < shared_ld"
+    ],
+    "range_lo_thm": [
+     "Calibrator.presentDayPGSVarianceMutationDrift_nonneg",
+     3
     ],
     "range_lo": 0
    },
@@ -33991,7 +35002,15 @@
      "fst_observed ≤ fstMigrationDriftEquilibrium Ne m",
      "fstMigrationDriftEquilibrium Ne m < fst_nomial"
     ],
+    "range_lo_thm": [
+     "Calibrator.fstMigrationDriftEquilibrium_pos",
+     2
+    ],
     "range_lo": 0,
+    "range_hi_thm": [
+     "Calibrator.fstMigrationDriftEquilibrium_le_one",
+     2
+    ],
     "range_hi": 1
    },
    "mentioned_by": [
@@ -34134,6 +35153,10 @@
      "0 < m",
      "0 ≤ m"
     ],
+    "range_lo_thm": [
+     "Calibrator.scaledMigrationRate_pos",
+     2
+    ],
     "range_lo": 0
    },
    "mentioned_by": [
@@ -34236,8 +35259,7 @@
      "1 < d",
      "0 ≤ α",
      "1 ≤ d"
-    ],
-    "range_lo": 0
+    ]
    },
    "mentioned_by": [
     "Calibrator.steppingStoneFst_at_one",
@@ -34320,7 +35342,15 @@
      "r2_target ≤ privateArchitectureTransferCeiling h2_target f_private M",
      "0 < M"
     ],
+    "range_lo_thm": [
+     "Calibrator.sharedLDFromMigration_nonneg",
+     1
+    ],
     "range_lo": 0,
+    "range_hi_thm": [
+     "Calibrator.sharedLDFromMigration_lt_one",
+     1
+    ],
     "range_hi": 1
    },
    "mentioned_by": [
@@ -34369,6 +35399,10 @@
      "0 ≤ m",
      "0 < V_A",
      "0 < m"
+    ],
+    "range_lo_thm": [
+     "Calibrator.signalRetentionMigrationDrift_pos",
+     3
     ],
     "range_lo": 0
    },
@@ -34504,7 +35538,15 @@
      "r < 1",
      "equilibrium_ld < admixtureLDDecay r t_since"
     ],
+    "range_lo_thm": [
+     "Calibrator.admixtureLDDecay_nonneg",
+     1
+    ],
     "range_lo": 0,
+    "range_hi_thm": [
+     "Calibrator.admixtureLDDecay_le_one",
+     2
+    ],
     "range_hi": 1
    },
    "mentioned_by": [
@@ -34564,6 +35606,10 @@
     "declared_kind": "ratio",
     "declared_lo": 0.0,
     "declared_hi": 1.0,
+    "range_lo_thm": [
+     "Calibrator.admixtureLDBoost_gt_one",
+     2
+    ],
     "range_lo": 1,
     "hypotheses": [
      "0 < equilibrium_ld",
@@ -34652,7 +35698,15 @@
      "0 ≤ m",
      "0 < m"
     ],
+    "range_lo_thm": [
+     "Calibrator.fstMigDriftEquil_pos",
+     2
+    ],
     "range_lo": 0,
+    "range_hi_thm": [
+     "Calibrator.fstMigDriftEquil_le_one",
+     2
+    ],
     "range_hi": 1
    },
    "mentioned_by": [
@@ -34703,7 +35757,15 @@
      "0 ≤ m",
      "0 < m"
     ],
+    "range_lo_thm": [
+     "Calibrator.neutralAFBenchmarkFromRecurrence_nonneg",
+     2
+    ],
     "range_lo": 0,
+    "range_hi_thm": [
+     "Calibrator.neutralAFBenchmarkFromRecurrence_lt_one",
+     2
+    ],
     "range_hi": 1
    },
    "mentioned_by": [
@@ -34760,6 +35822,10 @@
      "p < 1",
      "0 < n"
     ],
+    "range_lo_thm": [
+     "Calibrator.ncp_nonneg",
+     2
+    ],
     "range_lo": 0
    },
    "mentioned_by": [
@@ -34799,7 +35865,6 @@
     "declared_kind": "probability",
     "declared_lo": 0.0,
     "declared_hi": 1.0,
-    "range_hi": 1,
     "hypotheses": []
    },
    "mentioned_by": [
@@ -34957,7 +36022,11 @@
      "0 ≤ n",
      "delta < n"
     ],
-    "range_hi": 2
+    "range_hi_thm": [
+     "Calibrator.r2_scaling_bounded",
+     2
+    ],
+    "range_hi": 1
    },
    "mentioned_by": [
     "Calibrator.balanced_allocation_maximizes_total_utility",
@@ -35004,6 +36073,7 @@
    },
    "mentioned_by": [
     "Calibrator.gradeCertified_understates_sample_size",
+    "Calibrator.gradeCertified_understates_sample_size_eventually",
     "Calibrator.logRateSampleSize_attains",
     "Calibrator.twoPoint_understates_sample_size"
    ]
@@ -35051,6 +36121,7 @@
    "mentioned_by": [
     "Calibrator.gradeCertifiedSampleSize_attains",
     "Calibrator.gradeCertified_understates_sample_size",
+    "Calibrator.gradeCertified_understates_sample_size_eventually",
     "Calibrator.twoPoint_understates_sample_size"
    ]
   },
@@ -35074,7 +36145,6 @@
     "declared_kind": "probability",
     "declared_lo": 0.0,
     "declared_hi": 1.0,
-    "range_hi": 1,
     "hypotheses": []
    },
    "mentioned_by": [
@@ -35253,6 +36323,10 @@
     "declared_kind": "probability",
     "declared_lo": 0.0,
     "declared_hi": 1.0,
+    "range_hi_thm": [
+     "Calibrator.InformationTheoryBridge.unitProbToNNReal_le_one",
+     0
+    ],
     "range_hi": 1,
     "hypotheses": []
    },
@@ -35535,6 +36609,10 @@
     "hypotheses": [
      "0 < h.altFreq",
      "h.altFreq < 1"
+    ],
+    "range_hi_thm": [
+     "Calibrator.HardyWeinbergModel.refFreq_le_one",
+     1
     ],
     "range_hi": 1
    },
@@ -35964,6 +37042,10 @@
     "declared_kind": "nonnegative",
     "declared_lo": 0.0,
     "declared_hi": null,
+    "range_lo_thm": [
+     "Calibrator.berryEsseenErrorBound_nonneg",
+     3
+    ],
     "range_lo": 0,
     "hypotheses": [
      "0 ≤ berryEsseenConstant",
@@ -36028,6 +37110,10 @@
    "fields": [],
    "equations": [],
    "constraints": {
+    "range_lo_thm": [
+     "Calibrator.berryEsseenErrorBound_nonneg",
+     3
+    ],
     "range_lo": 0,
     "hypotheses": [
      "0 ≤ berryEsseenConstant"
@@ -36209,7 +37295,15 @@
    "equations": [],
    "constraints": {
     "hypotheses": [],
+    "range_lo_thm": [
+     "Calibrator.Phi_nonneg",
+     0
+    ],
     "range_lo": 0,
+    "range_hi_thm": [
+     "Calibrator.Phi_le_one",
+     0
+    ],
     "range_hi": 1
    },
    "mentioned_by": [
@@ -36291,8 +37385,7 @@
    "constraints": {
     "hypotheses": [
      "GaussianNoiseAssumption k"
-    ],
-    "range_hi": 0
+    ]
    },
    "mentioned_by": [
     "Calibrator.liability_threshold_probit_raw",
@@ -36709,7 +37802,6 @@
     "declared_kind": "nonnegative",
     "declared_lo": 0.0,
     "declared_hi": null,
-    "range_lo": 0,
     "hypotheses": [
      "B.mulVec artifact = weightedResidualMoment P densityRatio X residual",
      "∀ f g : Ω → ℝ, P (fun ω => f ω * g ω",
@@ -36887,7 +37979,6 @@
    "fields": [],
    "equations": [],
    "constraints": {
-    "range_lo": 0,
     "hypotheses": [
      "B.mulVec artifact = weightedResidualMoment P densityRatio X residual",
      "0 ≤ coefficientEnergy B artifact",
@@ -36938,6 +38029,7 @@
     "hypotheses": []
    },
    "mentioned_by": [
+    "Calibrator.clumping_minimizes_detection_on_ld_kernel",
     "Calibrator.detectionWeight_strictAnti",
     "Calibrator.detection_threshold_of_variance_threshold",
     "Calibrator.scalarized_optimum_is_coordinate_split",
@@ -36977,6 +38069,7 @@
     "hypotheses": []
    },
    "mentioned_by": [
+    "Calibrator.clumping_maximizes_reconstruction_on_ld_kernel",
     "Calibrator.reconstructionWeight_strictMono",
     "Calibrator.scalarized_optimum_is_coordinate_split",
     "Calibrator.topVariance_maximizes_reconstruction",
@@ -37093,10 +38186,11 @@
    "fields": [],
    "equations": [],
    "constraints": {
-    "range_lo": 0,
     "hypotheses": []
    },
    "mentioned_by": [
+    "Calibrator.clumping_maximizes_reconstruction_on_ld_kernel",
+    "Calibrator.clumping_minimizes_detection_on_ld_kernel",
     "Calibrator.topVariance_maximizes_reconstruction",
     "Calibrator.topVariance_minimizes_detection"
    ]
@@ -37139,6 +38233,7 @@
     ]
    },
    "mentioned_by": [
+    "Calibrator.clumping_maximizes_reconstruction_on_ld_kernel",
     "Calibrator.topVariance_maximizes_reconstruction"
    ]
   },
@@ -37180,6 +38275,7 @@
     ]
    },
    "mentioned_by": [
+    "Calibrator.clumping_minimizes_detection_on_ld_kernel",
     "Calibrator.topVariance_minimizes_detection"
    ]
   },
@@ -37214,6 +38310,8 @@
     "declared_hi": null,
     "hypotheses": [
      "IsRankAllocation (S.card : ℝ",
+     "∀ i ∈ S, Real.cos cutAngle ≤ Real.cos (angle i",
+     "∀ i ∉ S, Real.cos (angle i",
      "∀ i ∈ S, t ≤ spectrum i",
      "∀ i ∉ S, spectrum i ≤ t",
      "∀ i ∈ S, t ≤ lam * reconstructionWeight (spectrum i",
@@ -37221,6 +38319,8 @@
     ]
    },
    "mentioned_by": [
+    "Calibrator.clumping_maximizes_reconstruction_on_ld_kernel",
+    "Calibrator.clumping_minimizes_detection_on_ld_kernel",
     "Calibrator.pruneAllocation_isRankAllocation",
     "Calibrator.scalarized_optimum_is_coordinate_split",
     "Calibrator.spectralCapture_pruneAllocation",
@@ -37550,6 +38650,14 @@
      "mu ≠ 0",
      "0 < h"
     ],
+    "range_lo_thm": [
+     "Calibrator.mutationSelectionBalance_mem_unit",
+     2
+    ],
+    "range_hi_thm": [
+     "Calibrator.mutationSelectionBalance_mem_unit",
+     2
+    ],
     "range_lo": 0,
     "range_hi": 1
    },
@@ -37634,6 +38742,10 @@
      "0 ≤ mu",
      "0 < s"
     ],
+    "range_lo_thm": [
+     "Calibrator.mutationSelectionBalanceRecessive_sq_le",
+     2
+    ],
     "range_lo": 0
    },
    "mentioned_by": [
@@ -37709,6 +38821,10 @@
     "declared_kind": "heritability",
     "declared_lo": 0.0,
     "declared_hi": 1.0,
+    "range_lo_thm": [
+     "Calibrator.overlap_inflation_positive",
+     2
+    ],
     "range_lo": 0,
     "hypotheses": [
      "0 < r2_true",
@@ -37959,8 +39075,7 @@
     "hypotheses": [
      "∀ i, 0 ≤ p i",
      "∀ i, p i ≤ 1"
-    ],
-    "range_lo": 0
+    ]
    },
    "mentioned_by": [
     "Calibrator.pgsVariance_uses_hwe",
@@ -38435,6 +39550,14 @@
      "1 < Ns",
      "tau < t / (-Real.log (effectCorrelationStabilizing Ns"
     ],
+    "range_lo_thm": [
+     "Calibrator.effectCorrelation_mem_range",
+     4
+    ],
+    "range_hi_thm": [
+     "Calibrator.effectCorrelation_mem_range",
+     4
+    ],
     "range_lo": -1,
     "range_hi": 1
    },
@@ -38698,6 +39821,10 @@
      "0 < rho",
      "rho < 1"
     ],
+    "range_lo_thm": [
+     "Calibrator.tauFromObservedEffectCorrelation_pos",
+     3
+    ],
     "range_lo": 0
    },
    "mentioned_by": [
@@ -38748,6 +39875,10 @@
      "0 < rho",
      "rho < 1",
      "stabilizingSelectedArchitectureVariance v_mutation s < v_selected"
+    ],
+    "range_lo_thm": [
+     "Calibrator.sigmaThetaFromObservedSelectedVariance_pos",
+     4
     ],
     "range_lo": 0
    },
@@ -38806,8 +39937,7 @@
     "hypotheses": [
      "∀ i, 0 ≤ β i * Δp i",
      "∃ i, 0 < β i * Δp i"
-    ],
-    "range_lo": 0
+    ]
    },
    "mentioned_by": [
     "Calibrator.neutral_expected_shift_zero",
@@ -38858,8 +39988,7 @@
      "0 < p",
      "p < 1",
      "0 < β"
-    ],
-    "range_lo": 0
+    ]
    },
    "mentioned_by": [
     "Calibrator.gwasNCP_uses_hwe",
@@ -39019,6 +40148,10 @@
     "declared_kind": "nonnegative",
     "declared_lo": 0.0,
     "declared_hi": null,
+    "range_lo_thm": [
+     "Calibrator.missedSelectedVariance_nonneg",
+     0
+    ],
     "range_lo": 0,
     "hypotheses": [
      "summary₁.predictedEffectCorrelation = validation.observedEffectCorrelation",
@@ -39168,7 +40301,6 @@
     "declared_kind": "nonnegative",
     "declared_lo": 0.0,
     "declared_hi": null,
-    "range_lo": 0,
     "hypotheses": [
      "0 < sourceSquaredEffectMass β"
     ]
@@ -39752,6 +40884,10 @@
     "declared_kind": "R-squared",
     "declared_lo": 0.0,
     "declared_hi": 1.0,
+    "range_hi_thm": [
+     "Calibrator.portability_ratio_le_one",
+     2
+    ],
     "range_hi": 1,
     "hypotheses": []
    },
@@ -39789,6 +40925,10 @@
     "declared_kind": "nonnegative",
     "declared_lo": 0.0,
     "declared_hi": null,
+    "range_lo_thm": [
+     "Calibrator.effective_n_pos",
+     1
+    ],
     "range_lo": 0,
     "hypotheses": [
      "0 < se"
@@ -40200,6 +41340,10 @@
     "declared_kind": "nonnegative",
     "declared_lo": 0.0,
     "declared_hi": null,
+    "range_hi_thm": [
+     "Calibrator.ColliderModel.inducedCov_neg",
+     0
+    ],
     "range_hi": 0,
     "hypotheses": []
    },
@@ -40553,15 +41697,13 @@
     "declared_kind": "R-squared",
     "declared_lo": 0.0,
     "declared_hi": 1.0,
-    "range_lo": 0,
     "hypotheses": [
      "0 ≤ Real.sqrt r2_target * Real.sqrt m.h_sq * m.case_mean - T'",
      "0 ≤ T' - Real.sqrt r2_target * Real.sqrt m.h_sq * μ_control",
      "0 ≤ sensFromR2 m r2_target T'",
      "0 ≤ specFromR2 m r2_target T' μ_control",
      "specFromR2 m r2_source T' μ_control ≤ 1"
-    ],
-    "range_hi": 1
+    ]
    },
    "mentioned_by": [
     "Calibrator.afr_needs_more_samples",
@@ -40667,6 +41809,10 @@
     "declared_kind": "R-squared",
     "declared_lo": 0.0,
     "declared_hi": 1.0,
+    "range_lo_thm": [
+     "Calibrator.r2_estimator_variance_pos",
+     3
+    ],
     "range_lo": 0,
     "hypotheses": [
      "0 < r2",
@@ -40785,8 +41931,7 @@
      "0 < sharedLDGeneticVariance β_s ld",
      "0 < sharedLDGeneticVariance β_t ld",
      "sharedLDHeritability β_t ld var_y ≤ sharedLDHeritability β_s ld var_y"
-    ],
-    "range_lo": 0
+    ]
    },
    "mentioned_by": [
     "Calibrator.ldEffectGeneticCorrelation_standardizedDiagonalLD_eq_effectGeneticCorrelation",
@@ -41151,7 +42296,6 @@
     "declared_kind": "correlation",
     "declared_lo": -1.0,
     "declared_hi": 1.0,
-    "range_hi": 1,
     "hypotheses": [
      "0 < ∑ i : Fin m, β_s i ^ 2",
      "0 < ∑ i : Fin m, β_t i ^ 2"
@@ -41246,8 +42390,7 @@
     "declared_hi": null,
     "hypotheses": [
      "0 < additiveGeneticVariance β"
-    ],
-    "range_lo": 0
+    ]
    },
    "mentioned_by": [
     "Calibrator.additiveGeneticVariance_add_of_orthogonal",
@@ -41383,8 +42526,7 @@
     "hypotheses": [
      "0 < var_y",
      "additiveHeritability β_t var_y ≤ additiveHeritability β_s var_y"
-    ],
-    "range_lo": 0
+    ]
    },
    "mentioned_by": [
     "Calibrator.portability_bound_diagonal_ld",
@@ -42339,6 +43481,10 @@
      "0 < gapSq",
      "0 < noiseVar"
     ],
+    "range_hi_thm": [
+     "Calibrator.optimalSourceShrinkageWeight_le_half_iff_target_samples_dominate_gap",
+     3
+    ],
     "range_hi": 1
    },
    "mentioned_by": [
@@ -42776,6 +43922,10 @@
      "tau < metaLearnedTransferGapSq wShared wTarget deviation k₂",
      "∀ j < k₂, ∀ l < k₂, j ≠ l -> dotProduct (deviation j"
     ],
+    "range_lo_thm": [
+     "Calibrator.metaLearnedTransferGapSq_pos",
+     7
+    ],
     "range_lo": 0
    },
    "mentioned_by": [
@@ -43188,6 +44338,10 @@
     "declared_kind": "nonnegative",
     "declared_lo": 0.0,
     "declared_hi": null,
+    "range_lo_thm": [
+     "Calibrator.requiredTargetSamplesForOptimalFineTuningMSE_pos",
+     3
+    ],
     "range_lo": 0,
     "hypotheses": [
      "0 < noiseVar",
@@ -43466,7 +44620,6 @@
     "declared_kind": "nonnegative",
     "declared_lo": 0.0,
     "declared_hi": null,
-    "range_lo": 0,
     "hypotheses": [
      "0 < variance E Y",
      "variance E S = variance E Y * lam",
@@ -43677,6 +44830,10 @@
     "hypotheses": [
      "Integrable (fun x : ℝ × (Fin k → ℝ"
     ],
+    "range_lo_thm": [
+     "Calibrator.normal_solution_minimizes_singular_quadratic_risk",
+     3
+    ],
     "range_lo": 0
    },
    "mentioned_by": [
@@ -43722,6 +44879,8 @@
     "Calibrator.singular_minimizer_kernel_invariance",
     "Calibrator.singular_quadratic_excess_risk_identity",
     "Calibrator.total_shift_energy_le_sum_budget_sq",
+    "Calibrator.traceForm_spikeOuter",
+    "Calibrator.traceWindowBudgetClass_spikeLoad",
     "Calibrator.varianceNonneg_sub_rankOne_iff",
     "Calibrator.weighted_residual_moment_directional_bound"
    ]
@@ -43881,8 +45040,7 @@
      "∀ i, E (fun ω => X ω i",
      "∀ i, E (fun ω => X ω i * (Y ω - dot wStar (X ω",
      "∀ j, E (fun ω => X ω j"
-    ],
-    "range_hi": 1
+    ]
    },
    "mentioned_by": [
     "Calibrator.additive_architecture_weights_agree_across_populations",
@@ -44563,8 +45721,7 @@
     "hypotheses": [
      "∀ p c, f_norm p c = pi_bar + pdgp.pgs_effect * p",
      "∀ c, pdgp.prevalence c = π₀"
-    ],
-    "range_lo": 0
+    ]
    },
    "mentioned_by": [
     "Calibrator.ConfusionMatrix.one_sub_prevalence",
@@ -44641,9 +45798,7 @@
    "fields": [],
    "equations": [],
    "constraints": {
-    "range_lo": 0,
-    "hypotheses": [],
-    "range_hi": 1
+    "hypotheses": []
    },
    "mentioned_by": [
     "Calibrator.ConfusionMatrix.one_sub_prevalence_mul_fpr",
@@ -44679,7 +45834,10 @@
    "fields": [],
    "equations": [],
    "constraints": {
-    "range_lo": 0,
+    "range_hi_thm": [
+     "Calibrator.f1_le_one",
+     4
+    ],
     "range_hi": 1,
     "hypotheses": []
    },
@@ -44763,6 +45921,10 @@
      "logLNull ≤ logLAlt",
      "logLNull < logLAlt"
     ],
+    "range_lo_thm": [
+     "Calibrator.likelihoodRatioStat_nonneg",
+     1
+    ],
     "range_lo": 0
    },
    "mentioned_by": [
@@ -44803,6 +45965,14 @@
     "declared_kind": "heritability",
     "declared_lo": 0.0,
     "declared_hi": 1.0,
+    "range_lo_thm": [
+     "Calibrator.narrow_h2_in_unit",
+     5
+    ],
+    "range_hi_thm": [
+     "Calibrator.narrow_h2_in_unit",
+     5
+    ],
     "range_lo": 0,
     "range_hi": 1,
     "hypotheses": [
@@ -44907,8 +46077,7 @@
     "hypotheses": [
      "∀ i, 0 ≤ p i",
      "∀ i, p i ≤ 1"
-    ],
-    "range_lo": 0
+    ]
    },
    "mentioned_by": [
     "Calibrator.additiveVariance_uses_hwe",
@@ -47338,7 +48507,7 @@
    "kind": "structure",
    "noncomputable": false,
    "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-   "line": 163,
+   "line": 225,
    "signature": "(ι : Type*) [Fintype ι] [DecidableEq ι] (cidx : Type*) where base : Matrix ι ι ℝ form : cidx → Matrix ι ι ℝ → ℝ bound : cidx → ℝ form_add : ∀ (a : cidx) (M N : Matrix ι ι ℝ), form a (M + N) = form a M + form a N form_smul : ∀ (a : cidx) (c : ℝ) (M : Matrix ι ι ℝ), form a (c • M) = c * form a M",
    "args": [
     {
@@ -47415,7 +48584,7 @@
    "kind": "structure",
    "noncomputable": false,
    "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-   "line": 539,
+   "line": 636,
    "signature": "(K : BackgroundClass ι cidx) (S₀ : Matrix ι ι ℝ) (support : Set (ι → ℝ)) where binding : cidx load : ℝ load_pos : 0 < load supported : ∃ v, v ∈ support equi : ∀ v ∈ support, K.spikeLoad binding v = load binds : ∀ (a : cidx) (v : ι → ℝ), v ∈ support → 0 < K.spikeLoad a v → K.headroom binding S₀ / load ≤ K.headroom a S₀ / K.spikeLoad a v",
    "args": [
     {
@@ -47486,7 +48655,7 @@
    "kind": "structure",
    "noncomputable": false,
    "file": "Calibrator/PCCorrectability/ImitationCapacity.lean",
-   "line": 1030,
+   "line": 1127,
    "signature": "where value : ℕ → (ℕ → ℝ) → ℝ order : ℕ modulus : ℝ modulus_nonneg : 0 ≤ modulus moment_lipschitz : ∀ (m : ℕ) (lam mu : ℕ → ℝ) (δ : ℝ), 0 ≤ δ → (∀ p, p ≤ order → |normalizedMoment m lam p - normalizedMoment m mu p| ≤ δ) →",
    "args": [],
    "ret_type": "ℕ → (ℕ → ℝ) → ℝ order : ℕ modulus : ℝ modulus_nonneg : 0 ≤ modulus moment_lipschitz : ∀ (m : ℕ) (lam mu : ℕ → ℝ) (δ : ℝ), 0 ≤ δ → (∀ p, p ≤ order → |normalizedMoment m lam p - normalizedMoment m mu p| ≤ δ) →",

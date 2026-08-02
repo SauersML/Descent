@@ -90,9 +90,14 @@ def pyname(lean: str) -> str:
         else:
             out.append("_u%04x" % ord(c))
     s = "".join(out)
-    if s[0].isdigit():
-        s = "v" + s
+    if s[0].isdigit() or s in _PYKW:
+        s = "v_" + s
     return s
+
+
+import keyword as _kw
+
+_PYKW = set(_kw.kwlist) | {"_b", "backends", "math"}
 
 
 # ---------------------------------------------------------------- parser
@@ -101,11 +106,12 @@ def pyname(lean: str) -> str:
 class Parser:
     """Recursive-descent over the token list, emitting Python source strings."""
 
-    def __init__(self, toks, arity, locals_):
+    def __init__(self, toks, arity, locals_, rename=None):
         self.t = toks
         self.i = 0
         self.arity = arity  # name -> int, for user-defined callables
         self.locals = locals_  # set of bound variable names (arity 0)
+        self.rename = rename or {}  # Lean name -> unique Python identifier
 
     def peek(self, k=0):
         return self.t[self.i + k] if self.i + k < len(self.t) else (None, None)
@@ -246,9 +252,10 @@ class Parser:
                 return self._postfix(pyname(v))
             if v in self.arity:
                 self._pending_arity = self.arity[v]
+                pv = self.rename.get(v, pyname(v))
                 if self._pending_arity == 0:
-                    return self._postfix(pyname(v))
-                return pyname(v)
+                    return self._postfix(pv)
+                return pv
             raise Untranspilable(f"unknown identifier {v}")
         raise Untranspilable(f"unexpected token {v!r}")
 
@@ -259,7 +266,7 @@ class Parser:
         return s
 
 
-def transpile(body: str, params, arity, name=""):
+def transpile(body: str, params, arity, name="", rename=None):
     """Return Python source for `body` given parameter names and known arities.
 
     `arity` maps callable names (user definitions) to argument counts.
@@ -288,11 +295,27 @@ def transpile(body: str, params, arity, name=""):
             toks.append(("op", ":="))
         toks.extend(_tokens(part))
     locals_ = {p for p, _ in params}
-    p = Parser(toks, arity, set(locals_))
+    p = Parser(toks, arity, set(locals_), rename)
     out = p.expr()
     if p.i != len(p.t):
         raise Untranspilable(f"trailing tokens at {p.t[p.i:][:4]}")
     return out
+
+
+def build_rename(defs):
+    """Lean name -> unique Python identifier, per (module, name).
+
+    Names are reused across files, so a single flat namespace collides.  Every
+    definition gets `Module_name`; the caller passes the map for the module it
+    is transpiling, so `hetDecayFactor` in one file cannot bind to the
+    same-named, different-arity definition in another.
+    """
+    per_module = {}
+    for d in defs:
+        per_module.setdefault(d["module"], {})[d["name"]] = (
+            pyname(d["module"] + "_" + d["name"])
+        )
+    return per_module
 
 
 def build_arity(defs, module=None):
@@ -302,11 +325,13 @@ def build_arity(defs, module=None):
     `hetDecayFactor`s).  When transpiling a body from `module`, that module's
     own definition wins, matching Lean's own resolution order.
     """
-    ar = {}
+    ar, rn = {}, {}
     for d in defs:
-        if d["module"] != module:
-            ar.setdefault(d["name"], len(d["params"]))
+        if d["module"] != module and d["name"] not in ar:
+            ar[d["name"]] = len(d["params"])
+            rn[d["name"]] = pyname(d["module"] + "_" + d["name"])
     for d in defs:
         if d["module"] == module:
             ar[d["name"]] = len(d["params"])
-    return ar
+            rn[d["name"]] = pyname(d["module"] + "_" + d["name"])
+    return ar, rn

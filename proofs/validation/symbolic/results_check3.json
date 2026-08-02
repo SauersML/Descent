@@ -1,0 +1,3127 @@
+{
+ "equal_groups": [
+  {
+   "check": "check3_duplicate_body",
+   "arity": 3,
+   "expression": "4*x0**2*x1*x2*(1 - x1)*(1 - x2)",
+   "cross_file": true,
+   "members": [
+    {
+     "fqn": "Calibrator.AncestryCalibration.epistaticVariancePairwise",
+     "name": "epistaticVariancePairwise",
+     "file": "/Users/user/gnomon/proofs/Calibrator/AncestryCalibration.lean",
+     "line": 296,
+     "binders": [
+      "γ",
+      "p₁",
+      "p₂"
+     ],
+     "body": "γ ^ 2 * (2 * p₁ * (1 - p₁)) * (2 * p₂ * (1 - p₂))"
+    },
+    {
+     "fqn": "Calibrator.EpistasisAndNonAdditivity.epistaticVariance",
+     "name": "epistaticVariance",
+     "file": "/Users/user/gnomon/proofs/Calibrator/EpistasisAndNonAdditivity.lean",
+     "line": 126,
+     "binders": [
+      "beta12",
+      "p1",
+      "p2"
+     ],
+     "body": "beta12 ^ 2 * (2 * p1 * (1 - p1)) * (2 * p2 * (1 - p2))"
+    }
+   ]
+  },
+  {
+   "check": "check3_duplicate_body",
+   "arity": 2,
+   "expression": "x0*x1*(1 - x0)",
+   "cross_file": true,
+   "members": [
+    {
+     "fqn": "Calibrator.AncestrySpecificArchitecture.driftVariance",
+     "name": "driftVariance",
+     "file": "/Users/user/gnomon/proofs/Calibrator/AncestrySpecificArchitecture.lean",
+     "line": 74,
+     "binders": [
+      "p0",
+      "fst"
+     ],
+     "body": "p0 * (1 - p0) * fst"
+    },
+    {
+     "fqn": "Calibrator.BayesianPGSTheory.misspecExcessRisk",
+     "name": "misspecExcessRisk",
+     "file": "/Users/user/gnomon/proofs/Calibrator/BayesianPGSTheory.lean",
+     "line": 386,
+     "binders": [
+      "π",
+      "σ_β_sq"
+     ],
+     "body": "π * (1 - π) * σ_β_sq"
+    }
+   ]
+  },
+  {
+   "check": "check3_duplicate_body",
+   "arity": 2,
+   "expression": "x0*x1",
+   "cross_file": true,
+   "members": [
+    {
+     "fqn": "Calibrator.AncestrySpecificArchitecture.gwasHeritability",
+     "name": "gwasHeritability",
+     "file": "/Users/user/gnomon/proofs/Calibrator/AncestrySpecificArchitecture.lean",
+     "line": 213,
+     "binders": [
+      "h2_true",
+      "avg_r2_tag"
+     ],
+     "body": "h2_true * avg_r2_tag"
+    },
+    {
+     "fqn": "Calibrator.AncestrySpecificPower.fisherInformation",
+     "name": "fisherInformation",
+     "file": "/Users/user/gnomon/proofs/Calibrator/AncestrySpecificPower.lean",
+     "line": 74,
+     "binders": [
+      "n",
+      "v"
+     ],
+     "body": "n * v"
+    },
+    {
+     "fqn": "Calibrator.DGP.taggingMismatchScale",
+     "name": "taggingMismatchScale",
+     "file": "/Users/user/gnomon/proofs/Calibrator/DGP.lean",
+     "line": 289,
+     "binders": [
+      "recombRate",
+      "arraySparsity"
+     ],
+     "body": "recombRate * arraySparsity"
+    },
+    {
+     "fqn": "Calibrator.DriftRegime.targetHetOfRetention",
+     "name": "targetHetOfRetention",
+     "file": "/Users/user/gnomon/proofs/Calibrator/DriftRegime.lean",
+     "line": 165,
+     "binders": [
+      "H₀",
+      "r"
+     ],
+     "body": "H₀ * r"
+    },
+    {
+     "fqn": "Calibrator.DriftRegime.targetPgsVarOfRetention",
+     "name": "targetPgsVarOfRetention",
+     "file": "/Users/user/gnomon/proofs/Calibrator/DriftRegime.lean",
+     "line": 168,
+     "binders": [
+      "V_A",
+      "r"
+     ],
+     "body": "V_A * r"
+    },
+    {
+     "fqn": "Calibrator.LongitudinalPortability.secularTrendBias",
+     "name": "secularTrendBias",
+     "file": "/Users/user/gnomon/proofs/Calibrator/LongitudinalPortability.lean",
+     "line": 158,
+     "binders": [
+      "trend_rate",
+      "t"
+     ],
+     "body": "trend_rate * t"
+    },
+    {
+     "fqn": "Calibrator.PCCorrectability.Diagnostic.ancestryGradientSusceptibility",
+     "name": "ancestryGradientSusceptibility",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/Diagnostic.lean",
+     "line": 74,
+     "binders": [
+      "markerAxisVariance",
+      "ancestryVariance"
+     ],
+     "body": "markerAxisVariance * ancestryVariance"
+    },
+    {
+     "fqn": "Calibrator.PolygenicAdaptation.pgsDriftVariance_one_pop",
+     "name": "pgsDriftVariance_one_pop",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicAdaptation.lean",
+     "line": 95,
+     "binders": [
+      "V_A",
+      "fst"
+     ],
+     "body": "fst * V_A"
+    },
+    {
+     "fqn": "Calibrator.PortabilityDrift.pgsVarianceFromHet",
+     "name": "pgsVarianceFromHet",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+     "line": 628,
+     "binders": [
+      "β_sq_sum",
+      "het"
+     ],
+     "body": "β_sq_sum * het"
+    },
+    {
+     "fqn": "Calibrator.PortabilityDrift.covarianceRetention",
+     "name": "covarianceRetention",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+     "line": 4248,
+     "binders": [
+      "freq_corr",
+      "ld_overlap"
+     ],
+     "body": "freq_corr * ld_overlap"
+    }
+   ]
+  },
+  {
+   "check": "check3_duplicate_body",
+   "arity": 2,
+   "expression": "1/(4*x0*x1 + 1)",
+   "cross_file": true,
+   "members": [
+    {
+     "fqn": "Calibrator.AncestrySpecificArchitecture.equilibriumFst",
+     "name": "equilibriumFst",
+     "file": "/Users/user/gnomon/proofs/Calibrator/AncestrySpecificArchitecture.lean",
+     "line": 353,
+     "binders": [
+      "m",
+      "Ne"
+     ],
+     "body": "1 / (1 + 4 * Ne * m)"
+    },
+    {
+     "fqn": "Calibrator.PopulationGeneticsFoundations.islandModelFst",
+     "name": "islandModelFst",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
+     "line": 791,
+     "binders": [
+      "Ne",
+      "m"
+     ],
+     "body": "1 / (1 + 4 * Ne * m)"
+    },
+    {
+     "fqn": "Calibrator.PortabilityDrift.fstMigrationDriftEquilibrium",
+     "name": "fstMigrationDriftEquilibrium",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+     "line": 4569,
+     "binders": [
+      "Ne",
+      "m"
+     ],
+     "body": "1 / (1 + 4 * Ne * m)"
+    },
+    {
+     "fqn": "Calibrator.PortabilityDrift.asymmetricFst",
+     "name": "asymmetricFst",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+     "line": 5002,
+     "binders": [
+      "Ne",
+      "m_into"
+     ],
+     "body": "1 / (1 + 4 * Ne * m_into)"
+    },
+    {
+     "fqn": "Calibrator.PortabilityDrift.fstMigDriftEquil",
+     "name": "fstMigDriftEquil",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+     "line": 5208,
+     "binders": [
+      "Ne",
+      "m"
+     ],
+     "body": "1 / (4 * Ne * m + 1)"
+    }
+   ]
+  },
+  {
+   "check": "check3_duplicate_body",
+   "arity": 1,
+   "expression": "2*x0*(1 - x0)",
+   "cross_file": true,
+   "members": [
+    {
+     "fqn": "Calibrator.AncestrySpecificPower.genotypeVarianceHWE",
+     "name": "genotypeVarianceHWE",
+     "file": "/Users/user/gnomon/proofs/Calibrator/AncestrySpecificPower.lean",
+     "line": 95,
+     "binders": [
+      "p"
+     ],
+     "body": "2 * p * (1 - p)"
+    },
+    {
+     "fqn": "Calibrator.AncestrySpecificPower.hweHeterozygosity",
+     "name": "hweHeterozygosity",
+     "file": "/Users/user/gnomon/proofs/Calibrator/AncestrySpecificPower.lean",
+     "line": 341,
+     "binders": [
+      "p"
+     ],
+     "body": "2 * p * (1 - p)"
+    },
+    {
+     "fqn": "Calibrator.Conventions.hweGenotypeVariance",
+     "name": "hweGenotypeVariance",
+     "file": "/Users/user/gnomon/proofs/Calibrator/Conventions.lean",
+     "line": 86,
+     "binders": [
+      "p"
+     ],
+     "body": "ploidy * p * (1 - p)"
+    }
+   ]
+  },
+  {
+   "check": "check3_duplicate_body",
+   "arity": 3,
+   "expression": "2*x0*x1*x2*(1 - x1)",
+   "cross_file": false,
+   "members": [
+    {
+     "fqn": "Calibrator.AncestrySpecificPower.effectiveFisherInformation",
+     "name": "effectiveFisherInformation",
+     "file": "/Users/user/gnomon/proofs/Calibrator/AncestrySpecificPower.lean",
+     "line": 126,
+     "binders": [
+      "n",
+      "p",
+      "r2_ld"
+     ],
+     "body": "fisherInformation n (genotypeVarianceHWE p) * r2_ld"
+    },
+    {
+     "fqn": "Calibrator.AncestrySpecificPower.effectiveSampleSize",
+     "name": "effectiveSampleSize",
+     "file": "/Users/user/gnomon/proofs/Calibrator/AncestrySpecificPower.lean",
+     "line": 194,
+     "binders": [
+      "n",
+      "p",
+      "r2_ld"
+     ],
+     "body": "n * (2 * p * (1 - p)) * r2_ld"
+    }
+   ]
+  },
+  {
+   "check": "check3_duplicate_body",
+   "arity": 2,
+   "expression": "x0*x1**2",
+   "cross_file": true,
+   "members": [
+    {
+     "fqn": "Calibrator.AncestrySpecificPower.ncp",
+     "name": "ncp",
+     "file": "/Users/user/gnomon/proofs/Calibrator/AncestrySpecificPower.lean",
+     "line": 285,
+     "binders": [
+      "n_eff",
+      "β"
+     ],
+     "body": "n_eff * β ^ 2"
+    },
+    {
+     "fqn": "Calibrator.BayesianPGSTheory.spikeAndSlabPriorVariance",
+     "name": "spikeAndSlabPriorVariance",
+     "file": "/Users/user/gnomon/proofs/Calibrator/BayesianPGSTheory.lean",
+     "line": 368,
+     "binders": [
+      "π",
+      "σ_slab"
+     ],
+     "body": "π * σ_slab ^ 2"
+    }
+   ]
+  },
+  {
+   "check": "check3_duplicate_body",
+   "arity": 2,
+   "expression": "x0/x1",
+   "cross_file": true,
+   "members": [
+    {
+     "fqn": "Calibrator.AncestrySpecificPower.portableFraction",
+     "name": "portableFraction",
+     "file": "/Users/user/gnomon/proofs/Calibrator/AncestrySpecificPower.lean",
+     "line": 415,
+     "binders": [
+      "r2_causal",
+      "r2_total"
+     ],
+     "body": "r2_causal / r2_total"
+    },
+    {
+     "fqn": "Calibrator.CausalInference.proportionMediated",
+     "name": "proportionMediated",
+     "file": "/Users/user/gnomon/proofs/Calibrator/CausalInference.lean",
+     "line": 116,
+     "binders": [
+      "indirect_effect",
+      "total_effect"
+     ],
+     "body": "indirect_effect / total_effect"
+    },
+    {
+     "fqn": "Calibrator.CausalInference.costEffectiveness",
+     "name": "costEffectiveness",
+     "file": "/Users/user/gnomon/proofs/Calibrator/CausalInference.lean",
+     "line": 355,
+     "binders": [
+      "improvement",
+      "cost"
+     ],
+     "body": "improvement / cost"
+    },
+    {
+     "fqn": "Calibrator.CovarianceStructure.numBlocks",
+     "name": "numBlocks",
+     "file": "/Users/user/gnomon/proofs/Calibrator/CovarianceStructure.lean",
+     "line": 251,
+     "binders": [
+      "genome_length",
+      "mean_block_size"
+     ],
+     "body": "genome_length / mean_block_size"
+    },
+    {
+     "fqn": "Calibrator.GeneticArchitectureDiscovery.perCausalLocusSignal",
+     "name": "perCausalLocusSignal",
+     "file": "/Users/user/gnomon/proofs/Calibrator/GeneticArchitectureDiscovery.lean",
+     "line": 358,
+     "binders": [
+      "h2",
+      "k"
+     ],
+     "body": "h2 / k"
+    },
+    {
+     "fqn": "Calibrator.MetricSpecificPortability.adaptationDifficultyIndex",
+     "name": "adaptationDifficultyIndex",
+     "file": "/Users/user/gnomon/proofs/Calibrator/MetricSpecificPortability.lean",
+     "line": 527,
+     "binders": [
+      "nParams",
+      "infoPerSample"
+     ],
+     "body": "nParams / infoPerSample"
+    },
+    {
+     "fqn": "Calibrator.PGSCalibrationTheory.recalibratedCalibrationSlope",
+     "name": "recalibratedCalibrationSlope",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PGSCalibrationTheory.lean",
+     "line": 1450,
+     "binders": [
+      "targetSlope",
+      "fittedSlope"
+     ],
+     "body": "targetSlope / fittedSlope"
+    },
+    {
+     "fqn": "Calibrator.PolygenicArchitecture.expectedSquaredEffect",
+     "name": "expectedSquaredEffect",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicArchitecture.lean",
+     "line": 43,
+     "binders": [
+      "h2",
+      "M"
+     ],
+     "body": "h2 / M"
+    },
+    {
+     "fqn": "Calibrator.SelectionArchitecture.equilibriumEffectVariance",
+     "name": "equilibriumEffectVariance",
+     "file": "/Users/user/gnomon/proofs/Calibrator/SelectionArchitecture.lean",
+     "line": 44,
+     "binders": [
+      "v_mutation",
+      "s"
+     ],
+     "body": "v_mutation / s"
+    },
+    {
+     "fqn": "Calibrator.SelectionArchitecture.stabilizingSelectedArchitectureVariance",
+     "name": "stabilizingSelectedArchitectureVariance",
+     "file": "/Users/user/gnomon/proofs/Calibrator/SelectionArchitecture.lean",
+     "line": 184,
+     "binders": [
+      "v_mutation",
+      "s"
+     ],
+     "body": "equilibriumEffectVariance v_mutation s"
+    },
+    {
+     "fqn": "Calibrator.StatisticalGeneticsMethodology.portabilityRatio",
+     "name": "portabilityRatio",
+     "file": "/Users/user/gnomon/proofs/Calibrator/StatisticalGeneticsMethodology.lean",
+     "line": 74,
+     "binders": [
+      "dr2_target",
+      "dr2_source"
+     ],
+     "body": "dr2_target / dr2_source"
+    },
+    {
+     "fqn": "Calibrator.TransportIdentities.explainableFraction",
+     "name": "explainableFraction",
+     "file": "/Users/user/gnomon/proofs/Calibrator/TransportIdentities.lean",
+     "line": 667,
+     "binders": [
+      "between",
+      "total"
+     ],
+     "body": "between / total"
+    },
+    {
+     "fqn": "Calibrator.VarianceComponents.snpH2",
+     "name": "snpH2",
+     "file": "/Users/user/gnomon/proofs/Calibrator/VarianceComponents.lean",
+     "line": 55,
+     "binders": [
+      "V_A_tagged",
+      "V_P"
+     ],
+     "body": "V_A_tagged / V_P"
+    }
+   ]
+  },
+  {
+   "check": "check3_duplicate_body",
+   "arity": 2,
+   "expression": "x1/(x0 + x1)",
+   "cross_file": true,
+   "members": [
+    {
+     "fqn": "Calibrator.BayesianPGSTheory.optimalShrinkage",
+     "name": "optimalShrinkage",
+     "file": "/Users/user/gnomon/proofs/Calibrator/BayesianPGSTheory.lean",
+     "line": 200,
+     "binders": [
+      "σ_sq",
+      "β_sq"
+     ],
+     "body": "β_sq / (σ_sq + β_sq)"
+    },
+    {
+     "fqn": "Calibrator.ProjectionShiftBounds.wienerWeight",
+     "name": "wienerWeight",
+     "file": "/Users/user/gnomon/proofs/Calibrator/ProjectionShiftBounds.lean",
+     "line": 276,
+     "binders": [
+      "noise",
+      "s"
+     ],
+     "body": "s / (s + noise)"
+    }
+   ]
+  },
+  {
+   "check": "check3_duplicate_body",
+   "arity": 2,
+   "expression": "x0/(x0 + x1)",
+   "cross_file": true,
+   "members": [
+    {
+     "fqn": "Calibrator.BayesianPGSTheory.snpShrinkage",
+     "name": "snpShrinkage",
+     "file": "/Users/user/gnomon/proofs/Calibrator/BayesianPGSTheory.lean",
+     "line": 257,
+     "binders": [
+      "σ",
+      "τ"
+     ],
+     "body": "σ / (σ + τ)"
+    },
+    {
+     "fqn": "Calibrator.DGP.r2FromSignalVariance",
+     "name": "r2FromSignalVariance",
+     "file": "/Users/user/gnomon/proofs/Calibrator/DGP.lean",
+     "line": 2100,
+     "binders": [
+      "vSignal",
+      "vNoise"
+     ],
+     "body": "vSignal / (vSignal + vNoise)"
+    },
+    {
+     "fqn": "Calibrator.PortabilityDrift.expectedR2",
+     "name": "expectedR2",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+     "line": 935,
+     "binders": [
+      "vSignal",
+      "V_E"
+     ],
+     "body": "vSignal / (vSignal + V_E)"
+    },
+    {
+     "fqn": "Calibrator.PowerAnalysis.r2ScalingModel",
+     "name": "r2ScalingModel",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PowerAnalysis.lean",
+     "line": 362,
+     "binders": [
+      "n",
+      "C"
+     ],
+     "body": "n / (n + C)"
+    },
+    {
+     "fqn": "Calibrator.StratificationConfounding.reliabilityRatio",
+     "name": "reliabilityRatio",
+     "file": "/Users/user/gnomon/proofs/Calibrator/StratificationConfounding.lean",
+     "line": 469,
+     "binders": [
+      "r2",
+      "σ2_noise"
+     ],
+     "body": "r2 / (r2 + σ2_noise)"
+    }
+   ]
+  },
+  {
+   "check": "check3_duplicate_body",
+   "arity": 2,
+   "expression": "x0 + x1",
+   "cross_file": true,
+   "members": [
+    {
+     "fqn": "Calibrator.BayesianPGSTheory.posteriorPredictiveVariance",
+     "name": "posteriorPredictiveVariance",
+     "file": "/Users/user/gnomon/proofs/Calibrator/BayesianPGSTheory.lean",
+     "line": 488,
+     "binders": [
+      "residual_var",
+      "estimation_var"
+     ],
+     "body": "residual_var + estimation_var"
+    },
+    {
+     "fqn": "Calibrator.ClinicalUtilityFairness.netReclassificationImprovement",
+     "name": "netReclassificationImprovement",
+     "file": "/Users/user/gnomon/proofs/Calibrator/ClinicalUtilityFairness.lean",
+     "line": 403,
+     "binders": [
+      "event_nri",
+      "nonevent_nri"
+     ],
+     "body": "event_nri + nonevent_nri"
+    },
+    {
+     "fqn": "Calibrator.GeneticArchitectureDiscovery.expectedLinearEffectEstimate",
+     "name": "expectedLinearEffectEstimate",
+     "file": "/Users/user/gnomon/proofs/Calibrator/GeneticArchitectureDiscovery.lean",
+     "line": 326,
+     "binders": [
+      "β_true",
+      "meanEstimationError"
+     ],
+     "body": "β_true + meanEstimationError"
+    },
+    {
+     "fqn": "Calibrator.ImputationPortability.total_portability_loss",
+     "name": "total_portability_loss",
+     "file": "/Users/user/gnomon/proofs/Calibrator/ImputationPortability.lean",
+     "line": 294,
+     "binders": [
+      "loss_genetic",
+      "loss_technical"
+     ],
+     "body": "loss_genetic + loss_technical"
+    },
+    {
+     "fqn": "Calibrator.PGSCalibrationTheory.interceptRecalibrated",
+     "name": "interceptRecalibrated",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PGSCalibrationTheory.lean",
+     "line": 1397,
+     "binders": [
+      "pgs",
+      "new_intercept"
+     ],
+     "body": "new_intercept + pgs"
+    },
+    {
+     "fqn": "Calibrator.Probability.latentLiability",
+     "name": "latentLiability",
+     "file": "/Users/user/gnomon/proofs/Calibrator/Probability.lean",
+     "line": 538,
+     "binders": [
+      "s",
+      "e"
+     ],
+     "body": "s + e"
+    }
+   ]
+  },
+  {
+   "check": "check3_duplicate_body",
+   "arity": 3,
+   "expression": "x0*x2 + x1*(1 - x2)",
+   "cross_file": true,
+   "members": [
+    {
+     "fqn": "Calibrator.ClinicalUtilityFairness.proportionCorrectlyClassified",
+     "name": "proportionCorrectlyClassified",
+     "file": "/Users/user/gnomon/proofs/Calibrator/ClinicalUtilityFairness.lean",
+     "line": 809,
+     "binders": [
+      "sensitivity",
+      "specificity",
+      "prevalence"
+     ],
+     "body": "sensitivity * prevalence + specificity * (1 - prevalence)"
+    },
+    {
+     "fqn": "Calibrator.HaplotypeTheory.ancestrySpecificEffect",
+     "name": "ancestrySpecificEffect",
+     "file": "/Users/user/gnomon/proofs/Calibrator/HaplotypeTheory.lean",
+     "line": 620,
+     "binders": [
+      "beta_pop1",
+      "beta_pop2",
+      "alpha"
+     ],
+     "body": "alpha * beta_pop1 + (1 - alpha) * beta_pop2"
+    },
+    {
+     "fqn": "Calibrator.HaplotypeTheory.globalAncestryAveragedEffect",
+     "name": "globalAncestryAveragedEffect",
+     "file": "/Users/user/gnomon/proofs/Calibrator/HaplotypeTheory.lean",
+     "line": 636,
+     "binders": [
+      "beta₁",
+      "beta₂",
+      "alpha"
+     ],
+     "body": "ancestrySpecificEffect beta₁ beta₂ alpha"
+    }
+   ]
+  },
+  {
+   "check": "check3_duplicate_body",
+   "arity": 2,
+   "expression": "1/(x0*x1)",
+   "cross_file": true,
+   "members": [
+    {
+     "fqn": "Calibrator.ClinicalUtilityFairness.numberNeededToScreen",
+     "name": "numberNeededToScreen",
+     "file": "/Users/user/gnomon/proofs/Calibrator/ClinicalUtilityFairness.lean",
+     "line": 955,
+     "binders": [
+      "sens",
+      "π"
+     ],
+     "body": "1 / (sens * π)"
+    },
+    {
+     "fqn": "Calibrator.HaplotypeTheory.expectedSegmentLength",
+     "name": "expectedSegmentLength",
+     "file": "/Users/user/gnomon/proofs/Calibrator/HaplotypeTheory.lean",
+     "line": 680,
+     "binders": [
+      "g",
+      "r_total"
+     ],
+     "body": "1 / (g * r_total)"
+    }
+   ]
+  },
+  {
+   "check": "check3_duplicate_body",
+   "arity": 2,
+   "expression": "(-x0 + x1)**2",
+   "cross_file": true,
+   "members": [
+    {
+     "fqn": "Calibrator.Conclusions.brierScore",
+     "name": "brierScore",
+     "file": "/Users/user/gnomon/proofs/Calibrator/Conclusions.lean",
+     "line": 49,
+     "binders": [
+      "p",
+      "y"
+     ],
+     "body": "(y - p) ^ 2"
+    },
+    {
+     "fqn": "Calibrator.MetricSpecificPortability.brierScoreMetric",
+     "name": "brierScoreMetric",
+     "file": "/Users/user/gnomon/proofs/Calibrator/MetricSpecificPortability.lean",
+     "line": 1021,
+     "binders": [
+      "p",
+      "y"
+     ],
+     "body": "brierScore p y"
+    },
+    {
+     "fqn": "Calibrator.PortabilityDrift.brierRegretPoint",
+     "name": "brierRegretPoint",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+     "line": 3879,
+     "binders": [
+      "η",
+      "q"
+     ],
+     "body": "brierBernoulliRisk η q - brierBernoulliRisk η η"
+    }
+   ]
+  },
+  {
+   "check": "check3_duplicate_body",
+   "arity": 2,
+   "expression": "-x0*log(x1) - (1 - x0)*log(1 - x1)",
+   "cross_file": false,
+   "members": [
+    {
+     "fqn": "Calibrator.Conclusions.bernoulliLogLoss",
+     "name": "bernoulliLogLoss",
+     "file": "/Users/user/gnomon/proofs/Calibrator/Conclusions.lean",
+     "line": 457,
+     "binders": [
+      "p",
+      "q"
+     ],
+     "body": "-(p * Real.log q + (1 - p) * Real.log (1 - q))"
+    },
+    {
+     "fqn": "Calibrator.Conclusions.logBernoulliRisk",
+     "name": "logBernoulliRisk",
+     "file": "/Users/user/gnomon/proofs/Calibrator/Conclusions.lean",
+     "line": 859,
+     "binders": [
+      "η",
+      "q"
+     ],
+     "body": "bernoulliLogLoss η q"
+    }
+   ]
+  },
+  {
+   "check": "check3_duplicate_body",
+   "arity": 1,
+   "expression": "2*x0",
+   "cross_file": true,
+   "members": [
+    {
+     "fqn": "Calibrator.Conventions.coalescentTimeScale",
+     "name": "coalescentTimeScale",
+     "file": "/Users/user/gnomon/proofs/Calibrator/Conventions.lean",
+     "line": 90,
+     "binders": [
+      "Ne"
+     ],
+     "body": "ploidy * Ne"
+    },
+    {
+     "fqn": "Calibrator.DGP.ldBreakageRate",
+     "name": "ldBreakageRate",
+     "file": "/Users/user/gnomon/proofs/Calibrator/DGP.lean",
+     "line": 2354,
+     "binders": [
+      "r"
+     ],
+     "body": "2 * r"
+    }
+   ]
+  },
+  {
+   "check": "check3_duplicate_body",
+   "arity": 2,
+   "expression": "x0/2 + x1/2",
+   "cross_file": true,
+   "members": [
+    {
+     "fqn": "Calibrator.Conventions.meanAlleleFreq",
+     "name": "meanAlleleFreq",
+     "file": "/Users/user/gnomon/proofs/Calibrator/Conventions.lean",
+     "line": 133,
+     "binders": [
+      "p₁",
+      "p₂"
+     ],
+     "body": "(p₁ + p₂) / 2"
+    },
+    {
+     "fqn": "Calibrator.PopulationGeneticsFoundations.effectiveMigration",
+     "name": "effectiveMigration",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
+     "line": 988,
+     "binders": [
+      "m₁₂",
+      "m₂₁"
+     ],
+     "body": "(m₁₂ + m₂₁) / 2"
+    },
+    {
+     "fqn": "Calibrator.PortabilityDrift.effectiveSymmetricMigration",
+     "name": "effectiveSymmetricMigration",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+     "line": 5043,
+     "binders": [
+      "m₁₂",
+      "m₂₁"
+     ],
+     "body": "(m₁₂ + m₂₁) / 2"
+    }
+   ]
+  },
+  {
+   "check": "check3_duplicate_body",
+   "arity": 2,
+   "expression": "(x0 - x1)**2/4",
+   "cross_file": true,
+   "members": [
+    {
+     "fqn": "Calibrator.Conventions.betweenSubgroupVariance",
+     "name": "betweenSubgroupVariance",
+     "file": "/Users/user/gnomon/proofs/Calibrator/Conventions.lean",
+     "line": 167,
+     "binders": [
+      "p₁",
+      "p₂"
+     ],
+     "body": "(p₁ - p₂) ^ 2 / 4"
+    },
+    {
+     "fqn": "Calibrator.ImitationRigidity.fairTwoPointVariance",
+     "name": "fairTwoPointVariance",
+     "file": "/Users/user/gnomon/proofs/Calibrator/ImitationRigidity.lean",
+     "line": 262,
+     "binders": [
+      "a",
+      "b"
+     ],
+     "body": "(a - b) ^ 2 / 4"
+    }
+   ]
+  },
+  {
+   "check": "check3_duplicate_body",
+   "arity": 3,
+   "expression": "x0*x1 + x2*(1 - x0)",
+   "cross_file": true,
+   "members": [
+    {
+     "fqn": "Calibrator.Conventions.convexMix",
+     "name": "convexMix",
+     "file": "/Users/user/gnomon/proofs/Calibrator/Conventions.lean",
+     "line": 696,
+     "binders": [
+      "α",
+      "x",
+      "y"
+     ],
+     "body": "α * x + (1 - α) * y"
+    },
+    {
+     "fqn": "Calibrator.DemographicHistory.admixedAlleleFreq",
+     "name": "admixedAlleleFreq",
+     "file": "/Users/user/gnomon/proofs/Calibrator/DemographicHistory.lean",
+     "line": 351,
+     "binders": [
+      "α",
+      "p_A",
+      "p_B"
+     ],
+     "body": "α * p_A + (1 - α) * p_B"
+    },
+    {
+     "fqn": "Calibrator.HaplotypeTheory.averagePhaseInteraction",
+     "name": "averagePhaseInteraction",
+     "file": "/Users/user/gnomon/proofs/Calibrator/HaplotypeTheory.lean",
+     "line": 201,
+     "binders": [
+      "freq_cis",
+      "interaction_cis",
+      "interaction_trans"
+     ],
+     "body": "freq_cis * interaction_cis + (1 - freq_cis) * interaction_trans"
+    },
+    {
+     "fqn": "Calibrator.PolygenicArchitecture.spikeAndSlabVariance",
+     "name": "spikeAndSlabVariance",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicArchitecture.lean",
+     "line": 62,
+     "binders": [
+      "pi",
+      "sigma_sq_large",
+      "sigma_sq_small"
+     ],
+     "body": "pi * sigma_sq_large + (1 - pi) * sigma_sq_small"
+    }
+   ]
+  },
+  {
+   "check": "check3_duplicate_body",
+   "arity": 2,
+   "expression": "(1 - x0)**x1",
+   "cross_file": true,
+   "members": [
+    {
+     "fqn": "Calibrator.Conventions.geometricDecay",
+     "name": "geometricDecay",
+     "file": "/Users/user/gnomon/proofs/Calibrator/Conventions.lean",
+     "line": 716,
+     "binders": [
+      "r",
+      "t"
+     ],
+     "body": "(1 - r) ^ t"
+    },
+    {
+     "fqn": "Calibrator.DGP.discreteRecombinationSurvival",
+     "name": "discreteRecombinationSurvival",
+     "file": "/Users/user/gnomon/proofs/Calibrator/DGP.lean",
+     "line": 306,
+     "binders": [
+      "recombRate",
+      "tmrca"
+     ],
+     "body": "(1 - recombRate) ^ tmrca"
+    },
+    {
+     "fqn": "Calibrator.LongitudinalPortability.ldDecayPerGeneration",
+     "name": "ldDecayPerGeneration",
+     "file": "/Users/user/gnomon/proofs/Calibrator/LongitudinalPortability.lean",
+     "line": 108,
+     "binders": [
+      "r",
+      "t"
+     ],
+     "body": "(1 - r) ^ t"
+    },
+    {
+     "fqn": "Calibrator.PortabilityDrift.admixtureLDDecay",
+     "name": "admixtureLDDecay",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+     "line": 5064,
+     "binders": [
+      "r",
+      "generations_since"
+     ],
+     "body": "(1 - r) ^ generations_since"
+    }
+   ]
+  },
+  {
+   "check": "check3_duplicate_body",
+   "arity": 2,
+   "expression": "-x0/x1 + 1",
+   "cross_file": true,
+   "members": [
+    {
+     "fqn": "Calibrator.Conventions.oneMinusRatio",
+     "name": "oneMinusRatio",
+     "file": "/Users/user/gnomon/proofs/Calibrator/Conventions.lean",
+     "line": 733,
+     "binders": [
+      "a",
+      "b"
+     ],
+     "body": "1 - a / b"
+    },
+    {
+     "fqn": "Calibrator.DGP.r2FromMSE",
+     "name": "r2FromMSE",
+     "file": "/Users/user/gnomon/proofs/Calibrator/DGP.lean",
+     "line": 176,
+     "binders": [
+      "mse",
+      "varY"
+     ],
+     "body": "1 - mse / varY"
+    },
+    {
+     "fqn": "Calibrator.PopulationGeneticsFoundations.fstFromHetRatio",
+     "name": "fstFromHetRatio",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
+     "line": 1378,
+     "binders": [
+      "H",
+      "H₀"
+     ],
+     "body": "1 - H / H₀"
+    },
+    {
+     "fqn": "Calibrator.PortabilityDrift.hudsonFstFromCoalescenceTimes",
+     "name": "hudsonFstFromCoalescenceTimes",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+     "line": 236,
+     "binders": [
+      "ETss",
+      "ETst"
+     ],
+     "body": "1 - ETss / ETst"
+    }
+   ]
+  },
+  {
+   "check": "check3_duplicate_body",
+   "arity": 2,
+   "expression": "x1*(1 - x0)",
+   "cross_file": true,
+   "members": [
+    {
+     "fqn": "Calibrator.Conventions.retainedFraction",
+     "name": "retainedFraction",
+     "file": "/Users/user/gnomon/proofs/Calibrator/Conventions.lean",
+     "line": 762,
+     "binders": [
+      "loss",
+      "total"
+     ],
+     "body": "(1 - loss) * total"
+    },
+    {
+     "fqn": "Calibrator.ImputationPortability.ascertainment_loss",
+     "name": "ascertainment_loss",
+     "file": "/Users/user/gnomon/proofs/Calibrator/ImputationPortability.lean",
+     "line": 258,
+     "binders": [
+      "coverage",
+      "v_causal"
+     ],
+     "body": "(1 - coverage) * v_causal"
+    },
+    {
+     "fqn": "Calibrator.PhenomeWidePortability.neutralPortabilityRatioLD",
+     "name": "neutralPortabilityRatioLD",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PhenomeWidePortability.lean",
+     "line": 37,
+     "binders": [
+      "fst_additional",
+      "ld_factor"
+     ],
+     "body": "(1 - fst_additional) * ld_factor"
+    }
+   ]
+  },
+  {
+   "check": "check3_duplicate_body",
+   "arity": 3,
+   "expression": "x0**2/(x1*x2)",
+   "cross_file": true,
+   "members": [
+    {
+     "fqn": "Calibrator.DGP.explainedR2FromTransportMoments",
+     "name": "explainedR2FromTransportMoments",
+     "file": "/Users/user/gnomon/proofs/Calibrator/DGP.lean",
+     "line": 182,
+     "binders": [
+      "scoreOutcomeCov",
+      "scoreVariance",
+      "outcomeVariance"
+     ],
+     "body": "scoreOutcomeCov ^ 2 / (scoreVariance * outcomeVariance)"
+    },
+    {
+     "fqn": "Calibrator.TransferLearningPGS.pgsR2",
+     "name": "pgsR2",
+     "file": "/Users/user/gnomon/proofs/Calibrator/TransferLearningPGS.lean",
+     "line": 77,
+     "binders": [
+      "cov_pgs_y",
+      "var_pgs",
+      "var_y"
+     ],
+     "body": "cov_pgs_y ^ 2 / (var_pgs * var_y)"
+    }
+   ]
+  },
+  {
+   "check": "check3_duplicate_body",
+   "arity": 2,
+   "expression": "x0*(1 - x0)*(1 - x1)",
+   "cross_file": true,
+   "members": [
+    {
+     "fqn": "Calibrator.DGP.calibratedBrier",
+     "name": "calibratedBrier",
+     "file": "/Users/user/gnomon/proofs/Calibrator/DGP.lean",
+     "line": 2108,
+     "binders": [
+      "π",
+      "r2"
+     ],
+     "body": "π * (1 - π) * (1 - r2)"
+    },
+    {
+     "fqn": "Calibrator.PortabilityDrift.exactCalibratedBrierRiskFromR2",
+     "name": "exactCalibratedBrierRiskFromR2",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+     "line": 3065,
+     "binders": [
+      "π",
+      "r2"
+     ],
+     "body": "π * (1 - π) * (1 - r2)"
+    },
+    {
+     "fqn": "Calibrator.PortabilityDrift.brierFromR2",
+     "name": "brierFromR2",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+     "line": 3070,
+     "binders": [
+      "π",
+      "r2"
+     ],
+     "body": "exactCalibratedBrierRiskFromR2 π r2"
+    },
+    {
+     "fqn": "Calibrator.PortabilityDrift.sourceBrierFromR2",
+     "name": "sourceBrierFromR2",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+     "line": 3087,
+     "binders": [
+      "π",
+      "r2Source"
+     ],
+     "body": "exactCalibratedBrierRiskFromR2 π r2Source"
+    }
+   ]
+  },
+  {
+   "check": "check3_duplicate_body",
+   "arity": 1,
+   "expression": "1/(2*x0)",
+   "cross_file": true,
+   "members": [
+    {
+     "fqn": "Calibrator.DemographicHistory.driftLDCreationRate",
+     "name": "driftLDCreationRate",
+     "file": "/Users/user/gnomon/proofs/Calibrator/DemographicHistory.lean",
+     "line": 636,
+     "binders": [
+      "Ne"
+     ],
+     "body": "1 / (2 * Ne)"
+    },
+    {
+     "fqn": "Calibrator.LDDecayTheory.ldDecayRatePerGen",
+     "name": "ldDecayRatePerGen",
+     "file": "/Users/user/gnomon/proofs/Calibrator/LDDecayTheory.lean",
+     "line": 813,
+     "binders": [
+      "Ne"
+     ],
+     "body": "1 / (2 * Ne)"
+    }
+   ]
+  },
+  {
+   "check": "check3_duplicate_body",
+   "arity": 2,
+   "expression": "(1 - 1/(2*x0))**x1",
+   "cross_file": true,
+   "members": [
+    {
+     "fqn": "Calibrator.DriftRegime.driftRetention",
+     "name": "driftRetention",
+     "file": "/Users/user/gnomon/proofs/Calibrator/DriftRegime.lean",
+     "line": 159,
+     "binders": [
+      "Ne",
+      "t"
+     ],
+     "body": "(1 - 1 / (2 * Ne)) ^ t"
+    },
+    {
+     "fqn": "Calibrator.LDDecayTheory.ldRetainedFraction",
+     "name": "ldRetainedFraction",
+     "file": "/Users/user/gnomon/proofs/Calibrator/LDDecayTheory.lean",
+     "line": 873,
+     "binders": [
+      "Ne",
+      "t"
+     ],
+     "body": "(1 - 1/(2 * Ne)) ^ t"
+    },
+    {
+     "fqn": "Calibrator.PhenomeWidePortability.neutralDriftFactor",
+     "name": "neutralDriftFactor",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PhenomeWidePortability.lean",
+     "line": 106,
+     "binders": [
+      "Ne",
+      "t"
+     ],
+     "body": "(1 - 1 / (2 * Ne)) ^ t"
+    }
+   ]
+  },
+  {
+   "check": "check3_duplicate_body",
+   "arity": 1,
+   "expression": "1 - x0",
+   "cross_file": true,
+   "members": [
+    {
+     "fqn": "Calibrator.DriftRegime.lossOfRetention",
+     "name": "lossOfRetention",
+     "file": "/Users/user/gnomon/proofs/Calibrator/DriftRegime.lean",
+     "line": 162,
+     "binders": [
+      "r"
+     ],
+     "body": "1 - r"
+    },
+    {
+     "fqn": "Calibrator.PhenomeWidePortability.fstFromDriftFactor",
+     "name": "fstFromDriftFactor",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PhenomeWidePortability.lean",
+     "line": 154,
+     "binders": [
+      "driftFactor"
+     ],
+     "body": "1 - driftFactor"
+    },
+    {
+     "fqn": "Calibrator.PortabilityDrift.freqCorrFromFst",
+     "name": "freqCorrFromFst",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+     "line": 4258,
+     "binders": [
+      "fst"
+     ],
+     "body": "1 - fst"
+    }
+   ]
+  },
+  {
+   "check": "check3_duplicate_body",
+   "arity": 2,
+   "expression": "(1 - x1)/(1 - x0)",
+   "cross_file": true,
+   "members": [
+    {
+     "fqn": "Calibrator.DriftRegime.benchmarkRatio",
+     "name": "benchmarkRatio",
+     "file": "/Users/user/gnomon/proofs/Calibrator/DriftRegime.lean",
+     "line": 227,
+     "binders": [
+      "fstS",
+      "fstT"
+     ],
+     "body": "(1 - fstT) / (1 - fstS)"
+    },
+    {
+     "fqn": "Calibrator.PortabilityDrift.neutralAFBenchmarkRatio",
+     "name": "neutralAFBenchmarkRatio",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+     "line": 2982,
+     "binders": [
+      "fstSource",
+      "fstTarget"
+     ],
+     "body": "(1 - fstTarget) / (1 - fstSource)"
+    }
+   ]
+  },
+  {
+   "check": "check3_duplicate_body",
+   "arity": 3,
+   "expression": "x0 + x1*x2",
+   "cross_file": true,
+   "members": [
+    {
+     "fqn": "Calibrator.GeneEnvironmentInterplay.effectiveGeneticEffect",
+     "name": "effectiveGeneticEffect",
+     "file": "/Users/user/gnomon/proofs/Calibrator/GeneEnvironmentInterplay.lean",
+     "line": 43,
+     "binders": [
+      "β_G",
+      "β_GxE",
+      "E_mean"
+     ],
+     "body": "β_G + β_GxE * E_mean"
+    },
+    {
+     "fqn": "Calibrator.GeneEnvironmentInterplay.linearNormOfReaction",
+     "name": "linearNormOfReaction",
+     "file": "/Users/user/gnomon/proofs/Calibrator/GeneEnvironmentInterplay.lean",
+     "line": 258,
+     "binders": [
+      "a",
+      "b",
+      "E"
+     ],
+     "body": "a + b * E"
+    },
+    {
+     "fqn": "Calibrator.SampleOverlapBias.kinshipInflation",
+     "name": "kinshipInflation",
+     "file": "/Users/user/gnomon/proofs/Calibrator/SampleOverlapBias.lean",
+     "line": 212,
+     "binders": [
+      "r2_true",
+      "K",
+      "h2_family"
+     ],
+     "body": "r2_true + K * h2_family"
+    }
+   ]
+  },
+  {
+   "check": "check3_duplicate_body",
+   "arity": 3,
+   "expression": "x0/(x1*x2)",
+   "cross_file": true,
+   "members": [
+    {
+     "fqn": "Calibrator.GeneticArchitectureDiscovery.olsEffectEstimationVariance",
+     "name": "olsEffectEstimationVariance",
+     "file": "/Users/user/gnomon/proofs/Calibrator/GeneticArchitectureDiscovery.lean",
+     "line": 332,
+     "binders": [
+      "σ2",
+      "varX",
+      "n"
+     ],
+     "body": "σ2 / (n * varX)"
+    },
+    {
+     "fqn": "Calibrator.HaplotypeTheory.haplotypeEffectEstimationVariance",
+     "name": "haplotypeEffectEstimationVariance",
+     "file": "/Users/user/gnomon/proofs/Calibrator/HaplotypeTheory.lean",
+     "line": 522,
+     "binders": [
+      "σ2",
+      "n",
+      "freq"
+     ],
+     "body": "σ2 / (n * freq)"
+    },
+    {
+     "fqn": "Calibrator.LDDecayTheory.tagR2",
+     "name": "tagR2",
+     "file": "/Users/user/gnomon/proofs/Calibrator/LDDecayTheory.lean",
+     "line": 117,
+     "binders": [
+      "D_sq",
+      "var_tag",
+      "var_causal"
+     ],
+     "body": "D_sq / (var_tag * var_causal)"
+    },
+    {
+     "fqn": "Calibrator.MetricSpecificPortability.requiredEffectiveSampleSizeForTraceMSE",
+     "name": "requiredEffectiveSampleSizeForTraceMSE",
+     "file": "/Users/user/gnomon/proofs/Calibrator/MetricSpecificPortability.lean",
+     "line": 544,
+     "binders": [
+      "nParams",
+      "infoPerSample",
+      "targetTraceMSE"
+     ],
+     "body": "adaptationDifficultyIndex nParams infoPerSample / targetTraceMSE"
+    },
+    {
+     "fqn": "Calibrator.PGSCalibrationTheory.requiredEventsForRecalibration",
+     "name": "requiredEventsForRecalibration",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PGSCalibrationTheory.lean",
+     "line": 1539,
+     "binders": [
+      "nParams",
+      "infoPerEvent",
+      "targetTraceMSE"
+     ],
+     "body": "nParams / (infoPerEvent * targetTraceMSE)"
+    }
+   ]
+  },
+  {
+   "check": "check3_duplicate_body",
+   "arity": 2,
+   "expression": "x0 - x1",
+   "cross_file": true,
+   "members": [
+    {
+     "fqn": "Calibrator.ImputationPortability.apparent_portability_loss",
+     "name": "apparent_portability_loss",
+     "file": "/Users/user/gnomon/proofs/Calibrator/ImputationPortability.lean",
+     "line": 228,
+     "binders": [
+      "r2_source",
+      "r2_target_array"
+     ],
+     "body": "r2_source - r2_target_array"
+    },
+    {
+     "fqn": "Calibrator.ImputationPortability.true_portability_loss",
+     "name": "true_portability_loss",
+     "file": "/Users/user/gnomon/proofs/Calibrator/ImputationPortability.lean",
+     "line": 234,
+     "binders": [
+      "r2_source",
+      "r2_target_ideal"
+     ],
+     "body": "r2_source - r2_target_ideal"
+    },
+    {
+     "fqn": "Calibrator.LongitudinalPortability.temporalCalibrationInTheLarge",
+     "name": "temporalCalibrationInTheLarge",
+     "file": "/Users/user/gnomon/proofs/Calibrator/LongitudinalPortability.lean",
+     "line": 352,
+     "binders": [
+      "π_obs",
+      "π_pred"
+     ],
+     "body": "calibrationInTheLarge π_obs π_pred"
+    },
+    {
+     "fqn": "Calibrator.MultiAncestryTheory.portabilityGap",
+     "name": "portabilityGap",
+     "file": "/Users/user/gnomon/proofs/Calibrator/MultiAncestryTheory.lean",
+     "line": 428,
+     "binders": [
+      "r2_source",
+      "r2_target"
+     ],
+     "body": "r2_source - r2_target"
+    },
+    {
+     "fqn": "Calibrator.PGSCalibrationTheory.calibrationInTheLarge",
+     "name": "calibrationInTheLarge",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PGSCalibrationTheory.lean",
+     "line": 62,
+     "binders": [
+      "mean_observed",
+      "mean_predicted"
+     ],
+     "body": "mean_observed - mean_predicted"
+    },
+    {
+     "fqn": "Calibrator.StatisticalGeneticsMethodology.incrementalR2",
+     "name": "incrementalR2",
+     "file": "/Users/user/gnomon/proofs/Calibrator/StatisticalGeneticsMethodology.lean",
+     "line": 42,
+     "binders": [
+      "r2_full",
+      "r2_covariates"
+     ],
+     "body": "r2_full - r2_covariates"
+    },
+    {
+     "fqn": "Calibrator.TransferLearningPGS.pcaBiasReduction",
+     "name": "pcaBiasReduction",
+     "file": "/Users/user/gnomon/proofs/Calibrator/TransferLearningPGS.lean",
+     "line": 764,
+     "binders": [
+      "ancestryBiasWith",
+      "ancestryBiasWithout"
+     ],
+     "body": "ancestryBiasWith - ancestryBiasWithout"
+    },
+    {
+     "fqn": "Calibrator.TransferLearningPGS.scratchTargetR2",
+     "name": "scratchTargetR2",
+     "file": "/Users/user/gnomon/proofs/Calibrator/TransferLearningPGS.lean",
+     "line": 1107,
+     "binders": [
+      "oracle_target_r2",
+      "estimation_penalty"
+     ],
+     "body": "oracle_target_r2 - estimation_penalty"
+    },
+    {
+     "fqn": "Calibrator.TransferLearningPGS.transportPenalty",
+     "name": "transportPenalty",
+     "file": "/Users/user/gnomon/proofs/Calibrator/TransferLearningPGS.lean",
+     "line": 1127,
+     "binders": [
+      "source_r2",
+      "transported_r2"
+     ],
+     "body": "source_r2 - transported_r2"
+    }
+   ]
+  },
+  {
+   "check": "check3_duplicate_body",
+   "arity": 3,
+   "expression": "(1 - x1)**2*(x2*(1 - 1/(2*x0)) + 1/(2*x0))",
+   "cross_file": true,
+   "members": [
+    {
+     "fqn": "Calibrator.LDDecayTheory.driftLDStep",
+     "name": "driftLDStep",
+     "file": "/Users/user/gnomon/proofs/Calibrator/LDDecayTheory.lean",
+     "line": 263,
+     "binders": [
+      "Ne",
+      "c",
+      "Q"
+     ],
+     "body": "(1 - c) ^ 2 * (1 / (2 * Ne) + (1 - 1 / (2 * Ne)) * Q)"
+    },
+    {
+     "fqn": "Calibrator.PortabilityDrift.islandFstMultiplicativeStep",
+     "name": "islandFstMultiplicativeStep",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+     "line": 4602,
+     "binders": [
+      "Ne",
+      "m",
+      "F"
+     ],
+     "body": "(1 - m) ^ 2 * (1 / (2 * Ne) + (1 - 1 / (2 * Ne)) * F)"
+    }
+   ]
+  },
+  {
+   "check": "check3_duplicate_body",
+   "arity": 2,
+   "expression": "(1 - x1)**2/(2*x0*(-(1 - 1/(2*x0))*(1 - x1)**2 + 1))",
+   "cross_file": true,
+   "members": [
+    {
+     "fqn": "Calibrator.LDDecayTheory.driftLDEquilibrium",
+     "name": "driftLDEquilibrium",
+     "file": "/Users/user/gnomon/proofs/Calibrator/LDDecayTheory.lean",
+     "line": 300,
+     "binders": [
+      "Ne",
+      "c"
+     ],
+     "body": "(1 - c) ^ 2 * (1 / (2 * Ne)) / (1 - driftLDRetention Ne c)"
+    },
+    {
+     "fqn": "Calibrator.PortabilityDrift.fstIslandMultiplicativeEquilibrium",
+     "name": "fstIslandMultiplicativeEquilibrium",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+     "line": 4613,
+     "binders": [
+      "Ne",
+      "m"
+     ],
+     "body": "(1 - m) ^ 2 / ((1 - m) ^ 2 + 2 * Ne * m * (2 - m))"
+    }
+   ]
+  },
+  {
+   "check": "check3_duplicate_body",
+   "arity": 1,
+   "expression": "x0/(x0 + 1)",
+   "cross_file": true,
+   "members": [
+    {
+     "fqn": "Calibrator.LongitudinalPortability.temporalR2",
+     "name": "temporalR2",
+     "file": "/Users/user/gnomon/proofs/Calibrator/LongitudinalPortability.lean",
+     "line": 216,
+     "binders": [
+      "signalAtTime"
+     ],
+     "body": "TransportedMetrics.r2FromSignalVariance signalAtTime 1"
+    },
+    {
+     "fqn": "Calibrator.PopulationGeneticsFoundations.expectedHeterozygosity",
+     "name": "expectedHeterozygosity",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
+     "line": 100,
+     "binders": [
+      "θ"
+     ],
+     "body": "θ / (1 + θ)"
+    },
+    {
+     "fqn": "Calibrator.PortabilityDrift.fstFromTau",
+     "name": "fstFromTau",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+     "line": 38,
+     "binders": [
+      "tau"
+     ],
+     "body": "tau / (1 + tau)"
+    },
+    {
+     "fqn": "Calibrator.PortabilityDrift.sharedLDFromMigration",
+     "name": "sharedLDFromMigration",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+     "line": 4870,
+     "binders": [
+      "M"
+     ],
+     "body": "M / (1 + M)"
+    }
+   ]
+  },
+  {
+   "check": "check3_duplicate_body",
+   "arity": 3,
+   "expression": "x1/(x0*x2)",
+   "cross_file": true,
+   "members": [
+    {
+     "fqn": "Calibrator.MetricSpecificPortability.fisherTraceMSELowerBound",
+     "name": "fisherTraceMSELowerBound",
+     "file": "/Users/user/gnomon/proofs/Calibrator/MetricSpecificPortability.lean",
+     "line": 535,
+     "binders": [
+      "nEff",
+      "nParams",
+      "infoPerSample"
+     ],
+     "body": "adaptationDifficultyIndex nParams infoPerSample / nEff"
+    },
+    {
+     "fqn": "Calibrator.PGSCalibrationTheory.recalibrationTraceMSELowerBound",
+     "name": "recalibrationTraceMSELowerBound",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PGSCalibrationTheory.lean",
+     "line": 1530,
+     "binders": [
+      "nEvents",
+      "nParams",
+      "infoPerEvent"
+     ],
+     "body": "nParams / (nEvents * infoPerEvent)"
+    }
+   ]
+  },
+  {
+   "check": "check3_duplicate_body",
+   "arity": 2,
+   "expression": "1 - x1/x0",
+   "cross_file": true,
+   "members": [
+    {
+     "fqn": "Calibrator.PCCorrectability.Diagnostic.pcTargetAxisEfficacy",
+     "name": "pcTargetAxisEfficacy",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PCCorrectability/Diagnostic.lean",
+     "line": 107,
+     "binders": [
+      "uncorrectedSusceptibility",
+      "residualSusceptibility"
+     ],
+     "body": "1 - residualSusceptibility / uncorrectedSusceptibility"
+    },
+    {
+     "fqn": "Calibrator.PopulationGeneticsFoundations.neiFst",
+     "name": "neiFst",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
+     "line": 42,
+     "binders": [
+      "H_T",
+      "H_S"
+     ],
+     "body": "(H_T - H_S) / H_T"
+    }
+   ]
+  },
+  {
+   "check": "check3_duplicate_body",
+   "arity": 2,
+   "expression": "x0/(x0 + 2*x1)",
+   "cross_file": true,
+   "members": [
+    {
+     "fqn": "Calibrator.PolygenicAdaptation.qst",
+     "name": "qst",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicAdaptation.lean",
+     "line": 46,
+     "binders": [
+      "V_between",
+      "V_within"
+     ],
+     "body": "V_between / (V_between + 2 * V_within)"
+    },
+    {
+     "fqn": "Calibrator.PopulationGeneticsFoundations.coalFst",
+     "name": "coalFst",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
+     "line": 127,
+     "binders": [
+      "t",
+      "Ne"
+     ],
+     "body": "t / (t + 2 * Ne)"
+    },
+    {
+     "fqn": "Calibrator.PortabilityDrift.fstFromGenerations",
+     "name": "fstFromGenerations",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+     "line": 41,
+     "binders": [
+      "t",
+      "Ne"
+     ],
+     "body": "fstFromTau (coalescentTau t Ne)"
+    }
+   ]
+  },
+  {
+   "check": "check3_duplicate_body",
+   "arity": 2,
+   "expression": "2*x0*x1",
+   "cross_file": true,
+   "members": [
+    {
+     "fqn": "Calibrator.PolygenicAdaptation.pgsDiffVariance_two_pop",
+     "name": "pgsDiffVariance_two_pop",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicAdaptation.lean",
+     "line": 144,
+     "binders": [
+      "V_A",
+      "fst"
+     ],
+     "body": "2 * pgsDriftVariance_one_pop V_A fst"
+    },
+    {
+     "fqn": "Calibrator.PolygenicAdaptation.expectedPGSDiffVariance",
+     "name": "expectedPGSDiffVariance",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicAdaptation.lean",
+     "line": 160,
+     "binders": [
+      "V_A",
+      "fst"
+     ],
+     "body": "V_A * 2 * fst"
+    },
+    {
+     "fqn": "Calibrator.PortabilityDrift.Var_Delta_Mu",
+     "name": "Var_Delta_Mu",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+     "line": 773,
+     "binders": [
+      "V_A",
+      "fst"
+     ],
+     "body": "2 * fst * V_A"
+    }
+   ]
+  },
+  {
+   "check": "check3_duplicate_body",
+   "arity": 2,
+   "expression": "x0**2/x1",
+   "cross_file": true,
+   "members": [
+    {
+     "fqn": "Calibrator.PolygenicArchitecture.effectivePolygenicity",
+     "name": "effectivePolygenicity",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicArchitecture.lean",
+     "line": 169,
+     "binders": [
+      "sum_beta_sq",
+      "sum_beta_fourth"
+     ],
+     "body": "sum_beta_sq^2 / sum_beta_fourth"
+    },
+    {
+     "fqn": "Calibrator.TransferLearningPGS.importanceWeightESS",
+     "name": "importanceWeightESS",
+     "file": "/Users/user/gnomon/proofs/Calibrator/TransferLearningPGS.lean",
+     "line": 632,
+     "binders": [
+      "sum_w",
+      "sum_w_sq"
+     ],
+     "body": "sum_w ^ 2 / sum_w_sq"
+    }
+   ]
+  },
+  {
+   "check": "check3_duplicate_body",
+   "arity": 2,
+   "expression": "-(1 - x0)*(1 - x1) + 1",
+   "cross_file": true,
+   "members": [
+    {
+     "fqn": "Calibrator.PopulationGeneticsFoundations.wrightFIT",
+     "name": "wrightFIT",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
+     "line": 383,
+     "binders": [
+      "f_IS",
+      "f_ST"
+     ],
+     "body": "1 - (1 - f_IS) * (1 - f_ST)"
+    },
+    {
+     "fqn": "Calibrator.PortabilityDrift.pairwiseFstFromBranches",
+     "name": "pairwiseFstFromBranches",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+     "line": 73,
+     "binders": [
+      "fstS",
+      "fstT"
+     ],
+     "body": "1 - (1 - fstS) * (1 - fstT)"
+    }
+   ]
+  },
+  {
+   "check": "check3_duplicate_body",
+   "arity": 2,
+   "expression": "4*x0*x1",
+   "cross_file": true,
+   "members": [
+    {
+     "fqn": "Calibrator.PopulationGeneticsFoundations.scaledMutationRate",
+     "name": "scaledMutationRate",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
+     "line": 455,
+     "binders": [
+      "Ne",
+      "μ"
+     ],
+     "body": "4 * Ne * μ"
+    },
+    {
+     "fqn": "Calibrator.PortabilityDrift.scaledMigrationRate",
+     "name": "scaledMigrationRate",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+     "line": 4663,
+     "binders": [
+      "Ne",
+      "m"
+     ],
+     "body": "4 * Ne * m"
+    }
+   ]
+  },
+  {
+   "check": "check3_duplicate_body",
+   "arity": 2,
+   "expression": "4*x0*x1/(4*x0*x1 + 1)",
+   "cross_file": true,
+   "members": [
+    {
+     "fqn": "Calibrator.PopulationGeneticsFoundations.hetEquilibrium",
+     "name": "hetEquilibrium",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
+     "line": 1199,
+     "binders": [
+      "Ne",
+      "mu"
+     ],
+     "body": "4 * Ne * mu / (1 + 4 * Ne * mu)"
+    },
+    {
+     "fqn": "Calibrator.PortabilityDrift.hetMutationFloor",
+     "name": "hetMutationFloor",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+     "line": 460,
+     "binders": [
+      "Ne",
+      "mu"
+     ],
+     "body": "4 * Ne * mu / (1 + 4 * Ne * mu)"
+    },
+    {
+     "fqn": "Calibrator.PortabilityDrift.sharedLD_from_equilibrium",
+     "name": "sharedLD_from_equilibrium",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+     "line": 4844,
+     "binders": [
+      "Ne",
+      "m"
+     ],
+     "body": "1 - fstMigrationDriftEquilibrium Ne m"
+    },
+    {
+     "fqn": "Calibrator.PortabilityDrift.neutralAFBenchmarkFromRecurrence",
+     "name": "neutralAFBenchmarkFromRecurrence",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+     "line": 5290,
+     "binders": [
+      "Ne",
+      "m"
+     ],
+     "body": "1 - fstMigDriftEquil Ne m"
+    }
+   ]
+  },
+  {
+   "check": "check3_duplicate_body",
+   "arity": 2,
+   "expression": "x0*(1 - x1)",
+   "cross_file": false,
+   "members": [
+    {
+     "fqn": "Calibrator.PortabilityDrift.targetHetFromFst",
+     "name": "targetHetFromFst",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+     "line": 653,
+     "binders": [
+      "het_source",
+      "fst"
+     ],
+     "body": "het_source * (1 - fst)"
+    },
+    {
+     "fqn": "Calibrator.PortabilityDrift.targetPGSVariance",
+     "name": "targetPGSVariance",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+     "line": 679,
+     "binders": [
+      "V_A",
+      "fst"
+     ],
+     "body": "pgsVarianceFromHet V_A (1 - fst)"
+    },
+    {
+     "fqn": "Calibrator.PortabilityDrift.presentDayPGSVariance",
+     "name": "presentDayPGSVariance",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+     "line": 689,
+     "binders": [
+      "V_A",
+      "fst"
+     ],
+     "body": "(1 - fst) * V_A"
+    }
+   ]
+  },
+  {
+   "check": "check3_duplicate_body",
+   "arity": 3,
+   "expression": "x0*x2*(1 - x1)",
+   "cross_file": false,
+   "members": [
+    {
+     "fqn": "Calibrator.PortabilityDrift.realWorldPGSVariance",
+     "name": "realWorldPGSVariance",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+     "line": 1094,
+     "binders": [
+      "V_A",
+      "fst",
+      "rhoSq"
+     ],
+     "body": "rhoSq * (1 - fst) * V_A"
+    },
+    {
+     "fqn": "Calibrator.PortabilityDrift.presentDayPGSVarianceMutationDrift",
+     "name": "presentDayPGSVarianceMutationDrift",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+     "line": 4349,
+     "binders": [
+      "V_A",
+      "fst_drift",
+      "shared_ld"
+     ],
+     "body": "(1 - covarianceDivergenceMutationDrift fst_drift shared_ld) * V_A"
+    }
+   ]
+  },
+  {
+   "check": "check3_duplicate_body",
+   "arity": 3,
+   "expression": "-2*x1*x2 + x2 + (1 - x2)/(2*x0)",
+   "cross_file": false,
+   "members": [
+    {
+     "fqn": "Calibrator.PortabilityDrift.ibdFlowStep",
+     "name": "ibdFlowStep",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+     "line": 4094,
+     "binders": [
+      "Ne",
+      "rate",
+      "F"
+     ],
+     "body": "F + (1 - F) / (2 * Ne) - 2 * rate * F"
+    },
+    {
+     "fqn": "Calibrator.PortabilityDrift.fstMigDriftNext",
+     "name": "fstMigDriftNext",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+     "line": 5173,
+     "binders": [
+      "Ne",
+      "m",
+      "Fst"
+     ],
+     "body": "(1 - 2 * m - 1 / (2 * Ne)) * Fst + 1 / (2 * Ne)"
+    }
+   ]
+  },
+  {
+   "check": "check3_duplicate_body",
+   "arity": 1,
+   "expression": "x0",
+   "cross_file": true,
+   "members": [
+    {
+     "fqn": "Calibrator.PortabilityDrift.ldOverlapFromSharedLD",
+     "name": "ldOverlapFromSharedLD",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+     "line": 4262,
+     "binders": [
+      "shared_ld"
+     ],
+     "body": "shared_ld"
+    },
+    {
+     "fqn": "Calibrator.ProjectionShiftBounds.reconstructionWeight",
+     "name": "reconstructionWeight",
+     "file": "/Users/user/gnomon/proofs/Calibrator/ProjectionShiftBounds.lean",
+     "line": 267,
+     "binders": [
+      "s"
+     ],
+     "body": "s"
+    }
+   ]
+  },
+  {
+   "check": "check3_duplicate_body",
+   "arity": 2,
+   "expression": "-x1*(1 - x0) + 1",
+   "cross_file": false,
+   "members": [
+    {
+     "fqn": "Calibrator.PortabilityDrift.covarianceDivergenceFromRetention",
+     "name": "covarianceDivergenceFromRetention",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+     "line": 4274,
+     "binders": [
+      "fst",
+      "shared_ld"
+     ],
+     "body": "1 - covarianceRetention (freqCorrFromFst fst) (ldOverlapFromSharedLD shared_ld)"
+    },
+    {
+     "fqn": "Calibrator.PortabilityDrift.covarianceDivergenceMutationDrift",
+     "name": "covarianceDivergenceMutationDrift",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+     "line": 4293,
+     "binders": [
+      "fst_drift",
+      "shared_ld"
+     ],
+     "body": "fst_drift + (1 - fst_drift) * (1 - shared_ld)"
+    }
+   ]
+  },
+  {
+   "check": "check3_duplicate_body",
+   "arity": 3,
+   "expression": "2*x0*x1**2*x2*(1 - x2)",
+   "cross_file": true,
+   "members": [
+    {
+     "fqn": "Calibrator.PowerAnalysis.noncentralityParam",
+     "name": "noncentralityParam",
+     "file": "/Users/user/gnomon/proofs/Calibrator/PowerAnalysis.lean",
+     "line": 42,
+     "binders": [
+      "n",
+      "beta",
+      "p"
+     ],
+     "body": "n * beta^2 * (2 * p * (1 - p))"
+    },
+    {
+     "fqn": "Calibrator.SelectionArchitecture.gwasNCP",
+     "name": "gwasNCP",
+     "file": "/Users/user/gnomon/proofs/Calibrator/SelectionArchitecture.lean",
+     "line": 544,
+     "binders": [
+      "n",
+      "β",
+      "p"
+     ],
+     "body": "n * β ^ 2 * (2 * p * (1 - p))"
+    }
+   ]
+  },
+  {
+   "check": "check3_duplicate_body",
+   "arity": 3,
+   "expression": "x0 - x1*x2",
+   "cross_file": true,
+   "members": [
+    {
+     "fqn": "Calibrator.SampleOverlapBias.approxLOOPGS",
+     "name": "approxLOOPGS",
+     "file": "/Users/user/gnomon/proofs/Calibrator/SampleOverlapBias.lean",
+     "line": 173,
+     "binders": [
+      "pgs_full",
+      "leverage",
+      "residual"
+     ],
+     "body": "pgs_full - leverage * residual"
+    },
+    {
+     "fqn": "Calibrator.TransferLearningPGS.infoBottleneckObjective",
+     "name": "infoBottleneckObjective",
+     "file": "/Users/user/gnomon/proofs/Calibrator/TransferLearningPGS.lean",
+     "line": 953,
+     "binders": [
+      "I_phi_Y",
+      "I_phi_A",
+      "lam"
+     ],
+     "body": "I_phi_Y - lam * I_phi_A"
+    }
+   ]
+  },
+  {
+   "check": "check3_duplicate_body",
+   "arity": 3,
+   "expression": "(x0 - x1)/x2",
+   "cross_file": false,
+   "members": [
+    {
+     "fqn": "Calibrator.ScoreDistribution.thresholdStandardizedCoordinate",
+     "name": "thresholdStandardizedCoordinate",
+     "file": "/Users/user/gnomon/proofs/Calibrator/ScoreDistribution.lean",
+     "line": 104,
+     "binders": [
+      "threshold",
+      "μ",
+      "σ"
+     ],
+     "body": "(threshold - μ) / σ"
+    },
+    {
+     "fqn": "Calibrator.ScoreDistribution.externallyStandardized",
+     "name": "externallyStandardized",
+     "file": "/Users/user/gnomon/proofs/Calibrator/ScoreDistribution.lean",
+     "line": 385,
+     "binders": [
+      "pgs",
+      "μ_source",
+      "σ_source"
+     ],
+     "body": "(pgs - μ_source) / σ_source"
+    },
+    {
+     "fqn": "Calibrator.ScoreDistribution.internallyStandardized",
+     "name": "internallyStandardized",
+     "file": "/Users/user/gnomon/proofs/Calibrator/ScoreDistribution.lean",
+     "line": 392,
+     "binders": [
+      "pgs",
+      "μ_target",
+      "σ_target"
+     ],
+     "body": "(pgs - μ_target) / σ_target"
+    }
+   ]
+  }
+ ],
+ "disagreements": [
+  {
+   "check": "check3_name_mate_disagreement",
+   "concept": "hudsonfst",
+   "a": {
+    "fqn": "Calibrator.Conventions.hudsonFst",
+    "line": 162,
+    "file": "/Users/user/gnomon/proofs/Calibrator/Conventions.lean",
+    "expr": "1 - (x0*(1 - x0) + x1*(1 - x1))/((x0 + x1)*(-x0/2 - x1/2 + 1))",
+    "binders": [
+     "p₁",
+     "p₂"
+    ],
+    "body": "1 - (p₁ * (1 - p₁) + p₂ * (1 - p₂)) / (ploidy * meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂))"
+   },
+   "b": {
+    "fqn": "Calibrator.PortabilityDrift.hudsonFstFromCoalescenceTimes",
+    "line": 236,
+    "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+    "expr": "-x0/x1 + 1",
+    "binders": [
+     "ETss",
+     "ETst"
+    ],
+    "body": "1 - ETss / ETst"
+   }
+  },
+  {
+   "check": "check3_name_mate_disagreement",
+   "concept": "ldcorrelation",
+   "a": {
+    "fqn": "Calibrator.CovarianceStructure.ldCorrelationSq",
+    "line": 110,
+    "file": "/Users/user/gnomon/proofs/Calibrator/CovarianceStructure.lean",
+    "expr": "x0**2/(4*x1*x2*(1 - x1)*(1 - x2))",
+    "binders": [
+     "D",
+     "p_i",
+     "p_j"
+    ],
+    "body": "D^2 / (genotypeVarianceHWE p_i * genotypeVarianceHWE p_j)"
+   },
+   "b": {
+    "fqn": "Calibrator.CovarianceStructure.ldCorrelationSqOfHaplotypeD",
+    "line": 139,
+    "file": "/Users/user/gnomon/proofs/Calibrator/CovarianceStructure.lean",
+    "expr": "x0**2/(x1*x2*(1 - x1)*(1 - x2))",
+    "binders": [
+     "D",
+     "p_i",
+     "p_j"
+    ],
+    "body": "ldCorrelationSq (2 * D) p_i p_j"
+   }
+  },
+  {
+   "check": "check3_name_mate_disagreement",
+   "concept": "ldcorrelation",
+   "a": {
+    "fqn": "Calibrator.CovarianceStructure.ldCorrelationSq",
+    "line": 110,
+    "file": "/Users/user/gnomon/proofs/Calibrator/CovarianceStructure.lean",
+    "expr": "x0**2/(4*x1*x2*(1 - x1)*(1 - x2))",
+    "binders": [
+     "D",
+     "p_i",
+     "p_j"
+    ],
+    "body": "D^2 / (genotypeVarianceHWE p_i * genotypeVarianceHWE p_j)"
+   },
+   "b": {
+    "fqn": "Calibrator.PortabilityDrift.ldCorrelationDecay",
+    "line": 2106,
+    "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+    "expr": "exp(-x0*x1*x2)",
+    "binders": [
+     "distance",
+     "fstGap",
+     "lambda"
+    ],
+    "body": "Real.exp (-(lambda * fstGap * distance))"
+   }
+  },
+  {
+   "check": "check3_name_mate_disagreement",
+   "concept": "ldcorrelation",
+   "a": {
+    "fqn": "Calibrator.CovarianceStructure.ldCorrelationSqOfHaplotypeD",
+    "line": 139,
+    "file": "/Users/user/gnomon/proofs/Calibrator/CovarianceStructure.lean",
+    "expr": "x0**2/(x1*x2*(1 - x1)*(1 - x2))",
+    "binders": [
+     "D",
+     "p_i",
+     "p_j"
+    ],
+    "body": "ldCorrelationSq (2 * D) p_i p_j"
+   },
+   "b": {
+    "fqn": "Calibrator.PortabilityDrift.ldCorrelationDecay",
+    "line": 2106,
+    "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+    "expr": "exp(-x0*x1*x2)",
+    "binders": [
+     "distance",
+     "fstGap",
+     "lambda"
+    ],
+    "body": "Real.exp (-(lambda * fstGap * distance))"
+   }
+  },
+  {
+   "check": "check3_name_mate_disagreement",
+   "concept": "admixtureld",
+   "a": {
+    "fqn": "Calibrator.CovarianceStructure.admixtureLDTwoLocus",
+    "line": 520,
+    "file": "/Users/user/gnomon/proofs/Calibrator/CovarianceStructure.lean",
+    "expr": "x0*x1*x2 + x3*x4*(1 - x0) - (x0*x1 + x3*(1 - x0))*(x0*x2 + x4*(1 - x0))",
+    "binders": [
+     "alpha",
+     "p_A",
+     "q_A",
+     "p_B",
+     "q_B"
+    ],
+    "body": "haplotypeFreqAdmixed alpha p_A q_A p_B q_B - admixedAlleleFreq alpha p_A p_B * admixedAlleleFreq alpha q_A q_B"
+   },
+   "b": {
+    "fqn": "Calibrator.CovarianceStructure.admixtureLDMagnitude",
+    "line": 569,
+    "file": "/Users/user/gnomon/proofs/Calibrator/CovarianceStructure.lean",
+    "expr": "x0*(1 - x0)*(1 - x3)**x4*(x1 - x2)**2",
+    "binders": [
+     "alpha",
+     "p_A",
+     "p_B",
+     "r",
+     "g"
+    ],
+    "body": "alpha * (1 - alpha) * (p_A - p_B)^2 * (1 - r)^g"
+   }
+  },
+  {
+   "check": "check3_name_mate_disagreement",
+   "concept": "admixtureld",
+   "a": {
+    "fqn": "Calibrator.LDDecayTheory.admixtureLD",
+    "line": 169,
+    "file": "/Users/user/gnomon/proofs/Calibrator/LDDecayTheory.lean",
+    "expr": "x0*x1*x2*(1 - x0)",
+    "binders": [
+     "α",
+     "Δp₁",
+     "Δp₂"
+    ],
+    "body": "α * (1 - α) * Δp₁ * Δp₂"
+   },
+   "b": {
+    "fqn": "Calibrator.PortabilityDrift.admixtureLDBoost",
+    "line": 5111,
+    "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+    "expr": "(1 - x0)**x1/x2",
+    "binders": [
+     "r",
+     "t_since",
+     "equilibrium_ld"
+    ],
+    "body": "admixtureLDDecay r t_since / equilibrium_ld"
+   }
+  },
+  {
+   "check": "check3_name_mate_disagreement",
+   "concept": "r2from",
+   "a": {
+    "fqn": "Calibrator.DGP.r2FromMSE",
+    "line": 176,
+    "file": "/Users/user/gnomon/proofs/Calibrator/DGP.lean",
+    "expr": "-x0/x1 + 1",
+    "binders": [
+     "mse",
+     "varY"
+    ],
+    "body": "1 - mse / varY"
+   },
+   "b": {
+    "fqn": "Calibrator.DGP.r2FromSignalVariance",
+    "line": 2100,
+    "file": "/Users/user/gnomon/proofs/Calibrator/DGP.lean",
+    "expr": "x0/(x0 + x1)",
+    "binders": [
+     "vSignal",
+     "vNoise"
+    ],
+    "body": "vSignal / (vSignal + vNoise)"
+   }
+  },
+  {
+   "check": "check3_name_mate_disagreement",
+   "concept": "driftld",
+   "a": {
+    "fqn": "Calibrator.LDDecayTheory.driftLDRetention",
+    "line": 284,
+    "file": "/Users/user/gnomon/proofs/Calibrator/LDDecayTheory.lean",
+    "expr": "(1 - 1/(2*x0))*(1 - x1)**2",
+    "binders": [
+     "Ne",
+     "c"
+    ],
+    "body": "(1 - c) ^ 2 * (1 - 1 / (2 * Ne))"
+   },
+   "b": {
+    "fqn": "Calibrator.LDDecayTheory.driftLDEquilibrium",
+    "line": 300,
+    "file": "/Users/user/gnomon/proofs/Calibrator/LDDecayTheory.lean",
+    "expr": "(1 - x1)**2/(2*x0*(-(1 - 1/(2*x0))*(1 - x1)**2 + 1))",
+    "binders": [
+     "Ne",
+     "c"
+    ],
+    "body": "(1 - c) ^ 2 * (1 / (2 * Ne)) / (1 - driftLDRetention Ne c)"
+   }
+  },
+  {
+   "check": "check3_name_mate_disagreement",
+   "concept": "targethet",
+   "a": {
+    "fqn": "Calibrator.DriftRegime.targetHetOfRetention",
+    "line": 165,
+    "file": "/Users/user/gnomon/proofs/Calibrator/DriftRegime.lean",
+    "expr": "x0*x1",
+    "binders": [
+     "H₀",
+     "r"
+    ],
+    "body": "H₀ * r"
+   },
+   "b": {
+    "fqn": "Calibrator.PortabilityDrift.targetHetFromFst",
+    "line": 653,
+    "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+    "expr": "x0*(1 - x1)",
+    "binders": [
+     "het_source",
+     "fst"
+    ],
+    "body": "het_source * (1 - fst)"
+   }
+  },
+  {
+   "check": "check3_name_mate_disagreement",
+   "concept": "targetpgs",
+   "a": {
+    "fqn": "Calibrator.DriftRegime.targetPgsVarOfRetention",
+    "line": 168,
+    "file": "/Users/user/gnomon/proofs/Calibrator/DriftRegime.lean",
+    "expr": "x0*x1",
+    "binders": [
+     "V_A",
+     "r"
+    ],
+    "body": "V_A * r"
+   },
+   "b": {
+    "fqn": "Calibrator.PortabilityDrift.targetPGSVariance",
+    "line": 679,
+    "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+    "expr": "x0*(1 - x1)",
+    "binders": [
+     "V_A",
+     "fst"
+    ],
+    "body": "pgsVarianceFromHet V_A (1 - fst)"
+   }
+  },
+  {
+   "check": "check3_name_mate_disagreement",
+   "concept": "benchmarkratio",
+   "a": {
+    "fqn": "Calibrator.DriftRegime.benchmarkRatio",
+    "line": 227,
+    "file": "/Users/user/gnomon/proofs/Calibrator/DriftRegime.lean",
+    "expr": "(1 - x1)/(1 - x0)",
+    "binders": [
+     "fstS",
+     "fstT"
+    ],
+    "body": "(1 - fstT) / (1 - fstS)"
+   },
+   "b": {
+    "fqn": "Calibrator.DriftRegime.benchmarkRatioSquared",
+    "line": 231,
+    "file": "/Users/user/gnomon/proofs/Calibrator/DriftRegime.lean",
+    "expr": "(1 - x1)**2/(1 - x0)**2",
+    "binders": [
+     "fstS",
+     "fstT"
+    ],
+    "body": "((1 - fstT) / (1 - fstS)) ^ 2"
+   }
+  },
+  {
+   "check": "check3_name_mate_disagreement",
+   "concept": "circulantspectrum",
+   "a": {
+    "fqn": "Calibrator.EpistaticChaos.circulantSpectrumA",
+    "line": 1328,
+    "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
+    "expr": "8*x0**2 + 2*x0 - 4",
+    "binders": [
+     "c"
+    ],
+    "body": "8 * c ^ 2 + 2 * c - 4"
+   },
+   "b": {
+    "fqn": "Calibrator.EpistaticChaos.circulantSpectrumB",
+    "line": 1335,
+    "file": "/Users/user/gnomon/proofs/Calibrator/EpistaticChaos.lean",
+    "expr": "4*x0**2 + 4*x0 - 2",
+    "binders": [
+     "c"
+    ],
+    "body": "4 * c ^ 2 + 4 * c - 2"
+   }
+  },
+  {
+   "check": "check3_name_mate_disagreement",
+   "concept": "agedependent",
+   "a": {
+    "fqn": "Calibrator.LongitudinalPortability.ageDependentSignalVariance",
+    "line": 245,
+    "file": "/Users/user/gnomon/proofs/Calibrator/LongitudinalPortability.lean",
+    "expr": "x0*exp(-(x1 - x2)**2/(2*x3**2))",
+    "binders": [
+     "sourceSignalPeak",
+     "age",
+     "age_peak",
+     "width"
+    ],
+    "body": "sourceSignalPeak * ageDependentSignalShape age age_peak width"
+   },
+   "b": {
+    "fqn": "Calibrator.LongitudinalPortability.ageDependentR2",
+    "line": 275,
+    "file": "/Users/user/gnomon/proofs/Calibrator/LongitudinalPortability.lean",
+    "expr": "x0*exp(-(x1 - x2)**2/(2*x3**2))/(x0*exp(-(x1 - x2)**2/(2*x3**2)) + 1)",
+    "binders": [
+     "sourceSignalPeak",
+     "age",
+     "age_peak",
+     "width"
+    ],
+    "body": "temporalR2 (ageDependentSignalVariance sourceSignalPeak age age_peak width)"
+   }
+  },
+  {
+   "check": "check3_name_mate_disagreement",
+   "concept": "ldband",
+   "a": {
+    "fqn": "Calibrator.MetricSpecificPortability.ldBandReconstructionShare",
+    "line": 1167,
+    "file": "/Users/user/gnomon/proofs/Calibrator/MetricSpecificPortability.lean",
+    "expr": "2*atan((x0 + 1)*tan(pi*x1/2)/(1 - x0))/pi",
+    "binders": [
+     "decay",
+     "kappa"
+    ],
+    "body": "2 * Real.arctan (((1 + decay) / (1 - decay)) * Real.tan (Real.pi * kappa / 2)) / Real.pi"
+   },
+   "b": {
+    "fqn": "Calibrator.MetricSpecificPortability.ldBandDetectionShare",
+    "line": 1182,
+    "file": "/Users/user/gnomon/proofs/Calibrator/MetricSpecificPortability.lean",
+    "expr": "-2*x0*sin(pi*x1)/(pi*(x0**2 + 1)) + x1",
+    "binders": [
+     "decay",
+     "kappa"
+    ],
+    "body": "kappa - 2 * decay * Real.sin (Real.pi * kappa) / (Real.pi * (1 + decay ^ 2))"
+   }
+  },
+  {
+   "check": "check3_name_mate_disagreement",
+   "concept": "neutralportability",
+   "a": {
+    "fqn": "Calibrator.PhenomeWidePortability.neutralPortabilityRatioLD",
+    "line": 37,
+    "file": "/Users/user/gnomon/proofs/Calibrator/PhenomeWidePortability.lean",
+    "expr": "x1*(1 - x0)",
+    "binders": [
+     "fst_additional",
+     "ld_factor"
+    ],
+    "body": "(1 - fst_additional) * ld_factor"
+   },
+   "b": {
+    "fqn": "Calibrator.PortabilityBounds.neutralPortability",
+    "line": 246,
+    "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityBounds.lean",
+    "expr": "x0*Max(0, 1 - 2*x1)",
+    "binders": [
+     "r2_0",
+     "fst"
+    ],
+    "body": "r2_0 * max 0 (1 - 2 * fst)"
+   }
+  },
+  {
+   "check": "check3_name_mate_disagreement",
+   "concept": "fstfrom",
+   "a": {
+    "fqn": "Calibrator.PhenomeWidePortability.fstFromDriftFactor",
+    "line": 154,
+    "file": "/Users/user/gnomon/proofs/Calibrator/PhenomeWidePortability.lean",
+    "expr": "1 - x0",
+    "binders": [
+     "driftFactor"
+    ],
+    "body": "1 - driftFactor"
+   },
+   "b": {
+    "fqn": "Calibrator.PortabilityDrift.fstFromTau",
+    "line": 38,
+    "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+    "expr": "x0/(x0 + 1)",
+    "binders": [
+     "tau"
+    ],
+    "body": "tau / (1 + tau)"
+   }
+  },
+  {
+   "check": "check3_name_mate_disagreement",
+   "concept": "fstfrom",
+   "a": {
+    "fqn": "Calibrator.PopulationGeneticsFoundations.fstFromHetRatio",
+    "line": 1378,
+    "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
+    "expr": "-x0/x1 + 1",
+    "binders": [
+     "H",
+     "H₀"
+    ],
+    "body": "1 - H / H₀"
+   },
+   "b": {
+    "fqn": "Calibrator.PortabilityDrift.fstFromGenerations",
+    "line": 41,
+    "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+    "expr": "x0/(2*x1*(x0/(2*x1) + 1))",
+    "binders": [
+     "t",
+     "Ne"
+    ],
+    "body": "fstFromTau (coalescentTau t Ne)"
+   }
+  },
+  {
+   "check": "check3_name_mate_disagreement",
+   "concept": "effectcorrelation",
+   "a": {
+    "fqn": "Calibrator.PolygenicAdaptation.effectCorrelationStabilizing",
+    "line": 288,
+    "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicAdaptation.lean",
+    "expr": "-x0/(x1*x2 + 1) + 1",
+    "binders": [
+     "d",
+     "s",
+     "N"
+    ],
+    "body": "1 - d / (1 + s * N)"
+   },
+   "b": {
+    "fqn": "Calibrator.PolygenicAdaptation.effectCorrelationFluctuating",
+    "line": 297,
+    "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicAdaptation.lean",
+    "expr": "Max(-1, -x0*(x1*x2 + 1) + 1)",
+    "binders": [
+     "d",
+     "f",
+     "N"
+    ],
+    "body": "max (-1) (1 - d * (1 + f * N))"
+   }
+  },
+  {
+   "check": "check3_name_mate_disagreement",
+   "concept": "gradecertified",
+   "a": {
+    "fqn": "Calibrator.PolygenicArchitecture.gradeCertifiedRisk",
+    "line": 517,
+    "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicArchitecture.lean",
+    "expr": "x0**(-x2/x1)",
+    "binders": [
+     "q",
+     "K",
+     "c"
+    ],
+    "body": "q ^ (-(c / K))"
+   },
+   "b": {
+    "fqn": "Calibrator.PowerAnalysis.gradeCertifiedSampleSize",
+    "line": 559,
+    "file": "/Users/user/gnomon/proofs/Calibrator/PowerAnalysis.lean",
+    "expr": "x0**(-x1/x2)",
+    "binders": [
+     "epsilon",
+     "K",
+     "c"
+    ],
+    "body": "epsilon ^ (-(K / c))"
+   }
+  },
+  {
+   "check": "check3_name_mate_disagreement",
+   "concept": "hwemellin",
+   "a": {
+    "fqn": "Calibrator.PolygenicSpectroscopy.hweMellinDrift",
+    "line": 210,
+    "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicSpectroscopy.lean",
+    "expr": "4*x0*(1 - x0)*log(2) + (1 - 2*x0)**2*log((1 - 2*x0)**2/(2*x0*(1 - x0)))",
+    "binders": [
+     "q"
+    ],
+    "body": "(1 - 2 * q) ^ 2 * Real.log ((1 - 2 * q) ^ 2 / (2 * q * (1 - q))) + 4 * q * (1 - q) * Real.log 2"
+   },
+   "b": {
+    "fqn": "Calibrator.PolygenicSpectroscopy.hweMellinJetVariance",
+    "line": 809,
+    "file": "/Users/user/gnomon/proofs/Calibrator/PolygenicSpectroscopy.lean",
+    "expr": "2*x0*(1 - x0)*log((2 - 2*x0)/x0)**2 + 2*x0*(1 - x0)*log(2*x0/(1 - x0))**2 + (1 - 2*x0)**2*log((1 - 2*x0)**2/(2*x0*(1 - x0)))**2 - (4*x0*(1 - x0)*log(2) + (1 - 2*x0)**2*log((1 - 2*x0)**2/(2*x0*(1 - x0))))**2",
+    "binders": [
+     "q"
+    ],
+    "body": "2 * q * (1 - q) * (Real.log (2 * q / (1 - q))) ^ 2 + (1 - 2 * q) ^ 2 * (Real.log ((1 - 2 * q) ^ 2 / (2 * q * (1 - q)))) ^ 2 + 2 * q * (1 - q) * (Real.log (2 * (1 - q) / q)) ^ 2 - hweMellinDrift q ^ 2"
+   }
+  },
+  {
+   "check": "check3_name_mate_disagreement",
+   "concept": "continentisland",
+   "a": {
+    "fqn": "Calibrator.PopulationGeneticsFoundations.continentIslandStepSelectionFirst",
+    "line": 219,
+    "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
+    "expr": "x2*(1 - x1)*(x0 + 1)/(x0*x2 + 1)",
+    "binders": [
+     "s",
+     "m",
+     "p"
+    ],
+    "body": "(1 - m) * (p * (1 + s) / (1 + s * p))"
+   },
+   "b": {
+    "fqn": "Calibrator.PopulationGeneticsFoundations.continentIslandStepMigrationFirst",
+    "line": 226,
+    "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
+    "expr": "x2*(1 - x1)*(x0 + 1)/(x0*x2*(1 - x1) + 1)",
+    "binders": [
+     "s",
+     "m",
+     "p"
+    ],
+    "body": "((1 - m) * p) * (1 + s) / (1 + s * ((1 - m) * p))"
+   }
+  },
+  {
+   "check": "check3_name_mate_disagreement",
+   "concept": "selectionmigration",
+   "a": {
+    "fqn": "Calibrator.PopulationGeneticsFoundations.selectionMigrationEquilibrium",
+    "line": 243,
+    "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
+    "expr": "Max(0, (-x0*x1 + x0 - x1)/x0)",
+    "binders": [
+     "s",
+     "m"
+    ],
+    "body": "max 0 ((s - m - m * s) / s)"
+   },
+   "b": {
+    "fqn": "Calibrator.PopulationGeneticsFoundations.selectionMigrationEquilibriumMigrationFirst",
+    "line": 247,
+    "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
+    "expr": "Max(0, (-x0*x1 + x0 - x1)/(x0*(1 - x1)))",
+    "binders": [
+     "s",
+     "m"
+    ],
+    "body": "max 0 ((s - m - m * s) / (s * (1 - m)))"
+   }
+  },
+  {
+   "check": "check3_name_mate_disagreement",
+   "concept": "sharedld",
+   "a": {
+    "fqn": "Calibrator.PopulationGeneticsFoundations.sharedLDFractionFromMutation",
+    "line": 725,
+    "file": "/Users/user/gnomon/proofs/Calibrator/PopulationGeneticsFoundations.lean",
+    "expr": "exp(-x0*x1/2)",
+    "binders": [
+     "θ",
+     "t"
+    ],
+    "body": "Real.exp (-(expectedNewMutations θ t))"
+   },
+   "b": {
+    "fqn": "Calibrator.PortabilityDrift.sharedLD_from_equilibrium",
+    "line": 4844,
+    "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+    "expr": "1 - 1/(4*x0*x1 + 1)",
+    "binders": [
+     "Ne",
+     "m"
+    ],
+    "body": "1 - fstMigrationDriftEquilibrium Ne m"
+   }
+  },
+  {
+   "check": "check3_name_mate_disagreement",
+   "concept": "pairwisefst",
+   "a": {
+    "fqn": "Calibrator.PortabilityDrift.pairwiseFstFromBranches",
+    "line": 73,
+    "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+    "expr": "-(1 - x0)*(1 - x1) + 1",
+    "binders": [
+     "fstS",
+     "fstT"
+    ],
+    "body": "1 - (1 - fstS) * (1 - fstT)"
+   },
+   "b": {
+    "fqn": "Calibrator.PortabilityDrift.pairwiseFstFromBranchTaus",
+    "line": 92,
+    "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+    "expr": "(x0 + x1)/(x0 + x1 + 1)",
+    "binders": [
+     "tauS",
+     "tauT"
+    ],
+    "body": "fstFromTau (tauS + tauT)"
+   }
+  },
+  {
+   "check": "check3_name_mate_disagreement",
+   "concept": "twodeme",
+   "a": {
+    "fqn": "Calibrator.PortabilityDrift.twoDemeIMFirstStepSame",
+    "line": 269,
+    "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+    "expr": "x0*x2/(x0 + 1) + 1/(x0 + 1)",
+    "binders": [
+     "M",
+     "_ETss",
+     "ETst"
+    ],
+    "body": "1 / (1 + M) + (M / (1 + M)) * ETst"
+   },
+   "b": {
+    "fqn": "Calibrator.PortabilityDrift.twoDemeIMFirstStepDiff",
+    "line": 277,
+    "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+    "expr": "x1 + 1/x0",
+    "binders": [
+     "M",
+     "ETss",
+     "_ETst"
+    ],
+    "body": "1 / M + ETss"
+   }
+  },
+  {
+   "check": "check3_name_mate_disagreement",
+   "concept": "twodeme",
+   "a": {
+    "fqn": "Calibrator.PortabilityDrift.twoDemeIMEquilibriumETss",
+    "line": 289,
+    "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+    "expr": "2",
+    "binders": [
+     "_M"
+    ],
+    "body": "2"
+   },
+   "b": {
+    "fqn": "Calibrator.PortabilityDrift.twoDemeIMEquilibriumETst",
+    "line": 296,
+    "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+    "expr": "(2*x0 + 1)/x0",
+    "binders": [
+     "M"
+    ],
+    "body": "(2 * M + 1) / M"
+   }
+  },
+  {
+   "check": "check3_name_mate_disagreement",
+   "concept": "twodeme",
+   "a": {
+    "fqn": "Calibrator.PortabilityDrift.twoDemeIMEquilibriumETss",
+    "line": 289,
+    "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+    "expr": "2",
+    "binders": [
+     "_M"
+    ],
+    "body": "2"
+   },
+   "b": {
+    "fqn": "Calibrator.PortabilityDrift.twoDemeIMEquilibriumDelta",
+    "line": 314,
+    "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+    "expr": "1/(2*x0 + 1)",
+    "binders": [
+     "M"
+    ],
+    "body": "1 / (2 * M + 1)"
+   }
+  },
+  {
+   "check": "check3_name_mate_disagreement",
+   "concept": "twodeme",
+   "a": {
+    "fqn": "Calibrator.PortabilityDrift.twoDemeIMEquilibriumETst",
+    "line": 296,
+    "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+    "expr": "(2*x0 + 1)/x0",
+    "binders": [
+     "M"
+    ],
+    "body": "(2 * M + 1) / M"
+   },
+   "b": {
+    "fqn": "Calibrator.PortabilityDrift.twoDemeIMEquilibriumDelta",
+    "line": 314,
+    "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+    "expr": "1/(2*x0 + 1)",
+    "binders": [
+     "M"
+    ],
+    "body": "1 / (2 * M + 1)"
+   }
+  },
+  {
+   "check": "check3_name_mate_disagreement",
+   "concept": "presentday",
+   "a": {
+    "fqn": "Calibrator.PortabilityDrift.presentDaySignalToNoise",
+    "line": 876,
+    "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+    "expr": "x0*(1 - x2)/x1",
+    "binders": [
+     "V_A",
+     "V_E",
+     "fst"
+    ],
+    "body": "presentDayPGSVariance V_A fst / V_E"
+   },
+   "b": {
+    "fqn": "Calibrator.PortabilityDrift.presentDayPGSVarianceMutationDrift",
+    "line": 4349,
+    "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+    "expr": "x0*(-x1 - (1 - x1)*(1 - x2) + 1)",
+    "binders": [
+     "V_A",
+     "fst_drift",
+     "shared_ld"
+    ],
+    "body": "(1 - covarianceDivergenceMutationDrift fst_drift shared_ld) * V_A"
+   }
+  },
+  {
+   "check": "check3_name_mate_disagreement",
+   "concept": "neutralaf",
+   "a": {
+    "fqn": "Calibrator.PortabilityDrift.neutralAFBenchmarkRatio",
+    "line": 2982,
+    "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+    "expr": "(1 - x1)/(1 - x0)",
+    "binders": [
+     "fstSource",
+     "fstTarget"
+    ],
+    "body": "(1 - fstTarget) / (1 - fstSource)"
+   },
+   "b": {
+    "fqn": "Calibrator.PortabilityDrift.neutralAFBenchmarkFromRecurrence",
+    "line": 5290,
+    "file": "/Users/user/gnomon/proofs/Calibrator/PortabilityDrift.lean",
+    "expr": "1 - 1/(4*x0*x1 + 1)",
+    "binders": [
+     "Ne",
+     "m"
+    ],
+    "body": "1 - fstMigDriftEquil Ne m"
+   }
+  },
+  {
+   "check": "check3_name_mate_disagreement",
+   "concept": "mutationselection",
+   "a": {
+    "fqn": "Calibrator.RareVariantPortability.mutationSelectionBalance",
+    "line": 286,
+    "file": "/Users/user/gnomon/proofs/Calibrator/RareVariantPortability.lean",
+    "expr": "x0/(x0 + x1*x2)",
+    "binders": [
+     "mu",
+     "s",
+     "h"
+    ],
+    "body": "mu / (h * s + mu)"
+   },
+   "b": {
+    "fqn": "Calibrator.RareVariantPortability.mutationSelectionStepRecessive",
+    "line": 337,
+    "file": "/Users/user/gnomon/proofs/Calibrator/RareVariantPortability.lean",
+    "expr": "x0*(1 - x2) - x1*x2**2 + x2",
+    "binders": [
+     "mu",
+     "s",
+     "p"
+    ],
+    "body": "p - s * p ^ 2 + mu * (1 - p)"
+   }
+  }
+ ],
+ "homonyms": [
+  {
+   "check": "check3_homonym",
+   "name": "effectCorrelationStabilizing",
+   "distinct_bodies": [
+    {
+     "expr": "-x0/(x1*x2 + 1) + 1",
+     "sites": [
+      "Calibrator.PolygenicAdaptation:288"
+     ]
+    },
+    {
+     "expr": "1 - 1/(2*x0)",
+     "sites": [
+      "Calibrator.SelectionArchitecture:90"
+     ]
+    }
+   ]
+  }
+ ],
+ "parsed": 366,
+ "opaque": 593,
+ "opaque_reasons": [
+  [
+   "non-real binder",
+   475
+  ],
+  [
+   "Phi expects 0 args [], got 1",
+   11
+  ],
+  [
+   "non-closed-form construct: let",
+   10
+  ],
+  [
+   "non-closed-form construct: fun",
+   8
+  ],
+  [
+   "non-closed-form construct: with",
+   8
+  ],
+  [
+   "lex error at 'ℝ'",
+   4
+  ],
+  [
+   "r2FromSignalVariance expects 2 args ['vSignal', 'vNoise'], got 3",
+   4
+  ],
+  [
+   "propositional",
+   4
+  ],
+  [
+   "non-closed-form construct: then",
+   4
+  ],
+  [
+   "non-closed-form construct: Set",
+   4
+  ],
+  [
+   "non-closed-form construct: ∑",
+   3
+  ],
+  [
+   "lex error at 'ℝ))) ^ t'",
+   3
+  ],
+  [
+   "unresolved name Real.eulerMascheroniConstant",
+   2
+  ],
+  [
+   "lex error at '![1, 1]'",
+   2
+  ],
+  [
+   "applied non-function driftLDTrajectory",
+   2
+  ]
+ ]
+}

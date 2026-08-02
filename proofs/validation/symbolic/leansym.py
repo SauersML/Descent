@@ -82,8 +82,15 @@ class Converter:
 
     MAX_DEPTH = 12
 
-    def __init__(self, table: dict[str, tuple[list[str], str]] | None = None):
+    def __init__(self, table: dict[str, tuple[list[str], str]] | None = None,
+                 opaque_defs: bool = False):
+        """`opaque_defs` turns every user definition into an uninterpreted
+        function symbol instead of inlining its body.  A theorem whose two
+        sides are still equal under that reading uses nothing about the
+        definitions it names -- it is pure algebra wearing a derivation's
+        name."""
         self.table = table or {}
+        self.opaque_defs = opaque_defs
 
     # -- entry point
     def convert(self, text: str, env: dict[str, sp.Expr] | None = None,
@@ -253,6 +260,11 @@ class _Def(_Callable):
         self.fn = None
 
     def apply(self, args, conv):
+        if conv.opaque_defs:
+            if len(args) != self.arity:
+                raise Unsupported(
+                    f"{self.name} expects {self.arity} args, got {len(args)}")
+            return sp.Function(self.name)(*args)
         if conv.depth >= Converter.MAX_DEPTH:
             raise Unsupported(f"inlining depth exceeded at {self.name}")
         if self.name in conv.stack:

@@ -148,6 +148,68 @@ theorem varianceNonneg_spikeOuter (v : ι → ℝ) : VarianceNonneg (spikeOuter 
 
 end SpikeAlgebra
 
+/-!
+## Two-block vectors
+
+Both concrete objects this file has to compute with are two-block: the
+subgroup-contrast direction of a stratified panel takes one value on the
+subgroup and another on its complement, and the witness spectrum of the `m_eff`
+prohibition takes one eigenvalue on a vanishing block and another off it.  One
+summation lemma serves both, which is the reason they are written this way
+rather than separately.
+-/
+
+section TwoBlock
+
+/-- **A two-block sequence**: value `a` on the first `k` indices, `b` after.
+
+    Empirical status: DERIVED (an indexing device; the genotype content is in
+    `subgroupContrast`, which is an instance of it). -/
+def twoBlock (k : ℕ) (a b : ℝ) : ℕ → ℝ := fun i => if i < k then a else b
+
+theorem sum_twoBlock (a b : ℝ) (k j : ℕ) :
+    ∑ i ∈ Finset.range (k + j), (if i < k then a else b) =
+      (k : ℝ) * a + (j : ℝ) * b := by
+  induction j with
+  | zero =>
+      have hcongr : ∀ i ∈ Finset.range (k + 0), (if i < k then a else b) = a := by
+        intro i hi
+        have hi' : i < k := by
+          have := Finset.mem_range.mp hi
+          omega
+        exact if_pos hi'
+      rw [Finset.sum_congr rfl hcongr, Finset.sum_const, Finset.card_range,
+        nsmul_eq_mul]
+      simp
+  | succ n ih =>
+      have hstep : k + (n + 1) = (k + n) + 1 := by omega
+      have hnot : ¬ (k + n < k) := by omega
+      rw [hstep, Finset.sum_range_succ, ih, if_neg hnot]
+      push_cast
+      ring
+
+theorem sum_twoBlock_apply (k j : ℕ) (a b : ℝ) (f : ℝ → ℝ) :
+    ∑ i ∈ Finset.range (k + j), f (twoBlock k a b i) =
+      (k : ℝ) * f a + (j : ℝ) * f b := by
+  have hpoint : ∀ i : ℕ, f (twoBlock k a b i) = if i < k then f a else f b := by
+    intro i
+    unfold twoBlock
+    exact apply_ite f (i < k) a b
+  simp only [hpoint]
+  exact sum_twoBlock (f a) (f b) k j
+
+theorem sum_pow_twoBlock (k j : ℕ) (a b : ℝ) (p : ℕ) :
+    ∑ i ∈ Finset.range (k + j), (twoBlock k a b i) ^ p =
+      (k : ℝ) * a ^ p + (j : ℝ) * b ^ p :=
+  sum_twoBlock_apply k j a b (fun x => x ^ p)
+
+theorem sum_inv_twoBlock (k j : ℕ) (a b : ℝ) :
+    ∑ i ∈ Finset.range (k + j), (twoBlock k a b i)⁻¹ =
+      (k : ℝ) * a⁻¹ + (j : ℝ) * b⁻¹ :=
+  sum_twoBlock_apply k j a b (fun x => x⁻¹)
+
+end TwoBlock
+
 /-- **A background class cut out by linear constraints.**
 
 `base` is the floor of the class: membership requires `Σ - base` to be
@@ -488,29 +550,64 @@ theorem frobeniusForm_tendsto (A : Matrix ι ι ℝ)
   exact tendsto_finset_sum _ (fun i _ =>
     tendsto_finset_sum _ (fun j _ => (hentry i j).const_mul (A i j)))
 
-/-- **Achievability for an abstract certificate: the remaining obligation.**
+/-!
+### The trace window
 
-For a general `BackgroundClass.form` — additive and `ℝ`-homogeneous, but with
-no further structure recorded in the type — the step from entrywise consistency
-to consistency of the certificate statistic is the routine finite-dimensional
-fact that such a functional is a linear combination of matrix entries and hence
-continuous.  It is *not* proved here.
+The trace window is the one linear constraint a standardized genotype panel
+always carries: the trace of a standardized genotype covariance is pinned by
+the marker count, so a background class over genotypes has this constraint
+whether or not anyone writes it down.  It is the constraint whose certificate
+the corpus has in fact been using, and the rest of this file identifies it.
+-/
 
-What this `sorry` stands for, exactly: the representation
-`form a M = ∑ i ∑ j (form a Eᵢⱼ) · Mᵢⱼ` over the matrix units `Eᵢⱼ`, followed
-by `frobeniusForm_tendsto`.  Nothing probabilistic is hidden in it — the
-probabilistic content, that a sample covariance is entrywise consistent, is a
-hypothesis of this statement rather than part of its conclusion.  For the
-certificate actually used in the applications the obligation does not arise,
-because `frobeniusForm_tendsto` is proved outright. -/
-theorem BackgroundClass.form_tendsto_of_entrywise
-    (K : BackgroundClass ι cidx) (a : cidx)
-    (empirical : ℕ → Matrix ι ι ℝ) (S : Matrix ι ι ℝ)
-    (_hentry : ∀ i j, Filter.Tendsto (fun n => empirical n i j) Filter.atTop
-      (nhds (S i j))) :
-    Filter.Tendsto (fun n => K.form a (empirical n)) Filter.atTop
-      (nhds (K.form a S)) := by
-  sorry
+/-- **The trace-window functional**: total standardized variance.
+
+    Empirical status: DERIVED (the trace of a matrix; `traceForm_spikeOuter`
+    identifies its spike load with the squared length of the effect vector). -/
+def traceForm (M : Matrix ι ι ℝ) : ℝ := ∑ i, M i i
+
+theorem traceForm_add (M N : Matrix ι ι ℝ) :
+    traceForm (M + N) = traceForm M + traceForm N := by
+  unfold traceForm
+  rw [← Finset.sum_add_distrib]
+  exact Finset.sum_congr rfl (fun i _ => by simp only [Matrix.add_apply])
+
+theorem traceForm_smul (c : ℝ) (M : Matrix ι ι ℝ) :
+    traceForm (c • M) = c * traceForm M := by
+  unfold traceForm
+  rw [Finset.mul_sum]
+  exact Finset.sum_congr rfl (fun i _ => by simp only [Matrix.smul_apply, smul_eq_mul])
+
+/-- **The spike load of the trace window is the squared length of the effect
+vector.**  Everything downstream — `effectiveSubgroupSize`, `demographicSpike`,
+the AR(1) whitening gain — is a computation of this one quantity in a
+particular basis. -/
+theorem traceForm_spikeOuter (v : ι → ℝ) : traceForm (spikeOuter v) = dot v v := by
+  unfold traceForm dot
+  exact Finset.sum_congr rfl (fun i _ => by simp only [spikeOuter])
+
+/-- **The trace-window background class**: every legal background carries total
+standardized variance at most `budget`.
+
+    Empirical status: UNTESTED. `budget` is measurable — it is the trace of the
+    standardized genotype covariance the panel admits as background. -/
+def traceWindowBudgetClass (base : Matrix ι ι ℝ) (budget : ℝ) :
+    BackgroundClass ι Unit where
+  base := base
+  form := fun _ => traceForm
+  bound := fun _ => budget
+  form_add := fun _ M N => traceForm_add M N
+  form_smul := fun _ c M => traceForm_smul c M
+
+theorem traceWindowBudgetClass_spikeLoad (base : Matrix ι ι ℝ) (budget : ℝ)
+    (v : ι → ℝ) :
+    (traceWindowBudgetClass base budget).spikeLoad () v = dot v v :=
+  traceForm_spikeOuter v
+
+theorem traceWindowBudgetClass_headroom (base : Matrix ι ι ℝ) (budget : ℝ)
+    (S₀ : Matrix ι ι ℝ) :
+    (traceWindowBudgetClass base budget).headroom () S₀ = budget - traceForm S₀ :=
+  rfl
 
 end Frobenius
 
@@ -583,8 +680,8 @@ theorem imitationCapacity_eq (E : EquiExit K S₀ support) (hnull : K.IsNull S�
     exact E.binds a w hw hload
 
 /-- **The margin by which a level-`t` alternative overshoots the binding
-constraint.**  Positive exactly above the capacity; this is the quantity the
-synthesized test is calibrated against.
+constraint.**  It is positive above the capacity and nonpositive at or below
+it, and it is the quantity the synthesized test is calibrated against.
 
     Empirical status: UNTESTED. -/
 def margin (E : EquiExit K S₀ support) (t : ℝ) : ℝ :=
@@ -818,6 +915,262 @@ theorem whitenedCapacity_strictAnti {headroom decay₁ decay₂ : ℝ}
 end WhiteningGain
 
 /-!
+## The existing BBP threshold, as a case — and where it is not one
+
+`Calibrator.PCCorrectability.Threshold` already contains a detection threshold
+for a rank-one demographic spike: `demographicSpike n F m = 4 F · m(n-m)/n`
+against `bbpProxyThreshold n M = √(n/M)`, with the sign of their difference,
+`pcCorrectabilityMargin`, documented as "the detectable side of the phase
+diagram".  That is the same object this file is about, so the two must be
+related or one of them is wrong.  The relation is partial, and the part that
+fails is the more useful finding.
+
+**What is a case.**  Two of the three pieces are certificate values of the
+trace window, exactly:
+
+* `effectiveSubgroupSize n m` is the *spike load* — the squared length of the
+  centered subgroup-contrast direction (`dot_demographicSpikeDirection`);
+* `demographicSpike n F m` is the *certificate increment* — the spike level
+  times that load (`demographicSpike_eq_level_mul_spikeLoad`), with the level
+  being the standardized contrast variance and the level's pinning to Hudson
+  `F_ST` supplied by `Conventions.four_hudsonFst_eq_standardizedContrastVariance`
+  and composed in `Calibrator.DemographicCapacity`.
+
+So the left-hand side of the existing comparison sits in exactly the place the
+linear program puts it.
+
+**What is not a case, and this is the finding.**  `bbpProxyThreshold` is *not*
+a headroom.  A headroom is `κ_a - ℓ_a(Σ₀)`: a difference of values of a linear
+functional, a property of the background class and the baseline covariance.
+`√(n/M)` contains no covariance at all — only the design shape.  It is the
+Marchenko–Pastur edge, the fluctuation scale of the *empirical* certificate,
+which is the `ε` of `EquiExit.certificateTest_null_control`, not the `κ_a -
+ℓ_a(Σ₀)` of the linear program.  This is consistent with the rest of the file
+rather than an anomaly: the spectral edge is a certificate of nothing, which is
+the same reason a participation-ratio `m_eff` cannot set a threshold.
+
+Two consequences follow, and both are proved below.
+
+1. `pcCorrectabilityMargin > 0` is **not sufficient** for detectability.  It
+   omits the headroom term.  `imitable_despite_positive_pcCorrectabilityMargin`
+   exhibits a spike that is a legal background — undetectable at any sample
+   size — while the existing margin is positive.  The existing docstring's
+   claim that a positive value is the detectable side holds only under an
+   additional hypothesis.
+2. That hypothesis is **rigidity**.  When the trace window is active at the
+   baseline, the headroom is zero, `stratificationCertificateMargin` collapses
+   to `pcCorrectabilityMargin`, and its sign is then exactly the statement that
+   the alternative's certificate clears the null ceiling by more than the
+   sampling fluctuation
+   (`rigid_certificate_exceeds_ceiling_iff_pcCorrectabilityMargin_pos`).
+
+So the existing threshold is the *estimation* half of threshold-equals-capacity
+with the *imitation* half silently set to zero.  Both halves are needed, and
+`bbpProxyThreshold_tendsto_zero` shows they dominate in opposite regimes: at
+fixed panel size, adding markers drives the estimation barrier to zero and
+leaves the capacity as the whole obstruction.
+-/
+
+section DemographicInstance
+
+/-- **The subgroup-contrast direction**: the centered indicator of a subgroup of
+size `m` in a panel of `n` individuals.  Centering is forced rather than
+conventional — an uncentered indicator has a component along the all-ones
+vector, which is the grand mean and not a contrast, and its trace-window spike
+load is not `effectiveSubgroupSize`.
+
+    Empirical status: DERIVED. `dot_demographicSpikeDirection` proves its
+    squared length is `effectiveSubgroupSize`, which is what makes the latter a
+    certificate value rather than a stipulated formula. -/
+def subgroupContrast (n m : ℕ) : ℕ → ℝ :=
+  twoBlock m (((n : ℝ) - (m : ℝ)) / (n : ℝ)) (-((m : ℝ) / (n : ℝ)))
+
+/-- The subgroup contrast as a vector on the panel's individuals.
+
+    Empirical status: DERIVED. -/
+def demographicSpikeDirection (n m : ℕ) : Fin n → ℝ :=
+  fun i => subgroupContrast n m i.val
+
+/-- **`effectiveSubgroupSize` is the squared length of the subgroup contrast.**
+This is the theorem that stops `m(n-m)/n` from being a formula nothing can
+contradict: it is the trace-window spike load of an explicitly constructed
+direction, and any other centering would give a different number. -/
+theorem dot_demographicSpikeDirection (n m : ℕ) (hmn : m ≤ n) (hn : 0 < n) :
+    dot (demographicSpikeDirection n m) (demographicSpikeDirection n m) =
+      effectiveSubgroupSize (n : ℝ) (m : ℝ) := by
+  have hn' : (0 : ℝ) < (n : ℝ) := by exact_mod_cast hn
+  have hne : ((n : ℝ)) ≠ 0 := ne_of_gt hn'
+  have hpoint : ∀ i : Fin n,
+      demographicSpikeDirection n m i * demographicSpikeDirection n m i =
+        (subgroupContrast n m i.val) ^ 2 := by
+    intro i
+    unfold demographicSpikeDirection
+    ring
+  have hsq : dot (demographicSpikeDirection n m) (demographicSpikeDirection n m) =
+      ∑ i ∈ Finset.range n, (subgroupContrast n m i) ^ 2 := by
+    unfold dot
+    rw [Finset.sum_congr rfl (fun i _ => hpoint i)]
+    exact Fin.sum_univ_eq_sum_range (fun i => (subgroupContrast n m i) ^ 2) n
+  have hsplit : m + (n - m) = n := by omega
+  have hrange : Finset.range n = Finset.range (m + (n - m)) := by rw [hsplit]
+  rw [hsq, hrange]
+  unfold subgroupContrast
+  rw [sum_pow_twoBlock m (n - m) (((n : ℝ) - (m : ℝ)) / (n : ℝ))
+      (-((m : ℝ) / (n : ℝ))) 2,
+    Nat.cast_sub hmn, neg_sq, div_pow, div_pow, ← mul_div_assoc, ← mul_div_assoc,
+    div_add_div_same]
+  unfold effectiveSubgroupSize
+  rw [div_eq_div_iff (pow_ne_zero 2 hne) hne]
+  ring
+
+theorem traceWindowBudgetClass_form {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (base : Matrix ι ι ℝ) (budget : ℝ) (a : Unit) (M : Matrix ι ι ℝ) :
+    (traceWindowBudgetClass base budget).form a M = traceForm M := rfl
+
+theorem traceWindowBudgetClass_bound {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (base : Matrix ι ι ℝ) (budget : ℝ) (a : Unit) :
+    (traceWindowBudgetClass base budget).bound a = budget := rfl
+
+/-- **The spike load of the demographic direction is `effectiveSubgroupSize`.** -/
+theorem traceWindow_spikeLoad_demographic {N : ℕ} (m : ℕ) (hmn : m ≤ N) (hN : 0 < N)
+    (base : Matrix (Fin N) (Fin N) ℝ) (budget : ℝ) (a : Unit) :
+    (traceWindowBudgetClass base budget).spikeLoad a (demographicSpikeDirection N m) =
+      effectiveSubgroupSize (N : ℝ) (m : ℝ) := by
+  unfold BackgroundClass.spikeLoad
+  rw [traceWindowBudgetClass_form, traceForm_spikeOuter]
+  exact dot_demographicSpikeDirection N m hmn hN
+
+/-- **`demographicSpike` is the trace-window certificate increment.**  The
+existing quantity is the amount by which a demographic spike at level `4F`
+raises the certificate: level times load, which is exactly the linear program's
+left-hand side.  The level is the standardized contrast variance, pinned to
+Hudson `F_ST` by `Conventions.four_hudsonFst_eq_standardizedContrastVariance`. -/
+theorem demographicSpike_eq_level_mul_spikeLoad {N : ℕ} (m : ℕ) (F : ℝ)
+    (hmn : m ≤ N) (hN : 0 < N)
+    (base : Matrix (Fin N) (Fin N) ℝ) (budget : ℝ) (a : Unit) :
+    demographicSpike (N : ℝ) F (m : ℝ) =
+      (4 * F) *
+        (traceWindowBudgetClass base budget).spikeLoad a
+          (demographicSpikeDirection N m) := by
+  rw [traceWindow_spikeLoad_demographic m hmn hN base budget a]
+  unfold demographicSpike
+  ring
+
+/-- **The certificate margin for a demographic spike**, with the class headroom
+and the estimation-error scale as separate arguments, because they are separate
+things and the existing `pcCorrectabilityMargin` conflates them by omitting the
+first.
+
+    Empirical status: UNTESTED. Falsifiable against a simulation that varies
+    the trace-window budget at fixed `n`, `M`, `F`: the detection boundary must
+    move with `headroom`, which `pcCorrectabilityMargin` predicts it does
+    not. -/
+def stratificationCertificateMargin (headroom n M F m : ℝ) : ℝ :=
+  demographicSpike n F m - (headroom + bbpProxyThreshold n M)
+
+/-- **The existing margin is this one at zero headroom.**  This is the precise
+sense in which `pcCorrectabilityMargin` is a special case: it assumes the
+background class has no room left. -/
+theorem stratificationCertificateMargin_zero_headroom (n M F m : ℝ) :
+    stratificationCertificateMargin 0 n M F m = pcCorrectabilityMargin n M F m := by
+  unfold stratificationCertificateMargin pcCorrectabilityMargin
+  ring
+
+/-- **A positive `pcCorrectabilityMargin` does not imply detectability.**
+
+The hypothesis `_hmargin` is deliberately unused, and its being unused is the
+content: whenever the spike fits inside the trace-window budget, the spiked
+covariance is a legal background and no test at any sample size can separate
+it, however far the spike clears the spectral edge.  What the existing margin
+omits is the headroom, and the omission is not conservative. -/
+theorem imitable_despite_positive_pcCorrectabilityMargin
+    {N : ℕ} (m : ℕ) (F markerCount : ℝ) (hF : 0 ≤ F) (hmn : m ≤ N) (hN : 0 < N)
+    (base S₀ : Matrix (Fin N) (Fin N) ℝ) (budget : ℝ)
+    (hbase : VarianceNonneg (S₀ - base))
+    (hbudget : traceForm S₀ + demographicSpike (N : ℝ) F (m : ℝ) ≤ budget)
+    (_hmargin : 0 < pcCorrectabilityMargin (N : ℝ) markerCount F (m : ℝ)) :
+    (traceWindowBudgetClass base budget).IsNull
+      ((traceWindowBudgetClass base budget).spiked S₀ (4 * F)
+        (demographicSpikeDirection N m)) := by
+  constructor
+  · have hrewrite :
+        (traceWindowBudgetClass base budget).spiked S₀ (4 * F)
+              (demographicSpikeDirection N m) -
+            (traceWindowBudgetClass base budget).base =
+          (S₀ - base) + (4 * F) • spikeOuter (demographicSpikeDirection N m) := by
+      unfold BackgroundClass.spiked
+      exact add_sub_right_comm S₀
+        ((4 * F) • spikeOuter (demographicSpikeDirection N m)) base
+    rw [hrewrite]
+    exact varianceNonneg_add hbase
+      (varianceNonneg_smul (by linarith) (varianceNonneg_spikeOuter _))
+  · intro a
+    rw [BackgroundClass.form_spiked, traceWindowBudgetClass_form,
+      traceWindowBudgetClass_bound,
+      ← demographicSpike_eq_level_mul_spikeLoad m F hmn hN base budget a]
+    exact hbudget
+
+/-- **The converse: exceeding the budget leaves the class.**  Together with the
+previous theorem this is the linear program in genotype terms — the demographic
+spike is imitable exactly when it fits inside the trace-window headroom, and
+`bbpProxyThreshold` plays no part in that question. -/
+theorem not_isNull_of_demographicSpike_gt_budget
+    {N : ℕ} (m : ℕ) (F : ℝ) (hmn : m ≤ N) (hN : 0 < N)
+    (base S₀ : Matrix (Fin N) (Fin N) ℝ) (budget : ℝ)
+    (hbudget : budget < traceForm S₀ + demographicSpike (N : ℝ) F (m : ℝ)) :
+    ¬ (traceWindowBudgetClass base budget).IsNull
+      ((traceWindowBudgetClass base budget).spiked S₀ (4 * F)
+        (demographicSpikeDirection N m)) := by
+  intro hcontra
+  have hle := hcontra.2 ()
+  rw [BackgroundClass.form_spiked, traceWindowBudgetClass_form,
+    traceWindowBudgetClass_bound,
+    ← demographicSpike_eq_level_mul_spikeLoad m F hmn hN base budget ()] at hle
+  linarith
+
+/-- **Under rigidity the existing margin is the criterion, exactly.**
+
+When the trace window is active at the baseline — budget equal to the
+baseline's own certificate value, so the headroom is zero — the sign of
+`pcCorrectabilityMargin` is precisely the statement that the alternative's
+certificate value clears the null ceiling by more than the sampling
+fluctuation.  This is the hypothesis under which the existing docstring's claim
+is true, and it was not previously stated. -/
+theorem rigid_certificate_exceeds_ceiling_iff_pcCorrectabilityMargin_pos
+    {N : ℕ} (m : ℕ) (F markerCount : ℝ) (hmn : m ≤ N) (hN : 0 < N)
+    (base S₀ : Matrix (Fin N) (Fin N) ℝ) (a : Unit) :
+    0 < pcCorrectabilityMargin (N : ℝ) markerCount F (m : ℝ) ↔
+      (traceWindowBudgetClass base (traceForm S₀)).bound a +
+          bbpProxyThreshold (N : ℝ) markerCount <
+        (traceWindowBudgetClass base (traceForm S₀)).form a
+          ((traceWindowBudgetClass base (traceForm S₀)).spiked S₀ (4 * F)
+            (demographicSpikeDirection N m)) := by
+  rw [BackgroundClass.form_spiked, traceWindowBudgetClass_form,
+    traceWindowBudgetClass_form, traceWindowBudgetClass_bound,
+    ← demographicSpike_eq_level_mul_spikeLoad m F hmn hN base (traceForm S₀) a]
+  unfold pcCorrectabilityMargin
+  constructor
+  · intro h
+    linarith
+  · intro h
+    linarith
+
+/-- **The estimation barrier vanishes with markers; the capacity does not.**
+At fixed panel size, `√(n/M) → 0` as the effectively independent marker count
+grows, so the spectral-edge term is asymptotically free and the imitation
+capacity is the whole of what remains.  This is why the two halves cannot be
+collapsed into one: they dominate in opposite regimes. -/
+theorem bbpProxyThreshold_tendsto_zero (n : ℝ) :
+    Filter.Tendsto (fun M : ℕ => bbpProxyThreshold n (M : ℝ)) Filter.atTop
+      (nhds 0) := by
+  have hdiv : Filter.Tendsto (fun M : ℕ => n / (M : ℝ)) Filter.atTop (nhds 0) :=
+    tendsto_const_div_atTop_nhds_zero_nat n
+  have hcomp := (Real.continuous_sqrt.tendsto (0 : ℝ)).comp hdiv
+  simpa [bbpProxyThreshold, Function.comp] using hcomp
+
+end DemographicInstance
+
+/-!
 ## The `m_eff` prohibition
 
 Multiple-testing corrections in statistical genetics replace the raw variant
@@ -852,7 +1205,7 @@ equal `1`.
 
     Empirical status: DERIVED. A witness construction, not a claim about any
     real LD matrix; its only role is to be a legal spectrum. -/
-def blockSpectrum (k : ℕ) (ε : ℝ) : ℕ → ℝ := fun i => if i < k then ε else 1
+def blockSpectrum (k : ℕ) (ε : ℝ) : ℕ → ℝ := twoBlock k ε 1
 
 /-- **The `p`-th normalized moment of the leading `m` eigenvalues.**  Weak
 convergence of empirical spectral distributions with bounded support is
@@ -873,56 +1226,60 @@ denominator.
 def inverseTraceCertificate (m : ℕ) (lam : ℕ → ℝ) : ℝ :=
   (∑ i ∈ Finset.range m, (lam i)⁻¹) / (m : ℝ)
 
-theorem sum_twoBlock (a b : ℝ) (k j : ℕ) :
-    ∑ i ∈ Finset.range (k + j), (if i < k then a else b) =
-      (k : ℝ) * a + (j : ℝ) * b := by
-  induction j with
-  | zero =>
-      have hcongr : ∀ i ∈ Finset.range (k + 0), (if i < k then a else b) = a := by
-        intro i hi
-        have hi' : i < k := by
-          have := Finset.mem_range.mp hi
-          omega
-        exact if_pos hi'
-      rw [Finset.sum_congr rfl hcongr, Finset.sum_const, Finset.card_range,
-        nsmul_eq_mul]
-      simp
-  | succ n ih =>
-      have hstep : k + (n + 1) = (k + n) + 1 := by omega
-      have hnot : ¬ (k + n < k) := by omega
-      rw [hstep, Finset.sum_range_succ, ih, if_neg hnot]
-      push_cast
-      ring
+/-! ### The certificate and the AR(1) whitening gain are one quantity
 
-theorem sum_blockSpectrum (k j : ℕ) (ε : ℝ) (f : ℝ → ℝ) :
-    ∑ i ∈ Finset.range (k + j), f (blockSpectrum k ε i) =
-      (k : ℝ) * f ε + (j : ℝ) * f 1 := by
-  have hpoint : ∀ i : ℕ, f (blockSpectrum k ε i) = if i < k then f ε else f 1 := by
-    intro i
-    unfold blockSpectrum
-    exact apply_ite f (i < k) ε 1
-  simp only [hpoint]
-  exact sum_twoBlock (f ε) (f 1) k j
+`ldWhiteningGain ρ = (1+ρ²)/(1-ρ²)` is the corpus's existing claim about what
+governs detection after whitening.  The two theorems here make that claim true
+rather than asserted: for a spectrum that *is* the AR(1) LD spectrum — the
+hypothesis is explicit and checkable, being an identity between the sum of
+inverse eigenvalues and `ldPrecisionTrace` — the certificate of the `m_eff`
+prohibition below is the trace-window spike load, and its limit is the
+whitening gain.  So the object the prohibition says is irreplaceable and the
+object `ImitationRigidity` computes in closed form are the same object.
+-/
+
+/-- **The inverse-trace certificate of an AR(1) LD spectrum is the trace-window
+spike load.**  The hypothesis says `lam` is the spectrum of the stationary LD
+matrix on `m` sites, in the only form the statement needs: its inverse-trace
+agrees with `ldPrecisionTrace`. -/
+theorem inverseTraceCertificate_eq_traceWindowSpikeLoad {decay : ℝ} {m : ℕ}
+    (lam : ℕ → ℝ)
+    (hspectrum : ∑ i ∈ Finset.range m, (lam i)⁻¹ = ldPrecisionTrace decay m) :
+    inverseTraceCertificate m lam = traceWindowSpikeLoad decay m := by
+  unfold inverseTraceCertificate traceWindowSpikeLoad
+  rw [hspectrum]
+
+/-- **The certificate's large-chromosome limit is the whitening gain.**  This
+is the theorem the corpus was missing: `(1+ρ²)/(1-ρ²)` is not merely correlated
+with detectability, it is the limiting value of the certificate that
+`certificate_not_momentContinuous` proves no weakly continuous functional can
+reproduce. -/
+theorem inverseTraceCertificate_tendsto_ldWhiteningGain {decay : ℝ}
+    (hd : |decay| < 1) (lam : ℕ → ℕ → ℝ)
+    (hspectrum : ∀ m : ℕ,
+      ∑ i ∈ Finset.range m, (lam m i)⁻¹ = ldPrecisionTrace decay m) :
+    Filter.Tendsto (fun m : ℕ => inverseTraceCertificate m (lam m)) Filter.atTop
+      (nhds (ldWhiteningGain decay)) := by
+  have hrewrite : (fun m : ℕ => inverseTraceCertificate m (lam m)) =
+      traceWindowSpikeLoad decay := by
+    funext m
+    exact inverseTraceCertificate_eq_traceWindowSpikeLoad (lam m) (hspectrum m)
+  rw [hrewrite]
+  exact traceWindowSpikeLoad_tendsto_ldWhiteningGain hd
 
 theorem normalizedMoment_blockSpectrum (k j : ℕ) (ε : ℝ) (p : ℕ) :
     normalizedMoment (k + j) (blockSpectrum k ε) p =
       ((k : ℝ) * ε ^ p + (j : ℝ)) / ((k : ℝ) + (j : ℝ)) := by
-  unfold normalizedMoment
-  have hsum : ∑ i ∈ Finset.range (k + j), blockSpectrum k ε i ^ p =
-      (k : ℝ) * ε ^ p + (j : ℝ) * (1 : ℝ) ^ p :=
-    sum_blockSpectrum k j ε (fun x => x ^ p)
-  rw [hsum, one_pow, mul_one]
+  unfold normalizedMoment blockSpectrum
+  rw [sum_pow_twoBlock k j ε 1 p, one_pow, mul_one]
   push_cast
   ring
 
 theorem inverseTraceCertificate_blockSpectrum (k j : ℕ) (ε : ℝ) :
     inverseTraceCertificate (k + j) (blockSpectrum k ε) =
       ((k : ℝ) * ε⁻¹ + (j : ℝ)) / ((k : ℝ) + (j : ℝ)) := by
-  unfold inverseTraceCertificate
-  have hsum : ∑ i ∈ Finset.range (k + j), (blockSpectrum k ε i)⁻¹ =
-      (k : ℝ) * ε⁻¹ + (j : ℝ) * (1 : ℝ)⁻¹ :=
-    sum_blockSpectrum k j ε (fun x => x⁻¹)
-  rw [hsum, inv_one, mul_one]
+  unfold inverseTraceCertificate blockSpectrum
+  rw [sum_inv_twoBlock k j ε 1, inv_one, mul_one]
   push_cast
   ring
 

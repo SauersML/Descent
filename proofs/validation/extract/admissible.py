@@ -15,11 +15,12 @@ from __future__ import annotations
 import random
 import re
 
+# Names that carry a unit-interval convention throughout this corpus.  Matched
+# as a substring, because the corpus writes `h2_true`, `avg_r2_tag`, `fstTarget`.
 UNIT_NAMES = re.compile(
-    r"^(p|q|p[₀-₉0-9]|q[₀-₉0-9]|freq\w*|prob\w*|prevalence|fst\w*|f_?st\w*|rg|r2|h2|"
-    r"\w*Freq|\w*Prob|\w*Fst|\w*R2|\w*H2|\w*Ratio|\w*Rate|\w*Fraction|\w*Share|"
-    r"\w*Prevalence|\w*Correlation|\w*Heritability|alpha|beta|rho|tau|m|mu|epsilon)$",
-    re.I)
+    r"(^p$|^q$|^p[₀-₉0-9']?$|^q[₀-₉0-9']?$|freq|prob|prevalence|fst|"
+    r"\br2\b|r2|h2|heritab|rg\b|ratio|rate|fraction|share|proportion|"
+    r"correlation|sens|spec|auc|power|accuracy|coverage|retention|portab)", re.I)
 COUNT_NAMES = re.compile(r"^(n|N|m|Ne|N₀|N₁|nEff|nSource|nTarget|\w*Size|\w*Count|"
                          r"\w*Samples?|t|gen\w*|generations?)$")
 
@@ -72,6 +73,54 @@ def box_for(d):
     return box
 
 
+def hypothesis_predicates(d):
+    """Mined theorem hypotheses, compiled into Python predicates over the args.
+
+    These are the conditions under which the corpus itself asserts things about
+    the definition; sampling outside them produces false accusations, so the
+    admissible set is the box intersected with these.
+    """
+    import translate
+    preds, texts, dropped = [], [], []
+    argnames = {translate.pyname(n) for a in d["args"] for n in a["names"]}
+    for h in d.get("constraints", {}).get("hypotheses", []):
+        try:
+            stmts, ret = translate.translate_body(h)
+        except Exception:                                        # noqa: BLE001
+            dropped.append(h)
+            continue
+        if stmts:
+            dropped.append(h)
+            continue
+        src = "\n".join(stmts + [f"__r = {ret}"])
+        used = set(re.findall(r"[A-Za-z_][A-Za-z0-9_]*", ret)) - {"_rt"}
+        if not used or not used <= argnames:
+            dropped.append(h)          # constrains something we do not model
+            continue
+        try:
+            code = compile(src, "<hyp>", "exec")
+        except SyntaxError:
+            dropped.append(h)
+            continue
+        preds.append(code)
+        texts.append(h)
+    return preds, texts, dropped
+
+
+def satisfies(preds, pt):
+    import lean_rt as _rt
+    for code in preds:
+        ns = dict(pt)
+        ns["_rt"] = _rt
+        try:
+            exec(code, {"__builtins__": {}}, ns)
+        except Exception:                                        # noqa: BLE001
+            return False
+        if ns.get("__r") is not True:
+            return False
+    return True
+
+
 def sample(box, rng: random.Random):
     return {n: rng.uniform(lo, hi) for n, (lo, hi) in box.items()}
 
@@ -91,11 +140,59 @@ def corners(box, limit=32):
 
 
 def declared_range(d):
-    """The range the definition's own docstring/name and its theorems assert."""
+    """Bounds on the definition's value, each with its own provenance.
+
+    A bound proved by a theorem is authoritative; a bound merely implied by the
+    docstring or by the quantity's name is a conjecture.  They must never be
+    conflated: a violated conjecture is a lead, a violated theorem is a defect.
+    """
     c = d.get("constraints", {})
-    lo = c.get("range_lo", c.get("declared_lo"))
-    hi = c.get("range_hi", c.get("declared_hi"))
     kind = c.get("declared_kind")
-    src = "theorem" if ("range_lo" in c or "range_hi" in c) else (
-        "docstring/name" if kind else None)
-    return lo, hi, kind, src
+    if "range_lo" in c:
+        lo, src_lo = c["range_lo"], "theorem"
+    else:
+        lo, src_lo = c.get("declared_lo"), ("docstring/name" if kind else None)
+    if "range_hi" in c:
+        hi, src_hi = c["range_hi"], "theorem"
+    else:
+        hi, src_hi = c.get("declared_hi"), ("docstring/name" if kind else None)
+    return lo, hi, kind, src_lo, src_hi
+
+
+# ------------------------------------------------------------ structures
+
+FIELD_HYP = re.compile(r"^\s*(-?[\d./]+|\w[\w'\u2080-\u2089]*)\s*(<|\u2264|>|\u2265)"
+                       r"\s*(-?[\d./]+|\w[\w'\u2080-\u2089]*)\s*$")
+
+
+def struct_value(sdecl, rng):
+    """An admissible inhabitant of a Lean structure, as a dict of its ℝ/ℕ fields.
+
+    The structure's own Prop fields are its stated invariants (`0 < varY`,
+    `varCondE ≤ varYhat`); they are enforced here so that the sampled witness is
+    actually admissible and a range violation downstream means something.
+    """
+    real = [f["name"] for f in sdecl["fields"] if f["type"] in ("\u211d", "\u2115")]
+    props = [f["type"] for f in sdecl["fields"] if f["type"] not in ("\u211d", "\u2115")]
+    val = {n: rng.uniform(0.05, 1.0) for n in real}
+    for _ in range(6):                       # fixed-point repair of the invariants
+        changed = False
+        for h in props:
+            m = FIELD_HYP.match(h)
+            if not m:
+                continue
+            a, op, b = m.groups()
+            if a in val and b in val:
+                lo, hi = (a, b) if op in ("<", "\u2264") else (b, a)
+                if val[lo] > val[hi]:
+                    val[lo], val[hi] = val[hi], val[lo]
+                    changed = True
+            elif b in val and _num(a) is not None and val[b] <= _num(a):
+                val[b] = _num(a) + 0.1
+                changed = True
+            elif a in val and _num(b) is not None and val[a] >= _num(b):
+                val[a] = _num(b) - 0.1
+                changed = True
+        if not changed:
+            break
+    return val

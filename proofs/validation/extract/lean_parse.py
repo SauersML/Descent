@@ -335,7 +335,10 @@ def mine_from_theorems(defs, theorems):
         by_short.setdefault(d.short, []).append(d)
     for t in theorems:
         text = t._chunk                        # type: ignore[attr-defined]
-        stmt = text.split(":=", 1)[0]
+        stmt = text.split(":=", 1)[0].split(":= by")[0]
+        # Bounds must come from what the theorem PROVES, not from what it
+        # ASSUMES.  Strip the hypothesis binders before mining ranges.
+        concl = re.sub(r"\([^()]*?h[\w'₀-ₜ]*\s*:[^()]*\)", " ", stmt)
         names = set(IDENT_RE.findall(text))
         for nm in names:
             base = nm.split(".")[-1]
@@ -345,19 +348,28 @@ def mine_from_theorems(defs, theorems):
                 d.mentioned_by.append(t.name)
                 # bounds
                 lo, hi = d.constraints.get("range_lo"), d.constraints.get("range_hi")
+                # `<lit> ≤ NAME <simple args>` / `NAME <simple args> ≤ <lit>`,
+                # where "simple args" excludes any arithmetic operator, so the
+                # bound really is a bound on this definition's own value.
+                simple = r"(?:[A-Za-z0-9_'₀-ₜ.\s]|\([A-Za-z0-9_'₀-ₜ.\s]*\))*"
                 for pat, which in (
-                    (rf"(-?[\d./]+)\s*[{LE}<]\s*{re.escape(base)}\b", "lo"),
-                    (rf"{re.escape(base)}\b[^,;\n]*?[{LE}<]\s*(-?[\d./]+)", "hi"),
+                    (rf"(-?[\d./]+)\s*[{LE}<]\s*{re.escape(base)}\b{simple}(?=[,∧)\n]|$)", "lo"),
+                    (rf"(?<![\w'])(?<![-+*/^]\s){re.escape(base)}\b{simple}[{LE}<]\s*(-?[\d./]+)", "hi"),
                 ):
-                    for mm in re.finditer(pat, stmt):
+                    for mm in re.finditer(pat, concl):
                         try:
                             v = eval(mm.group(1), {"__builtins__": {}})  # numeric literal only
                         except Exception:
                             continue
+                        nh = len(re.findall(r"\(\s*h[\w'₀-ₜ]*\s*:", stmt))
                         if which == "lo":
-                            lo = v if lo is None else min(lo, v)
+                            if lo is None or v < lo:
+                                lo = v
+                                d.constraints["range_lo_thm"] = [t.name, nh]
                         else:
-                            hi = v if hi is None else max(hi, v)
+                            if hi is None or v > hi:
+                                hi = v
+                                d.constraints["range_hi_thm"] = [t.name, nh]
                 if lo is not None:
                     d.constraints["range_lo"] = lo
                 if hi is not None:

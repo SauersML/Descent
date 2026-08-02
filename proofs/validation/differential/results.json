@@ -1,0 +1,5997 @@
+{
+ "environment": {
+  "python": "3.13.13",
+  "sampling": false,
+  "note": "all references are closed form; no Monte Carlo error"
+ },
+ "extraction": {
+  "n_callables": 134,
+  "n_refused": 24,
+  "refused": {
+   "LDDecayTheory.ldMismatchFrobenius": "implicit/instance binders not in subset",
+   "LDDecayTheory.harmonicMeanNe": "binder type 'Fin T \u2192 \u211d' not in subset",
+   "DemographicHistory.cumulativeDrift": "binder type 'Fin T \u2192 \u211d' not in subset",
+   "DemographicHistory.fstVariableNe": "binder type 'Fin T \u2192 \u211d' not in subset",
+   "PortabilityDrift.integratedCoalescentHazard": "binder type '\u211d \u2192 \u211d' not in subset",
+   "PortabilityDrift.coalescenceSurvivalFromHazard": "binder type '\u211d \u2192 \u211d' not in subset",
+   "PortabilityDrift.coalescenceCdfFromHazard": "binder type '\u211d \u2192 \u211d' not in subset",
+   "PortabilityDrift.PureSplitModel": "binder type 'PureSplitModel' not in subset",
+   "PortabilityDrift.SplitMigrationModel": "binder type 'SplitMigrationModel' not in subset",
+   "PortabilityDrift.sigmaObsSource": "unlexable at offset 0: '!![1, 0.5; 0.5, 1]'",
+   "PortabilityDrift.sigmaObsTarget": "unlexable at offset 0: '!![1, 0.1; 0.1, 1]'",
+   "PortabilityDrift.crossSource": "unlexable at offset 0: '![0.8, 0.4]'",
+   "PortabilityDrift.crossTarget": "unlexable at offset 0: '![0.8, 0.4]'",
+   "PortabilityDrift.wSource_opt": "unlexable at offset 0: '![0.8, 0.0]'",
+   "PortabilityDrift.wTarget_opt": "unlexable at offset 0: '![76 / 99, 32 / 99]'",
+   "PortabilityDrift.theta": "binder type 'GenerationalPopGenParameters' not in subset",
+   "PortabilityDrift.bigM": "binder type 'GenerationalPopGenParameters' not in subset",
+   "PortabilityDrift.tauAt": "binder type 'GenerationalPopGenParameters' not in subset",
+   "PortabilityDrift.fstTransientAt": "binder type 'GenerationalPopGenParameters' not in subset",
+   "PortabilityDrift.mutationSharedRetentionAt": "binder type 'GenerationalPopGenParameters' not in subset",
+   "PortabilityDrift.migrationSharedBoostAt": "binder type 'GenerationalPopGenParameters' not in subset",
+   "PortabilityDrift.alleleFreqMismatchPenalty": "recursive/match body -- use parse_nat_recursion",
+   "PortabilityDrift.novelVariantInnovationAt": "binder type 'GenerationalPopGenParameters' not in subset",
+   "PortabilityDrift.MutationDriftModelAssumptions": "binder type 'MutationDriftModelAssumptions' not in subset"
+  },
+  "provenance": {
+   "Expected_Abs_Shift": {
+    "source": "PortabilityDrift.lean:777",
+    "sha256_16": "81dc38167ec868a2"
+   },
+   "Var_Delta_Mu": {
+    "source": "PortabilityDrift.lean:773",
+    "sha256_16": "e225ea3da8ba410b"
+   },
+   "admixedAlleleFreq": {
+    "source": "DemographicHistory.lean:351",
+    "sha256_16": "aaa1111f2c4fe9d4"
+   },
+   "admixedFst": {
+    "source": "DemographicHistory.lean:271",
+    "sha256_16": "b91ab1344101b21b"
+   },
+   "admixtureLD": {
+    "source": "LDDecayTheory.lean:169",
+    "sha256_16": "dcc92f6fb9a073aa"
+   },
+   "admixtureLDAtGen": {
+    "source": "CovarianceStructure.lean:550",
+    "sha256_16": "0523bdb19ebf32e7"
+   },
+   "admixtureLDBoost": {
+    "source": "PortabilityDrift.lean:5111",
+    "sha256_16": "64ee1884254ef516"
+   },
+   "admixtureLDDecay": {
+    "source": "PortabilityDrift.lean:5064",
+    "sha256_16": "c3a5afb2658a3e74"
+   },
+   "admixtureLDMagnitude": {
+    "source": "CovarianceStructure.lean:569",
+    "sha256_16": "2dc93a8bbfa63d11"
+   },
+   "admixtureLDTwoLocus": {
+    "source": "CovarianceStructure.lean:520",
+    "sha256_16": "b5ae1c6c64804db2"
+   },
+   "alleleFreqAfterMigration": {
+    "source": "PopulationGeneticsFoundations.lean:954",
+    "sha256_16": "b6c1d7edd836c515"
+   },
+   "asymmetricFst": {
+    "source": "PortabilityDrift.lean:5002",
+    "sha256_16": "064c11d71e9c2d2b"
+   },
+   "bottleneckExcessLD": {
+    "source": "DemographicHistory.lean:685",
+    "sha256_16": "4cbc56bec8529deb"
+   },
+   "brierRegretPoint": {
+    "source": "PortabilityDrift.lean:3879",
+    "sha256_16": "94eaadc105495a33"
+   },
+   "brierRegretRatio": {
+    "source": "PortabilityDrift.lean:3883",
+    "sha256_16": "9b7069cbb714eed8"
+   },
+   "coalFst": {
+    "source": "PopulationGeneticsFoundations.lean:127",
+    "sha256_16": "8df99d3238db79c0"
+   },
+   "coalescentTau": {
+    "source": "PortabilityDrift.lean:21",
+    "sha256_16": "f7230ae6ef2a4cb5"
+   },
+   "continentIslandStepMigrationFirst": {
+    "source": "PopulationGeneticsFoundations.lean:226",
+    "sha256_16": "713806c7f40b1e30"
+   },
+   "continentIslandStepSelectionFirst": {
+    "source": "PopulationGeneticsFoundations.lean:219",
+    "sha256_16": "7ed5da69b0de3c13"
+   },
+   "continuousSteppingStoneFst": {
+    "source": "PopulationGeneticsFoundations.lean:907",
+    "sha256_16": "e74e085b1654de50"
+   },
+   "covarianceDivergenceFromRetention": {
+    "source": "PortabilityDrift.lean:4274",
+    "sha256_16": "b3966260700c862f"
+   },
+   "covarianceDivergenceMutationDrift": {
+    "source": "PortabilityDrift.lean:4293",
+    "sha256_16": "0af3d99d158f177e"
+   },
+   "covarianceRetention": {
+    "source": "PortabilityDrift.lean:4248",
+    "sha256_16": "0da10fed2889c432"
+   },
+   "demoSteppingStoneFst": {
+    "source": "DemographicHistory.lean:134",
+    "sha256_16": "a438e8ef7bd9665a"
+   },
+   "driftLDCreationRate": {
+    "source": "DemographicHistory.lean:636",
+    "sha256_16": "61a1737a19dc7f96"
+   },
+   "driftLDEquilibrium": {
+    "source": "LDDecayTheory.lean:300",
+    "sha256_16": "4c602bba2836766d"
+   },
+   "driftLDRetention": {
+    "source": "LDDecayTheory.lean:284",
+    "sha256_16": "1ead3eaa2790f2bd"
+   },
+   "driftLDStep": {
+    "source": "LDDecayTheory.lean:263",
+    "sha256_16": "8ada520e4e0ae222"
+   },
+   "driftLDTrajectory": {
+    "source": "LDDecayTheory.lean:495",
+    "sha256_16": "0319c354478170cf"
+   },
+   "effectiveMigration": {
+    "source": "PopulationGeneticsFoundations.lean:988",
+    "sha256_16": "d468c5b98e96ce6d"
+   },
+   "effectiveSymmetricMigration": {
+    "source": "PortabilityDrift.lean:5043",
+    "sha256_16": "e3b1a1226e5347e5"
+   },
+   "equalVarianceGaussianAUCFromExplainedR2": {
+    "source": "PortabilityDrift.lean:3226",
+    "sha256_16": "61841d1d855cd787"
+   },
+   "equalVarianceGaussianAUCFromSNR": {
+    "source": "PortabilityDrift.lean:3181",
+    "sha256_16": "abe870a42afd3497"
+   },
+   "equalVarianceGaussianAUCFromVariances": {
+    "source": "PortabilityDrift.lean:3193",
+    "sha256_16": "fafaf3e45f817e7d"
+   },
+   "exactCalibratedBrierRiskFromR2": {
+    "source": "PortabilityDrift.lean:3065",
+    "sha256_16": "dd4a1a8cefc819dc"
+   },
+   "excessLDAfterBottleneck": {
+    "source": "LDDecayTheory.lean:660",
+    "sha256_16": "ae8181a4b54c7da2"
+   },
+   "expectedHeterozygosity": {
+    "source": "PopulationGeneticsFoundations.lean:100",
+    "sha256_16": "fe1a84f1b045cb80"
+   },
+   "expectedNewMutations": {
+    "source": "PopulationGeneticsFoundations.lean:695",
+    "sha256_16": "9cce594343c0a389"
+   },
+   "expectedR2": {
+    "source": "PortabilityDrift.lean:935",
+    "sha256_16": "af84ea8fcecae9d2"
+   },
+   "expectedSqMeanPGSDiff_IMEquilibrium": {
+    "source": "PortabilityDrift.lean:3998",
+    "sha256_16": "37a4e933a482d607"
+   },
+   "expectedSqMeanPGSDiff_pureSplit": {
+    "source": "PortabilityDrift.lean:3988",
+    "sha256_16": "2dbad831d4072423"
+   },
+   "founderFst": {
+    "source": "DemographicHistory.lean:451",
+    "sha256_16": "41152e1f8c8fb7c6"
+   },
+   "freqCorrFromFst": {
+    "source": "PortabilityDrift.lean:4258",
+    "sha256_16": "fc64f078d1726183"
+   },
+   "fstDerived": {
+    "source": "PopulationGeneticsFoundations.lean:1116",
+    "sha256_16": "9337b79c1aaa760d"
+   },
+   "fstFromGenerations": {
+    "source": "PortabilityDrift.lean:41",
+    "sha256_16": "c80a96ef0c8cd2a3"
+   },
+   "fstFromHetRatio": {
+    "source": "PopulationGeneticsFoundations.lean:1378",
+    "sha256_16": "93ba9a9709a41964"
+   },
+   "fstFromTau": {
+    "source": "PortabilityDrift.lean:38",
+    "sha256_16": "1972b4e8c5788109"
+   },
+   "fstIslandMultiplicativeEquilibrium": {
+    "source": "PortabilityDrift.lean:4613",
+    "sha256_16": "7aa7784778788110"
+   },
+   "fstMigDriftEquil": {
+    "source": "PortabilityDrift.lean:5208",
+    "sha256_16": "0c56b6eb557a5ff3"
+   },
+   "fstMigDriftNext": {
+    "source": "PortabilityDrift.lean:5173",
+    "sha256_16": "197ff14d16df47ac"
+   },
+   "fstMigrationDriftEquilibrium": {
+    "source": "PortabilityDrift.lean:4569",
+    "sha256_16": "4a8471a522ea177c"
+   },
+   "fstMigrationMutationEquilibrium": {
+    "source": "PopulationGeneticsFoundations.lean:867",
+    "sha256_16": "52f6f4a615063884"
+   },
+   "fstMutationDriftEquilibrium": {
+    "source": "PopulationGeneticsFoundations.lean:469",
+    "sha256_16": "abd4ef081bac9350"
+   },
+   "fstMutationDriftTransient": {
+    "source": "PopulationGeneticsFoundations.lean:619",
+    "sha256_16": "551b4e1de355f601"
+   },
+   "fstMutationDriftTransientDiscrete": {
+    "source": "PopulationGeneticsFoundations.lean:1414",
+    "sha256_16": "7949a368af5d6307"
+   },
+   "haplotypeFreqAdmixed": {
+    "source": "CovarianceStructure.lean:497",
+    "sha256_16": "1e45bb6555fb2b60"
+   },
+   "hetDecayFactor": {
+    "source": "PopulationGeneticsFoundations.lean:1341",
+    "sha256_16": "177ecd21092d890e"
+   },
+   "hetEquilibrium": {
+    "source": "PopulationGeneticsFoundations.lean:1199",
+    "sha256_16": "7d02e5f6d431b0d5"
+   },
+   "hetMutationDriftRecurrence": {
+    "source": "PopulationGeneticsFoundations.lean:1192",
+    "sha256_16": "ddff8bc865cd2407"
+   },
+   "hetMutationFloor": {
+    "source": "PortabilityDrift.lean:460",
+    "sha256_16": "1f840570e2f257a2"
+   },
+   "hetMutationRecurrence": {
+    "source": "PopulationGeneticsFoundations.lean:1350",
+    "sha256_16": "d2c72268aeea9562"
+   },
+   "hetRatioBetweenBranches": {
+    "source": "PortabilityDrift.lean:3030",
+    "sha256_16": "42f0205b88c83279"
+   },
+   "hetRecurrence": {
+    "source": "PopulationGeneticsFoundations.lean:1090",
+    "sha256_16": "8b6e0be5070f25e5"
+   },
+   "hetStepWithMutation": {
+    "source": "PortabilityDrift.lean:435",
+    "sha256_16": "b8a070995fbf3619"
+   },
+   "hetTrajectory": {
+    "source": "PortabilityDrift.lean:443",
+    "sha256_16": "f08f7adacf6ba29c"
+   },
+   "heterozygosityLossFromDrift": {
+    "source": "PopulationGeneticsFoundations.lean:415",
+    "sha256_16": "244f175fb29a7286"
+   },
+   "hudsonFstFromCoalescenceTimes": {
+    "source": "PortabilityDrift.lean:236",
+    "sha256_16": "0260260d51dfc8f0"
+   },
+   "ibdFlowStep": {
+    "source": "PortabilityDrift.lean:4094",
+    "sha256_16": "9ee6503d11881e6a"
+   },
+   "introgressionVariants": {
+    "source": "DemographicHistory.lean:405",
+    "sha256_16": "f29750670ac6da0c"
+   },
+   "islandFstMultiplicativeStep": {
+    "source": "PortabilityDrift.lean:4602",
+    "sha256_16": "296e0fa594e65670"
+   },
+   "islandModelFst": {
+    "source": "PopulationGeneticsFoundations.lean:791",
+    "sha256_16": "bab3f1db6c440e79"
+   },
+   "ldAfterGenerations": {
+    "source": "LDDecayTheory.lean:76",
+    "sha256_16": "23beabdfe0fbb745"
+   },
+   "ldCorrelationDecay": {
+    "source": "PortabilityDrift.lean:2106",
+    "sha256_16": "ff71a2af8fd51ce4"
+   },
+   "ldCorrelationFromMigration": {
+    "source": "PopulationGeneticsFoundations.lean:1021",
+    "sha256_16": "9ba3e70f23998cef"
+   },
+   "ldCorrelationSq": {
+    "source": "CovarianceStructure.lean:110",
+    "sha256_16": "487edc2e24294704"
+   },
+   "ldCorrelationSqOfHaplotypeD": {
+    "source": "CovarianceStructure.lean:139",
+    "sha256_16": "b9701a956b7fd225"
+   },
+   "ldDecayRatePerGen": {
+    "source": "LDDecayTheory.lean:813",
+    "sha256_16": "8acbd209a8a2321a"
+   },
+   "ldHalfLife": {
+    "source": "LDDecayTheory.lean:828",
+    "sha256_16": "35611517d2d47486"
+   },
+   "ldOverlapFromSharedLD": {
+    "source": "PortabilityDrift.lean:4262",
+    "sha256_16": "3730958498549519"
+   },
+   "ldRecurrence": {
+    "source": "LDDecayTheory.lean:937",
+    "sha256_16": "f11ff4287f7089c0"
+   },
+   "ldRetainedFraction": {
+    "source": "LDDecayTheory.lean:873",
+    "sha256_16": "c4dddf09a91a0b4a"
+   },
+   "ldRetentionPerGen": {
+    "source": "LDDecayTheory.lean:45",
+    "sha256_16": "426536898c459a53"
+   },
+   "ldsrExpectedBetaSq": {
+    "source": "CovarianceStructure.lean:356",
+    "sha256_16": "6fd7c395f4cfc93a"
+   },
+   "ldsrExpectedChi2": {
+    "source": "CovarianceStructure.lean:374",
+    "sha256_16": "6878d75edad80c4b"
+   },
+   "logLossRegretPoint": {
+    "source": "PortabilityDrift.lean:3900",
+    "sha256_16": "487fa24513d61e0a"
+   },
+   "logLossRegretRatio": {
+    "source": "PortabilityDrift.lean:3904",
+    "sha256_16": "c9e931d5bdba3a4d"
+   },
+   "neiFst": {
+    "source": "PopulationGeneticsFoundations.lean:42",
+    "sha256_16": "7c83c2ba3de8f850"
+   },
+   "neutralAFBenchmarkFromRecurrence": {
+    "source": "PortabilityDrift.lean:5290",
+    "sha256_16": "1342a24a9adbe482"
+   },
+   "neutralAFBenchmarkMetricProfile": {
+    "source": "PortabilityDrift.lean:3113",
+    "sha256_16": "a491fd9d26959353"
+   },
+   "neutralAFBenchmarkRatio": {
+    "source": "PortabilityDrift.lean:2982",
+    "sha256_16": "f97db4c02f3d92a0"
+   },
+   "neutralAFSharedLDBenchmarkRatio": {
+    "source": "PortabilityDrift.lean:4424",
+    "sha256_16": "332cbb5a19ca5dae"
+   },
+   "neutralDriftR2Ratio": {
+    "source": "HumanDemography.lean:66",
+    "sha256_16": "179f82696722bf50"
+   },
+   "numBlocks": {
+    "source": "CovarianceStructure.lean:251",
+    "sha256_16": "06c556a11cd22cbc"
+   },
+   "pairwiseFstFromBranchTaus": {
+    "source": "PortabilityDrift.lean:92",
+    "sha256_16": "db0bd84f79e40dc6"
+   },
+   "pairwiseFstFromBranches": {
+    "source": "PortabilityDrift.lean:73",
+    "sha256_16": "0d9127e8953d1420"
+   },
+   "pgsVarianceFromHet": {
+    "source": "PortabilityDrift.lean:628",
+    "sha256_16": "f60c94cf8864ef36"
+   },
+   "presentDayEqualVarianceGaussianAUC": {
+    "source": "PortabilityDrift.lean:952",
+    "sha256_16": "03b078f596526e34"
+   },
+   "presentDayGaussianAUC": {
+    "source": "PortabilityDrift.lean:943",
+    "sha256_16": "eef40af7d0eb95c3"
+   },
+   "presentDayPGSVariance": {
+    "source": "PortabilityDrift.lean:689",
+    "sha256_16": "57eaf6463b803cc9"
+   },
+   "presentDayPGSVarianceMutationDrift": {
+    "source": "PortabilityDrift.lean:4349",
+    "sha256_16": "7c67e62aaef38990"
+   },
+   "presentDayR2": {
+    "source": "PortabilityDrift.lean:887",
+    "sha256_16": "7f24264fc9d86ab0"
+   },
+   "presentDayR2MutationDrift": {
+    "source": "PortabilityDrift.lean:4394",
+    "sha256_16": "c22a04ed3bb23027"
+   },
+   "presentDaySignalToNoise": {
+    "source": "PortabilityDrift.lean:876",
+    "sha256_16": "1361383e10ed82c4"
+   },
+   "realWorldPGSVariance": {
+    "source": "PortabilityDrift.lean:1094",
+    "sha256_16": "3768efc94ee405db"
+   },
+   "scaledMigrationRate": {
+    "source": "PortabilityDrift.lean:4663",
+    "sha256_16": "777a8f78617eac09"
+   },
+   "scaledMutationRate": {
+    "source": "PopulationGeneticsFoundations.lean:455",
+    "sha256_16": "013a21605a4b6d06"
+   },
+   "selectionMigrationEquilibrium": {
+    "source": "PopulationGeneticsFoundations.lean:243",
+    "sha256_16": "d97f4cb67843e8de"
+   },
+   "selectionMigrationEquilibriumMigrationFirst": {
+    "source": "PopulationGeneticsFoundations.lean:247",
+    "sha256_16": "650b330cbdaea82e"
+   },
+   "sharedLDFractionFromMutation": {
+    "source": "PopulationGeneticsFoundations.lean:725",
+    "sha256_16": "87b864f6c71d758d"
+   },
+   "sharedLDFromMigration": {
+    "source": "PortabilityDrift.lean:4870",
+    "sha256_16": "ceb75459df48ae0e"
+   },
+   "sharedLD_from_equilibrium": {
+    "source": "PortabilityDrift.lean:4844",
+    "sha256_16": "87f969db2209ada5"
+   },
+   "signalRetentionMigrationDrift": {
+    "source": "PortabilityDrift.lean:4921",
+    "sha256_16": "fab8f8cf420beb4e"
+   },
+   "simpleFst": {
+    "source": "PopulationGeneticsFoundations.lean:60",
+    "sha256_16": "076c6a9c4440fdf3"
+   },
+   "sourceBrierFromR2": {
+    "source": "PortabilityDrift.lean:3087",
+    "sha256_16": "1106497be205e912"
+   },
+   "steppingStoneCharacteristicLength": {
+    "source": "PopulationGeneticsFoundations.lean:893",
+    "sha256_16": "287d2b2a34fd1bfa"
+   },
+   "steppingStoneCoalescenceTime": {
+    "source": "DemographicHistory.lean:202",
+    "sha256_16": "206e77f5afb7d4fc"
+   },
+   "steppingStoneFst": {
+    "source": "PortabilityDrift.lean:4782",
+    "sha256_16": "b11aba1879a31ef5"
+   },
+   "tagR2": {
+    "source": "LDDecayTheory.lean:117",
+    "sha256_16": "27f9cd0dd44ca286"
+   },
+   "taggedDriftR2Ratio": {
+    "source": "HumanDemography.lean:182",
+    "sha256_16": "a901106224615956"
+   },
+   "targetBrierFromNeutralAFBenchmark": {
+    "source": "PortabilityDrift.lean:3107",
+    "sha256_16": "a4e51864153620a5"
+   },
+   "targetExactCalibratedBrierRisk": {
+    "source": "PortabilityDrift.lean:3100",
+    "sha256_16": "dd350decb933c00c"
+   },
+   "targetExactGaussianAUCFromNeutralAFBenchmark": {
+    "source": "PortabilityDrift.lean:3755",
+    "sha256_16": "9e07886b9c93d12d"
+   },
+   "targetGaussianAUCFromNeutralAFBenchmark": {
+    "source": "PortabilityDrift.lean:3074",
+    "sha256_16": "307c300332088094"
+   },
+   "targetHetFromFst": {
+    "source": "PortabilityDrift.lean:653",
+    "sha256_16": "53b9dcd38669cb40"
+   },
+   "targetPGSVariance": {
+    "source": "PortabilityDrift.lean:679",
+    "sha256_16": "31633e4f7d272d0f"
+   },
+   "targetR2FromNeutralAFBenchmark": {
+    "source": "PortabilityDrift.lean:2908",
+    "sha256_16": "34f34f8cf1a74af8"
+   },
+   "twoDemeIMEquilibriumDelta": {
+    "source": "PortabilityDrift.lean:314",
+    "sha256_16": "b85a3a3f7c390cb7"
+   },
+   "twoDemeIMEquilibriumETss": {
+    "source": "PortabilityDrift.lean:289",
+    "sha256_16": "202da482e4ced395"
+   },
+   "twoDemeIMEquilibriumETst": {
+    "source": "PortabilityDrift.lean:296",
+    "sha256_16": "f2b5e26f7547aefe"
+   },
+   "twoDemeIMFirstStepDiff": {
+    "source": "PortabilityDrift.lean:277",
+    "sha256_16": "16a0db36b5b23378"
+   },
+   "twoDemeIMFirstStepSame": {
+    "source": "PortabilityDrift.lean:269",
+    "sha256_16": "d530286d016a3583"
+   },
+   "wrightFIT": {
+    "source": "PopulationGeneticsFoundations.lean:383",
+    "sha256_16": "1eca000a731661a9"
+   },
+   "wrightFisherDriftRetention": {
+    "source": "PortabilityDrift.lean:710",
+    "sha256_16": "0651082c595ecc44"
+   },
+   "wrightFisherHeterozygosityLoss": {
+    "source": "PortabilityDrift.lean:730",
+    "sha256_16": "bd0ba009f0beaa70"
+   }
+  }
+ },
+ "checks": {
+  "simpleFst-is-nei": {
+   "definition": "Calibrator.PopulationGeneticsFoundations.simpleFst",
+   "claim": "simpleFst p1 p2 equals Nei's G_ST for two equally weighted demes",
+   "model_definition": "biallelic, two demes, parametric allele frequencies",
+   "model_reference": "same",
+   "reference": "refs.fst_nei_gst",
+   "tol": 1e-09,
+   "verdict": "AGREE",
+   "kind": "formula",
+   "vacuous": false,
+   "mutants_detected": [
+    "scale x1.05",
+    "scale x0.5"
+   ],
+   "canfail_clause": "grid must include |p1-p2| large AND pbar far from 0.5: at p1=p2 both sides are 0 and at pbar=0.5 the Nei and Hudson denominators coincide, so a symmetric grid cannot separate the conventions",
+   "note": "",
+   "max_rel_err": 0.0,
+   "min_rel_err": 0.0,
+   "worst_point": {
+    "params": {
+     "p1": 0.02,
+     "p2": 0.05
+    },
+    "lean": 0.0066617320503330885,
+    "ref": 0.006661732050333158,
+    "rel_err": 0.0
+   },
+   "n_grid": 16,
+   "rows": [
+    {
+     "params": {
+      "p1": 0.02,
+      "p2": 0.05
+     },
+     "lean": 0.0066617320503330885,
+     "ref": 0.006661732050333158,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p1": 0.02,
+      "p2": 0.2
+     },
+     "lean": 0.08273748723186927,
+     "ref": 0.08273748723186902,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p1": 0.02,
+      "p2": 0.5
+     },
+     "lean": 0.29937629937629934,
+     "ref": 0.2993762993762994,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p1": 0.02,
+      "p2": 0.8
+     },
+     "lean": 0.6287722199255892,
+     "ref": 0.6287722199255892,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p1": 0.1,
+      "p2": 0.05
+     },
+     "lean": 0.009009009009009009,
+     "ref": 0.00900900900900925,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p1": 0.1,
+      "p2": 0.2
+     },
+     "lean": 0.019607843137254905,
+     "ref": 0.01960784313725472,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p1": 0.1,
+      "p2": 0.5
+     },
+     "lean": 0.19047619047619052,
+     "ref": 0.19047619047619035,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p1": 0.1,
+      "p2": 0.8
+     },
+     "lean": 0.49494949494949503,
+     "ref": 0.49494949494949503,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p1": 0.3,
+      "p2": 0.05
+     },
+     "lean": 0.10822510822510824,
+     "ref": 0.108225108225108,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p1": 0.3,
+      "p2": 0.2
+     },
+     "lean": 0.013333333333333327,
+     "ref": 0.013333333333333308,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p1": 0.3,
+      "p2": 0.5
+     },
+     "lean": 0.04166666666666668,
+     "ref": 0.04166666666666674,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p1": 0.3,
+      "p2": 0.8
+     },
+     "lean": 0.25252525252525254,
+     "ref": 0.2525252525252525,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p1": 0.5,
+      "p2": 0.05
+     },
+     "lean": 0.2539184952978057,
+     "ref": 0.25391849529780564,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p1": 0.5,
+      "p2": 0.2
+     },
+     "lean": 0.09890109890109891,
+     "ref": 0.09890109890109877,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p1": 0.5,
+      "p2": 0.5
+     },
+     "lean": 0.0,
+     "ref": 0.0,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p1": 0.5,
+      "p2": 0.8
+     },
+     "lean": 0.09890109890109894,
+     "ref": 0.09890109890109888,
+     "rel_err": 0.0
+    }
+   ]
+  },
+  "simpleFst-vs-hudson": {
+   "definition": "Calibrator.PopulationGeneticsFoundations.simpleFst",
+   "claim": "CONVENTION PIN: is simpleFst Hudson's F_ST rather than Nei's?",
+   "model_definition": "biallelic, two demes, parametric",
+   "model_reference": "Hudson ratio-of-averages, parametric limit (Bhatia 2013 eq 10)",
+   "reference": "refs.fst_hudson",
+   "tol": 1e-09,
+   "verdict": "CONVENTION-DIFFERS",
+   "kind": "convention",
+   "vacuous": false,
+   "mutants_detected": [
+    "scale x1.05",
+    "scale x0.5",
+    "transpose first two args"
+   ],
+   "canfail_clause": "needs pbar != 0.5; Nei and Hudson coincide exactly at pbar=0.5",
+   "note": "expected to DISAGREE; that disagreement is the pin",
+   "max_rel_err": 0.49666913397483337,
+   "min_rel_err": 0.0,
+   "worst_point": {
+    "params": {
+     "p1": 0.02,
+     "p2": 0.05
+    },
+    "lean": 0.0066617320503330885,
+    "ref": 0.01323529411764706,
+    "rel_err": 0.49666913397483337
+   },
+   "n_grid": 16,
+   "rows": [
+    {
+     "params": {
+      "p1": 0.02,
+      "p2": 0.05
+     },
+     "lean": 0.0066617320503330885,
+     "ref": 0.01323529411764706,
+     "rel_err": 0.49666913397483337
+    },
+    {
+     "params": {
+      "p1": 0.02,
+      "p2": 0.2
+     },
+     "lean": 0.08273748723186927,
+     "ref": 0.1528301886792453,
+     "rel_err": 0.4586312563840653
+    },
+    {
+     "params": {
+      "p1": 0.02,
+      "p2": 0.5
+     },
+     "lean": 0.29937629937629934,
+     "ref": 0.4608,
+     "rel_err": 0.35031185031185036
+    },
+    {
+     "params": {
+      "p1": 0.02,
+      "p2": 0.8
+     },
+     "lean": 0.6287722199255892,
+     "ref": 0.7720812182741117,
+     "rel_err": 0.18561389003720535
+    },
+    {
+     "params": {
+      "p1": 0.1,
+      "p2": 0.05
+     },
+     "lean": 0.009009009009009009,
+     "ref": 0.01785714285714286,
+     "rel_err": 0.4954954954954956
+    },
+    {
+     "params": {
+      "p1": 0.1,
+      "p2": 0.2
+     },
+     "lean": 0.019607843137254905,
+     "ref": 0.03846153846153847,
+     "rel_err": 0.4901960784313726
+    },
+    {
+     "params": {
+      "p1": 0.1,
+      "p2": 0.5
+     },
+     "lean": 0.19047619047619052,
+     "ref": 0.32000000000000006,
+     "rel_err": 0.4047619047619047
+    },
+    {
+     "params": {
+      "p1": 0.1,
+      "p2": 0.8
+     },
+     "lean": 0.49494949494949503,
+     "ref": 0.6621621621621622,
+     "rel_err": 0.25252525252525243
+    },
+    {
+     "params": {
+      "p1": 0.3,
+      "p2": 0.05
+     },
+     "lean": 0.10822510822510824,
+     "ref": 0.19531250000000003,
+     "rel_err": 0.4458874458874459
+    },
+    {
+     "params": {
+      "p1": 0.3,
+      "p2": 0.2
+     },
+     "lean": 0.013333333333333327,
+     "ref": 0.0263157894736842,
+     "rel_err": 0.49333333333333335
+    },
+    {
+     "params": {
+      "p1": 0.3,
+      "p2": 0.5
+     },
+     "lean": 0.04166666666666668,
+     "ref": 0.08000000000000002,
+     "rel_err": 0.47916666666666663
+    },
+    {
+     "params": {
+      "p1": 0.3,
+      "p2": 0.8
+     },
+     "lean": 0.25252525252525254,
+     "ref": 0.403225806451613,
+     "rel_err": 0.3737373737373738
+    },
+    {
+     "params": {
+      "p1": 0.5,
+      "p2": 0.05
+     },
+     "lean": 0.2539184952978057,
+     "ref": 0.405,
+     "rel_err": 0.3730407523510971
+    },
+    {
+     "params": {
+      "p1": 0.5,
+      "p2": 0.2
+     },
+     "lean": 0.09890109890109891,
+     "ref": 0.18,
+     "rel_err": 0.4505494505494505
+    },
+    {
+     "params": {
+      "p1": 0.5,
+      "p2": 0.5
+     },
+     "lean": 0.0,
+     "ref": 0.0,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p1": 0.5,
+      "p2": 0.8
+     },
+     "lean": 0.09890109890109894,
+     "ref": 0.18000000000000005,
+     "rel_err": 0.4505494505494505
+    }
+   ]
+  },
+  "neiFst-identity": {
+   "definition": "Calibrator.PopulationGeneticsFoundations.neiFst",
+   "claim": "neiFst H_T H_S fed the two-deme heterozygosities reproduces G_ST",
+   "model_definition": "H_T, H_S supplied by the caller",
+   "model_reference": "H_S = mean within-deme het, H_T = het of pooled frequency",
+   "reference": "refs.fst_nei_gst",
+   "tol": 1e-09,
+   "verdict": "AGREE",
+   "kind": "formula",
+   "vacuous": false,
+   "mutants_detected": [
+    "scale x1.05",
+    "scale x0.5",
+    "transpose first two args"
+   ],
+   "canfail_clause": "p1 != p2 required; at p1=p2, H_T=H_S and both sides are 0",
+   "note": "",
+   "max_rel_err": 0.0,
+   "min_rel_err": 0.0,
+   "worst_point": {
+    "params": {
+     "p1": 0.02,
+     "p2": 0.05
+    },
+    "lean": 0.006661732050333175,
+    "ref": 0.006661732050333158,
+    "rel_err": 0.0
+   },
+   "n_grid": 16,
+   "rows": [
+    {
+     "params": {
+      "p1": 0.02,
+      "p2": 0.05
+     },
+     "lean": 0.006661732050333175,
+     "ref": 0.006661732050333158,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p1": 0.02,
+      "p2": 0.2
+     },
+     "lean": 0.08273748723186908,
+     "ref": 0.08273748723186902,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p1": 0.02,
+      "p2": 0.5
+     },
+     "lean": 0.2993762993762994,
+     "ref": 0.2993762993762994,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p1": 0.02,
+      "p2": 0.8
+     },
+     "lean": 0.6287722199255892,
+     "ref": 0.6287722199255892,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p1": 0.1,
+      "p2": 0.05
+     },
+     "lean": 0.009009009009009214,
+     "ref": 0.00900900900900925,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p1": 0.1,
+      "p2": 0.2
+     },
+     "lean": 0.0196078431372547,
+     "ref": 0.01960784313725472,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p1": 0.1,
+      "p2": 0.5
+     },
+     "lean": 0.19047619047619038,
+     "ref": 0.19047619047619035,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p1": 0.1,
+      "p2": 0.8
+     },
+     "lean": 0.49494949494949503,
+     "ref": 0.49494949494949503,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p1": 0.3,
+      "p2": 0.05
+     },
+     "lean": 0.10822510822510806,
+     "ref": 0.108225108225108,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p1": 0.3,
+      "p2": 0.2
+     },
+     "lean": 0.013333333333333345,
+     "ref": 0.013333333333333308,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p1": 0.3,
+      "p2": 0.5
+     },
+     "lean": 0.041666666666666706,
+     "ref": 0.04166666666666674,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p1": 0.3,
+      "p2": 0.8
+     },
+     "lean": 0.25252525252525254,
+     "ref": 0.2525252525252525,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p1": 0.5,
+      "p2": 0.05
+     },
+     "lean": 0.2539184952978057,
+     "ref": 0.25391849529780564,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p1": 0.5,
+      "p2": 0.2
+     },
+     "lean": 0.09890109890109876,
+     "ref": 0.09890109890109877,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p1": 0.5,
+      "p2": 0.5
+     },
+     "lean": 0.0,
+     "ref": 0.0,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p1": 0.5,
+      "p2": 0.8
+     },
+     "lean": 0.09890109890109887,
+     "ref": 0.09890109890109888,
+     "rel_err": 0.0
+    }
+   ]
+  },
+  "hudson-sample-limit": {
+   "definition": "refs.fst_hudson_sample",
+   "claim": "SELF-TEST of the reference: Hudson's finite-n estimator -> parametric",
+   "model_definition": "n = 10^7 haploids per deme",
+   "model_reference": "parametric limit",
+   "reference": "refs.fst_hudson",
+   "tol": 1e-05,
+   "verdict": "AGREE",
+   "kind": "formula",
+   "vacuous": true,
+   "mutants_detected": [],
+   "canfail_clause": "fails if n is small; run at n=20 to see it break",
+   "note": "guards the reference itself, not the corpus",
+   "max_rel_err": 0.0,
+   "min_rel_err": 0.0,
+   "worst_point": {
+    "params": {
+     "p1": 0.02,
+     "p2": 0.05
+    },
+    "lean": 0.013235195441166605,
+    "ref": 0.01323529411764706,
+    "rel_err": 0.0
+   },
+   "n_grid": 16,
+   "rows": [
+    {
+     "params": {
+      "p1": 0.02,
+      "p2": 0.05
+     },
+     "lean": 0.013235195441166605,
+     "ref": 0.01323529411764706,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p1": 0.02,
+      "p2": 0.2
+     },
+     "lean": 0.1528301039622557,
+     "ref": 0.1528301886792453,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p1": 0.02,
+      "p2": 0.5
+     },
+     "lean": 0.4607999460799946,
+     "ref": 0.4608,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p1": 0.02,
+      "p2": 0.8
+     },
+     "lean": 0.7720811954822314,
+     "ref": 0.7720812182741117,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p1": 0.1,
+      "p2": 0.05
+     },
+     "lean": 0.017857044642847323,
+     "ref": 0.01785714285714286,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p1": 0.1,
+      "p2": 0.2
+     },
+     "lean": 0.0384614423076827,
+     "ref": 0.03846153846153847,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p1": 0.1,
+      "p2": 0.5
+     },
+     "lean": 0.3199999319999932,
+     "ref": 0.32000000000000006,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p1": 0.1,
+      "p2": 0.8
+     },
+     "lean": 0.6621621283783751,
+     "ref": 0.6621621621621622,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p1": 0.3,
+      "p2": 0.05
+     },
+     "lean": 0.19531241953124198,
+     "ref": 0.19531250000000003,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p1": 0.3,
+      "p2": 0.2
+     },
+     "lean": 0.02631569210525341,
+     "ref": 0.0263157894736842,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p1": 0.3,
+      "p2": 0.5
+     },
+     "lean": 0.07999990799999082,
+     "ref": 0.08000000000000002,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p1": 0.3,
+      "p2": 0.8
+     },
+     "lean": 0.40322574677418765,
+     "ref": 0.403225806451613,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p1": 0.5,
+      "p2": 0.05
+     },
+     "lean": 0.40499994049999405,
+     "ref": 0.405,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p1": 0.5,
+      "p2": 0.2
+     },
+     "lean": 0.1799999179999918,
+     "ref": 0.18,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p1": 0.5,
+      "p2": 0.5
+     },
+     "lean": -1.00000010000001e-07,
+     "ref": 0.0,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p1": 0.5,
+      "p2": 0.8
+     },
+     "lean": 0.17999991799999185,
+     "ref": 0.18000000000000005,
+     "rel_err": 0.0
+    }
+   ]
+  },
+  "coalFst-exact-split": {
+   "definition": "Calibrator.PopulationGeneticsFoundations.coalFst",
+   "claim": "coalFst t Ne is exactly Hudson F_ST after a clean split",
+   "model_definition": "split t generations ago; one size parameter Ne",
+   "model_reference": "clean split, N_daughter = N_ancestral = Ne, infinite sites",
+   "reference": "refs.split_fst_hudson",
+   "tol": 1e-09,
+   "verdict": "AGREE",
+   "kind": "formula",
+   "vacuous": false,
+   "mutants_detected": [
+    "scale x1.05",
+    "scale x0.5",
+    "transpose first two args"
+   ],
+   "canfail_clause": "t must reach order Ne. For t << Ne every candidate F_ST formula collapses to t/(2Ne) and the check cannot discriminate.",
+   "note": "",
+   "max_rel_err": 0.0,
+   "min_rel_err": 0.0,
+   "worst_point": {
+    "params": {
+     "t": 10.0,
+     "Ne": 500.0
+    },
+    "lean": 0.009900990099009901,
+    "ref": 0.00990099009900991,
+    "rel_err": 0.0
+   },
+   "n_grid": 15,
+   "rows": [
+    {
+     "params": {
+      "t": 10.0,
+      "Ne": 500.0
+     },
+     "lean": 0.009900990099009901,
+     "ref": 0.00990099009900991,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "t": 10.0,
+      "Ne": 1000.0
+     },
+     "lean": 0.004975124378109453,
+     "ref": 0.00497512437810943,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "t": 10.0,
+      "Ne": 10000.0
+     },
+     "lean": 0.0004997501249375312,
+     "ref": 0.0004997501249375258,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "t": 100.0,
+      "Ne": 500.0
+     },
+     "lean": 0.09090909090909091,
+     "ref": 0.09090909090909094,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "t": 100.0,
+      "Ne": 1000.0
+     },
+     "lean": 0.047619047619047616,
+     "ref": 0.04761904761904767,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "t": 100.0,
+      "Ne": 10000.0
+     },
+     "lean": 0.004975124378109453,
+     "ref": 0.00497512437810943,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "t": 1000.0,
+      "Ne": 500.0
+     },
+     "lean": 0.5,
+     "ref": 0.5,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "t": 1000.0,
+      "Ne": 1000.0
+     },
+     "lean": 0.3333333333333333,
+     "ref": 0.33333333333333337,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "t": 1000.0,
+      "Ne": 10000.0
+     },
+     "lean": 0.047619047619047616,
+     "ref": 0.04761904761904767,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "t": 2000.0,
+      "Ne": 500.0
+     },
+     "lean": 0.6666666666666666,
+     "ref": 0.6666666666666667,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "t": 2000.0,
+      "Ne": 1000.0
+     },
+     "lean": 0.5,
+     "ref": 0.5,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "t": 2000.0,
+      "Ne": 10000.0
+     },
+     "lean": 0.09090909090909091,
+     "ref": 0.09090909090909094,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "t": 8000.0,
+      "Ne": 500.0
+     },
+     "lean": 0.8888888888888888,
+     "ref": 0.8888888888888888,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "t": 8000.0,
+      "Ne": 1000.0
+     },
+     "lean": 0.8,
+     "ref": 0.8,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "t": 8000.0,
+      "Ne": 10000.0
+     },
+     "lean": 0.2857142857142857,
+     "ref": 0.2857142857142857,
+     "rel_err": 0.0
+    }
+   ]
+  },
+  "coalFst-asymmetric-sizes": {
+   "definition": "Calibrator.PopulationGeneticsFoundations.coalFst",
+   "claim": "SCOPE: coalFst has one Ne, so it cannot express unequal daughter sizes",
+   "model_definition": "single Ne; caller must pick one",
+   "model_reference": "N1 = Ne/4, N2 = 4*Ne, N_anc = Ne",
+   "reference": "refs.split_fst_hudson (asymmetric)",
+   "tol": 1e-09,
+   "verdict": "SCOPE",
+   "kind": "scope",
+   "vacuous": false,
+   "mutants_detected": [
+    "scale x1.05",
+    "scale x0.5",
+    "transpose first two args"
+   ],
+   "canfail_clause": "THE asymmetry: N1 != N2. With N1 = N2 the check reduces to coalFst-exact-split and passes trivially.",
+   "note": "expected to disagree; quantifies the cost of the single-size assumption",
+   "max_rel_err": 0.36894949371058006,
+   "min_rel_err": 0.03505901740483978,
+   "worst_point": {
+    "params": {
+     "t": 500.0,
+     "Ne": 1000.0
+    },
+    "lean": 0.2,
+    "ref": 0.3169318430247382,
+    "rel_err": 0.36894949371058006
+   },
+   "n_grid": 3,
+   "rows": [
+    {
+     "params": {
+      "t": 500.0,
+      "Ne": 1000.0
+     },
+     "lean": 0.2,
+     "ref": 0.3169318430247382,
+     "rel_err": 0.36894949371058006
+    },
+    {
+     "params": {
+      "t": 2000.0,
+      "Ne": 1000.0
+     },
+     "lean": 0.5,
+     "ref": 0.518166405011916,
+     "rel_err": 0.03505901740483978
+    },
+    {
+     "params": {
+      "t": 8000.0,
+      "Ne": 1000.0
+     },
+     "lean": 0.8,
+     "ref": 0.6853638239112945,
+     "rel_err": 0.14329522011088197
+    }
+   ]
+  },
+  "fstDerived-is-not-split-fst": {
+   "definition": "Calibrator.PopulationGeneticsFoundations.fstDerived",
+   "claim": "MODEL: the drift recurrence is not the F_ST of a split",
+   "model_definition": "closed population, NO mutation: 1-(1-1/2Ne)^t",
+   "model_reference": "clean split at mutation-drift equilibrium, infinite sites",
+   "reference": "refs.split_fst_hudson",
+   "tol": 1e-09,
+   "verdict": "MODEL",
+   "kind": "model",
+   "vacuous": false,
+   "mutants_detected": [
+    "scale x1.05",
+    "scale x0.5",
+    "transpose first two args"
+   ],
+   "canfail_clause": "REQUIRES t/(2Ne) >= ~0.5. Both sides are t/(2Ne) + O(t^2/Ne^2), so at t << Ne they agree to <1% and the test is vacuous.",
+   "note": "root of the fstDerived/fstFromTau/targetHetFromFst cluster",
+   "max_rel_err": 0.22910891633179434,
+   "min_rel_err": 0.00027484195340639225,
+   "worst_point": {
+    "params": {
+     "t": 2000.0,
+     "Ne": 500.0
+    },
+    "lean": 0.8648000746025005,
+    "ref": 0.6666666666666667,
+    "rel_err": 0.22910891633179434
+   },
+   "n_grid": 15,
+   "rows": [
+    {
+     "params": {
+      "t": 10.0,
+      "Ne": 500.0
+     },
+     "lean": 0.009955119790251765,
+     "ref": 0.00990099009900991,
+     "rel_err": 0.005437372164507773
+    },
+    {
+     "params": {
+      "t": 10.0,
+      "Ne": 1000.0
+     },
+     "lean": 0.004988764986882277,
+     "ref": 0.00497512437810943,
+     "rel_err": 0.0027342656566733924
+    },
+    {
+     "params": {
+      "t": 10.0,
+      "Ne": 10000.0
+     },
+     "lean": 0.0004998875149986315,
+     "ref": 0.0004997501249375258,
+     "rel_err": 0.00027484195340639225
+    },
+    {
+     "params": {
+      "t": 100.0,
+      "Ne": 500.0
+     },
+     "lean": 0.09520785288629108,
+     "ref": 0.09090909090909094,
+     "rel_err": 0.045151338328512126
+    },
+    {
+     "params": {
+      "t": 100.0,
+      "Ne": 1000.0
+     },
+     "lean": 0.04878246975766576,
+     "ref": 0.04761904761904767,
+     "rel_err": 0.023849184848523674
+    },
+    {
+     "params": {
+      "t": 100.0,
+      "Ne": 10000.0
+     },
+     "lean": 0.0049876451880153105,
+     "ref": 0.00497512437810943,
+     "rel_err": 0.0025103649986904426
+    },
+    {
+     "params": {
+      "t": 1000.0,
+      "Ne": 500.0
+     },
+     "lean": 0.6323045752290363,
+     "ref": 0.5,
+     "rel_err": 0.2092418439026988
+    },
+    {
+     "params": {
+      "t": 1000.0,
+      "Ne": 1000.0
+     },
+     "lean": 0.393545177159905,
+     "ref": 0.33333333333333337,
+     "rel_err": 0.15299855600086898
+    },
+    {
+     "params": {
+      "t": 1000.0,
+      "Ne": 10000.0
+     },
+     "lean": 0.048771764574954246,
+     "ref": 0.04761904761904767,
+     "rel_err": 0.023634924140073635
+    },
+    {
+     "params": {
+      "t": 2000.0,
+      "Ne": 500.0
+     },
+     "lean": 0.8648000746025005,
+     "ref": 0.6666666666666667,
+     "rel_err": 0.22910891633179434
+    },
+    {
+     "params": {
+      "t": 2000.0,
+      "Ne": 1000.0
+     },
+     "lean": 0.6322125478539891,
+     "ref": 0.5,
+     "rel_err": 0.20912673799780995
+    },
+    {
+     "params": {
+      "t": 2000.0,
+      "Ne": 10000.0
+     },
+     "lean": 0.09516484413015369,
+     "ref": 0.09090909090909094,
+     "rel_err": 0.044719804461007734
+    },
+    {
+     "params": {
+      "t": 8000.0,
+      "Ne": 500.0
+     },
+     "lean": 0.9996658774341463,
+     "ref": 0.8888888888888888,
+     "rel_err": 0.11081401400795031
+    },
+    {
+     "params": {
+      "t": 8000.0,
+      "Ne": 1000.0
+     },
+     "lean": 0.9817026736967768,
+     "ref": 0.8,
+     "rel_err": 0.18508931325667358
+    },
+    {
+     "params": {
+      "t": 8000.0,
+      "Ne": 10000.0
+     },
+     "lean": 0.3296866573547218,
+     "ref": 0.2857142857142857,
+     "rel_err": 0.13337625487562463
+    }
+   ]
+  },
+  "fstDerived-is-coalescence-prob": {
+   "definition": "Calibrator.PopulationGeneticsFoundations.fstDerived",
+   "claim": "what fstDerived actually computes: P(coalesce within t) in a closed pop",
+   "model_definition": "closed population, no mutation",
+   "model_reference": "same",
+   "reference": "refs.prob_coalesce_within",
+   "tol": 1e-09,
+   "verdict": "AGREE",
+   "kind": "formula",
+   "vacuous": false,
+   "mutants_detected": [
+    "scale x1.05",
+    "scale x0.5",
+    "transpose first two args"
+   ],
+   "canfail_clause": "t >= 1 and Ne finite; at t=0 both sides are 0",
+   "note": "",
+   "max_rel_err": 0.0,
+   "min_rel_err": 0.0,
+   "worst_point": {
+    "params": {
+     "t": 10.0,
+     "Ne": 500.0
+    },
+    "lean": 0.009955119790251765,
+    "ref": 0.009955119790251765,
+    "rel_err": 0.0
+   },
+   "n_grid": 15,
+   "rows": [
+    {
+     "params": {
+      "t": 10.0,
+      "Ne": 500.0
+     },
+     "lean": 0.009955119790251765,
+     "ref": 0.009955119790251765,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "t": 10.0,
+      "Ne": 1000.0
+     },
+     "lean": 0.004988764986882277,
+     "ref": 0.004988764986882277,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "t": 10.0,
+      "Ne": 10000.0
+     },
+     "lean": 0.0004998875149986315,
+     "ref": 0.0004998875149986315,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "t": 100.0,
+      "Ne": 500.0
+     },
+     "lean": 0.09520785288629108,
+     "ref": 0.09520785288629108,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "t": 100.0,
+      "Ne": 1000.0
+     },
+     "lean": 0.04878246975766576,
+     "ref": 0.04878246975766576,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "t": 100.0,
+      "Ne": 10000.0
+     },
+     "lean": 0.0049876451880153105,
+     "ref": 0.0049876451880153105,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "t": 1000.0,
+      "Ne": 500.0
+     },
+     "lean": 0.6323045752290363,
+     "ref": 0.6323045752290363,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "t": 1000.0,
+      "Ne": 1000.0
+     },
+     "lean": 0.393545177159905,
+     "ref": 0.393545177159905,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "t": 1000.0,
+      "Ne": 10000.0
+     },
+     "lean": 0.048771764574954246,
+     "ref": 0.048771764574954246,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "t": 2000.0,
+      "Ne": 500.0
+     },
+     "lean": 0.8648000746025005,
+     "ref": 0.8648000746025005,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "t": 2000.0,
+      "Ne": 1000.0
+     },
+     "lean": 0.6322125478539891,
+     "ref": 0.6322125478539891,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "t": 2000.0,
+      "Ne": 10000.0
+     },
+     "lean": 0.09516484413015369,
+     "ref": 0.09516484413015369,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "t": 8000.0,
+      "Ne": 500.0
+     },
+     "lean": 0.9996658774341463,
+     "ref": 0.9996658774341463,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "t": 8000.0,
+      "Ne": 1000.0
+     },
+     "lean": 0.9817026736967768,
+     "ref": 0.9817026736967768,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "t": 8000.0,
+      "Ne": 10000.0
+     },
+     "lean": 0.3296866573547218,
+     "ref": 0.3296866573547218,
+     "rel_err": 0.0
+    }
+   ]
+  },
+  "hetLossFromDrift-duplicates-fstDerived": {
+   "definition": "Calibrator.PopulationGeneticsFoundations.heterozygosityLossFromDrift",
+   "claim": "DUPLICATE: identical body to fstDerived under a different name",
+   "model_definition": "closed population, no mutation",
+   "model_reference": "same",
+   "reference": "refs.prob_coalesce_within",
+   "tol": 1e-09,
+   "verdict": "AGREE",
+   "kind": "formula",
+   "vacuous": false,
+   "mutants_detected": [
+    "scale x1.05",
+    "scale x0.5",
+    "transpose first two args"
+   ],
+   "canfail_clause": "t >= 1; at t=0 both sides are 0",
+   "note": "",
+   "max_rel_err": 0.0,
+   "min_rel_err": 0.0,
+   "worst_point": {
+    "params": {
+     "t": 10.0,
+     "Ne": 500.0
+    },
+    "lean": 0.009955119790251765,
+    "ref": 0.009955119790251765,
+    "rel_err": 0.0
+   },
+   "n_grid": 15,
+   "rows": [
+    {
+     "params": {
+      "t": 10.0,
+      "Ne": 500.0
+     },
+     "lean": 0.009955119790251765,
+     "ref": 0.009955119790251765,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "t": 10.0,
+      "Ne": 1000.0
+     },
+     "lean": 0.004988764986882277,
+     "ref": 0.004988764986882277,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "t": 10.0,
+      "Ne": 10000.0
+     },
+     "lean": 0.0004998875149986315,
+     "ref": 0.0004998875149986315,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "t": 100.0,
+      "Ne": 500.0
+     },
+     "lean": 0.09520785288629108,
+     "ref": 0.09520785288629108,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "t": 100.0,
+      "Ne": 1000.0
+     },
+     "lean": 0.04878246975766576,
+     "ref": 0.04878246975766576,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "t": 100.0,
+      "Ne": 10000.0
+     },
+     "lean": 0.0049876451880153105,
+     "ref": 0.0049876451880153105,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "t": 1000.0,
+      "Ne": 500.0
+     },
+     "lean": 0.6323045752290363,
+     "ref": 0.6323045752290363,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "t": 1000.0,
+      "Ne": 1000.0
+     },
+     "lean": 0.393545177159905,
+     "ref": 0.393545177159905,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "t": 1000.0,
+      "Ne": 10000.0
+     },
+     "lean": 0.048771764574954246,
+     "ref": 0.048771764574954246,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "t": 2000.0,
+      "Ne": 500.0
+     },
+     "lean": 0.8648000746025005,
+     "ref": 0.8648000746025005,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "t": 2000.0,
+      "Ne": 1000.0
+     },
+     "lean": 0.6322125478539891,
+     "ref": 0.6322125478539891,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "t": 2000.0,
+      "Ne": 10000.0
+     },
+     "lean": 0.09516484413015369,
+     "ref": 0.09516484413015369,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "t": 8000.0,
+      "Ne": 500.0
+     },
+     "lean": 0.9996658774341463,
+     "ref": 0.9996658774341463,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "t": 8000.0,
+      "Ne": 1000.0
+     },
+     "lean": 0.9817026736967768,
+     "ref": 0.9817026736967768,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "t": 8000.0,
+      "Ne": 10000.0
+     },
+     "lean": 0.3296866573547218,
+     "ref": 0.3296866573547218,
+     "rel_err": 0.0
+    }
+   ]
+  },
+  "fstFromGenerations-equals-coalFst": {
+   "definition": "Calibrator.PortabilityDrift.fstFromGenerations",
+   "claim": "cross-file: fstFromGenerations agrees with the exact split F_ST",
+   "model_definition": "tau = t/2Ne, F = tau/(1+tau)",
+   "model_reference": "clean split, equal sizes",
+   "reference": "refs.split_fst_hudson",
+   "tol": 1e-09,
+   "verdict": "AGREE",
+   "kind": "formula",
+   "vacuous": false,
+   "mutants_detected": [
+    "scale x1.05",
+    "scale x0.5",
+    "transpose first two args"
+   ],
+   "canfail_clause": "t of order Ne (see fstDerived-is-not-split-fst)",
+   "note": "",
+   "max_rel_err": 0.0,
+   "min_rel_err": 0.0,
+   "worst_point": {
+    "params": {
+     "t": 10.0,
+     "Ne": 500.0
+    },
+    "lean": 0.009900990099009901,
+    "ref": 0.00990099009900991,
+    "rel_err": 0.0
+   },
+   "n_grid": 15,
+   "rows": [
+    {
+     "params": {
+      "t": 10.0,
+      "Ne": 500.0
+     },
+     "lean": 0.009900990099009901,
+     "ref": 0.00990099009900991,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "t": 10.0,
+      "Ne": 1000.0
+     },
+     "lean": 0.0049751243781094535,
+     "ref": 0.00497512437810943,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "t": 10.0,
+      "Ne": 10000.0
+     },
+     "lean": 0.0004997501249375313,
+     "ref": 0.0004997501249375258,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "t": 100.0,
+      "Ne": 500.0
+     },
+     "lean": 0.09090909090909091,
+     "ref": 0.09090909090909094,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "t": 100.0,
+      "Ne": 1000.0
+     },
+     "lean": 0.047619047619047616,
+     "ref": 0.04761904761904767,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "t": 100.0,
+      "Ne": 10000.0
+     },
+     "lean": 0.0049751243781094535,
+     "ref": 0.00497512437810943,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "t": 1000.0,
+      "Ne": 500.0
+     },
+     "lean": 0.5,
+     "ref": 0.5,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "t": 1000.0,
+      "Ne": 1000.0
+     },
+     "lean": 0.3333333333333333,
+     "ref": 0.33333333333333337,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "t": 1000.0,
+      "Ne": 10000.0
+     },
+     "lean": 0.047619047619047616,
+     "ref": 0.04761904761904767,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "t": 2000.0,
+      "Ne": 500.0
+     },
+     "lean": 0.6666666666666666,
+     "ref": 0.6666666666666667,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "t": 2000.0,
+      "Ne": 1000.0
+     },
+     "lean": 0.5,
+     "ref": 0.5,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "t": 2000.0,
+      "Ne": 10000.0
+     },
+     "lean": 0.09090909090909091,
+     "ref": 0.09090909090909094,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "t": 8000.0,
+      "Ne": 500.0
+     },
+     "lean": 0.8888888888888888,
+     "ref": 0.8888888888888888,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "t": 8000.0,
+      "Ne": 1000.0
+     },
+     "lean": 0.8,
+     "ref": 0.8,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "t": 8000.0,
+      "Ne": 10000.0
+     },
+     "lean": 0.28571428571428575,
+     "ref": 0.2857142857142857,
+     "rel_err": 0.0
+    }
+   ]
+  },
+  "pairwiseFstFromBranches": {
+   "definition": "Calibrator.PortabilityDrift.pairwiseFstFromBranches",
+   "claim": "multiplicative branch composition vs the exact two-branch split F_ST",
+   "model_definition": "1-(1-fstS)(1-fstT) with per-branch F_ST",
+   "model_reference": "clean split, both daughters size Ne, total separation tS+tT",
+   "reference": "refs.split_fst_hudson",
+   "tol": 1e-09,
+   "verdict": "FORMULA",
+   "kind": "formula",
+   "vacuous": false,
+   "mutants_detected": [
+    "scale x1.05",
+    "scale x0.5",
+    "transpose first two args"
+   ],
+   "canfail_clause": "needs tS+tT of order Ne AND ideally tS != tT. At tS,tT << Ne the composition is exact to first order.",
+   "note": "",
+   "max_rel_err": 0.0999999999999999,
+   "min_rel_err": 0.028050490883590594,
+   "worst_point": {
+    "params": {
+     "tS": 4000.0,
+     "tT": 4000.0,
+     "Ne": 1000.0
+    },
+    "lean": 0.8888888888888888,
+    "ref": 0.8,
+    "rel_err": 0.0999999999999999
+   },
+   "n_grid": 9,
+   "rows": [
+    {
+     "params": {
+      "tS": 200.0,
+      "tT": 200.0,
+      "Ne": 1000.0
+     },
+     "lean": 0.17355371900826455,
+     "ref": 0.16666666666666663,
+     "rel_err": 0.03968253968254038
+    },
+    {
+     "params": {
+      "tS": 200.0,
+      "tT": 1000.0,
+      "Ne": 1000.0
+     },
+     "lean": 0.3939393939393939,
+     "ref": 0.375,
+     "rel_err": 0.04807692307692304
+    },
+    {
+     "params": {
+      "tS": 200.0,
+      "tT": 4000.0,
+      "Ne": 1000.0
+     },
+     "lean": 0.696969696969697,
+     "ref": 0.6774193548387096,
+     "rel_err": 0.028050490883590594
+    },
+    {
+     "params": {
+      "tS": 1000.0,
+      "tT": 200.0,
+      "Ne": 1000.0
+     },
+     "lean": 0.3939393939393939,
+     "ref": 0.375,
+     "rel_err": 0.04807692307692304
+    },
+    {
+     "params": {
+      "tS": 1000.0,
+      "tT": 1000.0,
+      "Ne": 1000.0
+     },
+     "lean": 0.5555555555555555,
+     "ref": 0.5,
+     "rel_err": 0.09999999999999987
+    },
+    {
+     "params": {
+      "tS": 1000.0,
+      "tT": 4000.0,
+      "Ne": 1000.0
+     },
+     "lean": 0.7777777777777777,
+     "ref": 0.7142857142857143,
+     "rel_err": 0.08163265306122436
+    },
+    {
+     "params": {
+      "tS": 4000.0,
+      "tT": 200.0,
+      "Ne": 1000.0
+     },
+     "lean": 0.696969696969697,
+     "ref": 0.6774193548387096,
+     "rel_err": 0.028050490883590594
+    },
+    {
+     "params": {
+      "tS": 4000.0,
+      "tT": 1000.0,
+      "Ne": 1000.0
+     },
+     "lean": 0.7777777777777777,
+     "ref": 0.7142857142857143,
+     "rel_err": 0.08163265306122436
+    },
+    {
+     "params": {
+      "tS": 4000.0,
+      "tT": 4000.0,
+      "Ne": 1000.0
+     },
+     "lean": 0.8888888888888888,
+     "ref": 0.8,
+     "rel_err": 0.0999999999999999
+    }
+   ]
+  },
+  "hetEquilibrium-vs-exact-iam": {
+   "definition": "Calibrator.PopulationGeneticsFoundations.hetEquilibrium",
+   "claim": "theta/(1+theta) vs the exact infinite-alleles stationary heterozygosity",
+   "model_definition": "theta/(1+theta), theta = 4 Ne mu",
+   "model_reference": "exact IAM recursion F' = (1-mu)^2[1/2Ne + (1-1/2Ne)F]",
+   "reference": "refs.iam_het_equilibrium",
+   "tol": 0.01,
+   "verdict": "AGREE",
+   "kind": "formula",
+   "vacuous": false,
+   "mutants_detected": [
+    "scale x1.05",
+    "scale x0.5"
+   ],
+   "canfail_clause": "needs mu large enough that (1-mu)^2 != 1-2mu; mu >= 1e-3",
+   "note": "agreement to O(mu) is the claim; tol reflects that",
+   "max_rel_err": 0.0010712499106463203,
+   "min_rel_err": 0.0,
+   "worst_point": {
+    "params": {
+     "Ne": 100.0,
+     "mu": 0.001
+    },
+    "lean": 0.28571428571428575,
+    "ref": 0.2860206853479077,
+    "rel_err": 0.0010712499106463203
+   },
+   "n_grid": 12,
+   "rows": [
+    {
+     "params": {
+      "Ne": 100.0,
+      "mu": 1e-06
+     },
+     "lean": 0.00039984006397441024,
+     "ref": 0.00039984066350506886,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "Ne": 100.0,
+      "mu": 1e-05
+     },
+     "lean": 0.00398406374501992,
+     "ref": 0.0039841232686591566,
+     "rel_err": 1.4940210235096724e-05
+    },
+    {
+     "params": {
+      "Ne": 100.0,
+      "mu": 0.0001
+     },
+     "lean": 0.038461538461538464,
+     "ref": 0.03846708650654018,
+     "rel_err": 0.00014422836522270545
+    },
+    {
+     "params": {
+      "Ne": 100.0,
+      "mu": 0.001
+     },
+     "lean": 0.28571428571428575,
+     "ref": 0.2860206853479077,
+     "rel_err": 0.0010712499106463203
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "mu": 1e-06
+     },
+     "lean": 0.00398406374501992,
+     "ref": 0.0039840696973822975,
+     "rel_err": 1.494040724540864e-06
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "mu": 1e-05
+     },
+     "lean": 0.038461538461538464,
+     "ref": 0.038462093202250136,
+     "rel_err": 1.4423050476096602e-05
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "mu": 0.0001
+     },
+     "lean": 0.28571428571428575,
+     "ref": 0.28574490072900727,
+     "rel_err": 0.00010714107108615685
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "mu": 0.001
+     },
+     "lean": 0.8,
+     "ref": 0.8002400319775748,
+     "rel_err": 0.00029994997498630977
+    },
+    {
+     "params": {
+      "Ne": 10000.0,
+      "mu": 1e-06
+     },
+     "lean": 0.038461538461538464,
+     "ref": 0.038461593936116145,
+     "rel_err": 1.4423369393805046e-06
+    },
+    {
+     "params": {
+      "Ne": 10000.0,
+      "mu": 1e-05
+     },
+     "lean": 0.28571428571428575,
+     "ref": 0.28571734696622186,
+     "rel_err": 1.0714266979636411e-05
+    },
+    {
+     "params": {
+      "Ne": 10000.0,
+      "mu": 0.0001
+     },
+     "lean": 0.8,
+     "ref": 0.8000240003199773,
+     "rel_err": 2.9999499974615445e-05
+    },
+    {
+     "params": {
+      "Ne": 10000.0,
+      "mu": 0.001
+     },
+     "lean": 0.975609756097561,
+     "ref": 0.9756454444910573,
+     "rel_err": 3.6579265242140856e-05
+    }
+   ]
+  },
+  "hetDecayFactor-vs-exact-eigenvalue": {
+   "definition": "Calibrator.PopulationGeneticsFoundations.hetDecayFactor",
+   "claim": "(1-1/2Ne)(1-theta/2Ne) vs the exact IAM eigenvalue (1-1/2Ne)(1-mu)^2",
+   "model_definition": "theta passed in must be 4*Ne*mu for the SAME Ne",
+   "model_reference": "exact IAM",
+   "reference": "refs.iam_decay_eigenvalue",
+   "tol": 0.0001,
+   "verdict": "AGREE",
+   "kind": "formula",
+   "vacuous": false,
+   "mutants_detected": [
+    "scale x1.05",
+    "scale x0.5",
+    "transpose first two args"
+   ],
+   "canfail_clause": "mu >= 1e-3 (difference is mu^2 per generation)",
+   "note": "",
+   "max_rel_err": 1.0020030041409253e-06,
+   "min_rel_err": 0.0,
+   "worst_point": {
+    "params": {
+     "Ne": 10000.0,
+     "mu": 0.001
+    },
+    "lean": 0.9979501,
+    "ref": 0.9979510999500001,
+    "rel_err": 1.0020030041409253e-06
+   },
+   "n_grid": 12,
+   "rows": [
+    {
+     "params": {
+      "Ne": 100.0,
+      "mu": 1e-06
+     },
+     "lean": 0.9949980100000001,
+     "ref": 0.994998010000995,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "Ne": 100.0,
+      "mu": 1e-05
+     },
+     "lean": 0.9949800999999999,
+     "ref": 0.9949801000995001,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "Ne": 100.0,
+      "mu": 0.0001
+     },
+     "lean": 0.994801,
+     "ref": 0.9948010099500001,
+     "rel_err": 1.000200034639156e-08
+    },
+    {
+     "params": {
+      "Ne": 100.0,
+      "mu": 0.001
+     },
+     "lean": 0.99301,
+     "ref": 0.993010995,
+     "rel_err": 1.0020030040645653e-06
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "mu": 1e-06
+     },
+     "lean": 0.9994980010000001,
+     "ref": 0.9994980010009995,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "mu": 1e-05
+     },
+     "lean": 0.9994800100000001,
+     "ref": 0.9994800100999501,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "mu": 0.0001
+     },
+     "lean": 0.9993001,
+     "ref": 0.9993001099950001,
+     "rel_err": 1.0002000349908798e-08
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "mu": 0.001
+     },
+     "lean": 0.9975010000000001,
+     "ref": 0.9975019995000001,
+     "rel_err": 1.0020030039923598e-06
+    },
+    {
+     "params": {
+      "Ne": 10000.0,
+      "mu": 1e-06
+     },
+     "lean": 0.9999480001000001,
+     "ref": 0.9999480001009998,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "Ne": 10000.0,
+      "mu": 1e-05
+     },
+     "lean": 0.999930001,
+     "ref": 0.9999300010999951,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "Ne": 10000.0,
+      "mu": 0.0001
+     },
+     "lean": 0.9997500100000001,
+     "ref": 0.9997500199995001,
+     "rel_err": 1.0002000305838755e-08
+    },
+    {
+     "params": {
+      "Ne": 10000.0,
+      "mu": 0.001
+     },
+     "lean": 0.9979501,
+     "ref": 0.9979510999500001,
+     "rel_err": 1.0020030041409253e-06
+    }
+   ]
+  },
+  "hetMutationDriftRecurrence-trajectory": {
+   "definition": "Calibrator.PopulationGeneticsFoundations.hetMutationDriftRecurrence",
+   "claim": "the corpus recurrence vs the exact IAM trajectory from H0=0",
+   "model_definition": "H' = (1-1/2Ne)H + 2mu(1-H)",
+   "model_reference": "exact IAM trajectory",
+   "reference": "refs.iam_het_trajectory",
+   "tol": 0.01,
+   "verdict": "AGREE",
+   "kind": "formula",
+   "vacuous": false,
+   "mutants_detected": [
+    "scale x1.05",
+    "scale x0.5"
+   ],
+   "canfail_clause": "H0 must differ from H*, and t must not be so large that both sides have converged to H* -- at t -> inf the trajectory check degenerates into the equilibrium check and cannot see a wrong eigenvalue.",
+   "note": "",
+   "max_rel_err": 0.0010712499106546659,
+   "min_rel_err": 0.0,
+   "worst_point": {
+    "params": {
+     "Ne": 100.0,
+     "mu": 0.001,
+     "t": 10000
+    },
+    "lean": 0.28571428571428337,
+    "ref": 0.2860206853479077,
+    "rel_err": 0.0010712499106546659
+   },
+   "n_grid": 18,
+   "rows": [
+    {
+     "params": {
+      "Ne": 100.0,
+      "mu": 1e-05,
+      "t": 100
+     },
+     "lean": 0.0015754819992516893,
+     "ref": 0.0015754813057283247,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "Ne": 100.0,
+      "mu": 1e-05,
+      "t": 1000
+     },
+     "lean": 0.003958081456613332,
+     "ref": 0.003958137977959461,
+     "rel_err": 1.42797816660789e-05
+    },
+    {
+     "params": {
+      "Ne": 100.0,
+      "mu": 1e-05,
+      "t": 10000
+     },
+     "lean": 0.003984063745019868,
+     "ref": 0.0039841232686591566,
+     "rel_err": 1.4940210248158997e-05
+    },
+    {
+     "params": {
+      "Ne": 100.0,
+      "mu": 0.0001,
+      "t": 100
+     },
+     "lean": 0.015626365165267855,
+     "ref": 0.015626300511084802,
+     "rel_err": 4.137506219052888e-06
+    },
+    {
+     "params": {
+      "Ne": 100.0,
+      "mu": 0.0001,
+      "t": 1000
+     },
+     "lean": 0.0382522220648358,
+     "ref": 0.03825752727353697,
+     "rel_err": 0.00013867097743248998
+    },
+    {
+     "params": {
+      "Ne": 100.0,
+      "mu": 0.0001,
+      "t": 10000
+     },
+     "lean": 0.03846153846153788,
+     "ref": 0.03846708650654018,
+     "rel_err": 0.00014422836523785782
+    },
+    {
+     "params": {
+      "Ne": 100.0,
+      "mu": 0.001,
+      "t": 100
+     },
+     "lean": 0.14418158132689923,
+     "ref": 0.14417923520257148,
+     "rel_err": 1.6272011349614814e-05
+    },
+    {
+     "params": {
+      "Ne": 100.0,
+      "mu": 0.001,
+      "t": 1000
+     },
+     "lean": 0.28546008284339813,
+     "ref": 0.2857633765471764,
+     "rel_err": 0.0010613456050347647
+    },
+    {
+     "params": {
+      "Ne": 100.0,
+      "mu": 0.001,
+      "t": 10000
+     },
+     "lean": 0.28571428571428337,
+     "ref": 0.2860206853479077,
+     "rel_err": 0.0010712499106546659
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "mu": 1e-05,
+      "t": 100
+     },
+     "lean": 0.0019493835556824422,
+     "ref": 0.0019493747753143165,
+     "rel_err": 4.504176769173576e-06
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "mu": 1e-05,
+      "t": 1000
+     },
+     "lean": 0.015598455909476837,
+     "ref": 0.015598449849407357,
+     "rel_err": 3.8850444649040105e-07
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "mu": 1e-05,
+      "t": 10000
+     },
+     "lean": 0.03824964967376644,
+     "ref": 0.038250179945160674,
+     "rel_err": 1.386323920547075e-05
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "mu": 0.0001,
+      "t": 100
+     },
+     "lean": 0.019322581179575717,
+     "ref": 0.019321719085161504,
+     "rel_err": 4.461590334134996e-05
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "mu": 0.0001,
+      "t": 1000
+     },
+     "lean": 0.1438675432850402,
+     "ref": 0.143867343166011,
+     "rel_err": 1.3909949710646146e-06
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "mu": 0.0001,
+      "t": 10000
+     },
+     "lean": 0.28545438584324817,
+     "ref": 0.28548468674373695,
+     "rel_err": 0.00010613844418204162
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "mu": 0.001,
+      "t": 100
+     },
+     "lean": 0.17715436832822554,
+     "ref": 0.17708262175800937,
+     "rel_err": 0.00040499464333407746
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "mu": 0.001,
+      "t": 1000
+     },
+     "lean": 0.7345372348800305,
+     "ref": 0.7346262336764668,
+     "rel_err": 0.0001211484049390865
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "mu": 0.001,
+      "t": 10000
+     },
+     "lean": 0.7999999999892492,
+     "ref": 0.8002400319665854,
+     "rel_err": 0.0002999499746924234
+    }
+   ]
+  },
+  "transient-discrete-vs-continuous": {
+   "definition": "Calibrator.PopulationGeneticsFoundations.fstMutationDriftTransientDiscrete",
+   "claim": "discrete and continuous transients agree only for large Ne",
+   "model_definition": "discrete: Feq*(1-lambda^t)",
+   "model_reference": "continuous: Feq*(1-exp(-(1+theta)t/2Ne)) [same file]",
+   "reference": "Calibrator.PopulationGeneticsFoundations.fstMutationDriftTransient",
+   "tol": 0.01,
+   "verdict": "INTERNAL-INCONSISTENT",
+   "kind": "internal",
+   "vacuous": false,
+   "mutants_detected": [
+    "scale x1.05",
+    "scale x0.5",
+    "transpose first two args"
+   ],
+   "canfail_clause": "Ne must go down to ~5; at Ne=5000 the two agree to 1e-4",
+   "note": "internal consistency; reference is another corpus definition",
+   "max_rel_err": 0.02903464751593405,
+   "min_rel_err": 0.0,
+   "worst_point": {
+    "params": {
+     "Ne": 5.0,
+     "theta": 0.01,
+     "t": 10
+    },
+    "lean": 0.6483095995440332,
+    "ref": 0.6294861588400759,
+    "rel_err": 0.02903464751593405
+   },
+   "n_grid": 12,
+   "rows": [
+    {
+     "params": {
+      "Ne": 5.0,
+      "theta": 0.01,
+      "t": 10
+     },
+     "lean": 0.6483095995440332,
+     "ref": 0.6294861588400759,
+     "rel_err": 0.02903464751593405
+    },
+    {
+     "params": {
+      "Ne": 5.0,
+      "theta": 0.01,
+      "t": 100
+     },
+     "lean": 0.9900752153018516,
+     "ref": 0.9900583370740343,
+     "rel_err": 1.7047419788321042e-05
+    },
+    {
+     "params": {
+      "Ne": 5.0,
+      "theta": 1.0,
+      "t": 10
+     },
+     "lean": 0.43921167270471534,
+     "ref": 0.43233235838169365,
+     "rel_err": 0.015662867702622957
+    },
+    {
+     "params": {
+      "Ne": 5.0,
+      "theta": 1.0,
+      "t": 100
+     },
+     "lean": 0.49999999964724606,
+     "ref": 0.4999999989694232,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "Ne": 50.0,
+      "theta": 0.01,
+      "t": 10
+     },
+     "lean": 0.09556623782453186,
+     "ref": 0.0951158090238969,
+     "rel_err": 0.004713262872835816
+    },
+    {
+     "params": {
+      "Ne": 50.0,
+      "theta": 0.01,
+      "t": 100
+     },
+     "lean": 0.6312969530522612,
+     "ref": 0.6294861588400759,
+     "rel_err": 0.002868371538038177
+    },
+    {
+     "params": {
+      "Ne": 50.0,
+      "theta": 1.0,
+      "t": 10
+     },
+     "lean": 0.09104653120138467,
+     "ref": 0.09063462346100909,
+     "rel_err": 0.0045241453456858205
+    },
+    {
+     "params": {
+      "Ne": 50.0,
+      "theta": 1.0,
+      "t": 100
+     },
+     "lean": 0.4330101625710192,
+     "ref": 0.43233235838169365,
+     "rel_err": 0.0015653309042472894
+    },
+    {
+     "params": {
+      "Ne": 5000.0,
+      "theta": 0.01,
+      "t": 10
+     },
+     "lean": 0.0009995446331911191,
+     "ref": 0.0009994951699737688,
+     "rel_err": 4.948575151909476e-05
+    },
+    {
+     "params": {
+      "Ne": 5000.0,
+      "theta": 0.01,
+      "t": 100
+     },
+     "lean": 0.009950159744470392,
+     "ref": 0.009949669588240265,
+     "rel_err": 4.926114180217182e-05
+    },
+    {
+     "params": {
+      "Ne": 5000.0,
+      "theta": 1.0,
+      "t": 10
+     },
+     "lean": 0.0009990505697574648,
+     "ref": 0.0009990006663334605,
+     "rel_err": 4.9950848850777654e-05
+    },
+    {
+     "params": {
+      "Ne": 5000.0,
+      "theta": 1.0,
+      "t": 100
+     },
+     "lean": 0.009901153478386104,
+     "ref": 0.009900663346622374,
+     "rel_err": 4.950249128049941e-05
+    }
+   ]
+  },
+  "islandModelFst-finite-demes": {
+   "definition": "Calibrator.PopulationGeneticsFoundations.islandModelFst",
+   "claim": "MODEL: 1/(1+4Nm) is the infinite-island limit",
+   "model_definition": "infinite number of demes",
+   "model_reference": "d demes: 1/(1+4Nm(d/(d-1))^2)",
+   "reference": "refs.island_fst_finite_demes",
+   "tol": 1e-09,
+   "verdict": "MODEL",
+   "kind": "model",
+   "vacuous": false,
+   "mutants_detected": [
+    "scale x1.05",
+    "scale x0.5",
+    "transpose first two args"
+   ],
+   "canfail_clause": "d must include small values. At d=40 the correction is 5% and at d -> inf it vanishes, so a large-d-only grid cannot fail.",
+   "note": "",
+   "max_rel_err": 0.7453416149068324,
+   "min_rel_err": 0.014622859787135511,
+   "worst_point": {
+    "params": {
+     "Ne": 1000.0,
+     "m": 0.01,
+     "d": 2
+    },
+    "lean": 0.024390243902439025,
+    "ref": 0.006211180124223602,
+    "rel_err": 0.7453416149068324
+   },
+   "n_grid": 12,
+   "rows": [
+    {
+     "params": {
+      "Ne": 1000.0,
+      "m": 0.0001,
+      "d": 2
+     },
+     "lean": 0.7142857142857143,
+     "ref": 0.3846153846153846,
+     "rel_err": 0.4615384615384616
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "m": 0.0001,
+      "d": 5
+     },
+     "lean": 0.7142857142857143,
+     "ref": 0.6153846153846154,
+     "rel_err": 0.13846153846153844
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "m": 0.0001,
+      "d": 10
+     },
+     "lean": 0.7142857142857143,
+     "ref": 0.6694214876033058,
+     "rel_err": 0.06280991735537193
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "m": 0.0001,
+      "d": 40
+     },
+     "lean": 0.7142857142857143,
+     "ref": 0.7038408144377604,
+     "rel_err": 0.014622859787135511
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "m": 0.001,
+      "d": 2
+     },
+     "lean": 0.2,
+     "ref": 0.058823529411764705,
+     "rel_err": 0.7058823529411764
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "m": 0.001,
+      "d": 5
+     },
+     "lean": 0.2,
+     "ref": 0.13793103448275862,
+     "rel_err": 0.31034482758620696
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "m": 0.001,
+      "d": 10
+     },
+     "lean": 0.2,
+     "ref": 0.16839916839916838,
+     "rel_err": 0.15800415800415815
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "m": 0.001,
+      "d": 40
+     },
+     "lean": 0.2,
+     "ref": 0.19202120944325216,
+     "rel_err": 0.03989395278373928
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "m": 0.01,
+      "d": 2
+     },
+     "lean": 0.024390243902439025,
+     "ref": 0.006211180124223602,
+     "rel_err": 0.7453416149068324
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "m": 0.01,
+      "d": 5
+     },
+     "lean": 0.024390243902439025,
+     "ref": 0.015748031496062992,
+     "rel_err": 0.35433070866141736
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "m": 0.01,
+      "d": 10
+     },
+     "lean": 0.024390243902439025,
+     "ref": 0.019848076451850036,
+     "rel_err": 0.18622886547414857
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "m": 0.01,
+      "d": 40
+     },
+     "lean": 0.024390243902439025,
+     "ref": 0.023213931411303252,
+     "rel_err": 0.0482288121365667
+    }
+   ]
+  },
+  "fstIslandMultiplicative-exact-fixedpoint": {
+   "definition": "Calibrator.PortabilityDrift.fstIslandMultiplicativeEquilibrium",
+   "claim": "the closed form is the exact fixed point of its own step function",
+   "model_definition": "F' = (1-m)^2[1/2Ne + (1-1/2Ne)F]",
+   "model_reference": "same recursion, solved exactly",
+   "reference": "refs.island_fst_exact_recursion",
+   "tol": 1e-09,
+   "verdict": "AGREE",
+   "kind": "formula",
+   "vacuous": false,
+   "mutants_detected": [
+    "scale x1.05",
+    "scale x0.5",
+    "transpose first two args"
+   ],
+   "canfail_clause": "m must reach ~0.3 so the (1-m)^2 terms matter",
+   "note": "",
+   "max_rel_err": 0.0,
+   "min_rel_err": 0.0,
+   "worst_point": {
+    "params": {
+     "Ne": 100.0,
+     "m": 0.0001
+    },
+    "lean": 0.9615329134934582,
+    "ref": 0.9615329134934582,
+    "rel_err": 0.0
+   },
+   "n_grid": 8,
+   "rows": [
+    {
+     "params": {
+      "Ne": 100.0,
+      "m": 0.0001
+     },
+     "lean": 0.9615329134934582,
+     "ref": 0.9615329134934582,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "Ne": 100.0,
+      "m": 0.01
+     },
+     "lean": 0.19759682264470474,
+     "ref": 0.19759682264470474,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "Ne": 100.0,
+      "m": 0.1
+     },
+     "lean": 0.020870909559391908,
+     "ref": 0.020870909559391908,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "Ne": 100.0,
+      "m": 0.3
+     },
+     "lean": 0.004780954239437993,
+     "ref": 0.004780954239437993,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "m": 0.0001
+     },
+     "lean": 0.7142550992709203,
+     "ref": 0.7142550992709203,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "m": 0.01
+     },
+     "lean": 0.024033781182488518,
+     "ref": 0.024033781182488518,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "m": 0.1
+     },
+     "lean": 0.00212704498306242,
+     "ref": 0.00212704498306242,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "m": 0.3
+     },
+     "lean": 0.00048016149104841786,
+     "ref": 0.00048016149104841786,
+     "rel_err": 0.0
+    }
+   ]
+  },
+  "islandModelFst-vs-exact-in-m": {
+   "definition": "Calibrator.PopulationGeneticsFoundations.islandModelFst",
+   "claim": "1/(1+4Nm) vs the exact-in-m island fixed point",
+   "model_definition": "small-m expansion",
+   "model_reference": "exact recursion fixed point",
+   "reference": "refs.island_fst_exact_recursion",
+   "tol": 0.01,
+   "verdict": "MODEL",
+   "kind": "model",
+   "vacuous": false,
+   "mutants_detected": [
+    "scale x1.05",
+    "scale x0.5",
+    "transpose first two args"
+   ],
+   "canfail_clause": "m >= 0.1; at m <= 1e-3 the expansion is exact to 0.1%",
+   "note": "",
+   "max_rel_err": 0.42332604925085016,
+   "min_rel_err": 5.76996680343278e-06,
+   "worst_point": {
+    "params": {
+     "Ne": 1000.0,
+     "m": 0.3
+    },
+    "lean": 0.0008326394671107411,
+    "ref": 0.00048016149104841786,
+    "rel_err": 0.42332604925085016
+   },
+   "n_grid": 8,
+   "rows": [
+    {
+     "params": {
+      "Ne": 100.0,
+      "m": 0.0001
+     },
+     "lean": 0.9615384615384615,
+     "ref": 0.9615329134934582,
+     "rel_err": 5.76996680343278e-06
+    },
+    {
+     "params": {
+      "Ne": 100.0,
+      "m": 0.01
+     },
+     "lean": 0.2,
+     "ref": 0.19759682264470474,
+     "rel_err": 0.012015886776476359
+    },
+    {
+     "params": {
+      "Ne": 100.0,
+      "m": 0.1
+     },
+     "lean": 0.024390243902439025,
+     "ref": 0.020870909559391908,
+     "rel_err": 0.1442927080649318
+    },
+    {
+     "params": {
+      "Ne": 100.0,
+      "m": 0.3
+     },
+     "lean": 0.008264462809917356,
+     "ref": 0.004780954239437993,
+     "rel_err": 0.42150453702800283
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "m": 0.0001
+     },
+     "lean": 0.7142857142857143,
+     "ref": 0.7142550992709203,
+     "rel_err": 4.286102071153763e-05
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "m": 0.01
+     },
+     "lean": 0.024390243902439025,
+     "ref": 0.024033781182488518,
+     "rel_err": 0.014614971517970799
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "m": 0.1
+     },
+     "lean": 0.0024937655860349127,
+     "ref": 0.00212704498306242,
+     "rel_err": 0.14705496179196959
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "m": 0.3
+     },
+     "lean": 0.0008326394671107411,
+     "ref": 0.00048016149104841786,
+     "rel_err": 0.42332604925085016
+    }
+   ]
+  },
+  "steppingStoneLength-missing-mutation": {
+   "definition": "Calibrator.PopulationGeneticsFoundations.steppingStoneCharacteristicLength",
+   "claim": "FORMULA: the 1D decay scale is sqrt(m/2mu), not sqrt(2 Ne m)",
+   "model_definition": "L = sqrt(2 Ne m); no mutation argument",
+   "model_reference": "Malecot/Kimura-Weiss 1D lattice: L = sqrt(m/(2 mu))",
+   "reference": "refs.stepping_stone_decay_scale_malecot",
+   "tol": 1e-09,
+   "verdict": "FORMULA",
+   "kind": "formula",
+   "vacuous": false,
+   "mutants_detected": [
+    "scale x1.05",
+    "scale x0.5",
+    "transpose first two args"
+   ],
+   "canfail_clause": "the grid MUST vary mu at fixed Ne and m: the Lean value is constant along that axis while the reference moves as mu^-1/2. Varying only Ne and m would let a fitted constant hide the error.",
+   "note": "",
+   "max_rel_err": 0.998,
+   "min_rel_err": 0.8,
+   "worst_point": {
+    "params": {
+     "Ne": 100.0,
+     "m": 0.001,
+     "mu": 1e-08
+    },
+    "lean": 0.4472135954999579,
+    "ref": 223.60679774997897,
+    "rel_err": 0.998
+   },
+   "n_grid": 12,
+   "rows": [
+    {
+     "params": {
+      "Ne": 100.0,
+      "m": 0.001,
+      "mu": 1e-08
+     },
+     "lean": 0.4472135954999579,
+     "ref": 223.60679774997897,
+     "rel_err": 0.998
+    },
+    {
+     "params": {
+      "Ne": 100.0,
+      "m": 0.001,
+      "mu": 1e-06
+     },
+     "lean": 0.4472135954999579,
+     "ref": 22.360679774997898,
+     "rel_err": 0.9800000000000001
+    },
+    {
+     "params": {
+      "Ne": 100.0,
+      "m": 0.01,
+      "mu": 1e-08
+     },
+     "lean": 1.4142135623730951,
+     "ref": 707.1067811865476,
+     "rel_err": 0.998
+    },
+    {
+     "params": {
+      "Ne": 100.0,
+      "m": 0.01,
+      "mu": 1e-06
+     },
+     "lean": 1.4142135623730951,
+     "ref": 70.71067811865476,
+     "rel_err": 0.9800000000000001
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "m": 0.001,
+      "mu": 1e-08
+     },
+     "lean": 1.4142135623730951,
+     "ref": 223.60679774997897,
+     "rel_err": 0.9936754446796632
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "m": 0.001,
+      "mu": 1e-06
+     },
+     "lean": 1.4142135623730951,
+     "ref": 22.360679774997898,
+     "rel_err": 0.9367544467966323
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "m": 0.01,
+      "mu": 1e-08
+     },
+     "lean": 4.47213595499958,
+     "ref": 707.1067811865476,
+     "rel_err": 0.9936754446796633
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "m": 0.01,
+      "mu": 1e-06
+     },
+     "lean": 4.47213595499958,
+     "ref": 70.71067811865476,
+     "rel_err": 0.9367544467966326
+    },
+    {
+     "params": {
+      "Ne": 10000.0,
+      "m": 0.001,
+      "mu": 1e-08
+     },
+     "lean": 4.47213595499958,
+     "ref": 223.60679774997897,
+     "rel_err": 0.98
+    },
+    {
+     "params": {
+      "Ne": 10000.0,
+      "m": 0.001,
+      "mu": 1e-06
+     },
+     "lean": 4.47213595499958,
+     "ref": 22.360679774997898,
+     "rel_err": 0.8
+    },
+    {
+     "params": {
+      "Ne": 10000.0,
+      "m": 0.01,
+      "mu": 1e-08
+     },
+     "lean": 14.142135623730951,
+     "ref": 707.1067811865476,
+     "rel_err": 0.98
+    },
+    {
+     "params": {
+      "Ne": 10000.0,
+      "m": 0.01,
+      "mu": 1e-06
+     },
+     "lean": 14.142135623730951,
+     "ref": 70.71067811865476,
+     "rel_err": 0.8
+    }
+   ]
+  },
+  "steppingStone-cross-file-contradiction": {
+   "definition": "Calibrator.PopulationGeneticsFoundations.continuousSteppingStoneFst",
+   "claim": "two corpus formulas for stepping-stone F_ST at distance d disagree",
+   "model_definition": "1 - exp(-d/sqrt(2 Ne m))",
+   "model_reference": "DemographicHistory.demoSteppingStoneFst = d/(d+4 Ne m sigma^2)",
+   "reference": "Calibrator.DemographicHistory.demoSteppingStoneFst",
+   "tol": 1e-09,
+   "verdict": "INTERNAL-INCONSISTENT",
+   "kind": "internal",
+   "vacuous": false,
+   "mutants_detected": [
+    "scale x1.05",
+    "scale x0.5",
+    "transpose first two args"
+   ],
+   "canfail_clause": "d must be comparable to or larger than L; at d -> 0 both -> 0",
+   "note": "",
+   "max_rel_err": 0.8782742842676788,
+   "min_rel_err": 0.16666606553777238,
+   "worst_point": {
+    "params": {
+     "Ne": 1000.0,
+     "m": 0.01,
+     "d": 1.0
+    },
+    "lean": 0.20037051132296457,
+    "ref": 0.024390243902439025,
+    "rel_err": 0.8782742842676788
+   },
+   "n_grid": 6,
+   "rows": [
+    {
+     "params": {
+      "Ne": 1000.0,
+      "m": 0.001,
+      "d": 1.0
+     },
+     "lean": 0.5069313086047602,
+     "ref": 0.2,
+     "rel_err": 0.6054692290549877
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "m": 0.001,
+      "d": 5.0
+     },
+     "lean": 0.9708568068887575,
+     "ref": 0.5555555555555556,
+     "rel_err": 0.42776777006291095
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "m": 0.001,
+      "d": 20.0
+     },
+     "lean": 0.9999992786458473,
+     "ref": 0.8333333333333334,
+     "rel_err": 0.16666606553777238
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "m": 0.01,
+      "d": 1.0
+     },
+     "lean": 0.20037051132296457,
+     "ref": 0.024390243902439025,
+     "rel_err": 0.8782742842676788
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "m": 0.01,
+      "d": 5.0
+     },
+     "lean": 0.6730781046482421,
+     "ref": 0.1111111111111111,
+     "rel_err": 0.8349209247132188
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "m": 0.01,
+      "d": 20.0
+     },
+     "lean": 0.9885771090065331,
+     "ref": 0.3333333333333333,
+     "rel_err": 0.6628150396196049
+    }
+   ]
+  },
+  "demoSteppingStoneFst-exact": {
+   "definition": "Calibrator.DemographicHistory.demoSteppingStoneFst",
+   "claim": "d/(d+4 Ne m sigma^2) is the Hudson F_ST built from its own T(d)",
+   "model_definition": "E[T_within]=2Ne, Delta(d)=d/(2 sigma^2 m)",
+   "model_reference": "same, assembled independently",
+   "reference": "refs.stepping_stone_fst_hudson",
+   "tol": 1e-09,
+   "verdict": "AGREE",
+   "kind": "formula",
+   "vacuous": false,
+   "mutants_detected": [
+    "scale x1.05",
+    "scale x0.5",
+    "transpose first two args"
+   ],
+   "canfail_clause": "d > 0 and finite Ne; at d=0 both sides are 0",
+   "note": "",
+   "max_rel_err": 0.0,
+   "min_rel_err": 0.0,
+   "worst_point": {
+    "params": {
+     "d": 1.0,
+     "Ne": 500.0,
+     "m": 0.001,
+     "sigma_sq": 1.0
+    },
+    "lean": 0.3333333333333333,
+    "ref": 0.3333333333333333,
+    "rel_err": 0.0
+   },
+   "n_grid": 24,
+   "rows": [
+    {
+     "params": {
+      "d": 1.0,
+      "Ne": 500.0,
+      "m": 0.001,
+      "sigma_sq": 1.0
+     },
+     "lean": 0.3333333333333333,
+     "ref": 0.3333333333333333,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "d": 1.0,
+      "Ne": 500.0,
+      "m": 0.001,
+      "sigma_sq": 4.0
+     },
+     "lean": 0.1111111111111111,
+     "ref": 0.1111111111111111,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "d": 1.0,
+      "Ne": 500.0,
+      "m": 0.01,
+      "sigma_sq": 1.0
+     },
+     "lean": 0.047619047619047616,
+     "ref": 0.047619047619047616,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "d": 1.0,
+      "Ne": 500.0,
+      "m": 0.01,
+      "sigma_sq": 4.0
+     },
+     "lean": 0.012345679012345678,
+     "ref": 0.012345679012345678,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "d": 1.0,
+      "Ne": 5000.0,
+      "m": 0.001,
+      "sigma_sq": 1.0
+     },
+     "lean": 0.047619047619047616,
+     "ref": 0.047619047619047616,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "d": 1.0,
+      "Ne": 5000.0,
+      "m": 0.001,
+      "sigma_sq": 4.0
+     },
+     "lean": 0.012345679012345678,
+     "ref": 0.012345679012345678,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "d": 1.0,
+      "Ne": 5000.0,
+      "m": 0.01,
+      "sigma_sq": 1.0
+     },
+     "lean": 0.004975124378109453,
+     "ref": 0.004975124378109453,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "d": 1.0,
+      "Ne": 5000.0,
+      "m": 0.01,
+      "sigma_sq": 4.0
+     },
+     "lean": 0.0012484394506866417,
+     "ref": 0.0012484394506866417,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "d": 5.0,
+      "Ne": 500.0,
+      "m": 0.001,
+      "sigma_sq": 1.0
+     },
+     "lean": 0.7142857142857143,
+     "ref": 0.7142857142857143,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "d": 5.0,
+      "Ne": 500.0,
+      "m": 0.001,
+      "sigma_sq": 4.0
+     },
+     "lean": 0.38461538461538464,
+     "ref": 0.38461538461538464,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "d": 5.0,
+      "Ne": 500.0,
+      "m": 0.01,
+      "sigma_sq": 1.0
+     },
+     "lean": 0.2,
+     "ref": 0.2,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "d": 5.0,
+      "Ne": 500.0,
+      "m": 0.01,
+      "sigma_sq": 4.0
+     },
+     "lean": 0.058823529411764705,
+     "ref": 0.058823529411764705,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "d": 5.0,
+      "Ne": 5000.0,
+      "m": 0.001,
+      "sigma_sq": 1.0
+     },
+     "lean": 0.2,
+     "ref": 0.2,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "d": 5.0,
+      "Ne": 5000.0,
+      "m": 0.001,
+      "sigma_sq": 4.0
+     },
+     "lean": 0.058823529411764705,
+     "ref": 0.058823529411764705,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "d": 5.0,
+      "Ne": 5000.0,
+      "m": 0.01,
+      "sigma_sq": 1.0
+     },
+     "lean": 0.024390243902439025,
+     "ref": 0.024390243902439025,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "d": 5.0,
+      "Ne": 5000.0,
+      "m": 0.01,
+      "sigma_sq": 4.0
+     },
+     "lean": 0.006211180124223602,
+     "ref": 0.006211180124223602,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "d": 20.0,
+      "Ne": 500.0,
+      "m": 0.001,
+      "sigma_sq": 1.0
+     },
+     "lean": 0.9090909090909091,
+     "ref": 0.9090909090909091,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "d": 20.0,
+      "Ne": 500.0,
+      "m": 0.001,
+      "sigma_sq": 4.0
+     },
+     "lean": 0.7142857142857143,
+     "ref": 0.7142857142857143,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "d": 20.0,
+      "Ne": 500.0,
+      "m": 0.01,
+      "sigma_sq": 1.0
+     },
+     "lean": 0.5,
+     "ref": 0.5,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "d": 20.0,
+      "Ne": 500.0,
+      "m": 0.01,
+      "sigma_sq": 4.0
+     },
+     "lean": 0.2,
+     "ref": 0.2,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "d": 20.0,
+      "Ne": 5000.0,
+      "m": 0.001,
+      "sigma_sq": 1.0
+     },
+     "lean": 0.5,
+     "ref": 0.5,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "d": 20.0,
+      "Ne": 5000.0,
+      "m": 0.001,
+      "sigma_sq": 4.0
+     },
+     "lean": 0.2,
+     "ref": 0.2,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "d": 20.0,
+      "Ne": 5000.0,
+      "m": 0.01,
+      "sigma_sq": 1.0
+     },
+     "lean": 0.09090909090909091,
+     "ref": 0.09090909090909091,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "d": 20.0,
+      "Ne": 5000.0,
+      "m": 0.01,
+      "sigma_sq": 4.0
+     },
+     "lean": 0.024390243902439025,
+     "ref": 0.024390243902439025,
+     "rel_err": 0.0
+    }
+   ]
+  },
+  "ldRetentionPerGen-exact": {
+   "definition": "Calibrator.LDDecayTheory.ldRetentionPerGen",
+   "claim": "(1-r)(1-1/2Ne) is the exact per-generation retention of E[D]",
+   "model_definition": "two neutral loci, recombination r, Wright-Fisher Ne",
+   "model_reference": "Hill & Robertson (1968)",
+   "reference": "refs.ld_expected_D_retention",
+   "tol": 1e-09,
+   "verdict": "AGREE",
+   "kind": "formula",
+   "vacuous": false,
+   "mutants_detected": [
+    "scale x1.05",
+    "scale x0.5",
+    "transpose first two args"
+   ],
+   "canfail_clause": "r > 0 and Ne finite; at r=0, Ne=inf both sides are 1",
+   "note": "",
+   "max_rel_err": 0.0,
+   "min_rel_err": 0.0,
+   "worst_point": {
+    "params": {
+     "r": 1e-05,
+     "Ne": 100.0
+    },
+    "lean": 0.9949900500000001,
+    "ref": 0.9949900500000001,
+    "rel_err": 0.0
+   },
+   "n_grid": 12,
+   "rows": [
+    {
+     "params": {
+      "r": 1e-05,
+      "Ne": 100.0
+     },
+     "lean": 0.9949900500000001,
+     "ref": 0.9949900500000001,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "r": 1e-05,
+      "Ne": 1000.0
+     },
+     "lean": 0.9994900050000001,
+     "ref": 0.9994900050000001,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "r": 1e-05,
+      "Ne": 10000.0
+     },
+     "lean": 0.9999400005000001,
+     "ref": 0.9999400005000001,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "r": 0.001,
+      "Ne": 100.0
+     },
+     "lean": 0.994005,
+     "ref": 0.994005,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "r": 0.001,
+      "Ne": 1000.0
+     },
+     "lean": 0.9985005,
+     "ref": 0.9985005,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "r": 0.001,
+      "Ne": 10000.0
+     },
+     "lean": 0.99895005,
+     "ref": 0.99895005,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "r": 0.01,
+      "Ne": 100.0
+     },
+     "lean": 0.98505,
+     "ref": 0.98505,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "r": 0.01,
+      "Ne": 1000.0
+     },
+     "lean": 0.9895050000000001,
+     "ref": 0.9895050000000001,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "r": 0.01,
+      "Ne": 10000.0
+     },
+     "lean": 0.9899505,
+     "ref": 0.9899505,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "r": 0.1,
+      "Ne": 100.0
+     },
+     "lean": 0.8955,
+     "ref": 0.8955,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "r": 0.1,
+      "Ne": 1000.0
+     },
+     "lean": 0.8995500000000001,
+     "ref": 0.8995500000000001,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "r": 0.1,
+      "Ne": 10000.0
+     },
+     "lean": 0.8999550000000001,
+     "ref": 0.8999550000000001,
+     "rel_err": 0.0
+    }
+   ]
+  },
+  "ldHalfLife-drops-recombination": {
+   "definition": "Calibrator.LDDecayTheory.ldHalfLife",
+   "claim": "FORMULA: 2 Ne ln2 is the r=0 half-life; the true one depends on r",
+   "model_definition": "half-life = 2 Ne ln 2; no recombination argument",
+   "model_reference": "ln2 / -ln[(1-r)(1-1/2Ne)], from ldRetentionPerGen in the same file",
+   "reference": "refs.ld_half_life_exact",
+   "tol": 1e-09,
+   "verdict": "FORMULA",
+   "kind": "formula",
+   "vacuous": false,
+   "mutants_detected": [
+    "scale x1.05",
+    "scale x0.5",
+    "transpose first two args"
+   ],
+   "canfail_clause": "REQUIRES r >> 1/(2Ne). At r=0 the two are identical, and that is exactly the degenerate point a careless grid would sit on.",
+   "note": "",
+   "max_rel_err": 0.9995256640279669,
+   "min_rel_err": 0.004488140489834654,
+   "worst_point": {
+    "params": {
+     "r": 0.1,
+     "Ne": 10000.0
+    },
+    "lean": 13862.943611198905,
+    "ref": 6.575692833057423,
+    "rel_err": 0.9995256640279669
+   },
+   "n_grid": 12,
+   "rows": [
+    {
+     "params": {
+      "r": 1e-05,
+      "Ne": 100.0
+     },
+     "lean": 138.62943611198907,
+     "ref": 138.0072477266919,
+     "rel_err": 0.004488140489834654
+    },
+    {
+     "params": {
+      "r": 1e-05,
+      "Ne": 1000.0
+     },
+     "lean": 1386.2943611198905,
+     "ref": 1358.7788404481673,
+     "rel_err": 0.019848252610286377
+    },
+    {
+     "params": {
+      "r": 1e-05,
+      "Ne": 10000.0
+     },
+     "lean": 13862.943611198905,
+     "ref": 11552.202703538123,
+     "rel_err": 0.1666847224130736
+    },
+    {
+     "params": {
+      "r": 0.001,
+      "Ne": 100.0
+     },
+     "lean": 138.62943611198907,
+     "ref": 115.27395991034204,
+     "rel_err": 0.1684741484685818
+    },
+    {
+     "params": {
+      "r": 0.001,
+      "Ne": 1000.0
+     },
+     "lean": 1386.2943611198905,
+     "ref": 461.9055441716506,
+     "rel_err": 0.6668055810322208
+    },
+    {
+     "params": {
+      "r": 0.001,
+      "Ne": 10000.0
+     },
+     "lean": 13862.943611198905,
+     "ref": 659.8249744355159,
+     "rel_err": 0.9524036890763596
+    },
+    {
+     "params": {
+      "r": 0.01,
+      "Ne": 100.0
+     },
+     "lean": 138.62943611198907,
+     "ref": 46.01691625075263,
+     "rel_err": 0.6680581156401821
+    },
+    {
+     "params": {
+      "r": 0.01,
+      "Ne": 1000.0
+     },
+     "lean": 1386.2943611198905,
+     "ref": 65.69828441109816,
+     "rel_err": 0.9526087054425979
+    },
+    {
+     "params": {
+      "r": 0.01,
+      "Ne": 10000.0
+     },
+     "lean": 13862.943611198905,
+     "ref": 68.62614321226886,
+     "rel_err": 0.9950496701756162
+    },
+    {
+     "params": {
+      "r": 0.1,
+      "Ne": 100.0
+     },
+     "lean": 138.62943611198907,
+     "ref": 6.280039679764589,
+     "rel_err": 0.9546990894870885
+    },
+    {
+     "params": {
+      "r": 0.1,
+      "Ne": 1000.0
+     },
+     "lean": 1386.2943611198905,
+     "ref": 6.547732717086828,
+     "rel_err": 0.9952768092399963
+    },
+    {
+     "params": {
+      "r": 0.1,
+      "Ne": 10000.0
+     },
+     "lean": 13862.943611198905,
+     "ref": 6.575692833057423,
+     "rel_err": 0.9995256640279669
+    }
+   ]
+  },
+  "ldRetainedFraction-inconsistent-with-retention": {
+   "definition": "Calibrator.LDDecayTheory.ldRetainedFraction",
+   "claim": "INTERNAL: retained fraction is not ldRetentionPerGen^t",
+   "model_definition": "(1-1/2Ne)^t; no recombination argument",
+   "model_reference": "ldRetentionPerGen(r,Ne)^t [same file]",
+   "reference": "Calibrator.LDDecayTheory.ldRetentionPerGen ** t",
+   "tol": 1e-09,
+   "verdict": "INTERNAL-INCONSISTENT",
+   "kind": "internal",
+   "vacuous": false,
+   "mutants_detected": [
+    "scale x1.05",
+    "scale x0.5",
+    "transpose first two args"
+   ],
+   "canfail_clause": "r > 0 required; the r=0 row is in the grid and passes, which is the point",
+   "note": "",
+   "max_rel_err": 0.9999734386011123,
+   "min_rel_err": 0.0,
+   "worst_point": {
+    "params": {
+     "r": 0.1,
+     "Ne": 1000.0,
+     "t": 100
+    },
+    "lean": 0.9512175302423342,
+    "ref": 2.5265668249632505e-05,
+    "rel_err": 0.9999734386011123
+   },
+   "n_grid": 8,
+   "rows": [
+    {
+     "params": {
+      "r": 0.0,
+      "Ne": 1000.0,
+      "t": 10
+     },
+     "lean": 0.9950112350131177,
+     "ref": 0.9950112350131177,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "r": 0.0,
+      "Ne": 1000.0,
+      "t": 100
+     },
+     "lean": 0.9512175302423342,
+     "ref": 0.9512175302423342,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "r": 0.0001,
+      "Ne": 1000.0,
+      "t": 10
+     },
+     "lean": 0.9950112350131177,
+     "ref": 0.9940166714137803,
+     "rel_err": 0.000999550119978656
+    },
+    {
+     "params": {
+      "r": 0.0001,
+      "Ne": 1000.0,
+      "t": 100
+     },
+     "lean": 0.9512175302423342,
+     "ref": 0.9417522867680658,
+     "rel_err": 0.009950661308625257
+    },
+    {
+     "params": {
+      "r": 0.01,
+      "Ne": 1000.0,
+      "t": 10
+     },
+     "lean": 0.9950112350131177,
+     "ref": 0.8998703253782369,
+     "rel_err": 0.09561792499119527
+    },
+    {
+     "params": {
+      "r": 0.01,
+      "Ne": 1000.0,
+      "t": 100
+     },
+     "lean": 0.9512175302423342,
+     "ref": 0.34817637965474146,
+     "rel_err": 0.6339676587267696
+    },
+    {
+     "params": {
+      "r": 0.1,
+      "Ne": 1000.0,
+      "t": 10
+     },
+     "lean": 0.9950112350131177,
+     "ref": 0.34693896530634843,
+     "rel_err": 0.6513215599
+    },
+    {
+     "params": {
+      "r": 0.1,
+      "Ne": 1000.0,
+      "t": 100
+     },
+     "lean": 0.9512175302423342,
+     "ref": 2.5265668249632505e-05,
+     "rel_err": 0.9999734386011123
+    }
+   ]
+  },
+  "driftLDEquilibrium-exact-fixedpoint": {
+   "definition": "Calibrator.LDDecayTheory.driftLDEquilibrium",
+   "claim": "closed form is the exact fixed point of driftLDStep",
+   "model_definition": "Q' = (1-c)^2[1/2Ne + (1-1/2Ne)Q]",
+   "model_reference": "same recursion solved exactly",
+   "reference": "refs.ld_ibd_equilibrium_exact",
+   "tol": 1e-09,
+   "verdict": "AGREE",
+   "kind": "formula",
+   "vacuous": false,
+   "mutants_detected": [
+    "scale x1.05",
+    "scale x0.5",
+    "transpose first two args"
+   ],
+   "canfail_clause": "c up to 0.3 so the (1-c)^2 factor is not ~1",
+   "note": "",
+   "max_rel_err": 0.0,
+   "min_rel_err": 0.0,
+   "worst_point": {
+    "params": {
+     "Ne": 100.0,
+     "c": 0.0001
+    },
+    "lean": 0.9615329134934755,
+    "ref": 0.9615329134934755,
+    "rel_err": 0.0
+   },
+   "n_grid": 8,
+   "rows": [
+    {
+     "params": {
+      "Ne": 100.0,
+      "c": 0.0001
+     },
+     "lean": 0.9615329134934755,
+     "ref": 0.9615329134934755,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "Ne": 100.0,
+      "c": 0.01
+     },
+     "lean": 0.19759682264470474,
+     "ref": 0.1975968226447047,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "Ne": 100.0,
+      "c": 0.1
+     },
+     "lean": 0.020870909559391918,
+     "ref": 0.020870909559391918,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "Ne": 100.0,
+      "c": 0.3
+     },
+     "lean": 0.004780954239437993,
+     "ref": 0.0047809542394379925,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "c": 0.0001
+     },
+     "lean": 0.7142550992709963,
+     "ref": 0.7142550992709963,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "c": 0.01
+     },
+     "lean": 0.02403378118248859,
+     "ref": 0.02403378118248859,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "c": 0.1
+     },
+     "lean": 0.0021270449830624203,
+     "ref": 0.0021270449830624203,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "c": 0.3
+     },
+     "lean": 0.00048016149104841786,
+     "ref": 0.00048016149104841786,
+     "rel_err": 0.0
+    }
+   ]
+  },
+  "driftLDEquilibrium-vs-ohta-kimura": {
+   "definition": "Calibrator.LDDecayTheory.driftLDEquilibrium",
+   "claim": "MODEL: the IBD equilibrium is not Ohta-Kimura's sigma_d^2 = E[r^2]",
+   "model_definition": "probability of gametic identity by descent (Sved)",
+   "model_reference": "Ohta & Kimura (1971) (10+rho)/((2+rho)(11+rho))",
+   "reference": "refs.ohta_kimura_sigma_d_sq",
+   "tol": 1e-09,
+   "verdict": "MODEL",
+   "kind": "model",
+   "vacuous": false,
+   "mutants_detected": [
+    "scale x1.05",
+    "scale x0.5",
+    "transpose first two args"
+   ],
+   "canfail_clause": "REQUIRES rho = 4Nc <~ 10. The two forms converge as rho -> inf (2% apart at rho=100), so a tightly-linked-only grid is essential.",
+   "note": "",
+   "max_rel_err": 0.5445307104790772,
+   "min_rel_err": 0.02875580732582413,
+   "worst_point": {
+    "params": {
+     "Ne": 1000.0,
+     "c": 1e-06
+    },
+    "lean": 0.9960159303026916,
+    "ref": 0.45365466812648786,
+    "rel_err": 0.5445307104790772
+   },
+   "n_grid": 5,
+   "rows": [
+    {
+     "params": {
+      "Ne": 1000.0,
+      "c": 1e-06
+     },
+     "lean": 0.9960159303026916,
+     "ref": 0.45365466812648786,
+     "rel_err": 0.5445307104790772
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "c": 1e-05
+     },
+     "lean": 0.9615379067979044,
+     "ref": 0.4457942597328786,
+     "rel_err": 0.5363737023978032
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "c": 0.0001
+     },
+     "lean": 0.7142550992709963,
+     "ref": 0.3801169590643275,
+     "rel_err": 0.46781344725113827
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "c": 0.001
+     },
+     "lean": 0.1997599680224299,
+     "ref": 0.15555555555555556,
+     "rel_err": 0.22128764288704172
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "c": 0.01
+     },
+     "lean": 0.02403378118248859,
+     "ref": 0.02334267040149393,
+     "rel_err": 0.02875580732582413
+    }
+   ]
+  },
+  "driftLDTrajectory-converges": {
+   "definition": "Calibrator.LDDecayTheory.driftLDTrajectory",
+   "claim": "iterating driftLDStep from Q0=0 reaches driftLDEquilibrium",
+   "model_definition": "iterated step",
+   "model_reference": "exact fixed point",
+   "reference": "refs.ld_ibd_equilibrium_exact",
+   "tol": 1e-06,
+   "verdict": "AGREE",
+   "kind": "formula",
+   "vacuous": false,
+   "mutants_detected": [
+    "scale x1.05",
+    "scale x0.5"
+   ],
+   "canfail_clause": "Q0 must differ from the equilibrium; Q0=0 is chosen for that reason",
+   "note": "",
+   "max_rel_err": 0.0,
+   "min_rel_err": 0.0,
+   "worst_point": {
+    "params": {
+     "Ne": 100.0,
+     "c": 0.001
+    },
+    "lean": 0.7139793146520795,
+    "ref": 0.7139793146520865,
+    "rel_err": 0.0
+   },
+   "n_grid": 4,
+   "rows": [
+    {
+     "params": {
+      "Ne": 100.0,
+      "c": 0.001
+     },
+     "lean": 0.7139793146520795,
+     "ref": 0.7139793146520865,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "Ne": 100.0,
+      "c": 0.01
+     },
+     "lean": 0.1975968226447046,
+     "ref": 0.1975968226447047,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "c": 0.001
+     },
+     "lean": 0.1997599680224249,
+     "ref": 0.1997599680224299,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "c": 0.01
+     },
+     "lean": 0.02403378118248847,
+     "ref": 0.02403378118248859,
+     "rel_err": 0.0
+    }
+   ]
+  },
+  "selectionMigrationEquilibrium": {
+   "definition": "Calibrator.PopulationGeneticsFoundations.selectionMigrationEquilibrium",
+   "claim": "closed form vs the exact fixed point of its own one-generation map",
+   "model_definition": "max 0 ((s - m - m*s)/s), selection-first ordering",
+   "model_reference": "deterministic iteration of continentIslandStepSelectionFirst",
+   "reference": "_sel_mig_fixed_point",
+   "tol": 1e-06,
+   "verdict": "AGREE",
+   "kind": "formula",
+   "vacuous": false,
+   "mutants_detected": [
+    "scale x1.05",
+    "scale x0.5",
+    "transpose first two args"
+   ],
+   "canfail_clause": "grid must straddle m = s. Below it the polymorphism is protected and any formula of the right shape looks fine; at and above m = s the allele is lost and a wrong formula returns a positive frequency.",
+   "note": "",
+   "max_rel_err": 0.0,
+   "min_rel_err": 0.0,
+   "worst_point": {
+    "params": {
+     "s": 0.01,
+     "m": 0.001
+    },
+    "lean": 0.8990000000000001,
+    "ref": 0.8989999999998843,
+    "rel_err": 0.0
+   },
+   "n_grid": 12,
+   "rows": [
+    {
+     "params": {
+      "s": 0.01,
+      "m": 0.001
+     },
+     "lean": 0.8990000000000001,
+     "ref": 0.8989999999998843,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "s": 0.01,
+      "m": 0.01
+     },
+     "lean": 0.0,
+     "ref": 2.018718986198866e-11,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "s": 0.01,
+      "m": 0.05
+     },
+     "lean": 0.0,
+     "ref": 2.29984275698385e-14,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "s": 0.01,
+      "m": 0.2
+     },
+     "lean": 0.0,
+     "ref": 4.114640008524952e-15,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "s": 0.05,
+      "m": 0.001
+     },
+     "lean": 0.979,
+     "ref": 0.9789999999999782,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "s": 0.05,
+      "m": 0.01
+     },
+     "lean": 0.7899999999999999,
+     "ref": 0.7899999999999721,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "s": 0.05,
+      "m": 0.05
+     },
+     "lean": 0.0,
+     "ref": 3.9877465905478163e-13,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "s": 0.05,
+      "m": 0.2
+     },
+     "lean": 0.0,
+     "ref": 5.050180422451335e-15,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "s": 0.2,
+      "m": 0.001
+     },
+     "lean": 0.994,
+     "ref": 0.9939999999999948,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "s": 0.2,
+      "m": 0.01
+     },
+     "lean": 0.94,
+     "ref": 0.9399999999999936,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "s": 0.2,
+      "m": 0.05
+     },
+     "lean": 0.7000000000000001,
+     "ref": 0.6999999999999923,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "s": 0.2,
+      "m": 0.2
+     },
+     "lean": 0.0,
+     "ref": 2.357550376145242e-14,
+     "rel_err": 0.0
+    }
+   ]
+  },
+  "alleleFreqAfterMigration": {
+   "definition": "Calibrator.PopulationGeneticsFoundations.alleleFreqAfterMigration",
+   "claim": "p_c + (p0-p_c)(1-m)^t is the exact solution of the migration recursion",
+   "model_definition": "continent-island, no selection or drift",
+   "model_reference": "deterministic iteration p' = (1-m)p + m*p_c",
+   "reference": "direct iteration",
+   "tol": 1e-09,
+   "verdict": "AGREE",
+   "kind": "formula",
+   "vacuous": false,
+   "mutants_detected": [
+    "scale x1.05",
+    "scale x0.5",
+    "transpose first two args"
+   ],
+   "canfail_clause": "p0 != p_c required; otherwise the frequency never moves",
+   "note": "",
+   "max_rel_err": 0.0,
+   "min_rel_err": 0.0,
+   "worst_point": {
+    "params": {
+     "p0": 0.1,
+     "p_c": 0.3,
+     "m": 0.001,
+     "t": 1
+    },
+    "lean": 0.10020000000000001,
+    "ref": 0.1002,
+    "rel_err": 0.0
+   },
+   "n_grid": 24,
+   "rows": [
+    {
+     "params": {
+      "p0": 0.1,
+      "p_c": 0.3,
+      "m": 0.001,
+      "t": 1
+     },
+     "lean": 0.10020000000000001,
+     "ref": 0.1002,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p0": 0.1,
+      "p_c": 0.3,
+      "m": 0.001,
+      "t": 10
+     },
+     "lean": 0.10199102395805035,
+     "ref": 0.1019910239580503,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p0": 0.1,
+      "p_c": 0.3,
+      "m": 0.001,
+      "t": 200
+     },
+     "lean": 0.13627023410427289,
+     "ref": 0.13627023410427186,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p0": 0.1,
+      "p_c": 0.3,
+      "m": 0.05,
+      "t": 1
+     },
+     "lean": 0.11000000000000001,
+     "ref": 0.11,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p0": 0.1,
+      "p_c": 0.3,
+      "m": 0.05,
+      "t": 10
+     },
+     "lean": 0.18025261215232427,
+     "ref": 0.1802526121523242,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p0": 0.1,
+      "p_c": 0.3,
+      "m": 0.05,
+      "t": 200
+     },
+     "lean": 0.29999298946675024,
+     "ref": 0.2999929894667503,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p0": 0.1,
+      "p_c": 0.7,
+      "m": 0.001,
+      "t": 1
+     },
+     "lean": 0.10060000000000002,
+     "ref": 0.10060000000000001,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p0": 0.1,
+      "p_c": 0.7,
+      "m": 0.001,
+      "t": 10
+     },
+     "lean": 0.10597307187415106,
+     "ref": 0.10597307187415114,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p0": 0.1,
+      "p_c": 0.7,
+      "m": 0.001,
+      "t": 200
+     },
+     "lean": 0.20881070231281862,
+     "ref": 0.2088107023128198,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p0": 0.1,
+      "p_c": 0.7,
+      "m": 0.05,
+      "t": 1
+     },
+     "lean": 0.13,
+     "ref": 0.13,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p0": 0.1,
+      "p_c": 0.7,
+      "m": 0.05,
+      "t": 10
+     },
+     "lean": 0.3407578364569728,
+     "ref": 0.3407578364569725,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p0": 0.1,
+      "p_c": 0.7,
+      "m": 0.05,
+      "t": 200
+     },
+     "lean": 0.6999789684002506,
+     "ref": 0.6999789684002505,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p0": 0.9,
+      "p_c": 0.3,
+      "m": 0.001,
+      "t": 1
+     },
+     "lean": 0.8994,
+     "ref": 0.8994,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p0": 0.9,
+      "p_c": 0.3,
+      "m": 0.001,
+      "t": 10
+     },
+     "lean": 0.894026928125849,
+     "ref": 0.8940269281258485,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p0": 0.9,
+      "p_c": 0.3,
+      "m": 0.001,
+      "t": 200
+     },
+     "lean": 0.7911892976871815,
+     "ref": 0.7911892976871753,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p0": 0.9,
+      "p_c": 0.3,
+      "m": 0.05,
+      "t": 1
+     },
+     "lean": 0.8700000000000001,
+     "ref": 0.87,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p0": 0.9,
+      "p_c": 0.3,
+      "m": 0.05,
+      "t": 10
+     },
+     "lean": 0.6592421635430272,
+     "ref": 0.6592421635430271,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p0": 0.9,
+      "p_c": 0.3,
+      "m": 0.05,
+      "t": 200
+     },
+     "lean": 0.3000210315997493,
+     "ref": 0.3000210315997493,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p0": 0.9,
+      "p_c": 0.7,
+      "m": 0.001,
+      "t": 1
+     },
+     "lean": 0.8998,
+     "ref": 0.8998,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p0": 0.9,
+      "p_c": 0.7,
+      "m": 0.001,
+      "t": 10
+     },
+     "lean": 0.8980089760419496,
+     "ref": 0.89800897604195,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p0": 0.9,
+      "p_c": 0.7,
+      "m": 0.001,
+      "t": 200
+     },
+     "lean": 0.8637297658957271,
+     "ref": 0.8637297658957331,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p0": 0.9,
+      "p_c": 0.7,
+      "m": 0.05,
+      "t": 1
+     },
+     "lean": 0.89,
+     "ref": 0.89,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p0": 0.9,
+      "p_c": 0.7,
+      "m": 0.05,
+      "t": 10
+     },
+     "lean": 0.8197473878476758,
+     "ref": 0.8197473878476756,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "p0": 0.9,
+      "p_c": 0.7,
+      "m": 0.05,
+      "t": 200
+     },
+     "lean": 0.7000070105332498,
+     "ref": 0.7000070105332498,
+     "rel_err": 0.0
+    }
+   ]
+  },
+  "admixedFst-ratio-not-numerator": {
+   "definition": "Calibrator.DemographicHistory.admixedFst",
+   "claim": "(1-alpha)^2 scaling ignores that F_ST is a ratio, not a numerator",
+   "model_definition": "F_ST(C,A) = (1-alpha)^2 * F_ST(A,B)",
+   "model_reference": "G_ST evaluated directly on (p_A, p_C)",
+   "reference": "_admixed_fst_exact",
+   "tol": 1e-09,
+   "verdict": "FORMULA",
+   "kind": "formula",
+   "vacuous": false,
+   "mutants_detected": [
+    "scale x1.05",
+    "scale x0.5",
+    "transpose first two args"
+   ],
+   "canfail_clause": "REQUIRES pbar to move with alpha, i.e. p_a and p_b far apart and both away from 0.5. If p_a + p_b = 1 the denominators coincide and the (1-alpha)^2 numerator scaling is exactly right -- a symmetric frequency pair makes this check unable to fail.",
+   "note": "",
+   "max_rel_err": 0.4395604395604412,
+   "min_rel_err": 0.006400000000000025,
+   "worst_point": {
+    "params": {
+     "alpha": 0.8,
+     "p_a": 0.1,
+     "p_b": 0.6
+    },
+    "lean": 0.01098901098901098,
+    "ref": 0.019607843137254943,
+    "rel_err": 0.4395604395604412
+   },
+   "n_grid": 16,
+   "rows": [
+    {
+     "params": {
+      "alpha": 0.1,
+      "p_a": 0.1,
+      "p_b": 0.6
+     },
+     "lean": 0.22252747252747246,
+     "ref": 0.23076923076923073,
+     "rel_err": 0.03571428571428584
+    },
+    {
+     "params": {
+      "alpha": 0.1,
+      "p_a": 0.1,
+      "p_b": 0.9
+     },
+     "lean": 0.5184000000000001,
+     "ref": 0.5217391304347827,
+     "rel_err": 0.006400000000000025
+    },
+    {
+     "params": {
+      "alpha": 0.1,
+      "p_a": 0.3,
+      "p_b": 0.6
+     },
+     "lean": 0.07363636363636367,
+     "ref": 0.07415318889227962,
+     "rel_err": 0.006969696969697852
+    },
+    {
+     "params": {
+      "alpha": 0.1,
+      "p_a": 0.3,
+      "p_b": 0.9
+     },
+     "lean": 0.30375,
+     "ref": 0.29742962056303557,
+     "rel_err": 0.020807833537331528
+    },
+    {
+     "params": {
+      "alpha": 0.3,
+      "p_a": 0.1,
+      "p_b": 0.6
+     },
+     "lean": 0.13461538461538455,
+     "ref": 0.1536050156739811,
+     "rel_err": 0.12362637362637353
+    },
+    {
+     "params": {
+      "alpha": 0.3,
+      "p_a": 0.1,
+      "p_b": 0.9
+     },
+     "lean": 0.3136,
+     "ref": 0.33276740237691005,
+     "rel_err": 0.05760000000000012
+    },
+    {
+     "params": {
+      "alpha": 0.3,
+      "p_a": 0.3,
+      "p_b": 0.6
+     },
+     "lean": 0.044545454545454555,
+     "ref": 0.045751633986928164,
+     "rel_err": 0.02636363636363743
+    },
+    {
+     "params": {
+      "alpha": 0.3,
+      "p_a": 0.3,
+      "p_b": 0.9
+     },
+     "lean": 0.18374999999999997,
+     "ref": 0.17647058823529427,
+     "rel_err": 0.03961584633853443
+    },
+    {
+     "params": {
+      "alpha": 0.5,
+      "p_a": 0.1,
+      "p_b": 0.6
+     },
+     "lean": 0.06868131868131866,
+     "ref": 0.08960573476702494,
+     "rel_err": 0.23351648351648244
+    },
+    {
+     "params": {
+      "alpha": 0.5,
+      "p_a": 0.1,
+      "p_b": 0.9
+     },
+     "lean": 0.16,
+     "ref": 0.19047619047619035,
+     "rel_err": 0.15999999999999945
+    },
+    {
+     "params": {
+      "alpha": 0.5,
+      "p_a": 0.3,
+      "p_b": 0.6
+     },
+     "lean": 0.022727272727272735,
+     "ref": 0.02399999999999991,
+     "rel_err": 0.053030303030299174
+    },
+    {
+     "params": {
+      "alpha": 0.5,
+      "p_a": 0.3,
+      "p_b": 0.9
+     },
+     "lean": 0.09375,
+     "ref": 0.09090909090909094,
+     "rel_err": 0.03030303030302998
+    },
+    {
+     "params": {
+      "alpha": 0.8,
+      "p_a": 0.1,
+      "p_b": 0.6
+     },
+     "lean": 0.01098901098901098,
+     "ref": 0.019607843137254943,
+     "rel_err": 0.4395604395604412
+    },
+    {
+     "params": {
+      "alpha": 0.8,
+      "p_a": 0.1,
+      "p_b": 0.9
+     },
+     "lean": 0.025599999999999987,
+     "ref": 0.043360433604335946,
+     "rel_err": 0.40959999999999896
+    },
+    {
+     "params": {
+      "alpha": 0.8,
+      "p_a": 0.3,
+      "p_b": 0.6
+     },
+     "lean": 0.003636363636363636,
+     "ref": 0.004070556309362261,
+     "rel_err": 0.1066666666666627
+    },
+    {
+     "params": {
+      "alpha": 0.8,
+      "p_a": 0.3,
+      "p_b": 0.9
+     },
+     "lean": 0.014999999999999993,
+     "ref": 0.015625,
+     "rel_err": 0.04000000000000048
+    }
+   ]
+  },
+  "dup-islandModelFst-fstMigDriftEquil": {
+   "definition": "Calibrator.*.islandModelFst",
+   "claim": "DUPLICATE: islandModelFst and fstMigDriftEquil are the same function",
+   "model_definition": "-",
+   "model_reference": "-",
+   "reference": "Calibrator.*.fstMigDriftEquil",
+   "tol": 1e-09,
+   "verdict": "AGREE",
+   "kind": "identity",
+   "vacuous": true,
+   "mutants_detected": [],
+   "canfail_clause": "arguments differ between rows; identical bodies give 0 error by construction",
+   "note": "peer=fstMigDriftEquil",
+   "max_rel_err": 0.0,
+   "min_rel_err": 0.0,
+   "worst_point": {
+    "params": {
+     "Ne": 100.0,
+     "m": 0.0001
+    },
+    "lean": 0.9615384615384615,
+    "ref": 0.9615384615384615,
+    "rel_err": 0.0
+   },
+   "n_grid": 4,
+   "rows": [
+    {
+     "params": {
+      "Ne": 100.0,
+      "m": 0.0001
+     },
+     "lean": 0.9615384615384615,
+     "ref": 0.9615384615384615,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "Ne": 100.0,
+      "m": 0.01
+     },
+     "lean": 0.2,
+     "ref": 0.2,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "Ne": 10000.0,
+      "m": 0.0001
+     },
+     "lean": 0.2,
+     "ref": 0.2,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "Ne": 10000.0,
+      "m": 0.01
+     },
+     "lean": 0.0024937655860349127,
+     "ref": 0.0024937655860349127,
+     "rel_err": 0.0
+    }
+   ]
+  },
+  "dup-islandModelFst-asymmetricFst": {
+   "definition": "Calibrator.*.islandModelFst",
+   "claim": "DUPLICATE: islandModelFst and asymmetricFst are the same function",
+   "model_definition": "-",
+   "model_reference": "-",
+   "reference": "Calibrator.*.asymmetricFst",
+   "tol": 1e-09,
+   "verdict": "AGREE",
+   "kind": "identity",
+   "vacuous": true,
+   "mutants_detected": [],
+   "canfail_clause": "arguments differ between rows; identical bodies give 0 error by construction",
+   "note": "peer=asymmetricFst",
+   "max_rel_err": 0.0,
+   "min_rel_err": 0.0,
+   "worst_point": {
+    "params": {
+     "Ne": 100.0,
+     "m": 0.0001
+    },
+    "lean": 0.9615384615384615,
+    "ref": 0.9615384615384615,
+    "rel_err": 0.0
+   },
+   "n_grid": 4,
+   "rows": [
+    {
+     "params": {
+      "Ne": 100.0,
+      "m": 0.0001
+     },
+     "lean": 0.9615384615384615,
+     "ref": 0.9615384615384615,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "Ne": 100.0,
+      "m": 0.01
+     },
+     "lean": 0.2,
+     "ref": 0.2,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "Ne": 10000.0,
+      "m": 0.0001
+     },
+     "lean": 0.2,
+     "ref": 0.2,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "Ne": 10000.0,
+      "m": 0.01
+     },
+     "lean": 0.0024937655860349127,
+     "ref": 0.0024937655860349127,
+     "rel_err": 0.0
+    }
+   ]
+  },
+  "dup-islandModelFst-fstMigrationDriftEquilibrium": {
+   "definition": "Calibrator.*.islandModelFst",
+   "claim": "DUPLICATE: islandModelFst and fstMigrationDriftEquilibrium are the same function",
+   "model_definition": "-",
+   "model_reference": "-",
+   "reference": "Calibrator.*.fstMigrationDriftEquilibrium",
+   "tol": 1e-09,
+   "verdict": "AGREE",
+   "kind": "identity",
+   "vacuous": true,
+   "mutants_detected": [],
+   "canfail_clause": "arguments differ between rows; identical bodies give 0 error by construction",
+   "note": "peer=fstMigrationDriftEquilibrium",
+   "max_rel_err": 0.0,
+   "min_rel_err": 0.0,
+   "worst_point": {
+    "params": {
+     "Ne": 100.0,
+     "m": 0.0001
+    },
+    "lean": 0.9615384615384615,
+    "ref": 0.9615384615384615,
+    "rel_err": 0.0
+   },
+   "n_grid": 4,
+   "rows": [
+    {
+     "params": {
+      "Ne": 100.0,
+      "m": 0.0001
+     },
+     "lean": 0.9615384615384615,
+     "ref": 0.9615384615384615,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "Ne": 100.0,
+      "m": 0.01
+     },
+     "lean": 0.2,
+     "ref": 0.2,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "Ne": 10000.0,
+      "m": 0.0001
+     },
+     "lean": 0.2,
+     "ref": 0.2,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "Ne": 10000.0,
+      "m": 0.01
+     },
+     "lean": 0.0024937655860349127,
+     "ref": 0.0024937655860349127,
+     "rel_err": 0.0
+    }
+   ]
+  },
+  "dup-effectiveMigration-effectiveSymmetricMigration": {
+   "definition": "Calibrator.*.effectiveMigration",
+   "claim": "DUPLICATE: effectiveMigration and effectiveSymmetricMigration are the same function",
+   "model_definition": "-",
+   "model_reference": "-",
+   "reference": "Calibrator.*.effectiveSymmetricMigration",
+   "tol": 1e-09,
+   "verdict": "AGREE",
+   "kind": "identity",
+   "vacuous": true,
+   "mutants_detected": [],
+   "canfail_clause": "arguments differ between rows; identical bodies give 0 error by construction",
+   "note": "peer=effectiveSymmetricMigration",
+   "max_rel_err": 0.0,
+   "min_rel_err": 0.0,
+   "worst_point": {
+    "params": {
+     "Ne": 0.001,
+     "m": 0.004
+    },
+    "lean": 0.0025,
+    "ref": 0.0025,
+    "rel_err": 0.0
+   },
+   "n_grid": 4,
+   "rows": [
+    {
+     "params": {
+      "Ne": 0.001,
+      "m": 0.004
+     },
+     "lean": 0.0025,
+     "ref": 0.0025,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "Ne": 0.001,
+      "m": 0.05
+     },
+     "lean": 0.025500000000000002,
+     "ref": 0.025500000000000002,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "Ne": 0.02,
+      "m": 0.004
+     },
+     "lean": 0.012,
+     "ref": 0.012,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "Ne": 0.02,
+      "m": 0.05
+     },
+     "lean": 0.035,
+     "ref": 0.035,
+     "rel_err": 0.0
+    }
+   ]
+  },
+  "pairwiseFstFromBranchTaus-correct-composition": {
+   "definition": "Calibrator.PortabilityDrift.pairwiseFstFromBranchTaus",
+   "claim": "the tau-additive composition IS the exact two-branch split F_ST",
+   "model_definition": "F = fstFromTau(tauS + tauT)",
+   "model_reference": "clean split, total separation tS+tT, equal sizes",
+   "reference": "refs.split_fst_hudson",
+   "tol": 1e-09,
+   "verdict": "AGREE",
+   "kind": "formula",
+   "vacuous": false,
+   "mutants_detected": [
+    "scale x1.05",
+    "scale x0.5",
+    "transpose first two args"
+   ],
+   "canfail_clause": "tS+tT of order Ne, and tS != tT rows included so an incorrect symmetric-only composition cannot hide.",
+   "note": "PortabilityDrift contains both compositions; this one is exact and pairwiseFstFromBranches is not. They are not alternatives.",
+   "max_rel_err": 0.0,
+   "min_rel_err": 0.0,
+   "worst_point": {
+    "params": {
+     "tS": 200.0,
+     "tT": 200.0,
+     "Ne": 1000.0
+    },
+    "lean": 0.16666666666666669,
+    "ref": 0.16666666666666663,
+    "rel_err": 0.0
+   },
+   "n_grid": 9,
+   "rows": [
+    {
+     "params": {
+      "tS": 200.0,
+      "tT": 200.0,
+      "Ne": 1000.0
+     },
+     "lean": 0.16666666666666669,
+     "ref": 0.16666666666666663,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "tS": 200.0,
+      "tT": 1000.0,
+      "Ne": 1000.0
+     },
+     "lean": 0.37499999999999994,
+     "ref": 0.375,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "tS": 200.0,
+      "tT": 4000.0,
+      "Ne": 1000.0
+     },
+     "lean": 0.6774193548387097,
+     "ref": 0.6774193548387096,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "tS": 1000.0,
+      "tT": 200.0,
+      "Ne": 1000.0
+     },
+     "lean": 0.37499999999999994,
+     "ref": 0.375,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "tS": 1000.0,
+      "tT": 1000.0,
+      "Ne": 1000.0
+     },
+     "lean": 0.5,
+     "ref": 0.5,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "tS": 1000.0,
+      "tT": 4000.0,
+      "Ne": 1000.0
+     },
+     "lean": 0.7142857142857143,
+     "ref": 0.7142857142857143,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "tS": 4000.0,
+      "tT": 200.0,
+      "Ne": 1000.0
+     },
+     "lean": 0.6774193548387097,
+     "ref": 0.6774193548387096,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "tS": 4000.0,
+      "tT": 1000.0,
+      "Ne": 1000.0
+     },
+     "lean": 0.7142857142857143,
+     "ref": 0.7142857142857143,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "tS": 4000.0,
+      "tT": 4000.0,
+      "Ne": 1000.0
+     },
+     "lean": 0.8,
+     "ref": 0.8,
+     "rel_err": 0.0
+    }
+   ]
+  },
+  "expectedHeterozygosity-equals-hetEquilibrium": {
+   "definition": "Calibrator.PopulationGeneticsFoundations.expectedHeterozygosity",
+   "claim": "theta/(1+theta) composed with theta=4Ne mu reproduces hetEquilibrium",
+   "model_definition": "infinite alleles, mutation-drift balance",
+   "model_reference": "same file, hetEquilibrium Ne mu",
+   "reference": "Calibrator.PopulationGeneticsFoundations.hetEquilibrium",
+   "tol": 1e-09,
+   "verdict": "AGREE",
+   "kind": "identity",
+   "vacuous": false,
+   "mutants_detected": [
+    "scale x1.05",
+    "scale x0.5"
+   ],
+   "canfail_clause": "identity by construction; recorded as a duplicate, not a validation",
+   "note": "",
+   "max_rel_err": 0.0,
+   "min_rel_err": 0.0,
+   "worst_point": {
+    "params": {
+     "Ne": 100.0,
+     "mu": 1e-06
+    },
+    "lean": 0.00039984006397441024,
+    "ref": 0.00039984006397441024,
+    "rel_err": 0.0
+   },
+   "n_grid": 12,
+   "rows": [
+    {
+     "params": {
+      "Ne": 100.0,
+      "mu": 1e-06
+     },
+     "lean": 0.00039984006397441024,
+     "ref": 0.00039984006397441024,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "Ne": 100.0,
+      "mu": 1e-05
+     },
+     "lean": 0.00398406374501992,
+     "ref": 0.00398406374501992,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "Ne": 100.0,
+      "mu": 0.0001
+     },
+     "lean": 0.038461538461538464,
+     "ref": 0.038461538461538464,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "Ne": 100.0,
+      "mu": 0.001
+     },
+     "lean": 0.28571428571428575,
+     "ref": 0.28571428571428575,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "mu": 1e-06
+     },
+     "lean": 0.00398406374501992,
+     "ref": 0.00398406374501992,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "mu": 1e-05
+     },
+     "lean": 0.038461538461538464,
+     "ref": 0.038461538461538464,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "mu": 0.0001
+     },
+     "lean": 0.28571428571428575,
+     "ref": 0.28571428571428575,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "Ne": 1000.0,
+      "mu": 0.001
+     },
+     "lean": 0.8,
+     "ref": 0.8,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "Ne": 10000.0,
+      "mu": 1e-06
+     },
+     "lean": 0.038461538461538464,
+     "ref": 0.038461538461538464,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "Ne": 10000.0,
+      "mu": 1e-05
+     },
+     "lean": 0.28571428571428575,
+     "ref": 0.28571428571428575,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "Ne": 10000.0,
+      "mu": 0.0001
+     },
+     "lean": 0.8,
+     "ref": 0.8,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "Ne": 10000.0,
+      "mu": 0.001
+     },
+     "lean": 0.975609756097561,
+     "ref": 0.975609756097561,
+     "rel_err": 0.0
+    }
+   ]
+  },
+  "ldCorrelationFromMigration-vs-sharedLD-squared": {
+   "definition": "Calibrator.PopulationGeneticsFoundations.ldCorrelationFromMigration",
+   "claim": "M^2/(1+M)^2 is exactly the square of PortabilityDrift.sharedLDFromMigration",
+   "model_definition": "proportion of LD that is shared, as a function of M=4Nm",
+   "model_reference": "sharedLDFromMigration(M)^2 = (1 - islandModelFst)^2",
+   "reference": "Calibrator.PortabilityDrift.sharedLDFromMigration ** 2",
+   "tol": 1e-09,
+   "verdict": "AGREE",
+   "kind": "internal",
+   "vacuous": false,
+   "mutants_detected": [
+    "scale x1.05",
+    "scale x0.5"
+   ],
+   "canfail_clause": "M must be away from the fixed points of x->x^2 (0 and 1); M=1 gives 0.25 vs 0.5",
+   "note": "CONSISTENT: PopulationGeneticsFoundations.ldCorrelationFromMigration is exactly the square of PortabilityDrift.sharedLDFromMigration, i.e. (1 - islandModelFst)^2. Both are 'shared LD' but one is a correlation and the other its square; the relation is exact and now recorded.",
+   "max_rel_err": 0.0,
+   "min_rel_err": 0.0,
+   "worst_point": {
+    "params": {
+     "M": 0.1
+    },
+    "lean": 0.008264462809917356,
+    "ref": 0.008264462809917356,
+    "rel_err": 0.0
+   },
+   "n_grid": 4,
+   "rows": [
+    {
+     "params": {
+      "M": 0.1
+     },
+     "lean": 0.008264462809917356,
+     "ref": 0.008264462809917356,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "M": 1.0
+     },
+     "lean": 0.25,
+     "ref": 0.25,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "M": 4.0
+     },
+     "lean": 0.64,
+     "ref": 0.6400000000000001,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "M": 40.0
+     },
+     "lean": 0.9518143961927424,
+     "ref": 0.9518143961927423,
+     "rel_err": 0.0
+    }
+   ]
+  },
+  "targetHetFromFst-tautology": {
+   "definition": "Calibrator.PortabilityDrift.targetHetFromFst",
+   "claim": "het_source*(1-fst) is exactly the rearrangement of fstFromHetRatio",
+   "model_definition": "F_ST defined as fractional heterozygosity loss",
+   "model_reference": "PopulationGeneticsFoundations.fstFromHetRatio inverted",
+   "reference": "algebraic inverse of fstFromHetRatio",
+   "tol": 1e-09,
+   "verdict": "AGREE",
+   "kind": "identity",
+   "vacuous": false,
+   "mutants_detected": [
+    "scale x1.05",
+    "scale x0.5",
+    "transpose first two args"
+   ],
+   "canfail_clause": "none available. The composition is the identity for every input, so no grid can make it fail -- which is the finding, not a defect of the check.",
+   "note": "confirms the corpus's own VACUOUS annotation: this round-trips to the identity and so carries no empirical content about F_ST",
+   "max_rel_err": 0.0,
+   "min_rel_err": 0.0,
+   "worst_point": {
+    "params": {
+     "het_source": 0.1,
+     "fst": 0.05
+    },
+    "lean": 0.050000000000000044,
+    "ref": 0.05,
+    "rel_err": 0.0
+   },
+   "n_grid": 6,
+   "rows": [
+    {
+     "params": {
+      "het_source": 0.1,
+      "fst": 0.05
+     },
+     "lean": 0.050000000000000044,
+     "ref": 0.05,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "het_source": 0.1,
+      "fst": 0.2
+     },
+     "lean": 0.19999999999999984,
+     "ref": 0.2,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "het_source": 0.1,
+      "fst": 0.5
+     },
+     "lean": 0.5,
+     "ref": 0.5,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "het_source": 0.3,
+      "fst": 0.05
+     },
+     "lean": 0.050000000000000044,
+     "ref": 0.05,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "het_source": 0.3,
+      "fst": 0.2
+     },
+     "lean": 0.19999999999999996,
+     "ref": 0.2,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "het_source": 0.3,
+      "fst": 0.5
+     },
+     "lean": 0.5,
+     "ref": 0.5,
+     "rel_err": 0.0
+    }
+   ]
+  },
+  "neutralAFBenchmarkRatio-bounded": {
+   "definition": "Calibrator.PortabilityDrift.neutralAFBenchmarkRatio",
+   "claim": "(1-fstT)/(1-fstS) vs the heterozygosity ratio it is meant to be",
+   "model_definition": "ratio of retained heterozygosity, drift-only closed population",
+   "model_reference": "exact IAM heterozygosity ratio between two branches at mutation-drift balance",
+   "reference": "refs.iam_het_trajectory ratio",
+   "tol": 1e-09,
+   "verdict": "MODEL",
+   "kind": "model",
+   "vacuous": false,
+   "mutants_detected": [
+    "scale x1.05",
+    "scale x0.5",
+    "transpose first two args"
+   ],
+   "canfail_clause": "tS != tT is mandatory. At tS = tT the definition returns exactly 1 and so does the reference -- the symmetric design in which both sides collapse to 1 is precisely the false-validation failure mode.",
+   "note": "the reference starts each branch AT equilibrium, so the true ratio is 1: mutation replenishes what drift removes. The definition predicts a ratio far from 1 because its model has no mutation.",
+   "max_rel_err": 0.5833333333333334,
+   "min_rel_err": 0.0,
+   "worst_point": {
+    "params": {
+     "tS": 4000.0,
+     "tT": 500.0,
+     "Ne": 1000.0,
+     "mu": 1e-05
+    },
+    "lean": 2.4,
+    "ref": 1.0,
+    "rel_err": 0.5833333333333334
+   },
+   "n_grid": 4,
+   "rows": [
+    {
+     "params": {
+      "tS": 500.0,
+      "tT": 500.0,
+      "Ne": 1000.0,
+      "mu": 1e-05
+     },
+     "lean": 1.0,
+     "ref": 1.0,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "tS": 500.0,
+      "tT": 4000.0,
+      "Ne": 1000.0,
+      "mu": 1e-05
+     },
+     "lean": 0.4166666666666667,
+     "ref": 1.0,
+     "rel_err": 0.5833333333333333
+    },
+    {
+     "params": {
+      "tS": 4000.0,
+      "tT": 500.0,
+      "Ne": 1000.0,
+      "mu": 1e-05
+     },
+     "lean": 2.4,
+     "ref": 1.0,
+     "rel_err": 0.5833333333333334
+    },
+    {
+     "params": {
+      "tS": 4000.0,
+      "tT": 4000.0,
+      "Ne": 1000.0,
+      "mu": 1e-05
+     },
+     "lean": 1.0,
+     "ref": 1.0,
+     "rel_err": 0.0
+    }
+   ]
+  },
+  "wrightFIT-composition": {
+   "definition": "Calibrator.PopulationGeneticsFoundations.wrightFIT",
+   "claim": "1-(1-F_IS)(1-F_ST) is Wright's exact F-statistic composition",
+   "model_definition": "hierarchical F-statistics",
+   "model_reference": "Wright (1951): (1-F_IT) = (1-F_IS)(1-F_ST), definitionally",
+   "reference": "Wright's identity",
+   "tol": 1e-09,
+   "verdict": "AGREE",
+   "kind": "formula",
+   "vacuous": false,
+   "mutants_detected": [
+    "scale x1.05",
+    "scale x0.5"
+   ],
+   "canfail_clause": "both f_IS and f_ST nonzero in at least one row; at f_IS=0 it reduces to f_ST",
+   "note": "",
+   "max_rel_err": 0.0,
+   "min_rel_err": 0.0,
+   "worst_point": {
+    "params": {
+     "f_IS": 0.0,
+     "f_ST": 0.0
+    },
+    "lean": 0.0,
+    "ref": 0.0,
+    "rel_err": 0.0
+   },
+   "n_grid": 12,
+   "rows": [
+    {
+     "params": {
+      "f_IS": 0.0,
+      "f_ST": 0.0
+     },
+     "lean": 0.0,
+     "ref": 0.0,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "f_IS": 0.0,
+      "f_ST": 0.05
+     },
+     "lean": 0.050000000000000044,
+     "ref": 0.050000000000000044,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "f_IS": 0.0,
+      "f_ST": 0.2
+     },
+     "lean": 0.19999999999999996,
+     "ref": 0.19999999999999996,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "f_IS": 0.0,
+      "f_ST": 0.5
+     },
+     "lean": 0.5,
+     "ref": 0.5,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "f_IS": 0.05,
+      "f_ST": 0.0
+     },
+     "lean": 0.050000000000000044,
+     "ref": 0.050000000000000044,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "f_IS": 0.05,
+      "f_ST": 0.05
+     },
+     "lean": 0.09750000000000003,
+     "ref": 0.09750000000000003,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "f_IS": 0.05,
+      "f_ST": 0.2
+     },
+     "lean": 0.24,
+     "ref": 0.24,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "f_IS": 0.05,
+      "f_ST": 0.5
+     },
+     "lean": 0.525,
+     "ref": 0.525,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "f_IS": 0.3,
+      "f_ST": 0.0
+     },
+     "lean": 0.30000000000000004,
+     "ref": 0.30000000000000004,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "f_IS": 0.3,
+      "f_ST": 0.05
+     },
+     "lean": 0.3350000000000001,
+     "ref": 0.3350000000000001,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "f_IS": 0.3,
+      "f_ST": 0.2
+     },
+     "lean": 0.44000000000000006,
+     "ref": 0.44000000000000006,
+     "rel_err": 0.0
+    },
+    {
+     "params": {
+      "f_IS": 0.3,
+      "f_ST": 0.5
+     },
+     "lean": 0.65,
+     "ref": 0.65,
+     "rel_err": 0.0
+    }
+   ]
+  }
+ }
+}

@@ -1,0 +1,19 @@
+CHECK 2: 472 derivation-claiming theorems
+  opaque                     270
+  not_an_equation            152
+  derivation_verified        46
+  inconclusive               3
+  VACUOUS_DERIVATION_NO_DEFS 1
+
+=== VACUOUS_DERIVATION_NO_DEFS (1) ===
+  Calibrator.OpenQuestions.brier_uncertainty_formula  (OpenQuestions.lean:379)
+     statement : π * (1 - π) = -(π - 1/2) ^ 2 + 1/4
+     opaque    : pi*(1 - pi)  ==  1/4 - (-1/2 + pi)**2
+
+=== theorems named for a definition they never mention (6) ===
+  Calibrator.AncestrySpecificPower.ncp_from_wald_test:173  -> theorem is named for `ncp` but its statement never mentions it
+  Calibrator.DemographicHistory.steppingStoneFst_from_coalescence_time:229  -> theorem is named for `steppingStoneFst` but its statement never mentions it
+  Calibrator.PopulationGeneticsFoundations.fstEquilibrium_derived:1254  -> theorem is named for `fstEquilibrium` but its statement never mentions it
+  Calibrator.PortabilityDrift.neutralAFBenchmarkRatio_from_state:2914  -> theorem is named for `neutralAFBenchmarkRatio` but its statement never mentions it
+  Calibrator.PortabilityDrift.targetBrierFromNeutralAFBenchmark_eq:3801  -> theorem is named for `targetBrierFromNeutralAFBenchmark` but its statement never mentions it
+  Calibrator.TransportIdentities.mse_from_variance_ratio_corr_bias:788  -> theorem is named for `mse` but its statement never mentions it

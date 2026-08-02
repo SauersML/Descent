@@ -755,6 +755,21 @@ def ldBandDetectionShare(decay, kappa):
 def ldPruningDetectionDeficit(decay, kappa):
     return _rt.rdiv(((2.0 * decay) * _rt.sin(((_rt.pi * kappa)))), ((_rt.pi * ((1.0 + _rt.lpow(decay, 2.0))))))
 
+def ldPanelRetentionFraction(retainedMarkers, totalMarkers):
+    return _rt.rdiv((retainedMarkers), (totalMarkers))
+
+def ldBlockReconstructionShare(recomb, Ne, retainedMarkers, totalMarkers):
+    return ldBandReconstructionShare((ldRetentionPerGen(recomb, Ne)), (ldPanelRetentionFraction(retainedMarkers, totalMarkers)))
+
+def ldBlockDetectionShare(recomb, Ne, retainedMarkers, totalMarkers):
+    return ldBandDetectionShare((ldRetentionPerGen(recomb, Ne)), (ldPanelRetentionFraction(retainedMarkers, totalMarkers)))
+
+def ldBlockPruningDeficit(recomb, Ne, retainedMarkers, totalMarkers):
+    return ldPruningDetectionDeficit((ldRetentionPerGen(recomb, Ne)), (ldPanelRetentionFraction(retainedMarkers, totalMarkers)))
+
+def ldTightLinkageDetectionShare(retainedMarkers, totalMarkers):
+    return (ldPanelRetentionFraction(retainedMarkers, totalMarkers) - _rt.rdiv(_rt.sin(((_rt.pi * ldPanelRetentionFraction(retainedMarkers, totalMarkers)))), _rt.pi))
+
 def effectMutualInformation(m, ρ):
     return (_rt.rdiv((-(m)), 2.0) * _rt.rlog(((1.0 - _rt.lpow(ρ, 2.0)))))
 
@@ -806,6 +821,9 @@ def weightedInformation(cohort, weight):
 def spikeOuter(v):
     return (lambda i, j: (v(i) * v(j)))
 
+def twoBlock(k, a, b):
+    return (lambda i: (a if (i < k) else b))
+
 def traceWindowSpikeLoad(decay, nSites):
     return _rt.rdiv(ldPrecisionTrace(decay, nSites), (nSites))
 
@@ -813,7 +831,10 @@ def whitenedCapacity(headroom, decay):
     return _rt.rdiv(headroom, ldWhiteningGain(decay))
 
 def blockSpectrum(k, ε):
-    return (lambda i: (ε if (i < k) else 1.0))
+    return twoBlock(k, ε, 1.0)
+
+def meffPerturbed(n):
+    return blockSpectrum(n, (_rt.rinv((((n) + 1.0)))))
 
 def meffFlat(n):
     return blockSpectrum(n, 1.0)
@@ -1425,6 +1446,12 @@ def jointDirectCausalKernelAt(m, t, i, j):
 def jointProxyTaggingKernelAt(m, t, i, j):
     return ((((ldCorrelationDecay((_rt._proj(m, 'tagCausalDistance')(i, j)), (_rt._proj(_rt._proj(m, 'popGen'), 'fstTransientAt')(t)), _rt._proj(_rt._proj(m, 'popGen'), 'recomb')) * _rt._proj(_rt._proj(m, 'popGen'), 'mutationSharedRetentionAt')(t)) * _rt._proj(_rt._proj(m, 'popGen'), 'migrationSharedBoostAt')(t)) * tagAlleleFreqRetentionAt(m, t, i)) * causalAlleleFreqRetentionAt(m, t, j))
 
+def jointNovelDirectCausalKernelAt(m, t, i, j):
+    return (((novelVariantInnovationAt(_rt._proj(m, 'popGen'), t) * _rt.rinv((_rt._proj(_rt._proj(m, 'popGen'), 'migrationSharedBoostAt')(t)))) * tagAlleleFreqRetentionAt(m, t, i)) * causalAlleleFreqRetentionAt(m, t, j))
+
+def jointNovelProxyTaggingKernelAt(m, t, i, j):
+    return ((((ldCorrelationDecay((_rt._proj(m, 'tagCausalDistance')(i, j)), (_rt._proj(_rt._proj(m, 'popGen'), 'fstTransientAt')(t)), _rt._proj(_rt._proj(m, 'popGen'), 'recomb')) * novelVariantInnovationAt(_rt._proj(m, 'popGen'), t)) * _rt.rinv((_rt._proj(_rt._proj(m, 'popGen'), 'migrationSharedBoostAt')(t)))) * tagAlleleFreqRetentionAt(m, t, i)) * causalAlleleFreqRetentionAt(m, t, j))
+
 def sigmaTagTargetAt(m, t):
     return (lambda i, j: (_rt._proj(m, 'sigmaTagSource')(i, j) * jointTagLDKernelAt(m, t, i, j)))
 
@@ -1681,6 +1708,9 @@ def directionalResidualCurvature(P, X, residual, direction):
 def weightedResidualMoment(P, densityRatio, X, residual):
     return rawCrossMoment(P, X, ((lambda ω: (((densityRatio(ω) - 1.0)) * residual(ω)))))
 
+def detectionWeight(s):
+    return _rt.rinv(s)
+
 def reconstructionWeight(s):
     return s
 
@@ -1915,6 +1945,9 @@ def optimalSourceShrinkageWeight(gapSq, noiseVar, nTarget):
 def coefficientGapSq(wSource, wTarget):
     return dotProduct(((lambda i: (wSource(i) - wTarget(i)))), ((lambda i: (wSource(i) - wTarget(i)))))
 
+def meanPopulationDeviation(deviation, k):
+    return (lambda i: (_rt.rinv((k)) * populationDeviationSum(deviation, k, i)))
+
 def metaLearnedSourceWeights(wShared, deviation, k):
     return (lambda i: (wShared(i) + meanPopulationDeviation(deviation, k, i)))
 
@@ -1929,6 +1962,9 @@ def weightedMetaSourceWeights(wShared, deviation, weight):
 
 def weightedMetaTransferGapSq(wShared, wTarget, deviation, weight):
     return coefficientGapSq((weightedMetaSourceWeights(wShared, deviation, weight)), wTarget)
+
+def uniformMetaWeight(k):
+    return (lambda _: _rt.rinv((k)))
 
 def centeredPopulationEffectDeviationFin(wShared, wSource):
     return (lambda j, i: (wSource(j, i) - wShared(i)))

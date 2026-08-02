@@ -611,6 +611,39 @@ theorem twoPoint_understates_sample_size (epsilon K c : ℝ)
   rw [h2] at h1
   linarith
 
+/-- **Every grade understates, at no normalisation, once the target is sharp
+    enough.**
+
+    Written along the sharpening target `ε = 1/x` as `x → ∞`, which is where the
+    statement has content and which keeps the filter on `atTop` rather than on a
+    punctured neighbourhood of zero. At accuracy `1/x` the certified sample size
+    is `x^(K/c)` and the requirement is `exp x`, so the claim is that a power is
+    eventually beaten by the exponential — `isLittleO_rpow_exp_atTop`, which
+    holds for every real exponent with no side condition. This is the general
+    form of `twoPoint_understates_sample_size` with its normalisation `K/c ≤ 1`
+    removed: no grade of certificate, however high, and no constant, however
+    favourable, escapes the shortfall. -/
+theorem gradeCertified_understates_sample_size_eventually (K c : ℝ) :
+    ∀ᶠ x : ℝ in Filter.atTop,
+      gradeCertifiedSampleSize (1 / x) K c < logRateSampleSize (1 / x) := by
+  have hbound := (isLittleO_rpow_exp_atTop (K / c)).bound
+    (by norm_num : (0 : ℝ) < 1 / 2)
+  filter_upwards [hbound, Filter.eventually_ge_atTop (2 : ℝ)] with x hx hx2
+  have hx0 : (0 : ℝ) < x := by linarith
+  have hxm : 0 < x ^ (K / c) := Real.rpow_pos_of_pos hx0 (K / c)
+  have hexp : 0 < Real.exp x := Real.exp_pos x
+  have hle : x ^ (K / c) ≤ 1 / 2 * Real.exp x := by
+    rw [Real.norm_of_nonneg (le_of_lt hxm), Real.norm_of_nonneg (le_of_lt hexp)] at hx
+    exact hx
+  have hcert : gradeCertifiedSampleSize (1 / x) K c = x ^ (K / c) := by
+    unfold gradeCertifiedSampleSize
+    rw [one_div, Real.inv_rpow (le_of_lt hx0), Real.rpow_neg (le_of_lt hx0), inv_inv]
+  have hlog : logRateSampleSize (1 / x) = Real.exp x := by
+    unfold logRateSampleSize
+    rw [one_div_one_div]
+  rw [hcert, hlog]
+  linarith
+
 end NonsmoothSampleSize
 
 end Calibrator

@@ -57,14 +57,14 @@ BUILTINS = {
 
 # Unicode subscripts and Greek letters that appear in Lean binder names.
 _IDENT_EXTRA = "₀₁₂₃₄₅₆₇₈₉_'ₐₑₙₜᵢⱼₖ"
-_GREEK = "αβγδεζηθικλμνξορστυφχψωΔΣΩμσρθλαπ"
+_GREEK = "αβγδεζηθικλμνξορστυφχψωΔΣΩμσρθλαπℝℕℤℚ"
 
 _TOKEN_RE = re.compile(
     r"""
       (?P<ws>\s+)
     | (?P<num>\d+\.\d+|\d+)
     | (?P<ident>[A-Za-z%s%s][A-Za-z0-9.%s%s]*)
-    | (?P<op>:=|=>|\^|\*|/|\+|-|\(|\)|,|;)
+    | (?P<op>:=|=>|:|\^|\*|/|\+|-|\(|\)|,|;)
     """
     % (_GREEK, _IDENT_EXTRA, _GREEK, _IDENT_EXTRA),
     re.VERBOSE,
@@ -276,7 +276,15 @@ def _pyname(lean_name: str) -> str:
 # Definition extraction from a .lean file
 # --------------------------------------------------------------------------
 _DEF_RE = re.compile(
-    r"^(?:noncomputable\s+)?def\s+(?P<name>[A-Za-z_][A-Za-z0-9_'!?]*)\s*(?P<binders>.*?):=\s*$",
+    r"^(?:noncomputable\s+)?def\s+(?P<name>[A-Za-z_][A-Za-z0-9_'!?]*)\s*"
+    r"(?P<binders>[^\n]*?):=(?P<inline>[^\n]*)$",
+    re.MULTILINE,
+)
+
+# `def f (a b : ℝ) : ℕ → ℝ` followed by `| 0 => ..` / `| t + 1 => ..`
+_REC_DEF_RE = re.compile(
+    r"^(?:noncomputable\s+)?def\s+(?P<name>[A-Za-z_][A-Za-z0-9_'!?]*)\s*"
+    r"(?P<binders>.*?)\s*:\s*ℕ\s*→\s*ℝ\s*$",
     re.MULTILINE,
 )
 
@@ -292,6 +300,8 @@ class LeanDef:
     py_src: str | None = None
     deps: set[str] = field(default_factory=set)
     error: str | None = None
+    base_src: str | None = None
+    is_recursion: bool = False
 
     @property
     def fqn(self) -> str:
@@ -333,8 +343,16 @@ def extract_file(path: str, module: str) -> list[LeanDef]:
     out: list[LeanDef] = []
     for m in _DEF_RE.finditer(text):
         line_no = text[: m.start()].count("\n") + 1
-        body = _body_lines(lines, line_no)
-        body_src = "\n".join(body)
+        # The signature may wrap across lines; the body begins after the match.
+        body_start = text[: m.end()].count("\n") + 1
+        inline = m.group("inline").strip()
+        # A def is either `... :=` with an indented body, or `... := body` on
+        # one line (possibly with indented continuations).
+        body_src = (
+            inline + "\n" + "\n".join(_body_lines(lines, body_start))
+            if inline
+            else "\n".join(_body_lines(lines, body_start))
+        ).strip()
         d = LeanDef(
             name=m.group("name"),
             module=module,
@@ -361,6 +379,84 @@ def extract_file(path: str, module: str) -> list[LeanDef]:
             d.error = str(e)
         out.append(d)
     return out
+
+
+def extract_recursions(path: str, module: str) -> list[LeanDef]:
+    """Extract `ℕ → ℝ` primitive recursions of the shape
+
+        | 0     => <base>
+        | t + 1 => <step in which `f <binders> t` occurs>
+
+    The recursive call is rewritten to a bound variable `prev`, giving a step
+    function that the caller iterates.  Anything that recurses on more than the
+    immediately preceding value, or that mentions `t` outside the recursive
+    call, is refused: those are not simple iterations and translating them by
+    eye is exactly the risk this module exists to remove.
+    """
+    text = open(path, encoding="utf-8").read()
+    lines = text.split("\n")
+    out: list[LeanDef] = []
+    for m in _REC_DEF_RE.finditer(text):
+        line_no = text[: m.start()].count("\n") + 1
+        # The signature may wrap across lines; the body begins after the match.
+        body_start = text[: m.end()].count("\n") + 1
+        body = _body_lines(lines, body_start)
+        body_src = "\n".join(body)
+        name = m.group("name")
+        d = LeanDef(
+            name=name, module=module, line=line_no, binders=[],
+            body_src=body_src,
+            sha256=hashlib.sha256((m.group(0) + "\n" + body_src).encode()).hexdigest()[:16],
+        )
+        try:
+            d.binders = _parse_binders(m.group("binders"))
+            flat = re.sub(r"\s*--.*", "", body_src)
+            flat = re.sub(r"\s+", " ", flat).strip()
+            mm = re.match(r"\|\s*0\s*=>\s*(.*?)\s*\|\s*(\w+)\s*\+\s*1\s*=>\s*(.*)$", flat)
+            if not mm:
+                raise Unsupported("not a two-branch ℕ recursion")
+            base_src, ivar, step_src = mm.group(1), mm.group(2), mm.group(3)
+            # Rewrite `name b1 b2 .. bk t` -> `prev`.
+            call = re.escape(name) + r"\s+" + r"\s+".join(
+                re.escape(b) for b in d.binders
+            ) + r"\s+" + re.escape(ivar) + r"\b"
+            step_src, n_sub = re.subn(call, "prev", step_src)
+            if n_sub == 0:
+                raise Unsupported("no recognised recursive call")
+            if re.search(r"\b" + re.escape(ivar) + r"\b", step_src):
+                raise Unsupported("index variable used outside the recursive call")
+            if name in step_src:
+                raise Unsupported("unrewritten recursive occurrence")
+            pb = Parser(tokenize(base_src), set(d.binders))
+            ps = Parser(tokenize(step_src), set(d.binders) | {"prev"})
+            d.py_src = ps.parse()
+            d.deps = pb.deps | ps.deps
+            d.base_src = pb.parse()
+            d.is_recursion = True
+        except Unsupported as e:
+            d.error = str(e)
+        out.append(d)
+    return out
+
+
+def compile_recursion(d: LeanDef, dep_table: dict) -> callable:
+    """Compile a recursion into `f(*binders, t)` evaluated by iteration."""
+    if d.py_src is None:
+        raise Unsupported(d.error or "not extractable")
+    args = ", ".join(_pyname(b) for b in d.binders)
+    src = (
+        f"def _f({args}, _t):\n"
+        f"    {_pyname('prev')} = {d.base_src}\n"
+        f"    for _ in range(int(_t)):\n"
+        f"        {_pyname('prev')} = {d.py_src}\n"
+        f"    return {_pyname('prev')}\n"
+    )
+    ns = {"math": math, "_dep": dep_table}
+    exec(compile(src, f"<lean:{d.fqn}>", "exec"), ns)
+    fn = ns["_f"]
+    fn.lean_fqn, fn.lean_source = d.fqn, f"{d.module}.lean:{d.line}"
+    fn.lean_sha, fn.lean_body = d.sha256, d.body_src
+    return fn
 
 
 def compile_def(d: LeanDef, dep_table: dict) -> callable:

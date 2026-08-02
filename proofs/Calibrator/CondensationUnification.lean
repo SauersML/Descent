@@ -279,7 +279,7 @@ theorem disjoint_design_gaussian_null_below_condensation
     {ι : Type*} [Fintype ι] {n : ℕ} {Limit : Type*}
     (Sp : GenotypeChaosLimits n ι Limit) (design : GenotypeDesign n ι)
     (hadmissible : Sp.isAdmissible design) (hpolymorphic : design.Polymorphic)
-    (hindependent : design.LociIndependent) (hdisjoint : design.VariantDisjoint)
+    (hindependent : design.InLinkageEquilibrium) (hdisjoint : design.VariantDisjoint)
     (s : ι) (i : Fin n) {N : ℝ}
     (hdrift : 0 < hweMellinDrift (design.model i).altFreq)
     (hsafe : (design.interactionOrder s : ℝ) <
@@ -309,7 +309,7 @@ theorem subcritical_order_does_not_license_overlapping_design
     (target : Limit) (htarget : Sp.InMomentBody target) (ε : ℝ) (hε : 0 < ε) :
     hweMellinDrift q * m < Real.log N ∧
       ∃ design : GenotypeDesign n ι, design.model = model ∧
-        design.LociIndependent ∧ Sp.isAdmissible design ∧
+        design.InLinkageEquilibrium ∧ Sp.isAdmissible design ∧
         Sp.weakDistance (Sp.limitLaw design) target < ε :=
   ⟨(epistatic_order_safe_iff hdrift).mp hsafe,
     Sp.maximal_spectrum model hpolymorphic target htarget ε hε⟩

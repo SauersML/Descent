@@ -1334,4 +1334,382 @@ theorem ldBandReconstructionShare_eq_integral {decay kappa : ℝ}
 
 end ARoneFrontier
 
+/-!
+## The frontier as a function of recombination rate and effective size
+
+The section above is still parameterised by an abstract decay.  This one closes
+the loop to genotype primitives: the AR(1) kernel's decay parameter *is* the
+Ohta–Kimura per-generation retention `LDDecayTheory.ldRetentionPerGen r Ne`, so
+every quantity on the frontier becomes an explicit function of the recombination
+rate, the effective population size, and the number of markers retained.
+
+Composition convention, inherited from
+`Calibrator.ImitationRigidity.markovLDStep`: separation along the chromosome is
+measured in *sites*, and one site-step carries one application of the retention
+factor.  `ImitationRigidity.stationaryLDEntry_eq_ldAfterGenerations` is the
+corpus theorem licensing that identification.  Reading `r` as anything other
+than the per-generation recombination fraction between *adjacent* markers gives
+a different kernel and different numbers.
+
+What this buys: `pruning_loses_detection_iff_whiteningGain_exceeds_one` makes
+the connection to the corpus's existing detection quantity an implication rather
+than a remark — the whitening gain `ldWhiteningGain` exceeds its no-linkage
+value exactly when pruning strictly loses detection weight, because the
+inverse-kernel trace that the gain measures is built out of the very directions
+pruning discards.  And `clumping_minimizes_detection_on_ld_kernel` states the
+prohibition over a genetic pruning rule on the LD kernel itself.
+
+Scope is unchanged and is not weakened by the instantiation: these are results
+about linear, projection-type reductions of the LD kernel.  Extension to
+arbitrary measurable reductions would need a joint data-processing inequality
+for the detection/reconstruction pair, which does not exist.
+-/
+
+section GeneticFrontier
+
+/-- **Fraction of the marker panel retained** by a pruning or clumping pass:
+`retainedMarkers` of `totalMarkers` survive.  This is the rank budget of the
+reduction, expressed in the units a clumping tool reports.
+
+Empirical status: UNTESTED. -/
+def ldPanelRetentionFraction (retainedMarkers totalMarkers : ℕ) : ℝ :=
+  (retainedMarkers : ℝ) / (totalMarkers : ℝ)
+
+theorem ldPanelRetentionFraction_mem {retainedMarkers totalMarkers : ℕ}
+    (h0 : 0 < retainedMarkers) (h1 : retainedMarkers < totalMarkers) :
+    0 < ldPanelRetentionFraction retainedMarkers totalMarkers ∧
+      ldPanelRetentionFraction retainedMarkers totalMarkers < 1 := by
+  have hr : (0 : ℝ) < (retainedMarkers : ℝ) := by exact_mod_cast h0
+  have htotal : 0 < totalMarkers := lt_trans h0 h1
+  have ht : (0 : ℝ) < (totalMarkers : ℝ) := by exact_mod_cast htotal
+  have hlt : (retainedMarkers : ℝ) < (totalMarkers : ℝ) := by exact_mod_cast h1
+  unfold ldPanelRetentionFraction
+  exact ⟨div_pos hr ht, (div_lt_one ht).mpr hlt⟩
+
+/-- The Ohta–Kimura retention lies in `[0, 1)` for admissible parameters, so it
+is an admissible AR(1) decay.  This is the compatibility check that lets the two
+corpus modules be chained at all. -/
+theorem ldRetentionPerGen_abs_lt_one {recomb Ne : ℝ}
+    (hr0 : 0 ≤ recomb) (hr1 : recomb ≤ 1) (hNe : 1 < Ne) :
+    |ldRetentionPerGen recomb Ne| < 1 := by
+  have hnn : 0 ≤ ldRetentionPerGen recomb Ne :=
+    ld_retention_nonneg recomb Ne hr0 hr1 (le_of_lt hNe)
+  have hlt : ldRetentionPerGen recomb Ne < 1 := by
+    have hfac : 0 < 1 - 1 / (2 * Ne) := by
+      rw [sub_pos, div_lt_one (by linarith)]
+      linarith
+    have hfac1 : 1 - 1 / (2 * Ne) < 1 := by
+      have hpos : 0 < 1 / (2 * Ne) := div_pos one_pos (by linarith)
+      linarith
+    unfold ldRetentionPerGen
+    nlinarith [mul_nonneg hr0 (le_of_lt hfac), hfac1]
+  rw [abs_lt]
+  exact ⟨by linarith, hlt⟩
+
+/-- Less recombination, more retention.  Extracted here in the form the frontier
+needs; it is the step the corpus already performs inside
+`ImitationRigidity.ldWhiteningGain_of_ldRetention_antitone`. -/
+theorem ldRetentionPerGen_strictAnti_recomb {r₁ r₂ Ne : ℝ}
+    (hNe : 1 < Ne) (hlt : r₁ < r₂) :
+    ldRetentionPerGen r₂ Ne < ldRetentionPerGen r₁ Ne := by
+  have hfac : 0 < 1 - 1 / (2 * Ne) := by
+    rw [sub_pos, div_lt_one (by linarith)]
+    linarith
+  unfold ldRetentionPerGen
+  nlinarith [hlt, hfac]
+
+/-- **Reconstruction share of a clumped panel**, as a function of the
+recombination rate between adjacent markers, the effective population size, and
+how many markers survive clumping.
+
+Empirical status: UNTESTED. -/
+def ldBlockReconstructionShare (recomb Ne : ℝ)
+    (retainedMarkers totalMarkers : ℕ) : ℝ :=
+  ldBandReconstructionShare (ldRetentionPerGen recomb Ne)
+    (ldPanelRetentionFraction retainedMarkers totalMarkers)
+
+/-- **Detection share of a clumped panel**: the fraction of the whitened
+detection weight — the inverse-LD-kernel trace whose per-variant limit is
+`ImitationRigidity.ldWhiteningGain` — that survives clumping, as a function of
+recombination rate, effective size and marker counts.
+
+Empirical status: UNTESTED. -/
+def ldBlockDetectionShare (recomb Ne : ℝ)
+    (retainedMarkers totalMarkers : ℕ) : ℝ :=
+  ldBandDetectionShare (ldRetentionPerGen recomb Ne)
+    (ldPanelRetentionFraction retainedMarkers totalMarkers)
+
+/-- **Detection weight surrendered to clumping**, over and above the fraction of
+markers discarded, as a function of recombination rate and effective size.  This
+is the price the frontier puts on the pruning convention.
+
+Empirical status: UNTESTED. -/
+def ldBlockPruningDeficit (recomb Ne : ℝ)
+    (retainedMarkers totalMarkers : ℕ) : ℝ :=
+  ldPruningDetectionDeficit (ldRetentionPerGen recomb Ne)
+    (ldPanelRetentionFraction retainedMarkers totalMarkers)
+
+/-- **Tight-linkage floor on the detection share**, `κ - sin(πκ)/π`.  It carries
+no recombination rate because it is the value the frontier saturates to as the
+retention approaches one, and `ldTightLinkage_le_ldBlockDetectionShare` shows it
+bounds the detection share at every recombination rate and effective size.
+
+Empirical status: UNTESTED. -/
+def ldTightLinkageDetectionShare (retainedMarkers totalMarkers : ℕ) : ℝ :=
+  ldPanelRetentionFraction retainedMarkers totalMarkers -
+    Real.sin (Real.pi *
+      ldPanelRetentionFraction retainedMarkers totalMarkers) / Real.pi
+
+/-- Accounting identity: what clumping keeps plus what it surrenders is the
+fraction of markers it retained. -/
+theorem ldBlockDetectionShare_add_deficit (recomb Ne : ℝ)
+    (retainedMarkers totalMarkers : ℕ) :
+    ldBlockDetectionShare recomb Ne retainedMarkers totalMarkers +
+        ldBlockPruningDeficit recomb Ne retainedMarkers totalMarkers =
+      ldPanelRetentionFraction retainedMarkers totalMarkers := by
+  unfold ldBlockDetectionShare ldBlockPruningDeficit ldBandDetectionShare
+    ldPruningDetectionDeficit
+  ring
+
+/-- **Clumping loses detection weight faster than it loses markers**, at every
+recombination rate and effective size. -/
+theorem ldBlockDetectionShare_le_retention {recomb Ne : ℝ}
+    {retainedMarkers totalMarkers : ℕ}
+    (hr0 : 0 ≤ recomb) (hr1 : recomb ≤ 1) (hNe : 1 < Ne)
+    (h0 : 0 < retainedMarkers) (h1 : retainedMarkers < totalMarkers) :
+    ldBlockDetectionShare recomb Ne retainedMarkers totalMarkers ≤
+      ldPanelRetentionFraction retainedMarkers totalMarkers := by
+  obtain ⟨hkpos, hklt⟩ := ldPanelRetentionFraction_mem h0 h1
+  have hp0 : 0 ≤ ldRetentionPerGen recomb Ne :=
+    ld_retention_nonneg recomb Ne hr0 hr1 (le_of_lt hNe)
+  unfold ldBlockDetectionShare
+  exact ldBandDetectionShare_le_retention hp0 (le_of_lt hkpos) (le_of_lt hklt)
+
+/-- The whitening gain exceeds its no-linkage value exactly when there is
+linkage to exploit. -/
+theorem ldWhiteningGain_one_lt_iff {decay : ℝ}
+    (hd0 : 0 ≤ decay) (hd1 : decay < 1) :
+    1 < ldWhiteningGain decay ↔ 0 < decay := by
+  have hden : (0 : ℝ) < 1 - decay ^ 2 := by
+    nlinarith [mul_pos (by linarith : (0:ℝ) < 1 - decay)
+      (by linarith : (0:ℝ) < 1 + decay)]
+  unfold ldWhiteningGain
+  rw [one_lt_div hden]
+  constructor
+  · intro h
+    rcases eq_or_lt_of_le hd0 with heq | hpos
+    · exfalso
+      rw [← heq] at h
+      norm_num at h
+    · exact hpos
+  · intro h
+    nlinarith [mul_pos h h]
+
+/-- The pruning deficit is strictly positive exactly when there is linkage. -/
+theorem ldPruningDetectionDeficit_pos_iff {decay kappa : ℝ}
+    (hd0 : 0 ≤ decay) (hk0 : 0 < kappa) (hk1 : kappa < 1) :
+    0 < ldPruningDetectionDeficit decay kappa ↔ 0 < decay := by
+  have hpi : 0 < Real.pi := Real.pi_pos
+  have hden : 0 < Real.pi * (1 + decay ^ 2) := by positivity
+  have hsin : 0 < Real.sin (Real.pi * kappa) := by
+    refine Real.sin_pos_of_pos_of_lt_pi ?_ ?_
+    · exact mul_pos hpi hk0
+    · nlinarith [mul_pos hpi (by linarith : (0:ℝ) < 1 - kappa)]
+  unfold ldPruningDetectionDeficit
+  constructor
+  · intro h
+    rcases eq_or_lt_of_le hd0 with heq | hpos
+    · exfalso
+      rw [← heq] at h
+      norm_num at h
+    · exact hpos
+  · intro h
+    exact div_pos (mul_pos (by linarith) hsin) hden
+
+/-- **The corpus's detection quantity is what clumping destroys.**
+
+`ImitationRigidity.ldWhiteningGain` is the per-variant limit of `tr K⁻¹`, the
+quantity every whitened detection threshold in this corpus is stated in.  It
+exceeds its no-linkage value `1` precisely when the LD kernel has spectral
+spread — and that is precisely the condition under which a clumped panel loses
+detection weight strictly faster than it loses markers.
+
+This is the implication the inverse-ordering result explains: the inverse-kernel
+trace is built out of the small-eigenvalue directions, clumping keeps the large
+ones, so the gain being larger than one and the pruning deficit being positive
+are the same fact seen from two sides.  Everything on both sides is an explicit
+function of the recombination rate and the effective population size. -/
+theorem pruning_loses_detection_iff_whiteningGain_exceeds_one
+    {recomb Ne : ℝ} {retainedMarkers totalMarkers : ℕ}
+    (hr0 : 0 ≤ recomb) (hr1 : recomb ≤ 1) (hNe : 1 < Ne)
+    (h0 : 0 < retainedMarkers) (h1 : retainedMarkers < totalMarkers) :
+    1 < ldWhiteningGain (ldRetentionPerGen recomb Ne) ↔
+      0 < ldBlockPruningDeficit recomb Ne retainedMarkers totalMarkers := by
+  obtain ⟨hkpos, hklt⟩ := ldPanelRetentionFraction_mem h0 h1
+  have hp0 : 0 ≤ ldRetentionPerGen recomb Ne :=
+    ld_retention_nonneg recomb Ne hr0 hr1 (le_of_lt hNe)
+  have hp1 : ldRetentionPerGen recomb Ne < 1 :=
+    (abs_lt.mp (ldRetentionPerGen_abs_lt_one hr0 hr1 hNe)).2
+  unfold ldBlockPruningDeficit
+  rw [ldWhiteningGain_one_lt_iff hp0 hp1,
+    ldPruningDetectionDeficit_pos_iff hp0 hkpos hklt]
+
+/-- The deficit is strictly increasing in the AR(1) decay. -/
+theorem ldPruningDetectionDeficit_strictMono {p₁ p₂ kappa : ℝ}
+    (h₁ : 0 ≤ p₁) (h₂ : p₂ < 1) (hlt : p₁ < p₂)
+    (hk0 : 0 < kappa) (hk1 : kappa < 1) :
+    ldPruningDetectionDeficit p₁ kappa < ldPruningDetectionDeficit p₂ kappa := by
+  have hpi : 0 < Real.pi := Real.pi_pos
+  have hsin : 0 < Real.sin (Real.pi * kappa) := by
+    refine Real.sin_pos_of_pos_of_lt_pi ?_ ?_
+    · exact mul_pos hpi hk0
+    · nlinarith [mul_pos hpi (by linarith : (0:ℝ) < 1 - kappa)]
+  have hd1 : 0 < Real.pi * (1 + p₁ ^ 2) := by positivity
+  have hd2 : 0 < Real.pi * (1 + p₂ ^ 2) := by positivity
+  have hprod : (0 : ℝ) < 1 - p₁ * p₂ := by
+    nlinarith [mul_nonneg h₁ (by linarith : (0:ℝ) ≤ 1 - p₂)]
+  unfold ldPruningDetectionDeficit
+  rw [div_lt_div_iff hd1 hd2]
+  nlinarith [mul_pos (mul_pos (mul_pos hsin hpi) (sub_pos.mpr hlt)) hprod]
+
+/-- **Tighter linkage, larger surrendered detection power.**  Lowering the
+recombination rate between adjacent markers at fixed effective size strictly
+increases the detection weight a clumped panel gives up.  This is the frontier's
+dependence on `r`, and it runs in the same direction as
+`ImitationRigidity.ldWhiteningGain_of_ldRetention_antitone`: the tighter the
+block, the more there was to lose. -/
+theorem ldBlockPruningDeficit_antitone_in_recombination
+    {r₁ r₂ Ne : ℝ} {retainedMarkers totalMarkers : ℕ}
+    (hr₁ : 0 ≤ r₁) (hr₂ : r₂ ≤ 1) (hNe : 1 < Ne) (hlt : r₁ < r₂)
+    (h0 : 0 < retainedMarkers) (h1 : retainedMarkers < totalMarkers) :
+    ldBlockPruningDeficit r₂ Ne retainedMarkers totalMarkers <
+      ldBlockPruningDeficit r₁ Ne retainedMarkers totalMarkers := by
+  obtain ⟨hkpos, hklt⟩ := ldPanelRetentionFraction_mem h0 h1
+  have hp2nn : 0 ≤ ldRetentionPerGen r₂ Ne :=
+    ld_retention_nonneg r₂ Ne (by linarith) hr₂ (le_of_lt hNe)
+  have hp1lt : ldRetentionPerGen r₁ Ne < 1 :=
+    (abs_lt.mp (ldRetentionPerGen_abs_lt_one hr₁ (by linarith) hNe)).2
+  have hret : ldRetentionPerGen r₂ Ne < ldRetentionPerGen r₁ Ne :=
+    ldRetentionPerGen_strictAnti_recomb hNe hlt
+  unfold ldBlockPruningDeficit
+  exact ldPruningDetectionDeficit_strictMono hp2nn hp1lt hret hkpos hklt
+
+/-- The deficit never exceeds `sin(πκ)/π`, at any decay. -/
+theorem ldPruningDetectionDeficit_le_sin_div_pi {decay kappa : ℝ}
+    (hd0 : 0 ≤ decay) (hk0 : 0 ≤ kappa) (hk1 : kappa ≤ 1) :
+    ldPruningDetectionDeficit decay kappa ≤
+      Real.sin (Real.pi * kappa) / Real.pi := by
+  have hpi : 0 < Real.pi := Real.pi_pos
+  have hden : 0 < Real.pi * (1 + decay ^ 2) := by positivity
+  have hsin : 0 ≤ Real.sin (Real.pi * kappa) := by
+    refine Real.sin_nonneg_of_nonneg_of_le_pi ?_ ?_
+    · exact mul_nonneg (le_of_lt hpi) hk0
+    · nlinarith [mul_nonneg (le_of_lt hpi) (by linarith : (0:ℝ) ≤ 1 - kappa)]
+  unfold ldPruningDetectionDeficit
+  rw [div_le_div_iff hden hpi]
+  nlinarith [mul_nonneg (mul_nonneg hsin (le_of_lt hpi)) (sq_nonneg (1 - decay))]
+
+/-- **The tight-linkage floor.**  At every recombination rate and effective
+size, a clumped panel retaining `retainedMarkers` of `totalMarkers` keeps at
+least `κ - sin(πκ)/π` of the detection weight, and no more than `κ`.  The lower
+end is approached as linkage tightens, so on a dense panel the detection share
+is pinned near a curve carrying no free parameters at all — which is what makes
+the prediction cheap to test. -/
+theorem ldTightLinkage_le_ldBlockDetectionShare {recomb Ne : ℝ}
+    {retainedMarkers totalMarkers : ℕ}
+    (hr0 : 0 ≤ recomb) (hr1 : recomb ≤ 1) (hNe : 1 < Ne)
+    (h0 : 0 < retainedMarkers) (h1 : retainedMarkers < totalMarkers) :
+    ldTightLinkageDetectionShare retainedMarkers totalMarkers ≤
+      ldBlockDetectionShare recomb Ne retainedMarkers totalMarkers := by
+  obtain ⟨hkpos, hklt⟩ := ldPanelRetentionFraction_mem h0 h1
+  have hp0 : 0 ≤ ldRetentionPerGen recomb Ne :=
+    ld_retention_nonneg recomb Ne hr0 hr1 (le_of_lt hNe)
+  have hbound := ldPruningDetectionDeficit_le_sin_div_pi
+    (decay := ldRetentionPerGen recomb Ne)
+    (kappa := ldPanelRetentionFraction retainedMarkers totalMarkers)
+    hp0 (le_of_lt hkpos) (le_of_lt hklt)
+  unfold ldTightLinkageDetectionShare ldBlockDetectionShare
+    ldBandDetectionShare
+  unfold ldPruningDetectionDeficit at hbound
+  linarith
+
+/-- **The pruning prohibition on the LD kernel itself.**
+
+`S` is the set of retained directions of a clumping pass: the low-frequency band
+of the LD kernel, which by `ldKernelSymbol_mono_in_cos` is exactly a top-`|S|`
+set by eigenvalue.  The conclusion is that among *all* relaxed rank-`|S|`
+reductions of the same kernel — every linear dimension reduction with the same
+budget, fractional ones included — the clumped panel has the minimum detection
+efficiency.
+
+The kernel is the Ohta–Kimura one: its decay is `ldRetentionPerGen recomb Ne`,
+so the statement is about a chromosome with a named recombination rate and a
+named effective population size, not an abstract spectrum.
+
+Scope: relaxed projection-type reductions.  This is not a statement about
+arbitrary measurable summaries of the genotypes, and no joint data-processing
+inequality is available that would make it one. -/
+theorem clumping_minimizes_detection_on_ld_kernel
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (angle : ι → ℝ) (recomb Ne cutAngle : ℝ) (S : Finset ι) (M : ι → ℝ)
+    (hr0 : 0 ≤ recomb) (hr1 : recomb ≤ 1) (hNe : 1 < Ne)
+    (hM : IsRankAllocation (S.card : ℝ) M)
+    (hin : ∀ i ∈ S, Real.cos cutAngle ≤ Real.cos (angle i))
+    (hout : ∀ i ∉ S, Real.cos (angle i) ≤ Real.cos cutAngle)
+    (htotal : 0 < spectralTotal (fun i =>
+      detectionWeight (ldKernelSymbol (ldRetentionPerGen recomb Ne) (angle i)))) :
+    detectionEfficiency
+        (fun i => ldKernelSymbol (ldRetentionPerGen recomb Ne) (angle i))
+        (pruneAllocation S) ≤
+      detectionEfficiency
+        (fun i => ldKernelSymbol (ldRetentionPerGen recomb Ne) (angle i)) M := by
+  have habs : |ldRetentionPerGen recomb Ne| < 1 :=
+    ldRetentionPerGen_abs_lt_one hr0 hr1 hNe
+  have hp0 : 0 ≤ ldRetentionPerGen recomb Ne :=
+    ld_retention_nonneg recomb Ne hr0 hr1 (le_of_lt hNe)
+  refine topVariance_minimizes_detection
+    (fun i => ldKernelSymbol (ldRetentionPerGen recomb Ne) (angle i)) M S
+    (ldKernelSymbol (ldRetentionPerGen recomb Ne) cutAngle)
+    (fun i => ldKernelSymbol_pos habs) (ldKernelSymbol_pos habs)
+    hM ?_ ?_ htotal
+  · intro i hi
+    exact ldKernelSymbol_mono_in_cos habs hp0 (hin i hi)
+  · intro i hi
+    exact ldKernelSymbol_mono_in_cos habs hp0 (hout i hi)
+
+/-- The same statement for the other task: a clumped panel maximises
+reconstruction efficiency on the LD kernel.  Stated alongside the prohibition
+because the pair is the trade-off — the clumping rule is not merely bad for
+detection, it is bad for detection *because* it is optimal for reconstruction,
+and the two conclusions come from the one threshold hypothesis. -/
+theorem clumping_maximizes_reconstruction_on_ld_kernel
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (angle : ι → ℝ) (recomb Ne cutAngle : ℝ) (S : Finset ι) (M : ι → ℝ)
+    (hr0 : 0 ≤ recomb) (hr1 : recomb ≤ 1) (hNe : 1 < Ne)
+    (hM : IsRankAllocation (S.card : ℝ) M)
+    (hin : ∀ i ∈ S, Real.cos cutAngle ≤ Real.cos (angle i))
+    (hout : ∀ i ∉ S, Real.cos (angle i) ≤ Real.cos cutAngle)
+    (htotal : 0 < spectralTotal (fun i =>
+      reconstructionWeight
+        (ldKernelSymbol (ldRetentionPerGen recomb Ne) (angle i)))) :
+    reconstructionEfficiency
+        (fun i => ldKernelSymbol (ldRetentionPerGen recomb Ne) (angle i)) M ≤
+      reconstructionEfficiency
+        (fun i => ldKernelSymbol (ldRetentionPerGen recomb Ne) (angle i))
+        (pruneAllocation S) := by
+  have habs : |ldRetentionPerGen recomb Ne| < 1 :=
+    ldRetentionPerGen_abs_lt_one hr0 hr1 hNe
+  have hp0 : 0 ≤ ldRetentionPerGen recomb Ne :=
+    ld_retention_nonneg recomb Ne hr0 hr1 (le_of_lt hNe)
+  refine topVariance_maximizes_reconstruction
+    (fun i => ldKernelSymbol (ldRetentionPerGen recomb Ne) (angle i)) M S
+    (ldKernelSymbol (ldRetentionPerGen recomb Ne) cutAngle)
+    (fun i => ldKernelSymbol_pos habs) hM ?_ ?_ htotal
+  · intro i hi
+    exact ldKernelSymbol_mono_in_cos habs hp0 (hin i hi)
+  · intro i hi
+    exact ldKernelSymbol_mono_in_cos habs hp0 (hout i hi)
+
+end GeneticFrontier
+
 end Calibrator

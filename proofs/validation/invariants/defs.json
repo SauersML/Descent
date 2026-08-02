@@ -8573,7 +8573,7 @@
   "name": "circulantSpectrumA",
   "module": "EpistaticChaos",
   "path": "proofs/Calibrator/EpistaticChaos.lean",
-  "line": 1331,
+  "line": 1349,
   "params": [
    [
     "c",
@@ -8605,7 +8605,7 @@
   "name": "circulantSpectrumB",
   "module": "EpistaticChaos",
   "path": "proofs/Calibrator/EpistaticChaos.lean",
-  "line": 1338,
+  "line": 1356,
   "params": [
    [
     "c",
@@ -11076,9 +11076,37 @@
      "ℝ",
      "ℝ"
     ]
+   },
+   {
+    "thm": "clumping_minimizes_detection_on_ld_kernel",
+    "hyps": [
+     "ι → ℝ",
+     "Finset ι",
+     "ι → ℝ",
+     "0 ≤ recomb",
+     "recomb ≤ 1",
+     "1 < Ne",
+     "IsRankAllocation (S.card : ℝ) M",
+     "∀ i ∈ S, Real.cos cutAngle ≤ Real.cos (angle i)",
+     "∀ i ∉ S, Real.cos (angle i) ≤ Real.cos cutAngle"
+    ]
+   },
+   {
+    "thm": "clumping_maximizes_reconstruction_on_ld_kernel",
+    "hyps": [
+     "ι → ℝ",
+     "Finset ι",
+     "ι → ℝ",
+     "0 ≤ recomb",
+     "recomb ≤ 1",
+     "1 < Ne",
+     "IsRankAllocation (S.card : ℝ) M",
+     "∀ i ∈ S, Real.cos cutAngle ≤ Real.cos (angle i)",
+     "∀ i ∉ S, Real.cos (angle i) ≤ Real.cos cutAngle"
+    ]
    }
   ],
-  "n_theorems": 7
+  "n_theorems": 9
  },
  {
   "name": "ldHardEdge",
@@ -11173,6 +11201,23 @@
     ]
    },
    {
+    "thm": "ldWhiteningGain_one_lt_iff",
+    "hyps": [
+     "0 ≤ decay",
+     "decay < 1"
+    ]
+   },
+   {
+    "thm": "pruning_loses_detection_iff_whiteningGain_exceeds_one",
+    "hyps": [
+     "0 ≤ recomb",
+     "recomb ≤ 1",
+     "1 < Ne",
+     "0 < retainedMarkers",
+     "retainedMarkers < totalMarkers"
+    ]
+   },
+   {
     "thm": "traceWindowSpikeLoad_tendsto_ldWhiteningGain",
     "hyps": [
      "|decay| < 1"
@@ -11187,7 +11232,7 @@
     ]
    }
   ],
-  "n_theorems": 8
+  "n_theorems": 10
  },
  {
   "name": "ldPrecisionTrace",
@@ -12020,9 +12065,62 @@
      "r ≤ 1",
      "1 ≤ Ne"
     ]
+   },
+   {
+    "thm": "ldRetentionPerGen_abs_lt_one",
+    "hyps": [
+     "0 ≤ recomb",
+     "recomb ≤ 1",
+     "1 < Ne"
+    ]
+   },
+   {
+    "thm": "ldRetentionPerGen_strictAnti_recomb",
+    "hyps": [
+     "1 < Ne",
+     "r₁ < r₂"
+    ]
+   },
+   {
+    "thm": "pruning_loses_detection_iff_whiteningGain_exceeds_one",
+    "hyps": [
+     "0 ≤ recomb",
+     "recomb ≤ 1",
+     "1 < Ne",
+     "0 < retainedMarkers",
+     "retainedMarkers < totalMarkers"
+    ]
+   },
+   {
+    "thm": "clumping_minimizes_detection_on_ld_kernel",
+    "hyps": [
+     "ι → ℝ",
+     "Finset ι",
+     "ι → ℝ",
+     "0 ≤ recomb",
+     "recomb ≤ 1",
+     "1 < Ne",
+     "IsRankAllocation (S.card : ℝ) M",
+     "∀ i ∈ S, Real.cos cutAngle ≤ Real.cos (angle i)",
+     "∀ i ∉ S, Real.cos (angle i) ≤ Real.cos cutAngle"
+    ]
+   },
+   {
+    "thm": "clumping_maximizes_reconstruction_on_ld_kernel",
+    "hyps": [
+     "ι → ℝ",
+     "Finset ι",
+     "ι → ℝ",
+     "0 ≤ recomb",
+     "recomb ≤ 1",
+     "1 < Ne",
+     "IsRankAllocation (S.card : ℝ) M",
+     "∀ i ∈ S, Real.cos cutAngle ≤ Real.cos (angle i)",
+     "∀ i ∉ S, Real.cos (angle i) ≤ Real.cos cutAngle"
+    ]
    }
   ],
-  "n_theorems": 5
+  "n_theorems": 10
  },
  {
   "name": "ldAfterGenerations",
@@ -13838,9 +13936,248 @@
     "hyps": [
      "ℝ"
     ]
+   },
+   {
+    "thm": "ldPruningDetectionDeficit_pos_iff",
+    "hyps": [
+     "0 ≤ decay",
+     "0 < kappa",
+     "kappa < 1"
+    ]
+   },
+   {
+    "thm": "ldPruningDetectionDeficit_strictMono",
+    "hyps": [
+     "0 ≤ p₁",
+     "p₂ < 1",
+     "p₁ < p₂",
+     "0 < kappa",
+     "kappa < 1"
+    ]
+   },
+   {
+    "thm": "ldPruningDetectionDeficit_le_sin_div_pi",
+    "hyps": [
+     "0 ≤ decay",
+     "0 ≤ kappa",
+     "kappa ≤ 1"
+    ]
+   }
+  ],
+  "n_theorems": 6
+ },
+ {
+  "name": "ldPanelRetentionFraction",
+  "module": "MetricSpecificPortability",
+  "path": "proofs/Calibrator/MetricSpecificPortability.lean",
+  "line": 1375,
+  "params": [
+   [
+    "retainedMarkers",
+    "ℕ"
+   ],
+   [
+    "totalMarkers",
+    "ℕ"
+   ]
+  ],
+  "ret": "ℝ",
+  "doc": "**Fraction of the marker panel retained** by a pruning or clumping pass:\n`retainedMarkers` of `totalMarkers` survive.  This is the rank budget of the\nreduction, expressed in the units a clumping tool reports.\n\nEmpirical status: UNTESTED.",
+  "body": "(retainedMarkers : ℝ) / (totalMarkers : ℝ)",
+  "theorem_hyps": [
+   {
+    "thm": "ldPanelRetentionFraction_mem",
+    "hyps": [
+     "0 < retainedMarkers",
+     "retainedMarkers < totalMarkers"
+    ]
+   },
+   {
+    "thm": "ldBlockDetectionShare_add_deficit",
+    "hyps": []
+   },
+   {
+    "thm": "ldBlockDetectionShare_le_retention",
+    "hyps": [
+     "0 ≤ recomb",
+     "recomb ≤ 1",
+     "1 < Ne",
+     "0 < retainedMarkers",
+     "retainedMarkers < totalMarkers"
+    ]
    }
   ],
   "n_theorems": 3
+ },
+ {
+  "name": "ldBlockReconstructionShare",
+  "module": "MetricSpecificPortability",
+  "path": "proofs/Calibrator/MetricSpecificPortability.lean",
+  "line": 1426,
+  "params": [
+   [
+    "recomb",
+    "ℝ"
+   ],
+   [
+    "Ne",
+    "ℝ"
+   ],
+   [
+    "retainedMarkers",
+    "ℕ"
+   ],
+   [
+    "totalMarkers",
+    "ℕ"
+   ]
+  ],
+  "ret": "ℝ",
+  "doc": "**Reconstruction share of a clumped panel**, as a function of the\nrecombination rate between adjacent markers, the effective population size, and\nhow many markers survive clumping.\n\nEmpirical status: UNTESTED.",
+  "body": "ldBandReconstructionShare (ldRetentionPerGen recomb Ne)\n(ldPanelRetentionFraction retainedMarkers totalMarkers)",
+  "theorem_hyps": [],
+  "n_theorems": 0
+ },
+ {
+  "name": "ldBlockDetectionShare",
+  "module": "MetricSpecificPortability",
+  "path": "proofs/Calibrator/MetricSpecificPortability.lean",
+  "line": 1437,
+  "params": [
+   [
+    "recomb",
+    "ℝ"
+   ],
+   [
+    "Ne",
+    "ℝ"
+   ],
+   [
+    "retainedMarkers",
+    "ℕ"
+   ],
+   [
+    "totalMarkers",
+    "ℕ"
+   ]
+  ],
+  "ret": "ℝ",
+  "doc": "**Detection share of a clumped panel**: the fraction of the whitened\ndetection weight — the inverse-LD-kernel trace whose per-variant limit is\n`ImitationRigidity.ldWhiteningGain` — that survives clumping, as a function of\nrecombination rate, effective size and marker counts.\n\nEmpirical status: UNTESTED.",
+  "body": "ldBandDetectionShare (ldRetentionPerGen recomb Ne)\n(ldPanelRetentionFraction retainedMarkers totalMarkers)",
+  "theorem_hyps": [
+   {
+    "thm": "ldBlockDetectionShare_add_deficit",
+    "hyps": []
+   },
+   {
+    "thm": "ldBlockDetectionShare_le_retention",
+    "hyps": [
+     "0 ≤ recomb",
+     "recomb ≤ 1",
+     "1 < Ne",
+     "0 < retainedMarkers",
+     "retainedMarkers < totalMarkers"
+    ]
+   },
+   {
+    "thm": "ldTightLinkage_le_ldBlockDetectionShare",
+    "hyps": [
+     "0 ≤ recomb",
+     "recomb ≤ 1",
+     "1 < Ne",
+     "0 < retainedMarkers",
+     "retainedMarkers < totalMarkers"
+    ]
+   }
+  ],
+  "n_theorems": 3
+ },
+ {
+  "name": "ldBlockPruningDeficit",
+  "module": "MetricSpecificPortability",
+  "path": "proofs/Calibrator/MetricSpecificPortability.lean",
+  "line": 1447,
+  "params": [
+   [
+    "recomb",
+    "ℝ"
+   ],
+   [
+    "Ne",
+    "ℝ"
+   ],
+   [
+    "retainedMarkers",
+    "ℕ"
+   ],
+   [
+    "totalMarkers",
+    "ℕ"
+   ]
+  ],
+  "ret": "ℝ",
+  "doc": "**Detection weight surrendered to clumping**, over and above the fraction of\nmarkers discarded, as a function of recombination rate and effective size.  This\nis the price the frontier puts on the pruning convention.\n\nEmpirical status: UNTESTED.",
+  "body": "ldPruningDetectionDeficit (ldRetentionPerGen recomb Ne)\n(ldPanelRetentionFraction retainedMarkers totalMarkers)",
+  "theorem_hyps": [
+   {
+    "thm": "ldBlockDetectionShare_add_deficit",
+    "hyps": []
+   },
+   {
+    "thm": "pruning_loses_detection_iff_whiteningGain_exceeds_one",
+    "hyps": [
+     "0 ≤ recomb",
+     "recomb ≤ 1",
+     "1 < Ne",
+     "0 < retainedMarkers",
+     "retainedMarkers < totalMarkers"
+    ]
+   },
+   {
+    "thm": "ldBlockPruningDeficit_antitone_in_recombination",
+    "hyps": [
+     "0 ≤ r₁",
+     "r₂ ≤ 1",
+     "1 < Ne",
+     "r₁ < r₂",
+     "0 < retainedMarkers",
+     "retainedMarkers < totalMarkers"
+    ]
+   }
+  ],
+  "n_theorems": 3
+ },
+ {
+  "name": "ldTightLinkageDetectionShare",
+  "module": "MetricSpecificPortability",
+  "path": "proofs/Calibrator/MetricSpecificPortability.lean",
+  "line": 1458,
+  "params": [
+   [
+    "retainedMarkers",
+    "ℕ"
+   ],
+   [
+    "totalMarkers",
+    "ℕ"
+   ]
+  ],
+  "ret": "ℝ",
+  "doc": "**Tight-linkage floor on the detection share**, `κ - sin(πκ)/π`.  It carries\nno recombination rate because it is the value the frontier saturates to as the\nretention approaches one, and `ldTightLinkage_le_ldBlockDetectionShare` shows it\nbounds the detection share at every recombination rate and effective size.\n\nEmpirical status: UNTESTED.",
+  "body": "ldPanelRetentionFraction retainedMarkers totalMarkers -\nReal.sin (Real.pi *\nldPanelRetentionFraction retainedMarkers totalMarkers) / Real.pi",
+  "theorem_hyps": [
+   {
+    "thm": "ldTightLinkage_le_ldBlockDetectionShare",
+    "hyps": [
+     "0 ≤ recomb",
+     "recomb ≤ 1",
+     "1 < Ne",
+     "0 < retainedMarkers",
+     "retainedMarkers < totalMarkers"
+    ]
+   }
+  ],
+  "n_theorems": 1
  },
  {
   "name": "effectMutualInformation",
@@ -20138,7 +20475,7 @@
   "name": "expectedSquaredEffect",
   "module": "PolygenicArchitecture",
   "path": "proofs/Calibrator/PolygenicArchitecture.lean",
-  "line": 43,
+  "line": 44,
   "params": [
    [
     "h2",
@@ -20169,7 +20506,7 @@
   "name": "spikeAndSlabVariance",
   "module": "PolygenicArchitecture",
   "path": "proofs/Calibrator/PolygenicArchitecture.lean",
-  "line": 62,
+  "line": 63,
   "params": [
    [
     "pi",
@@ -20238,7 +20575,7 @@
   "name": "effectivePolygenicity",
   "module": "PolygenicArchitecture",
   "path": "proofs/Calibrator/PolygenicArchitecture.lean",
-  "line": 169,
+  "line": 170,
   "params": [
    [
     "sum_beta_sq",
@@ -20267,7 +20604,7 @@
   "name": "effectivePolygenicityOfEffects",
   "module": "PolygenicArchitecture",
   "path": "proofs/Calibrator/PolygenicArchitecture.lean",
-  "line": 197,
+  "line": 198,
   "params": [
    [
     "beta",
@@ -20293,7 +20630,7 @@
   "name": "sourceEffectMass",
   "module": "PolygenicArchitecture",
   "path": "proofs/Calibrator/PolygenicArchitecture.lean",
-  "line": 265,
+  "line": 266,
   "params": [
    [
     "model",
@@ -20395,7 +20732,7 @@
   "name": "targetRetainedEffectMass",
   "module": "PolygenicArchitecture",
   "path": "proofs/Calibrator/PolygenicArchitecture.lean",
-  "line": 270,
+  "line": 271,
   "params": [
    [
     "model",
@@ -20425,7 +20762,7 @@
   "name": "lostEffectMass",
   "module": "PolygenicArchitecture",
   "path": "proofs/Calibrator/PolygenicArchitecture.lean",
-  "line": 275,
+  "line": 276,
   "params": [
    [
     "model",
@@ -20442,7 +20779,7 @@
   "name": "relativePortabilityLoss",
   "module": "PolygenicArchitecture",
   "path": "proofs/Calibrator/PolygenicArchitecture.lean",
-  "line": 281,
+  "line": 282,
   "params": [
    [
     "model",
@@ -20485,7 +20822,7 @@
   "name": "portabilityScore",
   "module": "PolygenicArchitecture",
   "path": "proofs/Calibrator/PolygenicArchitecture.lean",
-  "line": 287,
+  "line": 288,
   "params": [
    [
     "model",
@@ -20510,7 +20847,7 @@
   "name": "uniformCatastrophicPortabilityScore",
   "module": "PolygenicArchitecture",
   "path": "proofs/Calibrator/PolygenicArchitecture.lean",
-  "line": 351,
+  "line": 352,
   "params": [
    [
     "M",
@@ -20557,7 +20894,7 @@
   "name": "meanAbsoluteEffect",
   "module": "PolygenicArchitecture",
   "path": "proofs/Calibrator/PolygenicArchitecture.lean",
-  "line": 469,
+  "line": 470,
   "params": [
    [
     "beta",
@@ -20588,7 +20925,7 @@
   "name": "nonsmoothSummaryRisk",
   "module": "PolygenicArchitecture",
   "path": "proofs/Calibrator/PolygenicArchitecture.lean",
-  "line": 507,
+  "line": 508,
   "params": [
    [
     "q",
@@ -20607,19 +20944,26 @@
     ]
    },
    {
+    "thm": "nonsmoothSummaryRisk_exceeds_polynomial_eventually",
+    "hyps": [
+     "ℝ",
+     "0 < a"
+    ]
+   },
+   {
     "thm": "logRateSampleSize_attains",
     "hyps": [
      "ℝ"
     ]
    }
   ],
-  "n_theorems": 2
+  "n_theorems": 3
  },
  {
   "name": "gradeCertifiedRisk",
   "module": "PolygenicArchitecture",
   "path": "proofs/Calibrator/PolygenicArchitecture.lean",
-  "line": 517,
+  "line": 518,
   "params": [
    [
     "q",
@@ -20653,7 +20997,7 @@
   "name": "certificateDeficit",
   "module": "PolygenicArchitecture",
   "path": "proofs/Calibrator/PolygenicArchitecture.lean",
-  "line": 526,
+  "line": 527,
   "params": [
    [
     "q",
@@ -20685,15 +21029,22 @@
      "0 < Real.log q",
      "D * Real.log q ≤ q ^ (c / K)"
     ]
+   },
+   {
+    "thm": "gradeCertifiedRisk_deficit_eventually_ge",
+    "hyps": [
+     "0 < c / K",
+     "0 < D"
+    ]
    }
   ],
-  "n_theorems": 2
+  "n_theorems": 3
  },
  {
   "name": "heritabilityEnrichment",
   "module": "PolygenicArchitecture",
   "path": "proofs/Calibrator/PolygenicArchitecture.lean",
-  "line": 583,
+  "line": 645,
   "params": [
    [
     "h2_cat",
@@ -20740,7 +21091,7 @@
   "name": "predictedPortability",
   "module": "PolygenicArchitecture",
   "path": "proofs/Calibrator/PolygenicArchitecture.lean",
-  "line": 656,
+  "line": 718,
   "params": [
    [
     "model",
@@ -20818,7 +21169,7 @@
   "name": "weightedRetentionUpperBound",
   "module": "PolygenicArchitecture",
   "path": "proofs/Calibrator/PolygenicArchitecture.lean",
-  "line": 671,
+  "line": 733,
   "params": [
    [
     "model",
@@ -20873,7 +21224,7 @@
   "name": "rgFstWeightedUpperBound",
   "module": "PolygenicArchitecture",
   "path": "proofs/Calibrator/PolygenicArchitecture.lean",
-  "line": 814,
+  "line": 876,
   "params": [
    [
     "model",
@@ -31886,9 +32237,13 @@
      "epsilon ≤ 1",
      "K / c ≤ 1"
     ]
+   },
+   {
+    "thm": "gradeCertified_understates_sample_size_eventually",
+    "hyps": []
    }
   ],
-  "n_theorems": 3
+  "n_theorems": 4
  },
  {
   "name": "gradeCertifiedSampleSize",
@@ -31932,9 +32287,13 @@
      "epsilon ≤ 1",
      "K / c ≤ 1"
     ]
+   },
+   {
+    "thm": "gradeCertified_understates_sample_size_eventually",
+    "hyps": []
    }
   ],
-  "n_theorems": 3
+  "n_theorems": 4
  },
  {
   "name": "bernoulliPMF",
@@ -33143,6 +33502,20 @@
   "body": "s⁻¹",
   "theorem_hyps": [
    {
+    "thm": "clumping_minimizes_detection_on_ld_kernel",
+    "hyps": [
+     "ι → ℝ",
+     "Finset ι",
+     "ι → ℝ",
+     "0 ≤ recomb",
+     "recomb ≤ 1",
+     "1 < Ne",
+     "IsRankAllocation (S.card : ℝ) M",
+     "∀ i ∈ S, Real.cos cutAngle ≤ Real.cos (angle i)",
+     "∀ i ∉ S, Real.cos (angle i) ≤ Real.cos cutAngle"
+    ]
+   },
+   {
     "thm": "detectionWeight_strictAnti",
     "hyps": [
      "0 < s₁",
@@ -33190,7 +33563,7 @@
     ]
    }
   ],
-  "n_theorems": 5
+  "n_theorems": 6
  },
  {
   "name": "reconstructionWeight",
@@ -33207,6 +33580,20 @@
   "doc": "**Reconstruction weight of an eigendirection** with background variance `s`:\nthe direction's own variance, i.e. its share of the total signal energy.  A\nrank-`k` truncation maximising `∑ σᵢ` over retained directions is what\nprincipal-component truncation does.\n\nEmpirical status: UNTESTED.",
   "body": "s",
   "theorem_hyps": [
+   {
+    "thm": "clumping_maximizes_reconstruction_on_ld_kernel",
+    "hyps": [
+     "ι → ℝ",
+     "Finset ι",
+     "ι → ℝ",
+     "0 ≤ recomb",
+     "recomb ≤ 1",
+     "1 < Ne",
+     "IsRankAllocation (S.card : ℝ) M",
+     "∀ i ∈ S, Real.cos cutAngle ≤ Real.cos (angle i)",
+     "∀ i ∉ S, Real.cos (angle i) ≤ Real.cos cutAngle"
+    ]
+   },
    {
     "thm": "reconstructionWeight_strictMono",
     "hyps": [
@@ -33241,7 +33628,7 @@
     ]
    }
   ],
-  "n_theorems": 4
+  "n_theorems": 5
  },
  {
   "name": "wienerWeight",
@@ -33357,6 +33744,34 @@
   "body": "∑ i, w i",
   "theorem_hyps": [
    {
+    "thm": "clumping_minimizes_detection_on_ld_kernel",
+    "hyps": [
+     "ι → ℝ",
+     "Finset ι",
+     "ι → ℝ",
+     "0 ≤ recomb",
+     "recomb ≤ 1",
+     "1 < Ne",
+     "IsRankAllocation (S.card : ℝ) M",
+     "∀ i ∈ S, Real.cos cutAngle ≤ Real.cos (angle i)",
+     "∀ i ∉ S, Real.cos (angle i) ≤ Real.cos cutAngle"
+    ]
+   },
+   {
+    "thm": "clumping_maximizes_reconstruction_on_ld_kernel",
+    "hyps": [
+     "ι → ℝ",
+     "Finset ι",
+     "ι → ℝ",
+     "0 ≤ recomb",
+     "recomb ≤ 1",
+     "1 < Ne",
+     "IsRankAllocation (S.card : ℝ) M",
+     "∀ i ∈ S, Real.cos cutAngle ≤ Real.cos (angle i)",
+     "∀ i ∉ S, Real.cos (angle i) ≤ Real.cos cutAngle"
+    ]
+   },
+   {
     "thm": "topVariance_maximizes_reconstruction",
     "hyps": [
      "Finset ι",
@@ -33380,7 +33795,7 @@
     ]
    }
   ],
-  "n_theorems": 2
+  "n_theorems": 4
  },
  {
   "name": "reconstructionEfficiency",
@@ -33402,6 +33817,20 @@
   "body": "spectralCapture (fun i => reconstructionWeight (spectrum i)) M /\nspectralTotal (fun i => reconstructionWeight (spectrum i))",
   "theorem_hyps": [
    {
+    "thm": "clumping_maximizes_reconstruction_on_ld_kernel",
+    "hyps": [
+     "ι → ℝ",
+     "Finset ι",
+     "ι → ℝ",
+     "0 ≤ recomb",
+     "recomb ≤ 1",
+     "1 < Ne",
+     "IsRankAllocation (S.card : ℝ) M",
+     "∀ i ∈ S, Real.cos cutAngle ≤ Real.cos (angle i)",
+     "∀ i ∉ S, Real.cos (angle i) ≤ Real.cos cutAngle"
+    ]
+   },
+   {
     "thm": "topVariance_maximizes_reconstruction",
     "hyps": [
      "Finset ι",
@@ -33413,7 +33842,7 @@
     ]
    }
   ],
-  "n_theorems": 1
+  "n_theorems": 2
  },
  {
   "name": "detectionEfficiency",
@@ -33435,6 +33864,20 @@
   "body": "spectralCapture (fun i => detectionWeight (spectrum i)) M /\nspectralTotal (fun i => detectionWeight (spectrum i))",
   "theorem_hyps": [
    {
+    "thm": "clumping_minimizes_detection_on_ld_kernel",
+    "hyps": [
+     "ι → ℝ",
+     "Finset ι",
+     "ι → ℝ",
+     "0 ≤ recomb",
+     "recomb ≤ 1",
+     "1 < Ne",
+     "IsRankAllocation (S.card : ℝ) M",
+     "∀ i ∈ S, Real.cos cutAngle ≤ Real.cos (angle i)",
+     "∀ i ∉ S, Real.cos (angle i) ≤ Real.cos cutAngle"
+    ]
+   },
+   {
     "thm": "topVariance_minimizes_detection",
     "hyps": [
      "Finset ι",
@@ -33447,7 +33890,7 @@
     ]
    }
   ],
-  "n_theorems": 1
+  "n_theorems": 2
  },
  {
   "name": "pruneAllocation",
@@ -33464,6 +33907,34 @@
   "doc": "The variance-greedy (\"pruning\") allocation: keep the directions in `S`\nentirely and discard everything else.  LD pruning and clumping are of this form\nwith `S` the high-variance block representatives.\n\nEmpirical status: UNTESTED.",
   "body": "fun i => if i ∈ S then 1 else 0",
   "theorem_hyps": [
+   {
+    "thm": "clumping_minimizes_detection_on_ld_kernel",
+    "hyps": [
+     "ι → ℝ",
+     "Finset ι",
+     "ι → ℝ",
+     "0 ≤ recomb",
+     "recomb ≤ 1",
+     "1 < Ne",
+     "IsRankAllocation (S.card : ℝ) M",
+     "∀ i ∈ S, Real.cos cutAngle ≤ Real.cos (angle i)",
+     "∀ i ∉ S, Real.cos (angle i) ≤ Real.cos cutAngle"
+    ]
+   },
+   {
+    "thm": "clumping_maximizes_reconstruction_on_ld_kernel",
+    "hyps": [
+     "ι → ℝ",
+     "Finset ι",
+     "ι → ℝ",
+     "0 ≤ recomb",
+     "recomb ≤ 1",
+     "1 < Ne",
+     "IsRankAllocation (S.card : ℝ) M",
+     "∀ i ∈ S, Real.cos cutAngle ≤ Real.cos (angle i)",
+     "∀ i ∉ S, Real.cos (angle i) ≤ Real.cos cutAngle"
+    ]
+   },
    {
     "thm": "spectralCapture_pruneAllocation",
     "hyps": [
@@ -33510,7 +33981,7 @@
     ]
    }
   ],
-  "n_theorems": 5
+  "n_theorems": 7
  },
  {
   "name": "quadraticRisk",
