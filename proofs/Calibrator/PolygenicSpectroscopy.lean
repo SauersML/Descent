@@ -632,7 +632,7 @@ theorem maxSafeEpistaticOrder_collapse_at_rare_maf {N : ℝ} (hN : 0 < Real.log 
   have hrw : 7 * (Real.log N / hweMellinDrift (1 / 1024))
       = 7 * Real.log N / hweMellinDrift (1 / 1024) := by ring
   rw [hrw]
-  rw [div_lt_div_iff hdpos hgpos]
+  rw [div_lt_div_iff₀ hdpos hgpos]
   linarith
 
 /-- **Supercriticality from a small allele frequency, in usable form.**
