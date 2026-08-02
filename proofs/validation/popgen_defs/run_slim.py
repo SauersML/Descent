@@ -51,9 +51,9 @@ def main():
     gens = int(os.environ.get("GENS", "5000"))
     reps = int(os.environ.get("REPS", "3"))
 
-    mus = [1e-6, 2e-6, 4e-6, 8e-6]
-    alphas = [0.05, 0.1, 0.2]
-    vss = [1.0, 5.0]
+    mus = [1e-6, 4e-6, 1.6e-5]
+    alphas = [0.025, 0.05, 0.1, 0.2, 0.4]
+    vss = [0.5, 2.0, 8.0]
 
     jobs = []
     for mu, alpha, vs in itertools.product(mus, alphas, vss):
