@@ -1638,7 +1638,7 @@ theorem fstEquilibrium_lt_one (p : EvolutionaryParameters)
 /-- Full equilibrium Fst ≤ drift-mutation Fst (migration only helps). -/
 theorem fstEquilibrium_le_driftMutation (p : EvolutionaryParameters) :
     fstEquilibrium p ≤ fstMutationDriftEquilibrium p.theta := by
-  unfold fstEquilibrium fstMutationDriftEquilibrium fstMutationDriftEquilibrium.theta
+  unfold fstEquilibrium fstMutationDriftEquilibrium
   exact one_div_le_one_div_of_le (by linarith [p.theta_nonneg]) (by linarith [p.bigM_nonneg])
 
 /-- Full equilibrium Fst ≤ drift-migration Fst (mutation only helps). -/
@@ -1656,7 +1656,7 @@ theorem fst_ordering (p : EvolutionaryParameters) (h_theta : 0 < p.theta) :
     fstMutationDriftEquilibrium p.theta < 1 := by
   constructor
   · exact fstEquilibrium_le_driftMutation p
-  · unfold fstMutationDriftEquilibrium fstMutationDriftEquilibrium.theta
+  · unfold fstMutationDriftEquilibrium
     rw [div_lt_one (by linarith : 0 < 1 + p.theta)]
     linarith
 
