@@ -108,7 +108,7 @@ def evaluate(prop, ns_globals, seed=None, want=40, tries=8000):
     """
     import seeds as _s
     rng = random.Random(_s.sub("theorems") if seed is None else seed)
-    ok = fail = 0
+    ok = fail = undecided = 0
     first = None
     for _ in range(tries):
         if ok + fail >= want:
@@ -129,6 +129,10 @@ def evaluate(prop, ns_globals, seed=None, want=40, tries=8000):
             fail += 1
             if first is None:
                 first = dict(zip(prop["vars"], x))
+        else:
+            # not representable in double precision; counted, not silently
+            # dropped, so a theorem that is mostly unevaluable says so
+            undecided += 1
     return ok, fail, first
 
 

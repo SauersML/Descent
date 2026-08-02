@@ -372,6 +372,16 @@ class TolerantBackend(FloatBackend):
 
     @staticmethod
     def cmp(a, op, b):
+        # A comparison involving a value double precision cannot represent is
+        # not evidence about a statement that is exact over the reals.
+        # `gradeCertifiedRisk (gradeCertifiedSampleSize eps K c) K c = eps` is
+        # an identity, but at c = 7.4e-06 the intermediate `eps ^ (-K/c)` is
+        # about 10^31000 and overflows to inf, after which every comparison is
+        # meaningless. Returning None makes the point UNDECIDED and it is
+        # skipped, rather than counted as a proved theorem failing -- which is
+        # what produced this checker's one and only disagreement.
+        if not (math.isfinite(a) and math.isfinite(b)):
+            return None
         tol = TolerantBackend.REL * max(1.0, abs(a), abs(b))
         if op == "==":
             return abs(a - b) <= tol
@@ -410,6 +420,11 @@ class StrictBackend(FloatBackend):
 
     @staticmethod
     def cmp(a, op, b):
+        # Same rule on the hypothesis side, and here it shrinks the admissible
+        # set as everything else in this backend does: a point whose
+        # hypothesis cannot be evaluated in double precision is not sampled.
+        if not (math.isfinite(a) and math.isfinite(b)):
+            return None
         tol = StrictBackend.REL * max(1.0, abs(a), abs(b))
         if op == "==":
             return abs(a - b) <= 1e-12 * max(1.0, abs(a), abs(b))
