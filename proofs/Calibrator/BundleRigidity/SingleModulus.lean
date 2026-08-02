@@ -40,6 +40,31 @@ Every mass is strictly positive, because `B < A`. At `v = 3/5` this is `A = 2B` 
 `threeAtomWitness_threeFifths`, which is rational arithmetic and needs no square-root
 manipulation at all.
 
+### Two witnesses, and they are two *different* defects
+
+The refutation has two witnesses, and it matters that they are **not two instances of one
+mistake**. They are two independent failures of different kinds, and only the first could
+have been caught by being more careful with the existing argument.
+
+1. **`0 < v < 1` (`threeAtom`, and `threeAtomWitness_threeFifths` at `v = 3/5`) — a
+   boundary mishandled.** This family *is* expressible in the upstream parameterization:
+   it is the closed endpoint `|c| = 1/(4√(1+v))` of the very `c`-line the upstream
+   statement writes down. The upstream text restricted to "`|c|` small enough for
+   positivity" and then asserted the endpoints were empty. The parameter interval is
+   closed and its endpoints are families. A careful redo of the same argument finds this.
+
+2. **`v = 1` (`threeAtomAtOne`) — a case the method cannot express.** This one is *not* a
+   point of the `c`-line. At `v = 1` the two `(1-v)`-side atoms collide at zero, so `d = 4`
+   is impossible outright (`card_le_three_of_v_eq_one`) and the three-atom family
+   `(√2, -√2, 0)` with masses `(1/4, 1/4, 1/2)` is the *only* family there. The upstream
+   argument turns on the ratio `√((1+v)/(1-v))`, which **divides by zero at `v = 1`**, so
+   the case was never reachable by it at all.
+
+**The second is the more serious kind.** No amount of care with the existing argument
+would have found it, because the argument has no value to take at that point. A defect of
+type 1 is a slip; a defect of type 2 says the method's domain of validity was never
+checked against the domain of the claim.
+
 ### Where the upstream argument went wrong, precisely
 
 The upstream proof deleted an atom and derived a negative mass. It deleted a
