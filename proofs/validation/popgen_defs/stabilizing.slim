@@ -1,0 +1,44 @@
+// Equilibrium genetic variance under stabilizing selection.
+//
+// SelectionArchitecture.lean: equilibriumEffectVariance v_mutation s = v_m / s
+// i.e. the equilibrium genetic variance is LINEAR in the mutational variance.
+//
+// V_m enters through two independent routes -- the mutation rate MU and the
+// per-mutation effect size ALPHA (V_m is proportional to MU and to ALPHA^2).
+// The house-of-cards regime gives V_g proportional to MU and independent of
+// ALPHA; Lande's Gaussian approximation gives V_g proportional to
+// sqrt(V_m * V_S), hence to ALPHA.  Varying MU and ALPHA separately therefore
+// discriminates the two, which is what the Lean form asserts.
+
+initialize() {
+    initializeMutationRate(MU);
+    initializeMutationType("m1", 0.5, "n", 0.0, ALPHA);
+    m1.convertToSubstitution = F;
+    initializeGenomicElementType("g1", m1, 1.0);
+    initializeGenomicElement(g1, 0, L - 1);
+    initializeRecombinationRate(0.5);      // free recombination, unlinked loci
+}
+
+1 early() {
+    sim.addSubpop("p1", N);
+}
+
+// QTL mutations are neutral with respect to direct fitness; selection acts on
+// the phenotype only, through the fitnessEffect callback below.
+mutationEffect(m1) {
+    return 1.0;
+}
+
+fitnessEffect() {
+    phenotype = individual.sumOfMutationsOfType(m1);
+    return exp(-(phenotype * phenotype) / (2.0 * VS));
+}
+
+GENS late() {
+    phenos = p1.individuals.sumOfMutationsOfType(m1);
+    // V_m per generation for a diploid: 2 * L * MU * ALPHA^2
+    vm = 2.0 * L * MU * ALPHA * ALPHA;
+    catn("RESULT " + MU + " " + ALPHA + " " + VS + " " + N + " " +
+         vm + " " + var(phenos) + " " + size(sim.mutations));
+    sim.simulationFinished();
+}
