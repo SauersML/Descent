@@ -1,0 +1,104 @@
+srun: Setting account: hsiehph
+srun: job 14679665 queued and waiting for resources
+srun: job 14679665 has been allocated resources
+CONTROLS -- ENGINE 1 (three rates, split three ways)
+  F1 drift alone      : het retention 0.989914 vs 1-1/2Ne 0.990000 -> PASS
+  F2 migration alone  : max |rel err| on spatial variance 2.63e-16 -> PASS
+  F3 mutation alone   : (p-1/2) retention 0.367511255 vs (1-2mu)^t 0.367511255 -> PASS
+
+CONTROLS -- ENGINE 2 (two factors of F_ST = H/(H+T0), split)
+  E1 coalescence alone: E[T] in one deme 80.517 vs 2Ne 80.0 -> PASS
+  E2 random walk alone: max |rel err| vs exact linear solve 0.0099 -> PASS
+  E3 no structure     : E[T]=1199.7 vs 2*Ne*D=1200.0, F_ST(1)=+0.00608 vs 0 -> PASS
+
+A. steppingStoneCharacteristicLength   corpus: L = sqrt(m/(2 mu))
+   diffusion balance 2*V*C'' = 4*mu*C gives sqrt(m*sigma^2/(2 mu)),
+   sigma^2 = k^2, which the corpus body does not contain.
+   Ne     m       k    mu        L_meas     L_corpus   L_truth    err_corp 
+   100    0.1000  1    2.00e-03  3.472      5.000      5.000      +0.440   
+   100    0.1000  1    5.00e-04  6.925      10.000     10.000     +0.444   
+   100    0.1000  1    1.25e-04  13.961     20.000     20.000     +0.433   
+   20     0.1000  1    5.00e-04  7.000      10.000     10.000     +0.429   
+   500    0.1000  1    5.00e-04  7.000      10.000     10.000     +0.429   
+   100    0.0250  1    5.00e-04  3.510      5.000      5.000      +0.425   
+   100    0.2000  1    5.00e-04  10.210     14.142     14.142     +0.385   
+   100    0.1000  2    5.00e-04  16.412     10.000     20.000     -0.391   
+   100    0.1000  3    5.00e-04  26.099     10.000     30.000     -0.617   
+   fitted exponents           measured   corpus   truth
+     dlogL_dlogmu           -0.502     -0.5     -0.5    
+     dlogL_dlogNe           -0.000     0.0      0.0     
+     dlogL_dlogm            0.510      0.5      0.5     
+     dlogL_dlogsigma2       0.606      0.0      0.5     
+
+B. F_ST(d) AND MEETING TIME  (d out to D/2 -- the can-fail range)
+  E4 engine agreement : max |rel err| MC vs exact solve 0.0072, censored 0.00000 -> PASS
+  m=0.100 k=1 sigma^2=1  T0=12545 (2NeD=12800)
+    d     fst_meas   demoSSFst  quadratic  linear     exp(fit)   | H_measured  H_corpus   
+    1     0.09678    0.09091    0.50000    0.09678    0.05306    | 1344.2      5.0        
+    2     0.17208    0.16667    0.66667    0.19357    0.10330    | 2607.4      10.0       
+    4     0.28933    0.28571    0.80000    0.38713    0.19592    | 5107.5      20.0       
+    8     0.44325    0.44444    0.88889    0.77426    0.35346    | 9987.5      40.0       
+    16    0.60566    0.61538    0.94118    1.00000    0.58199    | 19267.5     80.0       
+    32    0.74109    0.76190    0.96970    1.00000    0.82526    | 35907.5     160.0      
+    64    0.83059    0.86486    0.98462    1.00000    0.96947    | 61507.5     320.0      
+    128   0.86729    0.92754    0.99225    1.00000    0.99907    | 81987.5     640.0      
+    RMS rel err: demo 0.0441 | quadratic 0.6223 | linear 0.3347 | exp 0.1627
+  m=0.025 k=2 sigma^2=4  T0=6273 (2NeD=12800)
+    d     fst_meas   demoSSFst  quadratic  linear     exp(fit)   | H_measured  H_corpus   
+    1     1.00000    0.09091    0.50000    1.00000    0.15361    | 141354360718018256.0 5.0        
+    2     0.29083    0.16667    0.66667    1.00000    0.28362    | 2572.6      10.0       
+    4     0.44709    0.28571    0.80000    1.00000    0.48680    | 5072.4      20.0       
+    8     0.61338    0.44444    0.88889    1.00000    0.73663    | 9952.4      40.0       
+    16    0.75405    0.61538    0.94118    1.00000    0.93063    | 19232.4     80.0       
+    32    0.85116    0.76190    0.96970    1.00000    0.99519    | 35872.4     160.0      
+    64    0.90740    0.86486    0.98462    1.00000    0.99998    | 61472.4     320.0      
+    128   0.92890    0.92754    0.99225    1.00000    1.00000    | 81952.4     640.0      
+    RMS rel err: demo 0.2080 | quadratic 0.1812 | linear 0.2817 | exp 0.1416
+  m=0.400 k=1 sigma^2=1  T0=12545 (2NeD=12800)
+    d     fst_meas   demoSSFst  quadratic  linear     exp(fit)   | H_measured  H_corpus   
+    1     0.03179    0.02439    0.05882    0.03179    0.01342    | 411.9       1.2        
+    2     0.05401    0.04762    0.11111    0.06358    0.02666    | 716.3       2.5        
+    4     0.09668    0.09091    0.20000    0.12715    0.05262    | 1342.6      5.0        
+    8     0.16962    0.16667    0.33333    0.25430    0.10247    | 2562.6      10.0       
+    16    0.28017    0.28571    0.50000    0.50860    0.19444    | 4882.6      20.0       
+    32    0.41888    0.44444    0.66667    1.00000    0.35107    | 9042.6      40.0       
+    64    0.55177    0.61538    0.80000    1.00000    0.57888    | 15442.6     80.0       
+    128   0.62108    0.76190    0.88889    1.00000    0.82266    | 20562.6     160.0      
+    RMS rel err: demo 0.1327 | quadratic 0.5655 | linear 0.8335 | exp 0.2269
+  m=0.100 k=2 sigma^2=4  T0=6273 (2NeD=12800)
+    d     fst_meas   demoSSFst  quadratic  linear     exp(fit)   | H_measured  H_corpus   
+    1     1.00000    0.02439    0.05882    1.00000    0.03700    | -12447195731267386.0 1.2        
+    2     0.09645    0.04762    0.11111    1.00000    0.07262    | 669.6       2.5        
+    4     0.17097    0.09091    0.20000    1.00000    0.13997    | 1293.7      5.0        
+    8     0.28608    0.16667    0.33333    1.00000    0.26035    | 2513.7      10.0       
+    16    0.43521    0.28571    0.50000    1.00000    0.45292    | 4833.7      20.0       
+    32    0.58911    0.44444    0.66667    1.00000    0.70071    | 8993.7      40.0       
+    64    0.71048    0.61538    0.80000    1.00000    0.91042    | 15393.7     80.0       
+    128   0.76582    0.76190    0.88889    1.00000    0.99198    | 20513.7     160.0      
+    RMS rel err: demo 0.3749 | quadratic 0.2552 | linear 1.0951 | exp 0.2881
+
+  FIXED-PRODUCT EXPERIMENT (m*sigma^2 = 0.1, m varied 4x)
+    d=1    measured 0.09678 vs 1.00000 | demo 0.09091/0.09091 | quad 0.50000/0.50000
+    d=4    measured 0.28933 vs 0.44709 | demo 0.28571/0.28571 | quad 0.80000/0.80000
+    d=16   measured 0.60566 vs 0.75405 | demo 0.61538/0.61538 | quad 0.94118/0.94118
+    d=64   measured 0.83059 vs 0.90740 | demo 0.86486/0.86486 | quad 0.98462/0.98462
+    d=128  measured 0.86729 vs 0.92890 | demo 0.92754/0.92754 | quad 0.99225/0.99225
+
+READ_THE_TEST (all seven controls): True
+Traceback (most recent call last):
+  File "/projects/standard/hsiehph/sauer354/simruns/simrepo/proofs/validation/differential/cluster/fam_stepping_stone.py", line 635, in <module>
+    "fst_measured_m0.1_k1": ca[d]["fst_measured"],
+  File "/projects/standard/hsiehph/sauer354/simruns/simrepo/proofs/validation/differential/cluster/fam_stepping_stone.py", line 628, in main
+    b = pair[(0.025, 2)]
+  File "/common/software/install/migrated/anaconda/python3-2023.03-libmamba/lib/python3.10/json/__init__.py", line 179, in dump
+    for chunk in iterable:
+  File "/common/software/install/migrated/anaconda/python3-2023.03-libmamba/lib/python3.10/json/encoder.py", line 431, in _iterencode
+    yield from _iterencode_dict(o, _current_indent_level)
+  File "/common/software/install/migrated/anaconda/python3-2023.03-libmamba/lib/python3.10/json/encoder.py", line 405, in _iterencode_dict
+    yield from chunks
+  File "/common/software/install/migrated/anaconda/python3-2023.03-libmamba/lib/python3.10/json/encoder.py", line 438, in _iterencode
+    o = _default(o)
+  File "/common/software/install/migrated/anaconda/python3-2023.03-libmamba/lib/python3.10/json/encoder.py", line 179, in default
+    raise TypeError(f'Object of type {o.__class__.__name__} '
+TypeError: Object of type bool is not JSON serializable
+srun: error: cn1085: task 0: Exited with exit code 1
