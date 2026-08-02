@@ -1,5 +1,6 @@
 import Calibrator.BundleRigidity
 import Calibrator.ConditionalGain
+import Calibrator.SpectralDegradation
 import Calibrator.EffectSizeSurgery
 import Mathlib.Data.Real.Sqrt
 import Mathlib.Data.Fin.VecNotation

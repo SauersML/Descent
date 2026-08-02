@@ -65,6 +65,7 @@ import Calibrator.EpistaticChaos
 import Calibrator.CondensationUnification
 import Calibrator.CramerStratum
 import Calibrator.FoldedSpectrum
+import Calibrator.SpectralDegradation
 
 namespace Calibrator
 

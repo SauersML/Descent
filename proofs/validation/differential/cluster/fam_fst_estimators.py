@@ -264,10 +264,19 @@ def arm_fst_estimators(rng):
         pbar = (p1 + p2) / 2.0
         nei = 1.0 - (float(np.mean(p1 * (1 - p1) + p2 * (1 - p2)))
                      / (2.0 * float(np.mean(pbar * (1 - pbar)))))
-        # the heterozygosity-ratio inversion the corpus also calls F_ST
+        # The heterozygosity-ratio inversion the corpus also calls F_ST.
+        #
+        # NORMALISATION, WHICH THE FIRST RUN GOT WRONG. h_now below is
+        # mean(p1(1-p1) + p2(1-p2)), which is already 2*mean(p(1-p)) = H_S, the
+        # mean WITHIN-deme expected heterozygosity. The ancestral counterpart is
+        # H_anc = 2 p(1-p), not half of it. The first version divided by
+        # h_anc/2 and returned -0.4999 where the true F_ST was 0.25 -- exactly
+        # 1 - 2*(1-0.25), the signature of a factor-two normalisation error. It
+        # was reported as a number about fstFromHetRatio; it was a number about
+        # this script.
         h_anc = 2 * p_anc * (1 - p_anc)
         h_now = float(np.mean(p1 * (1 - p1) + p2 * (1 - p2)))
-        het_ratio = 1.0 - h_now / (h_anc / 2.0) if h_anc > 0 else float("nan")
+        het_ratio = 1.0 - h_now / h_anc if h_anc > 0 else float("nan")
         ratio = hud / nei if nei != 0 else float("inf")
         rows.append({
             "cell": "E3 POSITIVE CONTROL Nei vs Hudson",
@@ -443,8 +452,23 @@ def arm_ibd(rng):
             "migration_arm_measured_Fst": mig_measured,
             "migration_arm_at_two_thirds": mig_mid,
             "converged": conv,
+            # REFERENCES, CORRECTED AFTER THE FIRST RUN.
+            #
+            # The first version labelled BOTH arms 1/(1+scaled), the
+            # INFINITE-ALLELES identity. The mutation arm does not simulate
+            # infinite alleles; it simulates the BIALLELIC model with symmetric
+            # two-way mutation, whose stationary law is Wright's Beta(a, a)
+            # with a = 4 Ne mu. For that law E[2p(1-p)] / (1/2) = 2a/(2a+1), so
+            # the identity is 1/(1 + 2a), NOT 1/(1 + a).
+            #
+            # With the right reference the mutation arm is exact at every rate:
+            # measured 0.501034 / 0.201568 / 0.059631 against 0.5 / 0.2 /
+            # 0.058824 at 4Ne*mu = 0.5 / 2 / 8. The apparent gap to the corpus
+            # fixed point in the first run was my reference, not the corpus.
+            "biallelic_mutation_reference": 1.0 / (1.0 + 2.0 * scaled),
+            "infinite_alleles_reference": 1.0 / (1.0 + scaled),
+            "two_deme_island_reference": 1.0 / (1.0 + 4.0 * scaled),
             "infinite_island_reference": 1.0 / (1.0 + scaled),
-            "mutation_drift_reference": 1.0 / (1.0 + scaled),
             "isolates": ("nothing -- this is the test. I1 and I2 have already "
                          "pinned the drift and flow arms separately, so a gap "
                          "here is about the READING of `rate`, not about the "

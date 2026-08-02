@@ -5,6 +5,7 @@ import Calibrator.ClinicalUtilityFairness
 import Calibrator.OpenQuestions
 import Calibrator.ProjectionShiftBounds
 import Calibrator.ImitationRigidity
+import Calibrator.SpectralDegradation
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Inverse
 
 namespace Calibrator
@@ -1943,5 +1944,39 @@ theorem sharedCorrectionSpread_of_identical_optima (curvature : ι → ℝ)
   rfl
 
 end SharedCorrectionFamily
+
+/-!
+## No task-independent scalar ordering of spectral portability
+
+The low/high-frequency witness from `SpectralDegradation` is now a dependency of the
+metric-specific biological theory, not a leaf result.  Low-frequency shifts model
+long-horizon ancestry or population-structure mismatch; high-frequency shifts model local
+haplotype, imputation, or short-window mismatch.  A single pair of populations can reverse
+order when the deployment task changes bands.
+-/
+
+/-- Existence of one scalar population-shift score whose monotone task-specific charts
+recover both low-band and high-band degradation for the two-band witness. -/
+def HasTaskIndependentSpectralPortabilityScalar (a : ℝ) : Prop :=
+  let low₁ := FiniteSpectralModel.bandDegradation
+    twoBandBaseline (twoBandLowShift a) {0}
+  let low₂ := FiniteSpectralModel.bandDegradation
+    twoBandBaseline (twoBandHighShift a) {0}
+  let high₁ := FiniteSpectralModel.bandDegradation
+    twoBandBaseline (twoBandLowShift a) {1}
+  let high₂ := FiniteSpectralModel.bandDegradation
+    twoBandBaseline (twoBandHighShift a) {1}
+  ∃ (d₁ d₂ : ℝ) (Φlow Φhigh : ℝ → ℝ),
+    Monotone Φlow ∧ Monotone Φhigh ∧
+    Φlow d₁ = low₁ ∧ Φlow d₂ = low₂ ∧
+    Φhigh d₁ = high₁ ∧ Φhigh d₂ = high₂
+
+/-- **Metric-specific portability has no universal scalar degradation order.**  At every
+nonzero shift the low-band and high-band tasks rank the same two population shifts in
+opposite orders. -/
+theorem not_hasTaskIndependentSpectralPortabilityScalar (a : ℝ) (ha : a ≠ 0) :
+    ¬ HasTaskIndependentSpectralPortabilityScalar a := by
+  unfold HasTaskIndependentSpectralPortabilityScalar
+  exact twoBand_no_common_monotone_scalar a ha
 
 end Calibrator
