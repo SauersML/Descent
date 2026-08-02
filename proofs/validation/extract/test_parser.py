@@ -127,14 +127,15 @@ def cross_validate():
     except Exception as e:                                       # noqa: BLE001
         print(f"cross-validation: could not import harness ({e!r}), skipped")
         return
-    points = getattr(corpus, "CROSSCHECK_POINTS", None)
-    if points is None:
-        battery = getattr(crossvalidate, "battery_points", None)
-        points = battery() if callable(battery) else None
+    battery = getattr(crossvalidate, "battery_points", None)
+    points = battery() if callable(battery) else getattr(
+        corpus, "CROSSCHECK_POINTS", None)
     if not points:
         print("cross-validation: harness exposes no argument tuples, skipped")
         return
-    agree, disagree, unavailable = crossvalidate.compare(list(points), points)
+    names = getattr(crossvalidate, "battery_names", None)
+    names = names() if callable(names) else list(points)
+    agree, disagree, unavailable = crossvalidate.compare(names, points)
     n = len(agree)
     print(f"cross-validated against leanexpr: {n} definitions, "
           f"{sum(a[2] for a in agree)} points, {len(disagree)} disagreements")

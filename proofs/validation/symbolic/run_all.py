@@ -22,7 +22,7 @@ HERE = Path(__file__).parent
 PY = str(HERE / ".venv" / "bin" / "python")
 
 STEPS = ["leanparse.py", "check1_fixedpoints.py", "check1b_joint.py", "check3_duplicates.py",
-         "check2_derivations.py", "check4_limits.py", "mutation.py"]
+         "check2_derivations.py", "check4_limits.py", "check5_recurrences.py", "mutation.py"]
 
 # statuses that constitute a finding rather than a pass
 FINDING = {
@@ -36,6 +36,7 @@ FINDING = {
     "JOINT_SOLVE_FAILED": "gap",
     "HOLDS_TO_FIRST_ORDER": "linearisation",
     "no_fixed_point_theorem": "gap",
+    "ONLY_REST_POINT_IS_ZERO": "degenerate_limit",
     "UNGUARDED_BINDERS_DO_NOT_CORRESPOND": "gap",
     "LINEARISATION_WITHOUT_STATED_REGIME": "unstated_regime",
     "UNGUARDED_NO_MAP": "gap",
@@ -102,6 +103,13 @@ def main():
             fqn = r.get("fqn") or r["a"]["fqn"]
             add(fqn, {"check": r["check"], "severity": FINDING[r["status"]],
                       "status": r["status"], "detail": r})
+
+    c5 = json.load(open(HERE / "results_check5.json"))
+    for r in c5["recurrences"]:
+        if r["status"] in FINDING:
+            add(r["fqn"], {"check": "check5_recurrence_limit",
+                           "severity": FINDING[r["status"]], "status": r["status"],
+                           "file": r["file"], "line": r["line"], "detail": r["detail"]})
 
     cov = json.load(open(HERE / "coverage.json"))
     for fqn, e in cov.items():

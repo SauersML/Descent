@@ -1,0 +1,125 @@
+{
+ "recurrences": [
+  {
+   "check": "check5_recurrence_limit",
+   "fqn": "Calibrator.driftLDTrajectory",
+   "name": "driftLDTrajectory",
+   "file": "Calibrator/LDDecayTheory.lean",
+   "line": 495,
+   "status": "has_nonzero_rest_point",
+   "detail": {
+    "step": "(1 - c)**2*(_H*(1 - 1/(2*Ne)) + 1/(2*Ne))",
+    "base": "Q₀",
+    "rest_points": [
+     "(c - 1)**2/(-2*Ne*(c - 1)**2 + 2*Ne + (c - 1)**2)"
+    ],
+    "slope": "(Ne - 1/2)*(c - 1)**2/Ne",
+    "contracting_when": "(c - 1)**2*Abs(Ne - 1/2)/Ne < 1",
+    "affine": true,
+    "intercept": "(c - 1)**2/(2*Ne)",
+    "limit_if_contracting": "(c - 1)**2/(2*Ne - (2*Ne - 1)*(c - 1)**2)"
+   }
+  },
+  {
+   "check": "check5_recurrence_limit",
+   "fqn": "Calibrator.ldRecurrence",
+   "name": "ldRecurrence",
+   "file": "Calibrator/LDDecayTheory.lean",
+   "line": 937,
+   "status": "ONLY_REST_POINT_IS_ZERO",
+   "detail": {
+    "step": "_H*(1 - r)",
+    "base": "D₀",
+    "rest_points": [
+     "0"
+    ],
+    "slope": "1 - r",
+    "contracting_when": "Abs(r - 1) < 1",
+    "affine": true,
+    "intercept": "0",
+    "limit_if_contracting": "0"
+   }
+  },
+  {
+   "check": "check5_recurrence_limit",
+   "fqn": "Calibrator.hetRecurrence",
+   "name": "hetRecurrence",
+   "file": "Calibrator/PopulationGeneticsFoundations.lean",
+   "line": 1090,
+   "status": "ONLY_REST_POINT_IS_ZERO",
+   "detail": {
+    "step": "_H*(1 - 1/(2*Ne))",
+    "base": "H₀",
+    "rest_points": [
+     "0"
+    ],
+    "slope": "(Ne - 1/2)/Ne",
+    "contracting_when": "Abs(Ne - 1/2)/Ne < 1",
+    "affine": true,
+    "intercept": "0",
+    "limit_if_contracting": "0"
+   }
+  },
+  {
+   "check": "check5_recurrence_limit",
+   "fqn": "Calibrator.hetMutationDriftRecurrence",
+   "name": "hetMutationDriftRecurrence",
+   "file": "Calibrator/PopulationGeneticsFoundations.lean",
+   "line": 1192,
+   "status": "has_nonzero_rest_point",
+   "detail": {
+    "step": "_H*(1 - 1/(2*Ne)) + 2*mu*(1 - _H)",
+    "base": "H₀",
+    "rest_points": [
+     "4*Ne*mu/(4*Ne*mu + 1)"
+    ],
+    "slope": "-2*mu + 1 - 1/(2*Ne)",
+    "contracting_when": "Abs(2*mu - 1 + 1/(2*Ne)) < 1",
+    "affine": true,
+    "intercept": "2*mu",
+    "limit_if_contracting": "4*Ne*mu/(4*Ne*mu + 1)"
+   }
+  },
+  {
+   "check": "check5_recurrence_limit",
+   "fqn": "Calibrator.hetMutationRecurrence",
+   "name": "hetMutationRecurrence",
+   "file": "Calibrator/PopulationGeneticsFoundations.lean",
+   "line": 1350,
+   "status": "has_nonzero_rest_point",
+   "detail": {
+    "step": "Hstar*(1 - lam) + _H*lam",
+    "base": "H₀",
+    "rest_points": [
+     "Hstar"
+    ],
+    "slope": "lam",
+    "contracting_when": "lam < 1",
+    "affine": true,
+    "intercept": "Hstar*(1 - lam)",
+    "limit_if_contracting": "Hstar"
+   }
+  },
+  {
+   "check": "check5_recurrence_limit",
+   "fqn": "Calibrator.hetTrajectory",
+   "name": "hetTrajectory",
+   "file": "Calibrator/PortabilityDrift.lean",
+   "line": 443,
+   "status": "has_nonzero_rest_point",
+   "detail": {
+    "step": "_H*(1 - 1/(2*Ne)) + 2*mu*(1 - _H)",
+    "base": "H₀",
+    "rest_points": [
+     "4*Ne*mu/(4*Ne*mu + 1)"
+    ],
+    "slope": "-2*mu + 1 - 1/(2*Ne)",
+    "contracting_when": "Abs(2*mu - 1 + 1/(2*Ne)) < 1",
+    "affine": true,
+    "intercept": "2*mu",
+    "limit_if_contracting": "4*Ne*mu/(4*Ne*mu + 1)"
+   }
+  }
+ ],
+ "consumers": []
+}

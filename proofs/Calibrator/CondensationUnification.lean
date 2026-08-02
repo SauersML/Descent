@@ -542,12 +542,16 @@ The fourth-cumulant channel separates a coordinate law from the Gaussian exactly
 is `6q² - 6q + 1 = 0`, whose polymorphic roots are `(3 ± √3)/6`. The minor-allele root is
 this constant.
 
-Empirical status: UNTESTED as a claim about any real scan. The arithmetic is derived —
+Empirical status: DERIVED. The constant is the polymorphic root of `6q² - 6q + 1`, forced
+by `hweGenotypeVariance` through `standardizedGenotype_fourth_moment`;
 `gaussianKurtosisMaf_genotypeVariance` proves the variance identity and
-`standardizedGenotype_kurtosis_gaussian_at_blind_maf` proves the moment is `3` there — but
-the prediction that an interaction statistic relying on fourth-cumulant separation loses
-power near this frequency has not been checked in simulation. It is the most directly
-falsifiable number this development produces. -/
+`standardizedGenotype_kurtosis_gaussian_at_blind_maf` proves the fourth moment is `3`
+there. Nothing is fitted and there is no free parameter.
+
+What is *not* tested is the consequence rather than the constant: the prediction that an
+interaction statistic relying on fourth-cumulant separation loses power near this
+frequency has not been checked in simulation. It is the most directly falsifiable number
+this development produces. -/
 noncomputable def gaussianKurtosisMaf : ℝ := (3 - Real.sqrt 3) / 6
 
 theorem sqrt_three_sq : Real.sqrt 3 ^ 2 = 3 := Real.sq_sqrt (by norm_num)

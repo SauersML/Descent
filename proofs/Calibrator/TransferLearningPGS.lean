@@ -1221,10 +1221,87 @@ theorem fine_tuned_target_r2_exceeds_scratch_of_penalty_gap
   linarith
 
 /-- Scratch-trained target `R²` with finite-sample estimation noise
-    `noiseVar / nTarget`. -/
+    `noiseVar / nTarget`.
+
+    Regime: `noiseVar / nTarget ≤ oracle_target_r2`. The subtraction is a
+    first-order estimation penalty and is only a model of `R²` while it stays
+    below the ceiling it is subtracted from. Outside that regime it returns
+    values no `R²` can take: at `oracle_target_r2 = 1e-4`, `noiseVar = 1000`,
+    `nTarget = 1` it is `-1000`.
+    `sampleLimitedScratchTargetR2_negative_of_small_sample` exhibits the escape
+    and `sampleLimitedScratchTargetR2_nonneg` states the condition that
+    excludes it. `usableScratchTargetR2` is the clamped variant for callers who
+    cannot discharge the regime; it is offered rather than substituted here
+    because clamping would assert that the estimator still attains `0` at
+    sample sizes where this model has simply left its domain, and that is a
+    modelling claim the development has no evidence for.
+
+    Empirical status: UNTESTED inside the regime; FALSIFIED outside it, where
+    the value is not an `R²`. -/
 noncomputable def sampleLimitedScratchTargetR2
     (oracle_target_r2 noiseVar nTarget : ℝ) : ℝ :=
   scratchTargetR2 oracle_target_r2 (noiseVar / nTarget)
+
+/-- **The range escape, exhibited.**  Once the estimation penalty exceeds the
+oracle ceiling the modelled `R²` goes negative, without bound. -/
+theorem sampleLimitedScratchTargetR2_negative_of_small_sample
+    (oracle_target_r2 noiseVar nTarget : ℝ)
+    (h : oracle_target_r2 < noiseVar / nTarget) :
+    sampleLimitedScratchTargetR2 oracle_target_r2 noiseVar nTarget < 0 := by
+  unfold sampleLimitedScratchTargetR2 scratchTargetR2
+  linarith
+
+/-- **The condition that keeps it an `R²`.**  This is the regime declared on the
+definition, stated as a hypothesis a caller can discharge. -/
+theorem sampleLimitedScratchTargetR2_nonneg
+    (oracle_target_r2 noiseVar nTarget : ℝ)
+    (h : noiseVar / nTarget ≤ oracle_target_r2) :
+    0 ≤ sampleLimitedScratchTargetR2 oracle_target_r2 noiseVar nTarget := by
+  unfold sampleLimitedScratchTargetR2 scratchTargetR2
+  linarith
+
+/-- **Clamped scratch-trained target `R²`.**
+
+The same model, floored at `0`: a predictor is never worse than the population
+mean in the `R²` a deployment would report, because the mean is always
+available. Use this where the sample size is not known to satisfy the regime on
+`sampleLimitedScratchTargetR2`; the two agree inside it
+(`usableScratchTargetR2_eq_of_nonneg`), and `0` is attained rather than
+approached, which is the correct behaviour at sample sizes carrying no usable
+signal.
+
+    Empirical status: UNTESTED. -/
+noncomputable def usableScratchTargetR2
+    (oracle_target_r2 noiseVar nTarget : ℝ) : ℝ :=
+  max 0 (sampleLimitedScratchTargetR2 oracle_target_r2 noiseVar nTarget)
+
+/-- Inside the regime the clamp does nothing, so no downstream result changes
+meaning. -/
+theorem usableScratchTargetR2_eq_of_nonneg
+    (oracle_target_r2 noiseVar nTarget : ℝ)
+    (h : noiseVar / nTarget ≤ oracle_target_r2) :
+    usableScratchTargetR2 oracle_target_r2 noiseVar nTarget =
+      sampleLimitedScratchTargetR2 oracle_target_r2 noiseVar nTarget :=
+  max_eq_right (sampleLimitedScratchTargetR2_nonneg oracle_target_r2 noiseVar nTarget h)
+
+/-- The clamped variant never leaves `[0, ∞)`, which is the range property the
+unclamped model lacks. -/
+theorem usableScratchTargetR2_nonneg
+    (oracle_target_r2 noiseVar nTarget : ℝ) :
+    0 ≤ usableScratchTargetR2 oracle_target_r2 noiseVar nTarget :=
+  le_max_left _ _
+
+/-- **The zero floor is attained**, at any sample size where the estimation
+penalty reaches the oracle ceiling: no usable signal, and the model says so
+rather than reporting a negative number. -/
+theorem usableScratchTargetR2_eq_zero_of_exhausted
+    (oracle_target_r2 noiseVar nTarget : ℝ)
+    (h : oracle_target_r2 ≤ noiseVar / nTarget) :
+    usableScratchTargetR2 oracle_target_r2 noiseVar nTarget = 0 := by
+  unfold usableScratchTargetR2
+  apply max_eq_left
+  unfold sampleLimitedScratchTargetR2 scratchTargetR2
+  linarith
 
 /-- Sample-limited scratch training is the exact target heritability ceiling
     minus the explicit finite-sample estimation penalty `noiseVar / nTarget`. -/

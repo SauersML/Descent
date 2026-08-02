@@ -255,11 +255,32 @@ def satisfies(name: str, point: dict, theorem: str | None = None) -> bool:
     `_rt` in the namespace; `eval`-ing one returns None, which reads as False,
     so every point looks inadmissible and every check manufactures a violation.
     `point` maps python-level argument names (see `callable_for`) to values.
+    A point that does not cover every argument RAISES rather than returning
+    False: an unbound name inside a predicate degrades to a falsy verdict, so a
+    misnamed grid axis would silently mark every point inadmissible and discard
+    real findings.  Malformed input is a bug, not a verdict.
     """
     import admissible
-    preds, _texts, _dropped = admissible.hypothesis_predicates(
-        definition(name), theorem)
+    d = definition(name)
+    try:
+        _fn, argnames = callable_for(name)
+    except NotExtractable:
+        argnames = [_tr().pyname(n) for a in d["args"]
+                    if not a["implicit"] for n in a["names"]]
+    missing = [a for a in argnames if a not in point]
+    if missing:
+        raise ValueError(
+            f"satisfies({name!r}): point is missing {missing}; it has "
+            f"{sorted(point)}. Keys must be the definition's argument names "
+            f"({argnames}), not an experiment's axis names. Safest source is "
+            f"dict(zip(api.callable_for(name)[1], the_actual_positional_args)).")
+    preds, _texts, _dropped = admissible.hypothesis_predicates(d, theorem)
     return admissible.satisfies(preds, point)
+
+
+def _tr():
+    import translate
+    return translate
 
 
 # ------------------------------------------------------------ provenance
