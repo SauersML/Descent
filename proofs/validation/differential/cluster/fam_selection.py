@@ -98,6 +98,7 @@ for _v in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS",
     os.environ.setdefault(_v, "1")
 
 import json
+import math
 import os
 import sys
 
@@ -218,72 +219,194 @@ def wf_mutation_selection(q, mu, s, h, N, recessive, mu_back=0.0):
 #      and compare the two samples with a two-sample Kolmogorov-Smirnov
 #      statistic. Same mean is not enough -- a correlated batch matches the
 #      mean exactly. The whole distribution is compared.
-#   B. INDEPENDENT ACROSS REPLICATES. The mean absolute pairwise correlation
-#      between replicate trajectories must be at the level expected from
-#      finite trajectory length, not at the level of a shared variate.
-#      A batch sharing one binomial draw would score near 1 here and near 0 on
-#      the mean, which is exactly why A alone is not sufficient.
+#   B. ONE BATCHED GENERATION IS AN i.i.d. SAMPLE. Start every replicate at
+#      the SAME frequency and take one vectorized step. The R results must be
+#      an i.i.d. Binomial(2N, p') sample: a chi-square goodness-of-fit against
+#      the exact binomial pmf. This is the direct test -- a shared variate
+#      makes every replicate identical and the statistic explodes.
+#   C. TRAJECTORY CROSS-CORRELATION AGAINST A MEASURED NULL, NOT A GUESS.
+#      An earlier version of this control required the mean absolute pairwise
+#      correlation between replicate trajectories to be below 0.25 and it
+#      FAILED at 0.2549 -- because two INDEPENDENT autocorrelated chains of
+#      length 200 have mean |r| of about that size by construction. The bound
+#      was measuring autocorrelation time, not dependence, and no correct
+#      simulator could have passed it. The null is now MEASURED, from the
+#      scalar-loop replicates, which are independent because they are
+#      generated in separate calls; the vectorized statistic is required to
+#      sit inside the scalar-loop spread rather than under a number I chose.
+#   D. POSITIVE CONTROL ON A, B AND C. A deliberately BROKEN kernel that
+#      shares one binomial variate across replicates is run through the same
+#      three tests, which must all reject it. Without D, "C0 passed" would be
+#      consistent with three tests that pass on anything.
 # ===========================================================================
+
+def _ks_two_sample(x, y):
+    a, b = np.sort(x), np.sort(y)
+    allv = np.concatenate([a, b])
+    ca = np.searchsorted(a, allv, side="right") / len(a)
+    cb = np.searchsorted(b, allv, side="right") / len(b)
+    return float(np.max(np.abs(ca - cb)))
+
+
+_LGAMMA = np.vectorize(math.lgamma)      # scipy is not assumed to be present
+
+
+def _mean_abs_pairwise_corr(traj):
+    dev = traj - traj.mean(axis=0, keepdims=True)
+    sd = dev.std(axis=0)
+    keep = sd > 0
+    if keep.sum() < 3:
+        # every replicate frozen at the same value is PERFECT dependence, not
+        # missing data; returning nan here would let the positive control's
+        # broken kernel slip through the comparison as "not measurable".
+        return 1.0
+    C = np.corrcoef(dev[:, keep].T)
+    off = C[~np.eye(C.shape[0], dtype=bool)]
+    return float(np.mean(np.abs(off)))
+
+
+def _binomial_chisq(counts, n_trials, p):
+    """Chi-square goodness of fit of `counts` to Binomial(n_trials, p).
+
+    Bins are pooled until each has expectation >= 5, so the asymptotic null is
+    usable. Returns (chi2, degrees_of_freedom).
+    """
+    R = len(counts)
+    ks = np.arange(0, n_trials + 1)
+    logpmf = (_LGAMMA(n_trials + 1) - _LGAMMA(ks + 1)
+              - _LGAMMA(n_trials - ks + 1)
+              + ks * np.log(p) + (n_trials - ks) * np.log1p(-p))
+    pmf = np.exp(logpmf)
+    obs = np.bincount(counts.astype(np.int64), minlength=n_trials + 1)
+    # pool from both ends until every expected count is at least 5
+    exp = pmf * R
+    keep = exp >= 5.0
+    if keep.sum() < 2:
+        return float("nan"), 0
+    idx = np.where(keep)[0]
+    e = list(exp[idx])
+    o = list(obs[idx].astype(float))
+    e.insert(0, float(exp[:idx[0]].sum())); o.insert(0, float(obs[:idx[0]].sum()))
+    e.append(float(exp[idx[-1] + 1:].sum())); o.append(float(obs[idx[-1] + 1:].sum()))
+    e = np.array(e); o = np.array(o)
+    m = e > 0
+    chi2 = float((((o[m] - e[m]) ** 2) / e[m]).sum())
+    return chi2, int(m.sum() - 1)
+
+
+def _broken_step(p, s, m, N, order):
+    """Deliberately WRONG batched kernel: ONE binomial variate for all.
+
+    Exists only to be rejected. It is fast, it has the right marginal mean,
+    and its replicates are perfectly correlated -- the exact failure mode the
+    coordinator flagged and the reason a mean-only check is not enough.
+    """
+    if order == "selection_first":
+        p = p * (1.0 + s) / (1.0 + s * p)
+        p = (1.0 - m) * p
+    else:
+        p = (1.0 - m) * p
+        p = p * (1.0 + s) / (1.0 + s * p)
+    shared = RNG.binomial(2 * N, float(np.clip(p.mean(), 0.0, 1.0))) / (2.0 * N)
+    return np.full_like(p, shared)
+
 
 def control_vectorization_identity():
     R, GENS = 600, 400
     s, m, N = 0.10, 0.05, 200
+    p0 = 0.45
 
-    # vectorized: one binomial call per generation over an array of R
-    p_vec = np.full(R, 0.45)
-    traj = np.empty((GENS, R))
-    for g in range(GENS):
-        p_vec = wf_continent_island(p_vec, s, m, N, "selection_first")
-        traj[g] = p_vec
+    def run(step):
+        p = np.full(R, p0)
+        traj = np.empty((GENS, R))
+        for g in range(GENS):
+            p = step(p, s, m, N, "selection_first")
+            traj[g] = p
+        return p, traj[GENS // 2:]
 
-    # scalar: R independent single-replicate simulations, one at a time
+    p_vec, traj_vec = run(wf_continent_island)
+    p_bad, traj_bad = run(_broken_step)
+
+    # scalar: R independent single-replicate simulations, one call at a time
     p_sca = np.empty(R)
+    traj_sca = np.empty((GENS - GENS // 2, R))
     for i in range(R):
-        p = np.array([0.45])
-        for _ in range(GENS):
+        p = np.array([p0])
+        for g in range(GENS):
             p = wf_continent_island(p, s, m, N, "selection_first")
+            if g >= GENS // 2:
+                traj_sca[g - GENS // 2, i] = p[0]
         p_sca[i] = p[0]
 
-    # A. two-sample KS statistic
-    a = np.sort(p_vec)
-    b = np.sort(p_sca)
-    allv = np.concatenate([a, b])
-    cdf_a = np.searchsorted(a, allv, side="right") / R
-    cdf_b = np.searchsorted(b, allv, side="right") / R
-    ks = float(np.max(np.abs(cdf_a - cdf_b)))
-    # 99.9% critical value for two samples of size R
-    ks_crit = 1.949 * np.sqrt(2.0 / R)
+    # ---- A. same law as the scalar loop -------------------------------
+    ks = _ks_two_sample(p_vec, p_sca)
+    ks_bad = _ks_two_sample(p_bad, p_sca)
+    ks_crit = 1.949 * np.sqrt(2.0 / R)          # 99.9% two-sample critical
 
-    # B. independence across replicates, measured on the trajectories
-    dev = traj[GENS // 2:] - traj[GENS // 2:].mean(axis=0, keepdims=True)
-    sd = dev.std(axis=0)
-    ok_cols = sd > 0
-    C = np.corrcoef(dev[:, ok_cols].T)
-    off = C[~np.eye(C.shape[0], dtype=bool)]
-    mean_abs_corr = float(np.mean(np.abs(off)))
-    # trajectories of length GENS/2 with autocorrelation give |r| ~ a few
-    # times 1/sqrt(effective length); a SHARED variate would give ~1.
-    corr_bound = 0.25
+    # ---- B. one batched generation is i.i.d. binomial ------------------
+    pflat = np.full(R, p0)
+    pflat = pflat * (1.0 + s) / (1.0 + s * pflat)
+    pflat = (1.0 - m) * pflat
+    pstar = float(pflat[0])
+    draw = np.rint(wf_continent_island(np.full(R, p0), s, m, N,
+                                       "selection_first") * 2 * N)
+    draw_bad = np.rint(_broken_step(np.full(R, p0), s, m, N,
+                                    "selection_first") * 2 * N)
+    chi2, dof = _binomial_chisq(draw, 2 * N, pstar)
+    chi2_bad, dof_bad = _binomial_chisq(draw_bad, 2 * N, pstar)
+    # 99.9% chi-square critical value, Wilson-Hilferty
+    crit = (dof * (1 - 2.0 / (9 * dof) + 3.0902 * np.sqrt(2.0 / (9 * dof))) ** 3
+            if dof > 0 else float("inf"))
 
-    ok = bool(ks < ks_crit and mean_abs_corr < corr_bound)
-    print("  C0a KS(vectorized, scalar-loop) = %.4f   99.9%% critical %.4f  %s"
-          % (ks, ks_crit, "PASS" if ks < ks_crit else "FAIL"))
-    print("  C0a means %.6f vs %.6f, sds %.6f vs %.6f  (means alone cannot "
-          "detect a shared variate; the KS statistic can)"
-          % (p_vec.mean(), p_sca.mean(), p_vec.std(), p_sca.std()))
-    print("  C0b mean |pairwise corr| across replicate trajectories = %.4f  "
-          "(a shared draw would give ~1) %s"
-          % (mean_abs_corr, "PASS" if mean_abs_corr < corr_bound else "FAIL"))
+    # ---- C. cross-correlation against the MEASURED scalar-loop null ----
+    corr_vec = _mean_abs_pairwise_corr(traj_vec)
+    corr_sca = _mean_abs_pairwise_corr(traj_sca)
+    corr_bad = _mean_abs_pairwise_corr(traj_bad)
+    # the scalar loop IS the null; allow the vectorized value to sit anywhere
+    # within 25% of it, and require the broken kernel to blow past it.
+    corr_ok = abs(corr_vec - corr_sca) <= 0.25 * corr_sca
+
+    a_ok = ks < ks_crit
+    b_ok = chi2 < crit
+    ok = bool(a_ok and b_ok and corr_ok)
+    rejects_broken = bool(ks_bad >= ks_crit and chi2_bad >= crit
+                          and abs(corr_bad - corr_sca) > 0.25 * corr_sca)
+
+    print("  C0a KS(vectorized, scalar-loop) = %.4f  99.9%% critical %.4f  %s"
+          % (ks, ks_crit, "PASS" if a_ok else "FAIL"))
+    print("      means %.6f vs %.6f, sds %.6f vs %.6f" %
+          (p_vec.mean(), p_sca.mean(), p_vec.std(), p_sca.std()))
+    print("  C0b one batched generation vs Binomial(%d, %.6f): chi2 %.1f on "
+          "%d dof, 99.9%% critical %.1f  %s"
+          % (2 * N, pstar, chi2, dof, crit, "PASS" if b_ok else "FAIL"))
+    print("  C0c mean |pairwise corr|: vectorized %.4f vs MEASURED "
+          "scalar-loop null %.4f  %s"
+          % (corr_vec, corr_sca, "PASS" if corr_ok else "FAIL"))
+    print("      (the null is measured, not assumed: independent "
+          "autocorrelated chains of this length give ~%.2f, so a fixed small "
+          "bound would be unsatisfiable by construction)" % corr_sca)
+    print("  C0d POSITIVE CONTROL, a kernel sharing ONE variate across "
+          "replicates: KS %.4f, chi2 %.3g, corr %.4f -> %s"
+          % (ks_bad, chi2_bad, corr_bad,
+             "REJECTED by all three as required" if rejects_broken
+             else "NOT REJECTED"))
+    ok = ok and rejects_broken
     print("  CONTROL 0 (vectorized draw is the same draw): %s"
           % ("PASS" if ok else "FAIL"))
     return ok, {"replicates": R, "generations": GENS,
                 "ks_statistic": ks, "ks_critical_999": float(ks_crit),
+                "ks_broken_kernel": ks_bad,
                 "mean_vectorized": float(p_vec.mean()),
                 "mean_scalar_loop": float(p_sca.mean()),
                 "sd_vectorized": float(p_vec.std()),
                 "sd_scalar_loop": float(p_sca.std()),
-                "mean_abs_pairwise_corr": mean_abs_corr,
-                "corr_bound": corr_bound}
+                "binomial_chisq": chi2, "binomial_dof": dof,
+                "binomial_chisq_critical_999": float(crit),
+                "binomial_chisq_broken_kernel": chi2_bad,
+                "mean_abs_pairwise_corr_vectorized": corr_vec,
+                "mean_abs_pairwise_corr_scalar_null": corr_sca,
+                "mean_abs_pairwise_corr_broken_kernel": corr_bad,
+                "broken_kernel_rejected_by_all_three": rejects_broken}
 
 
 # ===========================================================================
