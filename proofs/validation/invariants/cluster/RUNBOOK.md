@@ -91,6 +91,25 @@ oracle implementations in the same run as a stability sweep.** The sweep exists
 to isolate seed dependence, and a simultaneous numerics change would confound
 it. Numerics changes go in a later, separate run.
 
+## Every invocation must delete its log first
+
+```
+rm -f /abs/path/out_thing.txt && setsid nohup python3 -u <script> \
+      > /abs/path/out_thing.txt 2>&1 < /dev/null & disown
+```
+
+`rm -f` FIRST, always. A job that fails before writing — a git step that
+aborts, an import error, a `&&` chain that stops early — leaves the previous
+run's log in place, and the next `tail` prints THE PREVIOUS ANSWER. That reads
+as a successful run of code that never executed, which is the worst possible
+failure: it does not look like a failure at all, it looks like confirmation.
+
+Another tier nearly reported stale numbers as confirming a fix this way.
+
+Deleting first makes a failed run read as EMPTY, and empty is unambiguous.
+This is the log-file instance of the rule that a measurement must be able to
+report its own failure.
+
 ## Results do not come back on their own
 
 **The cluster is write-only compute.** Its checkout has no push credentials, so
