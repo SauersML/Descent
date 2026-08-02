@@ -2221,7 +2221,6 @@ theorem r2FromSignalVariance_eq_rsquared {k : ℕ} [Fintype (Fin k)]
   have ho : R.vSignal + V_E ≠ 0 := by
     rw [← h_split]; exact ne_of_gt R.vOutcome_pos
   field_simp
-  ring
 
 
 /-- **AUC of the equal-variance Gaussian model**, from signal and residual
