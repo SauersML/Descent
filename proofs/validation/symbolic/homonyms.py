@@ -95,7 +95,18 @@ def main():
             print(f"       {x['file']}:{x['line']}  {'private ' if x['private'] else ''}{x['kind']}")
     if not r["colliding_public"]:
         print("  no public name declared more than once")
+        return 0
+    # Exit non-zero so this can gate a commit or a CI step.  A duplicate
+    # fully-qualified declaration does not compile, and it has been
+    # reintroduced by a multi-stage refactor whose later stage was authored
+    # against a pre-rename copy of the file -- which no amount of renaming
+    # prevents, but a guard run before pushing does.
+    print()
+    print("  FAIL: a fully-qualified name is declared more than once. Lean will")
+    print("  reject this. If a rename already fixed it once, check whether a")
+    print("  later stage of an in-flight refactor was authored before the fix.")
+    return 1
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main() or 0)
