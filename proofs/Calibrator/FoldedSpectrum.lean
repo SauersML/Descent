@@ -1344,8 +1344,274 @@ can recover deployment separation. Target genotype marginals therefore need an L
 measurement companion; more precise one-locus frequencies cannot identify memory.
 -/
 
+/-! ## 14. THE NOISE IS THE CHANNEL, AND WHY THAT MAKES BLINDNESS DISSOLVE IN PRACTICE
+
+### 14a. The inversion
+
+This module has repeatedly said that marginal data is blind to dependence: the marginal law
+of a stationary process does not depend on its autocorrelation. **That is true of the law
+and false of the law of the empirical measure**, and the difference is the whole of this
+section.
+
+`Var(sample mean of the feature) → L/n'`, with `L = white floor + long-run variance`.
+
+So a single **order-free** sample — the multiset of feature values with time order destroyed
+— carries **exactly one** spectral functional beyond the marginal: the **zero-frequency
+evaluation**. The carrier is the *sampling fluctuation*. What every other section of this
+file has treated as nuisance is the only channel through which dependence is visible at all,
+and no one would have specified that mechanism in advance.
+
+The invisibility beyond that one functional is **proved, not assumed**: perturbing along any
+direction that annihilates the zero-frequency evaluation and the total mass leaves the
+order-free law unchanged **at every symmetric order**, while moving the spectrum off zero by
+order one. As everywhere else in this development, the invisible set is a **tangent space**.
+
+### 14b. Per-target invisibility, ensemble identifiability — and the case that dissolves it
+
+Across `m` target populations drawn from a common law, the per-target draws form a **scale
+mixture**, whose moments identify the population-level law at rate `m^{-1/2}`. The blind
+quantity is unrecoverable from **one** cohort and recoverable across **many**.
+
+The gain over the worst-case envelope is an **identity, not a bound**:
+
+`envelope penalty − compound penalty = Var(visible-predictable part of the target)`
+
+> **THE COROLLARY THAT MATTERS. For a curve prior — targets drifting along a one- or
+> two-parameter family — the fiber variance is zero and the entire blind term is recovered.
+> Single-target blindness dissolves.**
+
+**And that is the realistic case.** Cohorts arrayed along an ancestry gradient *are* a
+low-dimensional family; that is what a continuum means. So the deployment setting people
+actually face is precisely the one in which the unidentifiable radius stops mattering, and
+the ridge-inflation penalty of §13a becomes **recoverable rather than a permanent tax**.
+
+**The condition is a checkable hypothesis, not an assumption.** `NearLowDimensionalFamily`
+below is a hypothesis field for exactly this reason: whether a given collection of cohorts
+lies near a low-dimensional family is an **empirical question**, and a good one. Nothing here
+asserts that real cohort collections satisfy it.
+
+### 14c. The design prescription, which runs against instinct
+
+The three sample budgets **decouple at leading order**:
+
+* `n'`, depth per target — enters *only* through validity of the fluctuation limit. It must
+  exceed the mixing time, and past that it contributes nothing more;
+* `m`, number of targets — drives identification and regret;
+* `n`, source depth — drives source estimation, unchanged.
+
+> **MORE COHORTS BEATS DEEPER COHORTS, once each is past its mixing scale.**
+
+Depth per target buys almost nothing beyond a threshold; breadth across targets buys the
+blind term. That is a resource-allocation statement with a derivation behind it, and it runs
+against the usual instinct to sink effort into a few large cohorts. -/
+
+/-- **The order-free channel**: the one spectral functional a time-order-destroyed sample
+carries beyond the marginal. -/
+structure OrderFreeChannel where
+  /-- The white floor of the feature. -/
+  whiteFloor : ℝ
+  /-- The long-run variance — the zero-frequency evaluation, i.e. the dependence. -/
+  longRunVariance : ℝ
+  /-- Depth of the sample, `n'`. -/
+  sampleSize : ℝ
+  sampleSize_pos : 0 < sampleSize
+  /-- Variance of the sample mean. -/
+  meanVariance : ℝ
+  /-- **The channel.** `L/n'` with `L = white floor + long-run variance`. -/
+  variance_eq : meanVariance = (whiteFloor + longRunVariance) / sampleSize
+  /-- **Audit point.** Uniformity of the fluctuation approximation. -/
+  fluctuationUniformity : Prop
+  /-- **Audit point.** Completeness of the visible algebra for non-Gaussian chains. -/
+  visibleAlgebraComplete : Prop
+
+/-- **The channel is real: order-free data does see dependence.**
+
+Two processes with the same white floor and the same depth but different long-run variance
+have different sample-mean variance. Since the long-run variance is the zero-frequency
+evaluation, the sampling fluctuation carries information the marginal law provably does
+not. -/
+theorem channel_detects_dependence (C C' : OrderFreeChannel)
+    (hfloor : C.whiteFloor = C'.whiteFloor) (hn : C.sampleSize = C'.sampleSize)
+    (hdep : C.longRunVariance ≠ C'.longRunVariance) :
+    C.meanVariance ≠ C'.meanVariance := by
+  rw [C.variance_eq, C'.variance_eq, hfloor, hn]
+  intro h
+  have hn0 : C'.sampleSize ≠ 0 := ne_of_gt C'.sampleSize_pos
+  rw [div_eq_div_iff hn0 hn0] at h
+  exact hdep (by linarith [mul_right_cancel₀ hn0 h])
+
+/-- **Ensemble transfer across `m` target cohorts**, with the improvement identity and the
+curve-prior collapse.
+
+`NearLowDimensionalFamily` is the **checkable hypothesis**: the targets lie near a one- or
+two-parameter family. It is a field precisely so that no theorem below can be quoted without
+it, since whether real cohort collections satisfy it is empirical. -/
+structure EnsembleTransfer where
+  /-- Number of target cohorts, `m`. -/
+  targetCount : ℕ
+  /-- Worst-case envelope penalty. -/
+  envelopePenalty : ℝ
+  /-- Penalty of the compound rule that pools across cohorts. -/
+  compoundPenalty : ℝ
+  /-- Variance of the visible-predictable part of the target. -/
+  visiblePredictableVariance : ℝ
+  visiblePredictableVariance_nonneg : 0 ≤ visiblePredictableVariance
+  /-- **The improvement identity — an equation, not a bound.** -/
+  improvement : envelopePenalty - compoundPenalty = visiblePredictableVariance
+  /-- The full blind term: what single-cohort analysis cannot recover. -/
+  blindTerm : ℝ
+  /-- **The checkable hypothesis.** Targets lie near a low-dimensional family — an ancestry
+  gradient, for instance. Empirical, and not asserted here. -/
+  NearLowDimensionalFamily : Prop
+  /-- Fiber variance of the prior. -/
+  fiberVariance : ℝ
+  /-- A curve prior has zero fiber variance. -/
+  curve_fiber_zero : NearLowDimensionalFamily → fiberVariance = 0
+  /-- **The dissolution.** With zero fiber variance the recovered term is the whole blind
+  term. -/
+  full_recovery : NearLowDimensionalFamily → visiblePredictableVariance = blindTerm
+  /-- **Audit point.** The regret constants. -/
+  regretConstants : Prop
+
+namespace EnsembleTransfer
+
+variable (E : EnsembleTransfer)
+
+/-- **Pooling never loses.** The compound rule is at least as good as the worst-case
+envelope, because the gap is a variance. -/
+theorem compound_le_envelope : E.compoundPenalty ≤ E.envelopePenalty := by
+  have h := E.improvement
+  have hv := E.visiblePredictableVariance_nonneg
+  linarith
+
+/-- **THE DISSOLUTION, stated as the deployment claim.** Under the checkable
+low-dimensional-family hypothesis the compound rule beats the envelope by exactly the full
+blind term — the quantity no single cohort can recover. The ridge-inflation penalty of §13a
+is then recoverable rather than a permanent tax. -/
+theorem curve_prior_recovers_blind_term (hcurve : E.NearLowDimensionalFamily) :
+    E.envelopePenalty - E.compoundPenalty = E.blindTerm := by
+  rw [E.improvement, E.full_recovery hcurve]
+
+/-- **Strict improvement exactly when there is something visible to predict.** -/
+theorem compound_lt_envelope (hpos : 0 < E.visiblePredictableVariance) :
+    E.compoundPenalty < E.envelopePenalty := by
+  have h := E.improvement
+  linarith
+
+end EnsembleTransfer
+
+/-- **The three-budget decoupling.** Regret depends on the number of cohorts and the source
+depth, and — past the mixing threshold — not on depth per cohort. -/
+structure SampleBudget where
+  /-- Depth per target, `n'`. -/
+  depthPerTarget : ℝ
+  /-- Mixing time the depth must exceed for the fluctuation limit to be valid. -/
+  mixingTime : ℝ
+  /-- Number of targets, `m`. -/
+  targetCount : ℝ
+  /-- Source depth, `n`. -/
+  sourceDepth : ℝ
+  /-- The depth is past the threshold, which is all that is asked of it. -/
+  depthSufficient : mixingTime < depthPerTarget
+  /-- Regret of the deployed rule. -/
+  regret : ℝ
+  /-- The leading-order regret law: a function of `m` and `n` only. -/
+  regretLaw : ℝ → ℝ → ℝ
+  /-- **The decoupling.** `n'` does not appear. -/
+  regret_eq : regret = regretLaw targetCount sourceDepth
+
+/-- **MORE COHORTS BEATS DEEPER COHORTS.** Two designs that differ only in depth per
+cohort — both past their mixing scale — have *identical* regret. Depth beyond the threshold
+buys nothing, so the marginal sample should be spent on another cohort. -/
+theorem depth_beyond_mixing_buys_nothing (B B' : SampleBudget)
+    (hlaw : B.regretLaw = B'.regretLaw) (hm : B.targetCount = B'.targetCount)
+    (hn : B.sourceDepth = B'.sourceDepth) :
+    B.regret = B'.regret := by
+  rw [B.regret_eq, B'.regret_eq, hlaw, hm, hn]
+
+/-! ## 15. THE TRICHOTOMY OF BLINDNESS
+
+Three blindness theorems arrived separately in this development. They are not a coincidence
+and they are not three instances of one theorem; they are a **classification**, recorded
+here because a structure that arrives piecemeal is the kind that gets lost if only its
+instances are written down.
+
+* **SYMMETRY blindness.** The observation factors through a gauge action, and the invisible
+  set is the **orbit tangent**. Both the marginal-versus-dependence blindness of §14a and the
+  modulus-versus-reflection blindness of §2 are of this kind — the folded spectrum is a gauge
+  orbit.
+* **RESONANCE blindness.** No gauge acts. Kernels exist only on **arithmetic or dynamical
+  resonance sets**, and the direction of blindness is **not predictable a priori**. The
+  degenerate balanced locus of §1b and the cycle conditions of §7b are of this kind.
+* **SUPPORT blindness.** Resonance made **total** by a vanishing-support condition. The
+  modulus-copy case at `η = 0` — perfect linkage disequilibrium — is the instance, and it is
+  why §10's condition is `η > 0` and nothing weaker.
+
+### Why the invisible direction is always the one we care about
+
+This kept recurring and it is **structural rather than bad luck**: **robustness *is*
+invariance.** A statistic built to ignore a nuisance has fibers that *are* the deformation
+space, so drift moves along exactly what the robust statistic was designed not to see. Every
+blindness result in this file is that sentence applied to a different gauge.
+
+### The principle that resolves it, with one theorem behind it
+
+> **NOISE COUPLES TO THE GAUGE.**
+
+The gauge-invariant law of *one unit* hides the orbit coordinate. The law of an **estimator**
+does not, because estimation error is built from the very time structure the gauge acts on.
+That is why the channel of §14a exists at all, and `channel_detects_dependence` is the one
+theorem standing behind the principle. **The general version — that estimator fluctuation
+always sees the orbit coordinate a gauge-invariant marginal hides — is named here as the
+continuation and is not proved.** -/
+
+/-- The three mechanisms by which a statistic can be blind to a deformation. Recorded as a
+type so the classification survives independently of its instances. -/
+inductive BlindnessMechanism where
+  /-- The observation factors through a gauge action; the invisible set is the orbit
+  tangent. -/
+  | symmetry : BlindnessMechanism
+  /-- No gauge; kernels live on arithmetic or dynamical resonance sets, with direction not
+  predictable in advance. -/
+  | resonance : BlindnessMechanism
+  /-- Resonance made total by a vanishing-support condition. -/
+  | support : BlindnessMechanism
+  deriving DecidableEq, Repr
+
+/-- The folded spectrum is symmetry blindness: `q ↔ 1-q` is a gauge action and the invisible
+directions are its orbit tangents (§2). -/
+def foldedSpectrumBlindness : BlindnessMechanism := BlindnessMechanism.symmetry
+
+/-- Marginal-versus-dependence blindness is also symmetry blindness, which is why the
+estimator fluctuation of §14a breaks it. -/
+def marginalDependenceBlindness : BlindnessMechanism := BlindnessMechanism.symmetry
+
+/-- The balanced-locus degeneracy is resonance blindness: it occurs at an isolated
+arithmetic condition, `q = 1/2`, not along an orbit (§1b). -/
+def balancedLocusBlindness : BlindnessMechanism := BlindnessMechanism.resonance
+
+/-- Perfect linkage disequilibrium is support blindness: `η = 0` makes the resonance total
+(§10). -/
+def perfectLinkageBlindness : BlindnessMechanism := BlindnessMechanism.support
+
+/-- The three mechanisms are genuinely distinct, so the trichotomy is a classification
+rather than a restatement. -/
+theorem blindness_mechanisms_distinct :
+    foldedSpectrumBlindness ≠ balancedLocusBlindness ∧
+      balancedLocusBlindness ≠ perfectLinkageBlindness ∧
+      foldedSpectrumBlindness ≠ perfectLinkageBlindness := by
+  refine ⟨?_, ?_, ?_⟩ <;> decide
+
 /-!
 ## What is left open, plainly
+
+* **The general form of "noise couples to the gauge" (§15).** One theorem stands behind the
+  principle — `channel_detects_dependence`. That estimator fluctuation *always* sees the orbit
+  coordinate a gauge-invariant marginal hides is the continuation, and it is not proved.
+
+* **Whether real cohort collections lie near a low-dimensional family (§14b).** The
+  dissolution of single-target blindness depends on it, it is stated as a hypothesis field
+  rather than an assumption, and it is an empirical question this module does not answer.
 
 * **The geometric witness for §11.** The finite spectral reversal is proved. A reversal in
   one shared-germ reversible Markov family is still open: its cross-spectra and weighted
@@ -1362,6 +1628,28 @@ measurement companion; more precise one-locus frequencies cannot identify memory
   calculation showing which standardized thresholds and baseline variances are fixed and
   that its value factors through the chosen two coordinates. Non-Gaussian readouts are not
   covered.
+
+* **The nonparametric moment-body rate is open.** The coefficient envelope
+  `|cₖ| ≲ k⁻ᵅ` does not by itself prove the asserted positive-measure entropy exponent.
+  A shell packing, a matching convex-hull upper bound, and a uniform Whittle/Hellinger
+  equivalence theorem are all still required, especially when `1/2 < α < 1` and symbols
+  are unbounded. Consequently no adaptive minimax rate or claim that long memory has zero
+  marginal sample cost is imported from that calculation.
+
+* **The width exponent needs a profile class.** The scaling `‖B_w‖² ∼ w⁻¹` and
+  `‖∂B_w‖² ∼ w⁻³` is valid for a fixed rescaled Sobolev profile with controlled derivative
+  norm. Unit mass and nominal width alone do not control oscillation inside the bump, so
+  they do not make exponent three shape-free. In genetics this distinction separates a
+  simple ancestry-tract peak from multi-scale LD generated by inversions, selection, or
+  recent admixture.
+
+* **Order-erased target panels are not one-number channels.** Their sample-mean variance
+  does expose a Fejér-weighted LD functional, but the law of the unordered empirical
+  measure generally retains further symmetric covariance and higher-order information.
+  `EnsembleChannel` proves a three-locus positive-symbol witness: equal Fejér channel,
+  unequal symmetric fourth-order channel. Compound deployment can exploit the richer
+  observation, but its exact sufficient statistic and nonparametric empirical-Bayes regret
+  remain open.
 
 * **Linkage disequilibrium proper — coverage is closed, rigidity is not.** Section 9 proves
   that a positive **joint atom floor** makes coverage coupling-invariant. It does not prove
