@@ -444,10 +444,42 @@ check(
     lean=lambda D, Ne, m, mu: D["steppingStoneCharacteristicLength"](m, mu),
     ref=lambda Ne, m, mu: refs.stepping_stone_decay_scale_malecot(m, mu),
     kind="formula",
+    note=(
+        "SIMULATED, and the repair is VALIDATED. cluster/fam_stepping_stone.py "
+        "measures the spatial autocovariance decay length on a Wright-Fisher "
+        "lattice at mutation-migration-drift equilibrium.\n\n"
+        "CONVENTION FIRST, because it is the whole story. The corpus mu is "
+        "INFINITE-ALLELES -- the docstring says identity is destroyed in the "
+        "two lineages at rate 2*mu -- while the simulator's symmetric "
+        "two-allele model at mu_sim decays the covariance at 4*mu_sim. So "
+        "mu_corpus = 2*mu_sim. Comparing without that conversion reports a "
+        "spurious +44%; applying the definition's OWN DECLARED CONVENTION "
+        "gives agreement within 2.2% on every sigma^2 = 1 cell, across 16x in "
+        "mu, 25x in Ne and 8x in m. That is a conversion, not a discrepancy, "
+        "and it is recorded here so it is not rediscovered as a defect.\n\n"
+        "The EXPONENTS are what make this a validation rather than a "
+        "coincidence, since each one separates the old body from the new:\n"
+        "    d log L / d log mu  = -0.502   (corrected -1/2; OLD BODY 0)\n"
+        "    d log L / d log Ne  = -0.000   (corrected 0;    OLD BODY +1/2)\n"
+        "    d log L / d log m   = +0.510   (corrected +1/2)\n"
+        "A magnitude agreement can be a coincidence; three exponents cannot.\n\n"
+        "OPEN, and not fixed by this repair: the body carries NO dispersal "
+        "variance. The lattice truth is L = sqrt(m*sigma^2/(2*mu)), so this is "
+        "the sigma^2 = 1 case, while the two siblings in the same family -- "
+        "demoSteppingStoneFst (d Ne m sigma_sq) and steppingStoneCoalescenceTime "
+        "(d sigma_sq m) -- both take sigma_sq explicitly. A mentions query "
+        "finds no call site that supplies a dispersal variance and no "
+        "docstring that says sigma^2 = 1, so the family is silently split on "
+        "whether its lattice has one. The repair is a declaration."
+    ),
     canfail_clause=(
         "the grid MUST vary mu at fixed Ne and m: the Lean value is constant "
         "along that axis while the reference moves as mu^-1/2. Varying only "
-        "Ne and m would let a fitted constant hide the error."
+        "Ne and m would let a fitted constant hide the error.\n\n"
+        "It must ALSO keep the Ne axis even though both sides are flat along "
+        "it. That axis is not a discriminator, it is a regression guard: the "
+        "pre-repair body went as sqrt(Ne), so an edit that reintroduces an Ne "
+        "dependence fires here and nowhere else."
     ),
 )
 
@@ -473,7 +505,96 @@ check(
     grid=grid(d=[1.0, 5.0, 20.0], Ne=[500.0, 5000.0], m=[1e-3, 1e-2], sigma_sq=[1.0, 4.0]),
     lean=lambda D, d, Ne, m, sigma_sq: D["demoSteppingStoneFst"](d, Ne, m, sigma_sq),
     ref=lambda d, Ne, m, sigma_sq: refs.stepping_stone_fst_hudson(d, Ne, m, sigma_sq),
-    canfail_clause="d > 0 and finite Ne; at d=0 both sides are 0",
+    note=(
+        "SIMULATED, and it WINS. cluster/fam_stepping_stone.py solves the "
+        "two-lineage coalescent on a circle of 256 demes exactly and compares "
+        "every candidate F_ST(d) the corpus has ever carried. RMS relative "
+        "error over d = 1..128 at m = 0.1, sigma^2 = 1:\n"
+        "    demoSteppingStoneFst        0.044\n"
+        "    steppingStoneFstQuadratic   0.622\n"
+        "    steppingStoneFst (linear)   0.335\n"
+        "    1 - exp(-d/L), L FITTED     0.163\n"
+        "The exponential is given its best possible chance -- L is fitted "
+        "freely to the measurement -- and is still 3.7x worse than the "
+        "hyperbolic. That is empirical corroboration of the decision to delete "
+        "continuousSteppingStoneFst, which was taken by derivation alone.\n\n"
+        "Crucially, sigma^2 was SET (by the migration kernel) and not fitted. "
+        "A freely fitted sigma^2 absorbs the extra power of the quadratic form "
+        "exactly, which is the degeneracy demoSteppingStoneFst's own docstring "
+        "records; the simulator holds sigma^2 at a value control F2 measures "
+        "back, so the quadratic form can lose, and it does.\n\n"
+        "REGIME FOUND: the agreement degrades toward the far side of the "
+        "lattice, -6.6% at d = D/2, because the exact circle result is "
+        "d(D-d)/(...) and the corpus form is its d << D limit. Nothing in the "
+        "corpus states that limit."
+    ),
+    canfail_clause=(
+        "d > 0 and finite Ne; at d=0 both sides are 0.\n\n"
+        "For the SIMULATED comparison the d grid must reach D/2. Every "
+        "candidate here -- hyperbolic, quadratic, linear, exponential -- "
+        "agrees with every other to first order in d once its one free scale "
+        "is matched at d = 1, so a short-distance grid validates all four and "
+        "decides nothing."
+    ),
+)
+
+
+check(
+    id="steppingStoneCoalescenceTime-lattice-scale",
+    fqn="Calibrator.DemographicHistory.steppingStoneCoalescenceTime",
+    claim="d/(2 sigma^2 m) is not the meeting time in generations; the "
+          "meeting time is d(D-d)/(2 sigma^2 m) and depends on lattice size",
+    model_lean="T(d) = d/(2 sigma^2 m), a quantity with no lattice size in "
+               "its signature",
+    model_ref="exact meeting time of two lineages on a circle of D demes, "
+              "d(D-d)/V_rel with V_rel = 2 m sigma^2",
+    reference="circle hitting time, verified against an exact linear solve",
+    # The lattice-size axis is `n_demes`, NOT `D`. run.py decides whether a
+    # check consumes the corpus table by testing whether its first parameter is
+    # literally named `D`, so a grid axis called `D` silently stops the table
+    # being passed and the check dies on a missing argument instead of running.
+    # d is a CIRCULAR distance, so it cannot exceed n_demes/2; the unfiltered
+    # product contained d = n_demes, where (D - d) = 0 and the reference is
+    # identically zero. That point is not a hard case, it is a meaningless
+    # one, and leaving it in would have let a degenerate 100% error stand in
+    # for the real disagreement.
+    grid=[g for g in grid(d=[1.0, 4.0, 16.0, 64.0], sigma_sq=[1.0, 4.0],
+                          m=[0.025, 0.1], n_demes=[64.0, 256.0])
+          if g["d"] <= g["n_demes"] / 2],
+    lean=lambda D, d, sigma_sq, m, n_demes: D["steppingStoneCoalescenceTime"](
+        d, sigma_sq, m),
+    ref=lambda d, sigma_sq, m, n_demes: (
+        d * (n_demes - d) / (2.0 * m * sigma_sq)),
+    kind="scope",
+    expected_verdict="SCOPE",
+    note=(
+        "MEASURED STANDALONE FOR THE FIRST TIME by "
+        "cluster/fam_stepping_stone.py. The docstring says 'UNTESTED as a "
+        "standalone quantity'; it now is tested, and the ratio of the true "
+        "meeting time to this expression is EXACTLY (D - d). On a circle of "
+        "256 demes at m = 0.1, sigma^2 = 1: d = 1 gives 1344.2 generations "
+        "against 5.0, and d = 128 gives 81987 against 640.\n\n"
+        "AND YET THE F_ST IT FEEDS IS RIGHT TO 4.4%. `coalFst` pairs this "
+        "quantity with 2*Ne rather than 2*Ne*D -- both sides are per-deme -- "
+        "so the lattice size cancels and demoSteppingStoneFst comes out "
+        "correct. That is why no consumer-level check could ever have found "
+        "this: the error is invisible everywhere the quantity is actually "
+        "used, and visible only when the quantity is asked what it claims to "
+        "be.\n\n"
+        "So the corpus knew this was untested and did not know what it was "
+        "untested FOR. The repair is a scale declaration, not arithmetic: the "
+        "quantity is a meeting time per deme of lattice, defined only up to "
+        "the factor its signature cannot carry."
+    ),
+    canfail_clause=(
+        "D MUST VARY. At a single lattice size (D - d) is very nearly a "
+        "constant over the small-d part of any grid, and a refitted m absorbs "
+        "a constant exactly -- the same degeneracy that makes a free sigma^2 "
+        "useless for demoSteppingStoneFst. Two lattice sizes a factor of 4 "
+        "apart are what make the dependence visible. d must also reach a "
+        "sizeable fraction of D, since it is only there that (D - d) departs "
+        "from D and the shape, not just the scale, disagrees."
+    ),
 )
 
 # --- 6. Linkage disequilibrium ---------------------------------------------
@@ -689,13 +810,158 @@ check(
     ),
     ref=lambda alpha, p_a, p_b: _admixed_fst_exact(alpha, p_a, p_b),
     kind="formula",
+    note=(
+        "MEASURED against cluster/fam_admixture.py, which is the first time "
+        "this definition has been run over a frequency SPECTRUM rather than a "
+        "frequency pair. The account closes exactly: the measured ratio\n\n"
+        "    F_ST(C,A)/F_ST(A,B) = (1-alpha)^2 / denominator_ratio\n\n"
+        "reconstructs the measurement to 1e-16. The NUMERATOR ratio is "
+        "(1-alpha)^2 to machine precision, so the corpus's own derivation "
+        "step -- `admixed_freq_diff` -- survives intact; what the definition "
+        "omits is the DENOMINATOR ratio, which is not 1 and runs from 0.978 "
+        "down to 0.428 as alpha and the parental divergence rise.\n\n"
+        "Errors are ALWAYS NEGATIVE (the definition understates F_ST(C,A)): "
+        "-2.2% to -19.9% for alpha 0.1 -> 0.9 at F_ST(A,B) = 0.222, and -6.4% "
+        "to -57.2% at F_ST(A,B) = 0.633. Twenty generations of post-admixture "
+        "drift take it to -82.8%. Controls: A1 builds the admixed population "
+        "by sampling ancestry per gamete rather than by evaluating "
+        "admixedAlleleFreq, and A4b re-runs the comparison with alpha "
+        "perturbed 1% and confirms the reported error moves."
+    ),
     canfail_clause=(
         "REQUIRES pbar to move with alpha, i.e. p_a and p_b far apart and "
         "both away from 0.5. If p_a + p_b = 1 the denominators coincide and "
         "the (1-alpha)^2 numerator scaling is exactly right -- a symmetric "
-        "frequency pair makes this check unable to fail."
+        "frequency PAIR makes this check unable to fail.\n\n"
+        "CORRECTION, measured. That clause used to end 'a symmetric spectrum "
+        "makes this check unable to fail', and THAT PART IS FALSE. "
+        "cluster/fam_admixture.py ran three spectra -- a 1/p density, a "
+        "uniform density, and Beta(1/2,1/2) -- and they agree to the THIRD "
+        "DECIMAL (alpha=0.5, F_ST(A,B)=0.633: -0.3179, -0.3173, -0.3167). The "
+        "spectrum barely matters; alpha and the parental divergence are what "
+        "move the error. Symmetry of a PAIR makes the two denominators "
+        "coincide; symmetry of a SPECTRUM does not, because E[p_C(1-p_A)] and "
+        "E[p_B(1-p_A)] differ whenever the spectrum has any spread at all.\n\n"
+        "This correction matters more than the defect it sits on: a check "
+        "whose stated reason for being trustworthy is wrong is worse than one "
+        "with no stated reason, because the justification is what stops "
+        "anyone re-examining it."
     ),
 )
+
+# --- 8b. Admixture: what cluster/fam_admixture.py established ---------------
+#
+# A DETERMINISTIC spectrum, so nothing here samples and the file's opening
+# promise still holds. The pairs below are a fixed, weighted set standing in
+# for a differentiated pair of populations; the reference evaluates F_ST as a
+# RATIO OF AVERAGES over that set, which is how F_ST is actually computed and
+# is exactly what the simulator measured over 200000 sampled loci.
+_SPECTRUM = [
+    (0.05, 0.35), (0.10, 0.55), (0.20, 0.75), (0.30, 0.05),
+    (0.45, 0.90), (0.60, 0.15), (0.75, 0.25), (0.90, 0.40),
+]
+
+
+def _ratio_of_averages_fst(pairs: list[tuple[float, float]]) -> float:
+    num = sum((a - b) ** 2 for a, b in pairs)
+    den = sum(a * (1 - b) + b * (1 - a) for a, b in pairs)
+    return 0.0 if den == 0 else num / den
+
+
+def _admixed_fst_spectrum(alpha: float) -> float:
+    """Hudson F_ST(C, A) over the whole spectrum, C = alpha A + (1-alpha) B."""
+    pc = [(alpha * a + (1 - alpha) * b, a) for a, b in _SPECTRUM]
+    return _ratio_of_averages_fst(pc)
+
+
+check(
+    id="admixedFst-over-a-spectrum",
+    fqn="Calibrator.DemographicHistory.admixedFst",
+    claim="(1-alpha)^2 is a NUMERATOR identity; over a spectrum the "
+          "denominator moves too and the F_ST identity fails",
+    model_lean="F_ST(C,A) = (1-alpha)^2 * F_ST(A,B), i.e. the ratio of the "
+               "two F_ST values is exactly (1-alpha)^2",
+    model_ref="Hudson F_ST as a ratio of averages over a fixed spectrum, "
+              "evaluated directly on (p_A, p_C) at every locus",
+    reference="_admixed_fst_spectrum",
+    grid=grid(alpha=[0.1, 0.25, 0.5, 0.75, 0.8, 0.9]),
+    lean=lambda D, alpha: D["admixedFst"](
+        alpha, _ratio_of_averages_fst(_SPECTRUM)
+    ),
+    ref=lambda alpha: _admixed_fst_spectrum(alpha),
+    kind="model",
+    expected_verdict="MODEL",
+    note=(
+        "The companion to `admixedFst-ratio-not-numerator`, which evaluates "
+        "one frequency pair at a time. This one is the SPECTRUM version, "
+        "because F_ST is a ratio of averages and the averaging correction is "
+        "not deducible from a single pair.\n\n"
+        "Measured by cluster/fam_admixture.py over 200000 loci and three "
+        "spectra: the error is always negative and grows with alpha and with "
+        "the parental divergence, reaching -57.2% at alpha = 0.9 with "
+        "F_ST(A,B) = 0.633. The decomposition there shows the numerator ratio "
+        "is exactly (1-alpha)^2 and the denominator ratio runs 0.978 -> 0.428, "
+        "so the repair is a REGIME DECLARATION -- the identity holds for "
+        "Var(p_C - p_A) always, and for F_ST only as alpha -> 0 or "
+        "F_ST(A,B) -> 0."
+    ),
+    canfail_clause=(
+        "The spectrum must have spread in BOTH coordinates and must not be a "
+        "single pair. A degenerate spectrum (all loci at one (p_A, p_B)) "
+        "reduces this to the pair check; a spectrum with p_A = p_B "
+        "everywhere makes both F_ST values 0 and the comparison vacuous. "
+        "alpha must also reach past 0.5: below it (1-alpha)^2 ~ 1 - 2 alpha "
+        "and the ratio-versus-numerator distinction is second order."
+    ),
+)
+
+
+check(
+    id="admixtureLDDecay-is-the-infinite-Ne-limit",
+    fqn="Calibrator.PortabilityDrift.admixtureLDDecay",
+    claim="(1-r)^g omits drift; the retention of E[D] is (1-r)(1-1/(2Ne)) "
+          "per generation",
+    model_lean="(1-r)^g -- recombination only, no effective size anywhere in "
+               "the signature",
+    model_ref="Hill-Robertson: E[D] decays by (1-r)(1-1/(2Ne)) per generation",
+    reference="closed form, (1-r)^g vs ((1-r)(1-1/(2Ne)))^g",
+    grid=grid(r=[0.0, 0.00125, 0.0025, 0.005, 0.02, 0.1], Ne=[200.0], g=[20]),
+    lean=lambda D, r, Ne, g: D["admixtureLDDecay"](r, g),
+    ref=lambda r, Ne, g: ((1.0 - r) * (1.0 - 1.0 / (2.0 * Ne))) ** g,
+    kind="model",
+    expected_verdict="MODEL",
+    note=(
+        "MEASURED by cluster/fam_admixture.py. Per-generation retention of "
+        "E[D] against both forms, Ne = 200:\n"
+        "    r=0        measured 0.997575  corpus 1.000000 (+0.24%)  "
+        "with drift 0.997500 (-0.01%)\n"
+        "    r=0.0025   measured 0.994828  corpus 0.997500 (+0.27%)  "
+        "with drift 0.995006 (+0.02%)\n"
+        "    r=0.02     measured 0.977596  corpus 0.980000 (+0.25%)  "
+        "with drift 0.977550 (-0.00%)\n"
+        "    r=0.1      measured 0.896658  corpus 0.900000 (+0.37%)  "
+        "with drift 0.897750 (+0.12%)\n"
+        "    r=0.5      measured 0.506154  corpus 0.500000 (-1.22%)\n"
+        "So (1-r)(1-1/(2Ne)) is right to <= 0.12% across the grid and the "
+        "corpus's bare (1-r) is high by exactly the drift factor. This is a "
+        "small, clean REGIME: admixtureLDDecay is the Ne -> infinity limit and "
+        "does not say so. Controls B1 (Ne infinite) and B2 (r = 0) pin the two "
+        "factors separately, which is what makes it readable as a limit rather "
+        "than as a fitted discrepancy.\n\n"
+        "The r = 0.5 row is recorded because an earlier run reported -41% "
+        "there and that number was a MEASUREMENT defect, not a corpus one: the "
+        "fit had run below the standard error of its own replicate mean. It is "
+        "kept here so nobody re-derives the retracted figure."
+    ),
+    canfail_clause=(
+        "The r grid MUST straddle 1/(2Ne). Where r >> 1/(2Ne) the drift factor "
+        "is invisible and (1-r)^g is indistinguishable from the truth; where "
+        "r << 1/(2Ne) recombination is invisible. Only near r ~ 1/(2Ne) do "
+        "both factors matter at once. The r = 0 row is the extreme case and is "
+        "the one where the corpus form is exactly 1 and the truth is not."
+    ),
+)
+
 
 # --- 9. Cross-name duplicates ----------------------------------------------
 # The three `dup-islandModelFst-*` entries were REMOVED because the duplication
