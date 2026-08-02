@@ -354,6 +354,46 @@ theorem stabilizing_le_neutral (r2_0 fst strength : ℝ)
 noncomputable def diversifyingPortability (r2_0 fst lam_turn : ℝ) : ℝ :=
   neutralPortability r2_0 fst * (Real.exp (-lam_turn * fst)) ^ 2
 
+/-- **The magnitude claim of the selection laws, as an obligation.**
+
+`stabilizingPortability` and `diversifyingPortability` are recorded FALSIFIED as
+one-parameter laws: simulation finds no constant `strength` fitting the portability curve,
+the fitted value spanning 13-fold over a 29-fold range of `F_ST`. The definitions survive
+because the *ordering* they support does, for any positive parameter.
+
+Nothing in the types said which of those two claims a caller was making. This structure
+separates them. Reading a number off `stabilizingPortability` means asserting one constant
+reproduces the measurements across a stated range, and that assertion is now `fits`,
+supplied with the range and tolerance it holds over — the `PowerAgreement` device again.
+`measured` is the observed curve, external data rather than anything derived here.
+
+It is expected to be undischargeable at realistic ranges, and that is the content: the
+falsification is enforced by the type rather than reported beside it. The ordering
+theorems below take no `FittedSelectionLaw`, which is exactly the distinction being drawn. -/
+structure FittedSelectionLaw (r2_0 : ℝ) where
+  /-- The single constant claimed to govern the trait. -/
+  strength : ℝ
+  strength_pos : 0 < strength
+  /-- Portability as actually measured, supplied externally. -/
+  measured : ℝ → ℝ
+  /-- The `F_ST` range over which the fit is claimed. -/
+  fstLo : ℝ
+  fstHi : ℝ
+  range_ok : 0 ≤ fstLo ∧ fstLo < fstHi
+  /-- Accepted discrepancy between law and measurement. -/
+  tolerance : ℝ
+  tolerance_pos : 0 < tolerance
+  /-- **The claim.** One constant reproduces the measurements across the whole range. -/
+  fits : ∀ fst, fstLo ≤ fst → fst ≤ fstHi →
+    |stabilizingPortability r2_0 fst strength - measured fst| ≤ tolerance
+
+/-- **A fitted law does pin the magnitude at every point of its range** — which is what
+makes the obligation worth carrying, and what simulation reports cannot be met. -/
+theorem FittedSelectionLaw.magnitude_pinned {r2_0 : ℝ} (F : FittedSelectionLaw r2_0)
+    (fst : ℝ) (hlo : F.fstLo ≤ fst) (hhi : fst ≤ F.fstHi) :
+    |stabilizingPortability r2_0 fst F.strength - F.measured fst| ≤ F.tolerance :=
+  F.fits fst hlo hhi
+
 /-- Diversifying portability is a nonnegative `R²`. -/
 theorem diversifyingPortability_nonneg (r2_0 fst lam_turn : ℝ) (hr2 : 0 ≤ r2_0) :
     0 ≤ diversifyingPortability r2_0 fst lam_turn := by
