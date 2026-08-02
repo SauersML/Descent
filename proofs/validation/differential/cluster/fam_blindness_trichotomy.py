@@ -140,15 +140,45 @@ def mass_at(q, reflect=None, use_abs=True, shift=None, mass_permute=True):
     qq = reflect(q) if reflect is not None else q
     m = moduli(qq, use_abs=use_abs, shift=shift)
     w = atom_masses(qq) if mass_permute else atom_masses(q)
-    order = np.argsort(m)
-    return m[order], w[order]
+    return canonical_law(m, w)
+
+
+def canonical_law(m, w):
+    """Canonical form of a modulus law: sorted values with TIED VALUES MERGED.
+
+    Merging is not tidying, it is the definition.  The modulus law is a measure
+    on the value axis, so two atoms landing on the same value are one atom of
+    combined mass, and any representation that keeps them apart depends on a
+    genotype label the observer does not have.
+
+    THIS FILE'S FIRST RUN GOT THIS WRONG AND THE ERROR LOOKED LIKE A REFUTATION.
+    Sorting by value and comparing mass vectors elementwise reported the folded
+    spectrum failing by 3/16 = 0.1875.  The whole discrepancy came from q = 1/4,
+    where m_0 = m_1 = 1/3 exactly: with two equal values, argsort breaks the tie
+    by index, the index order is reversed between q and 1-q, and the masses
+    0.5625 and 0.375 were subtracted in the wrong pairing.  The theorem was fine
+    and the harness was wrong -- and the within-locus tie at q = 1/4 is a real
+    feature of this family, not a numerical accident, so the harness had to
+    handle it rather than avoid it.
+    """
+    order = np.argsort(m, kind="stable")
+    m = np.asarray(m, dtype=float)[order]
+    w = np.asarray(w, dtype=float)[order]
+    vals, mass = [], []
+    for v, u in zip(m, w):
+        if vals and abs(v - vals[-1]) < NEAR_TIE:
+            mass[-1] += u
+        else:
+            vals.append(v)
+            mass.append(u)
+    return np.array(vals), np.array(mass)
 
 
 def law_distance(q1, q2, **kw):
-    """Distance between two loci's modulus laws, as sorted (value, mass) pairs."""
+    """Distance between two loci's canonical modulus laws."""
     m1, w1 = mass_at(q1, **kw)
     m2, w2 = mass_at(q2, **kw)
-    return float(max(np.max(np.abs(m1 - m2)), np.max(np.abs(w1 - w2))))
+    return compare_laws(m1, w1, m2, w2)
 
 
 # ------------------------------------------------------- B1 symmetry instance
@@ -162,11 +192,26 @@ def test_symmetry(qs, shift=None, gauge=None, mass_permute=True):
     gauge = gauge if gauge is not None else (lambda q: 1.0 - q)
     worst = 0.0
     for q in qs:
-        d = law_distance(q, q, **{}) if False else None
         m1, w1 = mass_at(q, shift=shift, mass_permute=True)
         m2, w2 = mass_at(q, reflect=gauge, shift=shift, mass_permute=mass_permute)
-        worst = max(worst, float(np.max(np.abs(m1 - m2))), float(np.max(np.abs(w1 - w2))))
+        worst = max(worst, compare_laws(m1, w1, m2, w2))
     return worst
+
+
+def compare_laws(m1, w1, m2, w2):
+    """Distance between two canonical modulus laws.
+
+    Different atom counts means the two measures are supported on different
+    numbers of points, which is a maximal disagreement, not a shape mismatch to
+    be padded away.
+    """
+    if len(m1) != len(m2):
+        return float("inf")
+    if len(m1) == 0:
+        return 0.0
+    if not (np.all(np.isfinite(m1)) and np.all(np.isfinite(m2))):
+        return float("inf")
+    return float(max(np.max(np.abs(m1 - m2)), np.max(np.abs(w1 - w2))))
 
 
 # ------------------------------------------------------ B2 resonance instance
@@ -280,8 +325,10 @@ def mutation_gate(grid):
     results = []
 
     # M1: wrong gauge map.  q -> 0.9 - q is not the reflection.
-    dev = test_symmetry(grid, gauge=lambda q: 0.9 - q)
-    results.append({"mutant": "M1_wrong_gauge_map_0.9_minus_q",
+    # Chosen to stay inside (0,1) on the whole grid, so the mutant is rejected
+    # for being the wrong map and not for producing NaN.
+    dev = test_symmetry(grid, gauge=lambda q: 1.0 - 0.9 * q)
+    results.append({"mutant": "M1_wrong_gauge_map_1_minus_0.9q",
                     "statistic": dev, "rejected": bool(dev > 1e-6),
                     "expected_rejected": True})
 
