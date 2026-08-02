@@ -72,6 +72,42 @@ noncomputable def ensembleSquaredLoss {ι : Type*} [Fintype ι]
     (target : ι → ℝ) (deployment : ℝ) : ℝ :=
   ∑ i, (target i - deployment) ^ 2
 
+/-- Squared loss of a target-specific predictor across a finite ensemble. -/
+noncomputable def ensemblePredictorSquaredLoss {ι : Type*} [Fintype ι]
+    (target predictor : ι → ℝ) : ℝ :=
+  ∑ i, (target i - predictor i) ^ 2
+
+/-- **Conditional-predictor Pythagorean identity.** If the prediction residual is
+orthogonal to the displacement from the source deployment, then source deployment loss is
+residual loss plus the squared recoverable displacement. For a conditional expectation,
+the orthogonality premise is the defining projection property.
+
+The recoverable term is `∑ᵢ (predictor i - source)²`. It is not generally the variance of
+the predictor: it also contains the squared displacement between the source and the target
+ensemble mean. This distinction matters when a PGS is transported into cohorts whose
+average genetic architecture has shifted from the training population. -/
+theorem ensemblePredictorSquaredLoss_decomposition {ι : Type*} [Fintype ι]
+    (target predictor : ι → ℝ) (source : ℝ)
+    (horthogonal : ∑ i, (target i - predictor i) * (predictor i - source) = 0) :
+    ensembleSquaredLoss target source =
+      ensemblePredictorSquaredLoss target predictor + ∑ i, (predictor i - source) ^ 2 := by
+  unfold ensembleSquaredLoss ensemblePredictorSquaredLoss
+  calc
+    ∑ i, (target i - source) ^ 2 =
+        ∑ i, ((target i - predictor i) ^ 2 + (predictor i - source) ^ 2 +
+          2 * ((target i - predictor i) * (predictor i - source))) := by
+      apply Finset.sum_congr rfl
+      intro i _
+      ring
+    _ = (∑ i, (target i - predictor i) ^ 2) +
+        (∑ i, (predictor i - source) ^ 2) +
+          2 * ∑ i, (target i - predictor i) * (predictor i - source) := by
+      rw [Finset.sum_add_distrib, Finset.sum_add_distrib, Finset.mul_sum]
+    _ = (∑ i, (target i - predictor i) ^ 2) +
+        ∑ i, (predictor i - source) ^ 2 := by
+      rw [horthogonal]
+      ring
+
 /-- **Compound deployment Pythagorean identity.** If `center` is an ensemble centroid,
 loss from deploying the source decomposes into irreducible within-ensemble loss plus the
 recoverable displacement of the centroid from the source. -/

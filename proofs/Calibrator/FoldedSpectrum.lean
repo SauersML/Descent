@@ -1346,7 +1346,7 @@ can recover deployment separation. Target genotype marginals therefore need an L
 measurement companion; more precise one-locus frequencies cannot identify memory.
 -/
 
-/-! ## 14. THE NOISE IS THE CHANNEL, AND WHY THAT MAKES BLINDNESS DISSOLVE IN PRACTICE
+/-! ## 14. THE ORDER-ERASED ENSEMBLE CHANNEL
 
 ### 14a. The inversion
 
@@ -1367,16 +1367,24 @@ with the same Fejér number but different symmetric Gaussian fourth-order statis
 Consequently the unordered empirical-measure law is generally richer than one long-run
 variance. Any exact visible algebra must be derived for the named observation model.
 
-### 14b. Per-target invisibility, ensemble identifiability — and the case that dissolves it
+### 14b. Per-target invisibility and compound prediction
 
 Across `m` target populations drawn from a common law, pooling can learn a conditional
 predictor from the permutation-invariant panel summaries. Parametric `m⁻¹/²` regret,
 nonparametric mixture identifiability, and uniformity across long-memory targets require
 separate statistical assumptions and are not proved here.
 
-The gain over the worst-case envelope is an **identity, not a bound**:
+The gain over source-centered deployment is an identity once the compound predictor is an
+orthogonal projection. For source deployment `s` and visible summary `V`, it is
 
-`envelope penalty − compound penalty = Var(visible-predictable part of the target)`
+`E ‖E[S' | V] - s‖²
+ = Var(E[S' | V]) + ‖E[S'] - s‖²`.
+
+Thus the gain equals the variance of the visible-predictable part only when the source
+center agrees with the target-ensemble mean. The second term is population-level mean
+architecture shift; omitting it can make a reported "fraction of blind variance recovered"
+exceed one. `EnsembleChannel.ensemblePredictorSquaredLoss_decomposition` proves the finite
+orthogonal identity.
 
 For a prior supported on a curve, the residual fibre variance is zero only if the chosen
 visible summaries identify position on that curve. That injectivity is a substantive

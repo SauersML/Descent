@@ -1280,9 +1280,14 @@ FAMILIES = [
         "model": "stationary Gaussian latent target panels with genomic order erased; "
                  "finite Fejer and symmetric fourth-order dependence channels",
         "simulator": "cluster/fam_ensemble_channel.py",
-        "status": "IMPLEMENTED, NOT YET RUN. The formal core predicts an exact finite "
-                  "sample-mean channel and proves that it is incomplete; deconvolution "
-                  "rates and compound empirical-Bayes performance are exploratory arms.",
+        "status": "QUICK PROFILE RUN ON ACN116 (2026-08-02). Exact Fejer reference "
+                  "agreed with brute force to 6.6e-15; finite sample means agreed within "
+                  "2.60 SE; equal-Fejer processes separated in several higher symmetric "
+                  "channels; ensemble moment RMSE slopes were -0.492 and -0.465. The "
+                  "run also falsified the original compound-gain label: gain from an "
+                  "arbitrary source includes squared target-mean shift as well as "
+                  "predictable variance. The Lean identity and simulator were corrected; "
+                  "the corrected operational arm awaits rerun.",
         "found_by": "manual",
         "spec": "Simulate stationary scaled-rotation Gaussian chains with exact stationary "
                 "starts. Compare n Var(mean) to the finite Fejer sum, then hold the Fejer "
@@ -1290,7 +1295,8 @@ FAMILIES = [
                 "arm must verify injectivity rather than infer it from low dimension. Do not "
                 "interpret `(mass,L)` as sufficient for the full unordered panel law.",
         "members": ["fejerChannel3", "gaussianPairSquareChannel3",
-                    "ensembleSquaredLoss", "scalarPermeability"],
+                    "ensembleSquaredLoss", "ensemblePredictorSquaredLoss",
+                    "scalarPermeability"],
     },
 ]
 

@@ -24,10 +24,11 @@ WHAT THE FORMAL CORE CLAIMS (`EnsembleChannel.lean`)
       targets, estimate the visible scale-mixture law and measure its empirical
       rate. Uniform deconvolution rates remain open.
 
-  T4  COMPOUND CENTROID GEOMETRY. `ensembleSquaredLoss_decomposition` proves
-      the Pythagorean loss identity. Full recovery on a curve additionally
-      requires the visible observation to be injective on that curve; this arm
-      checks injectivity numerically instead of inferring it from dimension.
+  T4  COMPOUND PREDICTOR GEOMETRY. `ensembleSquaredLoss_decomposition` and
+      `ensemblePredictorSquaredLoss_decomposition` prove the two Pythagorean
+      legs. Full recovery on a curve additionally requires the visible
+      observation to be injective on that curve; this arm checks injectivity
+      numerically instead of inferring it from dimension.
 
   T5  LIMIT OF THE MEAN CHANNEL. Two priors can share `(mass,L)` and have
       different transported risk. The mean channel cannot distinguish them;
@@ -574,7 +575,7 @@ def simulate_ma_stats(b, n, reps, rng, chunk=4000):
 def test2(rng, out):
     print("")
     print("=" * 74)
-    print("TEST 2  OFF-ZERO INVISIBILITY  (impossibility claim + live control)")
+    print("TEST 2  EQUAL FEJER CHANNEL, DIFFERENT SYMMETRIC CHANNELS")
     print("=" * 74)
     chA, chB, chC = ma_channels(MA_A), ma_channels(MA_B), ma_channels(MA_C)
     print("  A  b=(1,0,0)        gamma = %s" % np.round(chA["gamma"], 6).tolist())
@@ -612,8 +613,8 @@ def test2(rng, out):
 
     print("")
     print("  ORDER-FREE FLUCTUATION CHANNELS, n' Var(statistic).  A vs B have")
-    print("  the same marginal AND the same L; the claim is that they agree at")
-    print("  EVERY order.  Predictions are closed-form, no free constant.")
+    print("  the same marginal AND the same L; the mean channel should agree")
+    print("  while higher symmetric channels may separate. Predictions are closed-form.")
     print("  %-9s %-11s %-11s %-11s %-11s %-11s %-9s"
           % ("stat", "meas A", "pred A", "meas B", "pred B", "B-A", "sigma"))
     rows = []
@@ -773,7 +774,7 @@ def test3(rng, out):
     sv = float(np.polyfit(lm, np.log([x["rmse_VarL"] for x in rows]), 1)[0])
     print("")
     print("  fitted rate  d log RMSE / d log m :  E[L] %+.4f, Var[L] %+.4f "
-          "(claim -0.5)" % (s1, sv))
+          "(parametric benchmark -0.5)" % (s1, sv))
     ok = abs(s1 + 0.5) < 0.06 and abs(sv + 0.5) < 0.10
     # can-fail: an estimator that were merely CONSISTENT but slower, or biased,
     # would show a slope away from -1/2 or a bias not shrinking; both are visible
@@ -788,10 +789,10 @@ def test3(rng, out):
 
 
 # ===========================================================================
-# TEST 4: THE CURVE-PRIOR DISSOLUTION
+# TEST 4: THE COMPOUND PREDICTOR DECOMPOSITION
 # ===========================================================================
 #
-# Blind term b = gamma(1) = amp * rho * cos(theta): an off-zero spectral
+# Deployment target b = gamma(1) = amp * rho * cos(theta): an off-zero spectral
 # functional, invisible to the channel.  Visible pair v = (gamma0, L).
 #   CURVE arm : one parameter xi, rho and theta both functions of xi, so v
 #               determines xi determines b.  fiberVariance must be 0.
@@ -800,7 +801,7 @@ def test3(rng, out):
 # Rules:
 #   source-centred (the envelope): a single constant, the source's b.
 #   pooled/compound             : E[b | v], fitted across the m cohorts.
-# `ensembleSquaredLoss_decomposition` supplies the finite Pythagorean identity.
+# The two EnsembleChannel decompositions supply the finite Pythagorean identities.
 # The curve arm separately checks that the visible coordinate is injective; low
 # dimension alone would not imply full recovery.
 
@@ -831,10 +832,24 @@ def binned_regression(v, b, nbin):
     return fit[inv]
 
 
+def binned_regression_predict(v_train, b_train, v_test, nbin):
+    """Predict on held-out cohorts from bins fitted only on training cohorts."""
+    order = np.argsort(v_train)
+    vs, bs = v_train[order], b_train[order]
+    edges = np.linspace(0, len(v_train), nbin + 1).astype(int)
+    centers, means = [], []
+    for i in range(nbin):
+        lo, hi = edges[i], edges[i + 1]
+        if hi > lo:
+            centers.append(float(vs[lo:hi].mean()))
+            means.append(float(bs[lo:hi].mean()))
+    return np.interp(v_test, np.asarray(centers), np.asarray(means))
+
+
 def test4(rng, out):
     print("")
     print("=" * 74)
-    print("TEST 4  THE CURVE-PRIOR DISSOLUTION")
+    print("TEST 4  THE COMPOUND PREDICTOR DECOMPOSITION")
     print("=" * 74)
     AMP, S2 = 1.0, 1.0
 
@@ -852,7 +867,8 @@ def test4(rng, out):
         varb = float(b.var())
         varpred = float(pred.var())
         resid = float(np.mean((b - pred) ** 2))
-        arms[name] = {"var_b": varb, "visible_predictable": varpred,
+        arms[name] = {"var_b": varb, "mean_b": float(b.mean()),
+                      "visible_predictable_variance": varpred,
                       "fiber_residual": resid,
                       "identity_gap": varb - (varpred + resid),
                       "L_min": float(L.min()), "L_max": float(L.max()),
@@ -892,16 +908,16 @@ def test4(rng, out):
     # The first run reported a "recovered fraction" of 2.63 on the curve arm --
     # 263% of a variance -- which is impossible and was my instrument, not the
     # corpus. The source-centred penalty is Var(b) + (E[b] - b_src)^2, and the
-    # squared bias is not part of the blind term at all. The corpus in fact
+    # squared bias is not part of the predictable variance at all. The core
     # states TWO decompositions and they stack:
     #   LEG 1  EnsembleChannel.lean `ensembleSquaredLoss_decomposition`:
     #          loss(source) = loss(centroid) + card * (centroid - source)^2,
     #          so moving from the source to the ensemble centroid gains
     #          exactly the squared displacement (E[b] - b_src)^2.
-    #   LEG 2  FoldedSpectrum `EnsembleTransfer.improvement`:
-    #          envelopePenalty - compoundPenalty = visiblePredictableVariance,
+    #   LEG 2  `ensemblePredictorSquaredLoss_decomposition`, centered at E[b]:
+    #          centroidPenalty - compoundPenalty = visiblePredictableVariance,
     #          so moving from the centroid to E[b|v] gains exactly Var(E[b|v]).
-    # LEG 2 is the curve-prior claim and the only one with a blind term in it,
+    # LEG 2 is the curve-prior claim and the only one with predictable variance,
     # so the recovered fraction is measured against the CENTROID rule. Both
     # legs are printed; neither is a free constant.
     print("")
@@ -942,45 +958,49 @@ def test4(rng, out):
             for e in range(ENS_T4):
                 src_l.append(float(np.mean((bE[e] - b_src) ** 2)))
                 cen_l.append(float(np.mean((bE[e] - bE[e].mean()) ** 2)))
-                fit = binned_regression(LE[e], bE[e], max(4, int(M_T4 / 20)))
+                # Two-fold cross-fitting: evaluating bins on their training cohorts
+                # understated pooled loss and produced an impossible >100% recovery.
+                mid = M_T4 // 2
+                nbin = max(4, int(M_T4 / 40))
+                fit = np.empty(M_T4)
+                fit[mid:] = binned_regression_predict(
+                    LE[e, :mid], bE[e, :mid], LE[e, mid:], nbin)
+                fit[:mid] = binned_regression_predict(
+                    LE[e, mid:], bE[e, mid:], LE[e, :mid], nbin)
                 pol_l.append(float(np.mean((bE[e] - fit) ** 2)))
             src = float(np.mean(src_l))
             cen = float(np.mean(cen_l))
             pol = float(np.mean(pol_l))
             leg1 = src - cen        # ensembleSquaredLoss_decomposition
-            leg2 = cen - pol        # EnsembleTransfer.improvement
+            leg2 = cen - pol        # conditional-predictor Pythagorean leg
+            oracle_leg2 = arms[name]["visible_predictable_variance"]
             rows.append({"arm": name, "B": B, "source_penalty": src,
                          "centroid_penalty": cen, "pooled_penalty": pol,
                          "leg1_source_to_centroid": leg1,
                          "leg1_predicted_sq_displacement": src - cen,
                          "leg2_centroid_to_pooled": leg2,
-                         "leg2_predicted_VarEbv": arms[name]["visible_predictable"],
+                         "leg2_predicted_VarEbv": oracle_leg2,
                          "oracle_total_blind_Var_b": arms[name]["var_b"],
                          "oracle_fiber": arms[name]["fiber_residual"],
-                         "fraction_of_blind_recovered":
-                             leg2 / arms[name]["var_b"]})
+                         "fraction_of_predictable_variance_recovered":
+                             leg2 / oracle_leg2})
             print("  %-6s %-5d %-13.6f %-13.6f %-13.6f %-13.6f"
                   % (name, B, src, cen, pol, leg2))
     out["T4_operational"] = rows
 
     print("")
-    print("  LEG 2, the curve-prior claim: centroid penalty - pooled penalty")
-    print("  measured against Var(E[b|v]), and as a fraction of the whole")
-    print("  blind term Var(b), which the corpus says is 1.0000 on a curve:")
+    print("  LEG 2: centroid penalty - cross-fitted pooled penalty")
+    print("  as a fraction of the oracle predictable variance Var(E[b|v]):")
     for r in rows:
-        print("    %-6s B=%-3d  leg2 %.6f vs Var(E[b|v]) %.6f (ratio %.4f)  "
-              "| fraction of Var(b) recovered %.4f  (corpus: 1.0000 on a "
-              "curve, 1 - fiber/Var(b) = %.4f off it)"
+        print("    %-6s B=%-3d  leg2 %.6f vs Var(E[b|v]) %.6f (ratio %.4f)"
               % (r["arm"], r["B"], r["leg2_centroid_to_pooled"],
                  r["leg2_predicted_VarEbv"],
-                 r["leg2_centroid_to_pooled"] / r["leg2_predicted_VarEbv"],
-                 r["fraction_of_blind_recovered"],
-                 1.0 - r["oracle_fiber"] / r["oracle_total_blind_Var_b"]))
+                 r["fraction_of_predictable_variance_recovered"]))
     cur = [r for r in rows if r["arm"] == "curve"]
-    monoB = all(cur[i]["fraction_of_blind_recovered"]
-                >= cur[i - 1]["fraction_of_blind_recovered"] - 1e-3
+    monoB = all(cur[i]["fraction_of_predictable_variance_recovered"]
+                >= cur[i - 1]["fraction_of_predictable_variance_recovered"] - 1e-3
                 for i in range(1, len(cur)))
-    print("  C-attenuation: recovered fraction on the curve rises "
+    print("  C-attenuation: recovered predictable fraction on the curve rises "
           "monotonically with B -> %s" % ("PASS" if monoB else "FAIL"))
     out["T4_attenuation_monotone"] = bool(monoB)
     return c4, monoB
@@ -1127,10 +1147,10 @@ def test5(rng, out):
     print("  C5 POSITIVE CONTROL: the mean-channel discriminator separates P "
           "from a prior with a DIFFERENT L law -> %s (|t| = %.1f)"
           % ("FIRED" if c5 else "DEAD", abs(tPR)))
-    print("  CLAIM: it must NOT separate P from Q (same visible pair, %.2fx "
-          "risk difference): |t| = %.2f -> %s"
+    print("  MEAN-CHANNEL FINITE-DEPTH CHECK: P and Q have the same limiting visible "
+          "pair and %.2fx risk difference; at this depth |t| = %.2f -> %s"
           % (riskQ / riskP, abs(tPQ),
-             "invisible as claimed" if abs(tPQ) < 3.0 else "SEPARATED"))
+             "not separated" if abs(tPQ) < 3.0 else "separated by the predicted Fejer remainder"))
     print("  BUT the fourth-order ensemble observable separates P from Q at "
           "|t| = %.1f" % abs(qPQ))
 
@@ -1151,7 +1171,7 @@ def test5(rng, out):
                  "fourth_channel_R": float(qR.mean()),
                  "t_fourth_PQ": qPQ, "t_fourth_PR": qPR,
                  "C5_control_fired": bool(c5),
-                 "mean_channel_blind_as_claimed": bool(abs(tPQ) < 3.0)}
+                 "mean_channel_not_separated_at_this_depth": bool(abs(tPQ) < 3.0)}
     return c5, abs(tPQ) < 3.0, abs(qPQ)
 
 
@@ -1197,7 +1217,7 @@ def main(argv=None):
               and c5_fired)
     out["ALL_CONTROLS_FIRED"] = ok
     out["T2_channels_separating"] = n_sep
-    out["T5_mean_channel_blind"] = bool(t5_blind)
+    out["T5_mean_channel_not_separated_at_this_depth"] = bool(t5_blind)
     out["T5_fourth_order_t"] = float(t5_fourth)
     out["READ_THE_TEST"] = ok
     print("")
