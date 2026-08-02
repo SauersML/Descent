@@ -417,6 +417,38 @@ check(
 )
 
 check(
+    id="islandFstFiniteDemes-is-the-finite-form",
+    fqn="Calibrator.PopulationGeneticsFoundations.islandFstFiniteDemes",
+    claim="POSITIVE CONTROL for islandModelFst-finite-demes: the corpus's "
+          "finite-deme form really is 1/(1+4Nm(d/(d-1))^2)",
+    model_lean="d demes of size Ne, symmetric migration m, mutation negligible",
+    model_ref="same, computed independently in refs",
+    reference="refs.island_fst_finite_demes",
+    grid=grid(Ne=[1000.0], m=[1e-4, 1e-3, 1e-2], d=[2, 5, 10, 40]),
+    lean=lambda D, Ne, m, d: D["islandFstFiniteDemes"](Ne, m, float(d)),
+    ref=lambda Ne, m, d: refs.island_fst_finite_demes(Ne, m, d),
+    note=(
+        "This exists so that `islandModelFst-finite-demes` failing is "
+        "INTERPRETABLE, and it is the same omission that let the F_ST "
+        "convention claim survive for three passes: a check that reports a "
+        "disagreement cannot say WHICH side is wrong unless something pins "
+        "the other side. Until now the finite-deme reference was unpinned, so "
+        "'the corpus limit disagrees with refs by 74.5% at d=2' was equally "
+        "consistent with refs.island_fst_finite_demes being wrong.\n\n"
+        "With the pair, one passing to machine precision while the other "
+        "differs localises the disagreement to the infinite-island limit, "
+        "which is the thing actually being claimed about."
+    ),
+    canfail_clause=(
+        "shares the grid of islandModelFst-finite-demes deliberately, so the "
+        "two are evaluated at identical cells and the comparison between them "
+        "is exact rather than approximate. d=2 must stay: it is where the "
+        "correction factor is largest (4x) and so where a sign or reciprocal "
+        "error in the correction would show up first."
+    ),
+)
+
+check(
     id="fstIslandMultiplicative-exact-fixedpoint",
     fqn="Calibrator.PortabilityDrift.fstIslandMultiplicativeEquilibrium",
     claim="the closed form is the exact fixed point of its own step function",
@@ -521,6 +553,21 @@ def _ss_length_with_sigma(m: float, mu: float, sigma_sq: float) -> float:
     return math.sqrt(m * sigma_sq / (2.0 * mu))
 
 
+def _ss_lattice_meeting_time(d: float, D: float, sigma_sq: float, m: float) -> float:
+    """Expected time for two lineages d demes apart to first share a deme, on a
+    lattice of D demes.
+
+    MODEL: 1D stepping stone, D demes, symmetric nearest-neighbour migration m,
+    dispersal variance sigma^2.  The separation is a random walk absorbed at 0
+    and D, so the expected absorption time is d(D-d)/(2 sigma^2 m).
+
+    Note what the corpus's `steppingStoneCoalescenceTime` is instead: this
+    divided by (D-d).  That is not a small correction -- at d=1, D=256 the
+    corpus value is 5.0 against a measured 1344.2.
+    """
+    return d * (D - d) / (2.0 * sigma_sq * m)
+
+
 check(
     id="steppingStoneLength-missing-sigma-squared",
     fqn="Calibrator.PopulationGeneticsFoundations.steppingStoneCharacteristicLength",
@@ -581,6 +628,43 @@ check(
     ),
 )
 
+
+check(
+    id="steppingStoneMeetingTime-lattice-form",
+    fqn="Calibrator.DemographicHistory.steppingStoneMeetingTimeOnLattice",
+    claim="the lattice meeting time is d(D-d)/(2 sigma^2 m), and the corpus's "
+          "per-deme steppingStoneCoalescenceTime is that divided by (D-d)",
+    model_lean="random walk on D demes absorbed at 0 and D",
+    model_ref="same, computed independently in refs",
+    reference="_ss_lattice_meeting_time",
+    grid=grid(d=[1.0, 8.0, 64.0], D=[256.0], sigma_sq=[1.0, 4.0], m=[1e-2, 0.1]),
+    lean=lambda D_, d, D, sigma_sq, m: D_["steppingStoneMeetingTimeOnLattice"](
+        d, D, sigma_sq, m
+    ),
+    ref=lambda d, D, sigma_sq, m: _ss_lattice_meeting_time(d, D, sigma_sq, m),
+    note=(
+        "Added because this definition had NO simulation behind it at all "
+        "while carrying a numerical claim: `steppingStoneCoalescenceTime` "
+        "gives 5.0 at d=1, D=256 where the measured meeting time is 1344.2, a "
+        "factor of (D-d) = 255. That factor was recorded in a docstring and "
+        "nowhere else.\n\n"
+        "Why no consumer-level check could have caught the original defect, "
+        "which is the reason it needs its OWN check rather than inheriting "
+        "coverage from demoSteppingStoneFst: the only consumer feeds it to "
+        "`coalFst _ Ne` with the PER-DEME size rather than the metapopulation "
+        "size D*Ne, so the lattice size cancels between the two arguments and "
+        "the F_ST comes out right to 4.4% anyway. Two compensating omissions "
+        "in a ratio are indistinguishable from a correct ratio from outside, "
+        "and only a check on the meeting time ITSELF can separate them."
+    ),
+    canfail_clause=(
+        "d must range over both ends: at d << D the (D-d) factor is nearly "
+        "constant at D and could be absorbed by a refitted m*sigma^2, so a "
+        "small-d-only grid could not distinguish the lattice form from the "
+        "per-deme one. d = 64 against D = 256 makes (D-d) move by 25%, which "
+        "no rescaling of m or sigma^2 can follow."
+    ),
+)
 
 check(
     id="demoSteppingStoneFst-exact",
