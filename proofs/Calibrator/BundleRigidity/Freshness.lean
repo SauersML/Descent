@@ -1,4 +1,5 @@
 import Mathlib
+import Calibrator.BundleRigidity.Realizability
 
 /-!
 # Effective independence dimension and the master decay bound
@@ -85,22 +86,17 @@ genuine conditional law requires the disintegration machinery, which this module
 carry. What the module *does* prove is that the step bound implies the master bound —
 which is the whole of the telescope, and the part that was worth checking.
 
-## A principle worth recording: continuation kills identities, not inequalities
+## Analytic realization is a separate obligation
 
-An earlier obstruction ruled out exact operator identities across sheets of a single
-analytic curve — equal constant weights, equal maps. Those are **closed** conditions, and
-analytic continuation violates them.
+The former slogan “continuation kills identities, not inequalities” is too coarse.
+Analytic continuation constrains the entire labelled configuration wherever a connected
+extension exists. It supplies uniqueness, not global existence: positivity, real-root
+bounds, collision-free labelling, and exact window coverage must still be checked.
 
-The M5 mechanism needs only **open** conditions: strict containment of images, a fixed
-point in an open gap, a strict ratio inequality. **Open conditions coexist with
-continuation.** That is why M5 is realizable despite the obstruction, and it is a more
-useful statement than either the obstruction or any particular construction: it says which
-side of the closed/open line a proposed mechanism must land on to survive continuation.
-
-An explicit 8-atom analytic family realizes M5: atoms `±√(1 ± v t)` at mass `P/4` and
-`±√(1 ± w t)` at mass `(1-P)/4`, so the modulus law is `P·δ_{v} + (1-P)·δ_{w}` with
-exactly two values and no stray branches, which is what makes the sheet-operator equations
-the *complete* bundle equations.
+`symmetric_block_moments` proves the finite moment cancellation behind the
+four-atom-per-block construction, while `symmetric_atoms_have_modulus` exposes its actual
+domain `0 ≤ w ≤ 1`. Those synthetic atoms provide a useful operator stress test, but are
+not automatically a Hardy--Weinberg genotype family.
 
 **This does not reopen our own case.** The genotype family has more than two modulus
 values, its cycle variety is empty, and M5 is unavailable for two independent reasons: the

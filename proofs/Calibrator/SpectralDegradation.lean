@@ -1,8 +1,10 @@
 import Mathlib.Data.Fin.VecNotation
 import Mathlib.Algebra.BigOperators.Fin
 import Mathlib.Tactic.FieldSimp
+import Mathlib.Tactic.FinCases
 import Mathlib.Tactic.Linarith
 import Mathlib.Tactic.Ring
+import Calibrator.ReversibleMarkovSpectrum
 
 namespace Calibrator
 
@@ -29,7 +31,7 @@ control of boundary terms; bounded variation alone does not silently provide all
 -/
 
 /-- Second-order spectral data for a finite family of frequency bands. -/
-structure FiniteSpectralModel (Band : Type*) [Fintype Band] where
+structure FiniteSpectralModel (Band : Type*) where
   featureSpectrum : Band → ℝ
   crossSpectrum : Band → ℝ
   targetPower : Band → ℝ
@@ -51,10 +53,21 @@ noncomputable def risk (P : FiniteSpectralModel Band) (readout : Band → ℝ) :
 /-- Directed degradation: excess target risk incurred by transporting the source-optimal
 readout instead of refitting the target-optimal readout. -/
 noncomputable def degradation (source target : FiniteSpectralModel Band) : ℝ :=
-  target.risk source.optimalReadout - target.risk target.optimalReadout
+  risk target (optimalReadout source) - risk target (optimalReadout target)
+
+/-- The bandwise density of degradation. This vector is the exact finite analogue of the
+degradation measure in a stationary spectral model. -/
+noncomputable def degradationProfile (source target : FiniteSpectralModel Band)
+    (b : Band) : ℝ :=
+  (optimalReadout source b - optimalReadout target b) ^ 2 * target.featureSpectrum b
+
+/-- Degradation for an arbitrary task-specific band weighting. -/
+noncomputable def taskDegradation (source target : FiniteSpectralModel Band)
+    (taskWeight : Band → ℝ) : ℝ :=
+  ∑ b, taskWeight b * degradationProfile source target b
 
 theorem crossSpectrum_eq_mul_optimalReadout (P : FiniteSpectralModel Band) (b : Band) :
-    P.crossSpectrum b = P.featureSpectrum b * P.optimalReadout b := by
+    P.crossSpectrum b = P.featureSpectrum b * optimalReadout P b := by
   unfold optimalReadout
   field_simp [ne_of_gt (P.featureSpectrum_pos b)]
 
@@ -62,34 +75,117 @@ theorem crossSpectrum_eq_mul_optimalReadout (P : FiniteSpectralModel Band) (b : 
 argument: this is completion of the target quadratic risk around its own optimum. -/
 theorem degradation_eq_weighted_readout_distance
     (source target : FiniteSpectralModel Band) :
-    source.degradation target =
-      ∑ b, (source.optimalReadout b - target.optimalReadout b) ^ 2 *
+    degradation source target =
+      ∑ b, (optimalReadout source b - optimalReadout target b) ^ 2 *
         target.featureSpectrum b := by
   unfold degradation risk
   rw [← Finset.sum_sub_distrib]
   refine Finset.sum_congr rfl fun b _ => ?_
-  rw [target.crossSpectrum_eq_mul_optimalReadout b]
+  rw [crossSpectrum_eq_mul_optimalReadout target b]
   ring
+
+/-- Ordinary degradation is the total mass of the degradation profile. -/
+theorem degradation_eq_sum_profile (source target : FiniteSpectralModel Band) :
+    degradation source target = ∑ b, degradationProfile source target b := by
+  rw [degradation_eq_weighted_readout_distance]
+  rfl
 
 /-- Transport degradation is non-negative. -/
 theorem degradation_nonneg (source target : FiniteSpectralModel Band) :
-    0 ≤ source.degradation target := by
+    0 ≤ degradation source target := by
   rw [degradation_eq_weighted_readout_distance]
   exact Finset.sum_nonneg fun b _ =>
     mul_nonneg (sq_nonneg _) (le_of_lt (target.featureSpectrum_pos b))
 
 /-- On the diagonal there is no transport degradation. -/
-@[simp] theorem degradation_self (P : FiniteSpectralModel Band) : P.degradation P = 0 := by
+@[simp] theorem degradation_self (P : FiniteSpectralModel Band) : degradation P P = 0 := by
   rw [degradation_eq_weighted_readout_distance]
   simp
 
 /-- The same degradation restricted to a selected set of frequency bands. -/
 noncomputable def bandDegradation (source target : FiniteSpectralModel Band)
     (bands : Finset Band) : ℝ :=
-  ∑ b ∈ bands, (source.optimalReadout b - target.optimalReadout b) ^ 2 *
+  ∑ b ∈ bands, (optimalReadout source b - optimalReadout target b) ^ 2 *
     target.featureSpectrum b
 
+/-- **Exact portability criterion.** Transport costs nothing exactly when the source and
+target regression ratios `c/σ` agree in every frequency band. Raw feature spectra may
+differ: the invariant relevant to this linear task is the optimal readout, not a scalar
+distance between populations. -/
+theorem degradation_eq_zero_iff (source target : FiniteSpectralModel Band) :
+    degradation source target = 0 ↔
+      ∀ b, optimalReadout source b = optimalReadout target b := by
+  classical
+  rw [degradation_eq_weighted_readout_distance]
+  constructor
+  · intro hsum b
+    have hnonneg : ∀ i ∈ (Finset.univ : Finset Band),
+        0 ≤ (optimalReadout source i - optimalReadout target i) ^ 2 *
+          target.featureSpectrum i := by
+      intro i _
+      exact mul_nonneg (sq_nonneg _) (le_of_lt (target.featureSpectrum_pos i))
+    have hle := Finset.single_le_sum hnonneg (Finset.mem_univ b)
+    rw [hsum] at hle
+    have hterm_nonneg := hnonneg b (Finset.mem_univ b)
+    have hterm : (optimalReadout source b - optimalReadout target b) ^ 2 *
+        target.featureSpectrum b = 0 := le_antisymm hle hterm_nonneg
+    rcases mul_eq_zero.mp hterm with hsquare | hspectrum
+    · exact sub_eq_zero.mp (sq_eq_zero_iff.mp hsquare)
+    · exact False.elim ((ne_of_gt (target.featureSpectrum_pos b)) hspectrum)
+  · intro hreadout
+    apply Finset.sum_eq_zero
+    intro b _
+    simp [hreadout b]
+
+/-- **Complete finite-band invariant.** Two transported pairs have identical degradation
+for every band-weighted linear task exactly when their degradation profiles agree in every
+band. Thus the full object is a vector (a measure in the continuum), not a scalar. -/
+theorem taskDegradation_eq_forall_iff_profile_eq
+    (source₁ target₁ source₂ target₂ : FiniteSpectralModel Band) :
+    (∀ taskWeight, taskDegradation source₁ target₁ taskWeight =
+        taskDegradation source₂ target₂ taskWeight) ↔
+      ∀ b, degradationProfile source₁ target₁ b =
+        degradationProfile source₂ target₂ b := by
+  classical
+  constructor
+  · intro hall b
+    simpa [taskDegradation] using hall (fun i => if i = b then 1 else 0)
+  · intro hprofile taskWeight
+    unfold taskDegradation
+    apply Finset.sum_congr rfl
+    intro b _
+    rw [hprofile b]
+
 end FiniteSpectralModel
+
+/-! ## Normalization can reverse a portability ranking -/
+
+/-- **Exact normalization-reversal window.** Let `Dᵢ > 0` be raw degradation and
+`Qᵢ > 0` the evaluation-side variance used to normalize it. Pair `1` is worse in raw
+degradation but better after normalization exactly when
+
+`1 < D₁ / D₂ < Q₁ / Q₂`.
+
+The right side uses the actual denominators `Q₁,Q₂`. Replacing them by ratios to separate
+pair-specific baselines requires an additional equality of those baselines. -/
+theorem normalized_degradation_reversal_iff
+    (D₁ D₂ Q₁ Q₂ : ℝ) (hD₂ : 0 < D₂)
+    (hQ₁ : 0 < Q₁) (hQ₂ : 0 < Q₂) :
+    (D₂ < D₁ ∧ D₁ / Q₁ < D₂ / Q₂) ↔
+      (1 < D₁ / D₂ ∧ D₁ / D₂ < Q₁ / Q₂) := by
+  constructor
+  · rintro ⟨hraw, hnorm⟩
+    constructor
+    · exact (one_lt_div hD₂).2 hraw
+    · rw [div_lt_div_iff₀ hD₂ hQ₂]
+      rw [div_lt_div_iff₀ hQ₁ hQ₂] at hnorm
+      nlinarith
+  · rintro ⟨hratio, hwindow⟩
+    constructor
+    · exact (one_lt_div hD₂).1 hratio
+    · rw [div_lt_div_iff₀ hQ₁ hQ₂]
+      rw [div_lt_div_iff₀ hD₂ hQ₂] at hwindow
+      nlinarith
 
 /-! ## Scalar degradation cannot represent reversing tasks -/
 
@@ -148,7 +244,7 @@ theorem twoBand_reversal_values (a : ℝ) :
     FiniteSpectralModel.bandDegradation twoBandBaseline (twoBandLowShift a) {1} = 0 ∧
     FiniteSpectralModel.bandDegradation twoBandBaseline (twoBandHighShift a) {1} = a ^ 2 := by
   simp [FiniteSpectralModel.bandDegradation, FiniteSpectralModel.optimalReadout,
-    twoBandBaseline, twoBandLowShift, twoBandHighShift]
+    twoBandBaseline]
 
 /-- **No task-independent scalar ranks the two genomic-band shifts.**  For any nonzero
 shift, pair 1 is strictly worse on the low-frequency task and pair 2 is strictly worse on

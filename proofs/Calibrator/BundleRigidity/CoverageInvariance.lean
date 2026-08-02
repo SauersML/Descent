@@ -1,27 +1,14 @@
 import Mathlib
 
 /-!
-# Coverage invariance under coupling, and slotwise peeling
+# Support-level coverage invariance and slotwise bookkeeping
 
 This module is **self-contained: it imports only Mathlib**.
 
-## The theorem
+This module proves three finite/set-theoretic ingredients. It does not prove coupled
+injectivity or a singular-value bound.
 
-Let the base family be peelable with quantitative constant `C_*`. Let the coupling `Π` be
-**arbitrary**, subject only to a charging floor:
-
-```
-P( Xᵢ = a_j(tᵢ) | X_{-i}, fibers )  ≥  η > 0    a.s.
-```
-
-Then the coupled `k`-point modulus map is **injective for every `k`**, with
-`σ_min ≥ (η / C_*)^k`.
-
-No perturbation theory, no band, no conditional independence, no smallness hypothesis, and
-no restriction on `k`. That is what makes this the strongest available statement of the
-coupled case.
-
-## Why it is true: coverage is a property of supports
+## Coverage is a property of supports
 
 **Coverage — which value cells are charged from which fiber tuples — is determined by the
 supports alone.** It does not see the coupling's probabilities, only which tuples are
@@ -36,69 +23,16 @@ the first is a congruence and the second is an extensionality — and their shal
 the result: coupling-invariance of coverage is not an estimate that could degrade, it is an
 identity that either holds or fails with the support.
 
-Once coverage is the product's, the peeling lemma runs **slotwise**: peel slot `1`, whose
-top singly-covered band is singly covered in `t₁` uniformly in the other slots, so the
-pullback test function
+`slot_uniform` shows that single coverage in one coordinate is uniform over spectator
+coordinates when the support is a product. `sigmaMin_pow_le` is only the algebraic
+iteration of an explicitly assumed per-slot inequality. The missing mathematical bridge
+is still substantial: a support identity does not itself supply a peeling estimate,
+conditional recursion, transfinite exhaustion, or a smallest-singular-value statement.
 
-```
-f(v₁, v_rest)  =  h(c(v₁)) · χ(v₁) · ψ(v_rest)
-```
-
-is legal for **every** spectator function `ψ`, and the peeling lemma applies verbatim with
-its constant degraded by `η`. Transfinite exhaustion clears slot `1`; recurse on the
-conditional `(k-1)`-slot kernel, which again satisfies the hypothesis. The `k` factors of
-`η / C_*` compound, which is `sigmaMin_pow_le`.
-
-## The pre-registered joint, attacked
-
-The pre-registered concern is that **the transfinite step uses uniformity of the
-singly-covered band across the other slots**, and that a coupling-dependent coverage
-pathology **at limit ordinals** is where a crack would be. That is exactly the shape of the
-enumerate-and-assert-completeness failure that sank the single-modulus classification, so
-it deserved a direct attack rather than a downstream formalization. Two findings, and both
-go the same way.
-
-**Finding 1 — the coinductive core has no limit ordinals, so the crack has no site *there*.**
-The core is definable coinductively, as the union of all peel-stable subsets, i.e. the
-greatest post-fixed point, and peeling is monotone (`Coverage.peel_mono`, proved). That
-object has no successor step, no limit step, and no stabilization lemma, so a pathology
-located specifically at limit ordinals cannot be a pathology of *it*.
-
-**This finding is weaker than it first looks, and the gap is stated rather than
-papered over.** The claim that the coinductive core **equals** the limit of the transfinite
-decreasing iteration is Knaster–Tarski, and **it is not proved here** — it is carried as
-`coincidesWithTransfiniteIteration` below. Without that equality what is established is
-only that *an* object with the right fixed-point property is definable without ordinals,
-**not** that the source's transfinitely-defined core is that object. So this dissolves the
-concern for the formulation used in `Coverage`, and it does **not** by itself discharge the
-concern for the source's formulation. Anyone citing it for the latter is citing more than
-was shown.
-
-**Finding 2 — uniformity is a consequence, not an assumption.** In the coinductive
-formulation uniformity is needed wherever the peeling lemma is applied, not specially at
-limits. And under a product support it is **free**: if `v₁` is singly covered in slot `1`,
-then every charged tuple has the same slot-`1` coordinate, whatever the spectator values,
-because the spectator constraints do not interact with slot `1` at all. That is
-`slot_uniform`, and its proof is one appeal to `Set.Subsingleton`.
-
-So the charging floor does **double duty**: it makes coverage coupling-invariant *and* it
-supplies the uniformity the transfinite step was asked to assume. The two are not
-independent hypotheses, which is why they fail together.
-
-## Sharpness: `η = 0` is exactly the boundary
-
-The hypothesis is **not a convenience**. The modulus-copy coupling is precisely `η = 0`,
-and there the kernel is **infinite-dimensional even over rigid base families**. So there
-are witnesses on both sides of `η > 0`: rigidity for every positive floor, total collapse
-at zero. The bound `σ_min ≥ (η/C_*)^k` degenerates to `0` at `η = 0`, which is the correct
-behaviour rather than a defect of the estimate.
-
-## Attribution
-
-The peeling argument is the classical lightning-bolt argument (Diliberto–Straus,
-Marshall–O'Farrell, Ismailov). The slotwise recursion with a spectator argument is the new
-structure here; the observation that coverage depends only on supports is elementary and
-is stated because everything rests on it.
+In genetics this separates two questions that LD summaries often conflate. A positive
+joint genotype-cell floor preserves which multilocus configurations are possible; it does
+not quantify how stably their frequencies can be recovered. Pairwise `r²` alone implies
+neither a joint floor nor stable inversion.
 -/
 
 namespace Calibrator.BundleRigidity
@@ -125,11 +59,10 @@ theorem charged_eq_of_support_eq (curve : Fin d → T → ℝ) {Sup Sup' : Set (
     chargedTuples curve Sup v = chargedTuples curve Sup' v := by
   rw [chargedTuples, chargedTuples, h]
 
-/-- **The charging floor makes the support the full product.**
+/-- Full product inclusion together with the obvious reverse inclusion identifies support.
 
-`hsub` says the support respects the slot supports; `hfull` is what `η > 0` delivers —
-every product tuple is possible. Together the support *is* the product, so by
-`charged_eq_of_support_eq` the coverage structure is the independent product's. -/
+For a concrete finite probability mass function, a uniform positive cell floor is one way
+to prove `hfull`; this set-theoretic theorem does not infer it from a conditional law. -/
 theorem support_eq_product {Sup : Set (Fin k → T)} {S : Fin k → Set T}
     (hsub : ∀ t ∈ Sup, ∀ i, t i ∈ S i)
     (hfull : ∀ t : Fin k → T, (∀ i, t i ∈ S i) → t ∈ Sup) :
@@ -176,14 +109,13 @@ theorem chargedTuples_slot_subsingleton (curve : Fin d → T → ℝ) {S : Fin k
 
 /-! ## The slotwise constant compounds -/
 
-/-- **The `k` slots contribute `k` factors of `η / C_*`.**
+/-- An explicitly assumed per-slot recurrence compounds to a `k`-fold product.
 
 Each peeled slot degrades the quantitative constant by one factor, so after `k` slots the
 smallest singular value is bounded below by `(η / C_*)^k`. Proved by induction on the
 number of slots; `hstep` is the per-slot degradation and `hbase` the normalization.
 
-At `η = 0` the bound is `0`, which is correct rather than vacuous: the modulus-copy
-coupling really does have an infinite-dimensional kernel. -/
+No claim is made here that coverage supplies `hstep`; it is a separate analytic input. -/
 theorem sigmaMin_pow_le (η C : ℝ) (hη : 0 < η) (hC : 0 < C) (σ : ℕ → ℝ)
     (hbase : 1 ≤ σ 0) (hstep : ∀ n, (η / C) * σ n ≤ σ (n + 1)) (m : ℕ) :
     (η / C) ^ m ≤ σ m := by
@@ -195,43 +127,9 @@ theorem sigmaMin_pow_le (η C : ℝ) (hη : 0 < η) (hC : 0 < C) (σ : ℕ → �
       _ ≤ (η / C) * σ n := mul_le_mul_of_nonneg_left ih (le_of_lt hr)
       _ ≤ σ (n + 1) := hstep n
 
-/-- Injectivity follows from a strictly positive lower bound on the smallest singular
-value: a map with `σ_min > 0` separates points, and `(η/C_*)^k > 0` whenever `η > 0`. -/
+/-- The numerical lower-bound expression is positive when both constants are positive. -/
 theorem sigmaMin_pos (η C : ℝ) (hη : 0 < η) (hC : 0 < C) (m : ℕ) :
     0 < (η / C) ^ m :=
   pow_pos (div_pos hη hC) m
-
-/-! ## The hypotheses that are not proved here -/
-
-/-- The inputs of the coverage-invariance theorem that this module does not establish.
-
-They are named fields, not `sorry`s, so anything derived from them carries them in its
-type. Note what is **absent** from this list: uniformity across spectator slots is *not*
-here, because `slot_uniform` proves it, and stabilization is *not* here, because the
-coinductive core does not need it. -/
-structure CoupledPeelingHypotheses where
-  /-- The base family peels with a quantitative constant `C_*`. -/
-  basePeelable : Prop
-  /-- The charging floor `η > 0`, holding almost surely under the coupling. -/
-  chargingFloor : Prop
-  /-- The peeling lemma applied to one slot with spectator test functions attached,
-  degrading the constant by `η`. -/
-  slotwisePeeling : Prop
-  /-- After clearing a slot, the conditional `(k-1)`-slot kernel again satisfies the
-  charging floor, which is what licenses the recursion. -/
-  conditionalRecursion : Prop
-  /-- **The sharpness witness.** The modulus-copy coupling has `η = 0` and an
-  infinite-dimensional kernel even over a rigid base family, so `η > 0` is the exact
-  boundary rather than a convenience. -/
-  modulusCopyWitness : Prop
-  /-- **Knaster–Tarski, demoted from an assertion to an input.** That the coinductive core
-  coincides with the limit of the transfinite decreasing iteration. The module docstring
-  previously asserted this as established; it is not proved anywhere in this development,
-  and Finding 1 applies only to the coinductive formulation without it. -/
-  coincidesWithTransfiniteIteration : Prop
-  /-- **The headline bound is the source's, not this module's.** That the coupled
-  `k`-point modulus map is injective with `σ_min ≥ (η/C_*)^k`. What is proved here is the
-  bookkeeping (`sigmaMin_pow_le`) and the coverage invariance it rests on, not this. -/
-  coupledInjectivity : Prop
 
 end Calibrator.BundleRigidity

@@ -1,26 +1,17 @@
 import Mathlib
 
 /-!
-# Realizability: the moment identities are vacuous, and folds fix constants
+# Realizability: a conditional symmetric lift and a fold obstruction
 
 This module is **self-contained: it imports only Mathlib**.
 
-## The headline, which is a refutation of a plausible count
+This file isolates the finite algebra that is valid inside the proposed monodromy
+picture.  It does **not** assert the global analytic assembly theorem.  Analytic
+continuation gives uniqueness only after one has supplied a collision-free labelled
+configuration on a connected domain; it does not ensure that an arbitrary germ extends
+through the proposed visit pattern while retaining positive weights and real atoms.
 
-The naive count says a connected analytic family has "one free analytic function per sheet".
-**That is false.** The configuration germ — the distinct modulus values with pooled weights
-— is real-analytic, and an analytic function on an interval is determined by its
-restriction to *any* subinterval. So sheet `1`'s data determines the germ on its arc, hence
-on all of `T` by continuation, hence **every later sheet**. Realizable arrays are exactly
-the branch tuples of **one** germ read along **one** visit pattern.
-
-The earlier slogan "continuation kills identities, not inequalities" is **retired**. The
-precise form is: **continuation determines everything; what varies is only which germ and
-which visit pattern.** This module does not prove that theorem — it is analysis, and it is
-carried as named hypotheses in `RealizabilityHypotheses`. What it proves are the two
-elementary pieces that are fully finite.
-
-## Item 1: the general-`B` variance identity, and why it is quotable
+## The conditional symmetric lift
 
 Split block `b` into four atoms `±√(1 + w b)` and `±√(1 - w b)`, each at mass `q b / 4`.
 Then the mean vanishes by symmetry (`block_mean_zero`) and the variance is
@@ -29,60 +20,40 @@ Then the mean vanishes by symmetry (`block_mean_zero`) and the variance is
 ∑_b (q b / 4)·[ (1 + w b) + (1 + w b) + (1 - w b) + (1 - w b) ]  =  ∑_b q b  =  1
 ```
 
-**identically** — for every `B`, every choice of defining values `w`, and every weight
-vector `q` summing to one (`block_variance_one`). The `w` cancel in pairs before the sum is
-ever taken.
-
-The consequence is the quotable one and it is `moment_realizability_vacuous`:
-
-> **pointwise moment realizability is never a condition.**
-
-The entire content of realizability is the continuation relation plus boundary discipline.
-The moment constraints absorb themselves and constrain nothing. Anyone reporting a
-"moment obstruction" to realizability has found an artefact of their parameterization.
+The cancellation is exact, but the lift exists over the reals only when `0 ≤ w b ≤ 1`,
+and it is a probability law only when the pooled weights are positive and sum to one.
+Those conditions are explicit below.  Thus moments create no *additional* obstruction
+inside this admissible symmetric construction; they are not vacuous for an arbitrary
+family.
 
 This generalizes to all `B` the `B = 1` identity already recorded in `SingleModulus`
 (`fourAtom`), where the same cancellation appears as the fact that the mean identity holds
 for *every* `c` and the variance is insensitive to `c`.
 
-## Item 3: folds fix constants — an empirical wall reduced to a corollary
+## A local fold obstruction
 
 At a fold the two laps are the two branches of one square-root germ. With `τ = √(v₁ - v)`,
 the **difference** `(dataᵢ - dataᵢ₊₁)/(2τ)` must stay analytic at `v₁`, so in particular
 bounded. A constant numerator divided by `τ` blows up unless the numerator is zero
 (`eq_zero_of_bounded_by_linear`). Hence:
 
-> **two sheets carrying different constant weights violate the fold criterion
-> immediately**, and no visit pattern evades it (`folds_fix_constants`).
+> **two constant branches directly paired at a fold must carry the same value.**
 
 That is an earlier obstruction — originally found the hard way, by three failed hand
 constructions — reduced to a two-line corollary of boundedness. It is recorded here as a
 corollary precisely because a wall discovered empirically and a wall derived from a
 criterion are very different objects, and only the second tells you where the next wall is.
 
-## Problem 7: effective in `(d, D)`, and the negative half is the useful one
+Finally, `sin_has_many_zeros` supplies the elementary oscillation witness underlying a
+possible fixed-atom/unbounded-visit construction.  Turning those zeros into an exact
+eight-atom visit family still requires window, positivity, and no-extra-coverer checks;
+the theorem is deliberately named for what it proves.
 
-For polynomial or Nash data of degree `≤ D` the exceptional set is bounded by `C·d²·D²`,
-itemized by critical values, branch coincidences and cross-parameter resultants — so the
-block criterion is polynomial in the input degree and effective.
-
-**But there is no bound in `d` alone.** An `8`-atom family with defining value
-`v* + ε·sin(N t)` crosses the window edge `2N` times and produces at least `N` blocks:
-**fixed atom count, unbounded block count.** `crossings_unbounded_at_fixed_atom_count`
-records the counting half of that witness — the atom count does not appear in it, which is
-exactly the point.
-
-So the criterion is **semi-effective in `d` and effective in `(d, D)`**, and *any claim
-that a bounded atom count bounds the analysis is false.*
-
-## Attribution and scope
-
-The realizability theorem is the source's; only the elementary fragments are proved here.
-The reduction that actually matters downstream is their 3.2 — the moduli of a connected
-`r`-sheet system needs **one** function's worth of germ plus finite combinatorics rather
-than `r` functions — because it is what makes stratification by kernel dimension tractable,
-and that stratification says which perturbations of a panel change identifiability. That
-reduction is carried as a named field, not proved.
+Biologically, the construction is a synthetic standardized atomic phenotype law.  It is
+useful as a stress test for modulus identifiability, but it is not an HWE genotype fiber:
+Hardy--Weinberg has three dosage atoms whose probabilities are fixed by allele frequency.
+The distinction prevents an abstract realization from being reported as a realizable
+genetic panel.
 -/
 
 namespace Calibrator.BundleRigidity
@@ -123,16 +94,42 @@ theorem block_variance_one (q w A C : Fin B → ℝ)
   rw [Finset.sum_congr rfl hterm]
   exact hq
 
-/-- **Pointwise moment realizability is never a condition.**
+/-- Four copies of mass `q b / 4` have total mass one when the pooled weights do. -/
+theorem block_mass_one (q : Fin B → ℝ) (hq : ∑ b, q b = 1) :
+    ∑ b, 4 * (q b / 4) = 1 := by
+  convert hq using 1
+  refine Finset.sum_congr rfl fun b _ => ?_
+  ring
+
+/-- Outer and inner atom magnitudes used by the symmetric lift. -/
+noncomputable def outerAtom (w : ℝ) : ℝ := Real.sqrt (1 + w)
+noncomputable def innerAtom (w : ℝ) : ℝ := Real.sqrt (1 - w)
+
+theorem outerAtom_sq {w : ℝ} (hw : 0 ≤ w) : outerAtom w ^ 2 = 1 + w := by
+  exact Real.sq_sqrt (by linarith)
+
+theorem innerAtom_sq {w : ℝ} (hw : w ≤ 1) : innerAtom w ^ 2 = 1 - w := by
+  exact Real.sq_sqrt (by linarith)
+
+/-- Both atom pairs induce the intended modulus `|X² - 1| = w`. -/
+theorem symmetric_atoms_have_modulus {w : ℝ} (hw0 : 0 ≤ w) (hw1 : w ≤ 1) :
+    |outerAtom w ^ 2 - 1| = w ∧ |innerAtom w ^ 2 - 1| = w := by
+  rw [outerAtom_sq hw0, innerAtom_sq hw1]
+  constructor <;> simp [abs_of_nonneg hw0]
+
+/-- Positive pooled weights give positive mass to every one of the four split atoms. -/
+theorem split_atom_mass_pos (q : Fin B → ℝ) (hq : ∀ b, 0 < q b) (b : Fin B) :
+    0 < q b / 4 := div_pos (hq b) (by norm_num)
+
+/-- **The symmetric block lift satisfies both moment identities.**
 
 Both standardization identities hold *simultaneously and identically*: for every block
 count `B`, every vector of defining values `w`, and every weight vector `q` summing to one,
 the four-atom-per-block configuration has mean zero and variance one.
 
-There is no side condition to check and nothing to obstruct. The whole content of
-realizability lies in the continuation relation and the boundary discipline; the moment
-constraints absorb themselves. -/
-theorem moment_realizability_vacuous (q w A C : Fin B → ℝ)
+The hypotheses state the real-root conditions explicitly. Positivity of masses is a
+separate hypothesis when this algebra is packaged as a probability law. -/
+theorem symmetric_block_moments (q w A C : Fin B → ℝ)
     (hA : ∀ b, A b ^ 2 = 1 + w b) (hC : ∀ b, C b ^ 2 = 1 - w b)
     (hq : ∑ b, q b = 1) :
     (∑ b, (q b / 4) * (A b + (-A b) + C b + (-C b)) = 0) ∧
@@ -172,27 +169,23 @@ If two sheets carry constant data `c₁` and `c₂`, the fold relation forces
 `|c₁ - c₂| = O(τ)` near the fold, and a constant that is `O(τ)` is zero. So the two
 constants agree.
 
-**Two sheets with different constant weights therefore violate the criterion immediately,
-and no visit pattern evades it** — the argument never mentions the visit pattern. This is
-the earlier obstruction, found originally by three failed hand constructions, as a
-corollary. -/
+Two directly fold-paired constant branches therefore cannot have different weights. -/
 theorem folds_fix_constants (c₁ c₂ M δ : ℝ) (hM : 0 ≤ M) (hδ : 0 < δ)
     (hfold : ∀ τ : ℝ, 0 < τ → τ < δ → |c₁ - c₂| ≤ M * τ) : c₁ = c₂ := by
   have := eq_zero_of_bounded_by_linear (c₁ - c₂) M δ hM hδ hfold
   linarith [sub_eq_zero.mp this]
 
-/-! ## Problem 7: no bound in the atom count alone -/
+/-! ## The oscillation ingredient for visit-count witnesses -/
 
-/-- **Fixed atom count, unbounded block count.**
+/-- `sin (N t)` has at least `N + 1` explicitly exhibited distinct zeros.
 
 The witness family has a fixed atom count (`8`) and defining value `v* + ε·sin(N t)`, whose
 level crossings grow without bound in `N`. This lemma records the counting half: `sin(N t)`
 has at least `N + 1` distinct zeros, exhibited explicitly at `t = kπ/N`.
 
-**The atom count does not appear in the statement**, which is exactly the content: no
-function of `d` alone can bound the number of blocks. The block criterion is therefore
-semi-effective in `d`, and effective only in `(d, D)`. -/
-theorem crossings_unbounded_at_fixed_atom_count (N : ℕ) (hN : 0 < N) :
+This is the counting ingredient of a high-oscillation analytic construction, not by
+itself a theorem about exact coverage blocks. -/
+theorem sin_has_many_zeros (N : ℕ) (hN : 0 < N) :
     ∃ f : Fin (N + 1) → ℝ, Function.Injective f ∧
       ∀ k : Fin (N + 1), Real.sin ((N : ℝ) * f k) = 0 := by
   have hNne : (N : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr (Nat.pos_iff.mp hN).ne'
@@ -208,42 +201,5 @@ theorem crossings_unbounded_at_fixed_atom_count (N : ℕ) (hN : 0 < N) :
       field_simp
     rw [this]
     exact Real.sin_nat_mul_pi _
-
-/-! ## The analytic inputs -/
-
-/-- The realizability analysis this module does not carry, as named fields.
-
-Nothing here is a `sorry`. `configurationGermAnalytic` and `continuationDetermines` are the
-content of the headline theorem; `puiseuxFoldRelation` is the `ℤ/2` monodromy at a fold —
-the mean is analytic and the difference divided by `2τ` is analytic, so the second sheet's
-Puiseux coefficients are the sign-alternated coefficients of the first, checkable
-coefficient by coefficient. `boundaryDiscipline` is the remaining side condition once the
-moment constraints are known to be vacuous.
-
-`sheetModuliReduction` is their 3.2, and it is the item with real downstream value: the
-moduli of a connected `r`-sheet system reduce to one germ plus finite combinatorics rather
-than `r` independent functions, which is what makes stratification by kernel dimension
-tractable — and that stratification says which perturbations of a panel change
-identifiability.
-
-**`blockCollisionStrata` is audit point (AP-b)** and it is the one that touches this
-project: the sufficiency argument assumes a constant block pattern, so it is currently
-proved *off* the isolated strata where atoms merge. -/
-structure RealizabilityHypotheses where
-  /-- The configuration germ (distinct modulus values with pooled weights) is
-  real-analytic. -/
-  configurationGermAnalytic : Prop
-  /-- Sheet one's data determines the germ on its arc, hence everywhere by continuation. -/
-  continuationDetermines : Prop
-  /-- The `ℤ/2` Puiseux monodromy relating the two laps at a fold. -/
-  puiseuxFoldRelation : Prop
-  /-- The boundary discipline, which with continuation is the entire content of
-  realizability once the moment identities are known vacuous. -/
-  boundaryDiscipline : Prop
-  /-- **Their 3.2.** Connected `r`-sheet moduli reduce to one germ plus finite
-  combinatorics. The item with genuine downstream value. -/
-  sheetModuliReduction : Prop
-  /-- **AP-b.** Sufficiency is proved off the isolated strata where blocks collide. -/
-  blockCollisionStrata : Prop
 
 end Calibrator.BundleRigidity

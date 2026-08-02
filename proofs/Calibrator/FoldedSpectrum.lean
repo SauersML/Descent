@@ -1039,7 +1039,7 @@ cross-spectrum and controlled finite-window boundaries. Likewise, no
 claimed without the missing analytic and non-cancellation hypotheses.
 -/
 
-/-! ## 11. Two proved no-go theorems about summarizing degradation
+/-! ## 11. Finite-band degradation and its realizability boundary
 
 These two were removed once as "unproved coupling landscape claims" and are restored here
 because **they are proved, from explicit hypotheses, with no analytic input at all.** What
@@ -1047,8 +1047,10 @@ was correctly removed alongside them — the structures asserting an `n^β log n
 heavy-tail renewal rate and a Pisot classification — is not restored: those carried their
 conclusions as fields, and the objection to them was right. These two do not.
 
-The hypothesis of each is a *witness*, supplied by the caller. Neither theorem claims the
-witness exists; each says what follows if it does. That is the whole difference.
+The generic implication below is complemented by the concrete finite-band witness in
+`SpectralDegradation`. `taskDegradation_eq_forall_iff_profile_eq` proves that its complete
+finite invariant is a vector of band contributions. Geometric realizability of that
+abstract spectral witness remains a separate obligation.
 -/
 
 /-- A **family of degradation functionals**, indexed by the evaluation band a readout
@@ -1071,25 +1073,20 @@ number per population pair — however rescaled, and however the rescaling varie
 band — reproduces both orderings. Monotone maps preserve order, so a scalar summary forces
 every band to agree on the ranking.
 
-**Biologically:** portability degradation is not a scalar property of a population pair that
-different traits and metrics estimate with different noise. The reported cross-trait
-disagreement and metric-dependent trend reversal in the portability literature are
-structural, not defects of those studies.
+**Biologically, within the finite spectral model:** low-frequency ancestry structure and
+high-frequency local haplotype signal are independent portability axes. This motivates
+estimating a task-weighted degradation profile instead of calibrating every endpoint to one
+genetic-distance scalar.
 
 **On the witnesses, which have a history worth knowing.** The first reversal quadruple used
 compactly supported spectral bumps, and those were **withdrawn**: geometrically ergodic
 driving forces the symbol analytic in a strip, so compactly supported bumps are unrealizable
 by any geometric family, and the theorem as first witnessed was about objects that do not
-occur. It was then re-proved inside the *most constrained realizable class* — four corners
-sharing one configuration germ, all drivings two-state reversible chains with convex symbols
-— which is the strongest form available, since every larger class inherits the quadruple.
-A reader who meets the earlier bump-based witnesses elsewhere should know they were
-superseded rather than merely restated. **This module still supplies no witness itself**;
-the theorem here is the implication, and the antecedent is discharged in the geometric
-class, not here.
-
-The reversal is unrestricted only for **quadratic** tasks. For level-set tasks it collapses
-to two dimensions — see §12, which is the reconciliation. -/
+occur. The proposed replacement uses shared-germ two-state reversible chains. The exact
+mirror and endpoint laws for their Poisson kernels are proved in
+`ReversibleMarkovSpectrum`; an explicit compatible cross-spectrum and the weighted
+reversal inequalities have not yet been proved. The geometric reversal therefore remains
+open. -/
 theorem no_scalar_summary_of_reversal {Pair : Type*} (F : DegradationFamily Pair)
     (p q : Pair) (k l : ℕ)
     (hk : F.deg k p < F.deg k q) (hl : F.deg l q < F.deg l p) :
@@ -1120,11 +1117,9 @@ theorem no_counting_functional {Coupling : Type*} (count gain : Coupling → ℝ
 
 /-! ## 12. The observable formula, and the two-dimensional collapse for threshold metrics
 
-### 12a. THE FORMULA A METHOD CAN ACTUALLY EVALUATE
+### 12a. A certificate interface for an observable approximation
 
-In the **small-signal regime** — the readout explains only a small fraction of target
-variance, which is the regime every polygenic readout is in — the exact degradation identity
-reduces to
+The proposed small-signal analysis would reduce the exact degradation identity to
 
 `DEG = (1 + O(ε)) · (v_w'/2π) · ∫ |β(s)|² [ σ_g(s)/v_w − σ_g'(s)/v_w' ]² ds`
 
@@ -1139,18 +1134,16 @@ that remain are
   germ-plus-marginal integral computable from the germ and target-side marginal fiber
   statistics.
 
-**No target outcome data appears.** In genetic terms: **transfer loss is predictable from
-target-side genotypes without target phenotypes.** That is a design statement rather than an
-explanatory one, and it is what the ceiling and threshold results could not give — those say
-when a normal approximation is safe; this says how much accuracy is lost, and lets it be
-computed *before* outcomes are collected.
+If this approximation is derived under a shared outcome mechanism, no target outcome data
+appears at leading order. That derivation is not present here. `ObservableDegradation`
+stores the relative-error inequality as an input and proves its usable two-sided bracket;
+it must not be cited as proving that genotype marginals alone predict transfer loss.
 -/
 
 /-- **The small-signal observable formula**, with its relative error explicit.
 
-`predicted` is the band-weighted L² distance between SNR spectra — computable from source
-data plus target-side *marginals* only. `smallSignal` is `ε`. The identity is an
-approximation with a stated relative error, not an equality, and `accuracy` says so. -/
+`predicted` is a proposed approximation and `smallSignal` is `ε`. The field `accuracy` is
+the substantive analytical assumption; the theorem below is its interval consequence. -/
 structure ObservableDegradation where
   /-- The true degradation. -/
   degradation : ℝ
@@ -1179,29 +1172,20 @@ theorem degradation_bracket :
 
 end ObservableDegradation
 
-/-! ### 12b. THE LEVEL-SET COLLAPSE: threshold metrics live in exactly two dimensions
+/-! ### 12b. A two-coordinate interface for Gaussian level-set metrics
 
-The reversal theorem of §11 says degradation has no scalar summary. **That is true for
-quadratic tasks and false for threshold tasks, and the difference is the reconciliation.**
-
-In the Gaussian layer, *every* level-set functional — the mass of any super-level set of the
-readout above any quantile, any agreement or overlap probability between readout and target
-exceedances — is a function of exactly **two** numbers:
+For a fully standardized jointly Gaussian readout/target pair, a specified exceedance
+probability can often be expressed using predictor variance and correlation. The exact
+coordinates also depend on which raw or quantile thresholds and baseline variances are held
+fixed. This module therefore defines the factorization as a predicate; it does not prove
+that every metric satisfies it.
 
 * the **correlation drop**, and
 * the **variance ratio `V`** of the transferred readout.
 
-A Gaussian pair enters any exceedance probability only through its variance and its
-correlation, so the level-set degradation cone is **exactly two-dimensional**. This is a
-genuine collapse from infinite dimension, not an approximation to one.
-
-**The consequence for the published finding that precision and recall behave qualitatively
-differently with genetic distance:** threshold-based metrics cannot exhibit the full richness
-of the reversal, and reversals *among* them occur **if and only if** the two coordinates
-order oppositely. So that finding is not "metrics differ" — it is a two-dimensional
-phenomenon with named coordinates, and which way it goes is decidable from those two numbers.
-
-Quadratic tasks: infinite-dimensional. Level-set tasks: exactly two-dimensional. -/
+The two theorems below establish only the consequences of an explicit factorization and
+coordinatewise monotonicity. They give a useful method interface once the Gaussian
+calculation for a named metric has supplied those hypotheses. -/
 
 /-- The two coordinates a Gaussian level-set functional can see. -/
 structure LevelSetCoordinates where
@@ -1246,7 +1230,7 @@ theorem no_levelSet_reversal_of_aligned_coordinates {Pair : Type*}
   rw [hg p, hg q]
   exact hmono _ _ hcorr hvar
 
-/-! ### 12c. The normalization window, exactly
+/-! ### 12c. The normalization window
 
 Raw and normalized degradation order two pairs oppositely **if and only if**
 
@@ -1255,37 +1239,16 @@ Raw and normalized degradation order two pairs oppositely **if and only if**
 — that is, precisely when the more-degraded pair carries proportionally more
 evaluation-side readout variance. Outside that window the two comparisons agree.
 
-This is a complete characterisation rather than a caution: it says exactly when a raw and a
-normalized comparison can be trusted to agree, and it is checkable from four numbers. -/
-theorem normalization_reverses_iff (d₁ d₂ v₁ v₂ : ℝ)
-    (hd₂ : 0 < d₂) (hv₁ : 0 < v₁) (hv₂ : 0 < v₂) :
-    (d₂ < d₁ ∧ d₁ / v₁ < d₂ / v₂) ↔ (1 < d₁ / d₂ ∧ d₁ / d₂ < v₁ / v₂) := by
-  have hswap : d₂ * v₁ = v₁ * d₂ := mul_comm d₂ v₁
-  constructor
-  · rintro ⟨hraw, hnorm⟩
-    refine ⟨(lt_div_iff₀ hd₂).mpr (by linarith), ?_⟩
-    rw [div_lt_div_iff₀ hd₂ hv₂]
-    rw [div_lt_div_iff₀ hv₁ hv₂] at hnorm
-    linarith
-  · rintro ⟨hratio, hwindow⟩
-    have hraw : d₂ < d₁ := by
-      have := (lt_div_iff₀ hd₂).mp hratio
-      linarith
-    refine ⟨hraw, ?_⟩
-    rw [div_lt_div_iff₀ hv₁ hv₂]
-    rw [div_lt_div_iff₀ hd₂ hv₂] at hwindow
-    linarith
+`SpectralDegradation.normalized_degradation_reversal_iff` proves this statement once, using
+the actual evaluation-side variances as its denominators. Pair-specific ratios to separate
+optimal baselines may be substituted only after proving those baselines agree. -/
 
-/-! ### 12d. A free diagnostic: an interior spectral peak certifies non-reversible driving
+/-! ### 12d. A conditional convexity diagnostic
 
-For reversible driving the symbol is **convex in `cos s`**, so it can attain its maximum only
-at the endpoints. Contrapositive: **an interior peak in the spectrum certifies that the
-driving is not reversible.**
-
-This costs nothing to compute — it is a shape check on a correlation structure already
-estimated, needing no extra data — and it can overturn a reversibility assumption that is
-usually made silently. Convexity is taken as an explicit hypothesis below rather than
-imported, so the statement carries no analytic machinery. -/
+The generic theorem below says that a convex function of `cos s` cannot have a strict
+interior maximum. To turn its contrapositive into a test of Markov reversibility, one must
+also prove that the fitted symbol is a positive mixture of reversible Poisson kernels.
+That spectral-representation theorem is not supplied by this generic convexity lemma. -/
 
 /-- A convex function on `[-1, 1]` is bounded by its endpoint values: no interior peak. -/
 theorem convex_le_max_endpoints {f : ℝ → ℝ}
@@ -1309,9 +1272,8 @@ theorem convex_le_max_endpoints {f : ℝ → ℝ}
     rw [← add_mul, hab, one_mul]
   linarith
 
-/-- **THE DIAGNOSTIC.** An interior value strictly exceeding both endpoints refutes
-convexity, hence refutes reversible driving. A spectral peak away from the band edges is a
-certificate, not a hint. -/
+/-- An interior value strictly exceeding both endpoints refutes the stated convexity
+hypothesis. -/
 theorem nonreversible_of_interior_peak {f : ℝ → ℝ} {x : ℝ} (hx1 : -1 ≤ x) (hx2 : x ≤ 1)
     (hpeak : max (f (-1)) (f 1) < f x) :
     ¬ (∀ u v a b : ℝ, 0 ≤ a → 0 ≤ b → a + b = 1 →
@@ -1321,11 +1283,10 @@ theorem nonreversible_of_interior_peak {f : ℝ → ℝ} {x : ℝ} (hx1 : -1 ≤
 /-!
 ## What is left open, plainly
 
-* **The witnesses for §11.** Both no-go theorems are implications whose antecedents are not
-  discharged *here*. The reversal witness now exists — re-proved in the geometric class after
-  the original bump-based quadruple was withdrawn as unrealizable — but it lives elsewhere;
-  the equal-count pair for the counting no-go is still open. The mathematics that would
-  supply them is not in this module and is not claimed by it.
+* **The geometric witness for §11.** The finite spectral reversal is proved. A reversal in
+  one shared-germ reversible Markov family is still open: its cross-spectra and weighted
+  integral inequalities have not been constructed. The equal-count pair for the counting
+  no-go is also open.
 
 * **The reduction in §12a is an approximation, and only in its own regime.** The bracket is
   proved *from* the stated relative-error hypothesis; that the true degradation satisfies
@@ -1333,9 +1294,10 @@ theorem nonreversible_of_interior_peak {f : ℝ → ℝ} {x : ℝ} (hx1 : -1 ≤
   small-signal regime the evaluation-side cross-spectrum does not drop out and the formula
   is not target-outcome-free.
 
-* **The level-set collapse of §12b is Gaussian.** Two numbers suffice because a Gaussian pair
-  enters an exceedance probability only through its variance and correlation. Non-Gaussian
-  readouts are not covered, and the collapse should not be quoted for them.
+* **The level-set factorization of §12b is an input.** A named Gaussian metric still needs a
+  calculation showing which standardized thresholds and baseline variances are fixed and
+  that its value factors through the chosen two coordinates. Non-Gaussian readouts are not
+  covered.
 
 * **Linkage disequilibrium proper — coverage is closed, rigidity is not.** Section 9 proves
   that a positive **joint atom floor** makes coverage coupling-invariant. It does not prove
@@ -1372,12 +1334,10 @@ theorem nonreversible_of_interior_peak {f : ℝ → ℝ} {x : ℝ} (hx1 : -1 ≤
   containment is total, so the image-free region where the mechanism would have to live is
   empty; and the band has exactly two sheets, hence one return generator, so the composition
   `M5` needs is not formable. This is a statement about the genotype family only. The
-  general claim that `M5` is unrealizable in any analytic family is **withdrawn**: an
-  explicit eight-atom recipe realizes it. The reason the earlier obstruction looked general
-  is worth keeping, because the principle is: *continuation kills identities, not
-  inequalities.* It forbids exact operator identities across sheets of one analytic curve,
-  while `M5` needs only open conditions — strict containment, a fixed point in an open gap,
-  a strict inequality — and open conditions survive continuation.
+  general claim that `M5` is unrealizable in any analytic family is **withdrawn**. The
+  conditional eight-atom construction supplies exact moment algebra, but global
+  realization still requires real-root, positivity, continuation, collision, and exact
+  coverage checks; see `BundleRigidity.Realizability`.
 
   Relatedly, the operator classification behind these negatives is **closed for atomic
   kernels and only partial for continuous ones**: an exact criterion in the atomic case,

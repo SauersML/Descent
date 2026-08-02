@@ -1938,7 +1938,12 @@ theorem sourceR2FromSourceWeights_eq_signalVariance_ratio {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
     r2FromSourceWeights m Pop.source =
       explainedSignalVarianceFromSourceWeights m Pop.source / (m.outcomeVariance Pop.source) := by
-  rfl
+  -- `r2FromSourceWeights` divides by `effectiveOutcomeVariance`, which is
+  -- `outcomeVariance + residualBurden`. At the source the burden is zero, but
+  -- `x + 0 = x` is not a definitional equality on `ℝ`, so `rfl` cannot close
+  -- this and the rewrite has to be done explicitly.
+  unfold r2FromSourceWeights effectiveOutcomeVariance
+  rw [residualBurden_source, add_zero]
 
 /-- Exact mechanistic source `R²` law from the source-learned score moments. -/
 theorem sourceR2FromSourceWeights_exact_metric_law {p q : ℕ}
@@ -1946,7 +1951,12 @@ theorem sourceR2FromSourceWeights_exact_metric_law {p q : ℕ}
     r2FromSourceWeights m Pop.source =
       (predictiveCovarianceFromSourceWeights m Pop.source) ^ 2 /
         (scoreVarianceFromSourceWeights m Pop.source * (m.outcomeVariance Pop.source)) := by
+  -- Same source-side burden discharge as
+  -- `sourceR2FromSourceWeights_eq_signalVariance_ratio`: the statement names
+  -- `outcomeVariance`, the definition routes through `effectiveOutcomeVariance`.
   unfold r2FromSourceWeights explainedSignalVarianceFromSourceWeights
+    effectiveOutcomeVariance
+  rw [residualBurden_source, add_zero]
   ring_nf
 
 /-- The target `R²` is exactly the explained signal variance from the explicit
