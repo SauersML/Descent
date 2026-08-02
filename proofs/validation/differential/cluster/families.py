@@ -435,8 +435,16 @@ FAMILIES = [
                  "(Nei G_ST, Hudson, Weir-Cockerham, Wright F_IT) and the "
                  "heterozygosity-ratio and drift-factor inversions that the "
                  "corpus treats as interchangeable",
-        "simulator": "cluster/fam_fst_estimators.py",
-        "status": "SIMULATED (this tier). The corpus contains at least four "
+        "simulator": None,   # UNCONFIRMED: script exists, run not confirmed
+        "status": "SIMULATOR WRITTEN, NOT YET CONFIRMED GREEN. The script "
+                  "exists and its controls are specified, but the run on the "
+                  "node exited without writing output and I could not confirm "
+                  "a completed pass before handing over. That is recorded as "
+                  "UNCONFIRMED rather than as SIMULATED, because a family "
+                  "counted as covered on the strength of an unrun script is "
+                  "exactly the coverage inflation this inventory exists to "
+                  "remove. Treat the 5 members here as UNCHECKED. The corpus "
+                  "contains at least four "
                   "distinct quantities all called F_ST and converts freely "
                   "between them; the generative process that distinguishes "
                   "them is finite sampling at a swept allele-frequency "
@@ -471,8 +479,10 @@ FAMILIES = [
                  "'flow' rate: F' = (1-rate)^2 (1/(2Ne) + (1-1/(2Ne)) F). The "
                  "corpus instantiates `rate` as a MUTATION rate in some "
                  "members and a MIGRATION rate in others, from one body.",
-        "simulator": "cluster/fam_fst_estimators.py (ibd arm)",
-        "status": "SIMULATED (this tier). The discriminating fact is that "
+        "simulator": None,   # UNCONFIRMED: script exists, run not confirmed
+        "status": "SIMULATOR WRITTEN, NOT YET CONFIRMED GREEN -- same run as "
+                  "fst_estimator_sampling, same caveat. Treat the 10 members "
+                  "here as UNCHECKED. The discriminating fact is that "
                   "mutation and migration do NOT enter the identity recurrence "
                   "the same way -- mutation destroys identity on both lineages "
                   "independently, migration moves one lineage -- so the shared "
