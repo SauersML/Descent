@@ -35,8 +35,8 @@ def compile_mutant(defs, ns, d, body):
     Rebuilding all 400 definitions per mutant would cost about a second each;
     only the mutated definition changes, so only it is recompiled.
     """
-    ar, rn = build_arity(defs, d["module"])
-    src = transpile(body, d["params"], ar, d["name"], rn)
+    ar, rn, amb = build_arity(defs, d["module"])
+    src = transpile(body, d["params"], ar, d["name"], rn, amb)
     args = ", ".join(pyname(p) for p, _ in d["params"])
     sig = f"_b, {args}" if args else "_b"
     text = f"def _mutant({sig}):\n    return {src}"

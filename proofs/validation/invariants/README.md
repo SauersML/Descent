@@ -24,35 +24,43 @@ Mathlib totalises partial operations: `x / 0 = 0`, `x⁻¹ = 0` at 0,
    differential-tested against `extract/lean_rt.py` on 16000 random arguments.
 
 2. Totality explains why the expression does not error. It does **not** make
-   the resulting value defensible. Where the point is attainable inside the
-   definition's own admissible box, and the modelled quantity has a defined
-   limit there, and the junk value differs from that limit, the definition
-   returns a **wrong value inside its domain** — silently, at exactly the
-   endpoint people care about, and no type error will ever reveal it. That is a
-   defect, and a more serious one than an unbounded range: an unbounded range
-   is usually a missing hypothesis; this is a wrong answer.
+   the resulting value defensible. **Grade a totality artifact by what a
+   comparison sees, not by whether a limit exists.** At an attainable boundary:
 
-The distinguishing question is whether the limit exists and differs from what
-totality returns. `totality.py` decides it by instrumenting the backend to
+   | returned value | verdict |
+   | --- | --- |
+   | differs from a **finite** limit | defect — a wrong answer inside the domain |
+   | sits at the **opposite end of the range** from the limit, finite or not | defect, and **worse**: it inverts orderings |
+   | arbitrary but **not extremal** | not a defect; still wants guarding |
+
+   The middle row is the one that is easy to rule out by mistake. When the
+   limit diverges there is no right finite answer, which makes it tempting to
+   call the junk value an arbitrary choice. It is not arbitrary: returning the
+   minimum of a range where the truth is the maximum inverts every ordering
+   that reads the quantity, and almost everything downstream of these
+   quantities is a comparison. An inverted ordering is worse than a missing
+   value, because it is confidently wrong in a specific direction. `totality.py` decides it by instrumenting the backend to
 record every divisor and every `log`/`sqrt` argument, finding where a guard
 changes sign along a coordinate, and bisecting onto the exact junk point —
 sampling essentially never lands on one, since they are a measure-zero set.
 
-Findings are graded in three classes, and only the first is called a defect:
+On this corpus: **18 defects**, of which 17 are the severe `direction-inverted`
+kind.
 
-| `klass` | meaning | count |
+| `klass` | count | defect |
 | --- | --- | --- |
-| `wrong-finite-value` | the limit is finite and the definition returns something else. A wrong answer inside the domain | 1 |
-| `direction-inverted` | the limit diverges to `+inf` and the definition returns 0 — the opposite extreme. There is no right finite answer to return, so this is not a defect, but it inverts the direction any downstream comparison sees | 17 |
-| `singularity` | the limit is infinite and the junk value is an arbitrary but not misleading choice | 0 |
+| `direction-inverted` | 17 | yes — and the worse kind |
+| `wrong-finite-value` | 1 | yes |
+| `singularity` | 0 | no |
 
-The one defect is `equalVarianceGaussianAUCFromExplainedR2`, which returns 0.5 —
-chance discrimination — at `r2 = 1`, where the AUC tends to 1.
+`equalVarianceGaussianAUCFromExplainedR2` returns 0.5 — chance discrimination —
+at `r2 = 1`, where the AUC tends to 1.
 
-The sharpest of the inverted cases is
+The sharpest inversion is
 `stabilizingNsFromObservedCorrelation = 1 / (2 * (1 - rho))`, which reports
 **no** selection at `rho = 1`, the correlation at which selection is infinitely
-strong.
+strong. `benchmarkRatio` and `neutralAFBenchmarkRatio` both invert at
+`fst = 1`.
 
 Nothing here runs Lean. Bodies are transcribed by a narrow transpiler
 (`transpile.py`) that accepts the arithmetic fragment and **raises rather than

@@ -20,7 +20,7 @@ import sys
 import compile_defs as C
 import invariants as INV
 import totality
-from semantics import admissible_box
+from semantics import admissible_box, required_range
 
 HERE = pathlib.Path(__file__).resolve().parent
 
@@ -51,12 +51,15 @@ def check_one(c, defs):
 
         pts = _sample(box, c.names, random.Random(0), 40)
         try:
-            tf = totality.scan(c, box, c.names, pts)
+            rr = required_range(d)
+            tf = totality.scan(c, box, c.names, pts,
+                               rng=(rr[0], rr[1]) if rr else None)
         except Exception as e:
             tf = []
             out.append(dict(kind="totality", why="junk-branch scan",
                             holds=None, detail=dict(error=str(e))))
         else:
+            defects = [f for f in tf if f.get("is_defect")]
             finite = [f for f in tf if f.get("klass") == "wrong-finite-value"]
             inverted = [f for f in tf if f.get("klass") == "direction-inverted"]
             out.append(dict(
@@ -65,8 +68,9 @@ def check_one(c, defs):
                     "where such a point is attainable inside the box AND the "
                     "quantity has a defined limit there, the junk value is a "
                     "wrong answer inside the domain, not a harmless artifact",
-                holds=not finite,
-                detail=dict(findings=tf[:4], n_findings=len(tf),
+                holds=not defects,
+                detail=dict(findings=tf, n_findings=len(tf),
+                            n_defects=len(defects),
                             n_wrong_finite_value=len(finite),
                             n_direction_inverted=len(inverted))))
     else:
@@ -90,7 +94,7 @@ def severity(r):
     # attainable point inside the domain, it is silent, and it sits exactly at
     # the endpoint people care about.  An unbounded range, by contrast, is
     # usually a missing hypothesis.
-    weight = dict(totality=120, absorbing=100, monotone=80, limit=70,
+    weight = dict(totality=140, absorbing=100, monotone=80, limit=70,
                   continuity=65, symmetry=60, scale=55)
     s = -1.0
     for ch in r.get("checks", []):

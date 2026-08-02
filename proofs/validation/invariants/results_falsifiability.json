@@ -2418,7 +2418,7 @@
  "EpistaticChaos.circulantSpectrumA": {
   "name": "circulantSpectrumA",
   "module": "EpistaticChaos",
-  "line": 1691,
+  "line": 1761,
   "registered": [
    "continuity"
   ],
@@ -2440,7 +2440,7 @@
  "EpistaticChaos.circulantSpectrumB": {
   "name": "circulantSpectrumB",
   "module": "EpistaticChaos",
-  "line": 1698,
+  "line": 1768,
   "registered": [
    "continuity"
   ],
@@ -2462,7 +2462,7 @@
  "EpistaticChaos.fourthCumulantFromMoments": {
   "name": "fourthCumulantFromMoments",
   "module": "EpistaticChaos",
-  "line": 1561,
+  "line": 1631,
   "registered": [],
   "covered": false,
   "reason": "no check on this definition currently holds, so there is nothing to falsify"
@@ -2470,7 +2470,7 @@
  "EpistaticChaos.palindromicCycleDensityA": {
   "name": "palindromicCycleDensityA",
   "module": "EpistaticChaos",
-  "line": 2030,
+  "line": 2100,
   "registered": [
    "continuity"
   ],
@@ -2489,7 +2489,7 @@
  "EpistaticChaos.palindromicCycleDensityB": {
   "name": "palindromicCycleDensityB",
   "module": "EpistaticChaos",
-  "line": 2039,
+  "line": 2109,
   "registered": [
    "continuity"
   ],
@@ -3434,7 +3434,7 @@
  "LDDecayTheory.ldRetainedFraction": {
   "name": "ldRetainedFraction",
   "module": "LDDecayTheory",
-  "line": 873,
+  "line": 884,
   "registered": [
    "continuity",
    "range"
@@ -4210,7 +4210,7 @@
  "PhenomeWidePortability.fstFromDriftFactor": {
   "name": "fstFromDriftFactor",
   "module": "PhenomeWidePortability",
-  "line": 192,
+  "line": 196,
   "registered": [
    "continuity",
    "range"
@@ -4262,7 +4262,7 @@
  "PhenomeWidePortability.selectedDriftFactor": {
   "name": "selectedDriftFactor",
   "module": "PhenomeWidePortability",
-  "line": 165,
+  "line": 169,
   "registered": [
    "continuity",
    "range"
@@ -4913,7 +4913,7 @@
  "PopulationGeneticsFoundations.fstDerived": {
   "name": "fstDerived",
   "module": "PopulationGeneticsFoundations",
-  "line": 1212,
+  "line": 1227,
   "registered": [
    "continuity",
    "limit",
@@ -4962,7 +4962,7 @@
  "PopulationGeneticsFoundations.fstFromHetRatio": {
   "name": "fstFromHetRatio",
   "module": "PopulationGeneticsFoundations",
-  "line": 1482,
+  "line": 1497,
   "registered": [
    "range"
   ],
@@ -5103,7 +5103,7 @@
  "PopulationGeneticsFoundations.fstMutationDriftTransientDiscrete": {
   "name": "fstMutationDriftTransientDiscrete",
   "module": "PopulationGeneticsFoundations",
-  "line": 1518,
+  "line": 1533,
   "registered": [
    "continuity",
    "limit",
@@ -5152,7 +5152,7 @@
  "PopulationGeneticsFoundations.hetDecayFactor": {
   "name": "hetDecayFactor",
   "module": "PopulationGeneticsFoundations",
-  "line": 1445,
+  "line": 1460,
   "registered": [
    "continuity",
    "range"
@@ -5199,7 +5199,7 @@
  "PopulationGeneticsFoundations.hetEquilibrium": {
   "name": "hetEquilibrium",
   "module": "PopulationGeneticsFoundations",
-  "line": 1295,
+  "line": 1310,
   "registered": [
    "continuity",
    "range"
@@ -5630,7 +5630,7 @@
  "PortabilityDrift.admixtureLDBoost": {
   "name": "admixtureLDBoost",
   "module": "PortabilityDrift",
-  "line": 5351,
+  "line": 5377,
   "registered": [],
   "covered": false,
   "reason": "no check on this definition currently holds, so there is nothing to falsify"
@@ -5638,7 +5638,7 @@
  "PortabilityDrift.admixtureLDDecay": {
   "name": "admixtureLDDecay",
   "module": "PortabilityDrift",
-  "line": 5304,
+  "line": 5330,
   "registered": [
    "continuity"
   ],
@@ -5658,7 +5658,7 @@
  "PortabilityDrift.alleleFreqMismatchPenalty": {
   "name": "alleleFreqMismatchPenalty",
   "module": "PortabilityDrift",
-  "line": 2287,
+  "line": 2317,
   "registered": [
    "continuity",
    "range"
@@ -5698,7 +5698,7 @@
  "PortabilityDrift.asymmetricFst": {
   "name": "asymmetricFst",
   "module": "PortabilityDrift",
-  "line": 5242,
+  "line": 5268,
   "registered": [
    "range"
   ],
@@ -5712,7 +5712,7 @@
  "PortabilityDrift.brierRegretPoint": {
   "name": "brierRegretPoint",
   "module": "PortabilityDrift",
-  "line": 3929,
+  "line": 3955,
   "registered": [
    "continuity"
   ],
@@ -5732,7 +5732,7 @@
  "PortabilityDrift.brierRegretRatio": {
   "name": "brierRegretRatio",
   "module": "PortabilityDrift",
-  "line": 3933,
+  "line": 3959,
   "registered": [
    "continuity"
   ],
@@ -5776,7 +5776,7 @@
  "PortabilityDrift.covarianceDivergenceFromRetention": {
   "name": "covarianceDivergenceFromRetention",
   "module": "PortabilityDrift",
-  "line": 4324,
+  "line": 4350,
   "registered": [
    "continuity",
    "range"
@@ -5805,7 +5805,7 @@
  "PortabilityDrift.covarianceDivergenceMutationDrift": {
   "name": "covarianceDivergenceMutationDrift",
   "module": "PortabilityDrift",
-  "line": 4343,
+  "line": 4369,
   "registered": [
    "continuity",
    "range"
@@ -5842,7 +5842,7 @@
  "PortabilityDrift.covarianceRetention": {
   "name": "covarianceRetention",
   "module": "PortabilityDrift",
-  "line": 4298,
+  "line": 4324,
   "registered": [
    "continuity",
    "range"
@@ -5857,7 +5857,7 @@
  "PortabilityDrift.effectiveSymmetricMigration": {
   "name": "effectiveSymmetricMigration",
   "module": "PortabilityDrift",
-  "line": 5283,
+  "line": 5309,
   "registered": [
    "continuity"
   ],
@@ -5879,7 +5879,7 @@
  "PortabilityDrift.equalVarianceGaussianAUCChart": {
   "name": "equalVarianceGaussianAUCChart",
   "module": "PortabilityDrift",
-  "line": 3255,
+  "line": 3281,
   "registered": [
    "continuity",
    "range"
@@ -5917,7 +5917,7 @@
  "PortabilityDrift.equalVarianceGaussianAUCFromExplainedR2": {
   "name": "equalVarianceGaussianAUCFromExplainedR2",
   "module": "PortabilityDrift",
-  "line": 3209,
+  "line": 3235,
   "registered": [
    "continuity",
    "range"
@@ -5932,7 +5932,7 @@
  "PortabilityDrift.equalVarianceGaussianAUCFromSNR": {
   "name": "equalVarianceGaussianAUCFromSNR",
   "module": "PortabilityDrift",
-  "line": 3150,
+  "line": 3176,
   "registered": [
    "range"
   ],
@@ -5971,7 +5971,7 @@
  "PortabilityDrift.equalVarianceGaussianAUCFromVariances": {
   "name": "equalVarianceGaussianAUCFromVariances",
   "module": "PortabilityDrift",
-  "line": 3162,
+  "line": 3188,
   "registered": [
    "continuity",
    "range",
@@ -6020,7 +6020,7 @@
  "PortabilityDrift.exactCalibratedBrierRiskFromR2": {
   "name": "exactCalibratedBrierRiskFromR2",
   "module": "PortabilityDrift",
-  "line": 3034,
+  "line": 3060,
   "registered": [
    "continuity"
   ],
@@ -6064,7 +6064,7 @@
  "PortabilityDrift.expectedSqMeanPGSDiff_IMEquilibrium": {
   "name": "expectedSqMeanPGSDiff_IMEquilibrium",
   "module": "PortabilityDrift",
-  "line": 4048,
+  "line": 4074,
   "registered": [
    "continuity"
   ],
@@ -6086,7 +6086,7 @@
  "PortabilityDrift.expectedSqMeanPGSDiff_pureSplit": {
   "name": "expectedSqMeanPGSDiff_pureSplit",
   "module": "PortabilityDrift",
-  "line": 4038,
+  "line": 4064,
   "registered": [
    "continuity"
   ],
@@ -6109,7 +6109,7 @@
  "PortabilityDrift.freqCorrFromFst": {
   "name": "freqCorrFromFst",
   "module": "PortabilityDrift",
-  "line": 4308,
+  "line": 4334,
   "registered": [
    "continuity"
   ],
@@ -6199,7 +6199,7 @@
  "PortabilityDrift.fstIslandMultiplicativeEquilibrium": {
   "name": "fstIslandMultiplicativeEquilibrium",
   "module": "PortabilityDrift",
-  "line": 4777,
+  "line": 4803,
   "registered": [
    "continuity",
    "limit",
@@ -6248,7 +6248,7 @@
  "PortabilityDrift.fstMigDriftEquil": {
   "name": "fstMigDriftEquil",
   "module": "PortabilityDrift",
-  "line": 5448,
+  "line": 5474,
   "registered": [
    "continuity",
    "limit",
@@ -6302,7 +6302,7 @@
  "PortabilityDrift.fstMigDriftNext": {
   "name": "fstMigDriftNext",
   "module": "PortabilityDrift",
-  "line": 5413,
+  "line": 5439,
   "registered": [
    "continuity",
    "range"
@@ -6347,7 +6347,7 @@
  "PortabilityDrift.fstMigrationDriftEquilibrium": {
   "name": "fstMigrationDriftEquilibrium",
   "module": "PortabilityDrift",
-  "line": 4619,
+  "line": 4645,
   "registered": [
    "continuity",
    "limit",
@@ -6477,7 +6477,7 @@
  "PortabilityDrift.ibdFlowStep": {
   "name": "ibdFlowStep",
   "module": "PortabilityDrift",
-  "line": 4144,
+  "line": 4170,
   "registered": [],
   "covered": false,
   "reason": "no check on this definition currently holds, so there is nothing to falsify"
@@ -6485,7 +6485,7 @@
  "PortabilityDrift.ibdRecurrenceFixedPoint": {
   "name": "ibdRecurrenceFixedPoint",
   "module": "PortabilityDrift",
-  "line": 4670,
+  "line": 4696,
   "registered": [
    "continuity"
   ],
@@ -6509,7 +6509,7 @@
  "PortabilityDrift.ibdRecurrenceStep": {
   "name": "ibdRecurrenceStep",
   "module": "PortabilityDrift",
-  "line": 4657,
+  "line": 4683,
   "registered": [],
   "covered": false,
   "reason": "no check on this definition currently holds, so there is nothing to falsify"
@@ -6517,7 +6517,7 @@
  "PortabilityDrift.islandFstMultiplicativeStep": {
   "name": "islandFstMultiplicativeStep",
   "module": "PortabilityDrift",
-  "line": 4760,
+  "line": 4786,
   "registered": [
    "range"
   ],
@@ -6531,7 +6531,7 @@
  "PortabilityDrift.ldCorrelationDecay": {
   "name": "ldCorrelationDecay",
   "module": "PortabilityDrift",
-  "line": 2075,
+  "line": 2105,
   "registered": [
    "continuity",
    "range"
@@ -6574,7 +6574,7 @@
  "PortabilityDrift.ldOverlapFromSharedLD": {
   "name": "ldOverlapFromSharedLD",
   "module": "PortabilityDrift",
-  "line": 4312,
+  "line": 4338,
   "registered": [
    "continuity"
   ],
@@ -6593,7 +6593,7 @@
  "PortabilityDrift.logLossRegretPoint": {
   "name": "logLossRegretPoint",
   "module": "PortabilityDrift",
-  "line": 3950,
+  "line": 3976,
   "registered": [
    "continuity"
   ],
@@ -6613,7 +6613,7 @@
  "PortabilityDrift.logLossRegretRatio": {
   "name": "logLossRegretRatio",
   "module": "PortabilityDrift",
-  "line": 3954,
+  "line": 3980,
   "registered": [
    "continuity"
   ],
@@ -6635,7 +6635,7 @@
  "PortabilityDrift.neutralAFBenchmarkFromRecurrence": {
   "name": "neutralAFBenchmarkFromRecurrence",
   "module": "PortabilityDrift",
-  "line": 5530,
+  "line": 5556,
   "registered": [
    "continuity",
    "monotone"
@@ -6670,7 +6670,7 @@
  "PortabilityDrift.neutralAFBenchmarkRatio": {
   "name": "neutralAFBenchmarkRatio",
   "module": "PortabilityDrift",
-  "line": 2951,
+  "line": 2977,
   "registered": [
    "continuity"
   ],
@@ -6691,7 +6691,7 @@
  "PortabilityDrift.neutralAFSharedLDBenchmarkRatio": {
   "name": "neutralAFSharedLDBenchmarkRatio",
   "module": "PortabilityDrift",
-  "line": 4474,
+  "line": 4500,
   "registered": [
    "continuity"
   ],
@@ -6952,7 +6952,7 @@
  "PortabilityDrift.presentDayPGSVarianceMutationDrift": {
   "name": "presentDayPGSVarianceMutationDrift",
   "module": "PortabilityDrift",
-  "line": 4399,
+  "line": 4425,
   "registered": [
    "continuity",
    "range"
@@ -6997,7 +6997,7 @@
  "PortabilityDrift.presentDayR2MutationDrift": {
   "name": "presentDayR2MutationDrift",
   "module": "PortabilityDrift",
-  "line": 4444,
+  "line": 4470,
   "registered": [
    "continuity"
   ],
@@ -7066,7 +7066,7 @@
  "PortabilityDrift.retainedSignalVarianceMigrationDrift": {
   "name": "retainedSignalVarianceMigrationDrift",
   "module": "PortabilityDrift",
-  "line": 5131,
+  "line": 5157,
   "registered": [
    "continuity",
    "range"
@@ -7090,7 +7090,7 @@
  "PortabilityDrift.scaledMigrationRate": {
   "name": "scaledMigrationRate",
   "module": "PortabilityDrift",
-  "line": 4809,
+  "line": 4835,
   "registered": [
    "continuity"
   ],
@@ -7112,7 +7112,7 @@
  "PortabilityDrift.sharedLDFromMigration": {
   "name": "sharedLDFromMigration",
   "module": "PortabilityDrift",
-  "line": 5056,
+  "line": 5082,
   "registered": [
    "continuity",
    "range"
@@ -7133,7 +7133,7 @@
  "PortabilityDrift.sharedLD_from_equilibrium": {
   "name": "sharedLD_from_equilibrium",
   "module": "PortabilityDrift",
-  "line": 5030,
+  "line": 5056,
   "registered": [
    "continuity",
    "range"
@@ -7180,7 +7180,7 @@
  "PortabilityDrift.signalRetentionMigrationDrift": {
   "name": "signalRetentionMigrationDrift",
   "module": "PortabilityDrift",
-  "line": 5120,
+  "line": 5146,
   "registered": [
    "continuity",
    "range"
@@ -7199,7 +7199,7 @@
  "PortabilityDrift.sourceBrierFromR2": {
   "name": "sourceBrierFromR2",
   "module": "PortabilityDrift",
-  "line": 3056,
+  "line": 3082,
   "registered": [
    "continuity",
    "range"
@@ -7227,7 +7227,7 @@
  "PortabilityDrift.steppingStoneFst": {
   "name": "steppingStoneFst",
   "module": "PortabilityDrift",
-  "line": 4945,
+  "line": 4971,
   "registered": [
    "continuity",
    "range"
@@ -7270,7 +7270,7 @@
  "PortabilityDrift.targetBrierFromNeutralAFBenchmark": {
   "name": "targetBrierFromNeutralAFBenchmark",
   "module": "PortabilityDrift",
-  "line": 3076,
+  "line": 3102,
   "registered": [
    "continuity",
    "range"
@@ -7320,7 +7320,7 @@
  "PortabilityDrift.targetExactCalibratedBrierRisk": {
   "name": "targetExactCalibratedBrierRisk",
   "module": "PortabilityDrift",
-  "line": 3069,
+  "line": 3095,
   "registered": [
    "continuity"
   ],
@@ -7342,7 +7342,7 @@
  "PortabilityDrift.targetExactGaussianAUCFromNeutralAFBenchmark": {
   "name": "targetExactGaussianAUCFromNeutralAFBenchmark",
   "module": "PortabilityDrift",
-  "line": 3805,
+  "line": 3831,
   "registered": [
    "continuity",
    "range"
@@ -7390,7 +7390,7 @@
  "PortabilityDrift.targetGaussianAUCFromNeutralAFBenchmark": {
   "name": "targetGaussianAUCFromNeutralAFBenchmark",
   "module": "PortabilityDrift",
-  "line": 3043,
+  "line": 3069,
   "registered": [
    "continuity",
    "range"
@@ -7481,7 +7481,7 @@
  "PortabilityDrift.targetR2FromNeutralAFBenchmark": {
   "name": "targetR2FromNeutralAFBenchmark",
   "module": "PortabilityDrift",
-  "line": 2877,
+  "line": 2903,
   "registered": [
    "continuity"
   ],

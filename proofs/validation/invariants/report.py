@@ -16,10 +16,32 @@ from __future__ import annotations
 
 import collections
 import json
+import math
 import pathlib
 import sys
 
 HERE = pathlib.Path(__file__).resolve().parent
+
+
+def blast_radius():
+    """definition -> number of theorems mentioning it.
+
+    A 5% escape in something forty theorems rest on matters more than a 300%
+    escape in a leaf, so findings are ranked by dependents as well as by
+    overshoot.  From the `extract` agent's table; it is a syntactic mention so
+    it over-counts slightly, but it is the right order of magnitude.
+    """
+    try:
+        import sys
+        sys.path.insert(0, str(HERE.parents[0] / "extract"))
+        import api
+        out = {}
+        for n, rec in api.definition_table().items():
+            key = (rec["file"].split("/")[-1][:-5], rec["short"])
+            out[key] = len(rec.get("mentioned_by") or [])
+        return out
+    except Exception:
+        return {}
 
 
 def load(name):
@@ -33,6 +55,7 @@ def build():
     rng = load("results_ranges.json")
     inv = load("results_invariants.json")
     fal = load("results_falsifiability.json")
+    radius = blast_radius()
 
     out = {}
     for k, d in defs.items():
@@ -46,13 +69,25 @@ def build():
                                required_range=r.get("range"),
                                why=r.get("range_why")))
         for c in i.get("checks", []):
-            checks.append(dict(family="invariant", kind=c["kind"],
-                               verdict={True: "holds", False: "violated",
-                                        None: "error"}[c["holds"]],
-                               why=c["why"]))
+            e = dict(family="invariant", kind=c["kind"],
+                     verdict={True: "holds", False: "violated",
+                              None: "error"}[c["holds"]],
+                     why=c["why"])
+            if c["kind"] == "totality":
+                # Totality defects go in the SAME stream as the range escapes:
+                # they are findings with an exact triggering input, and the
+                # owner needs to see which kind they have.
+                e["totality_findings"] = [
+                    dict(klass=f["klass"], point=f["point"],
+                         value=f["value"], limit=f["limit"],
+                         junk_branch=f["junk_branch"], note=f["severity_note"])
+                    for f in (c.get("detail") or {}).get("findings", [])
+                    if f.get("is_defect")]
+            checks.append(e)
         covered = bool(f.get("covered"))
         entry = dict(
             module=d["module"], line=d["line"], path=d["path"],
+            dependent_theorems=radius.get((d["module"], d["name"])),
             params=[p for p, _ in d["params"]], ret=d["ret"],
             covered=covered,
             demonstration=f.get("demonstration"),
@@ -121,11 +156,17 @@ def main(argv):
                 continue
             sev = max(rng.get(k, {}).get("severity", -1),
                       inv.get(k, {}).get("severity", -1))
+            # blast radius as a multiplier, not an addend: it should reorder
+            # findings of similar severity, never promote a trivial one.
+            n_dep = v.get("dependent_theorems") or 0
+            sev = sev * (1.0 + 0.15 * math.log10(1 + n_dep))
             rows.append((sev, k, v, rng.get(k, {}), inv.get(k, {})))
         rows.sort(key=lambda t: -t[0])
         print(f"\n{len(rows)} definitions with a finding, by severity:\n")
         for sev, k, v, r, i in rows:
-            print(f"[{sev:5.1f}] {k}  ({v['path']}:{v['line']})")
+            dep = v.get("dependent_theorems")
+            dtxt = f", {dep} dependent theorems" if dep else ""
+            print(f"[{sev:5.1f}] {k}  ({v['path']}:{v['line']}{dtxt})")
             if r.get("verdict") == "contradicts-theorem":
                 print(f"        CHECKER ERROR, not a corpus defect: "
                       f"contradicts {r['contradicted']}")
@@ -138,7 +179,19 @@ def main(argv):
                     print(f"        NOTE: needs {r['blind_coordinates']}, "
                           "whose admissible values could not be determined")
             for ch in i.get("checks", []):
-                if ch["holds"] is False:
+                if ch["holds"] is not False:
+                    continue
+                if ch["kind"] == "totality":
+                    for f in (ch.get("detail") or {}).get("findings", []):
+                        if not f.get("is_defect"):
+                            continue
+                        pt = ", ".join(f"{a}={b:.6g}"
+                                       for a, b in f["point"].items())
+                        print(f"        totality [{f['klass']}]: returns "
+                              f"{f['value']:.6g} at {pt}; the limit there is "
+                              f"{f['limit']}")
+                        print(f"        {f['severity_note']}")
+                else:
                     print(f"        {ch['kind']}: {ch['why']}")
     return 0
 

@@ -200,7 +200,32 @@ def _limit(c, x, k, t, side, box_lo, box_hi):
     return None, False
 
 
-def scan(c, box, names, pts, max_report=6):
+def _extremal_opposite(val, lim, rng):
+    """Is `val` at the opposite end of the quantity's range from `lim`?
+
+    `rng` is the range the definition's NAME requires, when there is one.
+    Without it we fall back to sign: 0 (or below) against a limit diverging
+    upwards is still an inversion, because a nonnegative quantity's floor is 0.
+    """
+    if lim is None:
+        return False
+    if rng is not None:
+        lo, hi = rng
+        span = hi - lo
+        if math.isfinite(span) and span > 0:
+            near_lo = val <= lo + 0.01 * span
+            near_hi = val >= hi - 0.01 * span
+            lim_lo = lim <= lo + 0.01 * span
+            lim_hi = lim >= hi - 0.01 * span or lim == INF
+            return (near_lo and lim_hi) or (near_hi and lim_lo)
+    if lim == INF or (math.isfinite(lim) and lim > 0):
+        return val <= 0
+    if lim == -INF or (math.isfinite(lim) and lim < 0):
+        return val >= 0
+    return False
+
+
+def scan(c, box, names, pts, max_report=6, rng=None):
     """Find attainable junk points whose value contradicts the limit.
 
     Returns a list of findings, each with the exact input point, the junk
@@ -208,6 +233,7 @@ def scan(c, box, names, pts, max_report=6):
     """
     tb = TracingBackend()
     findings = []
+    del max_report  # kept in the signature for callers; all findings returned
     seen = set()
     for x in pts[:25]:
         for k, nm in enumerate(names):
@@ -249,29 +275,34 @@ def scan(c, box, names, pts, max_report=6):
                 # answer -- there is no right finite answer to return -- but
                 # much worse than an arbitrary one, because it inverts the
                 # direction any downstream comparison will see.
-                inverted = (not finite) and lim > 0 and val <= 0
+                # Grade by WHAT A COMPARISON SEES, not by whether a limit
+                # exists.  A value at the opposite end of the range from the
+                # limit inverts every ordering that reads it, and an inverted
+                # ordering is worse than a missing value: it is confidently
+                # wrong in a specific direction.  Almost everything downstream
+                # of these quantities is a comparison.
+                inverted = _extremal_opposite(val, lim, rng)
                 findings.append(dict(
                     point={n: v for n, v in zip(names, y)},
                     coordinate=nm, at=t, junk_branch=kind,
                     value=val, limit=lim, limit_kind=why,
-                    klass=("wrong-finite-value" if finite else
-                           "direction-inverted" if inverted else
+                    klass=("direction-inverted" if inverted else
+                           "wrong-finite-value" if finite else
                            "singularity"),
+                    is_defect=bool(inverted or finite),
                     severity_note=(
+                        "the definition returns a value at the OPPOSITE end "
+                        "of the range from the limit; every ordering that "
+                        "reads this quantity is inverted here"
+                        if inverted else
                         "the quantity has a finite limit here and the "
                         "definition returns something else -- a wrong value "
                         "inside the domain"
                         if finite else
-                        "the limit diverges to +infinity and the definition "
-                        "returns 0, the opposite extreme; there is no right "
-                        "finite answer, but this one inverts the direction"
-                        if inverted else
-                        "the limit is infinite, so the quantity is genuinely "
-                        "undefined here and the junk value is a modelling "
-                        "choice"),
+                        "the returned value is arbitrary but not extremal; "
+                        "not a defect, but the point wants guarding"),
                 ))
-                if len(findings) >= max_report:
-                    return findings
+
     return findings
 
 

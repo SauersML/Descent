@@ -106,12 +106,13 @@ _PYKW = set(_kw.kwlist) | {"_b", "backends", "math"}
 class Parser:
     """Recursive-descent over the token list, emitting Python source strings."""
 
-    def __init__(self, toks, arity, locals_, rename=None):
+    def __init__(self, toks, arity, locals_, rename=None, ambiguous=None):
         self.t = toks
         self.i = 0
         self.arity = arity  # name -> int, for user-defined callables
         self.locals = locals_  # set of bound variable names (arity 0)
         self.rename = rename or {}  # Lean name -> unique Python identifier
+        self.ambiguous = ambiguous or set()  # bare names with several targets
 
     def peek(self, k=0):
         return self.t[self.i + k] if self.i + k < len(self.t) else (None, None)
@@ -250,6 +251,10 @@ class Parser:
                 return fn
             if v in self.locals:
                 return self._postfix(pyname(v))
+            if v in self.ambiguous:
+                raise Untranspilable(
+                    f"ambiguous call to `{v}`: several definitions in other "
+                    "files share this bare name and nothing disambiguates")
             if v in self.arity:
                 self._pending_arity = self.arity[v]
                 pv = self.rename.get(v, pyname(v))
@@ -266,7 +271,8 @@ class Parser:
         return s
 
 
-def transpile(body: str, params, arity, name="", rename=None):
+def transpile(body: str, params, arity, name="", rename=None,
+              ambiguous=None):
     """Return Python source for `body` given parameter names and known arities.
 
     `arity` maps callable names (user definitions) to argument counts.
@@ -295,14 +301,14 @@ def transpile(body: str, params, arity, name="", rename=None):
             toks.append(("op", ":="))
         toks.extend(_tokens(part))
     locals_ = {p for p, _ in params}
-    p = Parser(toks, arity, set(locals_), rename)
+    p = Parser(toks, arity, set(locals_), rename, ambiguous)
     out = p.expr()
     if p.i != len(p.t):
         raise Untranspilable(f"trailing tokens at {p.t[p.i:][:4]}")
     return out
 
 
-def build_rename(defs):
+def _unused_build_rename(defs):
     """Lean name -> unique Python identifier, per (module, name).
 
     Names are reused across files, so a single flat namespace collides.  Every
@@ -325,13 +331,26 @@ def build_arity(defs, module=None):
     `hetDecayFactor`s).  When transpiling a body from `module`, that module's
     own definition wins, matching Lean's own resolution order.
     """
-    ar, rn = {}, {}
+    by_name = {}
     for d in defs:
-        if d["module"] != module and d["name"] not in ar:
-            ar[d["name"]] = len(d["params"])
-            rn[d["name"]] = pyname(d["module"] + "_" + d["name"])
-    for d in defs:
-        if d["module"] == module:
-            ar[d["name"]] = len(d["params"])
-            rn[d["name"]] = pyname(d["module"] + "_" + d["name"])
-    return ar, rn
+        by_name.setdefault(d["name"], []).append(d)
+
+    ar, rn, ambiguous = {}, {}, set()
+    for name, cands in by_name.items():
+        here = [d for d in cands if d["module"] == module]
+        if here:
+            # Lean resolves an unqualified call to the same file first.
+            pick = here[0]
+        elif len(cands) == 1:
+            pick = cands[0]
+        else:
+            # Several definitions in OTHER files share this bare name and
+            # nothing here disambiguates.  Picking one by iteration order is
+            # how a call silently binds to the wrong function and computes a
+            # WRONG NUMBER rather than raising -- 22 short names in this
+            # corpus are ambiguous, `hetDecayFactor` among them.  Refuse.
+            ambiguous.add(name)
+            continue
+        ar[name] = len(pick["params"])
+        rn[name] = pyname(pick["module"] + "_" + pick["name"])
+    return ar, rn, ambiguous

@@ -96,7 +96,7 @@ def theorem_guards(c, defs):
     are wholly expressible in the arithmetic fragment.
     """
     d = c.d
-    ar, rn = build_arity(defs, d["module"])
+    ar, rn, amb = build_arity(defs, d["module"])
     proved = PROVED.get((d["module"], d["name"]), {})
     lo_thms = proved.get("lo_thms", set())
     hi_thms = proved.get("hi_thms", set())
@@ -113,7 +113,7 @@ def theorem_guards(c, defs):
             if not re.search(r"[<>≤≥]", h):
                 continue  # a typing binder, not a constraint
             try:
-                src = transpile(h, d["params"], ar, d["name"], rn)
+                src = transpile(h, d["params"], ar, d["name"], rn, amb)
                 ns = {"_b": FLOAT}
                 args = ", ".join(pyname(p) for p, _ in d["params"])
                 exec(compile(f"def _p({args}):\n return {src}", "<hyp>", "exec"), ns)

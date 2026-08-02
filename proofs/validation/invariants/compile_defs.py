@@ -64,9 +64,9 @@ def transpile_all(defs, overrides=None):
             why_not[key(d)] = f"non-scalar signature ({d['ret']})"
             continue
         body = (overrides or {}).get(d["name"], d["body"])
-        ar, rn = build_arity(defs, d["module"])
+        ar, rn, amb = build_arity(defs, d["module"])
         try:
-            srcs[key(d)] = transpile(body, d["params"], ar, d["name"], rn)
+            srcs[key(d)] = transpile(body, d["params"], ar, d["name"], rn, amb)
         except Untranspilable as e:
             why_not[key(d)] = str(e)
         except Exception as e:  # parser bug, not a corpus property
