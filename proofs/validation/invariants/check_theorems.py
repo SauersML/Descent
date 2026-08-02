@@ -119,9 +119,15 @@ def evaluate(prop, ns_globals, seed=None, want=40, tries=8000):
                 continue
         except Exception:
             continue
+        backends.OVERFLOWED[0] = False
         try:
             v = prop["concl"](*x)
         except Exception:
+            continue
+        if backends.OVERFLOWED[0]:
+            # an intermediate exceeded double precision; the point says
+            # nothing about a statement that is exact over the reals
+            undecided += 1
             continue
         if v is True:
             ok += 1

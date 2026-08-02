@@ -19,6 +19,28 @@ from __future__ import annotations
 
 import math
 
+# Set whenever an operation produces a value double precision cannot hold.
+#
+# Checking the FINAL values for finiteness is not enough: an intermediate can
+# overflow to inf and then collapse back to a finite number.
+# `gradeCertifiedRisk (gradeCertifiedSampleSize eps K c) K c = eps` does
+# exactly that -- the inner term is about 10^32000 and overflows, and the
+# outer `inf ** -4e-05` comes back as a perfectly finite 0.0, which then
+# compares unequal to eps with both sides finite. The comparison sees nothing
+# wrong. So the fact of the overflow has to be carried out of band.
+#
+# A caller resets this before an evaluation and consults it after; a point
+# whose evaluation passed through a non-representable intermediate is not
+# evidence about a statement that is exact over the reals -- in EITHER
+# direction, since a collapse can as easily make two sides agree as disagree.
+OVERFLOWED = [False]
+
+
+def _finite(v):
+    if isinstance(v, float) and not math.isfinite(v):
+        OVERFLOWED[0] = True
+    return v
+
 
 # --------------------------------------------------------------- float
 
@@ -39,8 +61,9 @@ class FloatBackend:
     @staticmethod
     def exp(x):
         try:
-            return math.exp(x)
+            return _finite(math.exp(x))
         except OverflowError:
+            OVERFLOWED[0] = True
             return math.inf
 
     @staticmethod
@@ -100,9 +123,13 @@ class FloatBackend:
     def pow(a, b):
         if isinstance(b, float) and b.is_integer():
             n = int(b)
-            if n >= 0:
-                return a ** n
-            return FloatBackend.div(1.0, a ** (-n))
+            try:
+                if n >= 0:
+                    return _finite(a ** n)
+                return FloatBackend.div(1.0, _finite(a ** (-n)))
+            except OverflowError:
+                OVERFLOWED[0] = True
+                return math.inf
         return FloatBackend.rpow(a, b)
 
     @staticmethod
@@ -114,9 +141,10 @@ class FloatBackend:
             return 1.0 if b == 0 else 0.0
         try:
             if a > 0:
-                return math.exp(b * math.log(a))
-            return math.exp(b * math.log(-a)) * math.cos(b * math.pi)
+                return _finite(math.exp(b * math.log(a)))
+            return _finite(math.exp(b * math.log(-a)) * math.cos(b * math.pi))
         except OverflowError:
+            OVERFLOWED[0] = True
             return math.inf
 
     mx = staticmethod(max)
