@@ -75,7 +75,7 @@ noncomputable def sharedLDHeritability {m : ℕ}
 
     Empirical status: UNTESTED. -/
 noncomputable def pgsR2 (cov_pgs_y : ℝ) (var_pgs var_y : ℝ) : ℝ :=
-  cov_pgs_y ^ 2 / (var_pgs * var_y)
+  explainedR2FromTransportMoments cov_pgs_y var_pgs var_y
 
 /-- Source-population `R²` of the score that uses the true source effects as
     weights under a shared LD kernel. -/
