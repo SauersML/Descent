@@ -1,5 +1,7 @@
 import Mathlib.Tactic
 import Mathlib.Algebra.BigOperators.Fin
+import Mathlib.Algebra.BigOperators.Ring.Finset
+import Mathlib.Data.Fintype.Basic
 import Mathlib.Data.Fin.VecNotation
 import Mathlib.Data.Real.Sqrt
 import Mathlib.Analysis.SpecialFunctions.Exp
@@ -168,7 +170,7 @@ theorem eq_zero_of_bounded_by_linear (k M δ : ℝ) (hM : 0 ≤ M) (hδ : 0 < δ
     mul_le_mul_of_nonneg_left hτle hM
   have hfrac : M * (|k| / (2 * (M + 1))) < |k| := by
     rw [mul_div_assoc'] at *
-    rw [div_lt_iff (by linarith : (0:ℝ) < 2 * (M + 1))]
+    rw [div_lt_iff₀ (by linarith : (0:ℝ) < 2 * (M + 1))]
     nlinarith [habs, hM]
   linarith
 
@@ -197,14 +199,17 @@ itself a theorem about exact coverage blocks. -/
 theorem sin_has_many_zeros (N : ℕ) (hN : 0 < N) :
     ∃ f : Fin (N + 1) → ℝ, Function.Injective f ∧
       ∀ k : Fin (N + 1), Real.sin ((N : ℝ) * f k) = 0 := by
-  have hNne : (N : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr (Nat.pos_iff.mp hN).ne'
+  have hNne : (N : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr (Nat.ne_of_gt hN)
   refine ⟨fun k => (k : ℕ) * Real.pi / (N : ℝ), ?_, ?_⟩
   · intro k k' hkk'
-    have hpi : Real.pi ≠ 0 := Real.pi_ne_zero
-    field_simp at hkk'
-    rcases hkk' with h | h
-    · exact Fin.ext (Nat.cast_injective h)
-    · exact absurd h hpi
+    have hc : Real.pi / (N : ℝ) ≠ 0 := div_ne_zero Real.pi_ne_zero hNne
+    have hkreal : (k : ℝ) = (k' : ℝ) := by
+      apply mul_right_cancel₀ hc
+      calc
+        (k : ℝ) * (Real.pi / (N : ℝ)) = (k : ℝ) * Real.pi / (N : ℝ) := by ring
+        _ = (k' : ℝ) * Real.pi / (N : ℝ) := hkk'
+        _ = (k' : ℝ) * (Real.pi / (N : ℝ)) := by ring
+    exact Fin.ext (by exact_mod_cast hkreal)
   · intro k
     have : (N : ℝ) * ((k : ℕ) * Real.pi / (N : ℝ)) = (k : ℕ) * Real.pi := by
       field_simp

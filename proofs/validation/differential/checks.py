@@ -98,9 +98,10 @@ check(
     lean=lambda D, p1, p2: D["neiGstFromFrequencies"](p1, p2),
     ref=lambda p1, p2: refs.fst_nei_gst(p1, p2),
     canfail_clause=(
-        "grid must include |p1-p2| large AND pbar far from 0.5: at p1=p2 both "
-        "sides are 0 and at pbar=0.5 the Nei and Hudson denominators coincide, "
-        "so a symmetric grid cannot separate the conventions"
+        "grid must include |p1-p2| large: at p1=p2 both sides are 0 and no "
+        "grid confined there can separate the conventions. It need NOT avoid "
+        "pbar=0.5 -- see the CORRECTION note on simpleFst-vs-hudson; the two "
+        "conventions differ at pbar=0.5 too, by up to a factor of 2."
     ),
 )
 
@@ -122,7 +123,20 @@ check(
          "vanishes as G -> 1. It is not a constant, which is why no tolerance "
          "or calibration factor may ever absorb it. If this check ever PASSES, "
          "either the definition changed or refs.fst_hudson broke.",
-    canfail_clause="needs pbar != 0.5; Nei and Hudson coincide exactly at pbar=0.5",
+    canfail_clause=(
+        "needs p1 != p2. CORRECTED: this clause used to read 'needs pbar != "
+        "0.5; Nei and Hudson coincide exactly at pbar=0.5', copying the same "
+        "disjunct from the Conventions.hudsonFst docstring. It is FALSE and "
+        "cluster/fam_fst_allel_crosscheck.py cell C3 measures it: the exact "
+        "conversion Hudson = 2G/(1+G) has 2G/(1+G) = G only at G in {0,1}, so "
+        "the two coincide only at p1 = p2 (or complete fixation). At pbar=0.5 "
+        "exactly, (p1,p2) = (0.525,0.475) gives NEI_GST 0.0025 against HUDSON "
+        "0.0049875, a ratio of 1.995, and (0.9,0.1) gives 0.64 against "
+        "0.780488, ratio 1.2195. The clause was harmless here -- _PQ contains "
+        "pbar=0.5 rows and they separate the conventions fine -- but it named "
+        "a degeneracy that does not exist, which would have licensed dropping "
+        "exactly the rows that discriminate best at small divergence."
+    ),
 )
 
 check(
@@ -144,9 +158,12 @@ check(
         "differs by up to 50% localises the disagreement to the definition."
     ),
     canfail_clause=(
-        "the grid must stay off pbar = 0.5, where Nei and Hudson coincide "
-        "exactly and every check in this group goes degenerate. _PQ is chosen "
-        "for that."
+        "the grid must contain p1 != p2; at p1 = p2 every check in this group "
+        "goes degenerate because all estimators return 0. CORRECTED: this "
+        "clause used to say the grid must stay off pbar = 0.5. It does not -- "
+        "see simpleFst-vs-hudson's clause and cell C3 of "
+        "cluster/fam_fst_allel_crosscheck.py, which measures a factor of "
+        "1.995 between the conventions AT pbar = 0.5 exactly."
     ),
 )
 

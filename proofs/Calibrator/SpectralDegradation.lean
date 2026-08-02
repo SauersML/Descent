@@ -5,6 +5,8 @@ import Mathlib.Tactic.FinCases
 import Mathlib.Tactic.Linarith
 import Mathlib.Tactic.Ring
 import Calibrator.ReversibleMarkovSpectrum
+import Calibrator.GenerativePortabilityLaw
+import Calibrator.TransportedMinimax
 
 namespace Calibrator
 
