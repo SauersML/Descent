@@ -321,7 +321,6 @@ theorem selectionMigrationEquilibrium_orderings (s m : ℝ)
   have hkey : (s - m - m * s) / s =
       (1 - m) * ((s - m - m * s) / (s * (1 - m))) := by
     field_simp
-    ring
   unfold selectionMigrationEquilibrium selectionMigrationEquilibriumMigrationFirst
   rcases le_or_lt ((s - m - m * s) / (s * (1 - m))) 0 with h | h
   · have h0 : (s - m - m * s) / s ≤ 0 := by rw [hkey]; nlinarith

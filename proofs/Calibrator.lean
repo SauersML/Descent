@@ -121,7 +121,7 @@ def sigmaT : Matrix (Fin 2) (Fin 2) ℝ := ![![1, 1], ![1, 1]]
 /-- Source cross-covariances. -/
 def crossS : Fin 2 → ℝ := ![1, 0]
 
-/-! Target cross-covariances were restated here as `ldWitnessTargetCross`. The same witness
+/-! Target cross-covariances were restated here as `crossT`. The same witness
 vector `![1, 1]` is `DGP.ldWitnessTargetCross`, and the restatement has been
 deleted so that the two `2 × 2` witnesses in this development are one witness. -/
 

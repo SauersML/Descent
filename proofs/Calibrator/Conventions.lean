@@ -152,8 +152,8 @@ theorem effectiveSymmetricMigration_eq_meanAlleleFreq_map (m₁₂ m₂₁ : ℝ
 /-- **Hudson's `F_ST` for two subgroups**, as one minus the ratio of mean
 within-subgroup heterozygosity to total heterozygosity. Restored as a
 definition so that `F` denotes a quantity rather than a name; it had been
-deleted as unreferenced, which is precisely why `F` in the spike was free to
-mean anything.
+deleted as unreferenced, which is the reason `F` in the spike was free to mean
+anything.
 
     Empirical status: UNTESTED. Simulation recovers the spike constant against
     `F` measured this way (see `four_hudsonFst_eq_standardizedContrastVariance`

@@ -232,6 +232,28 @@ because it had no other place to go.
 
       Q(t+1) = (1 - c)² · [ 1/(2 Nₑ) + (1 - 1/(2 Nₑ)) · Q(t) ]
 
+    **This map is shared with the island model, and the sharing is substantive
+    rather than a coincidence of algebra.** The single-locus island-model
+    identity recursion is the same map with the migration rate `m` in the place
+    of `c` and `F_ST` in the place of `Q`
+    (`driftLDStep_eq_islandFstMultiplicativeStep` below states the identity).
+    The exact fixed point of `x = (1-t)²(a + (1-a)x)` with `a = 1/(2 Nₑ)` is
+    `x* = (1-t)² a / (1 - (1-t)²(1-a))`, which to first order in small `t` and
+    `a` is `a/(a + 2t) = 1/(1 + 4 Nₑ t)`. Sved's `1/(1 + 4 Nₑ c)` and Wright's
+    `1/(1 + 4 Nₑ m)` are therefore the same linearisation of the same
+    recurrence, which is why the two formulas have always looked alike.
+
+    **Pending refactor.** The owner of `PortabilityDrift.lean` is extracting the
+    shared map under a rate-neutral name (`ibdRecurrenceStep Ne rate x`), with
+    the exact fixed point and the weak-rate linearisation stated there as
+    theorems. Once that lands this body should become
+    `ibdRecurrenceStep Ne c Q`, keeping the recombination reading in this
+    docstring and inheriting the fixed-point theorem instead of restating it.
+    It must NOT be defined as `islandFstMultiplicativeStep`: an LD recurrence
+    defined in terms of a symbol named after `F_ST` is a misnaming, and
+    misnaming is what produced the factor-of-four error already recorded in this
+    corpus.
+
     Empirical status: UNTESTED as written here.  The formula it replaces
     (`bottleneckLDAmplification`, deleted above) was falsified by up to 3.3-fold
     through omitting `c`; the classical small-`c`, large-`Nₑ` limit of the
@@ -284,6 +306,31 @@ theorem driftLDStep_affine (Ne c Q : ℝ) :
       (1 - c) ^ 2 * (1 / (2 * Ne)) + driftLDRetention Ne c * Q := by
   unfold driftLDStep driftLDRetention
   ring
+
+/-- **The two equilibria are one equilibrium too.**  The step-level identity
+above forces this, but the two closed forms are written differently enough that
+nothing would have caught it: `driftLDEquilibrium` is
+`(1-c)²·(1/(2Nₑ)) / (1 - (1-c)²(1 - 1/(2Nₑ)))` and
+`fstIslandMultiplicativeEquilibrium` is `(1-m)²/((1-m)² + 2Nₑm(2-m))`.
+Multiplying the first through by `2Nₑ` gives the second, since
+`2Nₑ(1 - (1-t)²(1 - 1/(2Nₑ))) = (1-t)² + 2Nₑt(2-t)`.
+
+Stated here so that when the shared map is extracted under a neutral name, the
+two equilibria go with it as one quantity rather than being deduplicated by
+inspection. -/
+theorem driftLDEquilibrium_eq_fstIslandMultiplicativeEquilibrium (Ne c : ℝ)
+    (hNe : Ne ≠ 0) :
+    driftLDEquilibrium Ne c = fstIslandMultiplicativeEquilibrium Ne c := by
+  have h2Ne : (2 * Ne : ℝ) ≠ 0 := mul_ne_zero two_ne_zero hNe
+  have hlink : (1 - c) ^ 2 + 2 * Ne * c * (2 - c)
+      = 2 * Ne * (1 - driftLDRetention Ne c) := by
+    unfold driftLDRetention
+    field_simp
+    ring
+  unfold driftLDEquilibrium fstIslandMultiplicativeEquilibrium
+  rw [hlink,
+    show (1 - c) ^ 2 * (1 / (2 * Ne)) = (1 - c) ^ 2 / (2 * Ne) from by ring,
+    div_div]
 
 /-- The retention factor is a genuine per-generation probability: it lies in
     `[0, 1]` whenever `Nₑ ≥ 1` and `c ∈ [0, 1]`. -/

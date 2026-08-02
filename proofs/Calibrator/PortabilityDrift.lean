@@ -4628,7 +4628,14 @@ theorem fstIslandMultiplicativeEquilibrium_isFixedPoint (Ne m : ℝ)
   have hd' : (1 - m) ^ 2 + 2 * Ne * m * (2 - m) ≠ 0 := ne_of_gt hd
   unfold islandFstMultiplicativeStep fstIslandMultiplicativeEquilibrium
   have h2Ne : (2 : ℝ) * Ne ≠ 0 := mul_ne_zero two_ne_zero hNe'
+  set D : ℝ := (1 - m) ^ 2 + 2 * Ne * m * (2 - m) with hDdef
   rw [eq_div_iff hd']
+  have hAD : (1 - m) ^ 2 / D * D = (1 - m) ^ 2 := div_mul_cancel₀ _ hd'
+  have hexpand :
+      (1 - m) ^ 2 * (1 / (2 * Ne) + (1 - 1 / (2 * Ne)) * ((1 - m) ^ 2 / D)) * D =
+        (1 - m) ^ 2 * (1 / (2 * Ne)) * D +
+          (1 - m) ^ 2 * (1 - 1 / (2 * Ne)) * ((1 - m) ^ 2 / D * D) := by ring
+  rw [hexpand, hAD, hDdef]
   field_simp
   ring
 

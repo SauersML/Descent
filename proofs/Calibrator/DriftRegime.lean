@@ -1,5 +1,4 @@
 import Calibrator.ObservationalCeiling
-import Mathlib.Analysis.SpecialFunctions.Pow.NNRpow
 import Mathlib.Tactic.Linarith
 
 namespace Calibrator

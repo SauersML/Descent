@@ -32,11 +32,36 @@ that there is one place to add a row and one place that can go stale.
 
 The mathematical probes are not arbitrary. Each is certified by a witness ranging over a
 **σ-compact** parameter: a distortion constant `C`, a radius `r`, a cumulant order `K`,
-a bounded operator. Any relation so certified is a countable union of closed conditions
-(`IsCountablyCertified`), and reductions cannot raise a relation above the ceiling of
-its target (`countablyCertified_of_reduction`). In each of those settings the true
-object provably sits above that ceiling — which is why the failures are structural
-rather than a matter of finding a better statistic.
+a bounded operator. Section 4 says what that buys and — as of this revision — what it
+does not. A relation that is a countable union of conditions from a base class of simple
+sets is *below* the ceiling (`IsCountablyCertified`), and a reduction cannot raise a
+relation above the ceiling of its target **provided the reducing map preserves the base
+class** (`countablyCertified_of_reduction`; the preservation hypothesis is the content,
+and an earlier version of that theorem omitted it and was consequently free).
+
+Two honest corrections to what this section used to claim. First, the bare union shape
+with no restriction on the certificates is satisfied by every relation whatsoever —
+`unionOfCertificates_vacuous` proves it — so nothing can be read off it. Second, the
+claim that in each setting the true object *provably* sits above the ceiling is not
+established anywhere in this development: doing so requires, per instance, a
+union-stable invariant that the true relation fails, in the shape of
+`not_countablyCertified_of_invariant`, and no instance supplies one. What the corpus
+does prove is the blindness half — sections 1 to 3 — and it is the blindness half that
+carries the impossibility results. The ceiling is a classification of the probes, not
+the proof.
+
+## What "structural" means here, exactly
+
+`ProbeBlindness.same_data` is exact equality of probe output, so
+`no_criterion_of_factors` rules out criteria that factor through the probe *exactly*.
+That alone does not speak to a criterion resolving arbitrarily small differences in
+probe data. `ApproxProbeBlindness.no_stable_criterion` extends it to the approximate
+setting: if the two witnesses' probe outputs are close at a noise scale, then no
+criterion whose verdict is stable at that scale decides the property either — including
+every thresholded statistic with a decision margin wider than the gap. That is the
+precise sense in which the failures are structural rather than a matter of finding a
+better statistic: better statistics do not help unless they resolve below the noise
+scale, which is a question about the witness pair, not about the logic.
 
 ## Why a polygenic-score development states this abstractly
 
@@ -156,6 +181,82 @@ def ofWitnessFamily {Data ι : Type*} (p : ι → Object → Data) (P : Object �
   fails := hneg
 
 end ProbeBlindness
+
+/-!
+### 1a. Approximate blindness, and criteria with a margin
+
+`ProbeBlindness.same_data` is exact equality, so `no_criterion_of_factors` says nothing
+about a criterion that resolves arbitrarily small differences in probe data. The
+witness pairs in practice are only *close* — probe outputs agreeing to within a noise
+scale, a sampling error, a finite precision — and the criteria in practice are only
+required to be stable at that scale.
+
+`close` is any relation on data: a metric ball of radius `ε`, agreement to `k` digits,
+equality up to measurement noise. Nothing is assumed of it — not reflexivity, not
+symmetry, not transitivity — because nothing is needed.
+-/
+
+/-- An **approximate blindness witness**: two objects whose probe outputs are close at
+the noise scale `close`, but which differ in the property of interest. -/
+structure ApproxProbeBlindness {Object Data : Type*}
+    (close : Data → Data → Prop) (probe : Object → Data) (P : Object → Prop) where
+  /-- An object satisfying the property. -/
+  positive : Object
+  /-- An object failing it. -/
+  negative : Object
+  /-- The probe separates them by less than the noise scale. -/
+  close_data : close (probe positive) (probe negative)
+  holds : P positive
+  fails : ¬ P negative
+
+namespace ApproxProbeBlindness
+
+variable {Object Data : Type*} {close : Data → Data → Prop} {probe : Object → Data}
+  {P : Object → Prop}
+
+/-- **The approximate law.** No criterion whose verdict is stable at the noise scale
+decides the property.
+
+`hstable` is the whole hypothesis: the report must agree on data it cannot distinguish
+at scale `close`. Every thresholded statistic with a decision margin wider than the gap
+between the two witnesses satisfies it, as does any procedure that rounds, bins, or
+quantizes its input before deciding. The conclusion is the same as the exact law, and
+so is the proof — a stable report is a function of the data modulo the noise. -/
+theorem no_stable_criterion (B : ApproxProbeBlindness close probe P)
+    {Report : Type*} (report : Data → Report)
+    (hstable : ∀ d d' : Data, close d d' → report d = report d') :
+    ¬ ∃ accept : Report → Prop, ∀ o : Object, P o ↔ accept (report (probe o)) := by
+  rintro ⟨accept, hdec⟩
+  have hpos : accept (report (probe B.positive)) := (hdec B.positive).mp B.holds
+  rw [hstable _ _ B.close_data] at hpos
+  exact B.fails ((hdec B.negative).mpr hpos)
+
+/-- The concrete reading, for a real-valued probe and an explicit tolerance: if the two
+witnesses' probe values differ by at most `ε`, no `ε`-stable summary of that value
+decides the property. -/
+theorem no_stable_criterion_of_tolerance {Object : Type*} {probe : Object → ℝ}
+    {P : Object → Prop} {ε : ℝ}
+    (B : ApproxProbeBlindness (fun a b => |a - b| ≤ ε) probe P)
+    {Report : Type*} (report : ℝ → Report)
+    (hstable : ∀ a b : ℝ, |a - b| ≤ ε → report a = report b) :
+    ¬ ∃ accept : Report → Prop, ∀ o : Object, P o ↔ accept (report (probe o)) :=
+  B.no_stable_criterion report hstable
+
+end ApproxProbeBlindness
+
+/-- An exact witness is an approximate witness at any scale that is reflexive on the
+shared probe value. So the approximate law subsumes the exact one, and every instance in
+`Calibrator.BlindnessRegistry` inherits it. -/
+def ProbeBlindness.toApprox {Object Data : Type*} {probe : Object → Data}
+    {P : Object → Prop} (B : ProbeBlindness probe P) {close : Data → Data → Prop}
+    (hrefl : ∀ d : Data, close d d) : ApproxProbeBlindness close probe P where
+  positive := B.positive
+  negative := B.negative
+  close_data := by
+    rw [B.same_data]
+    exact hrefl _
+  holds := B.holds
+  fails := B.fails
 
 /-!
 ## 2. Blindness at every level at once
@@ -389,18 +490,23 @@ theorem not_countablyCertified_of_invariant
   rw [hEeq]
   exact hInv cert h.base_certificates
 
-/-- **What is still owed.** The prose of this development says the true object in each
-of the five settings sits *above* the ceiling. That is a statement of the form refuted
-by `not_countablyCertified_of_invariant`, and discharging it requires, per instance, a
+/-!
+### What section 4 still owes
+
+The prose of this development says the true object in each setting sits *above* the
+ceiling. That is a statement of the form refuted by
+`not_countablyCertified_of_invariant`, and discharging it requires, per instance, a
 union-stable invariant of `Base` conditions that the true relation fails. No instance
-supplies one, and this file does not prove one exists.
+supplies one, and nothing here proves one exists. It is stated as an open obligation
+rather than carried as a `sorry`, because no theorem in this file depends on it: the
+impossibility results rest on sections 1 to 3.
 
 What the corpus does establish is the opposite direction — that the *probes* sit below
-the ceiling (`IsUnionOfCertificates`, e.g. `HiddenConeAmbiguity`'s
-`boundedLogDistortion_iff_nat`) — together with the blindness results of sections 1
-to 3, which are what actually carry the impossibility claims. The ceiling is a
-classification, not the proof. -/
-theorem countablyCertified_open_obligation : True := trivial
+the ceiling as unions of certificates (`IsUnionOfCertificates`, e.g.
+`HiddenConeAmbiguity.boundedLogDistortion_iff_nat`) — together with the blindness
+results, which are what actually carry the claims. The ceiling classifies the probes;
+it does not do the refuting.
+-/
 
 /-!
 ## 5. The shape, stated once
