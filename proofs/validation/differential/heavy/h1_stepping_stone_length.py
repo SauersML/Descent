@@ -64,6 +64,7 @@ REQUIREMENTS
 
 import itertools
 import json
+import os
 import sys
 
 import msprime
@@ -125,19 +126,45 @@ def fit_length(fst):
     return -1.0 / slope
 
 
+# Incremental artifact.  This run takes hours per cell at the committed
+# SEQ_LEN and REPLICATES, and those are NOT to be reduced to make it finish --
+# a faster run and a weaker run are indistinguishable in a commit log, and only
+# one of them is allowed.  What IS fixable is the everything-or-nothing output:
+# the original wrote nothing until every cell was done, so a job killed at 95%
+# left no evidence at all.  Every replicate is now appended to a JSON-lines
+# file as soon as it is fitted, so a run that dies has still produced the
+# replicates it finished and the exponents can be refitted from them.
+JSONL_PATH = os.environ.get("H1_JSONL", "h1_replicates.jsonl")
+
+
+def _emit(record):
+    """Append one record to the JSON-lines artifact and to stdout, durably."""
+    line = json.dumps(record)
+    with open(JSONL_PATH, "a") as fh:
+        fh.write(line + "\n")
+        fh.flush()
+        os.fsync(fh.fileno())
+    print(line, flush=True)
+
+
 def main():
     out = []
     for cell in GRID:
-        Ls = [fit_length(run_one(**cell, seed=1000 + r)) for r in range(REPLICATES)]
+        Ls = []
+        for r in range(REPLICATES):
+            L_r = float(fit_length(run_one(**cell, seed=1000 + r)))
+            Ls.append(L_r)
+            _emit(dict(cell, kind="replicate", replicate=r, L_fit=L_r))
         rec = dict(
             cell,
+            kind="cell",
             L_measured=float(np.mean(Ls)),
             L_sd=float(np.std(Ls)),
             L_lean=float(np.sqrt(2 * cell["Ne"] * cell["m"])),
             L_malecot=float(np.sqrt(cell["m"] / (2 * cell["mu"]))),
         )
         out.append(rec)
-        print(json.dumps(rec), flush=True)
+        _emit(rec)
 
     # The decisive numbers: fitted exponents.
     mu_cells = [r for r in out if r["Ne"] == 1000]
