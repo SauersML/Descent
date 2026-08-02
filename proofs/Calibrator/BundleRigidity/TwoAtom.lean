@@ -178,7 +178,9 @@ theorem chain_denom_pos (k : ℕ) : (0 : ℝ) < 2 * (k : ℝ) + 1 := by positivi
 never reaches the Rademacher point. -/
 theorem chain_lt_half (k : ℕ) : chain k < 1 / 2 := by
   have hd := chain_denom_pos k
-  rw [chain, div_lt_div_iff hd (by norm_num : (0:ℝ) < 2)]
+  have hkey : 1 / 2 - chain k = 1 / (2 * (2 * (k : ℝ) + 1)) := by
+    rw [chain]; field_simp; ring
+  have hpos : 0 < 1 / (2 * (2 * (k : ℝ) + 1)) := by positivity
   linarith
 
 /-- **The exact gap to `1/2`.** This is the quantitative form of convergence:
@@ -229,12 +231,13 @@ theorem chain_identity_right (k : ℕ) :
     (1 - 2 * chain k) / (1 - chain k) = 1 / ((k : ℝ) + 1) := by
   have hd := chain_denom_pos k
   have hk : (0 : ℝ) < (k : ℝ) + 1 := by positivity
+  have hne : (2 * (k : ℝ) + 1) ≠ 0 := ne_of_gt hd
+  have hkne : ((k : ℝ) + 1) ≠ 0 := ne_of_gt hk
   have hnum : 1 - 2 * chain k = 1 / (2 * (k : ℝ) + 1) := by
     rw [chain]; field_simp
   have hden : 1 - chain k = ((k : ℝ) + 1) / (2 * (k : ℝ) + 1) := by
-    rw [chain]; field_simp; ring
-  rw [hnum, hden, div_div_div_cancel_right']
-  rw [one_div_div]
+    rw [chain]; field_simp
+  rw [hnum, hden, div_div_div_comm]
   field_simp
 
 /-- **The chain identity, as the source states it:**
@@ -318,10 +321,15 @@ theorem chain_tendsto_half :
   have hd := chain_denom_pos n
   have hNn : (N : ℝ) ≤ (n : ℝ) := Nat.cast_le.mpr hn
   have hbound : 1 / (2 * (2 * (n : ℝ) + 1)) < ε := by
-    rw [div_lt_iff (by linarith)]
+    -- Avoid named division lemmas entirely: supply the inverse identity to `nlinarith`.
+    have hD : (0 : ℝ) < 2 * (2 * (n : ℝ) + 1) := by linarith
     have h1 : 1 / ε < (n : ℝ) := lt_of_lt_of_le hN hNn
-    rw [div_lt_iff hε] at h1
-    nlinarith [hε.le]
+    have hεinv : ε * (1 / ε) = 1 := by field_simp
+    have h2 : 1 < ε * (n : ℝ) := by nlinarith [mul_lt_mul_of_pos_left h1 hε]
+    have hn0 : (0 : ℝ) ≤ (n : ℝ) := Nat.cast_nonneg n
+    have hinv : (2 * (2 * (n : ℝ) + 1)) * (1 / (2 * (2 * (n : ℝ) + 1))) = 1 := by
+      field_simp
+    nlinarith [hinv, hD, hε, h2, hn0]
   rw [Real.dist_eq, hgap n]
   exact hbound
 

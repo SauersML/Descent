@@ -75,6 +75,7 @@ noncomputable def taskDegradation (source target : FiniteSpectralModel Band)
     (taskWeight : Band → ℝ) : ℝ :=
   ∑ b, taskWeight b * degradationProfile source target b
 
+omit [Fintype Band] in
 theorem crossSpectrum_eq_mul_optimalReadout (P : FiniteSpectralModel Band) (b : Band) :
     P.crossSpectrum b = P.featureSpectrum b * optimalReadout P b := by
   unfold optimalReadout

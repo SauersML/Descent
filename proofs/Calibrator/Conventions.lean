@@ -157,8 +157,28 @@ of mean within-subgroup heterozygosity to TOTAL heterozygosity is the
 definition of `G_ST`; the docstring said exactly that and nobody noticed it
 described a different estimator from the one in the name. Hudson's `F_ST`
 divides by the BETWEEN-subgroup heterozygosity `p₁(1-p₂) + p₂(1-p₁)`, not by
-the total-pool `2·p̄·(1-p̄)`. The two denominators differ by `(p₁-p₂)²/2`, so
-they agree only when `p₁ = p₂` or `p̄ = 1/2`.
+the total-pool `2·p̄·(1-p̄)`. The two denominators differ by exactly
+`(p₁-p₂)²/2`, so THE DENOMINATORS agree iff `p₁ = p₂`, and the two ESTIMATORS
+agree iff `G_ST = 0` or `G_ST = 1` -- that is, only where the differentiation
+is degenerate.
+
+**A previous version of this docstring said they agree when `p₁ = p₂` OR
+`p̄ = 1/2`. THE SECOND DISJUNCT IS FALSE**, and it is false in both readings.
+The denominators differ by `(p₁-p₂)²/2`, which does not vanish at `p̄ = 1/2`;
+and by the corpus's own `trueHudsonFst_eq_of_neiGst`, Hudson `= 2G/(1+G)`,
+which equals `G` only at `G = 0` or `G = 1`. So there is no interior
+`p̄ = 1/2` slice on which the two coincide. Witness, on `p̄ = 1/2` exactly:
+at `p₁ = 0.9, p₂ = 0.1` the Nei denominator is `1`, `G_ST = 0.64`, and Hudson
+is `0.64/0.82 = 0.7805` -- a ratio of `1.22`. Nearer the middle it is worse:
+`1.995` at `(0.525, 0.475)`, `1.923` at `(0.6, 0.4)`, `1.724` at `(0.7, 0.3)`.
+
+The error is worth naming because it is cheap to half-check and wrong: at
+`p̄ = 1/2` the Nei denominator `4·p̄·(1-p̄)` is exactly `1`, which feels like it
+should settle the comparison and does not -- it makes `G_ST = (p₁-p₂)²`, while
+Hudson still divides by `1 - 2p₁p₂`. A DENOMINATOR COINCIDENCE IS NOT AN
+ESTIMATOR COINCIDENCE, and here there was not even a denominator coincidence.
+The claim had propagated into three `checks.py` can-fail clauses and out of the
+corpus into status reporting before anyone tested the slice it names.
 
     Derivation, since this is decidable without any simulation. With
     `d = p₁ - p₂` and `p̄ = (p₁+p₂)/2`,
@@ -233,6 +253,20 @@ spellings of one. Without an exhibited point the conflation can be
 reintroduced by anyone who reads the `hudsonFst` name and believes it. -/
 theorem hudsonFst_ne_trueHudsonFst :
     hudsonFst (1/5) (3/5) ≠ trueHudsonFst (1/5) (3/5) := by
+  unfold hudsonFst trueHudsonFst ploidy meanAlleleFreq
+  norm_num
+
+/-- **A witness ON the `p̄ = 1/2` slice**, which two docstrings and three
+`checks.py` clauses used to name as a place where the estimators agree.
+
+`p₁ = 9/10, p₂ = 1/10` has `p̄ = 1/2` exactly. `hudsonFst` (Nei's `G_ST`) is
+`16/25` and `trueHudsonFst` is `(16/25)/(41/50)`, a ratio of `50/41 ≈ 1.22`.
+The false claim is therefore refuted at a point, not merely argued against:
+`p̄ = 1/2` makes the Nei denominator `1` and nothing more. Stated separately
+from `hudsonFst_ne_trueHudsonFst` because that witness sits at `p̄ = 2/5` and
+so cannot exclude the slice that was actually claimed. -/
+theorem hudsonFst_ne_trueHudsonFst_at_mean_half :
+    hudsonFst (9/10) (1/10) ≠ trueHudsonFst (9/10) (1/10) := by
   unfold hudsonFst trueHudsonFst ploidy meanAlleleFreq
   norm_num
 

@@ -138,10 +138,10 @@ If each conditioning step contracts the partial expectation by a factor `1 - a k
 initial expectation is bounded by one, then the `n`-th partial expectation is bounded by
 the product of the contraction factors.
 
-This is the entire iteration of the master theorem, proved by induction and with no
-hypothesis beyond `0 ≤ a k ≤ 1`. -/
+This is the entire iteration of the master theorem, proved by induction. The only sign
+condition needed here is `a k ≤ 1`, which makes every contraction factor non-negative. -/
 theorem abs_le_prod_of_step (E : ℕ → ℝ) (a : ℕ → ℝ)
-    (ha0 : ∀ k, 0 ≤ a k) (ha1 : ∀ k, a k ≤ 1)
+    (ha1 : ∀ k, a k ≤ 1)
     (h0 : |E 0| ≤ 1)
     (hstep : ∀ k, |E (k + 1)| ≤ (1 - a k) * |E k|) (n : ℕ) :
     |E n| ≤ ∏ k ∈ range n, (1 - a k) := by
@@ -161,7 +161,7 @@ theorem abs_le_prod_of_step (E : ℕ → ℝ) (a : ℕ → ℝ)
 Each factor obeys `1 - x ≤ e^{-x}`, and the factors are non-negative, so the products
 compare. This is the step that turns the telescope into a decay rate. -/
 theorem prod_one_sub_le_exp_neg_sum (a : ℕ → ℝ)
-    (ha0 : ∀ k, 0 ≤ a k) (ha1 : ∀ k, a k ≤ 1) (n : ℕ) :
+    (ha1 : ∀ k, a k ≤ 1) (n : ℕ) :
     ∏ k ∈ range n, (1 - a k) ≤ Real.exp (-(∑ k ∈ range n, a k)) := by
   have hterm : ∀ k ∈ range n, (1 - a k) ≤ Real.exp (-(a k)) := by
     intro k _
@@ -195,15 +195,12 @@ the step bound gives the exponential bound, for **any coupling whatsoever** — 
 point of the theorem, and the step that replaces the product-of-characteristic-functions
 argument everywhere downstream. -/
 theorem master_decay_bound (E : ℕ → ℝ) (θ : ℝ) (ε γ : ℕ → ℝ)
-    (hθ0 : 0 ≤ θ) (hfresh : ∀ k, 0 ≤ ε k) (hgain : ∀ k, 0 ≤ γ k)
     (hle : ∀ k, θ * ε k * γ k ≤ 1)
     (h0 : |E 0| ≤ 1)
     (hstep : ∀ k, |E (k + 1)| ≤ (1 - θ * ε k * γ k) * |E k|) (n : ℕ) :
     |E n| ≤ Real.exp (-(∑ k ∈ range n, θ * ε k * γ k)) := by
-  have ha0 : ∀ k, 0 ≤ θ * ε k * γ k := fun k =>
-    mul_nonneg (mul_nonneg hθ0 (hfresh k)) (hgain k)
-  exact le_trans (abs_le_prod_of_step E _ ha0 hle h0 hstep n)
-    (prod_one_sub_le_exp_neg_sum _ ha0 hle n)
+  exact le_trans (abs_le_prod_of_step E _ hle h0 hstep n)
+    (prod_one_sub_le_exp_neg_sum _ hle n)
 
 /-- **The master bound in terms of the freshness floor `D`.**
 
@@ -215,13 +212,11 @@ For independent coordinates every `ε k = 1`, so `D = n` and the bound recovers 
 classical product decay. Under dependence `D` collapses gracefully — which is exactly the
 behaviour the product-of-characteristic-functions step could not express. -/
 theorem master_decay_bound_uniform (E : ℕ → ℝ) (θ γ : ℝ) (ε : ℕ → ℝ)
-    (hθ0 : 0 ≤ θ) (hγ0 : 0 ≤ γ) (hfresh : ∀ k, 0 ≤ ε k)
     (hle : ∀ k, θ * ε k * γ ≤ 1)
     (h0 : |E 0| ≤ 1)
     (hstep : ∀ k, |E (k + 1)| ≤ (1 - θ * ε k * γ) * |E k|) (n : ℕ) :
     |E n| ≤ Real.exp (-(θ * γ * ∑ k ∈ range n, ε k)) := by
-  have hmain := master_decay_bound E θ ε (fun _ => γ) hθ0 hfresh (fun _ => hγ0) hle h0
-    hstep n
+  have hmain := master_decay_bound E θ ε (fun _ => γ) hle h0 hstep n
   have hrw : ∑ k ∈ range n, θ * ε k * γ = θ * γ * ∑ k ∈ range n, ε k := by
     rw [Finset.mul_sum]
     exact Finset.sum_congr rfl fun k _ => by ring
@@ -323,12 +318,11 @@ is that those contractions deliver exponential decay in `D`. -/
 theorem master_decay_bound_effDim (E : ℕ → ℝ) (θ γ : ℝ)
     (fresh : Equiv.Perm (Fin n) → ℕ → ℝ) (σ : Equiv.Perm (Fin n))
     (hopt : dimSum fresh σ = effDim fresh)
-    (hθ0 : 0 ≤ θ) (hγ0 : 0 ≤ γ) (hfresh : ∀ k, 0 ≤ fresh σ k)
     (hle : ∀ k, θ * fresh σ k * γ ≤ 1)
     (h0 : |E 0| ≤ 1)
     (hstep : ∀ k, |E (k + 1)| ≤ (1 - θ * fresh σ k * γ) * |E k|) :
     |E n| ≤ Real.exp (-(θ * γ * effDim fresh)) := by
-  have hmain := master_decay_bound_uniform E θ γ (fresh σ) hθ0 hγ0 hfresh hle h0 hstep n
+  have hmain := master_decay_bound_uniform E θ γ (fresh σ) hle h0 hstep n
   have hsum : ∑ k ∈ range n, fresh σ k = effDim fresh := hopt
   rwa [hsum] at hmain
 

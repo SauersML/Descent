@@ -64,8 +64,19 @@ theorem nei_fst_in_unit (H_T H_S : ℝ)
     by `H_T` gives this body. Hudson's estimator lives in `Conventions` as
     `trueHudsonFst`, with the exact conversion `Hudson = 2·G/(1 + G)` proved as
     `Conventions.trueHudsonFst_eq_of_neiGst`. The two differ by up to a factor
-    of two -- +71.4% at `p₁ = 0.2, p₂ = 0.6` -- and agree only at `p₁ = p₂` or
-    `p̄ = 1/2`.
+    of two -- +71.4% at `p₁ = 0.2, p₂ = 0.6` -- and AGREE ONLY WHERE THIS
+    QUANTITY IS `0` OR `1`, i.e. at `p₁ = p₂` or at complete differentiation.
+    That is immediate from the conversion: `2·G/(1+G) = G` iff `G = 0` or
+    `G = 1`.
+
+    **This corrects a false claim that stood here.** The docstring used to add
+    "or `p̄ = 1/2`" as a second agreement condition. There is no such slice.
+    On `p̄ = 1/2` exactly, with `p₁ = 0.9, p₂ = 0.1`, this body gives `0.64`
+    and Hudson gives `0.7805`, a ratio of `1.22`; toward the middle the ratio
+    approaches `2` (`1.995` at `(0.525, 0.475)`). The trap is that `p̄ = 1/2`
+    makes the denominator `4·p̄·(1-p̄)` equal `1`, which looks like it should
+    settle the comparison — it only makes `G_ST = (p₁-p₂)²`, while Hudson
+    still divides by `1 - 2·p₁·p₂`.
 
     The arithmetic is unchanged by the rename; only the claim about what the
     number is has been made explicit.

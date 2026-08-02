@@ -157,3 +157,109 @@ def mul(a, b):
 
 def neg(a):
     return [neg(x) for x in a] if _is_vec(a) else -a
+
+
+# ------------------------------------------- inhabitants of function types
+#
+# A Lean value of type `Fin n → ℝ` is read in TWO different ways by the code
+# this package generates:
+#
+#   * as a table, when the argument was declared `Fin n → ℝ` -- the translator
+#     emits `v[int(i)]`, and `∑ i, v i` needs `len(v)`;
+#   * as a function, when the same value arrives as a structure FIELD -- the
+#     translator emits `_rt._proj(s, 'v')(i)`, because from inside a body a
+#     projection is just an expression that gets applied.
+#
+# Handing out two different Python values for the one Lean value is what broke
+# this before: `admissible.struct_value` gave function-typed fields a lambda,
+# which has no length, so `∑ j, spectrum.weight j` could not run, and gave
+# `Pop → Matrix …` fields a *dict* (it read the head `Pop` as a structure name),
+# so `m.directCausal P` raised "'dict' object is not callable".  VecFn is ONE
+# value that answers both readings, so a field and an argument of the same Lean
+# type behave identically and cannot disagree.
+#
+# Out-of-range indexing RAISES.  It must: silently clamping or wrapping would
+# turn "this definition was evaluated at an index its argument does not have"
+# into a plausible number, and that number would become evidence.
+
+
+def _ix(k, n, who):
+    if isinstance(k, bool) or not isinstance(k, (int, float)):
+        raise TypeError(f"{who}: index {k!r} is not a finite-type index; "
+                        "refusing to invent one")
+    i = int(k)
+    if not 0 <= i < n:
+        raise IndexError(f"{who}: index {i} outside 0..{n - 1}; the inhabitant "
+                         "does not cover this point (widen the sampled "
+                         "dimension rather than reading a wrapped entry)")
+    return i
+
+
+class VecFn(list):
+    """A finite Lean function `ι → X`, usable as a table AND as a function.
+
+    `v[i]` and `v(i)` are the same entry; `v(i, j)` walks two levels, which is
+    how `M i j` for a `Matrix (Fin p) (Fin q) ℝ` field arrives.  Being a `list`
+    subclass means `len`, iteration, `sum`, and the elementwise `add`/`sub`/
+    `mul` above all work on it unchanged.
+    """
+
+    __slots__ = ()
+
+    def __call__(self, *idx):
+        v = self
+        for k in idx:
+            if not isinstance(v, (list, tuple)):
+                raise TypeError(
+                    f"VecFn applied to {len(idx)} indices but ran out of "
+                    "dimensions; this value is not that many levels deep")
+            v = v[_ix(k, len(v), "VecFn")]
+        return v
+
+    def __repr__(self):
+        return f"VecFn({list.__repr__(self)})"
+
+
+def dotProduct(u, v):
+    """Mathlib `dotProduct u v = ∑ i, u i * v i`.
+
+    Refuses on a length mismatch: Lean's version is typed `(Fin n → ℝ) → (Fin n
+    → ℝ) → ℝ`, so unequal lengths mean the two arguments came from different
+    dimensions and zipping them would silently compute a truncated sum.
+    """
+    u, v = list(u), list(v)
+    if len(u) != len(v):
+        raise ValueError(f"dotProduct: lengths {len(u)} and {len(v)} differ; "
+                         "in Lean both live in `Fin n → ℝ` for one `n`")
+    return sum(a * b for a, b in zip(u, v))
+
+
+def mulVec(M, v):
+    """Mathlib `Matrix.mulVec M v = fun i => ∑ j, M i j * v j`."""
+    M = [list(r) for r in M]
+    v = list(v)
+    for r in M:
+        if len(r) != len(v):
+            raise ValueError(f"mulVec: matrix row width {len(r)} does not "
+                             f"match vector length {len(v)}")
+    return VecFn(sum(a * b for a, b in zip(r, v)) for r in M)
+
+
+def vecMul(v, M):
+    """Mathlib `Matrix.vecMul v M = fun j => ∑ i, v i * M i j`."""
+    M = [list(r) for r in M]
+    v = list(v)
+    if len(M) != len(v):
+        raise ValueError(f"vecMul: matrix has {len(M)} rows, vector has "
+                         f"{len(v)} entries")
+    return VecFn(sum(v[i] * M[i][j] for i in range(len(v)))
+                 for j in range(len(M[0]) if M else 0))
+
+
+def trace(M):
+    """Mathlib `Matrix.trace M = ∑ i, M i i`.  Square matrices only."""
+    M = [list(r) for r in M]
+    for r in M:
+        if len(r) != len(M):
+            raise ValueError(f"trace: matrix is {len(M)}x{len(r)}, not square")
+    return sum(M[i][i] for i in range(len(M)))

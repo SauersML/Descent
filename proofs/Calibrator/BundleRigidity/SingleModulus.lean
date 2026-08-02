@@ -433,45 +433,54 @@ which is exactly `v > 0`.
 `c = 1/(4A)` endpoint of the upstream one-parameter line, at which the mass on `√(1-v)`
 reaches zero and the atom disappears — not a new solution, but an endpoint of the known
 one that the upstream positivity analysis excluded by assumption. -/
-noncomputable def threeAtom (v A B : ℝ) (hv : 0 ≤ v) (hA : A ^ 2 = 1 + v)
-    (hB : B ^ 2 = 1 - v) (hApos : 0 < A) (hBpos : 0 < B) (hBA : B < A) :
+Parameterized by the **ratio** `r = B / A` rather than by a quotient written inline: the
+masses are then `1/4 + r/4`, `1/4 - r/4`, `1/2`, and the construction contains **no
+division at all**. Positivity of the middle mass is exactly `r < 1`, which is exactly
+`B < A`, which is exactly `v > 0`. This shape was adopted after a build showed the
+divided form failing on renamed division lemmas; it is the same family. -/
+noncomputable def threeAtom (v A B r : ℝ) (hv : 0 ≤ v) (hA : A ^ 2 = 1 + v)
+    (hB : B ^ 2 = 1 - v) (hApos : 0 < A) (hBpos : 0 < B)
+    (hr0 : 0 < r) (hr1 : r < 1) (hr : B = A * r) :
     SingleModulus 3 v where
   atom := ![A, -A, -B]
-  mass := ![1 / 4 + B / (4 * A), 1 / 4 - B / (4 * A), 1 / 2]
+  mass := ![1 / 4 + r / 4, 1 / 4 - r / 4, 1 / 2]
   atom_inj := by
+    have hBA : B < A := by rw [hr]; nlinarith
     intro i j hij
-    fin_cases i <;> fin_cases j <;> simp_all <;> linarith
+    fin_cases i <;> fin_cases j <;>
+      simp only [Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons,
+        Matrix.head_fin_const, Matrix.cons_val] at hij ⊢ <;>
+      first
+        | rfl
+        | (exfalso; linarith)
   mass_pos := by
     intro j
-    have hA0 : A ≠ 0 := ne_of_gt hApos
-    have hlt : B / (4 * A) < 1 / 4 := by
-      rw [div_lt_iff (by linarith : (0:ℝ) < 4 * A)]
-      linarith
-    have hgt : 0 < B / (4 * A) := div_pos hBpos (by linarith)
-    fin_cases j <;> simp <;> linarith
+    fin_cases j <;>
+      simp only [Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons,
+        Matrix.head_fin_const, Matrix.cons_val] <;> linarith
   mass_sum := by
     rw [Fin.sum_univ_three]
-    simp
+    show (1 / 4 + r / 4) + (1 / 4 - r / 4) + (1 / 2 : ℝ) = 1
     ring
   mean_zero := by
-    have hA0 : A ≠ 0 := ne_of_gt hApos
     rw [Fin.sum_univ_three]
-    simp
-    field_simp
-    ring
+    show (1 / 4 + r / 4) * A + (1 / 4 - r / 4) * (-A) + (1 / 2 : ℝ) * (-B) = 0
+    rw [hr]; ring
   var_one := by
-    have hA0 : A ≠ 0 := ne_of_gt hApos
     rw [Fin.sum_univ_three]
-    simp
-    have hkey : (1 / 4 + B / (4 * A)) * A ^ 2 + (1 / 4 - B / (4 * A)) * (-A) ^ 2
-        + (1 / 2) * (-B) ^ 2 = (1 / 2) * A ^ 2 + (1 / 2) * B ^ 2 := by
-      field_simp; ring
+    show (1 / 4 + r / 4) * A ^ 2 + (1 / 4 - r / 4) * (-A) ^ 2
+      + (1 / 2 : ℝ) * (-B) ^ 2 = 1
+    have hkey : (1 / 4 + r / 4) * A ^ 2 + (1 / 4 - r / 4) * (-A) ^ 2
+        + (1 / 2 : ℝ) * (-B) ^ 2 = (1 / 2) * A ^ 2 + (1 / 2) * B ^ 2 := by ring
     rw [hkey, hA, hB]; ring
   modulus_eq := by
     intro j
-    fin_cases j <;> simp
-    · rw [hA]; rw [abs_of_nonneg (by linarith)]; ring
-    · rw [show (-A) ^ 2 = A ^ 2 by ring, hA, abs_of_nonneg (by linarith)]; ring
+    fin_cases j <;>
+      simp only [Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons,
+        Matrix.head_fin_const, Matrix.cons_val]
+    · rw [hA, abs_of_nonneg (by linarith : (0:ℝ) ≤ 1 + v - 1)]; ring
+    · rw [show (-A) ^ 2 = A ^ 2 by ring, hA,
+        abs_of_nonneg (by linarith : (0:ℝ) ≤ 1 + v - 1)]; ring
     · rw [show (-B) ^ 2 = B ^ 2 by ring, hB, show (1 : ℝ) - v - 1 = -v by ring,
         abs_neg, abs_of_nonneg hv]
 
@@ -482,8 +491,8 @@ This is the positive control. A search that reports "no `d = 3` family exists fo
 must find this one, and the upstream search did not. -/
 noncomputable def threeAtomWitness_threeFifths (B : ℝ) (hB : B ^ 2 = 2 / 5)
     (hBpos : 0 < B) : SingleModulus 3 (3 / 5) := by
-  refine threeAtom (3 / 5) (2 * B) B (by norm_num) ?_ (by rw [hB]; norm_num)
-    (by linarith) hBpos (by linarith)
+  refine threeAtom (3 / 5) (2 * B) B (1 / 2) (by norm_num) ?_ (by rw [hB]; norm_num)
+    (by linarith) hBpos (by norm_num) (by norm_num) (by ring)
   rw [show (2 * B) ^ 2 = 4 * B ^ 2 by ring, hB]; norm_num
 
 /-- **The `v = 1` family: atoms `(√2, -√2, 0)` with masses `(1/4, 1/4, 1/2)`.**
@@ -504,19 +513,36 @@ noncomputable def threeAtomAtOne (A : ℝ) (hA : A ^ 2 = 2) (hApos : 0 < A) :
   mass := ![1 / 4, 1 / 4, 1 / 2]
   atom_inj := by
     intro i j hij
-    fin_cases i <;> fin_cases j <;> simp_all <;> linarith
-  mass_pos := by intro j; fin_cases j <;> norm_num
-  mass_sum := by rw [Fin.sum_univ_three]; norm_num
-  mean_zero := by rw [Fin.sum_univ_three]; simp; ring
+    fin_cases i <;> fin_cases j <;>
+      simp only [Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons,
+        Matrix.head_fin_const, Matrix.cons_val] at hij ⊢ <;>
+      first
+        | rfl
+        | (exfalso; linarith)
+  mass_pos := by
+    intro j
+    fin_cases j <;>
+      simp only [Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons,
+        Matrix.head_fin_const, Matrix.cons_val] <;> norm_num
+  mass_sum := by
+    rw [Fin.sum_univ_three]
+    show (1 / 4 : ℝ) + 1 / 4 + 1 / 2 = 1
+    norm_num
+  mean_zero := by
+    rw [Fin.sum_univ_three]
+    show (1 / 4 : ℝ) * A + 1 / 4 * (-A) + 1 / 2 * (0 : ℝ) = 0
+    ring
   var_one := by
     rw [Fin.sum_univ_three]
-    simp
+    show (1 / 4 : ℝ) * A ^ 2 + 1 / 4 * (-A) ^ 2 + 1 / 2 * (0 : ℝ) ^ 2 = 1
     have hkey : (1 / 4 : ℝ) * A ^ 2 + 1 / 4 * (-A) ^ 2 + 1 / 2 * (0 : ℝ) ^ 2
         = (1 / 2) * A ^ 2 := by ring
     rw [hkey, hA]; norm_num
   modulus_eq := by
     intro j
-    fin_cases j <;> simp
+    fin_cases j <;>
+      simp only [Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons,
+        Matrix.head_fin_const, Matrix.cons_val]
     · rw [hA]; norm_num
     · rw [show (-A) ^ 2 = A ^ 2 by ring, hA]; norm_num
     · norm_num
@@ -539,33 +565,52 @@ noncomputable def fourAtom (v A B c : ℝ) (hv : 0 ≤ v) (hA : A ^ 2 = 1 + v)
   mass := ![1 / 4 + c * B, 1 / 4 - c * B, 1 / 4 - c * A, 1 / 4 + c * A]
   atom_inj := by
     intro i j hij
-    fin_cases i <;> fin_cases j <;> simp_all <;> linarith
+    fin_cases i <;> fin_cases j <;>
+      simp only [Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons,
+        Matrix.head_fin_const, Matrix.cons_val] at hij ⊢ <;>
+      first
+        | rfl
+        | (exfalso; linarith)
   mass_pos := by
     intro j
     have hcA : |c * A| < 1 / 4 := by
       rw [abs_mul, abs_of_pos hApos]; exact hc
     have hcB : |c * B| < 1 / 4 := by
       rw [abs_mul, abs_of_pos hBpos]
-      have : |c| * B ≤ |c| * A := by
-        apply mul_le_mul_of_nonneg_left (le_of_lt hBA) (abs_nonneg c)
+      have hmul : |c| * B ≤ |c| * A :=
+        mul_le_mul_of_nonneg_left (le_of_lt hBA) (abs_nonneg c)
       linarith
     have h1 := abs_lt.mp hcA
     have h2 := abs_lt.mp hcB
-    fin_cases j <;> simp <;> linarith [h1.1, h1.2, h2.1, h2.2]
-  mass_sum := by rw [Fin.sum_univ_four]; simp; ring
-  mean_zero := by rw [Fin.sum_univ_four]; simp; ring
+    fin_cases j <;>
+      simp only [Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons,
+        Matrix.head_fin_const, Matrix.cons_val] <;>
+      linarith [h1.1, h1.2, h2.1, h2.2]
+  mass_sum := by
+    rw [Fin.sum_univ_four]
+    show (1 / 4 + c * B) + (1 / 4 - c * B) + (1 / 4 - c * A) + (1 / 4 + c * A) = 1
+    ring
+  mean_zero := by
+    rw [Fin.sum_univ_four]
+    show (1 / 4 + c * B) * A + (1 / 4 - c * B) * (-A) + (1 / 4 - c * A) * B
+      + (1 / 4 + c * A) * (-B) = 0
+    ring
   var_one := by
     rw [Fin.sum_univ_four]
-    simp
+    show (1 / 4 + c * B) * A ^ 2 + (1 / 4 - c * B) * (-A) ^ 2
+      + (1 / 4 - c * A) * B ^ 2 + (1 / 4 + c * A) * (-B) ^ 2 = 1
     have hkey : (1 / 4 + c * B) * A ^ 2 + (1 / 4 - c * B) * (-A) ^ 2
         + (1 / 4 - c * A) * B ^ 2 + (1 / 4 + c * A) * (-B) ^ 2
         = (1 / 2) * A ^ 2 + (1 / 2) * B ^ 2 := by ring
     rw [hkey, hA, hB]; ring
   modulus_eq := by
     intro j
-    fin_cases j <;> simp
-    · rw [hA, abs_of_nonneg (by linarith)]; ring
-    · rw [show (-A) ^ 2 = A ^ 2 by ring, hA, abs_of_nonneg (by linarith)]; ring
+    fin_cases j <;>
+      simp only [Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons,
+        Matrix.head_fin_const, Matrix.cons_val]
+    · rw [hA, abs_of_nonneg (by linarith : (0:ℝ) ≤ 1 + v - 1)]; ring
+    · rw [show (-A) ^ 2 = A ^ 2 by ring, hA,
+        abs_of_nonneg (by linarith : (0:ℝ) ≤ 1 + v - 1)]; ring
     · rw [hB, show (1 : ℝ) - v - 1 = -v by ring, abs_neg, abs_of_nonneg hv]
     · rw [show (-B) ^ 2 = B ^ 2 by ring, hB, show (1 : ℝ) - v - 1 = -v by ring,
         abs_neg, abs_of_nonneg hv]
