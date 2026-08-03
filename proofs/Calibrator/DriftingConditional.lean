@@ -1686,6 +1686,59 @@ theorem invariance_slope_pos (L : ℝ → ℝ) (hmono : StrictMono L)
     exact absurd hsep (lt_irrefl _)
   · exact hpos
 
+/-! ### Step four: averaging cannot see a jump
+
+`link_average_as_convolution` needs a liability measure `ν` with `L u = p + ν (Iic u)`, and a
+monotone bounded curve carries one only if it is right-continuous. The hypotheses of
+`link_rigidity` do not say that: `StrictMono` permits countably many jumps.
+
+They do not have to say it. A monotone curve is discontinuous at only countably many points, an
+affine change of variable with nonzero scale keeps that set countable, and the standard normal
+assigns it no mass. So the Gaussian average of the curve is the Gaussian average of its
+right-continuous version, and the jumps are invisible to the averaging that the invariance is
+about. -/
+
+open MeasureTheory ProbabilityTheory Filter Topology Function in
+/-- **The displaced discontinuity set is null.** -/
+theorem gaussianAverage_ae_continuousAt (L : ℝ → ℝ) (hmono : Monotone L) (σ : ℝ) (hσ : σ ≠ 0)
+    (x : ℝ) :
+    ∀ᵐ z ∂(gaussianReal 0 1), ContinuousAt L (x + σ * z) := by
+  haveI : NoAtoms (gaussianReal 0 1) := noAtoms_gaussianReal one_ne_zero
+  have hinj : Function.Injective (fun z : ℝ ↦ x + σ * z) := by
+    intro a b hab
+    simp only at hab
+    exact mul_left_cancel₀ hσ (by linarith)
+  have hcount : {z : ℝ | ¬ ContinuousAt L (x + σ * z)}.Countable :=
+    Set.Countable.preimage hmono.countable_not_continuousAt hinj
+  rw [MeasureTheory.ae_iff]
+  exact hcount.measure_zero _
+
+open MeasureTheory ProbabilityTheory Filter Topology Function in
+/-- **Averaging a curve is averaging its right-continuous version.**
+
+This is what lets the necessity argument replace `L` by a genuine distribution function without
+changing anything the invariance says. Without it the representation `L u = p + ν (Iic u)` is an
+extra hypothesis, and a hypothesis that strong would be doing the work the theorem claims to do. -/
+theorem gaussianAverage_eq_rightLim (L : ℝ → ℝ) (hmono : Monotone L) (σ : ℝ) (hσ : σ ≠ 0)
+    (x : ℝ) :
+    ∫ z, L (x + σ * z) ∂(gaussianReal 0 1)
+      = ∫ z, rightLim L (x + σ * z) ∂(gaussianReal 0 1) := by
+  refine MeasureTheory.integral_congr_ae ?_
+  filter_upwards [gaussianAverage_ae_continuousAt L hmono σ hσ x] with z hz
+  exact (hmono.continuousWithinAt_Ioi_iff_rightLim_eq.mp hz.continuousWithinAt).symm
+
+open MeasureTheory ProbabilityTheory Filter Topology Function in
+/-- **The right-continuous version has the same floor and ceiling**, so replacing `L` by it does
+not move the two numbers the conclusion identifies. -/
+theorem rightLim_mem_Icc_of_bounded (L : ℝ → ℝ) (hmono : Monotone L)
+    (hlo : ∀ u, 0 < L u) (hhi : ∀ u, L u < 1) (u : ℝ) :
+    (⨅ v, L v) ≤ rightLim L u ∧ rightLim L u ≤ ⨆ v, L v := by
+  have hbb : BddBelow (Set.range L) := ⟨0, fun _ ⟨v, hv⟩ ↦ hv ▸ le_of_lt (hlo v)⟩
+  have hba : BddAbove (Set.range L) := ⟨1, fun _ ⟨v, hv⟩ ↦ hv ▸ le_of_lt (hhi v)⟩
+  constructor
+  · exact le_trans (ciInf_le hbb u) (hmono.le_rightLim le_rfl)
+  · exact le_trans (hmono.rightLim_le (lt_add_one u)) (le_ciSup hba (u + 1))
+
 open MeasureTheory ProbabilityTheory in
 /-- **Necessity: no other bounded link shape survives.** A strictly increasing bounded link whose
 two-parameter family is closed under Gaussian averaging is a positive vertical affine transform
