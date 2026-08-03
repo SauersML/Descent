@@ -309,7 +309,10 @@ def cand_founder_ceiling(k):
     t_anc = S1_T0 + (S1_D - 1) * S1_SPLIT_STEP + 500
     ss = np.linspace(0.0, t1, 20001)[1:]
     integ = np.array([math.erf(k / math.sqrt(8.0 * S1_M * x)) for x in ss])
-    tau = float(np.trapz(integ, ss))
+    # numpy 2 renamed trapz to trapezoid. Accept either, so that this script
+    # runs on the numpy that produced its stored result and on the current one.
+    _trapz = getattr(np, "trapezoid", None) or np.trapz
+    tau = float(_trapz(integ, ss))
     q = math.exp(-t_anc / (2.0 * S1_N))
     Tw = 2.0 * S1_N * (1.0 - q) + q * (t_anc + 2.0 * S1_NANC)
     return tau / (Tw + tau)
