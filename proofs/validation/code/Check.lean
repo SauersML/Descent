@@ -277,8 +277,10 @@ WHAT IS REPORTED
                       review, not fatal by shape alone: model domains and algebraic
                       interfaces also package laws in Prop-valued fields.  The source
                       guard separately rejects advertised theorem carriers.
-  LAUNDER_PREMISE     a Prop-valued premise, explicit or implicit or instance.  The
-                      conditionality ledger: its count is the size of what is assumed.
+  LAUNDER_PREMISE     a hidden Prop-valued premise (implicit, strict implicit, or instance).
+                      All Prop premises still contribute to `LAUNDER_PREMISES`; ordinary
+                      explicit side conditions are aggregated rather than printed thousands
+                      of times.
   LAUNDER_EMPTY       a parameter type proved uninhabited, or `Empty` / `PEmpty` / `Fin 0`.
   LAUNDER_ASSUMPTION  an instance premise of class `Fact`, `Nonempty` or `Inhabited`:
                       assumptions in instance syntax.
@@ -540,13 +542,17 @@ run_cmd do
               fs := fs.push ⟨"LAUNDER_DEFEQ_BRIDGE", false, mod, name,
                 s!"premise `{nm}` and conclusion agree after unfolding"⟩
             else
-              let kind := match bi with
-                | .instImplicit => "instance"
-                | .implicit => "implicit"
-                | .strictImplicit => "strict-implicit"
-                | .default => "explicit"
-              fs := fs.push ⟨"LAUNDER_PREMISE", false, mod, name,
-                s!"{kind} premise `{nm} : {← ppExpr ty}`"⟩
+              match bi with
+              | .instImplicit =>
+                  fs := fs.push ⟨"LAUNDER_PREMISE", false, mod, name,
+                    s!"instance premise `{nm} : {← ppExpr ty}`"⟩
+              | .implicit =>
+                  fs := fs.push ⟨"LAUNDER_PREMISE", false, mod, name,
+                    s!"implicit premise `{nm} : {← ppExpr ty}`"⟩
+              | .strictImplicit =>
+                  fs := fs.push ⟨"LAUNDER_PREMISE", false, mod, name,
+                    s!"strict-implicit premise `{nm} : {← ppExpr ty}`"⟩
+              | .default => pure ()
               if let some h := headConst? ty then
                 if Laundering.assumptionClasses.contains h then
                   fs := fs.push ⟨"LAUNDER_ASSUMPTION", false, mod, name,
