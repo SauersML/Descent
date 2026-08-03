@@ -773,7 +773,29 @@ Fst-heterozygosity step is applied, not restated. A second body spelling `(1 - f
 directly would need a theorem to hold it in step, which is the failure this file's own
 regime discussion is about.
 
-    Empirical status: UNTESTED. -/
+**Which `fst` this means, declared rather than left to the argument name.** The
+second argument of `pgsVarianceFromHet` is called `het`, so `1 - fst` is used here
+as a **heterozygosity retention** `H_target / H_source`, and `fst` is the
+proportional heterozygosity loss. That is not the between-population Hudson
+`F_ST`, and the same distinction is spelled out at `targetHetFromFst` above. A
+caller holding a Hudson value is asserting the extra claim that the two readings
+coincide for its populations.
+
+    Regime: heterozygosity-retention reading of `fst`; ancestral heterozygosities
+    scaled by a common factor, which is what makes a single `fst` sufficient for a
+    sum over loci.
+
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/differential/cluster/fam_pgs_transport_drift.py`,
+    check C3; Wright-Fisher, `Ne = 500`, 400 unlinked loci, 200 replicate
+    populations, `V_A = 93.667`, `t` from 0 to 350 so that the heterozygosity-loss
+    `F_HET` reaches `0.295` and half the loci have fixed). Worst cell `0.94` sems
+    on the retention reading. The grid does not by itself separate the two
+    readings -- the Hudson reading also passes, worst cell `0.99` sems, the two
+    predictions differing by at most `0.26` percent, at `F_HET 0.2953` against
+    `F_HUDSON 0.2934` -- because a single deme drifting from its own ancestor
+    makes them nearly equal. The declaration above, not that grid, is what says
+    which reading the body means; a design that separates them is still owed. -/
 noncomputable def presentDayPGSVariance (V_A fst : ℝ) : ℝ :=
   pgsVarianceFromHet V_A (1 - fst)
 
@@ -1175,13 +1197,77 @@ theorem drift_degrades_equalVarianceGaussianAUC
     nlinarith
   exact Real.sqrt_lt_sqrt hhalf_nonneg hhalf_lt
 
-/-! Real-world PGS variance with both drift and LD tagging efficiency.
+/-! Real-world PGS variance with both drift and LD tagging efficiency. -/
+/-- The additive variance a score **explains** in a target population: the source
+additive variance `V_A`, attenuated by the transported effect correlation `rhoSq`
+and eroded by drift through `1 - fst`.
 
-    Empirical status: UNTESTED. -/
-/-- Realised PGS variance in a target population: the additive variance scaled
-by the transported correlation `rhoSq` and eroded by drift through `1 - F_ST`.
+**This is a scope declaration, not a correction. The body is right; the one-line
+reading of it as "the variance of the score" was wrong.** Write `bhat` for the
+weights the deployed score actually carries, `b` for the true effects, `w` for the
+ancestral per-locus heterozygosities `2p(1-p)`, and put
 
-    Empirical status: UNTESTED. -/
+    A = Σ w bhat²,   B = Σ w b² = V_A,   C = Σ w bhat b,   rhoSq = C² / (A B).
+
+In a target population whose heterozygosities are the ancestral ones scaled by
+`1 - fst`:
+
+* the **variance of the score itself** is `(1 - fst) A`;
+* the variance of the part of the genetic value that the score predicts, i.e.
+  `Cov(G, S)² / Var(S)`, is `(1 - fst) C² / A`, and *that* is this body.
+
+The two agree exactly when `A = C`, i.e. when `Σ w bhat (bhat - b) = 0`: the
+weights are calibrated, the residual `b - bhat` orthogonal to `bhat` in the
+heterozygosity metric. Read this definition as the explained-variance one. It is
+the reading the downstream `r2FromSignalVariance` compositions need, since only
+explained variance can enter an `R²`, and it is the reading under which `rhoSq`
+attenuates a covariance rather than inflating a variance.
+
+`rhoSq` is meant in the heterozygosity metric `w` above, not as the plain
+`corr(bhat, b)²` a reader computes from a table of effect estimates. Score
+variance is a `w`-weighted quadratic form in the effects, so no other reading can
+enter a variance identity at all. The choice is not cosmetic: at source `n = 500`
+the measurement below found `0.63392` weighted against `0.36383` unweighted, the
+weighted reading being 74 percent larger.
+
+    Regime: calibrated weights; equivalently, the large-source-GWAS limit.
+    Nothing in the body carries a sample size, and at finite source `n` raw
+    marginal-OLS weights are not calibrated. To leading order in `1/n`,
+    `E[C] = V_A` while `E[A] = V_A + Σ_j w_j Var(bhat_j) ≈ V_A + m V_P / n` over
+    `m` loci at phenotypic variance `V_P`, the per-locus term having the shape of
+    `HaplotypeTheory.haplotypeEffectVarianceOLS`. So `A > C`, and the score's own
+    variance overshoots this body by the factor `(A / C)²`. The finite-`n` score
+    variance is `(1 - fst)(V_A + m V_P / n)`; this body is unchanged, which is the
+    point. Estimation noise inflates score variance without adding any covariance
+    with the phenotype, so it cannot improve prediction, and the quantity defined
+    here is the one that survives to an `R²`.
+
+    Empirical status: **VALIDATED as the explained-variance reading; FALSIFIED as
+    a claim about the variance of a score built from finite-`n` weights**
+    (`proofs/validation/empirical/differential/cluster/fam_pgs_transport_drift.py`,
+    check C6; Wright-Fisher, `Ne = 500`, `m = 300` unlinked loci, `V_E = 1`,
+    `V_A = 62.853`). Measured score variance against this body: at `n = 500`,
+    `fst = 0`, `135.20 ± 0.49` against `39.84`; at `n = 2000`, `81.11 ± 0.24`
+    against `55.18`; at `n = 20000`, `65.88 ± 0.26` against `61.88`; at
+    `n = 20000`, `fst = 0.295`, `46.55 ± 0.71` against `43.64`. The gap is
+    `95.4`, `25.9`, `3.99` across that `n` grid -- it falls as `1/n`, which is the
+    signature of estimation noise and not of a wrong constant. Recovering the
+    noise term `Σ w (bhat - b)²` from those cells gives `10.16` against the
+    predicted `m V_P / n = 9.58` at `n = 2000` and `1.03` against `0.958` at
+    `n = 20000`, so the mechanism above is the whole of the gap where the
+    leading-order form applies. At `n = 500` it gives `51.3` against `38.3`,
+    which is the leading-order form itself degrading: the ancestral spectrum
+    there carries loci at `p = 0.01`, about ten minor-allele copies in a sample
+    of 500, where `E[1 / Σ (g - ḡ)²]` is no longer `1 / (n w)`. The run's scale
+    control reproduced additive variance to relative error `0.00e+00` and its
+    corruption control fired to `27.9` sems where it must fire.
+
+    One consequence of the scope. As `n → ∞` with weights carried on the causal
+    variants, `rhoSq → 1` and this collapses to `presentDayPGSVariance`. The
+    content of `rhoSq < 1` is therefore cross-population tagging loss, which is
+    what the surrounding file means by it, and never source-GWAS estimation
+    noise, which belongs in `V_A` instead: a score's `V_A` is the variance it
+    explains in its own source population, already net of its own noise. -/
 noncomputable def realWorldPGSVariance (V_A fst rhoSq : ℝ) : ℝ :=
   rhoSq * (1 - fst) * V_A
 
