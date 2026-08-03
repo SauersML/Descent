@@ -1284,34 +1284,15 @@ check(
     ),
 )
 
-check(
-    id="neutralAFBenchmarkRatio-bounded",
-    fqn="Calibrator.PortabilityDrift.neutralAFBenchmarkRatio",
-    claim="(1-fstT)/(1-fstS) vs the heterozygosity ratio it is meant to be",
-    model_lean="ratio of retained heterozygosity, drift-only closed population",
-    model_ref="exact IAM heterozygosity ratio between two branches at "
-              "mutation-drift balance",
-    reference="refs.iam_het_trajectory ratio",
-    grid=grid(tS=[500.0, 4000.0], tT=[500.0, 4000.0], Ne=[1000.0], mu=[1e-5]),
-    lean=lambda D, tS, tT, Ne, mu: D["neutralAFBenchmarkRatio"](
-        D["fstFromGenerations"](tS, Ne), D["fstFromGenerations"](tT, Ne)
-    ),
-    ref=lambda tS, tT, Ne, mu: (
-        refs.iam_het_trajectory(Ne, mu, refs.iam_het_equilibrium(Ne, mu), int(tT))
-        / refs.iam_het_trajectory(Ne, mu, refs.iam_het_equilibrium(Ne, mu), int(tS))
-    ),
-    kind="model",
-    note=(
-        "the reference starts each branch AT equilibrium, so the true ratio is "
-        "1: mutation replenishes what drift removes. The definition predicts a "
-        "ratio far from 1 because its model has no mutation."
-    ),
-    canfail_clause=(
-        "tS != tT is mandatory. At tS = tT the definition returns exactly 1 "
-        "and so does the reference -- the symmetric design in which both sides "
-        "collapse to 1 is precisely the false-validation failure mode."
-    ),
-)
+# `neutralAFBenchmarkRatio-bounded` was checked here.  The definition has been
+# DELETED from Calibrator.PortabilityDrift as falsified -- the reference starts
+# each branch at equilibrium, so the true ratio is 1 while the definition, whose
+# model has no mutation, predicts a ratio far from 1 -- so the check has no
+# target left to run against.  The finding survives in Lean as
+# `PortabilityDrift.benchmarkRatioForm_cannot_reach_measured`, which states the
+# ceiling about the written-out expression rather than about the name.  Note the
+# check's own canfail_clause recorded the trap that produced the original false
+# VALIDATED: at tS = tT both sides collapse to 1 and the design has no power.
 
 check(
     id="wrightFIT-composition",
@@ -1686,7 +1667,7 @@ check(
     lean=lambda D, Ne, m: D["fstIslandMultiplicativeEquilibrium"](Ne, m),
     ref=lambda Ne, m: _ibd_exact_island_fst(Ne, m, 2),
     kind="model",
-    expected_verdict="MODEL-DIFFERS",
+    expected_verdict="MODEL",
     note=(
         "EXPECTED TO DISAGREE, and the disagreement is the result. Its "
         "companion ibdRecurrenceFixedPoint-mutation-reading-exact passes to "
@@ -1712,7 +1693,7 @@ check(
     lean=lambda D, Ne, m: D["fstIslandMultiplicativeEquilibrium"](Ne, m),
     ref=lambda Ne, m: refs.island_fst_finite_demes(Ne, m, 2),
     kind="scope",
-    expected_verdict="SCOPE-DIFFERS",
+    expected_verdict="SCOPE",
     note=(
         "The corpus body returns ONE number for d = 2, 10 and 100 demes; the "
         "finite-island reference differs between them by the factor "
@@ -1740,7 +1721,7 @@ check(
         lambda x: D["ibdFlowStep"](Ne, rate, x)),
     ref=lambda D, Ne, rate: D["ibdRecurrenceFixedPoint"](Ne, rate),
     kind="model",
-    expected_verdict="MODEL-DIFFERS",
+    expected_verdict="MODEL",
     note=(
         "Quantifies ibdRecurrenceFixedPoint_lt_linearisation. The two are "
         "the SAME model composed in two different orders -- added versus "
