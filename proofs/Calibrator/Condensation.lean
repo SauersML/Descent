@@ -11,8 +11,9 @@ namespace Calibrator
 /-!
 # Condensation: the multiplicative obstruction to Gaussian universality of chaos
 
-This file formalizes the *tangency* geometry that governs when a normalized sum of
-high-degree monomials in independent coordinates forgets its coordinate law.
+This file formalizes closed numerical pieces of the proposed condensation geometry.
+The general tangency theorem is not exported because its former interface supplied the
+Legendre-transform conclusions as structure fields instead of proving them.
 
 ## Why this belongs in a polygenic-score development
 
@@ -22,9 +23,31 @@ assumption underlying `Calibrator.ScoreDistribution`, liability-threshold
 calibration, the Berry-Esseen certificates in `Calibrator.Probability` — is an
 instance of the following claim: *a low-influence aggregate of genotypes behaves as
 if the genotypes were Gaussian.* For **degree-one** (purely additive) scores this is
-true and quantitative (Berry-Esseen). The theorems in this file and its companions
-say that it becomes **false** for aggregates of diverging multiplicative degree, i.e.
-for epistatic scores, and they locate the exact degree at which it fails.
+true and quantitative (Berry-Esseen). The condensation geometry PROPOSES that it
+becomes false for aggregates of diverging multiplicative degree, i.e. for epistatic
+scores, and locates the degree at which it fails.
+
+**THAT PROPOSAL IS NOT PROVED IN THIS FILE, and this paragraph used to say it was.**
+It read: "The theorems in this file and its companions say that it becomes false ...
+and they locate the exact degree at which it fails." That contradicted the file's own
+opening line and its own attribution block, both of which correctly say that what is
+formalized here is the closed constant/window algebra.
+
+What the fifteen theorems below actually establish, exhaustively:
+* numeric bounds and positivity for `condensationConstant = 2 - gamma - log 2` and
+  for `gaussianJetVariance = pi ^ 2 / 2 - 4`, from mathlib's Euler-Mascheroni and
+  `log 2` brackets -- real results, and the reason this file exists;
+* elementary properties of `Phi` (monotone, into `[0,1]`) and of
+  `windowVariance = Phi (w / sqrt v)` built from them;
+* `criticalDegree N c = log N / c` as a DEFINITION, with `subcritical_iff` and
+  `supercritical_iff` relating it to `c * m` -- these are `lt_div_iff₀` and
+  `div_lt_iff₀`, i.e. arithmetic, not a phase transition.
+
+NOT ONE THEOREM HERE MENTIONS CHAOS, UNIVERSALITY, OR A LIMIT LAW. `criticalDegree`
+is a name given to `log N / c`; that the quantity so named is the boundary of a real
+phase transition is the BBM result cited below, not something proved here. The name
+carries the physics and the proof carries the arithmetic, which is exactly the
+confusion this correction exists to remove.
 
 The failure is not additive and is therefore invisible to every additive diagnostic
 (cumulants, influences, mixing). It is multiplicative: a product of `m` independent
@@ -45,21 +68,11 @@ bounds for Gaussian universality of approximately polynomial functions are
 Huang-Austern-Orbanz, arXiv:2403.10711; the condensation counterexample lives in
 their lower-bound territory. `condensationConstant` below is an **evaluation** of the
 BBM second critical point for `log g ^ 2` increments, not a new constant. What is
-formalized here as our own contribution is only the *completeness-of-blindness*
-packaging (`Calibrator.JetBarrier`) and the genetics transport
-(`Calibrator.PolygenicSpectroscopy`).
+formalized here is the closed Gaussian constant/window algebra and its direct genetics
+specializations. The proposed completeness-of-blindness theorem is not exported.
 
 ## Main results in this file
 
-* `MellinProfile.tangency` — **Lemma T**: `s ≤ rate s` for every unit-variance law,
-  one line from `psi 1 = 0`. The diagonal is tangent from below to every rate
-  function.
-* `MellinProfile.tangency_eq_drift` — equality forces `s = drift`: the tangency point
-  is the size-bias mean, so every variance-normalized design is *pinned* to
-  `theta = 1`.
-* `MellinProfile.spike_cost_ge` — the operational form: a monomial spike of size `N`
-  costs at least `log N`, hence is never more likely than `1 / N`. Spikes are always
-  at most marginal, and exactly marginal only at the tangency slope.
 * `condensationConstant` (`c_G = 2 - gamma - log 2`) with rigorous two-sided bounds
   and strict positivity, from mathlib's Euler-Mascheroni and `log 2` bounds.
 * `gaussianJetVariance` (`v_G = pi ^ 2 / 2 - 4`) with strict positivity.
@@ -75,104 +88,10 @@ open scoped BigOperators
 /-!
 ## 1. The Mellin profile and the Tangency Lemma
 
-We package the multiplicative data of a unit-variance coordinate law. `psi` is the
-Mellin exponent `theta ↦ log E |x| ^ (2 * theta)`; `psi 1 = 0` is exactly unit second
-moment. `rate` is its Legendre transform (the Cramer rate function of `log x ^ 2`);
-we do not construct the supremum, we axiomatize the two properties of a supremum that
-the theory uses, so that the analytic input is named rather than hidden.
+The former `MellinProfile` interface accepted the defining properties of a Legendre
+transform, tangency, uniqueness, and positive jet variance as fields.  It is removed:
+those analytic facts must be proved from an actual law and an actual transform.
 -/
-
-/-- The multiplicative (Mellin) data of a centered unit-variance coordinate law.
-
-`psi theta = log E |x| ^ (2 * theta)` is convex with `psi 1 = 0`; `rate` is its
-Legendre transform, the Cramer rate function of the increment `l = log x ^ 2`;
-`drift = E[x ^ 2 * log x ^ 2] = psi'(1)` is the mean of `l` under the size-biased law
-`dPtilde = x ^ 2 dP`; `jetVariance = psi''(1)` is its variance under the same law.
-
-The pair `(drift, jetVariance)` is the **Mellin 2-jet at the size-bias point**. -/
-structure MellinProfile where
-  /-- Mellin exponent `theta ↦ log E |x| ^ (2 * theta)`. -/
-  psi : ℝ → ℝ
-  /-- Unit second moment. This single equation is what makes `theta = 1` special. -/
-  psi_one : psi 1 = 0
-  /-- Cramer rate function of `log x ^ 2`. -/
-  rate : ℝ → ℝ
-  /-- `rate` dominates every affine minorant: the defining property of a Legendre
-  transform that we actually use. -/
-  rate_ge : ∀ θ s : ℝ, θ * s - psi θ ≤ rate s
-  /-- `drift = psi'(1) = E[x ^ 2 log x ^ 2]`, the size-biased mean increment. -/
-  drift : ℝ
-  /-- At the size-bias mean the tilt `theta = 1` is optimal: this is the statement
-  that `drift` really is `psi'(1)`, and it is the only place attainment is used. -/
-  rate_drift_le : rate drift ≤ drift
-  /-- Strict convexity of `psi`, in the only form the theory needs: `psi` has a
-  unique subgradient at `theta = 1`, namely `drift`. -/
-  subgradient_unique : ∀ s : ℝ, (∀ θ : ℝ, (θ - 1) * s ≤ psi θ) → s = drift
-  /-- `jetVariance = psi''(1)`, the size-biased increment variance. -/
-  jetVariance : ℝ
-  jetVariance_pos : 0 < jetVariance
-
-namespace MellinProfile
-
-variable (P : MellinProfile)
-
-/-- **Lemma T (Tangency Lemma).** For every unit-variance law the Cramer rate function
-of `log x ^ 2` dominates the diagonal: `rate s ≥ s` for all `s`.
-
-The entire proof is: take `theta = 1` in the Legendre supremum and use `psi 1 = 0`.
-This one line is the engine of the whole development. -/
-theorem tangency (s : ℝ) : s ≤ P.rate s := by
-  have h := P.rate_ge 1 s
-  rw [P.psi_one] at h
-  linarith
-
-/-- The diagonal is tangent to the rate function **exactly** at the size-bias mean:
-if `rate s = s` then `s = drift`.
-
-Consequence: any design whose variance normalization forces its relevant deviation to
-sit on the diagonal is pinned to the tilt `theta = 1`. This is why the observable
-algebra of independent designs is a *jet at `theta = 1`*, and why cumulants — the jet
-at the origin of the multiplicative group — cannot see it. -/
-theorem tangency_eq_drift {s : ℝ} (h : P.rate s = s) : s = P.drift := by
-  refine P.subgradient_unique s ?_
-  intro θ
-  have hle : θ * s - P.psi θ ≤ P.rate s := P.rate_ge θ s
-  rw [h] at hle
-  linarith
-
-/-- The tangency point is attained: `rate drift = drift`. -/
-theorem rate_drift (P : MellinProfile) : P.rate P.drift = P.drift :=
-  le_antisymm P.rate_drift_le (P.tangency P.drift)
-
-/-- **Operational form of Lemma T.** A monomial of degree `m` contributes to the
-variance of a normalized sum of `N` terms only through values `M ^ 2` of size about
-`N`, i.e. through the event `log M ^ 2 ≈ log N`. Its large-deviation cost is
-`m * rate (log N / m)`, and tangency says this is **never less than `log N`**:
-a spike is never more likely than `1 / N`.
-
-Written with `L := log N` and `m > 0`. -/
-theorem spike_cost_ge {m L : ℝ} (hm : 0 < m) : L ≤ m * P.rate (L / m) := by
-  have h : L / m ≤ P.rate (L / m) := P.tangency (L / m)
-  have h2 : m * (L / m) ≤ m * P.rate (L / m) := by
-    exact mul_le_mul_of_nonneg_left h hm.le
-  rwa [mul_div_cancel₀ _ (ne_of_gt hm)] at h2
-
-/-- Spikes are **exactly** marginal only when the design slope `L / m` equals the
-size-bias mean. Away from the tangency slope the union bound closes with room to
-spare, which is why off-diagonal design terms are invisible under *every* coordinate
-law simultaneously (this universality of Lemma T is what makes the Jet Barrier
-possible). -/
-theorem spike_cost_eq_iff {m L : ℝ} (hm : 0 < m) :
-    m * P.rate (L / m) = L → L / m = P.drift := by
-  intro h
-  refine P.tangency_eq_drift ?_
-  have hm' : (m : ℝ) ≠ 0 := ne_of_gt hm
-  have : P.rate (L / m) = L / m := by
-    field_simp
-    linarith [h]
-  exact this
-
-end MellinProfile
 
 /-!
 ## 2. The condensation constant
@@ -180,8 +99,12 @@ end MellinProfile
 For a standard Gaussian `g`, the size-biased law of `g ^ 2` (density proportional to
 `x` times the chi-square-one density) is a chi-square with **three** degrees of
 freedom, whose log-mean is `digamma(3/2) + log 2 = 2 - gamma - log 2`. That number is
-the drift of the size-biased multiplicative walk, hence — by the tangency geometry
-above — the reciprocal slope of the condensation phase boundary.
+the drift of the size-biased multiplicative walk, and — in the BBM phase diagram
+cited above, NOT by anything proved in this file — the reciprocal slope of the
+condensation phase boundary. The clause here used to read "by the tangency geometry
+above"; there is no tangency geometry above any more. The `MellinProfile` interface
+that supplied it was removed for assuming its conclusions, and a citation to a deleted
+result is worse than no citation, because it reads as a discharged obligation.
 -/
 
 /-- The **condensation constant** `c_G = 2 - gamma - log 2 = 0.72965...`, the
