@@ -1,0 +1,4843 @@
+{
+ "claim": "coverage_invariance_sharp / copyWitness_not_coversTuple",
+ "sweep": [
+  {
+   "pA": "1/2",
+   "pB": "1/2",
+   "t_of_Dmax": "0",
+   "D": "0",
+   "r2": "0",
+   "r2_float": 0.0,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "1/4",
+   "eta_min_haplotype_float": 0.25,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "1/16",
+   "eta_min_genotype_float": 0.0625,
+   "n_charged_modulus_cells": 1,
+   "n_product_modulus_cells": 1,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": false,
+   "modulus_map_injective_B": false
+  },
+  {
+   "pA": "1/2",
+   "pB": "1/2",
+   "t_of_Dmax": "1/2",
+   "D": "1/8",
+   "r2": "1/4",
+   "r2_float": 0.25,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "1/8",
+   "eta_min_haplotype_float": 0.125,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "1/64",
+   "eta_min_genotype_float": 0.015625,
+   "n_charged_modulus_cells": 1,
+   "n_product_modulus_cells": 1,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": false,
+   "modulus_map_injective_B": false
+  },
+  {
+   "pA": "1/2",
+   "pB": "1/2",
+   "t_of_Dmax": "9/10",
+   "D": "9/40",
+   "r2": "81/100",
+   "r2_float": 0.81,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "1/40",
+   "eta_min_haplotype_float": 0.025,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "1/1600",
+   "eta_min_genotype_float": 0.000625,
+   "n_charged_modulus_cells": 1,
+   "n_product_modulus_cells": 1,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": false,
+   "modulus_map_injective_B": false
+  },
+  {
+   "pA": "1/2",
+   "pB": "1/2",
+   "t_of_Dmax": "99/100",
+   "D": "99/400",
+   "r2": "9801/10000",
+   "r2_float": 0.9801,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "1/400",
+   "eta_min_haplotype_float": 0.0025,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "1/160000",
+   "eta_min_genotype_float": 6.25e-06,
+   "n_charged_modulus_cells": 1,
+   "n_product_modulus_cells": 1,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": false,
+   "modulus_map_injective_B": false
+  },
+  {
+   "pA": "1/2",
+   "pB": "1/2",
+   "t_of_Dmax": "999/1000",
+   "D": "999/4000",
+   "r2": "998001/1000000",
+   "r2_float": 0.998001,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "1/4000",
+   "eta_min_haplotype_float": 0.00025,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "1/16000000",
+   "eta_min_genotype_float": 6.25e-08,
+   "n_charged_modulus_cells": 1,
+   "n_product_modulus_cells": 1,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": false,
+   "modulus_map_injective_B": false
+  },
+  {
+   "pA": "1/2",
+   "pB": "1/2",
+   "t_of_Dmax": "9999/10000",
+   "D": "9999/40000",
+   "r2": "99980001/100000000",
+   "r2_float": 0.99980001,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "1/40000",
+   "eta_min_haplotype_float": 2.5e-05,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "1/1600000000",
+   "eta_min_genotype_float": 6.25e-10,
+   "n_charged_modulus_cells": 1,
+   "n_product_modulus_cells": 1,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": false,
+   "modulus_map_injective_B": false
+  },
+  {
+   "pA": "1/2",
+   "pB": "1/2",
+   "t_of_Dmax": "99999/100000",
+   "D": "99999/400000",
+   "r2": "9999800001/10000000000",
+   "r2_float": 0.9999800001,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "1/400000",
+   "eta_min_haplotype_float": 2.5e-06,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "1/160000000000",
+   "eta_min_genotype_float": 6.25e-12,
+   "n_charged_modulus_cells": 1,
+   "n_product_modulus_cells": 1,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": false,
+   "modulus_map_injective_B": false
+  },
+  {
+   "pA": "1/2",
+   "pB": "1/2",
+   "t_of_Dmax": "999999/1000000",
+   "D": "999999/4000000",
+   "r2": "999998000001/1000000000000",
+   "r2_float": 0.999998000001,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "1/4000000",
+   "eta_min_haplotype_float": 2.5e-07,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "1/16000000000000",
+   "eta_min_genotype_float": 6.25e-14,
+   "n_charged_modulus_cells": 1,
+   "n_product_modulus_cells": 1,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": false,
+   "modulus_map_injective_B": false
+  },
+  {
+   "pA": "1/2",
+   "pB": "1/2",
+   "t_of_Dmax": "999999999/1000000000",
+   "D": "999999999/4000000000",
+   "r2": "999999998000000001/1000000000000000000",
+   "r2_float": 0.999999998,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "1/4000000000",
+   "eta_min_haplotype_float": 2.5e-10,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "1/16000000000000000000",
+   "eta_min_genotype_float": 6.25e-20,
+   "n_charged_modulus_cells": 1,
+   "n_product_modulus_cells": 1,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": false,
+   "modulus_map_injective_B": false
+  },
+  {
+   "pA": "1/2",
+   "pB": "1/2",
+   "t_of_Dmax": "1",
+   "D": "1/4",
+   "r2": "1",
+   "r2_float": 1.0,
+   "r2_is_one": true,
+   "n_haplotypes_positive": 2,
+   "eta_min_haplotype": "0",
+   "eta_min_haplotype_float": 0.0,
+   "full_support_haplotype": false,
+   "n_genotype_cells_positive": 3,
+   "eta_min_genotype": "1/4",
+   "eta_min_genotype_float": 0.25,
+   "n_charged_modulus_cells": 1,
+   "n_product_modulus_cells": 1,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": false,
+   "modulus_map_injective_B": false
+  },
+  {
+   "pA": "3/10",
+   "pB": "3/10",
+   "t_of_Dmax": "0",
+   "D": "0",
+   "r2": "0",
+   "r2_float": 0.0,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "9/100",
+   "eta_min_haplotype_float": 0.09,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "81/10000",
+   "eta_min_genotype_float": 0.0081,
+   "n_charged_modulus_cells": 9,
+   "n_product_modulus_cells": 9,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": true,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "3/10",
+   "pB": "3/10",
+   "t_of_Dmax": "1/2",
+   "D": "21/200",
+   "r2": "1/4",
+   "r2_float": 0.25,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "21/200",
+   "eta_min_haplotype_float": 0.105,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "441/40000",
+   "eta_min_genotype_float": 0.011025,
+   "n_charged_modulus_cells": 9,
+   "n_product_modulus_cells": 9,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": true,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "3/10",
+   "pB": "3/10",
+   "t_of_Dmax": "9/10",
+   "D": "189/1000",
+   "r2": "81/100",
+   "r2_float": 0.81,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "21/1000",
+   "eta_min_haplotype_float": 0.021,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "441/1000000",
+   "eta_min_genotype_float": 0.000441,
+   "n_charged_modulus_cells": 9,
+   "n_product_modulus_cells": 9,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": true,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "3/10",
+   "pB": "3/10",
+   "t_of_Dmax": "99/100",
+   "D": "2079/10000",
+   "r2": "9801/10000",
+   "r2_float": 0.9801,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "21/10000",
+   "eta_min_haplotype_float": 0.0021,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "441/100000000",
+   "eta_min_genotype_float": 4.41e-06,
+   "n_charged_modulus_cells": 9,
+   "n_product_modulus_cells": 9,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": true,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "3/10",
+   "pB": "3/10",
+   "t_of_Dmax": "999/1000",
+   "D": "20979/100000",
+   "r2": "998001/1000000",
+   "r2_float": 0.998001,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "21/100000",
+   "eta_min_haplotype_float": 0.00021,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "441/10000000000",
+   "eta_min_genotype_float": 4.41e-08,
+   "n_charged_modulus_cells": 9,
+   "n_product_modulus_cells": 9,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": true,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "3/10",
+   "pB": "3/10",
+   "t_of_Dmax": "9999/10000",
+   "D": "209979/1000000",
+   "r2": "99980001/100000000",
+   "r2_float": 0.99980001,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "21/1000000",
+   "eta_min_haplotype_float": 2.1e-05,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "441/1000000000000",
+   "eta_min_genotype_float": 4.41e-10,
+   "n_charged_modulus_cells": 9,
+   "n_product_modulus_cells": 9,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": true,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "3/10",
+   "pB": "3/10",
+   "t_of_Dmax": "99999/100000",
+   "D": "2099979/10000000",
+   "r2": "9999800001/10000000000",
+   "r2_float": 0.9999800001,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "21/10000000",
+   "eta_min_haplotype_float": 2.1e-06,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "441/100000000000000",
+   "eta_min_genotype_float": 4.41e-12,
+   "n_charged_modulus_cells": 9,
+   "n_product_modulus_cells": 9,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": true,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "3/10",
+   "pB": "3/10",
+   "t_of_Dmax": "999999/1000000",
+   "D": "20999979/100000000",
+   "r2": "999998000001/1000000000000",
+   "r2_float": 0.999998000001,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "21/100000000",
+   "eta_min_haplotype_float": 2.1e-07,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "441/10000000000000000",
+   "eta_min_genotype_float": 4.41e-14,
+   "n_charged_modulus_cells": 9,
+   "n_product_modulus_cells": 9,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": true,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "3/10",
+   "pB": "3/10",
+   "t_of_Dmax": "999999999/1000000000",
+   "D": "20999999979/100000000000",
+   "r2": "999999998000000001/1000000000000000000",
+   "r2_float": 0.999999998,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "21/100000000000",
+   "eta_min_haplotype_float": 2.1e-10,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "441/10000000000000000000000",
+   "eta_min_genotype_float": 4.41e-20,
+   "n_charged_modulus_cells": 9,
+   "n_product_modulus_cells": 9,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": true,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "3/10",
+   "pB": "3/10",
+   "t_of_Dmax": "1",
+   "D": "21/100",
+   "r2": "1",
+   "r2_float": 1.0,
+   "r2_is_one": true,
+   "n_haplotypes_positive": 2,
+   "eta_min_haplotype": "0",
+   "eta_min_haplotype_float": 0.0,
+   "full_support_haplotype": false,
+   "n_genotype_cells_positive": 3,
+   "eta_min_genotype": "9/100",
+   "eta_min_genotype_float": 0.09,
+   "n_charged_modulus_cells": 3,
+   "n_product_modulus_cells": 9,
+   "charged_equals_product": false,
+   "charged_equals_LE_baseline": false,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": true,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "1/10",
+   "pB": "1/10",
+   "t_of_Dmax": "0",
+   "D": "0",
+   "r2": "0",
+   "r2_float": 0.0,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "1/100",
+   "eta_min_haplotype_float": 0.01,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "1/10000",
+   "eta_min_genotype_float": 0.0001,
+   "n_charged_modulus_cells": 9,
+   "n_product_modulus_cells": 9,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": true,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "1/10",
+   "pB": "1/10",
+   "t_of_Dmax": "1/2",
+   "D": "9/200",
+   "r2": "1/4",
+   "r2_float": 0.25,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "9/200",
+   "eta_min_haplotype_float": 0.045,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "81/40000",
+   "eta_min_genotype_float": 0.002025,
+   "n_charged_modulus_cells": 9,
+   "n_product_modulus_cells": 9,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": true,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "1/10",
+   "pB": "1/10",
+   "t_of_Dmax": "9/10",
+   "D": "81/1000",
+   "r2": "81/100",
+   "r2_float": 0.81,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "9/1000",
+   "eta_min_haplotype_float": 0.009,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "81/1000000",
+   "eta_min_genotype_float": 8.1e-05,
+   "n_charged_modulus_cells": 9,
+   "n_product_modulus_cells": 9,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": true,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "1/10",
+   "pB": "1/10",
+   "t_of_Dmax": "99/100",
+   "D": "891/10000",
+   "r2": "9801/10000",
+   "r2_float": 0.9801,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "9/10000",
+   "eta_min_haplotype_float": 0.0009,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "81/100000000",
+   "eta_min_genotype_float": 8.1e-07,
+   "n_charged_modulus_cells": 9,
+   "n_product_modulus_cells": 9,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": true,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "1/10",
+   "pB": "1/10",
+   "t_of_Dmax": "999/1000",
+   "D": "8991/100000",
+   "r2": "998001/1000000",
+   "r2_float": 0.998001,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "9/100000",
+   "eta_min_haplotype_float": 9e-05,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "81/10000000000",
+   "eta_min_genotype_float": 8.1e-09,
+   "n_charged_modulus_cells": 9,
+   "n_product_modulus_cells": 9,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": true,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "1/10",
+   "pB": "1/10",
+   "t_of_Dmax": "9999/10000",
+   "D": "89991/1000000",
+   "r2": "99980001/100000000",
+   "r2_float": 0.99980001,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "9/1000000",
+   "eta_min_haplotype_float": 9e-06,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "81/1000000000000",
+   "eta_min_genotype_float": 8.1e-11,
+   "n_charged_modulus_cells": 9,
+   "n_product_modulus_cells": 9,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": true,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "1/10",
+   "pB": "1/10",
+   "t_of_Dmax": "99999/100000",
+   "D": "899991/10000000",
+   "r2": "9999800001/10000000000",
+   "r2_float": 0.9999800001,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "9/10000000",
+   "eta_min_haplotype_float": 9e-07,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "81/100000000000000",
+   "eta_min_genotype_float": 8.1e-13,
+   "n_charged_modulus_cells": 9,
+   "n_product_modulus_cells": 9,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": true,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "1/10",
+   "pB": "1/10",
+   "t_of_Dmax": "999999/1000000",
+   "D": "8999991/100000000",
+   "r2": "999998000001/1000000000000",
+   "r2_float": 0.999998000001,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "9/100000000",
+   "eta_min_haplotype_float": 9e-08,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "81/10000000000000000",
+   "eta_min_genotype_float": 8.1e-15,
+   "n_charged_modulus_cells": 9,
+   "n_product_modulus_cells": 9,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": true,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "1/10",
+   "pB": "1/10",
+   "t_of_Dmax": "999999999/1000000000",
+   "D": "8999999991/100000000000",
+   "r2": "999999998000000001/1000000000000000000",
+   "r2_float": 0.999999998,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "9/100000000000",
+   "eta_min_haplotype_float": 9e-11,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "81/10000000000000000000000",
+   "eta_min_genotype_float": 8.1e-21,
+   "n_charged_modulus_cells": 9,
+   "n_product_modulus_cells": 9,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": true,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "1/10",
+   "pB": "1/10",
+   "t_of_Dmax": "1",
+   "D": "9/100",
+   "r2": "1",
+   "r2_float": 1.0,
+   "r2_is_one": true,
+   "n_haplotypes_positive": 2,
+   "eta_min_haplotype": "0",
+   "eta_min_haplotype_float": 0.0,
+   "full_support_haplotype": false,
+   "n_genotype_cells_positive": 3,
+   "eta_min_genotype": "1/100",
+   "eta_min_genotype_float": 0.01,
+   "n_charged_modulus_cells": 3,
+   "n_product_modulus_cells": 9,
+   "charged_equals_product": false,
+   "charged_equals_LE_baseline": false,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": true,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "1/2",
+   "pB": "3/10",
+   "t_of_Dmax": "0",
+   "D": "0",
+   "r2": "0",
+   "r2_float": 0.0,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "3/20",
+   "eta_min_haplotype_float": 0.15,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "9/400",
+   "eta_min_genotype_float": 0.0225,
+   "n_charged_modulus_cells": 3,
+   "n_product_modulus_cells": 3,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": false,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "1/2",
+   "pB": "3/10",
+   "t_of_Dmax": "1/2",
+   "D": "3/40",
+   "r2": "3/28",
+   "r2_float": 0.10714285714285714,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "3/40",
+   "eta_min_haplotype_float": 0.075,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "9/1600",
+   "eta_min_genotype_float": 0.005625,
+   "n_charged_modulus_cells": 3,
+   "n_product_modulus_cells": 3,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": false,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "1/2",
+   "pB": "3/10",
+   "t_of_Dmax": "9/10",
+   "D": "27/200",
+   "r2": "243/700",
+   "r2_float": 0.34714285714285714,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "3/200",
+   "eta_min_haplotype_float": 0.015,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "9/40000",
+   "eta_min_genotype_float": 0.000225,
+   "n_charged_modulus_cells": 3,
+   "n_product_modulus_cells": 3,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": false,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "1/2",
+   "pB": "3/10",
+   "t_of_Dmax": "99/100",
+   "D": "297/2000",
+   "r2": "29403/70000",
+   "r2_float": 0.42004285714285716,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "3/2000",
+   "eta_min_haplotype_float": 0.0015,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "9/4000000",
+   "eta_min_genotype_float": 2.25e-06,
+   "n_charged_modulus_cells": 3,
+   "n_product_modulus_cells": 3,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": false,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "1/2",
+   "pB": "3/10",
+   "t_of_Dmax": "999/1000",
+   "D": "2997/20000",
+   "r2": "2994003/7000000",
+   "r2_float": 0.4277147142857143,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "3/20000",
+   "eta_min_haplotype_float": 0.00015,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "9/400000000",
+   "eta_min_genotype_float": 2.25e-08,
+   "n_charged_modulus_cells": 3,
+   "n_product_modulus_cells": 3,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": false,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "1/2",
+   "pB": "3/10",
+   "t_of_Dmax": "9999/10000",
+   "D": "29997/200000",
+   "r2": "299940003/700000000",
+   "r2_float": 0.4284857185714286,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "3/200000",
+   "eta_min_haplotype_float": 1.5e-05,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "9/40000000000",
+   "eta_min_genotype_float": 2.25e-10,
+   "n_charged_modulus_cells": 3,
+   "n_product_modulus_cells": 3,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": false,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "1/2",
+   "pB": "3/10",
+   "t_of_Dmax": "99999/100000",
+   "D": "299997/2000000",
+   "r2": "29999400003/70000000000",
+   "r2_float": 0.4285628571857143,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "3/2000000",
+   "eta_min_haplotype_float": 1.5e-06,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "9/4000000000000",
+   "eta_min_genotype_float": 2.25e-12,
+   "n_charged_modulus_cells": 3,
+   "n_product_modulus_cells": 3,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": false,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "1/2",
+   "pB": "3/10",
+   "t_of_Dmax": "999999/1000000",
+   "D": "2999997/20000000",
+   "r2": "428570571429/1000000000000",
+   "r2_float": 0.428570571429,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "3/20000000",
+   "eta_min_haplotype_float": 1.5e-07,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "9/400000000000000",
+   "eta_min_genotype_float": 2.25e-14,
+   "n_charged_modulus_cells": 3,
+   "n_product_modulus_cells": 3,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": false,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "1/2",
+   "pB": "3/10",
+   "t_of_Dmax": "999999999/1000000000",
+   "D": "2999999997/20000000000",
+   "r2": "2999999994000000003/7000000000000000000",
+   "r2_float": 0.4285714277142857,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "3/20000000000",
+   "eta_min_haplotype_float": 1.5e-10,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "9/400000000000000000000",
+   "eta_min_genotype_float": 2.25e-20,
+   "n_charged_modulus_cells": 3,
+   "n_product_modulus_cells": 3,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": false,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "1/2",
+   "pB": "3/10",
+   "t_of_Dmax": "1",
+   "D": "3/20",
+   "r2": "3/7",
+   "r2_float": 0.42857142857142855,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 3,
+   "eta_min_haplotype": "0",
+   "eta_min_haplotype_float": 0.0,
+   "full_support_haplotype": false,
+   "n_genotype_cells_positive": 6,
+   "eta_min_genotype": "1/25",
+   "eta_min_genotype_float": 0.04,
+   "n_charged_modulus_cells": 3,
+   "n_product_modulus_cells": 3,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": false,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "1/2",
+   "pB": "1/10",
+   "t_of_Dmax": "0",
+   "D": "0",
+   "r2": "0",
+   "r2_float": 0.0,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "1/20",
+   "eta_min_haplotype_float": 0.05,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "1/400",
+   "eta_min_genotype_float": 0.0025,
+   "n_charged_modulus_cells": 3,
+   "n_product_modulus_cells": 3,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": false,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "1/2",
+   "pB": "1/10",
+   "t_of_Dmax": "1/2",
+   "D": "1/40",
+   "r2": "1/36",
+   "r2_float": 0.027777777777777776,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "1/40",
+   "eta_min_haplotype_float": 0.025,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "1/1600",
+   "eta_min_genotype_float": 0.000625,
+   "n_charged_modulus_cells": 3,
+   "n_product_modulus_cells": 3,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": false,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "1/2",
+   "pB": "1/10",
+   "t_of_Dmax": "9/10",
+   "D": "9/200",
+   "r2": "9/100",
+   "r2_float": 0.09,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "1/200",
+   "eta_min_haplotype_float": 0.005,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "1/40000",
+   "eta_min_genotype_float": 2.5e-05,
+   "n_charged_modulus_cells": 3,
+   "n_product_modulus_cells": 3,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": false,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "1/2",
+   "pB": "1/10",
+   "t_of_Dmax": "99/100",
+   "D": "99/2000",
+   "r2": "1089/10000",
+   "r2_float": 0.1089,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "1/2000",
+   "eta_min_haplotype_float": 0.0005,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "1/4000000",
+   "eta_min_genotype_float": 2.5e-07,
+   "n_charged_modulus_cells": 3,
+   "n_product_modulus_cells": 3,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": false,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "1/2",
+   "pB": "1/10",
+   "t_of_Dmax": "999/1000",
+   "D": "999/20000",
+   "r2": "110889/1000000",
+   "r2_float": 0.110889,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "1/20000",
+   "eta_min_haplotype_float": 5e-05,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "1/400000000",
+   "eta_min_genotype_float": 2.5e-09,
+   "n_charged_modulus_cells": 3,
+   "n_product_modulus_cells": 3,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": false,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "1/2",
+   "pB": "1/10",
+   "t_of_Dmax": "9999/10000",
+   "D": "9999/200000",
+   "r2": "11108889/100000000",
+   "r2_float": 0.11108889,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "1/200000",
+   "eta_min_haplotype_float": 5e-06,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "1/40000000000",
+   "eta_min_genotype_float": 2.5e-11,
+   "n_charged_modulus_cells": 3,
+   "n_product_modulus_cells": 3,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": false,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "1/2",
+   "pB": "1/10",
+   "t_of_Dmax": "99999/100000",
+   "D": "99999/2000000",
+   "r2": "1111088889/10000000000",
+   "r2_float": 0.1111088889,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "1/2000000",
+   "eta_min_haplotype_float": 5e-07,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "1/4000000000000",
+   "eta_min_genotype_float": 2.5e-13,
+   "n_charged_modulus_cells": 3,
+   "n_product_modulus_cells": 3,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": false,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "1/2",
+   "pB": "1/10",
+   "t_of_Dmax": "999999/1000000",
+   "D": "999999/20000000",
+   "r2": "111110888889/1000000000000",
+   "r2_float": 0.111110888889,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "1/20000000",
+   "eta_min_haplotype_float": 5e-08,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "1/400000000000000",
+   "eta_min_genotype_float": 2.5e-15,
+   "n_charged_modulus_cells": 3,
+   "n_product_modulus_cells": 3,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": false,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "1/2",
+   "pB": "1/10",
+   "t_of_Dmax": "999999999/1000000000",
+   "D": "999999999/20000000000",
+   "r2": "111111110888888889/1000000000000000000",
+   "r2_float": 0.11111111088888889,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "1/20000000000",
+   "eta_min_haplotype_float": 5e-11,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "1/400000000000000000000",
+   "eta_min_genotype_float": 2.5e-21,
+   "n_charged_modulus_cells": 3,
+   "n_product_modulus_cells": 3,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": false,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "1/2",
+   "pB": "1/10",
+   "t_of_Dmax": "1",
+   "D": "1/20",
+   "r2": "1/9",
+   "r2_float": 0.1111111111111111,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 3,
+   "eta_min_haplotype": "0",
+   "eta_min_haplotype_float": 0.0,
+   "full_support_haplotype": false,
+   "n_genotype_cells_positive": 6,
+   "eta_min_genotype": "1/100",
+   "eta_min_genotype_float": 0.01,
+   "n_charged_modulus_cells": 3,
+   "n_product_modulus_cells": 3,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": false,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "1/2",
+   "pB": "1/100",
+   "t_of_Dmax": "0",
+   "D": "0",
+   "r2": "0",
+   "r2_float": 0.0,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "1/200",
+   "eta_min_haplotype_float": 0.005,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "1/40000",
+   "eta_min_genotype_float": 2.5e-05,
+   "n_charged_modulus_cells": 3,
+   "n_product_modulus_cells": 3,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": false,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "1/2",
+   "pB": "1/100",
+   "t_of_Dmax": "1/2",
+   "D": "1/400",
+   "r2": "1/396",
+   "r2_float": 0.0025252525252525255,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "1/400",
+   "eta_min_haplotype_float": 0.0025,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "1/160000",
+   "eta_min_genotype_float": 6.25e-06,
+   "n_charged_modulus_cells": 3,
+   "n_product_modulus_cells": 3,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": false,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "1/2",
+   "pB": "1/100",
+   "t_of_Dmax": "9/10",
+   "D": "9/2000",
+   "r2": "9/1100",
+   "r2_float": 0.008181818181818182,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "1/2000",
+   "eta_min_haplotype_float": 0.0005,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "1/4000000",
+   "eta_min_genotype_float": 2.5e-07,
+   "n_charged_modulus_cells": 3,
+   "n_product_modulus_cells": 3,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": false,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "1/2",
+   "pB": "1/100",
+   "t_of_Dmax": "99/100",
+   "D": "99/20000",
+   "r2": "99/10000",
+   "r2_float": 0.0099,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "1/20000",
+   "eta_min_haplotype_float": 5e-05,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "1/400000000",
+   "eta_min_genotype_float": 2.5e-09,
+   "n_charged_modulus_cells": 3,
+   "n_product_modulus_cells": 3,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": false,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "1/2",
+   "pB": "1/100",
+   "t_of_Dmax": "999/1000",
+   "D": "999/200000",
+   "r2": "110889/11000000",
+   "r2_float": 0.010080818181818182,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "1/200000",
+   "eta_min_haplotype_float": 5e-06,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "1/40000000000",
+   "eta_min_genotype_float": 2.5e-11,
+   "n_charged_modulus_cells": 3,
+   "n_product_modulus_cells": 3,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": false,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "1/2",
+   "pB": "1/100",
+   "t_of_Dmax": "9999/10000",
+   "D": "9999/2000000",
+   "r2": "1009899/100000000",
+   "r2_float": 0.01009899,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "1/2000000",
+   "eta_min_haplotype_float": 5e-07,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "1/4000000000000",
+   "eta_min_genotype_float": 2.5e-13,
+   "n_charged_modulus_cells": 3,
+   "n_product_modulus_cells": 3,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": false,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "1/2",
+   "pB": "1/100",
+   "t_of_Dmax": "99999/100000",
+   "D": "99999/20000000",
+   "r2": "1111088889/110000000000",
+   "r2_float": 0.010100808081818182,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "1/20000000",
+   "eta_min_haplotype_float": 5e-08,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "1/400000000000000",
+   "eta_min_genotype_float": 2.5e-15,
+   "n_charged_modulus_cells": 3,
+   "n_product_modulus_cells": 3,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": false,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "1/2",
+   "pB": "1/100",
+   "t_of_Dmax": "999999/1000000",
+   "D": "999999/200000000",
+   "r2": "10100989899/1000000000000",
+   "r2_float": 0.010100989899,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "1/200000000",
+   "eta_min_haplotype_float": 5e-09,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "1/40000000000000000",
+   "eta_min_genotype_float": 2.5e-17,
+   "n_charged_modulus_cells": 3,
+   "n_product_modulus_cells": 3,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": false,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "1/2",
+   "pB": "1/100",
+   "t_of_Dmax": "999999999/1000000000",
+   "D": "999999999/200000000000",
+   "r2": "111111110888888889/11000000000000000000",
+   "r2_float": 0.010101010080808081,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "1/200000000000",
+   "eta_min_haplotype_float": 5e-12,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "1/40000000000000000000000",
+   "eta_min_genotype_float": 2.5e-23,
+   "n_charged_modulus_cells": 3,
+   "n_product_modulus_cells": 3,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": false,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "1/2",
+   "pB": "1/100",
+   "t_of_Dmax": "1",
+   "D": "1/200",
+   "r2": "1/99",
+   "r2_float": 0.010101010101010102,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 3,
+   "eta_min_haplotype": "0",
+   "eta_min_haplotype_float": 0.0,
+   "full_support_haplotype": false,
+   "n_genotype_cells_positive": 6,
+   "eta_min_genotype": "1/10000",
+   "eta_min_genotype_float": 0.0001,
+   "n_charged_modulus_cells": 3,
+   "n_product_modulus_cells": 3,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": false,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "1/5",
+   "pB": "4/5",
+   "t_of_Dmax": "0",
+   "D": "0",
+   "r2": "0",
+   "r2_float": 0.0,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "1/25",
+   "eta_min_haplotype_float": 0.04,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "1/625",
+   "eta_min_genotype_float": 0.0016,
+   "n_charged_modulus_cells": 9,
+   "n_product_modulus_cells": 9,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": true,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "1/5",
+   "pB": "4/5",
+   "t_of_Dmax": "1/2",
+   "D": "1/50",
+   "r2": "1/64",
+   "r2_float": 0.015625,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "1/50",
+   "eta_min_haplotype_float": 0.02,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "1/2500",
+   "eta_min_genotype_float": 0.0004,
+   "n_charged_modulus_cells": 9,
+   "n_product_modulus_cells": 9,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": true,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "1/5",
+   "pB": "4/5",
+   "t_of_Dmax": "9/10",
+   "D": "9/250",
+   "r2": "81/1600",
+   "r2_float": 0.050625,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "1/250",
+   "eta_min_haplotype_float": 0.004,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "1/62500",
+   "eta_min_genotype_float": 1.6e-05,
+   "n_charged_modulus_cells": 9,
+   "n_product_modulus_cells": 9,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": true,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "1/5",
+   "pB": "4/5",
+   "t_of_Dmax": "99/100",
+   "D": "99/2500",
+   "r2": "9801/160000",
+   "r2_float": 0.06125625,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "1/2500",
+   "eta_min_haplotype_float": 0.0004,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "1/6250000",
+   "eta_min_genotype_float": 1.6e-07,
+   "n_charged_modulus_cells": 9,
+   "n_product_modulus_cells": 9,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": true,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "1/5",
+   "pB": "4/5",
+   "t_of_Dmax": "999/1000",
+   "D": "999/25000",
+   "r2": "998001/16000000",
+   "r2_float": 0.0623750625,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "1/25000",
+   "eta_min_haplotype_float": 4e-05,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "1/625000000",
+   "eta_min_genotype_float": 1.6e-09,
+   "n_charged_modulus_cells": 9,
+   "n_product_modulus_cells": 9,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": true,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "1/5",
+   "pB": "4/5",
+   "t_of_Dmax": "9999/10000",
+   "D": "9999/250000",
+   "r2": "99980001/1600000000",
+   "r2_float": 0.062487500625,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "1/250000",
+   "eta_min_haplotype_float": 4e-06,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "1/62500000000",
+   "eta_min_genotype_float": 1.6e-11,
+   "n_charged_modulus_cells": 9,
+   "n_product_modulus_cells": 9,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": true,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "1/5",
+   "pB": "4/5",
+   "t_of_Dmax": "99999/100000",
+   "D": "99999/2500000",
+   "r2": "9999800001/160000000000",
+   "r2_float": 0.06249875000625,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "1/2500000",
+   "eta_min_haplotype_float": 4e-07,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "1/6250000000000",
+   "eta_min_genotype_float": 1.6e-13,
+   "n_charged_modulus_cells": 9,
+   "n_product_modulus_cells": 9,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": true,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "1/5",
+   "pB": "4/5",
+   "t_of_Dmax": "999999/1000000",
+   "D": "999999/25000000",
+   "r2": "999998000001/16000000000000",
+   "r2_float": 0.0624998750000625,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "1/25000000",
+   "eta_min_haplotype_float": 4e-08,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "1/625000000000000",
+   "eta_min_genotype_float": 1.6e-15,
+   "n_charged_modulus_cells": 9,
+   "n_product_modulus_cells": 9,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": true,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "1/5",
+   "pB": "4/5",
+   "t_of_Dmax": "999999999/1000000000",
+   "D": "999999999/25000000000",
+   "r2": "999999998000000001/16000000000000000000",
+   "r2_float": 0.062499999875,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "1/25000000000",
+   "eta_min_haplotype_float": 4e-11,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "1/625000000000000000000",
+   "eta_min_genotype_float": 1.6e-21,
+   "n_charged_modulus_cells": 9,
+   "n_product_modulus_cells": 9,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": true,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "1/5",
+   "pB": "4/5",
+   "t_of_Dmax": "1",
+   "D": "1/25",
+   "r2": "1/16",
+   "r2_float": 0.0625,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 3,
+   "eta_min_haplotype": "0",
+   "eta_min_haplotype_float": 0.0,
+   "full_support_haplotype": false,
+   "n_genotype_cells_positive": 6,
+   "eta_min_genotype": "1/25",
+   "eta_min_genotype_float": 0.04,
+   "n_charged_modulus_cells": 6,
+   "n_product_modulus_cells": 9,
+   "charged_equals_product": false,
+   "charged_equals_LE_baseline": false,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": true,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "1/20",
+   "pB": "9/10",
+   "t_of_Dmax": "0",
+   "D": "0",
+   "r2": "0",
+   "r2_float": 0.0,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "1/200",
+   "eta_min_haplotype_float": 0.005,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "1/40000",
+   "eta_min_genotype_float": 2.5e-05,
+   "n_charged_modulus_cells": 9,
+   "n_product_modulus_cells": 9,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": true,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "1/20",
+   "pB": "9/10",
+   "t_of_Dmax": "1/2",
+   "D": "1/400",
+   "r2": "1/684",
+   "r2_float": 0.0014619883040935672,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "1/400",
+   "eta_min_haplotype_float": 0.0025,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "1/160000",
+   "eta_min_genotype_float": 6.25e-06,
+   "n_charged_modulus_cells": 9,
+   "n_product_modulus_cells": 9,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": true,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "1/20",
+   "pB": "9/10",
+   "t_of_Dmax": "9/10",
+   "D": "9/2000",
+   "r2": "9/1900",
+   "r2_float": 0.004736842105263158,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "1/2000",
+   "eta_min_haplotype_float": 0.0005,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "1/4000000",
+   "eta_min_genotype_float": 2.5e-07,
+   "n_charged_modulus_cells": 9,
+   "n_product_modulus_cells": 9,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": true,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "1/20",
+   "pB": "9/10",
+   "t_of_Dmax": "99/100",
+   "D": "99/20000",
+   "r2": "1089/190000",
+   "r2_float": 0.005731578947368421,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "1/20000",
+   "eta_min_haplotype_float": 5e-05,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "1/400000000",
+   "eta_min_genotype_float": 2.5e-09,
+   "n_charged_modulus_cells": 9,
+   "n_product_modulus_cells": 9,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": true,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "1/20",
+   "pB": "9/10",
+   "t_of_Dmax": "999/1000",
+   "D": "999/200000",
+   "r2": "110889/19000000",
+   "r2_float": 0.005836263157894737,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "1/200000",
+   "eta_min_haplotype_float": 5e-06,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "1/40000000000",
+   "eta_min_genotype_float": 2.5e-11,
+   "n_charged_modulus_cells": 9,
+   "n_product_modulus_cells": 9,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": true,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "1/20",
+   "pB": "9/10",
+   "t_of_Dmax": "9999/10000",
+   "D": "9999/2000000",
+   "r2": "11108889/1900000000",
+   "r2_float": 0.005846783684210526,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "1/2000000",
+   "eta_min_haplotype_float": 5e-07,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "1/4000000000000",
+   "eta_min_genotype_float": 2.5e-13,
+   "n_charged_modulus_cells": 9,
+   "n_product_modulus_cells": 9,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": true,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "1/20",
+   "pB": "9/10",
+   "t_of_Dmax": "99999/100000",
+   "D": "99999/20000000",
+   "r2": "1111088889/190000000000",
+   "r2_float": 0.005847836257894737,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "1/20000000",
+   "eta_min_haplotype_float": 5e-08,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "1/400000000000000",
+   "eta_min_genotype_float": 2.5e-15,
+   "n_charged_modulus_cells": 9,
+   "n_product_modulus_cells": 9,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": true,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "1/20",
+   "pB": "9/10",
+   "t_of_Dmax": "999999/1000000",
+   "D": "999999/200000000",
+   "r2": "111110888889/19000000000000",
+   "r2_float": 0.005847941520473684,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "1/200000000",
+   "eta_min_haplotype_float": 5e-09,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "1/40000000000000000",
+   "eta_min_genotype_float": 2.5e-17,
+   "n_charged_modulus_cells": 9,
+   "n_product_modulus_cells": 9,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": true,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "1/20",
+   "pB": "9/10",
+   "t_of_Dmax": "999999999/1000000000",
+   "D": "999999999/200000000000",
+   "r2": "111111110888888889/19000000000000000000",
+   "r2_float": 0.005847953204678362,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 4,
+   "eta_min_haplotype": "1/200000000000",
+   "eta_min_haplotype_float": 5e-12,
+   "full_support_haplotype": true,
+   "n_genotype_cells_positive": 9,
+   "eta_min_genotype": "1/40000000000000000000000",
+   "eta_min_genotype_float": 2.5e-23,
+   "n_charged_modulus_cells": 9,
+   "n_product_modulus_cells": 9,
+   "charged_equals_product": true,
+   "charged_equals_LE_baseline": true,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": true,
+   "modulus_map_injective_B": true
+  },
+  {
+   "pA": "1/20",
+   "pB": "9/10",
+   "t_of_Dmax": "1",
+   "D": "1/200",
+   "r2": "1/171",
+   "r2_float": 0.005847953216374269,
+   "r2_is_one": false,
+   "n_haplotypes_positive": 3,
+   "eta_min_haplotype": "0",
+   "eta_min_haplotype_float": 0.0,
+   "full_support_haplotype": false,
+   "n_genotype_cells_positive": 6,
+   "eta_min_genotype": "1/400",
+   "eta_min_genotype_float": 0.0025,
+   "n_charged_modulus_cells": 6,
+   "n_product_modulus_cells": 9,
+   "charged_equals_product": false,
+   "charged_equals_LE_baseline": false,
+   "product_equals_LE_baseline": true,
+   "modulus_map_injective_A": true,
+   "modulus_map_injective_B": true
+  }
+ ],
+ "r2_max_table": [
+  {
+   "pA": "1/10",
+   "pB": "1/10",
+   "r2_max": "1",
+   "r2_max_float": 1.0,
+   "r2_max_is_one": true
+  },
+  {
+   "pA": "1/10",
+   "pB": "1/5",
+   "r2_max": "4/9",
+   "r2_max_float": 0.4444444444444444,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "1/10",
+   "pB": "3/10",
+   "r2_max": "7/27",
+   "r2_max_float": 0.25925925925925924,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "1/10",
+   "pB": "2/5",
+   "r2_max": "1/6",
+   "r2_max_float": 0.16666666666666666,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "1/10",
+   "pB": "1/2",
+   "r2_max": "1/9",
+   "r2_max_float": 0.1111111111111111,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "1/10",
+   "pB": "3/5",
+   "r2_max": "2/27",
+   "r2_max_float": 0.07407407407407407,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "1/10",
+   "pB": "7/10",
+   "r2_max": "1/21",
+   "r2_max_float": 0.047619047619047616,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "1/10",
+   "pB": "4/5",
+   "r2_max": "1/36",
+   "r2_max_float": 0.027777777777777776,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "1/10",
+   "pB": "9/10",
+   "r2_max": "1/81",
+   "r2_max_float": 0.012345679012345678,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "1/5",
+   "pB": "1/10",
+   "r2_max": "4/9",
+   "r2_max_float": 0.4444444444444444,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "1/5",
+   "pB": "1/5",
+   "r2_max": "1",
+   "r2_max_float": 1.0,
+   "r2_max_is_one": true
+  },
+  {
+   "pA": "1/5",
+   "pB": "3/10",
+   "r2_max": "7/12",
+   "r2_max_float": 0.5833333333333334,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "1/5",
+   "pB": "2/5",
+   "r2_max": "3/8",
+   "r2_max_float": 0.375,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "1/5",
+   "pB": "1/2",
+   "r2_max": "1/4",
+   "r2_max_float": 0.25,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "1/5",
+   "pB": "3/5",
+   "r2_max": "1/6",
+   "r2_max_float": 0.16666666666666666,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "1/5",
+   "pB": "7/10",
+   "r2_max": "3/28",
+   "r2_max_float": 0.10714285714285714,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "1/5",
+   "pB": "4/5",
+   "r2_max": "1/16",
+   "r2_max_float": 0.0625,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "1/5",
+   "pB": "9/10",
+   "r2_max": "1/36",
+   "r2_max_float": 0.027777777777777776,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "3/10",
+   "pB": "1/10",
+   "r2_max": "7/27",
+   "r2_max_float": 0.25925925925925924,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "3/10",
+   "pB": "1/5",
+   "r2_max": "7/12",
+   "r2_max_float": 0.5833333333333334,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "3/10",
+   "pB": "3/10",
+   "r2_max": "1",
+   "r2_max_float": 1.0,
+   "r2_max_is_one": true
+  },
+  {
+   "pA": "3/10",
+   "pB": "2/5",
+   "r2_max": "9/14",
+   "r2_max_float": 0.6428571428571429,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "3/10",
+   "pB": "1/2",
+   "r2_max": "3/7",
+   "r2_max_float": 0.42857142857142855,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "3/10",
+   "pB": "3/5",
+   "r2_max": "2/7",
+   "r2_max_float": 0.2857142857142857,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "3/10",
+   "pB": "7/10",
+   "r2_max": "9/49",
+   "r2_max_float": 0.1836734693877551,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "3/10",
+   "pB": "4/5",
+   "r2_max": "3/28",
+   "r2_max_float": 0.10714285714285714,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "3/10",
+   "pB": "9/10",
+   "r2_max": "1/21",
+   "r2_max_float": 0.047619047619047616,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "2/5",
+   "pB": "1/10",
+   "r2_max": "1/6",
+   "r2_max_float": 0.16666666666666666,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "2/5",
+   "pB": "1/5",
+   "r2_max": "3/8",
+   "r2_max_float": 0.375,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "2/5",
+   "pB": "3/10",
+   "r2_max": "9/14",
+   "r2_max_float": 0.6428571428571429,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "2/5",
+   "pB": "2/5",
+   "r2_max": "1",
+   "r2_max_float": 1.0,
+   "r2_max_is_one": true
+  },
+  {
+   "pA": "2/5",
+   "pB": "1/2",
+   "r2_max": "2/3",
+   "r2_max_float": 0.6666666666666666,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "2/5",
+   "pB": "3/5",
+   "r2_max": "4/9",
+   "r2_max_float": 0.4444444444444444,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "2/5",
+   "pB": "7/10",
+   "r2_max": "2/7",
+   "r2_max_float": 0.2857142857142857,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "2/5",
+   "pB": "4/5",
+   "r2_max": "1/6",
+   "r2_max_float": 0.16666666666666666,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "2/5",
+   "pB": "9/10",
+   "r2_max": "2/27",
+   "r2_max_float": 0.07407407407407407,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "1/2",
+   "pB": "1/10",
+   "r2_max": "1/9",
+   "r2_max_float": 0.1111111111111111,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "1/2",
+   "pB": "1/5",
+   "r2_max": "1/4",
+   "r2_max_float": 0.25,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "1/2",
+   "pB": "3/10",
+   "r2_max": "3/7",
+   "r2_max_float": 0.42857142857142855,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "1/2",
+   "pB": "2/5",
+   "r2_max": "2/3",
+   "r2_max_float": 0.6666666666666666,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "1/2",
+   "pB": "1/2",
+   "r2_max": "1",
+   "r2_max_float": 1.0,
+   "r2_max_is_one": true
+  },
+  {
+   "pA": "1/2",
+   "pB": "3/5",
+   "r2_max": "2/3",
+   "r2_max_float": 0.6666666666666666,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "1/2",
+   "pB": "7/10",
+   "r2_max": "3/7",
+   "r2_max_float": 0.42857142857142855,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "1/2",
+   "pB": "4/5",
+   "r2_max": "1/4",
+   "r2_max_float": 0.25,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "1/2",
+   "pB": "9/10",
+   "r2_max": "1/9",
+   "r2_max_float": 0.1111111111111111,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "3/5",
+   "pB": "1/10",
+   "r2_max": "2/27",
+   "r2_max_float": 0.07407407407407407,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "3/5",
+   "pB": "1/5",
+   "r2_max": "1/6",
+   "r2_max_float": 0.16666666666666666,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "3/5",
+   "pB": "3/10",
+   "r2_max": "2/7",
+   "r2_max_float": 0.2857142857142857,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "3/5",
+   "pB": "2/5",
+   "r2_max": "4/9",
+   "r2_max_float": 0.4444444444444444,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "3/5",
+   "pB": "1/2",
+   "r2_max": "2/3",
+   "r2_max_float": 0.6666666666666666,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "3/5",
+   "pB": "3/5",
+   "r2_max": "1",
+   "r2_max_float": 1.0,
+   "r2_max_is_one": true
+  },
+  {
+   "pA": "3/5",
+   "pB": "7/10",
+   "r2_max": "9/14",
+   "r2_max_float": 0.6428571428571429,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "3/5",
+   "pB": "4/5",
+   "r2_max": "3/8",
+   "r2_max_float": 0.375,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "3/5",
+   "pB": "9/10",
+   "r2_max": "1/6",
+   "r2_max_float": 0.16666666666666666,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "7/10",
+   "pB": "1/10",
+   "r2_max": "1/21",
+   "r2_max_float": 0.047619047619047616,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "7/10",
+   "pB": "1/5",
+   "r2_max": "3/28",
+   "r2_max_float": 0.10714285714285714,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "7/10",
+   "pB": "3/10",
+   "r2_max": "9/49",
+   "r2_max_float": 0.1836734693877551,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "7/10",
+   "pB": "2/5",
+   "r2_max": "2/7",
+   "r2_max_float": 0.2857142857142857,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "7/10",
+   "pB": "1/2",
+   "r2_max": "3/7",
+   "r2_max_float": 0.42857142857142855,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "7/10",
+   "pB": "3/5",
+   "r2_max": "9/14",
+   "r2_max_float": 0.6428571428571429,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "7/10",
+   "pB": "7/10",
+   "r2_max": "1",
+   "r2_max_float": 1.0,
+   "r2_max_is_one": true
+  },
+  {
+   "pA": "7/10",
+   "pB": "4/5",
+   "r2_max": "7/12",
+   "r2_max_float": 0.5833333333333334,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "7/10",
+   "pB": "9/10",
+   "r2_max": "7/27",
+   "r2_max_float": 0.25925925925925924,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "4/5",
+   "pB": "1/10",
+   "r2_max": "1/36",
+   "r2_max_float": 0.027777777777777776,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "4/5",
+   "pB": "1/5",
+   "r2_max": "1/16",
+   "r2_max_float": 0.0625,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "4/5",
+   "pB": "3/10",
+   "r2_max": "3/28",
+   "r2_max_float": 0.10714285714285714,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "4/5",
+   "pB": "2/5",
+   "r2_max": "1/6",
+   "r2_max_float": 0.16666666666666666,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "4/5",
+   "pB": "1/2",
+   "r2_max": "1/4",
+   "r2_max_float": 0.25,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "4/5",
+   "pB": "3/5",
+   "r2_max": "3/8",
+   "r2_max_float": 0.375,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "4/5",
+   "pB": "7/10",
+   "r2_max": "7/12",
+   "r2_max_float": 0.5833333333333334,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "4/5",
+   "pB": "4/5",
+   "r2_max": "1",
+   "r2_max_float": 1.0,
+   "r2_max_is_one": true
+  },
+  {
+   "pA": "4/5",
+   "pB": "9/10",
+   "r2_max": "4/9",
+   "r2_max_float": 0.4444444444444444,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "9/10",
+   "pB": "1/10",
+   "r2_max": "1/81",
+   "r2_max_float": 0.012345679012345678,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "9/10",
+   "pB": "1/5",
+   "r2_max": "1/36",
+   "r2_max_float": 0.027777777777777776,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "9/10",
+   "pB": "3/10",
+   "r2_max": "1/21",
+   "r2_max_float": 0.047619047619047616,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "9/10",
+   "pB": "2/5",
+   "r2_max": "2/27",
+   "r2_max_float": 0.07407407407407407,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "9/10",
+   "pB": "1/2",
+   "r2_max": "1/9",
+   "r2_max_float": 0.1111111111111111,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "9/10",
+   "pB": "3/5",
+   "r2_max": "1/6",
+   "r2_max_float": 0.16666666666666666,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "9/10",
+   "pB": "7/10",
+   "r2_max": "7/27",
+   "r2_max_float": 0.25925925925925924,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "9/10",
+   "pB": "4/5",
+   "r2_max": "4/9",
+   "r2_max_float": 0.4444444444444444,
+   "r2_max_is_one": false
+  },
+  {
+   "pA": "9/10",
+   "pB": "9/10",
+   "r2_max": "1",
+   "r2_max_float": 1.0,
+   "r2_max_is_one": true
+  }
+ ],
+ "zero_support_below_r2_one": [
+  {
+   "pA": "1/10",
+   "pB": "1/5",
+   "r2": "4/9",
+   "r2_float": 0.4444444444444444,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 6,
+   "product": 9,
+   "coverage_lost": true
+  },
+  {
+   "pA": "1/10",
+   "pB": "3/10",
+   "r2": "7/27",
+   "r2_float": 0.25925925925925924,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 6,
+   "product": 9,
+   "coverage_lost": true
+  },
+  {
+   "pA": "1/10",
+   "pB": "2/5",
+   "r2": "1/6",
+   "r2_float": 0.16666666666666666,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 6,
+   "product": 9,
+   "coverage_lost": true
+  },
+  {
+   "pA": "1/10",
+   "pB": "1/2",
+   "r2": "1/9",
+   "r2_float": 0.1111111111111111,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 3,
+   "product": 3,
+   "coverage_lost": false
+  },
+  {
+   "pA": "1/10",
+   "pB": "3/5",
+   "r2": "2/27",
+   "r2_float": 0.07407407407407407,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 6,
+   "product": 9,
+   "coverage_lost": true
+  },
+  {
+   "pA": "1/10",
+   "pB": "7/10",
+   "r2": "1/21",
+   "r2_float": 0.047619047619047616,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 6,
+   "product": 9,
+   "coverage_lost": true
+  },
+  {
+   "pA": "1/10",
+   "pB": "4/5",
+   "r2": "1/36",
+   "r2_float": 0.027777777777777776,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 6,
+   "product": 9,
+   "coverage_lost": true
+  },
+  {
+   "pA": "1/10",
+   "pB": "9/10",
+   "r2": "1/81",
+   "r2_float": 0.012345679012345678,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 6,
+   "product": 9,
+   "coverage_lost": true
+  },
+  {
+   "pA": "1/5",
+   "pB": "1/10",
+   "r2": "4/9",
+   "r2_float": 0.4444444444444444,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 6,
+   "product": 9,
+   "coverage_lost": true
+  },
+  {
+   "pA": "1/5",
+   "pB": "3/10",
+   "r2": "7/12",
+   "r2_float": 0.5833333333333334,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 6,
+   "product": 9,
+   "coverage_lost": true
+  },
+  {
+   "pA": "1/5",
+   "pB": "2/5",
+   "r2": "3/8",
+   "r2_float": 0.375,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 6,
+   "product": 9,
+   "coverage_lost": true
+  },
+  {
+   "pA": "1/5",
+   "pB": "1/2",
+   "r2": "1/4",
+   "r2_float": 0.25,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 3,
+   "product": 3,
+   "coverage_lost": false
+  },
+  {
+   "pA": "1/5",
+   "pB": "3/5",
+   "r2": "1/6",
+   "r2_float": 0.16666666666666666,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 6,
+   "product": 9,
+   "coverage_lost": true
+  },
+  {
+   "pA": "1/5",
+   "pB": "7/10",
+   "r2": "3/28",
+   "r2_float": 0.10714285714285714,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 6,
+   "product": 9,
+   "coverage_lost": true
+  },
+  {
+   "pA": "1/5",
+   "pB": "4/5",
+   "r2": "1/16",
+   "r2_float": 0.0625,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 6,
+   "product": 9,
+   "coverage_lost": true
+  },
+  {
+   "pA": "1/5",
+   "pB": "9/10",
+   "r2": "1/36",
+   "r2_float": 0.027777777777777776,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 6,
+   "product": 9,
+   "coverage_lost": true
+  },
+  {
+   "pA": "3/10",
+   "pB": "1/10",
+   "r2": "7/27",
+   "r2_float": 0.25925925925925924,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 6,
+   "product": 9,
+   "coverage_lost": true
+  },
+  {
+   "pA": "3/10",
+   "pB": "1/5",
+   "r2": "7/12",
+   "r2_float": 0.5833333333333334,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 6,
+   "product": 9,
+   "coverage_lost": true
+  },
+  {
+   "pA": "3/10",
+   "pB": "2/5",
+   "r2": "9/14",
+   "r2_float": 0.6428571428571429,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 6,
+   "product": 9,
+   "coverage_lost": true
+  },
+  {
+   "pA": "3/10",
+   "pB": "1/2",
+   "r2": "3/7",
+   "r2_float": 0.42857142857142855,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 3,
+   "product": 3,
+   "coverage_lost": false
+  },
+  {
+   "pA": "3/10",
+   "pB": "3/5",
+   "r2": "2/7",
+   "r2_float": 0.2857142857142857,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 6,
+   "product": 9,
+   "coverage_lost": true
+  },
+  {
+   "pA": "3/10",
+   "pB": "7/10",
+   "r2": "9/49",
+   "r2_float": 0.1836734693877551,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 6,
+   "product": 9,
+   "coverage_lost": true
+  },
+  {
+   "pA": "3/10",
+   "pB": "4/5",
+   "r2": "3/28",
+   "r2_float": 0.10714285714285714,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 6,
+   "product": 9,
+   "coverage_lost": true
+  },
+  {
+   "pA": "3/10",
+   "pB": "9/10",
+   "r2": "1/21",
+   "r2_float": 0.047619047619047616,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 6,
+   "product": 9,
+   "coverage_lost": true
+  },
+  {
+   "pA": "2/5",
+   "pB": "1/10",
+   "r2": "1/6",
+   "r2_float": 0.16666666666666666,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 6,
+   "product": 9,
+   "coverage_lost": true
+  },
+  {
+   "pA": "2/5",
+   "pB": "1/5",
+   "r2": "3/8",
+   "r2_float": 0.375,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 6,
+   "product": 9,
+   "coverage_lost": true
+  },
+  {
+   "pA": "2/5",
+   "pB": "3/10",
+   "r2": "9/14",
+   "r2_float": 0.6428571428571429,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 6,
+   "product": 9,
+   "coverage_lost": true
+  },
+  {
+   "pA": "2/5",
+   "pB": "1/2",
+   "r2": "2/3",
+   "r2_float": 0.6666666666666666,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 3,
+   "product": 3,
+   "coverage_lost": false
+  },
+  {
+   "pA": "2/5",
+   "pB": "3/5",
+   "r2": "4/9",
+   "r2_float": 0.4444444444444444,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 6,
+   "product": 9,
+   "coverage_lost": true
+  },
+  {
+   "pA": "2/5",
+   "pB": "7/10",
+   "r2": "2/7",
+   "r2_float": 0.2857142857142857,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 6,
+   "product": 9,
+   "coverage_lost": true
+  },
+  {
+   "pA": "2/5",
+   "pB": "4/5",
+   "r2": "1/6",
+   "r2_float": 0.16666666666666666,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 6,
+   "product": 9,
+   "coverage_lost": true
+  },
+  {
+   "pA": "2/5",
+   "pB": "9/10",
+   "r2": "2/27",
+   "r2_float": 0.07407407407407407,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 6,
+   "product": 9,
+   "coverage_lost": true
+  },
+  {
+   "pA": "1/2",
+   "pB": "1/10",
+   "r2": "1/9",
+   "r2_float": 0.1111111111111111,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 3,
+   "product": 3,
+   "coverage_lost": false
+  },
+  {
+   "pA": "1/2",
+   "pB": "1/5",
+   "r2": "1/4",
+   "r2_float": 0.25,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 3,
+   "product": 3,
+   "coverage_lost": false
+  },
+  {
+   "pA": "1/2",
+   "pB": "3/10",
+   "r2": "3/7",
+   "r2_float": 0.42857142857142855,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 3,
+   "product": 3,
+   "coverage_lost": false
+  },
+  {
+   "pA": "1/2",
+   "pB": "2/5",
+   "r2": "2/3",
+   "r2_float": 0.6666666666666666,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 3,
+   "product": 3,
+   "coverage_lost": false
+  },
+  {
+   "pA": "1/2",
+   "pB": "3/5",
+   "r2": "2/3",
+   "r2_float": 0.6666666666666666,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 3,
+   "product": 3,
+   "coverage_lost": false
+  },
+  {
+   "pA": "1/2",
+   "pB": "7/10",
+   "r2": "3/7",
+   "r2_float": 0.42857142857142855,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 3,
+   "product": 3,
+   "coverage_lost": false
+  },
+  {
+   "pA": "1/2",
+   "pB": "4/5",
+   "r2": "1/4",
+   "r2_float": 0.25,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 3,
+   "product": 3,
+   "coverage_lost": false
+  },
+  {
+   "pA": "1/2",
+   "pB": "9/10",
+   "r2": "1/9",
+   "r2_float": 0.1111111111111111,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 3,
+   "product": 3,
+   "coverage_lost": false
+  },
+  {
+   "pA": "3/5",
+   "pB": "1/10",
+   "r2": "2/27",
+   "r2_float": 0.07407407407407407,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 6,
+   "product": 9,
+   "coverage_lost": true
+  },
+  {
+   "pA": "3/5",
+   "pB": "1/5",
+   "r2": "1/6",
+   "r2_float": 0.16666666666666666,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 6,
+   "product": 9,
+   "coverage_lost": true
+  },
+  {
+   "pA": "3/5",
+   "pB": "3/10",
+   "r2": "2/7",
+   "r2_float": 0.2857142857142857,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 6,
+   "product": 9,
+   "coverage_lost": true
+  },
+  {
+   "pA": "3/5",
+   "pB": "2/5",
+   "r2": "4/9",
+   "r2_float": 0.4444444444444444,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 6,
+   "product": 9,
+   "coverage_lost": true
+  },
+  {
+   "pA": "3/5",
+   "pB": "1/2",
+   "r2": "2/3",
+   "r2_float": 0.6666666666666666,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 3,
+   "product": 3,
+   "coverage_lost": false
+  },
+  {
+   "pA": "3/5",
+   "pB": "7/10",
+   "r2": "9/14",
+   "r2_float": 0.6428571428571429,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 6,
+   "product": 9,
+   "coverage_lost": true
+  },
+  {
+   "pA": "3/5",
+   "pB": "4/5",
+   "r2": "3/8",
+   "r2_float": 0.375,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 6,
+   "product": 9,
+   "coverage_lost": true
+  },
+  {
+   "pA": "3/5",
+   "pB": "9/10",
+   "r2": "1/6",
+   "r2_float": 0.16666666666666666,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 6,
+   "product": 9,
+   "coverage_lost": true
+  },
+  {
+   "pA": "7/10",
+   "pB": "1/10",
+   "r2": "1/21",
+   "r2_float": 0.047619047619047616,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 6,
+   "product": 9,
+   "coverage_lost": true
+  },
+  {
+   "pA": "7/10",
+   "pB": "1/5",
+   "r2": "3/28",
+   "r2_float": 0.10714285714285714,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 6,
+   "product": 9,
+   "coverage_lost": true
+  },
+  {
+   "pA": "7/10",
+   "pB": "3/10",
+   "r2": "9/49",
+   "r2_float": 0.1836734693877551,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 6,
+   "product": 9,
+   "coverage_lost": true
+  },
+  {
+   "pA": "7/10",
+   "pB": "2/5",
+   "r2": "2/7",
+   "r2_float": 0.2857142857142857,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 6,
+   "product": 9,
+   "coverage_lost": true
+  },
+  {
+   "pA": "7/10",
+   "pB": "1/2",
+   "r2": "3/7",
+   "r2_float": 0.42857142857142855,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 3,
+   "product": 3,
+   "coverage_lost": false
+  },
+  {
+   "pA": "7/10",
+   "pB": "3/5",
+   "r2": "9/14",
+   "r2_float": 0.6428571428571429,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 6,
+   "product": 9,
+   "coverage_lost": true
+  },
+  {
+   "pA": "7/10",
+   "pB": "4/5",
+   "r2": "7/12",
+   "r2_float": 0.5833333333333334,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 6,
+   "product": 9,
+   "coverage_lost": true
+  },
+  {
+   "pA": "7/10",
+   "pB": "9/10",
+   "r2": "7/27",
+   "r2_float": 0.25925925925925924,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 6,
+   "product": 9,
+   "coverage_lost": true
+  },
+  {
+   "pA": "4/5",
+   "pB": "1/10",
+   "r2": "1/36",
+   "r2_float": 0.027777777777777776,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 6,
+   "product": 9,
+   "coverage_lost": true
+  },
+  {
+   "pA": "4/5",
+   "pB": "1/5",
+   "r2": "1/16",
+   "r2_float": 0.0625,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 6,
+   "product": 9,
+   "coverage_lost": true
+  },
+  {
+   "pA": "4/5",
+   "pB": "3/10",
+   "r2": "3/28",
+   "r2_float": 0.10714285714285714,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 6,
+   "product": 9,
+   "coverage_lost": true
+  },
+  {
+   "pA": "4/5",
+   "pB": "2/5",
+   "r2": "1/6",
+   "r2_float": 0.16666666666666666,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 6,
+   "product": 9,
+   "coverage_lost": true
+  },
+  {
+   "pA": "4/5",
+   "pB": "1/2",
+   "r2": "1/4",
+   "r2_float": 0.25,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 3,
+   "product": 3,
+   "coverage_lost": false
+  },
+  {
+   "pA": "4/5",
+   "pB": "3/5",
+   "r2": "3/8",
+   "r2_float": 0.375,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 6,
+   "product": 9,
+   "coverage_lost": true
+  },
+  {
+   "pA": "4/5",
+   "pB": "7/10",
+   "r2": "7/12",
+   "r2_float": 0.5833333333333334,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 6,
+   "product": 9,
+   "coverage_lost": true
+  },
+  {
+   "pA": "4/5",
+   "pB": "9/10",
+   "r2": "4/9",
+   "r2_float": 0.4444444444444444,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 6,
+   "product": 9,
+   "coverage_lost": true
+  },
+  {
+   "pA": "9/10",
+   "pB": "1/10",
+   "r2": "1/81",
+   "r2_float": 0.012345679012345678,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 6,
+   "product": 9,
+   "coverage_lost": true
+  },
+  {
+   "pA": "9/10",
+   "pB": "1/5",
+   "r2": "1/36",
+   "r2_float": 0.027777777777777776,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 6,
+   "product": 9,
+   "coverage_lost": true
+  },
+  {
+   "pA": "9/10",
+   "pB": "3/10",
+   "r2": "1/21",
+   "r2_float": 0.047619047619047616,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 6,
+   "product": 9,
+   "coverage_lost": true
+  },
+  {
+   "pA": "9/10",
+   "pB": "2/5",
+   "r2": "2/27",
+   "r2_float": 0.07407407407407407,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 6,
+   "product": 9,
+   "coverage_lost": true
+  },
+  {
+   "pA": "9/10",
+   "pB": "1/2",
+   "r2": "1/9",
+   "r2_float": 0.1111111111111111,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 3,
+   "product": 3,
+   "coverage_lost": false
+  },
+  {
+   "pA": "9/10",
+   "pB": "3/5",
+   "r2": "1/6",
+   "r2_float": 0.16666666666666666,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 6,
+   "product": 9,
+   "coverage_lost": true
+  },
+  {
+   "pA": "9/10",
+   "pB": "7/10",
+   "r2": "7/27",
+   "r2_float": 0.25925925925925924,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 6,
+   "product": 9,
+   "coverage_lost": true
+  },
+  {
+   "pA": "9/10",
+   "pB": "4/5",
+   "r2": "4/9",
+   "r2_float": 0.4444444444444444,
+   "zero_haplotypes": 1,
+   "zero_genotype_cells": 3,
+   "charged": 6,
+   "product": 9,
+   "coverage_lost": true
+  }
+ ],
+ "modulus_degeneracy": [
+  {
+   "p": "1/50",
+   "moduli": [
+    "47/49",
+    "1103/49",
+    "97"
+   ],
+   "distinct": 3,
+   "injective": true
+  },
+  {
+   "p": "1/25",
+   "moduli": [
+    "11/12",
+    "481/48",
+    "47"
+   ],
+   "distinct": 3,
+   "injective": true
+  },
+  {
+   "p": "3/50",
+   "moduli": [
+    "41/47",
+    "827/141",
+    "91/3"
+   ],
+   "distinct": 3,
+   "injective": true
+  },
+  {
+   "p": "2/25",
+   "moduli": [
+    "19/23",
+    "349/92",
+    "22"
+   ],
+   "distinct": 3,
+   "injective": true
+  },
+  {
+   "p": "1/10",
+   "moduli": [
+    "7/9",
+    "23/9",
+    "17"
+   ],
+   "distinct": 3,
+   "injective": true
+  },
+  {
+   "p": "3/25",
+   "moduli": [
+    "8/11",
+    "229/132",
+    "41/3"
+   ],
+   "distinct": 3,
+   "injective": true
+  },
+  {
+   "p": "7/50",
+   "moduli": [
+    "29/43",
+    "347/301",
+    "79/7"
+   ],
+   "distinct": 3,
+   "injective": true
+  },
+  {
+   "p": "4/25",
+   "moduli": [
+    "13/21",
+    "121/168",
+    "19/2"
+   ],
+   "distinct": 3,
+   "injective": true
+  },
+  {
+   "p": "9/50",
+   "moduli": [
+    "23/41",
+    "143/369",
+    "73/9"
+   ],
+   "distinct": 3,
+   "injective": true
+  },
+  {
+   "p": "1/5",
+   "moduli": [
+    "1/2",
+    "1/8",
+    "7"
+   ],
+   "distinct": 3,
+   "injective": true
+  },
+  {
+   "p": "11/50",
+   "moduli": [
+    "17/39",
+    "37/429",
+    "67/11"
+   ],
+   "distinct": 3,
+   "injective": true
+  },
+  {
+   "p": "6/25",
+   "moduli": [
+    "7/19",
+    "59/228",
+    "16/3"
+   ],
+   "distinct": 3,
+   "injective": true
+  },
+  {
+   "p": "13/50",
+   "moduli": [
+    "11/37",
+    "193/481",
+    "61/13"
+   ],
+   "distinct": 3,
+   "injective": true
+  },
+  {
+   "p": "7/25",
+   "moduli": [
+    "2/9",
+    "131/252",
+    "29/7"
+   ],
+   "distinct": 3,
+   "injective": true
+  },
+  {
+   "p": "3/10",
+   "moduli": [
+    "1/7",
+    "13/21",
+    "11/3"
+   ],
+   "distinct": 3,
+   "injective": true
+  },
+  {
+   "p": "8/25",
+   "moduli": [
+    "1/17",
+    "191/272",
+    "13/4"
+   ],
+   "distinct": 3,
+   "injective": true
+  },
+  {
+   "p": "17/50",
+   "moduli": [
+    "1/33",
+    "433/561",
+    "49/17"
+   ],
+   "distinct": 3,
+   "injective": true
+  },
+  {
+   "p": "9/25",
+   "moduli": [
+    "1/8",
+    "239/288",
+    "23/9"
+   ],
+   "distinct": 3,
+   "injective": true
+  },
+  {
+   "p": "19/50",
+   "moduli": [
+    "7/31",
+    "517/589",
+    "43/19"
+   ],
+   "distinct": 3,
+   "injective": true
+  },
+  {
+   "p": "2/5",
+   "moduli": [
+    "1/3",
+    "11/12",
+    "2"
+   ],
+   "distinct": 3,
+   "injective": true
+  },
+  {
+   "p": "21/50",
+   "moduli": [
+    "13/29",
+    "577/609",
+    "37/21"
+   ],
+   "distinct": 3,
+   "injective": true
+  },
+  {
+   "p": "11/25",
+   "moduli": [
+    "4/7",
+    "299/308",
+    "17/11"
+   ],
+   "distinct": 3,
+   "injective": true
+  },
+  {
+   "p": "23/50",
+   "moduli": [
+    "19/27",
+    "613/621",
+    "31/23"
+   ],
+   "distinct": 3,
+   "injective": true
+  },
+  {
+   "p": "12/25",
+   "moduli": [
+    "11/13",
+    "311/312",
+    "7/6"
+   ],
+   "distinct": 3,
+   "injective": true
+  },
+  {
+   "p": "1/2",
+   "moduli": [
+    "1",
+    "1",
+    "1"
+   ],
+   "distinct": 1,
+   "injective": false
+  },
+  {
+   "p": "13/25",
+   "moduli": [
+    "7/6",
+    "311/312",
+    "11/13"
+   ],
+   "distinct": 3,
+   "injective": true
+  },
+  {
+   "p": "27/50",
+   "moduli": [
+    "31/23",
+    "613/621",
+    "19/27"
+   ],
+   "distinct": 3,
+   "injective": true
+  },
+  {
+   "p": "14/25",
+   "moduli": [
+    "17/11",
+    "299/308",
+    "4/7"
+   ],
+   "distinct": 3,
+   "injective": true
+  },
+  {
+   "p": "29/50",
+   "moduli": [
+    "37/21",
+    "577/609",
+    "13/29"
+   ],
+   "distinct": 3,
+   "injective": true
+  },
+  {
+   "p": "3/5",
+   "moduli": [
+    "2",
+    "11/12",
+    "1/3"
+   ],
+   "distinct": 3,
+   "injective": true
+  },
+  {
+   "p": "31/50",
+   "moduli": [
+    "43/19",
+    "517/589",
+    "7/31"
+   ],
+   "distinct": 3,
+   "injective": true
+  },
+  {
+   "p": "16/25",
+   "moduli": [
+    "23/9",
+    "239/288",
+    "1/8"
+   ],
+   "distinct": 3,
+   "injective": true
+  },
+  {
+   "p": "33/50",
+   "moduli": [
+    "49/17",
+    "433/561",
+    "1/33"
+   ],
+   "distinct": 3,
+   "injective": true
+  },
+  {
+   "p": "17/25",
+   "moduli": [
+    "13/4",
+    "191/272",
+    "1/17"
+   ],
+   "distinct": 3,
+   "injective": true
+  },
+  {
+   "p": "7/10",
+   "moduli": [
+    "11/3",
+    "13/21",
+    "1/7"
+   ],
+   "distinct": 3,
+   "injective": true
+  },
+  {
+   "p": "18/25",
+   "moduli": [
+    "29/7",
+    "131/252",
+    "2/9"
+   ],
+   "distinct": 3,
+   "injective": true
+  },
+  {
+   "p": "37/50",
+   "moduli": [
+    "61/13",
+    "193/481",
+    "11/37"
+   ],
+   "distinct": 3,
+   "injective": true
+  },
+  {
+   "p": "19/25",
+   "moduli": [
+    "16/3",
+    "59/228",
+    "7/19"
+   ],
+   "distinct": 3,
+   "injective": true
+  },
+  {
+   "p": "39/50",
+   "moduli": [
+    "67/11",
+    "37/429",
+    "17/39"
+   ],
+   "distinct": 3,
+   "injective": true
+  },
+  {
+   "p": "4/5",
+   "moduli": [
+    "7",
+    "1/8",
+    "1/2"
+   ],
+   "distinct": 3,
+   "injective": true
+  },
+  {
+   "p": "41/50",
+   "moduli": [
+    "73/9",
+    "143/369",
+    "23/41"
+   ],
+   "distinct": 3,
+   "injective": true
+  },
+  {
+   "p": "21/25",
+   "moduli": [
+    "19/2",
+    "121/168",
+    "13/21"
+   ],
+   "distinct": 3,
+   "injective": true
+  },
+  {
+   "p": "43/50",
+   "moduli": [
+    "79/7",
+    "347/301",
+    "29/43"
+   ],
+   "distinct": 3,
+   "injective": true
+  },
+  {
+   "p": "22/25",
+   "moduli": [
+    "41/3",
+    "229/132",
+    "8/11"
+   ],
+   "distinct": 3,
+   "injective": true
+  },
+  {
+   "p": "9/10",
+   "moduli": [
+    "17",
+    "23/9",
+    "7/9"
+   ],
+   "distinct": 3,
+   "injective": true
+  },
+  {
+   "p": "23/25",
+   "moduli": [
+    "22",
+    "349/92",
+    "19/23"
+   ],
+   "distinct": 3,
+   "injective": true
+  },
+  {
+   "p": "47/50",
+   "moduli": [
+    "91/3",
+    "827/141",
+    "41/47"
+   ],
+   "distinct": 3,
+   "injective": true
+  },
+  {
+   "p": "24/25",
+   "moduli": [
+    "47",
+    "481/48",
+    "11/12"
+   ],
+   "distinct": 3,
+   "injective": true
+  },
+  {
+   "p": "49/50",
+   "moduli": [
+    "97",
+    "1103/49",
+    "47/49"
+   ],
+   "distinct": 3,
+   "injective": true
+  }
+ ],
+ "finite_sample": [
+  {
+   "pA": "3/10",
+   "pB": "3/10",
+   "r2": "0",
+   "r2_float": 0.0,
+   "min_positive_genotype_prob": "81/10000",
+   "min_positive_genotype_prob_float": 0.0081,
+   "N_for_95pct_chance_to_observe_rarest": 369,
+   "N_for_50pct_chance_to_observe_rarest": 86,
+   "per_N": [
+    {
+     "N": 1000,
+     "P_some_genotype_cell_unobserved_upper_bound": 0.00029369074553276106,
+     "empirical_frac_runs_missing_a_genotype_cell": 0.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 0.0,
+     "reps": 200
+    },
+    {
+     "N": 10000,
+     "P_some_genotype_cell_unobserved_upper_bound": 4.774222081997588e-36,
+     "empirical_frac_runs_missing_a_genotype_cell": 0.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 0.0,
+     "reps": 200
+    },
+    {
+     "N": 100000,
+     "P_some_genotype_cell_unobserved_upper_bound": 0.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 0.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 0.0,
+     "reps": 200
+    },
+    {
+     "N": 500000,
+     "P_some_genotype_cell_unobserved_upper_bound": 0.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 0.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 0.0,
+     "reps": 200
+    },
+    {
+     "N": 5000000,
+     "P_some_genotype_cell_unobserved_upper_bound": 0.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 0.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 0.0,
+     "reps": 200
+    }
+   ]
+  },
+  {
+   "pA": "3/10",
+   "pB": "3/10",
+   "r2": "81/100",
+   "r2_float": 0.81,
+   "min_positive_genotype_prob": "441/1000000",
+   "min_positive_genotype_prob_float": 0.000441,
+   "N_for_95pct_chance_to_observe_rarest": 6792,
+   "N_for_50pct_chance_to_observe_rarest": 1572,
+   "per_N": [
+    {
+     "N": 1000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 0.91,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 0.91,
+     "reps": 200
+    },
+    {
+     "N": 10000,
+     "P_some_genotype_cell_unobserved_upper_bound": 0.024286721691763522,
+     "empirical_frac_runs_missing_a_genotype_cell": 0.02,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 0.02,
+     "reps": 200
+    },
+    {
+     "N": 100000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.3945015472576375e-19,
+     "empirical_frac_runs_missing_a_genotype_cell": 0.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 0.0,
+     "reps": 200
+    },
+    {
+     "N": 500000,
+     "P_some_genotype_cell_unobserved_upper_bound": 3.295907538100428e-96,
+     "empirical_frac_runs_missing_a_genotype_cell": 0.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 0.0,
+     "reps": 200
+    },
+    {
+     "N": 5000000,
+     "P_some_genotype_cell_unobserved_upper_bound": 0.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 0.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 0.0,
+     "reps": 200
+    }
+   ]
+  },
+  {
+   "pA": "3/10",
+   "pB": "3/10",
+   "r2": "9801/10000",
+   "r2_float": 0.9801,
+   "min_positive_genotype_prob": "441/100000000",
+   "min_positive_genotype_prob_float": 4.41e-06,
+   "N_for_95pct_chance_to_observe_rarest": 679303,
+   "N_for_50pct_chance_to_observe_rarest": 157176,
+   "per_N": [
+    {
+     "N": 1000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 1.0,
+     "reps": 200
+    },
+    {
+     "N": 10000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 1.0,
+     "reps": 200
+    },
+    {
+     "N": 100000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 0.865,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 0.865,
+     "reps": 200
+    },
+    {
+     "N": 500000,
+     "P_some_genotype_cell_unobserved_upper_bound": 0.22049997853179545,
+     "empirical_frac_runs_missing_a_genotype_cell": 0.225,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 0.225,
+     "reps": 200
+    },
+    {
+     "N": 5000000,
+     "P_some_genotype_cell_unobserved_upper_bound": 5.306590243711708e-10,
+     "empirical_frac_runs_missing_a_genotype_cell": 0.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 0.0,
+     "reps": 200
+    }
+   ]
+  },
+  {
+   "pA": "3/10",
+   "pB": "3/10",
+   "r2": "998001/1000000",
+   "r2_float": 0.998001,
+   "min_positive_genotype_prob": "441/10000000000",
+   "min_positive_genotype_prob_float": 4.41e-08,
+   "N_for_95pct_chance_to_observe_rarest": 67930436,
+   "N_for_50pct_chance_to_observe_rarest": 15717623,
+   "per_N": [
+    {
+     "N": 1000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 1.0,
+     "reps": 200
+    },
+    {
+     "N": 10000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 1.0,
+     "reps": 200
+    },
+    {
+     "N": 100000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 1.0,
+     "reps": 200
+    },
+    {
+     "N": 500000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 1.0,
+     "reps": 200
+    },
+    {
+     "N": 5000000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 0.975,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 0.975,
+     "reps": 200
+    }
+   ]
+  },
+  {
+   "pA": "3/10",
+   "pB": "3/10",
+   "r2": "99980001/100000000",
+   "r2_float": 0.99980001,
+   "min_positive_genotype_prob": "441/1000000000000",
+   "min_positive_genotype_prob_float": 4.41e-10,
+   "N_for_95pct_chance_to_observe_rarest": 6793043483,
+   "N_for_50pct_chance_to_observe_rarest": 1571762263,
+   "per_N": [
+    {
+     "N": 1000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 1.0,
+     "reps": 200
+    },
+    {
+     "N": 10000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 1.0,
+     "reps": 200
+    },
+    {
+     "N": 100000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 1.0,
+     "reps": 200
+    },
+    {
+     "N": 500000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 1.0,
+     "reps": 200
+    },
+    {
+     "N": 5000000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 1.0,
+     "reps": 200
+    }
+   ]
+  },
+  {
+   "pA": "3/10",
+   "pB": "3/10",
+   "r2": "9999800001/10000000000",
+   "r2_float": 0.9999800001,
+   "min_positive_genotype_prob": "441/100000000000000",
+   "min_positive_genotype_prob_float": 4.41e-12,
+   "N_for_95pct_chance_to_observe_rarest": 679300073051,
+   "N_for_50pct_chance_to_observe_rarest": 157175237102,
+   "per_N": [
+    {
+     "N": 1000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 1.0,
+     "reps": 200
+    },
+    {
+     "N": 10000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 1.0,
+     "reps": 200
+    },
+    {
+     "N": 100000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 1.0,
+     "reps": 200
+    },
+    {
+     "N": 500000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 1.0,
+     "reps": 200
+    },
+    {
+     "N": 5000000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 1.0,
+     "reps": 200
+    }
+   ]
+  },
+  {
+   "pA": "3/10",
+   "pB": "3/10",
+   "r2": "999998000001/1000000000000",
+   "r2_float": 0.999998000001,
+   "min_positive_genotype_prob": "441/10000000000000000",
+   "min_positive_genotype_prob_float": 4.41e-14,
+   "N_for_95pct_chance_to_observe_rarest": 67967651137931,
+   "N_for_50pct_chance_to_observe_rarest": 15726233672961,
+   "per_N": [
+    {
+     "N": 1000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 1.0,
+     "reps": 200
+    },
+    {
+     "N": 10000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 1.0,
+     "reps": 200
+    },
+    {
+     "N": 100000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 1.0,
+     "reps": 200
+    },
+    {
+     "N": 500000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 1.0,
+     "reps": 200
+    },
+    {
+     "N": 5000000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 1.0,
+     "reps": 200
+    }
+   ]
+  }
+ ],
+ "finite_sample_p_half_degenerate": [
+  {
+   "pA": "1/2",
+   "pB": "1/2",
+   "r2": "0",
+   "r2_float": 0.0,
+   "min_positive_genotype_prob": "1/16",
+   "min_positive_genotype_prob_float": 0.0625,
+   "N_for_95pct_chance_to_observe_rarest": 47,
+   "N_for_50pct_chance_to_observe_rarest": 11,
+   "per_N": [
+    {
+     "N": 1000,
+     "P_some_genotype_cell_unobserved_upper_bound": 3.7440047502653604e-28,
+     "empirical_frac_runs_missing_a_genotype_cell": 0.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 0.0,
+     "reps": 200
+    },
+    {
+     "N": 10000,
+     "P_some_genotype_cell_unobserved_upper_bound": 2.064543266999399e-280,
+     "empirical_frac_runs_missing_a_genotype_cell": 0.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 0.0,
+     "reps": 200
+    },
+    {
+     "N": 100000,
+     "P_some_genotype_cell_unobserved_upper_bound": 0.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 0.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 0.0,
+     "reps": 200
+    },
+    {
+     "N": 500000,
+     "P_some_genotype_cell_unobserved_upper_bound": 0.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 0.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 0.0,
+     "reps": 200
+    },
+    {
+     "N": 5000000,
+     "P_some_genotype_cell_unobserved_upper_bound": 0.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 0.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 0.0,
+     "reps": 200
+    }
+   ]
+  },
+  {
+   "pA": "1/2",
+   "pB": "1/2",
+   "r2": "81/100",
+   "r2_float": 0.81,
+   "min_positive_genotype_prob": "1/1600",
+   "min_positive_genotype_prob_float": 0.000625,
+   "N_for_95pct_chance_to_observe_rarest": 4792,
+   "N_for_50pct_chance_to_observe_rarest": 1109,
+   "per_N": [
+    {
+     "N": 1000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 0.795,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 0.0,
+     "reps": 200
+    },
+    {
+     "N": 10000,
+     "P_some_genotype_cell_unobserved_upper_bound": 0.0038533716579385725,
+     "empirical_frac_runs_missing_a_genotype_cell": 0.01,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 0.0,
+     "reps": 200
+    },
+    {
+     "N": 100000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.4097400131660746e-27,
+     "empirical_frac_runs_missing_a_genotype_cell": 0.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 0.0,
+     "reps": 200
+    },
+    {
+     "N": 500000,
+     "P_some_genotype_cell_unobserved_upper_bound": 3.4799672004002685e-136,
+     "empirical_frac_runs_missing_a_genotype_cell": 0.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 0.0,
+     "reps": 200
+    },
+    {
+     "N": 5000000,
+     "P_some_genotype_cell_unobserved_upper_bound": 0.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 0.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 0.0,
+     "reps": 200
+    }
+   ]
+  },
+  {
+   "pA": "1/2",
+   "pB": "1/2",
+   "r2": "9801/10000",
+   "r2_float": 0.9801,
+   "min_positive_genotype_prob": "1/160000",
+   "min_positive_genotype_prob_float": 6.25e-06,
+   "N_for_95pct_chance_to_observe_rarest": 479316,
+   "N_for_50pct_chance_to_observe_rarest": 110904,
+   "per_N": [
+    {
+     "N": 1000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 0.0,
+     "reps": 200
+    },
+    {
+     "N": 10000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 0.995,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 0.0,
+     "reps": 200
+    },
+    {
+     "N": 100000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 0.75,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 0.0,
+     "reps": 200
+    },
+    {
+     "N": 500000,
+     "P_some_genotype_cell_unobserved_upper_bound": 0.08787300910483455,
+     "empirical_frac_runs_missing_a_genotype_cell": 0.05,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 0.0,
+     "reps": 200
+    },
+    {
+     "N": 5000000,
+     "P_some_genotype_cell_unobserved_upper_bound": 5.3614841257717725e-14,
+     "empirical_frac_runs_missing_a_genotype_cell": 0.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 0.0,
+     "reps": 200
+    }
+   ]
+  },
+  {
+   "pA": "1/2",
+   "pB": "1/2",
+   "r2": "998001/1000000",
+   "r2_float": 0.998001,
+   "min_positive_genotype_prob": "1/16000000",
+   "min_positive_genotype_prob_float": 6.25e-08,
+   "N_for_95pct_chance_to_observe_rarest": 47931715,
+   "N_for_50pct_chance_to_observe_rarest": 11090355,
+   "per_N": [
+    {
+     "N": 1000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 0.0,
+     "reps": 200
+    },
+    {
+     "N": 10000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 0.0,
+     "reps": 200
+    },
+    {
+     "N": 100000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 0.0,
+     "reps": 200
+    },
+    {
+     "N": 500000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 0.0,
+     "reps": 200
+    },
+    {
+     "N": 5000000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 0.915,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 0.0,
+     "reps": 200
+    }
+   ]
+  },
+  {
+   "pA": "1/2",
+   "pB": "1/2",
+   "r2": "99980001/100000000",
+   "r2_float": 0.99980001,
+   "min_positive_genotype_prob": "1/1600000000",
+   "min_positive_genotype_prob_float": 6.25e-10,
+   "N_for_95pct_chance_to_observe_rarest": 4793171240,
+   "N_for_50pct_chance_to_observe_rarest": 1109035397,
+   "per_N": [
+    {
+     "N": 1000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 0.0,
+     "reps": 200
+    },
+    {
+     "N": 10000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 0.0,
+     "reps": 200
+    },
+    {
+     "N": 100000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 0.0,
+     "reps": 200
+    },
+    {
+     "N": 500000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 0.0,
+     "reps": 200
+    },
+    {
+     "N": 5000000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 0.0,
+     "reps": 200
+    }
+   ]
+  },
+  {
+   "pA": "1/2",
+   "pB": "1/2",
+   "r2": "9999800001/10000000000",
+   "r2_float": 0.9999800001,
+   "min_positive_genotype_prob": "1/160000000000",
+   "min_positive_genotype_prob_float": 6.25e-12,
+   "N_for_95pct_chance_to_observe_rarest": 479317124109,
+   "N_for_50pct_chance_to_observe_rarest": 110903539714,
+   "per_N": [
+    {
+     "N": 1000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 0.0,
+     "reps": 200
+    },
+    {
+     "N": 10000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 0.0,
+     "reps": 200
+    },
+    {
+     "N": 100000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 0.0,
+     "reps": 200
+    },
+    {
+     "N": 500000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 0.0,
+     "reps": 200
+    },
+    {
+     "N": 5000000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 0.0,
+     "reps": 200
+    }
+   ]
+  },
+  {
+   "pA": "1/2",
+   "pB": "1/2",
+   "r2": "999998000001/1000000000000",
+   "r2_float": 0.999998000001,
+   "min_positive_genotype_prob": "1/16000000000000",
+   "min_positive_genotype_prob_float": 6.25e-14,
+   "N_for_95pct_chance_to_observe_rarest": 47927455598150,
+   "N_for_50pct_chance_to_observe_rarest": 11089369037594,
+   "per_N": [
+    {
+     "N": 1000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 0.0,
+     "reps": 200
+    },
+    {
+     "N": 10000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 0.0,
+     "reps": 200
+    },
+    {
+     "N": 100000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 0.0,
+     "reps": 200
+    },
+    {
+     "N": 500000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 0.0,
+     "reps": 200
+    },
+    {
+     "N": 5000000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 0.0,
+     "reps": 200
+    }
+   ]
+  }
+ ],
+ "finite_sample_rare_allele": [
+  {
+   "pA": "1/20",
+   "pB": "1/20",
+   "r2": "0",
+   "r2_float": 0.0,
+   "min_positive_genotype_prob": "1/160000",
+   "min_positive_genotype_prob_float": 6.25e-06,
+   "N_for_95pct_chance_to_observe_rarest": 479316,
+   "N_for_50pct_chance_to_observe_rarest": 110904,
+   "per_N": [
+    {
+     "N": 1000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 1.0,
+     "reps": 200
+    },
+    {
+     "N": 10000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 0.955,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 0.955,
+     "reps": 200
+    },
+    {
+     "N": 100000,
+     "P_some_genotype_cell_unobserved_upper_bound": 0.5352603831806316,
+     "empirical_frac_runs_missing_a_genotype_cell": 0.525,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 0.525,
+     "reps": 200
+    },
+    {
+     "N": 500000,
+     "P_some_genotype_cell_unobserved_upper_bound": 0.04393650455241727,
+     "empirical_frac_runs_missing_a_genotype_cell": 0.05,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 0.05,
+     "reps": 200
+    },
+    {
+     "N": 5000000,
+     "P_some_genotype_cell_unobserved_upper_bound": 2.6807420628858863e-14,
+     "empirical_frac_runs_missing_a_genotype_cell": 0.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 0.0,
+     "reps": 200
+    }
+   ]
+  },
+  {
+   "pA": "1/20",
+   "pB": "1/20",
+   "r2": "81/100",
+   "r2_float": 0.81,
+   "min_positive_genotype_prob": "361/16000000",
+   "min_positive_genotype_prob_float": 2.25625e-05,
+   "N_for_95pct_chance_to_observe_rarest": 132774,
+   "N_for_50pct_chance_to_observe_rarest": 30721,
+   "per_N": [
+    {
+     "N": 1000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 1.0,
+     "reps": 200
+    },
+    {
+     "N": 10000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 0.965,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 0.965,
+     "reps": 200
+    },
+    {
+     "N": 100000,
+     "P_some_genotype_cell_unobserved_upper_bound": 0.209479735307242,
+     "empirical_frac_runs_missing_a_genotype_cell": 0.195,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 0.195,
+     "reps": 200
+    },
+    {
+     "N": 500000,
+     "P_some_genotype_cell_unobserved_upper_bound": 2.5211001583288903e-05,
+     "empirical_frac_runs_missing_a_genotype_cell": 0.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 0.0,
+     "reps": 200
+    },
+    {
+     "N": 5000000,
+     "P_some_genotype_cell_unobserved_upper_bound": 2.0259607898535387e-49,
+     "empirical_frac_runs_missing_a_genotype_cell": 0.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 0.0,
+     "reps": 200
+    }
+   ]
+  },
+  {
+   "pA": "1/20",
+   "pB": "1/20",
+   "r2": "9801/10000",
+   "r2_float": 0.9801,
+   "min_positive_genotype_prob": "361/1600000000",
+   "min_positive_genotype_prob_float": 2.25625e-07,
+   "N_for_95pct_chance_to_observe_rarest": 13277483,
+   "N_for_50pct_chance_to_observe_rarest": 3072121,
+   "per_N": [
+    {
+     "N": 1000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 1.0,
+     "reps": 200
+    },
+    {
+     "N": 10000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 1.0,
+     "reps": 200
+    },
+    {
+     "N": 100000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 1.0,
+     "reps": 200
+    },
+    {
+     "N": 500000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 1.0,
+     "reps": 200
+    },
+    {
+     "N": 5000000,
+     "P_some_genotype_cell_unobserved_upper_bound": 0.647278941499435,
+     "empirical_frac_runs_missing_a_genotype_cell": 0.585,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 0.585,
+     "reps": 200
+    }
+   ]
+  },
+  {
+   "pA": "1/20",
+   "pB": "1/20",
+   "r2": "998001/1000000",
+   "r2_float": 0.998001,
+   "min_positive_genotype_prob": "361/160000000000",
+   "min_positive_genotype_prob_float": 2.25625e-09,
+   "N_for_95pct_chance_to_observe_rarest": 1327748396,
+   "N_for_50pct_chance_to_observe_rarest": 307212052,
+   "per_N": [
+    {
+     "N": 1000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 1.0,
+     "reps": 200
+    },
+    {
+     "N": 10000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 1.0,
+     "reps": 200
+    },
+    {
+     "N": 100000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 1.0,
+     "reps": 200
+    },
+    {
+     "N": 500000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 1.0,
+     "reps": 200
+    },
+    {
+     "N": 5000000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 1.0,
+     "reps": 200
+    }
+   ]
+  },
+  {
+   "pA": "1/20",
+   "pB": "1/20",
+   "r2": "99980001/100000000",
+   "r2_float": 0.99980001,
+   "min_positive_genotype_prob": "361/16000000000000",
+   "min_positive_genotype_prob_float": 2.25625e-11,
+   "N_for_95pct_chance_to_observe_rarest": 132774793955,
+   "N_for_50pct_chance_to_observe_rarest": 30721194578,
+   "per_N": [
+    {
+     "N": 1000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 1.0,
+     "reps": 200
+    },
+    {
+     "N": 10000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 1.0,
+     "reps": 200
+    },
+    {
+     "N": 100000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 1.0,
+     "reps": 200
+    },
+    {
+     "N": 500000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 1.0,
+     "reps": 200
+    },
+    {
+     "N": 5000000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 1.0,
+     "reps": 200
+    }
+   ]
+  },
+  {
+   "pA": "1/20",
+   "pB": "1/20",
+   "r2": "9999800001/10000000000",
+   "r2_float": 0.9999800001,
+   "min_positive_genotype_prob": "361/1600000000000000",
+   "min_positive_genotype_prob_float": 2.25625e-13,
+   "N_for_95pct_chance_to_observe_rarest": 13279112943778,
+   "N_for_50pct_chance_to_observe_rarest": 3072497425278,
+   "per_N": [
+    {
+     "N": 1000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 1.0,
+     "reps": 200
+    },
+    {
+     "N": 10000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 1.0,
+     "reps": 200
+    },
+    {
+     "N": 100000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 1.0,
+     "reps": 200
+    },
+    {
+     "N": 500000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 1.0,
+     "reps": 200
+    },
+    {
+     "N": 5000000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 1.0,
+     "reps": 200
+    }
+   ]
+  },
+  {
+   "pA": "1/20",
+   "pB": "1/20",
+   "r2": "999998000001/1000000000000",
+   "r2_float": 0.999998000001,
+   "min_positive_genotype_prob": "361/160000000000000000",
+   "min_positive_genotype_prob_float": 2.25625e-15,
+   "N_for_95pct_chance_to_observe_rarest": 1349157875087951,
+   "N_for_50pct_chance_to_observe_rarest": 312165738408268,
+   "per_N": [
+    {
+     "N": 1000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 1.0,
+     "reps": 200
+    },
+    {
+     "N": 10000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 1.0,
+     "reps": 200
+    },
+    {
+     "N": 100000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 1.0,
+     "reps": 200
+    },
+    {
+     "N": 500000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 1.0,
+     "reps": 200
+    },
+    {
+     "N": 5000000,
+     "P_some_genotype_cell_unobserved_upper_bound": 1.0,
+     "empirical_frac_runs_missing_a_genotype_cell": 1.0,
+     "empirical_frac_runs_losing_a_MODULUS_cell": 1.0,
+     "reps": 200
+    }
+   ]
+  }
+ ],
+ "modulus_values_detail": [
+  {
+   "p": "1/2",
+   "moduli": [
+    "1",
+    "1",
+    "1"
+   ]
+  },
+  {
+   "p": "3/10",
+   "moduli": [
+    "1/7",
+    "13/21",
+    "11/3"
+   ]
+  },
+  {
+   "p": "1/10",
+   "moduli": [
+    "7/9",
+    "23/9",
+    "17"
+   ]
+  },
+  {
+   "p": "1/20",
+   "moduli": [
+    "17/19",
+    "143/19",
+    "37"
+   ]
+  }
+ ],
+ "coverage_at_r2_one_by_freq": [
+  {
+   "p": "1/20",
+   "r2": "1",
+   "charged": 3,
+   "product": 9
+  },
+  {
+   "p": "1/10",
+   "r2": "1",
+   "charged": 3,
+   "product": 9
+  },
+  {
+   "p": "3/20",
+   "r2": "1",
+   "charged": 3,
+   "product": 9
+  },
+  {
+   "p": "1/5",
+   "r2": "1",
+   "charged": 3,
+   "product": 9
+  },
+  {
+   "p": "1/4",
+   "r2": "1",
+   "charged": 2,
+   "product": 4
+  },
+  {
+   "p": "3/10",
+   "r2": "1",
+   "charged": 3,
+   "product": 9
+  },
+  {
+   "p": "7/20",
+   "r2": "1",
+   "charged": 3,
+   "product": 9
+  },
+  {
+   "p": "2/5",
+   "r2": "1",
+   "charged": 3,
+   "product": 9
+  },
+  {
+   "p": "9/20",
+   "r2": "1",
+   "charged": 3,
+   "product": 9
+  },
+  {
+   "p": "1/2",
+   "r2": "1",
+   "charged": 1,
+   "product": 1
+  },
+  {
+   "p": "11/20",
+   "r2": "1",
+   "charged": 3,
+   "product": 9
+  },
+  {
+   "p": "3/5",
+   "r2": "1",
+   "charged": 3,
+   "product": 9
+  },
+  {
+   "p": "13/20",
+   "r2": "1",
+   "charged": 3,
+   "product": 9
+  },
+  {
+   "p": "7/10",
+   "r2": "1",
+   "charged": 3,
+   "product": 9
+  },
+  {
+   "p": "3/4",
+   "r2": "1",
+   "charged": 2,
+   "product": 4
+  },
+  {
+   "p": "4/5",
+   "r2": "1",
+   "charged": 3,
+   "product": 9
+  },
+  {
+   "p": "17/20",
+   "r2": "1",
+   "charged": 3,
+   "product": 9
+  },
+  {
+   "p": "9/10",
+   "r2": "1",
+   "charged": 3,
+   "product": 9
+  },
+  {
+   "p": "19/20",
+   "r2": "1",
+   "charged": 3,
+   "product": 9
+  }
+ ]
+}

@@ -312,16 +312,41 @@ The witness is the **modulus-copy coupling**: two loci in perfect LD, the second
 the first. Its joint mass sits on the diagonal, so the floor `η` is zero, and a product cell
 that both marginals reach is charged by no joint atom at all.
 
-**The genetic reading, and it is sharper than "LD hurts identifiability".** Coverage is a
-support property, so it is invariant under couplings of *arbitrary* strength provided every
-joint genotype cell retains positive mass. It can fail only when the haplotype law reaches
-the boundary of its simplex and a cell has zero mass. That boundary is **not** the scalar
-condition `r² = 1`: with unequal allele frequencies, a haplotype can disappear at moderate
-`r²`. The copy coupling below is the clean `r² = 1` witness, not a classification of every
-zero-floor law. Consequently LD pruning and support protection are different design axes;
-an `r²` cutoff alone does not certify the conditional floor needed by coverage invariance.
+**The genetic reading, with two corrections the simulation forced.** Coverage is a support
+property, so it is invariant under couplings of *arbitrary* strength — any amount of linkage
+disequilibrium, any correlation length, any haplotype structure — provided every joint
+genotype cell retains positive mass. That half is confirmed: a two-locus sweep in exact
+rational arithmetic finds charged cells equal to product cells at **every** `r² < 1`, down to
+a smallest genotype-cell mass of `6.25e-20` at `r² = 1 - 2e-9`.
 
-Empirical status: DERIVED. The witness is exact and finite. -/
+The first draft of this note then said "`η = 0` is exactly `r² = 1`, so pruning at `r² = 1`
+removes the whole obstruction". **The first clause is false and the second is right for a
+weaker reason.** Complete linkage costs coverage only when two further conditions hold:
+
+* the two loci must have **equal** allele frequencies. At `pA ≠ pB` complete linkage does not
+  reach `r² = 1` at all — at `pA = 1/2, pB = 3/10` the maximum is `r² = 3/7` — and coverage is
+  unchanged there, 3 cells charged against 3 in the product.
+* the modulus map must **separate the genotypes**. At `p = 1/2` it does not: all three
+  genotypes share one modulus value, so there is one cell and nothing to lose. Measured at
+  complete linkage, `p = 1/2` gives 1 charged against 1 in the product, while `p = 3/10` and
+  `p = 1/10` give **3 charged against 9**.
+
+So `r² = 1` is *sufficient* for coverage loss and not necessary for coverage to survive, and
+the implication "`r² = 1` ⟹ coverage lost" is false. Pruning at `r² = 1` still removes the
+whole obstruction, since every loss sits inside that set, but that conclusion no longer rests
+on the equivalence originally claimed for it.
+
+**The caveat that matters more than the theorem.** This is a statement about *positive* mass,
+and positive is not observable. At `pA = pB = 3/10` with `N = 500,000` samples the rarest
+genotype cell is missed with probability `0.22` already at `r² = 0.98`, and with probability
+`1.00` at `r² ≥ 0.998`, where observing it would need `N ≈ 6.8e7`. **Empirically coverage is
+lost far below `r² = 1`**, at a threshold set by sample size rather than by the population
+parameter. The population theorem does not describe what a real study meets, and nothing here
+licenses an `r² = 1` pruning rule in practice.
+
+Empirical status: **VALIDATED** on the population half, with **two claims corrected and one
+practical caveat added**. Exact rational sweep and finite-sample arm in
+`proofs/validation/ld_coverage_boundary/`. -/
 
 /-- The witness family: two atoms, values `1` and `0`, hence moduli `0` and `1`. -/
 noncomputable def copyWitnessFamily : BundleFamily 2 where
