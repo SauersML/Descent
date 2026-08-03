@@ -112,12 +112,15 @@ theorem finitePrior_probability_mem {n : ℕ} (P : FinitePrior n) :
   · exact fun i ↦ P.probability_nonneg i
   · simp only [FinitePrior.probability]
     rw [← ENNReal.toReal_sum (fun i _ ↦ P.apply_ne_top i)]
-    -- `PMF.tsum_coe` is itself a simp lemma, so a bare `simpa` rewrites the
-    -- supplied term to `True` rather than reshaping it, and the goal is a
-    -- `Finset.sum` it never touches. `simp only` with the one bridging lemma
-    -- turns the `tsum` into the sum and nothing else.
+    -- `PMF.tsum_coe` is itself a simp lemma, so `simpa only [tsum_fintype]
+    -- using P.tsum_coe` simplifies the SUPPLIED TERM to `True` instead of
+    -- reshaping it, and reports a mismatch against a goal it never touched.
+    -- Rewriting the goal is what was wanted: turn its `Finset.sum` into a
+    -- `tsum` and discharge that with the lemma directly, so simp never sees
+    -- the term at all.
     have hsum : (∑ i : Fin (n + 1), P i) = 1 := by
-      simpa only [tsum_fintype] using P.tsum_coe
+      rw [← tsum_fintype]
+      exact P.tsum_coe
     rw [hsum]
     norm_num
 
