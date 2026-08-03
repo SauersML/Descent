@@ -304,7 +304,7 @@ theorem gene_shared_variants_specific
     No analysis, no discovery, and no conditioning appears in the statement —
     only counts. Whether a population-specific signal count is evidence of
     allelic heterogeneity is a modelling claim this theorem does not reach. -/
-theorem signal_union_ge_each_population_count
+theorem le_add_sub_of_le_of_le
     (n_signals_eur n_signals_afr n_shared : ℕ)
     (h_eur : 0 < n_signals_eur) (h_afr : 0 < n_signals_afr)
     (h_some_shared : 0 < n_shared)
