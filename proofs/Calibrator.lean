@@ -93,6 +93,56 @@ import Calibrator.BundleRigidity.TwoAtom
 
 namespace Calibrator
 
+/-
+THE WARNING WAS ALREADY WRITTEN DOWN. READ THE PROSE NEXT TO WHAT YOU ARE ABOUT
+TO CHANGE, BEFORE YOU CHANGE IT.
+
+On 2026-08-02 three separate defects were introduced, and in ALL THREE the
+corpus already contained a correct, specific warning ADJACENT to the mistake.
+None of them was a documentation gap. Each was a failure to read documentation
+that was already there, at the moment of acting.
+
+  * `validation/extract/coverage_v2.context()` says in its own docstring:
+    "168 definitions reported 'could not compile body' here purely because this
+    file called translate_def bare." A later audit called the translator bare
+    one file over, reported 283 definitions blocked and 31 of them blocked on
+    `Pop`, and proposed building `Pop` support. Through the shared context the
+    real numbers were 213 blocked and ZERO on `Pop` -- `emit.build_context`
+    registers `Pop` already. The whole lever was an artefact of the
+    under-provisioned call the docstring warns about.
+
+  * A `DGP.lean` docstring three lines above a deletion site NAMED the consumer
+    of the declaration being deleted, while a grep for the bare identifier
+    found nothing.
+
+  * An ordering comment above a `field_simp` block in `PortabilityDrift`
+    explained why two passes had to stay separate. A commit titled "Finish ...
+    in one field pass" merged them and regressed a green proof.
+
+WHY IT KEEPS HAPPENING, which is the part worth internalising: A WELL-FORMED
+ARGUMENT FOR A FALSE PREMISE IS HARDER TO STOP THAN A WEAK ONE. The reasoning
+survives inspection and the premise never gets inspected. "One mechanical
+feature beats three" is a good argument; it moved two readers past a
+thirty-second check of whether the feature was already implemented. When an
+argument feels clean, that is the moment to re-derive its premise, not to act
+on it.
+
+AND WHEN A CHECK LOOKS LIKE IT PASSES, ASK WHICH AXIS IT MEASURES. Three
+distinct ways a check can be dead were found in one day:
+  (1) it CANNOT FIRE -- `prove_contained` documented a 'refuted' verdict its
+      body never returns, so a caller branching on it got 0 of 137 and read it
+      as a finding;
+  (2) it FIRES ON THE WRONG AXIS -- a control asserting one definition
+      translates passed under BOTH a bare and a provisioned translator, so it
+      certified "the translator works" while the question was "is it
+      provisioned as production provisions it";
+  (3) its CONDITION IS INERT -- `ceiling.py` chose between call-graph
+      candidates with `X if len(...) == 1 else X`, both branches identical, so
+      ambiguity was silently resolved to whichever came first.
+The third is the hardest to see by reading, because the shape of the intent
+survives while the intent itself is gone.
+-/
+
 local instance : Fact (2 ≤ 2) := ⟨by decide⟩
 
 /-
