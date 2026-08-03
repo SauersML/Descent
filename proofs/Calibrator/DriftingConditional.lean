@@ -141,8 +141,10 @@ theorem isInvariantWeight_zero {n : ℕ} (L : Fin n → Fin n → ℝ) :
     vacuity without assuming that an arbitrary biological generator has a stationary law. -/
 theorem exists_invariantProbabilityWeight (n : ℕ) :
     ∃ ϖ : Fin (n + 1) → ℝ, ∃ L : Fin (n + 1) → Fin (n + 1) → ℝ,
-      (∑ i, ϖ i = 1) ∧ IsInvariantWeight ϖ L := by
-  refine ⟨fun i ↦ if i = 0 then 1 else 0, fun _ _ ↦ 0, ?_, ?_⟩
+      (∀ i, 0 ≤ ϖ i) ∧ (∑ i, ϖ i = 1) ∧ IsInvariantWeight ϖ L := by
+  refine ⟨fun i ↦ if i = 0 then 1 else 0, fun _ _ ↦ 0, ?_, ?_, ?_⟩
+  · intro i
+    positivity
   · simp
   · intro j
     simp
