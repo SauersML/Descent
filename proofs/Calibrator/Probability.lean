@@ -1,3 +1,8 @@
+/-
+Copyright (c) 2026 Sauers. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Sauers
+-/
 import Init.Data.ULift
 import Init.GrindInstances.Nat
 import Init.GrindInstances.Ring.Fin
@@ -128,7 +133,7 @@ def poly_n (n : Nat) (x : Real) : Real := x ^ n
 /-- For any natural number n, x^n is integrable with respect to the standard Gaussian measure.
     This follows from the finiteness of Gaussian moments. -/
 theorem integrable_poly_n (n : Nat) : MeasureTheory.Integrable (poly_n n) stdGaussianMeasure := by
-  have h_gauss_integral : ∀ n : ℕ, MeasureTheory.IntegrableOn (fun x : ℝ => x^n * Real.exp (-x^2 / 2)) (Set.univ : Set ℝ) := by
+  have h_gauss_integral : ∀ n : ℕ, MeasureTheory.IntegrableOn (fun x : ℝ ↦ x^n * Real.exp (-x^2 / 2)) (Set.univ : Set ℝ) := by
     intro n
     have := @integrable_rpow_mul_exp_neg_mul_sq
     simpa [ div_eq_inv_mul ] using @this ( 1 / 2 ) ( by norm_num ) n ( by linarith )
@@ -136,30 +141,30 @@ theorem integrable_poly_n (n : Nat) : MeasureTheory.Integrable (poly_n n) stdGau
   unfold stdGaussianMeasure
   simp_all +decide [ProbabilityTheory.gaussianReal]
   refine' MeasureTheory.Integrable.mono' _ _ _
-  refine' fun x => |x ^ n|
+  refine' fun x ↦ |x ^ n|
   · refine' MeasureTheory.Integrable.abs _
     rw [ MeasureTheory.integrable_withDensity_iff ]
-    · convert h_gauss_integral n |> fun h => h.div_const ( Real.sqrt ( 2 * Real.pi ) ) using 2 ; norm_num [ ProbabilityTheory.gaussianPDF ] ; ring
+    · convert h_gauss_integral n |> fun h ↦ h.div_const ( Real.sqrt ( 2 * Real.pi ) ) using 2 ; norm_num [ ProbabilityTheory.gaussianPDF ] ; ring
       norm_num [ ProbabilityTheory.gaussianPDFReal ] ; ring
       rw [ ENNReal.toReal_ofReal ( Real.exp_nonneg _ ) ]
     · fun_prop
     · simp [ProbabilityTheory.gaussianPDF]
   · exact Continuous.aestronglyMeasurable ( by continuity )
-  · exact Filter.Eventually.of_forall fun x => Real.norm_eq_abs _ ▸ le_rfl
+  · exact Filter.Eventually.of_forall fun x ↦ Real.norm_eq_abs _ ▸ le_rfl
 
 /-- x^2 is integrable with respect to the standard Gaussian measure. -/
-theorem integrable_sq_gaussian : MeasureTheory.Integrable (fun x => x ^ 2) stdGaussianMeasure := by
+theorem integrable_sq_gaussian : MeasureTheory.Integrable (fun x ↦ x ^ 2) stdGaussianMeasure := by
   apply integrable_poly_n 2
 
 /-- x is integrable with respect to the standard Gaussian measure. -/
-theorem integrable_id_gaussian : MeasureTheory.Integrable (fun x => x) stdGaussianMeasure := by
+theorem integrable_id_gaussian : MeasureTheory.Integrable (fun x ↦ x) stdGaussianMeasure := by
   have h := integrable_poly_n 1
   unfold poly_n at h
   simp only [pow_one] at h
   exact h
 
 /-- x^4 is integrable with respect to the standard Gaussian measure (useful for variance calculations). -/
-theorem integrable_pow4_gaussian : MeasureTheory.Integrable (fun x => x ^ 4) stdGaussianMeasure := by
+theorem integrable_pow4_gaussian : MeasureTheory.Integrable (fun x ↦ x ^ 4) stdGaussianMeasure := by
   apply integrable_poly_n 4
 
 /-- If f is integrable on μ and g is integrable on ν, then f(x) * g(y) is integrable on μ.prod ν.
@@ -167,7 +172,7 @@ theorem integrable_pow4_gaussian : MeasureTheory.Integrable (fun x => x ^ 4) std
 theorem integrable_prod_mul {X Y : Type*} [MeasurableSpace X] [MeasurableSpace Y]
     {μ : Measure X} {ν : Measure Y} [SigmaFinite μ] [SigmaFinite ν]
     (f : X → ℝ) (g : Y → ℝ) (hf : Integrable f μ) (hg : Integrable g ν) :
-    Integrable (fun p : X × Y => f p.1 * g p.2) (μ.prod ν) :=
+    Integrable (fun p : X × Y ↦ f p.1 * g p.2) (μ.prod ν) :=
   hf.mul_prod hg
 
 /-!
@@ -264,6 +269,26 @@ structure HardyWeinbergModel where
   altFreq : ℝ
   altFreq_nonneg : 0 ≤ altFreq
   altFreq_le_one : altFreq ≤ 1
+
+/-- **The model class is inhabited**, at the polymorphic frequency `q = 1/2`.
+
+WHY THIS DECLARATION EXISTS, AND WHY IT IS NOT DECORATION.  126 theorems in this
+corpus are quantified over `HardyWeinbergModel`.  A universally quantified statement
+over a type with no inhabitant is TRUE AND EMPTY: every one of those theorems would
+hold, be checked by the kernel, report clean axioms, and say nothing about any locus.
+Nothing else in the corpus discharges that, because a structure is not automatically
+nonempty and Lean never asks.  This is the witness, so those theorems are about
+something.  See `scripts/check-laundering.py` family F4 and `LAUNDER_CERT` in
+`proofs/validation/invariants/LaunderingScan.lean`, which fail on a certificate
+structure the corpus consumes and never constructs.
+
+`1/2` rather than `0` or `1` deliberately: the boundary values satisfy the fields but
+degenerate the genotype variance to zero, and a nonemptiness witness that only inhabits
+the degenerate boundary leaves the interesting sub-class unwitnessed. -/
+def HardyWeinbergModel.witness : HardyWeinbergModel where
+  altFreq := 1 / 2
+  altFreq_nonneg := by norm_num
+  altFreq_le_one := by norm_num
 
 /-- Reference-allele frequency `p = 1 - q`. -/
 def HardyWeinbergModel.refFreq (h : HardyWeinbergModel) : ℝ :=
@@ -486,7 +511,7 @@ distinction the names were there to make. Callers use `approximationInterval` an
 own statement which functional they mean. -/
 
 noncomputable def stdNormalProdMeasure (k : ℕ) [Fintype (Fin k)] : Measure (ℝ × (Fin k → ℝ)) :=
-  (ProbabilityTheory.gaussianReal 0 1).prod (Measure.pi (fun (_ : Fin k) => ProbabilityTheory.gaussianReal 0 1))
+  (ProbabilityTheory.gaussianReal 0 1).prod (Measure.pi (fun (_ : Fin k) ↦ ProbabilityTheory.gaussianReal 0 1))
 
 instance stdNormalProdMeasure_is_prob {k : ℕ} [Fintype (Fin k)] : IsProbabilityMeasure (stdNormalProdMeasure k) := by
   unfold stdNormalProdMeasure
@@ -550,10 +575,11 @@ theorem strictMono_Phi : StrictMono Phi := by
     measureReal_def, measureReal_def]
   exact ENNReal.toReal_lt_toReal (measure_ne_top _ _) (measure_ne_top _ _) |>.mpr hlt
 
-/- No `Monotone Phi` corollary is stated here, deliberately: `Calibrator.monotone_Phi`
-already exists in `Condensation` and `Calibrator.Phi_monotone` in `DGP`, both proved
-independently. Either could now be `strictMono_Phi.monotone`; collapsing the two of them
-onto this lemma is a separate change in files this one does not own. -/
+/- No `Monotone Phi` corollary is stated here. `Calibrator.monotone_Phi` in `Condensation`
+and `Calibrator.Phi_monotone` in `DGP` are the two spellings the corpus already had, and
+both are now `strictMono_Phi.monotone` rather than independent appeals to
+`ProbabilityTheory.monotone_cdf`. Adding a third here would recreate the duplication the
+collapse removed; the derivation lives once, above. -/
 
 /-- Heteroscedastic Gaussian noise assumption:
 for each ancestry coordinate `x`, the environmental noise follows `N(0, σ²(x))`. -/
@@ -580,7 +606,7 @@ theorem noise_integrated_cdf {k : ℕ} (hN : GaussianNoiseAssumption k)
         (ProbabilityTheory.gaussianReal μ (hN.sigma2 x)) t) := by
   calc
     noiseMeasureGivenX hN x {e : ℝ | μ + e ≤ t}
-        = ((noiseMeasureGivenX hN x).map (fun e : ℝ => μ + e)) (Set.Iic t) := by
+        = ((noiseMeasureGivenX hN x).map (fun e : ℝ ↦ μ + e)) (Set.Iic t) := by
             rw [Measure.map_apply (by fun_prop) measurableSet_Iic]
             rfl
     _ = (ProbabilityTheory.gaussianReal μ (hN.sigma2 x)) (Set.Iic t) := by
@@ -741,7 +767,7 @@ structure ConditionalMeanDGP (k : ℕ) where
       conditional expectation as an L² projection. -/
   m_spec :
     ∀ (φ : ℝ × (Fin k → ℝ) → ℝ),
-      Integrable (fun x : ℝ × (Fin k → ℝ) × ℝ => (x.2.2 - m x.1 x.2.1) * φ (x.1, x.2.1)) μ →
+      Integrable (fun x : ℝ × (Fin k → ℝ) × ℝ ↦ (x.2.2 - m x.1 x.2.1) * φ (x.1, x.2.1)) μ →
       (∫ x, (x.2.2 - m x.1 x.2.1) * φ (x.1, x.2.1) ∂μ) = 0
 
 /-- Full predictive risk under a joint law on `(P,C,Y)`.
@@ -754,12 +780,12 @@ noncomputable def predictionRiskY {k : ℕ} [Fintype (Fin k)]
     The marginal on (P,C) is obtained by mapping out Y. -/
 noncomputable def ConditionalMeanDGP.toDGP {k : ℕ} (cmdgp : ConditionalMeanDGP k) : DataGeneratingProcess k where
   trueExpectation := cmdgp.m
-  jointMeasure := cmdgp.μ.map (fun x => (x.1, x.2.1))
+  jointMeasure := cmdgp.μ.map (fun x ↦ (x.1, x.2.1))
   is_prob := by
     letI : IsProbabilityMeasure cmdgp.μ := cmdgp.prob
     simpa using
       (Measure.isProbabilityMeasure_map (μ := cmdgp.μ)
-        (f := fun x : ℝ × (Fin k → ℝ) × ℝ => (x.1, x.2.1))
+        (f := fun x : ℝ × (Fin k → ℝ) × ℝ ↦ (x.1, x.2.1))
         (by fun_prop))
 
 /-!
@@ -772,7 +798,7 @@ noncomputable def ConditionalMeanDGP.toDGP {k : ℕ} (cmdgp : ConditionalMeanDGP
 /-- **Lemma**: Moments of the standard Gaussian distribution are integrable.
     Specifically, x^n is integrable w.r.t N(0,1). -/
 lemma gaussian_moments_integrable (n : ℕ) :
-    Integrable (fun x : ℝ => x ^ n) (ProbabilityTheory.gaussianReal 0 1) := by
+    Integrable (fun x : ℝ ↦ x ^ n) (ProbabilityTheory.gaussianReal 0 1) := by
   simpa [poly_n, stdGaussianMeasure] using (integrable_poly_n n)
 
 /-! ### Gaussian Moment Facts
@@ -806,27 +832,27 @@ theorem independent_product_mean_zero {k : ℕ} [Fintype (Fin k)] (l : Fin k) :
     ∫ pc, pc.1 * pc.2 l ∂(stdNormalProdMeasure k) = 0 := by
   let μP : Measure ℝ := ProbabilityTheory.gaussianReal 0 1
   let μC : Measure (Fin k → ℝ) :=
-    Measure.pi (fun (_ : Fin k) => ProbabilityTheory.gaussianReal 0 1)
+    Measure.pi (fun (_ : Fin k) ↦ ProbabilityTheory.gaussianReal 0 1)
   have hPC :
       ∫ pc, pc.1 * pc.2 l ∂(μP.prod μC) =
         (∫ p, p ∂μP) * (∫ c, c l ∂μC) := by
     simpa using
       (MeasureTheory.integral_prod_mul (μ := μP) (ν := μC)
-        (f := fun p : ℝ => p) (g := fun c : Fin k → ℝ => c l))
+        (f := fun p : ℝ ↦ p) (g := fun c : Fin k → ℝ ↦ c l))
   have hC_map : μC.map (Function.eval l) = ProbabilityTheory.gaussianReal 0 1 := by
     simpa [μC] using
       (MeasureTheory.measurePreserving_eval
-        (μ := fun (_ : Fin k) => ProbabilityTheory.gaussianReal 0 1) l).map_eq
+        (μ := fun (_ : Fin k) ↦ ProbabilityTheory.gaussianReal 0 1) l).map_eq
   have h_eval_ae : AEMeasurable (Function.eval l) μC := by
     exact
       (MeasureTheory.measurePreserving_eval
-        (μ := fun (_ : Fin k) => ProbabilityTheory.gaussianReal 0 1) l).measurable.aemeasurable
+        (μ := fun (_ : Fin k) ↦ ProbabilityTheory.gaussianReal 0 1) l).measurable.aemeasurable
   have hC0 : (∫ c, c l ∂μC) = 0 := by
     calc
       ∫ c, c l ∂μC = ∫ x, x ∂(μC.map (Function.eval l)) := by
         simpa using
           (MeasureTheory.integral_map (μ := μC) (φ := Function.eval l)
-            (f := fun x : ℝ => x) h_eval_ae aestronglyMeasurable_id).symm
+            (f := fun x : ℝ ↦ x) h_eval_ae aestronglyMeasurable_id).symm
       _ = ∫ x, x ∂(ProbabilityTheory.gaussianReal 0 1) := by rw [hC_map]
       _ = 0 := gaussian_mean_zero
   have h_prod : stdNormalProdMeasure k = μP.prod μC := by

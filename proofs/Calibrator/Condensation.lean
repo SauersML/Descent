@@ -1,3 +1,8 @@
+/-
+Copyright (c) 2026 Sauers. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Sauers
+-/
 import Calibrator.Probability
 import Mathlib.NumberTheory.Harmonic.EulerMascheroni
 import Mathlib.Analysis.Complex.ExponentialBounds
@@ -268,9 +273,12 @@ and interpolates `0 -> 1`.
 the limit law at the condensation window is `N(0, windowVariance w v)`. -/
 noncomputable def windowVariance (w v : ℝ) : ℝ := Phi (w / Real.sqrt v)
 
-theorem monotone_Phi : Monotone Phi := by
-  unfold Phi
-  exact ProbabilityTheory.monotone_cdf _
+/-- Monotonicity of `Phi`, derived from the strict statement rather than proved again.
+
+    This was an independent appeal to `ProbabilityTheory.monotone_cdf`, one of two in the
+    corpus alongside `DGP.Phi_monotone`. Both are now `strictMono_Phi.monotone`, so the
+    three spellings cannot drift: there is one derivation, in `Probability`. -/
+theorem monotone_Phi : Monotone Phi := strictMono_Phi.monotone
 
 theorem Phi_nonneg (x : ℝ) : 0 ≤ Phi x := by
   unfold Phi
@@ -291,7 +299,7 @@ subcritical side retains more variance, pushing it into the supercritical side r
 less. This is the precise sense in which the transition, viewed at scale `sqrt m`, is
 a smooth interpolation rather than a jump. -/
 theorem windowVariance_mono {v : ℝ} (hv : 0 < v) :
-    Monotone (fun w => windowVariance w v) := by
+    Monotone (fun w ↦ windowVariance w v) := by
   intro a b hab
   have hs : 0 < Real.sqrt v := Real.sqrt_pos.mpr hv
   have : a / Real.sqrt v ≤ b / Real.sqrt v := by gcongr
@@ -301,7 +309,7 @@ theorem windowVariance_mono {v : ℝ} (hv : 0 < v) :
 retain different variance fractions" — was carried here as `windowVariance_ne_of_arg_ne`,
 which took `Function.Injective Phi` as a hypothesis and transported an *assumed*
 disequality `w / √v ≠ w / √v'` through it. Both the analytic fact and the substance of the
-conclusion came from the caller; the remaining content was `fun hEq => h (hinj hEq)`. It
+conclusion came from the caller; the remaining content was `fun hEq ↦ h (hinj hEq)`. It
 was deleted on those grounds.
 
 `Calibrator.Probability.strictMono_Phi` now proves strict monotonicity of the standard

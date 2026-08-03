@@ -185,7 +185,7 @@ noncomputable def crossCovEntry {c t : ℕ}
 /-- Cross-covariance matrix `Σ_tc` between tag and causal coordinates. -/
 noncomputable def sigmaTagCausal {c t : ℕ}
     (dgp : TaggedDataGeneratingProcess c t) : Matrix (Fin t) (Fin c) ℝ :=
-  Matrix.of fun j i => crossCovEntry dgp i j
+  Matrix.of fun j i ↦ crossCovEntry dgp i j
 
 
 /-- Source tagged second moments for best linear prediction from tags.
@@ -220,7 +220,7 @@ theorem frobeniusNormSq_nonneg {t : ℕ}
     (A : Matrix (Fin t) (Fin t) ℝ) :
     0 ≤ frobeniusNormSq A := by
   unfold frobeniusNormSq
-  exact Finset.sum_nonneg (fun i _ => Finset.sum_nonneg (fun j _ => sq_nonneg (A i j)))
+  exact Finset.sum_nonneg (fun i _ ↦ Finset.sum_nonneg (fun j _ ↦ sq_nonneg (A i j)))
 
 theorem frobeniusNormSq_pos_of_exists_ne_zero {t : ℕ}
     (A : Matrix (Fin t) (Fin t) ℝ)
@@ -229,13 +229,13 @@ theorem frobeniusNormSq_pos_of_exists_ne_zero {t : ℕ}
   rcases h with ⟨i0, j0, hne⟩
   unfold frobeniusNormSq
   have h_inner_nonneg : 0 ≤ ∑ j : Fin t, (A i0 j) ^ 2 :=
-    Finset.sum_nonneg (fun j _ => sq_nonneg (A i0 j))
+    Finset.sum_nonneg (fun j _ ↦ sq_nonneg (A i0 j))
   have h_inner_lower : (A i0 j0) ^ 2 ≤ ∑ j : Fin t, (A i0 j) ^ 2 := by
-    exact Finset.single_le_sum (fun j _ => sq_nonneg (A i0 j)) (by simp)
+    exact Finset.single_le_sum (fun j _ ↦ sq_nonneg (A i0 j)) (by simp)
   have h_outer_lower :
       ∑ j : Fin t, (A i0 j) ^ 2 ≤ ∑ i : Fin t, ∑ j : Fin t, (A i j) ^ 2 := by
     exact Finset.single_le_sum
-      (fun i _ => Finset.sum_nonneg (fun j _ => sq_nonneg (A i j)))
+      (fun i _ ↦ Finset.sum_nonneg (fun j _ ↦ sq_nonneg (A i j)))
       (by simp)
   have hsq_pos : 0 < (A i0 j0) ^ 2 := by
     exact sq_pos_of_ne_zero hne
@@ -396,7 +396,7 @@ The diagonal is normalized to `1`; the linked pair `(0,1)` and `(1,0)` carries
 the covariance implied by the recombination-survival probability. -/
 noncomputable def twoLocusCoalescentCovarianceMatrix {t : ℕ} [Fact (2 ≤ t)]
     (ibdWeight recombRate : ℝ) (tmrca : ℕ) : Matrix (Fin t) (Fin t) ℝ :=
-  fun i j =>
+  fun i j ↦
     if i = twoLocusIdx0 ∧ j = twoLocusIdx1 then twoLocusIBDCovariance ibdWeight recombRate tmrca
     else if i = twoLocusIdx1 ∧ j = twoLocusIdx0 then twoLocusIBDCovariance ibdWeight recombRate tmrca
     else if i = j then 1 else 0
@@ -432,25 +432,25 @@ private theorem twoLocusCoalescentCovarianceMatrix_diff_lower_bound
     simp [A, i0, i1, twoLocusCoalescentCovarianceMatrix, hi_ne, Matrix.sub_apply]
   have h_row01 :
       (A i0 i1)^2 ≤ ∑ j : Fin t, (A i0 j)^2 := by
-    exact Finset.single_le_sum (fun j _ => sq_nonneg (A i0 j)) (by simp)
+    exact Finset.single_le_sum (fun j _ ↦ sq_nonneg (A i0 j)) (by simp)
   have h_row10 :
       (A i1 i0)^2 ≤ ∑ j : Fin t, (A i1 j)^2 := by
-    exact Finset.single_le_sum (fun j _ => sq_nonneg (A i1 j)) (by simp)
+    exact Finset.single_le_sum (fun j _ ↦ sq_nonneg (A i1 j)) (by simp)
   have h_pair :
-      Finset.sum ({i0, i1} : Finset (Fin t)) (fun i => ∑ j : Fin t, (A i j)^2) =
+      Finset.sum ({i0, i1} : Finset (Fin t)) (fun i ↦ ∑ j : Fin t, (A i j)^2) =
         (∑ j : Fin t, (A i0 j)^2) + (∑ j : Fin t, (A i1 j)^2) := by
     rw [Finset.sum_pair hi_ne]
   have h_selected_le :
       (A i0 i1)^2 + (A i1 i0)^2 ≤
-        Finset.sum ({i0, i1} : Finset (Fin t)) (fun i => ∑ j : Fin t, (A i j)^2) := by
+        Finset.sum ({i0, i1} : Finset (Fin t)) (fun i ↦ ∑ j : Fin t, (A i j)^2) := by
     rw [h_pair]
     exact add_le_add h_row01 h_row10
   have h_subset_le :
-      Finset.sum ({i0, i1} : Finset (Fin t)) (fun i => ∑ j : Fin t, (A i j)^2) ≤
+      Finset.sum ({i0, i1} : Finset (Fin t)) (fun i ↦ ∑ j : Fin t, (A i j)^2) ≤
         ∑ i : Fin t, (∑ j : Fin t, (A i j)^2) := by
     exact Finset.sum_le_sum_of_subset_of_nonneg (by simp) (by
       intro i _ _
-      exact Finset.sum_nonneg (fun j _ => sq_nonneg (A i j)))
+      exact Finset.sum_nonneg (fun j _ ↦ sq_nonneg (A i j)))
   calc
     2 *
         (twoLocusIBDCovariance ibdWeightS recombRateS tmrcaS -
@@ -458,7 +458,7 @@ private theorem twoLocusCoalescentCovarianceMatrix_diff_lower_bound
         (A i0 i1)^2 + (A i1 i0)^2 := by
       rw [h01, h10]
       ring
-    _ ≤ Finset.sum ({i0, i1} : Finset (Fin t)) (fun i => ∑ j : Fin t, (A i j)^2) := h_selected_le
+    _ ≤ Finset.sum ({i0, i1} : Finset (Fin t)) (fun i ↦ ∑ j : Fin t, (A i j)^2) := h_selected_le
     _ ≤ ∑ i : Fin t, (∑ j : Fin t, (A i j)^2) := h_subset_le
 
 /-- Algebraic decomposition of the two-locus covariance gap in terms of the MRCA time gap. -/
@@ -745,7 +745,7 @@ from simulation studies. For general proofs, use `dgpAdditiveBias` with arbitrar
 /-- General interaction-bias DGP:
     phenotype = P * (1 + β_int * Σ C). -/
 noncomputable def dgpInteractiveBias (k : ℕ) [Fintype (Fin k)] (β_int : ℝ) : DataGeneratingProcess k := {
-  trueExpectation := fun p pc => p * (1 + β_int * (∑ l, pc l)),
+  trueExpectation := fun p pc ↦ p * (1 + β_int * (∑ l, pc l)),
   jointMeasure := stdNormalProdMeasure k
 }
 
@@ -762,7 +762,7 @@ The following definitions support a cleaner, more general proof approach:
     The key insight: the raw model (span{1, P}) cannot capture the β_env * C term,
     so the projection leaves a residual of exactly β_env * C. -/
 noncomputable def dgpAdditiveBias (k : ℕ) [Fintype (Fin k)] (β_env : ℝ) : DataGeneratingProcess k := {
-  trueExpectation := fun p pc => p + β_env * (∑ l, pc l),
+  trueExpectation := fun p pc ↦ p + β_env * (∑ l, pc l),
   jointMeasure := stdNormalProdMeasure k
 }
 
@@ -779,7 +779,7 @@ theorem scenarios_are_distinct (k : ℕ) (hk_pos : 0 < k) :
     unfold hasInteraction
     -- We provide witnesses for p₁, p₂, c₁, and c₂.
     -- p₁ and p₂ are real numbers. c₁ and c₂ are functions from Fin k to ℝ.
-    use 0, 1, (fun _ => 0), (fun i => if i = ⟨0, hk_pos⟩ then 1 else 0)
+    use 0, 1, (fun _ ↦ 0), (fun i ↦ if i = ⟨0, hk_pos⟩ then 1 else 0)
     constructor; · norm_num -- Proves p₁ ≠ p₂
     constructor
     · -- Proves c₁ ≠ c₂ for any k > 0, including k=1
@@ -846,8 +846,8 @@ theorem linear_noise_implies_nonlinear_slope
     (hB2_pos : 0 < sigma_g_sq + base_error + 2 * slope_error)
     (h_slope_ne : slope_error ≠ 0) :
     ∀ (beta0 beta1 : ℝ),
-      (fun c => beta0 + beta1 * c) ≠
-        (fun c => optimalSlopeLinearNoise sigma_g_sq base_error slope_error c) := by
+      (fun c ↦ beta0 + beta1 * c) ≠
+        (fun c ↦ optimalSlopeLinearNoise sigma_g_sq base_error slope_error c) := by
   intro beta0 beta1 h_eq
   have h0 := congr_fun h_eq 0
   have h1 := congr_fun h_eq 1
@@ -972,8 +972,8 @@ theorem optimalSlopeLinearNoise_not_affine_of_nonneg_errors
     (h_slope_pos : 0 ≤ slope_error)
     (h_slope_ne : slope_error ≠ 0) :
     ∀ (beta0 beta1 : ℝ),
-      (fun c => beta0 + beta1 * c) ≠
-        (fun c => optimalSlopeLinearNoise sigma_g_sq base_error slope_error c) := by
+      (fun c ↦ beta0 + beta1 * c) ≠
+        (fun c ↦ optimalSlopeLinearNoise sigma_g_sq base_error slope_error c) := by
   apply linear_noise_implies_nonlinear_slope sigma_g_sq base_error slope_error
   · exact h_g_pos
   · apply add_pos_of_pos_of_nonneg h_g_pos h_base
@@ -1262,7 +1262,7 @@ noncomputable def outcomeMeanVariance {k : ℕ} [Fintype (Fin k)]
 noncomputable def signalOutcomeCovariance {k : ℕ} [Fintype (Fin k)]
     (dgp : DataGeneratingProcess k) (signal : Predictor k) : ℝ :=
   measureCovariance dgp.jointMeasure
-    (fun pc => signal pc.1 pc.2) (fun pc => dgp.trueExpectation pc.1 pc.2)
+    (fun pc ↦ signal pc.1 pc.2) (fun pc ↦ dgp.trueExpectation pc.1 pc.2)
 
 /-- **The statistical `R²` of a reading is the squared correlation of its three moments.**
 
@@ -1276,7 +1276,7 @@ theorem rsquared_eq_process_moments {k : ℕ} [Fintype (Fin k)]
       signalOutcomeCovariance dgp signal ^ 2 /
         (signalVariance dgp signal * outcomeMeanVariance dgp) := by
   unfold rsquared
-  rw [if_neg (by exact fun h => h.elim hs ho)]
+  rw [if_neg (by exact fun h ↦ h.elim hs ho)]
   rfl
 
 end MomentReadings
@@ -1289,25 +1289,25 @@ theorem measureVariance_eq_expect_sq_sub_sq_mean
     (μ : Measure Ω) [IsProbabilityMeasure μ]
     (Z : Ω → ℝ)
     (hZ_int : Integrable Z μ)
-    (hZsq_int : Integrable (fun ω => Z ω ^ 2) μ) :
+    (hZsq_int : Integrable (fun ω ↦ Z ω ^ 2) μ) :
     measureVariance μ Z = (∫ ω, Z ω ^ 2 ∂μ) - (measureMean μ Z) ^ 2 := by
   unfold measureVariance measureMean
   set mZ : ℝ := ∫ ω, Z ω ∂μ
-  have hlin : Integrable (fun ω => (-2 * mZ) * Z ω) μ := hZ_int.const_mul (-2 * mZ)
-  have hconst : Integrable (fun _ : Ω => mZ ^ 2) μ := integrable_const (mZ ^ 2)
+  have hlin : Integrable (fun ω ↦ (-2 * mZ) * Z ω) μ := hZ_int.const_mul (-2 * mZ)
+  have hconst : Integrable (fun _ : Ω ↦ mZ ^ 2) μ := integrable_const (mZ ^ 2)
   have h_expand :
-      (fun ω => (Z ω - mZ) ^ 2) =
-        (((fun ω => Z ω ^ 2) + fun ω => (-2 * mZ) * Z ω) + fun _ : Ω => mZ ^ 2) := by
+      (fun ω ↦ (Z ω - mZ) ^ 2) =
+        (((fun ω ↦ Z ω ^ 2) + fun ω ↦ (-2 * mZ) * Z ω) + fun _ : Ω ↦ mZ ^ 2) := by
     funext ω
     simp
     ring_nf
   rw [h_expand]
-  rw [show ∫ ω, (((fun ω => Z ω ^ 2) + fun ω => (-2 * mZ) * Z ω) + fun _ : Ω => mZ ^ 2) ω ∂μ
-        = ∫ ω, ((fun ω => Z ω ^ 2) + fun ω => (-2 * mZ) * Z ω) ω ∂μ
-            + ∫ ω, (fun _ : Ω => mZ ^ 2) ω ∂μ by
+  rw [show ∫ ω, (((fun ω ↦ Z ω ^ 2) + fun ω ↦ (-2 * mZ) * Z ω) + fun _ : Ω ↦ mZ ^ 2) ω ∂μ
+        = ∫ ω, ((fun ω ↦ Z ω ^ 2) + fun ω ↦ (-2 * mZ) * Z ω) ω ∂μ
+            + ∫ ω, (fun _ : Ω ↦ mZ ^ 2) ω ∂μ by
         simpa using (integral_add (hZsq_int.add hlin) hconst)]
-  rw [show ∫ ω, ((fun ω => Z ω ^ 2) + fun ω => (-2 * mZ) * Z ω) ω ∂μ
-        = ∫ ω, (fun ω => Z ω ^ 2) ω ∂μ + ∫ ω, (fun ω => (-2 * mZ) * Z ω) ω ∂μ by
+  rw [show ∫ ω, ((fun ω ↦ Z ω ^ 2) + fun ω ↦ (-2 * mZ) * Z ω) ω ∂μ
+        = ∫ ω, (fun ω ↦ Z ω ^ 2) ω ∂μ + ∫ ω, (fun ω ↦ (-2 * mZ) * Z ω) ω ∂μ by
         simpa using (integral_add hZsq_int hlin)]
   rw [MeasureTheory.integral_const_mul, MeasureTheory.integral_const]
   simp [mZ]
@@ -1318,36 +1318,36 @@ theorem measureCovariance_eq_expect_mul_sub_means
     (X Y : Ω → ℝ)
     (hX_int : Integrable X μ)
     (hY_int : Integrable Y μ)
-    (hXY_int : Integrable (fun ω => X ω * Y ω) μ) :
+    (hXY_int : Integrable (fun ω ↦ X ω * Y ω) μ) :
     measureCovariance μ X Y =
       (∫ ω, X ω * Y ω ∂μ) - (measureMean μ X) * (measureMean μ Y) := by
   unfold measureCovariance measureMean
   set mX : ℝ := ∫ ω, X ω ∂μ
   set mY : ℝ := ∫ ω, Y ω ∂μ
-  have hXlin : Integrable (fun ω => (-mY) * X ω) μ := hX_int.const_mul (-mY)
-  have hYlin : Integrable (fun ω => (-mX) * Y ω) μ := hY_int.const_mul (-mX)
-  have hconst : Integrable (fun _ : Ω => mX * mY) μ := integrable_const (mX * mY)
+  have hXlin : Integrable (fun ω ↦ (-mY) * X ω) μ := hX_int.const_mul (-mY)
+  have hYlin : Integrable (fun ω ↦ (-mX) * Y ω) μ := hY_int.const_mul (-mX)
+  have hconst : Integrable (fun _ : Ω ↦ mX * mY) μ := integrable_const (mX * mY)
   have h_expand :
-      (fun ω => (X ω - mX) * (Y ω - mY)) =
-        ((((fun ω => X ω * Y ω) + fun ω => (-mY) * X ω) +
-          fun ω => (-mX) * Y ω) + fun _ : Ω => mX * mY) := by
+      (fun ω ↦ (X ω - mX) * (Y ω - mY)) =
+        ((((fun ω ↦ X ω * Y ω) + fun ω ↦ (-mY) * X ω) +
+          fun ω ↦ (-mX) * Y ω) + fun _ : Ω ↦ mX * mY) := by
     funext ω
     simp
     ring_nf
   rw [h_expand]
   rw [show ∫ ω,
-        ((((fun ω => X ω * Y ω) + fun ω => (-mY) * X ω) + fun ω => (-mX) * Y ω) +
-          fun _ : Ω => mX * mY) ω ∂μ
+        ((((fun ω ↦ X ω * Y ω) + fun ω ↦ (-mY) * X ω) + fun ω ↦ (-mX) * Y ω) +
+          fun _ : Ω ↦ mX * mY) ω ∂μ
         =
-          ∫ ω, (((fun ω => X ω * Y ω) + fun ω => (-mY) * X ω) + fun ω => (-mX) * Y ω) ω ∂μ
-            + ∫ ω, (fun _ : Ω => mX * mY) ω ∂μ by
+          ∫ ω, (((fun ω ↦ X ω * Y ω) + fun ω ↦ (-mY) * X ω) + fun ω ↦ (-mX) * Y ω) ω ∂μ
+            + ∫ ω, (fun _ : Ω ↦ mX * mY) ω ∂μ by
         simpa using (integral_add ((hXY_int.add hXlin).add hYlin) hconst)]
-  rw [show ∫ ω, (((fun ω => X ω * Y ω) + fun ω => (-mY) * X ω) + fun ω => (-mX) * Y ω) ω ∂μ
-        = ∫ ω, ((fun ω => X ω * Y ω) + fun ω => (-mY) * X ω) ω ∂μ
-            + ∫ ω, (fun ω => (-mX) * Y ω) ω ∂μ by
+  rw [show ∫ ω, (((fun ω ↦ X ω * Y ω) + fun ω ↦ (-mY) * X ω) + fun ω ↦ (-mX) * Y ω) ω ∂μ
+        = ∫ ω, ((fun ω ↦ X ω * Y ω) + fun ω ↦ (-mY) * X ω) ω ∂μ
+            + ∫ ω, (fun ω ↦ (-mX) * Y ω) ω ∂μ by
         simpa using (integral_add (hXY_int.add hXlin) hYlin)]
-  rw [show ∫ ω, ((fun ω => X ω * Y ω) + fun ω => (-mY) * X ω) ω ∂μ
-        = ∫ ω, (fun ω => X ω * Y ω) ω ∂μ + ∫ ω, (fun ω => (-mY) * X ω) ω ∂μ by
+  rw [show ∫ ω, ((fun ω ↦ X ω * Y ω) + fun ω ↦ (-mY) * X ω) ω ∂μ
+        = ∫ ω, (fun ω ↦ X ω * Y ω) ω ∂μ + ∫ ω, (fun ω ↦ (-mY) * X ω) ω ∂μ by
         simpa using (integral_add hXY_int hXlin)]
   rw [MeasureTheory.integral_const_mul, MeasureTheory.integral_const_mul,
     MeasureTheory.integral_const]
@@ -1359,9 +1359,9 @@ theorem measureExpMSE_eq_variance_add_variance_sub_two_cov_add_bias_sq
     (Y S : Ω → ℝ)
     (hY_int : Integrable Y μ)
     (hS_int : Integrable S μ)
-    (hYsq_int : Integrable (fun ω => Y ω ^ 2) μ)
-    (hSsq_int : Integrable (fun ω => S ω ^ 2) μ)
-    (hYS_int : Integrable (fun ω => Y ω * S ω) μ) :
+    (hYsq_int : Integrable (fun ω ↦ Y ω ^ 2) μ)
+    (hSsq_int : Integrable (fun ω ↦ S ω ^ 2) μ)
+    (hYS_int : Integrable (fun ω ↦ Y ω * S ω) μ) :
     measureExpMSE μ Y S =
       measureVariance μ Y + measureVariance μ S -
         2 * measureCovariance μ Y S + (measureBias μ Y S) ^ 2 := by
@@ -1369,20 +1369,20 @@ theorem measureExpMSE_eq_variance_add_variance_sub_two_cov_add_bias_sq
   rw [measureVariance_eq_expect_sq_sub_sq_mean μ S hS_int hSsq_int]
   rw [measureCovariance_eq_expect_mul_sub_means μ Y S hY_int hS_int hYS_int]
   unfold measureExpMSE measureBias measureMean
-  have hScaledYS : Integrable (fun ω => (-2 : ℝ) * (Y ω * S ω)) μ := hYS_int.const_mul (-2)
+  have hScaledYS : Integrable (fun ω ↦ (-2 : ℝ) * (Y ω * S ω)) μ := hYS_int.const_mul (-2)
   have h_expand :
-      (fun ω => (Y ω - S ω) ^ 2) =
-        (((fun ω => Y ω ^ 2) + fun ω => (-2 : ℝ) * (Y ω * S ω)) + fun ω => S ω ^ 2) := by
+      (fun ω ↦ (Y ω - S ω) ^ 2) =
+        (((fun ω ↦ Y ω ^ 2) + fun ω ↦ (-2 : ℝ) * (Y ω * S ω)) + fun ω ↦ S ω ^ 2) := by
     funext ω
     simp
     ring_nf
   rw [h_expand]
-  rw [show ∫ ω, (((fun ω => Y ω ^ 2) + fun ω => (-2 : ℝ) * (Y ω * S ω)) + fun ω => S ω ^ 2) ω ∂μ
-        = ∫ ω, ((fun ω => Y ω ^ 2) + fun ω => (-2 : ℝ) * (Y ω * S ω)) ω ∂μ
-            + ∫ ω, (fun ω => S ω ^ 2) ω ∂μ by
+  rw [show ∫ ω, (((fun ω ↦ Y ω ^ 2) + fun ω ↦ (-2 : ℝ) * (Y ω * S ω)) + fun ω ↦ S ω ^ 2) ω ∂μ
+        = ∫ ω, ((fun ω ↦ Y ω ^ 2) + fun ω ↦ (-2 : ℝ) * (Y ω * S ω)) ω ∂μ
+            + ∫ ω, (fun ω ↦ S ω ^ 2) ω ∂μ by
         simpa using (integral_add (hYsq_int.add hScaledYS) hSsq_int)]
-  rw [show ∫ ω, ((fun ω => Y ω ^ 2) + fun ω => (-2 : ℝ) * (Y ω * S ω)) ω ∂μ
-        = ∫ ω, (fun ω => Y ω ^ 2) ω ∂μ + ∫ ω, (fun ω => (-2 : ℝ) * (Y ω * S ω)) ω ∂μ by
+  rw [show ∫ ω, ((fun ω ↦ Y ω ^ 2) + fun ω ↦ (-2 : ℝ) * (Y ω * S ω)) ω ∂μ
+        = ∫ ω, (fun ω ↦ Y ω ^ 2) ω ∂μ + ∫ ω, (fun ω ↦ (-2 : ℝ) * (Y ω * S ω)) ω ∂μ by
         simpa using (integral_add hYsq_int hScaledYS)]
   rw [MeasureTheory.integral_const_mul]
   ring
@@ -1392,21 +1392,21 @@ theorem measureLinearPredictionRisk_transport_decomposition_of_orthogonality
     (μ : Measure Ω)
     (X : Ω → ι → ℝ) (Y : Ω → ℝ)
     (wStar w : ι → ℝ)
-    (hResidualSq_int : Integrable (fun ω => (Y ω - dot wStar (X ω)) ^ 2) μ)
+    (hResidualSq_int : Integrable (fun ω ↦ (Y ω - dot wStar (X ω)) ^ 2) μ)
     (hCross_int :
       Integrable
-        (fun ω => (Y ω - dot wStar (X ω)) * dot (fun i => w i - wStar i) (X ω)) μ)
+        (fun ω ↦ (Y ω - dot wStar (X ω)) * dot (fun i ↦ w i - wStar i) (X ω)) μ)
     (hDeltaSq_int :
-      Integrable (fun ω => (dot (fun i => w i - wStar i) (X ω)) ^ 2) μ)
+      Integrable (fun ω ↦ (dot (fun i ↦ w i - wStar i) (X ω)) ^ 2) μ)
     (horth :
-      ∫ ω, (Y ω - dot wStar (X ω)) * dot (fun i => w i - wStar i) (X ω) ∂μ = 0) :
+      ∫ ω, (Y ω - dot wStar (X ω)) * dot (fun i ↦ w i - wStar i) (X ω) ∂μ = 0) :
     ∫ ω, (Y ω - dot w (X ω)) ^ 2 ∂μ =
       ∫ ω, (Y ω - dot wStar (X ω)) ^ 2 ∂μ +
-        ∫ ω, (dot (fun i => w i - wStar i) (X ω)) ^ 2 ∂μ := by
-  let residual : Ω → ℝ := fun ω => Y ω - dot wStar (X ω)
-  let delta : Ω → ℝ := fun ω => dot (fun i => w i - wStar i) (X ω)
+        ∫ ω, (dot (fun i ↦ w i - wStar i) (X ω)) ^ 2 ∂μ := by
+  let residual : Ω → ℝ := fun ω ↦ Y ω - dot wStar (X ω)
+  let delta : Ω → ℝ := fun ω ↦ dot (fun i ↦ w i - wStar i) (X ω)
   have hdot :
-      ∀ ω, dot w (X ω) = dot wStar (X ω) + dot (fun i => w i - wStar i) (X ω) := by
+      ∀ ω, dot w (X ω) = dot wStar (X ω) + dot (fun i ↦ w i - wStar i) (X ω) := by
     intro ω
     calc
       dot w (X ω) = ∑ i, (wStar i + (w i - wStar i)) * X ω i := by
@@ -1418,34 +1418,34 @@ theorem measureLinearPredictionRisk_transport_decomposition_of_orthogonality
         refine Finset.sum_congr rfl ?_
         intro i hi
         ring
-      _ = dot wStar (X ω) + dot (fun i => w i - wStar i) (X ω) := by
+      _ = dot wStar (X ω) + dot (fun i ↦ w i - wStar i) (X ω) := by
         unfold dot
         rw [Finset.sum_add_distrib]
   have h_expand :
-      (fun ω => (Y ω - dot w (X ω)) ^ 2) =
-        (fun ω => residual ω ^ 2) +
-          ((-2 : ℝ) • fun ω => residual ω * delta ω) +
-          fun ω => delta ω ^ 2 := by
+      (fun ω ↦ (Y ω - dot w (X ω)) ^ 2) =
+        (fun ω ↦ residual ω ^ 2) +
+          ((-2 : ℝ) • fun ω ↦ residual ω * delta ω) +
+          fun ω ↦ delta ω ^ 2 := by
     funext ω
     rw [hdot ω]
     simp [residual, delta, smul_eq_mul]
     ring
   rw [h_expand]
   rw [show ∫ ω,
-        (((fun ω => residual ω ^ 2) + (-2 : ℝ) • fun ω => residual ω * delta ω) +
-          fun ω => delta ω ^ 2) ω ∂μ
+        (((fun ω ↦ residual ω ^ 2) + (-2 : ℝ) • fun ω ↦ residual ω * delta ω) +
+          fun ω ↦ delta ω ^ 2) ω ∂μ
         =
-          ∫ ω, ((fun ω => residual ω ^ 2) + (-2 : ℝ) • fun ω => residual ω * delta ω) ω ∂μ
-            + ∫ ω, (fun ω => delta ω ^ 2) ω ∂μ by
+          ∫ ω, ((fun ω ↦ residual ω ^ 2) + (-2 : ℝ) • fun ω ↦ residual ω * delta ω) ω ∂μ
+            + ∫ ω, (fun ω ↦ delta ω ^ 2) ω ∂μ by
         simpa using (integral_add (hResidualSq_int.add (hCross_int.const_mul (-2))) hDeltaSq_int)]
-  rw [show ∫ ω, ((fun ω => residual ω ^ 2) + (-2 : ℝ) • fun ω => residual ω * delta ω) ω ∂μ
-        = ∫ ω, (fun ω => residual ω ^ 2) ω ∂μ
-            + ∫ ω, (((-2 : ℝ) • fun ω => residual ω * delta ω) ω) ∂μ by
+  rw [show ∫ ω, ((fun ω ↦ residual ω ^ 2) + (-2 : ℝ) • fun ω ↦ residual ω * delta ω) ω ∂μ
+        = ∫ ω, (fun ω ↦ residual ω ^ 2) ω ∂μ
+            + ∫ ω, (((-2 : ℝ) • fun ω ↦ residual ω * delta ω) ω) ∂μ by
         simpa using (integral_add hResidualSq_int (hCross_int.const_mul (-2)))]
-  rw [show ∫ ω, (((-2 : ℝ) • fun ω => residual ω * delta ω) ω) ∂μ
+  rw [show ∫ ω, (((-2 : ℝ) • fun ω ↦ residual ω * delta ω) ω) ∂μ
         = (-2 : ℝ) * ∫ ω, residual ω * delta ω ∂μ by
         simpa [Pi.smul_apply] using
-          (MeasureTheory.integral_const_mul (-2 : ℝ) (fun ω => residual ω * delta ω))]
+          (MeasureTheory.integral_const_mul (-2 : ℝ) (fun ω ↦ residual ω * delta ω))]
   rw [horth]
   ring
 
@@ -1463,44 +1463,44 @@ theorem ConditionalMeanDGP.predictionRiskY_eq_irreducible_plus_conditionalMeanAp
     {k : ℕ} [Fintype (Fin k)]
     (cmdgp : ConditionalMeanDGP k) (pred : Predictor k)
     (hResidualSq_int :
-      Integrable (fun x : ℝ × (Fin k → ℝ) × ℝ => (x.2.2 - cmdgp.m x.1 x.2.1) ^ 2) cmdgp.μ)
+      Integrable (fun x : ℝ × (Fin k → ℝ) × ℝ ↦ (x.2.2 - cmdgp.m x.1 x.2.1) ^ 2) cmdgp.μ)
     (hGapSq_int :
-      Integrable (fun x : ℝ × (Fin k → ℝ) × ℝ =>
+      Integrable (fun x : ℝ × (Fin k → ℝ) × ℝ ↦
         (cmdgp.m x.1 x.2.1 - pred x.1 x.2.1) ^ 2) cmdgp.μ)
     (hOrth_int :
-      Integrable (fun x : ℝ × (Fin k → ℝ) × ℝ =>
+      Integrable (fun x : ℝ × (Fin k → ℝ) × ℝ ↦
         (x.2.2 - cmdgp.m x.1 x.2.1) * (cmdgp.m x.1 x.2.1 - pred x.1 x.2.1)) cmdgp.μ) :
     predictionRiskY cmdgp pred =
       irreduciblePredictionRisk cmdgp + conditionalMeanApproximationRisk cmdgp pred := by
-  let residual : ℝ × (Fin k → ℝ) × ℝ → ℝ := fun x => x.2.2 - cmdgp.m x.1 x.2.1
-  let gap : ℝ × (Fin k → ℝ) × ℝ → ℝ := fun x => cmdgp.m x.1 x.2.1 - pred x.1 x.2.1
+  let residual : ℝ × (Fin k → ℝ) × ℝ → ℝ := fun x ↦ x.2.2 - cmdgp.m x.1 x.2.1
+  let gap : ℝ × (Fin k → ℝ) × ℝ → ℝ := fun x ↦ cmdgp.m x.1 x.2.1 - pred x.1 x.2.1
   have horth : ∫ x, residual x * gap x ∂cmdgp.μ = 0 := by
-    simpa [residual, gap] using cmdgp.m_spec (fun pc => cmdgp.m pc.1 pc.2 - pred pc.1 pc.2) hOrth_int
+    simpa [residual, gap] using cmdgp.m_spec (fun pc ↦ cmdgp.m pc.1 pc.2 - pred pc.1 pc.2) hOrth_int
   have h_expand :
-      (fun x : ℝ × (Fin k → ℝ) × ℝ => (x.2.2 - pred x.1 x.2.1) ^ 2) =
-        (((fun x => residual x ^ 2) +
-          ((2 : ℝ) • fun x => residual x * gap x)) +
-          fun x => gap x ^ 2) := by
+      (fun x : ℝ × (Fin k → ℝ) × ℝ ↦ (x.2.2 - pred x.1 x.2.1) ^ 2) =
+        (((fun x ↦ residual x ^ 2) +
+          ((2 : ℝ) • fun x ↦ residual x * gap x)) +
+          fun x ↦ gap x ^ 2) := by
     funext x
     simp [residual, gap, smul_eq_mul]
     ring
   unfold predictionRiskY irreduciblePredictionRisk conditionalMeanApproximationRisk
   rw [h_expand]
   rw [show ∫ x,
-        (((fun x => residual x ^ 2) + (2 : ℝ) • fun x => residual x * gap x) +
-          fun x => gap x ^ 2) x ∂cmdgp.μ
+        (((fun x ↦ residual x ^ 2) + (2 : ℝ) • fun x ↦ residual x * gap x) +
+          fun x ↦ gap x ^ 2) x ∂cmdgp.μ
         =
-          ∫ x, ((fun x => residual x ^ 2) + (2 : ℝ) • fun x => residual x * gap x) x ∂cmdgp.μ
-            + ∫ x, (fun x => gap x ^ 2) x ∂cmdgp.μ by
+          ∫ x, ((fun x ↦ residual x ^ 2) + (2 : ℝ) • fun x ↦ residual x * gap x) x ∂cmdgp.μ
+            + ∫ x, (fun x ↦ gap x ^ 2) x ∂cmdgp.μ by
         simpa using (integral_add (hResidualSq_int.add (hOrth_int.const_mul 2)) hGapSq_int)]
-  rw [show ∫ x, ((fun x => residual x ^ 2) + (2 : ℝ) • fun x => residual x * gap x) x ∂cmdgp.μ
-        = ∫ x, (fun x => residual x ^ 2) x ∂cmdgp.μ
-            + ∫ x, (((2 : ℝ) • fun x => residual x * gap x) x) ∂cmdgp.μ by
+  rw [show ∫ x, ((fun x ↦ residual x ^ 2) + (2 : ℝ) • fun x ↦ residual x * gap x) x ∂cmdgp.μ
+        = ∫ x, (fun x ↦ residual x ^ 2) x ∂cmdgp.μ
+            + ∫ x, (((2 : ℝ) • fun x ↦ residual x * gap x) x) ∂cmdgp.μ by
         simpa using (integral_add hResidualSq_int (hOrth_int.const_mul 2))]
-  rw [show ∫ x, (((2 : ℝ) • fun x => residual x * gap x) x) ∂cmdgp.μ
+  rw [show ∫ x, (((2 : ℝ) • fun x ↦ residual x * gap x) x) ∂cmdgp.μ
         = (2 : ℝ) * ∫ x, residual x * gap x ∂cmdgp.μ by
         simpa [Pi.smul_apply] using
-          (MeasureTheory.integral_const_mul (2 : ℝ) (fun x => residual x * gap x))]
+          (MeasureTheory.integral_const_mul (2 : ℝ) (fun x ↦ residual x * gap x))]
   rw [horth]
   ring
 
@@ -1509,15 +1509,15 @@ theorem ConditionalMeanDGP.conditionalMeanApproximationRisk_eq_mseRisk_toDGP
     (cmdgp : ConditionalMeanDGP k) (pred : Predictor k)
     (hGapSq_meas :
       AEStronglyMeasurable
-        (fun pc : ℝ × (Fin k → ℝ) => (cmdgp.m pc.1 pc.2 - pred pc.1 pc.2) ^ 2)
+        (fun pc : ℝ × (Fin k → ℝ) ↦ (cmdgp.m pc.1 pc.2 - pred pc.1 pc.2) ^ 2)
         cmdgp.toDGP.jointMeasure) :
     conditionalMeanApproximationRisk cmdgp pred = mseRisk cmdgp.toDGP pred := by
   unfold conditionalMeanApproximationRisk mseRisk ConditionalMeanDGP.toDGP
   simpa using
     (MeasureTheory.integral_map
       (μ := cmdgp.μ)
-      (φ := fun x : ℝ × (Fin k → ℝ) × ℝ => (x.1, x.2.1))
-      (f := fun pc : ℝ × (Fin k → ℝ) => (cmdgp.m pc.1 pc.2 - pred pc.1 pc.2) ^ 2)
+      (φ := fun x : ℝ × (Fin k → ℝ) × ℝ ↦ (x.1, x.2.1))
+      (f := fun pc : ℝ × (Fin k → ℝ) ↦ (cmdgp.m pc.1 pc.2 - pred pc.1 pc.2) ^ 2)
       (by fun_prop) hGapSq_meas).symm
 
 theorem ConditionalMeanDGP.predictionRiskY_linear_transport_decomposition
@@ -1528,24 +1528,24 @@ theorem ConditionalMeanDGP.predictionRiskY_linear_transport_decomposition
     (wStar w : ι → ℝ)
     (hm_linear : ∀ p c, cmdgp.m p c = dot wStar (X (p, c)))
     (hResidualSq_int :
-      Integrable (fun x : ℝ × (Fin k → ℝ) × ℝ => (x.2.2 - cmdgp.m x.1 x.2.1) ^ 2) cmdgp.μ)
+      Integrable (fun x : ℝ × (Fin k → ℝ) × ℝ ↦ (x.2.2 - cmdgp.m x.1 x.2.1) ^ 2) cmdgp.μ)
     (hOrth_int :
-      Integrable (fun x : ℝ × (Fin k → ℝ) × ℝ =>
+      Integrable (fun x : ℝ × (Fin k → ℝ) × ℝ ↦
         (x.2.2 - cmdgp.m x.1 x.2.1) *
-          dot (fun i => w i - wStar i) (X (x.1, x.2.1))) cmdgp.μ)
+          dot (fun i ↦ w i - wStar i) (X (x.1, x.2.1))) cmdgp.μ)
     (hDeltaSq_int :
-      Integrable (fun x : ℝ × (Fin k → ℝ) × ℝ =>
-        (dot (fun i => w i - wStar i) (X (x.1, x.2.1))) ^ 2) cmdgp.μ) :
-    predictionRiskY cmdgp (fun p c => dot w (X (p, c))) =
+      Integrable (fun x : ℝ × (Fin k → ℝ) × ℝ ↦
+        (dot (fun i ↦ w i - wStar i) (X (x.1, x.2.1))) ^ 2) cmdgp.μ) :
+    predictionRiskY cmdgp (fun p c ↦ dot w (X (p, c))) =
       irreduciblePredictionRisk cmdgp +
-        ∫ x, (dot (fun i => w i - wStar i) (X (x.1, x.2.1))) ^ 2 ∂cmdgp.μ := by
+        ∫ x, (dot (fun i ↦ w i - wStar i) (X (x.1, x.2.1))) ^ 2 ∂cmdgp.μ := by
   have horth :
       ∫ x, (x.2.2 - cmdgp.m x.1 x.2.1) *
-        dot (fun i => w i - wStar i) (X (x.1, x.2.1)) ∂cmdgp.μ = 0 := by
+        dot (fun i ↦ w i - wStar i) (X (x.1, x.2.1)) ∂cmdgp.μ = 0 := by
     simpa using
-      cmdgp.m_spec (fun pc => dot (fun i => w i - wStar i) (X pc)) hOrth_int
+      cmdgp.m_spec (fun pc ↦ dot (fun i ↦ w i - wStar i) (X pc)) hOrth_int
   have hResidualSq_int_linear :
-      Integrable (fun x : ℝ × (Fin k → ℝ) × ℝ =>
+      Integrable (fun x : ℝ × (Fin k → ℝ) × ℝ ↦
         (x.2.2 - dot wStar (X (x.1, x.2.1))) ^ 2) cmdgp.μ := by
     refine hResidualSq_int.congr ?_
     filter_upwards with x
@@ -1558,28 +1558,28 @@ theorem ConditionalMeanDGP.predictionRiskY_linear_transport_decomposition
     filter_upwards with x
     rw [← hm_linear x.1 x.2.1]
   have hOrth_int_linear :
-      Integrable (fun x : ℝ × (Fin k → ℝ) × ℝ =>
+      Integrable (fun x : ℝ × (Fin k → ℝ) × ℝ ↦
         (x.2.2 - dot wStar (X (x.1, x.2.1))) *
-          dot (fun i => w i - wStar i) (X (x.1, x.2.1))) cmdgp.μ := by
+          dot (fun i ↦ w i - wStar i) (X (x.1, x.2.1))) cmdgp.μ := by
     refine hOrth_int.congr ?_
     filter_upwards with x
     rw [← hm_linear x.1 x.2.1]
   have horth_linear :
       ∫ x, (x.2.2 - dot wStar (X (x.1, x.2.1))) *
-        dot (fun i => w i - wStar i) (X (x.1, x.2.1)) ∂cmdgp.μ = 0 := by
+        dot (fun i ↦ w i - wStar i) (X (x.1, x.2.1)) ∂cmdgp.μ = 0 := by
     simpa [hm_linear] using horth
   unfold predictionRiskY
   calc
     ∫ x, (x.2.2 - dot w (X (x.1, x.2.1))) ^ 2 ∂cmdgp.μ =
         ∫ x, (x.2.2 - dot wStar (X (x.1, x.2.1))) ^ 2 ∂cmdgp.μ +
-          ∫ x, (dot (fun i => w i - wStar i) (X (x.1, x.2.1))) ^ 2 ∂cmdgp.μ := by
+          ∫ x, (dot (fun i ↦ w i - wStar i) (X (x.1, x.2.1))) ^ 2 ∂cmdgp.μ := by
             exact measureLinearPredictionRisk_transport_decomposition_of_orthogonality
               cmdgp.μ
-              (fun x : ℝ × (Fin k → ℝ) × ℝ => X (x.1, x.2.1))
-              (fun x : ℝ × (Fin k → ℝ) × ℝ => x.2.2)
+              (fun x : ℝ × (Fin k → ℝ) × ℝ ↦ X (x.1, x.2.1))
+              (fun x : ℝ × (Fin k → ℝ) × ℝ ↦ x.2.2)
               wStar w hResidualSq_int_linear hOrth_int_linear hDeltaSq_int horth_linear
     _ = irreduciblePredictionRisk cmdgp +
-          ∫ x, (dot (fun i => w i - wStar i) (X (x.1, x.2.1))) ^ 2 ∂cmdgp.μ := by
+          ∫ x, (dot (fun i ↦ w i - wStar i) (X (x.1, x.2.1))) ^ 2 ∂cmdgp.μ := by
             rw [hbase]
 
 end ExactMeasureMetricIdentities
@@ -1608,7 +1608,7 @@ structure HeterogeneousEffectDGP (k : ℕ) where
 
 /-- True expectation for heterogeneous effect DGP. -/
 def HeterogeneousEffectDGP.trueExp {k : ℕ} (hdgp : HeterogeneousEffectDGP k) :
-    ℝ → (Fin k → ℝ) → ℝ := fun p c => hdgp.alpha c * p + hdgp.baseline c
+    ℝ → (Fin k → ℝ) → ℝ := fun p c ↦ hdgp.alpha c * p + hdgp.baseline c
 
 /-- Convert to standard DGP. -/
 noncomputable def HeterogeneousEffectDGP.toDGP {k : ℕ} (hdgp : HeterogeneousEffectDGP k) :
@@ -1625,7 +1625,7 @@ theorem mse_calibrated_zero {k : ℕ} [Fintype (Fin k)] (hdgp : HeterogeneousEff
 
 /-- **MSE of raw model equals E[(α(c) - β)² · P²]**. -/
 theorem mse_raw_formula {k : ℕ} [Fintype (Fin k)] (hdgp : HeterogeneousEffectDGP k) (β : ℝ) :
-    let pred_raw := fun p c => β * p + hdgp.baseline c
+    let pred_raw := fun p c ↦ β * p + hdgp.baseline c
     mse hdgp.toDGP pred_raw = ∫ pc, (hdgp.alpha pc.2 - β)^2 * pc.1^2 ∂hdgp.jointMeasure := by
   simp only [mse, HeterogeneousEffectDGP.toDGP, HeterogeneousEffectDGP.trueExp]
   congr 1; ext pc
@@ -1639,7 +1639,7 @@ theorem mse_raw_formula {k : ℕ} [Fintype (Fin k)] (hdgp : HeterogeneousEffectD
 theorem mse_improvement {k : ℕ} [Fintype (Fin k)] (hdgp : HeterogeneousEffectDGP k) (β : ℝ)
     -- Direct hypothesis: the product integral is positive
     (h_product_pos : ∫ pc, (hdgp.alpha pc.2 - β)^2 * pc.1^2 ∂hdgp.jointMeasure > 0) :
-    let pred_raw := fun p c => β * p + hdgp.baseline c
+    let pred_raw := fun p c ↦ β * p + hdgp.baseline c
     mse hdgp.toDGP pred_raw > mse hdgp.toDGP hdgp.trueExp := by
   -- Expand the let and rewrite MSE(calibrated) = 0
   simp only [mse_calibrated_zero]
@@ -1659,7 +1659,7 @@ theorem mse_improvement {k : ℕ} [Fintype (Fin k)] (hdgp : HeterogeneousEffectD
 theorem rsquared_improvement {k : ℕ} [Fintype (Fin k)] (hdgp : HeterogeneousEffectDGP k) (β : ℝ)
     (hY_var_pos : var hdgp.toDGP hdgp.trueExp > 0)
     (h_product_pos : ∫ pc, (hdgp.alpha pc.2 - β)^2 * pc.1^2 ∂hdgp.jointMeasure > 0) :
-    let pred_raw := fun p c => β * p + hdgp.baseline c
+    let pred_raw := fun p c ↦ β * p + hdgp.baseline c
     let r2_raw := 1 - mse hdgp.toDGP pred_raw / var hdgp.toDGP hdgp.trueExp
     let r2_cal := 1 - mse hdgp.toDGP hdgp.trueExp / var hdgp.toDGP hdgp.trueExp
     r2_cal > r2_raw := by
@@ -1667,9 +1667,9 @@ theorem rsquared_improvement {k : ℕ} [Fintype (Fin k)] (hdgp : HeterogeneousEf
   have h_cal_zero := mse_calibrated_zero hdgp
   simp only [h_cal_zero, zero_div, sub_zero]
   -- r2_cal = 1, r2_raw = 1 - MSE(raw)/Var(Y) < 1
-  have h_mse_pos : mse hdgp.toDGP (fun p c => β * p + hdgp.baseline c) > 0 := by
+  have h_mse_pos : mse hdgp.toDGP (fun p c ↦ β * p + hdgp.baseline c) > 0 := by
     rw [h_cal_zero] at h_mse; exact h_mse
-  have h_ratio_pos : mse hdgp.toDGP (fun p c => β * p + hdgp.baseline c) /
+  have h_ratio_pos : mse hdgp.toDGP (fun p c ↦ β * p + hdgp.baseline c) /
                      var hdgp.toDGP hdgp.trueExp > 0 :=
     div_pos h_mse_pos hY_var_pos
   linarith
@@ -1740,6 +1740,30 @@ structure EvolutionaryParameters where
   recomb_nonneg : 0 ≤ recomb
   recomb_le_half : recomb ≤ 1 / 2
   V_A_pos : 0 < V_A
+
+/-- **The parameter class is inhabited.**  Thirty theorems below quantify over
+`EvolutionaryParameters`; without a term of this type each of them is a true and empty
+statement about an empty class.  Every field is a strict or weak inequality on a real,
+so nonemptiness is not in doubt -- but "not in doubt" is not "proved", and only the
+proof keeps the thirty theorems from being vacuous.
+
+Chosen away from every boundary the fields permit (`mu`, `mig`, `t_div` are only
+required nonnegative, and zero for all three is a closed panmictic population with no
+mutation, in which several downstream quantities degenerate). -/
+noncomputable def EvolutionaryParameters.witness : EvolutionaryParameters where
+  Ne := 1
+  mu := 1
+  mig := 1
+  t_div := 1
+  recomb := 1 / 4
+  V_A := 1
+  Ne_pos := by norm_num
+  mu_nonneg := by norm_num
+  mig_nonneg := by norm_num
+  t_div_nonneg := by norm_num
+  recomb_nonneg := by norm_num
+  recomb_le_half := by norm_num
+  V_A_pos := by norm_num
 
 /-- Scaled drift parameter: τ = t/(2Ne).
 
@@ -2238,6 +2262,17 @@ structure PGSEvolutionaryModel extends EvolutionaryParameters where
   prev_pos : 0 < prevalence
   prev_lt_one : prevalence < 1
 
+/-- **The class is inhabited**, extending `EvolutionaryParameters.witness`.  Fifteen
+theorems quantify over `PGSEvolutionaryModel`; this is what makes them statements about
+a nonempty class rather than vacuous universals. -/
+noncomputable def PGSEvolutionaryModel.witness : PGSEvolutionaryModel where
+  toEvolutionaryParameters := EvolutionaryParameters.witness
+  V_E := 1
+  prevalence := 1 / 2
+  V_E_pos := by norm_num
+  prev_pos := by norm_num
+  prev_lt_one := by norm_num
+
 /-- Access the underlying evolutionary parameters. -/
 noncomputable def PGSEvolutionaryModel.toEvo (m : PGSEvolutionaryModel) :
     EvolutionaryParameters := m.toEvolutionaryParameters
@@ -2507,6 +2542,19 @@ structure IrreducibleTargetPenalty where
   ancestrySpecificLD_nonneg : 0 ≤ ancestrySpecificLD
   sourceSpecificOverfit_nonneg : 0 ≤ sourceSpecificOverfit
   novelUntaggablePhenotype_nonneg : 0 ≤ novelUntaggablePhenotype
+
+/-- **The class is inhabited.**  Without a term of this type every theorem quantified
+over it is a true statement about an empty class: kernel-checked, clean axiom report,
+and no content.  See `scripts/check-laundering.py` family F4. -/
+noncomputable def IrreducibleTargetPenalty.witness : IrreducibleTargetPenalty where
+  brokenTagging := 0
+  ancestrySpecificLD := 0
+  sourceSpecificOverfit := 0
+  novelUntaggablePhenotype := 0
+  brokenTagging_nonneg := le_refl 0
+  ancestrySpecificLD_nonneg := le_refl 0
+  sourceSpecificOverfit_nonneg := le_refl 0
+  novelUntaggablePhenotype_nonneg := le_refl 0
 
 /-- Total additive target-side residual-loss budget. -/
 noncomputable def IrreducibleTargetPenalty.total

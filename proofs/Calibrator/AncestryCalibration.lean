@@ -94,14 +94,15 @@ theorem spline_error_improves_with_knots
     no estimator — the decomposition `MSE = bias² + variance`, which the reading
     calls the real content, is assumed by naming the two summands, not derived.
 
-    The two ordering hypotheses are unused: `h_var_dominates` alone entails the
-    conclusion, by moving one term across the inequality. They are kept because
-    dropping them would leave a statement that no longer looks like the
-    tradeoff it is standing in for, and that mismatch is the point. -/
+    This used to carry two further hypotheses, `bias₂² < bias₁²` and `var₁ < var₂`, which
+    the proof never used — kept, by an earlier note here, so that the statement would still
+    "look like the tradeoff it is standing in for". That is the wrong direction: dressing a
+    weaker fact in the hypotheses of a stronger one makes it *cite* like the stronger one,
+    and a candid docstring does not travel with the name. They are dropped. What remains is
+    the whole of what `linarith` proves, and the gap between this and the bias-variance
+    tradeoff is now visible in the statement rather than described beside it. -/
 theorem sum_lt_sum_of_gap_dominates
     (bias₁ bias₂ var₁ var₂ : ℝ)
-    (h_bias_improves : bias₂ ^ 2 < bias₁ ^ 2)
-    (h_var_worsens : var₁ < var₂)
     (h_var_dominates : var₂ - var₁ > bias₁ ^ 2 - bias₂ ^ 2) :
     bias₁ ^ 2 + var₁ < bias₂ ^ 2 + var₂ := by linarith
 
