@@ -1810,7 +1810,9 @@ it is **absent from this application**.
 **WHERE THE CONTENT RETURNS**, because the Arrow Theorem is empty *here*, not in general:
 
 * **vector-valued observables**, where `Γ(-k) = Γ(k)ᵀ` rather than `Γ(k)`, so the quadrature
-  cross-spectrum is genuinely reversal-odd even in the Gaussian case;
+  cross-spectrum can be genuinely reversal-odd even in the Gaussian case.
+  `EnsembleChannel.threeCycle_crossFeatureArrow_witness` supplies a stationary finite
+  positive control with cross-feature arrow `1/3`;
 * **real scalar non-Gaussian**, where asymmetry appears at third order as the imaginary part
   of the bispectrum — which is filed as *Conjecture A.1*, a "generalization", when for
   scalars it is precisely where the only content lives. -/
@@ -1857,37 +1859,41 @@ theorem reversalOdd_eq_zero_of_real_scalar (k : ℤ) :
 
 end ScalarSecondMoments
 
-/-! ### 14a⁗. THE CEILING COLLAPSES TO THE SUPPORT WALL
+/-! ### 14a⁗. The conditional ceiling model and the support wall
 
 The boxed characterization of the deployment ceiling is
 
 `r⊥ = 0  ⟺  (η > 0) ∧ (reversible ∨ arrow bit)`.
 
-By `reversalOdd_eq_zero_of_real_scalar` the second conjunct is a **tautology** in this
-setting, so the characterization collapses to
+If a named deployment experiment proves this characterization, then
+`reversalOdd_eq_zero_of_real_scalar` makes the second conjunct a tautology in the scalar
+stationary setting, and the characterization collapses to
 
 > **`r⊥ = 0 ⟺ η > 0`**
 
-which is cleaner and strictly stronger than the papers state it.
+The reduction is exact.  The boxed characterization itself is **not** proved by the
+reversal calculation: it requires a separate identifiability theorem showing that positive
+conditional support removes every remaining deployment-blind direction.
 
-**THE BIOLOGICAL CLAIM, and it is the strongest in the arc.** As long as no marker is a
-deterministic function of the others, aggregate deployment risk has **no floor**: it decays to
-zero in source sample size and number of target groups. **The irreducible portability gap is
-not an information-theoretic wall. It is a sample-size problem, provided perfect LD is
-pruned.**
+**THE CONDITIONAL BIOLOGICAL CONSEQUENCE.** In any experiment satisfying that missing
+identifiability theorem, pruning perfect LD removes the information-theoretic floor and
+leaves a sample-size problem.  This must not be quoted for arbitrary PGS deployment merely
+from pairwise `r²`, a positive MAF floor, or the algebraic reversal result.
 
-**THE QUALIFICATION THAT MUST TRAVEL WITH IT: the floor is replaced by a cost, not by
-nothing.** The sealing law contributes `1/(mη²)`, which diverges as pruning becomes
-permissive. The honest form is *a sample-size problem whose constant explodes as you approach
-perfect LD*, and the trade-off is
+Within the same conditional model, the floor is replaced by a cost rather than nothing.
+If the named experiment separately establishes permeability proportional to `η²`, its
+sample term is proportional to `1/(mη²)`, and the trade-off is
 
 `m ≥ d / (2·c₋·η²·R_target)`.
 
-**LD-pruning threshold and cohort diversity are conjugate**, and both are currently set by
-convention in the field rather than by this inequality. -/
+This makes LD-pruning threshold and cohort diversity conjugate **inside the verified support
+model**.  The proportionality constant and the link between biological support and `η`
+must be measured or proved for the assay being designed. -/
 
-/-- The deployment ceiling, with the boxed characterization as a field. -/
-structure DeploymentCeiling where
+/-- A deployment experiment for which the boxed ceiling characterization has been supplied
+as an explicit premise.  This structure records a conditional model; constructing it is the
+unresolved biological identifiability obligation. -/
+structure AssumedDeploymentCeiling where
   /-- Aggregate deployment risk orthogonal to what the source identifies. -/
   perpRisk : ℝ
   /-- The conditional charge floor `η` of §10: `η = 0` is perfect LD. -/
@@ -1899,10 +1905,10 @@ structure DeploymentCeiling where
   /-- **The boxed characterization.** -/
   characterization : perpRisk = 0 ↔ (0 < eta ∧ (reversible ∨ arrowBit))
 
-/-- **THE COLLAPSE.** Since every real scalar stationary family here is reversible, the
-ceiling vanishes exactly when the support wall is clear: `r⊥ = 0 ⟺ η > 0`. No arrow bit is
-required, and none would help. -/
-theorem ceiling_collapses_to_support_wall (C : DeploymentCeiling) (hrev : C.reversible) :
+/-- Under the structure's boxed-characterization premise, scalar reversibility reduces the
+zero-ceiling criterion to positivity of the support floor. -/
+theorem assumedCeiling_collapses_to_support_wall
+    (C : AssumedDeploymentCeiling) (hrev : C.reversible) :
     C.perpRisk = 0 ↔ 0 < C.eta := by
   rw [C.characterization]
   exact ⟨fun h => h.1, fun h => ⟨h, Or.inl hrev⟩⟩
@@ -1911,10 +1917,10 @@ theorem ceiling_collapses_to_support_wall (C : DeploymentCeiling) (hrev : C.reve
 noncomputable def requiredCohorts (d cMinus eta R : ℝ) : ℝ :=
   d / (2 * cMinus * eta ^ 2 * R)
 
-/-- **The cost that replaces the floor.** Permissive pruning — smaller `η` — needs strictly
-more cohorts, and the requirement diverges as `η → 0`. This is why "no floor" must never be
-quoted without "whose constant explodes as you approach perfect LD". -/
-theorem requiredCohorts_diverges_as_eta_shrinks
+/-- **Strict inverse-square monotonicity.** In the conditional cost formula, smaller positive
+`η` requires strictly more cohorts.  A separate limit theorem would be needed to formalize
+divergence as `η → 0`; this result proves the exact finite comparison used by design. -/
+theorem requiredCohorts_strictAnti_eta
     (d cMinus R e₁ e₂ : ℝ) (hd : 0 < d) (hc : 0 < cMinus) (hR : 0 < R)
     (he₁ : 0 < e₁) (hlt : e₁ < e₂) :
     requiredCohorts d cMinus e₂ R < requiredCohorts d cMinus e₁ R := by
@@ -1990,8 +1996,9 @@ theorem two_units_carry_information (m B : ℝ) (hm : 0 < m) (hB : 0 < B)
 
 end AssumedMembraneThreshold
 
-/-! The binary orientation experiment now supplies one fully derived instance of this design
-logic. `EnsembleChannel.binaryOrientation_orderFree_mean` proves that **every** order-free
+/-! The binary orientation experiment supplies one fully derived **directed-transition
+positive control** for this design logic. `EnsembleChannel.binaryOrientation_orderFree_mean`
+proves that **every** order-free
 readout has mean independent of the forward/reverse imbalance `θ`, while
 `binaryOrientation_arrow_mean` gives the ordered determinant mean `θ` and
 `binaryOrientationArrowVariance_pos` gives variance `1 - θ² > 0` for `|θ| < 1`.
@@ -1999,11 +2006,13 @@ readout has mean independent of the forward/reverse imbalance `θ`, while
 law `p(θ) = 1/(1-θ²)`, with one information unit at the reversible center and `m`-pair
 information `m/(1-θ²)`. `binaryOrientationArrowAssay_moreEfficient_iff` then gives the
 fixed-budget assay rule: retain the ordered transition exactly when this arrow information
-per added cost exceeds the baseline design's information per cost.  This is the first
-non-Gaussian, direction-sensitive permeability calculation in the strand.  It says exactly
-what a deployment study can buy by retaining an oriented adjacent haplotype/ancestry
-transition; extension to a multistate chain still requires its transition law and noise
-covariance. -/
+per added cost exceeds the baseline design's information per cost.
+`threeCycle_crossFeatureArrow_witness` realizes a nonzero arrow in a stationary
+two-annotation process, and `threeCycleOrientationArrowPermeability_eq_binary` proves that
+its `1/3` coding scale leaves the information law unchanged.  These theorems apply when the
+assay has a genuine directional label—multiple feature channels, parent-of-origin,
+longitudinal state, or a non-Gaussian higher-order transition.  They do **not** assign an
+arrow to ordinary real scalar LD merely because loci have a reference-coordinate order. -/
 
 /-! ### 14b. Per-target invisibility and compound prediction
 
@@ -2276,8 +2285,9 @@ separates quotient fibres remains the continuation. -/
   two-orientation binary transition model, all order-free means are independent of `θ`, the
   ordered arrow has response one and variance `1-θ²`, and its permeability is exactly
   `1/(1-θ²)`. This validates the one-versus-two-unit design threshold for that named model.
-  It does not prove a universal one-bit completion theorem for arbitrary non-reversible LD
-  or ancestry processes.
+  The stationary three-cycle witness proves that such an arrow can occur for multiple
+  feature channels without contradicting scalar autocovariance symmetry. It does not prove
+  a universal one-bit completion theorem or make ordinary scalar LD directional.
 
 * **Permeability is experiment-specific, not a universal cumulant slogan.**
   `Permeability.covarianceScoreInformation_gaussian` now derives

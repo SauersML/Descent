@@ -199,6 +199,46 @@ theorem binaryOrientationArrowVariance_pos {θ : ℝ} (hθ : |θ| < 1) :
   have hbounds := abs_lt.mp hθ
   nlinarith
 
+/-! ### A nonvacuous vector-valued stationary-cycle witness
+
+Real scalar stationary second moments are automatically reversal-even.  A genuine
+second-order arrow first appears for multiple annotations, because reversing lag transposes
+the cross-moment matrix rather than fixing each off-diagonal entry.  The following uniform
+three-state cycle is the smallest explicit positive control.
+-/
+
+/-- First annotation on a three-state cycle: present only in state `0`. -/
+noncomputable def threeCycleFeatureA (i : Fin 3) : ℝ := if i.val = 0 then 1 else 0
+
+/-- Second annotation on a three-state cycle: present only in state `1`. -/
+noncomputable def threeCycleFeatureB (i : Fin 3) : ℝ := if i.val = 1 then 1 else 0
+
+/-- Uniform lag-one cross moment along the deterministic cycle `0 → 1 → 2 → 0`.
+Choosing the initial phase uniformly makes this a stationary finite process. -/
+noncomputable def threeCycleForwardCrossMoment
+    (f g : Fin 3 → ℝ) : ℝ :=
+  (f 0 * g 1 + f 1 * g 2 + f 2 * g 0) / 3
+
+/-- Reversal-odd off-diagonal component of the lag-one cross-moment matrix. -/
+noncomputable def threeCycleCrossFeatureArrow (f g : Fin 3 → ℝ) : ℝ :=
+  threeCycleForwardCrossMoment f g - threeCycleForwardCrossMoment g f
+
+/-- Swapping the two feature channels negates the cross-feature arrow. -/
+theorem threeCycleCrossFeatureArrow_swap (f g : Fin 3 → ℝ) :
+    threeCycleCrossFeatureArrow g f = -threeCycleCrossFeatureArrow f g := by
+  unfold threeCycleCrossFeatureArrow
+  ring
+
+/-- **Nonvacuity witness.** On the uniform three-state cycle, the forward `A → B`
+cross moment is `1/3`, the reverse `B → A` moment is zero, and the resulting arrow is
+`1/3`.  Thus stationarity does not kill vector-valued reversal asymmetry. -/
+theorem threeCycle_crossFeatureArrow_witness :
+    threeCycleForwardCrossMoment threeCycleFeatureA threeCycleFeatureB = 1 / 3 ∧
+      threeCycleForwardCrossMoment threeCycleFeatureB threeCycleFeatureA = 0 ∧
+      threeCycleCrossFeatureArrow threeCycleFeatureA threeCycleFeatureB = 1 / 3 := by
+  norm_num [threeCycleForwardCrossMoment, threeCycleCrossFeatureArrow,
+    threeCycleFeatureA, threeCycleFeatureB]
+
 /-- Total squared deployment loss for a scalar spectral coordinate across a finite target
 ensemble. The vector-valued/bandwise identity follows by summing this theorem by band. -/
 noncomputable def ensembleSquaredLoss {ι : Type*} [Fintype ι]

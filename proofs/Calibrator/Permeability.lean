@@ -23,11 +23,14 @@ and fourth moments, including its exact information--variance constant. No CLT-t
 transfer, Edgeworth hierarchy, universal support-floor model, or general minimax constant
 is asserted. Those require a separately named experiment and uniform regularity.
 
-The module also contains one exact direction-sensitive completion: the two-orientation
+The module also contains one exact direction-sensitive channel: the two-orientation
 binary transition experiment from `EnsembleChannel`.  Every order-free readout collapses
 the two orientations, while the ordered arrow has unit response, variance `1-θ²`, and
 per-pair permeability `1/(1-θ²)`.  This supplies a concrete haplotype/ancestry-transition
-assay law without promoting it to a theorem about arbitrary non-reversible chains.
+positive control when orientation has biological meaning (for example parent-of-origin,
+multiple feature channels, or longitudinal state).  Ordinary real scalar LD is
+second-order reversal-even, so the calculation is not promoted to a theorem about arbitrary
+genomic chains.
 -/
 
 open scoped BigOperators
@@ -98,6 +101,15 @@ the tangent with reciprocal-variance information `Γ²/V`. -/
 noncomputable def momentPermeability (response noiseVariance : ℝ) : ℝ :=
   response ^ 2 / noiseVariance
 
+/-- Rescaling a scalar moment and its response by the same nonzero factor leaves
+permeability unchanged: response squares and noise variance scale together. -/
+theorem momentPermeability_scale
+    (response noiseVariance scale : ℝ) (hscale : scale ≠ 0) :
+    momentPermeability (scale * response) (scale ^ 2 * noiseVariance) =
+      momentPermeability response noiseVariance := by
+  unfold momentPermeability
+  field_simp [hscale]
+
 /-- **Permeability of the named covariance-moment experiment.**  A centered-square
 summary has noise variance `Var(X²)` and response `Γ`, so its local signal-to-noise
 information is `Γ² / Var(X²)`.
@@ -151,6 +163,22 @@ theorem totalBinaryOrientationArrowPermeability_eq (m θ : ℝ) :
   rw [totalBinaryOrientationArrowPermeability,
     binaryOrientationArrowPermeability_eq]
   ring
+
+/-- Permeability of the vector-valued three-cycle arrow witness.  Its observed arrow is
+the binary orientation sign scaled by `1/3`, so its mean response is `1/3` and its variance
+is `(1-θ²)/9`. -/
+noncomputable def threeCycleOrientationArrowPermeability (θ : ℝ) : ℝ :=
+  momentPermeability (1 / 3) ((1 / 3 : ℝ) ^ 2 * (1 - θ ^ 2))
+
+/-- The three-cycle vector witness carries exactly the same orientation information as the
+unit-scaled binary arrow.  This is coding-scale invariance, not an additional information
+source. -/
+theorem threeCycleOrientationArrowPermeability_eq_binary (θ : ℝ) :
+    threeCycleOrientationArrowPermeability θ =
+      binaryOrientationArrowPermeability θ := by
+  unfold threeCycleOrientationArrowPermeability binaryOrientationArrowPermeability
+  simpa [binaryOrientationArrowVariance] using
+    (momentPermeability_scale 1 (1 - θ ^ 2) (1 / 3) (by norm_num))
 
 /-- The covariance-moment permeability of a Gaussian coordinate is exactly the scalar
 Gaussian permeability already used by the completed-channel theory. -/
