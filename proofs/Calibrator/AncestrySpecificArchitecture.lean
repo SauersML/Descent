@@ -284,21 +284,22 @@ theorem gene_shared_variants_specific
   rw [div_lt_one (by linarith)]
   linarith
 
-/-- **Conditional analysis reveals heterogeneity.**
-    Running conditional analysis (adjusting for lead SNP)
-    may reveal secondary signals. If secondary signals are
-    population-specific, this indicates allelic heterogeneity.
+/-- **Inclusion-exclusion on signal counts.**
+    Model: each population has `n_signals` independent signals at a locus, of
+    which `n_shared` are shared, so the union of distinct signals is
+    `n_eur + n_afr - n_shared`.
 
-    Model: each population has n_signals total independent signals
-    at a locus, of which n_shared are shared. The population-specific
-    signal count is n_signals - n_shared.
+    What is proved is that the union is at least as large as either population's
+    count. `≤`, not `<`: when one population's signals are all shared
+    (`n_afr = n_shared`) the union equals `n_eur` exactly, so "exceeds" would be
+    false. `omega` on three naturals.
 
-    Derived: when both populations have signals and some are shared
-    (0 < n_shared ≤ min(n_eur, n_afr)), the union of distinct signals
-    (n_eur + n_afr - n_shared) exceeds each population's count alone,
-    proving that conditional analysis in either population alone
-    cannot discover all causal variants at this locus. -/
-theorem conditional_reveals_heterogeneity
+    What is **not** proved, and what an earlier docstring claimed: that
+    conditional analysis in one population cannot discover all causal variants.
+    No analysis, no discovery, and no conditioning appears in the statement —
+    only counts. Whether a population-specific signal count is evidence of
+    allelic heterogeneity is a modelling claim this theorem does not reach. -/
+theorem signal_union_ge_each_population_count
     (n_signals_eur n_signals_afr n_shared : ℕ)
     (h_eur : 0 < n_signals_eur) (h_afr : 0 < n_signals_afr)
     (h_some_shared : 0 < n_shared)

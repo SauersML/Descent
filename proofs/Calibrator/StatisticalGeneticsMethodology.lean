@@ -332,7 +332,12 @@ theorem ldsc_se_decreases_with_n
   · exact Real.sqrt_pos.mpr h_n₁
   · exact Real.sqrt_lt_sqrt (le_of_lt h_n₁) h_more
 
-/-- **Constrained intercept LDSC — DOCSTRING OVERCLAIMS; this theorem is `k < k+1`.**
+/-- **`k` parameters cost less than `k+1`, at any positive per-parameter price.**
+
+    The name used to be `constrained_intercept_more_powerful`, which is the LDSC
+    claim this arithmetic was standing in for. The claim is not proved here and
+    the name is gone; what follows is the record of what the theorem does and
+    does not reach.
 
     The statement contains no standard error. `se_per_param` is a variable name, not a
     quantity the theorem constrains, so what is proved is that `k` parameters cost less than
@@ -348,7 +353,7 @@ theorem ldsc_se_decreases_with_n
     Empirical status: theorem **PROVED** and trivial; the SE reading is **UNDERPOWERED**
     (6/7 arms, unweighted OLS without jackknife) and the no-overlap premise is
     **unverifiable from summary statistics** (`proofs/validation/ldsc_diff/`). -/
-theorem constrained_intercept_more_powerful
+theorem cost_of_k_params_lt_cost_of_k_succ
     (se_per_param : ℝ) (k : ℕ)
     (h_se : 0 < se_per_param) :
     se_per_param * k < se_per_param * (k + 1) := by

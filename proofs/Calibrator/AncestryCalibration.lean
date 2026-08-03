@@ -80,33 +80,37 @@ theorem spline_error_improves_with_knots
   apply pow_lt_pow_left₀ h_finer (le_of_lt h_pos)
   norm_num
 
-/-- **Bias-variance tradeoff in spline calibration.**
-    More knots → less bias (better approximation)
-    More knots → more variance (overfitting)
-    Optimal: minimize bias² + variance = MSE.
+/-- **A rearrangement: `var₂ - var₁ > bias₁² - bias₂²` gives
+    `bias₁² + var₁ < bias₂² + var₂`.**
 
-    Model: MSE(k knots) = bias(k)² + var(k).
-    Config 1 (fewer knots): higher bias, lower variance.
-    Config 2 (more knots): lower bias, higher variance.
+    The genetics reading is the bias-variance tradeoff for spline knot count:
+    more knots lower the bias and raise the variance, and the sum is what
+    matters. None of that is here. There are no knots, no splines, no MSE and
+    no estimator — the decomposition `MSE = bias² + variance`, which the reading
+    calls the real content, is assumed by naming the two summands, not derived.
 
-    Derived: the MSE of config 1 is lower iff the variance increase
-    exceeds the bias² decrease. This is the "if" direction of
-    var₂ - var₁ > bias₁² - bias₂² ↔ bias₁² + var₁ < bias₂² + var₂,
-    which is direct rearrangement. The real content is the model
-    decomposition MSE = bias² + variance. -/
-theorem bias_variance_tradeoff
+    The two ordering hypotheses are unused: `h_var_dominates` alone entails the
+    conclusion, by moving one term across the inequality. They are kept because
+    dropping them would leave a statement that no longer looks like the
+    tradeoff it is standing in for, and that mismatch is the point. -/
+theorem sum_lt_sum_of_gap_dominates
     (bias₁ bias₂ var₁ var₂ : ℝ)
     (h_bias_improves : bias₂ ^ 2 < bias₁ ^ 2)
     (h_var_worsens : var₁ < var₂)
     (h_var_dominates : var₂ - var₁ > bias₁ ^ 2 - bias₂ ^ 2) :
     bias₁ ^ 2 + var₁ < bias₂ ^ 2 + var₂ := by linarith
 
-/-- **Spline R² is bounded by the signal-to-noise ratio.**
-    R²_spline ≤ Var(E[ε²|d]) / Var(ε²).
+/-- **A nonnegative part of a positive total is at most the whole of it:**
+    `var_signal / var_total ≤ 1` when `var_total = var_signal + var_noise` with
+    both parts nonnegative.
 
-    Worked example: Wang et al. find R² = 0.51% for height, illustrating
-    that very little signal is explained by the spline. -/
-theorem spline_r2_upper_bound
+    Not what an earlier docstring claimed. It stated
+    `R²_spline ≤ Var(E[ε²|d]) / Var(ε²)`, a bound relating a fitted `R²` to a
+    conditional-variance ratio; no conditional variance, no spline and no `R²`
+    occurs below, and the two claims are not the same inequality. The worked
+    example it cited (`R² = 0.51%` for height, Wang et al.) is a measurement
+    about a fitted model and is not an instance of this statement. -/
+theorem part_div_total_le_one
     (var_signal var_noise var_total : ℝ)
     (h_total : var_total = var_signal + var_noise)
     (h_total_pos : 0 < var_total)
@@ -215,11 +219,26 @@ distributions across populations, affecting portability.
 
 section PhenotypeHeterogeneity
 
-/-- **Measurement invariance violation.**
-    If the phenotype Y is measured with different scales or thresholds
-    across populations, R² comparisons are invalid. -/
+/-- **Rescaling the phenotype changes `R²` in the additive-noise chart, unless `R² = 1`.**
+
+    In the chart `r2 ↦ r2·s² / (r2·s² + (1 - r2))`, which is the `R²` of the same
+    predictor after the phenotype is multiplied by `s` with the noise variance held at
+    `1 - r2`, no positive `s ≠ 1` fixes an `R²` in `(0, 1)`.
+
+    **`r2₂` was a phantom parameter and has been removed.** The theorem took a second `R²`
+    that occurs nowhere in its statement, its hypotheses, or its proof. With `r2₂` in the
+    signature the result read as a comparison between two populations' `R²` values — which
+    is what "measurement invariance" means — while everything proved concerns one `R²` and
+    one scale factor. Nothing here compares populations, and nothing here shows that `R²`
+    comparisons across populations are invalid; that was the docstring's claim and it does
+    not follow from a one-population rescaling identity. What follows is that `R²` is not
+    invariant to the units of `Y`, which is a necessary ingredient of such an argument and
+    not the argument.
+
+    The unit-scale exclusion is genuinely needed in both directions: `h_scale` rules out
+    `s = 1`, and `h_scale_pos` rules out `s = -1`, which also satisfies `s² = 1`. -/
 theorem measurement_invariance_violation
-    (r2₁ r2₂ : ℝ) (scale : ℝ)
+    (r2₁ : ℝ) (scale : ℝ)
     (h_scale : scale ≠ 1) (h_scale_pos : 0 < scale)
     (h_r2₁ : 0 < r2₁) (h_r2₁_le : r2₁ ≤ 1) :
     -- Scaling the phenotype changes R² when there's additive noise

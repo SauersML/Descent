@@ -118,14 +118,18 @@ and can improve portability.
 
 section BurdenTests
 
-/-- **Gene-level scores are more portable than variant-level.**
-    Even if specific rare variants differ, the gene-level burden
-    may be similar across populations. If variant sharing rate is s < 1
-    and there are k variants per gene with independent presence/absence,
-    the probability that at least one variant is shared is 1-(1-s)^k > s
-    for k ≥ 2. The gene-level signal is preserved whenever any variant
-    in the gene is present. -/
-theorem gene_level_more_portable
+/-- **At least one of `k` shares beats one share**, for `k ≥ 2`:
+    `s < 1 - (1-s)^k` whenever `0 < s < 1`.
+
+    The motivating reading is that if each of `k` variants in a gene is shared
+    across populations independently with rate `s`, a gene-level burden survives
+    when any one of them is shared. That reading is prose: no gene, no burden,
+    no population and no independence assumption appears below. The statement is
+    the inequality on two reals and a natural, and `nlinarith` proves it. Whether
+    the sharing events are independent — the assumption that makes
+    `1 - (1-s)^k` the right probability — is exactly what a portability claim
+    would have to establish, and it is assumed away by writing the expression. -/
+theorem gene_level_share_gt_single_share
     (s : ℝ) (k : ℕ)
     (h_s_pos : 0 < s) (h_s_lt : s < 1)
     (h_k : 2 ≤ k) :
@@ -135,22 +139,17 @@ theorem gene_level_more_portable
   have h_expand : (1 - s) ^ 2 = 1 - 2 * s + s ^ 2 := by ring
   nlinarith [sq_nonneg s]
 
-/-- **Functional equivalence across populations aids portability.**
-    If k variants in a gene have equivalent functional effects (each
-    with effect size β), then the gene-level burden score has variance
-    k·β² in each population. Even if the specific variants differ
-    completely between populations, the burden scores are both drawn
-    from distributions with the same mean and variance.
+/-- **`β² < k·β²` for `k ≥ 2` and `β ≠ 0`.**
 
-    We model this: pop A has k_A variants, pop B has k_B variants,
-    all with effect β. The cross-population correlation of gene
-    burden depends on √(k_A · k_B) / max(k_A, k_B), which increases
-    when variants are functionally equivalent (because both k_A and
-    k_B contribute to the same gene signal).
-
-    Here we prove the core algebraic fact: the gene-level variance
-    (k · β²) exceeds single-variant variance (β²) when k ≥ 2. -/
-theorem functional_equivalence_aids_portability
+    Read as genetics: if `k` variants in a gene carry the same effect `β` and
+    contribute additively, gene-level burden variance `k·β²` exceeds
+    single-variant variance `β²`. Nothing below carries that reading. There is
+    no gene, no burden, no second population, and in particular no
+    cross-population correlation — the `√(k_A·k_B)/max(k_A,k_B)` quantity an
+    earlier docstring described as the object of interest never appears, here or
+    anywhere else in the corpus. What is proved is that multiplying a positive
+    number by something larger than one increases it. -/
+theorem sq_lt_nsmul_sq_of_two_le
     (β : ℝ) (k : ℕ)
     (h_β : β ≠ 0)
     (h_k : 2 ≤ k) :
@@ -162,13 +161,15 @@ theorem functional_equivalence_aids_portability
   linarith [mul_lt_mul_of_pos_right h_k_real h_β2]
 
 
-/-- **SKAT (sequence kernel association test) handles bidirectional effects.**
-    Unlike burden tests, SKAT allows variants to have different
-    directions of effect within a gene. When effects cancel in a burden
-    test (positive and negative effects sum to ~0), the burden signal
-    is lost. The variance-based SKAT statistic Σβᵢ² captures signal
-    regardless of sign. -/
-theorem skat_handles_bidirectional
+/-- **Two opposite nonzero effects: the sum vanishes and the sum of squares does
+    not.** `(β₁+β₂)² < β₁² + β₂²` when `β₁ + β₂ = 0` and `β₁ ≠ 0`.
+
+    This is the two-variant shape of the reason a variance statistic sees signal
+    a burden statistic cancels away. It is not a theorem about SKAT: no kernel,
+    no test statistic, no null distribution and no power comparison appears
+    below, and nothing here says the variance statistic *detects* anything. Two
+    reals summing to zero, one of them nonzero. -/
+theorem sq_sum_lt_sum_sq_of_opposite
     (β₁ β₂ : ℝ)
     (h_opposite : β₁ + β₂ = 0)
     (h_nonzero : β₁ ≠ 0) :
