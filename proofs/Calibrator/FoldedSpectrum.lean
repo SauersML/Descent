@@ -1669,11 +1669,17 @@ when estimator noise separates quotient fibres is the continuation, not a theore
 
 * **Permeability is proved only for the Gaussian covariance experiment.**
   `Permeability.scalarPermeability` formalizes `p = (1/2)(Γ/Σ)²`, proves coding-scale
-  invariance and additivity over independent channels, and supplies the completion-count
-  lower bound. `scalarPermeability_derivative_scale` proves the conditional sealing law:
-  if a named support or tagging mechanism attenuates `Γ` linearly by `η`, then
-  permeability is attenuated by `η²`. It does not prove that every biological support
-  floor enters `Γ` that way. A vanishing first derivative is not an absolute wall:
+  invariance and additivity over independent channels, and supplies both the
+  completion-count lower bound and a constructive finite-dimensional criterion:
+  selected lag summaries complete a deployment family when their sensitivity matrix is
+  nonsingular. `firstTwoLags_complete_geometric_dependence` verifies the criterion for
+  the biological workhorse `γ(k)=Aρ^k`: lag zero and lag one identify covariance amplitude
+  and persistence whenever `A ≠ 0`. `scalarPermeability_derivative_scale` and
+  `inverse_square_replicates_compensate_attenuation` prove the conditional sealing/design
+  law: if a named support or tagging mechanism attenuates `Γ` linearly by `η`, permeability
+  is attenuated by `η²` and equal information requires `1/η²` as many estimator draws. It
+  does not prove that every biological support floor enters `Γ` that way. A vanishing
+  first derivative is not an absolute wall:
   `quadraticChannel_deriv_zero` and `quadraticChannel_visible_away_from_zero` give the exact
   counterexample. Edgeworth completion, persistent-resonance-to-symmetry collapse, a
   universal support-floor law, and the closing aggregate-risk constants remain open.
