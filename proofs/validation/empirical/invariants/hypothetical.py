@@ -35,9 +35,9 @@ the docstring is ahead of the mathematics.
 The output is ranked by how much of the statement sits in the hypotheses, since
 that is the quantity that decides how much a conditional is really claiming.
 
-Run:  python3 proofs/validation/invariants/hypothetical.py
-      python3 proofs/validation/invariants/hypothetical.py --json
-      python3 proofs/validation/invariants/hypothetical.py --min-score 3
+Run:  python3 proofs/validation/empirical/invariants/hypothetical.py
+      python3 proofs/validation/empirical/invariants/hypothetical.py --json
+      python3 proofs/validation/empirical/invariants/hypothetical.py --min-score 3
 """
 
 from __future__ import annotations

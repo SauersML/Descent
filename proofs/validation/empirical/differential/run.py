@@ -248,7 +248,7 @@ def main() -> int:
         },
         "corpus_stamp": corpus.api.stamp(),
         "extraction": {
-            "primary_source": "proofs/validation/extract/api.py",
+            "primary_source": "proofs/validation/empirical/extract/api.py",
             "n_callables": len(D),
             "n_unavailable": len(unavailable),
             "unavailable": unavailable,

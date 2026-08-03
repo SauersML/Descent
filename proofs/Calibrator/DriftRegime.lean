@@ -71,7 +71,7 @@ are indistinguishable, so no symmetric grid can ever separate them.
 
 The obligation this creates: a docstring claiming an empirical status of `VALIDATED` must
 record the spread of the predicted quantity across the design, in a `Power:` clause.
-`scripts/check-identifications.py` now enforces it.
+`proofs/validation/code/check.py` now enforces it.
 -/
 
 open scoped BigOperators
@@ -305,7 +305,7 @@ is every power of it.
     need fixing; the form does not.
 
     Empirical status: **VALIDATED as a functional form** (`-0.003%`), VACUOUS as a
-    prediction. See `proofs/validation/drift_diff/`. -/
+    prediction. See `proofs/validation/empirical/drift_diff/`. -/
 noncomputable def benchmarkRatio (fstS fstT : ℝ) : ℝ := (1 - fstT) / (1 - fstS)
 
 /-- A deliberately wrong rival: the same ratio squared. Any design that cannot separate
@@ -316,7 +316,7 @@ these two has no power to check the functional form.
     `symmetric_design_has_no_power` observed, with a `3.1×` dynamic range.
 
     Empirical status: **VALIDATED as a discriminating rival**
-    (`proofs/validation/drift_diff/`). -/
+    (`proofs/validation/empirical/drift_diff/`). -/
 noncomputable def benchmarkRatioSquared (fstS fstT : ℝ) : ℝ := ((1 - fstT) / (1 - fstS)) ^ 2
 
 /-- What a **symmetric** design observes: the two branch lengths are equal, so only the
@@ -386,7 +386,7 @@ mechanically checkable, and each is now checked.
    assumption about the data-generating process (closed population, no mutation,
    infinite sites, demographic equilibrium) must name that assumption. Section 1
    exhibits the two regimes that were conflated and proves they disagree at every
-   positive time. `scripts/check-identifications.py` guard 3i requires a `Regime:` line
+   positive time. `proofs/validation/code/check.py` guard 3i requires a `Regime:` line
    on any definition whose body is a drift-style recurrence.
 
 2. **A cross-check is not a measurement.** Over-determination detects divergence between

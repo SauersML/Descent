@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Bring the symbolic tier's artifacts back from the cluster.
 #
-#   bash proofs/validation/symbolic/fetch_results.sh
+#   bash proofs/validation/empirical/symbolic/fetch_results.sh
 #
 # WHY THIS EXISTS. Generated artifacts are gitignored and live at a shared path
 # OUTSIDE any working tree, so no git command can reach them -- which protects

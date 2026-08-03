@@ -792,7 +792,7 @@ section BottleneckLDExcess
     process demonstrably saturates (`driftLDEquilibrium_le_one`).
 
     Empirical status: **DISAGREES WITH AN EXISTING MEASUREMENT**, direction unresolved
-    (`validation/differential/cluster/fam_ld_decay.py`, `proofs/validation/coalescent_diff/`). -/
+    (`validation/differential/cluster/fam_ld_decay.py`, `proofs/validation/empirical/coalescent_diff/`). -/
 noncomputable def excessLDAfterBottleneck (N_b N_r c : ℝ) (t_b t_r : ℕ) : ℝ :=
   driftLDTrajectory N_r c
       (driftLDTrajectory N_b c (driftLDEquilibrium N_r c) t_b) t_r -
@@ -959,7 +959,7 @@ section ExpansionLD
     An identical twin carries the same reading at `DemographicHistory.driftLDCreationRate`.
 
     Empirical status: body **DERIVED** as a drift rate; the fraction-lost reading
-    **FALSIFIED** (`proofs/validation/coalescent_diff/`).
+    **FALSIFIED** (`proofs/validation/empirical/coalescent_diff/`).
 
     Denotes: a per-generation rate. Other definitions share this formula under names from a
     different concept family; the formula does not fix which is meant. -/

@@ -73,7 +73,7 @@ and the drift diverges as `q → 0` at exactly that rate. The mechanism is the
 moment at a diverging log-value. It is *not* the rare homozygote: that has a large
 standardized value `≈ sqrt (2/q)` but contributes only
 `q^2 * (2/q) * log (2/q) ≈ 2q log (1/q) → 0`. Numerically (see
-`proofs/validation/condensation/check_condensation.py`, which recomputes all of this
+`proofs/validation/empirical/condensation/check_condensation.py`, which recomputes all of this
 by direct summation over the three genotypes):
 
 | alt-allele frequency `q` | `c(q)`  | safe order at `N = 10^6` |
@@ -207,7 +207,7 @@ diagnostic determines it.
 Empirical status: DERIVED from `HardyWeinbergModel.genotypeProb` and
 `HardyWeinbergModel.standardizedSquare` by direct summation over the three
 genotypes; no free parameter and nothing fitted. Recomputed independently by
-`proofs/validation/condensation/check_condensation.py`, which evaluates this sum
+`proofs/validation/empirical/condensation/check_condensation.py`, which evaluates this sum
 numerically and checks it against `hweMellinDrift` across the frequency
 spectrum. -/
 noncomputable def mellinDrift (h : HardyWeinbergModel) : ℝ :=
@@ -222,7 +222,7 @@ alternative-allele frequency.
 Empirical status: DERIVED. Equal to `HardyWeinbergModel.mellinDrift` by
 `HardyWeinbergModel.mellinDrift_eq`, which is a proof, not a fit; the two are
 also checked against each other numerically across the frequency spectrum by
-`proofs/validation/condensation/check_condensation.py`. No free parameter. -/
+`proofs/validation/empirical/condensation/check_condensation.py`. No free parameter. -/
 noncomputable def hweMellinDrift (q : ℝ) : ℝ :=
   (1 - 2 * q) ^ 2 * Real.log ((1 - 2 * q) ^ 2 / (2 * q * (1 - q))) +
     4 * q * (1 - q) * Real.log 2
@@ -664,7 +664,7 @@ safe order `33.22` vs `33.2`); at `m = 1` the genotype and surrogate laws are in
 `additive_score_is_subcritical`.
 
 Empirical status: **FALSIFIED on the common-variant column and on the condensation
-direction; VALIDATED on the rare-variant tail** (`proofs/validation/safe_order/`). Scope: HWE,
+direction; VALIDATED on the rare-variant tail** (`proofs/validation/empirical/safe_order/`). Scope: HWE,
 unlinked loci, disjoint monomials as defined — no LD, no real genotypes, no structure. -/
 noncomputable def maxSafeEpistaticOrder (N q : ℝ) : ℝ :=
   Real.log N / hweMellinDrift q
@@ -1303,7 +1303,7 @@ exactly which two of the four this file establishes and which two it assumes.
 Empirical status: DERIVED in its first two components, from `hweMellinDrift` and
 `hweMellinJetVariance`, both of which are proved equal to direct sums over the three
 genotypes and recomputed numerically by
-`proofs/validation/condensation/check_condensation.py`. The third and fourth components
+`proofs/validation/empirical/condensation/check_condensation.py`. The third and fourth components
 are inputs, not claims. No free parameter. -/
 noncomputable def hweCodingInvariants (h : HardyWeinbergModel)
     (arithmeticType : LatticeDatum) (squareCumulant : ℕ → ℝ) : CodingInvariants where

@@ -176,7 +176,7 @@ This is the missing-parameter class: no allele frequency appears in the signatur
 constant repairs it. The same defect falsifies `ridgeBalance`. The expression `1/SE²` is a
 correct inverse-variance meta-analysis **weight**, and where a weight is wanted
 `fixed_weights` below is the declaration that says so. Measured in
-`proofs/validation/popgen_diff2/`.
+`proofs/validation/empirical/popgen_diff2/`.
 
 `effectiveSampleSizeFromSE` is the sample size. -/
 
@@ -184,7 +184,7 @@ correct inverse-variance meta-analysis **weight**, and where a weight is wanted
 
     `n_eff = 1/(SE² · 2p(1-p))` for a standardized trait. Recovers the true `n` to about 1%
     across allele frequencies from 0.5 down to 0.01, where `1/SE²` alone understates
-    it by 50% at `p = 0.5` and by 98% at `p = 0.01` (`proofs/validation/popgen_diff2/`).
+    it by 50% at `p = 0.5` and by 98% at `p = 0.01` (`proofs/validation/empirical/popgen_diff2/`).
 
     **Scope caveat:** it overstates `N` for large-effect SNPs, by `+27%` at `h²_snp = 0.10` and
     `+64%` at `0.20`. The derivation assumes the SNP explains a negligible share of variance,
@@ -192,7 +192,7 @@ correct inverse-variance meta-analysis **weight**, and where a weight is wanted
     `0.9965, 1.0065, 1.0966, 1.0283`.
 
     Empirical status: **VALIDATED at small effect**, biased upward at large effect
-    (`proofs/validation/ldsc_diff/`). -/
+    (`proofs/validation/empirical/ldsc_diff/`). -/
 noncomputable def effectiveSampleSizeFromSE (se p : ℝ) : ℝ :=
   1 / (se ^ 2 * (2 * p * (1 - p)))
 
@@ -365,7 +365,7 @@ theorem ldsc_se_decreases_with_n
 
     Empirical status: theorem **PROVED** and trivial; the SE reading is **UNDERPOWERED**
     (6/7 arms, unweighted OLS without jackknife) and the no-overlap premise is
-    **unverifiable from summary statistics** (`proofs/validation/ldsc_diff/`). -/
+    **unverifiable from summary statistics** (`proofs/validation/empirical/ldsc_diff/`). -/
 theorem cost_of_k_params_lt_cost_of_k_succ
     (se_per_param : ℝ) (k : ℕ)
     (h_se : 0 < se_per_param) :

@@ -20,7 +20,7 @@ is a **recurrence** and not a closed form.
 
 ## What was measured
 
-`proofs/validation/differential/cluster/fam_serial_founder.py` solves the demography of
+`proofs/validation/empirical/differential/cluster/fam_serial_founder.py` solves the demography of
 `gen_real_pt.py::dem_serial1d` exactly, as a piecewise-constant structured coalescent on a
 56-state pair chain — no simulation, no fitted quantity. For `D = 10`, `N = 3000`,
 `N_anc = 10000`, `m = 1e-3`, `splitStep = 400`, `T0 = 200`:

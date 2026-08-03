@@ -513,7 +513,7 @@ is `0 < α < 2ρ`, so **over-estimating `λ` is always safe** and under-estimati
 true one strictly beats not adapting, at every horizon, whatever the true rate is. The
 threshold does not survive a badly estimated `λ`; the damping does.
 
-Empirical status: **VALIDATED** (`proofs/validation/tau_c/`). Untested: non-reversible
+Empirical status: **VALIDATED** (`proofs/validation/empirical/tau_c/`). Untested: non-reversible
 couplings, value functionals not linear-quadratic in the metric that diagonalises `L`,
 non-stationary environments, and continuum spectral measures. -/
 

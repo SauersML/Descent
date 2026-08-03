@@ -60,7 +60,7 @@ Usage:
     python3 validation/extract/coverage_v2.py [--json out.json] [--verbose]
 """
 
-# REGENERATE WITH:  python3 proofs/validation/extract/coverage_v2.py
+# REGENERATE WITH:  python3 proofs/validation/empirical/extract/coverage_v2.py
 #
 # This produces classes.json and coverage.json, which are NOT IN GIT.
 # They are generated from proofs/Calibrator/, which changes every few

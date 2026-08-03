@@ -1,6 +1,6 @@
 """Cross-validate two independent Lean->Python extractions of the same corpus.
 
-`leanexpr.py` (this directory) and `proofs/validation/extract/api.py` were
+`leanexpr.py` (this directory) and `proofs/validation/empirical/extract/api.py` were
 written separately from the same Lean sources.  Neither is authoritative.  If
 they agree on a definition at every point a check evaluates, a transcription
 error would have to be the SAME error in both, which is a far stronger

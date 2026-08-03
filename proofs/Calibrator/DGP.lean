@@ -49,9 +49,10 @@ noncomputable def scaledMigrationRate (Ne m : ℝ) : ℝ :=
 
 /-- **Identity fraction at a scaled rate**, `1 / (1 + θ)`.
 
-Not stipulated: `fstMutationDriftEquilibrium_isFixedPoint` derives it as the rest point of
-`scaledIdentityStep` at scaled rate `θ`. Two structure accessors used to write the quotient
-out again for their own `theta`, for the same import reason as the scaled rates.
+Not stipulated: `PopulationGeneticsFoundations.fstMutationDriftEquilibrium_isFixedPoint`
+derives it as the rest point of `scaledIdentityStep` at scaled rate `θ`. That theorem lives
+in another module, so a guard looking for a fixed-point result beside the definition will
+not find it.
 
     Empirical status: UNTESTED. -/
 noncomputable def fstMutationDriftEquilibrium (θ : ℝ) : ℝ :=
@@ -1911,7 +1912,7 @@ not see docstrings — a third instance left an orphaned doc comment above the
 (That sentence originally quoted the doc-comment opener literally. Lean nests
 block comments, so the quoted opener opened one, the closer below shut only
 that, and this note left its own module unterminated — the failure
-`check-identifications.py` counts delimiters for. Do not write the opener
+the `identifications` guard in check.py counts delimiters for. Do not write the opener
 literally in prose here.)
 -/
 

@@ -1,7 +1,7 @@
 """Extract Lean definitions from proofs/Calibrator into a machine-readable table.
 
 Standalone fallback extractor: the `extract` agent is building a richer table
-under proofs/validation/extract/.  This module produces the subset that the
+under proofs/validation/empirical/extract/.  This module produces the subset that the
 range and metamorphic checkers need, and switches over automatically if the
 richer table appears (see `load_table`).
 
@@ -33,7 +33,7 @@ def _lean_sources(_r):
     return _fs
 
 
-CAL = pathlib.Path(__file__).resolve().parents[2] / "Calibrator"
+CAL = pathlib.Path(__file__).resolve().parents[3] / "Calibrator"
 
 DEF_RE = re.compile(
     r"^(?:@\[[^\]]*\]\s*)?(?:private\s+|protected\s+)?(?:noncomputable\s+)?def\s+"

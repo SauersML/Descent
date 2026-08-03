@@ -53,7 +53,7 @@ except ImportError as _exc:
         "  looked in: %s\n"
         "  reason:    %s\n"
         "  These tables are DELIBERATELY NOT IN GIT -- regenerate them:\n"
-        "      python3 proofs/validation/extract/emit.py\n"
+        "      python3 proofs/validation/empirical/extract/emit.py\n"
         "  (about a minute; writes only inside your worktree)" % (EXTRACT, _exc))
 
 OUT = os.path.join(HERE, "auc_collapse_check_results.json")

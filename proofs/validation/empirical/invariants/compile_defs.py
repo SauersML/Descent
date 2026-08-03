@@ -84,7 +84,7 @@ def check_fresh(defs_path):
         return
     table_mtime = defs_path.stat().st_mtime
     newest, newest_src = 0.0, None
-    cal = HERE.parents[1] / "Calibrator"
+    cal = HERE.parents[2] / "Calibrator"
     for src in _lean_sources(cal):
         m = src.stat().st_mtime
         if m > newest:

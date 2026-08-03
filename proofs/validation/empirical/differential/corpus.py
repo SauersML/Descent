@@ -1,6 +1,6 @@
 """Load Calibrator definitions as Python callables.
 
-PRIMARY SOURCE is `proofs/validation/extract/api.py`, the project's definition
+PRIMARY SOURCE is `proofs/validation/empirical/extract/api.py`, the project's definition
 table.  `leanexpr.py` in this directory is a second, independently written
 translator; it is retained for two reasons and only two:
 
@@ -23,7 +23,8 @@ import sys
 import leanexpr as L
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-CALIBRATOR = os.path.join(os.path.dirname(os.path.dirname(HERE)), "Calibrator")
+CALIBRATOR = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.dirname(HERE))), "Calibrator")
 EXTRACT = os.path.join(os.path.dirname(HERE), "extract")
 
 if EXTRACT not in sys.path:

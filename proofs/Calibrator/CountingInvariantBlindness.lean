@@ -53,7 +53,7 @@ establishes the blindness *conditional on the two rates*, and says so. The separ
 divergence, on the other hand, is proved outright.
 
 Empirical status: UNTESTED. The `m_eff` instance referred to above is separately SIMULATED
-in `proofs/validation/meff_prohibition/`; nothing in this module is a numerical claim.
+in `proofs/validation/empirical/meff_prohibition/`; nothing in this module is a numerical claim.
 -/
 
 namespace Calibrator.CountingInvariantBlindness

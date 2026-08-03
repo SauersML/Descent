@@ -376,7 +376,7 @@ gets both of these backwards.
 
 Empirical status: **VALIDATED** on the population half, with **two claims corrected and one
 practical caveat added**. Exact rational sweep and finite-sample arm in
-`proofs/validation/ld_coverage_boundary/`. -/
+`proofs/validation/empirical/ld_coverage_boundary/`. -/
 
 /-- The witness family: two atoms, values `1` and `0`, hence moduli `0` and `1`. -/
 noncomputable def copyWitnessFamily : BundleFamily 2 where

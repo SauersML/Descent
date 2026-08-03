@@ -97,7 +97,7 @@ section SteppingStone
     handed — a factor of `D = 64`. It cancels against the `(D-d) ≈ D` dropped from the meeting
     time, which is exactly why this definition is right anyway.
 
-    Empirical status: **VALIDATED in its stated regime** (`proofs/validation/coalescent_diff/`),
+    Empirical status: **VALIDATED in its stated regime** (`proofs/validation/empirical/coalescent_diff/`),
     with the untruncated `d(D-d)/D` form recorded as the available improvement. -/
 noncomputable def demoSteppingStoneFst (d Ne m σ_sq : ℝ) : ℝ :=
   d / (d + 4 * Ne * m * σ_sq)
@@ -232,15 +232,21 @@ noncomputable def steppingStoneDiffusionTimescale (d σ_sq m : ℝ) : ℝ :=
     the quantity `steppingStoneDiffusionTimescale` is a per-deme rescaling of.
     Stated so that the corpus contains the lattice-level time under a name,
     rather than only the rescaled one under a name that does not say it is
-    rescaled. -/
+    rescaled.
+
+    Denotes: `d` is the lattice separation between the two sampled demes and
+    `demeCount` is `D`, the total number of demes, with `0 ≤ d ≤ demeCount`. The
+    two are not interchangeable and the formula is not symmetric in them —
+    swapping them flips the sign whenever `d < demeCount`, as the guard below
+    measures. -/
 noncomputable def steppingStoneMeetingTimeOnLattice
     (d demeCount σ_sq m : ℝ) : ℝ :=
   d * (demeCount - d) / (2 * σ_sq * m)
 
-/-- **The guard this definition was missing.**
+/-- **The guard against the argument swap.**
 
-    A meeting time is nonnegative on the admissible range `0 ≤ d ≤ D`. Its siblings carry a
-    positivity fact; this one did not, and the omission had teeth: the `d`/`D` arguments differ
+    A meeting time is nonnegative on the admissible range `0 ≤ d ≤ D`. The omission of such a
+    fact has teeth here, because the `d`/`D` arguments differ
     only in case, and a swap **always flips the sign** when `d < D`, so it returns a *negative
     expected time*. In exact rationals at `D = 256`: `d = 1` gives `1275` correct against
     `-326400` swapped, `d = 8` gives `9920` against `-317440`, `d = 128` gives `81920` against
@@ -833,7 +839,7 @@ trajectory of that process and its closed form is proved, not asserted.
 
     **Identical twin of `LDDecayTheory.driftRatePerGen`**, which was named
     `ldDecayRatePerGen` until its LD reading was FALSIFIED at up to 201x
-    (`proofs/validation/coalescent_diff/`): `1/(2Ne)` is not the fraction of LD lost per
+    (`proofs/validation/empirical/coalescent_diff/`): `1/(2Ne)` is not the fraction of LD lost per
     generation, because recombination dominates it. The same caution applies to any LD
     reading of this body -- the `LD` in this name is about where the rate is *used*, not
     about what it measures. As a bare drift rate it stands.

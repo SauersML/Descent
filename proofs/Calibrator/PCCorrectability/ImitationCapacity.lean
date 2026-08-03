@@ -1392,7 +1392,7 @@ smallest eigenvalues from `1` down to `1/(n+1)` — a vanishing fraction,
 So the threshold is discontinuous in the weak topology.
 
 **This has been measured, and the prohibition holds.**
-`proofs/validation/meff_prohibition/check_meff_prohibition.py` builds both
+`proofs/validation/empirical/meff_prohibition/check_meff_prohibition.py` builds both
 spectra, computes the Li–Ji / Cheverud–Nyholt effective-marker count on each,
 and bisects for the spike level at which the whitened certificate statistic
 attains 50% power at level 0.05.  Across `n = 4, 8, 16` (so `m = 20, 72, 272`):

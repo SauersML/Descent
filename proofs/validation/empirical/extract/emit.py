@@ -9,7 +9,7 @@ scripts should import it instead of re-transcribing formulas:
     lean_defs.neiFst(0.4, 0.3)
 """
 
-# REGENERATE WITH:  python3 proofs/validation/extract/emit.py
+# REGENERATE WITH:  python3 proofs/validation/empirical/extract/emit.py
 #
 # This produces lean_defs.py and defs.json, which are NOT IN GIT.
 # They are generated from proofs/Calibrator/, which changes every few

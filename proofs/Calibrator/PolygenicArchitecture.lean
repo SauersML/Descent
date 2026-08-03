@@ -467,10 +467,12 @@ estimate than the variance-type summaries standing beside it.
 The second half of the picture is about certificates rather than estimators.
 The unconditional result is algebraic: completeness at grade `K` is equivalent
 to grade-insensitivity of the modulus, and the deficit is the squared modulus
-ratio. The first Gaussian-location-mixture audit found its grade-8 modulus
-recovered 99.93% of the ungraded one, so the proposed polynomial fixed-grade
-gap is not stated as a Lean theorem here. In particular it is not accepted as
-a theorem-valued field of a biological model.
+ratio. The polynomial fixed-grade gap is stated below for an actual biological
+experiment, with an explicit `sorry`: the first Gaussian-location-mixture audit
+found that its grade-8 modulus recovered 99.93% of the ungraded one, so that
+experiment is evidence neither for the general theorem nor for its biological
+specialization. In particular the gap is never accepted as a theorem-valued
+field of a biological model.
 
 `Calibrator.PowerAnalysis` compares the logarithmic and polynomial benchmark
 curves conditionally. Those comparisons are useful for falsifying a proposed
@@ -552,7 +554,6 @@ between mixture experiments.  No field has type `Prop`, and in particular the
 graded modulus is not supplied by the caller: it is derived below as a
 supremum over moment-matched prior pairs. -/
 structure MeanAbsoluteEffectCertificateProblem (q n : ℕ) where
-  effectRadius : ℝ
   architecture : Fin (n + 1) → Fin q → ℝ
   /-- Actual catalogue-indexed observation laws.  Prior discrepancies are
   derived as total variation between mixtures of these laws; they are not an
@@ -564,13 +565,33 @@ namespace MeanAbsoluteEffectCertificateProblem
 
 open Calibrator.CertificateGrading
 
-/-- The effect vectors this problem ranges over: the ball of radius
-`effectRadius` in the per-variant effect coordinates.
+/-- A data-derived radius containing the whole finite architecture catalogue.
+Using the sum of absolute coordinates is deliberately conservative but total:
+there is no supplied radius and no side condition saying that the catalogue
+fits inside it. -/
+noncomputable def architectureRadius {q n : ℕ}
+    (P : MeanAbsoluteEffectCertificateProblem q n) : ℝ :=
+  ∑ i, ∑ j, |P.architecture i j|
+
+theorem architectureRadius_nonneg {q n : ℕ}
+    (P : MeanAbsoluteEffectCertificateProblem q n) :
+    0 ≤ P.architectureRadius := by
+  exact Finset.sum_nonneg fun i _ ↦ Finset.sum_nonneg fun j _ ↦ abs_nonneg _
+
+/-- The effect vectors this problem ranges over: the ball whose radius is
+derived from, and contains, the architecture catalogue.
 
     Empirical status: NOT AN EMPIRICAL CLAIM -- the carrier set a certificate
     problem ranges over. -/
 noncomputable def effects {q n : ℕ} (P : MeanAbsoluteEffectCertificateProblem q n) :
-    Set (Fin q → ℝ) := boundedEffectCarrier q P.effectRadius
+    Set (Fin q → ℝ) := boundedEffectCarrier q P.architectureRadius
+
+/-- Every catalogue entry belongs to the biological carrier.  This is a theorem
+of the numerical construction, not a validity field supplied by the caller. -/
+theorem architecture_mem_effects {q n : ℕ}
+    (P : MeanAbsoluteEffectCertificateProblem q n) (i : Fin (n + 1)) :
+    P.architecture i ∈ P.effects := by
+  sorry
 
 /-- Signed effect moment used by grade matching.  Grade two, for example,
 matches the catalogue-average signed effect and squared-effect mass before it
@@ -639,10 +660,10 @@ theorem momentMatched_two_iff {q n : ℕ}
     · simpa only [FinitePrior.mean, finiteProblem_moment, architectureMoment_one] using h1
 
 theorem effects_nonempty {q n : ℕ} (P : MeanAbsoluteEffectCertificateProblem q n) :
-    P.effects.Nonempty := boundedEffectCarrier_nonempty q P.effectRadius
+    P.effects.Nonempty := boundedEffectCarrier_nonempty q P.architectureRadius
 
 theorem effects_convex {q n : ℕ} (P : MeanAbsoluteEffectCertificateProblem q n) :
-    Convex ℝ P.effects := boundedEffectCarrier_convex q P.effectRadius
+    Convex ℝ P.effects := boundedEffectCarrier_convex q P.architectureRadius
 
 /-- Exact biological specialization of the completeness criterion. -/
 theorem complete_iff_gradeInsensitive {q n : ℕ}
@@ -678,7 +699,8 @@ that construction. -/
 theorem fixedGrade_incompleteness_biology (K : ℕ) :
     ∀ᶠ n : ℕ in Filter.atTop,
       ∃ P : MeanAbsoluteEffectCertificateProblem (n + 1) n,
-        P.effects.Nonempty ∧ Convex ℝ P.effects ∧
+        (∀ i, P.architecture i ∈ P.effects) ∧
+          P.effects.Nonempty ∧ Convex ℝ P.effects ∧
           FiniteMixtureExperiment.fixedGradeGapScale K n ≤
             P.certificationGap (K + 1) 1 := by
   sorry

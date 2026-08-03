@@ -464,7 +464,7 @@ theorem neutralAF_benchmark_auc_depends_only_on_attenuated_signal
     (V_A V_E fst V_A' fst' : ℝ)
     (h : presentDayPGSVariance V_A fst = presentDayPGSVariance V_A' fst') :
     presentDayEqualVarianceGaussianAUC V_A V_E fst = presentDayEqualVarianceGaussianAUC V_A' V_E fst' := by
-  unfold presentDayEqualVarianceGaussianAUC presentDaySignalToNoise
+  unfold presentDayEqualVarianceGaussianAUC
   rw [h]
 
 /-- **Benchmark discrimination can be preserved while calibration is lost.**

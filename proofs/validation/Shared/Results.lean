@@ -14,7 +14,7 @@ or a docstring and nowhere else, so none could be re-read, re-checked, or dated.
 The cost is on the record: three of the nine specimens named in commit 6e47789b
 did not exist in the tree that commit describes, which means that result list was
 not a transcript of a run, and nothing could have caught it. See
-`proofs/validation/inflation/CROSSCHECK.md` §3.
+`proofs/validation/code/CROSSCHECK.md` §3.
 
 A detector whose output nobody can re-read is not an instrument. Every writer
 here stamps the revision it ran against and whether the tree was clean, so a

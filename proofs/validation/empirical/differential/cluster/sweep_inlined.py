@@ -69,7 +69,7 @@ if EXTRACT not in sys.path:
 # stale copy happened to be lying around, is exactly how a committed cache
 # became consumable in the first place. The message carries the command because
 # the next person reads the error, not the docstring.
-_REGEN = ("python3 proofs/validation/extract/emit.py    "
+_REGEN = ("python3 proofs/validation/empirical/extract/emit.py    "
           "(about a minute; writes only inside your worktree)")
 try:
     import lean_defs  # noqa: E402

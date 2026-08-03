@@ -1046,7 +1046,7 @@ usual equation. The evaluation geometry does not appear.
 optional: the fixed point is a functional of the design *and its aspect ratio*,
 and dropping it — the first version of this definition did — misprices the
 resolvent functional by 34 percent at `aspect = 0.3`, as
-`proofs/validation/imitation_rigidity/check_imitation.py` records.
+`proofs/validation/empirical/imitation_rigidity/check_imitation.py` records.
 
 Empirical status: VALIDATED. Simulated ridge regression on genotype-like
 designs matches `tr(B (S + ridge)⁻¹)/k` computed from this fixed point, for

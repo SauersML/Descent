@@ -52,7 +52,7 @@ def _find_repo():
     """The repository root, found by walking up to the `.git` directory.
 
     NOT a fixed number of `parents[]`, and the difference is not academic.
-    This module was written at `proofs/validation/simprov.py` and used
+    This module was written at `proofs/validation/empirical/simprov.py` and used
     `parents[2]`. It was then moved one level deeper, to
     `proofs/validation/empirical/`, and `parents[2]` silently became
     `<repo>/proofs`.

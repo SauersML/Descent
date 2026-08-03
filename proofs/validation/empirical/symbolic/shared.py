@@ -1,6 +1,6 @@
 """Adapter onto the shared extraction API.
 
-Definition bodies come from `proofs/validation/extract/api.py` and nowhere else.
+Definition bodies come from `proofs/validation/empirical/extract/api.py` and nowhere else.
 This directory no longer parses Lean *definitions*; `leanparse.py` is retained
 only for THEOREM statements, which the shared API does not yet expose, and
 `audit_against_shared()` cross-checks whatever it does parse against the shared

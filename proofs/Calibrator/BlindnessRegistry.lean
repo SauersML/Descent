@@ -60,7 +60,7 @@ been blind too.
 
 That is not an argument against guards. It is the criterion for what a new guard has to
 do to be worth adding: **exhibit a pair the existing suite identifies and it separates.**
-Guard 3j of `scripts/check-identifications.py` (declare your regime) meets it — the two
+Guard 3j of `proofs/validation/code/check.py` (declare your regime) meets it — the two
 regimes of `Calibrator.DriftRegime` are separated as objects, and a regime declaration is
 data no algebraic check can supply. Guards 3k and 3l meet it for the same reason: they
 read the *provenance* and the *power* of a validation, neither of which is a function of

@@ -426,7 +426,7 @@ valid**, not one at which it is blind.
 So the blindness is real for the latent-locus channel and does **not** transfer to interaction
 tests on genotyped loci. What needed narrowing was this gloss, not the constant.
 
-Empirical status: **VALIDATED** (`proofs/validation/blind_maf/`). Scope caveat: HWE, unlinked
+Empirical status: **VALIDATED** (`proofs/validation/empirical/blind_maf/`). Scope caveat: HWE, unlinked
 loci, no LD or structure, and not every statistic that could be called fourth-cumulant-based
 was constructed. -/
 noncomputable def gaussianKurtosisMaf : ℝ := (3 - Real.sqrt 3) / 6
@@ -1371,7 +1371,7 @@ The three orders this corpus computes in closed form are the instances:
 with `V = 2q(1-q)` (`standardizedGenotype_second_moment_one`,
 `standardizedGenotype_fourth_moment`, `standardizedGenotype_sixth_moment`, collected as
 `hweLadderMoments`). A symbolic check over `m = 1..5`
-(`proofs/validation/coupling/ladder_moments.py`) confirms the sharp form the bound only
+(`proofs/validation/empirical/coupling/ladder_moments.py`) confirms the sharp form the bound only
 brackets: `V^(m-1) E[x^(2m)] → 1` at every order tested, and `V` divides the numerator
 exactly, so that quantity is a polynomial in `q` equal to `1` at `q = 0`. The exponent of
 `V⁻¹` advances by one per moment-order step of two, so along the ladder — whose steps
@@ -1507,7 +1507,7 @@ full column rank, its nullspace is trivial, and there is no direction along whic
 part can move while `|u|` stays fixed.
 
 Verified in exact rational arithmetic by
-`proofs/validation/coupling/fiber_splitting.py` over uniform, rare-weighted, clustered
+`proofs/validation/empirical/coupling/fiber_splitting.py` over uniform, rare-weighted, clustered
 and fifty-locus frequency sets: nullity zero throughout. Its control is the reflection
 `q ↔ 1-q`, which *must* produce a dependency — the two frequencies give identical laws of
 `u` by `reflect_even_moment` — and does, with the odd part moving by exactly zero. A

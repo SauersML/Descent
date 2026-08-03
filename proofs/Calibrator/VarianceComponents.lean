@@ -151,7 +151,7 @@ section PopulationSpecificH2
     `D = 0` control at `0.9974` against `1.0`.
 
     Empirical status: **VALIDATED at linkage equilibrium**; the unconditional reading is
-    **FALSIFIED** (`proofs/validation/ldsc_diff/`). -/
+    **FALSIFIED** (`proofs/validation/empirical/ldsc_diff/`). -/
 noncomputable def additiveVariance
     {m : ℕ} (p : Fin m → ℝ) (α : Fin m → ℝ) : ℝ :=
   ∑ i, 2 * p i * (1 - p i) * (α i) ^ 2

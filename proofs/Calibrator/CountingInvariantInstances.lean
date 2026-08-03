@@ -41,7 +41,7 @@ finite supremum over `Finset.range (o+1)`.
 
 ## The floor is VACUOUS for the formulas people actually use, and this must be said
 
-Simulation in exact rational arithmetic (`proofs/validation/meff_error_floor/`, `n` up to 32,
+Simulation in exact rational arithmetic (`proofs/validation/empirical/meff_error_floor/`, `n` up to 32,
 moments to order 8) measured `L*`, the **tightest** Lipschitz constant consistent with the
 witness pair — so any globally valid `L` is at least this, and using `L*` is maximally
 generous to the theorem. At `n = 32`, order 2:
@@ -83,7 +83,7 @@ order 8 — 3× and 7.6× over the claimed bound. So "uniformly in the order `p`
 of the illegal normalization. Order ≤ 2 is unaffected, which covers the formulas above.
 
 Empirical status: **the abstract bound is VALIDATED and the instantiation is shown VACUOUS at
-native scale** — see `proofs/validation/meff_error_floor/`. The positive control passes: the
+native scale** — see `proofs/validation/empirical/meff_error_floor/`. The positive control passes: the
 script re-derives `certificate gap = n/(n+1)` exactly and every order-2 moment gap within
 `1/(n+1)`, so the instrument reproduces the theorems it tests.
 -/

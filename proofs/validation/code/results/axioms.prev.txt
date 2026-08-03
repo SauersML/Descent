@@ -91,7 +91,7 @@
 # copy of the generated-declaration filter and its counts are not directly
 # comparable with inflation_results.json or rfl_scan_results.json.
 #
-#   command   lake env lean proofs/validation/invariants/AxiomScan.lean
+#   command   lake env lean proofs/validation/code/Check.lean
 #   oleans    built from ad2fa5ba23fd1d601d1d7a1f3af81518cd37a0db
 #   git said  629a80ea8618f167d4e925551a0b2233c3fa5a0c  (source, not oleans)
 #   run at    2026-08-03T19:01Z, exit 0 after 23m41s

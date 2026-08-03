@@ -98,7 +98,7 @@ import Calibrator.UnifiedBiology
 -- entire point: that is the signal that was missing. Do not remove an import here to
 -- make the root build green -- that restores the blindness rather than fixing the break.
 --
--- Check for new orphans with `proofs/validation/invariants/module_closure.py`, which
+-- Check for new orphans with `proofs/validation/code/check.py`, which
 -- compares the TRANSITIVE closure of this file against every source module on disk.
 --
 -- A caution about HOW to run that check, learned by getting it wrong here: comparing the

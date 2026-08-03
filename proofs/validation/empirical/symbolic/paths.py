@@ -11,12 +11,13 @@ from __future__ import annotations
 
 from pathlib import Path
 
-HERE = Path(__file__).resolve().parent          # .../proofs/validation/symbolic
-VALIDATION = HERE.parent                        # .../proofs/validation
-PROOFS = VALIDATION.parent                      # .../proofs
+HERE = Path(__file__).resolve().parent    # .../proofs/validation/empirical/symbolic
+EMPIRICAL = HERE.parent                   # .../proofs/validation/empirical
+VALIDATION = EMPIRICAL.parent             # .../proofs/validation
+PROOFS = VALIDATION.parent                # .../proofs
 REPO = PROOFS.parent                            # repo root
 CALIBRATOR = PROOFS / "Calibrator"
-EXTRACT = VALIDATION / "extract"
+EXTRACT = EMPIRICAL / "extract"
 
 # ---------------------------------------------------------------- artifacts
 #

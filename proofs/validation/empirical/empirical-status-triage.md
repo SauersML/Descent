@@ -2,7 +2,7 @@
 
 This file exists for whoever is applying `Empirical status:` markers. It is a
 per-definition verdict on the 38 definitions that check 3b of
-`scripts/check-identifications.py` reported as making an empirical claim with no
+`proofs/validation/code/check.py` reported as making an empirical claim with no
 status marker.
 
 **All 38 have since been marked, nearly all `UNTESTED`.** So this is no longer a

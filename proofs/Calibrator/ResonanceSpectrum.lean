@@ -95,7 +95,7 @@ a computable, measurable feature of a real panel, so the resonance spectrum can 
 estimated from data rather than only defined for an idealized measure.
 
 The floor is a statement about typical phases and is not proved here; it is recorded
-numerically in `proofs/validation/coupling/mixture_cramer_window.py`, where the observed
+numerically in `proofs/validation/empirical/coupling/mixture_cramer_window.py`, where the observed
 `floor × √n` is flat at 0.51, 0.60, 0.40, 0.48 across four decades of `n`. What *is*
 proved here is the deterministic half: the intensity is bounded by one, attains one at
 resonance, and never depends on a sign.

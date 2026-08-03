@@ -218,7 +218,7 @@ comparison in exact arithmetic:
 The error is exactly zero iff `shared_ld = 1`, which is why the sibling
 `neutralDriftR2Ratio` validates at `0.0%` and this one does not. It grows with heritability:
 `+9`–`15%` at `h² = 0.2`, `+28`–`49%` at `0.5`, `+60`–`112%` at `0.8`.
-Measured in `proofs/validation/drift_diff/`. Use `taggedDriftR2RatioCorrected` below. -/
+Measured in `proofs/validation/empirical/drift_diff/`. Use `taggedDriftR2RatioCorrected` below. -/
 
 /-- **The tagged-drift accuracy ratio.**
 
@@ -228,7 +228,7 @@ Measured in `proofs/validation/drift_diff/`. Use `taggedDriftR2RatioCorrected` b
     rationals, 12 of 12 replicates across two independent designs — where a form that also
     shrinks the denominator runs `+15%` to `+112%` high.
 
-    Empirical status: **VALIDATED** (`proofs/validation/drift_diff/`). -/
+    Empirical status: **VALIDATED** (`proofs/validation/empirical/drift_diff/`). -/
 noncomputable def taggedDriftR2RatioCorrected (V_A V_E fst shared_ld : ℝ) : ℝ :=
   (1 - fst) * shared_ld * (V_A + V_E) / ((1 - fst) * V_A + V_E)
 

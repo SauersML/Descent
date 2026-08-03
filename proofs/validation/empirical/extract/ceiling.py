@@ -17,7 +17,7 @@ blockers are load-bearing for the most dependents.
     python3 validation/extract/ceiling.py
 """
 
-# REGENERATE WITH:  python3 proofs/validation/extract/ceiling.py
+# REGENERATE WITH:  python3 proofs/validation/empirical/extract/ceiling.py
 #
 # This produces ceiling.json, which are NOT IN GIT.
 # They are generated from proofs/Calibrator/, which changes every few

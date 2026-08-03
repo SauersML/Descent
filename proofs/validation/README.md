@@ -1,9 +1,26 @@
 # Validation
 
-This directory holds the instruments. A Lean proof says a formula follows from
-its assumptions. Nothing in Lean says the assumptions describe a real
-population, so every formula that claims to describe one needs a simulation
-that could contradict it.
+This directory holds the instruments, split by the question they answer.
+
+    code/       Is the corpus written honestly?
+    empirical/  Does what it says describe a real population?
+    Shared/     The Lean modules both halves import.
+
+`code/` is two files: `check.py` reads the Lean source text, `Check.lean` reads
+the elaborated environment. Between them they cover style, admissions, proof
+laundering, vacuity, the axiom closure, the import closure, and wiring. They are
+cheap, deterministic and gate CI. See `code/README.md`.
+
+`empirical/` is everything else. A Lean proof says a formula follows from its
+assumptions. Nothing in Lean says the assumptions describe a real population, so
+every formula that claims to describe one needs a simulation that could
+contradict it. The rest of this file is about those.
+
+The split matters because the two halves fail differently. A code-validation
+failure is always a defect. An empirical failure may be a defect in the
+simulation, and its verdict is statistical — which is why most of `empirical/`
+is deliberately not a required check. `.github/workflows/prover.yml` says which
+subset is, and why the rest is not.
 
 ## Regenerate the extraction tables before you run anything
 
@@ -20,7 +37,7 @@ and this one had drifted by six figures of changed lines before anyone noticed.
 Regenerate them in whichever tree you are about to run, from a corpus that
 builds:
 
-    python3 proofs/validation/extract/emit.py
+    python3 proofs/validation/empirical/extract/emit.py
 
 Consumers fail loudly rather than reading a stale table. If a script stops with
 `defs.json missing`, that is the design working. Run `emit.py` and try again.

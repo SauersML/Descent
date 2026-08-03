@@ -675,8 +675,9 @@ supply the square roots, and until someone does, the correction to the upstream 
 claim is a family conditional on an unmet hypothesis rather than an existence statement.
 
 The three corollaries below supply them, so the counterexamples stand as closed claims.
-They do NOT discharge `SingleModulus.nonempty`, which is about `SingleModulus 2 0` and
-remains admitted; these inhabit `3 (3/5)`, `3 1` and `4 v` for `0 < v < 1`.
+They are separate from `SingleModulus.nonempty`, which is about `SingleModulus 2 0`; these
+inhabit `3 (3/5)`, `3 1` and `4 v` for `0 < v < 1`, which are the cases the upstream
+`d ≤ 3` impossibility claim covers.
 -/
 
 /-- **The `v = 3/5` three-atom family exists**, at `B = √(2/5)`. -/

@@ -40,7 +40,7 @@ statement of the world they describe.  That cell is a defect inventory.
     python3 validation/extract/regime.py [--json regime.json]
 """
 
-# REGENERATE WITH:  python3 proofs/validation/extract/regime.py
+# REGENERATE WITH:  python3 proofs/validation/empirical/extract/regime.py
 #
 # This produces regime.json, which are NOT IN GIT.
 # They are generated from proofs/Calibrator/, which changes every few

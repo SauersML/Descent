@@ -94,13 +94,33 @@ theorem decay_bound (h : ∀ y : ℝ, portabilityDecay y ≤ 1) (x : ℝ) :
 -- Lean makes the quotient `0` and the claim is silently true.
 theorem ratio_nonneg (x d : ℝ) (hx : 0 ≤ x) : 0 ≤ x / d := by positivity
 
+-- F22: the noun does all the work -- the structure's field IS the conclusion.
+-- Witnessed on purpose: an UNwitnessed certificate is F4, and F4 would mask this.
+-- The defect here is not that nothing inhabits the class; it is that the class is
+-- defined to already satisfy the theorem.
+structure GoodAction where
+  act : ℕ
+  fixedPoint : ∃ x : ℕ, x = act
+
+def GoodAction.witness : GoodAction where
+  act := 0
+  fixedPoint := ⟨0, rfl⟩
+
+theorem every_good_action_has_fixed_point (a : GoodAction) : ∃ x : ℕ, x = a.act :=
+  a.fixedPoint
+
 -- F24: a custom axiom.
 axiom deepResult : ∀ n : ℕ, n = n
 
 end Fixture
 """
 
-POSITIVE_EXPECTED = {"F1", "F1b", "F2", "F4", "F8", "F11", "F16", "F21", "F24"}
+# The EXACT set the positive fixture produces at every severity.  Two entries are
+# incidental to the planted patterns and are correct: `famous_conjecture` carries a
+# premise under a name claiming a conjecture (F17), and `ratio_nonneg` has an honest
+# side condition alongside its unguarded denominator (F16s).
+POSITIVE_EXPECTED = {"F1", "F1b", "F2", "F4", "F8", "F11", "F16", "F16s", "F17", "F21",
+                     "F22", "F24"}
 
 # --------------------------------------------------------------------------------------
 # Clean mathematics that superficially resembles each of the above.
@@ -202,7 +222,12 @@ def main() -> int:
 
     # False negatives, and misfiling -- which is a false negative at the severity that
     # matters, since a FATAL pattern reported as FIDELITY does not stop the build.
-    got = families(run(POSITIVE, "--severity", "conditional"))
+    #
+    # AT EVERY SEVERITY, not `--severity conditional`.  F21 is a FIDELITY family, so
+    # filtering to CONDITIONAL hid it and the harness reported a working detector as a
+    # FALSE NEGATIVE.  A severity flag in the harness cannot be distinguished from a
+    # blind spot in the detector, so the harness must not use one here.
+    got = families(run(POSITIVE))
     for missing in sorted(POSITIVE_EXPECTED - got):
         failures.append(f"FALSE NEGATIVE  {missing} planted but not reported")
     for extra in sorted(got - POSITIVE_EXPECTED):

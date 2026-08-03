@@ -41,7 +41,7 @@ def _lean_sources(_r):
     return _fs
 
 
-CAL = pathlib.Path(__file__).resolve().parents[2] / "Calibrator"
+CAL = pathlib.Path(__file__).resolve().parents[3] / "Calibrator"
 
 HEAD = re.compile(r"^\s*(?:@\[[^\]]*\]\s*)?(?:theorem|lemma)\s+([\w.'₀-₉]+)")
 SCALAR = {"ℝ", "ℕ"}

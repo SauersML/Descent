@@ -859,7 +859,7 @@ theorem fstMutationDriftTransient_at_zero (θ Ne : ℝ) :
     `t = 1200`, growing linearly in `t`**. Watterson is reproduced to 2–3%.
 
     Empirical status: body **VALIDATED** as a count of mutations arising; the
-    segregating-sites reading **FALSIFIED** (`proofs/validation/coalescent_diff/`). -/
+    segregating-sites reading **FALSIFIED** (`proofs/validation/empirical/coalescent_diff/`). -/
 noncomputable def expectedNewMutations (θ t : ℝ) : ℝ :=
   θ / 2 * t
 
@@ -887,7 +887,7 @@ theorem expectedNewMutations_increases_with_time (θ t₁ t₂ : ℝ)
 together with `sharedLDFraction_pos`, `sharedLDFraction_le_one` and
 `sharedLDFraction_decreases_with_time`.**
 
-Measured in `proofs/validation/coalescent_diff/`. -/
+Measured in `proofs/validation/empirical/coalescent_diff/`. -/
 
 end MutationDriftBalance
 

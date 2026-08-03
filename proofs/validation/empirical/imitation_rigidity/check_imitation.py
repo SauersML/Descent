@@ -22,7 +22,7 @@ Ground truth used
   ridge regression on simulated genotypes               spectator claim
   Wright-Fisher forward simulation                      allele-loss claims
 
-Run: python3 proofs/validation/imitation_rigidity/check_imitation.py
+Run: python3 proofs/validation/empirical/imitation_rigidity/check_imitation.py
 """
 from __future__ import annotations
 

@@ -32,7 +32,7 @@ Checks performed
     same one-percent/half-response channel retains `99/19604` of the moment information
     of a balanced, perfectly observed standardized genotype.
 
-Run:  python3 proofs/validation/condensation/check_condensation.py
+Run:  python3 proofs/validation/empirical/condensation/check_condensation.py
 """
 
 from __future__ import annotations

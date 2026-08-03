@@ -100,6 +100,29 @@ rescaling to coalescent time and applying `fstFromTau`.
 noncomputable def fstFromGenerations (t Ne : ℝ) : ℝ :=
   fstFromTau (coalescentTau t Ne)
 
+/-- **Circulation inflates transfer time by the same saturation law that drift
+uses for `F_ST`.**
+
+`CirculationDefect.transferTimeInflation` is `1 + (a/s)^2`, the factor by which
+circulation stretches the frontier time. Its reciprocal -- the fraction of the
+frontier time that survives -- is `1 - fstFromTau ((a/s)^2)`, the complement of
+the chart this file uses for drift at coalescent time `tau`.
+
+The two modules are about different processes, and that is why the shared
+functional form is worth recording rather than assuming: `x / (1 + x)` appears
+in both, so a change to either body that breaks the identity fails to compile
+instead of leaving the two quietly disagreeing about a shape they both use. No
+hypothesis is needed, because `1 + (a/s)^2` is positive for every `s` and `a`,
+including `s = 0`. -/
+theorem one_div_transferTimeInflation_eq_one_sub_fstFromTau (s a : ℝ) :
+    1 / transferTimeInflation s a = 1 - fstFromTau ((a / s) ^ 2) := by
+  have hpos : (0 : ℝ) < 1 + (a / s) ^ 2 := by positivity
+  have hne : (1 : ℝ) + (a / s) ^ 2 ≠ 0 := ne_of_gt hpos
+  unfold transferTimeInflation fstFromTau
+  first
+  | (field_simp; ring)
+  | field_simp
+
 /-- **Branchwise-to-pairwise `F_ST` map under independent drift from a common
 ancestor.**
 

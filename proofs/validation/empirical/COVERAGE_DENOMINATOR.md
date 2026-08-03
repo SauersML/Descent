@@ -14,7 +14,7 @@ denominator without a digest attached is not a measurement.
 
 ## Method, and what could not be measured
 
-The extraction tables under `proofs/validation/extract/` (`defs.json`,
+The extraction tables under `proofs/validation/empirical/extract/` (`defs.json`,
 `lean_defs.py`, `classes.json`) were **stale**: the copy on disk carried
 `source_digest sha256:73b56b2e…` over 115 files against a live tree of 116.
 `api.require_fresh()` would have refused them, correctly.
@@ -54,8 +54,8 @@ is the check that the replication is faithful.
 
 ## 1. What exactly is the slice?
 
-**File:** `proofs/validation/differential/coverage.py:29`, and the identical
-list at `proofs/validation/differential/cluster/families.py:63`.
+**File:** `proofs/validation/empirical/differential/coverage.py:29`, and the identical
+list at `proofs/validation/empirical/differential/cluster/families.py:63`.
 
 **Predicate:** `d.get("file") in SLICE_FILES` — `coverage.py:118`
 (`slice_definitions`) and `families.py:1598` (`in_slice_fq`).

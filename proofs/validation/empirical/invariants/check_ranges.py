@@ -51,7 +51,7 @@ def _viol(v, lo, hi):
 def _proved_bounds():
     try:
         import sys
-        sys.path.insert(0, str(HERE.parents[1] / "validation" / "extract"))
+        sys.path.insert(0, str(HERE.parents[0] / "extract"))
         import api
     except Exception:
         return {}

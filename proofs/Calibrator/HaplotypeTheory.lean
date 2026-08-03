@@ -535,7 +535,7 @@ appeals to. Monte-Carlo at `n = 1000`, 3000 replicates, MC standard error about 
 | 0.3 | 0.0048055 | −30.6% | −0.9% |
 | 0.5 | 0.0040328 | **−50.4%** | −0.8% |
 
-Measured in `proofs/validation/popgen_diff2/`. -/
+Measured in `proofs/validation/empirical/popgen_diff2/`. -/
 
 /-- **The OLS estimation variance for a binary haplotype indicator.**
 
@@ -546,7 +546,7 @@ Measured in `proofs/validation/popgen_diff2/`. -/
     Note the shape is **U-shaped in `f`**, not monotone: the variance is largest at the two
     extremes and smallest at `f = 1/2`. The rarity intuition holds only below `f = 1/2`.
 
-    Empirical status: **VALIDATED** (`proofs/validation/popgen_diff2/`). -/
+    Empirical status: **VALIDATED** (`proofs/validation/empirical/popgen_diff2/`). -/
 noncomputable def haplotypeEffectVarianceOLS
     (σ2 n freq : ℝ) : ℝ :=
   σ2 / (n * freq * (1 - freq))
@@ -743,7 +743,7 @@ theorem la_deconvolution_improves_pgs
     argument is spurious and another is missing.
 
     Empirical status: **VALIDATED**; the form below is FALSIFIED
-    (`proofs/validation/popgen_diff2/`). -/
+    (`proofs/validation/empirical/popgen_diff2/`). -/
 noncomputable def expectedTractLength (g admixtureFraction : ℝ) : ℝ :=
   1 / (g * (1 - admixtureFraction))
 

@@ -1,5 +1,23 @@
 # Cross-check: Inflation.lean vs RflScan.lean / AxiomScan.lean
 
+> **The four files this document compares no longer exist separately.**
+> `Inflation.lean`, `RflScan.lean`, `AxiomScan.lean` and `LaunderingScan.lean`
+> were merged into `proofs/validation/code/Check.lean`, where they are the
+> INFLATION, RFL, AXIOMS and LAUNDERING scans of one `run_cmd`.
+>
+> The text below is left exactly as it was written, including its file names and
+> its line-number citations. It is the RECORD OF A MEASUREMENT, and rewriting a
+> measurement's subject to match a later tree is how a result comes to describe
+> something nobody checked — which is the failure §3 of this very document is
+> about. Read it as a description of the tree it names.
+>
+> §4 is the reason the merge happened. It records that the four detectors carried
+> three disagreeing copies of the declaration filter; `Shared.DeclFilter` fixed
+> two of them, and the merge fixed the rest by leaving exactly one caller of
+> `Shared.userWritten`. The one behavioural change is noted in `Check.lean`'s
+> header: the private copies did not exclude `eq_unfold`, so the AXIOMS and
+> LAUNDERING denominators drop by a handful of generated lemmas.
+
 Read-only comparison, 2026-08-03. No build was run and neither detector was
 executed; this is source and stored output only.
 
@@ -20,7 +38,7 @@ the disagreement is real.
 
 ## 1. What each one actually detects
 
-`proofs/validation/inflation/Inflation.lean` (committed 6e47789b) reports four
+`proofs/validation/code/Check.lean` (committed 6e47789b) reports four
 things over `Calibrator` declarations:
 
 - **Pattern 1** — after stripping lambdas, the proof term's head is a projection
@@ -32,10 +50,10 @@ things over `Calibrator` declarations:
   appears in no user-written `def` or theorem value; i.e. nothing in the corpus
   exhibits an inhabitant.
 
-`proofs/validation/invariants/RflScan.lean` reports theorems whose proof term,
+`proofs/validation/code/Check.lean` reports theorems whose proof term,
 under its binders, is headed by `Eq.refl` — the theorem closes by reflexivity.
 
-`proofs/validation/invariants/AxiomScan.lean` (untracked, non-empty, complete)
+`proofs/validation/code/Check.lean` (untracked, non-empty, complete)
 reports the transitive axiom closure of every `Calibrator` theorem, `def` and
 `opaque`, and fails on anything outside `propext`, `Classical.choice`,
 `Quot.sound`. Its targets are `sorryAx`, `native_decide`, and locally declared
@@ -166,7 +184,7 @@ the others structurally cannot:
 - **AxiomScan.lean** — *did the kernel accept it, and on what?* The only guard
   against `sorryAx` and `native_decide`, and the only one of the three that
   belongs in CI: it exits nonzero, it has a fixed allow-list, and its failures
-  are unambiguous. `scripts/check-identifications.py` greps for the word
+  are unambiguous. `proofs/validation/code/check.py` greps for the word
   `sorry`, which cannot see error-recovered sorries.
 
 Three things to fix, in order:

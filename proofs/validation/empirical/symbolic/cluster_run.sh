@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Run the symbolic checks on the cluster.  Nothing here executes locally.
 #
-#   bash proofs/validation/symbolic/cluster_run.sh            # full pipeline
-#   bash proofs/validation/symbolic/cluster_run.sh smoke      # regressions only, ~2 min
+#   bash proofs/validation/empirical/symbolic/cluster_run.sh            # full pipeline
+#   bash proofs/validation/empirical/symbolic/cluster_run.sh smoke      # regressions only, ~2 min
 #
 # The smoke target exists because the pipeline is a ~15 minute job and the
 # regression suite decides in two minutes whether the interpreter and sympy

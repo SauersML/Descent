@@ -89,7 +89,7 @@ Both directions fail, which is why the mechanical flag cannot be the verdict:
 
 === WORKED VERDICTS: THE POPGEN SLICE, 8 OF 8 ===
 
-From `RflScan.lean` at the elaborated environment, not from text.
+From the RFL scan in Check.lean at the elaborated environment, not from text.
 
   A (structural, nothing can drift) -- 2
     temporalMetricProfile_brier      the RHS, `temporalExactBrierRisk`, is
@@ -191,7 +191,7 @@ collapse" on the strength of a plausible-sounding description.
   belongs in no bucket and must not be deleted for being in A. Where intent is
   the deciding fact and intent is not in the body, this refuses and says so.
 
-=== ENUMERATION: USE RflScan.lean, NOT THIS FILE'S TEXT SCAN ===
+=== ENUMERATION: USE the RFL scan in Check.lean, NOT THIS FILE'S TEXT SCAN ===
 
 THE TEXT SCAN IN THIS FILE IS NOT TRUSTWORTHY AND ITS COUNTS MUST NOT BE USED.
 Three text methods over the same nine modules returned 2, 16 and 3, with ZERO
@@ -202,10 +202,10 @@ because a non-greedy regex spans declarations to reach the first `:= rfl` it
 can find. Lean is whitespace-insensitive and its proofs are not a regular
 language; no text scan recovers this reliably.
 
-`RflScan.lean` (this directory) asks the ELABORATED ENVIRONMENT instead, which
+the RFL scan in Check.lean (this directory) asks the ELABORATED ENVIRONMENT instead, which
 is the only authority: a theorem closes by `rfl` exactly when its proof term,
 under its binders, is headed by `Eq.refl`. Run it with
-`lake env lean proofs/validation/invariants/RflScan.lean`.
+`lake env lean proofs/validation/code/Check.lean`.
 
     hand-written rfl-closing theorems in the popgen slice:  8
     (19 raw, of which 11 are compiler-generated equation lemmas,
@@ -395,7 +395,7 @@ def main(argv):
         raise SystemExit(
             "rfl_triage: extract/defs.json is missing. It is generated and\n"
             "  untracked -- regenerate:\n"
-            "      python3 proofs/validation/extract/emit.py")
+            "      python3 proofs/validation/empirical/extract/emit.py")
     tally, rows = {}, []
     for mod in MINE:
         f = CALIB / (mod + ".lean")

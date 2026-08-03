@@ -89,7 +89,7 @@ def _find_repo(start):
     """Repository root by walking up to `.git`, not by counting directories.
 
     This file used four `..` segments, which was right when it lived at
-    `proofs/validation/differential/cluster/`. The tree was then reorganised
+    `proofs/validation/empirical/differential/cluster/`. The tree was then reorganised
     and it moved one level deeper, so the same four segments now land on
     `<repo>/proofs` and RES points at a directory that has never existed.
 
