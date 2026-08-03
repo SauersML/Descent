@@ -51,6 +51,7 @@ import Calibrator.CausalInference
 import Calibrator.CertificateGrading
 import Calibrator.PencilEnvironment
 import Calibrator.DirichletTransfer
+import Calibrator.DeclaredInteractionClass
 import Calibrator.CountingInvariantBlindness
 import Calibrator.CountingInvariantInstances
 import Calibrator.PolygenicArchitecture
