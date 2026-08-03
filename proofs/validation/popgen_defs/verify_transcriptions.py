@@ -58,6 +58,16 @@ N = 200
 
 def main() -> int:
     api.refresh()
+    # NAME EVERY INPUT.  A run that does not print which files it read has to be
+    # trusted; one that does can be checked.  This script exists because a
+    # harness was comparing simulation against definitions that no longer
+    # existed, and the report gave no way to see that from its output.
+    st = api.stamp()
+    print(f"transcriptions : {pathlib.Path(check_defs.__file__).resolve()}")
+    print(f"extracted table: {(EXTRACT / 'defs.json').resolve()}")
+    print(f"corpus         : {st['source_digest_on_disk']} over "
+          f"{st['source_files']} files, {st['n_definitions']} definitions")
+    print(f"table current  : {st['table_is_current']}\n")
     rng = random.Random(20260803)
     bad, gone, ok = [], [], []
 

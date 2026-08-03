@@ -40,11 +40,12 @@ TOKEN_RE = re.compile(r"""
   | (?P<num>\d+\.\d+(?:[eE][-+]?\d+)?|\d+(?:[eE][-+]?\d+)?)
   | (?P<ident>[A-Za-z_Α-ωϑ-ϵᴀ-ᵿ℀-⅏Ḁ-ỿ][A-Za-z0-9_'Α-ωϑ-ϵ₀-₉ₐ-ₜḀ-ỿ]*(?:\.[A-Za-z0-9_'₀-₉]+)*)
   | (?P<proj>\.[A-Za-z_][A-Za-z0-9_'₀-₉]*|\.[0-9]+)
-  | (?P<op>⁻¹|<=|>=|!=|:=|=>|<\||\|>|\.\.|[-+*/%^()\[\]{},:;<>=|↦→←≤≥≠∧∨¬⁻¹↑√⌊⌋‖∑∏∫∘⟨⟩·×∙∈∉⊆∩∪ℝℕℤ∞πΦ∀∃⁻¹])
+  | (?P<op>⁻¹|<=|>=|!=|:=|=>|<\||\|>|\.\.|[-+*/%^()\[\]{},:;<>=|↦→←≤≥≠∧∨¬⁻¹↑√⌊⌋‖∑∏∫∘⟨⟩·×∙∈∉⊆∩∪ℝℕℤ∞πΦ∀∃↔⁻¹])
   | (?P<other>.)
 """, re.X)
 
 BINOPS = {
+    "↔": (25, "none", "=="),
     "∨": (30, "left", "or"),
     "∧": (35, "left", "and"),
     "=": (50, "none", "=="), "≠": (50, "none", "!="),
@@ -577,7 +578,16 @@ class Parser:
                 raise Untranslatable(
                     f"{sym} over the infinite domain {annot!r}: sampling it "
                     "would report a verdict no finite check can support")
-            if annot_dim is None:
+            if annot_dim is None and len(toks) == 2 and toks[0] == "Fin":
+                # `∀ i : Fin n` where `n` is an implicit binder no argument
+                # pins down.  `Fin n` IS a finite index set -- we simply do not
+                # know its size from the annotation -- so falling through to
+                # the use-inference below (the length of whatever the index is
+                # applied to) is sound, and is what `∑` already does.  This is
+                # NOT the function-space or infinite-domain case: those stay
+                # refusals, because there no finite length exists at all.
+                pass
+            elif annot_dim is None:
                 # THE ANNOTATION IS AUTHORITATIVE.  If it is present and names
                 # something we cannot enumerate, REFUSE -- do not fall through
                 # to the range-inference below.  `∀ x : ι → ℝ, 0 ≤ quadForm A x`
@@ -810,6 +820,116 @@ def translate_recursion(d, struct_arg_names=(), fname=None, resolver=None):
     return "\n".join(lines), args
 
 
+def structure_literal_fields(body: str):
+    """[(field, expression_text)] if this body is a structure literal, else None.
+
+    The corpus writes structure values three ways, and the translator refused
+    all three -- `{` was an unsupported token, and the brace-less `where` form
+    parsed its first field as a whole expression and then reported "trailing
+    tokens after expression: op::=".  Together those two messages accounted for
+    86 STRUCTURAL definitions.
+
+        { f := e, g := e2 }          brace literal
+        { base with f := e }         update literal
+        f := e  g := e2              the `where` form, braces omitted
+
+    A field expression is ordinary arithmetic, so once the literal is split each
+    field is a body this translator already handles.  The split is done on the
+    TOKEN stream, not with a regex: a field expression can itself contain `:=`
+    inside a `let`, and it can contain commas inside parentheses, so neither
+    delimiter is safe textually.
+    """
+    src = body.strip()
+    base = None
+    if src.startswith("{"):
+        if not src.endswith("}"):
+            return None
+        inner = src[1:-1].strip()
+        m = re.match(r"^([A-Za-z_][\w'₀-₉.]*)\s+with\s+", inner)
+        if m:
+            base, inner = m.group(1), inner[m.end():]
+    else:
+        inner = src
+    try:
+        toks = tokenize(inner)
+    except Untranslatable:
+        return None
+    starts = []
+    depth = 0
+    for i, t in enumerate(toks):
+        if t.text in ("(", "[", "{"):
+            depth += 1
+        elif t.text in (")", "]", "}"):
+            depth -= 1
+        elif (depth == 0 and t.text == ":=" and i >= 1
+                and toks[i - 1].kind == "ident"
+                and (i == 1 or toks[i - 2].text in (",", ";"))):
+            starts.append(i - 1)
+    if not starts:
+        return None
+    out = []
+    for j, si in enumerate(starts):
+        name = toks[si].text
+        lo = toks[si + 2].col_off if si + 2 < len(toks) else len(inner)
+        if j + 1 < len(starts):
+            end = toks[starts[j + 1]].col_off
+            hi = end
+        else:
+            hi = len(inner)
+        expr = inner[lo:hi].strip().rstrip(",").strip()
+        if expr:
+            out.append((name, expr))
+    return (base, out) if out else None
+
+
+def translate_structure_literal(d, lit, struct_arg_names, fname, kw):
+    """A structure literal becomes a function returning a dict of its fields.
+
+    FIELD BY FIELD, AND PARTIAL ON PURPOSE.  A field whose expression this
+    translator cannot handle is LEFT OUT of the dict rather than defaulted, so
+    that a body which later projects it raises KeyError and the definition is
+    judged NOT-EXTRACTABLE for a stated reason.  Substituting a value would make
+    a wrong field silently computable, which is the failure this package exists
+    to prevent.  The omissions are recorded under `__uninhabited__`, the same
+    key `admissible.struct_value` uses, so `lean_rt._proj` reports them the same
+    way whether the structure was sampled or computed.
+    """
+    base, fields = lit
+    binders = [n for a in d["args"] for n in a["names"]]
+    argnames = [pyname(n) for a in d["args"] if not a["implicit"]
+                for n in a["names"]]
+    parts, refused, pre = [], {}, []
+    for name, expr in fields:
+        try:
+            stmts, ret = translate_body(expr, struct_arg_names, binders, **kw)
+        except Untranslatable as e:
+            refused[name] = str(e)
+            continue
+        except Exception as e:                                    # noqa: BLE001
+            refused[name] = f"translator error: {e!r}"
+            continue
+        pre.extend(stmts)
+        parts.append(f"{name!r}: {ret}")
+    if not parts:
+        raise Untranslatable(
+            "structure literal: not one field expression could be translated ("
+            + "; ".join(f"{k}: {v}" for k, v in list(refused.items())[:3]) + ")")
+    if refused:
+        parts.append("'__uninhabited__': " + repr(refused))
+    lines = [f"def {fname}({', '.join(argnames)}):"]
+    for st in pre:
+        lines.append(f"    {st}")
+    body = "{" + ", ".join(parts) + "}"
+    if base is not None:
+        # `{ base with f := e }`: start from the base record and override.
+        lines.append(f"    _b = dict({pyname(base)})")
+        lines.append(f"    _b.update({body})")
+        lines.append("    return _b")
+    else:
+        lines.append(f"    return {body}")
+    return "\n".join(lines), argnames
+
+
 def translate_def(d, struct_arg_names=(), fname=None, resolver=None,
                   struct_types=None, fields_of=None, dot_resolver=None,
                   vector_args=None, dims=None, lift_arith=False,
@@ -832,6 +952,15 @@ def translate_def(d, struct_arg_names=(), fname=None, resolver=None,
     argnames = [pyname(n) for a in d["args"] if not a["implicit"] for n in a["names"]]
     if not argnames and not d["body"].strip():
         raise Untranslatable("no explicit arguments and no body")
+    lit = structure_literal_fields(d["body"])
+    if lit is not None:
+        return translate_structure_literal(
+            d, lit, struct_arg_names, fname or pyname(d["short"]),
+            dict(resolver=resolver, struct_types=struct_types,
+                 fields_of=fields_of, dot_resolver=dot_resolver,
+                 vector_args=vector_args, dims=dims,
+                 lift_arith=bool(vector_args), enums=enums,
+                 qualified_resolver=qualified_resolver))
     binders = [n for a in d["args"] for n in a["names"]]      # incl. implicit
     stmts, ret = translate_body(d["body"], struct_arg_names, binders, resolver,
                                 struct_types, fields_of, dot_resolver,

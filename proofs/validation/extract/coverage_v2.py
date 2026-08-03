@@ -123,6 +123,13 @@ def mutants(body: str):
     # sampling whatsoever.  Including it would make every non-constant predicate
     # score COVERED on the strength of a mutant that tests nothing -- the same
     # trap as a range check that certifies its own codomain.
+    # If you are about to add the complements "for completeness": DO NOT.
+    # `not P` differs from `P` at every point where `P` is defined, so it is
+    # killed by any sampling whatsoever.  Adding it would hand COVERED to every
+    # non-constant predicate in the corpus -- roughly 48 of them -- on the
+    # strength of a mutant that discriminates nothing.  It is the same structure
+    # as a range check that certifies `Phi`'s codomain instead of the body: a
+    # test that cannot fail, reported as evidence that something passed.
     for a, b in (("≤", "<"), ("≥", ">"), ("<", "≤"), (">", "≥")):
         idx = body.find(f" {a} ")
         if idx >= 0:
@@ -470,6 +477,21 @@ def main(argv=None):
                 continue
 
         else:                                    # STRUCTURAL: the predicate gate
+            # ---------------------------------------------------------------
+            # THIS GATE MADE COVERAGE GO DOWN, 4 -> 3, AND THAT IS THE POINT.
+            # Do not "fix" it back.  What it replaced granted COVERED to any
+            # predicate that was true somewhere in the box and false elsewhere,
+            # and then recorded `falsifiability: 0.5` for a mutant it had never
+            # run -- a fabricated score for an experiment that did not happen.
+            #
+            # NON-CONSTANCY IS NOT FALSIFIABILITY.  `classifiedHighRisk` is the
+            # specimen: it is true at 6 of 40 sampled points, so it varies, so
+            # the old branch scored it COVERED -- and yet its one
+            # distinguishable mutant agrees with it at every one of those 40
+            # points.  A wrong body would not be caught.  That is why the
+            # criterion has to be MUTANT DISAGREEMENT and cannot be any
+            # property of the predicate taken alone.
+            # ---------------------------------------------------------------
             # A predicate has no range, so the range gate cannot touch it.  The
             # falsifiability criterion is the same one though: a check earns
             # coverage only if a NEARBY WRONG BODY would be caught.  For a

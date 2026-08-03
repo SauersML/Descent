@@ -276,6 +276,16 @@ def main(argv=None):
     ap.add_argument("--json", default=None)
     a = ap.parse_args(argv)
     api.require_fresh()
+    # PRINT THE RESOLVED PATH AND REVISION OF EVERY INPUT.  The freshness gate
+    # refuses on a stale table, but it cannot tell that someone pointed this at
+    # the right file in the wrong tree.  A run that names its inputs can be
+    # checked by a reader; one that does not has to be trusted.
+    st = api.stamp()
+    print(f"table   : {(HERE / 'defs.json').resolve()}")
+    print(f"module  : {(HERE / 'lean_defs.py').resolve()}")
+    print(f"corpus  : {st['source_digest_on_disk']} over {st['source_files']} "
+          f"files, {st['n_definitions']} definitions")
+    print(f"current : {st['table_is_current']}\n")
     evaluated, everywhere, on_box = classes()
 
     print("=" * 78)

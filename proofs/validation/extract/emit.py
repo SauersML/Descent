@@ -495,7 +495,16 @@ def main():
             except Exception as e:                                # noqa: BLE001
                 err = repr(e)
                 continue
-            if isinstance(v, bool) or (isinstance(v, (int, float)) and math.isfinite(v)):
+            # A STRUCTURE VALUE IS A LEGITIMATE RESULT.  A definition that
+            # builds a record returns a dict of its fields, and judging that
+            # "not a real number" would report a definition we can now evaluate
+            # as unevaluable.  It is still classified STRUCTURAL -- it does
+            # build a structure -- but it now carries an executable form, so
+            # everything that projects a field out of it becomes reachable.
+            if isinstance(v, dict):
+                ok += 1 if any(k != "__uninhabited__" for k in v) else 0
+            elif isinstance(v, bool) or (isinstance(v, (int, float))
+                                         and math.isfinite(v)):
                 ok += 1
             else:
                 err = err or f"value is not a real number: {type(v).__name__}"
