@@ -34,6 +34,11 @@ structure ExpFunctional (Ω : Type*) where
   add_eval : ∀ f g : Ω → ℝ, eval (f + g) = eval f + eval g
   smul_eval : ∀ (c : ℝ) (f : Ω → ℝ), eval (c • f) = c * eval f
   const_one : eval (fun _ ↦ (1 : ℝ)) = 1
+  /-- Positivity. Without it the functional is signed, Cauchy-Schwarz is FALSE for it,
+  and every consumer needing that inequality has to take it as a hypothesis -- which is a
+  literature theorem passed as a parameter. Positivity is what an expectation actually has,
+  and it is what makes the inequality a theorem here rather than an assumption. -/
+  nonneg_eval : ∀ f : Ω → ℝ, (∀ ω, 0 ≤ f ω) → 0 ≤ eval f
 
 instance {Ω : Type*} : CoeFun (ExpFunctional Ω) (fun _ ↦ (Ω → ℝ) → ℝ) :=
   ⟨ExpFunctional.eval⟩
@@ -59,6 +64,7 @@ def ExpFunctional.evalAt {Ω : Type*} (ω : Ω) : ExpFunctional Ω where
   add_eval _ _ := rfl
   smul_eval _ _ := rfl
   const_one := rfl
+  nonneg_eval _ hf := hf ω
 
 instance {Ω : Type*} [Nonempty Ω] : Nonempty (ExpFunctional Ω) :=
   ⟨ExpFunctional.evalAt (Classical.arbitrary Ω)⟩
@@ -66,6 +72,72 @@ instance {Ω : Type*} [Nonempty Ω] : Nonempty (ExpFunctional Ω) :=
 namespace ExpFunctional
 
 variable {Ω : Type*}
+
+/-- Monotonicity: a pointwise inequality is preserved. -/
+theorem eval_mono (E : ExpFunctional Ω) {f g : Ω → ℝ} (h : ∀ ω, f ω ≤ g ω) :
+    E f ≤ E g := by
+  have hnn : 0 ≤ E (g - f) := E.nonneg_eval _ fun ω ↦ by
+    simpa using sub_nonneg.mpr (h ω)
+  have hsub : E (g - f) = E g - E f := by
+    have := E.add_eval (g - f) f
+    simp only [sub_add_cancel] at this
+    linarith
+  linarith [hsub ▸ hnn]
+
+/-- **Cauchy-Schwarz, proved rather than assumed.**
+
+    For a positive linear functional, `E(fg)² ≤ E(f²) E(g²)`. The proof is the discriminant
+    argument: `E((f - t g)²) ≥ 0` for every real `t`, and a nonnegative quadratic in `t` has
+    nonpositive discriminant.
+
+    This exists because consumers were taking the inequality as a hypothesis, which proves
+    only that it was assumed. It could not be proved before `nonneg_eval` was added, because
+    the inequality is FALSE for a signed linear functional -- the missing field was the
+    defect, and the hypothesis was the symptom. -/
+theorem cauchy_schwarz (E : ExpFunctional Ω) (f g : Ω → ℝ) :
+    E (fun ω ↦ f ω * g ω) ^ 2 ≤ E (fun ω ↦ f ω ^ 2) * E (fun ω ↦ g ω ^ 2) := by
+  have hquad : ∀ t : ℝ,
+      0 ≤ E (fun ω ↦ f ω ^ 2) - 2 * t * E (fun ω ↦ f ω * g ω)
+            + t ^ 2 * E (fun ω ↦ g ω ^ 2) := by
+    intro t
+    have hpt : 0 ≤ E (fun ω ↦ (f ω - t * g ω) ^ 2) :=
+      E.nonneg_eval _ fun ω ↦ sq_nonneg _
+    have hexp : E (fun ω ↦ (f ω - t * g ω) ^ 2)
+        = E (fun ω ↦ f ω ^ 2) - 2 * t * E (fun ω ↦ f ω * g ω)
+            + t ^ 2 * E (fun ω ↦ g ω ^ 2) := by
+      have hsplit : (fun ω ↦ (f ω - t * g ω) ^ 2)
+          = (fun ω ↦ f ω ^ 2) + ((-(2 * t)) • fun ω ↦ f ω * g ω)
+            + ((t ^ 2) • fun ω ↦ g ω ^ 2) := by
+        funext ω
+        simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul]
+        ring
+      rw [hsplit, E.add_eval, E.add_eval, E.smul_eval, E.smul_eval]
+      ring
+    linarith [hexp ▸ hpt]
+  have hg : 0 ≤ E (fun ω ↦ g ω ^ 2) := E.nonneg_eval _ fun ω ↦ sq_nonneg _
+  rcases eq_or_lt_of_le hg with hg0 | hgpos
+  · set c := E (fun ω ↦ f ω * g ω) with hcdef
+    set a := E (fun ω ↦ f ω ^ 2) with hadef
+    have hall : ∀ t : ℝ, 0 ≤ a - 2 * t * c := by
+      intro t
+      have ht := hquad t
+      rw [← hg0] at ht
+      simpa using ht
+    have hzero : c = 0 := by
+      by_contra hne
+      have hc2 : (2 : ℝ) * c ≠ 0 := by
+        simpa using hne
+      have hval : 2 * ((a + 1) / (2 * c)) * c = a + 1 := by
+        field_simp
+      have h := hall ((a + 1) / (2 * c))
+      rw [hval] at h
+      linarith
+    rw [hzero, ← hg0]
+    simp
+  · have hne : E (fun ω ↦ g ω ^ 2) ≠ 0 := ne_of_gt hgpos
+    have hdisc := hquad (E (fun ω ↦ f ω * g ω) / E (fun ω ↦ g ω ^ 2))
+    field_simp at hdisc
+    nlinarith [hdisc, hgpos]
 
 @[simp] theorem eval_zero (E : ExpFunctional Ω) : E (0 : Ω → ℝ) = 0 := by
   have h := E.smul_eval (0 : ℝ) (fun _ ↦ (1 : ℝ))
