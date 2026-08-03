@@ -276,8 +276,12 @@
 
 set -uo pipefail
 
-ROOT=/projects/standard/hsiehph/sauer354
-REPO=$ROOT/gnomon
+ROOT=${GNOMON_ROOT:-/projects/standard/hsiehph/sauer354}
+# The shared checkout runs many commits behind and carries dirty files, so a
+# build of it reports the state of that tree rather than the state of the
+# corpus. Point GNOMON_REPO at a clean clone at a named revision when you want
+# a number anyone can trust, and record the revision beside the number.
+REPO=${GNOMON_REPO:-$ROOT/gnomon}
 TARGETS=("$@")
 if [ ${#TARGETS[@]} -eq 0 ]; then TARGETS=(Calibrator); fi
 
