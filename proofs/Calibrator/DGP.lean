@@ -107,7 +107,8 @@ So what these prove is `mem_approximationInterval_of_abs_sub_le` — `|x - c| �
 [c-ε, c+ε]` — with `ε` instantiated at a named quantity.  They are kept because the
 interval interface is used downstream, and stated so that the assumed step is visible in
 the hypothesis rather than implied by the word "certified".  Note also that
-`aucApproximationInterval` and `r2ApproximationInterval` are the *same* function
+`approximationInterval` is used for both AUC and `R²` below; the two aliases that used to
+distinguish them were the *same* function
 `approximationInterval` under two names, so nothing in either statement would detect
 swapping AUC for `R²`. -/
 
@@ -119,8 +120,8 @@ theorem HWEPolygenicScoreDGP.mem_aucApproximationInterval_of_abs_sub_le
     (aucExact aucGaussian : ℝ)
     (h : |aucExact - aucGaussian| ≤ dgp.scoreApproximationError) :
     aucExact ∈
-      Calibrator.aucApproximationInterval aucGaussian dgp.scoreApproximationError := by
-  simpa [Calibrator.aucApproximationInterval] using
+      Calibrator.approximationInterval aucGaussian dgp.scoreApproximationError := by
+  simpa [Calibrator.approximationInterval] using
     (mem_approximationInterval_of_abs_sub_le
     aucExact aucGaussian dgp.scoreApproximationError
     (by
@@ -136,8 +137,8 @@ theorem HWEPolygenicScoreDGP.mem_r2ApproximationInterval_of_abs_sub_le
     (r2Exact r2Gaussian : ℝ)
     (h : |r2Exact - r2Gaussian| ≤ dgp.scoreApproximationError) :
     r2Exact ∈
-      Calibrator.r2ApproximationInterval r2Gaussian dgp.scoreApproximationError := by
-  simpa [Calibrator.r2ApproximationInterval] using
+      Calibrator.approximationInterval r2Gaussian dgp.scoreApproximationError := by
+  simpa [Calibrator.approximationInterval] using
     (mem_approximationInterval_of_abs_sub_le
     r2Exact r2Gaussian dgp.scoreApproximationError
     (by

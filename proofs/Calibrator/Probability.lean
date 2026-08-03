@@ -466,27 +466,6 @@ theorem HWEScoreModel.berryEsseenErrorBound_nonneg {m : ℕ} [Fintype (Fin m)]
     berryEsseenConstant model.scoreVariance model.scoreThirdAbsMomentBound
     hC (model.scoreVariance_nonneg) (model.scoreThirdAbsMomentBound_nonneg)
 
-/-- A pointwise CDF-approximation certificate. This is the interface needed to transport
-Berry-Esseen bounds into liability-threshold, AUC, and `R²` error envelopes. -/
-structure CdfApproximationCertificate where
-  exactCdf : ℝ → ℝ
-  approxCdf : ℝ → ℝ
-  epsilon : ℝ
-  epsilon_nonneg : 0 ≤ epsilon
-  pointwise_error : ∀ x : ℝ, |exactCdf x - approxCdf x| ≤ epsilon
-
-/-- If a score CDF is within `ε` of an approximating CDF at threshold `t`,
-then the corresponding tail probability is also within `ε`. -/
-theorem tail_probability_error_of_cdf_error
-    (cert : CdfApproximationCertificate) (t : ℝ) :
-    |((1 - cert.exactCdf t) - (1 - cert.approxCdf t))| ≤ cert.epsilon := by
-  have h := cert.pointwise_error t
-  calc
-    |((1 - cert.exactCdf t) - (1 - cert.approxCdf t))|
-        = |-(cert.exactCdf t - cert.approxCdf t)| := by ring_nf
-    _ = |cert.exactCdf t - cert.approxCdf t| := by rw [abs_neg]
-    _ ≤ cert.epsilon := h
-
 /-- Closed interval of values consistent with an approximation center and error radius. -/
 def approximationInterval (center epsilon : ℝ) : Set ℝ :=
   Set.Icc (center - epsilon) (center + epsilon)
@@ -500,13 +479,11 @@ theorem mem_approximationInterval_of_abs_sub_le
   unfold approximationInterval
   constructor <;> linarith [abs_le.mp h |>.1, abs_le.mp h |>.2]
 
-/-- AUC approximation envelope from a Gaussian center and a Berry-Esseen error radius. -/
-def aucApproximationInterval (aucGaussian epsilon : ℝ) : Set ℝ :=
-  approximationInterval aucGaussian epsilon
-
-/-- `R²` approximation envelope from a Gaussian center and a Berry-Esseen error radius. -/
-def r2ApproximationInterval (r2Gaussian epsilon : ℝ) : Set ℝ :=
-  approximationInterval r2Gaussian epsilon
+/-! `aucApproximationInterval` and `r2ApproximationInterval` used to sit here as two names for
+`approximationInterval`. They are removed: identical bodies under different names meant that
+nothing in any statement using them would detect swapping AUC for `R²`, which is precisely the
+distinction the names were there to make. Callers use `approximationInterval` and say in their
+own statement which functional they mean. -/
 
 noncomputable def stdNormalProdMeasure (k : ℕ) [Fintype (Fin k)] : Measure (ℝ × (Fin k → ℝ)) :=
   (ProbabilityTheory.gaussianReal 0 1).prod (Measure.pi (fun (_ : Fin k) => ProbabilityTheory.gaussianReal 0 1))

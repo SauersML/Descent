@@ -442,12 +442,22 @@ that follow are stated against it.
 Empirical status: DERIVED. The discrepancy is between two files in this corpus, not against
 an experiment. -/
 
-/-- **The Berry–Esseen bound, spelled correctly**: `C·ρ/(σ³·√m)` with `σ³ = (σ²)^{3/2}`.
+/-- **The Berry–Esseen bound at `m` summands**, defined *through* the existing
+    `Calibrator.Probability.berryEsseenErrorBound` rather than beside it.
 
-    Matches `Calibrator.Probability`'s spelling. Prefer this to the `σ²`-denominator form
-    used by the older theorems in this section. -/
+    A first version of this wrote the formula out again and claimed in its docstring to
+    "match `Probability`'s spelling" — which is the duplicate-body defect this corpus's guard
+    reports: two files carrying alpha-equivalent bodies tied by neither a call nor a theorem,
+    so a later edit to one silently diverges from the other. It now calls that definition, and
+    `berryEsseenBound_eq` states the closed form as a theorem. -/
 noncomputable def berryEsseenBound (C ρ σ_sq m : ℝ) : ℝ :=
-  C * ρ / (σ_sq * Real.sqrt σ_sq * Real.sqrt m)
+  berryEsseenErrorBound C σ_sq ρ / Real.sqrt m
+
+/-- The closed form, now a theorem rather than a second definition. -/
+theorem berryEsseenBound_eq (C ρ σ_sq m : ℝ) :
+    berryEsseenBound C ρ σ_sq m = C * ρ / (σ_sq * Real.sqrt σ_sq * Real.sqrt m) := by
+  unfold berryEsseenBound berryEsseenErrorBound
+  rw [div_div]
 
 /-- The corrected bound still decreases in the marker count, so the older theorems' *conclusion*
     survives the respelling even though their formula does not. -/
@@ -458,7 +468,7 @@ theorem berryEsseenBound_antitone (C ρ σ_sq m₁ m₂ : ℝ)
   have hsm₁ : 0 < Real.sqrt m₁ := Real.sqrt_pos.mpr hm₁
   have hlt : Real.sqrt m₁ < Real.sqrt m₂ :=
     Real.sqrt_lt_sqrt (le_of_lt hm₁) hm
-  unfold berryEsseenBound
+  rw [berryEsseenBound_eq, berryEsseenBound_eq]
   apply div_lt_div_of_pos_left (mul_pos hC hρ) (by positivity)
   exact mul_lt_mul_of_pos_left hlt (by positivity)
 
