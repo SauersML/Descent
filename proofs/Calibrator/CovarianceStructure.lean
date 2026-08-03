@@ -38,11 +38,9 @@ section LDMatrixProperties
 
 /-! **Diagonal of LD matrix is genotype variance.** `Σ_jj = 2p_j(1-p_j)`.
 
-This file used to define that quantity itself, under the name
-`genotypeVarianceAtLocus`. It is `genotypeVarianceHWE` from
-`Calibrator.AncestrySpecificPower`, and the definition here has been deleted in
-favour of that one so that the ploidy convention lives in a single place; the
-empirical status and the `Denotes` declaration travelled with it. -/
+This is `genotypeVarianceHWE` from `Calibrator.AncestrySpecificPower`. Do not define it
+here: the ploidy convention lives in a single place, and its empirical status and
+`Denotes` declaration belong with that definition. -/
 
 /-! **Why this was renamed.** It was called `allelicVariance`, and the allelic
 variance is `p(1-p)`, not `2p(1-p)`. The formula is the *genotype* variance,
@@ -354,7 +352,7 @@ noncomputable def ldsrExpectedBetaSq (h2 M ell_j N : ℝ) : ℝ :=
     `χ²_j = (N h²/M) ℓ_j + N a + 1`, with intercept above one indicating
     confounding and slope proportional to `h²/M`.
 
-    The confounding term was previously divided by `M` as well. Simulation with
+    **The confounding term is not divided by `M`.** Simulation with
     pure stratification and no genetic effect holds the confounding fixed and
     varies `M` sixteenfold: the excess over one is flat, so the reference law's
     `a` is constant to within noise while the divided form's implied `a` grows
@@ -493,11 +491,9 @@ noncomputable def haplotypeFreqAdmixed (alpha p_A q_A p_B q_B : ℝ) : ℝ :=
 
 /-! **Marginal allele frequency at either locus in the admixed population.**
 
-This file used to define that quantity twice, as `admixedAlleleFreq1` and
-`admixedAlleleFreq2`, differing only in the names of the bound variables. It is
-`admixedAlleleFreq` from `Calibrator.DemographicHistory`, one function of a
-mixing weight and two parental frequencies, applied once per locus; both
-restatements have been deleted in favour of that one.
+This is `admixedAlleleFreq` from `Calibrator.DemographicHistory` -- one function of a
+mixing weight and two parental frequencies, applied once per locus. Do not add a
+per-locus copy; two copies differing only in bound-variable names is what that invites.
 
     Denotes: a frequency or proportion. Other definitions share this formula
     under names from a different concept family; the formula does not fix which
