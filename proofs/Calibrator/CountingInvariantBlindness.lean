@@ -51,9 +51,7 @@ Empirical status: UNTESTED. The `m_eff` instance referred to above is separately
 in `proofs/validation/meff_prohibition/`; nothing in this module is a numerical claim.
 -/
 
-namespace Calibrator
-
-namespace CountingInvariantBlindness
+namespace Calibrator.CountingInvariantBlindness
 
 /-! ## The abstract witness -/
 
@@ -282,6 +280,4 @@ theorem ghostGain_ne_countPredicted_at_one :
 noncomputable def ghostWitnessExample (u : ℝ) : Witness Bool ℝ :=
   ghostWitness 1 1 u ghostGain_ne_countPredicted_at_one
 
-end CountingInvariantBlindness
-
-end Calibrator
+end Calibrator.CountingInvariantBlindness
