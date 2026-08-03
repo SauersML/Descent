@@ -220,20 +220,26 @@ def unionOfClosures (env : Environment) (names : Array Name) : Array Name :=
     ({} : CollectAxioms.State)
   st.axioms
 
-/-- Which roots actually depend on `target`, up to `limit` of them.
+/-- User-authored declarations that directly introduce or use `target`.
 
-Runs only when `unionOfClosures` has already found `target`, so the expensive
-per-declaration walk is paid on the interesting path and never on the clean
-one.  Capped because the point is to name the debtor, not to enumerate every
-consumer -- and the cap is reported, so a truncated list cannot be misread as a
-complete one. -/
-def witnessesOf (env : Environment) (names : Array Name) (target : Name)
-    (limit : Nat) : Array Name := Id.run do
+`unionOfClosures` already answers the transitive question once.  Attribution
+must not call `collectAxioms` again for each root: doing so re-walked Mathlib
+forty times whenever `sorryAx` was present and turned a seconds-scale audit into
+a fourteen-minute job.  A direct occurrence names the actual debtor.  An axiom
+is included by its own name; an admission is included where the elaborated
+proof term contains `sorryAx`.  Downstream consumers remain transitively marked
+by Lean's ordinary `#print axioms` semantics, but are not mislabeled as forty
+separate admissions. -/
+def directDebtorsOf (env : Environment) (names : Array Name) (target : Name) :
+    Array Name := Id.run do
   let mut out := #[]
   for n in names do
-    if out.size ≥ limit then break
-    let ax := (((CollectAxioms.collect n).run env).run {}).2.axioms
-    if ax.contains target then out := out.push n
+    if n == target then
+      out := out.push n
+      continue
+    let some ci := env.find? n | continue
+    let some value := ci.value? | continue
+    if value.getUsedConstants.contains target then out := out.push n
   return out
 
 end Axioms
@@ -458,17 +464,16 @@ run_cmd do
   let mut offenders : Array (Name × Name × Array Name) := #[]
   let mut admissions : Array (Name × Name × Array Name) := #[]
   for a in offending do
-    for n in Axioms.witnessesOf env names a 20 do
+    for n in Axioms.directDebtorsOf env names a do
       offenders := offenders.push ((env.getModuleFor? n).getD `«unknown», n, #[a])
   for a in admitted do
-    for n in Axioms.witnessesOf env names a 40 do
+    for n in Axioms.directDebtorsOf env names a do
       admissions := admissions.push ((env.getModuleFor? n).getD `«unknown», n, #[a])
   for (m, name, bad) in offenders do
     logError m!"AXIOM\t{m}\t{name}\t{bad.toList}"
-  -- Admissions are printed one per declaration, at the same volume and in the
-  -- same format.  The transitive closure means this list names every consumer
-  -- as well as the admitted declaration itself, which is the intended reading:
-  -- it is the blast radius of the debt, not a single site.
+  -- Admissions are printed one per direct debtor.  The union check above is
+  -- transitive; this attribution list intentionally names where the debt enters
+  -- the corpus rather than an arbitrary capped prefix of downstream consumers.
   for (m, name, bad) in admissions do
     logInfo m!"ADMISSION\t{m}\t{name}\t{bad.toList}"
   logInfo m!"AXIOM_SCAN_SCANNED\t{scanned}"
@@ -528,7 +533,12 @@ run_cmd do
               if h == ``Empty || h == ``PEmpty then
                 fs := fs.push ⟨"LAUNDER_EMPTY", true, mod, name,
                   s!"parameter `{nm} : {h}` -- the statement is vacuous"⟩
-              else if (getStructureInfo? env h).isSome then
+              -- Mathlib typeclasses such as `TopologicalSpace`, `Ring`, and
+              -- `MeasurableSpace` also have Prop-valued fields.  They are part
+              -- of the ambient language, not theorem certificates declared by
+              -- this corpus.  Treating them as unbuilt Calibrator carriers
+              -- made every ordinary polymorphic theorem a fatal false positive.
+              else if Check.isOurs h && (getStructureInfo? env h).isSome then
                 let entry ← match cache[h]? with
                   | some e => pure e
                   | none => do
