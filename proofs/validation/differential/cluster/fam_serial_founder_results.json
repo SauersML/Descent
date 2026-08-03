@@ -8,7 +8,14 @@
   "seed": null,
   "seedNote": "The script draws no random numbers. Its output is a function of the code and of sims/results_hpc/ancestry_calibration/results/{accuracy_binary.csv,calibration_binary.csv} alone, so a disagreement with a re-run is NOT explainable as a seed change.",
   "numpy": null,
-  "numpyConstraint": "numpy 1.x. The run predates commit db344f43 and used the bare np.trapz at line 312, which numpy 2 removed, so it cannot have executed on numpy 2. A re-run on the current venv is on numpy 2.5.1, which makes the numpy version a live candidate for any small disagreement.",
+  "numpyConstraint": "numpy 1.x. The run predates commit db344f43 and used the bare np.trapz that numpy 2 removed, so it cannot have executed on numpy 2.",
+  "reproduction": {
+   "note": "REPORTED BY A LATER RUN, not by the run that wrote this file. Recorded here because it settles two questions this block would otherwise leave open.",
+   "reportedBy": "cluster run, revision bb0d1f6a, 2026-08-03T18:53:20Z, node cn1136, numpy 2.5.1, python 3.12.13",
+   "A_serial_founder": "REPRODUCED. Every row k=1..9 agrees with this file to the precision the run prints. The two values the website cites are in the k=9 row, which is rows[8]: exact 0.192481575584186 and founder_ceiling 0.18496515431908497. The re-run printed the latter as 0.184965154319085, which is the same number to the 15 significant figures printed and is NOT a full-precision string comparison; nobody has compared the stored float bit for bit against a fresh one. Part A is an exact 56-state calculation with no sampling, so agreement is the expected outcome, and it strikes NUMPY VERSION off the list of explanations for that part.",
+   "B_brier": "NOT REPRODUCED, AND NOT CONTRADICTED. Part B reads accuracy_binary.csv and calibration_binary.csv from sims/results_hpc/, which is gitignored: no checkout contains it and no clone ever will. On a machine without that private tree part B cannot run at all. So B_brier here has no reproducible path behind it, and nothing in the later run either confirms or refutes it.",
+   "C_prevalence": "NOT REPRODUCED, same reason as B_brier: it reads the same study data."
+  },
   "producedBetween": {
    "after": "c35cecb57b83adec13c3935a6fa651509d8318e1",
    "afterAt": "2026-08-03T09:28:49-05:00",
@@ -18,6 +25,7 @@
    "beforeWhy": "the single commit that added this file; it has never been modified since"
   },
   "howToVerifyThisBlock": "git log --format='%H %ad' --date=iso -- proofs/validation/differential/cluster/fam_serial_founder_results.json  and  git show c35cecb5:proofs/validation/differential/cluster/fam_serial_founder.py | grep -n trapz",
+  "reproducibilityIsNotUniformAcrossTHISFILE": "A_serial_founder is regenerable by anyone with a checkout: it reads no data files. B_brier and C_prevalence are NOT, on any machine that does not have the private study tree mounted. Do not read a provenance block on this file as a claim that the whole of it can be regenerated.",
   "supersededBy": "Any future run writes a real _provenance block from proofs/validation/simprov.py. If this after-the-fact block is still here, this file is still the original run."
  },
  "A_serial_founder": {
