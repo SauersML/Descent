@@ -6,7 +6,7 @@ import Calibrator.OpenQuestions
 namespace Calibrator
 
 open MeasureTheory
-open TransportedMetrics (gaussianAUCFromSignalVariance)
+open TransportedMetrics (equalVarianceGaussianAUCFromSignalVariance)
 
 /-!
 # PGS Calibration Theory
@@ -1102,7 +1102,7 @@ theorem targetMetricAndCalibrationProfilesAtGeneration_exact_mechanistic_popgen_
             (scoreVarianceFromSourceWeights (m.metric.toMetricModelAt t) Pop.target *
               effectiveOutcomeVariance (m.metric.toMetricModelAt t) Pop.target)
       , auc :=
-          gaussianAUCFromSignalVariance
+          equalVarianceGaussianAUCFromSignalVariance
             ((predictiveCovarianceFromSourceWeights (m.metric.toMetricModelAt t) Pop.target) ^ 2 /
               scoreVarianceFromSourceWeights (m.metric.toMetricModelAt t) Pop.target)
             (effectiveOutcomeVariance (m.metric.toMetricModelAt t) Pop.target -
@@ -1243,7 +1243,7 @@ theorem neutralAF_benchmark_cross_ancestry_auc_drops_and_brier_worsens
     (h_fst : fstSource < fstTarget)
     (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1)
     (hPhiStrict : StrictMono Phi) :
-    targetExactGaussianAUCFromNeutralAFBenchmark V_A V_E fstTarget <
+    targetEqualVarianceGaussianAUCFromNeutralAFBenchmark V_A V_E fstTarget <
       presentDayEqualVarianceGaussianAUC V_A V_E fstSource ∧
     sourceBrierFromR2 π (presentDayR2 V_A V_E fstSource) <
       targetExactCalibratedBrierRisk π V_A V_E fstTarget := by

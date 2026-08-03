@@ -360,7 +360,7 @@ theorem neutralAF_benchmark_liability_auc_sensitive_to_drift
     (h_fst_bounds : 0 ≤ fstS ∧ fstT < 1)
     (hPhiStrict : StrictMono Phi) :
     0 < presentDayEqualVarianceGaussianAUC V_A V_E fstS -
-      targetExactGaussianAUCFromNeutralAFBenchmark V_A V_E fstT := by
+      targetEqualVarianceGaussianAUCFromNeutralAFBenchmark V_A V_E fstT := by
   have h_drop :=
     targetLiabilityAUC_lt_source_of_neutralAF_benchmark
       V_A V_E fstS fstT hVA hVE h_fst h_fst_bounds hPhiStrict
@@ -424,17 +424,17 @@ THIS IS WHAT IT SHOULD HAVE SAID.**
 
 The deleted conjunct was
 
-`targetExactGaussianAUCFromNeutralAFBenchmark V_A V_E fst =
+`targetEqualVarianceGaussianAUCFromNeutralAFBenchmark V_A V_E fst =
    presentDayEqualVarianceGaussianAUC V_A V_E fst`
 
 and it was proved by `rfl`, because those two names denote **the same function**:
-`targetExactGaussianAUCFromNeutralAFBenchmark` delegates to
-`targetGaussianAUCFromNeutralAFBenchmark`, which delegates to `presentDayGaussianAUC`, of
+`targetEqualVarianceGaussianAUCFromNeutralAFBenchmark` delegates to
+`targetEqualVarianceGaussianAUCFromNeutralAFBenchmark`, which delegates to `presentDayEqualVarianceGaussianAUC`, of
 which `presentDayEqualVarianceGaussianAUC` is a one-line alias. It was `f x = f x` wearing
 two names, and it would have held equally well had AUC been wildly *not* preserved. Nothing
 in reading the statement revealed this; the name structure concealed it.
 
-Note what did **not** help: the docstring on `targetExactGaussianAUCFromNeutralAFBenchmark`
+Note what did **not** help: the docstring on `targetEqualVarianceGaussianAUCFromNeutralAFBenchmark`
 had already been corrected to say "equal-variance Gaussian" and to record the `-0.068`
 bias. A docstring cannot repair a statement built out of identifiers.
 
@@ -446,8 +446,8 @@ with different attenuated signal variance and the conclusion goes away. -/
 theorem neutralAF_benchmark_auc_depends_only_on_attenuated_signal
     (V_A V_E fst V_A' fst' : ℝ)
     (h : presentDayPGSVariance V_A fst = presentDayPGSVariance V_A' fst') :
-    presentDayGaussianAUC V_A V_E fst = presentDayGaussianAUC V_A' V_E fst' := by
-  unfold presentDayGaussianAUC presentDaySignalToNoise
+    presentDayEqualVarianceGaussianAUC V_A V_E fst = presentDayEqualVarianceGaussianAUC V_A' V_E fst' := by
+  unfold presentDayEqualVarianceGaussianAUC presentDaySignalToNoise
   rw [h]
 
 /-- **Benchmark discrimination can be preserved while calibration is lost.**
@@ -473,7 +473,7 @@ theorem neutralAF_benchmark_discrimination_preserved_calibration_lost
     (h_same_signal : presentDayPGSVariance V_A fst = presentDayPGSVariance V_A' fst')
     (h_src_cal : calibrationInTheLarge mean_obs mean_pred = 0)
     (h_shift : δ ≠ 0) :
-    presentDayGaussianAUC V_A V_E fst = presentDayGaussianAUC V_A' V_E fst' ∧
+    presentDayEqualVarianceGaussianAUC V_A V_E fst = presentDayEqualVarianceGaussianAUC V_A' V_E fst' ∧
     |calibrationInTheLarge mean_obs mean_pred| <
       |calibrationInTheLarge mean_obs (mean_pred + δ)| := by
   have h_citl_shift :=

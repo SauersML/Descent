@@ -23,7 +23,7 @@ cannot collide, since this file defines none of these names and the only
 namespace. The remaining `TransportedMetrics.` prefixes in this file are left
 alone; both spellings resolve to the same constant. -/
 open TransportedMetrics (r2FromSignalVariance r2FromSignalVariance_eq_rsquared
-  gaussianAUCFromSignalVariance gaussianAUCFromSignalVariance_eq_processAUC
+  equalVarianceGaussianAUCFromSignalVariance equalVarianceGaussianAUCFromSignalVariance_eq_processAUC
   GaussianLiabilityRegime)
 
 section PortabilityDrift
@@ -59,8 +59,8 @@ never equal.
     regime is the whole point of this definition rather than a caveat on it: the
     closed-population drift recurrence is a *different* model, not the `F_ST` of
     a split, and confusing the two is the model error that the
-    `fstDerived`/`fstFromTau`/`targetHetFromFst` cluster turns on (see the
-    `fstDerived-is-not-split-fst` check).  Outside a clean split -- under
+    `heterozygosityLossDerived`/`fstFromTau`/`targetHetFromFst` cluster turns on (see the
+    `heterozygosityLossDerived-is-not-split-fst` check).  Outside a clean split -- under
     migration, unequal sizes, or ongoing gene flow -- this map is not claimed.
 
     Empirical status: VALIDATED (0.0909/0.2000/0.3333/0.5000/0.6667/0.8000 at
@@ -944,22 +944,8 @@ Measured cost of the substitution on 400 simulated binary-trait PGS studies: bia
 `-0.068` AUC, RMSE `0.071`, max error `0.120`. For a dichotomised trait use
 `liabilityThresholdAUCFromExplainedR2` (RMSE `0.0121` on the same runs, against a `0.0120`
 seed-noise floor). -/
-noncomputable def presentDayGaussianAUC (V_A V_E fst : ℝ) : ℝ :=
-  Phi (Real.sqrt (presentDaySignalToNoise V_A V_E fst / 2))
-
-/-- Closed-form present-day AUC under the equal-variance Gaussian model, `Φ(√(SNR/2))` with
-`SNR = presentDayPGSVariance / V_E`.
-
-**NOT APPLICABLE TO DICHOTOMISED TRAITS**, for the reason given on `presentDayGaussianAUC`,
-which this delegates to: equal residual variance in cases and controls is the
-equal-variance Gaussian outcome assumption, not the liability-threshold one. Binary-trait
-counterpart: `liabilityThresholdAUCFromExplainedR2`.
-
-    Empirical status: UNTESTED as written. The formula it delegates to is VALIDATED for an
-    equal-variance Gaussian outcome and FALSIFIED for dichotomised traits, where it is
-    biased `-0.068` AUC over 400 simulated studies. -/
 noncomputable def presentDayEqualVarianceGaussianAUC (V_A V_E fst : ℝ) : ℝ :=
-  presentDayGaussianAUC V_A V_E fst
+  Phi (Real.sqrt (presentDaySignalToNoise V_A V_E fst / 2))
 
 /-- Drift monotonically degrades signal-to-noise when `V_A, V_E > 0`. -/
 theorem drift_degrades_signalToNoise
@@ -1048,8 +1034,8 @@ theorem drift_degrades_AUC_of_strictMono
     (hfst : fstS < fstT)
     (hfstT_le_one : fstT ≤ 1)
     (hPhiStrict : StrictMono Phi) :
-    presentDayGaussianAUC V_A V_E fstT < presentDayGaussianAUC V_A V_E fstS := by
-  unfold presentDayGaussianAUC
+    presentDayEqualVarianceGaussianAUC V_A V_E fstT < presentDayEqualVarianceGaussianAUC V_A V_E fstS := by
+  unfold presentDayEqualVarianceGaussianAUC
   apply hPhiStrict
   have hsnr := drift_degrades_signalToNoise V_A V_E fstS fstT hVA hVE hfst
   have hhalf_nonneg : 0 ≤ presentDaySignalToNoise V_A V_E fstT / 2 := by
@@ -2258,7 +2244,7 @@ theorem PGSEvolutionaryModel.toGenerationalPopGenParameters_mutationSharedRetent
   rw [PGSEvolutionaryModel.toGenerationalPopGenParameters_theta]
   simp only [GenerationalPopGenParameters.tauAt,
     PGSEvolutionaryModel.toGenerationalPopGenParameters,
-    PGSEvolutionaryModel.toEvo, EvolutionaryParameters.theta, EvolutionaryParameters.tau]
+    EvolutionaryParameters.theta, EvolutionaryParameters.tau]
   rw [h_disc, Nat.floor_natCast]
 
 /-- When divergence time is an integer number of generations, the coarse
@@ -2274,7 +2260,7 @@ theorem PGSEvolutionaryModel.toGenerationalPopGenParameters_migrationSharedBoost
   rw [PGSEvolutionaryModel.toGenerationalPopGenParameters_bigM]
   simp only [GenerationalPopGenParameters.tauAt,
     PGSEvolutionaryModel.toGenerationalPopGenParameters,
-    PGSEvolutionaryModel.toEvo, EvolutionaryParameters.bigM, EvolutionaryParameters.tau]
+    EvolutionaryParameters.bigM, EvolutionaryParameters.tau]
   rw [h_disc, Nat.floor_natCast]
 
 /-- Exact bridge from the DGP coordinate summary to the generational popgen
@@ -2954,25 +2940,75 @@ explained-risk coordinates. -/
 abbrev brierFromR2 (π r2 : ℝ) : ℝ :=
   TransportedMetrics.calibratedBrier π r2
 
+/-! ### Liability-threshold primitives
+
+These declarations precede every public profile that names the binary-trait
+AUC. Lean checks declaration references in documentation as well as terms, so
+placing the liability chart after its first consumer made the module fail even
+though the eventual formula was present in the same file. -/
+
+/-- Standard normal density, `φ(x) = exp(-x²/2)/√(2π)`. -/
+noncomputable def standardNormalPdf (x : ℝ) : ℝ :=
+  Real.exp (-x ^ 2 / 2) / Real.sqrt (2 * Real.pi)
+
+/-- The liability threshold `T = Φ⁻¹(1 - K)` for prevalence `K`. -/
+noncomputable def liabilityThreshold (K : ℝ) : ℝ := Function.invFun Phi (1 - K)
+
+/-- Mean liability among cases, `i = φ(T)/K`. -/
+noncomputable def liabilityCaseMean (K : ℝ) : ℝ :=
+  standardNormalPdf (liabilityThreshold K) / K
+
+/-- Mean liability among controls, `i_c = -i·K/(1-K)`. -/
+noncomputable def liabilityControlMean (K : ℝ) : ℝ :=
+  -liabilityCaseMean K * K / (1 - K)
+
+/-- Score variance among cases, `v₁ = 1 - R²·i·(i - T)`. -/
+noncomputable def liabilityCaseVariance (r2 K : ℝ) : ℝ :=
+  1 - r2 * liabilityCaseMean K * (liabilityCaseMean K - liabilityThreshold K)
+
+/-- Score variance among controls, `v₀ = 1 - R²·i_c·(i_c - T)`. -/
+noncomputable def liabilityControlVariance (r2 K : ℝ) : ℝ :=
+  1 - r2 * liabilityControlMean K * (liabilityControlMean K - liabilityThreshold K)
+
+/-- **The liability-threshold AUC**, with prevalence a required argument.
+
+Empirical status: VALIDATED against 400 simulated PGS studies. Pooled RMSE is
+`0.0121` with bias `-0.0007`, matching the independently measured `0.0120`
+seed-to-seed noise floor. -/
+noncomputable def liabilityThresholdAUCFromExplainedR2 (r2 K : ℝ) : ℝ :=
+  Phi ((liabilityCaseMean K - liabilityControlMean K) * Real.sqrt r2 /
+    Real.sqrt (liabilityCaseVariance r2 K + liabilityControlVariance r2 K))
+
+/-- The regime in which the liability-threshold AUC formula has its stated
+biological meaning. Every degeneracy is an explicit field. -/
+structure LiabilityThresholdRegime (r2 K : ℝ) : Prop where
+  prevalence_pos : 0 < K
+  prevalence_lt_one : K < 1
+  r2_nonneg : 0 ≤ r2
+  r2_lt_one : r2 < 1
+  threshold_spec : Phi (liabilityThreshold K) = 1 - K
+  caseVariance_pos : 0 < liabilityCaseVariance r2 K
+  controlVariance_pos : 0 < liabilityControlVariance r2 K
+
 /-- Exact target AUC from the neutral allele-frequency benchmark state.
 
 **INHERITED ASSUMPTION, AND THIS IS THE DANGEROUS KIND.** This delegates to
-`presentDayGaussianAUC`, so it silently carries the equal-variance Gaussian outcome
+`presentDayEqualVarianceGaussianAUC`, so it silently carries the equal-variance Gaussian outcome
 assumption. It converts a drift-induced drop into **AUC units**, which means the `-0.068`
 bias measured on dichotomised traits does not surface here as a wrong formula — it surfaces
 as a wrong *portability conclusion*, with the arithmetic intact throughout. For a binary
 trait, convert with `liabilityThresholdAUCFromExplainedR2` at the trait's prevalence
 instead. -/
-noncomputable def targetGaussianAUCFromNeutralAFBenchmark
+noncomputable def targetEqualVarianceGaussianAUCFromNeutralAFBenchmark
     (V_A V_E fstTarget : ℝ) : ℝ :=
-  presentDayGaussianAUC V_A V_E fstTarget
+  presentDayEqualVarianceGaussianAUC V_A V_E fstTarget
 
 /-- The neutral allele-frequency benchmark target AUC is definitionally the
 literal present-day AUC in this coarse chart. -/
 theorem targetAUCFromNeutralAFBenchmark_eq_presentDayAUC
     (V_A V_E fstTarget : ℝ) :
-    targetGaussianAUCFromNeutralAFBenchmark V_A V_E fstTarget =
-      presentDayGaussianAUC V_A V_E fstTarget := by
+    targetEqualVarianceGaussianAUCFromNeutralAFBenchmark V_A V_E fstTarget =
+      presentDayEqualVarianceGaussianAUC V_A V_E fstTarget := by
   rfl
 
 /-- Source Brier chart as a function of prevalence and source `R²`. -/
@@ -3021,7 +3057,7 @@ theorem neutralAFBenchmarkMetricProfile_eq
     (π V_A V_E fstTarget : ℝ) :
     neutralAFBenchmarkMetricProfile π V_A V_E fstTarget =
       { r2 := targetR2FromNeutralAFBenchmark V_A V_E fstTarget
-      , auc := targetGaussianAUCFromNeutralAFBenchmark V_A V_E fstTarget
+      , auc := targetEqualVarianceGaussianAUCFromNeutralAFBenchmark V_A V_E fstTarget
       , brier := targetBrierFromNeutralAFBenchmark π V_A V_E fstTarget } := by
   ext
   · change
@@ -3030,10 +3066,10 @@ theorem neutralAFBenchmarkMetricProfile_eq
     unfold targetR2FromNeutralAFBenchmark TransportedMetrics.r2FromSignalVariance presentDayR2
     rfl
   · change
-      TransportedMetrics.gaussianAUCFromSignalVariance (presentDayPGSVariance V_A fstTarget) V_E =
-        targetGaussianAUCFromNeutralAFBenchmark V_A V_E fstTarget
-    unfold targetGaussianAUCFromNeutralAFBenchmark TransportedMetrics.gaussianAUCFromSignalVariance
-      presentDayGaussianAUC presentDaySignalToNoise
+      TransportedMetrics.equalVarianceGaussianAUCFromSignalVariance (presentDayPGSVariance V_A fstTarget) V_E =
+        targetEqualVarianceGaussianAUCFromNeutralAFBenchmark V_A V_E fstTarget
+    unfold targetEqualVarianceGaussianAUCFromNeutralAFBenchmark TransportedMetrics.equalVarianceGaussianAUCFromSignalVariance
+      presentDayEqualVarianceGaussianAUC presentDaySignalToNoise
     congr 1
     congr 1
     ring_nf
@@ -3059,9 +3095,9 @@ theorem targetAUC_lt_source_of_neutralAF_benchmark
     (h_fst : fstSource < fstTarget)
     (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1)
     (hPhiStrict : StrictMono Phi) :
-    targetGaussianAUCFromNeutralAFBenchmark V_A V_E fstTarget <
-      presentDayGaussianAUC V_A V_E fstSource := by
-  simpa [targetGaussianAUCFromNeutralAFBenchmark] using
+    targetEqualVarianceGaussianAUCFromNeutralAFBenchmark V_A V_E fstTarget <
+      presentDayEqualVarianceGaussianAUC V_A V_E fstSource := by
+  simpa [targetEqualVarianceGaussianAUCFromNeutralAFBenchmark] using
     drift_degrades_AUC_of_strictMono
       V_A V_E fstSource fstTarget hVA hVE h_fst (le_of_lt h_fst_bounds.2) hPhiStrict
 
@@ -3091,7 +3127,7 @@ noncomputable def equalVarianceGaussianAUCFromSNR (snr : ℝ) : ℝ :=
 
 /-- **The signal-to-noise reading of the AUC, under the same obligation.**
 
-`gaussianAUCFromSignalVariance` earns the name "AUC" only through
+`equalVarianceGaussianAUCFromSignalVariance` earns the name "AUC" only through
 `GaussianLiabilityRegime`, whose `equalVarianceGaussian` field someone must discharge.
 This form is that one at the signal-to-noise ratio, so it inherits the obligation rather
 than needing a second one — which is the point of routing the chart forms through a single
@@ -3100,13 +3136,13 @@ theorem equalVarianceGaussianAUCFromSNR_eq_processAUC {k : ℕ} [Fintype (Fin k)
     {dgp : DataGeneratingProcess k} {signal : Predictor k}
     (G : GaussianLiabilityRegime dgp signal) :
     equalVarianceGaussianAUCFromSNR (G.moments.vSignal / G.vEnv) = G.processAUC := by
-  rw [← gaussianAUCFromSignalVariance_eq_processAUC G]
-  unfold equalVarianceGaussianAUCFromSNR gaussianAUCFromSignalVariance
+  rw [← equalVarianceGaussianAUCFromSignalVariance_eq_processAUC G]
+  unfold equalVarianceGaussianAUCFromSNR equalVarianceGaussianAUCFromSignalVariance
   congr 2
   rw [div_div, mul_comm]
 
 /-! The variance form of the equal-variance Gaussian AUC used to be written out again here
-under a second name, tied to `DGP.gaussianAUCFromSignalVariance` by a theorem. The tie
+under a second name, tied to `DGP.equalVarianceGaussianAUCFromSignalVariance` by a theorem. The tie
 recorded a real incident: the two copies had drifted to *opposite* claims about which
 quantity they computed — one called it the liability-threshold AUC, which the other
 records as falsified — and the identity existed to keep the corrected label attached to
@@ -3115,8 +3151,8 @@ both. One definition cannot drift from itself, and it is the one carrying
 
 /-- With `vEnv = 1`, variance form equals SNR form exactly. -/
 theorem equalVarianceGaussianAUCFromVariances_scaleOne (vSignal : ℝ) :
-    gaussianAUCFromSignalVariance vSignal 1 = equalVarianceGaussianAUCFromSNR vSignal := by
-  unfold gaussianAUCFromSignalVariance equalVarianceGaussianAUCFromSNR
+    equalVarianceGaussianAUCFromSignalVariance vSignal 1 = equalVarianceGaussianAUCFromSNR vSignal := by
+  unfold equalVarianceGaussianAUCFromSignalVariance equalVarianceGaussianAUCFromSNR
   ring_nf
 
 /-- On nonnegative SNR, the liability-threshold AUC map is strictly increasing
@@ -3191,83 +3227,9 @@ Gaussian information constants and van Trees are classical components named as s
 contribution here is not the derivation; it is that the corpus carried only the
 equal-variance form for binary traits, and that this one has been measured. -/
 
-/-- Standard normal density, `φ(x) = exp(-x²/2)/√(2π)`. -/
-noncomputable def standardNormalPdf (x : ℝ) : ℝ :=
-  Real.exp (-x ^ 2 / 2) / Real.sqrt (2 * Real.pi)
-
-/-- The liability threshold `T = Φ⁻¹(1 - K)` for prevalence `K`.
-
-Defined through `Function.invFun` rather than by a closed form. `Phi` is strictly monotone,
-hence injective, so this inverts it on its range; off the range it is junk, which is why
-`LiabilityThresholdRegime` carries `threshold_spec` as a hypothesis rather than assuming it
-holds. -/
-noncomputable def liabilityThreshold (K : ℝ) : ℝ := Function.invFun Phi (1 - K)
-
-/-- Mean liability among cases, `i = φ(T)/K`. -/
-noncomputable def liabilityCaseMean (K : ℝ) : ℝ :=
-  standardNormalPdf (liabilityThreshold K) / K
-
-/-- Mean liability among controls, `i_c = -i·K/(1-K)`. -/
-noncomputable def liabilityControlMean (K : ℝ) : ℝ :=
-  -liabilityCaseMean K * K / (1 - K)
-
-/-- Score variance among cases, `v₁ = 1 - R²·i·(i - T)`. -/
-noncomputable def liabilityCaseVariance (r2 K : ℝ) : ℝ :=
-  1 - r2 * liabilityCaseMean K * (liabilityCaseMean K - liabilityThreshold K)
-
-/-- Score variance among controls, `v₀ = 1 - R²·i_c·(i_c - T)`. -/
-noncomputable def liabilityControlVariance (r2 K : ℝ) : ℝ :=
-  1 - r2 * liabilityControlMean K * (liabilityControlMean K - liabilityThreshold K)
-
-/-- **The liability-threshold AUC**: `Φ((i - i_c)·√R² / √(v₁ + v₀))`.
-
-Regime: prevalence `K ∈ (0,1)` and `r2 ∈ [0,1)`, with the two conditional variances
-strictly positive. **Both degeneracies are real and are carried as hypotheses rather than
-assumed** (`LiabilityThresholdRegime`): `K → 0` or `K → 1` sends `T → ±∞`, and `v₁` or `v₀`
-can go non-positive at large `R²`, where the expression stops describing anything.
-
-Empirical status: VALIDATED against 400 simulated PGS studies, with **one free parameter
-per trait** — its prevalence — shared across both demographies, all five methods and all ten
-seeds, so 100 runs per fitted `K`. Pooled RMSE `0.0121`, bias `-0.0007`. The residual
-matches the independently measured seed-to-seed noise floor of `0.0120`, i.e. it fits as
-well as anything can. The four fitted prevalences cluster at `0.167-0.184`, a sensible
-common trait prevalence rather than four unrelated numbers, and the same `K` works on
-`grid2d` and `serial1d` separately (RMSE `0.0097-0.0136` versus `0.0112-0.0150`), so it is a
-trait constant and is not absorbing demography.
-
-Contrast `equalVarianceGaussianAUCFromExplainedR2`, which on the same 400 runs is biased
-`-0.068` AUC with RMSE `0.071` and max error `0.120`. That form is correct for an
-equal-variance Gaussian *outcome*; this one is correct for a dichotomised liability. Neither
-supersedes the other and the regime is what selects between them. -/
-noncomputable def liabilityThresholdAUCFromExplainedR2 (r2 K : ℝ) : ℝ :=
-  Phi ((liabilityCaseMean K - liabilityControlMean K) * Real.sqrt r2 /
-    Real.sqrt (liabilityCaseVariance r2 K + liabilityControlVariance r2 K))
-
-/-- The conditions under which `liabilityThresholdAUCFromExplainedR2` describes anything.
-
-Every field is a place the expression degenerates, and each is a hypothesis rather than a
-silent assumption:
-
-* `prevalence_pos`, `prevalence_lt_one` — outside `(0,1)` the threshold diverges;
-* `threshold_spec` — that `Function.invFun` actually inverted `Phi` here, which holds
-  because `1 - K` is in the range of a CDF for `K ∈ (0,1)` but is not free;
-* `caseVariance_pos`, `controlVariance_pos` — these fail at large `R²`, and the square root
-  of a non-positive number is where the formula stops meaning anything. -/
-structure LiabilityThresholdRegime (r2 K : ℝ) : Prop where
-  /-- Prevalence is a genuine probability, bounded away from the degenerate ends. -/
-  prevalence_pos : 0 < K
-  /-- Prevalence is a genuine probability, bounded away from the degenerate ends. -/
-  prevalence_lt_one : K < 1
-  /-- The explained fraction is a genuine fraction below the perfect-prediction boundary. -/
-  r2_nonneg : 0 ≤ r2
-  /-- The explained fraction is a genuine fraction below the perfect-prediction boundary. -/
-  r2_lt_one : r2 < 1
-  /-- The threshold really is the probit of `1 - K`. -/
-  threshold_spec : Phi (liabilityThreshold K) = 1 - K
-  /-- Case-conditional score variance is positive. -/
-  caseVariance_pos : 0 < liabilityCaseVariance r2 K
-  /-- Control-conditional score variance is positive. -/
-  controlVariance_pos : 0 < liabilityControlVariance r2 K
+/-! The liability-threshold primitives and their regime are declared before
+the first binary-trait profile above. The substantive comparison starts here,
+after the equal-variance chart has also been declared. -/
 
 /-- **The two AUC maps are not the same function, and must not be collapsed into one.**
 
@@ -3318,7 +3280,7 @@ not elaborate until whoever owns the call site supplies the prevalence, which is
 who knows it.
 
 This is the conversion to use for a binary trait. For a genuinely **continuous** outcome the
-equal-variance chart is correct and `presentDayGaussianAUC` is the one to call. -/
+equal-variance chart is correct and `presentDayEqualVarianceGaussianAUC` is the one to call. -/
 noncomputable def targetLiabilityAUCFromNeutralAFBenchmark
     (V_A V_E fstTarget K : ℝ) : ℝ :=
   liabilityThresholdAUCFromExplainedR2 (presentDayR2 V_A V_E fstTarget) K
@@ -3382,9 +3344,8 @@ theorem equalVarianceGaussianAUCFromExplainedR2_eq_processAUC {k : ℕ} [Fintype
   -- never consults hypotheses. Whether the fed version closes the goal
   -- outright or leaves a polynomial identity is not knowable in advance, so
   -- `first` takes neither bet.
-  first
-    | (field_simp [hv, he]; ring)
-    | field_simp [hv, he]
+  field_simp [hv, he]
+  ring
 
 /-- **The boundary escape, exhibited.**  At perfect prediction the chart
 returns `Phi 0`, which for the standard normal `Phi` of
@@ -3496,7 +3457,7 @@ equation.
     Empirical status: UNTESTED. -/
 noncomputable def equalVarianceGaussianAUCFromSourceWeights {p q : ℕ}
     (m : CrossPopulationMetricModel p q) (P : Pop) : ℝ :=
-  gaussianAUCFromSignalVariance
+  equalVarianceGaussianAUCFromSignalVariance
     (explainedSignalVarianceFromSourceWeights m P)
     (residualVarianceFromSourceWeights m P)
 
@@ -3505,7 +3466,7 @@ applied to source explained signal and source residual variance. -/
 theorem sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explicit_source_variances
     {p q : ℕ} (m : CrossPopulationMetricModel p q) :
     equalVarianceGaussianAUCFromSourceWeights m Pop.source =
-      gaussianAUCFromSignalVariance
+      equalVarianceGaussianAUCFromSignalVariance
         (explainedSignalVarianceFromSourceWeights m Pop.source)
         (residualVarianceFromSourceWeights m Pop.source) := by
   rfl
@@ -3521,7 +3482,7 @@ theorem sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart {p 
       equalVarianceGaussianAUCFromExplainedR2 (r2FromSourceWeights m Pop.source) := by
   have h_source_ne : (m.outcomeVariance Pop.source) ≠ 0 := by
     exact ne_of_gt (m.outcomeVariance_pos Pop.source)
-  unfold equalVarianceGaussianAUCFromSourceWeights gaussianAUCFromSignalVariance
+  unfold equalVarianceGaussianAUCFromSourceWeights equalVarianceGaussianAUCFromSignalVariance
     residualVarianceFromSourceWeights equalVarianceGaussianAUCFromExplainedR2
     r2FromSourceWeights
   congr 1
@@ -3533,7 +3494,7 @@ applied to target explained signal and target residual variance. -/
 theorem targetEqualVarianceGaussianAUCFromSourceWeights_eq_explicit_target_variances {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
     equalVarianceGaussianAUCFromSourceWeights m Pop.target =
-      gaussianAUCFromSignalVariance
+      equalVarianceGaussianAUCFromSignalVariance
         (explainedSignalVarianceFromSourceWeights m Pop.target)
         (residualVarianceFromSourceWeights m Pop.target) := by
   rfl
@@ -3544,7 +3505,7 @@ explicit SNP-level transport model. -/
 theorem targetEqualVarianceGaussianAUCFromSourceWeights_exact_metric_portability_law
     {p q : ℕ} (m : CrossPopulationMetricModel p q) :
     equalVarianceGaussianAUCFromSourceWeights m Pop.target =
-      gaussianAUCFromSignalVariance
+      equalVarianceGaussianAUCFromSignalVariance
         ((predictiveCovarianceFromSourceWeights m Pop.target) ^ 2 /
           scoreVarianceFromSourceWeights m Pop.target)
         (effectiveOutcomeVariance m Pop.target -
@@ -3559,7 +3520,7 @@ biological loss budget made explicit in the residual term. -/
 theorem targetEqualVarianceGaussianAUCFromSourceWeights_exact_loss_budget_law
     {p q : ℕ} (m : CrossPopulationMetricModel p q) :
     equalVarianceGaussianAUCFromSourceWeights m Pop.target =
-      gaussianAUCFromSignalVariance
+      equalVarianceGaussianAUCFromSignalVariance
         ((predictiveCovarianceFromSourceWeights m Pop.target) ^ 2 /
           scoreVarianceFromSourceWeights m Pop.target)
         ((m.outcomeVariance Pop.target) +
@@ -3583,7 +3544,7 @@ theorem targetEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart {p 
       equalVarianceGaussianAUCFromExplainedR2 (r2FromSourceWeights m Pop.target) := by
   have h_eff_ne : effectiveOutcomeVariance m Pop.target ≠ 0 := by
     exact ne_of_gt (effectiveTargetOutcomeVariance_pos m)
-  unfold equalVarianceGaussianAUCFromSourceWeights gaussianAUCFromSignalVariance
+  unfold equalVarianceGaussianAUCFromSourceWeights equalVarianceGaussianAUCFromSignalVariance
     residualVarianceFromSourceWeights equalVarianceGaussianAUCFromExplainedR2
     r2FromSourceWeights
   congr 1
@@ -3692,7 +3653,7 @@ theorem targetMetricProfileFromSourceWeights_exact_mechanistic_portability_law
           (predictiveCovarianceFromSourceWeights m Pop.target) ^ 2 /
             (scoreVarianceFromSourceWeights m Pop.target * effectiveOutcomeVariance m Pop.target)
       , auc :=
-          gaussianAUCFromSignalVariance
+          equalVarianceGaussianAUCFromSignalVariance
             ((predictiveCovarianceFromSourceWeights m Pop.target) ^ 2 /
               scoreVarianceFromSourceWeights m Pop.target)
             (effectiveOutcomeVariance m Pop.target -
@@ -3752,11 +3713,7 @@ theorem sourceNormalizedTargetR2AtGeneration_exact_mechanistic_popgen_portabilit
             scoreVarianceFromSourceWeights (m.toMetricModelAt t) Pop.target *
             effectiveOutcomeVariance (m.toMetricModelAt t) Pop.target)) := by
   unfold sourceNormalizedTargetR2AtGeneration
-  first
-    | (rw [exactR2PortabilityRatio_mechanistic_law];
-       simp [predictiveCovarianceFromSourceWeights, scoreVarianceFromSourceWeights,
-        effectiveOutcomeVariance])
-    | rw [exactR2PortabilityRatio_mechanistic_law]
+  rw [exactR2PortabilityRatio_mechanistic_law]
 
 /-- Bundled exact metric portability law after `t` generations on the explicit
 population-genetic state. This packages the exact `R²`, liability-AUC, and
@@ -3769,7 +3726,7 @@ theorem targetMetricProfileAtGeneration_exact_mechanistic_popgen_portability_law
             (scoreVarianceFromSourceWeights (m.toMetricModelAt t) Pop.target *
               effectiveOutcomeVariance (m.toMetricModelAt t) Pop.target)
       , auc :=
-          gaussianAUCFromSignalVariance
+          equalVarianceGaussianAUCFromSignalVariance
             ((predictiveCovarianceFromSourceWeights (m.toMetricModelAt t) Pop.target) ^ 2 /
               scoreVarianceFromSourceWeights (m.toMetricModelAt t) Pop.target)
             (effectiveOutcomeVariance (m.toMetricModelAt t) Pop.target -
@@ -3784,41 +3741,15 @@ theorem targetMetricProfileAtGeneration_exact_mechanistic_popgen_portability_law
               (predictiveCovarianceFromSourceWeights (m.toMetricModelAt t) Pop.target) ^ 2 /
                 scoreVarianceFromSourceWeights (m.toMetricModelAt t) Pop.target) } := by
   ext
-  · first
-      | (rw [targetMetricProfileAtGeneration_eq_slice,
-          targetMetricProfileFromSourceWeights_exact_mechanistic_portability_law];
-         simp [predictiveCovarianceFromSourceWeights, scoreVarianceFromSourceWeights,
-          effectiveOutcomeVariance])
-      | rw [targetMetricProfileAtGeneration_eq_slice,
-          targetMetricProfileFromSourceWeights_exact_mechanistic_portability_law]
-  · first
-      | (rw [targetMetricProfileAtGeneration_eq_slice,
-          targetMetricProfileFromSourceWeights_exact_mechanistic_portability_law];
-         simp [predictiveCovarianceFromSourceWeights, scoreVarianceFromSourceWeights,
-          effectiveOutcomeVariance])
-      | rw [targetMetricProfileAtGeneration_eq_slice,
-          targetMetricProfileFromSourceWeights_exact_mechanistic_portability_law]
+  · rw [targetMetricProfileAtGeneration_eq_slice,
+      targetMetricProfileFromSourceWeights_exact_mechanistic_portability_law]
+  · rw [targetMetricProfileAtGeneration_eq_slice,
+      targetMetricProfileFromSourceWeights_exact_mechanistic_portability_law]
   · rw [targetMetricProfileAtGeneration_eq_slice,
       targetMetricProfileFromSourceWeights_exact_mechanistic_portability_law]
     simp [predictiveCovarianceFromSourceWeights, scoreVarianceFromSourceWeights,
       effectiveOutcomeVariance,
       CrossPopulationGenerationalModel.toMetricModelAt]
-
-/-- Closed-form target AUC under the neutral allele-frequency benchmark, in the
-equal-variance Gaussian model.
-
-**THE NAME AND THE OLD DOCSTRING BOTH SAID "liability-threshold" AND THE BODY IS NOT THAT
-FORMULA** — it delegates to `targetGaussianAUCFromNeutralAFBenchmark` and thence to
-`presentDayGaussianAUC`. This was the sharpest instance of the defect in the family: a
-declaration promising a liability-threshold AUC while computing the prevalence-free
-equal-variance one. Corrected here to say what it computes.
-
-    Empirical status: UNTESTED as written; FALSIFIED as a liability-threshold AUC, by the
-    `-0.068` bias measured over 400 simulated binary-trait studies. Binary-trait
-    counterpart: `liabilityThresholdAUCFromExplainedR2`. -/
-noncomputable def targetExactGaussianAUCFromNeutralAFBenchmark
-    (V_A V_E fstTarget : ℝ) : ℝ :=
-  targetGaussianAUCFromNeutralAFBenchmark V_A V_E fstTarget
 
 /-- The direct `R²`-chart liability AUC agrees with the literal present-day
 liability AUC when the deployed `R²` comes from the same neutral benchmark
@@ -3828,7 +3759,7 @@ theorem equalVarianceGaussianAUCFromExplainedR2_eq_presentDayAUC
     (hVA : 0 < V_A) (hVE : 0 < V_E)
     (hfst_lt_one : fst < 1) :
     equalVarianceGaussianAUCFromExplainedR2 (presentDayR2 V_A V_E fst) =
-      presentDayGaussianAUC V_A V_E fst := by
+      presentDayEqualVarianceGaussianAUC V_A V_E fst := by
   have hv_pos : 0 < presentDayPGSVariance V_A fst := by
     unfold presentDayPGSVariance pgsVarianceFromHet
     have h_one_minus : 0 < 1 - fst := by linarith
@@ -3842,7 +3773,7 @@ theorem equalVarianceGaussianAUCFromExplainedR2_eq_presentDayAUC
     unfold presentDayR2 r2FromSignalVariance presentDaySignalToNoise
     field_simp [hsum_ne, hve_ne]
     ring
-  unfold equalVarianceGaussianAUCFromExplainedR2 presentDayGaussianAUC
+  unfold equalVarianceGaussianAUCFromExplainedR2 presentDayEqualVarianceGaussianAUC
   rw [hchart]
 
 /-- Full neutral allele-frequency benchmark liability-AUC degradation theorem
@@ -3854,9 +3785,9 @@ theorem targetLiabilityAUC_lt_source_of_neutralAF_benchmark
     (h_fst : fstSource < fstTarget)
     (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1)
     (hPhiStrict : StrictMono Phi) :
-    targetExactGaussianAUCFromNeutralAFBenchmark V_A V_E fstTarget <
+    targetEqualVarianceGaussianAUCFromNeutralAFBenchmark V_A V_E fstTarget <
       presentDayEqualVarianceGaussianAUC V_A V_E fstSource := by
-  simpa [targetExactGaussianAUCFromNeutralAFBenchmark] using
+  simpa [targetEqualVarianceGaussianAUCFromNeutralAFBenchmark] using
     drift_degrades_equalVarianceGaussianAUC
       V_A V_E fstSource fstTarget hVA hVE h_fst (le_of_lt h_fst_bounds.2) hPhiStrict
 
@@ -5407,7 +5338,7 @@ noncomputable def admixtureLDDecay (r : ℝ) (generations_since : ℕ) : ℝ :=
     name because `LDDecayTheory.ldRetentionPerGen`, which is that expression,
     lives in a module that imports this one; the two are the same quantity. -/
 theorem admixtureLDDecay_ge_finitePopulation (r Ne : ℝ) (t : ℕ)
-    (hr0 : 0 ≤ r) (hr1 : r ≤ 1) (hNe : 1 ≤ Ne) :
+    (hr1 : r ≤ 1) (hNe : 1 ≤ Ne) :
     ((1 - r) * (1 - 1 / (2 * Ne))) ^ t ≤ admixtureLDDecay r t := by
   unfold admixtureLDDecay
   have hdrift_nn : (0 : ℝ) ≤ 1 - 1 / (2 * Ne) := by

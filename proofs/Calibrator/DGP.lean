@@ -2373,7 +2373,7 @@ theorem r2FromSignalVariance_eq_rsquared {k : ℕ} [Fintype (Fin k)]
     **Not the liability-threshold AUC.** The docstring here used to call it
     that. The liability-threshold AUC depends on prevalence, which this
     signature cannot express, and its sibling
-    `gaussianAUCFromSignalVariance` -- which now calls this body --
+    `equalVarianceGaussianAUCFromSignalVariance` -- which now calls this body --
     carries the marker recording that the liability reading is falsified. Two
     copies of one formula had drifted to opposite claims about which quantity
     it is; that is why they are one definition now.
@@ -2405,7 +2405,7 @@ theorem r2FromSignalVariance_eq_rsquared {k : ℕ} [Fintype (Fin k)]
     The binary-trait counterpart is
     `PortabilityDrift.liabilityThresholdAUCFromExplainedR2`, which takes a
     prevalence; do not substitute this one for it. -/
-noncomputable def gaussianAUCFromSignalVariance (vSignal vNoise : ℝ) : ℝ :=
+noncomputable def equalVarianceGaussianAUCFromSignalVariance (vSignal vNoise : ℝ) : ℝ :=
   Phi (Real.sqrt (vSignal / (2 * vNoise)))
 
 /-- **The equal-variance Gaussian liability regime, carried as an obligation.**
@@ -2420,7 +2420,7 @@ The device is therefore the one `PowerAnalysis.PowerAgreement` already uses for
 non-central chi-squared power. The AUC the process actually has is a *field*, supplied by
 whoever instantiates this, and the regime is the hypothesis that it agrees with the closed
 form. A caller who cannot discharge `equalVarianceGaussian` does not get to call
-`gaussianAUCFromSignalVariance` an AUC — which is the whole point, because that
+`equalVarianceGaussianAUCFromSignalVariance` an AUC — which is the whole point, because that
 assumption was previously nowhere at all. -/
 structure GaussianLiabilityRegime {k : ℕ} [Fintype (Fin k)]
     (dgp : DataGeneratingProcess k) (signal : Predictor k) where
@@ -2440,13 +2440,13 @@ structure GaussianLiabilityRegime {k : ℕ} [Fintype (Fin k)]
 /-- **Under the stated regime the closed form is the process's AUC.**
 
 Deliberately a one-line consequence. The content is not the proof but the obligation:
-before this, "`gaussianAUCFromSignalVariance` is the AUC" was asserted by a name; now it
+before this, "`equalVarianceGaussianAUCFromSignalVariance` is the AUC" was asserted by a name; now it
 is discharged by whoever supplies `equalVarianceGaussian`, and cannot be assumed by
 anyone who cannot. -/
-theorem gaussianAUCFromSignalVariance_eq_processAUC {k : ℕ} [Fintype (Fin k)]
+theorem equalVarianceGaussianAUCFromSignalVariance_eq_processAUC {k : ℕ} [Fintype (Fin k)]
     {dgp : DataGeneratingProcess k} {signal : Predictor k}
     (G : GaussianLiabilityRegime dgp signal) :
-    gaussianAUCFromSignalVariance G.moments.vSignal G.vEnv = G.processAUC :=
+    equalVarianceGaussianAUCFromSignalVariance G.moments.vSignal G.vEnv = G.processAUC :=
   G.equalVarianceGaussian.symm
 
 /-- Exact calibrated Bernoulli Brier risk from prevalence and explained-risk fraction. -/
@@ -2546,7 +2546,7 @@ structure Profile where
 noncomputable def profileFromSignalVariance
     (π vNoise vSignal : ℝ) : Profile where
   r2 := r2FromSignalVariance vSignal vNoise
-  auc := gaussianAUCFromSignalVariance vSignal vNoise
+  auc := equalVarianceGaussianAUCFromSignalVariance vSignal vNoise
   brier := calibratedBrierFromVariances π vSignal vNoise
 
 @[simp] theorem profileFromSignalVariance_r2
@@ -2558,7 +2558,7 @@ noncomputable def profileFromSignalVariance
 @[simp] theorem profileFromSignalVariance_auc
     (π vNoise vSignal : ℝ) :
     (profileFromSignalVariance π vNoise vSignal).auc =
-      gaussianAUCFromSignalVariance vSignal vNoise := by
+      equalVarianceGaussianAUCFromSignalVariance vSignal vNoise := by
   rfl
 
 @[simp] theorem profileFromSignalVariance_brier
@@ -2588,7 +2588,7 @@ noncomputable def profileFromSignalVarianceWithPenalty
 @[simp] theorem profileFromSignalVarianceWithPenalty_auc
     (π vNoise vSignal : ℝ) (penalty : IrreducibleTargetPenalty) :
     (profileFromSignalVarianceWithPenalty π vNoise vSignal penalty).auc =
-      gaussianAUCFromSignalVariance vSignal (vNoise + penalty.total) := by
+      equalVarianceGaussianAUCFromSignalVariance vSignal (vNoise + penalty.total) := by
   rfl
 
 @[simp] theorem profileFromSignalVarianceWithPenalty_brier
@@ -2686,7 +2686,7 @@ noncomputable def PGSEvolutionaryModel.metricProfileFromTargetSignalWithPenalty
     (m : PGSEvolutionaryModel) (vSignalTarget : ℝ)
     (penalty : TransportedMetrics.IrreducibleTargetPenalty) :
     (m.metricProfileFromTargetSignalWithPenalty vSignalTarget penalty).auc =
-      TransportedMetrics.gaussianAUCFromSignalVariance vSignalTarget (m.V_E + penalty.total) := by
+      TransportedMetrics.equalVarianceGaussianAUCFromSignalVariance vSignalTarget (m.V_E + penalty.total) := by
   rfl
 
 @[simp] theorem PGSEvolutionaryModel.metricProfileFromTargetSignalWithPenalty_brier

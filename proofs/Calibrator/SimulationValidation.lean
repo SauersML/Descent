@@ -479,7 +479,7 @@ variance; no source-`R²` transport summary appears in the definition. -/
 theorem target_metric_profile_auc_uses_explicit_target_moments {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
     (targetMetricProfileFromSourceWeights m).auc =
-      TransportedMetrics.gaussianAUCFromSignalVariance
+      TransportedMetrics.equalVarianceGaussianAUCFromSignalVariance
         (explainedSignalVarianceFromSourceWeights m Pop.target)
         (residualVarianceFromSourceWeights m Pop.target) := by
   simp [targetMetricProfileFromSourceWeights, equalVarianceGaussianAUCFromSourceWeights]
