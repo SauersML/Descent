@@ -1067,7 +1067,8 @@ theorem targetCalibrationProfileAtGeneration_exact_mechanistic_popgen_portabilit
     CrossPopulationMechanisticCalibrationModel.observedMean,
     CrossPopulationMechanisticCalibrationModel.observedMeanShift,
     CrossPopulationMechanisticCalibrationModel.deploymentIntercept,
-    CrossPopulationMechanisticCalibrationModel.scoreMean]
+    CrossPopulationMechanisticCalibrationModel.scoreMean,
+    calibrationSlopeFromSourceWeights]
   ring
 
 /-- Exact generation-indexed target CITL law on the explicit population-genetic
