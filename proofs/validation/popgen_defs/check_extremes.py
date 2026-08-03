@@ -51,15 +51,6 @@ def main():
         check("expectedR2FromN", "EquityAndImplementation.lean:202", v, 0.0, h2,
               dict(n=n, h2=h2, M=M), "R2 cannot exceed the heritability")
 
-    # ---- stabilizingPortability / diversifyingPortability: R^2 >= 0 ------
-    for r2_0, fst, s in itertools.product([0.2], [0.1, 0.4, 0.5, 0.6, 0.9], [1.0]):
-        v = r2_0 * (1 - 2 * fst) * np.exp(-s * fst)
-        check("stabilizingPortability", "PortabilityBounds.lean:223", v, 0.0, None,
-              dict(r2_0=r2_0, fst=fst, strength=s), "negative R2 once fst > 0.5")
-        v2 = r2_0 * (1 - 2 * fst) * np.exp(-s * fst) ** 2
-        check("diversifyingPortability", "PortabilityBounds.lean:246", v2, 0.0,
-              None, dict(r2_0=r2_0, fst=fst, lam=s), "negative R2 once fst > 0.5")
-
     # ---- amInflationFactor: a variance ratio, must be >= 1 ---------------
     for r in [0.0, 0.5, 0.9, 0.99, 1.0, 1.5]:
         v = 1 / (1 - r) if r != 1 else np.inf

@@ -791,15 +791,6 @@ theorem fstMigDriftNext_uses_timeScale (Ne m Fst : ℝ) :
         + 1 / coalescentTimeScale Ne := by
   unfold fstMigDriftNext; rw [coalescentTimeScale_eq]
 
-/-- Pins the `2` in `stabilizingPortability`. Note that this law and
-`diversifyingPortability` below are recorded FALSIFIED as one-parameter laws — no
-constant `strength` fits the portability curve, the fitted value spanning 13-fold over a
-29-fold range of `F_ST`. The convention is right; the magnitude is not a prediction. -/
-theorem stabilizingPortability_uses_ploidy (r2_0 fst strength : ℝ) :
-    stabilizingPortability r2_0 fst strength
-      = r2_0 * max 0 (1 - ploidy * fst) * Real.exp (-strength * fst) := by
-  rfl
-
 theorem ibdFst_eq_ploidy_form (d N sigma_sq : ℝ) :
     ibdFst d N sigma_sq = d / (2 * ploidy * N * sigma_sq + d) := by
   unfold ibdFst ploidy; ring_nf
@@ -827,11 +818,6 @@ theorem tauAt_uses_timeScale (g : GenerationalPopGenParameters) (t : ℕ) :
     GenerationalPopGenParameters.tauAt g t
       = (t : ℝ) / coalescentTimeScale g.Ne := by
   unfold GenerationalPopGenParameters.tauAt; rw [coalescentTimeScale_eq]
-
-theorem diversifyingPortability_uses_ploidy (r2_0 fst lam_turn : ℝ) :
-    diversifyingPortability r2_0 fst lam_turn
-      = r2_0 * max 0 (1 - ploidy * fst) * (Real.exp (-lam_turn * fst)) ^ 2 := by
-  rfl
 
 theorem alleleFreqDivergenceRate_eq_scaled (Ne mu m_rate : ℝ) :
     alleleFreqDivergenceRate Ne mu m_rate

@@ -55,7 +55,6 @@ SIMULATED = {
     'phaseAttenuation',
     'r2EstimatorVariance',
     'r2ScalingModel',
-    'stabilizingPortability',
     'targetHet',
     'variance',
 }

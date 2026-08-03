@@ -11,13 +11,9 @@ open MeasureTheory
 
 Formal bounds on PGS portability derived from population-genetic parameters.
 
-**Read "quantitative prediction" narrowly here.** What this file supports is *orderings*
-between portability laws, which hold for any positive parameters. The magnitudes do not:
-`stabilizingPortability` and `diversifyingPortability` are recorded FALSIFIED as
-one-parameter laws — simulation finds no constant `strength` fitting the portability
-curve, the fitted value spanning 13-fold over a 29-fold range of `F_ST`. The definitions
-survive for the ordering results; their fitted constants must not be reported as
-properties of a trait. See the deletion-and-status note in the selection-models section.
+Only laws with a derivation or a live empirical contract are exported. One-parameter
+stabilizing- and diversifying-selection curves are excluded because simulation shows that
+no constant selection parameter fits the portability curve.
 
 Reference: Wang et al. (2026), Nature Communications 17:942.
 -/
@@ -256,126 +252,6 @@ theorem neutralPortability_mem_unit (r2_0 fst : ℝ)
     0 ≤ neutralPortability r2_0 fst ∧ neutralPortability r2_0 fst ≤ 1 :=
   ⟨neutralPortability_nonneg r2_0 fst hr2,
     le_trans (neutralPortability_le_r2_0 r2_0 fst hr2 hfst) hr2_le⟩
-
-/-- **Stabilizing selection model: faster-than-neutral decay.**
-    Under stabilizing selection, allelic effects are constrained near the optimum
-    in both populations. The portability decay is close to neutral.
-
-    Defined through `neutralPortability` so that it inherits the nonnegativity
-    floor. The previous body spelled out `r2_0 * (1 - 2 * fst)` a second time
-    and inherited the negative-`R²` escape with it.
-
-    Empirical status: FALSIFIED as a one-parameter law. Simulation finds no
-    constant `strength` that fits the portability curve: the fitted value spans
-    13-fold over a 29-fold range of `F_ST`. The definition is retained because
-    the qualitative ordering it supports (`stabilizing_le_neutral`,
-    `diversifying_lt_stabilizing`) survives any positive `strength`, but the
-    magnitude it predicts should not be used, and `strength` should not be
-    reported as a fitted constant of a trait. -/
-noncomputable def stabilizingPortability (r2_0 fst strength : ℝ) : ℝ :=
-  neutralPortability r2_0 fst * Real.exp (-strength * fst)
-
-/-- Stabilizing portability is a nonnegative `R²`. -/
-theorem stabilizingPortability_nonneg (r2_0 fst strength : ℝ) (hr2 : 0 ≤ r2_0) :
-    0 ≤ stabilizingPortability r2_0 fst strength := by
-  unfold stabilizingPortability
-  exact mul_nonneg (neutralPortability_nonneg r2_0 fst hr2)
-    (le_of_lt (Real.exp_pos _))
-
-/-- Stabilizing selection is never better than neutral for portability. -/
-theorem stabilizing_le_neutral (r2_0 fst strength : ℝ)
-    (hr2 : 0 ≤ r2_0)
-    (hfst : 0 ≤ fst)
-    (hs : 0 ≤ strength) :
-    stabilizingPortability r2_0 fst strength ≤ neutralPortability r2_0 fst := by
-  unfold stabilizingPortability
-  have h_base_nn : 0 ≤ neutralPortability r2_0 fst :=
-    neutralPortability_nonneg r2_0 fst hr2
-  have h_exp_le : Real.exp (-strength * fst) ≤ 1 := by
-    rw [← Real.exp_zero]
-    exact Real.exp_le_exp.mpr (by nlinarith)
-  calc neutralPortability r2_0 fst * Real.exp (-strength * fst)
-      ≤ neutralPortability r2_0 fst * 1 :=
-        mul_le_mul_of_nonneg_left h_exp_le h_base_nn
-    _ = neutralPortability r2_0 fst := mul_one _
-
-/-- **Diversifying/fluctuating selection model: much-faster-than-neutral decay.**
-    Under fluctuating selection (immune traits), effects change rapidly.
-
-    Defined through `neutralPortability` for the same reason as
-    `stabilizingPortability`: the nonnegativity floor must be inherited, not
-    re-spelled.
-
-    Empirical status: FALSIFIED as a one-parameter law, jointly with
-    `stabilizingPortability` -- no constant turnover rate fits the curve, the
-    fitted value spanning 13-fold over a 29-fold `F_ST` range. The ordering
-    results below hold for any positive parameters; the magnitudes do not. -/
-noncomputable def diversifyingPortability (r2_0 fst lam_turn : ℝ) : ℝ :=
-  neutralPortability r2_0 fst * (Real.exp (-lam_turn * fst)) ^ 2
-
-/-! **The magnitude claim of the selection laws is not exported.**
-
-`stabilizingPortability` and `diversifyingPortability` are recorded FALSIFIED as
-one-parameter laws: simulation finds no constant `strength` fitting the portability curve,
-the fitted value spanning 13-fold over a 29-fold range of `F_ST`. The definitions survive
-because the *ordering* they support does, for any positive parameter.
-
-The fitted-magnitude claim is deliberately not represented in Lean until a derivation from
-an explicit population-genetic observation model is present.  In particular, callers cannot
-turn an empirical curve fit into a theorem by packaging the fit as a structure field.  The
-ordering theorems below remain because they are derived directly from the displayed laws. -/
-
-/-- **The selection laws inherit the neutral law's vacuity beyond `F_ST = 1/2`.**
-
-Both are defined *through* `neutralPortability` — deliberately, so the nonnegativity floor
-is inherited rather than re-spelled — and that inheritance carries the floor's defect with
-it. Past `fst = 1/2` both return `0` for every ancestral `r2_0` and every selection
-parameter, so beyond that point the selection model is not weakly informative, it is
-silent: no `strength` and no turnover rate changes the answer.
-
-This is worth having explicitly because the ordering results are what these definitions are
-retained for, and an ordering between two constants is not an ordering. Below `1/2` the
-ordering theorems say something; at or above it they compare `0` with `0`. -/
-theorem selectionPortability_vacuous_beyond_half (r2_0 fst strength lam_turn : ℝ)
-    (h : 1 / 2 ≤ fst) :
-    stabilizingPortability r2_0 fst strength = 0 ∧
-      diversifyingPortability r2_0 fst lam_turn = 0 := by
-  constructor
-  · unfold stabilizingPortability
-    rw [neutralPortability_vacuous_beyond_half r2_0 fst h]
-    ring
-  · unfold diversifyingPortability
-    rw [neutralPortability_vacuous_beyond_half r2_0 fst h]
-    ring
-
-/-- Diversifying portability is a nonnegative `R²`. -/
-theorem diversifyingPortability_nonneg (r2_0 fst lam_turn : ℝ) (hr2 : 0 ≤ r2_0) :
-    0 ≤ diversifyingPortability r2_0 fst lam_turn := by
-  unfold diversifyingPortability
-  exact mul_nonneg (neutralPortability_nonneg r2_0 fst hr2)
-    (pow_nonneg (le_of_lt (Real.exp_pos _)) 2)
-
-/-- Diversifying selection gives strictly worse portability than stabilizing. -/
-theorem diversifying_lt_stabilizing
-    (r2_0 fst lam_stab lam_turn : ℝ)
-    (hr2 : 0 < r2_0)
-    (hfst : 0 < fst) (hfst_small : 2 * fst < 1)
-    -- Diversifying effect is stronger than stabilizing
-    (h_stronger : 2 * lam_turn > lam_stab) :
-    diversifyingPortability r2_0 fst lam_turn <
-      stabilizingPortability r2_0 fst lam_stab := by
-  unfold diversifyingPortability stabilizingPortability
-  have h_max : max 0 (1 - 2 * fst) = 1 - 2 * fst :=
-    max_eq_right (by linarith)
-  have h_base_pos : 0 < neutralPortability r2_0 fst := by
-    unfold neutralPortability
-    rw [h_max]
-    exact mul_pos hr2 (by linarith)
-  apply mul_lt_mul_of_pos_left _ h_base_pos
-  rw [← Real.exp_nat_mul]
-  simp only [Nat.cast_ofNat]
-  apply Real.exp_lt_exp.mpr
-  nlinarith
 
 end EvolutionaryModels
 

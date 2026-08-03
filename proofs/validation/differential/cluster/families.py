@@ -425,9 +425,8 @@ FAMILIES = [
                   "rather than new arithmetic. selectedDriftFactor is NOT "
                   "covered and stays UNREACHABLE: s_correction is a free "
                   "parameter the corpus derives from nothing, so any "
-                  "measurement can be fitted. The four portability members "
-                  "(neutralPortability, neutralPortabilityRatioLD, "
-                  "stabilizingPortability, diversifyingPortability) are also "
+                  "measurement can be fitted. The two portability members "
+                  "(neutralPortability and neutralPortabilityRatioLD) are "
                   "NOT covered by this simulator -- it is one-locus and they "
                   "are score-level claims.",
         "found_by": "manual",
@@ -467,7 +466,6 @@ FAMILIES = [
                     "selectedDriftFactor",
                     # newly classified
                     "neutralPortability", "neutralPortabilityRatioLD",
-                    "stabilizingPortability", "diversifyingPortability",
                     # mutation-selection balance, covered by fam_selection.py
                     "mutationSelectionStepRare", "mutationSelectionBalance",
                     "mutationSelectionStepRecessive",

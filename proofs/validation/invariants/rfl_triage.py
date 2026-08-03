@@ -102,8 +102,6 @@ From `RflScan.lean` at the elaborated environment, not from text.
 
   B (load-bearing, do not delete) -- 6
     neutralPortability_uses_ploidy      \
-    stabilizingPortability_uses_ploidy   >  see below
-    diversifyingPortability_uses_ploidy /
     temporalMetricProfile_r2         pins the profile's `r2` FIELD against the
                                      separately written `temporalR2`, argument
                                      order included; neither references the
@@ -116,14 +114,9 @@ From `RflScan.lean` at the elaborated environment, not from text.
   C -- 0.   D -- 0.   E -- 0 in this slice.
 
   A PREDICTION ABOUT THIS LIST WAS MADE AND WAS WRONG, WHICH IS USEFUL: the
-  other auditor expected only TWO of the `_uses_ploidy` family to appear here,
-  reasoning that the rest close by `unfold ...; ring`. THREE appear. Checked
-  against the source: `neutralPortability`, `stabilizingPortability` AND
-  `diversifyingPortability` are all written `:= by rfl`, while `pgsMean`,
-  `fisherAverageEffect` and `sharedLDRetention` close by `ring`/`ring_nf`.
-  The scan split one family correctly along that line without being told the
-  family existed, which is the best positive control it has had: it
-  discriminated WITHIN a group of six near-identical theorems.
+  other auditor expected two of the `_uses_ploidy` family to appear here,
+  reasoning that the rest close by `unfold ...; ring`. The scan split the
+  family correctly along that line without being told it existed.
 
 === THE BODY-REFERENCE TEST FAILS IN BOTH DIRECTIONS. IT HAS NO SAFE SIDE. ===
 
