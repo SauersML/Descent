@@ -66,8 +66,7 @@ theorem nei_fst_in_unit (H_T H_S : ℝ)
     that `Conventions.hudsonFst` is a genuinely different estimator that only looks
     like a third spelling of the same thing.
 
-    RENAMED from `simpleFst`, which named no estimator and so left the reader
-    to supply one. It is Nei's `G_ST` -- `1 - H_S/H_T` with `H_T = 2p̄(1-p̄)`
+    This is Nei's `G_ST` -- `1 - H_S/H_T` with `H_T = 2p̄(1-p̄)`
     the total-pool heterozygosity and `H_S` the mean within-subgroup
     heterozygosity -- and it is NOT Hudson's `F_ST`, which divides instead by
     the between-subgroup heterozygosity `p₁(1-p₂) + p₂(1-p₁)`. Derivation:
@@ -80,8 +79,7 @@ theorem nei_fst_in_unit (H_T H_S : ℝ)
     That is immediate from the conversion: `2·G/(1+G) = G` iff `G = 0` or
     `G = 1`.
 
-    **This corrects a false claim that stood here.** The docstring used to add
-    "or `p̄ = 1/2`" as a second agreement condition. There is no such slice.
+    **There is no `p̄ = 1/2` agreement slice. Do not add one.**
     On `p̄ = 1/2` exactly, with `p₁ = 0.9, p₂ = 0.1`, this body gives `0.64`
     and Hudson gives `0.7805`, a ratio of `1.22`; toward the middle the ratio
     approaches `2` (`1.995` at `(0.525, 0.475)`). The trap is that `p̄ = 1/2`
@@ -467,8 +465,7 @@ theorem wright_decomposition (f_IS f_ST : ℝ) :
 /-- **Within-population heterozygosity loss after `t` generations of drift.**
     `1 - (1 - 1/(2 Nₑ))^t`.
 
-    This is *not* between-population `F_ST` after a split, although it was
-    previously documented as such. Coalescent simulation with branch-mode
+    **This is *not* between-population `F_ST` after a split.** Coalescent simulation with branch-mode
     divergence, which removes mutational noise analytically, shows the split
     quantity is `coalFst t Ne = t / (t + 2 Nₑ)`: that is unbiased across the
     tested grid, while this formula is biased upward in eleven of twelve cells
@@ -1168,9 +1165,8 @@ theorem steppingStoneCharacteristicLength_balances_mutation (m σ_sq μ : ℝ)
   rw [Real.sq_sqrt (by positivity)]
   field_simp
 
-/-- **The `σ² = 1` slice is the old body**, stated so the correction is not
-    silently a different quantity: everything previously proved about
-    `√(m/(2μ))` is the unit-dispersal case of this. -/
+/-- **The `σ² = 1` slice.** Anything stated about `√(m/(2μ))` is the unit-dispersal
+    case of this, and not a different quantity. -/
 theorem steppingStoneCharacteristicLength_at_unit_dispersal (m μ : ℝ) :
     steppingStoneCharacteristicLength m 1 μ = Real.sqrt (m / (2 * μ)) := by
   unfold steppingStoneCharacteristicLength
@@ -1305,12 +1301,10 @@ theorem asymmetric_fst_difference_sign (Ne m₁₂ m₂₁ : ℝ)
     LD_correlation(M) = M² / (1 + M)² (proportion of LD that is shared).
     This accounts for both allele frequency sharing and haplotype sharing.
 
-    RENAMED from `ldCorrelationFromMigration`. The `From` asserted a derivation and
-    the body is a stipulation -- the docstring's own "we model the LD correlation as"
-    is the tell. No source is cited, nothing derives this shape from a migration
-    process, and no theorem here constrains it beyond monotonicity and range. `Ansatz`
-    says what it is, so a reader does not mistake a modelling choice for a result.
-    If it is ever derived, the name should change back.
+    **This is a stipulation, not a derivation, and the name says so.** No source is
+    cited, nothing derives this shape from a migration process, and no theorem here
+    constrains it beyond monotonicity and range. Do not rename it to assert a derivation
+    unless one is supplied.
 
     Empirical status: UNTESTED, and untested here means unfalsified rather than
     supported: it is a functional form nobody has compared to a simulation. -/
@@ -1403,16 +1397,11 @@ theorem hetRecurrence_closed_form (Ne H₀ : ℝ) (t : ℕ) :
 /-- **Within-population heterozygosity loss, derived from the decay recurrence.**
     `L(t) = 1 - H(t)/H₀ = 1 - (1 - 1/(2Ne))^t`.
 
-    RENAMED from `fstDerived`. The docstring below already said this is not a split
-    `F_ST`; the identifier went on asserting one, which is the same
-    convention-identified-name-uncorrected state `hudsonFst` was in. For
-    between-population `F_ST` after a split use `coalFst t Ne = t / (t + 2 Nₑ)`.
+    **This is not a split `F_ST`.** For between-population `F_ST` after a split use
+    `coalFst t Ne = t / (t + 2 Nₑ)`.
 
-    Regime: closed population, no mutation. The previous sentence here read
-    "This is not a definition imposed from outside; it is the fractional loss
-    of heterozygosity after t generations of drift", which is the strongest
-    form of the claim and is the one measurement rejects. Derived it is, but
-    derived *within a regime*: the recurrence it comes from lets heterozygosity
+    Regime: closed population, no mutation. **Being derived is not a defence, and this
+    is derived only WITHIN that regime**: the recurrence it comes from lets heterozygosity
     decay with nothing replenishing it. Under mutation-drift balance
     heterozygosity is stationary, the retention is measured at `1.025 ± 0.020`
     at `Ne = 1000`, `t = 4000` where this expression's factor gives `0.135`,
@@ -1570,9 +1559,8 @@ theorem fstEquilibrium_derived (Ne mu : ℝ) (hNe : 0 < Ne) (hmu : 0 < mu) :
   field_simp
   ring
 
-/-- **Derived Fst_eq agrees with the earlier fstMutationDriftEquilibrium.**
-    This confirms that the formula we derived from the recurrence is the
-    same as the one previously defined. -/
+/-- **The equilibrium derived from the recurrence agrees with
+    `fstMutationDriftEquilibrium`.** -/
 theorem fstEquilibrium_derived_consistent (Ne mu : ℝ)
     (hNe : 0 < Ne) (hmu : 0 < mu) :
     1 - hetMutationFloor Ne mu = fstMutationDriftEquilibrium (4 * Ne * mu) := by
@@ -1622,9 +1610,8 @@ end FstDerivationFromDrift
 /-!
 ## Derivation of Transient Fst from Heterozygosity Recurrence with Mutation
 
-The continuous-time `fstMutationDriftTransient` was previously *assumed*.
-Here we *derive* the discrete-time analogue from the heterozygosity
-recurrence that includes both drift and mutation, using only:
+The discrete-time analogue of `fstMutationDriftTransient` is DERIVED here, not assumed,
+from the heterozygosity recurrence that includes both drift and mutation, using only:
 1. The recurrence H(t+1) = λ H(t) + c, where λ = (1 - 1/(2N))(1 - θ/(2N))
    and c captures mutation input.
 2. The closed-form solution of affine recurrences via geometric series.
@@ -1648,14 +1635,12 @@ section TransientFstDerivation
     the second captures the approximate mutation effect:
     two lineages both fail to mutate with probability (1-μ)² ≈ 1 - 2μ = 1 - θ/(2N).
 
-    **This is `Calibrator.hetDecayFromScaled` applied, not a second copy of its body.**
-    It used to re-type the product `(1 - 1/(2Ne)) * (1 - θ/(2Ne))`, which is the same
-    two-bodies-for-one-quantity failure `presentDayPGSVariance` records above it. Every
-    call site here already unfolds the pair `hetDecayFactor hetDecayFromScaled` — as do
-    `Calibrator.Conventions` and `Calibrator.DemographicHistory` — and those unfolds
-    failed against the re-typed body, because after unfolding the copy there was no
-    `hetDecayFromScaled` left in the goal to unfold. So the two-name unfold is the
-    contract: if you inline this definition again, five proofs in three files break.
+    **This is `Calibrator.hetDecayFromScaled` applied, not a second copy of its body.
+    Do not inline the product `(1 - 1/(2Ne)) * (1 - θ/(2Ne))` here.** Every call site
+    unfolds the PAIR `hetDecayFactor hetDecayFromScaled` — including
+    `Calibrator.Conventions` and `Calibrator.DemographicHistory` — and an inlined body
+    leaves no `hetDecayFromScaled` in the goal for the second unfold to find. The
+    two-name unfold is the contract: inlining breaks five proofs in three files.
 
     Empirical status: UNTESTED. -/
 noncomputable def hetDecayFactor (Ne θ : ℝ) : ℝ :=
