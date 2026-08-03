@@ -301,6 +301,90 @@ theorem fullSupport_of_uniform_floor (J : FiberCoupling k d) (η : ℝ) (hη : 0
   intro x
   exact ne_of_gt (lt_of_lt_of_le hη (hfloor x))
 
+/-! ### The boundary: where coverage invariance stops
+
+`coverage_invariant` says LD cannot change which modulus cells are charged **until it kills
+support**. That clause is doing all the work, and until now nothing in this corpus exhibited
+the case where it bites. Without a witness the theorem is a statement whose hypothesis has
+never been shown capable of failing, which is the standard this corpus imposes on itself.
+
+The witness is the **modulus-copy coupling**: two loci in perfect LD, the second a copy of
+the first. Its joint mass sits on the diagonal, so the floor `η` is zero, and a product cell
+that both marginals reach is charged by no joint atom at all.
+
+**The genetic reading, and it is sharper than "LD hurts identifiability".** Coverage is a
+support property, so it is invariant under couplings of *arbitrary* strength provided every
+joint genotype cell retains positive mass. It can fail only when the haplotype law reaches
+the boundary of its simplex and a cell has zero mass. That boundary is **not** the scalar
+condition `r² = 1`: with unequal allele frequencies, a haplotype can disappear at moderate
+`r²`. The copy coupling below is the clean `r² = 1` witness, not a classification of every
+zero-floor law. Consequently LD pruning and support protection are different design axes;
+an `r²` cutoff alone does not certify the conditional floor needed by coverage invariance.
+
+Empirical status: DERIVED. The witness is exact and finite. -/
+
+/-- The witness family: two atoms, values `1` and `0`, hence moduli `0` and `1`. -/
+noncomputable def copyWitnessFamily : BundleFamily 2 where
+  atomValue := fun j _ => if j = 0 then 1 else 0
+  atomMass := fun _ _ => 1 / 2
+
+theorem copyWitnessFamily_modulus (j : Fin 2) (t : ℝ) :
+    copyWitnessFamily.modulus j t = if j = 0 then 0 else 1 := by
+  simp only [BundleFamily.modulus, copyWitnessFamily]
+  split_ifs <;> norm_num
+
+/-- **The modulus-copy coupling**: locus two copies locus one, so only the diagonal carries
+    mass. This is perfect LD, and it is the `η = 0` boundary of the floor hypothesis. -/
+noncomputable def modulusCopyCoupling : FiberCoupling 2 2 where
+  mass := fun x => if x 0 = x 1 then 1 / 2 else 0
+
+/-- The modulus-copy coupling fails full support: the off-diagonal cells are empty. -/
+theorem modulusCopyCoupling_not_fullSupport : ¬ modulusCopyCoupling.FullSupport := by
+  intro hfull
+  have h := hfull (fun i => if i = 0 then 0 else 1)
+  unfold modulusCopyCoupling at h
+  norm_num at h
+
+/-- The target cell: slot one at modulus `0`, slot two at modulus `1`. -/
+def copyWitnessValue : Fin 2 → ℝ := fun i => if i = 0 then 0 else 1
+
+/-- **Both marginals reach the cell**: it is covered by the product. -/
+theorem copyWitness_productCovers :
+    ProductCovers copyWitnessFamily (fun _ => 0) copyWitnessValue := by
+  refine ⟨fun i => if i = 0 then 0 else 1, fun i => ?_⟩
+  rw [copyWitnessFamily_modulus]
+  unfold copyWitnessValue
+  by_cases hi : i = 0 <;> simp [hi]
+
+/-- **The coupling reaches it not at all.**
+
+    Every atom tuple carrying mass is diagonal, and a diagonal tuple assigns the two slots
+    the same modulus, while the target cell asks for two different ones. So coverage under
+    perfect LD is strictly smaller than product coverage — the exact failure that
+    `coverage_invariant`'s support hypothesis excludes. -/
+theorem copyWitness_not_coversTuple :
+    ¬ CoversTuple copyWitnessFamily (fun _ => 0) modulusCopyCoupling copyWitnessValue := by
+  rintro ⟨x, hmass, hx⟩
+  have hdiag : x 0 = x 1 := by
+    unfold modulusCopyCoupling at hmass
+    by_contra hne
+    simp [hne] at hmass
+  have heq : copyWitnessValue 0 = copyWitnessValue 1 := by
+    rw [← hx 0, ← hx 1, hdiag]
+  norm_num [copyWitnessValue] at heq
+
+/-- **Coverage invariance is sharp.** Under a positive joint floor coverage is exactly
+    product coverage; once the floor reaches `η = 0`, coverage can be strictly smaller, as
+    this perfect-copy witness proves. The two halves say the hypothesis of
+    `coverage_invariant` cannot be dropped; they do not assert that every zero-floor
+    coupling loses this particular cell. -/
+theorem coverage_invariance_sharp :
+    ProductCovers copyWitnessFamily (fun _ => 0) copyWitnessValue ∧
+      ¬ CoversTuple copyWitnessFamily (fun _ => 0) modulusCopyCoupling copyWitnessValue ∧
+      ¬ modulusCopyCoupling.FullSupport :=
+  ⟨copyWitness_productCovers, copyWitness_not_coversTuple,
+    modulusCopyCoupling_not_fullSupport⟩
+
 end FiberCoupling
 
 namespace FiniteCoupledPhaseLaw

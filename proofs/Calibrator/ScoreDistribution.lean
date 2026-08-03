@@ -367,6 +367,99 @@ theorem highly_polygenic_better_gaussian
     C * ρ / (σ_sq * Real.sqrt m_poly) < C * ρ / (σ_sq * Real.sqrt m_oligo) :=
   berry_esseen_error_decreases_with_snps C ρ σ_sq m_oligo m_poly h_C h_ρ h_σ h_oligo h_more
 
+/-! ### The count that decides is blocks, not markers
+
+`berry_esseen_error_decreases_with_snps` above is stated in the **marker count**, and under
+linkage that count is wrong in the anti-conservative direction. The freezing transition
+supplies the correction: a score over a genome with correlation length `ℓ` behaves, for
+normal-approximation purposes, like a sum over `m/ℓ` effectively independent **blocks**, and
+the residual discreteness it leaves behind is `(1 - 1/ℓ)^(n-1)`.
+
+**The reduction itself is an analytic input and is carried as one.** That a linked score
+obeys a central limit theorem with the block count in place of the marker count is a
+regeneration/renewal statement — the excursion decomposition of
+`Calibrator.FoldedSpectrum` §8 — and it is not proved here. What is proved is the
+consequence, which is the part a practitioner is exposed to: **the marker-count error bound
+understates the true one by exactly `√ℓ`.**
+
+The direction matters more than the factor. A bound that is too small reads as "the Gaussian
+approximation is safe here", so the error is not conservative, and it is worst exactly where
+LD is strongest and where the marker count is most flattering. A panel of a million variants
+with correlation length one hundred has the normal-approximation quality of ten thousand
+independent ones, and its Berry–Esseen bound is ten times larger than the marker count says.
+
+Empirical status: the reduction is UNTESTED here and carried as a hypothesis; the residual
+discreteness `(1 - 1/ℓ)^(n-1)` is MEASURED upstream (max deviation `0.033` against a
+binomial standard error of `0.024`, with the predicted failure on a non-renewal chain also
+firing). The algebra below is PROVED. -/
+
+section BlockCount
+
+/-- **The effectively independent block count**: markers divided by correlation length. -/
+noncomputable def effectiveBlockCount (markers correlationLength : ℝ) : ℝ :=
+  markers / correlationLength
+
+/-- **Residual discreteness of the freezing transition.**
+
+    The lattice ghost surviving in a block of `n` markers at correlation length `ℓ`. It is
+    the quantity whose vanishing licenses treating the block sum as continuous. -/
+noncomputable def residualDiscreteness (correlationLength : ℝ) (n : ℕ) : ℝ :=
+  (1 - 1 / correlationLength) ^ (n - 1)
+
+/-- At a single marker there is no averaging and the ghost is undiminished. -/
+theorem residualDiscreteness_one (correlationLength : ℝ) :
+    residualDiscreteness correlationLength 1 = 1 := by
+  unfold residualDiscreteness
+  norm_num
+
+/-- With no linkage the ghost is extinguished past the first marker. -/
+theorem residualDiscreteness_of_no_linkage (n : ℕ) (hn : 2 ≤ n) :
+    residualDiscreteness 1 n = 0 := by
+  unfold residualDiscreteness
+  have hpos : n - 1 ≠ 0 := by omega
+  norm_num [zero_pow hpos]
+
+/-- **The block-count Berry–Esseen bound is exactly `√ℓ` times the marker-count bound.**
+
+    Writing the marker count as `b · ℓ` for `b` blocks at correlation length `ℓ`, the bound
+    computed from blocks is `√ℓ` times the bound computed from markers. The marker-count
+    figure is therefore an understatement whenever there is any linkage at all. -/
+theorem berry_esseen_block_bound_eq (C ρ σ_sq b ℓ : ℝ)
+    (hb : 0 < b) (hℓ : 0 < ℓ) (hσ : 0 < σ_sq) :
+    C * ρ / (σ_sq * Real.sqrt b) =
+      Real.sqrt ℓ * (C * ρ / (σ_sq * Real.sqrt (b * ℓ))) := by
+  have hsb : 0 < Real.sqrt b := Real.sqrt_pos.mpr hb
+  have hsl : 0 < Real.sqrt ℓ := Real.sqrt_pos.mpr hℓ
+  rw [Real.sqrt_mul (le_of_lt hb) ℓ]
+  field_simp <;> ring
+
+/-- **The marker count is anti-conservative**: at any correlation length above one the true
+    bound strictly exceeds the one the marker count reports.
+
+    This is the statement to carry into study design. It says the failure of a
+    marker-counted normal approximation is not a small correction to be absorbed into
+    constants — it is a `√ℓ` inflation whose size is set by the LD structure of the panel,
+    and it runs in the direction that makes an unsafe approximation look safe. -/
+theorem marker_count_understates_berry_esseen (C ρ σ_sq b ℓ : ℝ)
+    (hC : 0 < C) (hρ : 0 < ρ) (hb : 0 < b) (hσ : 0 < σ_sq) (hℓ : 1 < ℓ) :
+    C * ρ / (σ_sq * Real.sqrt (b * ℓ)) < C * ρ / (σ_sq * Real.sqrt b) := by
+  have hℓ0 : (0 : ℝ) < ℓ := by linarith
+  have hsb : 0 < Real.sqrt b := Real.sqrt_pos.mpr hb
+  have hlt : Real.sqrt b < Real.sqrt (b * ℓ) := by
+    have : b < b * ℓ := by nlinarith
+    exact Real.sqrt_lt_sqrt (le_of_lt hb) this
+  apply div_lt_div_of_pos_left (mul_pos hC hρ) (mul_pos hσ hsb)
+  exact mul_lt_mul_of_pos_left hlt hσ
+
+/-- The effective block count is what the corrected bound consumes: at `markers = b · ℓ` it
+    returns `b`. Recorded so that the two vocabularies cannot drift apart. -/
+theorem effectiveBlockCount_of_blocks (b ℓ : ℝ) (hℓ : ℓ ≠ 0) :
+    effectiveBlockCount (b * ℓ) ℓ = b := by
+  unfold effectiveBlockCount
+  field_simp
+
+end BlockCount
+
 end GaussianApproximation
 
 
