@@ -329,9 +329,14 @@ on LD and population structure assumptions.
 
 section GREML
 
-/-- **GREML h² estimate depends on LD structure.**
-    GREML estimates h²_SNP = trace(GRM⁻¹ × Σ_pheno) / n.
-    When LD differs between training and evaluation, the estimate is biased. -/
+/-- **A quantity plus a nonzero offset differs from the quantity.**
+
+    The name says what is proved. The GREML reading — that using linkage-disequilibrium
+    structure from one population to estimate heritability in another leaves a nonzero bias —
+    is the reason someone would supply `h_ld_nonzero`, and it is not derived here: no genomic
+    relationship matrix, no phenotypic covariance and no estimator appears below. That the bias
+    is nonzero is the hypothesis, so this cannot be cited as evidence that GREML is
+    LD-sensitive. -/
 theorem add_ne_self_of_ne_zero
     (h2_estimated h2_true ld_bias : ℝ)
     (h_bias : h2_estimated = h2_true + ld_bias)

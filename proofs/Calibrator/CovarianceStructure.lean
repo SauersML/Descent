@@ -422,10 +422,13 @@ theorem ldsr_increases_with_ell (N h2 M ell₁ ell₂ a : ℝ)
   have : 0 < N * h2 / M := div_pos (mul_pos h_N h_h2) h_M
   nlinarith
 
-/-- **Cross-ancestry LDSR.**
-    Using LD scores from population A to analyze GWAS from B
-    produces biased h² estimates. The bias direction depends on
-    whether LD_A > LD_B or LD_A < LD_B. -/
+/-- **Scaling by a ratio that is not one changes the quantity.**
+
+    The name says what is proved. The cross-ancestry reading — that LD scores taken from one
+    population and applied to another rescale the heritability estimate by the ratio of the two
+    LD scores — is supplied as `h_formula`, not derived, and the claim about bias DIRECTION in
+    the older headline is not in the statement at all. Nothing below is evidence that LDSR is
+    biased across ancestries; it is arithmetic on an assumed rescaling. -/
 theorem mul_div_ne_self_of_ne
     (h2_true h2_estimated ell_discovery ell_reference : ℝ)
     (h_formula : h2_estimated = h2_true * ell_discovery / ell_reference)
