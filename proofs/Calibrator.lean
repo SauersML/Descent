@@ -53,6 +53,7 @@ import Calibrator.PowerAnalysis
 import Calibrator.CovarianceStructure
 import Calibrator.CausalInference
 import Calibrator.CertificateGrading
+import Calibrator.FiniteMinimax
 import Calibrator.PencilEnvironment
 import Calibrator.DirichletTransfer
 import Calibrator.DeclaredInteractionClass

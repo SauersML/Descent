@@ -69,9 +69,32 @@ theorem probability_nonneg (P : FinitePrior n) (i : Fin (n + 1)) :
     0 ≤ FinitePrior.probability P i :=
   ENNReal.toReal_nonneg
 
+theorem probability_le_one (P : FinitePrior n) (i : Fin (n + 1)) :
+    FinitePrior.probability P i ≤ 1 := by
+  simpa [FinitePrior.probability] using
+    ENNReal.toReal_le_coe_of_le_coe (P.coe_le_one i)
+
 /-- Expectation of a function under the derived prior. -/
 noncomputable def mean (P : FinitePrior n) (f : Fin (n + 1) → ℝ) : ℝ :=
   ∑ i, FinitePrior.probability P i * f i
+
+/-- A finite-prior expectation is bounded by the unweighted absolute sum.
+This is deliberately proved from `PMF.coe_le_one`; callers do not supply a
+boundedness theorem for the modulus below. -/
+theorem abs_mean_le_sum_abs (P : FinitePrior n) (f : Fin (n + 1) → ℝ) :
+    |P.mean f| ≤ ∑ i, |f i| := by
+  calc
+    |P.mean f| ≤ ∑ i, |P.probability i * f i| := by
+      exact Finset.abs_sum_le_sum_abs _ _
+    _ = ∑ i, P.probability i * |f i| := by
+      apply Finset.sum_congr rfl
+      intro i _
+      rw [abs_mul, abs_of_nonneg (P.probability_nonneg i)]
+    _ ≤ ∑ i, 1 * |f i| := by
+      apply Finset.sum_le_sum
+      intro i _
+      exact mul_le_mul_of_nonneg_right (P.probability_le_one i) (abs_nonneg _)
+    _ = ∑ i, |f i| := by simp
 
 end FinitePrior
 
@@ -115,11 +138,41 @@ noncomputable def targetGap (P Q : FinitePrior n) : ℝ :=
 theorem targetGap_nonneg (P Q : FinitePrior n) : 0 ≤ E.targetGap P Q :=
   abs_nonneg _
 
+/-- Target gaps carried by feasible mixture pairs. -/
+noncomputable def admissibleGaps (K : ℕ) (h : ℝ) : Set ℝ :=
+  {d : ℝ | ∃ P Q, E.Feasible K h P Q ∧ d = E.targetGap P Q}
+
 /-- The grade-`K` modulus: the largest target separation carried by a feasible
-mixture pair.  This definition is the grading; evaluating it is the hard
-problem and cannot be installed as a theorem-valued field. -/
+mixture pair.  Zero is inserted explicitly, so an empty feasible family has
+modulus zero instead of relying on the implementation value of `sSup ∅`.
+Evaluating this supremum is the hard problem and cannot be installed as a
+theorem-valued field. -/
 noncomputable def modulus (K : ℕ) (h : ℝ) : ℝ :=
-  sSup {d : ℝ | ∃ P Q, E.Feasible K h P Q ∧ d = E.targetGap P Q}
+  sSup (insert 0 (E.admissibleGaps K h))
+
+/-- Every target gap is bounded by twice the catalogue's absolute target mass. -/
+theorem targetGap_le_catalogueBound (P Q : FinitePrior n) :
+    E.targetGap P Q ≤ 2 * ∑ i, |E.target i| := by
+  unfold targetGap
+  have hP := FinitePrior.abs_mean_le_sum_abs P E.target
+  have hQ := FinitePrior.abs_mean_le_sum_abs Q E.target
+  calc
+    |P.mean E.target - Q.mean E.target| ≤
+        |P.mean E.target| + |Q.mean E.target| := abs_sub _ _
+    _ ≤ 2 * ∑ i, |E.target i| := by linarith
+
+theorem admissibleGaps_bddAbove (K : ℕ) (h : ℝ) :
+    BddAbove (insert 0 (E.admissibleGaps K h)) := by
+  refine ⟨2 * ∑ i, |E.target i|, ?_⟩
+  intro d hd
+  rcases hd with (rfl | hd)
+  · positivity
+  · rcases hd with ⟨P, Q, _, rfl⟩
+    exact E.targetGap_le_catalogueBound P Q
+
+theorem modulus_nonneg (K : ℕ) (h : ℝ) : 0 ≤ E.modulus K h := by
+  apply le_csSup (E.admissibleGaps_bddAbove K h)
+  exact Set.mem_insert 0 _
 
 /-- The feasible sets are nested in grade. -/
 theorem feasible_mono {K L : ℕ} (hKL : K ≤ L) (h : ℝ)
@@ -127,7 +180,93 @@ theorem feasible_mono {K L : ℕ} (hKL : K ≤ L) (h : ℝ)
     E.Feasible K h P Q :=
   ⟨E.momentMatched_mono hKL hfeas.1, hfeas.2⟩
 
+/-- Requiring more matched moments can only decrease the certificate modulus. -/
+theorem modulus_antitone_grade {K L : ℕ} (hKL : K ≤ L) (h : ℝ) :
+    E.modulus L h ≤ E.modulus K h := by
+  unfold modulus
+  apply csSup_le_csSup (E.admissibleGaps_bddAbove K h)
+    ⟨0, Set.mem_insert 0 (E.admissibleGaps L h)⟩
+  intro d hd
+  rcases hd with (rfl | hd)
+  · exact Set.mem_insert 0 _
+  · rcases hd with ⟨P, Q, hfeas, rfl⟩
+    exact Set.mem_insert_iff.mpr <| Or.inr
+      ⟨P, Q, E.feasible_mono hKL h hfeas, rfl⟩
+
 end FiniteMomentCertificateProblem
+
+/-! ## A genuine finite experiment, rather than an arbitrary discrepancy
+
+The abstract problem above is useful for algebra.  The structure below is the
+statistical specialization used by incompleteness statements: each parameter
+has an actual observation law, prior mixtures are formed with `PMF.bind`, and
+the discrepancy is total variation computed from those mixture laws.  Thus a
+gap theorem cannot choose an arbitrary numerical discrepancy to manufacture a
+desired answer.
+-/
+
+/-- Finite mixture experiment with numerical target and moment functions. -/
+structure FiniteMixtureExperiment (parameterCount observationCount : ℕ) where
+  target : Fin (parameterCount + 1) → ℝ
+  moment : ℕ → Fin (parameterCount + 1) → ℝ
+  observation : Fin (parameterCount + 1) → FinitePrior observationCount
+
+namespace FiniteMixtureExperiment
+
+variable {parameterCount observationCount : ℕ}
+    (E : FiniteMixtureExperiment parameterCount observationCount)
+
+/-- Observation law obtained after first drawing a parameter from `P`. -/
+noncomputable def mixture (P : FinitePrior parameterCount) :
+    FinitePrior observationCount :=
+  P.bind E.observation
+
+/-- Total-variation distance between the two prior-predictive laws. -/
+noncomputable def totalVariation
+    (P Q : FinitePrior parameterCount) : ℝ :=
+  (1 / 2 : ℝ) * ∑ x,
+    |(E.mixture P).probability x - (E.mixture Q).probability x|
+
+/-- The corresponding graded certificate problem. -/
+noncomputable def certificateProblem :
+    FiniteMomentCertificateProblem parameterCount where
+  target := E.target
+  moment := E.moment
+  pairDiscrepancy := E.totalVariation
+
+/-- Grade exponent used in the fixed-grade gap theorem.  Writing `K + 1`
+makes the theorem total at grade zero while retaining order `1/K`. -/
+noncomputable def fixedGradeExponent (K : ℕ) : ℝ :=
+  1 / (K + 1 : ℝ)
+
+/-- The explicit polynomial-over-logarithmic factor from the program. -/
+noncomputable def fixedGradeGapScale (K n : ℕ) : ℝ :=
+  (n + 2 : ℝ) ^ (fixedGradeExponent K / 2) /
+    Real.sqrt (Real.log (n + 2 : ℝ))
+
+/-- Modulus-level certification gap of this actual finite experiment. -/
+noncomputable def certificationGap (K : ℕ) (h : ℝ) : ℝ :=
+  E.certificateProblem.modulus 0 h /
+    E.certificateProblem.modulus K h
+
+/-- **Fixed-grade incompleteness.**  At every fixed positive grade there is a
+sequence of finite mixture experiments whose ungraded-to-graded modulus ratio
+is at least
+
+`n^(b_K/2) / sqrt(log n)`, with `b_K = 1/(K+1) = Θ(1/K)`.
+
+This is intentionally a visible proof obligation.  Its proof must construct
+the moment-matching priors and compare their actual prior-predictive total
+variation laws.  A conditional crossing hypothesis, an arbitrary discrepancy,
+or a cited moment-comparison theorem is not accepted in its place. -/
+theorem fixedGrade_incompleteness (K : ℕ) :
+    ∀ᶠ n : ℕ in Filter.atTop,
+      ∃ observationCount : ℕ,
+        ∃ E : FiniteMixtureExperiment n observationCount,
+          fixedGradeGapScale K n ≤ E.certificationGap (K + 1) 1 := by
+  sorry
+
+end FiniteMixtureExperiment
 
 /-! ## Total, proof-free input data -/
 
