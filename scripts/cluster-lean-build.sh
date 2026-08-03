@@ -389,7 +389,15 @@ while IFS= read -r src; do
   else
     echo "MODULE_STATUS $name STALE"; _stale=$((_stale+1))
   fi
-done < <(find proofs -name '*.lean' | sort)
+done < <(find proofs -name '*.lean' \
+           -not -path 'proofs/validation/*' | sort)
+# proofs/validation is excluded on purpose, and the exclusion is not cosmetic.
+# Two of its modules belong to the ValidationShared library, which this script
+# is not asked to build, and three are detector scripts that run under
+# `lake env lean` and by design never produce an olean at all. Counting those
+# five as ABSENT made a fully green Calibrator build report WHOLE_CORPUS
+# INCOMPLETE and exit 3, so a correct build looked like a failed one. A guard
+# that fires on the healthy case is a guard everyone learns to ignore.
 echo "MODULES_COMPILED=$_compiled"
 echo "MODULES_STALE=$_stale"
 echo "MODULES_ABSENT=$_absent"
