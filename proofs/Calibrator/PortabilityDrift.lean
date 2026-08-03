@@ -2998,8 +2998,9 @@ assumption. It converts a drift-induced drop into **AUC units**, which means the
 bias measured on dichotomised traits does not surface here as a wrong formula — it surfaces
 as a wrong *portability conclusion*, with the arithmetic intact throughout. For a binary
 trait, convert with `liabilityThresholdAUCFromExplainedR2` at the trait's prevalence
-instead. -/
-/-- **DEFINITIONALLY `presentDayEqualVarianceGaussianAUC` AT THE BENCHMARK DRIFT LEVEL, AND
+instead.
+
+**DEFINITIONALLY `presentDayEqualVarianceGaussianAUC` AT THE BENCHMARK DRIFT LEVEL, AND
 MEASURED AS SUCH: max spread `0.000e+00` over the admissible box.**
 
 The name is retained because it records *provenance* — that `fstTarget` comes from the
