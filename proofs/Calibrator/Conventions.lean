@@ -253,6 +253,16 @@ saying it meant.
 noncomputable def hudsonFst (p₁ p₂ : ℝ) : ℝ :=
   (p₁ - p₂) ^ 2 / (p₁ * (1 - p₂) + p₂ * (1 - p₁))
 
+/-- **Hudson's `F_ST` does not care which population is called first.** Both the squared
+frequency difference and the denominator `p₁ + p₂ - 2p₁p₂` are symmetric, so the statistic is
+too. A body that broke this would be measuring a directed quantity under a symmetric name. -/
+theorem hudsonFst_symm (p₁ p₂ : ℝ) : hudsonFst p₁ p₂ = hudsonFst p₂ p₁ := by
+  unfold hudsonFst; ring_nf
+
+/-- Two populations at the same frequency are not differentiated. -/
+theorem hudsonFst_self (p : ℝ) : hudsonFst p p = 0 := by
+  unfold hudsonFst; simp
+
 /-- **The exact conversion between the two conventions**, which is what turns
 "they disagree by about 72% somewhere in this range" into a statement that
 holds everywhere: `F_ST^Hudson = 2·G_ST / (1 + G_ST)`. Note it is not a

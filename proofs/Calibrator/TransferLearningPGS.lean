@@ -85,6 +85,17 @@ noncomputable def sharedLDHeritability {m : ℕ}
 noncomputable def pgsR2 (cov_pgs_y : ℝ) (var_pgs var_y : ℝ) : ℝ :=
   cov_pgs_y ^ 2 / (var_pgs * var_y)
 
+/-- **`R²` is invariant under rescaling the score.** Multiplying the polygenic score by `c`
+multiplies its covariance with the outcome by `c` and its variance by `c²`, and the ratio is
+unchanged. This is the defining property of a squared correlation: it is why `R²` is comparable
+across scores on different scales, and a body that failed it would depend on the arbitrary units
+the score happens to be reported in. -/
+theorem pgsR2_scale_invariant (cov_pgs_y var_pgs var_y c : ℝ) (hc : c ≠ 0) :
+    pgsR2 (c * cov_pgs_y) (c ^ 2 * var_pgs) var_y = pgsR2 cov_pgs_y var_pgs var_y := by
+  unfold pgsR2
+  rw [mul_pow, show c ^ 2 * var_pgs * var_y = c ^ 2 * (var_pgs * var_y) by ring,
+    mul_div_mul_left _ _ (pow_ne_zero 2 hc)]
+
 /-- **One body, two names, tied.** `DGP.explainedR2FromTransportMoments` is the
 same squared-correlation coordinate. -/
 theorem pgsR2_eq_explainedR2FromTransportMoments (cov_pgs_y var_pgs var_y : ℝ) :

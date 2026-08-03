@@ -52,6 +52,17 @@ section IncrementalR2
 noncomputable def incrementalR2 (r2_full r2_covariates : ℝ) : ℝ :=
   r2_full - r2_covariates
 
+/-- **Increments telescope.** The gain from covariates to full equals the gain through any
+intermediate model plus the gain from there. A body that failed this would not be an increment. -/
+theorem incrementalR2_telescope (a b c : ℝ) :
+    incrementalR2 a b + incrementalR2 b c = incrementalR2 a c := by
+  unfold incrementalR2; ring
+
+/-- Nesting the models makes the increment nonnegative. -/
+theorem incrementalR2_nonneg (r2_full r2_covariates : ℝ)
+    (h : r2_covariates ≤ r2_full) : 0 ≤ incrementalR2 r2_full r2_covariates := by
+  unfold incrementalR2; linarith
+
 /-- **Incremental R² is nonneg from nested model theory.**
     In a nested linear regression, adding predictors can only increase R²
     because the full model minimizes RSS over a strictly larger parameter

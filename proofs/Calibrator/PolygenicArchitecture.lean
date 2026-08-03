@@ -698,27 +698,47 @@ noncomputable def certificationGap {q n : ℕ}
     (P : MeanAbsoluteEffectCertificateProblem q n) (K : ℕ) (h : ℝ) : ℝ :=
   P.finiteProblem.modulus 0 h / P.finiteProblem.modulus K h
 
-/-- **Fixed-grade incompleteness for polygenic architecture transport.**
+/-- The unproved biological construction isolated from its automatic carrier facts.
 
 For every fixed grade, sufficiently large architecture catalogues contain an
 actual finite observation experiment on a convex bounded effect carrier whose
 ungraded-to-graded modulus ratio is at least
 `n^(b_K/2) / sqrt(log n)`, with `b_K = 1/(K+1)`.
 
-The target is the mean absolute causal effect, grade two matches signed-effect
-mass and squared-effect mass, and discrepancy is total variation between the
-prior-predictive observation laws.  The proof is admitted openly: it must
-construct the moment-matching architecture priors.  No benchmark curve,
-crossing hypothesis, or external moment-comparison theorem substitutes for
-that construction. -/
+The target is the mean absolute causal effect, grade two matches signed-effect mass and
+squared-effect mass, and discrepancy is total variation between the prior-predictive observation
+laws. The proof is admitted openly: it must construct the moment-matching architecture priors.
+No benchmark curve, crossing hypothesis, or external moment-comparison theorem substitutes for
+that construction.
+
+Only existence of the catalogue and its gap is admitted here. Catalogue membership, nonemptiness,
+and convexity are theorems of the numerical construction and are attached below. -/
+theorem exists_fixedGrade_gap_biology (K : ℕ) :
+    ∀ᶠ n : ℕ in Filter.atTop,
+      ∃ P : MeanAbsoluteEffectCertificateProblem (n + 1) n,
+        FiniteMixtureExperiment.fixedGradeGapScale K n ≤
+          P.certificationGap (K + 1)
+            (FiniteMixtureExperiment.fixedGradeInformationRadius n) := by
+  sorry
+
+/-- **Fixed-grade incompleteness for polygenic architecture transport.**
+
+This is the biology-facing theorem. Its hard content is exactly
+`exists_fixedGrade_gap_biology`; the remaining clauses are discharged by the already-proved
+geometry of the data-derived effect carrier. In particular, convexity is a conclusion, never a
+field or premise supplied by a caller. -/
 theorem fixedGrade_incompleteness_biology (K : ℕ) :
     ∀ᶠ n : ℕ in Filter.atTop,
       ∃ P : MeanAbsoluteEffectCertificateProblem (n + 1) n,
         (∀ i, P.architecture i ∈ P.effects) ∧
           P.effects.Nonempty ∧ Convex ℝ P.effects ∧
           FiniteMixtureExperiment.fixedGradeGapScale K n ≤
-            P.certificationGap (K + 1) 1 := by
-  sorry
+            P.certificationGap (K + 1)
+              (FiniteMixtureExperiment.fixedGradeInformationRadius n) := by
+  filter_upwards [exists_fixedGrade_gap_biology K] with n hn
+  rcases hn with ⟨P, hgap⟩
+  exact ⟨P, fun i ↦ P.architecture_mem_effects i, P.effects_nonempty,
+    P.effects_convex, hgap⟩
 
 end MeanAbsoluteEffectCertificateProblem
 

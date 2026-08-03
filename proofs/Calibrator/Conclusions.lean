@@ -63,6 +63,19 @@ section BrierScore
     This is the standard proper scoring rule for probability forecasts. -/
 noncomputable def brierScore (p : ℝ) (y : ℝ) : ℝ := (y - p) ^ 2
 
+/-- **Anchors of the Brier score.** A confident correct call scores `0`, a confident wrong call
+scores `1`, and the uninformative call scores `1/4`. Three numbers rather than one, because a
+single anchor is met by many wrong bodies. -/
+theorem brierScore_anchors :
+    brierScore 1 1 = 0 ∧ brierScore 0 1 = 1 ∧ brierScore (1 / 2) 1 = 1 / 4 := by
+  refine ⟨?_, ?_, ?_⟩ <;> unfold brierScore <;> norm_num
+
+/-- The score vanishes exactly on a correct point prediction. -/
+theorem brierScore_eq_zero_iff (p y : ℝ) : brierScore p y = 0 ↔ p = y := by
+  unfold brierScore
+  rw [pow_eq_zero_iff two_ne_zero, sub_eq_zero]
+  exact eq_comm
+
 /-- Expected Brier Score when Y is Bernoulli(π).
     E[(Y - p)²] = π(1-p)² + (1-π)p²
 

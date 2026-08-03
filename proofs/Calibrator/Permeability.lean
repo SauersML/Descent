@@ -620,6 +620,14 @@ theorem twoChannelMomentInformation_eq_first_iff
 noncomputable def informationPerUnitCost (information cost : ℝ) : ℝ :=
   information / cost
 
+/-- **The rate does not depend on the units.** Measuring both information and cost in units `t`
+times smaller leaves the rate unchanged, which is what makes it a rate rather than a difference. -/
+theorem informationPerUnitCost_scale_invariant (information cost t : ℝ) (ht : t ≠ 0) :
+    informationPerUnitCost (t * information) (t * cost)
+      = informationPerUnitCost information cost := by
+  unfold informationPerUnitCost
+  exact mul_div_mul_left _ _ ht
+
 /-- Total information attainable by spending a fixed budget on exchangeable units of one
 design. Fractional units represent the continuous design relaxation; an implemented study
 rounds sample counts and rechecks the inequality. -/

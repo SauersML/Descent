@@ -392,6 +392,26 @@ noncomputable def fixedGradeGapScale (K n : ℕ) : ℝ :=
   (n + 2 : ℝ) ^ (fixedGradeExponent K / 2) /
     Real.sqrt (Real.log (n + 2 : ℝ))
 
+/-- Statistical indistinguishability radius for `n` independent observations.
+
+The `+ 2` makes the definition total while preserving the canonical `n⁻¹ʲ²` scale. Unlike
+radius one, this radius is strictly below one, so total variation is not automatically feasible
+and the observation kernel remains part of the modulus. -/
+noncomputable def fixedGradeInformationRadius (n : ℕ) : ℝ :=
+  1 / Real.sqrt (n + 2 : ℝ)
+
+theorem fixedGradeInformationRadius_pos (n : ℕ) :
+    0 < fixedGradeInformationRadius n := by
+  unfold fixedGradeInformationRadius
+  exact div_pos zero_lt_one (Real.sqrt_pos.2 (by positivity))
+
+theorem fixedGradeInformationRadius_lt_one (n : ℕ) :
+    fixedGradeInformationRadius n < 1 := by
+  unfold fixedGradeInformationRadius
+  have hbase : (1 : ℝ) < n + 2 := by exact_mod_cast (show 1 < n + 2 by omega)
+  have hsqrt : 1 < Real.sqrt (n + 2 : ℝ) := (Real.lt_sqrt (by norm_num)).2 (by nlinarith)
+  exact (div_lt_one (by positivity)).2 hsqrt
+
 /-- The proposed fixed-grade scale is strictly positive for every grade and catalogue size. -/
 theorem fixedGradeGapScale_pos (K n : ℕ) : 0 < fixedGradeGapScale K n := by
   unfold fixedGradeGapScale fixedGradeExponent
@@ -424,7 +444,8 @@ theorem exists_fixedGrade_gap (K : ℕ) :
     ∀ᶠ n : ℕ in Filter.atTop,
       ∃ observationCount : ℕ,
         ∃ E : FiniteMixtureExperiment n observationCount,
-          fixedGradeGapScale K n ≤ E.certificationGap (K + 1) 1 := by
+          fixedGradeGapScale K n ≤
+            E.certificationGap (K + 1) (fixedGradeInformationRadius n) := by
   sorry
 
 /-- **Fixed-grade incompleteness on a convex problem.**
@@ -438,7 +459,8 @@ theorem fixedGrade_incompleteness (K : ℕ) :
       ∃ observationCount : ℕ,
         ∃ E : FiniteMixtureExperiment n observationCount,
           Convex ℝ (finitePriorCarrier n) ∧
-            fixedGradeGapScale K n ≤ E.certificationGap (K + 1) 1 := by
+            fixedGradeGapScale K n ≤
+              E.certificationGap (K + 1) (fixedGradeInformationRadius n) := by
   filter_upwards [exists_fixedGrade_gap K] with n hn
   rcases hn with ⟨observationCount, E, hgap⟩
   exact ⟨observationCount, E, finitePriorCarrier_convex n, hgap⟩

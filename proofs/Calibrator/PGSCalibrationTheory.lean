@@ -256,6 +256,18 @@ end CalibrationDefinitions
 noncomputable def prevalenceLogit (pi : ℝ) : ℝ :=
   Real.log (pi / (1 - pi))
 
+/-- The logit is zero exactly at even odds. -/
+theorem prevalenceLogit_half : prevalenceLogit (1 / 2) = 0 := by
+  unfold prevalenceLogit; norm_num
+
+/-- **The logit is odd about even odds**: swapping a disease for its complement flips the sign.
+This is the property that makes it a log-odds rather than any other increasing reparameterisation
+of prevalence. -/
+theorem prevalenceLogit_reflect (pi : ℝ) (h0 : pi ≠ 0) (h1 : pi ≠ 1) :
+    prevalenceLogit (1 - pi) = -prevalenceLogit pi := by
+  unfold prevalenceLogit
+  rw [sub_sub_cancel, ← Real.log_inv, inv_div]
+
 /-- **Prevalence-driven logistic intercept shift.**
     If disease prevalence is `π_source` in training and `π_target`
     in the target, the intercept shift on the logistic linear-predictor

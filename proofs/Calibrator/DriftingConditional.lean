@@ -132,6 +132,22 @@ def IsInvariantWeight {n : ℕ} (ϖ : Fin n → ℝ) (L : Fin n → Fin n → �
 def KillsConstants {n : ℕ} (L : Fin n → Fin n → ℝ) : Prop :=
   ∀ i, ∑ j, L i j = 0
 
+/-- **The zero generator kills constants**, so the theorems assuming `KillsConstants` are
+    about something. A predicate assumed by theorems and satisfied by nothing leaves them
+    vacuously true -- kernel-checked, clean axiom report, no content. -/
+theorem killsConstants_zero {n : ℕ} :
+    KillsConstants (fun _ _ : Fin n ↦ (0 : ℝ)) := by
+  intro i
+  simp
+
+/-- **A two-state symmetric switching generator kills constants**, which is the witness that
+    matters biologically rather than the trivial one: rows `(-s, s)` and `(s, -s)` sum to
+    zero, so ancestry switching at any rate is conservative. -/
+theorem killsConstants_twoStateSwitch (s : ℝ) :
+    KillsConstants (fun i j : Fin 2 ↦ if i = j then -s else s) := by
+  intro i
+  fin_cases i <;> simp [Fin.sum_univ_two]
+
 /-- The zero weight is invariant for every generator. This is a useful algebraic base case, but
 it is not a probability weight because its total mass is zero. -/
 theorem isInvariantWeight_zero {n : ℕ} (L : Fin n → Fin n → ℝ) :
