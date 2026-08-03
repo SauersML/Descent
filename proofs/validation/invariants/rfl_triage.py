@@ -1,0 +1,323 @@
+"""Triage criterion for the `rfl`-provable theorem audit, STATED BEFORE READING.
+
+=== WHY THE CRITERION IS PUBLISHED FIRST ===
+
+A mechanical extraction hands over N candidates and the reading supplies
+whichever verdict the reader already expected. That is the same failure as a
+witness placed outside the slice it certifies: the test cannot come out any way
+but the expected one. So the rule is written, committed, and only then applied.
+
+The list also OVERSTATES IN THE DIRECTION OF "INTERESTING" before any reading
+happens: `equivalence.py`'s `agree_everywhere_different_bodies` suggested 19
+genuine identities because it compares equivalence CLASSES, while a theorem
+equates a specific PAIR; re-joining on the pair gives 7. Concretely:
+`cluster_identities_hold_at_every_retention` lands in a class with
+`fisherInformation` because everything in that class is shaped `a*b`, which
+says nothing whatever about the pair the theorem actually equates. JOIN ON THE
+EQUATED PAIR, normalise argument names, and compare the two bodies directly. A criterion applied
+after seeing 19 is not the same criterion as one applied after seeing 7.
+
+=== "PROVABLE BY rfl" IS NOT THE SAME PREDICATE AS "TAUTOLOGY" ===
+
+Both directions fail, which is why the mechanical flag cannot be the verdict:
+
+  * TRUE, CLOSABLE, AND STILL DEFECTIVE. `neiGstFromFrequencies_eq_hudsonFst`
+    (as it then was) proved that two spellings agree. They did. The defect was
+    the NAME: it asserted an estimator identity that does not hold, because
+    `hudsonFst` computed Nei's G_ST. Nothing about the proof was wrong.
+  * rfl-PROVABLE AND LOAD-BEARING. When two sides were defined INDEPENDENTLY,
+    the equality IS the claim, and the theorem is an anti-drift guard: change
+    either body and it stops compiling. `ldAfterGenerations_eq_retainedFraction`
+    and `driftLDStep_eq_islandFstMultiplicativeStep` exist for exactly that.
+
+=== THE THREE BUCKETS, AND THE MECHANICAL DISCRIMINATOR ===
+
+  A. rfl-PROVABLE AND VACUOUS.
+     One side is the other by construction -- a wrapper, an abbreviation, or a
+     restatement whose body literally invokes the other. Nothing can drift,
+     because there is only one definition. Deleting it loses nothing.
+
+  B. rfl-PROVABLE AND LOAD-BEARING.
+     Two bodies written independently, neither mentioning the other, that
+     happen to agree. The theorem is the assertion that they agree, and it is
+     the only thing preventing them from separating. Deleting it removes a
+     guard while leaving the code compiling -- silent, and undetectable later.
+
+     DISCRIMINATOR BETWEEN A AND B, and it is mechanical:
+     DOES EITHER DEFINITION'S BODY REFERENCE THE OTHER?
+     Yes -> A, the equality is structural.  No -> B, the equality is a claim.
+     This is decidable from the bodies alone, without reading the docstring,
+     which is what keeps the reader's expectation out of it.
+
+  C. NOT ACTUALLY rfl, BUT EASY.
+     Closes by `ring`/`simp`/`norm_num`, often with hypotheses. Trivial is not
+     the same as vacuous: `ascertainment_artificial_loss` is easy, and dropping
+     `h_array_worse` makes its second conjunct FALSE, so the hypothesis is
+     load-bearing and the theorem has content.
+
+     TEST FOR C: drop each hypothesis in turn and ask whether the statement
+     survives. A hypothesis whose removal falsifies the conclusion is content.
+
+  D. rfl-PROVABLE, TRUE, AND CERTIFYING THE WRONG PAIRING.
+     The proof is correct, both bodies are independent, and the theorem is
+     still a defect -- because the ARGUMENTS passed were the wrong ones.
+     `olsEffectEstimationVariance_eq_haplotypeEffectEstimationVariance` was
+     `sigma2/(n*varX) = sigma2/(n*f)`: true by `ring`, and reachable only by
+     passing a haplotype FREQUENCY into a slot that wants a genotype VARIANCE.
+     For a binary indicator the variance is `f*(1-f)`, and the missing `(1-f)`
+     was measured at -50.4% at `f = 1/2`. The theorem was a cross-check that
+     CERTIFIED the falsified identification.
+
+     THIS BUCKET IS INVISIBLE TO EVERY MECHANICAL TEST IN THIS FILE, and that
+     is the point of naming it. A `rfl` proof says the two sides reduce to the
+     same term. IT SAYS NOTHING ABOUT WHETHER THE ARGUMENTS WERE THE RIGHT ONES
+     TO PASS. The body-reference discriminator puts D in B -- independent
+     bodies, equality is the claim -- and B is exactly the bucket labelled
+     "do not delete". So D is the bucket where the mechanical answer is
+     confidently wrong, and only checking each argument against the UNITS the
+     slot expects will find it.
+
+     `neiGstFromFrequencies_eq_hudsonFst` is the same disease at the level of
+     NAMES; D is it at the level of ARGUMENT SLOTS.
+
+  COLLAPSING B AND C INTO A IS HOW A GUARD GETS DELETED AS REDUNDANT, which is
+  not hypothetical -- it is the failure this criterion was written to prevent.
+  MISTAKING D FOR B IS THE OPPOSITE ERROR AND IS WORSE: it preserves, and
+  thereby certifies, a wrong identification.
+
+=== ONE CASE THE BUCKETS DO NOT COVER, DECLARED RATHER THAN FORCED ===
+
+  VACUOUS ON PURPOSE. `cluster_identities_hold_at_every_retention` is vacuous
+  BY DESIGN: the property it flags is exactly the property being exhibited. It
+  belongs in no bucket and must not be deleted for being in A. Where intent is
+  the deciding fact and intent is not in the body, this refuses and says so.
+
+=== STATUS OF THE MECHANICAL PART: NOT TRUSTWORTHY YET. DO NOT USE ITS COUNTS ===
+
+THE CRITERION ABOVE IS THE DELIVERABLE. The extractor below is not, and this
+section exists so nobody mistakes one for the other.
+
+Three methods were used to enumerate the `rfl`-closing theorems in the same
+nine modules. They returned THREE DIFFERENT ANSWERS WITH ZERO OVERLAP in the
+named theorems:
+
+    regex, end-of-line anchored          2   (undercount: Lean puts `rfl` on
+                                              its own line as often as not)
+    regex, whitespace-flattened         16   (WRONG: `(.*?)` spans declarations,
+                                              pairing a theorem closed by
+                                              `apply mul_nonneg` with a later
+                                              `:= rfl`; it also matched
+                                              `downstream`, a word in prose)
+    regex, flattened + decl-guarded      3
+    block-split on declaration starts    2   (different two -- misses proofs
+                                              that end in `rfl` after other
+                                              tactics, and splits on a `:=`
+                                              occurring inside the statement)
+
+The last two share NO theorem names at all. So the true count is unknown, and
+every bucket tally this file could print is currently meaningless.
+
+WHAT THIS COST AND WHAT IT TAUGHT. The rule in `Calibrator.lean` says to run a
+query a second way and require the two to agree. I did, got 16 twice, and
+believed it -- because BOTH queries were the same SHAPE, a regex over flattened
+text, and they inherited the same declaration-spanning flaw. AGREEMENT BETWEEN
+TWO QUERIES OF THE SAME SHAPE IS NOT CORROBORATION; IT IS THE SAME MEASUREMENT
+TAKEN TWICE. The second query has to differ in KIND -- parse blocks instead of
+matching patterns -- and when it did, it disagreed immediately.
+
+So the discriminator needs one more word: run the query a second way OF A
+DIFFERENT SHAPE. Only the block-split disagreed, and only because it was not
+another regex.
+
+Anyone extending this should extract from the ELABORATED environment rather
+than the source text -- Lean knows which theorems close by `rfl` and no text
+scan of a whitespace-insensitive language will reliably recover it.
+
+=== AND A CONNECTIVITY RULE FOR ANY DELETION IN BUCKET A ===
+
+A cluster of N spellings pinned pairwise can be collapsed to a hub with N-1
+edges without losing the guard: a divergence between any two still fails some
+proof. BUT THE INVARIANT IS CONNECTIVITY, NOT COUNT. Deleting the last edge to
+a spelling disconnects it, and it can then drift freely with everything still
+green. Before deleting a pairwise theorem, check that BOTH endpoints remain
+reachable from the hub.
+
+Verified on the live corpus: deleting `ldDecayPerGeneration_eq_
+discreteRecombinationSurvival` and `..._eq_admixtureLDDecay` was SAFE, because
+`geometricDecay` still carries three spokes in Conventions.lean and all four
+spellings stay connected. That deletion was sound; the check is what shows it,
+not the count.
+"""
+from __future__ import annotations
+
+import json
+import pathlib
+import re
+import sys
+
+HERE = pathlib.Path(__file__).resolve().parent
+CALIB = HERE.parent.parent / "Calibrator"
+
+# The population-genetics slice. Split by MODULE, not by list position: a
+# tautology audit needs the surrounding file open, and two agents in one file
+# is how the sweeps collided.
+MINE = ["LDDecayTheory", "Conventions", "PopulationGeneticsFoundations",
+        "DemographicHistory", "DriftRegime", "LongitudinalPortability",
+        "HumanDemography", "AncestrySpecificArchitecture",
+        "AncestrySpecificPower"]
+
+# `theorem NAME (binders) : LHS = RHS := by rfl` / `:= rfl` / `:= by\n  rfl`.
+#
+# THE FIRST VERSION OF THIS ANCHORED `rfl` TO END-OF-LINE and found 2 theorems
+# where a whitespace-flattened count finds 16 -- an eight-fold undercount that
+# looked like a clean result. Caught by running the same question a second way
+# and requiring the two to agree, which is the rule this file's own criterion
+# states. Lean puts `rfl` on its own line as often as not, so the source is
+# flattened before matching and line structure is never load-bearing here.
+THM = re.compile(
+    r"\btheorem\s+([A-Za-z_][A-Za-z0-9_'.]*)\s*(.*?):=\s*(?:by\s+)?rfl\b")
+
+# A NON-GREEDY MATCH STILL SPANS DECLARATIONS. `(.*?)` will happily run from
+# one theorem's name, past its own proof and several later declarations, to the
+# first `:= rfl` it can find -- so a theorem closed by `apply mul_nonneg` gets
+# paired with a conclusion belonging to something else entirely. That produced
+# 16 matches of which every verdict was attached to the wrong theorem, and it
+# included `downstream`, a word from prose that is not a declaration at all.
+# Any candidate whose captured statement contains another declaration keyword
+# is therefore discarded.
+DECL_KEYWORD = re.compile(
+    r"\b(theorem|lemma|def|abbrev|instance|structure|inductive|example)\b")
+
+
+def flatten(text):
+    """Collapse newline+indent to a single space; Lean wraps statements freely."""
+    return re.sub(r"[ \t]*\n[ \t]*", " ", text)
+IDENT = re.compile(r"[A-Za-z_][A-Za-z0-9_'.]*")
+KEYWORDS = {"by", "rfl", "theorem", "fun", "let", "if", "then", "else",
+            "forall", "exists", "Type", "Prop", "Real", "ℝ", "ℕ"}
+
+
+def _depth_split(text, wanted):
+    """Indices of `wanted` at bracket depth 0."""
+    out, d = [], 0
+    for i, ch in enumerate(text):
+        if ch in "([{":
+            d += 1
+        elif ch in ")]}":
+            d -= 1
+        elif ch == wanted and d == 0:
+            out.append(i)
+    return out
+
+
+def conclusion(stmt):
+    """The part after the LAST top-level `:`.
+
+    Splitting on the FIRST colon takes a binder ascription -- `(r : R)` -- and
+    calls it the conclusion. That dropped 13 of 16 candidates here while
+    looking like a clean result, which is the same undercount the flattening
+    fix already caught once in this file.
+    """
+    cuts = _depth_split(stmt, ":")
+    if not cuts:
+        return None
+    return stmt[cuts[-1] + 1:]
+
+
+def top_level_eq(concl):
+    """(lhs, rhs) if the conclusion is one equality at depth 0, else None.
+
+    Hypotheses and nested equalities live inside brackets or behind arrows; a
+    conclusion with an implication is not a bare identity and is refused rather
+    than guessed at.
+    """
+    if "->" in concl or "\u2192" in concl:
+        return None
+    cuts = [i for i in _depth_split(concl, "=")
+            if concl[i - 1] not in "<>!:" and concl[i + 1: i + 2] != "="]
+    if len(cuts) != 1:
+        return None
+    return concl[:cuts[0]], concl[cuts[0] + 1:]
+
+
+def bodies():
+    """{short name: body} from the generated table, if it is present."""
+    p = HERE.parent / "extract" / "defs.json"
+    if not p.exists():
+        return None
+    blob = json.loads(p.read_text())
+    return {d["short"]: (d.get("body") or "") for d in blob["definitions"]}
+
+
+def heads(expr):
+    """Identifiers appearing in one side of the equality."""
+    return [t.split(".")[-1] for t in IDENT.findall(expr)
+            if t.split(".")[-1] not in KEYWORDS]
+
+
+def classify(lhs, rhs, defbodies):
+    """A / B / REFUSE, from the bodies alone."""
+    l, r = heads(lhs), heads(rhs)
+    if not l or not r:
+        return "REFUSE", "could not identify both sides"
+    known = [n for n in set(l + r) if n in defbodies]
+    if len(known) < 2:
+        return "REFUSE", "fewer than two sides resolve to definitions"
+    # Does either body reference the other definition?
+    for a in known:
+        for b in known:
+            if a == b:
+                continue
+            if re.search(r"\b%s\b" % re.escape(b), defbodies[a]):
+                return "A", f"{a}'s body references {b}: structural"
+    return "B", f"{'/'.join(sorted(known)[:2])}: independent bodies, equality is the claim"
+
+
+def main(argv):
+    db = bodies()
+    if db is None:
+        raise SystemExit(
+            "rfl_triage: extract/defs.json is missing. It is generated and\n"
+            "  untracked -- regenerate:\n"
+            "      python3 proofs/validation/extract/emit.py")
+    tally, rows = {}, []
+    for mod in MINE:
+        f = CALIB / (mod + ".lean")
+        if not f.exists():
+            continue
+        text = flatten(f.read_text())
+        for m in THM.finditer(text):
+            name, stmt = m.group(1), m.group(2)
+            if DECL_KEYWORD.search(stmt):
+                continue          # the match ran past its own declaration
+            concl = conclusion(stmt)
+            if concl is None:
+                tally["REFUSE"] = tally.get("REFUSE", 0) + 1
+                rows.append((mod, name, "REFUSE",
+                             "could not isolate the conclusion"))
+                continue
+            eq = top_level_eq(concl)
+            if eq is None:
+                tally["REFUSE"] = tally.get("REFUSE", 0) + 1
+                rows.append((mod, name, "REFUSE",
+                             "conclusion is not a single top-level equality"))
+                continue
+            lhs, rhs = eq
+            verdict, why = classify(lhs, rhs, db)
+            tally[verdict] = tally.get(verdict, 0) + 1
+            rows.append((mod, name, verdict, why))
+    print(f"{'module':32s} {'theorem':46s} {'':1s} why")
+    for mod, name, v, why in rows:
+        print(f"{mod[:32]:32s} {name[:46]:46s} {v:1s} {why[:60]}")
+    print()
+    for k in ("A", "B", "REFUSE"):
+        print(f"  {tally.get(k,0):4d}  {k}")
+    print("\nA = structural (one body references the other), safe to collapse")
+    print("B = independent bodies; the theorem IS the guard, do NOT delete")
+    print("REFUSE = not decidable from bodies; needs reading, and is reported")
+    print("         rather than assigned a bucket")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))
