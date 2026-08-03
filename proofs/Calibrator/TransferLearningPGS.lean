@@ -94,7 +94,9 @@ theorem pgsR2_eq_explainedR2FromTransportMoments (cov_pgs_y var_pgs var_y : ℝ)
       explainedR2FromTransportMoments cov_pgs_y var_pgs var_y := rfl
 
 /-- Source-population `R²` of the score that uses the true source effects as
-    weights under a shared LD kernel. -/
+    weights under a shared LD kernel.
+
+    Empirical status: UNTESTED. -/
 noncomputable def sourceTruthR2SharedLD {m : ℕ}
     (β_source : Fin m → ℝ) (ld : Fin m → Fin m → ℝ) (var_y : ℝ) : ℝ :=
   pgsR2 (sharedLDGeneticVariance β_source ld)
@@ -259,7 +261,7 @@ theorem transportedTargetR2_eq_ldRgSq_mul_targetH2_sharedLD
 
     No extra source-optimality surrogate is assumed here: the source `R²`
     term is the actual source-truth score under the same kernel. -/
-theorem portability_bound_sharedLD {m : ℕ}
+theorem portability_bound_sharedLD_of_target_h2_le_source_h2 {m : ℕ}
     (β_s β_t : Fin m → ℝ)
     (ld : Fin m → Fin m → ℝ)
     (var_y : ℝ)
@@ -375,7 +377,7 @@ theorem transportedTargetR2_eq_rgSq_mul_targetH2_diagonalLD
 
     This is a corollary of the shared-LD theorem, not a separately assumed
     source-optimality statement. -/
-theorem portability_bound_diagonal_ld {m : ℕ}
+theorem portability_bound_diagonal_ld_of_target_h2_le_source_h2 {m : ℕ}
     (β_s β_t : Fin m → ℝ)
     (var_y : ℝ)
     (h_var_y : 0 < var_y)
@@ -398,7 +400,7 @@ theorem portability_bound_diagonal_ld {m : ℕ}
     simpa [sharedLDGeneticVariance_standardizedDiagonalLD_eq_additiveGeneticVariance] using
       h_t_nonzero
   have h_bound :=
-    portability_bound_sharedLD β_s β_t standardizedDiagonalLD var_y
+    portability_bound_sharedLD_of_target_h2_le_source_h2 β_s β_t standardizedDiagonalLD var_y
       h_var_y h_s_nonzero' h_t_nonzero' h_shared
   simpa [ldEffectGeneticCorrelation_standardizedDiagonalLD_eq_effectGeneticCorrelation] using
     h_bound
@@ -1044,8 +1046,10 @@ theorem more_label_info_less_ancestry_info_tightens_ben_david_bound
   unfold infoCertifiedBenDavidUpperBound
   linarith
 
-/-- An exact information certificate upper-bounds the Ben-David functional. -/
-theorem benDavidUpperBound_le_infoCertifiedBenDavidUpperBound
+/-- An exact information certificate upper-bounds the Ben-David functional —
+    but only for the source error and divergence the certificate actually
+    dominates, which is why the name carries the condition. -/
+theorem benDavidUpperBound_le_infoCertifiedBenDavidUpperBound_of_dominated_components
     (err_source divergence lambda_star I_phi_Y I_phi_A : ℝ)
     (h_source : err_source ≤ gaussianSourceResidualRisk I_phi_Y)
     (h_div : divergence ≤ pinskerAncestryDivergenceCap I_phi_A) :
@@ -1144,7 +1148,9 @@ theorem fineTunedTargetR2_eq_deployedTransferTargetR2
   ring
 
 /-- Exact target-only oracle `R²` in the diagonal-LD architecture model. This is
-    the target self-prediction ceiling, i.e. target additive heritability. -/
+    the target self-prediction ceiling, i.e. target additive heritability.
+
+    Empirical status: UNTESTED. -/
 noncomputable def targetOracleR2DiagonalLD {m : ℕ}
     (β_target : Fin m → ℝ) (var_y : ℝ) : ℝ :=
   sourceSelfR2DiagonalLD β_target var_y

@@ -433,11 +433,13 @@ theorem copyWitness_not_coversTuple :
     rw [← hx 0, ← hx 1, hdiag]
   norm_num [copyWitnessValue] at heq
 
-/-- **Coverage invariance is sharp.** Under a positive joint floor coverage is exactly
-    product coverage; once the floor reaches `η = 0`, coverage can be strictly smaller, as
-    this perfect-copy witness proves. The two halves say the hypothesis of
-    `coverage_invariant` cannot be dropped; they do not assert that every zero-floor
-    coupling loses this particular cell. -/
+/-- **Coverage invariance is sharp.** The perfect-copy witness covers the target cell
+    under the product coupling, fails to cover it under the copy coupling, and the copy
+    coupling has no full support. So the support hypothesis of `coverage_invariant`
+    cannot be dropped: at a zero joint floor, coverage can fall strictly below product
+    coverage. The three conjuncts do not assert that every zero-floor coupling loses this
+    particular cell, nor do they restate the positive-floor conclusion of
+    `coverage_invariant`. -/
 theorem coverage_invariance_sharp :
     ProductCovers copyWitnessFamily (fun _ ↦ 0) copyWitnessValue ∧
       ¬ CoversTuple copyWitnessFamily (fun _ ↦ 0) modulusCopyCoupling copyWitnessValue ∧

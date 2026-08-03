@@ -327,6 +327,51 @@ theorem sign_erasure (coding : SymmetricCoding V)
     rw [Finset.sum_neg_distrib]
   linarith [hneg]
 
+/-- **The magnitude profile of a configuration**: the absolute coded value at each
+locus. This is the data a truncation is allowed to see if it is to be
+sign-blind.
+
+Empirical status: DERIVED. Absolute values of the coding's own field; no free
+parameter. -/
+def magnitudeProfile (coding : SymmetricCoding V) (x : Fin n → V) : Fin n → ℝ :=
+  fun j ↦ |coding.value (x j)|
+
+/-- **A one-locus flip does not move the magnitude profile**, since the flip
+negates the coded value and negation is invisible to `|·|`. -/
+theorem magnitudeProfile_flipLocus (coding : SymmetricCoding V) (i : Fin n)
+    (x : Fin n → V) :
+    magnitudeProfile coding (flipLocus coding i x) = magnitudeProfile coding x := by
+  funext j
+  unfold magnitudeProfile flipLocus
+  simp only [Equiv.coe_fn_mk]
+  by_cases hj : j = i
+  · subst hj
+    rw [Function.update_self, coding.value_flip, abs_neg]
+  · rw [Function.update_of_ne hj]
+
+/-- **Sign erasure with the truncation hypothesis discharged.**
+
+`sign_erasure` takes the flip-invariance of the truncation as an argument, and
+its docstring says the intended class is "any truncation that depends only on
+magnitudes". This states that class explicitly — a truncation is a `gauge`
+composed with `magnitudeProfile` — and proves that every member of it satisfies
+the hypothesis, so no caller of this form has to supply it.
+
+The general form is kept because flip-invariance is genuinely weaker than
+factoring through the magnitude profile: a truncation may ignore locus `i`
+entirely and be invariant without being sign-blind elsewhere. Narrowing
+`sign_erasure` to this class would lose those. -/
+theorem sign_erasure_of_magnitudeProfile (coding : SymmetricCoding V)
+    (firstSet secondSet : Finset (Fin n)) (gauge : (Fin n → ℝ) → ℝ)
+    {i : Fin n} (hfirst : i ∈ firstSet) (hsecond : i ∉ secondSet) :
+    ∑ x : Fin n → V,
+        configurationWeight coding x * interactionMonomial coding firstSet x *
+          interactionMonomial coding secondSet x *
+            gauge (magnitudeProfile coding x) = 0 :=
+  sign_erasure coding firstSet secondSet
+    (fun x ↦ gauge (magnitudeProfile coding x)) hfirst hsecond
+    (fun x ↦ by simp only [magnitudeProfile_flipLocus])
+
 /-- **Symmetry is scale-invariant.** Rescaling every coded value by a constant
 keeps the same relabelling working, because negation commutes with scaling.
 
@@ -1501,6 +1546,25 @@ def InLinkageEquilibrium : Prop :=
   ∀ x : Fin n → DiploidGenotype,
     design.jointGenotypeProb x = ∏ i, (design.model i).genotypeProb (x i)
 
+/-- **One generation of free recombination across the tested panel.** The step
+    leaves the per-locus models, the tested sets and the coefficients where they
+    are and replaces the joint genotype law by the product of the panel's own
+    per-locus Hardy-Weinberg laws: with free recombination and an infinite
+    population, next generation's genotypes at distinct panel loci are drawn
+    independently from the marginals this generation already has.
+
+    This is the map the equilibrium of `InLinkageEquilibrium` is an equilibrium
+    of. The rate at which a finite recombination fraction approaches it lives in
+    `Calibrator.LDDecayTheory`; here the step is taken in one generation.
+
+    Empirical status: UNTESTED. The infinite-population free-recombination step,
+    carrying no free parameter beyond the design's own per-locus models. -/
+def freeRecombinationStep (d : GenotypeDesign n ι) : GenotypeDesign n ι where
+  model := d.model
+  locusSet := d.locusSet
+  coefficient := d.coefficient
+  jointGenotypeProb := fun x ↦ ∏ i, (d.model i).genotypeProb (x i)
+
 /-- The design carrying the product law over its own per-locus models.
 
     The structure's docstring says the joint law is carried alongside the
@@ -1508,11 +1572,10 @@ def InLinkageEquilibrium : Prop :=
     than a silent assumption. Because the joint law is a free field, nothing
     forces a design to satisfy that relation; this exhibits one that does.
 
-    It is the equilibrium design by construction, and it is the only witness
-    that is honest here -- linkage equilibrium IS the product law, so there is
-    nothing to prove beyond writing it down. A design in linkage DISequilibrium
-    is equally easy to write and is what the disjoint-licence results are about
-    failing on. -/
+    It is the rest point of `freeRecombinationStep`
+    (`equilibriumDesign_isFixedPoint`), so the name is earned by the dynamic
+    rather than stipulated. A design in linkage DISequilibrium is equally easy
+    to write and is what the disjoint-licence results are about failing on. -/
 def equilibriumDesign (model : Fin n → HardyWeinbergModel)
     (locusSet : ι → Finset (Fin n)) (coefficient : ι → ℝ) : GenotypeDesign n ι where
   model := model
@@ -1524,6 +1587,23 @@ theorem inLinkageEquilibrium_equilibriumDesign (model : Fin n → HardyWeinbergM
     (locusSet : ι → Finset (Fin n)) (coefficient : ι → ℝ) :
     (equilibriumDesign model locusSet coefficient).InLinkageEquilibrium :=
   fun _ ↦ rfl
+
+/-- **The equilibrium design is the fixed point of free recombination.** One
+    generation of `freeRecombinationStep` returns it unchanged, which is what
+    entitles it to the name: the product law is where the recombination map
+    rests, not a closed form written down and then guarded by value bounds. -/
+theorem equilibriumDesign_isFixedPoint (model : Fin n → HardyWeinbergModel)
+    (locusSet : ι → Finset (Fin n)) (coefficient : ι → ℝ) :
+    freeRecombinationStep (equilibriumDesign model locusSet coefficient) =
+      equilibriumDesign model locusSet coefficient := rfl
+
+/-- Being at linkage equilibrium is exactly being at rest under the step, on the
+    field the step moves: the joint law of a design in linkage equilibrium
+    survives a generation of free recombination. -/
+theorem freeRecombinationStep_jointGenotypeProb_of_inLinkageEquilibrium
+    (d : GenotypeDesign n ι) (h : d.InLinkageEquilibrium) :
+    (freeRecombinationStep d).jointGenotypeProb = d.jointGenotypeProb :=
+  funext fun x ↦ (h x).symm
 
 /-- Every panel locus is polymorphic, so the standardized coordinate exists and
 has unit variance.
@@ -1735,8 +1815,10 @@ theorem variantDisjoint_iff_variantRecurrence_le_one {design : GenotypeDesign n 
   · intro hrecurrence s t hst
     rw [Finset.disjoint_left]
     intro i hi hi'
-    have hcard : (Finset.univ.filter (fun u ↦ i ∈ design.locusSet u)).card ≤ 1 :=
-      hrecurrence i
+    have hdef : design.variantRecurrence i =
+        (Finset.univ.filter (fun u ↦ i ∈ design.locusSet u)).card := rfl
+    have hcard : (Finset.univ.filter (fun u ↦ i ∈ design.locusSet u)).card ≤ 1 := by
+      rw [← hdef]; exact hrecurrence i
     have hs : s ∈ Finset.univ.filter (fun u ↦ i ∈ design.locusSet u) :=
       Finset.mem_filter.mpr ⟨Finset.mem_univ s, hi⟩
     have ht : t ∈ Finset.univ.filter (fun u ↦ i ∈ design.locusSet u) :=
@@ -2408,6 +2490,18 @@ proved: `hdesign` and `hresampled` pin the two designs' fourth cycle densities t
 the two palindromic circulants' values, and the separation is then
 `palindromic_fourth_cycle_densities_differ`. There is no claim here about an
 arbitrary recurrence-matched pair.
+
+**The realizability gap, stated.** Nothing in this corpus builds a
+`GenotypeDesign` whose fourth cycle density is either of these numbers, so
+`hdesign` and `hresampled` are hypotheses no in-corpus object is known to
+satisfy. They are not vacuous — `cycleDensity 4` is a single real and many
+designs could hit `1840` — but the section's prose reading, that the two
+palindromic circulants *are* overlap structures, is false as written: both
+offset vectors have `a₀ = 0`, and `GenotypeDesign.overlapMatrix`'s diagonal is
+`(locusSet s).card`, so a design realizing either circulant would have every
+tested set empty and hence the zero overlap matrix. Any future construction must
+therefore use a different pair of matrices with the same separation, not these
+two read literally.
 
 Within that scope the point stands. The hypothesis `hrecurrence` — that the two
 agree in the whole variant-recurrence profile — is an argument of the theorem and
