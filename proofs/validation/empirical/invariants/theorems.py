@@ -84,7 +84,7 @@ def parse_statement(block):
     groups, concl = _split_binders(head)
     if not concl.strip():
         return None
-    variables, hypotheses = [], []
+    variables, hypotheses, binders = [], [], []
     for g in groups:
         inner = g[1:-1]
         implicit = g[0] in "{["
@@ -92,13 +92,20 @@ def parse_statement(block):
             continue
         lhs, rhs = inner.split(":", 1)
         rhs = rhs.strip()
+        binders.append([lhs.split(), rhs, implicit])
         if rhs in SCALAR:
             for nm in lhs.split():
                 variables.append((nm, rhs, implicit))
         else:
             hypotheses.append(rhs)
+    # `binders` keeps what the split above discards.  A binder whose type is a
+    # STRUCTURE lands in `hypotheses` as a bare type name, which reads as an
+    # unusable statement even when the theorem is a perfectly ordinary numeric
+    # claim about that structure's fields -- `1 ≤ migrationLDBoost p` is the
+    # standing example.  `flatten_theorems` reads this key and rewrites those
+    # statements into the scalar fragment; nothing else uses it.
     return dict(name=name, variables=variables, hypotheses=hypotheses,
-                conclusion=" ".join(concl.split()))
+                binders=binders, conclusion=" ".join(concl.split()))
 
 
 def all_theorems():

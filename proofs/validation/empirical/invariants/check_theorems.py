@@ -25,6 +25,7 @@ import re
 
 import backends
 import compile_defs as C
+import flatten_theorems as FT
 import theorems as T
 from demo_falsifiable import compile_mutant
 from semantics import param_box
@@ -153,7 +154,18 @@ def main(argv):
     emitted = {C.pyid(c.d) for c in cs.values()}
 
     sts = T.all_theorems()
+    # A theorem about a structure states an ordinary numeric claim about that
+    # structure's fields, and reading it as unusable reports this checker's
+    # blind spot as a corpus deficiency. See flatten_theorems.
+    _structs, _shapes, _methods = FT.prepare()
+    _refused_flat = {}
+    if _structs:
+        sts, _refused_flat = FT.flatten(sts, _structs, _shapes, _methods)
     results, per_def = {}, {}
+    # A refusal is recorded, never dropped: a statement this pass declined to
+    # rewrite must not read the same as one it never saw.
+    for _name, _why in _refused_flat.items():
+        results[_name] = dict(status="untranspilable", reason=_why[:160])
     # Named for BOTH halves on purpose. The count is a property of the corpus
     # AND of this checker, and every name that mentions only the corpus makes
     # the checker's half disappear when the number is spoken. "427 usable

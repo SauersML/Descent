@@ -160,11 +160,25 @@ def flatten_once(defs: list[dict], structs: dict,
         if not ok:
             out.append(d)
             continue
+        # The shape of the ORIGINAL signature, position by position.  A caller
+        # that has to rewrite `f p x` into `f p_Ne ... p_V_A x` -- which is what
+        # `flatten_theorems` does to the corpus's own theorem statements -- needs
+        # to know which argument positions were structures and what they expand
+        # to.  The flattened parameter list alone does not say: `p_Ne` and `F`
+        # are both just names by then.
+        shape = []
+        for n, t in params:
+            if t in SCALAR:
+                shape.append(["scalar", n])
+            else:
+                shape.append(["struct", _base(t),
+                              [f for f, _ in structs[_base(t)]["fields"]]])
         e = dict(d)
         e["params"] = new_params
         e["body"] = body
         e["theorem_hyps"] = new_hyps
         e["flattened_from_structure"] = True
+        e["flattened_shape"] = shape
         if len(params) == 1 and params[0][1] not in SCALAR:
             suffix = d["name"].rsplit(".", 1)[-1]
             learned[(_base(params[0][1]), suffix)] = (
