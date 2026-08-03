@@ -351,10 +351,10 @@ The mechanistic cross-population calibration model talks in terms of observed an
 predicted means plus a deployed slope. These moments are the common bridge into the
 generic `CalibrationProfile` algebra.
 
-The target moments used to be built by applying a `shifted` budget to the source moments —
-a second route to the same triple, kept in step by hand. Both populations now read their
-own means and slope off one indexed definition, and
-`targetCalibrationMoments_eq_shifted` is the theorem that the shift route agrees. -/
+Both populations read their own means and slope off this one indexed definition. **Do not
+build the target moments by applying a `shifted` budget to the source moments** -- that is
+a second route to the same triple, kept in step by hand;
+`targetCalibrationMoments_eq_shifted` states that the shift route agrees. -/
 noncomputable def CrossPopulationCalibrationShiftModel.calibrationMoments
     (m : CrossPopulationCalibrationShiftModel) (P : Pop) : CalibrationMoments where
   meanObserved := m.observedMean P
