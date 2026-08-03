@@ -466,6 +466,26 @@ theorem wright_decomposition (f_IS f_ST : ℝ) :
     wrightFIT f_IS f_ST = f_IS + f_ST - f_IS * f_ST := by
   unfold wrightFIT; ring
 
+/-- **The multiplicative-complement composition `1 - (1-a)(1-b)` occurs twice, and the two
+occurrences do not have the same status.**
+
+`wrightFIT` composes `F_IS` with `F_ST` across *nested* levels — individual within
+subpopulation within total — and there the composition is exact, because the two
+complements are the retention factors of a genuine hierarchy.
+`PortabilityDrift.pairwiseFstFromBranches` applies the same algebra to two *sibling*
+branches, and `PortabilityDrift` records it as CONDITIONALLY VALID for exactly that
+reason: composing multiplicatively in `F_ST` inserts a spurious `tauS * tauT` of divergence
+time, because coalescence times add along a path while `F_ST` values do not, and near
+`tau = 1` that term doubles the divergence time.
+
+So the shared body is not a coincidence and not an identification either: it is one
+algebraic move that is *correct across levels and wrong across branches*.  This theorem
+exists so the arithmetic agreement is on the record and cannot drift, and so that anyone
+repairing one of the two is forced to look at the other. `pairwiseFstFromBranchTaus` is the
+composition PortabilityDrift offers in place of the branch case. -/
+theorem wrightFIT_eq_pairwiseFstFromBranches (a b : ℝ) :
+    wrightFIT a b = pairwiseFstFromBranches a b := rfl
+
 /-- **Within-population heterozygosity loss after `t` generations of drift.**
     `1 - (1 - 1/(2 Nₑ))^t`.
 
@@ -890,6 +910,23 @@ common case in this corpus, and `d = 2` is exactly where the limit is worst. -/
 finite-island result, isolated so that it can be stated about rather than
 carried implicitly. -/
 noncomputable def islandDemeCorrection (d : ℝ) : ℝ := (d / (d - 1)) ^ 2
+
+/-! **`PortabilityDrift.finiteIslandCorrection` is this same quantity written a second
+time, and the identity is NOT stated here because it cannot yet be compiled.**
+
+Both are `(d/(d-1))²`, both are documented as *the* standard finite-island correction
+factor in the number of demes, and both exist to isolate the entire gap between the
+infinite-island limit and the finite-`d` result.  This is one quantity defined twice, not
+two quantities that coincide — the failure mode this corpus already hit with three
+definitions of `F_ST`, where repairing one left the other two standing.
+
+The identity theorem was written and then withdrawn: `finiteIslandCorrection` is present in
+`PortabilityDrift.lean`'s source but **absent from its compiled `olean`**, so
+`islandDemeCorrection d = finiteIslandCorrection d` does not elaborate.  It fails loudly
+rather than silently only because it applies the name to an argument; a bare occurrence
+would have been auto-bound as an implicit variable and stayed green, which is the hazard
+`DGP.LDDecayMechanism` documents.  Restore the theorem, or delete one of the two
+definitions outright, once `PortabilityDrift` is rebuilt. -/
 
 /-- **Finite-island `F_ST` for `d` demes** (Wright; Nei):
 `F_ST = 1/(1 + 4·Nₑ·m·(d/(d-1))²)`.
@@ -1661,6 +1698,30 @@ theorem hetMutationRecurrence_closed_form (lam Hstar H₀ : ℝ) (t : ℕ) :
     Empirical status: UNTESTED. -/
 noncomputable def fstFromHetRatio (H H₀ : ℝ) : ℝ :=
   1 - H / H₀
+
+/-- **The proportional-reduction form, written three times in this corpus, related here so
+that a change to any one of them fails to compile.**
+
+`fstFromHetRatio H H₀`, `hudsonFstFromCoalescenceTimes ETss ETst` and `DGP.r2FromMSE mse
+varY` are all `1 - residual/baseline`.  They are **not one quantity**: the first divides a
+heterozygosity by an ancestral heterozygosity, the second an expected within-population
+coalescence time by a between-population one, the third a mean squared error by a total
+outcome variance.  Nothing lets a value of one be substituted for another.
+
+What they share is the *measure*, and sharing it is not a coincidence — proportional
+reduction of a residual against a baseline is one construction, and each of the three is
+an instance of it.  That is why this is stated rather than left to the reader: the three
+definitions carry no shared symbol, so before this theorem an edit to any one of them
+diverged from the other two silently.
+
+A fourth instance, `PCCorrectability.Diagnostic.pcTargetAxisEfficacy`, is deliberately
+absent.  `Diagnostic` imports nothing from this corpus outside `PCCorrectability`, and no
+module imports both it and any of the three below, so **no file can currently state that
+identity at all.** Closing that one needs an import, not a theorem. -/
+theorem fstFromHetRatio_eq_hudsonFst_eq_r2FromMSE (a b : ℝ) :
+    fstFromHetRatio a b = hudsonFstFromCoalescenceTimes a b ∧
+      fstFromHetRatio a b = r2FromMSE a b := by
+  constructor <;> rfl
 
 /-- **Fst(t) in terms of the closed-form heterozygosity.**
     Starting from H(0) = H₀, we have

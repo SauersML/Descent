@@ -252,7 +252,7 @@ FAMILIES = [
                     "theta", "tau", "tauAt", "hetDecayFromScaled",
                     "hetMutationRecurrence", "hetRatioBetweenBranches",
                     "fstTransient", "fstTransientAt", "fstDriftMutation",
-                    "expectedNewMutations", "sharedLDFractionFromMutation",
+                    "expectedNewMutations",
                     "mutationSharedRetentionAt", "mutErosion",
                     "mutationLDErosion", "covarianceDivergenceMutationDrift",
                     "presentDayPGSVarianceMutationDrift",
@@ -372,9 +372,10 @@ FAMILIES = [
                   "because the prediction is linear where the observable "
                   "saturates at Watterson's 1419.1. It is EXACT for mutations "
                   "that ARISE population-wide (2*Ne*mu*L*t); the docstring "
-                  "names segregating sites and the sole consumer "
-                  "sharedLDFractionFromMutation uses it as a per-locus Poisson "
-                  "exponent. Scope declaration, not new arithmetic. "
+                  "named segregating sites, and its sole consumer, "
+                  "sharedLDFractionFromMutation, used it as a per-locus Poisson "
+                  "exponent and has since been DELETED as falsified. Scope "
+                  "declaration, not new arithmetic. "
                   "expectedFreqDiffSq is CONFIRMED once p0 is observed from "
                   "ancient samples and second moments are corrected for "
                   "sampling variance: -2.6%, -0.5%, +2.6%, with the "

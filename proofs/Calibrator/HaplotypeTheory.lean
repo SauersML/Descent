@@ -567,9 +567,14 @@ theorem haplotype_pgs_overfitting_risk
       haplotypeEffectVarianceOLS σ2 n freq_common +
         haplotypeEffectVarianceOLS σ2 n freq_rare := by
   have h_rare_lt_half : freq_rare < 1 / 2 := lt_of_lt_of_le h_rarer h_common_le_half
-  have h_rare_den : 0 < n * freq_rare * (1 - freq_rare) := by nlinarith
+  have h_rare_den : 0 < n * freq_rare * (1 - freq_rare) :=
+    mul_pos (mul_pos h_n h_rare) (by linarith)
+  have h_gap : 0 < n * ((freq_common - freq_rare) * (1 - freq_common - freq_rare)) :=
+    mul_pos h_n (mul_pos (by linarith) (by linarith))
+  have h_expand : n * freq_common * (1 - freq_common) - n * freq_rare * (1 - freq_rare) =
+      n * ((freq_common - freq_rare) * (1 - freq_common - freq_rare)) := by ring
   have h_den_lt : n * freq_rare * (1 - freq_rare) < n * freq_common * (1 - freq_common) := by
-    nlinarith
+    linarith
   unfold haplotypeEffectVarianceOLS
   have h_common_var_lt_rare :
       σ2 / (n * freq_common * (1 - freq_common)) < σ2 / (n * freq_rare * (1 - freq_rare)) :=

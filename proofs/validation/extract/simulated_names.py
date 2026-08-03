@@ -25,7 +25,9 @@ Expect the number to go DOWN.  That is the right direction for a figure that
 has been quoted as a floor.
 """
 
-# 30 names, none ambiguous as short names in the current corpus.
+# 29 names, none ambiguous as short names in the current corpus.
+# (`expectedSegmentLength` was here; the definition was deleted as falsified and its
+#  validated replacement `expectedTractLength` has not been simulated under that name.)
 SIMULATED = {
     'admixedFst',
     'admixtureLD',
@@ -36,7 +38,6 @@ SIMULATED = {
     'discoveryNCP',
     'effectGeneticCorrelation',
     'expectedHeterozygosity',
-    'expectedSegmentLength',
     'heterozygosityLossDerived',
     'heterozygosityLossFromDrift',
     'islandModelFst',

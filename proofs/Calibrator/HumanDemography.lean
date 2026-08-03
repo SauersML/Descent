@@ -190,40 +190,36 @@ accuracy ratio into an upper bound on the second channel, which is the
 quantitative form of "the loss is in the linkage disequilibrium".
 -/
 
-/-- **FALSIFIED — the tagging factor is applied to the denominator as well.**
+/-! **Deleted: `taggedDriftR2Ratio V_A V_E fst shared_ld =
+presentDayR2MutationDrift V_A V_E fst shared_ld / presentDayR2 V_A V_E 0`, together with
+`taggedDriftR2Ratio_ge_retention`.**
 
-    Loss of shared LD attenuates the score's covariance with the phenotype; it does **not**
-    reduce the target population's genetic variance. The target's phenotypic variance is
-    `(1-F)·V_A + V_E`, not `(1-F)·shared_ld·V_A + V_E`. This body shrinks phenotypic variance
-    along with the signal and therefore **overstates portability**.
+It applied the tagging factor to the denominator as well. Loss of shared LD attenuates the
+score's covariance with the phenotype; it does **not** reduce the target population's genetic
+variance. The target's phenotypic variance is `(1-F)·V_A + V_E`, not
+`(1-F)·shared_ld·V_A + V_E`. That body shrank phenotypic variance along with the signal and
+therefore **overstated portability**. Wright–Fisher simulation with genotype sampling noise
+removed, every frequency an exact rational and every comparison in exact arithmetic:
 
-    Wright–Fisher simulation with genotype sampling noise removed, every frequency an exact
-    rational and every comparison in exact arithmetic:
+| design | `shared_ld` | simulated | deleted body | error |
+|---|---|---|---|---|
+| symmetric, `2N=2000`, `t=250` | 0.739 | 0.7407 | 0.8522 | **+15.1%** |
+| strong, `2N=400`, `t=100` | 0.583 | 0.5826 | 0.7328 | **+26.4%** |
+| the docstring's own example | 0.34 | 0.3183 | 0.4606 | **+44.7%** |
+| `h²=0.8`, `shared_ld=0.34` | 0.34 | 0.3400 | 0.7203 | **+111.9%** |
 
-    | design | `shared_ld` | simulated | this body | error |
-    |---|---|---|---|---|
-    | symmetric, `2N=2000`, `t=250` | 0.739 | 0.7407 | 0.8522 | **+15.1%** |
-    | strong, `2N=400`, `t=100` | 0.583 | 0.5826 | 0.7328 | **+26.4%** |
-    | the docstring's own example | 0.34 | 0.3183 | 0.4606 | **+44.7%** |
-    | `h²=0.8`, `shared_ld=0.34` | 0.34 | 0.3400 | 0.7203 | **+111.9%** |
+The error was exactly zero iff `shared_ld = 1` — which is precisely why the sibling
+`neutralDriftR2Ratio` validates at `0.0%` and this did not. It grew with heritability:
+`+9`–`15%` at `h² = 0.2`, `+28`–`49%` at `0.5`, `+60`–`112%` at `0.8`.
+Measured in `proofs/validation/drift_diff/`. Use `taggedDriftR2RatioCorrected` below. -/
 
-    The error is exactly zero iff `shared_ld = 1` — which is precisely why the sibling
-    `neutralDriftR2Ratio` validates at `0.0%` and this does not. It grows with heritability:
-    `+9`–`15%` at `h² = 0.2`, `+28`–`49%` at `0.5`, `+60`–`112%` at `0.8`.
-
-    Retained under its own name so the superseded form is named and struck; use
-    `taggedDriftR2RatioCorrected`.
-
-    Empirical status: **FALSIFIED** (`proofs/validation/drift_diff/`). -/
-noncomputable def taggedDriftR2Ratio (V_A V_E fst shared_ld : ℝ) : ℝ :=
-  presentDayR2MutationDrift V_A V_E fst shared_ld / presentDayR2 V_A V_E 0
-
-/-- **The corrected tagged-drift ratio.**
+/-- **The tagged-drift accuracy ratio.**
 
     `k·(V_A + V_E) / ((1-F)·V_A + V_E)` with `k = (1-F)·shared_ld`. The tagging factor
     multiplies the signal only; the target's phenotypic variance carries `(1-F)·V_A + V_E`.
     A closed form of this shape reproduced the simulation **exactly** — `0.00000` in exact
-    rationals, 12 of 12 replicates across two independent designs.
+    rationals, 12 of 12 replicates across two independent designs — where the superseded form
+    that also shrank the denominator ran `+15%` to `+112%` high.
 
     Empirical status: **VALIDATED** (`proofs/validation/drift_diff/`). -/
 noncomputable def taggedDriftR2RatioCorrected (V_A V_E fst shared_ld : ℝ) : ℝ :=
@@ -231,29 +227,21 @@ noncomputable def taggedDriftR2RatioCorrected (V_A V_E fst shared_ld : ℝ) : �
 
 /-- The accuracy ratio is at least the product of the two retention channels.
 Same computation as the neutral case, with `1 - F_ST` replaced by
-`(1 - F_ST) * shared_ld`. -/
-theorem taggedDriftR2Ratio_ge_retention (V_A V_E fst shared_ld : ℝ)
+`(1 - F_ST) * shared_ld`. The drift channel divides a phenotypic variance
+`(1 - F_ST)·V_A + V_E` that is no larger than the source's `V_A + V_E`, so the
+ratio can only exceed the bare product of the two channels. `0 ≤ F_ST` is
+load-bearing: simulation violated the bound in exactly the replicates where the
+realised drift coefficient came out negative. -/
+theorem taggedDriftR2RatioCorrected_ge_retention (V_A V_E fst shared_ld : ℝ)
     (hVA : 0 < V_A) (hVE : 0 < V_E)
-    (hfst0 : 0 ≤ fst) (hfst1 : fst < 1) (hs0 : 0 < shared_ld)
-    (hk1 : (1 - fst) * shared_ld ≤ 1) :
-    (1 - fst) * shared_ld ≤ taggedDriftR2Ratio V_A V_E fst shared_ld := by
+    (hfst0 : 0 ≤ fst) (hfst1 : fst < 1) (hs0 : 0 < shared_ld) :
+    (1 - fst) * shared_ld ≤ taggedDriftR2RatioCorrected V_A V_E fst shared_ld := by
   have h1f : 0 < 1 - fst := by linarith
   have hk0 : 0 < (1 - fst) * shared_ld := mul_pos h1f hs0
-  have hden : 0 < (1 - fst) * shared_ld * V_A + V_E :=
-    add_pos (mul_pos hk0 hVA) hVE
-  have hsum : V_A + V_E ≠ 0 := ne_of_gt (add_pos hVA hVE)
-  have hVA' : V_A ≠ 0 := ne_of_gt hVA
-  have key : taggedDriftR2Ratio V_A V_E fst shared_ld =
-      (1 - fst) * shared_ld * (V_A + V_E) /
-        ((1 - fst) * shared_ld * V_A + V_E) := by
-    unfold taggedDriftR2Ratio presentDayR2MutationDrift presentDayR2
-      presentDayPGSVariance TransportedMetrics.r2FromSignalVariance
-    rw [presentDayPGSVarianceMutationDrift_eq]
-    unfold pgsVarianceFromHet
-    field_simp [ne_of_gt hden, hsum, hVA']
-    ring
-  rw [key, le_div_iff₀ hden]
-  nlinarith [mul_nonneg hk0.le (mul_nonneg (by linarith : (0:ℝ) ≤ 1 - (1 - fst) * shared_ld) hVA.le)]
+  have hden : 0 < (1 - fst) * V_A + V_E := add_pos (mul_pos h1f hVA) hVE
+  unfold taggedDriftR2RatioCorrected
+  rw [le_div_iff₀ hden]
+  nlinarith [mul_nonneg hk0.le (mul_nonneg hfst0 hVA.le)]
 
 /-- **A measured accuracy ratio caps how much tagging can have survived.**
 
@@ -270,12 +258,11 @@ theorem sharedLD_le_observed_div_driftRetention
     (V_A V_E fst shared_ld observed : ℝ)
     (hVA : 0 < V_A) (hVE : 0 < V_E)
     (hfst0 : 0 ≤ fst) (hfst1 : fst < 1) (hs0 : 0 < shared_ld)
-    (hk1 : (1 - fst) * shared_ld ≤ 1)
-    (h_match : taggedDriftR2Ratio V_A V_E fst shared_ld = observed) :
+    (h_match : taggedDriftR2RatioCorrected V_A V_E fst shared_ld = observed) :
     shared_ld ≤ observed / (1 - fst) := by
   have h1f : 0 < 1 - fst := by linarith
-  have hge := taggedDriftR2Ratio_ge_retention V_A V_E fst shared_ld hVA hVE
-    hfst0 hfst1 hs0 hk1
+  have hge := taggedDriftR2RatioCorrected_ge_retention V_A V_E fst shared_ld hVA hVE
+    hfst0 hfst1 hs0
   rw [h_match] at hge
   rw [le_div_iff₀ h1f]
   linarith [hge]

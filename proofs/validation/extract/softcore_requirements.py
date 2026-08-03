@@ -141,15 +141,6 @@ REQUIREMENTS = {
                  "the expected number of new segregating sites over t generations is "
                  "directly measurable in any coalescent simulator.",
     },
-    "Calibrator.expectedSegmentLength": {
-        "kind": "unbounded-ratio",
-        "grounding": "INFERRED  HaplotypeTheory.lean:680",
-        "needs": "An expected haplotype segment length under recombination. The "
-                 "external check is standard and cheap: simulate recombination at a "
-                 "known rate and measure mean segment length. Until then, the "
-                 "structural check is the limit -- segment length must diverge as the "
-                 "recombination rate goes to zero and shrink monotonically as it rises.",
-    },
     "Calibrator.introgressionVariants": {
         "kind": "unbounded-ratio",
         "grounding": "INFERRED",
@@ -202,15 +193,6 @@ REQUIREMENTS = {
                  "returned slope and at perturbations either side, and confirm the "
                  "returned value is lowest. That rejects essentially every wrong body "
                  "and needs no theorem.",
-    },
-    "Calibrator.taggedDriftR2Ratio": {
-        "kind": "unbounded-ratio",
-        "grounding": "INFERRED",
-        "needs": "A ratio of R-squareds. If both numerator and denominator are defined "
-                 "in the corpus, the check is an identity against their quotient. If "
-                 "the name implies it lies in [0,1], that needs a theorem -- ratios of "
-                 "R-squareds routinely exceed 1, and `neutralAFBenchmarkRatio` in this "
-                 "same corpus returns 2.4 where its name implies at most 1.",
     },
 
     # ---- unit-interval quantities whose [0,1] is assumed and not proved.  The
