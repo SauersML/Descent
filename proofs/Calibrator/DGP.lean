@@ -92,7 +92,27 @@ noncomputable def HWEPolygenicScoreDGP.scoreApproximationError {m : ℕ} [Fintyp
     (dgp : HWEPolygenicScoreDGP m) : ℝ :=
   dgp.scoreModel.berryEsseenErrorBound dgp.berryEsseenConstant
 
-/-- Any exact AUC lying within the Berry-Esseen error radius belongs to the certified interval. -/
+/-! **The two interval-membership theorems below are `Set.Icc` membership, and the word
+"certified" has been removed from them.**
+
+`scoreApproximationError` is `berryEsseenErrorBound`, which is the *formula* `C·ρ₃/σ³`
+written down as a definition — no Berry-Esseen theorem is invoked from Mathlib or proved
+here, and `berryEsseenConstant` is a free field of `HWEPolygenicScoreDGP` rather than a
+constant any bound supplies.  Even granting the formula, a Kolmogorov bound on the
+standardized *score CDF* is not a bound on AUC or on `R²`: each is a further functional of
+that CDF and transferring the radius across is a separate estimate this corpus does not
+have.  That transfer is exactly what enters below as the hypothesis `h`.
+
+So what these prove is `mem_approximationInterval_of_abs_sub_le` — `|x - c| ≤ ε → x ∈
+[c-ε, c+ε]` — with `ε` instantiated at a named quantity.  They are kept because the
+interval interface is used downstream, and stated so that the assumed step is visible in
+the hypothesis rather than implied by the word "certified".  Note also that
+`aucApproximationInterval` and `r2ApproximationInterval` are the *same* function
+`approximationInterval` under two names, so nothing in either statement would detect
+swapping AUC for `R²`. -/
+
+/-- Any exact AUC within `scoreApproximationError` of a Gaussian center lies in the
+corresponding interval around that center.  The AUC-side error control is the hypothesis. -/
 theorem HWEPolygenicScoreDGP.mem_aucApproximationInterval_of_abs_sub_le
     {m : ℕ} [Fintype (Fin m)]
     (dgp : HWEPolygenicScoreDGP m)
@@ -108,7 +128,8 @@ theorem HWEPolygenicScoreDGP.mem_aucApproximationInterval_of_abs_sub_le
       exact dgp.scoreModel.berryEsseenErrorBound_nonneg _ dgp.berryEsseenConstant_nonneg)
     h)
 
-/-- Any exact `R²` lying within the Berry-Esseen error radius belongs to the certified interval. -/
+/-- Any exact `R²` within `scoreApproximationError` of a Gaussian center lies in the
+corresponding interval around that center.  The `R²`-side error control is the hypothesis. -/
 theorem HWEPolygenicScoreDGP.mem_r2ApproximationInterval_of_abs_sub_le
     {m : ℕ} [Fintype (Fin m)]
     (dgp : HWEPolygenicScoreDGP m)
@@ -916,26 +937,28 @@ theorem directionalLD_nonzero_implies_slope_ne_one {k : ℕ} [Fintype (Fin k)]
   simp [div_eq_zero_iff, h_genic_pos] at this
   contradiction
 
-theorem selection_variation_implies_nonlinear_slope {k : ℕ} [Fintype (Fin k)]
-    (arch : GeneticArchitecture k) (c₁ c₂ : Fin k → ℝ)
-    (h_genic_pos₁ : arch.V_genic c₁ ≠ 0)
-    (h_genic_pos₂ : arch.V_genic c₂ ≠ 0)
-    (h_link : ∀ c, arch.selection_effect c = arch.V_cov c / arch.V_genic c)
-    (h_sel_var : arch.selection_effect c₁ ≠ arch.selection_effect c₂) :
-    optimalSlopeFromVariance arch c₁ ≠ optimalSlopeFromVariance arch c₂ := by
-  unfold optimalSlopeFromVariance totalVariance
-  rw [add_div, div_self h_genic_pos₁, add_div, div_self h_genic_pos₂]
-  rw [← h_link c₁, ← h_link c₂]
-  intro h
-  simp at h
-  contradiction
+/-! `selection_variation_implies_nonlinear_slope` was removed here.  Its hypothesis
+`h_link : ∀ c, selection_effect c = V_cov c / V_genic c` makes `selection_effect` *equal to*
+the ratio `optimal_slope_trace_variance` shows the slope is `1 +`, so its remaining
+hypothesis `selection_effect c₁ ≠ selection_effect c₂` and its conclusion
+`optimalSlopeFromVariance c₁ ≠ optimalSlopeFromVariance c₂` differ by `add_left_cancel`.
+The hypothesis *was* the conclusion, and "nonlinear" named nothing in either: a two-point
+inequality is not nonlinearity.  Nothing about selection was formalized — `selection_effect`
+is an uninterpreted field the hypothesis immediately overwrites.  `optimal_slope_trace_variance`
+below is the surviving content. -/
 
-/-! ### LD Decay Theorem (Signal-to-Noise)
+/-! ### The reciprocal optimal slope is not affine
 
-Genetic distance increases error variance, so the optimal slope decays hyperbolically.
-This is the general statement used for divergence and admixture alike. -/
+Under the *linear noise model* `optimalSlopeLinearNoise`, and only under it, the optimal slope
+is a reciprocal function of `c` and so is matched by no affine function.  The name previously
+carried here, `ld_decay_implies_nonlinear_calibration`, asserted LD decay as the mechanism;
+neither LD, distance, nor decay appears in the statement, which is a hypothesis-weakening
+wrapper for `linear_noise_implies_nonlinear_slope` with the positivity side conditions
+discharged from nonnegativity.  The LD-decay statement that *is* proved is
+`Calibrator.ld_decay_implies_nonlinear_calibration_proved` in the corpus root, which supplies
+three explicit distances through an `LDDecayMechanism`. -/
 
-theorem ld_decay_implies_nonlinear_calibration
+theorem optimalSlopeLinearNoise_not_affine_of_nonneg_errors
     (sigma_g_sq base_error slope_error : ℝ)
     (h_g_pos : 0 < sigma_g_sq)
     (h_base : 0 ≤ base_error)
@@ -955,11 +978,15 @@ theorem ld_decay_implies_nonlinear_calibration
     · apply mul_nonneg zero_le_two h_slope_pos
   · exact h_slope_ne
 
-/-! ### Normalization Failure under Directional LD
+/-! ### Positive structural covariance puts the optimal slope above one
 
-Normalization forces Var(P|C)=1, which removes the LD covariance term. -/
+This says exactly `(a + b)/a > 1` for `a, b > 0`, read through
+`optimalSlopeFromVariance`.  It was called `normalization_erases_heritability` under a
+section header asserting that "normalization forces `Var(P|C) = 1`, which removes the LD
+covariance term": no normalization operation, no heritability and no `Var(P|C)` constraint
+occurs in the statement or anywhere else in this file, so that mechanism was prose only. -/
 
-theorem normalization_erases_heritability {k : ℕ} [Fintype (Fin k)]
+theorem optimalSlopeFromVariance_gt_one_of_cov_pos {k : ℕ} [Fintype (Fin k)]
     (arch : GeneticArchitecture k) (c : Fin k → ℝ)
     (h_genic_pos : arch.V_genic c > 0)
     (h_cov_pos : arch.V_cov c > 0) :
@@ -1206,56 +1233,42 @@ reals — and nothing connects them to a probability measure. That is why an alg
 identity between them can be proved without establishing anything about a data-generating
 process.
 
-A `MomentReading` is the missing connection, and it is deliberately a structure rather
-than a hypothesis list: the three equations are obligations a caller must discharge, and
-until someone does, no closed form built on it says anything about a `dgp`. It is the same
-device as `Calibrator.Identification`, at the level of moments rather than of names. -/
+A former `MomentReading` structure stored these equalities as fields.  That made the caller
+supply the very bridge being advertised.  The quantities below are now definitions of the
+process moments themselves. -/
 
 section MomentReadings
 
-/-- **A second-moment reading of a data-generating process by a predictor.**
+/-- Variance of a predictor under a concrete DGP. -/
+noncomputable def signalVariance {k : ℕ} [Fintype (Fin k)]
+    (dgp : DataGeneratingProcess k) (signal : Predictor k) : ℝ :=
+  var dgp signal
 
-The fields are the three numbers the closed forms are written in; the equations say those
-numbers really are the corresponding moments of `dgp` under `signal`. -/
-structure MomentReading {k : ℕ} [Fintype (Fin k)]
-    (dgp : DataGeneratingProcess k) (signal : Predictor k) where
-  /-- Variance of the signal. -/
-  vSignal : ℝ
-  /-- Variance of the outcome's conditional mean. -/
-  vOutcome : ℝ
-  /-- Covariance of signal with that conditional mean. -/
-  cov : ℝ
-  vSignal_eq : var dgp signal = vSignal
-  vOutcome_eq : var dgp dgp.trueExpectation = vOutcome
-  cov_eq :
-    measureCovariance dgp.jointMeasure
-      (fun pc => signal pc.1 pc.2) (fun pc => dgp.trueExpectation pc.1 pc.2) = cov
-  vSignal_pos : 0 < vSignal
-  vOutcome_pos : 0 < vOutcome
+/-- Variance of the DGP's conditional-mean outcome. -/
+noncomputable def outcomeMeanVariance {k : ℕ} [Fintype (Fin k)]
+    (dgp : DataGeneratingProcess k) : ℝ :=
+  var dgp dgp.trueExpectation
+
+/-- Covariance of a predictor with the DGP's conditional-mean outcome. -/
+noncomputable def signalOutcomeCovariance {k : ℕ} [Fintype (Fin k)]
+    (dgp : DataGeneratingProcess k) (signal : Predictor k) : ℝ :=
+  measureCovariance dgp.jointMeasure
+    (fun pc => signal pc.1 pc.2) (fun pc => dgp.trueExpectation pc.1 pc.2)
 
 /-- **The statistical `R²` of a reading is the squared correlation of its three moments.**
 
 This is what makes the reading useful: once the obligations are discharged, `rsquared` -
 an integral expression - is a rational function of three reals, and every algebraic
 identity about those reals becomes a statement about the process. -/
-theorem rsquared_eq_of_momentReading {k : ℕ} [Fintype (Fin k)]
-    {dgp : DataGeneratingProcess k} {signal : Predictor k} (R : MomentReading dgp signal) :
-    rsquared dgp signal dgp.trueExpectation = R.cov ^ 2 / (R.vSignal * R.vOutcome) := by
-  have hf : var dgp signal = R.vSignal := R.vSignal_eq
-  have hg : var dgp dgp.trueExpectation = R.vOutcome := R.vOutcome_eq
-  have hc :
-      measureCovariance dgp.jointMeasure
-        (fun pc => signal pc.1 pc.2) (fun pc => dgp.trueExpectation pc.1 pc.2) = R.cov :=
-    R.cov_eq
+theorem rsquared_eq_process_moments {k : ℕ} [Fintype (Fin k)]
+    (dgp : DataGeneratingProcess k) (signal : Predictor k)
+    (hs : signalVariance dgp signal ≠ 0) (ho : outcomeMeanVariance dgp ≠ 0) :
+    rsquared dgp signal dgp.trueExpectation =
+      signalOutcomeCovariance dgp signal ^ 2 /
+        (signalVariance dgp signal * outcomeMeanVariance dgp) := by
   unfold rsquared
-  unfold var at hf hg
-  unfold measureCovariance measureMean at hc
-  simp only
-  rw [hf, hg, hc]
-  rw [if_neg (by
-    rintro (h | h)
-    · exact absurd h (ne_of_gt R.vSignal_pos)
-    · exact absurd h (ne_of_gt R.vOutcome_pos))]
+  rw [if_neg (by exact fun h => h.elim hs ho)]
+  rfl
 
 end MomentReadings
 
@@ -2087,30 +2100,31 @@ theorem fstEquilibrium_decreasing_in_migration
     (by nlinarith : 0 < 1 + 4 * Ne * mu + 4 * Ne * mig₁)]
   nlinarith
 
-/-- **Connecting to the DGP framework**: The unified Fst maps to the demographic
-    covariance gap. Higher Fst → larger covariance mismatch → worse portability. -/
-theorem unified_fst_to_covariance_gap
-    (p : EvolutionaryParameters)
-    (kappa : ℝ) (h_kappa : 0 < kappa)
-    (_h_forces : 0 < p.theta + p.bigM) :
-    0 < kappa * fstEquilibrium p := by
-  exact mul_pos h_kappa (fstEquilibrium_pos p)
+/-! **Two Fst-to-covariance-gap statements were removed here, and neither mentioned a
+covariance gap.**
 
-/-- The covariance gap under the full model is strictly less than under pure drift
-    (when mutation or migration are present). -/
-theorem full_model_smaller_gap_than_drift
-    (fst_full fst_drift kappa : ℝ)
-    (h_kappa : 0 < kappa)
-    (h_less : fst_full < fst_drift) :
-    kappa * fst_full < kappa * fst_drift :=
-  mul_lt_mul_of_pos_left h_less h_kappa
+`unified_fst_to_covariance_gap` claimed "higher Fst → larger covariance mismatch → worse
+portability" and proved `0 < kappa * fstEquilibrium p` for an arbitrary positive real
+`kappa` — a positivity fact, not a map, not monotone in Fst, and with no covariance
+anywhere; its `0 < θ + M` hypothesis was unused.  `fstEquilibrium_pos` is the content.
 
-/-- **Variable Ne modulates drift via harmonic mean.**
-    If Ne varies over T generations with harmonic mean Ne_h,
-    then Fst ≈ 1 - exp(-T / (2 Ne_h)).
-    Bottleneck periods (low Ne) disproportionately increase Fst
-    because 1/Ne is large during bottlenecks. -/
-theorem harmonic_mean_governs_drift
+`full_model_smaller_gap_than_drift` claimed the full model has a smaller gap than pure
+drift and was `mul_lt_mul_of_pos_left` applied to free reals *named* `fst_full` and
+`fst_drift`.  The ordering it "proved" was its own hypothesis; the two names were never
+tied to `fstEquilibrium` or to `fstMutationDriftEquilibrium`.  The real comparison, proved
+from the definitions, is `fstEquilibrium_le_driftMutation` and
+`fstEquilibrium_le_driftMigration` above. -/
+
+/-- **The harmonic mean of `Ne` over a bottleneck lies below the time-weighted arithmetic
+mean.**  Given the harmonic-mean relation `T/Ne_h = T_b/Ne_small + (T-T_b)/Ne_large` as a
+hypothesis, `Ne_h < (T_b·Ne_small + (T-T_b)·Ne_large)/T` — the two-term AM–HM inequality,
+strict because `Ne_small ≠ Ne_large`.
+
+This was `harmonic_mean_governs_drift`, documented as "Fst ≈ 1 - exp(-T/(2 Ne_h))" with
+bottlenecks "disproportionately increasing Fst".  No Fst, no exponential and no drift
+recurrence appears below; the inequality is about two means of `Ne` and says nothing about
+how either maps to Fst. -/
+theorem harmonicMeanNe_lt_timeWeightedArithmeticMeanNe
     (Ne_h Ne_large Ne_small : ℝ) (T_total T_bottleneck : ℝ)
     (h_Ne_h_pos : 0 < Ne_h)
     (h_large : 0 < Ne_large) (h_small : 0 < Ne_small)
@@ -2152,17 +2166,19 @@ theorem harmonic_mean_governs_drift
                        (sq_pos_of_pos (show (0:ℝ) < Ne_large - Ne_small by linarith))]
   exact (mul_lt_mul_iff_left₀ hD_pos).mp hmul
 
-/-- **Integration theorem**: Under the unified model, portability at equilibrium is
-    strictly between 0 and 1 when all forces are present. -/
-theorem unified_portability_between_zero_and_one
-    (p : EvolutionaryParameters)
-    (_h_theta : 0 < p.theta) (_h_mig : 0 < p.bigM)
-    (_h_time : 0 < p.t_div) :
-    -- Fst is strictly between 0 and 1
-    0 < fstEquilibrium p ∧ fstEquilibrium p < 1 := by
-  constructor
-  · exact fstEquilibrium_pos p
-  · exact fstEquilibrium_lt_one p (by linarith)
+/-- **Equilibrium Fst lies strictly in `(0,1)` once mutation or migration is present.**
+The conjunction of `fstEquilibrium_pos` and `fstEquilibrium_lt_one`.
+
+This was `unified_portability_between_zero_and_one`, "portability at equilibrium is
+strictly between 0 and 1 when all forces are present".  It bounds `fstEquilibrium`, and
+Fst is not portability: no metric, predictor or transported `R²` occurs in it.  Its three
+hypotheses have become the one the proof actually uses — `0 < t_div` was never used, and
+`0 < θ` and `0 < M` separately are stronger than the `0 < θ + M` that
+`fstEquilibrium_lt_one` needs, so "all forces present" was decoration. -/
+theorem fstEquilibrium_mem_Ioo
+    (p : EvolutionaryParameters) (h_forces : 0 < p.theta + p.bigM) :
+    0 < fstEquilibrium p ∧ fstEquilibrium p < 1 :=
+  ⟨fstEquilibrium_pos p, fstEquilibrium_lt_one p h_forces⟩
 
 end EvolutionaryCoordinates
 
@@ -2355,15 +2371,24 @@ could express, let alone check: the quotient was a definition, and a definition 
 wrong. -/
 theorem r2FromSignalVariance_eq_rsquared {k : ℕ} [Fintype (Fin k)]
     {dgp : DataGeneratingProcess k} {signal : Predictor k}
-    (R : MomentReading dgp signal) (V_E : ℝ)
-    (h_additive : R.cov = R.vSignal)
-    (h_split : R.vOutcome = R.vSignal + V_E) :
-    r2FromSignalVariance R.vSignal V_E = rsquared dgp signal dgp.trueExpectation := by
-  rw [rsquared_eq_of_momentReading R, h_additive, h_split]
+    (V_signal V_E : ℝ)
+    (h_signal : signalVariance dgp signal = V_signal)
+    (h_additive : signalOutcomeCovariance dgp signal = V_signal)
+    (h_split : outcomeMeanVariance dgp = V_signal + V_E)
+    (h_signal_pos : 0 < V_signal) (h_outcome_pos : 0 < V_signal + V_E) :
+    r2FromSignalVariance V_signal V_E = rsquared dgp signal dgp.trueExpectation := by
+  have hs_process : signalVariance dgp signal ≠ 0 := by
+    rw [h_signal]
+    exact ne_of_gt h_signal_pos
+  have ho_process : outcomeMeanVariance dgp ≠ 0 := by
+    rw [h_split]
+    exact ne_of_gt h_outcome_pos
+  rw [rsquared_eq_process_moments dgp signal
+    hs_process ho_process,
+    h_signal, h_additive, h_split]
   unfold r2FromSignalVariance
-  have hs : R.vSignal ≠ 0 := ne_of_gt R.vSignal_pos
-  have ho : R.vSignal + V_E ≠ 0 := by
-    rw [← h_split]; exact ne_of_gt R.vOutcome_pos
+  have hs : V_signal ≠ 0 := ne_of_gt h_signal_pos
+  have ho : V_signal + V_E ≠ 0 := ne_of_gt h_outcome_pos
   field_simp
 
 
@@ -2408,46 +2433,10 @@ theorem r2FromSignalVariance_eq_rsquared {k : ℕ} [Fintype (Fin k)]
 noncomputable def equalVarianceGaussianAUCFromSignalVariance (vSignal vNoise : ℝ) : ℝ :=
   Phi (Real.sqrt (vSignal / (2 * vNoise)))
 
-/-- **The equal-variance Gaussian liability regime, carried as an obligation.**
-
-`R²` and Brier could be tied to a process through its second moments, because they *are*
-functions of second moments. AUC is not. Recovering it needs the full conditional law of
-the liability, and this development has no such derivation — so a definition named for the
-AUC of a process, justified by second moments alone, would be the `singletonProportion`
-failure exactly: a name claiming something its signature cannot express.
-
-The device is therefore the one `PowerAnalysis.PowerAgreement` already uses for
-non-central chi-squared power. The AUC the process actually has is a *field*, supplied by
-whoever instantiates this, and the regime is the hypothesis that it agrees with the closed
-form. A caller who cannot discharge `equalVarianceGaussian` does not get to call
-`equalVarianceGaussianAUCFromSignalVariance` an AUC — which is the whole point, because that
-assumption was previously nowhere at all. -/
-structure GaussianLiabilityRegime {k : ℕ} [Fintype (Fin k)]
-    (dgp : DataGeneratingProcess k) (signal : Predictor k) where
-  /-- The second-moment reading the signal-to-noise ratio is computed from. -/
-  moments : MomentReading dgp signal
-  /-- Residual (environmental) variance on the liability scale. -/
-  vEnv : ℝ
-  vEnv_pos : 0 < vEnv
-  /-- The AUC the process actually has, supplied externally rather than derived. -/
-  processAUC : ℝ
-  /-- **The regime.** Under an equal-variance Gaussian liability the process AUC is the
-  closed form at this signal-to-noise ratio. This is the assumption, and it is the
-  instantiator's to justify. -/
-  equalVarianceGaussian :
-    processAUC = Phi (Real.sqrt (moments.vSignal / (2 * vEnv)))
-
-/-- **Under the stated regime the closed form is the process's AUC.**
-
-Deliberately a one-line consequence. The content is not the proof but the obligation:
-before this, "`equalVarianceGaussianAUCFromSignalVariance` is the AUC" was asserted by a name; now it
-is discharged by whoever supplies `equalVarianceGaussian`, and cannot be assumed by
-anyone who cannot. -/
-theorem equalVarianceGaussianAUCFromSignalVariance_eq_processAUC {k : ℕ} [Fintype (Fin k)]
-    {dgp : DataGeneratingProcess k} {signal : Predictor k}
-    (G : GaussianLiabilityRegime dgp signal) :
-    equalVarianceGaussianAUCFromSignalVariance G.moments.vSignal G.vEnv = G.processAUC :=
-  G.equalVarianceGaussian.symm
+/-! AUC is not determined by second moments.  Consequently this module exposes the
+equal-variance Gaussian chart as a numerical function only; it does not offer a theorem
+identifying that chart with a process AUC.  Such an identification must be proved from an
+explicit liability distribution, not supplied as a record field. -/
 
 /-- Exact calibrated Bernoulli Brier risk from prevalence and explained-risk fraction. -/
 def calibratedBrier (π r2 : ℝ) : ℝ :=
@@ -2483,13 +2472,16 @@ The prevalence `π` is untouched by any of it, which is the honest reading: Brie
 with prevalence for reasons that have nothing to do with how well the score predicts. -/
 theorem calibratedBrierFromVariances_eq_rsquared_form {k : ℕ} [Fintype (Fin k)]
     {dgp : DataGeneratingProcess k} {signal : Predictor k}
-    (R : MomentReading dgp signal) (π V_E : ℝ)
-    (h_additive : R.cov = R.vSignal)
-    (h_split : R.vOutcome = R.vSignal + V_E) :
-    calibratedBrierFromVariances π R.vSignal V_E =
+    (V_signal π V_E : ℝ)
+    (h_signal : signalVariance dgp signal = V_signal)
+    (h_additive : signalOutcomeCovariance dgp signal = V_signal)
+    (h_split : outcomeMeanVariance dgp = V_signal + V_E)
+    (h_signal_pos : 0 < V_signal) (h_outcome_pos : 0 < V_signal + V_E) :
+    calibratedBrierFromVariances π V_signal V_E =
       calibratedBrier π (rsquared dgp signal dgp.trueExpectation) := by
   rw [calibratedBrierFromVariances_eq_chart,
-    r2FromSignalVariance_eq_rsquared R V_E h_additive h_split]
+    r2FromSignalVariance_eq_rsquared V_signal V_E h_signal h_additive h_split
+      h_signal_pos h_outcome_pos]
 
 /-- Explicit additive irreducible target-side residual-loss budget.
 These penalties are not compressed into a single multiplicative transport

@@ -107,11 +107,15 @@ structure TwoPopBiasModel (p : ℕ) extends StratificationModel p where
 noncomputable def TwoPopBiasModel.varBiasTarget {p : ℕ} (m : TwoPopBiasModel p) : ℝ :=
   m.attenuation * m.toStratificationModel.varBias
 
-theorem spurious_portability_from_stratification {p : ℕ} (m : TwoPopBiasModel p)
-    (r2_true : ℝ) :
-    -- Apparent portability drop (source_obs - target_obs) exceeds true drop (0)
-    (r2_true + m.toStratificationModel.varBias) -
-      (r2_true + m.varBiasTarget) > 0 := by
+/-- **Attenuated target bias variance is strictly below source bias variance.**
+
+This was `spurious_portability_from_stratification`, stated as
+`(r2_true + varBias) - (r2_true + varBiasTarget) > 0` for an arbitrary real `r2_true`.
+That `r2_true` cancels in the subtraction and is otherwise unconstrained — it was not the
+model's `R²`, was not tied to any predictor, and appeared only to make an inequality
+between two bias variances read as a statement about portability. -/
+theorem varBiasTarget_lt_varBias {p : ℕ} (m : TwoPopBiasModel p) :
+    m.varBiasTarget < m.toStratificationModel.varBias := by
   unfold TwoPopBiasModel.varBiasTarget
   have hv := stratification_bias_variance_pos m.toStratificationModel
   have : m.attenuation * m.toStratificationModel.varBias < m.toStratificationModel.varBias := by
@@ -203,12 +207,12 @@ theorem ColliderModel.inducedCov_neg (m : ColliderModel) :
   rw [neg_neg_iff_pos]
   exact div_pos (mul_pos m.σ2_G_pos m.σ2_E_pos) (by linarith [m.σ2_G_pos, m.σ2_E_pos])
 
-/-- **Selection induces correlation.**
-    Population covariance is zero; the model-derived induced covariance in the
-    selected sample is negative, hence different from the population value. -/
-theorem selection_induces_correlation (m : ColliderModel) :
-    m.inducedCov ≠ 0 := by
-  exact ne_of_lt m.inducedCov_neg
+/-! `selection_induces_correlation` was removed here.  It was `ne_of_lt inducedCov_neg` —
+strictly weaker than the theorem one line above it, restated under a name asserting that
+selection induces the correlation.  No selection event, no conditioning and no population
+covariance appear in this section: `inducedCov` is a closed-form *definition*, and
+`inducedCov_neg` says only that a negative-of-a-positive-ratio is negative.  The
+"explaining away" derivation that would connect the two is not in this corpus. -/
 
 /-- **Collider bias attenuates PGS-outcome association.**
     In the full population, regression coefficient is β_G.
@@ -229,18 +233,28 @@ theorem collider_attenuates_association (m : ColliderModel) :
       < m.β_G * 1 := by exact mul_lt_mul_of_pos_left h_ratio_lt_one m.β_G_pos
     _ = m.β_G := by ring
 
-/-- **Differential ascertainment creates portability artifact.**
-    If source and target cohorts have different ascertainment patterns,
-    the apparent portability drop includes an ascertainment component. -/
-theorem differential_ascertainment_artifact
-    (r2_source_pop r2_target_pop r2_source_asc r2_target_asc : ℝ)
-    -- Different ascertainment severity
-    (h_diff_severity : r2_target_pop - r2_target_asc < r2_source_pop - r2_source_asc) :
-    -- Apparent portability drop is larger than true portability drop
-    r2_source_asc - r2_target_asc > r2_source_pop - r2_target_pop →
-      False := by
-  intro h
-  linarith
+/-- **The ascertainment inflation of an apparent portability drop is exactly the
+difference of the two cohorts' ascertainment losses.**
+
+Writing the ascertainment loss of a cohort as `r2_pop - r2_asc`, the apparent drop
+`r2_source_asc - r2_target_asc` exceeds the true drop `r2_source_pop - r2_target_pop`
+**iff the target loses more to ascertainment than the source does.** With equal
+ascertainment severity the two drops coincide, so the artifact is differential
+ascertainment specifically, not ascertainment as such. The sign matters and is the whole
+statement, which is why this is an `iff`: severity in the *source* biases the apparent drop
+downward, hiding portability loss rather than manufacturing it.
+
+**This replaces `differential_ascertainment_artifact`, which asserted nothing.** That
+theorem read `(h : d_target < d_source) → (apparent > true) → False`, and by the identity
+`apparent - true = d_target - d_source` its second hypothesis is precisely the negation of
+its first: it proved `h → ¬¬h`, closed by `linarith`, for every choice of the four reals.
+Its docstring meanwhile claimed the *opposite* conclusion — "apparent portability drop is
+larger than true portability drop" — which is the branch that statement refutes. -/
+theorem apparent_portability_drop_gt_true_iff_target_more_ascertained
+    (r2_source_pop r2_target_pop r2_source_asc r2_target_asc : ℝ) :
+    r2_source_asc - r2_target_asc > r2_source_pop - r2_target_pop ↔
+      r2_source_pop - r2_source_asc < r2_target_pop - r2_target_asc :=
+  ⟨fun h => by linarith, fun h => by linarith⟩
 
 end ColliderBias
 
@@ -607,10 +621,15 @@ theorem weak_instrument_bias_increases
     linarith
   linarith
 
-/-- **Horizontal pleiotropy patterns differ across populations.**
-    If pleiotropic effects change across populations (due to different
-    LD patterns or gene regulation), MR estimates are not portable. -/
-theorem pleiotropy_changes_invalidate_mr
+/-- **A shared causal effect does not cancel a differing pleiotropic term.**  Cancellation
+on the left: `β + α ≠ β + α'` whenever `α ≠ α'`.
+
+This was `pleiotropy_changes_invalidate_mr`, "MR estimates are not portable".  Nothing here
+is an MR estimate: there is no instrument, no exposure, no ratio of reduced-form
+coefficients, and the additive form `β_causal + α_pleio` is written down rather than
+derived from an instrumental-variable model.  The MR content of the section that *is*
+proved is `instrument_strength_decreases`, from `MRInstrumentModel.fStat`. -/
+theorem add_left_ne_of_pleiotropy_ne
     (β_causal α_pleio_source α_pleio_target : ℝ)
     (h_diff : α_pleio_source ≠ α_pleio_target) :
     β_causal + α_pleio_source ≠ β_causal + α_pleio_target := by
