@@ -174,6 +174,8 @@ theorem lagObservationDerivative_injective_of_det_ne_zero {d : ℕ}
     (hdet : (lagSensitivityMatrix lag covarianceDerivative).det ≠ 0) :
     Function.Injective (lagObservationDerivative lag covarianceDerivative) := by
   intro tangent tangent' heq
+  change (lagSensitivityMatrix lag covarianceDerivative).mulVec tangent =
+    (lagSensitivityMatrix lag covarianceDerivative).mulVec tangent' at heq
   apply sub_eq_zero.mp
   apply Matrix.eq_zero_of_mulVec_eq_zero hdet
   change (lagSensitivityMatrix lag covarianceDerivative).mulVec (tangent - tangent') = 0
