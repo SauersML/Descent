@@ -469,14 +469,12 @@ section GeneticCorrelationMethods
     The genome-wide estimate is a weighted average of per-region estimates,
     so it falls between the extremes.
 
-    **The normality of the aggregate is no longer a caveat.** Aggregating
-    per-region estimates over a partition of the genome is a disjoint-window
-    design, and for such designs the set of limit laws is the Gaussian segment
-    and nothing else — see `disjointWindow_limit_variances_eq_segment` below.
-    The usual hedge that the pooled statistic is "approximately normal" is not
-    needed here: no compound-Poisson or other infinitely divisible component
-    can appear, because the Lévy measure vanishes. What remains free is the
-    limit variance, and that ranges over the whole segment. -/
+    **The normality of the aggregate remains a caveat, and this docstring used to deny
+    it.** It claimed that for a disjoint-window design the set of limit laws is the
+    Gaussian segment and nothing else, so the "approximately normal" hedge was not
+    needed. No such theorem exists in this corpus: the disjoint licence it appealed to
+    was carried as an interface field and has been removed rather than proved. What is
+    formalized below is the variance *parameter* of a hypothesised Gaussian limit. -/
 theorem local_genetic_correlation_varies
     (rho_chr1 rho_chr6 : ℝ) (w₁ w₆ : ℝ)
     (h_chr6_lower : rho_chr6 < rho_chr1) -- HLA region has lower correlation
@@ -491,7 +489,7 @@ end GeneticCorrelationMethods
 
 
 /-!
-## Disjoint-Window Designs: the Gaussian Segment, Not an Approximation
+## Disjoint-Window Designs: the variance parameter, not the limit law
 
 Gene-based tests, per-region genetic correlations and any statistic pooled over
 a partition of the genome share one structure: the windows do not overlap, so
@@ -502,17 +500,21 @@ attached, because in general a triangular array of independent summands
 converges to an arbitrary infinitely divisible law — Gaussian part, plus a
 Lévy measure carrying jumps.
 
-For a disjoint design the Lévy measure vanishes, and the set of achievable
-limit laws is therefore `{ N(0, s²) : 0 ≤ s² ≤ 1 }` — the Gaussian segment,
-entire and with nothing outside it. That is a theorem, not an approximation,
-and it removes the caveat rather than bounding it.
+It is often said that for a disjoint design the Lévy measure vanishes, so the
+achievable limit laws are exactly `{ N(0, s²) : 0 ≤ s² ≤ 1 }` — the Gaussian
+segment, with nothing outside it. **This corpus does not prove that**, and an
+earlier version of this section asserted it as "a theorem, not an
+approximation" while the declaration below simultaneously recorded that no
+probabilistic object occurs in the formal statement and that the central limit
+theorem is not formalized. The file contradicted itself; the local docstring
+was repaired and this surrounding narrative was not.
 
-What is formalised here is the parameter shadow of that statement, which is the
-part with content for a study design: the achievable limit variances of a
-disjoint-window design are the full segment `[0, 1]`, every point of it and no
-point outside it. The upper end is a design that concentrates all the signal in
-one window; the lower end is a design that captures none. Anything a
-partitioned-window analysis can converge to is pinned down by that one number.
+What is formalized here is only the **variance parameter** of a hypothesised
+Gaussian limit: the achievable values of `∑ⱼ share j` for a disjoint-window
+design are the full segment `[0, 1]`. That is a statement about a sum of
+nonnegative shares. It is worth having — the upper end is a design
+concentrating all signal in one window, the lower end one capturing none — but
+it is not evidence that the limit is Gaussian, and nothing below supplies that.
 -/
 
 section DisjointWindowDesigns
