@@ -1361,11 +1361,57 @@ So a single **order-free** sample — the multiset of feature values with genomi
 destroyed — carries **at least one** spectral functional beyond the marginal: a finite
 zero-frequency Fejér evaluation. The carrier is sampling fluctuation.
 
-It is not the only channel. `EnsembleChannel.equal_fejer_channel_witness` and
-`unequal_symmetric_fourth_channel_witness` give two positive-symbol covariance profiles
-with the same Fejér number but different symmetric Gaussian fourth-order statistics.
-Consequently the unordered empirical-measure law is generally richer than one long-run
-variance. Any exact visible algebra must be derived for the named observation model.
+**AN EARLIER VERSION OF THIS SECTION CLAIMED "EXACTLY ONE spectral functional, unchanged at
+every symmetric order". THAT WAS FALSE AND HAS BEEN REFUTED NUMERICALLY.** The refutation is
+recorded here rather than silently patched, because the mechanism it exposes is sharper than
+the claim it killed.
+
+Two Gaussian moving-average processes were built with marginal exactly `N(0,1)` and long-run
+variance `L` agreeing to `1e-16`, differing only off zero frequency (`f(π) = 1` versus
+`1/9`). **Six of ten order-free channels separate them**, and the separations are large:
+
+| channel | values | separation |
+|---|---|---|
+| second moment | 1.985 vs 2.382 | 18.1σ |
+| fourth moment | 95.66 vs 110.37 | 14.2σ |
+| sample variance | — | 18.2σ |
+| mean absolute value | — | 15.3σ |
+| empirical CDF at ±1 | — | 4.9σ / 4.4σ |
+
+The predicted values were 2.000/2.395 and 96.00/110.46, so measurement matches prediction to
+three digits: this is a **quantitative refutation**, not a tolerance failure. The positive
+control fired at 62.1σ, so the instrument can detect a difference when one exists.
+
+**THE PARITY IS EXACT, AND IT IS THE FINDING.** Odd channels agree — the mean at `+0.0σ`,
+the third moment at `+0.3σ` — while even channels separate. The reason is that
+
+> **odd channels see `Σγ(k) = L`; even channels see `Σγ(k)²`, which `L` does not
+> determine.**
+
+So the true statement is a **pair**, and it is sharper than the false one:
+
+* **The sample-mean channel carries exactly the zero-frequency evaluation `L`.** That part of
+  §14a stands — it is the first-order, odd channel, and `channel_detects_dependence` is a
+  theorem about it and remains true.
+* **The even-order channels read a different invariant, `Σγ(k)²`, which is not a function of
+  `L`.** `EnsembleChannel.gaussianPairSquareChannel3` is that invariant in the three-locus
+  case (`3γ₀² + 4γ₁² + 2γ₂²`), and the obstruction is proved by the pair
+  `EnsembleChannel.equal_fejer_channel_witness` and
+  `unequal_symmetric_fourth_channel_witness`: same Fejér number, different fourth-order
+  statistic, with the covariance profile's positivity checked separately by
+  `dependent_channel_symbol_positive` so the witness is a real stationary process.
+
+The guardrail in `EnsembleChannel.lean` was right and this section was the overreach. The
+unordered empirical-measure law is therefore **richer** than one long-run variance, which
+makes §14's channel claim narrower and its blindness claim weaker — both in the direction of
+being true.
+
+**A REGIME DECLARATION THE ORIGINAL STATEMENT LACKED.** `Var(sample mean) → L/n'` is
+**asymptotic, not an equation at finite depth**, and the depth hypothesis is load-bearing
+rather than decorative. Measured at `ρ = 0.99`, the deficit against `L` runs `−85%, −56%,
+−20%, −3.0%` as `n'` goes `32 → 4096`, while the deficit against the exact finite-depth
+Fejér reference never exceeds `1.7%`. So the finite-depth truth is the Fejér evaluation, and
+`L/n'` is its limit; any use of the limit at small `n'` is wrong by the amounts tabulated.
 
 ### 14b. Per-target invisibility and compound prediction
 
@@ -1390,6 +1436,96 @@ For a prior supported on a curve, the residual fibre variance is zero only if th
 visible summaries identify position on that curve. That injectivity is a substantive
 condition, not a consequence of low dimension. Real ancestry gradients may also be
 branched, admixed, or confounded by environment, so this is an empirical design target.
+
+**THE IDENTITY IS EXACT AND THE OPERATIONAL RECOVERY IS NOT, AND THAT GAP WAS MISSING FROM
+THIS CORPUS ENTIRELY.** The decomposition `Var(b) = Var(E[b|v]) + E[Var(b|v)]` was measured
+to hold at `1e-17`, and the curve arm is non-degenerate — its sheet fibre sits at `0.0169`,
+`72%` of `Var(b)`. So the population statement is right. But with **one order-free panel per
+cohort**, the per-cohort estimate `L̂` is a single `χ²₁` draw, and the pooled rule recovered
+only `−2.6%`, `1.7%`, `15.3%` of the predictable variance at `B = 1, 4, 16` panels per
+cohort. Attenuation *rises* with `B`, as it must.
+
+Stating the theorem as an equation rather than a bound was right, and this is the cost of
+that precision: **the equation is about population quantities, and a deployment sees
+estimates.** The difference between a dissolution that exists and one that can be used is
+the attenuation factor below, which is regression dilution in its usual form — the estimated
+visible coordinate carries noise, so the fitted predictor is shrunk toward the mean and the
+recovered variance is shrunk by the square of the reliability.
+
+The practical reading is not that the curve-prior dissolution fails. It is that **recovering
+it needs enough panels per cohort to make `L̂` reliable**, and `B = 16` is not enough. That
+is a design number, and it is the first one in this arc that bites. -/
+
+/-- **The estimation attenuation of the curve-prior recovery.**
+
+`predictableVariance` is the population quantity the identity of §14b delivers.
+`estimationNoise` is the variance of the per-cohort estimate of the visible coordinate.
+`recovered` is what a pooled rule actually obtains: the population quantity multiplied by the
+**reliability ratio** `predictable/(predictable + noise)`.
+
+This is regression dilution, and it is the difference between the exact identity and the
+`15.3%` measured at `B = 16` panels per cohort. -/
+structure RecoveryAttenuation where
+  /-- The population predictable variance — what the §14b identity delivers. -/
+  predictableVariance : ℝ
+  predictableVariance_pos : 0 < predictableVariance
+  /-- Variance of the per-cohort estimate of the visible coordinate. -/
+  estimationNoise : ℝ
+  estimationNoise_nonneg : 0 ≤ estimationNoise
+  /-- What a pooled rule actually recovers. -/
+  recovered : ℝ
+  /-- **The attenuation law.** -/
+  recovered_eq : recovered =
+    predictableVariance * (predictableVariance / (predictableVariance + estimationNoise))
+
+namespace RecoveryAttenuation
+
+variable (R : RecoveryAttenuation)
+
+/-- **The population identity is an upper bound on what any deployment recovers.** -/
+theorem recovered_le_predictable : R.recovered ≤ R.predictableVariance := by
+  have hden : 0 < R.predictableVariance + R.estimationNoise := by
+    have := R.predictableVariance_pos
+    have := R.estimationNoise_nonneg
+    linarith
+  have hfrac : R.predictableVariance / (R.predictableVariance + R.estimationNoise) ≤ 1 := by
+    rw [div_le_one hden]
+    linarith [R.estimationNoise_nonneg]
+  have hpos := R.predictableVariance_pos
+  calc R.recovered
+      = R.predictableVariance *
+        (R.predictableVariance / (R.predictableVariance + R.estimationNoise)) := R.recovered_eq
+    _ ≤ R.predictableVariance * 1 := by
+        exact mul_le_mul_of_nonneg_left hfrac (le_of_lt hpos)
+    _ = R.predictableVariance := mul_one _
+
+/-- **Noiseless estimation recovers the whole identity**, which is why the population
+statement is not wrong — it is the zero-noise end of this law. -/
+theorem recovered_eq_of_noiseless (h : R.estimationNoise = 0) :
+    R.recovered = R.predictableVariance := by
+  have hne : R.predictableVariance ≠ 0 := ne_of_gt R.predictableVariance_pos
+  rw [R.recovered_eq, h, add_zero, div_self hne, mul_one]
+
+/-- **Any estimation noise at all strictly attenuates the recovery.** With one panel per
+cohort the noise is a full `χ²₁` draw, which is how an exact identity becomes a measured
+`15.3%`. -/
+theorem recovered_lt_predictable (h : 0 < R.estimationNoise) :
+    R.recovered < R.predictableVariance := by
+  have hpos := R.predictableVariance_pos
+  have hden : 0 < R.predictableVariance + R.estimationNoise := by linarith
+  have hfrac : R.predictableVariance / (R.predictableVariance + R.estimationNoise) < 1 := by
+    rw [div_lt_one hden]
+    linarith
+  calc R.recovered
+      = R.predictableVariance *
+        (R.predictableVariance / (R.predictableVariance + R.estimationNoise)) := R.recovered_eq
+    _ < R.predictableVariance * 1 := by
+        exact (mul_lt_mul_left hpos).mpr hfrac
+    _ = R.predictableVariance := mul_one _
+
+end RecoveryAttenuation
+
+/-! Resuming the design discussion.
 
 ### 14c. The design prescription, which runs against instinct
 
