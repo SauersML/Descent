@@ -1234,6 +1234,7 @@ theorem hweSignBias_eq (h : HardyWeinbergModel) (hq0 : 0 < h.altFreq)
     unfold HardyWeinbergModel.centeredAltAlleleCount
     rw [h.expectedAltAlleleCount_eq]
     simp only [altAlleleCount]
+    ring
   have hchet : h.centeredAltAlleleCount DiploidGenotype.het = 1 - 2 * h.altFreq := by
     unfold HardyWeinbergModel.centeredAltAlleleCount
     rw [h.expectedAltAlleleCount_eq]
@@ -1242,7 +1243,6 @@ theorem hweSignBias_eq (h : HardyWeinbergModel) (hq0 : 0 < h.altFreq)
     unfold HardyWeinbergModel.centeredAltAlleleCount
     rw [h.expectedAltAlleleCount_eq]
     simp only [altAlleleCount]
-    ring
   unfold HardyWeinbergModel.signBias
   simp_rw [hsigned]
   rw [← Finset.sum_div, sum_over_genotypes, hcref, hchet, hcalt,
@@ -1301,9 +1301,9 @@ it is `genotypeFlip` on the probabilities. -/
 theorem reflect_genotypeProb (h : HardyWeinbergModel) (g : DiploidGenotype) :
     h.reflect.genotypeProb g = h.genotypeProb (genotypeFlip g) := by
   cases g <;>
-    · simp only [genotypeFlip_homRef, genotypeFlip_het, genotypeFlip_homAlt,
-        HardyWeinbergModel.genotypeProb, HardyWeinbergModel.refFreq,
-        HardyWeinbergModel.reflect_altFreq]
+    simp only [genotypeFlip_homRef, genotypeFlip_het, genotypeFlip_homAlt,
+      HardyWeinbergModel.genotypeProb, HardyWeinbergModel.refFreq,
+      HardyWeinbergModel.reflect_altFreq] <;> ring
 
 /-- Reflection preserves the genotype variance: `2(1-q)q = 2q(1-q)`. -/
 theorem reflect_genotypeVariance (h : HardyWeinbergModel) :

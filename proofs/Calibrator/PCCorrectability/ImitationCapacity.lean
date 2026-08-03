@@ -1319,7 +1319,7 @@ theorem bbpProxyThreshold_tendsto_zero (n : ℝ) :
     tendsto_const_div_atTop_nhds_zero_nat n
   have hcomp := (Real.continuous_sqrt.tendsto (0 : ℝ)).comp hdiv
   change Filter.Tendsto (fun M : ℕ => Real.sqrt (n / (M : ℝ))) Filter.atTop (nhds 0)
-  simpa only [Function.comp_apply] using hcomp
+  simpa only [Function.comp_apply, Real.sqrt_zero] using hcomp
 
 end DemographicInstance
 
