@@ -1673,7 +1673,12 @@ when estimator noise separates quotient fibres is the continuation, not a theore
   remain open.
 
 * **Permeability is proved only for the Gaussian covariance experiment.**
-  `Permeability.scalarPermeability` formalizes `p = (1/2)(Γ/Σ)²`, proves coding-scale
+  `Permeability.covarianceScoreInformation_gaussian` now derives
+  `p = (1/2)(Γ/Σ)²` from the centered Gaussian second and fourth moments rather than merely
+  naming the formula. `totalGaussianInformation_mul_estimatorVariance` proves the exact
+  known-mean covariance-estimator identity `m·p·Var = 1`. Consequently this experiment's
+  variance is `1/(m p)`, not `1/(2m p)`; an additional half in an aggregate risk law would
+  require an explicitly half-scaled loss. The same module proves coding-scale
   invariance and additivity over independent channels, and supplies both the
   completion-count lower bound and a constructive finite-dimensional criterion:
   selected lag summaries complete a deployment family when their sensitivity matrix is
@@ -1687,7 +1692,8 @@ when estimator noise separates quotient fibres is the continuation, not a theore
   first derivative is not an absolute wall:
   `quadraticChannel_deriv_zero` and `quadraticChannel_visible_away_from_zero` give the exact
   counterexample. Edgeworth completion, persistent-resonance-to-symmetry collapse, a
-  universal support-floor law, and the closing aggregate-risk constants remain open.
+  universal support-floor law, and closing aggregate-risk constants outside this named
+  Gaussian experiment remain open.
 
 * **Linkage disequilibrium proper — coverage is closed, rigidity is not.** Section 9 proves
   that a positive **joint atom floor** makes coverage coupling-invariant. It does not prove
