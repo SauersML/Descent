@@ -1546,24 +1546,17 @@ factor of ten in panels. -/
 theorem panels_suffice_iff (p c τ B : ℝ) (hp : 0 < p) (hc : 0 < c)
     (hτ0 : 0 < τ) (hτ1 : τ < 1) (hB : 0 < B) :
     τ ≤ p / (p + c / B) ↔ c * τ / (p * (1 - τ)) ≤ B := by
-  have hCB : 0 < c / B := div_pos hc hB
-  have hden : 0 < p + c / B := by linarith
   have h1τ : 0 < 1 - τ := by linarith
-  rw [le_div_iff₀ hden]
-  rw [div_le_iff₀ (mul_pos hp h1τ)]
-  constructor
-  · intro h
-    have hstep : τ * (c / B) ≤ p * (1 - τ) := by nlinarith
-    have := mul_le_mul_of_nonneg_right hstep (le_of_lt hB)
-    rw [div_mul_cancel₀ _ (ne_of_gt hB)] at this
-    linarith [this]
-  · intro h
-    have hstep : τ * c ≤ p * (1 - τ) * B := by linarith
-    have hdiv : τ * (c / B) ≤ p * (1 - τ) := by
-      rw [mul_div_assoc'] at *
-      rw [div_le_iff₀ hB]
-      linarith
-    nlinarith
+  have hBne : B ≠ 0 := ne_of_gt hB
+  -- Clear the inner division first: `p/(p + c/B) = pB/(pB + c)`. Rewriting the goal into
+  -- polynomial form before touching it keeps every later step a ring identity.
+  have hpB : 0 < p * B := mul_pos hp hB
+  have hrw : p / (p + c / B) = p * B / (p * B + c) := by
+    rw [div_eq_div_iff (by positivity) (by positivity)]
+    field_simp
+    ring
+  rw [hrw, le_div_iff₀ (by positivity), div_le_iff₀ (mul_pos hp h1τ)]
+  constructor <;> intro h <;> nlinarith [h]
 
 end RecoveryAttenuation
 
