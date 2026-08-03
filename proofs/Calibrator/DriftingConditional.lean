@@ -1364,6 +1364,254 @@ theorem link_average_as_convolution (ν : Measure ℝ) [IsFiniteMeasure ν]
   simp only [measureReal_univ_eq_one, one_smul, add_right_inj]
   rfl
 
+/-! ### Step one: the affine-probit parameters are identifiable
+
+`link_rigidity` asserts an affine-probit representation exists. Before that is worth proving it
+is worth knowing the representation is unique, because otherwise the conclusion names four
+numbers that the data do not determine and the biological reading -- that `p` is a penetrance
+floor and `p + q` a ceiling -- has nothing behind it.
+
+Uniqueness is where the floor and the ceiling actually come from: they are the two tail limits
+of the curve, which is why no amount of population drift can move them and why identifying them
+needs tail calibration rather than dynamics. The horizontal parameters then follow from
+injectivity.
+
+Everything here is proved. -/
+
+open Filter Topology in
+/-- The probit tends to the floor at low liability. -/
+theorem tendsto_affineProbit_atBot (p q α β : ℝ) (hα : 0 < α) :
+    Filter.Tendsto (fun u ↦ p + q * Phi (α * u + β)) Filter.atBot (𝓝 p) := by
+  have harg : Filter.Tendsto (fun u : ℝ ↦ α * u + β) Filter.atBot Filter.atBot := by
+    rw [Filter.tendsto_atBot]
+    intro c
+    filter_upwards [Filter.eventually_le_atBot ((c - β) / α)] with u hu
+    have h1 : α * u ≤ α * ((c - β) / α) := mul_le_mul_of_nonneg_left hu (le_of_lt hα)
+    have h2 : α * ((c - β) / α) = c - β := by field_simp
+    linarith
+  have hPhi : Filter.Tendsto (fun u : ℝ ↦ Phi (α * u + β)) Filter.atBot (𝓝 0) :=
+    (ProbabilityTheory.tendsto_cdf_atBot _).comp harg
+  have := (hPhi.const_mul q).const_add p
+  simpa using this
+
+open Filter Topology in
+/-- The probit tends to the ceiling at high liability. -/
+theorem tendsto_affineProbit_atTop (p q α β : ℝ) (hα : 0 < α) :
+    Filter.Tendsto (fun u ↦ p + q * Phi (α * u + β)) Filter.atTop (𝓝 (p + q)) := by
+  have harg : Filter.Tendsto (fun u : ℝ ↦ α * u + β) Filter.atTop Filter.atTop := by
+    rw [Filter.tendsto_atTop]
+    intro c
+    filter_upwards [Filter.eventually_ge_atTop ((c - β) / α)] with u hu
+    have h1 : α * ((c - β) / α) ≤ α * u := mul_le_mul_of_nonneg_left hu (le_of_lt hα)
+    have h2 : α * ((c - β) / α) = c - β := by field_simp
+    linarith
+  have hPhi : Filter.Tendsto (fun u : ℝ ↦ Phi (α * u + β)) Filter.atTop (𝓝 1) :=
+    (ProbabilityTheory.tendsto_cdf_atTop _).comp harg
+  have := (hPhi.const_mul q).const_add p
+  simpa using this
+
+/-- **The floor is identified**: it is the low-liability limit, so two affine-probit curves that
+agree everywhere have the same penetrance floor. -/
+theorem affineProbit_floor_unique (p q α β p' q' α' β' : ℝ) (hα : 0 < α) (hα' : 0 < α')
+    (h : ∀ u, p + q * Phi (α * u + β) = p' + q' * Phi (α' * u + β')) :
+    p = p' := by
+  have h1 := tendsto_affineProbit_atBot p q α β hα
+  have h2 := tendsto_affineProbit_atBot p' q' α' β' hα'
+  have hfun : (fun u ↦ p + q * Phi (α * u + β))
+      = fun u ↦ p' + q' * Phi (α' * u + β') := funext h
+  rw [hfun] at h1
+  exact tendsto_nhds_unique h1 h2
+
+/-- **The scale is identified**: it is the distance between the two tail limits. -/
+theorem affineProbit_scale_unique (p q α β p' q' α' β' : ℝ) (hα : 0 < α) (hα' : 0 < α')
+    (h : ∀ u, p + q * Phi (α * u + β) = p' + q' * Phi (α' * u + β')) :
+    q = q' := by
+  have hp : p = p' := affineProbit_floor_unique p q α β p' q' α' β' hα hα' h
+  have h1 := tendsto_affineProbit_atTop p q α β hα
+  have h2 := tendsto_affineProbit_atTop p' q' α' β' hα'
+  have hfun : (fun u ↦ p + q * Phi (α * u + β))
+      = fun u ↦ p' + q' * Phi (α' * u + β') := funext h
+  rw [hfun] at h1
+  have := tendsto_nhds_unique h1 h2
+  rw [hp] at this
+  linarith
+
+/-- With floor and scale pinned, the two probit arguments agree pointwise. -/
+theorem affineProbit_arg_eq (p q α β p' q' α' β' : ℝ) (hq : 0 < q) (hα : 0 < α) (hα' : 0 < α')
+    (h : ∀ u, p + q * Phi (α * u + β) = p' + q' * Phi (α' * u + β')) (u : ℝ) :
+    α * u + β = α' * u + β' := by
+  have hp : p = p' := affineProbit_floor_unique p q α β p' q' α' β' hα hα' h
+  have hqq : q = q' := affineProbit_scale_unique p q α β p' q' α' β' hα hα' h
+  have hu := h u
+  rw [← hp, ← hqq] at hu
+  have : Phi (α * u + β) = Phi (α' * u + β') := by
+    have hcancel : q * Phi (α * u + β) = q * Phi (α' * u + β') := by linarith
+    exact mul_left_cancel₀ (ne_of_gt hq) hcancel
+  exact strictMono_Phi.injective this
+
+/-- **The slope is identified.** -/
+theorem affineProbit_slope_unique (p q α β p' q' α' β' : ℝ) (hq : 0 < q) (hα : 0 < α)
+    (hα' : 0 < α')
+    (h : ∀ u, p + q * Phi (α * u + β) = p' + q' * Phi (α' * u + β')) :
+    α = α' := by
+  have h0 := affineProbit_arg_eq p q α β p' q' α' β' hq hα hα' h 0
+  have h1 := affineProbit_arg_eq p q α β p' q' α' β' hq hα hα' h 1
+  simp only [mul_zero, zero_add, mul_one] at h0 h1
+  linarith
+
+/-- **The intercept is identified.** With all four pinned, the affine-probit representation the
+rigidity theorem produces is the only one, so its floor and ceiling are properties of the curve
+rather than of the parametrisation chosen for it. -/
+theorem affineProbit_intercept_unique (p q α β p' q' α' β' : ℝ) (hq : 0 < q) (hα : 0 < α)
+    (hα' : 0 < α')
+    (h : ∀ u, p + q * Phi (α * u + β) = p' + q' * Phi (α' * u + β')) :
+    β = β' := by
+  have h0 := affineProbit_arg_eq p q α β p' q' α' β' hq hα hα' h 0
+  simpa using h0
+
+/-! ### Step two: what the invariance forces before any analysis
+
+The two facts below are the ones that do not need the functional equation. They are proved from
+monotonicity and boundedness alone, and they are what makes the normalisation in the necessity
+argument legitimate: without them there is no floor to subtract and no scale to divide by. -/
+
+open Filter Topology in
+/-- **A bounded increasing response curve has a floor.** The infimum is approached at low
+liability. This is where the `p` of the conclusion has to come from -- it is not a free
+parameter the witness may choose. -/
+theorem exists_floor_of_monotone_bddBelow (L : ℝ → ℝ) (hmono : Monotone L)
+    (hbdd : ∀ u, 0 < L u) :
+    Filter.Tendsto L Filter.atBot (𝓝 (⨅ u, L u)) :=
+  tendsto_atBot_ciInf hmono ⟨0, fun _ ⟨u, hu⟩ ↦ hu ▸ le_of_lt (hbdd u)⟩
+
+open Filter Topology in
+/-- **And a ceiling.** -/
+theorem exists_ceiling_of_monotone_bddAbove (L : ℝ → ℝ) (hmono : Monotone L)
+    (hbdd : ∀ u, L u < 1) :
+    Filter.Tendsto L Filter.atTop (𝓝 (⨆ u, L u)) :=
+  tendsto_atTop_ciSup hmono ⟨1, fun _ ⟨u, hu⟩ ↦ hu ▸ le_of_lt (hbdd u)⟩
+
+/-- **The floor is strictly below the ceiling** for a strictly increasing curve, so the scale `q`
+the rigidity conclusion asserts positive is genuinely positive and the normalisation that turns
+`L` into a distribution function does not divide by zero. -/
+theorem floor_lt_ceiling_of_strictMono (L : ℝ → ℝ) (hmono : StrictMono L)
+    (hlo : ∀ u, 0 < L u) (hhi : ∀ u, L u < 1) :
+    (⨅ u, L u) < ⨆ u, L u := by
+  have hbb : BddBelow (Set.range L) := ⟨0, fun _ ⟨u, hu⟩ ↦ hu ▸ le_of_lt (hlo u)⟩
+  have hba : BddAbove (Set.range L) := ⟨1, fun _ ⟨u, hu⟩ ↦ hu ▸ le_of_lt (hhi u)⟩
+  have h01 : L 0 < L 1 := hmono (by norm_num)
+  calc (⨅ u, L u) ≤ L 0 := ciInf_le hbb 0
+    _ < L 1 := h01
+    _ ≤ ⨆ u, L u := le_ciSup hba 1
+
+/-! ### Step three: the invariance cannot reverse or collapse the curve
+
+The necessity argument normalises `L` by subtracting its floor and dividing by its scale, which
+turns the invariance into a statement about a probability law. That normalisation is only
+legitimate if the reparametrised slope the invariance produces is positive: a zero slope would
+make the averaged curve constant, and a negative one would exchange the floor for the ceiling.
+
+Neither is ruled out by the statement of the invariance, so both are ruled out here. The
+argument is dominated convergence and nothing else -- the averaging weight is a probability
+measure and the curve is bounded, so the tail limits pass through the integral. -/
+
+open MeasureTheory ProbabilityTheory Filter Topology in
+/-- **Gaussian averaging inherits the floor.** At low liability every displaced value is already
+near the floor, and the displacement has finite weight, so the average goes there too. -/
+theorem tendsto_gaussianAverage_atBot (L : ℝ → ℝ) (hmono : Monotone L)
+    (hlo : ∀ u, 0 < L u) (hhi : ∀ u, L u < 1) (σ : ℝ) :
+    Tendsto (fun x ↦ ∫ z, L (x + σ * z) ∂(gaussianReal 0 1)) atBot (𝓝 (⨅ u, L u)) := by
+  have hmeas : Measurable L := hmono.measurable
+  have hfloor := exists_floor_of_monotone_bddBelow L hmono hlo
+  rw [tendsto_iff_seq_tendsto]
+  intro x hx
+  have hconst : ∫ _z : ℝ, (⨅ u, L u) ∂(gaussianReal 0 1) = ⨅ u, L u := by
+    simp
+  rw [← hconst]
+  refine MeasureTheory.tendsto_integral_of_dominated_convergence (fun _ ↦ (1 : ℝ))
+    (fun n ↦ (hmeas.comp (by fun_prop)).aestronglyMeasurable)
+    (integrable_const 1) (fun n ↦ ?_) ?_
+  · filter_upwards with z
+    rw [Real.norm_eq_abs, abs_of_pos (hlo _)]
+    exact le_of_lt (hhi _)
+  · filter_upwards with z
+    refine hfloor.comp ?_
+    rw [Filter.tendsto_atBot]
+    intro c
+    rw [Filter.tendsto_atBot] at hx
+    filter_upwards [hx (c - σ * z)] with n hn
+    linarith
+
+open MeasureTheory ProbabilityTheory Filter Topology in
+/-- **And the ceiling.** -/
+theorem tendsto_gaussianAverage_atTop (L : ℝ → ℝ) (hmono : Monotone L)
+    (hlo : ∀ u, 0 < L u) (hhi : ∀ u, L u < 1) (σ : ℝ) :
+    Tendsto (fun x ↦ ∫ z, L (x + σ * z) ∂(gaussianReal 0 1)) atTop (𝓝 (⨆ u, L u)) := by
+  have hmeas : Measurable L := hmono.measurable
+  have hceil := exists_ceiling_of_monotone_bddAbove L hmono hhi
+  rw [tendsto_iff_seq_tendsto]
+  intro x hx
+  have hconst : ∫ _z : ℝ, (⨆ u, L u) ∂(gaussianReal 0 1) = ⨆ u, L u := by
+    simp
+  rw [← hconst]
+  refine MeasureTheory.tendsto_integral_of_dominated_convergence (fun _ ↦ (1 : ℝ))
+    (fun n ↦ (hmeas.comp (by fun_prop)).aestronglyMeasurable)
+    (integrable_const 1) (fun n ↦ ?_) ?_
+  · filter_upwards with z
+    rw [Real.norm_eq_abs, abs_of_pos (hlo _)]
+    exact le_of_lt (hhi _)
+  · filter_upwards with z
+    refine hceil.comp ?_
+    rw [Filter.tendsto_atTop]
+    intro c
+    rw [Filter.tendsto_atTop] at hx
+    filter_upwards [hx (c - σ * z)] with n hn
+    linarith
+
+open MeasureTheory ProbabilityTheory Filter Topology in
+/-- **The reparametrised slope is positive.**
+
+The averaged curve has the same floor and the same ceiling as the original, and those differ.
+A zero slope would make it constant and a negative one would swap the two, so neither survives.
+
+This is the step that lets the necessity argument normalise: `(L - floor) / (ceiling - floor)`
+is then a genuine distribution function and the invariance becomes a statement about adding an
+independent Gaussian to a random liability. -/
+theorem invariance_slope_pos (L : ℝ → ℝ) (hmono : StrictMono L)
+    (hlo : ∀ u, 0 < L u) (hhi : ∀ u, L u < 1) (σ a' b' : ℝ)
+    (hinv : ∀ x, ∫ z, L (x + σ * z) ∂(gaussianReal 0 1) = L (a' * x + b')) :
+    0 < a' := by
+  have hsep : (⨅ u, L u) < ⨆ u, L u := floor_lt_ceiling_of_strictMono L hmono hlo hhi
+  have hfun : (fun x ↦ ∫ z, L (x + σ * z) ∂(gaussianReal 0 1))
+      = fun x ↦ L (a' * x + b') := funext hinv
+  have hbot := tendsto_gaussianAverage_atBot L hmono.monotone hlo hhi σ
+  have htop := tendsto_gaussianAverage_atTop L hmono.monotone hlo hhi σ
+  rw [hfun] at hbot htop
+  rcases lt_trichotomy a' 0 with hneg | hzero | hpos
+  · exfalso
+    -- a negative slope sends low liability to high, so the two limits are exchanged
+    have harg : Tendsto (fun x : ℝ ↦ a' * x + b') atBot atTop := by
+      rw [Filter.tendsto_atTop]
+      intro c
+      filter_upwards [Filter.eventually_le_atBot ((c - b') / a')] with u hu
+      have ha0 : a' ≠ 0 := ne_of_lt hneg
+      have h1 : a' * ((c - b') / a') ≤ a' * u :=
+        mul_le_mul_of_nonpos_left hu (le_of_lt hneg)
+      have h2 : a' * ((c - b') / a') = c - b' := by field_simp
+      linarith
+    have hswap : Tendsto (fun x ↦ L (a' * x + b')) atBot (𝓝 (⨆ u, L u)) :=
+      (exists_ceiling_of_monotone_bddAbove L hmono.monotone hhi).comp harg
+    exact absurd (tendsto_nhds_unique hbot hswap) (ne_of_lt hsep)
+  · exfalso
+    -- a zero slope makes the averaged curve constant, so it has no room for two limits
+    subst hzero
+    simp only [zero_mul, zero_add] at hbot htop
+    have h1 : (⨅ u, L u) = L b' := tendsto_nhds_unique hbot tendsto_const_nhds
+    have h2 : (⨆ u, L u) = L b' := tendsto_nhds_unique htop tendsto_const_nhds
+    rw [h1, h2] at hsep
+    exact absurd hsep (lt_irrefl _)
+  · exact hpos
+
 open MeasureTheory ProbabilityTheory in
 /-- **Necessity: no other bounded link shape survives.** A strictly increasing bounded link whose
 two-parameter family is closed under Gaussian averaging is a positive vertical affine transform
