@@ -740,7 +740,7 @@ section LocalAncestry
 /-- **Variance in local Fst across loci creates additional prediction error.**
     If local Fst varies (some loci have high Fst, others low), the prediction
     error has a "locus heterogeneity" component not captured by global Fst. -/
-theorem mul_sum_lt_sum_mul_of_nonneg_of_strict
+theorem mul_sum_lt_sum_mul_of_nonneg_of_exists_pos
     {m : ℕ} (β : Fin m → ℝ) (fst : Fin m → ℝ) (fst_global : ℝ)
     (h_nonneg : ∀ i, 0 ≤ β i ^ 2 * (fst i - fst_global))
     (i₀ : Fin m)
@@ -797,7 +797,7 @@ theorem lt_weighted_mean_of_weighted_deviation_pos
     (hweight_pos : 0 < ∑ i, β i ^ 2) :
     fst_global < (∑ i, β i ^ 2 * fst_local i) / (∑ i, β i ^ 2) :=
   (lt_div_iff₀ hweight_pos).2
-    (mul_sum_lt_sum_mul_of_nonneg_of_strict β fst_local fst_global h_nonneg i₀ h_strict)
+    (mul_sum_lt_sum_mul_of_nonneg_of_exists_pos β fst_local fst_global h_nonneg i₀ h_strict)
 
 end LocalAncestry
 
