@@ -567,15 +567,20 @@ noncomputable def fourAtom (v A B c : ℝ) (hv : 0 ≤ v) (hA : A ^ 2 = 1 + v)
     (hB : B ^ 2 = 1 - v) (hApos : 0 < A) (hBpos : 0 < B) (hBA : B < A)
     (hc : |c| * A < 1 / 4) :
     SingleModulus 4 v where
-  atom := fun j => if j = 0 then A else if j = 1 then -A else if j = 2 then B else -B
+  -- The branch conditions compare `j.val`, a natural-number literal, rather than `j`
+  -- itself. `fin_cases` leaves `j` as a raw `Fin.mk`, and `⟨2, _⟩ = 2` does NOT reduce,
+  -- because the right-hand side is an `OfNat` literal while the left is a `Fin.mk`:
+  -- `norm_num` gets through `⟨0, _⟩ = 0` and `⟨1, _⟩ = 1` and then stalls, leaving
+  -- `hij : A = if ⟨2, ⋯⟩ = 2 then B else -B` with the `if` intact. Comparing `.val`
+  -- makes every branch reduce definitionally, with no `Fin` lemma name to get wrong.
+  atom := fun j =>
+    if j.val = 0 then A else if j.val = 1 then -A else if j.val = 2 then B else -B
   mass := ![1 / 4 + c * B, 1 / 4 - c * B, 1 / 4 - c * A, 1 / 4 + c * A]
   atom_inj := by
     intro i j hij
-    -- `exfalso` is the whole fix. On the off-diagonal cases `norm_num` reduces `hij` to
-    -- an arithmetic contradiction but leaves the GOAL as a `Fin 4` equality, and
-    -- `linarith` proves arithmetic goals or `False` — not equalities in `Fin`. Six cases
-    -- close outright; the ten that did not were exactly the ten reported failures.
-    -- `<;>` runs nothing when a branch has no goals left, so the closed cases are safe.
+    -- `exfalso` supplies the `False` goal that `linarith` needs; `norm_num` leaves the
+    -- goal as a `Fin 4` equality, which `linarith` cannot prove. `<;>` runs nothing on a
+    -- branch with no goals, so cases already closed by `norm_num` are unaffected.
     fin_cases i <;> fin_cases j <;> norm_num at hij ⊢ <;> exfalso <;> linarith
   mass_pos := by
     intro j
