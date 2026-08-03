@@ -57,12 +57,22 @@ def _all_modules():
     can move between files in the same namespace and keep its fully-qualified
     name. So the file set is discovered, never enumerated. The dependency table
     is global for the same reason -- a callee that moves must still resolve.
+
+    Discovery was still scoped one directory too narrowly: the glob below walks
+    CALIBRATOR/**, which does not include `proofs/Calibrator.lean` -- the corpus ROOT,
+    a sibling of that directory rather than a child. "Discovered, never enumerated"
+    was true and still missed a file, because the discovery root was wrong. A
+    dead-code scan with the same blind spot deleted `decaySlope` and then
+    `LDDecayMechanism` as unreferenced; their only consumer was a theorem in the root.
     """
     import glob
     out = []
     for path in sorted(glob.glob(os.path.join(CALIBRATOR, "**", "*.lean"),
                                  recursive=True)):
         out.append(os.path.relpath(path, CALIBRATOR)[: -len(".lean")])
+    _root = os.path.join(os.path.dirname(CALIBRATOR.rstrip(os.sep)), "Calibrator.lean")
+    if os.path.exists(_root):
+        out.append("Calibrator")
     return out
 
 # Definitions where extract's callable is known-wrong and leanexpr's is used

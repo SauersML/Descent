@@ -85,7 +85,16 @@ def classify_token(tok, defs_short, struct_short):
 
 def scan(defs_short, struct_short):
     findings = []
-    for path in sorted((PROOFS / "Calibrator").rglob("*.lean")):
+    # `rglob` under Calibrator/ does NOT reach `proofs/Calibrator.lean`, the corpus
+    # ROOT, which sits one level above it. A scan blind to the root reported two
+    # definitions as unreferenced and they were deleted; their only consumer was a
+    # theorem in the root. `lean_parse.build` already carries this `extra` idiom --
+    # keep the three in step.
+    _root = PROOFS / "Calibrator.lean"
+    _paths = sorted((PROOFS / "Calibrator").rglob("*.lean"))
+    if _root.exists():
+        _paths.append(_root)
+    for path in _paths:
         src = path.read_text(errors="ignore")
         rel = str(path.relative_to(PROOFS))
         for line_no, tactic, tok in tactic_name_positions(src):

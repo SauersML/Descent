@@ -197,7 +197,12 @@ cross_validate()
 import re                                                       # noqa: E402
 
 grep = 0
-for p in sorted((HERE.parent.parent / "Calibrator").rglob("*.lean")):
+# The root `proofs/Calibrator.lean` is a sibling of Calibrator/, not a child, so
+# `rglob` misses it. See lean_parse.build's `extra` idiom.
+_lean_paths = sorted((HERE.parent.parent / "Calibrator").rglob("*.lean"))
+if (HERE.parent.parent / "Calibrator.lean").exists():
+    _lean_paths.append(HERE.parent.parent / "Calibrator.lean")
+for p in _lean_paths:
     for line in p.read_text(errors="ignore").splitlines():
         if re.match(r"^(?:(?:noncomputable|private|protected)\s+)*(?:def|abbrev)\s+\S",
                     line):

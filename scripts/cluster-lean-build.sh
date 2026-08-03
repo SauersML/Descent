@@ -45,6 +45,14 @@
 #   LAKE_EXIT=<code>                                  lake's own exit status
 #   MODULE_STATUS <mod> COMPILED|STALE|ABSENT         per module, one line each
 #   MODULES_COMPILED / MODULES_STALE / MODULES_ABSENT summary counts
+#   ORPHAN_MODULES=<n> / ORPHAN <mod>                 on disk, unreachable from root
+#   COVERAGE_EXIT=0|1                                 did the build cover the corpus?
+#   WHOLE_CORPUS_INCOMPLETE=0|1                       full build left work undone
+#
+#   COVERAGE_EXIT=1 or WHOLE_CORPUS_INCOMPLETE=1 exits the script with code 3 even
+#   when LAKE_EXIT=0. THAT COMBINATION IS THE POINT: lake can succeed on every
+#   target it was given and still have compiled none of the modules you care
+#   about. `LAKE_EXIT=0` means "the targets built", never "the corpus is green".
 #
 # HOW TO READ A LOG, in order. Absence is the signal:
 #
@@ -363,3 +371,84 @@ done < <(find proofs -name '*.lean' | sort)
 echo "MODULES_COMPILED=$_compiled"
 echo "MODULES_STALE=$_stale"
 echo "MODULES_ABSENT=$_absent"
+
+# ---------------------------------------------------------------------------
+# COVERAGE GUARD. THE BUILD MUST COVER ITS OWN CORPUS.
+#
+# On 2026-02 this script reported zero errors on whole-corpus builds, repeatedly,
+# while eight modules were never compiled at all: `Calibrator.ResonanceSpectrum`
+# and seven `Calibrator.BundleRigidity.*` submodules sat outside the import
+# closure of `proofs/Calibrator.lean`, so `lake build Calibrator` never reached
+# them. Naming them as explicit targets produced errors immediately -- a missing
+# `Real.log` import that had been red all day. The root module itself was also
+# never elaborated until `CondensationUnification` compiled, and it was carrying
+# a theorem over two names that have never been defined in this corpus.
+#
+# So every "0 errors" excluded the one file that transitively covers everything.
+# MODULES_ABSENT was reporting this truthfully the whole time, as a line in a
+# summary that nobody interrogated. A count is not a signal until something
+# fails on it. This is that something.
+#
+# The orphan check below is the durable half, and it does NOT depend on the
+# build succeeding: it compares the files on disk against the transitive import
+# closure of the root module. A file that no target can reach is UNBUILT, not
+# clean, and adding it here is not the fix -- adding it to the ROOT is.
+echo "--- COVERAGE ---"
+_orphans=$(python3 - <<'PYEOF'
+import os, re, sys
+root = "proofs/Calibrator.lean"
+if not os.path.exists(root):
+    print("ROOT_MISSING"); sys.exit(0)
+imports = {}
+for d, _, fs in os.walk("proofs/Calibrator"):
+    for f in fs:
+        if f.endswith(".lean"):
+            p = os.path.join(d, f)
+            mod = p[len("proofs/"):-5].replace(os.sep, ".")
+            imports[mod] = re.findall(r"^import (Calibrator\.\S+)", open(p, encoding="utf-8").read(), re.M)
+seen = set()
+def walk(m):
+    for i in imports.get(m, []):
+        if i not in seen:
+            seen.add(i); walk(i)
+for r in re.findall(r"^import (Calibrator\.\S+)", open(root, encoding="utf-8").read(), re.M):
+    seen.add(r); walk(r)
+for o in sorted(set(imports) - seen):
+    print(o)
+PYEOF
+)
+if [ -n "$_orphans" ]; then
+  echo "ORPHAN_MODULES=$(echo "$_orphans" | wc -l | tr -d ' ')"
+  echo "$_orphans" | sed 's/^/ORPHAN /'
+  echo "COVERAGE_EXIT=1"
+  echo "!!! MODULES ON DISK ARE OUTSIDE THE ROOT IMPORT CLOSURE. They were NOT built,"
+  echo "!!! and their silence in this log is ABSENCE OF EVIDENCE. Add them to"
+  echo "!!! proofs/Calibrator.lean -- not to this script's target list."
+  _coverage=1
+else
+  echo "ORPHAN_MODULES=0"
+  echo "COVERAGE_EXIT=0"
+  _coverage=0
+fi
+
+# On a whole-corpus run every module must actually have compiled. On a targeted
+# run most modules are legitimately untouched, so this only fires for the full
+# build -- otherwise it would cry wolf on every one-module check and be ignored,
+# which is how a guard becomes decoration.
+_whole=0
+if [ ${#TARGETS[@]} -eq 1 ] && [ "${TARGETS[0]}" = "Calibrator" ]; then _whole=1; fi
+if [ "$_whole" = "1" ]; then
+  if [ "$_absent" -gt 0 ] || [ "$_stale" -gt 0 ]; then
+    echo "WHOLE_CORPUS_INCOMPLETE=1"
+    echo "!!! A whole-corpus build left $_absent ABSENT and $_stale STALE modules."
+    echo "!!! THIS IS NOT A CLEAN BUILD. Those modules were not compiled in this run,"
+    echo "!!! so any error count above is a FLOOR. Check MODULE_STATUS before quoting it."
+    _coverage=1
+  else
+    echo "WHOLE_CORPUS_INCOMPLETE=0"
+  fi
+fi
+
+# Make the guard bite: a coverage failure is a script failure, so a caller that
+# only checks the exit code still learns about it.
+if [ "$_coverage" = "1" ]; then exit 3; fi

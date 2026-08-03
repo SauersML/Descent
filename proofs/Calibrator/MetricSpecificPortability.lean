@@ -1824,8 +1824,14 @@ the `optimum` that `sharedCorrectionConsensus` and `sharedCorrectionSpread`
 average and take the variance of; without it the "per-target optimal
 corrections" their docstrings name have no referent in the corpus.
 
+`noncomputable` because `sharedCorrectionOptimum` is: it divides by
+`coefficientEnergy`, and it sits inside a `noncomputable section` in
+`ProjectionShiftBounds`, so it carries no executable code. That section marker does not
+travel with the name, so this definition -- outside such a section -- has to say so
+itself, or the compiler IR check fails here rather than at the real-division site.
+
 Empirical status: UNTESTED. -/
-def targetCorrectionOptimum (B : ι → Matrix J J ℝ) (beta theta : J → ℝ) :
+noncomputable def targetCorrectionOptimum (B : ι → Matrix J J ℝ) (beta theta : J → ℝ) :
     ι → ℝ :=
   fun i => sharedCorrectionOptimum (B i) beta theta
 
