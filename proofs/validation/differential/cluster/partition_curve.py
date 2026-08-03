@@ -47,15 +47,19 @@ THE TWO THINGS A RATIO OF g_F MISSES.
   (a) THE WHITE FLOOR IS IN THE DENOMINATOR AND NOT IN THE NUMERATOR. p is
       built from Sigma = amp*g_F + s2, not from g_F. With amp = s2 = 1 and
       rho = 0.9 the saturated Sigma is 20 while the saturated g_F is 19, so the
-      floor is a 5% effect at large n' -- and at SMALL n' it is enormous,
-      because g_F -> 1 as n' -> 1 while s2 stays at 1. At n' = 8 the floor is
-      more than a third of Sigma. Any ratio built from g_F alone therefore has
-      the wrong denominator exactly where the turn-up happens.
+      floor is a 5% effect at large n' -- and at SMALL n' it grows sharply,
+      because g_F -> 1 as n' -> 1 while s2 stays at 1. Measured below: the
+      floor is 5.0% of Sigma at n' = 4096 and 13.9% at n' = 8, so the
+      denominator's saturation ratio is 0.998 at the top of the sweep and only
+      0.359 at the bottom. Any ratio built from g_F alone therefore has the
+      wrong denominator exactly where the turn-up happens.
 
   (b) THE NUMERATOR IS A DERIVATIVE, AND IT SATURATES MORE SLOWLY THAN g_F
       ITSELF. p depends on dg_F/drho, whose finite-depth deficit carries the
-      extra factor of (1-rho) visible in (4). At rho = 0.9 the derivative is
-      still 15% short of its limit at a depth where g_F is only 4% short.
+      extra factor of (1-rho) visible in (4). Measured below at rho = 0.9:
+      at n' = 256 the channel g_F is 3.7% short of its limit while the
+      derivative is 7.4% short, and at n' = 64 it is 14.8% against 29.5%. The
+      derivative's deficit runs about twice the channel's throughout.
 
   Together these are why f = g_F/g_infinity and f^2 track the first two grid
   points and fail at the last two: at large n' both corrections are small and
@@ -162,11 +166,14 @@ def check_against_reported(out):
     print("")
     print("  worst relative disagreement with the published numbers: %.2e"
           % worst)
+    print("  (the published table printed 4 significant figures, so ~1e-4 IS")
+    print("   exact agreement; the tolerance below is that print precision and")
+    print("   not a claim about the closed form, which is exact.)")
     print("  -> p, p/p_sat and risk_predicted were ALL COMPUTED, not measured.")
     print("     The only simulated column in that table was risk_measured.")
     out["reproduces_published"] = {"worst_rel": worst, "rows": rows,
                                    "p_sat": ps}
-    return worst < 1e-5
+    return worst < 5e-4
 
 
 def why_the_ratio_fails(out):
@@ -206,8 +213,10 @@ def why_the_ratio_fails(out):
     print("  check the last two columns against column five by hand and the")
     print("  identity is exact. f^2 uses g_F for BOTH, which is right only")
     print("  where the floor is negligible and the derivative has saturated.")
-    print("  At n' = 8 the white floor is %.0f%% of Sigma, which is the whole"
+    print("  At n' = 8 the white floor is %.1f%% of Sigma and the derivative"
           % (100.0 * rows[-1]["white_floor_share"]))
+    print("  has reached only %.1f%% of its limit, which together are the whole"
+          % (100.0 * rows[-1]["numerator_saturation"]))
     print("  of the 0.106 versus 0.047 gap you found.")
     out["ratio_breakdown"] = rows
 
