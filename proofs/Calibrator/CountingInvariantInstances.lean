@@ -179,6 +179,23 @@ theorem meff_error_floor_pos (n : ℕ) (L : ℝ) (hn : 0 < n) (hL : L < (n : ℝ
     nlinarith
   · norm_num
 
+/-- **The error floor, in the coordinates of the abstract witness.**
+
+`meff_error_floor_pos` states the floor as an expression in `n`, which hides that the two
+numbers in it are the packaged witness's `rateGap` and `countGap`. Read through the
+`ApproxWitness` the instance actually builds, the floor is `(rateGap − L·countGap)/2`, and
+the hypothesis `L < n` is exactly the condition `L·countGap < rateGap` for this witness.
+
+Stating it keeps the concrete numbers answerable to the abstract structure. If either gap
+moves — `ImitationCapacity` sharpens the moment bound, or the certificate gap is
+recomputed — this fails, rather than the floor quietly ceasing to be a statement about the
+witness while its arithmetic still holds. -/
+theorem meffApproxWitness_error_floor_pos (n o : ℕ) (L : ℝ) (hn : 0 < n) (hL : L < (n : ℝ))
+    (W : ApproxWitness (ℕ → ℝ) (ℕ → ℝ)) (hW : W = meffApproxWitness n o hn) :
+    0 < (W.rateGap - L * W.countGap) / 2 := by
+  subst hW
+  simpa [meffApproxWitness] using meff_error_floor_pos n L hn
+
 end
 
 end Calibrator

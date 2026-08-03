@@ -651,6 +651,27 @@ theorem singleModulus_atom_sq_eq_realizability_atom_sq {d : ℕ} {v : ℝ}
   rw [BundleRigidity.outerAtom_sq hv, BundleRigidity.innerAtom_sq hv1]
   exact S.sq_cases j
 
+/-- **The coupling order is a polynomial grade, and the deployment cost is the benchmark
+sample size at that grade.**
+
+`DeploymentCeiling.sampleCost η C k` is `(C/η)^(2k)`, the samples needed to resolve a
+direction whose coupling order is `k` from the guarantee `σ_min ≥ (η/C)^k`.
+`PowerAnalysis.fixedGradeBenchmarkSampleSize ε K c` is `ε^(-(K/c))`, the sample size that
+inverts a fixed-grade risk benchmark. They are the same number at accuracy `η/C`, grade
+`2k` and constant `1`.
+
+That is the statement behind the ceiling's own reading of the published cost. Quadratic in
+`1/η` is grade `2`, which is `k = 1`; the geometric degradation in `k` is the grade rising,
+not a separate phenomenon. Without this the two power laws are two power laws, and the
+claim that one specialises the other is prose. -/
+theorem sampleCost_eq_fixedGradeBenchmarkSampleSize (η C : ℝ) (k : ℕ)
+    (hη : 0 < η) (hC : 0 < C) :
+    BundleRigidity.sampleCost η C k
+      = fixedGradeBenchmarkSampleSize (η / C) ((2 * k : ℕ) : ℝ) 1 := by
+  unfold BundleRigidity.sampleCost fixedGradeBenchmarkSampleSize
+  rw [div_one, Real.rpow_neg (div_pos hη hC).le, Real.rpow_natCast,
+    div_pow, div_pow, inv_div]
+
 end Condensation
 
 end Calibrator
