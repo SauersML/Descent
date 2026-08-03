@@ -728,6 +728,20 @@ noncomputable def momentBodyExponent (α : ℝ) : ℝ := 1 / α
 /-- The enclosing hyperrectangle's entropy exponent, `2/(2α-1)`. -/
 noncomputable def hyperrectangleExponent (α : ℝ) : ℝ := 2 / (2 * α - 1)
 
+/-! **These two exponents are `TransportedMinimax`'s two exponents, copied, and the
+identity is NOT stated here because it cannot yet be compiled.**
+
+Not two quantities that happen to coincide: `momentBodyEntropyExponent` and
+`hyperrectangleEntropyExponent` are the same `1/α` and `2/(2α-1)`, introduced there for the
+same moment-body-versus-hyperrectangle comparison, and the comparison theorem is proved
+twice as well.  This file imports `TransportedMinimax`, so the duplication was avoidable.
+
+The identity theorem was written and withdrawn: both names are present in
+`TransportedMinimax.lean`'s source but **absent from its compiled `olean`**, so
+`momentBodyExponent α = momentBodyEntropyExponent α` does not elaborate.  Restore it, or
+better, redefine this file's two as calls to `TransportedMinimax`'s, once that module is
+rebuilt. -/
+
 /-- **The moment body's exponent is strictly smaller, at every admissible `α`.**
 
     `1/α < 2/(2α-1)` for every `α > 1/2`. The inequality is equivalent to `2α - 1 < 2α`, so
