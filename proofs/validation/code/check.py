@@ -1832,6 +1832,42 @@ def run_identifications() -> int:
                              r"namespace |/-))", src, re.S | re.M):
             full_decl[t.group(1).split(".")[-1]] = t.group(0)
 
+    # ---- 3d-bis. A named mathematical law supplied as a hypothesis ----------
+    #
+    # "Given Cauchy-Schwarz, apply Cauchy-Schwarz" is a modularisation, not a
+    # result, and it reads as one only because the law sits in a binder where no
+    # audit looks.  The tell is the binder NAME: a hypothesis called
+    # `hCauchySchwarz` is not a constraint distinguishing this object from
+    # another, it is a classical theorem the proof declines to prove or cite.
+    #
+    # Named laws only.  A hypothesis quantified over arbitrary functions is NOT
+    # flagged on shape alone: `hEbound : ∀ v, ‖v‖ = 1 → |⟪v, E v⟫| ≤ δ` is a
+    # genuine property of the operator `E`, and flagging it would push authors to
+    # inline the bound rather than name it.
+    LAW_HYPOTHESIS = re.compile(
+        r"^h_?(cauchy|schwarz|cauchyschwarz|jensen|holder|hoelder|minkowski|"
+        r"triangle|chebyshev|markov|hoeffding|bernstein|azuma|mcdiarmid|"
+        r"borel|cantelli|fatou|lebesgue|fubini|tonelli|radon|nikodym|"
+        r"hahn|banach|riesz|stone|weierstrass|arzela|ascoli|"
+        r"gnedenko|kolmogorov|donsker|slutsky|lindeberg|berry|esseen|"
+        r"donoho|liu|sion|neumann|brouwer|kakutani|farkas|"
+        r"pinsker|bretagnolle|huber|leCam|fano|assouad)",
+        re.I)
+    law_hypotheses = []
+    for tname, stmt in global_theorems:
+        decl = full_decl.get(tname, stmt)
+        signature = statement_of(decl)
+        for hname in re.findall(r"\((h[A-Za-z_0-9']*)\s*:", signature):
+            if LAW_HYPOTHESIS.match(hname):
+                law_hypotheses.append(
+                    "`%s` takes `%s` as a hypothesis: a named theorem supplied as a "
+                    "parameter proves only that the theorem was assumed" % (tname, hname))
+    if law_hypotheses:
+        bad.append("named mathematical laws supplied as hypotheses: %d, budget 0; "
+                   "prove the law for the object at hand, or state the theorem about "
+                   "an object that has it" % len(law_hypotheses))
+        bad.extend("    " + x for x in law_hypotheses)
+
     domain_named_arithmetic = []
     for tname, stmt in global_theorems:
         if not DOMAIN_WORD.search(tname):
