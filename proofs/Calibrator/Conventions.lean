@@ -258,19 +258,38 @@ theorem trueHudsonFst_eq_of_neiGst (p₁ p₂ : ℝ)
     (hbar : meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) ≠ 0) :
     trueHudsonFst p₁ p₂ = 2 * hudsonFst p₁ p₂ / (1 + hudsonFst p₁ p₂) := by
   have hne : p₁ * (1 - p₂) + p₂ * (1 - p₁) ≠ 0 := ne_of_gt hpos
+  have hmean : meanAlleleFreq p₁ p₂ ≠ 0 := left_ne_zero_of_mul hbar
+  have hcomp : 1 - meanAlleleFreq p₁ p₂ ≠ 0 := right_ne_zero_of_mul hbar
+  have hD : 2 * meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) ≠ 0 :=
+    mul_ne_zero (mul_ne_zero two_ne_zero hmean) hcomp
   have hlink :
       (1 + hudsonFst p₁ p₂) *
           (2 * meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂)) =
         p₁ * (1 - p₂) + p₂ * (1 - p₁) := by
     unfold hudsonFst ploidy
-    field_simp [hbar]
+    field_simp [hD]
+    unfold meanAlleleFreq
     ring
-  have hgst : 1 + hudsonFst p₁ p₂ ≠ 0 := by
-    intro hzero
-    rw [hzero, zero_mul] at hlink
-    exact hne hlink.symm
-  unfold trueHudsonFst hudsonFst ploidy meanAlleleFreq at *
-  field_simp [hne, hbar, hgst] <;> ring
+  have htwo :
+      2 * hudsonFst p₁ p₂ =
+        (p₁ - p₂) ^ 2 /
+          (2 * meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂)) := by
+    unfold hudsonFst ploidy
+    field_simp [hD]
+    unfold meanAlleleFreq
+    ring
+  have hone :
+      1 + hudsonFst p₁ p₂ =
+        (p₁ * (1 - p₂) + p₂ * (1 - p₁)) /
+          (2 * meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂)) :=
+    (eq_div_iff hD).2 hlink
+  have hquot :
+      (p₁ * (1 - p₂) + p₂ * (1 - p₁)) /
+          (2 * meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂)) ≠ 0 :=
+    div_ne_zero hne hD
+  unfold trueHudsonFst
+  rw [htwo, hone]
+  field_simp [hne, hD, hquot]
 
 /-- **Witness that the two estimators are different functions**, not two
 spellings of one. Without an exhibited point the conflation can be
