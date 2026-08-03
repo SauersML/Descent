@@ -943,6 +943,18 @@ theorem one_sub_prevalence (c : ConfusionMatrix) :
   unfold prevalence
   linarith [c.mass_one]
 
+/-- **The false positive rate recovers the false positives.** -/
+theorem fpr_mul_actualNegative (c : ConfusionMatrix) (h : c.fp + c.tn ≠ 0) :
+    fpr c * (c.fp + c.tn) = c.fp := by
+  unfold fpr
+  field_simp
+
+/-- **Precision recovers the true positives from what was predicted positive.** -/
+theorem precision_mul_predictedPositive (c : ConfusionMatrix) (h : c.tp + c.fp ≠ 0) :
+    precision c * (c.tp + c.fp) = c.tp := by
+  unfold precision
+  field_simp
+
 theorem prevalence_mul_recall (c : ConfusionMatrix) :
     prevalence c * recallRate c = c.tp := by
   unfold prevalence recallRate

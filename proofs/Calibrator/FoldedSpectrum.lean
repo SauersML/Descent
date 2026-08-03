@@ -1334,6 +1334,18 @@ theorem positiveThreshold_pos_smul (x c : ℝ) (hc : 0 < c) :
     · intro h; nlinarith
   by_cases hx : 0 < x <;> simp [hx, hiff]
 
+/-- **The two sides of zero partition the indicator.** Sign invariance leaves the height free and
+the tabulated values are a conjunction rather than one relation; this is a single equation that
+holds only at height one, away from the boundary the convention excludes. -/
+theorem positiveThreshold_add_neg (x : ℝ) (hx : x ≠ 0) :
+    positiveThreshold x + positiveThreshold (-x) = 1 := by
+  unfold positiveThreshold
+  rcases lt_or_gt_of_ne hx with h | h
+  · rw [if_neg (by linarith), if_pos (by linarith)]
+    norm_num
+  · rw [if_pos h, if_neg (by linarith)]
+    norm_num
+
 /-- Two random coordinates can have the same mean while producing different threshold
 probabilities: the equiprobable law on `{-1,1}` and the point mass at zero both have mean
 zero, but only the first crosses the positive threshold with probability `1/2`. Thus the

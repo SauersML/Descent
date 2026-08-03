@@ -956,6 +956,15 @@ theorem sensitivityPortabilityGap_eq_zero_iff (a b : ℝ) :
   rw [abs_eq_zero, sub_eq_zero]
   exact eq_comm
 
+/-- **The gap is bounded by the two sensitivities it compares.** Symmetry and the vanishing
+criterion are shared by every positive multiple of this distance; the triangle bound is not,
+so it is the one that fixes the multiple at one. -/
+theorem sensitivityPortabilityGap_le_add_abs (a b : ℝ) :
+    sensitivityPortabilityGap a b ≤ |a| + |b| := by
+  unfold sensitivityPortabilityGap
+  calc |b - a| ≤ |b| + |a| := abs_sub b a
+    _ = |a| + |b| := by ring
+
 /-- Absolute portability gap for PPV between source and target prevalences. -/
 noncomputable def ppvPortabilityGap
     (sensitivity specificity prevalenceSource prevalenceTarget : ℝ) : ℝ :=

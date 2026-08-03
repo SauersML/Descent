@@ -491,6 +491,14 @@ theorem effectiveBlockCount_unit_invariant (markers correlationLength t : ℝ) (
   unfold effectiveBlockCount
   exact mul_div_mul_left _ _ ht
 
+/-- **The blocks tile the markers.** Unit invariance does not say how many markers a block holds;
+this does, and it is the statement a miscounted block size would break. -/
+theorem effectiveBlockCount_mul_correlationLength (markers correlationLength : ℝ)
+    (hl : correlationLength ≠ 0) :
+    effectiveBlockCount markers correlationLength * correlationLength = markers := by
+  unfold effectiveBlockCount
+  field_simp
+
 /-- **Residual discreteness of the freezing transition.**
 
     The lattice ghost surviving in a block of `n` markers at correlation length `ℓ`.

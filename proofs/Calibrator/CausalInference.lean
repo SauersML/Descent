@@ -454,6 +454,14 @@ theorem costEffectiveness_unit_invariant (improvement cost t : ℝ) (ht : t ≠ 
   unfold costEffectiveness
   exact mul_div_mul_left _ _ ht
 
+/-- **The rate recovers the improvement it was divided out of.** Unit invariance is shared by
+every ratio of the same degree -- twice this one satisfies it too -- so it does not pin the
+value. Multiplying the cost back does. -/
+theorem costEffectiveness_mul_cost (improvement cost : ℝ) (hc : cost ≠ 0) :
+    costEffectiveness improvement cost * cost = improvement := by
+  unfold costEffectiveness
+  field_simp
+
 /-- **Cross-multiplication:** with both costs positive, ordering the two
     `costEffectiveness` ratios is ordering the cross products.
 

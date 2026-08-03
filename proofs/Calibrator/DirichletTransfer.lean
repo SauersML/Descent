@@ -163,6 +163,22 @@ theorem delocalizedTransferVariance_strictAnti (v : ℝ) (hv : 0 < v) (k₁ k₂
   unfold delocalizedTransferVariance
   exact div_lt_div_of_pos_left hv h1 h2
 
+/-- **Averaging over the sites recovers the total.** Strict antitonicity in the site count is
+shared by every `c * v / k`; multiplying the count back fixes `c`. -/
+theorem delocalizedTransferVariance_mul_sites (v : ℝ) (k : ℕ) (hk : k ≠ 0) :
+    delocalizedTransferVariance v k * k = v := by
+  have hkr : (k : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr hk
+  unfold delocalizedTransferVariance
+  field_simp
+
+/-- **A localized scheme is a delocalized one that never averages.** The constancy theorem above
+holds for every body that ignores `k`, including a body carrying the wrong variance; this says
+which value it is constant at. -/
+theorem localizedTransferVariance_eq_delocalized_one (v : ℝ) (k : ℕ) :
+    localizedTransferVariance v k = delocalizedTransferVariance v 1 := by
+  unfold localizedTransferVariance delocalizedTransferVariance
+  norm_num
+
 /-! ### The two correction factors -/
 
 /-- The Gaussian finite-`n` inverse-Wishart inflation, `n/(n - m - 1)`. -/

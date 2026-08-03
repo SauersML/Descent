@@ -628,6 +628,13 @@ theorem informationPerUnitCost_scale_invariant (information cost t : ℝ) (ht : 
   unfold informationPerUnitCost
   exact mul_div_mul_left _ _ ht
 
+/-- **Spending the cost back recovers the information.** Scale invariance holds for every rate of
+the same degree and so leaves the constant free; this fixes it at one. -/
+theorem informationPerUnitCost_mul_cost (information cost : ℝ) (hc : cost ≠ 0) :
+    informationPerUnitCost information cost * cost = information := by
+  unfold informationPerUnitCost
+  field_simp
+
 /-- Total information attainable by spending a fixed budget on exchangeable units of one
 design. Fractional units represent the continuous design relaxation; an implemented study
 rounds sample counts and rechecks the inequality. -/
