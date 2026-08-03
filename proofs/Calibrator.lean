@@ -23,6 +23,7 @@ import Calibrator.AncestryCalibration
 import Calibrator.LDDecayTheory
 import Calibrator.SelectionArchitecture
 import Calibrator.DemographicHistory
+import Calibrator.SerialFounderChain
 import Calibrator.ClinicalUtilityFairness
 import Calibrator.VarianceComponents
 import Calibrator.ScoreDistribution

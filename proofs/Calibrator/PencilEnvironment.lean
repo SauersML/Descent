@@ -61,14 +61,16 @@ closed four-step paths gives
 
 `φ(abab) = 2·E[α²]·E[β²] + 4·(E α)²·(E β)²`,
 
-which is **strictly positive** whenever the entries are nondegenerate. `abab_ne_free` below
-is that refutation. No centering, truncation or reweighting rescues it; it fails for every
-independent bounded-bandwidth pair, and freeness can be restored only by letting the
-bandwidth diverge — a different model.
+which is **strictly positive** whenever the entries are nondegenerate.
+`tridiagonalABAB_pathExpression_pos` proves positivity of that expression. The separate
+finite-path enumeration identifying it with the mixed trace is validated computationally;
+it is not encoded by that Lean theorem. Thus the refutation applies to this positive i.i.d.
+tridiagonal model, not automatically to every bounded-bandwidth ensemble.
 
 Empirical status: the identity `κ = E[ldWhiteningGain]` is DERIVED and its constant case is
-VALIDATED upstream to `2e-16`. The path count is DERIVED. The trichotomy is ASSERTED from the
-external analysis and is not proved here.
+VALIDATED upstream to `2e-16`. The finite path count is tested by
+`validation/pencil/pencil_freeness.py`; Lean proves positivity of the resulting expression.
+The heavy-tail trichotomy is ASSERTED from the external analysis and is not proved here.
 -/
 
 section PencilEnvironment
@@ -86,9 +88,8 @@ theorem whiteningGain_ergodic_mean_eq_of_constant (decay : ℝ) (n : ℕ) (hn : 
 /-- **The summand is unbounded on the admissible range.**
 
     For every target `M` there is an admissible correlation whose whitening gain exceeds it.
-    So no bound on the environment's moments bounds the ergodic average: what decides
-    finiteness is how much mass the environment law puts near the boundary — a tail index,
-    not a moment list.
+    So ordinary low-order moment bounds do not bound the ergodic average: what decides
+    finiteness is how much mass the environment law puts near the boundary.
 
     This is the formal residue of the external analysis's `b > 1` criterion that is available
     without measure theory, and it is the same edge-sensitivity that makes `tr K⁻¹` a legal
@@ -129,7 +130,8 @@ theorem whiteningGain_unbounded (M : ℝ) :
 
     The hypotheses are exactly nondegeneracy of the two second moments — no assumption on the
     means beyond their being real, since their contribution is a square and can only help. -/
-theorem abab_ne_free (Eα Eβ Eα2 Eβ2 : ℝ) (hα2 : 0 < Eα2) (hβ2 : 0 < Eβ2) :
+theorem tridiagonalABAB_pathExpression_pos
+    (Eα Eβ Eα2 Eβ2 : ℝ) (hα2 : 0 < Eα2) (hβ2 : 0 < Eβ2) :
     0 < 2 * Eα2 * Eβ2 + 4 * Eα ^ 2 * Eβ ^ 2 := by
   have h1 : 0 < 2 * Eα2 * Eβ2 := mul_pos (mul_pos two_pos hα2) hβ2
   have h2 : 0 ≤ 4 * Eα ^ 2 * Eβ ^ 2 := by positivity
