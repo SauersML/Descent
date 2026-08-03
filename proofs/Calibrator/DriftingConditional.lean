@@ -1094,6 +1094,50 @@ theorem link_average_semigroup (L : ℝ → ℝ) (hmono : StrictMono L)
   exact link_average_two_scale L hmono x s t
 
 open MeasureTheory ProbabilityTheory in
+/-- **The general two-parameter invariance is the one-parameter scale family in disguise.**
+
+`a (x + σ z) + b = (a x + b) + (a σ) z`, so averaging the affinely reparametrised link at
+scale `σ` is averaging `L` itself at scale `a σ`, evaluated at the shifted point `a x + b`.
+
+The hypothesis of `link_rigidity` quantifies over `a`, `b` and `σ` separately; this says
+only the product `a σ` and the point `a x + b` matter.  The classification is therefore
+about the one-parameter family `s ↦ (average of L at scale s)` and not about a
+three-parameter family. -/
+theorem link_average_reduce (L : ℝ → ℝ) (a b σ x : ℝ) :
+    ∫ z, L (a * (x + σ * z) + b) ∂(gaussianReal 0 1)
+      = ∫ z, L ((a * x + b) + (a * σ) * z) ∂(gaussianReal 0 1) := by
+  have harg : ∀ z : ℝ, a * (x + σ * z) + b = (a * x + b) + (a * σ) * z := fun z ↦ by ring
+  simp_rw [harg]
+
+open MeasureTheory ProbabilityTheory in
+/-- **The composition law for the scale family.**
+
+If averaging at scale `t` returns `L` reparametrised by `(αt, βt)`, then averaging at scale
+`s` *after* that is averaging `L` once at scale `√(s² + t²)`:
+
+`(average at scale αt·s)(αt·x + βt) = (average at scale √(s²+t²))(x)`.
+
+This is the classification's governing equation, and it is now a statement about one real
+parameter.  For the probit, `αt = 1/√(1+t²)` and `βt = 0`, and the law reads
+`α(αt·s) · αt = α(√(s²+t²))`, which is `1/√(1+s²+t²)` on both sides.
+
+What remains of `link_rigidity` is to solve this for the scale family and recover `L`. -/
+theorem link_scale_composition (L : ℝ → ℝ) (hmono : StrictMono L)
+    (hbdd : ∀ u, 0 < L u ∧ L u < 1) {t αt βt : ℝ}
+    (ht : ∀ y, ∫ z, L (y + t * z) ∂(gaussianReal 0 1) = L (αt * y + βt)) (s x : ℝ) :
+    ∫ z, L ((αt * x + βt) + (αt * s) * z) ∂(gaussianReal 0 1)
+      = ∫ w, L (x + Real.sqrt (s ^ 2 + t ^ 2) * w) ∂(gaussianReal 0 1) := by
+  rw [← link_average_semigroup L hmono hbdd x s t]
+  refine integral_congr_ae (Filter.Eventually.of_forall fun z₁ ↦ ?_)
+  -- `show` forces the beta reduction that `rw` needs; without it both sides are
+  -- unreduced applications and the pattern does not match.
+  show L (αt * x + βt + αt * s * z₁)
+      = ∫ z₂, L (x + s * z₁ + t * z₂) ∂(gaussianReal 0 1)
+  rw [ht (x + s * z₁)]
+  congr 1
+  ring
+
+open MeasureTheory ProbabilityTheory in
 /-- **The link is continuous — derived from the invariance, not assumed.**
 
 `link_rigidity` assumes only that `L` is strictly monotone and bounded.  A monotone
