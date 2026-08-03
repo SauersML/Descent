@@ -33,7 +33,7 @@ Hence: the minimal latent dimension is `1` for every non-constant family; it is
 factorizations form a continuum of inequivalent solutions; and the exceptional set for
 uniqueness is everything.
 
-## WHAT IS AND IS NOT IN LEAN HERE, BECAUSE THE TWO WERE READING AS ONE
+## Scope: what Lean checks here
 
 The paragraph above states the collapse theorem. **This file does not prove it, and does
 not state it in Lean at all.** What is proved here is the algebra of the construction's
@@ -50,12 +50,11 @@ statement, and the statement needs the definitions this file does not have. Writ
 gap, because the resulting theorem would be false or vacuous depending on how the
 predicate were instantiated.
 
-Consequently `minimalDim_eq_one_of_collapse` below is a CONDITIONAL, and it is order
-theory rather than geometry: given a minimal-dimension function, given that the minimum
-is attained and least, and given the collapse, the minimum is `1` on non-constant
-families. Its `hcollapse` argument is the collapse theorem, and nothing in this corpus
-discharges it. The name says so. Do not read the module title as something Lean has
-checked.
+What Lean carries for the identifiability consequence is the finite case:
+`mechanismCount_not_identified` shows one observed family reproduced exactly by three
+mechanisms and exactly by two, so the count is not a function of the data. That is
+unconditional, and no conditional standing in for the general statement appears anywhere
+in this file.
 
 The guard clause that was supposed to prevent this — "Borel encodings that collapse
 every latent space to one dimension are forbidden by the smooth category" — fails for a
@@ -267,31 +266,63 @@ theorem head_piece_pos (ε δ₀ g gTail : ℝ)
   nlinarith [hmargin, hεsmall, hδ, hε, hε1]
 
 /-!
-## 4. The collapse consequence, conditional on the collapse
+## 4. The mechanism count is not identified
+
+The general collapse theorem quantifies over smooth families on compact manifolds and
+needs kernels and mixing measures as formal objects. Mathlib has no mechanism-mixture
+theory to import, so that statement is a formalization project rather than a missing
+`import`, and it lives in the module docstring as prose.
+
+The finite case needs none of that and carries the operative moral on its own.
+`mechanismCount_not_identified` exhibits one observed family of three contexts reproduced
+EXACTLY by three mechanisms and EXACTLY by two, with every weight a genuine mixing weight
+in both. The count is therefore not a function of the data — which is what "the number of
+pathways is a modelling choice, not an estimate" means at the scale a study works at.
 -/
 
-/-- **Conditional on the collapse, minimal latent dimension is not an observable.** If
-every non-constant family in the class admits a factorization of latent dimension one,
-then the minimum is the constant function `1` on non-constant families: it separates no
-two families, so it cannot be a nontrivial invariant of the observed kernels.
+/-- Mixing two mechanisms at outcome-probabilities `2/10` and `9/10` with weight `w` on the
+first. On a two-outcome space a kernel is one number, so this is the whole mixture. -/
+noncomputable def twoMechanismMixture (w : ℝ) : ℝ := w * (2 / 10) + (1 - w) * (9 / 10)
 
-    `hcollapse` IS the collapse theorem. It is not proved anywhere in this corpus, and
-    this theorem is order theory conditional on it -- a least element of a set that
-    contains `1` and omits `0` is `1`. The biology is entirely in the antecedent. -/
-theorem minimalDim_eq_one_of_collapse
-    {Family : Type*} (admitsDim : Family → ℕ → Prop) (minimalDim : Family → ℕ)
-    (isConstantFamily : Family → Prop)
-    (hminimal : ∀ F : Family, admitsDim F (minimalDim F))
-    (hleast : ∀ (F : Family) (r : ℕ), admitsDim F r → minimalDim F ≤ r)
-    (hcollapse : ∀ F : Family, admitsDim F 1)
-    (hnonzero : ∀ F : Family, ¬ isConstantFamily F → ¬ admitsDim F 0) :
-    ∀ F : Family, ¬ isConstantFamily F → minimalDim F = 1 := by
-  intro F hF
-  have hle : minimalDim F ≤ 1 := hleast F 1 (hcollapse F)
-  have hne : minimalDim F ≠ 0 := by
-    intro h0
-    exact hnonzero F hF (h0 ▸ hminimal F)
-  omega
+/-- Mixing three mechanisms at `2/10`, `5/10` and `9/10` with weights `u`, `v` and the
+remainder. -/
+noncomputable def threeMechanismMixture (u v : ℝ) : ℝ :=
+  u * (2 / 10) + v * (5 / 10) + (1 - u - v) * (9 / 10)
+
+/-- **The number of mechanisms is not identified, unconditionally.**
+
+    One observed family of three contexts, with outcome probabilities `35/100`, `50/100`
+    and `70/100`. It is reproduced exactly by a three-mechanism model — each context using
+    all three mechanisms with strictly positive weight — and exactly by a two-mechanism
+    model, with every weight in `[0,1]` in both.
+
+    So two models differing in mechanism count fit the same data with zero residual. No
+    estimator can prefer one, because they are not distinguishable by the observations at
+    all. This is the finite, fully proved shadow of the collapse theorem stated in the
+    module docstring: the general statement is an open gap, this instance is not.
+
+    Empirical status: DERIVED. The arithmetic is exact and the witnesses are displayed. -/
+theorem mechanismCount_not_identified :
+    (threeMechanismMixture (7 / 10) (3 / 20) = 35 / 100 ∧
+      threeMechanismMixture (2 / 5) (3 / 10) = 50 / 100 ∧
+      threeMechanismMixture (1 / 5) (3 / 20) = 70 / 100) ∧
+    (twoMechanismMixture (11 / 14) = 35 / 100 ∧
+      twoMechanismMixture (4 / 7) = 50 / 100 ∧
+      twoMechanismMixture (2 / 7) = 70 / 100) := by
+  constructor <;> refine ⟨?_, ?_, ?_⟩ <;>
+    simp [threeMechanismMixture, twoMechanismMixture] <;> norm_num
+
+/-- Every weight used in `mechanismCount_not_identified` is a genuine mixing weight: in
+    `[0,1]`, and in the three-mechanism model the third weight `1 - u - v` is positive too,
+    so all three mechanisms are actually in use. -/
+theorem mechanismCount_witnesses_are_weights :
+    (0 : ℝ) < 7 / 10 ∧ (0 : ℝ) < 3 / 20 ∧ (0 : ℝ) < 1 - 7 / 10 - 3 / 20 ∧
+      (0 : ℝ) < 2 / 5 ∧ (0 : ℝ) < 3 / 10 ∧ (0 : ℝ) < 1 - 2 / 5 - 3 / 10 ∧
+      (0 : ℝ) < 1 / 5 ∧ (0 : ℝ) < 1 - 1 / 5 - 3 / 20 ∧
+      (0 : ℝ) ≤ 11 / 14 ∧ (11 : ℝ) / 14 ≤ 1 ∧
+      (0 : ℝ) ≤ 4 / 7 ∧ (4 : ℝ) / 7 ≤ 1 ∧
+      (0 : ℝ) ≤ 2 / 7 ∧ (2 : ℝ) / 7 ≤ 1 := by
+  norm_num
 
 /-- **Uniqueness fails everywhere.** Two factorizations of the same family whose
 profile sets differ as subsets of density space cannot be related by a
