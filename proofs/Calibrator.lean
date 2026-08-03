@@ -84,10 +84,19 @@ import Calibrator.Permeability
 -- make the root build green -- that restores the blindness rather than fixing the break.
 --
 -- Check for new orphans with the closure of this file's imports against the files on
--- disk; the count is 104 modules including this root, all 104 in its closure.
+-- disk; the count is 105 modules including this root, all 105 in its closure.
+--
+-- A caution about HOW to run that check, learned by getting it wrong here: comparing the
+-- files on disk against the imports named IN THIS FILE reports false orphans, because most
+-- modules are reached TRANSITIVELY. `BundleRigidity.CoverageInvariance`, `.EntropySplit`,
+-- `.Freshness` and `.Realizability` are named nowhere in this file and are all in the
+-- closure anyway, via `FoldedSpectrum -> ConditionalGain`. Only a genuine transitive
+-- closure distinguishes an orphan from a module someone else already imports;
+-- `DeploymentCeiling`, added above, was the only real one.
 import Calibrator.ResonanceSpectrum
 import Calibrator.BundleRigidity.Coverage
 import Calibrator.BundleRigidity.Cycles
+import Calibrator.BundleRigidity.DeploymentCeiling
 import Calibrator.BundleRigidity.Dichotomy
 import Calibrator.BundleRigidity.Operator
 import Calibrator.BundleRigidity.SingleModulus

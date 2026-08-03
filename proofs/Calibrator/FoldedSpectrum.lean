@@ -1917,7 +1917,35 @@ structure AssumedDeploymentCeiling where
   characterization : perpRisk = 0 ↔ (0 < eta ∧ (reversible ∨ arrowBit))
 
 /-- Under the structure's boxed-characterization premise, scalar reversibility reduces the
-zero-ceiling criterion to positivity of the support floor. -/
+zero-ceiling criterion to positivity of the support floor.
+
+**QUOTE THIS ONLY WITH ITS COST QUALIFIER.** The reading "aggregate deployment risk has no
+information-theoretic floor, so the portability gap is a sample-size problem, not a wall" is
+what this theorem says and is correct. It must travel with:
+
+> the sample size is **exponential in the coupling order** a direction requires; only the
+> order-one case is the quadratic `1/η²` formula.
+
+The only guarantee positive support supplies is `σ_min ≥ (η/C)^k`, which decays
+geometrically in the coupling order `k`, so resolving a direction of order `k` costs about
+`(C/η)^{2k}` samples. `Calibrator.BundleRigidity.sampleCost_unbounded` proves this exceeds
+every bound as `k` grows; `sampleCost_one` is the order-one case. So `requiredCohorts` and
+`m ≥ d/(2 c₋ η² R)` above are the **fixed-order specialisation**, and understate a
+high-order direction by an exponential factor. A direction with large coupling order is a
+wall in practice while remaining a sample-size problem in theory.
+
+**OUT OF SCOPE: directions unidentifiable at every order.** If an environmental gradient is
+collinear with the ancestry gradient, a one-parameter family of genetic/environmental splits
+produces *identical* cohort shifts — exactly equal, not approximately — so no cohort-level
+calibration separates them at any sample size, and the level-set collapse carries that to
+every threshold metric. That is an orthogonal wall. This theorem bounds how expensive a
+*visible* direction is; it says nothing about one that a design confined to a single
+ancestry axis cannot see at all, and `r⊥ = 0 ⟺ η > 0` must not be read as covering it.
+
+**On the premise itself:** the forward conjunct `η > 0 ⟹ perpRisk = 0` is no longer only
+assumed — it is derived in `Calibrator.BundleRigidity.DeploymentModel.perpRisk_eq_zero_of_eta_pos`
+from coverage invariance, for models where `perpRisk` and `eta` carry definitions rather
+than being free reals. The converse still rests on the modulus-copy witness at `η = 0`. -/
 theorem assumedCeiling_collapses_to_support_wall
     (C : AssumedDeploymentCeiling) (hrev : C.reversible) :
     C.perpRisk = 0 ↔ 0 < C.eta := by

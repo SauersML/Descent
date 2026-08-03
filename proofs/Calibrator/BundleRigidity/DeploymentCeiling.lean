@@ -154,7 +154,29 @@ falsifier exhibits at `η = 0`.
 
 The `reversible ∨ arrowBit` conjunct of the original does not appear: the reversal
 calculation already discharges it, so in the scalar stationary setting the characterization
-is exactly this biconditional. -/
+is exactly this biconditional.
+
+**QUOTE THIS ONLY WITH ITS COST QUALIFIER.** The reading "aggregate deployment risk has no
+information-theoretic floor, so the portability gap is a sample-size problem, not a wall"
+is correct and is what this theorem says. It must travel with:
+
+> the sample size is **exponential in the coupling order** a direction requires
+> (`sampleCost_unbounded`); only the order-one case is the quadratic `1/η²` formula
+> (`sampleCost_one`).
+
+A direction with large coupling order is a wall in practice while remaining a sample-size
+problem in theory. The published `m ≥ d/(2 c₋ η² R)` is the fixed-order specialisation and
+understates a high-order direction by an exponential factor.
+
+**AND NOTE WHAT IS OUT OF SCOPE.** This says nothing about directions that are not
+identifiable at *any* order. If an environmental gradient is collinear with the ancestry
+gradient, a one-parameter family of genetic/environmental splits produces **identical**
+cohort shifts — exactly equal, not approximately — so no cohort-level calibration separates
+them at any sample size, and the level-set collapse carries that to every threshold metric.
+That is a second and orthogonal kind of wall: this theorem is about how *expensive* a
+visible direction is to resolve, and says nothing about a direction a design confined to one
+ancestry axis cannot resolve at all. `η > 0` does not cover it, and `r⊥ = 0 ⟺ η > 0` must
+not be read as covering it. -/
 theorem characterization_of_model (η C : ℝ) (hηnonneg : 0 ≤ η) (hC : 0 < C)
     (hdetect : ∀ k : ℕ, 0 < (η / C) ^ k → M.blind k = 0)
     (hzero : η = 0 → 0 < M.perpRisk) :
@@ -212,6 +234,8 @@ theorem sampleCost_unbounded (η C : ℝ) (hη : 0 < η) (hlt : η < C) (B : ℝ
 regime the published formula describes, and stating it beside `sampleCost_unbounded` is the
 point — the two together say exactly which claim is safe to quote. -/
 theorem sampleCost_one (η C : ℝ) : sampleCost η C 1 = (C / η) ^ 2 := by
-  rw [sampleCost]; norm_num
+  first
+    | (rw [sampleCost]; norm_num)
+    | rw [sampleCost]
 
 end Calibrator.BundleRigidity
