@@ -1330,13 +1330,15 @@ def main(argv=None):
     print("=" * 78)
     print("SUMMARY")
     print("=" * 78)
-    for tag, v in (("C1 permeability constant", r1), ("C2 the wall", r2),
-                   ("C3 sealing law exponent", r3), ("C4 additivity", r4),
-                   ("C5 count and order", r5),
-                   ("C6 correlated-probe value", r6)):
+    checks = (("C1 permeability constant", r1), ("C2 the wall", r2),
+              ("C3 sealing law exponent", r3), ("C4 additivity", r4),
+              ("C5 count and order", r5), ("C6 correlated-probe value", r6))
+    for tag, v in checks:
         print("  %-30s %s" % (tag, v))
     ok = bool(r1 and r2 and r3 and r4 and r5 and r6)
+    failed = [tag for tag, v in checks if not v]
     out["READ_THE_TEST"] = ok
+    out["failed_checks"] = failed
     out["runtime_sec"] = time.time() - t0
     print("  READ_THE_TEST: %s" % ok)
     print("  runtime %.1f s" % (time.time() - t0))
@@ -1344,6 +1346,27 @@ def main(argv=None):
     json.dump(out, fh, indent=1)
     fh.close()
     print("-> %s" % args.output)
+    if not ok:
+        # A harness that runs twenty scripts and collects stderr saw this one
+        # exit 1 with stderr completely empty, and read that as a crash. It was
+        # not a crash: exit 1 here means a CHECK FAILED, and the whole report
+        # went to stdout. So say on stderr which checks failed and that the
+        # results file was still written -- a nonzero exit whose only
+        # explanation is on a stream the caller is not reading is a result
+        # nobody will find.
+        sys.stderr.write(
+            "fam_permeability: %d of %d checks FAILED under profile '%s': %s\n"
+            % (len(failed), len(checks), args.profile, ", ".join(failed)))
+        sys.stderr.write(
+            "fam_permeability: this is a measurement, not a crash. The full "
+            "report is on stdout and the results file was written to %s\n"
+            % args.output)
+        if args.profile == "quick":
+            sys.stderr.write(
+                "fam_permeability: profile 'quick' is the bounded development "
+                "run and its ensemble counts are too small for the C1 and C3 "
+                "tolerances to be meaningful. Use --profile full before "
+                "reading a failure here as a finding.\n")
     return 0 if ok else 1
 
 
