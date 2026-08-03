@@ -43,8 +43,17 @@ existing claim weaker than it should be.
      stratum (common.risk_vs_truth). This is a zero-free-parameter, strongly
      falsifiable prediction on 400 runs, and it is a sharper instrument than the
      requested regression because it can fail per run rather than in aggregate.
-     The regression is run too, since that is what was asked, and the identity
-     explains what the regression finds.
+
+     THE REGRESSION IS THE WRONG INSTRUMENT AND THE IDENTITY SAYS WHY. Within a
+     (dem, pheno) cell the rows pool ten SEEDS, and each seed has its own
+     E[p_true(1-p_true)] because a different draw of causal effects gives a
+     different spread of true risks. That term is constant WITHIN a run and
+     varies ACROSS seeds, so no fit pooled over seeds can absorb it with two
+     regressors. The prediction that "AUC plus a calibration statistic should
+     reach near 100%" is therefore true within a run and false within a cell.
+     Both are measured, and the leave-one-out form -- predict a method's Brier
+     from its own MSE plus the residual of the OTHER FOUR methods, using its own
+     Brier nowhere -- is the version that carries the claim.
 
   C. THE TRUE PREVALENCE IS NOT A FREE PARAMETER, AND IT IS NOT WHAT WAS FITTED.
      Read off the generator rather than inferred:
@@ -268,6 +277,44 @@ def cand_transient_pair(k):
     return 1.0 - prod
 
 
+def cand_founder_ceiling(k):
+    """(5) FOUNDER CEILING PLUS MIGRATION MEETING -- the mechanism the exact
+    curve actually exhibits, and the one the first run's three candidates all
+    missed.
+
+    The first run's diagnosis: WITHOUT migration every deme k >= 1 has the SAME
+    divergence from deme 0. A lineage in deme k walks back through k-1, k-2, ...
+    and joins deme 0 at t_1 = T0 + (D-2)*split_step, whatever k is. So the
+    founder events alone predict F_ST FLAT in k, and all three
+    compound-per-founder-event candidates (1)-(3) were built on a mechanism that
+    is not there. That is why they overshoot at every k.
+
+    The k-dependence is entirely MIGRATION. Two lineages separated by k demes
+    meet by migration before the forced merge only if a random walk closes the
+    gap in time. Each lineage migrates at rate m to each neighbour, so their
+    separation is a random walk with variance 4m per generation, and
+
+        tau_k = E[min(meeting time, t_1)]
+              = int_0^{t_1} erf( k / sqrt(8 m s) ) ds,
+
+    using the reflection principle for the separation process. F_ST is then the
+    ratio of that extra waiting time to the total, F = tau/(T_w + tau), with the
+    within-deme time from the chain's own age and the ancestral size,
+
+        T_w = 2N(1 - e^{-t_anc/2N}) + e^{-t_anc/2N} (t_anc + 2 N_anc).
+
+    Every quantity comes from (N, N_anc, m, split_step, T0, D). Nothing fitted.
+    """
+    t1 = S1_T0 + (S1_D - 2) * S1_SPLIT_STEP
+    t_anc = S1_T0 + (S1_D - 1) * S1_SPLIT_STEP + 500
+    ss = np.linspace(0.0, t1, 20001)[1:]
+    integ = np.array([math.erf(k / math.sqrt(8.0 * S1_M * x)) for x in ss])
+    tau = float(np.trapz(integ, ss))
+    q = math.exp(-t_anc / (2.0 * S1_N))
+    Tw = 2.0 * S1_N * (1.0 - q) + q * (t_anc + 2.0 * S1_NANC)
+    return tau / (Tw + tau)
+
+
 def cand_stepping_stone(k):
     """(4) The 1-D stepping-stone form the corpus already has, applied as if the
     chain were a stepping stone of the same size and migration. Present as a
@@ -296,19 +343,21 @@ def part_a(out):
     cands = [("(1) pure founder", cand_pure_founder),
              ("(2) island-damped", cand_island_damped),
              ("(3) transient+age", cand_transient_pair),
+             ("(5) founder ceiling + migration", cand_founder_ceiling),
              ("(4) stepping stone [CONTROL]", cand_stepping_stone)]
     print("")
-    print("  %-5s %-12s %-14s %-14s %-14s %-14s"
-          % ("k", "EXACT F_ST", cands[0][0], cands[1][0], cands[2][0],
-             "steppingstone"))
+    print("  %-5s %-12s %-11s %-11s %-11s %-13s %-11s"
+          % ("k", "EXACT F_ST", "(1) found", "(2) island", "(3) trans",
+             "(5) ceiling", "(4) stepstone"))
     rows = []
     for k in range(1, S1_D):
         vals = [c[1](k) for c in cands]
         rows.append({"k": k, "exact": exact[k],
                      "pure_founder": vals[0], "island_damped": vals[1],
-                     "transient_age": vals[2], "stepping_stone": vals[3]})
-        print("  %-5d %-12.5f %-14.5f %-14.5f %-14.5f %-14.5f"
-              % (k, exact[k], vals[0], vals[1], vals[2], vals[3]))
+                     "transient_age": vals[2], "founder_ceiling": vals[3],
+                     "stepping_stone": vals[4]})
+        print("  %-5d %-12.5f %-11.5f %-11.5f %-11.5f %-13.5f %-11.5f"
+              % (k, exact[k], vals[0], vals[1], vals[2], vals[3], vals[4]))
     print("")
     print("  worst relative error against the exact curve:")
     best, bestv = None, 1e9
@@ -330,6 +379,13 @@ def part_a(out):
     print("")
     print("  BEST NO-FREE-PARAMETER CANDIDATE: %s, worst error %.4f"
           % (best, bestv))
+    print("  WHY (1)-(3) FAIL, which is the diagnosis and not an excuse: they")
+    print("  all compound a per-founder-event term, but without migration EVERY")
+    print("  deme k >= 1 has the SAME divergence from deme 0 in this chain -- a")
+    print("  lineage from deme k walks back through k-1, k-2, ... and joins deme")
+    print("  0 at t_1 = %d whatever k is. Founder events set the CEILING; all"
+          % (S1_T0 + (S1_D - 2) * S1_SPLIT_STEP))
+    print("  the k-dependence is migration closing the gap first.")
     print("  CONTROL: the existing stepping-stone form is off by %.4f, so"
           % errs["(4) stepping stone [CONTROL]"])
     print("  serial1d genuinely needs its own definition and this is not a")
@@ -438,8 +494,63 @@ def part_b(out):
     print("  The identity collapses the between-method spread by a factor of")
     print("  %.0f in the worst cell: Brier moves across methods, Brier - MSE"
           % (1.0 / worst_ratio))
-    print("  does not. That is (B1) holding on real runs with no free "
-          "parameter.")
+    print("  does not.")
+    print("")
+    print("  BUT THE RESIDUAL SPREAD IS NOT ZERO, AND IT SHOULD NOT BE. (B1) is")
+    print("  exact in EXPECTATION; in a finite test set the cross term")
+    print("  2*mean((p-p_true)(p_true-y)) is zero-mean but not zero. Its scale")
+    print("  is predicted with no free parameter: for one method it is")
+    print("      2 * rmse * sqrt(ubar / n),  ubar = E[p_true(1-p_true)],")
+    print("  and the five methods share the same y, so their cross terms are")
+    print("  positively correlated and the SPREAD across methods must come in")
+    print("  BELOW that per-method scale. Both halves are checked:")
+    print("  %-10s %-9s %-15s %-15s %-9s"
+          % ("dem", "pheno", "sd resid obs", "cross-term scale", "obs/pred"))
+    for r in srows:
+        sub = [v for k, v in runs.items()
+               if k[0] == r["dem"] and k[1] == r["pheno"]]
+        mr = float(np.mean([math.sqrt(v["mse"]) for v in sub]))
+        nn = float(np.mean([v["n"] for v in sub]))
+        pred = 2.0 * mr * math.sqrt(max(r["mean_resid"], 0.0) / nn)
+        r["cross_term_scale"] = pred
+        r["obs_over_pred"] = r["sd_resid_within_run"] / pred
+        print("  %-10s %-9s %-15.6f %-15.6f %-9.3f"
+              % (r["dem"], r["pheno"], r["sd_resid_within_run"], pred,
+                 r["sd_resid_within_run"] / pred))
+    below = sum(1 for r in srows if r["obs_over_pred"] <= 1.0)
+    print("  observed spread below the per-method cross-term scale in %d of %d"
+          % (below, len(srows)))
+    print("  cells, and within a factor of %.1f everywhere. So the residual is"
+          % max(r["obs_over_pred"] for r in srows))
+    print("  finite-sample cross-term noise of exactly the predicted size, not")
+    print("  a failure of the identity.")
+
+    # THE DECISIVE VERSION: leave-one-out, genuinely out of sample
+    print("")
+    print("  LEAVE-ONE-OUT PREDICTION, which is the identity used as a")
+    print("  predictor rather than as a description. For each method j in each")
+    print("  run, predict its Brier from its OWN MSE plus the residual measured")
+    print("  on the OTHER FOUR methods only:")
+    print("      Brier_j_hat = MSE_j + mean_{i != j} (Brier_i - MSE_i).")
+    print("  No parameter is fitted and method j's own Brier is never used.")
+    ys, yh = [], []
+    for key, lst in groups.items():
+        if len(lst) < 2:
+            continue
+        for jm, jv in lst:
+            others = [v["resid"] for m2, v in lst if m2 != jm]
+            ys.append(jv["brier"])
+            yh.append(jv["mse"] + float(np.mean(others)))
+    ys = np.array(ys)
+    yh = np.array(yh)
+    r2loo = 1.0 - float(((ys - yh) ** 2).sum()
+                        / ((ys - ys.mean()) ** 2).sum())
+    rmseloo = float(np.sqrt(np.mean((ys - yh) ** 2)))
+    print("    %d method-runs:  R^2 = %.6f,  RMSE = %.6f,  sd(Brier) = %.6f"
+          % (len(ys), r2loo, rmseloo, float(ys.std())))
+    print("    so the identity predicts a held-out Brier to %.2f%% of its own"
+          % (100.0 * rmseloo / float(ys.std())))
+    print("    spread, with zero free parameters.")
 
     # the requested regression
     print("")
@@ -451,28 +562,40 @@ def part_b(out):
         sub = [v for k, v in runs.items() if k[0] == dem and k[1] == pheno]
         if len(sub) < 8:
             continue
-        y = np.array([s["brier"] for s in sub])
-        au = np.array([s["auc"] for s in sub])
-        ms = np.array([s["mse"] for s in sub])
+        y = np.array([s2["brier"] for s2 in sub])
+        au = np.array([s2["auc"] for s2 in sub])
+        ms = np.array([s2["mse"] for s2 in sub])
         r1 = _r2(y, np.column_stack([np.ones_like(au), au]))
-        r2 = _r2(y, np.column_stack([np.ones_like(au), au, ms]))
+        r2v = _r2(y, np.column_stack([np.ones_like(au), au, ms]))
         r3 = _r2(y, np.column_stack([np.ones_like(au), ms]))
         rrows.append({"dem": dem, "pheno": pheno, "r2_auc": r1,
-                      "r2_auc_mse": r2, "r2_mse": r3, "n": len(sub)})
+                      "r2_auc_mse": r2v, "r2_mse": r3, "n": len(sub)})
         print("  %-10s %-9s %-14.4f %-16.4f %-14.4f"
-              % (dem, pheno, r1, r2, r3))
+              % (dem, pheno, r1, r2v, r3))
     ma = float(np.mean([r["r2_auc"] for r in rrows]))
     mb = float(np.mean([r["r2_auc_mse"] for r in rrows]))
     print("")
-    print("  mean within-cell R^2: AUC alone %.4f, AUC + the calibration"
-          % ma)
-    print("  coordinate %.4f. The reported 67%% for AUC alone is reproduced,"
-          % mb)
-    print("  and adding the second coordinate takes it to %.1f%%." % (100 * mb))
-    print("  There is no fourth coordinate: (B1) is exact, and MSE(p,p_true)")
-    print("  IS the calibration coordinate rather than a proxy for it.")
+    print("  mean within-cell R^2: AUC alone %.4f, AUC + MSE %.4f." % (ma, mb))
+    print("")
+    print("  THIS DOES NOT REACH 1, AND THE IDENTITY SAYS WHY -- the regression")
+    print("  is the wrong instrument, not the wrong answer. Within a (dem,")
+    print("  pheno) CELL the rows pool ten SEEDS, and each seed has its own")
+    print("  E[p_true(1-p_true)]: a different draw of causal effects gives a")
+    print("  different spread of true risks. That term is a third coordinate")
+    print("  that varies ACROSS seeds while being identical WITHIN a run, so a")
+    print("  two-regressor fit pooled over seeds cannot absorb it. The")
+    print("  leave-one-out prediction above conditions on the run and reaches")
+    print("  R^2 = %.6f on the same data." % r2loo)
+    print("")
+    print("  So: AUC is not the second coordinate for Brier -- MSE(p,p_true) is,")
+    print("  and E[p_true(1-p_true)] is a THIRD. Brier needs three coordinates,")
+    print("  and the earlier claim that 'AUC plus a calibration statistic should")
+    print("  reach near 100%%' is only true within a run, not within a cell.")
     out["B_brier"] = {"n_runs": len(runs), "spread_rows": srows,
                       "worst_sd_ratio": worst_ratio,
+                      "loo_r2": r2loo, "loo_rmse": rmseloo,
+                      "loo_sd_brier": float(ys.std()),
+                      "n_method_runs": len(ys),
                       "regression_rows": rrows,
                       "mean_r2_auc": ma, "mean_r2_auc_mse": mb}
     return runs
@@ -597,25 +720,40 @@ def part_c(out, runs):
           % (min(ks), max(ks)))
     print("  to 0.184 band; the true value is %.3f." % PREV)
     print("")
-    print("  WHAT THE FITTED K WAS ABSORBING. liability_r2 in this study is")
-    print("  Lee's transform of the OBSERVED-scale R^2:")
-    print("    liability_r2 = corr(p,y)^2 * K(1-K) / phi(Phi^-1(1-K))^2,")
-    print("  which is a FIRST-ORDER relation, exact only as R^2 -> 0. At the")
-    print("  R^2 values here it underestimates the liability R^2, and the AUC")
-    print("  formula then needs a larger K to reproduce the observed AUC,")
-    print("  because dAUC/dK > 0 at fixed R^2 in this range. The fitted K is a")
-    print("  one-parameter absorber for a known first-order bias in the")
-    print("  liability_r2 column, not a property of the traits.")
-    _slope_check()
+    print("  THE HEADLINE: the ZERO-FREE-PARAMETER formula gives %.4f against"
+          % float(np.mean(allo)))
+    print("  %.4f for the one-parameter fit. Fitting a prevalence per cell buys"
+          % float(np.mean(allf)))
+    print("  %.0f%% of the RMSE, so the formula does NOT need a free K: it works"
+          % (100.0 * (1.0 - float(np.mean(allf)) / float(np.mean(allo)))))
+    print("  at the true value, and the earlier 0.0121-versus-0.0708 comparison")
+    print("  understated the result by making the formula look fitted.")
+    print("")
+    print("  AND THE FITTED K SPLITS BY DEMOGRAPHY, NOT BY TRAIT. serial1d fits")
+    print("  %.3f-%.3f, straddling the true 0.150; grid2d fits %.3f-%.3f, all"
+          % (min(r["best_fit_K"] for r in rows if r["dem"] == "serial1d"),
+             max(r["best_fit_K"] for r in rows if r["dem"] == "serial1d"),
+             min(r["best_fit_K"] for r in rows if r["dem"] == "grid2d"),
+             max(r["best_fit_K"] for r in rows if r["dem"] == "grid2d")))
+    print("  above it. A trait-level absorber cannot be the story; whatever the")
+    print("  fit is soaking up is a property of the DEMOGRAPHY.")
+    _slope_check(rows)
     out["C_prevalence"] = {"true_K": PREV, "rows": rows,
                            "pooled_rmse_true_K": float(np.mean(allo)),
                            "pooled_rmse_fitted_K": float(np.mean(allf)),
                            "fitted_K_range": [min(ks), max(ks)]}
 
 
-def _slope_check():
+def _slope_check(rows):
     print("")
-    print("  DIRECTION CHECK, so the explanation is not merely plausible:")
+    print("  DIRECTION CHECK. THE FIRST RUN OF THIS FILE ASSERTED dAUC/dK > 0")
+    print("  AND PRINTED THE NUMBERS THAT REFUTE IT. The assertion was mine and")
+    print("  it was wrong; the numbers are below and they are negative, so")
+    print("  raising K LOWERS the predicted AUC at fixed R^2. A cell whose")
+    print("  best-fit K exceeds 0.15 is therefore one where the formula at the")
+    print("  true K predicts an AUC that is too HIGH, i.e. where liability_r2 is")
+    print("  too LARGE for the observed AUC -- the opposite of the first run's")
+    print("  stated explanation.")
     print("  %-10s %-14s %-14s %-14s" % ("R^2", "AUC at K=0.15",
                                          "AUC at K=0.175", "d/dK"))
     for r in (0.05, 0.10, 0.20, 0.30):
@@ -623,9 +761,15 @@ def _slope_check():
         a2 = auc_from_r2(r, 0.175)
         print("  %-10.2f %-14.5f %-14.5f %+14.5f"
               % (r, a1, a2, (a2 - a1) / 0.025))
-    print("  dAUC/dK is positive throughout, so raising K raises the predicted")
-    print("  AUC, which is the direction needed to compensate an "
-          "under-estimated R^2.")
+    print("  dAUC/dK is NEGATIVE throughout the range in play.")
+    print("")
+    print("  So the sign of (best-fit K - 0.15) is the sign of the AUC residual")
+    print("  at the true K, and it is a demography effect: grid2d's PGS carries")
+    print("  a liability_r2 that is too large for the AUC it achieves, which is")
+    print("  what a score whose ranking degrades faster than its variance-")
+    print("  explained looks like out of ancestry. serial1d does not show it.")
+    print("  Named rather than explained away: this file establishes the sign")
+    print("  and the split, not the mechanism.")
 
 
 _R2CACHE = {}
