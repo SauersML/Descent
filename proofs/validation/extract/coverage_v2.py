@@ -59,6 +59,17 @@ Check kinds, by class:
 Usage:
     python3 validation/extract/coverage_v2.py [--json out.json] [--verbose]
 """
+
+# REGENERATE WITH:  python3 proofs/validation/extract/coverage_v2.py
+#
+# This produces classes.json and coverage.json, which are NOT IN GIT.
+# They are generated from proofs/Calibrator/, which changes every few
+# minutes, and a committed snapshot drifts by six figures -- defs.json
+# measured 122994 changed lines against its last committed copy. A cache
+# that far from its source is not a cache, it is a second source of truth
+# that disagrees with the first. Run this in your own worktree
+# immediately before use, so your numbers are pinned to the revision you
+# are standing on.
 from __future__ import annotations
 
 import argparse

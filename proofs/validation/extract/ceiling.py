@@ -16,6 +16,17 @@ blockers are load-bearing for the most dependents.
 
     python3 validation/extract/ceiling.py
 """
+
+# REGENERATE WITH:  python3 proofs/validation/extract/ceiling.py
+#
+# This produces ceiling.json, which are NOT IN GIT.
+# They are generated from proofs/Calibrator/, which changes every few
+# minutes, and a committed snapshot drifts by six figures -- defs.json
+# measured 122994 changed lines against its last committed copy. A cache
+# that far from its source is not a cache, it is a second source of truth
+# that disagrees with the first. Run this in your own worktree
+# immediately before use, so your numbers are pinned to the revision you
+# are standing on.
 from __future__ import annotations
 
 import collections

@@ -39,6 +39,17 @@ statement of the world they describe.  That cell is a defect inventory.
 
     python3 validation/extract/regime.py [--json regime.json]
 """
+
+# REGENERATE WITH:  python3 proofs/validation/extract/regime.py
+#
+# This produces regime.json, which are NOT IN GIT.
+# They are generated from proofs/Calibrator/, which changes every few
+# minutes, and a committed snapshot drifts by six figures -- defs.json
+# measured 122994 changed lines against its last committed copy. A cache
+# that far from its source is not a cache, it is a second source of truth
+# that disagrees with the first. Run this in your own worktree
+# immediately before use, so your numbers are pinned to the revision you
+# are standing on.
 from __future__ import annotations
 
 import argparse

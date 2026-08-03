@@ -107,3 +107,15 @@ python/gnomon/_gnomon*.so
 
 # Toolchain clones that concurrent build sessions drop in the tree
 /mathlib/
+
+# Generated extraction tables. Produced from proofs/Calibrator/, which changes
+# constantly; a committed snapshot drifts by six figures and reads as
+# authoritative while being wrong. Regenerate per worktree -- each producer
+# names its command in its own header.
+proofs/validation/extract/lean_defs.py
+proofs/validation/extract/defs.json
+proofs/validation/extract/classes.json
+proofs/validation/extract/ceiling.json
+proofs/validation/extract/regime.json
+proofs/validation/extract/reconcile.json
+proofs/validation/extract/coverage.json
