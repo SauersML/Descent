@@ -56,27 +56,77 @@ is the constant supplied by the value formula of whichever argument is being run
   deficit an approximation-theoretic invariant of the functional rather than slack in an
   argument.
 
-## What is deliberately *not* assumed, and why
+## Monotonicity in the grade: I hedged, and the hedge was wrong
 
-A `GradedModulus` here carries **no monotonicity in the grade.** It would be natural to
-demand `Δ L h ≤ Δ K h` for `K ≤ L` — more moment constraints, smaller supremum — and to
-make it a structure field. It is not one, for a reason worth recording:
+A first version of this header declined to make grade-ordering a structure field, on the
+grounds that "moment constraints are not only a restriction on the pair, they are also what
+*buys* the indistinguishability, and which effect wins is a property of the construction".
 
-> In a moment-matching construction the moment constraints are not only a restriction on
-> the pair, they are also what *buys* the indistinguishability. Adding constraints shrinks
-> the feasible set and simultaneously relaxes the separation budget, and the two effects
-> run in opposite directions. Which one wins is a property of the construction, not of the
-> definition.
+**That reasoning is wrong, and an LP measurement says so.** The grade-`(K+1)` feasible set is
+a *subset* of the grade-`K` set at the same scale and support, so the supremum cannot rise:
+monotonicity is forced by nesting and was never an empirical question. `gradeSound_of_nested_sup`
+below is the one-line proof. Measurement agreed — 0 violations across 198 `(A,K,h)` cells,
+largest step up `1.7e-12`.
 
-So grade-ordering is carried as an explicit hypothesis, `GradeSound`, on the theorems that
-need it, and every instance must discharge it at the scales where it is used. The
-architecture instance discharges it *eventually in the variant count* and not identically —
-see `PolygenicArchitecture.architecture_gradeSound_eventually`. Asserting the ordering as a
-field would have made that eventual quantifier disappear silently, which is the failure
-mode this corpus already tracks under "a theorem whose hypotheses are satisfied by the
-wrong answer too".
+The resolution of the tension I thought I saw: moment matching *does* buy small total
+variation — at `A = 1` the grade-8 optimum has `TV = 4.8e-7` against the grade-0 optimum's
+`2.1e-1` — but that cannot raise a supremum, because every grade-`K` construction is already
+available to the grade-0 sup. **Indistinguishability is a constraint being satisfied, not a
+budget being earned.** `GradeSound` is kept as an explicit hypothesis only because
+`GradedModulus` is abstract and does not know it is a sup over nested sets; for any nested
+reading it is a theorem, and the eventual quantifier in
+`PolygenicArchitecture.architecture_gradeSound_eventually` is therefore weaker than it needs
+to be.
 
-Empirical status: UNTESTED throughout. Nothing in this module is a numerical claim.
+## Part (III) FAILED its first measurement, and the mechanism is not an artifact
+
+An LP over discretised priors — Gaussian location mixture, `F(π) = E_π|θ|`, grade `K` as the
+number of matched moments, exact solves to `h = 1e-8` with grid refinement moving answers by
+under 0.1% — reports:
+
+* **The headline gap collapses.** The measured deficit `Δ₀/Δ₈` runs `3.284, 1.424, 1.007,
+  1.012, 1.027` as `h` goes `1e-1 … 1e-6`, and on a growing support reaches `1.0007` at
+  `h = 1e-9`. **A grade-8 certificate recovers 99.93% of the ungraded modulus.** There is no
+  polynomial gap; by `isComplete_iff_gradeInsensitive` every fixed grade is very nearly
+  *complete* here — the opposite of what part (III) asserts.
+* **`b_order` is falsified in that instance.** The fitted exponent is grade-*independent* to
+  within 0.7% (`0.1514 … 0.1524` across `K = 0…8`), so `b_K · K` grows linearly rather than
+  staying constant.
+* **The envelope shape is wrong at fixed support**: fitted `1/log(1/h)^{0.966}`, i.e.
+  `1/log(1/h)`, not `1/√log(1/h)`. Growing the support at the scale this module names does
+  bend the exponent toward `0.5`, reaching `0.74`, but over the accessible range the two
+  shapes fit equally badly (~22%) and cannot be separated. Not refuted asymptotically; not
+  confirmed either.
+
+**The mechanism, and why it is the interesting part.** At small `h` the grade-0 optimiser
+*already* matches moments to high order without being asked: its discrepancies at
+`h = 1e-9` are `2.1e-11, 3.0e-9, 2.1e-9, 2.0e-7` in the first four. Statistical closeness
+implies approximate moment matching, so the grading constraint becomes vacuous exactly in the
+regime the theory is about — and a grading that is nearly free certifies nearly everything.
+
+**A conceptual objection that outlives the numbers.** Grading these arguments by matched
+moment count makes higher grades *weaker*, which is correct for the definition as written but
+does **not** order the four named methods by power. Moment-matched fuzzy hypotheses are in
+practice the *strongest* of the four, and they are strong because they admit rich many-atom
+priors a two-point argument cannot use. The binding restriction that makes a two-point
+argument weak is the **support size**, not the moment count. If part (III) is to be recovered,
+the grading is probably the thing to change.
+
+**What this does and does not do to the Lean.** `NonsmoothIncompleteness` carries the
+envelope and the grade bound as *fields*, so `gradeGap_lower_bound` remains a true
+conditional — nothing here makes a theorem false. What is now known is that the one instance
+measured **does not satisfy those fields**, and that the mechanism above suggests they may be
+unsatisfiable in the small-`h` regime rather than merely unverified. `sampleIncompleteness`
+shows the fields are consistent; it does not show any statistical problem realises them, and
+that gap is now measured rather than hypothetical.
+
+Parts (I), (II) and (IV) are untouched. (IV) is pure algebra. (II)'s Donoho–Liu bound is
+comfortably satisfied in the measurement: the grade-2 deficit runs `1.00`–`1.05`, far inside
+`5/4`.
+
+Empirical status: parts (I), (II), (IV) PROVED and unaffected; part (III) **conditional, with
+its hypotheses FALSIFIED in the one instance measured**. See `proofs/validation/certgrading/`.
+Nothing in this module is a numerical claim.
 -/
 
 namespace Calibrator.CertificateGrading
@@ -95,6 +145,18 @@ structure GradedModulus where
   Δ : ℕ → ℝ → ℝ
   /-- A supremum of absolute functional separations is nonnegative. -/
   nonneg : ∀ K h, 0 ≤ Δ K h
+
+/-- **Grade-ordering is forced by nesting.**
+
+    If the grade-`K` feasible set of prior pairs sits inside the grade-`0` set — which it
+    does, since matching more moments is a further restriction — then the grade-`K` supremum
+    cannot exceed the ungraded one. `GradeSound` is therefore automatic for any modulus
+    presented as a sup over nested feasible sets, and is carried as a hypothesis elsewhere in
+    this file only because `GradedModulus` is abstract enough not to know that. -/
+theorem gradeSound_of_nested_sup (F : ℕ → ℝ → Set ℝ) (K : ℕ) (h : ℝ)
+    (hsub : F K h ⊆ F 0 h) (hne : (F K h).Nonempty) (hbdd : BddAbove (F 0 h)) :
+    sSup (F K h) ≤ sSup (F 0 h) :=
+  csSup_le_csSup hbdd hne hsub
 
 /-- **A certificate calculus**: a graded modulus together with the constant of its value
     formula. `scale` is whatever the mixture-decoupling step of the particular argument
@@ -414,14 +476,14 @@ noncomputable def sampleModulus (A c : ℝ) (hA : 0 ≤ A) : GradedModulus where
   nonneg := by
     intro K h
     by_cases hK : K = 0
-    · simp only [hK, if_pos rfl]
+    · simp only [hK]
       exact div_nonneg hA (Real.sqrt_nonneg _)
     · simp only [if_neg hK]
       exact Real.rpow_nonneg (abs_nonneg h) _
 
 theorem sampleModulus_zero (A c : ℝ) (hA : 0 ≤ A) (h : ℝ) :
     (sampleModulus A c hA).Δ 0 h = A / Real.sqrt (Real.log (1 / h)) := by
-  simp [sampleModulus]
+  rfl
 
 theorem sampleModulus_pos (A c : ℝ) (hA : 0 ≤ A) {K : ℕ} (hK : K ≠ 0) (h : ℝ) :
     (sampleModulus A c hA).Δ K h = |h| ^ (c / (2 * (K : ℝ))) := by
@@ -456,8 +518,10 @@ noncomputable def sampleIncompleteness (A c : ℝ) (hA : 0 < A) (hc : 0 < c) :
     exact le_of_eq (sampleModulus_zero A c (le_of_lt hA) h).symm
   grade_upper := by
     intro K hK h hh0 _
-    have hEq : (sampleCalculus A c (le_of_lt hA)).modulus.Δ K h
-        = |h| ^ (c / (2 * (K : ℝ))) := sampleModulus_pos A c (le_of_lt hA) hK.ne' h
+    have hEq : (sampleCalculus A c (le_of_lt hA)).modulus.Δ K h =
+        |h| ^ (c / (2 * (K : ℝ))) := by
+      change (sampleModulus A c (le_of_lt hA)).Δ K h = _
+      exact sampleModulus_pos A c (le_of_lt hA) hK.ne' h
     rw [hEq, abs_of_pos hh0]
     have hexp : c / (K : ℝ) / 2 = c / (2 * (K : ℝ)) := by ring
     exact le_of_eq (by rw [hexp])

@@ -1,0 +1,88 @@
+{
+ "target": "proofs/Calibrator/CertificateGrading.lean",
+ "instance": {
+  "model": "Gaussian location mixture, unit noise, priors on [-A,A]",
+  "functional": "F(pi) = E_pi |theta|  (canonical nonsmooth functional)",
+  "scale h": "total-variation budget on the two mixtures",
+  "grade K": "number of matched prior moments; K=0 is the ungraded calculus",
+  "method": "exact LP over a discretised support (HiGHS), theta grid m up to 801, x grid dx=0.02 over [-A-8,A+8]"
+ },
+ "controls": {
+  "best_approximation_duality": {
+   "statement": "with the TV budget slack, Delta_K must equal 2 A E_K(|u|)",
+   "E_K_exact_anchors": {"E0": 0.5, "E1": 0.5, "E2": 0.125, "E3": 0.125},
+   "E_K_measured": {"0": 0.5, "1": 0.5000000005, "2": 0.1250000253, "3": 0.1250000253,
+                    "4": 0.0676209171, "6": 0.0459291481, "8": 0.0346898409, "12": 0.0232474493},
+   "bernstein_ratio_E_n_times_n_over_beta": {"4": 0.9654, "6": 0.9836, "8": 0.9905, "12": 0.9957},
+   "LP_over_prediction_ratio": {"m=201": "0.99952 - 1.00000", "m=401": "0.99988 - 1.00000"},
+   "verdict": "PASS - measure-side LP and approximation-side LP agree to 5 digits and converge as the grid refines"
+  },
+  "grid_stability": {
+   "max_relative_change_m401_to_m801": 7.2e-4,
+   "note": "reported deficit ratios carry roughly +-0.05 to 0.1 percent grid uncertainty"
+  },
+  "tv_reverification": {
+   "note": "TV of every returned pair recomputed on a 4x finer x grid; ratio to budget within 1.001 for h >= 1e-8, degrading to 0.90-0.94 at h=1e-9 (HiGHS feasibility tolerance floor 1e-10)"
+  }
+ },
+ "Q1_direction_of_Delta_K_in_K": {
+  "answer": "DECREASING (nonincreasing, strictly at even grades)",
+  "numeric": "0 violations across 198 (A,K,h) cells; largest step up 1.7e-12, i.e. numerical zero",
+  "structural_reason": "the grade-(K+1) feasible set is a subset of the grade-K set at the same h and support, so monotonicity is forced by nesting and is not an empirical question at all; the hypothesis GradeSound is a theorem for any nested reading of the modulus",
+  "resolution_of_the_stated_tension": "moment matching does buy small TV -- e.g. at A=1 the grade-8 optimum has TV 4.8e-7 while the grade-0 optimum has TV 2.1e-1 -- but that cannot raise the supremum, because a grade-K construction is always available to the grade-0 sup. Indistinguishability is a constraint that is being satisfied, not a budget being earned.",
+  "example_A3_h1e-6": {"K0": 0.117166, "K2": 0.116932, "K4": 0.116318, "K6": 0.115115, "K8": 0.114115}
+ },
+ "Q2_claimed_shape_h_to_the_bK_over_2_with_bK_Theta_of_1_over_K": {
+  "verdict": "INCONSISTENT with the measurement",
+  "fixed_support_A3_fitted_bK": {"0": 0.1514, "1": 0.1514, "2": 0.1516, "3": 0.1516, "4": 0.1514,
+                                 "5": 0.1514, "6": 0.1524, "7": 0.1524, "8": 0.1524},
+  "bK_times_K_should_be_constant": {"1": 0.1514, "2": 0.3031, "4": 0.6058, "6": 0.9143, "8": 1.2188},
+  "finding": "the fitted exponent is grade-INDEPENDENT to within 0.7 percent, so b_K*K grows linearly instead of being constant; the b_order field b_K*K = b_1 is falsified in this instance",
+  "growing_support_A_h_eq_c_sqrt_log_1_over_h": {
+   "fitted_bK_from_the_deficit_ratio": {"c=0.7": {"2": -0.0013, "4": -0.0232, "6": -0.0545, "8": -0.0880},
+                                        "c=1.5": {"2": -0.0033, "4": -0.0039, "6": -0.0047, "8": -0.0209}},
+   "finding": "b_K is measured NEGATIVE at every grade, i.e. the deficit ratio SHRINKS toward 1 as h decreases instead of growing polynomially"
+  }
+ },
+ "Q3_K_free_envelope_Theta_1_over_sqrt_log_1_over_h": {
+  "fixed_support_A3": {"fitted_alpha_in_log_1_over_h_to_the_minus_alpha": 0.966,
+                       "max_rel_err_shape_1_over_log": 0.094,
+                       "max_rel_err_shape_1_over_sqrt_log": 0.447,
+                       "verdict": "at fixed support the envelope is 1/log(1/h), not 1/sqrt(log(1/h))"},
+  "growing_support_c_0.7_1.0_1.5": {"fitted_alpha": [0.739, 0.737, 0.737],
+                                    "max_rel_err_shape_1_over_sqrt_log": 0.22,
+                                    "max_rel_err_shape_1_over_log": 0.215,
+                                    "verdict": "growing the support at the scale the module names does bend the exponent from ~1.0 toward 0.5, reaching 0.74; over the accessible range (log(1/h) from 4.6 to 20.7) the two shapes fit equally badly (~22 percent) and cannot be separated. The envelope is NOT REFUTED but is NOT CONFIRMED asymptotically: a fitted 0.74 > 0.5 would eventually break any fixed constant."}
+ },
+ "Q4_the_headline_gap": {
+  "claim": "gradeGap_lower_bound: Delta_0/Delta_K >= envelopeConst * n^{b_K/2} / sqrt(log n), polynomial at every fixed grade",
+  "measured_deficit_ratio_Delta0_over_Delta8": {
+   "A=3 fixed": {"1e-1": 3.284, "1e-2": 1.424, "1e-3": 1.007, "1e-4": 1.012, "1e-6": 1.027},
+   "A=c sqrt(log(1/h)), c=1.5": {"1e-2": 1.3266, "1e-3": 1.0075, "1e-5": 1.0041, "1e-7": null,
+                                 "1e-8": 1.0004, "1e-9": 1.0007}
+  },
+  "verdict": "FAILS in this instance. The ratio collapses to 1 and stays there; at h=1e-9 a grade-8 certificate recovers 99.93 percent of the ungraded modulus. There is no polynomial gap, and by isComplete_iff_gradeInsensitive that means every fixed grade is very nearly COMPLETE here -- the opposite of part (III)."
+ },
+ "mechanism": {
+  "statement": "statistical closeness already implies approximate moment matching, so the moment constraints are not binding at small h",
+  "evidence_grade_0_optimiser_moment_discrepancies": {
+   "c=1.5,h=1e-6,A=5.58": {"m1": 1.07e-8, "m2": 1.80e-6, "m3": 8.87e-8, "m4": 1.44e-4},
+   "c=1.5,h=1e-9,A=6.83": {"m1": 2.10e-11, "m2": 3.02e-9, "m3": 2.11e-9, "m4": 2.04e-7}
+  },
+  "reading": "the modulus is graded by a constraint that becomes vacuous exactly in the regime the theory is about. A grading that is nearly free is a grading that certifies nearly everything."
+ },
+ "conceptual_note": {
+  "issue": "the module grades two-point, Assouad, Fano and moment-matched constructions by the number of matched moments, higher meaning more constrained and therefore weaker. In practice moment-matched fuzzy hypotheses are the STRONGEST of those four, and they are strong because they permit rich many-atom priors that a two-point argument cannot use. The binding restriction that makes a two-point argument weak is the support size, not the moment count.",
+  "consequence": "the LP-measured direction (weaker with more moments) is correct for the definition as written, but that definition does not order the four named methods by power."
+ },
+ "what_survives": [
+  "GradeSound is not merely satisfiable, it is automatic under nesting - the eventual quantifier in the architecture instance may be unnecessarily weak",
+  "Part IV (deficit_eq_modulus_ratio_sq, isComplete_iff_gradeInsensitive) is pure algebra and untouched by any of this",
+  "Part II's Donoho-Liu bound is comfortably satisfied here: the measured grade-2 deficit is 1.00 to 1.05 at small h, far inside 5/4"
+ ],
+ "what_could_not_be_tested": [
+  "whether some other functional or model realises the claimed shape; only F = E|theta| in a Gaussian location mixture was measured",
+  "the true h -> 0 asymptotics: the LP is trustworthy to h = 1e-8 (HiGHS feasibility floor 1e-10) and the fitted envelope exponent is soft over 4.5 e-folds of log(1/h)",
+  "the discretised support could in principle miss a construction requiring finer atomic structure; grid refinement to m=801 moved answers by under 0.1 percent"
+ ]
+}

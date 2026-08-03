@@ -1,0 +1,198 @@
+{
+ "A=1.0,m=201": {
+  "mono": {
+   "1.0e-01": {
+    "nonincreasing": true,
+    "strict_steps": 4,
+    "max_increase": 9.992007221626409e-16
+   },
+   "3.0e-02": {
+    "nonincreasing": true,
+    "strict_steps": 4,
+    "max_increase": 5.551115123125783e-17
+   },
+   "1.0e-02": {
+    "nonincreasing": true,
+    "strict_steps": 4,
+    "max_increase": 1.6653345369377348e-16
+   },
+   "3.0e-03": {
+    "nonincreasing": true,
+    "strict_steps": 4,
+    "max_increase": 0.0
+   },
+   "1.0e-03": {
+    "nonincreasing": true,
+    "strict_steps": 4,
+    "max_increase": 9.43689570931383e-16
+   },
+   "3.0e-04": {
+    "nonincreasing": true,
+    "strict_steps": 4,
+    "max_increase": 0.0
+   },
+   "1.0e-04": {
+    "nonincreasing": true,
+    "strict_steps": 4,
+    "max_increase": 1.2073675392798577e-15
+   },
+   "3.0e-05": {
+    "nonincreasing": true,
+    "strict_steps": 4,
+    "max_increase": 1.7763568394002505e-14
+   },
+   "1.0e-05": {
+    "nonincreasing": true,
+    "strict_steps": 4,
+    "max_increase": 1.547373340571312e-14
+   },
+   "3.0e-06": {
+    "nonincreasing": true,
+    "strict_steps": 4,
+    "max_increase": 5.914713163690521e-14
+   },
+   "1.0e-06": {
+    "nonincreasing": true,
+    "strict_steps": 4,
+    "max_increase": -3.57075480295066e-14
+   }
+  },
+  "bK": {
+   "0": {
+    "b": 0.17907194114636346,
+    "maxresid": 0.0608321736646924
+   },
+   "1": {
+    "b": 0.1790719411467934,
+    "maxresid": 0.060832173663993405
+   },
+   "2": {
+    "b": 0.17717683741743798,
+    "maxresid": 0.05859504203139876
+   },
+   "3": {
+    "b": 0.1771768374193429,
+    "maxresid": 0.058595042028936284
+   },
+   "4": {
+    "b": 0.1588334773001624,
+    "maxresid": 0.06687456806738146
+   },
+   "5": {
+    "b": 0.1588334773002288,
+    "maxresid": 0.06687456806734593
+   },
+   "6": {
+    "b": 0.04584948248454149,
+    "maxresid": 0.0840823733311522
+   },
+   "7": {
+    "b": 0.0458494824848705,
+    "maxresid": 0.0840823733326137
+   },
+   "8": {
+    "b": -5.21171157000993e-16,
+    "maxresid": 3.552713678800501e-15
+   }
+  },
+  "alpha": 1.1301114764142728
+ },
+ "A=3.0,m=201": {
+  "mono": {
+   "1.0e-01": {
+    "nonincreasing": true,
+    "strict_steps": 4,
+    "max_increase": 1.942890293094024e-15
+   },
+   "3.0e-02": {
+    "nonincreasing": true,
+    "strict_steps": 4,
+    "max_increase": 2.7755575615628914e-16
+   },
+   "1.0e-02": {
+    "nonincreasing": true,
+    "strict_steps": 4,
+    "max_increase": 4.385380947269368e-15
+   },
+   "3.0e-03": {
+    "nonincreasing": true,
+    "strict_steps": 4,
+    "max_increase": 4.496403249731884e-15
+   },
+   "1.0e-03": {
+    "nonincreasing": true,
+    "strict_steps": 3,
+    "max_increase": 1.1102230246251565e-16
+   },
+   "3.0e-04": {
+    "nonincreasing": true,
+    "strict_steps": 4,
+    "max_increase": 3.164135620181696e-15
+   },
+   "1.0e-04": {
+    "nonincreasing": true,
+    "strict_steps": 4,
+    "max_increase": 8.881784197001252e-16
+   },
+   "3.0e-05": {
+    "nonincreasing": true,
+    "strict_steps": 4,
+    "max_increase": 2.3120394487818885e-14
+   },
+   "1.0e-05": {
+    "nonincreasing": true,
+    "strict_steps": 4,
+    "max_increase": 1.1141088052113446e-13
+   },
+   "3.0e-06": {
+    "nonincreasing": true,
+    "strict_steps": 3,
+    "max_increase": 2.785827124540674e-13
+   },
+   "1.0e-06": {
+    "nonincreasing": true,
+    "strict_steps": 4,
+    "max_increase": 1.7146700725945152e-12
+   }
+  },
+  "bK": {
+   "0": {
+    "b": 0.15139502747702352,
+    "maxresid": 0.028570322429665618
+   },
+   "1": {
+    "b": 0.15139502747508932,
+    "maxresid": 0.02857032243175195
+   },
+   "2": {
+    "b": 0.15155107488358677,
+    "maxresid": 0.029561264980573654
+   },
+   "3": {
+    "b": 0.1515510748833543,
+    "maxresid": 0.02956126498087075
+   },
+   "4": {
+    "b": 0.15144876160253823,
+    "maxresid": 0.02794380210045455
+   },
+   "5": {
+    "b": 0.151448761602446,
+    "maxresid": 0.027943802100539816
+   },
+   "6": {
+    "b": 0.15237649535693049,
+    "maxresid": 0.0318210236895784
+   },
+   "7": {
+    "b": 0.15237649535683087,
+    "maxresid": 0.031821023689624806
+   },
+   "8": {
+    "b": 0.15235065683708204,
+    "maxresid": 0.03870618928421887
+   }
+  },
+  "alpha": 0.966177722152543
+ }
+}
