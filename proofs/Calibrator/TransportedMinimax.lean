@@ -134,62 +134,117 @@ theorem inflatedRidge_violates_stationarity :
   refine ⟨by norm_num [inflatedRidgeParameter], by norm_num [transportedRidgeParameter],
     by norm_num, by norm_num⟩
 
-/-! ## Long-memory geometry: why the sample cost of long memory is zero
+/-! ## Long-memory geometry: the floor is real, the mechanism I gave for it was not
 
-The design arc's most surprising corollary is that long memory is **free**: the estimation
-floor is `3/(2n)` uniformly in the memory parameter `δ`, even though the variance of the
-memory parameter's own estimator is anything but uniform in `δ`. The mechanism is that loss
-and information are the *same* metric at leading order, so the `δ` and `ε` factors appear
-once in each and cancel.
+The estimation floor is `3/(2n)` uniformly in the memory parameter `δ`. **That survived
+measurement and I could not break it.** Everything this section originally said about *why*
+did not survive, and the correction is more interesting than the claim.
 
-The cancellation is the part worth having, and it is exact algebra once the two inputs are
-named: the conformal metric `ε²δ^{-3}` and the parameter variance `3δ³/(nε²)`. Both are
-analytic inputs — a Whittle-Fisher computation and a variance calculation — and neither is
-derived here.
+**Measured, on a near-unit-root AR(1) (`ρ = 1 - δ`) with an ARFIMA arm alongside, Whittle
+estimation, 20000 replicates, controls passing first (iid variance `1.005`–`1.009×` theory,
+AR(1) at `ρ=0.5` `0.994`–`1.022×`):**
 
-**A discrepancy in the upstream gloss, recorded rather than resolved.** The upstream text
-describes the parameter variance as one that "blows up" as memory lengthens, while giving it
-as `δ³/(nε²)`. Long memory is `δ → 0`, and `δ³/(nε²) → 0` there — the stated formula shrinks
-where the prose says it grows. `longMemoryVariance_strictMono` below records which way the
-stated formula actually runs. **The cancellation theorem is untouched either way**, since it
-only needs the product, which is why it is stated separately from the gloss. Whoever holds
-the upstream derivation should reconcile the word with the formula; nothing here depends on
-the outcome.
+* **The parameter variance scales as `δ^{+1}`, not `δ³`.** Fitted exponent `0.686, 0.870,
+  0.926` at `n = 1024, 4096, 16384`, converging to `1` as the near-unit-root finite-sample
+  effect dies. Observed over claimed runs from `2.0` at `δ = 0.5` to `1639` at `δ = 0.005`,
+  `ε = 2.5`.
+* **There is no `ε` dependence at all.** Measured `Var(ε=2.5)/Var(ε=1)` is `0.963`–`1.015`
+  across every cell; the claimed metric predicts `1/6.25 = 0.16`. And this needs no
+  simulation: in any family `f = ε²·g(λ;δ)` the amplitude enters `log f` *additively*, so
+  `∂(log f)/∂δ` is `ε`-free and the information for `δ` cannot depend on `ε`.
 
-Empirical status: UNTESTED. The two inputs are named hypotheses; the algebra is PROVED. -/
+So `ε²/δ³` **is not the Fisher information for a memory rate**; the true one is
+`1/(δ(2-δ)) ≈ 1/(2δ)`. With the claimed metric the transported loss is not flat at all — it
+runs `3.0, 23.0, 95.1, 388, 2542, 10679, 44740` as `δ` falls from `0.5` to `0.005`, four
+orders of magnitude, and scales with `ε²`.
+
+**With the true information it is flat, and the constant is the parameter count.** One
+parameter: `n·(1/2)·I·V = 0.5103, 0.4985, 0.5003, 0.4970, 0.5136, 0.5367, 0.5607` across the
+same `δ` range — flat at `0.500`. Three parameters (`ρ`, innovation variance, mean):
+`1.4969, 1.5151, 1.5002, 1.5083, 1.5100, 1.6046` — flat at `1.500 = 3/2`.
+
+**The mechanism is reparameterisation invariance, and it is trivial.** When loss *is* the
+Fisher metric, an efficient estimator has expected transported loss exactly `p/(2n)` for `p`
+parameters, because the metric and the variance are reciprocal *by construction* — `δ` and
+`ε` cancel because the factors of **any** parameterisation cancel. `efficientFloor_eq` below
+is that statement, and it is one line. The original `transportedFloor_eq` is the same algebra
+with two inputs that are **each wrong, reciprocally**, which is exactly why their product
+survived. It is kept because the identity is true and is the shape a reader will look for,
+but it should not be read as evidence for either factor.
+
+The honest residue: long memory has zero marginal sample cost *because loss is measured in
+the information metric*, and that is a statement about the choice of loss, not about memory.
+
+**The gloss discrepancy is resolved: absolute versus relative.** This section previously
+recorded that the upstream text calls the variance one that "blows up" while giving a formula
+that shrinks, and declined to adjudicate. Both are right about different quantities.
+Absolute `Var(δ̂)` at `n = 1024` is `7.45e-4, 2.04e-4, 5.69e-5, 3.51e-5` as `δ` goes
+`0.5 → 0.005` — it *shrinks*, as `longMemoryVariance_strictMono` says. Relative precision
+*blows up*: `Var(log δ̂)` is `2.96e-3, 1.92e-2, 1.09e-1, 9.01e-1` over the same range, a
+factor of 300, and `sd(δ̂)/δ` reaches `1.185` — at `δ = 0.005, n = 1024` **the memory
+parameter is not identified at all**, even though its absolute variance is the smallest in
+the table. The prose describes relative precision and is correct; the formula is an absolute
+variance and is correct.
+
+Empirical status: **the `p/(2n)` floor is VALIDATED and its stated mechanism is FALSIFIED**;
+the metric and the variance are each refuted individually. See `proofs/validation/longmemory/`.
+The measurement bounds the Whittle estimator's risk, so the floor is an efficiency statement,
+not a minimax lower bound. -/
 
 section LongMemoryGeometry
 
-/-- The conformal metric coefficient of the generative geometry: `ε²/δ³`. -/
+/-- The conformal metric coefficient as originally posited: `ε²/δ³`.
+
+    **Retained as a named object, not endorsed.** Measurement shows this is not the Fisher
+    information for a memory rate — the information is `ε`-free for structural reasons and
+    scales as `1/δ`, not `1/δ³`. See the section header. -/
 noncomputable def longMemoryMetric (ε δ : ℝ) : ℝ := ε ^ 2 / δ ^ 3
 
-/-- The variance of the memory-parameter estimator at sample size `n`: `3δ³/(nε²)`. -/
+/-- The parameter variance as originally posited: `3δ³/(nε²)`.
+
+    **Retained as a named object, not endorsed.** The measured scaling is `δ^{+1}` with no
+    `ε` dependence. -/
 noncomputable def longMemoryVariance (ε δ n : ℝ) : ℝ := 3 * δ ^ 3 / (n * ε ^ 2)
 
-/-- **The transported estimation floor is `3/(2n)`, with `δ` and `ε` cancelling.**
+/-- **The actual mechanism: an efficient estimator's transported loss is `p/(2n)`.**
 
-    Loss is the information metric at leading order, so the geometry enters the loss once
-    and the variance once, with opposite exponents. The floor a practitioner faces is
-    therefore free of both the memory parameter and the amplitude.
+    If loss is the information metric `g` and the estimator attains the Cramér–Rao variance
+    `1/(n·g)`, the transported loss is `1/(2n)` — **whatever `g` is**. The metric cancels
+    identically, so no property of the family, and in particular no property of long memory,
+    is doing any work. For `p` parameters the same computation gives `p/(2n)`.
 
-    This is the exact statement behind "long memory has zero marginal sample cost". -/
+    This is the honest form of "long memory is free": it is free because loss is being
+    measured in the information metric, which is a choice about the loss and not a fact
+    about memory. -/
+theorem efficientFloor_eq (g n : ℝ) (hg : g ≠ 0) (hn : n ≠ 0) :
+    (1 / 2) * g * (1 / (n * g)) = 1 / (2 * n) := by
+  field_simp
+
+/-- The `p`-parameter form: `p` independent coordinates each contribute `1/(2n)`. -/
+theorem efficientFloor_dim (p g n : ℝ) (hg : g ≠ 0) (hn : n ≠ 0) :
+    p * ((1 / 2) * g * (1 / (n * g))) = p / (2 * n) := by
+  rw [efficientFloor_eq g n hg hn]
+  ring
+
+/-- **The originally posited pair reproduces `3/(2n)`** — because its two factors are wrong
+    reciprocally, not because either is right. Kept for continuity with the upstream
+    statement; see `efficientFloor_eq` for the mechanism that actually holds. -/
 theorem transportedFloor_eq (ε δ n : ℝ) (hε : ε ≠ 0) (hδ : δ ≠ 0) (hn : n ≠ 0) :
     (1 / 2) * longMemoryMetric ε δ * longMemoryVariance ε δ n = 3 / (2 * n) := by
   unfold longMemoryMetric longMemoryVariance
   field_simp
 
-/-- **The floor does not depend on the memory parameter at all**: two panels with different
-    memory lengths face the same estimation floor at the same sample size. -/
+/-- The floor does not depend on the memory parameter. True, and true for every `δ`-dependent
+    pair whose product is constant — which is the point of `efficientFloor_eq`. -/
 theorem transportedFloor_indep_of_memory (ε δ₁ δ₂ n : ℝ)
     (hε : ε ≠ 0) (hδ₁ : δ₁ ≠ 0) (hδ₂ : δ₂ ≠ 0) (hn : n ≠ 0) :
     (1 / 2) * longMemoryMetric ε δ₁ * longMemoryVariance ε δ₁ n =
       (1 / 2) * longMemoryMetric ε δ₂ * longMemoryVariance ε δ₂ n := by
   rw [transportedFloor_eq ε δ₁ n hε hδ₁ hn, transportedFloor_eq ε δ₂ n hε hδ₂ hn]
 
-/-- **Which way the stated variance formula actually runs.**
-
-    It is strictly increasing in `δ`, so it *shrinks* as memory lengthens (`δ → 0`). Recorded
-    because the upstream prose says the opposite; see the section header. -/
+/-- **The stated formula is increasing in `δ`**, so the absolute variance shrinks as memory
+    lengthens. Confirmed by measurement (`7.45e-4 → 3.51e-5` as `δ` falls `0.5 → 0.005`);
+    what blows up over the same range is *relative* precision, by a factor of 300. -/
 theorem longMemoryVariance_strictMono (ε n : ℝ) (hε : ε ≠ 0) (hn : 0 < n)
     (δ₁ δ₂ : ℝ) (h₁ : 0 < δ₁) (h₁₂ : δ₁ < δ₂) :
     longMemoryVariance ε δ₁ n < longMemoryVariance ε δ₂ n := by
@@ -197,9 +252,9 @@ theorem longMemoryVariance_strictMono (ε n : ℝ) (hε : ε ≠ 0) (hn : 0 < n)
   have hden : 0 < n * ε ^ 2 := mul_pos hn hε2
   unfold longMemoryVariance
   have hδ₂ : 0 < δ₂ := lt_trans h₁ h₁₂
-  have hquad : (0:ℝ) < δ₂ ^ 2 + δ₂ * δ₁ + δ₁ ^ 2 := by
+  have hquad : (0 : ℝ) < δ₂ ^ 2 + δ₂ * δ₁ + δ₁ ^ 2 := by
     nlinarith [mul_pos hδ₂ h₁, sq_nonneg δ₁, sq_nonneg δ₂]
-  have hfac : (0:ℝ) < (δ₂ - δ₁) * (δ₂ ^ 2 + δ₂ * δ₁ + δ₁ ^ 2) :=
+  have hfac : (0 : ℝ) < (δ₂ - δ₁) * (δ₂ ^ 2 + δ₂ * δ₁ + δ₁ ^ 2) :=
     mul_pos (by linarith) hquad
   apply div_lt_div_of_pos_right _ hden
   nlinarith [hfac]
