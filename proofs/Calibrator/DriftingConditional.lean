@@ -357,6 +357,53 @@ theorem singleMode_interiorError_eq (w lam t₁ t₂ : ℝ) :
     _ = w ^ 2 * (Real.exp (-(2 * lam * t₁)) * Real.exp (-(2 * lam * t₂))) := by rw [hexp]
     _ = (w * Real.exp (-(2 * lam * t₁))) * (w * Real.exp (-(2 * lam * t₂))) := by ring
 
+/-! ## The evolution law of the response curve
+
+Theorem 1 of the source analysis: in the frozen-mark coupling the marked and unmarked
+subpopulations solve the SAME forward equation, so the response curve `c = q/p` obeys a
+drift-diffusion equation whose drift is built from the OBSERVED marginal `p`. The marginal is not
+a companion to the conditional; it is a coefficient in the conditional's own equation.
+
+The computation is the product rule applied to `L*(cp) - c L*p` with `L*ρ = ½(aρ)'' - (bρ)'`, and
+what survives is `(ap)'c' + ½ap c'' - bp c'`. Dividing by `p` gives the drift
+`a' + a (log p)' - b`. Both steps are below: the first as an algebraic identity in the derivative
+values, in the style this file already uses for the stationary collapse, and the second as the
+division, which is where `p > 0` is needed.
+
+Analytic hypotheses -- that the densities are twice differentiable and that the equation holds in
+a genuine sense -- are not formalized here, and no semigroup is constructed. What is proved is the
+identity those hypotheses would be used to obtain. -/
+
+/-- **The response curve's transport identity.**
+
+    With `a, a', a''`, `b, b'`, `c, c', c''` and `p, p', p''` standing for the values of the
+    coefficients and their derivatives at a point, the second-order operator applied to the
+    product `c p`, minus `c` times the same operator applied to `p`, collapses to a
+    first-and-second-order expression in `c` alone. Every term carrying `c` undifferentiated
+    cancels, which is why the result is an evolution equation FOR the curve rather than an
+    identity constraining it. -/
+theorem responseCurve_transport_identity
+    (a a' a'' b b' c c' c'' p p' p'' : ℝ) :
+    (a'' * (c * p) + 2 * a' * (c' * p + c * p') + a * (c'' * p + 2 * c' * p' + c * p'')) / 2
+        - (b' * (c * p) + b * (c' * p + c * p'))
+        - c * ((a'' * p + 2 * a' * p' + a * p'') / 2 - (b' * p + b * p'))
+      = (a' * p + a * p') * c' + a * p * c'' / 2 - b * p * c' := by
+  ring
+
+/-- **The marginal appears in the conditional's drift.**
+
+    Dividing the transport identity by the population density turns `(a'p + a p')/p` into
+    `a' + a (log p)'`, written here as `a' + a * (p'/p)` since the logarithmic derivative is
+    exactly that quotient. The drift the curve feels is therefore assembled from the observed
+    marginal and the generator's own coefficients, and at `p ≡ π` stationary it collapses back to
+    `b` by `stationaryDrift_collapses_to_generator`. -/
+theorem responseCurve_drift_from_marginal
+    (a a' b c' c'' p p' : ℝ) (hp : p ≠ 0) :
+    ((a' * p + a * p') * c' + a * p * c'' / 2 - b * p * c') / p
+      = a * c'' / 2 + (a' + a * (p' / p) - b) * c' := by
+  field_simp
+  ring
+
 /-! ## The probit realization dynamics
 
 The one piece of the continuum realization theory that is calculus rather than analysis. Under
