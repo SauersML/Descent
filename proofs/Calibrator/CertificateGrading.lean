@@ -421,7 +421,10 @@ theorem constantObservationExperiment_feasible_iff
   constructor
   · exact fun hfeasible ↦ hfeasible.1
   · intro hmatched
-    exact ⟨hmatched, by simp⟩
+    refine ⟨hmatched, ?_⟩
+    change |(constantObservationExperiment target moment law).totalVariation P Q| ≤ |h|
+    rw [constantObservationExperiment_totalVariation]
+    simp [abs_nonneg h]
 
 /-- Consequently the modulus of a constant channel is independent of the information radius.
 
@@ -433,20 +436,23 @@ theorem constantObservationExperiment_modulus_eq
     (law : FinitePrior observationCount) (K : ℕ) (h₁ h₂ : ℝ) :
     (constantObservationExperiment target moment law).certificateProblem.modulus K h₁ =
       (constantObservationExperiment target moment law).certificateProblem.modulus K h₂ := by
-  congr 1
+  unfold FiniteMomentCertificateProblem.modulus
+  apply congrArg sSup
   ext d
-  simp only [FiniteMomentCertificateProblem.admissibleGaps, Set.mem_setOf_eq]
+  simp only [Set.mem_insert_iff, FiniteMomentCertificateProblem.admissibleGaps]
   constructor
-  · rintro ⟨P, Q, hfeasible, rfl⟩
-    exact ⟨P, Q,
-      (constantObservationExperiment_feasible_iff target moment law K h₂ P Q).2
-        ((constantObservationExperiment_feasible_iff target moment law K h₁ P Q).1 hfeasible),
-      rfl⟩
-  · rintro ⟨P, Q, hfeasible, rfl⟩
-    exact ⟨P, Q,
-      (constantObservationExperiment_feasible_iff target moment law K h₁ P Q).2
-        ((constantObservationExperiment_feasible_iff target moment law K h₂ P Q).1 hfeasible),
-      rfl⟩
+  · rintro (rfl | ⟨P, Q, hfeasible, rfl⟩)
+    · exact Or.inl rfl
+    · exact Or.inr ⟨P, Q,
+        (constantObservationExperiment_feasible_iff target moment law K h₂ P Q).2
+          ((constantObservationExperiment_feasible_iff target moment law K h₁ P Q).1 hfeasible),
+        rfl⟩
+  · rintro (rfl | ⟨P, Q, hfeasible, rfl⟩)
+    · exact Or.inl rfl
+    · exact Or.inr ⟨P, Q,
+        (constantObservationExperiment_feasible_iff target moment law K h₁ P Q).2
+          ((constantObservationExperiment_feasible_iff target moment law K h₂ P Q).1 hfeasible),
+        rfl⟩
 
 /-- Grade exponent used in the fixed-grade gap theorem.  Writing `K + 1`
 makes the theorem total at grade zero while retaining order `1/K`. -/
