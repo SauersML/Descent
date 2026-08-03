@@ -39,11 +39,9 @@ section IslandModel
     Empirical status: CONDITIONALLY VALID. Accurate in the limit it was derived
     for; frequently violated in use. Neither validated nor falsified.
 
-This file used to restate the formula as `demoIslandModelFst`. It is
-`fstMigrationDriftEquilibrium` from `Calibrator.PopulationGeneticsFoundations`, which this
-file already imports, so the restatement has been deleted and the theorems
-below are stated about that one definition. The regime caveats above travel
-with it. -/
+The theorems below are stated about `fstMigrationDriftEquilibrium` from
+`Calibrator.PopulationGeneticsFoundations`, which this file imports. Do not restate
+`1/(1 + 4 Nₑ m)` here; the regime caveats above belong to that one definition. -/
 
 /-- More migration → lower equilibrium F_ST. -/
 theorem more_migration_lower_fst (Ne m₁ m₂ : ℝ)
@@ -53,12 +51,9 @@ theorem more_migration_lower_fst (Ne m₁ m₂ : ℝ)
   unfold fstMigrationDriftEquilibrium
   apply div_lt_div_of_pos_left one_pos (by positivity) (by nlinarith)
 
-/-! **This module used to hold its own copy of the island-model `F_ST`.**
-
-`demoIslandModelFst` was one of four independently written spellings of
-`1/(1 + 4 Nₑ m)`, and this section carried a theorem relating this copy to the one in
-`PortabilityDrift`. There is now a single definition, so the relating theorem had become
-`X = X` and is gone, along with the no-op rewrite that used it.
+/-! The island-model `F_ST` has one definition, `fstMigrationDriftEquilibrium`. A second
+spelling in this module would need its own theorem tying it to that one, which is a
+reason not to add it.
 
 The caveat that stood here is also discharged. It recorded that the constant was merely
 stipulated — that `PortabilityDrift` defined a one-generation migration-drift map and,
@@ -209,11 +204,10 @@ being 2m (or 2·m·σ²), not from any separate diploid doubling.
     `(D-d)`; that pairing is a load-bearing convention and not an incidental
     choice of argument.
 
-    RENAMED from `steppingStoneCoalescenceTime`. It is a diffusion timescale, not a
-    coalescence time: as the note above records, it is MEASURED to be off by exactly
-    `(D-d)` as a standalone meeting time, and it only yields a correct
-    `demoSteppingStoneFst` because that error cancels against a per-deme `Nₑ`. The old
-    name asserted the quantity the measurement rejects.
+    **This is a diffusion timescale, not a coalescence time.** As the note above
+    records, it is MEASURED off by exactly `(D-d)` as a standalone meeting time, and it
+    yields a correct `demoSteppingStoneFst` only because that error cancels against a
+    per-deme `Nₑ`.
 
     Empirical status: MEASURED and off by exactly `(D-d)` as a standalone
     meeting time. Its consequence `demoSteppingStoneFst` is CONDITIONALLY
@@ -287,10 +281,8 @@ theorem steppingStoneMeetingTime_eq_perDeme_iff (d D σ_sq m : ℝ)
     linarith
   · intro h; rw [h, one_mul]
 
-/-! **Fst from coalescence time ratio**: `Fst = T/(T + 2Ne)`. This file used to
-restate it as `fstFromCoalescenceTime`; it is `coalFst` from
-`Calibrator.PopulationGeneticsFoundations`, and the restatement has been
-deleted in favour of that one. -/
+/-! **Fst from coalescence time ratio**: `Fst = T/(T + 2Ne)`. This is `coalFst` from
+`Calibrator.PopulationGeneticsFoundations`; use it rather than restating it here. -/
 
 /-- **Derivation, and the theorem that pins the definition.**
     With T(d) = d/(2·σ²·m) and effective size Ne:
@@ -603,36 +595,26 @@ section FounderEffects
 /-- **Within-population heterozygosity loss after `t` generations in a founding
     population of size `k`**: `1 - (1 - 1/(2k))^t`.
 
-    RENAMED from `founderFst`. This is *not* between-population `F_ST`, and the
-    difference is not a convention fork or a factor of two -- they are different
-    quantities with different limits. `PopulationGeneticsFoundations` records the
-    measurement: at `Nₑ = 1000`, `t = 4000` this expression's retention factor gives
-    `0.135` against a measured `1.025 ± 0.020`, and the `F_ST` its cluster reports is
-    approximately zero where the measurable between-population `F_ST` at that design
-    point is `0.50`. Anything reading this as a differentiation measure is not slightly
-    off; it is on the wrong axis.
+    **This is NOT between-population `F_ST`, and the gap is not a convention fork or a
+    factor of two -- they are different quantities with different limits.** At
+    `Nₑ = 1000`, `t = 4000` this expression's retention factor gives `0.135` against a
+    measured `1.025 ± 0.020`, and the `F_ST` its cluster reports is approximately zero
+    where the measurable between-population `F_ST` at that design point is `0.50`.
+    Reading this as a differentiation measure is not slightly off; it is the wrong axis.
 
-    **If you want between-population `F_ST` after a split, use
+    **For between-population `F_ST` after a split use
     `PopulationGeneticsFoundations.coalFst t Ne = t / (t + 2 Nₑ)`**, which coalescent
     simulation in branch mode -- which removes mutational noise analytically -- finds
-    unbiased across the tested grid. That sentence is here rather than in a commit
-    message so the next reader who wants an `F_ST` finds the right object in this
-    paragraph instead of reaching for this one out of habit.
+    unbiased across the tested grid.
 
-    The identifier was the last part of this defect to be corrected. The corpus had
-    already written the right semantics down in its own check:
-    `validation/popgen_defs/battery2.py` compares this body against
-    `truth = 1 - H/H₀`, simulated heterozygosity loss, and passes -- so the test
-    agreed with the body while the name contradicted both, and nothing in the
-    pipeline compared the two. `heterozygosityLossFromDrift` and
-    `heterozygosityLossDerived` in `PopulationGeneticsFoundations` are the same
-    quantity and were repaired earlier; that sweep did not cross into this file.
+    `heterozygosityLossFromDrift` and `heterozygosityLossDerived` in
+    `PopulationGeneticsFoundations` are this same quantity.
 
     Regime: closed population, no mutation. `founderHeterozygosityLoss_eq_derived`
     below pins it to the `θ = 0` slice of the general transient, which is what makes
     the no-mutation premise explicit rather than implied.
 
-    Empirical status: correct for what it now says; FALSIFIED as an `F_ST`. -/
+    Empirical status: correct for what it says; FALSIFIED as an `F_ST`. -/
 noncomputable def founderHeterozygosityLoss (k : ℕ) (t : ℕ) : ℝ :=
   1 - (1 - 1 / (2 * (k : ℝ))) ^ t
 
@@ -683,13 +665,12 @@ heterozygosity is
   L(T) = 1 - exp(-Σ_{t=0}^{T-1} 1/(2·Ne(t)))
 replacing the constant-size form L = 1 - exp(-T/(2·Ne)).
 
-This section used to say `Fst` in every one of those places. It is heterozygosity
-loss, not between-population `F_ST` -- see the note on `founderHeterozygosityLoss`
-above for the measurement that separates them, and use
-`PopulationGeneticsFoundations.coalFst` if differentiation after a split is what is
-wanted. The constant-size form named above as the thing being "replaced" is itself
-the falsified expression, which is how the error propagated into the variable-Ne
-case unremarked.
+**This is heterozygosity loss, not between-population `F_ST`.** See the note on
+`founderHeterozygosityLoss` above for the measurement that separates them, and use
+`PopulationGeneticsFoundations.coalFst` if differentiation after a split is wanted.
+Note that the constant-size form `1 - exp(-T/(2·Ne))` named above is the same
+falsified expression, so neither the constant-size nor the variable-`Nₑ` form is an
+`F_ST`.
 -/
 
 section VariableNeFst
@@ -703,15 +684,13 @@ noncomputable def cumulativeDrift {T : ℕ} (Ne : Fin T → ℝ) : ℝ :=
 /-- **Within-population heterozygosity loss under variable Nₑ**:
     `1 - exp(-Σ 1/(2·Nₑ(t)))`.
 
-    RENAMED from `fstVariableNe`. The continuous-time form of
-    `founderHeterozygosityLoss`; see that docstring for the measurement showing this
-    family is not between-population `F_ST` (`≈ 0` here against a measured `0.50` at
-    `Nₑ = 1000`, `t = 4000`) and for `coalFst t Ne = t / (t + 2 Nₑ)`, which is the
-    between-population quantity.
+    The continuous-time form of `founderHeterozygosityLoss`; see that docstring for
+    the measurement showing this family is **not** between-population `F_ST` (`≈ 0`
+    here against a measured `0.50` at `Nₑ = 1000`, `t = 4000`) and for
+    `coalFst t Ne = t / (t + 2 Nₑ)`, which is the between-population quantity.
 
-    `validation/popgen_defs/battery2.py` already checked this body against
-    `truth = 1 - H_t/H_0` and carried the note "drift-only heterozygosity loss", so
-    the test named the quantity correctly while the identifier did not.
+    `validation/popgen_defs/battery2.py` checks this body against
+    `truth = 1 - H_t/H_0`, drift-only heterozygosity loss, which is what it computes.
 
     Empirical status: correct for what it now says; FALSIFIED as an `F_ST`. -/
 noncomputable def heterozygosityLossVariableNe {T : ℕ} (Ne : Fin T → ℝ) : ℝ :=
@@ -787,22 +766,20 @@ bottleneck) compared to a stably-sized population at the same Fst.
 section BottleneckExcessLD_Derivation
 
 /-!
-## Excess LD from a bottleneck: what was here, and why it is gone
+## Excess LD from a bottleneck
 
-This section used to derive `bottleneckExcessLD` from an additive drift
-accounting: LD is created at rate `1/(2 Ne)` per generation, the excess creation
-rate during a bottleneck is `1/(2 Ne_b) - 1/(2 Ne_stable)`, and the cumulative
-excess is the geometric sum of that rate under drift-only decay.
+**Do not derive a bottleneck LD excess from additive drift accounting.** That route --
+LD created at rate `1/(2 Ne)` per generation, excess creation rate
+`1/(2 Ne_b) - 1/(2 Ne_stable)`, cumulative excess the geometric sum under drift-only
+decay -- is internally consistent and gives the wrong function. It carries no
+recombination rate, so the level rises without bound toward `1` instead of saturating
+at the drift-recombination equilibrium. Simulation puts the same defect at up to
+3.3-fold high, and no constant repairs a missing argument.
 
-The derivation was internally consistent and produced the wrong function. It has
-no recombination rate anywhere in it, so the level it accumulates to rises
-without bound toward `1` rather than saturating at the drift-recombination
-equilibrium. That is precisely the defect for which `bottleneckLDAmplification`
-was deleted from `LDDecayTheory.lean` (simulation: overstates by up to
-3.3-fold), and the closed form this derivation targeted,
-`(1 - (1-1/(2 Ne_b))^t_b) - (1 - (1-1/(2 Ne_stable))^t_b)`, contains that
-deleted formula as its first term. Deleted here for the same reason: no constant
-repairs a missing argument.
+Any closed form of the shape
+`(1 - (1-1/(2 Ne_b))^t_b) - (1 - (1-1/(2 Ne_stable))^t_b)` has that error in its first
+term. Use `excessLDAfterBottleneck`, which runs the two-locus recurrence and therefore
+carries `c`.
 
 Deleted with it: `excessDriftRate`, `cumulativeExcessLD`, `geom_sum_drift`,
 `cumulativeExcessLD_eq_closedForm`, and `derivation_matches_bottleneckExcessLD`.
