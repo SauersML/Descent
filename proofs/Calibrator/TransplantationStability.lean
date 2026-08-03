@@ -282,6 +282,27 @@ theorem bilinear_le_of_unit {n : ℕ} {E : Matrix (Fin (n + 1)) (Fin (n + 1)) �
   rcases abs_cases (u ⬝ᵥ (E *ᵥ v)) with ⟨heq, _⟩ | ⟨heq, _⟩ <;> rw [heq] <;>
     linarith [h1.1, h1.2, h2.1, h2.2]
 
+/-- Scaling the right argument of the bilinear form. -/
+theorem bilinear_smul_right {m : ℕ} (E : Matrix (Fin m) (Fin m) ℝ) (t : ℝ)
+    (u w : Fin m → ℝ) :
+    u ⬝ᵥ (E *ᵥ fun i ↦ t * w i) = t * (u ⬝ᵥ (E *ᵥ w)) := by
+  simp only [dotProduct, Matrix.mulVec, Finset.mul_sum]
+  refine Finset.sum_congr rfl fun i _ ↦ ?_
+  refine Finset.sum_congr rfl fun j _ ↦ by ring
+
+/-- **Where the `√2` comes from.** If a squared ground weight and a squared misalignment sum
+to one, the sum of the misalignment's square root and the ground weight's absolute value is
+at most `√2`. This is Cauchy-Schwarz on the pair `(|α|, √s)`. -/
+theorem sqrt_add_abs_le_sqrt_two {α s : ℝ} (hs : 0 ≤ s) (h : α ^ 2 + s = 1) :
+    Real.sqrt s + |α| ≤ Real.sqrt 2 := by
+  have hsq : Real.sqrt s ^ 2 = s := Real.sq_sqrt hs
+  have habs : |α| ^ 2 = α ^ 2 := sq_abs α
+  have hnn : 0 ≤ Real.sqrt s + |α| := by positivity
+  refine (Real.le_sqrt hnn (by norm_num)).mpr ?_
+  have hcross : 2 * (Real.sqrt s * |α|) ≤ Real.sqrt s ^ 2 + |α| ^ 2 := by
+    nlinarith [sq_nonneg (Real.sqrt s - |α|)]
+  nlinarith [hsq, habs, hcross]
+
 /-- **The sharp bound holds outright once the misalignment is at least one half.**
 
     At `misalignmentSq c ≥ 1/2` the sharp right-hand side `2√2 δ √s` is already at least
