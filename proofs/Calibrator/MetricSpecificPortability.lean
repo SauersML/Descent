@@ -463,7 +463,8 @@ with different attenuated signal variance and the conclusion goes away. -/
 theorem neutralAF_benchmark_auc_depends_only_on_attenuated_signal
     (V_A V_E fst V_A' fst' : ℝ)
     (h : presentDayPGSVariance V_A fst = presentDayPGSVariance V_A' fst') :
-    presentDayEqualVarianceGaussianAUC V_A V_E fst = presentDayEqualVarianceGaussianAUC V_A' V_E fst' := by
+    presentDayEqualVarianceGaussianAUC V_A V_E fst =
+      presentDayEqualVarianceGaussianAUC V_A' V_E fst' := by
   unfold presentDayEqualVarianceGaussianAUC
   rw [h]
 
@@ -490,7 +491,8 @@ theorem neutralAF_benchmark_discrimination_preserved_calibration_lost
     (h_same_signal : presentDayPGSVariance V_A fst = presentDayPGSVariance V_A' fst')
     (h_src_cal : calibrationInTheLarge mean_obs mean_pred = 0)
     (h_shift : δ ≠ 0) :
-    presentDayEqualVarianceGaussianAUC V_A V_E fst = presentDayEqualVarianceGaussianAUC V_A' V_E fst' ∧
+    presentDayEqualVarianceGaussianAUC V_A V_E fst =
+      presentDayEqualVarianceGaussianAUC V_A' V_E fst' ∧
     |calibrationInTheLarge mean_obs mean_pred| <
       |calibrationInTheLarge mean_obs (mean_pred + δ)| := by
   have h_citl_shift :=
