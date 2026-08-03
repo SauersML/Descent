@@ -571,7 +571,12 @@ noncomputable def fourAtom (v A B c : ℝ) (hv : 0 ≤ v) (hA : A ^ 2 = 1 + v)
   mass := ![1 / 4 + c * B, 1 / 4 - c * B, 1 / 4 - c * A, 1 / 4 + c * A]
   atom_inj := by
     intro i j hij
-    fin_cases i <;> fin_cases j <;> norm_num at hij ⊢ <;> linarith
+    -- `exfalso` is the whole fix. On the off-diagonal cases `norm_num` reduces `hij` to
+    -- an arithmetic contradiction but leaves the GOAL as a `Fin 4` equality, and
+    -- `linarith` proves arithmetic goals or `False` — not equalities in `Fin`. Six cases
+    -- close outright; the ten that did not were exactly the ten reported failures.
+    -- `<;>` runs nothing when a branch has no goals left, so the closed cases are safe.
+    fin_cases i <;> fin_cases j <;> norm_num at hij ⊢ <;> exfalso <;> linarith
   mass_pos := by
     intro j
     have hcA : |c * A| < 1 / 4 := by
