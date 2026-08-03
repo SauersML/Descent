@@ -865,7 +865,29 @@ section ExpansionLD
     The fraction of LD that decays per generation is 1/(2Ne).
     Larger Ne → slower decay → LD persists longer.
 
-    Empirical status: UNTESTED.
+    **The docstring's numeric reading is FALSIFIED; the body survives as a bare drift rate.**
+    "The fraction of LD that decays per generation is `1/(2Ne)`" omits recombination, which
+    dominates it. This file's own `ldRetentionPerGen r Ne = (1-r)(1-1/(2Ne))` is VALIDATED to
+    `0.7%`, and it makes the fraction of `E[D]` lost per generation
+    `r + 1/(2Ne) - r/(2Ne)`. In exact rational arithmetic:
+
+    | `Ne` | `r` | true fraction lost | this body | ratio |
+    |---|---|---|---|---|
+    | 10⁴ | 1/100 | 0.0100495 | 5e-5 | **201×** |
+    | 10⁴ | 1/1000 | 0.00104995 | 5e-5 | 21× |
+    | 10³ | 1/100 | 0.010495 | 5e-4 | 21× |
+    | 10⁴ | 0 | 5e-5 | 5e-5 | 1× |
+
+    The error is unbounded in `r/(1/(2Ne))` and the claim holds only on the `r = 0` slice.
+    **This is the same defect class, in the same file, as the already-repaired `ldHalfLife`
+    (2110×) and `ldRetainedFraction` (37000×): the recombination argument is absent from the
+    signature, so no constant repairs it.** The body is retained as the drift-only rate it
+    actually is; for the fraction of LD lost, use `ldRetentionPerGen`.
+
+    An identical twin carries the same reading at `DemographicHistory.driftLDCreationRate`.
+
+    Empirical status: body **DERIVED** as a drift rate; the fraction-lost reading
+    **FALSIFIED** (`proofs/validation/coalescent_diff/`).
 
     Denotes: a per-generation rate. Other definitions share this formula under names from a
     different concept family; the formula does not fix which is meant. -/

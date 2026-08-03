@@ -789,9 +789,22 @@ theorem fstMutationDriftTransient_at_zero (θ Ne : ℝ) :
 
 /-- **Mutation introduces new population-specific variants over time.**
     The expected number of new mutations per generation per locus is 2Neμ = θ/2.
-    Over t generations, the expected number of new segregating sites is ~θt/2.
 
-    Empirical status: UNTESTED. -/
+    **The body is a count of mutations ARISING, and the second sentence of the original
+    docstring was wrong.** It read "the expected number of new *segregating sites* is ~θt/2".
+    Segregating sites saturate at Watterson's `θ·Σ(1/i)`; mutations arising do not.
+    Infinite-sites simulation at `Ne = 50`, `t = 1200`, 16 replicates:
+
+    | `θ` | arisen (measured) | this body | segregating (measured) | Watterson |
+    |---|---|---|---|---|
+    | 1 | 599.9 | 600.0 | 5.1 | 5.2 |
+    | 4 | 2423.8 | 2400.0 | 21.3 | 20.7 |
+
+    So the body tracks *arisen* to 1%, while the segregating reading overstates by **118× at
+    `t = 1200`, growing linearly in `t`**. Watterson is reproduced to 2–3%.
+
+    Empirical status: body **VALIDATED** as a count of mutations arising; the
+    segregating-sites reading **FALSIFIED** (`proofs/validation/coalescent_diff/`). -/
 noncomputable def expectedNewMutations (θ t : ℝ) : ℝ :=
   θ / 2 * t
 
@@ -815,13 +828,20 @@ theorem expectedNewMutations_increases_with_time (θ t₁ t₂ : ℝ)
   unfold expectedNewMutations
   nlinarith
 
-/-- **LD decay from new mutations.**
-    New population-specific mutations create variants in LD with existing causal
-    variants, but this LD is population-specific. The fraction of LD that is
-    shared between populations decays as new mutations accumulate:
-    shared_LD ∝ exp(-θt/2) for the mutation-driven component.
+/-- **DOCSTRING OVERCLAIM — this is not a fraction of anything.**
 
-    Empirical status: UNTESTED. -/
+    The body is `exp(-expectedNewMutations θ t) = exp(-θt/2)`, and by the corpus's own
+    composition that exponent is a **count of mutations**, not a dimensionless rate. Simulation
+    measures the count directly: `599.9` arisen at `θ = 1, t = 1200`, so the body evaluates to
+    `exp(-600) ≈ 1e-261`; at `θ = 4` it is `exp(-2424)`.
+
+    A quantity described as "the fraction of LD shared between populations" is therefore
+    **identically zero to machine precision for any locus older than roughly `60/θ`
+    generations**. Nothing in the corpus derives an `exp(-N_mutations)` law, and the regime in
+    which the expression looks plausible (`θt/2 ~ 1`) exists only for a per-*site* `θ` and
+    vanishes for any locus-scale `θ`.
+
+    Empirical status: **FALSIFIED as stated** (`proofs/validation/coalescent_diff/`). -/
 noncomputable def sharedLDFractionFromMutation (θ t : ℝ) : ℝ :=
   Real.exp (-(expectedNewMutations θ t))
 

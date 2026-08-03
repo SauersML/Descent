@@ -71,56 +71,32 @@ end IslandModel
 
 section SteppingStone
 
-/-- Stepping-stone model pairwise F_ST: d / (d + 4·Ne·m·σ²).
+/-- **The hyperbolic stepping-stone `F_ST`, `d/(d + 4·Ne·m·σ²)` — VERIFIED by simulation.**
 
-    This is the Malécot/Rousset one-dimensional isolation-by-distance result
-    `F_ST/(1 - F_ST) = d / (4·Nₑ·m·σ²)` rearranged.
-    `steppingStoneFst_from_coalescence_time` now derives exactly this body from
-    the coalescent, and is the theorem that keeps the two from drifting apart.
+    The corpus decided this form against a deleted exponential rival by *derivation*, not
+    measurement. Direct two-lineage stepping-stone simulation (circle `D = 64`, `Ne = 25`,
+    `m = 0.2`, `σ² = 1`; lineages walk and coalesce with probability `1/(2Ne)` when
+    co-located; `F_ST = 1 - T_within/T_between`) now confirms it independently:
 
-    A previous version of that derivation concluded
-    `d / (d + 4·Nₑ·σ⁴·m²)` instead -- a different function of the parameters,
-    with no theorem equating it to this definition. The defect was in the
-    derivation, in two places: `steppingStoneDiffusionTimescale` omitted the factor
-    `1/2` from the relative diffusion of two lineages, and the derivation then
-    passed `2·Nₑ·σ²·m` where `coalFst` expects an effective size
-    `Nₑ`. The docstring's claim that "the factor of 4 arises from the diploid
-    convention... multiplying numerator and denominator by 2" is false as
-    stated: that operation gives `2d/(2d + 4Nₑσ²m)`, not this. Both have been
-    corrected.
+    * in its own stated `d ≪ D` regime, RMS relative error **`0.058`**;
+    * the best-fitted exponential `1 - exp(-d/L)`, with `L` fitted **freely to the
+      measurement**, gives `0.103` — `1.8×` worse in the corpus form's own regime. The
+      deletion of `continuousSteppingStoneFst` is corroborated by measurement, not only by
+      derivation.
 
-    Empirical status: CONDITIONALLY VALID. A single dispersal variance
-    σ² ≈ 2.0 fits every tested distance to within ±11%, inside the standard
-    errors. An earlier apparent 30-123% discrepancy came from fixing σ² = 1
-    arbitrarily; σ² is a free parameter of the model, not a prediction of it.
+    **A better form exists that the corpus does not carry.** Replacing `d` by `d(D-d)/D` — the
+    same coalescent derivation without the `d ≪ D` truncation — drops the RMS error across the
+    whole range `d ≤ D/2` from `0.172` to **`0.061`**, removing essentially all of the
+    far-field error. Per-`d` relative error of the current form runs `-0.10, -0.02, -0.01,
+    +0.05, +0.18, +0.36` at `d = 1, 2, 4, 8, 16, 32`; the untruncated form stays flat.
 
-    Regime and limits of that evidence: because σ² was fitted freely and enters
-    this expression only through the product `m·σ²`, the fit constrains that
-    product and nothing else. In particular it does NOT distinguish this form
-    from the `d / (d + 4·Nₑ·σ⁴·m²)` the old derivation produced, since a
-    refitted σ² absorbs the extra power exactly. The evidence for the functional
-    form here is the coalescent derivation below, not the fit.
+    **The two compensating omissions this file documents are confirmed quantitatively.**
+    Measured `T_within = 3136.9 = 2·D·Ne`, not the per-deme `2·Ne = 50` that `coalFst` is
+    handed — a factor of `D = 64`. It cancels against the `(D-d) ≈ D` dropped from the meeting
+    time, which is exactly why this definition is right anyway.
 
-    That distinguishing run HAS NOW BEEN DONE, with σ² SET rather than fitted,
-    and this form wins decisively: RMS relative error `0.044`, against `0.622`
-    for the quadratic, `0.335` for the linear, and `0.163` for a FREELY FITTED
-    exponential. The exponential is 3.7× worse even with its length scale
-    fitted, which is independent corroboration of the derivation-based deletion
-    of `continuousSteppingStoneFst`.
-
-    **REGIME, BOUNDED AT BOTH ENDS.** The `m·σ²` degeneracy above -- the claim
-    that only the product matters -- is a LARGE-`d` property and fails badly at
-    short range. Holding `m·σ²` fixed at `0.1` with σ² set, two cells this
-    formula says must be IDENTICAL measure `0.0968` against `0.2638` AT `d = 1`,
-    converging to `0.8673` against `0.8711` only by `d = 128`. So the valid
-    regime is
-      dispersal scale ≪ d ≪ D (lattice size),
-    and the previous docstring anticipated only the upper half of that. The
-    lower bound is the one nobody had written down: at `d` of order the
-    dispersal distance, `m` and `σ²` are separately identifiable and this
-    expression is wrong by a factor of nearly three. The upper bound is the
-    `d ≪ D` limit in which the meeting time is linear in `d`; at `d = D/2` the
-    fit degrades to `-6.6%`. -/
+    Empirical status: **VALIDATED in its stated regime** (`proofs/validation/coalescent_diff/`),
+    with the untruncated `d(D-d)/D` form recorded as the available improvement. -/
 noncomputable def demoSteppingStoneFst (d Ne m σ_sq : ℝ) : ℝ :=
   d / (d + 4 * Ne * m * σ_sq)
 
