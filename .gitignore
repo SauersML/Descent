@@ -112,17 +112,17 @@ python/gnomon/_gnomon*.so
 # constantly; a committed snapshot drifts by six figures and reads as
 # authoritative while being wrong. Regenerate per worktree -- each producer
 # names its command in its own header.
-proofs/validation/extract/lean_defs.py
-proofs/validation/extract/defs.json
-proofs/validation/extract/classes.json
-proofs/validation/extract/ceiling.json
-proofs/validation/extract/regime.json
-proofs/validation/extract/reconcile.json
-proofs/validation/extract/coverage.json
+proofs/validation/empirical/extract/lean_defs.py
+proofs/validation/empirical/extract/defs.json
+proofs/validation/empirical/extract/classes.json
+proofs/validation/empirical/extract/ceiling.json
+proofs/validation/empirical/extract/regime.json
+proofs/validation/empirical/extract/reconcile.json
+proofs/validation/empirical/extract/coverage.json
 
 # Per-run validator output. These files are regenerated from the current Lean
 # sources and must not masquerade as versioned evidence from an older revision.
-proofs/validation/differential/results.json
-proofs/validation/drift_diff/results_migration_mean.json
-proofs/validation/invariants/defs.json
-proofs/validation/invariants/results_ranges.json
+proofs/validation/empirical/differential/results.json
+proofs/validation/empirical/drift_diff/results_migration_mean.json
+proofs/validation/empirical/invariants/defs.json
+proofs/validation/empirical/invariants/results_ranges.json

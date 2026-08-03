@@ -117,25 +117,36 @@ jobs:
       - name: Build project
         run: lake build Calibrator ValidationShared
 
-      - name: Verify transitive axiom closure
-        run: lake env lean proofs/validation/invariants/AxiomScan.lean
+      # CODE VALIDATION, in two steps because there are exactly two instruments.
+      #
+      # The calibration runs FIRST and gates the laundering detector.  A detector
+      # that reports nothing is indistinguishable from a clean corpus, so its
+      # report is not evidence until both directions are asserted: every planted
+      # pattern reported in the right family, and no finding at gating severity
+      # on clean mathematics.  This step also fails if the calibration file is
+      # deleted, which has happened once.
+      - name: Calibrate the laundering detector
+        run: python3 proofs/validation/code/test_check.py
 
-      - name: Audit theorem-valued structure fields
-        run: lake env lean proofs/validation/inflation/Inflation.lean
+      # Source text: style, structural guards, laundering, regimes, root import
+      # closure, wiring.  Was six separate steps in three directories, each with
+      # its own idea of where the corpus is; they disagreed.
+      - name: Code validation (source text)
+        run: python3 proofs/validation/code/check.py
 
-      - name: Structural guards
-        run: python3 scripts/check-identifications.py
-
-      - name: Verify root import closure
-        run: python3 proofs/validation/invariants/module_closure.py
+      # Elaborated environment: transitive axiom closure, laundered premises,
+      # theorem-valued structure fields, rfl proofs.  Was four separate `lake env
+      # lean` invocations, two of which carried private copies of the
+      # generated-declaration filter that disagreed with `Shared.DeclFilter`.
+      #
+      # Source text and elaborated type are different objects and each sees what
+      # the other cannot; that is why this stays two steps and not one.
+      - name: Code validation (elaborated environment)
+        run: lake env lean proofs/validation/code/Check.lean
 
       - name: Verify arithmetic runtime semantics
-        working-directory: proofs/validation/invariants
+        working-directory: proofs/validation/empirical/invariants
         run: python3 test_lean_semantics.py
-
-      - name: No externally supplied theorems in production structures
-        working-directory: proofs/validation/invariants
-        run: python3 check_regimes.py
 
       - name: Regenerate the extracted definition table
         # defs.json and lean_defs.py are generated, never committed: they are
@@ -143,7 +154,7 @@ jobs:
         # must build them from the revision under test, which is also what
         # makes the battery below evidence about THIS commit rather than about
         # whenever someone last refreshed a cache.
-        run: python3 proofs/validation/extract/emit.py
+        run: python3 proofs/validation/empirical/extract/emit.py
 
       - name: Differential battery
         # 67 checks comparing each transcribed Lean body against an
@@ -151,24 +162,26 @@ jobs:
         # points. Exact arithmetic on a fixed grid, so the verdict is
         # reproducible. It also gates the EXPECTED disagreements: a check
         # pinned as model-differing that starts agreeing is a regression.
-        working-directory: proofs/validation/differential
+        working-directory: proofs/validation/empirical/differential
         run: python3 run.py
 
-      # WHAT IS NOT WIRED UP, and why. The steps above are the subset of
-      # proofs/validation/ that is deterministic, dependency-free and about
-      # twenty seconds in total. Everything else falls into one of four
-      # buckets, none of which belongs in a required check:
+      # WHAT IS NOT WIRED UP, and why. The steps above are all of
+      # proofs/validation/code/ plus the subset of proofs/validation/empirical/
+      # that is deterministic, dependency-free and about twenty seconds in
+      # total. Everything else under empirical/ falls into one of four buckets,
+      # none of which belongs in a required check:
       #
       #   * Monte-Carlo suites (coalescent_diff, drift_diff, block_count,
       #     ldsc_diff, meff_*, pencil, tau_c, ld_coverage_boundary, ...).
       #     Their verdicts are statistical, so at any sample size they carry a
       #     false failure rate. A required check that fails at random gets
       #     ignored, which costs more than the coverage would gain.
-      #   * Deterministic but slow: imitation_rigidity/check_imitation.py is
-      #     44s and invariants/vacuity.py is 60s, against ~20s for all of the
-      #     above together.
+      #   * Deterministic but slow: empirical/imitation_rigidity/check_imitation.py
+      #     is 44s and empirical/invariants/vacuity.py is 60s, against ~20s for
+      #     all of the above together.
       #   * Needs numpy, scipy, sympy or z3 (condensation, bundle_rigidity,
-      #     invariants/check_ranges.py, extract/xcheck_vector.py). Installable,
+      #     invariants/check_ranges.py, extract/xcheck_vector.py, all under
+      #     empirical/). Installable,
       #     but check_ranges prints its findings and exits 0 whatever it finds,
       #     so as a gate it would catch nothing but its own crashes.
       #   * extract/test_parser.py, which pins absolute LINE NUMBERS in the
@@ -177,7 +190,7 @@ jobs:
       #     is testing. It is currently failing for exactly that reason.
 
       - name: Executable correctability contract
-        run: cargo test --manifest-path proofs/validation/correctability_calculator/Cargo.toml
+        run: cargo test --manifest-path proofs/validation/empirical/correctability_calculator/Cargo.toml
 
   auto-close-failed-proof-pr:
     runs-on: ubuntu-latest
