@@ -918,11 +918,30 @@ them. Three are kept, immediately below: each ties one spelling to this primitiv
 together they make a divergence between any two spellings a failed proof. The other three
 were pairwise restatements implied by these by transitivity, and are deleted.
 
-The collapse to one name is the fix and has not been done: it is ~86 references across
-Lean, Python and the JSON string tables, and is blocked on `PortabilityDrift.lean`. When
-that file is editable, `geometricDecay` is the name to keep — it is the only one of the
-four that names the function rather than one of its applications, which is why the other
-three can each be a *use* of it without loss. -/
+**CORRECTION, and this paragraph used to say the opposite.** It read: "the collapse to
+one name is the fix and has not been done ... `geometricDecay` is the name to keep ...
+the other three can each be a *use* of it without loss." That instruction was wrong and
+is withdrawn. `PortabilityDrift.lean` became editable and the four were read against the
+criterion instead of counted, which reversed the call:
+
+  * `PortabilityDrift.admixtureLDDecay` MUST NOT be folded. It is `VALIDATED` as the
+    `Nₑ → ∞` limit and `MEASURED` high by `+0.24%` to `+0.37%` against finite-population
+    retention, with `admixtureLDDecay_ge_finitePopulation` proving the bias is one-sided
+    rather than leaving it to the runs that happened to be done. Folding it into a bare
+    primitive would detach a measured regime and a proved error direction from the name
+    they describe.
+  * `DGP.discreteRecombinationSurvival` is the survival of two linked loci to the MRCA --
+    a genealogical probability, not an LD quantity.
+  * `LongitudinalPortability.ldDecayPerGeneration` is per-generation LD decay.
+
+So this is not one function under four names. It is one FUNCTION under four REFERENTS,
+three correctly named and one carrying measurements -- the same shape as
+`hweHeterozygosity` and `genotypeVarianceHWE`, which are both `2p(1-p)` and are
+heterozygosity and dosage variance respectively. Identical arithmetic is not identical
+meaning, and a name census counts only the arithmetic.
+
+What the hub theorems below are for is unchanged, and three is the right amount of
+machinery: a divergence between any two spellings fails one of them. -/
 noncomputable def geometricDecay (r : ℝ) (t : ℕ) : ℝ := (1 - r) ^ t
 
 theorem ldDecayPerGeneration_eq_geometricDecay (r : ℝ) (t : ℕ) :
