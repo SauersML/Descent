@@ -210,15 +210,21 @@ theorem ncp_eq_neff_times_beta_sq (n : ℕ) (p r2_ld β : ℝ) :
     n_eff = n × 2p(1-p) × r²_LD(tag, causal)
     where p is MAF in that ancestry and r²_LD is tagging efficiency.
 
+    ORPHANED, PENDING REMOVAL. Every consumer in this file and in
+    `Conventions.lean` now calls `effectiveFisherInformation`, whose body is this
+    body. This declaration is left in place for one commit so the repoint can be
+    built and seen green before anything is deleted; see the removal commit for the
+    units argument. Do not add new callers.
+
     Empirical status: UNTESTED. -/
 noncomputable def effectiveSampleSize (n : ℕ) (p r2_ld : ℝ) : ℝ :=
   n * (2 * p * (1 - p)) * r2_ld
 
 /-- Effective sample size is nonneg. -/
-theorem effective_n_nonneg (n : ℕ) (p r2_ld : ℝ)
+theorem effective_information_nonneg (n : ℕ) (p r2_ld : ℝ)
     (h_p : 0 ≤ p) (h_p_le : p ≤ 1) (h_r2 : 0 ≤ r2_ld) :
-    0 ≤ effectiveSampleSize n p r2_ld := by
-  unfold effectiveSampleSize
+    0 ≤ effectiveFisherInformation n p r2_ld := by
+  unfold effectiveFisherInformation fisherInformation genotypeVarianceHWE
   apply mul_nonneg
   · apply mul_nonneg
     · exact Nat.cast_nonneg n
@@ -229,12 +235,12 @@ theorem effective_n_nonneg (n : ℕ) (p r2_ld : ℝ)
     Holding sample size and MAF fixed, higher tagging r² gives higher n_eff.
     This is the key lemma: populations with shorter LD have lower r²_LD
     to the GWAS tag SNPs, hence lower effective sample size. -/
-theorem effective_n_mono_r2 (n : ℕ) (p r2_a r2_b : ℝ)
+theorem effective_information_mono_r2 (n : ℕ) (p r2_a r2_b : ℝ)
     (h_n : 0 < n) (h_p : 0 < p) (h_p_lt : p < 1)
     (h_r2_a : 0 ≤ r2_a) (h_r2_b : 0 ≤ r2_b)
     (h_r2 : r2_a < r2_b) :
-    effectiveSampleSize n p r2_a < effectiveSampleSize n p r2_b := by
-  unfold effectiveSampleSize
+    effectiveFisherInformation n p r2_a < effectiveFisherInformation n p r2_b := by
+  unfold effectiveFisherInformation fisherInformation genotypeVarianceHWE
   have h_het : 0 < 2 * p * (1 - p) := by nlinarith
   have h_coeff : 0 < ↑n * (2 * p * (1 - p)) := by
     apply mul_pos
@@ -244,12 +250,12 @@ theorem effective_n_mono_r2 (n : ℕ) (p r2_a r2_b : ℝ)
 
 /-- **Effective sample size is monotone in sample count.**
     Holding MAF and r²_LD fixed, more samples give higher n_eff. -/
-theorem effective_n_mono_n (n_a n_b : ℕ) (p r2_ld : ℝ)
+theorem effective_information_mono_n (n_a n_b : ℕ) (p r2_ld : ℝ)
     (h_p : 0 < p) (h_p_lt : p < 1)
     (h_r2 : 0 < r2_ld)
     (h_n : n_a < n_b) :
-    effectiveSampleSize n_a p r2_ld < effectiveSampleSize n_b p r2_ld := by
-  unfold effectiveSampleSize
+    effectiveFisherInformation n_a p r2_ld < effectiveFisherInformation n_b p r2_ld := by
+  unfold effectiveFisherInformation fisherInformation genotypeVarianceHWE
   have h_het : 0 < 2 * p * (1 - p) := by nlinarith
   have h_cast : (↑n_a : ℝ) < ↑n_b := Nat.cast_lt.mpr h_n
   have h_suffix : 0 < 2 * p * (1 - p) * r2_ld := mul_pos h_het h_r2
@@ -263,7 +269,7 @@ theorem effective_n_mono_n (n_a n_b : ℕ) (p r2_ld : ℝ)
     Step 1: n_target with r2_target < n_target with r2_source (mono in r²)
     Step 2: n_target with r2_source < n_source with r2_source (mono in n)
     Compose by transitivity. -/
-theorem source_higher_effective_n
+theorem source_higher_effective_information
     (n_source n_target : ℕ) (p_source p_target r2_source r2_target : ℝ)
     (h_n : n_target < n_source) (h_r2 : r2_target < r2_source)
     (h_p_source : 0 < p_source) (h_p_source_lt : p_source < 1)
@@ -271,14 +277,14 @@ theorem source_higher_effective_n
     (h_r2_target : 0 < r2_target)
     -- Same variant, same allele frequency for simplicity
     (h_same_p : p_source = p_target) :
-    effectiveSampleSize n_target p_target r2_target <
-      effectiveSampleSize n_source p_source r2_source := by
+    effectiveFisherInformation n_target p_target r2_target <
+      effectiveFisherInformation n_source p_source r2_source := by
   rw [h_same_p]
   -- Case split: n_target = 0 vs n_target > 0
   by_cases h_nt : n_target = 0
   · -- When n_target = 0, LHS is 0; RHS is positive since n_source ≥ 1
     have h_ns_pos : 0 < n_source := by omega
-    unfold effectiveSampleSize
+    unfold effectiveFisherInformation fisherInformation genotypeVarianceHWE
     rw [h_nt]; simp
     have h_het : 0 < 2 * p_target * (1 - p_target) := by nlinarith
     have h_cast : (0 : ℝ) < ↑n_source := Nat.cast_pos.mpr h_ns_pos
@@ -286,14 +292,14 @@ theorem source_higher_effective_n
     exact mul_pos (mul_pos h_cast h_het) h_r2_source
   · -- When n_target > 0, compose monotonicity in r² and n
     have h_nt_pos : 0 < n_target := Nat.pos_of_ne_zero h_nt
-    have step1 : effectiveSampleSize n_target p_target r2_target <
-        effectiveSampleSize n_target p_target r2_source :=
-      effective_n_mono_r2 n_target p_target r2_target r2_source
+    have step1 : effectiveFisherInformation n_target p_target r2_target <
+        effectiveFisherInformation n_target p_target r2_source :=
+      effective_information_mono_r2 n_target p_target r2_target r2_source
         h_nt_pos h_p_target h_p_target_lt
         (le_of_lt h_r2_target) (le_of_lt (by linarith)) h_r2
-    have step2 : effectiveSampleSize n_target p_target r2_source <
-        effectiveSampleSize n_source p_target r2_source :=
-      effective_n_mono_n n_target n_source p_target r2_source
+    have step2 : effectiveFisherInformation n_target p_target r2_source <
+        effectiveFisherInformation n_source p_target r2_source :=
+      effective_information_mono_n n_target n_source p_target r2_source
         h_p_target h_p_target_lt (by linarith) h_n
     linarith
 
@@ -581,14 +587,14 @@ theorem afr_needs_more_samples
     -- The multiplier needed is r²_source / r²_target > 1
     1 < r2_source / r2_target ∧
     -- At same sample size, shorter LD gives lower effective n
-    effectiveSampleSize n_source p r2_target <
-      effectiveSampleSize n_source p r2_source := by
+    effectiveFisherInformation n_source p r2_target <
+      effectiveFisherInformation n_source p r2_source := by
   constructor
   · -- r²_source / r²_target > 1 because r²_source > r²_target > 0
     rw [one_lt_div h_r2_target]
     exact h_shorter_ld
   · -- Direct application of monotonicity in r²
-    exact effective_n_mono_r2 n_source p r2_target r2_source
+    exact effective_information_mono_r2 n_source p r2_target r2_source
       h_n h_p h_p_lt (le_of_lt h_r2_target) (le_of_lt h_r2_source) h_shorter_ld
 
 /-- **General version: any population with shorter LD needs more samples.**
@@ -604,11 +610,11 @@ theorem shorter_ld_needs_more_samples
     (h_r2_short : 0 < r2_short)
     (h_shorter : r2_short < r2_long) :
     -- Same sample size yields lower effective n with shorter LD
-    effectiveSampleSize n p r2_short < effectiveSampleSize n p r2_long ∧
+    effectiveFisherInformation n p r2_short < effectiveFisherInformation n p r2_long ∧
     -- The multiplier to compensate is > 1
     1 < r2_long / r2_short := by
   constructor
-  · exact effective_n_mono_r2 n p r2_short r2_long
+  · exact effective_information_mono_r2 n p r2_short r2_long
       h_n h_p h_p_lt (le_of_lt h_r2_short) (le_of_lt h_r2_long) h_shorter
   · rw [one_lt_div h_r2_short]
     exact h_shorter

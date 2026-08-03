@@ -687,9 +687,11 @@ theorem gwasNCP_uses_hwe (n : ℕ) (β p : ℝ) :
     gwasNCP n β p = n * β ^ 2 * hweGenotypeVariance p := by
   unfold gwasNCP hweGenotypeVariance ploidy; ring_nf
 
-theorem effectiveSampleSize_uses_hwe (n : ℕ) (p r2_ld : ℝ) :
-    effectiveSampleSize n p r2_ld = n * hweGenotypeVariance p * r2_ld := by
-  unfold effectiveSampleSize hweGenotypeVariance ploidy; ring_nf
+theorem effectiveFisherInformation_uses_hwe (n : ℕ) (p r2_ld : ℝ) :
+    effectiveFisherInformation n p r2_ld = n * hweGenotypeVariance p * r2_ld := by
+  unfold effectiveFisherInformation fisherInformation genotypeVarianceHWE
+    hweGenotypeVariance ploidy
+  ring_nf
 
 theorem epistaticVariancePairwise_uses_hwe (γ p₁ p₂ : ℝ) :
     epistaticVariancePairwise γ p₁ p₂ =
