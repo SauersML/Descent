@@ -671,10 +671,19 @@ def c3(base, rng, out):
         engine_gap = (meas_b - meas) / meas if meas else float("nan")
         good = dev_het <= 4.0
         ok = ok and good
+        # THE DIFFERENCE IS STATED, NOT LEFT TO BE SUBTRACTED. A reader must
+        # not have to difference two columns to find out how much the choice of
+        # convention costs; see the C3 block's site_consequence field.
+        gap_abs = pred_hud - pred_het
+        gap_rel = (gap_abs / pred_het) if pred_het else float("nan")
         rows.append({"t": c["t"], "F_HET": c["F_HET"], "F_HUDSON": c["F_HUDSON"],
                      "measured_WF": meas, "se": se,
                      "presentDayPGSVariance_at_F_HET": pred_het,
                      "presentDayPGSVariance_at_F_HUDSON": pred_hud,
+                     "convention_gap_absolute": gap_abs,
+                     "convention_gap_relative": gap_rel,
+                     "convention_gap_pct": 100.0 * gap_rel,
+                     "F_HUDSON_minus_F_HET": c["F_HUDSON"] - c["F_HET"],
                      "sems_F_HET": dev_het, "sems_F_HUDSON": dev_hud,
                      "measured_BaldingNichols": meas_b,
                      "engine_gap_rel": engine_gap,
@@ -688,7 +697,48 @@ def c3(base, rng, out):
                  100 * c["fixed_locus_fraction"], "ok" if good else "FAIL"))
     print("  EVERY NUMBER ABOVE IS LABELLED WITH ITS F_ST READING. The corpus "
           "declaration does not say which it means.")
-    out["C3"] = {"cells": rows, "pass": bool(ok)}
+    # The verdict on the convention, stated as a sentence rather than left for a
+    # reader to derive by differencing two columns.
+    gaps = [abs(r["convention_gap_pct"]) for r in rows
+            if r["convention_gap_pct"] == r["convention_gap_pct"]]
+    worst = max(gaps) if gaps else float("nan")
+    which = None
+    for r in rows:
+        if r["t"] == 0:
+            continue
+        if r["sems_F_HET"] <= 4.0 < r["sems_F_HUDSON"]:
+            which = "F_HET"
+        elif r["sems_F_HUDSON"] <= 4.0 < r["sems_F_HET"]:
+            which = "F_HUDSON"
+        else:
+            which = which or "UNDECIDED"
+    statement = (
+        "presentDayPGSVariance evaluated at the two F_ST readings differs by up "
+        "to %.2f%% on this grid. The measurement is consistent with the %s "
+        "reading." % (worst, which))
+    print("  CONVENTION VERDICT: %s" % statement)
+    out["C3"] = {
+        "cells": rows, "pass": bool(ok),
+        "worst_convention_gap_pct": worst,
+        "reading_consistent_with_measurement": which,
+        "convention_statement": statement,
+        "site_consequence":
+            "This is not only a scope note owed on a declaration. The public "
+            "page built from this corpus instructs a reader to supply an F_ST "
+            "in the HUDSON convention to the step that computes this quantity, "
+            "and warns that Nei G_ST is a different and smaller number. If "
+            "presentDayPGSVariance means heterozygosity retention instead, "
+            "that instruction sends the wrong number into the step, and the "
+            "interactive panel's headline figure is computed from it. The "
+            "worst_convention_gap_pct field above is the size of that error on "
+            "this grid. Do not change the page from a prediction: change it "
+            "from this measurement, or not at all.",
+        "pass_note":
+            "pass reflects the INSTRUMENT (the measurement must match the "
+            "heterozygosity-retention reading, which is what the corpus body "
+            "composes). Which convention the DECLARATION should name is a "
+            "finding reported in the fields above and does not flip "
+            "READ_THE_TEST."}
     return ok
 
 
