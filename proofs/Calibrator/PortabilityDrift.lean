@@ -1,5 +1,6 @@
 import Calibrator.Conclusions
 import Calibrator.DGP
+import Calibrator.CirculationDefect
 
 namespace Calibrator
 
@@ -1012,11 +1013,10 @@ theorem drift_degrades_AUC_of_strictMono
     (V_A V_E fstS fstT : ℝ)
     (hVA : 0 < V_A) (hVE : 0 < V_E)
     (hfst : fstS < fstT)
-    (hfstT_le_one : fstT ≤ 1)
-    (hPhiStrict : StrictMono Phi) :
+    (hfstT_le_one : fstT ≤ 1) :
     presentDayEqualVarianceGaussianAUC V_A V_E fstT < presentDayEqualVarianceGaussianAUC V_A V_E fstS := by
   unfold presentDayEqualVarianceGaussianAUC
-  apply hPhiStrict
+  apply strictMono_Phi
   have hsnr := drift_degrades_signalToNoise V_A V_E fstS fstT hVA hVE hfst
   have hhalf_nonneg : 0 ≤ presentDaySignalToNoise V_A V_E fstT / 2 := by
     have hsnr_nonneg : 0 ≤ presentDaySignalToNoise V_A V_E fstT := by
@@ -1044,11 +1044,10 @@ theorem drift_degrades_equalVarianceGaussianAUC
     (V_A V_E fstS fstT : ℝ)
     (hVA : 0 < V_A) (hVE : 0 < V_E)
     (hfst : fstS < fstT)
-    (hfstT_le_one : fstT ≤ 1)
-    (hPhiStrict : StrictMono Phi) :
+    (hfstT_le_one : fstT ≤ 1) :
     presentDayEqualVarianceGaussianAUC V_A V_E fstT < presentDayEqualVarianceGaussianAUC V_A V_E fstS := by
   unfold presentDayEqualVarianceGaussianAUC
-  apply hPhiStrict
+  apply strictMono_Phi
   have hsnr := drift_degrades_signalToNoise V_A V_E fstS fstT hVA hVE hfst
   have hhalf_nonneg : 0 ≤ presentDaySignalToNoise V_A V_E fstT / 2 := by
     have hsnr_nonneg : 0 ≤ presentDaySignalToNoise V_A V_E fstT := by
@@ -2765,7 +2764,7 @@ noncomputable def targetR2FromNeutralAFBenchmark
 
 /-- Within the neutral allele-frequency benchmark, the target/source `R²` ratio
 is strictly below `1` when target `F_ST` exceeds source `F_ST`. -/
-theorem neutralAFBenchmarkRatio_from_state
+theorem targetR2FromNeutralAFBenchmark_ratio_lt_one
     (V_A V_E fstSource fstTarget : ℝ)
     (hVA : 0 < V_A) (hVE : 0 < V_E)
     (h_fst : fstSource < fstTarget)
@@ -2798,69 +2797,53 @@ theorem targetR2_lt_source_from_neutralAF_benchmark
   simpa [targetR2FromNeutralAFBenchmark] using
     drift_degrades_R2 V_A V_E fstSource fstTarget hVA hVE h_fst (le_of_lt h_fst_bounds.2)
 
-/-- **Neutral allele-frequency benchmark ratio from source/target `F_ST`.**
+/-! **Deleted: `neutralAFBenchmarkRatio fstSource fstTarget = (1 - fstTarget)/(1 - fstSource)`,
+together with `neutralAFBenchmarkRatio_le_inv_one_sub_source`, `_nonneg`, `_lt_one`, `_self`,
+and the `FstBounds` section of `Calibrator.PortabilityBounds` that was stated about it.**
 
-    On asymmetric effective sizes it is `-37%` to `-74%` low, at nine to fifteen
-    standard errors:
+On asymmetric effective sizes it ran `-37%` to `-74%` low, at nine to fifteen standard
+errors:
 
-        T    NeA    NeB     fstS     fstT   het_B/het_A   se      this def   err
-      500    200   2000   0.3577   0.0582     3.7862    0.2547    1.4662   -61.3%
-     1000    200   2000   0.4860   0.1187     6.5409    0.3445    1.7147   -73.8%
-     1000    500   5000   0.3165   0.0450     2.2220    0.0771    1.3972   -37.1%
-     2000    300   3000   0.5611   0.1454     5.7238    0.2201    1.9472   -66.0%
+      T    NeA    NeB     fstS     fstT   het_B/het_A   se    deleted body   err
+    500    200   2000   0.3577   0.0582     3.7862    0.2547    1.4662   -61.3%
+   1000    200   2000   0.4860   0.1187     6.5409    0.3445    1.7147   -73.8%
+   1000    500   5000   0.3165   0.0450     2.2220    0.0771    1.3972   -37.1%
+   2000    300   3000   0.5611   0.1454     5.7238    0.2201    1.9472   -66.0%
 
-    The earlier record of `VALIDATED to 3.2%` was an artifact of a symmetric
-    design: with equal branch lengths both sides of the ratio collapse to about
-    `1`, so the test had no power to reject a wrong functional form.
-    `Calibrator.DriftRegime.symmetric_design_has_no_power` proves that on any
-    symmetric design this form and its *square* are indistinguishable.
+The earlier record of `VALIDATED to 3.2%` was an artifact of a symmetric design: with equal
+branch lengths both sides of the ratio collapse to about `1`, so the test had no power to
+reject a wrong functional form. `Calibrator.DriftRegime.symmetric_design_has_no_power` proves
+that on any symmetric design this form and its *square* are indistinguishable.
 
-    The defect is not a miscalibration, it is the wrong argument list. The
-    observed ratio is `2.2` to `6.5` and is driven by the tenfold ratio in
-    effective size, not by `F_ST`: heterozygosity is governed by `Nₑ` and the
-    mutation floor `hetMutationFloor`, and `F_ST` is a between-population
-    variance ratio that does not determine either. This is quantitative and
-    needs no simulation to see --
-    `neutralAFBenchmarkRatio_cannot_reach_measured` shows that at the measured
-    `fstSource = 0.3577` this expression cannot exceed `1.557` for *any* target
-    `F_ST` whatsoever, while the measurement at that design point is
-    `3.79 ± 0.25`. No calibration of `fstTarget` repairs it; the observable is
-    outside the formula's range.
+The defect was not a miscalibration, it was the wrong argument list. The observed ratio is
+`2.2` to `6.5` and is driven by the tenfold ratio in effective size, not by `F_ST`:
+heterozygosity is governed by `Nₑ` and the mutation floor `hetMutationFloor`, and `F_ST` is a
+between-population variance ratio that does not determine either.
 
-    No replacement is substituted here. `hetRatioBetweenBranches` is a
-    clearly-labelled candidate for testing, and it is a function of the two
-    effective sizes, the mutation rate and the horizon, which is what the data
-    say the quantity depends on.
+**The falsification survives the deletion**, because it never needed the name.
+`benchmarkRatioForm_cannot_reach_measured` below states it about the expression written out,
+and is the machine-checked form of "no argument brings this formula into the measured range".
+A certificate that can only be stated about a name is hostage to that name.
 
-    Empirical status: FALSIFIED. -/
-noncomputable def neutralAFBenchmarkRatio (fstSource fstTarget : ℝ) : ℝ :=
-  (1 - fstTarget) / (1 - fstSource)
+No replacement is substituted. `hetRatioBetweenBranches` below is a clearly-labelled
+candidate for testing, and is a function of the two effective sizes, the mutation rate and
+the horizon, which is what the data say the quantity depends on. `DriftRegime.benchmarkRatio`
+is NOT this quantity and is not affected: measurement confirmed that form to `-0.003%`, and
+what was falsified there was a different quantity fed into its `fst` slot. -/
 
-/-- The benchmark ratio is bounded above by `1/(1 - fstSource)` for every target
-`F_ST` in range, because its numerator is at most `1`. -/
-theorem neutralAFBenchmarkRatio_le_inv_one_sub_source (fstSource fstTarget : ℝ)
-    (h0 : 0 ≤ fstTarget) (h1 : fstSource < 1) :
-    neutralAFBenchmarkRatio fstSource fstTarget ≤ 1 / (1 - fstSource) := by
-  have hpos : (0 : ℝ) < 1 - fstSource := by linarith
-  unfold neutralAFBenchmarkRatio
-  rw [div_le_div_iff₀ hpos hpos]
-  nlinarith [mul_nonneg h0 hpos.le]
+/-- **The measured value is outside the range of the heterozygosity-ratio-from-`F_ST` form,
+stated about the expression rather than about a name.**
 
-/-- **The measured value is outside the formula's range.**
-
-At the design point `fstSource = 0.3577` the benchmark ratio is below `3` for
-every target `F_ST` -- its supremum there is `1/(1 - 0.3577) = 1.557`. The
-measured heterozygosity ratio at that point is `3.79 ± 0.25`, more than nine
-standard errors above `3`. This is the falsification in a form that does not
-depend on the simulation being rerun: no choice of the free argument brings the
-expression into the measured range. -/
-theorem neutralAFBenchmarkRatio_cannot_reach_measured (fstTarget : ℝ)
+At the design point `fstSource = 0.3577` the form `(1 - fstT)/(1 - fstS)` is below `3` for
+every target `F_ST` in range -- its supremum there is `1/(1 - 0.3577) = 1.557`. The measured
+heterozygosity ratio at that point is `3.79 ± 0.25`, more than nine standard errors above
+`3`. This is the falsification in a form that depends on neither the simulation being rerun
+nor the definition continuing to exist: no choice of the free argument brings the expression
+into the measured range. -/
+theorem benchmarkRatioForm_cannot_reach_measured (fstTarget : ℝ)
     (h0 : 0 ≤ fstTarget) :
-    neutralAFBenchmarkRatio (3577 / 10000) fstTarget < 3 := by
-  have hbound :=
-    neutralAFBenchmarkRatio_le_inv_one_sub_source (3577 / 10000) fstTarget h0
-      (by norm_num)
-  have hnum : (1 : ℝ) / (1 - 3577 / 10000) < 3 := by norm_num
+    (1 - fstTarget) / (1 - 3577 / 10000) < 3 := by
+  rw [div_lt_iff₀ (by norm_num : (0:ℝ) < 1 - 3577 / 10000)]
   linarith
 
 /-- **Candidate replacement, offered for testing and deliberately not
@@ -2869,18 +2852,18 @@ substituted.**
 The ratio of present-day heterozygosities between two branches that started
 from the same ancestral value, as a function of the two effective sizes, the
 mutation rate and the horizon -- which is what the measurement says it depends
-on. It reduces to `1` when the effective sizes agree, and unlike
-`neutralAFBenchmarkRatio` it has the dynamic range the data require:
-`hetRatioBetweenBranches_exceeds_benchmark_ceiling` puts it above `3` at a
-two-generation, tenfold-`Nₑ` design point where the benchmark form is capped at
-`1.557`.
+on. It reduces to `1` when the effective sizes agree, and unlike the deleted
+`(1 - fstT)/(1 - fstS)` benchmark form it has the dynamic range the data
+require: `hetRatioBetweenBranches_exceeds_benchmark_ceiling` puts it above `3`
+at a two-generation, tenfold-`Nₑ` design point where the benchmark form is
+capped at `1.557`.
 
     Regime: none baked in; the closed population is the `mu = 0` case, and the
     mutation floor enters through `hetTrajectory`.
 
     Empirical status: UNTESTED. This is written from the recurrence, not fitted
-    to the four rows tabulated on `neutralAFBenchmarkRatio`, and the user has
-    the simulation capability to adjudicate it. -/
+    to the four rows tabulated in the deletion note above, and the user has the
+    simulation capability to adjudicate it. -/
 noncomputable def hetRatioBetweenBranches (NeA NeB mu H₀ : ℝ) (t : ℕ) : ℝ :=
   hetTrajectory NeB mu H₀ t / hetTrajectory NeA mu H₀ t
 
@@ -2894,7 +2877,7 @@ theorem hetRatioBetweenBranches_self (Ne mu H₀ : ℝ) (t : ℕ)
 /-- **The candidate has the range the measurement needs and the falsified form
 does not.**  At `Nₑ_A = 1`, `Nₑ_B = 5`, no mutation and two generations the
 ratio is `81/25 = 3.24`, above the ceiling that
-`neutralAFBenchmarkRatio_cannot_reach_measured` places on the benchmark form. -/
+`benchmarkRatioForm_cannot_reach_measured` places on the benchmark form. -/
 theorem hetRatioBetweenBranches_exceeds_benchmark_ceiling :
     3 < hetRatioBetweenBranches 1 5 0 1 2 := by
   unfold hetRatioBetweenBranches
@@ -3078,13 +3061,12 @@ theorem targetAUC_lt_source_of_neutralAF_benchmark
     (V_A V_E fstSource fstTarget : ℝ)
     (hVA : 0 < V_A) (hVE : 0 < V_E)
     (h_fst : fstSource < fstTarget)
-    (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1)
-    (hPhiStrict : StrictMono Phi) :
+    (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1) :
     presentDayEqualVarianceGaussianAUC V_A V_E fstTarget <
       presentDayEqualVarianceGaussianAUC V_A V_E fstSource := by
   simpa [presentDayEqualVarianceGaussianAUC] using
     drift_degrades_AUC_of_strictMono
-      V_A V_E fstSource fstTarget hVA hVE h_fst (le_of_lt h_fst_bounds.2) hPhiStrict
+      V_A V_E fstSource fstTarget hVA hVE h_fst (le_of_lt h_fst_bounds.2)
 
 /-- Exact liability-threshold AUC as a function of SNR:
 `AUC = Φ(√(snr/2))`.
@@ -3136,12 +3118,11 @@ theorem equalVarianceGaussianAUCFromVariances_scaleOne (vSignal : ℝ) :
 
 /-- On nonnegative SNR, the liability-threshold AUC map is strictly increasing
 whenever `Phi` is strictly increasing. -/
-theorem equalVarianceGaussianAUCFromSNR_strictMonoOn_nonneg
-    (hPhiStrict : StrictMono Phi) :
+theorem equalVarianceGaussianAUCFromSNR_strictMonoOn_nonneg :
     StrictMonoOn equalVarianceGaussianAUCFromSNR (Set.Ici 0) := by
   intro x hx y hy hxy
   unfold equalVarianceGaussianAUCFromSNR
-  apply hPhiStrict
+  apply strictMono_Phi
   have hx2 : 0 ≤ x / 2 := by
     exact div_nonneg hx (by positivity)
   have hxy2 : x / 2 < y / 2 := by nlinarith
@@ -3340,12 +3321,12 @@ attaining its minimum there. No range guard on `[0, 1]` would catch this --
 `Phi 0` is a perfectly legal AUC -- which is why it needed exhibiting rather
 than bounding. -/
 theorem equalVarianceGaussianAUCFromExplainedR2_endpoint_lt_interior
-    (hPhiStrict : StrictMono Phi) (x : ℝ) (hx0 : 0 < x) (hx1 : x < 1) :
+    (x : ℝ) (hx0 : 0 < x) (hx1 : x < 1) :
     equalVarianceGaussianAUCFromExplainedR2 1 <
       equalVarianceGaussianAUCFromExplainedR2 x := by
   rw [equalVarianceGaussianAUCFromExplainedR2_at_one]
   unfold equalVarianceGaussianAUCFromExplainedR2
-  apply hPhiStrict
+  apply strictMono_Phi
   have hden : (0 : ℝ) < 2 * (1 - x) := by linarith
   have harg : 0 < x / (2 * (1 - x)) := div_pos hx0 hden
   exact Real.sqrt_pos.mpr harg
@@ -3404,12 +3385,11 @@ theorem equalVarianceGaussianAUCFromExplainedR2_eq_fromSNR (r2 : ℝ) :
 
 /-- On valid deployed `R²` values, the liability-threshold AUC chart is strictly
 increasing whenever `Phi` is strictly increasing. -/
-theorem equalVarianceGaussianAUCFromExplainedR2_strictMonoOn_unitInterval
-    (hPhiStrict : StrictMono Phi) :
+theorem equalVarianceGaussianAUCFromExplainedR2_strictMonoOn_unitInterval :
     StrictMonoOn equalVarianceGaussianAUCFromExplainedR2 (Set.Ico 0 1) := by
   intro x hx y hy hxy
   unfold equalVarianceGaussianAUCFromExplainedR2
-  apply hPhiStrict
+  apply strictMono_Phi
   have hx_one_sub : 0 < 1 - x := by linarith [hx.2]
   have hy_one_sub : 0 < 1 - y := by linarith [hy.2]
   have hx_den : 0 < 2 * (1 - x) := by
@@ -3757,13 +3737,12 @@ theorem targetLiabilityAUC_lt_source_of_neutralAF_benchmark
     (V_A V_E fstSource fstTarget : ℝ)
     (hVA : 0 < V_A) (hVE : 0 < V_E)
     (h_fst : fstSource < fstTarget)
-    (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1)
-    (hPhiStrict : StrictMono Phi) :
+    (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1) :
     presentDayEqualVarianceGaussianAUC V_A V_E fstTarget <
       presentDayEqualVarianceGaussianAUC V_A V_E fstSource := by
   simpa [presentDayEqualVarianceGaussianAUC] using
     drift_degrades_equalVarianceGaussianAUC
-      V_A V_E fstSource fstTarget hVA hVE h_fst (le_of_lt h_fst_bounds.2) hPhiStrict
+      V_A V_E fstSource fstTarget hVA hVE h_fst (le_of_lt h_fst_bounds.2)
 
 /-- The exact target calibrated Brier risk is `TransportedMetrics.calibratedBrier`
 evaluated at the explicit target `R²` by definition. -/
@@ -3891,32 +3870,6 @@ theorem logLossRegretRatio_eq_kl_ratio (η qSource qTarget : ℝ)
   unfold logLossRegretRatio
   rw [logLossRegretPoint_eq_kl η qTarget hη0 hη1 hqT0 hqT1,
     logLossRegretPoint_eq_kl η qSource hη0 hη1 hqS0 hqS1]
-
-/-- Neutral allele-frequency benchmark ratio is nonnegative when both `F_ST`
-values are at most `1`. -/
-theorem neutralAFBenchmarkRatio_nonneg
-    (fstSource fstTarget : ℝ)
-    (hS : fstSource < 1) (hT : fstTarget ≤ 1) :
-    0 ≤ neutralAFBenchmarkRatio fstSource fstTarget := by
-  simp [neutralAFBenchmarkRatio]
-  exact div_nonneg (by linarith) (by linarith)
-
-/-- Neutral allele-frequency benchmark ratio is strictly below `1` when target
-has more drift. -/
-theorem neutralAFBenchmarkRatio_lt_one
-    (fstSource fstTarget : ℝ)
-    (hS : fstSource < 1)
-    (hfst : fstSource < fstTarget) :
-    neutralAFBenchmarkRatio fstSource fstTarget < 1 := by
-  simp [neutralAFBenchmarkRatio]
-  rw [div_lt_one (by linarith : (0 : ℝ) < 1 - fstSource)]
-  linarith
-
-/-- At zero divergence, the neutral allele-frequency benchmark ratio equals `1`. -/
-@[simp] theorem neutralAFBenchmarkRatio_self (fst : ℝ) (hfst : fst < 1) :
-    neutralAFBenchmarkRatio fst fst = 1 := by
-  simp [neutralAFBenchmarkRatio]
-  exact div_self (by linarith : (1 : ℝ) - fst ≠ 0)
 
 /-! **Do not add an "at zero divergence" variant of
 `targetR2FromNeutralAFBenchmark_eq_presentDayR2`.** `targetR2FromNeutralAFBenchmark` is
@@ -4398,20 +4351,20 @@ noncomputable def neutralAFSharedLDBenchmarkRatio
 when shared LD is perfect in both populations. -/
 theorem neutralAFSharedLDBenchmarkRatio_pure_drift (fstSource fstTarget : ℝ) :
     neutralAFSharedLDBenchmarkRatio fstSource fstTarget 1 1 =
-      neutralAFBenchmarkRatio fstSource fstTarget := by
-  unfold neutralAFSharedLDBenchmarkRatio neutralAFBenchmarkRatio
+      (1 - fstTarget) / (1 - fstSource) := by
+  unfold neutralAFSharedLDBenchmarkRatio
   ring
 
 /-- The shared-LD benchmark is below the pure neutral allele-frequency
 benchmark when target shared LD is worse than source shared LD. -/
-theorem neutralAFSharedLDBenchmarkRatio_lt_neutralAFBenchmarkRatio
+theorem neutralAFSharedLDBenchmarkRatio_lt_pure_drift_form
     (fstSource fstTarget shared_ld_source shared_ld_target : ℝ)
     (hfstS : fstSource < 1) (hfstT : fstTarget < 1)
     (hldS : 0 < shared_ld_source)
     (hld_decay : shared_ld_target / shared_ld_source < 1) :
     neutralAFSharedLDBenchmarkRatio fstSource fstTarget shared_ld_source shared_ld_target <
-      neutralAFBenchmarkRatio fstSource fstTarget := by
-  unfold neutralAFSharedLDBenchmarkRatio neutralAFBenchmarkRatio
+      (1 - fstTarget) / (1 - fstSource) := by
+  unfold neutralAFSharedLDBenchmarkRatio
   have h1 : 0 < 1 - fstSource := by linarith
   have h_den_pos : 0 < (1 - fstSource) * shared_ld_source := mul_pos h1 hldS
   rw [div_lt_div_iff₀ h_den_pos h1]
@@ -5669,5 +5622,58 @@ theorem recurrence_derived_R2_increases_with_m (V_A V_E Ne m₁ m₂ : ℝ)
 end MigrationDriftRecurrence
 
 end PortabilityDrift
+
+/-! ## Nonreversible gene flow: the mixing time is not the transfer time
+
+Everything above this point models divergence with reversible machinery — drift, symmetric
+migration, coalescent times. Real gene flow is not reversible: expansions, admixture pulses and
+sex-biased migration carry probability around cycles. `Calibrator.CirculationDefect` shows what
+that changes and, more usefully, what it does not.
+
+It does not change the degradation calculus: the Dirichlet energy annihilates the circulation, so
+every ordering of weighting schemes by that energy survives unchanged.
+
+It does change what a **measured** mixing time means. Circulation accelerates ergodic averaging
+without contributing to the frontier, so a mixing-time diagnostic reports a shorter time than the
+one that governs transfer. The gap is exact, and at equal circulation and dissipation the
+transfer-relevant time is **twice** what the diagnostic reports.
+
+That is a third mechanism, separate from the two this file already carries: allele-frequency
+divergence says how far apart populations are, tagging mismatch says how much of the linkage
+structure carries over, and this says that a population which *looks* well mixed can still be a
+bad transfer target because the rate at which its environment forgets is not the rate at which a
+design degrades. -/
+
+section NonreversibleFlow
+
+/-- **A mixing-time diagnostic understates the transfer-relevant time.**
+
+    Instance of `apparentMixingTime_lt_frontierTime`: whenever gene flow has any cyclic component,
+    the time constant an ergodic-averaging diagnostic measures is strictly shorter than the one
+    that sets the transfer frontier. Substituting the measured value into a horizon calculus
+    overstates transportability.
+
+    Empirical status: DERIVED; the circulation-to-dissipation ratio of a real demography is the
+    unmeasured input this asks for. -/
+theorem geneFlowMixingTime_understates_transferTime
+    (dissipation circulation : ℝ) (hd : 0 < dissipation) (hc : circulation ≠ 0) :
+    apparentMixingTime dissipation circulation < frontierTime dissipation :=
+  apparentMixingTime_lt_frontierTime dissipation circulation hd hc
+
+/-- **The overstatement is a factor of two at equal circulation and dissipation**, and grows
+    quadratically in the ratio beyond that.
+
+    Empirical status: DERIVED. -/
+theorem transferTime_doubles_at_equal_circulation (dissipation : ℝ) (hd : 0 < dissipation) :
+    frontierTime dissipation
+        = transferTimeInflation dissipation dissipation *
+            apparentMixingTime dissipation dissipation ∧
+      transferTimeInflation dissipation dissipation = 2 := by
+  refine ⟨frontierTime_eq_inflation_mul_apparent dissipation dissipation hd, ?_⟩
+  unfold transferTimeInflation
+  rw [div_self (ne_of_gt hd)]
+  norm_num
+
+end NonreversibleFlow
 
 end Calibrator

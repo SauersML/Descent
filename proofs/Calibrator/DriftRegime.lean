@@ -279,8 +279,9 @@ is every power of it.
 /-- The neutral allele-frequency benchmark ratio, in the form under test.
 
     **The functional form is CORRECT, and the family-guilt reading of it was wrong.** Its
-    identical-bodied twin `PortabilityDrift.neutralAFBenchmarkRatio` carries a FALSIFIED
-    marker, which invites the inference that this body inherits the defect. It does not.
+    identical-bodied twin `PortabilityDrift.neutralAFBenchmarkRatio` was falsified and has
+    been deleted, which invites the inference that this body inherits the defect. It does
+    not.
     Measured at the same design point that falsified the twin (`2N_A = 400`, `2N_B = 4000`,
     `t = 500`, `L = 1500`, 6 replicates), with the branch drift coefficient
     `F_i = 1 - H_i/H_ancestral`:

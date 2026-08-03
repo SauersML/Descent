@@ -1290,9 +1290,20 @@ check(
 # model has no mutation, predicts a ratio far from 1 -- so the check has no
 # target left to run against.  The finding survives in Lean as
 # `PortabilityDrift.benchmarkRatioForm_cannot_reach_measured`, which states the
-# ceiling about the written-out expression rather than about the name.  Note the
-# check's own canfail_clause recorded the trap that produced the original false
-# VALIDATED: at tS = tT both sides collapse to 1 and the design has no power.
+# ceiling about the written-out expression rather than about the name.
+#
+# The check's own canfail_clause is preserved here VERBATIM, because it is
+# evidence about how we read our own tooling and not merely a comment.  It had
+# already named the symmetric design that produced the false VALIDATED, and it
+# was read as agreement anyway:
+#
+#     "tS != tT is mandatory. At tS = tT the definition returns exactly 1 "
+#     "and so does the reference -- the symmetric design in which both sides "
+#     "collapse to 1 is precisely the false-validation failure mode."
+#
+# The instrument said so first.  Calibrator.DriftRegime.symmetric_design_has_no_power
+# is the same fact proved: on a symmetric design this form and its square are
+# indistinguishable, so the design could not have rejected a wrong functional form.
 
 check(
     id="wrightFIT-composition",

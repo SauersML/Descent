@@ -278,7 +278,7 @@ FAMILIES = [
                 "the rho grid must reach below 10, where Sved and Ohta-Kimura "
                 "differ by more than 100%.",
         "members": ["ldRetentionPerGen", "ldAfterGenerations", "ldRecurrence",
-                    "ldDecayRatePerGen", "ldHalfLife", "driftLDStep",
+                    "driftRatePerGen", "ldHalfLife", "driftLDStep",
                     "driftLDRetention", "driftLDEquilibrium",
                     "driftLDTrajectory", "excessLDAfterBottleneck",
                     "bottleneckExcessLD", "driftLDCreationRate", "tagR2",
@@ -1189,7 +1189,7 @@ FAMILIES = [
                 "to within 1e-4.",
         "members": ["covarianceRetention", "covarianceDivergenceFromRetention",
                     "freqCorrFromFst", "ldOverlapFromSharedLD",
-                    "neutralAFBenchmarkRatio", "neutralAFSharedLDBenchmarkRatio",
+                    "neutralAFSharedLDBenchmarkRatio",
                     "neutralAFBenchmarkMetricProfile",
                     "targetR2FromNeutralAFBenchmark",
                     "targetGaussianAUCFromNeutralAFBenchmark",
