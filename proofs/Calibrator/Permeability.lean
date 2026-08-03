@@ -338,7 +338,6 @@ theorem covarianceTangentEstimatorVariance_kurtosis_attenuation
   rw [gaussianCovarianceTangentEstimatorVariance_eq]
   unfold covarianceTangentEstimatorVarianceFromMoments centeredSquareVarianceFromMoments
   field_simp [hm, hderivative, hη]
-  ring
 
 /-- The named Gaussian tangent-estimator variance is positive for a positive replicate
 budget, positive covariance, and a nonzero covariance response. -/

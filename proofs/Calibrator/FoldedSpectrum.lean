@@ -531,6 +531,31 @@ theorem onePercentMaf_covariance_estimator_variance
     (1 / 100) m covarianceDerivative (by norm_num) (by norm_num)]
   norm_num [invHeterozygosity]
 
+/-- **Joint rare-variant and incomplete-tagging design constant.** At one-percent MAF,
+if the observed marker or assay retains only half of the covariance response of the
+deployment-relevant variant, the exact known-mean covariance-estimation variance is
+
+`9802/99 ≈ 99.01`
+
+times the Gaussian calculation for a perfectly tagged coordinate.  The approximately
+`24.75×` Hardy--Weinberg fourth-moment cost and the `4×` inverse-square tagging cost
+multiply.  Thus MAF and tagging quality cannot be entered as additive corrections in a
+cross-population panel or polygenic-score portability budget. -/
+theorem onePercentMaf_halfResponse_covariance_estimator_variance
+    (m covarianceDerivative : ℝ) (hm : m ≠ 0)
+    (hderivative : covarianceDerivative ≠ 0) :
+    covarianceTangentEstimatorVarianceFromMoments m
+        ((1 / 2) * covarianceDerivative) 1
+        (∑ j : Fin 3,
+          diploidAtomMass j (1 / 100) * diploidAtomValue j (1 / 100) ^ 4) =
+      (9802 / 99 : ℝ) *
+        gaussianCovarianceTangentEstimatorVariance m 1 covarianceDerivative := by
+  rw [diploid_fourth_moment (1 / 100) (by norm_num) (by norm_num)]
+  rw [covarianceTangentEstimatorVariance_kurtosis_attenuation
+    m 1 covarianceDerivative (invHeterozygosity (1 / 100)) (1 / 2)
+    hm hderivative (by norm_num)]
+  norm_num [invHeterozygosity]
+
 /-- **Level one, what escapes: the dispersion.**
 
 Two panels can agree exactly in mean inverse heterozygosity and differ in its variance
