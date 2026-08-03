@@ -174,8 +174,18 @@ FAMILIES = [
         "name": "island_migration_fst",
         "model": "infinite island; F_ST = 1/(1 + 4 Ne m), no deme count",
         "simulator": "cluster/fam_coalescent.py (family_island)",
-        "status": "SIMULATED -- varies deme count, which no member takes as an "
-                  "argument",
+        "status": "SIMULATED. The standing complaint -- that the simulator "
+                  "varies a deme count no member takes as an argument -- is "
+                  "RETIRED by membership, not by new code: islandFstFiniteDemes "
+                  "(Ne m d), islandDemeCorrection (d) and finiteIslandCorrection "
+                  "(demes) all take the deme count, and fam_coalescent.py's "
+                  "finite_deme_theory column is 1/(1 + 4 Ne m (d/(d-1))^2), "
+                  "which is islandFstFiniteDemes' body with islandDemeCorrection "
+                  "inlined. The d grid is 2, 5, 20, so the correction is "
+                  "exercised at d = 2 where it is 4x. NEEDS A RE-RUN: the "
+                  "recorded rel_err_finite_deme numbers predate these three "
+                  "being members, so the column exists but has not been "
+                  "attributed to them.",
         "found_by": "sweep",
         "spec": "d-deme symmetric island coalescent at scaled migration "
                 "M = 4 Ne m; measure branch-mode Hudson F_ST between two "
@@ -201,7 +211,11 @@ FAMILIES = [
                     "ldCorrelationMigrationAnsatz", "sharedLDFromMigration",
                     "signalRetentionMigrationDrift",
                     "retainedSignalVarianceMigrationDrift",
-                    "migrationSharedBoostAt", "migBoost", "migrationLDBoost"],
+                    "migrationSharedBoostAt", "migBoost", "migrationLDBoost",
+                    # finite-deme corrections -- the members that DO take the
+                    # deme count the simulator varies
+                    "islandFstFiniteDemes", "islandDemeCorrection",
+                    "finiteIslandCorrection"],
     },
     {
         "name": "split_fst",
@@ -322,7 +336,13 @@ FAMILIES = [
                     "steppingStoneDiffusionTimescale", "steppingStoneFst",
                     "steppingStoneFstQuadratic",
                     # newly classified
-                    "ldCorrelationDecay"],
+                    "ldCorrelationDecay",
+                    # d*(D-d)/(2 sigma^2 m) -- fam_stepping_stone.py already
+                    # computes exactly this body as
+                    # T_textbook_d_Dmd_over_Vrel (control E2) and
+                    # meeting_time_circle_theory_dDmd_over_Vrel (cell B),
+                    # against measured meeting times out to d = D/2
+                    "steppingStoneMeetingTimeOnLattice"],
     },
     {
         "name": "admixture",
@@ -355,7 +375,13 @@ FAMILIES = [
                     "admixtureLDDecay", "admixtureLDBoost",
                     "admixtureLDTwoLocus",
                     # newly classified
-                    "introgressionVariants"],
+                    "introgressionVariants",
+                    # the denominator-corrected form: (1-a)^2 fst_AB / hetRatio.
+                    # fam_admixture.py already records denominator_ratio and
+                    # reconstructed_ratio per cell, which is this quantity
+                    # divided by fst_AB whenever the numerator identity holds
+                    # (g_C = 0). Needs a column named for it.
+                    "admixedFstExact"],
     },
     {
         "name": "site_frequency_spectrum",
@@ -902,7 +928,15 @@ FAMILIES = [
         "members": ["measureMean", "measureVariance", "measureCovariance",
                     "measureExpMSE", "measureBias", "var", "rsquared", "mse",
                     "r2FromMSE", "irreduciblePredictionRisk",
-                    "conditionalMeanApproximationRisk", "frobeniusNormSq"],
+                    "conditionalMeanApproximationRisk", "frobeniusNormSq",
+                    # the three DGP moment wrappers: signalVariance is
+                    # var dgp signal, outcomeMeanVariance is
+                    # var dgp trueExpectation, signalOutcomeCovariance is
+                    # measureCovariance of the signal against the conditional
+                    # mean. moment_cell already draws all three quantities;
+                    # only var_s is currently recorded.
+                    "signalVariance", "outcomeMeanVariance",
+                    "signalOutcomeCovariance"],
     },
     {
         "name": "liability_threshold_metrics",
@@ -956,6 +990,16 @@ FAMILIES = [
                 "harness is not testing anything. CAN-FAIL: the SNR grid must "
                 "include AUC below 0.75; above 0.95 every candidate AUC "
                 "formula agrees to within Monte-Carlo error at any feasible R.",
+        # TWO ESTIMANDS, NOT ONE. Everything on the
+        # equalVarianceGaussianAUC* line takes NO prevalence and is the
+        # two-Gaussian chart; everything on the liabilityThreshold* line takes
+        # a prevalence K and is the dichotomised-trait AUC. The corpus proves
+        # they differ (0.753 to 0.921 across prevalence at R^2 = 0.3) and the
+        # simulator's L2 and L3 cells measure two DIFFERENT processes for
+        # them. They are in one family because they share the liability model
+        # and its controls, NOT because they are the same number, and any cell
+        # that compares a member of one line to a measurement of the other
+        # line's process is a scale error.
         "members": ["equalVarianceGaussianAUCFromSNR",
                     "equalVarianceGaussianAUCFromExplainedR2",
                     "equalVarianceGaussianAUCChart",
@@ -979,7 +1023,29 @@ FAMILIES = [
                     "sourceMetricProfileFromSourceWeightsAtPrevalence",
                     "sourceMetricProfileFromSourceWeightsAtTargetPrevalence",
                     "exactCalibratedBrierRiskFromR2",
-                    "total"],
+                    "total",
+                    # -- the EQUAL-VARIANCE GAUSSIAN line (no prevalence). This
+                    # one IS exercised: corpus_auc() in fam_metrics.py is a
+                    # transcription of its body, Phi(sqrt(vSignal/(2 vNoise))),
+                    # including the total-division convention at vNoise = 0
+                    # that the L4 positive control fires on.
+                    "TransportedMetrics.equalVarianceGaussianAUCFromSignalVariance",
+                    # -- the LIABILITY-THRESHOLD line (prevalence required).
+                    # NOT YET EXERCISED. fam_metrics.py's L3 cell MEASURES the
+                    # dichotomised-liability AUC across prevalence, but there
+                    # is no transcription of liabilityThresholdAUCFromExplainedR2
+                    # to compare it against -- L3 is recorded as a scope
+                    # measurement with no corpus-side prediction. Earning the
+                    # credit is one function: T = Phi^-1(1-K),
+                    # i = phi(T)/K, i_c = -iK/(1-K),
+                    # v1 = 1 - R^2 i(i-T), v0 = 1 - R^2 i_c(i_c-T),
+                    # AUC = Phi((i - i_c) sqrt(R^2) / sqrt(v1 + v0)),
+                    # evaluated at L3's own (R^2, pi) cells. Phi_inv and
+                    # phi_pdf are already defined in that file and unused.
+                    "liabilityThreshold", "liabilityCaseMean",
+                    "liabilityControlMean", "liabilityCaseVariance",
+                    "liabilityControlVariance", "standardNormalPdf",
+                    "liabilityThresholdAUCFromExplainedR2"],
     },
     {
         "name": "linear_prediction_transport",
@@ -1196,7 +1262,20 @@ FAMILIES = [
                     "targetR2FromNeutralAFBenchmark",
                     "targetGaussianAUCFromNeutralAFBenchmark",
                     "targetExactGaussianAUCFromNeutralAFBenchmark",
-                    "targetBrierFromNeutralAFBenchmark"],
+                    "targetBrierFromNeutralAFBenchmark",
+                    # The DICHOTOMISED-TRAIT counterparts of the two entries
+                    # above. targetLiabilityAUCFromNeutralAFBenchmark is
+                    # liabilityThresholdAUCFromExplainedR2 (presentDayR2 ...) K
+                    # and the profile is neutralAFBenchmarkMetricProfile with
+                    # the AUC field swapped for it -- same benchmark, binary
+                    # readout. They sit HERE and not in
+                    # liability_threshold_metrics because their empirical
+                    # content is the benchmark R^2 they are composed with, and
+                    # that is the quantity this family has no simulator for.
+                    # Filing them under the liability family would credit them
+                    # to fam_metrics.py, which never computes a benchmark R^2.
+                    "targetLiabilityAUCFromNeutralAFBenchmark",
+                    "neutralAFBenchmarkLiabilityMetricProfile"],
     },
     {
         "name": "pgs_transport_drift",
@@ -1595,6 +1674,25 @@ def main():
         by_short.setdefault(d.get("short") or d["name"].split(".")[-1],
                             []).append(d)
 
+    # DOTTED SUFFIX -> list of declarations, so a membership entry can be
+    # QUALIFIED as well as short.
+    #
+    # Membership was keyed on the short name alone, which is
+    # lean_parse.Decl.short: the LAST dotted component and explicitly not
+    # unique. That is why the eight structure-inhabitation witnesses
+    # (EvolutionaryParameters.witness, PrevalenceDGP.witness, ...) could not be
+    # assigned at all: their short name is `witness` for every one of them, so
+    # a member entry "witness" would sweep all eight into whichever single
+    # family declared it. Suffix keying is what makes them separately
+    # nameable, and it is a strict generalisation -- the one-component suffix
+    # of a name IS its short name, so every existing dotless member entry
+    # resolves to exactly the same declarations as before.
+    by_suffix = {}
+    for d in entries:
+        parts = d["name"].split(".")
+        for i in range(len(parts)):
+            by_suffix.setdefault(".".join(parts[i:]), []).append(d)
+
     # IN-SLICE IS A SET OF FULLY QUALIFIED NAMES.
     in_slice_fq = set()
     in_slice_short = set()
@@ -1613,7 +1711,7 @@ def main():
     for fam in FAMILIES:
         present, missing, slice_members = [], [], []
         for m in fam["members"]:
-            ds = by_short.get(m)
+            ds = by_suffix.get(m) if "." in m else by_short.get(m)
             if not ds:
                 missing.append(m)
                 continue
