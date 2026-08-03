@@ -498,6 +498,38 @@ theorem diploid_covariance_estimator_variance_eq_gaussian_factor
   simpa using covarianceTangentEstimatorVariance_kurtosis_eq_gaussian_factor
     m 1 covarianceDerivative (invHeterozygosity q)
 
+/-- Inverse heterozygosity is bounded below by `1/(2q)`. Hence the covariance-estimation
+penalty cannot remain bounded as the minor-allele frequency approaches zero. -/
+theorem invHeterozygosity_ge_rare_boundary (q : ℝ)
+    (hq0 : 0 < q) (hq1 : q < 1) :
+    1 / (2 * q) ≤ invHeterozygosity q := by
+  unfold invHeterozygosity
+  apply one_div_le_one_div_of_le
+  · positivity
+  · nlinarith [sq_nonneg q]
+
+/-- The fourth-moment covariance-variance multiplier is at least
+`(1/(2q)-1)/2`, an explicit divergent rare-variant lower envelope. -/
+theorem diploid_covariance_variance_factor_rare_lower_bound (q : ℝ)
+    (hq0 : 0 < q) (hq1 : q < 1) :
+    (1 / (2 * q) - 1) / 2 ≤ (invHeterozygosity q - 1) / 2 := by
+  linarith [invHeterozygosity_ge_rare_boundary q hq0 hq1]
+
+/-- **One-percent MAF design constant.** At `q=0.01`, the exact covariance-estimation
+variance multiplier relative to a Gaussian feature is `4901/198 ≈ 24.75`. Thus a
+Gaussian study-design calculation can understate the independent target-panel budget by
+nearly twenty-five-fold even before LD, imputation, or support attenuation is applied. -/
+theorem onePercentMaf_covariance_estimator_variance
+    (m covarianceDerivative : ℝ) :
+    covarianceTangentEstimatorVarianceFromMoments m covarianceDerivative 1
+        (∑ j : Fin 3,
+          diploidAtomMass j (1 / 100) * diploidAtomValue j (1 / 100) ^ 4) =
+      (4901 / 198 : ℝ) *
+        gaussianCovarianceTangentEstimatorVariance m 1 covarianceDerivative := by
+  rw [diploid_covariance_estimator_variance_eq_gaussian_factor
+    (1 / 100) m covarianceDerivative (by norm_num) (by norm_num)]
+  norm_num [invHeterozygosity]
+
 /-- **Level one, what escapes: the dispersion.**
 
 Two panels can agree exactly in mean inverse heterozygosity and differ in its variance
