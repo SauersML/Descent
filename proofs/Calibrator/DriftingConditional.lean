@@ -1138,6 +1138,33 @@ theorem link_scale_composition (L : ℝ → ℝ) (hmono : StrictMono L)
   ring
 
 open MeasureTheory ProbabilityTheory in
+/-- **The induced affine parameters obey the scale-composition law.**
+
+`link_scale_composition` equates the two averaged functions. If each is represented in
+the affine family of `L`, `link_invariance_params_unique` upgrades equality of functions to
+equality of both parameters. The theorem stays relational: it neither selects witnesses
+from the closure hypothesis nor stores a theorem as parameter data.
+
+For portability, this is path independence in its sharp form. Transport through two
+independent Gaussian liability shifts produces exactly the same calibration slope and
+intercept as transport through their variance-summed shift. -/
+theorem link_scale_params_compose (L : ℝ → ℝ) (hmono : StrictMono L)
+    (hbdd : ∀ u, 0 < L u ∧ L u < 1) {t αt βt : ℝ}
+    (ht : ∀ y, ∫ z, L (y + t * z) ∂(gaussianReal 0 1) = L (αt * y + βt))
+    (s aₛₜ bₛₜ aᵣ bᵣ : ℝ)
+    (hstep : ∀ x,
+      ∫ z, L ((αt * x + βt) + (αt * s) * z) ∂(gaussianReal 0 1) =
+        L (aₛₜ * x + bₛₜ))
+    (hcombined : ∀ x,
+      ∫ z, L (x + Real.sqrt (s ^ 2 + t ^ 2) * z) ∂(gaussianReal 0 1) =
+        L (aᵣ * x + bᵣ)) :
+    aₛₜ = aᵣ ∧ bₛₜ = bᵣ := by
+  apply link_invariance_params_unique L hmono
+  intro x
+  rw [← hstep x, ← hcombined x]
+  exact link_scale_composition L hmono hbdd ht s x
+
+open MeasureTheory ProbabilityTheory in
 /-- **The link is continuous — derived from the invariance, not assumed.**
 
 `link_rigidity` assumes only that `L` is strictly monotone and bounded.  A monotone
