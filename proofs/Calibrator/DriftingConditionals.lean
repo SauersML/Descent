@@ -6,6 +6,7 @@ Authors: Sauers
 import Calibrator.HorizonCurve
 import Calibrator.ReversibleMarkovSpectrum
 import Calibrator.DriftingConditional
+import Calibrator.UnifiedBiology
 
 /-!
 # Drifting conditionals in finite biological state spaces
@@ -110,6 +111,57 @@ theorem transportedResponse_prevalence_conserved
     _ = ∑ x, markedMass population response x :=
       transportMass_total P (markedMass population response) hP
 
+/-! ## The population-built reverse bridge -/
+
+/-- Bayes' reverse transition from destination `y` back to source `x`.
+
+    The observed source population and its transported marginal supply the
+    reweighting. Positivity is proof-carrying because no conditional law exists
+    at an empty destination cell. -/
+noncomputable def reverseBridge (P : ι → ι → ℝ) (population : ι → ℝ)
+    (_hpositive : ∀ y, 0 < transportMass P population y) (y x : ι) : ℝ :=
+  population x * P x y / transportMass P population y
+
+/-- Every row of the population-built reverse bridge has mass one. -/
+theorem reverseBridge_mass_preserving
+    (P : ι → ι → ℝ) (population : ι → ℝ)
+    (hpositive : ∀ y, 0 < transportMass P population y) :
+    IsMassPreservingKernel (reverseBridge P population hpositive) := by
+  intro y
+  have hdenom : ∑ x, population x * P x y ≠ 0 := by
+    simpa [transportMass] using ne_of_gt (hpositive y)
+  unfold reverseBridge transportMass
+  rw [← Finset.sum_div, div_self hdenom]
+
+/-- Nonnegative forward transport and population weights give a nonnegative
+reverse bridge. -/
+theorem reverseBridge_nonnegative
+    (P : ι → ι → ℝ) (population : ι → ℝ)
+    (hkernel : IsNonnegativeKernel P) (hpopulation : ∀ x, 0 ≤ population x)
+    (hpositive : ∀ y, 0 < transportMass P population y) :
+    IsNonnegativeKernel (reverseBridge P population hpositive) := by
+  intro y x
+  exact div_nonneg (mul_nonneg (hpopulation x) (hkernel x y)) (hpositive y).le
+
+/-- **The reconstructed response is expectation through the reverse bridge.**
+
+    This is the exact finite time-reversal formula. The marginal does not merely
+    accompany the conditional: it constructs the bridge that transports the
+    earlier response to the destination population. -/
+theorem transportedResponse_eq_reverseBridge_average
+    (P : ι → ι → ℝ) (population response : ι → ℝ)
+    (hpositive : ∀ y, 0 < transportMass P population y) (y : ι) :
+    transportedResponse P population response hpositive y =
+      ∑ x, reverseBridge P population hpositive y x * response x := by
+  unfold transportedResponse reverseBridge transportMass markedMass
+  calc
+    (∑ x, population x * response x * P x y) / ∑ x, population x * P x y =
+        ∑ x, (population x * response x * P x y) /
+          ∑ x, population x * P x y := by rw [Finset.sum_div]
+    _ = ∑ x, (population x * P x y / ∑ x, population x * P x y) * response x := by
+      refine Finset.sum_congr rfl fun x _ ↦ ?_
+      ring
+
 /-- **Transported response is a weighted average of source responses.**
 
     If source responses lie in `[lower, upper]`, nonnegative transport and
@@ -212,6 +264,15 @@ def stateZeroResponse (i : Fin 2) : ℝ := if i = 0 then 1 else 0
 /-- A response concentrated in ancestry state one. -/
 def stateOneResponse (i : Fin 2) : ℝ := if i = 1 then 1 else 0
 
+/-- The ancestry-state-one response IS `UnifiedBiology.targetAnnotation`.
+
+    Both are the indicator of state one on two states. Stating the identity rather than
+    leaving two alpha-equivalent bodies is what makes a later edit to either one a compile
+    error instead of a silent divergence: two definitions of one quantity, tied by neither a
+    call nor a theorem, cannot disagree loudly. -/
+theorem stateOneResponse_eq_targetAnnotation :
+    stateOneResponse = targetAnnotation := rfl
+
 /-- The uniform two-state population remains positive under the kernel that
 never moves. -/
 theorem transportMass_stayKernel_uniformTwo_pos (y : Fin 2) :
@@ -245,6 +306,15 @@ theorem stationaryMarginal_does_not_identify_conditional :
 /-- Symmetric switching between two local-ancestry or haplotype states. -/
 def symmetricTwoStateKernel (switch : ℝ) (i j : Fin 2) : ℝ :=
   if i = j then 1 - switch else switch
+
+/-- **The symmetric switching kernel is a genuine Markov kernel**, so the theorems assuming
+`IsNonnegativeKernel` are about something. Without a witness those theorems could hold
+vacuously, which is the difference between a maximum principle and an empty statement. -/
+theorem symmetricTwoStateKernel_nonneg (switch : ℝ) (h0 : 0 ≤ switch) (h1 : switch ≤ 1) :
+    IsNonnegativeKernel (symmetricTwoStateKernel switch) := by
+  intro i j
+  unfold symmetricTwoStateKernel
+  split <;> linarith
 
 theorem symmetricTwoStateKernel_mass_preserving (switch : ℝ) :
     IsMassPreservingKernel (symmetricTwoStateKernel switch) := by
