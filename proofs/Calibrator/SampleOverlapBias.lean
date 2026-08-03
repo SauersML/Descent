@@ -133,13 +133,16 @@ theorem apparent_portability_loss_includes_overlap
   · linarith
   · linarith
 
-/-- **Correcting for overlap reveals true portability.**
-    After removing overlap bias from same-ancestry R²,
-    the true portability gap is smaller than it appeared.
-    Portability ratio = R²_cross / R²_same. When R²_same is inflated
-    by overlap bias, the apparent portability ratio is lower than the
-    true ratio R²_cross / R²_same_true. -/
-theorem corrected_portability_better
+/-- **A larger denominator gives a smaller ratio:**
+    `a/(b + c) < a/b` for positive `a`, `b`, `c`.
+
+    Read as genetics, `b + c` is a same-ancestry `R²` inflated by overlap bias,
+    so the ratio computed from it understates portability. That the inflation
+    is additive, and that `c` is the overlap bias rather than any other
+    quantity, are both stipulated by writing the sum. No sample, no overlap and
+    no ancestry appears below, and nothing identifies `b` as the true value —
+    three positive reals and a division. -/
+theorem div_add_lt_div
     (r2_cross r2_same_true overlap_bias : ℝ)
     (h_cross_pos : 0 < r2_cross)
     (h_same_pos : 0 < r2_same_true)

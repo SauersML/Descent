@@ -74,12 +74,15 @@ can capture the nonlinear portability decay.
 
 section SplineCalibration
 
-/-- **Spline approximation error bound.**
-    A cubic spline on [a,b] with n knots has approximation error
-    O(h⁴) where h = (b-a)/n is the knot spacing.
-    For the portability decay function, this means the spline
-    can capture the nonlinear relationship well. -/
-theorem spline_error_improves_with_knots
+/-- **Fourth powers are strictly monotone on the positives:**
+    `0 < h₂ < h₁` gives `h₂⁴ < h₁⁴`.
+
+    The reading is that a cubic spline has approximation error `O(h⁴)` in the
+    knot spacing `h`, so more knots approximate the portability decay better.
+    The `O(h⁴)` rate is the content of that reading and is stipulated in prose:
+    there is no spline, no knot, no function being approximated and no error
+    below, only two positive reals and an exponent. -/
+theorem pow_four_lt_pow_four_of_lt
     (h₁ h₂ : ℝ) (h_finer : h₂ < h₁) (h_pos : 0 < h₂) :
     h₂ ^ 4 < h₁ ^ 4 := by
   apply pow_lt_pow_left₀ h_finer (le_of_lt h_pos)

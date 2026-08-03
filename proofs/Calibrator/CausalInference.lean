@@ -433,8 +433,14 @@ theorem r2_increments_strictAnti_in_signal
 noncomputable def costEffectiveness (improvement cost : ℝ) : ℝ :=
   improvement / cost
 
-/-- Higher cost-effectiveness is better. -/
-theorem choose_more_cost_effective
+/-- **Cross-multiplication:** with both costs positive, ordering the two
+    `costEffectiveness` ratios is ordering the cross products.
+
+    This is the arithmetic content of comparing two ratios and nothing more. It
+    does not say which option to choose: no budget, no constraint and no
+    decision rule appears, and a larger `improvement / cost` is preferable only
+    under assumptions this corpus does not state. -/
+theorem mul_lt_mul_of_costEffectiveness_lt
     (improv₁ improv₂ cost₁ cost₂ : ℝ)
     (h_ce₁ : costEffectiveness improv₂ cost₂ < costEffectiveness improv₁ cost₁)
     (h_c₁ : 0 < cost₁) (h_c₂ : 0 < cost₂) :
