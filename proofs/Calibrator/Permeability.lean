@@ -215,6 +215,43 @@ theorem lagCompletionPermeability_eq_zero_iff {d : ℕ}
     subst tangent
     simp [lagObservationDerivative]
 
+/-! ### Geometric LD/tract-decay witness -/
+
+/-- The first two lags, used as a concrete two-channel completion. -/
+def firstTwoLags (i : Fin 2) : ℕ := i.val
+
+/-- Parameter derivatives of the geometric covariance profile `γ(k) = A ρ^k`.
+Coordinate zero is the covariance amplitude `A`; coordinate one is the persistence `ρ`.
+For an LD-decay or ancestry-tract model, statistical admissibility additionally requires
+the model's usual positivity and stationarity conditions; the derivative identity itself
+is algebraic. -/
+noncomputable def geometricLagCovarianceDerivative
+    (amplitude persistence : ℝ) (k : ℕ) : Fin 2 → ℝ :=
+  ![persistence ^ k,
+    amplitude * (k : ℝ) * persistence ^ (k - 1)]
+
+/-- The lag-zero/lag-one sensitivity determinant for `γ(k)=Aρ^k` is exactly `A`.
+Lag zero measures amplitude; once that is known, lag one separates persistence. -/
+theorem firstTwoLags_geometric_sensitivity_det
+    (amplitude persistence : ℝ) :
+    (lagSensitivityMatrix firstTwoLags
+      (geometricLagCovarianceDerivative amplitude persistence)).det = amplitude := by
+  rw [Matrix.det_fin_two]
+  simp [lagSensitivityMatrix, firstTwoLags, geometricLagCovarianceDerivative]
+
+/-- **Two-statistic completion for geometric dependence.** At nonzero covariance
+amplitude, retaining lag zero and lag one locally identifies both amplitude and
+persistence.  In applications these are the leading strength and decay-scale coordinates
+of LD, IBD sharing, or ancestry-tract persistence. -/
+theorem firstTwoLags_complete_geometric_dependence
+    (amplitude persistence : ℝ) (hamplitude : amplitude ≠ 0) :
+    Function.Injective
+      (lagObservationDerivative firstTwoLags
+        (geometricLagCovarianceDerivative amplitude persistence)) := by
+  apply lagObservationDerivative_injective_of_det_ne_zero
+  rw [firstTwoLags_geometric_sensitivity_det]
+  exact hamplitude
+
 /-! ## First-order walls are not absolute walls -/
 
 /-- A channel can have zero first derivative at the base point while changing at every
