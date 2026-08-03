@@ -690,7 +690,8 @@ theorem CrossPopulationMechanisticCalibrationModel.sourceCalibrationProfile_exac
       CrossPopulationMechanisticCalibrationModel.predictedMean,
       CrossPopulationMechanisticCalibrationModel.deploymentIntercept,
       CrossPopulationMechanisticCalibrationModel.scoreMean,
-      CalibrationMoments.toProfile, calibrationProfile, calibrationInTheLarge]
+      CalibrationMoments.toProfile, Calibrator.calibrationProfile,
+      calibrationSlopeFromSourceWeights, calibrationInTheLarge]
 
 /-- Exact mechanistic target calibration-profile portability law. The target
 predicted mean is the deployed source weights applied to the target tag mean,
@@ -709,7 +710,7 @@ theorem CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile_exac
           predictiveCovarianceFromSourceWeights m.metric Pop.target /
             scoreVarianceFromSourceWeights m.metric Pop.target
       , link := link } := by
-  cases link <;> ext <;>
+  cases link <;>
     simp [CrossPopulationMechanisticCalibrationModel.calibrationProfile,
       CrossPopulationMechanisticCalibrationModel.toShiftModel,
       CrossPopulationCalibrationShiftModel.calibrationProfile,
@@ -719,7 +720,8 @@ theorem CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile_exac
       CrossPopulationMechanisticCalibrationModel.predictedMean,
       CrossPopulationMechanisticCalibrationModel.scoreMean,
       CrossPopulationMechanisticCalibrationModel.deploymentIntercept,
-      CalibrationMoments.toProfile, CalibrationMoments.shifted, calibrationProfile,
+      CalibrationMoments.toProfile, CalibrationMoments.shifted,
+      Calibrator.calibrationProfile, calibrationSlopeFromSourceWeights,
       calibrationInTheLarge, sub_eq_add_neg, add_assoc] <;> ring
 
 /-- Exact mechanistic CITL law: calibration-in-the-large is source CITL plus
@@ -888,8 +890,9 @@ theorem cross_ancestry_exact_metric_profile
       h_target_mean_eq_prevalence
   have h_src_cal_shift :
       ((cal.toShiftModel.identityCalibrationProfile Pop.source)).citl = 0 := by
-    simpa [CrossPopulationMechanisticCalibrationModel.identityCalibrationProfile,
-      CrossPopulationMechanisticCalibrationModel.calibrationProfile] using h_src_cal
+    simpa only [CrossPopulationMechanisticCalibrationModel.identityCalibrationProfile,
+      CrossPopulationMechanisticCalibrationModel.calibrationProfile,
+      CrossPopulationCalibrationShiftModel.identityCalibrationProfile] using h_src_cal
   have h_shift_nonzero_shift :
       cal.toShiftModel.observedMeanShift - cal.toShiftModel.predictedMeanShift ≠ 0 := by
     simpa [CrossPopulationMechanisticCalibrationModel.toShiftModel,
@@ -919,14 +922,7 @@ theorem cross_ancestry_exact_metric_profile
       CrossPopulationMechanisticCalibrationModel.scoreMeanShift,
       CrossPopulationCalibrationShiftModel.observedMeanShift,
       CrossPopulationCalibrationShiftModel.predictedMeanShift] using h_abs
-  · simpa [CrossPopulationMechanisticCalibrationModel.identityCalibrationProfile,
-      CrossPopulationMechanisticCalibrationModel.identityCalibrationProfile,
-      CrossPopulationMechanisticCalibrationModel.calibrationProfile,
-      CrossPopulationMechanisticCalibrationModel.toShiftModel,
-      CrossPopulationMechanisticCalibrationModel.observedMeanShift,
-      CrossPopulationMechanisticCalibrationModel.scoreMeanShift,
-      CrossPopulationCalibrationShiftModel.observedMeanShift,
-      CrossPopulationCalibrationShiftModel.predictedMeanShift] using h_worse
+  · exact h_worse
   · simpa [CrossPopulationMechanisticCalibrationModel.toShiftModel,
       CrossPopulationMechanisticCalibrationModel.observedMean,
       CrossPopulationMechanisticCalibrationModel.observedMeanShift,
@@ -1033,7 +1029,10 @@ score of a tag-mean difference; defining it as the difference makes it `rfl`. -/
   simp [CrossPopulationGenerationalCalibrationModel.toMechanisticCalibrationModelAt,
     CrossPopulationGenerationalCalibrationModel.predictedMeanAt,
     CrossPopulationGenerationalCalibrationModel.scoreMeanAt,
+    CrossPopulationGenerationalCalibrationModel.tagMeanAt,
+    CrossPopulationGenerationalCalibrationModel.deploymentInterceptAt,
     CrossPopulationMechanisticCalibrationModel.predictedMean,
+    CrossPopulationMechanisticCalibrationModel.deploymentIntercept,
     CrossPopulationMechanisticCalibrationModel.scoreMean]
 
 /-- Shared target calibration profile at generation `t`. -/
@@ -1061,10 +1060,15 @@ theorem targetCalibrationProfileAtGeneration_exact_mechanistic_popgen_portabilit
               sourceWeightedTagScore (m.metric.toMetricModelAt t) (m.targetTagMeanAt t))
       , slope := calibrationSlopeFromSourceWeights (m.metric.toMetricModelAt t) Pop.target
       , link := link } := by
-  rw [targetCalibrationProfileAtGeneration]
-  simp [CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile_exact_mechanistic_portability_law,
+  unfold targetCalibrationProfileAtGeneration
+  rw [CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile_exact_mechanistic_portability_law]
+  simp [
     CrossPopulationGenerationalCalibrationModel.toMechanisticCalibrationModelAt,
-    calibrationSlopeFromSourceWeights, calibrationSlopeFromSourceWeights]
+    CrossPopulationMechanisticCalibrationModel.observedMean,
+    CrossPopulationMechanisticCalibrationModel.observedMeanShift,
+    CrossPopulationMechanisticCalibrationModel.deploymentIntercept,
+    CrossPopulationMechanisticCalibrationModel.scoreMean]
+  ring
 
 /-- Exact generation-indexed target CITL law on the explicit population-genetic
 state slice. -/
@@ -1082,8 +1086,9 @@ theorem targetIdentityCalibrationProfileAtGeneration_citl_eq_exact_biological_sh
     CrossPopulationMechanisticCalibrationModel.identityCalibrationProfile] using
     source_calibrated_target_citl_eq_shift_budget
       (m.toMechanisticCalibrationModelAt t).toShiftModel
-      (by simpa [CrossPopulationMechanisticCalibrationModel.identityCalibrationProfile,
-            CrossPopulationMechanisticCalibrationModel.calibrationProfile] using h_src_cal)
+      (by simpa only [CrossPopulationMechanisticCalibrationModel.identityCalibrationProfile,
+            CrossPopulationMechanisticCalibrationModel.calibrationProfile,
+            CrossPopulationCalibrationShiftModel.identityCalibrationProfile] using h_src_cal)
 
 /-- Bundled exact generation-indexed deployment law: the target metric profile
 and target calibration profile are both determined by the same time-sliced
