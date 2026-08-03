@@ -1,4 +1,5 @@
 import Calibrator.ReversibleMarkovSpectrum
+import Calibrator.ObservationalCeiling
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
 
 namespace Calibrator
@@ -128,5 +129,36 @@ theorem not_marginalAmplitudeDeterminesHistoryDegradation :
     same_marginal_different_memory_degradation.1
   rw [same_marginal_different_memory_degradation.2] at hzero
   norm_num at hzero
+
+/-- The independent/persistent pair as an exact blindness witness for the property
+"zero spectral-history degradation from the independent source."  The probe retains
+only one-locus marginal amplitude.
+
+Biologically, this is the finite realizable obstruction behind the statement that no
+re-analysis of order-erased allele- or feature-frequency marginals can determine the
+portability loss caused by ancestry-tract or haplotype persistence. -/
+noncomputable def marginalAmplitudeHistoryDegradationBlindness :
+    ProbeBlindness historyMarginalAmplitude
+      (fun h => historyDegradation (independentHistory 1) h = 0) where
+  positive := independentHistory 1
+  negative := persistentHalfHistory 1
+  same_data := same_marginal_different_memory_degradation.1
+  holds := by
+    norm_num [historyDegradation, historySelfEnergy, historyKernel,
+      markovPoissonKernel, independentHistory]
+  fails := by
+    rw [same_marginal_different_memory_degradation.2]
+    norm_num
+
+/-- **No marginal-only portability criterion.** Any report computed solely from the
+one-locus marginal amplitude fails to decide whether spectral-history degradation from
+the independent source is zero.  A successful completion must retain dependence-sensitive
+information such as selected lagged moments. -/
+theorem no_marginal_only_history_degradation_criterion
+    {Report : Type*} (report : ℝ → Report) :
+    ¬ ∃ accept : Report → Prop, ∀ h : SpectralHistory,
+      historyDegradation (independentHistory 1) h = 0 ↔
+        accept (report (historyMarginalAmplitude h)) :=
+  marginalAmplitudeHistoryDegradationBlindness.no_criterion_of_factors report
 
 end Calibrator

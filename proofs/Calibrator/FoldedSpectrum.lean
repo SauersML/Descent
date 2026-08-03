@@ -1734,9 +1734,15 @@ Resonance and support examples need separate proofs and are not consequences of 
 
 The gauge-invariant law of one unit may hide an orbit coordinate, while the law of an
 estimator can couple to time structure. That is why the sample-mean channel of §14a exists.
-But `EnsembleChannel` also proves that this channel is incomplete, and some gauges may
-remain invisible to every statistic in a specified observation experiment. Characterizing
-when estimator noise separates quotient fibres is the continuation, not a theorem here. -/
+`ObservationalCeiling.identical_observable_law_implies_identical_statistic_law` proves the
+absolute side precisely: equality of the retained observable laws propagates through every
+measurable downstream statistic, so an algorithm cannot complete a sigma-algebra that the
+assay discarded.  `GenerativePortabilityLaw.no_marginal_only_history_degradation_criterion`
+instantiates the deterministic probe form on a realizable independent/persistent Markov
+pair: one-locus marginals cannot decide its nonzero history degradation.  But
+`EnsembleChannel` also proves that estimator fluctuations expose some dependence and that
+the sample-mean channel is incomplete. Characterizing exactly when estimator noise
+separates quotient fibres remains the continuation. -/
 
 /-!
 ## What is left open, plainly

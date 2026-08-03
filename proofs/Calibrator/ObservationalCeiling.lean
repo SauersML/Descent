@@ -118,6 +118,34 @@ theorem no_criterion (B : ProbeBlindness probe P) :
 end ProbeBlindness
 
 /-!
+### Equality of observable laws is an absolute wall for downstream statistics
+
+`ProbeBlindness` is deliberately more general than probability.  In an explicitly
+statistical experiment the corresponding obstruction is equality of pushforward laws.
+The theorem below records the exact data-processing statement needed by the permeability
+program: if two populations induce the same law on the retained observable, every
+measurable statistic of that observable also has the same law.  A vanishing derivative
+does not imply this premise; an exact gauge or support obstruction can.
+-/
+
+/-- **Observable-law obstruction.** Exact equality after the observation map propagates
+through every measurable downstream statistic, at every output dimension.  Escaping the
+wall requires enlarging the observable sigma-algebra, not changing the downstream
+algorithm. -/
+theorem identical_observable_law_implies_identical_statistic_law
+    {Sample Observable Report : Type*}
+    [MeasurableSpace Sample] [MeasurableSpace Observable] [MeasurableSpace Report]
+    (source target : MeasureTheory.Measure Sample)
+    (observe : Sample → Observable) (statistic : Observable → Report)
+    (hobserve : Measurable observe) (hstatistic : Measurable statistic)
+    (hsame : MeasureTheory.Measure.map observe source =
+      MeasureTheory.Measure.map observe target) :
+    MeasureTheory.Measure.map (statistic ∘ observe) source =
+      MeasureTheory.Measure.map (statistic ∘ observe) target := by
+  rw [← MeasureTheory.Measure.map_map hstatistic hobserve,
+    ← MeasureTheory.Measure.map_map hstatistic hobserve, hsame]
+
+/-!
 ### Stacking probes does not help when they share a witness
 
 The standing response to a discovered defect is to add another check. This section
