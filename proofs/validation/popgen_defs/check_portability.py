@@ -30,13 +30,46 @@ tends to 1 as fst tends to 0, so both predict 0.98 of source R^2 at F_ST
 0.0099 where the simulation gives 0.55. Keep these transcriptions. Deleting
 them removes the only reproducible record of why the two laws are absent.
 
-AND THIS SCRIPT IS NOT ONLY A FALSIFIER.  The same run CONFIRMED pgsVariance:
-across the 18 replicates in port.json the linkage-equilibrium formula sits at a
-mean ratio of 0.969 to the actual score variance, range 0.813 to 1.072, about
+AND THIS SCRIPT IS NOT ONLY A FALSIFIER.  It is the only instrument that holds
+pgsVariance to a measurement, so deleting it as "the script for two dead laws"
+would silently retire that check as well.
+
+THE PREDICTED RATIO IS 1.000, AND AN EARLIER VERSION OF THIS PARAGRAPH GOT BOTH
+THE DIRECTION AND THE SIGNIFICANCE WRONG.  It read: mean ratio 0.969, "about
 three per cent low, which is the direction and size its stated assumption
-predicts.  That makes this file the only instrument that holds pgsVariance to a
-measurement, so deleting it as "the script for two dead laws" would silently
-retire a confirmation as well.
+predicts".  Both halves are false.
+
+  DIRECTION.  The weights are braw = beta / sqrt(2 p (1-p)), so the formula's
+  numerator sum braw^2 * 2 p (1-p) collapses identically to sum beta^2.  Under
+  the stated assumption -- linkage equilibrium plus Hardy-Weinberg, so that the
+  dosage covariance is diagonal with entries 2 p (1-p) -- the ratio is not an
+  approximation that lands near 1.  It is an IDENTITY equal to 1.000 in every
+  replicate, with zero scatter.  Departures are the assumption failing, through
+  off-diagonal LD among the causal variants and through the sample dosage
+  variance differing from 2 p (1-p).  The cross terms are zero-mean over the
+  beta draw, so by Jensen the expected ratio sits slightly ABOVE 1, by about the
+  variance of the relative perturbation.  A shortfall is therefore NOT what the
+  assumption predicts.
+
+  SIGNIFICANCE.  0.969 was never evidence of a shortfall, and it did not take a
+  later run to show that -- only its own range and a division.  A range of 0.813
+  to 1.072 over 18 draws implies a standard deviation near 0.071 and a standard
+  error near 0.017, so 0.969 sits about 1.8 standard errors from 1.000.  The
+  file carried the range that refutes the claim in the same breath as the prose
+  that made it.
+
+  POOLING.  Those 18 records pooled six split times.  If the ratio varies with
+  split time, the pooled spread is inflated and the pooled mean estimates
+  nothing in particular.
+
+The level is being remeasured per cell, with a standard error on every cell,
+across split time, heritability and causal-variant count.  Two things to read
+when it lands: the ratio should NOT depend on h2, because h2 enters the
+phenotype and never the score variance, so movement there means the pipeline is
+miswired rather than the formula wrong; and a consistent deviation well outside
+1.000 would be a real finding about LD among randomly chosen causal variants,
+worth having in its own right.  Until then this script confirms nothing about
+the level, and no single cell should be quoted as one either.
 
 THREE REPLICATES PER CELL WAS NOT A MEASUREMENT.  The eighteen records above
 are six split times at three replicates, with no error bar anywhere in the
@@ -45,7 +78,8 @@ scatter comparable to the effect being reported.  The falsification of the two
 selection laws survives that, because the gap between 0.55 observed and 0.98
 predicted at F_ST 0.0099 is far larger than any plausible standard error; the
 CONFIRMATION of pgsVariance at "0.969, about three per cent low" does not,
-because three per cent is smaller than the scatter that produced it.
+because three per cent is smaller than the scatter that produced it, and
+because 1.000 rather than 0.97 is what the formula's own assumption predicts.
 
 So the grid is now swept on all three axes the claim depends on -- split time,
 heritability, and causal-variant count -- and every cell reports the standard

@@ -1,23 +1,72 @@
 # CAPTURED STDOUT, NOT A FILE THE DETECTOR WROTE.
 #
-# AxiomScan.lean writes no output file. Unlike Inflation.lean and RflScan.lean
-# it was not unified onto Shared.Results, because another session held it
-# dirty, so it still carries its own private copy of the generated-declaration
-# filter. Its counts are therefore NOT directly comparable with the other two
-# detectors' numbers, which use the shared filter.
+# ============================================================================
+# THE REVISION LABEL ON THIS RUN WAS WRONG, AND THE ZERO BELONGS TO A
+# DIFFERENT REVISION THAN THE ONE ORIGINALLY RECORDED. READ THIS FIRST.
+# ============================================================================
 #
-# Everything below the marker is the verbatim stdout of:
-#     lake env lean proofs/validation/invariants/AxiomScan.lean
+# This artifact first claimed revision 629a80ea. That was wrong, and the error
+# was mine rather than the scan's.
 #
-#   revision  629a80ea8618f167d4e925551a0b2233c3fa5a0c
-#   run at    2026-08-03T19:01Z (elaboration finished after 23m41s, exit 0)
+# `lake env lean` does NOT build. It elaborates the named file against whatever
+# `.olean` files already exist, so the environment it scans is the environment
+# the last BUILD produced, not the source tree checked out at run time.
+#
+#   the build in that clone compiled  ad2fa5ba   (0 `sorry` in the corpus)
+#   another session then fast-forwarded the tree to 629a80ea, which ADDED four
+#   CertificateGrading.lean:267, FiniteMinimax.lean:71, JetBarrier.lean:175,
+#   PolygenicArchitecture.lean:667 -- all real theorems closed by `sorry` in
+#   tactic position, all four imported directly by proofs/Calibrator.lean
+#   the scan then ran and reported the ad2fa5ba environment
+#
+# So ADMISSION_SCAN_COUNT 0 is a TRUE statement about ad2fa5ba and a FALSE
+# statement about 629a80ea. The scan is not defective; it measured the tree it
+# was given. Nothing here indicts AxiomScan.lean, whose design was checked
+# line by line while resolving this: it imports the root, it walks
+# `CollectAxioms` transitively, it prints the count even at zero, and its
+# filter provably cannot drop a declaration that carries an axiom.
+#
+# THE REAL DEFECT IS THAT A `lake env lean` RUN CANNOT SEE ITS OWN STALENESS.
+# It records the git revision, which is the revision of the SOURCE, while
+# reporting on the OLEANS. Those two agree only if a build ran in between. Any
+# future run of this scan must either build first in the same job, or record
+# the revision that produced the oleans rather than the one git reports.
+#
+# ============================================================================
+# SCOPE, WHICH IS A SEPARATE LIMIT AND APPLIES TO EVERY RUN
+# ============================================================================
+#
+# AxiomScan sees only what `import Calibrator` pulls in. At both 629a80ea and
+# origin/main the corpus holds 115 `.lean` modules under proofs/Calibrator
+# while proofs/Calibrator.lean imports 93 of them. TWENTY-TWO MODULES ARE
+# OUTSIDE THE ROOT CLOSURE and no run of this scan can reach them, whatever the
+# build state. "AXIOM_SCAN_SCANNED 4474" is a count over the closure, not over
+# the corpus. All seven `sorry` sites at origin/main happen to be inside the
+# closure, so a correct run would report them -- but a `sorry` added to any of
+# the other 22 modules would be invisible here.
+#
+# ============================================================================
+# OTHER CAVEATS, UNCHANGED
+# ============================================================================
+#
+# AxiomScan writes no output file, so this is redirected stdout rather than an
+# artifact the detector produced. It was also not unified onto Shared.Results,
+# because another session held it dirty, so it still carries its own private
+# copy of the generated-declaration filter and its counts are not directly
+# comparable with inflation_results.json or rfl_scan_results.json.
+#
+#   command   lake env lean proofs/validation/invariants/AxiomScan.lean
+#   oleans    built from ad2fa5ba23fd1d601d1d7a1f3af81518cd37a0db
+#   git said  629a80ea8618f167d4e925551a0b2233c3fa5a0c  (source, not oleans)
+#   run at    2026-08-03T19:01Z, exit 0 after 23m41s
 #   host      acn59, slurm job 14759172
-#   tree      tracked sources clean at that revision; the eight untracked
-#             paths present were build scripts and logs, not sources
 #
-# Reading: 4474 declarations were reached, none depends on an axiom outside
-# Lean's own three, and the sorryAx admission count is zero, so no declaration
-# in the scanned set is proved by `sorry`.
+# READING, corrected: over the 93-module root closure as compiled at ad2fa5ba,
+# 4474 declarations were reached and none depends on an axiom outside propext,
+# Classical.choice and Quot.sound. The zero-admission line is true of that
+# environment. It is NOT a current statement about origin/main, which contains
+# seven `sorry` sites. A rebuild-then-rescan is required before any current
+# soundness claim is made from this file.
 # --- BEGIN VERBATIM STDOUT ---
 AXIOM_SCAN_SCANNED	4474
 AXIOM_SCAN_OFFENDERS	0
