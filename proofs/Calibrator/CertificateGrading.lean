@@ -25,11 +25,10 @@ What remains is unconditional:
 The literature claim that grade two is within `5/4` in the Donoho--Liu
 convex-linear regime remains provenance only: this repository does not yet
 contain the white-noise decision model needed to state it faithfully.  The
-fixed-grade incompleteness claim is proved below for actual finite predictive
-laws by an explicit four-point experiment. One coarse moment is repeated at
-every positive grade; a duplicated moment fiber carries a tunably small target
-residual, while the ungraded target separation remains one. No cited moment
-comparison result or theorem-valued parameter enters the construction.
+fixed-grade incompleteness claim is stated below for actual finite predictive
+laws, with a visible `sorry` at the missing construction. A citation is never
+accepted as a theorem parameter, and the underconstrained four-point witness
+identified in `proofs/validation/FIXED_GRADE_AUDIT.md` is explicitly rejected.
 -/
 
 namespace Calibrator.CertificateGrading
