@@ -270,22 +270,10 @@ structure HardyWeinbergModel where
   altFreq_nonneg : 0 ≤ altFreq
   altFreq_le_one : altFreq ≤ 1
 
-/-- **The model class is inhabited**, at the polymorphic frequency `q = 1/2`.
-
-WHY THIS DECLARATION EXISTS, AND WHY IT IS NOT DECORATION.  126 theorems in this
-corpus are quantified over `HardyWeinbergModel`.  A universally quantified statement
-over a type with no inhabitant is TRUE AND EMPTY: every one of those theorems would
-hold, be checked by the kernel, report clean axioms, and say nothing about any locus.
-Nothing else in the corpus discharges that, because a structure is not automatically
-nonempty and Lean never asks.  This is the witness, so those theorems are about
-something.  See `scripts/check-laundering.py` family F4 and `LAUNDER_CERT` in
-`proofs/validation/invariants/LaunderingScan.lean`, which fail on a certificate
-structure the corpus consumes and never constructs.
-
-`1/2` rather than `0` or `1` deliberately: the boundary values satisfy the fields but
-degenerate the genotype variance to zero, and a nonemptiness witness that only inhabits
-the degenerate boundary leaves the interesting sub-class unwitnessed. -/
-def HardyWeinbergModel.witness : HardyWeinbergModel where
+/-- **The class is inhabited.**  A theorem quantified over an uninhabited structure is
+true and empty: kernel-checked, clean axiom report, no content.  This is the witness that
+makes the theorems below statements about something. -/
+noncomputable def HardyWeinbergModel.witness : HardyWeinbergModel where
   altFreq := 1 / 2
   altFreq_nonneg := by norm_num
   altFreq_le_one := by norm_num
@@ -575,11 +563,8 @@ theorem strictMono_Phi : StrictMono Phi := by
     measureReal_def, measureReal_def]
   exact ENNReal.toReal_lt_toReal (measure_ne_top _ _) (measure_ne_top _ _) |>.mpr hlt
 
-/- No `Monotone Phi` corollary is stated here. `Calibrator.monotone_Phi` in `Condensation`
-and `Calibrator.Phi_monotone` in `DGP` are the two spellings the corpus already had, and
-both are now `strictMono_Phi.monotone` rather than independent appeals to
-`ProbabilityTheory.monotone_cdf`. Adding a third here would recreate the duplication the
-collapse removed; the derivation lives once, above. -/
+/- The `Monotone Phi` corollary is stated where it is used: `Calibrator.monotone_Phi` in
+`Condensation` and `Calibrator.Phi_monotone` in `DGP`, both `strictMono_Phi.monotone`. -/
 
 /-- Heteroscedastic Gaussian noise assumption:
 for each ancestry coordinate `x`, the environmental noise follows `N(0, σ²(x))`. -/
