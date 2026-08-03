@@ -13,6 +13,10 @@ import Calibrator.AssortativeMatingPGS
 import Calibrator.CovarianceStructure
 import Calibrator.AncestrySpecificPower
 import Calibrator.GeneticArchitectureDiscovery
+import Calibrator.StatisticalGeneticsMethodology
+import Calibrator.BlindnessRegistry
+import Calibrator.SerialFounderChain
+import Calibrator.BundleRigidity.TwoAtom
 import Calibrator.LongitudinalPortability
 import Calibrator.ImputationPortability
 import Calibrator.SimulationValidation

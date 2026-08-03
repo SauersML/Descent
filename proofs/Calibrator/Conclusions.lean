@@ -546,15 +546,64 @@ theorem bernoulliKLReal_nonneg (p q : ℝ) (hp0 : 0 < p) (hp1 : p < 1) (hq0 : 0 
 
 /-- **Strict Gibbs inequality for the Bernoulli KL divergence.**
 
-`bernoulliKLReal_nonneg` above gives one half of Gibbs' inequality; this is the strictness
-half, that the log-sum bound is tight only at `q = p`. Three theorems below used to take
-this as a caller-supplied premise `h_kl_zero_iff`; it is not a restriction on the inputs
-but a universally true fact about a divergence this corpus defines, so it is stated here
-and admitted, leaving the debt visible to `AxiomScan`. -/
+`bernoulliKLReal_nonneg` above gives one half of Gibbs' inequality. Strictness follows by
+using `log x < x - 1` on `x = q / p` whenever `q ≠ p`; the complementary-coordinate term
+retains the non-strict bound. -/
 theorem bernoulliKLReal_eq_zero_iff (p q : ℝ)
     (hp0 : 0 < p) (hp1 : p < 1) (hq0 : 0 < q) (hq1 : q < 1) :
     bernoulliKLReal p q = 0 ↔ q = p := by
-  sorry
+  constructor
+  · intro hzero
+    by_contra hqp
+    have hratio_ne : q / p ≠ 1 := by
+      intro hratio
+      apply hqp
+      field_simp [hp0.ne'] at hratio
+      exact hratio
+    have h1 : Real.log (q / p) < q / p - 1 := by
+      exact Real.log_lt_sub_one_of_pos (div_pos hq0 hp0) hratio_ne
+    have h2 : Real.log ((1 - q) / (1 - p)) ≤ (1 - q) / (1 - p) - 1 := by
+      apply Real.log_le_sub_one_of_pos
+      exact div_pos (by linarith) (by linarith)
+    have h1_neg :
+        -p * Real.log (q / p) > -p * (q / p - 1) := by
+      nlinarith [mul_lt_mul_of_pos_left h1 hp0]
+    have h2_neg :
+        -(1 - p) * Real.log ((1 - q) / (1 - p)) ≥
+          -(1 - p) * ((1 - q) / (1 - p) - 1) := by
+      have hp_compl : 0 ≤ 1 - p := by linarith
+      nlinarith [mul_le_mul_of_nonneg_left h2 hp_compl]
+    have h_log_inv1 : Real.log (p / q) = -Real.log (q / p) := by
+      rw [Real.log_div hp0.ne' hq0.ne', Real.log_div hq0.ne' hp0.ne']
+      ring
+    have h_log_inv2 :
+        Real.log ((1 - p) / (1 - q)) = -Real.log ((1 - q) / (1 - p)) := by
+      have h1p : 1 - p ≠ 0 := by linarith
+      have h1q : 1 - q ≠ 0 := by linarith
+      rw [Real.log_div h1p h1q, Real.log_div h1q h1p]
+      ring
+    have hpositive : 0 < bernoulliKLReal p q := by
+      unfold bernoulliKLReal
+      rw [h_log_inv1, h_log_inv2]
+      calc
+        p * -Real.log (q / p) + (1 - p) * -Real.log ((1 - q) / (1 - p))
+            > -p * (q / p - 1) -
+                (1 - p) * ((1 - q) / (1 - p) - 1) := by
+              nlinarith
+        _ = -q + p - (1 - q) + (1 - p) := by
+          have hqp_cancel : p * (q / p) = q := by
+            rw [mul_div_cancel₀ _ hp0.ne']
+          have hcompl_cancel : (1 - p) * ((1 - q) / (1 - p)) = 1 - q := by
+            rw [mul_div_cancel₀ _ (by linarith)]
+          rw [show -p * (q / p - 1) = -(p * (q / p)) + p by ring,
+            show -(1 - p) * ((1 - q) / (1 - p) - 1) =
+              -((1 - p) * ((1 - q) / (1 - p))) + (1 - p) by ring,
+            hqp_cancel, hcompl_cancel]
+        _ = 0 := by ring
+    exact hpositive.ne' hzero
+  · intro h
+    subst q
+    simp [bernoulliKLReal]
 
 /-- `UnitProb` form of `bernoulliKLReal_eq_zero_iff`. -/
 theorem klBernReal_eq_zero_iff (p q : UnitProb)

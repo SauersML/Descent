@@ -15,11 +15,14 @@ import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
 import Mathlib.Analysis.SpecificLimits.Basic
 import Mathlib.Topology.ContinuousMap.Algebra
 import Mathlib.GroupTheory.Perm.Basic
+import Calibrator.BundleRigidity.SingleModulus
 
 /-!
 # Realizability: a conditional symmetric lift and a fold obstruction
 
-This module is **self-contained: it imports only Mathlib**.
+This module imports targeted Mathlib modules **and**
+`Calibrator.BundleRigidity.SingleModulus`, whose atoms are the `B = 1` case of the lift
+built here (`atom_sq_eq_symmetric_atom_sq`, `symmetric_atoms_realize_fourAtom`).
 
 This file isolates the finite algebra that is valid inside the proposed monodromy
 picture.  It does **not** assert the global analytic assembly theorem.  Analytic
@@ -132,6 +135,48 @@ theorem symmetric_atoms_have_modulus {w : ℝ} (hw0 : 0 ≤ w) (hw1 : w ≤ 1) :
     |outerAtom w ^ 2 - 1| = w ∧ |innerAtom w ^ 2 - 1| = w := by
   rw [outerAtom_sq hw0, innerAtom_sq hw1]
   constructor <;> simp [abs_of_nonneg hw0]
+
+/-! ### The `B = 1` case is the single-modulus family
+
+The two magnitudes above are not a second construction: they are the atom magnitudes a
+single-modulus family is forced to use, and the four-atom line of `SingleModulus` is the
+one-block case of the lift. -/
+
+/-- **Every atom of a single-modulus family squares to one of these two.**
+
+`SingleModulus.sq_cases` says an atom squares to `1 + v` or to `1 - v`; those are exactly
+`outerAtom v ^ 2` and `innerAtom v ^ 2`. So the symmetric lift is not making a choice of
+magnitudes — at modulus `v` there is no other pair available, whatever the atom count. -/
+theorem atom_sq_eq_symmetric_atom_sq {d : ℕ} {v : ℝ} (hv0 : 0 ≤ v) (hv1 : v ≤ 1)
+    (S : SingleModulus d v) (j : Fin d) :
+    S.atom j ^ 2 = outerAtom v ^ 2 ∨ S.atom j ^ 2 = innerAtom v ^ 2 := by
+  rw [outerAtom_sq hv0, innerAtom_sq hv1]
+  exact S.sq_cases j
+
+/-- **Both magnitudes are attained: the one-block lift is the four-atom family.**
+
+`fourAtom` at `c = 0` puts mass `1/4` on each of `±A, ±B` with `A² = 1 + v` and
+`B² = 1 - v`. Taking `A = outerAtom v` and `B = innerAtom v` is legitimate exactly on
+`0 < v < 1`, where the real-root conditions of `outerAtom_sq` and `innerAtom_sq` and the
+strict ordering `innerAtom v < outerAtom v` all hold, and the result is a genuine
+`SingleModulus 4 v` whose outer and inner atoms are the ones defined here.
+
+This is the `B = 1` case of `symmetric_block_moments`: one block, four atoms, mean zero and
+variance one. The general-`B` statement above is its extension, and the two must agree on
+this overlap or one of them has the wrong atoms. -/
+theorem symmetric_atoms_realize_fourAtom (v : ℝ) (hv0 : 0 < v) (hv1 : v < 1) :
+    ∃ S : SingleModulus 4 v, S.atom 0 = outerAtom v ∧ S.atom 2 = innerAtom v := by
+  have hApos : 0 < outerAtom v := by
+    unfold outerAtom
+    exact Real.sqrt_pos.mpr (by linarith)
+  have hBpos : 0 < innerAtom v := by
+    unfold innerAtom
+    exact Real.sqrt_pos.mpr (by linarith)
+  have hBA : innerAtom v < outerAtom v := by
+    unfold innerAtom outerAtom
+    exact Real.sqrt_lt_sqrt (by linarith) (by linarith)
+  exact ⟨fourAtom v (outerAtom v) (innerAtom v) 0 hv0.le (outerAtom_sq hv0.le)
+    (innerAtom_sq hv1.le) hApos hBpos hBA (by norm_num), rfl, rfl⟩
 
 /-- Positive pooled weights give positive mass to every one of the four split atoms. -/
 theorem split_atom_mass_pos (q : Fin B → ℝ) (hq : ∀ b, 0 < q b) (b : Fin B) :

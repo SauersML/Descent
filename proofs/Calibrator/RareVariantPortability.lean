@@ -314,14 +314,10 @@ theorem mutationSelectionBalance_eq_fstFromTau (mu s h : ℝ)
     (hhs : h * s ≠ 0) (hsum : h * s + mu ≠ 0) :
     mutationSelectionBalance mu s h = fstFromTau (mu / (h * s)) := by
   unfold mutationSelectionBalance fstFromTau
-  have hone : (1 : ℝ) + mu / (h * s) ≠ 0 := by
-    rw [show (1 : ℝ) + mu / (h * s) = (h * s + mu) / (h * s) by field_simp]
-    exact div_ne_zero hsum hhs
-  -- `field_simp` may or may not leave a polynomial identity behind; guessing
-  -- which costs a build, so accept either outcome.
-  first
-  | (field_simp; ring)
-  | field_simp
+  have hden : (h * s + mu) / (h * s) = 1 + mu / (h * s) := by
+    rw [add_div, div_self hhs]
+  rw [← hden, div_eq_div_iff hsum (div_ne_zero hsum hhs)]
+  ring
 
 /-- **Mutation-selection balance is the identity-fraction map at the scaled selective load.**
 
@@ -341,6 +337,7 @@ theorem mutationSelectionBalance_eq_identityFraction (mu s h : ℝ) (hmu : mu �
     field_simp
   unfold mutationSelectionBalance fstMutationDriftEquilibrium
   rw [hsum, one_div_div]
+  ring
 
 /-- **The dominant balance is a fixed point of the dominant map.** This is what
 makes the closed form above impossible to stipulate: it is derived from the

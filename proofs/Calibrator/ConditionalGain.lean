@@ -97,6 +97,32 @@ theorem conditionalGainFunctional_eq_coe {s : ℝ}
 @[simp] theorem conditionalGainFunctional_zero : C.conditionalGainFunctional 0 = 0 := by
   simp [conditionalGainFunctional]
 
+/-- **The freshness floor is a floor on the conditional gain, and only that.**
+
+`BundleRigidity.master_decay_bound_effDim` bounds an amplitude by
+`exp (-(θ · γ · D))`, with `D = BundleRigidity.effDim fresh` the maximal total freshness
+over orderings. Whenever that bound is available for the joint characteristic amplitude of
+a phase law, the gain functional at that frequency is at least `θ · γ · D`, because the
+gain is minus the logarithm of the amplitude.
+
+This is the one direction that holds. `D` is a lower-bound parameter, not an evaluation:
+nothing here bounds the gain *above* by `θ · γ · D`, and the conditional-product identity
+that would compute the amplitude coordinatewise is false under dependence — refuted below
+by the copied-binary witness. The hypothesis is the master bound itself, carried
+explicitly, so a coupling for which no contraction is available yields no floor. -/
+theorem conditionalGainFunctional_ge_of_freshness_decay {m : ℕ}
+    (fresh : Equiv.Perm (Fin m) → ℕ → ℝ) (θ γ s : ℝ)
+    (hpos : 0 < C.characteristicAmplitude s)
+    (hbound : C.characteristicAmplitude s ≤
+      Real.exp (-(θ * γ * BundleRigidity.effDim fresh))) :
+    ((θ * γ * BundleRigidity.effDim fresh : ℝ) : WithTop ℝ) ≤
+      C.conditionalGainFunctional s := by
+  have hlog : Real.log (C.characteristicAmplitude s) ≤
+      -(θ * γ * BundleRigidity.effDim fresh) :=
+    (Real.log_le_iff_le_exp hpos).mpr hbound
+  rw [C.conditionalGainFunctional_eq_coe (ne_of_gt hpos), WithTop.coe_le_coe]
+  linarith
+
 end FiniteCoupledPhaseLaw
 
 /-! ## Support and oscillatory gain are different axes

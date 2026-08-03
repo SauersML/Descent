@@ -68,6 +68,29 @@ def chargedTuples (curve : Fin d → T → ℝ) (Sup : Set (Fin k → T)) (v : F
     Set (Fin k → T) :=
   {t | t ∈ Sup ∧ ∀ i, ∃ j, curve j (t i) = v i}
 
+/-- **One slot of the charged tuples is exactly the coverage set of `Coverage`.**
+
+`ModulusFamily.coverers S v` collects the parameters of `S` at which some branch takes the
+value `v`; `chargedTuples` collects the tuples of a support every slot of which is covered.
+At `k = 1` the two are the same set, transported along the projection `t ↦ t 0`. That is
+what licenses reading the slotwise results here as statements about the peeling machinery:
+`slot_uniform` says a value singly covered *in the sense of `Coverage`* pins its slot in
+every charging tuple. Should either side change which branches count as covering, this
+stops compiling. -/
+theorem chargedTuples_one_eq_coverers [TopologicalSpace T] (F : ModulusFamily T d)
+    (S : Set T) (v : Fin 1 → ℝ) :
+    (fun t : Fin 1 → T ↦ t 0) ''
+        chargedTuples (fun j t ↦ F.curve j t) {u : Fin 1 → T | ∀ l, u l ∈ S} v
+      = F.coverers S (v 0) := by
+  ext x
+  constructor
+  · rintro ⟨t, ⟨hmem, hcov⟩, rfl⟩
+    exact ⟨hmem 0, hcov 0⟩
+  · rintro ⟨hxS, j, hj⟩
+    refine ⟨fun _ ↦ x, ⟨fun _ ↦ hxS, fun i ↦ ⟨j, ?_⟩⟩, rfl⟩
+    rw [Subsingleton.elim i 0]
+    exact hj
+
 /-- **Coverage is a function of the support alone.**
 
 Two couplings with the same support have literally the same charged tuples, for every
