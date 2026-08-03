@@ -3,6 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Calibrator.Probability
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.LinearAlgebra.Vandermonde
 import Mathlib.Tactic.Linarith
 import Mathlib.Tactic.Ring
 
@@ -341,6 +342,59 @@ theorem mechanismCount_not_identified :
       twoMechanismMixture (2 / 7) = 70 / 100) := by
   constructor <;> refine ⟨?_, ?_, ?_⟩ <;>
     simp [threeMechanismMixture, twoMechanismMixture] <;> norm_num
+
+/-! ### Why a one-dimensional mechanism space is not a restriction
+
+The module docstring says the guard clause fails because "Sard's theorem bounds the image
+of a smooth curve, but mixtures see only the convex hull, and hulls of smooth curves are
+as large as hulls of Borel ones", and names this the moment-curve phenomenon. That
+sentence is the load-bearing one — it is why the smooth category buys nothing, and hence
+why the latent dimension collapses — and it is provable here.
+
+`u ↦ (1, u, u², …, u^(n-1))` is a single real-analytic curve. Its points at `n` distinct
+parameters are the rows of a Vandermonde matrix, whose determinant is nonzero exactly
+when the parameters are distinct. So those `n` points already span `ℝⁿ`, and every target
+vector is a combination of points on one curve — for every `n`, with no smoothness cost.
+
+That is the whole mechanism of the collapse, in the finite-dimensional case: a
+one-parameter family of mechanisms is not a restriction on what an observed family can
+look like, because a curve's span is already everything. What the general theorem adds is
+that the combination can be taken with smooth strictly positive *mixing densities* over a
+compact manifold, which needs kernels and measures as formal objects and remains the open
+gap described above. The obstruction the guard clause hoped for is refuted here; the
+construction that replaces it is not built here. -/
+
+/-- **`n` distinct parameters give `n` linearly independent moment-curve points.**  This
+is `Matrix.det_vandermonde_ne_zero_iff`, named for the use it is put to. -/
+theorem momentCurve_det_ne_zero {n : ℕ} (u : Fin n → ℝ) (hu : Function.Injective u) :
+    (Matrix.vandermonde u).det ≠ 0 :=
+  Matrix.det_vandermonde_ne_zero_iff.mpr hu
+
+/-- **Every target is a combination of points on one curve.**
+
+    Given `n` distinct parameters, every vector in `ℝⁿ` is `∑ᵢ cᵢ · (uᵢ^j)ⱼ` for some
+    coefficients — a combination of `n` points of the single moment curve.  The latent
+    space here is one-dimensional and the reachable set is everything, which is exactly
+    the failure of the smooth-category guard clause.
+
+    The coefficients are not constrained to be nonnegative, so this is a statement about
+    the affine span rather than the convex hull.  The general theorem needs the convex,
+    strictly positive, smooth-density version; what this settles is that dimension alone
+    is no obstruction. -/
+theorem exists_momentCurve_combination {n : ℕ} (u : Fin n → ℝ) (hu : Function.Injective u)
+    (target : Fin n → ℝ) :
+    ∃ c : Fin n → ℝ, ∀ j : Fin n, ∑ i, c i * u i ^ (j : ℕ) = target j := by
+  classical
+  have hdet : IsUnit (Matrix.vandermonde u).det :=
+    isUnit_iff_ne_zero.mpr (momentCurve_det_ne_zero u hu)
+  refine ⟨Matrix.vecMul target (Matrix.vandermonde u)⁻¹, fun j ↦ ?_⟩
+  -- `vecMul c V j` is literally `∑ i, c i * V i j`, and `V i j = u i ^ j`, so solving
+  -- the system is exactly the statement wanted.
+  have hsolve : Matrix.vecMul (Matrix.vecMul target (Matrix.vandermonde u)⁻¹)
+      (Matrix.vandermonde u) = target := by
+    rw [Matrix.vecMul_vecMul, Matrix.nonsing_inv_mul _ hdet, Matrix.vecMul_one]
+  have hcoord := congrFun hsolve j
+  simpa [Matrix.vecMul, dotProduct, Matrix.vandermonde] using hcoord
 
 /-- **Two mechanisms reach every achievable observation.**
 
