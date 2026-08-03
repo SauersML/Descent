@@ -727,6 +727,14 @@ the average heterozygosity 2p(1-p) (or its sum, depending on normalisation).
 noncomputable def pgsVarianceFromHet (β_sq_sum het : ℝ) : ℝ :=
   β_sq_sum * het
 
+/-- **Score variance is bilinear in effect scale and heterozygosity.** Rescaling every effect by
+`c` scales the summed squares by `c` as given, and the variance follows; the same holds in the
+heterozygosity argument. Separating the two orders is what a mutant collapsing them would lose. -/
+theorem pgsVarianceFromHet_bilinear (β_sq_sum het c : ℝ) :
+    pgsVarianceFromHet (c * β_sq_sum) het = c * pgsVarianceFromHet β_sq_sum het ∧
+      pgsVarianceFromHet β_sq_sum (c * het) = c * pgsVarianceFromHet β_sq_sum het := by
+  constructor <;> unfold pgsVarianceFromHet <;> ring
+
 /-- Target-population heterozygosity from a heterozygosity-loss fraction.
 
 This definition carries no independent content: `fst` here is *defined* as the
@@ -751,6 +759,19 @@ which carries the assumption in its type;
     empirical content lives entirely in whatever supplies `fst`. -/
 noncomputable def targetHetFromFst (het_source fst : ℝ) : ℝ :=
   het_source * (1 - fst)
+
+/-- **Endpoints of the drift-retention map.** No divergence retains all heterozygosity; complete
+divergence retains none. Two anchors rather than one, because a single one is met by many wrong
+bodies. -/
+theorem targetHetFromFst_endpoints (het_source : ℝ) :
+    targetHetFromFst het_source 0 = het_source ∧ targetHetFromFst het_source 1 = 0 := by
+  constructor <;> unfold targetHetFromFst <;> ring
+
+/-- The map is linear in the source heterozygosity: it is a retained FRACTION, so doubling the
+source doubles the target at fixed divergence. -/
+theorem targetHetFromFst_linear (het_source fst c : ℝ) :
+    targetHetFromFst (c * het_source) fst = c * targetHetFromFst het_source fst := by
+  unfold targetHetFromFst; ring
 
 /-- **The bridge named in the paragraph above**, which until now was named and not stated.
 
@@ -817,6 +838,18 @@ theorem presentDayPGSVariance_eq_one_sub_fst_mul (V_A fst : ℝ) :
     Empirical status: UNTESTED. -/
 noncomputable def wrightFisherDriftRetention (N t : ℕ) : ℝ :=
   (1 - 1 / (2 * (N : ℝ))) ^ t
+
+/-- **Drift retention composes over time.** Retention across `s + t` generations is retention
+across `s` times retention across `t`, and no generations retain everything. That semigroup
+property is what makes the per-generation factor a rate; a body without it would not compose. -/
+theorem wrightFisherDriftRetention_add (N s t : ℕ) :
+    wrightFisherDriftRetention N (s + t)
+      = wrightFisherDriftRetention N s * wrightFisherDriftRetention N t := by
+  unfold wrightFisherDriftRetention
+  exact pow_add _ s t
+
+theorem wrightFisherDriftRetention_zero (N : ℕ) : wrightFisherDriftRetention N 0 = 1 := by
+  unfold wrightFisherDriftRetention; exact pow_zero _
 
 /-- **Within-population heterozygosity loss after `t` generations of drift.**
 
@@ -2541,6 +2574,23 @@ score itself is unchanged.
     Empirical status: UNTESTED. -/
 noncomputable def alleleFreqMismatchPenalty (pSource pTarget : ℝ) : ℝ :=
   Real.exp (-|pTarget - pSource|)
+
+/-- **The penalty is a distance in disguise: symmetric, at most one, and exactly one on
+agreement.** A directed penalty would fail the first, and a penalty that could exceed one would
+reward mismatch. -/
+theorem alleleFreqMismatchPenalty_symm (pSource pTarget : ℝ) :
+    alleleFreqMismatchPenalty pSource pTarget = alleleFreqMismatchPenalty pTarget pSource := by
+  unfold alleleFreqMismatchPenalty
+  rw [abs_sub_comm]
+
+theorem alleleFreqMismatchPenalty_le_one (pSource pTarget : ℝ) :
+    alleleFreqMismatchPenalty pSource pTarget ≤ 1 := by
+  unfold alleleFreqMismatchPenalty
+  rw [Real.exp_le_one_iff]
+  simpa using abs_nonneg (pTarget - pSource)
+
+theorem alleleFreqMismatchPenalty_self (p : ℝ) : alleleFreqMismatchPenalty p p = 1 := by
+  unfold alleleFreqMismatchPenalty; simp
 
 @[simp] theorem alleleFreqMismatchPenalty_self (p : ℝ) :
     alleleFreqMismatchPenalty p p = 1 := by

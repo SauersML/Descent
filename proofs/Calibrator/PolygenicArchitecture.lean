@@ -716,7 +716,8 @@ and convexity are theorems of the numerical construction and are attached below.
 theorem exists_fixedGrade_gap_biology (K : ℕ) :
     ∀ᶠ n : ℕ in Filter.atTop,
       ∃ P : MeanAbsoluteEffectCertificateProblem (n + 1) n,
-        P.mixtureExperiment.Informative ∧
+        P.mixtureExperiment.SeparatedBy
+          (FiniteMixtureExperiment.fixedGradeInformationRadius n) ∧
           FiniteMixtureExperiment.fixedGradeGapScale K n ≤
             P.certificationGap (K + 1)
               (FiniteMixtureExperiment.fixedGradeInformationRadius n) := by
@@ -733,7 +734,8 @@ theorem fixedGrade_incompleteness_biology (K : ℕ) :
       ∃ P : MeanAbsoluteEffectCertificateProblem (n + 1) n,
         (∀ i, P.architecture i ∈ P.effects) ∧
           P.effects.Nonempty ∧ Convex ℝ P.effects ∧
-          P.mixtureExperiment.Informative ∧
+          P.mixtureExperiment.SeparatedBy
+          (FiniteMixtureExperiment.fixedGradeInformationRadius n) ∧
           FiniteMixtureExperiment.fixedGradeGapScale K n ≤
             P.certificationGap (K + 1)
               (FiniteMixtureExperiment.fixedGradeInformationRadius n) := by

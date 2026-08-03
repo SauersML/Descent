@@ -446,6 +446,14 @@ theorem r2_increments_strictAnti_in_signal
 noncomputable def costEffectiveness (improvement cost : ℝ) : ℝ :=
   improvement / cost
 
+/-- **Cost-effectiveness does not depend on the currency.** Measuring improvement and cost in
+units `t` times smaller leaves the ratio unchanged, which is what makes it a rate rather than a
+margin. -/
+theorem costEffectiveness_unit_invariant (improvement cost t : ℝ) (ht : t ≠ 0) :
+    costEffectiveness (t * improvement) (t * cost) = costEffectiveness improvement cost := by
+  unfold costEffectiveness
+  exact mul_div_mul_left _ _ ht
+
 /-- **Cross-multiplication:** with both costs positive, ordering the two
     `costEffectiveness` ratios is ordering the cross products.
 

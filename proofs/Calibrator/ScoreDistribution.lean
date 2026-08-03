@@ -112,6 +112,20 @@ itself a clinical decision or misclassification theorem.
 noncomputable def thresholdStandardizedCoordinate (threshold μ σ : ℝ) : ℝ :=
   (threshold - μ) / σ
 
+/-- **The standardized coordinate is translation equivariant and vanishes at the mean.** Shifting
+the threshold and the mean together leaves it unchanged, which is what makes it a position
+relative to the distribution rather than an absolute score. -/
+theorem thresholdStandardizedCoordinate_shift (threshold μ σ d : ℝ) :
+    thresholdStandardizedCoordinate (threshold + d) (μ + d) σ
+      = thresholdStandardizedCoordinate threshold μ σ := by
+  unfold thresholdStandardizedCoordinate
+  congr 1
+  ring
+
+theorem thresholdStandardizedCoordinate_at_mean (μ σ : ℝ) :
+    thresholdStandardizedCoordinate μ μ σ = 0 := by
+  unfold thresholdStandardizedCoordinate; simp
+
 /-- Gaussian benchmark fraction of scores above a raw threshold. This is the
 deployment-relevant tail-rate object associated with the standardized
 coordinate, but it is still only a benchmark score-distribution quantity. -/
