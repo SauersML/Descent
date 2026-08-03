@@ -1,0 +1,26 @@
+# CAPTURED STDOUT, NOT A FILE THE DETECTOR WROTE.
+#
+# AxiomScan.lean writes no output file. Unlike Inflation.lean and RflScan.lean
+# it was not unified onto Shared.Results, because another session held it
+# dirty, so it still carries its own private copy of the generated-declaration
+# filter. Its counts are therefore NOT directly comparable with the other two
+# detectors' numbers, which use the shared filter.
+#
+# Everything below the marker is the verbatim stdout of:
+#     lake env lean proofs/validation/invariants/AxiomScan.lean
+#
+#   revision  629a80ea8618f167d4e925551a0b2233c3fa5a0c
+#   run at    2026-08-03T19:01Z (elaboration finished after 23m41s, exit 0)
+#   host      acn59, slurm job 14759172
+#   tree      tracked sources clean at that revision; the eight untracked
+#             paths present were build scripts and logs, not sources
+#
+# Reading: 4474 declarations were reached, none depends on an axiom outside
+# Lean's own three, and the sorryAx admission count is zero, so no declaration
+# in the scanned set is proved by `sorry`.
+# --- BEGIN VERBATIM STDOUT ---
+AXIOM_SCAN_SCANNED	4474
+AXIOM_SCAN_OFFENDERS	0
+ADMISSION_SCAN_COUNT	0
+AXIOM_SCAN_ALLOWED	[propext, Classical.choice, Quot.sound]
+AXIOM_SCAN_ADMISSIBLE	[sorryAx]

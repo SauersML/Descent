@@ -78,3 +78,37 @@ those are claims about.
 
 The compute is shared. Submit to a partition, keep the core count modest, and
 say in the result which revision and which node produced it.
+
+## Verify your own tooling, and make the verification able to fail
+
+A verification step that cannot fail loudly will eventually certify the wrong
+thing. Four separate failures in one day shared this shape, and the sharpest was
+not in the corpus at all but in the wrapper used to measure it.
+
+`scripts/cluster-lean-build.sh` hardcoded the shared checkout, so measuring a
+clean clone meant rewriting one line with `sed`. Then the script gained
+`GNOMON_REPO` support and the rewritten line stopped existing. The `sed` matched
+nothing, exited 0, and produced a byte-identical copy of the script. Running
+that copy would have built the STALE SHARED CHECKOUT and reported it as the
+corpus at a revision it had never seen: a plausible number, precise-looking, and
+about the wrong tree. It was caught only because the diff between original and
+rewritten script was printed and required to be non-empty.
+
+The rule: after transforming a file, assert that the transformation changed
+something. `sed`, `grep -v`, a filter, a patch applied with fuzz -- each exits 0
+on a no-op. Print the diff, count the lines, check the marker; anything that
+turns silence into an error.
+
+The same shape, three more times the same day:
+
+  * A build verified with `lake build Calibrator.QuadraticShift` broke the root
+    module. Building a leaf never elaborates the root, so the build that was run
+    could not have exercised the edit that broke it. Name the target that
+    actually contains the change; for a root or import change, that is the root.
+  * A 25-second probe harness collected stderr only. A family that reports a
+    failed check on STDOUT and exits nonzero was recorded as crashing. Capture
+    both streams: for some scripts a nonzero exit is a measurement outcome, not
+    an error.
+  * A guard's real finding sat at the bottom of a long advisory list and went
+    unread for hours. A finding that is not surfaced is functionally invisible;
+    lead with the verdict, not the log.
