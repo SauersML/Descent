@@ -21,9 +21,44 @@ import re
 UNIT_NAMES = re.compile(
     r"(^p$|^q$|^p[₀-₉0-9']?$|^q[₀-₉0-9']?$|freq|prob|prevalence|fst|"
     r"\br2\b|r2|h2|heritab|rg\b|ratio|rate|fraction|share|proportion|"
-    r"correlation|sens|spec|auc|power|accuracy|coverage|retention|portab)", re.I)
-COUNT_NAMES = re.compile(r"^(n|N|m|Ne|N₀|N₁|nEff|nSource|nTarget|\w*Size|\w*Count|"
+    r"correlation|sens|spec|auc|power|accuracy|coverage|retention|portab|"
+    # ---- added after the box audit; see the note below.
+    # Allele frequencies with a locus or population suffix.  `p₁` matched
+    # before, `p_A` and `q_B` did not, so `haplotypeFreqAdmixed` was sampled
+    # with allele frequencies up to 3 and reported "26.7 above 1.0".
+    r"^[pq][_'][\w'₀-₉]+$|^[pq][A-Z]\w*$|"
+    # Admixture fraction.  `admixedAlleleFreq` and `admixedFstExact` take it as
+    # `alpha`/`α` and were sampled at 2.999997.
+    r"^alpha$|^α$|"
+    # Wright's F-statistics.  `fst` matched, `f_ST` did not (the underscore
+    # breaks the substring), so `wrightFIT` was evaluated at f_IS = 3 and
+    # reported "2.9 above 1.0" for a quantity its own formula keeps in range
+    # whenever its inputs are.
+    r"^f$|^f[_']?(is|st|it)$|^f[_'][\w'₀-₉]+$|"
+    # Heterozygosity, and prevalence written as pi/π.
+    r"het|^pi$|^π$)", re.I)
+# `m` IS NOT HERE.  It was, as a count, and that single entry produced the
+# harness's most convincing false defect: `geneFlowFstStep` sampled at
+# m = 999.999, Ne = 1.001, F = 0.05 gives
+# F + (1-F)/(2Ne) - 2mF = 0.0500 + 0.4745 - 100.006 = -99.481, an F_ST of
+# -99.48 that reads as a corpus defect and is a migration RATE of 1000.
+# See AMBIGUOUS_NAMES.
+COUNT_NAMES = re.compile(r"^(n|N|Ne|N₀|N₁|nEff|nSource|nTarget|\w*Size|\w*Count|"
                          r"\w*Samples?|t|gen\w*|generations?)$")
+
+# NAMES THE CORPUS USES FOR BOTH A RATE AND A COUNT.  `m` is a migration rate
+# in `geneFlowFstStep` and `fstMigDriftNext` and a subgroup size in
+# `effectiveSubgroupSize`; the name cannot separate them and neither can a
+# default.  Guessing produced a witness the definition was never defined at, so
+# where the docstring does not say, this REFUSES -- the same rule `type_value`
+# already follows with `Uninhabitable`.  An honest "cannot build a point" is
+# worth more than a fabricated one, because only one of the two can be mistaken
+# for a finding.
+AMBIGUOUS_NAMES = re.compile(r"^m$")
+_RATE_WORDS = re.compile(r"migration rate|per generation|\bm\b[^.]{0,40}\brate\b|"
+                         r"rate of (gene flow|migration)|migration probabilit", re.I)
+_COUNT_WORDS = re.compile(r"subgroup of size|panel of size|size `?m`?|"
+                          r"\bm\b[^.]{0,30}\b(individuals|samples|markers|loci)\b", re.I)
 
 # (lo, hi, open_lo, open_hi)
 DEFAULT_BOX = (0.05, 3.0)
@@ -45,11 +80,20 @@ def box_for(d):
             for n in a["names"]]
     nat = {n for a in d["args"] if a["type"] == "ℕ" for n in a["names"]}
     box = {}
+    doc = d.get("docstring", "") or ""
     for n in args:
         if n in nat:
             box[n] = (1.0, 20.0)
         elif UNIT_NAMES.match(n):
             box[n] = (0.02, 0.98)
+        elif AMBIGUOUS_NAMES.match(n):
+            # Disambiguate from this definition's own docstring, or refuse.
+            if _RATE_WORDS.search(doc) and not _COUNT_WORDS.search(doc):
+                box[n] = (0.02, 0.98)
+            elif _COUNT_WORDS.search(doc) and not _RATE_WORDS.search(doc):
+                box[n] = (1.0, 1000.0)
+            else:
+                continue                # refused; see ambiguous_args below
         elif COUNT_NAMES.match(n):
             box[n] = (1.0, 1000.0)
         else:
@@ -72,6 +116,65 @@ def box_for(d):
         if not (hi > lo):
             box[n] = (lo, lo + 1.0)
     return box
+
+
+def ambiguous_args(d):
+    """Explicit real arguments this module REFUSES to sample, with the reason.
+
+    A definition with any of these cannot be graded here.  That is the point:
+    the alternative is a point drawn from a range the quantity does not live in,
+    and a violation at such a point is indistinguishable from a real one.
+    """
+    doc = d.get("docstring", "") or ""
+    if _RATE_WORDS.search(doc) != _COUNT_WORDS.search(doc):
+        return []                       # exactly one reading; box_for resolved it
+    return [n for a in d["args"] if not a["implicit"] and a["type"] in ("ℝ", "ℕ")
+            for n in a["names"] if AMBIGUOUS_NAMES.match(n)]
+
+
+# ------------------------------------------------------- joint constraints
+#
+# A BOX IS A PRODUCT AND SOME DOMAINS ARE NOT.  `pgsR2 cov vs vy = cov²/(vs·vy)`
+# is a squared correlation and lies in [0,1] -- but only on the set where
+# Cauchy-Schwarz holds, `cov² ≤ vs·vy`, and that set is not a product of
+# per-argument ranges.  Sampling the three independently from [0.05, 3.0] drew
+# cov = 3, vs = vy = 0.05 and reported `pgsR2 = 3599.57 above 1.0`, which is not
+# a fact about the body: no covariance matrix has that entry.  The same draw is
+# behind `sourceTruthR2SharedLD`, `transportedTargetR2SharedLD`, `snpH2`
+# (V_A_tagged = 3 > V_P = 0.05, tagged variance exceeding phenotypic variance),
+# `additiveHeritability` and `r2FromMSE` (mse = 3 > varY = 0.05).
+_COV_NAME = re.compile(r"(^|_)cov|covariance", re.I)
+_VAR_NAME = re.compile(r"(^|_)var|variance|^v[A-Z_]|^V_", re.I)
+_NUM_OVER_TOTAL = ((re.compile(r"^mse$|mse", re.I), re.compile(r"var_?y|varY|total", re.I)),
+                   (re.compile(r"tagged|_a_tagged", re.I), re.compile(r"^v_?p$|phenotyp", re.I)))
+
+
+def joint_repair(pt):
+    """Clamp a sampled point onto the domain its arguments jointly define.
+
+    Returns a new point.  Only ever SHRINKS a coordinate towards the admissible
+    set, so it cannot invent a violation; if it cannot identify the pattern it
+    returns the point unchanged.
+    """
+    names = list(pt)
+    covs = [n for n in names if _COV_NAME.search(n)]
+    vars_ = [n for n in names if _VAR_NAME.search(n) and n not in covs]
+    out = dict(pt)
+    if len(covs) == 1 and len(vars_) >= 2:
+        v1, v2 = sorted(pt[n] for n in vars_)[:2]
+        if v1 > 0 and v2 > 0:
+            cap = math.sqrt(v1 * v2)
+            c = out[covs[0]]
+            if abs(c) > cap:
+                out[covs[0]] = math.copysign(cap, c)
+    # a part cannot exceed its whole
+    for numpat, denpat in _NUM_OVER_TOTAL:
+        num = [n for n in names if numpat.search(n)]
+        den = [n for n in names if denpat.search(n) and n not in num]
+        if len(num) == 1 and len(den) == 1 and out[den[0]] > 0:
+            if out[num[0]] > out[den[0]]:
+                out[num[0]] = out[den[0]]
+    return out
 
 
 def hypothesis_predicates(d, theorem=None):
@@ -298,7 +401,15 @@ def enum_cards(structs):
     return out
 
 
-def type_value(ty, rng, structs=None, dim=None, lo=0.05, hi=1.0, _depth=0):
+_CDF_NAME = re.compile(r"^(\u03a6|Phi|phi|cdf|CDF|\u03a6_?\w*|normalCdf|stdNormalCdf)$")
+
+
+def _is_cdf_name(name):
+    return bool(name) and bool(_CDF_NAME.match(str(name)))
+
+
+def type_value(ty, rng, structs=None, dim=None, lo=0.05, hi=1.0, _depth=0,
+               name=""):
     """An inhabitant of the Lean type `ty`, or raise `Uninhabitable`.
 
     `dim` is the size used for every finite index type whose cardinality is not
@@ -340,6 +451,20 @@ def type_value(ty, rng, structs=None, dim=None, lo=0.05, hi=1.0, _depth=0):
         n = _index_card(dom, structs, dim)
         if n is None:                   # infinite domain: a genuine function
             if _norm(cod) in SCALAR_TYPES:
+                if _is_cdf_name(name):
+                    # A `Φ : ℝ → ℝ` argument named for a distribution function is
+                    # not an arbitrary map: the corpus's invariants about the
+                    # definitions that take one -- `liabilitySensitivity`,
+                    # `liabilitySpecificity` -- follow from Φ being MONOTONE and
+                    # valued in [0,1], and from nothing else.  The generic
+                    # inhabitant below is neither, so `liabilitySensitivity`
+                    # returned 1.043 and was reported "above 1.0" for a body that
+                    # cannot leave [0,1] when handed an actual CDF.  A logistic
+                    # CDF satisfies exactly the contract the corpus states and
+                    # keeps the check falsifiable -- a wrong body still escapes.
+                    k = rng.uniform(0.5, 2.0)
+                    return lambda *xs: 0.5 * (1.0 + math.tanh(k * sum(
+                        x for x in xs if isinstance(x, (int, float)))))
                 a, b = rng.uniform(lo, hi), rng.uniform(lo, hi)
                 return lambda *xs: a + b / (1.0 + sum(
                     x for x in xs if isinstance(x, (int, float))))
@@ -554,7 +679,7 @@ def build_args(argnames, pt, structval, vecspec, rng, structs=None,
             # Raises Uninhabitable if the type is not modelled.  Deliberately
             # NOT caught here: the caller records it as the reason the
             # definition could not be evaluated, which is true and specific.
-            out.append(type_value(argtypes[a], rng, structs))
+            out.append(type_value(argtypes[a], rng, structs, name=a))
         else:
             out.append(1.0)
     return out
