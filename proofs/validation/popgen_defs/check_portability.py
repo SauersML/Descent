@@ -37,13 +37,35 @@ three per cent low, which is the direction and size its stated assumption
 predicts.  That makes this file the only instrument that holds pgsVariance to a
 measurement, so deleting it as "the script for two dead laws" would silently
 retire a confirmation as well.
+
+THREE REPLICATES PER CELL WAS NOT A MEASUREMENT.  The eighteen records above
+are six split times at three replicates, with no error bar anywhere in the
+file, and cells in the same condition have landed at 0.343, 0.370 and 0.639 --
+scatter comparable to the effect being reported.  The falsification of the two
+selection laws survives that, because the gap between 0.55 observed and 0.98
+predicted at F_ST 0.0099 is far larger than any plausible standard error; the
+CONFIRMATION of pgsVariance at "0.969, about three per cent low" does not,
+because three per cent is smaller than the scatter that produced it.
+
+So the grid is now swept on all three axes the claim depends on -- split time,
+heritability, and causal-variant count -- and every cell reports the standard
+error of its mean over replicates alongside the mean.  Each replicate is also
+written individually, with its own wall time, so the next person to size a run
+on this script does not have to guess.
+
+THE DEFAULTS ARE STILL THE SMALL RUN.  One replicate is minutes of CPU and
+gigabytes of memory at the shipped n_dip and sequence length, so a full
+factorial is a cluster job, not a laptop job; `--help` shows how to ask for it.
 """
 from __future__ import annotations
 
-import json
+import argparse
 import os
 import sys
+import time
 from concurrent.futures import ProcessPoolExecutor
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 for _v in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS",
            "NUMEXPR_NUM_THREADS", "VECLIB_MAXIMUM_THREADS"):
@@ -51,9 +73,29 @@ for _v in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS",
 
 import numpy as np  # noqa: E402
 
+import simprov  # noqa: E402
+
 NE = 10000
 MU = 1.25e-8
 RHO = 1e-8
+
+# Defaults are the run this file has always done: six split times, one
+# heritability, one causal count, three replicates.  The full factorial is a
+# flag away and is documented in the run plan rather than made the default,
+# because one replicate here costs minutes of CPU and gigabytes of memory.
+DEFAULT_SPLIT_TIMES = [200, 500, 1000, 2000, 4000, 8000]
+DEFAULT_H2 = [0.5]
+DEFAULT_NCAUSAL = [300]
+DEFAULT_REPS = 3
+DEFAULT_SEED = 1000
+
+# The per-cell quantities whose mean and standard error are reported.  Naming
+# them here rather than aggregating whatever keys happen to appear keeps a cell
+# from silently losing a column when a replicate returns early.
+CELL_METRICS = ("fst", "n_snps", "t_sec", "pgsVar_ratio",
+                "r2A_all", "r2B_all", "ratio_all",
+                "r2A_z2", "r2B_z2", "ratio_z2",
+                "r2A_z4", "r2B_z4", "ratio_z4")
 
 
 def lean_stabilizingPortability(r2_0, fst, strength):
@@ -88,6 +130,7 @@ def standardize(X):
 def one_rep(args):
     import msprime
     split_t, n_dip, length, n_causal, h2, seed = args
+    t_start = time.time()
     dem = msprime.Demography()
     for name in ("A", "B", "ANC"):
         dem.add_population(name=name, initial_size=NE)
@@ -159,6 +202,8 @@ def one_rep(args):
         sel = np.where(np.abs(z) > zt)[0]
         if len(sel) < 5:
             out[f"r2A_{tag}"] = out[f"r2B_{tag}"] = float("nan")
+            out[f"ratio_{tag}"] = float("nan")
+            out[f"nsnp_{tag}"] = int(len(sel))
             continue
         w = bhat[sel]
         sA_te = ZA[te][:, sel] @ w          # held-out source individuals
@@ -168,6 +213,12 @@ def one_rep(args):
         out[f"r2B_{tag}"] = float(np.corrcoef(sB, yB)[0, 1] ** 2)
         out[f"r2Ain_{tag}"] = float(np.corrcoef(sA_tr, y[tr])[0, 1] ** 2)
         out[f"nsnp_{tag}"] = int(len(sel))
+        # The portability ratio is formed PER REPLICATE and averaged, never as
+        # a ratio of the two cell means: the two R^2 come from the same
+        # simulated panel, so their fluctuations cancel within a replicate and
+        # not between them.
+        out[f"ratio_{tag}"] = (out[f"r2B_{tag}"] / out[f"r2A_{tag}"]
+                               if out[f"r2A_{tag}"] > 0 else float("nan"))
 
     # pgsVariance: sum beta^2 2p(1-p) vs the actual variance of the score,
     # using the causal weights on raw dosages (linkage equilibrium assumption)
@@ -176,25 +227,112 @@ def one_rep(args):
     score_raw = A @ braw
     out["pgsVar_actual"] = float(score_raw.var())
     out["pgsVar_lean_LE"] = lean_pgsVariance(braw[causal], pA[causal])
+    out["pgsVar_ratio"] = (out["pgsVar_lean_LE"] / out["pgsVar_actual"]
+                           if out["pgsVar_actual"] > 0 else float("nan"))
+    out["t_sec"] = time.time() - t_start
     return out
 
 
-def main():
-    n_dip = int(os.environ.get("NDIP", "3000"))
-    length = float(os.environ.get("LEN", "3e7"))
-    n_causal = int(os.environ.get("NCAUSAL", "300"))
-    reps = int(os.environ.get("REPS", "3"))
-    jobs = []
-    for split_t in (200, 500, 1000, 2000, 4000, 8000):
-        for r in range(reps):
-            jobs.append((split_t, n_dip, length, n_causal, 0.5,
-                         1000 + 37 * r + split_t))
-    with ProcessPoolExecutor(max_workers=int(os.environ.get("NPROC", "18"))) as ex:
-        out = [f.result() for f in [ex.submit(one_rep, a) for a in jobs]]
-    out = [o for o in out if o]
-    with open(sys.argv[1] if len(sys.argv) > 1 else "port.json", "w") as fh:
-        json.dump(out, fh)
-    print(f"wrote {len(out)} records")
+def _pm(s, dp):
+    """Format a summary as mean +/- SE, and say so plainly when there is neither.
+
+    A cell that produced one usable replicate has no standard error, and
+    printing its mean as though it did is exactly the habit this rewrite is
+    meant to break.
+    """
+    if s["mean"] is None:
+        return "no data"
+    if s["se"] is None:
+        return ("%.*f (1 rep, no SE)" % (dp, s["mean"]))
+    return "%.*f+/-%.*f" % (dp, s["mean"], dp, s["se"])
+
+
+def main(argv=None):
+    ap = argparse.ArgumentParser(
+        description="Sweep split time, heritability and causal-variant count "
+                    "through the msprime -> GWAS -> PGS portability pipeline.",
+        epilog="One replicate is minutes of CPU and gigabytes of memory at the "
+               "shipped --n-dip and --seq-length. Time a single replicate "
+               "before sizing a factorial run.")
+    ap.add_argument("--split-times", type=simprov.parse_ints,
+                    default=DEFAULT_SPLIT_TIMES,
+                    help="split times in generations, comma separated")
+    ap.add_argument("--h2", type=simprov.parse_floats, default=DEFAULT_H2,
+                    help="heritabilities, comma separated")
+    ap.add_argument("--n-causal", type=simprov.parse_ints,
+                    default=DEFAULT_NCAUSAL,
+                    help="causal-variant counts, comma separated")
+    ap.add_argument("--n-dip", type=int,
+                    default=int(os.environ.get("NDIP", "3000")),
+                    help="diploids per population (env NDIP)")
+    ap.add_argument("--seq-length", type=float,
+                    default=float(os.environ.get("LEN", "3e7")),
+                    help="simulated sequence length in bp (env LEN)")
+    simprov.add_sweep_args(ap, int(os.environ.get("REPS", str(DEFAULT_REPS))),
+                           "port.json", DEFAULT_SEED)
+    ap.set_defaults(jobs=int(os.environ.get("NPROC", "8")))
+    args = ap.parse_args(argv)
+
+    cells_spec = [(t, h2, nc) for t in args.split_times
+                  for h2 in args.h2 for nc in args.n_causal]
+    jobs = [(t, args.n_dip, args.seq_length, nc, h2,
+             args.seed + 37 * r + t + 101 * nc + int(1000 * h2))
+            for (t, h2, nc) in cells_spec for r in range(args.reps)]
+    print("%d cells x %d replicates = %d simulations on %d workers"
+          % (len(cells_spec), args.reps, len(jobs), args.jobs), flush=True)
+
+    t0 = time.time()
+    with ProcessPoolExecutor(max_workers=args.jobs) as ex:
+        raw = list(ex.map(one_rep, jobs, chunksize=1))
+    print("simulation wall time %.1f s" % (time.time() - t0), flush=True)
+
+    records, cells = [], []
+    for ci, (t, h2, nc) in enumerate(cells_spec):
+        blk = raw[ci * args.reps:(ci + 1) * args.reps]
+        for r, o in enumerate(blk):
+            if o is None:
+                # A replicate that returned nothing had too few common variants
+                # to place n_causal on. It is recorded, not dropped: a cell
+                # standing on two survivors of five must not look like a cell of
+                # two.
+                records.append(dict(split_t=t, h2=h2, n_causal=nc, rep=r,
+                                    seed=jobs[ci * args.reps + r][5],
+                                    failed="panel smaller than 3 * n_causal"))
+            else:
+                records.append(dict(o, rep=r))
+        good = [o for o in blk if o]
+        cell = dict(split_t=t, h2=h2, n_causal=nc, reps=args.reps,
+                    n_ok=len(good), n_failed=len(blk) - len(good))
+        for k in CELL_METRICS:
+            cell[k] = simprov.summarize([o.get(k, float("nan")) for o in good])
+        cells.append(cell)
+        print("t=%-6d h2=%.2f nc=%-5d  F_ST %s  target/source R2 %s  (n=%d)"
+              % (t, h2, nc, _pm(cell["fst"], 4), _pm(cell["ratio_all"], 3),
+                 cell["n_ok"]), flush=True)
+
+    pv = simprov.summarize([o["pgsVar_ratio"] for o in raw
+                            if o and "pgsVar_ratio" in o])
+    print("")
+    print("pgsVariance (linkage-equilibrium formula) / actual score variance:")
+    if pv["n"] == 0:
+        print("  no usable replicate produced one.")
+    else:
+        print("  mean %.4f  sd %s  se %s  range [%.4f, %.4f] over %d replicates"
+              % (pv["mean"],
+                 "%.4f" % pv["sd"] if pv["sd"] is not None else "n/a",
+                 "%.4f" % pv["se"] if pv["se"] is not None else "n/a",
+                 pv["min"], pv["max"], pv["n"]))
+    print("  A three per cent shortfall is only a confirmation if the standard")
+    print("  error above is well under three per cent. Read them together.")
+
+    p = simprov.write(args.output, "popgen_defs/check_portability.py",
+                      dict(split_times=args.split_times, h2=args.h2,
+                           n_causal=args.n_causal, n_dip=args.n_dip,
+                           seq_length=args.seq_length,
+                           NE=NE, MU=MU, RHO=RHO),
+                      args.seed, args.reps, cells, records)
+    print("-> %s (%d cells, %d replicate records)"
+          % (p, len(cells), len(records)))
 
 
 if __name__ == "__main__":
