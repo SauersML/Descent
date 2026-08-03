@@ -712,7 +712,7 @@ The `higher_cumulants_need_divergent_hub` field carries the correction: a design
 exposes a cumulant of `x²` beyond the second cannot have bounded hub recurrence, so it
 sits outside the tempered class where cycle densities determine the limit. That is why
 the naive list is not the answer and the recursion is. -/
-structure ObservableTower (n : ℕ) (ι : Type*) (Limit : Type*) where
+structure ObservableTower (n : ℕ) (ι : Type*) [Fintype ι] (Limit : Type*) where
   /-- Minimum interaction order diverging, influence vanishing, unit variance. -/
   isAdmissible : GenotypeDesign n ι → Prop
   /-- The limit law of a design's statistic. -/
@@ -739,7 +739,8 @@ structure ObservableTower (n : ℕ) (ι : Type*) (Limit : Type*) where
 
 namespace ObservableTower
 
-variable {n : ℕ} {ι : Type*} {Limit : Type*} (T : ObservableTower n ι Limit)
+variable {n : ℕ} {ι : Type*} {Limit : Type*} [Fintype ι]
+    (T : ObservableTower n ι Limit)
 
 /-- **Observability completeness, to the tower's depth.** Any experiment reporting a
 function of a design's limit is a function of the channel data alone: two panels agreeing
@@ -793,7 +794,9 @@ theorem complete_content_of_truncation
   intro floor i hfloor
   rw [htruncates] at hfloor
   have hzero : floor = 0 := Nat.le_zero.mp hfloor
-  rw [hzero, T.levelChannels_zero]
+  subst floor
+  rw [T.levelChannels_zero (model i).altFreq,
+    T.levelChannels_zero (model' i).altFreq]
   unfold hweLevelOne
   rw [hdrift i, hjet i, hlattice i, hsymmetry i]
 
@@ -958,7 +961,8 @@ theorem sixthMoment_eq_floorOne_plus_dispersion (spectrum : MafSpectrum m)
         (10 * spectrum.moment 4 - 20) := by
     rw [hdef6]
     simp_rw [hterm]
-    rw [Finset.sum_add_distrib, Finset.sum_sub_distrib, ← Finset.mul_sum, spectrum.weight_sum, mul_one]
+    rw [Finset.sum_add_distrib, Finset.sum_sub_distrib, ← Finset.mul_sum,
+      ← Finset.mul_sum, spectrum.weight_sum, mul_one]
     congr 2
     rw [hdef4]
     exact Finset.sum_congr rfl (fun j _ => hfour j)
@@ -1159,7 +1163,7 @@ theorem squaringFlow_lipschitz {R x y : ℝ} (hx : |x| ≤ R) (hy : |y| ≤ R) :
     |x ^ 2 - y ^ 2| ≤ 2 * R * |x - y| := by
   have hfactor : x ^ 2 - y ^ 2 = (x + y) * (x - y) := by ring
   have hsum : |x + y| ≤ 2 * R := by
-    calc |x + y| ≤ |x| + |y| := abs_add x y
+    calc |x + y| ≤ |x| + |y| := abs_add_le x y
       _ ≤ R + R := by linarith
       _ = 2 * R := by ring
   rw [hfactor, abs_mul]
@@ -1859,7 +1863,7 @@ theorem centeredSquare_homAlt_strictAnti (h h' : HardyWeinbergModel)
     h'.centeredSquare DiploidGenotype.homAlt <
       h.centeredSquare DiploidGenotype.homAlt := by
   rw [centeredSquare_homAlt_eq h hq0 hq1, centeredSquare_homAlt_eq h' hq0' hq1']
-  rw [div_lt_div_iff hq0' hq0]
+  rw [div_lt_div_iff₀ hq0' hq0]
   nlinarith [hq0, hq0', hrarer]
 
 /-- **The rare-homozygote atom dominates the other two on the minor-allele range.**
@@ -1883,7 +1887,7 @@ theorem abs_centeredSquare_le_homAlt (h : HardyWeinbergModel)
         rw [centeredSquare_eq_standardizedSquare_sub_one h hq0 hq1, href, div_sub_one (ne_of_gt hp)]
         congr 1
         ring
-      rw [hval, haltval, abs_div, abs_of_pos hp, div_le_div_iff hp hq0]
+      rw [hval, haltval, abs_div, abs_of_pos hp, div_le_div_iff₀ hp hq0]
       rcases abs_cases (3 * h.altFreq - 1) with ⟨heq, _⟩ | ⟨heq, _⟩ <;> rw [heq] <;>
         nlinarith [hq0, hhalf, hp]
   | het =>
@@ -1895,7 +1899,7 @@ theorem abs_centeredSquare_le_homAlt (h : HardyWeinbergModel)
         congr 1
         ring
       have hden : (0 : ℝ) < 2 * h.altFreq * (1 - h.altFreq) := by positivity
-      rw [hval, haltval, abs_div, abs_of_pos hden, div_le_div_iff hden hq0]
+      rw [hval, haltval, abs_div, abs_of_pos hden, div_le_div_iff₀ hden hq0]
       rcases abs_cases (1 - 6 * h.altFreq + 6 * h.altFreq ^ 2) with
         ⟨heq, _⟩ | ⟨heq, _⟩ <;> rw [heq] <;>
         nlinarith [hq0, hhalf, hp, sq_nonneg (2 * h.altFreq - 1)]
