@@ -82,8 +82,7 @@ SLICE_FILES = [
 #       three consecutive calls asking `hostname` and checking one path gave
 #       PRESENT once and ABSENT twice, same path, same second. A log in /tmp is
 #       therefore invisible to the call that checks it, and absence reads as
-#       "the job never started". One agent spent several rounds concluding its
-#       run had been killed while `pgrep` reported the process alive.
+#       "the job never started" while the process is in fact alive.
 #
 #   O2  UNIQUE FILENAME PER RUN. A fixed path leaves the previous run's log
 #       impersonating this one's. Combined with O1, absence then genuinely
