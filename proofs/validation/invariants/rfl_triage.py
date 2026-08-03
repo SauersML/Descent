@@ -68,8 +68,10 @@ Both directions fail, which is why the mechanical flag cannot be the verdict:
      was measured at -50.4% at `f = 1/2`. The theorem was a cross-check that
      CERTIFIED the falsified identification.
 
-     THIS BUCKET IS INVISIBLE TO EVERY MECHANICAL TEST IN THIS FILE, and that
-     is the point of naming it. A `rfl` proof says the two sides reduce to the
+     THE MECHANICAL ANSWER FOR D IS NOT MERELY ABSENT -- IT IS CONFIDENTLY
+     AND SPECIFICALLY WRONG, IN THE SAFE-LOOKING DIRECTION. That is worse
+     than a gap: a gap invites a reader to look, and a confident wrong
+     answer does not. A `rfl` proof says the two sides reduce to the
      same term. IT SAYS NOTHING ABOUT WHETHER THE ARGUMENTS WERE THE RIGHT ONES
      TO PASS. The body-reference discriminator puts D in B -- independent
      bodies, equality is the claim -- and B is exactly the bucket labelled
@@ -92,46 +94,49 @@ Both directions fail, which is why the mechanical flag cannot be the verdict:
   belongs in no bucket and must not be deleted for being in A. Where intent is
   the deciding fact and intent is not in the body, this refuses and says so.
 
-=== STATUS OF THE MECHANICAL PART: NOT TRUSTWORTHY YET. DO NOT USE ITS COUNTS ===
+=== ENUMERATION: USE RflScan.lean, NOT THIS FILE'S TEXT SCAN ===
 
-THE CRITERION ABOVE IS THE DELIVERABLE. The extractor below is not, and this
-section exists so nobody mistakes one for the other.
+THE TEXT SCAN IN THIS FILE IS NOT TRUSTWORTHY AND ITS COUNTS MUST NOT BE USED.
+Three text methods over the same nine modules returned 2, 16 and 3, with ZERO
+overlap in theorem names between the last two. One classified `downstream` -- a
+word occurring in prose -- as a theorem, and paired a theorem closed by
+`apply mul_nonneg` with a conclusion belonging to a different declaration,
+because a non-greedy regex spans declarations to reach the first `:= rfl` it
+can find. Lean is whitespace-insensitive and its proofs are not a regular
+language; no text scan recovers this reliably.
 
-Three methods were used to enumerate the `rfl`-closing theorems in the same
-nine modules. They returned THREE DIFFERENT ANSWERS WITH ZERO OVERLAP in the
-named theorems:
+`RflScan.lean` (this directory) asks the ELABORATED ENVIRONMENT instead, which
+is the only authority: a theorem closes by `rfl` exactly when its proof term,
+under its binders, is headed by `Eq.refl`. Run it with
+`lake env lean proofs/validation/invariants/RflScan.lean`.
 
-    regex, end-of-line anchored          2   (undercount: Lean puts `rfl` on
-                                              its own line as often as not)
-    regex, whitespace-flattened         16   (WRONG: `(.*?)` spans declarations,
-                                              pairing a theorem closed by
-                                              `apply mul_nonneg` with a later
-                                              `:= rfl`; it also matched
-                                              `downstream`, a word in prose)
-    regex, flattened + decl-guarded      3
-    block-split on declaration starts    2   (different two -- misses proofs
-                                              that end in `rfl` after other
-                                              tactics, and splits on a `:=`
-                                              occurring inside the statement)
+    hand-written rfl-closing theorems in the popgen slice:  8
+    (19 raw, of which 11 are compiler-generated equation lemmas,
+     sizeOf_spec and injEq, which are rfl by construction and written
+     by nobody)
 
-The last two share NO theorem names at all. So the true count is unknown, and
-every bucket tally this file could print is currently meaningless.
+TWO CONTROLS EARNED THEIR KEEP WHILE BUILDING IT, and both produced a clean
+null before firing:
+  * The first version tested `ti.value.getAppFn` directly and returned 0 of 0.
+    A theorem with binders stores its proof as `fun a b c => Eq.refl _`, so
+    that asked whether a LAMBDA is `Eq.refl`, which is never true. A positive
+    control on two theorems known to be written `:= rfl` refuted the zero
+    immediately.
+  * The unfiltered scan returned 19, which flattered the result until the
+    generated names were separated out. Eleven of the nineteen are `f.eq_1`
+    and friends.
 
-WHAT THIS COST AND WHAT IT TAUGHT. The rule in `Calibrator.lean` says to run a
-query a second way and require the two to agree. I did, got 16 twice, and
-believed it -- because BOTH queries were the same SHAPE, a regex over flattened
-text, and they inherited the same declaration-spanning flaw. AGREEMENT BETWEEN
-TWO QUERIES OF THE SAME SHAPE IS NOT CORROBORATION; IT IS THE SAME MEASUREMENT
-TAKEN TWICE. The second query has to differ in KIND -- parse blocks instead of
-matching patterns -- and when it did, it disagreed immediately.
-
-So the discriminator needs one more word: run the query a second way OF A
-DIFFERENT SHAPE. Only the block-split disagreed, and only because it was not
-another regex.
-
-Anyone extending this should extract from the ELABORATED environment rather
-than the source text -- Lean knows which theorems close by `rfl` and no text
-scan of a whitespace-insensitive language will reliably recover it.
+AND THE SAME RE-DERIVATION IS OWED ON THE OTHER HALF. The candidate list this
+criterion triages is built from numerically-sampled equivalence CLASSES plus a
+`mentions` field parsed out of the sources by regex. The class side is
+agreement at finitely many points, which is evidence toward "same function" and
+NOT a proof -- only the converse is solid, that definitions in different classes
+are definitely different, so NO DELETION MAY REST ON CLASS MEMBERSHIP ALONE.
+The `mentions` side inherits the text parser's error rate, and the parser
+reconciliation reports 101 disagreements including six dropped parameters in
+multi-line signatures; a dropped parameter changes which definitions a
+statement appears to mention. Lean knows definitional equality and it knows
+what each statement mentions. Both halves should come from the environment.
 
 === AND A CONNECTIVITY RULE FOR ANY DELETION IN BUCKET A ===
 
