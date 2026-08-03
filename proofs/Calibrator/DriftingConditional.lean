@@ -127,6 +127,11 @@ theorem linkedCurve_identified_modulo_constants {ι : Type*}
 def IsInvariantWeight {n : ℕ} (ϖ : Fin n → ℝ) (L : Fin n → Fin n → ℝ) : Prop :=
   ∀ j, ∑ i, ϖ i * L i j = 0
 
+/-- A conservative generator kills constant functions. For the matrix action
+    `(L u) i = ∑ j, L i j * u j`, this is exactly the zero-row-sum condition. -/
+def KillsConstants {n : ℕ} (L : Fin n → Fin n → ℝ) : Prop :=
+  ∀ i, ∑ j, L i j = 0
+
 /-- The zero weight is invariant for every generator. This is a useful algebraic base case, but
 it is not a probability weight because its total mass is zero. -/
 theorem isInvariantWeight_zero {n : ℕ} (L : Fin n → Fin n → ℝ) :
@@ -213,6 +218,40 @@ theorem constantForcing_conflates_threshold {n : ℕ}
   rw [Finset.sum_congr rfl fun i _ ↦ hsplit i, Finset.sum_add_distrib,
     sum_invariantWeight_mul_generator_eq_zero ϖ L u hinv, ← Finset.mul_sum, hmass]
   ring
+
+/-- Subtracting a spatially constant threshold commutes with a conservative generator.
+
+    This is the algebraic bridge between autonomous population motion and the linked response
+    curve: it is derived here, rather than assumed as part of the curve dynamics. -/
+theorem generator_linkedCurve_eq_generator {n : ℕ}
+    (L : Fin n → Fin n → ℝ) (m : Fin n → ℝ) (theta : ℝ)
+    (hconst : KillsConstants L) (i : Fin n) :
+    ∑ j, L i j * (m j - theta) = ∑ j, L i j * m j := by
+  calc
+    ∑ j, L i j * (m j - theta) =
+        (∑ j, L i j * m j) - theta * ∑ j, L i j := by
+      rw [Finset.mul_sum, ← Finset.sum_sub_distrib]
+      refine Finset.sum_congr rfl fun j _ ↦ ?_
+      ring
+    _ = ∑ j, L i j * m j := by rw [hconst i, mul_zero, sub_zero]
+
+/-- **Autonomous conservative population dynamics identify threshold velocity.**
+
+    The population state `m` evolves by `dm = Lm`, while the observable linked curve is
+    `m - theta` and therefore has velocity `dm - thetaDot`. The zero-row-sum condition derives
+    the linked-curve equation; invariant averaging then removes `Lm` and returns `-thetaDot`.
+    Unlike `invariantAverage_eq_neg_of_affine_evolution`, this theorem does not take the desired
+    linked evolution as an input. -/
+theorem invariantAverage_linkedCurveVelocity_eq_neg_thresholdVelocity {n : ℕ}
+    (ϖ : Fin n → ℝ) (L : Fin n → Fin n → ℝ) (m dm : Fin n → ℝ)
+    (theta thetaDot : ℝ) (hmass : ∑ i, ϖ i = 1)
+    (hinv : IsInvariantWeight ϖ L) (hconst : KillsConstants L)
+    (hmotion : ∀ i, dm i = ∑ j, L i j * m j) :
+    ∑ i, ϖ i * (dm i - thetaDot) = -thetaDot := by
+  apply invariantAverage_eq_neg_of_affine_evolution ϖ L
+    (fun j ↦ m j - theta) (fun i ↦ dm i - thetaDot) thetaDot hmass hinv
+  intro i
+  rw [hmotion i, generator_linkedCurve_eq_generator L m theta hconst i]
 
 /-! ## What survives a mixing drift -/
 
