@@ -590,12 +590,12 @@ theorem momentMatched_two_iff {q n : ℕ}
   constructor
   · intro h
     constructor
-    · simpa [finiteProblem, architectureMoment] using h 0 (by omega)
-    · simpa [finiteProblem, architectureMoment] using h 1 (by omega)
+    · simpa [finiteProblem, FinitePrior.mean, architectureMoment] using h 0 (by omega)
+    · simpa [finiteProblem, FinitePrior.mean, architectureMoment] using h 1 (by omega)
   · rintro ⟨h0, h1⟩ r hr
     interval_cases r
-    · simpa [finiteProblem, architectureMoment] using h0
-    · simpa [finiteProblem, architectureMoment] using h1
+    · simpa [finiteProblem, FinitePrior.mean, architectureMoment] using h0
+    · simpa [finiteProblem, FinitePrior.mean, architectureMoment] using h1
 
 theorem effects_nonempty {q n : ℕ} (P : MeanAbsoluteEffectCertificateProblem q n) :
     P.effects.Nonempty := boundedEffectCarrier_nonempty q P.effectRadius
