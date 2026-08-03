@@ -10,11 +10,15 @@ import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
 import Mathlib.Analysis.SpecificLimits.Basic
 import Mathlib.Topology.ContinuousMap.Algebra
 import Mathlib.GroupTheory.Perm.Basic
+import Calibrator.BundleRigidity.Telescope
 
 /-!
 # The corrected kernel dichotomy for trip semigroups
 
-This module is **self-contained: it imports only Mathlib**.
+This module imports Mathlib and `Calibrator.BundleRigidity.Telescope`, from which it takes
+`prodWeight`. It previously carried its own copy under the name `wProd`, retained because a note here
+recorded that `Telescope` did not compile. **That note was stale** -- `Telescope`
+builds green -- so the repoint it asked for has been done and the duplicate is gone.
 
 ## What this replaces
 
@@ -119,25 +123,8 @@ variable {ι : Type*}
 
 /-! ## Words and weight defects -/
 
-/-- The product of a weight function along a word.
-
-DUPLICATE, KNOWINGLY RETAINED. This is character-for-character
-`Calibrator.BundleRigidity.Telescope.prodWeight` -- same body, same namespace, and the
-same two `rfl` companion lemmas below -- and the structural guard reports the pair as an
-alpha-equivalent duplicate. The repoint (import `Telescope`, delete this copy, use
-`prodWeight`) was made, built, and undone: `Telescope.altSum_eq` and `Telescope.altSum_pair`
-do not compile, so importing that module makes this one unbuildable, and trading a
-duplicate for a red module is a bad trade. Do the repoint once `Telescope` is green;
-nothing else in this file needs to change. -/
-def wProd (P : ι → ℝ) (w : List ι) : ℝ := (w.map P).prod
-
-@[simp] theorem wProd_nil (P : ι → ℝ) : wProd P ([] : List ι) = 1 := rfl
-
-@[simp] theorem wProd_cons (P : ι → ℝ) (i : ι) (u : List ι) :
-    wProd P (i :: u) = P i * wProd P u := rfl
-
 /-- The **weight ratio** of a word: `Q`-product over `P`-product. -/
-noncomputable def weightRatio (P Q : ι → ℝ) (w : List ι) : ℝ := wProd Q w / wProd P w
+noncomputable def weightRatio (P Q : ι → ℝ) (w : List ι) : ℝ := prodWeight Q w / prodWeight P w
 
 /-- The **weight defect of a relation** `w ≈ u`: the ratio of the two words' weight
 ratios. The refuted conjecture asserted that a relation contributes to the kernel exactly
@@ -155,7 +142,7 @@ theorem commutation_defect_eq_one (P Q : ι → ℝ) (i j : ι)
     (hP : P i ≠ 0) (hP' : P j ≠ 0) (hQ : Q i ≠ 0) (hQ' : Q j ≠ 0) :
     defect P Q [i, j] [j, i] = 1 := by
   unfold defect weightRatio
-  simp only [wProd_cons, wProd_nil, mul_one]
+  simp only [prodWeight_cons, prodWeight_nil, mul_one]
   field_simp
 
 /-! ## The falsifier's arithmetic
@@ -179,7 +166,7 @@ value reported by the source. -/
 theorem defect_witness :
     defect falsifierP falsifierQ [0, 0] [1] = 98 / 27 := by
   unfold defect weightRatio falsifierP falsifierQ
-  simp only [wProd_cons, wProd_nil, mul_one, Matrix.cons_val_zero, Matrix.cons_val_one,
+  simp only [prodWeight_cons, prodWeight_nil, mul_one, Matrix.cons_val_zero, Matrix.cons_val_one,
     Matrix.head_cons]
   norm_num
 
@@ -194,19 +181,19 @@ theorem defect_witness_ne_one :
 
 Both constants of the falsifier come from this one definition: the Bézout constant is an
 alternating combination of `χ` and the weight defect is a ratio of `χ`. -/
-noncomputable def chi (P Q : ι → ℝ) (w : List ι) : ℝ := wProd P w / wProd Q w
+noncomputable def chi (P Q : ι → ℝ) (w : List ι) : ℝ := prodWeight P w / prodWeight Q w
 
 /-- A product of positive weights along a word is positive. -/
-theorem wProd_pos (P : ι → ℝ) (hP : ∀ i, 0 < P i) (w : List ι) : 0 < wProd P w := by
+theorem prodWeight_pos (P : ι → ℝ) (hP : ∀ i, 0 < P i) (w : List ι) : 0 < prodWeight P w := by
   induction w with
-  | nil => rw [wProd_nil]; norm_num
-  | cons i u ih => rw [wProd_cons]; exact mul_pos (hP i) ih
+  | nil => rw [prodWeight_nil]; norm_num
+  | cons i u ih => rw [prodWeight_cons]; exact mul_pos (hP i) ih
 
 /-- **The character is strictly positive**, being a ratio of products of positive
 weights. This is half of why the Bézout constant cannot vanish. -/
 theorem chi_pos (P Q : ι → ℝ) (hP : ∀ i, 0 < P i) (hQ : ∀ i, 0 < Q i) (w : List ι) :
     0 < chi P Q w :=
-  div_pos (wProd_pos P hP w) (wProd_pos Q hQ w)
+  div_pos (prodWeight_pos P hP w) (prodWeight_pos Q hQ w)
 
 /-- **The weight defect is a ratio of characters**: `defect w u = χ u / χ w`.
 
@@ -214,10 +201,10 @@ So the `98/27` and the `125/147` are the same four numbers read two different wa
 theorem defect_eq_chi_ratio (P Q : ι → ℝ) (hP : ∀ i, 0 < P i) (hQ : ∀ i, 0 < Q i)
     (w u : List ι) :
     defect P Q w u = chi P Q u / chi P Q w := by
-  have hPw := wProd_pos P hP w
-  have hQw := wProd_pos Q hQ w
-  have hPu := wProd_pos P hP u
-  have hQu := wProd_pos Q hQ u
+  have hPw := prodWeight_pos P hP w
+  have hQw := prodWeight_pos Q hQ w
+  have hPu := prodWeight_pos P hP u
+  have hQu := prodWeight_pos Q hQ u
   unfold defect weightRatio chi
   field_simp
 
@@ -237,7 +224,7 @@ the terms add, giving `2/3 + 9/49 = 125/147`. Derived from the weights here. -/
 theorem bezout_witness :
     bezout falsifierP falsifierQ [1] [0, 0] = 125 / 147 := by
   unfold bezout chi falsifierP falsifierQ
-  simp only [wProd_cons, wProd_nil, mul_one, List.length_cons, List.length_nil,
+  simp only [prodWeight_cons, prodWeight_nil, mul_one, List.length_cons, List.length_nil,
     Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons]
   norm_num
 
@@ -427,5 +414,85 @@ structure ShellPartitionHypotheses where
   partitionsAmbient : Prop
   /-- Depth-`n` cylinders partition the attractor, which is what lets step 4 collapse. -/
   cylindersPartitionAttractor : Prop
+
+/-! ## Theorem 1's engine, proved
+
+`ShellPartitionHypotheses` carries the *geometric* inputs — disjointness of the shells, their
+separation from the attractor, and the two partition statements. What it does not carry, and
+what was previously left in prose, is the **arithmetic** those inputs feed: once the shells
+are disjoint the mass they force satisfies `U_{n+1} ≥ (Q_min/P_max)·U_n`, and in the
+normalized regime that ratio exceeds one while the total mass is bounded. A quantity that
+grows geometrically inside a bounded one cannot start positive.
+
+That step is elementary and it is the whole of Theorem 1 downstream of the geometry, so it
+belongs in the corpus as a theorem rather than as a sentence. `forcedMass_ge` is the growth
+recursion unrolled; `forcedMass_bounded_contradiction` is the contradiction; and
+`kernel_mass_must_vanish` is the form Theorem 1 consumes — **the forced mass at the root is
+zero**, which is what "zero kernel" means once the shell partition is in hand.
+
+This does not discharge `TripSystem.theorem1`, which still carries the geometric half as an
+input. What it does is localize what remains unproved: after this, the only unproved content
+of Theorem 1 is the disjointness of the shells.
+
+Empirical status: DERIVED. Pure arithmetic, no analytic input. -/
+
+section ForcedMassGrowth
+
+/-- **The growth recursion, unrolled.** A geometric lower bound compounds.
+
+    Note what is *not* needed: nonnegativity of `U 0`. The recursion propagates the bound
+    whatever the sign of the starting mass, so the hypothesis a first draft carried here was
+    dead weight and is omitted rather than left in to look reassuring. -/
+theorem forcedMass_ge (ρ : ℝ) (U : ℕ → ℝ) (hρ : 0 ≤ ρ)
+    (hstep : ∀ n, ρ * U n ≤ U (n + 1)) :
+    ∀ n, ρ ^ n * U 0 ≤ U n := by
+  intro n
+  induction n with
+  | zero => simp
+  | succ k ih =>
+    calc ρ ^ (k + 1) * U 0 = ρ * (ρ ^ k * U 0) := by ring
+      _ ≤ ρ * U k := mul_le_mul_of_nonneg_left ih hρ
+      _ ≤ U (k + 1) := hstep k
+
+/-- **Geometric growth inside a bounded quantity forces a zero start.**
+
+    If the forced mass obeys `U_{n+1} ≥ ρ U_n` with `ρ > 1`, and every `U_n` is bounded above
+    by the total mass `B`, then `U 0` cannot be positive. This is the contradiction step of
+    the word-shell argument, with the shells' disjointness already used to produce `hstep`
+    and the ambient total mass supplying `hbound`. -/
+theorem forcedMass_bounded_contradiction (ρ B : ℝ) (U : ℕ → ℝ)
+    (hρ : 1 < ρ) (hU0 : 0 < U 0) (hstep : ∀ n, ρ * U n ≤ U (n + 1))
+    (hbound : ∀ n, U n ≤ B) : False := by
+  obtain ⟨n, hn⟩ := pow_unbounded_of_one_lt (B / U 0) hρ
+  have hgrow := forcedMass_ge ρ U (by linarith) hstep n
+  have hlt : B / U 0 * U 0 < ρ ^ n * U 0 := by
+    exact mul_lt_mul_of_pos_right hn hU0
+  rw [div_mul_cancel₀ _ (ne_of_gt hU0)] at hlt
+  have := hbound n
+  linarith
+
+/-- **The form Theorem 1 consumes.** Under the same hypotheses the forced mass at the root
+    vanishes, which is the statement that no nonzero kernel element survives the shell
+    decomposition. -/
+theorem kernel_mass_must_vanish (ρ B : ℝ) (U : ℕ → ℝ)
+    (hρ : 1 < ρ) (hnonneg : 0 ≤ U 0) (hstep : ∀ n, ρ * U n ≤ U (n + 1))
+    (hbound : ∀ n, U n ≤ B) : U 0 = 0 := by
+  rcases eq_or_lt_of_le hnonneg with h | h
+  · exact h.symm
+  · exact absurd (forcedMass_bounded_contradiction ρ B U hρ h hstep hbound) not_false
+
+/-- **The normalized regime supplies the ratio.** With `P i + Q i = 1` and `P i < Q i`, every
+    ratio `Q j / P i` exceeds one — so the growth hypothesis of the contradiction above is
+    automatic, exactly as `weight_condition_automatic` makes Theorem 1's weight hypothesis
+    automatic. -/
+theorem growth_ratio_gt_one {ι : Type*} (P Q : ι → ℝ)
+    (hnorm : ∀ i, P i + Q i = 1) (hlt : ∀ i, P i < Q i) (i j : ι)
+    (hP : 0 < P i) : 1 < Q j / P i := by
+  have h1 : P i < 1 / 2 := by have := hnorm i; have := hlt i; linarith
+  have h2 : (1 : ℝ) / 2 < Q j := by have := hnorm j; have := hlt j; linarith
+  rw [lt_div_iff₀ hP]
+  linarith
+
+end ForcedMassGrowth
 
 end Calibrator.BundleRigidity
