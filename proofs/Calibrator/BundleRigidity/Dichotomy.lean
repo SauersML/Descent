@@ -267,110 +267,21 @@ theorem falsifier_parity_mismatch :
 
 /-! ## The dichotomy, with the deep theorems as named inputs -/
 
-/-- **A trip system**: the weights, the relation structure, and the three theorems of the
-corrected picture carried as named fields.
+/-! ## The carried upstream theorems are removed
 
-The fields `theorem1`, `theorem3` and `theorem4` are **inputs, not results of this
-development**. They appear here so that anything derived from them carries them in its
-type. -/
-structure TripSystem (ι : Type*) where
-  /-- The `P` weights. -/
-  P : ι → ℝ
-  /-- The `Q` weights. -/
-  Q : ι → ℝ
-  /-- Weights are strictly positive. -/
-  P_pos : ∀ i, 0 < P i
-  /-- Weights are strictly positive. -/
-  Q_pos : ∀ i, 0 < Q i
-  /-- Two distinct words inducing the same composed map. -/
-  Relation : List ι → List ι → Prop
-  /-- The kernel of the associated operator is non-zero. -/
-  KernelNonzero : Prop
-  /-- The kernel is infinite-dimensional. -/
-  KernelInfiniteDim : Prop
-  /-- The generating maps have pairwise disjoint images. -/
-  DisjointImages : Prop
-  /-- **Theorem 3 (input).** Any relation forces an infinite-dimensional kernel,
-  unconditionally on the weights. This is what refutes the weight-product conjecture. -/
-  theorem3 : (∃ w u, Relation w u) → KernelInfiniteDim
-  /-- **Theorem 1 (input).** Disjoint images plus a uniform weight gap gives zero
-  kernel. -/
-  theorem1 : DisjointImages → (∀ i j, P i < Q j) → ¬ KernelNonzero
-  /-- **The zero-or-infinite dichotomy (input).** On every decided stratum the kernel is
-  either zero or infinite-dimensional; it is never finite and non-zero. -/
-  zero_or_infinite : KernelNonzero → KernelInfiniteDim
-  /-- An infinite-dimensional kernel is in particular non-zero. -/
-  infiniteDim_imp_nonzero : KernelInfiniteDim → KernelNonzero
+A `TripSystem` structure used to sit here, carrying **Theorem 1**, **Theorem 3** and the
+zero-or-infinite dichotomy as structure fields — results proved nowhere in this corpus — along
+with every consequence drawn from them (`weight_condition_automatic` excepted, which is proved
+and survives below in the arithmetic section).
 
-namespace TripSystem
+They are gone. The distinction between "proved here" and "asserted upstream and consumed here"
+was previously carried by a docstring convention, and a docstring is not a type. What remains
+in this file is what it proves: the weight arithmetic of the executed falsifier, the Bézout
+constant derived from the character, the parity argument that makes the refutation structural
+rather than lucky, and the forced-mass-growth engine.
+-/
 
-variable (S : TripSystem ι)
 
-/-- **The weight condition of Theorem 1 is automatic in the normalized regime.**
-
-If `P i + Q i = 1` and `P i < Q i` for every `i`, then `P i < Q j` for *every* pair `i, j`
-— not merely for matching indices. The reason is that both conditions pin each weight to
-its own side of `1/2`: `P i < 1/2 < Q j`.
-
-Proved here in full, with no hypotheses beyond the two displayed. This is the sense in
-which Theorem 1's hypothesis is cheaper than it looks. -/
-theorem weight_condition_automatic (hnorm : ∀ i, S.P i + S.Q i = 1)
-    (hlt : ∀ i, S.P i < S.Q i) : ∀ i j, S.P i < S.Q j := by
-  intro i j
-  have h1 : S.P i < 1 / 2 := by
-    have := hnorm i; have := hlt i; linarith
-  have h2 : (1 : ℝ) / 2 < S.Q j := by
-    have := hnorm j; have := hlt j; linarith
-  linarith
-
-/-- Theorem 1 in the normalized regime, with the weight hypothesis discharged. -/
-theorem kernel_zero_of_disjoint_normalized (hdisj : S.DisjointImages)
-    (hnorm : ∀ i, S.P i + S.Q i = 1) (hlt : ∀ i, S.P i < S.Q i) :
-    ¬ S.KernelNonzero :=
-  S.theorem1 hdisj (S.weight_condition_automatic hnorm hlt)
-
-/-- A relation forces a non-zero kernel. -/
-theorem kernelNonzero_of_relation (h : ∃ w u, S.Relation w u) : S.KernelNonzero :=
-  S.infiniteDim_imp_nonzero (S.theorem3 h)
-
-/-- **The refutation, in logical form.**
-
-If a system has a relation, and **every** relation of the system has defect different from
-one, then the kernel is non-zero while no relation has weight product one. That is exactly
-the failure of the forward direction of the refuted conjecture.
-
-Stating it this way makes the refutation a theorem rather than an assertion: given
-Theorem 3 as an input, one only has to exhibit a system whose relations all have defect
-`≠ 1`, and `defect_witness_ne_one` supplies the arithmetic for the `φ₁ = f`, `φ₂ = f ∘ f`
-system at the source's weights. -/
-theorem weightProductOne_fails (hrel : ∃ w u, S.Relation w u)
-    (hdef : ∀ w u, S.Relation w u → defect S.P S.Q w u ≠ 1) :
-    S.KernelNonzero ∧ ¬ ∃ w u, S.Relation w u ∧ defect S.P S.Q w u = 1 := by
-  refine ⟨S.kernelNonzero_of_relation hrel, ?_⟩
-  rintro ⟨w, u, hwu, hone⟩
-  exact hdef w u hwu hone
-
-/-- **The superseded conjecture, named and struck.**
-
-This is the statement that was refuted: the kernel is non-zero *if and only if* some
-relation has weight product one. It is recorded as a definition so that the old form has a
-name to be referred to, and so that a reader meeting it elsewhere in the corpus finds it
-here next to `weightProductOne_fails` rather than finding nothing.
-
-**Do not use this as a criterion.** The correct statement is that relations alone
-suffice. -/
-def weightProductOne_conjecture : Prop :=
-  S.KernelNonzero ↔ ∃ w u, S.Relation w u ∧ defect S.P S.Q w u = 1
-
-/-- **The conjecture is false for any system meeting the falsifier's hypotheses.** -/
-theorem not_weightProductOne_conjecture (hrel : ∃ w u, S.Relation w u)
-    (hdef : ∀ w u, S.Relation w u → defect S.P S.Q w u ≠ 1) :
-    ¬ S.weightProductOne_conjecture := by
-  intro hconj
-  obtain ⟨hne, hno⟩ := S.weightProductOne_fails hrel hdef
-  exact hno (hconj.mp hne)
-
-end TripSystem
 
 /-! ## Theorem 1's architecture, and where its weight actually rests
 
@@ -432,9 +343,9 @@ recursion unrolled; `forcedMass_bounded_contradiction` is the contradiction; and
 `kernel_mass_must_vanish` is the form Theorem 1 consumes — **the forced mass at the root is
 zero**, which is what "zero kernel" means once the shell partition is in hand.
 
-This does not discharge `TripSystem.theorem1`, which still carries the geometric half as an
-input. What it does is localize what remains unproved: after this, the only unproved content
-of Theorem 1 is the disjointness of the shells.
+What this localizes: the arithmetic of the word-shell argument is proved here, and the
+geometric half — disjointness of the shells — is simply not in this corpus. It is not carried
+as an assumption either; it is absent, and any use of the word-shell argument must supply it.
 
 Empirical status: DERIVED. Pure arithmetic, no analytic input. -/
 
