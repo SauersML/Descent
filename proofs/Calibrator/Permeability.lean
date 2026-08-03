@@ -158,7 +158,7 @@ noncomputable def lagSensitivityMatrix {d : ℕ}
 noncomputable def lagObservationDerivative {d : ℕ}
     (lag : Fin d → ℕ) (covarianceDerivative : ℕ → Fin d → ℝ)
     (tangent : Fin d → ℝ) : Fin d → ℝ :=
-  lagSensitivityMatrix lag covarianceDerivative *ᵥ tangent
+  (lagSensitivityMatrix lag covarianceDerivative).mulVec tangent
 
 /-- **Constructive completion criterion.** A set of `d` lagged covariance statistics
 locally distinguishes all `d` deployment directions exactly when the model-supplied
@@ -176,7 +176,7 @@ theorem lagObservationDerivative_injective_of_det_ne_zero {d : ℕ}
   intro tangent tangent' heq
   apply sub_eq_zero.mp
   apply Matrix.eq_zero_of_mulVec_eq_zero hdet
-  change lagSensitivityMatrix lag covarianceDerivative *ᵥ (tangent - tangent') = 0
+  change (lagSensitivityMatrix lag covarianceDerivative).mulVec (tangent - tangent') = 0
   rw [Matrix.mulVec_sub, heq, sub_self]
 
 /-- Total order-two information exposed by a completed collection of lag summaries along
@@ -208,7 +208,7 @@ theorem lagCompletionPermeability_eq_zero_iff {d : ℕ}
   · intro hzero
     apply Matrix.eq_zero_of_mulVec_eq_zero hdet
     funext i
-    exact hzero i
+    simpa [lagObservationDerivative] using hzero i
   · intro hzero
     subst tangent
     simp [lagObservationDerivative]
