@@ -611,6 +611,46 @@ realizable system. -/
 theorem frustration_floor_proved : (0.127 : ℝ) < expanderAgreementFloor :=
   expanderAgreementFloor_gt
 
+/-!
+### The bundle-rigidity modules are one development
+
+Each of `Coverage`, `CoverageInvariance`, `Realizability` and `SingleModulus` imports only
+Mathlib, which is what makes them readable in isolation and also what leaves each of them
+unable to contradict any of the others. The two statements below are stated here, the one
+place that sees all four, and each is an identification rather than a restatement: it says
+two independently written objects are one object.
+-/
+
+/-- **Coverage is charge at one slot.**
+
+`CoverageInvariance.chargedTuples` asks that every slot of a tuple have some branch landing
+on that slot's value; `Coverage.coverers` asks that a single parameter have some branch
+landing on one value. At one slot these are the same condition, so the support-only theorem
+that `CoverageInvariance` proves about charge is a theorem about the coverers that
+`Coverage`'s single window is built from — not a parallel fact about a similar-looking set. -/
+theorem chargedTuples_one_slot_iff {T : Type*} [TopologicalSpace T] {d : ℕ}
+    (F : BundleRigidity.ModulusFamily T d) (S : Set T) (v : ℝ) (t : Fin 1 → T) :
+    t ∈ BundleRigidity.chargedTuples (fun j x ↦ F.curve j x) {u | u 0 ∈ S} (fun _ ↦ v)
+      ↔ t 0 ∈ F.coverers S v := by
+  unfold BundleRigidity.chargedTuples BundleRigidity.ModulusFamily.coverers
+  simp [Fin.forall_fin_one]
+
+/-- **The symmetric lift's two atom magnitudes are the two sides of a single-modulus
+family.**
+
+`Realizability.outerAtom v` is `√(1 + v)` and `Realizability.innerAtom v` is `√(1 - v)`,
+introduced there as the magnitudes a symmetric lift uses. `SingleModulus.sq_cases` proves
+that every atom of a modulus-`v` family squares to `1 + v` or to `1 - v` and to nothing
+else. So the lift is not choosing a parameterization: the only two magnitudes available to
+it are the two the dichotomy already forces, and a change to either file's constant is a
+contradiction here. -/
+theorem singleModulus_atom_sq_eq_realizability_atom_sq {d : ℕ} {v : ℝ}
+    (S : BundleRigidity.SingleModulus d v) (hv : 0 ≤ v) (hv1 : v ≤ 1) (j : Fin d) :
+    S.atom j ^ 2 = BundleRigidity.outerAtom v ^ 2 ∨
+      S.atom j ^ 2 = BundleRigidity.innerAtom v ^ 2 := by
+  rw [BundleRigidity.outerAtom_sq hv, BundleRigidity.innerAtom_sq hv1]
+  exact S.sq_cases j
+
 end Condensation
 
 end Calibrator
