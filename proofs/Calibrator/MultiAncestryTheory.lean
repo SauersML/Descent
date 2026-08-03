@@ -503,7 +503,7 @@ section VariantCountAndEstimationNoise
 /-- **Fewer variants → noisier portability estimates.**
     With fewer variants, each SNP's contribution is larger,
     making the score more sensitive to individual LD changes. -/
-theorem div_lt_div_of_lt_denom_cast
+theorem div_natCast_lt_div_natCast_of_lt
     (m₁ m₂ : ℕ) (σ_sq : ℝ)
     (hm : m₁ < m₂) (hσ : 0 < σ_sq)
     (hm₁ : 0 < m₁) :
