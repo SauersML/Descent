@@ -4498,12 +4498,19 @@ theorem ibdRecurrenceFixedPoint_isFixedPoint (Ne rate : ℝ)
   have hd : (0 : ℝ) < (1 - rate) ^ 2 + 2 * Ne * rate * (2 - rate) := by linarith
   have hd' : (1 - rate) ^ 2 + 2 * Ne * rate * (2 - rate) ≠ 0 := ne_of_gt hd
   unfold ibdRecurrenceStep ibdRecurrenceFixedPoint
-  -- Same omission as `equalVarianceGaussianAUCFromExplainedR2_eq_processAUC`:
-  -- `h2Ne'` and `hd'` are proved immediately above and were not passed, so
-  -- `field_simp` left an inverse `ring` cannot cancel.
+  -- `hd'` states the denominator nonzero in FACTORED form, but by the time
+  -- `field_simp` sees the goal the denominator has been expanded, so the
+  -- hypothesis matched nothing and no denominator was cleared. Supply the same
+  -- fact in the expanded form the goal actually holds, bridged by `ring`.
+  have hdExp :
+      (1 : ℝ) - rate * 2 + rate * Ne * 4 + (rate ^ 2 - rate ^ 2 * Ne * 2) ≠ 0 := by
+    have hbridge :
+        (1 : ℝ) - rate * 2 + rate * Ne * 4 + (rate ^ 2 - rate ^ 2 * Ne * 2)
+          = (1 - rate) ^ 2 + 2 * Ne * rate * (2 - rate) := by ring
+    rw [hbridge]; exact hd'
   first
-    | (field_simp [h2Ne', hd']; ring)
-    | field_simp [h2Ne', hd']
+    | (field_simp [h2Ne', hd', hdExp]; ring)
+    | field_simp [h2Ne', hd', hdExp]
 
 /-- **Total isolation is a boundary the rest point attains.**  With `rate = 0`
 nothing separates the lineages and the recurrence rests at `1`. -/
