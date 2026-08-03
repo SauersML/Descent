@@ -1,4 +1,5 @@
 import Mathlib
+import Calibrator.DGP
 
 namespace Calibrator
 
@@ -141,6 +142,119 @@ theorem diagonalPermeability_derivative_scale {ι : Type*} [Fintype ι]
   unfold diagonalPermeability
   simp_rw [scalarPermeability_derivative_scale]
   rw [Finset.mul_sum]
+
+/-! ## Correlated multivariate Gaussian channels -/
+
+/-- **Multivariate Gaussian permeability in whitened coordinates.** If a covariance
+tangent `Γ` is whitened to
+
+`W = Σ⁻¹ᐟ² Γ Σ⁻¹ᐟ²`,
+
+then one Gaussian estimator draw carries information `½‖W‖_F²`.  This definition takes
+`W` directly: existence and correctness of a chosen whitening map are model-specific
+obligations, while the information geometry after whitening is universal. -/
+noncomputable def multivariateGaussianPermeability {d : ℕ}
+    (whitenedCovarianceDerivative : Matrix (Fin d) (Fin d) ℝ) : ℝ :=
+  (1 / 2 : ℝ) * frobeniusNormSq whitenedCovarianceDerivative
+
+/-- Multivariate permeability is nonnegative. -/
+theorem multivariateGaussianPermeability_nonneg {d : ℕ}
+    (whitenedCovarianceDerivative : Matrix (Fin d) (Fin d) ℝ) :
+    0 ≤ multivariateGaussianPermeability whitenedCovarianceDerivative := by
+  unfold multivariateGaussianPermeability
+  positivity
+
+/-- The correlated Gaussian channel seals exactly when the entire whitened covariance
+response vanishes. -/
+theorem multivariateGaussianPermeability_eq_zero_iff {d : ℕ}
+    (whitenedCovarianceDerivative : Matrix (Fin d) (Fin d) ℝ) :
+    multivariateGaussianPermeability whitenedCovarianceDerivative = 0 ↔
+      whitenedCovarianceDerivative = 0 := by
+  constructor
+  · intro hzero
+    ext i j
+    by_contra hentry
+    have hpositive : 0 < frobeniusNormSq whitenedCovarianceDerivative :=
+      frobeniusNormSq_pos_of_exists_ne_zero
+        whitenedCovarianceDerivative ⟨i, j, hentry⟩
+    unfold multivariateGaussianPermeability at hzero
+    nlinarith
+  · intro hzero
+    subst whitenedCovarianceDerivative
+    simp [multivariateGaussianPermeability, frobeniusNormSq]
+
+/-- Linear attenuation of the full whitened covariance response attenuates correlated
+Gaussian permeability quadratically. This is the matrix sealing law. -/
+theorem multivariateGaussianPermeability_scale {d : ℕ}
+    (whitenedCovarianceDerivative : Matrix (Fin d) (Fin d) ℝ) (η : ℝ) :
+    multivariateGaussianPermeability (η • whitenedCovarianceDerivative) =
+      η ^ 2 * multivariateGaussianPermeability whitenedCovarianceDerivative := by
+  unfold multivariateGaussianPermeability frobeniusNormSq
+  simp_rw [Matrix.smul_apply, smul_eq_mul, mul_pow]
+  rw [← Finset.mul_sum, ← Finset.mul_sum]
+  ring
+
+/-- The pre-existing independent-channel formula is exactly the diagonal face of the
+multivariate Hilbert--Schmidt law.  Thus the scalar and matrix APIs are one theory rather
+than competing approximations. -/
+theorem multivariateGaussianPermeability_diagonal {d : ℕ}
+    (covariance covarianceDerivative : Fin d → ℝ) :
+    multivariateGaussianPermeability
+        (Matrix.diagonal fun i => covarianceDerivative i / covariance i) =
+      diagonalPermeability covariance covarianceDerivative := by
+  classical
+  unfold multivariateGaussianPermeability frobeniusNormSq
+    diagonalPermeability scalarPermeability
+  simp [Matrix.diagonal_apply, Finset.mul_sum]
+
+/-- Information in `m` independent multivariate Gaussian estimator draws. -/
+noncomputable def totalMultivariateGaussianInformation {d : ℕ}
+    (m : ℝ) (whitenedCovarianceDerivative : Matrix (Fin d) (Fin d) ℝ) : ℝ :=
+  m * multivariateGaussianPermeability whitenedCovarianceDerivative
+
+/-- The inverse-square cohort compensation law remains exact for correlated channels:
+attenuation by `η` is offset by multiplying effective ensemble size by `1/η²`. -/
+theorem inverse_square_replicates_compensate_multivariate_attenuation {d : ℕ}
+    (m η : ℝ) (whitenedCovarianceDerivative : Matrix (Fin d) (Fin d) ℝ)
+    (hη : η ≠ 0) :
+    totalMultivariateGaussianInformation (m / η ^ 2)
+        (η • whitenedCovarianceDerivative) =
+      totalMultivariateGaussianInformation m whitenedCovarianceDerivative := by
+  unfold totalMultivariateGaussianInformation
+  rw [multivariateGaussianPermeability_scale]
+  field_simp [hη]
+
+/-- Symmetric whitened covariance response for two correlated completion channels.
+The off-diagonal coordinate `shared` is the response shared between the two probes after
+whitening; biologically it can arise from overlapping LD, haplotypes, ancestry tracts, or
+longitudinal sampling. -/
+noncomputable def twoChannelWhitenedDerivative
+    (first second shared : ℝ) : Matrix (Fin 2) (Fin 2) ℝ :=
+  ![![first, shared], ![shared, second]]
+
+/-- **Exact two-channel correlated law.** Off-diagonal response contributes `shared²`
+to permeability in addition to the two diagonal terms. It must not be discarded merely
+because each probe has already been standardized. -/
+theorem twoChannelWhitenedDerivative_permeability
+    (first second shared : ℝ) :
+    multivariateGaussianPermeability
+        (twoChannelWhitenedDerivative first second shared) =
+      (1 / 2 : ℝ) * (first ^ 2 + second ^ 2) + shared ^ 2 := by
+  simp [multivariateGaussianPermeability, frobeniusNormSq,
+    twoChannelWhitenedDerivative, Fin.sum_univ_two]
+  ring
+
+/-- A genuine shared covariance response strictly increases information relative to the
+diagonal-only calculation. -/
+theorem twoChannel_shared_response_strictly_increases_permeability
+    (first second shared : ℝ) (hshared : shared ≠ 0) :
+    multivariateGaussianPermeability
+        (twoChannelWhitenedDerivative first second 0) <
+      multivariateGaussianPermeability
+        (twoChannelWhitenedDerivative first second shared) := by
+  rw [twoChannelWhitenedDerivative_permeability,
+    twoChannelWhitenedDerivative_permeability]
+  nlinarith [sq_pos_of_ne_zero hshared]
 
 /-- Information in `m` independent Gaussian estimator draws for one completed
 deployment coordinate.  Here `m` is real-valued so the exact design law can also describe
