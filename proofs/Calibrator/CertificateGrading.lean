@@ -112,16 +112,25 @@ theorem finitePrior_probability_mem {n : ℕ} (P : FinitePrior n) :
   · exact fun i ↦ P.probability_nonneg i
   · simp only [FinitePrior.probability]
     rw [← ENNReal.toReal_sum (fun i _ ↦ P.apply_ne_top i)]
-    -- `PMF.tsum_coe` is a simp lemma, so a bare `simpa using P.tsum_coe`
-    -- rewrites the supplied term to `True` and reports a mismatch against a
-    -- goal it never touched. Restricting to `simp only [tsum_fintype]` is what
-    -- fixes that: with one lemma in the set the term cannot collapse, and the
-    -- `tsum` becomes the `Finset.sum` the goal wants. Rewriting the goal with
-    -- `← tsum_fintype` instead leaves the summation filter as a metavariable
-    -- and the instance stuck, which is a different failure from the one the
-    -- mismatch reported.
+    -- Two shapes fail here and both were tried against the kernel, so neither
+    -- guess is worth repeating.
+    --
+    -- `simpa only [tsum_fintype] using P.tsum_coe` fails: `PMF.tsum_coe` is
+    -- itself a simp lemma, so simp closes the SUPPLIED TERM to `True` and then
+    -- reports a mismatch against a goal it never touched. Restricting the simp
+    -- set does not prevent this -- the term collapses on its own lemma, not on
+    -- `tsum_fintype`.
+    --
+    -- `rw [← tsum_fintype]` on the goal fails differently: nothing in the goal
+    -- pins the summation filter, so the instance is left stuck on
+    -- `SummationFilter.LeAtTop ?m`.
+    --
+    -- Rewriting FORWARD in the hypothesis has neither problem. The term is
+    -- already elaborated, so the filter is determined, and simp never gets the
+    -- chance to close it.
     have hsum : (∑ i : Fin (n + 1), P i) = 1 := by
-      simpa only [tsum_fintype] using P.tsum_coe
+      have hcoe := P.tsum_coe
+      rwa [tsum_fintype] at hcoe
     rw [hsum]
     norm_num
 
