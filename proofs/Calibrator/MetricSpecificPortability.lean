@@ -943,6 +943,19 @@ noncomputable def metricPPV (sensitivity specificity prevalence : ℝ) : ℝ :=
 def sensitivityPortabilityGap (sensSource sensTarget : ℝ) : ℝ :=
   |sensTarget - sensSource|
 
+/-- **The gap is a distance: symmetric, nonnegative, and zero exactly on agreement.** A signed
+difference would satisfy neither the first nor the third, and the name says gap. -/
+theorem sensitivityPortabilityGap_symm (a b : ℝ) :
+    sensitivityPortabilityGap a b = sensitivityPortabilityGap b a := by
+  unfold sensitivityPortabilityGap
+  exact abs_sub_comm _ _
+
+theorem sensitivityPortabilityGap_eq_zero_iff (a b : ℝ) :
+    sensitivityPortabilityGap a b = 0 ↔ a = b := by
+  unfold sensitivityPortabilityGap
+  rw [abs_eq_zero, sub_eq_zero]
+  exact eq_comm
+
 /-- Absolute portability gap for PPV between source and target prevalences. -/
 noncomputable def ppvPortabilityGap
     (sensitivity specificity prevalenceSource prevalenceTarget : ℝ) : ℝ :=

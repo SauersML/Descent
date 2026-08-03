@@ -1316,6 +1316,24 @@ structure LevelSetCoordinates where
 need the **law** of their random coordinates, not merely coordinate means. -/
 noncomputable def positiveThreshold (x : ℝ) : ℝ := if 0 < x then 1 else 0
 
+/-- **The threshold reads only the sign, and reads it exactly.** Two values, taken at the two
+sides and at the boundary: the indicator is `0` at zero, not `1`, so the convention is strict
+positivity rather than nonnegativity, and that choice is visible here rather than left in the
+`if`. -/
+theorem positiveThreshold_values :
+    positiveThreshold 1 = 1 ∧ positiveThreshold 0 = 0 ∧ positiveThreshold (-1) = 0 := by
+  refine ⟨?_, ?_, ?_⟩ <;> unfold positiveThreshold <;> norm_num
+
+/-- The indicator is scale invariant under positive rescaling: it is a property of the sign. -/
+theorem positiveThreshold_pos_smul (x c : ℝ) (hc : 0 < c) :
+    positiveThreshold (c * x) = positiveThreshold x := by
+  unfold positiveThreshold
+  have hiff : 0 < c * x ↔ 0 < x := by
+    constructor
+    · intro h; nlinarith
+    · intro h; nlinarith
+  by_cases hx : 0 < x <;> simp [hx, hiff]
+
 /-- Two random coordinates can have the same mean while producing different threshold
 probabilities: the equiprobable law on `{-1,1}` and the point mass at zero both have mean
 zero, but only the first crosses the positive threshold with probability `1/2`. Thus the

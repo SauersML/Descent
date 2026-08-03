@@ -481,6 +481,15 @@ section BlockCount
 noncomputable def effectiveBlockCount (markers correlationLength : ℝ) : ℝ :=
   markers / correlationLength
 
+/-- **The block count is a ratio of lengths, so it does not depend on the unit.** Counting
+markers and correlation length in units `t` times finer leaves the number of independent blocks
+unchanged, which is what makes it a count rather than a length. -/
+theorem effectiveBlockCount_unit_invariant (markers correlationLength t : ℝ) (ht : t ≠ 0) :
+    effectiveBlockCount (t * markers) (t * correlationLength)
+      = effectiveBlockCount markers correlationLength := by
+  unfold effectiveBlockCount
+  exact mul_div_mul_left _ _ ht
+
 /-- **Residual discreteness of the freezing transition.**
 
     The lattice ghost surviving in a block of `n` markers at correlation length `ℓ`.

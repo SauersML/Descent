@@ -197,6 +197,15 @@ noncomputable def stabilizingSelectedArchitectureVariance (v_mutation s : ℝ) :
 noncomputable def optimumOUVariance (sigmaTheta tau : ℝ) : ℝ :=
   sigmaTheta ^ 2 * tau / 2
 
+/-- **The stationary variance of the optimum is linear in the autocorrelation time and quadratic
+in the driving amplitude.** Halving the amplitude quarters the variance while halving the
+correlation time only halves it: the two parameters enter at different orders, which is the
+content a mutant that multiplied them symmetrically would lose. -/
+theorem optimumOUVariance_scaling (sigmaTheta tau c : ℝ) :
+    optimumOUVariance (c * sigmaTheta) tau = c ^ 2 * optimumOUVariance sigmaTheta tau ∧
+      optimumOUVariance sigmaTheta (c * tau) = c * optimumOUVariance sigmaTheta tau := by
+  constructor <;> unfold optimumOUVariance <;> ring
+
 /-- Selected-architecture variance under fluctuating selection: the baseline
     mutation-selection variance plus the variance induced by a moving optimum. -/
 noncomputable def fluctuatingSelectedArchitectureVariance
