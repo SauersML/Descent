@@ -45,10 +45,7 @@ theorem multi_ancestry_reduces_fst
     (h_d₂_closer : d₂ < d₁)
     (h_d₁_le_one : d₁ ≤ 1)
     (h_α_pos : 0 < α) :
-    let fst_single := d₁
-    let fst_multi := (1 - α) * d₁ + α * d₂
-    presentDayR2 V_A V_E fst_multi > presentDayR2 V_A V_E fst_single := by
-  simp only
+    presentDayR2 V_A V_E ((1 - α) * d₁ + α * d₂) > presentDayR2 V_A V_E d₁ := by
   have h_multi_lt_single : (1 - α) * d₁ + α * d₂ < d₁ := by
     nlinarith
   simpa using
@@ -506,7 +503,7 @@ section VariantCountAndEstimationNoise
 /-- **Fewer variants → noisier portability estimates.**
     With fewer variants, each SNP's contribution is larger,
     making the score more sensitive to individual LD changes. -/
-theorem fewer_variants_noisier
+theorem div_lt_div_of_lt_denom_cast
     (m₁ m₂ : ℕ) (σ_sq : ℝ)
     (hm : m₁ < m₂) (hσ : 0 < σ_sq)
     (hm₁ : 0 < m₁) :
@@ -527,7 +524,7 @@ theorem more_variants_more_stable
 /-- **Shrinkage regularization dampens portability noise.**
     Bayesian shrinkage pulls small effects toward zero,
     reducing the impact of LD-specific noise on portability. -/
-theorem shrinkage_reduces_portability_variance
+theorem sq_mul_le_sq_mul_of_abs_le
     (β_raw β_shrunk σ_sq_noise : ℝ)
     (h_shrunk : |β_shrunk| ≤ |β_raw|)
     (hσ : 0 < σ_sq_noise) :

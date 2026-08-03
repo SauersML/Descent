@@ -387,7 +387,7 @@ theorem fluctuatingSelectedArchitectureVariance_eq_observed_of_recoveredSigmaThe
     selected-variance excess. At the same time, no stabilizing regime can match
     the same joint summary, because under stabilizing selection the selected
     variance is fixed at the baseline `v_mutation / s` independently of `Ns`. -/
-theorem observedSelectionSummary_identifies_fluctuating_not_stabilizing
+theorem observedSummary_identifies_fluctuating_not_stabilizing
     (v_mutation s t rho_obs v_selected_obs : ℝ)
     (h_t : 0 < t)
     (h_rho : 0 < rho_obs) (h_rho_lt : rho_obs < 1)
@@ -426,7 +426,7 @@ theorem observedSelectionSummary_identifies_fluctuating_not_stabilizing
     Under balancing selection (e.g., heterozygote advantage in HLA),
     allele frequencies are maintained near 0.5 → high heterozygosity.
     This increases PGS variance even as accuracy drops. -/
-theorem balancing_selection_high_het
+theorem two_mul_one_sub_lt_of_lt_of_lt_half
     (p_neutral p_balanced lo hi : ℝ)
     (h_neutral_low : p_neutral < lo)
     (h_neutral_pos : 0 < p_neutral)
@@ -598,7 +598,7 @@ section ArchitecturePredictions
     The characteristic timescale for portability decay is 1/(2s) generations,
     where s is the selection coefficient.
     Smaller `s` gives slower change; larger `s` gives faster change. -/
-theorem selection_determines_timescale
+theorem one_div_two_mul_antitone
     (s₁ s₂ : ℝ) (h₁ : 0 < s₁) (h₂ : 0 < s₂)
     (h_stronger : s₁ < s₂) :
     1 / (2 * s₂) < 1 / (2 * s₁) := by
@@ -635,7 +635,7 @@ section Pleiotropy
     If two traits share many pleiotropic loci, their portability
     patterns are correlated. Specifically, if turnover affects
     the shared loci, both traits suffer. -/
-theorem shared_pleiotropy_correlated_portability
+theorem both_mul_one_sub_lt_self
     (r2_t1_source r2_t1_target r2_t2_source r2_t2_target ρ_shared : ℝ)
     (h_shared : 0 < ρ_shared) (h_shared_le : ρ_shared ≤ 1)
     -- Both traits drop proportionally to the shared component

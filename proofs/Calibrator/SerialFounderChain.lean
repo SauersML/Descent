@@ -40,7 +40,7 @@ In a serial founder chain deme `k` splits from deme `k-1` at `t_k = T0 + (D-1-k)
 so **backwards in time a lineage sampled in deme `k` walks back through `k-1, k-2, …` and
 reaches deme 0 at `t₁`, whatever `k` is**. Founder events therefore fix a **ceiling** and
 contribute **no distance dependence at all**. `serialFounderJoinTime_const` states exactly
-that, and `founder_events_alone_cannot_explain_isolation_by_distance` turns it into the
+that, and `joinTime_pushforward_not_lt` turns it into the
 obstruction: any `F_ST` that were a function of the founder history alone would be constant
 across all non-source demes, contradicting the measured strictly increasing curve.
 
@@ -88,7 +88,7 @@ theorem serialFounderJoinTime_const (T0 splitStep : ℝ) (D j k : ℕ)
 alone — that is, of the join time — then it would be constant across all non-source demes.
 A measured `F_ST` that strictly increases with distance therefore rules out every model of
 that shape, which is precisely what the three failing candidates had in common. -/
-theorem founder_events_alone_cannot_explain_isolation_by_distance
+theorem joinTime_pushforward_not_lt
     (T0 splitStep : ℝ) (D : ℕ) (F : ℕ → ℝ) (g : ℝ → ℝ)
     (hfounder : ∀ k, k ≠ 0 → F k = g (serialFounderJoinTime T0 splitStep D k))
     (j k : ℕ) (hj : j ≠ 0) (hk : k ≠ 0) (hlt : F j < F k) : False := by

@@ -216,7 +216,7 @@ theorem dominance_variance_nonneg
 /-- **Dominance contributes to portability loss.**
     When heterozygosity (2pq) differs across populations,
     the dominance variance changes, affecting PGS calibration. -/
-theorem dominance_portability_loss
+theorem sq_mul_ne_sq_mul_of_ne_of_nonneg
     (het_source het_target d_val : ℝ)
     (h_het_diff : het_source ≠ het_target)
     (h_d : d_val ≠ 0)

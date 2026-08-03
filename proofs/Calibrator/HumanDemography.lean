@@ -261,7 +261,7 @@ lost to linkage-disequilibrium mismatch rather than to allele frequencies.
 This is the complement of `observed_ratio_below_neutral_floor_needs_other_mechanism`:
 that result says drift cannot produce the gap, this one says how small the
 tagging channel has to be for the gap to appear at all. -/
-theorem sharedLD_le_observed_div_driftRetention
+theorem le_div_one_sub_of_ratio_eq
     (V_A V_E fst shared_ld observed : ℝ)
     (hVA : 0 < V_A) (hVE : 0 < V_E)
     (hfst0 : 0 ≤ fst) (hfst1 : fst < 1) (hs0 : 0 < shared_ld)

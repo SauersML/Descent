@@ -250,7 +250,7 @@ section PGSCeiling
     R²_PGS ≤ h²_SNP. No PGS can explain more variance than what's
     genetically tagged. The PGS explains a fraction f of tagged
     additive variance, so R²_PGS = f × h²_SNP ≤ h²_SNP. -/
-theorem pgs_r2_ceiling_from_h2
+theorem mul_le_self_of_factor_le_one
     (h2_snp f : ℝ)
     (h_h2 : 0 < h2_snp)
     (h_f_le : f ≤ 1) :
@@ -259,12 +259,12 @@ theorem pgs_r2_ceiling_from_h2
 
 /-- **The ceiling is attained only by a complete PGS.**
 
-    The two-sided companion to `pgs_r2_ceiling_from_h2`: the ceiling `h²_SNP`
+    The two-sided companion to `mul_le_self_of_factor_le_one`: the ceiling `h²_SNP`
     is reached exactly when the fraction of tagged additive variance the score
     captures is one. A bound with no attainment condition cannot distinguish a
     ceiling that is approached from one that is unreachable; this says which
     this is. -/
-theorem pgs_r2_ceiling_attained_iff
+theorem mul_eq_self_iff_eq_one
     (h2_snp f : ℝ) (h_h2 : 0 < h2_snp) :
     h2_snp * f = h2_snp ↔ f = 1 := by
   constructor
@@ -278,7 +278,7 @@ theorem pgs_r2_ceiling_attained_iff
     R²_PGS ≤ h²_SNP × (1 - (1-power)^m)
     where power is per-SNP GWAS power and m is number of causal SNPs.
     With finite sample size, not all SNPs are discovered. -/
-theorem pgs_r2_ceiling_from_gwas_power
+theorem mul_le_self_of_fraction_le_one
     (h2_snp power_fraction : ℝ)
     (h_h2 : 0 < h2_snp)
     (h_power_le : power_fraction ≤ 1) :
@@ -287,7 +287,7 @@ theorem pgs_r2_ceiling_from_gwas_power
 
 /-- **Portability further reduces the ceiling.**
     R²_PGS_target ≤ h²_SNP × power_fraction × portability_ratio. -/
-theorem portability_reduces_ceiling
+theorem mul_mul_le_self_of_le_one_of_le_one
     (h2_snp power_frac port_ratio : ℝ)
     (h_h2 : 0 < h2_snp) (h_power : 0 < power_frac) (h_port : 0 < port_ratio)
     (h_power_le : power_frac ≤ 1) (h_port_le : port_ratio ≤ 1) :
@@ -332,7 +332,7 @@ section GREML
 /-- **GREML h² estimate depends on LD structure.**
     GREML estimates h²_SNP = trace(GRM⁻¹ × Σ_pheno) / n.
     When LD differs between training and evaluation, the estimate is biased. -/
-theorem greml_ld_sensitive
+theorem add_ne_self_of_ne_zero
     (h2_estimated h2_true ld_bias : ℝ)
     (h_bias : h2_estimated = h2_true + ld_bias)
     (h_ld_nonzero : ld_bias ≠ 0) :

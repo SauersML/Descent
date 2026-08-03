@@ -183,7 +183,7 @@ theorem signal_exceeds_threshold_iff_confounding_exceeds_critical
 causal-differentiation state produce the same observation but have different
 causal targets, no estimator can recover the target on both.  Mutual
 contiguity supplies the asymptotic, quantitative analogue of this collision. -/
-theorem no_exact_deconfounder_of_two_point_collision
+theorem no_exact_estimator_of_two_point_collision
     {Parameter Observation : Type}
     (observe : Parameter → Observation) (causalTarget : Parameter → ℝ)
     (confoundedNull causalAlternative : Parameter)

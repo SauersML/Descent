@@ -166,7 +166,7 @@ theorem tag_r2_decreases_with_ld_change
 /-- **Total PGS accuracy is the product of tag accuracies.**
     R²_PGS ≈ Σᵢ r²_tag_i × β_causal_i² / V_Y.
     When tag r² drops, PGS R² drops proportionally. -/
-theorem pgs_accuracy_from_tagging
+theorem div_sum_mul_nonneg
     {m : ℕ} (r2_tag : Fin m → ℝ) (β_sq : Fin m → ℝ) (v_y : ℝ)
     (h_vy : 0 < v_y) (h_β : ∀ i, 0 ≤ β_sq i) (h_r2 : ∀ i, 0 ≤ r2_tag i) :
     0 ≤ (∑ i, r2_tag i * β_sq i) / v_y := by
@@ -731,7 +731,7 @@ theorem bottleneck_dominates_harmonic_mean (T : ℕ) (hT : 0 < T)
     smaller than the arithmetic mean would suggest.
     Specifically: if Ne_b < Ne_normal, then 1/Ne_b > 1/Ne_normal,
     so the sum of reciprocals is dominated by bottleneck terms. -/
-theorem bottleneck_reciprocal_dominance (Ne_b Ne_normal : ℝ)
+theorem one_div_lt_one_div_of_lt_of_pos (Ne_b Ne_normal : ℝ)
     (hb : 0 < Ne_b)
     (h_bottle : Ne_b < Ne_normal) :
     1 / Ne_normal < 1 / Ne_b := by

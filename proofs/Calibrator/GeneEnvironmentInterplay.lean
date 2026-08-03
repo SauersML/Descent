@@ -75,7 +75,7 @@ theorem gxe_population_specific_effects
     cross-population correlation of effective effects depends on
     Var(β_GxE × E). When the interaction variance V_GxE > 0, the
     correlation ρ = V_G / (V_G + V_GxE) < 1. -/
-theorem gxe_reduces_genetic_correlation
+theorem div_self_add_lt_one_of_pos
     (V_G V_GxE : ℝ)
     (h_G : 0 < V_G) (h_GxE : 0 < V_GxE) :
     V_G / (V_G + V_GxE) < 1 := by
@@ -88,7 +88,7 @@ theorem gxe_reduces_genetic_correlation
     We derive: when V_GxE > 0, the bound ρ_G² < 1 strictly, meaning
     portability is strictly reduced. The portability ratio is at most
     (V_G / (V_G + V_GxE))². -/
-theorem portability_bounded_by_genetic_correlation
+theorem div_self_add_and_sq_lt_one_of_pos
     (V_G V_GxE : ℝ)
     (h_G : 0 < V_G) (h_GxE : 0 < V_GxE) :
     let rho_G := V_G / (V_G + V_GxE)
@@ -163,7 +163,7 @@ theorem rge_inflates_pgs_r2
     When rGE differs across populations (rge_source > rge_target ≥ 0), the apparent
     portability R²_target/R²_source is lower than the true genetic portability,
     because the source denominator is more inflated. -/
-theorem rge_difference_amplifies_portability_loss
+theorem two_mul_sqrt_lt_of_lt
     (r2_g r2_e rge_source rge_target : ℝ)
     (h_g : 0 < r2_g) (h_e : 0 < r2_e)
     (h_rge_diff : rge_target < rge_source) :
@@ -317,7 +317,7 @@ theorem crossover_gxe_worst_for_portability
     variance that is environment-independent is Var(a) / (Var(a) + Var(b) × E²).
     When environmental exposure E increases, this fraction decreases,
     meaning portability worsens with greater environmental difference. -/
-theorem gxe_variance_determines_portability
+theorem div_lt_div_of_denom_sq_lt
     (var_a var_b E₁ E₂ : ℝ)
     (h_a : 0 < var_a) (h_b : 0 < var_b)
     (h_E₁ : 0 < E₁) (h_E₂ : E₁ < E₂) :

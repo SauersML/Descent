@@ -472,7 +472,7 @@ theorem worse_than_neutral_implies_fluctuating_regime
       ¬ ∃ Ns,
         effectCorrelationStabilizing Ns = rho_obs ∧
           stabilizingSelectedArchitectureVariance v_mutation s = v_selected_obs := by
-    exact observedSelectionSummary_identifies_fluctuating_not_stabilizing
+    exact observedSummary_identifies_fluctuating_not_stabilizing
       v_mutation s t rho_obs v_selected_obs h_t h_rho h_rho_lt h_var_gap
   rcases h_selection with ⟨h_match, h_not_stab⟩
   have h_port :

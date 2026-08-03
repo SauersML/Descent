@@ -402,7 +402,7 @@ unconditionally in the kernel. So
 `ker L = {τ-odd measures} ⊕ (ker L ∩ {τ-even measures})`,
 
 and the second summand is the kernel of the quotient operator — see
-`tauEven_eq_of_agree_on_invariants` below for why even measures are the same thing as
+`tauEven_eq_of_agree_on_symmetricFns` below for why even measures are the same thing as
 measures on `T / τ`. -/
 theorem mem_ker_iff_evenPart_mem_ker {τ : C(T, T)} (hsym : F.IsSymmetry τ)
     (hinv : ∀ t : T, τ (τ t) = t) (κ : C(T, ℝ) →ₗ[ℝ] ℝ) :
@@ -438,7 +438,7 @@ diploid genotype family at allele frequency `q`, the involution is `q ↦ 1 - q`
 directions are exactly the relabelling of which allele is called minor — a gauge freedom,
 not an ambiguity in the science — and the real question is rigidity on `(0, 1/2]`, which
 is what Theorem E settles for `d = 2`. -/
-theorem tauEven_eq_of_agree_on_invariants {τ : C(T, T)} (hinv : ∀ t : T, τ (τ t) = t)
+theorem tauEven_eq_of_agree_on_symmetricFns {τ : C(T, T)} (hinv : ∀ t : T, τ (τ t) = t)
     {κ κ' : C(T, ℝ) →ₗ[ℝ] ℝ} (hκ : IsTauEven τ κ) (hκ' : IsTauEven τ κ')
     (hagree : ∀ f : C(T, ℝ), IsInvariantFn τ f → κ f = κ' f) : κ = κ' := by
   ext f

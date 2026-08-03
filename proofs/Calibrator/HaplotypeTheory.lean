@@ -426,7 +426,7 @@ theorem dosage_beats_haplotype_when_phasing_poor
 /-- **Phase effects are population-specific.**
     Haplotype frequencies differ → phase configuration frequencies
     differ → average phase-dependent effect differs across populations. -/
-theorem phase_effects_population_specific
+theorem mul_ne_mul_right_of_ne_of_ne_zero
     (freq_cis_source freq_cis_target delta_cis : ℝ)
     (h_diff_freq : freq_cis_source ≠ freq_cis_target)
     (h_delta : delta_cis ≠ 0) :

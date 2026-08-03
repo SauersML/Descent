@@ -447,7 +447,7 @@ theorem admixed_fst_smaller (α fst_AB : ℝ)
     Model: R² to admixed = α · R²(A→A) + (1-α) · R²(A→B) for admixture
     proportion α from population A. Since R²(A→B) < R²(A→A) and 0 < α < 1,
     the weighted average is strictly between the two parent values. -/
-theorem admixed_intermediate_portability
+theorem convexCombination_strictly_between
     (r2_AA r2_AB α : ℝ)
     (h_AA_pos : 0 < r2_AA)
     (h_AB_nn : 0 ≤ r2_AB)
@@ -462,7 +462,7 @@ theorem admixed_intermediate_portability
     nlinarith
 
 /-- Optimal admixed PGS (convex combination) is between the two parent values. -/
-theorem optimal_admixed_pgs_is_weighted
+theorem min_le_convexCombination_le_max
     (pgs_A pgs_B α : ℝ)
     (hα : 0 ≤ α) (hα1 : α ≤ 1) :
     min pgs_A pgs_B ≤ α * pgs_A + (1 - α) * pgs_B ∧
@@ -987,7 +987,7 @@ theorem bottleneck_reduces_portability_ratio
     Formally: if |ρ_exp - ρ_src| < |ρ_small - ρ_src| where ρ is the LD
     retention, then the PGS accuracy loss (proportional to LD mismatch²)
     is smaller for the expanded population. -/
-theorem expansion_smaller_portability_loss
+theorem mul_sq_lt_mul_sq_of_lt_of_nonneg
     (ld_mismatch_exp ld_mismatch_small accuracy_coeff : ℝ)
     (h_coeff_pos : 0 < accuracy_coeff)
     (h_mismatch_exp_nn : 0 ≤ ld_mismatch_exp)

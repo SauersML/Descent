@@ -485,7 +485,7 @@ section PowerPortabilityTradeoff
     - Pop2 R² increases from 0: (1-α) × N × c > 0 when α < 1
 
     Both parts are derived from the allocation model. -/
-theorem multi_ancestry_tradeoff
+theorem mul_lt_self_and_complement_mul_pos
     (N c₁ c₂ α : ℝ)
     (h_N : 0 < N) (h_c₁ : 0 < c₁) (h_c₂ : 0 < c₂)
     (h_α_pos : 0 < α) (h_α_lt : α < 1) :
@@ -511,7 +511,7 @@ theorem multi_ancestry_tradeoff
 
     We derive: ρ² × R² < R²(1 + ρ²)/2 for any 0 < ρ² < 1.
     Proof: multiply out to get 2ρ² < 1 + ρ², i.e., ρ² < 1. -/
-theorem minimax_favors_multi_ancestry
+theorem mul_lt_mul_avg_of_lt_one
     (R2 ρ_sq : ℝ)
     (h_R2 : 0 < R2) (h_ρ : 0 < ρ_sq) (h_ρ_lt : ρ_sq < 1) :
     -- single-ancestry worst-case < multi-ancestry worst-case
