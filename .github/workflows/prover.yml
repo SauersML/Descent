@@ -112,6 +112,49 @@ jobs:
         working-directory: proofs/validation/invariants
         run: python3 test_lean_semantics.py
 
+      - name: No externally supplied theorems in production structures
+        working-directory: proofs/validation/invariants
+        run: python3 check_regimes.py
+
+      - name: Regenerate the extracted definition table
+        # defs.json and lean_defs.py are generated, never committed: they are
+        # derived from proofs/Calibrator/ and a committed snapshot drifts. CI
+        # must build them from the revision under test, which is also what
+        # makes the battery below evidence about THIS commit rather than about
+        # whenever someone last refreshed a cache.
+        run: python3 proofs/validation/extract/emit.py
+
+      - name: Differential battery
+        # 67 checks comparing each transcribed Lean body against an
+        # independently written reference, plus a totality audit over ~160k
+        # points. Exact arithmetic on a fixed grid, so the verdict is
+        # reproducible. It also gates the EXPECTED disagreements: a check
+        # pinned as model-differing that starts agreeing is a regression.
+        working-directory: proofs/validation/differential
+        run: python3 run.py
+
+      # WHAT IS NOT WIRED UP, and why. The steps above are the subset of
+      # proofs/validation/ that is deterministic, dependency-free and about
+      # twenty seconds in total. Everything else falls into one of four
+      # buckets, none of which belongs in a required check:
+      #
+      #   * Monte-Carlo suites (coalescent_diff, drift_diff, block_count,
+      #     ldsc_diff, meff_*, pencil, tau_c, ld_coverage_boundary, ...).
+      #     Their verdicts are statistical, so at any sample size they carry a
+      #     false failure rate. A required check that fails at random gets
+      #     ignored, which costs more than the coverage would gain.
+      #   * Deterministic but slow: imitation_rigidity/check_imitation.py is
+      #     44s and invariants/vacuity.py is 60s, against ~20s for all of the
+      #     above together.
+      #   * Needs numpy, scipy, sympy or z3 (condensation, bundle_rigidity,
+      #     invariants/check_ranges.py, extract/xcheck_vector.py). Installable,
+      #     but check_ranges prints its findings and exits 0 whatever it finds,
+      #     so as a gate it would catch nothing but its own crashes.
+      #   * extract/test_parser.py, which pins absolute LINE NUMBERS in the
+      #     Lean sources ("neiFst line: got 46, want 42"). Any edit above a
+      #     definition breaks it, so it fails for reasons unrelated to what it
+      #     is testing. It is currently failing for exactly that reason.
+
       - name: Executable correctability contract
         run: cargo test --manifest-path proofs/validation/correctability_calculator/Cargo.toml
 
