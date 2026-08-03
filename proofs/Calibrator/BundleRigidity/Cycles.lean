@@ -158,37 +158,42 @@ theorem solution_unique_of_ne_zero (ρ x y : ℕ → ℝ)
   rw [iterate_eq ρ x hx m, iterate_eq ρ y hy m]
   field_simp
 
-/-! ## The cycle data, with strong closure in the signature -/
+/-! ## What is NOT stated here, and why there is no `theoremD`
 
-/-- **The data of a finite cycle**, with its hypotheses as named fields.
+Earlier revisions carried a `CycleData` structure with `coincidence : Prop` and
+`strongClosure : Prop` fields, and a `theoremD` taking them as hypotheses. **Both are
+removed, and the reason is worth recording, because the construction looked more honest
+than it was.**
 
-`strongClosure` is **the existence condition**, not a regularity assumption. Without it a
-branch of some `t_s` reaches a modulus value covered nowhere else in the cycle; that value
-is then singly covered, the peeling lemma kills the weight at `t_s`, and no kernel element
-survives however the product condition comes out. It is carried here rather than in prose
-because a statement of Theorem D without it is false. -/
-structure CycleData (n : ℕ) where
-  /-- The parameters of the cycle. -/
-  point : ℕ → ℝ
-  /-- The mass ratio across each coincidence. -/
-  ratio : ℕ → ℝ
-  /-- Mass ratios are positive, being ratios of positive masses. -/
-  ratio_pos : ∀ s, 0 < ratio s
-  /-- The parameters are pairwise distinct. -/
-  points_distinct : ∀ s t, s < n → t < n → s ≠ t → point s ≠ point t
-  /-- The defining coincidences hold cyclically. -/
-  coincidence : Prop
-  /-- **Strong closure.** Every branch value of every `t_s` is shared within the cycle.
-  The finite shadow of value-closedness, and the existence condition for the theorem. -/
-  strongClosure : Prop
+A field of type `Prop` does not *state* anything. `strongClosure : Prop` is a variable
+ranging over propositions, satisfiable by `True`; it does not assert that every branch
+value is shared within the cycle. So it could not be discharged — there was nothing to
+prove — and it was not an external theorem either, because it named no theorem. It was a
+label.
 
-/-- **Theorem D, assembled.** For an even cycle satisfying strong closure, a
-one-dimensional space of atomic kernel elements exists exactly when the mass ratios
-multiply to one. -/
-theorem theoremD (r : ℕ) (C : CycleData (2 * r)) (_hclosure : C.strongClosure)
-    (_hcoinc : C.coincidence) :
-    (∃ x : ℕ → ℝ, x 0 ≠ 0 ∧ (∀ s, x (s + 1) = -C.ratio s * x s) ∧ x (2 * r) = x 0)
-      ↔ (∏ s ∈ range (2 * r), C.ratio s) = 1 :=
-  cycle_solvable_iff_even C.ratio r
+The `theoremD` that consumed it was worse in a specific way: its two hypotheses were
+`_hclosure` and `_hcoinc`, underscore-prefixed because **the proof did not use them**, and
+its body was literally `cycle_solvable_iff_even C.ratio r`. The signature advertised that
+strong closure was doing work; nothing in the term depended on it. Anyone reading the
+statement would conclude the corpus had formalized Theorem D. It had formalized the
+recursion criterion and dressed it in Theorem D's hypotheses.
+
+**What is genuinely proved is above and stands on its own**: `cycle_solvable_iff_even` (a
+non-zero cyclic solution exists iff the ratios multiply to one), `no_odd_cycle_of_pos` (odd
+cycles carry nothing, whatever the masses), and `solution_unique_of_ne_zero`
+(one-dimensionality). These are facts about the recursion `x_{s+1} = -ρ_s x_s`, they need
+no closure hypothesis, and they are complete.
+
+**What is not proved is Theorem D itself** — the statement that *atomic kernel elements*
+exist iff the product is one. That needs strong closure as a real hypothesis: without it a
+branch of some `t_s` reaches a modulus value covered nowhere else in the cycle, that value
+is singly covered, the peeling lemma kills the weight at `t_s`, and no kernel element
+survives however the product comes out. Stating that in Lean requires either formalizing
+value-closedness properly or carrying it as an unproved parameter. The second is no longer
+permitted, and rightly, so the kernel-element form of Theorem D is **absent from this
+module** rather than present in weakened dress.
+
+The classical closed-path criterion this transports (Diliberto–Straus, Marshall–O'Farrell,
+Ismailov) is cited in the header as background, not claimed as formalized. -/
 
 end Calibrator.BundleRigidity

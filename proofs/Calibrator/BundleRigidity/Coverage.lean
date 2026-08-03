@@ -225,23 +225,32 @@ theorem coverer_unique {S : Set T} {v : ℝ} (hv : v ∈ F.singleWindow S)
     {t₁ t₂ : T} (h₁ : t₁ ∈ F.coverers S v) (h₂ : t₂ ∈ F.coverers S v) : t₁ = t₂ :=
   (interior_subset hv).2 h₁ h₂
 
-/-- The analytic inputs that this module does not establish, as named fields.
+/-! ## What this module does not establish
 
-`coverer_continuous` is Lemma 2: on a component of the single window the unique coverer
-depends continuously on the value, proved by compactness — any subsequential limit of
-`c vₙ` lies in `C_S v`, which is a singleton. `vanishingOnOpen` is the measure-theoretic
-step from "`κ` vanishes on an open set" to "`supp κ` misses it".
+A `PeelingHypotheses` structure used to sit here with three `Prop`-valued fields, and its
+docstring claimed "anything derived from them carries them in its type". **Nothing was
+derived from them** — no declaration in this development ever took the structure as an
+argument. The claim was aspirational and false, and the structure is removed.
 
-Neither is a `sorry`: they are inputs, and anything derived from them carries them in its
-type. -/
-structure PeelingHypotheses where
-  /-- **Lemma 2.** The unique coverer is continuous on each component of the window. -/
-  coverer_continuous : Prop
-  /-- A measure vanishing on an open set has support disjoint from it. -/
-  vanishingOnOpen : Prop
-  /-- The uniform mass floor `Φ ≥ p_min > 0` that lets the peeling lemma divide. This is
-  the only place bundling is used: branches of one bundle pool, never trade. -/
-  massFloor : Prop
+It could not have been otherwise: a field of type `Prop` states nothing. `massFloor : Prop`
+is a variable ranging over propositions, satisfiable by `True`; it does not assert that
+`Φ ≥ p_min > 0`. So such a field can neither be discharged (there is nothing to prove) nor
+honestly cited as an external theorem (it names none).
+
+The three inputs the peeling lemma actually needs, stated here as prose because prose is
+what an unformalized input deserves:
+
+* **Lemma 2, continuity of the coverer.** On a component of the single window the unique
+  coverer depends continuously on the value, by compactness — any subsequential limit of
+  `c vₙ` lies in `C_S v`, which `coverer_unique` shows is a singleton. Not formalized.
+* **Support and open sets.** A measure vanishing on an open set has support disjoint from
+  it. Standard measure theory, not formalized here.
+* **The mass floor** `Φ ≥ p_min > 0`, which is the only place bundling enters: branches of
+  one bundle pool, never trade.
+
+What *is* proved in this module is the topological and order-theoretic skeleton —
+`peel_mono`, `isOpen_peelSet`, `core_subset_peel_core`, `support_subset_core`,
+`coverer_unique` — and those carry no hypotheses beyond their explicit arguments. -/
 
 end ModulusFamily
 

@@ -398,22 +398,24 @@ where `A > B` breaks the symmetry. Theorem 1 never enumerates.
 **Where its weight actually rests is step 1's disjointness**, which is a single sentence
 doing real work, together with the escape-depth claim separating shells from the attractor.
 If disjointness fails anywhere, the partition collapses and step 3 sums the same mass
-twice. That is where a hidden assumption would live, so those two are carried as separate
-named fields below rather than folded into one. -/
-structure ShellPartitionHypotheses where
-  /-- **The load-bearing step.** The shells `S_w = φ_w G` are pairwise disjoint. Argued
-  uniformly: two distinct words agree up to their first differing letter, and at that
-  letter the sets sit inside disjoint images pulled forward injectively. If this fails,
-  the growth step counts the same mass twice. -/
-  shellsPairwiseDisjoint : Prop
-  /-- A shell is disjoint from the attractor, because a point of `S_w` has escape depth
-  `|w|` while attractor points have none. Separated from disjointness because it is a
-  different claim about a different pair of sets. -/
-  shellDisjointFromAttractor : Prop
-  /-- `V` is the disjoint union of the shells together with the attractor. -/
-  partitionsAmbient : Prop
-  /-- Depth-`n` cylinders partition the attractor, which is what lets step 4 collapse. -/
-  cylindersPartitionAttractor : Prop
+twice. That is where a hidden assumption would live.
+
+A `ShellPartitionHypotheses` structure used to record those four geometric inputs as
+`Prop`-valued fields. It is removed: nothing consumed it, and a `Prop` field states
+nothing — `shellsPairwiseDisjoint : Prop` is a variable over propositions, satisfiable by
+`True`, not an assertion that the shells are disjoint. Recording them as prose is the
+honest form, and it loses no content because no proof ever referred to them.
+
+The four geometric inputs of step 1, none of them formalized here:
+
+1. **shells pairwise disjoint** — the load-bearing one. Two distinct words agree up to
+   their first differing letter, and at that letter the sets sit inside disjoint images
+   pulled forward injectively. If this fails, step 3 counts the same mass twice.
+2. **shell disjoint from the attractor** — a point of `S_w` has escape depth `|w|` while
+   attractor points have none. A different claim about a different pair of sets, which is
+   why it is listed separately.
+3. **`V` is the disjoint union** of the shells together with the attractor.
+4. **depth-`n` cylinders partition the attractor**, which is what lets step 4 collapse. -/
 
 /-! ## Theorem 1's engine, proved
 

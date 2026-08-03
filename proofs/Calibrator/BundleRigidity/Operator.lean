@@ -469,18 +469,25 @@ House style: an input the development does not establish appears as a named fiel
 structure, so that anything derived from it says so in its own type rather than in prose.
 -/
 
-/-- **Standing hypotheses of the modelling reading**, carried explicitly so that they
-appear in the signature of anything that uses them.
+/-! ## The standing modelling limitation, in prose
 
-`independentCoordinates` is not removable. The associated Cramér-type argument factors a
-characteristic function as a product over coordinates; under linkage disequilibrium that
-factorization fails. This is a structural limitation of the method, and it is recorded
-here rather than hidden. -/
-structure StandingHypotheses where
-  /-- Coordinates are independent. Required for the product-of-characteristic-functions
-  step; false under linkage disequilibrium. -/
-  independentCoordinates : Prop
-  /-- The observed panel is finite and realized, rather than a continuous mixing measure. -/
-  realizedPanel : Prop
+A `StandingHypotheses` structure used to sit here with `independentCoordinates : Prop` and
+`realizedPanel : Prop`, described as "carried explicitly so that they appear in the
+signature of anything that uses them". **Nothing used them**, so they appeared in no
+signature, and a `Prop`-valued field could not have carried the meaning anyway — it states
+nothing and is satisfiable by `True`.
+
+The limitation itself is real and stays recorded here:
+
+**Independent coordinates.** The associated Cramér-type argument factors a characteristic
+function as a product over coordinates. Under linkage disequilibrium that factorization
+fails, so the argument does not apply to the case the application cares about most. This is
+a structural limitation of the method rather than a gap awaiting work — and note that the
+`Freshness` module exists precisely because of it, replacing the product step with a
+telescope valid for any coupling.
+
+**Realized panels.** The rigidity statements here are about finite realized panels, not
+continuous mixing measures. Nothing in this module is stated for the continuum, and the
+`d = 2` results in `TwoAtom` are the only complete continuum case in this development. -/
 
 end Calibrator.BundleRigidity

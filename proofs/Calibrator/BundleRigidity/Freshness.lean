@@ -332,18 +332,22 @@ House style: what this development does not prove appears as a named field, so a
 derived from it carries the input in its own type.
 -/
 
-/-- **Audit point AP-β**, and the disintegration input, carried as named fields.
+/-! A `CoupledSliceHypotheses` structure used to record the unproved inputs as
+`Prop`-valued fields. It is removed — nothing consumed it, and a `Prop` field asserts
+nothing, being satisfiable by `True`. The inputs, in prose:
 
-`bandToOperatorNorm` is the passage from a pointwise kernel band to an operator-norm bound
-on measures, in the coupled slice theorem. `stepBoundFromFreshness` is the derivation of
-the per-step contraction from a genuine conditional law. Neither is proved here. -/
-structure CoupledSliceHypotheses where
-  /-- **AP-β.** Pointwise kernel band implies an operator-norm bound on measures. -/
-  bandToOperatorNorm : Prop
-  /-- The per-step contraction, derived from the conditional law by disintegration. -/
-  stepBoundFromFreshness : Prop
-  /-- **AP-α.** Whether an order-free simultaneous splitting improves the discard constant
-  beyond `1/2`. Open; a failure weakens constants, not statements. -/
-  orderFreeSplitting : Prop
+* **AP-β.** The passage from a pointwise kernel band to an operator-norm bound on measures,
+  in the coupled slice theorem. Not proved here.
+* **The per-step contraction** derived from a genuine conditional law by disintegration.
+  This is the hypothesis `hstep` of `master_decay_bound`, which is where it belongs: an
+  explicit argument of the theorem that uses it, visible in the signature, rather than a
+  field of a record nothing reads.
+* **AP-α.** Whether an order-free simultaneous splitting improves the discard constant
+  beyond `1/2`. Open; a failure weakens constants rather than statements, which is why `θ`
+  is an argument of `master_decay_bound` and not a literal.
+
+The contrast between the second item and the other two is the point of this whole edit. A
+genuinely used hypothesis appears as a typed argument of the theorem that needs it and
+cannot be forgotten; an unused one in a record is decoration. -/
 
 end Calibrator.BundleRigidity
