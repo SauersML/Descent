@@ -422,6 +422,46 @@ replaced.** Measurements in `proofs/validation/block_count/`; positive control (
 three independent generators) reproduces the analytic independent-panel value to
 `1.001 ± 0.003`. -/
 
+/-! ### A defect in the `σ` power, inherited from above
+
+An audit found that this file and `Calibrator.Probability` spell the Berry–Esseen bound
+differently, and **this file's spelling is the wrong one**. `Probability.lean` has
+`C·ρ/(variance·√variance) = Cρ/σ³`, which is correct. The theorems above use
+`C·ρ/(σ_sq·√m) = Cρ/(σ²√m)`, and the inline derivation at
+`berry_esseen_error_decreases_with_snps` states `m·ρ/(m·σ²)^{3/2} = ρ/(σ²·√m)` — the
+right-hand side should be `ρ/((σ²)^{3/2}·√m)`. The docstring of
+`highly_polygenic_better_gaussian` then asserts the *correct* form, `C·ρ/(σ³·√m)`, directly
+above a body that does not implement it.
+
+**Nothing above is thereby false**: those theorems compare the bound at two marker counts
+with everything else held fixed, and a missing constant power of `σ` cancels from such a
+comparison. What is wrong is the *formula*, and anything reading a number off it inherits a
+factor `σ`. `berryEsseenBound` below is the correct spelling, and the block-count theorems
+that follow are stated against it.
+
+Empirical status: DERIVED. The discrepancy is between two files in this corpus, not against
+an experiment. -/
+
+/-- **The Berry–Esseen bound, spelled correctly**: `C·ρ/(σ³·√m)` with `σ³ = (σ²)^{3/2}`.
+
+    Matches `Calibrator.Probability`'s spelling. Prefer this to the `σ²`-denominator form
+    used by the older theorems in this section. -/
+noncomputable def berryEsseenBound (C ρ σ_sq m : ℝ) : ℝ :=
+  C * ρ / (σ_sq * Real.sqrt σ_sq * Real.sqrt m)
+
+/-- The corrected bound still decreases in the marker count, so the older theorems' *conclusion*
+    survives the respelling even though their formula does not. -/
+theorem berryEsseenBound_antitone (C ρ σ_sq m₁ m₂ : ℝ)
+    (hC : 0 < C) (hρ : 0 < ρ) (hσ : 0 < σ_sq) (hm₁ : 0 < m₁) (hm : m₁ < m₂) :
+    berryEsseenBound C ρ σ_sq m₂ < berryEsseenBound C ρ σ_sq m₁ := by
+  have hs : 0 < Real.sqrt σ_sq := Real.sqrt_pos.mpr hσ
+  have hsm₁ : 0 < Real.sqrt m₁ := Real.sqrt_pos.mpr hm₁
+  have hlt : Real.sqrt m₁ < Real.sqrt m₂ :=
+    Real.sqrt_lt_sqrt (le_of_lt hm₁) hm
+  unfold berryEsseenBound
+  apply div_lt_div_of_pos_left (mul_pos hC hρ) (by positivity)
+  exact mul_lt_mul_of_pos_left hlt (by positivity)
+
 section BlockCount
 
 /-- **The effectively independent block count**: markers divided by correlation length.
@@ -501,7 +541,6 @@ theorem berry_esseen_block_bound_eq (C ρ σ_sq b ℓ κ : ℝ)
   have hsl : 0 < Real.sqrt ℓ := Real.sqrt_pos.mpr hℓ
   rw [Real.sqrt_mul (le_of_lt hb) ℓ]
   field_simp
-  ring
 
 /-- **When the marker count is anti-conservative, and when it is not.**
 
@@ -512,7 +551,7 @@ theorem berry_esseen_block_bound_eq (C ρ σ_sq b ℓ κ : ℝ)
     because the measurement found both signs. -/
 theorem marker_count_understates_berry_esseen (C ρ σ_sq b ℓ κ : ℝ)
     (hC : 0 < C) (hρ : 0 < ρ) (hb : 0 < b) (hσ : 0 < σ_sq) (hℓ : 0 < ℓ)
-    (hκ : 0 < κ) (hgap : 1 < κ * Real.sqrt ℓ) :
+    (hgap : 1 < κ * Real.sqrt ℓ) :
     C * ρ / (σ_sq * Real.sqrt (b * ℓ)) <
       κ * (C * ρ) / (σ_sq * Real.sqrt b) := by
   have hsb : 0 < Real.sqrt b := Real.sqrt_pos.mpr hb
