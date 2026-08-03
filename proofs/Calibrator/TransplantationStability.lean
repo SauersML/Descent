@@ -35,14 +35,10 @@ with squared misalignment `s²` away from the ground direction pays at least `γ
 excited direction sits at least `γ` above the ground energy. `excess_ge_gap_mul_misalignment` is
 that statement and it needs nothing but the spectral decomposition and a Finset sum.
 
-**The perturbation upper bound is not proved here.** `excess_le_perturbation_mul_misalignment`
-states that the transplanted state's excess is at most `2√2 δ s`, which is what testing the true
-ground state in the approximate problem gives, and its proof is a `sorry`. That is deliberate.
-The alternative — carrying the bound as a hypothesis of the theorem that needs it — would make
-this file's headline a conditional whose antecedent nothing in the corpus ever discharges, which
-is the shape `proofs/validation/empirical/invariants/hypothetical.py` exists to detect. A visible
-`sorry`
-is an honest gap; an invisible hypothesis is a laundered import.
+**The perturbation upper bound is proved here.**
+`excess_le_perturbation_mul_misalignment` decomposes the transplanted state into its ground and
+excited parts. Polarization turns the quadratic-form bound into the required cross-term bound,
+and Cauchy--Schwarz supplies the sharp factor `√2`.
 
 `excess_le_of_two_bounds` is the elimination step between the two, and it is pure real
 arithmetic: it is named for what it does rather than for the conclusion it contributes to.
@@ -52,9 +48,10 @@ arithmetic: it is named for what it does rather than for the conclusion it contr
 The degenerate branch is not a technicality. `crossing_loss_linear` is a witness at `γ = 0`: two
 designs whose true values differ by `δ`, and an approximate model within `δ` of the truth
 everywhere that ranks them the other way. The transplanted optimizer lands on the wrong branch and
-pays the full `δ`. Near-ties between candidate designs are common — two variant panels with almost
-equal source performance, two shrinkage levels, two ancestry-weighting schemes — and there the
-usual argument that stationarity at the optimum makes small model error cost second order fails.
+pays the full `δ`. Near-ties between candidate designs are common — two variant panels with
+almost equal source performance, two shrinkage levels, two ancestry-weighting schemes — and there
+the usual argument that stationarity at the optimum makes small model error cost second order
+fails.
 
 Operationally this asks for one number. `γ` is the margin between the best and second-best design
 in the fitted objective, and with an error budget `δ` it converts into a deployment-loss bound
@@ -63,9 +60,9 @@ frontier kink is a vanishing gap, and a phase transition in the horizon optimize
 gap. Degeneracy of the extremal, vanishing frontier curvature, and loss of second-order
 transplantation stability are one locus.
 
-Empirical status: the gap bound and the elimination step are PROVED; the perturbation bound is an
-OPEN GAP carried as a `sorry`; that a fitted design meets a particular `δ` is an empirical input,
-and `γ` is the quantity this asks studies to report.
+Empirical status: the gap bound, perturbation bound, and elimination step are PROVED. That a
+fitted design meets a particular `δ` is an empirical input, and `γ` is the quantity this asks
+studies to report.
 -/
 
 /-! ## The spectral setup
@@ -112,13 +109,12 @@ theorem excess_ge_gap_mul_misalignment {n : ℕ} (μ c : Fin (n + 1) → ℝ) (�
   rw [hc0]
   nlinarith [hsum]
 
-/-! ## The perturbation upper bound: the open gap
+/-! ## The perturbation upper bound
 
 The transplanted design is the ground state of the *approximate* operator, and that is what makes
-the bound true. Dropping that condition and keeping only the spectral data would give a statement
-that is false at `δ = 0` — it would force every state to sit at the ground energy — and a `sorry`
-on a false statement is not an honest gap, it is an inconsistency. So the perturbation enters as
-an actual symmetric operator and the state enters as its minimiser. -/
+the bound true. Dropping that condition and keeping only the spectral data would be false at
+`δ = 0`, because it would force every state to sit at the ground energy. The perturbation therefore
+enters as an actual symmetric operator and the state enters as its minimizer. -/
 
 /-- Energy of a state under the approximate operator: the true spectral energy plus the
 perturbation's quadratic form. -/
@@ -129,8 +125,8 @@ noncomputable def perturbedEnergy {n : ℕ} (μ : Fin (n + 1) → ℝ)
 /-- **The ground-state comparison bound, proved.**
 
     Testing the true ground direction `e₀` in the approximate problem gives
-    `spectralEnergy μ c - μ 0 ≤ ⟨e₀, Ee₀⟩ - ⟨c, Ec⟩`, and each quadratic form is bounded by
-    `δ` on unit states, so the excess is at most `2δ`.
+    `spectralEnergy μ c - μ 0 ≤ ⟨e₀, Ee₀⟩ - ⟨c, Ec⟩`, and each quadratic form is
+    bounded by `δ` on unit states, so the excess is at most `2δ`.
 
     This needs neither the symmetry of `E` nor the spectral gap: it is the half of the
     perturbation bound that follows from minimality alone. The sharp form below replaces the
@@ -187,7 +183,7 @@ theorem quadForm_le_mul_sumSq {n : ℕ} (E : Matrix (Fin (n + 1)) (Fin (n + 1)) 
       exact pow_eq_zero_iff (n := 2) (by norm_num) |>.mp this
     have : w = fun _ ↦ (0 : ℝ) := funext hw
     subst this
-    simp [← ht, ← hzero]
+    simp [← hzero]
   · have hsqrt : 0 < Real.sqrt t := Real.sqrt_pos.mpr hpos
     set v : Fin (n + 1) → ℝ := fun i ↦ (Real.sqrt t)⁻¹ * w i with hv
     have hvunit : ∑ i, v i ^ 2 = 1 := by
@@ -315,8 +311,8 @@ theorem sqrt_add_abs_le_sqrt_two {α s : ℝ} (hs : 0 ≤ s) (h : α ^ 2 + s = 1
 
     At `misalignmentSq c ≥ 1/2` the sharp right-hand side `2√2 δ √s` is already at least
     `2δ`, so the ground-state comparison above proves it with nothing further. The genuinely
-    open case is a minimiser CLOSE to the ground direction, where `√s` is small and the
-    constant has to be earned from the bilinear bound rather than from minimality. -/
+    remaining case is a minimizer close to the ground direction, where `√s` is small and the
+    constant is earned from the bilinear bound rather than from minimality. -/
 theorem excess_le_perturbation_mul_misalignment_of_half_le {n : ℕ}
     (μ c : Fin (n + 1) → ℝ) (E : Matrix (Fin (n + 1)) (Fin (n + 1)) ℝ) (δ : ℝ)
     (hδ : 0 ≤ δ)
@@ -344,22 +340,19 @@ theorem excess_le_perturbation_mul_misalignment_of_half_le {n : ℕ}
   rw [hval] at hstep
   linarith
 
-/-- **The perturbation upper bound, not proved here.**
+/-- **The perturbation upper bound.**
 
     `c` minimises the approximate energy; `E` is symmetric with quadratic form bounded by `δ` on
     unit states; `μ 0` is the true ground energy. Testing the true ground direction in the
-    approximate problem gives `q ≤ E₀₀ - ⟨c, Ec⟩`, and symmetry turns that difference into
-    `⟨e₀ + c, E(e₀ - c)⟩`, bounded by `2δ‖e₀ - c‖ ≤ 2√2 δ s`.
-
-    The proof is a `sorry`. It is stated as a theorem with a visible gap rather than carried as a
-    hypothesis of `transplant_excess_le`, because a hypothesis nothing discharges is an import
-    wearing the costume of a conditional. -/
+    approximate problem gives a comparison with the true ground direction. Decomposing `c` into
+    its ground coefficient and excited component reduces the perturbation difference to two
+    quadratic terms and one cross term. Homogeneity and polarization bound those terms, while
+    `sqrt_add_abs_le_sqrt_two` gives the sharp constant. -/
 theorem excess_le_perturbation_mul_misalignment {n : ℕ}
     (μ c : Fin (n + 1) → ℝ) (E : Matrix (Fin (n + 1)) (Fin (n + 1)) ℝ) (δ : ℝ)
     (hδ : 0 ≤ δ) (hEsymm : E.IsSymm)
     (hEbound : ∀ v : Fin (n + 1) → ℝ, (∑ i, v i ^ 2) = 1 → |v ⬝ᵥ (E *ᵥ v)| ≤ δ)
     (hunit : ∑ i, c i ^ 2 = 1)
-    (hground : ∀ i, μ 0 ≤ μ i)
     (hmin : ∀ v : Fin (n + 1) → ℝ, (∑ i, v i ^ 2) = 1 →
       perturbedEnergy μ E c ≤ perturbedEnergy μ E v) :
     spectralEnergy μ c - μ 0 ≤ 2 * Real.sqrt 2 * δ * Real.sqrt (misalignmentSq c) := by
@@ -393,7 +386,8 @@ theorem excess_le_perturbation_mul_misalignment {n : ℕ}
   rw [heenergy] at hcomp
   -- expand the perturbation quadratic form along the decomposition
   have hexp : c ⬝ᵥ (E *ᵥ c)
-      = c 0 ^ 2 * (e ⬝ᵥ (E *ᵥ e)) + 2 * (c 0 * (e ⬝ᵥ (E *ᵥ w))) + w ⬝ᵥ (E *ᵥ w) := by
+      = c 0 ^ 2 * (e ⬝ᵥ (E *ᵥ e)) +
+        2 * (c 0 * (e ⬝ᵥ (E *ᵥ w))) + w ⬝ᵥ (E *ᵥ w) := by
     conv_lhs => rw [hdecomp]
     rw [quadForm_add hEsymm (fun i ↦ c 0 * e i) w, quadForm_smul E (c 0) e,
       bilinear_smul_left E (c 0) e w]
@@ -452,8 +446,9 @@ theorem excess_le_perturbation_mul_misalignment {n : ℕ}
 
 /-! ## The elimination step -/
 
-/-- Pure arithmetic: from a lower bound `γ s² ≤ q` and an upper bound `q ≤ 2√2 δ s`, eliminating
-`s` gives `q ≤ 8δ²/γ`. Named for the elimination it performs, not for the conclusion it serves. -/
+/-- Pure arithmetic: from a lower bound `γ s² ≤ q` and an upper bound `q ≤ 2√2 δ s`,
+eliminating `s` gives `q ≤ 8δ²/γ`. Named for the elimination it performs, not for the conclusion
+it serves. -/
 theorem excess_le_of_two_bounds (γ δ s q : ℝ) (hγ : 0 < γ) (hs : 0 ≤ s)
     (hlow : γ * s ^ 2 ≤ q) (hhigh : q ≤ 2 * Real.sqrt 2 * δ * s) :
     q ≤ 8 * δ ^ 2 / γ := by
@@ -481,9 +476,7 @@ theorem excess_le_of_two_bounds (γ δ s q : ℝ) (hγ : 0 < γ) (hs : 0 ≤ s)
     rw [le_div_iff₀ hγ]
     linarith [h1, h2, h3, hre]
 
-/-- **The transplantation bound**, assembled from the proved gap bound and the `sorry`-carrying
-    perturbation bound. No hypothesis of this theorem is an imported claim: the two inequalities
-    that carry the argument are theorems above, one proved and one openly unproved. -/
+/-- **The transplantation bound**, assembled from the gap and perturbation bounds proved above. -/
 theorem transplant_excess_le {n : ℕ} (μ c : Fin (n + 1) → ℝ)
     (E : Matrix (Fin (n + 1)) (Fin (n + 1)) ℝ) (γ δ : ℝ)
     (hγ : 0 < γ) (hδ : 0 ≤ δ) (hEsymm : E.IsSymm)
@@ -495,17 +488,11 @@ theorem transplant_excess_le {n : ℕ} (μ c : Fin (n + 1) → ℝ)
     spectralEnergy μ c - μ 0 ≤ 8 * δ ^ 2 / γ := by
   have hmis : 0 ≤ misalignmentSq c :=
     Finset.sum_nonneg fun i _ ↦ sq_nonneg (c i)
-  have hground : ∀ i, μ 0 ≤ μ i := by
-    intro i
-    by_cases h : i = 0
-    · exact le_of_eq (by rw [h])
-    · have := hgap i (Finset.mem_erase.mpr ⟨h, Finset.mem_univ i⟩)
-      linarith
   have hlow : γ * Real.sqrt (misalignmentSq c) ^ 2 ≤ spectralEnergy μ c - μ 0 := by
     rw [Real.sq_sqrt hmis]
     exact excess_ge_gap_mul_misalignment μ c γ hunit hgap
-  have hhigh := excess_le_perturbation_mul_misalignment μ c E δ hδ hEsymm hEbound hunit
-    hground hmin
+  have hhigh :=
+    excess_le_perturbation_mul_misalignment μ c E δ hδ hEsymm hEbound hunit hmin
   exact excess_le_of_two_bounds γ δ (Real.sqrt (misalignmentSq c))
     (spectralEnergy μ c - μ 0) hγ (Real.sqrt_nonneg _) hlow hhigh
 

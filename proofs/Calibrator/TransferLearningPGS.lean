@@ -148,7 +148,8 @@ noncomputable def additiveHeritability {m : ℕ} (β : Fin m → ℝ) (var_y : �
     standardized diagonal-LD model.
 
     Empirical status: UNTESTED. -/
-noncomputable def sourceSelfR2DiagonalLD {m : ℕ} (β_source : Fin m → ℝ) (var_y : ℝ) : ℝ :=
+noncomputable def sourceSelfR2DiagonalLD {m : ℕ}
+    (β_source : Fin m → ℝ) (var_y : ℝ) : ℝ :=
   sourceTruthR2SharedLD β_source standardizedDiagonalLD var_y
 
 /-- Target-population transported `R²` of the source-weighted score in the
@@ -2617,7 +2618,8 @@ theorem coefficientGapSq_le_of_targetLinearExcessRisk_le
     (w wStar : Fin p → ℝ)
     (h_opt : (1 : Matrix (Fin p) (Fin p) ℝ).mulVec wStar = crossTarget)
     (h_excess :
-      targetLinearExcessRisk (1 : Matrix (Fin p) (Fin p) ℝ) crossTarget noiseVar w wStar ≤ errCap) :
+      targetLinearExcessRisk (1 : Matrix (Fin p) (Fin p) ℝ)
+        crossTarget noiseVar w wStar ≤ errCap) :
     coefficientGapSq w wStar ≤ errCap := by
   rw [← isotropic_targetLinearExcessRisk_eq_coefficientGapSq
     crossTarget noiseVar w wStar h_opt]
@@ -3046,13 +3048,11 @@ open Matrix
     `margin` the gap between the selected panel and the runner-up. The excess loss is quadratic
     in the model error with constant `8/margin`.
 
-    Note what this inherits: `transplant_excess_le` rests on
-    `excess_le_perturbation_mul_misalignment`, whose proof is an open `sorry`. The gap half of
-    the argument is proved; the perturbation half is not, and that gap is visible here rather
-    than hidden in a hypothesis.
+    The spectral gap bound and the perturbation estimate used by `transplant_excess_le` are both
+    proved in `Calibrator.TransplantationStability`.
 
-    Empirical status: DERIVED from one proved and one unproved input; `margin` is a quantity a
-    fit already produces and this result asks to be reported. -/
+    Empirical status: DERIVED; `margin` is a quantity a fit already produces and this result asks
+    to be reported. -/
 theorem ldModelError_to_deploymentLoss {n : ℕ}
     (spectrum weights : Fin (n + 1) → ℝ)
     (E : Matrix (Fin (n + 1)) (Fin (n + 1)) ℝ) (margin modelError : ℝ)
