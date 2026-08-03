@@ -262,12 +262,11 @@ theorem directional_selection_shifts_pgs
 /-!
 ### The effect-correlation family
 
-The three correlations below were previously written inline in theorem
-statements, with a docstring that described the stabilizing model as
-`ρ = 1 - drift/(drift + selection)` while the code computed `1 - d/(1 + s·N)`.
-Those are different expressions — the first is `1 - 1/(1 + s·N)` once
-`selection = d·s·N`, which is not the second — so the model that was stated and
-the model that was proved about did not agree. The definitions below are the
+**Do not write these correlations inline in theorem statements, and do not describe the
+stabilizing model as `ρ = 1 - drift/(drift + selection)`.** That expression is
+`1 - 1/(1 + s·N)` once `selection = d·s·N`, which is NOT the `1 - d/(1 + s·N)` computed
+here; stating one and proving about the other is what named definitions prevent. The
+definitions below are the
 ones the theorems use, and the docstrings now describe them.
 
 The fluctuating correlation is additionally clamped at `-1`. Unclamped,
@@ -298,8 +297,8 @@ noncomputable def effectCorrelationFluctuating (d f N : ℝ) : ℝ :=
   max (-1) (1 - d * (1 + f * N))
 
 /-- Both selected correlations are in `[-1, 1]` by construction, for any
-decorrelation `0 ≤ d ≤ 1` and nonnegative scaled selection. This is the bound
-that was previously supplied as a hypothesis. -/
+decorrelation `0 ≤ d ≤ 1` and nonnegative scaled selection. **Do not supply this bound as
+a hypothesis**; it is a theorem, and assuming it would let a model set it inconsistently. -/
 theorem effectCorrelation_mem_range
     (d s f N : ℝ)
     (h_d_nonneg : 0 ≤ d) (h_d_le : d ≤ 1)
