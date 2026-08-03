@@ -201,24 +201,17 @@ it affects heritability and PGS performance.
 
 section EnvironmentalVariance
 
-/-- **Environmental variance reduces heritability.**
-    h² = V_A / (V_A + V_E). More environmental variance → lower h². -/
+/-- **Environmental variance reduces heritability, and with it the attainable `R²`.**
+
+    `h² = V_A / (V_A + V_E)`, so more environmental variance lowers it. The same inequality is
+    the ceiling statement: a score that captured every genetic effect would attain `R² = h²`, so
+    raising `V_E` lowers the ceiling by exactly this much. One inequality, two readings — stated
+    once. -/
 theorem env_variance_reduces_h2
     (V_A V_E₁ V_E₂ : ℝ)
     (h_VA : 0 < V_A) (h_VE₁ : 0 < V_E₁)
     (h_more_env : V_E₁ < V_E₂) :
     V_A / (V_A + V_E₂) < V_A / (V_A + V_E₁) := by
-  exact div_lt_div_of_pos_left h_VA (by linarith) (by linarith)
-
-/-- **PGS R² ceiling is lower in high-variance environments.**
-    Even if the PGS perfectly captures all genetic effects,
-    R²_max = h² = V_A / (V_A + V_E). When V_E is higher,
-    the denominator is larger, so h² is lower. -/
-theorem pgs_ceiling_lower_in_high_env_variance
-    (V_A V_E_low V_E_high : ℝ)
-    (h_VA : 0 < V_A) (h_low : 0 < V_E_low)
-    (h_more_env : V_E_low < V_E_high) :
-    V_A / (V_A + V_E_high) < V_A / (V_A + V_E_low) := by
   exact div_lt_div_of_pos_left h_VA (by linarith) (by linarith)
 
 /-- **Heteroscedasticity across ancestry groups.**

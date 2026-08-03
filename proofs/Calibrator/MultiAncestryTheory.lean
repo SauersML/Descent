@@ -476,18 +476,6 @@ theorem diversity_reduces_max_gap
     drift_degrades_R2 V_A V_E fst_worst_multi fst_worst_single hVA hVE h_improvement h_single_bound
   linarith
 
-/-- **Even perfect diversity cannot eliminate environmental portability gaps.**
-    If environmental variance differs across populations, GWAS diversification
-    addresses genetic portability but not environmental portability. -/
-theorem diversity_doesnt_fix_environmental_gap
-    (Vg Ve_source Ve_target : ℝ)
-    (hVg : 0 < Vg)
-    (hVe_s : 0 < Ve_source)
-    (h_env_diff : Ve_source < Ve_target) :
-    -- Even with zero genetic Fst gap, R² still differs
-    Vg / (Vg + Ve_target) < Vg / (Vg + Ve_source) := by
-  exact div_lt_div_of_pos_left hVg (by linarith) (by linarith)
-
 end EquityImplications
 
 

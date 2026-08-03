@@ -311,8 +311,12 @@ end Question3
 
 section Question4
 
-/-- **R² decreases with environmental variance** even under identical genetics.
-    R² = Vg/(Vg + Ve), so larger Ve → smaller R². -/
+/-- **`Vg/(Vg + Ve)` decreases as `Ve` grows.**
+
+    Read as `R²` under identical genetics, or as heritability, or as the attainable ceiling:
+    they are one inequality. `Calibrator.GeneEnvironmentInterplay.env_variance_reduces_h2` is the
+    same statement, kept there because that file's discussion needs it locally; this is not an
+    independent result and should not be cited as one. -/
 theorem env_variance_lowers_r2
     (Vg Ve₁ Ve₂ : ℝ)
     (hVg : 0 < Vg) (hVe₁ : 0 < Ve₁) (_hVe₂ : 0 < Ve₂)
