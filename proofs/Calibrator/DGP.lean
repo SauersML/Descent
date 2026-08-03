@@ -296,6 +296,14 @@ noncomputable def ldWitnessSourceWeights : TagVec 2 :=
     Empirical status: UNTESTED. -/
 def ldWitnessTargetCross : TagVec 2 := ![1, 1]
 
+/-- **The witness scores the two SNPs with the causal effects themselves.**
+`CausalVec 2` and `TagVec 2` are both `Fin 2 → ℝ`, so the target cross-covariance vector
+and the source causal vector of this witness are literally the same vector; the two names
+record which side of the transport each is read on. Changing one effect size without the
+other stops this from compiling. -/
+theorem ldWitnessTargetCross_eq_ldWitnessBeta :
+    ldWitnessTargetCross = ldWitnessBeta := rfl
+
 /-- Target LD witness with independent scored SNPs.
 
     Empirical status: UNTESTED. -/
@@ -987,7 +995,7 @@ the mechanism, and neither LD, distance nor decay appears in the statement, whic
 hypothesis-weakening
 wrapper for `linear_noise_implies_nonlinear_slope` with the positivity side conditions
 discharged from nonnegativity.  The LD-decay statement that *is* proved is
-`Calibrator.ld_decay_implies_nonlinear_calibration_proved` in the corpus root, which supplies
+`Calibrator.ld_decay_implies_nonlinear_calibration_of_exp_tagging` in the corpus root, which supplies
 three explicit distances through an `LDDecayMechanism`. -/
 
 theorem optimalSlopeLinearNoise_not_affine_of_nonneg_errors
@@ -1147,7 +1155,7 @@ theorem normalization_no_bias_iff_constant_prevalence {k : ℕ} [Fintype (Fin k)
 
 These structures connect biological mechanisms to statistical DGPs and to the
 need for nonlinear calibration. The consequence for calibration is proved in
-`Calibrator.ld_decay_implies_nonlinear_calibration_proved`, which exhibits three
+`Calibrator.ld_decay_implies_nonlinear_calibration_of_exp_tagging`, which exhibits three
 explicit distances rather than assuming non-affineness as a hypothesis.
 
 **THIS CITATION IS LOAD-BEARING AND IT CROSSES A DIRECTORY BOUNDARY.** The consumer named
@@ -1167,7 +1175,7 @@ identifier: this paragraph named the consumer the whole time. -/
 /-- Exponential LD-decay mechanism: a distance proxy and a tagging efficiency.
 
 **DO NOT DELETE AS UNUSED.** Its consumer is
-`Calibrator.ld_decay_implies_nonlinear_calibration_proved`, which lives in
+`Calibrator.ld_decay_implies_nonlinear_calibration_of_exp_tagging`, which lives in
 `proofs/Calibrator.lean` — the corpus ROOT, one directory *above* `proofs/Calibrator/`.
 Two dead-code scans (`ec74a6a8`, `4815481c`) reported this and `decaySlope` as having no
 consumer, because the root file is outside the directory they walked. Deleting them did
@@ -1184,7 +1192,7 @@ structure LDDecayMechanism (k : ℕ) where
 /-- Tagging efficiency as a function of the genetic distance of `c`.
 
 **DO NOT DELETE AS UNUSED** — see the note on `LDDecayMechanism` above. This is the
-function that `ld_decay_implies_nonlinear_calibration_proved` shows is not affine. -/
+function that `ld_decay_implies_nonlinear_calibration_of_exp_tagging` shows is not affine. -/
 def decaySlope {k : ℕ} (mech : LDDecayMechanism k) (c : Fin k → ℝ) : ℝ :=
   mech.tagging_efficiency (mech.distance c)
 
@@ -1279,18 +1287,40 @@ noncomputable def signalOutcomeCovariance {k : ℕ} [Fintype (Fin k)]
 
 /-- **The statistical `R²` of a reading is the squared correlation of its three moments.**
 
-This is what makes the reading useful: once the obligations are discharged, `rsquared` -
-an integral expression - is a rational function of three reals, and every algebraic
-identity about those reals becomes a statement about the process. -/
+This is what makes the reading useful: `rsquared` — an integral expression — is a rational
+function of three reals, and every algebraic identity about those reals becomes a
+statement about the process.
+
+**The two nondegeneracy premises are gone, and nothing was weakened to remove them.**
+They used to read `signalVariance ≠ 0` and `outcomeMeanVariance ≠ 0`, and they were
+supplied by the caller as facts about quantities this file defines. They were never
+needed: `rsquared` returns `0` by its own guard exactly when one of those variances
+vanishes, and in that same case the right-hand side has a zero factor in its denominator,
+so it is `0` too — division by zero in Lean is `0`, and here that convention makes the two
+sides agree rather than papering over a gap. The identity is therefore unconditional, and
+the degenerate case is not an exception to it but an instance of it. -/
 theorem rsquared_eq_process_moments {k : ℕ} [Fintype (Fin k)]
-    (dgp : DataGeneratingProcess k) (signal : Predictor k)
-    (hs : signalVariance dgp signal ≠ 0) (ho : outcomeMeanVariance dgp ≠ 0) :
+    (dgp : DataGeneratingProcess k) (signal : Predictor k) :
     rsquared dgp signal dgp.trueExpectation =
       signalOutcomeCovariance dgp signal ^ 2 /
         (signalVariance dgp signal * outcomeMeanVariance dgp) := by
-  unfold rsquared
-  rw [if_neg (by exact fun h ↦ h.elim hs ho)]
-  rfl
+  by_cases h : signalVariance dgp signal = 0 ∨ outcomeMeanVariance dgp = 0
+  · have hzero : signalVariance dgp signal * outcomeMeanVariance dgp = 0 := by
+      rcases h with h | h
+      · rw [h, zero_mul]
+      · rw [h, mul_zero]
+    unfold rsquared
+    change
+      (if signalVariance dgp signal = 0 ∨ outcomeMeanVariance dgp = 0 then 0
+        else signalOutcomeCovariance dgp signal ^ 2 /
+          (signalVariance dgp signal * outcomeMeanVariance dgp)) = _
+    rw [if_pos h, hzero, div_zero]
+  · unfold rsquared
+    change
+      (if signalVariance dgp signal = 0 ∨ outcomeMeanVariance dgp = 0 then 0
+        else signalOutcomeCovariance dgp signal ^ 2 /
+          (signalVariance dgp signal * outcomeMeanVariance dgp)) = _
+    rw [if_neg h]
 
 end MomentReadings
 
@@ -2446,14 +2476,7 @@ theorem r2FromSignalVariance_eq_rsquared {k : ℕ} [Fintype (Fin k)]
     (h_split : outcomeMeanVariance dgp = V_signal + V_E)
     (h_signal_pos : 0 < V_signal) (h_outcome_pos : 0 < V_signal + V_E) :
     r2FromSignalVariance V_signal V_E = rsquared dgp signal dgp.trueExpectation := by
-  have hs_process : signalVariance dgp signal ≠ 0 := by
-    rw [h_signal]
-    exact ne_of_gt h_signal_pos
-  have ho_process : outcomeMeanVariance dgp ≠ 0 := by
-    rw [h_split]
-    exact ne_of_gt h_outcome_pos
-  rw [rsquared_eq_process_moments dgp signal
-    hs_process ho_process,
+  rw [rsquared_eq_process_moments dgp signal,
     h_signal, h_additive, h_split]
   unfold r2FromSignalVariance
   have hs : V_signal ≠ 0 := ne_of_gt h_signal_pos
@@ -2462,7 +2485,7 @@ theorem r2FromSignalVariance_eq_rsquared {k : ℕ} [Fintype (Fin k)]
 
 
 /-- **AUC of the equal-variance Gaussian model**, from signal and residual
-    variances: `Φ(√(vSignal / (2 · vNoise)))`.
+    variances.
 
     **Not the liability-threshold AUC.** The docstring here used to call it
     that. The liability-threshold AUC depends on prevalence, which this
@@ -2472,27 +2495,21 @@ theorem r2FromSignalVariance_eq_rsquared {k : ℕ} [Fintype (Fin k)]
     copies of one formula had drifted to opposite claims about which quantity
     it is; that is why they are one definition now.
 
-    **Boundary defect, measured.** Perfect prediction, `vNoise = 0`, is
-    attainable in this signature, and division being total there sends the
-    argument to `0` rather than to `+∞`. So the body returns `Φ(0) = 1/2`,
-    chance discrimination, where the limit as `vNoise → 0⁺` is `1`, perfect
-    discrimination. The returned value sits at the opposite end of the AUC
-    range from the limit -- the full width of `[1/2, 1]`.
+    For positive residual variance this is `Φ(√(vSignal / (2 · vNoise)))`.
+    At `vNoise = 0`, positive signal is perfect prediction and therefore has
+    AUC `1`; the zero-signal degenerate case is assigned `Φ 0`. This explicit
+    boundary prevents total real division from silently mapping a perfect
+    predictor to chance discrimination.
 
-    The defect is upstream of `Phi` and is not an artefact of any numeric
-    stand-in for it: the argument itself jumps from divergent to zero, so every
-    monotone increasing map of it is wrong in the same direction. Checked by
-    substituting the logistic, a shifted `tanh` and `z/(1+z)` for `Phi`; all
-    four return `1/2` at the boundary against `≈ 1` just inside it.
-
-    Empirical status: VALIDATED for the equal-variance Gaussian model, away
-    from `vNoise = 0`. Measured against Monte-Carlo of the underlying
+    Empirical status: VALIDATED for the equal-variance Gaussian model at
+    positive residual variance. Measured against Monte-Carlo of the underlying
     two-Gaussian model, 200000 draws per point: predicted against simulated
     `0.760250/0.760040`, `0.921350/0.921505`, `0.999797/0.999820`,
     `1.000000/1.000000` at `vNoise = 1, 0.25, 0.04, 0.01` with `vSignal = 1`;
     largest absolute difference `2.1e-4`. Power: the prediction spans `0.760`
     to `1.000` across that design, so a wrong functional form of this shape
-    would separate. At the boundary itself it is FALSIFIED, as above.
+    would separate. The zero-noise boundary is fixed analytically by the
+    perfect-discrimination value.
 
     Correct as it stands: this is a genuine two-Gaussian model and the
     validation above is against that model, not against a dichotomised trait.
@@ -2500,7 +2517,29 @@ theorem r2FromSignalVariance_eq_rsquared {k : ℕ} [Fintype (Fin k)]
     `PortabilityDrift.liabilityThresholdAUCFromExplainedR2`, which takes a
     prevalence; do not substitute this one for it. -/
 noncomputable def equalVarianceGaussianAUCFromSignalVariance (vSignal vNoise : ℝ) : ℝ :=
-  Phi (Real.sqrt (vSignal / (2 * vNoise)))
+  if vNoise = 0 then if 0 < vSignal then 1 else Phi 0
+  else Phi (Real.sqrt (vSignal / (2 * vNoise)))
+
+/-- Away from zero residual variance, the AUC chart is its Gaussian closed form. -/
+theorem equalVarianceGaussianAUCFromSignalVariance_eq_formula_of_ne_noise
+    (vSignal vNoise : ℝ) (h_noise : vNoise ≠ 0) :
+    equalVarianceGaussianAUCFromSignalVariance vSignal vNoise =
+      Phi (Real.sqrt (vSignal / (2 * vNoise))) := by
+  simp [equalVarianceGaussianAUCFromSignalVariance, h_noise]
+
+/-- Positive signal with no residual noise gives perfect discrimination. -/
+@[simp] theorem equalVarianceGaussianAUCFromSignalVariance_zero_noise_of_pos
+    (vSignal : ℝ) (h_signal : 0 < vSignal) :
+    equalVarianceGaussianAUCFromSignalVariance vSignal 0 = 1 := by
+  simp [equalVarianceGaussianAUCFromSignalVariance, h_signal]
+
+/-- With no signal, the equal-variance chart gives chance discrimination. -/
+@[simp] theorem equalVarianceGaussianAUCFromSignalVariance_zero_signal
+    (vNoise : ℝ) :
+    equalVarianceGaussianAUCFromSignalVariance 0 vNoise = Phi 0 := by
+  by_cases h_noise : vNoise = 0
+  · simp [equalVarianceGaussianAUCFromSignalVariance, h_noise]
+  · simp [equalVarianceGaussianAUCFromSignalVariance, h_noise]
 
 /-! AUC is not determined by second moments.  Consequently this module exposes the
 equal-variance Gaussian chart as a numerical function only; it does not offer a theorem
