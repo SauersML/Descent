@@ -1438,6 +1438,80 @@ theorem liability_selfSimilar_of_invariance (ν : Measure ℝ) [IsFiniteMeasure 
   rw [hmap]
   exact (ENNReal.toReal_eq_toReal (measure_ne_top _ _) (measure_ne_top _ _)).1 hcdf
 
+open MeasureTheory ProbabilityTheory in
+/-- Blurring multiplies the characteristic function by the Gaussian factor `e^{-s²t²/2}`.
+
+Fubini in the form `integral_prod_mul`: the exponential of a sum factors, and the two
+coordinates are independent under the product measure. -/
+theorem charFun_convolvedLiability (ν : Measure ℝ) [IsFiniteMeasure ν] (s t : ℝ) :
+    charFun (convolvedLiability ν s) t
+      = Complex.exp (-(((s * t) ^ 2 : ℝ) : ℂ) / 2) * charFun ν t := by
+  rw [convolvedLiability, charFun_apply_real, integral_map (by fun_prop) (by fun_prop)]
+  have key : ∀ q : ℝ × ℝ,
+      Complex.exp ((t : ℂ) * ((q.2 - s * q.1 : ℝ) : ℂ) * Complex.I)
+        = Complex.exp (((-(s * t) : ℝ) : ℂ) * (q.1 : ℂ) * Complex.I)
+          * Complex.exp ((t : ℂ) * (q.2 : ℂ) * Complex.I) := by
+    intro q
+    rw [← Complex.exp_add]
+    push_cast
+    ring_nf
+  simp_rw [key]
+  rw [integral_prod_mul (fun z : ℝ ↦ Complex.exp (((-(s * t) : ℝ) : ℂ) * (z : ℂ) * Complex.I))
+      (fun y : ℝ ↦ Complex.exp ((t : ℂ) * (y : ℂ) * Complex.I)),
+    ← charFun_apply_real, ← charFun_apply_real, charFun_gaussianReal]
+  push_cast
+  ring_nf
+
+open MeasureTheory ProbabilityTheory in
+/-- An affine change of variable rescales the argument of the characteristic function and
+multiplies it by a unit-modulus phase. -/
+theorem charFun_map_affine (ν : Measure ℝ) (α β t : ℝ) :
+    charFun (ν.map fun y ↦ (y - β) / α) t
+      = charFun ν (t / α) * Complex.exp (((-(β * t / α) : ℝ) : ℂ) * Complex.I) := by
+  rw [charFun_apply_real, integral_map (by fun_prop) (by fun_prop)]
+  have key : ∀ y : ℝ,
+      Complex.exp ((t : ℂ) * (((y - β) / α : ℝ) : ℂ) * Complex.I)
+        = Complex.exp (((t / α : ℝ) : ℂ) * (y : ℂ) * Complex.I)
+          * Complex.exp (((-(β * t / α) : ℝ) : ℂ) * Complex.I) := by
+    intro y
+    rw [← Complex.exp_add]
+    congr 1
+    push_cast
+    field_simp
+    ring
+  simp_rw [key]
+  rw [integral_mul_const, ← charFun_apply_real]
+
+open MeasureTheory ProbabilityTheory in
+/-- **The classification, reduced to one equation on one function.**
+
+Everything above collapses into this.  Write `φ` for the characteristic function of the
+liability distribution `ν`.  If the link's averaging family is closed at scale `s` with
+parameters `(α, β)`, then
+
+`e^{-s²t²/2} · φ(t) = φ(t/α) · e^{-iβt/α}`  for every `t`.
+
+This holds for every scale `s`, with `α` and `β` depending on `s`, and it is the whole
+content of the invariance hypothesis of `link_rigidity`: no measure, no monotone function
+and no Gaussian integral is left in it.
+
+`φ(t) = e^{iμt - σ²t²/2}` solves it with `α = 1/√(1 + s²/σ²)`, and the classical fact is
+that nothing else does: taking moduli kills the phase and gives
+`|φ(t)| e^{-s²t²/2} = |φ(t/α)|`, which forces `log |φ|` to be quadratic.
+
+Formalising that last implication — a Cauchy-type functional equation with regularity — is
+the remaining gap in `link_rigidity`, and it is now a statement about a single continuous
+function `ℝ → ℂ` rather than about links, measures or Gaussian integrals. -/
+theorem charFun_selfSimilar_of_invariance (ν : Measure ℝ) [IsFiniteMeasure ν]
+    (L : ℝ → ℝ) (p : ℝ) (hrep : ∀ u, L u = p + (ν (Set.Iic u)).toReal)
+    {s α β : ℝ} (hα : 0 < α)
+    (hinv : ∀ x, ∫ z, L (x + s * z) ∂(gaussianReal 0 1) = L (α * x + β)) (t : ℝ) :
+    Complex.exp (-(((s * t) ^ 2 : ℝ) : ℂ) / 2) * charFun ν t
+      = charFun ν (t / α) * Complex.exp (((-(β * t / α) : ℝ) : ℂ) * Complex.I) := by
+  rw [← charFun_convolvedLiability ν s t,
+    liability_selfSimilar_of_invariance ν L p hrep hα hinv,
+    charFun_map_affine ν α β t]
+
 /-! ### Step one: the affine-probit parameters are identifiable
 
 `link_rigidity` asserts an affine-probit representation exists. Before that is worth proving it
