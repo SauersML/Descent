@@ -141,6 +141,24 @@ noncomputable def totalCovarianceMomentInformation
   m * covarianceMomentPermeability
     covarianceDerivative secondMoment fourthMoment
 
+/-- Effective target replicate count required to match a source experiment's total
+information when per-replicate permeability changes.  Counts are real-valued design
+quantities; an implemented study rounds upward. -/
+noncomputable def replicatesForEqualPermeability
+    (sourceReplicates sourcePermeability targetPermeability : ℝ) : ℝ :=
+  sourceReplicates * sourcePermeability / targetPermeability
+
+/-- **General cohort-allocation law.** Multiplying target permeability by the prescribed
+replicate count recovers exactly the source total information. -/
+theorem replicatesForEqualPermeability_spec
+    (sourceReplicates sourcePermeability targetPermeability : ℝ)
+    (htarget : targetPermeability ≠ 0) :
+    replicatesForEqualPermeability
+        sourceReplicates sourcePermeability targetPermeability *
+      targetPermeability = sourceReplicates * sourcePermeability := by
+  unfold replicatesForEqualPermeability
+  field_simp [htarget]
+
 /-- Total covariance-moment permeability of finitely many independent channels.  Each
 channel may have its own response and second/fourth moments.  Independence is the
 load-bearing premise: correlated quadratic summaries require their full noise covariance,

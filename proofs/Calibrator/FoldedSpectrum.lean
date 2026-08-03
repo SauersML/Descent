@@ -723,6 +723,42 @@ theorem onePercentMaf_halfResponse_vs_balanced_permeability
   norm_num [invHeterozygosity]
   ring
 
+/-- Total covariance-moment information from `m` independent observations of one
+standardized Hardy--Weinberg locus. -/
+noncomputable def totalDiploidCovarianceMomentInformation
+    (m q covarianceDerivative : ℝ) : ℝ :=
+  m * diploidCovarianceMomentPermeability q covarianceDerivative
+
+/-- **Exact rare/tagged cohort multiplier.** For a nonzero covariance response, matching
+the information of `m` balanced, perfectly observed standardized genotypes with a
+one-percent-MAF, half-response channel requires exactly `(19604/99)·m` observations. -/
+theorem onePercentMaf_halfResponse_required_replicates
+    (m covarianceDerivative : ℝ) (hderivative : covarianceDerivative ≠ 0) :
+    replicatesForEqualPermeability m
+        (diploidCovarianceMomentPermeability (1 / 2) covarianceDerivative)
+        (diploidCovarianceMomentPermeability
+          (1 / 100) ((1 / 2) * covarianceDerivative)) =
+      (19604 / 99 : ℝ) * m := by
+  unfold replicatesForEqualPermeability
+  rw [diploidCovarianceMomentPermeability_eq
+      (1 / 2) covarianceDerivative (by norm_num) (by norm_num),
+    diploidCovarianceMomentPermeability_eq
+      (1 / 100) ((1 / 2) * covarianceDerivative) (by norm_num) (by norm_num)]
+  norm_num [invHeterozygosity]
+  field_simp [hderivative]
+  ring
+
+/-- The cohort multiplier attains its design target exactly: the enlarged rare/tagged
+experiment and the balanced source experiment have identical total moment information. -/
+theorem onePercentMaf_halfResponse_equal_total_information
+    (m covarianceDerivative : ℝ) :
+    totalDiploidCovarianceMomentInformation
+        ((19604 / 99 : ℝ) * m) (1 / 100) ((1 / 2) * covarianceDerivative) =
+      totalDiploidCovarianceMomentInformation m (1 / 2) covarianceDerivative := by
+  unfold totalDiploidCovarianceMomentInformation
+  rw [onePercentMaf_halfResponse_vs_balanced_permeability]
+  ring
+
 /-- **Level one, what escapes: the dispersion.**
 
 Two panels can agree exactly in mean inverse heterozygosity and differ in its variance
@@ -1958,7 +1994,10 @@ separates quotient fibres remains the continuation. -/
   genotype, a one-percent-MAF half-response channel retains exactly `99/19604` of the
   information, requiring `19604/99 ≈ 198.02` times the observations.  This stronger
   comparison is to a balanced **genotype moment experiment**, not to Gaussian data and
-  not to raw-dosage regression.  Genotype LD invalidates the diagonal sum and requires the
+  not to raw-dosage regression.  `onePercentMaf_halfResponse_required_replicates` derives
+  that cohort multiplier from the general `replicatesForEqualPermeability` design law,
+  and `onePercentMaf_halfResponse_equal_total_information` proves that it exactly matches
+  total information.  Genotype LD invalidates the diagonal sum and requires the
   covariance matrix of the quadratic summaries.  The unified replacement is
   `covarianceMomentPermeabilityWithPrecision = ΓᵀΩ⁻¹Γ`:
   `diploidPanelCovarianceMomentPermeability_eq_diagonal_precision` proves the independent
