@@ -1732,7 +1732,10 @@ when estimator noise separates quotient fibres is the continuation, not a theore
   naming the formula. `totalGaussianInformation_mul_estimatorVariance` proves the exact
   known-mean covariance-estimator identity `m·p·Var = 1`. Consequently this experiment's
   variance is `1/(m p)`, not `1/(2m p)`; an additional half in an aggregate risk law would
-  require an explicitly half-scaled loss. Outside Gaussianity,
+  require an explicitly half-scaled loss.
+  `gaussianCovarianceHalfSquaredRisk_eq` now proves that convention separately and yields
+  exactly `1/(2mp)`, matching the permeability simulator's unit-Hessian loss
+  `½‖error‖²`. Outside Gaussianity,
   `covarianceScoreInformation_kurtosis` gives the fourth-moment correction and labels it a
   quasi-score variance rather than silently calling it likelihood information.
   `diploid_covariance_estimator_variance_eq_gaussian_factor` specializes the corresponding

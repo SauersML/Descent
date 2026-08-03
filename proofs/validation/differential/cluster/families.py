@@ -1303,20 +1303,30 @@ FAMILIES = [
         "model": "Gaussian estimator-covariance channels, support-floor sealing, and "
                  "finite-dimensional lag completion",
         "simulator": "cluster/fam_permeability.py",
-        "status": "IMPLEMENTED, NOT YET RUN. The formal core proves the scalar Gaussian "
-                  "permeability constant, coding-scale invariance, independent-channel "
-                  "additivity, and a completion-count lower bound. The simulator tests "
-                  "the matrix constant, an explicit quadratic sealing family, additive "
-                  "risk in a flat experiment, and a finite MA lag-completion example. "
-                  "It does not promote these examples to an Edgeworth, monodromy, or "
-                  "universal minimax theorem.",
+        "status": "FULL PROFILE PASSED ON ACN116 (2026-08-02). In the anisotropic "
+                  "two-dimensional covariance experiment, measured/predicted RMSE "
+                  "ratios ranged 0.984-1.035 after the CLT controls passed. The sealing "
+                  "information converged to the eta-squared law and measured information "
+                  "ratios ranged 0.850-1.048. The factorial closing-law fit recovered "
+                  "the half-scaled quadratic-risk coefficients and excluded a detectable "
+                  "source-by-ensemble cross term; its injected cross-term control fired. "
+                  "The lag-completion negative and positive arms both passed. The formal "
+                  "core now derives the Gaussian constant from moments, distinguishes "
+                  "ordinary squared error 1/(mp) from half-scaled risk 1/(2mp), proves "
+                  "the full whitened Hilbert-Schmidt matrix law and its diagonal face, "
+                  "and supplies the nonsingular lag-completion criterion. These named "
+                  "experiments do not imply an Edgeworth, monodromy, or universal "
+                  "minimax theorem.",
         "found_by": "manual",
         "spec": "Measure constants rather than slopes alone. Verify the estimator-draw "
                 "CLT before using Gaussian covariance information; keep a level-0 positive "
                 "control; distinguish p proportional to eta squared from a linear law; "
                 "fit source, ensemble, residual, and cross terms on a factorial grid; and "
                 "construct two distinct histories left unidentified by d-1 lag probes.",
-        "members": ["scalarPermeability", "diagonalPermeability",
+        "members": ["scalarPermeability", "covarianceScoreInformation_gaussian",
+                    "multivariateGaussianPermeability", "diagonalPermeability",
+                    "gaussianCovarianceHalfSquaredRisk",
+                    "lagObservationDerivative", "lagCompletionPermeability",
                     "completion_count_lower_bound", "quadraticChannel"],
     },
 ]

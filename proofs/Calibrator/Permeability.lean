@@ -368,6 +368,29 @@ theorem gaussianCovarianceTangentEstimatorVariance_eq_inv_information
     totalGaussianInformation_mul_estimatorVariance
       m covariance covarianceDerivative hm hcovariance hderivative
 
+/-- Half-scaled quadratic loss for the Gaussian covariance tangent estimator.  Statistical
+geometry often uses `loss = ½(θ̂-θ)²`, whose Hessian is one; ordinary squared-error loss
+omits this half. Keeping the convention in the definition prevents the two constants from
+being conflated. -/
+noncomputable def gaussianCovarianceHalfSquaredRisk
+    (m covariance covarianceDerivative : ℝ) : ℝ :=
+  (1 / 2 : ℝ) *
+    gaussianCovarianceTangentEstimatorVariance m covariance covarianceDerivative
+
+/-- **The closing-law half, exactly located.** Under half-scaled quadratic loss the named
+Gaussian experiment contributes `1/(2mp)`. Under ordinary squared error it contributes
+`1/(mp)` by `gaussianCovarianceTangentEstimatorVariance_eq_inv_information`. -/
+theorem gaussianCovarianceHalfSquaredRisk_eq
+    (m covariance covarianceDerivative : ℝ)
+    (hm : m ≠ 0) (hcovariance : covariance ≠ 0)
+    (hderivative : covarianceDerivative ≠ 0) :
+    gaussianCovarianceHalfSquaredRisk m covariance covarianceDerivative =
+      1 / (2 * totalGaussianInformation m covariance covarianceDerivative) := by
+  unfold gaussianCovarianceHalfSquaredRisk
+  rw [gaussianCovarianceTangentEstimatorVariance_eq_inv_information
+    m covariance covarianceDerivative hm hcovariance hderivative]
+  ring
+
 /-- **Exact inverse-square cohort law.** If imperfect tagging, assay sensitivity, or
 conditional support attenuates a covariance derivative by a nonzero factor `η`, then
 `m / η²` estimator replicates recover exactly the information supplied by `m` unattenuated
