@@ -603,7 +603,7 @@ theorem deployment_meets_both_budgets
     (nEff nParams infoPerSample targetTraceMSE : ℝ)
     (p c tau B : ℝ)
     (h_nEff : 0 < nEff) (h_target : 0 < targetTraceMSE)
-    (hp : 0 < p) (hc : 0 < c) (htau0 : 0 < tau) (htau1 : tau < 1) (hB : 0 < B) :
+    (hp : 0 < p) (hc : 0 < c) (htau1 : tau < 1) (hB : 0 < B) :
     (fisherTraceMSELowerBound nEff nParams infoPerSample ≤ targetTraceMSE ∧
         tau ≤ p / (p + c / B)) ↔
       (requiredEffectiveSampleSizeForTraceMSE nParams infoPerSample targetTraceMSE ≤ nEff ∧
@@ -612,11 +612,11 @@ theorem deployment_meets_both_budgets
   · rintro ⟨hfisher, hrel⟩
     exact ⟨(fisherTraceMSELowerBound_le_target_iff nEff nParams infoPerSample targetTraceMSE
         h_nEff h_target).1 hfisher,
-      (RecoveryAttenuation.panels_suffice_iff p c tau B hp hc htau0 htau1 hB).1 hrel⟩
+      (RecoveryAttenuation.panels_suffice_iff p c tau B hp hc htau1 hB).1 hrel⟩
   · rintro ⟨hsample, hpanels⟩
     exact ⟨(fisherTraceMSELowerBound_le_target_iff nEff nParams infoPerSample targetTraceMSE
         h_nEff h_target).2 hsample,
-      (RecoveryAttenuation.panels_suffice_iff p c tau B hp hc htau0 htau1 hB).2 hpanels⟩
+      (RecoveryAttenuation.panels_suffice_iff p c tau B hp hc htau1 hB).2 hpanels⟩
 
 /-- **The panel budget is unbounded in the reliability target; the Fisher budget is not.**
 
@@ -1798,7 +1798,7 @@ theorem ldBlockPruningDeficit_antitone_in_recombination
 
 /-- The deficit never exceeds `sin(πκ)/π`, at any decay. -/
 theorem ldPruningDetectionDeficit_le_sin_div_pi {decay kappa : ℝ}
-    (hd0 : 0 ≤ decay) (hk0 : 0 ≤ kappa) (hk1 : kappa ≤ 1) :
+    (hk0 : 0 ≤ kappa) (hk1 : kappa ≤ 1) :
     ldPruningDetectionDeficit decay kappa ≤
       Real.sin (Real.pi * kappa) / Real.pi := by
   have hpi : 0 < Real.pi := Real.pi_pos
@@ -1819,17 +1819,14 @@ is pinned near a curve carrying no free parameters at all — which is what make
 the prediction cheap to test. -/
 theorem ldTightLinkage_le_ldBlockDetectionShare {recomb Ne : ℝ}
     {retainedMarkers totalMarkers : ℕ}
-    (hr0 : 0 ≤ recomb) (hr1 : recomb ≤ 1) (hNe : 1 < Ne)
     (h0 : 0 < retainedMarkers) (h1 : retainedMarkers < totalMarkers) :
     ldTightLinkageDetectionShare retainedMarkers totalMarkers ≤
       ldBlockDetectionShare recomb Ne retainedMarkers totalMarkers := by
   obtain ⟨hkpos, hklt⟩ := ldPanelRetentionFraction_mem h0 h1
-  have hp0 : 0 ≤ ldRetentionPerGen recomb Ne :=
-    ld_retention_nonneg recomb Ne hr0 hr1 (le_of_lt hNe)
   have hbound := ldPruningDetectionDeficit_le_sin_div_pi
     (decay := ldRetentionPerGen recomb Ne)
     (kappa := ldPanelRetentionFraction retainedMarkers totalMarkers)
-    hp0 (le_of_lt hkpos) (le_of_lt hklt)
+    (le_of_lt hkpos) (le_of_lt hklt)
   unfold ldTightLinkageDetectionShare ldBlockDetectionShare
     ldBandDetectionShare
   unfold ldPruningDetectionDeficit at hbound

@@ -94,6 +94,78 @@ theorem conditionalGainFunctional_eq_coe {s : ℝ}
 
 end FiniteCoupledPhaseLaw
 
+/-! ## Support and oscillatory gain are different axes
+
+The compendium's two-dimensional edge can already be seen in the smallest nontrivial
+finite model.  The two laws below have the **same two genotype cells**, the same phase
+coding, and positive mass on both cells.  Only their probabilities differ.  Coverage is
+therefore identical, while the characteristic amplitude at frequency one is zero for the
+balanced law and `1/2` for the biased law.
+
+This is the biological distinction between *which genotypes can occur* and *how their
+score phases cancel*.  A joint genotype-cell floor protects support-level identifiability;
+it does not determine a polygenic score's anti-concentration or local-limit rate.  LD-aware
+method design consequently needs both a support diagnostic and a gain diagnostic.
+-/
+
+/-- The two one-locus binary configurations, written explicitly so every later finite sum
+is checked against the actual function-space Fintype rather than an informal two-cell
+enumeration. -/
+private theorem binaryOneLocus_univ :
+    (Finset.univ : Finset (Fin 1 → Fin 2)) = {![0], ![1]} := by
+  decide
+
+/-- Balanced binary law with opposite phases `0` and `π`. -/
+noncomputable def balancedBinaryOppositePhaseLaw : FiniteCoupledPhaseLaw 1 2 where
+  mass := fun _ => 1 / 2
+  mass_nonneg := by intro; norm_num
+  mass_sum := by
+    rw [binaryOneLocus_univ]
+    norm_num
+  phase := fun _ j => if j = 0 then 0 else Real.pi
+
+/-- Biased binary law on the same support and with the same opposite phases. -/
+noncomputable def biasedBinaryOppositePhaseLaw : FiniteCoupledPhaseLaw 1 2 where
+  mass := fun x => if x 0 = 0 then 3 / 4 else 1 / 4
+  mass_nonneg := by
+    intro x
+    split_ifs <;> norm_num
+  mass_sum := by
+    rw [binaryOneLocus_univ]
+    norm_num
+  phase := fun _ j => if j = 0 then 0 else Real.pi
+
+/-- The balanced law cancels exactly at frequency one. -/
+theorem balancedBinaryOppositePhaseLaw_amplitude_one :
+    balancedBinaryOppositePhaseLaw.characteristicAmplitude 1 = 0 := by
+  rw [FiniteCoupledPhaseLaw.characteristicAmplitude]
+  simp [FiniteCoupledPhaseLaw.cosPart, FiniteCoupledPhaseLaw.sinPart,
+    FiniteCoupledPhaseLaw.scorePhase, balancedBinaryOppositePhaseLaw,
+    binaryOneLocus_univ]
+
+/-- The same phase coding under a `3/4 : 1/4` imbalance leaves amplitude `1/2`. -/
+theorem biasedBinaryOppositePhaseLaw_amplitude_one :
+    biasedBinaryOppositePhaseLaw.characteristicAmplitude 1 = 1 / 2 := by
+  rw [FiniteCoupledPhaseLaw.characteristicAmplitude]
+  simp [FiniteCoupledPhaseLaw.cosPart, FiniteCoupledPhaseLaw.sinPart,
+    FiniteCoupledPhaseLaw.scorePhase, biasedBinaryOppositePhaseLaw,
+    binaryOneLocus_univ]
+  norm_num
+
+/-- Exact cancellation gives infinite conditional gain. -/
+theorem balancedBinaryOppositePhaseLaw_gain_one :
+    balancedBinaryOppositePhaseLaw.conditionalGainFunctional 1 = ⊤ :=
+  FiniteCoupledPhaseLaw.conditionalGainFunctional_eq_top _
+    balancedBinaryOppositePhaseLaw_amplitude_one
+
+/-- The biased law has finite gain at the same frequency. -/
+theorem biasedBinaryOppositePhaseLaw_gain_one_ne_top :
+    biasedBinaryOppositePhaseLaw.conditionalGainFunctional 1 ≠ ⊤ := by
+  rw [FiniteCoupledPhaseLaw.conditionalGainFunctional_eq_coe _]
+  · exact WithTop.coe_ne_top
+  · rw [biasedBinaryOppositePhaseLaw_amplitude_one]
+    norm_num
+
 /-! ## The false conditional-product identity, executed -/
 
 /-- Joint expectation for two copied binary phase factors `Y,Y`, with `Y = ±1` equally
@@ -230,5 +302,46 @@ theorem fullSupport_of_uniform_floor (J : FiberCoupling k d) (η : ℝ) (hη : 0
   exact ne_of_gt (lt_of_lt_of_le hη (hfloor x))
 
 end FiberCoupling
+
+namespace FiniteCoupledPhaseLaw
+
+/-- Forget phases while retaining the coupling whose support controls coverage. -/
+def toFiberCoupling (C : FiniteCoupledPhaseLaw n d) : FiberCoupling n d where
+  mass := C.mass
+
+/-- Both binary witnesses charge every genotype cell. -/
+theorem balancedBinaryOppositePhaseLaw_fullSupport :
+    balancedBinaryOppositePhaseLaw.toFiberCoupling.FullSupport := by
+  intro x
+  norm_num [toFiberCoupling, balancedBinaryOppositePhaseLaw]
+
+theorem biasedBinaryOppositePhaseLaw_fullSupport :
+    biasedBinaryOppositePhaseLaw.toFiberCoupling.FullSupport := by
+  intro x
+  simp only [toFiberCoupling, biasedBinaryOppositePhaseLaw]
+  split_ifs <;> norm_num
+
+/-- **Support does not determine oscillatory gain.**  The two laws have full support and
+hence identical coverage for every one-slot bundle family, fiber, and value.  Nevertheless
+one has exact cancellation (infinite gain) and the other finite gain at frequency one.
+
+For genetics this rules out replacing the two-axis diagnostic by a single LD-support
+number: a panel may preserve all genotype cells while its score anti-concentration changes
+qualitatively under cell reweighting. -/
+theorem same_full_support_coverage_different_gain
+    (family : BundleFamily 2) (fiber : Fin 1 → ℝ) (value : Fin 1 → ℝ) :
+    (FiberCoupling.CoversTuple family fiber
+        balancedBinaryOppositePhaseLaw.toFiberCoupling value ↔
+      FiberCoupling.CoversTuple family fiber
+        biasedBinaryOppositePhaseLaw.toFiberCoupling value) ∧
+      balancedBinaryOppositePhaseLaw.conditionalGainFunctional 1 = ⊤ ∧
+      biasedBinaryOppositePhaseLaw.conditionalGainFunctional 1 ≠ ⊤ := by
+  refine ⟨FiberCoupling.coverage_invariant family fiber _ _
+      balancedBinaryOppositePhaseLaw_fullSupport
+      biasedBinaryOppositePhaseLaw_fullSupport value, ?_⟩
+  exact ⟨balancedBinaryOppositePhaseLaw_gain_one,
+    biasedBinaryOppositePhaseLaw_gain_one_ne_top⟩
+
+end FiniteCoupledPhaseLaw
 
 end Calibrator

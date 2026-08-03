@@ -273,7 +273,11 @@ theorem diploidAtomValue_reflect (j : Fin 3) (q : ℝ) :
 /-- **Reflection swaps the two homozygote masses and fixes the heterozygote.** -/
 theorem diploidAtomMass_reflect (j : Fin 3) (q : ℝ) :
     diploidAtomMass j (1 - q) = diploidAtomMass (genotypeFlip3 j) q := by
-  fin_cases j <;> simp [diploidAtomMass, genotypeFlip3] <;> ring
+  fin_cases j
+  · simp [diploidAtomMass, genotypeFlip3]
+  · simp [diploidAtomMass, genotypeFlip3]
+    ring
+  · simp [diploidAtomMass, genotypeFlip3]
 
 /-- **The modulus curve is reflection-invariant up to relabelling**: `m_j(1-q) = m_{2-j}(q)`.
 
@@ -442,7 +446,7 @@ configuration repeated. -/
 theorem tied_pair_invisible (q c v : ℝ) :
     spectrumModulusLaw diploidFamily { support := ![q, q], weight := ![c, -c] } v = 0 := by
   unfold spectrumModulusLaw
-  simp only [Fin.sum_univ_two, Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons]
+  simp only [Fin.sum_univ_two, Matrix.cons_val_zero, Matrix.cons_val_one]
   ring
 
 /-! ## 5. The three-level hierarchy, each level with its escaping quantity -/
@@ -854,8 +858,8 @@ theorem portability_gap_not_attributable_to_spectrum (q₁ q₂ q₃ : ℝ)
       = T { support := ![q₃, q₃], weight := ![1 / 2, 1 / 2] } := by
   refine matched_functionals_give_equal_estimates T _ hT _ _ (fun a => ?_)
   fin_cases a
-  simp only [Fin.isValue, Matrix.cons_val_fin_one, Fin.sum_univ_two, Matrix.cons_val_zero,
-    Matrix.cons_val_one, Matrix.head_cons]
+  simp only [Matrix.cons_val_fin_one, Fin.sum_univ_two, Matrix.cons_val_zero,
+    Matrix.cons_val_one]
   linarith
 
 /-! ## 7. The pair theorem -/
@@ -1054,7 +1058,7 @@ theorem threshold_grows (T' : TransferThreshold) (hconst : T.constant = T'.const
     Real.log_lt_log (by linarith [T.scoreLength_pos]) hlen
   have : T.constant * Real.log T.scoreLength < T'.constant * Real.log T'.scoreLength := by
     rw [hconst]
-    exact (mul_lt_mul_left T'.constant_pos).mpr hlog
+    exact (mul_lt_mul_iff_right₀ T'.constant_pos).mpr hlog
   rw [hdiv]
   linarith
 
@@ -1271,6 +1275,13 @@ possible? `FiberCoupling.coverage_invariant` proves that every full-support coup
 the product coverage correspondence, regardless of how severely LD reweights the cells.
 Support-killing dependence — perfect LD, structural haplotypes, or a modulus copy — lies
 on the other side of this boundary.
+
+The separation is now a theorem rather than only an interpretation:
+`FiniteCoupledPhaseLaw.same_full_support_coverage_different_gain` constructs balanced and
+biased binary genotype laws with the same positive support and the same phase coding. They
+have identical coverage for every bundle family, yet the balanced law has exact phase
+cancellation while the biased law has finite gain. Thus even a perfect support audit does
+not determine the anti-concentration input needed by a PGS calibration theorem.
 
 This distinction is useful in study design. A recombining panel may have enough gain for
 a local approximation while still having support holes caused by haplotype constraints;
@@ -2126,7 +2137,7 @@ theorem recovered_lt_predictable (h : 0 < R.estimationNoise) :
       = R.predictableVariance *
         (R.predictableVariance / (R.predictableVariance + R.estimationNoise)) := R.recovered_eq
     _ < R.predictableVariance * 1 := by
-        exact (mul_lt_mul_left hpos).mpr hfrac
+        exact (mul_lt_mul_iff_right₀ hpos).mpr hfrac
     _ = R.predictableVariance := mul_one _
 
 /-- **How many panels per cohort are enough?**
@@ -2150,7 +2161,7 @@ budgeted for.
 The `1/(1-τ)` blow-up is the shape to remember: each additional nine of reliability costs a
 factor of ten in panels. -/
 theorem panels_suffice_iff (p c τ B : ℝ) (hp : 0 < p) (hc : 0 < c)
-    (hτ0 : 0 < τ) (hτ1 : τ < 1) (hB : 0 < B) :
+    (hτ1 : τ < 1) (hB : 0 < B) :
     τ ≤ p / (p + c / B) ↔ c * τ / (p * (1 - τ)) ≤ B := by
   have h1τ : 0 < 1 - τ := by linarith
   have hBne : B ≠ 0 := ne_of_gt hB

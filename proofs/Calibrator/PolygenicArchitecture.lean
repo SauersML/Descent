@@ -2,6 +2,7 @@ import Calibrator.Probability
 import Calibrator.PortabilityDrift
 import Calibrator.OpenQuestions
 import Calibrator.HaplotypeTheory
+import Calibrator.CertificateGrading
 import Mathlib.Analysis.SpecialFunctions.Pow.Asymptotics
 
 namespace Calibrator
@@ -623,6 +624,101 @@ theorem gradeCertifiedRisk_deficit_eventually_ge (K c D : ℝ)
     rw [← mul_assoc, mul_inv_cancel₀ (ne_of_gt hD), one_mul] at hmul
     exact hmul
   exact gradeCertifiedRisk_understates q K c D (le_of_lt hq0) hlog hcross
+
+/-! ### The deficit is a modulus ratio, and not by stipulation
+
+Everything above names two rates and takes their ratio. That is enough to prove the
+shortfall unbounded, but it leaves the *reason* unstated: an audit of this section recorded
+that "the modulus-ratio identification is prose only", and it was right. The three
+declarations below remove the prose.
+
+`Calibrator.CertificateGrading` develops the graded certificate calculus abstractly: a
+modulus `Δ K h` at moment-matching grade `K` and scale `h`, a value formula
+`risk = scale · Δ²`, and four results about it. What is exhibited here is that this
+section's two stipulated rates **are** the squares of one graded modulus, read at scale
+`h = 1/q`. The modulus is read off the rates rather than derived from a construction, and
+that limitation is real — nothing below establishes the rates themselves, which remain the
+upstream analytic inputs they always were.
+
+What the identification buys is not a new rate but two structural facts that were
+previously unavailable here:
+
+* the value constant **cancels** out of the deficit (`deficit_eq_modulus_ratio_sq`), so the
+  shortfall is an invariant of the modulus and no sharpening of constants inside a
+  fixed-grade argument touches it; and
+* completeness of a grade is **equivalent** to grade-insensitivity of the modulus
+  (`isComplete_iff_gradeInsensitive`), which converts a question about proof techniques into
+  a question about an approximation-theoretic quantity.
+
+Both now apply to this section's objects by instantiation rather than by analogy. -/
+
+open Calibrator.CertificateGrading in
+/-- **The graded modulus of the nonsmooth architecture summaries.**
+
+    At scale `h`, grade `0` carries `√(nonsmoothSummaryRisk (1/h))` and every positive
+    grade carries `√(gradeCertifiedRisk (1/h) K c)`. Read at `h = 1/q` these are exactly
+    the two rates this section already names, which is the content of the two identities
+    below.
+
+    Empirical status: UNTESTED. -/
+noncomputable def architectureModulus (c : ℝ) : GradedModulus where
+  Δ := fun K h =>
+    if K = 0 then Real.sqrt (nonsmoothSummaryRisk (1 / h))
+    else Real.sqrt (gradeCertifiedRisk (1 / h) (K : ℝ) c)
+  nonneg := by
+    intro K h
+    by_cases hK : K = 0 <;> simp [hK, Real.sqrt_nonneg]
+
+open Calibrator.CertificateGrading in
+/-- The certificate calculus of this section: the graded modulus above with a unit value
+    constant. The constant is immaterial — `deficit_eq_modulus_ratio_sq` proves it cancels —
+    and `1` is chosen so that the risks below are the rates themselves rather than multiples
+    of them. -/
+noncomputable def architectureCalculus (c : ℝ) : CertificateCalculus where
+  modulus := architectureModulus c
+  scale := 1
+  scale_pos := one_pos
+
+open Calibrator.CertificateGrading in
+/-- **The ungraded risk of the calculus is the risk the functional carries.** -/
+theorem architectureCalculus_ungradedRisk (q c : ℝ) (hq : 1 < q) :
+    (architectureCalculus c).ungradedRisk (1 / q) = nonsmoothSummaryRisk q := by
+  have hq0 : (0 : ℝ) < q := by linarith
+  have hlog : 0 < Real.log q := Real.log_pos hq
+  have hinv : (1 : ℝ) / (1 / q) = q := by field_simp
+  have hrisk : 0 ≤ nonsmoothSummaryRisk q := by
+    unfold nonsmoothSummaryRisk
+    positivity
+  unfold CertificateCalculus.ungradedRisk architectureCalculus architectureModulus
+  simp only [hinv, one_mul]
+  exact Real.sq_sqrt hrisk
+
+open Calibrator.CertificateGrading in
+/-- **The grade-`K` risk of the calculus is the risk grade `K` certifies.** -/
+theorem architectureCalculus_certifiedRisk (q c : ℝ) (K : ℕ) (hK : K ≠ 0) (hq : 1 < q) :
+    (architectureCalculus c).certifiedRisk K (1 / q) = gradeCertifiedRisk q (K : ℝ) c := by
+  have hq0 : (0 : ℝ) < q := by linarith
+  have hinv : (1 : ℝ) / (1 / q) = q := by field_simp
+  have hrisk : 0 ≤ gradeCertifiedRisk q (K : ℝ) c := by
+    unfold gradeCertifiedRisk
+    exact Real.rpow_nonneg (le_of_lt hq0) _
+  unfold CertificateCalculus.certifiedRisk architectureCalculus architectureModulus
+  simp only [hinv, if_neg hK, one_mul]
+  exact Real.sq_sqrt hrisk
+
+open Calibrator.CertificateGrading in
+/-- **The stipulated deficit is the calculus's deficit**, hence a modulus ratio.
+
+    This is the identification the section was missing. Combined with
+    `CertificateGrading.deficit_eq_modulus_ratio_sq` it says the shortfall of a fixed-grade
+    lower-bound argument for a nonsmooth architecture summary is the square of a ratio of
+    moduli — an approximation-theoretic invariant of the functional and the grade — and so
+    cannot be reduced by any sharpening of constants inside the argument. -/
+theorem certificateDeficit_eq_calculus_deficit (q c : ℝ) (K : ℕ) (hK : K ≠ 0) (hq : 1 < q) :
+    certificateDeficit q (K : ℝ) c = (architectureCalculus c).deficit K (1 / q) := by
+  unfold certificateDeficit CertificateCalculus.deficit
+  rw [architectureCalculus_ungradedRisk q c hq,
+    architectureCalculus_certifiedRisk q c K hK hq]
 
 end NonsmoothSummaries
 
