@@ -831,6 +831,55 @@ theorem link_invariance_slope_pos (L : ℝ → ℝ) (hmono : StrictMono L)
   linarith
 
 open MeasureTheory ProbabilityTheory in
+/-- **A monotone link is continuous at almost every point the averaging sees.**
+
+A monotone function has countably many discontinuities, the affine map
+`z ↦ a (x + σ z) + b` is injective when `a σ ≠ 0`, and the standard Gaussian has no
+atoms.  So the pullback of the discontinuity set is countable and therefore null.
+
+This is what makes dominated convergence available below.  Without it the pointwise
+limit hypothesis fails: `y ↦ L (a (y + σ z) + b)` is continuous at `x` only where `L` is
+continuous, and a monotone `L` is not assumed continuous anywhere. -/
+theorem link_discontinuity_null (L : ℝ → ℝ) (hmono : StrictMono L) {a σ : ℝ}
+    (ha : a ≠ 0) (hσ : σ ≠ 0) (b x : ℝ) :
+    (gaussianReal 0 1) {z : ℝ | ¬ ContinuousAt L (a * (x + σ * z) + b)} = 0 := by
+  haveI : NoAtoms (gaussianReal 0 1) := noAtoms_gaussianReal one_ne_zero
+  have hinj : Function.Injective (fun z : ℝ ↦ a * (x + σ * z) + b) := by
+    intro z₁ z₂ h
+    simp only at h
+    exact mul_left_cancel₀ hσ (add_left_cancel (mul_left_cancel₀ ha (add_right_cancel h)))
+  have hcount : {u : ℝ | ¬ ContinuousAt L u}.Countable :=
+    hmono.monotone.countable_not_continuousAt
+  exact (hcount.preimage hinj).measure_zero _
+
+open MeasureTheory ProbabilityTheory in
+/-- **The averaged link is continuous, even though the link is not assumed to be.**
+
+Dominated convergence along the neighbourhood filter: the integrand is bounded by `1`,
+the measure is a probability measure, and by `link_discontinuity_null` the pointwise limit
+holds for almost every noise value.
+
+This is the first regularity gained from the invariance rather than assumed, and it is
+the step the classification needs before anything can be differentiated. -/
+theorem link_average_continuous (L : ℝ → ℝ) (hmono : StrictMono L)
+    (hbdd : ∀ u, 0 < L u ∧ L u < 1) {a σ : ℝ} (ha : a ≠ 0) (hσ : σ ≠ 0) (b : ℝ) :
+    Continuous (fun x ↦ ∫ z, L (a * (x + σ * z) + b) ∂(gaussianReal 0 1)) := by
+  rw [continuous_iff_continuousAt]
+  intro x
+  refine tendsto_integral_filter_of_dominated_convergence (fun _ ↦ (1 : ℝ)) ?_ ?_ ?_ ?_
+  · filter_upwards with y
+    exact (hmono.monotone.measurable.comp (by fun_prop)).aestronglyMeasurable
+  · filter_upwards with y
+    filter_upwards with z
+    rw [Real.norm_eq_abs, abs_of_pos (hbdd _).1]
+    exact le_of_lt (hbdd _).2
+  · exact integrable_const 1
+  · filter_upwards [measure_zero_iff_ae_nmem.mp
+      (link_discontinuity_null L hmono ha hσ b x)] with z hz
+    exact (not_not.mp hz).tendsto.comp
+      ((by fun_prop : Continuous fun y : ℝ ↦ a * (y + σ * z) + b).tendsto x)
+
+open MeasureTheory ProbabilityTheory in
 /-- **The averaging map pushes the standard Gaussian to a Gaussian centred at the
 covariate.**
 
@@ -892,6 +941,40 @@ theorem link_invariance_params_unique (L : ℝ → ℝ) (hmono : StrictMono L)
   have h1 := hmono.injective (heq 1)
   simp only [mul_one] at h1
   linarith [h0 ▸ h1]
+
+open MeasureTheory ProbabilityTheory in
+/-- **The link is continuous — derived from the invariance, not assumed.**
+
+`link_rigidity` assumes only that `L` is strictly monotone and bounded.  A monotone
+function may jump on a countable set, and the classification cannot begin against one that
+does.  This closes that: apply the invariance at `a = σ = 1`, `b = 0`.  The left-hand side
+is continuous by `link_average_continuous`, the right-hand side is `L` precomposed with an
+affine map of positive slope by `link_invariance_slope_pos`, and composing with the inverse
+affine map returns `L`.
+
+So the functional equation manufactures its own regularity, which is the first step of the
+classification and the reason the theorem can be true with no smoothness hypothesis. -/
+theorem link_continuous (L : ℝ → ℝ) (hmono : StrictMono L)
+    (hbdd : ∀ u, 0 < L u ∧ L u < 1)
+    (hinv : ∀ a b σ : ℝ, 0 < a → 0 < σ → ∃ a' b' : ℝ,
+      ∀ x, ∫ z, L (a * (x + σ * z) + b) ∂(gaussianReal 0 1) = L (a' * x + b')) :
+    Continuous L := by
+  obtain ⟨a', b', heq⟩ := hinv 1 0 1 one_pos one_pos
+  have hpos : 0 < a' := link_invariance_slope_pos L hmono hbdd one_pos heq
+  have hne : a' ≠ 0 := ne_of_gt hpos
+  have hA : Continuous (fun x ↦ L (a' * x + b')) := by
+    have hc := link_average_continuous L hmono hbdd (a := 1) (σ := 1) one_ne_zero one_ne_zero 0
+    have hfun : (fun x ↦ ∫ z, L (1 * (x + 1 * z) + 0) ∂(gaussianReal 0 1))
+        = fun x ↦ L (a' * x + b') := funext heq
+    rwa [hfun] at hc
+  have hcomp : Continuous (fun u : ℝ ↦ L (a' * ((u - b') / a') + b')) := hA.comp (by fun_prop)
+  have hid : (fun u : ℝ ↦ L (a' * ((u - b') / a') + b')) = L := by
+    funext u
+    have harg : a' * ((u - b') / a') + b' = u := by
+      rw [mul_comm, div_mul_cancel₀ _ hne]
+      ring
+    rw [harg]
+  rwa [hid] at hcomp
 
 /-- **Boundedness really does exclude the affine stratum.**
 
