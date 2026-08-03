@@ -132,14 +132,40 @@ agree, while the prescribed law makes a given edge agree with probability
 prescription, because the floor is a property of the graph and holds of every
 configuration whatsoever.
 
-The remaining step is a Gaussian tail bound at ten standard deviations, which
-this development does not have; `Phi` is `cdf (gaussianReal 0 1)` and Mathlib
-carries no numeric bound on it. Admitted rather than weakened: the statement
-below is the one the argument needs, and a version restricted to whatever is
-currently provable would not contradict the prescription. -/
+The Gaussian tail is bounded here by Chebyshev's inequality. The resulting
+`Phi (-10) ≤ 1/100` bound is intentionally coarse, but is already far below
+the graph-theoretic agreement floor. -/
 theorem prescribedAgreement_lt_expanderAgreementFloor :
     2 * Phi (-10) < expanderAgreementFloor := by
-  sorry
+  have hPhi : Phi (-10) ≤ (1 / 100 : ℝ) := by
+    let μ := ProbabilityTheory.gaussianReal 0 1
+    have hsubset : Set.Iic (-10 : ℝ) ⊆
+        {x : ℝ | 10 ≤ |id x - ∫ y, id y ∂μ|} := by
+      intro x hx
+      rw [show (∫ y, id y ∂μ) = 0 by
+        simp [μ, ProbabilityTheory.integral_id_gaussianReal]]
+      simp only [id_eq, sub_zero]
+      change x ≤ -10 at hx
+      change 10 ≤ |x|
+      rw [abs_of_nonpos (by linarith)]
+      linarith
+    have hcheb := ProbabilityTheory.meas_ge_le_variance_div_sq
+      (μ := μ) (X := id) (ProbabilityTheory.memLp_id_gaussianReal 2)
+      (show (0 : ℝ) < 10 by norm_num)
+    have hmeasure : μ (Set.Iic (-10 : ℝ)) ≤ ENNReal.ofReal (1 / 100 : ℝ) := by
+      calc
+        μ (Set.Iic (-10 : ℝ)) ≤ μ {x : ℝ | 10 ≤ |id x - ∫ y, id y ∂μ|} :=
+          MeasureTheory.measure_mono hsubset
+        _ ≤ ENNReal.ofReal (1 / 100 : ℝ) := by
+          convert hcheb using 1
+          all_goals
+            norm_num [μ, ProbabilityTheory.integral_id_gaussianReal,
+              ProbabilityTheory.variance_id_gaussianReal]
+    have hof : ENNReal.ofReal (Phi (-10)) ≤ ENNReal.ofReal (1 / 100 : ℝ) := by
+      rw [Phi, ProbabilityTheory.ofReal_cdf]
+      exact hmeasure
+    exact (ENNReal.ofReal_le_ofReal_iff (by norm_num)).mp hof
+  linarith [expanderAgreementFloor_gt]
 
 theorem expanderAgreementFloor_pos : 0 < expanderAgreementFloor := by
   have := expanderAgreementFloor_gt
