@@ -461,13 +461,13 @@ theorem disjointWindowLimitVariance_mem_segment {w : ℕ} (share : Fin w → ℝ
     (h_nonneg : ∀ j, 0 ≤ share j) (h_le_one : ∑ j, share j ≤ 1) :
     disjointWindowLimitVariance share ∈ Set.Icc (0 : ℝ) 1 := by
   unfold disjointWindowLimitVariance
-  exact Set.mem_Icc.mpr ⟨Finset.sum_nonneg fun j _ => h_nonneg j, h_le_one⟩
+  exact Set.mem_Icc.mpr ⟨Finset.sum_nonneg fun j _ ↦ h_nonneg j, h_le_one⟩
 
 /-- And every point of the segment is realised by a design. -/
 theorem disjointWindowLimitVariance_attains (s : ℝ) (h0 : 0 ≤ s) (h1 : s ≤ 1) :
     ∃ share : Fin 1 → ℝ, (∀ j, 0 ≤ share j) ∧ (∑ j, share j) ≤ 1 ∧
       disjointWindowLimitVariance share = s := by
-  refine ⟨fun _ => s, fun _ => h0, ?_, ?_⟩
+  refine ⟨fun _ ↦ s, fun _ ↦ h0, ?_, ?_⟩
   · simpa using h1
   · simp [disjointWindowLimitVariance]
 
@@ -527,9 +527,9 @@ drops to `3/4`.
 This formalizes the biological point that equal source `R²` does not determine
 cross-population portability without locus-resolved transport state. -/
 theorem same_source_r2_different_portability_two_locus_witness :
-    let sourceSignal : Fin 2 → ℝ := fun _ => 1
-    let stableTransport : Fin 2 → ℝ := fun _ => 1
-    let brokenTransport : Fin 2 → ℝ := fun i => if i = 0 then 1 else 0
+    let sourceSignal : Fin 2 → ℝ := fun _ ↦ 1
+    let stableTransport : Fin 2 → ℝ := fun _ ↦ 1
+    let brokenTransport : Fin 2 → ℝ := fun i ↦ if i = 0 then 1 else 0
     let sourceVariance : ℝ := ∑ l, sourceSignal l
     let stableTargetVariance : ℝ := ∑ l, sourceSignal l * stableTransport l
     let brokenTargetVariance : ℝ := ∑ l, sourceSignal l * brokenTransport l

@@ -48,9 +48,9 @@ theorem target_axis_control_iff_uniformly_unbiased {d : ℕ}
     have hsum_sq : (∑ i, residualTargetAxis i ^ 2) = 0 := by
       simpa [pow_two] using hsum_mul
     have hcoordinate_zero : ∀ i, residualTargetAxis i ^ 2 = 0 := by
-      have hfunction : (fun i => residualTargetAxis i ^ 2) = 0 :=
+      have hfunction : (fun i ↦ residualTargetAxis i ^ 2) = 0 :=
         (Fintype.sum_eq_zero_iff_of_nonneg
-          (fun i => sq_nonneg (residualTargetAxis i))).mp hsum_sq
+          (fun i ↦ sq_nonneg (residualTargetAxis i))).mp hsum_sq
       intro i
       simpa using congrFun hfunction i
     funext i

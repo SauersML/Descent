@@ -95,7 +95,7 @@ theorem degradation_eq_weighted_readout_distance
         target.featureSpectrum b := by
   unfold degradation risk
   rw [← Finset.sum_sub_distrib]
-  refine Finset.sum_congr rfl fun b _ => ?_
+  refine Finset.sum_congr rfl fun b _ ↦ ?_
   rw [crossSpectrum_eq_mul_optimalReadout target b]
   ring
 
@@ -109,7 +109,7 @@ theorem degradation_eq_sum_profile (source target : FiniteSpectralModel Band) :
 theorem degradation_nonneg (source target : FiniteSpectralModel Band) :
     0 ≤ degradation source target := by
   rw [degradation_eq_weighted_readout_distance]
-  exact Finset.sum_nonneg fun b _ =>
+  exact Finset.sum_nonneg fun b _ ↦
     mul_nonneg (sq_nonneg _) (le_of_lt (target.featureSpectrum_pos b))
 
 /-- On the diagonal there is no transport degradation. -/
@@ -138,10 +138,10 @@ of a transport residual is: **normalise the covariance mismatch by the feature v
 before adding it to an outcome variance.** -/
 noncomputable def rescale (P : FiniteSpectralModel Band) (c : ℝ) (hc : c ≠ 0) :
     FiniteSpectralModel Band where
-  featureSpectrum := fun b => c ^ 2 * P.featureSpectrum b
-  crossSpectrum := fun b => c * P.crossSpectrum b
+  featureSpectrum := fun b ↦ c ^ 2 * P.featureSpectrum b
+  crossSpectrum := fun b ↦ c * P.crossSpectrum b
   targetPower := P.targetPower
-  featureSpectrum_pos := fun b => mul_pos (sq_pos_of_ne_zero hc) (P.featureSpectrum_pos b)
+  featureSpectrum_pos := fun b ↦ mul_pos (sq_pos_of_ne_zero hc) (P.featureSpectrum_pos b)
 
 omit [Fintype Band] in
 /-- Under `g -> c * g` the optimal readout is `beta / c`: it is scale-covariant, which is
@@ -160,7 +160,7 @@ to reproduce this normalisation. -/
 theorem degradation_rescale (source target : FiniteSpectralModel Band) (c : ℝ) (hc : c ≠ 0) :
     degradation (source.rescale c hc) (target.rescale c hc) = degradation source target := by
   rw [degradation_eq_weighted_readout_distance, degradation_eq_weighted_readout_distance]
-  refine Finset.sum_congr rfl fun b _ => ?_
+  refine Finset.sum_congr rfl fun b _ ↦ ?_
   rw [optimalReadout_rescale source c hc b, optimalReadout_rescale target c hc b]
   show (optimalReadout source b / c - optimalReadout target b / c) ^ 2 *
       (c ^ 2 * target.featureSpectrum b) =
@@ -214,7 +214,7 @@ theorem taskDegradation_eq_forall_iff_profile_eq
   classical
   constructor
   · intro hall b
-    simpa [taskDegradation] using hall (fun i => if i = b then 1 else 0)
+    simpa [taskDegradation] using hall (fun i ↦ if i = b then 1 else 0)
   · intro hprofile taskWeight
     unfold taskDegradation
     apply Finset.sum_congr rfl

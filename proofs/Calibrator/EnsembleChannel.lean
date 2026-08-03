@@ -376,7 +376,7 @@ theorem weightedBandPredictorLoss_le_source
       weightedBandEnsembleLoss weight target source := by
   rw [weightedBandEnsembleLoss_decomposition weight target predictor source horthogonal]
   apply le_add_of_nonneg_right
-  exact Finset.sum_nonneg fun i _ =>
-    Finset.sum_nonneg fun b _ => mul_nonneg (hweight i b) (sq_nonneg _)
+  exact Finset.sum_nonneg fun i _ ↦
+    Finset.sum_nonneg fun b _ ↦ mul_nonneg (hweight i b) (sq_nonneg _)
 
 end Calibrator

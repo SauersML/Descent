@@ -295,12 +295,12 @@ theorem auc_invariant_and_citl_shifts_under_score_offset
     {Z : Type*} [MeasurableSpace Z]
     (pop : BinaryPopulation Z) (score : Z → ℝ)
     (mean_obs mean_pred c : ℝ) :
-    populationAUC pop (fun z => score z + c) = populationAUC pop score ∧
+    populationAUC pop (fun z ↦ score z + c) = populationAUC pop score ∧
       calibrationInTheLarge mean_obs (mean_pred + c) =
         calibrationInTheLarge mean_obs mean_pred - c := by
   constructor
   · simpa [Function.comp] using
-      populationAUC_strictMono_invariant pop score (fun x => x + c) (by
+      populationAUC_strictMono_invariant pop score (fun x ↦ x + c) (by
         intro a b hab
         linarith)
   · unfold calibrationInTheLarge
@@ -1559,10 +1559,10 @@ theorem logistic_recalibration_preserves_auc
     (pop : BinaryPopulation Z) (score : Z → ℝ)
     (a b : ℝ)
     (h_b_pos : 0 < b) :
-    populationAUC pop (fun z => logisticRecalibrated (score z) a b) =
+    populationAUC pop (fun z ↦ logisticRecalibrated (score z) a b) =
       populationAUC pop score := by
   simpa [logisticRecalibrated, Function.comp] using
-    (populationAUC_strictMono_invariant pop score (fun x => a + b * x) (by
+    (populationAUC_strictMono_invariant pop score (fun x ↦ a + b * x) (by
       intro x y hxy
       linarith [mul_lt_mul_of_pos_left hxy h_b_pos]))
 
@@ -1702,9 +1702,9 @@ theorem recalibration_preserves_auc
     (pop : BinaryPopulation Z) (score : Z → ℝ)
     (a b : ℝ)
     (h_b_pos : 0 < b) :
-    populationAUC pop (fun z => a + b * score z) = populationAUC pop score := by
+    populationAUC pop (fun z ↦ a + b * score z) = populationAUC pop score := by
   simpa [Function.comp] using
-    populationAUC_strictMono_invariant pop score (fun x => a + b * x) (by
+    populationAUC_strictMono_invariant pop score (fun x ↦ a + b * x) (by
       intro x y hxy
       linarith [mul_lt_mul_of_pos_left hxy h_b_pos])
 
@@ -1940,7 +1940,7 @@ noncomputable def qalyContributionAtTime {T : ℕ}
     censoring/eligibility weights. -/
 noncomputable def treatmentMargin {T : ℕ}
     (model : LongitudinalTreatmentModel T) (path : ClinicalPathway T) : ℝ :=
-  Finset.univ.sum (fun t => qalyContributionAtTime model path t)
+  Finset.univ.sum (fun t ↦ qalyContributionAtTime model path t)
 
 /-- A deployed rule treats when the predicted pathway has positive net QALY
     margin. -/
@@ -2184,7 +2184,7 @@ theorem treatmentMargin_error_eq_componentwise_sum
     {T : ℕ} (model : LongitudinalTreatmentModel T)
     (truePath predictedPath : ClinicalPathway T) :
     treatmentMargin model predictedPath - treatmentMargin model truePath =
-      Finset.univ.sum (fun t =>
+      Finset.univ.sum (fun t ↦
         model.discount t *
           ((predictedPath.followupWeight t - truePath.followupWeight t) *
               (truePath.eventProb t * truePath.treatmentBenefit t -
@@ -2227,7 +2227,7 @@ theorem abs_treatmentMargin_error_le_componentwise_calibration_bound
       |truePath.eventProb t * truePath.treatmentBenefit t -
           truePath.treatmentHarm t| ≤ netBound t) :
     |treatmentMargin model predictedPath - treatmentMargin model truePath| ≤
-      Finset.univ.sum (fun t =>
+      Finset.univ.sum (fun t ↦
         model.discount t *
           (εWeight t * netBound t +
             weightBound t *
@@ -2261,7 +2261,7 @@ theorem abs_treatmentMargin_error_le_componentwise_calibration_bound
                   (predictedPath.treatmentHarm t - truePath.treatmentHarm t)))| := by
         simpa using Finset.abs_sum_le_sum_abs
           (s := Finset.univ)
-          (f := fun t =>
+          (f := fun t ↦
             model.discount t *
               ((predictedPath.followupWeight t - truePath.followupWeight t) *
                   (truePath.eventProb t * truePath.treatmentBenefit t -
@@ -2524,7 +2524,7 @@ theorem qalyLoss_le_componentwise_calibration_bound
       |truePath.eventProb t * truePath.treatmentBenefit t -
           truePath.treatmentHarm t| ≤ netBound t) :
     qalyLoss model truePath predictedPath ≤
-      Finset.univ.sum (fun t =>
+      Finset.univ.sum (fun t ↦
         model.discount t *
           (εWeight t * netBound t +
             weightBound t *
@@ -2560,7 +2560,7 @@ theorem qalyLoss_eq_zero_of_componentwise_calibration_bound_lt_abs_true_margin
       |truePath.eventProb t * truePath.treatmentBenefit t -
           truePath.treatmentHarm t| ≤ netBound t)
     (h_small :
-      Finset.univ.sum (fun t =>
+      Finset.univ.sum (fun t ↦
         model.discount t *
           (εWeight t * netBound t +
             weightBound t *
@@ -2596,8 +2596,8 @@ theorem expectedQalyLoss_eq_zero_of_perfect_pathway_calibration
     expectedQalyLoss μ model truePath predictedPath = 0 := by
   unfold expectedQalyLoss
   have hfun :
-      (fun z => qalyLoss model (truePath z) (predictedPath z)) =
-        fun _ => (0 : ℝ) := by
+      (fun z ↦ qalyLoss model (truePath z) (predictedPath z)) =
+        fun _ ↦ (0 : ℝ) := by
     funext z
     exact qalyLoss_eq_zero_of_perfect_pathway_calibration
       model (truePath z) (predictedPath z) (h_cal z)
@@ -2613,7 +2613,7 @@ theorem expectedQalyLoss_eq_expected_qalyDecisionRegretMargin
       ∫ z, qalyDecisionRegretMargin model (truePath z) (predictedPath z) ∂μ := by
   unfold expectedQalyLoss
   refine integral_congr_ae ?_
-  exact Filter.Eventually.of_forall (fun z =>
+  exact Filter.Eventually.of_forall (fun z ↦
     qalyLoss_eq_qalyDecisionRegretMargin
       model (truePath z) (predictedPath z))
 
@@ -2629,7 +2629,7 @@ structure ScreeningDecisionModel where
 /-- One-step longitudinal embedding of the shared screening model. -/
 noncomputable def screeningLongitudinalModel
     (_model : ScreeningDecisionModel) : LongitudinalTreatmentModel 1 where
-  discount := fun _ => 1
+  discount := fun _ ↦ 1
   discount_nonneg := by
     intro _
     norm_num
@@ -2639,10 +2639,10 @@ noncomputable def screeningLongitudinalModel
     non-event yields utility `-harm`, and no treatment yields `0`. -/
 noncomputable def screeningClinicalPathway
     (model : ScreeningDecisionModel) (risk : ℝ) : ClinicalPathway 1 where
-  followupWeight := fun _ => 1
-  eventProb := fun _ => risk
-  treatmentBenefit := fun _ => model.benefit + model.harm
-  treatmentHarm := fun _ => model.harm
+  followupWeight := fun _ ↦ 1
+  eventProb := fun _ ↦ risk
+  treatmentBenefit := fun _ ↦ model.benefit + model.harm
+  treatmentHarm := fun _ ↦ model.harm
   followupWeight_nonneg := by
     intro _
     norm_num
@@ -2875,13 +2875,23 @@ structure ThresholdTreatmentModel where
   benefit_pos : 0 < benefit
   harm_eq_threshold : harm = benefit * threshold
 
+/-- **The model class is inhabited.**  Thirteen theorems quantify over
+`ThresholdTreatmentModel`.  `harm_eq_threshold` pins `harm` to the other two fields, so
+only `threshold` and `benefit` are free and the witness fixes both. -/
+noncomputable def ThresholdTreatmentModel.witness : ThresholdTreatmentModel where
+  threshold := 1
+  benefit := 1
+  harm := 1
+  benefit_pos := by norm_num
+  harm_eq_threshold := by norm_num
+
 /-- One-step longitudinal model corresponding to a single threshold-based
     treatment decision.
 
     Empirical status: UNTESTED. -/
 noncomputable def thresholdLongitudinalModel
     (_model : ThresholdTreatmentModel) : LongitudinalTreatmentModel 1 where
-  discount := fun _ => 1
+  discount := fun _ ↦ 1
   discount_nonneg := by
     intro _
     norm_num
@@ -2890,10 +2900,10 @@ noncomputable def thresholdLongitudinalModel
     treatment model. -/
 noncomputable def thresholdClinicalPathway
     (model : ThresholdTreatmentModel) (risk : ℝ) : ClinicalPathway 1 where
-  followupWeight := fun _ => 1
-  eventProb := fun _ => risk
-  treatmentBenefit := fun _ => model.benefit
-  treatmentHarm := fun _ => model.harm
+  followupWeight := fun _ ↦ 1
+  eventProb := fun _ ↦ risk
+  treatmentBenefit := fun _ ↦ model.benefit
+  treatmentHarm := fun _ ↦ model.harm
   followupWeight_nonneg := by
     intro _
     norm_num
@@ -2977,7 +2987,7 @@ theorem qalyGainUnderDecision_threshold_eq_thresholdQalyGainUnderDecision
   · have h_not_treat :
         ¬ receivesTreatment (thresholdLongitudinalModel model)
           (thresholdClinicalPathway model decisionRisk) :=
-      fun h_treat =>
+      fun h_treat ↦
         h ((receivesTreatment_thresholdClinicalPathway_iff model decisionRisk).1 h_treat)
     unfold qalyGainUnderDecision
     rw [if_neg h_not_treat]
@@ -3132,12 +3142,12 @@ theorem expectedQalyLoss_threshold_eq_expectedThresholdQalyLoss
     (μ : Measure Z) (model : ThresholdTreatmentModel)
     (trueRisk predictedRisk : Z → ℝ) :
     expectedQalyLoss μ (thresholdLongitudinalModel model)
-      (fun z => thresholdClinicalPathway model (trueRisk z))
-      (fun z => thresholdClinicalPathway model (predictedRisk z)) =
+      (fun z ↦ thresholdClinicalPathway model (trueRisk z))
+      (fun z ↦ thresholdClinicalPathway model (predictedRisk z)) =
         expectedThresholdQalyLoss μ model trueRisk predictedRisk := by
   unfold expectedQalyLoss expectedThresholdQalyLoss
   refine integral_congr_ae ?_
-  exact Filter.Eventually.of_forall (fun z =>
+  exact Filter.Eventually.of_forall (fun z ↦
     qalyLoss_threshold_eq_thresholdQalyLoss
       model (trueRisk z) (predictedRisk z))
 
@@ -3150,8 +3160,8 @@ theorem expectedThresholdQalyLoss_eq_zero_of_perfect_calibration
     expectedThresholdQalyLoss μ model trueRisk predictedRisk = 0 := by
   unfold expectedThresholdQalyLoss
   have hfun :
-      (fun z => thresholdQalyLoss model (trueRisk z) (predictedRisk z)) =
-        fun _ => (0 : ℝ) := by
+      (fun z ↦ thresholdQalyLoss model (trueRisk z) (predictedRisk z)) =
+        fun _ ↦ (0 : ℝ) := by
     funext z
     exact thresholdQalyLoss_eq_zero_of_perfect_calibration
       model (trueRisk z) (predictedRisk z) (h_cal z)
@@ -3169,7 +3179,7 @@ theorem expectedThresholdQalyLoss_eq_expected_thresholdDecisionRegret
         thresholdDecisionRegretMargin model (trueRisk z) (predictedRisk z) ∂μ := by
   unfold expectedThresholdQalyLoss
   refine integral_congr_ae ?_
-  exact Filter.Eventually.of_forall (fun z =>
+  exact Filter.Eventually.of_forall (fun z ↦
     thresholdQalyLoss_eq_benefit_mul_thresholdDecisionRegretMargin
       model (trueRisk z) (predictedRisk z))
 

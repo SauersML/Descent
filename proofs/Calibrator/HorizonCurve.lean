@@ -87,10 +87,10 @@ theorem naiveHorizonCurve_flat (π : ι → ℝ) (P : ι → ι → ℝ) (f : ι
   have hstep : ∀ x : ι, π x * ∑ y, P x y * f y = ∑ y, π x * (P x y * f y) := by
     intro x
     rw [Finset.mul_sum]
-  rw [Finset.sum_congr rfl fun x _ => hstep x, Finset.sum_comm]
-  refine Finset.sum_congr rfl fun y _ => ?_
+  rw [Finset.sum_congr rfl fun x _ ↦ hstep x, Finset.sum_comm]
+  refine Finset.sum_congr rfl fun y _ ↦ ?_
   have hy : ∀ x ∈ (Finset.univ : Finset ι), π x * (P x y * f y) = π x * P x y * f y :=
-    fun x _ => by ring
+    fun x _ ↦ by ring
   rw [Finset.sum_congr rfl hy, ← Finset.sum_mul, h y]
 
 /-- Two horizons of one stationary family give the same number, so this estimator carries no
@@ -106,7 +106,7 @@ end Flatness
 /-! ## Two states that separate the naive curve from the regret -/
 
 /-- The uniform law on two states. -/
-noncomputable def uniformTwo : Fin 2 → ℝ := fun _ => 1 / 2
+noncomputable def uniformTwo : Fin 2 → ℝ := fun _ ↦ 1 / 2
 
 /-- The kernel that never moves. -/
 def stayKernel (i j : Fin 2) : ℝ := if i = j then 1 else 0

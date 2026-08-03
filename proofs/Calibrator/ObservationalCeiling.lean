@@ -168,7 +168,7 @@ checks and reading the pair of answers is no better than running either. -/
 def and {D₁ D₂ : Type*} {p₁ : Object → D₁} {p₂ : Object → D₂} {P : Object → Prop}
     (B₁ : ProbeBlindness p₁ P) (B₂ : ProbeBlindness p₂ P)
     (hpos : B₂.positive = B₁.positive) (hneg : B₂.negative = B₁.negative) :
-    ProbeBlindness (fun o => (p₁ o, p₂ o)) P where
+    ProbeBlindness (fun o ↦ (p₁ o, p₂ o)) P where
   positive := B₁.positive
   negative := B₁.negative
   same_data := by
@@ -186,7 +186,7 @@ by any rule — decides the property. A guard suite is exactly such a family. -/
 def ofWitnessFamily {Data ι : Type*} (p : ι → Object → Data) (P : Object → Prop)
     (pos neg : Object) (hsame : ∀ i, p i pos = p i neg)
     (hpos : P pos) (hneg : ¬ P neg) :
-    ProbeBlindness (fun o => fun i => p i o) P where
+    ProbeBlindness (fun o ↦ fun i ↦ p i o) P where
   positive := pos
   negative := neg
   same_data := by funext i; exact hsame i
@@ -249,7 +249,7 @@ witnesses' probe values differ by at most `ε`, no `ε`-stable summary of that v
 decides the property. -/
 theorem no_stable_criterion_of_tolerance {Object : Type*} {probe : Object → ℝ}
     {P : Object → Prop} {ε : ℝ}
-    (B : ApproxProbeBlindness (fun a b => |a - b| ≤ ε) probe P)
+    (B : ApproxProbeBlindness (fun a b ↦ |a - b| ≤ ε) probe P)
     {Report : Type*} (report : ℝ → Report)
     (hstable : ∀ a b : ℝ, |a - b| ≤ ε → report a = report b) :
     ¬ ∃ accept : Report → Prop, ∀ o : Object, P o ↔ accept (report (probe o)) :=
@@ -262,7 +262,7 @@ end ApproxProbeBlindness
 
 The bounded-radius and fixed-order results need the stronger statement that a criterion
 may consult *every* level and combine the results arbitrarily. That is the same law
-applied to the probe `o ↦ fun r => probe r o`.
+applied to the probe `o ↦ fun r ↦ probe r o`.
 -/
 
 /-- A blindness witness that survives every level of a graded family of probes. -/
@@ -280,7 +280,7 @@ variable {Level Object Data : Type*} {probe : Level → Object → Data} {P : Ob
 
 /-- Collapse a leveled witness to a single-level witness for the full-family probe. -/
 def toProbeBlindness (B : LeveledBlindness probe P) :
-    ProbeBlindness (fun o => fun ℓ => probe ℓ o) P where
+    ProbeBlindness (fun o ↦ fun ℓ ↦ probe ℓ o) P where
   positive := B.positive
   negative := B.negative
   same_data := by funext ℓ; exact B.same_data ℓ
@@ -307,7 +307,7 @@ family, and the whole family is identical on the witness pair. -/
 theorem no_hierarchy_criterion (B : LeveledBlindness probe P)
     {Verdict : Type*} (combine : (Level → Data) → Verdict) :
     ¬ ∃ accept : Verdict → Prop,
-        ∀ o : Object, P o ↔ accept (combine (fun ℓ => probe ℓ o)) :=
+        ∀ o : Object, P o ↔ accept (combine (fun ℓ ↦ probe ℓ o)) :=
   B.toProbeBlindness.no_criterion_of_factors combine
 
 end LeveledBlindness
@@ -330,7 +330,7 @@ pair that some probe cannot separate therefore bounds what a catalogue may be bu
 from. -/
 theorem IsCompleteCatalogue.separates {α Invariant : Type*} {E : α → α → Prop}
     {label : α → Invariant} (h : IsCompleteCatalogue E label)
-    {x y : α} (hne : ¬ E x y) : label x ≠ label y := fun heq => hne ((h x y).mpr heq)
+    {x y : α} (hne : ¬ E x y) : label x ≠ label y := fun heq ↦ hne ((h x y).mpr heq)
 
 /-- No complete catalogue can factor through a probe that identifies an inequivalent
 pair. This is the invariant-theoretic form of the law, and it is what turns
@@ -339,7 +339,7 @@ complaint. -/
 theorem no_complete_catalogue_factoring
     {α Data Invariant : Type*} {E : α → α → Prop}
     (probe : α → Data) (build : Data → Invariant)
-    (h : IsCompleteCatalogue E (fun a => build (probe a)))
+    (h : IsCompleteCatalogue E (fun a ↦ build (probe a)))
     {x y : α} (hne : ¬ E x y) (hsame : probe x = probe y) : False := by
   refine h.separates hne ?_
   rw [hsame]
@@ -355,7 +355,7 @@ reducing map preserves what "simple" means**.
 Both qualifications are load-bearing, and dropping either empties the claim. The
 condition without them — `∀ x y, E x y ↔ ∃ c : ι, cert c x y`, with `ι` arbitrary and
 `cert` arbitrary — is satisfied by *every* relation whatsoever, by `ι := Unit` and
-`cert := fun _ => E`. `unionOfCertificates_vacuous` below proves that, so the collapse
+`cert := fun _ ↦ E`. `unionOfCertificates_vacuous` below proves that, so the collapse
 is on the record rather than in a reviewer's head. A ceiling everything meets bounds
 nothing, and no theorem stated over it can refute anything.
 
@@ -389,7 +389,7 @@ This theorem exists to make the collapse un-reintroducible: it fails to compile 
 unrestricted condition is ever strengthened, and it stands as the reason
 `IsCountablyCertified` below carries hypotheses. -/
 theorem unionOfCertificates_vacuous {α : Type*} (E : α → α → Prop) :
-    IsUnionOfCertificates E (fun _ : Unit => E) := by
+    IsUnionOfCertificates E (fun _ : Unit ↦ E) := by
   intro x y
   constructor
   · intro h
@@ -404,7 +404,7 @@ theorem unionOfCertificates_of_reduction
     {α β ι : Type*} {E : α → α → Prop} {F : β → β → Prop} {cert : ι → β → β → Prop}
     (f : α → β) (hred : ∀ x y, E x y ↔ F (f x) (f y))
     (hF : IsUnionOfCertificates F cert) :
-    IsUnionOfCertificates E (fun c x y => cert c (f x) (f y)) := by
+    IsUnionOfCertificates E (fun c x y ↦ cert c (f x) (f y)) := by
   intro x y
   rw [hred x y]
   exact hF (f x) (f y)
@@ -432,8 +432,8 @@ structure IsCountablyCertified {α ι : Type*} [Countable ι]
 all of the content is in `Base` being a genuine restriction. Stated so that the
 restriction cannot be quietly dropped later. -/
 theorem countablyCertified_trivialBase {α : Type*} (E : α → α → Prop) :
-    IsCountablyCertified (fun _ => True) E (fun _ : Unit => E) where
-  base_certificates := fun _ => trivial
+    IsCountablyCertified (fun _ ↦ True) E (fun _ : Unit ↦ E) where
+  base_certificates := fun _ ↦ trivial
   is_union := unionOfCertificates_vacuous E
 
 /-- **Ceilings transport along reductions that preserve the base class.**
@@ -459,11 +459,11 @@ theorem countablyCertified_of_reduction
     {BaseA : (α → α → Prop) → Prop} {BaseB : (β → β → Prop) → Prop}
     {E : α → α → Prop} {F : β → β → Prop} {cert : ι → β → β → Prop}
     (f : α → β)
-    (hpull : ∀ r : β → β → Prop, BaseB r → BaseA (fun x y => r (f x) (f y)))
+    (hpull : ∀ r : β → β → Prop, BaseB r → BaseA (fun x y ↦ r (f x) (f y)))
     (hred : ∀ x y, E x y ↔ F (f x) (f y))
     (hF : IsCountablyCertified BaseB F cert) :
-    IsCountablyCertified BaseA E (fun c x y => cert c (f x) (f y)) where
-  base_certificates := fun c => hpull (cert c) (hF.base_certificates c)
+    IsCountablyCertified BaseA E (fun c x y ↦ cert c (f x) (f y)) where
+  base_certificates := fun c ↦ hpull (cert c) (hF.base_certificates c)
   is_union := unionOfCertificates_of_reduction f hred hF.is_union
 
 /-- **How a ceiling refutes something.** To place a relation *above* the ceiling it
@@ -478,12 +478,12 @@ theorem not_countablyCertified_of_invariant
     {α ι : Type*} [Countable ι] {Base : (α → α → Prop) → Prop} {E : α → α → Prop}
     (Inv : (α → α → Prop) → Prop)
     (hInv : ∀ cert : ι → α → α → Prop, (∀ c, Base (cert c)) →
-      Inv (fun x y => ∃ c : ι, cert c x y))
+      Inv (fun x y ↦ ∃ c : ι, cert c x y))
     (hE : ¬ Inv E) (cert : ι → α → α → Prop) :
     ¬ IsCountablyCertified Base E cert := by
   intro h
   refine hE ?_
-  have hEeq : E = fun x y => ∃ c : ι, cert c x y := by
+  have hEeq : E = fun x y ↦ ∃ c : ι, cert c x y := by
     funext x y
     exact propext (h.is_union x y)
   rw [hEeq]
@@ -629,7 +629,7 @@ modulus is available, and `duplicate_separation f S |>.sigma` is definitionally
 `S.sigma`, which is the content the surrounding prose claims. -/
 def duplicate_separation {Object : Type*} [MetricSpace Object] (f : Object → ℝ)
     (S : ProbeSeparation f) :
-    ProbeSeparation (fun o => ((f o, f o) : ℝ × ℝ)) where
+    ProbeSeparation (fun o ↦ ((f o, f o) : ℝ × ℝ)) where
   sigma := S.sigma
   sigma_pos := S.sigma_pos
   separates := by

@@ -83,6 +83,21 @@ structure LiabilityThresholdModel where
   prev_lt_one : prevalence < 1
   case_mean_pos : 0 < case_mean
 
+/-- **The model class is inhabited.**  Sixteen theorems below quantify over
+`LiabilityThresholdModel`; this witness is what distinguishes them from vacuous
+universals over an empty class.  `threshold` is unconstrained by the fields, so `0` is
+as legitimate as any value. -/
+noncomputable def LiabilityThresholdModel.witness : LiabilityThresholdModel where
+  h_sq := 1 / 2
+  prevalence := 1 / 2
+  threshold := 0
+  case_mean := 1
+  h_sq_pos := by norm_num
+  h_sq_lt_one := by norm_num
+  prev_pos := by norm_num
+  prev_lt_one := by norm_num
+  case_mean_pos := by norm_num
+
 /-- **Liability sensitivity.**
     Under the liability threshold model, the sensitivity of a PGS-based
     classifier at classification threshold `T'` is:
@@ -338,7 +353,7 @@ theorem liability_model_provides_sensitivityCurve
     -- This ensures the z-score numerator is nonneg throughout [0,1].
     (h_T' : ∀ R2, 0 ≤ R2 → R2 ≤ 1 →
       0 ≤ Real.sqrt R2 * Real.sqrt m.h_sq * m.case_mean - T') :
-    StrictMonoOn (fun R2 => liabilitySensitivity Φ m R2 T') (Set.Icc 0 1) := by
+    StrictMonoOn (fun R2 ↦ liabilitySensitivity Φ m R2 T') (Set.Icc 0 1) := by
   intro R2₁ hR2₁ R2₂ hR2₂ hlt
   exact liabilitySensitivity_monotone_in_R2 Φ m T' hΦ_mono R2₁ R2₂
     hR2₁.1 hR2₂.2 hlt (h_σ_pos R2₂ hR2₂.1 hR2₂.2)
@@ -357,7 +372,7 @@ theorem liability_model_provides_specificityCurve
     -- Since μ_control < 0, this holds whenever T' ≥ 0.
     (h_T' : ∀ R2, 0 ≤ R2 → R2 ≤ 1 →
       0 ≤ T' - Real.sqrt R2 * Real.sqrt m.h_sq * μ_control) :
-    StrictMonoOn (fun R2 => liabilitySpecificity Φ m R2 T' μ_control) (Set.Icc 0 1) := by
+    StrictMonoOn (fun R2 ↦ liabilitySpecificity Φ m R2 T' μ_control) (Set.Icc 0 1) := by
   intro R2₁ hR2₁ R2₂ hR2₂ hlt
   exact liabilitySpecificity_monotone_in_R2 Φ m T' μ_control hΦ_mono hμ_control_neg R2₁ R2₂
     hR2₁.1 hR2₂.2 hlt (h_σ_pos R2₂ hR2₂.1 hR2₂.2)

@@ -637,7 +637,7 @@ theorem smaller_founder_larger_heterozygosity_loss
   have h_base : 1 - 1 / (2 * (k₂ : ℝ)) < 1 - 1 / (2 * (k₁ : ℝ)) := by
     rw [sub_lt_sub_iff_left]
     apply div_lt_div_of_pos_left one_pos
-    · exact Nat.cast_pos.mpr (by omega) |> (fun h => mul_pos (by norm_num : (0:ℝ) < 2) h)
+    · exact Nat.cast_pos.mpr (by omega) |> (fun h ↦ mul_pos (by norm_num : (0:ℝ) < 2) h)
     · exact mul_lt_mul_of_pos_left (Nat.cast_lt.mpr h_smaller) (by norm_num : (0:ℝ) < 2)
   have h_nn : 0 ≤ 1 - 1 / (2 * (k₂ : ℝ)) := by
     rw [sub_nonneg, div_le_one (by positivity)]

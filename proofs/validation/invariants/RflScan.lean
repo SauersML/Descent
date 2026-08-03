@@ -27,7 +27,7 @@ import Shared.Results
 open Lean Elab Command
 
 /-- Strip leading lambda binders. A theorem with binders stores its proof as
-`fun a b c => Eq.refl _`, so testing the head of the whole value asks whether a
+`fun a b c ↦ Eq.refl _`, so testing the head of the whole value asks whether a
 LAMBDA is `Eq.refl` -- which is never true. The first version of this scan did
 exactly that and reported 0 of 0, a clean-looking null that a positive control
 on two known `:= rfl` theorems refuted immediately. -/

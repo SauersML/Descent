@@ -145,10 +145,10 @@ theorem peelSet_anti {S S' : Set T} (h : S ⊆ S') : F.peelSet S' ⊆ F.peelSet 
 greatest post-fixed point exists. -/
 theorem peel_mono {S S' : Set T} (h : S ⊆ S') : F.peel S ⊆ F.peel S' := by
   rintro t ⟨htS, htP⟩
-  exact ⟨h htS, fun hc => htP (F.peelSet_anti h hc)⟩
+  exact ⟨h htS, fun hc ↦ htP (F.peelSet_anti h hc)⟩
 
 /-- Peeling only removes points. -/
-theorem peel_subset (S : Set T) : F.peel S ⊆ S := fun _ ht => ht.1
+theorem peel_subset (S : Set T) : F.peel S ⊆ S := fun _ ht ↦ ht.1
 
 /-- **The peelable set is open**, being a finite union of preimages of an open set under
 continuous maps. This is what lets a measure vanishing on it have support in the

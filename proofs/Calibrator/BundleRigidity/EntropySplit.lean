@@ -75,10 +75,10 @@ theorem cos_factor_le_one (x : ℝ) : |Real.cos x| ≤ 1 := Real.abs_cos_le_one 
 This is a rate statement only; no variance or central-limit conclusion follows from it. -/
 theorem sublinear_rate_of_bounded (Γ : ℕ → ℝ) (B : ℝ)
     (hnonneg : ∀ n, 0 ≤ Γ n) (hbdd : ∀ n, Γ n ≤ B) :
-    Filter.Tendsto (fun n : ℕ => Γ n / n) Filter.atTop (nhds 0) := by
+    Filter.Tendsto (fun n : ℕ ↦ Γ n / n) Filter.atTop (nhds 0) := by
   have hB : 0 ≤ B := le_trans (hnonneg 0) (hbdd 0)
-  apply squeeze_zero (fun n => div_nonneg (hnonneg n) (Nat.cast_nonneg n))
-    (fun n => div_le_div_of_nonneg_right (hbdd n) (Nat.cast_nonneg n))
+  apply squeeze_zero (fun n ↦ div_nonneg (hnonneg n) (Nat.cast_nonneg n))
+    (fun n ↦ div_le_div_of_nonneg_right (hbdd n) (Nat.cast_nonneg n))
   simpa using tendsto_const_div_atTop_nhds_zero_nat B
 
 end Calibrator.BundleRigidity

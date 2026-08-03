@@ -324,13 +324,13 @@ into shared plus private additive variance. -/
 private theorem additiveGeneticVariance_add_of_orthogonal {m : ℕ}
     (β_shared β_private : Fin m → ℝ)
     (h_orth : dotProduct β_shared β_private = 0) :
-    additiveGeneticVariance (fun i => β_shared i + β_private i) =
+    additiveGeneticVariance (fun i ↦ β_shared i + β_private i) =
       additiveGeneticVariance β_shared + additiveGeneticVariance β_private := by
   rw [additiveGeneticVariance_eq_dotProduct,
     additiveGeneticVariance_eq_dotProduct β_shared,
     additiveGeneticVariance_eq_dotProduct β_private]
   calc
-    dotProduct (fun i => β_shared i + β_private i) (fun i => β_shared i + β_private i)
+    dotProduct (fun i ↦ β_shared i + β_private i) (fun i ↦ β_shared i + β_private i)
         =
           dotProduct β_shared β_shared + dotProduct β_shared β_private +
             (dotProduct β_private β_shared + dotProduct β_private β_private) := by
@@ -349,7 +349,7 @@ private theorem transportedTargetR2DiagonalLD_eq_sharedHeritability_of_orthogona
     (h_var_y : 0 < var_y)
     (h_shared_nonzero : 0 < additiveGeneticVariance β_shared)
     (h_orth : dotProduct β_shared β_private = 0) :
-    transportedTargetR2DiagonalLD β_shared (fun i => β_shared i + β_private i) var_y =
+    transportedTargetR2DiagonalLD β_shared (fun i ↦ β_shared i + β_private i) var_y =
       additiveHeritability β_shared var_y := by
   unfold transportedTargetR2DiagonalLD transportedTargetR2SharedLD pgsR2
     sharedLDGeneticVariance additiveHeritability
@@ -390,9 +390,9 @@ theorem fundamental_portability_limit
     (h_var_y : 0 < var_y)
     (h_shared_nonzero : 0 < additiveGeneticVariance β_shared)
     (h_orth : dotProduct β_shared β_private = 0) :
-    transportedTargetR2DiagonalLD β_shared (fun i => β_shared i + β_private i) var_y +
+    transportedTargetR2DiagonalLD β_shared (fun i ↦ β_shared i + β_private i) var_y +
       additiveHeritability β_private var_y =
-        additiveHeritability (fun i => β_shared i + β_private i) var_y := by
+        additiveHeritability (fun i ↦ β_shared i + β_private i) var_y := by
   rw [transportedTargetR2DiagonalLD_eq_sharedHeritability_of_orthogonal_private
     β_shared β_private var_y h_var_y h_shared_nonzero h_orth]
   unfold additiveHeritability

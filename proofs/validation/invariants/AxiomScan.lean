@@ -142,9 +142,9 @@ not an admission -- otherwise adding one `sorry` anywhere in a proof would buy
 silence for every axiom it also happens to rest on. -/
 def classify (allowed admissible : List Name) (ax : Array Name) :
     Option (Bool × Array Name) :=
-  let bad := ax.filter fun a => !(allowed.contains a)
+  let bad := ax.filter fun a ↦ !(allowed.contains a)
   if bad.isEmpty then none
-  else some (bad.any fun a => !(admissible.contains a), bad)
+  else some (bad.any fun a ↦ !(admissible.contains a), bad)
 
 end AxiomScan
 

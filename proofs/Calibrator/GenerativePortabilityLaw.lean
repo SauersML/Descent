@@ -144,7 +144,7 @@ re-analysis of order-erased allele- or feature-frequency marginals can determine
 portability loss caused by ancestry-tract or haplotype persistence. -/
 noncomputable def marginalAmplitudeHistoryDegradationBlindness :
     ProbeBlindness historyMarginalAmplitude
-      (fun h => historyDegradation (independentHistory 1) h = 0) where
+      (fun h ↦ historyDegradation (independentHistory 1) h = 0) where
   positive := independentHistory 1
   negative := persistentHalfHistory 1
   same_data := same_marginal_different_memory_degradation.1

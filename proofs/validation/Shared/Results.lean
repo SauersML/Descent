@@ -59,7 +59,7 @@ def gitDirtyPaths : IO (Option (Array String)) := do
                           ":(exclude)proofs/validation/**/*.json"] with
   | none => return none
   | some s =>
-    return some <| (s.splitOn "\n").toArray.filterMap fun line =>
+    return some <| (s.splitOn "\n").toArray.filterMap fun line ↦
       let line := line.trim
       if line.isEmpty then none else some line
 

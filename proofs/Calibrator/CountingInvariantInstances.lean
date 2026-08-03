@@ -93,7 +93,7 @@ noncomputable section
 /-- The distance between two moment sequences, up to order `o`: the largest disagreement
     among the moments a functional of order `o` consults. -/
 def momentDist (o : ℕ) (mu nu : ℕ → ℝ) : ℝ :=
-  (Finset.range (o + 1)).sup' (by simp) fun p => |mu p - nu p|
+  (Finset.range (o + 1)).sup' (by simp) fun p ↦ |mu p - nu p|
 
 theorem momentDist_nonneg (o : ℕ) (mu nu : ℕ → ℝ) : 0 ≤ momentDist o mu nu := by
   unfold momentDist
@@ -116,7 +116,7 @@ theorem abs_moment_sub_le_momentDist (o : ℕ) (mu nu : ℕ → ℝ) {p : ℕ} (
   exact Finset.le_sup'_of_le _ (Finset.mem_range.mpr (Nat.lt_succ_of_le hp)) (le_refl _)
 
 /-- The moment sequence of a spectrum, as the counting invariant. -/
-def momentInvariant (m : ℕ) (lam : ℕ → ℝ) : ℕ → ℝ := fun p => normalizedMoment m lam p
+def momentInvariant (m : ℕ) (lam : ℕ → ℝ) : ℕ → ℝ := fun p ↦ normalizedMoment m lam p
 
 /-- **The `m_eff` witness, as an approximate blindness witness.**
 

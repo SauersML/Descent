@@ -147,7 +147,7 @@ variable (F : BundleFamily T d)
 /-- The **modulus curve** of atom `j`: `|atom j t ^ 2 - 1|`, the value taken by `|U|`
 where `U = X ^ 2 - 1` is the centered square of the standardized value. -/
 noncomputable def modulusMap (F : BundleFamily T d) (j : Fin d) : C(T, ℝ) :=
-  ⟨fun t => |F.atom j t ^ 2 - 1|,
+  ⟨fun t ↦ |F.atom j t ^ 2 - 1|,
     (((F.atom j).continuous.pow 2).sub continuous_const).abs⟩
 
 @[simp] theorem modulusMap_apply (j : Fin d) (t : T) :
@@ -165,8 +165,8 @@ Equivalently this is the pairing of `f` against the transfer measure
 `TT t = ∑ j, mass j t • δ (modulusMap j t)`. Everything in this file is a statement about
 this one expression. -/
 noncomputable def coTransfer (F : BundleFamily T d) (f : C(ℝ, ℝ)) : C(T, ℝ) :=
-  ⟨fun t => ∑ j, F.mass j t * f (F.modulusMap j t),
-    continuous_finset_sum _ fun j _ =>
+  ⟨fun t ↦ ∑ j, F.mass j t * f (F.modulusMap j t),
+    continuous_finset_sum _ fun j _ ↦
       (F.mass j).continuous.mul (f.continuous.comp (F.modulusMap j).continuous)⟩
 
 @[simp] theorem coTransfer_apply (f : C(ℝ, ℝ)) (t : T) :
@@ -179,13 +179,13 @@ noncomputable def coTransferₗ (F : BundleFamily T d) : C(ℝ, ℝ) →ₗ[ℝ]
     ext t
     simp only [coTransfer_apply, ContinuousMap.add_apply]
     rw [← Finset.sum_add_distrib]
-    exact Finset.sum_congr rfl fun j _ => by ring
+    exact Finset.sum_congr rfl fun j _ ↦ by ring
   map_smul' c f := by
     ext t
     simp only [coTransfer_apply, ContinuousMap.smul_apply, RingHom.id_apply,
       ContinuousMap.smul_apply, smul_eq_mul]
     rw [Finset.mul_sum]
-    exact Finset.sum_congr rfl fun j _ => by ring
+    exact Finset.sum_congr rfl fun j _ ↦ by ring
 
 @[simp] theorem coTransferₗ_apply (f : C(ℝ, ℝ)) : F.coTransferₗ f = F.coTransfer f := rfl
 
@@ -290,7 +290,7 @@ theorem isSymmetry_of_perm (τ : C(T, T)) (σ : Equiv.Perm (Fin d))
     F.IsSymmetry τ := by
   intro f t
   simp only [coTransfer_apply]
-  exact Fintype.sum_equiv σ _ _ fun j => by rw [hmass j t, hmod j t]
+  exact Fintype.sum_equiv σ _ _ fun j ↦ by rw [hmass j t, hmod j t]
 
 /-- A measure is **`τ`-odd** when pulling back along `τ` negates it. -/
 def IsTauOdd (τ : C(T, T)) (κ : C(T, ℝ) →ₗ[ℝ] ℝ) : Prop :=
@@ -316,7 +316,7 @@ theorem transfer_eq_zero_of_tauOdd {τ : C(T, T)} (hsym : F.IsSymmetry τ)
   ext f
   have hinv : pullback τ (F.coTransfer f) = F.coTransfer f := by
     ext t; exact hsym f t
-  have h := congrArg (fun L => L (F.coTransfer f)) hodd
+  have h := congrArg (fun L ↦ L (F.coTransfer f)) hodd
   simp only [LinearMap.comp_apply, LinearMap.neg_apply] at h
   rw [hinv] at h
   simp only [transfer_apply, LinearMap.zero_apply]
@@ -373,10 +373,10 @@ theorem transfer_eq_transfer_evenPart {τ : C(T, T)} (hsym : F.IsSymmetry τ)
   have hz : κ (F.coTransfer f) = evenPart τ κ (F.coTransfer f) := by
     have h1 : evenPart τ κ (F.coTransfer f) + oddPart τ κ (F.coTransfer f)
         = κ (F.coTransfer f) := by
-      have := congrArg (fun L => L (F.coTransfer f)) (evenPart_add_oddPart τ κ)
+      have := congrArg (fun L ↦ L (F.coTransfer f)) (evenPart_add_oddPart τ κ)
       simpa using this
     have h2 : oddPart τ κ (F.coTransfer f) = 0 := by
-      have := congrArg (fun L => L f) hodd
+      have := congrArg (fun L ↦ L f) hodd
       simpa using this
     rw [h2, add_zero] at h1
     exact h1.symm
@@ -402,8 +402,8 @@ theorem mem_ker_iff_evenPart_mem_ker {τ : C(T, T)} (hsym : F.IsSymmetry τ)
 theorem eq_zero_of_tauOdd_of_tauEven {τ : C(T, T)} {κ : C(T, ℝ) →ₗ[ℝ] ℝ}
     (hodd : IsTauOdd τ κ) (heven : IsTauEven τ κ) : κ = 0 := by
   ext f
-  have h1 := congrArg (fun L => L f) hodd
-  have h2 := congrArg (fun L => L f) heven
+  have h1 := congrArg (fun L ↦ L f) hodd
+  have h2 := congrArg (fun L ↦ L f) heven
   simp only [LinearMap.comp_apply, LinearMap.neg_apply] at h1
   simp only [LinearMap.comp_apply] at h2
   simp only [LinearMap.zero_apply]
@@ -415,7 +415,7 @@ def IsInvariantFn (τ : C(T, T)) (f : C(T, ℝ)) : Prop := ∀ t : T, f (τ t) =
 /-- **`L*` always lands in the `τ`-invariant test functions.** This is `TT ∘ τ = TT`
 restated, and it is the reason the operator factors through the quotient. -/
 theorem isInvariantFn_coTransfer {τ : C(T, T)} (hsym : F.IsSymmetry τ) (f : C(ℝ, ℝ)) :
-    IsInvariantFn τ (F.coTransfer f) := fun t => hsym f t
+    IsInvariantFn τ (F.coTransfer f) := fun t ↦ hsym f t
 
 /-- **`τ`-even measures are exactly measures on the quotient `T / τ`**, in the only sense
 needed here: an even measure is determined by its values on `τ`-invariant test functions.
@@ -441,7 +441,7 @@ theorem tauEven_eq_of_agree_on_invariants {τ : C(T, T)} (hinv : ∀ t : T, τ (
       smul_eq_mul, hinv t]
     ring
   have hkh : κ h = 0 := by
-    have h1 := congrArg (fun L => L h) hκ
+    have h1 := congrArg (fun L ↦ L h) hκ
     simp only [LinearMap.comp_apply] at h1
     have h2 : pullback τ h = -h := by
       ext t
@@ -451,7 +451,7 @@ theorem tauEven_eq_of_agree_on_invariants {τ : C(T, T)} (hinv : ∀ t : T, τ (
     rw [h2, map_neg] at h1
     linarith
   have hk'h : κ' h = 0 := by
-    have h1 := congrArg (fun L => L h) hκ'
+    have h1 := congrArg (fun L ↦ L h) hκ'
     simp only [LinearMap.comp_apply] at h1
     have h2 : pullback τ h = -h := by
       ext t

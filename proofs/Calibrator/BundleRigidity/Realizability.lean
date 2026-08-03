@@ -114,7 +114,7 @@ theorem block_variance_one (q w A C : Fin B → ℝ)
 theorem block_mass_one (q : Fin B → ℝ) (hq : ∑ b, q b = 1) :
     ∑ b, 4 * (q b / 4) = 1 := by
   convert hq using 1
-  refine Finset.sum_congr rfl fun b _ => ?_
+  refine Finset.sum_congr rfl fun b _ ↦ ?_
   ring
 
 /-- Outer and inner atom magnitudes used by the symmetric lift. -/
@@ -205,7 +205,7 @@ theorem sin_has_many_zeros (N : ℕ) (hN : 0 < N) :
     ∃ f : Fin (N + 1) → ℝ, Function.Injective f ∧
       ∀ k : Fin (N + 1), Real.sin ((N : ℝ) * f k) = 0 := by
   have hNne : (N : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr (Nat.ne_of_gt hN)
-  refine ⟨fun k => (k : ℕ) * Real.pi / (N : ℝ), ?_, ?_⟩
+  refine ⟨fun k ↦ (k : ℕ) * Real.pi / (N : ℝ), ?_, ?_⟩
   · intro k k' hkk'
     have hc : Real.pi / (N : ℝ) ≠ 0 := div_ne_zero Real.pi_ne_zero hNne
     have hkreal : (k : ℝ) = (k' : ℝ) := by

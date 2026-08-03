@@ -77,7 +77,7 @@ theorem crossCovVector_causalSignal_self
   simp only [Matrix.of_apply, dotProduct]
   refine Finset.sum_congr rfl ?_
   intro j _
-  rw [show (fun ω => β j * X ω j) = β j • (fun ω => X ω j) from rfl,
+  rw [show (fun ω ↦ β j * X ω j) = β j • (fun ω ↦ X ω j) from rfl,
     covariance_smul_right]
   ring
 

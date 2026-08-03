@@ -108,7 +108,7 @@ def PCCorrectionModel.fineScaleSubspace (m : PCCorrectionModel) :
 /-- Residual confounding after projecting out the corrected top PCs. -/
 noncomputable def PCCorrectionModel.removeTopPCs (m : PCCorrectionModel)
     (bias : Fin m.p → ℝ) : Fin m.p → ℝ :=
-  fun i => if m.k.val < i.val then bias i else 0
+  fun i ↦ if m.k.val < i.val then bias i else 0
 
 /-- Squared Euclidean magnitude of the confounding left after PC correction. -/
 noncomputable def PCCorrectionModel.residualBiasEnergy (m : PCCorrectionModel)
@@ -196,7 +196,7 @@ theorem pc_correction_recent_structure_lower_bound
           m.pc.residualBiasEnergy m.direction := by
       unfold PCCorrectionModel.residualBiasEnergy
       exact Finset.single_le_sum
-        (fun i _ => sq_nonneg (m.pc.removeTopPCs m.direction i)) (by simp)
+        (fun i _ ↦ sq_nonneg (m.pc.removeTopPCs m.direction i)) (by simp)
     rw [hwitness_residual] at hcoordinate
     exact hloading_sq.trans hcoordinate
 
@@ -228,7 +228,7 @@ theorem spectral_correction_residual_bias_lower_bound {p : ℕ}
       (retention j * bias j) ^ 2 ≤ spectralResidualBiasEnergy retention bias := by
     unfold spectralResidualBiasEnergy
     exact Finset.single_le_sum
-      (fun i _ => sq_nonneg (retention i * bias i)) (by simp)
+      (fun i _ ↦ sq_nonneg (retention i * bias i)) (by simp)
   exact hcoordinate_sq.trans hcoordinate
 
 end Calibrator

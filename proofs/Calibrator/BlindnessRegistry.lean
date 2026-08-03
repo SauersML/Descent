@@ -120,11 +120,11 @@ This is why the same wrong number was certified five times: it was never five
 independent certifications, it was one blind suite applied five times. -/
 noncomputable def guard_stack_blind_to_retention {trueRetention wrongRetention : ℝ}
     (hne : wrongRetention ≠ trueRetention) :
-    ProbeBlindness (fun r => fun g : StructuralGuard => g.verdict r)
-      (fun r => r = trueRetention) :=
+    ProbeBlindness (fun r ↦ fun g : StructuralGuard ↦ g.verdict r)
+      (fun r ↦ r = trueRetention) :=
   ProbeBlindness.ofWitnessFamily StructuralGuard.verdict _ trueRetention wrongRetention
-    (fun g => propext ⟨fun _ => g.verdict_holds wrongRetention,
-                       fun _ => g.verdict_holds trueRetention⟩)
+    (fun g ↦ propext ⟨fun _ ↦ g.verdict_holds wrongRetention,
+                       fun _ ↦ g.verdict_holds trueRetention⟩)
     rfl hne
 
 /-- Spelled out, including every way of folding the suite's answers into one verdict:
@@ -133,7 +133,7 @@ theorem no_guard_stack_criterion {trueRetention wrongRetention : ℝ}
     (hne : wrongRetention ≠ trueRetention)
     {Verdict : Type*} (combine : (StructuralGuard → Prop) → Verdict) :
     ¬ ∃ accept : Verdict → Prop,
-        ∀ r : ℝ, r = trueRetention ↔ accept (combine (fun g => g.verdict r)) :=
+        ∀ r : ℝ, r = trueRetention ↔ accept (combine (fun g ↦ g.verdict r)) :=
   (guard_stack_blind_to_retention hne).no_criterion_of_factors combine
 
 /-- Adding a fourth guard of the same kind changes nothing: any predicate on candidate
@@ -141,18 +141,18 @@ retentions that is satisfied at every retention joins the suite without narrowin
 noncomputable def extra_algebraic_guard_adds_nothing {trueRetention wrongRetention : ℝ}
     (hne : wrongRetention ≠ trueRetention)
     (newGuard : ℝ → Prop) (hnew : ∀ r, newGuard r) :
-    ProbeBlindness (fun r => (fun g : StructuralGuard => g.verdict r, newGuard r))
-      (fun r => r = trueRetention) where
+    ProbeBlindness (fun r ↦ (fun g : StructuralGuard ↦ g.verdict r, newGuard r))
+      (fun r ↦ r = trueRetention) where
   positive := trueRetention
   negative := wrongRetention
   same_data := by
-    have h₁ : (fun g : StructuralGuard => g.verdict trueRetention)
-        = fun g : StructuralGuard => g.verdict wrongRetention := by
+    have h₁ : (fun g : StructuralGuard ↦ g.verdict trueRetention)
+        = fun g : StructuralGuard ↦ g.verdict wrongRetention := by
       funext g
-      exact propext ⟨fun _ => g.verdict_holds wrongRetention,
-                     fun _ => g.verdict_holds trueRetention⟩
+      exact propext ⟨fun _ ↦ g.verdict_holds wrongRetention,
+                     fun _ ↦ g.verdict_holds trueRetention⟩
     have h₂ : newGuard trueRetention = newGuard wrongRetention :=
-      propext ⟨fun _ => hnew wrongRetention, fun _ => hnew trueRetention⟩
+      propext ⟨fun _ ↦ hnew wrongRetention, fun _ ↦ hnew trueRetention⟩
     rw [h₁, h₂]
   holds := rfl
   fails := hne
@@ -296,7 +296,7 @@ value on allele dosage under this development's own `HardyWeinbergModel`. So the
 this instance proves undecidable is the coefficient a polygenic score fits, not an
 abstraction standing in for it. -/
 noncomputable def averageEffect_blind_to_dominance {δ : ℝ} (hδ : δ ≠ 0) (a : ℝ) :
-    ProbeBlindness OneLocusArchitecture.averageEffect (fun m => m.d = 0) where
+    ProbeBlindness OneLocusArchitecture.averageEffect (fun m ↦ m.d = 0) where
   positive := ⟨a, 0, 1 / 2⟩
   negative := ⟨a, δ, 1 / 2⟩
   same_data := by

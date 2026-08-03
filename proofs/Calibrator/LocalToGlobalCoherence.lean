@@ -236,7 +236,7 @@ theorem no_bounded_locality_hierarchy
     (hbip : asymptoticallyRealizable bipartiteTwin)
     (hnon : ¬ asymptoticallyRealizable nonBipartiteTwin) :
     ¬ ∀ L : System,
-        asymptoticallyRealizable L ↔ accept (combine (fun r => localData r L)) := by
+        asymptoticallyRealizable L ↔ accept (combine (fun r ↦ localData r L)) := by
   intro hdec
   exact
     ({ positive := bipartiteTwin, negative := nonBipartiteTwin, same_data := hlocal,

@@ -980,15 +980,15 @@ theorem islandFstFiniteDemes_lt_islandLimit (Ne m d : ℝ)
 the definition rather than a claim in a comment. -/
 theorem islandDemeCorrection_tendsto_one :
     Filter.Tendsto islandDemeCorrection Filter.atTop (nhds 1) := by
-  have h1 : Filter.Tendsto (fun d : ℝ => d - 1) Filter.atTop Filter.atTop := by
+  have h1 : Filter.Tendsto (fun d : ℝ ↦ d - 1) Filter.atTop Filter.atTop := by
     simpa using Filter.tendsto_atTop_add_const_right Filter.atTop (-1)
       (Filter.tendsto_id (α := ℝ))
-  have h2 : Filter.Tendsto (fun d : ℝ => (d - 1)⁻¹) Filter.atTop (nhds 0) :=
+  have h2 : Filter.Tendsto (fun d : ℝ ↦ (d - 1)⁻¹) Filter.atTop (nhds 0) :=
     tendsto_inv_atTop_zero.comp h1
-  have h3 : Filter.Tendsto (fun d : ℝ => 1 + (d - 1)⁻¹) Filter.atTop (nhds 1) := by
+  have h3 : Filter.Tendsto (fun d : ℝ ↦ 1 + (d - 1)⁻¹) Filter.atTop (nhds 1) := by
     simpa using (tendsto_const_nhds (α := ℝ) (x := (1 : ℝ))
       (f := Filter.atTop)).add h2
-  have h4 : Filter.Tendsto (fun d : ℝ => d / (d - 1)) Filter.atTop (nhds 1) := by
+  have h4 : Filter.Tendsto (fun d : ℝ ↦ d / (d - 1)) Filter.atTop (nhds 1) := by
     apply h3.congr'
     filter_upwards [Filter.eventually_gt_atTop (1 : ℝ)] with d hd
     have hne : d - 1 ≠ 0 := by intro h; linarith [sub_eq_zero.mp h]

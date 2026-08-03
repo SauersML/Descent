@@ -184,7 +184,7 @@ theorem abs_sum_mul_mul_le
     rw [← Finset.sum_mul, mul_comm]
   have step3 : ∑ i ∈ s, |a i| * |b i|
       ≤ Real.sqrt (∑ i ∈ s, |a i| ^ 2) * Real.sqrt (∑ i ∈ s, |b i| ^ 2) :=
-    Real.sum_mul_le_sqrt_mul_sqrt s (fun i => |a i|) (fun i => |b i|)
+    Real.sum_mul_le_sqrt_mul_sqrt s (fun i ↦ |a i|) (fun i ↦ |b i|)
   have hsq : ∀ f : ι → ℝ, ∑ i ∈ s, |f i| ^ 2 = ∑ i ∈ s, f i ^ 2 := by
     intro f
     refine Finset.sum_congr rfl ?_
@@ -237,21 +237,21 @@ theorem prod_sup_bound {k : ℕ} (τ : ℝ) (hτ : 0 ≤ τ) (e : Fin k → ℝ)
   rw [Finset.abs_prod]
   calc ∏ l : Fin k, |e l|
       ≤ ∏ _l : Fin k, Real.sqrt τ := by
-        refine Finset.prod_le_prod (fun i _ => abs_nonneg _) (fun i _ => he i)
+        refine Finset.prod_le_prod (fun i _ ↦ abs_nonneg _) (fun i _ ↦ he i)
     _ = Real.sqrt τ ^ k := by simp
 
 /-- **Every fixed-order normalized contraction vanishes in the low-influence limit.**
 The bound `|kappa| * sqrt tau ^ k` tends to zero as `tau → 0` for every `k ≥ 1`, i.e.
 for every contraction order `r = k + 2 ≥ 3`. -/
 theorem contraction_bound_tendsto_zero {k : ℕ} (hk : 1 ≤ k) (κ : ℝ) :
-    Filter.Tendsto (fun τ : ℝ => |κ| * Real.sqrt τ ^ k)
+    Filter.Tendsto (fun τ : ℝ ↦ |κ| * Real.sqrt τ ^ k)
       (nhdsWithin 0 (Set.Ioi 0)) (nhds 0) := by
   have hk0 : k ≠ 0 := by omega
   -- `Continuous.const_mul` does not exist in mathlib; the constant factor goes in
   -- through `continuous_const.mul` instead.
-  have hmul : Continuous fun τ : ℝ => |κ| * Real.sqrt τ ^ k :=
+  have hmul : Continuous fun τ : ℝ ↦ |κ| * Real.sqrt τ ^ k :=
     continuous_const.mul (Real.continuous_sqrt.pow k)
-  have hcont : Filter.Tendsto (fun τ : ℝ => |κ| * Real.sqrt τ ^ k)
+  have hcont : Filter.Tendsto (fun τ : ℝ ↦ |κ| * Real.sqrt τ ^ k)
       (nhds 0) (nhds (|κ| * Real.sqrt 0 ^ k)) := hmul.tendsto 0
   simp only [Real.sqrt_zero, zero_pow hk0, mul_zero] at hcont
   exact hcont.mono_left nhdsWithin_le_nhds

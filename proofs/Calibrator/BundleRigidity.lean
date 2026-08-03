@@ -127,11 +127,11 @@ noncomputable def spectrumModulusLaw {k n : ℕ} (family : BundleFamily k)
 
 /-- Two panels on the same loci, with weights added. -/
 def Panel.addWeights {n : ℕ} (panel other : Panel n) : Panel n :=
-  { support := panel.support, weight := fun i => panel.weight i + other.weight i }
+  { support := panel.support, weight := fun i ↦ panel.weight i + other.weight i }
 
 /-- A panel with its weights rescaled. -/
 def Panel.smulWeights {n : ℕ} (c : ℝ) (panel : Panel n) : Panel n :=
-  { support := panel.support, weight := fun i => c * panel.weight i }
+  { support := panel.support, weight := fun i ↦ c * panel.weight i }
 
 /-- **The modulus law is additive in the weights.** -/
 theorem spectrumModulusLaw_add {k n : ℕ} (family : BundleFamily k)
@@ -140,7 +140,7 @@ theorem spectrumModulusLaw_add {k n : ℕ} (family : BundleFamily k)
       spectrumModulusLaw family panel v + spectrumModulusLaw family other v := by
   unfold spectrumModulusLaw Panel.addWeights
   rw [← Finset.sum_add_distrib]
-  refine Finset.sum_congr rfl (fun i _ => ?_)
+  refine Finset.sum_congr rfl (fun i _ ↦ ?_)
   rw [hsupport]
   ring
 
@@ -151,7 +151,7 @@ theorem spectrumModulusLaw_smul {k n : ℕ} (family : BundleFamily k)
       c * spectrumModulusLaw family panel v := by
   unfold spectrumModulusLaw Panel.smulWeights
   rw [Finset.mul_sum]
-  refine Finset.sum_congr rfl (fun i _ => ?_)
+  refine Finset.sum_congr rfl (fun i _ ↦ ?_)
   ring
 
 /-- **Locus `i` covers the modulus value `v`** when one of its atoms lands there with
@@ -190,7 +190,7 @@ theorem kernel_vanishes_at_singly_covered {k n : ℕ} (family : BundleFamily k)
   have hsum : spectrumModulusLaw family panel v =
       panel.weight i * family.massAt (panel.support i) v := by
     unfold spectrumModulusLaw
-    refine Finset.sum_eq_single i (fun l _ hl => ?_) (fun hcontra => ?_)
+    refine Finset.sum_eq_single i (fun l _ hl ↦ ?_) (fun hcontra ↦ ?_)
     · rw [hothers l hl, mul_zero]
     · exact absurd (Finset.mem_univ i) hcontra
   rw [hsum] at hkernel
@@ -233,21 +233,21 @@ the same spectrum. -/
 theorem panels_agree_of_modulus_law_agree {k n : ℕ} (family : BundleFamily k)
     (panel other : Panel n) (hsupport : panel.support = other.support)
     (hdiff : Separating family
-      { support := panel.support, weight := fun i => panel.weight i - other.weight i })
+      { support := panel.support, weight := fun i ↦ panel.weight i - other.weight i })
     (hlaw : ∀ v : ℝ, spectrumModulusLaw family panel v =
       spectrumModulusLaw family other v) (i : Fin n) :
     panel.weight i = other.weight i := by
   have hzero : ∀ v : ℝ, spectrumModulusLaw family
-      { support := panel.support, weight := fun i => panel.weight i - other.weight i } v
+      { support := panel.support, weight := fun i ↦ panel.weight i - other.weight i } v
         = 0 := by
     intro v
     have hexpand : spectrumModulusLaw family
         { support := panel.support,
-          weight := fun i => panel.weight i - other.weight i } v =
+          weight := fun i ↦ panel.weight i - other.weight i } v =
         spectrumModulusLaw family panel v - spectrumModulusLaw family other v := by
       unfold spectrumModulusLaw
       rw [← Finset.sum_sub_distrib]
-      refine Finset.sum_congr rfl (fun l _ => ?_)
+      refine Finset.sum_congr rfl (fun l _ ↦ ?_)
       rw [hsupport]
       ring
     rw [hexpand, hlaw v, sub_self]

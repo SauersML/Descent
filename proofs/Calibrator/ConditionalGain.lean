@@ -122,23 +122,23 @@ private theorem binaryOneLocus_univ :
 
 /-- Balanced binary law with opposite phases `0` and `π`. -/
 noncomputable def balancedBinaryOppositePhaseLaw : FiniteCoupledPhaseLaw 1 2 where
-  mass := fun _ => 1 / 2
+  mass := fun _ ↦ 1 / 2
   mass_nonneg := by intro; norm_num
   mass_sum := by
     rw [binaryOneLocus_univ]
     norm_num
-  phase := fun _ j => if j = 0 then 0 else Real.pi
+  phase := fun _ j ↦ if j = 0 then 0 else Real.pi
 
 /-- Biased binary law on the same support and with the same opposite phases. -/
 noncomputable def biasedBinaryOppositePhaseLaw : FiniteCoupledPhaseLaw 1 2 where
-  mass := fun x => if x 0 = 0 then 3 / 4 else 1 / 4
+  mass := fun x ↦ if x 0 = 0 then 3 / 4 else 1 / 4
   mass_nonneg := by
     intro x
     split_ifs <;> norm_num
   mass_sum := by
     rw [binaryOneLocus_univ]
     norm_num
-  phase := fun _ j => if j = 0 then 0 else Real.pi
+  phase := fun _ j ↦ if j = 0 then 0 else Real.pi
 
 /-- The balanced law cancels exactly at frequency one. -/
 theorem balancedBinaryOppositePhaseLaw_amplitude_one :
@@ -224,7 +224,7 @@ theorem secondMoment_le_radius_sq : B.secondMoment ≤ B.radius ^ 2 := by
   calc
     ∑ ω, B.weight ω * B.deviation ω ^ 2
         ≤ ∑ ω, B.weight ω * B.radius ^ 2 := by
-          refine Finset.sum_le_sum fun ω _ => ?_
+          refine Finset.sum_le_sum fun ω _ ↦ ?_
           have habs := B.bound ω
           have hsq : B.deviation ω ^ 2 ≤ B.radius ^ 2 := by
             rw [abs_le] at habs
@@ -364,8 +364,8 @@ practical caveat added**. Exact rational sweep and finite-sample arm in
 
 /-- The witness family: two atoms, values `1` and `0`, hence moduli `0` and `1`. -/
 noncomputable def copyWitnessFamily : BundleFamily 2 where
-  atomValue := fun j _ => if j = 0 then 1 else 0
-  atomMass := fun _ _ => 1 / 2
+  atomValue := fun j _ ↦ if j = 0 then 1 else 0
+  atomMass := fun _ _ ↦ 1 / 2
 
 theorem copyWitnessFamily_modulus (j : Fin 2) (t : ℝ) :
     copyWitnessFamily.modulus j t = if j = 0 then 0 else 1 := by
@@ -375,22 +375,22 @@ theorem copyWitnessFamily_modulus (j : Fin 2) (t : ℝ) :
 /-- **The modulus-copy coupling**: locus two copies locus one, so only the diagonal carries
     mass. This is perfect LD, and it is the `η = 0` boundary of the floor hypothesis. -/
 noncomputable def modulusCopyCoupling : FiberCoupling 2 2 where
-  mass := fun x => if x 0 = x 1 then 1 / 2 else 0
+  mass := fun x ↦ if x 0 = x 1 then 1 / 2 else 0
 
 /-- The modulus-copy coupling fails full support: the off-diagonal cells are empty. -/
 theorem modulusCopyCoupling_not_fullSupport : ¬ modulusCopyCoupling.FullSupport := by
   intro hfull
-  have h := hfull (fun i => if i = 0 then 0 else 1)
+  have h := hfull (fun i ↦ if i = 0 then 0 else 1)
   unfold modulusCopyCoupling at h
   norm_num at h
 
 /-- The target cell: slot one at modulus `0`, slot two at modulus `1`. -/
-def copyWitnessValue : Fin 2 → ℝ := fun i => if i = 0 then 0 else 1
+def copyWitnessValue : Fin 2 → ℝ := fun i ↦ if i = 0 then 0 else 1
 
 /-- **Both marginals reach the cell**: it is covered by the product. -/
 theorem copyWitness_productCovers :
-    ProductCovers copyWitnessFamily (fun _ => 0) copyWitnessValue := by
-  refine ⟨fun i => if i = 0 then 0 else 1, fun i => ?_⟩
+    ProductCovers copyWitnessFamily (fun _ ↦ 0) copyWitnessValue := by
+  refine ⟨fun i ↦ if i = 0 then 0 else 1, fun i ↦ ?_⟩
   rw [copyWitnessFamily_modulus]
   unfold copyWitnessValue
   by_cases hi : i = 0 <;> simp [hi]
@@ -402,7 +402,7 @@ theorem copyWitness_productCovers :
     perfect LD is strictly smaller than product coverage — the exact failure that
     `coverage_invariant`'s support hypothesis excludes. -/
 theorem copyWitness_not_coversTuple :
-    ¬ CoversTuple copyWitnessFamily (fun _ => 0) modulusCopyCoupling copyWitnessValue := by
+    ¬ CoversTuple copyWitnessFamily (fun _ ↦ 0) modulusCopyCoupling copyWitnessValue := by
   rintro ⟨x, hmass, hx⟩
   have hdiag : x 0 = x 1 := by
     unfold modulusCopyCoupling at hmass
@@ -418,8 +418,8 @@ theorem copyWitness_not_coversTuple :
     `coverage_invariant` cannot be dropped; they do not assert that every zero-floor
     coupling loses this particular cell. -/
 theorem coverage_invariance_sharp :
-    ProductCovers copyWitnessFamily (fun _ => 0) copyWitnessValue ∧
-      ¬ CoversTuple copyWitnessFamily (fun _ => 0) modulusCopyCoupling copyWitnessValue ∧
+    ProductCovers copyWitnessFamily (fun _ ↦ 0) copyWitnessValue ∧
+      ¬ CoversTuple copyWitnessFamily (fun _ ↦ 0) modulusCopyCoupling copyWitnessValue ∧
       ¬ modulusCopyCoupling.FullSupport :=
   ⟨copyWitness_productCovers, copyWitness_not_coversTuple,
     modulusCopyCoupling_not_fullSupport⟩
@@ -448,7 +448,7 @@ measurements. -/
 section GainLandscape
 
 /-- Row one: bounded gain. The Pisot collapse lives here. -/
-noncomputable def gainBounded : ℝ → ℝ := fun _ => 1
+noncomputable def gainBounded : ℝ → ℝ := fun _ ↦ 1
 
 /-- Row two: logarithmic gain. The heavy-tail ghost and the equicorrelated copula live here. -/
 noncomputable def gainLog (n : ℝ) : ℝ := Real.log n

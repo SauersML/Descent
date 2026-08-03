@@ -216,9 +216,9 @@ squares. -/
 theorem sum_fourth_le_sq_sum_sq {q : ℕ} (beta : Fin q → ℝ) :
     ∑ j, beta j ^ 4 ≤ (∑ j, beta j ^ 2) ^ 2 := by
   have h : ∑ j : Fin q, (beta j ^ 2) ^ 2 ≤ (∑ j : Fin q, beta j ^ 2) ^ 2 :=
-    Finset.sum_sq_le_sq_sum_of_nonneg (fun j _ => sq_nonneg (beta j))
+    Finset.sum_sq_le_sq_sum_of_nonneg (fun j _ ↦ sq_nonneg (beta j))
   have hrw : ∑ j : Fin q, (beta j ^ 2) ^ 2 = ∑ j, beta j ^ 4 :=
-    Finset.sum_congr rfl (fun j _ => by ring)
+    Finset.sum_congr rfl (fun j _ ↦ by ring)
   rw [hrw] at h
   exact h
 
@@ -228,9 +228,9 @@ state, because the variant count does not appear in its signature. -/
 theorem sq_sum_sq_le_card_mul_sum_fourth {q : ℕ} (beta : Fin q → ℝ) :
     (∑ j, beta j ^ 2) ^ 2 ≤ (q : ℝ) * ∑ j, beta j ^ 4 := by
   have h := Finset.sum_mul_sq_le_sq_mul_sq (Finset.univ : Finset (Fin q))
-    (fun _ => (1 : ℝ)) (fun j => beta j ^ 2)
+    (fun _ ↦ (1 : ℝ)) (fun j ↦ beta j ^ 2)
   have h3 : ∑ j : Fin q, (beta j ^ 2) ^ 2 = ∑ j, beta j ^ 4 :=
-    Finset.sum_congr rfl (fun j _ => by ring)
+    Finset.sum_congr rfl (fun j _ ↦ by ring)
   simp only [one_mul, one_pow, Finset.sum_const, Finset.card_univ,
     Fintype.card_fin, nsmul_eq_mul, mul_one] at h
   rw [h3] at h
@@ -269,6 +269,18 @@ structure SNPArchitecturePortabilityModel (q : ℕ) where
   targetRetained_nonneg : ∀ j, 0 ≤ targetRetainedSquaredEffect j
   targetRetained_le_source : ∀ j, targetRetainedSquaredEffect j ≤ sourceSquaredEffect j
 
+/-- **The model class is inhabited at every panel size `q`**, including `q = 0`.
+
+Sixteen theorems quantify over `SNPArchitecturePortabilityModel q`.  The witness retains
+half of each source effect, so it sits strictly inside the `targetRetained_le_source`
+constraint rather than on its boundary. -/
+def SNPArchitecturePortabilityModel.witness (q : ℕ) : SNPArchitecturePortabilityModel q where
+  sourceSquaredEffect := fun _ => 1
+  targetRetainedSquaredEffect := fun _ => 1 / 2
+  sourceSquaredEffect_nonneg := fun _ => by norm_num
+  targetRetained_nonneg := fun _ => by norm_num
+  targetRetained_le_source := fun _ => by norm_num
+
 namespace SNPArchitecturePortabilityModel
 
 /-- Total causal signal mass in the source architecture.
@@ -304,19 +316,19 @@ theorem sourceEffectMass_nonneg {q : ℕ}
     (model : SNPArchitecturePortabilityModel q) :
     0 ≤ model.sourceEffectMass := by
   unfold sourceEffectMass
-  exact Fintype.sum_nonneg fun j => model.sourceSquaredEffect_nonneg j
+  exact Fintype.sum_nonneg fun j ↦ model.sourceSquaredEffect_nonneg j
 
 theorem targetRetainedEffectMass_nonneg {q : ℕ}
     (model : SNPArchitecturePortabilityModel q) :
     0 ≤ model.targetRetainedEffectMass := by
   unfold targetRetainedEffectMass
-  exact Fintype.sum_nonneg fun j => model.targetRetained_nonneg j
+  exact Fintype.sum_nonneg fun j ↦ model.targetRetained_nonneg j
 
 theorem targetRetainedEffectMass_le_sourceEffectMass {q : ℕ}
     (model : SNPArchitecturePortabilityModel q) :
     model.targetRetainedEffectMass ≤ model.sourceEffectMass := by
   unfold targetRetainedEffectMass sourceEffectMass
-  exact Finset.sum_le_sum fun j _ => model.targetRetained_le_source j
+  exact Finset.sum_le_sum fun j _ ↦ model.targetRetained_le_source j
 
 /-- The relative portability loss is exactly the locuswise lost-effect mass
 fraction. -/
@@ -343,7 +355,7 @@ theorem relativePortabilityLoss_nonneg {q : ℕ}
     0 ≤ model.relativePortabilityLoss := by
   rw [relativePortabilityLoss_eq_locuswise_loss_fraction model]
   apply div_nonneg
-  · exact Fintype.sum_nonneg fun j => sub_nonneg.mpr (model.targetRetained_le_source j)
+  · exact Fintype.sum_nonneg fun j ↦ sub_nonneg.mpr (model.targetRetained_le_source j)
   · exact le_of_lt h_source
 
 theorem portabilityScore_le_one {q : ℕ}
@@ -481,7 +493,7 @@ noncomputable def meanAbsoluteEffect {q : ℕ} (beta : Fin q → ℝ) : ℝ :=
 theorem meanAbsoluteEffect_nonneg {q : ℕ} (beta : Fin q → ℝ) :
     0 ≤ meanAbsoluteEffect beta := by
   unfold meanAbsoluteEffect
-  exact div_nonneg (Finset.sum_nonneg fun j _ => abs_nonneg _) (Nat.cast_nonneg q)
+  exact div_nonneg (Finset.sum_nonneg fun j _ ↦ abs_nonneg _) (Nat.cast_nonneg q)
 
 /-- **The nonsmooth summary is dominated by the smooth one.**
 
@@ -496,9 +508,9 @@ theorem meanAbsoluteEffect_sq_le_meanSquaredEffect {q : ℕ} (beta : Fin q → �
     simp [meanAbsoluteEffect]
   · have hq' : (0 : ℝ) < q := Nat.cast_pos.mpr (Nat.pos_of_ne_zero hq)
     have h := Finset.sum_mul_sq_le_sq_mul_sq (Finset.univ : Finset (Fin q))
-      (fun _ => (1 : ℝ)) (fun j => |beta j|)
+      (fun _ ↦ (1 : ℝ)) (fun j ↦ |beta j|)
     have h3 : ∑ j : Fin q, |beta j| ^ 2 = ∑ j, beta j ^ 2 :=
-      Finset.sum_congr rfl (fun j _ => sq_abs _)
+      Finset.sum_congr rfl (fun j _ ↦ sq_abs _)
     simp only [one_mul, one_pow, Finset.sum_const, Finset.card_univ,
       Fintype.card_fin, nsmul_eq_mul, mul_one] at h
     rw [h3] at h
@@ -536,8 +548,10 @@ supremum over moment-matched prior pairs. -/
 structure MeanAbsoluteEffectCertificateProblem (q n : ℕ) where
   effectRadius : ℝ
   architecture : Fin (n + 1) → Fin q → ℝ
-  pairDiscrepancy :
-    FinitePrior n → FinitePrior n → ℝ
+  /-- Actual catalogue-indexed observation laws.  Prior discrepancies are
+  derived as total variation between mixtures of these laws; they are not an
+  arbitrary numerical input. -/
+  observation : Fin (n + 1) → FinitePrior n
   logScale : ℝ
 
 namespace MeanAbsoluteEffectCertificateProblem
@@ -555,12 +569,17 @@ noncomputable def architectureMoment {q n : ℕ}
     (i : Fin (n + 1)) : ℝ :=
   ∑ j, (P.architecture i j) ^ (r + 1)
 
-noncomputable def finiteProblem {q n : ℕ}
+noncomputable def mixtureExperiment {q n : ℕ}
     (P : MeanAbsoluteEffectCertificateProblem q n) :
-    FiniteMomentCertificateProblem n where
+    FiniteMixtureExperiment n n where
   target i := meanAbsoluteEffect (P.architecture i)
   moment := P.architectureMoment
-  pairDiscrepancy := P.pairDiscrepancy
+  observation := P.observation
+
+noncomputable def finiteProblem {q n : ℕ}
+    (P : MeanAbsoluteEffectCertificateProblem q n) :
+    FiniteMomentCertificateProblem n :=
+  P.mixtureExperiment.certificateProblem
 
 noncomputable def calculus {q n : ℕ}
     (P : MeanAbsoluteEffectCertificateProblem q n) : CertificateCalculus :=
@@ -588,10 +607,10 @@ theorem momentMatched_two_iff {q n : ℕ}
     (P : MeanAbsoluteEffectCertificateProblem q n)
     (A B : FinitePrior n) :
     P.finiteProblem.MomentMatched 2 A B ↔
-      FinitePrior.mean A (fun i => ∑ j, P.architecture i j) =
-          FinitePrior.mean B (fun i => ∑ j, P.architecture i j) ∧
-        FinitePrior.mean A (fun i => ∑ j, (P.architecture i j) ^ 2) =
-          FinitePrior.mean B (fun i => ∑ j, (P.architecture i j) ^ 2) := by
+      FinitePrior.mean A (fun i ↦ ∑ j, P.architecture i j) =
+          FinitePrior.mean B (fun i ↦ ∑ j, P.architecture i j) ∧
+        FinitePrior.mean A (fun i ↦ ∑ j, (P.architecture i j) ^ 2) =
+          FinitePrior.mean B (fun i ↦ ∑ j, (P.architecture i j) ^ 2) := by
   constructor
   · intro h
     constructor
@@ -621,125 +640,33 @@ theorem deficit_eq_modulusRatio_sq {q n : ℕ}
       (P.calculus.modulus.Δ 0 h / P.calculus.modulus.Δ K h) ^ 2 :=
   deficit_eq_modulus_ratio_sq P.calculus K h
 
+/-- Modulus ratio for the biological mean-absolute-effect experiment. -/
+noncomputable def certificationGap {q n : ℕ}
+    (P : MeanAbsoluteEffectCertificateProblem q n) (K : ℕ) (h : ℝ) : ℝ :=
+  P.finiteProblem.modulus 0 h / P.finiteProblem.modulus K h
+
+/-- **Fixed-grade incompleteness for polygenic architecture transport.**
+
+For every fixed grade, sufficiently large architecture catalogues contain an
+actual finite observation experiment on a convex bounded effect carrier whose
+ungraded-to-graded modulus ratio is at least
+`n^(b_K/2) / sqrt(log n)`, with `b_K = 1/(K+1)`.
+
+The target is the mean absolute causal effect, grade two matches signed-effect
+mass and squared-effect mass, and discrepancy is total variation between the
+prior-predictive observation laws.  The proof is admitted openly: it must
+construct the moment-matching architecture priors.  No benchmark curve,
+crossing hypothesis, or external moment-comparison theorem substitutes for
+that construction. -/
+theorem fixedGrade_incompleteness_biology (K : ℕ) :
+    ∀ᶠ n : ℕ in Filter.atTop,
+      ∃ P : MeanAbsoluteEffectCertificateProblem (n + 1) n,
+        P.effects.Nonempty ∧ Convex ℝ P.effects ∧
+          FiniteMixtureExperiment.fixedGradeGapScale K n ≤
+            P.certificationGap (K + 1) 1 := by
+  sorry
+
 end MeanAbsoluteEffectCertificateProblem
-
-/-- **Logarithmic comparison benchmark for a nonsmooth architecture summary.**
-
-    Order `1 / log q` at `q` variants. This declaration records the analytic benchmark used
-    for mean absolute effect in the Gaussian sequence model over a bounded effect class. It
-    does not prove that benchmark. A concrete biological experiment must derive it from
-    its mixture law and the modulus above. It is a comparison curve, not a proved minimax
-    law for the biological models in this repository.
-
-    Empirical status: UNTESTED. -/
-noncomputable def logarithmicRiskBenchmark (q : ℝ) : ℝ := 1 / Real.log q
-
-/-- **Candidate polynomial fixed-grade benchmark.**
-
-    `q ^ (-(c/K))`. This curve is the proposed analytic input from Part (III),
-    not a theorem about what every two-point, Assouad, Fano, or fuzzy-hypothesis
-    argument can establish. The distinction matters because the first LP audit
-    found the moment constraints asymptotically almost free.
-
-    Empirical status: UNTESTED. -/
-noncomputable def fixedGradeRiskBenchmark (q K c : ℝ) : ℝ := q ^ (-(c / K))
-
-/-- Ratio of the logarithmic and polynomial benchmark curves. It becomes an actual
-    certificate deficit only for an experiment that separately identifies these curves
-    with its ungraded and grade-`K` risks.
-
-    Empirical status: UNTESTED. -/
-noncomputable def benchmarkCertificateDeficit (q K c : ℝ) : ℝ :=
-  logarithmicRiskBenchmark q / fixedGradeRiskBenchmark q K c
-
-/-- Closed form for the deficit: `q^(c/K) / log q`. -/
-theorem benchmarkCertificateDeficit_eq (q K c : ℝ) (hq : 0 ≤ q) :
-    benchmarkCertificateDeficit q K c = q ^ (c / K) / Real.log q := by
-  unfold benchmarkCertificateDeficit logarithmicRiskBenchmark fixedGradeRiskBenchmark
-  rw [Real.rpow_neg hq (c / K), div_inv_eq_mul]
-  ring
-
-/-- **The polynomial benchmark is below the logarithmic benchmark in the stated regime.**
-
-    For every target factor `D`, once the variant count is large enough that
-    `D · log q ≤ q^(c/K)` — which happens for every `D` and every grade `K`,
-    since a positive power beats a logarithm — the ratio is at least `D`.
-    Calling that ratio a certificate shortfall additionally requires the
-    experiment-specific identifications recorded above. -/
-theorem benchmarkCertificateDeficit_ge (q K c D : ℝ)
-    (hq : 0 ≤ q) (h_log : 0 < Real.log q)
-    (h_cross : D * Real.log q ≤ q ^ (c / K)) :
-    D ≤ benchmarkCertificateDeficit q K c := by
-  rw [benchmarkCertificateDeficit_eq q K c hq, le_div_iff₀ h_log]
-  exact h_cross
-
-/-- **The logarithmic rate dominates every polynomial rate.**
-
-    Wherever `q^(-a) · log q ≤ 1`, the polynomial rate `q^(-a)` sits below the
-    logarithmic benchmark. This is a comparison of two curves, not a minimax
-    lower bound for a biological experiment. -/
-theorem logarithmicRiskBenchmark_ge_polynomial (q a : ℝ)
-    (h_log : 0 < Real.log q)
-    (h_cross : q ^ (-a) * Real.log q ≤ 1) :
-    q ^ (-a) ≤ logarithmicRiskBenchmark q := by
-  unfold logarithmicRiskBenchmark
-  rw [le_div_iff₀ h_log]
-  exact h_cross
-
-/-! ### The crossing hypotheses discharged
-
-The two statements above carry the crossing point as an explicit hypothesis,
-which is honest but leaves the reader to supply it. Both hypotheses hold
-eventually, for every exponent and every target factor, and the two theorems
-below say so. Their content is that a logarithm is negligible against every
-positive power, which is `isLittleO_log_rpow_atTop`; nothing about
-genetics enters. -/
-
-/-- **The logarithmic benchmark eventually dominates every polynomial benchmark.**
-
-    For every exponent `a > 0`, past some variant count the polynomial rate
-    `q^(-a)` sits below the logarithmic benchmark. The asymptotic comparison is
-    unconditional; its interpretation as an attainable or minimax rate is not. -/
-theorem logarithmicRiskBenchmark_ge_polynomial_eventually (a : ℝ) (ha : 0 < a) :
-    ∀ᶠ q : ℝ in Filter.atTop, q ^ (-a) ≤ logarithmicRiskBenchmark q := by
-  have hbound := (isLittleO_log_rpow_atTop ha).bound one_pos
-  filter_upwards [hbound, Filter.eventually_ge_atTop (2 : ℝ)] with q hq hq2
-  have hq0 : (0 : ℝ) < q := by linarith
-  have hlog : 0 < Real.log q := Real.log_pos (by linarith)
-  have hrpow : 0 < q ^ a := Real.rpow_pos_of_pos hq0 a
-  have hle : Real.log q ≤ q ^ a := by
-    rw [Real.norm_of_nonneg (le_of_lt hlog), Real.norm_of_nonneg (le_of_lt hrpow),
-      one_mul] at hq
-    exact hq
-  have hneg : q ^ (-a) = 1 / q ^ a := by
-    rw [Real.rpow_neg (le_of_lt hq0), one_div]
-  unfold logarithmicRiskBenchmark
-  rw [hneg]
-  exact one_div_le_one_div_of_le hlog hle
-
-/-- **The ratio of the two benchmark curves grows without bound.**
-
-    For every grade `K` with positive exponent `c/K` and every target factor
-    `D`, past some variant count the benchmark ratio exceeds `D`. This remains
-    pure real analysis until a statistical model proves both benchmark
-    identifications. -/
-theorem benchmarkCertificateDeficit_eventually_ge (K c D : ℝ)
-    (hr : 0 < c / K) (hD : 0 < D) :
-    ∀ᶠ q : ℝ in Filter.atTop, D ≤ benchmarkCertificateDeficit q K c := by
-  have hbound := (isLittleO_log_rpow_atTop hr).bound (inv_pos.mpr hD)
-  filter_upwards [hbound, Filter.eventually_ge_atTop (2 : ℝ)] with q hq hq2
-  have hq0 : (0 : ℝ) < q := by linarith
-  have hlog : 0 < Real.log q := Real.log_pos (by linarith)
-  have hrpow : 0 < q ^ (c / K) := Real.rpow_pos_of_pos hq0 (c / K)
-  have hle : Real.log q ≤ D⁻¹ * q ^ (c / K) := by
-    rw [Real.norm_of_nonneg (le_of_lt hlog),
-      Real.norm_of_nonneg (le_of_lt hrpow)] at hq
-    exact hq
-  have hcross : D * Real.log q ≤ q ^ (c / K) := by
-    have hmul := mul_le_mul_of_nonneg_left hle (le_of_lt hD)
-    rw [← mul_assoc, mul_inv_cancel₀ (ne_of_gt hD), one_mul] at hmul
-    exact hmul
-  exact benchmarkCertificateDeficit_ge q K c D (le_of_lt hq0) hlog hcross
 
 /-! ### Positivity buys an exponent: the moment body of architecture spectra
 
@@ -936,7 +863,7 @@ theorem predicted_le_weightedRetentionUpperBound {q : ℕ}
       model.targetRetainedEffectMass ≤
         ∑ j, retentionUpper j * model.sourceSquaredEffect j := by
     unfold targetRetainedEffectMass
-    exact Finset.sum_le_sum fun j _ => h_bound j
+    exact Finset.sum_le_sum fun j _ ↦ h_bound j
   exact (div_le_div_iff_of_pos_right h_source).2 h_sum
 
 /-- **The slack in the retention envelope, as an identity rather than a
@@ -974,7 +901,7 @@ theorem predicted_eq_weightedRetentionUpperBound_of_active {q : ℕ}
   have h_sum : model.targetRetainedEffectMass =
       ∑ j, retentionUpper j * model.sourceSquaredEffect j := by
     unfold targetRetainedEffectMass
-    exact Finset.sum_congr rfl (fun j _ => h_active j)
+    exact Finset.sum_congr rfl (fun j _ ↦ h_active j)
   unfold predictedPortability weightedRetentionUpperBound portabilityScore
   rw [h_sum]
 
@@ -1006,7 +933,7 @@ theorem weightedRetentionUpperBound_eq_predicted_iff_active {q : ℕ}
       · exact h1
       · exact absurd h1 (ne_of_gt h_source)
     have hall := (Finset.sum_eq_zero_iff_of_nonneg
-      (fun j _ => sub_nonneg.mpr (h_bound j))).mp hz'
+      (fun j _ ↦ sub_nonneg.mpr (h_bound j))).mp hz'
     intro j
     have hj := hall j (Finset.mem_univ j)
     linarith [hj]
@@ -1062,7 +989,7 @@ noncomputable def rgFstWeightedUpperBound {q : ℕ}
     (model : SNPArchitecturePortabilityModel q)
     (rgUpper fstLower : Fin q → ℝ) : ℝ :=
   weightedRetentionUpperBound model
-    (fun j => (rgUpper j) ^ 2 * (1 - fstLower j))
+    (fun j ↦ (rgUpper j) ^ 2 * (1 - fstLower j))
 
 /-- **Explicit SNP-level portability upper bound from locuswise effect
 correlation and causal divergence.**
@@ -1081,7 +1008,7 @@ theorem portability_upper_bound_from_rg_fst
     predictedPortability model ≤ rgFstWeightedUpperBound model rgUpper fstLower := by
   unfold rgFstWeightedUpperBound
   exact predicted_le_weightedRetentionUpperBound model
-    (fun j => (rgUpper j) ^ 2 * (1 - fstLower j))
+    (fun j ↦ (rgUpper j) ^ 2 * (1 - fstLower j))
     h_source h_locuswise_bound
 
 end ArchitecturePredictions

@@ -113,7 +113,7 @@ theorem cycle_solvable_iff (ρ : ℕ → ℝ) (n : ℕ) :
     · linarith [hz]
     · exact absurd hz hx0
   · intro hprod
-    refine ⟨fun m => (-1 : ℝ) ^ m * (∏ s ∈ range m, ρ s), by simp, ?_, ?_⟩
+    refine ⟨fun m ↦ (-1 : ℝ) ^ m * (∏ s ∈ range m, ρ s), by simp, ?_, ?_⟩
     · intro s
       -- `show` forces the beta reduction that `rw` cannot see through.
       show (-1 : ℝ) ^ (s + 1) * (∏ t ∈ range (s + 1), ρ t)
@@ -146,7 +146,7 @@ theorem no_odd_cycle_of_pos (ρ : ℕ → ℝ) (hρ : ∀ s, 0 < ρ s) (n : ℕ)
     ¬ ∃ x : ℕ → ℝ, x 0 ≠ 0 ∧ (∀ s, x (s + 1) = -ρ s * x s) ∧ x n = x 0 := by
   rw [cycle_solvable_iff]
   have hpos : 0 < ∏ s ∈ range n, ρ s :=
-    Finset.prod_pos fun s _ => hρ s
+    Finset.prod_pos fun s _ ↦ hρ s
   rw [hodd.neg_one_pow]
   intro hcontra
   nlinarith [hpos]

@@ -459,7 +459,7 @@ noncomputable def polygenicAdaptationShift
     E[Δpᵢ] = 0 under drift, so E[Δμ] = 0. -/
 theorem neutral_expected_shift_zero
     {m : ℕ} (β : Fin m → ℝ) :
-    polygenicAdaptationShift β (fun _ => 0) = 0 := by
+    polygenicAdaptationShift β (fun _ ↦ 0) = 0 := by
   unfold polygenicAdaptationShift
   simp
 
@@ -474,7 +474,7 @@ theorem selected_shift_positive
     0 < polygenicAdaptationShift β Δp := by
   unfold polygenicAdaptationShift
   obtain ⟨i₀, hi₀⟩ := h_exists_pos
-  exact Finset.sum_pos' (fun i _ => h_concordant i) ⟨i₀, Finset.mem_univ _, hi₀⟩
+  exact Finset.sum_pos' (fun i _ ↦ h_concordant i) ⟨i₀, Finset.mem_univ _, hi₀⟩
 
 /-- **Polygenic adaptation creates PGS mean shift but not R² loss.**
     The mean shift is recoverable by recalibration (intercept adjustment).
@@ -489,7 +489,7 @@ theorem selected_shift_positive
     invariant under translation by a constant shift. -/
 theorem adaptation_shift_recoverable
     {n : ℕ} (scores : Fin n → ℝ) (μ_shift : ℝ) :
-    let shifted := fun i => scores i + μ_shift
+    let shifted := fun i ↦ scores i + μ_shift
     let mean_orig := (∑ i, scores i) / n
     let mean_shifted := (∑ i, shifted i) / n
     (∑ i, (shifted i - mean_shifted) ^ 2) =

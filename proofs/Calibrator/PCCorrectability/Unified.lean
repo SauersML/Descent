@@ -118,8 +118,8 @@ theorem projection_artifact_implies_standardized_bias_bound
     (hmoment : B.mulVec artifact =
       weightedResidualMoment P densityRatio X residual)
     (hCauchySchwarz : ∀ f g : Ω → ℝ,
-      P (fun ω => f ω * g ω) ^ 2 ≤
-        P (fun ω => f ω ^ 2) * P (fun ω => g ω ^ 2))
+      P (fun ω ↦ f ω * g ω) ^ 2 ≤
+        P (fun ω ↦ f ω ^ 2) * P (fun ω ↦ g ω ^ 2))
     (henergy : 0 ≤ coefficientEnergy B artifact)
     (hchiSquare : 0 ≤ chiSquareBudget P densityRatio)
     (hcurvatureBound : 0 ≤ curvatureBound)

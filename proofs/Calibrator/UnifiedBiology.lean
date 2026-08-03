@@ -169,7 +169,7 @@ theorem geometry_and_effect_recovery_gates
     ((B - lambda • A).det = 0 ↔ (A⁻¹ - lambda • B⁻¹).det = 0) ∧
       (Identifiable M ↔
         ∀ theta theta' h h', h ∈ M.nuisance → h' ∈ M.nuisance →
-          actionGap M theta theta' = (fun x p => h' x p - h x p) → theta = theta') := by
+          actionGap M theta theta' = (fun x p ↦ h' x p - h x p) → theta = theta') := by
   exact ⟨covariancePencil_det_zero_iff_precisionPencil_det_zero A B lambda hA hB,
     identifiable_iff_transversal M⟩
 

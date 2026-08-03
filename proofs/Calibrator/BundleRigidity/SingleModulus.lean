@@ -192,12 +192,12 @@ The single load-bearing computation: the total mass on the `(1+v)` side and on t
 open Classical in
 /-- The atoms squaring to `1 + v`. -/
 noncomputable def plusSide (S : SingleModulus d v) : Finset (Fin d) :=
-  univ.filter fun j => S.atom j ^ 2 = 1 + v
+  univ.filter fun j ↦ S.atom j ^ 2 = 1 + v
 
 open Classical in
 /-- The atoms squaring to `1 - v`. -/
 noncomputable def minusSide (S : SingleModulus d v) : Finset (Fin d) :=
-  univ.filter fun j => ¬ (S.atom j ^ 2 = 1 + v)
+  univ.filter fun j ↦ ¬ (S.atom j ^ 2 = 1 + v)
 
 /-- Total mass on the `(1+v)` side. -/
 noncomputable def wPlus (S : SingleModulus d v) : ℝ := ∑ j ∈ S.plusSide, S.mass j
@@ -225,7 +225,7 @@ theorem sq_of_mem_plusSide (S : SingleModulus d v) {j : Fin d} (hj : j ∈ S.plu
 theorem wPlus_add_wMinus (S : SingleModulus d v) : S.wPlus + S.wMinus = 1 := by
   classical
   rw [wPlus, wMinus, plusSide, minusSide,
-    Finset.sum_filter_add_sum_filter_not univ (fun j => S.atom j ^ 2 = 1 + v) S.mass]
+    Finset.sum_filter_add_sum_filter_not univ (fun j ↦ S.atom j ^ 2 = 1 + v) S.mass]
   exact S.mass_sum
 
 /-- The variance identity, resolved onto the two sides. -/
@@ -236,15 +236,15 @@ theorem variance_split (S : SingleModulus d v) :
       ∑ j ∈ S.plusSide, S.mass j * S.atom j ^ 2
         + ∑ j ∈ S.minusSide, S.mass j * S.atom j ^ 2 = 1 := by
     rw [plusSide, minusSide,
-      Finset.sum_filter_add_sum_filter_not univ (fun j => S.atom j ^ 2 = 1 + v)
-        (fun j => S.mass j * S.atom j ^ 2)]
+      Finset.sum_filter_add_sum_filter_not univ (fun j ↦ S.atom j ^ 2 = 1 + v)
+        (fun j ↦ S.mass j * S.atom j ^ 2)]
     exact S.var_one
   have hp : ∑ j ∈ S.plusSide, S.mass j * S.atom j ^ 2 = (1 + v) * S.wPlus := by
     rw [wPlus, Finset.mul_sum]
-    exact Finset.sum_congr rfl fun j hj => by rw [S.sq_of_mem_plusSide hj]; ring
+    exact Finset.sum_congr rfl fun j hj ↦ by rw [S.sq_of_mem_plusSide hj]; ring
   have hm : ∑ j ∈ S.minusSide, S.mass j * S.atom j ^ 2 = (1 - v) * S.wMinus := by
     rw [wMinus, Finset.mul_sum]
-    exact Finset.sum_congr rfl fun j hj => by rw [S.sq_of_mem_minusSide hj]; ring
+    exact Finset.sum_congr rfl fun j hj ↦ by rw [S.sq_of_mem_minusSide hj]; ring
   rw [hp, hm] at hsplit
   exact hsplit
 
@@ -273,7 +273,7 @@ theorem v_le_one (S : SingleModulus d v) (hv : v ≠ 0) : v ≤ 1 := by
     · exact h
     · exfalso; nlinarith [sq_nonneg (S.atom j)]
   have hempty : S.minusSide = (∅ : Finset (Fin d)) :=
-    Finset.filter_false_of_mem fun j _ => not_not_intro (hall j)
+    Finset.filter_false_of_mem fun j _ ↦ not_not_intro (hall j)
   have hzero : S.wMinus = 0 := by rw [wMinus, hempty, Finset.sum_empty]
   have := (S.sideMass_eq_half hv).2
   rw [hzero] at this
@@ -452,7 +452,7 @@ noncomputable def threeAtom (v A B r : ℝ) (hv : 0 ≤ v) (hA : A ^ 2 = 1 + v)
     (hB : B ^ 2 = 1 - v) (hApos : 0 < A) (hBpos : 0 < B)
     (hr0 : 0 < r) (hr1 : r < 1) (hr : B = A * r) :
     SingleModulus 3 v where
-  atom := fun j => if j = 0 then A else if j = 1 then -A else -B
+  atom := fun j ↦ if j = 0 then A else if j = 1 then -A else -B
   mass := ![1 / 4 + r / 4, 1 / 4 - r / 4, 1 / 2]
   atom_inj := by
     have hBA : B < A := by rw [hr]; nlinarith
@@ -520,7 +520,7 @@ argument could not have reached at all, since the ratio `√((1+v)/(1-v))` on wh
 argument turns is undefined at `v = 1`. -/
 noncomputable def threeAtomAtOne (A : ℝ) (hA : A ^ 2 = 2) (hApos : 0 < A) :
     SingleModulus 3 1 where
-  atom := fun j => if j = 0 then A else if j = 1 then -A else 0
+  atom := fun j ↦ if j = 0 then A else if j = 1 then -A else 0
   mass := ![1 / 4, 1 / 4, 1 / 2]
   atom_inj := by
     intro i j hij
@@ -578,7 +578,7 @@ noncomputable def fourAtom (v A B c : ℝ) (hv : 0 ≤ v) (hA : A ^ 2 = 1 + v)
   -- `norm_num` gets through `⟨0, _⟩ = 0` and `⟨1, _⟩ = 1` and then stalls, leaving
   -- `hij : A = if ⟨2, ⋯⟩ = 2 then B else -B` with the `if` intact. Comparing `.val`
   -- makes every branch reduce definitionally, with no `Fin` lemma name to get wrong.
-  atom := fun j =>
+  atom := fun j ↦
     if j.val = 0 then A else if j.val = 1 then -A else if j.val = 2 then B else -B
   mass := ![1 / 4 + c * B, 1 / 4 - c * B, 1 / 4 - c * A, 1 / 4 + c * A]
   atom_inj := by

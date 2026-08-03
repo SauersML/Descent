@@ -34,8 +34,8 @@ def IsSymmetricBilinearMatrix (B : Matrix ι ι ℝ) : Prop :=
 
 omit [DecidableEq ι] in
 theorem matrix_mulVec_sub (B : Matrix ι ι ℝ) (x y : ι → ℝ) :
-    B.mulVec (fun i => x i - y i) =
-      fun i => B.mulVec x i - B.mulVec y i := by
+    B.mulVec (fun i ↦ x i - y i) =
+      fun i ↦ B.mulVec x i - B.mulVec y i := by
   ext i
   simp only [Matrix.mulVec, dotProduct]
   simp_rw [mul_sub]
@@ -49,7 +49,7 @@ theorem matrix_mulVec_smul (B : Matrix ι ι ℝ) (c : ℝ) (x : ι → ℝ) :
 
 omit [DecidableEq ι] in
 theorem dot_sub_right (x y z : ι → ℝ) :
-    dot x (fun i => y i - z i) = dot x y - dot x z := by
+    dot x (fun i ↦ y i - z i) = dot x y - dot x z := by
   simp [dot, mul_sub, Finset.sum_sub_distrib]
 
 omit [DecidableEq ι] in
@@ -71,8 +71,8 @@ theorem singular_quadratic_excess_risk_identity
     (hnormal : B.mulVec v = b) :
     quadraticRisk outcomeSecondMoment B b w -
         quadraticRisk outcomeSecondMoment B b v =
-      dot (fun i => w i - v i)
-        (B.mulVec (fun i => w i - v i)) := by
+      dot (fun i ↦ w i - v i)
+        (B.mulVec (fun i ↦ w i - v i)) := by
   have hnormalDotW : dot w b = dot w (B.mulVec v) := by rw [← hnormal]
   have hnormalDotV : dot v b = dot v (B.mulVec v) := by rw [← hnormal]
   have hcross : dot v (B.mulVec w) = dot w (B.mulVec v) := hsymmetric v w
@@ -93,7 +93,7 @@ theorem normal_solution_minimizes_singular_quadratic_risk
   intro w
   have hid := singular_quadratic_excess_risk_identity
     outcomeSecondMoment B b w v hsymmetric hnormal
-  linarith [hpsd (fun i => w i - v i)]
+  linarith [hpsd (fun i ↦ w i - v i)]
 
 /-- Moving a normal-equation solution by a kernel vector produces another
 solution with exactly the same risk. -/
@@ -103,19 +103,19 @@ theorem singular_minimizer_kernel_invariance
     (hsymmetric : IsSymmetricBilinearMatrix B)
     (hnormal : B.mulVec v = b)
     (hkernel : B.mulVec k = 0) :
-    B.mulVec (fun i => v i + k i) = b ∧
-      quadraticRisk outcomeSecondMoment B b (fun i => v i + k i) =
+    B.mulVec (fun i ↦ v i + k i) = b ∧
+      quadraticRisk outcomeSecondMoment B b (fun i ↦ v i + k i) =
         quadraticRisk outcomeSecondMoment B b v := by
-  have hnormalShift : B.mulVec (fun i => v i + k i) = b := by
+  have hnormalShift : B.mulVec (fun i ↦ v i + k i) = b := by
     rw [matrix_mulVec_add, hnormal, hkernel]
     simp
   refine ⟨hnormalShift, ?_⟩
   have hid := singular_quadratic_excess_risk_identity
-    outcomeSecondMoment B b (fun i => v i + k i) v hsymmetric hnormal
+    outcomeSecondMoment B b (fun i ↦ v i + k i) v hsymmetric hnormal
   have hzero :
-      dot (fun i => (v i + k i) - v i)
-        (B.mulVec (fun i => (v i + k i) - v i)) = 0 := by
-    have hdiff : (fun i => (v i + k i) - v i) = k := by
+      dot (fun i ↦ (v i + k i) - v i)
+        (B.mulVec (fun i ↦ (v i + k i) - v i)) = 0 := by
+    have hdiff : (fun i ↦ (v i + k i) - v i) = k := by
       funext i
       ring
     rw [hdiff, hkernel]
@@ -125,7 +125,7 @@ theorem singular_minimizer_kernel_invariance
 /-- Quadratic-form distance between two coefficient vectors. -/
 def quadraticCoefficientDistance (B : Matrix ι ι ℝ)
     (w v : ι → ℝ) : ℝ :=
-  dot (fun i => w i - v i) (B.mulVec (fun i => w i - v i))
+  dot (fun i ↦ w i - v i) (B.mulVec (fun i ↦ w i - v i))
 
 /-- Best scalar rescaling of a deployed direction toward a target direction. -/
 def bestScalarCorrection (B : Matrix ι ι ℝ)
@@ -144,11 +144,11 @@ theorem scalar_correction_completed_square
     (B : Matrix ι ι ℝ) (u v : ι → ℝ) (c : ℝ)
     (hsymmetric : IsSymmetricBilinearMatrix B)
     (hu : dot u (B.mulVec u) ≠ 0) :
-    quadraticCoefficientDistance B (fun i => c * u i) v =
+    quadraticCoefficientDistance B (fun i ↦ c * u i) v =
       scalarCorrectionFloor B u v +
         dot u (B.mulVec u) * (c - bestScalarCorrection B u v) ^ 2 := by
   have hcross : dot v (B.mulVec u) = dot u (B.mulVec v) := hsymmetric v u
-  have hscaled : (fun i => c * u i) = c • u := by
+  have hscaled : (fun i ↦ c * u i) = c • u := by
     funext i
     simp
   have hleftScaled : dot (c • u) (B.mulVec v) = c * dot u (B.mulVec v) :=
@@ -177,10 +177,10 @@ theorem best_scalar_correction_attains_floor
     (hsymmetric : IsSymmetricBilinearMatrix B)
     (hu : 0 < dot u (B.mulVec u)) :
       quadraticCoefficientDistance B
-        (fun i => bestScalarCorrection B u v * u i) v =
+        (fun i ↦ bestScalarCorrection B u v * u i) v =
         scalarCorrectionFloor B u v ∧
       ∀ c : ℝ, scalarCorrectionFloor B u v ≤
-        quadraticCoefficientDistance B (fun i => c * u i) v := by
+        quadraticCoefficientDistance B (fun i ↦ c * u i) v := by
   constructor
   · rw [scalar_correction_completed_square B u v
       (bestScalarCorrection B u v) hsymmetric hu.ne']

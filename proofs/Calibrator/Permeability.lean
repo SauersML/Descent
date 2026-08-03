@@ -260,7 +260,7 @@ theorem diagonalCovarianceMomentPermeability_derivative_scale
     {ι : Type*} [Fintype ι]
     (covarianceDerivative secondMoment fourthMoment : ι → ℝ) (η : ℝ) :
     diagonalCovarianceMomentPermeability
-        (fun i => η * covarianceDerivative i) secondMoment fourthMoment =
+        (fun i ↦ η * covarianceDerivative i) secondMoment fourthMoment =
       η ^ 2 * diagonalCovarianceMomentPermeability
         covarianceDerivative secondMoment fourthMoment := by
   unfold diagonalCovarianceMomentPermeability
@@ -302,7 +302,7 @@ theorem diagonalCovarianceMomentPermeability_eq_zero_iff
         diagonalCovarianceMomentPermeability
           covarianceDerivative secondMoment fourthMoment := by
       unfold diagonalCovarianceMomentPermeability
-      exact Finset.single_le_sum (fun j _ => hnonneg j) (Finset.mem_univ i)
+      exact Finset.single_le_sum (fun j _ ↦ hnonneg j) (Finset.mem_univ i)
     have hzero : covarianceMomentPermeability
         (covarianceDerivative i) (secondMoment i) (fourthMoment i) = 0 := by
       apply le_antisymm
@@ -372,7 +372,7 @@ theorem covarianceMomentPermeabilityWithPrecision_eq_zero_iff {d : ℕ}
 /-- The diagonal precision constructed from channel-specific square-noise variances. -/
 noncomputable def diagonalSquareNoisePrecision {d : ℕ}
     (secondMoment fourthMoment : Fin d → ℝ) : Matrix (Fin d) (Fin d) ℝ :=
-  Matrix.diagonal fun i =>
+  Matrix.diagonal fun i ↦
     1 / centeredSquareVarianceFromMoments (secondMoment i) (fourthMoment i)
 
 /-- Positive square-noise variance in every independent channel makes the induced
@@ -408,7 +408,7 @@ theorem covarianceMomentPermeabilityWithPrecision_diagonal {d : ℕ}
 inverse-square information law. -/
 theorem covarianceMomentPermeabilityWithPrecision_scale {d : ℕ}
     (precision : Matrix (Fin d) (Fin d) ℝ) (response : Fin d → ℝ) (η : ℝ) :
-    covarianceMomentPermeabilityWithPrecision precision (fun i => η * response i) =
+    covarianceMomentPermeabilityWithPrecision precision (fun i ↦ η * response i) =
       η ^ 2 * covarianceMomentPermeabilityWithPrecision precision response := by
   unfold covarianceMomentPermeabilityWithPrecision
   calc
@@ -772,7 +772,7 @@ theorem diagonalCovarianceMomentPermeability_gaussian
     (covariance covarianceDerivative : ι → ℝ)
     (hcovariance : ∀ i, covariance i ≠ 0) :
     diagonalCovarianceMomentPermeability covarianceDerivative covariance
-        (fun i => 3 * covariance i ^ 2) =
+        (fun i ↦ 3 * covariance i ^ 2) =
       diagonalPermeability covariance covarianceDerivative := by
   unfold diagonalCovarianceMomentPermeability diagonalPermeability
   apply Finset.sum_congr rfl
@@ -788,7 +788,7 @@ The premise is deliberately algebraic: a biological model must still prove that 
 channel derivatives are multiplied by `η`. -/
 theorem diagonalPermeability_derivative_scale {ι : Type*} [Fintype ι]
     (covariance covarianceDerivative : ι → ℝ) (η : ℝ) :
-    diagonalPermeability covariance (fun i => η * covarianceDerivative i) =
+    diagonalPermeability covariance (fun i ↦ η * covarianceDerivative i) =
       η ^ 2 * diagonalPermeability covariance covarianceDerivative := by
   unfold diagonalPermeability
   simp_rw [scalarPermeability_derivative_scale]
@@ -862,7 +862,7 @@ than competing approximations. -/
 theorem multivariateGaussianPermeability_diagonal {d : ℕ}
     (covariance covarianceDerivative : Fin d → ℝ) :
     multivariateGaussianPermeability
-        (Matrix.diagonal fun i => covarianceDerivative i / covariance i) =
+        (Matrix.diagonal fun i ↦ covarianceDerivative i / covariance i) =
       diagonalPermeability covariance covarianceDerivative := by
   classical
   unfold multivariateGaussianPermeability frobeniusNormSq
@@ -1106,7 +1106,7 @@ theorem diagonalPermeability_eq_zero_iff {ι : Type*} [Fintype ι]
         diagonalPermeability covariance covarianceDerivative := by
       unfold diagonalPermeability
       exact Finset.single_le_sum
-        (fun j _ => scalarPermeability_nonneg (covariance j) (covarianceDerivative j))
+        (fun j _ ↦ scalarPermeability_nonneg (covariance j) (covarianceDerivative j))
         (Finset.mem_univ i)
     have hzero : scalarPermeability (covariance i) (covarianceDerivative i) = 0 := by
       apply le_antisymm
@@ -1133,7 +1133,7 @@ longitudinal model. -/
 noncomputable def lagSensitivityMatrix {d : ℕ}
     (lag : Fin d → ℕ) (covarianceDerivative : ℕ → Fin d → ℝ) :
     Matrix (Fin d) (Fin d) ℝ :=
-  fun i j => covarianceDerivative (lag i) j
+  fun i j ↦ covarianceDerivative (lag i) j
 
 /-- Linearized change in the selected lag statistics along a deployment tangent. -/
 noncomputable def lagObservationDerivative {d : ℕ}
@@ -1242,8 +1242,8 @@ noncomputable def quadraticChannel (θ : ℝ) : ℝ := θ ^ 2
 /-- The quadratic channel is first-order blind at zero. -/
 theorem quadraticChannel_deriv_zero : deriv quadraticChannel 0 = 0 := by
   unfold quadraticChannel
-  have hderiv : deriv (fun x : ℝ => x ^ 2) 0 =
-      2 * (0 : ℝ) ^ (2 - 1) * deriv (fun x : ℝ => x) 0 := by
+  have hderiv : deriv (fun x : ℝ ↦ x ^ 2) 0 =
+      2 * (0 : ℝ) ^ (2 - 1) * deriv (fun x : ℝ ↦ x) 0 := by
     exact deriv_pow (n := 2) differentiableAt_id
   rw [hderiv]
   norm_num

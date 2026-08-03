@@ -97,6 +97,23 @@ structure R2DecompositionData where
   -- Var(E[Y|Ŷ]) ≤ Var(Y) (law of total variance: explained ≤ total)
   hCondE_le_Y : varCondE ≤ varY
 
+/-- **The data class is inhabited**, and away from every boundary: `Var(E[Y|Ŷ]) = 1`,
+`Var(Ŷ) = 2`, `Var(Y) = 4`, so both `≤` chains are strict and `R² = 1/4`.
+
+Fourteen theorems quantify over `R2DecompositionData`.  Six of its nine fields are
+order constraints among three reals, and a witness is what shows the six are jointly
+satisfiable; without one, those fourteen theorems are true of nothing. -/
+noncomputable def R2DecompositionData.witness : R2DecompositionData where
+  varY := 4
+  varYhat := 2
+  varCondE := 1
+  hVarY_pos := by norm_num
+  hVarYhat_pos := by norm_num
+  hVarCondE_pos := by norm_num
+  hCondE_le_Yhat := by norm_num
+  hYhat_le_Y := by norm_num
+  hCondE_le_Y := by norm_num
+
 /-- **R² from the standard definition** (population version).
 
     R² = Var(E[Y|Ŷ]) / Var(Y).
@@ -1857,21 +1874,21 @@ theorem clumping_minimizes_detection_on_ld_kernel
     (hM : IsRankAllocation (S.card : ℝ) M)
     (hin : ∀ i ∈ S, Real.cos cutAngle ≤ Real.cos (angle i))
     (hout : ∀ i ∉ S, Real.cos (angle i) ≤ Real.cos cutAngle)
-    (htotal : 0 < spectralTotal (fun i =>
+    (htotal : 0 < spectralTotal (fun i ↦
       detectionWeight (ldKernelSymbol (ldRetentionPerGen recomb Ne) (angle i)))) :
     detectionEfficiency
-        (fun i => ldKernelSymbol (ldRetentionPerGen recomb Ne) (angle i))
+        (fun i ↦ ldKernelSymbol (ldRetentionPerGen recomb Ne) (angle i))
         (pruneAllocation S) ≤
       detectionEfficiency
-        (fun i => ldKernelSymbol (ldRetentionPerGen recomb Ne) (angle i)) M := by
+        (fun i ↦ ldKernelSymbol (ldRetentionPerGen recomb Ne) (angle i)) M := by
   have habs : |ldRetentionPerGen recomb Ne| < 1 :=
     ldRetentionPerGen_abs_lt_one hr0 hr1 hNe
   have hp0 : 0 ≤ ldRetentionPerGen recomb Ne :=
     ld_retention_nonneg recomb Ne hr0 hr1 (le_of_lt hNe)
   refine topVariance_minimizes_detection
-    (fun i => ldKernelSymbol (ldRetentionPerGen recomb Ne) (angle i)) M S
+    (fun i ↦ ldKernelSymbol (ldRetentionPerGen recomb Ne) (angle i)) M S
     (ldKernelSymbol (ldRetentionPerGen recomb Ne) cutAngle)
-    (fun i => ldKernelSymbol_pos habs) (ldKernelSymbol_pos habs)
+    (fun i ↦ ldKernelSymbol_pos habs) (ldKernelSymbol_pos habs)
     hM ?_ ?_ htotal
   · intro i hi
     exact ldKernelSymbol_mono_in_cos habs hp0 (hin i hi)
@@ -1890,22 +1907,22 @@ theorem clumping_maximizes_reconstruction_on_ld_kernel
     (hM : IsRankAllocation (S.card : ℝ) M)
     (hin : ∀ i ∈ S, Real.cos cutAngle ≤ Real.cos (angle i))
     (hout : ∀ i ∉ S, Real.cos (angle i) ≤ Real.cos cutAngle)
-    (htotal : 0 < spectralTotal (fun i =>
+    (htotal : 0 < spectralTotal (fun i ↦
       reconstructionWeight
         (ldKernelSymbol (ldRetentionPerGen recomb Ne) (angle i)))) :
     reconstructionEfficiency
-        (fun i => ldKernelSymbol (ldRetentionPerGen recomb Ne) (angle i)) M ≤
+        (fun i ↦ ldKernelSymbol (ldRetentionPerGen recomb Ne) (angle i)) M ≤
       reconstructionEfficiency
-        (fun i => ldKernelSymbol (ldRetentionPerGen recomb Ne) (angle i))
+        (fun i ↦ ldKernelSymbol (ldRetentionPerGen recomb Ne) (angle i))
         (pruneAllocation S) := by
   have habs : |ldRetentionPerGen recomb Ne| < 1 :=
     ldRetentionPerGen_abs_lt_one hr0 hr1 hNe
   have hp0 : 0 ≤ ldRetentionPerGen recomb Ne :=
     ld_retention_nonneg recomb Ne hr0 hr1 (le_of_lt hNe)
   refine topVariance_maximizes_reconstruction
-    (fun i => ldKernelSymbol (ldRetentionPerGen recomb Ne) (angle i)) M S
+    (fun i ↦ ldKernelSymbol (ldRetentionPerGen recomb Ne) (angle i)) M S
     (ldKernelSymbol (ldRetentionPerGen recomb Ne) cutAngle)
-    (fun i => ldKernelSymbol_pos habs) hM ?_ ?_ htotal
+    (fun i ↦ ldKernelSymbol_pos habs) hM ?_ ?_ htotal
   · intro i hi
     exact ldKernelSymbol_mono_in_cos habs hp0 (hin i hi)
   · intro i hi
@@ -1959,7 +1976,7 @@ abstract; it hollowed the claim and left the file green.
 Empirical status: UNTESTED. -/
 def targetCorrectionCurvature (weight : ι → ℝ) (B : ι → Matrix J J ℝ)
     (beta : J → ℝ) : ι → ℝ :=
-  fun i => weight i * coefficientEnergy (B i) beta
+  fun i ↦ weight i * coefficientEnergy (B i) beta
 
 /-- **The correction each target would choose alone**, as a family indexed by
 deployment target.
@@ -1978,7 +1995,7 @@ itself, or the compiler IR check fails here rather than at the real-division sit
 Empirical status: UNTESTED. -/
 noncomputable def targetCorrectionOptimum (B : ι → Matrix J J ℝ) (beta theta : J → ℝ) :
     ι → ℝ :=
-  fun i => sharedCorrectionOptimum (B i) beta theta
+  fun i ↦ sharedCorrectionOptimum (B i) beta theta
 
 /-- The curvature-weighted mean of the per-target optimal corrections: the
 shared correction that a weighted-least-squares compromise selects.
@@ -2017,7 +2034,7 @@ theorem sharedCorrection_centered (curvature optimum : ι → ℝ)
           (sharedCorrectionConsensus curvature optimum - optimum i)
         = ∑ i, (sharedCorrectionConsensus curvature optimum * curvature i -
             curvature i * optimum i) :=
-          Finset.sum_congr rfl (fun i _ => by ring)
+          Finset.sum_congr rfl (fun i _ ↦ by ring)
       _ = (∑ i, sharedCorrectionConsensus curvature optimum * curvature i) -
             ∑ i, curvature i * optimum i := by
           rw [Finset.sum_sub_distrib]
@@ -2048,7 +2065,7 @@ theorem sharedCorrectionCost_eq_consensus_add_spread
                 (sharedCorrectionConsensus curvature optimum - optimum i)) +
             curvature i *
               (optimum i - sharedCorrectionConsensus curvature optimum) ^ 2) :=
-        Finset.sum_congr rfl (fun i _ => by ring)
+        Finset.sum_congr rfl (fun i _ ↦ by ring)
     _ = (∑ i, curvature i *
             (correction - sharedCorrectionConsensus curvature optimum) ^ 2) +
           (∑ i, 2 * (correction - sharedCorrectionConsensus curvature optimum) *
@@ -2088,7 +2105,7 @@ theorem sharedCorrectionSpread_nonneg (curvature optimum : ι → ℝ)
     (hc : ∀ i, 0 ≤ curvature i) :
     0 ≤ sharedCorrectionSpread curvature optimum := by
   unfold sharedCorrectionSpread
-  exact Finset.sum_nonneg (fun i _ => mul_nonneg (hc i) (sq_nonneg _))
+  exact Finset.sum_nonneg (fun i _ ↦ mul_nonneg (hc i) (sq_nonneg _))
 
 /-- **The price of sharing vanishes exactly on agreement.** -/
 theorem sharedCorrectionSpread_eq_zero_iff (curvature optimum : ι → ℝ)
@@ -2097,7 +2114,7 @@ theorem sharedCorrectionSpread_eq_zero_iff (curvature optimum : ι → ℝ)
       ∀ i, optimum i = sharedCorrectionConsensus curvature optimum := by
   have hnn : ∀ j ∈ (Finset.univ : Finset ι), 0 ≤ curvature j *
       (optimum j - sharedCorrectionConsensus curvature optimum) ^ 2 :=
-    fun j _ => mul_nonneg (le_of_lt (hc j)) (sq_nonneg _)
+    fun j _ ↦ mul_nonneg (le_of_lt (hc j)) (sq_nonneg _)
   constructor
   · intro h i
     have hle : curvature i *
@@ -2136,7 +2153,7 @@ theorem sharedCorrectionSpread_eq_zero_iff_agree (curvature optimum : ι → ℝ
     have hsum : ∑ j, curvature j * optimum j =
         optimum i * ∑ j, curvature j := by
       rw [Finset.mul_sum]
-      exact Finset.sum_congr rfl (fun j _ => by rw [h j i]; ring)
+      exact Finset.sum_congr rfl (fun j _ ↦ by rw [h j i]; ring)
     unfold sharedCorrectionConsensus
     rw [hsum, mul_div_assoc, div_self hC, mul_one]
 
@@ -2145,8 +2162,8 @@ of targets that all want the same correction pays nothing for sharing one.  Any
 simulation of the spread law must return exactly zero here. -/
 theorem sharedCorrectionSpread_of_identical_optima (curvature : ι → ℝ)
     (a : ℝ) (hc : ∀ i, 0 < curvature i) (hC : ∑ i, curvature i ≠ 0) :
-    sharedCorrectionSpread curvature (fun _ => a) = 0 := by
-  rw [sharedCorrectionSpread_eq_zero_iff_agree curvature (fun _ => a) hc hC]
+    sharedCorrectionSpread curvature (fun _ ↦ a) = 0 := by
+  rw [sharedCorrectionSpread_eq_zero_iff_agree curvature (fun _ ↦ a) hc hC]
   intro i j
   rfl
 

@@ -138,7 +138,7 @@ mechanism is stated in terms of. -/
 theorem imputation_rescaling_cannot_repair_lattice (lam : ℝ) (hlam : lam ≠ 0) :
     1 < latticeInflation hardCallLatticeSpan ∧
       ∀ c V : ℝ, V ≠ 0 → (lam * c) ^ 2 / (lam ^ 2 * V) = c ^ 2 / V :=
-  ⟨hardCall_intensity_inflated, fun c V _hV => standardizedSquare_scale_invariant c V lam hlam⟩
+  ⟨hardCall_intensity_inflated, fun c V _hV ↦ standardizedSquare_scale_invariant c V lam hlam⟩
 
 /-!
 ## 4-5. Two abstract results this file used to re-export under genetics names
@@ -229,7 +229,7 @@ theorem no_signSymmetric_nondegenerate_locus
         (∀ g, coding.value g = h.centeredAltAlleleCount g) →
         h.altFreq = 1 / 2) ∧
       (h.altFreq = 1 / 2 → hweMellinJetVariance h.altFreq = 0) := by
-  refine ⟨fun coding hweight hvalue => ?_, fun hhalf => ?_⟩
+  refine ⟨fun coding hweight hvalue ↦ ?_, fun hhalf ↦ ?_⟩
   · exact hwe_symmetricCoding_forces_half h hq0 hq1 coding hweight hvalue
   · rw [hhalf]
     exact hweMellinJetVariance_half
@@ -675,7 +675,7 @@ theorem fourthMoment_eq (spectrum : MafSpectrum m)
           (spectrum.model j).genotypeProb g *
             (spectrum.model j).standardizedGenotype g ^ 4 := rfl
   rw [hdef]
-  exact Finset.sum_congr rfl (fun j _ => hterm j)
+  exact Finset.sum_congr rfl (fun j _ ↦ hterm j)
 
 /-- **The first floor-two datum of a panel**: the third moment of the centered square,
 `E[u³] = E[x⁶] - 3 E[x⁴] + 2`, where the `+2` uses `E[x²] = 1`, which holds atom by atom
@@ -763,7 +763,7 @@ theorem sixthMoment_eq_floorOne_plus_dispersion (spectrum : MafSpectrum m)
     -- Descend the extra level explicitly. Keeping alternative proof branches here hid two
     -- unreachable tactics from the linter; the goal shape is part of the checked theorem,
     -- so the exact congruence is the stronger and more maintainable proof.
-    exact congrArg (fun s => 10 * s) (Finset.sum_congr rfl (fun j _ => hfour j))
+    exact congrArg (fun s ↦ 10 * s) (Finset.sum_congr rfl (fun j _ ↦ hfour j))
   rw [hsplit]
   unfold fourthMomentDispersion
   ring

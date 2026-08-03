@@ -225,7 +225,7 @@ current discovered set. When discovery at larger sample size recovers more
 causal loci, this gap shrinks. -/
 noncomputable def ctMissedTargetSignal {m : ℕ}
     (discovered : Finset (Fin m)) (targetCausalSignal : Fin m → ℝ) : ℝ :=
-  Finset.sum (Finset.univ \ discovered) fun i => targetCausalSignal i
+  Finset.sum (Finset.univ \ discovered) fun i ↦ targetCausalSignal i
 
 /-- **C+T uses fewer variants → more variable portability estimates.**
     This is stated on an explicit per-locus estimation-risk surface rather than
@@ -247,10 +247,10 @@ theorem ct_more_variable_than_bayesian
     (h_sigma : ∀ i, 0 < σSq i)
     (h_beta : ∀ i, 0 < βSq i) :
     taggedScoreEstimationRisk targetTagVariance
-        (fun i => jamesSteinMSE
+        (fun i ↦ jamesSteinMSE
           (optimalShrinkage (σSq i) (βSq i)) (σSq i) (βSq i)) <
       taggedScoreEstimationRisk targetTagVariance
-        (fun i => jamesSteinMSE 1 (σSq i) (βSq i)) := by
+        (fun i ↦ jamesSteinMSE 1 (σSq i) (βSq i)) := by
   unfold taggedScoreEstimationRisk
   refine Finset.sum_lt_sum ?_ ?_
   · intro i _
@@ -376,7 +376,7 @@ LASSO, modeled here by the loci whose marginal effect magnitude clears the
 selection threshold `lam`. -/
 noncomputable def lassoActiveLoci {m : ℕ}
     (β : Fin m → ℝ) (lam : ℝ) : Finset (Fin m) :=
-  Finset.univ.filter fun i => lam ≤ |β i|
+  Finset.univ.filter fun i ↦ lam ≤ |β i|
 
 /-- Equal-contribution per-locus signal in a trait with total heritability `h2`
 spread over `k` causal loci. -/
@@ -549,7 +549,7 @@ namespace CrossTraitBorrowingModel
 genetic architecture. -/
 noncomputable def borrowedTraitBCrossCov {p q : ℕ}
     (m : CrossTraitBorrowingModel p q) : Fin p → ℝ :=
-  m.sigmaTagCausal.mulVec (fun j => m.rg * m.sharedTraitEffect j)
+  m.sigmaTagCausal.mulVec (fun j ↦ m.rg * m.sharedTraitEffect j)
 
 /-- Trait-B cross-covariance component specific to trait B after removing the
 shared trait-A component. -/
@@ -579,7 +579,7 @@ theorem traitBSpecificCrossCov_nonneg {p q : ℕ}
     0 ≤ traitBSpecificCrossCov m := by
   intro i
   unfold traitBSpecificCrossCov Matrix.mulVec
-  exact Finset.sum_nonneg fun j _ => mul_nonneg (h_sigma i j) (h_specific j)
+  exact Finset.sum_nonneg fun j _ ↦ mul_nonneg (h_sigma i j) (h_specific j)
 
 theorem borrowedTraitBCrossCov_nonneg {p q : ℕ}
     (m : CrossTraitBorrowingModel p q)
@@ -589,7 +589,7 @@ theorem borrowedTraitBCrossCov_nonneg {p q : ℕ}
     0 ≤ borrowedTraitBCrossCov m := by
   intro i
   unfold borrowedTraitBCrossCov Matrix.mulVec
-  exact Finset.sum_nonneg fun j _ =>
+  exact Finset.sum_nonneg fun j _ ↦
     mul_nonneg (h_sigma i j) (mul_nonneg h_rg (h_shared j))
 
 end CrossTraitBorrowingModel

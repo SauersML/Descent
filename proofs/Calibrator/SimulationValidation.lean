@@ -605,8 +605,8 @@ noncomputable def popgenDrivenProxyGenerationalModel :
     CrossPopulationGenerationalModel 2 1 := {
   popGen := nondegenerateGenerationalPopGen
   betaSource := ![1]
-  targetEffectHeterogeneityAt := fun _ => ![0]
-  novelCausalEffectTargetAt := fun _ => ![0]
+  targetEffectHeterogeneityAt := fun _ ↦ ![0]
+  novelCausalEffectTargetAt := fun _ ↦ ![0]
   sigmaTagSource := 1
   directCausalSource := !![0; 0]
   novelDirectCausalTemplate := !![0; 0]
@@ -615,17 +615,17 @@ noncomputable def popgenDrivenProxyGenerationalModel :
   tagDistance := !![0, 1; 1, 0]
   tagCausalDistance := !![1; 1]
   tagAlleleFreqSource := ![1 / 2, 1 / 2]
-  tagAlleleFreqStandingTargetAt := fun _ => ![1 / 2, 1 / 2]
-  tagAlleleFreqMutationShiftAt := fun _ => ![0, 0]
+  tagAlleleFreqStandingTargetAt := fun _ ↦ ![1 / 2, 1 / 2]
+  tagAlleleFreqMutationShiftAt := fun _ ↦ ![0, 0]
   causalAlleleFreqSource := ![1 / 2]
-  causalAlleleFreqStandingTargetAt := fun _ => ![1 / 2]
-  causalAlleleFreqMutationShiftAt := fun _ => ![0]
+  causalAlleleFreqStandingTargetAt := fun _ ↦ ![1 / 2]
+  causalAlleleFreqMutationShiftAt := fun _ ↦ ![0]
   contextCrossSource := ![0, 0]
-  contextCrossTargetAt := fun _ => ![0, 0]
+  contextCrossTargetAt := fun _ ↦ ![0, 0]
   sourceOutcomeVariance := 4
-  targetOutcomeVarianceAt := fun _ => 4
-  novelUntaggablePhenotypeVarianceAt := fun _ => 0
-  targetPrevalenceAt := fun _ => 1 / 2
+  targetOutcomeVarianceAt := fun _ ↦ 4
+  novelUntaggablePhenotypeVarianceAt := fun _ ↦ 0
+  targetPrevalenceAt := fun _ ↦ 1 / 2
   sourceOutcomeVariance_pos := by norm_num
   targetOutcomeVariance_pos := by intro t; norm_num
   novelUntaggablePhenotypeVariance_nonneg := by intro t; norm_num
@@ -910,8 +910,8 @@ noncomputable def timeVaryingAFGenerationalModel :
     CrossPopulationGenerationalModel 1 1 := {
   popGen := baselineGenerationalPopGen
   betaSource := ![1]
-  targetEffectHeterogeneityAt := fun _ => ![0]
-  novelCausalEffectTargetAt := fun _ => ![0]
+  targetEffectHeterogeneityAt := fun _ ↦ ![0]
+  novelCausalEffectTargetAt := fun _ ↦ ![0]
   sigmaTagSource := !![1]
   directCausalSource := !![0]
   novelDirectCausalTemplate := !![0]
@@ -920,17 +920,17 @@ noncomputable def timeVaryingAFGenerationalModel :
   tagDistance := !![1]
   tagCausalDistance := !![1]
   tagAlleleFreqSource := ![1 / 2]
-  tagAlleleFreqStandingTargetAt := fun _ => ![1 / 2]
-  tagAlleleFreqMutationShiftAt := fun t => ![if t = 0 then (0 : ℝ) else 1 / 4]
+  tagAlleleFreqStandingTargetAt := fun _ ↦ ![1 / 2]
+  tagAlleleFreqMutationShiftAt := fun t ↦ ![if t = 0 then (0 : ℝ) else 1 / 4]
   causalAlleleFreqSource := ![1 / 2]
-  causalAlleleFreqStandingTargetAt := fun _ => ![1 / 2]
-  causalAlleleFreqMutationShiftAt := fun t => ![if t = 0 then (0 : ℝ) else 1 / 4]
+  causalAlleleFreqStandingTargetAt := fun _ ↦ ![1 / 2]
+  causalAlleleFreqMutationShiftAt := fun t ↦ ![if t = 0 then (0 : ℝ) else 1 / 4]
   contextCrossSource := ![0]
-  contextCrossTargetAt := fun _ => ![0]
+  contextCrossTargetAt := fun _ ↦ ![0]
   sourceOutcomeVariance := 2
-  targetOutcomeVarianceAt := fun _ => 2
-  novelUntaggablePhenotypeVarianceAt := fun _ => 0
-  targetPrevalenceAt := fun _ => 1 / 2
+  targetOutcomeVarianceAt := fun _ ↦ 2
+  novelUntaggablePhenotypeVarianceAt := fun _ ↦ 0
+  targetPrevalenceAt := fun _ ↦ 1 / 2
   sourceOutcomeVariance_pos := by norm_num
   targetOutcomeVariance_pos := by intro t; norm_num
   novelUntaggablePhenotypeVariance_nonneg := by intro t; norm_num
@@ -947,9 +947,9 @@ noncomputable def timeVaryingEffectGenerationalModel :
     CrossPopulationGenerationalModel 1 1 := {
   popGen := baselineGenerationalPopGen
   betaSource := ![1]
-  targetEffectHeterogeneityAt := fun t =>
+  targetEffectHeterogeneityAt := fun t ↦
     ![if t = 0 then (0 : ℝ) else -(1 / 2)]
-  novelCausalEffectTargetAt := fun _ => ![0]
+  novelCausalEffectTargetAt := fun _ ↦ ![0]
   sigmaTagSource := !![1]
   directCausalSource := !![1]
   novelDirectCausalTemplate := !![0]
@@ -958,17 +958,17 @@ noncomputable def timeVaryingEffectGenerationalModel :
   tagDistance := !![1]
   tagCausalDistance := !![1]
   tagAlleleFreqSource := ![1 / 2]
-  tagAlleleFreqStandingTargetAt := fun _ => ![1 / 2]
-  tagAlleleFreqMutationShiftAt := fun _ => ![0]
+  tagAlleleFreqStandingTargetAt := fun _ ↦ ![1 / 2]
+  tagAlleleFreqMutationShiftAt := fun _ ↦ ![0]
   causalAlleleFreqSource := ![1 / 2]
-  causalAlleleFreqStandingTargetAt := fun _ => ![1 / 2]
-  causalAlleleFreqMutationShiftAt := fun _ => ![0]
+  causalAlleleFreqStandingTargetAt := fun _ ↦ ![1 / 2]
+  causalAlleleFreqMutationShiftAt := fun _ ↦ ![0]
   contextCrossSource := ![0]
-  contextCrossTargetAt := fun _ => ![0]
+  contextCrossTargetAt := fun _ ↦ ![0]
   sourceOutcomeVariance := 2
-  targetOutcomeVarianceAt := fun _ => 2
-  novelUntaggablePhenotypeVarianceAt := fun _ => 0
-  targetPrevalenceAt := fun _ => 1 / 2
+  targetOutcomeVarianceAt := fun _ ↦ 2
+  novelUntaggablePhenotypeVarianceAt := fun _ ↦ 0
+  targetPrevalenceAt := fun _ ↦ 1 / 2
   sourceOutcomeVariance_pos := by norm_num
   targetOutcomeVariance_pos := by intro t; norm_num
   novelUntaggablePhenotypeVariance_nonneg := by intro t; norm_num

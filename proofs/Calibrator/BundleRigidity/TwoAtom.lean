@@ -329,7 +329,7 @@ theorem chain_tendsto_half :
   rw [Metric.tendsto_atTop]
   intro ε hε
   obtain ⟨N, hN⟩ := exists_nat_gt (1 / ε)
-  refine ⟨N, fun n hn => ?_⟩
+  refine ⟨N, fun n hn ↦ ?_⟩
   have hd := chain_denom_pos n
   have hNn : (N : ℝ) ≤ (n : ℝ) := Nat.cast_le.mpr hn
   have hbound : 1 / (2 * (2 * (n : ℝ) + 1)) < ε := by

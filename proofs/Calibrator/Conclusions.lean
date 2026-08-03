@@ -85,35 +85,35 @@ theorem expectedBrierScore_quadratic (p π : ℝ) :
 
     Setting this to zero gives p* = π. -/
 theorem expectedBrierScore_deriv (p π : ℝ) :
-    deriv (fun x : ℝ => expectedBrierScore x π) p = 2 * (p - π) := by
-  have h_eq : (fun x : ℝ => expectedBrierScore x π) = fun x : ℝ => π - 2 * π * x + x ^ 2 := by
+    deriv (fun x : ℝ ↦ expectedBrierScore x π) p = 2 * (p - π) := by
+  have h_eq : (fun x : ℝ ↦ expectedBrierScore x π) = fun x : ℝ ↦ π - 2 * π * x + x ^ 2 := by
     ext x
     exact expectedBrierScore_quadratic x π
   rw [h_eq]
-  have hd1 : DifferentiableAt ℝ (fun x : ℝ => π - 2 * π * x) p := by
+  have hd1 : DifferentiableAt ℝ (fun x : ℝ ↦ π - 2 * π * x) p := by
     apply DifferentiableAt.sub
     · exact differentiableAt_const π
     · apply DifferentiableAt.const_mul
       exact differentiableAt_id
-  have hd2 : DifferentiableAt ℝ (fun x : ℝ => x ^ 2) p :=
+  have hd2 : DifferentiableAt ℝ (fun x : ℝ ↦ x ^ 2) p :=
     differentiableAt_id.pow 2
-  have h_deriv_add : deriv (fun x : ℝ => (π - 2 * π * x) + x ^ 2) p = deriv (fun x : ℝ => π - 2 * π * x) p + deriv (fun x : ℝ => x ^ 2) p :=
+  have h_deriv_add : deriv (fun x : ℝ ↦ (π - 2 * π * x) + x ^ 2) p = deriv (fun x : ℝ ↦ π - 2 * π * x) p + deriv (fun x : ℝ ↦ x ^ 2) p :=
     deriv_add hd1 hd2
-  have h_eq_add : (fun x : ℝ => π - 2 * π * x + x ^ 2) = (fun x : ℝ => (π - 2 * π * x) + x ^ 2) := rfl
+  have h_eq_add : (fun x : ℝ ↦ π - 2 * π * x + x ^ 2) = (fun x : ℝ ↦ (π - 2 * π * x) + x ^ 2) := rfl
   rw [h_eq_add, h_deriv_add]
-  have hd1_sub1 : DifferentiableAt ℝ (fun x : ℝ => π) p := differentiableAt_const π
-  have hd1_sub2 : DifferentiableAt ℝ (fun x : ℝ => 2 * π * x) p := differentiableAt_id.const_mul (2 * π)
-  have h_deriv_sub : deriv (fun x : ℝ => π - 2 * π * x) p = deriv (fun x : ℝ => π) p - deriv (fun x : ℝ => 2 * π * x) p :=
+  have hd1_sub1 : DifferentiableAt ℝ (fun x : ℝ ↦ π) p := differentiableAt_const π
+  have hd1_sub2 : DifferentiableAt ℝ (fun x : ℝ ↦ 2 * π * x) p := differentiableAt_id.const_mul (2 * π)
+  have h_deriv_sub : deriv (fun x : ℝ ↦ π - 2 * π * x) p = deriv (fun x : ℝ ↦ π) p - deriv (fun x : ℝ ↦ 2 * π * x) p :=
     deriv_sub hd1_sub1 hd1_sub2
   rw [h_deriv_sub]
   rw [deriv_const]
-  have h_deriv_const_mul : deriv (fun x : ℝ => 2 * π * x) p = 2 * π * deriv (fun x : ℝ => x) p :=
+  have h_deriv_const_mul : deriv (fun x : ℝ ↦ 2 * π * x) p = 2 * π * deriv (fun x : ℝ ↦ x) p :=
     deriv_const_mul (2 * π) differentiableAt_id
   rw [h_deriv_const_mul]
-  have h_deriv_id : deriv (fun x : ℝ => x) p = 1 :=
+  have h_deriv_id : deriv (fun x : ℝ ↦ x) p = 1 :=
     deriv_id p
   rw [h_deriv_id]
-  have h_deriv_pow : deriv (fun x : ℝ => x ^ 2) p = 2 * p ^ (2 - 1) * deriv (fun x : ℝ => x) p :=
+  have h_deriv_pow : deriv (fun x : ℝ ↦ x ^ 2) p = 2 * p ^ (2 - 1) * deriv (fun x : ℝ ↦ x) p :=
     deriv_pow (n := 2) differentiableAt_id
   rw [h_deriv_pow]
   rw [h_deriv_id]
@@ -324,7 +324,7 @@ lemma differentiable_sigmoid (x : ℝ) : DifferentiableAt ℝ sigmoid x := by
     linarith
 
 lemma deriv_sigmoid (x : ℝ) : deriv sigmoid x = sigmoid x * (1 - sigmoid x) := by
-  have h_diff : DifferentiableAt ℝ (fun x => 1 + Real.exp (-x)) x := by
+  have h_diff : DifferentiableAt ℝ (fun x ↦ 1 + Real.exp (-x)) x := by
     apply DifferentiableAt.add
     · exact differentiableAt_const _
     · apply DifferentiableAt.exp
@@ -335,7 +335,7 @@ lemma deriv_sigmoid (x : ℝ) : deriv sigmoid x = sigmoid x * (1 - sigmoid x) :=
   unfold sigmoid
   simp only [one_div]
   apply HasDerivAt.deriv
-  convert HasDerivAt.inv (c := fun x => 1 + Real.exp (-x)) (by
+  convert HasDerivAt.inv (c := fun x ↦ 1 + Real.exp (-x)) (by
       apply HasDerivAt.add
       · apply hasDerivAt_const
       · apply HasDerivAt.exp
@@ -346,7 +346,7 @@ lemma deriv_sigmoid (x : ℝ) : deriv sigmoid x = sigmoid x * (1 - sigmoid x) :=
   ring
 
 lemma deriv2_sigmoid (x : ℝ) : deriv (deriv sigmoid) x = sigmoid x * (1 - sigmoid x) * (1 - 2 * sigmoid x) := by
-  have h_eq : deriv sigmoid = fun x => sigmoid x * (1 - sigmoid x) := by
+  have h_eq : deriv sigmoid = fun x ↦ sigmoid x * (1 - sigmoid x) := by
     ext y; rw [deriv_sigmoid]
   rw [h_eq]
   apply HasDerivAt.deriv
@@ -358,7 +358,7 @@ lemma deriv2_sigmoid (x : ℝ) : deriv (deriv sigmoid) x = sigmoid x * (1 - sigm
 
 lemma sigmoid_strictConcaveOn_Ici : StrictConcaveOn ℝ (Set.Ici 0) sigmoid := by
   apply strictConcaveOn_of_deriv2_neg (convex_Ici 0)
-  · have h_diff : Differentiable ℝ sigmoid := fun x => differentiable_sigmoid x
+  · have h_diff : Differentiable ℝ sigmoid := fun x ↦ differentiable_sigmoid x
     exact h_diff.continuous.continuousOn
   · intro x hx
     rw [interior_Ici] at hx
@@ -391,10 +391,10 @@ lemma sigmoid_strictConcaveOn_Ici : StrictConcaveOn ℝ (Set.Ici 0) sigmoid := b
       filter_upwards [h_support] with ω hω
       exact le_of_lt hω
     have h_ae_meas : AEStronglyMeasurable X P := h_measurable.aestronglyMeasurable
-    have h_diff : Differentiable ℝ sigmoid := fun x => differentiable_sigmoid x
+    have h_diff : Differentiable ℝ sigmoid := fun x ↦ differentiable_sigmoid x
     have h_cont : ContinuousOn sigmoid (Set.Ici 0) := h_diff.continuous.continuousOn
     have h_int_sigmoid : Integrable (sigmoid ∘ X) P := by
-      have h_cont_sig : Continuous sigmoid := Differentiable.continuous (fun x => differentiable_sigmoid x)
+      have h_cont_sig : Continuous sigmoid := Differentiable.continuous (fun x ↦ differentiable_sigmoid x)
       refine Integrable.of_bound (h_cont_sig.comp_aestronglyMeasurable h_ae_meas) (1:ℝ) ?_
       filter_upwards with ω
       rw [Real.norm_eq_abs]
@@ -574,7 +574,7 @@ theorem logLoss_regret_eq_integral_kl {Z : Type u} [MeasurableSpace Z] (μ : Mea
     logLossRegret μ p q = logLossKLCertificate μ p q := by
   unfold logLossRegret logLossKLCertificate
   refine integral_congr_ae ?_
-  exact Filter.Eventually.of_forall (fun z => by
+  exact Filter.Eventually.of_forall (fun z ↦ by
     exact logLoss_regret_eq_kl_pointwise (p z) (q z) (hp z).1 (hp z).2 (hq z).1 (hq z).2)
 
 /-- Method-agnostic main theorem:
@@ -586,7 +586,7 @@ theorem logRisk_regret_eq_expected_klBernReal {Z : Type u} [MeasurableSpace Z] (
     (∫ z, bernoulliLogLoss (p z).1 (q z).1 - bernoulliLogLoss (p z).1 (p z).1 ∂μ)
       = ∫ z, klBernReal (p z) (q z) ∂μ := by
   unfold klBernReal
-  exact logLoss_regret_eq_integral_kl μ (fun z => (p z).1) (fun z => (q z).1) hp hq
+  exact logLoss_regret_eq_integral_kl μ (fun z ↦ (p z).1) (fun z ↦ (q z).1) hp hq
 
 /-- Method-comparison magnitude identity:
 the log-risk gap equals the KL-gap integral. -/
@@ -598,7 +598,7 @@ theorem logRisk_gap_eq_integral_klGap {Z : Type u} [MeasurableSpace Z] (μ : Mea
     (∫ z, bernoulliLogLoss (p z).1 (qBaseline z).1 - bernoulliLogLoss (p z).1 (qYours z).1 ∂μ)
       = ∫ z, (klBernReal (p z) (qBaseline z) - klBernReal (p z) (qYours z)) ∂μ := by
   refine integral_congr_ae ?_
-  exact Filter.Eventually.of_forall (fun z => by
+  exact Filter.Eventually.of_forall (fun z ↦ by
     have hB := logLoss_regret_eq_kl_pointwise (p z).1 (qBaseline z).1
       (hp z).1 (hp z).2 (hqBaseline z).1 (hqBaseline z).2
     have hY := logLoss_regret_eq_kl_pointwise (p z).1 (qYours z).1
@@ -625,7 +625,7 @@ theorem logRisk_regret_zero_iff_ae_eq {Z : Type u} [MeasurableSpace Z] (μ : Mea
     (p q : ProbPredictor Z)
     (hp : ∀ z, 0 < (p z).1 ∧ (p z).1 < 1)
     (hq : ∀ z, 0 < (q z).1 ∧ (q z).1 < 1)
-    (h_int : Integrable (fun z => klBernReal (p z) (q z)) μ)
+    (h_int : Integrable (fun z ↦ klBernReal (p z) (q z)) μ)
     (h_kl_zero_iff : ∀ z, klBernReal (p z) (q z) = 0 ↔ q z = p z) :
     (∫ z, bernoulliLogLoss (p z).1 (q z).1 - bernoulliLogLoss (p z).1 (p z).1 ∂μ) = 0
       ↔ q =ᵐ[μ] p := by
@@ -636,12 +636,12 @@ theorem logRisk_regret_zero_iff_ae_eq {Z : Type u} [MeasurableSpace Z] (μ : Mea
   rw [logRisk_regret_eq_expected_klBernReal μ p q hp hq]
   constructor
   · intro h0
-    have h_ae_zero : (fun z => klBernReal (p z) (q z)) =ᵐ[μ] 0 :=
+    have h_ae_zero : (fun z ↦ klBernReal (p z) (q z)) =ᵐ[μ] 0 :=
       (integral_eq_zero_iff_of_nonneg h_kl_nonneg h_int).mp h0
     filter_upwards [h_ae_zero] with z hz
     exact (h_kl_zero_iff z).1 hz
   · intro hqeqp
-    have h_ae_zero : (fun z => klBernReal (p z) (q z)) =ᵐ[μ] 0 := by
+    have h_ae_zero : (fun z ↦ klBernReal (p z) (q z)) =ᵐ[μ] 0 := by
       filter_upwards [hqeqp] with z hz
       exact (h_kl_zero_iff z).2 hz
     rw [integral_congr_ae h_ae_zero]
@@ -668,7 +668,7 @@ theorem brier_regret_eq_l2_certificate {Z : Type u} [MeasurableSpace Z] (μ : Me
     brierRegret μ p q = brierL2Certificate μ p q := by
   unfold brierRegret brierL2Certificate
   refine integral_congr_ae ?_
-  exact Filter.Eventually.of_forall (fun z => by simpa using brier_regret_pointwise (p z) (q z))
+  exact Filter.Eventually.of_forall (fun z ↦ by simpa using brier_regret_pointwise (p z) (q z))
 
 /-- Method-agnostic Brier identity on `p,q : Z → [0,1]`:
 regret equals the `L²` distance. -/
@@ -676,14 +676,14 @@ theorem brier_regret_eq_l2_probPredictor {Z : Type u} [MeasurableSpace Z] (μ : 
     (p q : ProbPredictor Z) :
     (∫ z, expectedBrierScore (q z).1 (p z).1 - expectedBrierScore (p z).1 (p z).1 ∂μ)
       = ∫ z, ((p z).1 - (q z).1) ^ 2 ∂μ := by
-  have h := brier_regret_eq_l2_certificate μ (fun z => (p z).1) (fun z => (q z).1)
+  have h := brier_regret_eq_l2_certificate μ (fun z ↦ (p z).1) (fun z ↦ (q z).1)
   calc
     (∫ z, expectedBrierScore (q z).1 (p z).1 - expectedBrierScore (p z).1 (p z).1 ∂μ)
         = ∫ z, ((q z).1 - (p z).1) ^ 2 ∂μ := by
           simpa [brierRegret, brierL2Certificate] using h
     _ = ∫ z, ((p z).1 - (q z).1) ^ 2 ∂μ := by
       refine integral_congr_ae ?_
-      exact Filter.Eventually.of_forall (fun z => by ring)
+      exact Filter.Eventually.of_forall (fun z ↦ by ring)
 
 /-! ### Clean Bayes-Optimal Target Statements -/
 
@@ -704,15 +704,15 @@ theorem brierRisk_target_le_mul_source_of_withDensity
     (μS μT : Measure Z)
     (η q : ProbPredictor Z)
     (w : Z → ℝ) (M : ℝ)
-    (h_density : μT = μS.withDensity (fun z => ENNReal.ofReal (w z)))
-    (hw_meas : AEMeasurable (fun z => ENNReal.ofReal (w z)) μS)
+    (h_density : μT = μS.withDensity (fun z ↦ ENNReal.ofReal (w z)))
+    (hw_meas : AEMeasurable (fun z ↦ ENNReal.ofReal (w z)) μS)
     (hw_nonneg : ∀ z, 0 ≤ w z)
     (hw_bdd : ∀ z, w z ≤ M)
     (_hM_nonneg : 0 ≤ M)
-    (h_int_source : Integrable (fun z => expectedBrierScore (q z).1 (η z).1) μS)
-    (h_int_weighted : Integrable (fun z => w z * expectedBrierScore (q z).1 (η z).1) μS) :
+    (h_int_source : Integrable (fun z ↦ expectedBrierScore (q z).1 (η z).1) μS)
+    (h_int_weighted : Integrable (fun z ↦ w z * expectedBrierScore (q z).1 (η z).1) μS) :
     brierRisk μT η q ≤ M * brierRisk μS η q := by
-  let ℓ : Z → ℝ := fun z => expectedBrierScore (q z).1 (η z).1
+  let ℓ : Z → ℝ := fun z ↦ expectedBrierScore (q z).1 (η z).1
   have hℓ_nonneg : ∀ z, 0 ≤ ℓ z := by
     intro z
     unfold ℓ expectedBrierScore
@@ -729,18 +729,18 @@ theorem brierRisk_target_le_mul_source_of_withDensity
     simp [ℓ]
     rw [h_density]
     have h_lt_top : ∀ᵐ z ∂μS, ENNReal.ofReal (w z) < ⊤ :=
-      Filter.Eventually.of_forall (fun _ => ENNReal.ofReal_lt_top)
+      Filter.Eventually.of_forall (fun _ ↦ ENNReal.ofReal_lt_top)
     calc
-      ∫ z, ℓ z ∂μS.withDensity (fun z => ENNReal.ofReal (w z))
+      ∫ z, ℓ z ∂μS.withDensity (fun z ↦ ENNReal.ofReal (w z))
           = ∫ z, ((ENNReal.ofReal (w z)).toReal) • ℓ z ∂μS := by
               simpa using
                 (integral_withDensity_eq_integral_toReal_smul₀
-                  (μ := μS) (f := fun z => ENNReal.ofReal (w z)) hw_meas h_lt_top ℓ)
+                  (μ := μS) (f := fun z ↦ ENNReal.ofReal (w z)) hw_meas h_lt_top ℓ)
       _ = ∫ z, w z * ℓ z ∂μS := by
             refine integral_congr_ae ?_
-            exact Filter.Eventually.of_forall (fun z => by
+            exact Filter.Eventually.of_forall (fun z ↦ by
               simp [smul_eq_mul, ENNReal.toReal_ofReal (hw_nonneg z)])
-  have h_int_Mℓ : Integrable (fun z => M * ℓ z) μS := h_int_source.const_mul M
+  have h_int_Mℓ : Integrable (fun z ↦ M * ℓ z) μS := h_int_source.const_mul M
   have h_mono :
       ∫ z, w z * ℓ z ∂μS ≤ ∫ z, M * ℓ z ∂μS :=
     integral_mono_ae h_int_weighted h_int_Mℓ (Filter.Eventually.of_forall h_pointwise)
@@ -758,11 +758,11 @@ and integrable against it.**
 
 Do not quantify the side conditions over the whole predictor type:
 
-    (h_int_q : ∀ q : ProbPredictor Z, Integrable (fun z => bernoulliLogLoss (η z).1 (q z).1) μ)
+    (h_int_q : ∀ q : ProbPredictor Z, Integrable (fun z ↦ bernoulliLogLoss (η z).1 (q z).1) μ)
     (h_q_open : ∀ q : ProbPredictor Z, ∀ z, 0 < (q z).1 ∧ (q z).1 < 1)
 
 `h_q_open` in that form **cannot be satisfied**. `ProbPredictor Z` is `Z → Set.Icc (0:ℝ) 1`,
-a closed interval, so for any inhabited `Z` the constant predictor `fun _ => ⟨0, _⟩` is a
+a closed interval, so for any inhabited `Z` the constant predictor `fun _ ↦ ⟨0, _⟩` is a
 term of the type and refutes it. Every instance of such a theorem carries a false
 hypothesis, which makes the theorem vacuous rather than merely over-strong. `h_int_q` is
 unsatisfiable in the same style for any `μ` and `Z` admitting a non-measurable function,
@@ -774,10 +774,10 @@ is all the proof uses them for, and which is satisfiable. -/
 theorem logRisk_minimized_at_eta {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
     (η : ProbPredictor Z)
     (hη_open : ∀ z, 0 < (η z).1 ∧ (η z).1 < 1)
-    (h_int_eta : Integrable (fun z => bernoulliLogLoss (η z).1 (η z).1) μ) :
+    (h_int_eta : Integrable (fun z ↦ bernoulliLogLoss (η z).1 (η z).1) μ) :
     ∀ q : ProbPredictor Z,
       (∀ z, 0 < (q z).1 ∧ (q z).1 < 1) →
-      Integrable (fun z => bernoulliLogLoss (η z).1 (q z).1) μ →
+      Integrable (fun z ↦ bernoulliLogLoss (η z).1 (q z).1) μ →
       logRisk μ η η ≤ logRisk μ η q := by
   intro q hq_open h_int_q
   have hreg :
@@ -798,10 +798,10 @@ theorem logRisk_eq_iff_ae_eq_eta {Z : Type u} [MeasurableSpace Z] (μ : Measure 
     (η q : ProbPredictor Z)
     (hη_open : ∀ z, 0 < (η z).1 ∧ (η z).1 < 1)
     (hq_open : ∀ z, 0 < (q z).1 ∧ (q z).1 < 1)
-    (h_int_kl : Integrable (fun z => klBernReal (η z) (q z)) μ)
+    (h_int_kl : Integrable (fun z ↦ klBernReal (η z) (q z)) μ)
     (h_kl_zero_iff : ∀ z, klBernReal (η z) (q z) = 0 ↔ q z = η z)
-    (h_int_eta : Integrable (fun z => bernoulliLogLoss (η z).1 (η z).1) μ)
-    (h_int_q : Integrable (fun z => bernoulliLogLoss (η z).1 (q z).1) μ) :
+    (h_int_eta : Integrable (fun z ↦ bernoulliLogLoss (η z).1 (η z).1) μ)
+    (h_int_q : Integrable (fun z ↦ bernoulliLogLoss (η z).1 (q z).1) μ) :
     logRisk μ η q = logRisk μ η η ↔ q =ᵐ[μ] η := by
   have hzero :
       (∫ z,
@@ -832,16 +832,16 @@ theorem was vacuous. It is now demanded of the competitor being compared against
 the only place the proof used it. -/
 theorem brierRisk_minimized_at_eta {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
     (η : ProbPredictor Z)
-    (h_int_eta : Integrable (fun z => expectedBrierScore (η z).1 (η z).1) μ) :
+    (h_int_eta : Integrable (fun z ↦ expectedBrierScore (η z).1 (η z).1) μ) :
     ∀ q : ProbPredictor Z,
-      Integrable (fun z => expectedBrierScore (q z).1 (η z).1) μ →
+      Integrable (fun z ↦ expectedBrierScore (q z).1 (η z).1) μ →
       brierRisk μ η η ≤ brierRisk μ η q := by
   intro q h_int_q
   have hreg : (∫ z, expectedBrierScore (q z).1 (η z).1 - expectedBrierScore (η z).1 (η z).1 ∂μ)
       = ∫ z, ((η z).1 - (q z).1) ^ 2 ∂μ :=
     brier_regret_eq_l2_probPredictor μ η q
   have hnonneg : 0 ≤ ∫ z, ((η z).1 - (q z).1) ^ 2 ∂μ :=
-    integral_nonneg (μ := μ) (fun z => sq_nonneg ((η z).1 - (q z).1))
+    integral_nonneg (μ := μ) (fun z ↦ sq_nonneg ((η z).1 - (q z).1))
   have hsub :
       (∫ z, expectedBrierScore (q z).1 (η z).1 - expectedBrierScore (η z).1 (η z).1 ∂μ)
         = brierRisk μ η q - brierRisk μ η η := by
@@ -854,9 +854,9 @@ theorem brierRisk_minimized_at_eta {Z : Type u} [MeasurableSpace Z] (μ : Measur
 /-- Brier uniqueness: equal risks iff predictors are equal a.e. -/
 theorem brierRisk_eq_iff_ae_eq_eta {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
     (η q : ProbPredictor Z)
-    (h_int_eta : Integrable (fun z => expectedBrierScore (η z).1 (η z).1) μ)
-    (h_int_q : Integrable (fun z => expectedBrierScore (q z).1 (η z).1) μ)
-    (h_int_sq : Integrable (fun z => ((η z).1 - (q z).1) ^ 2) μ) :
+    (h_int_eta : Integrable (fun z ↦ expectedBrierScore (η z).1 (η z).1) μ)
+    (h_int_q : Integrable (fun z ↦ expectedBrierScore (q z).1 (η z).1) μ)
+    (h_int_sq : Integrable (fun z ↦ ((η z).1 - (q z).1) ^ 2) μ) :
     brierRisk μ η q = brierRisk μ η η ↔ q =ᵐ[μ] η := by
   have hreg : (∫ z, expectedBrierScore (q z).1 (η z).1 - expectedBrierScore (η z).1 (η z).1 ∂μ)
       = ∫ z, ((η z).1 - (q z).1) ^ 2 ∂μ :=
@@ -868,19 +868,19 @@ theorem brierRisk_eq_iff_ae_eq_eta {Z : Type u} [MeasurableSpace Z] (μ : Measur
     simpa [sub_eq_add_neg] using integral_sub h_int_q h_int_eta
   have hzero_sq :
       (∫ z, ((η z).1 - (q z).1) ^ 2 ∂μ) = 0
-      ↔ (fun z => ((η z).1 - (q z).1) ^ 2) =ᵐ[μ] 0 :=
-    integral_eq_zero_iff_of_nonneg (fun z => sq_nonneg ((η z).1 - (q z).1)) h_int_sq
+      ↔ (fun z ↦ ((η z).1 - (q z).1) ^ 2) =ᵐ[μ] 0 :=
+    integral_eq_zero_iff_of_nonneg (fun z ↦ sq_nonneg ((η z).1 - (q z).1)) h_int_sq
   constructor
   · intro hEq
     have h0 : (∫ z, ((η z).1 - (q z).1) ^ 2 ∂μ) = 0 := by
       linarith [hreg, hsub, hEq]
-    have h_ae_zero : (fun z => ((η z).1 - (q z).1) ^ 2) =ᵐ[μ] 0 := (hzero_sq.mp h0)
+    have h_ae_zero : (fun z ↦ ((η z).1 - (q z).1) ^ 2) =ᵐ[μ] 0 := (hzero_sq.mp h0)
     filter_upwards [h_ae_zero] with z hz
     have hsub : (η z).1 - (q z).1 = 0 := sq_eq_zero_iff.mp hz
     apply Subtype.ext
     linarith
   · intro hAe
-    have h_ae_zero : (fun z => ((η z).1 - (q z).1) ^ 2) =ᵐ[μ] 0 := by
+    have h_ae_zero : (fun z ↦ ((η z).1 - (q z).1) ^ 2) =ᵐ[μ] 0 := by
       filter_upwards [hAe] with z hz
       have hsub : (η z).1 - (q z).1 = 0 := by
         have : (q z).1 = (η z).1 := congrArg Subtype.val hz
@@ -1016,8 +1016,8 @@ theorem logBayesRisk_eq_eta_of_mem {Z : Type u} [MeasurableSpace Z] (μ : Measur
     (h_eta_mem : η ∈ F)
     (h_bdd : BddBelow ((logRisk μ η) '' F))
     (hη_open : ∀ z, 0 < (η z).1 ∧ (η z).1 < 1)
-    (h_int_eta : Integrable (fun z => bernoulliLogLoss (η z).1 (η z).1) μ)
-    (h_int_q : ∀ q ∈ F, Integrable (fun z => bernoulliLogLoss (η z).1 (q z).1) μ)
+    (h_int_eta : Integrable (fun z ↦ bernoulliLogLoss (η z).1 (η z).1) μ)
+    (h_int_q : ∀ q ∈ F, Integrable (fun z ↦ bernoulliLogLoss (η z).1 (q z).1) μ)
     (h_q_open : ∀ q ∈ F, ∀ z, 0 < (q z).1 ∧ (q z).1 < 1) :
     logBayesRisk μ η F = logRisk μ η η := by
   unfold logBayesRisk BayesRisk oracleRisk
@@ -1035,8 +1035,8 @@ theorem brierBayesRisk_eq_eta_of_mem {Z : Type u} [MeasurableSpace Z] (μ : Meas
     (η : ProbPredictor Z) (F : Set (ProbPredictor Z))
     (h_eta_mem : η ∈ F)
     (h_bdd : BddBelow ((brierRisk μ η) '' F))
-    (h_int_eta : Integrable (fun z => expectedBrierScore (η z).1 (η z).1) μ)
-    (h_int_q : ∀ q ∈ F, Integrable (fun z => expectedBrierScore (q z).1 (η z).1) μ) :
+    (h_int_eta : Integrable (fun z ↦ expectedBrierScore (η z).1 (η z).1) μ)
+    (h_int_q : ∀ q ∈ F, Integrable (fun z ↦ expectedBrierScore (q z).1 (η z).1) μ) :
     brierBayesRisk μ η F = brierRisk μ η η := by
   unfold brierBayesRisk BayesRisk oracleRisk
   apply le_antisymm

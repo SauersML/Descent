@@ -120,6 +120,6 @@ theorem lumped_dynamics_blind_to_exchange (a b b' : ℝ) (f : Fin 3 → ℝ) (hf
         rw [← heq]
         exact lumped_generator_blind_to_exchange a b b' _ hlump
       · exact lumped_closed_under_generator a b _ hlump
-  exact fun n => (key n).1
+  exact fun n ↦ (key n).1
 
 end Calibrator

@@ -145,12 +145,12 @@ def BoundedLogDistortion (t t' : ℕ → ℝ) : Prop :=
   ∃ C : ℝ, ∀ n : ℕ, |Real.log (t n) - Real.log (t' n)| ≤ C
 
 theorem BoundedLogDistortion.refl (t : ℕ → ℝ) : BoundedLogDistortion t t :=
-  ⟨0, fun n => by simp⟩
+  ⟨0, fun n ↦ by simp⟩
 
 theorem BoundedLogDistortion.symm {t t' : ℕ → ℝ} (h : BoundedLogDistortion t t') :
     BoundedLogDistortion t' t := by
   obtain ⟨C, hC⟩ := h
-  refine ⟨C, fun n => ?_⟩
+  refine ⟨C, fun n ↦ ?_⟩
   rw [abs_sub_comm]
   exact hC n
 
@@ -159,7 +159,7 @@ theorem BoundedLogDistortion.trans {t t' t'' : ℕ → ℝ}
     BoundedLogDistortion t t'' := by
   obtain ⟨C₁, hC₁⟩ := h₁
   obtain ⟨C₂, hC₂⟩ := h₂
-  refine ⟨C₁ + C₂, fun n => ?_⟩
+  refine ⟨C₁ + C₂, fun n ↦ ?_⟩
   have := abs_sub_abs_le_abs_sub (Real.log (t n) - Real.log (t' n))
     (Real.log (t' n) - Real.log (t'' n))
   calc |Real.log (t n) - Real.log (t'' n)|
@@ -190,7 +190,7 @@ theorem boundedLogDistortion_iff_nat (t t' : ℕ → ℝ) :
   constructor
   · rintro ⟨C, hC⟩
     obtain ⟨N, hN⟩ := exists_nat_ge C
-    exact ⟨N, fun n => le_trans (hC n) hN⟩
+    exact ⟨N, fun n ↦ le_trans (hC n) hN⟩
   · rintro ⟨C, hC⟩
     exact ⟨(C : ℝ), hC⟩
 
@@ -217,14 +217,14 @@ why: every relation is the union of the one-element family containing itself, so
 union shape alone refutes nothing. A ceiling additionally requires each certificate to
 lie in a base class `Base` that is a genuine restriction, and this module has no such
 class in scope — it imports no topology, so the σ-compact reading of `Base` is not
-available here. Supplying `fun _ => True` would satisfy the elaborator and establish
+available here. Supplying `fun _ ↦ True` would satisfy the elaborator and establish
 nothing, which `ObservationalCeiling.countablyCertified_trivialBase` exists to make
 visible. What is proved here is the union shape, so that is what is claimed. -/
 theorem boundedLogDistortion_isUnionOfCertificates :
     IsUnionOfCertificates BoundedLogDistortion
-      (fun C : ℕ => fun t t' : ℕ → ℝ =>
+      (fun C : ℕ ↦ fun t t' : ℕ → ℝ ↦
         ∀ n : ℕ, |Real.log (t n) - Real.log (t' n)| ≤ (C : ℝ)) :=
-  fun t t' => boundedLogDistortion_iff_nat t t'
+  fun t t' ↦ boundedLogDistortion_iff_nat t t'
 
 /-- **The union shape transports along reductions.** If a relation `E` reduces to `F`
 via `f`, and `F` is a countable union of conditions `F_C`, then `E` is the countable
@@ -259,7 +259,7 @@ permutation to exclude and the reduction is immediate.
 /-- The coding family: a strictly positive decay profile carrying a coding sequence
 `x` on top of a rapidly separating gap sequence `B`. -/
 noncomputable def codedDecayProfile (B x : ℕ → ℝ) : ℕ → ℝ :=
-  fun n => Real.exp (-(B n) - x n)
+  fun n ↦ Real.exp (-(B n) - x n)
 
 @[simp] theorem log_codedDecayProfile (B x : ℕ → ℝ) (n : ℕ) :
     Real.log (codedDecayProfile B x n) = -(B n) - x n := by
@@ -275,14 +275,14 @@ theorem codedDecayProfile_equiv_iff (B x y : ℕ → ℝ) :
   unfold BoundedLogDistortion
   constructor
   · rintro ⟨C, hC⟩
-    refine ⟨C, fun n => ?_⟩
+    refine ⟨C, fun n ↦ ?_⟩
     have h := hC n
     rw [log_codedDecayProfile, log_codedDecayProfile] at h
     have heq : (-(B n) - x n) - (-(B n) - y n) = y n - x n := by ring
     rw [heq, abs_sub_comm] at h
     exact h
   · rintro ⟨C, hC⟩
-    refine ⟨C, fun n => ?_⟩
+    refine ⟨C, fun n ↦ ?_⟩
     rw [log_codedDecayProfile, log_codedDecayProfile]
     have heq : (-(B n) - x n) - (-(B n) - y n) = y n - x n := by ring
     rw [heq, abs_sub_comm]
@@ -323,7 +323,7 @@ theorem rigidity_of_boundedBelowAbove
     BoundedLogDistortion t t' := by
   obtain ⟨ha, hab⟩ := h
   obtain ⟨ha', hab'⟩ := h'
-  refine ⟨max (Real.log b - Real.log a') (Real.log b' - Real.log a), fun n => ?_⟩
+  refine ⟨max (Real.log b - Real.log a') (Real.log b' - Real.log a), fun n ↦ ?_⟩
   obtain ⟨hn1, hn2⟩ := hab n
   obtain ⟨hn1', hn2'⟩ := hab' n
   have hpos : 0 < t n := lt_of_lt_of_le ha hn1

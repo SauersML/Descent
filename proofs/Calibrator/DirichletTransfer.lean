@@ -303,7 +303,7 @@ theorem sharpFloor_ge_spectralGap (lmin : ℝ)
     lmin * autocorrTime s w lam ≤ valueMass s w := by
   unfold autocorrTime valueMass
   rw [Finset.mul_sum]
-  refine Finset.sum_le_sum fun i hi => ?_
+  refine Finset.sum_le_sum fun i hi ↦ ?_
   have hl := hlam i hi
   have hwi := hw i hi
   rw [mul_div_assoc']
@@ -319,11 +319,11 @@ theorem sharpFloor_ge_spectralGap (lmin : ℝ)
 theorem conflict_nonneg (hw : ∀ i ∈ s, 0 ≤ w i) :
     (∑ i ∈ s, w i / lam i) ^ 2 ≤ (∑ i ∈ s, w i) * (∑ i ∈ s, w i / lam i ^ 2) := by
   have key := Finset.sum_mul_sq_le_sq_mul_sq s
-    (fun i => Real.sqrt (w i)) (fun i => Real.sqrt (w i) / lam i)
+    (fun i ↦ Real.sqrt (w i)) (fun i ↦ Real.sqrt (w i) / lam i)
   have e1 : ∀ i ∈ s, Real.sqrt (w i) * (Real.sqrt (w i) / lam i) = w i / lam i := by
     intro i hi
     rw [← mul_div_assoc, Real.mul_self_sqrt (hw i hi)]
-  have e2 : ∀ i ∈ s, Real.sqrt (w i) ^ 2 = w i := fun i hi => Real.sq_sqrt (hw i hi)
+  have e2 : ∀ i ∈ s, Real.sqrt (w i) ^ 2 = w i := fun i hi ↦ Real.sq_sqrt (hw i hi)
   have e3 : ∀ i ∈ s, (Real.sqrt (w i) / lam i) ^ 2 = w i / lam i ^ 2 := by
     intro i hi
     rw [div_pow, Real.sq_sqrt (hw i hi)]

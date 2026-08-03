@@ -303,7 +303,7 @@ per-locus law of `|U|` is invariant — not merely its moments. -/
 theorem diploid_massAt_reflect (q v : ℝ) :
     diploidFamily.massAt (1 - q) v = diploidFamily.massAt q v := by
   unfold BundleFamily.massAt
-  refine Fintype.sum_equiv genotypeFlip3_involutive.toPerm _ _ (fun j => ?_)
+  refine Fintype.sum_equiv genotypeFlip3_involutive.toPerm _ _ (fun j ↦ ?_)
   have hmod : diploidFamily.modulus j (1 - q) = diploidFamily.modulus (genotypeFlip3 j) q :=
     diploid_modulus_reflect j q
   have hmass : diploidFamily.atomMass j (1 - q) = diploidFamily.atomMass (genotypeFlip3 j) q :=
@@ -313,7 +313,7 @@ theorem diploid_massAt_reflect (q v : ℝ) :
 
 /-- The panel with every frequency reflected: `q ↦ 1 - q` at every locus. -/
 def Panel.reflect {n : ℕ} (panel : Panel n) : Panel n :=
-  { support := fun i => 1 - panel.support i, weight := panel.weight }
+  { support := fun i ↦ 1 - panel.support i, weight := panel.weight }
 
 /-- **THE ALLELE-LABEL GAUGE THEOREM (the folded spectrum).**
 
@@ -335,7 +335,7 @@ theorem foldedSpectrum_gauge {n : ℕ} (panel : Panel n) (v : ℝ) :
     spectrumModulusLaw diploidFamily panel.reflect v =
       spectrumModulusLaw diploidFamily panel v := by
   unfold spectrumModulusLaw Panel.reflect
-  refine Finset.sum_congr rfl (fun i _ => ?_)
+  refine Finset.sum_congr rfl (fun i _ ↦ ?_)
   simp only
   rw [diploid_massAt_reflect]
 
@@ -352,7 +352,7 @@ theorem reflection_odd_in_kernel {n : ℕ} (panel : Panel n) (v : ℝ) :
 
 /-- The folded panel: every locus moved to `min q (1-q)`, its minor allele frequency. -/
 noncomputable def Panel.fold {n : ℕ} (panel : Panel n) : Panel n :=
-  { support := fun i => min (panel.support i) (1 - panel.support i),
+  { support := fun i ↦ min (panel.support i) (1 - panel.support i),
     weight := panel.weight }
 
 theorem diploid_massAt_fold (q v : ℝ) :
@@ -368,7 +368,7 @@ theorem fold_preserves_modulusLaw {n : ℕ} (panel : Panel n) (v : ℝ) :
     spectrumModulusLaw diploidFamily panel.fold v =
       spectrumModulusLaw diploidFamily panel v := by
   unfold spectrumModulusLaw Panel.fold
-  refine Finset.sum_congr rfl (fun i _ => ?_)
+  refine Finset.sum_congr rfl (fun i _ ↦ ?_)
   simp only
   rw [diploid_massAt_fold]
 
@@ -441,7 +441,7 @@ theorem frequencyTie_gives_kernel {n : ℕ} (panel : Panel n) (i l : Fin n) (hne
   unfold spectrumModulusLaw
   simp only
   rw [Finset.sum_eq_add_of_mem i l (Finset.mem_univ i) (Finset.mem_univ l) hne
-    (fun m _ hm => by rw [hrest m hm.1 hm.2, zero_mul])]
+    (fun m _ hm ↦ by rw [hrest m hm.1 hm.2, zero_mul])]
   rw [hi, hl, htie]
   ring
 
@@ -646,9 +646,9 @@ quadratic summaries. -/
 noncomputable def diploidPanelCovarianceMomentPermeability {n : ℕ}
     (q covarianceDerivative taggingResponse : Fin n → ℝ) : ℝ :=
   diagonalCovarianceMomentPermeability
-    (fun i => taggingResponse i * covarianceDerivative i)
-    (fun _ => 1)
-    (fun i => ∑ j : Fin 3,
+    (fun i ↦ taggingResponse i * covarianceDerivative i)
+    (fun _ ↦ 1)
+    (fun i ↦ ∑ j : Fin 3,
       diploidAtomMass j (q i) * diploidAtomValue j (q i) ^ 4)
 
 /-- The independent Hardy--Weinberg panel is exactly the diagonal-precision face of the
@@ -659,10 +659,10 @@ theorem diploidPanelCovarianceMomentPermeability_eq_diagonal_precision {n : ℕ}
     (q covarianceDerivative taggingResponse : Fin n → ℝ) :
     diploidPanelCovarianceMomentPermeability q covarianceDerivative taggingResponse =
       covarianceMomentPermeabilityWithPrecision
-        (diagonalSquareNoisePrecision (fun _ => 1)
-          (fun i => ∑ j : Fin 3,
+        (diagonalSquareNoisePrecision (fun _ ↦ 1)
+          (fun i ↦ ∑ j : Fin 3,
             diploidAtomMass j (q i) * diploidAtomValue j (q i) ^ 4))
-        (fun i => taggingResponse i * covarianceDerivative i) := by
+        (fun i ↦ taggingResponse i * covarianceDerivative i) := by
   unfold diploidPanelCovarianceMomentPermeability
   rw [covarianceMomentPermeabilityWithPrecision_diagonal]
 
@@ -670,8 +670,8 @@ theorem diploidPanelCovarianceMomentPermeability_eq_diagonal_precision {n : ℕ}
 independent squared-genotype summary experiment. -/
 theorem diploidPanelDiagonalPrecision_posDef {n : ℕ}
     (q : Fin n → ℝ) (hq0 : ∀ i, 0 < q i) (hq1 : ∀ i, q i < 1) :
-    (diagonalSquareNoisePrecision (fun _ => 1)
-      (fun i => ∑ j : Fin 3,
+    (diagonalSquareNoisePrecision (fun _ ↦ 1)
+      (fun i ↦ ∑ j : Fin 3,
         diploidAtomMass j (q i) * diploidAtomValue j (q i) ^ 4)).PosDef := by
   apply diagonalSquareNoisePrecision_posDef
   intro i
@@ -688,7 +688,7 @@ theorem diploidPanelCovarianceMomentPermeability_eq_zero_iff {n : ℕ}
     (q covarianceDerivative taggingResponse : Fin n → ℝ)
     (hq0 : ∀ i, 0 < q i) (hq1 : ∀ i, q i < 1) :
     diploidPanelCovarianceMomentPermeability q covarianceDerivative taggingResponse = 0 ↔
-      (fun i => taggingResponse i * covarianceDerivative i) = 0 := by
+      (fun i ↦ taggingResponse i * covarianceDerivative i) = 0 := by
   rw [diploidPanelCovarianceMomentPermeability_eq_diagonal_precision]
   apply covarianceMomentPermeabilityWithPrecision_eq_zero_iff
   exact diploidPanelDiagonalPrecision_posDef q hq0 hq1
@@ -834,7 +834,7 @@ theorem matched_functionals_give_equal_estimates {n m : ℕ} (T : Panel n → �
     T panel = T other := by
   obtain ⟨c, hc⟩ := hT
   rw [hc, hc]
-  exact Finset.sum_congr rfl (fun a _ => by rw [hmatch a])
+  exact Finset.sum_congr rfl (fun a _ ↦ by rw [hmatch a])
 
 /-- **THE PORTABILITY DECOMPOSITION.**
 
@@ -861,7 +861,7 @@ theorem portability_gap_not_attributable_to_spectrum (q₁ q₂ q₃ : ℝ)
     (T : Panel 2 → ℝ) (hT : ReadsThroughFunctionals T ![invHeterozygosity]) :
     T { support := ![q₁, q₂], weight := ![1 / 2, 1 / 2] }
       = T { support := ![q₃, q₃], weight := ![1 / 2, 1 / 2] } := by
-  refine matched_functionals_give_equal_estimates T _ hT _ _ (fun a => ?_)
+  refine matched_functionals_give_equal_estimates T _ hT _ _ (fun a ↦ ?_)
   fin_cases a
   simp only [Matrix.cons_val_fin_one, Fin.sum_univ_two, Matrix.cons_val_zero,
     Matrix.cons_val_one]
@@ -901,7 +901,7 @@ theorem spectrum_recoverable_architecture_not {n : ℕ} (panel : Panel n)
     (F : Fiber) (shift : ℝ) {summary : ℝ → ℝ} (heven : IsEvenSummary summary) :
     (∀ i : Fin n, panel.weight i = 0) ∧
       (F.transfer shift).contribution summary = F.contribution summary :=
-  ⟨fun i => spectrum_determined_of_separating diploidFamily panel hsep hkernel i,
+  ⟨fun i ↦ spectrum_determined_of_separating diploidFamily panel hsep hkernel i,
     F.even_summary_blind_to_transfer heven shift⟩
 
 /-! ## 7b. THE HEADLINE: every finite MAF panel is identifiable, with no exceptional set
@@ -1065,11 +1065,11 @@ choice; the identification map itself is still linear in the marginal, so the sa
 computation applies. -/
 theorem twoPointModulusLaw_add {K m : ℕ} (family : BundleFamily K)
     (site : Fin m → ℝ × ℝ) (u u' : Fin m → ℝ) (v w : ℝ) :
-    twoPointModulusLaw family site (fun i => u i + u' i) v w =
+    twoPointModulusLaw family site (fun i ↦ u i + u' i) v w =
       twoPointModulusLaw family site u v w + twoPointModulusLaw family site u' v w := by
   unfold twoPointModulusLaw
   rw [← Finset.sum_add_distrib]
-  exact Finset.sum_congr rfl (fun i _ => by ring)
+  exact Finset.sum_congr rfl (fun i _ ↦ by ring)
 
 /-! ## 9. The coupled core: gain and support are different biological axes
 
@@ -1395,7 +1395,7 @@ theorem nonreversible_of_interior_peak {f : ℝ → ℝ} {x : ℝ} (hx1 : -1 ≤
     (hpeak : max (f (-1)) (f 1) < f x) :
     ¬ (∀ u v a b : ℝ, 0 ≤ a → 0 ≤ b → a + b = 1 →
         f (a * u + b * v) ≤ a * f u + b * f v) :=
-  fun hconv => absurd (convex_le_max_endpoints hconv hx1 hx2) (not_le.mpr hpeak)
+  fun hconv ↦ absurd (convex_le_max_endpoints hconv hx1 hx2) (not_le.mpr hpeak)
 
 /-! ## 13. Transport-aware regularization: the proved direction
 
@@ -1620,6 +1620,14 @@ structure ScalarSecondMoments where
   /-- Stationarity: second moments depend only on the lag. -/
   stationary : ∀ i j d : ℤ, moment (i + d) (j + d) = moment i j
 
+/-- **The class is inhabited.**  Without a term of this type every theorem quantified
+over it is a true statement about an empty class: kernel-checked, clean axiom report,
+and no content.  See `scripts/check-laundering.py` family F4. -/
+noncomputable def ScalarSecondMoments.witness : ScalarSecondMoments where
+  moment := fun _ _ => 0
+  moment_comm := fun _ _ => rfl
+  stationary := fun _ _ _ => rfl
+
 namespace ScalarSecondMoments
 
 variable (S : ScalarSecondMoments)
@@ -1637,7 +1645,7 @@ theorem gamma_symmetric_of_stationary (k : ℤ) : S.gamma (-k) = S.gamma k := by
     _ = S.moment 0 k := S.moment_comm k 0
 
 /-- **Every real scalar stationary process is its own time reverse.** -/
-theorem gamma_reversible : (fun k => S.gamma (-k)) = S.gamma := by
+theorem gamma_reversible : (fun k ↦ S.gamma (-k)) = S.gamma := by
   funext k
   exact S.gamma_symmetric_of_stationary k
 

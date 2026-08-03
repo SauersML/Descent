@@ -261,7 +261,7 @@ theorem apparent_portability_drop_gt_true_iff_target_more_ascertained
     (r2_source_pop r2_target_pop r2_source_asc r2_target_asc : ℝ) :
     r2_source_asc - r2_target_asc > r2_source_pop - r2_target_pop ↔
       r2_source_pop - r2_source_asc < r2_target_pop - r2_target_asc :=
-  ⟨fun h => by linarith, fun h => by linarith⟩
+  ⟨fun h ↦ by linarith, fun h ↦ by linarith⟩
 
 end ColliderBias
 
@@ -538,7 +538,7 @@ theorem transportability_violation_creates_gap {n : ℕ}
     m.r2_target < m.r2_source := by
   unfold TransportabilityModel.r2_target
   linarith [show 0 < ∑ i : Fin n, m.δ i from
-    Finset.sum_pos' (fun i _ => m.δ_nonneg i)
+    Finset.sum_pos' (fun i _ ↦ m.δ_nonneg i)
       (let ⟨j, hj⟩ := m.violated; ⟨j, Finset.mem_univ _, hj⟩)]
 
 end CausalInference

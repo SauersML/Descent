@@ -142,7 +142,7 @@ theorem no_macroscopic_interaction_term
     have hden : 0 < threshold ^ 2 * Real.sqrt minimumOrder := by positivity
     apply div_le_div_of_nonneg_left (by positivity) hden
     exact mul_le_mul_of_nonneg_left hsqrt (le_of_lt hthresh2)
-  refine le_trans (Finset.sum_le_sum (fun s _ => hstep s)) ?_
+  refine le_trans (Finset.sum_le_sum (fun s _ ↦ hstep s)) ?_
   have hfactor : ∀ s : S,
       tiltConstant * coefficient s ^ 2 / (threshold ^ 2 * Real.sqrt minimumOrder) =
         (tiltConstant / (threshold ^ 2 * Real.sqrt minimumOrder)) * coefficient s ^ 2 := by
@@ -155,19 +155,19 @@ epistatic order the design has no jump part at all, whatever the coding. -/
 theorem no_macroscopic_interaction_limit
     (tiltConstant threshold : ℝ) (hthreshold : threshold ≠ 0) :
     Filter.Tendsto
-      (fun minimumOrder : ℕ =>
+      (fun minimumOrder : ℕ ↦
         tiltConstant / (threshold ^ 2 * Real.sqrt minimumOrder))
       Filter.atTop (nhds 0) := by
   have hpos : (0 : ℝ) < threshold ^ 2 := by positivity
-  have hsqrt : Filter.Tendsto (fun m : ℕ => Real.sqrt m) Filter.atTop Filter.atTop := by
-    refine Filter.tendsto_atTop_atTop.2 (fun b => ⟨⌈b ^ 2⌉₊, fun m hm => ?_⟩)
+  have hsqrt : Filter.Tendsto (fun m : ℕ ↦ Real.sqrt m) Filter.atTop Filter.atTop := by
+    refine Filter.tendsto_atTop_atTop.2 (fun b ↦ ⟨⌈b ^ 2⌉₊, fun m hm ↦ ?_⟩)
     have hb : b ^ 2 ≤ (m : ℝ) :=
       le_trans (Nat.le_ceil _) (by exact_mod_cast hm)
     calc b ≤ |b| := le_abs_self b
       _ = Real.sqrt (b ^ 2) := (Real.sqrt_sq_eq_abs b).symm
       _ ≤ Real.sqrt m := Real.sqrt_le_sqrt hb
   have hscaled : Filter.Tendsto
-      (fun m : ℕ => threshold ^ 2 * Real.sqrt m) Filter.atTop Filter.atTop :=
+      (fun m : ℕ ↦ threshold ^ 2 * Real.sqrt m) Filter.atTop Filter.atTop :=
     Filter.Tendsto.const_mul_atTop hpos hsqrt
   exact Filter.Tendsto.div_atTop tendsto_const_nhds hscaled
 
@@ -198,6 +198,16 @@ structure SymmetricCoding (V : Type*) [Fintype V] where
   weight_flip : ∀ v, weight (flip v) = weight v
   /-- Relabelling negates values. -/
   value_flip : ∀ v, value (flip v) = -value v
+
+/-- **The class is inhabited.**  Without a term of this type every theorem quantified
+over it is a true statement about an empty class: kernel-checked, clean axiom report,
+and no content.  See `scripts/check-laundering.py` family F4. -/
+noncomputable def SymmetricCoding.witness (V : Type*) [Fintype V] : SymmetricCoding V where
+  weight := fun _ => 0
+  value := fun _ => 0
+  flip := Equiv.refl V
+  weight_flip := fun _ => rfl
+  value_flip := fun _ => by norm_num
 
 /-- Probability of a genotype configuration under independence across loci. -/
 def configurationWeight (coding : SymmetricCoding V) (x : Fin n → V) : ℝ :=
@@ -232,7 +242,7 @@ private theorem prod_update_split {β : Type*} [CommMonoid β] (f : V → β)
   rw [Finset.prod_eq_mul_prod_diff_singleton hi]
   congr 1
   · rw [Function.update_self]
-  · refine Finset.prod_congr rfl (fun j hj => ?_)
+  · refine Finset.prod_congr rfl (fun j hj ↦ ?_)
     have hne : j ≠ i := Finset.notMem_singleton.mp (Finset.mem_sdiff.mp hj).2
     rw [Function.update_of_ne hne]
 
@@ -244,7 +254,7 @@ theorem configurationWeight_flipLocus (coding : SymmetricCoding V) (i : Fin n)
   rw [prod_update_split coding.weight x i (coding.flip (x i)) Finset.univ
       (Finset.mem_univ i),
     Finset.prod_eq_mul_prod_diff_singleton (Finset.mem_univ i)
-      (fun j => coding.weight (x j)),
+      (fun j ↦ coding.weight (x j)),
     coding.weight_flip]
 
 theorem interactionMonomial_flipLocus_mem (coding : SymmetricCoding V)
@@ -254,7 +264,7 @@ theorem interactionMonomial_flipLocus_mem (coding : SymmetricCoding V)
   unfold interactionMonomial flipLocus
   simp only [Equiv.coe_fn_mk]
   rw [prod_update_split coding.value x i (coding.flip (x i)) locusSet hi,
-    Finset.prod_eq_mul_prod_diff_singleton hi (fun j => coding.value (x j)),
+    Finset.prod_eq_mul_prod_diff_singleton hi (fun j ↦ coding.value (x j)),
     coding.value_flip]
   ring
 
@@ -264,7 +274,7 @@ theorem interactionMonomial_flipLocus_not_mem (coding : SymmetricCoding V)
       interactionMonomial coding locusSet x := by
   unfold interactionMonomial flipLocus
   simp only [Equiv.coe_fn_mk]
-  refine Finset.prod_congr rfl (fun j hj => ?_)
+  refine Finset.prod_congr rfl (fun j hj ↦ ?_)
   have hne : j ≠ i := by rintro rfl; exact hi hj
   rw [Function.update_of_ne hne]
 
@@ -303,7 +313,7 @@ theorem sign_erasure (coding : SymmetricCoding V)
     ∑ x : Fin n → V,
         configurationWeight coding x * interactionMonomial coding firstSet x *
           interactionMonomial coding secondSet x * truncation x = 0 := by
-  set F : (Fin n → V) → ℝ := fun x =>
+  set F : (Fin n → V) → ℝ := fun x ↦
     configurationWeight coding x * interactionMonomial coding firstSet x *
       interactionMonomial coding secondSet x * truncation x with hF
   have hflip : ∀ x, F (flipLocus coding i x) = -F x := by
@@ -313,8 +323,8 @@ theorem sign_erasure (coding : SymmetricCoding V)
       interactionMonomial_flipLocus_not_mem coding hsecond, htruncation]
     ring
   have hsum : ∑ x, F x = ∑ x, F (flipLocus coding i x) :=
-    (Fintype.sum_equiv (flipLocus coding i) (fun x => F (flipLocus coding i x)) F
-      (fun _ => rfl)).symm
+    (Fintype.sum_equiv (flipLocus coding i) (fun x ↦ F (flipLocus coding i x)) F
+      (fun _ ↦ rfl)).symm
   have hneg : ∑ x, F x = -∑ x, F x := by
     conv_lhs => rw [hsum]
     simp_rw [hflip]
@@ -333,7 +343,7 @@ content and no free parameter. -/
 def SymmetricCoding.scale (coding : SymmetricCoding V) (a : ℝ) :
     SymmetricCoding V where
   weight := coding.weight
-  value := fun v => a * coding.value v
+  value := fun v ↦ a * coding.value v
   flip := coding.flip
   weight_flip := coding.weight_flip
   value_flip v := by
@@ -353,8 +363,8 @@ theorem symmetricCoding_third_moment_zero (coding : SymmetricCoding V) :
   have hswap : ∑ v, coding.weight v * coding.value v ^ 3 =
       ∑ v, coding.weight (coding.flip v) * coding.value (coding.flip v) ^ 3 :=
     (Fintype.sum_equiv coding.flip
-      (fun v => coding.weight (coding.flip v) * coding.value (coding.flip v) ^ 3)
-      (fun v => coding.weight v * coding.value v ^ 3) (fun _ => rfl)).symm
+      (fun v ↦ coding.weight (coding.flip v) * coding.value (coding.flip v) ^ 3)
+      (fun v ↦ coding.weight v * coding.value v ^ 3) (fun _ ↦ rfl)).symm
   have hterm : ∀ v : V,
       coding.weight (coding.flip v) * coding.value (coding.flip v) ^ 3 =
         -(coding.weight v * coding.value v ^ 3) := by
@@ -513,7 +523,7 @@ theorem hwe_symmetricCoding_iff_half
   · rintro ⟨coding, hweight, hvalue⟩
     exact hwe_symmetricCoding_forces_half h hq0 hq1 coding hweight hvalue
   · intro hhalf
-    exact ⟨equalFrequencyGenotypeCoding h hhalf, fun _ => rfl, fun _ => rfl⟩
+    exact ⟨equalFrequencyGenotypeCoding h hhalf, fun _ ↦ rfl, fun _ ↦ rfl⟩
 
 /-- The standardized genotype coordinate `x = (dosage - 2q) / sqrt (2 q (1 - q))`.
 
@@ -556,7 +566,7 @@ theorem standardizedGenotype_symmetric_iff
   constructor
   · rintro ⟨coding, hweight, hvalue⟩
     refine hwe_symmetricCoding_forces_half h hq0 hq1
-      (coding.scale (Real.sqrt h.genotypeVariance)) (fun g => hweight g) ?_
+      (coding.scale (Real.sqrt h.genotypeVariance)) (fun g ↦ hweight g) ?_
     intro g
     show Real.sqrt h.genotypeVariance * coding.value g = h.centeredAltAlleleCount g
     rw [hvalue g]
@@ -564,7 +574,7 @@ theorem standardizedGenotype_symmetric_iff
     field_simp
   · intro hhalf
     refine ⟨(equalFrequencyGenotypeCoding h hhalf).scale (1 / Real.sqrt h.genotypeVariance),
-      fun _ => rfl, ?_⟩
+      fun _ ↦ rfl, ?_⟩
     intro g
     show (1 / Real.sqrt h.genotypeVariance) * h.centeredAltAlleleCount g =
       h.standardizedGenotype g
@@ -1161,7 +1171,7 @@ theorem standardizedGenotype_even_moment_lower_bound (h : HardyWeinbergModel)
     _ ≤ ∑ g : DiploidGenotype,
           h.genotypeProb g * h.centeredAltAlleleCount g ^ (2 * m) :=
         Finset.single_le_sum
-          (fun g _ => mul_nonneg (h.genotypeProb_nonneg g) (hpow_nonneg g))
+          (fun g _ ↦ mul_nonneg (h.genotypeProb_nonneg g) (hpow_nonneg g))
           (Finset.mem_univ _)
 
 /-!
@@ -1349,8 +1359,8 @@ theorem reflect_moment (h : HardyWeinbergModel) (k : ℕ) :
   rw [← Finset.mul_sum]
   congr 1
   exact Fintype.sum_equiv genotypeFlip
-    (fun g => h.genotypeProb (genotypeFlip g) * h.standardizedGenotype (genotypeFlip g) ^ k)
-    (fun g => h.genotypeProb g * h.standardizedGenotype g ^ k) (fun _ => rfl)
+    (fun g ↦ h.genotypeProb (genotypeFlip g) * h.standardizedGenotype (genotypeFlip g) ^ k)
+    (fun g ↦ h.genotypeProb g * h.standardizedGenotype g ^ k) (fun _ ↦ rfl)
 
 /-- **Even moments are reflection-invariant.** Floor two is built from the law of
 `x²`, which is even data, so it cannot separate `q` from `1-q`. -/
@@ -1523,7 +1533,7 @@ This is the statistic permutation and resampling schemes preserve, and
 Empirical status: UNTESTED. A count read off the design; no free parameter and
 nothing fitted. -/
 def variantRecurrence (i : Fin n) : ℕ :=
-  (Finset.univ.filter (fun s => i ∈ design.locusSet s)).card
+  (Finset.univ.filter (fun s ↦ i ∈ design.locusSet s)).card
 
 /-- **The influence of a variant**: the share of the statistic's energy carried
 by locus `i`, namely the total squared coefficient of the tested sets containing
@@ -1532,10 +1542,10 @@ it. Admissibility asks that this vanish uniformly in `i`.
 Empirical status: UNTESTED. An energy share read off the design's coefficients;
 no free parameter and nothing fitted. -/
 def locusInfluence (i : Fin n) : ℝ :=
-  ∑ s ∈ Finset.univ.filter (fun s => i ∈ design.locusSet s), design.coefficient s ^ 2
+  ∑ s ∈ Finset.univ.filter (fun s ↦ i ∈ design.locusSet s), design.coefficient s ^ 2
 
 theorem locusInfluence_nonneg (i : Fin n) : 0 ≤ design.locusInfluence i :=
-  Finset.sum_nonneg (fun _ _ => sq_nonneg _)
+  Finset.sum_nonneg (fun _ _ ↦ sq_nonneg _)
 
 /-- **Flip the orientation of one locus.** Choosing the other allele as reference
 negates that coordinate, so every tested set containing the locus has its monomial
@@ -1546,7 +1556,7 @@ modelling content and no free parameter. -/
 def flipOrientation (locus : Fin n) : GenotypeDesign n ι where
   model := design.model
   locusSet := design.locusSet
-  coefficient := fun s =>
+  coefficient := fun s ↦
     if locus ∈ design.locusSet s then -design.coefficient s else design.coefficient s
   jointGenotypeProb := design.jointGenotypeProb
 
@@ -1613,10 +1623,10 @@ coefficients and a flip only changes signs. -/
 theorem flipOrientation_locusInfluence {design : GenotypeDesign n ι} (locus i : Fin n) :
     (design.flipOrientation locus).locusInfluence i = design.locusInfluence i := by
   have hdef : ∀ d : GenotypeDesign n ι, d.locusInfluence i =
-      ∑ s ∈ Finset.univ.filter (fun s => i ∈ d.locusSet s), d.coefficient s ^ 2 :=
-    fun _ => rfl
+      ∑ s ∈ Finset.univ.filter (fun s ↦ i ∈ d.locusSet s), d.coefficient s ^ 2 :=
+    fun _ ↦ rfl
   rw [hdef, hdef]
-  refine Finset.sum_congr rfl (fun s _ => ?_)
+  refine Finset.sum_congr rfl (fun s _ ↦ ?_)
   show (if locus ∈ design.locusSet s then -design.coefficient s
         else design.coefficient s) ^ 2 = design.coefficient s ^ 2
   by_cases hs : locus ∈ design.locusSet s
@@ -1629,7 +1639,7 @@ order, vanishing influence, unit variance — is closed under per-coordinate sig
 theorem flipOrientation_energy {design : GenotypeDesign n ι} (locus : Fin n) :
     ∑ s : ι, (design.flipOrientation locus).coefficient s ^ 2 =
       ∑ s : ι, design.coefficient s ^ 2 := by
-  refine Finset.sum_congr rfl (fun s _ => ?_)
+  refine Finset.sum_congr rfl (fun s _ ↦ ?_)
   show (if locus ∈ design.locusSet s then -design.coefficient s
         else design.coefficient s) ^ 2 = design.coefficient s ^ 2
   by_cases hs : locus ∈ design.locusSet s
@@ -1650,7 +1660,7 @@ theorem variantRecurrence_le_one_of_disjoint {design : GenotypeDesign n ι}
     (hdisjoint : design.VariantDisjoint)
     (i : Fin n) : design.variantRecurrence i ≤ 1 := by
   have hdef : design.variantRecurrence i =
-      (Finset.univ.filter (fun s => i ∈ design.locusSet s)).card := rfl
+      (Finset.univ.filter (fun s ↦ i ∈ design.locusSet s)).card := rfl
   rw [hdef, Finset.card_le_one]
   intro s hs t ht
   exact unique_set_of_variantDisjoint hdisjoint
@@ -1675,13 +1685,13 @@ theorem locusInfluence_eq_of_disjoint {design : GenotypeDesign n ι}
     (hdisjoint : design.VariantDisjoint)
     {i : Fin n} {s : ι} (hi : i ∈ design.locusSet s) :
     design.locusInfluence i = design.coefficient s ^ 2 := by
-  have hfilter : Finset.univ.filter (fun t => i ∈ design.locusSet t) = {s} := by
+  have hfilter : Finset.univ.filter (fun t ↦ i ∈ design.locusSet t) = {s} := by
     refine Finset.eq_singleton_iff_unique_mem.mpr ⟨?_, ?_⟩
     · exact Finset.mem_filter.mpr ⟨Finset.mem_univ s, hi⟩
     · intro t ht
       exact unique_set_of_variantDisjoint hdisjoint (Finset.mem_filter.mp ht).2 hi
   have hdef : design.locusInfluence i =
-      ∑ t ∈ Finset.univ.filter (fun t => i ∈ design.locusSet t),
+      ∑ t ∈ Finset.univ.filter (fun t ↦ i ∈ design.locusSet t),
         design.coefficient t ^ 2 := rfl
   rw [hdef, hfilter, Finset.sum_singleton]
 
@@ -1699,7 +1709,7 @@ def geneBurdenDesign {γ : Type*} [DecidableEq γ] (model : Fin n → HardyWeinb
     (geneOf : Fin n → γ) (coeff : γ → ℝ)
     (jointGenotypeProb : (Fin n → DiploidGenotype) → ℝ) : GenotypeDesign n γ where
   model := model
-  locusSet := fun g => Finset.univ.filter (fun i => geneOf i = g)
+  locusSet := fun g ↦ Finset.univ.filter (fun i ↦ geneOf i = g)
   coefficient := coeff
   jointGenotypeProb := jointGenotypeProb
 
@@ -1713,8 +1723,8 @@ theorem geneBurdenDesign_variantDisjoint {γ : Type*} [DecidableEq γ]
   intro g g' hne
   rw [Finset.disjoint_left]
   intro i hi hi'
-  have hig : i ∈ Finset.univ.filter (fun j => geneOf j = g) := hi
-  have hig' : i ∈ Finset.univ.filter (fun j => geneOf j = g') := hi'
+  have hig : i ∈ Finset.univ.filter (fun j ↦ geneOf j = g) := hi
+  have hig' : i ∈ Finset.univ.filter (fun j ↦ geneOf j = g') := hi'
   exact hne (((Finset.mem_filter.mp hig).2).symm.trans (Finset.mem_filter.mp hig').2)
 
 /-- **A sliding-window design**: the tested set at start `k` is the block of
@@ -1726,8 +1736,8 @@ def slidingWindowDesign (model : Fin n → HardyWeinbergModel) (width : ℕ)
     (coeff : Fin n → ℝ) (jointGenotypeProb : (Fin n → DiploidGenotype) → ℝ) :
     GenotypeDesign n (Fin n) where
   model := model
-  locusSet := fun k =>
-    Finset.univ.filter (fun i : Fin n => (k : ℕ) ≤ (i : ℕ) ∧ (i : ℕ) < (k : ℕ) + width)
+  locusSet := fun k ↦
+    Finset.univ.filter (fun i : Fin n ↦ (k : ℕ) ≤ (i : ℕ) ∧ (i : ℕ) < (k : ℕ) + width)
   coefficient := coeff
   jointGenotypeProb := jointGenotypeProb
 
@@ -1748,13 +1758,13 @@ theorem slidingWindowDesign_not_variantDisjoint
   have hmem : j ∈ (slidingWindowDesign model width coeff jointGenotypeProb).locusSet k := by
     have hset : (slidingWindowDesign model width coeff jointGenotypeProb).locusSet k =
         Finset.univ.filter
-          (fun i : Fin n => (k : ℕ) ≤ (i : ℕ) ∧ (i : ℕ) < (k : ℕ) + width) := rfl
+          (fun i : Fin n ↦ (k : ℕ) ≤ (i : ℕ) ∧ (i : ℕ) < (k : ℕ) + width) := rfl
     rw [hset, Finset.mem_filter]
     exact ⟨Finset.mem_univ _, by omega, by omega⟩
   have hmem' : j ∈ (slidingWindowDesign model width coeff jointGenotypeProb).locusSet k' := by
     have hset : (slidingWindowDesign model width coeff jointGenotypeProb).locusSet k' =
         Finset.univ.filter
-          (fun i : Fin n => (k' : ℕ) ≤ (i : ℕ) ∧ (i : ℕ) < (k' : ℕ) + width) := rfl
+          (fun i : Fin n ↦ (k' : ℕ) ≤ (i : ℕ) ∧ (i : ℕ) < (k' : ℕ) + width) := rfl
     rw [hset, Finset.mem_filter]
     exact ⟨Finset.mem_univ _, by omega, by omega⟩
   exact GenotypeDesign.not_variantDisjoint_of_recurrent hne hmem hmem'
@@ -1789,7 +1799,7 @@ asymptotic statement anywhere below. What is proved is:
   Theorem D does not cover it.
 * `fourthCumulantFromMoments_gaussian` — Gaussian moments give fourth cumulant
   `0`.
-* `twoPool_interaction_fourthCumulant` — *if* the product law's second and
+* `fourthCumulantFromMoments_of_squared_standard_moments` — *if* the product law's second and
   fourth moments are `1 * 1` and `3 * 3`, its fourth cumulant is `6`. The
   hypotheses supply those moments; the multiplicativity that a real independence
   argument would have to establish is written into the statement rather than
@@ -1869,10 +1879,14 @@ theorem fourthCumulantFromMoments_gaussian (s2 : ℝ) :
   unfold fourthCumulantFromMoments
   ring
 
-/-- **The moment arithmetic.** Given a pool second moment of `1` and a pool
-fourth moment of `3` — the standard-law values a central limit theorem would
-supply, assumed here rather than proved — the products `1 * 1` and `3 * 3` have
-fourth cumulant `6`.
+/-- **The moment arithmetic.** Given a second moment of `1` and a fourth moment of `3` —
+the standard-law values a central limit theorem would supply, assumed here rather than
+proved — the products `1 * 1` and `3 * 3` have fourth cumulant `6`.
+
+The name used to be `twoPool_interaction_fourthCumulant`, which asserted a two-pool
+epistatic interaction for a statement containing no pool and no interaction. The prose
+below always said so; the name did not, and a name is what gets cited. It now describes
+the arithmetic it performs.
 
 What the statement does *not* contain: any pool, any genotype, any allele
 frequency, any independence hypothesis, and any limit. Writing the product law's
@@ -1880,7 +1894,7 @@ moments as `m₂ * m₂` and `m₄ * m₄` is the independence assumption, appli
 statement rather than derived from a joint distribution. Because no frequency
 appears, the absence of frequencies here is not a uniformity theorem over the
 frequency spectrum; it is the absence of the model. -/
-theorem twoPool_interaction_fourthCumulant
+theorem fourthCumulantFromMoments_of_squared_standard_moments
     (poolSecondMoment poolFourthMoment : ℝ)
     (hsecond : poolSecondMoment = 1) (hfourth : poolFourthMoment = 3) :
     fourthCumulantFromMoments (poolSecondMoment * poolSecondMoment)
@@ -1986,7 +2000,7 @@ eigenvalue multiset and the profile functionals are not, the null is not a
 function of the profile. -/
 theorem palindromic_circulant_spectra_differ :
     ∃ c : ℝ, ∀ c' : ℝ, circulantSpectrumA c ≠ circulantSpectrumB c' := by
-  refine ⟨0, fun c' hcontra => ?_⟩
+  refine ⟨0, fun c' hcontra ↦ ?_⟩
   rw [circulantSpectrumA_at_quarter_turn] at hcontra
   exact circulantSpectrumB_ne_neg_four c' hcontra.symm
 
@@ -2047,13 +2061,13 @@ are the recurrence profile.
 Empirical status: UNTESTED. A count matrix read off the design; no free parameter
 and nothing fitted. -/
 def overlapMatrix (design : GenotypeDesign nx ιx) : Matrix ιx ιx ℝ :=
-  fun s t => ((design.locusSet s ∩ design.locusSet t).card : ℝ)
+  fun s t ↦ ((design.locusSet s ∩ design.locusSet t).card : ℝ)
 
 /-- The overlap structure is symmetric: sharing is a symmetric relation. -/
 theorem overlapMatrix_symm (design : GenotypeDesign nx ιx) (s t : ιx) :
     design.overlapMatrix s t = design.overlapMatrix t s := by
   have hdef : ∀ u v : ιx, design.overlapMatrix u v =
-      ((design.locusSet u ∩ design.locusSet v).card : ℝ) := fun _ _ => rfl
+      ((design.locusSet u ∩ design.locusSet v).card : ℝ) := fun _ _ ↦ rfl
   rw [hdef, hdef, Finset.inter_comm]
 
 /-- **The `p`-th cycle density**: `trace (A ^ p)`, the total weight of closed
@@ -2080,7 +2094,7 @@ theorem overlap_row_sum_eq_recurrence (design : GenotypeDesign nx ιx) (s : ιx)
     ∑ t : ιx, ((design.locusSet s ∩ design.locusSet t).card : ℕ) =
       ∑ i ∈ design.locusSet s, design.variantRecurrence i := by
   have hinter : ∀ t : ιx, design.locusSet s ∩ design.locusSet t =
-      (design.locusSet s).filter (fun i => i ∈ design.locusSet t) := by
+      (design.locusSet s).filter (fun i ↦ i ∈ design.locusSet t) := by
     intro t
     exact Finset.filter_mem_eq_inter.symm
   have hcard : ∀ t : ιx, (design.locusSet s ∩ design.locusSet t).card =
@@ -2091,7 +2105,7 @@ theorem overlap_row_sum_eq_recurrence (design : GenotypeDesign nx ιx) (s : ιx)
       ∑ t : ιx, if i ∈ design.locusSet t then 1 else 0 := by
     intro i
     have hdef : design.variantRecurrence i =
-        (Finset.univ.filter (fun t => i ∈ design.locusSet t)).card := rfl
+        (Finset.univ.filter (fun t ↦ i ∈ design.locusSet t)).card := rfl
     rw [hdef, Finset.card_filter]
   simp_rw [hcard, hrec]
   exact Finset.sum_comm
@@ -2121,9 +2135,9 @@ theorem variantRecurrence_eq_card_of_ubiquitous (design : GenotypeDesign nx ιx)
     (i : Fin nx) (hall : ∀ s : ιx, i ∈ design.locusSet s) :
     design.variantRecurrence i = Fintype.card ιx := by
   have hdef : design.variantRecurrence i =
-      (Finset.univ.filter (fun s => i ∈ design.locusSet s)).card := rfl
-  have hfilter : Finset.univ.filter (fun s => i ∈ design.locusSet s) = Finset.univ :=
-    Finset.filter_true_of_mem (fun s _ => hall s)
+      (Finset.univ.filter (fun s ↦ i ∈ design.locusSet s)).card := rfl
+  have hfilter : Finset.univ.filter (fun s ↦ i ∈ design.locusSet s) = Finset.univ :=
+    Finset.filter_true_of_mem (fun s _ ↦ hall s)
   rw [hdef, hfilter, Finset.card_univ]
 
 /-- **A ubiquitous variant forces the hub bound up with the number of tested

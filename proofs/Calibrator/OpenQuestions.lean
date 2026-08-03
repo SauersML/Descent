@@ -75,7 +75,7 @@ theorem explainable_fraction_bound_of_conditional_gaussian_floor_exact
     (hVar_pos : 0 < Var[L; μ])
     (hsigma4_int : Integrable sigma4 μ)
     (hsigma4_nonneg : 0 ≤ μ[sigma4])
-    (hGaussianFloor : (fun ω => (2 : ℝ) * sigma4 ω) ≤ᵐ[μ] conditionalVariance μ m L) :
+    (hGaussianFloor : (fun ω ↦ (2 : ℝ) * sigma4 ω) ≤ᵐ[μ] conditionalVariance μ m L) :
     explainableFraction (Var[conditionalMean μ m L; μ]) (Var[L; μ])
       ≤ Var[conditionalMean μ m L; μ] / (Var[conditionalMean μ m L; μ] + 2 * μ[sigma4]) :=
   explainable_fraction_bound_of_conditional_gaussian_floor hm hL hVar_pos
@@ -754,8 +754,8 @@ theorem locus_heterogeneity_creates_weighted_gap
           ≤ ∑ i, β i ^ 2 * (fst i - fst_global) := by
       simpa only using
         (Finset.single_le_sum
-          (f := fun i => β i ^ 2 * (fst i - fst_global))
-          (fun i _ => h_nonneg i)
+          (f := fun i ↦ β i ^ 2 * (fst i - fst_global))
+          (fun i _ ↦ h_nonneg i)
           (Finset.mem_univ i₀))
     exact lt_of_lt_of_le h_strict hsingle
   have hrewrite :

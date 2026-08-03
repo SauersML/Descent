@@ -114,9 +114,9 @@ converse is false; `coordinateMarginalsDoNotDetermineJointLaw` below is a finite
 theorem coordinateLaw_preserved {Ω K E : Type*}
     [MeasurableSpace Ω] [MeasurableSpace E]
     (P : StationaryTwoSliceField Ω K E) (k : K) :
-    Measure.map (fun ω => P.source ω k) P.probability =
-      Measure.map (fun ω => P.target ω k) P.probability := by
-  have h := congrArg (Measure.map (fun x : K → E => x k)) P.jointLaw_preserved
+    Measure.map (fun ω ↦ P.source ω k) P.probability =
+      Measure.map (fun ω ↦ P.target ω k) P.probability := by
+  have h := congrArg (Measure.map (fun x : K → E ↦ x k)) P.jointLaw_preserved
   simpa [Measure.map_map (measurable_pi_apply k) P.measurable_source,
     Measure.map_map (measurable_pi_apply k) P.measurable_target] using h
 
@@ -135,8 +135,8 @@ def coordinatewiseMarginalPreserver (ω : Bool) (k : Fin 2) : Bool :=
 /-- The source and transformed processes have the same counting law at each individual
 coordinate.  This is the finite analogue of preserving all one-dimensional marginals. -/
 theorem binary_coordinate_marginals_match (k : Fin 2) (b : Bool) :
-    ((Finset.univ.filter fun ω : Bool => coupledBinarySource ω k = b).card) =
-      ((Finset.univ.filter fun ω : Bool => coordinatewiseMarginalPreserver ω k = b).card) := by
+    ((Finset.univ.filter fun ω : Bool ↦ coupledBinarySource ω k = b).card) =
+      ((Finset.univ.filter fun ω : Bool ↦ coordinatewiseMarginalPreserver ω k = b).card) := by
   fin_cases k <;> cases b <;> decide
 
 /-- The full joint laws nevertheless differ: the source loci agree for every realization,

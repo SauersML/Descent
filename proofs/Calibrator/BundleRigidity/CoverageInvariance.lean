@@ -118,7 +118,7 @@ the slot-`i` projection of the charged tuples is a subsingleton. -/
 theorem chargedTuples_slot_subsingleton (curve : Fin d → T → ℝ) {S : Fin k → Set T}
     {v : Fin k → ℝ} (i : Fin k)
     (hsingle : {t : T | t ∈ S i ∧ ∃ j, curve j t = v i}.Subsingleton) :
-    ((fun t : Fin k → T => t i) ''
+    ((fun t : Fin k → T ↦ t i) ''
       chargedTuples curve {u : Fin k → T | ∀ l, u l ∈ S l} v).Subsingleton := by
   rintro x ⟨t, ht, rfl⟩ y ⟨t', ht', rfl⟩
   exact slot_uniform curve i hsingle ht ht'

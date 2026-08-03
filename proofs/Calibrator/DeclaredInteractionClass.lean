@@ -82,7 +82,7 @@ structure ObservationModel (Context Probe Param : Type*) where
 /-- What is actually observed, given a parameter field and a nuisance. -/
 def observable (M : ObservationModel Context Probe Param)
     (θ : Context → Param) (h : Context → Probe → ℝ) : Context → Probe → ℝ :=
-  fun x p => M.action x (θ x) p + h x p
+  fun x p ↦ M.action x (θ x) p + h x p
 
 /-- **Identifiability**: no two distinct parameter fields are observationally equivalent under
     admissible nuisances. -/
@@ -93,7 +93,7 @@ def Identifiable (M : ObservationModel Context Probe Param) : Prop :=
 /-- The observable gap between two parameter fields. -/
 def actionGap (M : ObservationModel Context Probe Param) (θ θ' : Context → Param) :
     Context → Probe → ℝ :=
-  fun x p => M.action x (θ x) p - M.action x (θ' x) p
+  fun x p ↦ M.action x (θ x) p - M.action x (θ' x) p
 
 /-- **The binding negative: an unrestricted nuisance destroys identification outright.**
 
@@ -124,7 +124,7 @@ theorem not_identifiable_of_unrestricted_nuisance
 theorem observable_eq_iff_gap (M : ObservationModel Context Probe Param)
     (θ θ' : Context → Param) (h h' : Context → Probe → ℝ) :
     observable M θ h = observable M θ' h' ↔
-      actionGap M θ θ' = fun x p => h' x p - h x p := by
+      actionGap M θ θ' = fun x p ↦ h' x p - h x p := by
   constructor
   · intro hobs
     funext x p
@@ -147,7 +147,7 @@ theorem observable_eq_iff_gap (M : ObservationModel Context Probe Param)
 theorem identifiable_iff_transversal (M : ObservationModel Context Probe Param) :
     Identifiable M ↔
       ∀ θ θ' h h', h ∈ M.nuisance → h' ∈ M.nuisance →
-        actionGap M θ θ' = (fun x p => h' x p - h x p) → θ = θ' := by
+        actionGap M θ θ' = (fun x p ↦ h' x p - h x p) → θ = θ' := by
   constructor
   · intro hid θ θ' h h' hh hh' hgap
     exact hid θ θ' h h' hh hh' ((observable_eq_iff_gap M θ θ' h h').mpr hgap)
@@ -169,7 +169,7 @@ theorem identifiability_depends_on_declaration
     (act : Context → Param → Probe → ℝ)
     (θ θ' : Context → Param) (hne : θ ≠ θ')
     (hsep : ∀ ψ ψ' : Context → Param,
-      (fun x p => act x (ψ x) p) = (fun x p => act x (ψ' x) p) → ψ = ψ') :
+      (fun x p ↦ act x (ψ x) p) = (fun x p ↦ act x (ψ' x) p) → ψ = ψ') :
     Identifiable ⟨act, {0}⟩ ∧ ¬ Identifiable ⟨act, Set.univ⟩ := by
   constructor
   · intro ψ ψ' h h' hh hh' hobs

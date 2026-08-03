@@ -37,7 +37,7 @@ theorem residual_bias_floor_of_subthreshold_overlap
     (hoverlap : ∀ i, m.overlapSq i ≤ ε ^ 2) :
     m.confoundingEnergy - (m.k : ℝ) * ε ^ 2 ≤ m.residualBiasEnergy := by
   have hsum : (∑ i, m.overlapSq i) ≤ ∑ _i : Fin m.k, ε ^ 2 := by
-    exact Finset.sum_le_sum (fun i _ => hoverlap i)
+    exact Finset.sum_le_sum (fun i _ ↦ hoverlap i)
   have hsum' : (∑ i, m.overlapSq i) ≤ (m.k : ℝ) * ε ^ 2 := by
     simpa [Finset.sum_const, nsmul_eq_mul] using hsum
   unfold EmpiricalPCOverlapModel.residualBiasEnergy

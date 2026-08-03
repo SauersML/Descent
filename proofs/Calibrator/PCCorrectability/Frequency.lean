@@ -28,6 +28,20 @@ structure FrequencyResolvedCohort (classes : ℕ) where
   effectiveMarkers_pos : ∀ i, 0 < effectiveMarkers i
   differentiation_nonneg : ∀ i, 0 ≤ differentiation i
 
+/-- **The class is inhabited.**  Without a term of this type every theorem quantified
+over it is a true statement about an empty class: kernel-checked, clean axiom report,
+and no content.  See `scripts/check-laundering.py` family F4. -/
+noncomputable def FrequencyResolvedCohort.witness (classes : ℕ) :
+    FrequencyResolvedCohort classes where
+  sampleSize := 1
+  subgroupSize := 1
+  effectiveMarkers := fun _ => 1
+  differentiation := fun _ => 0
+  sampleSize_pos := by norm_num
+  subgroupSize_pos := by norm_num
+  effectiveMarkers_pos := fun _ => by norm_num
+  differentiation_nonneg := fun _ => by norm_num
+
 noncomputable def FrequencyResolvedCohort.classMargin {classes : ℕ}
     (cohort : FrequencyResolvedCohort classes) (i : Fin classes) : ℝ :=
   pcCorrectabilityMargin cohort.sampleSize (cohort.effectiveMarkers i)
@@ -35,7 +49,7 @@ noncomputable def FrequencyResolvedCohort.classMargin {classes : ℕ}
 
 noncomputable def FrequencyResolvedCohort.correctableClasses {classes : ℕ}
     (cohort : FrequencyResolvedCohort classes) : Finset (Fin classes) :=
-  Finset.univ.filter (fun i => 0 < cohort.classMargin i)
+  Finset.univ.filter (fun i ↦ 0 < cohort.classMargin i)
 
 theorem FrequencyResolvedCohort.mem_correctableClasses_iff {classes : ℕ}
     (cohort : FrequencyResolvedCohort classes) (i : Fin classes) :
@@ -80,7 +94,7 @@ theorem FrequencyResolvedCohort.totalInformation_nonneg {classes : ℕ}
     (cohort : FrequencyResolvedCohort classes) :
     0 ≤ cohort.totalInformation := by
   unfold FrequencyResolvedCohort.totalInformation
-  exact Finset.sum_nonneg (fun i _ => cohort.classInformation_nonneg i)
+  exact Finset.sum_nonneg (fun i _ ↦ cohort.classInformation_nonneg i)
 
 noncomputable def FrequencyResolvedCohort.weightedSignal {classes : ℕ}
     (cohort : FrequencyResolvedCohort classes) (weight : Fin classes → ℝ) : ℝ :=
@@ -100,9 +114,9 @@ theorem FrequencyResolvedCohort.weightedSignal_sq_le_information_mul_noise
     (weight : Fin classes → ℝ) :
     cohort.weightedSignal weight ^ 2 ≤
       cohort.totalInformation * cohort.weightedNoise weight := by
-  let signalVector : Fin classes → ℝ := fun i =>
+  let signalVector : Fin classes → ℝ := fun i ↦
     Real.sqrt (cohort.effectiveMarkers i) * cohort.differentiation i
-  let weightVector : Fin classes → ℝ := fun i =>
+  let weightVector : Fin classes → ℝ := fun i ↦
     weight i / Real.sqrt (cohort.effectiveMarkers i)
   have hproduct : (∑ i, signalVector i * weightVector i) =
       cohort.weightedSignal weight := by
@@ -135,7 +149,7 @@ theorem FrequencyResolvedCohort.matched_weight_signal_and_noise
   constructor
   · unfold FrequencyResolvedCohort.weightedSignal
       FrequencyResolvedCohort.totalInformation
-    exact Finset.sum_congr rfl fun i _ =>
+    exact Finset.sum_congr rfl fun i _ ↦
       cohort.weight_mul_differentiation_eq_information i
   · unfold FrequencyResolvedCohort.weightedNoise
       FrequencyResolvedCohort.informationMatchedWeight

@@ -35,9 +35,9 @@ structure ExpFunctional (Ω : Type*) where
   eval : (Ω → ℝ) → ℝ
   add_eval : ∀ f g : Ω → ℝ, eval (f + g) = eval f + eval g
   smul_eval : ∀ (c : ℝ) (f : Ω → ℝ), eval (c • f) = c * eval f
-  const_one : eval (fun _ => (1 : ℝ)) = 1
+  const_one : eval (fun _ ↦ (1 : ℝ)) = 1
 
-instance {Ω : Type*} : CoeFun (ExpFunctional Ω) (fun _ => (Ω → ℝ) → ℝ) :=
+instance {Ω : Type*} : CoeFun (ExpFunctional Ω) (fun _ ↦ (Ω → ℝ) → ℝ) :=
   ⟨ExpFunctional.eval⟩
 
 namespace ExpFunctional
@@ -45,7 +45,7 @@ namespace ExpFunctional
 variable {Ω : Type*}
 
 @[simp] theorem eval_zero (E : ExpFunctional Ω) : E (0 : Ω → ℝ) = 0 := by
-  have h := E.smul_eval (0 : ℝ) (fun _ => (1 : ℝ))
+  have h := E.smul_eval (0 : ℝ) (fun _ ↦ (1 : ℝ))
   simpa using h
 
 @[simp] theorem eval_neg (E : ExpFunctional Ω) (f : Ω → ℝ) : E (-f) = -E f := by
@@ -57,8 +57,8 @@ variable {Ω : Type*}
   rw [sub_eq_add_neg, E.add_eval, E.eval_neg]
   simp [sub_eq_add_neg]
 
-@[simp] theorem eval_const (E : ExpFunctional Ω) (c : ℝ) : E (fun _ : Ω => c) = c := by
-  have hconst : (fun _ : Ω => c) = c • (fun _ : Ω => (1 : ℝ)) := by
+@[simp] theorem eval_const (E : ExpFunctional Ω) (c : ℝ) : E (fun _ : Ω ↦ c) = c := by
+  have hconst : (fun _ : Ω ↦ c) = c • (fun _ : Ω ↦ (1 : ℝ)) := by
     funext ω
     simp
   rw [hconst, E.smul_eval, E.const_one]
@@ -66,7 +66,7 @@ variable {Ω : Type*}
 
 @[simp] theorem eval_sum {ι : Type*} [DecidableEq ι]
     (E : ExpFunctional Ω) (s : Finset ι) (f : ι → Ω → ℝ) :
-    E (Finset.sum s f) = Finset.sum s (fun i => E (f i)) := by
+    E (Finset.sum s f) = Finset.sum s (fun i ↦ E (f i)) := by
   induction s using Finset.induction with
   | empty =>
       simp [eval_zero]
@@ -82,31 +82,31 @@ variable {Ω : Type*}
 def mean (E : ExpFunctional Ω) (Z : Ω → ℝ) : ℝ := E Z
 
 def variance (E : ExpFunctional Ω) (Z : Ω → ℝ) : ℝ :=
-  E (fun ω => (Z ω - E Z) ^ 2)
+  E (fun ω ↦ (Z ω - E Z) ^ 2)
 
 def covariance (E : ExpFunctional Ω) (X Y : Ω → ℝ) : ℝ :=
-  E (fun ω => (X ω - E X) * (Y ω - E Y))
+  E (fun ω ↦ (X ω - E X) * (Y ω - E Y))
 
 def expMse (E : ExpFunctional Ω) (Y S : Ω → ℝ) : ℝ :=
-  E (fun ω => (Y ω - S ω) ^ 2)
+  E (fun ω ↦ (Y ω - S ω) ^ 2)
 
 def bias (E : ExpFunctional Ω) (Y S : Ω → ℝ) : ℝ :=
   E S - E Y
 
 theorem eval_centered_zero (E : ExpFunctional Ω) (Z : Ω → ℝ) :
-    E (fun ω => Z ω - E Z) = 0 := by
-  rw [show (fun ω => Z ω - E Z) = Z - (fun _ => E Z) by
+    E (fun ω ↦ Z ω - E Z) = 0 := by
+  rw [show (fun ω ↦ Z ω - E Z) = Z - (fun _ ↦ E Z) by
     funext ω
     simp]
   rw [E.eval_sub, E.eval_const]
   ring
 
 theorem variance_eq_expect_sq_sub_sq_mean (E : ExpFunctional Ω) (Z : Ω → ℝ) :
-    variance E Z = E (fun ω => Z ω ^ 2) - (E Z) ^ 2 := by
+    variance E Z = E (fun ω ↦ Z ω ^ 2) - (E Z) ^ 2 := by
   unfold variance
   have h_expand :
-      (fun ω => (Z ω - E Z) ^ 2)
-        = (fun ω => Z ω ^ 2) + ((-2 * E Z) • Z) + (fun _ => (E Z) ^ 2) := by
+      (fun ω ↦ (Z ω - E Z) ^ 2)
+        = (fun ω ↦ Z ω ^ 2) + ((-2 * E Z) • Z) + (fun _ ↦ (E Z) ^ 2) := by
     funext ω
     simp [smul_eq_mul]
     ring
@@ -115,14 +115,14 @@ theorem variance_eq_expect_sq_sub_sq_mean (E : ExpFunctional Ω) (Z : Ω → ℝ
   ring
 
 theorem covariance_eq_expect_mul_sub_means (E : ExpFunctional Ω) (X Y : Ω → ℝ) :
-    covariance E X Y = E (fun ω => X ω * Y ω) - (E X) * (E Y) := by
+    covariance E X Y = E (fun ω ↦ X ω * Y ω) - (E X) * (E Y) := by
   unfold covariance
   have h_expand :
-      (fun ω => (X ω - E X) * (Y ω - E Y))
-        = (fun ω => X ω * Y ω)
+      (fun ω ↦ (X ω - E X) * (Y ω - E Y))
+        = (fun ω ↦ X ω * Y ω)
           + (-(E Y)) • X
           + (-(E X)) • Y
-          + (fun _ => (E X) * (E Y)) := by
+          + (fun _ ↦ (E X) * (E Y)) := by
     funext ω
     simp [smul_eq_mul]
     ring
@@ -138,8 +138,8 @@ theorem mse_eq_variance_add_variance_sub_two_cov_add_bias_sq
   rw [variance_eq_expect_sq_sub_sq_mean, variance_eq_expect_sq_sub_sq_mean,
       covariance_eq_expect_mul_sub_means]
   have h_expand :
-      (fun ω => (Y ω - S ω) ^ 2)
-        = (fun ω => Y ω ^ 2) + ((-2 : ℝ) • (fun ω => Y ω * S ω)) + (fun ω => S ω ^ 2) := by
+      (fun ω ↦ (Y ω - S ω) ^ 2)
+        = (fun ω ↦ Y ω ^ 2) + ((-2 : ℝ) • (fun ω ↦ Y ω * S ω)) + (fun ω ↦ S ω ^ 2) := by
     funext ω
     simp [smul_eq_mul]
     ring
@@ -147,20 +147,20 @@ theorem mse_eq_variance_add_variance_sub_two_cov_add_bias_sq
   ring
 
 theorem covariance_add_right (E : ExpFunctional Ω) (X Y Z : Ω → ℝ) :
-    covariance E X (fun ω => Y ω + Z ω) = covariance E X Y + covariance E X Z := by
+    covariance E X (fun ω ↦ Y ω + Z ω) = covariance E X Y + covariance E X Z := by
   rw [covariance_eq_expect_mul_sub_means, covariance_eq_expect_mul_sub_means,
       covariance_eq_expect_mul_sub_means]
   have hxy :
-      E (fun ω => X ω * (Y ω + Z ω))
-        = E (fun ω => X ω * Y ω) + E (fun ω => X ω * Z ω) := by
+      E (fun ω ↦ X ω * (Y ω + Z ω))
+        = E (fun ω ↦ X ω * Y ω) + E (fun ω ↦ X ω * Z ω) := by
     have h :
-        (fun ω => X ω * (Y ω + Z ω))
-          = (fun ω => X ω * Y ω) + (fun ω => X ω * Z ω) := by
+        (fun ω ↦ X ω * (Y ω + Z ω))
+          = (fun ω ↦ X ω * Y ω) + (fun ω ↦ X ω * Z ω) := by
       funext ω
       change X ω * (Y ω + Z ω) = X ω * Y ω + X ω * Z ω
       rw [mul_add]
     rw [h, E.add_eval]
-  have hyz : E (fun ω => Y ω + Z ω) = E Y + E Z := by
+  have hyz : E (fun ω ↦ Y ω + Z ω) = E Y + E Z := by
     simpa using E.add_eval Y Z
   rw [hxy, hyz]
   ring
@@ -168,9 +168,9 @@ theorem covariance_add_right (E : ExpFunctional Ω) (X Y Z : Ω → ℝ) :
 theorem covariance_smul_right (E : ExpFunctional Ω) (X Y : Ω → ℝ) (c : ℝ) :
     covariance E X (c • Y) = c * covariance E X Y := by
   rw [covariance_eq_expect_mul_sub_means, covariance_eq_expect_mul_sub_means]
-  have hxy : E (fun ω => X ω * (c • Y) ω) = c * E (fun ω => X ω * Y ω) := by
+  have hxy : E (fun ω ↦ X ω * (c • Y) ω) = c * E (fun ω ↦ X ω * Y ω) := by
     have h :
-        (fun ω => X ω * (c • Y) ω) = c • (fun ω => X ω * Y ω) := by
+        (fun ω ↦ X ω * (c • Y) ω) = c • (fun ω ↦ X ω * Y ω) := by
       funext ω
       simp [smul_eq_mul, mul_assoc, mul_left_comm]
     rw [h, E.smul_eval]
@@ -182,8 +182,8 @@ theorem covariance_smul_right (E : ExpFunctional Ω) (X Y : Ω → ℝ) (c : ℝ
 theorem covariance_finset_sum_right
     {ι : Type*} [DecidableEq ι]
     (E : ExpFunctional Ω) (X : Ω → ℝ) (s : Finset ι) (Y : ι → Ω → ℝ) :
-    covariance E X (fun ω => Finset.sum s (fun i => Y i ω))
-      = Finset.sum s (fun i => covariance E X (Y i)) := by
+    covariance E X (fun ω ↦ Finset.sum s (fun i ↦ Y i ω))
+      = Finset.sum s (fun i ↦ covariance E X (Y i)) := by
   induction s using Finset.induction with
   | empty =>
       simp [covariance_eq_expect_mul_sub_means, ExpFunctional.eval_zero]
@@ -200,31 +200,31 @@ variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 def dot (x y : ι → ℝ) : ℝ := ∑ i, x i * y i
 
 theorem dot_add_left (x y z : ι → ℝ) :
-    dot (fun i => x i + y i) z = dot x z + dot y z := by
+    dot (fun i ↦ x i + y i) z = dot x z + dot y z := by
   simp [dot, add_mul, Finset.sum_add_distrib]
 
 theorem dot_sub_left (x y z : ι → ℝ) :
-    dot (fun i => x i - y i) z = dot x z - dot y z := by
+    dot (fun i ↦ x i - y i) z = dot x z - dot y z := by
   simp [dot, sub_eq_add_neg, add_mul, Finset.sum_add_distrib]
 
 theorem normal_equations_orthogonality
     (E : ExpFunctional Ω)
     (X : Ω → ι → ℝ) (Y : Ω → ℝ)
     (wStar u : ι → ℝ)
-    (hnormal : ∀ i, E (fun ω => X ω i * (Y ω - dot wStar (X ω))) = 0) :
-    E (fun ω => (Y ω - dot wStar (X ω)) * dot u (X ω)) = 0 := by
+    (hnormal : ∀ i, E (fun ω ↦ X ω i * (Y ω - dot wStar (X ω))) = 0) :
+    E (fun ω ↦ (Y ω - dot wStar (X ω)) * dot u (X ω)) = 0 := by
   have h_expand :
-      (fun ω => (Y ω - dot wStar (X ω)) * dot u (X ω))
-        = ∑ i, (u i) • (fun ω => X ω i * (Y ω - dot wStar (X ω))) := by
+      (fun ω ↦ (Y ω - dot wStar (X ω)) * dot u (X ω))
+        = ∑ i, (u i) • (fun ω ↦ X ω i * (Y ω - dot wStar (X ω))) := by
     funext ω
     simp [dot, Finset.mul_sum, smul_eq_mul, mul_assoc, mul_left_comm, mul_comm]
   rw [h_expand, ExpFunctional.eval_sum]
-  rw [show (∑ i, E ((u i) • (fun ω => X ω i * (Y ω - dot wStar (X ω)))))
-        = ∑ i, u i * E (fun ω => X ω i * (Y ω - dot wStar (X ω))) by
+  rw [show (∑ i, E ((u i) • (fun ω ↦ X ω i * (Y ω - dot wStar (X ω)))))
+        = ∑ i, u i * E (fun ω ↦ X ω i * (Y ω - dot wStar (X ω))) by
         apply Finset.sum_congr rfl
         intro i hi
         rw [E.smul_eval]]
-  rw [show (∑ i, u i * E (fun ω => X ω i * (Y ω - dot wStar (X ω))))
+  rw [show (∑ i, u i * E (fun ω ↦ X ω i * (Y ω - dot wStar (X ω))))
         = ∑ i, u i * 0 by
         apply Finset.sum_congr rfl
         intro i hi
@@ -235,40 +235,40 @@ theorem mse_transport_decomposition
     (E : ExpFunctional Ω)
     (X : Ω → ι → ℝ) (Y : Ω → ℝ)
     (wStar u : ι → ℝ)
-    (hnormal : ∀ i, E (fun ω => X ω i * (Y ω - dot wStar (X ω))) = 0) :
-    E (fun ω => (Y ω - dot (fun i => wStar i + u i) (X ω)) ^ 2)
-      = E (fun ω => (Y ω - dot wStar (X ω)) ^ 2)
-        + E (fun ω => (dot u (X ω)) ^ 2) := by
-  let R : Ω → ℝ := fun ω => Y ω - dot wStar (X ω)
-  let U : Ω → ℝ := fun ω => dot u (X ω)
-  have horth : E (fun ω => R ω * U ω) = 0 := by
+    (hnormal : ∀ i, E (fun ω ↦ X ω i * (Y ω - dot wStar (X ω))) = 0) :
+    E (fun ω ↦ (Y ω - dot (fun i ↦ wStar i + u i) (X ω)) ^ 2)
+      = E (fun ω ↦ (Y ω - dot wStar (X ω)) ^ 2)
+        + E (fun ω ↦ (dot u (X ω)) ^ 2) := by
+  let R : Ω → ℝ := fun ω ↦ Y ω - dot wStar (X ω)
+  let U : Ω → ℝ := fun ω ↦ dot u (X ω)
+  have horth : E (fun ω ↦ R ω * U ω) = 0 := by
     simpa [R, U, mul_comm] using normal_equations_orthogonality E X Y wStar u hnormal
   have hdot :
-      ∀ ω, dot (fun i => wStar i + u i) (X ω) = dot wStar (X ω) + dot u (X ω) := by
+      ∀ ω, dot (fun i ↦ wStar i + u i) (X ω) = dot wStar (X ω) + dot u (X ω) := by
     intro ω
     simpa using dot_add_left wStar u (X ω)
   have hsq :
-      (fun ω => (Y ω - dot (fun i => wStar i + u i) (X ω)) ^ 2)
-        = (fun ω => (R ω - U ω) ^ 2) := by
+      (fun ω ↦ (Y ω - dot (fun i ↦ wStar i + u i) (X ω)) ^ 2)
+        = (fun ω ↦ (R ω - U ω) ^ 2) := by
     funext ω
     rw [hdot ω]
     simp [R, U]
     ring
   have hexpand :
-      (fun ω => (R ω - U ω) ^ 2)
-        = (fun ω => R ω ^ 2) + ((-2 : ℝ) • (fun ω => R ω * U ω)) + (fun ω => U ω ^ 2) := by
+      (fun ω ↦ (R ω - U ω) ^ 2)
+        = (fun ω ↦ R ω ^ 2) + ((-2 : ℝ) • (fun ω ↦ R ω * U ω)) + (fun ω ↦ U ω ^ 2) := by
     funext ω
     simp [smul_eq_mul]
     ring_nf
   rw [hsq, hexpand, E.add_eval, E.add_eval, E.smul_eval, horth]
   ring_nf
   have hRexp :
-      (fun ω => R ω ^ 2)
-        = (fun ω => -(Y ω * dot wStar (X ω) * 2) + Y ω ^ 2 + dot wStar (X ω) ^ 2) := by
+      (fun ω ↦ R ω ^ 2)
+        = (fun ω ↦ -(Y ω * dot wStar (X ω) * 2) + Y ω ^ 2 + dot wStar (X ω) ^ 2) := by
     funext ω
     simp [R]
     ring
-  have hUsq : (fun ω => U ω ^ 2) = (fun ω => (dot u (X ω)) ^ 2) := by
+  have hUsq : (fun ω ↦ U ω ^ 2) = (fun ω ↦ (dot u (X ω)) ^ 2) := by
     rfl
   rw [hRexp, hUsq]
 
@@ -276,13 +276,13 @@ theorem mse_transport_decomposition_general
     (E : ExpFunctional Ω)
     (X : Ω → ι → ℝ) (Y : Ω → ℝ)
     (wStar w : ι → ℝ)
-    (hnormal : ∀ i, E (fun ω => X ω i * (Y ω - dot wStar (X ω))) = 0) :
-    E (fun ω => (Y ω - dot w (X ω)) ^ 2)
-      = E (fun ω => (Y ω - dot wStar (X ω)) ^ 2)
-        + E (fun ω => (dot (fun i => w i - wStar i) (X ω)) ^ 2) := by
+    (hnormal : ∀ i, E (fun ω ↦ X ω i * (Y ω - dot wStar (X ω))) = 0) :
+    E (fun ω ↦ (Y ω - dot w (X ω)) ^ 2)
+      = E (fun ω ↦ (Y ω - dot wStar (X ω)) ^ 2)
+        + E (fun ω ↦ (dot (fun i ↦ w i - wStar i) (X ω)) ^ 2) := by
   have h :=
-    mse_transport_decomposition E X Y wStar (fun i => w i - wStar i) hnormal
-  have hw : (fun i => wStar i + (w i - wStar i)) = w := by
+    mse_transport_decomposition E X Y wStar (fun i ↦ w i - wStar i) hnormal
+  have hw : (fun i ↦ wStar i + (w i - wStar i)) = w := by
     funext i
     ring
   simpa [hw] using h
@@ -296,33 +296,33 @@ variable {J L : Type*} [Fintype J] [DecidableEq J] [Fintype L] [DecidableEq L]
 
 /-- Linear score `wᵀX`. -/
 def linScore (w : J → ℝ) (X : Ω → J → ℝ) : Ω → ℝ :=
-  fun ω => dot w (X ω)
+  fun ω ↦ dot w (X ω)
 
 /-- Second-moment matrix `E[X_i X_j]`. -/
 def secondMomentMatrix (E : ExpFunctional Ω) (X : Ω → J → ℝ) : Matrix J J ℝ :=
-  Matrix.of fun i j => E (fun ω => X ω i * X ω j)
+  Matrix.of fun i j ↦ E (fun ω ↦ X ω i * X ω j)
 
 /-- Covariance matrix `Cov(X_i, X_j)`. -/
 def covarianceMatrix (E : ExpFunctional Ω) (X : Ω → J → ℝ) : Matrix J J ℝ :=
-  Matrix.of fun i j => covariance E (fun ω => X ω i) (fun ω => X ω j)
+  Matrix.of fun i j ↦ covariance E (fun ω ↦ X ω i) (fun ω ↦ X ω j)
 
 /-- Cross-covariance vector `Cov(X_i, Y)`. -/
 def crossCovVector (E : ExpFunctional Ω) (X : Ω → J → ℝ) (Y : Ω → ℝ) : J → ℝ :=
-  fun i => covariance E (fun ω => X ω i) Y
+  fun i ↦ covariance E (fun ω ↦ X ω i) Y
 
 /-- Tag/causal covariance transport object `K`. -/
 def predictorCausalCovariance
     (E : ExpFunctional Ω) (X : Ω → J → ℝ) (C : Ω → L → ℝ) : Matrix J L ℝ :=
-  Matrix.of fun j l => covariance E (fun ω => X ω j) (fun ω => C ω l)
+  Matrix.of fun j l ↦ covariance E (fun ω ↦ X ω j) (fun ω ↦ C ω l)
 
 /-- Context-dependent cross-covariance correction `c`. -/
 def contextCrossCovVector
     (E : ExpFunctional Ω) (X : Ω → J → ℝ) (h : Ω → ℝ) : J → ℝ :=
-  fun j => covariance E (fun ω => X ω j) h
+  fun j ↦ covariance E (fun ω ↦ X ω j) h
 
 /-- Causal linear signal `Cᵀβ`. -/
 def causalSignal (β : L → ℝ) (C : Ω → L → ℝ) : Ω → ℝ :=
-  fun ω => dot β (C ω)
+  fun ω ↦ dot β (C ω)
 
 /-- Closed-form moment map `Σ^{-1} Σ_xy`. -/
 def optimalWeightsFromMoments
@@ -331,23 +331,23 @@ def optimalWeightsFromMoments
   sigmaInv.mulVec (crossCovVector E X Y)
 
 theorem matrix_mulVec_add (A : Matrix J J ℝ) (x y : J → ℝ) :
-    A.mulVec (fun i => x i + y i) = A.mulVec x + A.mulVec y := by
+    A.mulVec (fun i ↦ x i + y i) = A.mulVec x + A.mulVec y := by
   ext j
   simp [Matrix.mulVec, dotProduct, left_distrib, Finset.sum_add_distrib]
 
 theorem covariance_with_causal_signal
     (E : ExpFunctional Ω) (Xj : Ω → ℝ) (C : Ω → L → ℝ) (β : L → ℝ) :
     covariance E Xj (causalSignal β C)
-      = dot (fun l => covariance E Xj (fun ω => C ω l)) β := by
+      = dot (fun l ↦ covariance E Xj (fun ω ↦ C ω l)) β := by
   unfold causalSignal dot
   have hsum :
-      (fun ω => ∑ l, β l * C ω l)
-        = (fun ω => ∑ l, ((β l) • (fun ω' => C ω' l)) ω) := by
+      (fun ω ↦ ∑ l, β l * C ω l)
+        = (fun ω ↦ ∑ l, ((β l) • (fun ω' ↦ C ω' l)) ω) := by
     funext ω
     simp
   rw [hsum, covariance_finset_sum_right]
-  rw [show (∑ i, covariance E Xj ((β i) • fun ω => C ω i))
-        = ∑ i, β i * covariance E Xj (fun ω => C ω i) by
+  rw [show (∑ i, covariance E Xj ((β i) • fun ω ↦ C ω i))
+        = ∑ i, β i * covariance E Xj (fun ω ↦ C ω i) by
         apply Finset.sum_congr rfl
         intro i hi
         rw [covariance_smul_right]]
@@ -356,7 +356,7 @@ theorem covariance_with_causal_signal
 theorem crossCovVector_decomposition
     (E : ExpFunctional Ω) (X : Ω → J → ℝ) (C : Ω → L → ℝ)
     (β : L → ℝ) (h : Ω → ℝ) :
-    crossCovVector E X (fun ω => causalSignal β C ω + h ω)
+    crossCovVector E X (fun ω ↦ causalSignal β C ω + h ω)
       = (predictorCausalCovariance E X C).mulVec β + contextCrossCovVector E X h := by
   ext j
   unfold crossCovVector predictorCausalCovariance contextCrossCovVector
@@ -368,7 +368,7 @@ theorem optimalWeightsFromMoments_decomposition
     (sigmaInv : Matrix J J ℝ)
     (E : ExpFunctional Ω) (X : Ω → J → ℝ) (C : Ω → L → ℝ)
     (β : L → ℝ) (h : Ω → ℝ) :
-    optimalWeightsFromMoments sigmaInv E X (fun ω => causalSignal β C ω + h ω)
+    optimalWeightsFromMoments sigmaInv E X (fun ω ↦ causalSignal β C ω + h ω)
       = sigmaInv.mulVec ((predictorCausalCovariance E X C).mulVec β)
         + sigmaInv.mulVec (contextCrossCovVector E X h) := by
   unfold optimalWeightsFromMoments
@@ -378,21 +378,21 @@ theorem optimalWeightsFromMoments_decomposition
 
 theorem secondMoment_quadratic_form
     (E : ExpFunctional Ω) (X : Ω → J → ℝ) (u : J → ℝ) :
-    E (fun ω => (dot u (X ω)) ^ 2)
+    E (fun ω ↦ (dot u (X ω)) ^ 2)
       = dot u ((secondMomentMatrix E X).mulVec u) := by
   have h_expand :
-      (fun ω => (dot u (X ω)) ^ 2)
-        = ∑ i, ∑ j, (u i * u j) • (fun ω => X ω i * X ω j) := by
+      (fun ω ↦ (dot u (X ω)) ^ 2)
+        = ∑ i, ∑ j, (u i * u j) • (fun ω ↦ X ω i * X ω j) := by
     funext ω
     simp [dot, pow_two, Finset.sum_mul_sum, smul_eq_mul, mul_assoc, mul_left_comm, mul_comm]
   rw [h_expand, ExpFunctional.eval_sum]
-  rw [show (∑ i, E (∑ j, (u i * u j) • fun ω => X ω i * X ω j))
-        = ∑ i, ∑ j, E ((u i * u j) • fun ω => X ω i * X ω j) by
+  rw [show (∑ i, E (∑ j, (u i * u j) • fun ω ↦ X ω i * X ω j))
+        = ∑ i, ∑ j, E ((u i * u j) • fun ω ↦ X ω i * X ω j) by
         apply Finset.sum_congr rfl
         intro i hi
         rw [ExpFunctional.eval_sum]]
-  rw [show (∑ i, ∑ j, E ((u i * u j) • fun ω => X ω i * X ω j))
-        = ∑ i, ∑ j, (u i * u j) * E (fun ω => X ω i * X ω j) by
+  rw [show (∑ i, ∑ j, E ((u i * u j) • fun ω ↦ X ω i * X ω j))
+        = ∑ i, ∑ j, (u i * u j) * E (fun ω ↦ X ω i * X ω j) by
         apply Finset.sum_congr rfl
         intro i hi
         apply Finset.sum_congr rfl
@@ -403,21 +403,21 @@ theorem secondMoment_quadratic_form
   apply Finset.sum_congr rfl
   intro i hi
   calc
-    ∑ x, u i * u x * E (fun ω => X ω i * X ω x)
-      = u i * ∑ x, u x * E (fun ω => X ω i * X ω x) := by
+    ∑ x, u i * u x * E (fun ω ↦ X ω i * X ω x)
+      = u i * ∑ x, u x * E (fun ω ↦ X ω i * X ω x) := by
           rw [Finset.mul_sum]
           apply Finset.sum_congr rfl
           intro x hx
           ring
-    _ = u i * ∑ x, E (fun ω => X ω i * X ω x) * u x := by
-          apply congrArg (fun t => u i * t)
+    _ = u i * ∑ x, E (fun ω ↦ X ω i * X ω x) * u x := by
+          apply congrArg (fun t ↦ u i * t)
           apply Finset.sum_congr rfl
           intro x hx
           ring
 
 theorem secondMoment_eq_covariance_of_centered
     (E : ExpFunctional Ω) (X : Ω → J → ℝ)
-    (hcentered : ∀ i, E (fun ω => X ω i) = 0) :
+    (hcentered : ∀ i, E (fun ω ↦ X ω i) = 0) :
     secondMomentMatrix E X = covarianceMatrix E X := by
   ext i j
   unfold secondMomentMatrix covarianceMatrix
@@ -427,20 +427,20 @@ theorem master_transport_theorem
     (E : ExpFunctional Ω)
     (X : Ω → J → ℝ) (Y : Ω → ℝ)
     (wStar w : J → ℝ)
-    (hnormal : ∀ i, E (fun ω => X ω i * (Y ω - dot wStar (X ω))) = 0)
-    (hcentered : ∀ i, E (fun ω => X ω i) = 0) :
+    (hnormal : ∀ i, E (fun ω ↦ X ω i * (Y ω - dot wStar (X ω))) = 0)
+    (hcentered : ∀ i, E (fun ω ↦ X ω i) = 0) :
     expMse E Y (linScore w X)
       = expMse E Y (linScore wStar X)
-        + dot (fun i => w i - wStar i)
-            ((covarianceMatrix E X).mulVec (fun i => w i - wStar i)) := by
+        + dot (fun i ↦ w i - wStar i)
+            ((covarianceMatrix E X).mulVec (fun i ↦ w i - wStar i)) := by
   have hdecomp :=
     mse_transport_decomposition_general E X Y wStar w hnormal
   have hquad :
-      E (fun ω => (dot (fun i => w i - wStar i) (X ω)) ^ 2)
-        = dot (fun i => w i - wStar i)
-            ((covarianceMatrix E X).mulVec (fun i => w i - wStar i)) := by
+      E (fun ω ↦ (dot (fun i ↦ w i - wStar i) (X ω)) ^ 2)
+        = dot (fun i ↦ w i - wStar i)
+            ((covarianceMatrix E X).mulVec (fun i ↦ w i - wStar i)) := by
     rw [← secondMoment_eq_covariance_of_centered E X hcentered]
-    exact secondMoment_quadratic_form E X (fun i => w i - wStar i)
+    exact secondMoment_quadratic_form E X (fun i ↦ w i - wStar i)
   unfold expMse linScore
   simpa using hdecomp.trans (by rw [hquad])
 
@@ -448,17 +448,17 @@ theorem expected_coordinate_dot_eq_covariance_mulVec
     (E : ExpFunctional Ω)
     (X : Ω → J → ℝ) (w : J → ℝ)
     (i : J)
-    (hcentered : ∀ j, E (fun ω => X ω j) = 0) :
-    E (fun ω => X ω i * dot w (X ω))
+    (hcentered : ∀ j, E (fun ω ↦ X ω j) = 0) :
+    E (fun ω ↦ X ω i * dot w (X ω))
       = ((covarianceMatrix E X).mulVec w) i := by
   have h_expand :
-      (fun ω => X ω i * dot w (X ω))
-        = ∑ j, (w j) • (fun ω => X ω i * X ω j) := by
+      (fun ω ↦ X ω i * dot w (X ω))
+        = ∑ j, (w j) • (fun ω ↦ X ω i * X ω j) := by
     funext ω
     simp [dot, Finset.mul_sum, smul_eq_mul, mul_assoc, mul_left_comm, mul_comm]
   rw [h_expand, ExpFunctional.eval_sum]
-  rw [show (∑ j, E ((w j) • fun ω => X ω i * X ω j))
-        = ∑ j, w j * E (fun ω => X ω i * X ω j) by
+  rw [show (∑ j, E ((w j) • fun ω ↦ X ω i * X ω j))
+        = ∑ j, w j * E (fun ω ↦ X ω i * X ω j) by
         apply Finset.sum_congr rfl
         intro j hj
         rw [E.smul_eval]]
@@ -472,22 +472,22 @@ theorem optimalWeightsFromMoments_normal_equations
     (sigmaInv : Matrix J J ℝ)
     (E : ExpFunctional Ω)
     (X : Ω → J → ℝ) (Y : Ω → ℝ)
-    (hcentered : ∀ i, E (fun ω => X ω i) = 0)
+    (hcentered : ∀ i, E (fun ω ↦ X ω i) = 0)
     (hsigmaInv : covarianceMatrix E X * sigmaInv = 1) :
     ∀ i,
       E
-        (fun ω =>
+        (fun ω ↦
           X ω i *
             (Y ω - dot (optimalWeightsFromMoments sigmaInv E X Y) (X ω))) = 0 := by
   intro i
   have hxy :
-      E (fun ω => X ω i * Y ω) = crossCovVector E X Y i := by
+      E (fun ω ↦ X ω i * Y ω) = crossCovVector E X Y i := by
     unfold crossCovVector
     rw [covariance_eq_expect_mul_sub_means, hcentered]
     ring
   have hpred :
       E
-        (fun ω =>
+        (fun ω ↦
           X ω i * dot (optimalWeightsFromMoments sigmaInv E X Y) (X ω))
         = ((covarianceMatrix E X).mulVec (optimalWeightsFromMoments sigmaInv E X Y)) i := by
     exact expected_coordinate_dot_eq_covariance_mulVec E X
@@ -500,10 +500,10 @@ theorem optimalWeightsFromMoments_normal_equations
     rw [hsigmaInv, Matrix.one_mulVec] at hmul
     simpa using hmul
   have hsub :
-      (fun ω =>
+      (fun ω ↦
         X ω i * (Y ω - dot (optimalWeightsFromMoments sigmaInv E X Y) (X ω)))
-        = (fun ω => X ω i * Y ω)
-          - (fun ω =>
+        = (fun ω ↦ X ω i * Y ω)
+          - (fun ω ↦
               X ω i * dot (optimalWeightsFromMoments sigmaInv E X Y) (X ω)) := by
     funext ω
     simp [Pi.sub_apply]
@@ -516,13 +516,13 @@ theorem master_transport_theorem_closed_form
     (E : ExpFunctional Ω)
     (X : Ω → J → ℝ) (Y : Ω → ℝ)
     (w : J → ℝ)
-    (hcentered : ∀ i, E (fun ω => X ω i) = 0)
+    (hcentered : ∀ i, E (fun ω ↦ X ω i) = 0)
     (hsigmaInv : covarianceMatrix E X * sigmaInv = 1) :
     expMse E Y (linScore w X)
       = expMse E Y (linScore (optimalWeightsFromMoments sigmaInv E X Y) X)
-        + dot (fun i => w i - optimalWeightsFromMoments sigmaInv E X Y i)
+        + dot (fun i ↦ w i - optimalWeightsFromMoments sigmaInv E X Y i)
             ((covarianceMatrix E X).mulVec
-              (fun i => w i - optimalWeightsFromMoments sigmaInv E X Y i)) := by
+              (fun i ↦ w i - optimalWeightsFromMoments sigmaInv E X Y i)) := by
   apply master_transport_theorem E X Y (optimalWeightsFromMoments sigmaInv E X Y) w
   · exact optimalWeightsFromMoments_normal_equations sigmaInv E X Y hcentered hsigmaInv
   · exact hcentered
@@ -621,7 +621,7 @@ theorem transported_covariance_decomposes
   apply Finset.sum_congr rfl
   intro l hl
   simpa [mul_assoc, mul_left_comm, mul_comm] using
-    (Finset.sum_mul (s := Finset.univ) (f := fun j => w j * K j l) (a := β l)).symm
+    (Finset.sum_mul (s := Finset.univ) (f := fun j ↦ w j * K j l) (a := β l)).symm
 
 theorem normalized_transport_as_weighted_average
     (aT τ : L → ℝ) :
@@ -645,8 +645,8 @@ theorem normalized_transport_from_factors
     (∑ l, aQ l) / (∑ l, aT l)
       = ∑ l, baselineWeight aT l * transportFactor aQ aT l := by
   unfold baselineWeight transportFactor
-  rw [← normalized_transport_as_weighted_average aT (fun l => aQ l / aT l)]
-  apply congrArg (fun z => z / (∑ m, aT m))
+  rw [← normalized_transport_as_weighted_average aT (fun l ↦ aQ l / aT l)]
+  apply congrArg (fun z ↦ z / (∑ m, aT m))
   apply Finset.sum_congr rfl
   intro l hl
   field_simp [hbase l]
@@ -770,13 +770,13 @@ theorem explainable_fraction_bound_of_conditional_gaussian_floor
     (hVar_pos : 0 < Var[L; μ])
     (hsigma4_int : Integrable sigma4 μ)
     (hsigma4_nonneg : 0 ≤ μ[sigma4])
-    (hGaussianFloor : (fun ω => (2 : ℝ) * sigma4 ω) ≤ᵐ[μ] conditionalVariance μ m L) :
+    (hGaussianFloor : (fun ω ↦ (2 : ℝ) * sigma4 ω) ≤ᵐ[μ] conditionalVariance μ m L) :
     explainableFraction (Var[conditionalMean μ m L; μ]) (Var[L; μ])
       ≤ Var[conditionalMean μ m L; μ] / (Var[conditionalMean μ m L; μ] + 2 * μ[sigma4]) := by
-  have hNoise_int : Integrable (fun ω => (2 : ℝ) * sigma4 ω) μ := hsigma4_int.const_mul 2
-  have hNoise_eq : μ[fun ω => (2 : ℝ) * sigma4 ω] = (2 : ℝ) * μ[sigma4] := by
+  have hNoise_int : Integrable (fun ω ↦ (2 : ℝ) * sigma4 ω) μ := hsigma4_int.const_mul 2
+  have hNoise_eq : μ[fun ω ↦ (2 : ℝ) * sigma4 ω] = (2 : ℝ) * μ[sigma4] := by
     rw [integral_const_mul]
-  have hNoise_nonneg : 0 ≤ μ[fun ω => (2 : ℝ) * sigma4 ω] := by
+  have hNoise_nonneg : 0 ≤ μ[fun ω ↦ (2 : ℝ) * sigma4 ω] := by
     rw [hNoise_eq]
     nlinarith
   have hbound :=
@@ -815,6 +815,20 @@ structure ConfusionMatrix where
   tn_nonneg : 0 ≤ tn
   fn_nonneg : 0 ≤ fn
   mass_one : tp + fp + tn + fn = 1
+
+/-- **The class is inhabited**, by the uniform matrix.  `mass_one` is an equality
+constraint tying all four fields together, so satisfiability is a real question and this
+answers it; five theorems below depend on the answer for their content. -/
+noncomputable def ConfusionMatrix.witness : ConfusionMatrix where
+  tp := 1 / 4
+  fp := 1 / 4
+  tn := 1 / 4
+  fn := 1 / 4
+  tp_nonneg := by norm_num
+  fp_nonneg := by norm_num
+  tn_nonneg := by norm_num
+  fn_nonneg := by norm_num
+  mass_one := by norm_num
 
 namespace ConfusionMatrix
 

@@ -120,7 +120,7 @@ noncomputable def effectGeneticCorrelation {m : ℕ} (β_source β_target : Fin 
 
 /-- Standardized diagonal LD operator: independent variants with unit variance. -/
 def standardizedDiagonalLD {m : ℕ} : Fin m → Fin m → ℝ :=
-  fun i j => if i = j then 1 else 0
+  fun i j ↦ if i = j then 1 else 0
 
 /-- Additive genetic variance in the standardized diagonal-LD model. -/
 noncomputable def additiveGeneticVariance {m : ℕ} (β : Fin m → ℝ) : ℝ :=
@@ -393,7 +393,7 @@ theorem portability_bound_diagonal_ld {m : ℕ}
     proportionality constant. -/
 theorem additiveGeneticVariance_proportional {m : ℕ}
     (β : Fin m → ℝ) (c : ℝ) :
-    additiveGeneticVariance (fun i => c * β i) = c ^ 2 * additiveGeneticVariance β := by
+    additiveGeneticVariance (fun i ↦ c * β i) = c ^ 2 * additiveGeneticVariance β := by
   unfold additiveGeneticVariance
   calc
     ∑ i : Fin m, (c * β i) ^ 2 = ∑ i : Fin m, c ^ 2 * (β i ^ 2) := by
@@ -409,7 +409,7 @@ theorem additiveGeneticVariance_proportional {m : ℕ}
     proportionality constant. -/
 theorem additiveHeritability_proportional {m : ℕ}
     (β : Fin m → ℝ) (c var_y : ℝ) :
-    additiveHeritability (fun i => c * β i) var_y =
+    additiveHeritability (fun i ↦ c * β i) var_y =
       c ^ 2 * additiveHeritability β var_y := by
   unfold additiveHeritability
   rw [additiveGeneticVariance_proportional]
@@ -421,7 +421,7 @@ theorem effectGeneticCorrelation_sq_one_of_proportional {m : ℕ}
     (β : Fin m → ℝ) (c : ℝ)
     (h_beta_nonzero : 0 < additiveGeneticVariance β)
     (h_c : c ≠ 0) :
-    (effectGeneticCorrelation β (fun i => c * β i)) ^ 2 = 1 := by
+    (effectGeneticCorrelation β (fun i ↦ c * β i)) ^ 2 = 1 := by
   have h_cross :
       (∑ i : Fin m, β i * (c * β i)) = c * additiveGeneticVariance β := by
     unfold additiveGeneticVariance
@@ -435,7 +435,7 @@ theorem effectGeneticCorrelation_sq_one_of_proportional {m : ℕ}
       _ = c * additiveGeneticVariance β := by
         rfl
   have h_t_nonzero :
-      0 < additiveGeneticVariance (fun i => c * β i) := by
+      0 < additiveGeneticVariance (fun i ↦ c * β i) := by
     rw [additiveGeneticVariance_proportional]
     have h_c_sq_pos : 0 < c ^ 2 := by
       nlinarith [sq_pos_iff.mpr h_c]
@@ -449,12 +449,12 @@ theorem effectGeneticCorrelation_sq_one_of_proportional {m : ℕ}
     (c * additiveGeneticVariance β /
         Real.sqrt
           (additiveGeneticVariance β *
-            ∑ i : Fin m, (fun i => c * β i) i ^ 2)) ^ 2 = 1
+            ∑ i : Fin m, (fun i ↦ c * β i) i ^ 2)) ^ 2 = 1
   change
     (c * additiveGeneticVariance β /
         Real.sqrt
           (additiveGeneticVariance β *
-            additiveGeneticVariance (fun i => c * β i))) ^ 2 = 1
+            additiveGeneticVariance (fun i ↦ c * β i))) ^ 2 = 1
   rw [additiveGeneticVariance_proportional, div_pow]
   rw [Real.sq_sqrt]
   · field_simp [h_beta_ne, h_c_sq_ne]
@@ -474,16 +474,16 @@ theorem portability_bound_tight_when_proportional {m : ℕ}
     (h_var_y : 0 < var_y)
     (h_s_nonzero : 0 < additiveGeneticVariance β_s)
     (h_rg : rg ≠ 0) :
-    transportedTargetR2DiagonalLD β_s (fun i => rg * β_s i) var_y =
+    transportedTargetR2DiagonalLD β_s (fun i ↦ rg * β_s i) var_y =
       rg ^ 2 * sourceSelfR2DiagonalLD β_s var_y := by
   have h_t_nonzero :
-      0 < additiveGeneticVariance (fun i => rg * β_s i) := by
+      0 < additiveGeneticVariance (fun i ↦ rg * β_s i) := by
     rw [additiveGeneticVariance_proportional]
     have h_rg_sq_pos : 0 < rg ^ 2 := by
       nlinarith [sq_pos_iff.mpr h_rg]
     exact mul_pos h_rg_sq_pos h_s_nonzero
   rw [transportedTargetR2_eq_rgSq_mul_targetH2_diagonalLD
-    β_s (fun i => rg * β_s i) var_y h_var_y h_s_nonzero h_t_nonzero]
+    β_s (fun i ↦ rg * β_s i) var_y h_var_y h_s_nonzero h_t_nonzero]
   rw [effectGeneticCorrelation_sq_one_of_proportional β_s rg h_s_nonzero h_rg]
   rw [one_mul]
   rw [additiveHeritability_proportional]
@@ -510,7 +510,7 @@ theorem portability_ratio_tight_when_proportional {m : ℕ}
     (h_var_y : 0 < var_y)
     (h_s_nonzero : 0 < additiveGeneticVariance β_s)
     (h_rg : rg ≠ 0) :
-    transportedTargetR2DiagonalLD β_s (fun i => rg * β_s i) var_y /
+    transportedTargetR2DiagonalLD β_s (fun i ↦ rg * β_s i) var_y /
       sourceSelfR2DiagonalLD β_s var_y = rg ^ 2 := by
   have h_source_pos : 0 < sourceSelfR2DiagonalLD β_s var_y :=
     sourceSelfR2DiagonalLD_pos β_s var_y h_var_y h_s_nonzero
@@ -693,7 +693,7 @@ def AsymptoticallyZero (err : ℕ → ℝ) : Prop :=
 
 /-- An estimator sequence converges to the target parameter in absolute error. -/
 def AsymptoticallyConsistent (est : ℕ → ℝ) (truth : ℝ) : Prop :=
-  AsymptoticallyZero (fun n => est n - truth)
+  AsymptoticallyZero (fun n ↦ est n - truth)
 
 /-- If an error term is bounded by a product and one factor converges to zero
     while the other is uniformly bounded, then the error also converges to zero. -/
@@ -746,10 +746,10 @@ theorem doubly_robust_consistency
   unfold AsymptoticallyConsistent
   rcases h_either with h_iw_zero | h_model_zero
   · exact asymptoticallyZero_of_abs_le_mul
-      (fun n => est_dr n - θ) bias_iw_only bias_model_only
+      (fun n ↦ est_dr n - θ) bias_iw_only bias_model_only
       h_dr_error_bound h_model_bounded h_iw_zero
   · exact asymptoticallyZero_of_abs_le_mul
-      (fun n => est_dr n - θ) bias_model_only bias_iw_only
+      (fun n ↦ est_dr n - θ) bias_model_only bias_iw_only
       (by
         intro n
         have h := h_dr_error_bound n
@@ -1510,7 +1510,7 @@ theorem optimalSourceShrinkageWeight_minimizes_mse
     have h_noise_zero : noiseVar = 0 := by
       have hn_ne : nTarget ≠ 0 := ne_of_gt h_n
       have hmul : (noiseVar / nTarget) * nTarget = 0 := by
-        simpa using congrArg (fun x : ℝ => x * nTarget) hdiv_zero
+        simpa using congrArg (fun x : ℝ ↦ x * nTarget) hdiv_zero
       calc
         noiseVar = (noiseVar / nTarget) * nTarget := by
           field_simp [hn_ne]
@@ -1603,26 +1603,26 @@ theorem optimalSourceShrinkageWeight_le_half_iff_target_samples_dominate_gap
     the source-shrinkage fine-tuning MSE. -/
 noncomputable def coefficientGapSq {p : ℕ}
     (wSource wTarget : Fin p → ℝ) : ℝ :=
-  dotProduct (fun i => wSource i - wTarget i) (fun i => wSource i - wTarget i)
+  dotProduct (fun i ↦ wSource i - wTarget i) (fun i ↦ wSource i - wTarget i)
 
 /-- Sum of the first `k` population-specific deviations around a shared
     representation center. -/
 noncomputable def populationDeviationSum {p : ℕ}
     (deviation : ℕ → Fin p → ℝ) (k : ℕ) : Fin p → ℝ :=
-  fun i => Finset.sum (Finset.range k) (fun j => deviation j i)
+  fun i ↦ Finset.sum (Finset.range k) (fun j ↦ deviation j i)
 
 /-- Mean population-specific deviation after training on the first `k`
     source populations. -/
 noncomputable def meanPopulationDeviation {p : ℕ}
     (deviation : ℕ → Fin p → ℝ) (k : ℕ) : Fin p → ℝ :=
-  fun i => (k : ℝ)⁻¹ * populationDeviationSum deviation k i
+  fun i ↦ (k : ℝ)⁻¹ * populationDeviationSum deviation k i
 
 /-- Meta-learned source weights: a shared center plus the average
     source-population-specific deviation. -/
 noncomputable def metaLearnedSourceWeights {p : ℕ}
     (wShared : Fin p → ℝ)
     (deviation : ℕ → Fin p → ℝ) (k : ℕ) : Fin p → ℝ :=
-  fun i => wShared i + meanPopulationDeviation deviation k i
+  fun i ↦ wShared i + meanPopulationDeviation deviation k i
 
 /-- Population-specific effect deviation around a shared ancestral-effect
     center. This is the closed-form effect-architecture object whose average is used
@@ -1636,12 +1636,12 @@ noncomputable def metaLearnedSourceWeights {p : ℕ}
 noncomputable def centeredPopulationEffectDeviation {p : ℕ} {ι : Type*}
     (wShared : Fin p → ℝ)
     (wSource : ι → Fin p → ℝ) : ι → Fin p → ℝ :=
-  fun j i => wSource j i - wShared i
+  fun j i ↦ wSource j i - wShared i
 
 /-- Exact mean effect vector over the first `k` source populations. -/
 noncomputable def sourcePopulationMeanWeights {p : ℕ}
     (wSource : ℕ → Fin p → ℝ) (k : ℕ) : Fin p → ℝ :=
-  fun i => (k : ℝ)⁻¹ * (Finset.sum (Finset.range k) (fun j => wSource j i))
+  fun i ↦ (k : ℝ)⁻¹ * (Finset.sum (Finset.range k) (fun j ↦ wSource j i))
 
 /-- The meta-learned source weights are exactly the mean source-population
     effect vector once the deviations are instantiated as centered effect
@@ -1660,18 +1660,18 @@ theorem metaLearnedSourceWeights_eq_sourcePopulationMeanWeights
     exact_mod_cast (Nat.ne_of_gt h_k)
   unfold metaLearnedSourceWeights meanPopulationDeviation populationDeviationSum
     centeredPopulationEffectDeviation sourcePopulationMeanWeights
-  have hsum_const : Finset.sum (Finset.range k) (fun _ => wShared i) = (k : ℝ) * wShared i := by
+  have hsum_const : Finset.sum (Finset.range k) (fun _ ↦ wShared i) = (k : ℝ) * wShared i := by
     simp
   calc
-    wShared i + (k : ℝ)⁻¹ * (Finset.sum (Finset.range k) (fun j => wSource j i - wShared i))
+    wShared i + (k : ℝ)⁻¹ * (Finset.sum (Finset.range k) (fun j ↦ wSource j i - wShared i))
         = wShared i + (k : ℝ)⁻¹ *
-            (Finset.sum (Finset.range k) (fun j => wSource j i) -
-              Finset.sum (Finset.range k) (fun _ => wShared i)) := by
+            (Finset.sum (Finset.range k) (fun j ↦ wSource j i) -
+              Finset.sum (Finset.range k) (fun _ ↦ wShared i)) := by
               rw [Finset.sum_sub_distrib]
     _ = wShared i + (k : ℝ)⁻¹ *
-            (Finset.sum (Finset.range k) (fun j => wSource j i) - (k : ℝ) * wShared i) := by
+            (Finset.sum (Finset.range k) (fun j ↦ wSource j i) - (k : ℝ) * wShared i) := by
               rw [hsum_const]
-    _ = (k : ℝ)⁻¹ * (Finset.sum (Finset.range k) (fun j => wSource j i)) := by
+    _ = (k : ℝ)⁻¹ * (Finset.sum (Finset.range k) (fun j ↦ wSource j i)) := by
           field_simp [hk_ne]
           ring
 
@@ -1699,13 +1699,13 @@ theorem metaLearnedTransferGapSq_eq_sourcePopulationMeanEffectGapSq
 /-- Dot product distributes over addition in the left argument. -/
 theorem dotProduct_add_left {p : ℕ}
     (u v w : Fin p → ℝ) :
-    dotProduct (fun i => u i + v i) w = dotProduct u w + dotProduct v w := by
+    dotProduct (fun i ↦ u i + v i) w = dotProduct u w + dotProduct v w := by
   simp [dotProduct, add_mul, Finset.sum_add_distrib]
 
 /-- Dot product distributes over addition in the right argument. -/
 theorem dotProduct_add_right {p : ℕ}
     (u v w : Fin p → ℝ) :
-    dotProduct u (fun i => v i + w i) = dotProduct u v + dotProduct u w := by
+    dotProduct u (fun i ↦ v i + w i) = dotProduct u v + dotProduct u w := by
   simp [dotProduct, mul_add, Finset.sum_add_distrib]
 
 /-- Dot product is symmetric over `ℝ`. -/
@@ -1717,7 +1717,7 @@ theorem dotProduct_comm {p : ℕ}
 /-- Pulling a scalar out of the left dot-product argument. -/
 theorem dotProduct_smul_left {p : ℕ}
     (c : ℝ) (u v : Fin p → ℝ) :
-    dotProduct (fun i => c * u i) v = c * dotProduct u v := by
+    dotProduct (fun i ↦ c * u i) v = c * dotProduct u v := by
   unfold dotProduct
   rw [show (∑ i, (c * u i) * v i) = ∑ i, c * (u i * v i) by
         apply Finset.sum_congr rfl
@@ -1728,7 +1728,7 @@ theorem dotProduct_smul_left {p : ℕ}
 /-- Pulling a scalar out of the right dot-product argument. -/
 theorem dotProduct_smul_right {p : ℕ}
     (u v : Fin p → ℝ) (c : ℝ) :
-    dotProduct u (fun i => c * v i) = c * dotProduct u v := by
+    dotProduct u (fun i ↦ c * v i) = c * dotProduct u v := by
   unfold dotProduct
   rw [show (∑ i, u i * (c * v i)) = ∑ i, c * (u i * v i) by
         apply Finset.sum_congr rfl
@@ -1741,11 +1741,11 @@ theorem dotProduct_sum_left {α : Type*} [DecidableEq α] {p : ℕ}
     (s : Finset α)
     (f : α → Fin p → ℝ)
     (v : Fin p → ℝ) :
-    dotProduct (fun i => Finset.sum s (fun j => f j i)) v =
-      Finset.sum s (fun j => dotProduct (f j) v) := by
+    dotProduct (fun i ↦ Finset.sum s (fun j ↦ f j i)) v =
+      Finset.sum s (fun j ↦ dotProduct (f j) v) := by
   unfold dotProduct
-  rw [show (∑ i, (Finset.sum s (fun j => f j i)) * v i) =
-      ∑ i, Finset.sum s (fun j => f j i * v i) by
+  rw [show (∑ i, (Finset.sum s (fun j ↦ f j i)) * v i) =
+      ∑ i, Finset.sum s (fun j ↦ f j i * v i) by
         apply Finset.sum_congr rfl
         intro i hi
         rw [Finset.sum_mul]]
@@ -1756,11 +1756,11 @@ theorem dotProduct_sum_right {α : Type*} [DecidableEq α] {p : ℕ}
     (s : Finset α)
     (u : Fin p → ℝ)
     (f : α → Fin p → ℝ) :
-    dotProduct u (fun i => Finset.sum s (fun j => f j i)) =
-      Finset.sum s (fun j => dotProduct u (f j)) := by
+    dotProduct u (fun i ↦ Finset.sum s (fun j ↦ f j i)) =
+      Finset.sum s (fun j ↦ dotProduct u (f j)) := by
   unfold dotProduct
-  rw [show (∑ i, u i * (Finset.sum s (fun j => f j i))) =
-      ∑ i, Finset.sum s (fun j => u i * f j i) by
+  rw [show (∑ i, u i * (Finset.sum s (fun j ↦ f j i))) =
+      ∑ i, Finset.sum s (fun j ↦ u i * f j i) by
         apply Finset.sum_congr rfl
         intro i hi
         rw [Finset.mul_sum]]
@@ -1770,7 +1770,7 @@ theorem dotProduct_sum_right {α : Type*} [DecidableEq α] {p : ℕ}
 theorem populationDeviationSum_succ {p : ℕ}
     (deviation : ℕ → Fin p → ℝ) (k : ℕ) :
     populationDeviationSum deviation (k + 1) =
-      fun i => populationDeviationSum deviation k i + deviation k i := by
+      fun i ↦ populationDeviationSum deviation k i + deviation k i := by
   funext i
   simp [populationDeviationSum, Finset.sum_range_succ]
 
@@ -1781,7 +1781,7 @@ theorem dotProduct_populationDeviationSum_last_eq_zero {p : ℕ}
     (h_pair : ∀ j < k, dotProduct (deviation j) (deviation k) = 0) :
     dotProduct (populationDeviationSum deviation k) (deviation k) = 0 := by
   rw [show dotProduct (populationDeviationSum deviation k) (deviation k) =
-      Finset.sum (Finset.range k) (fun j => dotProduct (deviation j) (deviation k)) by
+      Finset.sum (Finset.range k) (fun j ↦ dotProduct (deviation j) (deviation k)) by
       simpa [populationDeviationSum] using
         dotProduct_sum_left (Finset.range k) deviation (deviation k)]
   apply Finset.sum_eq_zero
@@ -1856,8 +1856,8 @@ theorem meanPopulationDeviation_squaredNorm_eq_populationSpecificGap_div_k {p : 
     exact_mod_cast (Nat.ne_of_gt h_k)
   unfold meanPopulationDeviation
   calc
-    dotProduct (fun i => (k : ℝ)⁻¹ * populationDeviationSum deviation k i)
-        (fun i => (k : ℝ)⁻¹ * populationDeviationSum deviation k i)
+    dotProduct (fun i ↦ (k : ℝ)⁻¹ * populationDeviationSum deviation k i)
+        (fun i ↦ (k : ℝ)⁻¹ * populationDeviationSum deviation k i)
         =
           ((k : ℝ)⁻¹)^2 *
             dotProduct (populationDeviationSum deviation k) (populationDeviationSum deviation k) := by
@@ -1888,11 +1888,11 @@ theorem dotProduct_meanPopulationDeviation_eq_zero {p : ℕ}
   unfold meanPopulationDeviation
   rw [dotProduct_smul_right]
   rw [show dotProduct u (populationDeviationSum deviation k) =
-      Finset.sum (Finset.range k) (fun j => dotProduct u (deviation j)) by
+      Finset.sum (Finset.range k) (fun j ↦ dotProduct u (deviation j)) by
       simpa [populationDeviationSum] using
         dotProduct_sum_right (Finset.range k) u deviation]
   have hsum :
-      Finset.sum (Finset.range k) (fun j => dotProduct u (deviation j)) = 0 := by
+      Finset.sum (Finset.range k) (fun j ↦ dotProduct u (deviation j)) = 0 := by
     apply Finset.sum_eq_zero
     intro j hj
     exact h_orth j (Finset.mem_range.mp hj)
@@ -1913,14 +1913,14 @@ theorem metaLearnedTransferGapSq_eq_irreducible_plus_populationSpecificGap_div_k
     (h_k : 0 < k)
     (h_shared : coefficientGapSq wShared wTarget = irreducibleGap)
     (h_shared_orth :
-      ∀ j < k, dotProduct (fun i => wShared i - wTarget i) (deviation j) = 0)
+      ∀ j < k, dotProduct (fun i ↦ wShared i - wTarget i) (deviation j) = 0)
     (h_norm :
       ∀ j < k, dotProduct (deviation j) (deviation j) = populationSpecificGap)
     (h_pair :
       ∀ j < k, ∀ l < k, j ≠ l → dotProduct (deviation j) (deviation l) = 0) :
     metaLearnedTransferGapSq wShared wTarget deviation k =
       irreducibleGap + populationSpecificGap / k := by
-  let sharedResidual : Fin p → ℝ := fun i => wShared i - wTarget i
+  let sharedResidual : Fin p → ℝ := fun i ↦ wShared i - wTarget i
   have h_shared_norm : dotProduct sharedResidual sharedResidual = irreducibleGap := by
     simpa [sharedResidual, coefficientGapSq] using h_shared
   have h_mean_norm :
@@ -1933,9 +1933,9 @@ theorem metaLearnedTransferGapSq_eq_irreducible_plus_populationSpecificGap_div_k
     dotProduct_meanPopulationDeviation_eq_zero
       sharedResidual deviation k h_shared_orth
   have h_sub :
-      (fun i =>
+      (fun i ↦
         (metaLearnedSourceWeights wShared deviation k i) - wTarget i) =
-        fun i => sharedResidual i + meanPopulationDeviation deviation k i := by
+        fun i ↦ sharedResidual i + meanPopulationDeviation deviation k i := by
     funext i
     unfold metaLearnedSourceWeights sharedResidual
     ring
@@ -1943,8 +1943,8 @@ theorem metaLearnedTransferGapSq_eq_irreducible_plus_populationSpecificGap_div_k
   rw [h_sub]
   calc
     dotProduct
-        (fun i => sharedResidual i + meanPopulationDeviation deviation k i)
-        (fun i => sharedResidual i + meanPopulationDeviation deviation k i)
+        (fun i ↦ sharedResidual i + meanPopulationDeviation deviation k i)
+        (fun i ↦ sharedResidual i + meanPopulationDeviation deviation k i)
         =
           dotProduct sharedResidual sharedResidual +
             dotProduct sharedResidual (meanPopulationDeviation deviation k) +
@@ -1971,7 +1971,7 @@ theorem sourcePopulationMeanEffectGapSq_eq_irreducible_plus_populationSpecificGa
     (h_k : 0 < k)
     (h_shared : coefficientGapSq wShared wTarget = irreducibleGap)
     (h_shared_orth :
-      ∀ j < k, dotProduct (fun i => wShared i - wTarget i)
+      ∀ j < k, dotProduct (fun i ↦ wShared i - wTarget i)
         (centeredPopulationEffectDeviation wShared wSource j) = 0)
     (h_norm :
       ∀ j < k, dotProduct (centeredPopulationEffectDeviation wShared wSource j)
@@ -2001,7 +2001,7 @@ theorem metaLearnedTransferGapSq_strictMono {p : ℕ}
     (h_more : k₁ < k₂)
     (h_shared : coefficientGapSq wShared wTarget = irreducibleGap)
     (h_shared_orth :
-      ∀ j < k₂, dotProduct (fun i => wShared i - wTarget i) (deviation j) = 0)
+      ∀ j < k₂, dotProduct (fun i ↦ wShared i - wTarget i) (deviation j) = 0)
     (h_norm :
       ∀ j < k₂, dotProduct (deviation j) (deviation j) = populationSpecificGap)
     (h_pair :
@@ -2049,7 +2049,7 @@ theorem metaLearnedTransferGapSq_pos {p : ℕ}
     (h_k : 0 < k)
     (h_shared : coefficientGapSq wShared wTarget = irreducibleGap)
     (h_shared_orth :
-      ∀ j < k, dotProduct (fun i => wShared i - wTarget i) (deviation j) = 0)
+      ∀ j < k, dotProduct (fun i ↦ wShared i - wTarget i) (deviation j) = 0)
     (h_norm :
       ∀ j < k, dotProduct (deviation j) (deviation j) = populationSpecificGap)
     (h_pair :
@@ -2069,7 +2069,7 @@ theorem metaLearnedTransferGapSq_pos {p : ℕ}
 noncomputable def weightedPopulationDeviation {p k : ℕ}
     (deviation : Fin k → Fin p → ℝ)
     (weight : Fin k → ℝ) : Fin p → ℝ :=
-  fun i => ∑ j : Fin k, weight j * deviation j i
+  fun i ↦ ∑ j : Fin k, weight j * deviation j i
 
 /-- Weighted meta-learned source weights built from an affine combination of
     source-population-specific deviations around a shared center. -/
@@ -2077,7 +2077,7 @@ noncomputable def weightedMetaSourceWeights {p k : ℕ}
     (wShared : Fin p → ℝ)
     (deviation : Fin k → Fin p → ℝ)
     (weight : Fin k → ℝ) : Fin p → ℝ :=
-  fun i => wShared i + weightedPopulationDeviation deviation weight i
+  fun i ↦ wShared i + weightedPopulationDeviation deviation weight i
 
 /-- Exact transfer gap of a weighted affine meta-aggregator. -/
 noncomputable def weightedMetaTransferGapSq {p k : ℕ}
@@ -2088,7 +2088,7 @@ noncomputable def weightedMetaTransferGapSq {p k : ℕ}
 
 /-- Uniform affine weights on `k` source populations. -/
 noncomputable def uniformMetaWeight (k : ℕ) : Fin k → ℝ :=
-  fun _ => (k : ℝ)⁻¹
+  fun _ ↦ (k : ℝ)⁻¹
 
 /-- Weighted average of source-population effect vectors.
 
@@ -2096,7 +2096,7 @@ noncomputable def uniformMetaWeight (k : ℕ) : Fin k → ℝ :=
 noncomputable def weightedPopulationEffectAverage {p k : ℕ}
     (wSource : Fin k → Fin p → ℝ)
     (weight : Fin k → ℝ) : Fin p → ℝ :=
-  fun i => ∑ j : Fin k, weight j * wSource j i
+  fun i ↦ ∑ j : Fin k, weight j * wSource j i
 
 /-- Any affine meta-aggregator is exactly the weighted average of the source
     effect vectors once deviations are instantiated as centered source effects. -/
@@ -2179,24 +2179,24 @@ theorem weightedPopulationDeviation_squaredNorm_eq_populationSpecificGap_mul_sum
   unfold weightedPopulationDeviation
   rw [show
       dotProduct
-          (fun i => ∑ j : Fin k, weight j * deviation j i)
-          (fun i => ∑ j : Fin k, weight j * deviation j i) =
+          (fun i ↦ ∑ j : Fin k, weight j * deviation j i)
+          (fun i ↦ ∑ j : Fin k, weight j * deviation j i) =
         ∑ j : Fin k,
-          dotProduct (fun i => weight j * deviation j i)
-            (fun i => ∑ l : Fin k, weight l * deviation l i) by
+          dotProduct (fun i ↦ weight j * deviation j i)
+            (fun i ↦ ∑ l : Fin k, weight l * deviation l i) by
       simpa using
         dotProduct_sum_left (Finset.univ)
-          (fun j : Fin k => fun i => weight j * deviation j i)
-          (fun i => ∑ l : Fin k, weight l * deviation l i)]
+          (fun j : Fin k ↦ fun i ↦ weight j * deviation j i)
+          (fun i ↦ ∑ l : Fin k, weight l * deviation l i)]
   calc
     ∑ j : Fin k,
-        dotProduct (fun i => weight j * deviation j i)
-          (fun i => ∑ l : Fin k, weight l * deviation l i)
+        dotProduct (fun i ↦ weight j * deviation j i)
+          (fun i ↦ ∑ l : Fin k, weight l * deviation l i)
       =
         ∑ j : Fin k,
           weight j *
             dotProduct (deviation j)
-              (fun i => ∑ l : Fin k, weight l * deviation l i) := by
+              (fun i ↦ ∑ l : Fin k, weight l * deviation l i) := by
             apply Finset.sum_congr rfl
             intro j hj
             rw [dotProduct_smul_left]
@@ -2208,12 +2208,12 @@ theorem weightedPopulationDeviation_squaredNorm_eq_populationSpecificGap_mul_sum
           intro j hj
           rw [show
               dotProduct (deviation j)
-                (fun i => ∑ l : Fin k, weight l * deviation l i) =
+                (fun i ↦ ∑ l : Fin k, weight l * deviation l i) =
               ∑ l : Fin k,
-                dotProduct (deviation j) (fun i => weight l * deviation l i) by
+                dotProduct (deviation j) (fun i ↦ weight l * deviation l i) by
                 simpa using
                   dotProduct_sum_right (Finset.univ) (deviation j)
-                    (fun l : Fin k => fun i => weight l * deviation l i)]
+                    (fun l : Fin k ↦ fun i ↦ weight l * deviation l i)]
           congr 1
           apply Finset.sum_congr rfl
           intro l hl
@@ -2245,12 +2245,12 @@ theorem weightedMetaTransferGapSq_eq_irreducible_plus_populationSpecificGap_mul_
     (irreducibleGap populationSpecificGap : ℝ)
     (h_shared : coefficientGapSq wShared wTarget = irreducibleGap)
     (h_shared_orth :
-      ∀ j, dotProduct (fun i => wShared i - wTarget i) (deviation j) = 0)
+      ∀ j, dotProduct (fun i ↦ wShared i - wTarget i) (deviation j) = 0)
     (h_norm : ∀ j, dotProduct (deviation j) (deviation j) = populationSpecificGap)
     (h_pair : ∀ j l, j ≠ l → dotProduct (deviation j) (deviation l) = 0) :
     weightedMetaTransferGapSq wShared wTarget deviation weight =
       irreducibleGap + populationSpecificGap * ∑ j : Fin k, weight j ^ 2 := by
-  let sharedResidual : Fin p → ℝ := fun i => wShared i - wTarget i
+  let sharedResidual : Fin p → ℝ := fun i ↦ wShared i - wTarget i
   have h_shared_norm : dotProduct sharedResidual sharedResidual = irreducibleGap := by
     simpa [sharedResidual, coefficientGapSq] using h_shared
   have h_weighted_norm :
@@ -2264,19 +2264,19 @@ theorem weightedMetaTransferGapSq_eq_irreducible_plus_populationSpecificGap_mul_
     unfold weightedPopulationDeviation
     rw [show
         dotProduct sharedResidual
-          (fun i => ∑ j : Fin k, weight j * deviation j i) =
+          (fun i ↦ ∑ j : Fin k, weight j * deviation j i) =
           ∑ j : Fin k,
-            dotProduct sharedResidual (fun i => weight j * deviation j i) by
+            dotProduct sharedResidual (fun i ↦ weight j * deviation j i) by
           simpa using
             dotProduct_sum_right (Finset.univ) sharedResidual
-              (fun j : Fin k => fun i => weight j * deviation j i)]
+              (fun j : Fin k ↦ fun i ↦ weight j * deviation j i)]
     apply Finset.sum_eq_zero
     intro j hj
     rw [dotProduct_smul_right, h_shared_orth j, mul_zero]
   have h_sub :
-      (fun i =>
+      (fun i ↦
         weightedMetaSourceWeights wShared deviation weight i - wTarget i) =
-      fun i => sharedResidual i + weightedPopulationDeviation deviation weight i := by
+      fun i ↦ sharedResidual i + weightedPopulationDeviation deviation weight i := by
     funext i
     unfold weightedMetaSourceWeights sharedResidual weightedPopulationDeviation
     ring
@@ -2284,8 +2284,8 @@ theorem weightedMetaTransferGapSq_eq_irreducible_plus_populationSpecificGap_mul_
   rw [h_sub]
   calc
     dotProduct
-        (fun i => sharedResidual i + weightedPopulationDeviation deviation weight i)
-        (fun i => sharedResidual i + weightedPopulationDeviation deviation weight i)
+        (fun i ↦ sharedResidual i + weightedPopulationDeviation deviation weight i)
+        (fun i ↦ sharedResidual i + weightedPopulationDeviation deviation weight i)
         =
           dotProduct sharedResidual sharedResidual +
             dotProduct sharedResidual (weightedPopulationDeviation deviation weight) +
@@ -2331,7 +2331,7 @@ theorem weightedMetaTransferGapSq_eq_irreducible_plus_populationSpecificGap_div_
     (h_k : 0 < k)
     (h_shared : coefficientGapSq wShared wTarget = irreducibleGap)
     (h_shared_orth :
-      ∀ j, dotProduct (fun i => wShared i - wTarget i) (deviation j) = 0)
+      ∀ j, dotProduct (fun i ↦ wShared i - wTarget i) (deviation j) = 0)
     (h_norm : ∀ j, dotProduct (deviation j) (deviation j) = populationSpecificGap)
     (h_pair : ∀ j l, j ≠ l → dotProduct (deviation j) (deviation l) = 0) :
     weightedMetaTransferGapSq wShared wTarget deviation (uniformMetaWeight k) =
@@ -2362,7 +2362,7 @@ theorem weightedMetaTransferGapSq_ge_uniform_of_affine_weights
     (h_sum : ∑ j : Fin k, weight j = 1)
     (h_shared : coefficientGapSq wShared wTarget = irreducibleGap)
     (h_shared_orth :
-      ∀ j, dotProduct (fun i => wShared i - wTarget i) (deviation j) = 0)
+      ∀ j, dotProduct (fun i ↦ wShared i - wTarget i) (deviation j) = 0)
     (h_norm : ∀ j, dotProduct (deviation j) (deviation j) = populationSpecificGap)
     (h_pair : ∀ j l, j ≠ l → dotProduct (deviation j) (deviation l) = 0)
     (h_pop : 0 ≤ populationSpecificGap) :
@@ -2516,14 +2516,14 @@ theorem targetLinearExcessRisk_eq_quadratic_gap
     (h_symm : sigmaObsTarget.IsSymm)
     (h_opt : sigmaObsTarget.mulVec wStar = crossTarget) :
     targetLinearExcessRisk sigmaObsTarget crossTarget noiseVar w wStar =
-      dotProduct (fun i => w i - wStar i)
-        (sigmaObsTarget.mulVec (fun i => w i - wStar i)) := by
-  let u : Fin p → ℝ := fun i => w i - wStar i
-  have hw : w = fun i => wStar i + u i := by
+      dotProduct (fun i ↦ w i - wStar i)
+        (sigmaObsTarget.mulVec (fun i ↦ w i - wStar i)) := by
+  let u : Fin p → ℝ := fun i ↦ w i - wStar i
+  have hw : w = fun i ↦ wStar i + u i := by
     funext i
     simp [u]
   have hmul :
-      sigmaObsTarget.mulVec (fun i => wStar i + u i) =
+      sigmaObsTarget.mulVec (fun i ↦ wStar i + u i) =
         sigmaObsTarget.mulVec wStar + sigmaObsTarget.mulVec u := by
     simpa [u] using matrix_mulVec_add sigmaObsTarget wStar u
   have hswap :
@@ -2539,16 +2539,16 @@ theorem targetLinearExcessRisk_eq_quadratic_gap
   let c : ℝ := dotProduct u crossTarget
   let d : ℝ := dotProduct u (sigmaObsTarget.mulVec u)
   have hexpand1 :
-      dotProduct (fun i => wStar i + u i) (crossTarget + sigmaObsTarget.mulVec u) =
+      dotProduct (fun i ↦ wStar i + u i) (crossTarget + sigmaObsTarget.mulVec u) =
         a + b + c + d := by
     simp [a, b, c, d, dotProduct, Finset.sum_add_distrib, add_mul, mul_add]
     ring
   have hexpand2 :
-      dotProduct (fun i => wStar i + u i) crossTarget = a + c := by
+      dotProduct (fun i ↦ wStar i + u i) crossTarget = a + c := by
     simp [a, c, dotProduct, Finset.sum_add_distrib, add_mul]
   have h_gap_rhs :
-      dotProduct (fun i => (fun j => wStar j + u j) i - wStar i)
-        (sigmaObsTarget.mulVec (fun i => (fun j => wStar j + u j) i - wStar i)) = d := by
+      dotProduct (fun i ↦ (fun j ↦ wStar j + u j) i - wStar i)
+        (sigmaObsTarget.mulVec (fun i ↦ (fun j ↦ wStar j + u j) i - wStar i)) = d := by
     simp [d]
   unfold targetLinearExcessRisk targetLinearRisk
   rw [hw, hmul, h_opt, hexpand1, hexpand2]
@@ -2769,7 +2769,7 @@ theorem amortized_per_population_adaptation_cost_falls_with_task_count
     (k₁ k₂ : ℕ)
     (h_shared : coefficientGapSq wShared wTarget = irreducibleGap)
     (h_shared_orth :
-      ∀ j < k₂, dotProduct (fun i => wShared i - wTarget i) (deviation j) = 0)
+      ∀ j < k₂, dotProduct (fun i ↦ wShared i - wTarget i) (deviation j) = 0)
     (h_norm :
       ∀ j < k₂, dotProduct (deviation j) (deviation j) = populationSpecificGap)
     (h_pair :
@@ -2859,7 +2859,7 @@ theorem metaLearned_deployedTransferTargetR2_strictMono
     (k₁ k₂ : ℕ)
     (h_shared : coefficientGapSq wShared wTarget = irreducibleGap)
     (h_shared_orth :
-      ∀ j < k₂, dotProduct (fun i => wShared i - wTarget i) (deviation j) = 0)
+      ∀ j < k₂, dotProduct (fun i ↦ wShared i - wTarget i) (deviation j) = 0)
     (h_norm :
       ∀ j < k₂, dotProduct (deviation j) (deviation j) = populationSpecificGap)
     (h_pair :

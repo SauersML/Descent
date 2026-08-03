@@ -133,6 +133,47 @@ inductive LatticeDatum where
   | nonlattice : LatticeDatum
   | lattice (span offset : ℝ) : LatticeDatum
 
+/-- **What a lattice datum claims about an actual law.**
+
+    `IsLatticeLaw μ span offset` says `μ` puts no mass outside the arithmetic progression
+    `offset + span * ℤ`, with `span > 0`. This is the content a `LatticeDatum` asserts; the
+    datum by itself is a constructor and asserts nothing.
+
+    Introduced because `gaussianObservables` used to *stipulate* `nonlattice` as a data
+    field, with a docstring conceding the fact was true but unproved. A stipulated field is
+    silently inherited by every comparison against the record. Under the standing rule that
+    a `sorry` is preferred to a smuggled premise, the claim is now stated and its one
+    unproved step is marked as such in `logSqGaussian_nonlattice`. -/
+def IsLatticeLaw (μ : MeasureTheory.Measure ℝ) (span offset : ℝ) : Prop :=
+  0 < span ∧ μ {x : ℝ | ∀ k : ℤ, x ≠ offset + span * k} = 0
+
+/-- A law is **nonlattice** when no span and offset make it a lattice law. -/
+def IsNonlatticeLaw (μ : MeasureTheory.Measure ℝ) : Prop :=
+  ∀ span offset : ℝ, ¬ IsLatticeLaw μ span offset
+
+/-- The proposition a `LatticeDatum` makes about a law, so the datum can be checked
+    against something rather than asserted. -/
+def LatticeDatum.Describes : LatticeDatum → MeasureTheory.Measure ℝ → Prop
+  | .nonlattice, μ => IsNonlatticeLaw μ
+  | .lattice span offset, μ => IsLatticeLaw μ span offset
+
+/-- The law of the increment `log g²` for a standard Gaussian `g`. -/
+noncomputable def logSqGaussianLaw : MeasureTheory.Measure ℝ :=
+  stdGaussianMeasure.map (fun x ↦ Real.log (x ^ 2))
+
+/-- **`log g²` is nonlattice.**
+
+    True, and NOT PROVED HERE. `g²` has a density on `(0, ∞)`, so `log g²` has a density on
+    `ℝ`, and a law with a density gives measure zero to no countable set — in particular it
+    cannot be concentrated on an arithmetic progression. Formalizing that chain needs the
+    pushforward density of `log ∘ (·²)` under the Gaussian, which this corpus does not have.
+
+    It is a `sorry` rather than a hypothesis on the theorems below, or a stipulated field,
+    because those forms hide the debt in places that read as discharged. This one does not:
+    the axiom audit reports it, and anything depending on it depends on a visible hole. -/
+theorem logSqGaussian_nonlattice : IsNonlatticeLaw logSqGaussianLaw := by
+  sorry
+
 /-- A triple of Mellin data for a coordinate law: drift, jet variance, lattice datum.
 
 It is a record for carrying those three numbers together, and nothing here shows it is
@@ -283,13 +324,27 @@ theorem inflated_intensity_ne_of_injective
   nlinarith [h1, h2, hμ]
 
 /-- The Gaussian's Mellin triple. The drift and jet variance are the constants proved in
-`Calibrator.Condensation`; the `nonlattice` datum is **stipulated**, not derived — that
-`log g²` has a density is true and is not proved anywhere in this corpus. Every
-comparison against this record inherits that stipulation. -/
+`Calibrator.Condensation`.
+
+The `nonlattice` datum used to be **stipulated** here, with this docstring conceding that
+`log g²` having a density is true but proved nowhere in the corpus — so every comparison
+against the record inherited an undischarged claim that read as settled. The claim is now
+stated about an actual law and carries a visible `sorry`; see
+`gaussianObservables_describes_logSqGaussianLaw` immediately below. -/
 noncomputable def gaussianObservables : MellinObservables where
   drift := condensationConstant
   jetVariance := gaussianJetVariance
   latticeDatum := LatticeDatum.nonlattice
+
+/-- The Gaussian triple's lattice datum says something true about the actual law of
+    `log g²`, rather than being a field set by hand.
+
+    This is the whole point of the `Describes` predicate: the record now has to agree with a
+    law, and the one step that is not proved is isolated in `logSqGaussian_nonlattice`
+    instead of being spread across every downstream comparison. -/
+theorem gaussianObservables_describes_logSqGaussianLaw :
+    gaussianObservables.latticeDatum.Describes logSqGaussianLaw :=
+  logSqGaussian_nonlattice
 
 /-- A triple with a `lattice` datum is not the Gaussian triple, whatever its 2-jet.
 

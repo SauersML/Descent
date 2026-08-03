@@ -261,8 +261,8 @@ theorem gains_separate (α D : ℝ) (hα : 0 < α) (hD : 0 < D) :
     any level of ingenuity in the choice of function. -/
 noncomputable def ghostWitness (α n u : ℝ)
     (hne : ghostGain α n ≠ countPredictedGain α n) : Witness Bool ℝ where
-  count := fun _ => u
-  rate := fun b => if b then ghostGain α n else countPredictedGain α n
+  count := fun _ ↦ u
+  rate := fun b ↦ if b then ghostGain α n else countPredictedGain α n
   left := true
   right := false
   count_eq := rfl

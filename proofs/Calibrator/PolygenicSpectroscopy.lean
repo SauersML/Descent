@@ -1150,8 +1150,8 @@ proved on the Cramér stratum transfer to imputed dosages and **do not** transfe
 calls at this frequency. -/
 theorem hardCall_not_cramer_at_critical_maf (h : HardyWeinbergModel)
     (hq : h.altFreq = latticeCriticalMaf) :
-    ¬ CramerCondition h.genotypeProb (fun g => Real.log (h.standardizedSquare g)) :=
-  hwe_not_cramer_of_lattice h (fun g => Real.log (h.standardizedSquare g))
+    ¬ CramerCondition h.genotypeProb (fun g ↦ Real.log (h.standardizedSquare g)) :=
+  hwe_not_cramer_of_lattice h (fun g ↦ Real.log (h.standardizedSquare g))
     hardCallLatticeSpan hardCallLatticeSpan_pos
     (hardCall_logSquare_lattice_at_critical_maf h hq)
 

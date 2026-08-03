@@ -106,7 +106,7 @@ at the drift rate. This is the premise the cluster encodes.
     the retention as `1.025 ± 0.020` at `Ne = 1000`, `t = 4000`, where this
     trajectory gives `0.135`. -/
 noncomputable def closedPopulation (Ne H₀ : ℝ) (hH : 0 < H₀) : HeterozygosityTrajectory where
-  het := fun t => (1 - 1 / (2 * Ne)) ^ t * H₀
+  het := fun t ↦ (1 - 1 / (2 * Ne)) ^ t * H₀
   het_zero_pos := by simpa using hH
 
 /-- **Regime B: mutation-drift balance.** At demographic equilibrium mutation replenishes
@@ -119,7 +119,7 @@ regime the simulation was actually in.
     spans `0.905` to `0.135` across the same design, so the design separates
     them by a factor of seven at the far end. -/
 noncomputable def mutationDriftBalance (H₀ : ℝ) (hH : 0 < H₀) : HeterozygosityTrajectory where
-  het := fun _ => H₀
+  het := fun _ ↦ H₀
   het_zero_pos := hH
 
 /-- **The balance regime is a stationary point of the trajectory**, which is what
@@ -254,7 +254,7 @@ immediately below.
     measurement it explains is recorded in `Calibrator.PortabilityDrift`. -/
 noncomputable def crossChecks_blind_to_retention {trueRetention wrongRetention : ℝ}
     (hne : wrongRetention ≠ trueRetention) :
-    ProbeBlindness clusterCrossCheck (fun r => r = trueRetention) where
+    ProbeBlindness clusterCrossCheck (fun r ↦ r = trueRetention) where
   positive := trueRetention
   negative := wrongRetention
   same_data := by
@@ -262,7 +262,7 @@ noncomputable def crossChecks_blind_to_retention {trueRetention wrongRetention :
       (cluster_identities_hold_at_every_retention 1 1 trueRetention).1
     have h2 : clusterCrossCheck wrongRetention :=
       (cluster_identities_hold_at_every_retention 1 1 wrongRetention).1
-    exact propext ⟨fun _ => h2, fun _ => h1⟩
+    exact propext ⟨fun _ ↦ h2, fun _ ↦ h1⟩
   holds := rfl
   fails := hne
 
@@ -323,7 +323,7 @@ diagonal of the candidate function is ever evaluated.
 
     Empirical status: not an empirical claim. This is a description of a test
     design, not a prediction about a population. -/
-noncomputable def diagonalDesign (g : ℝ → ℝ → ℝ) : ℝ → ℝ := fun x => g x x
+noncomputable def diagonalDesign (g : ℝ → ℝ → ℝ) : ℝ → ℝ := fun x ↦ g x x
 
 /-- **A symmetric design sees `1` whatever the exponent is.** -/
 theorem diagonalDesign_benchmark_eq :
@@ -361,12 +361,12 @@ proposition is `symmetric_design_has_no_power` immediately below.
 
     Empirical status: not an empirical claim. This is a witness construction. -/
 noncomputable def symmetricDesignBlindness :
-    ProbeBlindness diagonalDesign (fun g => g = benchmarkRatio) where
+    ProbeBlindness diagonalDesign (fun g ↦ g = benchmarkRatio) where
   positive := benchmarkRatio
   negative := benchmarkRatioSquared
   same_data := diagonalDesign_benchmark_eq
   holds := rfl
-  fails := fun h => benchmark_forms_differ h.symm
+  fails := fun h ↦ benchmark_forms_differ h.symm
 
 /-- Spelled out: no rule reading only symmetric-design output decides the functional
 form. -/

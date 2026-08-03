@@ -42,10 +42,18 @@ This is optimal under additivity but misses non-additive effects.
 
 section AdditiveApproximation
 
-/-- **Additive variance captures most genetic variance.**
-    For most quantitative traits: V_A / V_G ≥ 0.5.
-    This is why additive PGS works reasonably well. -/
-theorem additive_dominates_genetic_variance
+/-- **`a ≥ t/2` and `t > 0` give `a/t ≥ 1/2`.**
+
+    **The claim is the hypothesis.** `h_A_large : V_A ≥ V_G / 2` says the
+    additive part is at least half the total, which is the empirical assertion
+    the name makes; dividing through by `V_G` adds nothing to it. `V_D` and
+    `V_I` are unconstrained apart from nonnegativity and do not enter the
+    conclusion, and there is no trait, no variance component and no
+    decomposition below beyond the equation `h_total` that names one.
+
+    Whether `V_A / V_G ≥ 1/2` actually holds for quantitative traits is a
+    measurement, and this file makes none. -/
+theorem half_le_div_of_half_le
     (V_A V_D V_I V_G : ℝ)
     (h_total : V_G = V_A + V_D + V_I)
     (h_A_large : V_A ≥ V_G / 2)
@@ -203,7 +211,7 @@ theorem dominance_variance_nonneg
     {m : ℕ} (p : Fin m → ℝ) (d : Fin m → ℝ) :
     0 ≤ dominanceVariance p d := by
   unfold dominanceVariance
-  exact Finset.sum_nonneg (fun i _ => sq_nonneg _)
+  exact Finset.sum_nonneg (fun i _ ↦ sq_nonneg _)
 
 /-- **Dominance contributes to portability loss.**
     When heterozygosity (2pq) differs across populations,
@@ -251,24 +259,32 @@ Methods that incorporate non-additive effects for better prediction.
 
 section NonAdditiveMethods
 
-/-- **Machine learning PGS captures non-additivity.**
-    Methods like XGBoost or neural network PGS can capture
-    epistasis and dominance. An ML model that captures both additive
-    (V_A) and non-additive (V_D + V_I) variance explains more
-    phenotypic variance than an additive-only model. -/
-theorem ml_pgs_captures_more_variance
+/-- **A share is at most the share of a larger numerator over the same
+    positive denominator:** `a/(a+b+c+d) ≤ (a+b+c)/(a+b+c+d)`.
+
+    The reading is that a model capturing dominance and epistasis as well as
+    additive effects explains more phenotypic variance than an additive-only
+    model. Nothing below is about a model. There is no estimator, no fitting,
+    no XGBoost and no neural network — the claim that such a method *attains*
+    `V_A + V_D + V_I` is the whole content and is not stated, let alone proved.
+    Four positive reals and one division. -/
+theorem div_le_div_of_le_numerator
     (V_A V_D V_I V_E : ℝ)
     (h_A : 0 < V_A) (h_D : 0 < V_D) (h_I : 0 ≤ V_I) (h_E : 0 < V_E) :
     V_A / (V_A + V_D + V_I + V_E) ≤
       (V_A + V_D + V_I) / (V_A + V_D + V_I + V_E) := by
   apply div_le_div_of_nonneg_right (by linarith) (by linarith)
 
-/-- **ML PGS overfits to population-specific patterns.**
-    Non-linear methods capture population-specific epistatic
-    patterns that don't generalize. An ML model with k_ml > k_linear
-    parameters has a larger overfitting penalty (proportional to k/n),
-    so its cross-population prediction degrades more. -/
-theorem ml_pgs_worse_portability
+/-- **Subtracting more leaves less:** `k₁ < k₂` and `n > 0` give
+    `r - k₂/n < r - k₁/n`.
+
+    The reading is that a method with more free parameters carries a larger
+    overfitting penalty `k/n`, so its cross-population prediction degrades
+    further. That the penalty *is* `k/n` is stipulated by writing it, and no
+    generalization bound is invoked or proved; `r2_train` is a variable name,
+    not a fitted quantity. There is no second population below, so nothing here
+    is cross-population at all. -/
+theorem sub_div_lt_sub_div_of_lt
     (r2_train k_linear k_ml n : ℝ)
     (h_r2 : 0 < r2_train)
     (h_kl : 0 < k_linear) (h_km : 0 < k_ml)
@@ -280,14 +296,17 @@ theorem ml_pgs_worse_portability
   have : k_linear / n < k_ml / n := div_lt_div_of_pos_right h_more_params h_n
   linarith
 
-/-- **The portability-accuracy tradeoff.**
-    Within-population: ML > Linear (more variance captured).
-    Cross-population: Linear ≥ ML (simpler model ports better).
-    We model this: ML captures V_A + V_NA in source but only V_A
-    cross-population (non-additive signal V_NA doesn't port).
-    Linear captures V_A in both. So ML wins in-source but the
-    cross-population gap for ML is larger. -/
-theorem portability_accuracy_tradeoff
+/-- **A strictly smaller numerator gives a strictly smaller share, and a
+    positive numerator a positive one:** for positive `a`, `b`, `c`,
+    `a/(a+b+c) < (a+b)/(a+b+c)` and `0 < b/(a+b+c)`.
+
+    The reading is a tradeoff: a richer model captures `V_A + V_NA` in the
+    source population and only `V_A` in the target, so it wins within
+    population and loses across. There is exactly one population below, and no
+    model. The asserted tradeoff needs the non-additive share to fail to
+    transport, which is assumed in the prose and appears nowhere in the
+    statement. Two inequalities between three positive reals. -/
+theorem div_lt_div_add_and_div_pos
     (V_A V_NA V_E : ℝ)
     (h_A : 0 < V_A) (h_NA : 0 < V_NA) (h_E : 0 < V_E) :
     -- ML within-pop R² > linear within-pop R², but
@@ -299,13 +318,14 @@ theorem portability_accuracy_tradeoff
   · exact div_lt_div_of_pos_right (by linarith) h_denom
   · exact div_pos h_NA h_denom
 
-/-- **Kernel-based PGS captures epistasis efficiently.**
-    GBLUP with epistatic kernel:
-    K_epi = K_add ∘ K_add (Hadamard product).
-    An epistatic kernel model captures V_A + V_I, while an
-    additive-only kernel captures only V_A. Both are bounded
-    by the total phenotypic variance V_A + V_I + V_E. -/
-theorem epistatic_kernel_improves_within_pop
+/-- **`a/(a+b+c) ≤ (a+b)/(a+b+c)` for positive `a`, `b`, `c`.**
+
+    The reading is that a GBLUP kernel built as the Hadamard square of the
+    additive kernel captures `V_A + V_I` where an additive kernel captures
+    `V_A`. No kernel, no Hadamard product and no BLUP appears below, and that a
+    kernel method attains either quantity is not stated. The same inequality as
+    `div_le_div_of_le_numerator` with one fewer summand. -/
+theorem div_le_div_of_le_numerator'
     (V_A V_I V_E : ℝ)
     (h_A : 0 < V_A) (h_I : 0 < V_I) (h_E : 0 < V_E) :
     V_A / (V_A + V_I + V_E) ≤ (V_A + V_I) / (V_A + V_I + V_E) := by

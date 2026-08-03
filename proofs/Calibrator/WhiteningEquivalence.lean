@@ -21,7 +21,7 @@ variable {rows cols : Type*} [Fintype cols]
 /-- Apply a right-side linear transformation independently to every data row. -/
 def rightTransform (transform : Matrix cols cols ℝ)
     (data : Matrix rows cols ℝ) : Matrix rows cols ℝ :=
-  fun row => transform.transpose.mulVec (data row)
+  fun row ↦ transform.transpose.mulVec (data row)
 
 /-- Right-whitening is the row transformation induced by the inverse coloring
 operator. -/
@@ -48,8 +48,8 @@ theorem right_whitening_removes_coloring
     (signal noise : Matrix rows cols ℝ)
     (color inverseColor : Matrix cols cols ℝ)
     (hremove : Function.LeftInverse
-      (fun x => inverseColor.transpose.mulVec x)
-      (fun x => color.transpose.mulVec x)) :
+      (fun x ↦ inverseColor.transpose.mulVec x)
+      (fun x ↦ color.transpose.mulVec x)) :
     rightWhiten inverseColor (signal + rightColor color noise) =
       rightWhiten inverseColor signal + noise := by
   rw [rightWhiten, rightTransform_add]
@@ -62,8 +62,8 @@ maps are inverse in that direction. -/
 theorem rightColor_leftInverse_rightWhiten
     (color inverseColor : Matrix cols cols ℝ)
     (hleft : Function.LeftInverse
-      (fun x => color.transpose.mulVec x)
-      (fun x => inverseColor.transpose.mulVec x)) :
+      (fun x ↦ color.transpose.mulVec x)
+      (fun x ↦ inverseColor.transpose.mulVec x)) :
     Function.LeftInverse (rightColor color : Matrix rows cols ℝ → Matrix rows cols ℝ)
       (rightWhiten inverseColor) := by
   intro data
@@ -75,8 +75,8 @@ maps are inverse in the other direction. -/
 theorem rightColor_rightInverse_rightWhiten
     (color inverseColor : Matrix cols cols ℝ)
     (hright : Function.RightInverse
-      (fun x => color.transpose.mulVec x)
-      (fun x => inverseColor.transpose.mulVec x)) :
+      (fun x ↦ color.transpose.mulVec x)
+      (fun x ↦ inverseColor.transpose.mulVec x)) :
     Function.RightInverse (rightColor color : Matrix rows cols ℝ → Matrix rows cols ℝ)
       (rightWhiten inverseColor) := by
   intro data
@@ -88,11 +88,11 @@ of data spaces, with recoloring as its explicit inverse. -/
 theorem rightWhiten_bijective
     (color inverseColor : Matrix cols cols ℝ)
     (hleft : Function.LeftInverse
-      (fun x => color.transpose.mulVec x)
-      (fun x => inverseColor.transpose.mulVec x))
+      (fun x ↦ color.transpose.mulVec x)
+      (fun x ↦ inverseColor.transpose.mulVec x))
     (hright : Function.RightInverse
-      (fun x => color.transpose.mulVec x)
-      (fun x => inverseColor.transpose.mulVec x)) :
+      (fun x ↦ color.transpose.mulVec x)
+      (fun x ↦ inverseColor.transpose.mulVec x)) :
     Function.Bijective (rightWhiten inverseColor :
       Matrix rows cols ℝ → Matrix rows cols ℝ) := by
   have hmatrixLeft := rightColor_leftInverse_rightWhiten

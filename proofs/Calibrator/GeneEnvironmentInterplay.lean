@@ -579,7 +579,7 @@ theorem no_threshold_metric_separates_collinear_split {n : ℕ}
     (gamma eta t : ℝ) :
     metric ⟨G, gamma + c * t, eta - t⟩ = metric ⟨G, gamma, eta⟩ := by
   refine levelSet_metrics_agree_of_coords_eq coords metric hmetric _ _ ?_
-  refine hfactor _ _ (fun i => ?_)
+  refine hfactor _ _ (fun i ↦ ?_)
   exact shift_blind_to_split_of_collinear G c hcol gamma eta t i
 
 end CounterfactualFramework

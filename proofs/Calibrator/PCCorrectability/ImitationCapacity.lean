@@ -100,7 +100,7 @@ of second moments.
     Empirical status: DERIVED. `spikeOuter_eq_rankOneCovarianceBump` identifies
     it with the bump of `covarianceMatrix_addRankOneSignal`, which is an exact
     covariance identity rather than a modelling choice. -/
-def spikeOuter (v : ι → ℝ) : Matrix ι ι ℝ := fun i j => v i * v j
+def spikeOuter (v : ι → ℝ) : Matrix ι ι ℝ := fun i j ↦ v i * v j
 
 theorem spikeOuter_eq_rankOneCovarianceBump (v : ι → ℝ) :
     spikeOuter v = rankOneCovarianceBump 1 v := by
@@ -118,9 +118,9 @@ theorem quadForm_add_matrix (A B : Matrix ι ι ℝ) (x : ι → ℝ) :
     quadForm (A + B) x = quadForm A x + quadForm B x := by
   unfold quadForm gramForm
   rw [← Finset.sum_add_distrib]
-  refine Finset.sum_congr rfl (fun i _ => ?_)
+  refine Finset.sum_congr rfl (fun i _ ↦ ?_)
   rw [← Finset.sum_add_distrib]
-  refine Finset.sum_congr rfl (fun j _ => ?_)
+  refine Finset.sum_congr rfl (fun j _ ↦ ?_)
   simp only [Matrix.add_apply]
   ring
 
@@ -128,9 +128,9 @@ theorem quadForm_smul_matrix (c : ℝ) (A : Matrix ι ι ℝ) (x : ι → ℝ) :
     quadForm (c • A) x = c * quadForm A x := by
   unfold quadForm gramForm
   rw [Finset.mul_sum]
-  refine Finset.sum_congr rfl (fun i _ => ?_)
+  refine Finset.sum_congr rfl (fun i _ ↦ ?_)
   rw [Finset.mul_sum]
-  refine Finset.sum_congr rfl (fun j _ => ?_)
+  refine Finset.sum_congr rfl (fun j _ ↦ ?_)
   simp only [Matrix.smul_apply, smul_eq_mul]
   ring
 
@@ -170,7 +170,7 @@ section TwoBlock
 
     Empirical status: DERIVED (an indexing device; the genotype content is in
     `subgroupContrast`, which is an instance of it). -/
-def twoBlock (k : ℕ) (a b : ℝ) : ℕ → ℝ := fun i => if i < k then a else b
+def twoBlock (k : ℕ) (a b : ℝ) : ℕ → ℝ := fun i ↦ if i < k then a else b
 
 theorem sum_twoBlock (a b : ℝ) (k j : ℕ) :
     ∑ i ∈ Finset.range (k + j), (if i < k then a else b) =
@@ -206,12 +206,12 @@ theorem sum_twoBlock_apply (k j : ℕ) (a b : ℝ) (f : ℝ → ℝ) :
 theorem sum_pow_twoBlock (k j : ℕ) (a b : ℝ) (p : ℕ) :
     ∑ i ∈ Finset.range (k + j), (twoBlock k a b i) ^ p =
       (k : ℝ) * a ^ p + (j : ℝ) * b ^ p :=
-  sum_twoBlock_apply k j a b (fun x => x ^ p)
+  sum_twoBlock_apply k j a b (fun x ↦ x ^ p)
 
 theorem sum_inv_twoBlock (k j : ℕ) (a b : ℝ) :
     ∑ i ∈ Finset.range (k + j), (twoBlock k a b i)⁻¹ =
       (k : ℝ) * a⁻¹ + (j : ℝ) * b⁻¹ :=
-  sum_twoBlock_apply k j a b (fun x => x⁻¹)
+  sum_twoBlock_apply k j a b (fun x ↦ x⁻¹)
 
 end TwoBlock
 
@@ -516,9 +516,9 @@ theorem frobeniusForm_add (A M N : Matrix ι ι ℝ) :
     frobeniusForm A (M + N) = frobeniusForm A M + frobeniusForm A N := by
   unfold frobeniusForm
   rw [← Finset.sum_add_distrib]
-  refine Finset.sum_congr rfl (fun i _ => ?_)
+  refine Finset.sum_congr rfl (fun i _ ↦ ?_)
   rw [← Finset.sum_add_distrib]
-  refine Finset.sum_congr rfl (fun j _ => ?_)
+  refine Finset.sum_congr rfl (fun j _ ↦ ?_)
   simp only [Matrix.add_apply]
   ring
 
@@ -526,9 +526,9 @@ theorem frobeniusForm_smul (A : Matrix ι ι ℝ) (c : ℝ) (M : Matrix ι ι �
     frobeniusForm A (c • M) = c * frobeniusForm A M := by
   unfold frobeniusForm
   rw [Finset.mul_sum]
-  refine Finset.sum_congr rfl (fun i _ => ?_)
+  refine Finset.sum_congr rfl (fun i _ ↦ ?_)
   rw [Finset.mul_sum]
-  refine Finset.sum_congr rfl (fun j _ => ?_)
+  refine Finset.sum_congr rfl (fun j _ ↦ ?_)
   simp only [Matrix.smul_apply, smul_eq_mul]
   ring
 
@@ -539,8 +539,8 @@ holds in every nonzero direction. -/
 theorem frobeniusForm_spikeOuter (A : Matrix ι ι ℝ) (v : ι → ℝ) :
     frobeniusForm A (spikeOuter v) = quadForm A v := by
   unfold frobeniusForm quadForm gramForm
-  refine Finset.sum_congr rfl (fun i _ => ?_)
-  refine Finset.sum_congr rfl (fun j _ => ?_)
+  refine Finset.sum_congr rfl (fun i _ ↦ ?_)
+  refine Finset.sum_congr rfl (fun j _ ↦ ?_)
   simp only [spikeOuter]
   ring
 
@@ -554,13 +554,13 @@ does *not* supply is the probabilistic statement that a sample covariance from
 conclusion. -/
 theorem frobeniusForm_tendsto (A : Matrix ι ι ℝ)
     (empirical : ℕ → Matrix ι ι ℝ) (S : Matrix ι ι ℝ)
-    (hentry : ∀ i j, Filter.Tendsto (fun n => empirical n i j) Filter.atTop
+    (hentry : ∀ i j, Filter.Tendsto (fun n ↦ empirical n i j) Filter.atTop
       (nhds (S i j))) :
-    Filter.Tendsto (fun n => frobeniusForm A (empirical n)) Filter.atTop
+    Filter.Tendsto (fun n ↦ frobeniusForm A (empirical n)) Filter.atTop
       (nhds (frobeniusForm A S)) := by
   unfold frobeniusForm
-  exact tendsto_finset_sum _ (fun i _ =>
-    tendsto_finset_sum _ (fun j _ => (hentry i j).const_mul (A i j)))
+  exact tendsto_finset_sum _ (fun i _ ↦
+    tendsto_finset_sum _ (fun j _ ↦ (hentry i j).const_mul (A i j)))
 
 /-!
 ### The trace window
@@ -582,13 +582,13 @@ theorem traceForm_add (M N : Matrix ι ι ℝ) :
     traceForm (M + N) = traceForm M + traceForm N := by
   unfold traceForm
   rw [← Finset.sum_add_distrib]
-  exact Finset.sum_congr rfl (fun i _ => by simp only [Matrix.add_apply])
+  exact Finset.sum_congr rfl (fun i _ ↦ by simp only [Matrix.add_apply])
 
 theorem traceForm_smul (c : ℝ) (M : Matrix ι ι ℝ) :
     traceForm (c • M) = c * traceForm M := by
   unfold traceForm
   rw [Finset.mul_sum]
-  exact Finset.sum_congr rfl (fun i _ => by simp only [Matrix.smul_apply, smul_eq_mul])
+  exact Finset.sum_congr rfl (fun i _ ↦ by simp only [Matrix.smul_apply, smul_eq_mul])
 
 /-- **The spike load of the trace window is the squared length of the effect
 vector.**  Everything downstream — `effectiveSubgroupSize`, `demographicSpike`,
@@ -596,7 +596,7 @@ the AR(1) whitening gain — is a computation of this one quantity in a
 particular basis. -/
 theorem traceForm_spikeOuter (v : ι → ℝ) : traceForm (spikeOuter v) = dot v v := by
   unfold traceForm dot
-  exact Finset.sum_congr rfl (fun i _ => by simp only [spikeOuter])
+  exact Finset.sum_congr rfl (fun i _ ↦ by simp only [spikeOuter])
 
 /-- **The trace-window background class**: every legal background carries total
 standardized variance at most `budget`.
@@ -606,10 +606,10 @@ standardized variance at most `budget`.
 def traceWindowBudgetClass (base : Matrix ι ι ℝ) (budget : ℝ) :
     BackgroundClass ι Unit where
   base := base
-  form := fun _ => traceForm
-  bound := fun _ => budget
-  form_add := fun _ M N => traceForm_add M N
-  form_smul := fun _ c M => traceForm_smul c M
+  form := fun _ ↦ traceForm
+  bound := fun _ ↦ budget
+  form_add := fun _ M N ↦ traceForm_add M N
+  form_smul := fun _ c M ↦ traceForm_smul c M
 
 theorem traceWindowBudgetClass_spikeLoad (base : Matrix ι ι ℝ) (budget : ℝ)
     (v : ι → ℝ) :
@@ -780,10 +780,10 @@ variable {ι : Type*} [Fintype ι] [DecidableEq ι]
     Empirical status: UNTESTED. -/
 def traceWindowClass (base A S₀ : Matrix ι ι ℝ) : BackgroundClass ι Unit where
   base := base
-  form := fun _ => frobeniusForm A
-  bound := fun _ => frobeniusForm A S₀
-  form_add := fun _ M N => frobeniusForm_add A M N
-  form_smul := fun _ c M => frobeniusForm_smul A c M
+  form := fun _ ↦ frobeniusForm A
+  bound := fun _ ↦ frobeniusForm A S₀
+  form_add := fun _ M N ↦ frobeniusForm_add A M N
+  form_smul := fun _ c M ↦ frobeniusForm_smul A c M
 
 theorem traceWindowClass_active (base A S₀ : Matrix ι ι ℝ) :
     (traceWindowClass base A S₀).Active () S₀ := rfl
@@ -914,10 +914,10 @@ all `ImitationRigidity` ever used.
 def diagonalGapClass (base : Matrix ι ι ℝ) (i j : ι) (budget : ℝ) :
     BackgroundClass ι Unit where
   base := base
-  form := fun _ => diagonalGapForm i j
-  bound := fun _ => budget
-  form_add := fun _ M N => diagonalGapForm_add i j M N
-  form_smul := fun _ c M => diagonalGapForm_smul i j c M
+  form := fun _ ↦ diagonalGapForm i j
+  bound := fun _ ↦ budget
+  form_add := fun _ M N ↦ diagonalGapForm_add i j M N
+  form_smul := fun _ c M ↦ diagonalGapForm_smul i j c M
 
 theorem diagonalGapClass_spikeLoad (base : Matrix ι ι ℝ) (i j : ι) (budget : ℝ)
     (a : Unit) (v : ι → ℝ) :
@@ -1145,7 +1145,7 @@ def subgroupContrast (n m : ℕ) : ℕ → ℝ :=
 
     Empirical status: DERIVED. -/
 def demographicSpikeDirection (n m : ℕ) : Fin n → ℝ :=
-  fun i => subgroupContrast n m i.val
+  fun i ↦ subgroupContrast n m i.val
 
 /-- **`effectiveSubgroupSize` is the squared length of the subgroup contrast.**
 This is the theorem that stops `m(n-m)/n` from being a formula nothing can
@@ -1165,8 +1165,8 @@ theorem dot_demographicSpikeDirection (n m : ℕ) (hmn : m ≤ n) (hn : 0 < n) :
   have hsq : dot (demographicSpikeDirection n m) (demographicSpikeDirection n m) =
       ∑ i ∈ Finset.range n, (subgroupContrast n m i) ^ 2 := by
     unfold dot
-    rw [Finset.sum_congr rfl (fun i _ => hpoint i)]
-    exact Fin.sum_univ_eq_sum_range (fun i => (subgroupContrast n m i) ^ 2) n
+    rw [Finset.sum_congr rfl (fun i _ ↦ hpoint i)]
+    exact Fin.sum_univ_eq_sum_range (fun i ↦ (subgroupContrast n m i) ^ 2) n
   have hsplit : m + (n - m) = n := by omega
   have hrange : Finset.range n = Finset.range (m + (n - m)) := by rw [hsplit]
   rw [hsq, hrange]
@@ -1318,12 +1318,12 @@ grows, so the spectral-edge term is asymptotically free and the imitation
 capacity is the whole of what remains.  This is why the two halves cannot be
 collapsed into one: they dominate in opposite regimes. -/
 theorem bbpProxyThreshold_tendsto_zero (n : ℝ) :
-    Filter.Tendsto (fun M : ℕ => bbpProxyThreshold n (M : ℝ)) Filter.atTop
+    Filter.Tendsto (fun M : ℕ ↦ bbpProxyThreshold n (M : ℝ)) Filter.atTop
       (nhds 0) := by
-  have hdiv : Filter.Tendsto (fun M : ℕ => n / (M : ℝ)) Filter.atTop (nhds 0) :=
+  have hdiv : Filter.Tendsto (fun M : ℕ ↦ n / (M : ℝ)) Filter.atTop (nhds 0) :=
     tendsto_const_div_atTop_nhds_zero_nat n
   have hcomp := (Real.continuous_sqrt.tendsto (0 : ℝ)).comp hdiv
-  change Filter.Tendsto (fun M : ℕ => Real.sqrt (n / (M : ℝ))) Filter.atTop (nhds 0)
+  change Filter.Tendsto (fun M : ℕ ↦ Real.sqrt (n / (M : ℝ))) Filter.atTop (nhds 0)
   simpa only [Function.comp_apply, Real.sqrt_zero] using hcomp
 
 end DemographicInstance
@@ -1437,9 +1437,9 @@ theorem inverseTraceCertificate_tendsto_ldWhiteningGain {decay : ℝ}
     (hd : |decay| < 1) (lam : ℕ → ℕ → ℝ)
     (hspectrum : ∀ m : ℕ,
       ∑ i ∈ Finset.range m, (lam m i)⁻¹ = ldPrecisionTrace decay m) :
-    Filter.Tendsto (fun m : ℕ => inverseTraceCertificate m (lam m)) Filter.atTop
+    Filter.Tendsto (fun m : ℕ ↦ inverseTraceCertificate m (lam m)) Filter.atTop
       (nhds (ldWhiteningGain decay)) := by
-  have hrewrite : (fun m : ℕ => inverseTraceCertificate m (lam m)) =
+  have hrewrite : (fun m : ℕ ↦ inverseTraceCertificate m (lam m)) =
       traceWindowSpikeLoad decay := by
     funext m
     exact inverseTraceCertificate_eq_traceWindowSpikeLoad (lam m) (hspectrum m)
@@ -1604,7 +1604,7 @@ theorem certificate_not_momentContinuous (Φ : MomentContinuousFunctional)
   have hne : ((n : ℝ) + 1) ≠ 0 := ne_of_gt hn1
   have hδ : (0 : ℝ) ≤ 1 / ((n : ℝ) + 1) := le_of_lt (by positivity)
   have hlip := Φ.moment_lipschitz (meffSize n) (meffPerturbed n) (meffFlat n)
-    (1 / ((n : ℝ) + 1)) hδ (fun p _ => meff_moment_gap_le n p hnpos)
+    (1 / ((n : ℝ) + 1)) hδ (fun p _ ↦ meff_moment_gap_le n p hnpos)
   simp only [hΦ] at hlip
   rw [meff_certificate_gap n hnpos] at hlip
   rw [abs_of_nonneg (le_of_lt (div_pos hn' hn1))] at hlip
@@ -1656,14 +1656,14 @@ theorem meff_prohibition_with_certificate {decay : ℝ} (hd : |decay| < 1)
     (hspectrum : ∀ m : ℕ,
       ∑ i ∈ Finset.range m, (lam m i)⁻¹ = ldPrecisionTrace decay m)
     (Φ : MomentContinuousFunctional) :
-    Filter.Tendsto (fun m : ℕ => inverseTraceCertificate m (lam m)) Filter.atTop
+    Filter.Tendsto (fun m : ℕ ↦ inverseTraceCertificate m (lam m)) Filter.atTop
         (nhds (ldWhiteningGain decay)) ∧
       (∀ headroom : ℝ, whitenedCapacity headroom decay =
         headroom * (1 - decay ^ 2) / (1 + decay ^ 2)) ∧
       ¬ (∀ (m : ℕ) (s : ℕ → ℝ), Φ.value m s = inverseTraceCertificate m s) :=
   ⟨inverseTraceCertificate_tendsto_ldWhiteningGain hd lam hspectrum,
-    fun headroom => whitenedCapacity_closedForm headroom decay,
-    fun h => certificate_not_momentContinuous Φ h⟩
+    fun headroom ↦ whitenedCapacity_closedForm headroom decay,
+    fun h ↦ certificate_not_momentContinuous Φ h⟩
 
 end MeffProhibition
 
@@ -1733,8 +1733,8 @@ theorem weighted_sq_expand (w c : tgt → ℝ) (s : ℝ) :
     ∑ t, w t * (c t - s) ^ 2 =
       (∑ t, w t * c t ^ 2) - 2 * s * (∑ t, w t * c t) + s ^ 2 * (∑ t, w t) := by
   have hpoint : ∀ t : tgt, w t * (c t - s) ^ 2 =
-      w t * c t ^ 2 - 2 * s * (w t * c t) + s ^ 2 * w t := fun t => by ring
-  rw [Finset.sum_congr rfl (fun t _ => hpoint t), Finset.sum_add_distrib,
+      w t * c t ^ 2 - 2 * s * (w t * c t) + s ^ 2 * w t := fun t ↦ by ring
+  rw [Finset.sum_congr rfl (fun t _ ↦ hpoint t), Finset.sum_add_distrib,
     Finset.sum_sub_distrib, ← Finset.mul_sum, ← Finset.mul_sum]
 
 /-- **The obstruction law.**  For any shared correction `s`, the energy-weighted

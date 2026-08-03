@@ -219,10 +219,10 @@ theorem master_decay_bound_uniform (E : ℕ → ℝ) (θ γ : ℝ) (ε : ℕ →
     (h0 : |E 0| ≤ 1)
     (hstep : ∀ k, |E (k + 1)| ≤ (1 - θ * ε k * γ) * |E k|) (n : ℕ) :
     |E n| ≤ Real.exp (-(θ * γ * ∑ k ∈ range n, ε k)) := by
-  have hmain := master_decay_bound E θ ε (fun _ => γ) hle h0 hstep n
+  have hmain := master_decay_bound E θ ε (fun _ ↦ γ) hle h0 hstep n
   have hrw : ∑ k ∈ range n, θ * ε k * γ = θ * γ * ∑ k ∈ range n, ε k := by
     rw [Finset.mul_sum]
-    exact Finset.sum_congr rfl fun k _ => by ring
+    exact Finset.sum_congr rfl fun k _ ↦ by ring
   rwa [hrw] at hmain
 
 /-! ## The freshness floor `D`
@@ -277,16 +277,16 @@ theorem dimSum_le_effDim (fresh : Equiv.Perm (Fin n) → ℕ → ℝ) (σ : Equi
 coordinates. -/
 theorem effDim_le_card (fresh : Equiv.Perm (Fin n) → ℕ → ℝ)
     (hle : ∀ σ k, fresh σ k ≤ 1) : effDim fresh ≤ n := by
-  refine Finset.sup'_le _ _ fun σ _ => ?_
+  refine Finset.sup'_le _ _ fun σ _ ↦ ?_
   calc dimSum fresh σ = ∑ k ∈ range n, fresh σ k := rfl
-    _ ≤ ∑ _k ∈ range n, (1 : ℝ) := Finset.sum_le_sum fun k _ => hle σ k
+    _ ≤ ∑ _k ∈ range n, (1 : ℝ) := Finset.sum_le_sum fun k _ ↦ hle σ k
     _ = n := by simp
 
 /-- **`D ≥ 0`**, since freshness is non-negative. -/
 theorem effDim_nonneg (fresh : Equiv.Perm (Fin n) → ℕ → ℝ)
     (h0 : ∀ σ k, 0 ≤ fresh σ k) : 0 ≤ effDim fresh := by
   refine le_trans ?_ (dimSum_le_effDim fresh 1)
-  exact Finset.sum_nonneg fun k _ => h0 1 k
+  exact Finset.sum_nonneg fun k _ ↦ h0 1 k
 
 /-- **The positive control: independent coordinates give `D = n`.**
 
@@ -302,9 +302,9 @@ theorem effDim_eq_of_independent (fresh : Equiv.Perm (Fin n) → ℕ → ℝ)
   have hconst : ∀ σ : Equiv.Perm (Fin n), dimSum fresh σ = (n : ℝ) := by
     intro σ
     calc dimSum fresh σ = ∑ k ∈ range n, fresh σ k := rfl
-      _ = ∑ _k ∈ range n, (1 : ℝ) := Finset.sum_congr rfl fun k _ => hone σ k
+      _ = ∑ _k ∈ range n, (1 : ℝ) := Finset.sum_congr rfl fun k _ ↦ hone σ k
       _ = n := by simp
-  refine le_antisymm (Finset.sup'_le _ _ fun σ _ => le_of_eq (hconst σ)) ?_
+  refine le_antisymm (Finset.sup'_le _ _ fun σ _ ↦ le_of_eq (hconst σ)) ?_
   rw [← hconst 1]
   exact dimSum_le_effDim fresh 1
 

@@ -79,23 +79,23 @@ def IsEvenSummary (f : ℝ → ℝ) : Prop := ∀ x : ℝ, f (-x) = f x
 /-- A function is **odd** when reflecting the argument reverses its sign. -/
 def IsOddSummary (f : ℝ → ℝ) : Prop := ∀ x : ℝ, f (-x) = -f x
 
-theorem sq_isEven : IsEvenSummary (fun x => x ^ 2) := by
+theorem sq_isEven : IsEvenSummary (fun x ↦ x ^ 2) := by
   intro x
   ring
 
-theorem fourthPower_isEven : IsEvenSummary (fun x => x ^ 4) := by
+theorem fourthPower_isEven : IsEvenSummary (fun x ↦ x ^ 4) := by
   intro x
   ring
 
-theorem abs_isEven : IsEvenSummary (fun x => |x|) := by
+theorem abs_isEven : IsEvenSummary (fun x ↦ |x|) := by
   intro x
   exact abs_neg x
 
-theorem id_isOdd : IsOddSummary (fun x => x) := by
+theorem id_isOdd : IsOddSummary (fun x ↦ x) := by
   intro x
   rfl
 
-theorem cube_isOdd : IsOddSummary (fun x => x ^ 3) := by
+theorem cube_isOdd : IsOddSummary (fun x ↦ x ^ 3) := by
   intro x
   ring
 

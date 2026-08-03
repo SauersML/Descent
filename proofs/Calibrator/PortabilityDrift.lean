@@ -1545,7 +1545,7 @@ theorem brokenTaggingResidual_nonneg {p q : ℕ}
   unfold brokenTaggingResidual
   classical
   simp [dotProduct]
-  exact Finset.sum_nonneg (fun _ _ => mul_self_nonneg _)
+  exact Finset.sum_nonneg (fun _ _ ↦ mul_self_nonneg _)
 
 /-- Additive irreducible loss from ancestry-specific LD distortion.
 This is the squared source-score covariance distortion induced by the gap
@@ -1564,7 +1564,7 @@ theorem ancestrySpecificLDResidual_nonneg {p q : ℕ}
   unfold ancestrySpecificLDResidual
   classical
   simp [dotProduct]
-  exact Finset.sum_nonneg (fun _ _ => mul_self_nonneg _)
+  exact Finset.sum_nonneg (fun _ _ ↦ mul_self_nonneg _)
 
 /-- Additive irreducible loss from source-specific overfit or context mismatch.
 This is the squared gap between source-only and target score/outcome
@@ -1580,7 +1580,7 @@ theorem sourceSpecificOverfitResidual_nonneg {p q : ℕ}
   unfold sourceSpecificOverfitResidual
   classical
   simp [dotProduct]
-  exact Finset.sum_nonneg (fun _ _ => mul_self_nonneg _)
+  exact Finset.sum_nonneg (fun _ _ ↦ mul_self_nonneg _)
 
 /-- Additive target-only phenotype variance from novel causal mutations that are
 not tagged by the transported source score. -/
@@ -2262,7 +2262,7 @@ theorem PGSEvolutionaryModel.coordinateSummary_matches_generational_popgen_at_fl
       (m.toGenerationalPopGenParameters).migrationSharedBoostAt (Nat.floor m.t_div) := by
   refine ⟨?_, ?_, ?_⟩
   · rw [PGSEvolutionaryModel.coordinateSummary_alleleFreqCoordinate]
-    exact congrArg (fun x => 1 - x)
+    exact congrArg (fun x ↦ 1 - x)
       (PGSEvolutionaryModel.toGenerationalPopGenParameters_fstTransientAt_floor m)
   · rw [PGSEvolutionaryModel.coordinateSummary_ancestralVariantCoordinate]
     exact (PGSEvolutionaryModel.toGenerationalPopGenParameters_mutationSharedRetentionAt_floor
@@ -2511,7 +2511,7 @@ tag-SNP allele-frequency drift. -/
 noncomputable def sigmaTagTargetAt {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) :
     Matrix (Fin p) (Fin p) ℝ :=
-  fun i j =>
+  fun i j ↦
     m.sigmaTagSource i j * jointTagLDKernelAt m t i j
 
 /-- Time-varying target tag-to-causal alignment. This is the explicit tagging
@@ -2520,7 +2520,7 @@ migration, and the underlying source tag-causal alignment. -/
 noncomputable def directCausalTargetAt {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) :
     Matrix (Fin p) (Fin q) ℝ :=
-  fun i j =>
+  fun i j ↦
     m.directCausalSource i j * jointDirectCausalKernelAt m t i j
 
 /-- Time-varying target-only novel direct-causal alignment.
@@ -2529,7 +2529,7 @@ noncomputable def directCausalTargetAt {p q : ℕ}
 noncomputable def novelDirectCausalTargetAt {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) :
     Matrix (Fin p) (Fin q) ℝ :=
-  fun i j =>
+  fun i j ↦
     m.novelDirectCausalTemplate i j * jointNovelDirectCausalKernelAt m t i j
 
 /-- Time-varying proxy-tagging alignment. Unlike directly scored causal
@@ -2538,7 +2538,7 @@ unscored causal variant. -/
 noncomputable def proxyTaggingTargetAt {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) :
     Matrix (Fin p) (Fin q) ℝ :=
-  fun i j =>
+  fun i j ↦
     m.proxyTaggingSource i j * jointProxyTaggingKernelAt m t i j
 
 /-- Time-varying target-only novel proxy-tagging alignment created after
@@ -2546,7 +2546,7 @@ divergence. -/
 noncomputable def novelProxyTaggingTargetAt {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) :
     Matrix (Fin p) (Fin q) ℝ :=
-  fun i j =>
+  fun i j ↦
     m.novelProxyTaggingTemplate i j * jointNovelProxyTaggingKernelAt m t i j
 
 /-- Time-varying target tag-to-causal alignment is the sum of a direct-causal
@@ -3373,7 +3373,7 @@ standard normal: `1` against `Phi 0`. -/
 theorem equalVarianceGaussianAUCChart_ne_chart_at_one (hPhi0 : Phi 0 ≠ 1) :
     equalVarianceGaussianAUCChart 1 ≠ equalVarianceGaussianAUCFromExplainedR2 1 := by
   rw [equalVarianceGaussianAUCChart_at_one, equalVarianceGaussianAUCFromExplainedR2_at_one]
-  exact fun h => hPhi0 h.symm
+  exact fun h ↦ hPhi0 h.symm
 
 /-- **Cross-check: the `R²` form and the SNR form are the same map.**
 
@@ -3766,12 +3766,12 @@ theorem exactBrierRiskOfCalibrated_eq_exactCalibratedBrierRiskFromR2
     (μ : Measure Z) [IsProbabilityMeasure μ]
     (η : Z → ℝ) (π r2 : ℝ)
     (hη_int : Integrable η μ)
-    (hvar_int : Integrable (fun z => (η z - π) ^ 2) μ)
+    (hvar_int : Integrable (fun z ↦ (η z - π) ^ 2) μ)
     (hmean : ∫ z, η z ∂μ = π)
     (hvar : ∫ z, (η z - π) ^ 2 ∂μ = π * (1 - π) * r2) :
     exactBrierRiskOfCalibrated μ η = TransportedMetrics.calibratedBrier π r2 := by
   rw [exactBrierRiskOfCalibrated_eq_integral]
-  have hdiff_int : Integrable (fun z => η z - π) μ := by
+  have hdiff_int : Integrable (fun z ↦ η z - π) μ := by
     simpa [sub_eq_add_neg] using hη_int.sub (integrable_const π)
   have hlin_zero : ∫ z, (η z - π) ∂μ = 0 := by
     rw [integral_sub hη_int (integrable_const π), hmean]
@@ -3935,7 +3935,7 @@ noncomputable def expectedSqMeanPGSDiff_IMEquilibrium (V_A M : ℝ) : ℝ :=
 /-- IM equilibrium: increasing migration strictly decreases genetic differentiation
     on the biologically meaningful domain M > 0. -/
 theorem twoDemeIMEquilibriumDelta_strictAntiOn :
-    StrictAntiOn (fun M : ℝ => twoDemeIMEquilibriumDelta M) (Set.Ioi 0) := by
+    StrictAntiOn (fun M : ℝ ↦ twoDemeIMEquilibriumDelta M) (Set.Ioi 0) := by
   intro a ha b hb hab
   unfold twoDemeIMEquilibriumDelta
   have ha_pos : 0 < 2 * a + 1 := by linarith [Set.mem_Ioi.mp ha]
@@ -3946,7 +3946,7 @@ theorem twoDemeIMEquilibriumDelta_strictAntiOn :
     on the biological domain (M > 0) when `V_A > 0`. -/
 theorem expectedSqMeanPGSDiff_IMEquilibrium_strictAntiOn_M
     (V_A : ℝ) (hVA : 0 < V_A) :
-    StrictAntiOn (fun M : ℝ => expectedSqMeanPGSDiff_IMEquilibrium V_A M) (Set.Ioi 0) := by
+    StrictAntiOn (fun M : ℝ ↦ expectedSqMeanPGSDiff_IMEquilibrium V_A M) (Set.Ioi 0) := by
   intro a ha b hb hab
   simp only [expectedSqMeanPGSDiff_IMEquilibrium_eq]
   have := twoDemeIMEquilibriumDelta_strictAntiOn ha hb hab
@@ -3981,6 +3981,17 @@ structure MutationDriftModelAssumptions where
   Ne_pos : 0 < Ne
   mu_pos : 0 < μ
   t_nonneg : 0 ≤ t
+
+/-- **The class is inhabited.**  Without a term of this type every theorem quantified
+over it is a true statement about an empty class: kernel-checked, clean axiom report,
+and no content.  See `scripts/check-laundering.py` family F4. -/
+noncomputable def MutationDriftModelAssumptions.witness : MutationDriftModelAssumptions where
+  Ne := 1
+  μ := 1
+  t := 1
+  Ne_pos := by norm_num
+  mu_pos := by norm_num
+  t_nonneg := by norm_num
 
 /-- The scaled mutation parameter θ = 4Neμ for a mutation-drift model.
 
