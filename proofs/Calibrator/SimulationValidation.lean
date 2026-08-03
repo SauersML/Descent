@@ -496,8 +496,7 @@ theorem target_liability_auc_eq_explainedR2_chart {p q : ℕ}
 /-- When target LD among scored SNPs changes, the deployed liability-threshold
 AUC changes because the explicit target score moments, and therefore the
 derived deployed `R²`, change under the mechanistic state. -/
-theorem target_ld_shift_changes_liability_auc
-    (hPhiStrict : StrictMono Phi) :
+theorem target_ld_shift_changes_liability_auc :
     equalVarianceGaussianAUCFromSourceWeights targetLDShiftMetricModel Pop.target <
       equalVarianceGaussianAUCFromSourceWeights baselineMetricModel Pop.target := by
   rcases target_ld_shift_changes_portability_without_changing_source_r2 with
@@ -505,7 +504,7 @@ theorem target_ld_shift_changes_liability_auc
   rw [target_liability_auc_eq_explainedR2_chart,
     target_liability_auc_eq_explainedR2_chart,
     h_target_shift, h_target_base]
-  exact equalVarianceGaussianAUCFromExplainedR2_strictMonoOn_unitInterval hPhiStrict
+  exact equalVarianceGaussianAUCFromExplainedR2_strictMonoOn_unitInterval
     ⟨by norm_num, by norm_num⟩
     ⟨by norm_num, by norm_num⟩
     (by norm_num)

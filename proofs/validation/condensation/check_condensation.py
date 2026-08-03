@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Numerical validation for the condensation / polygenic-spectroscopy modules.
 
-This script exists for the reason stated in `proofs/Calibrator/Identification.lean`:
-a Lean `def` cannot be internally wrong, so the whole risk sits in whether a named
+This script exists for the reason stated by the corpus-wide interpretation discipline:
+a Lean `def` cannot be internally inconsistent, so the whole risk sits in whether a named
 quantity's *formula* has the population-genetic meaning its *name* claims. Every
 quantity below is computed twice — once by direct summation over the three diploid
 genotypes (the definition), once by the closed form (the theorem) — and the two are

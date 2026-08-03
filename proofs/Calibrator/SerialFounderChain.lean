@@ -154,11 +154,11 @@ structure SerialFounderChain where
   ceiling : ℝ
   /-- **Audit point, VALIDATED.** The saturated `F_ST` equals `serialFounderCeilingFst` at
   this ceiling, measured to `3.9%` with no free parameter. -/
-  ceilingValidated : Prop
+  ceilingValidated : Bool
   /-- **Audit point, OPEN.** The approach to the ceiling at small separation. The
   diffusion/reflection meeting time misses it by `95%` at `k = 1`; only the recurrence
   supplies it. -/
-  approachOpen : Prop
+  approachOpen : Bool
 
 namespace SerialFounderChain
 

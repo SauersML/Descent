@@ -339,12 +339,11 @@ theorem brier_depends_on_prevalence
 theorem sourceLiabilityAUC_strictly_increases_with_r2
     (r2₁ r2₂ : ℝ)
     (h_r2₁ : 0 < r2₁) (h_r2₂ : r2₂ < 1)
-    (h_lt : r2₁ < r2₂)
-    (hPhiStrict : StrictMono Phi) :
+    (h_lt : r2₁ < r2₂) :
     equalVarianceGaussianAUCFromExplainedR2 r2₁ <
       equalVarianceGaussianAUCFromExplainedR2 r2₂ := by
   have h_r2₂_pos : 0 < r2₂ := lt_trans h_r2₁ h_lt
-  exact equalVarianceGaussianAUCFromExplainedR2_strictMonoOn_unitInterval hPhiStrict
+  exact equalVarianceGaussianAUCFromExplainedR2_strictMonoOn_unitInterval
     ⟨le_of_lt h_r2₁, lt_trans h_lt h_r2₂⟩
     ⟨le_of_lt h_r2₂_pos, h_r2₂⟩
     h_lt
@@ -357,13 +356,12 @@ theorem neutralAF_benchmark_liability_auc_sensitive_to_drift
     (V_A V_E fstS fstT : ℝ)
     (hVA : 0 < V_A) (hVE : 0 < V_E)
     (h_fst : fstS < fstT)
-    (h_fst_bounds : 0 ≤ fstS ∧ fstT < 1)
-    (hPhiStrict : StrictMono Phi) :
+    (h_fst_bounds : 0 ≤ fstS ∧ fstT < 1) :
     0 < presentDayEqualVarianceGaussianAUC V_A V_E fstS -
       presentDayEqualVarianceGaussianAUC V_A V_E fstT := by
   have h_drop :=
     targetLiabilityAUC_lt_source_of_neutralAF_benchmark
-      V_A V_E fstS fstT hVA hVE h_fst h_fst_bounds hPhiStrict
+      V_A V_E fstS fstT hVA hVE h_fst h_fst_bounds
   linarith
 
 /-- **Brier worsens when R² drops and the prevalence factor weakly increases.**
@@ -1225,8 +1223,7 @@ theorem metrics_both_degrade_under_drift
     {p q : ℕ} (m : CrossPopulationMetricModel p q)
     (h_source_r2_unit : r2FromSourceWeights m Pop.source ∈ Set.Ico 0 1)
     (h_target_r2_unit : r2FromSourceWeights m Pop.target ∈ Set.Ico 0 1)
-    (h_r2_drop : r2FromSourceWeights m Pop.target < r2FromSourceWeights m Pop.source)
-    (hPhiStrict : StrictMono Phi) :
+    (h_r2_drop : r2FromSourceWeights m Pop.target < r2FromSourceWeights m Pop.source) :
     let sourceMetrics := sourceMetricProfileFromSourceWeightsAtTargetPrevalence m
     let targetMetrics := targetMetricProfileFromSourceWeights m
     targetMetrics.r2 < sourceMetrics.r2 ∧
@@ -1240,7 +1237,7 @@ theorem metrics_both_degrade_under_drift
       sourceMetricProfileFromSourceWeightsAtTargetPrevalence_auc,
       targetEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart,
       sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart]
-    exact equalVarianceGaussianAUCFromExplainedR2_strictMonoOn_unitInterval hPhiStrict
+    exact equalVarianceGaussianAUCFromExplainedR2_strictMonoOn_unitInterval
       h_target_r2_unit h_source_r2_unit h_r2_drop
   have h_brier :
       (sourceMetricProfileFromSourceWeightsAtTargetPrevalence m).brier <

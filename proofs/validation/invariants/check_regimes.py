@@ -1,166 +1,127 @@
 #!/usr/bin/env python3
-"""Check the regime obligation stated in Calibrator/Conventions.lean.
+"""Reject external theorem packaging in production Lean structures.
 
-A closed form whose docstring reads `Empirical status: FALSIFIED` or
-`CONDITIONALLY VALID` makes two claims: an algebraic one, which Lean checks, and a
-claim about the conditions under which the algebra describes a population, which
-Lean checks only if someone writes it down. `DriftRegime.lean` records why that
-matters: a formula carrying its regime in prose can be moved into a regime where it
-is false, and every internal cross-check still passes, because the identities are
-identities *in* the shared premise.
+Model data and genuine algebraic laws may live in structures.  A scientific or
+analytic conclusion may not be accepted from a caller and then re-exported by
+field projection.  This check guards the concrete anti-patterns removed from the
+Calibrator corpus and rejects bare ``Prop`` switches, which carry no mathematical
+content at all.
 
-This script checks that every such closed form carries its regime in one of the four
-forms Conventions.lean names:
-
-  signature       the definition takes a structure with an assumption field
-  regime-tie      a theorem identifies it with a quantity of a named regime object
-  obligation      the claimed quantity is a caller-supplied field (PowerAgreement shape)
-  proved-failure  the departure from the regime is itself a theorem
-
-It is a structural check, not a proof check: it confirms a witness of the right shape
-exists and is named, not that the witness type-checks. Compilation is what establishes
-the latter. Exit status is 1 if any closed form is uncovered.
-
-Run:  python3 proofs/validation/invariants/check_regimes.py
+Lean compilation remains the proof check.  This file is an architectural check
+that prevents the old ``AssumedTheorem.result`` interface from returning under a
+new edit.
 """
 
-import os
+from pathlib import Path
 import re
-import sys
 
-ROOT = os.path.join(os.path.dirname(__file__), "..", "..", "Calibrator")
 
-# `→` is deliberately excluded: it appears in every function type and would make
-# any data field look like an assumption.
-PROP = r"[=≤<≥>≠∀∃↔]"
-REGIME_OBJECT = (
-    r"(closedPopulation|mutationDriftBalance|Regime|Limit\b|Agreement"
-    r"|FittedSelectionLaw|MomentReading|processAUC)"
+REPO = Path(__file__).resolve().parents[3]
+SOURCE_ROOT = REPO / "proofs" / "Calibrator"
+
+# Names used by the historical result-as-data interfaces.  Exact matching keeps
+# legitimate algebraic fields such as ``stationary`` and ``mass_sum`` legal.
+FORBIDDEN_FIELDS = {
+    "accuracy",
+    "barrier",
+    "complete",
+    "completeness",
+    "freezing",
+    "identification",
+    "limit_adequate",
+    "maximalSpectrum",
+    "recovered_eq",
+    "renormalization",
+    "transferThreshold",
+}
+
+# WHY THIS LIST EXISTS, AND WHY DELETING AN ENTRY IS NOT A FIX.
+#
+# Every name here was a structure whose Prop-valued fields CONTAINED THE DESIRED
+# CONCLUSION, paired with a theorem that reached that conclusion by `rw` or `exact` on one
+# of those fields. `kernelTrivial_of_no_section` applied `D.dichotomy`;
+# `assumedCeiling_collapses_to_support_wall` rewrote with `C.characterization`. The
+# statement's content was the assumption, so it was not a theorem of this corpus.
+#
+# Naming such a structure `Assumed...` does not repair it. That is why
+# `AssumedDeploymentCeiling` and `AssumedMembraneThreshold` are on this list despite having
+# been honestly named: an honest name on a restatement still yields a restatement.
+#
+# THE ENTRIES ARE NOT STALE CRUFT. A name here means the structure was deleted deliberately
+# and must not return. If `check_regimes` fails on one of these, something reintroduced it,
+# and the repair is to remove the reintroduction — NOT to prune the list. Pruning restores
+# the blindness rather than fixing the break, which is the failure mode every guard in this
+# corpus has eventually suffered.
+#
+# The honest alternative, when the underlying input is real, is the one used in
+# `Calibrator.BundleRigidity.DeploymentCeiling`: state the input as a TYPED HYPOTHESIS of
+# the theorem that needs it, so it appears in the signature and cannot be forgotten, and
+# leave the unproved direction as a named gap with no theorem attached. A used hypothesis
+# is an argument of the theorem that needs it; an unused one in a record is decoration.
+FORBIDDEN_STRUCTURES = {
+    "AtomicCramerFailure",
+    "AssumedDeploymentCeiling",
+    "AssumedMembraneThreshold",
+    "BundleDichotomy",
+    "ChaosSpectroscopy",
+    "CycleDeterminacy",
+    "FittedSelectionLaw",
+    "FreezingTransition",
+    "GaussianLiabilityRegime",
+    "GenotypeChaosLimits",
+    "InfiniteIslandLimit",
+    "LDBandIntegralIdentification",
+    "LinearArchitectureCertificateAssumptions",
+    "MarkovModulatedChain",
+    "MeanAbsoluteEffectCertificateAssumptions",
+    "MellinProfile",
+    "MomentReading",
+    "ObservableDegradation",
+    "ObservableTower",
+    "PGSBenDavidCertificate",
+    "PowerAgreement",
+    "RecoveryAttenuation",
+    "ScaleSequence",
+    "SubthresholdPCCertificate",
+    "TowerRigidity",
+    "TransferThreshold",
+    "TwoPointIdentification",
+    "VertexWeightCompleteness",
+}
+
+BLOCK_COMMENT = re.compile(r"/-.*?-/", re.S)
+STRUCTURE = re.compile(
+    r"^structure\s+([A-Za-z_][A-Za-z0-9_']*)[^\n]*\swhere\n"
+    r"((?:(?:[ \t]+[^\n]*)?\n)*)",
+    re.M,
 )
-FAILURE = (
-    r"(cannot_reach|_excess|indistinguishable|negative_of|vacuous|_lt_"
-    r"|_le_inv|not_reach|_eq_of_lt_one)"
-)
+FIELD = re.compile(r"^[ \t]+([A-Za-z_][A-Za-z0-9_']*)\s*:\s*([^\n]+)$", re.M)
 
 
-def strip_comments(text):
-    """Remove docstrings and block comments so prose cannot look like a declaration."""
-    return re.sub(r"/-[-!]?(?:.|\n)*?-/", "", text)
+def main() -> None:
+    violations = []
+    for path in sorted(SOURCE_ROOT.rglob("*.lean")):
+        text = BLOCK_COMMENT.sub("", path.read_text(encoding="utf-8"))
+        for match in STRUCTURE.finditer(text):
+            structure = match.group(1)
+            rel = path.relative_to(REPO)
+            if structure in FORBIDDEN_STRUCTURES:
+                violations.append(f"{rel}: forbidden result carrier {structure}")
+            for field, type_text in FIELD.findall(match.group(2)):
+                if field in FORBIDDEN_FIELDS:
+                    violations.append(
+                        f"{rel}: {structure}.{field} packages an advertised result"
+                    )
+                if type_text.strip() == "Prop":
+                    violations.append(
+                        f"{rel}: {structure}.{field} is a content-free bare Prop switch"
+                    )
 
-
-def load():
-    sources = {}
-    for base, _, names in os.walk(ROOT):
-        for name in names:
-            if name.endswith(".lean"):
-                path = os.path.join(base, name)
-                with open(path, encoding="utf-8") as handle:
-                    sources[path] = handle.read()
-    return sources
-
-
-def collect(sources):
-    code = {p: strip_comments(s) for p, s in sources.items()}
-
-    carriers = {}
-    for text in code.values():
-        for m in re.finditer(
-            r"^structure\s+([\w.']+)[^\n]*\swhere\n((?:[ \t]+[^\n]*\n|\n)*)", text, re.M
-        ):
-            fields = re.findall(r"^[ \t]+([\w']+)\s*:[^\n]*" + PROP, m.group(2), re.M)
-            if fields:
-                carriers[m.group(1)] = fields[0]
-
-    theorems = []
-    for text in code.values():
-        for m in re.finditer(
-            r"^(?:@\[[^\]]*\]\s*)?theorem\s+([\w.']+)((?:.|\n)*?):=", text, re.M
-        ):
-            theorems.append((m.group(1), m.group(2)))
-
-    forms = []
-    for path, text in sources.items():
-        for m in re.finditer(
-            r"(/--(?:.|\n)*?-/)\n"
-            r"((?:noncomputable |private |protected )*(?:def|abbrev)\s+([\w.']+))"
-            r"((?:.|\n)*?):=",
-            text,
-        ):
-            doc = m.group(1)
-            if "FALSIFIED" in doc or "CONDITIONALLY VALID" in doc:
-                forms.append((m.group(3), m.group(4), os.path.basename(path)))
-    return carriers, theorems, sorted(set(forms))
-
-
-def witness(name, signature, carriers, theorems, forms, depth=0, seen=None):
-    seen = seen or set()
-    if name in seen or depth > 2:
-        return None
-    seen.add(name)
-    last = name.split(".")[-1]
-
-    for struct, field in carriers.items():
-        if struct in signature or name.startswith(struct + "."):
-            return "signature %s.%s" % (struct, field)
-
-    mentions = re.compile(r"(?<![\w'])" + re.escape(last) + r"(?![\w'])")
-    for tname, tstmt in theorems:
-        if (mentions.search(tname) or mentions.search(tstmt)) and re.search(
-            REGIME_OBJECT, tname + tstmt
-        ):
-            return "regime-tie %s" % tname
-    for tname, tstmt in theorems:
-        if (mentions.search(tname) or mentions.search(tstmt)) and re.search(
-            FAILURE, tname
-        ):
-            return "proved-failure %s" % tname
-
-    # One closed form may inherit its regime from another it is equated to.
-    for tname, tstmt in theorems:
-        if not (mentions.search(tname) or mentions.search(tstmt)):
-            continue
-        for other, other_sig, _ in forms:
-            if other == name:
-                continue
-            if re.search(
-                r"(?<![\w'])" + re.escape(other.split(".")[-1]) + r"(?![\w'])", tstmt
-            ):
-                found = witness(
-                    other, other_sig, carriers, theorems, forms, depth + 1, seen
-                )
-                if found:
-                    return "via %s: %s" % (other, found)
-    return None
-
-
-def main():
-    sources = load()
-    if not sources:
-        print("no Lean sources found under %s" % ROOT)
-        return 1
-    carriers, theorems, forms = collect(sources)
-
-    uncovered = []
-    print("%-46s %s" % ("closed form", "regime carrier"))
-    print("-" * 104)
-    for name, signature, _ in forms:
-        found = witness(name, signature, carriers, theorems, forms)
-        if not found:
-            uncovered.append(name)
-        print("%-46s %s" % (name, found or "*** NONE ***"))
-
-    print(
-        "\n%d closed forms marked FALSIFIED or CONDITIONALLY VALID; %d without a carrier"
-        % (len(forms), len(uncovered))
-    )
-    if uncovered:
-        print(
-            "\nEach of these asserts a regime no theorem states. Give it one of the four\n"
-            "forms above, or drop the empirical-status claim from its docstring."
-        )
-        return 1
-    return 0
+    if violations:
+        print("\n".join(violations))
+        raise SystemExit(1)
+    print("NO_EXTERNAL_THEOREM_PARAMETERS\tOK")
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    main()

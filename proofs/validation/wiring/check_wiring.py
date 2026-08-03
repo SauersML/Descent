@@ -50,6 +50,13 @@ import sys
 # The upstream arc: modules whose content is mathematics about coordinate laws,
 # designs and limits rather than about genotypes, phenotypes or study design.
 ARC = {
+    # Added with the horizon/circulation/transplantation/lumping results. Each is
+    # Mathlib-only mathematics with a named biological consumer, and each is listed
+    # here so that the guard -- not a docstring -- is what holds the consumer in place.
+    "HorizonCurve",
+    "CirculationDefect",
+    "TransplantationStability",
+    "LumpedRateBlindness",
     "Condensation",
     "CondensationUnification",
     "CumulantBlindness",

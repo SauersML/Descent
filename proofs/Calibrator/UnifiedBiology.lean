@@ -85,10 +85,8 @@ theorem targetOnlyTransportPerformance_eq_onePoint
     _ = ∑ y, (∑ x, weight x * transition x y) * score y := by
           apply Finset.sum_congr rfl
           intro y _
+          simp_rw [← mul_assoc]
           rw [← Finset.sum_mul]
-          apply Finset.sum_congr rfl
-          intro x _
-          ring
     _ = ∑ y, weight y * score y := by
           apply Finset.sum_congr rfl
           intro y _

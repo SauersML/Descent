@@ -181,15 +181,14 @@ theorem threshold_standardized_coordinate_diff_of_variance_change
 theorem mean_shift_changes_benchmark_high_score_rate
     (threshold μ_S μ_T σ : ℝ)
     (h_σ : 0 < σ)
-    (h_shift : μ_S < μ_T)
-    (hPhiStrict : StrictMono Phi) :
+    (h_shift : μ_S < μ_T) :
     benchmarkHighScoreRate threshold μ_S σ <
       benchmarkHighScoreRate threshold μ_T σ := by
   unfold benchmarkHighScoreRate thresholdStandardizedCoordinate
   have hz : (threshold - μ_T) / σ < (threshold - μ_S) / σ := by
     exact mean_shift_increases_tail threshold μ_S μ_T σ h_σ h_shift
   have hphi : Phi ((threshold - μ_T) / σ) < Phi ((threshold - μ_S) / σ) := by
-    exact hPhiStrict hz
+    exact strictMono_Phi hz
   linarith
 
 /-- **Variance change changes the benchmark high-score rate.**
@@ -201,15 +200,14 @@ theorem variance_change_changes_benchmark_high_score_rate
     (h_σS : 0 < σ_S)
     (_h_σT : 0 < σ_T)
     (h_larger : σ_S < σ_T)
-    (h_thr : 0 < threshold - μ)
-    (hPhiStrict : StrictMono Phi) :
+    (h_thr : 0 < threshold - μ) :
     benchmarkHighScoreRate threshold μ σ_S <
       benchmarkHighScoreRate threshold μ σ_T := by
   unfold benchmarkHighScoreRate thresholdStandardizedCoordinate
   have hz : (threshold - μ) / σ_T < (threshold - μ) / σ_S := by
     exact variance_increase_thickens_tails (threshold - μ) σ_S σ_T h_σS h_larger h_thr
   have hphi : Phi ((threshold - μ) / σ_T) < Phi ((threshold - μ) / σ_S) := by
-    exact hPhiStrict hz
+    exact strictMono_Phi hz
   linarith
 
 end TailProbabilities
@@ -337,59 +335,27 @@ The Gaussian approximation error affects tail probability estimates.
 
 section GaussianApproximation
 
-/-- **Berry-Esseen error decreases with more SNPs.**
-    As the number of SNPs m increases, ρ/σ³ decreases as 1/√m
-    (assuming each SNP contributes comparably).
+/-! Two theorems stood here — `berry_esseen_error_decreases_with_snps` and
+`highly_polygenic_better_gaussian` — both stating the Berry–Esseen bound as
+`C·ρ/(σ_sq·√m)`. That spelling is one power of `σ` short of `Cρ/σ³`, and the second
+theorem's docstring asserted the *correct* form directly above a body that did not
+implement it.
 
-    **Two corrections, both established below in this file; read them before quoting
-    this.** (1) The marker count is the wrong count under linkage: the score behaves
-    like a sum over `m/ℓ` blocks, and the `√ℓ` constant that would convert one to the
-    other is **FALSIFIED** — the excursion-bundle law carries its own `κ`, which can
-    sit on either side of one. (2) The inline derivation in this statement,
-    `m·ρ/(m·σ²)^{3/2} = ρ/(σ²·√m)`, has the wrong power of `σ`; the right-hand side
-    should be `ρ/((σ²)^{3/2}·√m)`.
+They were kept for a while behind candid warnings that the comparison survives the defect,
+since a constant power of `σ` cancels between two marker counts. That is true and it is not
+sufficient: a theorem whose statement is wrong is not repaired by a docstring saying so, and
+a reader quoting the formula gets a factor of `σ` wrong regardless of what the comment said.
+Both are deleted rather than annotated.
 
-    Neither defect makes this theorem false — it compares the bound at two marker
-    counts with everything else fixed, and both a constant and a constant power of `σ`
-    cancel from such a comparison. Anything reading a *number* off it inherits them.
-    Use `berryEsseenBound` and the block-count theorems below instead. -/
-theorem berry_esseen_error_decreases_with_snps
-    (C ρ_per_snp σ_sq_per_snp : ℝ) (m₁ m₂ : ℕ)
-    (h_C : 0 < C) (h_ρ : 0 < ρ_per_snp) (h_σ : 0 < σ_sq_per_snp)
-    (h_m₁ : 0 < m₁)
-    (h_more : m₁ < m₂) :
-    -- Total ρ = m × ρ_per_snp, σ³ = (m × σ²_per_snp)^(3/2)
-    -- Error ∝ m × ρ / (m × σ²)^(3/2) = ρ / (σ² × √m)
-    -- More SNPs → smaller error
-    C * ρ_per_snp / (σ_sq_per_snp * Real.sqrt m₂) <
-      C * ρ_per_snp / (σ_sq_per_snp * Real.sqrt m₁) := by
-  apply div_lt_div_of_pos_left
-  · exact mul_pos h_C h_ρ
-  · exact mul_pos h_σ (Real.sqrt_pos.mpr (Nat.cast_pos.mpr h_m₁))
-  · apply mul_lt_mul_of_pos_left _ h_σ
-    exact Real.sqrt_lt_sqrt (Nat.cast_nonneg _) (Nat.cast_lt.mpr h_more)
+The surviving content is stated below against `berryEsseenBound`, which is defined through
+`Calibrator.Probability.berryEsseenErrorBound` and therefore cannot drift from it:
+`berryEsseenBound_antitone` for the marker-count comparison, and
+`berryEsseenBound_polygenic_lt_oligogenic` for the polygenicity reading of it.
 
-/-- **Gaussian approximation is better for highly polygenic traits.**
-    The Berry-Esseen error scales as C·ρ/(σ³·√m) where m is the number
-    of loci. More loci → smaller error. Any trait with more contributing
-    loci than another will have a better Gaussian approximation.
-
-    Worked example: Height (~10000 loci) has much better Gaussian
-    approximation than an oligogenic trait with ~10 loci.
-
-    **The first sentence states the correct Berry-Esseen form and the body does not
-    implement it**: the body is `C·ρ/(σ²·√m)`, one power of `σ` short, as recorded in
-    the audit note below. And `m` is the marker count, which under linkage is the wrong
-    count — see the same note and the falsified `√ℓ` constant. The comparison proved
-    here survives both, since each defect cancels between the two sides; a numerical
-    reading of the bound does not. -/
-theorem highly_polygenic_better_gaussian
-    (C ρ σ_sq : ℝ) (m_oligo m_poly : ℕ)
-    (h_C : 0 < C) (h_ρ : 0 < ρ) (h_σ : 0 < σ_sq)
-    (h_oligo : 0 < m_oligo)
-    (h_more : m_oligo < m_poly) :
-    C * ρ / (σ_sq * Real.sqrt m_poly) < C * ρ / (σ_sq * Real.sqrt m_oligo) :=
-  berry_esseen_error_decreases_with_snps C ρ σ_sq m_oligo m_poly h_C h_ρ h_σ h_oligo h_more
+The second correction those warnings carried is still live and is *not* addressed by the
+respelling: `m` is the marker count, and under linkage the count that governs is the block
+count `m/ℓ`. See the block-count section below, where the count is VALIDATED and the `√ℓ`
+constant that would convert one to the other is FALSIFIED. -/
 
 /-! ### The count that decides is blocks, not markers — and the constant that does not
 
@@ -446,24 +412,21 @@ replaced.** Measurements in `proofs/validation/block_count/`; positive control (
 three independent generators) reproduces the analytic independent-panel value to
 `1.001 ± 0.003`. -/
 
-/-! ### A defect in the `σ` power, inherited from above
+/-! ### How the `σ` power went wrong, and why the fix is structural
 
-An audit found that this file and `Calibrator.Probability` spell the Berry–Esseen bound
-differently, and **this file's spelling is the wrong one**. `Probability.lean` has
-`C·ρ/(variance·√variance) = Cρ/σ³`, which is correct. The theorems above use
-`C·ρ/(σ_sq·√m) = Cρ/(σ²√m)`, and the inline derivation at
-`berry_esseen_error_decreases_with_snps` states `m·ρ/(m·σ²)^{3/2} = ρ/(σ²·√m)` — the
-right-hand side should be `ρ/((σ²)^{3/2}·√m)`. The docstring of
-`highly_polygenic_better_gaussian` then asserts the *correct* form, `C·ρ/(σ³·√m)`, directly
-above a body that does not implement it.
+An audit found that this file and `Calibrator.Probability` spelled the Berry–Esseen bound
+differently, and **this file's spelling was the wrong one**. `Probability.lean` has
+`C·ρ/(variance·√variance) = Cρ/σ³`, which is correct; this file had `C·ρ/(σ_sq·√m)`.
 
-**Nothing above is thereby false**: those theorems compare the bound at two marker counts
-with everything else held fixed, and a missing constant power of `σ` cancels from such a
-comparison. What is wrong is the *formula*, and anything reading a number off it inherits a
-factor `σ`. `berryEsseenBound` below is the correct spelling, and the block-count theorems
-that follow are stated against it.
+The mechanism is worth keeping even though the defect is gone, because it is the one this
+corpus is most prone to: the bound was written out a second time instead of being called.
+Two alpha-inequivalent bodies for the same quantity, tied by neither a call nor a theorem,
+cannot disagree loudly — they just disagree. Restating the formula correctly would have left
+the same trap for the next edit. So `berryEsseenBound` below is *defined through*
+`Probability.berryEsseenErrorBound`, and `berryEsseenBound_eq` recovers the closed form as a
+theorem. The two files can no longer drift, because there is only one body.
 
-Empirical status: DERIVED. The discrepancy is between two files in this corpus, not against
+Empirical status: DERIVED. The discrepancy was between two files in this corpus, not against
 an experiment. -/
 
 /-- **The Berry–Esseen bound at `m` summands**, defined *through* the existing
@@ -495,6 +458,28 @@ theorem berryEsseenBound_antitone (C ρ σ_sq m₁ m₂ : ℝ)
   rw [berryEsseenBound_eq, berryEsseenBound_eq]
   apply div_lt_div_of_pos_left (mul_pos hC hρ) (by positivity)
   exact mul_lt_mul_of_pos_left hlt (by positivity)
+
+/-- **The polygenicity reading of the bound**, restated against the correct spelling.
+
+    A trait with more contributing loci has the smaller Berry–Esseen bound, all else held
+    fixed. This replaces `highly_polygenic_better_gaussian`, which proved the same comparison
+    against a formula one power of `σ` short; see the deletion note in the Gaussian
+    approximation section above.
+
+    Two limits on how far this may be read, both of which the deleted version obscured:
+
+    * It compares *bounds*, not approximation qualities. A smaller Berry–Esseen bound does
+      not entail a smaller actual distributional distance, only a smaller certificate of one.
+    * `m` is a summand count. Under linkage the markers are not the summands — the block
+      count `m/ℓ` is — so applying this at marker counts requires the blocks to be the
+      markers. The block-count section below is where that is treated, and the `√ℓ` constant
+      that would convert between the two counts is FALSIFIED, so there is no general
+      conversion to fall back on. -/
+theorem berryEsseenBound_polygenic_lt_oligogenic (C ρ σ_sq m_oligo m_poly : ℝ)
+    (hC : 0 < C) (hρ : 0 < ρ) (hσ : 0 < σ_sq) (h_oligo : 0 < m_oligo)
+    (h_more : m_oligo < m_poly) :
+    berryEsseenBound C ρ σ_sq m_poly < berryEsseenBound C ρ σ_sq m_oligo :=
+  berryEsseenBound_antitone C ρ σ_sq m_oligo m_poly hC hρ hσ h_oligo h_more
 
 section BlockCount
 

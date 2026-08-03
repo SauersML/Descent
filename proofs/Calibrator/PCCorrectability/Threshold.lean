@@ -20,11 +20,9 @@ noncomputable def effectiveSubgroupSize (n m : ℝ) : ℝ := m * (n - m) / n
 the sum of the reciprocals of the subgroup and its complement. This pins the body — a
 scaled, shifted, negated or `n`/`m`-transposed version of `m(n-m)/n` fails it — which is
 why it is stated. Every other theorem mentioning `effectiveSubgroupSize` has it on both
-sides of an equation, where it cancels: `neiContrastSpike_eq_contrastVariance_mul_effectiveSize`
-in `Conventions.lean` and the `neiContrastSpikeIdentification` certificate built from it constrain
-the factor `4` and the scale of `F`, and constrain this definition not at all. The
-certificate census recorded that pair as VACUOUS_FOR `effectiveSubgroupSize` and this
-lemma is the repair; the certificate is sound for what it does certify, so it stays. -/
+sides of an equation, where it cancels. The direct contrast-variance theorem in
+`Conventions.lean` constrains the factor `4` and the scale of `F`, but does not constrain
+this definition. The reciprocal identity below is the independent repair. -/
 theorem inv_effectiveSubgroupSize (n m : ℝ)
     (hm : m ≠ 0) (hnm : n - m ≠ 0) :
     (effectiveSubgroupSize n m)⁻¹ = m⁻¹ + (n - m)⁻¹ := by

@@ -137,7 +137,7 @@ theorem mOne_eq_of_le_half {p : ℝ} (hp : 0 < p) (hhalf : p ≤ 1 / 2) :
   field_simp
 
 /-- **On `(0, 1/2]` the second modulus curve is `(1 - 2p)/(1 - p)`.** -/
-theorem mTwo_eq_of_le_half {p : ℝ} (hp : 0 < p) (hhalf : p ≤ 1 / 2) :
+theorem mTwo_eq_of_le_half {p : ℝ} (hhalf : p ≤ 1 / 2) :
     mTwo p = (1 - 2 * p) / (1 - p) := by
   unfold mTwo
   rw [abs_of_nonneg (by linarith)]
@@ -244,9 +244,8 @@ theorem chain_identity_right (k : ℕ) :
       field_simp at hcontra; linarith
     linarith
   rw [div_eq_iff hdne, chain]
-  first
-    | (field_simp; ring)
-    | field_simp
+  field_simp
+  ring
 
 /-- **The chain identity, as the source states it:**
 `1 / P (k+1) - 2 = 1 / (k+1) = (1 - 2 P k) / (1 - P k)`. -/

@@ -161,6 +161,12 @@ jobs:
       - name: Build project
         run: lake build Calibrator
 
+      - name: Verify transitive axiom closure
+        run: lake env lean proofs/validation/invariants/AxiomScan.lean
+
+      - name: Audit theorem-valued structure fields
+        run: lake env lean proofs/validation/inflation/Inflation.lean
+
   auto-close-failed-proof-pr:
     runs-on: ubuntu-latest
     needs: prove

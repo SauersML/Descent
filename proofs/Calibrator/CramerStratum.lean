@@ -59,16 +59,16 @@ Two halves, with different status here:
   `not_cramer_of_lattice` applied to the genotype coordinate, and it is not provable in
   that file without this one — the return of `|φ|²` to one at the frequencies `2πn/h`
   has no counterpart in the spectroscopy machinery.
-* **General atomic: carried as a hypothesis.** The nonlattice atomic case needs
+* **General atomic: not yet formalized.** The nonlattice atomic case needs
   Kronecker's theorem on *simultaneous* Diophantine approximation — for gaps `1` and
   `√2` one needs `t ≈ 2πm` and `t√2 ≈ 2πn` at once — and mathlib carries only the
   one-dimensional statement (`denseRange_zsmul_iff` and the `AddCircle` ergodic
   results); every `Kronecker` in mathlib is the matrix product. There is no elementary
   shortcut: the mean-value route gives
   `lim (1/2T) ∫_{-T}^{T} |φ|² = ∑_v w_v²`, which is bounded away from one and so says
-  nothing about the limsup. So the recurrence is a field of
-  `AtomicCramerFailure` rather than a theorem, which puts the Diophantine input where a
-  reader can see it is an input.
+  nothing about the limsup.  The repository therefore makes no general nonlattice-atomic
+  theorem until the simultaneous-approximation proof is formalized; it does not accept
+  recurrence as a caller-supplied theorem.
 
 ## Why this matters for genotypes
 
@@ -162,10 +162,7 @@ theorem charFnSq_eq_one_of_lattice (w a : V → ℝ) (hw : ∑ v, w v = 1)
     have hrw : 2 * Real.pi * (n : ℝ) / h * (h * (k : ℝ))
         = (((n : ℤ) * k : ℤ) : ℝ) * (2 * Real.pi) := by
       push_cast
-      first
-        | (field_simp; ring)
-        | field_simp
-        | ring
+      field_simp
     rw [hrw]
     exact Real.cos_int_mul_two_pi _
   simp_rw [hterm, mul_one]
@@ -201,46 +198,6 @@ theorem not_cramer_of_lattice (w a : V → ℝ) (hw : ∑ v, w v = 1)
 
 end Lattice
 
-section GeneralAtomic
-
-variable {V : Type*} [Fintype V]
-
-/-- **The general atomic case, with its Diophantine input named.**
-
-For a finitely supported law with incommensurable gaps the characteristic function is
-Bohr almost periodic and therefore recurrent, so it returns arbitrarily close to one at
-arbitrarily large frequencies. That recurrence is Kronecker's simultaneous
-approximation theorem, which mathlib does not carry (only the one-dimensional
-`denseRange_zsmul_iff`), so it is a field here rather than a proof.
-
-`recurrence` is exactly the statement that `limsup |φ|² = 1`: for every tolerance and
-every threshold there is a frequency past the threshold at which the squared modulus is
-within the tolerance of one.
-
-Empirical status: DERIVED, conditional on the named field. The consequence
-`not_cramer_of_recurrence` is proved; the recurrence itself is standard harmonic
-analysis carried as a hypothesis, not a measurement, and has no free parameter. -/
-structure AtomicCramerFailure (V : Type*) [Fintype V] where
-  /-- Probability of each atom. -/
-  weight : V → ℝ
-  /-- Value of each atom. -/
-  value : V → ℝ
-  /-- The weights are a probability vector. -/
-  weight_sum : ∑ v, weight v = 1
-  /-- **Kronecker input.** Almost-periodic recurrence of the characteristic function. -/
-  recurrence : ∀ ε : ℝ, 0 < ε → ∀ T : ℝ, ∃ t : ℝ, T ≤ |t| ∧ 1 - ε ≤ charFnSq weight value t
-
-/-- **Recurrence defeats Cramér's condition.** Given the almost-periodic return, no
-eventual bound strictly below one can hold: take the tolerance to be half the gap. -/
-theorem not_cramer_of_recurrence (A : AtomicCramerFailure V) :
-    ¬ CramerCondition A.weight A.value := by
-  rintro ⟨c, T, hc, hbound⟩
-  obtain ⟨t, ht, hge⟩ := A.recurrence ((1 - c) / 2) (by linarith) T
-  have hle := hbound t ht
-  linarith
-
-end GeneralAtomic
-
 section HardCalls
 
 /-- **A Hardy-Weinberg locus whose coordinate values are equally spaced is outside the
@@ -266,9 +223,8 @@ other way, and the arrow above stays a citation on purpose: reversing it would b
 cycle. Do not add an import of `PolygenicSpectroscopy` here.
 
 The general statement — that a hard call is outside the stratum at *every* polymorphic
-frequency, not only where the values happen to be equally spaced — is
-`not_cramer_of_recurrence` applied to the three-point law, and needs the Kronecker
-field. -/
+frequency, not only where the values happen to be equally spaced — remains unformalized
+until the required simultaneous-approximation theorem is proved from Mathlib primitives. -/
 theorem hwe_not_cramer_of_lattice (hwe : HardyWeinbergModel)
     (a : DiploidGenotype → ℝ)
     (h : ℝ) (hh : 0 < h) (hlat : ∀ u v : DiploidGenotype, ∃ k : ℤ, a u - a v = h * k) :

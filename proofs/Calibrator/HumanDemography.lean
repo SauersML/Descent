@@ -1,4 +1,5 @@
 import Calibrator.PortabilityDrift
+import Calibrator.LumpedRateBlindness
 
 namespace Calibrator
 
@@ -268,5 +269,54 @@ theorem sharedLD_le_observed_div_driftRetention
   linarith [hge]
 
 end AttributionToTagging
+
+/-! ## A demographic parameter this file could never have fitted
+
+The results above attribute the portability gap between measured parameters: `F_ST`, effective
+size, migration rate, shared tagging. `Calibrator.LumpedRateBlindness` marks off a parameter that
+is not merely hard to measure but **absent from the observable law**.
+
+Take three demes in which two share a covariance signature. The direct exchange rate between those
+two is invisible: the observable class is closed under the dynamics, and on that class the
+generator does not depend on the exchange rate at all. Every moment of every order at every set of
+times is identical across the whole family. The identified set is the full range.
+
+Three practical consequences. A demographic fit that reports such a rate is reporting its prior,
+because the likelihood is flat along that coordinate. The blindness is exact, so it is also a
+test: a method that returns different rates for datasets with the same observable law is defective
+in a way detectable without new data. And it is symmetry rather than degeneracy — the invisible
+direction is the antisymmetric mode of the two lumped demes — so the repair is to break the
+lumping with any observable that separates them, not to collect more samples under it.
+
+This is `Calibrator.DeclaredInteractionClass` arriving in demography: identification here is
+relative to a declaration or it does not exist. -/
+
+section UnidentifiableExchange
+
+/-- **The exchange rate between two covariance-indistinguishable demes is unidentifiable.**
+
+    Instance of `lumped_dynamics_blind_to_exchange`: the entire observable trajectory, at every
+    order, is constant along the exchange-rate coordinate. Not poorly estimated — not estimated.
+
+    Empirical status: DERIVED. Whether a given pair of human populations is lumpable at the
+    resolution of the observable is the empirical question this result asks to be answered
+    explicitly rather than assumed. -/
+theorem indistinguishableDemes_exchangeRate_unidentifiable
+    (hubRate exchange exchange' : ℝ) (observable : Fin 3 → ℝ) (hlump : Lumped observable)
+    (order : ℕ) :
+    generatorIter (demeRate hubRate exchange) observable order =
+      generatorIter (demeRate hubRate exchange') observable order :=
+  lumped_dynamics_blind_to_exchange hubRate exchange exchange' observable hlump order
+
+/-- The mechanism, in one identity: gene flow out of the hub never sees the leaf-to-leaf channel.
+
+    Empirical status: DERIVED. -/
+theorem hubFlow_carries_no_exchange_information
+    (hubRate exchange : ℝ) (observable : Fin 3 → ℝ) (hlump : Lumped observable) :
+    generatorApply (demeRate hubRate exchange) observable 0
+      = 2 * hubRate * (observable 1 - observable 0) :=
+  hubDrift_has_no_exchange_rate hubRate exchange observable hlump
+
+end UnidentifiableExchange
 
 end Calibrator

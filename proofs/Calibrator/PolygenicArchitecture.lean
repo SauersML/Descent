@@ -524,44 +524,94 @@ theorem boundedEffectCarrier_convex (q : ℕ) (B : ℝ) :
   convex_closedBall 0 |B|
 
 open Calibrator.CertificateGrading in
-/-- Numerical specification of certificate values for mean absolute effects.
-No field has type `Prop`. -/
-structure MeanAbsoluteEffectCertificateProblem (q : ℕ) where
+/-- A finite catalogue of additive architectures and a numerical discrepancy
+between mixture experiments.  No field has type `Prop`, and in particular the
+graded modulus is not supplied by the caller: it is derived below as a
+supremum over moment-matched prior pairs. -/
+structure MeanAbsoluteEffectCertificateProblem (q n : ℕ) where
   effectRadius : ℝ
-  rawModulus : ℕ → ℝ → ℝ
+  architecture : Fin (n + 1) → Fin q → ℝ
+  pairDiscrepancy :
+    FinitePrior n → FinitePrior n → ℝ
   logScale : ℝ
 
 namespace MeanAbsoluteEffectCertificateProblem
 
 open Calibrator.CertificateGrading
 
-noncomputable def effects {q : ℕ} (P : MeanAbsoluteEffectCertificateProblem q) :
+noncomputable def effects {q n : ℕ} (P : MeanAbsoluteEffectCertificateProblem q n) :
     Set (Fin q → ℝ) := boundedEffectCarrier q P.effectRadius
 
-noncomputable def calculus {q : ℕ} (P : MeanAbsoluteEffectCertificateProblem q) :
-    CertificateCalculus := explicitCalculus P.rawModulus P.logScale
+/-- Signed effect moment used by grade matching.  Grade two, for example,
+matches the catalogue-average signed effect and squared-effect mass before it
+tries to separate the nonsmooth mean-absolute-effect target. -/
+noncomputable def architectureMoment {q n : ℕ}
+    (P : MeanAbsoluteEffectCertificateProblem q n) (r : ℕ)
+    (i : Fin (n + 1)) : ℝ :=
+  ∑ j, (P.architecture i j) ^ (r + 1)
 
-noncomputable def target {q : ℕ} (_P : MeanAbsoluteEffectCertificateProblem q) :
-    (Fin q → ℝ) → ℝ := meanAbsoluteEffect
+noncomputable def finiteProblem {q n : ℕ}
+    (P : MeanAbsoluteEffectCertificateProblem q n) :
+    FiniteMomentCertificateProblem n where
+  target i := meanAbsoluteEffect (P.architecture i)
+  moment := P.architectureMoment
+  pairDiscrepancy := P.pairDiscrepancy
 
-@[simp] theorem target_eq {q : ℕ} (P : MeanAbsoluteEffectCertificateProblem q)
-    (beta : Fin q → ℝ) : P.target beta = meanAbsoluteEffect beta := rfl
+noncomputable def calculus {q n : ℕ}
+    (P : MeanAbsoluteEffectCertificateProblem q n) : CertificateCalculus :=
+  explicitCalculus P.finiteProblem.modulus P.logScale
 
-theorem effects_nonempty {q : ℕ} (P : MeanAbsoluteEffectCertificateProblem q) :
+@[simp] theorem finiteProblem_target {q n : ℕ}
+    (P : MeanAbsoluteEffectCertificateProblem q n) (i : Fin (n + 1)) :
+    P.finiteProblem.target i = meanAbsoluteEffect (P.architecture i) := rfl
+
+@[simp] theorem architectureMoment_zero {q n : ℕ}
+    (P : MeanAbsoluteEffectCertificateProblem q n) (i : Fin (n + 1)) :
+    P.architectureMoment 0 i = ∑ j, P.architecture i j := by
+  simp [architectureMoment]
+
+@[simp] theorem architectureMoment_one {q n : ℕ}
+    (P : MeanAbsoluteEffectCertificateProblem q n) (i : Fin (n + 1)) :
+    P.architectureMoment 1 i = ∑ j, (P.architecture i j) ^ 2 := by
+  simp [architectureMoment]
+
+/-- **What grade two means biologically.**  It is not a label or a theorem
+parameter: the two mixture priors have equal expected signed-effect sum and
+equal expected squared-effect mass across the architecture catalogue.  The
+nonsmooth target they may still separate is mean absolute effect. -/
+theorem momentMatched_two_iff {q n : ℕ}
+    (P : MeanAbsoluteEffectCertificateProblem q n)
+    (A B : FinitePrior n) :
+    P.finiteProblem.MomentMatched 2 A B ↔
+      FinitePrior.mean A (fun i ⇒ ∑ j, P.architecture i j) =
+          FinitePrior.mean B (fun i ⇒ ∑ j, P.architecture i j) ∧
+        FinitePrior.mean A (fun i ⇒ ∑ j, (P.architecture i j) ^ 2) =
+          FinitePrior.mean B (fun i ⇒ ∑ j, (P.architecture i j) ^ 2) := by
+  constructor
+  · intro h
+    constructor
+    · simpa [finiteProblem, architectureMoment] using h 0 (by omega)
+    · simpa [finiteProblem, architectureMoment] using h 1 (by omega)
+  · rintro ⟨h0, h1⟩ r hr
+    interval_cases r
+    · simpa [finiteProblem, architectureMoment] using h0
+    · simpa [finiteProblem, architectureMoment] using h1
+
+theorem effects_nonempty {q n : ℕ} (P : MeanAbsoluteEffectCertificateProblem q n) :
     P.effects.Nonempty := boundedEffectCarrier_nonempty q P.effectRadius
 
-theorem effects_convex {q : ℕ} (P : MeanAbsoluteEffectCertificateProblem q) :
+theorem effects_convex {q n : ℕ} (P : MeanAbsoluteEffectCertificateProblem q n) :
     Convex ℝ P.effects := boundedEffectCarrier_convex q P.effectRadius
 
 /-- Exact biological specialization of the completeness criterion. -/
-theorem complete_iff_gradeInsensitive {q : ℕ}
-    (P : MeanAbsoluteEffectCertificateProblem q) (K : ℕ) (h : ℝ) :
+theorem complete_iff_gradeInsensitive {q n : ℕ}
+    (P : MeanAbsoluteEffectCertificateProblem q n) (K : ℕ) (h : ℝ) :
     P.calculus.IsComplete K h ↔ P.calculus.GradeInsensitive K h :=
   isComplete_iff_gradeInsensitive P.calculus K h
 
 /-- Exact Bernstein-type invariant for the mean-absolute-effect problem. -/
-theorem deficit_eq_modulusRatio_sq {q : ℕ}
-    (P : MeanAbsoluteEffectCertificateProblem q) (K : ℕ) (h : ℝ) :
+theorem deficit_eq_modulusRatio_sq {q n : ℕ}
+    (P : MeanAbsoluteEffectCertificateProblem q n) (K : ℕ) (h : ℝ) :
     P.calculus.deficit K h =
       (P.calculus.modulus.Δ 0 h / P.calculus.modulus.Δ K h) ^ 2 :=
   deficit_eq_modulus_ratio_sq P.calculus K h
@@ -572,9 +622,9 @@ end MeanAbsoluteEffectCertificateProblem
 
     Order `1 / log q` at `q` variants. This declaration records the analytic benchmark used
     for mean absolute effect in the Gaussian sequence model over a bounded effect class. It
-    does not prove that benchmark; a concrete biological model must supply it through
-    `MeanAbsoluteEffectCertificateAssumptions.incompleteness`. It is a comparison curve,
-    not a proved minimax law for the biological models in this repository.
+    does not prove that benchmark. A concrete biological experiment must derive it from
+    its mixture law and the modulus above. It is a comparison curve, not a proved minimax
+    law for the biological models in this repository.
 
     Empirical status: UNTESTED. -/
 noncomputable def logarithmicRiskBenchmark (q : ℝ) : ℝ := 1 / Real.log q

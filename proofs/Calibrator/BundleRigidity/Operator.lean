@@ -463,12 +463,6 @@ theorem tauEven_eq_of_agree_on_invariants {τ : C(T, T)} (hinv : ∀ t : T, τ (
 
 end BundleFamily
 
-/-! ## Standing modelling hypotheses, carried as named fields
-
-House style: an input the development does not establish appears as a named field of a
-structure, so that anything derived from it says so in its own type rather than in prose.
--/
-
 /-! ## The standing modelling limitation, in prose
 
 A `StandingHypotheses` structure used to sit here with `independentCoordinates : Prop` and

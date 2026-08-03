@@ -64,13 +64,15 @@ def constsOf (e : Expr) : NameSet :=
         generated for it, and each of those mentions `S.mk` -- so scanning all
         constants for the constructor marks every structure as built. -/
 def userWritten (env : Environment) (n : Name) : Bool :=
-  !n.isInternal
+  !n.isInternalDetail
   && !(env.isProjectionFn n)
   && (match n with
-      | .str _ f => !(["mk", "injEq", "eta", "sizeOf", "noConfusion",
-                       "noConfusionType", "rec", "recOn", "casesOn", "brecOn",
-                       "below", "ndrec", "toCtorIdx", "ofNat", "sizeOf_spec",
-                       "mk.sizeOf_spec", "ext", "ext_iff"].contains f)
+      | .str _ f => !(f.startsWith "eq_" || f.startsWith "proof_" ||
+                       f.startsWith "match_" ||
+                       ["mk", "injEq", "eta", "sizeOf", "noConfusion",
+                        "noConfusionType", "rec", "recOn", "casesOn", "brecOn",
+                        "below", "ndrec", "toCtorIdx", "ofNat", "sizeOf_spec",
+                        "mk.sizeOf_spec", "ext", "ext_iff"].contains f)
       | _ => false)
 
 /-- Record every carrier whose CONSTRUCTOR appears among these constants.
@@ -159,8 +161,9 @@ def run : MetaM Unit := do
     IO.println s!"      consumes: {f}   [carrier instance built: {builtInstances.contains f.getPrefix}]"
   IO.println ""
   IO.println "=== PATTERNS 2/3: the proof MENTIONS an assumed field"
-  IO.println s!"    {usesHits.size} theorem(s)"
-  for (t, f) in usesHits.toList.take 80 do
+  let usedTheorems := usesHits.foldl (fun s (t, _) => s.insert t) NameSet.empty
+  IO.println s!"    {usedTheorems.size} distinct theorem(s), {usesHits.size} theorem/field pair(s)"
+  for (t, f) in usesHits do
     IO.println s!"  {t}   [{← whereIs env t}]  <- {f}"
   IO.println ""
   IO.println "=== PATTERN 4: assumption-carrying structures with NO instance built"

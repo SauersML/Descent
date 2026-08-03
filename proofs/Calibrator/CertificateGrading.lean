@@ -1,5 +1,6 @@
 import Mathlib.Tactic
 import Mathlib.Analysis.SpecialFunctions.Exp
+import Mathlib.Probability.ProbabilityMassFunction.Constructions
 
 /-!
 # Graded certificate calculus without theorem-valued inputs
@@ -27,6 +28,101 @@ in the repository.  A citation is never accepted as a theorem parameter.
 -/
 
 namespace Calibrator.CertificateGrading
+
+open scoped BigOperators
+
+/-! ## The certificate object itself
+
+The numerical calculus below is useful only after saying what its modulus is.
+The following definitions make the usual mixture-versus-mixture construction
+literal.  A prior is Mathlib's canonical probability mass function on a
+nonempty finite support, including boundary priors with zero-mass atoms.  Thus
+there is no caller-supplied mass or positivity theorem.  Grade `K` means equality of
+the moments with indices `< K`.  The statistical experiment enters only
+through a numerical discrepancy, and the modulus is the supremum of target
+separations among feasible pairs.
+
+This is the non-vacuous grading interface: removing the grade constraint gives
+the ungraded optimization, while increasing the grade shrinks the feasible
+set.  Any claim about the *value* or *rate* of the resulting modulus still has
+to be proved for the particular experiment.
+-/
+
+/-- A probability law on `n + 1` support points.  This is an alias of
+Mathlib's `PMF`, not a custom structure carrying theorem fields. -/
+abbrev FinitePrior (n : ℕ) := PMF (Fin (n + 1))
+
+namespace FinitePrior
+
+variable {n : ℕ}
+
+/-- Real-valued mass of an atom. -/
+noncomputable def probability (P : FinitePrior n) (i : Fin (n + 1)) : ℝ :=
+  (P i).toReal
+
+theorem probability_nonneg (P : FinitePrior n) (i : Fin (n + 1)) :
+    0 ≤ FinitePrior.probability P i :=
+  ENNReal.toReal_nonneg
+
+/-- Expectation of a function under the derived prior. -/
+noncomputable def mean (P : FinitePrior n) (f : Fin (n + 1) → ℝ) : ℝ :=
+  ∑ i, FinitePrior.probability P i * f i
+
+end FinitePrior
+
+/-- Numerical ingredients of a finite fuzzy-hypothesis problem.  There are no
+`Prop` fields: validity conditions are derived predicates below. -/
+structure FiniteMomentCertificateProblem (n : ℕ) where
+  target : Fin (n + 1) → ℝ
+  moment : ℕ → Fin (n + 1) → ℝ
+  pairDiscrepancy : FinitePrior n → FinitePrior n → ℝ
+
+namespace FiniteMomentCertificateProblem
+
+variable {n : ℕ} (E : FiniteMomentCertificateProblem n)
+
+/-- The first `K` selected moments of the two priors agree. -/
+def MomentMatched (K : ℕ) (P Q : FinitePrior n) : Prop :=
+  ∀ r < K, FinitePrior.mean P (E.moment r) =
+    FinitePrior.mean Q (E.moment r)
+
+@[simp] theorem momentMatched_zero (P Q : FinitePrior n) :
+    E.MomentMatched 0 P Q := by
+  intro r hr
+  omega
+
+/-- Higher-grade matching implies every lower grade. -/
+theorem momentMatched_mono {K L : ℕ} (hKL : K ≤ L)
+    {P Q : FinitePrior n} (h : E.MomentMatched L P Q) :
+    E.MomentMatched K P Q := by
+  intro r hr
+  exact h r (lt_of_lt_of_le hr hKL)
+
+/-- A pair is usable at information radius `h` when it matches the requested
+moments and its experiment discrepancy is at most `|h|`. -/
+def Feasible (K : ℕ) (h : ℝ) (P Q : FinitePrior n) : Prop :=
+  E.MomentMatched K P Q ∧ |E.pairDiscrepancy P Q| ≤ |h|
+
+/-- Absolute separation of the target functional under two priors. -/
+noncomputable def targetGap (P Q : FinitePrior n) : ℝ :=
+  |FinitePrior.mean P E.target - FinitePrior.mean Q E.target|
+
+theorem targetGap_nonneg (P Q : FinitePrior n) : 0 ≤ E.targetGap P Q :=
+  abs_nonneg _
+
+/-- The grade-`K` modulus: the largest target separation carried by a feasible
+mixture pair.  This definition is the grading; evaluating it is the hard
+problem and cannot be installed as a theorem-valued field. -/
+noncomputable def modulus (K : ℕ) (h : ℝ) : ℝ :=
+  sSup {d : ℝ | ∃ P Q, E.Feasible K h P Q ∧ d = E.targetGap P Q}
+
+/-- The feasible sets are nested in grade. -/
+theorem feasible_mono {K L : ℕ} (hKL : K ≤ L) (h : ℝ)
+    {P Q : FinitePrior n} (hfeas : E.Feasible L h P Q) :
+    E.Feasible K h P Q :=
+  ⟨E.momentMatched_mono hKL hfeas.1, hfeas.2⟩
+
+end FiniteMomentCertificateProblem
 
 /-! ## Total, proof-free input data -/
 

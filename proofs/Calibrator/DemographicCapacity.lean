@@ -83,8 +83,7 @@ The spike level is the standardized contrast variance — pinned by
 `four_neiGst_eq_standardizedContrastVariance`, so the old constant `2`
 cannot be substituted — and the load is the trace-window spike load of the
 subgroup-contrast direction, pinned by `dot_demographicSpikeDirection`.  Both
-factors are now quantities rather than names, which is the whole point of the
-`Identification` mechanism applied to the object that motivated it. -/
+factors are now quantities rather than names, and their equality is proved directly. -/
 theorem neiContrastSpike_eq_contrastVariance_mul_spikeLoad
     {N : ℕ} (m : ℕ) (p₁ p₂ : ℝ) (hmn : m ≤ N) (hN : 0 < N)
     (h : meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) ≠ 0)

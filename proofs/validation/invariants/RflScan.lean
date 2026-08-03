@@ -26,18 +26,6 @@ private partial def rflScanUnderBinders : Expr → Expr
 private def rflScanIsReflProof (e : Expr) : Bool :=
   (rflScanUnderBinders e).getAppFn.isConstOf ``Eq.refl
 
-/-- Modules in the population-genetics slice.  Names are prefixed
-`rflScan` because `slice` and `isReflProof` both collide with
-declarations already in scope once `Calibrator` (and Mathlib
-beneath it) is imported -- the first attempt bound `slice` to
-`Lean.ParserDescr.slice`. -/
-private def rflScanModules : List Name :=
-  [`Calibrator.LDDecayTheory, `Calibrator.Conventions,
-   `Calibrator.PopulationGeneticsFoundations, `Calibrator.DemographicHistory,
-   `Calibrator.DriftRegime, `Calibrator.LongitudinalPortability,
-   `Calibrator.HumanDemography, `Calibrator.AncestrySpecificArchitecture,
-   `Calibrator.AncestrySpecificPower, `Calibrator.GeneticArchitectureDiscovery]
-
 /-- Compiler-generated theorems: equation lemmas (`f.eq_1`), `sizeOf_spec`,
 `injEq`, and friends. They are `rfl` by construction and are not written by
 anyone, so counting them answers a different question than "which HAND-WRITTEN
@@ -60,8 +48,7 @@ run_cmd do
       if (`Calibrator).isPrefixOf name then
         match env.getModuleFor? name with
         | some m =>
-          if rflScanModules.contains m && rflScanIsReflProof ti.value
-              && !rflScanIsGenerated name then
+          if rflScanIsReflProof ti.value && !rflScanIsGenerated name then
             logInfo m!"RFL\t{m}\t{name}"
             n := n + 1
         | none => pure ()

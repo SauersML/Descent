@@ -208,7 +208,7 @@ def no_swallowed_declarations():
     for path in sources:
         src = path.read_text(errors="ignore")
         # strip docstrings and block comments: a `def` inside one is prose, not
-        # a declaration (Identification.lean has exactly this).
+        # a declaration (the retired record-based identification interface had exactly this).
         import lean_parse
         clean, _docs = lean_parse.strip_comments(src)
         rel = str(path.relative_to(PROOFS))

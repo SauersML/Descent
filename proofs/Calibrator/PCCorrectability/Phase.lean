@@ -38,36 +38,9 @@ theorem residual_bias_floor_of_subthreshold_overlap
   unfold EmpiricalPCOverlapModel.residualBiasEnergy
   linarith
 
-/-- A certificate packages the external random-matrix conclusion with the
-finite-sample correction model.  The threshold inequality and overlap envelope
-are kept separate because threshold-to-overlap is the genuinely hard theorem
-for sparse, LD-dependent genotype matrices. -/
-structure SubthresholdPCCertificate extends EmpiricalPCOverlapModel where
-  n : ℝ
-  markers : ℝ
-  differentiation : ℝ
-  subgroupSize : ℝ
-  n_pos : 0 < n
-  markers_pos : 0 < markers
-  differentiation_pos : 0 < differentiation
-  subgroupSize_pos : 0 < subgroupSize
-  subgroupSize_lt_n : subgroupSize < n
-  belowThreshold :
-    demographicSpike n differentiation subgroupSize ≤ bbpProxyThreshold n markers
-  overlapEnvelope : ℝ
-  overlap_bound : ∀ i, overlapSq i ≤ overlapEnvelope ^ 2
-
-/-- Certified sub-threshold structure has both a nonpositive correctability
-margin and the quantitative residual-bias floor implied by its overlap bound. -/
-theorem subthreshold_pc_residual_bias_floor (m : SubthresholdPCCertificate) :
-    pcCorrectabilityMargin m.n m.markers m.differentiation m.subgroupSize ≤ 0 ∧
-      m.confoundingEnergy - (m.k : ℝ) * m.overlapEnvelope ^ 2 ≤
-        m.residualBiasEnergy := by
-  constructor
-  · unfold pcCorrectabilityMargin
-    exact sub_nonpos.mpr m.belowThreshold
-  · exact residual_bias_floor_of_subthreshold_overlap
-      m.toEmpiricalPCOverlapModel m.overlapEnvelope m.overlap_bound
+/-! No sub-threshold random-matrix conclusion is accepted as a certificate field.  The
+algebraic overlap bound above remains reusable; connecting it to an LD-dependent genotype
+matrix requires a proved random-matrix theorem in this repository. -/
 
 /-- Exact one-step bias--variance accounting for adding an empirical PC. -/
 theorem pc_step_total_error_change

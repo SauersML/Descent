@@ -75,6 +75,10 @@ import Calibrator.SpectralDegradation
 import Calibrator.EnsembleChannel
 import Calibrator.Permeability
 import Calibrator.ErgodicCovariancePencil
+import Calibrator.HorizonCurve
+import Calibrator.CirculationDefect
+import Calibrator.LumpedRateBlindness
+import Calibrator.TransplantationStability
 import Calibrator.UnifiedBiology
 -- THE BUILD MUST COVER ITS OWN CORPUS. Everything below was outside this root's import
 -- closure, so `lake build Calibrator` never compiled it -- and a module the build never
@@ -103,6 +107,7 @@ import Calibrator.BundleRigidity.Coverage
 import Calibrator.BundleRigidity.Cycles
 import Calibrator.BundleRigidity.DeploymentCeiling
 import Calibrator.BundleRigidity.Dichotomy
+import Calibrator.BundleRigidity.LinearSCM
 import Calibrator.BundleRigidity.Operator
 import Calibrator.BundleRigidity.SingleModulus
 import Calibrator.BundleRigidity.Telescope

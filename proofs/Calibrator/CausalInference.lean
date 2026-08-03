@@ -76,8 +76,10 @@ Until those exist, **the biological readings in the docstrings below are interpr
 arithmetic, not consequences of a causal model**, and the file name is retained only
 because renaming a file is a larger change than this commit makes.
 
-The corpus's own `Identification.lean` warns that giving a biological name to a formula
-makes a false interpretation look machine-checked. This file was that warning's specimen.
+The corpus-wide no-external-theorem-parameter rule warns that giving a biological name to a
+formula makes a false interpretation look machine-checked. This file was that warning's
+specimen; the former record-based identification interface was deleted because callers could
+install the desired conclusion as data.
 
 Reference for the biological setting (not for any theorem here):
 Wang et al. (2026), Nature Communications 17:942.

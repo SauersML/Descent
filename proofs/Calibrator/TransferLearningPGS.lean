@@ -3,6 +3,7 @@ import Calibrator.PortabilityDrift
 import Mathlib.Algebra.Order.Chebyshev
 import Mathlib.LinearAlgebra.Matrix.Symmetric
 import Calibrator.OpenQuestions
+import Calibrator.TransplantationStability
 
 namespace Calibrator
 
@@ -617,56 +618,66 @@ section ImportanceWeighting
 noncomputable def importanceWeightESS (sum_w sum_w_sq : ℝ) : ℝ :=
   sum_w ^ 2 / sum_w_sq
 
-/-- IW ESS ≤ n (unweighted). -/
-theorem iw_ess_le_n
-    (n sum_w sum_w_sq : ℝ)
-    (h_cauchy_schwarz : sum_w ^ 2 ≤ n * sum_w_sq)
-    (h_sw_pos : 0 < sum_w_sq) :
-    importanceWeightESS sum_w sum_w_sq ≤ n := by
+/-- **IW ESS ≤ n, from an actual weight vector, with Cauchy-Schwarz proved.**
+
+    `iw_ess_le_n` used to state this for free scalars `sum_w` and `sum_w_sq` and take
+    `sum_w ^ 2 ≤ n * sum_w_sq` as a hypothesis. That hypothesis is Cauchy-Schwarz, which
+    is the only mathematical content the bound has; assuming it left the theorem as
+    `div_le_iff₀`, and left `n`, `sum_w` and `sum_w_sq` as three unrelated reals with no
+    stated connection to any set of weights. In particular nothing forced `sum_w` to be
+    the sum of the same weights whose squares make `sum_w_sq`, so the scalar form was
+    satisfied by triples that correspond to no weight vector at all.
+
+    Stated over `w : Fin n → ℝ` the hypothesis is discharged from Mathlib
+    (`sq_sum_le_card_mul_sum_sq`, the `f = g` case of Chebyshev's sum inequality) and `n`
+    is the actual sample size rather than a free variable. -/
+theorem importanceWeightESS_le_card {n : ℕ} (w : Fin n → ℝ)
+    (h_sq_pos : 0 < ∑ i, w i ^ 2) :
+    importanceWeightESS (∑ i, w i) (∑ i, w i ^ 2) ≤ (n : ℝ) := by
   unfold importanceWeightESS
-  rw [div_le_iff₀ h_sw_pos]
-  exact h_cauchy_schwarz
+  rw [div_le_iff₀ h_sq_pos]
+  simpa using (sq_sum_le_card_mul_sum_sq (s := (Finset.univ : Finset (Fin n))) (f := w))
 
-/-! **Two ESS formulas, and these theorems are about the other one.**
+/-- **The ESS is nonnegative**, since it is a square over a positive sum. -/
+theorem importanceWeightESS_nonneg {n : ℕ} (w : Fin n → ℝ)
+    (h_sq_pos : 0 < ∑ i, w i ^ 2) :
+    0 ≤ importanceWeightESS (∑ i, w i) (∑ i, w i ^ 2) := by
+  unfold importanceWeightESS
+  positivity
 
+/-- **Equal weights attain the bound**: the ESS of a constant weight vector is exactly
+    `n`, so the inequality above is sharp and not merely an envelope. Requires `c ≠ 0`,
+    since all-zero weights leave the ESS a `0/0`. -/
+theorem importanceWeightESS_of_const {n : ℕ} (c : ℝ) (hc : c ≠ 0) (hn : 0 < n) :
+    importanceWeightESS (∑ _i : Fin n, c) (∑ _i : Fin n, c ^ 2) = (n : ℝ) := by
+  have hn' : (n : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr (Nat.pos_iff.mp hn).ne'
+  unfold importanceWeightESS
+  simp only [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]
+  rw [mul_pow]
+  field_simp
+  ring
+
+/-! **Deleted: `iw_ess_decreases_with_divergence` and
+`iw_positive_weight_variance_reduces_ess`.**
+
+Two formulas for one quantity, with the theorems attached to the one that does not exist.
 `importanceWeightESS` — the definition this section is built around, and the one
-`validation/popgen_defs/transfer_battery.py` exercises — is `(Σw)² / Σw²`. The two
-theorems below are about `n / (1 + v)`. That expression is not `importanceWeightESS`, is
-not defined anywhere in this file, and is not proved equal to anything that is: the
-identification `(Σw)²/Σw² = n/(1 + Var(w))` holds when the weights are normalized to mean
-one, and no such normalization is stated or assumed here.
+`validation/popgen_defs/transfer_battery.py` exercises — is `(Σw)²/Σw²`. Both deleted
+theorems were about `n / (1 + v)`. That expression is defined nowhere in this corpus and
+was never proved equal to anything that is: the identification `(Σw)²/Σw² = n/(1 + Var(w))`
+needs the weights normalized to mean one, and no such normalization was stated or assumed.
+So two results named for the effective sample size established nothing about it.
 
-So the theorems are true and the names below now say what they are about. What they do not
-do — despite the names they previously carried, `iw_ess_decreases_with_divergence` and
-`iw_positive_weight_variance_reduces_ess` — is establish anything about the effective
-sample size this file defines. `iw_ess_le_n` above is the only result here that mentions
-`importanceWeightESS`, and it takes the Cauchy-Schwarz step as a hypothesis rather than
-proving it.
+Stripped of the naming, `iw_ess_decreases_with_divergence` was `div_lt_div_of_pos_left`
+and `iw_positive_weight_variance_reduces_ess` was `div_lt_iff₀` — Mathlib in domain
+costume, neither used anywhere. Divergence and `F_ST` appeared in neither statement; the
+chain from ancestry divergence to weight variance lived only in the docstrings ("as Fst
+increases, the importance weights become more variable") and is formalized nowhere.
 
-Divergence, and `F_ST`, appear in neither statement. The chain from ancestry divergence to
-weight variance was prose in the old docstrings ("as Fst increases, the importance weights
-become more variable") and is formalized nowhere. -/
-
-/-- **`n / (1 + v)` is strictly decreasing in `v` above `-1`.** Renamed from
-`iw_ess_decreases_with_divergence`; see the note above for why the old name overstated it. -/
-theorem div_one_add_strictAnti
-    (n var_w₁ var_w₂ : ℝ)
-    (h_n : 0 < n) (h_v1 : 0 ≤ var_w₁)
-    (h_more_divergent : var_w₁ < var_w₂) :
-    n / (1 + var_w₂) < n / (1 + var_w₁) := by
-  apply div_lt_div_of_pos_left h_n (by linarith) (by linarith)
-
-/-- **`n / (1 + v) < n` for positive `v`.** Renamed from
-`iw_positive_weight_variance_reduces_ess`; see the note above. -/
-theorem div_one_add_lt_self
-    (n var_w : ℝ)
-    (h_n : 0 < n)
-    (h_var : 0 < var_w) :
-    n / (1 + var_w) < n := by
-  have h_denom : 1 < 1 + var_w := by linarith
-  have h_denom_pos : 0 < 1 + var_w := by linarith
-  have h_mul : n < n * (1 + var_w) := by nlinarith
-  exact (div_lt_iff₀ h_denom_pos).2 h_mul
+What replaces them is `importanceWeightESS_le_card` above, which is about the definition
+that exists and that the validation battery tests. A genuine monotonicity result — that
+more variable weights give a smaller ESS — is a real and provable statement over `w`, and
+is the thing to add here if it is wanted; it is deliberately not asserted in the meantime. -/
 
 /-- **Doubly robust estimation combines IW with model adaptation.**
     DR estimator: if either the weighting model or the outcome model is
@@ -2967,5 +2978,63 @@ theorem private_causal_fraction_lowers_transfer_ceiling
   exact ⟨h_ceiling_lt_no_private, h_r2_lt_no_private, h_r2_lt_h2⟩
 
 end TransferLimits
+
+/-! ## What it costs to have fitted against the wrong linkage-disequilibrium operator
+
+Every bound above takes the operator as given. In practice the panel is optimised against an
+*estimated* reference linkage structure and deployed against the target's true one, and the
+question that decides whether that is tolerable is not the error in the estimated objective —
+which moves at first order and always will — but the loss from **transplanting the optimizer**.
+
+`Calibrator.TransplantationStability` answers it with one number the fit already contains: `γ`,
+the margin by which the selected panel beats the runner-up in the fitted objective. With `δ` an
+error budget for the operator, the deployment loss is `min(2δ, 8δ²/γ)`, and the quadratic branch —
+the reassuring one — binds exactly when `4δ < γ`.
+
+The degenerate branch is not hypothetical. Near-ties between candidate panels, shrinkage levels
+and ancestry-weighting schemes are the normal case, and precisely there the standard reassurance
+that "the objective is stationary at the optimum so small model error costs second order" fails:
+the transplanted choice lands on the wrong branch and pays the full `δ`.
+
+Operationally: **a transferred score should be reported with its margin.** Without `γ` there is no
+route from an operator error budget to a deployment-loss bound, and optimality under one estimated
+operator is a different claim from robustness to having estimated it. -/
+
+section OperatorError
+
+/-- **From linkage-disequilibrium model error to deployment loss.**
+
+    Instance of `transplant_excess_le`. `margin` is the gap between the selected panel and the
+    runner-up in the fitted objective; `modelError` bounds the operator error; `misalignment` is
+    the overlap deficit between the transplanted and true optima. The loss is quadratic in the
+    model error with constant `8/margin`.
+
+    Empirical status: DERIVED. The two inequalities are the modelling inputs; `margin` is a
+    quantity a fit already produces and this result asks to be reported. -/
+theorem ldModelError_to_deploymentLoss
+    (margin modelError misalignment loss : ℝ)
+    (hmargin : 0 < margin) (hmis : 0 ≤ misalignment)
+    (hgap : margin * misalignment ^ 2 ≤ loss)
+    (hpert : loss ≤ 2 * Real.sqrt 2 * modelError * misalignment) :
+    loss ≤ 8 * modelError ^ 2 / margin :=
+  transplant_excess_le margin modelError misalignment loss hmargin hmis hgap hpert
+
+/-- **Where the quadratic reassurance stops applying**: only while the model error is small
+    against the margin.
+
+    Empirical status: DERIVED. -/
+theorem quadraticLoss_binds_iff_error_small (margin modelError : ℝ)
+    (hmargin : 0 < margin) (herr : 0 < modelError) :
+    8 * modelError ^ 2 / margin < 2 * modelError ↔ 4 * modelError < margin :=
+  quadratic_beats_linear_iff margin modelError hmargin herr
+
+/-- **At a tie between candidate panels the loss is the full model error.**
+
+    Empirical status: DERIVED. -/
+theorem tiedPanels_lose_the_whole_error (modelError : ℝ) (herr : 0 < modelError) :
+    trueDesignValue modelError 0 - trueDesignValue modelError 1 = modelError :=
+  (crossing_loss_linear modelError herr).2.2
+
+end OperatorError
 
 end Calibrator
