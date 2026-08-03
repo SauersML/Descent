@@ -419,6 +419,37 @@ theorem residualDiscreteness_of_no_linkage (n : ℕ) (hn : 2 ≤ n) :
   have hpos : n - 1 ≠ 0 := by omega
   norm_num [zero_pow hpos]
 
+/-- **The residual ghost decays exponentially in blocks, not in markers.**
+
+    `(1 - 1/ℓ)^(n-1) ≤ exp(-(n-1)/ℓ)`. The exponent is `(n-1)/ℓ`, the number of correlation
+    lengths spanned, so the discreteness a normal approximation has to overcome is
+    controlled by the block count and not by the marker count. This is the same substitution
+    the Berry–Esseen bound below undergoes, arriving by a different route, and it is why
+    `residualDiscreteness` and `effectiveBlockCount` are two views of one quantity rather
+    than two independent knobs. -/
+theorem residualDiscreteness_le_exp (correlationLength : ℝ) (n : ℕ)
+    (hn : 1 ≤ n) (hℓ : 1 ≤ correlationLength) :
+    residualDiscreteness correlationLength n ≤
+      Real.exp (-((n : ℝ) - 1) / correlationLength) := by
+  have hℓ0 : (0 : ℝ) < correlationLength := by linarith
+  have hinv : 1 / correlationLength ≤ 1 := by
+    rw [div_le_one hℓ0]; exact hℓ
+  have hbase : (0 : ℝ) ≤ 1 - 1 / correlationLength := by linarith
+  have hstep : 1 - 1 / correlationLength ≤ Real.exp (-(1 / correlationLength)) := by
+    have := Real.add_one_le_exp (-(1 / correlationLength))
+    linarith
+  have hcast : ((n - 1 : ℕ) : ℝ) = (n : ℝ) - 1 := by
+    rw [Nat.cast_sub hn, Nat.cast_one]
+  unfold residualDiscreteness
+  calc (1 - 1 / correlationLength) ^ (n - 1)
+      ≤ (Real.exp (-(1 / correlationLength))) ^ (n - 1) :=
+        pow_le_pow_left₀ hbase hstep _
+    _ = Real.exp (((n - 1 : ℕ) : ℝ) * (-(1 / correlationLength))) := by
+        rw [← Real.exp_nat_mul]
+    _ = Real.exp (-((n : ℝ) - 1) / correlationLength) := by
+        rw [hcast]
+        ring_nf
+
 /-- **The block-count Berry–Esseen bound is exactly `√ℓ` times the marker-count bound.**
 
     Writing the marker count as `b · ℓ` for `b` blocks at correlation length `ℓ`, the bound
@@ -431,7 +462,7 @@ theorem berry_esseen_block_bound_eq (C ρ σ_sq b ℓ : ℝ)
   have hsb : 0 < Real.sqrt b := Real.sqrt_pos.mpr hb
   have hsl : 0 < Real.sqrt ℓ := Real.sqrt_pos.mpr hℓ
   rw [Real.sqrt_mul (le_of_lt hb) ℓ]
-  field_simp <;> ring
+  field_simp
 
 /-- **The marker count is anti-conservative**: at any correlation length above one the true
     bound strictly exceeds the one the marker count reports.
