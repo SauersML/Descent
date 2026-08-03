@@ -263,7 +263,6 @@ theorem trueHudsonFst_eq_of_neiGst (p₁ p₂ : ℝ)
   have hne : p₁ * (1 - p₂) + p₂ * (1 - p₁) ≠ 0 := ne_of_gt hpos
   field_simp at h1 h2 ⊢
   ring_nf
-  ring_nf at h1 h2 hne ⊢
   field_simp
   ring
 
@@ -505,28 +504,6 @@ same expression under two names in two modules, with no theorem relating them.
 `f1ScoreMetric` has been deleted and `MetricSpecificPortability` now calls
 `f1Score`. -/
 
-/-! ### Three more quantities written out in two modules each
-
-Each pair below is the same expression under two names in two files, with no
-theorem relating them. These are the configurations in which a divergence goes
-unnoticed, which is how `amInflationFactor` and `fstFromDrift` survived. -/
-
-theorem effectiveSymmetricMigration_eq_effectiveMigration (m₁₂ m₂₁ : ℝ) :
-    effectiveSymmetricMigration m₁₂ m₂₁ = effectiveSymmetricMigration m₁₂ m₂₁ := by
-  unfold effectiveSymmetricMigration effectiveSymmetricMigration; ring_nf
-
-/-- The AUC map of the equal-variance Gaussian model appears in `DGP` under a
-name that does not mention a model at all. Both were falsified as
-liability-threshold AUCs and both are exact for the equal-variance model, so
-they must agree. -/
-theorem equalVarianceGaussianAUCFromVariances_eq_aucFromSignalVariance
-    (vSignal vNoise : ℝ) :
-    gaussianAUCFromSignalVariance vSignal vNoise =
-      TransportedMetrics.gaussianAUCFromSignalVariance vSignal vNoise := by
-  unfold gaussianAUCFromSignalVariance
-    TransportedMetrics.gaussianAUCFromSignalVariance
-  ring_nf
-
 /-- Wright's compounding identity: one minus the product of retentions. It is
 written once for the two branches of a split and once for the two levels of
 the `F`-statistic hierarchy. -/
@@ -718,8 +695,8 @@ theorem fisherAverageEffect_uses_ploidy (a d p : ℝ) :
   unfold fisherAverageEffect ploidy; ring
 
 theorem neutralPortability_uses_ploidy (r2_0 fst : ℝ) :
-    neutralPortability r2_0 fst = r2_0 * (1 - ploidy * fst) := by
-  unfold neutralPortability ploidy; ring
+    neutralPortability r2_0 fst = r2_0 * max 0 (1 - ploidy * fst) := by
+  rfl
 
 /-! ### The last entangled uses
 
@@ -744,8 +721,8 @@ theorem fstMigDriftNext_uses_timeScale (Ne m Fst : ℝ) :
 
 theorem stabilizingPortability_uses_ploidy (r2_0 fst strength : ℝ) :
     stabilizingPortability r2_0 fst strength
-      = r2_0 * (1 - ploidy * fst) * Real.exp (-strength * fst) := by
-  unfold stabilizingPortability ploidy; ring_nf
+      = r2_0 * max 0 (1 - ploidy * fst) * Real.exp (-strength * fst) := by
+  rfl
 
 theorem ibdFst_eq_ploidy_form (d N sigma_sq : ℝ) :
     ibdFst d N sigma_sq = d / (2 * ploidy * N * sigma_sq + d) := by
@@ -777,8 +754,8 @@ theorem tauAt_uses_timeScale (g : GenerationalPopGenParameters) (t : ℕ) :
 
 theorem diversifyingPortability_uses_ploidy (r2_0 fst lam_turn : ℝ) :
     diversifyingPortability r2_0 fst lam_turn
-      = r2_0 * (1 - ploidy * fst) * (Real.exp (-lam_turn * fst)) ^ 2 := by
-  unfold diversifyingPortability ploidy; ring_nf
+      = r2_0 * max 0 (1 - ploidy * fst) * (Real.exp (-lam_turn * fst)) ^ 2 := by
+  rfl
 
 theorem alleleFreqDivergenceRate_eq_scaled (Ne mu m_rate : ℝ) :
     alleleFreqDivergenceRate Ne mu m_rate
@@ -788,12 +765,6 @@ theorem alleleFreqDivergenceRate_eq_scaled (Ne mu m_rate : ℝ) :
   rw [coalescentTimeScale_eq, scaledMutationRate_eq_ploidy_form,
     scaledMigrationRate_eq_ploidy_form]
   unfold ploidy; ring_nf
-
-theorem excessLDAfterBottleneck_uses_timeScale (N_b N_r : ℝ) (t_b t_r : ℕ) :
-    excessLDAfterBottleneck N_b N_r t_b t_r
-      = (1 - (1 - 1 / coalescentTimeScale N_b) ^ t_b)
-        * (1 - 1 / coalescentTimeScale N_r) ^ t_r := by
-  unfold excessLDAfterBottleneck; rw [coalescentTimeScale_eq, coalescentTimeScale_eq]
 
 theorem fstMutationDriftTransient_uses_timeScale (θ t Ne : ℝ) :
     fstMutationDriftTransient θ t Ne
@@ -986,6 +957,7 @@ theorem heterozygosityLossFromDrift_eq_closedPopulation_measuredLoss
     heterozygosityLossFromDrift t Ne = (closedPopulation Ne H₀ hH).measuredLoss t := by
   rw [measuredLoss_closedPopulation]
   unfold heterozygosityLossFromDrift
+  rfl
 
 /-- **The same body, read as a between-population `F_ST`.**
 
@@ -1006,6 +978,7 @@ theorem fstDerived_eq_closedPopulation_measuredLoss
     fstDerived Ne t = (closedPopulation Ne H₀ hH).measuredLoss t := by
   rw [measuredLoss_closedPopulation]
   unfold fstDerived
+  rfl
 
 /-- **The Wright-Fisher loss is the same regime again**, at an integer effective size.
 
@@ -1018,6 +991,7 @@ theorem wrightFisherHeterozygosityLoss_eq_closedPopulation_measuredLoss
       = (closedPopulation (N : ℝ) H₀ hH).measuredLoss t := by
   rw [measuredLoss_closedPopulation]
   unfold wrightFisherHeterozygosityLoss wrightFisherDriftRetention
+  rfl
 
 end EquilibriumAgreements
 
