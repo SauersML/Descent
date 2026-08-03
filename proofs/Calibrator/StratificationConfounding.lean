@@ -588,9 +588,9 @@ matters: what enters the noncentrality is the genotype *variance*, which
 `hweHeterozygosity_eq_genotypeVarianceHWE` says is this same number. -/
 
 /-- F-statistic of an instrument at a given allele frequency.
+    next to the deleted `heterozygosity`, whose marker it was reading.
 
-    Empirical status: UNTESTED. It carried no marker of its own while it sat
-    next to the deleted `heterozygosity`, whose marker it was reading. -/
+    Empirical status: UNTESTED. It carried no marker of its own while it sat -/
 noncomputable def MRInstrumentModel.fStat (m : MRInstrumentModel) (p : ℝ) : ℝ :=
   m.n * m.β_inst ^ 2 * hweHeterozygosity p / m.σ2_Y
 
@@ -732,10 +732,9 @@ theorem sqrt_scaled_variance_decreasing_in_n
     is that `1/·` is decreasing on the positives, so the bound survives
     replacing `r2_effect` by any upper bound for it.
 
-    Nothing derives `h_formula` from a test, a variance, or a power target, and
-    nothing here connects `n_required` to a sample. The worked example an
-    earlier docstring cited (Wang et al., `R² ≈ 0.5%` for distance-on-error) is
-    a measurement, not an instance of this inequality. -/
+    Nothing derives `h_formula` from a test, a variance or a power target, and
+    nothing here connects `n_required` to a sample. A measured effect size is
+    not an instance of this inequality, whose variables are free. -/
 theorem le_inv_of_le_inv_of_le
     (r2_effect n_required ub : ℝ)
     (h_small : r2_effect ≤ ub)

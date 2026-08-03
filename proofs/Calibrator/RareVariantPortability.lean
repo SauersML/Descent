@@ -148,11 +148,10 @@ theorem gene_level_share_gt_single_share
     Read as genetics: if `k` variants in a gene carry the same effect `β` and
     contribute additively, gene-level burden variance `k·β²` exceeds
     single-variant variance `β²`. Nothing below carries that reading. There is
-    no gene, no burden, no second population, and in particular no
-    cross-population correlation — the `√(k_A·k_B)/max(k_A,k_B)` quantity an
-    earlier docstring described as the object of interest never appears, here or
-    anywhere else in the corpus. What is proved is that multiplying a positive
-    number by something larger than one increases it. -/
+    no gene, no burden, and no second population — in particular no
+    cross-population correlation, which is what a portability claim would need.
+    What is proved is that multiplying a positive number by something larger
+    than one increases it. -/
 theorem sq_lt_cast_mul_sq_of_two_le
     (β : ℝ) (k : ℕ)
     (h_β : β ≠ 0)

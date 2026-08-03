@@ -94,13 +94,8 @@ theorem spline_error_improves_with_knots
     no estimator — the decomposition `MSE = bias² + variance`, which the reading
     calls the real content, is assumed by naming the two summands, not derived.
 
-    This used to carry two further hypotheses, `bias₂² < bias₁²` and `var₁ < var₂`, which
-    the proof never used — kept, by an earlier note here, so that the statement would still
-    "look like the tradeoff it is standing in for". That is the wrong direction: dressing a
-    weaker fact in the hypotheses of a stronger one makes it *cite* like the stronger one,
-    and a candid docstring does not travel with the name. They are dropped. What remains is
-    the whole of what `linarith` proves, and the gap between this and the bias-variance
-    tradeoff is now visible in the statement rather than described beside it. -/
+    The hypothesis is the whole of what the proof uses, so the gap between this and the
+    bias-variance tradeoff is visible in the statement rather than described beside it. -/
 theorem sum_lt_sum_of_gap_dominates
     (bias₁ bias₂ var₁ var₂ : ℝ)
     (h_var_dominates : var₂ - var₁ > bias₁ ^ 2 - bias₂ ^ 2) :
@@ -110,12 +105,11 @@ theorem sum_lt_sum_of_gap_dominates
     `var_signal / var_total ≤ 1` when `var_total = var_signal + var_noise` with
     both parts nonnegative.
 
-    Not what an earlier docstring claimed. It stated
-    `R²_spline ≤ Var(E[ε²|d]) / Var(ε²)`, a bound relating a fitted `R²` to a
-    conditional-variance ratio; no conditional variance, no spline and no `R²`
-    occurs below, and the two claims are not the same inequality. The worked
-    example it cited (`R² = 0.51%` for height, Wang et al.) is a measurement
-    about a fitted model and is not an instance of this statement. -/
+    This is not the spline bound `R²_spline ≤ Var(E[ε²|d]) / Var(ε²)`, which
+    relates a fitted `R²` to a conditional-variance ratio: no conditional
+    variance, no spline and no `R²` occurs below, and the two are not the same
+    inequality. A measured `R²` for a fitted model is likewise not an instance
+    of this statement, which has no numerals in it. -/
 theorem part_div_total_le_one
     (var_signal var_noise var_total : ℝ)
     (h_total : var_total = var_signal + var_noise)

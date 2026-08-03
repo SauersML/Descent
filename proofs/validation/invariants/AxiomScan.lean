@@ -94,13 +94,13 @@ def admissible : List Name :=
 `f.match_1`, `f.proof_2`.  The suffix is `eq_` or `match_` or `proof_` followed
 by *digits*, or the literal `eq_def`.
 
-MATCHING ON THE BARE PREFIX IS WRONG AND WAS WRONG HERE.  `startsWith "eq_"`
-excludes every hand-written theorem in the ordinary Mathlib naming style
-`eq_<conclusion>_of_<hypothesis>`, and this corpus has four:
+The test is by SHAPE and not by prefix.  `startsWith "eq_"` would exclude every
+hand-written theorem in the ordinary Mathlib naming style
+`eq_<conclusion>_of_<hypothesis>`, of which this corpus has four:
 `Calibrator.eq_of_ae_eq_of_continuous` and, in `BundleRigidity`,
 `eq_zero_of_tauOdd_of_tauEven`, `eq_empty_of_core_empty` and
-`eq_zero_of_bounded_by_linear`.  A guard that silently drops four theorems from
-the scan is worse than no guard, because its clean report is read as coverage. -/
+`eq_zero_of_bounded_by_linear`.  A guard that silently drops theorems from the
+scan is worse than no guard, because its clean report is read as coverage. -/
 def isGeneratedEquation (f : String) : Bool :=
   f == "eq_def" ||
   (["eq_", "match_", "proof_"].any f.startsWith &&
@@ -146,15 +146,9 @@ def classify (allowed admissible : List Name) (ax : Array Name) :
   if bad.isEmpty then none
   else some (bad.any fun a ↦ !(admissible.contains a), bad)
 
-end AxiomScan
-
-run_cmd do
-  let env ← getEnv
-  let allowed := AxiomScan.allowed
-  let admissible := AxiomScan.admissible
-  let mut offenders : Array (Name × Name × Array Name) := #[]
-  let mut admissions : Array (Name × Name × Array Name) := #[]
-  let mut scanned := 0
+/-- The names this scan is responsible for. -/
+def roots (env : Environment) : Array Name := Id.run do
+  let mut out := #[]
   for (name, ci) in env.constants.toList do
     unless (`Calibrator).isPrefixOf name do continue
     -- Scan every axiom, including unused custom axioms.  For value-bearing
@@ -162,26 +156,69 @@ run_cmd do
     -- introduce an axiom absent from those roots, and explicit source guards
     -- independently reject custom elaborators and compiler-backed proofs.
     match ci with
-    | .axiomInfo _ =>
-      scanned := scanned + 1
-      let ax ← Lean.collectAxioms name
-      match AxiomScan.classify allowed admissible ax with
-      | none => pure ()
-      | some (hard, bad) =>
-        let m := (env.getModuleFor? name).getD `«unknown»
-        if hard then offenders := offenders.push (m, name, bad)
-        else admissions := admissions.push (m, name, bad)
+    | .axiomInfo _ => out := out.push name
     | .thmInfo _ | .defnInfo _ | .opaqueInfo _ =>
-      unless AxiomScan.userWritten env name do continue
-      scanned := scanned + 1
-      let ax ← Lean.collectAxioms name
-      match AxiomScan.classify allowed admissible ax with
-      | none => pure ()
-      | some (hard, bad) =>
-        let m := (env.getModuleFor? name).getD `«unknown»
-        if hard then offenders := offenders.push (m, name, bad)
-        else admissions := admissions.push (m, name, bad)
+      if userWritten env name then out := out.push name
     | _ => pure ()
+  return out
+
+/-- The union of the axiom closures of `names`, in ONE traversal.
+
+ONE traversal is not an optimisation, it is what makes the scan terminate.
+`Lean.collectAxioms` starts from an empty `visited` set on every call, so
+calling it per declaration re-walks the shared Mathlib closure from scratch each
+time: at Lean 4.24.0 that is 88 seconds for 400 theorems, and the full
+8111-constant run dies with SIGBUS having produced no output.  A scan that
+crashes reports nothing, and nothing is indistinguishable from clean unless the
+exit status is read.
+
+Threading one `CollectAxioms.State` through every root makes the walk linear in
+the union of the closures.  The `visited` set is what does it, and it is also
+why this cannot attribute an axiom to a declaration: once a constant is visited
+for one root, later roots reaching it add nothing.  Attribution is `witnessesOf`
+below, and it runs only when there is something to attribute. -/
+def unionOfClosures (env : Environment) (names : Array Name) : Array Name :=
+  let st := names.foldl
+    (fun st n => (((CollectAxioms.collect n).run env).run st).2)
+    ({} : CollectAxioms.State)
+  st.axioms
+
+/-- Which roots actually depend on `target`, up to `limit` of them.
+
+Runs only when `unionOfClosures` has already found `target`, so the expensive
+per-declaration walk is paid on the interesting path and never on the clean
+one.  Capped because the point is to name the debtor, not to enumerate every
+consumer -- and the cap is reported, so a truncated list cannot be misread as a
+complete one. -/
+def witnessesOf (env : Environment) (names : Array Name) (target : Name)
+    (limit : Nat) : Array Name := Id.run do
+  let mut out := #[]
+  for n in names do
+    if out.size ≥ limit then break
+    let ax := (((CollectAxioms.collect n).run env).run {}).2.axioms
+    if ax.contains target then out := out.push n
+  return out
+
+end AxiomScan
+
+run_cmd do
+  let env ← getEnv
+  let allowed := AxiomScan.allowed
+  let admissible := AxiomScan.admissible
+  let names := AxiomScan.roots env
+  let scanned := names.size
+  let union := AxiomScan.unionOfClosures env names
+  let extra := union.filter fun a => !(allowed.contains a)
+  let offending := extra.filter fun a => !(admissible.contains a)
+  let admitted := extra.filter fun a => admissible.contains a
+  let mut offenders : Array (Name × Name × Array Name) := #[]
+  let mut admissions : Array (Name × Name × Array Name) := #[]
+  for a in offending do
+    for n in AxiomScan.witnessesOf env names a 20 do
+      offenders := offenders.push ((env.getModuleFor? n).getD `«unknown», n, #[a])
+  for a in admitted do
+    for n in AxiomScan.witnessesOf env names a 40 do
+      admissions := admissions.push ((env.getModuleFor? n).getD `«unknown», n, #[a])
   -- `logError` is what makes the run exit nonzero, so it marks offences only.
   for (m, name, bad) in offenders do
     logError m!"AXIOM\t{m}\t{name}\t{bad.toList}"

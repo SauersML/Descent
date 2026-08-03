@@ -299,11 +299,11 @@ theorem gene_shared_variants_specific
     (`n_afr = n_shared`) the union equals `n_eur` exactly, so "exceeds" would be
     false. `omega` on three naturals.
 
-    What is **not** proved, and what an earlier docstring claimed: that
-    conditional analysis in one population cannot discover all causal variants.
-    No analysis, no discovery, and no conditioning appears in the statement —
-    only counts. Whether a population-specific signal count is evidence of
-    allelic heterogeneity is a modelling claim this theorem does not reach. -/
+    What is **not** proved: that conditional analysis in one population cannot
+    discover all causal variants. No analysis, no discovery and no conditioning
+    appears in the statement — only counts. Whether a population-specific
+    signal count is evidence of allelic heterogeneity is a modelling claim this
+    theorem does not reach. -/
 theorem le_add_sub_of_le_of_le
     (n_signals_eur n_signals_afr n_shared : ℕ)
     (h_eur : 0 < n_signals_eur) (h_afr : 0 < n_signals_afr)

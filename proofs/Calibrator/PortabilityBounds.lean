@@ -298,11 +298,8 @@ theorem mul_sq_lt_mul_sq_of_le_of_lt
     no normal law and no absolute value below — only the monotonicity of the
     z-score in `ρ`, which is one input to the argument and not the argument.
     Turning it into a statement about flip rates needs `Φ` monotone and the
-    model assumed, and neither step is taken here.
-
-    An earlier docstring cited `ρ ≈ 0.3` for lymphocyte count as a worked
-    example; no numeral appears in the statement, so nothing here is an
-    instance of it. -/
+    model assumed, and neither step is taken here. No numeral appears in the
+    statement, so no measured `ρ` is an instance of it. -/
 theorem z_score_strictMono_in_rho
     (β σ ρ₁ ρ₂ : ℝ)
     (hβ : 0 < β) (hσ : 0 < σ)
