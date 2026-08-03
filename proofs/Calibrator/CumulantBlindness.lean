@@ -85,7 +85,7 @@ untouched, and that coordinate contributes the factor `E[s(g)] = 0`.
 
 section HiddenTilt
 
-variable {ι : Type*} [DecidableEq ι]
+variable {ι : Type*}
 
 /-- **The pigeonhole behind exact cumulant matching.** If a multi-index `a` has total
 order at most `K` on a block of `K + 1` coordinates, some coordinate of the block has
@@ -94,6 +94,7 @@ theorem exists_zero_exponent_of_sum_lt_card
     (B : Finset ι) (a : ι → ℕ) (K : ℕ)
     (hcard : B.card = K + 1) (hsum : ∑ i ∈ B, a i ≤ K) :
     ∃ i ∈ B, a i = 0 := by
+  classical
   by_contra hcon
   push_neg at hcon
   have hge : ∀ i ∈ B, 1 ≤ a i := by
@@ -231,7 +232,7 @@ theorem diagonal_contraction_bound
 /-- The sup-norm bound on the remaining `k` factors: each is bounded by `sqrt tau`,
 so their product is bounded by `tau ^ (k / 2)`. Stated with `Real.sqrt tau ^ k` to
 avoid real exponents. -/
-theorem prod_sup_bound {k : ℕ} (τ : ℝ) (hτ : 0 ≤ τ) (e : Fin k → ℝ)
+theorem prod_sup_bound {k : ℕ} (τ : ℝ) (e : Fin k → ℝ)
     (he : ∀ l, |e l| ≤ Real.sqrt τ) :
     |∏ l : Fin k, e l| ≤ Real.sqrt τ ^ k := by
   rw [Finset.abs_prod]
