@@ -1,9 +1,10 @@
-"""Check the liability-threshold AUC definitions in PortabilityDrift.lean.
+"""Check the prevalence-free AUC charts in PortabilityDrift.lean.
 
-    liabilityAUCFromSNR         snr   = Phi(sqrt(snr / 2))
-    liabilityAUCFromVariances   vS vE = Phi(sqrt(vS / (2 * vE)))
-    liabilityAUCFromExplainedR2 r2    = Phi(sqrt(r2 / (2 * (1 - r2))))
-    presentDayAUC               ...   = Phi(sqrt(snr / 2))
+    equalVarianceGaussianAUCFromSNR         snr   = Phi(sqrt(snr / 2))
+    equalVarianceGaussianAUCFromSignalVariance vS vE
+                                                  = Phi(sqrt(vS / (2 * vE)))
+    equalVarianceGaussianAUCFromExplainedR2 r2    = Phi(sqrt(r2 / (2 * (1 - r2))))
+    presentDayEqualVarianceGaussianAUC      ...   = Phi(sqrt(snr / 2))
 
 None of these takes a disease prevalence.  Under the liability-threshold model
 the AUC of a score against case/control status depends on prevalence, because
@@ -12,6 +13,18 @@ point sets how far the case and control score distributions separate.
 
 Ground truth here is the exact AUC = P(S_case > S_control) computed two ways:
 Gauss-Legendre integration of the bivariate normal, and a large Monte Carlo.
+
+RESOLVED.  These four were named `liabilityAUCFrom*` and `presentDayAUC` when
+this check was written, and the run reported below is what retired those names:
+RMSE 0.1199 over 25 cells against the exact bivariate-normal AUC, every cell
+biased low, worst at R2 = 0.20 and prevalence 0.001 where the exact AUC is
+0.8686 and the chart returns 0.6382, 26.5 per cent low.  The charts are correct
+for the equal-variance Gaussian model and were renamed to it; the binary-trait
+formula the old names promised is `liabilityThresholdAUCFromExplainedR2`, which
+takes prevalence and measures at pooled RMSE 0.0121.  Keep running this: it is
+the instrument that holds the equal-variance charts to the model they now name,
+and its failure against the liability-threshold oracle is the expected result,
+not a regression.
 """
 from __future__ import annotations
 
@@ -25,13 +38,15 @@ Phi = stats.norm.cdf
 phi = stats.norm.pdf
 
 
-def lean_liabilityAUCFromExplainedR2(r2):
-    """PortabilityDrift.lean:2578  `Phi (Real.sqrt (r2 / (2 * (1 - r2))))`"""
+def lean_equalVarianceGaussianAUCFromExplainedR2(r2):
+    """equalVarianceGaussianAUCFromExplainedR2
+    `Phi (Real.sqrt (r2 / (2 * (1 - r2))))`"""
     return float(Phi(np.sqrt(r2 / (2 * (1 - r2)))))
 
 
-def lean_liabilityAUCFromSNR(snr):
-    """PortabilityDrift.lean:2544  `Phi (Real.sqrt (snr / 2))`"""
+def lean_equalVarianceGaussianAUCFromSNR(snr):
+    """equalVarianceGaussianAUCFromSNR
+    `Phi (Real.sqrt (snr / 2))`"""
     return float(Phi(np.sqrt(snr / 2)))
 
 
@@ -87,8 +102,8 @@ def main():
                 r2=r2, K=K,
                 exact=exact_auc(rho, K),
                 mc=mc_auc(rho, K, seed=7 + int(r2 * 1000) + int(K * 10000)),
-                lean_fromR2=lean_liabilityAUCFromExplainedR2(r2),
-                lean_fromSNR=lean_liabilityAUCFromSNR(r2 / (1 - r2)),
+                lean_fromR2=lean_equalVarianceGaussianAUCFromExplainedR2(r2),
+                lean_fromSNR=lean_equalVarianceGaussianAUCFromSNR(r2 / (1 - r2)),
             ))
     with open(sys.argv[1] if len(sys.argv) > 1 else "auc.json", "w") as fh:
         json.dump(rows, fh)
