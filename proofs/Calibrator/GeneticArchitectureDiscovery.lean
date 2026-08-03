@@ -223,8 +223,8 @@ noncomputable def ctMissedTargetSignal {m : ℕ}
   Finset.sum (Finset.univ \ discovered) fun i => targetCausalSignal i
 
 /-- **C+T uses fewer variants → more variable portability estimates.**
-    This is now stated on an explicit per-locus estimation-risk surface rather
-    than the old `σ² / k` surrogate.
+    This is stated on an explicit per-locus estimation-risk surface rather than
+    on a `σ² / k` surrogate.
 
     - C+T is modeled as a hard-thresholded no-shrinkage estimator on retained loci;
     - the Bayesian method is modeled as the posterior mean with the optimal

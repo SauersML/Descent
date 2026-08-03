@@ -158,10 +158,10 @@ noncomputable def extra_algebraic_guard_adds_nothing {trueRetention wrongRetenti
 A guard is worth adding exactly when it separates a pair the existing suite identifies.
 Stated as the contrapositive of the law: if the new guard is blind on the same pair, the
 enlarged suite is blind on that pair (`extra_algebraic_guard_adds_nothing`); if it
-separates the pair, it is not a function of the data the old suite read.
+separates the pair, it is not a function of the data the existing suite reads.
 
-The three guards added after the incident are of the second kind, and each reads
-something the algebra does not contain:
+The three guards below are of the second kind, and each reads something the algebra does
+not contain:
 
 * **Regime declaration** reads the data-generating assumption. `DriftRegime.regimes_disagree`
   separates the two regimes as objects, so the declaration is not recoverable from any

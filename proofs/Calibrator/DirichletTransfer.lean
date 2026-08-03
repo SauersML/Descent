@@ -81,8 +81,8 @@ section DirichletTransfer
     `1 + τ·energy`.
 
     Convention: the second argument is a **Dirichlet energy** — a carré du champ of the weight
-    functional under the coupling generator. It was previously written `D`, which in this
-    corpus means linkage disequilibrium, and the two are unrelated quantities. -/
+    functional under the coupling generator. Do not write it `D`: in this corpus `D` means
+    linkage disequilibrium, and the two are unrelated quantities. -/
 noncomputable def dirichletEfficiency (τ energy : ℝ) : ℝ := 1 + τ * energy
 
 /-- At zero drift every scheme is at its source performance. -/
@@ -477,9 +477,9 @@ with no free parameters, on both an exact-transition multi-mode Ornstein–Uhlen
 a forward Wright–Fisher one (bounded, non-Gaussian, discrete population). The crossing
 measures `0.69411`, CI95 `[0.69289, 0.69524]`, against `log 2 = 0.693147`.
 
-**A positive control I stated was wrong, and its failure is the claim working.** I wrote that
-as `τ → ∞` all three designs converge to blind. False: damped → blind (`5.4e-12`), but stale
-→ `-V` and oracle → `+V`. It *has* to be false — if the stale design converged to blind there
+**A positive control that must fail, and its failure is the claim working.** As `τ → ∞`
+the three designs do not all converge to blind: damped → blind (`5.4e-12`), while stale
+→ `-V` and oracle → `+V`. That has to be so. If the stale design converged to blind there
 would be no sign flip to claim.
 
 **Three things that would burn a practitioner**, none of which the algebra sees:

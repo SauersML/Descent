@@ -175,9 +175,8 @@ but it should not be read as evidence for either factor.
 The honest residue: long memory has zero marginal sample cost *because loss is measured in
 the information metric*, and that is a statement about the choice of loss, not about memory.
 
-**The gloss discrepancy is resolved: absolute versus relative.** This section previously
-recorded that the upstream text calls the variance one that "blows up" while giving a formula
-that shrinks, and declined to adjudicate. Both are right about different quantities.
+**Absolute versus relative variance.** The upstream text calls the variance one that
+"blows up" while giving a formula that shrinks. Both are right, about different quantities.
 Absolute `Var(δ̂)` at `n = 1024` is `7.45e-4, 2.04e-4, 5.69e-5, 3.51e-5` as `δ` goes
 `0.5 → 0.005` — it *shrinks*, as `longMemoryVariance_strictMono` says. Relative precision
 *blows up*: `Var(log δ̂)` is `2.96e-3, 1.92e-2, 1.09e-1, 9.01e-1` over the same range, a

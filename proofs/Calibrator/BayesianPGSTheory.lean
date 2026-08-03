@@ -339,8 +339,8 @@ theorem cross_population_bias_gt_base_bias_of_positive_fst
 
     The attenuation factor `α < 1` is posited, not derived: nothing here shows that mixing
     reference panels attenuates rather than amplifies bias. Given that posit the conclusion
-    is now the strict inequality the docstring always claimed — it previously proved only
-    `≤`, which is also what an `α` of exactly `1` (no attenuation at all) would give.
+    is the strict inequality. A `≤` conclusion would be weaker than the headline claims,
+    and it also holds at `α = 1`, that is under no attenuation at all.
 
     `_h_α_pos` is deliberately unused and marked as such: `α > 0` is part of the modelled
     range of an attenuation factor, but the inequality does not need it. -/

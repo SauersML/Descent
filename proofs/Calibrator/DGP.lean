@@ -951,9 +951,10 @@ below is the surviving content. -/
 /-! ### The reciprocal optimal slope is not affine
 
 Under the *linear noise model* `optimalSlopeLinearNoise`, and only under it, the optimal slope
-is a reciprocal function of `c` and so is matched by no affine function.  The name previously
-carried here, `ld_decay_implies_nonlinear_calibration`, asserted LD decay as the mechanism;
-neither LD, distance, nor decay appears in the statement, which is a hypothesis-weakening
+is a reciprocal function of `c` and so is matched by no affine function.  The name
+`ld_decay_implies_nonlinear_calibration` is absent here on purpose: it asserts LD decay as
+the mechanism, and neither LD, distance nor decay appears in the statement, which is a
+hypothesis-weakening
 wrapper for `linear_noise_implies_nonlinear_slope` with the positivity side conditions
 discharged from nonnegativity.  The LD-decay statement that *is* proved is
 `Calibrator.ld_decay_implies_nonlinear_calibration_proved` in the corpus root, which supplies
