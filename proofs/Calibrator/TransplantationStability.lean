@@ -279,7 +279,8 @@ theorem bilinear_le_of_unit {n : ℕ} {E : Matrix (Fin (n + 1)) (Fin (n + 1)) �
   rw [hminus, hsumminus] at hbm
   have h1 := abs_le.mp hbp
   have h2 := abs_le.mp hbm
-  rcases abs_cases (u ⬝ᵥ (E *ᵥ v)) with ⟨heq, _⟩ | ⟨heq, _⟩ <;> rw [heq] <;> linarith [h1.1, h1.2, h2.1, h2.2]
+  rcases abs_cases (u ⬝ᵥ (E *ᵥ v)) with ⟨heq, _⟩ | ⟨heq, _⟩ <;> rw [heq] <;>
+    linarith [h1.1, h1.2, h2.1, h2.2]
 
 /-- **The sharp bound holds outright once the misalignment is at least one half.**
 
