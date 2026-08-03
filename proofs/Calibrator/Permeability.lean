@@ -143,6 +143,76 @@ theorem completion_count_lower_bound {d q : ℕ} (coordinate : Fin d → Fin q)
     (hcoordinate : Function.Injective coordinate) : d ≤ q := by
   simpa using Fintype.card_le_of_injective coordinate hcoordinate
 
+/-! ## Constructive lag completion -/
+
+/-- Sensitivity matrix of selected lagged covariance summaries.  Row `i` is the lag
+chosen for statistic `i`; column `j` is deployment coordinate `j`.  Its entries are the
+derivatives `∂γ(lag i)/∂h_j` supplied by a named LD, haplotype, ancestry-tract, or
+longitudinal model. -/
+noncomputable def lagSensitivityMatrix {d : ℕ}
+    (lag : Fin d → ℕ) (covarianceDerivative : ℕ → Fin d → ℝ) :
+    Matrix (Fin d) (Fin d) ℝ :=
+  fun i j => covarianceDerivative (lag i) j
+
+/-- Linearized change in the selected lag statistics along a deployment tangent. -/
+noncomputable def lagObservationDerivative {d : ℕ}
+    (lag : Fin d → ℕ) (covarianceDerivative : ℕ → Fin d → ℝ)
+    (tangent : Fin d → ℝ) : Fin d → ℝ :=
+  lagSensitivityMatrix lag covarianceDerivative *ᵥ tangent
+
+/-- **Constructive completion criterion.** A set of `d` lagged covariance statistics
+locally distinguishes all `d` deployment directions exactly when the model-supplied
+sensitivity matrix is nonsingular.  This is the actionable form of lag completion:
+candidate lags are accepted by a determinant check, not merely by counting them.
+
+For PGS portability the coordinates can represent, for example, ancestry-tract age,
+recombination-scale LD decay, selection-induced long haplotypes, and a phase/location
+parameter.  The theorem is model agnostic about those meanings but exact once their
+covariance derivatives are supplied. -/
+theorem lagObservationDerivative_injective_of_det_ne_zero {d : ℕ}
+    (lag : Fin d → ℕ) (covarianceDerivative : ℕ → Fin d → ℝ)
+    (hdet : (lagSensitivityMatrix lag covarianceDerivative).det ≠ 0) :
+    Function.Injective (lagObservationDerivative lag covarianceDerivative) := by
+  intro tangent tangent' heq
+  apply sub_eq_zero.mp
+  apply Matrix.eq_zero_of_mulVec_eq_zero hdet
+  change lagSensitivityMatrix lag covarianceDerivative *ᵥ (tangent - tangent') = 0
+  rw [Matrix.mulVec_sub, heq, sub_self]
+
+/-- Total order-two information exposed by a completed collection of lag summaries along
+one deployment tangent.  `covariance i` is the asymptotic covariance of estimator channel
+`i`; `lagObservationDerivative ... tangent` is its response to population change. -/
+noncomputable def lagCompletionPermeability {d : ℕ}
+    (covariance : Fin d → ℝ) (lag : Fin d → ℕ)
+    (covarianceDerivative : ℕ → Fin d → ℝ) (tangent : Fin d → ℝ) : ℝ :=
+  diagonalPermeability covariance
+    (lagObservationDerivative lag covarianceDerivative tangent)
+
+/-- **Completion and permeability coincide at order two.** With nonzero estimator
+covariances and a nonsingular lag-sensitivity matrix, total Gaussian permeability is zero
+exactly for the zero deployment tangent.  Consequently every genuine local population
+shift is visible to at least one selected lag channel.
+
+This does not turn marginal allele-frequency data into LD data: the selected lagged
+statistics explicitly break the order-erasure gauge. -/
+theorem lagCompletionPermeability_eq_zero_iff {d : ℕ}
+    (covariance : Fin d → ℝ) (lag : Fin d → ℕ)
+    (covarianceDerivative : ℕ → Fin d → ℝ) (tangent : Fin d → ℝ)
+    (hcovariance : ∀ i, covariance i ≠ 0)
+    (hdet : (lagSensitivityMatrix lag covarianceDerivative).det ≠ 0) :
+    lagCompletionPermeability covariance lag covarianceDerivative tangent = 0 ↔
+      tangent = 0 := by
+  unfold lagCompletionPermeability
+  rw [diagonalPermeability_eq_zero_iff _ _ hcovariance]
+  constructor
+  · intro hzero
+    apply Matrix.eq_zero_of_mulVec_eq_zero hdet
+    funext i
+    exact hzero i
+  · intro hzero
+    subst tangent
+    simp [lagObservationDerivative]
+
 /-! ## First-order walls are not absolute walls -/
 
 /-- A channel can have zero first derivative at the base point while changing at every
