@@ -235,13 +235,14 @@ theorem logSqGaussian_nonlattice : IsNonlatticeLaw logSqGaussianLaw := by
       rw [hprogressionZero]
       exact ENNReal.zero_ne_top
     have huniv : logSqGaussianLaw Set.univ = 1 := by
-      unfold logSqGaussianLaw stdGaussianMeasure
-      simp
+      unfold logSqGaussianLaw
+      rw [MeasureTheory.Measure.map_apply (by fun_prop) MeasurableSet.univ]
+      simp [stdGaussianMeasure]
     rw [MeasureTheory.measure_compl hprogressionMeasurable hfinite, huniv,
       hprogressionZero]
     simp
   rw [hcomplementZero] at hcomplementOne
-  exact (zero_ne_one : (0 : ℝ≥0∞) ≠ 1) hcomplementOne
+  exact (zero_ne_one : (0 : ENNReal) ≠ 1) hcomplementOne
 
 /-- A triple of Mellin data for a coordinate law: drift, jet variance, lattice datum.
 
@@ -320,7 +321,8 @@ theorem latticeInflation_normalization {h : ℝ} (hh : 0 < h) :
 /-- The bracket decreases as the threshold moves off the lattice: alignment is
 optimal. -/
 theorem latticeBracket_antitone {h : ℝ} (hh : 0 < h) :
-    ∀ ⦃δ₁ δ₂ : ℝ⦄, δ₁ ≤ δ₂ → latticeBracket h δ₂ ≤ latticeBracket h δ₁ := by
+    ∀ ⦃δ₁ δ₂ : ℝ⦄,
+      δ₁ ≤ δ₂ → latticeBracket h δ₂ ≤ latticeBracket h δ₁ := by
   intro δ₁ δ₂ hδ
   have hden : 0 < 1 - Real.exp (-h) := one_sub_exp_neg_pos hh
   have hexp : Real.exp (-δ₂) ≤ Real.exp (-δ₁) := Real.exp_le_exp.mpr (by linarith)
