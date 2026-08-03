@@ -9,6 +9,7 @@ import Calibrator.PGSCalibrationTheory
 import Calibrator.OpenQuestions
 import Calibrator.LDDecayTheory
 import Calibrator.HorizonCurve
+import Calibrator.DriftingConditional
 
 namespace Calibrator
 
@@ -594,5 +595,84 @@ theorem cohortCrossover_may_be_threefold :
   exact ⟨h1, h2, h3⟩
 
 end HorizonShape
+
+/-! ## Secular trend in the criterion versus secular trend in the population
+
+`secularTrendBias` above models drift as a single number growing linearly in time, which leaves
+open the question the number cannot answer: whether the phenotype moved or the definition of a
+case moved. Both produce a drifting response curve, and across cohorts both are happening.
+
+`Calibrator.DriftingConditional` settles when they can be told apart. At any fixed cohort they
+cannot: the observable determines the linked curve `m - θ` and the unidentified direction is
+exactly the spatially constant one, so a uniform shift in liability and an equal move of the
+diagnostic threshold are the same data however many cohorts are sampled at that resolution.
+
+From the *motion* they can, provided the population's own dynamics carry no constant forcing.
+Averaging the linked curve's velocity against the population's invariant distribution annihilates
+the population term and returns the threshold velocity alone. That is a formula, not a bound, and
+every quantity in it is observable.
+
+The hypothesis is the whole content and it is refutable: a population model with spatially uniform
+forcing conflates the two forever. So a study that wants to attribute cross-cohort drift to
+changing diagnostic criteria has to commit to a conservative population model first, and say so. -/
+
+section CriterionDrift
+
+/-- **Threshold drift is recoverable from cohort motion.**
+
+    Instance of `threshold_velocity_eq_neg_invariantAverage_drift`: with the linked response curve
+    observed across a stratified population, its velocity averaged against the population's
+    invariant distribution equals minus the velocity of the diagnostic threshold. The population's
+    own dynamics drop out because a generator annihilates constants.
+
+    Empirical status: DERIVED. The generator, the invariant distribution and the link are
+    modelling commitments; given them the threshold path is identified up to its starting value. -/
+theorem criterionDrift_from_cohortMotion {n : ℕ}
+    (stratumWeight : Fin n → ℝ) (populationGenerator : Fin n → Fin n → ℝ)
+    (linkedCurve linkedVelocity : Fin n → ℝ) (criterionVelocity : ℝ)
+    (hmass : ∑ i, stratumWeight i = 1)
+    (hinv : IsInvariantWeight stratumWeight populationGenerator)
+    (hdyn : ∀ i, linkedVelocity i =
+      (∑ j, populationGenerator i j * linkedCurve j) - criterionVelocity) :
+    ∑ i, stratumWeight i * linkedVelocity i = -criterionVelocity :=
+  threshold_velocity_eq_neg_invariantAverage_drift stratumWeight populationGenerator
+    linkedCurve linkedVelocity criterionVelocity hmass hinv hdyn
+
+/-- **A population model with uniform forcing destroys the separation.**
+
+    Instance of `constantForcing_conflates_threshold`: the same average now returns the difference
+    of the two velocities, so no amount of cohort data separates a secular phenotype shift that is
+    uniform across strata from a moving diagnostic criterion. This is the hypothesis of
+    `criterionDrift_from_cohortMotion` failing, and it fails loudly rather than silently.
+
+    Empirical status: DERIVED. -/
+theorem uniformSecularShift_conflated_with_criterion {n : ℕ}
+    (stratumWeight : Fin n → ℝ) (populationGenerator : Fin n → Fin n → ℝ)
+    (linkedCurve linkedVelocity : Fin n → ℝ) (criterionVelocity uniformShift : ℝ)
+    (hmass : ∑ i, stratumWeight i = 1)
+    (hinv : IsInvariantWeight stratumWeight populationGenerator)
+    (hdyn : ∀ i, linkedVelocity i =
+      (∑ j, populationGenerator i j * linkedCurve j) + uniformShift - criterionVelocity) :
+    ∑ i, stratumWeight i * linkedVelocity i = uniformShift - criterionVelocity :=
+  constantForcing_conflates_threshold stratumWeight populationGenerator linkedCurve
+    linkedVelocity criterionVelocity uniformShift hmass hinv hdyn
+
+/-- **An interpolated cohort inherits the geometric mean of its neighbours' errors.**
+
+    Instance of `interiorError_sq_le_mul_endpoints`: reconstructing the response curve for a cohort
+    between two measured cohorts costs the product of the two error energies, with constant one.
+    Interpolation between cohorts is safe; the expensive direction is extrapolation, which this
+    bound does not cover.
+
+    Empirical status: DERIVED. -/
+theorem interpolatedCohort_error_le_neighbours {n : ℕ}
+    (modeWeight relaxationRate : Fin n → ℝ) (earlier later : ℝ)
+    (hw : ∀ k, 0 ≤ modeWeight k) :
+    errorEnergy modeWeight relaxationRate ((earlier + later) / 2) ^ 2
+      ≤ errorEnergy modeWeight relaxationRate earlier *
+        errorEnergy modeWeight relaxationRate later :=
+  interiorError_sq_le_mul_endpoints modeWeight relaxationRate earlier later hw
+
+end CriterionDrift
 
 end Calibrator
