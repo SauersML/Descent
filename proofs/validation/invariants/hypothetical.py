@@ -128,11 +128,33 @@ def analyze(files: dict[str, str]) -> list[dict]:
         if not hyps:
             continue
         preds = PRED_PARAM.findall(sig)
-        # Count only UNBOUNDED universal hypotheses: those are the ones that can
-        # carry a general mathematical claim rather than a condition on given data.
+        # Count only universal hypotheses that ASSERT SOMETHING ABOUT AN ABSTRACT
+        # PREDICATE the theorem itself introduces.  This is the third and last
+        # narrowing of this criterion, and each narrowing was forced by reading the
+        # top of the previous ranking:
+        #
+        #   * scoring every ∀-hypothesis gave 552 hits, dominated by domain
+        #     conditions like `∀ i ∈ s, 0 ≤ w i`;
+        #   * excluding bounded quantifiers gave 125, still topped by
+        #     `qalyLoss_le_componentwise_calibration_bound`, whose eight
+        #     hypotheses are `∀ t, |predicted t - true t| ≤ ε t` -- unbounded only
+        #     because `Fin T` needs no `∈`, and quantitative conditions on supplied
+        #     data, not imports.
+        #
+        # What distinguishes an import is not the quantifier.  It is that the
+        # hypothesis constrains a PREDICATE PARAMETER, because a predicate parameter
+        # has no content of its own: whatever the hypothesis says about it is
+        # assumed outright rather than derived.  A numeric bound on given data is
+        # discharged by whoever supplies the data; `∀ F, admitsDim F 1` is not
+        # discharged by anyone.
         unbounded = 0
         for hname, htype in hyps:
-            if htype.lstrip().startswith("∀") and not BOUNDED_FORALL.search(htype):
+            if not htype.lstrip().startswith("∀"):
+                continue
+            if BOUNDED_FORALL.search(htype):
+                continue
+            if any(re.search(rf"(?<![A-Za-z0-9_.']){re.escape(p)}(?![A-Za-z0-9_'])",
+                             htype) for p in preds):
                 unbounded += 1
         # One occurrence is the declaration itself.
         uses = counts.get(name, 1) - 1
