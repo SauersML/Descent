@@ -470,11 +470,11 @@ dosage-only approximation incurs structural bias whenever the target
 configuration frequency differs from the source. A phase-aware model fitted at
 the target's own cis/trans effects avoids that bias.
 
-**Status change.** The left-hand side was previously the constant `0`, so the
-theorem was `0 < <positive thing>`. It is now the transport bias of an explicit
-predictor, and the portability of the effects is visible in the statement as the
-instantiation of the fitted pair. Drop that instantiation and the conclusion
-fails: see `haplotype_less_portable_when_effects_shift`. -/
+**The left-hand side must be the transport bias of an explicit predictor, not the
+constant `0`** -- with `0` the theorem is `0 < <positive thing>` and says nothing. The
+portability of the effects is visible in the statement as the instantiation of the fitted
+pair; drop that instantiation and the conclusion fails, as
+`haplotype_less_portable_when_effects_shift` shows. -/
 theorem haplotype_pgs_more_portable_for_cis
     (freq_cis_source freq_cis_target interaction_cis interaction_trans : ℝ)
     (h_freq_shift : freq_cis_source ≠ freq_cis_target)
