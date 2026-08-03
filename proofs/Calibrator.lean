@@ -270,7 +270,7 @@ verified the hard way:
 two-locus coalescent theorems in `Calibrator.DGP` is discharged here by computation.
 It was previously supplied as a `local instance : Fact (2 ≤ 2)`; a `Fact` instance is
 resolved silently and so kept the premise out of every signature that depended on it. -/
-theorem twoLocusBlockSize : (2 : ℕ) ≤ 2 := le_refl 2
+theorem two_le_two : (2 : ℕ) ≤ 2 := le_refl 2
 
 /-
 Proof policy: do not add theorems whose conclusion merely repackages a premise
@@ -289,10 +289,10 @@ theorem twoLocusCoalescent_covariance_gap_lower_bound_dim_two
         (ibdWeight * discreteRecombinationSurvival recombRate tSource *
           (1 - discreteRecombinationSurvival recombRate (tTarget - tSource))) ^ 2 ≤
       frobeniusNormSq
-        (twoLocusCoalescentCovarianceMatrix twoLocusBlockSize ibdWeight recombRate tSource -
-          twoLocusCoalescentCovarianceMatrix twoLocusBlockSize ibdWeight recombRate tTarget) :=
+        (twoLocusCoalescentCovarianceMatrix two_le_two ibdWeight recombRate tSource -
+          twoLocusCoalescentCovarianceMatrix two_le_two ibdWeight recombRate tTarget) :=
   twoLocusCoalescent_covariance_gap_lower_bound
-    twoLocusBlockSize ibdWeight recombRate tSource tTarget h_time
+    two_le_two ibdWeight recombRate tSource tTarget h_time
 
 /-- Concrete `2 × 2` positivity corollary for the two-locus coalescent witness. -/
 theorem covariance_mismatch_pos_of_twoLocusCoalescent_dim_two
@@ -304,10 +304,10 @@ theorem covariance_mismatch_pos_of_twoLocusCoalescent_dim_two
     (h_time : tSource < tTarget) :
     0 <
       frobeniusNormSq
-        (twoLocusCoalescentCovarianceMatrix twoLocusBlockSize ibdWeight recombRate tSource -
-          twoLocusCoalescentCovarianceMatrix twoLocusBlockSize ibdWeight recombRate tTarget) :=
+        (twoLocusCoalescentCovarianceMatrix two_le_two ibdWeight recombRate tSource -
+          twoLocusCoalescentCovarianceMatrix two_le_two ibdWeight recombRate tTarget) :=
   covariance_mismatch_pos_of_twoLocusCoalescent
-    twoLocusBlockSize ibdWeight recombRate tSource tTarget
+    two_le_two ibdWeight recombRate tSource tTarget
     h_ibd_pos h_recomb_pos h_recomb_lt_one h_time
 
 
@@ -336,7 +336,7 @@ def sigmaT2 : Matrix (Fin 2) (Fin 2) ℝ := ![![1, 0.5], ![0.5, 1]]
 /-- A concrete proof that the source ERM is LD-specific and does not solve
     the target normal equations under a new correlation structure. The mismatch is
     exhibited by explicit `2 × 2` witnesses rather than assumed as a hypothesis. -/
-theorem source_erm_is_ld_specific_proved :
+theorem source_erm_solves_source_not_target_normal_equations :
     let wS : Fin 2 → ℝ := ![1, 0]
     sigmaS.mulVec wS = crossS ∧
     sigmaT2.mulVec wS ≠ ldWitnessTargetCross := by
@@ -379,8 +379,8 @@ theorem target_r2_drop_of_twoLocusCoalescent_dim_two
     (h_mse_gap_lb :
       lam *
           frobeniusNormSq
-            (twoLocusCoalescentCovarianceMatrix twoLocusBlockSize ibdWeight recombRate tSource -
-              twoLocusCoalescentCovarianceMatrix twoLocusBlockSize ibdWeight recombRate tTarget) ≤
+            (twoLocusCoalescentCovarianceMatrix two_le_two ibdWeight recombRate tSource -
+              twoLocusCoalescentCovarianceMatrix two_le_two ibdWeight recombRate tTarget) ≤
         mseTarget - mseSource)
     (h_lam_pos : 0 < lam)
     (h_varY_pos : 0 < varY)
@@ -390,7 +390,7 @@ theorem target_r2_drop_of_twoLocusCoalescent_dim_two
     (h_time : tSource < tTarget) :
     r2FromMSE mseTarget varY < r2FromMSE mseSource varY :=
   target_r2_drop_of_twoLocusCoalescent
-    twoLocusBlockSize mseSource mseTarget varY lam
+    two_le_two mseSource mseTarget varY lam
     ibdWeight recombRate tSource tTarget
     h_mse_gap_lb h_lam_pos h_varY_pos
     h_ibd_pos h_recomb_pos h_recomb_lt_one h_time

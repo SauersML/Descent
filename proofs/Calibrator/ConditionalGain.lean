@@ -116,7 +116,7 @@ method design consequently needs both a support diagnostic and a gain diagnostic
 /-- The two one-locus binary configurations, written explicitly so every later finite sum
 is checked against the actual function-space Fintype rather than an informal two-cell
 enumeration. -/
-private theorem binaryOneLocus_univ :
+private theorem binaryOneSite_univ :
     (Finset.univ : Finset (Fin 1 → Fin 2)) = {![0], ![1]} := by
   decide
 
@@ -125,7 +125,7 @@ noncomputable def balancedBinaryOppositePhaseLaw : FiniteCoupledPhaseLaw 1 2 whe
   mass := fun _ ↦ 1 / 2
   mass_nonneg := by intro; norm_num
   mass_sum := by
-    rw [binaryOneLocus_univ]
+    rw [binaryOneSite_univ]
     norm_num
   phase := fun _ j ↦ if j = 0 then 0 else Real.pi
 
@@ -136,7 +136,7 @@ noncomputable def biasedBinaryOppositePhaseLaw : FiniteCoupledPhaseLaw 1 2 where
     intro x
     split_ifs <;> norm_num
   mass_sum := by
-    rw [binaryOneLocus_univ]
+    rw [binaryOneSite_univ]
     norm_num
   phase := fun _ j ↦ if j = 0 then 0 else Real.pi
 
@@ -146,7 +146,7 @@ theorem balancedBinaryOppositePhaseLaw_amplitude_one :
   rw [FiniteCoupledPhaseLaw.characteristicAmplitude]
   simp [FiniteCoupledPhaseLaw.cosPart, FiniteCoupledPhaseLaw.sinPart,
     FiniteCoupledPhaseLaw.scorePhase, balancedBinaryOppositePhaseLaw,
-    binaryOneLocus_univ]
+    binaryOneSite_univ]
 
 /-- The same phase coding under a `3/4 : 1/4` imbalance leaves amplitude `1/2`. -/
 theorem biasedBinaryOppositePhaseLaw_amplitude_one :
@@ -154,7 +154,7 @@ theorem biasedBinaryOppositePhaseLaw_amplitude_one :
   rw [FiniteCoupledPhaseLaw.characteristicAmplitude]
   simp [FiniteCoupledPhaseLaw.cosPart, FiniteCoupledPhaseLaw.sinPart,
     FiniteCoupledPhaseLaw.scorePhase, biasedBinaryOppositePhaseLaw,
-    binaryOneLocus_univ]
+    binaryOneSite_univ]
   norm_num
 
 /-- Exact cancellation gives infinite conditional gain. -/

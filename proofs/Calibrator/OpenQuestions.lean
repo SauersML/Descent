@@ -892,7 +892,7 @@ theorem slope_rescaling_inverts_slope_change
 /-- **LD mismatch is NOT recoverable by linear re-calibration.**
     If the LD structure changes, the normal equations have a different solution.
     No linear transformation of the source weights can recover the target optimum.
-    (This reuses the existing source_erm_is_ld_specific_proved.) -/
+    (This reuses the existing source_erm_solves_source_not_target_normal_equations.) -/
 theorem mulVec_smul_ne_of_not_aligned
     (w_source : Fin 2 → ℝ)
     (σ_target : Matrix (Fin 2) (Fin 2) ℝ)
