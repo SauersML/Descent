@@ -536,6 +536,23 @@ first proving the corresponding observation-model reduction and minimax law.
 
 section NonsmoothSampleSize
 
+/-- **Logarithmic risk benchmark at sample size `n`.**
+
+    `1 / log n`: the accuracy a logarithmically ill-posed recovery problem reaches at
+    sample size `n`. It is the benchmark the two theorems below invert, and it is a
+    benchmark rather than an asserted rate for any particular estimator.
+
+    Empirical status: UNTESTED. -/
+noncomputable def logarithmicRiskBenchmark (n : ℝ) : ℝ := 1 / Real.log n
+
+/-- **Fixed-grade polynomial risk benchmark at sample size `n`.**
+
+    `n ^ (-(c/K))`: the accuracy a problem of grade `K` with constant `c` reaches at
+    sample size `n`. Its inverse is `fixedGradeBenchmarkSampleSize`.
+
+    Empirical status: UNTESTED. -/
+noncomputable def fixedGradeRiskBenchmark (n K c : ℝ) : ℝ := n ^ (-(c / K))
+
 /-- **Sample size that inverts the logarithmic risk benchmark at `ε`.**
 
     `exp (1/ε)`. This is a benchmark inversion, not an asserted sample-size
