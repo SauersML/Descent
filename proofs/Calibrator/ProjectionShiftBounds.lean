@@ -781,14 +781,12 @@ theorem twoCoordinate_pruning_corner_lt_one
 is a set of `k` indices, no more and no fewer, separated from its complement by
 a cut value.
 
-This is the one ingredient the frontier packaging needs beyond what is proved
-here.  It is not an empirical assumption and not an external input: it holds for
-every score on a finite type, by sorting the values and cutting at rank `k`.
-That sorting argument is not written, so the general statement is admitted in
-`hasThresholdSetAtEveryRank_of_fintype` below and the admission is visible to
-`AxiomScan` as a `sorryAx`.  Carrying it instead as a premise of
-`exists_split_attaining_scalarized_optimum` would hide the same debt in a
-hypothesis, where no audit reports it.
+This is the one ingredient the frontier packaging needs beyond the analytic
+lemmas above.  It is not an empirical assumption or an external input: it holds
+for every score on a finite type.  The proof below chooses, among all `k`-sets,
+one maximizing total score.  Exchanging a selected minimum with a larger
+unselected value would improve that maximum, so the selected and unselected
+values are separated by the minimum selected score.
 
 What is proved without it: every threshold set is a scalarised optimum
 (`scalarized_optimum_is_coordinate_split`), so every supporting line of the
@@ -805,12 +803,8 @@ def HasThresholdSetAtEveryRank (score : ι → ℝ) : Prop :=
     ∃ (S : Finset ι) (t : ℝ), S.card = k ∧
       (∀ i ∈ S, t ≤ score i) ∧ (∀ i ∉ S, score i ≤ t)
 
-/-- Constant scores have a threshold set at every rank.  This is the
-`sorry`-free instance of `HasThresholdSetAtEveryRank`: the degenerate case where
-every subset of the right size works and the cut is at the common value.  It is
-kept alongside the admitted general statement
-`hasThresholdSetAtEveryRank_of_fintype` so that at least one member of the class
-is exhibited by a complete proof. -/
+/-- Constant scores have a threshold set at every rank: every subset of the
+right size works and the cut is at the common value. -/
 theorem hasThresholdSetAtEveryRank_const (c : ℝ) :
     HasThresholdSetAtEveryRank (fun _ : ι ↦ c) := by
   intro k hk
@@ -821,19 +815,52 @@ theorem hasThresholdSetAtEveryRank_const (c : ℝ) :
 
 /-- **Every score on a finite type has a threshold set at every rank.**
 
-ADMITTED (`sorry`).  What is admitted is exactly this: for a score `score : ι →
-ℝ` on a `Fintype` and every `k ≤ Fintype.card ι`, there is a set `S` with
-`S.card = k` and a cut value `t` with `score ≥ t` on `S` and `score ≤ t` off it.
-The proof is to sort the values of `score` in decreasing order and cut after the
-`k`-th; it is a finite-combinatorial fact with no analytic content and no
-empirical content, and it is unwritten only because the sorting bookkeeping is.
-
-An admission rather than a premise, because the two are reported differently: a
-`sorry` reaches `AxiomScan` as `sorryAx` and is counted, whereas the same claim
-carried as a hypothesis on the consumers is visible to no guard at all. -/
+The maximizing-set proof works with ties and requires no order on the index
+type.  At rank zero the cut is a maximum score (or arbitrary when the type is
+empty).  At positive rank, the cut is the minimum score in a maximum-total-score
+`k`-set. -/
 theorem hasThresholdSetAtEveryRank_of_fintype (score : ι → ℝ) :
     HasThresholdSetAtEveryRank score := by
-  sorry
+  intro k hk
+  have hcandidates : ((Finset.univ : Finset ι).powersetCard k).Nonempty :=
+    Finset.powersetCard_nonempty.mpr (by simpa [Finset.card_univ] using hk)
+  obtain ⟨S, hSmem, hSmax⟩ :=
+    ((Finset.univ : Finset ι).powersetCard k).exists_max_image
+      (fun T ↦ ∑ i ∈ T, score i) hcandidates
+  have hScard : S.card = k := (Finset.mem_powersetCard.mp hSmem).2
+  by_cases hk0 : k = 0
+  · have hSempty : S = ∅ := Finset.card_eq_zero.mp (hScard.trans hk0)
+    subst S
+    by_cases hι : (Finset.univ : Finset ι).Nonempty
+    · obtain ⟨i, -, himax⟩ :=
+        (Finset.univ : Finset ι).exists_max_image score hι
+      exact ⟨∅, score i, by simpa [hk0], by simp,
+        fun j _ ↦ himax j (Finset.mem_univ j)⟩
+    · refine ⟨∅, 0, by simpa [hk0], by simp, ?_⟩
+      intro j _
+      exact False.elim (hι ⟨j, Finset.mem_univ j⟩)
+  · have hSnonempty : S.Nonempty := Finset.card_pos.mp (by omega)
+    obtain ⟨i, hiS, himin⟩ := S.exists_min_image score hSnonempty
+    refine ⟨S, score i, hScard, himin, ?_⟩
+    intro j hjS
+    by_contra hji
+    have hij : score i < score j := lt_of_not_ge hji
+    let T := insert j (S.erase i)
+    have hjErase : j ∉ S.erase i := by simp [hjS]
+    have hTcard : T.card = k := by
+      simp [T, hjErase, hiS, hScard]
+      omega
+    have hTmem : T ∈ (Finset.univ : Finset ι).powersetCard k :=
+      Finset.mem_powersetCard.mpr ⟨Finset.subset_univ T, hTcard⟩
+    have hmax := hSmax T hTmem
+    have hsumErase :
+        (∑ x ∈ S.erase i, score x) + score i = ∑ x ∈ S, score x := by
+      exact Finset.sum_erase_add _ _ hiS
+    have hsumT :
+        (∑ x ∈ T, score x) = (∑ x ∈ S.erase i, score x) + score j := by
+      simp [T, hjErase, add_comm]
+    rw [hsumT] at hmax
+    linarith
 
 /-- **The frontier is carried by coordinate splits of the prescribed rank.**
 
