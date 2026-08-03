@@ -19,7 +19,11 @@ Key results:
 4. Heritability is population-specific
 5. PGS R² ceiling from heritability
 
-Reference: Wang et al. (2026), Nature Communications 17:942.
+Provenance: derived here, not imported. This file previously cited Wang et al. (2026),
+Nature Communications 17:942 for the results below. That paper is an empirical study of
+the polygenic-score portability gap; it does not treat GREML estimation, missing
+heritability or the population-specificity of h2, and so does not substantiate anything
+here. Sources for individual results, where they exist, are cited at those results.
 -/
 
 

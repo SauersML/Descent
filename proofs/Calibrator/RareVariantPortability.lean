@@ -20,7 +20,11 @@ Key results:
 3. Loss-of-function variant portability
 4. Rare variant effect size distribution
 
-Reference: Wang et al. (2026), Nature Communications 17:942.
+Provenance: derived here, not imported. This file previously cited Wang et al. (2026),
+Nature Communications 17:942 for the results below. That paper is an empirical study of
+the polygenic-score portability gap; it does not treat rare-variant sharing, burden
+tests or loss-of-function variants, and so does not substantiate anything here. Sources
+for individual results, where they exist, are cited at those results.
 -/
 
 

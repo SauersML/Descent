@@ -18,7 +18,11 @@ Key results:
 4. Calibration across populations
 5. Quantile-based risk and population-specific thresholds
 
-Reference: Wang et al. (2026), Nature Communications 17:942.
+Provenance: derived here, not imported. This file previously cited Wang et al. (2026),
+Nature Communications 17:942 for the results below. That paper is an empirical study of
+the polygenic-score portability gap; it does not treat score distribution theory, tail
+probabilities or quantile thresholds, and so does not substantiate anything here.
+Sources for individual results, where they exist, are cited at those results.
 -/
 
 
@@ -335,7 +339,20 @@ section GaussianApproximation
 
 /-- **Berry-Esseen error decreases with more SNPs.**
     As the number of SNPs m increases, ρ/σ³ decreases as 1/√m
-    (assuming each SNP contributes comparably). -/
+    (assuming each SNP contributes comparably).
+
+    **Two corrections, both established below in this file; read them before quoting
+    this.** (1) The marker count is the wrong count under linkage: the score behaves
+    like a sum over `m/ℓ` blocks, and the `√ℓ` constant that would convert one to the
+    other is **FALSIFIED** — the excursion-bundle law carries its own `κ`, which can
+    sit on either side of one. (2) The inline derivation in this statement,
+    `m·ρ/(m·σ²)^{3/2} = ρ/(σ²·√m)`, has the wrong power of `σ`; the right-hand side
+    should be `ρ/((σ²)^{3/2}·√m)`.
+
+    Neither defect makes this theorem false — it compares the bound at two marker
+    counts with everything else fixed, and both a constant and a constant power of `σ`
+    cancel from such a comparison. Anything reading a *number* off it inherits them.
+    Use `berryEsseenBound` and the block-count theorems below instead. -/
 theorem berry_esseen_error_decreases_with_snps
     (C ρ_per_snp σ_sq_per_snp : ℝ) (m₁ m₂ : ℕ)
     (h_C : 0 < C) (h_ρ : 0 < ρ_per_snp) (h_σ : 0 < σ_sq_per_snp)
@@ -358,7 +375,14 @@ theorem berry_esseen_error_decreases_with_snps
     loci than another will have a better Gaussian approximation.
 
     Worked example: Height (~10000 loci) has much better Gaussian
-    approximation than an oligogenic trait with ~10 loci. -/
+    approximation than an oligogenic trait with ~10 loci.
+
+    **The first sentence states the correct Berry-Esseen form and the body does not
+    implement it**: the body is `C·ρ/(σ²·√m)`, one power of `σ` short, as recorded in
+    the audit note below. And `m` is the marker count, which under linkage is the wrong
+    count — see the same note and the falsified `√ℓ` constant. The comparison proved
+    here survives both, since each defect cancels between the two sides; a numerical
+    reading of the bound does not. -/
 theorem highly_polygenic_better_gaussian
     (C ρ σ_sq : ℝ) (m_oligo m_poly : ℕ)
     (h_C : 0 < C) (h_ρ : 0 < ρ) (h_σ : 0 < σ_sq)

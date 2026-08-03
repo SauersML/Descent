@@ -20,7 +20,11 @@ Key results:
 4. Population bottlenecks amplify LD as a function of severity and duration
 5. LD mismatch quantification via Frobenius norm
 
-Reference: Wang et al. (2026), Nature Communications 17:942.
+Provenance: derived here, not imported. This file previously cited Wang et al. (2026),
+Nature Communications 17:942 for the results below. That paper is an empirical study of
+the polygenic-score portability gap; it does not treat the Ohta-Kimura decay model,
+admixture LD or bottleneck amplification, and so does not substantiate anything here.
+Sources for individual results, where they exist, are cited at those results.
 -/
 
 
@@ -879,9 +883,12 @@ pre-expansion persists longer. Large modern Ne means current drift is slow.
 
 section ExpansionLD
 
-/-- **LD decay rate depends on current Ne.**
-    The fraction of LD that decays per generation is 1/(2Ne).
-    Larger Ne → slower decay → LD persists longer.
+/-- **Per-generation drift rate at effective size Ne**, `1/(2Ne)`. Larger Ne means
+    slower drift.
+
+    **This is not the fraction of LD lost per generation**, which is what the name and
+    the original headline said; for that use `ldRetentionPerGen`, which takes the
+    recombination rate this body omits.
 
     **The docstring's numeric reading is FALSIFIED; the body survives as a bare drift rate.**
     "The fraction of LD that decays per generation is `1/(2Ne)`" omits recombination, which
@@ -912,7 +919,9 @@ section ExpansionLD
 noncomputable def ldDecayRatePerGen (Ne : ℝ) : ℝ :=
   1 / (2 * Ne)
 
-/-- Larger population has slower LD decay rate. -/
+/-- Larger population has a slower per-generation drift rate. The name says "LD decay
+rate", which is the reading falsified at `ldDecayRatePerGen`: without a recombination
+argument this is drift only. The monotonicity proved here is a fact about `1/(2Ne)`. -/
 theorem larger_pop_slower_ld_decay (Ne₁ Ne₂ : ℝ)
     (hNe₁ : 0 < Ne₁) (hNe₂ : 0 < Ne₂) (h_larger : Ne₁ < Ne₂) :
     ldDecayRatePerGen Ne₂ < ldDecayRatePerGen Ne₁ := by

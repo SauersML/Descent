@@ -23,7 +23,11 @@ Key results:
 4. Temporal calibration drift
 5. Retraining schedules and update strategies
 
-Reference: Wang et al. (2026), Nature Communications 17:942.
+Provenance: derived here, not imported. This file previously cited Wang et al. (2026),
+Nature Communications 17:942 for the results below. That paper is an empirical study of
+the polygenic-score portability gap; it does not treat temporal decay of portability,
+epoch effects or retraining schedules, and so does not substantiate anything here.
+Sources for individual results, where they exist, are cited at those results.
 -/
 
 
@@ -79,9 +83,12 @@ theorem portability_decreases_with_time (r2_initial lambda_total t₁ t₂ : ℝ
 
 This file used to restate `1 / (2 Nₑ)` as `longitudinalDriftDecayRate`. It is
 `ldDecayRatePerGen` from `Calibrator.LDDecayTheory` — one per-generation drift
-rate, read there as the fraction of LD lost per generation and here as the
-fraction of the ancestral score variance lost per generation — and the
-restatement has been deleted in favour of that one. -/
+rate — and the restatement has been deleted in favour of that one.
+
+Note that the "fraction of LD lost per generation" reading of that name is FALSIFIED
+there, by up to 201x, because recombination dominates `1 / (2 Nₑ)`. What is imported here
+is the drift rate itself. Whether it is the fraction of ancestral score variance lost per
+generation is a separate claim, and it is UNTESTED. -/
 
 /-- Drift decay rate is positive for positive Ne. -/
 theorem drift_decay_rate_pos (Ne : ℝ) (h : 0 < Ne) :

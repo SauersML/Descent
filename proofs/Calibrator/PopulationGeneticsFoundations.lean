@@ -21,7 +21,11 @@ Key results:
 4. Wright's fixation indices
 5. Mutation-drift balance (equilibrium and transient Fst, LD decay)
 
-Reference: Wang et al. (2026), Nature Communications 17:942.
+Provenance: derived here, not imported. This file previously cited Wang et al. (2026),
+Nature Communications 17:942 for the results below. That paper is an empirical study of
+the polygenic-score portability gap; it does not treat Fst estimators, coalescent theory
+or mutation-drift balance, and so does not substantiate anything here. Sources for
+individual results, where they exist, are cited at those results.
 -/
 
 
@@ -825,45 +829,20 @@ theorem expectedNewMutations_increases_with_time (θ t₁ t₂ : ℝ)
   unfold expectedNewMutations
   nlinarith
 
-/-- **DOCSTRING OVERCLAIM — this is not a fraction of anything.**
+/-! **Deleted: `sharedLDFractionFromMutation θ t = exp(-expectedNewMutations θ t)`,
+together with `sharedLDFraction_pos`, `sharedLDFraction_le_one` and
+`sharedLDFraction_decreases_with_time`.**
 
-    The body is `exp(-expectedNewMutations θ t) = exp(-θt/2)`, and by the corpus's own
-    composition that exponent is a **count of mutations**, not a dimensionless rate. Simulation
-    measures the count directly: `599.9` arisen at `θ = 1, t = 1200`, so the body evaluates to
-    `exp(-600) ≈ 1e-261`; at `θ = 4` it is `exp(-2424)`.
+The exponent was a **count of mutations**, not a dimensionless rate: simulation measures
+`599.9` mutations arisen at `θ = 1, t = 1200`, so the body evaluated to `exp(-600) ≈ 1e-261`,
+and to `exp(-2424)` at `θ = 4`. A quantity called "the fraction of LD shared between
+populations" was therefore identically zero to machine precision for any locus older than
+roughly `60/θ` generations. Nothing in the corpus derives an `exp(-N_mutations)` law, and the
+regime in which the expression looks plausible (`θt/2 ~ 1`) exists only for a per-*site* `θ`
+and vanishes at locus scale. No corrected replacement exists, so the name is simply gone;
+LD erosion by recombination is `Calibrator.LDDecayTheory`, not this.
 
-    A quantity described as "the fraction of LD shared between populations" is therefore
-    **identically zero to machine precision for any locus older than roughly `60/θ`
-    generations**. Nothing in the corpus derives an `exp(-N_mutations)` law, and the regime in
-    which the expression looks plausible (`θt/2 ~ 1`) exists only for a per-*site* `θ` and
-    vanishes for any locus-scale `θ`.
-
-    Empirical status: **FALSIFIED as stated** (`proofs/validation/coalescent_diff/`). -/
-noncomputable def sharedLDFractionFromMutation (θ t : ℝ) : ℝ :=
-  Real.exp (-(expectedNewMutations θ t))
-
-/-- Shared LD fraction is in (0, 1] for nonneg parameters. -/
-theorem sharedLDFraction_pos (θ t : ℝ) :
-    0 < sharedLDFractionFromMutation θ t := by
-  unfold sharedLDFractionFromMutation
-  exact Real.exp_pos _
-
-theorem sharedLDFraction_le_one (θ t : ℝ) (hθ : 0 ≤ θ) (ht : 0 ≤ t) :
-    sharedLDFractionFromMutation θ t ≤ 1 := by
-  unfold sharedLDFractionFromMutation
-  rw [← Real.exp_zero]
-  apply Real.exp_le_exp.mpr
-  have := expectedNewMutations_nonneg θ t hθ ht
-  linarith
-
-/-- Shared LD fraction decreases with time (mutation erodes shared LD). -/
-theorem sharedLDFraction_decreases_with_time (θ t₁ t₂ : ℝ)
-    (hθ : 0 < θ) (ht₁ : 0 ≤ t₁) (h_more : t₁ < t₂) :
-    sharedLDFractionFromMutation θ t₂ < sharedLDFractionFromMutation θ t₁ := by
-  unfold sharedLDFractionFromMutation
-  apply Real.exp_lt_exp.mpr
-  have h_inc := expectedNewMutations_increases_with_time θ t₁ t₂ hθ ht₁ h_more
-  linarith
+Measured in `proofs/validation/coalescent_diff/`. -/
 
 end MutationDriftBalance
 

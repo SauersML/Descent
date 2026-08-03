@@ -24,7 +24,12 @@ Key results:
 4. Architecture-dependent portability predictions
 5. Heritability partitioning by functional category
 
-Reference: Wang et al. (2026), Nature Communications 17:942.
+Provenance: derived here, not imported. This file previously cited Wang et al. (2026),
+Nature Communications 17:942 for the results below. That paper is an empirical study of
+the polygenic-score portability gap; it does not treat effect-size distribution models,
+or the minimax and certificate-modulus material below, and so does not substantiate
+anything here. Sources for individual results, where they exist, are cited at those
+results.
 -/
 
 
@@ -442,11 +447,10 @@ estimate than the variance-type summaries standing beside it.
 The second half of the picture is about certificates rather than estimators.
 The unconditional result is algebraic: completeness at grade `K` is equivalent
 to grade-insensitivity of the modulus, and the deficit is the squared modulus
-ratio. A polynomial fixed-grade gap follows only after supplying the two fields
-of `NonsmoothIncompleteness`. The first Gaussian-location-mixture audit did
-**not** supply them: its grade-8 modulus recovered 99.93% of the ungraded one.
-Consequently this file exposes those estimates as assumptions and does not
-promote the proposed gap to a law of polygenic architectures.
+ratio. The first Gaussian-location-mixture audit found its grade-8 modulus
+recovered 99.93% of the ungraded one, so the proposed polynomial fixed-grade
+gap is not stated as a Lean theorem here. In particular it is not accepted as
+a theorem-valued field of a biological model.
 
 `Calibrator.PowerAnalysis` compares the logarithmic and polynomial benchmark
 curves conditionally. Those comparisons are useful for falsifying a proposed
@@ -480,171 +484,89 @@ theorem meanAbsoluteEffect_nonneg {q : ℕ} (beta : Fin q → ℝ) :
     is the contrast it sets up: the smaller quantity is the harder one to
     estimate, so the ordering of the two summaries by magnitude runs opposite to
     their ordering by statistical difficulty. -/
-theorem meanAbsoluteEffect_sq_le_meanSquaredEffect {q : ℕ} (beta : Fin q → ℝ)
-    (hq : 0 < q) :
+theorem meanAbsoluteEffect_sq_le_meanSquaredEffect {q : ℕ} (beta : Fin q → ℝ) :
     (meanAbsoluteEffect beta) ^ 2 ≤ (∑ j, beta j ^ 2) / q := by
-  have hq' : (0 : ℝ) < q := Nat.cast_pos.mpr hq
-  have h := Finset.sum_mul_sq_le_sq_mul_sq (Finset.univ : Finset (Fin q))
-    (fun _ => (1 : ℝ)) (fun j => |beta j|)
-  have h3 : ∑ j : Fin q, |beta j| ^ 2 = ∑ j, beta j ^ 2 :=
-    Finset.sum_congr rfl (fun j _ => sq_abs _)
-  simp only [one_mul, one_pow, Finset.sum_const, Finset.card_univ,
-    Fintype.card_fin, nsmul_eq_mul, mul_one] at h
-  rw [h3] at h
-  unfold meanAbsoluteEffect
-  rw [div_pow, div_le_div_iff₀ (by positivity) hq']
-  have hmul := mul_le_mul_of_nonneg_right h (le_of_lt hq')
-  nlinarith [hmul]
+  by_cases hq : q = 0
+  · subst q
+    simp [meanAbsoluteEffect]
+  · have hq' : (0 : ℝ) < q := Nat.cast_pos.mpr (Nat.pos_of_ne_zero hq)
+    have h := Finset.sum_mul_sq_le_sq_mul_sq (Finset.univ : Finset (Fin q))
+      (fun _ => (1 : ℝ)) (fun j => |beta j|)
+    have h3 : ∑ j : Fin q, |beta j| ^ 2 = ∑ j, beta j ^ 2 :=
+      Finset.sum_congr rfl (fun j _ => sq_abs _)
+    simp only [one_mul, one_pow, Finset.sum_const, Finset.card_univ,
+      Fintype.card_fin, nsmul_eq_mul, mul_one] at h
+    rw [h3] at h
+    unfold meanAbsoluteEffect
+    rw [div_pow, div_le_div_iff₀ (by positivity) hq']
+    have hmul := mul_le_mul_of_nonneg_right h (le_of_lt hq')
+    nlinarith [hmul]
 
-/-! ### The biological models to which certificate grading applies
+/-! ### A biological certificate problem with no theorem fields
 
-The abstract theorem in `CertificateGrading` deliberately knows nothing about genetics.
-This layer supplies the missing typing information without pretending that Mathlib proves
-the analytic minimax inputs:
-
-* a parameter is a vector of additive allelic effects;
-* the parameter class is explicitly convex;
-* the target is either a linear polygenic summary or the nonsmooth mean absolute effect;
-* minimax duality and the analytic modulus bounds are named fields, so a consumer cannot
-  obtain a biological rate merely by defining a function with the desired formula.
-
-The distinction is scientifically important. A fixed-grade gap would apply to a biological
-functional only after its experiment establishes the analytic assumptions below. No such
-instance is currently constructed here. In particular the result does **not** automatically
-apply to prediction accuracy, calibration, or portability: those endpoints require their
-own reduction to the same modulus. This prevents an assumed lower-bound shape from being
-silently relabelled as a theorem about every PGS endpoint.
+The parameter is an additive-effect vector, the carrier is a closed ball, and
+the target is `meanAbsoluteEffect`.  The structure below contains numerical
+data only.  It cannot claim minimax duality, Donoho--Liu tightness, or a
+fixed-grade gap by projection from an assumption field.
 -/
 
-/-- A nonempty convex class of additive effect vectors for `q` variants. -/
-structure ConvexEffectClass (q : ℕ) where
-  /-- The admissible additive-effect vectors. -/
-  carrier : Set (Fin q → ℝ)
-  /-- A statistical parameter class must contain at least one architecture. -/
-  nonempty : carrier.Nonempty
-  /-- Convexity is explicit because any proposed incompleteness instance must establish it
-      rather than inherit it from prose. -/
-  convex : Convex ℝ carrier
+/-- Bounded additive-effect architectures.  The absolute radius makes the set
+nonempty and convex for every input, without a validity theorem parameter. -/
+noncomputable def boundedEffectCarrier (q : ℕ) (B : ℝ) : Set (Fin q → ℝ) :=
+  Metric.closedBall 0 |B|
 
-/-- The bounded-effect class used in Gaussian-sequence approximations of GWAS summary
-    statistics. The ambient norm on `Fin q → ℝ` is the sup norm, so this closed ball is the
-    coordinatewise box `|beta_j| ≤ B`. -/
-noncomputable def boundedEffectClass (q : ℕ) (B : ℝ) (hB : 0 ≤ B) : ConvexEffectClass q where
-  carrier := Metric.closedBall 0 B
-  nonempty := ⟨0, Metric.mem_closedBall_self hB⟩
-  convex := convex_closedBall 0 B
+theorem boundedEffectCarrier_nonempty (q : ℕ) (B : ℝ) :
+    (boundedEffectCarrier q B).Nonempty :=
+  ⟨0, Metric.mem_closedBall_self (abs_nonneg B)⟩
+
+theorem boundedEffectCarrier_convex (q : ℕ) (B : ℝ) :
+    Convex ℝ (boundedEffectCarrier q B) :=
+  convex_closedBall 0 |B|
 
 open Calibrator.CertificateGrading in
-/-- A convex biological problem with a **linear** architecture target. The field
-    `donohoLiu` is the named Donoho--Liu analytic input; Lean proves its consequences but
-    does not replace that theorem with a rate definition. -/
-structure LinearArchitectureCertificateAssumptions (q : ℕ) where
-  /-- Convex additive-effect parameter class. -/
-  effects : ConvexEffectClass q
-  /-- Weights defining the linear architecture summary. -/
-  weights : Fin q → ℝ
-  /-- The functional whose minimax risk is studied. -/
-  target : (Fin q → ℝ) → ℝ
-  /-- The target really is the stated weighted polygenic summary. -/
-  target_eq_weightedSum : target = fun beta => ∑ j, weights j * beta j
-  /-- Certificate calculus produced by the statistical experiment. -/
-  calculus : CertificateCalculus
-  /-- Ungraded mixture duality identifies the calculus with minimax risk. -/
-  duality : MinimaxDuality calculus
-  /-- The precise grade-2 Donoho--Liu fragment. -/
-  donohoLiu : DonohoLiuFragment calculus
+/-- Numerical specification of certificate values for mean absolute effects.
+No field has type `Prop`. -/
+structure MeanAbsoluteEffectCertificateProblem (q : ℕ) where
+  effectRadius : ℝ
+  rawModulus : ℕ → ℝ → ℝ
+  logScale : ℝ
 
-open Calibrator.CertificateGrading in
-/-- A convex biological problem whose target is mean absolute additive effect. The two
-    analytic modulus estimates are carried by `incompleteness`; this is the exact boundary
-    between what is formalized algebraically here and what must be proved for a concrete
-    Gaussian-sequence or GWAS experiment. -/
-structure MeanAbsoluteEffectCertificateAssumptions (q : ℕ) where
-  /-- Convex additive-effect parameter class. -/
-  effects : ConvexEffectClass q
-  /-- The functional whose minimax risk is studied. -/
-  target : (Fin q → ℝ) → ℝ
-  /-- The target is the biological mean absolute effect, not an arbitrary nonsmooth map. -/
-  target_eq_meanAbsoluteEffect : target = meanAbsoluteEffect
-  /-- Certificate calculus produced by the statistical experiment. -/
-  calculus : CertificateCalculus
-  /-- Ungraded mixture duality identifies the calculus with minimax risk. -/
-  duality : MinimaxDuality calculus
-  /-- The deconvolution envelope and fixed-grade moment-comparison bound. -/
-  incompleteness : NonsmoothIncompleteness calculus
+namespace MeanAbsoluteEffectCertificateProblem
 
-/-- The nonlinear target in a `MeanAbsoluteEffectCertificateAssumptions` is definitionally tied
-    to mean absolute additive effect. -/
-theorem MeanAbsoluteEffectCertificateAssumptions.target_eq {q : ℕ}
-    (P : MeanAbsoluteEffectCertificateAssumptions q) (beta : Fin q → ℝ) :
-    P.target beta = meanAbsoluteEffect beta := by
-  rw [P.target_eq_meanAbsoluteEffect]
+open Calibrator.CertificateGrading
 
-/-- The parameter class of the mean-absolute-effect problem is convex. This accessor keeps
-    convexity visible in downstream biological theorems rather than leaving it in prose. -/
-theorem MeanAbsoluteEffectCertificateAssumptions.convex_effects {q : ℕ}
-    (P : MeanAbsoluteEffectCertificateAssumptions q) : Convex ℝ P.effects.carrier :=
-  P.effects.convex
+noncomputable def effects {q : ℕ} (P : MeanAbsoluteEffectCertificateProblem q) :
+    Set (Fin q → ℝ) := boundedEffectCarrier q P.effectRadius
 
-open Calibrator.CertificateGrading in
-/-- **Biological Donoho--Liu corollary.** A linear polygenic architecture summary over a
-    convex effect class has grade-2 deficit at most `5/4`, provided its grade-2 modulus is
-    the Donoho--Liu one. This covers weighted allele burdens and linear annotations; it does
-    not cover `meanAbsoluteEffect`, whose absolute value is the nonsmooth obstruction. -/
-theorem linearArchitecture_gradeTwo_deficit_le {q : ℕ}
-    (P : LinearArchitectureCertificateAssumptions q) (h : ℝ)
-    (hpos : 0 < P.calculus.modulus.Δ 2 h) :
-    P.calculus.deficit 2 h ≤ 5 / 4 :=
-  donohoLiu_deficit_le P.calculus P.donohoLiu h hpos
+noncomputable def calculus {q : ℕ} (P : MeanAbsoluteEffectCertificateProblem q) :
+    CertificateCalculus := explicitCalculus P.rawModulus P.logScale
 
-open Calibrator.CertificateGrading in
-/-- **Ungraded completeness, biologically typed and conditional.** Under the explicitly
-    supplied duality assumption, the ungraded value equals the named minimax risk. -/
-theorem meanAbsoluteEffect_ungraded_eq_minimax {q : ℕ}
-    (P : MeanAbsoluteEffectCertificateAssumptions q) (h : ℝ) :
-    P.calculus.ungradedRisk h = P.duality.minimaxRisk h :=
-  P.duality.ungraded_eq_minimax h
+noncomputable def target {q : ℕ} (_P : MeanAbsoluteEffectCertificateProblem q) :
+    (Fin q → ℝ) → ℝ := meanAbsoluteEffect
 
-open Calibrator.CertificateGrading in
-/-- **Conditional fixed-grade consequence for mean absolute effect.** If a concrete
-    biological experiment proves the `NonsmoothIncompleteness` fields carried by `P`, then
-    at information scale `1/n` its modulus ratio has the displayed polynomial lower bound.
-    The structure packages assumptions; it is not itself a statistical construction. -/
-theorem meanAbsoluteEffect_fixedGrade_gap {q : ℕ}
-    (P : MeanAbsoluteEffectCertificateAssumptions q) (K : ℕ) (hK : 0 < K)
-    (n : ℝ) (hn : 1 < n) (hpos : 0 < P.calculus.modulus.Δ K (1 / n)) :
-    P.incompleteness.envelopeConst * n ^ (P.incompleteness.b K / 2) /
-        Real.sqrt (Real.log n) ≤
-      P.calculus.modulus.Δ 0 (1 / n) / P.calculus.modulus.Δ K (1 / n) :=
-  gradeGap_lower_bound P.incompleteness K hK n hn hpos
+@[simp] theorem target_eq {q : ℕ} (P : MeanAbsoluteEffectCertificateProblem q)
+    (beta : Fin q → ℝ) : P.target beta = meanAbsoluteEffect beta := rfl
 
-open Calibrator.CertificateGrading in
-/-- The exponent encoded by the conditional analytic assumptions is exactly proportional
-    to `1/K`. This theorem does not assert that a concrete GWAS experiment has that exponent. -/
-theorem meanAbsoluteEffect_gapExponent_eq {q : ℕ}
-    (P : MeanAbsoluteEffectCertificateAssumptions q) (K : ℕ) (hK : 0 < K) :
-    P.incompleteness.b K = P.incompleteness.b 1 / (K : ℝ) :=
-  P.incompleteness.b_eq K hK
+theorem effects_nonempty {q : ℕ} (P : MeanAbsoluteEffectCertificateProblem q) :
+    P.effects.Nonempty := boundedEffectCarrier_nonempty q P.effectRadius
 
-open Calibrator.CertificateGrading in
-/-- **Completeness criterion for the biological problem.** Grade `K` is complete exactly
-    when matching `K` moments leaves the mean-absolute-effect modulus unchanged. Combined
-    with `deficit_eq_modulus_ratio_sq`, the certification deficit is therefore a
-    Bernstein-type approximation invariant, not a tunable proof constant. -/
-theorem meanAbsoluteEffect_complete_iff_gradeInsensitive {q : ℕ}
-    (P : MeanAbsoluteEffectCertificateAssumptions q) (K : ℕ) (h : ℝ) :
+theorem effects_convex {q : ℕ} (P : MeanAbsoluteEffectCertificateProblem q) :
+    Convex ℝ P.effects := boundedEffectCarrier_convex q P.effectRadius
+
+/-- Exact biological specialization of the completeness criterion. -/
+theorem complete_iff_gradeInsensitive {q : ℕ}
+    (P : MeanAbsoluteEffectCertificateProblem q) (K : ℕ) (h : ℝ) :
     P.calculus.IsComplete K h ↔ P.calculus.GradeInsensitive K h :=
   isComplete_iff_gradeInsensitive P.calculus K h
 
-open Calibrator.CertificateGrading in
-/-- The exact Bernstein-type invariant for the biological problem: the risk deficit is the
-    square of the ungraded-to-grade-`K` modulus ratio, with the value-formula constant
-    cancelled identically. -/
-theorem meanAbsoluteEffect_deficit_eq_modulusRatio_sq {q : ℕ}
-    (P : MeanAbsoluteEffectCertificateAssumptions q) (K : ℕ) (h : ℝ) :
+/-- Exact Bernstein-type invariant for the mean-absolute-effect problem. -/
+theorem deficit_eq_modulusRatio_sq {q : ℕ}
+    (P : MeanAbsoluteEffectCertificateProblem q) (K : ℕ) (h : ℝ) :
     P.calculus.deficit K h =
       (P.calculus.modulus.Δ 0 h / P.calculus.modulus.Δ K h) ^ 2 :=
   deficit_eq_modulus_ratio_sq P.calculus K h
+
+end MeanAbsoluteEffectCertificateProblem
 
 /-- **Logarithmic comparison benchmark for a nonsmooth architecture summary.**
 

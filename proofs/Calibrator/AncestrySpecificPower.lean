@@ -21,7 +21,11 @@ Key results:
 4. Power-portability tradeoff
 5. Optimal multi-population study design
 
-Reference: Wang et al. (2026), Nature Communications 17:942.
+Provenance: derived here, not imported. This file previously cited Wang et al. (2026),
+Nature Communications 17:942 for the results below. That paper is an empirical study of
+the polygenic-score portability gap; it does not treat power curves, Fisher information
+or multi-population study design, and so does not substantiate anything here. Sources
+for individual results, where they exist, are cited at those results.
 -/
 
 
@@ -219,9 +223,10 @@ destroyed two correct definitions on a premise that looked just as solid, and th
 did not object, since Lean auto-binds an undefined name as an implicit variable rather
 than reporting it missing.
 
-`effectiveSampleSizeSE` and `effectiveSampleSizeFromSE` are DIFFERENT declarations that
-merely share this stem, and one of them was independently found numerically wrong. A
-bare-stem substitution here would have corrupted both. -/
+`effectiveSampleSizeSE` and `effectiveSampleSizeFromSE` were DIFFERENT declarations that
+merely shared this stem, and the first was independently found numerically wrong and has
+since been deleted from `StatisticalGeneticsMethodology`; `effectiveSampleSizeFromSE`
+remains. A bare-stem substitution here would have corrupted both. -/
 
 /-- Effective sample size is nonneg. -/
 theorem effective_information_nonneg (n : ℕ) (p r2_ld : ℝ)

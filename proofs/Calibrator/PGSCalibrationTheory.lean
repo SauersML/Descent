@@ -23,7 +23,12 @@ Key results:
 4. Recalibration methods and their limits
 5. Decision-theoretic implications of miscalibration
 
-Reference: Wang et al. (2026), Nature Communications 17:942.
+Provenance: derived here, not imported. This file previously cited Wang et al. (2026),
+Nature Communications 17:942 for the results below. That paper is an empirical study of
+the polygenic-score portability gap; it does not treat the calibration slope,
+calibration-in-the-large or the Hosmer-Lemeshow test, and so does not substantiate
+anything here. Sources for individual results, where they exist, are cited at those
+results.
 -/
 
 

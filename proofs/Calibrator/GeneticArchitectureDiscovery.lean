@@ -26,7 +26,11 @@ Key results:
 3. Effect size estimation and shrinkage
 4. Multi-trait analysis and genetic correlation
 
-Reference: Wang et al. (2026), Nature Communications 17:942.
+Provenance: derived here, not imported. This file previously cited Wang et al. (2026),
+Nature Communications 17:942 for the results below. That paper is an empirical study of
+the polygenic-score portability gap; it does not treat the winner's curse, ascertainment
+bias or shrinkage estimation, and so does not substantiate anything here. Sources for
+individual results, where they exist, are cited at those results.
 -/
 
 
@@ -348,14 +352,15 @@ theorem olsEffectEstimationVariance_eq_haplotypeEffectVarianceOLS
       haplotypeEffectVarianceOLS σ2 n freq := by
   unfold olsEffectEstimationVariance haplotypeEffectVarianceOLS; ring
 
-/-! **Do not equate `olsEffectEstimationVariance σ2 varX n` with
-`haplotypeEffectEstimationVariance σ2 n varX`.** That is true as arithmetic — both sides
-are `σ2 / (n · varX)` — and false as a claim, because it is reached only by passing a
-haplotype FREQUENCY where a genotype VARIANCE belongs. For a binary indicator of frequency
-`f` the variance is `f(1-f)`, not `f`, and that missing `(1-f)` is the defect
-`HaplotypeTheory` measures: the uncorrected body understates the estimation variance by
-50.4% at `f = 1/2`, worst for COMMON haplotypes, the opposite of the rarity intuition the
-surrounding prose appeals to.
+/-! **Do not supply a haplotype FREQUENCY to `olsEffectEstimationVariance σ2 varX n` where a
+genotype VARIANCE belongs.** `HaplotypeTheory` once carried a
+`haplotypeEffectEstimationVariance σ2 n freq = σ2 / (n · freq)` that made the substitution
+look legitimate: the equation `olsEffectEstimationVariance σ2 varX n = σ2 / (n · varX)` is
+true as arithmetic, and false as a claim, because it is reached only by that swap. For a
+binary indicator of frequency `f` the variance is `f(1-f)`, not `f`, and that missing `(1-f)`
+was measured at −50.4% at `f = 1/2`, worst for COMMON haplotypes, the opposite of the rarity
+intuition the surrounding prose appeals to. The wrong body has since been deleted; this note
+stands so the pairing is not re-derived.
 
 The theorem above is the correct pairing: `haplotypeEffectVarianceOLS`, the VALIDATED
 form, with the variance supplied explicitly as `freq * (1 - freq)` — which is what makes

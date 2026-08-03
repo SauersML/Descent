@@ -22,7 +22,11 @@ Key results:
 4. Phasing errors and their impact
 5. Local ancestry haplotype effects
 
-Reference: Wang et al. (2026), Nature Communications 17:942.
+Provenance: derived here, not imported. This file previously cited Wang et al. (2026),
+Nature Communications 17:942 for the results below. That paper is an empirical study of
+the polygenic-score portability gap; it does not treat haplotype structure, phasing or
+phase-dependent effects, and so does not substantiate anything here. Sources for
+individual results, where they exist, are cited at those results.
 -/
 
 
@@ -511,75 +515,68 @@ theorem haplotype_less_portable_when_effects_shift
   rw [hval]
   exact abs_pos.mpr h_e
 
-/-- **But haplotype PGS can overfit in training population.**
-    Rare haplotypes have fewer observed carriers, so their effect estimates are
-    noisier. This theorem states the actual carrier-count mechanism: estimation
-    variance scales like `σ² / (n × f)` where `f` is haplotype frequency in a
-    sample of size `n`. Adding a rarer haplotype strictly increases the total
-    estimation-noise burden.
+/-! **Deleted: `haplotypeEffectEstimationVariance σ2 n freq = σ2 / (n * freq)`, together with
+`haplotypeEffectEstimationVariance_lt_ols`.**
 
-    Empirical status: UNTESTED. -/
-noncomputable def haplotypeEffectEstimationVariance
-    (σ2 n freq : ℝ) : ℝ :=
-  σ2 / (n * freq)
+Regressing on a binary haplotype indicator of frequency `f` gives
+`Var(β̂) = σ²/(n·f·(1-f))`, not `σ²/(n·f)`. The missing `(1-f)` made that body
+**understate** the estimation variance — hence **overstate** precision — and it did so worst
+for **common** haplotypes, the opposite of the rarity intuition the surrounding prose appeals
+to. Monte-Carlo at `n = 1000`, 3000 replicates, MC standard error about 2.6%:
 
-/-- **The OLS estimation variance, corrected.**
+| `f` | measured | deleted body | `haplotypeEffectVarianceOLS` |
+|---|---|---|---|
+| 0.02 | 0.05286 | −5.4% | −3.5% |
+| 0.1 | 0.011255 | −11.2% | −1.3% |
+| 0.3 | 0.0048055 | −30.6% | −0.9% |
+| 0.5 | 0.0040328 | **−50.4%** | −0.8% |
 
-    Regressing on a binary haplotype indicator of frequency `f` gives
-    `Var(β̂) = σ²/(n·f·(1-f))`, not `σ²/(n·f)`. The missing `(1-f)` makes the uncorrected
-    body **understate** the estimation variance — hence **overstate** precision — and it does
-    so worst for **common** haplotypes, which is the opposite of the rarity intuition the
-    surrounding prose appeals to.
+Measured in `proofs/validation/popgen_diff2/`. -/
 
-    Monte-Carlo at `n = 1000`, 3000 replicates, MC standard error about 2.6%:
+/-- **The OLS estimation variance for a binary haplotype indicator.**
 
-    | `f` | measured | uncorrected | corrected |
-    |---|---|---|---|
-    | 0.02 | 0.05286 | −5.4% | −3.5% |
-    | 0.1 | 0.011255 | −11.2% | −1.3% |
-    | 0.3 | 0.0048055 | −30.6% | −0.9% |
-    | 0.5 | 0.0040328 | **−50.4%** | −0.8% |
+    `Var(β̂) = σ²/(n·f·(1-f))`. Monte-Carlo at `n = 1000`, 3000 replicates: within 0.8–3.5% of
+    the measured variance across `f ∈ {0.02, 0.1, 0.3, 0.5}`, where the superseded `σ²/(n·f)`
+    ran −5% to −50%.
 
-    Empirical status: **VALIDATED**; the uncorrected form is FALSIFIED
-    (`proofs/validation/popgen_diff2/`). -/
+    Note the shape is **U-shaped in `f`**, not monotone: the variance is largest at the two
+    extremes and smallest at `f = 1/2`. The rarity intuition holds only below `f = 1/2`.
+
+    Empirical status: **VALIDATED** (`proofs/validation/popgen_diff2/`). -/
 noncomputable def haplotypeEffectVarianceOLS
     (σ2 n freq : ℝ) : ℝ :=
   σ2 / (n * freq * (1 - freq))
 
-/-- **The uncorrected form understates the estimation variance, by exactly `(1-f)`.**
+/-- **But haplotype PGS can overfit in training population.**
 
-    So it overstates precision, and the error grows with frequency rather than shrinking:
-    at `f = 1/2` it is a factor of two. -/
-theorem haplotypeEffectEstimationVariance_lt_ols (σ2 n freq : ℝ)
-    (hσ : 0 < σ2) (hn : 0 < n) (hf0 : 0 < freq) (hf1 : freq < 1) :
-    haplotypeEffectEstimationVariance σ2 n freq < haplotypeEffectVarianceOLS σ2 n freq := by
-  have h1 : 0 < n * freq := mul_pos hn hf0
-  have h2 : 0 < n * freq * (1 - freq) := by nlinarith
-  have hlt : n * freq * (1 - freq) < n * freq := by nlinarith
-  unfold haplotypeEffectEstimationVariance haplotypeEffectVarianceOLS
-  exact div_lt_div_of_pos_left hσ h2 hlt
-
+    Rare haplotypes have fewer observed carriers, so their effect estimates are noisier, and
+    adding a rarer haplotype strictly increases the total estimation-noise burden. The
+    hypothesis `freq_common ≤ 1/2` is load-bearing rather than cosmetic: `f(1-f)` is U-shaped,
+    so above one half the *commoner* haplotype is the noisier one and the conclusion reverses.
+    The superseded `σ²/(n·f)` was monotone everywhere and so hid that. -/
 theorem haplotype_pgs_overfitting_risk
     (σ2 n freq_common freq_rare : ℝ)
     (h_sigma : 0 < σ2)
     (h_n : 0 < n)
     (h_rare : 0 < freq_rare)
-    (h_rarer : freq_rare < freq_common) :
-    haplotypeEffectEstimationVariance σ2 n freq_common <
-      haplotypeEffectEstimationVariance σ2 n freq_rare ∧
-    haplotypeEffectEstimationVariance σ2 n freq_common <
-      haplotypeEffectEstimationVariance σ2 n freq_common +
-        haplotypeEffectEstimationVariance σ2 n freq_rare := by
-  unfold haplotypeEffectEstimationVariance
+    (h_rarer : freq_rare < freq_common)
+    (h_common_le_half : freq_common ≤ 1 / 2) :
+    haplotypeEffectVarianceOLS σ2 n freq_common <
+      haplotypeEffectVarianceOLS σ2 n freq_rare ∧
+    haplotypeEffectVarianceOLS σ2 n freq_common <
+      haplotypeEffectVarianceOLS σ2 n freq_common +
+        haplotypeEffectVarianceOLS σ2 n freq_rare := by
+  have h_rare_lt_half : freq_rare < 1 / 2 := lt_of_lt_of_le h_rarer h_common_le_half
+  have h_rare_den : 0 < n * freq_rare * (1 - freq_rare) := by nlinarith
+  have h_den_lt : n * freq_rare * (1 - freq_rare) < n * freq_common * (1 - freq_common) := by
+    nlinarith
+  unfold haplotypeEffectVarianceOLS
   have h_common_var_lt_rare :
-      σ2 / (n * freq_common) < σ2 / (n * freq_rare) := by
-    exact div_lt_div_of_pos_left h_sigma (mul_pos h_n h_rare)
-      (by nlinarith [mul_pos h_n h_rare])
-  have h_rare_var_pos : 0 < σ2 / (n * freq_rare) := by
-    exact div_pos h_sigma (mul_pos h_n h_rare)
-  constructor
-  · exact h_common_var_lt_rare
-  · linarith
+      σ2 / (n * freq_common * (1 - freq_common)) < σ2 / (n * freq_rare * (1 - freq_rare)) :=
+    div_lt_div_of_pos_left h_sigma h_rare_den h_den_lt
+  have h_rare_var_pos : 0 < σ2 / (n * freq_rare * (1 - freq_rare)) :=
+    div_pos h_sigma h_rare_den
+  exact ⟨h_common_var_lt_rare, by linarith⟩
 
 end HaplotypePGS
 
@@ -716,13 +713,13 @@ theorem la_deconvolution_improves_pgs
     `1/(g(1-α))` Morgans, where `α` is the admixture fraction (Pool & Nielsen 2009; Liang &
     Nielsen 2014). The map length does **not** appear.
 
-    The uncorrected `expectedSegmentLength` below takes a total map length `r_total` that is
-    spurious and omits `α` entirely. A forward pedigree simulation with explicit Poisson
-    crossovers settles it decisively — holding `α = 0.5, g = 10` and varying chromosome
-    length, the truth is asymptotically **independent** of map length while the uncorrected
+    The superseded form, `1/(g·r_total)`, took a total map length `r_total` that is spurious
+    and omitted `α` entirely; it has been deleted. A forward pedigree simulation with explicit
+    Poisson crossovers settled it decisively — holding `α = 0.5, g = 10` and varying chromosome
+    length, the truth is asymptotically **independent** of map length while the superseded
     form moves 16-fold:
 
-    | map length | simulated | uncorrected |
+    | map length | simulated | superseded |
     |---|---|---|
     | 1 M | 0.1462 ± 0.0043 | 0.1000 |
     | 4 M | 0.1728 ± 0.0023 | 0.0250 |
@@ -738,20 +735,21 @@ theorem la_deconvolution_improves_pgs
 noncomputable def expectedTractLength (g admixtureFraction : ℝ) : ℝ :=
   1 / (g * (1 - admixtureFraction))
 
-/-- **FALSIFIED — spurious map-length argument, missing admixture fraction.** See
-    `expectedTractLength`. Retained so the superseded form is named and struck rather than
-    quietly absent. -/
-noncomputable def expectedSegmentLength (g r_total : ℝ) : ℝ :=
-  1 / (g * r_total)
+/-! **Deleted: `expectedSegmentLength g r_total = 1 / (g * r_total)`, together with
+`segments_shorten_with_time`.** The measurement is in `expectedTractLength` above: one
+argument was spurious and another missing, so no choice of units repaired it. The
+"segments shorten with more generations" content survives as
+`tract_length_shortens_with_time` below, stated about the validated body. -/
 
-/-- Segments get shorter with more generations. -/
-theorem segments_shorten_with_time (g₁ g₂ r_total : ℝ)
-    (h_r : 0 < r_total) (h_g₁ : 0 < g₁) (h_g₂ : 0 < g₂)
+/-- Tracts get shorter with more generations, at fixed admixture fraction. -/
+theorem tract_length_shortens_with_time (g₁ g₂ admixtureFraction : ℝ)
+    (h_α : admixtureFraction < 1) (h_g₁ : 0 < g₁) (h_g₂ : 0 < g₂)
     (h_g : g₁ < g₂) :
-    expectedSegmentLength g₂ r_total < expectedSegmentLength g₁ r_total := by
-  unfold expectedSegmentLength
-  exact div_lt_div_iff_of_pos_left one_pos (mul_pos h_g₂ h_r) (mul_pos h_g₁ h_r) |>.mpr
-    (mul_lt_mul_of_pos_right h_g h_r)
+    expectedTractLength g₂ admixtureFraction < expectedTractLength g₁ admixtureFraction := by
+  have h_a : 0 < 1 - admixtureFraction := by linarith
+  unfold expectedTractLength
+  exact div_lt_div_iff_of_pos_left one_pos (mul_pos h_g₂ h_a) (mul_pos h_g₁ h_a) |>.mpr
+    (mul_lt_mul_of_pos_right h_g h_a)
 
 end LocalAncestryHaplotypes
 

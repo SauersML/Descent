@@ -25,7 +25,11 @@ Key results:
 4. Phenotypic plasticity and its interaction with portability
 5. Counterfactual framework for separating G and E effects
 
-Reference: Wang et al. (2026), Nature Communications 17:942.
+Provenance: derived here, not imported. This file previously cited Wang et al. (2026),
+Nature Communications 17:942 for the results below. That paper is an empirical study of
+the polygenic-score portability gap; it does not treat gene-environment interaction or
+gene-environment correlation, and so does not substantiate anything here. Sources for
+individual results, where they exist, are cited at those results.
 -/
 
 

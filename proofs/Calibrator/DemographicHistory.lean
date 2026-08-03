@@ -14,7 +14,11 @@ open MeasureTheory
 Formalizes how demographic histories (migration, admixture, bottlenecks,
 expansion) affect PGS portability through their effects on F_ST and LD.
 
-Reference: Wang et al. (2026), Nature Communications 17:942.
+Provenance: derived here, not imported. This file previously cited Wang et al. (2026),
+Nature Communications 17:942 for the results below. That paper is an empirical study of
+the polygenic-score portability gap; it does not treat island, admixture or bottleneck
+demographic models, and so does not substantiate anything here. Sources for individual
+results, where they exist, are cited at those results.
 -/
 
 
@@ -813,7 +817,13 @@ trajectory of that process and its closed form is proved, not asserted.
     the honest accumulation is `driftLDStep` in `LDDecayTheory.lean`, in which
     this rate appears multiplied by the non-recombinant fraction `(1-c)²`.
 
-    Empirical status: UNTESTED.
+    **Identical twin of `LDDecayTheory.ldDecayRatePerGen`, whose LD reading is
+    FALSIFIED at up to 201x** (`proofs/validation/coalescent_diff/`): `1/(2Ne)` is not
+    the fraction of LD lost per generation, because recombination dominates it. The
+    same caution applies to any LD reading of this body. As a bare drift rate it stands.
+
+    Empirical status: UNTESTED as a drift rate; the LD reading of the shared formula is
+    FALSIFIED at the twin.
 
     Denotes: a per-generation rate. Other definitions share this formula under names from a
     different concept family; the formula does not fix which is meant. -/
@@ -821,11 +831,13 @@ noncomputable def driftLDCreationRate (Ne : ℝ) : ℝ :=
   1 / (2 * Ne)
 
 /-- **Cross-check: this is the same per-generation drift rate that
-`LDDecayTheory` calls `ldDecayRatePerGen`.** One rate, read there as the
-fraction of LD lost per generation and here as the rate at which drift creates
-it; the two readings are opposite in sign of effect and identical in
-magnitude, which is exactly the situation in which a divergence would go
-unnoticed. -/
+`LDDecayTheory` calls `ldDecayRatePerGen`.** One rate under two names.
+
+The "fraction of LD lost per generation" reading at the other name is FALSIFIED —
+recombination dominates `1/(2Ne)`, by up to 201x — so this equality ties two names for a
+drift rate, not two readings of an LD rate. It is worth keeping precisely because the two
+names sit in different concept families and identical magnitudes are where a divergence
+goes unnoticed. -/
 theorem driftLDCreationRate_eq_ldDecayRatePerGen (Ne : ℝ) :
     driftLDCreationRate Ne = ldDecayRatePerGen Ne := by
   unfold driftLDCreationRate ldDecayRatePerGen; ring

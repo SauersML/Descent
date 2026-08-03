@@ -23,7 +23,11 @@ Key results:
 4. Stabilizing vs directional selection effects
 5. Detecting adaptation from GWAS summary statistics
 
-Reference: Wang et al. (2026), Nature Communications 17:942.
+Provenance: derived here, not imported. This file previously cited Wang et al. (2026),
+Nature Communications 17:942 for the results below. That paper is an empirical study of
+the polygenic-score portability gap; it does not treat the QST-FST test or score
+overdispersion under selection, and so does not substantiate anything here. Sources for
+individual results, where they exist, are cited at those results.
 -/
 
 
