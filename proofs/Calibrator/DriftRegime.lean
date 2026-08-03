@@ -9,25 +9,25 @@ namespace Calibrator
 This file is not about a bug. It is about the two structural defects that let a whole
 class of bugs exist, and it makes both of them impossible to reintroduce silently.
 
-## The incident, stated once
+## The common-mode failure, stated once
 
 Five definitions — the within-population heterozygosity loss, the `F_ST` derived from
 it, the target heterozygosity read back off that `F_ST`, the target PGS variance, and
-the neutral allele-frequency benchmark ratio — formed a **self-consistent cluster**.
-Every cross-check between them passed. Every one of them was wrong in the same way and
+the neutral allele-frequency benchmark ratio — form a **self-consistent cluster**.
+Every cross-check between them passes, and every one of them fails in the same way and
 for the same reason: all five are functions of the single quantity
 
     retention = (1 - 1/(2 Ne)) ^ t,
 
 the closed-population, no-mutation drift recurrence. Simulation at demographic
 equilibrium measures a retention of `1.02 ± 0.02` where that formula predicts
-`e^(-2) = 0.135`: mutation replenishes diversity, so a population at equilibrium sits
+`e^(-2) = 0.135`. Mutation replenishes diversity, so a population at equilibrium sits
 at constant heterozygosity indefinitely. The cluster's `F_ST` is therefore `≈ 0`
 exactly where the measurable between-population `F_ST` is `0.50`.
 
 These are not two calibrations of one quantity. They are **different quantities sharing
-a name**, and that is why the same error was independently reproduced several times: it
-was never several slips, it was one modelling assumption propagated through a cluster.
+a name**, which is how one modelling assumption reproduces itself across a cluster and
+reads as several independent confirmations.
 
 ## Defect 1: over-determination cannot see common-mode error
 
@@ -278,10 +278,9 @@ is every power of it.
 
 /-- The neutral allele-frequency benchmark ratio, in the form under test.
 
-    **The functional form is CORRECT, and the family-guilt reading of it was wrong.** Its
-    identical-bodied twin `PortabilityDrift.neutralAFBenchmarkRatio` was falsified and has
-    been deleted, which invites the inference that this body inherits the defect. It does
-    not.
+    **The functional form is CORRECT, and guilt does not transfer along the family.** The
+    identical-bodied `PortabilityDrift.neutralAFBenchmarkRatio` is falsified and absent,
+    which invites the inference that this body inherits the defect. It does not.
     Measured at the same design point that falsified the twin (`2N_A = 400`, `2N_B = 4000`,
     `t = 500`, `L = 1500`, 6 replicates), with the branch drift coefficient
     `F_i = 1 - H_i/H_ancestral`:

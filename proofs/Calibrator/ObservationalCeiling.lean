@@ -36,10 +36,10 @@ a bounded operator. Section 4 says what that buys and — as of this revision �
 does not. A relation that is a countable union of conditions from a base class of simple
 sets is *below* the ceiling (`IsCountablyCertified`), and a reduction cannot raise a
 relation above the ceiling of its target **provided the reducing map preserves the base
-class** (`countablyCertified_of_reduction`; the preservation hypothesis is the content,
-and an earlier version of that theorem omitted it and was consequently free).
+class** (`countablyCertified_of_reduction`). The preservation hypothesis is the whole
+content of that theorem, and a version without it proves nothing.
 
-Two honest corrections to what this section used to claim. First, the bare union shape
+Two limits on what this section claims. First, the bare union shape
 with no restriction on the certificates is satisfied by every relation whatsoever —
 `unionOfCertificates_vacuous` proves it — so nothing can be read off it. Second, the
 claim that in each setting the true object *provably* sits above the ceiling is not
@@ -347,8 +347,8 @@ parameter. Relations so certified are countable unions of *simple* conditions, a
 reductions cannot raise a relation above the ceiling of its target **provided the
 reducing map preserves what "simple" means**.
 
-Both qualifications are load-bearing, and this section previously dropped both. The
-condition as it stood — `∀ x y, E x y ↔ ∃ c : ι, cert c x y`, with `ι` arbitrary and
+Both qualifications are load-bearing, and dropping either empties the claim. The
+condition without them — `∀ x y, E x y ↔ ∃ c : ι, cert c x y`, with `ι` arbitrary and
 `cert` arbitrary — is satisfied by *every* relation whatsoever, by `ι := Unit` and
 `cert := fun _ => E`. `unionOfCertificates_vacuous` below proves that, so the collapse
 is on the record rather than in a reviewer's head. A ceiling everything meets bounds
@@ -614,12 +614,12 @@ modulus of the original, so a perfectly redundant coordinate contributes nothing
 resolving objects.
 
 Declared `def` rather than `theorem`: `ProbeSeparation` is a STRUCTURE carrying a real
-modulus, so this returns data, not a proof, and `theorem` requires a `Prop`. That
-mismatch is what the elaborator was reporting as "type of theorem
-`Calibrator.duplicate_separation` is not a proposition". Nothing about the statement or
-the construction changes -- the body already built the witness with `where`, and it is
-the keyword that was wrong. Keeping it as data is also strictly stronger than the
-`Nonempty (ProbeSeparation _)` a `theorem` would have forced: the duplicated probe's
+modulus, so this returns data, not a proof, and `theorem` requires a `Prop`. Declaring it
+`theorem` makes the elaborator report "type of theorem
+`Calibrator.duplicate_separation` is not a proposition". The keyword is the only thing at
+stake, since the body builds the witness with `where` either way. Keeping it as data is
+also strictly stronger than the
+`Nonempty (ProbeSeparation _)` a `theorem` forces: the duplicated probe's
 modulus is available, and `duplicate_separation f S |>.sigma` is definitionally
 `S.sigma`, which is the content the surrounding prose claims. -/
 def duplicate_separation {Object : Type*} [MetricSpace Object] (f : Object → ℝ)

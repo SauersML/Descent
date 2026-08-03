@@ -93,13 +93,13 @@ theorem more_overlap_more_inflation (r2_true h2 f₁ f₂ : ℝ) (n_gwas : ℕ)
 
 /-! ### Inflation and discovery sample size
 
-`inflation_decreases_with_gwas_n` is removed rather than reproved. It asserted
-that overlap inflation falls as the discovery sample grows, which was a
-consequence of the spurious `1/n_gwas` in the old `partialOverlapR2`. Under the
-corrected mixture law the discovery size does not appear, and simulation agrees:
-inflation is set by what fraction of the test set was in training and does not
-decay with `n`. The theorem was true of the old formula and false of the
-quantity, so there is nothing here to salvage.
+`inflation_decreases_with_gwas_n` is absent on purpose, and must not be
+reproved. It asserts that overlap inflation falls as the discovery sample grows,
+which follows only from a spurious `1/n_gwas` term in `partialOverlapR2`. The
+mixture law carries no discovery size, and simulation agrees: inflation is set
+by what fraction of the test set sat in training and does not decay with `n`. A
+theorem true of the wrong formula and false of the quantity has nothing to
+salvage.
 -/
 
 end OverlapInflation

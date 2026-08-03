@@ -411,22 +411,21 @@ replaced.** Measurements in `proofs/validation/block_count/`; positive control (
 three independent generators) reproduces the analytic independent-panel value to
 `1.001 ± 0.003`. -/
 
-/-! ### How the `σ` power went wrong, and why the fix is structural
+/-! ### The `σ` power, and why the guard is structural
 
-An audit found that this file and `Calibrator.Probability` spelled the Berry–Esseen bound
-differently, and **this file's spelling was the wrong one**. `Probability.lean` has
-`C·ρ/(variance·√variance) = Cρ/σ³`, which is correct; this file had `C·ρ/(σ_sq·√m)`.
+The Berry–Esseen bound is `C·ρ/(variance·√variance) = Cρ/σ³`, and
+`Calibrator.Probability` holds the one body for it. A second spelling in this file, such
+as `C·ρ/(σ_sq·√m)`, is wrong in the power of `σ`.
 
-The mechanism is worth keeping even though the defect is gone, because it is the one this
-corpus is most prone to: the bound was written out a second time instead of being called.
-Two alpha-inequivalent bodies for the same quantity, tied by neither a call nor a theorem,
-cannot disagree loudly — they just disagree. Restating the formula correctly would have left
-the same trap for the next edit. So `berryEsseenBound` below is *defined through*
-`Probability.berryEsseenErrorBound`, and `berryEsseenBound_eq` recovers the closed form as a
-theorem. The two files can no longer drift, because there is only one body.
+Do not restate the bound here, even correctly. Two alpha-inequivalent bodies for the same
+quantity, tied by neither a call nor a theorem, cannot disagree loudly. They just
+disagree, and this corpus is more prone to that failure than to any other. So
+`berryEsseenBound` below is *defined through* `Probability.berryEsseenErrorBound`, and
+`berryEsseenBound_eq` recovers the closed form as a theorem. One body means the two files
+cannot drift.
 
-Empirical status: DERIVED. The discrepancy was between two files in this corpus, not against
-an experiment. -/
+Empirical status: DERIVED. This is a consistency constraint between two files in this
+corpus, not a claim against an experiment. -/
 
 /-- **The Berry–Esseen bound at `m` summands**, defined *through* the existing
     `Calibrator.Probability.berryEsseenErrorBound` rather than beside it.

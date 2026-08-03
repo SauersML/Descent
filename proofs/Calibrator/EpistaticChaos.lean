@@ -28,11 +28,11 @@ the coordinate law is invariant under a value-negating relabelling and the
 truncation depends only on magnitudes, then every truncated cross-moment between
 two distinct monomials vanishes identically.
 
-Second order is as far as that goes, and the qualifier is load-bearing. An
-earlier version of this docstring concluded from sign erasure that overlapping
-designs "collapse onto their disjoint skeletons", so that their limit theory is
-the independent one. That conclusion is false, and §`OverlapSpectrum` below
-refutes it inside the symmetric class: the two-pool interaction statistic
+Second order is as far as that goes, and the qualifier is load-bearing. Sign
+erasure does **not** license the conclusion that overlapping designs collapse
+onto their disjoint skeletons and so inherit the independent limit theory. That
+conclusion is false, and §`OverlapSpectrum` below refutes it inside the
+symmetric class: the two-pool interaction statistic
 `T₁ * T₂` has vanishing truncated cross-moments under any symmetric law, and a
 limiting fourth cumulant of `6`, whereas every disjoint design's limit has
 fourth cumulant `0` (`sign_symmetry_does_not_license_disjoint_reduction`). What
@@ -626,9 +626,10 @@ set-based or interaction study tests over a panel of Hardy-Weinberg loci, what
 null distributions can the test statistic have?
 
 Two results answer it, and they answer in opposite directions according to a
-single structural property — whether the tested locus-sets share variants. Both
-were previously carried as fields of `GenotypeChaosLimits`; that assumption-packaging
-interface is being removed. Everything is stated over
+single structural property — whether the tested locus-sets share variants. Neither
+is carried as a field of an assumption-packaging interface such as
+`GenotypeChaosLimits`, because a hypothesis held as a field cannot be contradicted.
+Everything is stated over
 `GenotypeDesign`, whose coordinates are the standardized Hardy-Weinberg genotypes
 `HardyWeinbergModel.standardizedGenotype` of a stated allele-frequency family, so
 that the statements can be contradicted by the rest of the corpus.
@@ -651,11 +652,10 @@ energy carried by that variant) vanishes, and the statistic has unit variance.
   (`slidingWindowDesign_not_variantDisjoint`), as are overlapping pathway panels
   and any pleiotropic variant recurring across tested sets.
 
-Theorem S is strictly stronger than the folklore it replaces. The previously
-recorded effect of overlap was a variance-mixture component in the limit; a
-variance mixture of centered Gaussians is symmetric, unimodal, and has
-non-negative fourth cumulant. The moment body contains laws that are none of
-those.
+Theorem S is strictly stronger than the folklore. Folklore puts the effect of
+overlap at a variance-mixture component in the limit. A variance mixture of
+centered Gaussians is symmetric, unimodal and has non-negative fourth cumulant,
+and the moment body contains laws that are none of those.
 
 
 ### Does the licence need sign symmetry? No, and this matters
@@ -1016,10 +1016,10 @@ theorem centeredSquare_values_at_half (h : HardyWeinbergModel) (hhalf : h.altFre
 `u` takes `+1` on the two homozygotes, of total probability `1/2`, and `-1` on the
 heterozygote, of probability `1/2`. So the law of `u` puts equal mass on `+1` and `-1`.
 
-This corrects a claim this development previously made in the other direction. The
-*uncentered* square is never symmetric — it is non-negative — but the tower's floor-two
-coordinate is the centered square, and at `q = 1/2` it is symmetric. The balanced locus is
-therefore degenerate at both floors.
+Do not read the non-negativity of the *uncentered* square as asymmetry here. The
+uncentered square is never symmetric, but the tower's floor-two coordinate is the
+*centered* square, and at `q = 1/2` that is symmetric. The balanced locus is therefore
+degenerate at both floors.
 
 **A subtlety worth recording.** The law of `u` is symmetric here, but no
 `SymmetricCoding DiploidGenotype` realizes it: a value-negating relabelling would have to
@@ -1172,15 +1172,13 @@ frequency one half, proved below. It vanishes exactly at `q = 1/2`, which is whe
 the coding is symmetric, so the Sign-Erasure Lemma is the zero fibre of `b` rather
 than a separate phenomenon.
 
-**What is open, and a retraction.** An earlier version of this section went further
-and claimed `b` governs a *separate* coupling channel, with a sliding design carrying
-a tuned-sector variance inflation `2b²/(1 - b²)`. That mechanism was withdrawn
-upstream by its author's own audit: the vanishing-first-order argument used a
-`θ = 1/2` weight, mixing a level-two normalization into a level-one computation, and
-at the correct weights the solo-factor mean is `E[(x² - 1) x²] = σ₁² = 2` rather than
-zero. What the first-order cross term exposes is `Λ(2)` data, that is `E[x⁴]` — which
-the hub channel already exposes. So the term is **hub-redundant, not a new channel**,
-and the inflation formula and its numbers are retracted; see
+**What is open, and what is ruled out.** `b` does **not** govern a *separate* coupling
+channel, and no sliding design carries a tuned-sector variance inflation `2b²/(1 - b²)`.
+The vanishing-first-order argument for such a channel uses a `θ = 1/2` weight, which
+mixes a level-two normalization into a level-one computation. At the correct weights the
+solo-factor mean is `E[(x² - 1) x²] = σ₁² = 2` rather than zero. The first-order cross
+term exposes `Λ(2)` data, that is `E[x⁴]`, which the hub channel already exposes. The
+term is therefore **hub-redundant, not a new channel**. See
 `Calibrator.CondensationUnification` §5j for the full record.
 
 `b` itself is untouched: it is well defined, it vanishes exactly on symmetric laws,
