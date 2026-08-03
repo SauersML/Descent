@@ -633,6 +633,21 @@ noncomputable def diploidPanelCovarianceMomentPermeability {n : ℕ}
     (fun i => ∑ j : Fin 3,
       diploidAtomMass j (q i) * diploidAtomValue j (q i) ^ 4)
 
+/-- The independent Hardy--Weinberg panel is exactly the diagonal-precision face of the
+correlated covariance-moment theory.  Replacing this diagonal precision by an estimated
+full inverse noise covariance is therefore a principled LD/haplotype completion, not a
+different objective. -/
+theorem diploidPanelCovarianceMomentPermeability_eq_diagonal_precision {n : ℕ}
+    (q covarianceDerivative taggingResponse : Fin n → ℝ) :
+    diploidPanelCovarianceMomentPermeability q covarianceDerivative taggingResponse =
+      covarianceMomentPermeabilityWithPrecision
+        (diagonalSquareNoisePrecision (fun _ => 1)
+          (fun i => ∑ j : Fin 3,
+            diploidAtomMass j (q i) * diploidAtomValue j (q i) ^ 4))
+        (fun i => taggingResponse i * covarianceDerivative i) := by
+  unfold diploidPanelCovarianceMomentPermeability
+  rw [covarianceMomentPermeabilityWithPrecision_diagonal]
+
 /-- **Exact multi-locus design law.** Under independent loci, the panel information is
 the sum of per-locus contributions
 
@@ -1908,7 +1923,13 @@ separates quotient fibres remains the continuation. -/
   information, requiring `19604/99 ≈ 198.02` times the observations.  This stronger
   comparison is to a balanced **genotype moment experiment**, not to Gaussian data and
   not to raw-dosage regression.  Genotype LD invalidates the diagonal sum and requires the
-  covariance matrix of the quadratic summaries.
+  covariance matrix of the quadratic summaries.  The unified replacement is
+  `covarianceMomentPermeabilityWithPrecision = ΓᵀΩ⁻¹Γ`:
+  `diploidPanelCovarianceMomentPermeability_eq_diagonal_precision` proves the independent
+  formula is exactly its diagonal face, while
+  `twoChannelMomentPermeabilityWithPrecision` exposes the cross term for two correlated
+  summaries.  In a real LD block, `Ω` depends on joint genotype fourth moments; MAFs and
+  pairwise `r²` alone do not generally determine it.
   `AncestrySpecificPower.ld_r2_matches_covariance_response_retention` fixes the convention
   bridge: a tag retaining correlation-scale response `η` has conventional LD
   `r² = η²`, so regression information and covariance permeability retain the same

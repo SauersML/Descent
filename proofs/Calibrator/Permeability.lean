@@ -210,6 +210,91 @@ theorem diagonalCovarianceMomentPermeability_eq_zero_iff
     unfold diagonalCovarianceMomentPermeability
     simp [hresponse, covarianceMomentPermeability]
 
+/-! ## Correlated non-Gaussian covariance-moment channels -/
+
+/-- **Precision-weighted covariance-moment permeability.**  If `response` is the vector
+of derivatives of retained quadratic summaries and `precision` is the inverse of their
+noise covariance matrix `Ω`, the exact generalized method-of-moments information for one
+deployment tangent is
+
+`responseᵀ precision response`.
+
+The definition accepts the precision matrix directly.  Symmetry, positive definiteness,
+and the proof that it is the inverse of the named summary covariance are model-specific
+obligations.  This separation prevents marginal fourth moments or pairwise LD from being
+silently treated as the full joint fourth-order experiment. -/
+noncomputable def covarianceMomentPermeabilityWithPrecision {d : ℕ}
+    (precision : Matrix (Fin d) (Fin d) ℝ) (response : Fin d → ℝ) : ℝ :=
+  ∑ i, ∑ j, response i * precision i j * response j
+
+/-- The diagonal precision constructed from channel-specific square-noise variances. -/
+noncomputable def diagonalSquareNoisePrecision {d : ℕ}
+    (secondMoment fourthMoment : Fin d → ℝ) : Matrix (Fin d) (Fin d) ℝ :=
+  Matrix.diagonal fun i =>
+    1 / centeredSquareVarianceFromMoments (secondMoment i) (fourthMoment i)
+
+/-- **Diagonal reduction.**  When quadratic-summary noise is independent, the full
+precision-weighted law is exactly the sum of scalar non-Gaussian moment permeabilities. -/
+theorem covarianceMomentPermeabilityWithPrecision_diagonal {d : ℕ}
+    (covarianceDerivative secondMoment fourthMoment : Fin d → ℝ) :
+    covarianceMomentPermeabilityWithPrecision
+        (diagonalSquareNoisePrecision secondMoment fourthMoment)
+        covarianceDerivative =
+      diagonalCovarianceMomentPermeability
+        covarianceDerivative secondMoment fourthMoment := by
+  classical
+  unfold covarianceMomentPermeabilityWithPrecision diagonalSquareNoisePrecision
+    diagonalCovarianceMomentPermeability covarianceMomentPermeability
+  apply Finset.sum_congr rfl
+  intro i _
+  simp [Matrix.diagonal_apply]
+  ring
+
+/-- Linear attenuation of every correlated moment response obeys the same exact
+inverse-square information law. -/
+theorem covarianceMomentPermeabilityWithPrecision_scale {d : ℕ}
+    (precision : Matrix (Fin d) (Fin d) ℝ) (response : Fin d → ℝ) (η : ℝ) :
+    covarianceMomentPermeabilityWithPrecision precision (fun i => η * response i) =
+      η ^ 2 * covarianceMomentPermeabilityWithPrecision precision response := by
+  unfold covarianceMomentPermeabilityWithPrecision
+  calc
+    ∑ i, ∑ j, (η * response i) * precision i j * (η * response j) =
+        ∑ i, η ^ 2 * ∑ j, response i * precision i j * response j := by
+      apply Finset.sum_congr rfl
+      intro i _
+      rw [Finset.mul_sum]
+      apply Finset.sum_congr rfl
+      intro j _
+      ring
+    _ = η ^ 2 * ∑ i, ∑ j, response i * precision i j * response j := by
+      rw [Finset.mul_sum]
+
+/-- Symmetric two-channel precision matrix, useful for displaying the joint-noise cross
+term explicitly. -/
+noncomputable def twoChannelMomentPrecision
+    (first second shared : ℝ) : Matrix (Fin 2) (Fin 2) ℝ :=
+  ![![first, shared], ![shared, second]]
+
+/-- Two covariance-summary responses. -/
+noncomputable def twoChannelMomentResponse (first second : ℝ) : Fin 2 → ℝ :=
+  ![first, second]
+
+/-- **Exact correlated two-channel moment law.**  The off-diagonal precision contributes
+`2·shared·firstResponse·secondResponse`.  Depending on the inverse-noise geometry and the
+response signs, correlated summaries can contribute less or more than a naive diagonal
+calculation; they must not simply be counted as independent loci or probes. -/
+theorem twoChannelMomentPermeabilityWithPrecision
+    (firstPrecision secondPrecision sharedPrecision firstResponse secondResponse : ℝ) :
+    covarianceMomentPermeabilityWithPrecision
+        (twoChannelMomentPrecision firstPrecision secondPrecision sharedPrecision)
+        (twoChannelMomentResponse firstResponse secondResponse) =
+      firstPrecision * firstResponse ^ 2 +
+        2 * sharedPrecision * firstResponse * secondResponse +
+        secondPrecision * secondResponse ^ 2 := by
+  simp [covarianceMomentPermeabilityWithPrecision, twoChannelMomentPrecision,
+    twoChannelMomentResponse, Fin.sum_univ_two]
+  ring
+
 /-- Permeability is non-negative. -/
 theorem scalarPermeability_nonneg (covariance covarianceDerivative : ℝ) :
     0 ≤ scalarPermeability covariance covarianceDerivative := by
