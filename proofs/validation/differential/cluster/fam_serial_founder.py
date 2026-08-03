@@ -377,6 +377,36 @@ def part_a(out):
     print("  exact solve within 0.05 of the study's stated far-Fst: %s"
           % agrees_with_note)
     print("")
+    # ceiling versus approach: the two halves of candidate (5) score very
+    # differently and a single worst-case number hides that
+    c5_far = abs(cand_founder_ceiling(9) - exact[9]) / exact[9]
+    c5_near = abs(cand_founder_ceiling(1) - exact[1]) / exact[1]
+    print("  CANDIDATE (5) SPLITS: it predicts the SATURATED far-deme F_ST to")
+    print("  %.1f%% with no free parameter (%.5f against %.5f), so the CEILING"
+          % (100 * c5_far, cand_founder_ceiling(9), exact[9]))
+    print("  mechanism -- founder events fix the maximum divergence at the")
+    print("  forced-merge time t_1 -- is RIGHT. Its error at k = 1 is %.0f%%,"
+          % (100 * c5_near))
+    print("  so the APPROACH to the ceiling is wrong: the diffusion/reflection")
+    print("  meeting time overestimates how long two adjacent demes stay")
+    print("  unmixed, which is exactly where a continuum approximation to a")
+    print("  rate-2m nearest-neighbour walk is worst.")
+    print("")
+    print("  HONEST NEGATIVE: no candidate is within %.0f%% across the whole"
+          % (100 * bestv))
+    print("  range, so this file does NOT deliver a closed form for serial1d.")
+    print("  What it delivers is the EXACT reference (56 states, milliseconds,")
+    print("  no msprime), the corroboration against the study's own far-F_ST")
+    print("  note, a control showing the existing stepping-stone form is off by")
+    print("  %.0fx, and the mechanism localised: the ceiling is founder-set and"
+          % errs["(4) stepping stone [CONTROL]"])
+    print("  predicted to %.0f%%, the distance decay is migration-set and is not"
+          % (100 * c5_far))
+    print("  any of the standard compounding forms. The reason no simple form")
+    print("  fits is structural: the forced merges make the separation process")
+    print("  TIME-INHOMOGENEOUS, so the meeting problem does not have the")
+    print("  stationary random-walk solution every candidate assumes.")
+    print("")
     print("  BEST NO-FREE-PARAMETER CANDIDATE: %s, worst error %.4f"
           % (best, bestv))
     print("  WHY (1)-(3) FAIL, which is the diagnosis and not an excuse: they")
@@ -397,6 +427,8 @@ def part_a(out):
         "E_T_00": ET[(0, 0)], "E_T_99": ET[(9, 9)], "E_T_09": ET[(0, 9)],
         "rows": rows, "worst_rel_err": errs,
         "best_candidate": best, "best_worst_rel_err": bestv,
+        "cand5_far_rel_err": c5_far, "cand5_near_rel_err": c5_near,
+        "closed_form_delivered": False,
         "exact_far_fst": exact[9],
         "agrees_with_study_note": bool(agrees_with_note)}
     return bestv
