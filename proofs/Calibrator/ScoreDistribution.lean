@@ -153,7 +153,7 @@ theorem mean_shift_increases_tail
     tail rates and needs `Phi` at two arguments; neither appears here, and the second tail is
     not reached by this inequality at all. The upper-tail consequence is
     `variance_change_changes_benchmark_high_score_rate` below. -/
-theorem variance_increase_thickens_tails
+theorem div_lt_div_of_lt_denom
     (x σ₁ σ₂ : ℝ) (h₁ : 0 < σ₁)
     (h_larger : σ₁ < σ₂) (h_x : 0 < x) :
     x / σ₂ < x / σ₁ := by
@@ -229,7 +229,7 @@ theorem variance_change_changes_benchmark_high_score_rate
       benchmarkHighScoreRate threshold μ σ_T := by
   unfold benchmarkHighScoreRate thresholdStandardizedCoordinate
   have hz : (threshold - μ) / σ_T < (threshold - μ) / σ_S := by
-    exact variance_increase_thickens_tails (threshold - μ) σ_S σ_T h_σS h_larger h_thr
+    exact div_lt_div_of_lt_denom (threshold - μ) σ_S σ_T h_σS h_larger h_thr
   have hphi : Phi ((threshold - μ) / σ_T) < Phi ((threshold - μ) / σ_S) := by
     exact strictMono_Phi hz
   linarith

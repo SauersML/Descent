@@ -59,6 +59,19 @@ noncomputable def uniformOccupancyDistinctHaplotypes (k n : ℕ) : ℝ :=
 
 /-- The occupancy-model expectation is strictly increasing in the number of sampled haplotypes
     whenever at least two haplotypes are possible in the region (`k > 0`). -/
+/-- **A sample cannot show more distinct haplotypes than the window admits.** With `k` sites
+there are `2^k` possible haplotypes, and the occupancy expectation stays below that ceiling
+however many chromosomes are drawn. -/
+theorem uniformOccupancyDistinctHaplotypes_le (k n : ℕ) :
+    uniformOccupancyDistinctHaplotypes k n ≤ (2 : ℝ) ^ k := by
+  unfold uniformOccupancyDistinctHaplotypes
+  have hm : (0 : ℝ) < (2 : ℝ) ^ k := by positivity
+  have hq : (0 : ℝ) ≤ (1 - 1 / (2 : ℝ) ^ k) ^ n := by
+    apply pow_nonneg
+    rw [sub_nonneg, div_le_one hm]
+    exact one_le_pow₀ (by norm_num)
+  nlinarith
+
 theorem uniformOccupancyDistinctHaplotypes_strictMono
     (k : ℕ) (h_k : 0 < k) :
     StrictMono (uniformOccupancyDistinctHaplotypes k) := by
@@ -680,6 +693,12 @@ noncomputable def ancestrySpecificEffect (beta_pop1 beta_pop2 alpha : ℝ) : ℝ
 relabelling.** At the two pure ancestries it returns the corresponding effect, and swapping the
 two populations together with the ancestry fraction leaves it unchanged. A body that was not
 affine in the fraction would fail the endpoints. -/
+/-- With the same effect in both ancestries the average is that effect, at every mixing
+fraction: the ancestry weighting cannot manufacture a difference that is not there. -/
+theorem ancestrySpecificEffect_const (b alpha : ℝ) :
+    ancestrySpecificEffect b b alpha = b := by
+  unfold ancestrySpecificEffect; ring
+
 theorem ancestrySpecificEffect_endpoints (b₁ b₂ : ℝ) :
     ancestrySpecificEffect b₁ b₂ 1 = b₁ ∧ ancestrySpecificEffect b₁ b₂ 0 = b₂ := by
   constructor <;> unfold ancestrySpecificEffect <;> ring

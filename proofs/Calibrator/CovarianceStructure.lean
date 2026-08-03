@@ -192,7 +192,7 @@ theorem r2_loss_bounded_by_ld_mismatch
     is spectral_loss · sparsity where sparsity = k/M ≤ 1.
     Since sparsity ≤ 1 and spectral_loss ≤ frob_loss, the
     spectral bound is tighter for sparse models. -/
-theorem spectral_bound_tighter_for_sparse
+theorem mul_le_of_le_of_le_one
     (frob_loss spectral_loss sparsity : ℝ)
     (h_frob : 0 < frob_loss)
     (h_spectral_nn : 0 ≤ spectral_loss)

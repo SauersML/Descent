@@ -66,6 +66,11 @@ noncomputable def brierScore (p : ℝ) (y : ℝ) : ℝ := (y - p) ^ 2
 /-- **Anchors of the Brier score.** A confident correct call scores `0`, a confident wrong call
 scores `1`, and the uninformative call scores `1/4`. Three numbers rather than one, because a
 single anchor is met by many wrong bodies. -/
+/-- The score is never negative: it is a squared error. -/
+theorem brierScore_nonneg (p y : ℝ) : 0 ≤ brierScore p y := by
+  unfold brierScore; positivity
+
+/-- Anchors of the Brier score. -/
 theorem brierScore_anchors :
     brierScore 1 1 = 0 ∧ brierScore 0 1 = 1 ∧ brierScore (1 / 2) 1 = 1 / 4 := by
   refine ⟨?_, ?_, ?_⟩ <;> unfold brierScore <;> norm_num
