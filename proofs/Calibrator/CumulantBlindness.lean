@@ -410,6 +410,46 @@ theorem locusInfluence_le_of_shares_bounded
         refine mul_le_mul_of_nonneg_left htotal ?_
         exact le_trans (le_trans (le_of_lt hd) (hlower j)) (hupper j)
 
+/-- **The bound is attained, so it is not a vacuous ceiling.**
+
+A score whose loci contribute equally has influence exactly `1 / m` at every locus.
+Setting `c = d` in `locusInfluence_le_of_shares_bounded` gives the ceiling `1 / m`, and
+this says that ceiling is reached, so the bound is sharp rather than a bound no
+configuration approaches.
+
+This matters for reading the vanishing result below. If the ceiling were unattainable,
+"influence at most `c / (m · d)`" could hold for a reason having nothing to do with
+polygenicity, and the limit would be an artifact of a loose estimate. It is not: the
+balanced score sits exactly on it. -/
+theorem locusInfluence_of_shares_const
+    (β h : Fin m → ℝ) (v : ℝ) (hv : 0 < v) (hm : 0 < m)
+    (hconst : ∀ j, locusVarianceShare β h j = v) (j : Fin m) :
+    locusInfluence β h j = 1 / m := by
+  have hmpos : (0 : ℝ) < m := by exact_mod_cast hm
+  have htotal : scoreVariance β h = (m : ℝ) * v := by
+    unfold scoreVariance
+    rw [Finset.sum_congr rfl fun i _ ↦ hconst i, Finset.sum_const, Finset.card_univ,
+      Fintype.card_fin, nsmul_eq_mul]
+  unfold locusInfluence
+  rw [hconst j, htotal]
+  field_simp
+
+/-- **A monomorphic locus has no influence.**  At allele frequency `0` or `1` the
+Hardy--Weinberg genotype variance vanishes, so the locus contributes nothing to the
+score variance and nothing to the influence budget.
+
+This is the configuration the lower bound `d > 0` of
+`locusInfluence_le_of_shares_bounded` excludes, and it is excluded for a reason rather
+than for convenience: a panel padded with monomorphic sites raises `m` without lowering
+any real locus's influence, so a bound stated in terms of `m` alone would be gameable by
+adding columns that carry no signal. -/
+theorem locusVarianceShare_hwe_eq_zero_of_monomorphic
+    (α p : Fin m → ℝ) (j : Fin m) (hj : p j = 0 ∨ p j = 1) :
+    locusVarianceShare α (fun i ↦ 2 * p i * (1 - p i)) j = 0 := by
+  -- `unfold` leaves the kernel argument as an unreduced beta-redex, so `p j` does not
+  -- appear syntactically and `rw [h]` finds nothing; `simp only` beta-reduces first.
+  rcases hj with h | h <;> simp [locusVarianceShare, h]
+
 /-- **Cumulant blindness in score units.**  As a score is spread over more loci with
 per-locus variance shares between `d > 0` and `c`, the fixed-order normalized
 contraction bound of Section 2 tends to zero.
