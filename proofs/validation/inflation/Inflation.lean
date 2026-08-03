@@ -3,7 +3,11 @@ Copyright (c) 2026 Sauers. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Sauers
 -/
-/-
+import Calibrator
+import Shared.DeclFilter
+import Shared.Results
+
+/-!
   Find theorems whose proof is their own assumed hypothesis.
 
   Run:
@@ -23,9 +27,6 @@ Authors: Sauers
   file rather than a commit message.  The 12/354/2 figures quoted for this tool
   were never backed by one and describe a tree 55 commits behind HEAD.
 -/
-import Calibrator
-import Shared.DeclFilter
-import Shared.Results
 
 open Lean Elab Meta Command
 

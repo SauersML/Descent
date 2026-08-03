@@ -3,7 +3,12 @@ Copyright (c) 2026 Sauers. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Sauers
 -/
-/-
+import Calibrator
+import Lean
+import Shared.DeclFilter
+import Shared.Results
+
+/-!
 Enumerate the theorems whose PROOF TERM is `Eq.refl`, from the elaborated
 environment rather than from source text.
 
@@ -19,10 +24,6 @@ commit message. The "8 of 8 classified" quoted for this scan was measured with a
 module allow-list of ten popgen modules that this file no longer contains, so it
 does not describe what this file now does.
 -/
-import Calibrator
-import Lean
-import Shared.DeclFilter
-import Shared.Results
 
 open Lean Elab Command
 

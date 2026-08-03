@@ -3,7 +3,9 @@ Copyright (c) 2026 Sauers. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Sauers
 -/
-/-
+import Lean
+
+/-!
 One answer to the question "did a person write this declaration".
 
 WHY THIS MODULE EXISTS.  Three detectors under `proofs/validation/` each carried
@@ -18,7 +20,6 @@ This module is that filter, once.  It deliberately imports only `Lean`: it must
 never import `Calibrator`, because the detectors import both, and a filter that
 depended on the corpus it audits could not be loaded before the corpus built.
 -/
-import Lean
 
 open Lean
 

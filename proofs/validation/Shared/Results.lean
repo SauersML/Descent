@@ -3,7 +3,9 @@ Copyright (c) 2026 Sauers. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Sauers
 -/
-/-
+import Lean
+
+/-!
 Stored output for the detectors under `proofs/validation/`.
 
 WHY THIS MODULE EXISTS.  Until now no detector here wrote a file.  Every count
@@ -22,7 +24,6 @@ quoting it.
 Imports only `Lean`, for the same reason as `Shared.DeclFilter`: it must load
 before the corpus it reports on.
 -/
-import Lean
 
 open Lean
 
