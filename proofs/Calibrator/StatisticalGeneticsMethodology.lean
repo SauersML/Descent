@@ -206,7 +206,8 @@ theorem effective_n_pos (se p : ℝ) (h_se : 0 < se) (hp0 : 0 < p) (hp1 : p < 1)
 
 /-- **Meta-analysis model definition.**
     Contains properties of the model, specifically:
-    k (number of studies), variances (of individual studies), and tau_sq (heterogeneity variance). -/
+    k (number of studies), variances (of individual studies), and tau_sq
+    (heterogeneity variance). -/
 structure MetaAnalysisModel where
   k : ℕ
   variances : Fin k → ℝ

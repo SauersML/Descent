@@ -382,7 +382,9 @@ theorem source_target_erm_differ_proved :
   intro wS wT
   refine ⟨?_, ?_, ?_⟩
   · ext i; fin_cases i <;> simp [wS, sigmaS, crossS, Matrix.mulVec, dotProduct]
-  · ext i; fin_cases i <;> simp [wT, sigmaT, ldWitnessTargetCross, Matrix.mulVec, dotProduct] <;> ring
+  · ext i
+    fin_cases i <;>
+      simp [wT, sigmaT, ldWitnessTargetCross, Matrix.mulVec, dotProduct] <;> ring
   · intro heq
     have h : wS 0 = wT 0 := congrFun heq 0
     simp [wS, wT] at h

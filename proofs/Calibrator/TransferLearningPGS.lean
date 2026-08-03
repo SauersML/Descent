@@ -1829,7 +1829,8 @@ theorem populationDeviationSum_squaredNorm_eq_mul {p : ℕ}
   | 0, _, _ => by
       simp [populationDeviationSum, dotProduct]
   | k + 1, h_norm, h_pair => by
-      have h_norm_prev : ∀ j < k, dotProduct (deviation j) (deviation j) = populationSpecificGap := by
+      have h_norm_prev :
+          ∀ j < k, dotProduct (deviation j) (deviation j) = populationSpecificGap := by
         intro j hj
         exact h_norm j (lt_trans hj (Nat.lt_succ_self k))
       have h_pair_prev :
@@ -1887,7 +1888,8 @@ theorem meanPopulationDeviation_squaredNorm_eq_populationSpecificGap_div_k {p : 
         (fun i ↦ (k : ℝ)⁻¹ * populationDeviationSum deviation k i)
         =
           ((k : ℝ)⁻¹)^2 *
-            dotProduct (populationDeviationSum deviation k) (populationDeviationSum deviation k) := by
+            dotProduct (populationDeviationSum deviation k)
+              (populationDeviationSum deviation k) := by
               unfold dotProduct
               rw [show (∑ i,
                     ((k : ℝ)⁻¹ * populationDeviationSum deviation k i) *
