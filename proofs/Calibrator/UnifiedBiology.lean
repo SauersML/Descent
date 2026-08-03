@@ -175,6 +175,26 @@ theorem crossStatePerformance_switching_eq_zero :
   norm_num [crossStatePerformance, binaryStateWeight, switchingTransition,
     contextMatchQuality, Fin.sum_univ_two]
 
+/-! ## The adaptation time and the transport time are one time -/
+
+/-- **A single-rate integrated autocorrelation time is the inverse-dissipation frontier
+time.**
+
+`DirichletTransfer.autocorrTime` is `Σ wᵢ / λᵢ`, the time the value signal stays informative;
+`CirculationDefect.frontierTime` is `1 / s`, the time scale a transfer frontier runs on. At
+one mode of unit weight they are the same number, and that is what puts the two layers of
+this dictionary on one clock: the cost of adapting a readout to `θ(x)` is measured in the
+units the transport frontier is measured in.
+
+The link matters because `CirculationDefect` proves that a mixing diagnostic *understates*
+`frontierTime` whenever the demography circulates, by the factor `1 + (a/s)²`. Through this
+identity that understatement is an understatement of the adaptation time too, rather than a
+fact about a separate quantity that happens to be written the same way. -/
+theorem autocorrTime_singleton_eq_frontierTime {ι : Type*} (i : ι) (lam : ι → ℝ) :
+    autocorrTime {i} (fun _ ↦ (1 : ℝ)) lam = frontierTime (lam i) := by
+  unfold autocorrTime frontierTime
+  simp
+
 /-! ## Geometry and effect recovery are separate gates -/
 
 /-- The observable covariance geometry and the biological effect field require different

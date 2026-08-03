@@ -333,6 +333,23 @@ deleted so that the two `2 × 2` witnesses in this development are one witness. 
 /-- Another target LD matrix with a different correlation structure. -/
 def sigmaT2 : Matrix (Fin 2) (Fin 2) ℝ := ![![1, 0.5], ![0.5, 1]]
 
+/-- **The root's `2 × 2` target witness is `DGP`'s, proved rather than asserted.**
+
+Source LD is independent, so `sigmaS` is the identity and the source ERM weight vector is
+the source cross-covariance `crossS` itself. Carrying that weight through the perfectly
+correlated target LD `sigmaT` gives the target cross-covariance, and the vector it gives is
+`DGP.ldWitnessTargetCross`.
+
+The note above says the local restatement was removed so that the two `2 × 2` witnesses in
+this development would be one witness. Removing a name does not by itself make that true:
+it leaves two files whose numbers happen to agree. This is the statement that carries it, so
+a change to either side is a contradiction rather than a divergence nobody notices. -/
+theorem sigmaT_mulVec_crossS_eq_ldWitnessTargetCross :
+    sigmaT.mulVec crossS = ldWitnessTargetCross := by
+  ext i
+  fin_cases i <;>
+    simp [sigmaT, crossS, ldWitnessTargetCross, Matrix.mulVec, dotProduct]
+
 /-- A concrete proof that the source ERM is LD-specific and does not solve
     the target normal equations under a new correlation structure. The mismatch is
     exhibited by explicit `2 × 2` witnesses rather than assumed as a hypothesis. -/
