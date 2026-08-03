@@ -1,0 +1,102 @@
+{
+ "model": "parameter-chain (NOT linkage disequilibrium)",
+ "n_markers": 40,
+ "q": 0.3,
+ "paths": 400,
+ "draws": 600,
+ "controls": {
+  "C1_ghost": 0.0005685208137557759,
+  "C1_pass": true,
+  "C2_ghost": 1.0,
+  "C2_pass": true
+ },
+ "sweep": [
+  {
+   "ell": 5.0,
+   "n_over_ell": 8.0,
+   "ghost_measured": 0.0009560267382311391,
+   "ghost_sem": 0.00029465733741296794,
+   "frozen_path_fraction": 0.0,
+   "exact_finite_n": 0.00016615349947311485,
+   "asymptotic": 0.00033546262790251185
+  },
+  {
+   "ell": 10.0,
+   "n_over_ell": 4.0,
+   "ghost_measured": 0.034839493073710946,
+   "ghost_sem": 0.00833646517067066,
+   "frozen_path_fraction": 0.0225,
+   "exact_finite_n": 0.016423203268260675,
+   "asymptotic": 0.01831563888873418
+  },
+  {
+   "ell": 20.0,
+   "n_over_ell": 2.0,
+   "ghost_measured": 0.18484910765302603,
+   "ghost_sem": 0.018420984833857193,
+   "frozen_path_fraction": 0.135,
+   "exact_finite_n": 0.13527595427905592,
+   "asymptotic": 0.1353352832366127
+  },
+  {
+   "ell": 40.0,
+   "n_over_ell": 1.0,
+   "ghost_measured": 0.4487351239857362,
+   "ghost_sem": 0.023782365037458637,
+   "frozen_path_fraction": 0.3775,
+   "exact_finite_n": 0.3725460921926978,
+   "asymptotic": 0.36787944117144233
+  },
+  {
+   "ell": 80.0,
+   "n_over_ell": 0.5,
+   "ghost_measured": 0.6848245067342714,
+   "ghost_sem": 0.02245474609098227,
+   "frozen_path_fraction": 0.645,
+   "exact_finite_n": 0.6122757622356447,
+   "asymptotic": 0.6065306597126334
+  },
+  {
+   "ell": 160.0,
+   "n_over_ell": 0.25,
+   "ghost_measured": 0.8240971977426301,
+   "ghost_sem": 0.018606452426679156,
+   "frozen_path_fraction": 0.8025,
+   "exact_finite_n": 0.7830843144252684,
+   "asymptotic": 0.7788007830714049
+  },
+  {
+   "ell": 320.0,
+   "n_over_ell": 0.125,
+   "ghost_measured": 0.9089072313824081,
+   "ghost_sem": 0.014066553148488698,
+   "frozen_path_fraction": 0.8975,
+   "exact_finite_n": 0.8850901034505203,
+   "asymptotic": 0.8824969025845955
+  }
+ ],
+ "max_dev_exact": 0.07618903179303838,
+ "max_dev_asymptotic": 0.08085568281429384,
+ "C3_periodic": [
+  {
+   "ell": 10.0,
+   "ghost_measured": 0.00373372459137153,
+   "ghost_sem": 0.0011500991929326413,
+   "renewal_prediction": 0.016423203268260675
+  },
+  {
+   "ell": 20.0,
+   "ghost_measured": 0.11280838167638682,
+   "ghost_sem": 0.013453921071425488,
+   "renewal_prediction": 0.13527595427905592
+  },
+  {
+   "ell": 40.0,
+   "ghost_measured": 1.0,
+   "ghost_sem": 0.0,
+   "renewal_prediction": 0.3725460921926978
+  }
+ ],
+ "C3_departs_as_predicted": true,
+ "READ_THE_TEST": true
+}
