@@ -968,8 +968,14 @@ section PopulationImpact
 /-- **Disparity in number-needed-to-screen (NNS).**
     NNS = 1 / (sensitivity × prevalence).
     Lower sensitivity → higher NNS → more people need screening
-    to identify one true case. -/
-noncomputable def numberNeededToScreen (sens π : ℝ) : ℝ :=
+    to identify one true case.
+
+    Both inputs are required to be positive. This keeps the real-valued formula
+    from assigning the mathematically false value `0` when sensitivity or
+    prevalence is zero; an endpoint with no detectable cases has infinite NNS
+    and therefore does not belong to this real-valued model. -/
+noncomputable def numberNeededToScreen (sens π : ℝ)
+    (_hsens : 0 < sens) (_hπ : 0 < π) : ℝ :=
   1 / (sens * π)
 
 /-- NNS is higher in the target population. -/
@@ -978,7 +984,8 @@ theorem nns_higher_in_target
     (h_sens_t : 0 < sens_t)
     (h_π : 0 < π)
     (h_lower : sens_t < sens_s) :
-    numberNeededToScreen sens_s π < numberNeededToScreen sens_t π := by
+    numberNeededToScreen sens_s π (lt_trans h_sens_t h_lower) h_π <
+      numberNeededToScreen sens_t π h_sens_t h_π := by
   unfold numberNeededToScreen
   apply div_lt_div_of_pos_left one_pos
   · exact mul_pos h_sens_t h_π
@@ -1042,7 +1049,8 @@ theorem diversification_is_optimal_equity_intervention
     (h_sens_t : 0 < sens_t)
     (h_π : 0 < π)
     (h_improves : sens_t < sens_t') :
-    numberNeededToScreen sens_t' π < numberNeededToScreen sens_t π := by
+    numberNeededToScreen sens_t' π (lt_trans h_sens_t h_improves) h_π <
+      numberNeededToScreen sens_t π h_sens_t h_π := by
   unfold numberNeededToScreen
   apply div_lt_div_of_pos_left one_pos
   · exact mul_pos h_sens_t h_π
@@ -1067,8 +1075,10 @@ theorem marginal_value_highest_for_underserved
     -- NNS = 1/(sens*π), so ΔNNS = 1/(sens*π) - 1/((sens+Δsens)*π)
     -- = Δsens / (sens*(sens+Δsens)*π)
     -- This is decreasing in sens, so underserved (lower sens) gets more improvement.
-    numberNeededToScreen sens_under π - numberNeededToScreen (sens_under + Δsens) π >
-    numberNeededToScreen sens_served π - numberNeededToScreen (sens_served + Δsens) π := by
+    numberNeededToScreen sens_under π h_under h_π -
+        numberNeededToScreen (sens_under + Δsens) π (by linarith) h_π >
+      numberNeededToScreen sens_served π h_served h_π -
+        numberNeededToScreen (sens_served + Δsens) π (by linarith) h_π := by
   unfold numberNeededToScreen
   -- NNS(s) - NNS(s+Δ) = 1/(s*π) - 1/((s+Δ)*π) = Δ*π / (s*π * (s+Δ)*π)
   -- = Δ / (s*(s+Δ)*π)
