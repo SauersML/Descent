@@ -48,11 +48,20 @@
 #   ORPHAN_MODULES=<n> / ORPHAN <mod>                 on disk, unreachable from root
 #   COVERAGE_EXIT=0|1                                 did the build cover the corpus?
 #   WHOLE_CORPUS_INCOMPLETE=0|1                       full build left work undone
+#   STALE_MTIME_ONLY=<n>                              stale mtimes, lake says clean
 #
 #   COVERAGE_EXIT=1 or WHOLE_CORPUS_INCOMPLETE=1 exits the script with code 3 even
 #   when LAKE_EXIT=0. THAT COMBINATION IS THE POINT: lake can succeed on every
 #   target it was given and still have compiled none of the modules you care
 #   about. `LAKE_EXIT=0` means "the targets built", never "the corpus is green".
+#
+#   STALE_MTIME_ONLY is the deliberately NON-fatal case: `git merge` bumps source
+#   mtimes, lake skips the rebuild on content traces, and the olean ends up older
+#   than its source without anything being wrong. The first run of the coverage
+#   guard fired on four such modules in a build with LAKE_EXIT=0 and zero errors.
+#   A guard that fires on the normal case gets ignored -- so ABSENT (no olean at
+#   all, never built under any reading) is fatal, while STALE is fatal only when
+#   lake ALSO failed.
 #
 # HOW TO READ A LOG, in order. Absence is the signal:
 #
@@ -120,6 +129,14 @@
 #                        errors FIRST -- `unexpected token`, `expected` -- and
 #                        treat any file carrying one as UNMEASURED, not as
 #                        nearly clean.
+#   `-/` INSIDE PROSE ENDS THE COMMENT. A doc comment containing the ordinary
+#                        phrase `low-/high-frequency` closes at that slash: the
+#                        remaining prose is parsed as commands and the file dies
+#                        with `unexpected identifier; expected command` dozens of
+#                        lines later, nowhere near the cause. Cost a whole-corpus
+#                        build on 2026-08-02. When a parse error points at plain
+#                        English, search the comment ABOVE it for `-/`; the usual
+#                        sources are `X-/Y` alternatives and arrow-like glyphs.
 #   no LAKE_EXIT      -> lake was killed or is still running. INCOMPLETE, not
 #                        clean; a truncated log with few errors is not a result.
 #   LAKE_EXIT=0       -> build succeeded.
@@ -331,7 +348,8 @@ python3 -S scripts/check-identifications.py > "$ROOT/guard-${SLURM_JOB_ID:-manua
 echo "GUARD_EXIT=$?"
 
 lake build "${TARGETS[@]}"
-echo "LAKE_EXIT=$?"
+_lake_exit=$?
+echo "LAKE_EXIT=$_lake_exit"
 
 # ---------------------------------------------------------------------------
 # PER-MODULE COMPILED/STALE TABLE.
@@ -437,15 +455,38 @@ fi
 # which is how a guard becomes decoration.
 _whole=0
 if [ ${#TARGETS[@]} -eq 1 ] && [ "${TARGETS[0]}" = "Calibrator" ]; then _whole=1; fi
+#
+# STALE IS NOT ALWAYS A FAILURE, and getting this wrong makes the guard useless.
+# `git merge` rewrites every file it touches, which bumps source mtimes; lake
+# then decides via CONTENT traces that the module is up to date and does not
+# rebuild it, leaving an olean older than its source. That is a benign mtime
+# artifact, not an unbuilt module -- and on the first run of this guard it fired
+# on four modules in a build with LAKE_EXIT=0 and zero errors. A guard that cries
+# wolf on the normal case gets ignored, which is how a guard becomes decoration.
+#
+# So the two signals are separated by what each can actually prove:
+#   ABSENT  -> no olean exists. That module was NEVER built, under any reading.
+#              Always a failure.
+#   STALE   -> olean older than source. Only conclusive when lake did NOT report
+#              success; with LAKE_EXIT=0 lake has asserted every target is up to
+#              date, and the mtime is the weaker evidence. Reported, not fatal.
 if [ "$_whole" = "1" ]; then
-  if [ "$_absent" -gt 0 ] || [ "$_stale" -gt 0 ]; then
+  if [ "$_absent" -gt 0 ]; then
     echo "WHOLE_CORPUS_INCOMPLETE=1"
-    echo "!!! A whole-corpus build left $_absent ABSENT and $_stale STALE modules."
-    echo "!!! THIS IS NOT A CLEAN BUILD. Those modules were not compiled in this run,"
-    echo "!!! so any error count above is a FLOOR. Check MODULE_STATUS before quoting it."
+    echo "!!! A whole-corpus build left $_absent module(s) with NO OLEAN AT ALL."
+    echo "!!! Those were never built, so any error count above is a FLOOR."
+    _coverage=1
+  elif [ "$_stale" -gt 0 ] && [ "${_lake_exit:-1}" != "0" ]; then
+    echo "WHOLE_CORPUS_INCOMPLETE=1"
+    echo "!!! lake FAILED and left $_stale STALE module(s): they were not reached."
+    echo "!!! Their silence is absence of evidence. Check MODULE_STATUS per file."
     _coverage=1
   else
     echo "WHOLE_CORPUS_INCOMPLETE=0"
+    if [ "$_stale" -gt 0 ]; then
+      echo "STALE_MTIME_ONLY=$_stale  (LAKE_EXIT=0: lake reports these up to date;"
+      echo "                          a merge or checkout touched the sources.)"
+    fi
   fi
 fi
 
