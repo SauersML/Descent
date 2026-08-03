@@ -80,6 +80,22 @@ theorem historyDegradation_equal_spectrum (h h' : SpectralHistory)
   rw [hcross, hself]
   ring
 
+/-- **Self-energy is the reversible-spectrum Poisson kernel read on its boundary.**
+
+A mode compared with itself has zero phase difference, so the kernel's frequency coordinate
+`cos (φ - φ)` is `cos 0 = 1` and the memory argument is the square of one memory. What is
+left is `ReversibleMarkovSpectrum.markovPoissonKernel` at `x = 1`, the endpoint whose value
+`markovPoissonKernel_at_one` computes.
+
+The point of stating it is that self-energy is then not a second spectral object with its
+own conventions: it is the Markov kernel of the reversible chain, evaluated where the
+frequency coordinate is extreme. `historySelfEnergy_closed` below is this identity composed
+with that endpoint evaluation, and either module changing its body contradicts this. -/
+theorem historySelfEnergy_eq_markovPoissonKernel_at_one (h : SpectralHistory) :
+    historySelfEnergy h = markovPoissonKernel (h.memory ^ 2) 1 := by
+  unfold historySelfEnergy historyKernel
+  rw [pow_two, sub_self, Real.cos_zero]
+
 /-- Exact self-energy formula away from the unit-memory boundary. -/
 theorem historySelfEnergy_closed (h : SpectralHistory) (hmemory : h.memory ^ 2 ≠ 1) :
     historySelfEnergy h = (1 + h.memory ^ 2) / (1 - h.memory ^ 2) := by

@@ -192,6 +192,20 @@ theorem indirect_eq_total_sub_direct_of_sum
 noncomputable def effectShare (indirect_effect total_effect : ℝ) : ℝ :=
   indirect_effect / total_effect
 
+/-- **The share and the proportional reduction are one ratio, read from the two ends.**
+
+`DGP.r2FromMSE mse varY` is `1 - mse / varY`, and `effectShare mse varY` is that same
+ratio. So a bound on the share is a bound on the explained-variance fraction and back
+again, with no second convention in between: `effectShare_mem_unit` below is exactly the
+statement that the `R²` coordinate stays in `[0, 1]` on the same hypotheses.
+
+It is stated because the two names invite the opposite reading. A share is large when the
+numerator is large; a proportional reduction is large when it is small. Writing the
+relation down is what stops the sign being carried by the reader. -/
+theorem r2FromMSE_eq_one_sub_effectShare (mse varY : ℝ) :
+    r2FromMSE mse varY = 1 - effectShare mse varY := by
+  unfold r2FromMSE effectShare; ring
+
 /-- `effectShare ie te` lies in [0,1] when `0 ≤ ie`, `0 < te` and `ie ≤ te`. A statement about
     a ratio of reals; "mediated" is not established anywhere. -/
 theorem effectShare_mem_unit

@@ -196,6 +196,20 @@ spellings drifting apart. -/
 theorem chi_eq_weightRatio_swap (P Q : ι → ℝ) (w : List ι) :
     chi P Q w = weightRatio Q P w := rfl
 
+/-- **The character converts one telescope weight into the other.**
+
+`Telescope.prodWeight` is the only product either constant of this file is built from, and
+`chi` is the ratio of two of them, so multiplying the character back by the `Q`-product
+returns the `P`-product exactly. That is what puts the Bézout constant and the weight defect
+on one scale rather than leaving them two unrelated ratios, and it is the statement that
+fails if either file changes what a word's weight is. The hypothesis is the honest one: a
+word carrying a zero `Q`-weight has no character to speak of, and the ratio is junk there
+rather than informative. -/
+theorem chi_mul_prodWeight (P Q : ι → ℝ) (w : List ι) (hQ : prodWeight Q w ≠ 0) :
+    chi P Q w * prodWeight Q w = prodWeight P w := by
+  unfold chi
+  field_simp
+
 /-- A product of positive weights along a word is positive. -/
 theorem prodWeight_pos (P : ι → ℝ) (hP : ∀ i, 0 < P i) (w : List ι) : 0 < prodWeight P w := by
   induction w with

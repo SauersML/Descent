@@ -301,6 +301,47 @@ admissible parameter, including the weak-constraint regime `s < mu` where
 noncomputable def mutationSelectionBalance (mu s h : ℝ) : ℝ :=
   mu / (h * s + mu)
 
+/-- **Mutation-selection balance is the drift chart's saturation map, at a
+different argument.**
+
+`fstFromTau` sends `tau` to `tau / (1 + tau)`, and the balance frequency is that
+same map applied to the ratio of mutation to effective selection, `mu / (h s)`.
+The two modules therefore share one rational function: whatever is true of the
+saturation law at one is true at the other, and a change to either body that
+breaks this identity fails to compile rather than leaving the two quietly
+disagreeing about a shape they both claim. -/
+theorem mutationSelectionBalance_eq_fstFromTau (mu s h : ℝ)
+    (hhs : h * s ≠ 0) (hsum : h * s + mu ≠ 0) :
+    mutationSelectionBalance mu s h = fstFromTau (mu / (h * s)) := by
+  unfold mutationSelectionBalance fstFromTau
+  have hone : (1 : ℝ) + mu / (h * s) ≠ 0 := by
+    rw [show (1 : ℝ) + mu / (h * s) = (h * s + mu) / (h * s) by field_simp]
+    exact div_ne_zero hsum hhs
+  -- `field_simp` may or may not leave a polynomial identity behind; guessing
+  -- which costs a build, so accept either outcome.
+  first
+  | (field_simp; ring)
+  | field_simp
+
+/-- **Mutation-selection balance is the identity-fraction map at the scaled selective load.**
+
+`DGP.fstMutationDriftEquilibrium θ = 1 / (1 + θ)` is this corpus's one body for the fraction
+surviving a balance between a replenishing and a removing force, and the dominant
+mutation-selection balance is that map at `θ = h·s / mu` — the selective load measured in
+units of the mutation rate, exactly as `θ` and `M` measure mutation and migration in units
+of drift.
+
+Reading it this way is what makes the `mu / (h·s + mu)` form forced rather than chosen. The
+textbook `mu / (h·s)` is not `1 / (1 + θ)` at any `θ`, and it leaves the unit interval in the
+weak-constraint regime; the identity below is what a substitution of the one for the other
+would have to contradict. -/
+theorem mutationSelectionBalance_eq_identityFraction (mu s h : ℝ) (hmu : mu ≠ 0) :
+    mutationSelectionBalance mu s h = fstMutationDriftEquilibrium (h * s / mu) := by
+  have hsum : (1 : ℝ) + h * s / mu = (h * s + mu) / mu := by
+    field_simp
+  unfold mutationSelectionBalance fstMutationDriftEquilibrium
+  rw [hsum, one_div_div]
+
 /-- **The dominant balance is a fixed point of the dominant map.** This is what
 makes the closed form above impossible to stipulate: it is derived from the
 dynamic rather than asserted alongside it. -/
