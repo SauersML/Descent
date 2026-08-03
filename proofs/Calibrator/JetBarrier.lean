@@ -172,15 +172,76 @@ noncomputable def logSqGaussianLaw : MeasureTheory.Measure ℝ :=
 
 /-- **`log g²` is nonlattice.**
 
-    True, and NOT PROVED HERE. `g²` has a density on `(0, ∞)`, so `log g²` has a density on
-    `ℝ`, and a law with a density gives measure zero to no countable set — in particular it
-    cannot be concentrated on an arithmetic progression. Formalizing that chain needs the
-    pushforward density of `log ∘ (·²)` under the Gaussian, which this corpus does not have.
-
-    The debt is a `sorry` rather than a hypothesis or a stipulated field, so that the axiom
-    audit reports it and anything depending on it depends on a visible hole. -/
+    Every arithmetic progression is countable. Its preimage under `x ↦ log (x²)` is
+    contained in zero together with the positive and negative square roots of the
+    progression's exponentials, hence is countable as well. The atomless Gaussian measure
+    assigns that preimage measure zero, whereas a lattice law would assign its complement
+    measure zero. -/
 theorem logSqGaussian_nonlattice : IsNonlatticeLaw logSqGaussianLaw := by
-  sorry
+  intro span offset hlattice
+  let progression : Set ℝ := Set.range fun k : ℤ ↦ offset + span * k
+  let logSquare : ℝ → ℝ := fun x ↦ Real.log (x ^ 2)
+  have hprogression : progression.Countable := Set.countable_range _
+  have hprogressionMeasurable : MeasurableSet progression :=
+    hprogression.measurableSet
+  let positiveRoot : ℤ → ℝ := fun k ↦ Real.sqrt (Real.exp (offset + span * k))
+  have hpreimage : logSquare ⁻¹' progression ⊆
+      ({0} : Set ℝ) ∪ Set.range positiveRoot ∪ Set.range (fun k ↦ -positiveRoot k) := by
+    intro x hx
+    rcases hx with ⟨k, hk⟩
+    by_cases hx0 : x = 0
+    · exact Or.inl (Or.inl (by simp [hx0]))
+    · have hsqpos : 0 < x ^ 2 := sq_pos_of_ne_zero hx0
+      have hsquare : x ^ 2 = Real.exp (offset + span * k) := by
+        have hexp := congrArg Real.exp hk
+        have hleft : Real.exp (logSquare x) = x ^ 2 := by
+          change Real.exp (Real.log (x ^ 2)) = x ^ 2
+          exact Real.exp_log hsqpos
+        calc
+          x ^ 2 = Real.exp (logSquare x) := hleft.symm
+          _ = Real.exp (offset + span * k) := hexp.symm
+      have hrootSquare : positiveRoot k ^ 2 = Real.exp (offset + span * k) := by
+        exact Real.sq_sqrt (Real.exp_nonneg _)
+      rcases sq_eq_sq_iff_eq_or_eq_neg.mp (hsquare.trans hrootSquare.symm) with hpos | hneg
+      · exact Or.inl (Or.inr ⟨k, hpos.symm⟩)
+      · exact Or.inr ⟨k, hneg.symm⟩
+  have hpreimageCountable : (logSquare ⁻¹' progression).Countable :=
+    ((Set.countable_singleton 0).union (Set.countable_range positiveRoot) |>.union
+      (Set.countable_range fun k ↦ -positiveRoot k)).mono hpreimage
+  letI : MeasureTheory.NoAtoms stdGaussianMeasure := by
+    unfold stdGaussianMeasure
+    exact ProbabilityTheory.noAtoms_gaussianReal (by norm_num)
+  have hpreimageZero : stdGaussianMeasure (logSquare ⁻¹' progression) = 0 :=
+    hpreimageCountable.measure_zero stdGaussianMeasure
+  have hprogressionZero : logSqGaussianLaw progression = 0 := by
+    unfold logSqGaussianLaw
+    rw [MeasureTheory.Measure.map_apply (by fun_prop) hprogressionMeasurable]
+    exact hpreimageZero
+  have hoffProgression :
+      {x : ℝ | ∀ k : ℤ, x ≠ offset + span * k} = progressionᶜ := by
+    ext x
+    simp only [progression, Set.mem_setOf_eq, Set.mem_compl_iff, Set.mem_range,
+      not_exists, ne_eq]
+    constructor
+    · intro h k hk
+      exact h k hk.symm
+    · intro h k hk
+      exact h k hk.symm
+  have hcomplementZero : logSqGaussianLaw progressionᶜ = 0 := by
+    rw [← hoffProgression]
+    exact hlattice.2
+  have hcomplementOne : logSqGaussianLaw progressionᶜ = 1 := by
+    have hfinite : logSqGaussianLaw progression ≠ ⊤ := by
+      rw [hprogressionZero]
+      exact ENNReal.zero_ne_top
+    have huniv : logSqGaussianLaw Set.univ = 1 := by
+      unfold logSqGaussianLaw stdGaussianMeasure
+      simp
+    rw [MeasureTheory.measure_compl hprogressionMeasurable hfinite, huniv,
+      hprogressionZero]
+    simp
+  rw [hcomplementZero] at hcomplementOne
+  exact (zero_ne_one : (0 : ℝ≥0∞) ≠ 1) hcomplementOne
 
 /-- A triple of Mellin data for a coordinate law: drift, jet variance, lattice datum.
 
@@ -335,8 +396,7 @@ theorem inflated_intensity_ne_of_injective
 `Calibrator.Condensation`.
 
 The `nonlattice` datum is not stipulated: it is checked against the law of `log g²` by
-`gaussianObservables_describes_logSqGaussianLaw` below, which rests on the `sorry` in
-`logSqGaussian_nonlattice`. -/
+`gaussianObservables_describes_logSqGaussianLaw` below. -/
 noncomputable def gaussianObservables : MellinObservables where
   drift := condensationConstant
   jetVariance := gaussianJetVariance
@@ -345,9 +405,8 @@ noncomputable def gaussianObservables : MellinObservables where
 /-- The Gaussian triple's lattice datum says something true about the actual law of
     `log g²`, rather than being a field set by hand.
 
-    This is the whole point of the `Describes` predicate: the record now has to agree with a
-    law, and the one step that is not proved is isolated in `logSqGaussian_nonlattice`
-    instead of being spread across every downstream comparison. -/
+    The `Describes` predicate ensures that the record agrees with the underlying law rather
+    than merely carrying a constructor chosen by hand. -/
 theorem gaussianObservables_describes_logSqGaussianLaw :
     gaussianObservables.latticeDatum.Describes logSqGaussianLaw :=
   logSqGaussian_nonlattice

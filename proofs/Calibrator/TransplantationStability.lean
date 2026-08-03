@@ -126,6 +126,128 @@ noncomputable def perturbedEnergy {n : ℕ} (μ : Fin (n + 1) → ℝ)
     (E : Matrix (Fin (n + 1)) (Fin (n + 1)) ℝ) (v : Fin (n + 1) → ℝ) : ℝ :=
   spectralEnergy μ v + v ⬝ᵥ (E *ᵥ v)
 
+/-- **The ground-state comparison bound, proved.**
+
+    Testing the true ground direction `e₀` in the approximate problem gives
+    `spectralEnergy μ c - μ 0 ≤ ⟨e₀, Ee₀⟩ - ⟨c, Ec⟩`, and each quadratic form is bounded by
+    `δ` on unit states, so the excess is at most `2δ`.
+
+    This needs neither the symmetry of `E` nor the spectral gap: it is the half of the
+    perturbation bound that follows from minimality alone. The sharp form below replaces the
+    constant `2` by `2√2 √(misalignment)`, which is stronger exactly when the minimiser is
+    close to the ground direction. -/
+theorem excess_le_two_mul_perturbation {n : ℕ}
+    (μ c : Fin (n + 1) → ℝ) (E : Matrix (Fin (n + 1)) (Fin (n + 1)) ℝ) (δ : ℝ)
+    (hEbound : ∀ v : Fin (n + 1) → ℝ, (∑ i, v i ^ 2) = 1 → |v ⬝ᵥ (E *ᵥ v)| ≤ δ)
+    (hunit : ∑ i, c i ^ 2 = 1)
+    (hmin : ∀ v : Fin (n + 1) → ℝ, (∑ i, v i ^ 2) = 1 →
+      perturbedEnergy μ E c ≤ perturbedEnergy μ E v) :
+    spectralEnergy μ c - μ 0 ≤ 2 * δ := by
+  set e : Fin (n + 1) → ℝ := fun i ↦ if i = 0 then (1 : ℝ) else 0 with he
+  have heunit : ∑ i, e i ^ 2 = 1 := by
+    simp [he, Finset.sum_ite_eq']
+  have heenergy : spectralEnergy μ e = μ 0 := by
+    simp [spectralEnergy, he, Finset.sum_ite_eq']
+  have hcomp := hmin e heunit
+  unfold perturbedEnergy at hcomp
+  rw [heenergy] at hcomp
+  have hc := hEbound c hunit
+  have hE0 := hEbound e heunit
+  have h1 : c ⬝ᵥ (E *ᵥ c) ≥ -δ := neg_le_of_abs_le hc
+  have h2 : e ⬝ᵥ (E *ᵥ e) ≤ δ := le_of_abs_le hE0
+  linarith
+
+/-- Scaling a vector scales its quadratic form by the square. -/
+theorem quadForm_smul {m : ℕ} (E : Matrix (Fin m) (Fin m) ℝ) (t : ℝ) (w : Fin m → ℝ) :
+    (fun i ↦ t * w i) ⬝ᵥ (E *ᵥ fun i ↦ t * w i) = t ^ 2 * (w ⬝ᵥ (E *ᵥ w)) := by
+  simp only [dotProduct, Matrix.mulVec, Finset.mul_sum]
+  refine Finset.sum_congr rfl fun i _ ↦ ?_
+  refine Finset.sum_congr rfl fun j _ ↦ by ring
+
+/-- Scaling a vector scales its squared norm by the square. -/
+theorem sumSq_smul {m : ℕ} (t : ℝ) (w : Fin m → ℝ) :
+    (∑ i, (t * w i) ^ 2) = t ^ 2 * ∑ i, w i ^ 2 := by
+  rw [Finset.mul_sum]
+  refine Finset.sum_congr rfl fun i _ ↦ by ring
+
+/-- **The quadratic-form bound, homogenised.** A bound on unit states extends to every state
+with the squared norm as the factor. -/
+theorem quadForm_le_mul_sumSq {n : ℕ} (E : Matrix (Fin (n + 1)) (Fin (n + 1)) ℝ) (δ : ℝ)
+    (hEbound : ∀ v : Fin (n + 1) → ℝ, (∑ i, v i ^ 2) = 1 → |v ⬝ᵥ (E *ᵥ v)| ≤ δ)
+    (w : Fin (n + 1) → ℝ) :
+    |w ⬝ᵥ (E *ᵥ w)| ≤ δ * ∑ i, w i ^ 2 := by
+  set t : ℝ := ∑ i, w i ^ 2 with ht
+  have htnn : 0 ≤ t := Finset.sum_nonneg fun i _ ↦ sq_nonneg _
+  rcases eq_or_lt_of_le htnn with hzero | hpos
+  · have hw : ∀ i, w i = 0 := by
+      intro i
+      have hsum : ∑ j, w j ^ 2 = 0 := hzero.symm
+      have := (Finset.sum_eq_zero_iff_of_nonneg (fun j _ ↦ sq_nonneg (w j))).mp hsum i
+        (Finset.mem_univ i)
+      exact pow_eq_zero_iff (n := 2) (by norm_num) |>.mp this
+    have : w = fun _ ↦ (0 : ℝ) := funext hw
+    subst this
+    simp [← ht, ← hzero]
+  · have hsqrt : 0 < Real.sqrt t := Real.sqrt_pos.mpr hpos
+    set v : Fin (n + 1) → ℝ := fun i ↦ (Real.sqrt t)⁻¹ * w i with hv
+    have hvunit : ∑ i, v i ^ 2 = 1 := by
+      rw [hv, sumSq_smul, ← ht, inv_pow, Real.sq_sqrt (le_of_lt hpos)]
+      field_simp
+    have hquad : v ⬝ᵥ (E *ᵥ v) = (Real.sqrt t)⁻¹ ^ 2 * (w ⬝ᵥ (E *ᵥ w)) := by
+      rw [hv]; exact quadForm_smul E _ w
+    have hb := hEbound v hvunit
+    rw [hquad, inv_pow, Real.sq_sqrt (le_of_lt hpos), abs_mul,
+      abs_of_pos (by positivity : (0:ℝ) < t⁻¹)] at hb
+    calc |w ⬝ᵥ (E *ᵥ w)| = t * (t⁻¹ * |w ⬝ᵥ (E *ᵥ w)|) := by
+          field_simp
+      _ ≤ t * δ := by
+          exact mul_le_mul_of_nonneg_left hb htnn
+      _ = δ * t := by ring
+
+/-- A symmetric matrix has a symmetric bilinear form. -/
+theorem dotProduct_mulVec_comm_of_isSymm {m : ℕ} {E : Matrix (Fin m) (Fin m) ℝ}
+    (hE : E.IsSymm) (u v : Fin m → ℝ) :
+    u ⬝ᵥ (E *ᵥ v) = v ⬝ᵥ (E *ᵥ u) := by
+  simp only [dotProduct, Matrix.mulVec, Finset.mul_sum]
+  rw [Finset.sum_comm]
+  refine Finset.sum_congr rfl fun i _ ↦ Finset.sum_congr rfl fun j _ ↦ ?_
+  have h : E j i = E i j := congrFun (congrFun hE i) j
+  rw [h]
+  ring
+
+/-- **The sharp bound holds outright once the misalignment is at least one half.**
+
+    At `misalignmentSq c ≥ 1/2` the sharp right-hand side `2√2 δ √s` is already at least
+    `2δ`, so the ground-state comparison above proves it with nothing further. The genuinely
+    open case is a minimiser CLOSE to the ground direction, where `√s` is small and the
+    constant has to be earned from the bilinear bound rather than from minimality. -/
+theorem excess_le_perturbation_mul_misalignment_of_half_le {n : ℕ}
+    (μ c : Fin (n + 1) → ℝ) (E : Matrix (Fin (n + 1)) (Fin (n + 1)) ℝ) (δ : ℝ)
+    (hδ : 0 ≤ δ)
+    (hEbound : ∀ v : Fin (n + 1) → ℝ, (∑ i, v i ^ 2) = 1 → |v ⬝ᵥ (E *ᵥ v)| ≤ δ)
+    (hunit : ∑ i, c i ^ 2 = 1)
+    (hhalf : (1 : ℝ) / 2 ≤ misalignmentSq c)
+    (hmin : ∀ v : Fin (n + 1) → ℝ, (∑ i, v i ^ 2) = 1 →
+      perturbedEnergy μ E c ≤ perturbedEnergy μ E v) :
+    spectralEnergy μ c - μ 0 ≤ 2 * Real.sqrt 2 * δ * Real.sqrt (misalignmentSq c) := by
+  have hbase := excess_le_two_mul_perturbation μ c E δ hEbound hunit hmin
+  have hsq : Real.sqrt ((1 : ℝ) / 2) ≤ Real.sqrt (misalignmentSq c) :=
+    Real.sqrt_le_sqrt hhalf
+  have hprod : Real.sqrt 2 * Real.sqrt ((1 : ℝ) / 2) = 1 := by
+    rw [← Real.sqrt_mul (by norm_num : (0 : ℝ) ≤ 2)]
+    norm_num
+  have hcoef : 0 ≤ 2 * Real.sqrt 2 * δ :=
+    mul_nonneg (mul_nonneg (by norm_num) (Real.sqrt_nonneg 2)) hδ
+  have hstep : 2 * Real.sqrt 2 * δ * Real.sqrt ((1 : ℝ) / 2)
+      ≤ 2 * Real.sqrt 2 * δ * Real.sqrt (misalignmentSq c) :=
+    mul_le_mul_of_nonneg_left hsq hcoef
+  have hval : 2 * Real.sqrt 2 * δ * Real.sqrt ((1 : ℝ) / 2) = 2 * δ := by
+    have hrw : 2 * Real.sqrt 2 * δ * Real.sqrt ((1 : ℝ) / 2)
+        = 2 * δ * (Real.sqrt 2 * Real.sqrt ((1 : ℝ) / 2)) := by ring
+    rw [hrw, hprod, mul_one]
+  rw [hval] at hstep
+  linarith
+
 /-- **The perturbation upper bound, not proved here.**
 
     `c` minimises the approximate energy; `E` is symmetric with quadratic form bounded by `δ` on
