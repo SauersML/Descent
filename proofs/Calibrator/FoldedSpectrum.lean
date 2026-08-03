@@ -1013,57 +1013,6 @@ theorem maf_spectrum_identifiable {n : ℕ} (panel : Panel n)
     panel.weight i = 0 :=
   spectrum_determined_of_separating diploidFamily panel hsep hkernel i
 
-/-! ### The transfer threshold: how many distinct frequencies a smooth approximation needs
-
-For a score summed over `N` steps from an `n`-point panel, the continuum local-limit and
-expansion theory transfers **if and only if** `n` is above order `log N`, with attainment
-on both sides: below the threshold there are explicit configurations, with phases in
-rational ratio, for which the continuum approximation fails by a constant-order lattice
-correction.
-
-Biologically: **the number of distinct marker frequencies must exceed a constant times the
-logarithm of the score length** before a smooth approximation to the score distribution is
-licensed. It is a panel-design condition and it is checkable by counting distinct values in
-a frequency column.
-
-Its failure mode is the same discreteness the freezing transition of §8 describes from the
-correlation side, and the two bound it from different directions: one by effective block
-count, this one by frequency diversity. A panel can fail either way independently. -/
-structure TransferThreshold where
-  /-- Number of distinct marker frequencies in the panel. -/
-  distinctFrequencies : ℝ
-  /-- Number of summands in the score. -/
-  scoreLength : ℝ
-  scoreLength_pos : 1 < scoreLength
-  /-- The threshold constant. -/
-  constant : ℝ
-  constant_pos : 0 < constant
-  /-- Whether the continuum local-limit and expansion theory transfers. -/
-  transfers : Prop
-  /-- **The threshold, with attainment on both sides.** -/
-  threshold : transfers ↔ constant * Real.log scoreLength < distinctFrequencies
-
-namespace TransferThreshold
-
-variable (T : TransferThreshold)
-
-/-- **A longer score needs a more diverse panel.** The requirement grows without bound in
-the score length, so no fixed panel is safe for arbitrarily long scores. -/
-theorem threshold_grows (T' : TransferThreshold) (hconst : T.constant = T'.constant)
-    (hlen : T.scoreLength < T'.scoreLength) (hdiv : T.distinctFrequencies = T'.distinctFrequencies)
-    (htransfers : T'.transfers) : T.transfers := by
-  rw [T.threshold]
-  have h' := (T'.threshold).mp htransfers
-  have hlog : Real.log T.scoreLength < Real.log T'.scoreLength :=
-    Real.log_lt_log (by linarith [T.scoreLength_pos]) hlen
-  have : T.constant * Real.log T.scoreLength < T'.constant * Real.log T'.scoreLength := by
-    rw [hconst]
-    exact (mul_lt_mul_iff_right₀ T'.constant_pos).mpr hlog
-  rw [hdiv]
-  linarith
-
-end TransferThreshold
-
 /-! ## 8. Correlated frequencies along the genome: what regeneration buys
 
 **The model, and its scope, first.** A *Markov-modulated bundle chain* lets the parameter
@@ -1073,12 +1022,11 @@ again before quoting anything below: this is dependence *in the frequency profil
 the genome*, not correlation between genotypes at fixed frequencies. Linkage
 disequilibrium is the latter. Nothing in this section covers it.
 
-The analytic content is classical — Doeblin minorization, Nummelin splitting, regeneration
-decomposition, Nagaev–Guivarc'h perturbation — and is carried below as named hypothesis
-fields rather than reproved.
+The analytic content would require Doeblin minorization, Nummelin splitting, regeneration
+decomposition, and Nagaev–Guivarc'h perturbation. It is not exported below without proofs.
 -/
 
-/-- **A Markov-modulated bundle chain, with its regeneration structure.**
+/-! **The removed Markov-modulated bundle-chain interface.**
 
 The two modelling hypotheses are fields, not assumptions in prose:
 
@@ -1091,113 +1039,10 @@ The two modelling hypotheses are fields, not assumptions in prose:
   parameter structure with **no** excursion decomposition, and the theory then declines to
   speak. That exception list is a scope statement, not advice.
 
-`renormalization` is **the renormalization theorem**: after one regeneration decomposition
-the chain's modulus law is exactly that of an *independent* panel over the excursion
-bundle family, whose loci are the blocks between regeneration events. Recombination is
-regeneration; the excursions are the blocks. This is the footing under the standard
-practice of treating LD blocks as independent units. -/
-structure MarkovModulatedChain (K n : ℕ) where
-  /-- The model hypothesis: coordinates independent given the frequency profile. -/
-  conditionalIndependenceGivenParameters : Prop
-  /-- Harris recurrence / Doeblin minorization of the parameter chain. Fails under
-  admixture, recent sweeps and population structure. -/
-  harrisMinorization : Prop
-  /-- The bundle family whose parameter is a whole excursion. -/
-  excursionFamily : BundleFamily K
-  /-- The panel of regeneration blocks. -/
-  blockPanel : Panel n
-  /-- The modulus law of the dependent chain itself. -/
-  chainModulusLaw : ℝ → ℝ
-  /-- **The renormalization theorem.** -/
-  renormalization : conditionalIndependenceGivenParameters → harrisMinorization →
-    ∀ v : ℝ, chainModulusLaw v = spectrumModulusLaw excursionFamily blockPanel v
-
-namespace MarkovModulatedChain
-
-variable {K n : ℕ} (M : MarkovModulatedChain K n)
-
-/-- **Rigidity survives parameter dependence, with no new condition.**
-
-Every theorem of the independent theory applies verbatim to the renormalized chain. Here
-is the identifiability theorem transported: if the block panel is separating, a dependent
-chain with vanishing modulus law has vanishing block weights.
-
-The hypotheses that must travel with it: the model, Harris regeneration, finiteness of the
-block panel, and separation of the blocks. -/
-theorem blockWeight_eq_zero_of_separating
-    (hmodel : M.conditionalIndependenceGivenParameters) (hharris : M.harrisMinorization)
-    (hsep : Separating M.excursionFamily M.blockPanel)
-    (hzero : ∀ v : ℝ, M.chainModulusLaw v = 0) (i : Fin n) :
-    M.blockPanel.weight i = 0 :=
-  spectrum_determined_of_separating M.excursionFamily M.blockPanel hsep
-    (fun v => by rw [← M.renormalization hmodel hharris v]; exact hzero v) i
-
-end MarkovModulatedChain
-
-/-- **The freezing transition.**
-
-With correlation length `ℓ` and `n` markers in the regime `n/ℓ → 1/κ`, the local law of a
-score is a smooth body plus a **lattice ghost of mass exactly `e^{-1/κ}`**.
-
-The operational content, which is what a methodologist would use: *the number of
-effectively independent blocks, not the number of markers, controls when a normal
-approximation to a score distribution is safe.* A score built from a few markers inside
-one correlated block stays visibly discrete — the comb one sees instead of a bell curve
-when plotting a twenty-marker score is this ghost — and a score spread over many
-independent blocks is smooth. The transition is quantitative, with the coefficient above.
-
-The derivation is a conditioning argument on the number of regenerations, so it carries
-the same Harris hypothesis as everything else in this section; it is recorded as a field. -/
-structure FreezingTransition where
-  /-- Correlation length of the parameter chain, in markers. -/
-  correlationLength : ℝ
-  /-- Number of markers in the score. -/
-  markerCount : ℝ
-  /-- The scaling parameter: `κ = ℓ/n`, so `n/ℓ = 1/κ` is the effective block count. -/
-  kappa : ℝ
-  kappa_pos : 0 < kappa
-  scaling : markerCount / correlationLength = 1 / kappa
-  /-- Harris minorization, inherited. -/
-  harrisMinorization : Prop
-  /-- Mass of the residual lattice component of the local law. -/
-  latticeGhostMass : ℝ
-  /-- Mass of the smooth component. -/
-  smoothBodyMass : ℝ
-  /-- **The transition, with its exact coefficient.** -/
-  freezing : harrisMinorization → latticeGhostMass = Real.exp (-(1 / kappa))
-  /-- The two components are a decomposition of the whole law. -/
-  decomposition : latticeGhostMass + smoothBodyMass = 1
-
-namespace FreezingTransition
-
-variable (T : FreezingTransition)
-
-/-- **The ghost never vanishes at any finite effective block count.** A normal
-approximation to a score distribution is never exactly right; it is right up to a mass
-`e^{-1/κ}` that the theorem names. -/
-theorem latticeGhostMass_pos (hharris : T.harrisMinorization) : 0 < T.latticeGhostMass := by
-  rw [T.freezing hharris]
-  exact Real.exp_pos _
-
-/-- **More effectively independent blocks means a smaller ghost**, monotonically. Halving
-`κ` — doubling the number of independent blocks per correlation length — squares the
-residual discreteness. -/
-theorem latticeGhostMass_mono (T' : FreezingTransition)
-    (hharris : T.harrisMinorization) (hharris' : T'.harrisMinorization)
-    (hlt : T.kappa < T'.kappa) : T.latticeGhostMass < T'.latticeGhostMass := by
-  rw [T.freezing hharris, T'.freezing hharris']
-  have h : 1 / T'.kappa < 1 / T.kappa :=
-    div_lt_div_of_pos_left one_pos T.kappa_pos hlt
-  exact Real.exp_lt_exp.mpr (by linarith)
-
-/-- **It is the block count that matters, not the marker count.** Two designs with the
-same `κ` carry the same residual discreteness however many markers they use. -/
-theorem latticeGhostMass_depends_only_on_blockCount (T' : FreezingTransition)
-    (hharris : T.harrisMinorization) (hharris' : T'.harrisMinorization)
-    (hkappa : T.kappa = T'.kappa) : T.latticeGhostMass = T'.latticeGhostMass := by
-  rw [T.freezing hharris, T'.freezing hharris', hkappa]
-
-end FreezingTransition
+The regeneration identity and the exact freezing coefficient were formerly exported by
+placing those conclusions in structure fields.  They are not established in this corpus,
+so the interfaces and their projection theorems have been removed.  A future restoration
+must construct the split chain and prove the modulus-law identity from it. -/
 
 /-- **Two-point modulus data**, as a functional of the two-site path marginal: the joint
 law of `|U|` at a pair of sites. -/
@@ -1220,40 +1065,6 @@ theorem twoPointModulusLaw_add {K m : ℕ} (family : BundleFamily K)
   unfold twoPointModulusLaw
   rw [← Finset.sum_add_distrib]
   exact Finset.sum_congr rfl (fun i _ => by ring)
-
-/-- **Joint two-site data is strictly more identifying than single-site data.**
-
-Two claims, both carried with their hypotheses visible:
-
-* if the one-point fiber map is injective, two-point modulus data determines the two-point
-  marginal and hence the chain (`chainDetermined`);
-* Markov consistency cuts the tensor kernel, so the surgery freedom under dependence is no
-  larger than the freedom marginal data leaves (`freedomShrinks`).
-
-**The slice-map hypothesis has been dissolved and is no longer needed.** It was the
-pre-registered weak point of the tensor argument; a later proof replaces it with two
-successive slicings, each producing a measure that annihilates the range algebra and is
-therefore zero, so the kernel description is now an **exact slice condition** rather than
-the closure of a sum. The field is retained below, marked superseded, and
-`identification_of_injective` is the version that does not use it. -/
-structure TwoPointIdentification where
-  /-- The one-point fiber map is injective. -/
-  oneSiteFiberInjective : Prop
-  /-- **SUPERSEDED.** The slice-map step of the tensor argument, carried when it was the
-  pre-registered weak point. A later proof removes the need for it entirely; it is kept
-  here only so that the earlier form remains readable beneath its correction. -/
-  sliceMapProperty : Prop
-  /-- Dimension of the surgery freedom left by single-site modulus data. -/
-  marginalFreedom : ℕ
-  /-- Dimension of the surgery freedom left by joint two-site modulus data. -/
-  jointFreedom : ℕ
-  /-- The chain is determined by two-point data. -/
-  chainDetermined : Prop
-  /-- **Identification from two-point data, needing only injectivity of the one-point fiber
-  map.** This is the current form; the slice-map input has been dissolved. -/
-  identification_of_injective : oneSiteFiberInjective → chainDetermined
-  /-- Markov consistency cuts the tensor kernel. -/
-  freedomShrinks : jointFreedom ≤ marginalFreedom
 
 /-! ## 9. The coupled core: gain and support are different biological axes
 
@@ -1441,42 +1252,9 @@ that remain are
   statistics.
 
 If this approximation is derived under a shared outcome mechanism, no target outcome data
-appears at leading order. That derivation is not present here. `ObservableDegradation`
-stores the relative-error inequality as an input and proves its usable two-sided bracket;
-it must not be cited as proving that genotype marginals alone predict transfer loss.
--/
-
-/-- **The small-signal observable formula**, with its relative error explicit.
-
-`predicted` is a proposed approximation and `smallSignal` is `ε`. The field `accuracy` is
-the substantive analytical assumption; the theorem below is its interval consequence. -/
-structure ObservableDegradation where
-  /-- The true degradation. -/
-  degradation : ℝ
-  /-- The predicted degradation: the band-weighted L² distance between SNR spectra. -/
-  predicted : ℝ
-  predicted_nonneg : 0 ≤ predicted
-  /-- The small-signal parameter `ε`. -/
-  smallSignal : ℝ
-  smallSignal_nonneg : 0 ≤ smallSignal
-  /-- **The reduction, with its relative error.** -/
-  accuracy : |degradation - predicted| ≤ smallSignal * predicted
-
-namespace ObservableDegradation
-
-variable (O : ObservableDegradation)
-
-/-- **The two-sided bracket**, which is the form a method would use: the true degradation is
-pinned between `(1-ε)` and `(1+ε)` times a quantity computable without target outcomes. -/
-theorem degradation_bracket :
-    (1 - O.smallSignal) * O.predicted ≤ O.degradation ∧
-      O.degradation ≤ (1 + O.smallSignal) * O.predicted := by
-  have h := abs_le.mp O.accuracy
-  constructor
-  · nlinarith [h.1]
-  · nlinarith [h.2]
-
-end ObservableDegradation
+appears at leading order. That derivation is not present here.  The former
+`ObservableDegradation` structure merely stored the desired relative-error theorem as a
+field; it and its projection lemma have therefore been removed. -/
 
 /-! ### 12b. A two-coordinate interface for Gaussian level-set metrics
 
@@ -1901,57 +1679,6 @@ This makes LD-pruning threshold and cohort diversity conjugate **inside the veri
 model**.  The proportionality constant and the link between biological support and `η`
 must be measured or proved for the assay being designed. -/
 
-/-- A deployment experiment for which the boxed ceiling characterization has been supplied
-as an explicit premise.  This structure records a conditional model; constructing it is the
-unresolved biological identifiability obligation. -/
-structure AssumedDeploymentCeiling where
-  /-- Aggregate deployment risk orthogonal to what the source identifies. -/
-  perpRisk : ℝ
-  /-- The conditional charge floor `η` of §10: `η = 0` is perfect LD. -/
-  eta : ℝ
-  /-- Whether the family is time-reversible. -/
-  reversible : Prop
-  /-- Whether an arrow bit — one lag-asymmetric statistic — has been measured. -/
-  arrowBit : Prop
-  /-- **The boxed characterization.** -/
-  characterization : perpRisk = 0 ↔ (0 < eta ∧ (reversible ∨ arrowBit))
-
-/-- Under the structure's boxed-characterization premise, scalar reversibility reduces the
-zero-ceiling criterion to positivity of the support floor.
-
-**QUOTE THIS ONLY WITH ITS COST QUALIFIER.** The reading "aggregate deployment risk has no
-information-theoretic floor, so the portability gap is a sample-size problem, not a wall" is
-what this theorem says and is correct. It must travel with:
-
-> the sample size is **exponential in the coupling order** a direction requires; only the
-> order-one case is the quadratic `1/η²` formula.
-
-The only guarantee positive support supplies is `σ_min ≥ (η/C)^k`, which decays
-geometrically in the coupling order `k`, so resolving a direction of order `k` costs about
-`(C/η)^{2k}` samples. `Calibrator.BundleRigidity.sampleCost_unbounded` proves this exceeds
-every bound as `k` grows; `sampleCost_one` is the order-one case. So `requiredCohorts` and
-`m ≥ d/(2 c₋ η² R)` above are the **fixed-order specialisation**, and understate a
-high-order direction by an exponential factor. A direction with large coupling order is a
-wall in practice while remaining a sample-size problem in theory.
-
-**OUT OF SCOPE: directions unidentifiable at every order.** If an environmental gradient is
-collinear with the ancestry gradient, a one-parameter family of genetic/environmental splits
-produces *identical* cohort shifts — exactly equal, not approximately — so no cohort-level
-calibration separates them at any sample size, and the level-set collapse carries that to
-every threshold metric. That is an orthogonal wall. This theorem bounds how expensive a
-*visible* direction is; it says nothing about one that a design confined to a single
-ancestry axis cannot see at all, and `r⊥ = 0 ⟺ η > 0` must not be read as covering it.
-
-**On the premise itself:** the forward conjunct `η > 0 ⟹ perpRisk = 0` is no longer only
-assumed — it is derived in `Calibrator.BundleRigidity.DeploymentModel.perpRisk_eq_zero_of_eta_pos`
-from coverage invariance, for models where `perpRisk` and `eta` carry definitions rather
-than being free reals. The converse still rests on the modulus-copy witness at `η = 0`. -/
-theorem assumedCeiling_collapses_to_support_wall
-    (C : AssumedDeploymentCeiling) (hrev : C.reversible) :
-    C.perpRisk = 0 ↔ 0 < C.eta := by
-  rw [C.characterization]
-  exact ⟨fun h => h.1, fun h => ⟨h, Or.inl hrev⟩⟩
-
 /-- Cohorts required for a target aggregate risk: `m ≥ d/(2 c₋ η² R)`. -/
 noncomputable def requiredCohorts (d cMinus eta R : ℝ) : ℝ :=
   d / (2 * cMinus * eta ^ 2 * R)
@@ -1997,43 +1724,8 @@ This sits directly beside `RecoveryAttenuation`, and the two constrain *differen
 * the arrow lemmas say depth `n' ≥ 2` is necessary for this ordered antisymmetric probe — a
   statement about **depth**, not yet a universal information bound.
 
-The structure below is an explicit assumption-bearing model for experiments in which the
-information threshold has separately been established.  Its theorems propagate that premise;
-they do not derive it from stationarity alone. -/
-
-/-- An experiment whose depth-one blindness and depth-two opening have been proved outside
-this interface. -/
-structure AssumedMembraneThreshold where
-  /-- Fisher information about a dependence direction carried by one target at depth `n'`. -/
-  info : ℕ → ℝ
-  info_nonneg : ∀ n : ℕ, 0 ≤ info n
-  /-- Depth-one blindness for the named experiment. -/
-  blind_at_one : info 1 = 0
-  /-- Sensitivity of the lag-one correlation to the dependence direction, `dρ(1)/dh`. -/
-  lagOneSensitivity : ℝ
-  /-- Depth-two opening for the named experiment when lag-one sensitivity is nonzero. -/
-  opens_at_two : lagOneSensitivity ≠ 0 → 0 < info 2
-
-namespace AssumedMembraneThreshold
-
-variable (M : AssumedMembraneThreshold)
-
-/-- Total information from `m` cohorts of `B` panels each, at depth `n'`. -/
-noncomputable def totalInfo (m B : ℝ) (n : ℕ) : ℝ := m * B * M.info n
-
-/-- Under the structure's explicit depth-one premise, breadth cannot create information. -/
-theorem depth_one_cannot_be_bought (m B : ℝ) : M.totalInfo m B 1 = 0 := by
-  unfold totalInfo
-  rw [M.blind_at_one, mul_zero]
-
-/-- Under the structure's explicit opening premise, positive breadth preserves positive
-depth-two information. -/
-theorem two_units_carry_information (m B : ℝ) (hm : 0 < m) (hB : 0 < B)
-    (hsens : M.lagOneSensitivity ≠ 0) : 0 < M.totalInfo m B 2 := by
-  unfold totalInfo
-  exact mul_pos (mul_pos hm hB) (M.opens_at_two hsens)
-
-end AssumedMembraneThreshold
+No generic information-threshold model is exported from this discussion.  The concrete
+binary-orientation experiment below supplies the proved positive control. -/
 
 /-! The binary orientation experiment supplies one fully derived **directed-transition
 positive control** for this design logic. `EnsembleChannel.binaryOrientation_orderFree_mean`
@@ -2101,72 +1793,52 @@ The practical reading is not that the curve-prior dissolution fails. It is that 
 it needs enough panels per cohort to make `L̂` reliable**, and `B = 16` is not enough. That
 is a design number, and it is the first one in this arc that bites. -/
 
-/-- **The estimation attenuation of the curve-prior recovery.**
+/-! **The estimation attenuation of curve-prior recovery.**
 
-`predictableVariance` is the population quantity the identity of §14b delivers.
-`estimationNoise` is the variance of the per-cohort estimate of the visible coordinate.
-`recovered` is what a pooled rule actually obtains: the population quantity multiplied by the
-**reliability ratio** `predictable/(predictable + noise)`.
-
-This is regression dilution, and it is the difference between the exact identity and the
-`15.3%` measured at `B = 16` panels per cohort. -/
-structure RecoveryAttenuation where
-  /-- The population predictable variance — what the §14b identity delivers. -/
-  predictableVariance : ℝ
-  predictableVariance_pos : 0 < predictableVariance
-  /-- Variance of the per-cohort estimate of the visible coordinate. -/
-  estimationNoise : ℝ
-  estimationNoise_nonneg : 0 ≤ estimationNoise
-  /-- What a pooled rule actually recovers. -/
-  recovered : ℝ
-  /-- **The attenuation law.** -/
-  recovered_eq : recovered =
-    predictableVariance * (predictableVariance / (predictableVariance + estimationNoise))
+The earlier `RecoveryAttenuation` structure accepted the attenuation law itself as a field.
+The recovered variance is instead defined by that algebraic model, so its bounds are actual
+theorems about a term rather than projections from a caller-supplied equality. -/
 
 namespace RecoveryAttenuation
 
-variable (R : RecoveryAttenuation)
+noncomputable def recoveredVariance (predictableVariance estimationNoise : ℝ) : ℝ :=
+  predictableVariance * (predictableVariance / (predictableVariance + estimationNoise))
 
 /-- **The population identity is an upper bound on what any deployment recovers.** -/
-theorem recovered_le_predictable : R.recovered ≤ R.predictableVariance := by
-  have hden : 0 < R.predictableVariance + R.estimationNoise := by
-    have := R.predictableVariance_pos
-    have := R.estimationNoise_nonneg
+theorem recoveredVariance_le_predictable (predictableVariance estimationNoise : ℝ)
+    (hp : 0 < predictableVariance) (hn : 0 ≤ estimationNoise) :
+    recoveredVariance predictableVariance estimationNoise ≤ predictableVariance := by
+  have hden : 0 < predictableVariance + estimationNoise := by
     linarith
-  have hfrac : R.predictableVariance / (R.predictableVariance + R.estimationNoise) ≤ 1 := by
+  have hfrac : predictableVariance / (predictableVariance + estimationNoise) ≤ 1 := by
     rw [div_le_one hden]
-    linarith [R.estimationNoise_nonneg]
-  have hpos := R.predictableVariance_pos
-  calc R.recovered
-      = R.predictableVariance *
-        (R.predictableVariance / (R.predictableVariance + R.estimationNoise)) := R.recovered_eq
-    _ ≤ R.predictableVariance * 1 := by
-        exact mul_le_mul_of_nonneg_left hfrac (le_of_lt hpos)
-    _ = R.predictableVariance := mul_one _
+    linarith
+  unfold recoveredVariance
+  calc predictableVariance * (predictableVariance / (predictableVariance + estimationNoise))
+      ≤ predictableVariance * 1 := mul_le_mul_of_nonneg_left hfrac hp.le
+    _ = predictableVariance := mul_one _
 
 /-- **Noiseless estimation recovers the whole identity**, which is why the population
 statement is not wrong — it is the zero-noise end of this law. -/
-theorem recovered_eq_of_noiseless (h : R.estimationNoise = 0) :
-    R.recovered = R.predictableVariance := by
-  have hne : R.predictableVariance ≠ 0 := ne_of_gt R.predictableVariance_pos
-  rw [R.recovered_eq, h, add_zero, div_self hne, mul_one]
+@[simp] theorem recoveredVariance_zero_noise (predictableVariance : ℝ)
+    (hp : predictableVariance ≠ 0) :
+    recoveredVariance predictableVariance 0 = predictableVariance := by
+  simp [recoveredVariance, hp]
 
 /-- **Any estimation noise at all strictly attenuates the recovery.** With one panel per
 cohort the noise is a full `χ²₁` draw, which is how an exact identity becomes a measured
 `15.3%`. -/
-theorem recovered_lt_predictable (h : 0 < R.estimationNoise) :
-    R.recovered < R.predictableVariance := by
-  have hpos := R.predictableVariance_pos
-  have hden : 0 < R.predictableVariance + R.estimationNoise := by linarith
-  have hfrac : R.predictableVariance / (R.predictableVariance + R.estimationNoise) < 1 := by
+theorem recoveredVariance_lt_predictable (predictableVariance estimationNoise : ℝ)
+    (hp : 0 < predictableVariance) (hn : 0 < estimationNoise) :
+    recoveredVariance predictableVariance estimationNoise < predictableVariance := by
+  have hden : 0 < predictableVariance + estimationNoise := by linarith
+  have hfrac : predictableVariance / (predictableVariance + estimationNoise) < 1 := by
     rw [div_lt_one hden]
     linarith
-  calc R.recovered
-      = R.predictableVariance *
-        (R.predictableVariance / (R.predictableVariance + R.estimationNoise)) := R.recovered_eq
-    _ < R.predictableVariance * 1 := by
-        exact (mul_lt_mul_iff_right₀ hpos).mpr hfrac
-    _ = R.predictableVariance := mul_one _
+  unfold recoveredVariance
+  calc predictableVariance * (predictableVariance / (predictableVariance + estimationNoise))
+      < predictableVariance * 1 := (mul_lt_mul_iff_right₀ hp).mpr hfrac
+    _ = predictableVariance := mul_one _
 
 /-- **How many panels per cohort are enough?**
 
@@ -2431,8 +2103,8 @@ separates quotient fibres remains the continuation. -/
 * **The regeneration hypothesis itself.** Admixture, recent sweeps and population structure
   are exactly the cases with no excursion decomposition, so §8 covers the well-mixed case
   and declines the interesting ones.
-* **The slice-map step** in `TwoPointIdentification` is unproved and is carried as a
-  hypothesis field.
+* **The slice-map step** from the earlier two-point-identification sketch remains unproved;
+  no theorem depending on it is exported.
 * **The continuum spectrum — open, and the gap with the finite case is total.** The finite
   theorem of §7b is unconditional; the continuum statement is not proved, and the evidence
   in its favour (free semigroup, no relations to word length five, no `M5` mechanism) does

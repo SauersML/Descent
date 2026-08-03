@@ -259,54 +259,9 @@ covered value interval is covered at least twice from within — supports no
 holonomy-consistent non-zero section. An empty core is the checkable sufficient condition
 and is what `Separating` captures in the finite case.
 
-Two analytic inputs are needed for the general statement and neither is proved here. They
-are carried as named fields rather than assumed silently, so that anything derived from
-them says so in its own type.
+Two analytic inputs are needed for the general statement and neither is proved here. No
+general dichotomy theorem is exported until those inputs are formalized.
 -/
-
-/-- The general dichotomy, with its two analytic inputs as named hypotheses.
-
-`coreEmpty` is the checkable condition; `kernelTrivial` is the conclusion. The two
-audit-point fields are the inputs the general argument rests on and which this file does
-not establish:
-
-* `localFiniteness` — subanalytic local finiteness, needed for peeling to stabilise and
-  for a measurable choice of covering points;
-* `holonomyPropagation` — convergence of the holonomy construction along infinite trips,
-  needed when peeling runs transfinitely rather than terminating.
-
-Anything proved from this structure inherits both, which is the point of putting them
-here rather than in prose. -/
-structure BundleDichotomy (Parameter Section' : Type*) where
-  /-- The core: parameters from which every covered value is covered at least twice. -/
-  core : Parameter → Prop
-  /-- Whether the kernel of the modulus map is trivial. -/
-  kernelTrivial : Prop
-  /-- Whether a non-zero holonomy-consistent section exists on the core. -/
-  consistentSection : Section' → Prop
-  /-- **BP1 (analytic input).** Subanalytic local finiteness of the coverage structure. -/
-  localFiniteness : Prop
-  /-- **BP2 (analytic input).** Propagation and convergence of holonomy along infinite
-  trips. -/
-  holonomyPropagation : Prop
-  /-- **The dichotomy.** Given both inputs, the kernel is trivial exactly when the core
-  carries no non-zero consistent section. -/
-  dichotomy : localFiniteness → holonomyPropagation →
-    (kernelTrivial ↔ ¬ ∃ s : Section', consistentSection s)
-
-namespace BundleDichotomy
-
-variable {Parameter Section' : Type*} (D : BundleDichotomy Parameter Section')
-
-/-- **An empty core forces triviality**, which is the checkable route: if no section
-exists at all, the right-hand side of the dichotomy holds. -/
-theorem kernelTrivial_of_no_section (hlocal : D.localFiniteness)
-    (hholonomy : D.holonomyPropagation)
-    (hempty : ¬ ∃ s : Section', D.consistentSection s) :
-    D.kernelTrivial :=
-  (D.dichotomy hlocal hholonomy).mpr hempty
-
-end BundleDichotomy
 
 /-!
 ## Where this sits, in one paragraph
