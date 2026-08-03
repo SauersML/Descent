@@ -283,6 +283,23 @@ theorem driftLDStep_eq_islandFstMultiplicativeStep (Ne c Q : ℝ) :
   unfold driftLDStep islandFstMultiplicativeStep ibdRecurrenceStep
   ring
 
+/-- **`driftLDStep` is the rate-neutral recurrence, stated directly.**
+
+This body and `PortabilityDrift.ibdRecurrenceStep` are the same expression written twice
+in two modules, which the pending refactor above is meant to collapse. Until it does, the
+identity has to be stated somewhere, because a duplicated body that nothing relates is the
+shape in which one copy gets repaired and the other silently does not — this corpus has
+already paid that bill three times over `F_ST`.
+
+It is available transitively — `driftLDStep_eq_islandFstMultiplicativeStep` just above,
+composed with `islandFstMultiplicativeStep` being `ibdRecurrenceStep` by definition — and
+stated here anyway, in the direct form. A two-step route is a route a reader has to
+reconstruct, and the guard that looks for these pairs cannot follow it. -/
+theorem driftLDStep_eq_ibdRecurrenceStep (Ne c Q : ℝ) :
+    driftLDStep Ne c Q = ibdRecurrenceStep Ne c Q := by
+  unfold driftLDStep ibdRecurrenceStep
+  ring
+
 /-- **Per-generation retention factor of the two-locus identity measure**,
     `(1 - c)² · (1 - 1/(2 Nₑ))`: the slope of `driftLDStep` in `Q`.
 
