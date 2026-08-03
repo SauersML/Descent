@@ -20,17 +20,16 @@ open TransportedMetrics (r2FromSignalVariance)
 /-!
 # Arithmetic of the `R²` noise formula, under names that say so
 
-**THIS FILE CONTAINS NO CAUSAL MATHEMATICS, AND ITS PREVIOUS NAMES CLAIMED OTHERWISE.**
+**THIS FILE CONTAINS NO CAUSAL MATHEMATICS. NO NAME IN IT MAY CLAIM OTHERWISE.**
 
-An external review found that the file claimed to formalize mediation, counterfactual
-reasoning, causal discovery and do-calculus, while containing **no causal graph, no
-structural causal model, no intervention operator, no counterfactual semantics and no
-identification criterion**. That finding is correct. Every declaration here has been
-renamed to what it proves.
+Nothing here formalizes mediation, counterfactual reasoning, causal discovery or
+do-calculus. The file holds **no causal graph, no structural causal model, no intervention
+operator, no counterfactual semantics and no identification criterion**. Every declaration
+is named for what it proves, and the names below that a reader may meet elsewhere are
+absent on purpose.
 
-**The arithmetic was and is correct.** Nothing was deleted. The defect was entirely in the
-naming and the surrounding prose, which is the more dangerous kind: a false interpretation
-attached to a true lemma looks machine-checked.
+**The arithmetic is correct.** The whole hazard is in naming and prose, which is the more
+dangerous kind: a false interpretation attached to a true lemma looks machine-checked.
 
 ## What is actually proved
 
@@ -39,26 +38,27 @@ strictly increasing in the signal `v` and strictly decreasing in the noise `n`. 
 theorems instantiate that with different names for the noise term:
 
 * `r2_strictMono_under_ld_noise_reduction`, `r2_strictMono_under_environment_noise_reduction`
-  — removing a positive fraction of a noise component raises `R²`. Formerly named
-  `ld_mediates_portability` and `environment_mediates_portability`. **Subtracting a positive
-  scalar is not mediation**; no mediator variable appears anywhere in the statement.
+  — removing a positive fraction of a noise component raises `R²`. The names
+  `ld_mediates_portability` and `environment_mediates_portability` are absent on purpose.
+  **Subtracting a positive scalar is not mediation.** No mediator variable appears anywhere
+  in the statement.
 * `r2_lt_of_drift_variance_pos`, `r2_lt_of_technical_noise_pos`, `r2_lt_of_sampling_noise_pos`,
-  `r2_lt_of_gxe_noise_pos` — four instances of the same monotonicity, formerly named
-  `counterfactual_*`. **No counterfactual semantics is involved**: there is no twin network,
+  `r2_lt_of_gxe_noise_pos` — four instances of the same monotonicity. The `counterfactual_*`
+  names are absent on purpose. **No counterfactual semantics is involved**: there is no twin network,
   no potential outcome, and nothing is evaluated in a world other than the one described by
   the formula.
 * `r2_chain_strictMono_of_decreasing_noise` — a chain of four inequalities obtained by
-  ordering hand-chosen denominators. Formerly `intervention_hierarchy`. **There is no
-  intervention operator here**; `do(·)` is never defined, so the ordering is an ordering of
-  expressions, not of interventions.
-* `indirect_eq_total_sub_direct_of_sum` — formerly `mediation_decomposition`. It **assumes**
-  `total = direct + indirect` and rearranges to `indirect = total - direct`. Deleting the
-  proof and substituting the hypothesis gives the same statement, so it is a rearrangement
-  and its name now says so.
+  ordering hand-chosen denominators. The name `intervention_hierarchy` is absent on purpose.
+  **There is no intervention operator here.** `do(·)` is never defined, so the ordering is
+  an ordering of expressions, not of interventions.
+* `indirect_eq_total_sub_direct_of_sum` — the name `mediation_decomposition` is absent on
+  purpose. It **assumes** `total = direct + indirect` and rearranges to
+  `indirect = total - direct`. Deleting the proof and substituting the hypothesis gives the
+  same statement, so it is a rearrangement and its name says so.
 * `each_component_le_total_of_sum_decomp`, `half_lt_share_of_half_lt_part` — likewise
   rearrangements of an assumed sum and of an assumed inequality.
-* `r2_increments_strictAnti_in_signal` — concavity of `v ↦ v/(v+n)`. This one was honestly
-  named before (`diminishing_marginal_returns`) and is a genuine property of the formula.
+* `r2_increments_strictAnti_in_signal` — concavity of `v ↦ v/(v+n)`. This one is a genuine
+  property of the formula, and `diminishing_marginal_returns` is an honest name for it.
 * `r2_strictMono_under_effect_turnover` — genuine monotonicity, since `ρ² v < v` for
   `0 < ρ < 1`.
 

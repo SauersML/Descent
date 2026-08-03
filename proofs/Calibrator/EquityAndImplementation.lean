@@ -209,8 +209,8 @@ section ResourceAllocation
     hundredfold range of training sizes matches the corrected form to three or
     four decimals.
 
-    `expectedR2FromN_le_h2` records the constraint the old form violated, so a
-    definition that can exceed heritability no longer typechecks as this one.
+    `expectedR2FromN_le_h2` states the constraint, so a definition that can
+    exceed heritability does not typecheck as this one.
 
     Empirical status: VALIDATED (out-of-sample GWAS simulation, n = 500 to
     50000, agreement to 3-4 decimals). -/

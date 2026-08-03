@@ -115,11 +115,9 @@ used in the portability theorem below.
     proves they disagree at every positive time.
 
     This body is the retention of `closedPopulation`, the regime object that
-    carries the falsification, while this copy stood marked UNTESTED in a
-    different file. That is how a corrected formula survives its own
-    correction, and it is why
-    `closedPopulation_het_eq_neutralDriftFactor` below ties the two: the
-    finding can no longer be recorded on one side alone.
+    carries the falsification. `closedPopulation_het_eq_neutralDriftFactor`
+    below ties the two together, so neither copy can carry an empirical status
+    the other lacks.
 
     Empirical status: FALSIFIED at demographic equilibrium; see
     `closedPopulation`. It remains correct inside the declared regime, so the
@@ -209,7 +207,7 @@ theorem fstFromDriftFactor_eq_freqCorrFromFst (driftFactor : ℝ) :
 
 /-- **`F_ST` from an admissible drift factor lies in `[0, 1)`.**
     The range constraint, stated so that a replacement body producing values
-    outside it no longer typechecks as this definition. -/
+    outside it does not typecheck as this definition. -/
 theorem fstFromDriftFactor_mem_unit (driftFactor : ℝ)
     (h_pos : 0 < driftFactor) (h_le : driftFactor ≤ 1) :
     0 ≤ fstFromDriftFactor driftFactor ∧ fstFromDriftFactor driftFactor < 1 := by
@@ -502,19 +500,18 @@ section ImmuneTraits
 
 /-! **Deleted: `region_disproportionate_variance`.**
 
-It took `snpFraction < bound` and `bound < varianceFraction` and concluded
-`snpFraction < varianceFraction` by `linarith` — transitivity of `<`, with two further
-hypotheses (`0 < r2_genome_wide`, `0 < n_total_snps`) that the proof never used and that
-were there to make the statement look like it was about genomes. Nothing in it referred to
-a region, a SNP count, or selection: substituting any three reals gives the same theorem.
-The docstring nonetheless asserted a mechanism ("due to balancing/diversifying selection")
-and quoted numbers ("<1% of SNPs but >10% of immune trait variance") that no part of the
-statement computes or constrains.
+This declaration is absent on purpose. It takes `snpFraction < bound` and
+`bound < varianceFraction` and concludes `snpFraction < varianceFraction` by `linarith` —
+transitivity of `<`, with two further hypotheses (`0 < r2_genome_wide`, `0 < n_total_snps`)
+that the proof never uses and that serve only to make the statement look like it is about
+genomes. Nothing in it refers to a region, a SNP count, or selection: substituting any
+three reals gives the same theorem. Its docstring asserted a mechanism ("due to
+balancing/diversifying selection") and quoted numbers ("<1% of SNPs but >10% of immune
+trait variance") that no part of the statement computes or constrains.
 
 `threshold_sandwich_implies_observed_portability_below_neutral` immediately below is the
-same transitivity step, already stated under a name that claims only transitivity, so the
-inference remains available. Per the corpus policy on results that repackage a premise,
-the inflated copy is deleted rather than renamed. -/
+same transitivity step under a name that claims only transitivity, so the inference stays
+available. A result that repackages a premise is deleted, not renamed. -/
 
 /-- **A threshold sandwich implies observed portability is below neutral.**
     This is the literal transitivity fact `port_observed < threshold < port_neutral
@@ -528,12 +525,12 @@ theorem threshold_sandwich_implies_observed_portability_below_neutral
 
 /-! **Deleted: `zero_portability_component_lowers_weighted_average`.**
 
-It proved `(1 - f) * port_rest < port_rest` from `0 < f` and `0 < port_rest` — Mathlib's
-`sub_lt_self`, with `f < 1` and `port_rest ≤ 1` carried as hypotheses the proof never used.
-The name promised a *weighted average over two components*, one of them at zero
-portability; the statement has one component, no weights, and no averaging, and it is the
-unused `f < 1` that would have been needed for `(1 - f)` to be a weight at all. Nothing
-about immunity, portability, or components is formalized. Nothing in the corpus used it. -/
+This declaration is absent on purpose. It proves `(1 - f) * port_rest < port_rest` from
+`0 < f` and `0 < port_rest` — Mathlib's `sub_lt_self`, with `f < 1` and `port_rest ≤ 1`
+carried as hypotheses the proof never uses. The name promises a *weighted average over two
+components*, one of them at zero portability. The statement has one component, no weights
+and no averaging, and the unused `f < 1` is exactly what `(1 - f)` needs to be a weight at
+all. Nothing about immunity, portability or components is formalized. -/
 
 end ImmuneTraits
 
@@ -680,23 +677,23 @@ section PhenomeWideStructure
 
 /-! **Deleted: three Mathlib lemmas wearing phenome-wide names.**
 
-This section held `bounded_portability_correlation_stays_within_unit_interval`
-(`le_trans`), `factor_lower_bounds_sum_strictly_below_total` (`add_lt_add`), and
-`prediction_error_bounded_by_looser_tolerance` (`lt_of_le_of_lt`). Each was proved in one
-step, each was applied nowhere in the corpus, and in each the domain vocabulary lived
-entirely in the binder names: rename `port_corr` to `x` and the statement is a Mathlib
-lemma with no phenome-wide content left to lose.
+`bounded_portability_correlation_stays_within_unit_interval` (`le_trans`),
+`factor_lower_bounds_sum_strictly_below_total` (`add_lt_add`) and
+`prediction_error_bounded_by_looser_tolerance` (`lt_of_le_of_lt`) are absent on purpose.
+Each is one step, none is applied anywhere in the corpus, and in each the domain vocabulary
+lives entirely in the binder names: rename `port_corr` to `x` and the statement is a
+Mathlib lemma with no phenome-wide content left to lose.
 
-Two carried the tell beyond naming. `factor_lower_bounds_sum_strictly_below_total` took
-`f₁ + f₂ ≤ 1` and `0 ≤ fᵢ` — the conditions that would make the two numbers *variance
-shares* — and used none of them, so nothing in it was about a decomposition.
-`prediction_error_bounded_by_looser_tolerance` took `polygenicity` and `selection_signal`
+Two carry a further tell. `factor_lower_bounds_sum_strictly_below_total` takes `f₁ + f₂ ≤ 1`
+and `0 ≤ fᵢ` — the conditions that would make the two numbers *variance shares* — and uses
+neither, so nothing in it is about a decomposition.
+`prediction_error_bounded_by_looser_tolerance` takes `polygenicity` and `selection_signal`
 as real arguments that appear nowhere in its statement: a predictor built from
 architecture, named in the signature and absent from the theorem.
 
-That is the shape worth naming, since it is not an unused *hypothesis*: a phantom value
-parameter is invisible to the unused-variable linter's usual reading and to any reviewer
-skimming the conclusion, because the conclusion is where it fails to appear. -/
+Name that shape, because it is not an unused *hypothesis*. A phantom value parameter
+escapes the unused-variable linter's usual reading and escapes any reviewer skimming the
+conclusion, because the conclusion is where it fails to appear. -/
 
 /-- **Pearson `R²` is strictly below `1` under additive prediction noise.**
     For the scalar model `Y = aX + ε` with `σ²_ε > 0`, the induced
