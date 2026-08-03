@@ -1990,7 +1990,7 @@ theorem two_units_carry_information (m B : ℝ) (hm : 0 < m) (hB : 0 < B)
 
 end AssumedMembraneThreshold
 
-The binary orientation experiment now supplies one fully derived instance of this design
+/-! The binary orientation experiment now supplies one fully derived instance of this design
 logic. `EnsembleChannel.binaryOrientation_orderFree_mean` proves that **every** order-free
 readout has mean independent of the forward/reverse imbalance `θ`, while
 `binaryOrientation_arrow_mean` gives the ordered determinant mean `θ` and
@@ -2003,7 +2003,7 @@ per added cost exceeds the baseline design's information per cost.  This is the 
 non-Gaussian, direction-sensitive permeability calculation in the strand.  It says exactly
 what a deployment study can buy by retaining an oriented adjacent haplotype/ancestry
 transition; extension to a multistate chain still requires its transition law and noise
-covariance.
+covariance. -/
 
 /-! ### 14b. Per-target invisibility and compound prediction
 
