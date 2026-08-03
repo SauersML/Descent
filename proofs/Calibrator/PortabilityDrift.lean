@@ -237,11 +237,11 @@ theorem fstFromTau_lt_coalescenceCdf (tau : ℝ) (htau : 0 < tau) :
 
 /-- A split with ongoing migration.
 
-`nDemes`, together with its `2 ≤ nDemes` hypothesis, used to sit here. Nothing read it:
-the deme count entered no formula and no theorem, so it was a free parameter that could
-take any value without changing a single statement in the file. The many-deme regime that
-`fstEqLimitLowMutationManyDemes` names is a limit, not a stored count, and naming it in a
-field gave the appearance of tracking something the development does not track. -/
+**Do not add a deme-count field here.** The many-deme regime that
+`fstEqLimitLowMutationManyDemes` names is a LIMIT, not a stored count: a deme count would
+enter no formula and no theorem in this file, so it could take any value without changing
+a single statement, while giving the appearance of tracking something the development does
+not track. -/
 structure SplitMigrationModel where
   t : ℝ
   Ne : ℝ
@@ -407,8 +407,9 @@ theorem twoDemeIMEquilibriumDelta_lt_one (M : ℝ) (hM : 0 < M) :
 ## The closed-population, no-mutation regime, made into an object
 
 Everything below that decays heterozygosity geometrically assumes a **closed
-population with no mutation**. That assumption used to live inside definition
-bodies, where nothing could contradict it. Simulation at demographic equilibrium
+population with no mutation**, and it is carried as an explicit regime object below
+rather than inside definition bodies, where nothing can contradict it. Simulation at
+demographic equilibrium
 with `Ne = 1000` measures the retention `het_A / het_anc` as
 
        T = 200    1.010 ± 0.022    drift-only prediction 0.905
@@ -665,12 +666,10 @@ noncomputable def targetHetFromFst (het_source fst : ℝ) : ℝ :=
 
 /-- **Present-day PGS variance after drift** from an ancestral variance `V_A`.
 
-There used to be two names for this — `targetPGSVariance`, defined as
-`pgsVarianceFromHet V_A (1 - fst)`, and `presentDayPGSVariance`, defined as
-`(1 - fst) * V_A` — together with a theorem proving them equal. Two bodies for one
-quantity is the failure this file's own regime discussion is about, so there is now one
-definition, and it is the composition rather than a re-typed product: the
-Fst-heterozygosity step is applied, not restated. -/
+**One definition, and it is the composition rather than a re-typed product**: the
+Fst-heterozygosity step is applied, not restated. A second body spelling `(1 - fst) * V_A`
+directly would need a theorem to hold it in step, which is the failure this file's own
+regime discussion is about. -/
 noncomputable def presentDayPGSVariance (V_A fst : ℝ) : ℝ :=
   pgsVarianceFromHet V_A (1 - fst)
 
@@ -1132,10 +1131,11 @@ structure CrossPopulationMetricModel (p q : ℕ) where
   novelUntaggablePhenotypeVarianceTarget : ℝ
   targetPrevalence : ℝ
   /-- **The source is the reference population.** "Novel" means novel *relative to the
-  source*, so nothing is novel in the source itself. Previously this was not a hypothesis
-  at all: it was baked into the shape of two separate definitions, the source one simply
-  omitting the novel terms that its target twin included. Stated here, it can be
-  discharged at the use site, and a model that violates it cannot be built by accident. -/
+  source*, so nothing is novel in the source itself. It is a FIELD rather than a shape
+  convention -- the alternative is two separate definitions whose source variant omits the
+  novel terms its target twin includes, which cannot be discharged or contradicted. Stated
+  here it must be discharged at the use site, and a model violating it cannot be built by
+  accident. -/
   novelDirectCausal_source : novelDirectCausal Pop.source = 0
   novelProxyTagging_source : novelProxyTagging Pop.source = 0
   novelCausalEffect_source : novelCausalEffect Pop.source = 0
@@ -1203,9 +1203,9 @@ noncomputable def targetLinearRisk {p : ℕ}
 
 /-- Dense covariance witness in each population, for non-degenerate ERM-transport tests.
 
-These names were previously six separate constants, three of which shadowed the parameter
-names of `sourceERMWeights` and `targetLinearRisk` directly above — the same identifier
-meaning a global witness in one declaration and a bound argument in the next. -/
+These are global witnesses. **Do not name one after a parameter of `sourceERMWeights` or
+`targetLinearRisk` directly above** -- the same identifier meaning a global witness in one
+declaration and a bound argument in the next is how this section became unreadable. -/
 def witnessSigmaObs : Pop → Matrix (Fin 2) (Fin 2) ℝ :=
   Pop.pair !![1, 0.5; 0.5, 1] !![1, 0.1; 0.1, 1]
 
@@ -1334,8 +1334,7 @@ noncomputable def proxyTaggingProjection {p q : ℕ}
   (m.proxyTagging P + m.novelProxyTagging P).mulVec (totalEffect m P)
 
 /-- **The aggregate tag-to-causal projection splits into direct causal and proxy-tagging
-contributions** — in either population. This was previously two theorems with two proofs;
-they were the same statement, and only the names recorded that. -/
+contributions** — in either population, from the one statement. -/
 theorem taggingProjection_eq_direct_plus_proxy {p q : ℕ}
     (m : CrossPopulationMetricModel p q) (P : Pop) :
     taggingProjection m P = directCausalProjection m P + proxyTaggingProjection m P := by
@@ -2929,11 +2928,10 @@ theorem targetR2FromNeutralAFBenchmark_eq_presentDayR2
       presentDayR2 V_A V_E fstTarget := by
   rfl
 
-/-! The exact calibrated Bernoulli Brier risk `π(1-π)(1-r2)` used to be written out again
-here under a second name, tied to `TransportedMetrics.calibratedBrier` by a theorem. The
-stated reason was that several proofs `unfold` it and need the concrete product exposed,
-which a wrapper would hide — but that argues against a *wrapper*, not for a second
-definition: unfolding the one definition yields the same product. -/
+/-! The exact calibrated Bernoulli Brier risk `π(1-π)(1-r2)` is
+`TransportedMetrics.calibratedBrier`. **Do not add a second definition here to expose the
+concrete product for `unfold`** -- unfolding the one definition yields the same product,
+so that argues against a wrapper, not for a copy. -/
 
 /-- Exact calibrated Bernoulli Brier risk written directly in prevalence and
 explained-risk coordinates. -/
@@ -3120,13 +3118,13 @@ theorem equalVarianceGaussianAUCFromSNR_eq_processAUC {k : ℕ} [Fintype (Fin k)
   congr 2
   rw [div_div, mul_comm]
 
-/-! The variance form of the equal-variance Gaussian AUC used to be written out again here
-under a second name, tied to `DGP.equalVarianceGaussianAUCFromSignalVariance` by a theorem. The tie
-recorded a real incident: the two copies had drifted to *opposite* claims about which
-quantity they computed — one called it the liability-threshold AUC, which the other
-records as falsified — and the identity existed to keep the corrected label attached to
-both. One definition cannot drift from itself, and it is the one carrying
-`GaussianLiabilityRegime`, so the obligation now reaches every use. -/
+/-! The variance form of the equal-variance Gaussian AUC is
+`DGP.equalVarianceGaussianAUCFromSignalVariance`. **Do not write a second copy here.** Two
+copies of an AUC formula can drift to opposite claims about which quantity they compute --
+equal-variance Gaussian versus liability-threshold, which are not the same and differ by a
+measured `-0.068` AUC -- and one definition cannot drift from itself. The single
+definition is the one carrying `GaussianLiabilityRegime`, so that obligation reaches every
+use. -/
 
 /-- With `vEnv = 1`, variance form equals SNR form exactly. -/
 theorem equalVarianceGaussianAUCFromVariances_scaleOne (vSignal : ℝ) :
@@ -3923,16 +3921,12 @@ theorem neutralAFBenchmarkRatio_lt_one
   simp [neutralAFBenchmarkRatio]
   exact div_self (by linarith : (1 : ℝ) - fst ≠ 0)
 
-/-! `targetR2FromNeutralAFBenchmark_self` used to sit here, stating that "at zero
-divergence" the benchmark target `R²` is the present-day `R²`. It is deleted because the
-condition it advertises does not exist: `targetR2FromNeutralAFBenchmark` is DEFINED as
-`presentDayR2`, so the equality holds at every `fst`, and the proof was `rfl`. The name
-`_self` and the phrase "at zero divergence" both point at a special case that is not
-special -- the same defect as a hypothesis that appears to do work and does not.
-
-`targetR2FromNeutralAFBenchmark_eq_presentDayR2` above states the same equality without
-the false condition and is the edge that keeps the two names tied, so nothing is
-disconnected by this. -/
+/-! **Do not add an "at zero divergence" variant of
+`targetR2FromNeutralAFBenchmark_eq_presentDayR2`.** `targetR2FromNeutralAFBenchmark` is
+DEFINED as `presentDayR2`, so the equality holds at every `fst`; a statement restricted to
+`fst = 0` advertises a special case that is not special, which is the same defect as a
+hypothesis that appears to do work and does not. The unrestricted theorem above is the
+edge that keeps the two names tied. -/
 
 /-- For valid prevalence `0 < π < 1`, the linear Brier approximation `π(1-π)(1-R²)`
 is strictly decreasing in `R²`. -/
@@ -4751,16 +4745,15 @@ identical.
 noncomputable def islandFstMultiplicativeStep (Ne m F : ℝ) : ℝ :=
   ibdRecurrenceStep Ne m F
 
-/-! `islandFstMultiplicativeStep_eq_ibdRecurrenceStep` used to sit here, proved by `rfl`.
-It restated the declaration immediately above it: `islandFstMultiplicativeStep` IS
-`ibdRecurrenceStep` by definition, so the theorem asserted what the definition already
-shows and could not have failed.
+/-! **`islandFstMultiplicativeStep` is `ibdRecurrenceStep` by definition, and needs no
+theorem saying so** -- a definitional alias is carried by the elaborator, and a `rfl`
+statement of it cannot fail.
 
-The DEFINITION stays, and deliberately. `LDDecayTheory.driftLDStep_eq_islandFstMultiplicativeStep`
-proves the independently written `driftLDStep` equal to it by `ring` -- that one is a
-genuine guard between two bodies, not a restatement of an alias, and deleting this name
-would disconnect `driftLDStep` from the recurrence it is being held to. Connectivity to
-the hub, not theorem count, is what makes a removal safe here. -/
+**The DEFINITION must stay.** `LDDecayTheory.driftLDStep_eq_islandFstMultiplicativeStep`
+proves the independently written `driftLDStep` equal to it by `ring`; that is a genuine
+guard between two bodies, and deleting this name would disconnect `driftLDStep` from the
+recurrence it is held to. Connectivity to the hub, not theorem count, is what makes a
+removal safe. -/
 
 /-- **Fixed point of the island-model recursion.**
 
@@ -5495,7 +5488,7 @@ theorem fstMigDriftNext_no_migration_fixedpoint_one (Ne : ℝ) (hNe : Ne ≠ 0) 
 noncomputable def fstMigDriftEquil (Ne m : ℝ) : ℝ :=
   1 / (4 * Ne * m + 1)
 
-/-- The derived equilibrium matches the previously defined formula. -/
+/-- The derived equilibrium matches `fstMigrationDriftEquilibrium`. -/
 theorem fstMigDriftEquil_eq_fstMigrationDriftEquilibrium (Ne m : ℝ) :
     fstMigDriftEquil Ne m = fstMigrationDriftEquilibrium Ne m := by
   unfold fstMigDriftEquil fstMigrationDriftEquilibrium
