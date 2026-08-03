@@ -79,13 +79,14 @@ error does not blow up in the interior, and the hardest data are pure single mod
 
 ## Scope
 
-Everything here is finite-state or finite-mixture and proved as stated. The continuum statements
-of the source analysis — the drift-diffusion evolution law for the curve, the probit rigidity
-classification, the reconstruction operator built from the observed marginal — need diffusion
-generators, Fréchet curve spaces and time-reversal as formal objects, and are not stated here in
-any form. `stationaryDrift_collapses_to_generator` is the one continuum computation that is pure
-algebra and is proved: at stationarity the curve's transport drift collapses back to the
-generator's own drift, which is why the stationary flow is the semigroup itself.
+The finite-state and finite-mixture results are proved as stated. The Gaussian averaging identity,
+affine-probit invariance, and the algebraic core of the drift-diffusion evolution law are also
+proved. The full affine-probit necessity classification is stated as `link_rigidity` with an
+explicit admission; it requires real-analytic semigroup arguments not yet formalized. The
+reconstruction operator built from the observed marginal likewise needs diffusion generators,
+Fréchet curve spaces, and time reversal. `stationaryDrift_collapses_to_generator` proves the
+stationary algebraic core: the curve's transport drift collapses back to the generator's own
+drift, which is why the stationary flow is the semigroup itself.
 
 Empirical status: DERIVED. The identification and stability results are proved at the stated
 hypotheses; whether a given cohort series satisfies them — a conservative population model, a
@@ -93,11 +94,9 @@ known link, an invariant distribution — is an empirical question this asks to 
 than assumed.
 -/
 
-/-! ## Probit rigidity, in the finite form that is available
+/-! ## Two-point rigidity inside the probit family
 
-The continuum classification named in the scope note needs diffusion generators and
-Fréchet curve spaces and is not stated anywhere here. What IS available, and is proved
-below, is the rigidity that makes the classification worth wanting: a probit response
+The elementary rigidity below makes the later classification worth wanting: a probit response
 curve is pinned by its values at two distinct covariate points, so the two-parameter
 probit family admits no deformation at all once two observations are fixed.
 
@@ -107,9 +106,9 @@ whole trajectory is carried by two numbers, and any two time points that agree i
 curve at two covariate values agree in the curve everywhere. Rigidity is what makes
 "the curve drifted" a two-parameter statement rather than an infinite-dimensional one.
 
-What is NOT proved: that the drift preserves the probit family. That is the
-classification, and it needs the continuum objects. These theorems say what rigidity
-buys IF the family is preserved; they do not establish the preservation.
+Gaussian preservation is proved later by an explicit product-measure argument. Necessity — that
+closure under every Gaussian averaging step forces affine-probit shape — remains the admitted
+classification theorem `link_rigidity`.
 -/
 
 section ProbitRigidity
@@ -548,17 +547,16 @@ theorem cdf_gaussianReal_zero_mean (v : NNReal) (hv : v ≠ 0) (x : ℝ) :
     Measure.map_apply (measurable_const_mul _) measurableSet_Iic, hpre]
 
 open MeasureTheory ProbabilityTheory in
-/-- **The conditioning step, and the only gap left in Theorem 3.**
+/-- **The conditioning step for Theorem 3.**
 
     Averaging the standard cdf over a Gaussian shift is the law of a difference: `E[Φ(α + βZ)]`
     is `P(W ≤ α + βZ)` for an independent standard normal `W`, which is `P(W - βZ ≤ α)`, and
     `W - βZ` is centred Gaussian with variance `1 + β²`.
 
-    NOT PROVED HERE. Both ingredients exist in Mathlib — `Measure.prod_apply` slices the product
-    measure into exactly this average, and `gaussianReal_add_gaussianReal_of_indepFun` with
-    `gaussianReal_map_const_mul` gives the law of the difference. What is missing is the
-    assembly, including the passage from the lower integral of measures to the Bochner integral
-    of the cdf. -/
+    `Measure.prod_apply` slices the product measure into exactly this average, and
+    `gaussianReal_add_gaussianReal_of_indepFun` with `gaussianReal_map_const_mul` gives the law of
+    the difference. The proof includes the passage from the lower integral of measures to the
+    Bochner integral of the cdf. -/
 theorem gaussianAverage_eq_cdf_sum (α β : ℝ) :
     ∫ z, Phi (α + β * z) ∂(gaussianReal 0 1)
       = cdf (gaussianReal 0 ⟨1 + β ^ 2, by positivity⟩) α := by
@@ -593,11 +591,11 @@ theorem gaussianAverage_eq_cdf_sum (α β : ℝ) :
       exact measure_lt_top _ _
   -- The difference of the two coordinates is centred Gaussian with variance `1 + β²`.
   have hX : (γ.prod γ).map (fun p : ℝ × ℝ ↦ p.2) = gaussianReal 0 1 := by
-    have := Measure.snd_prod (μ := γ) (ν := γ)
-    simpa [Measure.snd, hγdef] using this
+    change Measure.snd (γ.prod γ) = gaussianReal 0 1
+    rw [Measure.snd_prod, hγdef]
   have hfst : (γ.prod γ).map (fun p : ℝ × ℝ ↦ p.1) = gaussianReal 0 1 := by
-    have := Measure.fst_prod (μ := γ) (ν := γ)
-    simpa [Measure.fst, hγdef] using this
+    change Measure.fst (γ.prod γ) = gaussianReal 0 1
+    rw [Measure.fst_prod, hγdef]
   have hY : (γ.prod γ).map (fun p : ℝ × ℝ ↦ -β * p.1)
       = gaussianReal 0 ⟨β ^ 2, sq_nonneg β⟩ := by
     have hcomp : (fun p : ℝ × ℝ ↦ -β * p.1) = (fun y : ℝ ↦ -β * y) ∘
@@ -740,7 +738,7 @@ theorem affineProbit_link_invariant (p q a₀ b₀ σ : ℝ) :
     ring
   rw [hshape, gaussianAverage_probit]
   congr 2
-  ring
+  ring_nf
 
 /-- A positive horizontal and vertical scaling preserves the strict ordering of genetic or
 environmental liability. -/
@@ -766,7 +764,6 @@ theorem affineProbit_mem_Ioo (p q α β : ℝ) (hp : 0 ≤ p) (hq : 0 < q)
   constructor <;> nlinarith
 
 open MeasureTheory ProbabilityTheory in
-open MeasureTheory ProbabilityTheory in
 /-- A bounded monotone link composed with an affine map is integrable against a Gaussian.
 
 Monotone functions are measurable, the link is bounded by `1`, and the Gaussian is a
@@ -775,7 +772,7 @@ theorem link_integrable (L : ℝ → ℝ) (hmono : StrictMono L) (hbdd : ∀ u, 
     (a b σ c : ℝ) :
     Integrable (fun z : ℝ ↦ L (a * (c + σ * z) + b)) (gaussianReal 0 1) := by
   refine ⟨(hmono.monotone.measurable.comp (by fun_prop)).aestronglyMeasurable, ?_⟩
-  refine hasFiniteIntegral_of_bounded (C := 1) ?_
+  refine HasFiniteIntegral.of_bounded (C := 1) ?_
   filter_upwards with z
   rw [Real.norm_eq_abs, abs_of_pos (hbdd _).1]
   exact le_of_lt (hbdd _).2
@@ -832,6 +829,27 @@ theorem link_invariance_slope_pos (L : ℝ → ℝ) (hmono : StrictMono L)
     exact link_average_strictMono L hmono hbdd ha b (by norm_num)
   have := hmono.lt_iff_lt.mp hlt
   linarith
+
+/-- **The induced parameters are unique, so the invariance defines a map.**
+
+`hinv` asserts existence of `a'` and `b'`; it does not say they are determined.  They are:
+`L` is injective, so agreement of `L (a₁ x + b₁)` and `L (a₂ x + b₂)` at every `x` forces
+the affine maps to agree, and two affine maps agreeing everywhere have equal coefficients.
+
+Without this the "induced parameter map" of the classification argument is a relation, and
+the semigroup identity it has to satisfy would not typecheck as a statement about
+functions. -/
+theorem link_invariance_params_unique (L : ℝ → ℝ) (hmono : StrictMono L)
+    {a₁ b₁ a₂ b₂ : ℝ}
+    (heq : ∀ x, L (a₁ * x + b₁) = L (a₂ * x + b₂)) :
+    a₁ = a₂ ∧ b₁ = b₂ := by
+  have h0 : b₁ = b₂ := by
+    have := hmono.injective (heq 0)
+    simpa using this
+  refine ⟨?_, h0⟩
+  have h1 := hmono.injective (heq 1)
+  simp only [mul_one] at h1
+  linarith [h0 ▸ h1]
 
 /-- **Boundedness really does exclude the affine stratum.**
 
