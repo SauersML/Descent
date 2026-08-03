@@ -138,9 +138,31 @@ theorem frontierTime_eq_inflation_mul_apparent (s a : ℝ) (hs : 0 < s) :
   unfold frontierTime transferTimeInflation apparentMixingTime
   field_simp [h1, ne_of_gt h2]
 
-/-- The inflation factor is at least one, with equality exactly at reversibility. -/
-theorem transferTimeInflation_ge_one (s a : ℝ) : 1 ≤ transferTimeInflation s a := by
+/-- The inflation factor is at least one. The dissipation must be positive: at `s = 0` Lean's
+`a / 0 = 0` makes the factor exactly one for every circulation, so without the hypothesis the
+bound holds for the wrong reason at the one point where it matters most. -/
+theorem transferTimeInflation_ge_one (s a : ℝ) (hs : 0 < s) :
+    1 ≤ transferTimeInflation s a := by
   unfold transferTimeInflation
   nlinarith [sq_nonneg (a / s)]
+
+/-- **Equality holds exactly at reversibility**, which is the half the inequality alone does not
+carry. Stated as a theorem rather than asserted in prose beside `transferTimeInflation_ge_one`,
+because at `s = 0` the junk quotient gives equality at maximal circulation and the prose reading
+would be false there. -/
+theorem transferTimeInflation_eq_one_iff (s a : ℝ) (hs : 0 < s) :
+    transferTimeInflation s a = 1 ↔ a = 0 := by
+  unfold transferTimeInflation
+  constructor
+  · intro h
+    have hsq : (a / s) ^ 2 = 0 := by linarith
+    have hdiv : a / s = 0 := by
+      exact pow_eq_zero_iff (two_ne_zero) |>.mp hsq
+    rcases div_eq_zero_iff.mp hdiv with ha | hs0
+    · exact ha
+    · exact absurd hs0 (ne_of_gt hs)
+  · intro h
+    rw [h]
+    simp
 
 end Calibrator
