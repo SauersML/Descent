@@ -58,6 +58,7 @@ def main():
 
     # ---- call graph over definitions, from the parsed bodies
     deps = {}
+    ambiguous = []          # (caller, token, candidates)
     for name, d in table.items():
         binders = {n for a in d["args"] for n in a["names"]}
         text = d["body"] + " " + " ".join(e["rhs"] for e in d["equations"])
@@ -70,8 +71,26 @@ def main():
             if not cands:
                 continue
             same = [c for c in cands if table[c]["file"] == d["file"]]
-            out.add((same or cands)[0] if len(same or cands) == 1
-                    else (same or cands)[0])
+            eff = same or cands
+            # BOTH BRANCHES OF THE TERNARY THAT USED TO BE HERE WERE
+            # `(same or cands)[0]`, so the `len(...) == 1` test decided
+            # nothing and an ambiguous short name was silently attributed to
+            # whichever candidate happened to come first.  Measured on the
+            # live table: 20 of 834 edges are ambiguous after the same-file
+            # filter, and the examples show the resolution is not merely
+            # arbitrary but often WRONG -- `dgp.scoreModel.berryEsseenErrorBound`
+            # is a projection through a structure, so
+            # `HWEScoreModel.berryEsseenErrorBound` is meant, while the bare
+            # `Calibrator.berryEsseenErrorBound` may sort first.
+            #
+            # Selection is left EXACTLY as it was, deliberately: changing which
+            # edge is chosen changes every downstream ceiling, and that is the
+            # owner's call, not a side effect of removing dead code.  What
+            # changes is that the ambiguity is now COUNTED and returned instead
+            # of being invisible.
+            if len(eff) > 1:
+                ambiguous.append((name, tok, list(eff)))
+            out.add(eff[0])
         deps[name] = out
 
     ok = {n for n, e in classes.items() if e["class"] != "NOT-EXTRACTABLE"}
@@ -113,6 +132,14 @@ def main():
     print(f"blocked                            : {len(blocked)}")
     print(f"  INTRINSIC (root blockers)        : {len(roots)}")
     print(f"  INHERITED (blocked only by a dep): {len(inherited)}")
+    # Ambiguous call-graph edges are attributed to the first candidate, which
+    # is what this code has always done; it is now visible rather than silent,
+    # because INHERITED above is computed FROM this graph and a mis-attributed
+    # edge moves a definition between root and inherited.
+    print(f"ambiguous edges (attributed to first): {len(ambiguous)}"
+          f"{'  <- these may be mis-attributed' if ambiguous else ''}")
+    for caller, tok, cands in ambiguous[:5]:
+        print(f"    {caller.split('.')[-1]} -> {tok}  {cands}")
     print(f"  unexplained by the call graph    : {len(unexplained)}")
     print()
     print(f"CEILING if every INHERITED blockage were resolved: "
