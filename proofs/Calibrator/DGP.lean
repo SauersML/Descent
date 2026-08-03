@@ -1099,7 +1099,21 @@ theorem normalization_no_bias_iff_constant_prevalence {k : ℕ} [Fintype (Fin k)
 These structures connect biological mechanisms to statistical DGPs and to the
 need for nonlinear calibration. The consequence for calibration is proved in
 `Calibrator.ld_decay_implies_nonlinear_calibration_proved`, which exhibits three
-explicit distances rather than assuming non-affineness as a hypothesis. -/
+explicit distances rather than assuming non-affineness as a hypothesis.
+
+**THIS CITATION IS LOAD-BEARING AND IT CROSSES A DIRECTORY BOUNDARY.** The consumer named
+above lives in `proofs/Calibrator.lean` -- the corpus ROOT, one level *above*
+`proofs/Calibrator/`. A dead-code scan that walks only `proofs/Calibrator/` cannot see it,
+and on 2026-02 exactly that happened: `decaySlope` was deleted as having "no use anywhere
+and no theorem about them", and `LDDecayMechanism` was then deleted as having "lost its
+only consumer". Both premises were false and the second inherited the first's error.
+
+The deletion did NOT break the build, which is the part to remember. Lean auto-binds an
+undefined bare name as an implicit variable, so the consuming theorem kept elaborating --
+as a vacuous statement over an arbitrary term of unknown type -- and stayed green. For
+this class of name the build cannot detect the breakage at all, so **absence of a build
+failure is not evidence that a deletion was safe.** Grep the prose, not just the
+identifier: this paragraph named the consumer the whole time. -/
 
 /-- Exponential LD-decay mechanism: a distance proxy and a tagging efficiency.
 
