@@ -22,8 +22,8 @@ trusted corpus until their analytic foundations and missing arguments are formal
 | Forward reconstruction is non-expansive | `transportedResponse_mem_Icc`, `transportedResponse_dist_le` | A finite maximum principle proves the constant-one bound. `transportedResponse_add_const` proves sharpness. |
 | Reconstruction has a tower law | `transportedResponse_compose` | Sequential and composed transport are proved identical. |
 | A stationary marginal does not identify a conditional | `stationaryMarginal_does_not_identify_conditional` | Two explicit opposite response curves share one stationary population path. |
-| Static threshold gauge | `threshold_gauge_invisible`, `linkedCurve_identified_modulo_constants` | Strict monotonicity and the remaining additive gauge are explicit. |
-| Dynamic threshold separation | `threshold_velocity_eq_neg_invariantAverage_drift` | The invariant weight, unit mass, generator, and finite dynamics are all visible hypotheses. |
+| Static threshold gauge | `indicator_lt_eq_of_strictMono`, `linkedCurve_identified_modulo_constants` | Strict monotonicity and the remaining additive gauge are explicit. |
+| Dynamic threshold separation | `invariantAverage_eq_neg_of_affine_evolution` | The invariant weight, unit mass, generator, and finite dynamics are all visible hypotheses. |
 | Constant forcing destroys separation | `constantForcing_conflates_threshold` | The exact unidentified combination is proved. |
 | Continuous invariants collapse at a mixing limit | `continuousInvariant_eq_at_limit` | Continuity, invariance, convergence, and Hausdorff uniqueness are explicit. |
 | Interior constant-one stability | `interiorError_sq_le_mul_endpoints`, `singleMode_interiorError_eq` | The finite spectral midpoint inequality and its equality case are proved without taking a logarithm of zero. |
