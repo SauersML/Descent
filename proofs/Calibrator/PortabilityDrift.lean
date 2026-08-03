@@ -38,12 +38,24 @@ section PortabilityDrift
 noncomputable def integratedCoalescentHazard (hazard : ℝ → ℝ) (t : ℝ) : ℝ :=
   ∫ s in (0)..t, hazard s
 
+/-- Probability that a pair has not yet coalesced by time `t`, from the
+integrated hazard: `S(t) = exp(-Λ(t))`.
+
+    Empirical status: UNTESTED. -/
 noncomputable def coalescenceSurvivalFromHazard (hazard : ℝ → ℝ) (t : ℝ) : ℝ :=
   Real.exp (-(integratedCoalescentHazard hazard t))
 
+/-- Probability that a pair has coalesced by time `t`, the complement of the
+survival function.
+
+    Empirical status: UNTESTED. -/
 noncomputable def coalescenceCdfFromHazard (hazard : ℝ → ℝ) (t : ℝ) : ℝ :=
   1 - coalescenceSurvivalFromHazard hazard t
 
+/-- Coalescent time `τ = t / (2·Nₑ)`: generations rescaled by the diploid
+coalescent timescale.
+
+    Empirical status: UNTESTED. -/
 noncomputable def coalescentTau (t Ne : ℝ) : ℝ :=
   t / (2 * Ne)
 
@@ -74,6 +86,10 @@ never equal.
 noncomputable def fstFromTau (tau : ℝ) : ℝ :=
   tau / (1 + tau)
 
+/-- `F_ST` after `t` generations of drift at effective size `Nₑ`, obtained by
+rescaling to coalescent time and applying `fstFromTau`.
+
+    Empirical status: UNTESTED. -/
 noncomputable def fstFromGenerations (t Ne : ℝ) : ℝ :=
   fstFromTau (coalescentTau t Ne)
 
@@ -272,6 +288,10 @@ noncomputable def SplitMigrationModel.witness : SplitMigrationModel where
 noncomputable def SplitMigrationModel.fstEqLimitLowMutationManyDemes (m : SplitMigrationModel) : ℝ :=
   1 / (1 + scaledMigrationRate m.Ne m.mig)
 
+/-- Hudson's `F_ST` estimator from mean coalescence times: one minus the ratio
+of the within-population time to the total time.
+
+    Empirical status: UNTESTED. -/
 noncomputable def hudsonFstFromCoalescenceTimes (ETss ETst : ℝ) : ℝ :=
   1 - ETss / ETst
 
@@ -1086,6 +1106,10 @@ theorem drift_degrades_equalVarianceGaussianAUC
 /-! Real-world PGS variance with both drift and LD tagging efficiency.
 
     Empirical status: UNTESTED. -/
+/-- Realised PGS variance in a target population: the additive variance scaled
+by the transported correlation `rhoSq` and eroded by drift through `1 - F_ST`.
+
+    Empirical status: UNTESTED. -/
 noncomputable def realWorldPGSVariance (V_A fst rhoSq : ℝ) : ℝ :=
   rhoSq * (1 - fst) * V_A
 
@@ -1144,6 +1168,30 @@ structure CrossPopulationMetricModel (p q : ℕ) where
   novelUntaggablePhenotypeVarianceTarget_nonneg : 0 ≤ novelUntaggablePhenotypeVarianceTarget
   targetPrevalence_pos : 0 < targetPrevalence
   targetPrevalence_lt_one : targetPrevalence < 1
+
+/-- **The class is inhabited.**  A theorem quantified over an uninhabited structure is
+true and empty: kernel-checked, clean axiom report, no content.  This is the witness that
+makes the theorems below statements about something. -/
+noncomputable def CrossPopulationMetricModel.witness (p q : ℕ) :
+    CrossPopulationMetricModel p q where
+  beta := fun _ => 0
+  sigmaTag := fun _ => 0
+  directCausal := fun _ => 0
+  proxyTagging := fun _ => 0
+  novelDirectCausal := fun _ => 0
+  novelProxyTagging := fun _ => 0
+  novelCausalEffect := fun _ => 0
+  contextCross := fun _ => 0
+  outcomeVariance := fun _ => 1
+  novelUntaggablePhenotypeVarianceTarget := 0
+  targetPrevalence := 1 / 2
+  novelDirectCausal_source := rfl
+  novelProxyTagging_source := rfl
+  novelCausalEffect_source := rfl
+  outcomeVariance_pos := fun _ => by norm_num
+  novelUntaggablePhenotypeVarianceTarget_nonneg := le_refl 0
+  targetPrevalence_pos := by norm_num
+  targetPrevalence_lt_one := by norm_num
 
 /-- Source ERM weights in closed form (normal equations) under invertible source covariance. -/
 noncomputable def sourceERMWeights {p : ℕ}

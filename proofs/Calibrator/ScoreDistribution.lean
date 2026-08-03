@@ -48,7 +48,9 @@ noncomputable def pgsMean {m : ℕ} (β : Fin m → ℝ) (p : Fin m → ℝ) : �
   ∑ i, β i * (2 * p i)
 
 /-- **PGS variance under HWE and linkage equilibrium.**
-    Var(PGS) = Σᵢ βᵢ² × 2pᵢ(1-pᵢ). -/
+    Var(PGS) = Σᵢ βᵢ² × 2pᵢ(1-pᵢ).
+
+    Empirical status: UNTESTED. -/
 noncomputable def pgsVariance {m : ℕ} (β : Fin m → ℝ) (p : Fin m → ℝ) : ℝ :=
   ∑ i, β i ^ 2 * (2 * p i * (1 - p i))
 
@@ -339,27 +341,14 @@ The Gaussian approximation error affects tail probability estimates.
 
 section GaussianApproximation
 
-/-! Two theorems stood here — `berry_esseen_error_decreases_with_snps` and
-`highly_polygenic_better_gaussian` — both stating the Berry–Esseen bound as
-`C·ρ/(σ_sq·√m)`. That spelling is one power of `σ` short of `Cρ/σ³`, and the second
-theorem's docstring asserted the *correct* form directly above a body that did not
-implement it.
+/-! The Berry–Esseen statements of this section are `berryEsseenBound_antitone` for the
+summand-count comparison and `berryEsseenBound_polygenic_lt_oligogenic` for the
+polygenicity reading of it. Both are stated against `berryEsseenBound`, which is defined
+through `Calibrator.Probability.berryEsseenErrorBound` and so cannot drift from it.
 
-They were kept for a while behind candid warnings that the comparison survives the defect,
-since a constant power of `σ` cancels between two marker counts. That is true and it is not
-sufficient: a theorem whose statement is wrong is not repaired by a docstring saying so, and
-a reader quoting the formula gets a factor of `σ` wrong regardless of what the comment said.
-Both are deleted rather than annotated.
-
-The surviving content is stated below against `berryEsseenBound`, which is defined through
-`Calibrator.Probability.berryEsseenErrorBound` and therefore cannot drift from it:
-`berryEsseenBound_antitone` for the marker-count comparison, and
-`berryEsseenBound_polygenic_lt_oligogenic` for the polygenicity reading of it.
-
-The second correction those warnings carried is still live and is *not* addressed by the
-respelling: `m` is the marker count, and under linkage the count that governs is the block
-count `m/ℓ`. See the block-count section below, where the count is VALIDATED and the `√ℓ`
-constant that would convert one to the other is FALSIFIED. -/
+`m` is a summand count, and under linkage the count that governs is the block count `m/ℓ`.
+See the block-count section below, where the count is VALIDATED and the `√ℓ` constant that
+would convert one to the other is FALSIFIED. -/
 
 /-! ### The count that decides is blocks, not markers — and the constant that does not
 
@@ -368,9 +357,9 @@ linkage that count is wrong. The freezing transition supplies the correction: a 
 genome with correlation length `ℓ` behaves, for normal-approximation purposes, like a sum
 over `m/ℓ` effectively independent **blocks**.
 
-**The count is confirmed and the constant is refuted.** A first version of this section
-claimed the marker-count bound understates the true one by *exactly* `√ℓ`. Simulation on
-1.6M individuals per configuration (153 configurations) says otherwise:
+**The count is confirmed and the constant is refuted.** The marker-count bound does *not*
+understate the true one by exactly `√ℓ`. Simulation on 1.6M individuals per configuration
+(153 configurations):
 
 * with **block-constant haplotypes and equal marker weights** the ratio is `1.00 ± 0.01` at
   every `ℓ ∈ [1,32]` and every `m ∈ [16,8192]` — there, and only there, the factor is `√ℓ`;
@@ -433,24 +422,18 @@ Empirical status: DERIVED. This is a consistency constraint between two files in
 corpus, not a claim against an experiment. -/
 
 /-- **The Berry–Esseen bound at `m` summands**, defined *through* the existing
-    `Calibrator.Probability.berryEsseenErrorBound` rather than beside it.
-
-    A first version of this wrote the formula out again and claimed in its docstring to
-    "match `Probability`'s spelling" — which is the duplicate-body defect this corpus's guard
-    reports: two files carrying alpha-equivalent bodies tied by neither a call nor a theorem,
-    so a later edit to one silently diverges from the other. It now calls that definition, and
-    `berryEsseenBound_eq` states the closed form as a theorem. -/
+    `Calibrator.Probability.berryEsseenErrorBound` rather than beside it, so the two files
+    share one body. `berryEsseenBound_eq` states the closed form as a theorem. -/
 noncomputable def berryEsseenBound (C ρ σ_sq m : ℝ) : ℝ :=
   berryEsseenErrorBound C σ_sq ρ / Real.sqrt m
 
-/-- The closed form, now a theorem rather than a second definition. -/
+/-- The closed form, as a theorem rather than a second definition. -/
 theorem berryEsseenBound_eq (C ρ σ_sq m : ℝ) :
     berryEsseenBound C ρ σ_sq m = C * ρ / (σ_sq * Real.sqrt σ_sq * Real.sqrt m) := by
   unfold berryEsseenBound berryEsseenErrorBound
   rw [div_div]
 
-/-- The corrected bound still decreases in the marker count, so the older theorems' *conclusion*
-    survives the respelling even though their formula does not. -/
+/-- The bound decreases in the summand count. -/
 theorem berryEsseenBound_antitone (C ρ σ_sq m₁ m₂ : ℝ)
     (hC : 0 < C) (hρ : 0 < ρ) (hσ : 0 < σ_sq) (hm₁ : 0 < m₁) (hm : m₁ < m₂) :
     berryEsseenBound C ρ σ_sq m₂ < berryEsseenBound C ρ σ_sq m₁ := by
@@ -462,14 +445,12 @@ theorem berryEsseenBound_antitone (C ρ σ_sq m₁ m₂ : ℝ)
   apply div_lt_div_of_pos_left (mul_pos hC hρ) (by positivity)
   exact mul_lt_mul_of_pos_left hlt (by positivity)
 
-/-- **The polygenicity reading of the bound**, restated against the correct spelling.
+/-- **The polygenicity reading of the bound.**
 
     A trait with more contributing loci has the smaller Berry–Esseen bound, all else held
-    fixed. This replaces `highly_polygenic_better_gaussian`, which proved the same comparison
-    against a formula one power of `σ` short; see the deletion note in the Gaussian
-    approximation section above.
+    fixed.
 
-    Two limits on how far this may be read, both of which the deleted version obscured:
+    Two limits on how far this may be read:
 
     * It compares *bounds*, not approximation qualities. A smaller Berry–Esseen bound does
       not entail a smaller actual distributional distance, only a smaller certificate of one.
@@ -490,7 +471,9 @@ section BlockCount
 
     Junk-value note: at `correlationLength = 0` Lean's division returns `0`, which reads as
     "no blocks at infinite correlation" — nonsense in the wrong direction. Every theorem
-    below carries `0 < correlationLength`. -/
+    below carries `0 < correlationLength`.
+
+        Empirical status: UNTESTED. -/
 noncomputable def effectiveBlockCount (markers correlationLength : ℝ) : ℝ :=
   markers / correlationLength
 
@@ -499,7 +482,9 @@ noncomputable def effectiveBlockCount (markers correlationLength : ℝ) : ℝ :=
     The lattice ghost surviving in a block of `n` markers at correlation length `ℓ`.
 
     Junk-value note: natural subtraction makes `n = 0` and `n = 1` agree at `1`, so this is
-    the lag-`(n-1)` quantity only for `n ≥ 1`, which every theorem below requires. -/
+    the lag-`(n-1)` quantity only for `n ≥ 1`, which every theorem below requires.
+
+        Empirical status: UNTESTED. -/
 noncomputable def residualDiscreteness (correlationLength : ℝ) (n : ℕ) : ℝ :=
   (1 - 1 / correlationLength) ^ (n - 1)
 

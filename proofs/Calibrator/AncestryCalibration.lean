@@ -225,15 +225,11 @@ section PhenotypeHeterogeneity
     predictor after the phenotype is multiplied by `s` with the noise variance held at
     `1 - r2`, no positive `s ≠ 1` fixes an `R²` in `(0, 1)`.
 
-    **`r2₂` was a phantom parameter and has been removed.** The theorem took a second `R²`
-    that occurs nowhere in its statement, its hypotheses, or its proof. With `r2₂` in the
-    signature the result read as a comparison between two populations' `R²` values — which
-    is what "measurement invariance" means — while everything proved concerns one `R²` and
-    one scale factor. Nothing here compares populations, and nothing here shows that `R²`
-    comparisons across populations are invalid; that was the docstring's claim and it does
-    not follow from a one-population rescaling identity. What follows is that `R²` is not
-    invariant to the units of `Y`, which is a necessary ingredient of such an argument and
-    not the argument.
+    **This concerns one `R²` and one scale factor, not two populations.** Nothing here
+    compares populations, and nothing here shows that `R²` comparisons across populations
+    are invalid — that does not follow from a one-population rescaling identity. What
+    follows is that `R²` is not invariant to the units of `Y`, which is a necessary
+    ingredient of such an argument and not the argument.
 
     The unit-scale exclusion is genuinely needed in both directions: `h_scale` rules out
     `s = 1`, and `h_scale_pos` rules out `s = -1`, which also satisfies `s² = 1`. -/

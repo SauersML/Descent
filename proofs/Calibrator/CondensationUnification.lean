@@ -141,30 +141,18 @@ theorem imputation_rescaling_cannot_repair_lattice (lam : ℝ) (hlam : lam ≠ 0
   ⟨hardCall_intensity_inflated, fun c V _hV ↦ standardizedSquare_scale_invariant c V lam hlam⟩
 
 /-!
-## 4-5. Two abstract results this file used to re-export under genetics names
+## 4-5. Two abstract results, and why they are not re-exported here
 
-Three theorems stood here: `scree_invariant_incomplete`,
-`pc_loadings_identifiable_of_bounded_below` and `mechanism_count_not_identifiable`.
-Each had the *identical* statement and hypotheses of an imported theorem, and a proof
-consisting of applying it:
+`HiddenConeAmbiguity.catalogue_induces_reduction`,
+`HiddenConeAmbiguity.rigidity_of_boundedBelowAbove` and
+`LatentMechanismCollapse.minimal_latent_dimension_is_constant` are what a caller should
+use directly. Re-exporting them under genetics names would assert a domain applicability
+no instance here establishes: nothing is instantiated, `Family` is never given the type of
+context-specific genotype-phenotype kernels, and `screeLabel` is never given an
+eigenvalue-gap rule, so a reader could not tell a re-export from a derivation.
 
-* `scree_invariant_incomplete` was `HiddenConeAmbiguity.catalogue_induces_reduction`,
-  with `inv` renamed `screeLabel`;
-* `pc_loadings_identifiable_of_bounded_below` was
-  `HiddenConeAmbiguity.rigidity_of_boundedBelowAbove`, unchanged;
-* `mechanism_count_not_identifiable` was
-  `LatentMechanismCollapse.minimal_latent_dimension_is_constant`, with `Family`
-  renamed `KernelFamily`.
-
-**All three are removed.** The genetics names asserted a domain applicability that no
-instance established. Nothing was instantiated: `Family` was never given the type of
-context-specific genotype-phenotype kernels, `screeLabel` was never given an
-eigenvalue-gap rule, and a reader could not tell a re-export from a derivation. Renaming
-each to something non-asserting would leave `foo := bar`, which is noise; the imported
-theorems are what a caller should use.
-
-The readings those names carried are still what this corpus believes, and they are
-stated here as readings rather than as theorems. If a complete scree-type invariant of a
+The genetics readings are what this corpus believes, and they are stated here as readings
+rather than as theorems. If a complete scree-type invariant of a
 loading-decay profile existed it would have to separate profiles with identical complete
 second-order observables, so the number of principal components to retain is a convention
 in the sense of `Calibrator.Conventions`; `Calibrator.PCCorrectability` answers the
@@ -337,8 +325,7 @@ The proof is the third-moment detector of `symmetricCoding_third_moment_zero`: a
 symmetric coding has vanishing third moment, while `E[(x²)³]` is a sum of non-negative
 terms with a strictly positive one.
 
-**Read the scope of this theorem carefully; an earlier draft of this file did not.** It is
-about the *uncentered* square `x²`, which is non-negative and therefore trivially never
+**Read the scope of this theorem carefully.** It is about the *uncentered* square `x²`, which is non-negative and therefore trivially never
 symmetric. It is **not** about the tower's floor-two coordinate, which is the *centered*
 square `u = (x² - 1)/σ₁`, and it does not settle the floor-two symmetry question.
 
@@ -473,8 +460,8 @@ At that frequency `E[x⁴] = 3`, so the fourth-cumulant channel cannot separate 
 *coordinate* from a Gaussian one.
 
 **Do not extend that to interaction tests; the extension was measured and is refuted.**
-The sentence that stood here said an interaction statistic drawing its power from
-fourth-cumulant separation has no signal at `q*`. Simulation says the opposite: on a
+An interaction statistic drawing its power from fourth-cumulant separation does *not* lose
+signal at `q*`, which is the natural guess. Simulation says the opposite: on a
 measured locus the natural fourth-order test `cum(y,y,x,x)` holds power `0.47`–`0.80`
 flat, *higher* at MAF `0.21` (`0.712`) than at `0.05` (`0.554`), with no dip. What
 happens at `q*` is that the same test, calibrated against the Gaussian surrogate, has
@@ -503,8 +490,8 @@ theorem standardizedGenotype_kurtosis_gaussian_at_blind_maf (h : HardyWeinbergMo
 ### The tower itself
 
 `LevelChannels` is one floor: the two-jet, the arithmetic type, the symmetry verdict.
-The recursion above it is not formalized — the record that once stood for it took the
-Vertex-Weight Law as a field and was removed — so what follows is floor one only.
+The recursion above it is not formalized — a record for it would have to take the
+Vertex-Weight Law as a field — so what follows is floor one only.
 -/
 
 /-- The channels available at one floor of the observable tower. -/
@@ -580,16 +567,16 @@ theorem hweLevelOne_symmetric_jetVariance_zero (q : ℝ)
 /-- Re-model a design: the same tested locus-sets, coefficients and joint law, at a
 different allele-frequency family. This is what varying the coordinate law while holding
 the design fixed means.
+parameter.
 
-Empirical status: UNTESTED. A field update on a design; no modelling content and no free
-parameter. -/
+Empirical status: UNTESTED. A field update on a design; no modelling content and no free -/
 def GenotypeDesign.reModel {ι : Type*} {n : ℕ} (design : GenotypeDesign n ι)
     (model : Fin n → HardyWeinbergModel) : GenotypeDesign n ι :=
   { design with model := model }
 
-/-! The former observable-tower record accepted the Vertex-Weight Law and the exposure
-correction as fields. It is removed; the explicit panel-mixture calculations below do not
-depend on those unproved analytic claims. -/
+/-! No observable-tower record is exported: accepting the Vertex-Weight Law and the
+exposure correction as fields would assume unproved analytic claims, and the explicit
+panel-mixture calculations below do not depend on them. -/
 
 /-!
 ## 5g. Panels are mixtures, and that is where the tower bites
@@ -637,15 +624,24 @@ structure MafSpectrum (m : ℕ) where
   /-- Weights sum to one. -/
   weight_sum : ∑ j, weight j = 1
 
+/-- **The class is inhabited.**  A theorem quantified over an uninhabited structure is
+true and empty: kernel-checked, clean axiom report, no content.  This is the witness that
+makes the theorems below statements about something. -/
+noncomputable def MafSpectrum.witness (m : ℕ) : MafSpectrum (m + 1) where
+  model := fun _ => HardyWeinbergModel.witness
+  weight := fun j => if j = 0 then 1 else 0
+  weight_nonneg := fun j => by dsimp only; split <;> norm_num
+  weight_sum := by simp
+
 namespace MafSpectrum
 
 variable {m : ℕ}
 
 /-- The `k`-th moment of the panel's effective coordinate law: the mixture average of the
 per-locus moments of the standardized genotype.
+parameter beyond the spectrum itself, and nothing fitted.
 
-Empirical status: UNTESTED. A mixture average over the panel's own spectrum; no free
-parameter beyond the spectrum itself, and nothing fitted. -/
+Empirical status: UNTESTED. A mixture average over the panel's own spectrum; no free -/
 noncomputable def moment (spectrum : MafSpectrum m) (k : ℕ) : ℝ :=
   ∑ j, spectrum.weight j *
     ∑ g : DiploidGenotype,
@@ -788,14 +784,7 @@ theorem centeredSquareThirdMoment_differs_of_sixth (spectrum spectrum' : MafSpec
 
 end MafSpectrum
 
-/-! A theorem named `floorOne_match_does_not_transport_calibration` stood here. Its three
-floor-one hypotheses were unused — they were spelled `_hdrift`, `_hjet`, `_hfourth` — and
-its proof was `floorTwo_separates spectrum spectrum' hfloorTwo`, i.e. the application of a
-hypothesis stating that differing floor-two data give differing nulls, which is the
-conclusion the name claims. Nothing about floor one entered the proof, so the name asserted
-a non-transport result the statement did not contain. It is removed.
-
-The proved content of this section is `centeredSquareThirdMoment_differs_of_sixth`: two
+/-! The proved content of this section is `centeredSquareThirdMoment_differs_of_sixth`: two
 spectra agreeing in the fourth moment and differing in the sixth differ in the floor-two
 datum. Turning that into a statement about calibrations needs a theorem sending floor-two
 data to null laws, which this corpus does not have. -/
@@ -1069,8 +1058,7 @@ frequency to `q = 1/2`, and there the fourth moment is `2`, not `3`
 does match, `0.21132…`, the coordinate is not symmetric. Indeed the phase inequality and
 the symmetry hypothesis are *complementary* on the spectrum — the first holds exactly
 where the second fails (`phase_strict_iff_not_symmetric`) — so no allele frequency
-satisfies both. That is a stronger and more useful statement than "applies everywhere but
-one point", which is what an earlier draft of this section said.
+satisfies both. That is stronger than "applies everywhere but one point".
 
 ### The balanced locus is special twice, from one cause
 
@@ -1107,9 +1095,9 @@ The load in the rigidity argument is carried by the odd part of the *squared* la
 moment list mentions — which is why four successive finite lists failed to close the
 question.
 
-A note that stood here claimed the corpus already owns the decisive datum, on the ground
-that `standardizedSquare_never_symmetric` makes the odd part of the floor-two law nonzero
-at every polymorphic frequency including `q = 1/2`. **That is false**, and it is the exact
+The corpus does **not** already own the decisive datum, and the tempting argument that it
+does — that `standardizedSquare_never_symmetric` makes the odd part of the floor-two law
+nonzero at every polymorphic frequency including `q = 1/2` — is false. It is the exact
 misreading that theorem's own docstring warns against: it is about the *uncentered* square
 `x²`, which is non-negative and so trivially never symmetric, while floor two is the
 *centered* square, which at `q = 1/2` is Rademacher and symmetric
@@ -1676,10 +1664,10 @@ So the four checkable zeros are three constraints plus one free rider:
 
 ### Scope, in the signature and not only in prose
 
-A `LadderObservability` record once stood below carrying `CramerModulus` as a field, with
-the blindness input taken as a hypothesis at both laws. Record and hypothesis are gone —
-they held the blindness theorem itself as a parameter — so the scope note survives only as
-prose: the general ladder-measurability claim re-scopes to the smooth-modulus stratum and
+No `LadderObservability` record carries `CramerModulus` as a field with the blindness
+input taken as a hypothesis at both laws: that would hold the blindness theorem itself as a
+parameter. So the scope note is prose only: the general ladder-measurability claim
+re-scopes to the smooth-modulus stratum and
 the non-Cramér frontier is open. See §5l for why genotypes sit outside that scope. What
 remains formalized below is the profile arithmetic, which needs no scope condition at all.
 
@@ -1761,6 +1749,15 @@ structure FiberSplitting (k : ℕ) where
   /-- Locations are interior, so both preimages are genuine points of the square law. -/
   location_pos : ∀ j, 0 < location j
   location_lt_one : ∀ j, location j < 1
+
+/-- **The class is inhabited.**  A theorem quantified over an uninhabited structure is
+true and empty: kernel-checked, clean axiom report, no content.  This is the witness that
+makes the theorems below statements about something. -/
+noncomputable def FiberSplitting.witness (k : ℕ) : FiberSplitting k where
+  location := fun _ => 1 / 2
+  mass := fun _ => 0
+  location_pos := fun _ => by norm_num
+  location_lt_one := fun _ => by norm_num
 
 /-- The displacement a splitting produces in the moment whose profile is `profile`. -/
 noncomputable def FiberSplitting.displacement {k : ℕ} (F : FiberSplitting k)

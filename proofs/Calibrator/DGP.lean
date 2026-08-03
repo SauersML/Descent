@@ -90,6 +90,16 @@ structure HWEPolygenicScoreDGP (m : ℕ) where
   berryEsseenConstant : ℝ
   berryEsseenConstant_nonneg : 0 ≤ berryEsseenConstant
 
+/-- **The class is inhabited.**  A theorem quantified over an uninhabited structure is
+true and empty: kernel-checked, clean axiom report, no content.  This is the witness that
+makes the theorems below statements about something. -/
+noncomputable def HWEPolygenicScoreDGP.witness (m : ℕ) : HWEPolygenicScoreDGP m where
+  scoreModel :=
+    { alleleFreq := fun _ => HardyWeinbergModel.witness
+      effect := fun _ => 0 }
+  berryEsseenConstant := 0
+  berryEsseenConstant_nonneg := le_refl 0
+
 /-- Exact score mean under the discrete HWE architecture. -/
 noncomputable def HWEPolygenicScoreDGP.scoreMean {m : ℕ} [Fintype (Fin m)]
     (dgp : HWEPolygenicScoreDGP m) : ℝ :=
@@ -1045,6 +1055,14 @@ structure PrevalenceDGP (k : ℕ) where
   jointMeasure : Measure (ℝ × (Fin k → ℝ))
   is_prob : IsProbabilityMeasure jointMeasure := by infer_instance
 
+/-- **The class is inhabited.**  A theorem quantified over an uninhabited structure is
+true and empty: kernel-checked, clean axiom report, no content.  This is the witness that
+makes the theorems below statements about something. -/
+noncomputable def PrevalenceDGP.witness (k : ℕ) : PrevalenceDGP k where
+  prevalence := fun _ => 0
+  pgs_effect := 0
+  jointMeasure := Measure.dirac 0
+
 /-- True conditional risk under a prevalence DGP (identity link, additive form).
     E[Y | P, C] = π(C) + β · P, where π varies by ancestry and β is shared.
 
@@ -1809,7 +1827,9 @@ noncomputable def fstDriftFlowStep (p : EvolutionaryParameters) (F : ℝ) : ℝ 
     Not stipulated: `fstEquilibrium_isFixedPoint` derives it as the rest point
     of `fstDriftFlowStep`.  With `θ = 4 Nₑ μ` and `M = 4 Nₑ m`, balancing
     `(1 - F)/(2 Nₑ)` against `2(m + μ)F` gives `F (1 + 4 Nₑ (m + μ)) = 1`, and
-    `4 Nₑ (m + μ) = θ + M` is exactly why the two scaled rates add. -/
+    `4 Nₑ (m + μ) = θ + M` is why the two scaled rates add.
+
+    Empirical status: UNTESTED. -/
 noncomputable def fstEquilibrium (p : EvolutionaryParameters) : ℝ :=
   1 / (1 + p.theta + p.bigM)
 

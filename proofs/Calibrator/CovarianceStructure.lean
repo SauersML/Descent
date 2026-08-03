@@ -50,16 +50,11 @@ This is `genotypeVarianceHWE` from `Calibrator.AncestrySpecificPower`. Do not de
 here: the ploidy convention lives in a single place, and its empirical status and
 `Denotes` declaration belong with that definition. -/
 
-/-! **Why this was renamed.** It was called `allelicVariance`, and the allelic
-variance is `p(1-p)`, not `2p(1-p)`. The formula is the *genotype* variance,
-equivalently the Hardy-Weinberg heterozygote frequency; those two readings are
-both correct and the allelic one is not.
-
-That misnaming produced the `r²/4` defect directly rather than by coincidence:
+/-! **This is the genotype variance, not the allelic variance.** `2p(1-p)` is the
+genotype variance, equivalently the Hardy-Weinberg heterozygote frequency; the allelic
+variance is `p(1-p)`. Reading it as allelic is what produces the `r²/4` defect:
 `ldCorrelationSq` divides by the product of two of these, which is right for a
-genotype-scale `D` and wrong by four for the allele-scale `D` that this same
-file produces. The formula was never slipped; the name was, and the formula
-inherited it. -/
+genotype-scale `D` and wrong by four for the allele-scale `D` this same file produces. -/
 
 /-- Allelic variance is maximized at p = 0.5. -/
 theorem allelic_variance_max_at_half (p : ℝ)

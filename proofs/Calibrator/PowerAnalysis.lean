@@ -88,12 +88,9 @@ theorem ncp_increases_with_n (n₁ n₂ : ℕ) (beta p : ℝ)
     chi-squared power agrees to five decimals across `α ∈ {0.05, 5·10⁻⁸}` and
     `ncp ∈ {1, …, 20}`.
 
-    This replaces `approxPower ncp = 1 - exp(-ncp/2)`, which took no threshold
-    and so returned one number for a nominal test and a genome-wide scan
-    alike: at `α = 5·10⁻⁸` with `ncp = 10` it reported `0.993` against a true
-    `0.011`.  Its own docstring named the correct formula.  `Phi` was already
-    in scope, this file importing `Calibrator.Probability` directly, so the
-    approximation was never necessary.
+    The threshold argument is essential: a power formula without one, such as
+    `1 - exp(-ncp/2)`, returns a single number for a nominal test and a genome-wide scan
+    alike — at `α = 5·10⁻⁸` with `ncp = 10` that gives `0.993` against a true `0.011`.
 
     Empirical status: VALIDATED (matches exact non-central chi-squared power to five decimals). -/
 noncomputable def powerAtThreshold (ncp z_alpha : ℝ) : ℝ :=
@@ -118,10 +115,9 @@ theorem powerAtThreshold_antitone_in_threshold (ncp z₁ z₂ : ℝ) (h : z₁ �
     For a fixed effect size, the NCP scales with p(1-p).
     At MAF 1% vs 30%, need ~25× more samples.
 
-    **Strengthened: the symmetry hypothesis is removed.** The previous form
-    assumed `p_common ≤ 1/2`, folding both frequencies into the minor half of
-    the axis, and additionally `0 < p_common` and `p_common < 1`. None of that
-    is what the conclusion needs. The difference factors as
+    **No symmetry hypothesis is needed.** Assuming `p_common ≤ 1/2` — folding both
+    frequencies into the minor half of the axis — together with `0 < p_common` and
+    `p_common < 1` is more than the conclusion needs. The difference factors as
 
         `2 p_c (1 - p_c) - 2 p_r (1 - p_r) = 2 (p_c - p_r) (1 - p_c - p_r)`,
 
@@ -211,6 +207,16 @@ structure GWASObservationModel where
   h_sigma_pos : 0 < sigma
   /-- n > 0 -/
   h_n_pos : 0 < n
+
+/-- **The class is inhabited.**  A theorem quantified over an uninhabited structure is
+true and empty: kernel-checked, clean axiom report, no content.  This is the witness that
+makes the theorems below statements about something. -/
+noncomputable def GWASObservationModel.witness : GWASObservationModel where
+  true_beta := 1
+  sigma := 1
+  n := 1
+  h_sigma_pos := by norm_num
+  h_n_pos := by norm_num
 
 /-- **Standard error of the effect size estimate.**
     SE(β̂) = σ / √n. This is the standard deviation of the sampling

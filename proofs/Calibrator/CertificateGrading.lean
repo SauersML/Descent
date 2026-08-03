@@ -13,9 +13,8 @@ import Mathlib.Probability.ProbabilityMassFunction.Constructions
 This module formalizes the algebra common to mixture-versus-mixture minimax
 certificates.  It deliberately does **not** encode minimax duality, the
 Donoho--Liu constant, a moment-comparison inequality, or a deconvolution
-envelope as fields of a structure.  Those are theorems, not data.  Earlier
-versions accepted them as `Prop`-valued fields and then proved consequences by
-field projection.  That architecture has been removed.
+envelope as fields of a structure.  Those are theorems, not data, and accepting them as
+`Prop`-valued fields would prove consequences by field projection.
 
 What remains is unconditional:
 

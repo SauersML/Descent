@@ -1598,10 +1598,10 @@ def IsTwoPoolInteraction (poolOne poolTwo : Finset (Fin n)) : Prop :=
 
 /-- The smallest two-pool design: two loci, one tested set, one pool each.
 
-    `IsTwoPoolInteraction` demands that the tested sets be exactly the
-    cross-pairs of the two pools, which pins the index type to a copy of
-    `poolOne × poolTwo`. Nothing in the corpus ever built such a design, so the
-    theorem assuming it was about a class with no known member.
+    `IsTwoPoolInteraction` demands that the tested sets be the cross-pairs of
+    the two pools and nothing else, which pins the index type to a copy of
+    `poolOne × poolTwo`. This design is a member of that class, so the theorems
+    assuming it quantify over something inhabited.
 
     Two loci over a single tested set is the minimal instance and the fourth and
     fifth clauses become the same statement, which is why it is minimal:

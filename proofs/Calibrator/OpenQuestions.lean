@@ -164,14 +164,12 @@ theorem heterozygosity_increases_toward_half
 /-- **PGS variance increases when the large-effect locus gains more heterozygosity than the
 small-effect locus loses.** This is the mechanism proposed for WBC/lymphocyte count.
 
-    This replaces `pgs_variance_can_increase`, which was not a mechanism. That theorem took
-    `h_net : v_large_t - v_large_s > v_small_s - v_small_t` and concluded
-    `v_large_s + v_small_s < v_large_t + v_small_t` by `linarith` — but those two
-    inequalities are the *same inequality rearranged*, so the hypothesis was the conclusion
-    and the proof was the rearrangement. Replacing the proof body with the hypothesis would
-    have given the same theorem, which is the test for having no theorem at all.
+    A statement taking `h_net : v_large_t - v_large_s > v_small_s - v_small_t` and
+    concluding `v_large_s + v_small_s < v_large_t + v_small_t` would be no mechanism at all:
+    those two inequalities are the *same inequality rearranged*, so the hypothesis would be
+    the conclusion and the proof the rearrangement.
 
-    The version below cannot be rearranged into its own hypotheses, because the hypotheses
+    This one cannot be rearranged into its own hypotheses, because the hypotheses
     are about **effect sizes and heterozygosities separately** and the conclusion is about
     the variance sum they generate. A locus at frequency `p` with effect `β` contributes
     `2β²p(1-p)` to score variance, so the claim has content precisely when the weighting by

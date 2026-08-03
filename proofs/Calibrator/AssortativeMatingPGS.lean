@@ -71,10 +71,23 @@ structure AssortativeMatingModel where
   r_lt_one : r < 1
   V_A_pos : 0 < V_A
   /-- Additive variance is a strict part of the total, which is what makes the
-  heritability a proper fraction. This replaces the free `h2 < 1`. -/
+  heritability a proper fraction. -/
   V_A_lt_V_P : V_A < V_P
   /-- Stability: ensures geometric series converges -/
   stability : r * (V_A / V_P) < 1
+
+/-- **The class is inhabited.**  A theorem quantified over an uninhabited structure is
+true and empty: kernel-checked, clean axiom report, no content.  This is the witness that
+makes the theorems below statements about something. -/
+noncomputable def AssortativeMatingModel.witness : AssortativeMatingModel where
+  r := 1 / 2
+  V_A := 1
+  V_P := 2
+  r_pos := by norm_num
+  r_lt_one := by norm_num
+  V_A_pos := by norm_num
+  V_A_lt_V_P := by norm_num
+  stability := by norm_num
 
 /-- **Narrow-sense heritability**, the ratio of additive to total variance.
 
@@ -395,6 +408,21 @@ structure DifferentialAMModel where
   /-- Source has more AM than target -/
   more_am_in_source : r_t < r_s
 
+/-- **The class is inhabited.**  A theorem quantified over an uninhabited structure is
+true and empty: kernel-checked, clean axiom report, no content.  This is the witness that
+makes the theorems below statements about something. -/
+noncomputable def DifferentialAMModel.witness : DifferentialAMModel where
+  r_s := 1 / 2
+  r_t := 0
+  h2 := 1 / 2
+  r_s_pos := by norm_num
+  r_s_lt_one := by norm_num
+  r_t_nonneg := by norm_num
+  h2_pos := by norm_num
+  h2_lt_one := by norm_num
+  stability_s := by norm_num
+  more_am_in_source := by norm_num
+
 /-- **Target stability follows from source stability, so do not assume it separately.**
 With less assortative mating in the target and a positive heritability, `r_t * h2` is
 strictly below `r_s * h2`, which is already below one; a separate assumption would be a
@@ -502,6 +530,22 @@ structure CrossPopAMLD where
   h2_pos : 0 < h2
   stability_s : r_s * h2 < 1
   stability_t : r_t * h2 < 1
+
+/-- **The class is inhabited.**  A theorem quantified over an uninhabited structure is
+true and empty: kernel-checked, clean axiom report, no content.  This is the witness that
+makes the theorems below statements about something. -/
+noncomputable def CrossPopAMLD.witness : CrossPopAMLD where
+  beta_i := 1
+  beta_j := 1
+  r_s := 1 / 2
+  r_t := 0
+  h2 := 1 / 2
+  r_s_pos := by norm_num
+  r_t_nonneg := by norm_num
+  r_t_lt_rs := by norm_num
+  h2_pos := by norm_num
+  stability_s := by norm_num
+  stability_t := by norm_num
 
 /-- AM-LD in source is stronger than in target. -/
 theorem CrossPopAMLD.source_ld_exceeds_target (c : CrossPopAMLD)

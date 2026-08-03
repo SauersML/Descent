@@ -36,15 +36,8 @@ def IsSymmetricBilinearMatrix (B : Matrix ι ι ℝ) : Prop :=
 /-- Every symmetric matrix represents a symmetric bilinear form.
 
     Fourteen theorems in this file take `IsSymmetricBilinearMatrix B` as a
-    hypothesis, and until this lemma nothing in the corpus ever concluded it.
-    That is the configuration where a hypothesis class can be empty and nobody
-    notices: all fourteen would hold vacuously, and the excess-risk identity
-    they build would be a statement about no matrix at all.
-
-    The remedy is not to weaken the fourteen but to say which matrices they are
-    about. Every second-moment matrix is symmetric, which is why the hypothesis
-    was reasonable in the first place; this states that connection rather than
-    leaving it in the prose. -/
+    hypothesis. This says which matrices satisfy it: every symmetric one, and so
+    every second-moment matrix, which is the case those theorems are for. -/
 theorem isSymmetricBilinearMatrix_of_isSymm {B : Matrix ι ι ℝ} (hB : B.IsSymm) :
     IsSymmetricBilinearMatrix B := by
   intro x y

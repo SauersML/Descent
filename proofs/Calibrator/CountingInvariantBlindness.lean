@@ -187,12 +187,12 @@ noncomputable def ApproxWitness.ofWitness (W : Witness Config Inv) (d : Inv → 
     of a moment-continuous functional, `countGap = 1/(n+1)` and `rateGap = n/(n+1)` gives the
     `m_eff` prohibition's arithmetic: the residue is positive as soon as `n > L`.
 
-    **The Lipschitz hypothesis is local, at the two witness points only.** A first version
-    quantified it over all of `Inv`, which is a condition no effective-marker formula in the
-    literature satisfies — Cheverud–Nyholt is quadratic in the first moment and has unbounded
-    secants, and Li–Ji jumps by exactly one at every integer eigenvalue. The proof never used
-    more than the two points, so nothing is lost and the theorem now applies to functionals
-    that are merely locally controlled. -/
+    **The Lipschitz hypothesis is local, at the two witness points only.** Quantifying it
+    over all of `Inv` would be a condition no effective-marker formula in the literature
+    satisfies — Cheverud–Nyholt is quadratic in the first moment and has unbounded secants,
+    and Li–Ji jumps by exactly one at every integer eigenvalue — and the proof needs no more
+    than the two points, so the theorem applies to functionals that are merely locally
+    controlled. -/
 theorem lipschitz_predictor_error_ge (W : ApproxWitness Config Inv)
     (f : Inv → ℝ) (L : ℝ) (hL : 0 ≤ L)
     (hf : |f (W.count W.left) - f (W.count W.right)|

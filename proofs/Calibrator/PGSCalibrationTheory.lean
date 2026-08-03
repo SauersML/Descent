@@ -260,8 +260,11 @@ noncomputable def prevalenceLogit (pi : ℝ) : ℝ :=
 
 /-- **Prevalence-driven logistic intercept shift.**
     If disease prevalence is `π_source` in training and `π_target`
-    in the target, the exact intercept shift on the logistic linear-predictor
-    scale is `logit(π_target) - logit(π_source)`. -/
+    in the target, the intercept shift on the logistic linear-predictor
+    scale is `logit(π_target) - logit(π_source)`.
+
+    Empirical status: UNTESTED. Definitional within the logistic model declared
+    above: it fixes the shift rather than predicting an observable. -/
 noncomputable def prevalenceCITLShift (pi_source pi_target : ℝ) : ℝ :=
   prevalenceLogit pi_target - prevalenceLogit pi_source
 
@@ -281,12 +284,11 @@ section CalibrationVsDiscrimination
     pairwise comparison unchanged, so population AUC is invariant. Calibration-in-the-large
     shifts by exactly that offset with opposite sign.
 
-    Previously named `auc_independent_of_calibration`. Independence is a two-sided claim
-    about a family of models; what is exhibited here is one family — constant offsets —
+    This is not a claim that AUC is independent of calibration, which would be a two-sided
+    claim about a family of models. What is exhibited is one family — constant offsets —
     along which AUC is constant and CITL is not. That refutes "discrimination determines
-    calibration", which is the use the file makes of it, and it does not establish the
-    converse, that calibration fails to constrain discrimination. The name now describes
-    the construction rather than the general principle it is evidence for.
+    calibration", which is the use the file makes of it, and does not establish the
+    converse, that calibration fails to constrain discrimination.
 
     Note also that `mean_obs` and `mean_pred` are free reals unconnected to `pop` or
     `score`: the CITL half of the conjunction is an algebraic identity about two arbitrary
@@ -580,6 +582,20 @@ structure CrossPopulationMechanisticCalibrationModel (p q : ℕ) where
   deploymentInterceptShift : ℝ
   /-- Mean tag genotype in each population. -/
   tagMean : Pop → Fin p → ℝ
+
+/-- **The class is inhabited.**  A theorem quantified over an uninhabited structure is
+true and empty: kernel-checked, clean axiom report, no content.  This is the witness that
+makes the theorems below statements about something. -/
+noncomputable def CrossPopulationMechanisticCalibrationModel.witness (p q : ℕ) :
+    CrossPopulationMechanisticCalibrationModel p q where
+  metric := CrossPopulationMetricModel.witness p q
+  baseObservedMean := 0
+  prevalenceShift := 0
+  environmentalObservedShift := 0
+  geneticObservedShift := 0
+  baseDeploymentIntercept := 0
+  deploymentInterceptShift := 0
+  tagMean := fun _ => 0
 
 /-- **Deployment intercept in a population.** The shift applies at the target only. -/
 noncomputable def CrossPopulationMechanisticCalibrationModel.deploymentIntercept
@@ -2875,9 +2891,9 @@ structure ThresholdTreatmentModel where
   benefit_pos : 0 < benefit
   harm_eq_threshold : harm = benefit * threshold
 
-/-- **The model class is inhabited.**  Thirteen theorems quantify over
-`ThresholdTreatmentModel`.  `harm_eq_threshold` pins `harm` to the other two fields, so
-only `threshold` and `benefit` are free and the witness fixes both. -/
+/-- **The class is inhabited.**  A theorem quantified over an uninhabited structure is
+true and empty: kernel-checked, clean axiom report, no content.  This is the witness that
+makes the theorems below statements about something. -/
 noncomputable def ThresholdTreatmentModel.witness : ThresholdTreatmentModel where
   threshold := 1
   benefit := 1
@@ -2897,7 +2913,9 @@ noncomputable def thresholdLongitudinalModel
     norm_num
 
 /-- One-step clinical pathway induced by a scalar risk under the threshold
-    treatment model. -/
+    treatment model.
+
+    Empirical status: UNTESTED. -/
 noncomputable def thresholdClinicalPathway
     (model : ThresholdTreatmentModel) (risk : ℝ) : ClinicalPathway 1 where
   followupWeight := fun _ ↦ 1
@@ -2944,7 +2962,9 @@ noncomputable def thresholdQalyGainUnderDecision
       0
 
 /-- **Per-individual one-step QALY loss from using predicted instead of true
-    risk.** This is the threshold-rule specialization of `qalyLoss`. -/
+    risk.** This is the threshold-rule specialization of `qalyLoss`.
+
+    Empirical status: UNTESTED. -/
 noncomputable def thresholdQalyLoss
     (model : ThresholdTreatmentModel) (trueRisk predictedRisk : ℝ) : ℝ :=
   thresholdQalyGainUnderDecision model trueRisk trueRisk -

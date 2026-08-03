@@ -104,9 +104,9 @@ per-locus Hardy-Weinberg laws.
 This is the hypothesis under which a panel may be read as a mixture over loci, which is
 what `spectrumModulusLaw` computes. It is carried explicitly by the headline theorems
 below. Under linkage disequilibrium the joint law is not of this form, the factorization
+the surrounding theory relies on fails, and none of the statements below are claimed.
 
-    Empirical status: UNTESTED.
-the surrounding theory relies on fails, and none of the statements below are claimed. -/
+    Empirical status: UNTESTED. -/
 def InLinkageEquilibrium {k n : ℕ} (family : BundleFamily k) (panel : Panel n)
     (joint : (Fin n → Fin k) → ℝ) : Prop :=
   ∀ g : Fin n → Fin k, joint g = ∏ i : Fin n, family.atomMass (g i) (panel.support i)
@@ -737,9 +737,9 @@ theorem onePercentMaf_halfResponse_vs_balanced_permeability
   ring
 
 /-- Total covariance-moment information from `m` independent observations of one
+standardized Hardy--Weinberg locus.
 
-    Empirical status: UNTESTED.
-standardized Hardy--Weinberg locus. -/
+    Empirical status: UNTESTED. -/
 noncomputable def totalDiploidCovarianceMomentInformation
     (m q covarianceDerivative : ℝ) : ℝ :=
   m * diploidCovarianceMomentPermeability q covarianceDerivative
@@ -1468,10 +1468,9 @@ So a single **order-free** sample — the multiset of feature values with genomi
 destroyed — carries **at least one** spectral functional beyond the marginal: a finite
 zero-frequency Fejér evaluation. The carrier is sampling fluctuation.
 
-**AN EARLIER VERSION OF THIS SECTION CLAIMED "EXACTLY ONE spectral functional, unchanged at
-every symmetric order". THAT WAS FALSE AND HAS BEEN REFUTED NUMERICALLY.** The refutation is
-recorded here rather than silently patched, because the mechanism it exposes is sharper than
-the claim it killed.
+**THERE IS NOT "EXACTLY ONE spectral functional, unchanged at every symmetric order", AND
+THAT CLAIM IS REFUTED NUMERICALLY.** The refutation is recorded here because the mechanism
+it exposes is sharper than the claim it kills.
 
 Two Gaussian moving-average processes were built with marginal exactly `N(0,1)` and long-run
 variance `L` agreeing to `1e-16`, differing only off zero frequency (`f(π) = 1` versus
@@ -1591,14 +1590,11 @@ def Reversible (s : Symbol) : Prop := T.rev s = s
 
 /-- Constant statistics are reversal-even, and the zero statistic is reversal-odd.
 
-    Both classes are otherwise assumed and never concluded anywhere in the corpus,
-    which would leave `odd_vanishes_on_reversible` and its consumers vacuous. The
-    two witnesses are deliberately the degenerate ones: for an ABSTRACT involution
-    `T` nothing richer is available, because a reversal-odd statistic that is not
-    identically zero exists only once `rev` is known to have a free orbit. That is
-    a property of the particular `T`, not of involutions, so it belongs to the
-    caller and not here. Stating that boundary is the point -- the algebra below
-    is real, and it is thin. -/
+    Both witnesses are degenerate, and for an ABSTRACT involution `T` nothing
+    richer is available: a reversal-odd statistic that is not identically zero
+    exists only once `rev` is known to have a free orbit, which is a property of
+    the particular `T` and belongs to the caller. The algebra below is real, and
+    it is thin. -/
 theorem reversalEven_const (c : ℝ) : T.ReversalEven (fun _ ↦ c) := fun _ ↦ rfl
 
 theorem reversalOdd_zero : T.ReversalOdd (fun _ ↦ (0 : ℝ)) := fun _ ↦ (neg_zero).symm
@@ -1681,9 +1677,9 @@ structure ScalarSecondMoments where
   /-- Stationarity: second moments depend only on the lag. -/
   stationary : ∀ i j d : ℤ, moment (i + d) (j + d) = moment i j
 
-/-- **The class is inhabited.**  Without a term of this type every theorem quantified
-over it is a true statement about an empty class: kernel-checked, clean axiom report,
-and no content.  See `scripts/check-laundering.py` family F4. -/
+/-- **The class is inhabited.**  A theorem quantified over an uninhabited structure is
+true and empty: kernel-checked, clean axiom report, no content.  This is the witness that
+makes the theorems below statements about something. -/
 noncomputable def ScalarSecondMoments.witness : ScalarSecondMoments where
   moment := fun _ _ ↦ 0
   moment_comm := fun _ _ ↦ rfl

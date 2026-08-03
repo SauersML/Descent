@@ -374,7 +374,9 @@ noncomputable def HardyWeinbergModel.centeredAltAlleleCount
     (h : HardyWeinbergModel) (g : DiploidGenotype) : ℝ :=
   altAlleleCount g - h.expectedAltAlleleCount
 
-/-- One-locus genotype variance under Hardy-Weinberg equilibrium. -/
+/-- One-locus genotype variance under Hardy-Weinberg equilibrium.
+
+    Empirical status: UNTESTED. -/
 noncomputable def HardyWeinbergModel.genotypeVariance (h : HardyWeinbergModel) : ℝ :=
   ∑ g : DiploidGenotype,
     h.genotypeProb g * (h.centeredAltAlleleCount g) ^ 2

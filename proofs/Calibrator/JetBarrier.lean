@@ -14,18 +14,16 @@ namespace Calibrator
 /-!
 # Lattice arithmetic from the withdrawn Jet Barrier program
 
-This file proves the lattice-inflation arithmetic used by the Jet Barrier program.
-The nonlattice completeness theorem is not formalized here: its former
-`ChaosSpectroscopy` record accepted Stone/local-limit conclusions from the caller and has
-been removed together with every projection theorem.
+This file proves the lattice-inflation arithmetic used by the Jet Barrier program. The
+nonlattice completeness theorem is not formalized here, and no `ChaosSpectroscopy` record
+accepts Stone/local-limit conclusions from the caller.
 
-## The correction that produced the trichotomy
+## Why the trichotomy, and not a 2-jet
 
-An earlier form of this result claimed that the observable algebra of independent
-low-influence chaos over a symmetric product law is the **Mellin 2-jet**
-`(c, v) = (E[x² log x²], Var_tilde(log x²))` and nothing else. That statement is
-**false as stated**: lattice laws are a live counterexample class. Working the lattice
-case out shows it is not an exception to be excluded but a *third observable*.
+The observable algebra of independent low-influence chaos over a symmetric product law is
+**not** the Mellin 2-jet `(c, v) = (E[x² log x²], Var_tilde(log x²))` and nothing else: that
+is **false as stated**, because lattice laws are a live counterexample class. Working the
+lattice case out shows it is not an exception to be excluded but a *third observable*.
 The historical conjecture was:
 
 > Independent low-influence chaos over a symmetric product law observes exactly the
@@ -81,9 +79,9 @@ contributes to it is the inflation factor's arithmetic and nothing else. See
 The file splits cleanly along the symmetry hypothesis, and the split is worth
 stating once because it decides what may be quoted about real data.
 
-* **Symmetry-gated.** The withdrawn completeness claim required symmetric coordinate
-  laws. A standardized Hardy-Weinberg genotype is symmetric only at `q = 1/2`; no
-  completeness claim is exported even there.
+* **Symmetry-gated.** Any completeness claim requires symmetric coordinate laws. A
+  standardized Hardy-Weinberg genotype is symmetric only at `q = 1/2`; no completeness
+  claim is exported even there.
 * **Symmetry-free.** The lattice arithmetic (`one_lt_latticeInflation`,
   `latticeBracket_antitone`, `latticeInflation_normalization`) never mentions
   symmetry, and neither does the drift theory
@@ -91,17 +89,15 @@ stating once because it decides what may be quoted about real data.
   every allele frequency — and they are the parts
   `Calibrator.PolygenicSpectroscopy` actually instantiates.
 
-The instantiation in `Calibrator.PolygenicSpectroscopy` was built on the
-symmetry-free side, so nothing there is retracted by this record. The record
-exists so that the symmetry-gated statements are not quoted about genotypes at
-frequencies where their hypothesis is false.
+`Calibrator.PolygenicSpectroscopy` instantiates the symmetry-free side only. The split is
+stated so that the symmetry-gated statements are not quoted about genotypes at frequencies
+where their hypothesis is false.
 
 ## A second gate: disjointness of the tested locus-sets
 
 The title of this file says "independent chaos designs", and independence there
-means *disjoint variable supports*. That condition used to live only in prose.
-It would have to be an explicit hypothesis of any future barrier theorem, because it is
-not a technical convenience:
+means *disjoint variable supports*. That condition would have to be an explicit hypothesis
+of any future barrier theorem, because it is not a technical convenience:
 
 * on disjoint designs the achievable limits are the Gaussian segment
   `{N(0, s²) : 0 ≤ s² ≤ 1}`, so the trichotomy has something to be complete
@@ -139,11 +135,8 @@ inductive LatticeDatum where
     `offset + span * ℤ`, with `span > 0`. This is the content a `LatticeDatum` asserts; the
     datum by itself is a constructor and asserts nothing.
 
-    Introduced because `gaussianObservables` used to *stipulate* `nonlattice` as a data
-    field, with a docstring conceding the fact was true but unproved. A stipulated field is
-    silently inherited by every comparison against the record. Under the standing rule that
-    a `sorry` is preferred to a smuggled premise, the claim is now stated and its one
-    unproved step is marked as such in `logSqGaussian_nonlattice`. -/
+    A record carrying a lattice datum has to agree with an actual law, which is what
+    `LatticeDatum.Describes` below demands of it. -/
 def IsLatticeLaw (μ : MeasureTheory.Measure ℝ) (span offset : ℝ) : Prop :=
   0 < span ∧ μ {x : ℝ | ∀ k : ℤ, x ≠ offset + span * k} = 0
 
@@ -168,9 +161,8 @@ noncomputable def logSqGaussianLaw : MeasureTheory.Measure ℝ :=
     cannot be concentrated on an arithmetic progression. Formalizing that chain needs the
     pushforward density of `log ∘ (·²)` under the Gaussian, which this corpus does not have.
 
-    It is a `sorry` rather than a hypothesis on the theorems below, or a stipulated field,
-    because those forms hide the debt in places that read as discharged. This one does not:
-    the axiom audit reports it, and anything depending on it depends on a visible hole. -/
+    The debt is a `sorry` rather than a hypothesis or a stipulated field, so that the axiom
+    audit reports it and anything depending on it depends on a visible hole. -/
 theorem logSqGaussian_nonlattice : IsNonlatticeLaw logSqGaussianLaw := by
   sorry
 
@@ -264,11 +256,11 @@ theorem latticeBracket_antitone {h : ℝ} (hh : 0 < h) :
 /-!
 ## 2. The barrier is absent
 
-A `ChaosSpectroscopy` record once stood here holding Stone's local CLT, the lattice
-local CLT and Gnedenko-Kolmogorov triangular-array convergence as *fields*, with a
-`barrier` field carrying the central indistinguishability claim; its projection
-theorems then closed by `exact S.barrier`. The record and every projection are gone,
-and nothing replaces them — no barrier, no factorization, no chameleon-completeness
+No `ChaosSpectroscopy` record is exported. Holding Stone's local CLT, the lattice local
+CLT and Gnedenko-Kolmogorov triangular-array convergence as *fields*, with a `barrier`
+field carrying the central indistinguishability claim, would let projection theorems close
+by `exact S.barrier`. There is no such record and nothing replaces it — no barrier, no
+factorization, no chameleon-completeness
 theorem is exported by this file.
 
 Two conditions any future barrier statement must carry explicitly, recorded because
@@ -326,11 +318,9 @@ theorem inflated_intensity_ne_of_injective
 /-- The Gaussian's Mellin triple. The drift and jet variance are the constants proved in
 `Calibrator.Condensation`.
 
-The `nonlattice` datum used to be **stipulated** here, with this docstring conceding that
-`log g²` having a density is true but proved nowhere in the corpus — so every comparison
-against the record inherited an undischarged claim that read as settled. The claim is now
-stated about an actual law and carries a visible `sorry`; see
-`gaussianObservables_describes_logSqGaussianLaw` immediately below. -/
+The `nonlattice` datum is not stipulated: it is checked against the law of `log g²` by
+`gaussianObservables_describes_logSqGaussianLaw` below, which rests on the `sorry` in
+`logSqGaussian_nonlattice`. -/
 noncomputable def gaussianObservables : MellinObservables where
   drift := condensationConstant
   jetVariance := gaussianJetVariance
