@@ -257,11 +257,20 @@ theorem trueHudsonFst_eq_of_neiGst (p₁ p₂ : ℝ)
     (hpos : 0 < p₁ * (1 - p₂) + p₂ * (1 - p₁))
     (hbar : meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) ≠ 0) :
     trueHudsonFst p₁ p₂ = 2 * hudsonFst p₁ p₂ / (1 + hudsonFst p₁ p₂) := by
-  have h1 : meanAlleleFreq p₁ p₂ ≠ 0 := left_ne_zero_of_mul hbar
-  have h2 : (1 - meanAlleleFreq p₁ p₂) ≠ 0 := right_ne_zero_of_mul hbar
-  unfold trueHudsonFst hudsonFst ploidy meanAlleleFreq at *
   have hne : p₁ * (1 - p₂) + p₂ * (1 - p₁) ≠ 0 := ne_of_gt hpos
-  field_simp [hne, hbar, h1, h2] <;> ring
+  have hlink :
+      (1 + hudsonFst p₁ p₂) *
+          (2 * meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂)) =
+        p₁ * (1 - p₂) + p₂ * (1 - p₁) := by
+    unfold hudsonFst ploidy
+    field_simp [hbar]
+    ring
+  have hgst : 1 + hudsonFst p₁ p₂ ≠ 0 := by
+    intro hzero
+    rw [hzero, zero_mul] at hlink
+    exact hne hlink.symm
+  unfold trueHudsonFst hudsonFst ploidy meanAlleleFreq at *
+  field_simp [hne, hbar, hgst] <;> ring
 
 /-- **Witness that the two estimators are different functions**, not two
 spellings of one. Without an exhibited point the conflation can be
