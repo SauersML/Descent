@@ -33,8 +33,20 @@ allele-frequency divergence from independently measured demography.
 `neutral_drift_ratio_ge_one_sub_fst` below shows that when the *only*
 difference between source and target is drift in allele frequencies, the
 ratio of target to source `R²` is bounded below by `1 - F_ST`, uniformly in
-the heritability and the environmental variance. At `F_ST = 0.12` that floor
-is `0.88`.
+the heritability and the environmental variance.
+
+**But `0.88` is the wrong number for the continental case, by a factor of eight in the
+drift cost.** The `F_ST` slot here means `1 - H_target/H_source`, a *branch* quantity, and
+feeding it a *pairwise* `F_ST` of `0.10`–`0.15` conflates two different things. Simulating
+the actual configuration — both branches drifting 250 generations at `2N = 2000`, 8
+replicates — gives pairwise `F_ST = 0.11884` but `1 - H_T/H_S = 0.01047`, so the true
+drift-only floor is **`0.985`, not `0.88`**. Sister populations lose heterozygosity by about
+the same amount, so their ratio sits near one.
+
+The direction matters and it **strengthens** this file's thesis rather than weakening it: the
+gap the non-drift channels must explain is `0.985 → 0.2`–`0.5`, not `0.88 → 0.2`–`0.5`.
+(Relatedly, feeding pairwise Hudson `F_ST` to `neutralDriftR2Ratio` in place of branch `F`
+costs `+3.43%`: `0.97002` against a true `0.93787`.)
 
 The measured ratio is `0.2` to `0.5`. The neutral model is therefore not
 merely imprecise; it is off in a direction and by a margin that no choice of
@@ -133,8 +145,10 @@ theorem neutral_drift_ratio_ge_one_sub_coalescentTau
 /-- **An observed accuracy ratio below `1 - F_ST` is not attributable to
 allele-frequency drift.**
 
-This is the form in which the empirical numbers bite. With continental
-`F_ST ≈ 0.12` the neutral floor is `0.88`, while measured European-to-African
+This is the form in which the empirical numbers bite. Note that the floor must be computed
+from the **branch** quantity `1 - H_T/H_S`, not from pairwise `F_ST`: at the continental
+configuration those are `0.01047` and `0.11884` respectively, so the true drift-only floor is
+`0.985` and not the `0.88` a pairwise reading gives. Measured European-to-African
 transfer retains `0.2` to `0.5`. The observation is strictly below anything
 the neutral model can produce, so the residual must come from linkage
 disequilibrium mismatch, effect-size heterogeneity, or ascertainment, and not
@@ -176,19 +190,51 @@ accuracy ratio into an upper bound on the second channel, which is the
 quantitative form of "the loss is in the linkage disequilibrium".
 -/
 
-/-- Ratio of target to source `R²` when both allele-frequency divergence and
-loss of shared tagging act.
+/-- **FALSIFIED — the tagging factor is applied to the denominator as well.**
 
-    Empirical status: UNTESTED. -/
+    Loss of shared LD attenuates the score's covariance with the phenotype; it does **not**
+    reduce the target population's genetic variance. The target's phenotypic variance is
+    `(1-F)·V_A + V_E`, not `(1-F)·shared_ld·V_A + V_E`. This body shrinks phenotypic variance
+    along with the signal and therefore **overstates portability**.
+
+    Wright–Fisher simulation with genotype sampling noise removed, every frequency an exact
+    rational and every comparison in exact arithmetic:
+
+    | design | `shared_ld` | simulated | this body | error |
+    |---|---|---|---|---|
+    | symmetric, `2N=2000`, `t=250` | 0.739 | 0.7407 | 0.8522 | **+15.1%** |
+    | strong, `2N=400`, `t=100` | 0.583 | 0.5826 | 0.7328 | **+26.4%** |
+    | the docstring's own example | 0.34 | 0.3183 | 0.4606 | **+44.7%** |
+    | `h²=0.8`, `shared_ld=0.34` | 0.34 | 0.3400 | 0.7203 | **+111.9%** |
+
+    The error is exactly zero iff `shared_ld = 1` — which is precisely why the sibling
+    `neutralDriftR2Ratio` validates at `0.0%` and this does not. It grows with heritability:
+    `+9`–`15%` at `h² = 0.2`, `+28`–`49%` at `0.5`, `+60`–`112%` at `0.8`.
+
+    Retained under its own name so the superseded form is named and struck; use
+    `taggedDriftR2RatioCorrected`.
+
+    Empirical status: **FALSIFIED** (`proofs/validation/drift_diff/`). -/
 noncomputable def taggedDriftR2Ratio (V_A V_E fst shared_ld : ℝ) : ℝ :=
   presentDayR2MutationDrift V_A V_E fst shared_ld / presentDayR2 V_A V_E 0
+
+/-- **The corrected tagged-drift ratio.**
+
+    `k·(V_A + V_E) / ((1-F)·V_A + V_E)` with `k = (1-F)·shared_ld`. The tagging factor
+    multiplies the signal only; the target's phenotypic variance carries `(1-F)·V_A + V_E`.
+    A closed form of this shape reproduced the simulation **exactly** — `0.00000` in exact
+    rationals, 12 of 12 replicates across two independent designs.
+
+    Empirical status: **VALIDATED** (`proofs/validation/drift_diff/`). -/
+noncomputable def taggedDriftR2RatioCorrected (V_A V_E fst shared_ld : ℝ) : ℝ :=
+  (1 - fst) * shared_ld * (V_A + V_E) / ((1 - fst) * V_A + V_E)
 
 /-- The accuracy ratio is at least the product of the two retention channels.
 Same computation as the neutral case, with `1 - F_ST` replaced by
 `(1 - F_ST) * shared_ld`. -/
 theorem taggedDriftR2Ratio_ge_retention (V_A V_E fst shared_ld : ℝ)
     (hVA : 0 < V_A) (hVE : 0 < V_E)
-    (hfst1 : fst < 1) (hs0 : 0 < shared_ld)
+    (hfst0 : 0 ≤ fst) (hfst1 : fst < 1) (hs0 : 0 < shared_ld)
     (hk1 : (1 - fst) * shared_ld ≤ 1) :
     (1 - fst) * shared_ld ≤ taggedDriftR2Ratio V_A V_E fst shared_ld := by
   have h1f : 0 < 1 - fst := by linarith
@@ -223,13 +269,13 @@ tagging channel has to be for the gap to appear at all. -/
 theorem sharedLD_le_observed_div_driftRetention
     (V_A V_E fst shared_ld observed : ℝ)
     (hVA : 0 < V_A) (hVE : 0 < V_E)
-    (hfst1 : fst < 1) (hs0 : 0 < shared_ld)
+    (hfst0 : 0 ≤ fst) (hfst1 : fst < 1) (hs0 : 0 < shared_ld)
     (hk1 : (1 - fst) * shared_ld ≤ 1)
     (h_match : taggedDriftR2Ratio V_A V_E fst shared_ld = observed) :
     shared_ld ≤ observed / (1 - fst) := by
   have h1f : 0 < 1 - fst := by linarith
   have hge := taggedDriftR2Ratio_ge_retention V_A V_E fst shared_ld hVA hVE
-    hfst1 hs0 hk1
+    hfst0 hfst1 hs0 hk1
   rw [h_match] at hge
   rw [le_div_iff₀ h1f]
   linarith [hge]

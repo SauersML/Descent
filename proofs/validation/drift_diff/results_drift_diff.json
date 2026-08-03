@@ -1,0 +1,129 @@
+{
+  "run": {
+    "date": "2026-08-03",
+    "host": "MSI acn112",
+    "python": "/usr/bin/python3.12 (3.12.13), stdlib only",
+    "scripts": ["drift_sim.py", "sweep.py"],
+    "raw": ["ctrl_sym.json", "ctrl_anc.json", "tag_anc.json", "tag_sym.json",
+            "tag_strong.json", "bench_asym.json", "bench_sym.json", "regime.json",
+            "flow_m01.json", "flow_m05.json", "flow_long.json", "flow_long2.json",
+            "sweep.json"],
+    "method": "Direct Wright-Fisher forward simulation (biallelic single-locus, and 4-haplotype two-locus for the tagging channel). Genotype sampling noise removed: all population moments computed exactly from the simulated allele/haplotype counts under HWE. Every allele frequency is the exact rational c/(2N) and every deciding comparison is done in fractions.Fraction, never a float tolerance."
+  },
+
+  "positive_control": {
+    "target": "Calibrator.HumanDemography.neutralDriftR2Ratio",
+    "file_line": "proofs/Calibrator/HumanDemography.lean:66",
+    "design": "ctrl_anc: source = ancestral (t_s=0), target drifted t=250 gens at 2N=2000, L=1500 loci, 8 replicates, source h2 = 0.5",
+    "result": "err_pgs = 0.00000000 in EXACT rational arithmetic in all 8/8 replicates",
+    "note": "Reproduces (and exceeds) the prior sweep's 0.03% agreement. Harness validated.",
+    "obs_mean": 0.93787,
+    "lean_mean": 0.93787
+  },
+
+  "findings": [
+    {
+      "rank": 1,
+      "target": "Calibrator.HumanDemography.taggedDriftR2Ratio",
+      "file_line": "proofs/Calibrator/HumanDemography.lean:183",
+      "verdict": "Lean numerically WRONG",
+      "lean_computes": "R2T/R2S = [k*V_A/(k*V_A+V_E)] / [V_A/(V_A+V_E)] with k = (1-fst)*shared_ld",
+      "simulation_gives": "R2T/R2S = k*(V_A+V_E) / ((1-fst)*V_A + V_E)",
+      "mechanism": "The tagging channel is applied to the DENOMINATOR as well as the numerator. Loss of shared LD attenuates the score's covariance with the phenotype; it does NOT reduce the target population's genetic variance. The target's total phenotypic variance is (1-fst)*V_A + V_E, not (1-fst)*shared_ld*V_A + V_E. Lean therefore shrinks the phenotypic variance along with the signal and over-predicts retained R2.",
+      "direction": "Lean OVERSTATES portability. Error is 0 exactly when shared_ld = 1 (which is why the neutralDriftR2Ratio control passes at 0.0%).",
+      "evidence": [
+        {"design": "tag_sym: L=1200 causal+tag blocks, 2N=2000, both branches 250 gens, h2=0.5, 6 reps",
+         "measured_shared_ld": 0.7389, "obs": 0.74073, "lean": 0.85221, "err_pct": 15.09,
+         "correct_form_err": "0.00000 exact in 6/6 reps"},
+        {"design": "tag_strong: L=1200 blocks, 2N=400, both branches 100 gens, h2=0.5, 6 reps",
+         "measured_shared_ld": 0.5835, "obs": 0.58260, "lean": 0.73284, "err_pct": 26.38,
+         "correct_form_err": "0.00000 exact in 6/6 reps"},
+        {"design": "exact closed-form sweep at the docstring's own worked example (F_ST=0.12, shared_ld=0.34, h2=0.5)",
+         "lean": 0.4606, "correct": 0.3183, "err_pct": 44.70},
+        {"design": "sweep, worst case in grid (h2=0.8, fst=0.0, shared_ld=0.34)",
+         "lean": 0.7203, "correct": 0.3400, "err_pct": 111.86}
+      ],
+      "error_scaling": "Error grows with source h2 and with 1-shared_ld; it is +9% to +15% at h2=0.2, +28% to +49% at h2=0.5, +60% to +112% at h2=0.8.",
+      "downstream": {
+        "taggedDriftR2Ratio_ge_retention": "HumanDemography.lean:189. Stated as a BOUND, so checked per-replicate. VIOLATED in 3/6 reps in tag_sym and 3/6 in tag_strong, by <=0.6%. Violation occurs exactly when the realised drift coefficient fst is negative (target happens to retain more heterozygosity than source), which the theorem's hypotheses permit: it assumes fst < 1 but never 0 <= fst. Under the corrected model the bound holds whenever 0 <= fst. Adding that hypothesis repairs the conclusion.",
+        "sharedLD_le_observed_div_driftRetention": "HumanDemography.lean:223. Same violation rate and same cause (3/6, 3/6). Its CONCLUSION survives the correction for 0 <= fst -- the bound is loose enough -- but its proof route is through the wrong ratio."
+      },
+      "argument_order": "NOT a realised hazard. `taggedDriftR2Ratio` has no Lean call site outside HumanDemography.lean, and all six in-file uses pass (V_A V_E fst shared_ld) in declaration order. The four-real-argument swap risk is latent only."
+    },
+
+    {
+      "rank": 2,
+      "target": "Calibrator.DriftRegime.benchmarkRatio / benchmarkRatioSquared",
+      "file_line": "proofs/Calibrator/DriftRegime.lean:280, :284",
+      "verdict": "Lean NUMERICALLY CORRECT; the family's FALSIFIED marker is misattributed. The defect is in the ARGUMENT SUPPLIED, not the body -- i.e. NAME wrong on the fst slot.",
+      "lean_computes": "(1 - fstT) / (1 - fstS)",
+      "simulation_gives": "Exactly the heterozygosity ratio H_T/H_S, PROVIDED fst is read as the branch-specific drift coefficient F_i = 1 - H_i/H_ancestral, not as a between-population pairwise F_ST.",
+      "evidence": [
+        {"design": "bench_asym: 2N_A=400 (Ne=200), 2N_B=4000 (Ne=2000), t=500, L=1500, 6 reps -- the SAME design point as the first falsified row tabulated on neutralAFBenchmarkRatio",
+         "het_ratio_measured": 3.14043,
+         "branch_F_source": 0.71914, "branch_F_target": 0.11948,
+         "benchmarkRatio_at_branch_F": 3.14033,
+         "err_pct": -0.003,
+         "hudson_pairwise_fst": 0.41934,
+         "benchmarkRatio_at_hudson_fst": 1.0,
+         "note": "Hudson pairwise F_ST is a single symmetric number, so feeding it into both slots forces the ratio to 1 and destroys all the signal. That -- not the functional form -- is what produced the -37% to -74% errors recorded on neutralAFBenchmarkRatio."},
+        {"design": "bench_sym: 2N_A = 2N_B = 2000, t=500, 6 reps",
+         "het_ratio_measured": 0.99572, "benchmarkRatio_at_branch_F": 0.99572, "err_pct": 0.000}
+      ],
+      "power": "The asymmetric design DOES separate the two rivals: benchmarkRatioSquared is off by +214.0% (err_sq_branch = +2.140) on bench_asym while being indistinguishable (-0.4%) on bench_sym. This is an empirical confirmation of DriftRegime.symmetric_design_has_no_power, with a dynamic range of 3.1x across the design.",
+      "consequence": "benchmarkRatio is VACUOUS given its inputs -- H_i = H_anc*(1-F_i) is the definition of F_i rearranged, exactly like targetHetFromFst. That is the right verdict in the corpus's vocabulary, not FALSIFIED. The empirical content lives entirely in whatever supplies fst. It also means the replacement candidate hetRatioBetweenBranches is not required to fix the form; only the fst slot's semantics need fixing.",
+      "marker_defect": "Neither benchmarkRatio (:280) nor benchmarkRatioSquared (:284) carries any `Empirical status:` line, while their identical-bodied twin neutralAFBenchmarkRatio (PortabilityDrift.lean:2856) carries FALSIFIED. Adjacent siblings in the same file (diagonalDesign, :291) do carry status lines. A body bearing a FALSIFIED verdict has been duplicated into another file with no verdict attached."
+    },
+
+    {
+      "rank": 3,
+      "target": "Calibrator.HumanDemography, the file-level F_ST numbers",
+      "file_line": "proofs/Calibrator/HumanDemography.lean:20 (module docstring), :36, :116, :137",
+      "verdict": "DOCSTRING overclaims -- the stated floor 0.88 is not what the model predicts at the cited inputs. Conclusion unaffected (strengthened).",
+      "detail": "The module docstring supplies 'Pairwise F_ST between continental groups ... roughly 0.10 to 0.15' to neutralDriftR2Ratio, whose fst slot means 1 - H_target/H_source. Those are different quantities.",
+      "evidence": [
+        {"design": "ctrl_sym: BOTH branches drift 250 gens at 2N=2000 (two sister populations, the actual continental case), L=1500, 8 reps",
+         "hudson_pairwise_fst": 0.11884,
+         "measured_1_minus_H_T_over_H_S": 0.01047,
+         "true_R2_ratio": 0.98464,
+         "docstring_floor_1_minus_Fst": 0.88,
+         "note": "Two sister populations lose heterozygosity by ABOUT THE SAME amount, so 1 - H_T/H_S is near zero even at pairwise F_ST = 0.12. The drift-only R2 ratio is 0.985, not 0.88 -- an 8x overstatement of the drift cost."},
+        {"design": "ctrl_anc: source = ancestral, target drifted, 8 reps",
+         "branch_F": 0.11694, "hudson_pairwise_fst": 0.05822,
+         "lean_at_branch_F": 0.93787, "lean_at_hudson_fst": 0.97002,
+         "err_from_using_hudson_pct": 3.43}
+      ],
+      "direction": "The file OVERSTATES how much accuracy neutral drift can cost. Since the file's thesis is 'drift is nearly irrelevant to portability', the corrected number makes that thesis stronger: the gap the non-drift channels must explain is 0.985 -> 0.2..0.5, not 0.88 -> 0.2..0.5."
+    },
+
+    {
+      "rank": 4,
+      "target": "Calibrator.DriftRegime.closedPopulation and the FALSIFIED scope",
+      "file_line": "proofs/Calibrator/DriftRegime.lean:103",
+      "verdict": "Marker scope is CORRECT. The definition is exactly right inside its stated regime.",
+      "evidence": [
+        {"design": "regime, mu=0, Ne=1000, t=4000, L=400, 5 reps",
+         "measured_retention": 0.13218, "se": 0.00902,
+         "closedPopulation_prediction": 0.13527,
+         "agreement": "0.34 standard errors; 2.3% relative"},
+        {"design": "regime, symmetric two-way mutation mu=2.5e-4 (theta=1), same Ne and t",
+         "measured_retention": 0.98854, "se": 0.01001,
+         "closedPopulation_prediction": 0.13527,
+         "note": "Stationary, consistent with the corpus's reported 1.025 +/- 0.020. Confirms FALSIFIED-at-equilibrium is the right scope."},
+        {"design": "regime, mu=1e-3 (theta=4)", "measured_retention": 1.33401, "se": 0.02145}
+      ],
+      "unflagged_siblings_checked": "wrightFisherDriftRetention (PortabilityDrift.lean:~708) carries the same (1-1/(2Ne))^t body and is marked UNTESTED with an explicit Regime line plus a 'do not read as F_ST' warning -- adequately scoped. hetTrajectory_of_no_mutation states the mu=0 specialisation. No unflagged sibling with the same defect found in the heterozygosity family. The one marker gap found in this family is on DriftRegime.benchmarkRatio/Squared, reported under rank 2.",
+      "caveat": "My mutation model is biallelic two-way mutation on the gamete pool. The corpus's hetStepWithMutation / hetMutationFloor is the infinite-alleles IBD recurrence with fixed point theta/(1+theta). These are different processes, so hetMutationFloor's VALUE was NOT tested here -- only the qualitative stationarity that distinguishes the two regimes."
+    }
+  ],
+
+  "not_reached": {
+    "AncestrySpecificArchitecture.geneFlowFstStep": {
+      "file_line": "proofs/Calibrator/AncestrySpecificArchitecture.lean:351",
+      "status": "NOT DECIDED. Reported honestly as underpowered.",
+      "structural_note": "geneFlowFstStep m Ne F is rfl-equal to ibdFlowStep Ne m F (theorem at :355), so it carries zero independent content; its UNTESTED marker sits on a definitional alias and the empirical content is in ibdFlowStep / fstMigrationDriftEquilibrium. Its argument order (m Ne F) is REVERSED relative to ibdFlowStep (Ne rate F) -- documented in the docstring as 'the architecture file's argument order', and the rfl theorem pins it, so a swap would not typecheck silently here.",
+      "simulation": "Two-deme island model, no mutation. Measured F_ST plateaus at 0.21-0.22 (2N=200, m=0.01 and 2N=400, m=0.005, 8 reps each, L=800) against 1/(1+4*Ne*m) = 0.20. But: (a) my migration convention (each deme draws fraction m from the global mean) makes the effective pairwise rate m/2, so the intended comparand is ambiguous between 0.20, 0.333 and 0.111; (b) without mutation there is no true stationary F_ST -- the simulated trajectory erodes to 0 as loci fix (flow_long traj ends 0.0512, 0.0277, 0.0059, 0.0). The plateau reading is therefore a transient, not an equilibrium. This run does not separate the linearised fixed point from its rivals and should not be cited as validation or falsification."
+    },
+    "other": "The DriftRegime heterozygosity laws were tested only for the drift/no-drift regime distinction, not for hetMutationFloor's numerical value (wrong mutation model, see rank 4 caveat)."
+  }
+}

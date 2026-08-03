@@ -276,11 +276,41 @@ prediction spanned. On a symmetric design the benchmark ratio is identically one
 is every power of it.
 -/
 
-/-- The neutral allele-frequency benchmark ratio, in the form under test. -/
+/-- The neutral allele-frequency benchmark ratio, in the form under test.
+
+    **The functional form is CORRECT, and the family-guilt reading of it was wrong.** Its
+    identical-bodied twin `PortabilityDrift.neutralAFBenchmarkRatio` carries a FALSIFIED
+    marker, which invites the inference that this body inherits the defect. It does not.
+    Measured at the same design point that falsified the twin (`2N_A = 400`, `2N_B = 4000`,
+    `t = 500`, `L = 1500`, 6 replicates), with the branch drift coefficient
+    `F_i = 1 - H_i/H_ancestral`:
+
+    * measured heterozygosity ratio `H_B/H_A = 3.14043`;
+    * `(1 - fstT)/(1 - fstS)` at branch drift `= 3.14033`, an error of `-0.003%`;
+    * on a symmetric design, `0.000%`.
+
+    What was falsified upstream was a **different quantity substituted into the `fst` slot**:
+    Hudson pairwise `F_ST` is one symmetric number (`0.41934` here), so feeding it to both
+    slots forces the ratio to one and destroys all signal. That, not the functional form,
+    produced the reported `-37%` to `-74%`.
+
+    So the honest verdict is **VACUOUS given its inputs** — `H_i = H_anc(1 - F_i)` is the
+    definition of `F_i` rearranged — rather than falsified. Only the `fst` slot's semantics
+    need fixing; the form does not.
+
+    Empirical status: **VALIDATED as a functional form** (`-0.003%`), VACUOUS as a
+    prediction. See `proofs/validation/drift_diff/`. -/
 noncomputable def benchmarkRatio (fstS fstT : ℝ) : ℝ := (1 - fstT) / (1 - fstS)
 
 /-- A deliberately wrong rival: the same ratio squared. Any design that cannot separate
-these two has no power to check the functional form. -/
+these two has no power to check the functional form.
+
+    The separation is measured: this rival is `+214.0%` off on the asymmetric design and
+    `-0.4%` — indistinguishable — on the symmetric one. That is
+    `symmetric_design_has_no_power` observed, with a `3.1×` dynamic range.
+
+    Empirical status: **VALIDATED as a discriminating rival**
+    (`proofs/validation/drift_diff/`). -/
 noncomputable def benchmarkRatioSquared (fstS fstT : ℝ) : ℝ := ((1 - fstT) / (1 - fstS)) ^ 2
 
 /-- What a **symmetric** design observes: the two branch lengths are equal, so only the
