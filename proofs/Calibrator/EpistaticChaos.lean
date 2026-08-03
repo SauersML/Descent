@@ -66,10 +66,6 @@ standardized coordinate `x = (dosage - 2q) / sqrt (2 q (1 - q))`, since
 rescaling by a constant cannot create or destroy a value-negating relabelling
 (`SymmetricCoding.scale`).
 
-So the licensing statement, which should be read into every symmetry-carrying
-theorem below. The stronger `ChaosSpectroscopy` completeness result formerly in
-`Calibrator.JetBarrier` has been removed. The surviving licensing statement is:
-
 > the genotype instantiation of any sign-symmetry result is licensed only at
 > `q = 1/2`.
 
@@ -199,9 +195,9 @@ structure SymmetricCoding (V : Type*) [Fintype V] where
   /-- Relabelling negates values. -/
   value_flip : ∀ v, value (flip v) = -value v
 
-/-- **The class is inhabited.**  Without a term of this type every theorem quantified
-over it is a true statement about an empty class: kernel-checked, clean axiom report,
-and no content.  See `scripts/check-laundering.py` family F4. -/
+/-- **The class is inhabited.**  A theorem quantified over an uninhabited structure is
+true and empty: kernel-checked, clean axiom report, no content.  This is the witness that
+makes the theorems below statements about something. -/
 noncomputable def SymmetricCoding.witness (V : Type*) [Fintype V] : SymmetricCoding V where
   weight := fun _ ↦ 0
   value := fun _ ↦ 0
@@ -1468,9 +1464,9 @@ section Definitions
 variable (design : GenotypeDesign n ι)
 
 /-- The interaction order of a tested set: the number of loci in it.
+and nothing fitted.
 
-Empirical status: UNTESTED. A cardinality read off the design; no free parameter
-and nothing fitted. -/
+Empirical status: UNTESTED. A cardinality read off the design; no free parameter -/
 def interactionOrder (s : ι) : ℕ := (design.locusSet s).card
 
 /-- The test statistic: `∑_s c_s ∏_{i ∈ S_s} x_i` in the standardized genotypes
@@ -1497,9 +1493,9 @@ Note for automated checking: this is a *predicate* on a design, not a stipulated
 equilibrium quantity. There is no one-step map here and nothing for a
 `_isFixedPoint` theorem to be about; the recombination dynamics that have a fixed
 point live in `Calibrator.LDDecayTheory`.
+directly as pairwise LD between panel loci.
 
-Empirical status: UNTESTED. A factorization condition on the joint law; testable
-directly as pairwise LD between panel loci. -/
+Empirical status: UNTESTED. A factorization condition on the joint law; testable -/
 def InLinkageEquilibrium : Prop :=
   ∀ x : Fin n → DiploidGenotype,
     design.jointGenotypeProb x = ∏ i, (design.model i).genotypeProb (x i)
@@ -1546,27 +1542,27 @@ than in prose. Gene-based burden tests over non-overlapping genes have it
 (`geneBurdenDesign_variantDisjoint`); sliding windows never do
 (`slidingWindowDesign_not_variantDisjoint`); a pathway panel has it only if no
 gene belongs to two pathways.
+inspection and requiring no measurement.
 
-Empirical status: UNTESTED. A structural property of a study design, checkable by
-inspection and requiring no measurement. -/
+Empirical status: UNTESTED. A structural property of a study design, checkable by -/
 def VariantDisjoint : Prop :=
   ∀ s t : ι, s ≠ t → Disjoint (design.locusSet s) (design.locusSet t)
 
 /-- **The variant-recurrence profile**: how many tested sets a variant enters.
 This is the statistic permutation and resampling schemes preserve, and
 `Calibrator.CondensationUnification` shows it does not fix the null.
+nothing fitted.
 
-Empirical status: UNTESTED. A count read off the design; no free parameter and
-nothing fitted. -/
+Empirical status: UNTESTED. A count read off the design; no free parameter and -/
 def variantRecurrence (i : Fin n) : ℕ :=
   (Finset.univ.filter (fun s ↦ i ∈ design.locusSet s)).card
 
 /-- **The influence of a variant**: the share of the statistic's energy carried
 by locus `i`, namely the total squared coefficient of the tested sets containing
 it. Admissibility asks that this vanish uniformly in `i`.
+no free parameter and nothing fitted.
 
-Empirical status: UNTESTED. An energy share read off the design's coefficients;
-no free parameter and nothing fitted. -/
+Empirical status: UNTESTED. An energy share read off the design's coefficients; -/
 def locusInfluence (i : Fin n) : ℝ :=
   ∑ s ∈ Finset.univ.filter (fun s ↦ i ∈ design.locusSet s), design.coefficient s ^ 2
 
@@ -1608,10 +1604,12 @@ def IsTwoPoolInteraction (poolOne poolTwo : Finset (Fin n)) : Prop :=
     theorem assuming it was about a class with no known member.
 
     Two loci over a single tested set is the minimal instance and the fourth and
-    fifth clauses become the same statement, which is exactly why it is minimal:
+    fifth clauses become the same statement, which is why it is minimal:
     with one pair there is only one cross-pair to hit. Larger designs exist and
     are not harder in principle; they need `ι` to enumerate the product, which is
-    bookkeeping rather than content. -/
+    bookkeeping rather than content.
+
+    Empirical status: UNTESTED. -/
 def twoPoolDesign (model : Fin 2 → HardyWeinbergModel) : GenotypeDesign 2 Unit where
   model := model
   locusSet := fun _ ↦ {0, 1}
@@ -1755,9 +1753,9 @@ end GenotypeDesign
 /-- **A gene-based burden or kernel design**: each panel variant is assigned to
 one gene by `geneOf`, and the tested set of a gene is the variants assigned to
 it.
+formal shape of a gene-based burden or kernel scan over non-overlapping genes.
 
-Empirical status: UNTESTED. A study design, not a claim about data; it is the
-formal shape of a gene-based burden or kernel scan over non-overlapping genes. -/
+Empirical status: UNTESTED. A study design, not a claim about data; it is the -/
 def geneBurdenDesign {γ : Type*} [DecidableEq γ] (model : Fin n → HardyWeinbergModel)
     (geneOf : Fin n → γ) (coeff : γ → ℝ)
     (jointGenotypeProb : (Fin n → DiploidGenotype) → ℝ) : GenotypeDesign n γ where
@@ -1782,9 +1780,9 @@ theorem geneBurdenDesign_variantDisjoint {γ : Type*} [DecidableEq γ]
 
 /-- **A sliding-window design**: the tested set at start `k` is the block of
 `width` consecutive panel positions beginning at `k`.
+formal shape of a sliding-window interaction or kernel scan.
 
-Empirical status: UNTESTED. A study design, not a claim about data; it is the
-formal shape of a sliding-window interaction or kernel scan. -/
+Empirical status: UNTESTED. A study design, not a claim about data; it is the -/
 def slidingWindowDesign (model : Fin n → HardyWeinbergModel) (width : ℕ)
     (coeff : Fin n → ℝ) (jointGenotypeProb : (Fin n → DiploidGenotype) → ℝ) :
     GenotypeDesign n (Fin n) where
@@ -1936,11 +1934,6 @@ theorem fourthCumulantFromMoments_gaussian (s2 : ℝ) :
 the standard-law values a central limit theorem would supply, assumed here rather than
 proved — the products `1 * 1` and `3 * 3` have fourth cumulant `6`.
 
-The name used to be `twoPool_interaction_fourthCumulant`, which asserted a two-pool
-epistatic interaction for a statement containing no pool and no interaction. The prose
-below always said so; the name did not, and a name is what gets cited. It now describes
-the arithmetic it performs.
-
 What the statement does *not* contain: any pool, any genotype, any allele
 frequency, any independence hypothesis, and any limit. Writing the product law's
 moments as `m₂ * m₂` and `m₄ * m₄` is the independence assumption, applied in the
@@ -2007,16 +2000,16 @@ overlap spectra discharges it equally.
 
 /-- Eigenvalue of the circulant with offsets `(0,1,2,0,0,0,2,1)` as a polynomial
 in `c = cos θ`, from `λ = 2 cos θ + 4 cos 2θ`.
+content and no free parameter.
 
-Empirical status: UNTESTED. Algebra on one fixed integer matrix; no modelling
-content and no free parameter. -/
+Empirical status: UNTESTED. Algebra on one fixed integer matrix; no modelling -/
 def circulantSpectrumA (c : ℝ) : ℝ := 8 * c ^ 2 + 2 * c - 4
 
 /-- Eigenvalue of the circulant with offsets `(0,2,1,0,0,0,1,2)` as a polynomial
 in `c = cos θ`, from `λ = 4 cos θ + 2 cos 2θ`.
+integer matrix, no free parameter.
 
-Empirical status: UNTESTED. As for `circulantSpectrumA`: algebra on one fixed
-integer matrix, no free parameter. -/
+Empirical status: UNTESTED. As for `circulantSpectrumA`: algebra on one fixed -/
 def circulantSpectrumB (c : ℝ) : ℝ := 4 * c ^ 2 + 4 * c - 2
 
 /-- The reduction to a quadratic in `cos θ` for the first circulant. -/
@@ -2110,9 +2103,9 @@ namespace GenotypeDesign
 tested by both set `s` and set `t`; the diagonal is the interaction order. This
 is the object whose spectrum the limit law is a function of, and whose row sums
 are the recurrence profile.
+and nothing fitted.
 
-Empirical status: UNTESTED. A count matrix read off the design; no free parameter
-and nothing fitted. -/
+Empirical status: UNTESTED. A count matrix read off the design; no free parameter -/
 def overlapMatrix (design : GenotypeDesign nx ιx) : Matrix ιx ιx ℝ :=
   fun s t ↦ ((design.locusSet s ∩ design.locusSet t).card : ℝ)
 
@@ -2129,9 +2122,9 @@ Frobenius norm and for `p = 4` the fourth spectral moment.
 
 These are the invariants the limit law is a function of, in contrast to the star
 densities of `variantRecurrence`.
+free parameter and nothing fitted.
 
-Empirical status: UNTESTED. A trace of a power of the overlap count matrix; no
-free parameter and nothing fitted. -/
+Empirical status: UNTESTED. A trace of a power of the overlap count matrix; no -/
 def cycleDensity (design : GenotypeDesign nx ιx) (p : ℕ) : ℝ :=
   Matrix.trace (design.overlapMatrix ^ p)
 
@@ -2176,9 +2169,9 @@ def Tempered (design : GenotypeDesign nx ιx) (rate : ℝ) : Prop :=
 /-- **Bounded hub energy**, in its operational form: no variant is tested more
 than `bound` times. This is what fails for a lead variant in a dense sliding
 scan, or for a pleiotropic variant across a phenotype panel.
+checkable by inspection.
 
-Empirical status: UNTESTED. A bound on the design's own recurrence profile;
-checkable by inspection. -/
+Empirical status: UNTESTED. A bound on the design's own recurrence profile; -/
 def BoundedHubRecurrence (design : GenotypeDesign nx ιx) (bound : ℕ) : Prop :=
   ∀ i : Fin nx, design.variantRecurrence i ≤ bound
 
@@ -2295,18 +2288,18 @@ theorem circulantSpectrumB_at_neg_root (s : ℝ) (hs : s ^ 2 = 2) :
 
 /-- Power sum of the first circulant's eigenvalues, with their multiplicities:
 the `p`-th cycle density of that overlap structure.
+matrix; no modelling content and no free parameter.
 
-Empirical status: UNTESTED. A power sum of the eigenvalues of one fixed integer
-matrix; no modelling content and no free parameter. -/
+Empirical status: UNTESTED. A power sum of the eigenvalues of one fixed integer -/
 def palindromicCycleDensityA (s : ℝ) (p : ℕ) : ℝ :=
   circulantSpectrumA 1 ^ p + 2 * circulantSpectrumA (s / 2) ^ p +
     2 * circulantSpectrumA 0 ^ p + 2 * circulantSpectrumA (-(s / 2)) ^ p +
     circulantSpectrumA (-1) ^ p
 
 /-- Power sum of the second circulant's eigenvalues, with their multiplicities.
+one fixed integer matrix, no free parameter.
 
-Empirical status: UNTESTED. As for `palindromicCycleDensityA`: a power sum for
-one fixed integer matrix, no free parameter. -/
+Empirical status: UNTESTED. As for `palindromicCycleDensityA`: a power sum for -/
 def palindromicCycleDensityB (s : ℝ) (p : ℕ) : ℝ :=
   circulantSpectrumB 1 ^ p + 2 * circulantSpectrumB (s / 2) ^ p +
     2 * circulantSpectrumB 0 ^ p + 2 * circulantSpectrumB (-(s / 2)) ^ p +

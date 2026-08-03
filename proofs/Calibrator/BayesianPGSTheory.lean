@@ -69,6 +69,15 @@ structure BayesianLinearModel where
   prior_var_pos : 0 < prior_var
   data_precision_pos : 0 < data_precision
 
+/-- **The class is inhabited.**  A theorem quantified over an uninhabited structure is
+true and empty: kernel-checked, clean axiom report, no content.  This is the witness that
+makes the theorems below statements about something. -/
+noncomputable def BayesianLinearModel.witness : BayesianLinearModel where
+  prior_var := 1
+  data_precision := 1
+  prior_var_pos := by norm_num
+  data_precision_pos := by norm_num
+
 namespace BayesianLinearModel
 
 /-- Posterior precision = prior precision + data precision = 1/h + n. -/
@@ -722,25 +731,6 @@ theorem diminishing_returns_from_majority
     rg ^ 2 * Δn < Δn := by
   have h_sq_lt : rg ^ 2 < 1 := by nlinarith [sq_abs rg, sq_nonneg rg]
   nlinarith
-
-/-
-`optimal_allocation_oversamples_minority` was deleted here rather than renamed.
-
-It was documented as "For a fixed total budget N, the optimal allocation maximizes the
-minimum R² across populations. This generally requires oversampling underrepresented
-populations." No allocation was optimised, no budget constraint was used, and no R²
-appeared. The statement assumed `proportion < h_optimal_minority_share` and
-`proportion = n_minority / n_total`, and concluded
-`n_minority / n_total < h_optimal_minority_share` — the first hypothesis with the second
-substituted into it, closed by `linarith`. `h_total`, `h_pos` and `h_minority_share` were
-never used, and `h_optimal_minority_share` was not a hypothesis at all but a free real
-variable wearing an `h_` prefix, which is what made the conclusion read as a derived
-optimum rather than as the assumption it was.
-
-Per the corpus proof policy, a conclusion that repackages a premise by substitution is
-deleted, not retained under a better name: there is no weaker true statement here worth
-keeping.
--/
 
 end MultiAncestryBayesian
 

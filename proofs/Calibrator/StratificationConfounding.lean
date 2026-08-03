@@ -72,6 +72,16 @@ structure StratificationModel (p : ℕ) where
   /-- At least one bias is nonzero -/
   bias_nonzero : ∃ i, b i ≠ 0
 
+/-- **The class is inhabited.**  A theorem quantified over an uninhabited structure is
+true and empty: kernel-checked, clean axiom report, no content.  This is the witness that
+makes the theorems below statements about something. -/
+noncomputable def StratificationModel.witness (p : ℕ) : StratificationModel (p + 1) where
+  β := fun _ => 0
+  b := fun _ => 1
+  H := fun _ => 1
+  H_pos := fun _ => by norm_num
+  bias_nonzero := ⟨0, by norm_num⟩
+
 /-- True PGS variance component: Σ β_i² · H_i -/
 noncomputable def StratificationModel.varTrue {p : ℕ} (m : StratificationModel p) : ℝ :=
   ∑ i : Fin p, m.β i ^ 2 * m.H i
@@ -109,6 +119,15 @@ structure TwoPopBiasModel (p : ℕ) extends StratificationModel p where
   /-- Attenuation is in (0, 1): some but not all bias transfers -/
   atten_pos : 0 < attenuation
   atten_lt_one : attenuation < 1
+
+/-- **The class is inhabited.**  A theorem quantified over an uninhabited structure is
+true and empty: kernel-checked, clean axiom report, no content.  This is the witness that
+makes the theorems below statements about something. -/
+noncomputable def TwoPopBiasModel.witness (p : ℕ) : TwoPopBiasModel (p + 1) where
+  toStratificationModel := StratificationModel.witness p
+  attenuation := 1 / 2
+  atten_pos := by norm_num
+  atten_lt_one := by norm_num
 
 /-- Target population bias variance -/
 noncomputable def TwoPopBiasModel.varBiasTarget {p : ℕ} (m : TwoPopBiasModel p) : ℝ :=
@@ -214,13 +233,6 @@ theorem ColliderModel.inducedCov_neg (m : ColliderModel) :
   rw [neg_neg_iff_pos]
   exact div_pos (mul_pos m.σ2_G_pos m.σ2_E_pos) (by linarith [m.σ2_G_pos, m.σ2_E_pos])
 
-/-! `selection_induces_correlation` was removed here.  It was `ne_of_lt inducedCov_neg` —
-strictly weaker than the theorem one line above it, restated under a name asserting that
-selection induces the correlation.  No selection event, no conditioning and no population
-covariance appear in this section: `inducedCov` is a closed-form *definition*, and
-`inducedCov_neg` says only that a negative-of-a-positive-ratio is negative.  The
-"explaining away" derivation that would connect the two is not in this corpus. -/
-
 /-- **Collider bias attenuates PGS-outcome association.**
     In the full population, regression coefficient is β_G.
     In the selected sample, the induced G-E covariance attenuates:
@@ -251,12 +263,12 @@ ascertainment specifically, not ascertainment as such. The sign matters and is t
 statement, which is why this is an `iff`: severity in the *source* biases the apparent drop
 downward, hiding portability loss rather than manufacturing it.
 
-**This replaces `differential_ascertainment_artifact`, which asserted nothing.** That
-theorem read `(h : d_target < d_source) → (apparent > true) → False`, and by the identity
+**The iff is the content; the one-directional form asserts nothing.** A statement
+`(h : d_target < d_source) → (apparent > true) → False` is vacuous here: by the identity
 `apparent - true = d_target - d_source` its second hypothesis is precisely the negation of
-its first: it proved `h → ¬¬h`, closed by `linarith`, for every choice of the four reals.
-Its docstring meanwhile claimed the *opposite* conclusion — "apparent portability drop is
-larger than true portability drop" — which is the branch that statement refutes. -/
+its first, so it proves `h → ¬¬h` for every choice of the four reals, and the conclusion
+"apparent portability drop is larger than true portability drop" is the branch it
+refutes. -/
 theorem apparent_portability_drop_gt_true_iff_target_more_ascertained
     (r2_source_pop r2_target_pop r2_source_asc r2_target_asc : ℝ) :
     r2_source_asc - r2_target_asc > r2_source_pop - r2_target_pop ↔
@@ -292,6 +304,18 @@ structure RGEModel where
   β_env_ne : β_env ≠ 0
   rge_diff : rge Pop.source ≠ rge Pop.target
 
+/-- **The class is inhabited.**  A theorem quantified over an uninhabited structure is
+true and empty: kernel-checked, clean axiom report, no content.  This is the witness that
+makes the theorems below statements about something. -/
+noncomputable def RGEModel.witness : RGEModel where
+  β_direct := 1
+  β_genetic := 1
+  β_env := 1
+  rge := Pop.pair 0 1
+  β_genetic_ne := by norm_num
+  β_env_ne := by norm_num
+  rge_diff := by norm_num [Pop.pair]
+
 /-- **Total prediction in a population.** -/
 noncomputable def RGEModel.pred (m : RGEModel) (P : Pop) : ℝ :=
   m.β_direct + m.β_genetic * m.rge P * m.β_env
@@ -325,6 +349,17 @@ structure RGEInflationModel where
   r2_direct_pos : 0 < r2_direct
   β_indirect_ne : β_indirect ≠ 0
   σ2_pos : 0 < σ2
+
+/-- **The class is inhabited.**  A theorem quantified over an uninhabited structure is
+true and empty: kernel-checked, clean axiom report, no content.  This is the witness that
+makes the theorems below statements about something. -/
+noncomputable def RGEInflationModel.witness : RGEInflationModel where
+  r2_direct := 1
+  β_indirect := 1
+  σ2 := 1
+  r2_direct_pos := by norm_num
+  β_indirect_ne := by norm_num
+  σ2_pos := by norm_num
 
 /-- Observed R² under rGE -/
 noncomputable def RGEInflationModel.r2_obs (m : RGEInflationModel) : ℝ :=
@@ -367,6 +402,17 @@ structure SurvivorshipModel where
   s_pos : 0 < s
   s_lt_one : s < 1
 
+/-- **The class is inhabited.**  A theorem quantified over an uninhabited structure is
+true and empty: kernel-checked, clean axiom report, no content.  This is the witness that
+makes the theorems below statements about something. -/
+noncomputable def SurvivorshipModel.witness : SurvivorshipModel where
+  p₀ := 1 / 2
+  s := 1 / 2
+  p₀_pos := by norm_num
+  p₀_lt_one := by norm_num
+  s_pos := by norm_num
+  s_lt_one := by norm_num
+
 /-- Frequency of risk allele among survivors -/
 noncomputable def SurvivorshipModel.pSurv (m : SurvivorshipModel) : ℝ :=
   m.p₀ * m.s / (m.p₀ * m.s + (1 - m.p₀))
@@ -407,6 +453,18 @@ structure SurvivorshipAttenuationModel where
   var_surv_pos : 0 < var_surv
   /-- Survivorship truncation reduces variance -/
   var_reduced : var_surv < var_birth
+
+/-- **The class is inhabited.**  A theorem quantified over an uninhabited structure is
+true and empty: kernel-checked, clean axiom report, no content.  This is the witness that
+makes the theorems below statements about something. -/
+noncomputable def SurvivorshipAttenuationModel.witness : SurvivorshipAttenuationModel where
+  r2_full := 1
+  var_birth := 2
+  var_surv := 1
+  r2_full_pos := by norm_num
+  var_birth_pos := by norm_num
+  var_surv_pos := by norm_num
+  var_reduced := by norm_num
 
 /-- R² among survivors -/
 noncomputable def SurvivorshipAttenuationModel.r2_surv (m : SurvivorshipAttenuationModel) : ℝ :=
@@ -481,6 +539,20 @@ structure AttenuationModel where
   /-- Target has lower signal -/
   r2_drop : r2_target < r2_source
 
+/-- **The class is inhabited.**  A theorem quantified over an uninhabited structure is
+true and empty: kernel-checked, clean axiom report, no content.  This is the witness that
+makes the theorems below statements about something. -/
+noncomputable def AttenuationModel.witness : AttenuationModel where
+  β_true := 1
+  r2_source := 2
+  r2_target := 1
+  σ2_noise := 1
+  β_true_pos := by norm_num
+  r2_source_pos := by norm_num
+  r2_target_pos := by norm_num
+  σ2_noise_pos := by norm_num
+  r2_drop := by norm_num
+
 /-- Reliability ratio in a population
 
     Empirical status: UNTESTED. -/
@@ -523,6 +595,16 @@ structure TransportabilityModel (n : ℕ) where
   /-- At least one assumption violated (positive penalty) -/
   violated : ∃ i, 0 < δ i
   r2_source_pos : 0 < r2_source
+
+/-- **The class is inhabited.**  A theorem quantified over an uninhabited structure is
+true and empty: kernel-checked, clean axiom report, no content.  This is the witness that
+makes the theorems below statements about something. -/
+noncomputable def TransportabilityModel.witness (n : ℕ) : TransportabilityModel (n + 1) where
+  r2_source := 1
+  δ := fun _ => 1
+  δ_nonneg := fun _ => by norm_num
+  violated := ⟨0, by norm_num⟩
+  r2_source_pos := by norm_num
 
 /-- Target R² under the transportability model -/
 noncomputable def TransportabilityModel.r2_target {n : ℕ}
@@ -577,20 +659,29 @@ structure MRInstrumentModel where
   p_target_pos : 0 < p_target
   p_target_lt : p_target < 1
 
-/-! Heterozygosity `2p(1-p)` as a function of allele frequency was defined here
-as `heterozygosity`. It is `hweHeterozygosity` from
-`Calibrator.AncestrySpecificPower`, and the definition here has been deleted in
-favour of that one; the empirical status and the `Denotes` declaration
-travelled with it.
-
-The `F`-statistic below is the one place in this file where the distinction
-matters: what enters the noncentrality is the genotype *variance*, which
-`hweHeterozygosity_eq_genotypeVarianceHWE` says is this same number. -/
+/-- **The class is inhabited.**  A theorem quantified over an uninhabited structure is
+true and empty: kernel-checked, clean axiom report, no content.  This is the witness that
+makes the theorems below statements about something. -/
+noncomputable def MRInstrumentModel.witness : MRInstrumentModel where
+  n := 1
+  β_inst := 1
+  p_source := 1 / 2
+  p_target := 1 / 2
+  σ2_Y := 1
+  n_pos := by norm_num
+  β_inst_ne := by norm_num
+  σ2_Y_pos := by norm_num
+  p_source_pos := by norm_num
+  p_source_lt := by norm_num
+  p_target_pos := by norm_num
+  p_target_lt := by norm_num
 
 /-- F-statistic of an instrument at a given allele frequency.
-    next to the deleted `heterozygosity`, whose marker it was reading.
 
-    Empirical status: UNTESTED. It carried no marker of its own while it sat -/
+    What enters the noncentrality is the genotype *variance*, which
+    `hweHeterozygosity_eq_genotypeVarianceHWE` identifies with `hweHeterozygosity p`.
+
+    Empirical status: UNTESTED. -/
 noncomputable def MRInstrumentModel.fStat (m : MRInstrumentModel) (p : ℝ) : ℝ :=
   m.n * m.β_inst ^ 2 * hweHeterozygosity p / m.σ2_Y
 

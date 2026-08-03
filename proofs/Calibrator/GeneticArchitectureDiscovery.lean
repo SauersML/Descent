@@ -47,17 +47,6 @@ LD structure and allele frequency spectrum.
 
 section GWASDiscovery
 
-/-! Genotype variance of an additive tag SNP under Hardy-Weinberg equilibrium
-was defined here as `tagGenotypeVariance`. It is `genotypeVarianceHWE` from
-`Calibrator.AncestrySpecificPower`, and the definition here has been deleted in
-favour of that one; the empirical status and the `Denotes` declaration
-travelled with it.
-
-Convention: the argument is whatever frequency the caller supplies; this is the
-genotype variance `2p(1-p)` at that frequency. The old name said tag for
-historical reasons, but `discoveryNCP` correctly passes the *causal*
-frequency. -/
-
 /-- Noncentrality parameter for a GWAS tag SNP.
 
     The `ld` term captures attenuation of the causal effect by population-specific
@@ -336,7 +325,9 @@ noncomputable def expectedLinearEffectEstimate
   β_true + meanEstimationError
 
 /-- One-locus OLS effect-estimation variance under genotype variance `varX` and
-sample size `n`. -/
+sample size `n`.
+
+    Empirical status: UNTESTED. -/
 noncomputable def olsEffectEstimationVariance
     (σ2 varX n : ℝ) : ℝ :=
   σ2 / (n * varX)
@@ -710,11 +701,6 @@ population-specific. This has implications for portability.
 -/
 
 section WGSAndRareVariants
-
-/-! The portability ratio for a mechanistic transported-score model was
-restated here as `sourceTargetPortabilityRatio`. It is
-`mechanisticPortabilityRatio` from `Calibrator.SimulationValidation`, and the
-restatement has been deleted in favour of that one. -/
 
 /-- Common-variant-only witness: one shared common causal locus is directly
 scored in both populations, and there is no proxy tagging or target-only

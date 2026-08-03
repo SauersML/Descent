@@ -32,13 +32,10 @@ true and quantitative (Berry-Esseen). The condensation geometry PROPOSES that it
 becomes false for aggregates of diverging multiplicative degree, i.e. for epistatic
 scores, and locates the degree at which it fails.
 
-**THAT PROPOSAL IS NOT PROVED IN THIS FILE, and this paragraph used to say it was.**
-It read: "The theorems in this file and its companions say that it becomes false ...
-and they locate the exact degree at which it fails." That contradicted the file's own
-opening line and its own attribution block, both of which correctly say that what is
-formalized here is the closed constant/window algebra.
+**THAT PROPOSAL IS NOT PROVED IN THIS FILE.** What is formalized here is the closed
+constant/window algebra, as the opening line and the attribution block below both say.
 
-What the fifteen theorems below actually establish, exhaustively:
+What the fifteen theorems below establish, exhaustively:
 * numeric bounds and positivity for `condensationConstant = 2 - gamma - log 2` and
   for `gaussianJetVariance = pi ^ 2 / 2 - 4`, from mathlib's Euler-Mascheroni and
   `log 2` brackets -- real results, and the reason this file exists;
@@ -51,8 +48,8 @@ What the fifteen theorems below actually establish, exhaustively:
 NOT ONE THEOREM HERE MENTIONS CHAOS, UNIVERSALITY, OR A LIMIT LAW. `criticalDegree`
 is a name given to `log N / c`; that the quantity so named is the boundary of a real
 phase transition is the BBM result cited below, not something proved here. The name
-carries the physics and the proof carries the arithmetic, which is exactly the
-confusion this correction exists to remove.
+carries the physics and the proof carries the arithmetic, and the two must not be
+read as one.
 
 The failure is not additive and is therefore invisible to every additive diagnostic
 (cumulants, influences, mixing). It is multiplicative: a product of `m` independent
@@ -95,9 +92,9 @@ open scoped BigOperators
 /-!
 ## 1. The Mellin profile and the Tangency Lemma
 
-The former `MellinProfile` interface accepted the defining properties of a Legendre
-transform, tangency, uniqueness, and positive jet variance as fields.  It is removed:
-those analytic facts must be proved from an actual law and an actual transform.
+No `MellinProfile` interface is exported. The defining properties of a Legendre
+transform — tangency, uniqueness, positive jet variance — are analytic facts that must be
+proved from an actual law and an actual transform, not accepted as structure fields.
 -/
 
 /-!
@@ -108,10 +105,8 @@ For a standard Gaussian `g`, the size-biased law of `g ^ 2` (density proportiona
 freedom, whose log-mean is `digamma(3/2) + log 2 = 2 - gamma - log 2`. That number is
 the drift of the size-biased multiplicative walk, and — in the BBM phase diagram
 cited above, NOT by anything proved in this file — the reciprocal slope of the
-condensation phase boundary. The clause here used to read "by the tangency geometry
-above"; there is no tangency geometry above any more. The `MellinProfile` interface
-that supplied it was removed for assuming its conclusions, and a citation to a deleted
-result is worse than no citation, because it reads as a discharged obligation.
+condensation phase boundary. No tangency geometry in this file supplies that step; it is
+cited from BBM and nothing here discharges it.
 -/
 
 /-- The **condensation constant** `c_G = 2 - gamma - log 2 = 0.72965...`, the
@@ -207,7 +202,9 @@ Gaussian.
 
 /-- The critical degree `m* = log N / c`. Below it, chaos is Lindeberg-democratic;
 above it, the variance is carried by values too large ever to be witnessed among `N`
-samples and the observed sum is empty. -/
+samples and the observed sum is empty.
+
+    Empirical status: UNTESTED. -/
 noncomputable def criticalDegree (N c : ℝ) : ℝ := Real.log N / c
 
 /-- Subcriticality is exactly `c * m < log N`. -/
@@ -273,11 +270,7 @@ and interpolates `0 -> 1`.
 the limit law at the condensation window is `N(0, windowVariance w v)`. -/
 noncomputable def windowVariance (w v : ℝ) : ℝ := Phi (w / Real.sqrt v)
 
-/-- Monotonicity of `Phi`, derived from the strict statement rather than proved again.
-
-    This was an independent appeal to `ProbabilityTheory.monotone_cdf`, one of two in the
-    corpus alongside `DGP.Phi_monotone`. Both are now `strictMono_Phi.monotone`, so the
-    three spellings cannot drift: there is one derivation, in `Probability`. -/
+/-- Monotonicity of `Phi`, a corollary of `strictMono_Phi` in `Probability`. -/
 theorem monotone_Phi : Monotone Phi := strictMono_Phi.monotone
 
 theorem Phi_nonneg (x : ℝ) : 0 ≤ Phi x := by
@@ -304,20 +297,6 @@ theorem windowVariance_mono {v : ℝ} (hv : 0 < v) :
   have hs : 0 < Real.sqrt v := Real.sqrt_pos.mpr hv
   have : a / Real.sqrt v ≤ b / Real.sqrt v := by gcongr
   exact monotone_Phi this
-
-/-! A separation statement — "two laws with the same drift and different jet variances
-retain different variance fractions" — was carried here as `windowVariance_ne_of_arg_ne`,
-which took `Function.Injective Phi` as a hypothesis and transported an *assumed*
-disequality `w / √v ≠ w / √v'` through it. Both the analytic fact and the substance of the
-conclusion came from the caller; the remaining content was `fun hEq ↦ h (hinj hEq)`. It
-was deleted on those grounds.
-
-`Calibrator.Probability.strictMono_Phi` now proves strict monotonicity of the standard
-normal cdf outright, so the statement is earnable: discharge injectivity through
-`strictMono_Phi.injective` and *derive* the disequality of window arguments from
-`v ≠ v'` instead of assuming it. That restoration is written and is not landed here,
-because it could not be compiled — it is a real proof term, not a docstring, and this
-corpus does not ship unchecked proofs. -/
 
 /-!
 ## 5. What the condensation theorems say about a polygenic score

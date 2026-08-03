@@ -66,12 +66,16 @@ noncomputable def pgsPhenoCov {m : ℕ} (β_weights β_causal : Fin m → ℝ)
     (ld : Fin m → Fin m → ℝ) : ℝ :=
   ∑ i : Fin m, ∑ j : Fin m, β_weights i * ld i j * β_causal j
 
-/-- Genetic variance induced by a shared LD kernel. -/
+/-- Genetic variance induced by a shared LD kernel.
+
+    Empirical status: UNTESTED. -/
 noncomputable def sharedLDGeneticVariance {m : ℕ}
     (β : Fin m → ℝ) (ld : Fin m → Fin m → ℝ) : ℝ :=
   pgsPhenoCov β β ld
 
-/-- Heritability induced by a shared LD kernel. -/
+/-- Heritability induced by a shared LD kernel.
+
+    Empirical status: UNTESTED. -/
 noncomputable def sharedLDHeritability {m : ℕ}
     (β : Fin m → ℝ) (ld : Fin m → Fin m → ℝ) (var_y : ℝ) : ℝ :=
   sharedLDGeneticVariance β ld / var_y
@@ -113,7 +117,9 @@ noncomputable def ldEffectGeneticCorrelation {m : ℕ}
 
 /-- Euclidean / independent-variant genetic correlation between source and
     target effect-size vectors. This is the diagonal-LD specialization of the
-    shared-LD correlation above. -/
+    shared-LD correlation above.
+
+    Empirical status: UNTESTED. -/
 noncomputable def effectGeneticCorrelation {m : ℕ} (β_source β_target : Fin m → ℝ) : ℝ :=
   (∑ i : Fin m, β_source i * β_target i) /
     Real.sqrt ((∑ i : Fin m, β_source i ^ 2) * (∑ i : Fin m, β_target i ^ 2))
@@ -562,12 +568,6 @@ def benDavidUpperBound (err_source divergence lambda_star : ℝ) : ℝ :=
 
 /-! **Deleted: `divergence_increases_with_fst`.**
 
-This theorem is absent on purpose. Its statement is `c * fst₁ < c * fst₂` from `0 < c` and
-`fst₁ < fst₂` — Mathlib's `mul_lt_mul_of_pos_left`, applied verbatim as the entire proof.
-The H-divergence the name promises occurs nowhere in it. `fst₁` and `fst₂` are
-unconstrained reals, so the theorem holds at negative `F_ST` as readily as at admissible
-values.
-
 The name's claim — that H-divergence between ancestry populations is monotone in `F_ST` —
 lives entirely in prose, together with the linear model `divergence = c * F_ST` that would
 make it precise. Neither is derived anywhere in this corpus, and asserting the *shape* of
@@ -981,7 +981,9 @@ noncomputable def gaussianSourceResidualRisk (I_phi_Y : ℝ) : ℝ :=
 
 /-- Pinsker-certified ancestry-divergence cap from mutual information.
     This is the standard `√(2 I)` envelope obtained by combining binary-domain
-    total-variation control with Pinsker's inequality. -/
+    total-variation control with Pinsker's inequality.
+
+    Empirical status: UNTESTED. -/
 noncomputable def pinskerAncestryDivergenceCap (I_phi_A : ℝ) : ℝ :=
   Real.sqrt (2 * I_phi_A)
 

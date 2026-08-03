@@ -682,7 +682,9 @@ noncomputable def globalAncestryAveragedEffect
 
 /-- Structural prediction error from using a single ancestry-averaged effect in
 an admixed population whose local ancestry really switches between ancestry 1
-and ancestry 2. -/
+and ancestry 2.
+
+    Empirical status: UNTESTED. -/
 noncomputable def localAncestryMisspecification
     (beta₁ beta₂ alpha : ℝ) : ℝ :=
   alpha * (beta₁ - globalAncestryAveragedEffect beta₁ beta₂ alpha) ^ 2 +
@@ -744,12 +746,6 @@ theorem la_deconvolution_improves_pgs
     (`proofs/validation/popgen_diff2/`). -/
 noncomputable def expectedTractLength (g admixtureFraction : ℝ) : ℝ :=
   1 / (g * (1 - admixtureFraction))
-
-/-! **Deleted: `expectedSegmentLength g r_total = 1 / (g * r_total)`, together with
-`segments_shorten_with_time`.** These are absent on purpose. The measurement is in
-`expectedTractLength` above: one argument is spurious and another is missing, so no choice
-of units repairs the form. The "segments shorten with more generations" content lives in
-`tract_length_shortens_with_time` below, stated about the validated body. -/
 
 /-- Tracts get shorter with more generations, at fixed admixture fraction. -/
 theorem tract_length_shortens_with_time (g₁ g₂ admixtureFraction : ℝ)

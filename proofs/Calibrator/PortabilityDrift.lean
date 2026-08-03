@@ -256,6 +256,18 @@ structure SplitMigrationModel where
   mig_nonneg : 0 ≤ mig
   mu_nonneg : 0 ≤ mu
 
+/-- **The class is inhabited.**  A theorem quantified over an uninhabited structure is
+true and empty: kernel-checked, clean axiom report, no content.  This is the witness that
+makes the theorems below statements about something. -/
+noncomputable def SplitMigrationModel.witness : SplitMigrationModel where
+  t := 1
+  Ne := 1
+  mig := 1
+  mu := 1
+  Ne_pos := by norm_num
+  mig_nonneg := by norm_num
+  mu_nonneg := by norm_num
+
 /-- Empirical status: UNTESTED. -/
 noncomputable def SplitMigrationModel.fstEqLimitLowMutationManyDemes (m : SplitMigrationModel) : ℝ :=
   1 / (1 + scaledMigrationRate m.Ne m.mig)
@@ -674,7 +686,9 @@ noncomputable def targetHetFromFst (het_source fst : ℝ) : ℝ :=
 **One definition, and it is the composition rather than a re-typed product**: the
 Fst-heterozygosity step is applied, not restated. A second body spelling `(1 - fst) * V_A`
 directly would need a theorem to hold it in step, which is the failure this file's own
-regime discussion is about. -/
+regime discussion is about.
+
+    Empirical status: UNTESTED. -/
 noncomputable def presentDayPGSVariance (V_A fst : ℝ) : ℝ :=
   pgsVarianceFromHet V_A (1 - fst)
 
@@ -761,7 +775,9 @@ For one branch with drift index `fst`, this is `2 * fst * V_A`.
 noncomputable def Var_Delta_Mu (V_A fst : ℝ) : ℝ :=
   2 * fst * V_A
 
-/-- Drift-driven expected absolute PGS-mean shift under a Normal approximation. -/
+/-- Drift-driven expected absolute PGS-mean shift under a Normal approximation.
+
+    Empirical status: UNTESTED. -/
 noncomputable def Expected_Abs_Shift (V_A fstS fstT : ℝ) : ℝ :=
   Real.sqrt (Var_Delta_Mu V_A (fstS + fstT)) * Real.sqrt (2 / Real.pi)
 
@@ -1036,14 +1052,14 @@ theorem drift_degrades_AUC_of_strictMono
     nlinarith
   exact Real.sqrt_lt_sqrt hhalf_nonneg hhalf_lt
 
-/-- Exact present-day liability AUC formula in variance units. -/
+/-- Exact present-day **equal-variance Gaussian** AUC formula in variance units. -/
 theorem presentDayEqualVarianceGaussianAUC_eq
     (V_A V_E fst : ℝ) :
     presentDayEqualVarianceGaussianAUC V_A V_E fst =
       Phi (Real.sqrt (presentDaySignalToNoise V_A V_E fst / 2)) := by
   rfl
 
-/-- Drift strictly degrades the exact liability-threshold AUC whenever
+/-- Drift strictly degrades the exact **equal-variance Gaussian** AUC whenever
 signal variance is positive and target drift exceeds source drift. -/
 theorem drift_degrades_equalVarianceGaussianAUC
     (V_A V_E fstS fstT : ℝ)
@@ -1148,7 +1164,9 @@ noncomputable def sigmaTagCausalSourceAt {p q : ℕ}
     (m.proxyTagging P + m.novelProxyTagging P)
 
 /-- **Total causal-effect vector in a population**: standing effects plus those carried
-by variants that arose after divergence. -/
+by variants that arose after divergence.
+
+    Empirical status: UNTESTED. -/
 noncomputable def totalEffect {p q : ℕ}
     (m : CrossPopulationMetricModel p q) (P : Pop) : Fin q → ℝ :=
   m.beta P + m.novelCausalEffect P
@@ -1652,7 +1670,9 @@ noncomputable def residualBurden {p q : ℕ}
 The source carries no transport burden — it is where the weights were fitted — and that
 is now a computed consequence of `residualBurden` rather than the reason for writing two
 separate definitions. `effectiveOutcomeVariance_source` below is the statement that used
-to be implicit in the fact that only a `target` version existed. -/
+to be implicit in the fact that only a `target` version existed.
+
+    Empirical status: UNTESTED. -/
 noncomputable def effectiveOutcomeVariance {p q : ℕ}
     (m : CrossPopulationMetricModel p q) (P : Pop) : ℝ :=
   (m.outcomeVariance P) + residualBurden m P
@@ -1804,11 +1824,9 @@ explained signal has been computed from the transported score moments.
 **Simp direction changed here, and it affects every downstream file.** This name
 was declared twice — once here, general in `P`, and once earlier in the file
 specialised to `Pop.source` and spelling the right-hand side
-`m.outcomeVariance Pop.source`. The second declaration was being rejected, so the
-lemma actually in the simp set was the specialised one, and simp rewrote toward
-`m.outcomeVariance`, at source only. The specialised copy has been removed as the
-pre-index leftover, so from here simp rewrites toward `effectiveOutcomeVariance`,
-at every `P`.
+`m.outcomeVariance Pop.source`. Two declarations of it would leave the specialised one in
+the simp set, rewriting toward `m.outcomeVariance` at source only. There is one, so simp
+rewrites toward `effectiveOutcomeVariance` at every `P`.
 
 That is the direction the population index is going, and this statement is the
 definitional unfolding of `residualVarianceFromSourceWeights`, which the
@@ -2115,11 +2133,15 @@ namespace GenerationalPopGenParameters
 noncomputable def theta (g : GenerationalPopGenParameters) : ℝ :=
   scaledMutationRate g.Ne g.μ
 
-/-- Scaled migration rate `M = 4Nem`. -/
+/-- Scaled migration rate `M = 4Nem`.
+
+    Empirical status: UNTESTED. -/
 noncomputable def bigM (g : GenerationalPopGenParameters) : ℝ :=
   scaledMigrationRate g.Ne g.mig
 
-/-- Coalescent time coordinate at generation `t`. -/
+/-- Coalescent time coordinate at generation `t`.
+
+    Empirical status: UNTESTED. -/
 noncomputable def tauAt (g : GenerationalPopGenParameters) (t : ℕ) : ℝ :=
   (t : ℝ) / (2 * g.Ne)
 
@@ -2136,12 +2158,16 @@ noncomputable def fstTransientAt (g : GenerationalPopGenParameters) (t : ℕ) : 
   (1 / (1 + g.theta + g.bigM)) * (1 - g.hetDecayFactor ^ t)
 
 /-- Mutation-driven retention of shared ancestral variation after `t`
-generations. -/
+generations.
+
+    Empirical status: UNTESTED. -/
 noncomputable def mutationSharedRetentionAt
     (g : GenerationalPopGenParameters) (t : ℕ) : ℝ :=
   Real.exp (-g.theta * g.tauAt t)
 
-/-- Migration-driven restoration of shared variation after `t` generations. -/
+/-- Migration-driven restoration of shared variation after `t` generations.
+
+    Empirical status: UNTESTED. -/
 noncomputable def migrationSharedBoostAt
     (g : GenerationalPopGenParameters) (t : ℕ) : ℝ :=
   1 + g.bigM * g.tauAt t / (1 + g.bigM)
@@ -2372,7 +2398,9 @@ noncomputable def causalAlleleFreqTargetAt {p q : ℕ}
       m.causalAlleleFreqStandingTargetAt t j + m.causalAlleleFreqMutationShiftAt t j := by
   rfl
 
-/-- Per-tag allele-frequency retention at generation `t`. -/
+/-- Per-tag allele-frequency retention at generation `t`.
+
+    Empirical status: UNTESTED. -/
 noncomputable def tagAlleleFreqRetentionAt {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i : Fin p) : ℝ :=
   alleleFreqMismatchPenalty (m.tagAlleleFreqSource i) (tagAlleleFreqTargetAt m t i)
@@ -2919,22 +2947,32 @@ though the eventual formula was present in the same file. -/
 noncomputable def standardNormalPdf (x : ℝ) : ℝ :=
   Real.exp (-x ^ 2 / 2) / Real.sqrt (2 * Real.pi)
 
-/-- The liability threshold `T = Φ⁻¹(1 - K)` for prevalence `K`. -/
+/-- The liability threshold `T = Φ⁻¹(1 - K)` for prevalence `K`.
+
+    Empirical status: UNTESTED. -/
 noncomputable def liabilityThreshold (K : ℝ) : ℝ := Function.invFun Phi (1 - K)
 
-/-- Mean liability among cases, `i = φ(T)/K`. -/
+/-- Mean liability among cases, `i = φ(T)/K`.
+
+    Empirical status: UNTESTED. -/
 noncomputable def liabilityCaseMean (K : ℝ) : ℝ :=
   standardNormalPdf (liabilityThreshold K) / K
 
-/-- Mean liability among controls, `i_c = -i·K/(1-K)`. -/
+/-- Mean liability among controls, `i_c = -i·K/(1-K)`.
+
+    Empirical status: UNTESTED. -/
 noncomputable def liabilityControlMean (K : ℝ) : ℝ :=
   -liabilityCaseMean K * K / (1 - K)
 
-/-- Score variance among cases, `v₁ = 1 - R²·i·(i - T)`. -/
+/-- Score variance among cases, `v₁ = 1 - R²·i·(i - T)`.
+
+    Empirical status: UNTESTED. -/
 noncomputable def liabilityCaseVariance (r2 K : ℝ) : ℝ :=
   1 - r2 * liabilityCaseMean K * (liabilityCaseMean K - liabilityThreshold K)
 
-/-- Score variance among controls, `v₀ = 1 - R²·i_c·(i_c - T)`. -/
+/-- Score variance among controls, `v₀ = 1 - R²·i_c·(i_c - T)`.
+
+    Empirical status: UNTESTED. -/
 noncomputable def liabilityControlVariance (r2 K : ℝ) : ℝ :=
   1 - r2 * liabilityControlMean K * (liabilityControlMean K - liabilityThreshold K)
 
@@ -2948,15 +2986,6 @@ noncomputable def liabilityThresholdAUCFromExplainedR2 (r2 K : ℝ) : ℝ :=
     Real.sqrt (liabilityCaseVariance r2 K + liabilityControlVariance r2 K))
 
 /-! **Deleted: `LiabilityThresholdRegime`.**
-
-This structure is absent on purpose. It carried seven fields under the heading "the regime
-in which the liability-threshold AUC formula has its stated biological meaning. Every
-degeneracy is an explicit field", and nothing constructed or consumed it — no theorem in
-this file, nothing in the corpus, nothing in the validation harness.
-`liabilityThresholdAUCFromExplainedR2` is used freely and without it, including in
-`presentDayLiabilityThresholdAUC` and the metric-profile results below, and in
-`liabilityThresholdAUC_not_prevalence_free`, which reasons about
-`standardNormalPdf (liabilityThreshold K)` directly with its own local hypotheses.
 
 An *obligation* structure with no consumer is worse than an unused lemma. Its whole claim
 is that somebody must discharge these conditions before using the formula, and nobody does,
@@ -3072,7 +3101,7 @@ theorem targetAUC_lt_source_of_neutralAF_benchmark
     drift_degrades_AUC_of_strictMono
       V_A V_E fstSource fstTarget hVA hVE h_fst (le_of_lt h_fst_bounds.2)
 
-/-- Exact liability-threshold AUC as a function of SNR:
+/-- Exact **equal-variance Gaussian** AUC as a function of SNR:
 `AUC = Φ(√(snr/2))`.
 
     This is the AUC when cases and controls are two normals of equal variance
@@ -3120,8 +3149,7 @@ theorem equalVarianceGaussianAUCFromVariances_scaleOne (vSignal : ℝ) :
   unfold equalVarianceGaussianAUCFromSignalVariance equalVarianceGaussianAUCFromSNR
   ring_nf
 
-/-- On nonnegative SNR, the liability-threshold AUC map is strictly increasing
-whenever `Phi` is strictly increasing. -/
+/-- On nonnegative SNR, the **equal-variance Gaussian** AUC map is strictly increasing. -/
 theorem equalVarianceGaussianAUCFromSNR_strictMonoOn_nonneg :
     StrictMonoOn equalVarianceGaussianAUCFromSNR (Set.Ici 0) := by
   intro x hx y hy hxy
@@ -3244,7 +3272,9 @@ not elaborate until whoever owns the call site supplies the prevalence, which is
 who knows it.
 
 This is the conversion to use for a binary trait. For a genuinely **continuous** outcome the
-equal-variance chart is correct and `presentDayEqualVarianceGaussianAUC` is the one to call. -/
+equal-variance chart is correct and `presentDayEqualVarianceGaussianAUC` is the one to call.
+
+    Empirical status: UNTESTED. -/
 noncomputable def targetLiabilityAUCFromNeutralAFBenchmark
     (V_A V_E fstTarget K : ℝ) : ℝ :=
   liabilityThresholdAUCFromExplainedR2 (presentDayR2 V_A V_E fstTarget) K
@@ -3261,7 +3291,9 @@ AUC as well as for the Brier risk.
 No new modelling input is required to build this: `π` is already an argument of the profile
 it replaces. The old record simply declined to use it for the discrimination metric, which
 is how a `-0.068` AUC bias survived beside a Brier risk computed correctly at the same
-prevalence. -/
+prevalence.
+
+    Empirical status: UNTESTED. -/
 noncomputable def neutralAFBenchmarkLiabilityMetricProfile
     (π V_A V_E fstTarget : ℝ) : TransportedMetrics.Profile :=
   { r2 := targetR2FromNeutralAFBenchmark V_A V_E fstTarget
@@ -3407,10 +3439,14 @@ theorem equalVarianceGaussianAUCFromExplainedR2_strictMonoOn_unitInterval :
     nlinarith
   exact Real.sqrt_lt_sqrt hx_arg_nonneg harg_lt
 
-/-- Liability-threshold AUC induced by the full explicit source-side driver
+/-- **Equal-variance Gaussian** AUC induced by the full explicit source-side driver
 state. Like the target-side exported AUC, this is built directly from source
 explained signal and source residual variance under the source-learned score
 equation.
+
+    This is not the liability-threshold AUC: cases under a liability threshold are a
+    truncated tail, so the two distributions have unequal variances and the AUC depends on
+    prevalence, which this takes no argument for.
 
     Empirical status: UNTESTED. -/
 noncomputable def equalVarianceGaussianAUCFromSourceWeights {p q : ℕ}
@@ -3921,7 +3957,9 @@ noncomputable def expectedSqMeanPGSDiff_pureSplit (V_A fstS fstT : ℝ) : ℝ :=
   rfl
 
 /-- The expected squared mean PGS difference under the IM equilibrium model:
-`E[(Δμ)²] = 4δ V_A` where `δ = 1/(2M+1)`. -/
+`E[(Δμ)²] = 4δ V_A` where `δ = 1/(2M+1)`.
+
+    Empirical status: UNTESTED. -/
 noncomputable def expectedSqMeanPGSDiff_IMEquilibrium (V_A M : ℝ) : ℝ :=
   Var_Delta_Mu V_A (2 * twoDemeIMEquilibriumDelta M)
 
@@ -3982,9 +4020,9 @@ structure MutationDriftModelAssumptions where
   mu_pos : 0 < μ
   t_nonneg : 0 ≤ t
 
-/-- **The class is inhabited.**  Without a term of this type every theorem quantified
-over it is a true statement about an empty class: kernel-checked, clean axiom report,
-and no content.  See `scripts/check-laundering.py` family F4. -/
+/-- **The class is inhabited.**  A theorem quantified over an uninhabited structure is
+true and empty: kernel-checked, clean axiom report, no content.  This is the witness that
+makes the theorems below statements about something. -/
 noncomputable def MutationDriftModelAssumptions.witness : MutationDriftModelAssumptions where
   Ne := 1
   μ := 1
@@ -4196,7 +4234,9 @@ noncomputable def covarianceRetention (freq_corr ld_overlap : ℝ) : ℝ :=
 noncomputable def freqCorrFromFst (fst : ℝ) : ℝ := 1 - fst
 
 /-- LD overlap is directly the shared LD fraction (identity mapping, made
-    explicit for clarity in the derivation chain). -/
+    explicit for clarity in the derivation chain).
+
+    Empirical status: UNTESTED. -/
 noncomputable def ldOverlapFromSharedLD (shared_ld : ℝ) : ℝ := shared_ld
 
 /-- Covariance retention in terms of Fst and shared_LD. -/
@@ -5159,16 +5199,6 @@ theorem signalRetention_increases_with_migration (V_A Ne m₁ m₂ : ℝ)
 
 /-! **Deleted: `migration_improves_R2_over_pure_drift`.**
 
-This theorem is absent on purpose. The name asserts that migration improves `R²`. The
-statement takes as a hypothesis that the equilibrium `F_ST` is below some free real
-`fst_nomial` and concludes that `R²` is higher there. That `fst_nomial` exceeds the
-equilibrium — the entire content of "migration improves portability" — comes from the
-caller rather than from a proof, and `fst_nomial` is otherwise unconstrained: it is not
-derived from `Ne`, from `m`, from a divergence time, or from any pure-drift model. The
-gloss "under pure drift to t=∞" names a limit the statement never takes. `0 < Ne` and
-`0 < m` go unused, so the theorem holds for parameters at which the island model has no
-equilibrium at all.
-
 Strip the assumed premise and what is left is `drift_degrades_R2` with its first argument
 instantiated at `fstMigrationDriftEquilibrium Ne m`, which is the whole proof. The single
 call site, `recurrence_derived_R2_increases_with_m`, calls `drift_degrades_R2` directly.
@@ -5246,9 +5276,9 @@ theorem asymmetric_migration_portability_direction
     against it. Changing the body to a harmonic mean would falsify both. Which of the two
     means is the right effective rate for asymmetric migration is not settled anywhere in
     this corpus, and nothing here should be read as settling it.
+    nothing about the harmonic mean.
 
-    Empirical status: UNTESTED. A test of this quantity tests the arithmetic mean and says
-    nothing about the harmonic mean. -/
+    Empirical status: UNTESTED. A test of this quantity tests the arithmetic mean and says -/
 noncomputable def effectiveSymmetricMigration (m₁₂ m₂₁ : ℝ) : ℝ :=
   (m₁₂ + m₂₁) / 2
 

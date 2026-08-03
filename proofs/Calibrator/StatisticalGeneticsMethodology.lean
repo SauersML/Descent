@@ -29,10 +29,9 @@ Key results:
 4. `LDSCModel` as a data record, and root-`n` standard-error shape results stated
    against it. **No LD score regression is formalized here** — nothing in this file
    regresses chi-squared statistics on LD scores or estimates an intercept.
-5. **No genetic-correlation estimator survives in this file.** The one that stood here
-   was cosine similarity of effect vectors under an LDSC name; it is deleted, with the
-   measurements that killed it recorded at the deletion site. Do not read items 4 and 5
-   as capabilities this module provides.
+5. **No genetic-correlation estimator is defined in this file.** Cosine similarity of
+   effect vectors under an LDSC name is not one, and the measurements refuting that reading
+   are recorded below. Do not read items 4 and 5 as capabilities this module provides.
 
 Reference: Wang et al. (2026), Nature Communications 17:942 -- for the three open
 questions these methods are aimed at, not for the methods themselves. Incremental
@@ -165,11 +164,6 @@ section SummaryStatPGS
 /-! **Deleted: `effectiveSampleSizeSE se = 1/se^2`, together with
 `effectiveSampleSizeSE_lt_corrected` and the positivity lemma stated about it.**
 
-These definitions are absent on purpose. `1/SE²` is not `n_eff`. For a standardized trait
-`SE² = σ_y²/(n · Var(g))` with `Var(g) = 2p(1-p)`, so the allele frequency does not cancel
-and `1/SE²` **always understates** the sample size, by exactly the factor `2p(1-p)`.
-Measured against Monte-Carlo GWAS regressions at a true `n = 2000`:
-
 | `p` | `1/SE²` | `effectiveSampleSizeFromSE` | error |
 |---|---|---|---|
 | 0.5 | 996 | 1992 | −50.2% |
@@ -220,6 +214,17 @@ structure MetaAnalysisModel where
   h_k : 0 < k
   h_tau_sq : 0 < tau_sq
   h_variances : ∀ i, 0 < variances i
+
+/-- **The class is inhabited.**  A theorem quantified over an uninhabited structure is
+true and empty: kernel-checked, clean axiom report, no content.  This is the witness that
+makes the theorems below statements about something. -/
+noncomputable def MetaAnalysisModel.witness : MetaAnalysisModel where
+  k := 1
+  variances := fun _ => 1
+  tau_sq := 1
+  h_k := by norm_num
+  h_tau_sq := by norm_num
+  h_variances := fun _ => by norm_num
 
 noncomputable def fixed_weights (m : MetaAnalysisModel) (i : Fin m.k) : ℝ :=
   1 / m.variances i
@@ -287,12 +292,6 @@ structure LDSCModel (m : ℕ) where
 `genetic_correlation_predicts_portability` and
 `genetic_correlation_portability_bound_attained`.**
 
-These definitions are absent on purpose. The body
-`(∑ β_s β_t) / √((∑ β_s²)(∑ β_t²))` is cosine similarity. It carries no LD score, no
-chi-squared, no regression and no intercept, and it never touches `LDSCModel.ld_adj`.
-No reading of it survives measurement as a summary-statistic estimator
-(`proofs/validation/ldsc_diff/`):
-
 * **LD alone breaks it.** Two SNPs at `r = 1/2` with joint effects `(1,0)` and `(0,1)` are
   exactly orthogonal, `ρ_g = 0`. The *marginal* effects are `(1,1/2)` and `(1/2,1)`, giving
   `cos = 0.8` exactly — and marginal effects are what summary statistics supply.
@@ -343,11 +342,6 @@ theorem ldsc_se_decreases_with_n
 
 /-- **`k` parameters cost less than `k+1`, at any positive per-parameter price.**
 
-    The name `constrained_intercept_more_powerful` is absent on purpose. That name
-    asserts an LDSC claim, and this arithmetic does not reach it. The claim is
-    proved nowhere here. What follows states what the theorem does and does not
-    reach.
-
     The statement contains no standard error. `se_per_param` is a variable name, not a
     quantity the theorem constrains, so what is proved is that `k` parameters cost less than
     `k+1` at any positive per-parameter price — arithmetic, not a statement about estimator
@@ -389,10 +383,10 @@ section GeneticCorrelationMethods
 
     **The normality of the aggregate remains a caveat, and this docstring used to deny
     it.** It claimed that for a disjoint-window design the set of limit laws is the
-    Gaussian segment and nothing else, so the "approximately normal" hedge was not
-    needed. No such theorem exists in this corpus: the disjoint licence it appealed to
-    was carried as an interface field and has been removed rather than proved. What is
-    formalized below is the variance *parameter* of a hypothesised Gaussian limit. -/
+    Gaussian segment and nothing else, so no "approximately normal" hedge would be needed.
+    No such theorem exists in this corpus, and the disjoint licence it would appeal to is
+    not proved here. What is formalized below is the variance *parameter* of a hypothesised
+    Gaussian limit. -/
 theorem local_genetic_correlation_varies
     (rho_chr1 rho_chr6 : ℝ) (w₁ w₆ : ℝ)
     (h_chr6_lower : rho_chr6 < rho_chr1) -- HLA region has lower correlation
@@ -446,8 +440,8 @@ section DisjointWindowDesigns
     Gaussian with this variance" -- is not established anywhere in this corpus. It is
     the conclusion of the disjoint licence (Theorem D in `Calibrator.EpistaticChaos`),
     which is *not formalized*: it needs a central limit theorem for low-influence
-    multilinear forms, and the interface that used to carry it as a hypothesis-field was
-    removed rather than proved. Naming a sum "limit variance" does not supply it.
+    multilinear forms, and carrying it as an interface hypothesis-field would assume it
+    rather than prove it. Naming a sum "limit variance" does not supply it.
 
     So read this as the variance *parameter* of a hypothesised Gaussian limit, not as
     evidence that the limit is Gaussian.

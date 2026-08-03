@@ -127,7 +127,9 @@ theorem dirichlet_ordering_survives_remainder
   linarith
 
 /-- **The drift horizon of a Dirichlet gap**, isolated so it can be computed. Beyond this
-    much drift the first-order comparison is uninformative. -/
+    much drift the first-order comparison is uninformative.
+
+        Empirical status: UNTESTED. -/
 noncomputable def driftHorizon (D₁ D₂ C : ℝ) : ℝ := (D₂ - D₁) / (2 * C)
 
 /-- A wider Dirichlet gap buys a proportionally longer horizon. -/
@@ -236,9 +238,9 @@ Cauchy–Schwarz defect of the rate measure:
 **The irreducible conflict between performing now and transporting later is precisely the
 dispersion of the value signal's relaxation rates.**
 
-**RANK ONE IS DOUBLY DEGENERATE, AND THE SLOGAN ABOVE IS FALSE BEYOND IT.** A first version
-of this section said the conflict "is precisely the dispersion of the value signal's
-relaxation rates". That holds at rank one and **fails at rank ≥ 2**, where the four conditions
+**RANK ONE IS DOUBLY DEGENERATE, AND THE SLOGAN ABOVE IS FALSE BEYOND IT.** That the
+conflict "is precisely the dispersion of the value signal's relaxation rates" holds at rank
+one and **fails at rank ≥ 2**, where the four conditions
 that coincide in the scalar case — vanishing commutator `[V,L] = 0`, degenerate rate measure,
 zero Cauchy–Schwarz defect, and alignment of the myopic and transport optima — come apart.
 
@@ -262,12 +264,6 @@ cross-correlation times** of the value signals. `autocorrTime` below is its `1×
 frontier keeps its shape (linear, then convex, ending at myopia; convexity on the whole domain
 by Brickman's theorem on the joint numerical range) with the scalar secular equation becoming
 an `r`-dimensional one.
-
-What survives of the observation this section recurs on: the functionals with large
-rate-dispersion are the **boundary-loaded** ones — the same ones driving `κ`, the whitening
-gain, and the edge — so value–stability conflict remains an edge phenomenon in the sense the
-`m_eff` prohibition is. That connection is unaffected; only the claim that dispersion
-*measures* the conflict is withdrawn.
 
 ### Two escapes from a positive floor
 

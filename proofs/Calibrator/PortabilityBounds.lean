@@ -26,17 +26,6 @@ Reference: Wang et al. (2026), Nature Communications 17:942.
 /-!
 ## Fst-Based Neutral Benchmarks -- deleted
 
-**`neutralAFBenchmarkRatio` was FALSIFIED and has been deleted**, and with it the
-`FstBounds` section that stood here: `neutral_af_benchmark_at_equal_fst`,
-`neutral_af_benchmark_decreasing_in_fstT`, `selection_worsens_neutral_af_benchmark` and
-`neutral_af_benchmark_bounded_by_fst`. Every one was algebra about `(1 - fstT)/(1 - fstS)`
-presented under a name that asserted a neutral portability benchmark, which is the reading
-measurement rejected: at the measured `fstSource = 0.3577` the expression cannot exceed
-`1.557` for any target `F_ST` at all, while the measurement at that design point is
-`3.79 ± 0.25`. The observable is outside the formula's range, and no calibration of
-`fstTarget` repairs it; heterozygosity is governed by `Nₑ` and the mutation floor, not by a
-between-population variance ratio.
-
 The algebra itself is true, and nothing here disputes it. True algebra under a falsified
 name is exactly the configuration that lets a portability prediction be read off a theorem,
 which is why the name is absent rather than the algebra corrected. The falsification stands

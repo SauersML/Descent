@@ -857,16 +857,6 @@ theorem expectedNewMutations_increases_with_time (θ t₁ t₂ : ℝ)
 together with `sharedLDFraction_pos`, `sharedLDFraction_le_one` and
 `sharedLDFraction_decreases_with_time`.**
 
-This definition is absent on purpose. Its exponent is a **count of mutations**, not a
-dimensionless rate: simulation measures `599.9` mutations arisen at `θ = 1, t = 1200`, so
-the body evaluates to `exp(-600) ≈ 1e-261`, and to `exp(-2424)` at `θ = 4`. A quantity
-called "the fraction of LD shared between populations" is therefore identically zero to
-machine precision for any locus older than roughly `60/θ` generations. Nothing in the
-corpus derives an `exp(-N_mutations)` law, and the regime in which the expression looks
-plausible (`θt/2 ~ 1`) exists only for a per-*site* `θ` and vanishes at locus scale. No
-corrected replacement exists. For LD erosion by recombination use
-`Calibrator.LDDecayTheory`.
-
 Measured in `proofs/validation/coalescent_diff/`. -/
 
 end MutationDriftBalance
@@ -1168,9 +1158,7 @@ theorem fstMigrationMutation_lt_mutationOnly (Ne m μ : ℝ)
     Signature consistency: both siblings carry a dispersal variance --
     `DemographicHistory.demoSteppingStoneFst (d Ne m σ_sq)` and
     `DemographicHistory.steppingStoneDiffusionTimescale (d σ_sq m)` -- so this
-    signature matches the family.
-
-        Empirical status: UNTESTED. -/
+    signature matches the family. -/
 noncomputable def steppingStoneCharacteristicLength (m σ_sq μ : ℝ) : ℝ :=
   Real.sqrt (m * σ_sq / (2 * μ))
 
@@ -1681,7 +1669,9 @@ noncomputable def hetDecayFactor (Ne θ : ℝ) : ℝ :=
     c = (1 - λ) H* (since H* is the fixed point, c = (1-λ) H*).
     Rather than tracking c explicitly we parametrise by the equilibrium H*
     and λ, since the affine recurrence H(t+1) = λ H(t) + c has
-    fixed point H* = c/(1-λ), i.e. c = (1-λ) H*. -/
+    fixed point H* = c/(1-λ), i.e. c = (1-λ) H*.
+
+    Empirical status: UNTESTED. -/
 noncomputable def hetMutationRecurrence (lam Hstar H₀ : ℝ) : ℕ → ℝ
   | 0 => H₀
   | t + 1 => lam * hetMutationRecurrence lam Hstar H₀ t + (1 - lam) * Hstar

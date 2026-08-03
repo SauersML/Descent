@@ -111,9 +111,9 @@ used in the portability theorem below.
     fraction of ancestral heterozygosity remaining after t generations *in a
     closed population with no mutation*.
 
-    Regime: closed population, no mutation. The qualifier is not decoration and
-    the unqualified sentence this docstring used to carry — that the retained
-    fraction *is* this power — is the claim that measurement rejects. Under
+    Regime: closed population, no mutation. The qualifier is not decoration: the
+    unqualified claim that the retained fraction *is* this power is what measurement
+    rejects. Under
     mutation-drift balance heterozygosity is stationary: simulation at
     `Ne = 1000`, `t = 4000` measures the retention as `1.025 ± 0.020` where this
     formula gives `0.135`. `Calibrator.DriftRegime` exhibits the two regimes and
@@ -681,13 +681,6 @@ genetic architecture show similar portability patterns.
 section PhenomeWideStructure
 
 /-! **Deleted: three Mathlib lemmas wearing phenome-wide names.**
-
-`bounded_portability_correlation_stays_within_unit_interval` (`le_trans`),
-`factor_lower_bounds_sum_strictly_below_total` (`add_lt_add`) and
-`prediction_error_bounded_by_looser_tolerance` (`lt_of_le_of_lt`) are absent on purpose.
-Each is one step, none is applied anywhere in the corpus, and in each the domain vocabulary
-lives entirely in the binder names: rename `port_corr` to `x` and the statement is a
-Mathlib lemma with no phenome-wide content left to lose.
 
 Two carry a further tell. `factor_lower_bounds_sum_strictly_below_total` takes `f₁ + f₂ ≤ 1`
 and `0 ≤ fᵢ` — the conditions that would make the two numbers *variance shares* — and uses
