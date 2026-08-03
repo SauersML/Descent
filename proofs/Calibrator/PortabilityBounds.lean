@@ -23,87 +23,33 @@ Reference: Wang et al. (2026), Nature Communications 17:942.
 -/
 
 /-!
-## Fst-Based Neutral Benchmarks
+## Fst-Based Neutral Benchmarks -- deleted
 
-**`neutralAFBenchmarkRatio` is FALSIFIED**, and the theorems in this section are
-statements about the expression, not about a measured quantity. It is not "exactly
-determined by `F_ST`", which is what this section used to say: at the measured
-`fstSource = 0.3577` the expression cannot exceed `1.557` for any target `F_ST` at all
-(`PortabilityDrift.neutralAFBenchmarkRatio_cannot_reach_measured`), while the measurement
-at that design point is `3.79 ± 0.25`. The observable is outside the formula's range, and
-no calibration of `fstTarget` repairs it; heterozygosity is governed by `Nₑ` and the
-mutation floor, not by a between-population variance ratio.
+**`neutralAFBenchmarkRatio` was FALSIFIED and has been deleted**, and with it the
+`FstBounds` section that stood here: `neutral_af_benchmark_at_equal_fst`,
+`neutral_af_benchmark_decreasing_in_fstT`, `selection_worsens_neutral_af_benchmark` and
+`neutral_af_benchmark_bounded_by_fst`. Every one was algebra about `(1 - fstT)/(1 - fstS)`
+presented under a name that asserted a neutral portability benchmark, which is the reading
+measurement rejected: at the measured `fstSource = 0.3577` the expression cannot exceed
+`1.557` for any target `F_ST` at all, while the measurement at that design point is
+`3.79 ± 0.25`. The observable is outside the formula's range, and no calibration of
+`fstTarget` repairs it; heterozygosity is governed by `Nₑ` and the mutation floor, not by a
+between-population variance ratio.
 
-What survives is the algebra: the expression equals one at equal `F_ST`, decreases in the
-target, lies in `(0,1)` when the target has diverged further, and can only shrink under a
-scalar selection factor. Those are proved below and each is a fact about
-`(1 - fstT)/(1 - fstS)`. Do not read a portability prediction off any of them.
+The algebra was true and is not what was wrong, so nothing here is being disputed by its
+removal -- but true algebra under a falsified name is exactly the configuration that lets a
+portability prediction be read off a theorem. The falsification itself survives as
+`PortabilityDrift.benchmarkRatioForm_cannot_reach_measured`, which states the ceiling about
+the written-out expression and so needs no definition to exist.
+
+The worked examples that once stood in this section are withdrawn with it. They read
+`ratio ≈ 0.88` at `Fst ≈ 0.12` and `≈ 0.85` at `Fst ≈ 0.15` and concluded that larger
+observed `R²` drops confirm non-neutral effects. That inference ran through the out-of-range
+formula. `Calibrator.HumanDemography` reaches the neutral-floor conclusion by a route that
+survives measurement, and gets `0.985` rather than `0.88` for the continental case, because
+the floor must be computed from the branch quantity `1 - H_T/H_S` and not from a pairwise
+`F_ST`.
 -/
-
-section FstBounds
-
-/-- Neutral allele-frequency benchmark ratio at equal `F_ST` is `1`. -/
-theorem neutral_af_benchmark_at_equal_fst (fst : ℝ) (h : fst < 1) :
-    neutralAFBenchmarkRatio fst fst = 1 := by
-  simpa using neutralAFBenchmarkRatio_self fst h
-
-/-- Neutral allele-frequency benchmark ratio is strictly decreasing in target
-`F_ST`. -/
-theorem neutral_af_benchmark_decreasing_in_fstT
-    (fstS fstT₁ fstT₂ : ℝ)
-    (h_fstS : fstS < 1)
-    (h_order : fstT₁ < fstT₂) :
-    neutralAFBenchmarkRatio fstS fstT₂ < neutralAFBenchmarkRatio fstS fstT₁ := by
-  have h_denom : 0 < 1 - fstS := by linarith
-  simpa [neutralAFBenchmarkRatio] using
-    (div_lt_div_of_pos_right (show 1 - fstT₂ < 1 - fstT₁ by linarith) h_denom)
-
-/-- Under selection, the scalar effect factor can only shrink the neutral
-allele-frequency benchmark. -/
-theorem selection_worsens_neutral_af_benchmark
-    (fstS fstT ρ_eff : ℝ)
-    (h_fstS : fstS < 1) (h_fstT : fstT < 1)
-    (hρ : 0 ≤ ρ_eff) (hρ_le : ρ_eff ≤ 1) :
-    neutralAFBenchmarkRatio fstS fstT * ρ_eff ^ 2 ≤
-      neutralAFBenchmarkRatio fstS fstT := by
-  have h_sq_le : ρ_eff ^ 2 ≤ 1 := by nlinarith [sq_nonneg ρ_eff]
-  have h_ratio_nonneg : 0 ≤ neutralAFBenchmarkRatio fstS fstT := by
-    exact neutralAFBenchmarkRatio_nonneg fstS fstT h_fstS (le_of_lt h_fstT)
-  calc neutralAFBenchmarkRatio fstS fstT * ρ_eff ^ 2
-      ≤ neutralAFBenchmarkRatio fstS fstT * 1 :=
-        mul_le_mul_of_nonneg_left h_sq_le h_ratio_nonneg
-    _ = neutralAFBenchmarkRatio fstS fstT := mul_one _
-
-/-- **General neutral allele-frequency benchmark bound.**
-    For any target population with `Fst_T > Fst_S` (both < `1`),
-    the neutral benchmark ratio is strictly between `0` and `1`,
-    and decreasing in `(Fst_T - Fst_S)`. The ratio equals
-    `(1 - Fst_T)/(1 - Fst_S)`.
-
-    **The worked examples that stood here are withdrawn.** They read `ratio ≈ 0.88` at
-    `Fst ≈ 0.12` and `≈ 0.85` at `Fst ≈ 0.15`, and concluded that larger observed `R²`
-    drops confirm non-neutral effects. That inference ran through a formula measured to
-    be out of range — `3.79 ± 0.25` observed against a ceiling of `1.557` — so a gap
-    between it and the data is not evidence about selection. `Calibrator.HumanDemography`
-    reaches the neutral-floor conclusion by a route that survives measurement, and gets
-    `0.985` rather than `0.88` for the continental case, because the floor must be
-    computed from the branch quantity `1 - H_T/H_S` and not from a pairwise `F_ST`.
-
-    The bounds below are proved and are about the expression itself. -/
-theorem neutral_af_benchmark_bounded_by_fst
-    (fstS fstT : ℝ)
-    (h_fstS_lt : fstS < 1)
-    (h_fstT_lt : fstT < 1)
-    (h_diverged : fstS < fstT) :
-    0 < neutralAFBenchmarkRatio fstS fstT ∧
-    neutralAFBenchmarkRatio fstS fstT < 1 := by
-  constructor
-  · simpa [neutralAFBenchmarkRatio] using
-      (show 0 < (1 - fstT) / (1 - fstS) by exact div_pos (by linarith) (by linarith))
-  · simpa using
-      neutralAFBenchmarkRatio_lt_one fstS fstT h_fstS_lt h_diverged
-
-end FstBounds
 
 
 /-!
@@ -245,23 +191,21 @@ section EvolutionaryModels
     absorbing-boundary device used by `selectionMigrationEquilibrium` in
     `PopulationGeneticsFoundations.lean`.
 
-    **Two neutral laws coexist in this development and neither is settled.**
-    This one is linear in `F_ST` with slope `2·r2_0`. The other is
-    `neutralAFBenchmarkRatio fstS fstT = (1 - fstT)/(1 - fstS)`
-    (`PortabilityDrift.lean`), used at the top of this very file. They are
-    different functions: `neutralPortability_le_neutralAFBenchmark` below proves
-    this one is always the more pessimistic of the two, and that is the entire
-    relationship between them that is established. Which -- if either -- is the
-    right neutral benchmark is open:
+    **This is now the only neutral law in the development, and it is not
+    settled.** It is linear in `F_ST` with slope `2·r2_0`. The other candidate,
+    `neutralAFBenchmarkRatio fstS fstT = (1 - fstT)/(1 - fstS)` in
+    `PortabilityDrift.lean`, has been deleted: simulation put it −37% to −74%
+    low under asymmetric effective population sizes, and the measurement lies
+    outside the range the expression can reach at all. The theorem that ordered
+    the two, `neutralPortability_le_neutralAFBenchmark`, went with it; it fixed
+    this law as the more pessimistic of the pair, which is not a fact worth
+    stating once the pair is a single law.
 
-    * `neutralAFBenchmarkRatio` has just been falsified by simulation, −37% to
-      −74% under asymmetric effective population sizes.
-    * This law's `1 - 2·fst` slope has no derivation in the corpus at all; it is
-      the first-order expansion of a heterozygosity ratio and inherits no
-      evidence from the fit of anything else.
-
-    Both are under revision. Do not treat either as the neutral expectation
-    without saying which one and why.
+    That leaves this law's own standing untouched and unimproved. The
+    `1 - 2·fst` slope has no derivation in the corpus at all; it is the
+    first-order expansion of a heterozygosity ratio and inherits no evidence
+    from the fit of anything else. Do not treat it as the neutral expectation
+    without saying why.
 
     Empirical status: UNTESTED as a portability law, and CONDITIONALLY VALID at
     best as an approximation: the linear form can only be defensible for
@@ -312,33 +256,6 @@ theorem neutralPortability_mem_unit (r2_0 fst : ℝ)
     0 ≤ neutralPortability r2_0 fst ∧ neutralPortability r2_0 fst ≤ 1 :=
   ⟨neutralPortability_nonneg r2_0 fst hr2,
     le_trans (neutralPortability_le_r2_0 r2_0 fst hr2 hfst) hr2_le⟩
-
-/-- **The two neutral laws, related.** The linear law in this file is never
-    above the allele-frequency benchmark ratio of `PortabilityDrift.lean`,
-    scaled by the source `R²`:
-
-      `r2_0 · max 0 (1 - 2·fstT) ≤ r2_0 · (1 - fstT)/(1 - fstS)`
-
-    for any source differentiation `fstS ∈ [0, 1)`. Two neutral laws used to sit
-    in the same development with nothing relating them; this is the inequality
-    that relates them. It is not an endorsement of either -- see the note on
-    `neutralPortability`, both are under revision -- but it does fix their
-    order, so a claim derived under one is at least known to be conservative or
-    liberal with respect to the other. -/
-theorem neutralPortability_le_neutralAFBenchmark
-    (r2_0 fstS fstT : ℝ)
-    (hr2 : 0 ≤ r2_0)
-    (hS : 0 ≤ fstS) (hS1 : fstS < 1)
-    (hT : 0 ≤ fstT) (hT1 : fstT ≤ 1) :
-    neutralPortability r2_0 fstT ≤ r2_0 * neutralAFBenchmarkRatio fstS fstT := by
-  unfold neutralPortability neutralAFBenchmarkRatio
-  have hden : (0 : ℝ) < 1 - fstS := by linarith
-  have h1 : 1 - fstT ≤ (1 - fstT) / (1 - fstS) := by
-    rw [le_div_iff₀ hden]
-    nlinarith
-  have h2 : max 0 (1 - 2 * fstT) ≤ 1 - fstT :=
-    max_le (by linarith) (by linarith)
-  exact mul_le_mul_of_nonneg_left (le_trans h2 h1) hr2
 
 /-- **Stabilizing selection model: faster-than-neutral decay.**
     Under stabilizing selection, allelic effects are constrained near the optimum
@@ -474,10 +391,16 @@ framework produces the qualitative patterns observed in the paper:
 
 section ConcreteWitnesses
 
-/-- **Higher effect correlation → better portability.**
-    Traits with higher genetic effect correlation ρ across populations
-    retain more predictive accuracy (R² scales as ρ²). -/
-theorem higher_rho_better_portability
+/-- **`r·ρ²` is increasing in both factors**, for `0 ≤ ρ_B < ρ_A` and
+    `0 < r2_B ≤ r2_A`.
+
+    The reading is that a trait whose cross-population effect correlation is
+    higher retains more accuracy, because `R²` scales as `ρ²`. That scaling is
+    the modelling content, and it is assumed by writing the product `r2 * ρ^2`
+    rather than derived from anything. No population, no effect and no `R²`
+    occurs below; `r2_A`, `ρ_A` and their `B` counterparts are four unconstrained
+    reals. -/
+theorem mul_sq_lt_mul_sq_of_le_of_lt
     (r2_A r2_B ρ_A ρ_B : ℝ)
     (h_r2_A : 0 < r2_A) (h_r2_le : r2_B ≤ r2_A)
     (h_ρB : 0 ≤ ρ_B) (h_ρ : ρ_B < ρ_A) :
@@ -487,13 +410,20 @@ theorem higher_rho_better_portability
   calc r2_B * ρ_B ^ 2 ≤ r2_A * ρ_B ^ 2 := by nlinarith [sq_nonneg ρ_B]
     _ < r2_A * ρ_A ^ 2 := by nlinarith
 
-/-- **Sign discordance rate.**
-    Under N(ρβ, σ²) model for target effects, the probability of sign flip is
-    Φ(-|ρβ|/σ). We prove that smaller ρ implies more sign flips (larger flip
-    probability), since the z-score ρβ/σ decreases with ρ.
+/-- **`ρ ↦ ρβ/σ` is increasing**, for `β > 0` and `σ > 0`.
 
-    Worked example: With ρ ≈ 0.3 for lymphocyte count, sign flips are common. -/
-theorem more_turnover_more_sign_flips
+    Read as genetics: under a `N(ρβ, σ²)` model for target effects the sign-flip
+    probability is `Φ(-|ρβ|/σ)`, so a smaller effect correlation means more sign
+    flips. The statement does not reach that. There is no `Φ`, no probability,
+    no normal law and no absolute value below — only the monotonicity of the
+    z-score in `ρ`, which is one input to the argument and not the argument.
+    Turning it into a statement about flip rates needs `Φ` monotone and the
+    model assumed, and neither step is taken here.
+
+    An earlier docstring cited `ρ ≈ 0.3` for lymphocyte count as a worked
+    example; no numeral appears in the statement, so nothing here is an
+    instance of it. -/
+theorem z_score_strictMono_in_rho
     (β σ ρ₁ ρ₂ : ℝ)
     (hβ : 0 < β) (hσ : 0 < σ)
     (h_more_turnover : ρ₂ < ρ₁) :

@@ -697,10 +697,15 @@ theorem r2_estimator_variance_pos (r2 : ℝ) (n : ℕ)
     · exact sq_pos_of_pos (by linarith)
   · exact Nat.cast_pos.mpr h_n
 
-/-- **Power to detect portability difference.**
-    To detect ΔR² = R²_source - R²_target at power 1-β with significance α,
-    need n ≈ (z_α + z_β)² × (Var₁ + Var₂) / ΔR²². -/
-theorem larger_sample_more_power
+/-- **`√(v/n)` decreases in `n`**, scaled by a positive constant.
+
+    The reading is the standard-error half of a power calculation: to detect
+    `ΔR²` at power `1-β` and level `α` one needs
+    `n ≈ (z_α+z_β)²(Var₁+Var₂)/ΔR²²`, so a larger sample detects a smaller
+    effect. Below there is no test, no `α`, no `β`, no null hypothesis and no
+    power function — `z_sum` is a variable name and nothing constrains it to be
+    a sum of quantiles. Monotonicity of `n ↦ √(v/n)`. -/
+theorem sqrt_scaled_variance_decreasing_in_n
     (var₁ var₂ z_sum n₁ n₂ : ℝ)
     (h_var : 0 < var₁ + var₂)
     (h_z : 0 < z_sum)
@@ -713,13 +718,20 @@ theorem larger_sample_more_power
   · exact div_nonneg (le_of_lt h_var) (le_of_lt (by linarith : 0 < n₂))
   · exact div_lt_div_of_pos_left h_var h_n₁ h_n
 
-/-- **Small portability differences require large samples.**
-    When R² of the distance-on-error relationship is small, enormous
-    samples are needed to detect this reliably.
+/-- **Transitivity through `1/·`:** from `n ≥ 1/r` and `r ≤ ub` with `r > 0`,
+    conclude `n ≥ 1/ub`.
 
-    Worked example: Wang et al.'s finding of R² ≈ 0.5% for
-    distance-on-error illustrates this. -/
-theorem small_effect_needs_large_n
+    **The sample-size claim is a hypothesis here, not a conclusion.** `h_formula`
+    says `n_required ≥ 1 / r2_effect` — that *is* the assertion that a small
+    effect needs a large sample, supplied as an assumption. What the proof adds
+    is that `1/·` is decreasing on the positives, so the bound survives
+    replacing `r2_effect` by any upper bound for it.
+
+    Nothing derives `h_formula` from a test, a variance, or a power target, and
+    nothing here connects `n_required` to a sample. The worked example an
+    earlier docstring cited (Wang et al., `R² ≈ 0.5%` for distance-on-error) is
+    a measurement, not an instance of this inequality. -/
+theorem le_inv_of_le_inv_of_le
     (r2_effect n_required ub : ℝ)
     (h_small : r2_effect ≤ ub)
     (h_formula : n_required ≥ 1 / r2_effect)
