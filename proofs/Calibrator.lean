@@ -68,6 +68,28 @@ import Calibrator.FoldedSpectrum
 import Calibrator.SpectralDegradation
 import Calibrator.EnsembleChannel
 import Calibrator.Permeability
+-- THE BUILD MUST COVER ITS OWN CORPUS. Everything below was outside this root's import
+-- closure, so `lake build Calibrator` never compiled it -- and a module the build never
+-- reaches is not clean, it is UNBUILT. That is not a hypothetical: `ResonanceSpectrum`
+-- had been failing all day on a missing `Real.log` import while every whole-corpus build
+-- reported zero errors, because no target ever named it. It showed up only as a line in
+-- `MODULES_ABSENT`, which is a truthful report in a format nobody interrogated.
+--
+-- So orphan modules get imported here rather than left to be picked up by whoever
+-- remembers to name them. If one of these goes red the ROOT goes red, which is the
+-- entire point: that is the signal that was missing. Do not remove an import here to
+-- make the root build green -- that restores the blindness rather than fixing the break.
+--
+-- Check for new orphans with the closure of this file's imports against the files on
+-- disk; the count is 100 modules, 100 in closure.
+import Calibrator.ResonanceSpectrum
+import Calibrator.BundleRigidity.Coverage
+import Calibrator.BundleRigidity.Cycles
+import Calibrator.BundleRigidity.Dichotomy
+import Calibrator.BundleRigidity.Operator
+import Calibrator.BundleRigidity.SingleModulus
+import Calibrator.BundleRigidity.Telescope
+import Calibrator.BundleRigidity.TwoAtom
 
 namespace Calibrator
 
@@ -242,6 +264,35 @@ theorem target_r2_drop_of_fst_and_sparse_array_proved
   exact target_r2_strictly_decreases_of_covariance_mismatch
     mseSource mseTarget varY lam sigmaSource sigmaTarget
     h_mse_gap_lb h_lam_pos h_mismatch h_varY_pos
+
+/-! ### `ld_decay_implies_nonlinear_calibration_proved` -- READ BEFORE TOUCHING ITS INPUTS
+
+This theorem is the consumer of `LDDecayMechanism` and `decaySlope` in
+`Calibrator.DGP`, and it is the ONLY one. It also lives in `proofs/Calibrator.lean`, the
+corpus root, one directory *above* `proofs/Calibrator/`.
+
+That combination has already destroyed both definitions once. A dead-code scan walking
+only `proofs/Calibrator/` reported `decaySlope` as having "no use anywhere and no theorem
+about them" and deleted it; a second pass then deleted `LDDecayMechanism` as having "lost
+its only consumer". Both premises were false, and the second inherited the first's error.
+
+**The deletion did not break the build, and that is the dangerous part.** Lean auto-binds
+an undefined bare name as an implicit variable rather than reporting it missing, so this
+theorem kept elaborating -- with `mech` an arbitrary inhabitant of an arbitrary type and
+`decaySlope` an arbitrary function, every hypothesis about them constraining nothing. It
+sat here green, among the headline results, as a well-formed claim about nothing, until
+an application finally demanded a function. So for this class of name the build cannot
+detect the breakage: ABSENCE OF A BUILD FAILURE IS NOT EVIDENCE THAT A DELETION WAS SAFE.
+
+It compounded with a second blind spot: this root module was outside the import closure of
+every build target, so nothing elaborated the declaration either way. Two independent
+instruments were blind at once.
+
+If you are removing something as unreferenced, grep the full `proofs/` tree INCLUDING this
+file and the validation Python -- and grep the surrounding prose too. The section docstring
+three lines above the deletion site in `DGP.lean` named this theorem by its full path the
+entire time; only the identifier search missed it.
+-/
 
 /-- Rigorous proof that exponential LD decay cannot be fit by a linear slope calibration.
     Non-affineness is derived from three explicit distances rather than assumed. -/
