@@ -75,8 +75,8 @@ available to the grade-0 sup. **Indistinguishability is a constraint being satis
 budget being earned.** `GradeSound` is kept as an explicit hypothesis only because
 `GradedModulus` is abstract and does not know it is a sup over nested sets; for any nested
 reading it is a theorem, and the eventual quantifier in
-`PolygenicArchitecture.architecture_gradeSound_eventually` is therefore weaker than it needs
-to be.
+Any downstream grade-soundness assumption for a nested feasible-set model is therefore
+weaker than it needs to be.
 
 ## Part (III) FAILED its first measurement, and the mechanism is not an artifact
 
@@ -323,8 +323,9 @@ structure DonohoLiuFragment (C : CertificateCalculus) where
 /-- **In the Donoho–Liu regime the modulus error is bounded, and by how much.**
 
     `Δ₀ ≤ √(5/4) · Δ₂`. So a rate read off a grade-2 certificate is short by a factor of at
-    most `√(5/4) < 1.12` in the modulus — under 12%, and in particular a *constant*, which
-    is what part (III) shows fails at every fixed grade off this regime. -/
+    most `√(5/4) < 1.12` in the modulus — under 12%, and in particular a constant.
+    Part (III) would contrast with this only in an experiment satisfying its additional
+    analytic assumptions. -/
 theorem donohoLiu_modulus_ratio_le (C : CertificateCalculus) (DL : DonohoLiuFragment C)
     (h : ℝ) :
     C.modulus.Δ 0 h ≤ Real.sqrt (5 / 4) * C.modulus.Δ 2 h := by
@@ -408,14 +409,10 @@ theorem NonsmoothIncompleteness.b_eq {C : CertificateCalculus}
 
     At sample scale `h = 1/n`, a grade-`K` certificate understates the modulus by at least
     `envelopeConst · n ^ (b K / 2) / √(log n)`. The exponent `b K` is `Θ(1/K)`, so the
-    factor is polynomial in `n` for every fixed grade, and it is polynomial *however large*
-    the grade — which is the content of the theorem. Convexity of the problem is where one
-    would expect tightness, and this says every fixed grade still under-certifies by a
-    polynomial factor there.
-
-    The practical translation: a sample size derived for a nonsmooth functional from a
-    two-point, Assouad or Fano argument is polynomially optimistic, and by an amount that is
-    an approximation-theory quantity rather than an artifact of the argument. -/
+    factor is polynomial in `n` for every fixed grade. This conclusion is conditional on
+    `E`: neither convexity nor a statistical experiment is encoded by the theorem. The
+    first audited Gaussian-mixture instance did not satisfy these fields, so no practical
+    sample-size claim follows without a separate instantiation proof. -/
 theorem gradeGap_lower_bound {C : CertificateCalculus} (E : NonsmoothIncompleteness C)
     (K : ℕ) (hK : 0 < K) (n : ℝ) (hn : 1 < n)
     (hpos : 0 < C.modulus.Δ K (1 / n)) :

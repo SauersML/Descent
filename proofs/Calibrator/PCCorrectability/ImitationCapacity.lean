@@ -1083,10 +1083,10 @@ trace window, exactly:
 * `effectiveSubgroupSize n m` is the *spike load* — the squared length of the
   centered subgroup-contrast direction (`dot_demographicSpikeDirection`);
 * `demographicSpike n F m` is the *certificate increment* — the spike level
-  times that load (`demographicSpike_eq_level_mul_spikeLoad`), with the level
-  being the standardized contrast variance and the level's pinning to Hudson
-  `F_ST` supplied by `Conventions.four_neiGst_eq_standardizedContrastVariance`
-  and composed in `Calibrator.DemographicCapacity`.
+  times that load (`demographicSpike_eq_level_mul_spikeLoad`). This theorem is
+  intentionally convention-agnostic: `Calibrator.DemographicCapacity`
+  separately wires the empirically Hudson-calibrated PC law and the exact
+  Nei-normalized allele-contrast law. They are not the same specialization.
 
 So the left-hand side of the existing comparison sits in exactly the place the
 linear program puts it.
@@ -1192,11 +1192,12 @@ theorem traceWindow_spikeLoad_demographic {N : ℕ} (m : ℕ) (hmn : m ≤ N) (h
   rw [traceWindowBudgetClass_form, traceForm_spikeOuter]
   exact dot_demographicSpikeDirection N m hmn hN
 
-/-- **`demographicSpike` is the trace-window certificate increment.**  The
-existing quantity is the amount by which a demographic spike at level `4F`
-raises the certificate: level times load, which is exactly the linear program's
-left-hand side.  The level is the standardized contrast variance, pinned to
-Hudson `F_ST` by `Conventions.four_neiGst_eq_standardizedContrastVariance`. -/
+/-- **`demographicSpike` is the trace-window certificate increment at an
+abstract level coordinate.** The quantity is the amount by which a spike at
+level `4F` raises the certificate: level times load, exactly the linear
+program's left-hand side. No estimator convention is inferred here. The
+Hudson BBP and Nei contrast specializations are intentionally distinct in
+`Calibrator.DemographicCapacity`. -/
 theorem demographicSpike_eq_level_mul_spikeLoad {N : ℕ} (m : ℕ) (F : ℝ)
     (hmn : m ≤ N) (hN : 0 < N)
     (base : Matrix (Fin N) (Fin N) ℝ) (budget : ℝ) (a : Unit) :

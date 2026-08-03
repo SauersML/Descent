@@ -23,8 +23,8 @@ The scale of F is therefore pinned to GENUINE Hudson F_ST -- the ratio-of-
 averages estimator `hudson_fst` in `bn_independent.py`, whose denominator is
 the between-subgroup heterozygosity p1(1-p2) + p2(1-p1).
 
-Do NOT substitute `Calibrator.Conventions.neiGst`. Despite its name that
-definition computes NEI'S G_ST (it divides by the total-pool heterozygosity
+Do NOT substitute `Calibrator.Conventions.neiGst`. That definition computes
+NEI'S G_ST (it divides by the total-pool heterozygosity
 2 pbar (1 - pbar)), and the two are related exactly by
 
     Hudson = 2G / (1 + G)

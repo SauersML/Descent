@@ -108,17 +108,21 @@ theorem larger_Ne_slower_drift (Ne₁ Ne₂ : ℝ)
 noncomputable def ldDecayPerGeneration (r : ℝ) (t : ℕ) : ℝ :=
   (1 - r) ^ t
 
-/-- **Cross-check: geometric LD decay, recombination survival along a
-genealogy, and admixture-LD decay are one map.** `DGP.discreteRecombinationSurvival`
-and `PortabilityDrift.admixtureLDDecay` spell out `(1 - r)^t` independently;
-these theorems make a divergence between the three a failed proof. -/
-theorem ldDecayPerGeneration_eq_discreteRecombinationSurvival (r : ℝ) (t : ℕ) :
-    ldDecayPerGeneration r t = discreteRecombinationSurvival r t := by
-  unfold ldDecayPerGeneration discreteRecombinationSurvival; ring
+/-! **Cross-check: geometric LD decay, recombination survival along a genealogy, and
+admixture-LD decay are one map.** `ldDecayPerGeneration_eq_discreteRecombinationSurvival`
+and `ldDecayPerGeneration_eq_admixtureLDDecay` used to sit here. Both were deleted as
+redundant, not as wrong: `Conventions.lean` proves all four spellings equal to the shared
+primitive `geometricDecay`, and these two are that hub's transitive consequences. Six
+pairwise theorems for one function is five more than the corpus needs, and a divergence
+between any two spellings still fails a proof — it fails one of the three hub theorems.
 
-theorem ldDecayPerGeneration_eq_admixtureLDDecay (r : ℝ) (t : ℕ) :
-    ldDecayPerGeneration r t = admixtureLDDecay r t := by
-  unfold ldDecayPerGeneration admixtureLDDecay; ring
+Neither carried a hypothesis and nothing referenced either. What is NOT yet done is the
+part worth doing: `(1 - r)^t` is written out under four names in four files
+(`geometricDecay`, `ldDecayPerGeneration`, `DGP.discreteRecombinationSurvival`,
+`PortabilityDrift.admixtureLDDecay`) and should be one. That collapse is ~86 references
+across Lean, Python and JSON string tables and is blocked on `PortabilityDrift.lean`,
+which cannot currently be edited from this session without reverting another session's
+in-flight work. -/
 
 /-- LD decay is in [0,1] for r ∈ [0,1]. -/
 theorem ld_decay_in_unit (r : ℝ) (t : ℕ)

@@ -20,28 +20,29 @@ noncomputable def effectiveSubgroupSize (n m : ℝ) : ℝ := m * (n - m) / n
 the sum of the reciprocals of the subgroup and its complement. This pins the body — a
 scaled, shifted, negated or `n`/`m`-transposed version of `m(n-m)/n` fails it — which is
 why it is stated. Every other theorem mentioning `effectiveSubgroupSize` has it on both
-sides of an equation, where it cancels: `demographicSpike_eq_contrastVariance_mul_effectiveSize`
-in `Conventions.lean` and the `spikeIdentification` certificate built from it constrain
+sides of an equation, where it cancels: `neiContrastSpike_eq_contrastVariance_mul_effectiveSize`
+in `Conventions.lean` and the `neiContrastSpikeIdentification` certificate built from it constrain
 the factor `4` and the scale of `F`, and constrain this definition not at all. The
 certificate census recorded that pair as VACUOUS_FOR `effectiveSubgroupSize` and this
 lemma is the repair; the certificate is sound for what it does certify, so it stays. -/
 theorem inv_effectiveSubgroupSize (n m : ℝ)
-    (hn : n ≠ 0) (hm : m ≠ 0) (hnm : n - m ≠ 0) :
+    (hm : m ≠ 0) (hnm : n - m ≠ 0) :
     (effectiveSubgroupSize n m)⁻¹ = m⁻¹ + (n - m)⁻¹ := by
   unfold effectiveSubgroupSize
   field_simp
   ring
 
 /-- Rank-one signal contributed by a subgroup contrast with differentiation
-`F`, where `F` is Hudson `F_ST` between the two subgroups.
+coordinate `F`.
 
 The constant is `4`, not `2`.  Inverting the BBP eigenvalue law on simulated
-genotypes recovers `3.9920 ± 0.0045` with `F` measured as Hudson `F_ST` on the
-same simulated data, and the resulting sharp criterion `1 < M F² n` is the
-Patterson-Price-Reich boundary.  A constant of `2` corresponds instead to
-reading `F` as `Var(p₁ - p₂) / (p̄ (1 - p̄)) = 2 F_ST`; that is self-consistent
-but is not a standard quantity, so the scale of `F` is pinned to Hudson `F_ST`
-here rather than left to the caller.
+genotypes recovers `3.9920 ± 0.0045` when `F` is measured as genuine Hudson
+`F_ST` on the same simulated data. The generic algebra below leaves the real
+coordinate abstract; biologically safe specializations are named separately:
+`hudsonBbpSpike` is the empirically calibrated PC law, whereas
+`neiContrastSpike` is the exact per-frequency allele-contrast normalization.
+The conversion `Hudson = 2G/(1+G)` is nonlinear, so the two must not be
+substituted for one another.
 
     Empirical status: VALIDATED (BBP inversion recovers 3.9920 ± 0.0045 against the derived 4). -/
 noncomputable def demographicSpike (n F m : ℝ) : ℝ :=

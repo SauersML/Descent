@@ -519,7 +519,7 @@ end EffectSizeHeterogeneity
 
 
 /-!
-## Sample Size for Nonsmooth Architecture Summaries
+## Conditional Sample-Size Benchmarks for Nonsmooth Architecture Summaries
 
 Every sample-size law in this file is polynomial: `r2ScalingModel` saturates as
 `n / (n + C)`, the noncentrality grows linearly in `n`, and the allocation
@@ -528,79 +528,68 @@ targets those laws are about — `R²`, a per-variant association test, a varian
 component — because those are smooth functionals of the underlying parameters,
 and smooth functionals are estimable at polynomial rates.
 
-None of it transfers to the nonsmooth summaries of an effect-size distribution.
-For the mean absolute effect and its kin (see
-`Calibrator.PolygenicArchitecture`, section `NonsmoothSummaries`) the attainable
-risk is of order `1 / log n`. Two things follow, and neither was recorded
-anywhere in this corpus before.
+None of it transfers automatically to nonsmooth summaries of an effect-size
+distribution. For mean absolute effect and its kin, `1 / log n` is a candidate
+benchmark imported from a specific Gaussian-sequence analysis, not a theorem
+about every GWAS experiment. The functions below record what would follow if a
+concrete model identified that benchmark.
 
-First, the sample size needed to reach accuracy `ε` is `exp (1/ε)`, exponential
-in the reciprocal accuracy, not a power of it.
+First, the logarithmic benchmark inverts to `exp (1/ε)`, exponential in the
+reciprocal accuracy rather than a power of it.
 
-Second — and this is the trap — a designer who derives a sample size for such a
-summary from a two-point argument, an Assouad cube, a `K`-point Fano bound or an
-order-`K` moment-matched construction gets a *polynomial* answer, because that
-is all a fixed-grade certificate can express. The answer is not conservative in
-the safe direction. It is short, by a polynomial factor for grade `K` and by an
-exponential factor at grade one, and the shortfall is an invariant of the
-functional rather than looseness that a sharper version of the same argument
-could remove.
+Second, a polynomial candidate certificate curve inverts to a polynomial sample
+size, whereas the logarithmic curve inverts to an exponential one. This
+comparison is exact real analysis. It is not evidence that all two-point,
+Assouad, Fano, or fuzzy-hypothesis methods have the polynomial curve: the first
+LP audit in `CertificateGrading` found the proposed moment grade nearly free.
 
-The claims in this corpus that the incompleteness result marks as optimistic
-are listed in the module docstring of `Calibrator.PolygenicArchitecture`; within
-this file the affected surface is any use of `r2ScalingModel`,
-`diminishing_returns`, `invest_in_undersampled` or
-`balanced_allocation_maximizes_total_utility` where the quantity being bought
-with the samples is a polygenicity or sparsity summary rather than an `R²`.
-Those four theorems remain true as stated — they are statements about the
-saturating shape, and nothing here contradicts them — but the shape is the wrong
-model for a nonsmooth target.
+Thus the existing `R²` theorems remain true for their stated smooth endpoints.
+A user must not substitute a polygenicity or sparsity summary for `R²` without
+first proving the corresponding observation-model reduction and minimax law.
 -/
 
 section NonsmoothSampleSize
 
-/-- **Sample size at which the attainable risk for a nonsmooth summary reaches
-    `ε`.**
+/-- **Sample size that inverts the logarithmic risk benchmark at `ε`.**
 
-    `exp (1/ε)`. This is the inverse of `nonsmoothSummaryRisk`, and it is
-    exponential in the reciprocal accuracy.
-
-    Empirical status: UNTESTED. -/
-noncomputable def logRateSampleSize (epsilon : ℝ) : ℝ := Real.exp (1 / epsilon)
-
-/-- **Sample size a grade-`K` certificate reports as sufficient.**
-
-    `ε ^ (-(K/c))`, the inverse of `gradeCertifiedRisk`: a power law in the
-    reciprocal accuracy, with the grade of the certificate setting the exponent.
+    `exp (1/ε)`. This is a benchmark inversion, not an asserted sample-size
+    requirement for a GWAS.
 
     Empirical status: UNTESTED. -/
-noncomputable def gradeCertifiedSampleSize (epsilon K c : ℝ) : ℝ :=
+noncomputable def logarithmicBenchmarkSampleSize (epsilon : ℝ) : ℝ := Real.exp (1 / epsilon)
+
+/-- **Sample size that inverts the polynomial fixed-grade benchmark.**
+
+    `ε ^ (-(K/c))`, a power law in reciprocal accuracy. It acquires a certificate
+    interpretation only when a concrete calculus proves this benchmark.
+
+    Empirical status: UNTESTED. -/
+noncomputable def fixedGradeBenchmarkSampleSize (epsilon K c : ℝ) : ℝ :=
   epsilon ^ (-(K / c))
 
-/-- `logRateSampleSize` inverts the logarithmic rate. -/
-theorem logRateSampleSize_attains (epsilon : ℝ) :
-    nonsmoothSummaryRisk (logRateSampleSize epsilon) = epsilon := by
-  unfold nonsmoothSummaryRisk logRateSampleSize
+/-- `logarithmicBenchmarkSampleSize` inverts the logarithmic benchmark. -/
+theorem logarithmicBenchmarkSampleSize_inverts (epsilon : ℝ) :
+    logarithmicRiskBenchmark (logarithmicBenchmarkSampleSize epsilon) = epsilon := by
+  unfold logarithmicRiskBenchmark logarithmicBenchmarkSampleSize
   rw [Real.log_exp, one_div_one_div]
 
-/-- `gradeCertifiedSampleSize` inverts the certified polynomial rate. -/
-theorem gradeCertifiedSampleSize_attains (epsilon K c : ℝ)
+/-- `fixedGradeBenchmarkSampleSize` inverts the polynomial benchmark. -/
+theorem fixedGradeBenchmarkSampleSize_inverts (epsilon K c : ℝ)
     (h_eps : 0 < epsilon) (hK : K ≠ 0) (hc : c ≠ 0) :
-    gradeCertifiedRisk (gradeCertifiedSampleSize epsilon K c) K c = epsilon := by
-  unfold gradeCertifiedRisk gradeCertifiedSampleSize
+    fixedGradeRiskBenchmark (fixedGradeBenchmarkSampleSize epsilon K c) K c = epsilon := by
+  unfold fixedGradeRiskBenchmark fixedGradeBenchmarkSampleSize
   have hexp : (-(K / c)) * (-(c / K)) = 1 := by
     rw [neg_mul_neg, div_mul_div_comm, mul_comm c K, div_self (mul_ne_zero hK hc)]
   rw [← Real.rpow_mul (le_of_lt h_eps), hexp, Real.rpow_one]
 
-/-- **A grade-`K` sample-size calculation understates the requirement.**
+/-- **Conditional comparison of the polynomial and logarithmic sample-size benchmarks.**
 
     Stated with the crossing point as a hypothesis: wherever the power law sits
-    below the exponential, the certificate's answer is short. The unconditional
-    grade-one case is `twoPoint_understates_sample_size` below. -/
-theorem gradeCertified_understates_sample_size (epsilon K c : ℝ)
+    below the exponential, the former benchmark is smaller. -/
+theorem fixedGradeBenchmark_lt_logarithmicBenchmark (epsilon K c : ℝ)
     (h_gap : epsilon ^ (-(K / c)) < Real.exp (1 / epsilon)) :
-    gradeCertifiedSampleSize epsilon K c < logRateSampleSize epsilon := by
-  unfold gradeCertifiedSampleSize logRateSampleSize
+    fixedGradeBenchmarkSampleSize epsilon K c < logarithmicBenchmarkSampleSize epsilon := by
+  unfold fixedGradeBenchmarkSampleSize logarithmicBenchmarkSampleSize
   exact h_gap
 
 /-- **At a normalised grade one, the shortfall needs no crossing hypothesis.**
@@ -614,13 +603,12 @@ theorem gradeCertified_understates_sample_size (epsilon K c : ℝ)
     Under it, the certified sample size is at most `1/ε` while the requirement
     is `exp (1/ε)`, at every target accuracy in `(0, 1]`.
 
-    For every grade, with no normalisation at all, see
-    `gradeCertified_understates_sample_size_eventually` below, which gives the
-    same conclusion once the target is sharp enough. -/
-theorem twoPoint_understates_sample_size (epsilon K c : ℝ)
+    This remains a curve comparison; `h_grade` is not automatically supplied by
+    any particular lower-bound method. -/
+theorem normalizedFixedGradeBenchmark_lt_logarithmicBenchmark (epsilon K c : ℝ)
     (h_eps : 0 < epsilon) (h_eps_le : epsilon ≤ 1) (h_grade : K / c ≤ 1) :
-    gradeCertifiedSampleSize epsilon K c < logRateSampleSize epsilon := by
-  unfold gradeCertifiedSampleSize logRateSampleSize
+    fixedGradeBenchmarkSampleSize epsilon K c < logarithmicBenchmarkSampleSize epsilon := by
+  unfold fixedGradeBenchmarkSampleSize logarithmicBenchmarkSampleSize
   have h1 : epsilon ^ (-(K / c)) ≤ epsilon ^ (-(1 : ℝ)) :=
     Real.rpow_le_rpow_of_exponent_ge h_eps h_eps_le (by linarith)
   have h2 : epsilon ^ (-(1 : ℝ)) = 1 / epsilon := by
@@ -629,8 +617,7 @@ theorem twoPoint_understates_sample_size (epsilon K c : ℝ)
   rw [h2] at h1
   linarith
 
-/-- **Every grade understates, at no normalisation, once the target is sharp
-    enough.**
+/-- **Every fixed polynomial benchmark is eventually below the exponential benchmark.**
 
     Written along the sharpening target `ε = 1/x` as `x → ∞`, which is where the
     statement has content and which keeps the filter on `atTop` rather than on a
@@ -638,12 +625,12 @@ theorem twoPoint_understates_sample_size (epsilon K c : ℝ)
     is `x^(K/c)` and the requirement is `exp x`, so the claim is that a power is
     eventually beaten by the exponential — `isLittleO_rpow_exp_atTop`, which
     holds for every real exponent with no side condition. This is the general
-    form of `twoPoint_understates_sample_size` with its normalisation `K/c ≤ 1`
-    removed: no grade of certificate, however high, and no constant, however
-    favourable, escapes the shortfall. -/
-theorem gradeCertified_understates_sample_size_eventually (K c : ℝ) :
+    This proves no claim about a certificate calculus until the benchmark curves
+    are derived from that calculus. -/
+theorem fixedGradeBenchmark_lt_logarithmicBenchmark_eventually (K c : ℝ) :
     ∀ᶠ x : ℝ in Filter.atTop,
-      gradeCertifiedSampleSize (1 / x) K c < logRateSampleSize (1 / x) := by
+      fixedGradeBenchmarkSampleSize (1 / x) K c <
+        logarithmicBenchmarkSampleSize (1 / x) := by
   have hbound := (isLittleO_rpow_exp_atTop (K / c)).bound
     (by norm_num : (0 : ℝ) < 1 / 2)
   filter_upwards [hbound, Filter.eventually_ge_atTop (2 : ℝ)] with x hx hx2
@@ -653,11 +640,11 @@ theorem gradeCertified_understates_sample_size_eventually (K c : ℝ) :
   have hle : x ^ (K / c) ≤ 1 / 2 * Real.exp x := by
     rw [Real.norm_of_nonneg (le_of_lt hxm), Real.norm_of_nonneg (le_of_lt hexp)] at hx
     exact hx
-  have hcert : gradeCertifiedSampleSize (1 / x) K c = x ^ (K / c) := by
-    unfold gradeCertifiedSampleSize
+  have hcert : fixedGradeBenchmarkSampleSize (1 / x) K c = x ^ (K / c) := by
+    unfold fixedGradeBenchmarkSampleSize
     rw [one_div, Real.inv_rpow (le_of_lt hx0), Real.rpow_neg (le_of_lt hx0), inv_inv]
-  have hlog : logRateSampleSize (1 / x) = Real.exp x := by
-    unfold logRateSampleSize
+  have hlog : logarithmicBenchmarkSampleSize (1 / x) = Real.exp x := by
+    unfold logarithmicBenchmarkSampleSize
     rw [one_div_one_div]
   rw [hcert, hlog]
   linarith

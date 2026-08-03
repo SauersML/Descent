@@ -238,7 +238,22 @@ noncomputable def true_portability_loss
 /-- **Ascertainment creates artificial portability loss.**
     Even with identical genetic architecture, the PGS computed
     from an EUR-ascertained array has lower R² in non-EUR
-    populations because the array misses non-EUR causal variants. -/
+    populations because the array misses non-EUR causal variants.
+
+    **DO NOT COLLAPSE `apparent_portability_loss` INTO `true_portability_loss`.** Both
+    bodies are `a - b`, so `validation/extract/equivalence.py` reports them as one
+    equivalence class and a duplicate-body sweep will propose merging them. They are two
+    different quantities: one is measured against the array actually deployed, the other
+    against an ideal non-ascertained design that does not exist. Their arithmetic
+    coincides and their referents do not, which is the whole content of this theorem —
+    the gap between them is the ascertainment artifact.
+
+    Note honestly what is and is not proved. The first conjunct is a decomposition and is
+    an identity (`ring`). The second conjunct is `h_array_worse` restated through the two
+    definitions, so it is trivial to prove — but, unlike a vacuous statement, it CAN
+    fail: drop the hypothesis and it is false. Contrast
+    `DriftRegime.cluster_identities_hold_at_every_retention`, which holds at every value
+    of its argument and is intentionally unfalsifiable. -/
 theorem ascertainment_artificial_loss
     (r2_source r2_target_array r2_target_ideal : ℝ)
     (h_array_worse : r2_target_array < r2_target_ideal) :

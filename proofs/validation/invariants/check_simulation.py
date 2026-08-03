@@ -312,7 +312,7 @@ SPECS = [
          "variance of a diploid dosage drawn Binomial(2, p)"),
 
     spec("Conventions.neiGst",
-         lambda p1, p2, seed=0: S.sim_hudson_fst(p1, p2, seed=seed),
+         lambda p1, p2, seed=0: S.sim_nei_gst(p1, p2, seed=seed),
          [(0.1, 0.9), (0.1, 0.9)],
          "1 - within/total pairwise difference, with both diversities "
          "measured by drawing pairs of alleles and counting mismatches",

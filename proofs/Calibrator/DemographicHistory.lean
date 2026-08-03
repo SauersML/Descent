@@ -81,7 +81,7 @@ section SteppingStone
     A previous version of that derivation concluded
     `d / (d + 4·Nₑ·σ⁴·m²)` instead -- a different function of the parameters,
     with no theorem equating it to this definition. The defect was in the
-    derivation, in two places: `steppingStoneCoalescenceTime` omitted the factor
+    derivation, in two places: `steppingStoneDiffusionTimescale` omitted the factor
     `1/2` from the relative diffusion of two lineages, and the derivation then
     passed `2·Nₑ·σ²·m` where `coalFst` expects an effective size
     `Nₑ`. The docstring's claim that "the factor of 4 arises from the diploid
@@ -233,6 +233,12 @@ being 2m (or 2·m·σ²), not from any separate diploid doubling.
     `(D-d)`; that pairing is a load-bearing convention and not an incidental
     choice of argument.
 
+    RENAMED from `steppingStoneCoalescenceTime`. It is a diffusion timescale, not a
+    coalescence time: as the note above records, it is MEASURED to be off by exactly
+    `(D-d)` as a standalone meeting time, and it only yields a correct
+    `demoSteppingStoneFst` because that error cancels against a per-deme `Nₑ`. The old
+    name asserted the quantity the measurement rejects.
+
     Empirical status: MEASURED and off by exactly `(D-d)` as a standalone
     meeting time. Its consequence `demoSteppingStoneFst` is CONDITIONALLY
     VALID -- RMS relative error 0.044 with σ² SET rather than fitted, against
@@ -240,11 +246,11 @@ being 2m (or 2·m·σ²), not from any separate diploid doubling.
     exponential form. Note that this is the σ²-held-fixed comparison the
     docstring on `demoSteppingStoneFst` records as not yet done; it has now
     been done and the derived form wins. -/
-noncomputable def steppingStoneCoalescenceTime (d σ_sq m : ℝ) : ℝ :=
+noncomputable def steppingStoneDiffusionTimescale (d σ_sq m : ℝ) : ℝ :=
   d / (2 * σ_sq * m)
 
 /-- **Expected meeting time on a lattice of `D` demes**, `d·(D-d)/(2·σ²·m)`:
-    the quantity `steppingStoneCoalescenceTime` is a per-deme rescaling of.
+    the quantity `steppingStoneDiffusionTimescale` is a per-deme rescaling of.
     Stated so that the corpus contains the lattice-level time under a name,
     rather than only the rescaled one under a name that does not say it is
     rescaled. -/
@@ -257,25 +263,25 @@ noncomputable def steppingStoneMeetingTimeOnLattice (d D σ_sq m : ℝ) : ℝ :=
     by exactly this factor stops compiling. -/
 theorem steppingStoneMeetingTime_eq_scaled (d D σ_sq m : ℝ) :
     steppingStoneMeetingTimeOnLattice d D σ_sq m
-      = (D - d) * steppingStoneCoalescenceTime d σ_sq m := by
-  unfold steppingStoneMeetingTimeOnLattice steppingStoneCoalescenceTime
+      = (D - d) * steppingStoneDiffusionTimescale d σ_sq m := by
+  unfold steppingStoneMeetingTimeOnLattice steppingStoneDiffusionTimescale
   ring
 
 /-- **The two agree only when `D - d = 1`**, i.e. essentially never for a
     lattice worth modelling. Stated as the contrapositive of the regime: if a
-    reader takes `steppingStoneCoalescenceTime` for the meeting time, this is
+    reader takes `steppingStoneDiffusionTimescale` for the meeting time, this is
     the assumption they have made without writing it down. -/
 theorem steppingStoneMeetingTime_eq_perDeme_iff (d D σ_sq m : ℝ)
     (hd : 0 < d) (hσ : 0 < σ_sq) (hm : 0 < m) :
     steppingStoneMeetingTimeOnLattice d D σ_sq m
-      = steppingStoneCoalescenceTime d σ_sq m ↔ D - d = 1 := by
+      = steppingStoneDiffusionTimescale d σ_sq m ↔ D - d = 1 := by
   rw [steppingStoneMeetingTime_eq_scaled]
   constructor
   · intro h
-    have hpos : 0 < steppingStoneCoalescenceTime d σ_sq m := by
-      unfold steppingStoneCoalescenceTime
+    have hpos : 0 < steppingStoneDiffusionTimescale d σ_sq m := by
+      unfold steppingStoneDiffusionTimescale
       apply div_pos hd; have := mul_pos hσ hm; linarith
-    have := mul_right_cancel₀ (ne_of_gt hpos) (by linarith : (D - d) * steppingStoneCoalescenceTime d σ_sq m = 1 * steppingStoneCoalescenceTime d σ_sq m)
+    have := mul_right_cancel₀ (ne_of_gt hpos) (by linarith : (D - d) * steppingStoneDiffusionTimescale d σ_sq m = 1 * steppingStoneDiffusionTimescale d σ_sq m)
     linarith
   · intro h; rw [h, one_mul]
 
@@ -305,9 +311,9 @@ deleted in favour of that one. -/
     definition, and nothing equated them. -/
 theorem steppingStoneFst_from_coalescence_time (d Ne m σ_sq : ℝ)
     (hd : 0 < d) (hNe : 0 < Ne) (hm : 0 < m) (hσ : 0 < σ_sq) :
-    coalFst (steppingStoneCoalescenceTime d σ_sq m) Ne =
+    coalFst (steppingStoneDiffusionTimescale d σ_sq m) Ne =
       demoSteppingStoneFst d Ne m σ_sq := by
-  unfold coalFst steppingStoneCoalescenceTime demoSteppingStoneFst
+  unfold coalFst steppingStoneDiffusionTimescale demoSteppingStoneFst
   have hσm : (0 : ℝ) < 2 * σ_sq * m := by
     have h := mul_pos hσ hm; linarith
   have hσm' : (2 : ℝ) * σ_sq * m ≠ 0 := ne_of_gt hσm
@@ -324,7 +330,7 @@ theorem steppingStoneFst_from_coalescence_time (d Ne m σ_sq : ℝ)
 
 /-- **The meeting time inherits the indistinguishability of the `F_ST` it produces.**
 
-`steppingStoneCoalescenceTime` is the only route by which `demoSteppingStoneFst` acquires
+`steppingStoneDiffusionTimescale` is the only route by which `demoSteppingStoneFst` acquires
 its dispersal variance, so the freedom that makes the `F_ST` unidentifiable is freedom in
 this quantity. Stated so the meeting time carries the regime rather than borrowing it
 silently from a theorem three declarations away: a refitted `σ²` changes the meeting time
@@ -332,7 +338,7 @@ and leaves the observable `F_ST` fixed, which is what it means for the data to c
 `m·σ²` and not the dispersal variance itself. -/
 theorem steppingStoneCoalescenceTime_indistinguishable_through_coalFst
     (d Ne m σ_sq : ℝ) (hd : 0 < d) (hNe : 0 < Ne) (hm : 0 < m) (hσ : 0 < σ_sq) :
-    coalFst (steppingStoneCoalescenceTime d σ_sq m) Ne =
+    coalFst (steppingStoneDiffusionTimescale d σ_sq m) Ne =
       steppingStoneFstQuadratic d Ne m (Real.sqrt (σ_sq / m)) := by
   rw [steppingStoneFst_from_coalescence_time d Ne m σ_sq hd hNe hm hσ]
   exact demoSteppingStoneFst_indistinguishable_from_quadratic d Ne m σ_sq hm (le_of_lt hσ)
@@ -340,8 +346,8 @@ theorem steppingStoneCoalescenceTime_indistinguishable_through_coalFst
 /-- The coalescence time is positive for positive distance and dispersal. -/
 theorem steppingStoneCoalescenceTime_pos (d σ_sq m : ℝ)
     (hd : 0 < d) (hσ : 0 < σ_sq) (hm : 0 < m) :
-    0 < steppingStoneCoalescenceTime d σ_sq m := by
-  unfold steppingStoneCoalescenceTime
+    0 < steppingStoneDiffusionTimescale d σ_sq m := by
+  unfold steppingStoneDiffusionTimescale
   positivity
 
 /-- Fst from coalescence time is in (0, 1) for positive parameters. -/

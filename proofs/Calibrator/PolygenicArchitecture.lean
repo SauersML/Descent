@@ -440,21 +440,19 @@ kin in this file to a polygenicity or sparsity summary, and it is far harder to
 estimate than the variance-type summaries standing beside it.
 
 The second half of the picture is about certificates rather than estimators.
-For a nonsmooth functional every fixed-grade lower-bound argument —
-two-point, Assouad, Fano over `K` points, order-`K` moment-matched fuzzy
-hypotheses — under-certifies the minimax rate by a polynomial factor: grade `K`
-certifies only `n^(-Θ(1/K))` against a truth of order `1 / log n`. The
-shortfall is not slack in a particular argument but an approximation-theoretic
-invariant of the functional, a modulus ratio, so it cannot be closed by
-sharpening the constants. `certificateDeficit` below names the shortfall, and
-`gradeCertifiedRisk_understates` gives it a lower bound that grows without
-limit in the number of variants.
+The unconditional result is algebraic: completeness at grade `K` is equivalent
+to grade-insensitivity of the modulus, and the deficit is the squared modulus
+ratio. A polynomial fixed-grade gap follows only after supplying the two fields
+of `NonsmoothIncompleteness`. The first Gaussian-location-mixture audit did
+**not** supply them: its grade-8 modulus recovered 99.93% of the ungraded one.
+Consequently this file exposes those estimates as assumptions and does not
+promote the proposed gap to a law of polygenic architectures.
 
-The consequence for study design is stated in `Calibrator.PowerAnalysis`: a
-sample size read off a two-point or Fano calculation for one of these summaries
-is not merely conservative in the wrong direction, it is short by a polynomial
-factor, and for the two-point case the requirement is exponential in the
-reciprocal accuracy where the certificate reports a power law.
+`Calibrator.PowerAnalysis` compares the logarithmic and polynomial benchmark
+curves conditionally. Those comparisons are useful for falsifying a proposed
+design calculation, but they are not sample-size guarantees for a GWAS until a
+concrete observation model proves that its minimax risk and certificate modulus
+are the stated curves.
 -/
 
 section NonsmoothSummaries
@@ -498,69 +496,216 @@ theorem meanAbsoluteEffect_sq_le_meanSquaredEffect {q : ℕ} (beta : Fin q → �
   have hmul := mul_le_mul_of_nonneg_right h (le_of_lt hq')
   nlinarith [hmul]
 
-/-- **Attainable estimation risk for a nonsmooth architecture summary.**
+/-! ### The biological models to which certificate grading applies
 
-    Order `1 / log q` at `q` variants. This is the rate for the mean absolute
-    effect in the Gaussian sequence model over a box, and it is logarithmic
-    rather than polynomial, so it does not improve at any polynomial rate as
-    the variant count grows.
+The abstract theorem in `CertificateGrading` deliberately knows nothing about genetics.
+This layer supplies the missing typing information without pretending that Mathlib proves
+the analytic minimax inputs:
+
+* a parameter is a vector of additive allelic effects;
+* the parameter class is explicitly convex;
+* the target is either a linear polygenic summary or the nonsmooth mean absolute effect;
+* minimax duality and the analytic modulus bounds are named fields, so a consumer cannot
+  obtain a biological rate merely by defining a function with the desired formula.
+
+The distinction is scientifically important. A fixed-grade gap would apply to a biological
+functional only after its experiment establishes the analytic assumptions below. No such
+instance is currently constructed here. In particular the result does **not** automatically
+apply to prediction accuracy, calibration, or portability: those endpoints require their
+own reduction to the same modulus. This prevents an assumed lower-bound shape from being
+silently relabelled as a theorem about every PGS endpoint.
+-/
+
+/-- A nonempty convex class of additive effect vectors for `q` variants. -/
+structure ConvexEffectClass (q : ℕ) where
+  /-- The admissible additive-effect vectors. -/
+  carrier : Set (Fin q → ℝ)
+  /-- A statistical parameter class must contain at least one architecture. -/
+  nonempty : carrier.Nonempty
+  /-- Convexity is explicit because any proposed incompleteness instance must establish it
+      rather than inherit it from prose. -/
+  convex : Convex ℝ carrier
+
+/-- The bounded-effect class used in Gaussian-sequence approximations of GWAS summary
+    statistics. The ambient norm on `Fin q → ℝ` is the sup norm, so this closed ball is the
+    coordinatewise box `|beta_j| ≤ B`. -/
+noncomputable def boundedEffectClass (q : ℕ) (B : ℝ) (hB : 0 ≤ B) : ConvexEffectClass q where
+  carrier := Metric.closedBall 0 B
+  nonempty := ⟨0, Metric.mem_closedBall_self hB⟩
+  convex := convex_closedBall 0 B
+
+open Calibrator.CertificateGrading in
+/-- A convex biological problem with a **linear** architecture target. The field
+    `donohoLiu` is the named Donoho--Liu analytic input; Lean proves its consequences but
+    does not replace that theorem with a rate definition. -/
+structure LinearArchitectureCertificateAssumptions (q : ℕ) where
+  /-- Convex additive-effect parameter class. -/
+  effects : ConvexEffectClass q
+  /-- Weights defining the linear architecture summary. -/
+  weights : Fin q → ℝ
+  /-- The functional whose minimax risk is studied. -/
+  target : (Fin q → ℝ) → ℝ
+  /-- The target really is the stated weighted polygenic summary. -/
+  target_eq_weightedSum : target = fun beta => ∑ j, weights j * beta j
+  /-- Certificate calculus produced by the statistical experiment. -/
+  calculus : CertificateCalculus
+  /-- Ungraded mixture duality identifies the calculus with minimax risk. -/
+  duality : MinimaxDuality calculus
+  /-- The precise grade-2 Donoho--Liu fragment. -/
+  donohoLiu : DonohoLiuFragment calculus
+
+open Calibrator.CertificateGrading in
+/-- A convex biological problem whose target is mean absolute additive effect. The two
+    analytic modulus estimates are carried by `incompleteness`; this is the exact boundary
+    between what is formalized algebraically here and what must be proved for a concrete
+    Gaussian-sequence or GWAS experiment. -/
+structure MeanAbsoluteEffectCertificateAssumptions (q : ℕ) where
+  /-- Convex additive-effect parameter class. -/
+  effects : ConvexEffectClass q
+  /-- The functional whose minimax risk is studied. -/
+  target : (Fin q → ℝ) → ℝ
+  /-- The target is the biological mean absolute effect, not an arbitrary nonsmooth map. -/
+  target_eq_meanAbsoluteEffect : target = meanAbsoluteEffect
+  /-- Certificate calculus produced by the statistical experiment. -/
+  calculus : CertificateCalculus
+  /-- Ungraded mixture duality identifies the calculus with minimax risk. -/
+  duality : MinimaxDuality calculus
+  /-- The deconvolution envelope and fixed-grade moment-comparison bound. -/
+  incompleteness : NonsmoothIncompleteness calculus
+
+/-- The nonlinear target in a `MeanAbsoluteEffectCertificateAssumptions` is definitionally tied
+    to mean absolute additive effect. -/
+theorem MeanAbsoluteEffectCertificateAssumptions.target_eq {q : ℕ}
+    (P : MeanAbsoluteEffectCertificateAssumptions q) (beta : Fin q → ℝ) :
+    P.target beta = meanAbsoluteEffect beta := by
+  rw [P.target_eq_meanAbsoluteEffect]
+
+/-- The parameter class of the mean-absolute-effect problem is convex. This accessor keeps
+    convexity visible in downstream biological theorems rather than leaving it in prose. -/
+theorem MeanAbsoluteEffectCertificateAssumptions.convex_effects {q : ℕ}
+    (P : MeanAbsoluteEffectCertificateAssumptions q) : Convex ℝ P.effects.carrier :=
+  P.effects.convex
+
+open Calibrator.CertificateGrading in
+/-- **Biological Donoho--Liu corollary.** A linear polygenic architecture summary over a
+    convex effect class has grade-2 deficit at most `5/4`, provided its grade-2 modulus is
+    the Donoho--Liu one. This covers weighted allele burdens and linear annotations; it does
+    not cover `meanAbsoluteEffect`, whose absolute value is the nonsmooth obstruction. -/
+theorem linearArchitecture_gradeTwo_deficit_le {q : ℕ}
+    (P : LinearArchitectureCertificateAssumptions q) (h : ℝ)
+    (hpos : 0 < P.calculus.modulus.Δ 2 h) :
+    P.calculus.deficit 2 h ≤ 5 / 4 :=
+  donohoLiu_deficit_le P.calculus P.donohoLiu h hpos
+
+open Calibrator.CertificateGrading in
+/-- **Ungraded completeness, biologically typed and conditional.** Under the explicitly
+    supplied duality assumption, the ungraded value equals the named minimax risk. -/
+theorem meanAbsoluteEffect_ungraded_eq_minimax {q : ℕ}
+    (P : MeanAbsoluteEffectCertificateAssumptions q) (h : ℝ) :
+    P.calculus.ungradedRisk h = P.duality.minimaxRisk h :=
+  P.duality.ungraded_eq_minimax h
+
+open Calibrator.CertificateGrading in
+/-- **Conditional fixed-grade consequence for mean absolute effect.** If a concrete
+    biological experiment proves the `NonsmoothIncompleteness` fields carried by `P`, then
+    at information scale `1/n` its modulus ratio has the displayed polynomial lower bound.
+    The structure packages assumptions; it is not itself a statistical construction. -/
+theorem meanAbsoluteEffect_fixedGrade_gap {q : ℕ}
+    (P : MeanAbsoluteEffectCertificateAssumptions q) (K : ℕ) (hK : 0 < K)
+    (n : ℝ) (hn : 1 < n) (hpos : 0 < P.calculus.modulus.Δ K (1 / n)) :
+    P.incompleteness.envelopeConst * n ^ (P.incompleteness.b K / 2) /
+        Real.sqrt (Real.log n) ≤
+      P.calculus.modulus.Δ 0 (1 / n) / P.calculus.modulus.Δ K (1 / n) :=
+  gradeGap_lower_bound P.incompleteness K hK n hn hpos
+
+open Calibrator.CertificateGrading in
+/-- The exponent encoded by the conditional analytic assumptions is exactly proportional
+    to `1/K`. This theorem does not assert that a concrete GWAS experiment has that exponent. -/
+theorem meanAbsoluteEffect_gapExponent_eq {q : ℕ}
+    (P : MeanAbsoluteEffectCertificateAssumptions q) (K : ℕ) (hK : 0 < K) :
+    P.incompleteness.b K = P.incompleteness.b 1 / (K : ℝ) :=
+  P.incompleteness.b_eq K hK
+
+open Calibrator.CertificateGrading in
+/-- **Completeness criterion for the biological problem.** Grade `K` is complete exactly
+    when matching `K` moments leaves the mean-absolute-effect modulus unchanged. Combined
+    with `deficit_eq_modulus_ratio_sq`, the certification deficit is therefore a
+    Bernstein-type approximation invariant, not a tunable proof constant. -/
+theorem meanAbsoluteEffect_complete_iff_gradeInsensitive {q : ℕ}
+    (P : MeanAbsoluteEffectCertificateAssumptions q) (K : ℕ) (h : ℝ) :
+    P.calculus.IsComplete K h ↔ P.calculus.GradeInsensitive K h :=
+  isComplete_iff_gradeInsensitive P.calculus K h
+
+open Calibrator.CertificateGrading in
+/-- The exact Bernstein-type invariant for the biological problem: the risk deficit is the
+    square of the ungraded-to-grade-`K` modulus ratio, with the value-formula constant
+    cancelled identically. -/
+theorem meanAbsoluteEffect_deficit_eq_modulusRatio_sq {q : ℕ}
+    (P : MeanAbsoluteEffectCertificateAssumptions q) (K : ℕ) (h : ℝ) :
+    P.calculus.deficit K h =
+      (P.calculus.modulus.Δ 0 h / P.calculus.modulus.Δ K h) ^ 2 :=
+  deficit_eq_modulus_ratio_sq P.calculus K h
+
+/-- **Logarithmic comparison benchmark for a nonsmooth architecture summary.**
+
+    Order `1 / log q` at `q` variants. This declaration records the analytic benchmark used
+    for mean absolute effect in the Gaussian sequence model over a bounded effect class. It
+    does not prove that benchmark; a concrete biological model must supply it through
+    `MeanAbsoluteEffectCertificateAssumptions.incompleteness`. It is a comparison curve,
+    not a proved minimax law for the biological models in this repository.
 
     Empirical status: UNTESTED. -/
-noncomputable def nonsmoothSummaryRisk (q : ℝ) : ℝ := 1 / Real.log q
+noncomputable def logarithmicRiskBenchmark (q : ℝ) : ℝ := 1 / Real.log q
 
-/-- **Risk certified by a grade-`K` lower-bound argument.**
+/-- **Candidate polynomial fixed-grade benchmark.**
 
-    `q ^ (-(c/K))`: what a two-point (`K = 1`), Assouad, `K`-point Fano or
-    order-`K` moment-matched construction can establish. Polynomial in `q`,
-    hence for large `q` far below the risk of `nonsmoothSummaryRisk` that the
-    functional actually carries.
-
-    Empirical status: UNTESTED. -/
-noncomputable def gradeCertifiedRisk (q K c : ℝ) : ℝ := q ^ (-(c / K))
-
-/-- **The shortfall of a fixed-grade certificate**, as a ratio of the risk the
-    functional carries to the risk grade `K` can certify. The mathematics says
-    this ratio is a modulus ratio: an approximation-theoretic invariant of the
-    functional, not slack in any particular argument, so no sharpening of
-    constants inside a grade-`K` method reduces it.
+    `q ^ (-(c/K))`. This curve is the proposed analytic input from Part (III),
+    not a theorem about what every two-point, Assouad, Fano, or fuzzy-hypothesis
+    argument can establish. The distinction matters because the first LP audit
+    found the moment constraints asymptotically almost free.
 
     Empirical status: UNTESTED. -/
-noncomputable def certificateDeficit (q K c : ℝ) : ℝ :=
-  nonsmoothSummaryRisk q / gradeCertifiedRisk q K c
+noncomputable def fixedGradeRiskBenchmark (q K c : ℝ) : ℝ := q ^ (-(c / K))
+
+/-- Ratio of the logarithmic and polynomial benchmark curves. It becomes an actual
+    certificate deficit only for an experiment that separately identifies these curves
+    with its ungraded and grade-`K` risks.
+
+    Empirical status: UNTESTED. -/
+noncomputable def benchmarkCertificateDeficit (q K c : ℝ) : ℝ :=
+  logarithmicRiskBenchmark q / fixedGradeRiskBenchmark q K c
 
 /-- Closed form for the deficit: `q^(c/K) / log q`. -/
-theorem certificateDeficit_eq (q K c : ℝ) (hq : 0 ≤ q) :
-    certificateDeficit q K c = q ^ (c / K) / Real.log q := by
-  unfold certificateDeficit nonsmoothSummaryRisk gradeCertifiedRisk
+theorem benchmarkCertificateDeficit_eq (q K c : ℝ) (hq : 0 ≤ q) :
+    benchmarkCertificateDeficit q K c = q ^ (c / K) / Real.log q := by
+  unfold benchmarkCertificateDeficit logarithmicRiskBenchmark fixedGradeRiskBenchmark
   rw [Real.rpow_neg hq (c / K), div_inv_eq_mul]
   ring
 
-/-- **A fixed-grade certificate understates the risk by an unbounded factor.**
+/-- **The polynomial benchmark is below the logarithmic benchmark in the stated regime.**
 
     For every target factor `D`, once the variant count is large enough that
     `D · log q ≤ q^(c/K)` — which happens for every `D` and every grade `K`,
-    since a positive power beats a logarithm — the certificate is short by at
-    least `D`. The crossing point is supplied as a hypothesis rather than
-    derived, so the statement is an inequality about a stated regime and not an
-    asymptotic assertion dressed as one. -/
-theorem gradeCertifiedRisk_understates (q K c D : ℝ)
+    since a positive power beats a logarithm — the ratio is at least `D`.
+    Calling that ratio a certificate shortfall additionally requires the
+    experiment-specific identifications recorded above. -/
+theorem benchmarkCertificateDeficit_ge (q K c D : ℝ)
     (hq : 0 ≤ q) (h_log : 0 < Real.log q)
     (h_cross : D * Real.log q ≤ q ^ (c / K)) :
-    D ≤ certificateDeficit q K c := by
-  rw [certificateDeficit_eq q K c hq, le_div_iff₀ h_log]
+    D ≤ benchmarkCertificateDeficit q K c := by
+  rw [benchmarkCertificateDeficit_eq q K c hq, le_div_iff₀ h_log]
   exact h_cross
 
 /-- **The logarithmic rate dominates every polynomial rate.**
 
     Wherever `q^(-a) · log q ≤ 1`, the polynomial rate `q^(-a)` sits below the
-    risk the functional carries. Since the left side tends to zero for every
-    `a > 0`, no polynomial rate is attainable for such a summary, whatever the
-    exponent. -/
-theorem nonsmoothSummaryRisk_exceeds_polynomial (q a : ℝ)
+    logarithmic benchmark. This is a comparison of two curves, not a minimax
+    lower bound for a biological experiment. -/
+theorem logarithmicRiskBenchmark_ge_polynomial (q a : ℝ)
     (h_log : 0 < Real.log q)
     (h_cross : q ^ (-a) * Real.log q ≤ 1) :
-    q ^ (-a) ≤ nonsmoothSummaryRisk q := by
-  unfold nonsmoothSummaryRisk
+    q ^ (-a) ≤ logarithmicRiskBenchmark q := by
+  unfold logarithmicRiskBenchmark
   rw [le_div_iff₀ h_log]
   exact h_cross
 
@@ -573,16 +718,13 @@ below say so. Their content is that a logarithm is negligible against every
 positive power, which is `isLittleO_log_rpow_atTop`; nothing about
 genetics enters. -/
 
-/-- **No polynomial rate is attainable, unconditionally.**
+/-- **The logarithmic benchmark eventually dominates every polynomial benchmark.**
 
     For every exponent `a > 0`, past some variant count the polynomial rate
-    `q^(-a)` sits below the risk the nonsmooth summary carries. This discharges
-    the crossing hypothesis of `nonsmoothSummaryRisk_exceeds_polynomial`: there
-    is no `a` for which the polynomial rate eventually wins, so the logarithmic
-    rate is not a weak bound that a sharper analysis could improve to a power
-    law. -/
-theorem nonsmoothSummaryRisk_exceeds_polynomial_eventually (a : ℝ) (ha : 0 < a) :
-    ∀ᶠ q : ℝ in Filter.atTop, q ^ (-a) ≤ nonsmoothSummaryRisk q := by
+    `q^(-a)` sits below the logarithmic benchmark. The asymptotic comparison is
+    unconditional; its interpretation as an attainable or minimax rate is not. -/
+theorem logarithmicRiskBenchmark_ge_polynomial_eventually (a : ℝ) (ha : 0 < a) :
+    ∀ᶠ q : ℝ in Filter.atTop, q ^ (-a) ≤ logarithmicRiskBenchmark q := by
   have hbound := (isLittleO_log_rpow_atTop ha).bound one_pos
   filter_upwards [hbound, Filter.eventually_ge_atTop (2 : ℝ)] with q hq hq2
   have hq0 : (0 : ℝ) < q := by linarith
@@ -594,22 +736,19 @@ theorem nonsmoothSummaryRisk_exceeds_polynomial_eventually (a : ℝ) (ha : 0 < a
     exact hq
   have hneg : q ^ (-a) = 1 / q ^ a := by
     rw [Real.rpow_neg (le_of_lt hq0), one_div]
-  unfold nonsmoothSummaryRisk
+  unfold logarithmicRiskBenchmark
   rw [hneg]
   exact one_div_le_one_div_of_le hlog hle
 
-/-- **The certificate's shortfall grows without bound.**
+/-- **The ratio of the two benchmark curves grows without bound.**
 
     For every grade `K` with positive exponent `c/K` and every target factor
-    `D`, past some variant count the deficit exceeds `D`. This discharges the
-    crossing hypothesis of `gradeCertifiedRisk_understates`. Together with the
-    previous theorem it says the shortfall is not a constant that a careful
-    accounting could absorb: no fixed-grade certificate certifies the right
-    rate, and the factor by which it fails is unbounded in the number of
-    variants. -/
-theorem gradeCertifiedRisk_deficit_eventually_ge (K c D : ℝ)
+    `D`, past some variant count the benchmark ratio exceeds `D`. This remains
+    pure real analysis until a statistical model proves both benchmark
+    identifications. -/
+theorem benchmarkCertificateDeficit_eventually_ge (K c D : ℝ)
     (hr : 0 < c / K) (hD : 0 < D) :
-    ∀ᶠ q : ℝ in Filter.atTop, D ≤ certificateDeficit q K c := by
+    ∀ᶠ q : ℝ in Filter.atTop, D ≤ benchmarkCertificateDeficit q K c := by
   have hbound := (isLittleO_log_rpow_atTop hr).bound (inv_pos.mpr hD)
   filter_upwards [hbound, Filter.eventually_ge_atTop (2 : ℝ)] with q hq hq2
   have hq0 : (0 : ℝ) < q := by linarith
@@ -623,136 +762,7 @@ theorem gradeCertifiedRisk_deficit_eventually_ge (K c D : ℝ)
     have hmul := mul_le_mul_of_nonneg_left hle (le_of_lt hD)
     rw [← mul_assoc, mul_inv_cancel₀ (ne_of_gt hD), one_mul] at hmul
     exact hmul
-  exact gradeCertifiedRisk_understates q K c D (le_of_lt hq0) hlog hcross
-
-/-! ### The deficit is a modulus ratio, and not by stipulation
-
-Everything above names two rates and takes their ratio. That is enough to prove the
-shortfall unbounded, but it leaves the *reason* unstated: an audit of this section recorded
-that "the modulus-ratio identification is prose only", and it was right. The three
-declarations below remove the prose.
-
-`Calibrator.CertificateGrading` develops the graded certificate calculus abstractly: a
-modulus `Δ K h` at moment-matching grade `K` and scale `h`, a value formula
-`risk = scale · Δ²`, and four results about it. What is exhibited here is that this
-section's two stipulated rates **are** the squares of one graded modulus, read at scale
-`h = 1/q`. The modulus is read off the rates rather than derived from a construction, and
-that limitation is real — nothing below establishes the rates themselves, which remain the
-upstream analytic inputs they always were.
-
-What the identification buys is not a new rate but two structural facts that were
-previously unavailable here:
-
-* the value constant **cancels** out of the deficit (`deficit_eq_modulus_ratio_sq`), so the
-  shortfall is an invariant of the modulus and no sharpening of constants inside a
-  fixed-grade argument touches it; and
-* completeness of a grade is **equivalent** to grade-insensitivity of the modulus
-  (`isComplete_iff_gradeInsensitive`), which converts a question about proof techniques into
-  a question about an approximation-theoretic quantity.
-
-Both now apply to this section's objects by instantiation rather than by analogy. -/
-
-open Calibrator.CertificateGrading in
-/-- **The graded modulus of the nonsmooth architecture summaries.**
-
-    At scale `h`, grade `0` carries `√(nonsmoothSummaryRisk (1/h))` and every positive
-    grade carries `√(gradeCertifiedRisk (1/h) K c)`. Read at `h = 1/q` these are exactly
-    the two rates this section already names, which is the content of the two identities
-    below.
-
-    Empirical status: UNTESTED. -/
-noncomputable def architectureModulus (c : ℝ) : GradedModulus where
-  Δ := fun K h =>
-    if K = 0 then Real.sqrt (nonsmoothSummaryRisk (1 / h))
-    else Real.sqrt (gradeCertifiedRisk (1 / h) (K : ℝ) c)
-  nonneg := by
-    intro K h
-    by_cases hK : K = 0 <;> simp [hK, Real.sqrt_nonneg]
-
-open Calibrator.CertificateGrading in
-/-- The certificate calculus of this section: the graded modulus above with a unit value
-    constant. The constant is immaterial — `deficit_eq_modulus_ratio_sq` proves it cancels —
-    and `1` is chosen so that the risks below are the rates themselves rather than multiples
-    of them. -/
-noncomputable def architectureCalculus (c : ℝ) : CertificateCalculus where
-  modulus := architectureModulus c
-  scale := 1
-  scale_pos := one_pos
-
-open Calibrator.CertificateGrading in
-/-- **The ungraded risk of the calculus is the risk the functional carries.** -/
-theorem architectureCalculus_ungradedRisk (q c : ℝ) (hq : 1 < q) :
-    (architectureCalculus c).ungradedRisk (1 / q) = nonsmoothSummaryRisk q := by
-  have hq0 : (0 : ℝ) < q := by linarith
-  have hlog : 0 < Real.log q := Real.log_pos hq
-  have hinv : (1 : ℝ) / (1 / q) = q := by field_simp
-  have hrisk : 0 ≤ nonsmoothSummaryRisk q := by
-    unfold nonsmoothSummaryRisk
-    positivity
-  unfold CertificateCalculus.ungradedRisk architectureCalculus architectureModulus
-  simp only [hinv, one_mul]
-  exact Real.sq_sqrt hrisk
-
-open Calibrator.CertificateGrading in
-/-- **The grade-`K` risk of the calculus is the risk grade `K` certifies.** -/
-theorem architectureCalculus_certifiedRisk (q c : ℝ) (K : ℕ) (hK : K ≠ 0) (hq : 1 < q) :
-    (architectureCalculus c).certifiedRisk K (1 / q) = gradeCertifiedRisk q (K : ℝ) c := by
-  have hq0 : (0 : ℝ) < q := by linarith
-  have hinv : (1 : ℝ) / (1 / q) = q := by field_simp
-  have hrisk : 0 ≤ gradeCertifiedRisk q (K : ℝ) c := by
-    unfold gradeCertifiedRisk
-    exact Real.rpow_nonneg (le_of_lt hq0) _
-  unfold CertificateCalculus.certifiedRisk architectureCalculus architectureModulus
-  simp only [hinv, if_neg hK, one_mul]
-  exact Real.sq_sqrt hrisk
-
-open Calibrator.CertificateGrading in
-/-- **The stipulated deficit is the calculus's deficit**, hence a modulus ratio.
-
-    This is the identification the section was missing. Combined with
-    `CertificateGrading.deficit_eq_modulus_ratio_sq` it says the shortfall of a fixed-grade
-    lower-bound argument for a nonsmooth architecture summary is the square of a ratio of
-    moduli — an approximation-theoretic invariant of the functional and the grade — and so
-    cannot be reduced by any sharpening of constants inside the argument. -/
-theorem certificateDeficit_eq_calculus_deficit (q c : ℝ) (K : ℕ) (hK : K ≠ 0) (hq : 1 < q) :
-    certificateDeficit q (K : ℝ) c = (architectureCalculus c).deficit K (1 / q) := by
-  unfold certificateDeficit CertificateCalculus.deficit
-  rw [architectureCalculus_ungradedRisk q c hq,
-    architectureCalculus_certifiedRisk q c K hK hq]
-
-open Calibrator.CertificateGrading in
-/-- **Grade soundness holds eventually, and not identically.**
-
-    `CertificateGrading` deliberately declines to make grade-ordering a structure field, so
-    every instance owes a discharge of it. This is that discharge, and the shape of the
-    statement is the reason the field was refused: the grade-`K` modulus sits below the
-    ungraded one **past a variant count**, not at every scale, because the ordering here is
-    the statement that a positive power eventually beats a logarithm. Had the ordering been
-    a field, this eventual quantifier would have vanished into an axiom and the scales at
-    which the ordering fails would have become invisible.
-
-    Note what this does *not* say: it fixes no crossing point, so it licenses no claim about
-    any particular panel. It says only that the ordering is not vacuous. -/
-theorem architecture_gradeSound_eventually (c : ℝ) (K : ℕ) (hK : K ≠ 0)
-    (hc : 0 < c / (K : ℝ)) :
-    ∀ᶠ q : ℝ in Filter.atTop, (architectureCalculus c).GradeSound K (1 / q) := by
-  have hbound := (isLittleO_log_rpow_atTop hc).bound one_pos
-  filter_upwards [hbound, Filter.eventually_ge_atTop (2 : ℝ)] with q hq hq2
-  have hq0 : (0 : ℝ) < q := by linarith
-  have hlog : 0 < Real.log q := Real.log_pos (by linarith)
-  have hrpow : 0 < q ^ (c / (K : ℝ)) := Real.rpow_pos_of_pos hq0 _
-  have hle : Real.log q ≤ q ^ (c / (K : ℝ)) := by
-    rw [Real.norm_of_nonneg (le_of_lt hlog), Real.norm_of_nonneg (le_of_lt hrpow),
-      one_mul] at hq
-    exact hq
-  have hinv : (1 : ℝ) / (1 / q) = q := by field_simp
-  have hkey : gradeCertifiedRisk q (K : ℝ) c ≤ nonsmoothSummaryRisk q := by
-    unfold gradeCertifiedRisk nonsmoothSummaryRisk
-    rw [Real.rpow_neg (le_of_lt hq0), inv_eq_one_div]
-    exact one_div_le_one_div_of_le hlog hle
-  unfold CertificateCalculus.GradeSound architectureCalculus architectureModulus
-  simp only [hinv, if_neg hK]
-  exact Real.sqrt_le_sqrt hkey
+  exact benchmarkCertificateDeficit_ge q K c D (le_of_lt hq0) hlog hcross
 
 /-! ### Positivity buys an exponent: the moment body of architecture spectra
 
@@ -776,10 +786,9 @@ resolution**, not by a constant. So a sample-size calculation built on a box-sha
 conservative by a polynomial factor, and the positivity of the underlying spectrum is what
 pays for the difference.
 
-Note the direction, which is opposite to the certificate story above and complements it. The
-certificate deficit makes fixed-grade *lower bounds* polynomially **optimistic**; the moment
-body makes box-shaped *upper bounds* polynomially **pessimistic**. Both are exponent-level
-effects and both are invisible to any analysis that tracks constants only.
+The entropy comparison is independent of the conditional certificate-gap proposal above.
+It should not be used as evidence for that proposal: the first audit found no polynomial
+certificate deficit in the tested Gaussian-mixture instance.
 
 Empirical status: UNTESTED. -/
 

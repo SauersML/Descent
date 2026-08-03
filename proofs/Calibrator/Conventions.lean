@@ -908,7 +908,21 @@ theorem ancestrySpecificEffect_eq_convexMix (b1 b2 alpha : ℝ) :
   unfold ancestrySpecificEffect convexMix; ring
 
 /-- Geometric decay, `(1 - r)^t`: LD across generations, recombination
-survival along a genealogy, and admixture-LD decay are one map. -/
+survival along a genealogy, and admixture-LD decay are one map.
+
+**THIS IS THE HUB. Route new spellings through it, and do not add pairwise theorems.**
+`(1 - r)^t` is currently written out under FOUR names in four files — `geometricDecay`,
+`LongitudinalPortability.ldDecayPerGeneration`, `DGP.discreteRecombinationSurvival` and
+`PortabilityDrift.admixtureLDDecay` — and once carried SIX pairwise equalities between
+them. Three are kept, immediately below: each ties one spelling to this primitive, and
+together they make a divergence between any two spellings a failed proof. The other three
+were pairwise restatements implied by these by transitivity, and are deleted.
+
+The collapse to one name is the fix and has not been done: it is ~86 references across
+Lean, Python and the JSON string tables, and is blocked on `PortabilityDrift.lean`. When
+that file is editable, `geometricDecay` is the name to keep — it is the only one of the
+four that names the function rather than one of its applications, which is why the other
+three can each be a *use* of it without loss. -/
 noncomputable def geometricDecay (r : ℝ) (t : ℕ) : ℝ := (1 - r) ^ t
 
 theorem ldDecayPerGeneration_eq_geometricDecay (r : ℝ) (t : ℕ) :

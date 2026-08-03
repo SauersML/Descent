@@ -1,4 +1,21 @@
-"""GENERATED FILE -- do not edit.
+"""GENERATED FILE -- do not edit.  NOT AUTHORITATIVE IF COMMITTED.
+
+    THE COPY OF THIS FILE IN GIT IS STALE BY CONSTRUCTION.
+
+`proofs/Calibrator/` changes every few minutes.  A generated table committed
+alongside it is a cache of a moving target, and committing it moves the
+staleness from DETECTABLE to COMMITTED -- which is worse, because a file in the
+repository reads as authoritative.
+
+DO NOT CONSUME A COMMITTED COPY.  Run `python3 validation/extract/emit.py` in
+your own worktree immediately before use.  It takes about a minute, writes only
+inside that worktree, pins your numbers to the revision you are standing on, and
+makes `api.require_fresh()` pass for a reason rather than by luck.  It also means
+no two agents write to each other's artifacts.
+
+`api.require_fresh()` will raise if you skip this.  That is the intended
+behaviour, not an obstacle.
+
 
 Produced by validation/extract/emit.py from the Lean sources under
 proofs/Calibrator/.  Each function below was translated from the parsed body of
@@ -23,9 +40,6 @@ def expectedFreqDiffSq(fst, p0):
 
 def gwasHeritability(h2_true, avg_r2_tag):
     return (h2_true * avg_r2_tag)
-
-def equilibriumFst(m, Ne):
-    return _rt.rdiv(1.0, ((1.0 + ((4.0 * Ne) * m))))
 
 def geneFlowFstStep(m, Ne, F):
     return ibdFlowStep(Ne, m, F)
@@ -129,6 +143,55 @@ def posteriorPredictiveVariance(residual_var, estimation_var):
 def multiAncestryEffectiveN(n_target, rg, n_other):
     return (n_target + (_rt.lpow(rg, 2.0) * n_other))
 
+def averageEffect(m):
+    return (_rt._proj(m, 'a') + (_rt._proj(m, 'd') * ((1.0 - (2.0 * _rt._proj(m, 'p'))))))
+
+def genotypicValue(m, _e):
+    _t = [(-_rt._proj(m, 'a')), _rt._proj(m, 'd'), _rt._proj(m, 'a')]
+    return _t[_rt._ix(_e, 3, 'genotypicValue')]
+
+def meanValue(m, h):
+    return sum(((genotypeProb(h, g) * genotypicValue(m, g))) for g in range(int(3)))
+
+def valueDosageCovariance(m, h):
+    return sum((((genotypeProb(h, g) * ((genotypicValue(m, g) - meanValue(m, h)))) * centeredAltAlleleCount(h, g))) for g in range(int(3)))
+
+def weightRatio(P, Q, w):
+    return _rt.rdiv(wProd(Q, w), wProd(P, w))
+
+def defect(P, Q, w, u):
+    return _rt.rdiv(weightRatio(P, Q, w), weightRatio(P, Q, u))
+
+def chi(P, Q, w):
+    return _rt.rdiv(wProd(P, w), wProd(Q, w))
+
+def outerAtom(w):
+    return _rt.rsqrt(((1.0 + w)))
+
+def innerAtom(w):
+    return _rt.rsqrt(((1.0 - w)))
+
+def mOne(p):
+    return _rt.rdiv(_rt.rabs((1.0 - (2.0 * p))), p)
+
+def mTwo(p):
+    return _rt.rdiv(_rt.rabs((1.0 - (2.0 * p))), ((1.0 - p)))
+
+def chain(k):
+    return _rt.rdiv((k), (((2.0 * (k)) + 1.0)))
+
+def modulus(family, j, t):
+    return _rt.rabs((_rt.lpow(_rt._proj(family, 'atomValue')(j, t), 2.0) - 1.0))
+
+def massAt(family, t, v):
+    return sum(((_rt._proj(family, 'atomMass')(j, t) if (modulus(family, j, t) == v) else 0.0)) for j in range(int(_rt.sumdim('j', len(_rt._proj(family, 'atomMass'))))))
+
+def spectrumModulusLaw(family, panel, v):
+    return sum(((_rt._proj(panel, 'weight')(i) * massAt(family, (_rt._proj(panel, 'support')(i)), v))) for i in range(int(_rt.sumdim('i', len(_rt._proj(panel, 'weight')), len(_rt._proj(panel, 'support'))))))
+
+def Covers(family, panel, i, v):
+    return (massAt(family, (_rt._proj(panel, 'support')(i)), v) != 0.0)
+
 def proportionMediated(indirect_effect, total_effect):
     return _rt.rdiv(indirect_effect, total_effect)
 
@@ -222,8 +285,14 @@ def windowVariance(w, v):
 def gaussianKurtosisMaf():
     return _rt.rdiv(((3.0 - _rt.rsqrt(3.0))), 6.0)
 
+def moment(spectrum, k):
+    return sum(((_rt._proj(spectrum, 'weight')(j) * sum(((_rt._proj((_rt._proj(spectrum, 'model')(j)), 'genotypeProb')(g) * _rt.lpow(_rt._proj((_rt._proj(spectrum, 'model')(j)), 'standardizedGenotype')(g), k))) for g in range(int(3))))) for j in range(int(_rt.sumdim('j', len(_rt._proj(spectrum, 'weight')), len(_rt._proj(spectrum, 'model'))))))
+
 def centeredSquareThirdMoment(spectrum):
     return ((moment(spectrum, 6.0) - (3.0 * moment(spectrum, 4.0))) + 2.0)
+
+def fourthMomentDispersion(spectrum):
+    return ((sum(((_rt._proj(spectrum, 'weight')(j) * _rt.lpow((_rt.rdiv(1.0, _rt._proj((_rt._proj(spectrum, 'model')(j)), 'genotypeVariance'))), 2.0))) for j in range(int(_rt.sumdim('j', len(_rt._proj(spectrum, 'weight')), len(_rt._proj(spectrum, 'model'))))))) - _rt.lpow((moment(spectrum, 4.0)), 2.0))
 
 def squaringScaleSq(fourthMoment):
     return (fourthMoment - 1.0)
@@ -236,6 +305,30 @@ def squaringStep(scale, x):
 
 def squaringFixedPoint(scale):
     return _rt.rdiv(((scale + _rt.rsqrt(((_rt.lpow(scale, 2.0) + 4.0))))), 2.0)
+
+def ladderMomentOrder(rung):
+    return _rt.lpow(2.0, rung)
+
+def varianceProfile(s):
+    return (((1.0 + s)) - ((1.0 - s)))
+
+def fourthMomentProfile(s):
+    return (_rt.lpow(((1.0 + s)), 2.0) - _rt.lpow(((1.0 - s)), 2.0))
+
+def jProfile(tilt, order, s):
+    return ((_rt.lpow(_rt.rlog(((1.0 + s))), order) * _rt.lpow(((1.0 + s)), tilt)) - (_rt.lpow(_rt.rlog(((1.0 - s))), order) * _rt.lpow(((1.0 - s)), tilt)))
+
+def displacement(F, profile):
+    return sum(((_rt._proj(F, 'mass')(j) * profile((_rt._proj(F, 'location')(j))))) for j in range(int(_rt.sumdim('j', len(_rt._proj(F, 'mass')), len(_rt._proj(F, 'location'))))))
+
+def copiedBinaryJointExpectation():
+    return _rt.rdiv(((((1.0) * 1.0) + (((-1.0)) * ((-1.0))))), 2.0)
+
+def copiedBinaryConditionalProductExpectation():
+    return _rt.rdiv(((((_rt.rdiv((((1.0) + ((-1.0)))), 2.0)) * 1.0) + ((_rt.rdiv((((1.0) + ((-1.0)))), 2.0)) * ((-1.0))))), 2.0)
+
+def FullSupport(J):
+    return all(((_rt._proj(J, 'mass')(x) != 0.0)) for x in range(int(_rt.sumdim('x', len(_rt._proj(J, 'mass'))))))
 
 def ploidy():
     return 2.0
@@ -251,6 +344,9 @@ def meanAlleleFreq(p_1, p_2):
 
 def hudsonFst(p_1, p_2):
     return (1.0 - _rt.rdiv((((p_1 * ((1.0 - p_1))) + (p_2 * ((1.0 - p_2))))), (((ploidy * meanAlleleFreq(p_1, p_2)) * ((1.0 - meanAlleleFreq(p_1, p_2)))))))
+
+def trueHudsonFst(p_1, p_2):
+    return _rt.rdiv(_rt.lpow(((p_1 - p_2)), 2.0), (((p_1 * ((1.0 - p_2))) + (p_2 * ((1.0 - p_1))))))
 
 def betweenSubgroupVariance(p_1, p_2):
     return _rt.rdiv(_rt.lpow(((p_1 - p_2)), 2.0), 4.0)
@@ -293,6 +389,21 @@ def admixtureLDAtGen(alpha, p_A, q_A, p_B, q_B, r, g):
 
 def admixtureLDMagnitude(alpha, p_A, p_B, r, g):
     return (((alpha * ((1.0 - alpha))) * _rt.lpow(((p_A - p_B)), 2.0)) * _rt.lpow(((1.0 - r)), g))
+
+def charFnSq(w, a, t):
+    return sum((sum((_rt.mul(_rt.mul(w[int(u)], w[int(v)]), _rt.cos((_rt.mul(t, (_rt.sub(a[int(u)], a[int(v)]))))))) for v in range(int(len(w))))) for u in range(int(len(w))))
+
+def scaledMutationRate(Ne, μ):
+    return ((4.0 * Ne) * μ)
+
+def scaledMigrationRate(Ne, m):
+    return ((4.0 * Ne) * m)
+
+def fstMutationDriftEquilibrium(θ):
+    return _rt.rdiv(1.0, ((1.0 + θ)))
+
+def hetDecayFromScaled(Ne, θ):
+    return (((1.0 - _rt.rdiv(1.0, ((2.0 * Ne))))) * ((1.0 - _rt.rdiv(θ, ((2.0 * Ne))))))
 
 def Calibrator_HWEPolygenicScoreDGP_scoreMean(dgp):
     return _rt._proj(_rt._proj(dgp, 'scoreModel'), 'scoreMean')
@@ -353,22 +464,19 @@ def decaySlope(mech, c):
     return _rt._proj(mech, 'tagging_efficiency')((_rt._proj(mech, 'distance')(c)))
 
 def measureBias(μ, Y, S):
-    return (measureMean(μ, S) - measureMean(μ, Y))
+    return _rt.sub(measureMean(μ, S), measureMean(μ, Y))
 
 def trueExp(hdgp):
     return (lambda p, c: ((_rt._proj(hdgp, 'alpha')(c) * p) + _rt._proj(hdgp, 'baseline')(c)))
 
-def Calibrator_EvolutionaryParameters_tau(p):
+def tau(p):
     return _rt.rdiv(_rt._proj(p, 't_div'), ((2.0 * _rt._proj(p, 'Ne'))))
 
 def Calibrator_EvolutionaryParameters_theta(p):
-    return ((4.0 * _rt._proj(p, 'Ne')) * _rt._proj(p, 'mu'))
+    return scaledMutationRate(_rt._proj(p, 'Ne'), _rt._proj(p, 'mu'))
 
 def Calibrator_EvolutionaryParameters_bigM(p):
-    return ((4.0 * _rt._proj(p, 'Ne')) * _rt._proj(p, 'mig'))
-
-def fstDriftMutation(p):
-    return _rt.rdiv(1.0, ((1.0 + Calibrator_EvolutionaryParameters_theta(p))))
+    return scaledMigrationRate(_rt._proj(p, 'Ne'), _rt._proj(p, 'mig'))
 
 def fstDriftMigration(p):
     return _rt.rdiv(1.0, ((1.0 + Calibrator_EvolutionaryParameters_bigM(p))))
@@ -383,19 +491,10 @@ def sharedLDRetention(p):
     return _rt.rexp(((((-2.0) * _rt._proj(p, 'recomb')) * _rt._proj(p, 't_div'))))
 
 def mutationLDErosion(p):
-    return _rt.rexp((((-Calibrator_EvolutionaryParameters_theta(p)) * Calibrator_EvolutionaryParameters_tau(p))))
+    return _rt.rexp((((-Calibrator_EvolutionaryParameters_theta(p)) * tau(p))))
 
 def migrationLDBoost(p):
-    return (1.0 + _rt.rdiv((Calibrator_EvolutionaryParameters_bigM(p) * Calibrator_EvolutionaryParameters_tau(p)), ((1.0 + Calibrator_EvolutionaryParameters_bigM(p)))))
-
-def ldRetention(m):
-    return sharedLDRetention(toEvo(m))
-
-def mutErosion(m):
-    return mutationLDErosion(toEvo(m))
-
-def migBoost(m):
-    return migrationLDBoost(toEvo(m))
+    return (1.0 + _rt.rdiv((Calibrator_EvolutionaryParameters_bigM(p) * tau(p)), ((1.0 + Calibrator_EvolutionaryParameters_bigM(p)))))
 
 def r2FromSignalVariance(vSignal, vNoise):
     return _rt.rdiv(vSignal, ((vSignal + vNoise)))
@@ -409,11 +508,14 @@ def calibratedBrier(π, r2):
 def calibratedBrierFromVariances(π, vSignal, vResidual):
     return ((_rt.pi * ((1.0 - _rt.pi))) * ((1.0 - _rt.rdiv(vSignal, ((vSignal + vResidual))))))
 
-def total(penalty):
+def Calibrator_TransportedMetrics_IrreducibleTargetPenalty_total(penalty):
     return (((_rt._proj(penalty, 'brokenTagging') + _rt._proj(penalty, 'ancestrySpecificLD')) + _rt._proj(penalty, 'sourceSpecificOverfit')) + _rt._proj(penalty, 'novelUntaggablePhenotype'))
 
 def profileFromSignalVarianceWithPenalty(π, vNoise, vSignal, penalty):
-    return profileFromSignalVariance(_rt.pi, ((vNoise + total(penalty))), vSignal)
+    return profileFromSignalVariance(_rt.pi, ((vNoise + Calibrator_TransportedMetrics_IrreducibleTargetPenalty_total(penalty))), vSignal)
+
+def metricProfileFromTargetSignalWithPenalty(m, vSignalTarget, penalty):
+    return profileFromSignalVarianceWithPenalty(_rt._proj(m, 'prevalence'), _rt._proj(m, 'V_E'), vSignalTarget, penalty)
 
 def alleleFreqDivergenceRate(Ne, mu, m_rate):
     theta = ((4.0 * Ne) * mu)
@@ -429,11 +531,20 @@ def contrastSpikeLevel(p_1, p_2):
 def demoSteppingStoneFst(d, Ne, m, σ_sq):
     return _rt.rdiv(d, ((d + (((4.0 * Ne) * m) * σ_sq))))
 
+def steppingStoneFstQuadratic(d, Ne, m, σ_sq):
+    return _rt.rdiv(d, ((d + (((4.0 * Ne) * _rt.lpow(σ_sq, 2.0)) * _rt.lpow(m, 2.0)))))
+
 def steppingStoneCoalescenceTime(d, σ_sq, m):
     return _rt.rdiv(d, (((2.0 * σ_sq) * m)))
 
+def steppingStoneMeetingTimeOnLattice(d, D, σ_sq, m):
+    return _rt.rdiv((d * ((D - d))), (((2.0 * σ_sq) * m)))
+
 def admixedFst(α, fst_AB):
     return (_rt.lpow(((1.0 - α)), 2.0) * fst_AB)
+
+def admixedFstExact(α, fst_AB, hetRatio):
+    return _rt.rdiv((_rt.lpow(((1.0 - α)), 2.0) * fst_AB), hetRatio)
 
 def admixedAlleleFreq(α, p_A, p_B):
     return ((α * p_A) + (((1.0 - α)) * p_B))
@@ -480,6 +591,24 @@ def benchmarkRatioSquared(fstS, fstT):
 def diagonalDesign(g):
     return (lambda x: g(x, x))
 
+def fejerChannel3(γ_0, γ_1, γ_2):
+    return ((γ_0 + ((_rt.rdiv(4.0, 3.0)) * γ_1)) + ((_rt.rdiv(2.0, 3.0)) * γ_2))
+
+def gaussianPairSquareChannel3(γ_0, γ_1, γ_2):
+    return (((3.0 * _rt.lpow(γ_0, 2.0)) + (4.0 * _rt.lpow(γ_1, 2.0))) + (2.0 * _rt.lpow(γ_2, 2.0)))
+
+def ensembleSquaredLoss(target, deployment):
+    return sum((_rt.lpow((_rt.sub(target[int(i)], deployment)), 2.0)) for i in range(int(len(target))))
+
+def ensemblePredictorSquaredLoss(target, predictor):
+    return sum((_rt.lpow((_rt.sub(target[int(i)], predictor[int(i)])), 2.0)) for i in range(int(len(target))))
+
+def weightedBandEnsembleLoss(weight, target, deployment):
+    return sum((sum((_rt.mul(weight[int(i)][int(b)], _rt.lpow((_rt.sub(target[int(i)][int(b)], deployment[int(b)])), 2.0))) for b in range(int(_rt.sumdim('b', len(weight[0]), len(target[0]), len(deployment)))))) for i in range(int(_rt.sumdim('i', len(weight), len(target)))))
+
+def weightedBandPredictorLoss(weight, target, predictor):
+    return sum((sum((_rt.mul(weight[int(i)][int(b)], _rt.lpow((_rt.sub(target[int(i)][int(b)], predictor[int(i)][int(b)])), 2.0))) for b in range(int(len(weight))))) for i in range(int(len(weight))))
+
 def fisherAverageEffect(a, d, p):
     return (a + (d * ((1.0 - (2.0 * p)))))
 
@@ -492,11 +621,17 @@ def epistaticVariance(beta12, p1, p2):
 def dominanceVariance(p, d):
     return sum((_rt.lpow((_rt.mul(_rt.mul(_rt.mul(2.0, p[int(i)]), (_rt.sub(1.0, p[int(i)]))), d[int(i)])), 2.0)) for i in range(int(len(p))))
 
+def hweThirdCentralMoment(h):
+    return sum(((genotypeProb(h, g) * _rt.lpow(centeredAltAlleleCount(h, g), 3.0))) for g in range(int(3)))
+
 def standardizedGenotype(h, g):
     return _rt.rdiv(centeredAltAlleleCount(h, g), _rt.rsqrt(genotypeVariance(h)))
 
 def centeredSquare(h, g):
     return (_rt.lpow(standardizedGenotype(h, g), 2.0) - 1.0)
+
+def signBias(h):
+    return sum(((genotypeProb(h, g) * ((standardizedGenotype(h, g) * _rt.rabs(standardizedGenotype(h, g)))))) for g in range(int(3)))
 
 def fourthCumulantFromMoments(secondMoment, fourthMoment):
     return (fourthMoment - (3.0 * _rt.lpow(secondMoment, 2.0)))
@@ -507,6 +642,9 @@ def circulantSpectrumA(c):
 def circulantSpectrumB(c):
     return (((4.0 * _rt.lpow(c, 2.0)) + (4.0 * c)) - 2.0)
 
+def cycleDensity(design, p):
+    return _rt.trace((_rt.lpow(overlapMatrix(design), p)))
+
 def palindromicCycleDensityA(s, p):
     return ((((_rt.lpow(circulantSpectrumA(1.0), p) + (2.0 * _rt.lpow(circulantSpectrumA((_rt.rdiv(s, 2.0))), p))) + (2.0 * _rt.lpow(circulantSpectrumA(0.0), p))) + (2.0 * _rt.lpow(circulantSpectrumA(((-(_rt.rdiv(s, 2.0))))), p))) + _rt.lpow(circulantSpectrumA(((-1.0))), p))
 
@@ -516,11 +654,45 @@ def palindromicCycleDensityB(s, p):
 def expectedR2FromN(n, h2, M):
     return (h2 * (_rt.rdiv((n * h2), (((n * h2) + M)))))
 
+def diploidStdev(q):
+    return _rt.rsqrt((((2.0 * q) * ((1.0 - q)))))
+
+def diploidAtomValue(j, q):
+    return _rt.rdiv((((j) - (2.0 * q))), diploidStdev(q))
+
+def diploidAtomMass(j, q):
+    return (_rt.lpow(((1.0 - q)), 2.0) if (j == 0.0) else (((2.0 * q) * ((1.0 - q))) if (j == 1.0) else _rt.lpow(q, 2.0)))
+
+def invHeterozygosity(q):
+    return _rt.rdiv(1.0, (((2.0 * q) * ((1.0 - q)))))
+
+def twoPointModulusLaw(family, site, pathWeight, v, w):
+    m = float(len(pathWeight))
+    return sum((_rt.mul(pathWeight[int(i)], (_rt.mul(_rt._proj(massAt(family), '1')((site(i)), v), _rt._proj(massAt(family), '2')((site(i)), w))))) for i in range(int(len(pathWeight))))
+
+def positiveThreshold(x):
+    return (1.0 if (0.0 < x) else 0.0)
+
 def effectiveGeneticEffect(β_G, β_GxE, E_mean):
     return (β_G + (β_GxE * E_mean))
 
 def linearNormOfReaction(a, b, E):
     return (a + (b * E))
+
+def historyKernel(h, h_p):
+    return markovPoissonKernel(((_rt._proj(h, 'memory') * _rt._proj(h_p, 'memory'))), (_rt.cos(((_rt._proj(h, 'phase') - _rt._proj(h_p, 'phase'))))))
+
+def historySelfEnergy(h):
+    return historyKernel(h, h)
+
+def historySpectralDistanceSq(h, h_p):
+    return ((historySelfEnergy(h) + historySelfEnergy(h_p)) - (2.0 * historyKernel(h, h_p)))
+
+def historyDegradation(h, h_p):
+    return (((_rt.lpow(_rt._proj(h, 'amplitude'), 2.0) * historySelfEnergy(h)) - (((2.0 * _rt._proj(h, 'amplitude')) * _rt._proj(h_p, 'amplitude')) * historyKernel(h, h_p))) + (_rt.lpow(_rt._proj(h_p, 'amplitude'), 2.0) * historySelfEnergy(h_p)))
+
+def historyMarginalAmplitude(h):
+    return _rt._proj(h, 'amplitude')
 
 def discoveryNCP(n, β, maf_causal, ld):
     return (((n * _rt.lpow(β, 2.0)) * _rt.lpow(ld, 2.0)) * genotypeVarianceHWE(maf_causal))
@@ -559,13 +731,16 @@ def totalTraitBCrossCov(m):
     return (borrowedTraitBCrossCov(m) + traitBSpecificCrossCov(m))
 
 def borrowedTraitBProjection(m):
-    return dotProduct(_rt._proj(m, 'sourceWeights'), (borrowedTraitBCrossCov(m)))
+    return _rt.dotProduct(_rt._proj(m, 'sourceWeights'), (borrowedTraitBCrossCov(m)))
 
 def totalTraitBProjection(m):
-    return dotProduct(_rt._proj(m, 'sourceWeights'), (totalTraitBCrossCov(m)))
+    return _rt.dotProduct(_rt._proj(m, 'sourceWeights'), (totalTraitBCrossCov(m)))
 
 def expectedDistinctHaplotypes(k, n):
     return (_rt.lpow((2.0), k) * ((1.0 - _rt.lpow(((1.0 - _rt.rdiv(1.0, (_rt.lpow((2.0), k))))), n))))
+
+def haplotypeHomozygosity(freq):
+    return sum((_rt.lpow(freq[int(i)], 2.0)) for i in range(int(len(freq))))
 
 def effectiveHaplotypeNumber(freq):
     return _rt.rdiv(1.0, haplotypeHomozygosity(freq))
@@ -613,16 +788,25 @@ def taggedDriftR2Ratio(V_A, V_E, fst, shared_ld):
     return _rt.rdiv(presentDayR2MutationDrift(V_A, V_E, fst, shared_ld), presentDayR2(V_A, V_E, 0.0))
 
 def addRankOneSignal(noise, factor, scale, loading):
-    return (lambda ω, i: (noise(ω, i) + ((scale * factor(ω)) * loading(i))))
+    return (lambda ω, i: _rt.add(noise[int(ω)][int(i)], _rt.mul(_rt.mul(scale, factor[int(ω)]), loading[int(i)])))
 
 def rankOneCovarianceBump(scale, loading):
-    return (lambda i, j: ((_rt.lpow(scale, 2.0) * loading(i)) * loading(j)))
+    return (lambda i, j: _rt.mul(_rt.mul(_rt.lpow(scale, 2.0), loading[int(i)]), loading[int(j)]))
+
+def ConstantDiagonal(A):
+    return all(all(((A[int(i)][int(i)] == A[int(j)][int(j)])) for j in range(int(len(A)))) for i in range(int(len(A))))
+
+def ShiftInvariant(shift, A):
+    return all(all(((A[int((shift(i)))][int((shift(j)))] == A[int(i)][int(j)])) for j in range(int(len(A)))) for i in range(int(len(A))))
 
 def scalarRowResolvent(latent, quadraticForm):
     return _rt.rdiv(1.0, ((1.0 + (_rt.lpow(latent, 2.0) * quadraticForm))))
 
 def fairTwoPointVariance(a, b):
     return _rt.rdiv(_rt.lpow(((a - b)), 2.0), 4.0)
+
+def gramForm(A, x, y):
+    return sum((sum((_rt.mul(_rt.mul(x[int(i)], A[int(i)][int(j)]), y[int(j)])) for j in range(int(len(A))))) for i in range(int(len(A))))
 
 def quadForm(A, x):
     return gramForm(A, x, x)
@@ -650,6 +834,9 @@ def adjacentBoundarySeparation(d):
         return 1.0
     d = d - 1     # the `n + 1` pattern
     return d
+
+def lossGeometryRisk(B, M):
+    return _rt.trace((_rt.mul(B, M)))
 
 def alleleLossProbability(initial, time):
     return _rt.rexp(((-(_rt.rdiv(initial, ((2.0 * time)))))))
@@ -711,6 +898,10 @@ def driftLDRetention(Ne, c):
 def driftLDEquilibrium(Ne, c):
     return _rt.rdiv((_rt.lpow(((1.0 - c)), 2.0) * (_rt.rdiv(1.0, ((2.0 * Ne))))), ((1.0 - driftLDRetention(Ne, c))))
 
+def ohtaKimuraSigmaDSq(Ne, c):
+    ρ = ((4.0 * Ne) * c)
+    return _rt.rdiv(((10.0 + ρ)), ((((2.0 + ρ)) * ((11.0 + ρ)))))
+
 def driftLDTrajectory(Ne, c, Q_0, t):
     _prev = Q_0
     for _ in range(int(t)):
@@ -730,11 +921,11 @@ def excessLDAfterBottleneck(N_b, N_r, c, t_b, t_r):
 def ldDecayRatePerGen(Ne):
     return _rt.rdiv(1.0, ((2.0 * Ne)))
 
-def ldHalfLife(Ne):
-    return ((2.0 * Ne) * _rt.rlog(2.0))
+def ldHalfLife(r, Ne):
+    return _rt.rdiv(_rt.rlog(2.0), ((-_rt.rlog((ldRetentionPerGen(r, Ne))))))
 
-def ldRetainedFraction(Ne, t):
-    return _rt.lpow(((1.0 - _rt.rdiv(1.0, ((2.0 * Ne))))), t)
+def ldRetainedFraction(r, Ne, t):
+    return _rt.lpow((ldRetentionPerGen(r, Ne)), t)
 
 def ldRecurrence(r, D_0, t):
     _prev = D_0
@@ -753,6 +944,12 @@ def ldDecayPerGeneration(r, t):
 
 def secularTrendBias(trend_rate, t):
     return (trend_rate * t)
+
+def temporalMetricProfile(π, signalAtTime):
+    return profileFromSignalVariance(_rt.pi, 1.0, signalAtTime)
+
+def temporalR2(signalAtTime):
+    return r2FromSignalVariance(signalAtTime, 1.0)
 
 def ageDependentSignalShape(age, age_peak, width):
     return _rt.rexp((_rt.rdiv(_rt.lpow((-((age - age_peak))), 2.0), ((2.0 * _rt.lpow(width, 2.0))))))
@@ -833,10 +1030,19 @@ def ldTightLinkageDetectionShare(retainedMarkers, totalMarkers):
     return (ldPanelRetentionFraction(retainedMarkers, totalMarkers) - _rt.rdiv(_rt.sin(((_rt.pi * ldPanelRetentionFraction(retainedMarkers, totalMarkers)))), _rt.pi))
 
 def targetCorrectionCurvature(weight, B, beta):
-    return (lambda i: (weight(i) * coefficientEnergy((B(i)), beta)))
+    return (lambda i: _rt.mul(weight[int(i)], coefficientEnergy((B(i)), beta)))
 
 def targetCorrectionOptimum(B, beta, theta):
     return (lambda i: sharedCorrectionOptimum((B(i)), beta, theta))
+
+def sharedCorrectionConsensus(curvature, optimum):
+    return _rt.rdiv((sum((_rt.mul(curvature[int(i)], optimum[int(i)])) for i in range(int(len(curvature))))), sum((curvature[int(i)]) for i in range(int(len(curvature)))))
+
+def sharedCorrectionSpread(curvature, optimum):
+    return sum((_rt.mul(curvature[int(i)], _rt.lpow((_rt.sub(optimum[int(i)], sharedCorrectionConsensus(curvature, optimum))), 2.0))) for i in range(int(len(curvature))))
+
+def sharedCorrectionCost(curvature, optimum, correction):
+    return sum((_rt.mul(curvature[int(i)], _rt.lpow((_rt.sub(correction, optimum[int(i)])), 2.0))) for i in range(int(len(curvature))))
 
 def effectMutualInformation(m, ρ):
     return (_rt.rdiv((-(m)), 2.0) * _rt.rlog(((1.0 - _rt.lpow(ρ, 2.0)))))
@@ -855,6 +1061,9 @@ def snrPortabilityRatio(v_sig_s, v_noise_s, v_sig_t, v_noise_t):
 
 def f1Score(precision, sensitivity):
     return _rt.rdiv(((2.0 * precision) * sensitivity), ((precision + sensitivity)))
+
+def uncorrectedBias(m):
+    return (_rt._proj(m, 'c') * sum((_rt._proj(m, 'eigenvals')(i)) for i in range(int(_rt.sumdim('i', len(_rt._proj(m, 'eigenvals')))))))
 
 def spectralResidualBiasEnergy(retention, bias):
     return sum((_rt.lpow((_rt.mul(retention[int(i)], bias[int(i)])), 2.0)) for i in range(int(len(retention))))
@@ -899,13 +1108,19 @@ def weightedInformation(cohort, weight):
     return _rt.rdiv(_rt.lpow(weightedSignal(cohort, weight), 2.0), weightedNoise(cohort, weight))
 
 def spikeOuter(v):
-    return (lambda i, j: (v(i) * v(j)))
+    return (lambda i, j: _rt.mul(v[int(i)], v[int(j)]))
 
 def twoBlock(k, a, b):
     return (lambda i: (a if (i < k) else b))
 
+def frobeniusForm(A, M):
+    return sum((sum((_rt.mul(A[int(i)][int(j)], M[int(i)][int(j)])) for j in range(int(len(A))))) for i in range(int(len(A))))
+
+def traceForm(M):
+    return sum((M[int(i)][int(i)]) for i in range(int(len(M))))
+
 def diagonalGapForm(i, j, M):
-    return (M(i, i) - M(j, j))
+    return _rt.sub(M[int(i)][int(i)], M[int(j)][int(j)])
 
 def traceWindowSpikeLoad(decay, nSites):
     return _rt.rdiv(ldPrecisionTrace(decay, nSites), (nSites))
@@ -931,11 +1146,20 @@ def meffFlat(n):
 def meffSize(n):
     return (n + (n * n))
 
+def weightedMean(w, c):
+    return sum((_rt.mul(w[int(t)], c[int(t)])) for t in range(int(len(w))))
+
+def energyWeightedVariance(w, c):
+    return sum((_rt.mul(w[int(t)], _rt.lpow((_rt.sub(c[int(t)], weightedMean(w, c))), 2.0))) for t in range(int(len(w))))
+
 def samplePCOverlapSq(n, M, spike):
     return (_rt.rdiv(((1.0 - _rt.rdiv((_rt.rdiv(n, M)), _rt.lpow(spike, 2.0)))), ((1.0 + _rt.rdiv((_rt.rdiv(n, M)), spike)))) if (bbpProxyThreshold(n, M) < spike) else 0.0)
 
 def samplePCResidualAxisFraction(n, M, spike):
     return (1.0 - samplePCOverlapSq(n, M, spike))
+
+def Calibrator_EmpiricalPCOverlapModel_residualBiasEnergy(m):
+    return (_rt._proj(m, 'confoundingEnergy') - sum((_rt._proj(m, 'overlapSq')(i)) for i in range(int(_rt.sumdim('i', len(_rt._proj(m, 'overlapSq')))))))
 
 def markerDangerIndex(confounding, n, markers):
     return (confounding * _rt.rsqrt((_rt.rdiv(markers, n))))
@@ -964,8 +1188,11 @@ def calibrationSlopeDeviation(slope):
 def toProfile(mom, link):
     return Calibrator_calibrationProfile(link, _rt._proj(mom, 'meanObserved'), _rt._proj(mom, 'meanPredicted'), _rt._proj(mom, 'slope'))
 
-def slopeDeviation(p):
-    return calibrationSlopeDeviation(_rt._proj(p, 'slope'))
+def Calibrator_identityCalibrationProfile(mean_observed, mean_predicted, slope):
+    return Calibrator_calibrationProfile(0, mean_observed, mean_predicted, slope)
+
+def logisticCalibrationProfile(mean_observed, mean_predicted, slope):
+    return Calibrator_calibrationProfile(1, mean_observed, mean_predicted, slope)
 
 def hosmerLemeshowContrib(observed, expected, n_group):
     return _rt.rdiv((n_group * _rt.lpow(((observed - expected)), 2.0)), ((expected * ((1.0 - expected)))))
@@ -982,8 +1209,20 @@ def Calibrator_CrossPopulationCalibrationShiftModel_observedMeanShift(m):
 def predictedMeanShift(m):
     return (_rt._proj(m, 'scoreMeanShift') + _rt._proj(m, 'deploymentInterceptShift'))
 
+def Calibrator_CrossPopulationCalibrationShiftModel_observedMean(m, P):
+    return (_rt._proj(m, 'baseObservedMean') + pair(0.0, Calibrator_CrossPopulationCalibrationShiftModel_observedMeanShift(m), P))
+
+def Calibrator_CrossPopulationCalibrationShiftModel_predictedMean(m, P):
+    return (_rt._proj(m, 'basePredictedMean') + pair(0.0, predictedMeanShift(m), P))
+
 def Calibrator_CrossPopulationCalibrationShiftModel_calibrationProfile(m, P, link):
     return _rt._proj((calibrationMoments(m, P)), 'toProfile')(link)
+
+def Calibrator_CrossPopulationCalibrationShiftModel_identityCalibrationProfile(m, P):
+    return Calibrator_CrossPopulationCalibrationShiftModel_calibrationProfile(m, P, 0)
+
+def deploymentIntercept(m, P):
+    return (_rt._proj(m, 'baseDeploymentIntercept') + pair(0.0, _rt._proj(m, 'deploymentInterceptShift'), P))
 
 def Calibrator_CrossPopulationMechanisticCalibrationModel_observedMeanShift(m):
     return ((_rt._proj(m, 'prevalenceShift') + _rt._proj(m, 'environmentalObservedShift')) + _rt._proj(m, 'geneticObservedShift'))
@@ -991,8 +1230,14 @@ def Calibrator_CrossPopulationMechanisticCalibrationModel_observedMeanShift(m):
 def Calibrator_CrossPopulationMechanisticCalibrationModel_scoreMean(m, P):
     return sourceWeightedTagScore(_rt._proj(m, 'metric'), (_rt._proj(m, 'tagMean')(P)))
 
+def scoreMeanShift(m):
+    return (Calibrator_CrossPopulationMechanisticCalibrationModel_scoreMean(m, 1) - Calibrator_CrossPopulationMechanisticCalibrationModel_scoreMean(m, 0))
+
 def Calibrator_CrossPopulationMechanisticCalibrationModel_predictedMean(m, P):
     return (deploymentIntercept(m, P) + Calibrator_CrossPopulationMechanisticCalibrationModel_scoreMean(m, P))
+
+def Calibrator_CrossPopulationMechanisticCalibrationModel_observedMean(m, P):
+    return (_rt._proj(m, 'baseObservedMean') + pair(0.0, Calibrator_CrossPopulationMechanisticCalibrationModel_observedMeanShift(m), P))
 
 def calibrationSlope(m, P):
     return calibrationSlopeFromSourceWeights(_rt._proj(m, 'metric'), P)
@@ -1000,14 +1245,35 @@ def calibrationSlope(m, P):
 def Calibrator_CrossPopulationMechanisticCalibrationModel_calibrationProfile(m, P, link):
     return _rt._proj(_rt._proj(m, 'toShiftModel'), 'calibrationProfile')(P, link)
 
+def Calibrator_CrossPopulationMechanisticCalibrationModel_identityCalibrationProfile(m, P):
+    return Calibrator_CrossPopulationMechanisticCalibrationModel_calibrationProfile(m, P, 0)
+
+def tagMeanAt(m, P, t):
+    return pair(_rt._proj(m, 'baseTagMean'), (_rt._proj(m, 'targetTagMeanAt')(t)), P)
+
+def deploymentInterceptAt(m, P, t):
+    return (_rt._proj(m, 'baseDeploymentIntercept') + pair(0.0, (_rt._proj(m, 'deploymentInterceptShiftAt')(t)), P))
+
 def observedMeanShiftAt(m, t):
     return ((_rt._proj(m, 'prevalenceShiftAt')(t) + _rt._proj(m, 'environmentalObservedShiftAt')(t)) + _rt._proj(m, 'geneticObservedShiftAt')(t))
 
 def scoreMeanAt(m, P, t):
     return sourceWeightedTagScore((_rt._proj(_rt._proj(m, 'metric'), 'toMetricModelAt')(t)), (tagMeanAt(m, P, t)))
 
+def scoreMeanShiftAt(m, t):
+    return (scoreMeanAt(m, 1, t) - scoreMeanAt(m, 0, t))
+
 def predictedMeanAt(m, P, t):
     return (deploymentInterceptAt(m, P, t) + scoreMeanAt(m, P, t))
+
+def observedMeanAt(m, P, t):
+    return (_rt._proj(m, 'baseObservedMean') + pair(0.0, (observedMeanShiftAt(m, t)), P))
+
+def targetCalibrationProfileAtGeneration(m, t, link):
+    return _rt._proj((toMechanisticCalibrationModelAt(m, t)), 'calibrationProfile')(1, link)
+
+def targetIdentityCalibrationProfileAtGeneration(m, t):
+    return targetCalibrationProfileAtGeneration(m, t, 0)
 
 def prevalenceLogisticCalibrationProfile(pi_source, pi_target, slope):
     return logisticCalibrationProfile((prevalenceLogit(pi_target)), (prevalenceLogit(pi_source)), slope)
@@ -1075,6 +1341,36 @@ def thresholdQalyLoss(model, trueRisk, predictedRisk):
 def thresholdDecisionRegretMargin(model, trueRisk, predictedRisk):
     return by(classical, exact, (_rt.rmax(((_rt._proj(model, 'threshold') - trueRisk)), 0.0) if classifiedHighRisk(_rt._proj(model, 'threshold'), predictedRisk) else _rt.rmax(((trueRisk - _rt._proj(model, 'threshold'))), 0.0)))
 
+def scalarPermeability(covariance, covarianceDerivative):
+    return ((_rt.rdiv(1.0, 2.0)) * _rt.lpow((_rt.rdiv(covarianceDerivative, covariance)), 2.0))
+
+def centeredSquareVarianceFromMoments(secondMoment, fourthMoment):
+    return (fourthMoment - _rt.lpow(secondMoment, 2.0))
+
+def covarianceScoreInformationFromMoments(covariance, covarianceDerivative, secondMoment, fourthMoment):
+    return (_rt.lpow((_rt.rdiv(covarianceDerivative, ((2.0 * _rt.lpow(covariance, 2.0))))), 2.0) * centeredSquareVarianceFromMoments(secondMoment, fourthMoment))
+
+def diagonalPermeability(covariance, covarianceDerivative):
+    return sum((scalarPermeability((covariance[int(i)]), (covarianceDerivative[int(i)]))) for i in range(int(len(covariance))))
+
+def totalGaussianInformation(m, covariance, covarianceDerivative):
+    return (m * scalarPermeability(covariance, covarianceDerivative))
+
+def gaussianCovarianceTangentEstimatorVariance(m, covariance, covarianceDerivative):
+    return _rt.rdiv((2.0 * _rt.lpow(covariance, 2.0)), ((m * _rt.lpow(covarianceDerivative, 2.0))))
+
+def lagSensitivityMatrix(lag, covarianceDerivative):
+    return (lambda i, j: covarianceDerivative((lag(i)), j))
+
+def lagObservationDerivative(lag, covarianceDerivative, tangent):
+    return _rt._proj((lagSensitivityMatrix(lag, covarianceDerivative)), 'mulVec')(tangent)
+
+def lagCompletionPermeability(covariance, lag, covarianceDerivative, tangent):
+    return diagonalPermeability(covariance, (lagObservationDerivative(lag, covarianceDerivative, tangent)))
+
+def quadraticChannel(θ):
+    return _rt.lpow(θ, 2.0)
+
 def neutralPortabilityRatioLD(fst_additional, ld_factor):
     return (((1.0 - fst_additional)) * ld_factor)
 
@@ -1124,6 +1420,12 @@ def effectivePolygenicity(sum_beta_sq, sum_beta_fourth):
 def effectivePolygenicityOfEffects(beta):
     return effectivePolygenicity((sum((_rt.lpow(beta[int(j)], 2.0)) for j in range(int(len(beta))))), (sum((_rt.lpow(beta[int(j)], 4.0)) for j in range(int(len(beta))))))
 
+def sourceEffectMass(model):
+    return sum((_rt._proj(model, 'sourceSquaredEffect')(j)) for j in range(int(_rt.sumdim('j', len(_rt._proj(model, 'sourceSquaredEffect'))))))
+
+def targetRetainedEffectMass(model):
+    return sum((_rt._proj(model, 'targetRetainedSquaredEffect')(j)) for j in range(int(_rt.sumdim('j', len(_rt._proj(model, 'targetRetainedSquaredEffect'))))))
+
 def lostEffectMass(model):
     return (sourceEffectMass(model) - targetRetainedEffectMass(model))
 
@@ -1161,6 +1463,9 @@ def rgFstWeightedUpperBound(model, rgUpper, fstLower):
 def standardizedSquare(h, g):
     return _rt.rdiv(_rt.lpow((centeredAltAlleleCount(h, g)), 2.0), genotypeVariance(h))
 
+def mellinDrift(h):
+    return sum((((genotypeProb(h, g) * standardizedSquare(h, g)) * _rt.rlog((standardizedSquare(h, g))))) for g in range(int(3)))
+
 def hweMellinDrift(q):
     return ((_rt.lpow(((1.0 - (2.0 * q))), 2.0) * _rt.rlog((_rt.rdiv(_rt.lpow(((1.0 - (2.0 * q))), 2.0), (((2.0 * q) * ((1.0 - q)))))))) + (((4.0 * q) * ((1.0 - q))) * _rt.rlog(2.0)))
 
@@ -1173,16 +1478,26 @@ def hweLatticeCondition(q):
 def latticeCriticalMaf():
     return _rt.rdiv(((2.0 - _rt.rsqrt(2.0))), 4.0)
 
+def mellinJetVariance(h):
+    return ((sum((((genotypeProb(h, g) * standardizedSquare(h, g)) * _rt.lpow((_rt.rlog((standardizedSquare(h, g)))), 2.0))) for g in range(int(3)))) - _rt.lpow(mellinDrift(h), 2.0))
+
 def hweMellinJetVariance(q):
     return ((((((2.0 * q) * ((1.0 - q))) * _rt.lpow((_rt.rlog((_rt.rdiv((2.0 * q), ((1.0 - q)))))), 2.0)) + (_rt.lpow(((1.0 - (2.0 * q))), 2.0) * _rt.lpow((_rt.rlog((_rt.rdiv(_rt.lpow(((1.0 - (2.0 * q))), 2.0), (((2.0 * q) * ((1.0 - q)))))))), 2.0))) + (((2.0 * q) * ((1.0 - q))) * _rt.lpow((_rt.rlog((_rt.rdiv((2.0 * ((1.0 - q))), q)))), 2.0))) - _rt.lpow(hweMellinDrift(q), 2.0))
 
 def hardCallLatticeSpan():
     return _rt.rlog((_rt.rdiv(((1.0 - latticeCriticalMaf)), latticeCriticalMaf)))
 
+def hardCallLatticeIndex(_e):
+    _t = [(-1.0), 0.0, 1.0]
+    return _t[_rt._ix(_e, 3, 'hardCallLatticeIndex')]
+
+def standardizedFourthMoment(h):
+    return sum(((genotypeProb(h, g) * _rt.lpow(standardizedSquare(h, g), 2.0))) for g in range(int(3)))
+
 def neiFst(H_T, H_S):
     return _rt.rdiv(((H_T - H_S)), H_T)
 
-def simpleFst(p_1, p_2):
+def neiGstFromFrequencies(p_1, p_2):
     p_bar = _rt.rdiv(((p_1 + p_2)), 2.0)
     return _rt.rdiv(_rt.lpow(((p_1 - p_2)), 2.0), (((4.0 * p_bar) * ((1.0 - p_bar)))))
 
@@ -1210,14 +1525,8 @@ def wrightFIT(f_IS, f_ST):
 def heterozygosityLossFromDrift(t, Ne):
     return (1.0 - _rt.lpow(((1.0 - _rt.rdiv(1.0, ((2.0 * Ne))))), t))
 
-def scaledMutationRate(Ne, μ):
-    return ((4.0 * Ne) * μ)
-
 def scaledIdentityStep(scaledRate, F):
     return (1.0 - (scaledRate * F))
-
-def fstMutationDriftEquilibrium(θ):
-    return _rt.rdiv(1.0, ((1.0 + θ)))
 
 def fstMutationDriftTransient(θ, t, Ne):
     return (fstMutationDriftEquilibrium(θ) * ((1.0 - _rt.rexp((_rt.rdiv(((-((1.0 + θ))) * t), ((2.0 * Ne))))))))
@@ -1228,23 +1537,20 @@ def expectedNewMutations(θ, t):
 def sharedLDFractionFromMutation(θ, t):
     return _rt.rexp(((-(expectedNewMutations(θ, t)))))
 
-def islandModelFst(Ne, m):
-    return _rt.rdiv(1.0, ((1.0 + ((4.0 * Ne) * m))))
+def islandDemeCorrection(d):
+    return _rt.lpow((_rt.rdiv(d, ((d - 1.0)))), 2.0)
+
+def islandFstFiniteDemes(Ne, m, d):
+    return _rt.rdiv(1.0, ((1.0 + (((4.0 * Ne) * m) * islandDemeCorrection(d)))))
 
 def fstMigrationMutationEquilibrium(Ne, m, μ):
     return _rt.rdiv(1.0, (((1.0 + ((4.0 * Ne) * m)) + ((4.0 * Ne) * μ))))
 
-def steppingStoneCharacteristicLength(Ne, m):
-    return _rt.rsqrt((((2.0 * Ne) * m)))
-
-def continuousSteppingStoneFst(L, d):
-    return (1.0 - _rt.rexp(((-(_rt.rdiv(d, L))))))
+def steppingStoneCharacteristicLength(m, σ_sq, μ):
+    return _rt.rsqrt((_rt.rdiv((m * σ_sq), ((2.0 * μ)))))
 
 def alleleFreqAfterMigration(p_0, p_c, m, t):
     return (p_c + (((p_0 - p_c)) * _rt.lpow(((1.0 - m)), t)))
-
-def effectiveMigration(m_1_2, m_2_1):
-    return _rt.rdiv(((m_1_2 + m_2_1)), 2.0)
 
 def ldCorrelationFromMigration(M):
     return _rt.rdiv(_rt.lpow(M, 2.0), _rt.lpow(((1.0 + M)), 2.0))
@@ -1264,11 +1570,8 @@ def hetMutationDriftRecurrence(Ne, mu, H_0, t):
         _prev = ((((1.0 - _rt.rdiv(1.0, ((2.0 * Ne))))) * _prev) + ((2.0 * mu) * ((1.0 - _prev))))
     return _prev
 
-def hetEquilibrium(Ne, mu):
-    return _rt.rdiv(((4.0 * Ne) * mu), ((1.0 + ((4.0 * Ne) * mu))))
-
 def Calibrator_hetDecayFactor(Ne, θ):
-    return (((1.0 - _rt.rdiv(1.0, ((2.0 * Ne))))) * ((1.0 - _rt.rdiv(θ, ((2.0 * Ne))))))
+    return hetDecayFromScaled(Ne, θ)
 
 def hetMutationRecurrence(lam, Hstar, H_0, t):
     _prev = H_0
@@ -1312,17 +1615,8 @@ def pairwiseFstFromBranches(fstS, fstT):
 def pairwiseFstFromBranchTaus(tauS, tauT):
     return fstFromTau(((tauS + tauT)))
 
-def Calibrator_PureSplitModel_tau(m):
-    return coalescentTau(_rt._proj(m, 't'), _rt._proj(m, 'Ne'))
-
-def fst(m):
-    return fstFromTau(Calibrator_PureSplitModel_tau(m))
-
-def scaledMigration(m):
-    return ((4.0 * _rt._proj(m, 'Ne')) * _rt._proj(m, 'mig'))
-
 def fstEqLimitLowMutationManyDemes(m):
-    return _rt.rdiv(1.0, ((1.0 + scaledMigration(m))))
+    return _rt.rdiv(1.0, ((1.0 + scaledMigrationRate(_rt._proj(m, 'Ne'), _rt._proj(m, 'mig')))))
 
 def hudsonFstFromCoalescenceTimes(ETss, ETst):
     return (1.0 - _rt.rdiv(ETss, ETst))
@@ -1360,9 +1654,6 @@ def hetMutationFloor(Ne, mu):
 def retention(r):
     return _rt.lpow(((1.0 - _rt.rdiv(1.0, ((2.0 * _rt._proj(r, 'Ne')))))), _rt._proj(r, 'horizon'))
 
-def heterozygosityLoss(r):
-    return (1.0 - retention(r))
-
 def targetHet(r):
     return (_rt._proj(r, 'H₀') * retention(r))
 
@@ -1390,11 +1681,8 @@ def Expected_Abs_Shift(V_A, fstS, fstT):
 def presentDaySignalToNoise(V_A, V_E, fst):
     return _rt.rdiv(presentDayPGSVariance(V_A, fst), V_E)
 
-def expectedR2(vSignal, V_E):
-    return _rt.rdiv(vSignal, ((vSignal + V_E)))
-
 def presentDayR2(V_A, V_E, fst):
-    return expectedR2((presentDayPGSVariance(V_A, fst)), V_E)
+    return r2FromSignalVariance((presentDayPGSVariance(V_A, fst)), V_E)
 
 def presentDayGaussianAUC(V_A, V_E, fst):
     return Phi((_rt.rsqrt((_rt.rdiv(presentDaySignalToNoise(V_A, V_E, fst), 2.0)))))
@@ -1414,14 +1702,32 @@ def sigmaTagCausalSourceAt(m, P):
 def totalEffect(m, P):
     return (_rt._proj(m, 'beta')(P) + _rt._proj(m, 'novelCausalEffect')(P))
 
+def targetLinearRisk(sigmaObsTarget, crossTarget, noiseVar, w):
+    return _rt.sub(_rt.add(noiseVar, _rt.dotProduct(w, (_rt.mulVec(sigmaObsTarget, w)))), _rt.mul(2.0, _rt.dotProduct(w, crossTarget)))
+
 def crossCovariance(m, P):
     return (_rt._proj((sigmaTagCausalSourceAt(m, P)), 'mulVec')((totalEffect(m, P))) + _rt._proj(m, 'contextCross')(P))
 
+def sourceWeightsFromExplicitDrivers(m):
+    return sourceERMWeights((_rt._proj(m, 'sigmaTag')(0)), (crossCovariance(m, 0)))
+
 def sourceWeightedTagScore(m, tagState):
-    return dotProduct((sourceWeightsFromExplicitDrivers(m)), tagState)
+    return _rt.dotProduct((sourceWeightsFromExplicitDrivers(m)), tagState)
 
 def taggingProjection(m, P):
     return _rt._proj((sigmaTagCausalSourceAt(m, P)), 'mulVec')((totalEffect(m, P)))
+
+def targetEffectHeterogeneity(m):
+    return (totalEffect(m, 1) - (_rt._proj(m, 'beta')(0)))
+
+def targetSourceEffectProjection(m):
+    return _rt._proj((sigmaTagCausalSourceAt(m, 1)), 'mulVec')((_rt._proj(m, 'beta')(0)))
+
+def targetEffectHeterogeneityProjection(m):
+    return _rt._proj((sigmaTagCausalSourceAt(m, 1)), 'mulVec')((targetEffectHeterogeneity(m)))
+
+def targetNovelMutationEffectProjection(m):
+    return _rt._proj((sigmaTagCausalSourceAt(m, 1)), 'mulVec')((_rt._proj(m, 'novelCausalEffect')(1)))
 
 def directCausalProjection(m, P):
     return _rt._proj(((_rt._proj(m, 'directCausal')(P) + _rt._proj(m, 'novelDirectCausal')(P))), 'mulVec')((totalEffect(m, P)))
@@ -1431,19 +1737,35 @@ def proxyTaggingProjection(m, P):
 
 def scoreVarianceFromSourceWeights(m, P):
     wS = sourceWeightsFromExplicitDrivers(m)
-    return dotProduct(wS, (_rt._proj((_rt._proj(m, 'sigmaTag')(P)), 'mulVec')(wS)))
+    return _rt.dotProduct(wS, (_rt._proj((_rt._proj(m, 'sigmaTag')(P)), 'mulVec')(wS)))
 
 def predictiveCovarianceFromSourceWeights(m, P):
-    return dotProduct((sourceWeightsFromExplicitDrivers(m)), (crossCovariance(m, P)))
+    return _rt.dotProduct((sourceWeightsFromExplicitDrivers(m)), (crossCovariance(m, P)))
 
 def calibrationSlopeFromSourceWeights(m, P):
     return _rt.rdiv(predictiveCovarianceFromSourceWeights(m, P), scoreVarianceFromSourceWeights(m, P))
+
+def brokenTaggingResidual(m):
+    delta = _rt._proj((((sigmaTagCausalSourceAt(m, 0)) - (sigmaTagCausalSourceAt(m, 1)))), 'mulVec')((totalEffect(m, 1)))
+    return _rt.dotProduct(delta, delta)
+
+def ancestrySpecificLDResidual(m):
+    wS = sourceWeightsFromExplicitDrivers(m)
+    delta = _rt._proj((((_rt._proj(m, 'sigmaTag')(0)) - (_rt._proj(m, 'sigmaTag')(1)))), 'mulVec')(wS)
+    return _rt.dotProduct(delta, delta)
+
+def sourceSpecificOverfitResidual(m):
+    delta = ((_rt._proj(m, 'contextCross')(0)) - (_rt._proj(m, 'contextCross')(1)))
+    return _rt.dotProduct(delta, delta)
 
 def novelUntaggablePhenotypeResidual(m):
     return _rt._proj(m, 'novelUntaggablePhenotypeVarianceTarget')
 
 def irreducibleTargetResidualBurden(m):
     return (((brokenTaggingResidual(m) + ancestrySpecificLDResidual(m)) + sourceSpecificOverfitResidual(m)) + novelUntaggablePhenotypeResidual(m))
+
+def residualBurden(m, P):
+    return pair(0.0, (irreducibleTargetResidualBurden(m)), P)
 
 def effectiveOutcomeVariance(m, P):
     return ((_rt._proj(m, 'outcomeVariance')(P)) + residualBurden(m, P))
@@ -1457,17 +1779,23 @@ def r2FromSourceWeights(m, P):
 def residualVarianceFromSourceWeights(m, P):
     return (effectiveOutcomeVariance(m, P) - explainedSignalVarianceFromSourceWeights(m, P))
 
+def sourceCalibratedBrierFromSourceWeightsAtPrevalence(m, π):
+    return calibratedBrierFromVariances(_rt.pi, (explainedSignalVarianceFromSourceWeights(m, 0)), (residualVarianceFromSourceWeights(m, 0)))
+
+def targetCalibratedBrierFromSourceWeights(m):
+    return calibratedBrierFromVariances(_rt._proj(m, 'targetPrevalence'), (explainedSignalVarianceFromSourceWeights(m, 1)), (residualVarianceFromSourceWeights(m, 1)))
+
 def ldCorrelationDecay(distance, fstGap, lambda_):
     return _rt.rexp(((-(((lambda_ * fstGap) * distance)))))
 
 def Calibrator_GenerationalPopGenParameters_bigM(g):
-    return ((4.0 * _rt._proj(g, 'Ne')) * _rt._proj(g, 'mig'))
+    return scaledMigrationRate(_rt._proj(g, 'Ne'), _rt._proj(g, 'mig'))
 
 def tauAt(g, t):
     return _rt.rdiv((t), ((2.0 * _rt._proj(g, 'Ne'))))
 
 def Calibrator_GenerationalPopGenParameters_hetDecayFactor(g):
-    return (((1.0 - _rt.rdiv(1.0, ((2.0 * _rt._proj(g, 'Ne')))))) * ((1.0 - _rt.rdiv(Calibrator_GenerationalPopGenParameters_theta(g), ((2.0 * _rt._proj(g, 'Ne')))))))
+    return hetDecayFromScaled(_rt._proj(g, 'Ne'), Calibrator_GenerationalPopGenParameters_theta(g))
 
 def fstTransientAt(g, t):
     return ((_rt.rdiv(1.0, (((1.0 + Calibrator_GenerationalPopGenParameters_theta(g)) + Calibrator_GenerationalPopGenParameters_bigM(g))))) * ((1.0 - _rt.lpow(Calibrator_GenerationalPopGenParameters_hetDecayFactor(g), t))))
@@ -1480,6 +1808,9 @@ def migrationSharedBoostAt(g, t):
 
 def alleleFreqMismatchPenalty(pSource, pTarget):
     return _rt.rexp(((-_rt.rabs((pTarget - pSource)))))
+
+def betaTargetAt(m, t):
+    return ((_rt._proj(m, 'betaSource') + _rt._proj(m, 'targetEffectHeterogeneityAt')(t)) + _rt._proj(m, 'novelCausalEffectTargetAt')(t))
 
 def tagAlleleFreqTargetAt(m, t, i):
     return (_rt._proj(m, 'tagAlleleFreqStandingTargetAt')(t, i) + _rt._proj(m, 'tagAlleleFreqMutationShiftAt')(t, i))
@@ -1511,8 +1842,17 @@ def jointNovelDirectCausalKernelAt(m, t, i, j):
 def jointNovelProxyTaggingKernelAt(m, t, i, j):
     return ((((ldCorrelationDecay((_rt._proj(m, 'tagCausalDistance')(i, j)), (_rt._proj(_rt._proj(m, 'popGen'), 'fstTransientAt')(t)), _rt._proj(_rt._proj(m, 'popGen'), 'recomb')) * novelVariantInnovationAt(_rt._proj(m, 'popGen'), t)) * _rt.rinv((_rt._proj(_rt._proj(m, 'popGen'), 'migrationSharedBoostAt')(t)))) * tagAlleleFreqRetentionAt(m, t, i)) * causalAlleleFreqRetentionAt(m, t, j))
 
+def sigmaTagTargetAt(m, t):
+    return (lambda i, j: (_rt._proj(m, 'sigmaTagSource')(i, j) * jointTagLDKernelAt(m, t, i, j)))
+
+def directCausalTargetAt(m, t):
+    return (lambda i, j: (_rt._proj(m, 'directCausalSource')(i, j) * jointDirectCausalKernelAt(m, t, i, j)))
+
 def novelDirectCausalTargetAt(m, t):
     return (lambda i, j: (_rt._proj(m, 'novelDirectCausalTemplate')(i, j) * jointNovelDirectCausalKernelAt(m, t, i, j)))
+
+def proxyTaggingTargetAt(m, t):
+    return (lambda i, j: (_rt._proj(m, 'proxyTaggingSource')(i, j) * jointProxyTaggingKernelAt(m, t, i, j)))
 
 def novelProxyTaggingTargetAt(m, t):
     return (lambda i, j: (_rt._proj(m, 'novelProxyTaggingTemplate')(i, j) * jointNovelProxyTaggingKernelAt(m, t, i, j)))
@@ -1520,14 +1860,11 @@ def novelProxyTaggingTargetAt(m, t):
 def sigmaTagCausalTargetAt(m, t):
     return (directCausalTargetAt(m, t) + ((novelDirectCausalTargetAt(m, t) + ((proxyTaggingTargetAt(m, t) + novelProxyTaggingTargetAt(m, t))))))
 
+def targetSourceEffectProjectionAt(m, t):
+    return _rt._proj((sigmaTagCausalTargetAt(m, t)), 'mulVec')(_rt._proj(m, 'betaSource'))
+
 def targetEffectHeterogeneityProjectionAt(m, t):
     return _rt._proj((sigmaTagCausalTargetAt(m, t)), 'mulVec')(((_rt._proj(m, 'targetEffectHeterogeneityAt')(t) + _rt._proj(m, 'novelCausalEffectTargetAt')(t))))
-
-def targetR2AtGeneration(m, t):
-    return r2FromSourceWeights((toMetricModelAt(m, t)))
-
-def targetCalibratedBrierAtGeneration(m, t):
-    return targetCalibratedBrierFromSourceWeights((toMetricModelAt(m, t)))
 
 def targetR2FromNeutralAFBenchmark(V_A, V_E, fstTarget):
     return presentDayR2(V_A, V_E, fstTarget)
@@ -1538,29 +1875,26 @@ def neutralAFBenchmarkRatio(fstSource, fstTarget):
 def hetRatioBetweenBranches(NeA, NeB, mu, H_0, t):
     return _rt.rdiv(hetTrajectory(NeB, mu, H_0, t), hetTrajectory(NeA, mu, H_0, t))
 
-def exactCalibratedBrierRiskFromR2(π, r2):
-    return calibratedBrier(_rt.pi, r2)
-
 def brierFromR2(π, r2):
-    return exactCalibratedBrierRiskFromR2(_rt.pi, r2)
+    return calibratedBrier(_rt.pi, r2)
 
 def targetGaussianAUCFromNeutralAFBenchmark(V_A, V_E, fstTarget):
     return presentDayGaussianAUC(V_A, V_E, fstTarget)
 
 def sourceBrierFromR2(π, r2Source):
-    return exactCalibratedBrierRiskFromR2(_rt.pi, r2Source)
+    return calibratedBrier(_rt.pi, r2Source)
 
 def targetExactCalibratedBrierRisk(π, V_A, V_E, fstTarget):
-    return exactCalibratedBrierRiskFromR2(_rt.pi, (targetR2FromNeutralAFBenchmark(V_A, V_E, fstTarget)))
+    return calibratedBrier(_rt.pi, (targetR2FromNeutralAFBenchmark(V_A, V_E, fstTarget)))
 
 def targetBrierFromNeutralAFBenchmark(π, V_A, V_E, fstTarget):
     return targetExactCalibratedBrierRisk(_rt.pi, V_A, V_E, fstTarget)
 
+def neutralAFBenchmarkMetricProfile(π, V_A, V_E, fstTarget):
+    return profileFromSignalVariance(_rt.pi, V_E, (presentDayPGSVariance(V_A, fstTarget)))
+
 def equalVarianceGaussianAUCFromSNR(snr):
     return Phi((_rt.rsqrt((_rt.rdiv(snr, 2.0)))))
-
-def equalVarianceGaussianAUCFromVariances(vSignal, vEnv):
-    return gaussianAUCFromSignalVariance(vSignal, vEnv)
 
 def equalVarianceGaussianAUCFromExplainedR2(r2):
     return Phi((_rt.rsqrt((_rt.rdiv(r2, ((2.0 * ((1.0 - r2)))))))))
@@ -1569,34 +1903,16 @@ def equalVarianceGaussianAUCChart(r2):
     return (1.0 if (1.0 <= r2) else equalVarianceGaussianAUCFromExplainedR2(r2))
 
 def equalVarianceGaussianAUCFromSourceWeights(m, P):
-    return equalVarianceGaussianAUCFromVariances((explainedSignalVarianceFromSourceWeights(m, P)), (residualVarianceFromSourceWeights(m, P)))
+    return gaussianAUCFromSignalVariance((explainedSignalVarianceFromSourceWeights(m, P)), (residualVarianceFromSourceWeights(m, P)))
 
 def sourceMetricProfileFromSourceWeightsAtTargetPrevalence(m):
     return sourceMetricProfileFromSourceWeightsAtPrevalence(m, _rt._proj(m, 'targetPrevalence'))
 
-def targetGaussianAUCAtGeneration(m, t):
-    return equalVarianceGaussianAUCFromSourceWeights((toMetricModelAt(m, t)))
-
 def targetMetricProfileAtGeneration(m, t):
     return targetMetricProfileFromSourceWeights((toMetricModelAt(m, t)))
 
-def targetPredictiveCovarianceAtGeneration(m, t):
-    return predictiveCovarianceFromSourceWeights((toMetricModelAt(m, t)))
-
-def targetScoreVarianceAtGeneration(m, t):
-    return scoreVarianceFromSourceWeights((toMetricModelAt(m, t)))
-
-def effectiveTargetOutcomeVarianceAtGeneration(m, t):
-    return effectiveOutcomeVariance((toMetricModelAt(m, t)))
-
-def targetResidualVarianceAtGeneration(m, t):
-    return residualVarianceFromSourceWeights((toMetricModelAt(m, t)))
-
-def targetCalibrationSlopeAtGeneration(m, t):
-    return calibrationSlopeFromSourceWeights((toMetricModelAt(m, t)))
-
 def sourceNormalizedTargetR2AtGeneration(m, sourceBaseline, t):
-    return (sourceBaseline * (_rt.rdiv(targetR2AtGeneration(m, t), r2FromSourceWeights((toMetricModelAt(m, t))))))
+    return (sourceBaseline * (_rt.rdiv(r2FromSourceWeights((toMetricModelAt(m, t)), 1), r2FromSourceWeights((toMetricModelAt(m, t)), 0))))
 
 def targetExactGaussianAUCFromNeutralAFBenchmark(V_A, V_E, fstTarget):
     return targetGaussianAUCFromNeutralAFBenchmark(V_A, V_E, fstTarget)
@@ -1623,7 +1939,7 @@ def ibdFlowStep(Ne, rate, F):
     return ((F + _rt.rdiv(((1.0 - F)), ((2.0 * Ne)))) - ((2.0 * rate) * F))
 
 def Calibrator_MutationDriftModelAssumptions_fstEquilibrium(m):
-    return _rt.rdiv(1.0, ((1.0 + Calibrator_MutationDriftModelAssumptions_theta(m))))
+    return fstMutationDriftEquilibrium(Calibrator_MutationDriftModelAssumptions_theta(m))
 
 def Calibrator_MutationDriftModelAssumptions_fstTransient(m):
     return (Calibrator_MutationDriftModelAssumptions_fstEquilibrium(m) * ((1.0 - _rt.rexp((_rt.rdiv(((-((1.0 + Calibrator_MutationDriftModelAssumptions_theta(m)))) * _rt._proj(m, 't')), ((2.0 * _rt._proj(m, 'Ne')))))))))
@@ -1668,9 +1984,6 @@ def islandFstMultiplicativeStep(Ne, m, F):
 def fstIslandMultiplicativeEquilibrium(Ne, m):
     return ibdRecurrenceFixedPoint(Ne, m)
 
-def scaledMigrationRate(Ne, m):
-    return ((4.0 * Ne) * m)
-
 def fstMigDriftEq(s):
     return fstMigrationDriftEquilibrium(_rt._proj(s, 'Ne'), _rt._proj(s, 'mig'))
 
@@ -1696,7 +2009,7 @@ def effectiveSymmetricMigration(m_1_2, m_2_1):
     return _rt.rdiv(((m_1_2 + m_2_1)), 2.0)
 
 def admixtureLDDecay(r, generations_since):
-    return discreteRecombinationSurvival(r, generations_since)
+    return _rt.lpow(((1.0 - r)), generations_since)
 
 def admixtureLDBoost(r, t_since, equilibrium_ld):
     return _rt.rdiv(admixtureLDDecay(r, t_since), equilibrium_ld)
@@ -1734,8 +2047,12 @@ def logRateSampleSize(epsilon):
 def gradeCertifiedSampleSize(epsilon, K, c):
     return _rt.lpow(epsilon, ((-(_rt.rdiv(K, c)))))
 
-def bernoulliMeasure(p, hp):
-    return _rt._proj((bernoulliPMF(p, hp)), 'toMeasure')
+def pair(s, t, _e):
+    _t = [s, t]
+    return _t[_rt._ix(_e, 2, 'pair')]
+
+def withTarget(f, t):
+    return pair((f(0)), t)
 
 def klBern(p, q):
     return bernoulliKL((unitProbToNNReal(p)), (unitProbToNNReal(q)), (unitProbToNNReal_le_one(p)), (unitProbToNNReal_le_one(q)))
@@ -1743,19 +2060,48 @@ def klBern(p, q):
 def poly_n(n, x):
     return _rt.lpow(x, n)
 
+def altAlleleCount(_e):
+    _t = [0.0, 1.0, 2.0]
+    return _t[_rt._ix(_e, 3, 'altAlleleCount')]
+
 def refFreq(h):
     return (1.0 - _rt._proj(h, 'altFreq'))
+
+def genotypeProb(h, _e):
+    _t = [_rt.lpow(_rt._proj(h, 'refFreq'), 2.0), ((2.0 * _rt._proj(h, 'refFreq')) * _rt._proj(h, 'altFreq')), _rt.lpow(_rt._proj(h, 'altFreq'), 2.0)]
+    return _t[_rt._ix(_e, 3, 'genotypeProb')]
+
+def expectedAltAlleleCount(h):
+    return sum(((altAlleleCount(g) * genotypeProb(h, g))) for g in range(int(3)))
 
 def centeredAltAlleleCount(h, g):
     return (altAlleleCount(g) - expectedAltAlleleCount(h))
 
+def genotypeVariance(h):
+    return sum(((genotypeProb(h, g) * _rt.lpow((centeredAltAlleleCount(h, g)), 2.0))) for g in range(int(3)))
+
+def genotypeThirdAbsMoment(h):
+    return sum(((genotypeProb(h, g) * _rt.lpow(_rt.rabs(centeredAltAlleleCount(h, g)), 3.0))) for g in range(int(3)))
+
+def Calibrator_HWEScoreModel_scoreMean(model):
+    return sum(((_rt._proj(model, 'effect')(i) * _rt._proj((_rt._proj(model, 'alleleFreq')(i)), 'expectedAltAlleleCount'))) for i in range(int(_rt.sumdim('i', len(_rt._proj(model, 'effect')), len(_rt._proj(model, 'alleleFreq'))))))
+
+def Calibrator_HWEScoreModel_scoreVariance(model):
+    return sum(((_rt.lpow((_rt._proj(model, 'effect')(i)), 2.0) * _rt._proj((_rt._proj(model, 'alleleFreq')(i)), 'genotypeVariance'))) for i in range(int(_rt.sumdim('i', len(_rt._proj(model, 'effect')), len(_rt._proj(model, 'alleleFreq'))))))
+
+def scoreThirdAbsMomentBound(model):
+    return sum(((_rt.lpow(_rt.rabs(_rt._proj(model, 'effect')(i)), 3.0) * _rt._proj((_rt._proj(model, 'alleleFreq')(i)), 'genotypeThirdAbsMoment'))) for i in range(int(_rt.sumdim('i', len(_rt._proj(model, 'effect')), len(_rt._proj(model, 'alleleFreq'))))))
+
 def Calibrator_berryEsseenErrorBound(berryEsseenConstant, variance, thirdMomentSum):
     return _rt.rdiv((berryEsseenConstant * thirdMomentSum), ((variance * _rt.rsqrt(variance))))
 
-def Calibrator_aucApproximationInterval(aucGaussian, epsilon):
+def Calibrator_HWEScoreModel_berryEsseenErrorBound(model, berryEsseenConstant):
+    return Calibrator_berryEsseenErrorBound(berryEsseenConstant, Calibrator_HWEScoreModel_scoreVariance(model), scoreThirdAbsMomentBound(model))
+
+def aucApproximationInterval(aucGaussian, epsilon):
     return approximationInterval(aucGaussian, epsilon)
 
-def Calibrator_r2ApproximationInterval(r2Gaussian, epsilon):
+def r2ApproximationInterval(r2Gaussian, epsilon):
     return approximationInterval(r2Gaussian, epsilon)
 
 def Phi(x):
@@ -1768,13 +2114,13 @@ def etaLiabilityThreshold(hN, T, s, x):
     return _rt._proj((noiseMeasureGivenX(hN, x, (diseaseEvent(T, x, s)))), 'toReal')
 
 def chiSquareBudget(P, densityRatio):
-    return P(((lambda ω: _rt.lpow(((densityRatio(ω) - 1.0)), 2.0))))
-
-def directionalResidualCurvature(P, X, residual, direction):
-    return P(((lambda ω: _rt.lpow(((dot(direction, (X(ω))) * residual(ω))), 2.0))))
+    return P(((lambda ω: _rt.lpow((_rt.sub(densityRatio[int(ω)], 1.0)), 2.0))))
 
 def weightedResidualMoment(P, densityRatio, X, residual):
-    return rawCrossMoment(P, X, ((lambda ω: (((densityRatio(ω) - 1.0)) * residual(ω)))))
+    return rawCrossMoment(P, X, ((lambda ω: _rt.mul((_rt.sub(densityRatio[int(ω)], 1.0)), residual[int(ω)]))))
+
+def coefficientEnergy(B, x):
+    return dot(x, (_rt.mulVec(B, x)))
 
 def detectionWeight(s):
     return _rt.rinv(s)
@@ -1785,11 +2131,35 @@ def reconstructionWeight(s):
 def wienerWeight(noise, s):
     return _rt.rdiv(s, ((s + noise)))
 
+def spectralCapture(w, M):
+    return sum((_rt.mul(M[int(i)], w[int(i)])) for i in range(int(len(w))))
+
+def spectralTotal(w):
+    return sum((w[int(i)]) for i in range(int(len(w))))
+
 def reconstructionEfficiency(spectrum, M):
-    return _rt.rdiv(spectralCapture(((lambda i: reconstructionWeight((spectrum(i))))), M), spectralTotal(((lambda i: reconstructionWeight((spectrum(i)))))))
+    return _rt.rdiv(spectralCapture(((lambda i: reconstructionWeight((spectrum[int(i)])))), M), spectralTotal(((lambda i: reconstructionWeight((spectrum[int(i)]))))))
 
 def detectionEfficiency(spectrum, M):
-    return _rt.rdiv(spectralCapture(((lambda i: detectionWeight((spectrum(i))))), M), spectralTotal(((lambda i: detectionWeight((spectrum(i)))))))
+    return _rt.rdiv(spectralCapture(((lambda i: detectionWeight((spectrum[int(i)])))), M), spectralTotal(((lambda i: detectionWeight((spectrum[int(i)]))))))
+
+def sharedCorrectionOptimum(B, beta, theta):
+    return _rt.rdiv(dot(beta, (_rt.mulVec(B, theta))), coefficientEnergy(B, beta))
+
+def irreducibleDegradation(B, beta, theta):
+    return _rt.sub(coefficientEnergy(B, theta), _rt.rdiv(_rt.lpow(dot(beta, (_rt.mulVec(B, theta))), 2.0), coefficientEnergy(B, beta)))
+
+def quadraticRisk(outcomeSecondMoment, B, b, w):
+    return _rt.add(_rt.sub(outcomeSecondMoment, _rt.mul(2.0, dot(w, b))), dot(w, (_rt.mulVec(B, w))))
+
+def quadraticCoefficientDistance(B, w, v):
+    return dot(((lambda i: _rt.sub(w[int(i)], v[int(i)]))), (_rt.mulVec(B, ((lambda i: _rt.sub(w[int(i)], v[int(i)]))))))
+
+def bestScalarCorrection(B, u, v):
+    return _rt.rdiv(dot(u, (_rt.mulVec(B, v))), dot(u, (_rt.mulVec(B, u))))
+
+def scalarCorrectionFloor(B, u, v):
+    return _rt.sub(dot(v, (_rt.mulVec(B, v))), _rt.rdiv(_rt.lpow(dot(u, (_rt.mulVec(B, v))), 2.0), dot(u, (_rt.mulVec(B, u)))))
 
 def mutationSelectionStepRare(mu, s, h, p):
     return ((p * ((1.0 - (h * s)))) + (mu * ((1.0 - p))))
@@ -1805,6 +2175,12 @@ def mutationSelectionBalanceRecessive(mu, s):
 
 def expectedEffectMultiplier(p, α):
     return _rt.lpow(((p * ((1.0 - p)))), ((1.0 + α)))
+
+def markovPoissonKernel(lam, x):
+    return _rt.rdiv(((1.0 - _rt.lpow(lam, 2.0))), (((1.0 + _rt.lpow(lam, 2.0)) - ((2.0 * lam) * x))))
+
+def twoStatePersistence(a, b):
+    return ((1.0 - a) - b)
 
 def overlapInflation(r2_true, r2_observed):
     return (_rt.rdiv(r2_observed, r2_true) - 1.0)
@@ -1840,10 +2216,7 @@ def internallyStandardized(pgs, μ_target, σ_target):
     return _rt.rdiv(((pgs - μ_target)), σ_target)
 
 def rawCrossMoment(E, X, Y):
-    return (lambda i: E(((lambda ω: (X(ω, i) * Y(ω))))))
-
-def residualScoreMoment(E, X, Y, w):
-    return rawCrossMoment(E, X, ((lambda ω: (Y(ω) - dot(w, (X(ω)))))))
+    return (lambda i: E(((lambda ω: _rt.mul(X[int(ω)][int(i)], Y[int(ω)])))))
 
 def equilibriumEffectVariance(v_mutation, s):
     return _rt.rdiv(v_mutation, s)
@@ -1890,6 +2263,9 @@ def missedSelectedVariance(validation, summary):
 def selectionModelLRT(validation, nullSummary, altSummary):
     return likelihoodRatioStat((selectionSummaryLogLik(validation, nullSummary)), (selectionSummaryLogLik(validation, altSummary)))
 
+def mechanisticPortabilityRatio(m):
+    return _rt.rdiv(r2FromSourceWeights(m, 1), r2FromSourceWeights(m, 0))
+
 def sourceSquaredEffectMass(β):
     return sum((_rt.lpow(β[int(i)], 2.0)) for i in range(int(len(β))))
 
@@ -1898,6 +2274,18 @@ def popgenDrivenTagScale():
 
 def popgenDrivenProxyScale():
     return ((_rt.rdiv(7.0, 6.0)) * _rt.rexp(((-(_rt.rdiv(15.0, 14.0))))))
+
+def optimalReadout(P, b):
+    return _rt.rdiv(_rt._proj(P, 'crossSpectrum')(b), _rt._proj(P, 'featureSpectrum')(b))
+
+def risk(P, readout):
+    return sum(((_rt.add(_rt.sub(_rt.mul(_rt._proj(P, 'featureSpectrum')(b), _rt.lpow(readout[int(b)], 2.0)), _rt.mul(_rt.mul(2.0, _rt._proj(P, 'crossSpectrum')(b)), readout[int(b)])), _rt._proj(P, 'targetPower')(b)))) for b in range(int(len(readout))))
+
+def degradation(source, target):
+    return (risk(target, (optimalReadout(source))) - risk(target, (optimalReadout(target))))
+
+def degradationProfile(source, target, b):
+    return (_rt.lpow(((optimalReadout(source, b) - optimalReadout(target, b))), 2.0) * _rt._proj(target, 'featureSpectrum')(b))
 
 def incrementalR2(r2_full, r2_covariates):
     return (r2_full - r2_covariates)
@@ -1914,8 +2302,14 @@ def fixed_weights(m, i):
 def random_weights(m, i):
     return _rt.rdiv(1.0, ((_rt._proj(m, 'variances')(i) + _rt._proj(m, 'tau_sq'))))
 
+def geneticCorrelationLDSC(model):
+    return _rt.rdiv((sum(((_rt._proj(model, 'beta_s')(i) * _rt._proj(model, 'beta_t')(i))) for i in range(int(_rt.sumdim('i', len(_rt._proj(model, 'beta_s')), len(_rt._proj(model, 'beta_t'))))))), _rt.rsqrt((((sum((_rt.lpow(_rt._proj(model, 'beta_s')(i), 2.0)) for i in range(int(_rt.sumdim('i', len(_rt._proj(model, 'beta_s'))))))) * (sum((_rt.lpow(_rt._proj(model, 'beta_t')(i), 2.0)) for i in range(int(_rt.sumdim('i', len(_rt._proj(model, 'beta_t')))))))))))
+
 def disjointWindowLimitVariance(share):
     return sum((share[int(j)]) for j in range(int(len(share))))
+
+def varBias(m):
+    return sum(((_rt.lpow(_rt._proj(m, 'b')(i), 2.0) * _rt._proj(m, 'H')(i))) for i in range(int(_rt.sumdim('i', len(_rt._proj(m, 'b')), len(_rt._proj(m, 'H'))))))
 
 def varBiasTarget(m):
     return (_rt._proj(m, 'attenuation') * _rt._proj(_rt._proj(m, 'toStratificationModel'), 'varBias'))
@@ -1946,7 +2340,7 @@ def sharedLDHeritability(β, ld, var_y):
     return _rt.rdiv(sharedLDGeneticVariance(β, ld), var_y)
 
 def pgsR2(cov_pgs_y, var_pgs, var_y):
-    return explainedR2FromTransportMoments(cov_pgs_y, var_pgs, var_y)
+    return _rt.rdiv(_rt.lpow(cov_pgs_y, 2.0), ((var_pgs * var_y)))
 
 def sourceTruthR2SharedLD(β_source, ld, var_y):
     return pgsR2((sharedLDGeneticVariance(β_source, ld)), (sharedLDGeneticVariance(β_source, ld)), var_y)
@@ -2041,7 +2435,7 @@ def optimalSourceShrinkageWeight(gapSq, noiseVar, nTarget):
     return _rt.rdiv((_rt.rdiv(noiseVar, nTarget)), ((gapSq + _rt.rdiv(noiseVar, nTarget))))
 
 def coefficientGapSq(wSource, wTarget):
-    return dotProduct(((lambda i: _rt.sub(wSource[int(i)], wTarget[int(i)]))), ((lambda i: _rt.sub(wSource[int(i)], wTarget[int(i)]))))
+    return _rt.dotProduct(((lambda i: _rt.sub(wSource[int(i)], wTarget[int(i)]))), ((lambda i: _rt.sub(wSource[int(i)], wTarget[int(i)]))))
 
 def meanPopulationDeviation(deviation, k):
     return (lambda i: (_rt.rinv((k)) * populationDeviationSum(deviation, k, i)))
@@ -2050,7 +2444,7 @@ def metaLearnedSourceWeights(wShared, deviation, k):
     return (lambda i: _rt.add(wShared[int(i)], meanPopulationDeviation(deviation, k, i)))
 
 def centeredPopulationEffectDeviation(wShared, wSource):
-    return (lambda j, i: _rt.sub(wSource(j, i), wShared[int(i)]))
+    return (lambda j, i: _rt.sub(wSource[int(j)][int(i)], wShared[int(i)]))
 
 def metaLearnedTransferGapSq(wShared, wTarget, deviation, k):
     return coefficientGapSq((metaLearnedSourceWeights(wShared, deviation, k)), wTarget)
@@ -2072,9 +2466,6 @@ def weightedPopulationEffectAverage(wSource, weight):
     k = float(len(wSource))
     return (lambda i: sum((_rt.mul(weight[int(j)], wSource[int(j)][int(i)])) for j in range(int(len(wSource)))))
 
-def centeredPopulationEffectDeviationFin(wShared, wSource):
-    return (lambda j, i: _rt.sub(wSource[int(j)][int(i)], wShared[int(i)]))
-
 def optimalFineTuningMSE(gapSq, noiseVar, nTarget):
     return sourceShrinkageMSE(gapSq, noiseVar, nTarget, (optimalSourceShrinkageWeight(gapSq, noiseVar, nTarget)))
 
@@ -2094,31 +2485,40 @@ def mean(E, Z):
     return E(Z)
 
 def variance(E, Z):
-    return E(((lambda ω: _rt.lpow(((Z(ω) - E(Z))), 2.0))))
+    return E(((lambda ω: _rt.lpow((_rt.sub(Z[int(ω)], E(Z))), 2.0))))
 
 def covariance(E, X, Y):
-    return E(((lambda ω: (((X(ω) - E(X))) * ((Y(ω) - E(Y)))))))
+    return E(((lambda ω: _rt.mul((_rt.sub(X[int(ω)], E(X))), (_rt.sub(Y[int(ω)], E(Y)))))))
 
 def expMse(E, Y, S):
-    return E(((lambda ω: _rt.lpow(((Y(ω) - S(ω))), 2.0))))
+    return E(((lambda ω: _rt.lpow((_rt.sub(Y[int(ω)], S[int(ω)])), 2.0))))
 
 def bias(E, Y, S):
-    return (E(S) - E(Y))
+    return _rt.sub(E(S), E(Y))
 
-def linScore(w, X):
-    return (lambda ω: dot(w, (X(ω))))
+def dot(x, y):
+    return sum((_rt.mul(x[int(i)], y[int(i)])) for i in range(int(len(x))))
 
 def crossCovVector(E, X, Y):
-    return (lambda i: covariance(E, ((lambda ω: X(ω, i))), Y))
+    return (lambda i: covariance(E, ((lambda ω: X[int(ω)][int(i)])), Y))
 
 def contextCrossCovVector(E, X, h):
-    return (lambda j: covariance(E, ((lambda ω: X(ω, j))), h))
+    return (lambda j: covariance(E, ((lambda ω: X[int(ω)][int(j)])), h))
 
-def causalSignal(β, C):
-    return (lambda ω: dot(β, (C(ω))))
+def optimalWeightsFromMoments(sigmaInv, E, X, Y):
+    return _rt.mulVec(sigmaInv, (crossCovVector(E, X, Y)))
+
+def transportedCovariance(w, K, β):
+    return sum((sum((_rt.mul(_rt.mul(w[int(j)], K[int(j)][int(l)]), β[int(l)])) for l in range(int(_rt.sumdim('l', len(K[0]), len(β)))))) for j in range(int(_rt.sumdim('j', len(w), len(K)))))
+
+def locusTerm(w, K, β, l):
+    return _rt.mul((sum((_rt.mul(w[int(j)], K[int(j)][int(l)])) for j in range(int(_rt.sumdim('j', len(w), len(K)))))), β[int(l)])
+
+def baselineWeight(aT, l):
+    return _rt.rdiv(aT[int(l)], (sum((aT[int(m)]) for m in range(int(len(aT))))))
 
 def transportFactor(aQ, aT, l):
-    return _rt.rdiv(aQ(l), aT(l))
+    return _rt.rdiv(aQ[int(l)], aT[int(l)])
 
 def explainableFraction(between, total):
     return _rt.rdiv(between, total)
@@ -2134,6 +2534,12 @@ def fpr(c):
 
 def precision(c):
     return _rt.rdiv(_rt._proj(c, 'tp'), ((_rt._proj(c, 'tp') + _rt._proj(c, 'fp'))))
+
+def transportedRidgeParameter(τ, a, r):
+    return _rt.rdiv((_rt.lpow(τ, 2.0) * a), ((a + r)))
+
+def robustRidgeCandidate(S, τ, a, r):
+    return _rt.rdiv((((a + r)) * _rt.lpow(S, 2.0)), (((((a + r)) * _rt.lpow(S, 2.0)) + (_rt.lpow(τ, 2.0) * a))))
 
 def gaussianProfileLogLik(observed, mean, variance):
     return (_rt.rdiv((-(_rt.lpow(((observed - mean)), 2.0))), ((2.0 * variance))) - _rt.rdiv(_rt.rlog((((2.0 * _rt.pi) * variance))), 2.0))

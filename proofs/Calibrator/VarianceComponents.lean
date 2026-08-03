@@ -163,8 +163,9 @@ the right shape for them.
 That is a property of these particular summaries and does not extend to the
 whole file's subject matter. A summary of the same effect vector that is not
 smooth — the mean absolute effect, or an inverse-kurtosis polygenicity measure
-— carries an attainable risk of order `1 / log q` rather than a power of `q`;
-see `Calibrator.PolygenicArchitecture`, section `NonsmoothSummaries`. The
+— may carry a logarithmic benchmark rather than a power of `q` in a specified
+Gaussian-sequence model; see
+`Calibrator.PolygenicArchitecture`, section `NonsmoothSummaries`. The
 distinction is invisible in the formulas, which look equally elementary, and it
 is worth stating here because the two kinds of quantity are routinely reported
 side by side in the same table with the same standard errors. -/

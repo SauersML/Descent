@@ -523,6 +523,42 @@ noncomputable def haplotypeEffectEstimationVariance
     (σ2 n freq : ℝ) : ℝ :=
   σ2 / (n * freq)
 
+/-- **The OLS estimation variance, corrected.**
+
+    Regressing on a binary haplotype indicator of frequency `f` gives
+    `Var(β̂) = σ²/(n·f·(1-f))`, not `σ²/(n·f)`. The missing `(1-f)` makes the uncorrected
+    body **understate** the estimation variance — hence **overstate** precision — and it does
+    so worst for **common** haplotypes, which is the opposite of the rarity intuition the
+    surrounding prose appeals to.
+
+    Monte-Carlo at `n = 1000`, 3000 replicates, MC standard error about 2.6%:
+
+    | `f` | measured | uncorrected | corrected |
+    |---|---|---|---|
+    | 0.02 | 0.05286 | −5.4% | −3.5% |
+    | 0.1 | 0.011255 | −11.2% | −1.3% |
+    | 0.3 | 0.0048055 | −30.6% | −0.9% |
+    | 0.5 | 0.0040328 | **−50.4%** | −0.8% |
+
+    Empirical status: **VALIDATED**; the uncorrected form is FALSIFIED
+    (`proofs/validation/popgen_diff2/`). -/
+noncomputable def haplotypeEffectVarianceOLS
+    (σ2 n freq : ℝ) : ℝ :=
+  σ2 / (n * freq * (1 - freq))
+
+/-- **The uncorrected form understates the estimation variance, by exactly `(1-f)`.**
+
+    So it overstates precision, and the error grows with frequency rather than shrinking:
+    at `f = 1/2` it is a factor of two. -/
+theorem haplotypeEffectEstimationVariance_lt_ols (σ2 n freq : ℝ)
+    (hσ : 0 < σ2) (hn : 0 < n) (hf0 : 0 < freq) (hf1 : freq < 1) :
+    haplotypeEffectEstimationVariance σ2 n freq < haplotypeEffectVarianceOLS σ2 n freq := by
+  have h1 : 0 < n * freq := mul_pos hn hf0
+  have h2 : 0 < n * freq * (1 - freq) := by nlinarith
+  have hlt : n * freq * (1 - freq) < n * freq := by nlinarith
+  unfold haplotypeEffectEstimationVariance haplotypeEffectVarianceOLS
+  exact div_lt_div_of_pos_left hσ h2 hlt
+
 theorem haplotype_pgs_overfitting_risk
     (σ2 n freq_common freq_rare : ℝ)
     (h_sigma : 0 < σ2)
@@ -674,9 +710,37 @@ theorem la_deconvolution_improves_pgs
     exact div_pos (mul_pos h_mix h_gap) h_total
   linarith
 
-/-- **Recombination since admixture determines segment length.**
-    Average segment length ∝ 1/(g × r_total)
-    where g is generations since admixture. -/
+/-- **The admixture tract length, corrected.**
+
+    For a single-pulse hybrid-isolation model the ancestry-1 tracts are exponential with mean
+    `1/(g(1-α))` Morgans, where `α` is the admixture fraction (Pool & Nielsen 2009; Liang &
+    Nielsen 2014). The map length does **not** appear.
+
+    The uncorrected `expectedSegmentLength` below takes a total map length `r_total` that is
+    spurious and omits `α` entirely. A forward pedigree simulation with explicit Poisson
+    crossovers settles it decisively — holding `α = 0.5, g = 10` and varying chromosome
+    length, the truth is asymptotically **independent** of map length while the uncorrected
+    form moves 16-fold:
+
+    | map length | simulated | uncorrected |
+    |---|---|---|
+    | 1 M | 0.1462 ± 0.0043 | 0.1000 |
+    | 4 M | 0.1728 ± 0.0023 | 0.0250 |
+    | 16 M | 0.1913 ± 0.0013 | 0.00625 |
+
+    (The simulated value rises toward `1/(g(1-α)) = 0.20` as edge censoring vanishes.) Across
+    `α ∈ {0.2,0.5,0.8} × g ∈ {5,10,20}` the uncorrected form runs −78% to −95%; the corrected
+    one matches to 0.1–7% where censoring is small. **No choice of units repairs it** — one
+    argument is spurious and another is missing.
+
+    Empirical status: **VALIDATED**; the form below is FALSIFIED
+    (`proofs/validation/popgen_diff2/`). -/
+noncomputable def expectedTractLength (g admixtureFraction : ℝ) : ℝ :=
+  1 / (g * (1 - admixtureFraction))
+
+/-- **FALSIFIED — spurious map-length argument, missing admixture fraction.** See
+    `expectedTractLength`. Retained so the superseded form is named and struck rather than
+    quietly absent. -/
 noncomputable def expectedSegmentLength (g r_total : ℝ) : ℝ :=
   1 / (g * r_total)
 

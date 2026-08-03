@@ -203,7 +203,17 @@ noncomputable def targetPgsVarOfRetention (V_A r : ℝ) : ℝ := V_A * r
 
 This is the cluster's own cross-check, and the theorem says it is satisfied for an
 arbitrary `r` — so passing it is evidence about the algebra and no evidence at all about
-the number. That is precisely the gap the simulation found. -/
+the number. That is precisely the gap the simulation found.
+
+**INTENTIONALLY VACUOUS. DO NOT DELETE, DO NOT STRENGTHEN.** Its unfalsifiability is the
+result: a cross-check that holds at every `r` cannot detect a wrong `r`. Automated
+vacuity detection is WRONG here and cannot become right, because the property it flags —
+that no instance of this statement can fail — is exactly the property being exhibited.
+`validation/extract/equivalence.py` reports this among its rfl candidates on the same
+footing as genuinely empty restatements, so a sweep acting on that list without reading
+this paragraph would delete the finding while believing it was removing noise. If a
+future detector grows an allow-list, this and
+`ascertainment_artificial_loss` in `ImputationPortability` are its first two entries. -/
 theorem cluster_identities_hold_at_every_retention (H₀ V_A r : ℝ) :
     targetHetOfRetention H₀ r = H₀ * (1 - lossOfRetention r) ∧
       targetPgsVarOfRetention V_A r = V_A * (1 - lossOfRetention r) := by

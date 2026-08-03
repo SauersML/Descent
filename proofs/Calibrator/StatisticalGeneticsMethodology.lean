@@ -143,13 +143,58 @@ individual-level data. This introduces specific challenges.
 section SummaryStatPGS
 
 
-/-- **Effective sample size from summary stats.**
-    n_eff_j = (Z_j / β_true_j)² if β_true_j were known.
-    In practice: n_eff = median over SNPs of 1/SE_j².
-    This can differ from the reported GWAS n.
+/-- **FALSIFIED as a sample size — this is the inverse-variance meta-analysis weight.**
 
-    Empirical status: UNTESTED. -/
+    `1/SE²` is not `n_eff`. For a standardized trait `SE² = σ_y²/(n · Var(g))` with
+    `Var(g) = 2p(1-p)`, so the allele frequency does not cancel and this body **always
+    understates** the sample size, by exactly the factor `2p(1-p)`.
+
+    Measured against Monte-Carlo GWAS regressions at a true `n = 2000`:
+
+    | `p` | this body | corrected | error |
+    |---|---|---|---|
+    | 0.5 | 996 | 1992 | −50.2% |
+    | 0.3 | 838 | 1996 | −58.1% |
+    | 0.1 | 359 | 1994 | −82.1% |
+    | 0.05 | 189 | 1993 | −90.5% |
+    | 0.01 | 39 | 1976 | **−98.0%** |
+
+    The corrected form recovers `n` to 0.2–1.2% in every cell. This is the
+    missing-parameter class: no allele frequency appears in the signature, so no constant
+    repairs it — the same defect that falsified `ridgeBalance`. The docstring's own first
+    sentence, `(Z/β)²`, is right for a standardized effect; its second sentence states the
+    error.
+
+    Retained under its own name because the body **is** the correct inverse-variance weight
+    and is used as such; `effectiveSampleSizeFromSE` is the sample size.
+
+    Empirical status: **FALSIFIED** (`proofs/validation/popgen_diff2/`). -/
 noncomputable def effectiveSampleSizeSE (se : ℝ) : ℝ := 1 / se ^ 2
+
+/-- **Effective sample size from a standard error, corrected.**
+
+    `n_eff = 1/(SE² · 2p(1-p))` for a standardized trait. Recovers the true `n` to about 1%
+    across allele frequencies from 0.5 down to 0.01.
+
+    Empirical status: **VALIDATED** against Monte-Carlo GWAS regressions. -/
+noncomputable def effectiveSampleSizeFromSE (se p : ℝ) : ℝ :=
+  1 / (se ^ 2 * (2 * p * (1 - p)))
+
+/-- **The weight understates the sample size at every polymorphic frequency.**
+
+    The gap is not a constant: it is `2p(1-p)`, which is at most `1/2` and tends to zero at
+    rare variants, so the understatement is worst exactly where summary-statistic methods are
+    most fragile. -/
+theorem effectiveSampleSizeSE_lt_corrected (se p : ℝ)
+    (hse : se ≠ 0) (hp0 : 0 < p) (hp1 : p < 1) :
+    effectiveSampleSizeSE se < effectiveSampleSizeFromSE se p := by
+  have hse2 : 0 < se ^ 2 := by positivity
+  have hc : 0 < 2 * p * (1 - p) := by nlinarith
+  have hc1 : 2 * p * (1 - p) < 1 := by nlinarith [sq_nonneg (2 * p - 1)]
+  have h : se ^ 2 * (2 * p * (1 - p)) < se ^ 2 := by
+    nlinarith [hse2, hc1]
+  unfold effectiveSampleSizeSE effectiveSampleSizeFromSE
+  exact one_div_lt_one_div_of_lt (by positivity) h
 
 /-- Effective sample size is positive. -/
 theorem effective_n_pos (se : ℝ) (h_se : 0 < se) :

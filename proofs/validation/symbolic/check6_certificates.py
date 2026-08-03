@@ -5,7 +5,7 @@ SYSTEM, IN THE ONLY FORM THAT HAS REACH.  Read that before assuming the record
 types in `Identification.lean` are load-bearing, because they are not:
 
     In 1001 definitions the corpus contains exactly ONE `Identification` record
-    instance -- `spikeIdentification`, Conventions.lean:242 -- and ZERO
+    instance -- `neiContrastSpikeIdentification`, Conventions.lean -- and ZERO
     `Approximation` instances.  One `derivation :=` field, one
     `evidence := Evidence.derived`.  Against that, 493 theorems claim a
     derivation by name or docstring.
@@ -41,16 +41,17 @@ one factor of a definition and not another:
                   whatsoever and certifies nothing about this definition
 
 AND THE ONE INSTANCE THAT EXISTS IS THE ONE THAT OVERCLAIMS.
-`spikeIdentification`'s `derivation` field is discharged by the theorem below,
+`neiContrastSpikeIdentification`'s `derivation` field is discharged by the theorem below,
 in which `effectiveSubgroupSize` occurs on both sides and cancels.  So the
 single use of the machinery built to make obligations unskippable certifies one
 factor of its definition and not the other, in the file written to prevent
 exactly that.
 
-`Conventions.demographicSpike_eq_contrastVariance_mul_effectiveSize` is the
+`Conventions.neiContrastSpike_eq_contrastVariance_mul_effectiveSize` is the
 motivating case, and the nuance is worth preserving: it CONSTRAINS
-`demographicSpike` and `neiGst`, and pins the spike constant that was this
-project's historical factor-of-two error, which is the job it was built for.
+`neiContrastSpike` and `neiGst`, and pins the exact contrast normalization.
+It deliberately does not claim to validate the distinct Hudson-calibrated BBP
+law; that separation prevents the historical estimator-convention error.
 It is VACUOUS_FOR `effectiveSubgroupSize`, which occurs on both sides and
 cancels.  That is an overclaim of scope in a certificate, not a false
 certificate.

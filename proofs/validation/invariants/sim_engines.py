@@ -581,8 +581,8 @@ def sim_ou_stationary_variance(sigma_theta, tau, reps=20000, seed=0):
     return float(np.var(x))
 
 
-def sim_hudson_fst(p1, p2, n=200000, seed=0):
-    """Hudson's F_ST as 1 - (mean within-pop diversity)/(total diversity).
+def sim_nei_gst(p1, p2, n=200000, seed=0):
+    """Nei's G_ST as 1 - (mean within-pop diversity)/(pooled diversity).
 
     Diversity is measured by DRAWING PAIRS of alleles and counting the fraction
     that differ, which is what pi means, rather than evaluating 2p(1-p).
@@ -593,7 +593,7 @@ def sim_hudson_fst(p1, p2, n=200000, seed=0):
     a2 = rng.random(n) < p2
     b2 = rng.random(n) < p2
     within = 0.5 * (np.mean(a1 != b1) + np.mean(a2 != b2))
-    # total: draw one allele from each population's pooled sample
+    # Total-pool diversity: draw both alleles from the equally weighted pool.
     pool_a = np.where(rng.random(n) < 0.5, a1, a2)
     pool_b = np.where(rng.random(n) < 0.5, b1, b2)
     total = np.mean(pool_a != pool_b)
