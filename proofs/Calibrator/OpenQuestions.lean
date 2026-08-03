@@ -76,10 +76,20 @@ theorem explainable_fraction_bound_of_conditional_gaussian_floor_exact
   exact explainable_fraction_bound_of_conditional_gaussian_floor hm hL hVar_pos
     hsigma4_int hsigma4_nonneg hGaussianFloor
 
-/-- **Law of total variance identity.**
-    Var(Z) = E[Var(Z|D)] + Var(E[Z|D]).
-    The between-group fraction Var(E[Z|D])/Var(Z) = R² of D on Z. -/
-theorem law_of_total_variance_r2_bound
+/-- **The between-group fraction of an assumed variance decomposition is at most one.**
+
+    Previously `law_of_total_variance_r2_bound`, documented as the law of total variance
+    identity `Var(Z) = E[Var(Z|D)] + Var(E[Z|D])`. The law is not proved here: it is the
+    hypothesis `h_decomp`, three unrelated reals related by an equation. What remains after
+    it is assumed is that a nonnegative summand's share of a positive total is at most one,
+    which is `div_le_one` plus `linarith`.
+
+    The real conditional-variance statements in this file are
+    `explainable_fraction_bound_of_conditional_noise_floor_exact` and its Gaussian
+    companion, which work against `conditionalVariance` and `conditionalMean` on an actual
+    measure rather than against three scalars. Those are where the law of total variance
+    is genuinely used. -/
+theorem between_group_variance_fraction_le_one
     (varZ eVarZgivenD varEZgivenD : ℝ)
     (h_decomp : varZ = eVarZgivenD + varEZgivenD)
     (h_varZ_pos : 0 < varZ)
@@ -106,13 +116,22 @@ theorem r2_small_when_within_dominates
   rw [h1, sub_div, div_self (h_varZ_pos.ne')]
   linarith [le_div_iff₀ h_varZ_pos |>.mpr (by linarith : (1 - δ) * varZ ≤ eVarZgivenD)]
 
-/-- **χ² coefficient of variation.**
-    Squared prediction error ε² ~ σ² · χ²₁ has Var(ε²) = 2σ⁴ and E[ε²] = σ².
-    So CV² = 2σ⁴/σ⁴ = 2, making individual errors inherently noisy. -/
-theorem squared_error_cv_is_two (sigma_sq : ℝ) (hσ : 0 < sigma_sq) :
-    2 * sigma_sq ^ 2 / sigma_sq ^ 2 = 2 := by
-  rw [mul_div_cancel_right₀]
-  exact pow_ne_zero 2 (hσ.ne')
+/-
+`squared_error_cv_is_two` was deleted here.
+
+It was documented as the coefficient of variation of a squared prediction error: "ε² ~
+σ²·χ²₁ has Var(ε²) = 2σ⁴ and E[ε²] = σ², so CV² = 2σ⁴/σ⁴ = 2, making individual errors
+inherently noisy." No chi-squared distribution, no variance and no expectation appears in
+the statement, which was `2 * s ^ 2 / s ^ 2 = 2` for a positive real `s` — cancellation,
+closed by `mul_div_cancel_right₀`. The two moment formulae that carry the actual content
+are asserted in the docstring and derived nowhere; substituting them into the definition
+of CV² and cancelling is the whole theorem.
+
+The Gaussian noise floor this was meant to justify is available honestly as
+`explainable_fraction_bound_of_conditional_gaussian_floor_exact`, which takes the factor
+of two as an explicit pointwise hypothesis on `conditionalVariance` and says so in its
+name.
+-/
 
 /-- **SES explains as much as genetic distance.**
     If both covariates explain comparable fractions and their total
@@ -308,9 +327,14 @@ theorem env_variance_lowers_r2
     Vg / (Vg + Ve₂) < Vg / (Vg + Ve₁) := by
   apply div_lt_div_of_pos_left hVg (by linarith) (by linarith)
 
-/-- **Omitted variable bias in portability regression.**
-    If SES (β_s) correlates with genetic distance (correlation ρ),
-    the naive coefficient on distance absorbs the SES effect. -/
+/-- **A nonzero product added to a coefficient changes it.**
+
+    Kept under its old name because the arithmetic is what the surrounding discussion of
+    omitted-variable bias appeals to, but read it as what it is: no regression, no
+    estimator and no correlation appears in the statement. That the naive coefficient on
+    genetic distance picks up exactly `β_ses · ρ` when SES is omitted is the standard
+    omitted-variable formula, asserted in this docstring and derived nowhere in this
+    corpus. What is proved is that adding a nonzero product to a number changes it. -/
 theorem omitted_variable_bias
     (β_true β_ses ρ : ℝ)
     (h_ses : β_ses ≠ 0) (h_corr : ρ ≠ 0) :
@@ -445,8 +469,16 @@ poorly predicts individual-level accuracy.
 
 section UnifiedTheory
 
-/-- **No single factor captures the full ratio.** -/
-theorem single_factor_insufficient
+/-- **The four-factor product is strictly below its AF factor alone.**
+
+    Previously `single_factor_insufficient`, "No single factor captures the full ratio".
+    Insufficiency of a single factor is a claim about approximation error, or about a
+    factor failing to determine the product; neither is stated. What is proved is one
+    strict inequality between the product and one of its factors, which is what you get
+    from the other three being below one. It supports the surrounding argument — an Fst
+    proxy that sees only the AF factor overstates portability — without being that
+    argument. -/
+theorem four_factor_product_lt_af_factor
     (af ld eff env : ℝ)
     (h_af : 0 < af) (_h_af_le : af ≤ 1)
     (h_ld_lt : ld < 1)
@@ -466,8 +498,16 @@ theorem single_factor_insufficient
     _ < af * 1 := mul_lt_mul_of_pos_left h2 h_af
     _ = af := mul_one af
 
-/-- **R² of genetic distance on portability is bounded by the AF variance fraction.** -/
-theorem genetic_distance_variance_bound
+/-- **One positive summand's share of a sum of four positive summands is below one.**
+
+    Previously `genetic_distance_variance_bound`, "R² of genetic distance on portability is
+    bounded by the AF variance fraction". No R², no genetic distance and no portability
+    appears in the statement, and no bound *by* the AF fraction is proved — what is proved
+    is a bound *on* it, namely that it is under one, which holds of any of the four
+    fractions and is `div_lt_one`. The variance-decomposition reading, in which these four
+    numbers are the variances of independent contributions to portability, is asserted in
+    the section prose and formalised nowhere. -/
+theorem af_variance_fraction_lt_one
     (var_af var_ld var_eff var_env : ℝ)
     (h_af : 0 < var_af) (h_ld : 0 < var_ld)
     (h_eff : 0 < var_eff) (h_env : 0 < var_env) :
@@ -508,15 +548,25 @@ theorem neutral_beats_immune
   apply mul_lt_mul_of_pos_left _ hr2
   nlinarith [sq_abs ρ, sq_nonneg ρ]
 
-/-- **Drift-only portability (using existing infrastructure).**
-    Under pure drift, portability ratio = (1-Fst_T)/(1-Fst_S).
-    This is what Fst predicts. For immune traits, the actual ratio is
-    much lower due to the additional effect turnover factor. -/
-theorem drift_only_overestimates_immune_portability
+/-- **An effect-retention factor `ρ² < 1` strictly lowers target R² at a fixed target Fst.**
+
+    Previously `drift_only_overestimates_immune_portability`, documented as "Under pure
+    drift, portability ratio = (1-Fst_T)/(1-Fst_S). This is what Fst predicts." No ratio of
+    source to target appears in the conclusion: **both sides are evaluated at `fstT`**, and
+    the comparison is between including the turnover factor `ρ²` and omitting it. The
+    source Fst enters no term.
+
+    The linter caught it. `_hfstS` and `_hfst`, which were the hypotheses `0 ≤ fstS` and
+    `fstS < fstT` — the ones that make the statement look like a source-versus-target
+    comparison — are unused, and are now marked so. What the theorem says is that a
+    drift-only prediction, which omits `ρ²`, is higher than one that includes it; that
+    supports the surrounding claim about immune traits without being a statement about
+    genetic distance at all. -/
+theorem effect_retention_lowers_target_r2_at_fixed_fst
     (V_A V_E fstS fstT ρ : ℝ)
     (hVA : 0 < V_A) (hVE : 0 < V_E)
-    (hfstS : 0 ≤ fstS) (hfstT : fstT < 1)
-    (hfst : fstS < fstT)
+    (_hfstS : 0 ≤ fstS) (hfstT : fstT < 1)
+    (_hfst : fstS < fstT)
     (hρ_pos : 0 < ρ) (hρ_lt : ρ < 1) :
     r2FromSignalVariance (ρ ^ 2 * presentDayPGSVariance V_A fstT) V_E <
       r2FromSignalVariance (presentDayPGSVariance V_A fstT) V_E := by
@@ -766,8 +816,13 @@ noncomputable def f1Score (precision sensitivity : ℝ) : ℝ :=
 theorem f1_symmetric (p r : ℝ) : f1Score p r = f1Score r p := by
   unfold f1Score; ring
 
-/-- **F1 score ≤ max(precision, recall).**
-    This is because F1 = harmonic mean ≤ arithmetic mean ≤ max. -/
+/-- **F1 score ≤ arithmetic mean of precision and recall**, the harmonic-arithmetic mean
+    inequality for two positive reals.
+
+    The docstring previously headed this "F1 score ≤ max(precision, recall)" and gave
+    `harmonic ≤ arithmetic ≤ max` as the reason. Only the first of those two inequalities
+    is proved; the bound by the max is a strictly weaker statement that no theorem here
+    establishes. The name was always the honest one, and the docstring now agrees with it. -/
 theorem f1_le_arithmetic_mean (p r : ℝ)
     (hp : 0 < p) (hr : 0 < r) :
     f1Score p r ≤ (p + r) / 2 := by
@@ -775,51 +830,29 @@ theorem f1_le_arithmetic_mean (p r : ℝ)
   rw [div_le_div_iff₀ (by linarith) (by norm_num)]
   nlinarith [sq_nonneg (p - r)]
 
-/-- **Prevalence shift model for T2D.**
-    T2D prevalence is higher in South Asian and African-descent populations
-    than in European populations. This shifts the base rate for Bayesian calculations.
+/-
+Two theorems were deleted from this section rather than renamed.
 
-    With a fixed PGS threshold:
-    - Higher prevalence → more true cases → potentially higher recall
-    - Higher prevalence → higher PPV → potentially higher precision
-    - But lower PGS accuracy → lower sensitivity → counteracts recall gain
+`prevalence_dominates_sensitivity_for_recall` assumed
+`sens₁ / sens₂ < n_cases₂ / n_cases₁` and concluded `n_cases₁ * sens₁ < n_cases₂ * sens₂`.
+Those are the same inequality: the proof was `rwa [div_lt_div_iff₀ ...] at h_sens_ratio`,
+cross-multiplication and nothing else. The docstring said "The net effect on recall depends
+on whether the prevalence increase dominates the sensitivity decrease. We prove the
+sufficient condition" — but the sufficient condition *is* the conclusion, restated as a
+ratio, so proving it from itself decides nothing about which effect dominates. Four of its
+eight hypotheses, including the one saying the target has more cases, were unused.
 
-    The net effect on recall depends on whether the prevalence increase
-    dominates the sensitivity decrease. We prove the sufficient condition. -/
-theorem prevalence_dominates_sensitivity_for_recall
-    (n_cases₁ n_cases₂ sens₁ sens₂ : ℝ)
-    (h_cases₁ : 0 < n_cases₁) (_h_cases₂ : 0 < n_cases₂)
-    (_h_sens₁ : 0 < sens₁) (h_sens₂ : 0 < sens₂)
-    (_h_sens₁_le : sens₁ ≤ 1) (_h_sens₂_le : sens₂ ≤ 1)
-    -- More cases in target (prevalence is higher)
-    (_h_more_cases : n_cases₁ < n_cases₂)
-    -- Sensitivity doesn't drop too much (prevalence effect dominates)
-    (h_sens_ratio : sens₁ / sens₂ < n_cases₂ / n_cases₁) :
-    -- Then absolute true positives increase
-    n_cases₁ * sens₁ < n_cases₂ * sens₂ := by
-  have htp : sens₁ * n_cases₁ < n_cases₂ * sens₂ := by
-    rwa [div_lt_div_iff₀ h_sens₂ h_cases₁] at h_sens_ratio
-  simpa [mul_comm] using htp
+`different_diseases_different_portability_patterns` took four inequalities as hypotheses
+and returned their conjunction, `⟨⟨h₁, h₂⟩, ⟨h₃, h₄⟩⟩`. Conjunction-introduction over
+one's own premises is the case the corpus proof policy names explicitly. Nothing about
+asthma, T2D, or a prevalence-distance relationship enters; the statement is true of any
+four numbers with those orderings, which is what "qualitatively different patterns" was
+being read off from.
 
-/-- **Asthma vs T2D portability difference.**
-    For asthma, precision and recall decay similarly → qualitatively similar.
-    For T2D, they diverge → qualitatively different.
-    The difference is driven by the prevalence-distance relationship. -/
-theorem different_diseases_different_portability_patterns
-    -- Asthma: both metrics decay
-    (prec_asthma_near prec_asthma_far : ℝ)
-    (rec_asthma_near rec_asthma_far : ℝ)
-    (h_prec_asthma_drops : prec_asthma_far < prec_asthma_near)
-    (h_rec_asthma_drops : rec_asthma_far < rec_asthma_near)
-    -- T2D: precision constant, recall increases
-    (prec_t2d_near prec_t2d_far : ℝ)
-    (rec_t2d_near rec_t2d_far : ℝ)
-    (h_prec_t2d_const : prec_t2d_near = prec_t2d_far)
-    (h_rec_t2d_up : rec_t2d_near < rec_t2d_far) :
-    -- The diseases show qualitatively different portability patterns
-    (prec_asthma_far < prec_asthma_near ∧ rec_asthma_far < rec_asthma_near) ∧
-    (prec_t2d_near = prec_t2d_far ∧ rec_t2d_near < rec_t2d_far) :=
-  ⟨⟨h_prec_asthma_drops, h_rec_asthma_drops⟩, ⟨h_prec_t2d_const, h_rec_t2d_up⟩⟩
+The genuine metric-divergence result for this section is
+`precision_recall_divergence_exists` above, which exhibits explicit witnesses satisfying
+the precision identity rather than assuming the divergence.
+-/
 
 end DiseasePortability
 
@@ -837,16 +870,27 @@ We formalize which components of portability loss are recoverable.
 
 section RecoverablePortability
 
-/-- **Mean shift is recoverable by re-calibration.**
-    If the PGS has a mean shift μ across populations, adjusting the
-    intercept recovers the correct calibration. -/
-theorem mean_shift_recoverable
-    (y_pred μ_shift : ℝ) :
-    y_pred - μ_shift + μ_shift = y_pred := by ring
+/-
+`mean_shift_recoverable` was deleted here. It was `y_pred - μ_shift + μ_shift = y_pred`,
+closed by `ring`: subtraction and addition of the same real cancel. The docstring read it
+as "If the PGS has a mean shift μ across populations, adjusting the intercept recovers the
+correct calibration", which requires knowing what the shift *is* — the whole difficulty of
+recalibrating without target data — and the theorem hands that to itself by using the same
+`μ_shift` in both places.
 
-/-- **Slope change (shrinkage) is recoverable by re-calibration.**
-    If the PGS slope changes from b to b·r, multiplying by 1/r recovers it. -/
-theorem slope_change_recoverable
+The CITL-correction statements in `PGSCalibrationTheory` are what this was standing in for:
+`intercept_recal_corrects_citl` makes the correction term the fitted intercept and states
+the hypothesis `new_intercept = calibrationInTheLarge mean_obs mean_pgs` that identifies
+it, and `recalibration_needs_events` prices the target data needed to estimate it.
+-/
+
+/-- **Rescaling by `1/r` inverts a slope change by `r`.**
+
+    Kept, unlike `mean_shift_recoverable` above, because the nonvanishing hypothesis is
+    real content: no rescaling recovers a slope that has been multiplied by zero. Read the
+    name narrowly all the same — "recoverable by re-calibration" was the old framing, and
+    recovering the slope requires knowing `r`, which this statement supplies to itself. -/
+theorem slope_rescaling_inverts_slope_change
     (b r pgs : ℝ) (hr : r ≠ 0) :
     (b * r * pgs) * (1 / r) = b * pgs := by
   field_simp
@@ -870,10 +914,21 @@ theorem ld_mismatch_not_linearly_recoverable
   rw [Matrix.mulVec_smul]
   exact h_not_aligned α
 
-/-- **Effect turnover is NOT recoverable without target-population data.**
-    If true effects change between populations, the source GWAS provides
-    no information about the new effects. Only target GWAS data helps. -/
-theorem effect_turnover_requires_target_data
+/-- **Distinct effects give distinct predictions at every nonzero genotype.**
+
+    Previously `effect_turnover_requires_target_data`, "the source GWAS provides no
+    information about the new effects. Only target GWAS data helps." An information claim
+    needs an information measure and a claim about what data determines what; neither
+    appears. The statement is cancellation in a field: if `β_source ≠ β_target` then
+    `β_source · y ≠ β_target · y` unless `y = 0`.
+
+    This does say something the section wants — the discrepancy does not vanish, so no
+    amount of rescaling the *genotype* hides it — and unlike
+    `ld_mismatch_not_linearly_recoverable` above, which quantifies over all linear
+    recalibrations `α` and shows none succeeds, it never quantifies over corrections at
+    all. That is the difference between the two, and it is why only one of them keeps a
+    non-recoverability name. -/
+theorem effect_mismatch_gives_prediction_mismatch_at_nonzero_genotype
     (β_source β_target : ℝ)
     (h_different : β_source ≠ β_target) :
     -- Any prediction using β_source has nonzero error for β_target
