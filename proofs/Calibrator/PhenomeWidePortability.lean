@@ -4,6 +4,8 @@ import Calibrator.DriftRegime
 
 namespace Calibrator
 
+open TransportedMetrics (r2FromSignalVariance)
+
 /-!
 # Phenome-Wide Portability and Trait-Specific Patterns
 

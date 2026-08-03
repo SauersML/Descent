@@ -5,6 +5,7 @@ import Calibrator.OpenQuestions
 namespace Calibrator
 
 open MeasureTheory
+open TransportedMetrics (r2FromSignalVariance)
 
 /-!
 # Causal Inference Framework for PGS Portability

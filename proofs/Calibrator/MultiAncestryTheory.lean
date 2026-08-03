@@ -3,6 +3,8 @@ import Calibrator.TransferLearningPGS
 
 namespace Calibrator
 
+open TransportedMetrics (r2FromSignalVariance)
+
 /-!
 # Multi-Ancestry GWAS Theory and Equitable PGS
 

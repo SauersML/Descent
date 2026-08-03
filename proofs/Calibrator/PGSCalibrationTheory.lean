@@ -6,6 +6,7 @@ import Calibrator.OpenQuestions
 namespace Calibrator
 
 open MeasureTheory
+open TransportedMetrics (gaussianAUCFromSignalVariance)
 
 /-!
 # PGS Calibration Theory
