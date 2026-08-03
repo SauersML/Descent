@@ -81,14 +81,15 @@ theorem portability_decreases_with_time (r2_initial lambda_total t₁ t₂ : ℝ
     names from a different concept family; the formula does not fix which is
     meant.
 
-This file used to restate `1 / (2 Nₑ)` as `longitudinalDriftDecayRate`. It is
-`driftRatePerGen` from `Calibrator.LDDecayTheory` — one per-generation drift
-rate — and the restatement has been deleted in favour of that one.
+Do not restate `1 / (2 Nₑ)` in this file. It is `driftRatePerGen` from
+`Calibrator.LDDecayTheory`, the one per-generation drift rate, and this file
+imports it.
 
-Note that the "fraction of LD lost per generation" reading is FALSIFIED there, by up to
-201x, because recombination dominates `1 / (2 Nₑ)`; that reading is why the declaration was
-renamed from `ldDecayRatePerGen`. What is imported here is the drift rate itself. Whether it is the fraction of ancestral score variance lost per
-generation is a separate claim, and it is UNTESTED. -/
+The "fraction of LD lost per generation" reading of that rate is FALSIFIED there,
+by up to 201x, because recombination dominates `1 / (2 Nₑ)`. That is why the name
+`ldDecayRatePerGen` is absent. What this file imports is the drift rate itself.
+Whether it is the fraction of ancestral score variance lost per generation is a
+separate claim, and it is UNTESTED. -/
 
 /-- Drift decay rate is positive for positive Ne. -/
 theorem drift_decay_rate_pos (Ne : ℝ) (h : 0 < Ne) :
@@ -117,13 +118,13 @@ noncomputable def ldDecayPerGeneration (r : ℝ) (t : ℕ) : ℝ :=
 
 /-! **Cross-check: geometric LD decay, recombination survival along a genealogy, and
 admixture-LD decay are one map.** `ldDecayPerGeneration_eq_discreteRecombinationSurvival`
-and `ldDecayPerGeneration_eq_admixtureLDDecay` used to sit here. Both were deleted as
-redundant, not as wrong: `Conventions.lean` proves all four spellings equal to the shared
-primitive `geometricDecay`, and these two are that hub's transitive consequences. Six
-pairwise theorems for one function is five more than the corpus needs, and a divergence
-between any two spellings still fails a proof — it fails one of the three hub theorems.
+and `ldDecayPerGeneration_eq_admixtureLDDecay` are absent here as redundant, not as wrong.
+`Conventions.lean` proves all four spellings equal to the shared primitive
+`geometricDecay`, and these two are that hub's transitive consequences. Six pairwise
+theorems for one function is five more than the corpus needs, and a divergence between any
+two spellings still fails a proof: it fails one of the three hub theorems.
 
-Neither carried a hypothesis and nothing referenced either. What is NOT yet done is the
+Neither carries a hypothesis and nothing references either. What is NOT yet done is the
 part worth doing: `(1 - r)^t` is written out under four names in four files
 (`geometricDecay`, `ldDecayPerGeneration`, `DGP.discreteRecombinationSurvival`,
 `PortabilityDrift.admixtureLDDecay`) and should be one. That collapse is ~86 references
