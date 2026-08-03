@@ -81,7 +81,7 @@ asserted in the source and are worth having as checked lemmas rather than as rem
 
 namespace Calibrator.BundleRigidity
 
-variable {ι : Type*} {R : Type*} [Ring R] [Algebra ℝ R]
+variable {ι : Type*} {R : Type*} [Ring R]
 
 /-- The product of the `P`-weights along a word. -/
 def prodWeight (P : ι → ℝ) (w : List ι) : ℝ := (w.map P).prod
@@ -98,6 +98,8 @@ def prodOp (Φ : ι → R) (w : List ι) : R := (w.map Φ).prod
 
 @[simp] theorem prodOp_cons (Φ : ι → R) (i : ι) (u : List ι) :
     prodOp Φ (i :: u) = Φ i * prodOp Φ u := rfl
+
+variable [Algebra ℝ R]
 
 /-- **The alternating sum of the identity**, defined by the recursion it satisfies.
 
