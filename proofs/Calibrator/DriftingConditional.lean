@@ -830,6 +830,48 @@ theorem link_invariance_slope_pos (L : ℝ → ℝ) (hmono : StrictMono L)
   have := hmono.lt_iff_lt.mp hlt
   linarith
 
+open MeasureTheory ProbabilityTheory in
+/-- **The averaging map pushes the standard Gaussian to a Gaussian centred at the
+covariate.**
+
+`z ↦ a (x + σ z) + b` is the scaling by `a σ` followed by the shift by `a x + b`, so the
+pushforward of `N(0,1)` is `N(a x + b, (a σ)²)`. -/
+theorem link_average_pushforward (a σ b x : ℝ) :
+    (gaussianReal 0 1).map (fun z ↦ a * (x + σ * z) + b)
+      = gaussianReal (a * x + b) ⟨(a * σ) ^ 2, sq_nonneg _⟩ := by
+  have hfun : (fun z : ℝ ↦ a * (x + σ * z) + b)
+      = (fun w : ℝ ↦ w + (a * x + b)) ∘ (fun z : ℝ ↦ (a * σ) * z) := by
+    funext z; simp only [Function.comp_apply]; ring
+  rw [hfun, ← Measure.map_map (by fun_prop) (by fun_prop)]
+  have hscale := gaussianReal_map_const_mul (μ := (0 : ℝ)) (v := (1 : NNReal)) (a * σ)
+  have hv : (⟨(a * σ) ^ 2, sq_nonneg _⟩ : NNReal) * 1 = ⟨(a * σ) ^ 2, sq_nonneg _⟩ := by
+    ext; simp
+  rw [mul_zero, hv] at hscale
+  rw [hscale, gaussianReal_map_add_const]
+  congr 1
+  ring
+
+open MeasureTheory ProbabilityTheory in
+/-- **The averaging operator is `L` integrated against a Gaussian whose mean is the
+covariate.**
+
+This is the change of variables the classification needs.  On the left the covariate `x`
+sits inside `L`, where nothing is known about it beyond monotonicity; on the right it sits
+only in the mean of the measure, which is as smooth in `x` as anything could be.  Every
+route to regularity for `L` goes through moving `x` out of `L` and into the kernel, and
+this is that move.
+
+What still has to be supplied afterwards is the differentiation under the integral sign:
+`gaussianReal` is `volume.withDensity (gaussianPDF …)`, so the right-hand side is an
+integral of `L` against a density smooth in `x`, and `L` is bounded — the ingredients of a
+dominated-convergence argument.  That argument is not made here. -/
+theorem link_average_eq_gaussian_integral (L : ℝ → ℝ) (hmono : StrictMono L)
+    (a σ b x : ℝ) :
+    ∫ z, L (a * (x + σ * z) + b) ∂(gaussianReal 0 1)
+      = ∫ u, L u ∂(gaussianReal (a * x + b) ⟨(a * σ) ^ 2, sq_nonneg _⟩) := by
+  rw [← link_average_pushforward a σ b x,
+    integral_map (by fun_prop) hmono.monotone.measurable.aestronglyMeasurable]
+
 /-- **The induced parameters are unique, so the invariance defines a map.**
 
 `hinv` asserts existence of `a'` and `b'`; it does not say they are determined.  They are:
