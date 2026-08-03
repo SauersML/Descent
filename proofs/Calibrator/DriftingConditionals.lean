@@ -164,6 +164,28 @@ theorem transportedResponse_sub
   refine Finset.sum_congr rfl fun x _ ↦ ?_
   ring
 
+/-- A spatially constant perturbation is preserved exactly by forward
+reconstruction. This witnesses sharpness of the constant in
+`transportedResponse_dist_le`. -/
+theorem transportedResponse_add_const
+    (P : ι → ι → ℝ) (population response : ι → ℝ)
+    (hpositive : ∀ y, 0 < transportMass P population y) (shift : ℝ) (y : ι) :
+    transportedResponse P population (fun x ↦ response x + shift) hpositive y =
+      transportedResponse P population response hpositive y + shift := by
+  unfold transportedResponse transportMass markedMass
+  have hdenom : ∑ x, population x * P x y ≠ 0 := ne_of_gt (hpositive y)
+  apply (div_eq_iff hdenom).2
+  rw [add_mul, div_mul_cancel₀ _ hdenom]
+  calc
+    ∑ x, population x * (response x + shift) * P x y =
+        ∑ x, (population x * response x * P x y + shift * (population x * P x y)) := by
+      refine Finset.sum_congr rfl fun x _ ↦ ?_
+      ring
+    _ = (∑ x, population x * response x * P x y) +
+        ∑ x, shift * (population x * P x y) := Finset.sum_add_distrib
+    _ = (∑ x, population x * response x * P x y) +
+        shift * ∑ x, population x * P x y := by rw [Finset.mul_sum]
+
 /-- **Forward reconstruction is sup-norm non-expansive.**
 
     If two source response curves differ by at most `ε` pointwise, their
@@ -359,11 +381,27 @@ def OUHorizon.zero (rate : ℝ) (hrate : 0 < rate) : OUHorizon where
 noncomputable def ouVariance (horizon : OUHorizon) : ℝ :=
   (1 - Real.exp (-(2 * horizon.rate * horizon.time))) / (2 * horizon.rate)
 
+/-- A valid OU horizon accumulates nonnegative variance. -/
+theorem ouVariance_nonneg (horizon : OUHorizon) : 0 ≤ ouVariance horizon := by
+  unfold ouVariance
+  apply div_nonneg
+  · exact sub_nonneg.mpr (Real.exp_le_one_iff.mpr (by
+      nlinarith [horizon.rate_pos, horizon.time_nonneg]))
+  · exact mul_nonneg (by norm_num) horizon.rate_pos.le
+
 /-- The denominator shared by both surfaces of the drifting probit index.
 
     Empirical status: UNTESTED. -/
 noncomputable def probitScaleFactor (a0 : ℝ) (horizon : OUHorizon) : ℝ :=
   Real.sqrt (1 + a0 ^ 2 * ouVariance horizon)
+
+/-- The shared probit scale is strictly positive on every valid OU horizon;
+callers never need to assume away a zero denominator. -/
+theorem probitScaleFactor_pos (a0 : ℝ) (horizon : OUHorizon) :
+    0 < probitScaleFactor a0 horizon := by
+  unfold probitScaleFactor
+  apply Real.sqrt_pos.2
+  nlinarith [mul_nonneg (sq_nonneg a0) (ouVariance_nonneg horizon)]
 
 /-- Slope surface of the drifting probit index.
 
@@ -397,10 +435,11 @@ noncomputable def probitIntercept (a0 b0 : ℝ) (horizon : OUHorizon) : ℝ :=
 
     Empirical status: UNTESTED, and the test just described is how that changes. -/
 theorem probitIntercept_div_probitSlope (a0 b0 : ℝ) (horizon : OUHorizon)
-    (ha : a0 ≠ 0) (hS : probitScaleFactor a0 horizon ≠ 0) :
+    (ha : a0 ≠ 0) :
     probitIntercept a0 b0 horizon / probitSlope a0 horizon =
       b0 / a0 * Real.exp (horizon.rate * horizon.time) := by
   have hE : Real.exp (horizon.rate * horizon.time) ≠ 0 := Real.exp_ne_zero _
+  have hS : probitScaleFactor a0 horizon ≠ 0 := ne_of_gt (probitScaleFactor_pos a0 horizon)
   unfold probitIntercept probitSlope
   rw [Real.exp_neg]
   field_simp
@@ -408,11 +447,11 @@ theorem probitIntercept_div_probitSlope (a0 b0 : ℝ) (horizon : OUHorizon)
 /-- At drift time zero the ratio is the ratio of the initial parameters, so the invariant
     is anchored rather than merely proportional. -/
 theorem probitIntercept_div_probitSlope_zero (a0 b0 lam : ℝ) (ha : a0 ≠ 0)
-    (hlam : 0 < lam) (hS : probitScaleFactor a0 (OUHorizon.zero lam hlam) ≠ 0) :
+    (hlam : 0 < lam) :
     probitIntercept a0 b0 (OUHorizon.zero lam hlam) /
         probitSlope a0 (OUHorizon.zero lam hlam) = b0 / a0 := by
   simpa [OUHorizon.zero] using
-    probitIntercept_div_probitSlope a0 b0 (OUHorizon.zero lam hlam) ha hS
+    probitIntercept_div_probitSlope a0 b0 (OUHorizon.zero lam hlam) ha
 
 /-- The scale parameter `A = a ^ (-2)` linearizes the slope dynamics: if
     `a' = -lam * a - a ^ 3 / 2` then `A' = 2 * lam * A + 1`.
