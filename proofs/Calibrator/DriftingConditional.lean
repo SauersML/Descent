@@ -302,6 +302,38 @@ theorem singleMode_interiorError_eq (w lam t₁ t₂ : ℝ) :
     _ = w ^ 2 * (Real.exp (-(2 * lam * t₁)) * Real.exp (-(2 * lam * t₂))) := by rw [hexp]
     _ = (w * Real.exp (-(2 * lam * t₁))) * (w * Real.exp (-(2 * lam * t₂))) := by ring
 
+/-! ## The probit realization dynamics
+
+The one piece of the continuum realization theory that is calculus rather than analysis. Under
+Ornstein-Uhlenbeck drift the probit family `Φ(a x + b)` is exactly invariant, and its parameters
+obey `ȧ = -λ a - a³/2`. That planar system looks nonlinear and is not: the substitution
+`A = a⁻²` linearises it to `Ȧ = 2λA + 1`, which is why the realization is integrable in closed
+form rather than merely finite-dimensional.
+
+What is proved here is exactly that substitution. The invariance of the family itself needs the
+Gaussian identity `E[Φ(α + βZ)] = Φ(α/√(1+β²))` and the OU semigroup, neither of which is set up
+in this file, and neither is asserted. -/
+
+/-- **The inverse-square substitution linearises the probit realization flow.**
+
+    If the slope parameter obeys `ȧ = -λ a - a³/2`, then `A = a⁻²` obeys `Ȧ = 2λ A + 1`. The
+    nonlinearity is a coordinate artifact: the realization dynamics are affine, hence solvable in
+    closed form, which is what makes the two-dimensional invariant family explicit rather than
+    merely existent. -/
+theorem inverseSquare_linearises_probit_flow
+    (a : ℝ → ℝ) (lam t : ℝ) (hne : a t ≠ 0)
+    (hderiv : HasDerivAt a (-(lam * a t) - a t ^ 3 / 2) t) :
+    HasDerivAt (fun s => ((a s) ^ 2)⁻¹) (2 * lam * ((a t) ^ 2)⁻¹ + 1) t := by
+  have hsqne : (a t) ^ 2 ≠ 0 := pow_ne_zero 2 hne
+  have hsq : HasDerivAt (fun s => (a s) ^ 2)
+      (2 * a t ^ 1 * (-(lam * a t) - a t ^ 3 / 2)) t := hderiv.pow 2
+  have hinv := hsq.inv hsqne
+  have hval : -(2 * a t ^ 1 * (-(lam * a t) - a t ^ 3 / 2)) / ((a t) ^ 2) ^ 2
+      = 2 * lam * ((a t) ^ 2)⁻¹ + 1 := by
+    field_simp
+    ring
+  rwa [hval] at hinv
+
 /-! ## The stationary collapse -/
 
 /-- **At stationarity the curve's transport drift is the generator's own drift.**
