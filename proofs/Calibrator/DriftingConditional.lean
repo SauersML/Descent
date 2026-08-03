@@ -1165,6 +1165,50 @@ theorem link_scale_params_compose (L : ℝ → ℝ) (hmono : StrictMono L)
   exact link_scale_composition L hmono hbdd ht s x
 
 open MeasureTheory ProbabilityTheory in
+/-- **The induced parameter action commutes.**
+
+Averaging at scale `t` and then at scale `s` gives the same affine parameters as averaging
+at scale `s` and then at scale `t` — because both routes are averaging once at
+`√(s² + t²)`, and that is symmetric in `s` and `t`.
+
+Written out, the slope equation is `α(α(t)·s)·α(t) = α(α(s)·t)·α(s)`.  This is the
+constraint that pins the scale family: it is not satisfied by a generic decreasing
+`α : (0,∞) → (0,1]`, and `α(s) = 1/√(1 + c²s²)` satisfies it because both sides collapse to
+`1/√(1 + c²(s² + t²))`.
+
+Unlike `link_scale_params_compose` this needs no representation of the combined scale — the
+two-step routes are compared directly — so it constrains the parameter map using only the
+hypothesis `link_rigidity` actually has. -/
+theorem link_scale_params_symm (L : ℝ → ℝ) (hmono : StrictMono L)
+    (hbdd : ∀ u, 0 < L u ∧ L u < 1) {s t αs βs αt βt aₛₜ bₛₜ aₜₛ bₜₛ : ℝ}
+    (hs : ∀ y, ∫ z, L (y + s * z) ∂(gaussianReal 0 1) = L (αs * y + βs))
+    (ht : ∀ y, ∫ z, L (y + t * z) ∂(gaussianReal 0 1) = L (αt * y + βt))
+    (hst : ∀ x, ∫ z, L ((αt * x + βt) + (αt * s) * z) ∂(gaussianReal 0 1)
+      = L (aₛₜ * x + bₛₜ))
+    (hts : ∀ x, ∫ z, L ((αs * x + βs) + (αs * t) * z) ∂(gaussianReal 0 1)
+      = L (aₜₛ * x + bₜₛ)) :
+    aₛₜ = aₜₛ ∧ bₛₜ = bₜₛ := by
+  apply link_invariance_params_unique L hmono
+  intro x
+  rw [← hst x, ← hts x, link_scale_composition L hmono hbdd ht s x,
+    link_scale_composition L hmono hbdd hs t x, add_comm (t ^ 2) (s ^ 2)]
+
+open MeasureTheory ProbabilityTheory in
+/-- **Zero Gaussian scale induces the identity affine parameters.**
+
+At scale zero the noise vanishes, so closure reads `L x = L (a₀ x + b₀)`. Strict
+monotonicity then forces `a₀ = 1` and `b₀ = 0`. This pins the identity element of the
+parameter semigroup rather than adding it as a normalization assumption. -/
+theorem link_scale_zero_params (L : ℝ → ℝ) (hmono : StrictMono L) (a₀ b₀ : ℝ)
+    (hzero : ∀ x,
+      ∫ z, L (x + 0 * z) ∂(gaussianReal 0 1) = L (a₀ * x + b₀)) :
+    a₀ = 1 ∧ b₀ = 0 := by
+  apply link_invariance_params_unique L hmono
+  intro x
+  have hx := (hzero x).symm
+  simpa using hx
+
+open MeasureTheory ProbabilityTheory in
 /-- **The link is continuous — derived from the invariance, not assumed.**
 
 `link_rigidity` assumes only that `L` is strictly monotone and bounded.  A monotone
