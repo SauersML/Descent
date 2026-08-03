@@ -1,4 +1,9 @@
 /-
+Copyright (c) 2026 Sauers. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Sauers
+-/
+/-
 Enumerate the theorems whose PROOF TERM is `Eq.refl`, from the elaborated
 environment rather than from source text.
 

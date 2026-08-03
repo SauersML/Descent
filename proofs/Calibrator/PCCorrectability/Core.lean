@@ -1,3 +1,8 @@
+/-
+Copyright (c) 2026 Sauers. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Sauers
+-/
 import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 import Mathlib.Algebra.Module.Submodule.Basic
 import Mathlib.Algebra.Module.Pi

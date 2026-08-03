@@ -1,3 +1,8 @@
+/-
+Copyright (c) 2026 Sauers. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Sauers
+-/
 import Mathlib.Tactic
 import Mathlib.Data.Real.Sqrt
 import Mathlib.Analysis.SpecialFunctions.Pow.Real

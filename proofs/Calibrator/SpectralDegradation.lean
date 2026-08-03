@@ -1,3 +1,8 @@
+/-
+Copyright (c) 2026 Sauers. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Sauers
+-/
 import Mathlib.Data.Fin.VecNotation
 import Mathlib.Algebra.BigOperators.Fin
 -- `Finset.sum_nonneg` and `Finset.single_le_sum` live here, not in

@@ -1,3 +1,8 @@
+/-
+Copyright (c) 2026 Sauers. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Sauers
+-/
 import Calibrator.PCCorrectability.Core
 import Calibrator.PCCorrectability.Threshold
 import Mathlib.Tactic.Linarith

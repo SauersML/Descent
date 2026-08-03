@@ -1,3 +1,8 @@
+/-
+Copyright (c) 2026 Sauers. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Sauers
+-/
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
 -- `phase_of_abs_neg` uses `Real.log`, which lives here and is not reachable from the
 -- trigonometric import. Without it `Real.log` resolves as an Unknown constant -- the

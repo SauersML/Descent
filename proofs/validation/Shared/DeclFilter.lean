@@ -1,4 +1,9 @@
 /-
+Copyright (c) 2026 Sauers. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Sauers
+-/
+/-
 One answer to the question "did a person write this declaration".
 
 WHY THIS MODULE EXISTS.  Three detectors under `proofs/validation/` each carried
