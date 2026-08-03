@@ -447,8 +447,8 @@ theorem excess_le_perturbation_mul_misalignment {n : ℕ}
 /-! ## The elimination step -/
 
 /-- Pure arithmetic: from a lower bound `γ s² ≤ q` and an upper bound `q ≤ 2√2 δ s`,
-eliminating `s` gives `q ≤ 8δ²/γ`. Named for the elimination it performs, not for the conclusion
-it serves. -/
+eliminating `s` gives `q ≤ 8δ²/γ`. Named for the elimination it performs, not for the
+conclusion it serves. -/
 theorem excess_le_of_two_bounds (γ δ s q : ℝ) (hγ : 0 < γ) (hs : 0 ≤ s)
     (hlow : γ * s ^ 2 ≤ q) (hhigh : q ≤ 2 * Real.sqrt 2 * δ * s) :
     q ≤ 8 * δ ^ 2 / γ := by
