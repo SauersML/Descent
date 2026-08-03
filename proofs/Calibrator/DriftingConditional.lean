@@ -6,6 +6,7 @@ import Mathlib.Algebra.BigOperators.Fin
 import Mathlib.Analysis.SpecialFunctions.Exp
 import Mathlib.Analysis.SpecialFunctions.Sqrt
 import Mathlib.Tactic
+import Mathlib.Topology.Order.Monotone
 
 namespace Calibrator
 
@@ -921,6 +922,74 @@ theorem link_average_eq_gaussian_integral (L : ℝ → ℝ) (hmono : StrictMono 
   rw [← link_average_pushforward a σ b x,
     integral_map (by fun_prop) hmono.monotone.measurable.aestronglyMeasurable]
 
+open MeasureTheory ProbabilityTheory in
+/-- **Gaussian population averaging regularizes every bounded monotone response curve.**
+
+No continuity of `L` is assumed. A monotone real function has only countably many discontinuities.
+For a nondegenerate Gaussian displacement, the set of noise values that land on those points has
+measure zero. Dominated convergence then makes the averaged response continuous in the covariate.
+
+Biologically, cohort mixing smooths even a response curve with threshold jumps: discontinuities in
+individual liability occupy zero mass after a continuously distributed environmental or ancestry
+shift. This regularity is derived from the observation mechanism, not supplied as a model axiom. -/
+theorem link_average_continuous (L : ℝ → ℝ) (hmono : StrictMono L)
+    (hbdd : ∀ u, 0 < L u ∧ L u < 1) {a σ : ℝ} (ha : 0 < a) (hσ : 0 < σ) (b : ℝ) :
+    Continuous (fun x ↦ ∫ z, L (a * (x + σ * z) + b) ∂(gaussianReal 0 1)) := by
+  rw [continuous_iff_continuousAt]
+  intro x₀
+  refine continuousAt_of_dominated (bound := fun _ ↦ (1 : ℝ)) ?_ ?_
+      (integrable_const (1 : ℝ)) ?_
+  · exact Filter.Eventually.of_forall fun x ↦
+      (hmono.monotone.measurable.comp (by fun_prop)).aestronglyMeasurable
+  · exact Filter.Eventually.of_forall fun x ↦ Filter.Eventually.of_forall fun z ↦ by
+      rw [Real.norm_eq_abs, abs_of_pos (hbdd _).1]
+      exact (hbdd _).2.le
+  · rw [ae_iff]
+    let φ : ℝ → ℝ := fun z ↦ a * (x₀ + σ * z) + b
+    have hφinj : Function.Injective φ := by
+      intro z w hzw
+      have has : 0 < a * σ := mul_pos ha hσ
+      rw [show φ z = a * σ * z + (a * x₀ + b) by simp [φ]; ring,
+        show φ w = a * σ * w + (a * x₀ + b) by simp [φ]; ring] at hzw
+      nlinarith
+    have hdisc : Set.Countable {u : ℝ | ¬ContinuousAt L u} :=
+      hmono.monotone.countable_not_continuousAt
+    have hpreZero : gaussianReal 0 1 (φ ⁻¹' {u : ℝ | ¬ContinuousAt L u}) = 0 := by
+      apply gaussianReal_absolutelyContinuous 0 one_ne_zero
+      exact (hdisc.preimage hφinj).measure_zero volume
+    apply measure_mono_null (μ := gaussianReal 0 1) _ hpreZero
+    intro z hz
+    simp only [Set.mem_setOf_eq, Set.mem_preimage]
+    intro hL
+    change ContinuousAt L (a * (x₀ + σ * z) + b) at hL
+    apply hz
+    have hcomp := ContinuousAt.comp (f := fun x : ℝ ↦ a * (x + σ * z) + b)
+      (x := x₀) hL (by fun_prop)
+    simpa only [Function.comp_apply] using hcomp
+
+open MeasureTheory ProbabilityTheory in
+/-- **Closure forces continuity of the original link.**
+
+If one nondegenerate Gaussian averaging step lands back in the affine family of `L`, the output
+slope is positive and hence invertible. Solving the output affine coordinate for its input writes
+`L` itself as a continuous Gaussian average. Thus the continuity needed by the rigidity
+classification is a theorem of closure, not an extra regularity hypothesis. -/
+theorem link_continuous_of_invariance (L : ℝ → ℝ) (hmono : StrictMono L)
+    (hbdd : ∀ u, 0 < L u ∧ L u < 1) {a b σ a' b' : ℝ} (ha : 0 < a) (hσ : 0 < σ)
+    (heq : ∀ x, ∫ z, L (a * (x + σ * z) + b) ∂(gaussianReal 0 1) = L (a' * x + b')) :
+    Continuous L := by
+  have ha' : 0 < a' := link_invariance_slope_pos L hmono hbdd ha heq
+  have havg_cont := link_average_continuous L hmono hbdd ha hσ b
+  have hrepl : L = fun u ↦ ∫ z, L (a * ((u - b') / a' + σ * z) + b)
+      ∂(gaussianReal 0 1) := by
+    funext u
+    rw [heq]
+    congr 1
+    field_simp
+    ring
+  rw [hrepl]
+  exact havg_cont.comp (by fun_prop)
+
 /-- **The induced parameters are unique, so the invariance defines a map.**
 
 `hinv` asserts existence of `a'` and `b'`; it does not say they are determined.  They are:
@@ -941,6 +1010,61 @@ theorem link_invariance_params_unique (L : ℝ → ℝ) (hmono : StrictMono L)
   have h1 := hmono.injective (heq 1)
   simp only [mul_one] at h1
   linarith [h0 ▸ h1]
+
+open MeasureTheory ProbabilityTheory in
+/-- **Two averaging scales compose into one.**
+
+`(z₁, z₂) ↦ x + s z₁ + t z₂` pushes the product of two standard Gaussians to
+`N(x, s² + t²)`: it is a sum of two independent Gaussian coordinates, and variances add.
+
+This is the semigroup law of the averaging operator, and it is what turns the
+classification from an analytic problem into an algebraic one.  Averaging at scale `s` and
+then at scale `t` is averaging once at scale `√(s² + t²)`, so the induced parameter map of
+`link_rigidity` — well defined by `link_invariance_params_unique` — must satisfy a
+composition identity in the scale.  For the probit that identity is
+`α(√(s²+t²)) = α(s) · α(α(s) t)` with `α(s) = 1/√(1+s²)`, and pinning `α` is what pins the
+link. -/
+theorem gaussian_two_scale_map (x s t : ℝ) :
+    ((gaussianReal 0 1).prod (gaussianReal 0 1)).map
+        (fun p : ℝ × ℝ ↦ x + s * p.1 + t * p.2)
+      = gaussianReal x ⟨s ^ 2 + t ^ 2, by positivity⟩ := by
+  set γ : Measure ℝ := gaussianReal 0 1 with hγ
+  have hfst : (γ.prod γ).map (fun p : ℝ × ℝ ↦ p.1) = γ := by
+    simpa [Measure.fst, hγ] using Measure.fst_prod (μ := γ) (ν := γ)
+  have hsnd : (γ.prod γ).map (fun p : ℝ × ℝ ↦ p.2) = γ := by
+    simpa [Measure.snd, hγ] using Measure.snd_prod (μ := γ) (ν := γ)
+  have hX : (γ.prod γ).map (fun p : ℝ × ℝ ↦ x + s * p.1)
+      = gaussianReal x ⟨s ^ 2, sq_nonneg s⟩ := by
+    have hcomp : (fun p : ℝ × ℝ ↦ x + s * p.1)
+        = (fun y : ℝ ↦ y + x) ∘ ((fun y : ℝ ↦ s * y) ∘ fun p : ℝ × ℝ ↦ p.1) := by
+      funext p; simp only [Function.comp_apply]; ring
+    rw [hcomp, ← Measure.map_map (by fun_prop) (by fun_prop),
+      ← Measure.map_map (by fun_prop) (by fun_prop), hfst]
+    have hs := gaussianReal_map_const_mul (μ := (0 : ℝ)) (v := (1 : NNReal)) s
+    have hv : (⟨s ^ 2, sq_nonneg s⟩ : NNReal) * 1 = ⟨s ^ 2, sq_nonneg s⟩ := by ext; simp
+    rw [mul_zero, hv] at hs
+    rw [hs, gaussianReal_map_add_const]
+    congr 1
+    ring
+  have hY : (γ.prod γ).map (fun p : ℝ × ℝ ↦ t * p.2)
+      = gaussianReal 0 ⟨t ^ 2, sq_nonneg t⟩ := by
+    have hcomp : (fun p : ℝ × ℝ ↦ t * p.2) = (fun y : ℝ ↦ t * y) ∘ fun p : ℝ × ℝ ↦ p.2 := rfl
+    rw [hcomp, ← Measure.map_map (by fun_prop) (by fun_prop), hsnd]
+    have ht := gaussianReal_map_const_mul (μ := (0 : ℝ)) (v := (1 : NNReal)) t
+    have hv : (⟨t ^ 2, sq_nonneg t⟩ : NNReal) * 1 = ⟨t ^ 2, sq_nonneg t⟩ := by ext; simp
+    rw [mul_zero, hv] at ht
+    exact ht
+  have hindep : IndepFun (fun p : ℝ × ℝ ↦ x + s * p.1) (fun p : ℝ × ℝ ↦ t * p.2) (γ.prod γ) :=
+    ProbabilityTheory.indepFun_prod₀ (μ := γ) (ν := γ)
+      (X := fun y : ℝ ↦ x + s * y) (Y := fun y : ℝ ↦ t * y) (by fun_prop) (by fun_prop)
+  have hsum := gaussianReal_add_gaussianReal_of_indepFun hindep hX hY
+  have hfun : ((fun p : ℝ × ℝ ↦ x + s * p.1) + fun p : ℝ × ℝ ↦ t * p.2)
+      = fun p : ℝ × ℝ ↦ x + s * p.1 + t * p.2 := rfl
+  rw [hfun] at hsum
+  have hm : x + (0 : ℝ) = x := by ring
+  have hv : (⟨s ^ 2, sq_nonneg s⟩ : NNReal) + ⟨t ^ 2, sq_nonneg t⟩
+      = ⟨s ^ 2 + t ^ 2, by positivity⟩ := by ext; simp
+  rwa [hm, hv] at hsum
 
 open MeasureTheory ProbabilityTheory in
 /-- **The link is continuous — derived from the invariance, not assumed.**
