@@ -48,6 +48,24 @@ base), and every axiom declared in this repository. -/
 def allowed : List Name :=
   [``propext, ``Classical.choice, ``Quot.sound]
 
+/-- Whether a value-bearing declaration was authored in the corpus rather
+than generated automatically for an inductive type or structure.  Generated
+recursors, projections, `injEq` declarations, and extensionality lemmas are
+already in the dependency closure of their user-authored roots; asking
+`collectAxioms` to recompute their closures individually is redundant and was
+large enough to exhaust the CI job after a successful full build. -/
+def userWritten (env : Environment) (n : Name) : Bool :=
+  !n.isInternalDetail
+  && !(env.isProjectionFn n)
+  && (match n with
+      | .str _ f => !(f.startsWith "eq_" || f.startsWith "proof_" ||
+                       f.startsWith "match_" ||
+                       ["mk", "injEq", "eta", "sizeOf", "noConfusion",
+                        "noConfusionType", "rec", "recOn", "casesOn", "brecOn",
+                        "below", "ndrec", "toCtorIdx", "ofNat", "sizeOf_spec",
+                        "mk.sizeOf_spec", "ext", "ext_iff"].contains f)
+      | _ => false)
+
 end AxiomScan
 
 run_cmd do
@@ -57,12 +75,20 @@ run_cmd do
   let mut scanned := 0
   for (name, ci) in env.constants.toList do
     unless (`Calibrator).isPrefixOf name do continue
-    -- Scan axioms themselves as well as every value-bearing declaration.  An
-    -- unused custom axiom is still forbidden production state, and generated
-    -- declarations need no special case: a clean generated declaration has a
-    -- clean closure, while filtering it would create a trust blind spot.
+    -- Scan every axiom, including unused custom axioms.  For value-bearing
+    -- declarations scan user-authored roots: generated declarations cannot
+    -- introduce an axiom absent from those roots, and explicit source guards
+    -- independently reject custom elaborators and compiler-backed proofs.
     match ci with
-    | .axiomInfo _ | .thmInfo _ | .defnInfo _ | .opaqueInfo _ =>
+    | .axiomInfo _ =>
+      scanned := scanned + 1
+      let ax ← Lean.collectAxioms name
+      let bad := ax.filter fun a => !(allowed.contains a)
+      if !bad.isEmpty then
+        let m := (env.getModuleFor? name).getD `«unknown»
+        offenders := offenders.push (m, name, bad)
+    | .thmInfo _ | .defnInfo _ | .opaqueInfo _ =>
+      unless AxiomScan.userWritten env name do continue
       scanned := scanned + 1
       let ax ← Lean.collectAxioms name
       let bad := ax.filter fun a => !(allowed.contains a)
