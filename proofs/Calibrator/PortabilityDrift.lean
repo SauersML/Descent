@@ -931,19 +931,33 @@ theorem presentDayR2_eq_statistical_rsquared
 
 
 
-/-- Exact present-day AUC under the equal-variance Gaussian liability model.
-If case/control scores differ only by a mean shift with common residual variance
-`V_E`, then the population AUC is exactly `Φ(√(SNR/2))`, where
-`SNR = presentDayPGSVariance / V_E`. -/
+/-- Exact present-day AUC under the equal-variance Gaussian model.
+
+**NOT APPLICABLE TO DICHOTOMISED TRAITS. The word "liability" was in this docstring and
+the formula is not the liability-threshold one.** The hypothesis actually used is that
+case and control scores differ only by a mean shift with common residual variance `V_E`,
+which is an equal-variance Gaussian *outcome*. Under a liability-threshold model the two
+conditional variances are `v₁ = 1 - R²·i(i-T)` and `v₀ = 1 - R²·i_c(i_c-T)` and are **not**
+equal, and no prevalence argument appears here at all.
+
+Measured cost of the substitution on 400 simulated binary-trait PGS studies: bias
+`-0.068` AUC, RMSE `0.071`, max error `0.120`. For a dichotomised trait use
+`liabilityThresholdAUCFromExplainedR2` (RMSE `0.0121` on the same runs, against a `0.0120`
+seed-noise floor). -/
 noncomputable def presentDayGaussianAUC (V_A V_E fst : ℝ) : ℝ :=
   Phi (Real.sqrt (presentDaySignalToNoise V_A V_E fst / 2))
 
-/-- Closed-form present-day AUC under the equal-variance Gaussian liability model.
-If case/control scores differ only by a mean shift with common residual variance
-`V_E`, then the population AUC is under this model `Φ(√(SNR/2))`, where
+/-- Closed-form present-day AUC under the equal-variance Gaussian model, `Φ(√(SNR/2))` with
 `SNR = presentDayPGSVariance / V_E`.
 
-    Empirical status: UNTESTED. -/
+**NOT APPLICABLE TO DICHOTOMISED TRAITS**, for the reason given on `presentDayGaussianAUC`,
+which this delegates to: equal residual variance in cases and controls is the
+equal-variance Gaussian outcome assumption, not the liability-threshold one. Binary-trait
+counterpart: `liabilityThresholdAUCFromExplainedR2`.
+
+    Empirical status: UNTESTED as written. The formula it delegates to is VALIDATED for an
+    equal-variance Gaussian outcome and FALSIFIED for dichotomised traits, where it is
+    biased `-0.068` AUC over 400 simulated studies. -/
 noncomputable def presentDayEqualVarianceGaussianAUC (V_A V_E fst : ℝ) : ℝ :=
   presentDayGaussianAUC V_A V_E fst
 
@@ -2940,7 +2954,15 @@ explained-risk coordinates. -/
 abbrev brierFromR2 (π r2 : ℝ) : ℝ :=
   TransportedMetrics.calibratedBrier π r2
 
-/-- Exact target AUC from the neutral allele-frequency benchmark state. -/
+/-- Exact target AUC from the neutral allele-frequency benchmark state.
+
+**INHERITED ASSUMPTION, AND THIS IS THE DANGEROUS KIND.** This delegates to
+`presentDayGaussianAUC`, so it silently carries the equal-variance Gaussian outcome
+assumption. It converts a drift-induced drop into **AUC units**, which means the `-0.068`
+bias measured on dichotomised traits does not surface here as a wrong formula — it surfaces
+as a wrong *portability conclusion*, with the arithmetic intact throughout. For a binary
+trait, convert with `liabilityThresholdAUCFromExplainedR2` at the trait's prevalence
+instead. -/
 noncomputable def targetGaussianAUCFromNeutralAFBenchmark
     (V_A V_E fstTarget : ℝ) : ℝ :=
   presentDayGaussianAUC V_A V_E fstTarget
@@ -3051,7 +3073,10 @@ theorem targetAUC_lt_source_of_neutralAF_benchmark
     That missing argument is why no constant could repair it.
 
     Empirical status: VALIDATED for the equal-variance Gaussian model it now
-    names; FALSIFIED as the liability-threshold AUC. -/
+    names; FALSIFIED as the liability-threshold AUC. The binary-trait
+    counterpart is `liabilityThresholdAUCFromExplainedR2`, which takes the
+    prevalence this one lacks and measures at RMSE `0.0121` where this form is
+    biased `-0.068`. -/
 noncomputable def equalVarianceGaussianAUCFromSNR (snr : ℝ) : ℝ :=
   Phi (Real.sqrt (snr / 2))
 
@@ -3245,9 +3270,13 @@ the AUC argument is non-negative and the map is not accidentally reading the wro
 
 This is the one structural fact worth having beyond the separation theorem: `i > 0 > i_c`
 holds for every prevalence in `(0,1)`, because `i_c` is a negative multiple of `i`. -/
-theorem liabilityControlMean_lt_caseMean {K : ℝ} (hK0 : 0 < K) (hK1 : K < 1)
-    (hi : 0 < liabilityCaseMean K) :
+theorem liabilityControlMean_lt_caseMean {K : ℝ} (hK0 : 0 < K) (hK1 : K < 1) :
     liabilityControlMean K < liabilityCaseMean K := by
+  have hpdf : 0 < standardNormalPdf (liabilityThreshold K) := by
+    unfold standardNormalPdf
+    exact div_pos (Real.exp_pos _) (Real.sqrt_pos.2 (by positivity))
+  have hi : 0 < liabilityCaseMean K := by
+    exact div_pos hpdf hK0
   have h1K : 0 < 1 - K := by linarith
   have hneg : liabilityControlMean K < 0 := by
     unfold liabilityControlMean
@@ -3330,7 +3359,9 @@ extension is the honest one for the standard normal: `Phi` tends to `1` at
 
     Empirical status: UNTESTED as an extension. On `[0, 1)` it inherits
     whatever `equalVarianceGaussianAUCFromExplainedR2` has, by
-    `equalVarianceGaussianAUCChart_eq_of_lt_one`. -/
+    `equalVarianceGaussianAUCChart_eq_of_lt_one` -- including its
+    inapplicability to dichotomised traits. Binary-trait counterpart:
+    `liabilityThresholdAUCFromExplainedR2`. -/
 noncomputable def equalVarianceGaussianAUCChart (r2 : ℝ) : ℝ :=
   if 1 ≤ r2 then 1 else equalVarianceGaussianAUCFromExplainedR2 r2
 
@@ -3704,10 +3735,18 @@ theorem targetMetricProfileAtGeneration_exact_mechanistic_popgen_portability_law
       effectiveOutcomeVariance,
       CrossPopulationGenerationalModel.toMetricModelAt]
 
-/-- Closed-form target liability-threshold AUC under the neutral allele-frequency
-benchmark in the equal-variance Gaussian liability model.
+/-- Closed-form target AUC under the neutral allele-frequency benchmark, in the
+equal-variance Gaussian model.
 
-    Empirical status: UNTESTED. -/
+**THE NAME AND THE OLD DOCSTRING BOTH SAID "liability-threshold" AND THE BODY IS NOT THAT
+FORMULA** — it delegates to `targetGaussianAUCFromNeutralAFBenchmark` and thence to
+`presentDayGaussianAUC`. This was the sharpest instance of the defect in the family: a
+declaration promising a liability-threshold AUC while computing the prevalence-free
+equal-variance one. Corrected here to say what it computes.
+
+    Empirical status: UNTESTED as written; FALSIFIED as a liability-threshold AUC, by the
+    `-0.068` bias measured over 400 simulated binary-trait studies. Binary-trait
+    counterpart: `liabilityThresholdAUCFromExplainedR2`. -/
 noncomputable def targetExactGaussianAUCFromNeutralAFBenchmark
     (V_A V_E fstTarget : ℝ) : ℝ :=
   targetGaussianAUCFromNeutralAFBenchmark V_A V_E fstTarget
