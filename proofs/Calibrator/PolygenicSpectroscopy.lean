@@ -618,13 +618,53 @@ is carried and the Gaussian value `criticalDegree N condensationConstant` is a
 different number, recovered only when `c(q) = c_G`. The gap between them at rare
 frequencies is `maxSafeEpistaticOrder_collapse_at_rare_maf`.
 
-Empirical status: UNTESTED as a claim about real interaction analyses. The
-quantity is `criticalDegree N (hweMellinDrift q)` by definition and its inputs
-are derived, but the assertion that it is the order at which a real
-epistatic-aggregate null distribution changes limit has not been checked against
-simulated or empirical interaction statistics. What has been checked is the
-arithmetic: `proofs/validation/condensation/check_condensation.py` recomputes the
-safe-order column of the module docstring table. -/
+**MEASURED, and the common-variant column is optimistic by up to 2.64×.**
+
+`p ↦ log E[(x²)^p]` vanishes at `p = 1`; `c(q)` is its tangent slope there while `log(1/V)`
+is its secant slope on `[1,2]`, so by convexity `c(q) ≤ log(1/V)` always, with equality only
+at `q = 1/2`. Since `κ₄(S_N) = ((1/V)^m - 3)/N`, the true genotype chaos leaves the Gaussian
+limit at `log N / log(1/V)` — **below** this definition's `log N / c(q)` at every polymorphic
+frequency except `1/2`. At `N = 10⁶`:
+
+| `q` | this definition | true 4th-moment | surrogate condenses | ratio |
+|---|---|---|---|---|
+| 0.2764 | 33.22 | 15.08 | 18.93 | **2.64×** |
+| 0.25 | 33.01 | 14.09 | 18.93 | 2.63× |
+| 0.20 | 28.43 | 12.12 | 18.93 | 2.34× |
+| 0.05 | 7.40 | 5.87 | 18.93 | 1.26× |
+| 1e-4 | 1.62 | 1.62 | 18.93 | 1.00× |
+
+**The gap is worst exactly where the largest safe order is advertised.** Simulation agrees:
+at `q = 0.2764`, `N = 2048`, 4000 replicates per cell, the KS distance between true-genotype
+and surrogate score laws sits at null level through `m = 8` and goes significant at `m = 9`–`10`
+(`0.034`, `0.059`), reaching `0.306` by `m = 22` — the two laws are demonstrably different
+from about **half** the claimed safe order. At `q = 0.05` onset falls between `m = 2` and
+`m = 4` against a threshold of `4.08`, where this definition is nearly right.
+
+**There is an internal inconsistency using only committed theorems.** At `q = 0.2764` the
+corpus's own `drift_straddles_condensationConstant` proves `c(q) < c_G`, so the surrogate
+condenses at order `18.9` while this gate still reads "safe" to `33.2`.
+
+**And the direction claim is backwards.** The prose says that above `m*` the Gaussian
+surrogate condenses onto a point mass while the true genotype chaos does not. Participation
+ratio says the opposite in both regimes tested: at `q = 0.2764` the **surrogate** condenses
+faster at every `m` (`0.661` vs `0.383` at `m = 22`, already `0.61` at the claimed boundary),
+while at `q = 0.5` the **genotype** does (`1.000` vs `0.614` at `m = 18`). Which side condenses
+first is set by the sign of `c(q) - c_G`, which flips inside the common range — a fact this
+corpus proves and then does not use.
+
+**What survives is the rare-variant tail**, and it is the row the corpus calls "the claim
+worth arguing about": the convexity gap falls to `0.0035` at `q = 1e-4`, so pairwise
+interaction already exceeding the safe order at MAF `1e-4`, `N = 10⁶`, is correct to 0.4%.
+
+Controls: the module docstring table reproduces to all quoted digits (`c(0.2764) = 0.4159`,
+safe order `33.22` vs `33.2`); at `m = 1` the genotype and surrogate laws are indistinguishable
+(KS `0.019`–`0.025` against a split-half null of `0.024`–`0.035`), confirming
+`additive_score_is_subcritical`.
+
+Empirical status: **FALSIFIED on the common-variant column and on the condensation
+direction; VALIDATED on the rare-variant tail** (`proofs/validation/safe_order/`). Scope: HWE,
+unlinked loci, disjoint monomials as defined — no LD, no real genotypes, no structure. -/
 noncomputable def maxSafeEpistaticOrder (N q : ℝ) : ℝ :=
   Real.log N / hweMellinDrift q
 

@@ -573,10 +573,38 @@ by `hweGenotypeVariance` through `standardizedGenotype_fourth_moment`;
 `standardizedGenotype_kurtosis_gaussian_at_blind_maf` proves the fourth moment is `3`
 there. Nothing is fitted and there is no free parameter.
 
-What is *not* tested is the consequence rather than the constant: the prediction that an
-interaction statistic relying on fourth-cumulant separation loses power near this
-frequency has not been checked in simulation. It is the most directly falsifiable number
-this development produces. -/
+**The constant is CONFIRMED and the gloss around it was BACKWARDS.**
+
+Simulated at `n = 8000`, 2500 replicates per cell, 36 MAF points, each statistic calibrated
+against its own null at its own frequency so size is exactly `0.05` everywhere. For the
+**latent-locus** channel — excess kurtosis of `y` with the locus unobserved — power falls to
+nominal `0.050` at MAF `0.210`, and the bias-corrected zero-crossing of the measured fourth
+cumulant is `q = 0.21149 ± 0.00068` against `(3-√3)/6 = 0.21132`: **agreement within 0.25
+standard errors.** A control arm with both loci measured held power `0.981`–`0.997` at all 36
+points including `q*`, so the dip is interpretable.
+
+Two corrections follow.
+
+**The blind region is a wide asymmetric window, not a point.** Power is below `0.10` across
+MAF `[0.19, 0.26]`, below `0.20` across `[0.165, 0.29]`, below `0.30` across `[0.155, 0.35]`.
+Its half-width narrows only as `n^{-1/4}`, and it never closes on the common side — maximum
+power above MAF `0.30` is `0.398`, for a locus explaining 30% of variance.
+
+**The claim that "fourth-cumulant interaction tests go blind here" is refuted, and the truth
+is its opposite.** Built on a *measured* locus, the natural fourth-order interaction test
+`cum(y,y,x,x)` has power `0.47`–`0.80`, **flat, with no dip** — higher at MAF `0.21` (`0.712`)
+than at `0.05` (`0.554`), with its null mean matching the closed form to three digits at every
+point. What happens at `q*` is that this test, calibrated against the Gaussian surrogate, has
+type-I error `1.000` across almost the whole spectrum and `0.051` only at MAF `0.21`. **`q*`
+is the unique frequency at which a Gaussian-calibrated fourth-order interaction test is
+valid**, not one at which it is blind.
+
+So the blindness is real for the latent-locus channel and does **not** transfer to interaction
+tests on genotyped loci. What needed narrowing was this gloss, not the constant.
+
+Empirical status: **VALIDATED** (`proofs/validation/blind_maf/`). Scope caveat: HWE, unlinked
+loci, no LD or structure, and not every statistic that could be called fourth-cumulant-based
+was constructed. -/
 noncomputable def gaussianKurtosisMaf : ℝ := (3 - Real.sqrt 3) / 6
 
 theorem sqrt_three_sq : Real.sqrt 3 ^ 2 = 3 := Real.sq_sqrt (by norm_num)
@@ -1257,8 +1285,33 @@ structure ScaleSequence where
   scale_two_sq : scale 2 ^ 2 = 14
   /-- **The growth law (numerical input).** `exp(c · 2^k) ≤ σ_k` for some positive `c`;
   Gauss-Hermite quadrature at 200 nodes, exact through floor seven, gives
-  `1.414, 3.742, 19.07, 294.1, 7.276·10⁴, 4.699·10⁹, 2.005·10¹⁹`, whose logarithms double
-  at each floor to four significant figures. -/
+  `1.414, 3.742, 19.07, 294.1, 7.276·10⁴, 4.699·10⁹, 2.005·10¹⁹`.
+
+  **All seven figures are CONFIRMED**, by exact rational arithmetic rather than quadrature —
+  `σ_k²` is rational at every floor, so the table computes in `Fraction` with zero error
+  (`σ_7²` has a 214-digit numerator). Controls: `σ_1² = 2` and `σ_2² = 14` exactly, matching
+  the two theorems above. The stated *method* also checks out: independent Gauss–Hermite
+  reproduces all seven at 200 nodes to `≤ 2.2e-15` relative error, while 100 nodes is 30%
+  wrong at floor 7 and 50 nodes is 100% wrong — so 200 is near the minimum that works and
+  floor 8 would need more.
+
+  **The doubling claim was FALSE and is withdrawn.** This field previously read "whose
+  logarithms double at each floor to four significant figures". Successive ratios of
+  `log σ_k` are `3.807, 2.234, 1.928, 1.970, 1.989, 1.996`: the ratio *approaches* two and
+  never attains it to four figures anywhere in the table, the best pair (floors 6→7) matching
+  to three at most, with a maximum deviation of `1.807`. The growth is doubly exponential
+  asymptotically; it is not doubling at each floor.
+
+  **And this field is weaker than the prose it supports.** `exp(growthRate · 2^k) ≤ σ_k` is
+  satisfiable but **binds at floor 1**, forcing `growthRate ≤ 0.17329` — exactly half the
+  asymptotic rate `log σ_k / 2^k → 0.3472`. So `sampleSize_doubly_exponential` guarantees
+  only `15.9` at floor 3 and `6.6·10⁴` at floor 5, against the `≈4·10²` and `≈5·10⁹` the
+  prose quotes straight off `σ_k²`. The prose numbers are right and truncation at floor three
+  is sound, but **the theorem does not deliver them** — it is about 23× weaker at floor 3 and
+  8·10⁴× weaker at floor 5. Anyone quoting a sample size should quote the table, not this
+  bound.
+
+  Empirical status: **VALIDATED** (`proofs/validation/scale_tower/`). -/
   growthRate : ℝ
   growthRate_pos : 0 < growthRate
   doubly_exponential : ∀ k : ℕ, Real.exp (growthRate * 2 ^ k) ≤ scale k
