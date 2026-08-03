@@ -105,7 +105,8 @@ variable [Algebra ℝ R]
 
 Peeling the first letter of the word extracts the `k = 1` term `A i * (Q^u • Φ_u)` and
 rescales every later term by `-P i`, which is exactly the recursion below. -/
-noncomputable def altSum (P Q : ι → ℝ) (Φ A : ι → R) : List ι → R
+noncomputable def altSum (P Q : ι → ℝ) (Φ A : ι → R) (w : List ι) : R :=
+  match w with
   | [] => 0
   | i :: u => A i * (prodWeight Q u • prodOp Φ u) - P i • altSum P Q Φ A u
 

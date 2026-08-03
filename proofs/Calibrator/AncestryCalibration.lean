@@ -177,15 +177,18 @@ theorem transfer_beats_target_only
     exact (lt_div_iff₀ h_n).2 h_prod
   rw [add_div]; linarith
 
-/-- **Critical sample size for transfer benefit.**
-    Transfer learning helps when n_T < n_crit, where
-    n_crit depends on the portability ratio and source GWAS power.
-    Beyond n_crit, target-only GWAS is sufficient.
+/-- **The transfer/target comparison interval is nonempty.**
+    Transfer learning is expected to help below some critical sample size `n_crit` and
+    to stop helping above it.
 
-    General statement: given any n_lo and n_hi where transfer beats target
-    at n_lo but target beats transfer at n_hi, a crossover point exists
-    in between. -/
-theorem critical_sample_size_exists
+    WHAT IS PROVED IS WEAKER THAN THAT, and the name says so: given `n_lo < n_hi`, some
+    real number lies strictly between them. The monotonicity and sign-change premises are
+    carried because they are what makes the interval the interesting one to look in, but
+    they are NOT used to locate a crossover: no continuity of `mse_transfer - mse_target`
+    is assumed, so an intermediate-value argument is unavailable and the returned point is
+    the midpoint, not a crossing. Naming this `critical_sample_size_exists` claimed the
+    argument this file does not make. -/
+theorem exists_sample_size_strictly_between
     (mse_transfer mse_target : ℝ → ℝ) (n_lo n_hi : ℝ)
     (h_transfer_decreasing : ∀ n₁ n₂ : ℝ, 0 < n₁ → n₁ < n₂ → mse_transfer n₂ < mse_transfer n₁)
     (h_target_decreasing : ∀ n₁ n₂ : ℝ, 0 < n₁ → n₁ < n₂ → mse_target n₂ < mse_target n₁)

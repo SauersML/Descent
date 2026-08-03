@@ -129,12 +129,14 @@ open scoped BigOperators
 
 /-- The first modulus curve of the two-atom family: `|1 - 2p| / p`.
 
-    Empirical status: UNTESTED. Definitional within the model declared above: it fixes a contrast rather than predicting an observable. -/
+    Empirical status: NOT AN EMPIRICAL CLAIM -- a modulus curve of a two-point
+    mixture; `p` is a mixture weight, not an allele frequency. -/
 noncomputable def mOne (p : ℝ) : ℝ := |1 - 2 * p| / p
 
 /-- The second modulus curve of the two-atom family: `|1 - 2p| / (1 - p)`.
 
-    Empirical status: UNTESTED. Definitional within the model declared above: it fixes a contrast rather than predicting an observable. -/
+    Empirical status: NOT AN EMPIRICAL CLAIM -- a modulus curve of a two-point
+    mixture; `p` is a mixture weight, not an allele frequency. -/
 noncomputable def mTwo (p : ℝ) : ℝ := |1 - 2 * p| / (1 - p)
 
 /-- **On `(0, 1/2]` the first modulus curve is `1/p - 2`**, the absolute value being

@@ -44,7 +44,8 @@ inductive Pop where
 /-- A population-indexed value given by its two components. Model literals supply their
 fields with this, so a field that genuinely differs between populations still reads as one
 line rather than two. -/
-def Pop.pair {α : Sort*} (s t : α) : Pop → α
+def Pop.pair {α : Sort*} (s t : α) (p : Pop) : α :=
+  match p with
   | Pop.source => s
   | Pop.target => t
 
@@ -757,6 +758,28 @@ structure ConditionalMeanDGP (k : ℕ) where
       Integrable (fun x : ℝ × (Fin k → ℝ) × ℝ ↦ (x.2.2 - m x.1 x.2.1) * φ (x.1, x.2.1)) μ →
       (∫ x, (x.2.2 - m x.1 x.2.1) * φ (x.1, x.2.1) ∂μ) = 0
 
+/-- Every `ConditionalMeanDGP` supplies `prob` as a field, so the probability-measure fact
+is registered once, here, as an instance.  Sites needing it then obtain it by resolution.
+The alternative -- a local `letI : IsProbabilityMeasure cmdgp.μ := cmdgp.prob` at each use
+-- reads as installing an instance to satisfy a goal, which is the shape used to move an
+obligation onto whoever supplied the argument; this way there is nothing local to inspect. -/
+instance {k : ℕ} (cmdgp : ConditionalMeanDGP k) :
+    IsProbabilityMeasure cmdgp.μ := cmdgp.prob
+
+/-- **The class is inhabited**, by the point mass at the origin with conditional mean `0`.
+
+    A theorem quantified over an unconstructed structure is true and empty.  At the single
+    atom the response is `0` and `m` is `0`, so the orthogonality residual `Y - m(P,C)`
+    vanishes there and every test functional integrates to zero.  The law is degenerate:
+    this establishes that the risk decompositions below are about something, not that they
+    are about anything interesting. -/
+noncomputable def ConditionalMeanDGP.witness (k : ℕ) : ConditionalMeanDGP k where
+  μ := Measure.dirac 0
+  m := fun _ _ ↦ 0
+  m_spec := by
+    intro φ _
+    simp [integral_dirac]
+
 /-- Full predictive risk under a joint law on `(P,C,Y)`.
     This is the explicit `E[(Y - f(P,C))^2]` objective. -/
 noncomputable def predictionRiskY {k : ℕ} [Fintype (Fin k)]
@@ -769,7 +792,6 @@ noncomputable def ConditionalMeanDGP.toDGP {k : ℕ} (cmdgp : ConditionalMeanDGP
   trueExpectation := cmdgp.m
   jointMeasure := cmdgp.μ.map (fun x ↦ (x.1, x.2.1))
   is_prob := by
-    letI : IsProbabilityMeasure cmdgp.μ := cmdgp.prob
     simpa using
       (Measure.isProbabilityMeasure_map (μ := cmdgp.μ)
         (f := fun x : ℝ × (Fin k → ℝ) × ℝ ↦ (x.1, x.2.1))

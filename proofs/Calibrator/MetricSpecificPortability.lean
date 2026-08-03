@@ -1254,9 +1254,9 @@ theorem metrics_both_degrade_under_drift
         (sourceMetricProfileFromSourceWeightsAtTargetPrevalence m).auc := by
     rw [targetMetricProfileFromSourceWeights_auc,
       sourceMetricProfileFromSourceWeightsAtTargetPrevalence_auc,
-      targetEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart
+      targetEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart_of_lt_one
         m h_target_r2_unit.2,
-      sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart
+      sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart_of_lt_one
         m h_source_r2_unit.2]
     exact equalVarianceGaussianAUCFromExplainedR2_strictMonoOn_unitInterval
       h_target_r2_unit h_source_r2_unit h_r2_drop

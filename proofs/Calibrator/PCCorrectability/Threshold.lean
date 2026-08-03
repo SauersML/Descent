@@ -18,7 +18,15 @@ the effective independent-marker count; no such bridge is silently assumed.
 /-- Effective size of a subgroup contrast with subgroup size `m` in a panel of
 size `n`.
 
-    Empirical status: VALIDATED (recovered spike/F over m(n-m)/n is 3.95-4.06 for m in 100..900). -/
+    Empirical status: VALIDATED (recovered spike/F over m(n-m)/n is 3.95-4.06 for m in 100..900).
+
+    Power: the unbalanced arm of
+    `validation/empirical/pc_correctability/bn_independent.py` sweeps `m` over
+    `50, 100, 200, 350, 500, 650, 800, 900, 950` at `n = 1000`, so this
+    definition predicts effective sizes from `47.5` at the extreme arms through
+    `90.0`, `160.0` and `227.5` up to `250.0` at the balanced split — a
+    fivefold span, and a hump rather than a monotone trend, so a linear or
+    transposed body cannot ride along. -/
 noncomputable def effectiveSubgroupSize (n m : ℝ) : ℝ := m * (n - m) / n
 
 /-- **The effective size is the harmonic combination of the two arms**: its reciprocal is
@@ -47,7 +55,14 @@ coordinate abstract; biologically safe specializations are named separately:
 The conversion `Hudson = 2G/(1+G)` is nonlinear, so the two must not be
 substituted for one another.
 
-    Empirical status: VALIDATED (BBP inversion recovers 3.9920 ± 0.0045 against the derived 4). -/
+    Empirical status: VALIDATED (BBP inversion recovers 3.9920 ± 0.0045 against the derived 4).
+
+    Power: `validation/empirical/pc_correctability/which_fst_inversion.py`
+    inverts at `F_ST = 0.01, 0.02, 0.05` with `n = 800` and `m = 400`, where
+    this definition predicts spikes of `8.00`, `16.00` and `40.00`. The
+    fivefold span is what separates the constant `4` from `2`: a wrong constant
+    is a fixed factor on every one of those points and cannot be absorbed by
+    the fitted `F_ST`, which is measured on the same data. -/
 noncomputable def demographicSpike (n F m : ℝ) : ℝ :=
   4 * F * effectiveSubgroupSize n m
 

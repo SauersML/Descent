@@ -93,7 +93,7 @@ theorem pgsR2_eq_explainedR2FromTransportMoments (cov_pgs_y var_pgs var_y : ℝ)
     pgsR2 cov_pgs_y var_pgs var_y =
       explainedR2FromTransportMoments cov_pgs_y var_pgs var_y := rfl
 
-/-- Source-population `R²` of the score that uses the true source effects as
+/-- Source-population `R²` of the score that uses the source's own effects as
     weights under a shared LD kernel.
 
     Empirical status: UNTESTED. -/
@@ -1147,8 +1147,8 @@ theorem fineTunedTargetR2_eq_deployedTransferTargetR2
   unfold deployedTransferTargetR2
   ring
 
-/-- Exact target-only oracle `R²` in the diagonal-LD architecture model. This is
-    the target self-prediction ceiling, i.e. target additive heritability.
+/-- Target-only oracle `R²` in the diagonal-LD architecture model. This is the
+    target self-prediction ceiling, i.e. target additive heritability.
 
     Empirical status: UNTESTED. -/
 noncomputable def targetOracleR2DiagonalLD {m : ℕ}
@@ -2118,13 +2118,15 @@ noncomputable def weightedMetaTransferGapSq {p k : ℕ}
 noncomputable def uniformMetaWeight (k : ℕ) : Fin k → ℝ :=
   fun _ ↦ (k : ℝ)⁻¹
 
-/-- Weighted average of source-population effect vectors.
+/-- Weighted average of source-population effect vectors: the same weighted combination
+    as `weightedPopulationDeviation`, applied to the source effect vectors themselves
+    rather than to their deviations around a shared center.
 
     Empirical status: UNTESTED. -/
 noncomputable def weightedPopulationEffectAverage {p k : ℕ}
     (wSource : Fin k → Fin p → ℝ)
     (weight : Fin k → ℝ) : Fin p → ℝ :=
-  fun i ↦ ∑ j : Fin k, weight j * wSource j i
+  weightedPopulationDeviation wSource weight
 
 /-- Any affine meta-aggregator is exactly the weighted average of the source
     effect vectors once deviations are instantiated as centered source effects. -/
@@ -2138,8 +2140,8 @@ theorem weightedMetaSourceWeights_eq_weightedPopulationEffectAverage
         (centeredPopulationEffectDeviation wShared wSource) weight =
       weightedPopulationEffectAverage wSource weight := by
   funext i
-  unfold weightedMetaSourceWeights weightedPopulationDeviation
-    centeredPopulationEffectDeviation weightedPopulationEffectAverage
+  unfold weightedMetaSourceWeights weightedPopulationEffectAverage
+    centeredPopulationEffectDeviation weightedPopulationDeviation
   calc
     wShared i + ∑ j : Fin k, weight j * (wSource j i - wShared i)
         = wShared i + ((∑ j : Fin k, weight j * wSource j i) -

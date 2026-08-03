@@ -112,3 +112,45 @@ The same shape, three more times the same day:
   * A guard's real finding sat at the bottom of a long advisory list and went
     unread for hours. A finding that is not surfaced is functionally invisible;
     lead with the verdict, not the log.
+
+### Never locate anything by counting parent directories
+
+`parents[2]`, or four `..` segments, is a hidden dependency on where the file
+currently sits. Move the file and the expression still evaluates, still returns
+a real path, and now returns the wrong one. A reorganisation converts it into a
+wrong answer rather than an error, which is the worst available outcome.
+
+Both instances found so far were in provenance and data-location code, which is
+the worst available place for it, and both were caught only because someone
+happened to re-run a path check during the move.
+
+  * `simprov.py` used `parents[2]` to find the repository root. Moved one level
+    deeper into `empirical/`, that became `<repo>/proofs`, so the dirty-tree
+    exclusion pathspec `proofs/validation/**/*.json` was evaluated from inside
+    `proofs/`, meant `proofs/proofs/validation/...`, and matched nothing.
+    Measured at the moment of the move: **83 JSON paths leaked into the dirty
+    list.** Every sweep would have stamped `workingTreeClean: false` with a list
+    of files having nothing to do with the code under test — which is verbatim
+    the failure `Shared.Results.gitDirtyPaths` was written to prevent, reporting
+    a corruption that did not happen and training the reader to ignore the
+    field. Nothing would have crashed. The stamp that tells you whether to trust
+    a result was about to start lying, on every run.
+  * `fam_serial_founder.py` used four `..` segments to reach the repository
+    root. After the same move they landed on `<repo>/proofs` and the study-data
+    path pointed at a directory that has never existed. This was the second time
+    that day the same file was bitten by the same class of bug: earlier, run
+    from a scratch copy on a cluster, the identical expression produced
+    `/projects/sims/...`. An inferred path that *looks* plausible reports as a
+    missing dataset and sends the reader hunting for data rather than for the
+    path bug.
+
+The rule: ask for the thing you actually want. The repository root is the
+directory containing `.git`, so walk up until you find it. Where a path cannot
+be derived at all, take it as an argument or an environment variable and let the
+caller state it, rather than inferring one and presenting the inference as fact.
+
+A related trap, worth naming before it stops holding: four other scripts here
+bootstrap `simprov` with a fixed number of `dirname()` calls and survived this
+move **by coincidence**, because they and `simprov.py` moved together. They
+would break if `simprov.py` moved alone. A dependency that holds by accident is
+worth writing down while it still holds.

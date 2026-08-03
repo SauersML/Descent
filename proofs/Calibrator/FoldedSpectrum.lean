@@ -132,7 +132,8 @@ noncomputable def diploidFamily : BundleFamily 3 :=
 
 /-- Relabelling which allele is called the alternate one: genotype `j ↦ 2 - j`.
 
-    Empirical status: UNTESTED. Definitional within the model declared above: it fixes a contrast rather than predicting an observable. -/
+    Empirical status: NOT AN EMPIRICAL CLAIM -- the permutation `![2, 1, 0]`
+    on `Fin 3`. A relabelling of genotype indices. -/
 def genotypeFlip3 : Fin 3 → Fin 3 := ![2, 1, 0]
 
 theorem genotypeFlip3_involutive : Function.Involutive genotypeFlip3 := by
@@ -737,9 +738,7 @@ theorem onePercentMaf_halfResponse_vs_balanced_permeability
   ring
 
 /-- Total covariance-moment information from `m` independent observations of one
-standardized Hardy--Weinberg locus.
-
-    Empirical status: UNTESTED. -/
+standardized Hardy--Weinberg locus. -/
 noncomputable def totalDiploidCovarianceMomentInformation
     (m q covarianceDerivative : ℝ) : ℝ :=
   m * diploidCovarianceMomentPermeability q covarianceDerivative
@@ -2144,7 +2143,7 @@ separates quotient fibres remains the continuation. -/
   coding-scale invariance and supplies both the
   completion-count lower bound and a constructive finite-dimensional criterion:
   selected lag summaries complete a deployment family when their sensitivity matrix is
-  nonsingular. `firstTwoLags_complete_geometric_dependence` verifies the criterion for
+  nonsingular. `firstTwoLags_injective_of_amplitude_ne_zero` verifies the criterion for
   the biological workhorse `γ(k)=Aρ^k`: lag zero and lag one identify covariance amplitude
   and persistence whenever `A ≠ 0`. `scalarPermeability_derivative_scale` and
   `inverse_square_replicates_compensate_attenuation` prove the conditional sealing/design

@@ -187,7 +187,8 @@ theorem indirect_eq_total_sub_direct_of_sum
 /-- **Ratio of two reals.** Named `effectShare` rather than `proportionMediated`: nothing
     here establishes that the numerator is an indirect effect.
 
-        Empirical status: UNTESTED. -/
+    Empirical status: NOT AN EMPIRICAL CLAIM -- a ratio of two of its own
+    arguments. -/
 noncomputable def effectShare (indirect_effect total_effect : ℝ) : ℝ :=
   indirect_effect / total_effect
 

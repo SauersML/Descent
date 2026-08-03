@@ -37,9 +37,7 @@ noncomputable def historyKernel (h h' : SpectralHistory) : ℝ :=
 noncomputable def historySelfEnergy (h : SpectralHistory) : ℝ :=
   historyKernel h h
 
-/-- Squared spectral distance written through self- and cross-kernels.
-
-    Empirical status: UNTESTED. Definitional within the model declared above: it fixes a contrast rather than predicting an observable. -/
+/-- Squared spectral distance written through self- and cross-kernels. -/
 noncomputable def historySpectralDistanceSq (h h' : SpectralHistory) : ℝ :=
   historySelfEnergy h + historySelfEnergy h' - 2 * historyKernel h h'
 

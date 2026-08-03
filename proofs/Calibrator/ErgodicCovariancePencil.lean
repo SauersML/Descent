@@ -122,6 +122,16 @@ def twoSlice {Ω K E : Type*} [MeasurableSpace Ω] [MeasurableSpace E]
 
 end StationarySpaceTimeField
 
+/-- **The two-slice class is inhabited**, by the zero-separation coupling of the
+constant field above.
+
+    `twoSlice` alone does not establish this: it builds a two-slice field *from* a
+    stationary space--time field, so it moves the obligation rather than
+    discharging it.  Supplying the space--time witness discharges it. -/
+noncomputable def StationaryTwoSliceField.witness (K : Type*) :
+    StationaryTwoSliceField Unit K Unit :=
+  (StationarySpaceTimeField.witness K).twoSlice 0
+
 namespace StationaryTwoSliceField
 
 /-- Full slice-law preservation implies preservation of every one-locus marginal.  The

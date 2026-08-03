@@ -285,4 +285,13 @@ theorem ghostGain_ne_countPredicted_at_one :
 noncomputable def ghostWitnessExample (u : ℝ) : Witness Bool ℝ :=
   ghostWitness 1 1 u ghostGain_ne_countPredicted_at_one
 
+/-- **`ApproxWitness` is inhabited**, so `lipschitz_predictor_error_ge` is a statement
+    about something.
+
+    `ofWitness` alone does not settle this: it takes a `Witness` and a metric vanishing on
+    the diagonal, so it relocates the obligation.  Here the exact witness is
+    `ghostWitnessExample` and the metric is the absolute difference, both supplied. -/
+noncomputable def ApproxWitness.witness (u : ℝ) : ApproxWitness Bool ℝ :=
+  ApproxWitness.ofWitness (ghostWitnessExample u) (fun x y ↦ |x - y|) (fun x ↦ by simp)
+
 end Calibrator.CountingInvariantBlindness

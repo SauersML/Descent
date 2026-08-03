@@ -533,7 +533,8 @@ fixed-grade gap by projection from an assumption field.
 /-- Bounded additive-effect architectures.  The absolute radius makes the set
 nonempty and convex for every input, without a validity theorem parameter.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: NOT AN EMPIRICAL CLAIM -- the closed ball of radius
+    `|B|` in the effect coordinates. A set, with no observable attached. -/
 noncomputable def boundedEffectCarrier (q : ℕ) (B : ℝ) : Set (Fin q → ℝ) :=
   Metric.closedBall 0 |B|
 
@@ -566,9 +567,8 @@ open Calibrator.CertificateGrading
 /-- The effect vectors this problem ranges over: the ball of radius
 `effectRadius` in the per-variant effect coordinates.
 
-    Empirical status: UNTESTED. Definitional within the problem declared above:
-    it names the carrier the catalogue is quantified over rather than
-    predicting an observable. -/
+    Empirical status: NOT AN EMPIRICAL CLAIM -- the carrier set a certificate
+    problem ranges over. -/
 noncomputable def effects {q n : ℕ} (P : MeanAbsoluteEffectCertificateProblem q n) :
     Set (Fin q → ℝ) := boundedEffectCarrier q P.effectRadius
 

@@ -499,7 +499,7 @@ theorem target_liability_auc_eq_explainedR2_chart {p q : ℕ}
     (h_r2 : r2FromSourceWeights m Pop.target < 1) :
     equalVarianceGaussianAUCFromSourceWeights m Pop.target =
       equalVarianceGaussianAUCFromExplainedR2 (r2FromSourceWeights m Pop.target) := by
-  simpa using targetEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart m h_r2
+  simpa using targetEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart_of_lt_one m h_r2
 
 /-- When target LD among scored SNPs changes, the deployed liability-threshold
 AUC changes because the explicit target score moments, and therefore the

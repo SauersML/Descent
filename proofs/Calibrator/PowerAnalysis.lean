@@ -468,10 +468,15 @@ with perfect power.
 
 section EffectSizeHeterogeneity
 
-/-- **Genetic correlation between ancestries.**
+/-- **Given the `r_g²` ceiling, imperfect correlation forces a portability drop.**
     r_g < 1 means effect sizes are not perfectly correlated.
-    This sets an upper bound on cross-ancestry R². -/
-theorem genetic_correlation_bounds_portability
+
+    The ceiling `r2_target ≤ r_g² · r2_source` is a hypothesis, not a result of this
+    corpus: nothing here derives it from a model of cross-ancestry effect transfer. The
+    name carries `_of_rg_sq_bound` for that reason — the previous name,
+    `genetic_correlation_bounds_portability`, asserted the very implication that is
+    being assumed. -/
+theorem r2_target_lt_r2_source_of_rg_sq_bound
     (r2_source r2_target rg : ℝ)
     (h_bound : r2_target ≤ rg^2 * r2_source)
     (h_rg : |rg| < 1) (h_r2 : 0 < r2_source) :

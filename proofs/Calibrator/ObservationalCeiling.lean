@@ -371,7 +371,7 @@ theorem IsCompleteCatalogue.separates {α Invariant : Type*} {E : α → α → 
 pair. This is the invariant-theoretic form of the law, and it is what turns
 "scree plots cannot recover the loading decay" into a theorem rather than a
 complaint. -/
-theorem no_complete_catalogue_factoring
+theorem IsCompleteCatalogue.false_of_probe_eq
     {α Data Invariant : Type*} {E : α → α → Prop}
     (probe : α → Data) (build : Data → Invariant)
     (h : IsCompleteCatalogue E (fun a ↦ build (probe a)))

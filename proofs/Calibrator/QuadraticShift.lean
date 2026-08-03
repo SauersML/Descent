@@ -168,7 +168,7 @@ def scalarCorrectionFloor (B : Matrix ι ι ℝ)
 
 /-- Completed-square identity for post-hoc scalar correction.  It gives both
 the exact optimum and the exact geometric floor. -/
-theorem scalar_correction_completed_square
+theorem quadraticCoefficientDistance_eq_floor_add_sq
     (B : Matrix ι ι ℝ) (u v : ι → ℝ) (c : ℝ)
     (hsymmetric : IsSymmetricBilinearMatrix B)
     (hu : dot u (B.mulVec u) ≠ 0) :
@@ -210,11 +210,11 @@ theorem best_scalar_correction_attains_floor
       ∀ c : ℝ, scalarCorrectionFloor B u v ≤
         quadraticCoefficientDistance B (fun i ↦ c * u i) v := by
   constructor
-  · rw [scalar_correction_completed_square B u v
+  · rw [quadraticCoefficientDistance_eq_floor_add_sq B u v
       (bestScalarCorrection B u v) hsymmetric hu.ne']
     ring
   · intro c
-    rw [scalar_correction_completed_square B u v c hsymmetric hu.ne']
+    rw [quadraticCoefficientDistance_eq_floor_add_sq B u v c hsymmetric hu.ne']
     exact le_add_of_nonneg_right (mul_nonneg (le_of_lt hu) (sq_nonneg _))
 
 end

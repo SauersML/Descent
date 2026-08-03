@@ -561,12 +561,13 @@ theorem klBernReal_eq_zero_iff (p q : UnitProb)
     (hp : 0 < p.1 ∧ p.1 < 1) (hq : 0 < q.1 ∧ q.1 < 1) :
     klBernReal p q = 0 ↔ q = p := by
   unfold klBernReal
-  rw [bernoulliKLReal_eq_zero_iff p.1 q.1 hp.1 hp.2 hq.1 hq.2]
+  have hiff : bernoulliKLReal p.1 q.1 = 0 ↔ q.1 = p.1 :=
+    bernoulliKLReal_eq_zero_iff p.1 q.1 hp.1 hp.2 hq.1 hq.2
   constructor
   · intro h
-    exact Subtype.ext h
+    exact Subtype.ext (hiff.mp h)
   · intro h
-    rw [h]
+    exact hiff.mpr (by rw [h])
 
 /-- Pointwise log-loss regret equals Bernoulli KL. -/
 theorem logLoss_regret_eq_kl_pointwise (p q : ℝ)

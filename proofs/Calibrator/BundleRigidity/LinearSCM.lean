@@ -118,6 +118,18 @@ theorem isInterventionalSolution_witness (k : Fin n) (v : ℝ) (noise : Fin n �
   refine ⟨by simp, fun i hi ↦ ?_⟩
   simp [witness, hi]
 
+/-- **Observational solutions exist too**, in the same edgeless model: with every
+structural coefficient zero the system reads `x = noise` coordinatewise.
+
+Stated because `IsSolution` was otherwise a predicate this development defines and no
+theorem ever satisfies -- the observational counterpart of the emptiness that
+`LinearSCM.witness` exists to rule out, and the baseline the interventional solution above
+is compared against. -/
+theorem isSolution_witness (noise : Fin n → ℝ) :
+    (witness n).IsSolution noise noise := by
+  intro i
+  simp [witness]
+
 end LinearSCM
 
 /-! ## The three-variable chain, where mediation lives
@@ -162,20 +174,23 @@ def yUnderXM (x m nY : ℝ) : ℝ := S.b * x + S.c * m + nY
 /-- **Total effect** of moving `X` from `x` to `x'`: the change in `Y` under `do(X := ·)`,
 with `M` free to respond.
 
-    Empirical status: UNTESTED. Definitional within the model declared above: it fixes a contrast rather than predicting an observable. -/
+    Empirical status: NOT AN EMPIRICAL CLAIM -- an intervention contrast
+    defined from the model's own equations. -/
 def totalEffect (x x' nM nY : ℝ) : ℝ := S.yUnder x' nM nY - S.yUnder x nM nY
 
 /-- **Direct effect**: the change in `Y` when `X` moves but `M` is held at `m` by a second
 intervention. This is the controlled direct effect, and holding `M` fixed is what
 distinguishes it from the total effect.
 
-    Empirical status: UNTESTED. Definitional within the model declared above: it fixes a contrast rather than predicting an observable. -/
+    Empirical status: NOT AN EMPIRICAL CLAIM -- an intervention contrast
+    defined from the model's own equations. -/
 def directEffect (x x' m nY : ℝ) : ℝ := S.yUnderXM x' m nY - S.yUnderXM x m nY
 
 /-- **Indirect effect**: the part transmitted through `M`, namely the change `M` undergoes
 when `X` moves, propagated to `Y` by the coefficient `c`.
 
-    Empirical status: UNTESTED. Definitional within the model declared above: it fixes a contrast rather than predicting an observable. -/
+    Empirical status: NOT AN EMPIRICAL CLAIM -- an intervention contrast
+    defined from the model's own equations. -/
 def indirectEffect (x x' nM : ℝ) : ℝ := S.c * (S.mUnder x' nM - S.mUnder x nM)
 
 /-- The total effect is `(b + c·a)·(x' - x)`, computed from the equations. -/

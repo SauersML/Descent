@@ -314,14 +314,18 @@ theorem AssortativeMatingModel.inflates_observed_h2 (m : AssortativeMatingModel)
   rw [lt_div_iff₀ m.denom_pos]
   nlinarith [m.rh2_pos, mul_pos m.h2_pos m.rh2_pos]
 
-/-- Standalone version: AM inflates observed h2. -/
+/-- Standalone version: AM inflates observed h2.
+
+The observed heritability is written out rather than carried as a free variable
+pinned by a hypothesis `h2_observed = h2_true / (1 - r * h2_true)`.  That
+hypothesis stated the inflation law this module itself defines
+(`AssortativeMatingModel.observedH2`) and handed it to the theorem as a gift;
+substituting it changes nothing about what is proved and removes the gift. -/
 theorem am_inflates_observed_h2
-    (h2_true h2_observed r : ℝ)
-    (h_inflation : h2_observed = h2_true / (1 - r * h2_true))
+    (h2_true r : ℝ)
     (h_r : 0 < r) (h_r_le : r < 1)
     (h_h2 : 0 < h2_true) (h_h2_le : h2_true < 1) :
-    h2_true < h2_observed := by
-  rw [h_inflation]
+    h2_true < h2_true / (1 - r * h2_true) := by
   rw [lt_div_iff₀ (by nlinarith [mul_pos h_r h_h2])]
   nlinarith [mul_pos h_r h_h2, mul_pos h_h2 (mul_pos h_r h_h2)]
 

@@ -482,9 +482,7 @@ noncomputable def effectiveBlockCount (markers correlationLength : ℝ) : ℝ :=
     The lattice ghost surviving in a block of `n` markers at correlation length `ℓ`.
 
     Junk-value note: natural subtraction makes `n = 0` and `n = 1` agree at `1`, so this is
-    the lag-`(n-1)` quantity only for `n ≥ 1`, which every theorem below requires.
-
-        Empirical status: UNTESTED. -/
+    the lag-`(n-1)` quantity only for `n ≥ 1`, which every theorem below requires. -/
 noncomputable def residualDiscreteness (correlationLength : ℝ) (n : ℕ) : ℝ :=
   (1 - 1 / correlationLength) ^ (n - 1)
 

@@ -140,6 +140,22 @@ inductive LatticeDatum where
 def IsLatticeLaw (μ : MeasureTheory.Measure ℝ) (span offset : ℝ) : Prop :=
   0 < span ∧ μ {x : ℝ | ∀ k : ℤ, x ≠ offset + span * k} = 0
 
+/-- **`IsLatticeLaw` is satisfied by an actual measure**, namely a point mass.
+
+    All the mass of `Measure.dirac a` sits at `a`, which is the `k = 0` element of the
+    progression `a + 1 * ℤ`, so the set of points off that progression is null. The example
+    is degenerate, and that is its whole job: without it `IsLatticeLaw` is a predicate no
+    measure in this corpus is shown to satisfy, and only the nonlattice branch of
+    `LatticeDatum.Describes` would have anything to be checked against. It is not evidence
+    that the lattice branch is *interesting*, only that it is not empty. -/
+theorem dirac_isLatticeLaw (a : ℝ) :
+    IsLatticeLaw (MeasureTheory.Measure.dirac a) 1 a := by
+  refine ⟨one_pos, ?_⟩
+  have hsub : {x : ℝ | ∀ k : ℤ, x ≠ a + 1 * k} ⊆ ({a} : Set ℝ)ᶜ := by
+    intro x hx
+    simpa using hx 0
+  exact MeasureTheory.measure_mono_null hsub (by simp)
+
 /-- A law is **nonlattice** when no span and offset make it a lattice law. -/
 def IsNonlatticeLaw (μ : MeasureTheory.Measure ℝ) : Prop :=
   ∀ span offset : ℝ, ¬ IsLatticeLaw μ span offset

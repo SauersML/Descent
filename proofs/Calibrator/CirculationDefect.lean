@@ -63,7 +63,8 @@ theorem circulationQuadraticForm_eq_zero (a x y : ℝ) :
 
 /-- Dirichlet form of a generator with isotropic dissipation `s` and circulation `a`.
 
-    Empirical status: UNTESTED. Definitional within the model declared above: it fixes a contrast rather than predicting an observable. -/
+    Empirical status: NOT AN EMPIRICAL CLAIM -- `drift` here is the drift term
+    of a diffusion generator, not genetic drift. The body is a quadratic form. -/
 def driftGeneratorForm (s a x y : ℝ) : ℝ :=
   s * (x ^ 2 + y ^ 2) + circulationQuadraticForm a x y
 

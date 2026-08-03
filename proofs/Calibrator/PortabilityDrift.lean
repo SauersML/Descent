@@ -82,7 +82,13 @@ never equal.
 
     Empirical status: VALIDATED (0.0909/0.2000/0.3333/0.5000/0.6667/0.8000 at
     tau = .1/.25/.5/1/2/4 against simulated 0.0905/0.1887/0.3137/0.4782/0.6589/
-    0.8028, within simulation error at every point). -/
+    0.8028, within simulation error at every point).
+
+    Power: the prediction spans `0.0909` to `0.8000` across that `tau` grid,
+    nearly an order of magnitude and most of the range `F_ST` can occupy. A
+    fortyfold sweep of `tau` moves the prediction across the whole saturating
+    curve, so a form that is linear in `tau`, or one saturating at a different
+    rate, separates from this one on the grid rather than only at its ends. -/
 noncomputable def fstFromTau (tau : ℝ) : ℝ :=
   tau / (1 + tau)
 
@@ -830,7 +836,7 @@ theorem variance_mean_pgs_diff (V_A fst : ℝ) :
 
 /-- Rigorous algebraic proof of the expected absolute mean-shift formula for
     discrete Wright-Fisher drift, via explicit `Real.sqrt` and fraction manipulation. -/
-theorem expected_abs_mean_shift_bound_proved
+theorem expected_abs_mean_shift_ratio_eq
     (V_A fstS fstT : ℝ)
     (hVA_pos : 0 < V_A)
     (hfst_sum_nonneg : 0 ≤ fstS + fstT)
@@ -913,7 +919,7 @@ theorem expected_abs_mean_shift_of_wrightFisher
       2 * Real.sqrt
         ((wrightFisherHeterozygosityLoss NS tS + wrightFisherHeterozygosityLoss NT tT) /
           (Real.pi * (1 - wrightFisherHeterozygosityLoss NS tS))) := by
-  apply expected_abs_mean_shift_bound_proved
+  apply expected_abs_mean_shift_ratio_eq
   · exact hVA_pos
   · exact add_nonneg (wrightFisherHeterozygosityLoss_nonneg NS tS hNS) (wrightFisherHeterozygosityLoss_nonneg NT tT hNT)
   · exact wrightFisherHeterozygosityLoss_lt_one NS tS hNS
@@ -989,7 +995,7 @@ Measured cost of the substitution on 400 simulated binary-trait PGS studies: bia
 `liabilityThresholdAUCFromExplainedR2` (RMSE `0.0121` on the same runs, against a `0.0120`
 seed-noise floor). -/
 noncomputable def presentDayEqualVarianceGaussianAUC (V_A V_E fst : ℝ) : ℝ :=
-  Phi (Real.sqrt (presentDaySignalToNoise V_A V_E fst / 2))
+  equalVarianceGaussianAUCFromSignalVariance (presentDayPGSVariance V_A fst) V_E
 
 /-- Drift monotonically degrades signal-to-noise when `V_A, V_E > 0`. -/
 theorem drift_degrades_signalToNoise
@@ -2195,6 +2201,26 @@ structure GenerationalPopGenParameters where
   recomb_le_half : recomb ≤ 1 / 2
   V_A_pos : 0 < V_A
 
+/-- **The parameter class is inhabited**, at a standard human-scale setting:
+`Nₑ = 1000`, `μ = 10⁻⁵` per generation, `m = 10⁻³`, `r = 10⁻²`, additive variance
+`1`.
+
+    Every value is strictly inside the constraints — no rate is `0` and the
+    recombination fraction is well below the free-recombination boundary `1/2` —
+    so nothing downstream is read at a degenerate point. -/
+noncomputable def GenerationalPopGenParameters.witness : GenerationalPopGenParameters where
+  Ne := 1000
+  μ := 1 / 100000
+  mig := 1 / 1000
+  recomb := 1 / 100
+  V_A := 1
+  Ne_pos := by norm_num
+  μ_nonneg := by norm_num
+  mig_nonneg := by norm_num
+  recomb_nonneg := by norm_num
+  recomb_le_half := by norm_num
+  V_A_pos := by norm_num
+
 namespace GenerationalPopGenParameters
 
 /-- Scaled mutation rate `θ = 4Neμ`.
@@ -2425,6 +2451,46 @@ structure CrossPopulationGenerationalModel (p q : ℕ) where
   novelUntaggablePhenotypeVariance_nonneg : ∀ t, 0 ≤ novelUntaggablePhenotypeVarianceAt t
   targetPrevalence_pos : ∀ t, 0 < targetPrevalenceAt t
   targetPrevalence_lt_one : ∀ t, targetPrevalenceAt t < 1
+
+/-- **The generational transport model is inhabited**, at every panel size `(p, q)`.
+
+    The tag covariance is the identity, the two populations start at the same
+    allele frequencies, and the effect vector, the heterogeneity path and the
+    novel-mutation path are zero: this is the no-divergence configuration, in
+    which the transported score is the source score at every generation. It is
+    the null of the theory rather than an interesting member of it, and that is
+    the point — it fixes what the generational statements quantify over. The
+    variance and prevalence fields are strictly inside their constraints. -/
+noncomputable def CrossPopulationGenerationalModel.witness (p q : ℕ) :
+    CrossPopulationGenerationalModel p q where
+  popGen := GenerationalPopGenParameters.witness
+  betaSource := fun _ ↦ 0
+  targetEffectHeterogeneityAt := fun _ _ ↦ 0
+  novelCausalEffectTargetAt := fun _ _ ↦ 0
+  sigmaTagSource := 1
+  directCausalSource := 0
+  novelDirectCausalTemplate := 0
+  proxyTaggingSource := 0
+  novelProxyTaggingTemplate := 0
+  tagDistance := 0
+  tagCausalDistance := 0
+  tagAlleleFreqSource := fun _ ↦ 1 / 2
+  tagAlleleFreqStandingTargetAt := fun _ _ ↦ 1 / 2
+  tagAlleleFreqMutationShiftAt := fun _ _ ↦ 0
+  causalAlleleFreqSource := fun _ ↦ 1 / 2
+  causalAlleleFreqStandingTargetAt := fun _ _ ↦ 1 / 2
+  causalAlleleFreqMutationShiftAt := fun _ _ ↦ 0
+  contextCrossSource := fun _ ↦ 0
+  contextCrossTargetAt := fun _ _ ↦ 0
+  sourceOutcomeVariance := 1
+  targetOutcomeVarianceAt := fun _ ↦ 1
+  novelUntaggablePhenotypeVarianceAt := fun _ ↦ 0
+  targetPrevalenceAt := fun _ ↦ 1 / 2
+  sourceOutcomeVariance_pos := by norm_num
+  targetOutcomeVariance_pos := fun _ ↦ by norm_num
+  novelUntaggablePhenotypeVariance_nonneg := fun _ ↦ by norm_num
+  targetPrevalence_pos := fun _ ↦ by norm_num
+  targetPrevalence_lt_one := fun _ ↦ by norm_num
 
 /-- Generation-indexed target effect vector. This is derived from the source
 effect vector plus an explicit locus-resolved heterogeneity path and a
@@ -3058,7 +3124,14 @@ noncomputable def liabilityControlVariance (r2 K : ℝ) : ℝ :=
 
 Empirical status: VALIDATED against 400 simulated PGS studies. Pooled RMSE is
 `0.0121` with bias `-0.0007`, matching the independently measured `0.0120`
-seed-to-seed noise floor. -/
+seed-to-seed noise floor.
+
+Power: prevalence is the axis this chart has and the equal-variance Gaussian
+one lacks, and the design sweeps it. At `R² = 0.3` the AUC this definition
+predicts runs from `0.753` at prevalence `0.5` to `0.921` at prevalence
+`0.001`, while a prevalence-free chart returns one number for that whole range.
+The span is more than a sixth of the discriminable interval above chance, so a
+chart missing the prevalence dependence cannot fit it. -/
 noncomputable def liabilityThresholdAUCFromExplainedR2 (r2 K : ℝ) : ℝ :=
   Phi ((liabilityCaseMean K - liabilityControlMean K) * Real.sqrt r2 /
     Real.sqrt (liabilityCaseVariance r2 K + liabilityControlVariance r2 K))
@@ -3199,17 +3272,28 @@ theorem targetAUC_lt_source_of_neutralAF_benchmark
     names; FALSIFIED as the liability-threshold AUC. The binary-trait
     counterpart is `liabilityThresholdAUCFromExplainedR2`, which takes the
     prevalence this one lacks and measures at RMSE `0.0121` where this form is
-    biased `-0.068`. -/
+    biased `-0.068`.
+
+    Power: this chart's own prediction spans `0.760250`, `0.921350`, `0.999797`
+    and `1.000000` at `snr = 1, 4, 25, 100`, which is the design the
+    two-Gaussian Monte Carlo of `DGP.equalVarianceGaussianAUCFromSignalVariance`
+    was run on, at `200000` draws per point; the two are the same chart under
+    `snr = vSignal / vNoise`, and
+    `equalVarianceGaussianAUCFromSNR_eq_variance` is the theorem saying so, so
+    the measurement is of this function rather than of a sibling formula. The
+    prediction covers chance-to-perfect discrimination across that design. -/
 noncomputable def equalVarianceGaussianAUCFromSNR (snr : ℝ) : ℝ :=
   Phi (Real.sqrt (snr / 2))
 
 /-- The signal-to-noise and signal/residual-variance parameterizations are exactly the
 same closed-form chart.  This is algebra only: it does not assert that either chart is the
 AUC of a biological process without a separately proved distributional model. -/
-theorem equalVarianceGaussianAUCFromSNR_eq_variance (vSignal vEnv : ℝ) :
+theorem equalVarianceGaussianAUCFromSNR_eq_variance
+    (vSignal vEnv : ℝ) (h_env : vEnv ≠ 0) :
     equalVarianceGaussianAUCFromSNR (vSignal / vEnv) =
       equalVarianceGaussianAUCFromSignalVariance vSignal vEnv := by
-  unfold equalVarianceGaussianAUCFromSNR equalVarianceGaussianAUCFromSignalVariance
+  rw [equalVarianceGaussianAUCFromSignalVariance_eq_formula_of_ne_noise _ _ h_env]
+  unfold equalVarianceGaussianAUCFromSNR
   congr 2
   rw [div_div, mul_comm]
 
@@ -3224,7 +3308,8 @@ distributional model rather than supplied as a theorem-bearing parameter. -/
 /-- With `vEnv = 1`, variance form equals SNR form exactly. -/
 theorem equalVarianceGaussianAUCFromVariances_scaleOne (vSignal : ℝ) :
     equalVarianceGaussianAUCFromSignalVariance vSignal 1 = equalVarianceGaussianAUCFromSNR vSignal := by
-  unfold equalVarianceGaussianAUCFromSignalVariance equalVarianceGaussianAUCFromSNR
+  rw [equalVarianceGaussianAUCFromSignalVariance_eq_formula_of_ne_noise _ _ (by norm_num)]
+  unfold equalVarianceGaussianAUCFromSNR
   ring_nf
 
 /-- On nonnegative SNR, the **equal-variance Gaussian** AUC map is strictly increasing. -/
@@ -3247,7 +3332,14 @@ Values above one are outside the statistical model and are clamped rather than e
 This is not a liability-threshold AUC: that chart also requires prevalence.
 
     Empirical status: VALIDATED for the equal-variance Gaussian model on `[0, 1]`;
-    FALSIFIED as the liability-threshold AUC. -/
+    FALSIFIED as the liability-threshold AUC.
+
+    Power: on `r2 = 0.1, 0.3, 0.5, 0.8` this chart predicts `0.5932`, `0.6783`,
+    `0.7602` and `0.9214`, which is `snr = r2 / (1 - r2)` fed to the SNR form it
+    equals below the boundary. That span runs from near chance to near-perfect
+    discrimination. The falsification is read off the same span: at `r2 = 0.3`
+    the liability-threshold AUC runs from `0.753` to `0.921` as prevalence moves
+    from `0.5` to `0.001`, and this chart answers `0.6783` for all of it. -/
 noncomputable def equalVarianceGaussianAUCFromExplainedR2 (r2 : ℝ) : ℝ :=
   if 1 ≤ r2 then 1 else Phi (Real.sqrt (r2 / (2 * (1 - r2))))
 
@@ -3405,7 +3497,7 @@ theorem equalVarianceGaussianAUCFromExplainedR2_eq_variance
     unfold r2FromSignalVariance
     exact (div_lt_one h_total).2 (lt_add_of_pos_right vSignal h_env)
   rw [equalVarianceGaussianAUCFromExplainedR2_eq_formula_of_lt_one _ h_r2_lt]
-  rw [← equalVarianceGaussianAUCFromSNR_eq_variance vSignal vEnv]
+  rw [← equalVarianceGaussianAUCFromSNR_eq_variance vSignal vEnv (ne_of_gt h_env)]
   unfold equalVarianceGaussianAUCFromSNR r2FromSignalVariance
   congr 2
   -- `field_simp` was called without the two nonzero facts proved directly
@@ -3483,7 +3575,7 @@ same source explained-signal and total-variance decomposition.
 
 This is only a derived coordinate identity; it is not the defining
 construction of source AUC. -/
-theorem sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart {p q : ℕ}
+theorem sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart_of_lt_one {p q : ℕ}
     (m : CrossPopulationMetricModel p q)
     (h_r2 : r2FromSourceWeights m Pop.source < 1) :
     equalVarianceGaussianAUCFromSourceWeights m Pop.source =
@@ -3546,7 +3638,7 @@ same target explained-signal and total-variance decomposition.
 
 This is only a derived coordinate identity; it is not the defining
 construction of target AUC. -/
-theorem targetEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart {p q : ℕ}
+theorem targetEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart_of_lt_one {p q : ℕ}
     (m : CrossPopulationMetricModel p q)
     (h_r2 : r2FromSourceWeights m Pop.target < 1) :
     equalVarianceGaussianAUCFromSourceWeights m Pop.target =
@@ -5054,6 +5146,15 @@ theorem sharedLD_from_equilibrium_eq (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 ≤ m) 
 noncomputable def sharedLDFromMigration (M : ℝ) : ℝ :=
   M / (1 + M)
 
+/-- **The migration shared-LD map and the coalescent `F_ST` map are one function.**
+
+`fstFromTau` sends coalescent time `tau` to `tau / (1 + tau)`; `sharedLDFromMigration`
+sends the scaled migration number `M` to `M / (1 + M)`. The arguments are different
+quantities and no value of one may be substituted for the other, but the map is the same
+saturating map, and a change of convention in either spelling has to be made in both. -/
+theorem sharedLDFromMigration_eq_fstFromTau (M : ℝ) :
+    sharedLDFromMigration M = fstFromTau M := rfl
+
 /-- The derived shared LD fraction equals `sharedLDFromMigration M`. This
     closes the loop: the formula M/(1+M) is not an assumption but follows
     from the migration-drift Fst equilibrium. -/
@@ -5364,7 +5465,15 @@ theorem effectiveSymmetricMigration_between (m₁₂ m₂₁ : ℝ)
     `+0.24%` to `+0.37%` against the finite-population retention. The sibling
     quantities `LDDecayTheory.admixtureLD` and
     `CovarianceStructure.admixtureLDTwoLocus` are EXACT to `2.8e-17` and need
-    nothing. -/
+    nothing.
+
+    Power: the comparison in
+    `validation/empirical/differential/cluster/fam_admixture.py` runs the
+    per-generation retention at `r = 0, 0.0025, 0.02, 0.1, 0.5` with `Ne = 200`,
+    where this body predicts `1.000000`, `0.997500`, `0.980000`, `0.900000` and
+    `0.500000` against measured `0.997575`, `0.994828`, `0.977596`, `0.896658`
+    and `0.506154`. The grid straddles `1/(2Ne)`, so the drift factor is visible
+    rather than swamped, and the prediction covers half the unit interval. -/
 noncomputable def admixtureLDDecay (r : ℝ) (generations_since : ℕ) : ℝ :=
   (1 - r) ^ generations_since
 

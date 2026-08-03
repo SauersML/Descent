@@ -266,7 +266,11 @@ verified the hard way:
     files, inspect `git diff --cached --name-status` by hand before committing.
 -/
 
-local instance : Fact (2 ≤ 2) := ⟨by decide⟩
+/-- The two-locus block has exactly two loci, so the `2 ≤ t` premise carried by the
+two-locus coalescent theorems in `Calibrator.DGP` is discharged here by computation.
+It was previously supplied as a `local instance : Fact (2 ≤ 2)`; a `Fact` instance is
+resolved silently and so kept the premise out of every signature that depended on it. -/
+private theorem twoLocusBlockSize : (2 : ℕ) ≤ 2 := le_refl 2
 
 /-
 Proof policy: do not add theorems whose conclusion merely repackages a premise
@@ -277,7 +281,7 @@ than retained as named results.
 
 
 /-- Concrete `2 × 2` specialization of the two-locus coalescent covariance-gap theorem. -/
-theorem twoLocusCoalescent_covariance_gap_lower_bound_proved
+theorem twoLocusCoalescent_covariance_gap_lower_bound_dim_two
     (ibdWeight recombRate : ℝ)
     (tSource tTarget : ℕ)
     (h_time : tSource ≤ tTarget) :
@@ -285,13 +289,13 @@ theorem twoLocusCoalescent_covariance_gap_lower_bound_proved
         (ibdWeight * discreteRecombinationSurvival recombRate tSource *
           (1 - discreteRecombinationSurvival recombRate (tTarget - tSource))) ^ 2 ≤
       frobeniusNormSq
-        (twoLocusCoalescentCovarianceMatrix (t := 2) ibdWeight recombRate tSource -
-          twoLocusCoalescentCovarianceMatrix (t := 2) ibdWeight recombRate tTarget) :=
+        (twoLocusCoalescentCovarianceMatrix twoLocusBlockSize ibdWeight recombRate tSource -
+          twoLocusCoalescentCovarianceMatrix twoLocusBlockSize ibdWeight recombRate tTarget) :=
   twoLocusCoalescent_covariance_gap_lower_bound
-    (t := 2) ibdWeight recombRate tSource tTarget h_time
+    twoLocusBlockSize ibdWeight recombRate tSource tTarget h_time
 
 /-- Concrete `2 × 2` positivity corollary for the two-locus coalescent witness. -/
-theorem covariance_mismatch_pos_of_twoLocusCoalescent_proved
+theorem covariance_mismatch_pos_of_twoLocusCoalescent_dim_two
     (ibdWeight recombRate : ℝ)
     (tSource tTarget : ℕ)
     (h_ibd_pos : 0 < ibdWeight)
@@ -300,10 +304,10 @@ theorem covariance_mismatch_pos_of_twoLocusCoalescent_proved
     (h_time : tSource < tTarget) :
     0 <
       frobeniusNormSq
-        (twoLocusCoalescentCovarianceMatrix (t := 2) ibdWeight recombRate tSource -
-          twoLocusCoalescentCovarianceMatrix (t := 2) ibdWeight recombRate tTarget) :=
+        (twoLocusCoalescentCovarianceMatrix twoLocusBlockSize ibdWeight recombRate tSource -
+          twoLocusCoalescentCovarianceMatrix twoLocusBlockSize ibdWeight recombRate tTarget) :=
   covariance_mismatch_pos_of_twoLocusCoalescent
-    (t := 2) ibdWeight recombRate tSource tTarget
+    twoLocusBlockSize ibdWeight recombRate tSource tTarget
     h_ibd_pos h_recomb_pos h_recomb_lt_one h_time
 
 
@@ -368,15 +372,15 @@ theorem source_target_erm_differ_proved :
 
 
 /-- Rigorous `2 × 2` target-`R²` drop proof using the two-locus coalescent witness. -/
-theorem target_r2_drop_of_twoLocusCoalescent_proved
+theorem target_r2_drop_of_twoLocusCoalescent_dim_two
     (mseSource mseTarget varY lam : ℝ)
     (ibdWeight recombRate : ℝ)
     (tSource tTarget : ℕ)
     (h_mse_gap_lb :
       lam *
           frobeniusNormSq
-            (twoLocusCoalescentCovarianceMatrix (t := 2) ibdWeight recombRate tSource -
-              twoLocusCoalescentCovarianceMatrix (t := 2) ibdWeight recombRate tTarget) ≤
+            (twoLocusCoalescentCovarianceMatrix twoLocusBlockSize ibdWeight recombRate tSource -
+              twoLocusCoalescentCovarianceMatrix twoLocusBlockSize ibdWeight recombRate tTarget) ≤
         mseTarget - mseSource)
     (h_lam_pos : 0 < lam)
     (h_varY_pos : 0 < varY)
@@ -386,7 +390,7 @@ theorem target_r2_drop_of_twoLocusCoalescent_proved
     (h_time : tSource < tTarget) :
     r2FromMSE mseTarget varY < r2FromMSE mseSource varY :=
   target_r2_drop_of_twoLocusCoalescent
-    (t := 2) mseSource mseTarget varY lam
+    twoLocusBlockSize mseSource mseTarget varY lam
     ibdWeight recombRate tSource tTarget
     h_mse_gap_lb h_lam_pos h_varY_pos
     h_ibd_pos h_recomb_pos h_recomb_lt_one h_time
@@ -395,9 +399,11 @@ section NoAxioms
 
 variable {t : ℕ}
 
-/-- Abstract API wrapper: any concrete witness for the demographic covariance lower bound
-    yields strict covariance mismatch in arbitrary matrix dimension. -/
-theorem covariance_mismatch_pos_of_fst_and_sparse_array_proved
+/-- Root-level restatement of `DGP.covariance_mismatch_pos_of_fst_and_sparse_array`, with
+    the same premises: a demographic covariance lower bound and its positivity side
+    conditions. It is primed rather than suffixed `_proved` because nothing here is
+    discharged -- the premises are the ones the `DGP` theorem already carries. -/
+theorem covariance_mismatch_pos_of_fst_and_sparse_array'
     (sigmaSource sigmaTarget : Matrix (Fin t) (Fin t) ℝ)
     (fstSource fstTarget recombRate arraySparsity kappa : ℝ)
     (h_cov_lb :
@@ -412,9 +418,10 @@ theorem covariance_mismatch_pos_of_fst_and_sparse_array_proved
     sigmaSource sigmaTarget fstSource fstTarget recombRate arraySparsity kappa
     h_cov_lb h_fst h_recomb_pos h_sparse_pos h_kappa_pos
 
-/-- Abstract API wrapper: once a concrete witness supplies covariance and MSE lower bounds,
-    target `R²` strictly drops in arbitrary matrix dimension. -/
-theorem target_r2_drop_of_fst_and_sparse_array_proved
+/-- Root-level restatement of `DGP.target_r2_drop_of_fst_and_sparse_array`: once covariance
+    and MSE lower bounds are supplied, target `R²` strictly drops in arbitrary matrix
+    dimension. Primed, not `_proved`: the covariance and MSE bounds remain premises. -/
+theorem target_r2_drop_of_fst_and_sparse_array'
     (mseSource mseTarget varY lam : ℝ)
     (sigmaSource sigmaTarget : Matrix (Fin t) (Fin t) ℝ)
     (fstSource fstTarget recombRate arraySparsity kappa : ℝ)
@@ -431,14 +438,14 @@ theorem target_r2_drop_of_fst_and_sparse_array_proved
     (h_kappa_pos : 0 < kappa) :
     r2FromMSE mseTarget varY < r2FromMSE mseSource varY := by
   have h_mismatch : 0 < frobeniusNormSq (sigmaSource - sigmaTarget) :=
-    covariance_mismatch_pos_of_fst_and_sparse_array_proved
+    covariance_mismatch_pos_of_fst_and_sparse_array'
       sigmaSource sigmaTarget fstSource fstTarget recombRate arraySparsity kappa
       h_cov_lb h_fst h_recomb_pos h_sparse_pos h_kappa_pos
   exact target_r2_strictly_decreases_of_covariance_mismatch
     mseSource mseTarget varY lam sigmaSource sigmaTarget
     h_mse_gap_lb h_lam_pos h_mismatch h_varY_pos
 
-/-! ### `ld_decay_implies_nonlinear_calibration_proved` -- READ BEFORE TOUCHING ITS INPUTS
+/-! ### `ld_decay_implies_nonlinear_calibration_of_exp_tagging` -- READ BEFORE TOUCHING ITS INPUTS
 
 This theorem is the consumer of `LDDecayMechanism` and `decaySlope` in
 `Calibrator.DGP`, and it is the ONLY one. It also lives in `proofs/Calibrator.lean`, the
@@ -469,7 +476,7 @@ entire time; only the identifier search missed it.
 
 /-- Rigorous proof that exponential LD decay cannot be fit by a linear slope calibration.
     Non-affineness is derived from three explicit distances rather than assumed. -/
-theorem ld_decay_implies_nonlinear_calibration_proved {k : ℕ} [Fintype (Fin k)]
+theorem ld_decay_implies_nonlinear_calibration_of_exp_tagging {k : ℕ} [Fintype (Fin k)]
     (mech : LDDecayMechanism k)
     (lambda : ℝ) (h_lambda_pos : 0 < lambda)
     (h_tagging : mech.tagging_efficiency = fun d ↦ Real.exp (-lambda * d))

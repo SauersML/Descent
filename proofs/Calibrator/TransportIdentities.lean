@@ -423,7 +423,7 @@ theorem secondMoment_eq_covariance_of_centered
   unfold secondMomentMatrix covarianceMatrix
   simp [covariance_eq_expect_mul_sub_means, hcentered]
 
-theorem master_transport_theorem
+theorem master_transport_identity
     (E : ExpFunctional Ω)
     (X : Ω → J → ℝ) (Y : Ω → ℝ)
     (wStar w : J → ℝ)
@@ -511,7 +511,7 @@ theorem optimalWeightsFromMoments_normal_equations
   rw [hsub, E.eval_sub, hxy, hpred, hw]
   ring
 
-theorem master_transport_theorem_closed_form
+theorem master_transport_identity_closed_form
     (sigmaInv : Matrix J J ℝ)
     (E : ExpFunctional Ω)
     (X : Ω → J → ℝ) (Y : Ω → ℝ)
@@ -523,7 +523,7 @@ theorem master_transport_theorem_closed_form
         + dot (fun i ↦ w i - optimalWeightsFromMoments sigmaInv E X Y i)
             ((covarianceMatrix E X).mulVec
               (fun i ↦ w i - optimalWeightsFromMoments sigmaInv E X Y i)) := by
-  apply master_transport_theorem E X Y (optimalWeightsFromMoments sigmaInv E X Y) w
+  apply master_transport_identity E X Y (optimalWeightsFromMoments sigmaInv E X Y) w
   · exact optimalWeightsFromMoments_normal_equations sigmaInv E X Y hcentered hsigmaInv
   · exact hcentered
 
@@ -873,7 +873,7 @@ theorem precision_eq_prevalence_recall_fpr (c : ConfusionMatrix) :
   unfold precision
   rfl
 
-theorem constant_precision_construction
+theorem constant_precision_of_fpr_choice
     {π p r : ℝ}
     (hnum : π * r ≠ 0)
     (hpi : 1 - π ≠ 0)

@@ -259,14 +259,27 @@ model rather than part of the presentation.  The other order is
 relates the two.
 
     Empirical status: VALIDATED (deterministic iteration reproduces the fixed
-    point to all digits reported, s = 0.1 m = 0.05 -> 0.45000). -/
+    point to all digits reported, s = 0.1 m = 0.05 -> 0.45000).
+
+    Power: iterated over the four cells `(s, m) = (.1, .05), (.1, .08), (.1, .1),
+    (.2, .4)` this map rests at `0.45000`, `0.12000`, `0` and `0`, so the design
+    spans the maintained regime and the absorbing one. The migration-first
+    ordering rests at `0.47368` and `0.13043` on the first two of those cells,
+    which is the separation that makes the convention checkable rather than
+    stylistic. -/
 noncomputable def continentIslandStepSelectionFirst (s m p : ℝ) : ℝ :=
   (1 - m) * (p * (1 + s) / (1 + s * p))
 
 /-- The same generation with the migration step first.
 
     Empirical status: VALIDATED (iteration gives 0.47368 at s = 0.1, m = 0.05,
-    matching this map's fixed point exactly). -/
+    matching this map's fixed point exactly).
+
+    Power: over the same four cells `(s, m) = (.1, .05), (.1, .08), (.1, .1),
+    (.2, .4)` this map rests at `0.47368`, `0.13043`, `0` and `0`, against the
+    selection-first ordering's `0.45000` and `0.12000` on the first two. The
+    span covers both the maintained and the absorbing regime, and the two
+    orderings are separated at every cell where the allele survives. -/
 noncomputable def continentIslandStepMigrationFirst (s m p : ℝ) : ℝ :=
   ((1 - m) * p) * (1 + s) / (1 + s * ((1 - m) * p))
 
@@ -283,7 +296,13 @@ lost outright and the equilibrium is the boundary value `0`, which
 `continentIslandStep_zero` confirms is itself a fixed point.
 
     Empirical status: VALIDATED (0.45000, 0.12000, 0, 0 against iteration at
-    (s, m) = (.1, .05), (.1, .08), (.1, .1), (.2, .4)). -/
+    (s, m) = (.1, .05), (.1, .08), (.1, .1), (.2, .4)).
+
+    Power: the prediction spans `0.45000` down to `0` across those four cells,
+    crossing the absorbing boundary within the design, so the `max` and the
+    interior formula are both exercised. The migration-first closed form gives
+    `0.47368` and `0.13043` where this one gives `0.45000` and `0.12000`, so the
+    check also separates the two orderings. -/
 noncomputable def selectionMigrationEquilibrium (s m : ℝ) : ℝ :=
   max 0 ((s - m - m * s) / s)
 
@@ -298,7 +317,12 @@ under either ordering.
     Empirical status: VALIDATED (iteration gives 0.47368 at s = 0.1, m = 0.05,
     matching this closed form; the selection-first convention rests at 0.45000
     on the same parameters, which is the composition convention showing up in
-    the fourth decimal). -/
+    the fourth decimal).
+
+    Power: across `(s, m) = (.1, .05), (.1, .08), (.1, .1), (.2, .4)` this form
+    predicts `0.47368`, `0.13043`, `0` and `0`, spanning the maintained regime
+    and the absorbing one, against the selection-first form's `0.45000` and
+    `0.12000` where the allele survives. -/
 noncomputable def selectionMigrationEquilibriumMigrationFirst (s m : ℝ) : ℝ :=
   max 0 ((s - m - m * s) / (s * (1 - m)))
 
@@ -514,7 +538,13 @@ theorem wrightFIT_eq_pairwiseFstFromBranches (a b : ℝ) :
     Denotes: within-population heterozygosity loss. The same formula appears under
     `heterozygosityLossFromDrift` here and `founderHeterozygosityLoss` in
     `DemographicHistory`; all three now name the quantity rather than leaving the
-    formula to fix it, which it cannot. -/
+    formula to fix it, which it cannot.
+
+    Power: the retention this formula predicts spans `0.9048`, `0.6065` and
+    `0.1353` at `t = 200`, `1000` and `4000` with `Ne = 1000` — nearly the whole
+    unit interval — while the measurement at mutation-drift balance stays at
+    `1.025` across all three times. The design therefore has the power to
+    separate the two regimes, which is how the falsification was reached. -/
 noncomputable def heterozygosityLossFromDrift (t : ℕ) (Ne : ℝ) : ℝ :=
   1 - (1 - 1 / (2 * Ne)) ^ t
 

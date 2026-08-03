@@ -296,10 +296,10 @@ theorem precision_recall_divergence_exists :
   · rfl
   constructor
   · simpa using
-      (ConfusionMatrix.constant_precision_construction
+      (ConfusionMatrix.constant_precision_of_fpr_choice
         (π := 1 / 2) (p := 1 / 2) (r := 1 / 4) (by norm_num) (by norm_num) (by norm_num))
   · simpa using
-      (ConfusionMatrix.constant_precision_construction
+      (ConfusionMatrix.constant_precision_of_fpr_choice
         (π := 1 / 2) (p := 1 / 2) (r := 1 / 3) (by norm_num) (by norm_num) (by norm_num))
 
 end Question3

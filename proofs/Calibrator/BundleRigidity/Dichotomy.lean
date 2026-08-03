@@ -186,6 +186,16 @@ Both constants of the falsifier come from this one definition: the Bézout const
 alternating combination of `χ` and the weight defect is a ratio of `χ`. -/
 noncomputable def chi (P Q : ι → ℝ) (w : List ι) : ℝ := prodWeight P w / prodWeight Q w
 
+/-- **The character and the weight ratio are one map, read in opposite directions.**
+
+`weightRatio P Q` divides the `Q`-product by the `P`-product and `chi P Q` divides the
+`P`-product by the `Q`-product, so each is the other with its two weight families
+exchanged. Both names stay, because the defect is a ratio of weight ratios and the Bézout
+constant is an alternating combination of characters; what this forbids is the two
+spellings drifting apart. -/
+theorem chi_eq_weightRatio_swap (P Q : ι → ℝ) (w : List ι) :
+    chi P Q w = weightRatio Q P w := rfl
+
 /-- A product of positive weights along a word is positive. -/
 theorem prodWeight_pos (P : ι → ℝ) (hP : ∀ i, 0 < P i) (w : List ι) : 0 < prodWeight P w := by
   induction w with

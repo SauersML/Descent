@@ -157,6 +157,21 @@ noncomputable def extra_algebraic_guard_adds_nothing {trueRetention wrongRetenti
   holds := rfl
   fails := hne
 
+/-- The enlarged suite, spelled out the way `no_guard_stack_criterion` spells out the
+original: no rule reading the structural guards together with the added one decides
+whether the retention premise is right.
+
+Stated because a blindness witness that no criterion theorem consumes proves nothing about
+criteria -- it is a record with the right fields until something applies the law to it. -/
+theorem no_enlarged_guard_stack_criterion {trueRetention wrongRetention : ℝ}
+    (hne : wrongRetention ≠ trueRetention)
+    (newGuard : ℝ → Prop) (hnew : ∀ r, newGuard r)
+    {Verdict : Type*} (combine : ((StructuralGuard → Prop) × Prop) → Verdict) :
+    ¬ ∃ accept : Verdict → Prop,
+        ∀ r : ℝ, r = trueRetention ↔
+          accept (combine (fun g : StructuralGuard ↦ g.verdict r, newGuard r)) :=
+  (extra_algebraic_guard_adds_nothing hne newGuard hnew).no_criterion_of_factors combine
+
 /-!
 ## 3. The criterion a new guard must meet
 
@@ -300,7 +315,8 @@ value on allele dosage under this development's own `HardyWeinbergModel`. So the
 this instance proves undecidable is the coefficient a polygenic score fits, not an
 abstraction standing in for it.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: NOT AN EMPIRICAL CLAIM -- a proof object: it produces a
+    `ProbeBlindness` witness, not a quantity. -/
 noncomputable def averageEffect_blind_to_dominance {δ : ℝ} (hδ : δ ≠ 0) (a : ℝ) :
     ProbeBlindness OneLocusArchitecture.averageEffect (fun m ↦ m.d = 0) where
   positive := ⟨a, 0, 1 / 2⟩

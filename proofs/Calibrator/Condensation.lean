@@ -202,9 +202,7 @@ Gaussian.
 
 /-- The critical degree `m* = log N / c`. Below it, chaos is Lindeberg-democratic;
 above it, the variance is carried by values too large ever to be witnessed among `N`
-samples and the observed sum is empty.
-
-    Empirical status: UNTESTED. -/
+samples and the observed sum is empty. -/
 noncomputable def criticalDegree (N c : ℝ) : ℝ := Real.log N / c
 
 /-- Subcriticality is exactly `c * m < log N`. -/

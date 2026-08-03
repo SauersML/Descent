@@ -1224,7 +1224,7 @@ theorem firstTwoLags_geometric_sensitivity_det
 amplitude, retaining lag zero and lag one locally identifies both amplitude and
 persistence.  In applications these are the leading strength and decay-scale coordinates
 of LD, IBD sharing, or ancestry-tract persistence. -/
-theorem firstTwoLags_complete_geometric_dependence
+theorem firstTwoLags_injective_of_amplitude_ne_zero
     (amplitude persistence : ℝ) (hamplitude : amplitude ≠ 0) :
     Function.Injective
       (lagObservationDerivative firstTwoLags

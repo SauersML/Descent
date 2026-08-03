@@ -672,10 +672,25 @@ noncomputable def maxSafeEpistaticOrder (N q : ℝ) : ℝ :=
 theorem maxSafeEpistaticOrder_eq_criticalDegree (N q : ℝ) :
     maxSafeEpistaticOrder N q = criticalDegree N (hweMellinDrift q) := rfl
 
+/-- **The Hardy-Weinberg Mellin drift is strictly positive at every polymorphic
+frequency.**
+
+`hweMellinDrift q = E[X² log X²]` for the standardized HWE genotype `X`, whose second
+moment is `1` (`hwe_variance_eq`). Jensen on `x ↦ x log x` therefore gives `≥ 0`, with
+equality only if `X²` is almost surely `1`; for `0 < q < 1` the three genotype values
+`(1-2q)²/(2q(1-q))`, `2q/(1-q)`, `2(1-q)/q` are never all `1`, so the inequality is
+strict. Neither half is formalised here, and every theorem below that needs a positive
+drift used to take it as the premise `hc : 0 < hweMellinDrift q` — a fact about a
+function this file defines, received rather than proved. Stated and admitted so the
+debt is kernel-visible. -/
+theorem hweMellinDrift_pos (q : ℝ) (hq0 : 0 < q) (hq1 : q < 1) :
+    0 < hweMellinDrift q := by
+  sorry
+
 /-- Subcriticality (the Gaussian surrogate is valid) is exactly `m * c(q) < log N`. -/
-theorem epistatic_order_safe_iff {N q m : ℝ} (hc : 0 < hweMellinDrift q) :
+theorem epistatic_order_safe_iff {N q m : ℝ} (hq0 : 0 < q) (hq1 : q < 1) :
     m < maxSafeEpistaticOrder N q ↔ hweMellinDrift q * m < Real.log N :=
-  subcritical_iff hc
+  subcritical_iff (hweMellinDrift_pos q hq0 hq1)
 
 /-- **A drift above the Gaussian constant is a safe order below the Gaussian value.**
 

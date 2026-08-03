@@ -649,4 +649,41 @@ noncomputable def fourAtom (v A B c : ℝ) (hv : 0 ≤ v) (hA : A ^ 2 = 1 + v)
       rw [show (-B) ^ 2 = B ^ 2 by ring, hB, show (1 : ℝ) - v - 1 = -v by ring, abs_neg]
       exact abs_of_nonneg hv
 
+/-!
+## The three families, with no parameter left free
+
+Each construction above still takes its atoms abstractly -- `threeAtomWitness_threeFifths`
+wants a `B` with `B² = 2/5`, `threeAtomAtOne` an `A` with `A² = 2`, `fourAtom` both. A
+construction parameterized that way refutes nothing on its own: the caller still has to
+supply the square roots, and until someone does, the correction to the upstream `d ≤ 3`
+claim is a family conditional on an unmet hypothesis rather than an existence statement.
+
+The three corollaries below supply them, so the counterexamples stand as closed claims.
+They do NOT discharge `SingleModulus.nonempty`, which is about `SingleModulus 2 0` and
+remains admitted; these inhabit `3 (3/5)`, `3 1` and `4 v` for `0 < v < 1`.
+-/
+
+/-- **The `v = 3/5` three-atom family exists**, at `B = √(2/5)`. -/
+theorem nonempty_singleModulus_three_threeFifths :
+    Nonempty (SingleModulus 3 (3 / 5 : ℝ)) :=
+  ⟨threeAtomWitness_threeFifths (Real.sqrt (2 / 5))
+    (Real.sq_sqrt (by norm_num)) (Real.sqrt_pos.mpr (by norm_num))⟩
+
+/-- **The `v = 1` three-atom family exists**, at `A = √2`. This is the case the upstream
+ratio argument could not reach at all, since `√((1+v)/(1-v))` is undefined at `v = 1`. -/
+theorem nonempty_singleModulus_three_one :
+    Nonempty (SingleModulus 3 (1 : ℝ)) :=
+  ⟨threeAtomAtOne (Real.sqrt 2) (Real.sq_sqrt (by norm_num))
+    (Real.sqrt_pos.mpr (by norm_num))⟩
+
+/-- **The four-atom line is nonempty for every `0 < v < 1`**, at `c = 0` -- the midpoint
+of the closed parameter interval, where all four masses are exactly `1/4`. -/
+theorem nonempty_singleModulus_four (v : ℝ) (hv0 : 0 < v) (hv1 : v < 1) :
+    Nonempty (SingleModulus 4 v) :=
+  ⟨fourAtom v (Real.sqrt (1 + v)) (Real.sqrt (1 - v)) 0 hv0.le
+    (Real.sq_sqrt (by linarith)) (Real.sq_sqrt (by linarith))
+    (Real.sqrt_pos.mpr (by linarith)) (Real.sqrt_pos.mpr (by linarith))
+    (Real.sqrt_lt_sqrt (by linarith) (by linarith))
+    (by norm_num)⟩
+
 end Calibrator.BundleRigidity

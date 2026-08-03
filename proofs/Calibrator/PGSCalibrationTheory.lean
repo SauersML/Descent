@@ -864,9 +864,9 @@ theorem cross_ancestry_exact_metric_profile_from_shift_budget
           metric (cal.observedMean Pop.target)).auc := by
     rw [targetMetricProfileFromSourceWeights_auc,
       sourceMetricProfileFromSourceWeightsAtPrevalence_auc,
-      targetEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart
+      targetEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart_of_lt_one
         metric h_target_r2_unit.2,
-      sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart
+      sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart_of_lt_one
         metric h_source_r2_unit.2]
     exact equalVarianceGaussianAUCFromExplainedR2_strictMonoOn_unitInterval
       h_target_r2_unit h_source_r2_unit h_r2_drop
@@ -1007,6 +1007,27 @@ structure CrossPopulationGenerationalCalibrationModel (p q : ℕ) where
   deploymentInterceptShiftAt : ℕ → ℝ
   baseTagMean : Fin p → ℝ
   targetTagMeanAt : ℕ → Fin p → ℝ
+
+/-- **The generational calibration state is inhabited**, at every panel size `(p, q)`.
+
+    The only field carrying obligations is `metric`, and it is supplied by
+    `CrossPopulationGenerationalModel.witness` rather than assumed. The remaining
+    fields are the flat state: no observed-mean shift, no intercept drift, and
+    equal tag means in the two populations at every generation — the configuration
+    in which the calibration profile is exactly the source one. It establishes
+    that the generational results below are about something; a state with genuine
+    drift is what they are for. -/
+noncomputable def CrossPopulationGenerationalCalibrationModel.witness (p q : ℕ) :
+    CrossPopulationGenerationalCalibrationModel p q where
+  metric := CrossPopulationGenerationalModel.witness p q
+  baseObservedMean := 0
+  prevalenceShiftAt := fun _ ↦ 0
+  environmentalObservedShiftAt := fun _ ↦ 0
+  geneticObservedShiftAt := fun _ ↦ 0
+  baseDeploymentIntercept := 0
+  deploymentInterceptShiftAt := fun _ ↦ 0
+  baseTagMean := fun _ ↦ 0
+  targetTagMeanAt := fun _ _ ↦ 0
 
 /-- **Mean tag genotype in a population at generation `t`.** The source state is fixed, so
 the source slice ignores `t`; indexing both populations the same way is what lets the
@@ -1233,9 +1254,9 @@ theorem cross_ancestry_auc_drop_and_citl_worsening_of_r2_drop_and_shift_budget
         (sourceMetricProfileFromSourceWeightsAtTargetPrevalence metric).auc := by
     rw [targetMetricProfileFromSourceWeights_auc,
       sourceMetricProfileFromSourceWeightsAtTargetPrevalence_auc,
-      targetEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart
+      targetEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart_of_lt_one
         metric h_target_r2_unit.2,
-      sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart
+      sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart_of_lt_one
         metric h_source_r2_unit.2]
     exact equalVarianceGaussianAUCFromExplainedR2_strictMonoOn_unitInterval
       h_target_r2_unit h_source_r2_unit h_r2_drop
@@ -1472,13 +1493,14 @@ theorem intercept_recalibration_shifts_citl
   ring
 
 /-- Intercept recalibration corrects CITL exactly when the fitted intercept
-    equals the original CITL. -/
+    equals the original CITL. The fitted intercept is written out rather than
+    assumed of a free variable, so nothing is received from the caller. -/
 theorem intercept_recal_corrects_citl
-    (mean_obs mean_pgs new_intercept : ℝ)
-    (h_correction : new_intercept = calibrationInTheLarge mean_obs mean_pgs) :
+    (mean_obs mean_pgs : ℝ) :
     calibrationInTheLarge mean_obs
-      (interceptRecalibrated mean_pgs new_intercept) = 0 := by
-  rw [intercept_recalibration_shifts_citl, h_correction]
+      (interceptRecalibrated mean_pgs
+        (calibrationInTheLarge mean_obs mean_pgs)) = 0 := by
+  rw [intercept_recalibration_shifts_citl]
   ring
 
 /-- **Logistic recalibration.**
@@ -2915,6 +2937,18 @@ noncomputable def thresholdLongitudinalModel
   discount_nonneg := by
     intro _
     norm_num
+
+/-- **The one-step horizon carries no decision model.**
+
+A `LongitudinalTreatmentModel 1` holds only the discount schedule, and over a single
+period both embeddings undiscount it. So the threshold model and the screening model
+produce the identical longitudinal object: everything that separates the two decision
+rules lives in the clinical pathway, not in the horizon. Anyone who later gives one
+embedding a nontrivial discount has to give the other one too, or this stops
+compiling. -/
+theorem thresholdLongitudinalModel_eq_screeningLongitudinalModel
+    (model : ThresholdTreatmentModel) (screening : ScreeningDecisionModel) :
+    thresholdLongitudinalModel model = screeningLongitudinalModel screening := rfl
 
 /-- One-step clinical pathway induced by a scalar risk under the threshold
     treatment model.

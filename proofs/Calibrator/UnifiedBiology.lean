@@ -6,6 +6,7 @@ Authors: Sauers
 import Calibrator.DeclaredInteractionClass
 import Calibrator.DirichletTransfer
 import Calibrator.ErgodicCovariancePencil
+import Calibrator.HorizonCurve
 import Calibrator.PencilEnvironment
 
 namespace Calibrator
@@ -121,6 +122,26 @@ noncomputable def targetAnnotation (y : BinaryBiologicalState) : ℝ :=
 /-- Quality of a source-adapted readout: one exactly when source and target contexts match. -/
 noncomputable def contextMatchQuality
     (x y : BinaryBiologicalState) : ℝ := if x = y then 1 else 0
+
+/-- **The two-context biological witness runs on the horizon-curve kernels.**
+
+`HorizonCurve.stayKernel` is the Kronecker delta on two states, and so are the transition
+that preserves the biological context and the readout quality of a design used in the
+context it was built for — `HorizonCurve.agreement` is that same delta read as an
+efficiency. Four readings, one matrix: the biological witness is not a second two-state
+example but the horizon example under biological names, and a change to either file's
+delta contradicts this. -/
+theorem persistentTransition_contextMatchQuality_agreement_eq_stayKernel
+    (x y : BinaryBiologicalState) :
+    persistentTransition x y = stayKernel x y ∧
+      contextMatchQuality x y = stayKernel x y ∧
+        agreement x y = stayKernel x y :=
+  ⟨rfl, rfl, rfl⟩
+
+/-- **Complete context switching is the horizon curve's swap kernel**, the off-diagonal
+counterpart of the identification above. -/
+theorem switchingTransition_eq_swapKernel (x y : BinaryBiologicalState) :
+    switchingTransition x y = swapKernel x y := rfl
 
 theorem binaryStateWeight_stationary_persistent (y : BinaryBiologicalState) :
     ∑ x, binaryStateWeight x * persistentTransition x y = binaryStateWeight y := by
