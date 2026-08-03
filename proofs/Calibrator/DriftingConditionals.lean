@@ -494,6 +494,49 @@ theorem applyKernelIter_twoStateCurve (switch baseline amplitude : ℝ) (n : ℕ
       congr 1
       ring
 
+/-! ## Forward spectral contraction -/
+
+/-- **A spectral gap contracts every nonconstant finite spectral mixture.**
+
+    If every active relaxation rate is at least `gap`, advancing by a
+    nonnegative horizon `delta` contracts the error energy by at most
+    `exp (-2 * gap * delta)`. No division, logarithm, or differentiability is
+    hidden in the statement. -/
+theorem errorEnergy_forward_le {n : ℕ} (w lam : Fin n → ℝ)
+    (gap t delta : ℝ) (hw : ∀ k, 0 ≤ w k) (hgap : ∀ k, gap ≤ lam k)
+    (hdelta : 0 ≤ delta) :
+    errorEnergy w lam (t + delta) ≤
+      Real.exp (-(2 * gap * delta)) * errorEnergy w lam t := by
+  unfold errorEnergy
+  rw [Finset.mul_sum]
+  refine Finset.sum_le_sum fun k _ ↦ ?_
+  have hdecay : Real.exp (-(2 * lam k * delta)) ≤
+      Real.exp (-(2 * gap * delta)) := by
+    apply Real.exp_le_exp.mpr
+    nlinarith [hgap k]
+  calc
+    w k * Real.exp (-(2 * lam k * (t + delta))) =
+        w k * (Real.exp (-(2 * lam k * t)) *
+          Real.exp (-(2 * lam k * delta))) := by
+      rw [← Real.exp_add]
+      congr 2
+      ring
+    _ ≤ w k * (Real.exp (-(2 * lam k * t)) *
+          Real.exp (-(2 * gap * delta))) := by
+      exact mul_le_mul_of_nonneg_left
+        (mul_le_mul_of_nonneg_left hdecay (Real.exp_pos _).le) (hw k)
+    _ = Real.exp (-(2 * gap * delta)) *
+        (w k * Real.exp (-(2 * lam k * t))) := by ring
+
+/-- A single mode at the gap attains the forward contraction factor exactly. -/
+theorem singleMode_errorEnergy_forward_eq (weight gap t delta : ℝ) :
+    weight * Real.exp (-(2 * gap * (t + delta))) =
+      Real.exp (-(2 * gap * delta)) *
+        (weight * Real.exp (-(2 * gap * t))) := by
+  rw [show -(2 * gap * (t + delta)) =
+    -(2 * gap * t) + -(2 * gap * delta) by ring, Real.exp_add]
+  ring
+
 /-! ## The drifting probit index, and the constraint tying its two surfaces
 
 Under Ornstein-Uhlenbeck drift of the covariate the probit single-index family
@@ -515,6 +558,20 @@ structure OUHorizon where
   time : ℝ
   rate_pos : 0 < rate
   time_nonneg : 0 ≤ time
+
+/-- **The class is inhabited by a closed term**: unit relaxation rate, zero elapsed drift.
+
+    A structure whose every construction takes a hypothesis can still be empty, and then
+    every theorem quantified over it holds vacuously -- kernel-checked, clean axiom report,
+    no content. This is the witness that makes the horizon theorems statements about
+    something. -/
+def OUHorizon.unit : OUHorizon where
+  rate := 1
+  time := 0
+  rate_pos := one_pos
+  time_nonneg := le_refl 0
+
+theorem OUHorizon.nonempty : Nonempty OUHorizon := ⟨OUHorizon.unit⟩
 
 /-- The zero drift horizon at a positive relaxation rate. -/
 def OUHorizon.zero (rate : ℝ) (hrate : 0 < rate) : OUHorizon where
