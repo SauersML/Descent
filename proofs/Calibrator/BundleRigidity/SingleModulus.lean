@@ -161,7 +161,13 @@ noncomputable def SingleModulus.witness : SingleModulus 2 0 where
   mass := fun _ ↦ 1 / 2
   atom_inj := by
     intro i j h
-    fin_cases i <;> fin_cases j <;> norm_num at h ⊢
+    fin_cases i
+    · fin_cases j
+      · rfl
+      · norm_num at h
+    · fin_cases j
+      · norm_num at h
+      · rfl
   mass_pos := fun _ ↦ by norm_num
   mass_sum := by norm_num [Fin.sum_univ_two]
   mean_zero := by norm_num [Fin.sum_univ_two]
