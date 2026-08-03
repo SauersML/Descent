@@ -1,6 +1,0 @@
-seed-stability sweep: 39 specs x 8 independent point-sets
-
-definition                                                 agree  worst excess
-AncestrySpecificPower.genotypeVarianceHWE                  8/8           0.094
-AncestrySpecificArchitecture.driftVariance                 8/8           0.319
-AncestrySpecificArchitecture.expectedFreqDiffSq            8/8           0.787
