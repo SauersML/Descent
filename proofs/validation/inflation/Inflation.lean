@@ -12,8 +12,15 @@
   environment cannot make that mistake: a theorem is a `thmInfo`, its proof is
   an `Expr`, and a field access is a projection whether it was written
   `S.barrier`, `S.1`, or reached through dot notation.
+
+  Writes `proofs/validation/inflation/inflation_results.json`: every hit by
+  name, untruncated, stamped with the revision it was measured at.  Read that
+  file rather than a commit message.  The 12/354/2 figures quoted for this tool
+  were never backed by one and describe a tree 55 commits behind HEAD.
 -/
 import Calibrator
+import Shared.DeclFilter
+import Shared.Results
 
 open Lean Elab Meta Command
 
@@ -62,18 +69,12 @@ def constsOf (e : Expr) : NameSet :=
       * Pattern 4 reported that 0 of 104 carriers are never constructed, which
         is false.  Every structure gets `S.mk.injEq`, `S.eta` and friends
         generated for it, and each of those mentions `S.mk` -- so scanning all
-        constants for the constructor marks every structure as built. -/
-def userWritten (env : Environment) (n : Name) : Bool :=
-  !n.isInternalDetail
-  && !(env.isProjectionFn n)
-  && (match n with
-      | .str _ f => !(f.startsWith "eq_" || f.startsWith "proof_" ||
-                       f.startsWith "match_" ||
-                       ["mk", "injEq", "eta", "sizeOf", "noConfusion",
-                        "noConfusionType", "rec", "recOn", "casesOn", "brecOn",
-                        "below", "ndrec", "toCtorIdx", "ofNat", "sizeOf_spec",
-                        "mk.sizeOf_spec", "ext", "ext_iff"].contains f)
-      | _ => false)
+        constants for the constructor marks every structure as built.
+
+    The definition itself now lives in `Shared.DeclFilter`, shared with the
+    detectors under `proofs/validation/invariants/`.  It used to be a private
+    copy here, one of three that disagreed; see `CROSSCHECK.md` §4. -/
+abbrev userWritten (env : Environment) (n : Name) : Bool := Shared.userWritten env n
 
 /-- Record every carrier whose CONSTRUCTOR appears among these constants.
 
@@ -151,28 +152,63 @@ def run : MetaM Unit := do
       builtInstances := noteConstructors carrierNames cs builtInstances
     | _ => pure ()
 
+  -- Every loop below builds the console line and the stored JSON entry from the
+  -- same values in the same pass.  Not a stylistic choice: a printed total and
+  -- a stored list assembled separately can disagree, and a stored list that
+  -- disagrees with the console is worse than no stored list at all.
   IO.println s!"theorems examined (Calibrator only): {nthm}"
   IO.println s!"assumption-carrying structures      : {carriers.size}"
   IO.println ""
   IO.println "=== PATTERN 1: the proof IS the hypothesis (exact projection)"
   IO.println s!"    {exactHits.size} theorem(s)"
+  let mut exactJson : Array Json := #[]
   for (t, f) in exactHits do
-    IO.println s!"  {t}   [{← whereIs env t}]"
-    IO.println s!"      consumes: {f}   [carrier instance built: {builtInstances.contains f.getPrefix}]"
+    let loc ← whereIs env t
+    let built := builtInstances.contains f.getPrefix
+    IO.println s!"  {t}   [{loc}]"
+    IO.println s!"      consumes: {f}   [carrier instance built: {built}]"
+    exactJson := exactJson.push <| Json.mkObj
+      [ ("theorem", toJson t.toString), ("location", toJson loc),
+        ("consumes", toJson f.toString), ("carrierInstanceBuilt", toJson built) ]
   IO.println ""
   IO.println "=== PATTERNS 2/3: the proof MENTIONS an assumed field"
   let usedTheorems := usesHits.foldl (fun s (t, _) => s.insert t) NameSet.empty
   IO.println s!"    {usedTheorems.size} distinct theorem(s), {usesHits.size} theorem/field pair(s)"
+  let mut usesJson : Array Json := #[]
   for (t, f) in usesHits do
-    IO.println s!"  {t}   [{← whereIs env t}]  <- {f}"
+    let loc ← whereIs env t
+    IO.println s!"  {t}   [{loc}]  <- {f}"
+    usesJson := usesJson.push <| Json.mkObj
+      [ ("theorem", toJson t.toString), ("location", toJson loc),
+        ("field", toJson f.toString) ]
   IO.println ""
   IO.println "=== PATTERN 4: assumption-carrying structures with NO instance built"
   let mut none_ := 0
+  let mut uninhabitedJson : Array Json := #[]
   for (s, fs) in carriers do
     if !builtInstances.contains s then
       none_ := none_ + 1
-      IO.println s!"  {s}   ({fs.size} Prop field(s))  [{← whereIs env s}]"
+      let loc ← whereIs env s
+      IO.println s!"  {s}   ({fs.size} Prop field(s))  [{loc}]"
+      uninhabitedJson := uninhabitedJson.push <| Json.mkObj
+        [ ("structure", toJson s.toString), ("location", toJson loc),
+          ("propFields", toJson (fs.map (fun f => f.toString))) ]
   IO.println s!"    {none_} of {carriers.size} carriers are never constructed"
+
+  Shared.Results.write "proofs/validation/inflation/inflation_results.json" "Inflation"
+    [ ("theoremsExamined", toJson nthm),
+      ("assumptionCarryingStructures", toJson carriers.size),
+      -- Pattern 1 pushes at most once per theorem, so this size IS a theorem count.
+      ("pattern1Count", toJson exactHits.size),
+      ("pattern1", Json.arr exactJson),
+      -- Patterns 2/3 push once per (theorem, field), so the two differ and both
+      -- are stored.  Reporting only the pair count as a theorem count is the
+      -- error that turned an unknown number of theorems into the quoted "354".
+      ("pattern23DistinctTheorems", toJson usedTheorems.size),
+      ("pattern23PairCount", toJson usesHits.size),
+      ("pattern23", Json.arr usesJson),
+      ("pattern4UninhabitedCount", toJson none_),
+      ("pattern4", Json.arr uninhabitedJson) ]
 
 end Inflation
 

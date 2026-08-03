@@ -110,8 +110,12 @@ jobs:
       # an independent provenance or validation-ratchet failure below.  Every
       # gate remains mandatory; this ordering maximizes diagnostic signal from
       # a single remote run.
+      # `ValidationShared` carries the generated-declaration filter and the
+      # results writer that the detectors below import.  Naming only
+      # `Calibrator` leaves those oleans unbuilt and every detector step fails
+      # on an unknown module.
       - name: Build project
-        run: lake build Calibrator
+        run: lake build Calibrator ValidationShared
 
       - name: Verify transitive axiom closure
         run: lake env lean proofs/validation/invariants/AxiomScan.lean

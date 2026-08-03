@@ -17,3 +17,19 @@ lean_lib Calibrator where
   -- incident: see the header of `proofs/Calibrator/CausalInference.lean`,
   -- where 35 unresolved names had silently become implicit parameters.
   leanOptions := #[⟨`autoImplicit, false⟩]
+
+-- The generated-declaration filter and the results writer that the detectors
+-- under `proofs/validation/` share.  A separate library, and deliberately not
+-- part of `Calibrator`:
+--   * the detectors `import Calibrator`, so anything they import must be able to
+--     build BEFORE the corpus does -- these two modules import only `Lean`;
+--   * a proof module must not be able to import its own auditor, which putting
+--     them under the `Calibrator` root would permit.
+-- A default target so a plain `lake build` produces the oleans the detectors
+-- import.  A build that names its targets must name this one too:
+--   lake build Calibrator ValidationShared
+@[default_target]
+lean_lib ValidationShared where
+  srcDir := "proofs/validation"
+  roots := #[`Shared.DeclFilter, `Shared.Results]
+  leanOptions := #[⟨`autoImplicit, false⟩]
