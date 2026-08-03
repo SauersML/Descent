@@ -6,6 +6,7 @@ namespace Calibrator
 
 open MeasureTheory
 open scoped ProbabilityTheory
+open TransportedMetrics (r2FromSignalVariance)
 
 /-!
 # Formal Proofs for Open Questions in PGS Portability

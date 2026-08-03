@@ -91,11 +91,11 @@ theorem identityDirectMetricModel_metrics {q : ℕ}
     (h_mass : 0 < sourceSquaredEffectMass β) :
     r2FromSourceWeights
         (identityDirectMetricModel β outcomeVariance targetPrevalence
-          h_out h_prev_pos h_prev_lt) =
+          h_out h_prev_pos h_prev_lt) Pop.source =
       sourceSquaredEffectMass β / outcomeVariance ∧
     r2FromSourceWeights
         (identityDirectMetricModel β outcomeVariance targetPrevalence
-          h_out h_prev_pos h_prev_lt) =
+          h_out h_prev_pos h_prev_lt) Pop.target =
       sourceSquaredEffectMass β / outcomeVariance ∧
     mechanisticPortabilityRatio
         (identityDirectMetricModel β outcomeVariance targetPrevalence
@@ -219,7 +219,7 @@ noncomputable def targetEffectShiftMetricModel : CrossPopulationMetricModel 1 1 
 cross-covariance changes. -/
 noncomputable def targetContextShiftMetricModel : CrossPopulationMetricModel 1 1 :=
   { baselineMetricModel with
-      contextCrossTarget := ![-(1 / 2)] }
+      contextCross := Pop.withTarget baselineMetricModel.contextCross ![-(1 / 2)] }
 
 /-- Irreducible target mismatch witness. -/
 noncomputable def targetPrevalenceShiftMetricModel : CrossPopulationMetricModel 1 1 :=
@@ -232,8 +232,8 @@ noncomputable def targetPrevalenceShiftMetricModel : CrossPopulationMetricModel 
 target portability changes because new post-split tagging links appear. -/
 noncomputable def novelTargetOnlyTaggingMetricModel : CrossPopulationMetricModel 1 1 :=
   { baselineProxyTagMetricModel with
-      proxyTaggingTarget := !![0]
-      novelProxyTaggingTarget := !![1 / 2] }
+      proxyTagging := Pop.withTarget baselineProxyTagMetricModel.proxyTagging !![0]
+      novelProxyTagging := Pop.withTarget baselineProxyTagMetricModel.novelProxyTagging !![1 / 2] }
 
 /-- Target-only novel untaggable phenotype variance witness: transported score
 moments are unchanged, but target `R²` drops because new target-only causal

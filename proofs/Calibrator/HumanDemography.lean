@@ -77,7 +77,8 @@ theorem neutralDriftR2Ratio_eq (V_A V_E fst : ℝ)
   have hsum : V_A + V_E ≠ 0 := ne_of_gt (add_pos hVA hVE)
   have hVA' : V_A ≠ 0 := ne_of_gt hVA
   unfold neutralDriftR2Ratio presentDayR2 presentDayPGSVariance pgsVarianceFromHet
-  field_simp
+    TransportedMetrics.r2FromSignalVariance
+  field_simp [hden, hsum, hVA']
   ring
 
 /-- **Neutral allele-frequency drift cannot cost more than `F_ST` of the
@@ -200,9 +201,9 @@ theorem taggedDriftR2Ratio_ge_retention (V_A V_E fst shared_ld : ℝ)
       (1 - fst) * shared_ld * (V_A + V_E) /
         ((1 - fst) * shared_ld * V_A + V_E) := by
     unfold taggedDriftR2Ratio presentDayR2MutationDrift presentDayR2
-      presentDayPGSVariance
+      presentDayPGSVariance TransportedMetrics.r2FromSignalVariance
     rw [presentDayPGSVarianceMutationDrift_eq]
-    field_simp
+    field_simp [ne_of_gt hden, hsum, hVA']
     ring
   rw [key, le_div_iff₀ hden]
   nlinarith [mul_nonneg hk0.le (mul_nonneg (by linarith : (0:ℝ) ≤ 1 - (1 - fst) * shared_ld) hVA.le)]
