@@ -1699,7 +1699,13 @@ when estimator noise separates quotient fibres is the continuation, not a theore
   naming the formula. `totalGaussianInformation_mul_estimatorVariance` proves the exact
   known-mean covariance-estimator identity `m·p·Var = 1`. Consequently this experiment's
   variance is `1/(m p)`, not `1/(2m p)`; an additional half in an aggregate risk law would
-  require an explicitly half-scaled loss. The same module proves coding-scale
+  require an explicitly half-scaled loss. Outside Gaussianity,
+  `covarianceScoreInformation_kurtosis` gives the fourth-moment correction and labels it a
+  quasi-score variance rather than silently calling it likelihood information.
+  `diploid_covariance_estimator_variance_eq_gaussian_factor` specializes the corresponding
+  sampling law to standardized Hardy--Weinberg dosage: its covariance-estimation variance
+  is inflated by exactly `(1/[2q(1-q)]-1)/2`, which diverges at the rare-variant boundary.
+  The same module proves coding-scale
   invariance and additivity over independent channels, and supplies both the
   completion-count lower bound and a constructive finite-dimensional criterion:
   selected lag summaries complete a deployment family when their sensitivity matrix is
