@@ -517,38 +517,6 @@ neutral expectation, reflecting pathogen-driven divergent selection.
 
 section ImmuneTraits
 
-/-! **Deleted: `region_disproportionate_variance`.**
-
-This declaration is absent on purpose. It takes `snpFraction < bound` and
-`bound < varianceFraction` and concludes `snpFraction < varianceFraction` by `linarith` —
-transitivity of `<`, with two further hypotheses (`0 < r2_genome_wide`, `0 < n_total_snps`)
-that the proof never uses and that serve only to make the statement look like it is about
-genomes. Nothing in it refers to a region, a SNP count, or selection: substituting any
-three reals gives the same theorem. Its docstring asserted a mechanism ("due to
-balancing/diversifying selection") and quoted numbers ("<1% of SNPs but >10% of immune
-trait variance") that no part of the statement computes or constrains.
-
-A result that repackages a premise is deleted, not renamed. -/
-
-/-! **Deleted: `threshold_sandwich_implies_observed_portability_below_neutral`.**
-
-This declaration is absent on purpose, and for the same reason as the one above. It took
-`port_observed < threshold` and `threshold < port_neutral` and concluded
-`port_observed < port_neutral`: transitivity of `<` on three reals, which is Mathlib's
-`lt_trans`. It was kept as "a small inference step", used by nothing, under a name that
-reads as a claim about observed and neutral portability. A genetics name on `lt_trans` is
-the whole of the defect the deletion above describes, so keeping one instance of it to
-document the other was not a distinction worth drawing. -/
-
-/-! **Deleted: `zero_portability_component_lowers_weighted_average`.**
-
-This declaration is absent on purpose. It proves `(1 - f) * port_rest < port_rest` from
-`0 < f` and `0 < port_rest` — Mathlib's `sub_lt_self`, with `f < 1` and `port_rest ≤ 1`
-carried as hypotheses the proof never uses. The name promises a *weighted average over two
-components*, one of them at zero portability. The statement has one component, no weights
-and no averaging, and the unused `f < 1` is exactly what `(1 - f)` needs to be a weight at
-all. Nothing about immunity, portability or components is formalized. -/
-
 end ImmuneTraits
 
 
@@ -691,19 +659,6 @@ genetic architecture show similar portability patterns.
 -/
 
 section PhenomeWideStructure
-
-/-! **Deleted: three Mathlib lemmas wearing phenome-wide names.**
-
-Two carry a further tell. `factor_lower_bounds_sum_strictly_below_total` takes `f₁ + f₂ ≤ 1`
-and `0 ≤ fᵢ` — the conditions that would make the two numbers *variance shares* — and uses
-neither, so nothing in it is about a decomposition.
-`prediction_error_bounded_by_looser_tolerance` takes `polygenicity` and `selection_signal`
-as real arguments that appear nowhere in its statement: a predictor built from
-architecture, named in the signature and absent from the theorem.
-
-Name that shape, because it is not an unused *hypothesis*. A phantom value parameter
-escapes the unused-variable linter's usual reading and escapes any reviewer skimming the
-conclusion, because the conclusion is where it fails to appear. -/
 
 /-- **Pearson `R²` is strictly below `1` under additive prediction noise.**
     For the scalar model `Y = aX + ε` with `σ²_ε > 0`, the induced

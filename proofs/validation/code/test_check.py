@@ -109,6 +109,55 @@ def GoodAction.witness : GoodAction where
 theorem every_good_action_has_fixed_point (a : GoodAction) : ∃ x : ℕ, x = a.act :=
   a.fixedPoint
 
+-- F3: an assumption wearing instance syntax.
+theorem needs_fact [Fact (1 < 2)] : True := trivial
+
+-- F5: an existential conclusion repackaging an existential premise.
+theorem exists_nonneg (h : ∃ n : ℕ, 0 < n) : ∃ m : ℕ, 0 ≤ m := by
+  obtain ⟨n, hn⟩ := h; exact ⟨n, Nat.zero_le n⟩
+
+-- F6: choice applied to an ASSUMED existence premise. The gap is `h`, not `choose`.
+theorem choose_pos (h : ∃ n : ℕ, 0 < n) : 0 < Classical.choose h :=
+  Classical.choose_spec h
+
+-- F7: the advertised conclusion is a conjunct of the predicate's own definition.
+def isCalibrated (x : ℕ) : Prop := x = 0
+def ValidSetup (x : ℕ) : Prop := 0 ≤ x ∧ isCalibrated x
+
+-- F9: premise and conclusion are the same existential, up to renaming.
+theorem solve_it (h : ∃ s : ℕ, s = 1) : ∃ t : ℕ, t = 1 := h
+
+-- F10: quantified over the empty type, so it says nothing.
+theorem all_empty_good (x : Empty) : False := nomatch x
+
+-- F12: the domain is defined to consist of objects already satisfying the property.
+theorem sub_pos (x : {n : ℕ // 0 < n}) : 0 < x.val := x.property
+
+-- F13: a range advertised as the canonical object, with no isomorphism proved.
+/-- The canonical construction of the object. -/
+def constructedObject : Set ℕ := Set.range (fun n : ℕ => n + 1)
+
+-- F19: a Prop premise hidden in an implicit binder.
+theorem hidden_premise {h : (1 : ℕ) = 1} : True := trivial
+
+-- F20: a standard name redefined locally to mean something else.
+def IsCompact (s : Set ℕ) : Prop := s = ∅
+
+-- F23: existence proved by wrapping a parameter that was handed in.
+structure Carrier where
+  val : ℕ
+
+theorem carrier_nonempty (w : Carrier) : Nonempty Carrier := ⟨w⟩
+
+-- F15: prose asserts a bridge between two definitions; no theorem states it.
+def compressor : ℕ := 2
+
+/-- The map that `compressor` induces on the index. -/
+def compressionMap : ℕ → ℕ := fun n => n + 2
+
+-- F18: `#print axioms` aimed at a Prop DEFINITION rather than at a proof of it.
+#print axioms FamousConjecture
+
 -- F24: a custom axiom.
 axiom deepResult : ∀ n : ℕ, n = n
 
@@ -119,8 +168,9 @@ end Fixture
 # incidental to the planted patterns and are correct: `famous_conjecture` carries a
 # premise under a name claiming a conjecture (F17), and `ratio_nonneg` has an honest
 # side condition alongside its unguarded denominator (F16s).
-POSITIVE_EXPECTED = {"F1", "F1b", "F2", "F4", "F8", "F11", "F16", "F16s", "F17", "F21",
-                     "F22", "F24"}
+POSITIVE_EXPECTED = {"F1", "F1b", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9",
+                     "F10", "F11", "F12", "F13", "F15", "F16", "F16s", "F17", "F18",
+                     "F19", "F20", "F21", "F22", "F23", "F24"}
 
 # --------------------------------------------------------------------------------------
 # Clean mathematics that superficially resembles each of the above.

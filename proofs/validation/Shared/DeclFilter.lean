@@ -8,13 +8,32 @@ import Lean
 /-!
 One answer to the question "did a person write this declaration".
 
-WHY THIS MODULE EXISTS.  Three detectors under `proofs/validation/` each carried
-their own private copy of this filter and no two agreed.  The disagreement was
-not cosmetic: the INFLATION scan in Check.lean excluded projection functions and the constructor
-family, the RFL scan in Check.lean excluded equation lemmas and used the broader
-`Name.isInternalDetail`, and neither list was a superset of the other.  Two tools
-therefore reported totals over different populations while looking equally
-authoritative.  `proofs/validation/code/CROSSCHECK.md` §4 has the full table.
+WHY THIS MODULE EXISTS.  The detectors now merged into
+`proofs/validation/code/Check.lean` each carried their own private copy of this
+filter and no two agreed.  The disagreement was not cosmetic, and the full table
+is below because a filter nobody can audit is how the copies drifted apart:
+
+  ROW                                        INFLATION      RFL / AXIOMS
+  internal test                              isInternal     isInternalDetail (broader)
+  equation lemmas `f.eq_1`, `f.eq_def`       NOT excluded   excluded (startsWith "eq_")
+  `proof_*`, `match_*`                       NOT excluded   excluded
+  projection functions                       excluded       NOT excluded
+  `mk` `rec` `recOn` `casesOn` `eta` `ext`   excluded       NOT excluded
+  `ndrec`, `noConfusion`                     excluded       AXIOMS only; RFL missed both
+
+WHICH WAS RIGHT, PER ROW.  INFLATION was right about projections and
+constructors.  RFL was right about equation lemmas, and its own docstring
+conceded the point INFLATION missed: eleven of its nineteen unfiltered hits were
+equation lemmas and friends, and it had to add `startsWith "eq_"` ALONGSIDE
+`isInternalDetail` -- meaning `isInternalDetail` does not catch them and
+INFLATION's weaker `isInternal` certainly does not either.  So INFLATION's 3393
+"user-written theorems" denominator included every equation lemma in the corpus
+and was inflated.  Conversely RFL and AXIOMS reported `Foo.rec`, `Foo.casesOn`
+and `Foo.ext_iff` as hand-written, which they are not.
+
+NEITHER LIST WAS CORRECT.  This module is their union, which is closer to right
+than either.  That three files in one repository maintained three different
+answers to "did a person write this" was the actual defect.
 
 This module is that filter, once.  It deliberately imports only `Lean`: it must
 never import `Calibrator`, because the detectors import both, and a filter that

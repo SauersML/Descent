@@ -1817,4 +1817,16 @@ proved rows extend it from constants to structural quantities. The first two row
 where the programme is aimed, not where it has landed.
 -/
 
+/-- **The two-mechanism mixture is the corpus's convex-combination map.**
+
+`LatentMechanismCollapse.twoMechanismMixture` weights the mechanism values
+`2/10` and `9/10` by `w` and `1 - w`, which is `Conventions.convexMix` at those
+two points. `spikeAndSlabVariance`, `averagePhaseInteraction` and
+`ancestrySpecificEffect` are already tied to that map; this puts the mixture
+used for latent-mechanism collapse in the same family, so a change to the
+mixing convention in either file fails to compile rather than leaving two
+mixtures that disagree about which weight goes with which point. -/
+theorem twoMechanismMixture_eq_convexMix (w : ℝ) :
+    twoMechanismMixture w = convexMix w (2 / 10) (9 / 10) := rfl
+
 end Calibrator

@@ -15,11 +15,14 @@ import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
 import Mathlib.Analysis.SpecificLimits.Basic
 import Mathlib.Topology.ContinuousMap.Algebra
 import Mathlib.GroupTheory.Perm.Basic
+import Calibrator.BundleRigidity.Coverage
 
 /-!
 # Support-level coverage invariance and slotwise bookkeeping
 
-This module is **self-contained: it imports only Mathlib**.
+This module imports targeted Mathlib modules **and** `Calibrator.BundleRigidity.Coverage`,
+whose one-parameter coverage sets are the one-slot case of the charged tuples defined here
+(`chargedTuples_one_eq_coverers`).
 
 This module proves three finite/set-theoretic ingredients. It does not prove coupled
 injectivity or a singular-value bound.
