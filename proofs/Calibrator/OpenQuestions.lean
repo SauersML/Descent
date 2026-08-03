@@ -199,7 +199,7 @@ theorem pgs_variance_increases_of_large_effect_heterozygosity_gain
   -- ... and that loss is strictly smaller than the large locus's gain.
   have hgain : βL ^ 2 * (pS * (1 - pS) - pS' * (1 - pS'))
       < βL ^ 2 * (pL' * (1 - pL') - pL * (1 - pL)) :=
-    (mul_lt_mul_left hβL).mpr hlarge_gains_more
+    (mul_lt_mul_iff_right₀ hβL).mpr hlarge_gains_more
   nlinarith [hweighted, hgain]
 
 /-- **PGS variance increase + effect decorrelation = compounded R² drop.**
