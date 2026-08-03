@@ -666,6 +666,57 @@ theorem probit_invariant_under_ou (lam t a₀ b₀ x sigma : ℝ) :
   congr 2
   ring_nf
 
+/-! ## Rigidity of the probit link
+
+Theorem 4. Theorem 3 says the probit family is invariant; rigidity says nothing else is. Among
+bounded strictly increasing links, the normal cdf is the only one whose two-parameter family
+survives Gaussian averaging, so the response scale is DERIVED by the dynamics rather than chosen
+by the statistician — which is the claim that makes "use a probit link" a consequence instead of
+a convention.
+
+The two directions are on different footings here. Sufficiency is `probit_link_invariant` and it
+is proved, because it is Theorem 3 rearranged: the averaged probit is a probit, and the new
+parameters are exhibited. Necessity is `link_rigidity` and it is a `sorry`.
+
+That asymmetry is the honest state of the argument. The necessity proof runs through a functional
+equation — differentiate the invariance in the intercept, divide, and the logarithmic derivative
+of the link's density is forced to be affine, after which integrability over the whole line
+forces the leading coefficient negative and the link Gaussian. Each of those steps is real
+analysis this file does not set up, and the unbounded strata the source analysis identifies (the
+affine link, and the exponential link on a half-line) are exactly what the boundedness hypothesis
+excludes. -/
+
+open MeasureTheory ProbabilityTheory in
+/-- **Sufficiency: the probit family is closed under Gaussian averaging**, with the new
+parameters exhibited rather than merely asserted to exist. This is Theorem 3 rearranged into the
+single-index form rigidity is stated against. -/
+theorem probit_link_invariant (lam t a₀ b₀ σ : ℝ) :
+    ∃ a' b' : ℝ, ∀ x,
+      ∫ z, Phi (a₀ * (Real.exp (-(lam * t)) * x + σ * z) + b₀) ∂(gaussianReal 0 1)
+        = Phi (a' * x + b') := by
+  refine ⟨a₀ * Real.exp (-(lam * t)) / Real.sqrt (1 + a₀ ^ 2 * σ ^ 2),
+    b₀ / Real.sqrt (1 + a₀ ^ 2 * σ ^ 2), fun x => ?_⟩
+  rw [probit_invariant_under_ou]
+  congr 1
+  ring
+
+open MeasureTheory ProbabilityTheory in
+/-- **Necessity: no other bounded link survives.** A strictly increasing link onto `(0,1)` whose
+two-parameter family is closed under Gaussian averaging is the normal cdf composed with an affine
+map — the gauge freedom, and nothing more.
+
+    NOT PROVED HERE. Differentiating the invariance in the intercept and dividing forces the
+    logarithmic derivative of the link's density to be affine; integrability over the whole line
+    then forces its leading coefficient negative, which is exactly a Gaussian density. The
+    boundedness hypothesis is what excludes the other two strata — the affine link, and the
+    exponential link viable only on a half-line — so it is load-bearing rather than cosmetic. -/
+theorem link_rigidity (L : ℝ → ℝ) (hmono : StrictMono L)
+    (hbdd : ∀ u, 0 < L u ∧ L u < 1)
+    (hinv : ∀ a b σ : ℝ, 0 < a → 0 < σ → ∃ a' b' : ℝ,
+      ∀ x, ∫ z, L (a * (x + σ * z) + b) ∂(gaussianReal 0 1) = L (a' * x + b')) :
+    ∃ α β : ℝ, 0 < α ∧ ∀ u, L u = Phi (α * u + β) := by
+  sorry
+
 /-! ## The evolution law of the response curve
 
 Theorem 1 of the source analysis: in the frozen-mark coupling the marked and unmarked
