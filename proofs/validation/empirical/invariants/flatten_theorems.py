@@ -199,6 +199,45 @@ def _rewrite_constraint(text: str, name: str, fields: list[str]) -> str:
     return text
 
 
+SIMPLEX = re.compile(
+    r"^\s*([\w'₀-₉]+(?:\s*\+\s*[\w'₀-₉]+)+)\s*=\s*([0-9]+(?:\.[0-9]+)?)\s*$")
+
+
+def eliminate_equalities(concl, hyps, variables):
+    """Solve a mass constraint instead of rejection-sampling against it.
+
+    `ConfusionMatrix` carries `tp + fp + tn + fn = 1`.  Four independently drawn
+    reals satisfy that with probability zero, so every theorem about a confusion
+    matrix -- thirteen of them -- came back `no-admissible-points`, which reads
+    as "the hypotheses are too strong" when the truth is that the sampler was
+    drawing off the constraint surface entirely.
+
+    So the constraint is used rather than tested: solve it for its last summand,
+    substitute that expression everywhere, and drop both the variable and the
+    constraint.  Every remaining point is on the surface by construction."""
+    names = {v for v, _, _ in variables}
+    changed = True
+    while changed:
+        changed = False
+        for h in list(hyps):
+            m = SIMPLEX.match(h)
+            if not m:
+                continue
+            terms = [t.strip() for t in m.group(1).split("+")]
+            if len(set(terms)) != len(terms) or not all(t in names for t in terms):
+                continue
+            elim, rest = terms[-1], terms[:-1]
+            expr = "(" + m.group(2) + "".join(f" - {t}" for t in rest) + ")"
+            pat = re.compile(rf"(?<![\w'₀-₉]){re.escape(elim)}(?![\w'₀-₉])")
+            hyps = [pat.sub(expr, x) for x in hyps if x is not h]
+            concl = pat.sub(expr, concl)
+            variables = [v for v in variables if v[0] != elim]
+            names.discard(elim)
+            changed = True
+            break
+    return concl, hyps, variables
+
+
 def flatten_one(st: dict, structs: dict, shapes: dict,
                 methods: dict) -> tuple[dict | None, str]:
     binders = st.get("binders") or []
@@ -245,6 +284,8 @@ def flatten_one(st: dict, structs: dict, shapes: dict,
             return None, (f"`{name}` survives rewriting -- it is passed to something "
                           "this pass could not expand, so the statement would check "
                           "a different claim")
+
+    concl, hyps, variables = eliminate_equalities(concl, hyps, variables)
 
     out = dict(st)
     out["conclusion"] = concl

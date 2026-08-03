@@ -72,14 +72,35 @@ def _split_binders(text):
     return groups, ""
 
 
+def _cut_value(text):
+    """Everything before the first `:=` at bracket depth zero.
+
+    Depth matters: a structure instance `{ field := v }` inside a statement has
+    a `:=` that does not end the statement."""
+    depth = 0
+    for i, ch in enumerate(text):
+        if ch in "({[":
+            depth += 1
+        elif ch in ")}]":
+            depth -= 1
+        elif ch == ":" and depth == 0 and text[i + 1:i + 2] == "=":
+            return text[:i]
+    return text
+
+
 def parse_statement(block):
     """Return a dict describing one theorem, or None if it is not usable."""
     m = HEAD.match(block)
     if not m:
         return None
     name = m.group(1)
-    head = block.split(":= by")[0]
-    head = head.split(":=\n")[0]
+    # Cut at the first `:=` OUTSIDE brackets.  Splitting on `":= by"` and
+    # `":=\n"`, as this did, misses every term-mode proof written on one line:
+    # `theorem localizedTransferVariance_const ... := rfl` kept `:= rfl` inside
+    # the conclusion and was recorded as untranspilable with a tokeniser
+    # complaint, which reads as a statement outside the fragment rather than a
+    # parser that stopped in the wrong place.
+    head = _cut_value(block)
     head = head[m.end():]
     groups, concl = _split_binders(head)
     if not concl.strip():
