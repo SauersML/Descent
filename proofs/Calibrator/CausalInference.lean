@@ -18,37 +18,87 @@ open MeasureTheory
 open TransportedMetrics (r2FromSignalVariance)
 
 /-!
-# Causal Inference Framework for PGS Portability
+# Arithmetic of the `R²` noise formula, under names that say so
 
-This file formalizes the causal mediation framework for understanding
-PGS portability. Portability loss can be decomposed into direct
-(genetic architecture) and indirect (mediated by environment, LD,
-assortative mating) pathways.
+**THIS FILE CONTAINS NO CAUSAL MATHEMATICS, AND ITS PREVIOUS NAMES CLAIMED OTHERWISE.**
 
-Key results:
-1. Path decomposition of portability loss
-2. Mediation analysis for environmental effects
-3. Do-calculus for interventions on PGS accuracy
-4. Counterfactual portability under hypothetical designs
-5. Causal discovery for portability mechanisms
+An external review found that the file claimed to formalize mediation, counterfactual
+reasoning, causal discovery and do-calculus, while containing **no causal graph, no
+structural causal model, no intervention operator, no counterfactual semantics and no
+identification criterion**. That finding is correct. Every declaration here has been
+renamed to what it proves.
 
-Reference: Wang et al. (2026), Nature Communications 17:942.
+**The arithmetic was and is correct.** Nothing was deleted. The defect was entirely in the
+naming and the surrounding prose, which is the more dangerous kind: a false interpretation
+attached to a true lemma looks machine-checked.
+
+## What is actually proved
+
+Almost everything is one fact about `r2FromSignalVariance v n = v / (v + n)`: it is
+strictly increasing in the signal `v` and strictly decreasing in the noise `n`. The
+theorems instantiate that with different names for the noise term:
+
+* `r2_strictMono_under_ld_noise_reduction`, `r2_strictMono_under_environment_noise_reduction`
+  — removing a positive fraction of a noise component raises `R²`. Formerly named
+  `ld_mediates_portability` and `environment_mediates_portability`. **Subtracting a positive
+  scalar is not mediation**; no mediator variable appears anywhere in the statement.
+* `r2_lt_of_drift_variance_pos`, `r2_lt_of_technical_noise_pos`, `r2_lt_of_sampling_noise_pos`,
+  `r2_lt_of_gxe_noise_pos` — four instances of the same monotonicity, formerly named
+  `counterfactual_*`. **No counterfactual semantics is involved**: there is no twin network,
+  no potential outcome, and nothing is evaluated in a world other than the one described by
+  the formula.
+* `r2_chain_strictMono_of_decreasing_noise` — a chain of four inequalities obtained by
+  ordering hand-chosen denominators. Formerly `intervention_hierarchy`. **There is no
+  intervention operator here**; `do(·)` is never defined, so the ordering is an ordering of
+  expressions, not of interventions.
+* `indirect_eq_total_sub_direct_of_sum` — formerly `mediation_decomposition`. It **assumes**
+  `total = direct + indirect` and rearranges to `indirect = total - direct`. Deleting the
+  proof and substituting the hypothesis gives the same statement, so it is a rearrangement
+  and its name now says so.
+* `each_component_le_total_of_sum_decomp`, `half_lt_share_of_half_lt_part` — likewise
+  rearrangements of an assumed sum and of an assumed inequality.
+* `r2_increments_strictAnti_in_signal` — concavity of `v ↦ v/(v+n)`. This one was honestly
+  named before (`diminishing_marginal_returns`) and is a genuine property of the formula.
+* `r2_strictMono_under_effect_turnover` — genuine monotonicity, since `ρ² v < v` for
+  `0 < ρ < 1`.
+
+## What a causal version would require, and what is absent
+
+None of the following exists in this file, and no result here should be read as evidence
+about any of them: a directed acyclic graph on the variables; structural equations
+assigning each variable a function of its parents and an independent noise term;
+an intervention operator replacing an equation by a constant and deleting incoming edges;
+the interventional distribution that operator induces; a derivation — rather than an
+assumption — of `total = direct + indirect` from those equations; and any identification
+criterion such as backdoor adjustment.
+
+Until those exist, **the biological readings in the docstrings below are interpretations of
+arithmetic, not consequences of a causal model**, and the file name is retained only
+because renaming a file is a larger change than this commit makes.
+
+The corpus's own `Identification.lean` warns that giving a biological name to a formula
+makes a false interpretation look machine-checked. This file was that warning's specimen.
+
+Reference for the biological setting (not for any theorem here):
+Wang et al. (2026), Nature Communications 17:942.
 -/
 
 
 /-!
 ## Path Decomposition of Portability
 
-PGS portability loss can be decomposed into distinct causal pathways,
-each contributing a specific proportion of the total loss.
+Portability loss is written as a sum of named components. The decomposition is an
+ASSUMPTION supplied as a hypothesis, not something derived here; no pathway structure is
+formalized.
 -/
 
-section PathDecomposition
+section SumDecompositionArithmetic
 
 /-- **Total portability loss decomposition.**
     Δ_total = Δ_LD + Δ_MAF + Δ_effect + Δ_env + Δ_technical
-    Each component represents a distinct causal pathway. -/
-theorem total_loss_decomposition
+    Each summand is a named real number. No pathway, graph, or causal claim is formalized;
+    the hypothesis supplies the decomposition and the theorem rearranges it. -/
+theorem each_component_le_total_of_sum_decomp
     (delta_total delta_LD delta_MAF delta_effect delta_env delta_tech : ℝ)
     (h_decomp : delta_total = delta_LD + delta_MAF + delta_effect + delta_env + delta_tech)
     (h_LD : 0 ≤ delta_LD) (h_MAF : 0 ≤ delta_MAF) (h_effect : 0 ≤ delta_effect)
@@ -58,9 +108,10 @@ theorem total_loss_decomposition
     delta_tech ≤ delta_total := by
   constructor <;> [skip; constructor <;> [skip; constructor <;> [skip; constructor]]] <;> linarith
 
-/-- **LD pathway is the largest contributor for most traits.**
-    For non-immune traits, LD mismatch accounts for >50% of portability loss. -/
-theorem ld_dominant_pathway
+/-- **Rearrangement of an assumed inequality.** From `total/2 < part` and `0 < total`,
+    concludes `1/2 < part / total`. The biological reading -- that LD dominates -- is
+    supplied entirely by the hypothesis, not established here. -/
+theorem half_lt_share_of_half_lt_part
     (delta_total delta_LD : ℝ)
     (h_total : 0 < delta_total)
     (h_LD_large : delta_total / 2 < delta_LD)
@@ -69,7 +120,9 @@ theorem ld_dominant_pathway
   rw [div_lt_div_iff₀ (by norm_num : (0:ℝ) < 2) h_total]
   linarith
 
-/-- **Selection pathway dominates for immune traits.**
+/-- **`R²` strictly decreases when the signal is scaled by `ρ² < 1`.** Genuine monotonicity.
+    The identification of `ρ` with immune effect turnover is an interpretation, not a
+    formalized causal claim; no selection process is modelled.
     For immune/pathogen-related traits under divergent selection,
     the effect-turnover factor (ρ < 1) causes additional R² loss
     beyond what drift alone produces. The total immune portability
@@ -81,7 +134,7 @@ theorem ld_dominant_pathway
     We show the immune R² is strictly below the drift-only R²,
     establishing that effect turnover is a genuine additional
     pathway of portability loss. -/
-theorem selection_dominant_for_immune
+theorem r2_strictMono_under_effect_turnover
     (V_A V_E fst ρ : ℝ)
     (hVA : 0 < V_A) (hVE : 0 < V_E)
     (hfst_pos : 0 < fst) (hfst_lt : fst < 1)
@@ -102,42 +155,46 @@ theorem selection_dominant_for_immune
           nlinarith [sq_abs ρ, sq_nonneg ρ]
       _ = presentDayPGSVariance V_A fst := one_mul _
 
-end PathDecomposition
+end SumDecompositionArithmetic
 
 
 /-!
 ## Mediation Analysis
 
-Mediation analysis decomposes the total effect of ancestry
-on PGS accuracy into direct and indirect effects.
+No mediation is formalized here. `effectShare` is the ratio of two reals, and the theorem
+below rearranges an ASSUMED sum. A mediator variable appears nowhere in any statement.
 -/
 
-section MediationAnalysis
+section EffectShareArithmetic
 
-/-- **Total effect = Direct effect + Indirect effect.**
-    TE = DE + IE (in the linear case). -/
-theorem mediation_decomposition
+/-- **Rearrangement of an assumed sum.** Given `total = direct + indirect` as a HYPOTHESIS,
+    concludes `indirect = total - direct`. Replacing the proof body with the hypothesis
+    yields the same statement, so this is arithmetic and not a decomposition theorem. In a
+    real structural causal model the sum would be DERIVED from the structural equations. -/
+theorem indirect_eq_total_sub_direct_of_sum
     (total_effect direct_effect indirect_effect : ℝ)
     (h_decomp : total_effect = direct_effect + indirect_effect) :
     -- Indirect effect is the total minus direct
     indirect_effect = total_effect - direct_effect := by linarith
 
-/-- **Proportion mediated.**
-    PM = IE / TE = indirect / total. -/
-noncomputable def proportionMediated (indirect_effect total_effect : ℝ) : ℝ :=
+/-- **Ratio of two reals.** Named `effectShare` rather than `proportionMediated`: nothing
+    here establishes that the numerator is an indirect effect. -/
+noncomputable def effectShare (indirect_effect total_effect : ℝ) : ℝ :=
   indirect_effect / total_effect
 
-/-- Proportion mediated is in [0,1] when effects are nonneg and indirect ≤ total. -/
-theorem proportion_mediated_in_unit
+/-- `effectShare ie te` lies in [0,1] when `0 ≤ ie`, `0 < te` and `ie ≤ te`. A statement about
+    a ratio of reals; "mediated" is not established anywhere. -/
+theorem effectShare_mem_unit
     (ie te : ℝ)
     (h_ie : 0 ≤ ie) (h_te : 0 < te) (h_le : ie ≤ te) :
-    0 ≤ proportionMediated ie te ∧ proportionMediated ie te ≤ 1 := by
-  unfold proportionMediated
+    0 ≤ effectShare ie te ∧ effectShare ie te ≤ 1 := by
+  unfold effectShare
   constructor
   · exact div_nonneg h_ie (le_of_lt h_te)
   · rw [div_le_one h_te]; exact h_le
 
-/-- **LD mediates ancestry → PGS accuracy.**
+/-- **Removing part of the LD noise term strictly raises `R²`.** This is monotonicity of
+    `v / (v + n)` in `n`, not mediation: no mediator variable occurs in the statement.
     Ancestry → LD structure → PGS weights → Accuracy.
 
     Model: PGS accuracy = r2FromSignalVariance(vSignal, V_E + V_ld_mismatch).
@@ -147,7 +204,7 @@ theorem proportion_mediated_in_unit
     Since 0 < α ≤ 1, the corrected noise is strictly less,
     so R²_corrected > R²_uncorrected by r2FromSignalVariance monotonicity.
     A residual gap to source R² (V_E only) remains when α < 1. -/
-theorem ld_mediates_portability
+theorem r2_strictMono_under_ld_noise_reduction
     (vSignal V_E V_ld α : ℝ)
     (h_sig : 0 < vSignal) (h_VE : 0 < V_E)
     (h_ld : 0 < V_ld) (h_α_pos : 0 < α) (h_α_le : α ≤ 1) :
@@ -167,7 +224,8 @@ theorem ld_mediates_portability
     unfold r2FromSignalVariance
     exact div_lt_div_of_pos_left h_sig (by linarith) (by nlinarith)
 
-/-- **Environment mediates ancestry → PGS accuracy.**
+/-- **Removing part of the environment noise term strictly raises `R²`.** Monotonicity, not
+    mediation.
     Ancestry → Environment → Phenotype → Accuracy.
 
     Model: Total phenotypic variance = V_genetic + V_env.
@@ -178,7 +236,7 @@ theorem ld_mediates_portability
       R²_pheno = r2FromSignalVariance(V_genetic, V_env) < r2FromSignalVariance(V_genetic, 0) = 1.
     This shows environment genuinely reduces predictive accuracy;
     the reduction is derived from the variance decomposition, not assumed. -/
-theorem environment_mediates_portability
+theorem r2_strictMono_under_environment_noise_reduction
     (V_genetic V_env : ℝ)
     (h_gen : 0 < V_genetic) (h_env : 0 < V_env) :
     -- Phenotypic R² is strictly less than 1 (perfect genetic prediction)
@@ -187,25 +245,25 @@ theorem environment_mediates_portability
   rw [div_lt_one (by linarith : 0 < V_genetic + V_env)]
   linarith
 
-end MediationAnalysis
+end EffectShareArithmetic
 
 
 /-!
-## Counterfactual Portability
+## Monotonicity of `R²` when a noise component is absent
 
 What would PGS portability look like under hypothetical
 alternative study designs?
 -/
 
-section CounterfactualPortability
+section NoiseReductionMonotonicity
 
-/-- **Counterfactual: diverse training GWAS.**
+/-- **`R²` is strictly lower when drift variance is positive.**
     If the training GWAS had been done in the target ancestry,
     there is no drift divergence (fst = 0), so presentDayR2
     equals V_A/(V_A + V_E).  Cross-ancestry training with
     fst > 0 gives strictly lower R².  The gap is the
     portability loss attributable to ancestry mismatch. -/
-theorem counterfactual_same_ancestry_perfect
+theorem r2_lt_of_drift_variance_pos
     (V_A V_E fst : ℝ)
     (hVA : 0 < V_A) (hVE : 0 < V_E)
     (hfst_pos : 0 < fst) (hfst_lt : fst < 1) :
@@ -221,12 +279,12 @@ theorem counterfactual_same_ancestry_perfect
       exact mul_lt_mul_of_pos_right (by linarith) hVA
     linarith
 
-/-- **Counterfactual: WGS eliminates technical artifacts.**
+/-- **`R²` is strictly lower when a technical-noise term is present.**
     With array genotyping, imputation error adds noise V_tech to
     the environmental variance, reducing observed R².  WGS removes
     this (V_tech = 0), so the WGS R² exceeds array R².
     The remaining gap from source R² is purely genetic drift. -/
-theorem counterfactual_wgs_residual
+theorem r2_lt_of_technical_noise_pos
     (vSignal V_E V_tech : ℝ)
     (h_sig : 0 < vSignal) (h_VE : 0 < V_E) (h_tech : 0 < V_tech) :
     -- Array R² (with technical noise) < WGS R² (without)
@@ -237,7 +295,7 @@ theorem counterfactual_wgs_residual
   rw [div_lt_div_iff₀ h_denom_arr h_denom_wgs]
   nlinarith
 
-/-- **Counterfactual: infinite sample size.**
+/-- **`R²` is strictly lower when a sampling-noise term is present.**
     With finite sample, winner's curse inflates effect estimates,
     adding noise V_wc to the prediction.  With n → ∞, V_wc → 0.
     We model finite-sample R² as r2FromSignalVariance with signal vSignal
@@ -245,7 +303,7 @@ theorem counterfactual_wgs_residual
     Infinite-sample R² uses noise V_E only.
     The remaining loss (infinite-sample R² vs source R²) is from
     LD mismatch and true effect size differences. -/
-theorem counterfactual_infinite_sample
+theorem r2_lt_of_sampling_noise_pos
     (vSignal V_E V_wc : ℝ)
     (h_sig : 0 < vSignal) (h_VE : 0 < V_E) (h_wc : 0 < V_wc) :
     -- Finite-sample R² < infinite-sample R²
@@ -256,13 +314,13 @@ theorem counterfactual_infinite_sample
   rw [div_lt_div_iff₀ h_denom_fin h_denom_inf]
   nlinarith
 
-/-- **Counterfactual: equalized environments.**
+/-- **`R²` is strictly lower when a GxE noise term is present.**
     GxE interaction adds variance V_gxe to the target phenotype,
     inflating environmental noise from V_E to V_E + V_gxe.
     If environments were equalized (V_gxe = 0), the target R²
     would be higher.  The remaining loss is purely from genetic
     architecture differences (drift, LD, effect turnover). -/
-theorem counterfactual_equal_environments
+theorem r2_lt_of_gxe_noise_pos
     (vSignal V_E V_gxe : ℝ)
     (h_sig : 0 < vSignal) (h_VE : 0 < V_E) (h_gxe : 0 < V_gxe) :
     -- R² with GxE < R² without GxE
@@ -273,7 +331,7 @@ theorem counterfactual_equal_environments
   rw [div_lt_div_iff₀ h_denom_gxe h_denom_eq]
   nlinarith
 
-end CounterfactualPortability
+end NoiseReductionMonotonicity
 
 
 /-!
@@ -299,7 +357,7 @@ section InterventionsForPortability
       Noise = V_E.
     The ordering is derived from the noise levels being strictly decreasing,
     which follows from 0 < α < β < 1 and positivity of components. -/
-theorem intervention_hierarchy
+theorem r2_chain_strictMono_of_decreasing_noise
     (vSig V_E V_ld V_power V_cal α β : ℝ)
     (h_sig : 0 < vSig) (h_VE : 0 < V_E)
     (h_ld : 0 < V_ld) (h_power : 0 < V_power) (h_cal : 0 < V_cal)
@@ -326,7 +384,7 @@ theorem intervention_hierarchy
     the gain from v to v+Δ exceeds the gain from v+Δ to v+2Δ.
     This is because the denominator grows, so each additional unit
     of signal is divided by a larger total variance. -/
-theorem diminishing_marginal_returns
+theorem r2_increments_strictAnti_in_signal
     (v Δ V_E : ℝ)
     (hv : 0 ≤ v) (hΔ : 0 < Δ) (hVE : 0 < V_E) :
     -- Second increment gives less R² gain than the first
