@@ -266,13 +266,23 @@ and vice versa.
 
 section CalibrationVsDiscrimination
 
-/-- **Additive score shifts preserve AUC but change calibration.**
-    AUC depends only on pairwise ranking of scores. Adding a constant offset
-    leaves every pairwise comparison unchanged, so population AUC is
-    invariant. Calibration-in-the-large, however, shifts by exactly the same
-    offset with opposite sign. This is the formal content behind the claim
-    that discrimination does not determine calibration. -/
-theorem auc_independent_of_calibration
+/-- **Additive score shifts preserve AUC and shift CITL by the same offset.**
+
+    AUC depends only on pairwise ranking of scores. Adding a constant offset leaves every
+    pairwise comparison unchanged, so population AUC is invariant. Calibration-in-the-large
+    shifts by exactly that offset with opposite sign.
+
+    Previously named `auc_independent_of_calibration`. Independence is a two-sided claim
+    about a family of models; what is exhibited here is one family — constant offsets —
+    along which AUC is constant and CITL is not. That refutes "discrimination determines
+    calibration", which is the use the file makes of it, and it does not establish the
+    converse, that calibration fails to constrain discrimination. The name now describes
+    the construction rather than the general principle it is evidence for.
+
+    Note also that `mean_obs` and `mean_pred` are free reals unconnected to `pop` or
+    `score`: the CITL half of the conjunction is an algebraic identity about two arbitrary
+    numbers, not a computation of the AUC-invariant score's calibration. -/
+theorem auc_invariant_and_citl_shifts_under_score_offset
     {Z : Type*} [MeasurableSpace Z]
     (pop : BinaryPopulation Z) (score : Z → ℝ)
     (mean_obs mean_pred c : ℝ) :
@@ -287,10 +297,16 @@ theorem auc_independent_of_calibration
   · unfold calibrationInTheLarge
     ring
 
-/-- **Prevalence shift changes calibration.**
-    Prevalence shift changes calibration: if prevalence changes from
-    π₁ to π₂, the CITL shifts. Using calibrationInTheLarge, the shift
-    is exactly (π₂ - π₁) when the model's mean prediction remains fixed. -/
+/-- **At a fixed mean prediction, the CITL difference is exactly the prevalence
+    difference.**
+
+    The name is kept because `LongitudinalPortability` depends on it, but read it as the
+    identity it is: `calibrationInTheLarge` is `observed − predicted`, so holding the
+    prediction fixed and moving the observed mean from `π₁` to `π₂` moves CITL by
+    `π₂ − π₁`. That is `ring`, and in particular it says nothing when `π₁ = π₂`. The
+    consequence the name suggests — that a prevalence *change* forces a calibration change —
+    is the special case `π₁ ≠ π₂` of this identity, and holds only under the fixed-mean
+    prediction assumption built into the statement. -/
 theorem prevalence_shift_changes_calibration
     (mean_pred π₁ π₂ : ℝ) :
     calibrationInTheLarge π₂ mean_pred -
@@ -774,7 +790,25 @@ This is the headline exact theorem for the calibration block:
 
 No neutral-allele-frequency benchmark metrics appear in the statement. This is
 the generic shift-budget corollary used by the fully mechanistic calibration
-law below. -/
+law below.
+
+**What is assumed rather than derived**, since the word "exact" in the name is about the
+formulae and not about the direction of travel. Three of the four conclusions are
+transport of a hypothesis, not a discovery:
+
+- `targetMetrics.auc < sourceMetrics.auc` and `sourceMetrics.brier < targetMetrics.brier`
+  both come from `h_r2_drop`, which *assumes* the target R² is lower. Nothing here shows
+  that cross-ancestry transport lowers R². What is proved is that a drop in R² propagates
+  to AUC and to calibrated Brier through the monotone charts — a real and reusable step,
+  but a conditional one.
+- `|sourceProfile.citl| < |targetProfile.citl|` is immediate from `h_src_cal`, which
+  assumes the source is perfectly calibrated in the large, together with
+  `h_shift_nonzero`. Against a source CITL pinned to `0`, any nonzero shift is worse.
+
+`hPhiStrict : StrictMono Phi` is a hypothesis for a fact that is true and provable:
+`Phi` is `ProbabilityTheory.cdf (gaussianReal 0 1)`, whose strict monotonicity follows
+from the Gaussian density being positive. It is carried as a hypothesis here and in six
+other files in this corpus rather than proved once. -/
 theorem cross_ancestry_exact_metric_profile_from_shift_budget
     {p q : ℕ}
     (metric : CrossPopulationMetricModel p q)
@@ -854,7 +888,14 @@ This is the headline law surface for deployed metrics:
 - calibration slope is the literal transported `Cov/Var` ratio on the same
   score equation; and
 - Brier is the mechanistic source-vs-target calibrated Brier comparison on the
-  target-population observed prevalence scale. -/
+  target-population observed prevalence scale.
+
+The same reading applies as for `cross_ancestry_exact_metric_profile_from_shift_budget`,
+which this theorem is a mechanistic instance of: the AUC drop and the Brier worsening are
+carried by the hypothesis `h_r2_drop`, and the calibration worsening by `h_src_cal`
+together with `h_shift_nonzero`. "Exact" qualifies the formulae for CITL and slope, which
+are computed from the SNP-level state, not the direction of the metric changes, which are
+assumed. -/
 theorem cross_ancestry_exact_metric_profile
     {p q : ℕ}
     (cal : CrossPopulationMechanisticCalibrationModel p q)
@@ -1128,14 +1169,21 @@ theorem targetMetricAndCalibrationProfilesAtGeneration_exact_mechanistic_popgen_
   · exact targetMetricProfileAtGeneration_exact_mechanistic_popgen_portability_law m.metric t
   · exact targetCalibrationProfileAtGeneration_exact_mechanistic_popgen_portability_law m t link
 
-/-- **Cross-ancestry exact AUC drops while exact CITL worsens from an explicit
-target shift budget.**
+/-- **An assumed R² drop transports to an AUC drop, and an assumed nonzero shift budget
+transports to worsened CITL.**
 
 This is the AUC+CITL projection of the full exact metric theorem above. The
 discrimination term is the mechanistic AUC from the explicit SNP-level
 transport model, and the calibration term is the full observed-minus-predicted
-target shift budget. -/
-theorem cross_ancestry_auc_drops_and_citl_worsens_from_explicit_shift_budget
+target shift budget.
+
+The name used to be `cross_ancestry_auc_drops_and_citl_worsens_from_explicit_shift_budget`,
+which asserted that cross-ancestry AUC drops. It does not show that. `h_r2_drop` assumes
+the R² drop and the monotone chart carries it to AUC; `h_src_cal` and `h_shift_nonzero`
+assume a perfectly calibrated source and a nonzero budget, against which any shift is
+worse. The qualifier `from_explicit_shift_budget` covered only the calibration half, which
+is why the R² input is now named too. -/
+theorem cross_ancestry_auc_drop_and_citl_worsening_of_r2_drop_and_shift_budget
     {p q : ℕ}
     (metric : CrossPopulationMetricModel p q)
     (cal : CrossPopulationCalibrationShiftModel)
@@ -1188,8 +1236,11 @@ theorem cross_ancestry_auc_drops_and_citl_worsens_from_explicit_shift_budget
 /-- **Prevalence-only cross-ancestry CITL worsening is just a special case.**
 When every non-prevalence calibration shift vanishes, the full explicit shift
 budget reduces to prevalence shift alone. This theorem is deliberately scoped
-as a benchmark special case rather than a general SNP-level deployment law. -/
-theorem cross_ancestry_auc_drops_and_prevalence_only_citl_worsens_special_case
+as a benchmark special case rather than a general SNP-level deployment law.
+
+As above, the AUC drop is `h_r2_drop` transported through the monotone chart, not a
+consequence of ancestry distance; the name now says so. -/
+theorem cross_ancestry_auc_drop_and_prevalence_only_citl_worsening_of_r2_drop
     {p q : ℕ}
     (metric : CrossPopulationMetricModel p q)
     (cal : CrossPopulationCalibrationShiftModel)
@@ -1218,7 +1269,7 @@ theorem cross_ancestry_auc_drops_and_prevalence_only_citl_worsens_special_case
       CrossPopulationCalibrationShiftModel.predictedMeanShift,
       h_env, h_genetic, h_score, h_intercept, h_prev_shift]
   have h_main :=
-    cross_ancestry_auc_drops_and_citl_worsens_from_explicit_shift_budget
+    cross_ancestry_auc_drop_and_citl_worsening_of_r2_drop_and_shift_budget
       metric cal h_source_r2_unit h_target_r2_unit h_r2_drop
       h_src_cal h_shift_nonzero hPhiStrict
   dsimp at h_main ⊢
