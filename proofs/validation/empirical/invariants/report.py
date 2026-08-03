@@ -10,6 +10,39 @@ body as written, or because a named mutant of the body is rejected.  Every
 other definition carries `uncovered_reason`, and the set of them is the
 residue the simulation tiers inherit.
 
+THE STAGES THIS READS, AND WHAT HAPPENS IF THEY HAVE NOT RUN
+
+This module only reports.  The artifacts it consumes are not in git, and
+`compile_defs.check_fresh` refuses to count a result whose definition table has
+changed underneath it -- correctly, because a coverage figure computed against a
+stale table is worse than no figure.  The failure that produces is silent: in a
+clean checkout, or after any rename in `proofs/Calibrator`, this prints
+
+    covered BY THIS CHECKER .................. 0  (0.0%)
+    residue by stage:  <all> no-derivable-check
+
+and nothing is wrong with the corpus when it does.  Both `0.0%` and `27.7%` have
+been read off the same corpus on the same day; the difference was whether the
+stages below had been run in order.
+
+    python3 extract_defs.py        # proofs/Calibrator -> defs.json
+    python3 structures.py          # structure field and constraint tables
+    python3 flatten_structures.py  # structure methods -> scalar defs
+    python3 compile_defs.py        # defs.json -> callables, per backend
+    python3 check_theorems.py      # the corpus's own theorems as checks
+    python3 check_ranges.py        # declared ranges and their escapes
+    python3 report.py
+
+WHAT THE RESIDUE SPLIT MEANS
+
+`unreachable.py` divides the uncovered set into `corpus` and `checker`.  The
+uncovered majority is corpus-side: a definition is unreachable when nothing
+states a property about it and its name denotes no simulatable quantity, which is
+what most of the abstract material is, and no numeric tier will reach it.  A
+coverage number is a joint property of the corpus and this tool, never of the
+corpus alone, and quoting it without saying which tool at which freshness is how
+the two figures above both got attributed to the same corpus.
+
 Run:  python report.py           (add --findings for the ranked defect list)
 """
 from __future__ import annotations

@@ -119,8 +119,15 @@ def transpile_all(defs, overrides=None):
     """
     srcs, why_not = {}, {}
     for d in defs:
-        if d["ret"] != "ℝ" or not all(t in ("ℝ", "ℕ") for _, t in d["params"]):
-            why_not[key(d)] = f"non-scalar signature ({d['ret']})"
+        bad = [f"{n} : {t}" for n, t in d["params"] if t not in ("ℝ", "ℕ")]
+        if d["ret"] != "ℝ" or bad:
+            # Name the half of the signature that actually failed.  Printing the
+            # return type unconditionally filed 422 structure methods under
+            # "non-scalar signature (ℝ)", where the return type was the one part
+            # that was fine and the parameter was the model.
+            why_not[key(d)] = (
+                f"non-scalar parameter ({'; '.join(bad)})" if bad
+                else f"non-scalar return ({d['ret']})")
             continue
         # A body that mentions an implicit binder needs a value this tier
         # cannot supply -- Lean infers it from the call site.  Refuse rather
