@@ -28,7 +28,7 @@ guard name; `--only laundering --json out.json` reaches the laundering guard.
 
 THE GUARDS, and what each one catches:
 
-  style           mathlib-style policy: copyright header, module docstring,
+  style           corpus style policy: license header, module docstring,
                   import placement, line length, snake_case theorem names,
                   `↦` over `=>`, and documentation that narrates development
                   history rather than mathematics.
@@ -188,7 +188,7 @@ def corpus_capitalized_identifiers() -> frozenset:
 # every file. What still matters -- and what this checks -- is that the licence
 # notice is present and in the mathlib block form; a file with no header, or one
 # that reintroduces a copyright holder, still fails.
-STYLE_COPYRIGHT_HEADER = (
+STYLE_LICENSE_HEADER = (
     "/-\n"
     "Released under Apache 2.0 license as described in the file LICENSE.\n"
     "-/\n"
@@ -215,8 +215,8 @@ def style_check_file(path: Path) -> list[str]:
     rel = path.relative_to(CORPUS_BASE)
     errors: list[str] = []
 
-    if not source.startswith(STYLE_COPYRIGHT_HEADER):
-        errors.append(f"{rel}:1: missing or nonstandard copyright header")
+    if not source.startswith(STYLE_LICENSE_HEADER):
+        errors.append(f"{rel}:1: missing or nonstandard license header")
 
     lines = source.splitlines()
     for number, line in enumerate(lines, 1):
@@ -244,10 +244,10 @@ def style_check_file(path: Path) -> list[str]:
         errors.append(f"{rel}:{style_line_number(source, module_doc)}: module docstring precedes an import")
 
     if import_lines:
-        expected_first_import = STYLE_COPYRIGHT_HEADER.count("\n") + 1
+        expected_first_import = STYLE_LICENSE_HEADER.count("\n") + 1
         if import_lines[0] != expected_first_import:
             errors.append(
-                f"{rel}:{import_lines[0]}: imports must immediately follow the copyright header"
+                f"{rel}:{import_lines[0]}: imports must immediately follow the license header"
             )
         last_import = import_lines[-1]
         if last_import >= len(lines) or lines[last_import] != "":
@@ -1999,8 +1999,9 @@ def run_identifications() -> int:
 #
 #   CONDITIONAL -- valid implication, but the antecedent is unproved in this corpus.
 #     F2   Prop alias with a theorem-like name and no inhabitant anywhere.
-#     F3   typeclass laundering: nonstandard class, `Fact`, `Nonempty`, `Inhabited`, or
-#          a `letI`/`haveI`-installed instance standing in for a proof.
+#     F3   typeclass laundering: a nonstandard class, `Fact`, `Nonempty`, `Inhabited`, or
+#          a local instance obtained from a caller-supplied field. A local instance proved
+#          in the tactic block is ordinary proof plumbing, not an assumption.
 #     F16  wrapper chain: every Prop-valued binder in a theorem's signature.
 #     F19  hidden assumptions: Prop-valued *implicit* and *instance* binders, plus
 #          section `variable`s inherited silently.
@@ -3044,8 +3045,6 @@ def check_files(c: Corpus) -> list[Finding]:
              "custom syntax or elaborator"),
             (r"@\[implemented_by", "F24", "compiled implementation substituted for the "
                                           "definition"),
-            (r"^\s*(letI|haveI)\b", "F3", "instance installed locally; the obligation "
-                                          "moves to whoever supplied its argument"),
             (r"#print axioms", "F24_INFO", "handled by the F18 pass below"),
         ]:
             for mo in re.finditer(pat, m, re.M):
@@ -3529,7 +3528,6 @@ def run_wiring(argv: list[str]) -> int:
     )
     args = ap.parse_args(argv)
 
-    here = os.path.dirname(os.path.abspath(__file__))
     calibrator = str(PROOFS / "Calibrator")
     if not os.path.isdir(calibrator):
         print(f"cannot find {calibrator}", file=sys.stderr)
@@ -3549,7 +3547,7 @@ def run_wiring(argv: list[str]) -> int:
         print(f"upstream-arc declarations: {total_decls}")
         print(f"cross-boundary references: {total_edges}")
         print()
-        width = max(len(s) for s in report)
+        width = max((len(s) for s in report), default=0)
         for s in sorted(report):
             r = report[s]
             mark = "WIRED  " if r["wired"] else "UNWIRED"

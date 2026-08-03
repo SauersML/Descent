@@ -182,6 +182,11 @@ import Mathlib
 
 namespace Clean
 
+-- A locally proved instance discharges an obligation; it does not hide one in a parameter.
+theorem local_instance_is_proof_plumbing : True := by
+  letI : Fact True := ⟨trivial⟩
+  trivial
+
 /-- A model class WITH a witness: not an unbuilt certificate. -/
 structure Model where
   rate : ℝ
@@ -327,7 +332,7 @@ def run_guard(guard: str, files: dict, *args: str):
         return r.returncode, r.stdout + r.stderr
 
 
-# A minimal corpus every guard is willing to call clean: correct header, module
+# A minimal corpus every guard is willing to call clean: license header, module
 # docstring, short lines, one imported module, no forbidden shapes.
 CLEAN_ROOT = HEADER + """
 import Calibrator.Sub
@@ -370,9 +375,9 @@ CASES = [
      clean_plus("Calibrator/Sub.lean",
                 CLEAN_SUB + "\n-- " + "x" * 120 + "\n"),
      "characters"),
-    ("style", "missing copyright header",
-     clean_plus("Calibrator/Sub.lean", CLEAN_SUB.replace("Copyright (c) 2026", "Copr 2026")),
-     "copyright header"),
+    ("style", "missing license header",
+     clean_plus("Calibrator/Sub.lean", CLEAN_SUB.replace("Released under Apache", "Licensed under")),
+     "license header"),
     ("style", "lambda written with =>",
      clean_plus("Calibrator/Sub.lean", CLEAN_SUB + "\ndef f := fun x => x\n"),
      "rather than `=>`"),
