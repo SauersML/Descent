@@ -57,7 +57,38 @@ EXTRACT = os.path.normpath(os.path.join(HERE, "..", "..", "extract"))
 if EXTRACT not in sys.path:
     sys.path.insert(0, EXTRACT)
 
-import lean_defs  # noqa: E402
+# GENERATED TABLES ARE NOT IN GIT, BY DESIGN. `lean_defs.py` and `defs.json`
+# are produced from `proofs/Calibrator/` and drift by six figures against any
+# committed snapshot -- `defs.json` measured 122994 changed lines against its
+# last committed copy. `lean_defs.py`'s own header says the committed copy is
+# stale by construction and must not be consumed, so they are untracked and
+# regenerated per worktree.
+#
+# FAIL LOUDLY AND NAME THE COMMAND. A missing table must stop this script, not
+# start it on a fallback: proceeding without the table, or against whatever
+# stale copy happened to be lying around, is exactly how a committed cache
+# became consumable in the first place. The message carries the command because
+# the next person reads the error, not the docstring.
+_REGEN = ("python3 proofs/validation/extract/emit.py    "
+          "(about a minute; writes only inside your worktree)")
+try:
+    import lean_defs  # noqa: E402
+except ImportError as _exc:
+    raise SystemExit(
+        "sweep_inlined: cannot import the generated table `lean_defs`.\n"
+        "  looked in: %s\n"
+        "  reason:    %s\n"
+        "  These tables are DELIBERATELY NOT IN GIT -- regenerate them:\n"
+        "      %s\n"
+        "  Do not copy a table from another worktree: it pins your numbers to\n"
+        "  a revision you are not standing on." % (EXTRACT, _exc, _REGEN))
+
+_DEFS_JSON = os.path.join(EXTRACT, "defs.json")
+if not os.path.exists(_DEFS_JSON):
+    raise SystemExit(
+        "sweep_inlined: %s is missing.\n"
+        "  It is generated and untracked. Regenerate:\n      %s"
+        % (_DEFS_JSON, _REGEN))
 
 RTOL = 1e-9
 
