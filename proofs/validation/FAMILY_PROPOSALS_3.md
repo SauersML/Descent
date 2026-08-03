@@ -576,13 +576,12 @@ program), the dual by maximising the optimal Bayes risk over the prior simplex.
 problem instance.
 
 **Falsifier, and why this family is here despite being small.**
-`finite_minimax_duality`, which asserts `minimaxRisk = mixtureDualRisk`, **is
-closed by `sorry`** in `Calibrator/FiniteMinimax.lean` — it is one of the
-`sorry` sites `proofs/validation/invariants/axiom_scan_stdout.txt` records at
-`629a80ea`. It is therefore an *asserted* identity, not a proved one, and
-numerical evaluation is the only evidence the corpus has for it. **Refuted if**
-the two values differ on any instance. The duality does hold for randomised
-rules over finite spaces, so the informative version of this check is the
+`finite_minimax_duality` proves `minimaxRisk = mixtureDualRisk` by separating
+the convex set of randomized-rule risk profiles from the open half-space below
+the minimax value. Its transitive axiom closure contains only the approved Lean
+foundations. Numerical evaluation is therefore a regression test of the
+definitions and simulator, not evidence filling a proof gap. **Refuted if** the
+two computed values differ on any instance. The informative control remains the
 **positive control**: restrict the rule class to *deterministic* rules, where
 the duality gap is generically strictly positive, and require the check to
 fire. If it does not fire there, the harness is not evaluating the primal at
@@ -591,8 +590,7 @@ i.e. genuinely randomised, so the restriction is a one-line change to the
 simulator and cannot be confused with the corpus's own claim.
 
 **Cheapness.** No sampling. `scipy.optimize.linprog` on a problem with a dozen
-variables, plus a grid over a 2-simplex. Minutes to write, seconds to run, and
-it puts a number behind a `sorry`.
+variables, plus a grid over a 2-simplex. Minutes to write and seconds to run.
 
 ---
 
@@ -795,7 +793,7 @@ witnesses are proved, not measured.
 | 10 | `frequency_resolved_information` | 8 | new | none | optimal-weight claim never optimised against |
 | 11 | `ridge_self_consistent_risk` | 8 | new | exists in two places | grid never straddles `aspect = 1` |
 | 12 | `estimator_moments` | +7 | existing | GREEN | — |
-| 13 | `finite_decision_minimax` | 7 | new | none — hours to write | **yes** — `finite_minimax_duality` is closed by `sorry` |
+| 13 | `finite_decision_minimax` | 7 | new | none — hours to write | no — duality is proved; retain the deterministic-rule positive control |
 | 14 | `block_normal_approximation` | 6 | new | **exists**, `block_count/block_count_sim.py` | — |
 | 15 | `ld_decay_recurrence` | +4 | existing | SIMULATED | two names for `r²`, two names for LD decay |
 | 16 | `admixture` | +4 | existing | SIMULATED | members take the `g` the simulator already varies |
