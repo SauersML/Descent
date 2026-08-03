@@ -1,6 +1,7 @@
 import Calibrator.Probability
 import Calibrator.PortabilityDrift
 import Calibrator.OpenQuestions
+import Calibrator.Permeability
 
 namespace Calibrator
 
@@ -130,6 +131,25 @@ noncomputable def effectiveFisherInformation (n : ℕ) (p r2_ld : ℝ) : ℝ :=
 theorem effectiveFisherInfo_eq (n : ℕ) (p r2_ld : ℝ) :
     effectiveFisherInformation n p r2_ld = n * (2 * p * (1 - p)) * r2_ld := by
   unfold effectiveFisherInformation fisherInformation genotypeVarianceHWE
+  ring
+
+/-- **Bridge between conventional LD `r²` and permeability attenuation.**
+If `η` is the correlation-scale response retained by a tag, conventional regression
+information is multiplied by `r² = η²`.  The covariance-channel permeability is
+multiplied by the same `η²`.  The cross-multiplied identity below makes the two
+normalizations agree exactly without dividing by a possibly zero information channel.
+
+This distinction is load-bearing in cross-population design: supplying an LD `r²` value
+as the *linear* response `η` would square the loss twice and incorrectly predict `r⁴`
+retention. -/
+theorem ld_r2_matches_covariance_response_retention
+    (n : ℕ) (p covariance covarianceDerivative η : ℝ) :
+    effectiveFisherInformation n p (η ^ 2) *
+        scalarPermeability covariance covarianceDerivative =
+      fisherInformation n (genotypeVarianceHWE p) *
+        scalarPermeability covariance (η * covarianceDerivative) := by
+  unfold effectiveFisherInformation
+  rw [scalarPermeability_derivative_scale]
   ring
 
 /-- Information loss from imperfect tagging: effective info ≤ full info. -/

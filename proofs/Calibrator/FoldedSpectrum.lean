@@ -1822,6 +1822,11 @@ separates quotient fibres remains the continuation. -/
   `onePercentMaf_halfResponse_covariance_moment_permeability`.  This is
   a conditional law for a named response attenuation, not a claim that MAF alone fixes
   tagging quality or that every LD proxy induces the same scalar attenuation.
+  `AncestrySpecificPower.ld_r2_matches_covariance_response_retention` fixes the convention
+  bridge: a tag retaining correlation-scale response `η` has conventional LD
+  `r² = η²`, so regression information and covariance permeability retain the same
+  fraction.  Treating a reported `r²` as `η` would incorrectly square the tagging loss
+  twice.
   Correlated probes are now handled by
   `multivariateGaussianPermeability = (1/2)‖Σ⁻¹ᐟ²ΓΣ⁻¹ᐟ²‖²_F` once the named model supplies
   the whitening. `multivariateGaussianPermeability_diagonal` proves that the earlier
