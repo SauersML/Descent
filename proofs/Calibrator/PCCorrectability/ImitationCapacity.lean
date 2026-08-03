@@ -661,6 +661,47 @@ structure EquiExit (K : BackgroundClass ι cidx) (S₀ : Matrix ι ι ℝ)
   binds : ∀ (a : cidx) (v : ι → ℝ), v ∈ support → 0 < K.spikeLoad a v →
     K.headroom binding S₀ / load ≤ K.headroom a S₀ / K.spikeLoad a v
 
+/-- The one-constraint background class on a single coordinate, whose form reads
+    the `(0,0)` entry. Additivity and homogeneity hold because matrix addition
+    and scaling are pointwise. -/
+noncomputable def diagonalEntryClass : BackgroundClass (Fin 1) Unit where
+  base := 0
+  form := fun _ M ↦ M 0 0
+  bound := fun _ ↦ 1
+  form_add := fun _ _ _ ↦ rfl
+  form_smul := fun _ _ _ ↦ rfl
+
+/-- **The equi-exit class is inhabited**, on a single constraint over a support
+    containing one direction.
+
+    Equi-exit says the binding constraint's load is the same in every supported
+    direction, and `binds` says it attains the linear program's infimum. Both are
+    forced here rather than arranged: with one constraint and one supported
+    direction there is nothing for the load to vary over and nothing for the
+    infimum to be taken against, so `binds` reduces to reflexivity.
+
+    That is the honest reading of this witness. It shows the theorems over
+    `EquiExit` are not vacuous; it does not show equi-exit holds for a class with
+    several constraints, which is where the hypothesis has force. -/
+noncomputable def EquiExit.witness (S₀ : Matrix (Fin 1) (Fin 1) ℝ) :
+    EquiExit diagonalEntryClass S₀ {fun _ ↦ 1} where
+  binding := ()
+  load := 1
+  load_pos := by norm_num
+  supported := ⟨fun _ ↦ 1, rfl⟩
+  equi := by
+    intro v hv
+    have hv' : v = fun _ ↦ (1 : ℝ) := hv
+    subst hv'
+    simp [BackgroundClass.spikeLoad, diagonalEntryClass, spikeOuter]
+  binds := by
+    intro a v hv _
+    have hv' : v = fun _ ↦ (1 : ℝ) := hv
+    subst hv'
+    have ha : a = () := rfl
+    subst ha
+    simp [BackgroundClass.spikeLoad, diagonalEntryClass, spikeOuter]
+
 namespace EquiExit
 
 variable {K : BackgroundClass ι cidx} {S₀ : Matrix ι ι ℝ} {support : Set (ι → ℝ)}
