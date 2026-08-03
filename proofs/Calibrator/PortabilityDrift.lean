@@ -551,7 +551,7 @@ Once the drift-only prediction has fallen below the floor that mutation holds,
 it is strictly below the true heterozygosity -- for every mutation rate,
 starting value and horizon in range. This is the inequality that separates the
 drift-only quantity from the equilibrium one, in the same shape as
-`fstFromTau_lt_coalescenceCdf`, so the two can no longer be interchanged
+`fstFromTau_lt_coalescenceCdf`, so the two cannot be interchanged
 silently. -/
 theorem driftOnly_lt_hetTrajectory_of_below_floor (Ne mu H₀ : ℝ) (t : ℕ)
     (hNe : 0 < Ne) (hmu : 0 ≤ mu)
@@ -644,11 +644,11 @@ noncomputable def pgsVarianceFromHet (β_sq_sum het : ℝ) : ℝ :=
 This definition carries no independent content: `fst` here is *defined* as the
 proportional reduction `1 - H_target/H_source`, so `H_target = H_source (1 - fst)`
 is that definition rearranged. It is true for every value of `fst`, which is
-exactly why it could not detect that the value being supplied was wrong.
+exactly why it cannot detect a wrong value supplied for `fst`.
 
-Its previous docstring made the claim that failed. It read: "after `t`
-generations of Wright-Fisher drift with effective size N, `H_t = H_0 (1 -
-1/(2N))^t`, giving `Fst = 1 - (1 - 1/(2N))^t`." Both halves are wrong as
+Do not attach to it the claim that "after `t` generations of Wright-Fisher
+drift with effective size N, `H_t = H_0 (1 - 1/(2N))^t`, giving
+`Fst = 1 - (1 - 1/(2N))^t`". Both halves of that are wrong as
 written. The recurrence holds only in the closed-population, no-mutation regime
 -- at demographic equilibrium with `Ne = 1000`, `t = 4000` it predicts a
 retention of `0.135` where the measurement is `1.025 ± 0.020`, an 86 percent
@@ -2801,35 +2801,36 @@ theorem targetR2_lt_source_from_neutralAF_benchmark
 together with `neutralAFBenchmarkRatio_le_inv_one_sub_source`, `_nonneg`, `_lt_one`, `_self`,
 and the `FstBounds` section of `Calibrator.PortabilityBounds` that was stated about it.**
 
-On asymmetric effective sizes it ran `-37%` to `-74%` low, at nine to fifteen standard
-errors:
+These are absent on purpose. On asymmetric effective sizes the ratio form runs `-37%` to
+`-74%` low, at nine to fifteen standard errors:
 
-      T    NeA    NeB     fstS     fstT   het_B/het_A   se    deleted body   err
+      T    NeA    NeB     fstS     fstT   het_B/het_A   se   ratio form   err
     500    200   2000   0.3577   0.0582     3.7862    0.2547    1.4662   -61.3%
    1000    200   2000   0.4860   0.1187     6.5409    0.3445    1.7147   -73.8%
    1000    500   5000   0.3165   0.0450     2.2220    0.0771    1.3972   -37.1%
    2000    300   3000   0.5611   0.1454     5.7238    0.2201    1.9472   -66.0%
 
-The earlier record of `VALIDATED to 3.2%` was an artifact of a symmetric design: with equal
-branch lengths both sides of the ratio collapse to about `1`, so the test had no power to
-reject a wrong functional form. `Calibrator.DriftRegime.symmetric_design_has_no_power` proves
-that on any symmetric design this form and its *square* are indistinguishable.
+A symmetric design cannot rescue it. With equal branch lengths both sides of the ratio
+collapse to about `1`, so a symmetric test has no power to reject a wrong functional form,
+and an agreement to `3.2%` measured that way is an artifact.
+`Calibrator.DriftRegime.symmetric_design_has_no_power` proves that on any symmetric design
+this form and its *square* are indistinguishable.
 
-The defect was not a miscalibration, it was the wrong argument list. The observed ratio is
+The defect is not a miscalibration, it is the wrong argument list. The observed ratio is
 `2.2` to `6.5` and is driven by the tenfold ratio in effective size, not by `F_ST`:
 heterozygosity is governed by `Nₑ` and the mutation floor `hetMutationFloor`, and `F_ST` is a
 between-population variance ratio that does not determine either.
 
-**The falsification survives the deletion**, because it never needed the name.
+**The falsification needs no definition to state**, which is why it survives the deletion.
 `benchmarkRatioForm_cannot_reach_measured` below states it about the expression written out,
 and is the machine-checked form of "no argument brings this formula into the measured range".
 A certificate that can only be stated about a name is hostage to that name.
 
-No replacement is substituted. `hetRatioBetweenBranches` below is a clearly-labelled
-candidate for testing, and is a function of the two effective sizes, the mutation rate and
-the horizon, which is what the data say the quantity depends on. `DriftRegime.benchmarkRatio`
-is NOT this quantity and is not affected: measurement confirmed that form to `-0.003%`, and
-what was falsified there was a different quantity fed into its `fst` slot. -/
+Nothing replaces it. `hetRatioBetweenBranches` below is a clearly-labelled candidate for
+testing, and is a function of the two effective sizes, the mutation rate and the horizon,
+which is what the data say the quantity depends on. `DriftRegime.benchmarkRatio` is NOT
+this quantity and carries none of this: measurement confirms that form to `-0.003%`, and
+what fails there is a different quantity fed into its `fst` slot. -/
 
 /-- **The measured value is outside the range of the heterozygosity-ratio-from-`F_ST` form,
 stated about the expression rather than about a name.**
@@ -2943,23 +2944,21 @@ noncomputable def liabilityThresholdAUCFromExplainedR2 (r2 K : ℝ) : ℝ :=
 
 /-! **Deleted: `LiabilityThresholdRegime`.**
 
-It read "the regime in which the liability-threshold AUC formula has its stated biological
-meaning. Every degeneracy is an explicit field", and it had seven fields. It was also
-**never constructed and never consumed** — not by a theorem in this file, not anywhere in
-the corpus, not by the validation harness. Meanwhile
+This structure is absent on purpose. It carried seven fields under the heading "the regime
+in which the liability-threshold AUC formula has its stated biological meaning. Every
+degeneracy is an explicit field", and nothing constructed or consumed it — no theorem in
+this file, nothing in the corpus, nothing in the validation harness.
 `liabilityThresholdAUCFromExplainedR2` is used freely and without it, including in
 `presentDayLiabilityThresholdAUC` and the metric-profile results below, and in
 `liabilityThresholdAUC_not_prevalence_free`, which reasons about
 `standardNormalPdf (liabilityThreshold K)` directly with its own local hypotheses.
 
-So the degeneracies were named in a place that guarded nothing. That is worth separating
-from an unused lemma: an *obligation* structure with no consumer does not merely fail to
-help, it misrepresents the development, because the claim it makes is precisely that
-somebody has to discharge these before using the formula, and nobody does. It reads as
-rigour from the outside while every real use site bypasses it.
+An *obligation* structure with no consumer is worse than an unused lemma. Its whole claim
+is that somebody must discharge these conditions before using the formula, and nobody does,
+so it reads as rigour from the outside while every real use site bypasses it.
 
-Three of the seven fields were results rather than domain conditions, so had it been used
-it would have imported them unproved:
+Three of the seven fields are results rather than domain conditions, so any use of the
+structure would import them unproved:
 
 * `threshold_spec : Phi (liabilityThreshold K) = 1 - K`. Since `liabilityThreshold K` is
   `Function.invFun Phi (1 - K)`, this says `Phi` hits `1 - K`, i.e. that the standard
@@ -4425,19 +4424,19 @@ theorem mutationDrift_variance_ratio (V_A fst shared_ld : ℝ)
 
 /-! **Deleted: `neutral_af_benchmark_correction_factor`.**
 
-It stated `presentDayPGSVarianceMutationDrift V_A fst ld = ld * presentDayPGSVariance V_A
-fst` and proved it by `ring`. Every one of its six hypotheses was unused — `0 < V_A`,
-`0 < V_E`, `0 ≤ fst`, `fst < 1`, `0 < ld`, `ld ≤ 1` — and `V_E` was a phantom parameter
-appearing nowhere in the statement, present only so the signature would read like a
-statement about `R²`. The identity is `presentDayPGSVarianceMutationDrift_eq` with the
-factors reassociated, and `mutationDrift_variance_ratio` just above states the same content
-as a ratio with the hypotheses it actually needs.
+This theorem is absent on purpose. It states `presentDayPGSVarianceMutationDrift V_A fst
+ld = ld * presentDayPGSVariance V_A fst` and closes by `ring`. All six of its hypotheses go
+unused — `0 < V_A`, `0 < V_E`, `0 ≤ fst`, `fst < 1`, `0 < ld`, `ld ≤ 1` — and `V_E` is a
+phantom parameter appearing nowhere in the statement, present only so the signature reads
+like a statement about `R²`. The identity is `presentDayPGSVarianceMutationDrift_eq` with
+the factors reassociated, and `mutationDrift_variance_ratio` just above states the same
+content as a ratio with the hypotheses it genuinely needs.
 
-Two hypotheses were worse than unused: `0 ≤ fst` and `fst < 1` are the range in which the
-"correction factor" reading is meaningful, and because they were not used, the equation
-also holds at `fst > 1`, where `presentDayPGSVariance` is negative and the word
-*correction* has no referent. A theorem satisfied by the inadmissible parameter values
-too cannot be evidence that the admissible ones are the intended domain. -/
+Two of those hypotheses are worse than unused. `0 ≤ fst` and `fst < 1` are the range in
+which the "correction factor" reading means anything, and leaving them unused lets the
+equation hold at `fst > 1`, where `presentDayPGSVariance` is negative and the word
+*correction* has no referent. A theorem satisfied by the inadmissible parameter values too
+is no evidence that the admissible ones are the intended domain. -/
 
 /-- **Pairwise Fst under mutation-drift balance is bounded.**
     Under mutation-drift equilibrium, pairwise Fst between any two populations
@@ -4784,21 +4783,22 @@ theorem fstMigrationDriftEquilibrium_decreases_with_Ne (Ne₁ Ne₂ m : ℝ)
 
 /-! **Deleted: `migration_reduces_fst_vs_pure_drift`.**
 
-Its hypothesis was `1 / (1 + 4 * Ne * m) < t / (t + 2 * Ne)` and its conclusion was
+This theorem is absent on purpose. Its hypothesis is
+`1 / (1 + 4 * Ne * m) < t / (t + 2 * Ne)` and its conclusion is
 `fstMigrationDriftEquilibrium Ne m < t / (t + 2 * Ne)`. Since
 `fstMigrationDriftEquilibrium Ne m` unfolds to `1 / (1 + 4 * Ne * m)`, the two are the same
-proposition and the proof was `unfold; exact h_large_t` — the hypothesis, returned. The
-remaining three hypotheses (`0 < Ne`, `0 < m`, `0 < t`) were unused.
+proposition and the proof is `unfold; exact h_large_t` — the hypothesis, returned. The
+remaining three hypotheses (`0 < Ne`, `0 < m`, `0 < t`) go unused.
 
-The docstring claimed the derivation the theorem skipped: "Under migration-drift
+The prose around it claims the derivation the theorem skips: "Under migration-drift
 equilibrium, Fst = 1/(1+4Nm) < 1 - (1-1/(2Ne))^t for sufficiently large t." Nothing
-established *for which* `t` the inequality holds; that is precisely what was assumed, under
-a name (`h_large_t`) asserting the answer. Establishing it would mean showing
-`1/(1+4Nm) < t/(t+2Ne)` for `t` past an explicit threshold in `Ne` and `m`, which is a real
-result and is not present anywhere in this file.
+establishes *for which* `t` the inequality holds. That is exactly what the hypothesis
+assumes, under a name (`h_large_t`) that asserts the answer. Establishing it would mean
+showing `1/(1+4Nm) < t/(t+2Ne)` for `t` past an explicit threshold in `Ne` and `m`, which
+is a real result and appears nowhere in this file.
 
-Per the corpus policy on results that merely repackage a premise, deleted rather than
-renamed: there is no honest name for `h → h`. -/
+A result that merely repackages a premise is deleted, not renamed: there is no honest name
+for `h → h`. -/
 
 /-- **Finite equilibrium vs unbounded drift.**
     Under pure drift, Fst approaches 1 as t → ∞. Under migration-drift balance,
@@ -5072,7 +5072,7 @@ theorem signalRetentionMigrationDrift_eq_ratio (Ne m : ℝ)
   ring
 
 /-- **The retention is a fraction: it never reaches `1`.**  This is the range
-property the name asserts, and the property the old body did not have. -/
+property the name asserts, and a body that can reach `1` does not have it. -/
 theorem signalRetentionMigrationDrift_lt_one (Ne m : ℝ)
     (hNe : 0 < Ne) (hm : 0 < m) :
     signalRetentionMigrationDrift Ne m < 1 := by
@@ -5143,22 +5143,21 @@ theorem signalRetention_increases_with_migration (V_A Ne m₁ m₂ : ℝ)
 
 /-! **Deleted: `migration_improves_R2_over_pure_drift`.**
 
-The name asserted that migration improves `R²`; the statement took as a hypothesis that the
-equilibrium `F_ST` is below some free real `fst_nomial` and concluded that `R²` is higher
-there. That `fst_nomial` exceeds the equilibrium — the entire content of "migration
-improves portability" — was supplied by the caller, not proved, and `fst_nomial` was
-otherwise unconstrained: it is not derived from `Ne`, from `m`, from a divergence time, or
-from any pure-drift model. The docstring's "under pure drift to t=∞" named a limit the
-statement never takes. `0 < Ne` and `0 < m` were unused, so the theorem holds for
-parameters at which the island model has no equilibrium at all.
+This theorem is absent on purpose. The name asserts that migration improves `R²`. The
+statement takes as a hypothesis that the equilibrium `F_ST` is below some free real
+`fst_nomial` and concludes that `R²` is higher there. That `fst_nomial` exceeds the
+equilibrium — the entire content of "migration improves portability" — comes from the
+caller rather than from a proof, and `fst_nomial` is otherwise unconstrained: it is not
+derived from `Ne`, from `m`, from a divergence time, or from any pure-drift model. The
+gloss "under pure drift to t=∞" names a limit the statement never takes. `0 < Ne` and
+`0 < m` go unused, so the theorem holds for parameters at which the island model has no
+equilibrium at all.
 
-What remained after removing the assumed premise was `drift_degrades_R2` with its first
-argument instantiated at `fstMigrationDriftEquilibrium Ne m` — its whole proof was one
-application of that lemma. The single call site,
-`recurrence_derived_R2_increases_with_m`, now calls `drift_degrades_R2` directly and is
-unchanged in statement; that theorem *does* prove the migration claim, because it derives
-the `F_ST` ordering from `m₁ < m₂` via `fstMigrationDriftEquilibrium_decreases_with_m`
-instead of assuming it. -/
+Strip the assumed premise and what is left is `drift_degrades_R2` with its first argument
+instantiated at `fstMigrationDriftEquilibrium Ne m`, which is the whole proof. The single
+call site, `recurrence_derived_R2_increases_with_m`, calls `drift_degrades_R2` directly.
+That theorem *does* prove the migration claim, because it derives the `F_ST` ordering from
+`m₁ < m₂` via `fstMigrationDriftEquilibrium_decreases_with_m` instead of assuming it. -/
 
 /-! ### 6. Asymmetric migration -/
 
@@ -5232,14 +5231,14 @@ theorem asymmetric_migration_portability_direction
     means is the right effective rate for asymmetric migration is not settled anywhere in
     this corpus, and nothing here should be read as settling it.
 
-    Empirical status: UNTESTED, and note that a test of this quantity tests the arithmetic
-    mean; it would say nothing about the harmonic mean the old docstring claimed. -/
+    Empirical status: UNTESTED. A test of this quantity tests the arithmetic mean and says
+    nothing about the harmonic mean. -/
 noncomputable def effectiveSymmetricMigration (m₁₂ m₂₁ : ℝ) : ℝ :=
   (m₁₂ + m₂₁) / 2
 
-/-- **The arithmetic mean used here is never below the harmonic mean the docstring used
-to claim**, with equality exactly when the two directional rates agree. This is AM-GM-HM
-for two positive reals, and it fixes the sign of the discrepancy the old docstring hid. -/
+/-- **The arithmetic mean used here is never below the harmonic mean**, with equality
+exactly when the two directional rates agree. This is AM-GM-HM for two positive reals, and
+it fixes the sign of the discrepancy between the two means. -/
 theorem harmonicMigrationMean_le_effectiveSymmetricMigration (m₁₂ m₂₁ : ℝ)
     (h₁ : 0 < m₁₂) (h₂ : 0 < m₂₁) :
     2 * m₁₂ * m₂₁ / (m₁₂ + m₂₁) ≤ effectiveSymmetricMigration m₁₂ m₂₁ := by
