@@ -304,7 +304,7 @@ variant has with its neighbors. This is crucial for PGS weighting.
 section LDScore
 
 /-!
-### Derivation of ldsrExpectedChi2 = N·h²/M·ℓ_j + N·a/M + 1
+### Derivation of ldsrExpectedChi2 = N·h²/M·ℓ_j + N·a + 1
 
 **GWAS marginal test statistic:**
 For SNP j with sample size N, the chi-squared statistic is:
@@ -336,14 +336,20 @@ Multiplying by N:
            = N × (h²/M) × ℓ_j + 1
 
 **Adding confounding:**
-Population stratification and cryptic relatedness contribute
-an additional intercept inflation a/M per SNP:
-  E[χ²_j] = N·(h²/M)·ℓ_j + N·(a/M) + 1
+Population stratification and cryptic relatedness inflate the intercept:
+  E[χ²_j] = N·(h²/M)·ℓ_j + N·a + 1
+
+The confounding term is **not** divided by `M`. The divided form `N·(a/M)` is
+falsified: see the docstring of `ldsrExpectedChi2` below, where a sixteenfold
+sweep of `M` at fixed confounding leaves the excess over one flat, so the divided
+form's implied `a` grows with `M` in contradiction with its own definition, and at
+`N = 8·10⁵`, `M = 9·10⁵` it reports `χ² = 1.32` against a truth of `420.8`. Do not
+copy the divided form out of this file.
 
 This is a **linear regression model** with:
 - **Slope** = N·h²/M (proportional to per-SNP heritability)
 - **LD score ℓ_j** as the predictor (captures tagging/LD structure)
-- **Intercept** = N·a/M + 1 (1 from null + confounding)
+- **Intercept** = N·a + 1 (1 from null + confounding)
 
 The key insight is that LD scores create a linear relationship
 between E[χ²] and ℓ_j because each SNP's marginal statistic
@@ -391,9 +397,11 @@ theorem ldsr_chi2_from_beta_sq (h2 M ell_j N : ℝ) (h_N : N ≠ 0) :
   field_simp
 
 /-- **Adding confounding to the LDSR model.**
-    The confounding term a captures population stratification
-    and cryptic relatedness, contributing N·a/M to E[χ²_j].
-    The full model is: E[χ²_j] = N·h²/M·ℓ_j + N·a/M + 1. -/
+    The confounding term `a` captures population stratification and cryptic relatedness,
+    contributing `N·a` to `E[χ²_j]` — not `N·a/M`. The full model is
+    `E[χ²_j] = N·h²/M·ℓ_j + N·a + 1`, which is what the statement below proves and what
+    `ldsrExpectedChi2` computes. The divided form is falsified; the evidence is in that
+    definition's docstring. -/
 theorem ldsr_with_confounding_eq (N h2 M ell_j a : ℝ)
     (h_N : N ≠ 0) :
     N * ldsrExpectedBetaSq h2 M ell_j N + N * a =
