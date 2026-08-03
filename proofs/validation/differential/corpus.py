@@ -70,10 +70,30 @@ def _all_modules():
     for path in sorted(glob.glob(os.path.join(CALIBRATOR, "**", "*.lean"),
                                  recursive=True)):
         out.append(os.path.relpath(path, CALIBRATOR)[: -len(".lean")])
-    _root = os.path.join(os.path.dirname(CALIBRATOR.rstrip(os.sep)), "Calibrator.lean")
-    if os.path.exists(_root):
+    if os.path.exists(_module_path("Calibrator")):
         out.append("Calibrator")
     return out
+
+
+def _module_path(mod):
+    """Filesystem path for a module name.
+
+    THE ROOT MODULE IS A SIBLING OF `CALIBRATOR/`, NOT A CHILD. `Calibrator`
+    lives at `proofs/Calibrator.lean`; every other module `Foo` lives at
+    `proofs/Calibrator/Foo.lean`. Joining CALIBRATOR with the module name is
+    right for all of them except the one that names the directory itself.
+
+    This existed as a half-applied fix: `_all_modules` was corrected to
+    DISCOVER the root, and the caller still rebuilt its path as
+    `CALIBRATOR/Calibrator.lean`, so discovery succeeded and the open failed
+    with FileNotFoundError. Both halves now go through here, so they cannot
+    disagree again -- which is the actual defect, not the missing directory
+    level.
+    """
+    if mod == "Calibrator":
+        return os.path.join(os.path.dirname(CALIBRATOR.rstrip(os.sep)),
+                            "Calibrator.lean")
+    return os.path.join(CALIBRATOR, mod + ".lean")
 
 # Definitions where extract's callable is known-wrong and leanexpr's is used
 # instead.  Each entry must carry its evidence; an unexplained override is
@@ -110,7 +130,7 @@ def _leanexpr_table():
     table: dict[str, callable] = {}
     defs: dict[str, L.LeanDef] = {}
     for mod in _all_modules():
-        path = os.path.join(CALIBRATOR, mod + ".lean")
+        path = _module_path(mod)
         for d in L.extract_file(path, mod) + L.extract_recursions(path, mod):
             if d.name in defs:
                 continue
