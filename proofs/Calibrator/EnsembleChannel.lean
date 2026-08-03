@@ -16,6 +16,13 @@ fourth-order Gaussian statistic differs.  Thus ensemble PGS deployment may learn
 from order-erased target panels, but it must not compress all target dependence to one
 "long-run variance" without an additional model.
 
+The next section proves the exact symmetry that survives this correction.  Every statistic
+of an unordered panel is invariant under time reversal, whereas one ordered adjacent pair
+supports an antisymmetric arrow statistic.  This is a finite theorem, not a claim that a
+chosen list of Gaussian diagram moments completely determines every stationary process.
+Biologically, unordered genotype panels may retain rich symmetric LD fingerprints while
+still losing the direction of haplotype or ancestry-tract transitions.
+
 The final theorem is the exact finite-sample geometry behind compound deployment.  Moving
 from the source score to the ensemble centroid improves squared spectral loss by precisely
 the between-target predictable component; residual within-fibre variation is the price of
@@ -65,6 +72,71 @@ theorem dependent_channel_symbol_positive {x : ℝ} (hx₀ : -1 ≤ x) (hx₁ : 
     have hxplus : 0 ≤ 1 + x := by linarith
     nlinarith [mul_nonneg (sub_nonneg.mpr hx₁) hxplus]
   nlinarith
+
+/-! ## The finite arrow-of-time quotient
+
+The fourth-order witness above refutes the old one-number description of an unordered
+panel, but it does not refute the elementary symmetry that remains: an order-free
+observation is invariant under every permutation and therefore under time reversal.
+The next results isolate that exact wall without claiming that a particular collection of
+moments is a complete invariant of an arbitrary process.
+
+For genetics, the distinction is operational.  An unordered bag of genotypes can retain
+rich LD information through its empirical-measure fluctuations, but it cannot decide
+which haplotype transition came first.  One ordered adjacent pair is the smallest carrier
+of a reversal-odd, direction-of-transition probe.
+-/
+
+/-- A statistic on finite panels is order-free when it is constant on list-permutation
+classes.  This is the exact deterministic symmetry imposed by discarding genomic order. -/
+def IsOrderFreeStatistic {α β : Type*} (statistic : List α → β) : Prop :=
+  ∀ xs ys : List α, xs.Perm ys → statistic xs = statistic ys
+
+/-- **Finite reversal wall.** Every order-free statistic is invariant under reversing the
+entire panel.  Thus no downstream use of an unordered panel can recover the arrow of time
+without adding an order-sensitive observation. -/
+theorem orderFreeStatistic_reverse {α β : Type*} {statistic : List α → β}
+    (hstatistic : IsOrderFreeStatistic statistic) (xs : List α) :
+    statistic xs.reverse = statistic xs :=
+  hstatistic xs.reverse xs xs.reverse_perm
+
+/-- The antisymmetric statistic carried by one ordered pair.  Choices of `f` and `g` can
+represent two allele, haplotype, ancestry, or functional annotations; the determinant
+measures their directional transition imbalance. -/
+noncomputable def twoUnitArrow {α : Type*} (f g : α → ℝ) (x₀ x₁ : α) : ℝ :=
+  f x₀ * g x₁ - g x₀ * f x₁
+
+/-- Reversing an ordered pair negates its arrow statistic. -/
+theorem twoUnitArrow_swap {α : Type*} (f g : α → ℝ) (x₀ x₁ : α) :
+    twoUnitArrow f g x₁ x₀ = -twoUnitArrow f g x₀ x₁ := by
+  unfold twoUnitArrow
+  ring
+
+/-- A single repeated unit carries no arrow.  This is the algebraic core of the
+`n' = 1` versus `n' = 2` design threshold: the second ordered unit is the minimal carrier
+for this reversal-odd channel. -/
+theorem twoUnitArrow_diagonal {α : Type*} (f g : α → ℝ) (x : α) :
+    twoUnitArrow f g x x = 0 := by
+  unfold twoUnitArrow
+  ring
+
+/-- An order-free statistic gives the same answer on the two orientations of a pair. -/
+theorem orderFreeStatistic_pair_swap {α β : Type*} {statistic : List α → β}
+    (hstatistic : IsOrderFreeStatistic statistic) (x₀ x₁ : α) :
+    statistic [x₀, x₁] = statistic [x₁, x₀] := by
+  apply hstatistic
+  exact (List.Perm.swap x₀ x₁ []).symm
+
+/-- If an ordered pair has a nonzero arrow, the two orientations are distinguished by
+that one scalar probe.  The theorem asserts only orientation recovery for the named
+pair—not completeness of all Gaussian spectral diagrams. -/
+theorem twoUnitArrow_distinguishes_orientation {α : Type*} (f g : α → ℝ)
+    (x₀ x₁ : α) (harrow : twoUnitArrow f g x₀ x₁ ≠ 0) :
+    twoUnitArrow f g x₀ x₁ ≠ twoUnitArrow f g x₁ x₀ := by
+  intro h
+  have hswap := twoUnitArrow_swap f g x₀ x₁
+  apply harrow
+  linarith
 
 /-- Total squared deployment loss for a scalar spectral coordinate across a finite target
 ensemble. The vector-valued/bandwise identity follows by summing this theorem by band. -/
