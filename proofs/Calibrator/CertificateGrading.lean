@@ -394,4 +394,83 @@ theorem gradeGap_lower_bound {C : CertificateCalculus} (E : NonsmoothIncompleten
     _ = E.envelopeConst := hsimp
     _ ≤ C.modulus.Δ 0 (1 / n) * Real.sqrt (Real.log n) := henv'
 
+/-! ## The structures are inhabited, so the theorems are not vacuous
+
+A theorem conditioned on a structure says nothing if the structure has no instances, and
+this corpus tracks that failure mode explicitly. Both hypothesis-carrying structures above
+are therefore given explicit instances here, so that `gradeGap_lower_bound` and
+`donohoLiu_deficit_le` are known to be about something.
+
+These instances are **witnesses of consistency, not models of any statistical problem**. They
+are built to satisfy the fields and nothing more; exhibiting one does not establish that a
+real minimax problem realizes the envelope or the grade bound, which remains the open
+analytic content. -/
+
+/-- A modulus realizing the incompleteness shape: envelope `A/√(log(1/h))` at grade `0` and
+    `|h|^(c/2K)` at every positive grade. -/
+noncomputable def sampleModulus (A c : ℝ) (hA : 0 ≤ A) : GradedModulus where
+  Δ := fun K h =>
+    if K = 0 then A / Real.sqrt (Real.log (1 / h)) else |h| ^ (c / (2 * (K : ℝ)))
+  nonneg := by
+    intro K h
+    by_cases hK : K = 0
+    · simp only [hK, if_pos rfl]
+      exact div_nonneg hA (Real.sqrt_nonneg _)
+    · simp only [if_neg hK]
+      exact Real.rpow_nonneg (abs_nonneg h) _
+
+theorem sampleModulus_zero (A c : ℝ) (hA : 0 ≤ A) (h : ℝ) :
+    (sampleModulus A c hA).Δ 0 h = A / Real.sqrt (Real.log (1 / h)) := by
+  simp [sampleModulus]
+
+theorem sampleModulus_pos (A c : ℝ) (hA : 0 ≤ A) {K : ℕ} (hK : K ≠ 0) (h : ℝ) :
+    (sampleModulus A c hA).Δ K h = |h| ^ (c / (2 * (K : ℝ))) := by
+  simp [sampleModulus, hK]
+
+/-- The calculus built on `sampleModulus`, with unit value constant. -/
+noncomputable def sampleCalculus (A c : ℝ) (hA : 0 ≤ A) : CertificateCalculus where
+  modulus := sampleModulus A c hA
+  scale := 1
+  scale_pos := one_pos
+
+/-- **`NonsmoothIncompleteness` is inhabited.** Its fields are jointly satisfiable, so the
+    gap theorem is not conditioned on an empty hypothesis. -/
+noncomputable def sampleIncompleteness (A c : ℝ) (hA : 0 < A) (hc : 0 < c) :
+    NonsmoothIncompleteness (sampleCalculus A c (le_of_lt hA)) where
+  envelopeConst := A
+  envelopeConst_pos := hA
+  b := fun K => c / (K : ℝ)
+  b_pos := by
+    intro K hK
+    have hK' : (0 : ℝ) < (K : ℝ) := by exact_mod_cast hK
+    exact div_pos hc hK'
+  b_order := by
+    intro K hK
+    have hK' : ((K : ℝ)) ≠ 0 := by
+      have : (0 : ℝ) < (K : ℝ) := by exact_mod_cast hK
+      exact ne_of_gt this
+    push_cast
+    field_simp
+  envelope_lower := by
+    intro h _ _
+    exact le_of_eq (sampleModulus_zero A c (le_of_lt hA) h).symm
+  grade_upper := by
+    intro K hK h hh0 _
+    have hEq : (sampleCalculus A c (le_of_lt hA)).modulus.Δ K h
+        = |h| ^ (c / (2 * (K : ℝ))) := sampleModulus_pos A c (le_of_lt hA) hK.ne' h
+    rw [hEq, abs_of_pos hh0]
+    have hexp : c / (K : ℝ) / 2 = c / (2 * (K : ℝ)) := by ring
+    exact le_of_eq (by rw [hexp])
+
+/-- **`DonohoLiuFragment` is inhabited.** A grade-insensitive calculus satisfies it with room
+    to spare, which is the expected shape: the fragment is a statement about regimes where
+    grading costs the modulus little. -/
+def sampleDonohoLiu (C : CertificateCalculus)
+    (hflat : ∀ h, C.modulus.Δ 2 h = C.modulus.Δ 0 h) : DonohoLiuFragment C where
+  gradeTwoTight := by
+    intro h
+    unfold CertificateCalculus.ungradedRisk CertificateCalculus.certifiedRisk
+    rw [hflat h]
+    nlinarith [C.scale_pos, sq_nonneg (C.modulus.Δ 0 h)]
+
 end Calibrator.CertificateGrading
