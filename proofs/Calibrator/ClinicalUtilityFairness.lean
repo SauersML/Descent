@@ -421,13 +421,12 @@ noncomputable def specFromR2
     on `[0,1]` under the clinically relevant threshold regime. -/
 theorem sensFromR2_strictMono
     (m : LiabilityThresholdModel) (T' R2₁ R2₂ : ℝ)
-    (hPhi_mono : StrictMono Phi)
     (hR2₁ : 0 ≤ R2₁) (hR2₂ : R2₂ ≤ 1)
     (hR2 : R2₁ < R2₂)
     (h_num_nonneg : 0 ≤ Real.sqrt R2₁ * Real.sqrt m.h_sq * m.case_mean - T') :
     sensFromR2 m R2₁ T' < sensFromR2 m R2₂ T' := by
   unfold sensFromR2
-  exact liabilitySensitivity_monotone_in_R2 Phi m T' hPhi_mono
+  exact liabilitySensitivity_monotone_in_R2 Phi m T' strictMono_Phi
     R2₁ R2₂ hR2₁ hR2₂ hR2 (sigmaResid_pos m R2₂ (le_trans hR2₁ (le_of_lt hR2)) hR2₂)
     h_num_nonneg
 
@@ -435,14 +434,13 @@ theorem sensFromR2_strictMono
     on `[0,1]` under the clinically relevant threshold regime. -/
 theorem specFromR2_strictMono
     (m : LiabilityThresholdModel) (T' μ_control R2₁ R2₂ : ℝ)
-    (hPhi_mono : StrictMono Phi)
     (hμ_control_neg : μ_control < 0)
     (hR2₁ : 0 ≤ R2₁) (hR2₂ : R2₂ ≤ 1)
     (hR2 : R2₁ < R2₂)
     (h_num_nonneg : 0 ≤ T' - Real.sqrt R2₁ * Real.sqrt m.h_sq * μ_control) :
     specFromR2 m R2₁ T' μ_control < specFromR2 m R2₂ T' μ_control := by
   unfold specFromR2
-  exact liabilitySpecificity_monotone_in_R2 Phi m T' μ_control hPhi_mono hμ_control_neg
+  exact liabilitySpecificity_monotone_in_R2 Phi m T' μ_control strictMono_Phi hμ_control_neg
     R2₁ R2₂ hR2₁ hR2₂ hR2
     (sigmaResid_pos m R2₂ (le_trans hR2₁ (le_of_lt hR2)) hR2₂)
     h_num_nonneg
@@ -456,7 +454,6 @@ theorem nri_positive_when_pgs_adds_value
     (h_r2_improves : r2_old < r2_new)
     (h_r2_old : 0 ≤ r2_old)
     (h_r2_new : r2_new ≤ 1)
-    (hPhi_mono : StrictMono Phi)
     (hμ_control_neg : μ_control < 0)
     (h_sens_num_nonneg : 0 ≤ Real.sqrt r2_old * Real.sqrt m.h_sq * m.case_mean - T')
     (h_spec_num_nonneg : 0 ≤ T' - Real.sqrt r2_old * Real.sqrt m.h_sq * μ_control) :
@@ -467,12 +464,12 @@ theorem nri_positive_when_pgs_adds_value
   have h1 :
       sensFromR2 m r2_old T' < sensFromR2 m r2_new T' := by
     exact sensFromR2_strictMono m T' r2_old r2_new
-      hPhi_mono h_r2_old h_r2_new h_r2_improves h_sens_num_nonneg
+      h_r2_old h_r2_new h_r2_improves h_sens_num_nonneg
   have h2 :
       specFromR2 m r2_old T' μ_control <
         specFromR2 m r2_new T' μ_control := by
     exact specFromR2_strictMono m T' μ_control r2_old r2_new
-      hPhi_mono hμ_control_neg h_r2_old h_r2_new h_r2_improves h_spec_num_nonneg
+      hμ_control_neg h_r2_old h_r2_new h_r2_improves h_spec_num_nonneg
   linarith
 
 /-- **NRI decreases with portability loss.**
@@ -484,7 +481,6 @@ theorem nri_decreases_with_portability_loss
     (h_r2_loss : r2_target < r2_source)
     (h_r2_target : 0 ≤ r2_target)
     (h_r2_source : r2_source ≤ 1)
-    (hPhi_mono : StrictMono Phi)
     (hμ_control_neg : μ_control < 0)
     (h_sens_num_nonneg :
       0 ≤ Real.sqrt r2_target * Real.sqrt m.h_sq * m.case_mean - T')
@@ -500,12 +496,12 @@ theorem nri_decreases_with_portability_loss
   have h1 :
       sensFromR2 m r2_target T' < sensFromR2 m r2_source T' := by
     exact sensFromR2_strictMono m T' r2_target r2_source
-      hPhi_mono h_r2_target h_r2_source h_r2_loss h_sens_num_nonneg
+      h_r2_target h_r2_source h_r2_loss h_sens_num_nonneg
   have h2 :
       specFromR2 m r2_target T' μ_control <
         specFromR2 m r2_source T' μ_control := by
     exact specFromR2_strictMono m T' μ_control r2_target r2_source
-      hPhi_mono hμ_control_neg h_r2_target h_r2_source h_r2_loss h_spec_num_nonneg
+      hμ_control_neg h_r2_target h_r2_source h_r2_loss h_spec_num_nonneg
   linarith
 
 /-- **NRI can become negative in target populations.**
@@ -522,7 +518,6 @@ theorem nri_can_be_negative
     (h_r2_below : r2_target < r2_old)
     (h_r2_target : 0 ≤ r2_target)
     (h_r2_old : r2_old ≤ 1)
-    (hPhi_mono : StrictMono Phi)
     (hμ_control_neg : μ_control < 0)
     (h_sens_num_nonneg :
       0 ≤ Real.sqrt r2_target * Real.sqrt m.h_sq * m.case_mean - T')
@@ -535,12 +530,12 @@ theorem nri_can_be_negative
   have h1 :
       sensFromR2 m r2_target T' < sensFromR2 m r2_old T' := by
     exact sensFromR2_strictMono m T' r2_target r2_old
-      hPhi_mono h_r2_target h_r2_old h_r2_below h_sens_num_nonneg
+      h_r2_target h_r2_old h_r2_below h_sens_num_nonneg
   have h2 :
       specFromR2 m r2_target T' μ_control <
         specFromR2 m r2_old T' μ_control := by
     exact specFromR2_strictMono m T' μ_control r2_target r2_old
-      hPhi_mono hμ_control_neg h_r2_target h_r2_old h_r2_below h_spec_num_nonneg
+      hμ_control_neg h_r2_target h_r2_old h_r2_below h_spec_num_nonneg
   linarith
 
 end NRI
@@ -650,7 +645,6 @@ theorem portability_narrows_useful_range
     (h_r2 : r2_target < r2_source)
     (h_r2_target : 0 ≤ r2_target)
     (h_r2_source : r2_source ≤ 1)
-    (hPhi_mono : StrictMono Phi)
     (hμ_control_neg : μ_control < 0)
     (h_sens_num_nonneg :
       0 ≤ Real.sqrt r2_target * Real.sqrt m.h_sq * m.case_mean - T')
@@ -666,12 +660,12 @@ theorem portability_narrows_useful_range
   have h_sens :
       sensFromR2 m r2_target T' < sensFromR2 m r2_source T' := by
     exact sensFromR2_strictMono m T' r2_target r2_source
-      hPhi_mono h_r2_target h_r2_source h_r2 h_sens_num_nonneg
+      h_r2_target h_r2_source h_r2 h_sens_num_nonneg
   have h_spec :
       specFromR2 m r2_target T' μ_control <
         specFromR2 m r2_source T' μ_control := by
     exact specFromR2_strictMono m T' μ_control r2_target r2_source
-      hPhi_mono hμ_control_neg h_r2_target h_r2_source h_r2 h_spec_num_nonneg
+      hμ_control_neg h_r2_target h_r2_source h_r2 h_spec_num_nonneg
   repeat rw [decisionCurveNetBenefit_eq_formula]
   have htt : 0 < t / (1 - t) := div_pos ht (by linarith)
   have h1 : sensFromR2 m r2_target T' * π < sensFromR2 m r2_source T' * π :=
@@ -763,14 +757,13 @@ theorem portability_violates_equalized_odds
     (h_r2_gap : r2_target < r2_source)
     (h_r2_target : 0 ≤ r2_target)
     (h_r2_source : r2_source ≤ 1)
-    (hPhi_mono : StrictMono Phi)
     (h_sens_num_nonneg :
       0 ≤ Real.sqrt r2_target * Real.sqrt m.h_sq * m.case_mean - T') :
     sensFromR2 m r2_target T' ≠ sensFromR2 m r2_source T' := by
   have h_sens_lt :
       sensFromR2 m r2_target T' < sensFromR2 m r2_source T' := by
     exact sensFromR2_strictMono m T' r2_target r2_source
-      hPhi_mono h_r2_target h_r2_source h_r2_gap h_sens_num_nonneg
+      h_r2_target h_r2_source h_r2_gap h_sens_num_nonneg
   linarith
 
 /-- **The fairness-accuracy tradeoff.**

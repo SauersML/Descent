@@ -381,7 +381,6 @@ theorem do_no_harm_principle
     (h_r2_loss : r2_target < r2_source)
     (h_r2_target : 0 ≤ r2_target)
     (h_r2_source : r2_source ≤ 1)
-    (hPhi_mono : StrictMono Phi)
     (hμ_control_neg : μ_control < 0)
     (h_sens_num_nonneg :
       0 ≤ Real.sqrt r2_target * Real.sqrt m.h_sq * m.case_mean - T')
@@ -397,12 +396,12 @@ theorem do_no_harm_principle
   have h_sens :
       sensFromR2 m r2_target T' < sensFromR2 m r2_source T' := by
     exact sensFromR2_strictMono m T' r2_target r2_source
-      hPhi_mono h_r2_target h_r2_source h_r2_loss h_sens_num_nonneg
+      h_r2_target h_r2_source h_r2_loss h_sens_num_nonneg
   have h_spec :
       specFromR2 m r2_target T' μ_control <
         specFromR2 m r2_source T' μ_control := by
     exact specFromR2_strictMono m T' μ_control r2_target r2_source
-      hPhi_mono hμ_control_neg h_r2_target h_r2_source h_r2_loss h_spec_num_nonneg
+      hμ_control_neg h_r2_target h_r2_source h_r2_loss h_spec_num_nonneg
   have h1 :
       sensFromR2 m r2_target T' * π * benefit <
         sensFromR2 m r2_source T' * π * benefit := by
@@ -435,7 +434,6 @@ theorem phased_deployment_reduces_risk
     (h_r2_gap : r2_unvalidated < r2_validated)
     (h_r2_unvalidated : 0 ≤ r2_unvalidated)
     (h_r2_validated : r2_validated ≤ 1)
-    (hPhi_mono : StrictMono Phi)
     (hμ_control_neg : μ_control < 0)
     (h_sens_num_nonneg :
       0 ≤ Real.sqrt r2_unvalidated * Real.sqrt m.h_sq * m.case_mean - T')
@@ -453,12 +451,12 @@ theorem phased_deployment_reduces_risk
   have h_sens :
       sensFromR2 m r2_unvalidated T' < sensFromR2 m r2_validated T' := by
     exact sensFromR2_strictMono m T' r2_unvalidated r2_validated
-      hPhi_mono h_r2_unvalidated h_r2_validated h_r2_gap h_sens_num_nonneg
+      h_r2_unvalidated h_r2_validated h_r2_gap h_sens_num_nonneg
   have h_spec :
       specFromR2 m r2_unvalidated T' μ_control <
         specFromR2 m r2_validated T' μ_control := by
     exact specFromR2_strictMono m T' μ_control r2_unvalidated r2_validated
-      hPhi_mono hμ_control_neg h_r2_unvalidated h_r2_validated h_r2_gap h_spec_num_nonneg
+      hμ_control_neg h_r2_unvalidated h_r2_validated h_r2_gap h_spec_num_nonneg
   have h1 :
       sensFromR2 m r2_unvalidated T' * π <
         sensFromR2 m r2_validated T' * π :=

@@ -810,10 +810,13 @@ transport of a hypothesis, not a discovery:
   assumes the source is perfectly calibrated in the large, together with
   `h_shift_nonzero`. Against a source CITL pinned to `0`, any nonzero shift is worse.
 
-`hPhiStrict : StrictMono Phi` is a hypothesis for a fact that is true and provable:
-`Phi` is `ProbabilityTheory.cdf (gaussianReal 0 1)`, whose strict monotonicity follows
-from the Gaussian density being positive. It is carried as a hypothesis here and in six
-other files in this corpus rather than proved once. -/
+The `hPhiStrict : StrictMono Phi` hypothesis this theorem used to carry is **gone**, and
+the paragraph that used to be here — noting that it was a provable fact assumed in this
+file and six others — has been discharged rather than merely noted.
+`Probability.strictMono_Phi` proves it: `Phi` is `ProbabilityTheory.cdf (gaussianReal 0 1)`,
+and its
+strict monotonicity follows from the Gaussian density being positive.  Every use below now
+resolves against that theorem. -/
 theorem cross_ancestry_exact_metric_profile_from_shift_budget
     {p q : ℕ}
     (metric : CrossPopulationMetricModel p q)
@@ -826,8 +829,7 @@ theorem cross_ancestry_exact_metric_profile_from_shift_budget
       r2FromSourceWeights metric Pop.target < r2FromSourceWeights metric Pop.source)
     (h_src_cal : ((cal.identityCalibrationProfile Pop.source)).citl = 0)
     (h_shift_nonzero :
-      cal.observedMeanShift - cal.predictedMeanShift ≠ 0)
-    (hPhiStrict : StrictMono Phi) :
+      cal.observedMeanShift - cal.predictedMeanShift ≠ 0) :
     let sourceProfile := (cal.identityCalibrationProfile Pop.source)
     let targetProfile := (cal.identityCalibrationProfile Pop.target)
     let sourceMetrics :=
@@ -847,7 +849,7 @@ theorem cross_ancestry_exact_metric_profile_from_shift_budget
       sourceMetricProfileFromSourceWeightsAtPrevalence_auc,
       targetEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart,
       sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart]
-    exact equalVarianceGaussianAUCFromExplainedR2_strictMonoOn_unitInterval hPhiStrict
+    exact equalVarianceGaussianAUCFromExplainedR2_strictMonoOn_unitInterval
       h_target_r2_unit h_source_r2_unit h_r2_drop
   have h_citl_eq :
       ((cal.identityCalibrationProfile Pop.target)).citl =
@@ -912,8 +914,7 @@ theorem cross_ancestry_exact_metric_profile
       r2FromSourceWeights cal.metric Pop.target < r2FromSourceWeights cal.metric Pop.source)
     (h_src_cal : ((cal.identityCalibrationProfile Pop.source)).citl = 0)
     (h_shift_nonzero :
-      cal.observedMeanShift - (cal.scoreMeanShift + cal.deploymentInterceptShift) ≠ 0)
-    (hPhiStrict : StrictMono Phi) :
+      cal.observedMeanShift - (cal.scoreMeanShift + cal.deploymentInterceptShift) ≠ 0) :
     let sourceProfile := (cal.identityCalibrationProfile Pop.source)
     let targetProfile := (cal.identityCalibrationProfile Pop.target)
     let sourceMetrics :=
@@ -950,7 +951,7 @@ theorem cross_ancestry_exact_metric_profile
   have h_main :=
     cross_ancestry_exact_metric_profile_from_shift_budget cal.metric cal.toShiftModel
       h_target_mean_eq_prevalence_shift h_source_r2_unit h_target_r2_unit h_r2_drop
-      h_src_cal_shift h_shift_nonzero_shift hPhiStrict
+      h_src_cal_shift h_shift_nonzero_shift
   dsimp at h_main ⊢
   rcases h_main with ⟨h_auc, h_citl, h_abs, h_worse, h_brier⟩
   refine ⟨h_auc, ?_, ?_, ?_, ?_⟩
@@ -1198,8 +1199,7 @@ theorem cross_ancestry_auc_drop_and_citl_worsening_of_r2_drop_and_shift_budget
       r2FromSourceWeights metric Pop.target < r2FromSourceWeights metric Pop.source)
     (h_src_cal : ((cal.identityCalibrationProfile Pop.source)).citl = 0)
     (h_shift_nonzero :
-      cal.observedMeanShift - cal.predictedMeanShift ≠ 0)
-    (hPhiStrict : StrictMono Phi) :
+      cal.observedMeanShift - cal.predictedMeanShift ≠ 0) :
     let sourceProfile := (cal.identityCalibrationProfile Pop.source)
     let targetProfile := (cal.identityCalibrationProfile Pop.target)
     let sourceMetrics := sourceMetricProfileFromSourceWeightsAtTargetPrevalence metric
@@ -1216,7 +1216,7 @@ theorem cross_ancestry_auc_drop_and_citl_worsening_of_r2_drop_and_shift_budget
       sourceMetricProfileFromSourceWeightsAtTargetPrevalence_auc,
       targetEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart,
       sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart]
-    exact equalVarianceGaussianAUCFromExplainedR2_strictMonoOn_unitInterval hPhiStrict
+    exact equalVarianceGaussianAUCFromExplainedR2_strictMonoOn_unitInterval
       h_target_r2_unit h_source_r2_unit h_r2_drop
   have h_citl_eq :
       ((cal.identityCalibrationProfile Pop.target)).citl =
@@ -1258,8 +1258,7 @@ theorem cross_ancestry_auc_drop_and_prevalence_only_citl_worsening_of_r2_drop
     (h_genetic : cal.geneticObservedShift = 0)
     (h_score : cal.scoreMeanShift = 0)
     (h_intercept : cal.deploymentInterceptShift = 0)
-    (h_prev_shift : cal.prevalenceShift ≠ 0)
-    (hPhiStrict : StrictMono Phi) :
+    (h_prev_shift : cal.prevalenceShift ≠ 0) :
     let sourceProfile := (cal.identityCalibrationProfile Pop.source)
     let targetProfile := (cal.identityCalibrationProfile Pop.target)
     let sourceMetrics := sourceMetricProfileFromSourceWeightsAtTargetPrevalence metric
@@ -1276,7 +1275,7 @@ theorem cross_ancestry_auc_drop_and_prevalence_only_citl_worsening_of_r2_drop
   have h_main :=
     cross_ancestry_auc_drop_and_citl_worsening_of_r2_drop_and_shift_budget
       metric cal h_source_r2_unit h_target_r2_unit h_r2_drop
-      h_src_cal h_shift_nonzero hPhiStrict
+      h_src_cal h_shift_nonzero
   dsimp at h_main ⊢
   rcases h_main with ⟨h_auc, h_citl, h_abs, h_worse⟩
   refine ⟨h_auc, ?_, ?_, h_worse⟩
@@ -1297,15 +1296,14 @@ theorem neutralAF_benchmark_cross_ancestry_auc_drops_and_brier_worsens
     (hπ0 : 0 < π) (hπ1 : π < 1)
     (hVA : 0 < V_A) (hVE : 0 < V_E)
     (h_fst : fstSource < fstTarget)
-    (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1)
-    (hPhiStrict : StrictMono Phi) :
+    (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1) :
     presentDayEqualVarianceGaussianAUC V_A V_E fstTarget <
       presentDayEqualVarianceGaussianAUC V_A V_E fstSource ∧
     sourceBrierFromR2 π (presentDayR2 V_A V_E fstSource) <
       targetExactCalibratedBrierRisk π V_A V_E fstTarget := by
   constructor
   · exact targetLiabilityAUC_lt_source_of_neutralAF_benchmark
-      V_A V_E fstSource fstTarget hVA hVE h_fst h_fst_bounds hPhiStrict
+      V_A V_E fstSource fstTarget hVA hVE h_fst h_fst_bounds
   · exact targetBrier_strict_gt_source_of_neutralAF_benchmark π V_A V_E fstSource fstTarget
       hπ0 hπ1 hVA hVE h_fst h_fst_bounds
 
