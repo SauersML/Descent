@@ -99,12 +99,14 @@ CELL_METRICS = ("fst", "n_snps", "t_sec", "pgsVar_ratio",
 
 
 def lean_stabilizingPortability(r2_0, fst, strength):
-    """PortabilityBounds.lean:223"""
+    """Transcribed from the absent PortabilityBounds declaration
+    stabilizingPortability. This run falsified it, and the header records
+    the measurement that removed it."""
     return r2_0 * (1 - 2 * fst) * np.exp(-strength * fst)
 
 
 def lean_pgsVariance(beta, p):
-    """ScoreDistribution.lean:42  `∑ i, β i ^ 2 * (2 * p i * (1 - p i))`"""
+    """ScoreDistribution declaration pgsVariance, `∑ i, β i ^ 2 * (2 * p i * (1 - p i))`."""
     return float(np.sum(beta**2 * 2 * p * (1 - p)))
 
 
