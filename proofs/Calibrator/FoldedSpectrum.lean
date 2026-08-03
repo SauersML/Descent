@@ -1789,6 +1789,141 @@ theorem even_blind_to_reversal {φ : Symbol → ℝ} (h : T.ReversalEven φ) (s 
 
 end TimeReversal
 
+/-! ### 14a‴. COROLLARY 2 IS VACUOUS HERE, AND THAT IS THE RESULT
+
+The two corollaries above are correct. In **this corpus's actual setting** the second one has
+an **empty hypothesis**, and proving that is worth more than the corollary was.
+
+For a real scalar stationary process, `γ(-k) = E[X₀X₋ₖ] = E[XₖX₀] = γ(k)` **by stationarity
+alone** — no extra assumption, no Gaussianity, nothing about the model. So the spectral
+measure is real and even, its odd part is identically zero, and in the Gaussian-latent layer
+`Fᵢ = f(Zᵢ)` inherits reversibility pointwise from `Z`. **Every process in the Arrow
+Theorem's stated setting is time-reversible.** `odd_vanishes_on_reversible` therefore does
+not describe a special case; it describes everything here, and `odd_statistic_separates` has
+nothing to separate.
+
+**THE PHYSICAL REASON, which is what makes this robust rather than a technicality: genomic
+position has no arrow.** Reading a chromosome 5'→3' versus 3'→5' is not a dynamical
+asymmetry. The reversal-odd tangent is not merely unrealizable in the Gaussian scalar layer —
+it is **absent from this application**.
+
+**WHERE THE CONTENT RETURNS**, because the Arrow Theorem is empty *here*, not in general:
+
+* **vector-valued observables**, where `Γ(-k) = Γ(k)ᵀ` rather than `Γ(k)`, so the quadrature
+  cross-spectrum is genuinely reversal-odd even in the Gaussian case;
+* **real scalar non-Gaussian**, where asymmetry appears at third order as the imaginary part
+  of the bispectrum — which is filed as *Conjecture A.1*, a "generalization", when for
+  scalars it is precisely where the only content lives. -/
+
+/-- Second moments of a real scalar process, indexed by position pairs along the genome. -/
+structure ScalarSecondMoments where
+  /-- `moment i j = E[Xᵢ Xⱼ]`. -/
+  moment : ℤ → ℤ → ℝ
+  /-- `E[XᵢXⱼ] = E[XⱼXᵢ]`. This is commutativity of multiplication, not a modelling
+  assumption. -/
+  moment_comm : ∀ i j : ℤ, moment i j = moment j i
+  /-- Stationarity: second moments depend only on the lag. -/
+  stationary : ∀ i j d : ℤ, moment (i + d) (j + d) = moment i j
+
+namespace ScalarSecondMoments
+
+variable (S : ScalarSecondMoments)
+
+/-- The autocovariance at lag `k`. -/
+def gamma (k : ℤ) : ℝ := S.moment 0 k
+
+/-- **`γ(-k) = γ(k)`, FROM STATIONARITY ALONE.** Shift the pair `(0, -k)` by `k`, then
+commute. No hypothesis beyond the definition of a stationary second moment is used. -/
+theorem gamma_symmetric_of_stationary (k : ℤ) : S.gamma (-k) = S.gamma k := by
+  unfold gamma
+  calc S.moment 0 (-k)
+      = S.moment (0 + k) (-k + k) := (S.stationary 0 (-k) k).symm
+    _ = S.moment k 0 := by norm_num
+    _ = S.moment 0 k := S.moment_comm k 0
+
+/-- **Every real scalar stationary process is its own time reverse.** -/
+theorem gamma_reversible : (fun k => S.gamma (-k)) = S.gamma := by
+  funext k
+  exact S.gamma_symmetric_of_stationary k
+
+/-- **The reversal-odd part of a real scalar stationary symbol is identically zero.**
+
+This is the emptiness of Corollary 2's hypothesis, written as the vanishing of the odd part
+itself. There is no arrow to carry, so there is no bit to spend on carrying it. -/
+theorem reversalOdd_eq_zero_of_real_scalar (k : ℤ) :
+    (S.gamma (-k) - S.gamma k) / 2 = 0 := by
+  rw [S.gamma_symmetric_of_stationary k]
+  ring
+
+end ScalarSecondMoments
+
+/-! ### 14a⁗. THE CEILING COLLAPSES TO THE SUPPORT WALL
+
+The boxed characterization of the deployment ceiling is
+
+`r⊥ = 0  ⟺  (η > 0) ∧ (reversible ∨ arrow bit)`.
+
+By `reversalOdd_eq_zero_of_real_scalar` the second conjunct is a **tautology** in this
+setting, so the characterization collapses to
+
+> **`r⊥ = 0 ⟺ η > 0`**
+
+which is cleaner and strictly stronger than the papers state it.
+
+**THE BIOLOGICAL CLAIM, and it is the strongest in the arc.** As long as no marker is a
+deterministic function of the others, aggregate deployment risk has **no floor**: it decays to
+zero in source sample size and number of target groups. **The irreducible portability gap is
+not an information-theoretic wall. It is a sample-size problem, provided perfect LD is
+pruned.**
+
+**THE QUALIFICATION THAT MUST TRAVEL WITH IT: the floor is replaced by a cost, not by
+nothing.** The sealing law contributes `1/(mη²)`, which diverges as pruning becomes
+permissive. The honest form is *a sample-size problem whose constant explodes as you approach
+perfect LD*, and the trade-off is
+
+`m ≥ d / (2·c₋·η²·R_target)`.
+
+**LD-pruning threshold and cohort diversity are conjugate**, and both are currently set by
+convention in the field rather than by this inequality. -/
+
+/-- The deployment ceiling, with the boxed characterization as a field. -/
+structure DeploymentCeiling where
+  /-- Aggregate deployment risk orthogonal to what the source identifies. -/
+  perpRisk : ℝ
+  /-- The conditional charge floor `η` of §10: `η = 0` is perfect LD. -/
+  eta : ℝ
+  /-- Whether the family is time-reversible. -/
+  reversible : Prop
+  /-- Whether an arrow bit — one lag-asymmetric statistic — has been measured. -/
+  arrowBit : Prop
+  /-- **The boxed characterization.** -/
+  characterization : perpRisk = 0 ↔ (0 < eta ∧ (reversible ∨ arrowBit))
+
+/-- **THE COLLAPSE.** Since every real scalar stationary family here is reversible, the
+ceiling vanishes exactly when the support wall is clear: `r⊥ = 0 ⟺ η > 0`. No arrow bit is
+required, and none would help. -/
+theorem ceiling_collapses_to_support_wall (C : DeploymentCeiling) (hrev : C.reversible) :
+    C.perpRisk = 0 ↔ 0 < C.eta := by
+  rw [C.characterization]
+  exact ⟨fun h => h.1, fun h => ⟨h, Or.inl hrev⟩⟩
+
+/-- Cohorts required for a target aggregate risk: `m ≥ d/(2 c₋ η² R)`. -/
+noncomputable def requiredCohorts (d cMinus eta R : ℝ) : ℝ :=
+  d / (2 * cMinus * eta ^ 2 * R)
+
+/-- **The cost that replaces the floor.** Permissive pruning — smaller `η` — needs strictly
+more cohorts, and the requirement diverges as `η → 0`. This is why "no floor" must never be
+quoted without "whose constant explodes as you approach perfect LD". -/
+theorem requiredCohorts_diverges_as_eta_shrinks
+    (d cMinus R e₁ e₂ : ℝ) (hd : 0 < d) (hc : 0 < cMinus) (hR : 0 < R)
+    (he₁ : 0 < e₁) (hlt : e₁ < e₂) :
+    requiredCohorts d cMinus e₂ R < requiredCohorts d cMinus e₁ R := by
+  unfold requiredCohorts
+  have h1 : 0 < 2 * cMinus * e₁ ^ 2 * R := by positivity
+  have hsq : e₁ ^ 2 < e₂ ^ 2 := by nlinarith
+  have h2 : 2 * cMinus * e₁ ^ 2 * R < 2 * cMinus * e₂ ^ 2 * R := by nlinarith
+  exact div_lt_div_of_pos_left hd h1 h2
+
 /-! ### 14a″. The two-unit arrow carrier and a conditional information model
 
 `EnsembleChannel.twoUnitArrow_diagonal` proves that one repeated unit carries no value of the
@@ -1799,6 +1934,16 @@ dependence parameter.
 
 **Two units are qualitatively different from one; the second unit is the arrow's minimal
 carrier for this named probe.**
+
+**A UNIT CORRECTION THAT CHANGES HOW THIS SHOULD BE READ: `n'` IS LOCI PER TARGET, NOT
+INDIVIDUALS.** The index runs along the genome, so `n'` is in the millions and the mixing
+time is the **LD decay length**. So `n' = 1` is a regime nobody occupies, and the `n' ≫
+mixing` condition the budget decoupling requires is satisfied by about six orders of
+magnitude rather than being a condition anyone needs to check.
+
+`depth_one_cannot_be_bought` stays true and is worth keeping as the boundary case that shows
+the axes are independent — but it must **not** be quoted as a live constraint on study
+design. The breadth constraint of `RecoveryAttenuation` (`B ≈ 350`) is live; this one is not.
 
 This sits directly beside `RecoveryAttenuation`, and the two constrain *different axes*:
 
@@ -1844,6 +1989,18 @@ theorem two_units_carry_information (m B : ℝ) (hm : 0 < m) (hB : 0 < B)
   exact mul_pos (mul_pos hm hB) (M.opens_at_two hsens)
 
 end AssumedMembraneThreshold
+
+The binary orientation experiment now supplies one fully derived instance of this design
+logic. `EnsembleChannel.binaryOrientation_orderFree_mean` proves that **every** order-free
+readout has mean independent of the forward/reverse imbalance `θ`, while
+`binaryOrientation_arrow_mean` gives the ordered determinant mean `θ` and
+`binaryOrientationArrowVariance_pos` gives variance `1 - θ² > 0` for `|θ| < 1`.
+`Permeability.binaryOrientationArrowPermeability_eq` therefore yields the exact per-pair
+law `p(θ) = 1/(1-θ²)`, with one information unit at the reversible center and `m`-pair
+information `m/(1-θ²)`.  This is the first non-Gaussian, direction-sensitive permeability
+calculation in the strand.  It says exactly what a deployment study can buy by retaining
+an oriented adjacent haplotype/ancestry transition; extension to a multistate chain still
+requires its transition law and noise covariance.
 
 /-! ### 14b. Per-target invisibility and compound prediction
 
@@ -2112,7 +2269,14 @@ separates quotient fibres remains the continuation. -/
   observation, but the claimed full visible algebra modulo reversal, its Gaussian diagram
   reconstruction, and nonparametric empirical-Bayes regret remain open.
 
-* **Permeability is proved only for the Gaussian covariance experiment.**
+* **The arrow channel now has one exact experiment-specific information law.** In the
+  two-orientation binary transition model, all order-free means are independent of `θ`, the
+  ordered arrow has response one and variance `1-θ²`, and its permeability is exactly
+  `1/(1-θ²)`. This validates the one-versus-two-unit design threshold for that named model.
+  It does not prove a universal one-bit completion theorem for arbitrary non-reversible LD
+  or ancestry processes.
+
+* **Permeability is experiment-specific, not a universal cumulant slogan.**
   `Permeability.covarianceScoreInformation_gaussian` now derives
   `p = (1/2)(Γ/Σ)²` from the centered Gaussian second and fourth moments rather than merely
   naming the formula. `totalGaussianInformation_mul_estimatorVariance` proves the exact
