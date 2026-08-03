@@ -595,10 +595,12 @@ theorem bernoulliKLReal_eq_zero_iff (p q : ℝ)
             rw [mul_div_cancel₀ _ hp0.ne']
           have hcompl_cancel : (1 - p) * ((1 - q) / (1 - p)) = 1 - q := by
             rw [mul_div_cancel₀ _ (by linarith)]
-          rw [show -p * (q / p - 1) = -(p * (q / p)) + p by ring,
-            show -(1 - p) * ((1 - q) / (1 - p) - 1) =
-              -((1 - p) * ((1 - q) / (1 - p))) + (1 - p) by ring,
-            hqp_cancel, hcompl_cancel]
+          calc
+            -p * (q / p - 1) - (1 - p) * ((1 - q) / (1 - p) - 1) =
+                -(p * (q / p)) + p -
+                  ((1 - p) * ((1 - q) / (1 - p))) + (1 - p) := by ring
+            _ = -q + p - (1 - q) + (1 - p) := by
+              rw [hqp_cancel, hcompl_cancel]
         _ = 0 := by ring
     exact hpositive.ne' hzero
   · intro h
