@@ -30,8 +30,7 @@ open TransportedMetrics (r2FromSignalVariance)
 Nothing here formalizes mediation, counterfactual reasoning, causal discovery or
 do-calculus. The file holds **no causal graph, no structural causal model, no intervention
 operator, no counterfactual semantics and no identification criterion**. Every declaration
-is named for what it proves, and the names below that a reader may meet elsewhere are
-absent on purpose.
+is named for what it proves.
 
 **The arithmetic is correct.** The whole hazard is in naming and prose, which is the more
 dangerous kind: a false interpretation attached to a true lemma looks machine-checked.
@@ -43,27 +42,25 @@ strictly increasing in the signal `v` and strictly decreasing in the noise `n`. 
 theorems instantiate that with different names for the noise term:
 
 * `r2_strictMono_under_ld_noise_reduction`, `r2_strictMono_under_environment_noise_reduction`
-  — removing a positive fraction of a noise component raises `R²`. The names
-  `ld_mediates_portability` and `environment_mediates_portability` are absent on purpose.
+  — removing a positive fraction of a noise component raises `R²`.
   **Subtracting a positive scalar is not mediation.** No mediator variable appears anywhere
   in the statement.
 * `r2_lt_of_drift_variance_pos`, `r2_lt_of_technical_noise_pos`, `r2_lt_of_sampling_noise_pos`,
-  `r2_lt_of_gxe_noise_pos` — four instances of the same monotonicity. The `counterfactual_*`
-  names are absent on purpose. **No counterfactual semantics is involved**: there is no twin network,
+  `r2_lt_of_gxe_noise_pos` — four instances of the same monotonicity.
+  **No counterfactual semantics is involved**: there is no twin network,
   no potential outcome, and nothing is evaluated in a world other than the one described by
   the formula.
 * `r2_chain_strictMono_of_decreasing_noise` — a chain of four inequalities obtained by
-  ordering hand-chosen denominators. The name `intervention_hierarchy` is absent on purpose.
+  ordering hand-chosen denominators.
   **There is no intervention operator here.** `do(·)` is never defined, so the ordering is
   an ordering of expressions, not of interventions.
-* `indirect_eq_total_sub_direct_of_sum` — the name `mediation_decomposition` is absent on
-  purpose. It **assumes** `total = direct + indirect` and rearranges to
-  `indirect = total - direct`. Deleting the proof and substituting the hypothesis gives the
-  same statement, so it is a rearrangement and its name says so.
+* `indirect_eq_total_sub_direct_of_sum` — it **assumes** `total = direct + indirect` and
+  rearranges to `indirect = total - direct`. Deleting the proof and substituting the
+  hypothesis gives the same statement, so it is a rearrangement and its name says so.
 * `each_component_le_total_of_sum_decomp`, `half_lt_share_of_half_lt_part` — likewise
   rearrangements of an assumed sum and of an assumed inequality.
 * `r2_increments_strictAnti_in_signal` — concavity of `v ↦ v/(v+n)`. This one is a genuine
-  property of the formula, and `diminishing_marginal_returns` is an honest name for it.
+  property of the formula.
 * `r2_strictMono_under_effect_turnover` — genuine monotonicity, since `ρ² v < v` for
   `0 < ρ < 1`.
 
@@ -78,13 +75,16 @@ assumption — of `total = direct + indirect` from those equations; and any iden
 criterion such as backdoor adjustment.
 
 Until those exist, **the biological readings in the docstrings below are interpretations of
-arithmetic, not consequences of a causal model**, and the file name is retained only
-because renaming a file is a larger change than this commit makes.
+arithmetic, not consequences of a causal model**. The file name overstates the contents and
+is retained only because a rename touches every importer.
+
+The causal content this file is named for is built in
+`Calibrator.BundleRigidity.LinearSCM`, which has structural equations, intervention as
+graph surgery, and the mediation identity as a derived theorem rather than a hypothesis.
 
 The corpus-wide no-external-theorem-parameter rule warns that giving a biological name to a
-formula makes a false interpretation look machine-checked. This file was that warning's
-specimen; the former record-based identification interface was deleted because callers could
-install the desired conclusion as data.
+formula makes a false interpretation look machine-checked. This file is that warning's
+specimen.
 
 Reference for the biological setting (not for any theorem here):
 Wang et al. (2026), Nature Communications 17:942.
@@ -185,7 +185,9 @@ theorem indirect_eq_total_sub_direct_of_sum
     indirect_effect = total_effect - direct_effect := by linarith
 
 /-- **Ratio of two reals.** Named `effectShare` rather than `proportionMediated`: nothing
-    here establishes that the numerator is an indirect effect. -/
+    here establishes that the numerator is an indirect effect.
+
+        Empirical status: UNTESTED. -/
 noncomputable def effectShare (indirect_effect total_effect : ℝ) : ℝ :=
   indirect_effect / total_effect
 
