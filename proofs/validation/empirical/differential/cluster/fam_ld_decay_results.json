@@ -1,0 +1,184 @@
+{
+ "controls": {
+  "C1_drift_only": 0.9974548963376884,
+  "C1_expected": 0.9975,
+  "C1_pass": true,
+  "C2_recomb_only": 0.98,
+  "C2_expected": 0.98,
+  "C2_pass": true,
+  "C3_null_bottleneck_pass": false
+ },
+ "A_D_retention": [
+  {
+   "r": 0.0,
+   "measured": 0.9973587783400081,
+   "hill_robertson": 0.9975,
+   "rel_err": -0.00014157559898944828,
+   "gens_used": 61
+  },
+  {
+   "r": 0.00125,
+   "measured": 0.9962778761849962,
+   "hill_robertson": 0.9962531250000001,
+   "rel_err": 2.48442733829508e-05,
+   "gens_used": 61
+  },
+  {
+   "r": 0.0025,
+   "measured": 0.9951638836764376,
+   "hill_robertson": 0.9950062500000001,
+   "rel_err": 0.00015842481033411345,
+   "gens_used": 61
+  },
+  {
+   "r": 0.005,
+   "measured": 0.9920595683237848,
+   "hill_robertson": 0.9925125,
+   "rel_err": -0.00045634858625476725,
+   "gens_used": 61
+  },
+  {
+   "r": 0.02,
+   "measured": 0.9777250068512962,
+   "hill_robertson": 0.97755,
+   "rel_err": 0.00017902598465154953,
+   "gens_used": 61
+  },
+  {
+   "r": 0.1,
+   "measured": 0.9006163533836461,
+   "hill_robertson": 0.89775,
+   "rel_err": 0.003192819140792033,
+   "gens_used": 57
+  }
+ ],
+ "B_sigma_d2": [
+  {
+   "rho": 0.5,
+   "measured": 0.28114633743689504,
+   "corpus_driftLDEquilibrium": 0.6663886958750639,
+   "ohta_kimura": 0.3652173913043478,
+   "closer_to": "Ohta-Kimura"
+  },
+  {
+   "rho": 2.0,
+   "measured": 0.22757950085092657,
+   "corpus_driftLDEquilibrium": 0.3322209876589098,
+   "ohta_kimura": 0.23076923076923078,
+   "closer_to": "Ohta-Kimura"
+  },
+  {
+   "rho": 10.0,
+   "measured": 0.08196392265168671,
+   "corpus_driftLDEquilibrium": 0.08884408259105159,
+   "ohta_kimura": 0.07936507936507936,
+   "closer_to": "Ohta-Kimura"
+  },
+  {
+   "rho": 40.0,
+   "measured": 0.025332080182326515,
+   "corpus_driftLDEquilibrium": 0.022032374100719447,
+   "ohta_kimura": 0.02334267040149393,
+   "closer_to": "Ohta-Kimura"
+  }
+ ],
+ "C_bottleneck": [
+  {
+   "rho_at_Nb": 2.0,
+   "c": 0.01,
+   "N_b": 500,
+   "t_b": 25,
+   "arm": "NULL (no bottleneck)",
+   "sigma_d2_pre": 0.03861279005791392,
+   "sigma_d2_post": 0.044971813154076626,
+   "ratio_measured": 1.1646869621859761,
+   "corpus_prediction": 0.04693943036671273,
+   "corpus_ratio": 1.2156446166234034
+  },
+  {
+   "rho_at_Nb": 2.0,
+   "c": 0.01,
+   "N_b": 500,
+   "t_b": 100,
+   "arm": "NULL (no bottleneck)",
+   "sigma_d2_pre": 0.03861279005791392,
+   "sigma_d2_post": 0.040382360922569874,
+   "ratio_measured": 1.0458286195325912,
+   "corpus_prediction": 0.04693943036671273,
+   "corpus_ratio": 1.2156446166234034
+  },
+  {
+   "rho_at_Nb": 2.0,
+   "c": 0.01,
+   "N_b": 50,
+   "t_b": 25,
+   "arm": "bottleneck",
+   "sigma_d2_pre": 0.03861279005791392,
+   "sigma_d2_post": 0.2316805792155089,
+   "ratio_measured": 6.000099419596969,
+   "corpus_prediction": 0.19678959499835416,
+   "corpus_ratio": 5.096487322029737
+  },
+  {
+   "rho_at_Nb": 2.0,
+   "c": 0.01,
+   "N_b": 50,
+   "t_b": 100,
+   "arm": "bottleneck",
+   "sigma_d2_pre": 0.03861279005791392,
+   "sigma_d2_post": 0.12089992632683413,
+   "ratio_measured": 3.1310849629229263,
+   "corpus_prediction": 0.31610789073232065,
+   "corpus_ratio": 8.186610971602983
+  },
+  {
+   "rho_at_Nb": 10.0,
+   "c": 0.05,
+   "N_b": 500,
+   "t_b": 25,
+   "arm": "NULL (no bottleneck)",
+   "sigma_d2_pre": 0.010112780038559747,
+   "sigma_d2_post": 0.011665636723749864,
+   "ratio_measured": 1.1535538871872144,
+   "corpus_prediction": 0.009171514951347775,
+   "corpus_ratio": 0.9069232116566409
+  },
+  {
+   "rho_at_Nb": 10.0,
+   "c": 0.05,
+   "N_b": 500,
+   "t_b": 100,
+   "arm": "NULL (no bottleneck)",
+   "sigma_d2_pre": 0.010112780038559747,
+   "sigma_d2_post": 0.01762472031402469,
+   "ratio_measured": 1.7428165397469466,
+   "corpus_prediction": 0.009171514951347775,
+   "corpus_ratio": 0.9069232116566409
+  },
+  {
+   "rho_at_Nb": 10.0,
+   "c": 0.05,
+   "N_b": 50,
+   "t_b": 25,
+   "arm": "bottleneck",
+   "sigma_d2_pre": 0.010112780038559747,
+   "sigma_d2_post": 0.15676281249620663,
+   "ratio_measured": 15.501455771654719,
+   "corpus_prediction": 0.08020024785681482,
+   "corpus_ratio": 7.930583632889622
+  },
+  {
+   "rho_at_Nb": 10.0,
+   "c": 0.05,
+   "N_b": 50,
+   "t_b": 100,
+   "arm": "bottleneck",
+   "sigma_d2_pre": 0.010112780038559747,
+   "sigma_d2_post": 0.029868382039981222,
+   "ratio_measured": 2.9535283004370623,
+   "corpus_prediction": 0.08472092692615171,
+   "corpus_ratio": 8.37760997501312
+  }
+ ],
+ "READ_THE_TEST": false
+}

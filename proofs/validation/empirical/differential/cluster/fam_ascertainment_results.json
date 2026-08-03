@@ -9,7 +9,7 @@
  "covers": [
   "discoveryNCP",
   "noncentralityParam",
-  "effectiveSampleSize",
+  "effectiveFisherInformation",
   "standardErrorSq",
   "powerAtThreshold",
   "ascertainment_loss"
@@ -21,35 +21,35 @@
    "n": 4000,
    "measured_var_beta_hat": 0.002649555936134444,
    "corpus_standardErrorSq": 0.002631578947368421,
-   "corpus_effectiveSampleSize": 380.0,
+   "corpus_effectiveFisherInformation": 380.0,
    "rel_err": -0.006784906301034855
   },
   {
    "p": 0.05,
    "beta": 0.03,
    "n": 4000,
-   "measured_var_beta_hat": 0.002649555936134444,
+   "measured_var_beta_hat": 0.0026495559361344435,
    "corpus_standardErrorSq": 0.002631578947368421,
-   "corpus_effectiveSampleSize": 380.0,
-   "rel_err": -0.006784906301034855
+   "corpus_effectiveFisherInformation": 380.0,
+   "rel_err": -0.006784906301034693
   },
   {
    "p": 0.2,
    "beta": 0.0,
    "n": 4000,
-   "measured_var_beta_hat": 0.0007787797026148024,
+   "measured_var_beta_hat": 0.0007787797026148026,
    "corpus_standardErrorSq": 0.0007812499999999998,
-   "corpus_effectiveSampleSize": 1280.0000000000002,
-   "rel_err": 0.003172010488849672
+   "corpus_effectiveFisherInformation": 1280.0000000000002,
+   "rel_err": 0.0031720104888495323
   },
   {
    "p": 0.2,
    "beta": 0.03,
    "n": 4000,
-   "measured_var_beta_hat": 0.0007787797026148024,
+   "measured_var_beta_hat": 0.0007787797026148026,
    "corpus_standardErrorSq": 0.0007812499999999998,
-   "corpus_effectiveSampleSize": 1280.0000000000002,
-   "rel_err": 0.003172010488849672
+   "corpus_effectiveFisherInformation": 1280.0000000000002,
+   "rel_err": 0.0031720104888495323
   },
   {
    "p": 0.45,
@@ -57,17 +57,17 @@
    "n": 4000,
    "measured_var_beta_hat": 0.000496735359583938,
    "corpus_standardErrorSq": 0.0005050505050505049,
-   "corpus_effectiveSampleSize": 1980.0000000000002,
+   "corpus_effectiveFisherInformation": 1980.0000000000002,
    "rel_err": 0.016739588406856354
   },
   {
    "p": 0.45,
    "beta": 0.03,
    "n": 4000,
-   "measured_var_beta_hat": 0.0004967353595839379,
+   "measured_var_beta_hat": 0.000496735359583938,
    "corpus_standardErrorSq": 0.0005050505050505049,
-   "corpus_effectiveSampleSize": 1980.0000000000002,
-   "rel_err": 0.016739588406856572
+   "corpus_effectiveFisherInformation": 1980.0000000000002,
+   "rel_err": 0.016739588406856354
   }
  ],
  "control_ld_attenuation": [
@@ -76,11 +76,11 @@
    "p": 0.25,
    "beta": 0.05,
    "n": 4000,
-   "measured_ncp_at_tag": 4.748115536774797,
+   "measured_ncp_at_tag": 4.748115536774798,
    "measured_ncp_at_causal": 4.7027957878391495,
-   "ratio_tag_over_causal": 1.009636767357162,
+   "ratio_tag_over_causal": 1.0096367673571622,
    "corpus_discoveryNCP": 3.750000000000001,
-   "rel_err": 0.0005027761835818648
+   "rel_err": 0.0005027761835816278
   },
   {
    "r2": 0.6,
@@ -109,142 +109,314 @@
   "rejection_rate_ok": true,
   "conditional_mean_zero_ok": true
  },
- "control_power": [
-  {
-   "beta": 0.02,
-   "n": 2000,
-   "p": 0.25,
-   "z_alpha": 1.96,
-   "measured_rejection_rate": 0.08356,
-   "corpus_noncentralityParam": 0.30000000000000004,
-   "corpus_powerAtThreshold": 0.07893414282596291,
-   "one_sided_plus_lower_tail": 0.08500974448927963,
-   "rel_err_corpus": -0.055359707683545804
-  },
-  {
-   "beta": 0.02,
-   "n": 2000,
-   "p": 0.25,
-   "z_alpha": 4.0,
-   "measured_rejection_rate": 0.00026,
-   "corpus_noncentralityParam": 0.30000000000000004,
-   "corpus_powerAtThreshold": 0.0002779379182633811,
-   "one_sided_plus_lower_tail": 0.0002806493962716138,
-   "rel_err_corpus": 0.06899199332069662
-  },
-  {
-   "beta": 0.04,
-   "n": 2000,
-   "p": 0.25,
-   "z_alpha": 1.96,
-   "measured_rejection_rate": 0.19427,
-   "corpus_noncentralityParam": 1.2000000000000002,
-   "corpus_powerAtThreshold": 0.19364157180132835,
-   "one_sided_plus_lower_tail": 0.1947652054501069,
-   "rel_err_corpus": -0.0032348185446628348
-  },
-  {
-   "beta": 0.04,
-   "n": 2000,
-   "p": 0.25,
-   "z_alpha": 4.0,
-   "measured_rejection_rate": 0.00175,
-   "corpus_noncentralityParam": 1.2000000000000002,
-   "corpus_powerAtThreshold": 0.0018388785775109464,
-   "one_sided_plus_lower_tail": 0.0018390525389165048,
-   "rel_err_corpus": 0.05078775857768361
-  },
-  {
-   "beta": 0.06,
-   "n": 2000,
-   "p": 0.25,
-   "z_alpha": 1.96,
-   "measured_rejection_rate": 0.37357,
-   "corpus_noncentralityParam": 2.7,
-   "corpus_powerAtThreshold": 0.37568541657295285,
-   "one_sided_plus_lower_tail": 0.3758425978713547,
-   "rel_err_corpus": 0.00566270464157409
-  },
-  {
-   "beta": 0.06,
-   "n": 2000,
-   "p": 0.25,
-   "z_alpha": 4.0,
-   "measured_rejection_rate": 0.00924,
-   "corpus_noncentralityParam": 2.7,
-   "corpus_powerAtThreshold": 0.009215783563781303,
-   "one_sided_plus_lower_tail": 0.009215791911261898,
-   "rel_err_corpus": -0.002620826430594924
-  },
-  {
-   "beta": 0.08,
-   "n": 2000,
-   "p": 0.25,
-   "z_alpha": 1.96,
-   "measured_rejection_rate": 0.59087,
-   "corpus_noncentralityParam": 4.800000000000001,
-   "corpus_powerAtThreshold": 0.5912999594993307,
-   "one_sided_plus_lower_tail": 0.5913165187285687,
-   "rel_err_corpus": 0.000727671906393399
-  },
-  {
-   "beta": 0.08,
-   "n": 2000,
-   "p": 0.25,
-   "z_alpha": 4.0,
-   "measured_rejection_rate": 0.03499,
-   "corpus_noncentralityParam": 4.800000000000001,
-   "corpus_powerAtThreshold": 0.03521697577579181,
-   "one_sided_plus_lower_tail": 0.035216976074918645,
-   "rel_err_corpus": 0.006486875558497001
-  }
- ],
+ "control_power": {
+  "cells": [
+   {
+    "beta": 0.02,
+    "n": 2000,
+    "p": 0.25,
+    "z_alpha": 1.96,
+    "measured_rejection_rate": 0.08356,
+    "rate_sem": 0.0008750870036744918,
+    "corpus_noncentralityParam": 0.30000000000000004,
+    "ncp_in_declared_scope_1_to_20": false,
+    "corpus_powerAtThreshold": 0.07893414282596291,
+    "omitted_lower_tail": 0.006075601663316721,
+    "two_sided_reference": 0.08500974448927963,
+    "rel_err_corpus": -0.055359707683545804,
+    "rel_err_two_sided_reference": 0.017349742571560956,
+    "two_sided_deviation_in_sems": 1.6566861160000708
+   },
+   {
+    "beta": 0.02,
+    "n": 2000,
+    "p": 0.25,
+    "z_alpha": 4.0,
+    "measured_rejection_rate": 0.00026,
+    "rate_sem": 5.098356597963701e-05,
+    "corpus_noncentralityParam": 0.30000000000000004,
+    "ncp_in_declared_scope_1_to_20": false,
+    "corpus_powerAtThreshold": 0.0002779379182633811,
+    "omitted_lower_tail": 2.7114780082326817e-06,
+    "two_sided_reference": 0.0002806493962716138,
+    "rel_err_corpus": 0.06899199332069662,
+    "rel_err_two_sided_reference": 0.07942075489082231,
+    "two_sided_deviation_in_sems": 0.40502063507800207
+   },
+   {
+    "beta": 0.03651483716701107,
+    "n": 2000,
+    "p": 0.25,
+    "z_alpha": 1.96,
+    "measured_rejection_rate": 0.16998,
+    "rate_sem": 0.0011877996447212803,
+    "corpus_noncentralityParam": 1.0,
+    "ncp_in_declared_scope_1_to_20": true,
+    "corpus_powerAtThreshold": 0.16852760746683784,
+    "omitted_lower_tail": 0.001538195211738036,
+    "two_sided_reference": 0.17006580267857588,
+    "rel_err_corpus": -0.00854449072339187,
+    "rel_err_two_sided_reference": 0.0005047810246845856,
+    "two_sided_deviation_in_sems": 0.07223665957234703
+   },
+   {
+    "beta": 0.03651483716701107,
+    "n": 2000,
+    "p": 0.25,
+    "z_alpha": 4.0,
+    "measured_rejection_rate": 0.00132,
+    "rate_sem": 0.00011481539966398236,
+    "corpus_noncentralityParam": 1.0,
+    "ncp_in_declared_scope_1_to_20": true,
+    "corpus_powerAtThreshold": 0.0013498980316300957,
+    "omitted_lower_tail": 2.8665157186802404e-07,
+    "two_sided_reference": 0.0013501846832019637,
+    "rel_err_corpus": 0.022650023962193688,
+    "rel_err_two_sided_reference": 0.02286718424391189,
+    "two_sided_deviation_in_sems": 0.2628975145346521
+   },
+   {
+    "beta": 0.07302967433402215,
+    "n": 2000,
+    "p": 0.25,
+    "z_alpha": 1.96,
+    "measured_rejection_rate": 0.51589,
+    "rate_sem": 0.001580340178252771,
+    "corpus_noncentralityParam": 4.0,
+    "ncp_in_declared_scope_1_to_20": true,
+    "corpus_powerAtThreshold": 0.5159534368528308,
+    "omitted_lower_tail": 3.747488169109081e-05,
+    "two_sided_reference": 0.5159909117345218,
+    "rel_err_corpus": 0.00012296585091944753,
+    "rel_err_two_sided_reference": 0.00019560707616326947,
+    "two_sided_deviation_in_sems": 0.06385443837379202
+   },
+   {
+    "beta": 0.07302967433402215,
+    "n": 2000,
+    "p": 0.25,
+    "z_alpha": 4.0,
+    "measured_rejection_rate": 0.02248,
+    "rate_sem": 0.0004687712619177929,
+    "corpus_noncentralityParam": 4.0,
+    "ncp_in_declared_scope_1_to_20": true,
+    "corpus_powerAtThreshold": 0.02275013194817922,
+    "omitted_lower_tail": 9.865876449133282e-10,
+    "two_sided_reference": 0.022750132934766864,
+    "rel_err_corpus": 0.012016545737509743,
+    "rel_err_two_sided_reference": 0.012016589624860494,
+    "two_sided_deviation_in_sems": 0.5762574558468484
+   },
+   {
+    "beta": 0.10954451150103323,
+    "n": 2000,
+    "p": 0.25,
+    "z_alpha": 1.96,
+    "measured_rejection_rate": 0.84951,
+    "rate_sem": 0.0011306757267227417,
+    "corpus_noncentralityParam": 9.0,
+    "ncp_in_declared_scope_1_to_20": true,
+    "corpus_powerAtThreshold": 0.8508300496690185,
+    "omitted_lower_tail": 3.524658981901574e-07,
+    "two_sided_reference": 0.8508304021349167,
+    "rel_err_corpus": 0.0015538953855970532,
+    "rel_err_two_sided_reference": 0.0015543102905400611,
+    "two_sided_deviation_in_sems": 1.1677991343670804
+   },
+   {
+    "beta": 0.10954451150103323,
+    "n": 2000,
+    "p": 0.25,
+    "z_alpha": 4.0,
+    "measured_rejection_rate": 0.15855,
+    "rate_sem": 0.0011550406811017524,
+    "corpus_noncentralityParam": 9.0,
+    "ncp_in_declared_scope_1_to_20": true,
+    "corpus_powerAtThreshold": 0.15865525393145707,
+    "omitted_lower_tail": 1.2798095916366492e-12,
+    "two_sided_reference": 0.15865525393273688,
+    "rel_err_corpus": 0.0006638532416088157,
+    "rel_err_two_sided_reference": 0.0006638532496807778,
+    "two_sided_deviation_in_sems": 0.09112573648617235
+   },
+   {
+    "beta": 0.1460593486680443,
+    "n": 2000,
+    "p": 0.25,
+    "z_alpha": 1.96,
+    "measured_rejection_rate": 0.97861,
+    "rate_sem": 0.00045752014054028286,
+    "corpus_noncentralityParam": 16.0,
+    "ncp_in_declared_scope_1_to_20": true,
+    "corpus_powerAtThreshold": 0.9793248371339299,
+    "omitted_lower_tail": 1.261189652712602e-09,
+    "two_sided_reference": 0.9793248383951196,
+    "rel_err_corpus": 0.0007304617099048103,
+    "rel_err_two_sided_reference": 0.0007304629986610138,
+    "two_sided_deviation_in_sems": 1.5624195128885607
+   },
+   {
+    "beta": 0.1460593486680443,
+    "n": 2000,
+    "p": 0.25,
+    "z_alpha": 4.0,
+    "measured_rejection_rate": 0.49899,
+    "rate_sem": 0.0015811356042414577,
+    "corpus_noncentralityParam": 16.0,
+    "ncp_in_declared_scope_1_to_20": true,
+    "corpus_powerAtThreshold": 0.5,
+    "omitted_lower_tail": 6.106226635438361e-16,
+    "two_sided_reference": 0.5000000000000007,
+    "rel_err_corpus": 0.0020240886590913863,
+    "rel_err_two_sided_reference": 0.002024088659092721,
+    "two_sided_deviation_in_sems": 0.6387813905975634
+   }
+  ],
+  "worst_rel_err_in_declared_scope": 0.012016545737509743,
+  "worst_rel_err_outside_declared_scope": 0.055359707683545804
+ },
  "frequency_mismatch": [
   {
    "maf_causal": 0.05,
    "maf_tag": 0.05,
-   "r2": 0.5,
-   "beta": 0.05,
+   "r2": 0.8999999999999998,
+   "max_attainable_r2_at_these_frequencies": 0.9999999999999998,
+   "beta": 0.10814761408717503,
    "n": 4000,
-   "realized_allelic_corr": 0.7054848740893996,
-   "measured_ncp_at_tag": 0.4879589861189131,
-   "corpus_read_as_causal_maf": 0.4750000000000002,
-   "corpus_read_as_tag_maf": 0.4750000000000002,
-   "rel_err_causal_reading": -0.02655753144743777,
-   "rel_err_tag_reading": -0.02655753144743777
+   "frequency_ratio": 1.0,
+   "realized_allelic_corr": 0.9486305062291907,
+   "measured_ncp_at_tag": 4.004655566324122,
+   "corpus_read_as_causal_maf": 3.999999999999999,
+   "corpus_read_as_tag_maf": 3.999999999999999,
+   "rel_err_causal_reading": -0.0011625385122437826,
+   "rel_err_tag_reading": -0.0011625385122437826
+  },
+  {
+   "maf_causal": 0.05,
+   "maf_tag": 0.15,
+   "r2": 0.2684210526315791,
+   "max_attainable_r2_at_these_frequencies": 0.29824561403508787,
+   "beta": 0.1980295085953348,
+   "n": 4000,
+   "frequency_ratio": 2.9999999999999996,
+   "realized_allelic_corr": 0.5181561212836265,
+   "measured_ncp_at_tag": 4.017988565624487,
+   "corpus_read_as_causal_maf": 4.0,
+   "corpus_read_as_tag_maf": 10.73684210526316,
+   "rel_err_causal_reading": -0.004477007669555392,
+   "rel_err_tag_reading": 1.6721932952027727
+  },
+  {
+   "maf_causal": 0.05,
+   "maf_tag": 0.45,
+   "r2": 0.057894736842105284,
+   "max_attainable_r2_at_these_frequencies": 0.06432748538011698,
+   "beta": 0.42640143271122083,
+   "n": 4000,
+   "frequency_ratio": 9.0,
+   "realized_allelic_corr": 0.24088335160307459,
+   "measured_ncp_at_tag": 3.9403039040647956,
+   "corpus_read_as_causal_maf": 4.000000000000001,
+   "corpus_read_as_tag_maf": 20.8421052631579,
+   "rel_err_causal_reading": 0.01515012480982067,
+   "rel_err_tag_reading": 4.28946643979854
+  },
+  {
+   "maf_causal": 0.15,
+   "maf_tag": 0.05,
+   "r2": 0.26842105263157895,
+   "max_attainable_r2_at_these_frequencies": 0.2982456140350877,
+   "beta": 0.12087086280331326,
+   "n": 4000,
+   "frequency_ratio": 2.9999999999999996,
+   "realized_allelic_corr": 0.5172590353574015,
+   "measured_ncp_at_tag": 4.005176933635944,
+   "corpus_read_as_causal_maf": 4.0,
+   "corpus_read_as_tag_maf": 1.4901960784313726,
+   "rel_err_causal_reading": -0.0012925605339598576,
+   "rel_err_tag_reading": -0.6279325225518674
   },
   {
    "maf_causal": 0.15,
    "maf_tag": 0.15,
-   "r2": 0.5,
-   "beta": 0.05,
+   "r2": 0.9,
+   "max_attainable_r2_at_these_frequencies": 1.0,
+   "beta": 0.06600983619844496,
    "n": 4000,
-   "realized_allelic_corr": 0.706861200429272,
-   "measured_ncp_at_tag": 1.3072927848247144,
-   "corpus_read_as_causal_maf": 1.2750000000000006,
-   "corpus_read_as_tag_maf": 1.2750000000000006,
-   "rel_err_causal_reading": -0.02470202941496673,
-   "rel_err_tag_reading": -0.02470202941496673
+   "frequency_ratio": 1.0,
+   "realized_allelic_corr": 0.9482518456565668,
+   "measured_ncp_at_tag": 4.031157581116842,
+   "corpus_read_as_causal_maf": 4.0,
+   "corpus_read_as_tag_maf": 4.0,
+   "rel_err_causal_reading": -0.007729189566489186,
+   "rel_err_tag_reading": -0.007729189566489186
+  },
+  {
+   "maf_causal": 0.15,
+   "maf_tag": 0.45,
+   "r2": 0.19411764705882353,
+   "max_attainable_r2_at_these_frequencies": 0.21568627450980393,
+   "beta": 0.1421338109037403,
+   "n": 4000,
+   "frequency_ratio": 3.0,
+   "realized_allelic_corr": 0.43961204220281935,
+   "measured_ncp_at_tag": 3.9830725223047034,
+   "corpus_read_as_causal_maf": 4.000000000000001,
+   "corpus_read_as_tag_maf": 7.764705882352944,
+   "rel_err_causal_reading": 0.00424985425208949,
+   "rel_err_tag_reading": 0.949426187665821
+  },
+  {
+   "maf_causal": 0.45,
+   "maf_tag": 0.05,
+   "r2": 0.057894736842105284,
+   "max_attainable_r2_at_these_frequencies": 0.06432748538011698,
+   "beta": 0.1868004243323932,
+   "n": 4000,
+   "frequency_ratio": 9.0,
+   "realized_allelic_corr": 0.24022365251487543,
+   "measured_ncp_at_tag": 3.9334219580174805,
+   "corpus_read_as_causal_maf": 4.0,
+   "corpus_read_as_tag_maf": 0.7676767676767675,
+   "rel_err_causal_reading": 0.016926239466074494,
+   "rel_err_tag_reading": -0.8048323378802484
+  },
+  {
+   "maf_causal": 0.45,
+   "maf_tag": 0.15,
+   "r2": 0.19411764705882353,
+   "max_attainable_r2_at_these_frequencies": 0.21568627450980393,
+   "beta": 0.10201520139759673,
+   "n": 4000,
+   "frequency_ratio": 3.0,
+   "realized_allelic_corr": 0.43979121331119814,
+   "measured_ncp_at_tag": 3.997549594018877,
+   "corpus_read_as_causal_maf": 3.999999999999999,
+   "corpus_read_as_tag_maf": 2.0606060606060597,
+   "rel_err_causal_reading": 0.0006129770059109229,
+   "rel_err_tag_reading": -0.48453270881513694
   },
   {
    "maf_causal": 0.45,
    "maf_tag": 0.45,
-   "r2": 0.5,
-   "beta": 0.05,
+   "r2": 0.9,
+   "max_attainable_r2_at_these_frequencies": 1.0,
+   "beta": 0.047377936967913425,
    "n": 4000,
-   "realized_allelic_corr": 0.7072902803723334,
-   "measured_ncp_at_tag": 2.435962906819782,
-   "corpus_read_as_causal_maf": 2.475000000000001,
-   "corpus_read_as_tag_maf": 2.475000000000001,
-   "rel_err_causal_reading": 0.016025323321192567,
-   "rel_err_tag_reading": 0.016025323321192567
+   "frequency_ratio": 1.0,
+   "realized_allelic_corr": 0.9486663334598221,
+   "measured_ncp_at_tag": 3.99324129487807,
+   "corpus_read_as_causal_maf": 3.999999999999999,
+   "corpus_read_as_tag_maf": 3.999999999999999,
+   "rel_err_causal_reading": 0.001692536118615818,
+   "rel_err_tag_reading": 0.001692536118615818
   }
  ],
  "control_positive": {
   "matched_cells": 3,
   "matched_agree": true,
-  "mismatched_cells": 0,
-  "mismatched_caught": 0,
+  "mismatched_cells": 6,
+  "mismatched_caught": 6,
   "tolerance": 0.1
  },
  "winners_curse": {
@@ -435,49 +607,85 @@
     "beta_over_se": 4.0,
     "z_alpha": 5.4513104,
     "replicates": 300000,
-    "selected": 22345,
-    "selection_rate": 0.07448333333333333,
     "exact_selection_probability": 0.07334672331933839,
-    "simulated_E_in_SE": 5.883789579713566,
-    "sem": 0.002657628865686523,
     "exact_E_in_SE": 5.897368593531057,
-    "deviation_in_sems": 5.109446993451212
+    "z_known_SE": {
+     "selected": 22191,
+     "selection_rate": 0.07397,
+     "simulated_E_in_SE": 5.898635121526809,
+     "sem": 0.0025970579144212343,
+     "deviation_in_sems": -0.48767799467174505
+    },
+    "t_estimated_SE": {
+     "selected": 22345,
+     "selection_rate": 0.07448333333333333,
+     "simulated_E_in_SE": 5.890955816943078,
+     "sem": 0.0026262381491920944,
+     "deviation_in_sems": 2.4418107664579227
+    }
    },
    {
     "beta_over_se": 6.0,
     "z_alpha": 5.4513104,
     "replicates": 60000,
-    "selected": 42545,
-    "selection_rate": 0.7090833333333333,
     "exact_selection_probability": 0.7083907577303185,
-    "simulated_E_in_SE": 6.482665726039863,
-    "sem": 0.0034552789578281566,
     "exact_E_in_SE": 6.484465405858216,
-    "deviation_in_sems": 0.5208493555275872
+    "z_known_SE": {
+     "selected": 42542,
+     "selection_rate": 0.7090333333333333,
+     "simulated_E_in_SE": 6.487845338213949,
+     "sem": 0.0034496140527543995,
+     "deviation_in_sems": -0.9798001469280279
+    },
+    "t_estimated_SE": {
+     "selected": 42545,
+     "selection_rate": 0.7090833333333333,
+     "simulated_E_in_SE": 6.486583609456231,
+     "sem": 0.0034580041698456278,
+     "deviation_in_sems": -0.6125509091302626
+    }
    },
    {
     "beta_over_se": 0.0,
     "z_alpha": 1.96,
     "replicates": 200000,
-    "selected": 9948,
-    "selection_rate": 0.04974,
     "exact_selection_probability": 0.049995790296440856,
-    "simulated_E_in_SE": 0.06110947599960507,
-    "sem": 0.02361812198512944,
     "exact_E_in_SE": 0.0,
-    "deviation_in_sems": -2.5873977633819116
+    "z_known_SE": {
+     "selected": 9929,
+     "selection_rate": 0.049645,
+     "simulated_E_in_SE": 0.053945778509688194,
+     "sem": 0.023655830461954328,
+     "deviation_in_sems": -2.2804432334958262
+    },
+    "t_estimated_SE": {
+     "selected": 9948,
+     "selection_rate": 0.04974,
+     "simulated_E_in_SE": 0.060729602529313025,
+     "sem": 0.023618672102674407,
+     "deviation_in_sems": -2.5712538903673776
+    }
    },
    {
     "beta_over_se": 1.0,
     "z_alpha": 1.96,
     "replicates": 200000,
-    "selected": 34172,
-    "selection_rate": 0.17086,
     "exact_selection_probability": 0.17006580267857585,
-    "simulated_E_in_SE": 2.4507284866210393,
-    "sem": 0.003453618952659037,
     "exact_E_in_SE": 2.450329448952625,
-    "deviation_in_sems": -0.11554189210920207
+    "z_known_SE": {
+     "selected": 34107,
+     "selection_rate": 0.170535,
+     "simulated_E_in_SE": 2.4531925738814033,
+     "sem": 0.0034512499993684183,
+     "deviation_in_sems": -0.8295907075124803
+    },
+    "t_estimated_SE": {
+     "selected": 34172,
+     "selection_rate": 0.17086,
+     "simulated_E_in_SE": 2.451690408832941,
+     "sem": 0.0034504432863168163,
+     "deviation_in_sems": -0.3944304448397145
+    }
    }
   ]
  },
@@ -535,9 +743,9 @@
   "sampling_variance": true,
   "ld_attenuation": true,
   "threshold_null_two_sided": true,
-  "power": false,
-  "positive_control_mismatch_axis": false,
-  "winners_curse_exact_matches_simulated_gwas": false
+  "power": true,
+  "positive_control_mismatch_axis": true,
+  "winners_curse_exact_matches_simulated_gwas": true
  },
- "READ_THE_TEST": false
+ "READ_THE_TEST": true
 }

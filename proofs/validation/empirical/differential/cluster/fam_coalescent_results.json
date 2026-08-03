@@ -1,0 +1,157 @@
+{
+ "split": [
+  {
+   "t": 0,
+   "N1": 1000,
+   "N2": 1000,
+   "N_anc": 1000,
+   "sizes": "equal",
+   "fst_measured": 0.0013137404843431178,
+   "fst_sem": 0.0017364796759889519,
+   "coalFst_prediction": 0.0
+  },
+  {
+   "t": 0,
+   "N1": 250,
+   "N2": 4000,
+   "N_anc": 1000,
+   "sizes": "16x apart",
+   "fst_measured": 0.0013137404843431178,
+   "fst_sem": 0.0017364796759889519,
+   "coalFst_prediction": 0.0
+  },
+  {
+   "t": 500,
+   "N1": 1000,
+   "N2": 1000,
+   "N_anc": 1000,
+   "sizes": "equal",
+   "fst_measured": 0.1929462094913741,
+   "fst_sem": 0.011019143900003133,
+   "coalFst_prediction": 0.2
+  },
+  {
+   "t": 500,
+   "N1": 250,
+   "N2": 4000,
+   "N_anc": 1000,
+   "sizes": "16x apart",
+   "fst_measured": 0.31177467584129975,
+   "fst_sem": 0.009302038914088734,
+   "coalFst_prediction": 0.2
+  },
+  {
+   "t": 2000,
+   "N1": 1000,
+   "N2": 1000,
+   "N_anc": 1000,
+   "sizes": "equal",
+   "fst_measured": 0.48744292311202725,
+   "fst_sem": 0.015071668109098001,
+   "coalFst_prediction": 0.5
+  },
+  {
+   "t": 2000,
+   "N1": 250,
+   "N2": 4000,
+   "N_anc": 1000,
+   "sizes": "16x apart",
+   "fst_measured": 0.5224689757357595,
+   "fst_sem": 0.00426384953907311,
+   "coalFst_prediction": 0.5
+  },
+  {
+   "t": 8000,
+   "N1": 1000,
+   "N2": 1000,
+   "N_anc": 1000,
+   "sizes": "equal",
+   "fst_measured": 0.7947276394597005,
+   "fst_sem": 0.00482427121338713,
+   "coalFst_prediction": 0.8
+  },
+  {
+   "t": 8000,
+   "N1": 250,
+   "N2": 4000,
+   "N_anc": 1000,
+   "sizes": "16x apart",
+   "fst_measured": 0.6856392134357788,
+   "fst_sem": 0.0016232941978173991,
+   "coalFst_prediction": 0.8
+  }
+ ],
+ "island": [
+  {
+   "Ne": 500,
+   "m": 0.01,
+   "d": 2,
+   "fst_measured": 0.028876939203932462,
+   "fst_sem": 0.010692206619074858,
+   "islandModelFst_prediction": 0.047619047619047616,
+   "finite_deme_theory": 0.012345679012345678,
+   "rel_err_infinite_island": 0.6490337595254159,
+   "rel_err_finite_deme": -0.5724727290119292
+  },
+  {
+   "Ne": 500,
+   "m": 0.01,
+   "d": 5,
+   "fst_measured": 0.005092197469418758,
+   "fst_sem": 0.001925042224845183,
+   "islandModelFst_prediction": 0.047619047619047616,
+   "finite_deme_theory": 0.031007751937984496,
+   "rel_err_infinite_island": 8.351374903472278,
+   "rel_err_finite_deme": 5.0892673790052045
+  },
+  {
+   "Ne": 500,
+   "m": 0.01,
+   "d": 20,
+   "fst_measured": 0.0020721724069943104,
+   "fst_sem": 0.0006906334084955945,
+   "islandModelFst_prediction": 0.047619047619047616,
+   "finite_deme_theory": 0.04317665351034566,
+   "rel_err_infinite_island": 21.980253698155902,
+   "rel_err_finite_deme": 19.836419481607454
+  },
+  {
+   "Ne": 500,
+   "m": 0.002,
+   "d": 2,
+   "fst_measured": 0.09786767102988023,
+   "fst_sem": 0.0033622173572200303,
+   "islandModelFst_prediction": 0.2,
+   "finite_deme_theory": 0.058823529411764705,
+   "rel_err_infinite_island": 1.043575757912309,
+   "rel_err_finite_deme": -0.39894830649637975
+  },
+  {
+   "Ne": 500,
+   "m": 0.002,
+   "d": 5,
+   "fst_measured": 0.04361265815329427,
+   "fst_sem": 0.006891584364117271,
+   "islandModelFst_prediction": 0.2,
+   "finite_deme_theory": 0.13793103448275862,
+   "rel_err_infinite_island": 3.5858245855370563,
+   "rel_err_finite_deme": 2.1626376451979694
+  },
+  {
+   "Ne": 500,
+   "m": 0.002,
+   "d": 20,
+   "fst_measured": 0.009521481249664964,
+   "fst_sem": 0.0025352948697011978,
+   "islandModelFst_prediction": 0.2,
+   "finite_deme_theory": 0.184089750127486,
+   "rel_err_infinite_island": 20.005135099860382,
+   "rel_err_finite_deme": 18.334150359636915
+  }
+ ],
+ "controls": {
+  "split_t0_zero": true,
+  "island_monotone_in_m": true
+ },
+ "READ_THE_TEST": true
+}
