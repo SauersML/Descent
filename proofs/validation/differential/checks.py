@@ -140,15 +140,15 @@ check(
 )
 
 check(
-    id="trueHudsonFst-is-hudson",
-    fqn="Calibrator.Conventions.trueHudsonFst",
-    claim="POSITIVE CONTROL for the convention pin: trueHudsonFst really is "
+    id="hudsonFst-is-hudson",
+    fqn="Calibrator.Conventions.hudsonFst",
+    claim="POSITIVE CONTROL for the convention pin: hudsonFst really is "
           "Hudson's parametric F_ST",
     model_lean="(p1-p2)^2 / (p1(1-p2) + p2(1-p1)), Bhatia 2013 eq 10",
     model_ref="same, computed independently in refs",
     reference="refs.fst_hudson",
     grid=_PQ,
-    lean=lambda D, p1, p2: D["trueHudsonFst"](p1, p2),
+    lean=lambda D, p1, p2: D["hudsonFst"](p1, p2),
     ref=lambda p1, p2: refs.fst_hudson(p1, p2),
     note=(
         "This exists so that `simpleFst-vs-hudson` failing is INTERPRETABLE. "

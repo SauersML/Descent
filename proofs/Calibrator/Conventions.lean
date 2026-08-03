@@ -152,7 +152,7 @@ theorem effectiveSymmetricMigration_eq_meanAlleleFreq_map (m₁₂ m₂₁ : ℝ
     effectiveSymmetricMigration m₁₂ m₂₁ = meanAlleleFreq m₁₂ m₂₁ := by
   unfold effectiveSymmetricMigration meanAlleleFreq; ring
 
-/-- **MISNAMED: this is Nei's `G_ST`, not Hudson's `F_ST`.** One minus the ratio
+/-- **Nei's `G_ST`, explicitly distinguished from Hudson's `F_ST`.** One minus the ratio
 of mean within-subgroup heterozygosity to TOTAL heterozygosity is the
 definition of `G_ST`; the docstring said exactly that and nobody noticed it
 described a different estimator from the one in the name. Hudson's `F_ST`
@@ -165,7 +165,7 @@ is degenerate.
 **A previous version of this docstring said they agree when `p₁ = p₂` OR
 `p̄ = 1/2`. THE SECOND DISJUNCT IS FALSE**, and it is false in both readings.
 The denominators differ by `(p₁-p₂)²/2`, which does not vanish at `p̄ = 1/2`;
-and by the corpus's own `trueHudsonFst_eq_of_neiGst`, Hudson `= 2G/(1+G)`,
+and by the corpus's own `hudsonFst_eq_of_neiGst`, Hudson `= 2G/(1+G)`,
 which equals `G` only at `G = 0` or `G = 1`. So there is no interior
 `p̄ = 1/2` slice on which the two coincide. Witness, on `p̄ = 1/2` exactly:
 at `p₁ = 0.9, p₂ = 0.1` the Nei denominator is `1`, `G_ST = 0.64`, and Hudson
@@ -187,45 +187,43 @@ corpus into status reporting before anyone tested the slice it names.
     `PopulationGeneticsFoundations.neiGstFromFrequencies` --
     `neiGstFromFrequencies_eq_neiGst` below proves the two agree, and what
     it actually proves is that both are Nei.
-    Hudson's is `d² / (p₁ + p₂ - 2p₁p₂)`; `trueHudsonFst` states it and
-    `trueHudsonFst_eq_of_neiGst` gives the exact conversion. At `p₁ = 0.2`,
+    Hudson's is `d² / (p₁ + p₂ - 2p₁p₂)`; `hudsonFst` states it and
+    `hudsonFst_eq_of_neiGst` gives the exact conversion. At `p₁ = 0.2`,
     `p₂ = 0.6` this body gives `0.1667` where Hudson gives `0.2857`, the
     +71.4% the differential tier measured against an independent
     implementation.
 
-    THE NAME HAS NOT BEEN CHANGED HERE and it is still wrong. Renaming it
-    touches `DemographicCapacity` and `PCCorrectability/Threshold`, which are
-    owned elsewhere and were in flight; a textual repoint of a bare constant
-    inside `unfold`/`rw` lists is the mangling that has already bitten this
-    corpus, so the rename is routed rather than done. Until it happens, read
-    every `neiGst` in the spike chain -- including
-    `four_neiGst_eq_standardizedContrastVariance` and MATH_LEDGER row 23,
-    which says "`F` = Hudson `F_ST`" -- as Nei's `G_ST`. The algebra is
-    unaffected: `4·G_ST = ` the standardized contrast variance is a true
-    identity for THIS body. What is affected is what a user must supply: an
-    `F_ST` from a library's Hudson estimator is the wrong input by the factor
-    above, AT EVERY FREQUENCY PAIR WITH `p₁ ≠ p₂`. There is no exempt slice.
+    The old `hudsonFst` name on the Nei body was removed rather than retained as
+    a compatibility alias: that alias would preserve the biological category
+    error. The genuine Hudson body now owns `hudsonFst`. Read every `neiGst` in the *contrast-normalization* chain --
+    including `four_neiGst_eq_standardizedContrastVariance` -- as Nei's `G_ST`.
+    The algebra is unaffected: `4·G_ST` is the standardized allele-frequency
+    contrast variance for THIS body. It is not the empirically calibrated BBP
+    spike. That law uses genuine Hudson `F_ST` and is named `hudsonBbpSpike`
+    below. At weak differentiation the latter is almost twice
+    `neiContrastSpike`; silently exchanging them is therefore a biologically
+    material error, not a harmless change of notation.
 
     **This sentence used to end "at `p̄ ≠ 1/2`", which is the third instance of
     one false claim in this file** and the last to be found. It implies the
     factor VANISHES at `p̄ = 1/2`. It does not: measured ratios along that
     exact slice are `1.995`, `1.923`, `1.724`, `1.220` -- monotone in
     `|p₁ - p₂|` and never reaching `1`. The identity already in this file
-    settles it without any measurement: `trueHudsonFst_eq_of_neiGst` gives
+    settles it without any measurement: `hudsonFst_eq_of_neiGst` gives
     `Hudson = 2G/(1+G)`, which equals `G` only at `G = 0` or `G = 1`, so the
     exception named here is empty apart from the endpoints.
-    `neiGst_ne_trueHudsonFst_at_mean_half` certifies it at
+    `neiGst_ne_hudsonFst_at_mean_half` certifies it at
     `(9/10, 1/10)` -- `p̄ = 1/2` exactly, ratio `50/41`.
 
     Why it took three passes to remove: the pre-existing witness
-    `neiGst_ne_trueHudsonFst` sits at `p̄ = 2/5`, OUTSIDE the slice the claim
+    `neiGst_ne_hudsonFst` sits at `p̄ = 2/5`, OUTSIDE the slice the claim
     names, so the claim looked checked while nothing tested it. A witness
     outside the exception cannot refute the exception. If you are ever tempted
     to reintroduce an "except at `p̄ = 1/2`" caveat,
-    `neiGst_ne_trueHudsonFst_at_mean_half` below is what will stop you, and
+    `neiGst_ne_hudsonFst_at_mean_half` below is what will stop you, and
     it is placed there for that purpose.
 
-    Empirical status: CONVENTION IDENTIFIED (Nei `G_ST`), NAME UNCORRECTED. -/
+    Empirical status: CONVENTION IDENTIFIED and NAME CORRECTED (Nei `G_ST`). -/
 noncomputable def neiGst (p₁ p₂ : ℝ) : ℝ :=
   1 - (p₁ * (1 - p₁) + p₂ * (1 - p₂)) /
     (ploidy * meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂))
@@ -245,7 +243,7 @@ saying it meant.
 
     Empirical status: matches `validation/differential/refs.fst_hudson`, which
     is checked against scikit-allel. -/
-noncomputable def trueHudsonFst (p₁ p₂ : ℝ) : ℝ :=
+noncomputable def hudsonFst (p₁ p₂ : ℝ) : ℝ :=
   (p₁ - p₂) ^ 2 / (p₁ * (1 - p₂) + p₂ * (1 - p₁))
 
 /-- **The exact conversion between the two conventions**, which is what turns
@@ -253,6 +251,16 @@ noncomputable def trueHudsonFst (p₁ p₂ : ℝ) : ℝ :=
 holds everywhere: `F_ST^Hudson = 2·G_ST / (1 + G_ST)`. Note it is not a
 constant factor -- the discrepancy is 2× as `G_ST → 0` and vanishes as
 `G_ST → 1` -- so no recalibration constant can absorb a convention mix-up.
+
+WHAT IS AND IS NOT NEW HERE, stated so nobody reports the wrong half. THAT NEI
+AND HUDSON DISAGREE IS TEXTBOOK: Bhatia, Patterson, Sankararaman & Price (2013)
+is the standard reference, it is cited on `hudsonFst` above, and the
+disagreement is not a finding of this corpus. What belongs to this development
+is narrower and worth exactly what it is: the algebraic bridge between them
+written down explicitly, MACHINE-CHECKED in Lean rather than asserted, and then
+confirmed numerically against simulation to the last reported digit. A
+well-known fact and a proved identity are different objects, and only the
+second is ours.
 
     Empirical status: VALIDATED, and it is currently the cleanest
     theory-to-measurement match in this corpus. Inverting the identity to
@@ -263,10 +271,10 @@ constant factor -- the discrepancy is 2× as `G_ST → 0` and vanishes as
     which is the strongest form this kind of claim can take: a conversion that
     is proved and then found to hold to the last reported digit on data it was
     not fitted to. -/
-theorem trueHudsonFst_eq_of_neiGst (p₁ p₂ : ℝ)
+theorem hudsonFst_eq_of_neiGst (p₁ p₂ : ℝ)
     (hpos : 0 < p₁ * (1 - p₂) + p₂ * (1 - p₁))
     (hbar : meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) ≠ 0) :
-    trueHudsonFst p₁ p₂ = 2 * neiGst p₁ p₂ / (1 + neiGst p₁ p₂) := by
+    hudsonFst p₁ p₂ = 2 * neiGst p₁ p₂ / (1 + neiGst p₁ p₂) := by
   have hne : p₁ * (1 - p₂) + p₂ * (1 - p₁) ≠ 0 := ne_of_gt hpos
   have hmean : meanAlleleFreq p₁ p₂ ≠ 0 := left_ne_zero_of_mul hbar
   have hcomp : 1 - meanAlleleFreq p₁ p₂ ≠ 0 := right_ne_zero_of_mul hbar
@@ -297,30 +305,30 @@ theorem trueHudsonFst_eq_of_neiGst (p₁ p₂ : ℝ)
       (p₁ * (1 - p₂) + p₂ * (1 - p₁)) /
           (2 * meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂)) ≠ 0 :=
     div_ne_zero hne hD
-  unfold trueHudsonFst
+  unfold hudsonFst
   rw [htwo, hone]
   field_simp [hne, hD, hquot]
 
 /-- **Witness that the two estimators are different functions**, not two
 spellings of one. Without an exhibited point the conflation can be
 reintroduced by anyone who reads the `neiGst` name and believes it. -/
-theorem neiGst_ne_trueHudsonFst :
-    neiGst (1/5) (3/5) ≠ trueHudsonFst (1/5) (3/5) := by
-  unfold neiGst trueHudsonFst ploidy meanAlleleFreq
+theorem neiGst_ne_hudsonFst :
+    neiGst (1/5) (3/5) ≠ hudsonFst (1/5) (3/5) := by
+  unfold neiGst hudsonFst ploidy meanAlleleFreq
   norm_num
 
 /-- **A witness ON the `p̄ = 1/2` slice**, which two docstrings and three
 `checks.py` clauses used to name as a place where the estimators agree.
 
 `p₁ = 9/10, p₂ = 1/10` has `p̄ = 1/2` exactly. `neiGst` (Nei's `G_ST`) is
-`16/25` and `trueHudsonFst` is `(16/25)/(41/50)`, a ratio of `50/41 ≈ 1.22`.
+`16/25` and `hudsonFst` is `(16/25)/(41/50)`, a ratio of `50/41 ≈ 1.22`.
 The false claim is therefore refuted at a point, not merely argued against:
 `p̄ = 1/2` makes the Nei denominator `1` and nothing more. Stated separately
-from `neiGst_ne_trueHudsonFst` because that witness sits at `p̄ = 2/5` and
+from `neiGst_ne_hudsonFst` because that witness sits at `p̄ = 2/5` and
 so cannot exclude the slice that was actually claimed. -/
-theorem neiGst_ne_trueHudsonFst_at_mean_half :
-    neiGst (9/10) (1/10) ≠ trueHudsonFst (9/10) (1/10) := by
-  unfold neiGst trueHudsonFst ploidy meanAlleleFreq
+theorem neiGst_ne_hudsonFst_at_mean_half :
+    neiGst (9/10) (1/10) ≠ hudsonFst (9/10) (1/10) := by
+  unfold neiGst hudsonFst ploidy meanAlleleFreq
   norm_num
 
 /-- Between-subgroup allele-frequency variance for an equal-weight split. -/
@@ -351,12 +359,11 @@ theorem neiGst_eq_varianceRatio (p₁ p₂ : ℝ)
 
 /-- **Cross-check: the two spellings of Nei's `G_ST` in this corpus agree.**
 
-RENAMED from `simpleFst_eq_neiGst`. That name asserted that
+RENAMED from `neiGstFromFrequencies_eq_hudsonFst`. That name asserted that
 `PopulationGeneticsFoundations.simpleFst` is Hudson's `F_ST`. The theorem is
 true and the name was the defect: what it proves is that two independently
-written spellings of NEI's `G_ST` coincide, because `neiGst` is misnamed
-(see its docstring above). Neither side is Hudson's estimator; that one is
-`trueHudsonFst`, and `neiGst_ne_trueHudsonFst` exhibits a point where it
+written spellings of NEI's `G_ST` coincide. Neither side is Hudson's estimator; that one is
+`hudsonFst`, and `neiGst_ne_hudsonFst` exhibits a point where it
 differs from both of these. -/
 theorem neiGstFromFrequencies_eq_neiGst (p₁ p₂ : ℝ)
     (h : meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) ≠ 0) :
@@ -368,16 +375,14 @@ theorem neiGstFromFrequencies_eq_neiGst (p₁ p₂ : ℝ)
       (meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂))
   field_simp [h]
 
-/-- **The spike constant is forced, not chosen.**
+/-- **The allele-frequency contrast constant is forced, not chosen.**
 
 Four times `neiGst` -- which is Nei's `G_ST`, see its docstring; the `4` is
-derived for THAT quantity and is not the constant for Hudson's estimator -- is
-exactly the variance of the standardized subgroup
-contrast. Writing `2` in `demographicSpike` asserts that twice `F_ST` equals
-that variance, which this theorem refutes, so the old constant is now
-unprovable rather than merely differently calibrated. Simulation recovers
-`3.9920 ± 0.0045` with `F` measured as Hudson `F_ST`, agreeing with the
-derived value. -/
+derived for THAT quantity and is not an empirical constant for Hudson's
+estimator -- is exactly the variance of the standardized allele-frequency
+contrast. The BBP inversion that recovered `3.9920 ± 0.0045` used genuine
+Hudson `F_ST`; it validates `hudsonBbpSpike`, not this identity. Keeping those
+two facts separate is the point of the named specializations below. -/
 theorem four_neiGst_eq_standardizedContrastVariance (p₁ p₂ : ℝ)
     (h : meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) ≠ 0) :
     4 * neiGst p₁ p₂ =
@@ -386,36 +391,73 @@ theorem four_neiGst_eq_standardizedContrastVariance (p₁ p₂ : ℝ)
   unfold betweenSubgroupVariance
   field_simp
 
-/-- **The spike written without any free constant.** With `F` pinned to Hudson
-`F_ST`, the rank-one signal is the contrast variance times the effective
-subgroup size, and no numeral appears on the right. -/
-theorem demographicSpike_eq_contrastVariance_mul_effectiveSize
+/-- **The exact allele-frequency-contrast normalization.**
+
+This is deliberately not called the BBP spike: its input is Nei's `G_ST`, and
+its exact interpretation is the standardized allele-frequency contrast
+variance times the subgroup load. -/
+noncomputable def neiContrastSpike (n m p₁ p₂ : ℝ) : ℝ :=
+  demographicSpike n (neiGst p₁ p₂) m
+
+/-- **The empirically calibrated PC/BBP normalization.**
+
+The `F` supplied to the validation experiment was the ratio-of-averages Hudson
+estimator. This named specialization prevents that empirical law from being
+silently reinterpreted as the different Nei functional. -/
+noncomputable def hudsonBbpSpike (n m p₁ p₂ : ℝ) : ℝ :=
+  demographicSpike n (hudsonFst p₁ p₂) m
+
+/-- **The Nei-normalized contrast spike has an exact observable form.** -/
+theorem neiContrastSpike_eq_contrastVariance_mul_effectiveSize
     (n m p₁ p₂ : ℝ)
     (h : meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) ≠ 0) :
-    demographicSpike n (neiGst p₁ p₂) m =
+    neiContrastSpike n m p₁ p₂ =
       ((p₁ - p₂) ^ 2 / (meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂))) *
         effectiveSubgroupSize n m := by
-  unfold demographicSpike
+  unfold neiContrastSpike demographicSpike
   rw [← four_neiGst_eq_standardizedContrastVariance p₁ p₂ h]
 
-/-- **The spike, as an identification rather than a definition.**
+/-- **The Hudson-calibrated spike expressed on the Nei scale.**
+
+The exact conversion is nonlinear:
+`4·Hudson = 8·G_ST/(1+G_ST)`. Thus the two named spike laws cannot be
+reconciled by changing a global constant. In the weak-differentiation regime
+the Hudson-calibrated level approaches twice the Nei contrast level. -/
+theorem hudsonBbpSpike_eq_eight_neiGst_div_one_add_mul_effectiveSize
+    (n m p₁ p₂ : ℝ)
+    (hpos : 0 < p₁ * (1 - p₂) + p₂ * (1 - p₁))
+    (hbar : meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) ≠ 0) :
+    hudsonBbpSpike n m p₁ p₂ =
+      (8 * neiGst p₁ p₂ / (1 + neiGst p₁ p₂)) * effectiveSubgroupSize n m := by
+  unfold hudsonBbpSpike demographicSpike
+  rw [hudsonFst_eq_of_neiGst p₁ p₂ hpos hbar]
+  ring
+
+/-- **A regression witness preventing convention collapse.** At an interior,
+mean-one-half frequency pair, the empirically Hudson-calibrated spike and the
+exact Nei contrast spike are different. -/
+theorem hudsonBbpSpike_ne_neiContrastSpike_at_mean_half :
+    hudsonBbpSpike 4 2 (9/10) (1/10) ≠
+      neiContrastSpike 4 2 (9/10) (1/10) := by
+  unfold hudsonBbpSpike neiContrastSpike demographicSpike hudsonFst neiGst
+    effectiveSubgroupSize ploidy meanAlleleFreq
+  norm_num
+
+/-- **The Nei contrast spike, as an identification rather than a definition.**
 
 This is the mechanism of `Calibrator.Identification` applied to the quantity
-that motivated it. `formula` is what the calculator computes, `observable` is
-the standardized contrast variance times the effective subgroup size, defined
-without reference to the formula, and `derivation` is discharged. The old
-constant cannot be substituted here, because the resulting field would not
-typecheck.
+that motivated it. It identifies the per-frequency contrast normalization; it
+does not claim that the BBP experiment used Nei's estimator.
 
     Empirical status: UNTESTED. -/
-noncomputable def spikeIdentification (n m p₁ p₂ : ℝ)
+noncomputable def neiContrastSpikeIdentification (n m p₁ p₂ : ℝ)
     (h : meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) ≠ 0) :
     Identification ℝ where
-  formula := demographicSpike n (neiGst p₁ p₂) m
+  formula := neiContrastSpike n m p₁ p₂
   observable :=
     ((p₁ - p₂) ^ 2 / (meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂))) *
       effectiveSubgroupSize n m
-  derivation := demographicSpike_eq_contrastVariance_mul_effectiveSize n m p₁ p₂ h
+  derivation := neiContrastSpike_eq_contrastVariance_mul_effectiveSize n m p₁ p₂ h
   evidence := Evidence.derived
 
 end Differentiation

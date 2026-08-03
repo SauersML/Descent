@@ -62,7 +62,7 @@ WITNESS PLACEMENT: THE CLAIM SAYS "EXCEPT ON S", SO THE WITNESS GOES IN S
     witness below therefore sits AT q = 1/2, with the off-witnesses placed
     immediately beside it to measure how fast the coincidence dies.
 
-    This is the defect that `neiGst_ne_trueHudsonFst` had: it sat at
+    This is the defect that `neiGst_ne_hudsonFst` had: it sat at
     pbar = 2/5 and so could not exclude the pbar = 1/2 slice its own claim
     named.  It failed fine -- at a point nobody disputed.
 

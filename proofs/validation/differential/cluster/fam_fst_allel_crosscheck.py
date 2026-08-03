@@ -8,22 +8,22 @@ not a restatement of my own algebra.
 
 EVERY NUMBER IN THIS FILE IS LABELLED WITH THE ESTIMATOR IT BELONGS TO.
 An F_ST comparison that does not name the estimator is meaningless, and this
-family is where that bites: the corpus definition SPELLED `neiGst` computes
-NEI'S G_ST.
+family is where that bites: the corpus now explicitly distinguishes `neiGst`
+from `hudsonFst`.
 
     NEI_GST_corpus   1 - (p1(1-p1)+p2(1-p2)) / (2*pbar*(1-pbar))
-                     = Calibrator.Conventions.neiGst      (misnamed)
+                     = Calibrator.Conventions.neiGst
                      = Calibrator.PopulationGeneticsFoundations.simpleFst
                      = ...neiGstFromFrequencies
     HUDSON_corpus    (p1-p2)^2 / (p1(1-p2)+p2(1-p1))
-                     = Calibrator.Conventions.trueHudsonFst
+                     = Calibrator.Conventions.hudsonFst
     HUDSON_allel     scikit-allel hudson_fst, ratio of averages over loci
     WC_allel         scikit-allel weir_cockerham_fst, ratio of averages
 
 CLAIMS UNDER TEST
     C1  HUDSON_corpus == HUDSON_allel in the large-sample limit.  A positive
         control on the corpus's Hudson body against foreign code.
-    C2  The exact conversion proved in Conventions.trueHudsonFst_eq_of_neiGst,
+    C2  The exact conversion proved in Conventions.hudsonFst_eq_of_neiGst,
         HUDSON = 2*NEI_GST/(1 + NEI_GST), holds pointwise.
     C3  THE DOCSTRING CLAIM.  Conventions.neiGst says the two denominators
         "differ by (p1-p2)^2/2, so they agree only when p1 = p2 OR pbar = 1/2".
@@ -88,18 +88,18 @@ N_LOCI = 500
 # Lean name that spells them recorded next to it.
 # --------------------------------------------------------------------------
 def nei_gst_corpus(p1, p2):
-    """Calibrator.Conventions.neiGst -- MISNAMED; this is Nei's G_ST."""
+    """Calibrator.Conventions.neiGst: Nei's G_ST."""
     pbar = (p1 + p2) / 2.0
     return 1.0 - (p1 * (1 - p1) + p2 * (1 - p2)) / (2.0 * pbar * (1 - pbar))
 
 
 def hudson_corpus(p1, p2):
-    """Calibrator.Conventions.trueHudsonFst -- Hudson's parametric F_ST."""
+    """Calibrator.Conventions.hudsonFst -- Hudson's parametric F_ST."""
     return (p1 - p2) ** 2 / (p1 * (1 - p2) + p2 * (1 - p1))
 
 
 def conversion_from_nei(g):
-    """Conventions.trueHudsonFst_eq_of_neiGst : Hudson = 2G/(1+G)."""
+    """Conventions.hudsonFst_eq_of_neiGst : Hudson = 2G/(1+G)."""
     return 2.0 * g / (1.0 + g)
 
 

@@ -62,8 +62,8 @@ theorem nei_fst_in_unit (H_T H_S : ℝ)
     the between-subgroup heterozygosity `p₁(1-p₂) + p₂(1-p₁)`. Derivation:
     `H_T - H_S = 2p̄(1-p̄) - (p₁(1-p₁) + p₂(1-p₂)) = (p₁-p₂)²/2`, and dividing
     by `H_T` gives this body. Hudson's estimator lives in `Conventions` as
-    `trueHudsonFst`, with the exact conversion `Hudson = 2·G/(1 + G)` proved as
-    `Conventions.trueHudsonFst_eq_of_neiGst`. The two differ by up to a factor
+    `hudsonFst`, with the exact conversion `Hudson = 2·G/(1 + G)` proved as
+    `Conventions.hudsonFst_eq_of_neiGst`. The two differ by up to a factor
     of two -- +71.4% at `p₁ = 0.2, p₂ = 0.6` -- and AGREE ONLY WHERE THIS
     QUANTITY IS `0` OR `1`, i.e. at `p₁ = p₂` or at complete differentiation.
     That is immediate from the conversion: `2·G/(1+G) = G` iff `G = 0` or
