@@ -540,7 +540,7 @@ FAMILIES = [
                 "both readings and settles nothing, which is the failure mode "
                 "the discoveryNCP docstring itself names.",
         "members": ["discoveryNCP", "noncentralityParam", "powerAtThreshold",
-                    "effectiveSampleSize", "standardErrorSq",
+                    "effectiveFisherInformation", "standardErrorSq",
                     "ascertainment_loss",
                     # REMOVED FROM THE CORPUS -- kept here as a record of what
                     # the old membership list pointed at, not as coverage:

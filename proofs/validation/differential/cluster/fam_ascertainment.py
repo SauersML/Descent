@@ -25,7 +25,7 @@ WHERE THE MEMBERS WENT
       discoveryNCP        n β² ld² · 2·maf_causal·(1-maf_causal)
       noncentralityParam  n β² · 2p(1-p)
       ncp                 n_eff β²
-      effectiveSampleSize n · 2p(1-p) · r2_ld
+      effectiveFisherInformation  n · 2p(1-p) · r2_ld  (NOT a count of individuals)
       standardErrorSq     1 / (n · 2p(1-p) · r2_ld)
       powerAtThreshold    Φ(√ncp - z_α)
       multiTraitEffectiveSampleSize / multiTraitDiscoveryNCP
@@ -228,11 +228,11 @@ def control_sampling_variance():
             out = gwas(R, n, beta, p, p, 1.0, seed=11)
             var_meas = float(out["beta_causal"].var())
             pred = call("standardErrorSq", n, p, 1.0)
-            n_eff = call("effectiveSampleSize", n, p, 1.0)
+            n_eff = call("effectiveFisherInformation", n, p, 1.0)
             rows.append({"p": p, "beta": beta, "n": n,
                          "measured_var_beta_hat": var_meas,
                          "corpus_standardErrorSq": pred,
-                         "corpus_effectiveSampleSize": n_eff,
+                         "corpus_effectiveFisherInformation": n_eff,
                          "rel_err": (pred - var_meas) / var_meas})
             print("  p=%.2f beta=%.2f  Var(beta_hat)=%.6g  "
                   "standardErrorSq=%.6g  rel %+.2f%%"
@@ -679,7 +679,7 @@ def main():
                 "approxPower -- REMOVED",
                 "tagGenotypeVariance -- not present in defs.json"],
            "covers": ["discoveryNCP", "noncentralityParam",
-                      "effectiveSampleSize", "standardErrorSq",
+                      "effectiveFisherInformation", "standardErrorSq",
                       "powerAtThreshold", "ascertainment_loss"]}
     print("CONTROL 1 -- SAMPLING VARIANCE ALONE")
     c1, res["control_sampling_variance"] = control_sampling_variance()

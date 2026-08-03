@@ -333,18 +333,38 @@ noncomputable def olsEffectEstimationVariance
     (σ2 varX n : ℝ) : ℝ :=
   σ2 / (n * varX)
 
-/-- **Cross-check: haplotype effect estimation and one-locus OLS have the same
-estimation variance.** `HaplotypeTheory.haplotypeEffectEstimationVariance`
-divides by `n × f` with `f` a haplotype frequency; this divides by `n × varX`
-with `varX` a genotype variance. The two denominators are different quantities
-and the map is the same, so the arguments have to be read in the same order —
-which is the mistake this theorem is here to prevent, since the two definitions
-list `n` and the scale factor in opposite positions. -/
-theorem olsEffectEstimationVariance_eq_haplotypeEffectEstimationVariance
-    (σ2 varX n : ℝ) :
-    olsEffectEstimationVariance σ2 varX n =
-      haplotypeEffectEstimationVariance σ2 n varX := by
-  unfold olsEffectEstimationVariance haplotypeEffectEstimationVariance; ring
+/-- **Cross-check: the corrected haplotype estimation variance is the one-locus OLS
+variance at the binary-indicator genotype variance.** `HaplotypeTheory` divides by
+`n × f × (1-f)`; this divides by `n × varX` with `varX` a genotype variance, and for a
+binary haplotype indicator of frequency `f` that variance IS `f(1-f)`. Supplying it
+explicitly is what makes the two sides the same statement rather than two symbols that
+happen to sit in the same slot.
+
+The two definitions still list `n` and the scale factor in opposite positions, so the
+argument order is load-bearing and this theorem pins it. -/
+theorem olsEffectEstimationVariance_eq_haplotypeEffectVarianceOLS
+    (σ2 freq n : ℝ) :
+    olsEffectEstimationVariance σ2 (freq * (1 - freq)) n =
+      haplotypeEffectVarianceOLS σ2 n freq := by
+  unfold olsEffectEstimationVariance haplotypeEffectVarianceOLS; ring
+
+/-! **RESTATED, because the old form encoded a falsified identification.** This theorem
+used to read
+
+    olsEffectEstimationVariance σ2 varX n = haplotypeEffectEstimationVariance σ2 n varX
+
+which is true as arithmetic — both sides are `σ2 / (n · varX)` — and false as a claim,
+because it is only reached by passing a haplotype FREQUENCY where a genotype VARIANCE
+belongs. For a binary indicator of frequency `f` the variance is `f(1-f)`, not `f`, and
+that missing `(1-f)` is exactly the defect measured in `HaplotypeTheory`: the uncorrected
+body understates the estimation variance by 50.4% at `f = 1/2`, worst for COMMON
+haplotypes, which is the opposite of the rarity intuition its own prose appeals to.
+
+So the old theorem was a cross-check that certified the wrong pairing. It is restated
+against `haplotypeEffectVarianceOLS`, the VALIDATED form, with the variance supplied as
+`freq * (1 - freq)` — which is what makes the substitution legitimate rather than a
+coincidence of two symbols both named for a spread. `olsEffectEstimationVariance` itself
+was correct throughout and is unchanged; only what it was being equated to has moved. -/
 
 /-- The set of loci retained by a hard-threshold sparse estimator such as
 LASSO, modeled here by the loci whose marginal effect magnitude clears the

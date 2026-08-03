@@ -206,19 +206,22 @@ theorem ncp_eq_neff_times_beta_sq (n : ℕ) (p r2_ld β : ℝ) :
   rw [effectiveFisherInfo_eq]
   ring
 
-/-- **Effective sample size for a variant.**
-    n_eff = n × 2p(1-p) × r²_LD(tag, causal)
-    where p is MAF in that ancestry and r²_LD is tagging efficiency.
+/-! `effectiveSampleSize` used to sit here, with body `n * 2p(1-p) * r2_ld`. It is
+deleted: that body is `effectiveFisherInformation`, character for character, and the name
+was a units error rather than a second quantity. `2p(1-p) ≤ 1/2` for every allele
+frequency, so the value is below `n/2` always and equals `n` never; nothing carrying a
+genotype variance is a count of individuals. `ncp_eq_neff_times_beta_sq` already treated
+the two as interchangeable, because they were.
 
-    ORPHANED, PENDING REMOVAL. Every consumer in this file and in
-    `Conventions.lean` now calls `effectiveFisherInformation`, whose body is this
-    body. This declaration is left in place for one commit so the repoint can be
-    built and seen green before anything is deleted; see the removal commit for the
-    units argument. Do not add new callers.
+Removed in two steps deliberately. The consumers were repointed and built green first,
+and only then was the declaration deleted -- because a dead-code deletion in this repo
+destroyed two correct definitions on a premise that looked just as solid, and the build
+did not object, since Lean auto-binds an undefined name as an implicit variable rather
+than reporting it missing.
 
-    Empirical status: UNTESTED. -/
-noncomputable def effectiveSampleSize (n : ℕ) (p r2_ld : ℝ) : ℝ :=
-  n * (2 * p * (1 - p)) * r2_ld
+`effectiveSampleSizeSE` and `effectiveSampleSizeFromSE` are DIFFERENT declarations that
+merely share this stem, and one of them was independently found numerically wrong. A
+bare-stem substitution here would have corrupted both. -/
 
 /-- Effective sample size is nonneg. -/
 theorem effective_information_nonneg (n : ℕ) (p r2_ld : ℝ)
