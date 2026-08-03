@@ -16,9 +16,8 @@ import Calibrator.BundleRigidity.Telescope
 # The corrected kernel dichotomy for trip semigroups
 
 This module imports Mathlib and `Calibrator.BundleRigidity.Telescope`, from which it takes
-`prodWeight`. It previously carried its own copy under the name `wProd`, retained because a note here
-recorded that `Telescope` did not compile. **That note was stale** -- `Telescope`
-builds green -- so the repoint it asked for has been done and the duplicate is gone.
+`prodWeight`. **Do not add a local copy of the word-weight product**; one definition, one
+place to change it.
 
 ## What this replaces
 
@@ -96,17 +95,15 @@ it before any weight is chosen.
 
 The commutation relation is `ij = ji`, and its weight defect is **identically one** for
 every choice of weights (`commutation_defect_eq_one`). That is a two-line computation and
-it explains a fact that previously looked like a coincidence: the commutator mechanism was
-observed to work without any hypothesis on the weights, and the reason is that the only
-weight condition anyone could have imposed on it is satisfied automatically.
+it explains why the commutator mechanism works without any hypothesis on the weights: the
+only weight condition that could be imposed on it is satisfied automatically.
 
-## House style
+## Proof boundary
 
-The three deep theorems are **named fields of a structure**, not `sorry`s. Their proofs
-are not in this development, and carrying them as inputs means anything derived from them
-shows that in its own type. What *is* proved here without hypotheses: the automatic weight
-condition, the commutation defect, the falsifier's arithmetic, and the logical form of the
-refutation itself.
+**Do not package unproved analytic conclusions as fields of a structure here**: that makes
+callers supply the advertised results. This module exports only statements derived in Lean
+from their displayed hypotheses -- the automatic weight condition, the commutation defect,
+the falsifier's arithmetic, and the logical form of the refutation itself.
 
 ## Attribution
 
@@ -267,18 +264,17 @@ theorem falsifier_parity_mismatch :
 
 /-! ## The dichotomy, with the deep theorems as named inputs -/
 
-/-! ## The carried upstream theorems are removed
+/-! ## No upstream theorems are carried here
 
-A `TripSystem` structure used to sit here, carrying **Theorem 1**, **Theorem 3** and the
-zero-or-infinite dichotomy as structure fields — results proved nowhere in this corpus — along
-with every consequence drawn from them (`weight_condition_automatic` excepted, which is proved
-and survives below in the arithmetic section).
+**Do not add a structure carrying Theorem 1, Theorem 3 or the zero-or-infinite dichotomy as
+fields.** Those are proved nowhere in this corpus, and a structure field makes the caller
+supply them while looking like a result. The distinction between "proved here" and
+"asserted upstream and consumed here" cannot be carried by a docstring convention, because
+a docstring is not a type.
 
-They are gone. The distinction between "proved here" and "asserted upstream and consumed here"
-was previously carried by a docstring convention, and a docstring is not a type. What remains
-in this file is what it proves: the weight arithmetic of the executed falsifier, the Bézout
-constant derived from the character, the parity argument that makes the refutation structural
-rather than lucky, and the forced-mass-growth engine.
+This file contains what it proves: the weight arithmetic of the executed falsifier, the
+Bézout constant derived from the character, the parity argument that makes the refutation
+structural rather than lucky, and the forced-mass-growth engine.
 -/
 
 
@@ -311,11 +307,10 @@ doing real work, together with the escape-depth claim separating shells from the
 If disjointness fails anywhere, the partition collapses and step 3 sums the same mass
 twice. That is where a hidden assumption would live.
 
-A `ShellPartitionHypotheses` structure used to record those four geometric inputs as
-`Prop`-valued fields. It is removed: nothing consumed it, and a `Prop` field states
-nothing — `shellsPairwiseDisjoint : Prop` is a variable over propositions, satisfiable by
-`True`, not an assertion that the shells are disjoint. Recording them as prose is the
-honest form, and it loses no content because no proof ever referred to them.
+**Do not record these as `Prop`-valued structure fields.** A `Prop` field states nothing:
+`shellsPairwiseDisjoint : Prop` is a variable over propositions, satisfiable by `True`, not
+an assertion that the shells are disjoint. Prose is the honest form until someone
+formalizes them, and no proof here refers to them.
 
 The four geometric inputs of step 1, none of them formalized here:
 
@@ -330,9 +325,9 @@ The four geometric inputs of step 1, none of them formalized here:
 
 /-! ## Theorem 1's engine, proved
 
-`ShellPartitionHypotheses` carries the *geometric* inputs — disjointness of the shells, their
-separation from the attractor, and the two partition statements. What it does not carry, and
-what was previously left in prose, is the **arithmetic** those inputs feed: once the shells
+The *geometric* inputs — disjointness of the shells, their separation from the attractor,
+and the two partition statements — are the prose list above. What is proved here is the
+**arithmetic** those inputs feed: once the shells
 are disjoint the mass they force satisfies `U_{n+1} ≥ (Q_min/P_max)·U_n`, and in the
 normalized regime that ratio exceeds one while the total mass is bounded. A quantity that
 grows geometrically inside a bounded one cannot start positive.
