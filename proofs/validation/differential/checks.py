@@ -124,10 +124,9 @@ check(
          "or calibration factor may ever absorb it. If this check ever PASSES, "
          "either the definition changed or refs.fst_hudson broke.",
     canfail_clause=(
-        "needs p1 != p2. CORRECTED: this clause used to read 'needs pbar != "
-        "0.5; Nei and Hudson coincide exactly at pbar=0.5', copying the same "
-        "disjunct from the Conventions.neiGst docstring. It is FALSE and "
-        "cluster/fam_fst_allel_crosscheck.py cell C3 measures it: the exact "
+        "needs p1 != p2. Do NOT weaken this to 'needs pbar != 0.5': Nei and "
+        "Hudson do not coincide at pbar=0.5, and "
+        "cluster/fam_fst_allel_crosscheck.py cell C3 measures it. The exact "
         "conversion Hudson = 2G/(1+G) has 2G/(1+G) = G only at G in {0,1}, so "
         "the two coincide only at p1 = p2 (or complete fixation). At pbar=0.5 "
         "exactly, (p1,p2) = (0.525,0.475) gives NEI_GST 0.0025 against HUDSON "
@@ -159,8 +158,8 @@ check(
     ),
     canfail_clause=(
         "the grid must contain p1 != p2; at p1 = p2 every check in this group "
-        "goes degenerate because all estimators return 0. CORRECTED: this "
-        "clause used to say the grid must stay off pbar = 0.5. It does not -- "
+        "goes degenerate because all estimators return 0. The grid does NOT "
+        "need to stay off pbar = 0.5 -- "
         "see simpleFst-vs-hudson's clause and cell C3 of "
         "cluster/fam_fst_allel_crosscheck.py, which measures a factor of "
         "1.995 between the conventions AT pbar = 0.5 exactly."
@@ -537,11 +536,11 @@ check(
     ),
 )
 
-# `steppingStone-cross-file-contradiction` was DELETED, not repointed.
+# Do NOT add a check comparing 1 - exp(-d/L) against d/(d + 4 Ne m sigma^2).
 #
-# It compared 1 - exp(-d/L) against d/(d + 4 Ne m sigma^2) and found an 878%
-# disagreement. The contradiction is now resolved by REMOVING ONE SIDE:
-# `continuousSteppingStoneFst` has been deleted from the corpus, because the
+# There is no exponential side to compare: `continuousSteppingStoneFst` is not in
+# the corpus. A check of that shape reported an 878% disagreement, and the
+# resolution was to remove one side rather than tune a tolerance, because the
 # coalescent derivation in DemographicHistory yields the hyperbolic form
 # exactly and the exponential is not derivable from it -- no choice of L
 # reconciles them beyond first order.
@@ -1020,8 +1019,8 @@ check(
         "both away from 0.5. If p_a + p_b = 1 the denominators coincide and "
         "the (1-alpha)^2 numerator scaling is exactly right -- a symmetric "
         "frequency PAIR makes this check unable to fail.\n\n"
-        "CORRECTION, measured. That clause used to end 'a symmetric spectrum "
-        "makes this check unable to fail', and THAT PART IS FALSE. "
+        "A symmetric SPECTRUM does NOT make this check unable to fail; only a "
+        "symmetric PAIR does. "
         "cluster/fam_admixture.py ran three spectra -- a 1/p density, a "
         "uniform density, and Beta(1/2,1/2) -- and they agree to the THIRD "
         "DECIMAL (alpha=0.5, F_ST(A,B)=0.633: -0.3179, -0.3173, -0.3167). The "
@@ -1175,13 +1174,13 @@ check(
 
 
 # --- 9. Cross-name duplicates ----------------------------------------------
-# The three `dup-islandModelFst-*` entries were REMOVED because the duplication
-# they detected has been REPAIRED. islandModelFst, equilibriumFst and
-# fstMigDriftEquil were absorbed into fstMigrationDriftEquilibrium in 4decc9cd;
-# the corpus previously carried Lean-proved bridge theorems asserting they were
-# equal rather than collapsing them. A duplicate-detection check whose two sides
-# are now the same definition compares that definition to itself and reports
-# 0.0 forever, which is a passing check that has stopped meaning anything.
+# Do NOT add a duplicate-detection check for islandModelFst, equilibriumFst or
+# fstMigDriftEquil: they are all `fstMigrationDriftEquilibrium`.
+#
+# THE GENERAL RULE: a duplicate-detection check whose two sides have become the
+# same definition compares that definition to itself and reports 0.0 forever,
+# which is a passing check that has stopped meaning anything. When a duplication
+# is repaired by collapsing the names, retire the check that detected it.
 #
 # Kept below: the one pair that is still genuinely two definitions.
 for _dup_id, _a, _b, _args in [
