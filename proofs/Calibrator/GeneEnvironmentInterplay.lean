@@ -1,6 +1,11 @@
 import Calibrator.Probability
 import Calibrator.PortabilityDrift
 import Calibrator.OpenQuestions
+-- For `LevelSetCoordinates`, `IsLevelSetFunctional` and
+-- `levelSet_metrics_agree_of_coords_eq`: the section on genetic/environmental
+-- identifiability below upgrades a calibration-level non-identifiability into a
+-- statement about every threshold metric at once, which is not provable here.
+import Calibrator.FoldedSpectrum
 
 namespace Calibrator
 
@@ -332,9 +337,22 @@ section CounterfactualFramework
     The portability gap R²_own - R²_other decomposes into:
     - Genetic component: loss from LD mismatch and allele frequency differences
     - Environmental component: loss from GxE and rGE differences
-    Each component is the R² loss attributable to that factor.
     We model: R²_own uses V_genetic + V_env_corr, while
-    R²_other loses both partially. The gap is the sum of losses. -/
+    R²_other loses both partially. The gap is the sum of losses.
+
+    **This does NOT attribute the gap to either factor, and the conclusion is why.**
+    The docstring here used to say "each component is the R² loss attributable to that
+    factor". It is not: the conclusion is a function of `loss_genetic + loss_env`, so every
+    split with the same total yields the same `gap`, exactly. `loss_genetic` and `loss_env`
+    are free parameters of the statement, not quantities it measures, and no choice of
+    either is contradicted by any value of `gap`.
+
+    What that costs, and what recovers it, is proved in "Genetic versus environmental
+    attribution" below: under an environmental gradient collinear with the ancestry
+    gradient the split is invisible to every cohort-level calibration and to every threshold
+    metric, and it becomes identifiable exactly when the two gradients are non-collinear --
+    for instance two cohorts at matched nonzero genetic distance with different
+    environments. -/
 theorem portability_gap_decomposition
     (V_genetic V_env V_E : ℝ)
     (loss_genetic loss_env : ℝ)
@@ -366,6 +384,195 @@ theorem equalize_environment_reveals_genetic_portability
     effectiveGeneticEffect β_G β_GxE E_t - effectiveGeneticEffect β_G β_GxE E_s =
       β_GxE * (E_t - E_s) := by
   unfold effectiveGeneticEffect; ring
+
+/-! ## Genetic versus environmental attribution: what a cohort calibration cannot see
+
+`portability_gap_decomposition` above is the place this module states an attribution, and
+its docstring is explicit about it: "Each component is the R² loss attributable to that
+factor." **The theorem does not support that reading, and its own algebra is why.** Its
+conclusion is `gap = (loss_genetic + loss_env) / V_P` -- a function of the **sum**. Two
+different splits with the same total produce the same gap, exactly, so nothing in that
+statement attributes anything to either factor. The decomposition is a definition of terms,
+not a measurement of them.
+
+That is not a defect peculiar to that theorem. It is the shape of the problem, and this
+section proves it in the form that tells a study designer what to do.
+
+**The setup.** Deployment cohorts each carry two coordinates: a genetic one (genetic
+distance, ancestry position) and an environmental one (SES or any measured environmental
+contrast). The calibration shift a cohort exhibits is `gamma * genetic + eta * environmental`
+-- one number per cohort, the sum of the two contributions. This is the premise the whole
+question turns on, and it is the premise Harpak et al. make live: if ancestry coordinates
+partially predict environment, the environmental term is *not* a separate additive channel,
+it enters the same per-cohort number as drift.
+
+**The negative result.** If the environmental gradient is collinear with the genetic one --
+environment varies across cohorts only as ancestry does -- then an entire one-parameter
+family of `(gamma, eta)` splits produces **identical** shifts at every cohort
+(`shift_blind_to_split_of_collinear`). Not approximately equal: equal. So no cohort-level
+calibration can separate genetics from environment, at any sample size, because the
+observable is constant along the family. And by the level-set collapse this extends past
+calibration to **every threshold metric at once**
+(`no_threshold_metric_separates_collinear_split`): if the two act through the same
+deployment coordinate, no precision, recall, exceedance probability or quantile comparison
+distinguishes them either. That is the structural explanation of the Harpak finding -- the
+environmental contribution is not unmodelled noise, it is a direction the design cannot
+resolve.
+
+**The positive result, which is the study-design statement.** Identifiability returns
+exactly when the two gradients are non-collinear: two cohorts whose
+`(genetic, environmental)` coordinate vectors are not proportional determine the split
+uniquely (`split_identified_of_noncollinear`). The most quotable sufficient condition is
+`split_identified_of_matched_genetics`: **two cohorts at the same nonzero genetic distance
+with different environments suffice.** Equivalently, cohorts differing in genetics at
+matched environment. Collecting cohorts along a single ancestry gradient -- which is what
+biobank recruitment tends to produce -- buys none of this, however many cohorts there are.
+
+**What is deliberately absent.** No `sigma^2_env` term is added to the closing law. A fourth
+additive symbol would be fittable and never predictable, because nothing else in the
+derivation constrains it. The contribution here is the identifiability statement instead:
+negative under collinearity, positive under a stated design condition, and both proved.
+
+**Scope, stated so it is not overread.** These are exact statements about a linear
+two-source shift model. They do not claim environment is unimportant, nor that its
+magnitude is small -- Harpak et al. suggest the opposite -- only that magnitude and
+attribution are different questions, and that the second is unanswerable from cohorts
+strung along one gradient. -/
+
+/-- A panel of deployment cohorts, each carrying a genetic coordinate (ancestry position,
+genetic distance from the source) and an environmental coordinate (SES or any measured
+environmental contrast). -/
+structure CohortGradients (n : ℕ) where
+  /-- Genetic distance / ancestry position of each cohort. -/
+  geneticGradient : Fin n → ℝ
+  /-- Measured environmental contrast of each cohort. -/
+  environmentalGradient : Fin n → ℝ
+
+/-- **The one number a per-cohort calibration sees**: the sum of the genetic and
+environmental contributions. `gamma` and `eta` are the per-unit effects to be attributed. -/
+def cohortShift {n : ℕ} (G : CohortGradients n) (gamma eta : ℝ) (i : Fin n) : ℝ :=
+  gamma * G.geneticGradient i + eta * G.environmentalGradient i
+
+/-- **The negative result: under a collinear environmental gradient the split is invisible.**
+
+If environment varies across cohorts only as ancestry does (`environmental = c * genetic`),
+then for every `t` the split `(gamma + c*t, eta - t)` produces exactly the same shift at
+every cohort. The observable is constant along a one-parameter family, so no cohort-level
+calibration separates genetics from environment -- not poorly, but not at all, at any
+sample size. -/
+theorem shift_blind_to_split_of_collinear {n : ℕ} (G : CohortGradients n) (c : ℝ)
+    (hcol : ∀ i, G.environmentalGradient i = c * G.geneticGradient i)
+    (gamma eta t : ℝ) (i : Fin n) :
+    cohortShift G (gamma + c * t) (eta - t) i = cohortShift G gamma eta i := by
+  unfold cohortShift
+  rw [hcol i]
+  ring
+
+/-- **The positive result: non-collinear gradients identify the split.**
+
+If two cohorts have `(genetic, environmental)` coordinate vectors that are not proportional
+-- a nonzero `2x2` determinant -- then agreeing shifts force agreeing splits. This is the
+study-design condition, and it is a condition on the *panel*, not on the sample size. -/
+theorem split_identified_of_noncollinear {n : ℕ} (G : CohortGradients n) (i j : Fin n)
+    (hdet : G.geneticGradient i * G.environmentalGradient j -
+      G.geneticGradient j * G.environmentalGradient i ≠ 0)
+    (gamma eta gamma' eta' : ℝ)
+    (hagree : ∀ k : Fin n, cohortShift G gamma eta k = cohortShift G gamma' eta' k) :
+    gamma = gamma' ∧ eta = eta' := by
+  have hi := hagree i
+  have hj := hagree j
+  unfold cohortShift at hi hj
+  -- Write `a = gamma - gamma'`, `b = eta - eta'`; the two cohorts give
+  -- `a*g_i + b*e_i = 0` and `a*g_j + b*e_j = 0`, and the determinant kills both.
+  --
+  -- These four steps are `linear_combination` rather than `nlinarith` on purpose. The
+  -- identities are products of unknowns with gradient values, so they are nonlinear in the
+  -- atoms and a search tactic has to guess the multipliers; `nlinarith [hi, hj]` does not
+  -- find them and reports `linarith failed`, which reads as a false goal rather than as an
+  -- unguessed coefficient. The multipliers are known exactly -- they are Cramer's rule --
+  -- so they are written down.
+  have h1 : (gamma - gamma') * G.geneticGradient i
+      + (eta - eta') * G.environmentalGradient i = 0 := by linear_combination hi
+  have h2 : (gamma - gamma') * G.geneticGradient j
+      + (eta - eta') * G.environmentalGradient j = 0 := by linear_combination hj
+  have ha : (gamma - gamma') * (G.geneticGradient i * G.environmentalGradient j -
+      G.geneticGradient j * G.environmentalGradient i) = 0 := by
+    linear_combination G.environmentalGradient j * h1 - G.environmentalGradient i * h2
+  have hb : (eta - eta') * (G.geneticGradient i * G.environmentalGradient j -
+      G.geneticGradient j * G.environmentalGradient i) = 0 := by
+    linear_combination G.geneticGradient i * h2 - G.geneticGradient j * h1
+  constructor
+  · have := mul_eq_zero.mp ha
+    rcases this with h | h
+    · exact sub_eq_zero.mp h
+    · exact absurd h hdet
+  · have := mul_eq_zero.mp hb
+    rcases this with h | h
+    · exact sub_eq_zero.mp h
+    · exact absurd h hdet
+
+/-- **The study-design condition in its usable form: two cohorts at matched genetic distance
+with different environments.**
+
+This is what has to be recruited. Cohorts strung along a single ancestry gradient give a
+proportional coordinate pair at every pair of cohorts and identify nothing, however many
+there are. -/
+theorem split_identified_of_matched_genetics {n : ℕ} (G : CohortGradients n) (i j : Fin n)
+    (hmatch : G.geneticGradient i = G.geneticGradient j)
+    (hgne : G.geneticGradient i ≠ 0)
+    (henv : G.environmentalGradient i ≠ G.environmentalGradient j)
+    (gamma eta gamma' eta' : ℝ)
+    (hagree : ∀ k : Fin n, cohortShift G gamma eta k = cohortShift G gamma' eta' k) :
+    gamma = gamma' ∧ eta = eta' := by
+  refine split_identified_of_noncollinear G i j ?_ gamma eta gamma' eta' hagree
+  rw [← hmatch]
+  intro hcontra
+  apply henv
+  have : G.geneticGradient i *
+      (G.environmentalGradient j - G.environmentalGradient i) = 0 := by linarith [hcontra]
+  rcases mul_eq_zero.mp this with h | h
+  · exact absurd h hgne
+  · linarith [sub_eq_zero.mp h]
+
+/-- A deployment: a cohort panel together with the split being attributed. -/
+structure GxEDeployment (n : ℕ) where
+  /-- The cohort panel. -/
+  gradients : CohortGradients n
+  /-- Per-unit genetic effect. -/
+  gamma : ℝ
+  /-- Per-unit environmental effect. -/
+  eta : ℝ
+
+/-- The shift vector a deployment presents to a per-cohort calibration. -/
+def GxEDeployment.shift {n : ℕ} (D : GxEDeployment n) (i : Fin n) : ℝ :=
+  cohortShift D.gradients D.gamma D.eta i
+
+/-- **No threshold metric separates them either.**
+
+The upgrade from "calibration cannot see it" to "nothing threshold-based can see it".
+`hfactor` is the substantive modelling premise and is carried as a hypothesis rather than
+assumed silently: the readout coordinates a deployment presents depend on it only through
+its cohort shifts. That is precisely the claim that environment and drift **enter the same
+deployment coordinate**. Granting it, the Gaussian level-set collapse of
+`Calibrator.FoldedSpectrum` does the rest: the whole collinear family shares its two
+coordinates, so every level-set functional -- precision, recall, any exceedance probability,
+any quantile -- takes the same value across it.
+
+This is not provable in this file. `levelSet_metrics_agree_of_coords_eq` is the content, and
+deleting `FoldedSpectrum` removes it. -/
+theorem no_threshold_metric_separates_collinear_split {n : ℕ}
+    (G : CohortGradients n) (c : ℝ)
+    (hcol : ∀ i, G.environmentalGradient i = c * G.geneticGradient i)
+    (coords : GxEDeployment n → LevelSetCoordinates)
+    (hfactor : ∀ D D' : GxEDeployment n,
+      (∀ i, D.shift i = D'.shift i) → coords D = coords D')
+    (metric : GxEDeployment n → ℝ)
+    (hmetric : IsLevelSetFunctional metric coords)
+    (gamma eta t : ℝ) :
+    metric ⟨G, gamma + c * t, eta - t⟩ = metric ⟨G, gamma, eta⟩ := by
+  refine levelSet_metrics_agree_of_coords_eq coords metric hmetric _ _ ?_
+  refine hfactor _ _ (fun i => ?_)
+  exact shift_blind_to_split_of_collinear G c hcol gamma eta t i
 
 end CounterfactualFramework
 
