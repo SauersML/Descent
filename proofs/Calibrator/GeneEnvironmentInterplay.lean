@@ -294,23 +294,6 @@ theorem crossover_gxe_possible
       div_mul_cancel₀ _ (ne_of_gt h_bd)
     nlinarith [mul_pos h_bd (show 0 < (1:ℝ) from one_pos)]
 
-/-- **Crossover GxE makes portability impossible.**
-    When genotype rankings reverse across environments, the PGS
-    trained in one environment negatively predicts in another.
-    Using the linearNormOfReaction model, if two genotypes have
-    a₁ > a₂ but b₁ < b₂, the Pearson correlation between
-    predictions (based on environment 0) and outcomes (in environment E)
-    reverses sign for large enough E. We prove: there exists E where
-    the genotype that was better at E=0 becomes worse. -/
-theorem crossover_gxe_worst_for_portability
-    (a₁ a₂ b₁ b₂ : ℝ)
-    (h_a : a₂ < a₁) (h_b : b₁ < b₂) :
-    -- At E=0, genotype 1 is better
-    linearNormOfReaction a₂ b₂ 0 < linearNormOfReaction a₁ b₁ 0 ∧
-    -- But there exists E where genotype 1 is worse (ranking reversed)
-    ∃ E, linearNormOfReaction a₁ b₁ E < linearNormOfReaction a₂ b₂ E := by
-  exact crossover_gxe_possible a₁ a₂ b₁ b₂ h_a h_b
-
 /-- **Quantitative GxE: variance of slopes determines portability.**
     Under the linear norm of reaction Y = a(G) + b(G) × E, total
     genetic variance = Var(a) + Var(b) × E². The fraction of genetic

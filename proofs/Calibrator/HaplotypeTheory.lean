@@ -629,10 +629,13 @@ theorem more_errors_more_attenuation (s₁ s₂ : ℝ)
   have h₂ : 1 - 2 * s₂ < 1 - 2 * s₁ := by linarith
   exact sq_lt_sq' (by linarith) h₂
 
-/-- **Phasing accuracy varies by population representation.**
-    Phasing algorithms trained on well-represented populations
-    work worse on underrepresented samples because reference
-    panels are biased toward the training population. -/
+/-- **Phasing error costs more attenuation in the target than in the source.**
+
+    This is `more_errors_more_attenuation` read with source and target labels: the content is
+    that attenuation is decreasing in the switch-error rate, and the biology is entirely in the
+    hypothesis `s_source < s_target`. That reference panels are biased toward the training
+    population is the reason someone would assert that hypothesis; no panel, no representation
+    and no bias mechanism appears below, and none is derived. -/
 theorem phasing_worse_for_underrepresented
     (s_source s_target : ℝ)
     (h_worse : s_source < s_target)
