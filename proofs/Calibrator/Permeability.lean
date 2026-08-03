@@ -634,6 +634,18 @@ rounds sample counts and rechecks the inequality. -/
 noncomputable def informationAtBudget (budget information cost : ℝ) : ℝ :=
   budget * informationPerUnitCost information cost
 
+/-- **Information bought is linear in the budget.** Doubling the budget doubles the information
+at a fixed rate, and no budget buys nothing. A body that saturated would not be a budget times a
+rate. -/
+theorem informationAtBudget_linear (budget information cost c : ℝ) :
+    informationAtBudget (c * budget) information cost
+      = c * informationAtBudget budget information cost := by
+  unfold informationAtBudget; ring
+
+theorem informationAtBudget_zero (information cost : ℝ) :
+    informationAtBudget 0 information cost = 0 := by
+  unfold informationAtBudget; ring
+
 /-- At positive budget, ordering designs by total attainable information is exactly the
 same as ordering them by information per unit cost. -/
 theorem informationAtBudget_lt_iff_informationPerUnitCost_lt

@@ -64,6 +64,13 @@ Two accessors on two structures used to write this product out separately.
 noncomputable def hetDecayFromScaled (Ne θ : ℝ) : ℝ :=
   (1 - 1 / (2 * Ne)) * (1 - θ / (2 * Ne))
 
+/-- **The two channels factor.** Heterozygosity decay is drift times mutation, and at zero scaled
+mutation only the drift factor survives. A body that added the two channels instead of
+multiplying them would fail this, and would also predict decay exceeding one for large `θ`. -/
+theorem hetDecayFromScaled_no_mutation (Ne : ℝ) :
+    hetDecayFromScaled Ne 0 = 1 - 1 / (2 * Ne) := by
+  unfold hetDecayFromScaled; ring
+
 
 open scoped InnerProductSpace
 open InnerProductSpace
@@ -270,6 +277,19 @@ explicit source/target transport witnesses. -/
 noncomputable def explainedR2FromTransportMoments
     (scoreOutcomeCov scoreVariance outcomeVariance : ℝ) : ℝ :=
   scoreOutcomeCov ^ 2 / (scoreVariance * outcomeVariance)
+
+/-- **Rescaling the score leaves the explained fraction alone.** Multiplying the score by `c`
+multiplies its covariance with the outcome by `c` and its variance by `c²`. This is the property
+that makes the quantity a squared correlation and lets it be compared across scores reported on
+different scales. -/
+theorem explainedR2FromTransportMoments_scale_invariant
+    (scoreOutcomeCov scoreVariance outcomeVariance c : ℝ) (hc : c ≠ 0) :
+    explainedR2FromTransportMoments (c * scoreOutcomeCov) (c ^ 2 * scoreVariance) outcomeVariance
+      = explainedR2FromTransportMoments scoreOutcomeCov scoreVariance outcomeVariance := by
+  unfold explainedR2FromTransportMoments
+  rw [mul_pow, show c ^ 2 * scoreVariance * outcomeVariance
+        = c ^ 2 * (scoreVariance * outcomeVariance) by ring,
+    mul_div_mul_left _ _ (pow_ne_zero 2 hc)]
 
 /-- Source tagged moments for the explicit LD witness.
 
@@ -2582,6 +2602,19 @@ explicit liability distribution, not supplied as a record field. -/
 /-- Exact calibrated Bernoulli Brier risk from prevalence and explained-risk fraction. -/
 def calibratedBrier (π r2 : ℝ) : ℝ :=
   π * (1 - π) * (1 - r2)
+
+/-- **Anchors of the calibrated Brier risk.** A perfectly explanatory score reaches zero risk;
+an uninformative one falls back on the prevalence variance. The two together pin the linear
+dependence on `r2`, which one anchor alone would not. -/
+theorem calibratedBrier_anchors (π : ℝ) :
+    calibratedBrier π 1 = 0 ∧ calibratedBrier π 0 = π * (1 - π) := by
+  constructor <;> unfold calibratedBrier <;> ring
+
+/-- The risk is symmetric under exchanging a disease for its complement at fixed explained
+signal: prevalence enters only through `π(1-π)`. -/
+theorem calibratedBrier_prevalence_symm (π r2 : ℝ) :
+    calibratedBrier (1 - π) r2 = calibratedBrier π r2 := by
+  unfold calibratedBrier; ring
 
 /-- Exact calibrated Bernoulli Brier risk from prevalence, explained signal
 variance, and residual variance.

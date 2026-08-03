@@ -82,6 +82,17 @@ theorem additive_pgs_ceiling
 noncomputable def fisherAverageEffect (a d p : ℝ) : ℝ :=
   a + d * (1 - 2 * p)
 
+/-- **The average effect is the additive effect plus a dominance term that vanishes at even
+frequency and reverses across it.** At `p = 1/2` the dominance contribution is exactly zero, and
+reflecting the frequency flips its sign: that is why dominance is invisible to an additive model
+at intermediate frequency and visible at the extremes. -/
+theorem fisherAverageEffect_half (a d : ℝ) : fisherAverageEffect a d (1 / 2) = a := by
+  unfold fisherAverageEffect; ring
+
+theorem fisherAverageEffect_reflect (a d p : ℝ) :
+    fisherAverageEffect a d (1 - p) - a = -(fisherAverageEffect a d p - a) := by
+  unfold fisherAverageEffect; ring
+
 /-- **Average effect changes across populations.**
     When allele frequency changes from p₁ to p₂, the average
     effect changes even if a and d stay the same. -/
