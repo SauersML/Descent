@@ -107,8 +107,15 @@ theorem scaledMigrationRate_eq_ploidy_form (Ne m : ℝ) :
     scaledMigrationRate Ne m = 2 * ploidy * Ne * m := by
   unfold scaledMigrationRate ploidy; ring
 
-/-- **Cross-check: the drift `F_ST` uses the coalescent time scale**, so the
-`2 Nₑ` inside it is the same `ploidy · Nₑ` and not a separate choice. -/
+/-- **Cross-check: `heterozygosityLossFromDrift` uses the coalescent time scale**, so the
+`2 Nₑ` inside it is the same `ploidy · Nₑ` and not a separate choice.
+
+The name of this theorem calls that body "the drift `F_ST`", and `DriftRegime` names
+precisely that reading as the defect: a within-population heterozygosity loss and a
+between-population variance ratio are different quantities, and the shared body is what
+let one be substituted for the other. What is pinned here is the constant. The regime is
+pinned separately, by
+`heterozygosityLossFromDrift_eq_closedPopulation_measuredLoss` at the end of this file. -/
 theorem fstFromDrift_uses_coalescentTimeScale (t : ℕ) (Ne : ℝ) :
     heterozygosityLossFromDrift t Ne = 1 - (1 - 1 / coalescentTimeScale Ne) ^ t := by
   unfold heterozygosityLossFromDrift; rw [coalescentTimeScale_eq]
@@ -521,9 +528,9 @@ theorem driftLDCreationRate_eq_inv_timeScale (Ne : ℝ) :
     driftLDCreationRate Ne = 1 / coalescentTimeScale Ne := by
   unfold driftLDCreationRate; rw [coalescentTimeScale_eq]
 
-theorem ldDecayRatePerGen_eq_inv_timeScale (Ne : ℝ) :
-    ldDecayRatePerGen Ne = 1 / coalescentTimeScale Ne := by
-  unfold ldDecayRatePerGen; rw [coalescentTimeScale_eq]
+theorem driftRatePerGen_eq_inv_timeScale (Ne : ℝ) :
+    driftRatePerGen Ne = 1 / coalescentTimeScale Ne := by
+  unfold driftRatePerGen; rw [coalescentTimeScale_eq]
 
 /-- **Cross-check: the `2 Nₑ` inside `coalFst` is the coalescent time scale.**
 `coalFst t Ne = t / (t + 2 Nₑ)` is `t / (t + E[T_within])`, and `E[T_within]`
@@ -560,7 +567,20 @@ theorem pairwiseFstFromBranches_eq_wrightFIT (a b : ℝ) :
 
 `1 - 1/(2 Nₑ)` is the probability that two lineages fail to coalesce in one
 generation. It is spelled out independently in `PhenomeWidePortability`,
-`LDDecayTheory`, `PopulationGeneticsFoundations` and `PortabilityDrift`. -/
+`LDDecayTheory`, `PopulationGeneticsFoundations` and `PortabilityDrift`.
+
+**These theorems pin the constant, not the regime, and three of the four bodies below
+are members of a falsified cluster.** `(1 - 1/(2 Nₑ))^t` is the closed-population,
+no-mutation recurrence; at demographic equilibrium simulation measures a retention of
+`1.02 ± 0.02` where it predicts `e^(-2) = 0.135`, because mutation replenishes diversity
+(`DriftRegime`). Agreeing on `2 Nₑ` is exactly the kind of cross-check that cannot see
+that, since every identity here holds *in* the shared premise whatever its value.
+
+`heterozygosityLossDerived` and `wrightFisherDriftRetention` are attached to the named
+regime at the end of this file. `neutralDriftFactor` is **not** attached and carries a
+FALSIFIED status of its own in `PhenomeWidePortability`. Note that
+`ldRetainedFraction_uses_timeScale` below is the one guard in this group that states
+what its formula omits — copy that shape, not the bare ones. -/
 
 theorem neutralDriftFactor_uses_timeScale (Ne : ℝ) (t : ℕ) :
     neutralDriftFactor Ne t = (1 - 1 / coalescentTimeScale Ne) ^ t := by
@@ -641,6 +661,14 @@ theorem dominanceVariance_uses_hwe {m : ℕ} (p d : Fin m → ℝ) :
     dominanceVariance p d = ∑ i, (hweGenotypeVariance (p i) * d i) ^ 2 := by
   unfold dominanceVariance hweGenotypeVariance ploidy; ring_nf
 
+/-- **`additiveVariance` is a sum over loci and therefore assumes linkage equilibrium**;
+this theorem pins its `2 p (1 - p)` to `ploidy` and says nothing about that assumption.
+
+The qualifier is load-bearing. The per-locus sum drops the cross term
+`Σ_{i≠j} 4 α_i α_j D_ij`, and the sign of the resulting error flips with the sign of the
+effect product, so no constant repairs it: at `p = 1/2`, `D = 1/8`, `α = (1,1)` gives `1`
+against a true `3/2`, while `α = (1,-1)` gives `1` against a true `1/2`. The
+unconditional reading is FALSIFIED (`VarianceComponents.additiveVariance`). -/
 theorem additiveVariance_uses_hwe {m : ℕ} (p α : Fin m → ℝ) :
     additiveVariance p α = ∑ i, hweGenotypeVariance (p i) * (α i) ^ 2 := by
   unfold additiveVariance hweGenotypeVariance ploidy; ring_nf
@@ -763,6 +791,10 @@ theorem fstMigDriftNext_uses_timeScale (Ne m Fst : ℝ) :
         + 1 / coalescentTimeScale Ne := by
   unfold fstMigDriftNext; rw [coalescentTimeScale_eq]
 
+/-- Pins the `2` in `stabilizingPortability`. Note that this law and
+`diversifyingPortability` below are recorded FALSIFIED as one-parameter laws — no
+constant `strength` fits the portability curve, the fitted value spanning 13-fold over a
+29-fold range of `F_ST`. The convention is right; the magnitude is not a prediction. -/
 theorem stabilizingPortability_uses_ploidy (r2_0 fst strength : ℝ) :
     stabilizingPortability r2_0 fst strength
       = r2_0 * max 0 (1 - ploidy * fst) * Real.exp (-strength * fst) := by
@@ -988,7 +1020,7 @@ departure rather than an oversight:
   a numerical chart to a scientific observable, no identification theorem is exported.
   A citation or caller-supplied proposition cannot manufacture that theorem.
 * **As a proved failure.** The departure is itself a theorem, so the limit is checkable
-  rather than described: `neutralAFBenchmarkRatio_cannot_reach_measured`,
+  rather than described: `benchmarkRatioForm_cannot_reach_measured`,
   `finiteIslandCorrection_two_excess`,
   `demoSteppingStoneFst_indistinguishable_from_quadratic`,
   `pairwiseFstFromBranches_eq_fstFromTau_add_mul`,
@@ -1054,6 +1086,33 @@ theorem wrightFisherHeterozygosityLoss_eq_closedPopulation_measuredLoss
   rw [measuredLoss_closedPopulation]
   unfold wrightFisherHeterozygosityLoss wrightFisherDriftRetention
   rfl
+
+/-- **The fourth proportional-reduction body, and the one that could not be reached from
+its siblings.**
+
+`PopulationGeneticsFoundations.fstFromHetRatio_eq_hudsonFst_eq_r2FromMSE` already relates
+three spellings of `1 - residual/baseline`: a heterozygosity ratio, a coalescence-time
+ratio, and an error-to-variance ratio.  `PCCorrectability.Diagnostic.pcTargetAxisEfficacy`
+is the fourth — the fraction of a target ancestry axis captured by correction, written in
+its own docstring as `V_K = 1 - H'/H`, deliberately echoing `F_ST` — and it could not join
+them there, because `Diagnostic` imports nothing outside `PCCorrectability` and none of the
+other three files imports `Diagnostic`.
+
+This module reaches all four, through `StratificationConfounding → PCCorrectability`.  That
+is the whole reason the statement is here and not beside any of the definitions: **the
+tying theorem belongs wherever both sides are visible, not in one of the two files.**  A
+guard demanding the latter reported this pair as unfixable when the only thing missing was
+permission to speak from a third module.
+
+As with its siblings these are four different quantities and no value of one may be
+substituted for another; what is shared is the measure, and sharing it silently is what
+this section exists to prevent. -/
+theorem pcTargetAxisEfficacy_eq_proportionalReduction (residual baseline : ℝ) :
+    pcTargetAxisEfficacy baseline residual = fstFromHetRatio residual baseline ∧
+      pcTargetAxisEfficacy baseline residual =
+        hudsonFstFromCoalescenceTimes residual baseline ∧
+      pcTargetAxisEfficacy baseline residual = r2FromMSE residual baseline := by
+  refine ⟨rfl, rfl, rfl⟩
 
 end EquilibriumAgreements
 
