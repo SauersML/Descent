@@ -18,11 +18,10 @@ Key results:
 4. Calibration across populations
 5. Quantile-based risk and population-specific thresholds
 
-Provenance: derived here, not imported. This file previously cited Wang et al. (2026),
-Nature Communications 17:942 for the results below. That paper is an empirical study of
-the polygenic-score portability gap; it does not treat score distribution theory, tail
-probabilities or quantile thresholds, and so does not substantiate anything here.
-Sources for individual results, where they exist, are cited at those results.
+Provenance: derived here, not imported. Wang et al. (2026), Nature Communications 17:942,
+substantiates nothing below. It is an empirical study of the polygenic-score portability
+gap and does not treat score distribution theory, tail probabilities or quantile
+thresholds. Sources for individual results, where they exist, are cited at those results.
 -/
 
 

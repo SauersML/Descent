@@ -21,10 +21,9 @@ Key results:
 4. Posterior predictive distributions across populations
 5. Spike-and-slab vs continuous shrinkage
 
-Provenance: derived here, not imported. This file previously cited Wang et al. (2026),
-Nature Communications 17:942 for the results below. That paper is an empirical study of
-the polygenic-score portability gap; it does not treat Bayesian shrinkage, prior
-specification or LD reference panels, and so does not substantiate anything here.
+Provenance: derived here, not imported. Wang et al. (2026), Nature Communications 17:942,
+substantiates nothing below. It is an empirical study of the polygenic-score portability
+gap and does not treat Bayesian shrinkage, prior specification or LD reference panels.
 Sources for individual results, where they exist, are cited at those results.
 -/
 

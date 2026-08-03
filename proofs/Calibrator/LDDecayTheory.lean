@@ -20,11 +20,11 @@ Key results:
 4. Population bottlenecks amplify LD as a function of severity and duration
 5. LD mismatch quantification via Frobenius norm
 
-Provenance: derived here, not imported. This file previously cited Wang et al. (2026),
-Nature Communications 17:942 for the results below. That paper is an empirical study of
-the polygenic-score portability gap; it does not treat the Ohta-Kimura decay model,
-admixture LD or bottleneck amplification, and so does not substantiate anything here.
-Sources for individual results, where they exist, are cited at those results.
+Provenance: derived here, not imported. Wang et al. (2026), Nature Communications 17:942,
+substantiates nothing below. It is an empirical study of the polygenic-score portability
+gap and does not treat the Ohta-Kimura decay model, admixture LD or bottleneck
+amplification. Sources for individual results, where they exist, are cited at those
+results.
 -/
 
 

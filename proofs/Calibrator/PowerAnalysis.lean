@@ -21,12 +21,11 @@ Key results:
 4. Diminishing returns from larger discovery samples
 5. Optimal allocation across ancestries
 
-Provenance: derived here, not imported. This file previously cited Wang et al. (2026),
-Nature Communications 17:942 for the results below. That paper is an empirical study of
-the polygenic-score portability gap; it does not treat the noncentrality parameter,
-sample-size allocation, or the minimax and certificate material below, and so does not
-substantiate anything here. Sources for individual results, where they exist, are cited
-at those results.
+Provenance: derived here, not imported. Wang et al. (2026), Nature Communications 17:942,
+substantiates nothing below. It is an empirical study of the polygenic-score portability
+gap and does not treat the noncentrality parameter, sample-size allocation, or the
+minimax and certificate material below. Sources for individual results, where they exist,
+are cited at those results.
 -/
 
 

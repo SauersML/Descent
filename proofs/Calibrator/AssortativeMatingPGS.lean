@@ -36,11 +36,10 @@ At AM equilibrium, the additive variance inflates to V_A / (1 - r*h2),
 the observed heritability inflates to h2 / (1 - r*h2), and PGS R²
 inflates proportionally.
 
-Provenance: derived here, not imported. This file previously cited Wang et al. (2026),
-Nature Communications 17:942 for the results below. That paper is an empirical study of
-the polygenic-score portability gap; it does not treat assortative mating, and so does
-not substantiate anything here. Sources for individual results, where they exist, are
-cited at those results.
+Provenance: derived here, not imported. Wang et al. (2026), Nature Communications 17:942,
+substantiates nothing below. It is an empirical study of the polygenic-score portability
+gap and does not treat assortative mating. Sources for individual results, where they
+exist, are cited at those results.
 -/
 
 

@@ -24,12 +24,11 @@ Key results:
 4. Architecture-dependent portability predictions
 5. Heritability partitioning by functional category
 
-Provenance: derived here, not imported. This file previously cited Wang et al. (2026),
-Nature Communications 17:942 for the results below. That paper is an empirical study of
-the polygenic-score portability gap; it does not treat effect-size distribution models,
-or the minimax and certificate-modulus material below, and so does not substantiate
-anything here. Sources for individual results, where they exist, are cited at those
-results.
+Provenance: derived here, not imported. Wang et al. (2026), Nature Communications 17:942,
+substantiates nothing below. It is an empirical study of the polygenic-score portability
+gap and does not treat effect-size distribution models or the minimax and
+certificate-modulus material below. Sources for individual results, where they exist,
+are cited at those results.
 -/
 
 

@@ -21,11 +21,10 @@ Key results:
 4. Dominance effects and heterozygosity
 5. Non-additive PGS methods
 
-Provenance: derived here, not imported. This file previously cited Wang et al. (2026),
-Nature Communications 17:942 for the results below. That paper is an empirical study of
-the polygenic-score portability gap; it does not treat epistasis, dominance or other
-non-additive effects, and so does not substantiate anything here. Sources for individual
-results, where they exist, are cited at those results.
+Provenance: derived here, not imported. Wang et al. (2026), Nature Communications 17:942,
+substantiates nothing below. It is an empirical study of the polygenic-score portability
+gap and does not treat epistasis, dominance or other non-additive effects. Sources for
+individual results, where they exist, are cited at those results.
 -/
 
 

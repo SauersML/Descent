@@ -24,11 +24,10 @@ Key results:
 4. Temporal calibration drift
 5. Retraining schedules and update strategies
 
-Provenance: derived here, not imported. This file previously cited Wang et al. (2026),
-Nature Communications 17:942 for the results below. That paper is an empirical study of
-the polygenic-score portability gap; it does not treat temporal decay of portability,
-epoch effects or retraining schedules, and so does not substantiate anything here.
-Sources for individual results, where they exist, are cited at those results.
+Provenance: derived here, not imported. Wang et al. (2026), Nature Communications 17:942,
+substantiates nothing below. It is an empirical study of the polygenic-score portability
+gap and does not treat temporal decay of portability, epoch effects or retraining
+schedules. Sources for individual results, where they exist, are cited at those results.
 -/
 
 

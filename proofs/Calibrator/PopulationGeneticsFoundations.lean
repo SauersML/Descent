@@ -21,11 +21,10 @@ Key results:
 4. Wright's fixation indices
 5. Mutation-drift balance (equilibrium and transient Fst, LD decay)
 
-Provenance: derived here, not imported. This file previously cited Wang et al. (2026),
-Nature Communications 17:942 for the results below. That paper is an empirical study of
-the polygenic-score portability gap; it does not treat Fst estimators, coalescent theory
-or mutation-drift balance, and so does not substantiate anything here. Sources for
-individual results, where they exist, are cited at those results.
+Provenance: derived here, not imported. Wang et al. (2026), Nature Communications 17:942,
+substantiates nothing below. It is an empirical study of the polygenic-score portability
+gap and does not treat Fst estimators, coalescent theory or mutation-drift balance.
+Sources for individual results, where they exist, are cited at those results.
 -/
 
 
