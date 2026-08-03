@@ -227,11 +227,61 @@ noncomputable def covarianceMomentPermeabilityWithPrecision {d : ℕ}
     (precision : Matrix (Fin d) (Fin d) ℝ) (response : Fin d → ℝ) : ℝ :=
   ∑ i, ∑ j, response i * precision i j * response j
 
+/-- The entrywise definition is the usual quadratic form `responseᵀ precision response`. -/
+theorem covarianceMomentPermeabilityWithPrecision_eq_dotProduct_mulVec {d : ℕ}
+    (precision : Matrix (Fin d) (Fin d) ℝ) (response : Fin d → ℝ) :
+    covarianceMomentPermeabilityWithPrecision precision response =
+      dotProduct response (precision.mulVec response) := by
+  unfold covarianceMomentPermeabilityWithPrecision Matrix.mulVec dotProduct
+  apply Finset.sum_congr rfl
+  intro i _
+  rw [Finset.mul_sum]
+  apply Finset.sum_congr rfl
+  intro j _
+  ring
+
+/-- Positive-definite summary precision gives strictly positive information for every
+nonzero biological response direction. -/
+theorem covarianceMomentPermeabilityWithPrecision_pos {d : ℕ}
+    (precision : Matrix (Fin d) (Fin d) ℝ) (response : Fin d → ℝ)
+    (hprecision : precision.PosDef) (hresponse : response ≠ 0) :
+    0 < covarianceMomentPermeabilityWithPrecision precision response := by
+  rw [covarianceMomentPermeabilityWithPrecision_eq_dotProduct_mulVec]
+  simpa using hprecision.2 response hresponse
+
+/-- Under positive-definite precision, correlated covariance-moment permeability seals
+exactly when the entire retained response vector vanishes. -/
+theorem covarianceMomentPermeabilityWithPrecision_eq_zero_iff {d : ℕ}
+    (precision : Matrix (Fin d) (Fin d) ℝ) (response : Fin d → ℝ)
+    (hprecision : precision.PosDef) :
+    covarianceMomentPermeabilityWithPrecision precision response = 0 ↔ response = 0 := by
+  constructor
+  · intro hzero
+    by_contra hresponse
+    have hpos := covarianceMomentPermeabilityWithPrecision_pos
+      precision response hprecision hresponse
+    linarith
+  · intro hzero
+    subst response
+    simp [covarianceMomentPermeabilityWithPrecision]
+
 /-- The diagonal precision constructed from channel-specific square-noise variances. -/
 noncomputable def diagonalSquareNoisePrecision {d : ℕ}
     (secondMoment fourthMoment : Fin d → ℝ) : Matrix (Fin d) (Fin d) ℝ :=
   Matrix.diagonal fun i =>
     1 / centeredSquareVarianceFromMoments (secondMoment i) (fourthMoment i)
+
+/-- Positive square-noise variance in every independent channel makes the induced
+diagonal precision positive definite. -/
+theorem diagonalSquareNoisePrecision_posDef {d : ℕ}
+    (secondMoment fourthMoment : Fin d → ℝ)
+    (hnoise : ∀ i,
+      0 < centeredSquareVarianceFromMoments (secondMoment i) (fourthMoment i)) :
+    (diagonalSquareNoisePrecision secondMoment fourthMoment).PosDef := by
+  unfold diagonalSquareNoisePrecision
+  apply Matrix.PosDef.diagonal
+  intro i
+  exact one_div_pos.mpr (hnoise i)
 
 /-- **Diagonal reduction.**  When quadratic-summary noise is independent, the full
 precision-weighted law is exactly the sum of scalar non-Gaussian moment permeabilities. -/

@@ -477,6 +477,15 @@ theorem diploid_fourth_moment (q : ℝ) (hq0 : 0 < q) (hq1 : q < 1) :
   field_simp
   ring
 
+/-- Every interior Hardy--Weinberg locus has inverse heterozygosity strictly greater than
+one. Equivalently, the squared standardized dosage has positive sampling variance. -/
+theorem invHeterozygosity_gt_one (q : ℝ) (hq0 : 0 < q) (hq1 : q < 1) :
+    1 < invHeterozygosity q := by
+  have hden : 0 < 2 * q * (1 - q) := by nlinarith
+  unfold invHeterozygosity
+  apply (lt_div_iff₀ hden).2
+  nlinarith [sq_nonneg (q - 1 / 2)]
+
 /-- **Exact rare-variant sample-cost correction for a covariance channel.** The
 standardized Hardy--Weinberg dosage at allele frequency `q` has variance one and fourth
 moment `1/[2q(1-q)]`. Therefore a known-mean covariance-tangent estimator has variance
@@ -647,6 +656,33 @@ theorem diploidPanelCovarianceMomentPermeability_eq_diagonal_precision {n : ℕ}
         (fun i => taggingResponse i * covarianceDerivative i) := by
   unfold diploidPanelCovarianceMomentPermeability
   rw [covarianceMomentPermeabilityWithPrecision_diagonal]
+
+/-- Interior Hardy--Weinberg MAFs give a positive-definite diagonal precision for the
+independent squared-genotype summary experiment. -/
+theorem diploidPanelDiagonalPrecision_posDef {n : ℕ}
+    (q : Fin n → ℝ) (hq0 : ∀ i, 0 < q i) (hq1 : ∀ i, q i < 1) :
+    (diagonalSquareNoisePrecision (fun _ => 1)
+      (fun i => ∑ j : Fin 3,
+        diploidAtomMass j (q i) * diploidAtomValue j (q i) ^ 4)).PosDef := by
+  apply diagonalSquareNoisePrecision_posDef
+  intro i
+  rw [diploid_fourth_moment (q i) (hq0 i) (hq1 i)]
+  unfold centeredSquareVarianceFromMoments
+  have h := invHeterozygosity_gt_one (q i) (hq0 i) (hq1 i)
+  norm_num at ⊢
+  linarith
+
+/-- **Panel identifiability at order two.** Under locus independence and interior MAFs,
+the Hardy--Weinberg panel has zero covariance-moment information exactly when every
+tagged covariance response `ηᵢΓᵢ` is zero. -/
+theorem diploidPanelCovarianceMomentPermeability_eq_zero_iff {n : ℕ}
+    (q covarianceDerivative taggingResponse : Fin n → ℝ)
+    (hq0 : ∀ i, 0 < q i) (hq1 : ∀ i, q i < 1) :
+    diploidPanelCovarianceMomentPermeability q covarianceDerivative taggingResponse = 0 ↔
+      (fun i => taggingResponse i * covarianceDerivative i) = 0 := by
+  rw [diploidPanelCovarianceMomentPermeability_eq_diagonal_precision]
+  apply covarianceMomentPermeabilityWithPrecision_eq_zero_iff
+  exact diploidPanelDiagonalPrecision_posDef q hq0 hq1
 
 /-- **Exact multi-locus design law.** Under independent loci, the panel information is
 the sum of per-locus contributions
@@ -1929,7 +1965,12 @@ separates quotient fibres remains the continuation. -/
   formula is exactly its diagonal face, while
   `twoChannelMomentPermeabilityWithPrecision` exposes the cross term for two correlated
   summaries.  In a real LD block, `Ω` depends on joint genotype fourth moments; MAFs and
-  pairwise `r²` alone do not generally determine it.
+  pairwise `r²` alone do not generally determine it.  Under a positive-definite supplied
+  precision, `covarianceMomentPermeabilityWithPrecision_eq_zero_iff` proves that zero
+  information is equivalent to a zero retained response vector.  For independent
+  interior-MAF genotypes, `diploidPanelDiagonalPrecision_posDef` discharges that premise
+  and `diploidPanelCovarianceMomentPermeability_eq_zero_iff` gives the corresponding panel
+  identifiability theorem.
   `AncestrySpecificPower.ld_r2_matches_covariance_response_retention` fixes the convention
   bridge: a tag retaining correlation-scale response `η` has conventional LD
   `r² = η²`, so regression information and covariance permeability retain the same
