@@ -1528,9 +1528,11 @@ theorem heterozygosityLossDerived_faster_small_Ne (Ne₁ Ne₂ : ℝ) (t : ℕ) 
   have h_base_lt : 1 - 1 / (2 * Ne₁) < 1 - 1 / (2 * Ne₂) := by
     rw [sub_lt_sub_iff_left]
     exact div_lt_div_of_pos_left one_pos (by linarith) (by linarith)
-  linarith [pow_lt_pow_left₀ h_base_lt (le_of_lt h_base₁_pos) (Nat.not_eq_zero_of_lt (by omega : 0 < t))]
+  linarith [pow_lt_pow_left₀ h_base_lt (le_of_lt h_base₁_pos)
+    (Nat.not_eq_zero_of_lt (by omega : 0 < t))]
 
-/-- **Consistency check: heterozygosityLossDerived agrees with the earlier heterozygosityLossFromDrift.**
+/-- **Consistency check: heterozygosityLossDerived agrees with the earlier
+    heterozygosityLossFromDrift.**
     The derivation produces the same formula as the direct definition. -/
 theorem heterozygosityLossDerived_eq_fstFromDrift (Ne : ℝ) (t : ℕ) :
     heterozygosityLossDerived Ne t = heterozygosityLossFromDrift t Ne := by

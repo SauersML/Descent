@@ -472,7 +472,8 @@ theorem CrossPopulationCalibrationShiftModel.targetCalibrationMoments_eq_shifted
 
 /-- Generic CITL bridge: the mechanistic target shift budget feeds directly into
 the shared calibration-profile algebra for any chosen link label. -/
-theorem CrossPopulationCalibrationShiftModel.target_profile_citl_eq_source_profile_citl_add_shift_budget
+theorem
+    CrossPopulationCalibrationShiftModel.target_profile_citl_eq_source_profile_citl_add_shift_budget
     (m : CrossPopulationCalibrationShiftModel) (link : CalibrationLink) :
     (m.calibrationProfile Pop.target link).citl =
       (m.calibrationProfile Pop.source link).citl +
@@ -705,11 +706,13 @@ noncomputable def CrossPopulationMechanisticCalibrationModel.identityCalibration
     CrossPopulationCalibrationShiftModel.predictedMeanShift]
   ring
 
+namespace CrossPopulationMechanisticCalibrationModel
+
 /-- Exact mechanistic source calibration-profile law. The source predicted mean
 is the deployed intercept plus the source-weighted source tag mean, and the
 source slope is the literal source `Cov/Var` ratio from the SNP-level score
 equation. -/
-theorem CrossPopulationMechanisticCalibrationModel.sourceCalibrationProfile_exact_mechanistic_portability_law
+theorem sourceCalibrationProfile_exact_mechanistic_portability_law
     {p q : ℕ} (m : CrossPopulationMechanisticCalibrationModel p q)
     (link : CalibrationLink) :
     m.calibrationProfile Pop.source link =
@@ -738,7 +741,7 @@ theorem CrossPopulationMechanisticCalibrationModel.sourceCalibrationProfile_exac
 predicted mean is the deployed source weights applied to the target tag mean,
 plus deployment intercept drift, and the target slope is the literal
 transported `Cov/Var` ratio from the SNP-level score equation. -/
-theorem CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile_exact_mechanistic_portability_law
+theorem targetCalibrationProfile_exact_mechanistic_portability_law
     {p q : ℕ} (m : CrossPopulationMechanisticCalibrationModel p q)
     (link : CalibrationLink) :
     m.calibrationProfile Pop.target link =
@@ -768,7 +771,7 @@ theorem CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile_exac
 /-- Exact mechanistic CITL law: calibration-in-the-large is source CITL plus
 observed-mean drift minus the source-weighted score-mean drift and deployment
 intercept drift. -/
-theorem CrossPopulationMechanisticCalibrationModel.target_profile_citl_eq_source_profile_citl_add_exact_biological_shift_budget
+theorem target_profile_citl_eq_source_profile_citl_add_exact_biological_shift_budget
     {p q : ℕ} (m : CrossPopulationMechanisticCalibrationModel p q)
     (link : CalibrationLink) :
     (m.calibrationProfile Pop.target link).citl =
@@ -782,6 +785,8 @@ theorem CrossPopulationMechanisticCalibrationModel.target_profile_citl_eq_source
     CrossPopulationCalibrationShiftModel.predictedMeanShift] using
     CrossPopulationCalibrationShiftModel.target_profile_citl_eq_source_profile_citl_add_shift_budget
       m.toShiftModel link
+
+end CrossPopulationMechanisticCalibrationModel
 
 /-- Exact mechanistic target slope law with direct-causal, proxy-tagging, and
 context channels made explicit. -/
@@ -1099,7 +1104,8 @@ score of a tag-mean difference; defining it as the difference makes it `rfl`. -/
   simp
   ring
 
-@[simp] theorem CrossPopulationGenerationalCalibrationModel.toMechanisticCalibrationModelAt_targetObservedMean
+@[simp] theorem
+    CrossPopulationGenerationalCalibrationModel.toMechanisticCalibrationModelAt_targetObservedMean
     {p q : ℕ} (m : CrossPopulationGenerationalCalibrationModel p q) (t : ℕ) :
     (m.toMechanisticCalibrationModelAt t).observedMean Pop.target =
       m.observedMeanAt Pop.target t := by
@@ -1109,7 +1115,8 @@ score of a tag-mean difference; defining it as the difference makes it `rfl`. -/
     CrossPopulationMechanisticCalibrationModel.observedMean,
     CrossPopulationMechanisticCalibrationModel.observedMeanShift, add_assoc]
 
-@[simp] theorem CrossPopulationGenerationalCalibrationModel.toMechanisticCalibrationModelAt_targetPredictedMean
+@[simp] theorem
+    CrossPopulationGenerationalCalibrationModel.toMechanisticCalibrationModelAt_targetPredictedMean
     {p q : ℕ} (m : CrossPopulationGenerationalCalibrationModel p q) (t : ℕ) :
     (m.toMechanisticCalibrationModelAt t).predictedMean Pop.target =
       m.predictedMeanAt Pop.target t := by
@@ -1134,6 +1141,7 @@ noncomputable def targetIdentityCalibrationProfileAtGeneration
     (t : ℕ) : CalibrationProfile :=
   targetCalibrationProfileAtGeneration m t CalibrationLink.identity
 
+open CrossPopulationMechanisticCalibrationModel in
 /-- Exact generation-indexed target calibration-profile law on the explicit
 population-genetic state slice. -/
 theorem targetCalibrationProfileAtGeneration_exact_mechanistic_popgen_portability_law
@@ -1142,13 +1150,14 @@ theorem targetCalibrationProfileAtGeneration_exact_mechanistic_popgen_portabilit
     targetCalibrationProfileAtGeneration m t link =
       { citl :=
           (m.baseObservedMean +
-              (m.prevalenceShiftAt t + m.environmentalObservedShiftAt t + m.geneticObservedShiftAt t)) -
+              (m.prevalenceShiftAt t + m.environmentalObservedShiftAt t +
+                m.geneticObservedShiftAt t)) -
             (m.baseDeploymentIntercept + m.deploymentInterceptShiftAt t +
               sourceWeightedTagScore (m.metric.toMetricModelAt t) (m.targetTagMeanAt t))
       , slope := calibrationSlopeFromSourceWeights (m.metric.toMetricModelAt t) Pop.target
       , link := link } := by
   unfold targetCalibrationProfileAtGeneration
-  rw [CrossPopulationMechanisticCalibrationModel.targetCalibrationProfile_exact_mechanistic_portability_law]
+  rw [targetCalibrationProfile_exact_mechanistic_portability_law]
   simp [
     CrossPopulationGenerationalCalibrationModel.toMechanisticCalibrationModelAt,
     CrossPopulationMechanisticCalibrationModel.observedMean,
@@ -1206,7 +1215,8 @@ theorem targetMetricAndCalibrationProfilesAtGeneration_exact_mechanistic_popgen_
     targetCalibrationProfileAtGeneration m t link =
       { citl :=
           (m.baseObservedMean +
-              (m.prevalenceShiftAt t + m.environmentalObservedShiftAt t + m.geneticObservedShiftAt t)) -
+              (m.prevalenceShiftAt t + m.environmentalObservedShiftAt t +
+                m.geneticObservedShiftAt t)) -
             (m.baseDeploymentIntercept + m.deploymentInterceptShiftAt t +
               sourceWeightedTagScore (m.metric.toMetricModelAt t) (m.targetTagMeanAt t))
       , slope := calibrationSlopeFromSourceWeights (m.metric.toMetricModelAt t) Pop.target
@@ -1707,7 +1717,8 @@ theorem recalibration_needs_target_cohort
     (h_info : 0 < infoPerEvent)
     (h_target : 0 < targetTraceMSE) :
     recalibrationTraceMSELowerBound (prevalence * nTarget) nParams infoPerEvent ≤ targetTraceMSE ↔
-      requiredTargetCohortSizeForRecalibration nParams prevalence infoPerEvent targetTraceMSE ≤ nTarget := by
+      requiredTargetCohortSizeForRecalibration nParams prevalence infoPerEvent targetTraceMSE
+        ≤ nTarget := by
   have h_events : 0 < prevalence * nTarget := mul_pos h_prev h_target_n
   rw [recalibration_needs_events (prevalence * nTarget) nParams infoPerEvent targetTraceMSE
     h_events h_info h_target]
@@ -1786,7 +1797,8 @@ theorem miscalibration_changes_decisions
 /-- **Net reclassification improvement (NRI) from recalibration.**
     NRI measures the proportion of patients correctly reclassified.
     NRI = (net up-classification among events) + (net down-classification among non-events). -/
-noncomputable def nri (up_events down_events up_nonevents down_nonevents n_events n_nonevents : ℝ) : ℝ :=
+noncomputable def nri
+    (up_events down_events up_nonevents down_nonevents n_events n_nonevents : ℝ) : ℝ :=
   (up_events - down_events) / n_events + (down_nonevents - up_nonevents) / n_nonevents
 
 /-- **Downward reclassification at a clinical decision threshold.**
