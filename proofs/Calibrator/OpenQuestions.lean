@@ -121,22 +121,6 @@ theorem r2_small_when_within_dominates
   rw [h1, sub_div, div_self (h_varZ_pos.ne')]
   linarith [le_div_iff₀ h_varZ_pos |>.mpr (by linarith : (1 - δ) * varZ ≤ eVarZgivenD)]
 
-/-
-`squared_error_cv_is_two` was deleted here.
-
-It was documented as the coefficient of variation of a squared prediction error: "ε² ~
-σ²·χ²₁ has Var(ε²) = 2σ⁴ and E[ε²] = σ², so CV² = 2σ⁴/σ⁴ = 2, making individual errors
-inherently noisy." No chi-squared distribution, no variance and no expectation appears in
-the statement, which was `2 * s ^ 2 / s ^ 2 = 2` for a positive real `s` — cancellation,
-closed by `mul_div_cancel_right₀`. The two moment formulae that carry the actual content
-are asserted in the docstring and derived nowhere; substituting them into the definition
-of CV² and cancelling is the whole theorem.
-
-The Gaussian noise floor this was meant to justify is available honestly as
-`explainable_fraction_bound_of_conditional_gaussian_floor_exact`, which takes the factor
-of two as an explicit pointwise hypothesis on `conditionalVariance` and says so in its
-name.
--/
 
 /-- **SES explains as much as genetic distance.**
     If both covariates explain comparable fractions and their total
@@ -875,26 +859,13 @@ We formalize which components of portability loss are recoverable.
 
 section RecoverablePortability
 
-/-
-`mean_shift_recoverable` was deleted here. It was `y_pred - μ_shift + μ_shift = y_pred`,
-closed by `ring`: subtraction and addition of the same real cancel. The docstring read it
-as "If the PGS has a mean shift μ across populations, adjusting the intercept recovers the
-correct calibration", which requires knowing what the shift *is* — the whole difficulty of
-recalibrating without target data — and the theorem hands that to itself by using the same
-`μ_shift` in both places.
-
-The CITL-correction statements in `PGSCalibrationTheory` are what this was standing in for:
-`intercept_recal_corrects_citl` makes the correction term the fitted intercept and states
-the hypothesis `new_intercept = calibrationInTheLarge mean_obs mean_pgs` that identifies
-it, and `recalibration_needs_events` prices the target data needed to estimate it.
--/
 
 /-- **Rescaling by `1/r` inverts a slope change by `r`.**
 
-    Kept, unlike `mean_shift_recoverable` above, because the nonvanishing hypothesis is
-    real content: no rescaling recovers a slope that has been multiplied by zero. Read the
-    name narrowly all the same. This is not recoverability by re-calibration, because
-    recovering the slope requires knowing `r`, which this statement supplies to itself. -/
+    The nonvanishing hypothesis is real content: no rescaling recovers a slope that has
+    been multiplied by zero. Read the name narrowly all the same. This is not
+    recoverability by re-calibration, because recovering the slope requires knowing `r`,
+    which this statement supplies to itself. -/
 theorem slope_rescaling_inverts_slope_change
     (b r pgs : ℝ) (hr : r ≠ 0) :
     (b * r * pgs) * (1 / r) = b * pgs := by

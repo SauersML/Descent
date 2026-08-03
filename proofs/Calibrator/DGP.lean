@@ -35,11 +35,15 @@ mathematics and always in sites that *name* a definition without *applying* it �
 cluster" for the two failure shapes and the rule they share, recorded next to
 `fstEquilibrium` where they landed. -/
 
-/-- **Scaled mutation rate** `θ = 4 Nₑ μ`, the fundamental parameter of neutral theory. -/
+/-- **Scaled mutation rate** `θ = 4 Nₑ μ`, the fundamental parameter of neutral theory.
+
+    Empirical status: UNTESTED. -/
 noncomputable def scaledMutationRate (Ne μ : ℝ) : ℝ :=
   4 * Ne * μ
 
-/-- **Scaled migration rate** `M = 4 Nₑ m`, the same scaling applied to gene flow. -/
+/-- **Scaled migration rate** `M = 4 Nₑ m`, the same scaling applied to gene flow.
+
+    Empirical status: UNTESTED. -/
 noncomputable def scaledMigrationRate (Ne m : ℝ) : ℝ :=
   4 * Ne * m
 
@@ -47,13 +51,17 @@ noncomputable def scaledMigrationRate (Ne m : ℝ) : ℝ :=
 
 Not stipulated: `fstMutationDriftEquilibrium_isFixedPoint` derives it as the rest point of
 `scaledIdentityStep` at scaled rate `θ`. Two structure accessors used to write the quotient
-out again for their own `theta`, for the same import reason as the scaled rates. -/
+out again for their own `theta`, for the same import reason as the scaled rates.
+
+    Empirical status: UNTESTED. -/
 noncomputable def fstMutationDriftEquilibrium (θ : ℝ) : ℝ :=
   1 / (1 + θ)
 
 /-- **Per-generation heterozygosity decay** at effective size `Nₑ` and scaled mutation
 rate `θ`: drift removes a fraction `1 / (2 Nₑ)` and mutation is replenishing against it.
-Two accessors on two structures used to write this product out separately. -/
+Two accessors on two structures used to write this product out separately.
+
+    Empirical status: UNTESTED. -/
 noncomputable def hetDecayFromScaled (Ne θ : ℝ) : ℝ :=
   (1 - 1 / (2 * Ne)) * (1 - θ / (2 * Ne))
 
@@ -1009,34 +1017,6 @@ The score drifts with ancestry while true liability does not.
 The calibrator must subtract the drift term (PC main effects). -/
 
 
-/-! ### Biological mechanisms, and why there is no mechanism sum type here
-
-`BiologicalMechanism`, an inductive over `DifferentialTagging`,
-`StratifiedEnvironment` and `BiologicalGxE`, is absent on purpose. Its section
-header read "These lightweight structures capture the causal story and map it
-into the statistical DGPs used in the main proofs", and no such map existed: no
-value of any of the four was ever constructed, no theorem in the corpus
-mentioned one, and the three carried one data field each. The declarations
-asserted a correspondence between a causal story and the statistical DGPs, and
-discharged it by being declared.
-
-That is the shape worth naming, because it survives every check that reads
-proofs. There was nothing to verify: no `sorry`, no axiom, no weakened
-statement, no hypothesis anyone had to discharge -- just four names whose
-existence stood in for the reduction the prose claimed. A reader scanning this
-file for "does the development connect mechanism to DGP" found four structures
-and a sum type and stopped there.
-
-The mechanisms that are actually load-bearing are declared where they are used
-and are consumed by theorems: `LDDecayMechanism` below carries `distance` as
-well as `tagging_efficiency`, and `decaySlope` over it is what
-`ld_decay_implies_nonlinear_calibration_proved` in `proofs/Calibrator.lean`
-shows is not affine. GxE likewise enters through `GeneEnvironmentInterplay` and
-`CausalInference` as variance terms in theorems rather than as a constructor.
-Re-adding a mechanism type is
-fine once a theorem consumes it; a taxonomy no proof reads is a claim, not a
-formalization. -/
-
 /-! ### Normalization-Prevalence Bias (Cross-Ancestry Calibration)
 
 **Key Insight**: When a PGS is normalized (mean-centered across ancestries) and then
@@ -1741,15 +1721,9 @@ structure EvolutionaryParameters where
   recomb_le_half : recomb ≤ 1 / 2
   V_A_pos : 0 < V_A
 
-/-- **The parameter class is inhabited.**  Thirty theorems below quantify over
-`EvolutionaryParameters`; without a term of this type each of them is a true and empty
-statement about an empty class.  Every field is a strict or weak inequality on a real,
-so nonemptiness is not in doubt -- but "not in doubt" is not "proved", and only the
-proof keeps the thirty theorems from being vacuous.
-
-Chosen away from every boundary the fields permit (`mu`, `mig`, `t_div` are only
-required nonnegative, and zero for all three is a closed panmictic population with no
-mutation, in which several downstream quantities degenerate). -/
+/-- **The class is inhabited.**  A theorem quantified over an uninhabited structure is
+true and empty: kernel-checked, clean axiom report, no content.  This is the witness that
+makes the theorems below statements about something. -/
 noncomputable def EvolutionaryParameters.witness : EvolutionaryParameters where
   Ne := 1
   mu := 1
@@ -1801,7 +1775,9 @@ theorem EvolutionaryParameters.tau_nonneg (p : EvolutionaryParameters) :
 
 
 /-- **Drift-migration equilibrium Fst**: Fst = 1/(1 + M).
-    Migration homogenizes populations, reducing Fst. -/
+    Migration homogenizes populations, reducing Fst.
+
+        Empirical status: UNTESTED. -/
 noncomputable def fstDriftMigration (p : EvolutionaryParameters) : ℝ :=
   1 / (1 + p.bigM)
 
@@ -2262,9 +2238,9 @@ structure PGSEvolutionaryModel extends EvolutionaryParameters where
   prev_pos : 0 < prevalence
   prev_lt_one : prevalence < 1
 
-/-- **The class is inhabited**, extending `EvolutionaryParameters.witness`.  Fifteen
-theorems quantify over `PGSEvolutionaryModel`; this is what makes them statements about
-a nonempty class rather than vacuous universals. -/
+/-- **The class is inhabited.**  A theorem quantified over an uninhabited structure is
+true and empty: kernel-checked, clean axiom report, no content.  This is the witness that
+makes the theorems below statements about something. -/
 noncomputable def PGSEvolutionaryModel.witness : PGSEvolutionaryModel where
   toEvolutionaryParameters := EvolutionaryParameters.witness
   V_E := 1
@@ -2543,9 +2519,9 @@ structure IrreducibleTargetPenalty where
   sourceSpecificOverfit_nonneg : 0 ≤ sourceSpecificOverfit
   novelUntaggablePhenotype_nonneg : 0 ≤ novelUntaggablePhenotype
 
-/-- **The class is inhabited.**  Without a term of this type every theorem quantified
-over it is a true statement about an empty class: kernel-checked, clean axiom report,
-and no content.  See `scripts/check-laundering.py` family F4. -/
+/-- **The class is inhabited.**  A theorem quantified over an uninhabited structure is
+true and empty: kernel-checked, clean axiom report, no content.  This is the witness that
+makes the theorems below statements about something. -/
 noncomputable def IrreducibleTargetPenalty.witness : IrreducibleTargetPenalty where
   brokenTagging := 0
   ancestrySpecificLD := 0
@@ -2699,11 +2675,7 @@ theorem PGSEvolutionaryModel.coordinateSummary_explicit
       PGSEvolutionaryModel.toEvo,
       sharedLDRetention, mutationLDErosion, migrationLDBoost, fstEquilibrium]
 
-/-- Monotonicity of `Phi`, derived from the strict statement rather than proved again.
-
-    This was the second of two independent appeals to `ProbabilityTheory.monotone_cdf`
-    in the corpus, alongside `Condensation.monotone_Phi`. Both now go through
-    `strictMono_Phi`, so there is one derivation and the spellings cannot drift. -/
+/-- Monotonicity of `Phi`, a corollary of `strictMono_Phi` in `Probability`. -/
 theorem Phi_monotone : Monotone Phi := strictMono_Phi.monotone
 
 /-! ### Step 3: Metric evaluation from explicit target signal and additive losses
