@@ -64,6 +64,24 @@ theorem covarianceScoreInformation_gaussian
   rw [centeredSquareVariance_gaussian]
   field_simp [hcovariance]
 
+/-- **Kurtosis correction to the Gaussian covariance score.** If
+`E[X²]=Σ` and `E[X⁴]=κΣ²`, the variance of the Gaussian covariance score is
+
+`((κ - 1)/4) (Γ/Σ)²`.
+
+At `κ=3` this is ordinary Gaussian permeability. Away from Gaussianity it is a
+quasi-score variance, not automatically the Fisher information of the true likelihood;
+that distinction is essential for discrete genotype and haplotype features. -/
+theorem covarianceScoreInformation_kurtosis
+    (covariance covarianceDerivative kurtosis : ℝ)
+    (hcovariance : covariance ≠ 0) :
+    covarianceScoreInformationFromMoments covariance covarianceDerivative
+        covariance (kurtosis * covariance ^ 2) =
+      ((kurtosis - 1) / 4) * (covarianceDerivative / covariance) ^ 2 := by
+  unfold covarianceScoreInformationFromMoments centeredSquareVarianceFromMoments
+  field_simp [hcovariance]
+  ring
+
 /-- Permeability is non-negative. -/
 theorem scalarPermeability_nonneg (covariance covarianceDerivative : ℝ) :
     0 ≤ scalarPermeability covariance covarianceDerivative := by
@@ -131,16 +149,51 @@ noncomputable def totalGaussianInformation
     (m covariance covarianceDerivative : ℝ) : ℝ :=
   m * scalarPermeability covariance covarianceDerivative
 
+/-- Variance of the known-mean method-of-moments estimator for a one-dimensional
+covariance tangent, expressed through the observed coordinate's second and fourth
+moments. -/
+noncomputable def covarianceTangentEstimatorVarianceFromMoments
+    (m covarianceDerivative secondMoment fourthMoment : ℝ) : ℝ :=
+  centeredSquareVarianceFromMoments secondMoment fourthMoment /
+    (m * covarianceDerivative ^ 2)
+
 /-- Variance of the known-mean Gaussian method-of-moments estimator for a one-dimensional
-covariance tangent, based on `m` independent draws.  Since `Var(X²)=2Σ²`, dividing the
-sample square fluctuation by the covariance response `Γ` gives `2Σ²/(mΓ²)`.
+covariance tangent, based on `m` independent draws. Since `Var(X²)=2Σ²`, dividing the
+sample-square fluctuation by the covariance response `Γ` gives `2Σ²/(mΓ²)`.
 
 This is an exact finite-sample variance in the centered Gaussian experiment when the mean
 is known. Estimating the mean, dependence between draws, and non-Gaussian fourth moments
 change the experiment and must be handled separately. -/
 noncomputable def gaussianCovarianceTangentEstimatorVariance
     (m covariance covarianceDerivative : ℝ) : ℝ :=
-  2 * covariance ^ 2 / (m * covarianceDerivative ^ 2)
+  covarianceTangentEstimatorVarianceFromMoments m covarianceDerivative covariance
+    (3 * covariance ^ 2)
+
+/-- The Gaussian specialization reduces to the familiar closed form. -/
+theorem gaussianCovarianceTangentEstimatorVariance_eq
+    (m covariance covarianceDerivative : ℝ) :
+    gaussianCovarianceTangentEstimatorVariance m covariance covarianceDerivative =
+      2 * covariance ^ 2 / (m * covarianceDerivative ^ 2) := by
+  unfold gaussianCovarianceTangentEstimatorVariance
+    covarianceTangentEstimatorVarianceFromMoments
+  rw [centeredSquareVariance_gaussian]
+
+/-- **Exact fourth-moment inflation law.** A coordinate with standardized fourth-moment
+ratio `κ` inflates the known-mean covariance-tangent estimator variance by
+`(κ-1)/2` relative to a Gaussian coordinate with the same covariance response.
+
+For standardized Hardy--Weinberg dosage, `κ = 1/[2q(1-q)]`; the factor therefore diverges
+as minor-allele frequency `q` approaches zero. This is the sample-complexity penalty that
+a Gaussian portability calculation misses for rare variants. -/
+theorem covarianceTangentEstimatorVariance_kurtosis_eq_gaussian_factor
+    (m covariance covarianceDerivative kurtosis : ℝ) :
+    covarianceTangentEstimatorVarianceFromMoments m covarianceDerivative covariance
+        (kurtosis * covariance ^ 2) =
+      ((kurtosis - 1) / 2) *
+        gaussianCovarianceTangentEstimatorVariance m covariance covarianceDerivative := by
+  unfold covarianceTangentEstimatorVarianceFromMoments
+    gaussianCovarianceTangentEstimatorVariance centeredSquareVarianceFromMoments
+  ring
 
 /-- The named Gaussian tangent-estimator variance is positive for a positive replicate
 budget, positive covariance, and a nonzero covariance response. -/
@@ -151,6 +204,7 @@ theorem gaussianCovarianceTangentEstimatorVariance_pos
     0 < gaussianCovarianceTangentEstimatorVariance
       m covariance covarianceDerivative := by
   unfold gaussianCovarianceTangentEstimatorVariance
+    covarianceTangentEstimatorVarianceFromMoments
   positivity
 
 /-- **Exact information--variance reciprocity.** In the centered Gaussian covariance
@@ -170,6 +224,7 @@ theorem totalGaussianInformation_mul_estimatorVariance
         m covariance covarianceDerivative = 1 := by
   unfold totalGaussianInformation scalarPermeability
     gaussianCovarianceTangentEstimatorVariance
+    covarianceTangentEstimatorVarianceFromMoments centeredSquareVarianceFromMoments
   field_simp [hm, hcovariance, hderivative]
 
 /-- Equivalent reciprocal form of
