@@ -131,6 +131,24 @@ that was already there, at the moment of acting.
     explained why two passes had to stay separate. A commit titled "Finish ...
     in one field pass" merged them and regressed a green proof.
 
+  * AND THE WORST OF THE FOUR, BECAUSE PROXIMITY DID NOT HELP: in
+    `validation/differential/corpus.py`, `_all_modules()` carries a comment
+    saying that `proofs/Calibrator.lean` is a SIBLING of `Calibrator/` and that
+    a dead-code scan with exactly this blind spot deleted `decaySlope` and
+    `LDDecayMechanism` as unreferenced. Forty lines below, `_leanexpr_table()`
+    reconstructed the path as `join(CALIBRATOR, mod + ".lean")` and reintroduced
+    the assumption the comment was written to prevent. The documentation of the
+    bug and the bug were in the same file, in a pair of functions that must
+    agree.
+
+    THE OTHER THREE ARE "WARNING HERE, DEFECT THERE"; THIS ONE IS BOTH IN ONE
+    PLACE, AND IT STILL FAILED. Proximity is the thing everyone assumes is
+    sufficient, and it is not: A COMMENT CANNOT PROTECT CODE IT DOES NOT GATE.
+    So the repair was not "read the comment above you" -- it was routing both
+    halves through one `_module_path()`, so the two cannot disagree at all. When
+    two places must agree, make one of them call the other; a note explaining
+    why they must agree is not a mechanism.
+
 WHY IT KEEPS HAPPENING, which is the part worth internalising: A WELL-FORMED
 ARGUMENT FOR A FALSE PREMISE IS HARDER TO STOP THAN A WEAK ONE. The reasoning
 survives inspection and the premise never gets inspected. "One mechanical
@@ -153,6 +171,34 @@ distinct ways a check can be dead were found in one day:
       ambiguity was silently resolved to whichever came first.
 The third is the hardest to see by reading, because the shape of the intent
 survives while the intent itself is gone.
+
+AND A FIFTH SHAPE, WHICH IS THE ONE THAT PRODUCES CONFIDENT WRONG NUMBERS:
+A COUNT TAKEN FROM A TRUNCATED LISTING IS NOT A COUNT. Four instances in one
+day, each reporting a number that quietly answered a narrower question than the
+one asked:
+  * `grep -o` ate the trailing subscript of `div_lt_div_iff₀`;
+  * `grep -c AGREE` also matched DISAGREE, overstating agreement by exactly the
+    disagreement count;
+  * an enumeration pattern required a character BEFORE the name it searched
+    for, so it could not match the base name it was enumerating -- it returned
+    eight derived names and none of the 149 bare occurrences, and looked
+    complete;
+  * `grep ... | head` reported "two consumers" of the generated tables; there
+    were three, and the third would have died on an unexplained ImportError.
+      The count was stated as fact in a commit message.
+
+TWO GUARDS THAT CHECK SOMETHING ADJACENT TO WHAT THEY ARE NAMED FOR, both
+verified the hard way:
+  * `$?` AFTER A PIPE REPORTS THE PIPE. `cmd | head; echo $?` gives head's
+    status, so a "fails loudly, exits non-zero" claim checked that way is not a
+    claim about `cmd` at all. Check the exit code in a separate run with no
+    pipe. This was caught while verifying a fix for the truncation class above,
+    which is the same trap one level up.
+  * `git commit -F msg.txt -- <path>` DOES NOT COVER ADDITIONS. It refuses on an
+    untracked file (`pathspec did not match any file(s) known to git`), so a
+    commit that adds a file must `git add` first -- which reopens the shared
+    index window the pathspec form exists to close. On any commit that adds
+    files, inspect `git diff --cached --name-status` by hand before committing.
 -/
 
 local instance : Fact (2 ≤ 2) := ⟨by decide⟩
