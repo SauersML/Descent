@@ -3048,7 +3048,7 @@ theorem neutralAFBenchmarkMetricProfile_eq
       TransportedMetrics.equalVarianceGaussianAUCFromSignalVariance (presentDayPGSVariance V_A fstTarget) V_E =
         presentDayEqualVarianceGaussianAUC V_A V_E fstTarget
     unfold presentDayEqualVarianceGaussianAUC TransportedMetrics.equalVarianceGaussianAUCFromSignalVariance
-      presentDayEqualVarianceGaussianAUC presentDaySignalToNoise
+      presentDaySignalToNoise
     congr 1
     congr 1
     ring_nf
