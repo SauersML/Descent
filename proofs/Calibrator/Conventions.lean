@@ -1306,4 +1306,42 @@ theorem mOne_mul_mTwo_eq_neiGst_at_fold (p : ℝ) :
 
 end InlinedConstants
 
+section SharedMaps
+
+/-! ## Quantities written twice in two modules, tied here
+
+Three more pairs share a body across modules that cannot see each other. As everywhere in
+this file, the tying theorem lives where both sides are visible, and the names stay
+separate because they denote different things; what is forbidden is one spelling drifting
+while the other stays put. -/
+
+/-- **The importance-weighting effective sample size is a response-to-noise
+permeability.** `(Σ w)² / Σ w²` is `Γ² / V` at `Γ = Σ w` and `V = Σ w²`: the reciprocal
+variance with which averaging independent copies of a summary estimates its tangent.
+`TransferLearningPGS` reads it as a sample count and `Permeability` reads it as
+information; the arithmetic is one map, so a change of convention in either is a change in
+both. -/
+theorem importanceWeightESS_eq_momentPermeability (sum_w sum_w_sq : ℝ) :
+    importanceWeightESS sum_w sum_w_sq = momentPermeability sum_w sum_w_sq := rfl
+
+/-- **The `p (1 - p)` in the drift variance is half the diploid genotype variance.**
+`AncestrySpecificArchitecture.driftVariance` is `p₀ (1 - p₀) · F_ST`, the ancestral
+heterozygosity that has become between-population variance. Its heterozygosity factor is
+`hweGenotypeVariance` on the allele scale rather than the dosage scale, which is exactly
+one `ploidy` apart, and writing it inline left that scale choice free. -/
+theorem driftVariance_uses_hweGenotypeVariance (p0 fst : ℝ) :
+    driftVariance p0 fst = hweGenotypeVariance p0 * fst / ploidy := by
+  unfold driftVariance hweGenotypeVariance ploidy; ring
+
+/-- **The realised target PGS variance is a retained fraction, scaled by transport.**
+`PortabilityDrift.realWorldPGSVariance` erodes the additive variance by `1 - F_ST` and then
+by the transported correlation. The first factor is `retainedFraction`, the same
+`(1 - loss) · total` map as the ascertainment survivor and the neutral portability ratio,
+so drift between the drift erosion and its siblings fails here. -/
+theorem realWorldPGSVariance_eq_retainedFraction (V_A fst rhoSq : ℝ) :
+    realWorldPGSVariance V_A fst rhoSq = rhoSq * retainedFraction fst V_A := by
+  unfold realWorldPGSVariance retainedFraction; ring
+
+end SharedMaps
+
 end Calibrator
