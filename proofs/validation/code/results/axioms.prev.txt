@@ -14,9 +14,9 @@
 #
 #   the build in that clone compiled  ad2fa5ba   (0 `sorry` in the corpus)
 #   another session then fast-forwarded the tree to 629a80ea, which ADDED four
-#   CertificateGrading.lean:267, FiniteMinimax.lean:71, JetBarrier.lean:175,
-#   PolygenicArchitecture.lean:667 -- all real theorems closed by `sorry` in
-#   tactic position, all four imported directly by proofs/Calibrator.lean
+#   four `sorry` sites -- fixedGrade_incompleteness, finite_minimax_duality,
+#   logSqGaussian_nonlattice and fixedGrade_incompleteness_biology -- all real
+#   theorems closed by `sorry` in tactic position, all inside the root closure
 #   the scan then ran and reported the ad2fa5ba environment
 #
 # So ADMISSION_SCAN_COUNT 0 is a TRUE statement about ad2fa5ba and a FALSE
@@ -33,17 +33,53 @@
 # the revision that produced the oleans rather than the one git reports.
 #
 # ============================================================================
-# SCOPE, WHICH IS A SEPARATE LIMIT AND APPLIES TO EVERY RUN
+# SCOPE: THERE IS NO BLIND SPOT. AN EARLIER VERSION OF THIS HEADER CLAIMED ONE.
 # ============================================================================
 #
-# AxiomScan sees only what `import Calibrator` pulls in. At both 629a80ea and
-# origin/main the corpus holds 115 `.lean` modules under proofs/Calibrator
-# while proofs/Calibrator.lean imports 93 of them. TWENTY-TWO MODULES ARE
-# OUTSIDE THE ROOT CLOSURE and no run of this scan can reach them, whatever the
-# build state. "AXIOM_SCAN_SCANNED 4474" is a count over the closure, not over
-# the corpus. All seven `sorry` sites at origin/main happen to be inside the
-# closure, so a correct run would report them -- but a `sorry` added to any of
-# the other 22 modules would be invisible here.
+# This header previously said proofs/Calibrator.lean imports 93 of the corpus's
+# 115 modules, so 22 were outside the root closure and unreachable by any run
+# of this scan. THAT WAS WRONG, and the error was mine.
+#
+# 93 is the count of DIRECT imports. Following imports RECURSIVELY from the
+# root reaches all 115 modules on disk; ZERO are unreachable. The 22 not
+# imported directly, such as BundleRigidity.CoverageInvariance and the
+# PCCorrectability submodules, are reached through their parent modules.
+# Verified by computing the transitive closure over origin/main rather than
+# inferred from the import list.
+#
+# So AxiomScan, which imports the root, sees the WHOLE corpus. There is no
+# scope excuse available to it, and a future run that miscounts is a defect in
+# the scan rather than a limit on its reach.
+#
+# The weaker general point survives, and is why the wrong version was
+# plausible: A DIRECT-IMPORT COUNT IS NOT A CLOSURE. Anything reasoning about
+# coverage from one file's import list will understate reachability.
+#
+# ============================================================================
+# WHAT A CORRECT RESCAN MUST REPORT: EIGHT
+# ============================================================================
+#
+# At origin/main there are EIGHT `sorry` sites, not the seven an earlier
+# version of this header listed. All are tactic-position proofs of real
+# theorems and all are inside the closure, so a rescan against oleans that
+# match its source must report exactly 8 sorryAx admissions.
+#
+# Named by DECLARATION, not by line: the line numbers drifted within an hour of
+# first being written down (CertificateGrading 267->268, FiniteMinimax 71->96,
+# JetBarrier 175->183, PolygenicArchitecture 667->684), which is the same
+# reason the corpus stopped citing line numbers in docstrings today.
+#
+#   Calibrator.hasThresholdSetAtEveryRank_of_fintype    ProjectionShiftBounds
+#   Calibrator.fixedGrade_incompleteness_biology        PolygenicArchitecture
+#   Calibrator.fixedGrade_incompleteness                CertificateGrading
+#   Calibrator.bernoulliKLReal_eq_zero_iff              Conclusions
+#   Calibrator.finite_minimax_duality                   FiniteMinimax
+#   Calibrator.excess_le_perturbation_mul_misalignment  TransplantationStability
+#   Calibrator.hweMellinDrift_pos                       PolygenicSpectroscopy
+#   Calibrator.logSqGaussian_nonlattice                 JetBarrier
+#
+# Anything other than 8 from such a rescan is itself the finding, and outranks
+# whatever else that run reports.
 #
 # ============================================================================
 # OTHER CAVEATS, UNCHANGED
@@ -61,8 +97,8 @@
 #   run at    2026-08-03T19:01Z, exit 0 after 23m41s
 #   host      acn59, slurm job 14759172
 #
-# READING, corrected: over the 93-module root closure as compiled at ad2fa5ba,
-# 4474 declarations were reached and none depends on an axiom outside propext,
+# READING, corrected: over the root closure as compiled at ad2fa5ba, which
+# reaches all 115 modules, 4474 declarations were reached and none depends on an axiom outside propext,
 # Classical.choice and Quot.sound. The zero-admission line is true of that
 # environment. It is NOT a current statement about origin/main, which contains
 # seven `sorry` sites. A rebuild-then-rescan is required before any current
