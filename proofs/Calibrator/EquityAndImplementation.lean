@@ -200,10 +200,9 @@ section ResourceAllocation
     law.** `R² = h² · n h² / (n h² + M)`, with `M` the effective number of
     independent causal loci.
 
-    The `h²` prefactor was previously absent, so the definition returned
-    `R²/h²`: exactly `1/h²` too large, a factor of two at `h² = 0.5` and 3.3 at
-    `h² = 0.3`. It saturated at `1` where `R²` cannot exceed `h²`, which its own
-    docstring stated as the limit. Simulated out-of-sample `R²` across a
+    **The `h²` prefactor is load-bearing: without it this returns `R²/h²`**, exactly
+    `1/h²` too large -- a factor of two at `h² = 0.5` and 3.3 at `h² = 0.3` -- and
+    saturates at `1` where `R²` cannot exceed `h²`. Simulated out-of-sample `R²` across a
     hundredfold range of training sizes matches the corrected form to three or
     four decimals.
 
