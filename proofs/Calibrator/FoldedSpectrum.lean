@@ -1554,7 +1554,6 @@ theorem panels_suffice_iff (p c τ B : ℝ) (hp : 0 < p) (hc : 0 < c)
   have hrw : p / (p + c / B) = p * B / (p * B + c) := by
     rw [div_eq_div_iff (by positivity) (by positivity)]
     field_simp
-    ring
   rw [hrw, le_div_iff₀ (by positivity), div_le_iff₀ (mul_pos hp h1τ)]
   constructor <;> intro h <;> nlinarith [h]
 
