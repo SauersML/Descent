@@ -291,7 +291,7 @@ noncomputable def pushForward {n : ℕ} (M : Fin n → Fin n → ℝ) (f : Fin n
 by the pushed-forward marginal. -/
 noncomputable def reconstruct {n : ℕ} (M : Fin n → Fin n → ℝ) (p κ : Fin n → ℝ)
     (i : Fin n) : ℝ :=
-  pushForward M (fun j => κ j * p j) i / pushForward M p i
+  pushForward M (fun j ↦ κ j * p j) i / pushForward M p i
 
 /-- **Exactness.** If the marked subpopulation is `κ p`, the transported conditional is the ratio
 of the two pushed-forward densities. Both are pushed by the same coupling, which is the whole
@@ -302,7 +302,7 @@ theorem reconstruct_eq_of_pushed_marked {n : ℕ} (M : Fin n → Fin n → ℝ)
   unfold reconstruct
   congr 1
   unfold pushForward
-  exact Finset.sum_congr rfl fun j _ => by rw [hq j]
+  exact Finset.sum_congr rfl fun j _ ↦ by rw [hq j]
 
 /-- **Transport never amplifies.** The reconstructed conditional is a weighted average of the
 conditional's own values, so it stays inside their range. An error in the observed conditional is
@@ -312,17 +312,17 @@ theorem reconstruct_between {n : ℕ} (M : Fin n → Fin n → ℝ) (p κ : Fin 
     (hpos : 0 < pushForward M p i)
     (hlo : ∀ j, lo ≤ κ j) (hhi : ∀ j, κ j ≤ hi) :
     lo ≤ reconstruct M p κ i ∧ reconstruct M p κ i ≤ hi := by
-  have hnum_lo : lo * pushForward M p i ≤ pushForward M (fun j => κ j * p j) i := by
+  have hnum_lo : lo * pushForward M p i ≤ pushForward M (fun j ↦ κ j * p j) i := by
     unfold pushForward
     rw [Finset.mul_sum]
-    refine Finset.sum_le_sum fun j _ => ?_
+    refine Finset.sum_le_sum fun j _ ↦ ?_
     have hstep : lo * p j ≤ κ j * p j := mul_le_mul_of_nonneg_right (hlo j) (hp j)
     calc lo * (M i j * p j) = M i j * (lo * p j) := by ring
       _ ≤ M i j * (κ j * p j) := mul_le_mul_of_nonneg_left hstep (hM j)
-  have hnum_hi : pushForward M (fun j => κ j * p j) i ≤ hi * pushForward M p i := by
+  have hnum_hi : pushForward M (fun j ↦ κ j * p j) i ≤ hi * pushForward M p i := by
     unfold pushForward
     rw [Finset.mul_sum]
-    refine Finset.sum_le_sum fun j _ => ?_
+    refine Finset.sum_le_sum fun j _ ↦ ?_
     have hstep : κ j * p j ≤ hi * p j := mul_le_mul_of_nonneg_right (hhi j) (hp j)
     calc M i j * (κ j * p j) ≤ M i j * (hi * p j) := mul_le_mul_of_nonneg_left hstep (hM j)
       _ = hi * (M i j * p j) := by ring
