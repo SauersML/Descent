@@ -748,26 +748,44 @@ theorem brierRisk_target_le_mul_source_of_withDensity
     _ = M * ∫ z, ℓ z ∂μS := h_scal
     _ = M * brierRisk μS η q := by simp [brierRisk, ℓ]
 
-/-- Log-loss Bayes-optimality: `η` minimizes risk among all measurable predictors in `[0,1]`. -/
+/-- **Log-loss Bayes-optimality: `η` minimizes risk among competitors that are open-valued
+and integrable against it.**
+
+The side conditions used to be quantified over the whole predictor type:
+
+    (h_int_q : ∀ q : ProbPredictor Z, Integrable (fun z => bernoulliLogLoss (η z).1 (q z).1) μ)
+    (h_q_open : ∀ q : ProbPredictor Z, ∀ z, 0 < (q z).1 ∧ (q z).1 < 1)
+
+`h_q_open` in that form **cannot be satisfied**. `ProbPredictor Z` is `Z → Set.Icc (0:ℝ) 1`,
+a closed interval, so for any inhabited `Z` the constant predictor `fun _ => ⟨0, _⟩` is a
+term of the type and refutes it. Every instance of the theorem therefore had a false
+hypothesis, and the theorem was vacuous rather than merely over-strong. `h_int_q` was
+unsatisfiable in the same style for any `μ` and `Z` admitting a non-measurable function,
+since `ProbPredictor` carries no measurability requirement and `Integrable` demands
+`AEStronglyMeasurable`.
+
+Both conditions are now demanded of the competitor `q` actually being compared against,
+which is all the proof ever used them for, and which is satisfiable. -/
 theorem logRisk_minimized_at_eta {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
     (η : ProbPredictor Z)
     (hη_open : ∀ z, 0 < (η z).1 ∧ (η z).1 < 1)
-    (h_int_eta : Integrable (fun z => bernoulliLogLoss (η z).1 (η z).1) μ)
-    (h_int_q : ∀ q : ProbPredictor Z, Integrable (fun z => bernoulliLogLoss (η z).1 (q z).1) μ)
-    (h_q_open : ∀ q : ProbPredictor Z, ∀ z, 0 < (q z).1 ∧ (q z).1 < 1) :
-    ∀ q : ProbPredictor Z, logRisk μ η η ≤ logRisk μ η q := by
-  intro q
+    (h_int_eta : Integrable (fun z => bernoulliLogLoss (η z).1 (η z).1) μ) :
+    ∀ q : ProbPredictor Z,
+      (∀ z, 0 < (q z).1 ∧ (q z).1 < 1) →
+      Integrable (fun z => bernoulliLogLoss (η z).1 (q z).1) μ →
+      logRisk μ η η ≤ logRisk μ η q := by
+  intro q hq_open h_int_q
   have hreg :
       0 ≤
         (∫ z,
           bernoulliLogLoss (η z).1 (q z).1 - bernoulliLogLoss (η z).1 (η z).1 ∂μ) := by
-    exact logRisk_regret_nonneg μ η q hη_open (h_q_open q)
+    exact logRisk_regret_nonneg μ η q hη_open hq_open
   have hsub :
       (∫ z,
         bernoulliLogLoss (η z).1 (q z).1 - bernoulliLogLoss (η z).1 (η z).1 ∂μ)
         = logRisk μ η q - logRisk μ η η := by
     unfold logRisk
-    simpa [sub_eq_add_neg] using integral_sub (h_int_q q) h_int_eta
+    simpa [sub_eq_add_neg] using integral_sub h_int_q h_int_eta
   linarith [hreg, hsub]
 
 /-- Log-loss uniqueness: equality of risks iff equality of predictors a.e. -/
@@ -800,13 +818,20 @@ theorem logRisk_eq_iff_ae_eq_eta {Z : Type u} [MeasurableSpace Z] (μ : Measure 
       hzero.mpr hAe
     linarith [hsub, h0]
 
-/-- Brier Bayes-optimality. -/
+/-- **Brier Bayes-optimality among competitors integrable against `η`.**
+
+`h_int_q` was quantified over the whole of `ProbPredictor Z`, demanding integrability
+against *every* function `Z → Set.Icc (0:ℝ) 1`. `ProbPredictor` imposes no measurability,
+so on any `Z` carrying a non-measurable function that requirement cannot be met and the
+theorem was vacuous. It is now demanded of the competitor being compared against, which is
+the only place the proof used it. -/
 theorem brierRisk_minimized_at_eta {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
     (η : ProbPredictor Z)
-    (h_int_eta : Integrable (fun z => expectedBrierScore (η z).1 (η z).1) μ)
-    (h_int_q : ∀ q : ProbPredictor Z, Integrable (fun z => expectedBrierScore (q z).1 (η z).1) μ) :
-    ∀ q : ProbPredictor Z, brierRisk μ η η ≤ brierRisk μ η q := by
-  intro q
+    (h_int_eta : Integrable (fun z => expectedBrierScore (η z).1 (η z).1) μ) :
+    ∀ q : ProbPredictor Z,
+      Integrable (fun z => expectedBrierScore (q z).1 (η z).1) μ →
+      brierRisk μ η η ≤ brierRisk μ η q := by
+  intro q h_int_q
   have hreg : (∫ z, expectedBrierScore (q z).1 (η z).1 - expectedBrierScore (η z).1 (η z).1 ∂μ)
       = ∫ z, ((η z).1 - (q z).1) ^ 2 ∂μ := by
     exact brier_regret_eq_l2_probPredictor μ η q
@@ -816,7 +841,7 @@ theorem brierRisk_minimized_at_eta {Z : Type u} [MeasurableSpace Z] (μ : Measur
       (∫ z, expectedBrierScore (q z).1 (η z).1 - expectedBrierScore (η z).1 (η z).1 ∂μ)
         = brierRisk μ η q - brierRisk μ η η := by
     unfold brierRisk
-    simpa [sub_eq_add_neg] using integral_sub (h_int_q q) h_int_eta
+    simpa [sub_eq_add_neg] using integral_sub h_int_q h_int_eta
   have hdiff_nonneg : 0 ≤ brierRisk μ η q - brierRisk μ η η := by
     linarith [hreg, hnonneg, hsub]
   exact sub_nonneg.mp hdiff_nonneg
@@ -977,14 +1002,18 @@ noncomputable def brierBayesRisk {Z : Type u} [MeasurableSpace Z] (μ : Measure 
     (η : ProbPredictor Z) (F : Set (ProbPredictor Z)) : ℝ :=
   BayesRisk (brierRisk μ η) F
 
+/-- The side conditions are demanded of the members of `F`, the class the infimum is taken
+over, rather than of every term of `ProbPredictor Z`. In the previous form `h_q_open` was
+unsatisfiable, since `ProbPredictor Z = Z → Set.Icc (0:ℝ) 1` contains the constant `0`
+predictor, and the theorem held vacuously for every `F`. -/
 theorem logBayesRisk_eq_eta_of_mem {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
     (η : ProbPredictor Z) (F : Set (ProbPredictor Z))
     (h_eta_mem : η ∈ F)
     (h_bdd : BddBelow ((logRisk μ η) '' F))
     (hη_open : ∀ z, 0 < (η z).1 ∧ (η z).1 < 1)
     (h_int_eta : Integrable (fun z => bernoulliLogLoss (η z).1 (η z).1) μ)
-    (h_int_q : ∀ q : ProbPredictor Z, Integrable (fun z => bernoulliLogLoss (η z).1 (q z).1) μ)
-    (h_q_open : ∀ q : ProbPredictor Z, ∀ z, 0 < (q z).1 ∧ (q z).1 < 1) :
+    (h_int_q : ∀ q ∈ F, Integrable (fun z => bernoulliLogLoss (η z).1 (q z).1) μ)
+    (h_q_open : ∀ q ∈ F, ∀ z, 0 < (q z).1 ∧ (q z).1 < 1) :
     logBayesRisk μ η F = logRisk μ η η := by
   unfold logBayesRisk BayesRisk oracleRisk
   apply le_antisymm
@@ -993,14 +1022,16 @@ theorem logBayesRisk_eq_eta_of_mem {Z : Type u} [MeasurableSpace Z] (μ : Measur
     · exact ⟨logRisk μ η η, ⟨η, h_eta_mem, rfl⟩⟩
     · intro r hr
       rcases hr with ⟨q, hqF, rfl⟩
-      exact logRisk_minimized_at_eta μ η hη_open h_int_eta h_int_q h_q_open q
+      exact logRisk_minimized_at_eta μ η hη_open h_int_eta q (h_q_open q hqF) (h_int_q q hqF)
 
+/-- As for the log-loss version, integrability is demanded of the members of `F` rather
+than of every term of `ProbPredictor Z`. -/
 theorem brierBayesRisk_eq_eta_of_mem {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
     (η : ProbPredictor Z) (F : Set (ProbPredictor Z))
     (h_eta_mem : η ∈ F)
     (h_bdd : BddBelow ((brierRisk μ η) '' F))
     (h_int_eta : Integrable (fun z => expectedBrierScore (η z).1 (η z).1) μ)
-    (h_int_q : ∀ q : ProbPredictor Z, Integrable (fun z => expectedBrierScore (q z).1 (η z).1) μ) :
+    (h_int_q : ∀ q ∈ F, Integrable (fun z => expectedBrierScore (q z).1 (η z).1) μ) :
     brierBayesRisk μ η F = brierRisk μ η η := by
   unfold brierBayesRisk BayesRisk oracleRisk
   apply le_antisymm
@@ -1009,7 +1040,7 @@ theorem brierBayesRisk_eq_eta_of_mem {Z : Type u} [MeasurableSpace Z] (μ : Meas
     · exact ⟨brierRisk μ η η, ⟨η, h_eta_mem, rfl⟩⟩
     · intro r hr
       rcases hr with ⟨q, hqF, rfl⟩
-      exact brierRisk_minimized_at_eta μ η h_int_eta h_int_q q
+      exact brierRisk_minimized_at_eta μ η h_int_eta q (h_int_q q hqF)
 
 /-- Non-strict full-vs-baseline comparison from class inclusion. -/
 theorem logBayesRisk_full_le_baseline {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
