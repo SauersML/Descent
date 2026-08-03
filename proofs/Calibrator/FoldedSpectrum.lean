@@ -477,6 +477,27 @@ theorem diploid_fourth_moment (q : ℝ) (hq0 : 0 < q) (hq1 : q < 1) :
   field_simp
   ring
 
+/-- **Exact rare-variant sample-cost correction for a covariance channel.** The
+standardized Hardy--Weinberg dosage at allele frequency `q` has variance one and fourth
+moment `1/[2q(1-q)]`. Therefore a known-mean covariance-tangent estimator has variance
+
+`(1/[2q(1-q)] - 1)/2`
+
+times the Gaussian calculation with the same covariance response. The multiplier equals
+one only at the Gaussian fourth-moment frequencies and diverges toward the rare-variant
+boundary. This is a direct portability-design law: target-panel depth for LD or
+haplotype-covariance completion must be budgeted using allele-frequency kurtosis, not a
+Gaussian constant. -/
+theorem diploid_covariance_estimator_variance_eq_gaussian_factor
+    (q m covarianceDerivative : ℝ) (hq0 : 0 < q) (hq1 : q < 1) :
+    covarianceTangentEstimatorVarianceFromMoments m covarianceDerivative 1
+        (∑ j : Fin 3, diploidAtomMass j q * diploidAtomValue j q ^ 4) =
+      ((invHeterozygosity q - 1) / 2) *
+        gaussianCovarianceTangentEstimatorVariance m 1 covarianceDerivative := by
+  rw [diploid_fourth_moment q hq0 hq1]
+  simpa using covarianceTangentEstimatorVariance_kurtosis_eq_gaussian_factor
+    m 1 covarianceDerivative (invHeterozygosity q)
+
 /-- **Level one, what escapes: the dispersion.**
 
 Two panels can agree exactly in mean inverse heterozygosity and differ in its variance
