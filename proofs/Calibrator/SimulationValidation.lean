@@ -479,7 +479,7 @@ variance; no source-`R²` transport summary appears in the definition. -/
 theorem target_metric_profile_auc_uses_explicit_target_moments {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
     (targetMetricProfileFromSourceWeights m).auc =
-      gaussianAUCFromSignalVariance
+      TransportedMetrics.gaussianAUCFromSignalVariance
         (explainedSignalVarianceFromSourceWeights m Pop.target)
         (residualVarianceFromSourceWeights m Pop.target) := by
   simp [targetMetricProfileFromSourceWeights, equalVarianceGaussianAUCFromSourceWeights]
@@ -513,6 +513,11 @@ theorem target_ld_shift_changes_liability_auc
 end MechanisticValidation
 
 section GenerationalMechanisticValidation
+
+-- These primitive population-genetic rates are deliberately kept transparent in
+-- the concrete witnesses below.  Registering them locally prevents exact
+-- generation checks from getting stuck at an otherwise opaque `4 * Nₑ * rate`.
+attribute [local simp] scaledMutationRate scaledMigrationRate hetDecayFromScaled
 
 /-- Simple generation-indexed population-genetic parameters used to validate
 that the mechanistic target state can vary with time. Recombination, mutation,
@@ -646,6 +651,7 @@ theorem popgenDrivenProxyGenerationalModel_target_r2_at_zero :
   simp [r2FromSourceWeights, popgenDrivenProxyGenerationalModel,
     CrossPopulationGenerationalModel.toMetricModelAt,
     sigmaTagTargetAt, directCausalTargetAt, proxyTaggingTargetAt, sigmaTagCausalTargetAt,
+    novelDirectCausalTargetAt, novelProxyTaggingTargetAt,
     tagAlleleFreqRetentionAt, causalAlleleFreqRetentionAt, alleleFreqMismatchPenalty,
     r2FromSourceWeights, explainedSignalVarianceFromSourceWeights,
     predictiveCovarianceFromSourceWeights, scoreVarianceFromSourceWeights,
@@ -998,11 +1004,11 @@ theorem target_r2_changes_along_generation_indexed_af_path :
       Matrix.mulVec, dotProduct, Matrix.cons_val', Matrix.cons_val_fin_one]
   · have h_cov :
         predictiveCovarianceFromSourceWeights
-            (timeVaryingAFGenerationalModel.toMetricModelAt 1) =
+            (timeVaryingAFGenerationalModel.toMetricModelAt 1) Pop.target =
           Real.exp (-(1 / 2 : ℝ)) := by
       calc
         predictiveCovarianceFromSourceWeights
-            (timeVaryingAFGenerationalModel.toMetricModelAt 1) =
+            (timeVaryingAFGenerationalModel.toMetricModelAt 1) Pop.target =
           Real.exp (-(1 / 4 : ℝ)) *
             Real.exp (-(1 / 4 : ℝ)) := by
               simp [baselineGenerationalPopGen, timeVaryingAFGenerationalModel,
@@ -1029,11 +1035,11 @@ theorem target_r2_changes_along_generation_indexed_af_path :
               ring_nf
     have h_var :
         scoreVarianceFromSourceWeights
-            (timeVaryingAFGenerationalModel.toMetricModelAt 1) =
+            (timeVaryingAFGenerationalModel.toMetricModelAt 1) Pop.target =
           Real.exp (-(1 / 2 : ℝ)) := by
       calc
         scoreVarianceFromSourceWeights
-            (timeVaryingAFGenerationalModel.toMetricModelAt 1) =
+            (timeVaryingAFGenerationalModel.toMetricModelAt 1) Pop.target =
           Real.exp (-(1 / 4 : ℝ)) *
             Real.exp (-(1 / 4 : ℝ)) := by
               simp [baselineGenerationalPopGen, timeVaryingAFGenerationalModel,
@@ -1070,7 +1076,7 @@ theorem target_r2_changes_along_generation_indexed_af_path :
       simpa using h_ret
     have h_eff :
         effectiveOutcomeVariance
-            (timeVaryingAFGenerationalModel.toMetricModelAt 1) =
+            (timeVaryingAFGenerationalModel.toMetricModelAt 1) Pop.target =
           2 + 2 * (1 - Real.exp (-(1 / 2 : ℝ))) ^ 2 := by
       simp [baselineGenerationalPopGen, timeVaryingAFGenerationalModel,
         CrossPopulationGenerationalModel.toMetricModelAt,
@@ -1096,7 +1102,7 @@ theorem target_r2_changes_along_generation_indexed_af_path :
       ring
     have h_exp_ne : Real.exp (-(1 / 2 : ℝ)) ≠ 0 := by
       exact Real.exp_ne_zero _
-    unfold r2FromSourceWeights explainedSignalVarianceFromSourceWeights Pop.target
+    unfold r2FromSourceWeights explainedSignalVarianceFromSourceWeights
     rw [h_cov, h_var, h_eff]
     have hcalc :
         Real.exp (-(1 / 2 : ℝ)) ^ 2 /
