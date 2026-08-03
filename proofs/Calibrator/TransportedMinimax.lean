@@ -261,134 +261,20 @@ theorem longMemoryVariance_strictMono (ε n : ℝ) (hε : ε ≠ 0) (hn : 0 < n)
   apply div_lt_div_of_pos_right _ hden
   nlinarith [hfac]
 
-/-! ### The width law: the exponents are shape-free, the constant is not
+/-! ### The width law, removed
 
-For a spectral band of width `w`, `‖B‖² ~ 1/w` and `‖dB‖² ~ 1/w³`. **Measured across seven
-shapes, the exponents hold to fifteen digits** — fitted slopes `-1.0000000000000002` and
-`-3.0000000000000013`, ratio `-2.0000000000000004`, with a planted-exponent control on the
-fitter passing exactly.
+A `WidthLaw` structure used to sit here, carrying `‖B‖² = C₁/w` and `‖dB‖² = C₂/w³` as
+**structure fields** — results this module does not prove — together with three theorems that
+consumed them. Measurement had confirmed the exponents (`-1` and `-3` to fifteen digits across
+five shapes, `L¹`-normalised bands, finite Sobolev seminorm required) and refuted the
+shape-freedom of the constant (`C₂/C₁` spanning `0.333` to `13.16`, infinite for a rectangular
+band).
 
-**But the ratio constant is not shape-free, and a first version of this section asserted that
-it was.** That version gave `WidthLaw` a *single* shape constant appearing in both norms,
-which made `widthLaw_ratio_shape_free` true by construction — a tautology resting on a false
-premise. The two constants are independent and their ratio `C₂/C₁` measures:
-
-| shape | `C₁` | `C₂` | `C₂/C₁` |
-|---|---|---|---|
-| Gaussian | 0.2821 | 0.1410 | **0.500** |
-| Lorentzian | 0.1592 | 0.0796 | **0.500** |
-| gamma-3 (asymmetric) | 0.1875 | 0.0625 | **0.333** |
-| triangular | 0.6667 | 2.0 | **3.00** |
-| skew-normal (asymmetric) | 0.4946 | 1.0952 | **2.21** |
-| Hann | 1.5 | 19.739 | **13.16** |
-| rectangular | 1.0 | **∞** | **∞** |
-
-A factor of forty across the smooth shapes, and the rectangular band has no finite `‖dB‖²`
-at all — its derivative is a pair of Dirac deltas, so the theorem simply does not apply to a
-discontinuous band. That is a scope restriction, not a rounding error.
-
-**What survives is the scale invariance.** `w²·(‖dB‖²/‖B‖²)` is independent of `w` for every
-shape — that is the shape-free content and it is what `widthLaw_scaleInvariant` states. The
-*value* of that constant is a property of the band's profile.
-
-**The bands must be `L¹`-normalised**, which an earlier version of this section failed to
-state. Writing `B_w(λ) = (1/w)·ψ(λ/w)`, both scalings hold — and *only* under that
-normalisation. Exact symbolic values: Gaussian `1/(2√π w)` and `1/(4√π w³)`; Lorentzian
-`1/(2π w)` and `1/(4π w³)`; raised cosine `3/(2w)` and `2π²/w³`; triangular `2/(3w)` and
-`2/w³`; asymmetric gamma `1/(4w)` and `1/(4w³)`.
-
-**A finite Sobolev seminorm is a side condition, not a technicality.** The rectangular band
-has `‖B‖² = 1/w` exactly and `‖dB‖² = +∞`: finite-difference approximations give
-`3.33e2, 1.33e3, 5.33e3, 2.13e4` at grid resolutions `1000, 4000, 16000, 64000`, diverging
-linearly as a Dirac pair must. `WidthLaw` simply has no instance for such a band, and that is
-the honest encoding.
-
-**The identification with the estimation metric is withdrawn — a category error, established
-independently of the constant.** A previous theorem here identified the conformal coefficient
-`ε²/δ³` with the band derivative norm at shape `ε²`, to make the exponent `3` "derived rather
-than assumed". Two exact computations kill it, and the first is *upstream* of the
-shape-constant defect above — it would hold even if the constant cancelled cleanly:
-
-* **Three different objects, three different exponents, all shape-free.** On a scale family
-  the unweighted `L²` derivative norm `∫(∂B/∂δ)²` goes as `δ^{-3}`; the density Fisher
-  information `∫(∂ log B/∂δ)²B` as `δ^{-2}`; and the Whittle information for a memory rate as
-  `δ^{-1}`, exactly `1/(2δ)`. The width law measures the **first**; a transported estimation
-  floor needs the **third**. The gap is precisely the weighting: an unweighted norm of a
-  derivative versus the norm of a **score**, the derivative of the *log*. Two powers of `δ`.
-* **On a genuine spectral density nothing gives `ε²/δ³`.** For the OU/Lorentzian density
-  `f = ε²/(δ²+λ²)`, whose memory rate is `δ`, the width-law object is `πε⁴/(4δ⁵)` — because
-  that density is height-normalised, not mass-normalised, and its mass `πε²/δ` *grows* as
-  memory lengthens. Recovering `δ^{-3}` requires renormalising to unit mass, after which the
-  shape constant is a pure number and setting it to `ε²` makes `ε` a shape constant of a
-  unit-mass band, **not** the amplitude of a spectral density. So the `ε²` there was never the
-  `ε` of `longMemoryVariance`; the hypothesis was performing that rename silently.
-
-The `1/(2δ)` above was derived symbolically and matches the Monte-Carlo arm that found
-`n·(1/2)·I·V` flat at `0.500` — symbolic and simulation agreeing.
-
-And the theorem was discharged by `rw [gradNormSq_eq, longMemoryMetric, hε]`: the exponent `3`
-went in as a structure field and came out with a substituted symbol. True as algebra, empty as
-a derivation. It is deleted rather than weakened because its only purpose was the
-identification.
-
-Empirical status: **exponents VALIDATED to 15 digits across seven shapes; shape-freedom of
-the constant FALSIFIED (spread 0.333–13.16, infinite for rectangular); the metric
-identification WITHDRAWN.** See `proofs/validation/width_law/`. -/
-
-/-- **A band obeying the width law.**
-
-    The two constants are **independent**. An earlier version used one constant for both,
-    which silently forced the ratio to `1/w²` and made shape-freedom a tautology. -/
-structure WidthLaw where
-  /-- The constant in `‖B‖² = C₁/w`. -/
-  normConst : ℝ
-  /-- The constant in `‖dB‖² = C₂/w³`. Independent of `normConst`; measured ratios
-      `C₂/C₁` range from `0.333` to `13.16` across shapes. -/
-  gradConst : ℝ
-  /-- Norm constants are positive. -/
-  normConst_pos : 0 < normConst
-  /-- Derivative-norm constants are positive on the shapes where they are finite at all;
-      a rectangular band has none. -/
-  gradConst_pos : 0 < gradConst
-  /-- Squared norm of the band at width `w`. -/
-  normSq : ℝ → ℝ
-  /-- Squared norm of the band's derivative at width `w`. -/
-  gradNormSq : ℝ → ℝ
-  /-- The width law for the band. -/
-  normSq_eq : ∀ w, 0 < w → normSq w = normConst / w
-  /-- The width law for its derivative. -/
-  gradNormSq_eq : ∀ w, 0 < w → gradNormSq w = gradConst / w ^ 3
-
-/-- **The width-law ratio is `(C₂/C₁)/w²`.** The `w`-dependence is universal; the constant
-    is not. -/
-theorem widthLaw_ratio (W : WidthLaw) (w : ℝ) (hw : 0 < w) :
-    W.gradNormSq w / W.normSq w = (W.gradConst / W.normConst) / w ^ 2 := by
-  have hn : W.normConst ≠ 0 := ne_of_gt W.normConst_pos
-  have hwne : w ≠ 0 := ne_of_gt hw
-  rw [W.gradNormSq_eq w hw, W.normSq_eq w hw]
-  field_simp
-
-/-- **The shape-free content, stated correctly: scale invariance.**
-
-    `w²` times the ratio is independent of `w`, for every shape. This is what makes the
-    exponent a property of the width variable alone — and it is all that does. -/
-theorem widthLaw_scaleInvariant (W : WidthLaw) (w : ℝ) (hw : 0 < w) :
-    w ^ 2 * (W.gradNormSq w / W.normSq w) = W.gradConst / W.normConst := by
-  have hwne : w ≠ 0 := ne_of_gt hw
-  rw [widthLaw_ratio W w hw]
-  field_simp
-
-/-- **Two bands agree in the exponent at every width**, which is the honest form of the
-    shape-freedom claim: their scale-invariant constants may differ, but neither depends on
-    `w`. -/
-theorem widthLaw_exponent_shape_free (W W' : WidthLaw) (w w' : ℝ)
-    (hw : 0 < w) (hw' : 0 < w') :
-    w ^ 2 * (W.gradNormSq w / W.normSq w) = w' ^ 2 * (W.gradNormSq w' / W.normSq w') ∧
-      w ^ 2 * (W'.gradNormSq w / W'.normSq w) =
-        w' ^ 2 * (W'.gradNormSq w' / W'.normSq w') := by
-  refine ⟨?_, ?_⟩
-  · rw [widthLaw_scaleInvariant W w hw, widthLaw_scaleInvariant W w' hw']
-  · rw [widthLaw_scaleInvariant W' w hw, widthLaw_scaleInvariant W' w' hw']
+None of that is a reason to carry it as an assumption. The structure and its theorems are
+**deleted**: an exponent verified by simulation elsewhere is not a theorem of this corpus, and
+writing it as a field made it look like one. The `δ^{-3}` in `longMemoryMetric` is therefore
+unsupported here, which is the honest state — and it is independently contradicted by the
+Whittle measurement recorded above. -/
 
 /-! ### Positivity buys an exponent
 
