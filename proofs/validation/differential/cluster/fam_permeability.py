@@ -1068,6 +1068,18 @@ def c6(out):
     determinant = float(np.linalg.det(noise))
     identity_error = abs(total - decomposed)
     redundancy_error = abs(redundant_total - redundant_base)
+    base_cost = 1.0
+    worthwhile_added_cost = 0.4
+    excessive_added_cost = 2.0
+    base_efficiency = base / base_cost
+    worthwhile_efficiency = total / (base_cost + worthwhile_added_cost)
+    excessive_efficiency = total / (base_cost + excessive_added_cost)
+    worthwhile_gain_efficiency = innovation / worthwhile_added_cost
+    excessive_gain_efficiency = innovation / excessive_added_cost
+    budget = 1000.0
+    worthwhile_budget_gain = (
+        budget * worthwhile_efficiency - budget * base_efficiency
+    )
     passed = bool(
         determinant > 0.0
         and conditional_noise > 0.0
@@ -1075,6 +1087,11 @@ def c6(out):
         and total > base
         and identity_error < 1e-12
         and redundancy_error < 1e-12
+        and worthwhile_efficiency > base_efficiency
+        and worthwhile_gain_efficiency > base_efficiency
+        and excessive_efficiency < base_efficiency
+        and excessive_gain_efficiency < base_efficiency
+        and worthwhile_budget_gain > 0.0
     )
 
     print("  det(noise)                 = %.12f" % determinant)
@@ -1082,6 +1099,12 @@ def c6(out):
           (total, base, innovation))
     print("  decomposition abs error    = %.3e" % identity_error)
     print("  redundant-probe abs gain   = %.3e" % redundancy_error)
+    print("  base / augmented info/$    = %.12f / %.12f" %
+          (base_efficiency, worthwhile_efficiency))
+    print("  innovation info/added $    = %.12f" % worthwhile_gain_efficiency)
+    print("  excessive-cost augmented $ = %.12f (must be below base)" %
+          excessive_efficiency)
+    print("  fixed-budget information gain = %.12f" % worthwhile_budget_gain)
     print("  PASS                        = %s" % passed)
 
     out["C6"] = {
@@ -1095,6 +1118,16 @@ def c6(out):
         "innovation_information": innovation,
         "decomposition_abs_error": identity_error,
         "redundant_probe_abs_gain": redundancy_error,
+        "base_cost": base_cost,
+        "worthwhile_added_cost": worthwhile_added_cost,
+        "excessive_added_cost": excessive_added_cost,
+        "base_information_per_cost": base_efficiency,
+        "worthwhile_augmented_information_per_cost": worthwhile_efficiency,
+        "worthwhile_innovation_information_per_added_cost": worthwhile_gain_efficiency,
+        "excessive_augmented_information_per_cost": excessive_efficiency,
+        "excessive_innovation_information_per_added_cost": excessive_gain_efficiency,
+        "fixed_budget": budget,
+        "worthwhile_fixed_budget_information_gain": worthwhile_budget_gain,
         "pass": passed,
     }
     return passed

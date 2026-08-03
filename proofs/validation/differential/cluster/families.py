@@ -1321,7 +1321,10 @@ FAMILIES = [
                   "plus conditional-response innovation to machine precision, and its "
                   "constructed redundant probe added exactly zero. C1-C5 retain the "
                   "registered full-profile evidence; C6 is also included in future "
-                  "quick/full profiles.",
+                  "quick/full profiles. Its fixed-budget extension also fired both "
+                  "directions of the cost threshold: a 0.4 incremental assay cost "
+                  "increased information per dollar from 0.1500 to 0.2579, while cost "
+                  "2.0 reduced it to 0.1203.",
         "found_by": "manual",
         "spec": "Measure constants rather than slopes alone. Verify the estimator-draw "
                 "CLT before using Gaussian covariance information; keep a level-0 positive "
@@ -1330,13 +1333,17 @@ FAMILIES = [
                 "construct two distinct histories left unidentified by d-1 lag probes. "
                 "For correlated non-Gaussian moment probes, independently invert a "
                 "two-channel noise covariance and verify the Schur-complement innovation "
-                "identity, including strict-value and exact-redundancy controls.",
+                "identity, including strict-value and exact-redundancy controls. Then "
+                "vary incremental assay cost across the innovation-information-per-cost "
+                "threshold and require both include and exclude decisions to fire.",
         "members": ["scalarPermeability", "covarianceScoreInformation_gaussian",
                     "multivariateGaussianPermeability", "diagonalPermeability",
                     "covarianceMomentPermeability",
                     "covarianceMomentPermeabilityWithPrecision",
                     "twoChannelMomentInformation_eq_base_add_innovation",
                     "twoChannelMomentInformation_eq_first_iff",
+                    "twoChannelAugmentedAssay_moreEfficient_iff",
+                    "informationAtBudget",
                     "gaussianCovarianceHalfSquaredRisk",
                     "lagObservationDerivative", "lagCompletionPermeability",
                     "completion_count_lower_bound", "quadraticChannel"],

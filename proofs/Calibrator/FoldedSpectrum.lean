@@ -2016,7 +2016,12 @@ separates quotient fibres remains the continuation. -/
   (`twoChannelMomentInformation_ge_first`), improves it strictly for a nonzero innovation,
   and is exactly redundant under `twoChannelMomentInformation_eq_first_iff`.  Thus probe
   selection should maximize **conditional response-to-noise**, not marginal association,
-  locus count, or raw tagging alone.
+  locus count, or raw tagging alone.  With acquisition cost included,
+  `twoChannelAugmentedAssay_moreEfficient_iff` gives the exact assay-versus-cohort rule:
+  retain the richer probe iff its conditional information per added cost exceeds the
+  baseline design's information per cost.  By
+  `informationAtBudget_lt_iff_informationPerUnitCost_lt`, this is also exactly the rule
+  maximizing information at every positive fixed budget.
   `AncestrySpecificPower.ld_r2_matches_covariance_response_retention` fixes the convention
   bridge: a tag retaining correlation-scale response `η` has conventional LD
   `r² = η²`, so regression information and covariance permeability retain the same

@@ -514,6 +514,107 @@ theorem twoChannelMomentInformation_eq_first_iff
   · intro hzero
     simp [hzero]
 
+/-! ### Fixed-budget assay design -/
+
+/-- Information delivered per unit acquisition cost. -/
+noncomputable def informationPerUnitCost (information cost : ℝ) : ℝ :=
+  information / cost
+
+/-- Total information attainable by spending a fixed budget on exchangeable units of one
+design. Fractional units represent the continuous design relaxation; an implemented study
+rounds sample counts and rechecks the inequality. -/
+noncomputable def informationAtBudget (budget information cost : ℝ) : ℝ :=
+  budget * informationPerUnitCost information cost
+
+/-- At positive budget, ordering designs by total attainable information is exactly the
+same as ordering them by information per unit cost. -/
+theorem informationAtBudget_lt_iff_informationPerUnitCost_lt
+    (budget firstInformation firstCost secondInformation secondCost : ℝ)
+    (hbudget : 0 < budget) :
+    informationAtBudget budget firstInformation firstCost <
+        informationAtBudget budget secondInformation secondCost ↔
+      informationPerUnitCost firstInformation firstCost <
+        informationPerUnitCost secondInformation secondCost := by
+  unfold informationAtBudget
+  exact mul_lt_mul_iff_right₀ hbudget
+
+/-- **Exact augmentation threshold.**  Adding an assay with information gain `g` and
+incremental cost `d` improves overall information efficiency exactly when `g/d` exceeds
+the baseline design's information per cost. -/
+theorem augmented_informationPerUnitCost_gt_iff
+    (baseInformation gain baseCost addedCost : ℝ)
+    (hbaseCost : 0 < baseCost) (haddedCost : 0 < addedCost) :
+    informationPerUnitCost baseInformation baseCost <
+        informationPerUnitCost
+          (baseInformation + gain) (baseCost + addedCost) ↔
+      informationPerUnitCost baseInformation baseCost <
+        informationPerUnitCost gain addedCost := by
+  unfold informationPerUnitCost
+  constructor
+  · intro h
+    rw [div_lt_div_iff₀ hbaseCost (add_pos hbaseCost haddedCost)] at h
+    rw [div_lt_div_iff₀ hbaseCost haddedCost]
+    nlinarith
+  · intro h
+    rw [div_lt_div_iff₀ hbaseCost haddedCost] at h
+    rw [div_lt_div_iff₀ hbaseCost (add_pos hbaseCost haddedCost)]
+    nlinarith
+
+/-- Conditional information supplied by the second correlated moment probe. -/
+noncomputable def twoChannelMomentInnovationInformation
+    (firstNoise secondNoise sharedNoise firstResponse secondResponse : ℝ) : ℝ :=
+  twoChannelConditionalMomentResponse
+      firstNoise sharedNoise firstResponse secondResponse ^ 2 /
+    twoChannelConditionalMomentNoise firstNoise secondNoise sharedNoise
+
+/-- The base-plus-innovation theorem with the added probe's information exposed as a
+named method-design quantity. -/
+theorem twoChannelMomentInformation_eq_base_add_named_innovation
+    (firstNoise secondNoise sharedNoise firstResponse secondResponse : ℝ)
+    (hfirst : firstNoise ≠ 0)
+    (hdet : twoChannelMomentNoiseDet firstNoise secondNoise sharedNoise ≠ 0) :
+    covarianceMomentPermeabilityWithPrecision
+        (twoChannelMomentNoisePrecision firstNoise secondNoise sharedNoise)
+        (twoChannelMomentResponse firstResponse secondResponse) =
+      firstResponse ^ 2 / firstNoise +
+        twoChannelMomentInnovationInformation
+          firstNoise secondNoise sharedNoise firstResponse secondResponse := by
+  exact twoChannelMomentInformation_eq_base_add_innovation
+    firstNoise secondNoise sharedNoise firstResponse secondResponse hfirst hdet
+
+/-- **Optimal assay-versus-cohort rule.**  For a valid two-probe noise covariance, paying
+to retain the second probe improves fixed-budget efficiency exactly when its conditional
+moment-information gain per added assay cost exceeds the first probe's information per
+baseline cost.
+
+Biologically, a haplotype, sequencing, ancestry-tract, or longitudinal measurement should
+be added for its *conditional* response-to-noise per dollar—not because its marginal
+association is large or because it adds another marker. -/
+theorem twoChannelAugmentedAssay_moreEfficient_iff
+    (firstNoise secondNoise sharedNoise firstResponse secondResponse
+      baseCost addedCost : ℝ)
+    (hfirst : 0 < firstNoise)
+    (hdet : 0 < twoChannelMomentNoiseDet firstNoise secondNoise sharedNoise)
+    (hbaseCost : 0 < baseCost) (haddedCost : 0 < addedCost) :
+    informationPerUnitCost (firstResponse ^ 2 / firstNoise) baseCost <
+        informationPerUnitCost
+          (covarianceMomentPermeabilityWithPrecision
+            (twoChannelMomentNoisePrecision firstNoise secondNoise sharedNoise)
+            (twoChannelMomentResponse firstResponse secondResponse))
+          (baseCost + addedCost) ↔
+      informationPerUnitCost (firstResponse ^ 2 / firstNoise) baseCost <
+        informationPerUnitCost
+          (twoChannelMomentInnovationInformation
+            firstNoise secondNoise sharedNoise firstResponse secondResponse)
+          addedCost := by
+  rw [twoChannelMomentInformation_eq_base_add_named_innovation _ _ _ _ _
+    (ne_of_gt hfirst) (ne_of_gt hdet)]
+  exact augmented_informationPerUnitCost_gt_iff
+    (firstResponse ^ 2 / firstNoise)
+    (twoChannelMomentInnovationInformation
+      firstNoise secondNoise sharedNoise firstResponse secondResponse)
+    baseCost addedCost hbaseCost haddedCost
+
 /-- Permeability is non-negative. -/
 theorem scalarPermeability_nonneg (covariance covarianceDerivative : ℝ) :
     0 ≤ scalarPermeability covariance covarianceDerivative := by
