@@ -1101,6 +1101,30 @@ need for nonlinear calibration. The consequence for calibration is proved in
 `Calibrator.ld_decay_implies_nonlinear_calibration_proved`, which exhibits three
 explicit distances rather than assuming non-affineness as a hypothesis. -/
 
+/-- Exponential LD-decay mechanism: a distance proxy and a tagging efficiency.
+
+**DO NOT DELETE AS UNUSED.** Its consumer is
+`Calibrator.ld_decay_implies_nonlinear_calibration_proved`, which lives in
+`proofs/Calibrator.lean` — the corpus ROOT, one directory *above* `proofs/Calibrator/`.
+Two dead-code scans (`ec74a6a8`, `4815481c`) reported this and `decaySlope` as having no
+consumer, because the root file is outside the directory they walked. Deleting them did
+not break the build either, because Lean **auto-bound the now-undefined names as implicit
+variables**, so the consuming theorem kept elaborating as a vacuous statement about an
+arbitrary term until an application finally forced the error. Absence of a build failure
+is therefore not evidence that a deletion here was safe. -/
+structure LDDecayMechanism (k : ℕ) where
+  /-- Genetic distance proxy (e.g., PC-distance from training centroid). -/
+  distance : (Fin k → ℝ) → ℝ
+  /-- Tagging efficiency ρ² decreases with distance. -/
+  tagging_efficiency : ℝ → ℝ
+
+/-- Tagging efficiency as a function of the genetic distance of `c`.
+
+**DO NOT DELETE AS UNUSED** — see the note on `LDDecayMechanism` above. This is the
+function that `ld_decay_implies_nonlinear_calibration_proved` shows is not affine. -/
+def decaySlope {k : ℕ} (mech : LDDecayMechanism k) (c : Fin k → ℝ) : ℝ :=
+  mech.tagging_efficiency (mech.distance c)
+
 theorem optimal_slope_trace_variance {k : ℕ} [Fintype (Fin k)]
     (arch : GeneticArchitecture k) (c : Fin k → ℝ)
     (h_genic_pos : arch.V_genic c ≠ 0) :
