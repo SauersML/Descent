@@ -1316,15 +1316,27 @@ FAMILIES = [
                   "the full whitened Hilbert-Schmidt matrix law and its diagonal face, "
                   "and supplies the nonsingular lag-completion criterion. These named "
                   "experiments do not imply an Edgeworth, monodromy, or universal "
-                  "minimax theorem.",
+                  "minimax theorem. The new deterministic C6 arm passed on ACN116 "
+                  "(2026-08-02): the two-channel precision calculation equalled base "
+                  "plus conditional-response innovation to machine precision, and its "
+                  "constructed redundant probe added exactly zero. C1-C5 retain the "
+                  "registered full-profile evidence; C6 is also included in future "
+                  "quick/full profiles.",
         "found_by": "manual",
         "spec": "Measure constants rather than slopes alone. Verify the estimator-draw "
                 "CLT before using Gaussian covariance information; keep a level-0 positive "
                 "control; distinguish p proportional to eta squared from a linear law; "
                 "fit source, ensemble, residual, and cross terms on a factorial grid; and "
-                "construct two distinct histories left unidentified by d-1 lag probes.",
+                "construct two distinct histories left unidentified by d-1 lag probes. "
+                "For correlated non-Gaussian moment probes, independently invert a "
+                "two-channel noise covariance and verify the Schur-complement innovation "
+                "identity, including strict-value and exact-redundancy controls.",
         "members": ["scalarPermeability", "covarianceScoreInformation_gaussian",
                     "multivariateGaussianPermeability", "diagonalPermeability",
+                    "covarianceMomentPermeability",
+                    "covarianceMomentPermeabilityWithPrecision",
+                    "twoChannelMomentInformation_eq_base_add_innovation",
+                    "twoChannelMomentInformation_eq_first_iff",
                     "gaussianCovarianceHalfSquaredRisk",
                     "lagObservationDerivative", "lagCompletionPermeability",
                     "completion_count_lower_bound", "quadraticChannel"],

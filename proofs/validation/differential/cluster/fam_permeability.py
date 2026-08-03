@@ -59,6 +59,12 @@ WHAT IS MEASURED
       DIRECTION -- two distinct parameter points with identical observables --
       and not merely by fitting worse. Degenerate lag choices must fail too.
 
+  C6  VALUE OF AN ADDED CORRELATED PROBE. For two quadratic-summary channels,
+      precision-weighted information must equal first-channel information plus
+      squared CONDITIONAL response divided by CONDITIONAL noise. A probe whose
+      response is completely predicted through shared noise must add exactly
+      zero; a response innovation must add strictly positive information.
+
   NOT ATTEMPTED, AND WHY. The deconvolution face predicts rate (log m)^{-beta}
   with pi/2 in the exponent, from |Gamma(1/2+it)| ~ sqrt(2 pi) e^{-pi|t|/2}.
   Going from m = 1e3 to m = 1e6 moves log m by a factor of two; no achievable m
@@ -1028,12 +1034,84 @@ def c5(rng, out):
 
 # ===========================================================================
 
+def c6(out):
+    """Independent numerical evaluation of the two-channel Schur-complement law."""
+    print("")
+    print("=" * 78)
+    print("C6  VALUE OF AN ADDED CORRELATED PROBE")
+    print("=" * 78)
+
+    first_noise = 2.4
+    second_noise = 1.7
+    shared_noise = 0.8
+    response = np.array([0.6, -0.35])
+    noise = np.array([[first_noise, shared_noise],
+                      [shared_noise, second_noise]])
+    precision = np.linalg.inv(noise)
+    total = float(response @ precision @ response)
+    base = float(response[0] ** 2 / first_noise)
+    conditional_response = float(
+        response[1] - shared_noise / first_noise * response[0]
+    )
+    conditional_noise = float(
+        second_noise - shared_noise ** 2 / first_noise
+    )
+    innovation = float(conditional_response ** 2 / conditional_noise)
+    decomposed = base + innovation
+
+    redundant_response = np.array([
+        response[0], shared_noise / first_noise * response[0]
+    ])
+    redundant_total = float(redundant_response @ precision @ redundant_response)
+    redundant_base = float(redundant_response[0] ** 2 / first_noise)
+
+    determinant = float(np.linalg.det(noise))
+    identity_error = abs(total - decomposed)
+    redundancy_error = abs(redundant_total - redundant_base)
+    passed = bool(
+        determinant > 0.0
+        and conditional_noise > 0.0
+        and innovation > 0.0
+        and total > base
+        and identity_error < 1e-12
+        and redundancy_error < 1e-12
+    )
+
+    print("  det(noise)                 = %.12f" % determinant)
+    print("  total / base / innovation  = %.12f / %.12f / %.12f" %
+          (total, base, innovation))
+    print("  decomposition abs error    = %.3e" % identity_error)
+    print("  redundant-probe abs gain   = %.3e" % redundancy_error)
+    print("  PASS                        = %s" % passed)
+
+    out["C6"] = {
+        "noise": noise.tolist(),
+        "response": response.tolist(),
+        "determinant": determinant,
+        "total_information": total,
+        "first_information": base,
+        "conditional_response": conditional_response,
+        "conditional_noise": conditional_noise,
+        "innovation_information": innovation,
+        "decomposition_abs_error": identity_error,
+        "redundant_probe_abs_gain": redundancy_error,
+        "pass": passed,
+    }
+    return passed
+
+
+# ===========================================================================
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--profile", choices=("quick", "full"), default="quick",
                         help="bounded development signal or registered full experiment")
     parser.add_argument("--output", default="fam_permeability_results.json")
+    parser.add_argument("--innovation-only", action="store_true",
+                        help="run only the fast deterministic correlated-probe check")
     args = parser.parse_args(argv)
+    if args.innovation_only:
+        return 0 if c6({}) else 1
     configure_profile(args.profile)
     t0 = time.time()
     rng = np.random.default_rng(SEED)
@@ -1043,6 +1121,7 @@ def main(argv=None):
     r3 = c3(rng, out)
     r4 = c4(rng, out)
     r5 = c5(rng, out)
+    r6 = c6(out)
 
     print("")
     print("=" * 78)
@@ -1062,9 +1141,10 @@ def main(argv=None):
     print("=" * 78)
     for tag, v in (("C1 permeability constant", r1), ("C2 the wall", r2),
                    ("C3 sealing law exponent", r3), ("C4 additivity", r4),
-                   ("C5 count and order", r5)):
+                   ("C5 count and order", r5),
+                   ("C6 correlated-probe value", r6)):
         print("  %-30s %s" % (tag, v))
-    ok = bool(r1 and r2 and r3 and r4 and r5)
+    ok = bool(r1 and r2 and r3 and r4 and r5 and r6)
     out["READ_THE_TEST"] = ok
     print("  READ_THE_TEST: %s" % ok)
     print("  runtime %.1f s" % (time.time() - t0))

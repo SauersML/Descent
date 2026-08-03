@@ -363,6 +363,157 @@ theorem twoChannelMomentPermeabilityWithPrecision
     twoChannelMomentResponse, Fin.sum_univ_two]
   ring
 
+/-! ### Adding a correlated probe: the innovation law -/
+
+/-- Determinant of the noise covariance of two quadratic-summary channels. -/
+noncomputable def twoChannelMomentNoiseDet
+    (firstNoise secondNoise sharedNoise : ℝ) : ℝ :=
+  firstNoise * secondNoise - sharedNoise ^ 2
+
+/-- Explicit inverse of the symmetric two-channel noise covariance
+`[[v₁,c],[c,v₂]]`, expressed through its determinant. -/
+noncomputable def twoChannelMomentNoisePrecision
+    (firstNoise secondNoise sharedNoise : ℝ) : Matrix (Fin 2) (Fin 2) ℝ :=
+  let det := twoChannelMomentNoiseDet firstNoise secondNoise sharedNoise
+  twoChannelMomentPrecision
+    (secondNoise / det) (firstNoise / det) (-sharedNoise / det)
+
+/-- Response of the second channel not predicted by the first channel through their
+noise covariance. -/
+noncomputable def twoChannelConditionalMomentResponse
+    (firstNoise sharedNoise firstResponse secondResponse : ℝ) : ℝ :=
+  secondResponse - (sharedNoise / firstNoise) * firstResponse
+
+/-- Residual square-noise variance of the second channel after projecting out the first. -/
+noncomputable def twoChannelConditionalMomentNoise
+    (firstNoise secondNoise sharedNoise : ℝ) : ℝ :=
+  secondNoise - sharedNoise ^ 2 / firstNoise
+
+/-- **Closed two-channel GMM information.**  Inverting the named noise covariance gives
+the standard numerator divided by its determinant. -/
+theorem twoChannelMomentNoisePermeability_closed
+    (firstNoise secondNoise sharedNoise firstResponse secondResponse : ℝ) :
+    covarianceMomentPermeabilityWithPrecision
+        (twoChannelMomentNoisePrecision firstNoise secondNoise sharedNoise)
+        (twoChannelMomentResponse firstResponse secondResponse) =
+      (secondNoise * firstResponse ^ 2 -
+          2 * sharedNoise * firstResponse * secondResponse +
+          firstNoise * secondResponse ^ 2) /
+        twoChannelMomentNoiseDet firstNoise secondNoise sharedNoise := by
+  unfold twoChannelMomentNoisePrecision
+  rw [twoChannelMomentPermeabilityWithPrecision]
+  unfold twoChannelMomentNoiseDet
+  ring
+
+/-- Conditional noise is the covariance determinant divided by first-channel noise. -/
+theorem twoChannelConditionalMomentNoise_eq_det_div
+    (firstNoise secondNoise sharedNoise : ℝ) (hfirst : firstNoise ≠ 0) :
+    twoChannelConditionalMomentNoise firstNoise secondNoise sharedNoise =
+      twoChannelMomentNoiseDet firstNoise secondNoise sharedNoise / firstNoise := by
+  unfold twoChannelConditionalMomentNoise twoChannelMomentNoiseDet
+  field_simp [hfirst]
+
+/-- Positive first-channel noise and positive covariance determinant imply positive
+conditional noise for the added channel. -/
+theorem twoChannelConditionalMomentNoise_pos
+    (firstNoise secondNoise sharedNoise : ℝ)
+    (hfirst : 0 < firstNoise)
+    (hdet : 0 < twoChannelMomentNoiseDet firstNoise secondNoise sharedNoise) :
+    0 < twoChannelConditionalMomentNoise firstNoise secondNoise sharedNoise := by
+  rw [twoChannelConditionalMomentNoise_eq_det_div _ _ _ (ne_of_gt hfirst)]
+  exact div_pos hdet hfirst
+
+/-- **Base plus innovation decomposition.**  Information from two correlated probes is
+the first probe's information plus the squared conditional response of the added probe,
+normalized by its conditional noise.  This is the constructive method-design form of
+`ΓᵀΩ⁻¹Γ`. -/
+theorem twoChannelMomentInformation_eq_base_add_innovation
+    (firstNoise secondNoise sharedNoise firstResponse secondResponse : ℝ)
+    (hfirst : firstNoise ≠ 0)
+    (hdet : twoChannelMomentNoiseDet firstNoise secondNoise sharedNoise ≠ 0) :
+    covarianceMomentPermeabilityWithPrecision
+        (twoChannelMomentNoisePrecision firstNoise secondNoise sharedNoise)
+        (twoChannelMomentResponse firstResponse secondResponse) =
+      firstResponse ^ 2 / firstNoise +
+        twoChannelConditionalMomentResponse
+            firstNoise sharedNoise firstResponse secondResponse ^ 2 /
+          twoChannelConditionalMomentNoise firstNoise secondNoise sharedNoise := by
+  rw [twoChannelMomentNoisePermeability_closed,
+    twoChannelConditionalMomentNoise_eq_det_div _ _ _ hfirst]
+  unfold twoChannelConditionalMomentResponse twoChannelMomentNoiseDet at *
+  field_simp [hfirst, hdet]
+  ring_nf
+  field_simp [hdet]
+  ring
+
+/-- Under a valid positive two-channel noise covariance, an added probe can never reduce
+optimal moment information. -/
+theorem twoChannelMomentInformation_ge_first
+    (firstNoise secondNoise sharedNoise firstResponse secondResponse : ℝ)
+    (hfirst : 0 < firstNoise)
+    (hdet : 0 < twoChannelMomentNoiseDet firstNoise secondNoise sharedNoise) :
+    firstResponse ^ 2 / firstNoise ≤
+      covarianceMomentPermeabilityWithPrecision
+        (twoChannelMomentNoisePrecision firstNoise secondNoise sharedNoise)
+        (twoChannelMomentResponse firstResponse secondResponse) := by
+  rw [twoChannelMomentInformation_eq_base_add_innovation _ _ _ _ _
+    (ne_of_gt hfirst) (ne_of_gt hdet)]
+  have hconditional := twoChannelConditionalMomentNoise_pos
+    firstNoise secondNoise sharedNoise hfirst hdet
+  exact le_add_of_nonneg_right (div_nonneg (sq_nonneg _) (le_of_lt hconditional))
+
+/-- **Strict value-of-a-new-probe criterion.**  A second correlated probe strictly
+improves information exactly when its response contains a nonzero innovation beyond what
+the first probe's noise correlation predicts. -/
+theorem twoChannelMomentInformation_strictly_improves
+    (firstNoise secondNoise sharedNoise firstResponse secondResponse : ℝ)
+    (hfirst : 0 < firstNoise)
+    (hdet : 0 < twoChannelMomentNoiseDet firstNoise secondNoise sharedNoise)
+    (hinnovation : twoChannelConditionalMomentResponse
+      firstNoise sharedNoise firstResponse secondResponse ≠ 0) :
+    firstResponse ^ 2 / firstNoise <
+      covarianceMomentPermeabilityWithPrecision
+        (twoChannelMomentNoisePrecision firstNoise secondNoise sharedNoise)
+        (twoChannelMomentResponse firstResponse secondResponse) := by
+  rw [twoChannelMomentInformation_eq_base_add_innovation _ _ _ _ _
+    (ne_of_gt hfirst) (ne_of_gt hdet)]
+  have hconditional := twoChannelConditionalMomentNoise_pos
+    firstNoise secondNoise sharedNoise hfirst hdet
+  have hgain : 0 <
+      twoChannelConditionalMomentResponse
+          firstNoise sharedNoise firstResponse secondResponse ^ 2 /
+        twoChannelConditionalMomentNoise firstNoise secondNoise sharedNoise :=
+    div_pos (sq_pos_of_ne_zero hinnovation) hconditional
+  linarith
+
+/-- **Exact redundancy criterion.**  The second channel adds no information precisely
+when its response equals the response predicted from the first through the shared noise. -/
+theorem twoChannelMomentInformation_eq_first_iff
+    (firstNoise secondNoise sharedNoise firstResponse secondResponse : ℝ)
+    (hfirst : 0 < firstNoise)
+    (hdet : 0 < twoChannelMomentNoiseDet firstNoise secondNoise sharedNoise) :
+    covarianceMomentPermeabilityWithPrecision
+        (twoChannelMomentNoisePrecision firstNoise secondNoise sharedNoise)
+        (twoChannelMomentResponse firstResponse secondResponse) =
+        firstResponse ^ 2 / firstNoise ↔
+      twoChannelConditionalMomentResponse
+        firstNoise sharedNoise firstResponse secondResponse = 0 := by
+  rw [twoChannelMomentInformation_eq_base_add_innovation _ _ _ _ _
+    (ne_of_gt hfirst) (ne_of_gt hdet)]
+  have hconditional := twoChannelConditionalMomentNoise_pos
+    firstNoise secondNoise sharedNoise hfirst hdet
+  constructor
+  · intro hsum
+    have hgain :
+        twoChannelConditionalMomentResponse
+            firstNoise sharedNoise firstResponse secondResponse ^ 2 /
+          twoChannelConditionalMomentNoise firstNoise secondNoise sharedNoise = 0 := by
+      linarith
+    exact (div_eq_zero_iff.mp hgain).resolve_right (ne_of_gt hconditional) |>
+      sq_eq_zero_iff.mp
+  · intro hzero
+    simp [hzero]
+
 /-- Permeability is non-negative. -/
 theorem scalarPermeability_nonneg (covariance covarianceDerivative : ℝ) :
     0 ≤ scalarPermeability covariance covarianceDerivative := by
