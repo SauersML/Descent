@@ -284,14 +284,20 @@ theorem methods_converge_at_large_n
       (by intro i _ _; exact h_signal i)
   · simp [ctMissedTargetSignal]
 
-/-- **P-value threshold selection affects portability differently.**
-    Lenient threshold includes k_lenient > k_stringent SNPs. Each extra
-    SNP adds signal V_signal_per_snp but also LD-dependent noise V_noise_per_snp.
-    In the source population, net R² gain = (V_signal - V_noise) × extra_snps.
-    In the target population, the LD-noise component may double (different LD),
-    so target net = (V_signal - 2 × V_noise) × extra_snps. We show: there
-    exist regimes where the source gains but the target loses. -/
-theorem threshold_tradeoff
+/-- **A positive multiplier preserves the sign of both factors:** from
+    `b < a < 2b` and `x > 0`, `(a - b)x > 0` and `(a - 2b)x < 0`.
+
+    **Both signs are hypotheses.** `h_signal_wins_source` is `b < a` and
+    `h_noise_wins_target` is `a < 2b`; the conclusion multiplies each by a
+    positive `x`. The reading — that a lenient p-value threshold gains
+    `R²` in the source and loses it in the target because the LD-noise
+    component doubles — supplies the factor `2` and the additive net-gain form
+    by stipulation, and nothing here derives either.
+
+    Note also what the name promised and the statement does not deliver: this
+    is not an existence result. There is no `∃`, so the regime in which the two
+    sign conditions hold together is assumed rather than exhibited. -/
+theorem mul_pos_and_mul_neg_of_between
     (V_signal_per_snp V_noise_per_snp extra_snps : ℝ)
     (h_extra : 0 < extra_snps)
     (h_signal_wins_source : V_noise_per_snp < V_signal_per_snp)

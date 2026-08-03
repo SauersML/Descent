@@ -756,9 +756,14 @@ theorem smaller_ne_more_drift {T : ℕ} (hT : 0 < T)
     exact ⟨j, Finset.mem_univ j,
       div_lt_div_of_pos_left one_pos (by linarith [hNe₂ j]) (by linarith [h_smaller j])⟩
 
-/-- A bottleneck generation contributes more to cumulative drift than a
-    normal-sized generation. -/
-theorem bottleneck_gen_contributes_more_drift (Ne_b Ne_n : ℝ)
+/-- **`1/(2x)` is decreasing in `x` on the positives.**
+
+    The per-generation term of `cumulativeDrift` above, isolated. Read as
+    genetics it says a bottleneck generation contributes more drift than a
+    normal-sized one, but that reading needs the per-generation drift to BE
+    `1/(2Nₑ)`, which is the definition's business and not this statement's:
+    here there are two positive reals and no population. -/
+theorem one_div_two_mul_lt_one_div_two_mul (Ne_b Ne_n : ℝ)
     (hb : 0 < Ne_b) (hn : 0 < Ne_n)
     (h_bottle : Ne_b < Ne_n) :
     1 / (2 * Ne_n) < 1 / (2 * Ne_b) := by
