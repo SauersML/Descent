@@ -61,7 +61,11 @@ jobs:
     needs: gate
     if: ${{ github.event_name != 'schedule' || needs.gate.outputs.run == 'true' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    # The full cold-ish Lean root takes about eight minutes on a GitHub runner;
+    # the transitive axiom scan must still get time to run afterward.  Twenty
+    # minutes remains a hard hang detector while making the mandatory audit
+    # reachable instead of timing out immediately after a successful build.
+    timeout-minutes: 20
     
     steps:
       - name: Check out repository
