@@ -231,6 +231,38 @@ theorem supercritical_iff {N c m : ℝ} (hc : 0 < c) :
   unfold criticalDegree
   rw [div_lt_iff₀ hc, mul_comm]
 
+/-- **Subcriticality in panel units: the panel must exceed `exp (c * m)`.**
+
+`subcritical_iff` states the boundary additively, as `c * m < log N`.  Exponentiating
+puts it in the units a study is actually designed in, and the shape of the requirement
+becomes visible: the admissible interaction degree grows like the LOGARITHM of the
+panel, so the panel needed for a given degree grows exponentially in that degree.
+
+This is arithmetic about the defined quantity `criticalDegree`, exactly as
+`subcritical_iff` is.  That the quantity so named is where a real transition occurs is
+the cited BBM result and is not proved here; what is proved is what the definition
+costs in sample size. -/
+theorem subcritical_iff_exp_lt {N c m : ℝ} (hc : 0 < c) (hN : 0 < N) :
+    m < criticalDegree N c ↔ Real.exp (c * m) < N := by
+  rw [subcritical_iff hc, Real.lt_log_iff_exp_lt hN]
+
+/-- **Each unit of interaction degree more than doubles the panel required.**
+
+At the Gaussian coupling the panel must exceed `exp (condensationConstant * m)`, and
+`log 2 < condensationConstant` (`log_two_lt_condensationConstant`), so that requirement
+is at least `2 ^ m`.
+
+For a polygenic score this is the design statement behind the arc.  A purely additive
+score is degree one and costs nothing here.  Admitting interactions of multiplicative
+degree `m` — pairwise is `m = 2`, three-way is `m = 3` — requires a panel exponential in
+`m` before the aggregate is even in the regime where a Gaussian score assumption could
+hold.  Degree, not variant count, is what the panel has to outrun. -/
+theorem two_pow_le_gaussian_panel_requirement (m : ℝ) (hm : 0 ≤ m) :
+    (2 : ℝ) ^ m ≤ Real.exp (condensationConstant * m) := by
+  rw [Real.rpow_def_of_pos (by norm_num : (0 : ℝ) < 2)]
+  exact Real.exp_le_exp.2
+    (mul_le_mul_of_nonneg_right (le_of_lt log_two_lt_condensationConstant) hm)
+
 /-- The Gaussian critical degree is `1.37035... * log N`. We record the reciprocal
 constant as a strictly positive multiplier rather than a decimal. -/
 noncomputable def gaussianCriticalMultiplier : ℝ := 1 / condensationConstant
