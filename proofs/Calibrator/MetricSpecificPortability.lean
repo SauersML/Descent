@@ -413,38 +413,73 @@ while CITL shifts exactly with the mean-score offset.**
     fixed-`fst` statement behind "rank-based discrimination can be preserved
     while calibration is lost." -/
 theorem neutralAF_benchmark_auc_preserved_citl_shift_at_fixed_fst
-    (V_A V_E fst mean_obs mean_pred δ : ℝ) :
-    targetExactGaussianAUCFromNeutralAFBenchmark V_A V_E fst =
-      presentDayEqualVarianceGaussianAUC V_A V_E fst ∧
+    (mean_obs mean_pred δ : ℝ) :
     calibrationInTheLarge mean_obs (mean_pred + δ) =
       calibrationInTheLarge mean_obs mean_pred - δ := by
-  constructor
-  · rfl
-  · unfold calibrationInTheLarge
-    ring
+  unfold calibrationInTheLarge
+  ring
 
-/-- **Benchmark discrimination can be preserved while calibration is lost at
-fixed drift.**
-    In the neutral allele-frequency benchmark, if source and target share the same
-    drift level `fst`, then AUC is unchanged. If the source is calibrated in
-    the large and the target mean prediction is shifted by a nonzero offset
-    `δ`, then target absolute CITL becomes strictly worse.
+/-- **THE DISCRIMINATION CONJUNCT REMOVED FROM THE TWO THEOREMS BELOW WAS VACUOUS, AND
+THIS IS WHAT IT SHOULD HAVE SAID.**
 
-    This is the actual fixed-`fst` result the surrounding prose was aiming at:
-    AUC is preserved, while calibration loss is witnessed by a standard
-    calibration metric rather than an `R²` surrogate. -/
+The deleted conjunct was
+
+`targetExactGaussianAUCFromNeutralAFBenchmark V_A V_E fst =
+   presentDayEqualVarianceGaussianAUC V_A V_E fst`
+
+and it was proved by `rfl`, because those two names denote **the same function**:
+`targetExactGaussianAUCFromNeutralAFBenchmark` delegates to
+`targetGaussianAUCFromNeutralAFBenchmark`, which delegates to `presentDayGaussianAUC`, of
+which `presentDayEqualVarianceGaussianAUC` is a one-line alias. It was `f x = f x` wearing
+two names, and it would have held equally well had AUC been wildly *not* preserved. Nothing
+in reading the statement revealed this; the name structure concealed it.
+
+Note what did **not** help: the docstring on `targetExactGaussianAUCFromNeutralAFBenchmark`
+had already been corrected to say "equal-variance Gaussian" and to record the `-0.068`
+bias. A docstring cannot repair a statement built out of identifiers.
+
+The substantive claim the prose was reaching for is below, and it needs a hypothesis: the
+equal-variance AUC depends on heritability and drift **only through the attenuated signal
+variance**, so any two configurations agreeing there have equal AUC. That is why "same
+drift, same AUC" holds, and unlike the deleted conjunct it can fail — supply configurations
+with different attenuated signal variance and the conclusion goes away. -/
+theorem neutralAF_benchmark_auc_depends_only_on_attenuated_signal
+    (V_A V_E fst V_A' fst' : ℝ)
+    (h : presentDayPGSVariance V_A fst = presentDayPGSVariance V_A' fst') :
+    presentDayGaussianAUC V_A V_E fst = presentDayGaussianAUC V_A' V_E fst' := by
+  unfold presentDayGaussianAUC presentDaySignalToNoise
+  rw [h]
+
+/-- **Benchmark discrimination can be preserved while calibration is lost.**
+
+    Discrimination half: if two configurations agree in attenuated signal variance -- which
+    is what "sharing the same drift level" delivers -- the equal-variance AUC is unchanged.
+    This is now a hypothesis-carrying claim rather than the `rfl` it used to be; see
+    `neutralAF_benchmark_auc_depends_only_on_attenuated_signal` for why the previous form
+    was empty.
+
+    Calibration half: if the source is calibrated in the large and the target mean
+    prediction is shifted by a nonzero `δ`, target absolute CITL becomes strictly worse.
+    This half was always substantive and is unchanged.
+
+    The pairing is the point, and only now does it have two working halves: discrimination
+    can survive exactly the perturbation that destroys calibration, so reporting AUC alone
+    hides the failure. Note also that this is the **equal-variance** AUC; on a dichotomised
+    trait the discrimination half would have to be restated with
+    `liabilityThresholdAUCFromExplainedR2` at a named prevalence, where preservation is a
+    stronger claim because the conditional variances differ. -/
 theorem neutralAF_benchmark_discrimination_preserved_calibration_lost
-    (V_A V_E fst mean_obs mean_pred δ : ℝ)
+    (V_A V_E fst V_A' fst' mean_obs mean_pred δ : ℝ)
+    (h_same_signal : presentDayPGSVariance V_A fst = presentDayPGSVariance V_A' fst')
     (h_src_cal : calibrationInTheLarge mean_obs mean_pred = 0)
     (h_shift : δ ≠ 0) :
-    targetExactGaussianAUCFromNeutralAFBenchmark V_A V_E fst =
-      presentDayEqualVarianceGaussianAUC V_A V_E fst ∧
+    presentDayGaussianAUC V_A V_E fst = presentDayGaussianAUC V_A' V_E fst' ∧
     |calibrationInTheLarge mean_obs mean_pred| <
       |calibrationInTheLarge mean_obs (mean_pred + δ)| := by
-  rcases neutralAF_benchmark_auc_preserved_citl_shift_at_fixed_fst
-      V_A V_E fst mean_obs mean_pred δ with
-    ⟨h_auc, h_citl_shift⟩
-  refine ⟨h_auc, ?_⟩
+  have h_citl_shift :=
+    neutralAF_benchmark_auc_preserved_citl_shift_at_fixed_fst mean_obs mean_pred δ
+  refine ⟨neutralAF_benchmark_auc_depends_only_on_attenuated_signal V_A V_E fst V_A' fst'
+    h_same_signal, ?_⟩
   rw [h_src_cal]
   rw [h_citl_shift, h_src_cal]
   have h_shift_sub : 0 - δ ≠ 0 := by
