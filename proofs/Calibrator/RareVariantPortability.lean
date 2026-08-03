@@ -49,7 +49,6 @@ section RareVariantSpecificity
 theorem ultra_rare_not_shared
     (Ne p : ℝ)
     (h_Ne : 0 < Ne)
-    (h_p : 0 < p)
     (h_ultra_rare : p < 1 / (2 * Ne)) :
     -- sharing_prob = 2 * Ne * p (coalescent approximation) is < 1
     2 * Ne * p < 1 := by
@@ -201,7 +200,7 @@ theorem common_component_more_portable
     (h_β : β ≠ 0)
     (h_pc : 0 < p_common) (h_pc1 : p_common < 1)
     (h_pr : 0 < p_rare) (h_pr1 : p_rare < 1)
-    (h_sc : 0 < s_common) (h_sr : 0 < s_rare)
+    (h_sr : 0 < s_rare)
     (h_freq : p_rare < p_common) (h_half : p_common ≤ 1/2)
     (h_sharing : s_rare ≤ s_common) :
     β ^ 2 * (2 * p_rare * (1 - p_rare)) * s_rare ≤
@@ -295,9 +294,8 @@ theorem mutationSelectionBalance_isFixedPoint (mu s h : ℝ)
       mutationSelectionBalance mu s h := by
   have hne : h * s + mu ≠ 0 := ne_of_gt h_load
   unfold mutationSelectionStepRare mutationSelectionBalance
-  first
-    | (field_simp; ring)
-    | field_simp
+  field_simp
+  ring
 
 /-- The dominant balance is a frequency: it lies in `[0, 1]` for every
 nonnegative mutation rate, nonnegative selective component `h*s`, and positive
@@ -360,9 +358,7 @@ theorem mutationSelectionBalanceRecessive_isFixedPoint (mu s : ℝ)
   -- `x` is the candidate frequency; `2 s x = R - mu` is the only fact about it used.
   have hx : 2 * s * ((Real.sqrt (mu * (mu + 4 * s)) - mu) / (2 * s)) =
       Real.sqrt (mu * (mu + 4 * s)) - mu := by
-    first
-      | (field_simp; ring)
-      | field_simp
+    field_simp
   have hR' : (2 * s * ((Real.sqrt (mu * (mu + 4 * s)) - mu) / (2 * s)) + mu) ^ 2 =
       mu * (mu + 4 * s) := by
     rw [hx]
@@ -378,9 +374,7 @@ theorem mutationSelectionBalanceRecessive_isFixedPoint (mu s : ℝ)
       mu * (1 - (Real.sqrt (mu * (mu + 4 * s)) - mu) / (2 * s)) :=
     mul_left_cancel₀ hfour_ne hfour
   unfold mutationSelectionStepRecessive mutationSelectionBalanceRecessive
-  first
-    | linear_combination -hkey
-    | linarith [hkey]
+  linear_combination -hkey
 
 /-- The recessive balance is a frequency, and its square is bounded by `mu / s`:
 `s p² ≤ mu`, which is the exact sense in which `p ≲ √(mu/s)`. -/
@@ -469,8 +463,7 @@ section EffectSizeDistribution
     the expected effect size is larger. -/
 theorem negative_selection_constraint
     (maf_rare maf_common : ℝ)
-    (h_rare_pos : 0 < maf_rare) (h_rare_lt : maf_rare < 1)
-    (h_common_pos : 0 < maf_common) (h_common_lt : maf_common ≤ 1/2)
+    (h_common_lt : maf_common ≤ 1/2)
     (h_rare_maf : maf_rare < maf_common) :
     -- Heterozygosity is smaller for rarer variants (when both ≤ 1/2)
     2 * maf_rare * (1 - maf_rare) < 2 * maf_common * (1 - maf_common) := by
