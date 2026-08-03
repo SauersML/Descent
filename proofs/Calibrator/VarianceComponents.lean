@@ -129,11 +129,20 @@ in the specific population.
 
 section PopulationSpecificH2
 
-/-- **Additive variance depends on allele frequencies.**
-    V_A = Σᵢ 2pᵢ(1-pᵢ)αᵢ² where αᵢ is the average effect.
-    When frequencies differ, V_A differs.
+/-- **Additive variance under LINKAGE EQUILIBRIUM** — the qualifier is load-bearing and was
+    missing.
 
-    Empirical status: UNTESTED. -/
+    `V_A = Σᵢ 2pᵢ(1-pᵢ)αᵢ²` drops the LD cross term `Σᵢ≠ⱼ 4·αᵢ·αⱼ·D_ij`, so it is correct only
+    at `D = 0` and is stated unconditionally. **The sign of the error flips with the sign of
+    the effect product**, which is why no constant repairs it: at `p = 1/2`, `D = 1/8`, exact
+    rationals, `α = (1,1)` gives `1` against a true `3/2` (ratio `2/3`), while `α = (1,-1)`
+    gives `1` against a true `1/2` (ratio `2`).
+
+    Simulation at `n = 400k` reproduces both: `1.4975` against the LD-inclusive `1.5`, with a
+    `D = 0` control at `0.9974` against `1.0`.
+
+    Empirical status: **VALIDATED at linkage equilibrium**; the unconditional reading is
+    **FALSIFIED** (`proofs/validation/ldsc_diff/`). -/
 noncomputable def additiveVariance
     {m : ℕ} (p : Fin m → ℝ) (α : Fin m → ℝ) : ℝ :=
   ∑ i, 2 * p i * (1 - p i) * (α i) ^ 2

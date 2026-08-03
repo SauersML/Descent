@@ -1,0 +1,132 @@
+{
+ "A_additiveVariance_exact": {
+  "claim": "Lean drops the LD cross term 4 a_i a_j D_ij",
+  "cases": [
+   {
+    "p": [
+     "1/2",
+     "1/2"
+    ],
+    "alpha": [
+     "1",
+     "1"
+    ],
+    "D": "1/8",
+    "lean_VA": "1",
+    "true_VA": "3/2",
+    "exactly_equal": false,
+    "lean_over_true": "2/3",
+    "lean_over_true_float": 0.6666666666666666
+   },
+   {
+    "p": [
+     "1/2",
+     "1/2"
+    ],
+    "alpha": [
+     "1",
+     "-1"
+    ],
+    "D": "1/8",
+    "lean_VA": "1",
+    "true_VA": "1/2",
+    "exactly_equal": false,
+    "lean_over_true": "2",
+    "lean_over_true_float": 2.0
+   },
+   {
+    "p": [
+     "1/5",
+     "1/5"
+    ],
+    "alpha": [
+     "1",
+     "1"
+    ],
+    "D": "1/25",
+    "lean_VA": "16/25",
+    "true_VA": "4/5",
+    "exactly_equal": false,
+    "lean_over_true": "4/5",
+    "lean_over_true_float": 0.7999999999999999
+   },
+   {
+    "p": [
+     "1/2",
+     "1/2"
+    ],
+    "alpha": [
+     "1",
+     "1"
+    ],
+    "D": "0",
+    "lean_VA": "1",
+    "true_VA": "1",
+    "exactly_equal": true,
+    "lean_over_true": "1",
+    "lean_over_true_float": 1.0
+   }
+  ]
+ },
+ "A2_additiveVariance_simulated": {
+  "n_individuals": 400000,
+  "V_A_simulated": 1.4975198349437502,
+  "V_A_lean_formula": 1.0,
+  "V_A_with_LD_term": 1.5,
+  "sim_matches_LD_formula_within_1pct": true,
+  "lean_understates_by_pct": 33.333333333333336
+ },
+ "A2_LE_control": {
+  "V_A_simulated": 0.9973896156000004,
+  "V_A_lean_formula": 1.0,
+  "matches_within_1pct": true
+ },
+ "B_effectiveSampleSize": {
+  "note": "phenotype standardized; predicted exact value is N/(1-h2_snp), and h2_snp is ~0.4% here so the target ratio is ~1.00",
+  "rows": [
+   {
+    "N_true": 2000,
+    "p": 0.5,
+    "se_empirical": 0.02933390022733033,
+    "effectiveSampleSizeFromSE": 2324.2903262688865,
+    "ratio_corrected_to_N": 1.1621451631344433,
+    "effectiveSampleSizeSE": 1162.1451631344432,
+    "ratio_naive_to_N": 0.5810725815672216
+   },
+   {
+    "N_true": 2000,
+    "p": 0.1,
+    "se_empirical": 0.05429211654147577,
+    "effectiveSampleSizeFromSE": 1884.7508574885844,
+    "ratio_corrected_to_N": 0.9423754287442923,
+    "effectiveSampleSizeSE": 339.2551543479452,
+    "ratio_naive_to_N": 0.16962757717397262
+   },
+   {
+    "N_true": 500,
+    "p": 0.3,
+    "se_empirical": 0.07017610253149856,
+    "effectiveSampleSizeFromSE": 483.47299446645184,
+    "ratio_corrected_to_N": 0.9669459889329036,
+    "effectiveSampleSizeSE": 203.05865767590973,
+    "ratio_naive_to_N": 0.40611731535181944
+   },
+   {
+    "N_true": 4000,
+    "p": 0.05,
+    "se_empirical": 0.049619264665285295,
+    "effectiveSampleSizeFromSE": 4275.390095770599,
+    "ratio_corrected_to_N": 1.0688475239426498,
+    "effectiveSampleSizeSE": 406.16205909820695,
+    "ratio_naive_to_N": 0.10154051477455174
+   }
+  ]
+ },
+ "C_snpH2": {
+  "VA_tagged_sim": 0.13974812694632738,
+  "VP_sim": 0.7124716622335063,
+  "snpH2_lean": 0.1961455231892804,
+  "VA_tagged_from_lean_formula": 0.14008868436818325,
+  "note": "tagged and untagged loci are in linkage equilibrium here, so the per-locus formula and the simulated variance must agree"
+ }
+}

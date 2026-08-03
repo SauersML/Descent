@@ -176,7 +176,14 @@ noncomputable def effectiveSampleSizeSE (se : ℝ) : ℝ := 1 / se ^ 2
     `n_eff = 1/(SE² · 2p(1-p))` for a standardized trait. Recovers the true `n` to about 1%
     across allele frequencies from 0.5 down to 0.01.
 
-    Empirical status: **VALIDATED** against Monte-Carlo GWAS regressions. -/
+    **Scope caveat, found by a later sweep and absent from the first version of this
+    docstring:** it overstates `N` for large-effect SNPs, by `+27%` at `h²_snp = 0.10` and
+    `+64%` at `0.20`. The derivation assumes the SNP explains a negligible share of variance,
+    which is exactly where a GWAS hit does not sit. Ratios to the true `N` at small effect:
+    `0.9965, 1.0065, 1.0966, 1.0283`.
+
+    Empirical status: **VALIDATED at small effect**, biased upward at large effect
+    (`proofs/validation/ldsc_diff/`). -/
 noncomputable def effectiveSampleSizeFromSE (se p : ℝ) : ℝ :=
   1 / (se ^ 2 * (2 * p * (1 - p)))
 
@@ -275,9 +282,46 @@ structure LDSCModel (m : ℕ) where
   h_ld_adj_pos : ∀ i, 0 ≤ ld_adj i
   h_ld_adj_le_one : ∀ i, ld_adj i ≤ 1
 
-/-- Genetic correlation is defined by the inner product of effects.
+/-- **NAME WRONG — this is cosine similarity, not LD score regression.**
 
-    Empirical status: UNTESTED. -/
+    There is no LD score, no chi-squared, no regression and no intercept in this body, and
+    `LDSCModel.ld_adj` is never touched by it. This is the `hudsonFst` shape: a name asserting
+    a method the body does not implement. Unlike `hudsonFst` it has **no downstream consumer**
+    — grep finds no use outside its own two theorems — so no propagated error exists today and
+    the exposure is prospective.
+
+    **It is the right estimand under conventions nothing states.** Cosine of the *true* effect
+    vectors returns the designed `ρ_g` in every arm (`0.60` designed → `0.591`–`0.605`
+    measured). But that holds only under standardized genotypes, mean-zero effects and linkage
+    equilibrium, none of which is stated, and two exact-rational results show what breaks:
+
+    * **LD alone breaks it.** Two SNPs at `r = 1/2` with joint effects `(1,0)` and `(0,1)` are
+      exactly orthogonal, `ρ_g = 0`. The *marginal* effects are `(1,1/2)` and `(1/2,1)`, giving
+      `cos = 0.8` exactly — and marginal effects are what summary statistics supply.
+    * **It clashes with this corpus's own weighting.** `additiveVariance` weights per-allele
+      effects by `2p(1-p)`; this body weights uniformly. On the same vectors: `0.4714`
+      unweighted against `0.3739` HWE-weighted. `LDSCModel` carries no allele frequencies, so
+      neither weighted estimand is even expressible.
+
+    **It attenuates where LDSC does not.** At true `ρ_g = 0.60` with block-AR(1) LD and no
+    overlap, this body returns `0.529, 0.461, 0.373, 0.161, 0.076` at `M/N = 0.2, 0.5, 1, 4,
+    10` — **13% of the truth at the realistic ratio** — following
+    `ρ_g·∏ₖ√(h²L̄/(h²L̄ + M/Nₖ))`. Genuine bivariate LDSC does not: genetic covariance `0.311 ±
+    0.120` against a true `0.304` at `M/N = 10`. The attenuation is a pure noise effect, not an
+    LD effect; no-LD arms follow the same law.
+
+    **Sample overlap makes this a user-facing error rather than a naming quibble.** At true
+    `ρ_g = 0`, `ρ_e = 0.8`: this body returns `0.007` at no overlap, `0.153` at 50%, and
+    **`0.282` at full overlap — manufactured out of nothing** — while LDSC's intercept absorbs
+    it and its slope reads `-0.002`. On top of a real signal (`ρ_g = 0.30`) full overlap
+    inflates this body to `0.479`, **+60%**, in the direction of `sign(ρ_e)`. The bias is
+    `(M/N)·ρ_pheno/(h²L̄ + M/N)`, growing toward `ρ_pheno` as `M/N` grows. A negative control
+    confirms the mechanism: 100% overlap with `ρ_e = 0` gives `-0.003 ± 0.012`, so it is
+    overlap **times** phenotypic correlation that bites, not overlap alone.
+
+    Empirical status: **NAME FALSIFIED; body VALIDATED as `ρ_g` on true effects under
+    unstated conventions; FALSIFIED as an estimator from summary statistics**
+    (`proofs/validation/ldsc_diff/`). -/
 noncomputable def geneticCorrelationLDSC {m : ℕ} (model : LDSCModel m) : ℝ :=
   (∑ i, model.beta_s i * model.beta_t i) /
     Real.sqrt ((∑ i, model.beta_s i ^ 2) * (∑ i, model.beta_t i ^ 2))
@@ -384,10 +428,22 @@ theorem ldsc_se_decreases_with_n
   · exact Real.sqrt_pos.mpr h_n₁
   · exact Real.sqrt_lt_sqrt (le_of_lt h_n₁) h_more
 
-/-- **Constrained intercept LDSC.**
-    When there's no sample overlap, the intercept should be 1.
-    Constraining it reduces the number of free parameters from k+1 to k,
-    yielding a smaller SE (fewer parameters → tighter estimate). -/
+/-- **Constrained intercept LDSC — DOCSTRING OVERCLAIMS; this theorem is `k < k+1`.**
+
+    The statement contains no standard error. `se_per_param` is a variable name, not a
+    quantity the theorem constrains, so what is proved is that `k` parameters cost less than
+    `k+1` at any positive per-parameter price — arithmetic, not a statement about estimator
+    variance.
+
+    The empirical direction does hold **without** overlap: constrained was tighter in 6 of 7
+    simulated arms. But the docstring's premise, "when there's no sample overlap", is exactly
+    what a user cannot check from summary statistics — and constraining the intercept **under**
+    full overlap returns `ρ̂_g = 1.350` where the truth is `0`. The premise is the whole
+    content and it is unverifiable in the setting the definition serves.
+
+    Empirical status: theorem **PROVED** and trivial; the SE reading is **UNDERPOWERED**
+    (6/7 arms, unweighted OLS without jackknife) and the no-overlap premise is
+    **unverifiable from summary statistics** (`proofs/validation/ldsc_diff/`). -/
 theorem constrained_intercept_more_powerful
     (se_per_param : ℝ) (k : ℕ)
     (h_se : 0 < se_per_param) :

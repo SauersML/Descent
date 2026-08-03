@@ -1,0 +1,74 @@
+{
+ "Q1_per_allele_weighting": {
+  "note": "same population, so the weight w=2p(1-p) is unambiguous",
+  "p": [
+   "1/2",
+   "1/10",
+   "1/4"
+  ],
+  "beta_s": [
+   "1",
+   "2",
+   "-1"
+  ],
+  "beta_t": [
+   "1",
+   "1",
+   "1"
+  ],
+  "lean_cos2": "2/9",
+  "lean_cos": 0.4714045207910317,
+  "hwe_weighted_cos2": "9409/67309",
+  "hwe_weighted_cos": 0.3738825233398451,
+  "equal_exactly": false
+ },
+ "Q1b_frequencies_differ": {
+  "cos2_in_pop_s_metric": "9409/67309",
+  "cos2_in_pop_t_metric": "74529/108145",
+  "metrics_disagree": true,
+  "note": "the Lean body has no frequency argument, so it cannot express either; LDSCModel carries no allele frequencies at all"
+ },
+ "Q2_LD_marginal_vs_joint": {
+  "R": [
+   [
+    "1",
+    "1/2"
+   ],
+   [
+    "1/2",
+    "1"
+   ]
+  ],
+  "joint_beta_s": [
+   "1",
+   "0"
+  ],
+  "joint_beta_t": [
+   "0",
+   "1"
+  ],
+  "cos_joint": 0.0,
+  "cos2_joint": "0",
+  "marginal_beta_s": [
+   "1",
+   "1/2"
+  ],
+  "marginal_beta_t": [
+   "1/2",
+   "1"
+  ],
+  "cos2_marginal": "16/25",
+  "cos_marginal": 0.8,
+  "equal_exactly": false,
+  "verdict": "orthogonal joint effects (rho_g = 0) give a strictly nonzero cosine of marginal effects under LD"
+ },
+ "Q2b_identical_effects_are_safe": {
+  "cos2_joint": "1",
+  "cos2_marginal": "1",
+  "equal_exactly": true
+ },
+ "Q3_bounded_by_one": {
+  "max_cos2_over_2000_rational_draws": "1",
+  "exceeds_one": false
+ }
+}

@@ -156,15 +156,26 @@ def one_rep(cfg, seed):
     z2 = [v * math.sqrt(N2) for v in bh2]
 
     L = cfg["_L"]
-    # univariate LDSC:  E[z^2] = N h2 l / M + 1
-    _, s1 = ols2(L, [v * v for v in z1])
-    _, s2 = ols2(L, [v * v for v in z2])
-    h2a, h2b = s1 * M / N1, s2 * M / N2
-    # bivariate LDSC:  E[z1 z2] = sqrt(N1 N2) rho_G l / M + N_o rho_p/sqrt(N1N2)
-    icpt, sxy = ols2(L, [a * b for a, b in zip(z1, z2)])
-    gcov = sxy * M / math.sqrt(N1 * N2)
-    sxy_c = ols_noint(L, [a * b for a, b in zip(z1, z2)])
-    gcov_c = sxy_c * M / math.sqrt(N1 * N2)
+    prod = [a * b for a, b in zip(z1, z2)]
+    if cfg["_ld_varies"]:
+        # univariate LDSC:  E[z^2] = N h2 l / M + 1
+        _, s1 = ols2(L, [v * v for v in z1])
+        _, s2 = ols2(L, [v * v for v in z2])
+        h2a, h2b = s1 * M / N1, s2 * M / N2
+        # bivariate: E[z1 z2] = sqrt(N1N2) rho_G l/M + N_o rho_p/sqrt(N1N2)
+        icpt, sxy = ols2(L, prod)
+        gcov = sxy * M / math.sqrt(N1 * N2)
+        gcov_c = ols_noint(L, prod) * M / math.sqrt(N1 * N2)
+    else:
+        # No LD => every l_j = 1 => the LDSC regression has no leverage and the
+        # slope is NOT identified.  Fall back to the constrained-intercept
+        # method of moments (intercept fixed at its no-overlap value), which is
+        # what LDSC degenerates to.  Recorded as such.
+        mz1 = sum(v * v for v in z1) / M
+        mz2 = sum(v * v for v in z2) / M
+        h2a, h2b = (mz1 - 1) * M / N1, (mz2 - 1) * M / N2
+        icpt = float("nan")
+        gcov = gcov_c = (sum(prod) / M) * M / math.sqrt(N1 * N2)
 
     def rat(g, x, y):
         d = x * y
@@ -188,15 +199,19 @@ def run_cfg(cfg):
     cfg["_L"] = ld_scores(cfg["M"], cfg["B"], cfg["ld_r"])
     sp = blocks(cfg["M"], cfg["B"])
     cfg["_starts"] = [j == sp[j][0] for j in range(cfg["M"])]
+    cfg["_ld_varies"] = max(cfg["_L"]) - min(cfg["_L"]) > 1e-12
     reps = [one_rep(cfg, cfg["seed"] * 1000 + k) for k in range(cfg["reps"])]
     keys = reps[0].keys()
     out = {"cfg": {k: v for k, v in cfg.items() if not k.startswith("_")}}
     for k in keys:
-        vals = [rp[k] for rp in reps]
+        vals = [rp[k] for rp in reps if math.isfinite(rp[k])]
         n = len(vals)
+        if n == 0:
+            out[k] = {"mean": float("nan"), "se": float("nan"), "n_finite": 0}
+            continue
         m = sum(vals) / n
         sd = math.sqrt(sum((v - m) ** 2 for v in vals) / (n - 1)) if n > 1 else 0.0
-        out[k] = {"mean": m, "se": sd / math.sqrt(n)}
+        out[k] = {"mean": m, "se": sd / math.sqrt(n), "n_finite": n}
     # analytic predictions
     c = out["cfg"]
     M, N1, N2 = c["M"], c["N1"], c["N2"]
