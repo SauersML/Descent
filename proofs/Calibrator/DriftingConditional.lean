@@ -573,10 +573,11 @@ open MeasureTheory ProbabilityTheory in
 theorem gaussianAverage_probit (α β : ℝ) :
     ∫ z, Phi (α + β * z) ∂(gaussianReal 0 1) = Phi (α / Real.sqrt (1 + β ^ 2)) := by
   have hne : (⟨1 + β ^ 2, by positivity⟩ : NNReal) ≠ 0 := by
-    simp only [ne_eq, ← NNReal.coe_eq_zero, NNReal.coe_mk]
-    positivity
+    intro h
+    have h' : (1 + β ^ 2 : ℝ) = 0 := by simpa using congrArg NNReal.toReal h
+    nlinarith [sq_nonneg β]
   rw [gaussianAverage_eq_cdf_sum, cdf_gaussianReal_zero_mean _ hne]
-  norm_num
+  norm_num [NNReal.coe_mk]
 
 open MeasureTheory ProbabilityTheory in
 /-- **Probit is exactly invariant under one Ornstein-Uhlenbeck step**, with the slope contracted
