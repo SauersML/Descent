@@ -394,6 +394,38 @@ end NoAxioms
 section Condensation
 
 /-!
+### A VERIFICATION HAZARD: a green build certifies only the tree that was compiled
+
+Recorded here because it is not a Lean fact and will not be caught by anything in this file,
+and because the failure was silent in the place anyone would look for it.
+
+`lake build` reported **"Build completed successfully (7368 jobs)"** immediately below a
+`git merge` that had **aborted** with "Please commit your changes or stash them before you
+merge." The build was real; it was a build of the tree *without* the commit under test. Read
+bottom-up, it certified work that had never been compiled.
+
+**The corroborating detail was itself the artifact.** The job count had risen, 7364 → 7368,
+which reads as evidence that the new material was picked up. It was not: other modules had
+moved. A number that moves in the expected direction is not confirmation that the expected
+thing happened.
+
+The same shape one level down, in the same session: a relay invocation ending
+`shasum: command not found` returned **exit status 0** while the `&&` chain had died before
+`lake` ever ran, so an empty error list meant "no build" rather than "no errors".
+
+Two habits follow, and they are cheap:
+
+* after any build on a shared checkout, confirm **which tree** was compiled — the module's
+  `.olean` mtime against the wall clock is enough, and it is what settled it here;
+* never read a build verdict from an exit status or from the absence of error lines. Require
+  the positive string, and require it to be *about the file you changed*.
+
+This is the fourth specimen of one disease: evidence that fits while answering a different
+question. It is the one where the false evidence looked like confirmation rather than like
+absence, which is why it is the most dangerous of the four.
+-/
+
+/-!
 ### Concrete specializations of the condensation results
 
 Same policy as the rest of this file: only specializations that instantiate a general
