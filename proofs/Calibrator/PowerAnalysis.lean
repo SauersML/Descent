@@ -47,7 +47,15 @@ section PowerSampleSize
     NCP = n × β² × 2p(1-p) where n is sample size,
     β is effect size, p is allele frequency.
 
-    Empirical status: VALIDATED (mean Wald chi-squared from simulated genotypes, ratio 0.99-1.01). -/
+    Empirical status: VALIDATED (mean Wald chi-squared from simulated genotypes, ratio 0.99-1.01).
+
+    Power: `validation/empirical/popgen_defs/check_stats.py` simulates at
+    `n = 4000` over `p = 0.05, 0.2, 0.5` and `β = 0.05, 0.1`, where this
+    definition predicts `0.95`, `3.80`, `3.20`, `12.80`, `5.00` and `20.00`. The
+    twentyfold span moves in both arguments independently — `β` quadratically,
+    `p` through the genotype variance — so a form missing either factor, or
+    carrying the allelic variance instead of the genotype variance, departs
+    across the grid rather than at one cell. -/
 noncomputable def noncentralityParam (n : ℕ) (beta p : ℝ) : ℝ :=
   n * beta^2 * (2 * p * (1 - p))
 
@@ -92,7 +100,14 @@ theorem ncp_increases_with_n (n₁ n₂ : ℕ) (beta p : ℝ)
     `1 - exp(-ncp/2)`, returns a single number for a nominal test and a genome-wide scan
     alike — at `α = 5·10⁻⁸` with `ncp = 10` that gives `0.993` against a true `0.011`.
 
-    Empirical status: VALIDATED (matches exact non-central chi-squared power to five decimals). -/
+    Empirical status: VALIDATED (matches exact non-central chi-squared power to five decimals).
+
+    Power: across `ncp = 1, 5, 10, 20` this formula predicts `0.2595`, `0.7228`,
+    `0.9354` and `0.9977` at `α = 0.05`, and `0.0000`, `0.0007`, `0.0110` and
+    `0.1638` at `α = 5·10⁻⁸`. The prediction therefore covers essentially the
+    whole `[0, 1]` range of power, and the two thresholds separate by an order
+    of magnitude at every `ncp` — which is exactly what a threshold-free form
+    cannot reproduce. -/
 noncomputable def powerAtThreshold (ncp z_alpha : ℝ) : ℝ :=
   Phi (Real.sqrt ncp - z_alpha)
 

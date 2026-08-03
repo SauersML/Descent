@@ -29,7 +29,8 @@ cannot collide, since this file defines none of these names and the only
 namespace. The remaining `TransportedMetrics.` prefixes in this file are left
 alone; both spellings resolve to the same constant. -/
 open TransportedMetrics (r2FromSignalVariance r2FromSignalVariance_eq_rsquared
-  equalVarianceGaussianAUCFromSignalVariance)
+  equalVarianceGaussianAUCFromSignalVariance
+  equalVarianceGaussianAUCFromSignalVariance_eq_formula_of_ne_noise)
 
 section PortabilityDrift
 
@@ -729,6 +730,19 @@ which carries the assumption in its type;
 noncomputable def targetHetFromFst (het_source fst : ℝ) : ℝ :=
   het_source * (1 - fst)
 
+/-- **The bridge named in the paragraph above**, which until now was named and not stated.
+
+In the closed-population regime the proportional heterozygosity loss over the horizon is
+`1 - retention`, and feeding *that* value to `targetHetFromFst` returns the regime's own
+target heterozygosity. Which value goes in is the entire content: the rearrangement holds
+for every second argument, so it cannot detect a wrong one, and this says which one the
+regime supplies. It is a within-population loss, not a between-population `F_ST`. -/
+theorem ClosedPopulationNoMutation.targetHet_eq_targetHetFromFst
+    (r : ClosedPopulationNoMutation) :
+    r.targetHet = targetHetFromFst r.H₀ (1 - r.retention) := by
+  unfold ClosedPopulationNoMutation.targetHet targetHetFromFst
+  ring
+
 /-- **Present-day PGS variance after drift** from an ancestral variance `V_A`.
 
 **One definition, and it is the composition rather than a re-typed product**: the
@@ -997,6 +1011,18 @@ seed-noise floor). -/
 noncomputable def presentDayEqualVarianceGaussianAUC (V_A V_E fst : ℝ) : ℝ :=
   equalVarianceGaussianAUCFromSignalVariance (presentDayPGSVariance V_A fst) V_E
 
+/-- Exact present-day **equal-variance Gaussian** AUC formula at positive residual
+variance. -/
+theorem presentDayEqualVarianceGaussianAUC_eq
+    (V_A V_E fst : ℝ) (h_env : V_E ≠ 0) :
+    presentDayEqualVarianceGaussianAUC V_A V_E fst =
+      Phi (Real.sqrt (presentDaySignalToNoise V_A V_E fst / 2)) := by
+  rw [presentDayEqualVarianceGaussianAUC,
+    equalVarianceGaussianAUCFromSignalVariance_eq_formula_of_ne_noise _ _ h_env]
+  unfold presentDaySignalToNoise
+  congr 2
+  rw [div_div, mul_comm]
+
 /-- Drift monotonically degrades signal-to-noise when `V_A, V_E > 0`. -/
 theorem drift_degrades_signalToNoise
     (V_A V_E fstS fstT : ℝ)
@@ -1084,7 +1110,8 @@ theorem drift_degrades_AUC_of_strictMono
     (hfst : fstS < fstT)
     (hfstT_le_one : fstT ≤ 1) :
     presentDayEqualVarianceGaussianAUC V_A V_E fstT < presentDayEqualVarianceGaussianAUC V_A V_E fstS := by
-  unfold presentDayEqualVarianceGaussianAUC
+  rw [presentDayEqualVarianceGaussianAUC_eq _ _ _ (ne_of_gt hVE),
+    presentDayEqualVarianceGaussianAUC_eq _ _ _ (ne_of_gt hVE)]
   apply strictMono_Phi
   have hsnr := drift_degrades_signalToNoise V_A V_E fstS fstT hVA hVE hfst
   have hhalf_nonneg : 0 ≤ presentDaySignalToNoise V_A V_E fstT / 2 := by
@@ -1100,13 +1127,6 @@ theorem drift_degrades_AUC_of_strictMono
     nlinarith
   exact Real.sqrt_lt_sqrt hhalf_nonneg hhalf_lt
 
-/-- Exact present-day **equal-variance Gaussian** AUC formula in variance units. -/
-theorem presentDayEqualVarianceGaussianAUC_eq
-    (V_A V_E fst : ℝ) :
-    presentDayEqualVarianceGaussianAUC V_A V_E fst =
-      Phi (Real.sqrt (presentDaySignalToNoise V_A V_E fst / 2)) := by
-  rfl
-
 /-- Drift strictly degrades the exact **equal-variance Gaussian** AUC whenever
 signal variance is positive and target drift exceeds source drift. -/
 theorem drift_degrades_equalVarianceGaussianAUC
@@ -1115,7 +1135,8 @@ theorem drift_degrades_equalVarianceGaussianAUC
     (hfst : fstS < fstT)
     (hfstT_le_one : fstT ≤ 1) :
     presentDayEqualVarianceGaussianAUC V_A V_E fstT < presentDayEqualVarianceGaussianAUC V_A V_E fstS := by
-  unfold presentDayEqualVarianceGaussianAUC
+  rw [presentDayEqualVarianceGaussianAUC_eq _ _ _ (ne_of_gt hVE),
+    presentDayEqualVarianceGaussianAUC_eq _ _ _ (ne_of_gt hVE)]
   apply strictMono_Phi
   have hsnr := drift_degrades_signalToNoise V_A V_E fstS fstT hVA hVE hfst
   have hhalf_nonneg : 0 ≤ presentDaySignalToNoise V_A V_E fstT / 2 := by
@@ -3220,11 +3241,7 @@ theorem neutralAFBenchmarkMetricProfile_eq
   · change
       TransportedMetrics.equalVarianceGaussianAUCFromSignalVariance (presentDayPGSVariance V_A fstTarget) V_E =
         presentDayEqualVarianceGaussianAUC V_A V_E fstTarget
-    unfold presentDayEqualVarianceGaussianAUC TransportedMetrics.equalVarianceGaussianAUCFromSignalVariance
-      presentDaySignalToNoise
-    congr 1
-    congr 1
-    ring_nf
+    rfl
   · change
       TransportedMetrics.calibratedBrier π
         (TransportedMetrics.r2FromSignalVariance (presentDayPGSVariance V_A fstTarget) V_E) =
@@ -3582,9 +3599,19 @@ theorem sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart_of_
       equalVarianceGaussianAUCFromExplainedR2 (r2FromSourceWeights m Pop.source) := by
   have h_source_ne : (m.outcomeVariance Pop.source) ≠ 0 :=
     ne_of_gt (m.outcomeVariance_pos Pop.source)
+  have h_signal_lt :
+      explainedSignalVarianceFromSourceWeights m Pop.source <
+        effectiveOutcomeVariance m Pop.source := by
+    exact (div_lt_one (by simpa using m.outcomeVariance_pos Pop.source)).mp
+      (by simpa [r2FromSourceWeights] using h_r2)
+  have h_residual_ne :
+      residualVarianceFromSourceWeights m Pop.source ≠ 0 := by
+    rw [residualVarianceFromSourceWeights]
+    exact ne_of_gt (sub_pos.mpr h_signal_lt)
   rw [equalVarianceGaussianAUCFromExplainedR2_eq_formula_of_lt_one _ h_r2]
-  unfold equalVarianceGaussianAUCFromSourceWeights equalVarianceGaussianAUCFromSignalVariance
-    residualVarianceFromSourceWeights r2FromSourceWeights
+  rw [equalVarianceGaussianAUCFromSourceWeights,
+    equalVarianceGaussianAUCFromSignalVariance_eq_formula_of_ne_noise _ _ h_residual_ne]
+  unfold residualVarianceFromSourceWeights r2FromSourceWeights
   congr 1
   congr 1
   field_simp [h_source_ne]
@@ -3645,9 +3672,19 @@ theorem targetEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart_of_
       equalVarianceGaussianAUCFromExplainedR2 (r2FromSourceWeights m Pop.target) := by
   have h_eff_ne : effectiveOutcomeVariance m Pop.target ≠ 0 :=
     ne_of_gt (effectiveTargetOutcomeVariance_pos m)
+  have h_signal_lt :
+      explainedSignalVarianceFromSourceWeights m Pop.target <
+        effectiveOutcomeVariance m Pop.target := by
+    exact (div_lt_one (effectiveTargetOutcomeVariance_pos m)).mp
+      (by simpa [r2FromSourceWeights] using h_r2)
+  have h_residual_ne :
+      residualVarianceFromSourceWeights m Pop.target ≠ 0 := by
+    rw [residualVarianceFromSourceWeights]
+    exact ne_of_gt (sub_pos.mpr h_signal_lt)
   rw [equalVarianceGaussianAUCFromExplainedR2_eq_formula_of_lt_one _ h_r2]
-  unfold equalVarianceGaussianAUCFromSourceWeights equalVarianceGaussianAUCFromSignalVariance
-    residualVarianceFromSourceWeights r2FromSourceWeights
+  rw [equalVarianceGaussianAUCFromSourceWeights,
+    equalVarianceGaussianAUCFromSignalVariance_eq_formula_of_ne_noise _ _ h_residual_ne]
+  unfold residualVarianceFromSourceWeights r2FromSourceWeights
   congr 1
   congr 1
   field_simp [h_eff_ne]
@@ -3878,8 +3915,7 @@ theorem equalVarianceGaussianAUCFromExplainedR2_eq_presentDayAUC
     field_simp [hsum_ne, hve_ne]
     ring
   rw [equalVarianceGaussianAUCFromExplainedR2_eq_formula_of_lt_one _ hr2_lt]
-  unfold presentDayEqualVarianceGaussianAUC
-  rw [hchart]
+  rw [presentDayEqualVarianceGaussianAUC_eq _ _ _ hve_ne, hchart]
 
 /-- Full neutral allele-frequency benchmark liability-AUC degradation theorem
 (exact LTM formula): if drift increases (`fstTarget > fstSource`), target AUC

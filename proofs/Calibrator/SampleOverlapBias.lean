@@ -77,7 +77,15 @@ theorem overlap_inflation_positive (r2_true r2_observed : ℝ)
     Convention: `r2_true` is out-of-sample, `h2` is the in-sample value.
 
     Empirical status: VALIDATED in the corrected form (matches simulated mixed
-    R² to three decimals at f = 0.1, 0.25 and 0.5). -/
+    R² to three decimals at f = 0.1, 0.25 and 0.5).
+
+    Power: the overlap fraction is swept fivefold and the prediction is linear
+    in it, so at the in-sample/out-of-sample gap the `f = 0.5` cell measures
+    (`0.105` of inflation, hence a gap near `0.21`) the mixture predicts
+    inflations of `0.021`, `0.053` and `0.105` at `f = 0.1`, `0.25` and `0.5`.
+    The superseded `f (h2 - r2_true) / n_gwas` form predicts `0.000045` at the
+    same last cell, so the design separates them by three orders of magnitude
+    rather than by a margin. -/
 noncomputable def partialOverlapR2 (r2_true h2 : ℝ) (f : ℝ) (_n_gwas : ℕ) : ℝ :=
   (1 - f) * r2_true + f * h2
 
@@ -120,10 +128,9 @@ theorem apparent_portability_loss_includes_overlap
     (h_f_pos : 0 < f)
     (h_n : 0 < n_gwas)
     (h_real_gap : r2_cross < r2_same_true) :
-    let r2_same_with_overlap := partialOverlapR2 r2_same_true h2 f n_gwas
-    r2_cross < r2_same_with_overlap ∧
-    r2_same_with_overlap - r2_cross > r2_same_true - r2_cross := by
-  simp only
+    r2_cross < partialOverlapR2 r2_same_true h2 f n_gwas ∧
+    partialOverlapR2 r2_same_true h2 f n_gwas - r2_cross >
+      r2_same_true - r2_cross := by
   have h_inflation : r2_same_true < partialOverlapR2 r2_same_true h2 f n_gwas := by
     have h0 := no_overlap_unbiased r2_same_true h2 n_gwas
     have hlt := more_overlap_more_inflation r2_same_true h2 0 f n_gwas h_h2 h_n h_f_pos
@@ -225,7 +232,7 @@ theorem kinship_inflates (r2_true K h2_family : ℝ)
     the remaining validation sample size.
 
     We derive: the remaining kinship inflation is bounded by
-    threshold × h²_family (from cross_ancestry_no_kinship_bias),
+    threshold × h²_family (from abs_mul_lt_of_abs_lt_of_le_one),
     while the remaining sample is n_total - n_excluded.
     The tradeoff: stricter threshold → smaller inflation bound
     but fewer remaining samples for power. -/
@@ -246,7 +253,7 @@ theorem grm_threshold_tradeoff
     near-zero kinship, eliminating kinship-based inflation.
     When |K| < ε, the inflation |K × h²_family| < ε × h²_family,
     so the bias is bounded by ε × h²_family. -/
-theorem cross_ancestry_no_kinship_bias
+theorem abs_mul_lt_of_abs_lt_of_le_one
     (K_cross h2_family ε : ℝ)
     (h_ε_pos : 0 < ε)
     (h_K_small : |K_cross| < ε)

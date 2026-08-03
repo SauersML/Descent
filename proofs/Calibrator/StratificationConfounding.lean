@@ -776,7 +776,14 @@ section PowerAnalysis
     the status line is left to this file's owner, since it is a claim-versus-
     evidence question rather than a missing regime.
 
-    Empirical status: VALIDATED (40000-replicate Monte Carlo, ratio 0.99-1.01 for n >= 1000). -/
+    Empirical status: VALIDATED (40000-replicate Monte Carlo, ratio 0.99-1.01 for n >= 1000).
+
+    Power: over the `R² ∈ {0.01, 0.05, 0.2, 0.5}` by `n ∈ {200, 1000, 5000}`
+    grid the predicted variance runs, in units of `10⁻⁴`, from `0.078` at
+    `R² = 0.01, n = 5000` through `1.960`, `5.120` and `9.025` to `25.600` at
+    `R² = 0.2, n = 200` — a spread of more than `300` to `1`. Both arguments
+    move it, and the `R²` direction is non-monotone with a maximum inside the
+    grid, so the `(1 - R²)²` factor is exercised rather than assumed. -/
 noncomputable def r2EstimatorVariance (r2 : ℝ) (n : ℕ) : ℝ :=
   4 * r2 * (1 - r2) ^ 2 / n
 
