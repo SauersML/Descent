@@ -253,7 +253,6 @@ theorem ababFinite_deterministic (m : ℝ) (hm : m ≠ 0) :
     ababFinite 1 1 1 1 m = (2 * (m - 1) + 4 * (m - 2)) / m := by
   unfold ababFinite
   field_simp
-  ring
 
 /-- **The path expression is positive at every finite chain length past two**, so the
     obstruction to freeness is not an asymptotic artifact. -/
