@@ -16,9 +16,10 @@ method-design score: among candidate LD, haplotype, ancestry-tract, or longitudi
 prefer directions with large covariance sensitivity relative to their own noise.  The
 score is invariant to changing genotype coding units and adds across independent probes.
 
-No CLT-to-LAN transfer, Edgeworth hierarchy, universal support-floor model, or minimax
-constant is asserted here. Those require a named statistical experiment and uniform
-regularity.
+The known-mean centered Gaussian covariance experiment is derived below from its second
+and fourth moments, including its exact information--variance constant. No CLT-to-LAN
+transfer, Edgeworth hierarchy, universal support-floor model, or general minimax constant
+is asserted. Those require a separately named experiment and uniform regularity.
 -/
 
 open scoped BigOperators
@@ -26,6 +27,43 @@ open scoped BigOperators
 /-- One-dimensional Gaussian covariance permeability. -/
 noncomputable def scalarPermeability (covariance covarianceDerivative : ℝ) : ℝ :=
   (1 / 2 : ℝ) * (covarianceDerivative / covariance) ^ 2
+
+/-! ## The named Gaussian covariance experiment -/
+
+/-- Variance of a centered square from its second and fourth raw moments. -/
+noncomputable def centeredSquareVarianceFromMoments
+    (secondMoment fourthMoment : ℝ) : ℝ :=
+  fourthMoment - secondMoment ^ 2
+
+/-- A centered Gaussian variable of variance `Σ` has square variance `2Σ²`.  This is the
+moment identity that fixes the constant in Gaussian covariance information. -/
+theorem centeredSquareVariance_gaussian (covariance : ℝ) :
+    centeredSquareVarianceFromMoments covariance (3 * covariance ^ 2) =
+      2 * covariance ^ 2 := by
+  unfold centeredSquareVarianceFromMoments
+  ring
+
+/-- Second moment of the Gaussian covariance score, expressed only through raw moments.
+For covariance tangent `Γ`, the score is
+`Γ (X² - Σ) / (2Σ²)`, so its second moment is the coefficient squared times
+`Var(X²)`. -/
+noncomputable def covarianceScoreInformationFromMoments
+    (covariance covarianceDerivative secondMoment fourthMoment : ℝ) : ℝ :=
+  (covarianceDerivative / (2 * covariance ^ 2)) ^ 2 *
+    centeredSquareVarianceFromMoments secondMoment fourthMoment
+
+/-- **Derivation of permeability from the Gaussian experiment.** Substituting
+`E[X²]=Σ` and `E[X⁴]=3Σ²` into the covariance score gives exactly
+`p = (1/2)(Γ/Σ)²`; the factor `1/2` is therefore already inside `p`. -/
+theorem covarianceScoreInformation_gaussian
+    (covariance covarianceDerivative : ℝ) (hcovariance : covariance ≠ 0) :
+    covarianceScoreInformationFromMoments covariance covarianceDerivative
+        covariance (3 * covariance ^ 2) =
+      scalarPermeability covariance covarianceDerivative := by
+  unfold covarianceScoreInformationFromMoments scalarPermeability
+  rw [centeredSquareVariance_gaussian]
+  field_simp [hcovariance]
+  ring
 
 /-- Permeability is non-negative. -/
 theorem scalarPermeability_nonneg (covariance covarianceDerivative : ℝ) :
@@ -93,6 +131,66 @@ effective cohort size; an actual study rounds the resulting requirement upward. 
 noncomputable def totalGaussianInformation
     (m covariance covarianceDerivative : ℝ) : ℝ :=
   m * scalarPermeability covariance covarianceDerivative
+
+/-- Variance of the known-mean Gaussian method-of-moments estimator for a one-dimensional
+covariance tangent, based on `m` independent draws.  Since `Var(X²)=2Σ²`, dividing the
+sample square fluctuation by the covariance response `Γ` gives `2Σ²/(mΓ²)`.
+
+This is an exact finite-sample variance in the centered Gaussian experiment when the mean
+is known. Estimating the mean, dependence between draws, and non-Gaussian fourth moments
+change the experiment and must be handled separately. -/
+noncomputable def gaussianCovarianceTangentEstimatorVariance
+    (m covariance covarianceDerivative : ℝ) : ℝ :=
+  2 * covariance ^ 2 / (m * covarianceDerivative ^ 2)
+
+/-- The named Gaussian tangent-estimator variance is positive for a positive replicate
+budget, positive covariance, and a nonzero covariance response. -/
+theorem gaussianCovarianceTangentEstimatorVariance_pos
+    (m covariance covarianceDerivative : ℝ)
+    (hm : 0 < m) (hcovariance : 0 < covariance)
+    (hderivative : covarianceDerivative ≠ 0) :
+    0 < gaussianCovarianceTangentEstimatorVariance
+      m covariance covarianceDerivative := by
+  unfold gaussianCovarianceTangentEstimatorVariance
+  positivity
+
+/-- **Exact information--variance reciprocity.** In the centered Gaussian covariance
+experiment, the method-of-moments tangent estimator attains reciprocal total information:
+
+`m · p · Var(θ̂) = 1`.
+
+Because `p` already contains the Gaussian factor `1/2`, the corresponding variance is
+`1/(m p)`, not `1/(2 m p)`. Any additional half in a closing risk law must come from an
+explicitly half-scaled loss, not from Fisher information. -/
+theorem totalGaussianInformation_mul_estimatorVariance
+    (m covariance covarianceDerivative : ℝ)
+    (hm : m ≠ 0) (hcovariance : covariance ≠ 0)
+    (hderivative : covarianceDerivative ≠ 0) :
+    totalGaussianInformation m covariance covarianceDerivative *
+      gaussianCovarianceTangentEstimatorVariance
+        m covariance covarianceDerivative = 1 := by
+  unfold totalGaussianInformation scalarPermeability
+    gaussianCovarianceTangentEstimatorVariance
+  field_simp [hm, hcovariance, hderivative]
+  ring
+
+/-- Equivalent reciprocal form of
+`totalGaussianInformation_mul_estimatorVariance`. -/
+theorem gaussianCovarianceTangentEstimatorVariance_eq_inv_information
+    (m covariance covarianceDerivative : ℝ)
+    (hm : m ≠ 0) (hcovariance : covariance ≠ 0)
+    (hderivative : covarianceDerivative ≠ 0) :
+    gaussianCovarianceTangentEstimatorVariance m covariance covarianceDerivative =
+      1 / totalGaussianInformation m covariance covarianceDerivative := by
+  have hp : scalarPermeability covariance covarianceDerivative ≠ 0 := by
+    intro hzero
+    exact hderivative ((scalarPermeability_eq_zero_iff hcovariance).mp hzero)
+  have hinfo : totalGaussianInformation m covariance covarianceDerivative ≠ 0 := by
+    exact mul_ne_zero hm hp
+  apply (eq_div_iff hinfo).2
+  simpa [mul_comm] using
+    totalGaussianInformation_mul_estimatorVariance
+      m covariance covarianceDerivative hm hcovariance hderivative
 
 /-- **Exact inverse-square cohort law.** If imperfect tagging, assay sensitivity, or
 conditional support attenuates a covariance derivative by a nonzero factor `η`, then
