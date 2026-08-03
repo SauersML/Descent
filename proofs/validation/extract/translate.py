@@ -843,6 +843,13 @@ def translate_def(d, struct_arg_names=(), fname=None, resolver=None,
     # …`).  Bind each referenced dimension to the length of the argument that
     # carries it, before any other statement.
     for dimvar, lenexpr in (dims or {}).items():
+        # A dimension key is not always a NAME.  `Fin 3 → ℝ` keys on the literal
+        # "3", and binding it emitted `3 = float(len(f))`, a SyntaxError that
+        # took the whole generated module down with it -- every definition in
+        # the corpus became unavailable because one had a fixed dimension.
+        # A literal needs no binding: it already denotes itself in the body.
+        if not dimvar.isidentifier():
+            continue
         if re.search(rf"(?<![\w']){re.escape(dimvar)}(?![\w'])", d["body"]):
             lines.append(f"    {pyname(dimvar)} = float({lenexpr})")
     for s in stmts:
