@@ -504,6 +504,7 @@ theorem invHeterozygosity_ge_rare_boundary (q : ℝ)
     (hq0 : 0 < q) (hq1 : q < 1) :
     1 / (2 * q) ≤ invHeterozygosity q := by
   unfold invHeterozygosity
+  have h1q : 0 < 1 - q := by linarith
   apply one_div_le_one_div_of_le
   · positivity
   · nlinarith [sq_nonneg q]
