@@ -39,6 +39,26 @@ namespace Problem
 variable {parameterCount actionCount observationCount : ℕ}
     (E : Problem parameterCount actionCount observationCount)
 
+/-- Forget the action/loss layer while retaining the exact observation kernel
+used by the decision problem.  A target and its graded moment probes then make
+that same kernel into a genuine mixture-certificate experiment. -/
+noncomputable def toMixtureExperiment
+    (target : Fin (parameterCount + 1) → ℝ)
+    (moment : ℕ → Fin (parameterCount + 1) → ℝ) :
+    FiniteMixtureExperiment parameterCount observationCount where
+  target := target
+  moment := moment
+  observation := E.observation
+
+/-- The bridge is law-preserving: the certificate layer and the decision
+layer use exactly the same prior-predictive observation law. -/
+@[simp] theorem toMixtureExperiment_mixture
+    (target : Fin (parameterCount + 1) → ℝ)
+    (moment : ℕ → Fin (parameterCount + 1) → ℝ)
+    (π : FinitePrior parameterCount) :
+    (E.toMixtureExperiment target moment).mixture π =
+      π.bind E.observation := rfl
+
 /-- Frequentist risk at one parameter value. -/
 noncomputable def risk
     (δ : Rule actionCount observationCount)
