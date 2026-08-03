@@ -138,9 +138,9 @@ theorem invariantAverage_annihilates_generator {n : ℕ}
   have hstep : ∀ i : Fin n, ϖ i * (∑ j, L i j * u j) = ∑ j, ϖ i * L i j * u j := by
     intro i
     rw [Finset.mul_sum]
-    exact Finset.sum_congr rfl fun j _ => by ring
-  rw [Finset.sum_congr rfl fun i _ => hstep i, Finset.sum_comm]
-  refine Finset.sum_eq_zero fun j _ => ?_
+    exact Finset.sum_congr rfl fun j _ ↦ by ring
+  rw [Finset.sum_congr rfl fun i _ ↦ hstep i, Finset.sum_comm]
+  refine Finset.sum_eq_zero fun j _ ↦ ?_
   rw [← Finset.sum_mul, hinv j, zero_mul]
 
 /-- **The threshold's velocity is minus the invariant average of the linked curve's motion.**
@@ -162,7 +162,7 @@ theorem threshold_velocity_eq_neg_invariantAverage_drift {n : ℕ}
     intro i
     rw [hdyn i]
     ring
-  rw [Finset.sum_congr rfl fun i _ => hsplit i, Finset.sum_sub_distrib,
+  rw [Finset.sum_congr rfl fun i _ ↦ hsplit i, Finset.sum_sub_distrib,
     invariantAverage_annihilates_generator ϖ L u hinv, ← Finset.mul_sum, hmass]
   ring
 
@@ -182,7 +182,7 @@ theorem constantForcing_conflates_threshold {n : ℕ}
     intro i
     rw [hdyn i]
     ring
-  rw [Finset.sum_congr rfl fun i _ => hsplit i, Finset.sum_add_distrib,
+  rw [Finset.sum_congr rfl fun i _ ↦ hsplit i, Finset.sum_add_distrib,
     invariantAverage_annihilates_generator ϖ L u hinv, ← Finset.mul_sum, hmass]
   ring
 
@@ -200,10 +200,10 @@ theorem continuousInvariant_eq_at_limit {H : Type*} [TopologicalSpace H] [T2Spac
     (hinv : ∀ t, Phi (flow t) = Phi (flow 0))
     (hconv : Filter.Tendsto flow Filter.atTop (nhds limit)) :
     Phi (flow 0) = Phi limit := by
-  have hcomp : Filter.Tendsto (fun t => Phi (flow t)) Filter.atTop (nhds (Phi limit)) :=
+  have hcomp : Filter.Tendsto (fun t ↦ Phi (flow t)) Filter.atTop (nhds (Phi limit)) :=
     (hPhi.tendsto limit).comp hconv
-  have hconst : Filter.Tendsto (fun t => Phi (flow t)) Filter.atTop (nhds (Phi (flow 0))) := by
-    simpa [hinv] using tendsto_const_nhds (x := Phi (flow 0)) (f := Filter.atTop (α := ℝ))
+  have hconst : Filter.Tendsto (fun t ↦ Phi (flow t)) Filter.atTop (nhds (Phi (flow 0))) := by
+    simp [hinv]
   exact tendsto_nhds_unique hconst hcomp
 
 /-! ## Interior estimates: the interpolation bound with constant one -/
@@ -221,11 +221,12 @@ noncomputable def errorEnergy {n : ℕ} (w lam : Fin n → ℝ) (t : ℝ) : ℝ 
     errors and cannot blow up in the interior. -/
 theorem interiorError_sq_le_mul_endpoints {n : ℕ} (w lam : Fin n → ℝ) (t₁ t₂ : ℝ)
     (hw : ∀ k, 0 ≤ w k) :
-    errorEnergy w lam ((t₁ + t₂) / 2) ^ 2 ≤ errorEnergy w lam t₁ * errorEnergy w lam t₂ := by
+    errorEnergy w lam ((t₁ + t₂) / 2) ^ 2 ≤
+      errorEnergy w lam t₁ * errorEnergy w lam t₂ := by
   have key := Finset.sum_mul_sq_le_sq_mul_sq Finset.univ
-    (fun k : Fin n => Real.sqrt (w k * Real.exp (-(2 * lam k * t₁))))
-    (fun k : Fin n => Real.sqrt (w k * Real.exp (-(2 * lam k * t₂))))
-  have hnn : ∀ (k : Fin n) (r : ℝ), 0 ≤ w k * Real.exp r := fun k r =>
+    (fun k : Fin n ↦ Real.sqrt (w k * Real.exp (-(2 * lam k * t₁))))
+    (fun k : Fin n ↦ Real.sqrt (w k * Real.exp (-(2 * lam k * t₂))))
+  have hnn : ∀ (k : Fin n) (r : ℝ), 0 ≤ w k * Real.exp r := fun k r ↦
     mul_nonneg (hw k) (Real.exp_pos r).le
   have hexp : ∀ k : Fin n,
       Real.exp (-(2 * lam k * t₁)) * Real.exp (-(2 * lam k * t₂))
@@ -249,12 +250,13 @@ theorem interiorError_sq_le_mul_endpoints {n : ℕ} (w lam : Fin n → ℝ) (t�
     rw [hcollect, Real.sqrt_sq (hnn k _)]
   have hsq₁ : ∀ k : Fin n,
       Real.sqrt (w k * Real.exp (-(2 * lam k * t₁))) ^ 2 = w k * Real.exp (-(2 * lam k * t₁)) :=
-    fun k => Real.sq_sqrt (hnn k _)
+    fun k ↦ Real.sq_sqrt (hnn k _)
   have hsq₂ : ∀ k : Fin n,
       Real.sqrt (w k * Real.exp (-(2 * lam k * t₂))) ^ 2 = w k * Real.exp (-(2 * lam k * t₂)) :=
-    fun k => Real.sq_sqrt (hnn k _)
-  rw [Finset.sum_congr rfl fun k _ => hprod k, Finset.sum_congr rfl fun k _ => hsq₁ k,
-    Finset.sum_congr rfl fun k _ => hsq₂ k] at key
+    fun k ↦ Real.sq_sqrt (hnn k _)
+  rw [Finset.sum_congr rfl fun k _ ↦ hprod k,
+    Finset.sum_congr rfl fun k _ ↦ hsq₁ k,
+    Finset.sum_congr rfl fun k _ ↦ hsq₂ k] at key
   exact key
 
 /-- **A single mode attains the bound**, so the constant one cannot be improved: the hardest data

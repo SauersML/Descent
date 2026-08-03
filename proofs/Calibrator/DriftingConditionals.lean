@@ -105,6 +105,42 @@ theorem transportedResponse_prevalence_conserved
     _ = ∑ x, markedMass population response x :=
       transportMass_total P (markedMass population response) hP
 
+/-! ## A stationary marginal does not identify the conditional -/
+
+/-- A response concentrated in ancestry state zero. -/
+def stateZeroResponse (i : Fin 2) : ℝ := if i = 0 then 1 else 0
+
+/-- A response concentrated in ancestry state one. -/
+def stateOneResponse (i : Fin 2) : ℝ := if i = 1 then 1 else 0
+
+/-- The uniform two-state population remains positive under the kernel that
+never moves. -/
+theorem transportMass_stayKernel_uniformTwo_pos (y : Fin 2) :
+    0 < transportMass stayKernel uniformTwo y := by
+  fin_cases y <;>
+    norm_num [transportMass, stayKernel, uniformTwo, Fin.sum_univ_two]
+
+/-- **A stationary marginal carries no information about the conditional.**
+
+    The same uniform population and the same stationary transport support two
+    opposite response curves. Their transported population marginals agree at
+    every state, while their transported responses at state zero are `1` and
+    `0`. This is a concrete, non-vacuous counterexample to unconditional
+    reconstruction of a conditional from a stationary marginal path. -/
+theorem stationaryMarginal_does_not_identify_conditional :
+    (∀ y, transportMass stayKernel uniformTwo y = uniformTwo y) ∧
+      transportedResponse stayKernel uniformTwo stateZeroResponse
+          transportMass_stayKernel_uniformTwo_pos 0 = 1 ∧
+      transportedResponse stayKernel uniformTwo stateOneResponse
+          transportMass_stayKernel_uniformTwo_pos 0 = 0 := by
+  constructor
+  · intro y
+    fin_cases y <;>
+      norm_num [transportMass, stayKernel, uniformTwo, Fin.sum_univ_two]
+  · constructor <;>
+      norm_num [transportedResponse, transportMass, markedMass, uniformTwo,
+        stayKernel, stateZeroResponse, stateOneResponse, Fin.sum_univ_two]
+
 /-! ## Two-state local-ancestry switching -/
 
 /-- Symmetric switching between two local-ancestry or haplotype states. -/
