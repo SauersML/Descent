@@ -113,7 +113,57 @@ From `RflScan.lean` at the elaborated environment, not from text.
                                      asserts the profile's brier field IS the
                                      Bernoulli closed form pi(1-pi)(1-R2)
 
-  C -- 0.   D -- 0 in this slice.
+  C -- 0.   D -- 0.   E -- 0 in this slice.
+
+  A PREDICTION ABOUT THIS LIST WAS MADE AND WAS WRONG, WHICH IS USEFUL: the
+  other auditor expected only TWO of the `_uses_ploidy` family to appear here,
+  reasoning that the rest close by `unfold ...; ring`. THREE appear. Checked
+  against the source: `neutralPortability`, `stabilizingPortability` AND
+  `diversifyingPortability` are all written `:= by rfl`, while `pgsMean`,
+  `fisherAverageEffect` and `sharedLDRetention` close by `ring`/`ring_nf`.
+  The scan split one family correctly along that line without being told the
+  family existed, which is the best positive control it has had: it
+  discriminated WITHIN a group of six near-identical theorems.
+
+=== THE BODY-REFERENCE TEST FAILS IN BOTH DIRECTIONS. IT HAS NO SAFE SIDE. ===
+
+This is the most important caveat in the file and it was contributed by the
+agent auditing the other half.
+
+    D  is mechanically B, where the truth is "wrong pairing"  -> errs toward KEEP
+    the ploidy family is mechanically A, where the truth is B -> errs toward DELETE
+
+SO THE DISCRIMINATOR'S VERDICT CARRIES NO DIRECTIONAL SAFETY IN EITHER
+DIRECTION. It cannot be used as "when in doubt it fails safe", because its two
+known failure modes point opposite ways. It is a triage aid, never a decision.
+
+REPLACEMENT TEST FOR CONVENTION-PINNING THEOREMS, which is cheaper and needs no
+proof term at all:
+
+    DOES THE DEFINITION INLINE THE CONSTANT, OR REFERENCE THE CONVENTION?
+
+    inlines   -> the theorem is the LAST EDGE between the literal and the name,
+                 and by the connectivity invariant a last edge is never
+                 redundant however trivial its proof.  BUCKET B.
+    references -> the theorem restates the definition.  BUCKET A.
+
+Verified across the whole `_uses_ploidy` family: `neutralPortability` is
+`r2_0 * max 0 (1 - 2 * fst)`, `pgsMean` sums `beta i * (2 * p i)`,
+`fisherAverageEffect` is `a + d * (1 - 2 * p)`, `sharedLDRetention` is
+`exp (-2 * recomb * t_div)`. NOT ONE OF THEM REFERENCES `ploidy`. Every one
+inlines the literal, so every one of those theorems is a tripwire and none may
+be collapsed.
+
+=== A FIFTH FLAVOUR: ADVERTISING A HYPOTHESIS IT DOES NOT HAVE ===
+
+  E. rfl-provable, TRUE, and CLAIMING A CONDITION THAT DOES NO WORK.
+     `targetR2FromNeutralAFBenchmark_self` was documented as holding "at zero
+     divergence". The equality holds at EVERY `fst`, because the definition IS
+     `presentDayR2`. The docstring advertised a hypothesis the statement does
+     not have, which is the same disease as a guard written `|se - se|`: a
+     condition that appears to do work and does not.
+     E is invisible to every test here because the defect is in the PROSE, not
+     the term. Only reading the docstring against the statement finds it.
 
 === THE PLOIDY FAMILY REFINES THE DISCRIMINATOR, AGAINST MY OWN EXPECTATION ===
 
