@@ -810,9 +810,9 @@ theorem fstMutationDriftTransient_at_zero (θ Ne : ℝ) :
 /-- **Mutation introduces new population-specific variants over time.**
     The expected number of new mutations per generation per locus is 2Neμ = θ/2.
 
-    **The body is a count of mutations ARISING, and the second sentence of the original
-    docstring was wrong.** It read "the expected number of new *segregating sites* is ~θt/2".
-    Segregating sites saturate at Watterson's `θ·Σ(1/i)`; mutations arising do not.
+    **The body counts mutations ARISING, and never segregating sites.** Reading `θt/2`
+    as the expected number of new segregating sites is FALSIFIED. Segregating sites
+    saturate at Watterson's `θ·Σ(1/i)`, and mutations arising do not.
     Infinite-sites simulation at `Ne = 50`, `t = 1200`, 16 replicates:
 
     | `θ` | arisen (measured) | this body | segregating (measured) | Watterson |
@@ -852,14 +852,15 @@ theorem expectedNewMutations_increases_with_time (θ t₁ t₂ : ℝ)
 together with `sharedLDFraction_pos`, `sharedLDFraction_le_one` and
 `sharedLDFraction_decreases_with_time`.**
 
-The exponent was a **count of mutations**, not a dimensionless rate: simulation measures
-`599.9` mutations arisen at `θ = 1, t = 1200`, so the body evaluated to `exp(-600) ≈ 1e-261`,
-and to `exp(-2424)` at `θ = 4`. A quantity called "the fraction of LD shared between
-populations" was therefore identically zero to machine precision for any locus older than
-roughly `60/θ` generations. Nothing in the corpus derives an `exp(-N_mutations)` law, and the
-regime in which the expression looks plausible (`θt/2 ~ 1`) exists only for a per-*site* `θ`
-and vanishes at locus scale. No corrected replacement exists, so the name is simply gone;
-LD erosion by recombination is `Calibrator.LDDecayTheory`, not this.
+This definition is absent on purpose. Its exponent is a **count of mutations**, not a
+dimensionless rate: simulation measures `599.9` mutations arisen at `θ = 1, t = 1200`, so
+the body evaluates to `exp(-600) ≈ 1e-261`, and to `exp(-2424)` at `θ = 4`. A quantity
+called "the fraction of LD shared between populations" is therefore identically zero to
+machine precision for any locus older than roughly `60/θ` generations. Nothing in the
+corpus derives an `exp(-N_mutations)` law, and the regime in which the expression looks
+plausible (`θt/2 ~ 1`) exists only for a per-*site* `θ` and vanishes at locus scale. No
+corrected replacement exists. For LD erosion by recombination use
+`Calibrator.LDDecayTheory`.
 
 Measured in `proofs/validation/coalescent_diff/`. -/
 
@@ -1089,73 +1090,64 @@ theorem fstMigrationMutation_lt_mutationOnly (Ne m μ : ℝ)
 /-! ### Stepping-Stone Model Foundations -/
 
 /-- **Characteristic length of one-dimensional isolation by distance.**
-    `L = √(m / (2·μ))`, in demes. This is the Malécot / Kimura-Weiss decay
-    scale: in an infinite linear array of demes with nearest-neighbour
-    migration rate `m` and mutation rate `μ`, the probability that two genes
-    sampled `d` demes apart are identical by descent falls off as `exp(-d/L)`.
+    `L = √(m·σ² / (2·μ))`, in units of the deme spacing. This is the Malécot /
+    Kimura-Weiss decay scale: in an infinite linear array of demes with
+    nearest-neighbour migration rate `m`, dispersal variance `σ²` and mutation
+    rate `μ`, the probability that two genes sampled `d` demes apart are
+    identical by descent falls off as `exp(-d/L)`.
 
-    It is the balance point of two rates. Over a stretch of `L` demes a lineage
-    diffuses in time `L²/m`; identity is destroyed by mutation in the two
-    lineages at rate `2·μ`. Setting `L²/m = 1/(2·μ)` gives this body, and
+    It is the balance point of two rates. At unit dispersal variance a lineage
+    crosses a stretch of `L` demes in time `L²/m`, while mutation destroys
+    identity in the two lineages at rate `2·μ`. Setting `L²/m = 1/(2·μ)` gives
+    this body, and
     `steppingStoneCharacteristicLength_balances_mutation` states exactly that.
 
-    **This is a correction.** The previous body was `√(2·Nₑ·m)`: it contained
-    the deme size and no mutation rate. That is not a mis-set constant, it is
-    the wrong function. `√(2·Nₑ·m)` is not even a length -- `Nₑ` is a count of
-    individuals, so the expression has units of √individuals, while `m/(2μ)` is
-    a ratio of two per-generation rates and is dimensionless as a squared deme
-    count must be. Diagnostically the two disagree on both axes that matter:
-    the old body is constant in `μ` where the true scale goes as `μ^(-1/2)`,
-    and grows as `√Nₑ` where the true scale does not depend on `Nₑ` at all.
-    `validation/differential/heavy/h1_stepping_stone_length.py` measures those
-    two exponents and is retained as the standing check on this definition.
+    **The mutation rate is mandatory and the deme size does not enter.** The
+    form `√(2·Nₑ·m)` carries the deme size and no mutation rate. That is not a
+    mis-set constant, it is the wrong function. `√(2·Nₑ·m)` is not even a
+    length: `Nₑ` is a count of individuals, so the expression has units of
+    √individuals, while `m/(2μ)` is a ratio of two per-generation rates and is
+    dimensionless, as a squared deme count must be. The two forms disagree on
+    both axes that matter. `√(2·Nₑ·m)` is constant in `μ` where the true scale
+    goes as `μ^(-1/2)`, and grows as `√Nₑ` where the true scale does not depend
+    on `Nₑ` at all. `validation/differential/heavy/h1_stepping_stone_length.py`
+    measures those two exponents and is the standing check on this definition.
 
-    **REGIME: unit dispersal variance, `σ² = 1`.** The general
-    Kimura-Weiss scale is `L = σ·√(m/(2μ))`, in units of the deme spacing. This
-    body takes `σ² = 1` and says so nowhere -- there is no `σ_sq` argument for
-    it to say it with, while BOTH siblings in this family carry one explicitly:
-    `DemographicHistory.demoSteppingStoneFst (d Ne m σ_sq)` and
-    `DemographicHistory.steppingStoneDiffusionTimescale (d σ_sq m)`. A mentions
-    query over all 22 occurrences found no call site that supplies a dispersal
-    variance and no docstring that states the assumption, so the assumption was
-    being made by every caller and written down by none. `L` scales as `σ`, so
-    a habitat with `σ² = 4` has a decay length twice this one -- a factor, not
-    a rounding.
+    **The dispersal variance is an explicit argument, and it is load-bearing.**
+    `L` scales as `σ`, so a habitat with `σ² = 4` has a decay length twice that
+    of one with `σ² = 1` -- a factor, not a rounding. A body that fixes `σ² = 1`
+    has no argument with which to state the assumption, so every caller makes it
+    and none writes it down.
 
     Regime: mutation-limited, i.e. distances comparable to `L`. Below `L`,
     isolation by distance is governed instead by the mutation-free coalescent
     result `DemographicHistory.demoSteppingStoneFst`, which is a different
     function and is derived separately.
 
-    Measured on every axis that distinguishes it from the body it replaced:
-    `d log L / d log μ = -0.502` against the old body's `0`,
-    `d log L / d log Nₑ = -0.000` against the old `+1/2`, and
-    `d log L / d log m = +0.510`. The corrected form is confirmed and the old
-    one is excluded on two independent axes rather than one.
+    Measured on every axis that separates this body from `√(2·Nₑ·m)`:
+    `d log L / d log μ = -0.502` against that form's `0`,
+    `d log L / d log Nₑ = -0.000` against its `+1/2`, and
+    `d log L / d log m = +0.510`. This body is confirmed and `√(2·Nₑ·m)` is
+    excluded on two independent axes rather than one.
 
-    Empirical status: FORMULA CORRECTED AND MEASURED on all three axes above;
-    the corrected form is the published Kimura-Weiss result. The `σ² = 1`
-    assumption has now been MEASURED and it is load-bearing:
+    Empirical status: MEASURED on all three axes above, and the body is the
+    published Kimura-Weiss result. The dispersal-variance axis is MEASURED too:
     `d log L / d log σ² = +0.475` against `0` for a body without `σ²`, and the
-    errors at `σ² ≠ 1` are `-26.9%` at `σ² = 2` and `-49.3%` at `σ² = 4`. So
-    `σ²` is now an argument and the body is `√(m·σ²/(2μ))`; the previous body
-    is exactly its `σ² = 1` slice.
+    error from omitting `σ²` is `-26.9%` at `σ² = 2` and `-49.3%` at `σ² = 4`.
 
-    Why that measurement is decisive where an earlier one was not. A convention
-    difference -- infinite-alleles versus infinite-sites, say -- multiplies `μ`
-    by a constant, which rescales every `L` UNIFORMLY AND CANNOT MOVE AN
-    EXPONENT. An earlier +44% discrepancy on this definition dissolved into
-    exactly such a convention artefact because it was a constant factor. An
-    exponent is immune to that entire class of explanation, which is why the
-    `σ²` axis settles it and why it was worth waiting for rather than
+    Why an exponent is the decisive measurement here. A convention difference --
+    infinite-alleles versus infinite-sites, say -- multiplies `μ` by a constant,
+    which rescales every `L` UNIFORMLY AND CANNOT MOVE AN EXPONENT. A
+    constant-factor discrepancy on this definition, of the +44% size seen here,
+    therefore admits a convention artefact as its whole explanation and settles
+    nothing. An exponent is immune to that entire class of explanation, which is
+    why the `σ²` axis settles the question and is worth waiting for rather than
     estimating. The measured `+0.475` is the diffusion balance's `+1/2`.
 
-    Signature consistency: both siblings already carry a dispersal variance --
+    Signature consistency: both siblings carry a dispersal variance --
     `DemographicHistory.demoSteppingStoneFst (d Ne m σ_sq)` and
     `DemographicHistory.steppingStoneDiffusionTimescale (d σ_sq m)` -- so this
-    restores the family rather than adding a novelty. A mentions query found no
-    call site supplying one, so no caller was silently wrong and all become
-    able to express it. -/
+    signature matches the family. -/
 noncomputable def steppingStoneCharacteristicLength (m σ_sq μ : ℝ) : ℝ :=
   Real.sqrt (m * σ_sq / (2 * μ))
 
@@ -1242,12 +1234,12 @@ meeting time under the `T/(T+2Nₑ)` map cannot produce `1 - exp(-d/L)` for any
 mutation scale at all. The exponential had no derivation anywhere in the
 corpus and no theorem tying it to anything.
 
-Its three theorems -- `continuousSteppingStoneFst_nonneg`,
-`_increases`, `_decreases_with_L` -- were deleted with it. They were true of
-the body as written, and that is the point: all three are monotonicity and
-sign facts, which `d/(d + 4Nₑmσ²)` satisfies equally, so none of them could
-have detected that the functional form was wrong. Callers wanting a
-stepping-stone F_ST should use `demoSteppingStoneFst`. -/
+Its three theorems -- `continuousSteppingStoneFst_nonneg`, `_increases` and
+`_decreases_with_L` -- are absent with it, and their absence carries the
+lesson. All three are monotonicity and sign facts, true of the exponential body
+as written, and `d/(d + 4Nₑmσ²)` satisfies them equally. Facts of that shape
+cannot detect a wrong functional form. Callers wanting a stepping-stone F_ST
+should use `demoSteppingStoneFst`. -/
 
 /-! ### Allele Frequency Homogenization by Migration -/
 

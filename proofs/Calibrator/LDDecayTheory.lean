@@ -479,10 +479,9 @@ theorem driftLDEquilibrium_isFixedPoint (Ne c : ℝ)
   rw [driftLDStep_affine, ← driftLDEquilibrium_mul_one_sub_retention Ne c h_ne]
   ring
 
-/-- **Without recombination the equilibrium really is `1`.**  This records the
-    exact regime in which the deleted formula's limit was correct, and therefore
-    the exact sense in which it was wrong everywhere else: `c = 0` is the only
-    point at which drift-generated identity rises to one. -/
+/-- **Without recombination the equilibrium really is `1`.**  `c = 0` is the only
+    point at which drift-generated identity rises to one, so an equilibrium
+    formula that returns `1` at positive `c` is wrong there. -/
 theorem driftLDEquilibrium_zero_recomb (Ne : ℝ) (hNe : 0 < Ne) :
     driftLDEquilibrium Ne 0 = 1 := by
   have hb : (0 : ℝ) < 1 / (2 * Ne) := div_pos one_pos (by linarith)
@@ -886,14 +885,14 @@ section ExpansionLD
 /-- **Per-generation drift rate at effective size Ne**, `1/(2Ne)`. Larger Ne means
     slower drift.
 
-    **This is not the fraction of LD lost per generation**, which is what this
-    declaration used to be called -- `ldDecayRatePerGen` -- and what its headline used to
-    say. For that use `ldRetentionPerGen`, which takes the recombination rate this body
-    omits.
+    **This is not the fraction of LD lost per generation.** For that use
+    `ldRetentionPerGen`, which takes the recombination rate this body omits. The name
+    `ldDecayRatePerGen` is absent on purpose: reading `1/(2Ne)` as a rate of LD decay is
+    FALSIFIED, and no declaration here may carry that reading.
 
-    **The LD reading was FALSIFIED and the name has been changed to match the body, which
-    survives as a bare drift rate.** "The fraction of LD that decays per generation is
-    `1/(2Ne)`" omits recombination, which dominates it. This file's own
+    **The name states drift because the body is a bare drift rate.** "The fraction of LD
+    that decays per generation is `1/(2Ne)`" omits recombination, which dominates it. This
+    file's own
     `ldRetentionPerGen r Ne = (1-r)(1-1/(2Ne))` is VALIDATED to
     `0.7%`, and it makes the fraction of `E[D]` lost per generation
     `r + 1/(2Ne) - r/(2Ne)`. In exact rational arithmetic:
@@ -906,10 +905,10 @@ section ExpansionLD
     | 10⁴ | 0 | 5e-5 | 5e-5 | 1× |
 
     The error is unbounded in `r/(1/(2Ne))` and the claim holds only on the `r = 0` slice.
-    **This is the same defect class, in the same file, as the already-repaired `ldHalfLife`
-    (2110×) and `ldRetainedFraction` (37000×): the recombination argument is absent from the
-    signature, so no constant repairs it.** The body is retained under a name that says
-    drift, because it is genuinely consumed as a drift rate -- by
+    **The defect class is the absence of the recombination argument from the signature, and
+    no constant repairs it.** `ldHalfLife` and `ldRetainedFraction` in this file record the
+    same failure at 2110× and 37000×. The body carries a name that says drift, because it
+    is genuinely consumed as a drift rate -- by
     `LongitudinalPortability` and by `Conventions.driftRatePerGen_eq_inv_timeScale`, which
     identifies it as the reciprocal coalescent time scale. For the fraction of LD lost, use
     `ldRetentionPerGen`.
@@ -940,21 +939,19 @@ theorem larger_pop_slower_drift_rate (Ne₁ Ne₂ : ℝ)
 
       `t₁ᵥ₂ = ln 2 / -ln[(1-r)(1 - 1/(2Nₑ))]`
 
-    **This is a correction.** The previous body was `2·Nₑ·ln 2`, with no
-    recombination argument at all. That is the `r → 0` limit of this
-    expression and nothing else: it makes the half-life of linkage
-    disequilibrium independent of the recombination rate, which is the one
-    parameter that dominates it away from zero. The discrepancy is not a
-    constant factor -- at `Ne = 10000, r = 0.1` the old body gives 13863
-    generations against 6.6, a factor of 2110, and the factor grows without
-    bound in `Nₑ` at fixed `r`, since the true half-life tends to
-    `ln 2 / -ln(1-r)` while the old one diverges.
+    **The recombination argument is mandatory.** The form `2·Nₑ·ln 2` carries no
+    recombination argument. It is the `r → 0` limit of this expression and
+    nothing else: it makes the half-life of linkage disequilibrium independent
+    of the recombination rate, the one parameter that dominates it away from
+    zero. The discrepancy is not a constant factor -- at `Ne = 10000, r = 0.1`
+    that form gives 13863 generations against 6.6, a factor of 2110, and the
+    factor grows without bound in `Nₑ` at fixed `r`, since the true half-life
+    tends to `ln 2 / -ln(1-r)` while `2·Nₑ·ln 2` diverges.
 
     `ldHalfLife_halves_retention` states what this body claims, and the
-    differential check `ldHalfLife-drops-recombination` is retained as the
-    standing check. Note that the check's grid must keep `r > 0`: at `r = 0`
-    the corrected and the old body coincide exactly, which is the degenerate
-    point that let the defect survive.
+    differential check `ldHalfLife-drops-recombination` is the standing check.
+    The check's grid must keep `r > 0`: at `r = 0` the two forms coincide
+    exactly, so a grid through that point alone detects nothing.
 
     Empirical status: DERIVED from `ldRetentionPerGen`, which is VALIDATED. -/
 noncomputable def ldHalfLife (r Ne : ℝ) : ℝ :=
@@ -962,8 +959,8 @@ noncomputable def ldHalfLife (r Ne : ℝ) : ℝ :=
 
 /-- **What the definition claims.** Retaining LD for `ldHalfLife r Ne`
     generations leaves exactly half of it. Stated with the real power, since
-    the half-life is not an integer. This is the property the name asserts,
-    and the old body satisfied it only at `r = 0`. -/
+    the half-life is not an integer. This is the property the name asserts, and
+    a body that omits the recombination rate satisfies it only at `r = 0`. -/
 theorem ldHalfLife_halves_retention (r Ne : ℝ)
     (h0 : 0 < ldRetentionPerGen r Ne) (h1 : ldRetentionPerGen r Ne < 1) :
     (ldRetentionPerGen r Ne) ^ (ldHalfLife r Ne) = 1 / 2 := by
@@ -978,9 +975,9 @@ theorem ldHalfLife_halves_retention (r Ne : ℝ)
   norm_num
 
 /-- LD half-life increases with population size, at a fixed recombination
-    rate. Drift is the only channel `Nₑ` acts through, so the statement is
-    the same as before; its content is now conditional on `r`, which is
-    honest -- the old version's independence of `r` was the defect. -/
+    rate. Drift is the only channel `Nₑ` acts through. The content is
+    conditional on `r`, and it must be: a half-life independent of `r` is the
+    defect this signature avoids. -/
 theorem ld_half_life_increasing (r Ne₁ Ne₂ : ℝ)
     (hr0 : 0 ≤ r) (hr1 : r < 1) (hNe₁ : 1 < Ne₁) (h_larger : Ne₁ < Ne₂) :
     ldHalfLife r Ne₁ < ldHalfLife r Ne₂ := by
@@ -1052,16 +1049,14 @@ section LDHalfLifeTrajectory
     rate `r` and constant effective size `Nₑ`: the per-generation retention
     `ldRetentionPerGen r Ne`, compounded.
 
-    **This is a correction.** The previous body was `(1 - 1/(2Nₑ))^t`, with no
-    recombination argument -- the drift factor alone, raised to `t`. That
-    contradicted `ldRetentionPerGen`, stated 800 lines above in this same file,
-    which already says the per-generation retention is `(1-r)(1 - 1/(2Nₑ))`.
-    The gap is the missing `(1-r)^t` and is therefore unbounded in `t`: at
-    `r = 0.1, t = 100` the old body overstates retention by a factor of
-    `0.9^(-100) ≈ 3.7 × 10⁴`. `ldAfterGenerations` in this file already used
-    the correct compounding, so the corpus held both answers at once;
-    `ldAfterGenerations_eq_retainedFraction` below now makes them the same
-    expression, so they cannot separate again.
+    **The recombination argument is mandatory.** The form `(1 - 1/(2Nₑ))^t` is
+    the drift factor alone, raised to `t`. It contradicts `ldRetentionPerGen`,
+    stated 800 lines above in this same file, which puts the per-generation
+    retention at `(1-r)(1 - 1/(2Nₑ))`. The gap is the missing `(1-r)^t` and is
+    therefore unbounded in `t`: at `r = 0.1, t = 100` the drift-only form
+    overstates retention by a factor of `0.9^(-100) ≈ 3.7 × 10⁴`.
+    `ldAfterGenerations_eq_retainedFraction` below makes this body and
+    `ldAfterGenerations` the same expression, so the two cannot separate.
 
     Regime: two neutral loci, constant `Nₑ`, no mutation and no new input of
     disequilibrium. The `Nₑ` channel here is the same closed-population
