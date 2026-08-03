@@ -58,11 +58,10 @@ theorem more_migration_lower_fst (Ne m₁ m₂ : ℝ)
 spelling in this module would need its own theorem tying it to that one, which is a
 reason not to add it.
 
-The caveat that stood here is also discharged. It recorded that the constant was merely
-stipulated — that `PortabilityDrift` defined a one-generation migration-drift map and,
-separately, the constant, with no theorem saying the constant is a fixed point of the map,
-so the status was "unverified but probably true" rather than "derived". That theorem now
-exists: `fstMigrationDriftEquilibrium_isFixedPoint`. -/
+The constant is derived, not stipulated. `PortabilityDrift` defines a one-generation
+migration-drift map, and `fstMigrationDriftEquilibrium_isFixedPoint` proves the constant is
+a fixed point of that map. Without such a theorem the constant would rate only "unverified
+but probably true". -/
 
 end IslandModel
 
@@ -301,14 +300,13 @@ theorem steppingStoneMeetingTime_eq_perDeme_iff (d demeCount σ_sq m : ℝ)
 
     which is exactly `demoSteppingStoneFst d Ne m σ_sq`. Stating the conclusion
     as an equation between the derivation and the definition -- rather than as
-    a free-standing closed form, which is how the two came to disagree -- means
-    a replacement body for either one no longer typechecks.
+    a free-standing closed form, which lets the two disagree -- means a
+    replacement body for either one stops typechecking.
 
-    The previous statement of this theorem concluded
-    `d / (d + 4·Ne·σ⁴·m²)` from `coalFst _ (2·Ne·σ²·m)`, i.e. it fed a
-    non-effective-size into the effective-size slot and compensated for a
+    A conclusion of `d / (d + 4·Ne·σ⁴·m²)` from `coalFst _ (2·Ne·σ²·m)` feeds a
+    non-effective-size into the effective-size slot and compensates for a
     missing 1/2 in the meeting time. That is a different function from the
-    definition, and nothing equated them. -/
+    definition, and no theorem equates them. -/
 theorem steppingStoneFst_from_coalescence_time (d Ne m σ_sq : ℝ)
     (hd : 0 < d) (hNe : 0 < Ne) (hm : 0 < m) (hσ : 0 < σ_sq) :
     coalFst (steppingStoneDiffusionTimescale d σ_sq m) Ne =

@@ -540,21 +540,20 @@ theorem coalFst_uses_coalescentTimeScale (t Ne : ℝ) :
     coalFst t Ne = t / (t + coalescentTimeScale Ne) := by
   unfold coalFst; rw [coalescentTimeScale_eq]
 
-/-! ### The coalescent `F_ST` map, no longer written out twice
+/-! ### The coalescent `F_ST` map, written out once
 
-`DemographicHistory.fstFromCoalescenceTime` and
-`PopulationGeneticsFoundations.coalFst` were the same function under two names.
-`coalFst` is the one simulation validated as split `F_ST`, being unbiased
-against branch-mode divergence where the drift formula was biased upward by up
-to 28 percent, so it is the survivor; `fstFromCoalescenceTime` has been deleted
-and its uses in `DemographicHistory` now call `coalFst` directly. -/
+`PopulationGeneticsFoundations.coalFst` is the one body for this map, and
+`DemographicHistory` calls it directly. Simulation validates `coalFst` as split
+`F_ST`, unbiased against branch-mode divergence where the drift formula runs up
+to 28 percent high. The name `DemographicHistory.fstFromCoalescenceTime` is
+absent on purpose: a second spelling of `coalFst` can drift from it silently. -/
 
-/-! ### The harmonic mean, no longer written out twice
+/-! ### The harmonic mean, written out once
 
-`MetricSpecificPortability.f1ScoreMetric` and `OpenQuestions.f1Score` were the
-same expression under two names in two modules, with no theorem relating them.
-`f1ScoreMetric` has been deleted and `MetricSpecificPortability` now calls
-`f1Score`. -/
+`OpenQuestions.f1Score` is the one body for this expression, and
+`MetricSpecificPortability` calls it. The name
+`MetricSpecificPortability.f1ScoreMetric` is absent on purpose: two spellings in
+two modules, with no theorem relating them, can disagree without failing. -/
 
 /-- Wright's compounding identity: one minus the product of retentions. It is
 written once for the two branches of a split and once for the two levels of

@@ -32,19 +32,18 @@ measurement rejected: at the measured `fstSource = 0.3577` the expression cannot
 `fstTarget` repairs it; heterozygosity is governed by `Nₑ` and the mutation floor, not by a
 between-population variance ratio.
 
-The algebra was true and is not what was wrong, so nothing here is being disputed by its
-removal -- but true algebra under a falsified name is exactly the configuration that lets a
-portability prediction be read off a theorem. The falsification itself survives as
-`PortabilityDrift.benchmarkRatioForm_cannot_reach_measured`, which states the ceiling about
-the written-out expression and so needs no definition to exist.
+The algebra itself is true, and nothing here disputes it. True algebra under a falsified
+name is exactly the configuration that lets a portability prediction be read off a theorem,
+which is why the name is absent rather than the algebra corrected. The falsification stands
+as `PortabilityDrift.benchmarkRatioForm_cannot_reach_measured`, which states the ceiling
+about the written-out expression and so needs no definition to exist.
 
-The worked examples that once stood in this section are withdrawn with it. They read
-`ratio ≈ 0.88` at `Fst ≈ 0.12` and `≈ 0.85` at `Fst ≈ 0.15` and concluded that larger
-observed `R²` drops confirm non-neutral effects. That inference ran through the out-of-range
-formula. `Calibrator.HumanDemography` reaches the neutral-floor conclusion by a route that
-survives measurement, and gets `0.985` rather than `0.88` for the continental case, because
-the floor must be computed from the branch quantity `1 - H_T/H_S` and not from a pairwise
-`F_ST`.
+Worked examples of the form `ratio ≈ 0.88` at `Fst ≈ 0.12` and `≈ 0.85` at `Fst ≈ 0.15`,
+concluding that larger observed `R²` drops confirm non-neutral effects, run through the
+out-of-range formula and belong nowhere in this file. `Calibrator.HumanDemography` reaches
+the neutral-floor conclusion by a route that survives measurement, and gets `0.985` rather
+than `0.88` for the continental case, because the floor must be computed from the branch
+quantity `1 - H_T/H_S` and not from a pairwise `F_ST`.
 -/
 
 
@@ -182,18 +181,18 @@ section EvolutionaryModels
     with nothing constraining it, so it returned a negative `R²` for every
     `fst > 0.5` -- an impossible value for a squared correlation, and one the
     simulation harness flagged directly. `neutralPortability_nonneg` and
-    `neutralPortability_le_r2_0` now state the range, so a replacement body that
-    can go negative no longer typechecks as this definition. `max 0` is the same
+    `neutralPortability_le_r2_0` state the range, so a replacement body that
+    can go negative does not typecheck as this definition. `max 0` is the same
     absorbing-boundary device used by `selectionMigrationEquilibrium` in
     `PopulationGeneticsFoundations.lean`.
 
-    **This is now the only neutral law in the development, and it is not
-    settled.** It is linear in `F_ST` with slope `2·r2_0`. The other candidate,
-    `neutralAFBenchmarkRatio fstS fstT = (1 - fstT)/(1 - fstS)` in
-    `PortabilityDrift.lean`, has been deleted: simulation put it −37% to −74%
+    **This is the only neutral law in the development, and it is not
+    settled.** It is linear in `F_ST` with slope `2·r2_0`. The rival candidate
+    `neutralAFBenchmarkRatio fstS fstT = (1 - fstT)/(1 - fstS)` is absent from
+    `PortabilityDrift.lean` on purpose: simulation puts it −37% to −74%
     low under asymmetric effective population sizes, and the measurement lies
     outside the range the expression can reach at all. The theorem that ordered
-    the two, `neutralPortability_le_neutralAFBenchmark`, went with it; it fixed
+    the two, `neutralPortability_le_neutralAFBenchmark`, is absent with it. It fixed
     this law as the more pessimistic of the pair, which is not a fact worth
     stating once the pair is a single law.
 

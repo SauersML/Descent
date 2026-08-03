@@ -659,24 +659,25 @@ theorem importanceWeightESS_of_const {n : ℕ} (c : ℝ) (hc : c ≠ 0) (hn : 0 
 /-! **Deleted: `iw_ess_decreases_with_divergence` and
 `iw_positive_weight_variance_reduces_ess`.**
 
-Two formulas for one quantity, with the theorems attached to the one that does not exist.
-`importanceWeightESS` — the definition this section is built around, and the one
-`validation/popgen_defs/transfer_battery.py` exercises — is `(Σw)²/Σw²`. Both deleted
-theorems were about `n / (1 + v)`. That expression is defined nowhere in this corpus and
-was never proved equal to anything that is: the identification `(Σw)²/Σw² = n/(1 + Var(w))`
-needs the weights normalized to mean one, and no such normalization was stated or assumed.
-So two results named for the effective sample size established nothing about it.
+These theorems are absent on purpose. They attach to a second formula for one quantity,
+and it is the formula that does not exist. `importanceWeightESS` — the definition this
+section is built around, and the one `validation/popgen_defs/transfer_battery.py`
+exercises — is `(Σw)²/Σw²`. Both named theorems are about `n / (1 + v)`. That expression is
+defined nowhere in this corpus and is proved equal to nothing that is. The identification
+`(Σw)²/Σw² = n/(1 + Var(w))` needs the weights normalized to mean one, and no such
+normalization is stated or assumed, so a result named for the effective sample size
+establishes nothing about it.
 
-Stripped of the naming, `iw_ess_decreases_with_divergence` was `div_lt_div_of_pos_left`
-and `iw_positive_weight_variance_reduces_ess` was `div_lt_iff₀` — Mathlib in domain
-costume, neither used anywhere. Divergence and `F_ST` appeared in neither statement; the
-chain from ancestry divergence to weight variance lived only in the docstrings ("as Fst
-increases, the importance weights become more variable") and is formalized nowhere.
+Stripped of the naming, `iw_ess_decreases_with_divergence` is `div_lt_div_of_pos_left` and
+`iw_positive_weight_variance_reduces_ess` is `div_lt_iff₀` — Mathlib in domain costume,
+neither used anywhere. Divergence and `F_ST` appear in neither statement, and the chain
+from ancestry divergence to weight variance lives only in prose ("as Fst increases, the
+importance weights become more variable"), formalized nowhere.
 
-What replaces them is `importanceWeightESS_le_card` above, which is about the definition
-that exists and that the validation battery tests. A genuine monotonicity result — that
-more variable weights give a smaller ESS — is a real and provable statement over `w`, and
-is the thing to add here if it is wanted; it is deliberately not asserted in the meantime. -/
+`importanceWeightESS_le_card` above stands in their place, about the definition that
+exists and that the validation battery tests. A genuine monotonicity result — that more
+variable weights give a smaller ESS — is a real and provable statement over `w`, and is
+the thing to add here if it is wanted. Until then it stays unasserted. -/
 
 /-- **Doubly robust estimation combines IW with model adaptation.**
     DR estimator: if either the weighting model or the outcome model is
