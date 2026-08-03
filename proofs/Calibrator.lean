@@ -87,8 +87,8 @@ import Calibrator.ErgodicCovariancePencil
 -- entire point: that is the signal that was missing. Do not remove an import here to
 -- make the root build green -- that restores the blindness rather than fixing the break.
 --
--- Check for new orphans with the closure of this file's imports against the files on
--- disk; the count is 105 modules including this root, all 105 in its closure.
+-- Check for new orphans with `proofs/validation/invariants/module_closure.py`, which
+-- compares the TRANSITIVE closure of this file against every source module on disk.
 --
 -- A caution about HOW to run that check, learned by getting it wrong here: comparing the
 -- files on disk against the imports named IN THIS FILE reports false orphans, because most
@@ -152,6 +152,31 @@ that was already there, at the moment of acting.
     halves through one `_module_path()`, so the two cannot disagree at all. When
     two places must agree, make one of them call the other; a note explaining
     why they must agree is not a mechanism.
+
+AND THE INVERSE SHAPE, WHICH IS WORSE THAN ALL FOUR ABOVE: PROSE THAT IS NOT
+IGNORED BUT IS WRONG. The four specimens are warnings that were correct and
+went unread. This one is a note that was READ, TRUSTED, AND MISLEADING.
+
+A DEFERRED-WORK NOTE IS A CLAIM, AND IT INHERITS THE ERROR RATE OF THE ANALYSIS
+THAT PRODUCED IT. A paragraph in `Conventions.lean` told the next agent that
+"the collapse to one name is the fix and has not been done", naming
+`geometricDecay` as the name to keep and the other three as uses of it. It was
+written from a NAME CENSUS, before the bodies had been read, and it survived
+three commits looking like a decision already taken rather than a hypothesis.
+Reading the four bodies reversed it: `admixtureLDDecay` is VALIDATED as the
+`Nₑ → ∞` limit and MEASURED high by +0.24% to +0.37%, with a theorem proving
+the bias is one-sided, so folding it would detach a measured regime from the
+name that carries it. One function, four REFERENTS -- not four names for one
+thing.
+
+A "TODO" IS THE MOST AUTHORITATIVE-LOOKING SENTENCE IN A CODEBASE, because it
+reads as a decision taken by someone who had looked, and the next sweep
+executes it rather than re-deriving it. So a deferred-work note must carry the
+evidence it rests on and say what would overturn it, exactly as a result must.
+When one turns out wrong, WITHDRAW IT IN PLACE AND QUOTE WHAT IT USED TO SAY:
+a withdrawn instruction with its reason is more useful than a clean paragraph,
+because the clean paragraph loses the fact that a careful reader was misled
+here once. Same discipline as the retracted 14-sigma row in the ledger.
 
 WHY IT KEEPS HAPPENING, which is the part worth internalising: A WELL-FORMED
 ARGUMENT FOR A FALSE PREMISE IS HARDER TO STOP THAN A WEAK ONE. The reasoning

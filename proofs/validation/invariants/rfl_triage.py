@@ -242,6 +242,20 @@ multi-line signatures; a dropped parameter changes which definitions a
 statement appears to mention. Lean knows definitional equality and it knows
 what each statement mentions. Both halves should come from the environment.
 
+=== A DEFERRED-WORK NOTE IS A CLAIM, NOT AN INSTRUCTION ===
+
+It inherits the error rate of whatever produced it, and it is read by the next
+sweep as a decision already taken. The specimen: a note in `Conventions.lean`
+saying "the collapse to one name is the fix and has not been done" was written
+from a name census before the bodies were read, survived three commits, and was
+reversed by reading them -- `admixtureLDDecay` carries a VALIDATED regime and a
+proved one-sided error bound that folding would detach from its name.
+
+So a TODO in this corpus must carry its evidence and say what would overturn
+it, like any other result. And when one is wrong, withdraw it IN PLACE quoting
+what it said, rather than editing it away: the clean paragraph loses the fact
+that a careful reader was misled there once.
+
 === AND A CONNECTIVITY RULE FOR ANY DELETION IN BUCKET A ===
 
 A cluster of N spellings pinned pairwise can be collapsed to a hub with N-1
