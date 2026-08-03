@@ -833,9 +833,8 @@ def ReadsThroughFunctionals {n m : ℕ} (T : Panel n → ℝ) (φ : Fin m → �
 /-- Every fixed linear combination of panel averages reads through its functionals.
 
     The docstring above says most summary-statistic methods are of this shape by
-    construction; this is that sentence as a theorem. Two results assume the
-    class and nothing concluded it, so "no leakage" was being asserted about an
-    estimator family that nothing had been shown to belong to. -/
+    construction; this is that sentence as a theorem, and it is what puts the two
+    "no leakage" results over a nonempty estimator family. -/
 theorem readsThroughFunctionals_of_linearCombination {n m : ℕ} (c : Fin m → ℝ)
     (φ : Fin m → ℝ → ℝ) :
     ReadsThroughFunctionals
@@ -1338,12 +1337,11 @@ def IsLevelSetFunctional {Pair : Type*} (metric : Pair → ℝ)
 
 /-- Anything computed from the two coordinates is a level-set functional.
 
-    This is the converse direction of the collapse and the reason the class is
-    nonempty: three theorems below assume `IsLevelSetFunctional` and none
-    concluded it, so all three were statements about a possibly empty class. The
-    witness is not degenerate -- it says precisely which metrics qualify, namely
-    every metric that factors through `coords`, which is what "threshold-based"
-    means operationally. -/
+    This is the converse direction of the collapse, and it is what makes the
+    three theorems below statements about a nonempty class. The witness is not
+    degenerate: it says precisely which metrics qualify, namely every metric that
+    factors through `coords`, which is what "threshold-based" means
+    operationally. -/
 theorem isLevelSetFunctional_comp {Pair : Type*} (coords : Pair → LevelSetCoordinates)
     (g : LevelSetCoordinates → ℝ) :
     IsLevelSetFunctional (fun p ↦ g (coords p)) coords :=

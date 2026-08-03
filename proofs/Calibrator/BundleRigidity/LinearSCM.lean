@@ -75,11 +75,10 @@ structure LinearSCM (n : ℕ) where
   /-- Acyclicity, as topological indexing: no dependence on equal or higher indices. -/
   triangular : ∀ i j : Fin n, i ≤ j → coef i j = 0
 
-/-- **The class is inhabited at every size**, by the model with no structural edges.
-Eight theorems quantify over `LinearSCM n`; this is what keeps them from being vacuous.
-The empty model is the honest witness here: `triangular` forbids dependence on equal or
-higher indices, so a nonzero constant `coef` inhabits nothing. -/
-def LinearSCM.witness (n : ℕ) : LinearSCM n where
+/-- **The class is inhabited.**  A theorem quantified over an uninhabited structure is
+true and empty: kernel-checked, clean axiom report, no content.  This is the witness that
+makes the theorems below statements about something. -/
+noncomputable def LinearSCM.witness (n : ℕ) : LinearSCM n where
   coef := fun _ _ ↦ 0
   triangular := fun _ _ _ ↦ rfl
 
@@ -109,8 +108,7 @@ theorem interventional_value (k : Fin n) (v : ℝ) (noise x : Fin n → ℝ)
 /-- **Interventional solutions exist**, in the edgeless model of `LinearSCM.witness`:
 set the intervened variable to `v` and every other variable to its own noise.
 
-`interventional_value` assumed `IsInterventionalSolution` and nothing concluded it, so
-the surgery lemma held of a relation nothing was known to satisfy. The edgeless model is
+The edgeless model is
 the same witness `LinearSCM.witness` uses and for the same reason: `triangular` forbids
 dependence on equal or higher indices, so no nonzero constant coefficient inhabits the
 structure. With no edges the post-surgery system is already solved coordinatewise, which
@@ -162,16 +160,22 @@ deletes the `X → M` edge's influence on `Y`, which is what makes the next defi
 def yUnderXM (x m nY : ℝ) : ℝ := S.b * x + S.c * m + nY
 
 /-- **Total effect** of moving `X` from `x` to `x'`: the change in `Y` under `do(X := ·)`,
-with `M` free to respond. -/
+with `M` free to respond.
+
+    Empirical status: UNTESTED. Definitional within the model declared above: it fixes a contrast rather than predicting an observable. -/
 def totalEffect (x x' nM nY : ℝ) : ℝ := S.yUnder x' nM nY - S.yUnder x nM nY
 
 /-- **Direct effect**: the change in `Y` when `X` moves but `M` is held at `m` by a second
-intervention. This is the controlled direct effect, and holding `M` fixed is exactly what
-distinguishes it from the total effect. -/
+intervention. This is the controlled direct effect, and holding `M` fixed is what
+distinguishes it from the total effect.
+
+    Empirical status: UNTESTED. Definitional within the model declared above: it fixes a contrast rather than predicting an observable. -/
 def directEffect (x x' m nY : ℝ) : ℝ := S.yUnderXM x' m nY - S.yUnderXM x m nY
 
 /-- **Indirect effect**: the part transmitted through `M`, namely the change `M` undergoes
-when `X` moves, propagated to `Y` by the coefficient `c`. -/
+when `X` moves, propagated to `Y` by the coefficient `c`.
+
+    Empirical status: UNTESTED. Definitional within the model declared above: it fixes a contrast rather than predicting an observable. -/
 def indirectEffect (x x' nM : ℝ) : ℝ := S.c * (S.mUnder x' nM - S.mUnder x nM)
 
 /-- The total effect is `(b + c·a)·(x' - x)`, computed from the equations. -/

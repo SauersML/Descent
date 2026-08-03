@@ -183,10 +183,6 @@ noncomputable def singleLocusPanel : Panel 1 where
 
 /-- **Single coverage is inhabited**, on the one-atom, one-locus panel at modulus `1`.
 
-    The forcing step is the whole mechanism of this file and it assumed
-    `SinglyCoveredBy`, which nothing established -- so the peeling argument ran
-    on a condition the corpus never exhibited.
-
     The witness is minimal in a way that is worth being explicit about: with a
     single locus the second clause is vacuous, because there is no other locus
     to trade with. That is the degenerate end of exactly the phenomenon the

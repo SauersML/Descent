@@ -1504,12 +1504,10 @@ def InLinkageEquilibrium : Prop :=
 
     The structure's docstring says the joint law is carried alongside the
     per-locus models so that linkage equilibrium is a checkable relation rather
-    than a silent assumption. That cuts both ways: because the joint law is a
-    free field, nothing forced any design to satisfy the relation, and the three
-    theorems assuming `InLinkageEquilibrium` were quantified over a class the
-    corpus never exhibited a member of.
+    than a silent assumption. Because the joint law is a free field, nothing
+    forces a design to satisfy that relation; this exhibits one that does.
 
-    This is the equilibrium design by construction, and it is the only witness
+    It is the equilibrium design by construction, and it is the only witness
     that is honest here -- linkage equilibrium IS the product law, so there is
     nothing to prove beyond writing it down. A design in linkage DISequilibrium
     is equally easy to write and is what the disjoint-licence results are about

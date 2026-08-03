@@ -42,6 +42,8 @@
 #   MATHLIB_OLEAN_COUNT=<n>                           how whole? healthy ~2934
 #   TOOLCHAIN_DAMAGED=1                               emitted only when broken
 #   GUARD_EXIT=<code>                                 structural guard result
+#   LAUNDER_GUARD_EXIT=<code>                         source-text laundering guard
+#   LAUNDER_ENV_EXIT=<code>|SKIPPED_BUILD_FAILED      elaborated-telescope scan
 #   LAKE_EXIT=<code>                                  lake's own exit status
 #   MODULE_STATUS <mod> COMPILED|STALE|ABSENT         per module, one line each
 #   MODULES_COMPILED / MODULES_STALE / MODULES_ABSENT summary counts
@@ -351,9 +353,31 @@ fi
 python3 -S scripts/check-identifications.py > "$ROOT/guard-${SLURM_JOB_ID:-manual}.txt" 2>&1
 echo "GUARD_EXIT=$?"
 
+# Laundering guard.  Runs BEFORE lake, like the structural guard, because it reads
+# source text and therefore needs no oleans -- a build that dies in the toolchain
+# still gets this answer.  The elaborated-telescope half (LaunderingScan.lean) needs
+# the oleans and runs after the build, below.
+python3 -S scripts/check-laundering.py > "$ROOT/launder-${SLURM_JOB_ID:-manual}.txt" 2>&1
+echo "LAUNDER_GUARD_EXIT=$?"
+python3 -S scripts/check-laundering.py --summary 2>&1 | sed -n '3,20p' | sed 's/^/LAUNDER_/'
+
 lake build "${TARGETS[@]}"
 _lake_exit=$?
 echo "LAKE_EXIT=$_lake_exit"
+
+# The environment-level laundering scan needs a successful build: it walks the
+# fully elaborated type of every `Calibrator` declaration.  Reporting it as
+# SKIPPED when the build failed matters -- an absent scan must not read as a
+# clean one, which is the rule the rest of this file was written around.
+if [ "$_lake_exit" -eq 0 ]; then
+  lake env lean proofs/validation/invariants/LaunderingScan.lean \
+    > "$ROOT/launder-env-${SLURM_JOB_ID:-manual}.txt" 2>&1
+  echo "LAUNDER_ENV_EXIT=$?"
+  grep -E '^LAUNDER_(SCANNED|PREMISES|FATAL|TOTAL)' \
+    "$ROOT/launder-env-${SLURM_JOB_ID:-manual}.txt" || true
+else
+  echo "LAUNDER_ENV_EXIT=SKIPPED_BUILD_FAILED"
+fi
 
 # ---------------------------------------------------------------------------
 # PER-MODULE COMPILED/STALE TABLE.

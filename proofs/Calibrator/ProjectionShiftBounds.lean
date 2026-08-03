@@ -341,6 +341,14 @@ structure IsRankAllocation (k : ℝ) (M : ι → ℝ) : Prop where
   upper : ∀ i, M i ≤ 1
   trace : ∑ i, M i = k
 
+/-- **The predicate is satisfiable.**  Every theorem below assumes an allocation
+exists; the zero allocation at budget `0` is one.  Without this they are conditional on
+a hypothesis nothing in the corpus discharges. -/
+theorem IsRankAllocation.witness : IsRankAllocation (ι := ι) 0 (fun _ => 0) where
+  lower := fun _ => le_refl 0
+  upper := fun _ => by norm_num
+  trace := by simp
+
 /-- Weight captured by an allocation: the linear functional both task
 efficiencies are built from.
 

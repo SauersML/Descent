@@ -600,9 +600,9 @@ theorem traceForm_spikeOuter (v : ι → ℝ) : traceForm (spikeOuter v) = dot v
 
 /-- **The trace-window background class**: every legal background carries total
 standardized variance at most `budget`.
+    standardized genotype covariance the panel admits as background.
 
-    Empirical status: UNTESTED. `budget` is measurable — it is the trace of the
-    standardized genotype covariance the panel admits as background. -/
+    Empirical status: UNTESTED. `budget` is measurable — it is the trace of the -/
 def traceWindowBudgetClass (base : Matrix ι ι ℝ) (budget : ℝ) :
     BackgroundClass ι Unit where
   base := base
@@ -642,9 +642,9 @@ variable {ι : Type*} [Fintype ι] [DecidableEq ι] {cidx : Type*}
 /-- **The equi-exit hypothesis, made explicit.**  One constraint `binding`
 whose spike load is the same constant `load` in every supported direction, and
 which attains the linear program's infimum.
+    the prior, evaluate `ℓ_a(vvᵀ)` on each, and check the value is constant.
 
-    Empirical status: UNTESTED. Directly falsifiable: draw effect vectors from
-    the prior, evaluate `ℓ_a(vvᵀ)` on each, and check the value is constant. -/
+    Empirical status: UNTESTED. Directly falsifiable: draw effect vectors from -/
 structure EquiExit (K : BackgroundClass ι cidx) (S₀ : Matrix ι ι ℝ)
     (support : Set (ι → ℝ)) where
   /-- The certificate: which constraint binds. -/
@@ -908,9 +908,9 @@ differ in standardized variance by at most `budget`.  At `budget = 0` with the
 constraint
 active this is the constant-diagonal condition restricted to one pair, which is
 all `ImitationRigidity` ever used.
+    standardized variance a panel admits between two markers.
 
-    Empirical status: UNTESTED. `budget` is measurable — it is the spread in
-    standardized variance a panel admits between two markers. -/
+    Empirical status: UNTESTED. `budget` is measurable — it is the spread in -/
 def diagonalGapClass (base : Matrix ι ι ℝ) (i j : ι) (budget : ℝ) :
     BackgroundClass ι Unit where
   base := base
@@ -1576,6 +1576,16 @@ structure MomentContinuousFunctional where
     (∀ p, p ≤ order → |normalizedMoment m lam p - normalizedMoment m mu p| ≤ δ) →
     |value m lam - value m mu| ≤ modulus * δ
 
+/-- **The class is inhabited.**  A theorem quantified over an uninhabited structure is
+true and empty: kernel-checked, clean axiom report, no content.  This is the witness that
+makes the theorems below statements about something. -/
+noncomputable def MomentContinuousFunctional.witness : MomentContinuousFunctional where
+  value := fun _ _ => 0
+  order := 0
+  modulus := 0
+  modulus_nonneg := le_refl 0
+  moment_lipschitz := fun _ _ _ _ _ _ => by simp
+
 /-- **The `m_eff` prohibition.**  No weakly continuous functional of the
 spectral law can equal the inverse-trace certificate — hence no
 participation-ratio-type effective-marker count can determine a detection
@@ -1723,9 +1733,9 @@ def weightedMean (w c : tgt → ℝ) : ℝ := ∑ t, w t * c t
 /-- **Energy-weighted variance of the per-target optimal corrections.**  The
 degradation calculus's irreducible part: the component of the correction that
 no single shared choice removes.
+    target, take the energy-weighted spread.
 
-    Empirical status: UNTESTED. Measurable directly — fit a correction per
-    target, take the energy-weighted spread. -/
+    Empirical status: UNTESTED. Measurable directly — fit a correction per -/
 def energyWeightedVariance (w c : tgt → ℝ) : ℝ :=
   ∑ t, w t * (c t - weightedMean w c) ^ 2
 

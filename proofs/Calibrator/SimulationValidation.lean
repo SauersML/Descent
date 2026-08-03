@@ -226,7 +226,9 @@ noncomputable def targetContextShiftMetricModel : CrossPopulationMetricModel 1 1
   { baselineMetricModel with
       contextCross := Pop.withTarget baselineMetricModel.contextCross ![-(1 / 2)] }
 
-/-- Irreducible target mismatch witness. -/
+/-- Irreducible target mismatch witness.
+
+    Empirical status: UNTESTED. -/
 noncomputable def targetPrevalenceShiftMetricModel : CrossPopulationMetricModel 1 1 :=
   { baselineMetricModel with
       targetPrevalence := 1 / 4

@@ -98,7 +98,9 @@ theorem founder_events_alone_cannot_explain_isolation_by_distance
 
 /-- Expected within-deme coalescence time for the chain: a pair either coalesces inside the
 chain, whose total age is `tAnc`, or survives into the ancestral population and waits a
-further `2·N_anc`. -/
+further `2·N_anc`.
+
+    Empirical status: UNTESTED. -/
 noncomputable def serialFounderWithinTime (N Nanc tAnc : ℝ) : ℝ :=
   2 * N * (1 - Real.exp (-tAnc / (2 * N)))
     + Real.exp (-tAnc / (2 * N)) * (tAnc + 2 * Nanc)
@@ -108,7 +110,12 @@ time to the total, `τ / (T_w + τ)`, with `τ` the founder ceiling and `T_w` th
 time. Measured: `0.18497` against an exact `0.19248`, a `3.9%` error with no free parameter.
 
 This is the part a closed form gets right. The approach to it is not, and
-`serialFounderFstApproach` is the field that has to supply it. -/
+`serialFounderFstApproach` is the field that has to supply it.
+
+    Empirical status: MEASURED at one design point -- `0.18497` against the
+    analytic `0.19248`, a `3.9%` error with no free parameter. Power is not
+    established: a single configuration cannot reject a wrong functional form,
+    so this is not recorded as VALIDATED. -/
 noncomputable def serialFounderCeilingFst (N Nanc tAnc τ : ℝ) : ℝ :=
   τ / (serialFounderWithinTime N Nanc tAnc + τ)
 

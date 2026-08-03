@@ -93,6 +93,64 @@ def lean_equalVarianceGaussianAUCFromSNR(snr):
     return float(Phi(np.sqrt(snr / 2)))
 
 
+def lean_equalVarianceGaussianAUCFromSignalVariance(vSignal, vNoise):
+    """DGP.lean:2465  `Phi (Real.sqrt (vSignal / (2 * vNoise)))`
+
+    Algebraically the SNR chart at snr = vSignal / vNoise, and tested anyway:
+    it is a separate definition in a separate file, so it can drift from the
+    chart it currently equals, and an identity nobody measures is an identity
+    nobody will notice breaking.
+    """
+    return float(Phi(np.sqrt(vSignal / (2 * vNoise))))
+
+
+def lean_liabilityThreshold(K):
+    """PortabilityDrift.lean:3001  `Function.invFun Phi (1 - K)`"""
+    return float(stats.norm.ppf(1 - K))
+
+
+def lean_liabilityCaseMean(K):
+    """PortabilityDrift.lean:3006  `standardNormalPdf (liabilityThreshold K) / K`"""
+    return float(phi(lean_liabilityThreshold(K)) / K)
+
+
+def lean_liabilityControlMean(K):
+    """PortabilityDrift.lean:3012  `-liabilityCaseMean K * K / (1 - K)`"""
+    return float(-lean_liabilityCaseMean(K) * K / (1 - K))
+
+
+def lean_liabilityCaseVariance(r2, K):
+    """PortabilityDrift.lean:3018
+    `1 - r2 * liabilityCaseMean K * (liabilityCaseMean K - liabilityThreshold K)`"""
+    i = lean_liabilityCaseMean(K)
+    return float(1 - r2 * i * (i - lean_liabilityThreshold(K)))
+
+
+def lean_liabilityControlVariance(r2, K):
+    """PortabilityDrift.lean:3024
+    `1 - r2 * liabilityControlMean K * (liabilityControlMean K - liabilityThreshold K)`"""
+    ic = lean_liabilityControlMean(K)
+    return float(1 - r2 * ic * (ic - lean_liabilityThreshold(K)))
+
+
+def lean_liabilityThresholdAUCFromExplainedR2(r2, K):
+    """PortabilityDrift.lean:3032, the chart that DOES take a prevalence.
+
+    `Phi ((liabilityCaseMean K - liabilityControlMean K) * Real.sqrt r2 /
+      Real.sqrt (liabilityCaseVariance r2 K + liabilityControlVariance r2 K))`
+
+    PortabilityDrift.lean:967 quotes this at RMSE 0.0121 against a 0.0120
+    seed-to-seed noise floor. That number came from elsewhere; this is the
+    first instrument to hold it to the exact bivariate-normal oracle, on a
+    grid rather than at a handful of points.
+    """
+    num = ((lean_liabilityCaseMean(K) - lean_liabilityControlMean(K))
+           * math.sqrt(r2))
+    den = math.sqrt(lean_liabilityCaseVariance(r2, K)
+                    + lean_liabilityControlVariance(r2, K))
+    return float(Phi(num / den))
+
+
 def exact_auc(rho, K, npts=20001):
     """AUC of score S (corr rho with liability L) for cases L > T, P(L>T)=K.
 

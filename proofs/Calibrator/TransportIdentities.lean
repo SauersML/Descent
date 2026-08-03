@@ -816,9 +816,9 @@ structure ConfusionMatrix where
   fn_nonneg : 0 ≤ fn
   mass_one : tp + fp + tn + fn = 1
 
-/-- **The class is inhabited**, by the uniform matrix.  `mass_one` is an equality
-constraint tying all four fields together, so satisfiability is a real question and this
-answers it; five theorems below depend on the answer for their content. -/
+/-- **The class is inhabited.**  A theorem quantified over an uninhabited structure is
+true and empty: kernel-checked, clean axiom report, no content.  This is the witness that
+makes the theorems below statements about something. -/
 noncomputable def ConfusionMatrix.witness : ConfusionMatrix where
   tp := 1 / 4
   fp := 1 / 4

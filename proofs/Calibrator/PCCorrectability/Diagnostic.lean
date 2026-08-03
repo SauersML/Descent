@@ -138,7 +138,9 @@ noncomputable def pgsStratificationRiskCoefficient
     ascertainmentAmplification Φ Λ
 
 /-- Standardized residual stratification bias is linear in the confounding
-magnitude once the study design and residual target-axis geometry are fixed. -/
+magnitude once the study design and residual target-axis geometry are fixed.
+
+    Empirical status: UNTESTED. -/
 noncomputable def standardizedResidualPGSBias
     (expectedSNPCount Hres effectSD Φ Λ confounding : ℝ) : ℝ :=
   pgsStratificationRiskCoefficient expectedSNPCount Hres effectSD Φ Λ * confounding

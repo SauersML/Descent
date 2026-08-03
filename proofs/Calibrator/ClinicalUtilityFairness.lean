@@ -83,10 +83,9 @@ structure LiabilityThresholdModel where
   prev_lt_one : prevalence < 1
   case_mean_pos : 0 < case_mean
 
-/-- **The model class is inhabited.**  Sixteen theorems below quantify over
-`LiabilityThresholdModel`; this witness is what distinguishes them from vacuous
-universals over an empty class.  `threshold` is unconstrained by the fields, so `0` is
-as legitimate as any value. -/
+/-- **The class is inhabited.**  A theorem quantified over an uninhabited structure is
+true and empty: kernel-checked, clean axiom report, no content.  This is the witness that
+makes the theorems below statements about something. -/
 noncomputable def LiabilityThresholdModel.witness : LiabilityThresholdModel where
   h_sq := 1 / 2
   prevalence := 1 / 2

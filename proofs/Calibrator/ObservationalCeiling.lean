@@ -222,6 +222,18 @@ structure ApproxProbeBlindness {Object Data : Type*}
   holds : P positive
   fails : ¬ P negative
 
+/-- **The class is inhabited.**  A theorem quantified over an uninhabited structure is
+true and empty: kernel-checked, clean axiom report, no content.  This is the witness that
+makes the theorems below statements about something. -/
+def ApproxProbeBlindness.witness :
+    ApproxProbeBlindness (fun _ _ : Unit => True) (fun _ : Bool => ())
+      (fun b => b = true) where
+  positive := true
+  negative := false
+  close_data := trivial
+  holds := rfl
+  fails := by decide
+
 namespace ApproxProbeBlindness
 
 variable {Object Data : Type*} {close : Data → Data → Prop} {probe : Object → Data}
@@ -273,6 +285,17 @@ structure LeveledBlindness {Level Object Data : Type*}
   same_data : ∀ ℓ : Level, probe ℓ positive = probe ℓ negative
   holds : P positive
   fails : ¬ P negative
+
+/-- **The class is inhabited.**  A theorem quantified over an uninhabited structure is
+true and empty: kernel-checked, clean axiom report, no content.  This is the witness that
+makes the theorems below statements about something. -/
+def LeveledBlindness.witness :
+    LeveledBlindness (fun (_ : Unit) (_ : Bool) => ()) (fun b => b = true) where
+  positive := true
+  negative := false
+  same_data := fun _ => rfl
+  holds := rfl
+  fails := by decide
 
 namespace LeveledBlindness
 
@@ -326,10 +349,6 @@ def IsCompleteCatalogue {α Invariant : Type*} (E : α → α → Prop)
   ∀ x y, E x y ↔ label x = label y
 
 /-- Every labelling is a complete catalogue of the equivalence it induces.
-
-    Two results assumed `IsCompleteCatalogue` and nothing concluded it, which
-    left `IsCompleteCatalogue.separates` -- the bound on what a catalogue may be
-    built from -- quantified over a class nothing was known to inhabit.
 
     The witness carries the real content: completeness is not a property a
     labelling has or lacks in isolation, it is a relation between a labelling and
@@ -574,6 +593,14 @@ structure ProbeSeparation (probe : Object → Data) where
   sigma_pos : 0 < sigma
   /-- Objects far apart have data far apart, at rate `sigma`. -/
   separates : ∀ o o' : Object, sigma * dist o o' ≤ dist (probe o) (probe o')
+
+/-- **The class is inhabited.**  A theorem quantified over an uninhabited structure is
+true and empty: kernel-checked, clean axiom report, no content.  This is the witness that
+makes the theorems below statements about something. -/
+noncomputable def ProbeSeparation.witness : ProbeSeparation (id : ℝ → ℝ) where
+  sigma := 1
+  sigma_pos := by norm_num
+  separates := fun _ _ => by simp
 
 /-- **What separation buys: an object is pinned by its data to within `resolution / σ`.**
 

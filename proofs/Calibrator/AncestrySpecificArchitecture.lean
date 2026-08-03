@@ -108,7 +108,9 @@ theorem twoPopDriftVariance_eq_sum (p0 fst : ℝ) :
 
 /-- **Expected allele frequency difference from drift.**
     E[(p₁ - p₂)²] = 2 × FST × p₀(1-p₀)
-    where p₀ is the ancestral frequency. -/
+    where p₀ is the ancestral frequency.
+
+    Empirical status: UNTESTED. -/
 noncomputable def expectedFreqDiffSq (fst p0 : ℝ) : ℝ :=
   2 * fst * p0 * (1 - p0)
 

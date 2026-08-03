@@ -249,9 +249,7 @@ def SameTransfer (F : BundleFamily T d) (t₁ t₂ : T) : Prop :=
 
 /-- A parameter has the same transfer as itself.
 
-    Lemma 4 assumed `SameTransfer` and nothing concluded it, so the cheapest
-    source of non-rigidity was stated about a relation nothing was known to
-    satisfy. Reflexivity is the honest witness and it is also the sharp one: at
+    Reflexivity is the witness, and it is the sharp one: at
     `t₁ = t₂` the conclusion `F.transfer (diracAt t₁ - diracAt t₂) = 0` is the
     trivial instance, so Lemma 4 has content exactly when the caller supplies
     `t₁ ≠ t₂` -- which is why the informal statement says "two DISTINCT
@@ -356,7 +354,7 @@ theorem isTauEven_evenPart {τ : C(T, T)} (hinv : ∀ t : T, τ (τ t) = t)
     (κ : C(T, ℝ) →ₗ[ℝ] ℝ) : IsTauEven τ (evenPart τ κ) := by
   ext f
   have hff : pullback τ (pullback τ f) = f := by ext t; simp [hinv t]
-  simp only [IsTauEven, evenPart, LinearMap.comp_apply, LinearMap.smul_apply,
+  simp only [evenPart, LinearMap.comp_apply, LinearMap.smul_apply,
     LinearMap.add_apply, smul_eq_mul]
   rw [hff]
   ring
@@ -366,7 +364,7 @@ theorem isTauOdd_oddPart {τ : C(T, T)} (hinv : ∀ t : T, τ (τ t) = t)
     (κ : C(T, ℝ) →ₗ[ℝ] ℝ) : IsTauOdd τ (oddPart τ κ) := by
   ext f
   have hff : pullback τ (pullback τ f) = f := by ext t; simp [hinv t]
-  simp only [IsTauOdd, oddPart, LinearMap.comp_apply, LinearMap.smul_apply,
+  simp only [oddPart, LinearMap.comp_apply, LinearMap.smul_apply,
     LinearMap.sub_apply, LinearMap.neg_apply, smul_eq_mul]
   rw [hff]
   ring

@@ -103,7 +103,9 @@ noncomputable def demoSteppingStoneFst (d Ne m σ_sq : ℝ) : ℝ :=
   d / (d + 4 * Ne * m * σ_sq)
 
 /-- **The functional form the previous derivation produced**, retained so that the
-indistinguishability recorded in the note above can be stated rather than asserted. -/
+indistinguishability recorded in the note above can be stated rather than asserted.
+
+    Empirical status: UNTESTED. -/
 noncomputable def steppingStoneFstQuadratic (d Ne m σ_sq : ℝ) : ℝ :=
   d / (d + 4 * Ne * σ_sq ^ 2 * m ^ 2)
 
@@ -403,7 +405,9 @@ noncomputable def admixedFst (α fst_AB : ℝ) : ℝ :=
 
     where `hetRatio = p̄_adm(1-p̄_adm) / p̄_AB(1-p̄_AB)` is the ratio of the
     denominator heterozygosity of the (admixed, A) pair to that of the (A, B)
-    pair. This is the quantity `admixedFst` computes when that ratio is `1`. -/
+    pair. This is the quantity `admixedFst` computes when that ratio is `1`.
+
+    Empirical status: UNTESTED. -/
 noncomputable def admixedFstExact (α fst_AB hetRatio : ℝ) : ℝ :=
   (1 - α) ^ 2 * fst_AB / hetRatio
 

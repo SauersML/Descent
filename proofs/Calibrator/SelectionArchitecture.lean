@@ -52,7 +52,9 @@ noncomputable def equilibriumEffectVariance (v_mutation s : ℝ) : ℝ :=
 /-- **Mutation-selection balance recurrence.**
     Each generation, new mutational variance v_mut is added and selection
     of strength s removes a fraction s of the standing variance V.
-    The recurrence is: V(t+1) = (1 - s) × V(t) + v_mut. -/
+    The recurrence is: V(t+1) = (1 - s) × V(t) + v_mut.
+
+    Empirical status: UNTESTED. -/
 noncomputable def effectVarianceRecurrence (V v_mut s : ℝ) : ℝ :=
   (1 - s) * V + v_mut
 

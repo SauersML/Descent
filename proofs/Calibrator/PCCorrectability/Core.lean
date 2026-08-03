@@ -31,6 +31,35 @@ structure PCCorrectionModel where
   /-- At least one eigenvalue remains after correction -/
   k_lt : k.val + 1 < p
 
+/-- The two-component spectrum `(2, 1)`, correcting on the leading PC only.
+
+    This is the smallest model the fields permit: `k_lt` forces at least two
+    components, since a retained index must leave a later one uncorrected.
+    Eigenvalues `2 > 1` are positive and strictly decreasing, and `k = 0`
+    retains the second. -/
+noncomputable def PCCorrectionModel.witness : PCCorrectionModel where
+  p := 2
+  eigenvals := fun i ↦ if i.val = 0 then 2 else 1
+  eig_pos := by
+    intro i
+    by_cases h : i.val = 0 <;> simp [h] <;> norm_num
+  eig_decreasing := by
+    intro i j hij
+    have hlt : i.val < j.val := hij
+    have hj : j.val < 2 := j.isLt
+    have hi0 : i.val = 0 := by omega
+    have hj0 : j.val ≠ 0 := by omega
+    simp [hi0, hj0]
+    norm_num
+  c := 1
+  c_pos := by norm_num
+  k := 0
+  k_lt := by norm_num
+
+/-- **The class is inhabited**, so the results below are not vacuously true. -/
+theorem PCCorrectionModel.nonempty : Nonempty PCCorrectionModel :=
+  ⟨PCCorrectionModel.witness⟩
+
 /-- Residual bias after correcting for k PCs -/
 noncomputable def PCCorrectionModel.residualBias (m : PCCorrectionModel) : ℝ :=
   m.c * ∑ i : Fin m.p, if m.k.val < i.val then m.eigenvals i else 0

@@ -29,6 +29,17 @@ structure SelectionValidationModel where
   effectCorrelationNoise_pos : 0 < effectCorrelationNoise
   selectedVarianceNoise_pos : 0 < selectedVarianceNoise
 
+/-- **The class is inhabited.**  A theorem quantified over an uninhabited structure is
+true and empty: kernel-checked, clean axiom report, no content.  This is the witness that
+makes the theorems below statements about something. -/
+noncomputable def SelectionValidationModel.witness : SelectionValidationModel where
+  observedEffectCorrelation := 0
+  observedSelectedVariance := 0
+  effectCorrelationNoise := 1
+  selectedVarianceNoise := 1
+  effectCorrelationNoise_pos := by norm_num
+  selectedVarianceNoise_pos := by norm_num
+
 /-- A candidate model summarized only by the trait-level summaries it predicts
 for validation. -/
 structure SelectionModelSummary where

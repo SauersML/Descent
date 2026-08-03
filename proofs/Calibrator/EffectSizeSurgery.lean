@@ -100,9 +100,9 @@ theorem cube_isOdd : IsOddSummary (fun x ↦ x ^ 3) := by
   ring
 
 /-- **A fiber**: the two values `± level`, with the mass sitting on each.
+it carries no modelling content and no free parameter.
 
-Empirical status: UNTESTED. A bookkeeping object for one magnitude of a distribution;
-it carries no modelling content and no free parameter. -/
+Empirical status: UNTESTED. A bookkeeping object for one magnitude of a distribution; -/
 structure Fiber where
   /-- The magnitude shared by the two values. -/
   level : ℝ

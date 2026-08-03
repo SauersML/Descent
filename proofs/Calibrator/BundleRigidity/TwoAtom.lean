@@ -127,10 +127,14 @@ open scoped BigOperators
 
 /-! ## The modulus curves -/
 
-/-- The first modulus curve of the two-atom family: `|1 - 2p| / p`. -/
+/-- The first modulus curve of the two-atom family: `|1 - 2p| / p`.
+
+    Empirical status: UNTESTED. Definitional within the model declared above: it fixes a contrast rather than predicting an observable. -/
 noncomputable def mOne (p : ℝ) : ℝ := |1 - 2 * p| / p
 
-/-- The second modulus curve of the two-atom family: `|1 - 2p| / (1 - p)`. -/
+/-- The second modulus curve of the two-atom family: `|1 - 2p| / (1 - p)`.
+
+    Empirical status: UNTESTED. Definitional within the model declared above: it fixes a contrast rather than predicting an observable. -/
 noncomputable def mTwo (p : ℝ) : ℝ := |1 - 2 * p| / (1 - p)
 
 /-- **On `(0, 1/2]` the first modulus curve is `1/p - 2`**, the absolute value being

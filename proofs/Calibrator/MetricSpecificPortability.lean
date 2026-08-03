@@ -97,12 +97,9 @@ structure R2DecompositionData where
   -- Var(E[Y|Ŷ]) ≤ Var(Y) (law of total variance: explained ≤ total)
   hCondE_le_Y : varCondE ≤ varY
 
-/-- **The data class is inhabited**, and away from every boundary: `Var(E[Y|Ŷ]) = 1`,
-`Var(Ŷ) = 2`, `Var(Y) = 4`, so both `≤` chains are strict and `R² = 1/4`.
-
-Fourteen theorems quantify over `R2DecompositionData`.  Six of its nine fields are
-order constraints among three reals, and a witness is what shows the six are jointly
-satisfiable; without one, those fourteen theorems are true of nothing. -/
+/-- **The class is inhabited.**  A theorem quantified over an uninhabited structure is
+true and empty: kernel-checked, clean axiom report, no content.  This is the witness that
+makes the theorems below statements about something. -/
 noncomputable def R2DecompositionData.witness : R2DecompositionData where
   varY := 4
   varYhat := 2

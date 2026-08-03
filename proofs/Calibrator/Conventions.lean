@@ -91,7 +91,9 @@ coded `0, 1, …, ploidy`.
 noncomputable def hweGenotypeVariance (p : ℝ) : ℝ := ploidy * p * (1 - p)
 
 /-- Coalescent time scale: time measured in units of `ploidy · Nₑ`
-generations. -/
+generations.
+
+    Empirical status: UNTESTED. -/
 noncomputable def coalescentTimeScale (Ne : ℝ) : ℝ := ploidy * Ne
 
 @[simp] theorem coalescentTimeScale_eq (Ne : ℝ) :
@@ -391,11 +393,13 @@ theorem four_neiGst_eq_standardizedContrastVariance (p₁ p₂ : ℝ)
   unfold betweenSubgroupVariance
   field_simp
 
-/-- **The exact allele-frequency-contrast normalization.**
+/-- **The allele-frequency-contrast normalization.**
 
 This is deliberately not called the BBP spike: its input is Nei's `G_ST`, and
-its exact interpretation is the standardized allele-frequency contrast
-variance times the subgroup load. -/
+its interpretation is the standardized allele-frequency contrast
+variance times the subgroup load.
+
+    Empirical status: UNTESTED. -/
 noncomputable def neiContrastSpike (n m p₁ p₂ : ℝ) : ℝ :=
   demographicSpike n (neiGst p₁ p₂) m
 
@@ -403,7 +407,9 @@ noncomputable def neiContrastSpike (n m p₁ p₂ : ℝ) : ℝ :=
 
 The `F` supplied to the validation experiment was the ratio-of-averages Hudson
 estimator. This named specialization prevents that empirical law from being
-silently reinterpreted as the different Nei functional. -/
+silently reinterpreted as the different Nei functional.
+
+    Empirical status: UNTESTED. -/
 noncomputable def hudsonBbpSpike (n m p₁ p₂ : ℝ) : ℝ :=
   demographicSpike n (hudsonFst p₁ p₂) m
 

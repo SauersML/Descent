@@ -218,7 +218,9 @@ structure OneLocusArchitecture where
   /-- Allele frequency. -/
   p : ℝ
 
-/-- **Fisher's average effect**, the coefficient a dosage regression recovers. -/
+/-- **Fisher's average effect**, the coefficient a dosage regression recovers.
+
+    Empirical status: UNTESTED. -/
 noncomputable def OneLocusArchitecture.averageEffect (m : OneLocusArchitecture) : ℝ :=
   m.a + m.d * (1 - 2 * m.p)
 
@@ -244,7 +246,9 @@ separates the heterozygote from the homozygote midpoint when the two homozygotes
 equally frequent. -/
 
 /-- Genotypic values: homozygotes at `∓a`, heterozygote displaced by `d` from their
-midpoint. -/
+midpoint.
+
+    Empirical status: UNTESTED. Definitional within the model declared above: it fixes a contrast rather than predicting an observable. -/
 def OneLocusArchitecture.genotypicValue (m : OneLocusArchitecture) : DiploidGenotype → ℝ
   | .homRef => -m.a
   | .het => m.d
@@ -288,13 +292,15 @@ homozygote contrast at `p = 1/2`, one additive and one not. Kind: genotypic.
 The consequence, via `ProbeBlindness.no_criterion_of_factors`, is that *no* rule reading the
 average effect — no significance threshold, no effect-size filter, no combination of them —
 decides whether a locus is additive. A score fit on dosages is not approximately blind to
-dominance at equal frequency; it is exactly blind.
+dominance at equal frequency; it is blind.
 
 The probe is the observable and not merely a named quantity:
 `averageEffect_eq_regression_slope` identifies it with the least-squares slope of genotypic
 value on allele dosage under this development's own `HardyWeinbergModel`. So the object
 this instance proves undecidable is the coefficient a polygenic score fits, not an
-abstraction standing in for it. -/
+abstraction standing in for it.
+
+    Empirical status: UNTESTED. -/
 noncomputable def averageEffect_blind_to_dominance {δ : ℝ} (hδ : δ ≠ 0) (a : ℝ) :
     ProbeBlindness OneLocusArchitecture.averageEffect (fun m ↦ m.d = 0) where
   positive := ⟨a, 0, 1 / 2⟩

@@ -155,6 +155,15 @@ structure SingleModulus (d : ℕ) (v : ℝ) where
   /-- Every modulus value equals `v`: the transfer measure is `δ v`. -/
   modulus_eq : ∀ j, |atom j ^ 2 - 1| = v
 
+/-- **Nonemptiness of `SingleModulus` is ADMITTED, not proved.**  Every theorem quantified
+over it is vacuous if this fails, so the claim is stated and left open rather than left
+implicit.  Discharging it means the two-atom law at `±1` with mass `1/2` each: it is injective, centred, has unit variance, and has modulus `0`.
+
+Admitted rather than assumed: `sorry` is visible to `AxiomScan.lean` as `sorryAx` and to
+`check-identifications.py`, whereas a certificate parameter nothing constructs is visible
+to neither. -/
+theorem SingleModulus.nonempty : Nonempty (SingleModulus 2 0) := sorry
+
 namespace SingleModulus
 
 variable {d : ℕ} {v : ℝ}

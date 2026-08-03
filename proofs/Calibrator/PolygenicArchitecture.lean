@@ -269,11 +269,9 @@ structure SNPArchitecturePortabilityModel (q : ℕ) where
   targetRetained_nonneg : ∀ j, 0 ≤ targetRetainedSquaredEffect j
   targetRetained_le_source : ∀ j, targetRetainedSquaredEffect j ≤ sourceSquaredEffect j
 
-/-- **The model class is inhabited at every panel size `q`**, including `q = 0`.
-
-Sixteen theorems quantify over `SNPArchitecturePortabilityModel q`.  The witness retains
-half of each source effect, so it sits strictly inside the `targetRetained_le_source`
-constraint rather than on its boundary. -/
+/-- **The class is inhabited.**  A theorem quantified over an uninhabited structure is
+true and empty: kernel-checked, clean axiom report, no content.  This is the witness that
+makes the theorems below statements about something. -/
 noncomputable def SNPArchitecturePortabilityModel.witness
     (q : ℕ) : SNPArchitecturePortabilityModel q where
   sourceSquaredEffect := fun _ ↦ 1
@@ -291,12 +289,16 @@ noncomputable def sourceEffectMass {q : ℕ}
     (model : SNPArchitecturePortabilityModel q) : ℝ :=
   ∑ j, model.sourceSquaredEffect j
 
-/-- Total causal signal mass still retained in the target architecture. -/
+/-- Total causal signal mass still retained in the target architecture.
+
+    Empirical status: UNTESTED. -/
 noncomputable def targetRetainedEffectMass {q : ℕ}
     (model : SNPArchitecturePortabilityModel q) : ℝ :=
   ∑ j, model.targetRetainedSquaredEffect j
 
-/-- Total signal mass lost across SNPs when transporting to the target. -/
+/-- Total signal mass lost across SNPs when transporting to the target.
+
+    Empirical status: UNTESTED. -/
 noncomputable def lostEffectMass {q : ℕ}
     (model : SNPArchitecturePortabilityModel q) : ℝ :=
   model.sourceEffectMass - model.targetRetainedEffectMass
@@ -529,9 +531,9 @@ fixed-grade gap by projection from an assumption field.
 -/
 
 /-- Bounded additive-effect architectures.  The absolute radius makes the set
+nonempty and convex for every input, without a validity theorem parameter.
 
-    Empirical status: UNTESTED.
-nonempty and convex for every input, without a validity theorem parameter. -/
+    Empirical status: UNTESTED. -/
 noncomputable def boundedEffectCarrier (q : ℕ) (B : ℝ) : Set (Fin q → ℝ) :=
   Metric.closedBall 0 |B|
 
@@ -561,6 +563,12 @@ namespace MeanAbsoluteEffectCertificateProblem
 
 open Calibrator.CertificateGrading
 
+/-- The effect vectors this problem ranges over: the ball of radius
+`effectRadius` in the per-variant effect coordinates.
+
+    Empirical status: UNTESTED. Definitional within the problem declared above:
+    it names the carrier the catalogue is quantified over rather than
+    predicting an observable. -/
 noncomputable def effects {q n : ℕ} (P : MeanAbsoluteEffectCertificateProblem q n) :
     Set (Fin q → ℝ) := boundedEffectCarrier q P.effectRadius
 

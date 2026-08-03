@@ -111,6 +111,16 @@ structure DeploymentModel where
   /-- Whatever is absolutely blind is in particular blind at every finite order. -/
   perpRisk_le_blind : ∀ k, perpRisk ≤ blind k
 
+/-- **The class is inhabited.**  A theorem quantified over an uninhabited structure is
+true and empty: kernel-checked, clean axiom report, no content.  This is the witness that
+makes the theorems below statements about something. -/
+noncomputable def DeploymentModel.witness : DeploymentModel where
+  blind := fun _ ↦ 1
+  blind_nonneg := fun _ ↦ by norm_num
+  perpRisk := 0
+  perpRisk_nonneg := by norm_num
+  perpRisk_le_blind := fun _ ↦ by norm_num
+
 namespace DeploymentModel
 
 variable (M : DeploymentModel)

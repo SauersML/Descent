@@ -208,6 +208,16 @@ structure FiniteBoundedDeviation (Ω : Type*) [Fintype Ω] where
   radius_nonneg : 0 ≤ radius
   bound : ∀ ω, |deviation ω| ≤ radius
 
+/-- **Nonemptiness of `FiniteBoundedDeviation` is ADMITTED, not proved.**  Every theorem quantified
+over it is vacuous if this fails, so the claim is stated and left open rather than left
+implicit.  Discharging it means exhibiting a point-mass weight, zero deviation and zero radius, and evaluating the sum.
+
+Admitted rather than assumed: `sorry` is visible to `AxiomScan.lean` as `sorryAx` and to
+`check-identifications.py`, whereas a certificate parameter nothing constructs is visible
+to neither. -/
+theorem FiniteBoundedDeviation.nonempty (n : ℕ) :
+    Nonempty (FiniteBoundedDeviation (Fin (n + 1))) := sorry
+
 namespace FiniteBoundedDeviation
 
 variable {Ω : Type*} [Fintype Ω] (B : FiniteBoundedDeviation Ω)
@@ -441,9 +451,9 @@ for one growth class.
 The occupancy claims — that each row is attained by an actual coupling, with matched upper
 and lower bounds — are **not** proved here and are not asserted. This section establishes
 only that there are four places to be.
+measurements.
 
-Empirical status: UNTESTED. The separations are analytic facts about the rate functions, not
-measurements. -/
+Empirical status: UNTESTED. The separations are analytic facts about the rate functions, not -/
 
 section GainLandscape
 

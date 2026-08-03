@@ -99,12 +99,9 @@ def IsOrderFreeStatistic {α β : Type*} (statistic : List α → β) : Prop :=
 
 /-- Panel size is order-free, so the three results below are about a nonempty class.
 
-    Without an inhabitant the reversal wall would be a theorem about no statistic:
-    `orderFreeStatistic_reverse` and its consumers would all hold vacuously, and
-    "no unordered panel can recover the arrow of time" would be a claim about an
-    empty hypothesis. Length is the smallest honest witness -- it is exactly the
-    information an unordered bag retains -- and it is the statistic the informal
-    argument above appeals to when it says a bag keeps counts but loses order. -/
+    Length is the smallest witness and the apt one: it is exactly the information
+    an unordered bag retains, and it is the statistic the argument above appeals
+    to in saying a bag keeps counts but loses order. -/
 theorem isOrderFreeStatistic_length {α : Type*} :
     IsOrderFreeStatistic (fun xs : List α ↦ xs.length) :=
   fun _ _ h ↦ h.length_eq

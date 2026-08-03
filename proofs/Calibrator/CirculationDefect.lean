@@ -61,7 +61,9 @@ theorem circulationQuadraticForm_eq_zero (a x y : ℝ) :
     circulationQuadraticForm a x y = 0 := by
   unfold circulationQuadraticForm; ring
 
-/-- Dirichlet form of a generator with isotropic dissipation `s` and circulation `a`. -/
+/-- Dirichlet form of a generator with isotropic dissipation `s` and circulation `a`.
+
+    Empirical status: UNTESTED. Definitional within the model declared above: it fixes a contrast rather than predicting an observable. -/
 def driftGeneratorForm (s a x y : ℝ) : ℝ :=
   s * (x ^ 2 + y ^ 2) + circulationQuadraticForm a x y
 

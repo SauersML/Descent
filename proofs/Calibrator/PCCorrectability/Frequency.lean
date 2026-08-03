@@ -28,9 +28,9 @@ structure FrequencyResolvedCohort (classes : ℕ) where
   effectiveMarkers_pos : ∀ i, 0 < effectiveMarkers i
   differentiation_nonneg : ∀ i, 0 ≤ differentiation i
 
-/-- **The class is inhabited.**  Without a term of this type every theorem quantified
-over it is a true statement about an empty class: kernel-checked, clean axiom report,
-and no content.  See `scripts/check-laundering.py` family F4. -/
+/-- **The class is inhabited.**  A theorem quantified over an uninhabited structure is
+true and empty: kernel-checked, clean axiom report, no content.  This is the witness that
+makes the theorems below statements about something. -/
 noncomputable def FrequencyResolvedCohort.witness (classes : ℕ) :
     FrequencyResolvedCohort classes where
   sampleSize := 1
