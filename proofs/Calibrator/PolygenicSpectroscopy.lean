@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Sauers
 -/
 import Calibrator.Condensation
+import Mathlib.Analysis.Complex.ExponentialBounds
 import Calibrator.CramerStratum
 import Calibrator.CumulantBlindness
 import Calibrator.JetBarrier
@@ -676,17 +677,54 @@ theorem maxSafeEpistaticOrder_eq_criticalDegree (N q : ℝ) :
 /-- **The Hardy-Weinberg Mellin drift is strictly positive at every polymorphic
 frequency.**
 
-`hweMellinDrift q = E[X² log X²]` for the standardized HWE genotype `X`, whose second
-moment is `1` (`hwe_variance_eq`). Jensen on `x ↦ x log x` therefore gives `≥ 0`, with
-equality only if `X²` is almost surely `1`; for `0 < q < 1` the three genotype values
-`(1-2q)²/(2q(1-q))`, `2q/(1-q)`, `2(1-q)/q` are never all `1`, so the inequality is
-strict. Neither half is formalised here, and every theorem below that needs a positive
-drift used to take it as the premise `hc : 0 < hweMellinDrift q` — a fact about a
-function this file defines, received rather than proved. Stated and admitted so the
-debt is kernel-visible. -/
+Write `A = (1 - 2q)²`, `B = 2q(1-q)`, and `x = A/B`.  Since `B > 0`, the
+closed form factors as
+
+`B * (x log x + 2 log 2)`.
+
+For `x > 0`, Mathlib's elementary inequality `1 - x⁻¹ ≤ log x` gives
+`x log x ≥ x - 1 ≥ -1`, while the certified numerical bound on `log 2`
+gives `2 log 2 > 1`.  At `x = 0` the logarithmic term vanishes directly.
+Thus the factor in parentheses and `B` are both strictly positive. -/
 theorem hweMellinDrift_pos (q : ℝ) (hq0 : 0 < q) (hq1 : q < 1) :
     0 < hweMellinDrift q := by
-  sorry
+  let A : ℝ := (1 - 2 * q) ^ 2
+  let B : ℝ := 2 * q * (1 - q)
+  let x : ℝ := A / B
+  have hqComplement : 0 < 1 - q := by linarith
+  have hB : 0 < B := by
+    dsimp [B]
+    exact mul_pos (mul_pos (by norm_num) hq0) hqComplement
+  have hBne : B ≠ 0 := ne_of_gt hB
+  have hx : 0 ≤ x := div_nonneg (sq_nonneg (1 - 2 * q)) hB.le
+  have hBx : B * x = A := by
+    dsimp [x]
+    field_simp [hBne]
+  have hfactor :
+      hweMellinDrift q = B * (x * Real.log x + 2 * Real.log 2) := by
+    calc
+      hweMellinDrift q = A * Real.log x + 2 * B * Real.log 2 := by
+        dsimp [hweMellinDrift, A, B, x]
+        ring
+      _ = B * (x * Real.log x + 2 * Real.log 2) := by
+        rw [← hBx]
+        ring
+  have htwo : 1 < 2 * Real.log 2 := by
+    nlinarith [Real.log_two_gt_d9]
+  have hinner : 0 < x * Real.log x + 2 * Real.log 2 := by
+    by_cases hx0 : x = 0
+    · simp [hx0]
+      linarith
+    · have hxpos : 0 < x := lt_of_le_of_ne hx (Ne.symm hx0)
+      have hlog := Real.one_sub_inv_le_log_of_pos hxpos
+      have hmul : x * (1 - x⁻¹) ≤ x * Real.log x :=
+        mul_le_mul_of_nonneg_left hlog hx
+      have hxinv : x * x⁻¹ = 1 := mul_inv_cancel₀ hx0
+      have hlower : -1 ≤ x * Real.log x := by
+        nlinarith
+      linarith
+  rw [hfactor]
+  exact mul_pos hB hinner
 
 /-- Subcriticality (the Gaussian surrogate is valid) is exactly `m * c(q) < log N`. -/
 theorem epistatic_order_safe_iff {N q m : ℝ} (hq0 : 0 < q) (hq1 : q < 1) :
