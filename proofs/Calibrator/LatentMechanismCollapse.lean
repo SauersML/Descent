@@ -264,6 +264,38 @@ theorem head_piece_pos (ε δ₀ g gTail : ℝ)
   nlinarith [hmargin, hεsmall, hδ, hε, hε1]
 
 /-!
+## 3b. Why the smooth category does not prevent the collapse
+
+The guard clause the collapse has to defeat is: "Borel encodings that collapse every latent space
+to one dimension are forbidden by the smooth category." The reason it fails is geometric and it
+is small enough to prove.
+
+Sard's theorem does bound the image of a smooth curve — a curve is measure zero in the plane, and
+no reparametrisation changes that. But **a mixture does not see the image, it sees the convex
+hull**, and the convex hull of a curve is not a curve. Three points of the parabola are already
+affinely independent, so a one-parameter smooth family spans a full-dimensional set of mixtures
+in the plane, and the same construction in higher dimension is the moment curve.
+
+That is the whole of why the smooth category buys nothing here, and
+`smoothCurve_hull_not_collinear` is it. What remains prose is the construction that turns this
+into an exact factorization of an arbitrary family, which needs kernels and mixing measures as
+formal objects.
+-/
+
+/-- **The convex hull of a smooth curve is not a curve.** The three points of the parabola
+`t ↦ (t, t²)` at `t = -1, 0, 1` do not lie on a common line, so their mixtures already fill a
+two-dimensional set. Sard bounds the curve's image; it says nothing about what averaging over the
+curve can reach, and averaging is what a mixture does. -/
+theorem smoothCurve_hull_not_collinear :
+    ¬ ∃ c d : ℝ, (-1 : ℝ) ^ 2 = c * (-1) + d ∧ (0 : ℝ) ^ 2 = c * 0 + d ∧
+      (1 : ℝ) ^ 2 = c * 1 + d := by
+  rintro ⟨c, d, hneg, hzero, hpos⟩
+  norm_num at hneg hzero hpos
+  -- The middle point forces the intercept to vanish, and the two outer points then demand
+  -- `c = 1` and `c = -1` at once.
+  linarith
+
+/-!
 ## 4. The mechanism count is not identified
 
 The general collapse theorem quantifies over smooth families on compact manifolds and
