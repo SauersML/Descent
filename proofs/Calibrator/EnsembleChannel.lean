@@ -133,4 +133,72 @@ theorem ensembleSquaredLoss_decomposition {ι : Type*} [Fintype ι]
       rw [hcenter]
       simp
 
+/-! ## Exact multi-band compound geometry -/
+
+/-- Evaluation-weighted squared deployment loss across target populations and genomic
+frequency bands.  The weight may vary by target and band; in the spectral portability
+model it is the target feature spectrum, optionally multiplied by a task weight. -/
+noncomputable def weightedBandEnsembleLoss
+    {ι Band : Type*} [Fintype ι] [Fintype Band]
+    (weight : ι → Band → ℝ) (target : ι → Band → ℝ)
+    (deployment : Band → ℝ) : ℝ :=
+  ∑ i, ∑ b, weight i b * (target i b - deployment b) ^ 2
+
+/-- Evaluation-weighted loss of a target-specific predictor. -/
+noncomputable def weightedBandPredictorLoss
+    {ι Band : Type*} [Fintype ι] [Fintype Band]
+    (weight : ι → Band → ℝ) (target predictor : ι → Band → ℝ) : ℝ :=
+  ∑ i, ∑ b, weight i b * (target i b - predictor i b) ^ 2
+
+/-- **Exact spectral compound-deployment identity.** If the prediction residual is
+orthogonal to displacement from the source in the evaluation-weighted inner product,
+then source deployment loss is irreducible residual loss plus the complete recoverable
+term
+
+`∑ target ∑ band weight · (predictor - source)²`.
+
+Allowing weights to vary across targets is essential in genetics: LD spectra, genotype
+variance, imputation quality, and task emphasis can all differ between deployment
+populations.  The recoverable term is not generally the variance of the predictor; it
+also retains systematic displacement of the ensemble from the source population. -/
+theorem weightedBandEnsembleLoss_decomposition
+    {ι Band : Type*} [Fintype ι] [Fintype Band]
+    (weight : ι → Band → ℝ) (target predictor : ι → Band → ℝ)
+    (source : Band → ℝ)
+    (horthogonal :
+      ∑ i, ∑ b, weight i b *
+        (target i b - predictor i b) * (predictor i b - source b) = 0) :
+    weightedBandEnsembleLoss weight target source =
+      weightedBandPredictorLoss weight target predictor +
+        ∑ i, ∑ b, weight i b * (predictor i b - source b) ^ 2 := by
+  unfold weightedBandEnsembleLoss weightedBandPredictorLoss
+  have hpoint : ∀ i b,
+      weight i b * (target i b - source b) ^ 2 =
+        weight i b * (target i b - predictor i b) ^ 2 +
+          weight i b * (predictor i b - source b) ^ 2 +
+            2 * (weight i b * (target i b - predictor i b) *
+              (predictor i b - source b)) := by
+    intro i b
+    ring
+  simp_rw [hpoint, Finset.sum_add_distrib, ← Finset.mul_sum]
+  rw [horthogonal]
+  ring
+
+/-- With nonnegative evaluation weights, an orthogonal conditional predictor can only
+improve aggregate deployment risk; its exact improvement is the recoverable term in
+`weightedBandEnsembleLoss_decomposition`. -/
+theorem weightedBandPredictorLoss_le_source
+    {ι Band : Type*} [Fintype ι] [Fintype Band]
+    (weight : ι → Band → ℝ) (target predictor : ι → Band → ℝ)
+    (source : Band → ℝ) (hweight : ∀ i b, 0 ≤ weight i b)
+    (horthogonal :
+      ∑ i, ∑ b, weight i b *
+        (target i b - predictor i b) * (predictor i b - source b) = 0) :
+    weightedBandPredictorLoss weight target predictor ≤
+      weightedBandEnsembleLoss weight target source := by
+  rw [weightedBandEnsembleLoss_decomposition weight target predictor source horthogonal]
+  apply le_add_of_nonneg_right
+  exact Finset.sum_nonneg fun i _ =>
+    Finset.sum_nonneg fun b _ => mul_nonneg (hweight i b) (sq_nonneg _)
+
 end Calibrator
