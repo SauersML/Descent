@@ -109,6 +109,7 @@ import Calibrator.UnifiedBiology
 -- closure distinguishes an orphan from a module someone else already imports;
 -- `DeploymentCeiling`, added above, was the only real one.
 import Calibrator.ResonanceSpectrum
+import Calibrator.Identification
 import Calibrator.BundleRigidity.Coverage
 import Calibrator.BundleRigidity.Cycles
 import Calibrator.BundleRigidity.DeploymentCeiling
@@ -310,7 +311,7 @@ theorem covariance_mismatch_pos_of_twoLocusCoalescent_proved
 /-- The true derivative of expected Brier score with respect to `p`,
     proved via the quadratic-form derivative in `Conclusions`. -/
 theorem expectedBrierScore_deriv_proved (p π : ℝ) :
-    deriv (fun x => expectedBrierScore x π) p = 2 * (p - π) :=
+    deriv (fun x ↦ expectedBrierScore x π) p = 2 * (p - π) :=
   expectedBrierScore_deriv p π
 
 /-- Concrete 2x2 matrix representing independent LD. -/
@@ -472,14 +473,14 @@ entire time; only the identifier search missed it.
 theorem ld_decay_implies_nonlinear_calibration_proved {k : ℕ} [Fintype (Fin k)]
     (mech : LDDecayMechanism k)
     (lambda : ℝ) (h_lambda_pos : 0 < lambda)
-    (h_tagging : mech.tagging_efficiency = fun d => Real.exp (-lambda * d))
+    (h_tagging : mech.tagging_efficiency = fun d ↦ Real.exp (-lambda * d))
     (c0 c1 c2 : Fin k → ℝ)
     (hd0 : mech.distance c0 = 0)
     (hd1 : mech.distance c1 = 1)
     (hd2 : mech.distance c2 = 2) :
     ∀ (beta0 beta1 : ℝ),
-      (fun c => beta0 + beta1 * mech.distance c) ≠
-        (fun c => decaySlope mech c) := by
+      (fun c ↦ beta0 + beta1 * mech.distance c) ≠
+        (fun c ↦ decaySlope mech c) := by
   intro beta0 beta1 h_eq
   have h0 := congr_fun h_eq c0
   have h1 := congr_fun h_eq c1
