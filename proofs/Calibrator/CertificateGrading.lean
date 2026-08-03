@@ -306,6 +306,15 @@ noncomputable def fixedGradeGapScale (K n : ℕ) : ℝ :=
   (n + 2 : ℝ) ^ (fixedGradeExponent K / 2) /
     Real.sqrt (Real.log (n + 2 : ℝ))
 
+/-- The proposed fixed-grade scale is strictly positive for every grade and catalogue size. -/
+theorem fixedGradeGapScale_pos (K n : ℕ) : 0 < fixedGradeGapScale K n := by
+  unfold fixedGradeGapScale fixedGradeExponent
+  have hbase : (0 : ℝ) < n + 2 := by positivity
+  have honeNat : 1 < n + 2 := by omega
+  have hone : (1 : ℝ) < n + 2 := by exact_mod_cast honeNat
+  exact div_pos (Real.rpow_pos_of_pos hbase _)
+    (Real.sqrt_pos.2 (Real.log_pos hone))
+
 /-- Modulus-level certification gap of this actual finite experiment. -/
 noncomputable def certificationGap (K : ℕ) (h : ℝ) : ℝ :=
   E.certificateProblem.modulus 0 h /
