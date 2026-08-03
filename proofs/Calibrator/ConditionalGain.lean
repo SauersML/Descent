@@ -319,30 +319,39 @@ genotype cell retains positive mass. That half is confirmed: a two-locus sweep i
 rational arithmetic finds charged cells equal to product cells at **every** `r² < 1`, down to
 a smallest genotype-cell mass of `6.25e-20` at `r² = 1 - 2e-9`.
 
-The first draft of this note then said "`η = 0` is exactly `r² = 1`, so pruning at `r² = 1`
-removes the whole obstruction". **The first clause is false and the second is right for a
-weaker reason.** Complete linkage costs coverage only when two further conditions hold:
+The first draft of this note said "`η = 0` is exactly `r² = 1`, so pruning at `r² = 1` removes
+the whole obstruction". **Both halves are false**, and the second failed a second time after
+being weakened once. Measured over 8 allele-frequency pairs × 10 values of `D`:
 
-* the two loci must have **equal** allele frequencies. At `pA ≠ pB` complete linkage does not
-  reach `r² = 1` at all — at `pA = 1/2, pB = 3/10` the maximum is `r² = 3/7` — and coverage is
-  unchanged there, 3 cells charged against 3 in the product.
-* the modulus map must **separate the genotypes**. At `p = 1/2` it does not: all three
-  genotypes share one modulus value, so there is one cell and nothing to lose. Measured at
-  complete linkage, `p = 1/2` gives 1 charged against 1 in the product, while `p = 3/10` and
-  `p = 1/10` give **3 charged against 9**.
+* `r² = 1` requires `pA = pB`. On a `0.1` frequency grid only 9 of 81 pairs can reach it at
+  all; `pA = 1/2, pB = 1/10` caps at `r²_max = 1/9`.
+* **A vanishing haplotype does not need high `r²`.** Of the 72 configurations carrying a zero
+  haplotype at `r² < 1`, **56 lose coverage strictly**, the worst at `pA = 1/10, pB = 9/10`
+  with **`r² = 1/81 ≈ 0.0123`**. So losses do not sit inside `r² = 1`, and an `r²` cutoff —
+  at any threshold — does not certify the positive-floor hypothesis.
+* Complete linkage also costs nothing unless the modulus map separates the genotypes. At
+  `p = 1/2` all three genotypes share one modulus value, so there is one cell and nothing to
+  lose: 1 charged against 1, against 3 charged against 9 at `p = 3/10` and `p = 1/10`. **The
+  one frequency at which `r² = 1` is cleanest is precisely where the modulus statistic sees
+  nothing.**
 
-So `r² = 1` is *sufficient* for coverage loss and not necessary for coverage to survive, and
-the implication "`r² = 1` ⟹ coverage lost" is false. Pruning at `r² = 1` still removes the
-whole obstruction, since every loss sits inside that set, but that conclusion no longer rests
-on the equivalence originally claimed for it.
+The scalar `r²` is therefore the wrong variable for this boundary in both directions. What
+the theorem needs is a positive joint-cell floor, and no `r²` threshold implies one.
 
 **The caveat that matters more than the theorem.** This is a statement about *positive* mass,
 and positive is not observable. At `pA = pB = 3/10` with `N = 500,000` samples the rarest
 genotype cell is missed with probability `0.22` already at `r² = 0.98`, and with probability
 `1.00` at `r² ≥ 0.998`, where observing it would need `N ≈ 6.8e7`. **Empirically coverage is
 lost far below `r² = 1`**, at a threshold set by sample size rather than by the population
-parameter. The population theorem does not describe what a real study meets, and nothing here
-licenses an `r² = 1` pruning rule in practice.
+parameter.
+
+**And linkage is not even the dominant driver.** At `pA = pB = 1/20` with `r² = 0` — perfect
+linkage *equilibrium* — the rarest genotype cell has probability `6.25e-6` and `N = 500,000`
+loses a modulus cell in 5% of runs. Allele frequency alone breaks empirical coverage with no
+LD at all. Going the other way, at `p = 1/20` raising `r²` from `0` to `0.81` *increases* the
+rarest cell probability, from `6.25e-6` to `2.26e-5`, because the coupling phase inflates the
+rare-rare haplotype: **more LD made coverage easier**. Any design rule phrased purely in `r²`
+gets both of these backwards.
 
 Empirical status: **VALIDATED** on the population half, with **two claims corrected and one
 practical caveat added**. Exact rational sweep and finite-sample arm in

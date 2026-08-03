@@ -367,42 +367,77 @@ theorem highly_polygenic_better_gaussian
     C * ρ / (σ_sq * Real.sqrt m_poly) < C * ρ / (σ_sq * Real.sqrt m_oligo) :=
   berry_esseen_error_decreases_with_snps C ρ σ_sq m_oligo m_poly h_C h_ρ h_σ h_oligo h_more
 
-/-! ### The count that decides is blocks, not markers
+/-! ### The count that decides is blocks, not markers — and the constant that does not
 
 `berry_esseen_error_decreases_with_snps` above is stated in the **marker count**, and under
-linkage that count is wrong in the anti-conservative direction. The freezing transition
-supplies the correction: a score over a genome with correlation length `ℓ` behaves, for
-normal-approximation purposes, like a sum over `m/ℓ` effectively independent **blocks**, and
-the residual discreteness it leaves behind is `(1 - 1/ℓ)^(n-1)`.
+linkage that count is wrong. The freezing transition supplies the correction: a score over a
+genome with correlation length `ℓ` behaves, for normal-approximation purposes, like a sum
+over `m/ℓ` effectively independent **blocks**.
 
-**The reduction itself is an analytic input and is carried as one.** That a linked score
-obeys a central limit theorem with the block count in place of the marker count is a
-regeneration/renewal statement — the excursion decomposition of
-`Calibrator.FoldedSpectrum` §8 — and it is not proved here. What is proved is the
-consequence, which is the part a practitioner is exposed to: **the marker-count error bound
-understates the true one by exactly `√ℓ`.**
+**The count is confirmed and the constant is refuted.** A first version of this section
+claimed the marker-count bound understates the true one by *exactly* `√ℓ`. Simulation on
+1.6M individuals per configuration (153 configurations) says otherwise:
 
-The direction matters more than the factor. A bound that is too small reads as "the Gaussian
-approximation is safe here", so the error is not conservative, and it is worst exactly where
-LD is strongest and where the marker count is most flattering. A panel of a million variants
-with correlation length one hundred has the normal-approximation quality of ten thousand
-independent ones, and its Berry–Esseen bound is ten times larger than the marker count says.
+* with **block-constant haplotypes and equal marker weights** the ratio is `1.00 ± 0.01` at
+  every `ℓ ∈ [1,32]` and every `m ∈ [16,8192]` — there, and only there, the factor is `√ℓ`;
+* with **geometric block lengths** — a genuine renewal chain, i.e. actual recombination —
+  the ratio is `2.09` at `ℓ = 32`, between 25 and 240 standard errors from one.
 
-Empirical status: the reduction is UNTESTED here and carried as a hypothesis; the residual
-discreteness `(1 - 1/ℓ)^(n-1)` is MEASURED upstream (max deviation `0.033` against a
-binomial standard error of `0.024`, with the predicted failure on a non-renewal chain also
-firing). The algebra below is PROVED. -/
+The shortfall has a closed form. Writing `bw` for a block's summed weight, the third-moment
+ratio against an equal-weight independent panel is `κ = E[bw³]/E[bw²]^{3/2}`, which for
+geometric lengths of mean `ℓ` tends to `6/2^{3/2} = 2.1213`. Predicted against measured:
+`1.769/1.72`, `1.971/1.96`, `2.051/2.05`, `2.087/2.07`, `2.105/2.09` — under 2% throughout.
+
+**The same factor runs the other way for heterogeneous effect sizes**, because blocks average
+weights: half-normal weights give `κ → 0.6267` (measured plateau `0.65`). Both mechanisms
+together predict `2.121 × 0.6267 = 1.319`; measured `1.31 ± 0.03`. So `κ` is not a fudge
+absorbing error — it is a computable property of the excursion-weight law, and it can sit on
+either side of one.
+
+`κ` is therefore an **explicit argument** below rather than a suppressed hypothesis. The old
+statement, reusing one `ρ/σ³` on both sides, was a tautology whose entire content was the
+unstated `κ = 1`.
+
+**What the block reduction does and does not say.** `FoldedSpectrum` §8's `renormalization`
+gives the chain's law as that of an independent panel over the **excursion bundle** — a
+different family with its own moments — not as `m/ℓ` independent *markers*. Collapsing the
+one to the other is exactly the `κ = 1` smuggle, and it is the step the measurement refutes.
+
+**A warning about `ℓ` itself.** It has no operational definition here and the natural
+estimators disagree. For a copying chain the mean block length is `ℓ` while the score
+variance inflation is `2ℓ - 1` (measured `30.9` at `ℓ = 16`), so reading `ℓ` off variance
+inflation costs a further `√2`. Worse, with sign-random effect weights the measured variance
+inflation is `1.00 ± 0.01` at every `ℓ` up to 32 while the effective block count is still
+`m/ℓ` — the standard estimator returns `ℓ = 1` and reports that no correction is needed.
+
+**And the bound is not the distance.** For a lattice-valued score the two can move in
+opposite directions: with unit weights the copy arm's measured Kolmogorov–Smirnov distance is
+*half* the block prediction (`0.493` at `ℓ = 4`), because random block lengths destroy the
+lattice term that dominates KS. Once weights are continuous the lattice term vanishes and KS
+agrees with skewness (`1.31`). A Berry–Esseen bound is not a claim about measured
+distributional distance.
+
+Empirical status: **the block count is VALIDATED, the `√ℓ` constant is FALSIFIED and
+replaced.** Measurements in `proofs/validation/block_count/`; positive control (`ℓ = 1`,
+three independent generators) reproduces the analytic independent-panel value to
+`1.001 ± 0.003`. -/
 
 section BlockCount
 
-/-- **The effectively independent block count**: markers divided by correlation length. -/
+/-- **The effectively independent block count**: markers divided by correlation length.
+
+    Junk-value note: at `correlationLength = 0` Lean's division returns `0`, which reads as
+    "no blocks at infinite correlation" — nonsense in the wrong direction. Every theorem
+    below carries `0 < correlationLength`. -/
 noncomputable def effectiveBlockCount (markers correlationLength : ℝ) : ℝ :=
   markers / correlationLength
 
 /-- **Residual discreteness of the freezing transition.**
 
-    The lattice ghost surviving in a block of `n` markers at correlation length `ℓ`. It is
-    the quantity whose vanishing licenses treating the block sum as continuous. -/
+    The lattice ghost surviving in a block of `n` markers at correlation length `ℓ`.
+
+    Junk-value note: natural subtraction makes `n = 0` and `n = 1` agree at `1`, so this is
+    the lag-`(n-1)` quantity only for `n ≥ 1`, which every theorem below requires. -/
 noncomputable def residualDiscreteness (correlationLength : ℝ) (n : ℕ) : ℝ :=
   (1 - 1 / correlationLength) ^ (n - 1)
 
@@ -421,12 +456,8 @@ theorem residualDiscreteness_of_no_linkage (n : ℕ) (hn : 2 ≤ n) :
 
 /-- **The residual ghost decays exponentially in blocks, not in markers.**
 
-    `(1 - 1/ℓ)^(n-1) ≤ exp(-(n-1)/ℓ)`. The exponent is `(n-1)/ℓ`, the number of correlation
-    lengths spanned, so the discreteness a normal approximation has to overcome is
-    controlled by the block count and not by the marker count. This is the same substitution
-    the Berry–Esseen bound below undergoes, arriving by a different route, and it is why
-    `residualDiscreteness` and `effectiveBlockCount` are two views of one quantity rather
-    than two independent knobs. -/
+    `(1 - 1/ℓ)^(n-1) ≤ exp(-(n-1)/ℓ)`. The exponent counts correlation lengths spanned, so
+    the discreteness a normal approximation must overcome is governed by the block count. -/
 theorem residualDiscreteness_le_exp (correlationLength : ℝ) (n : ℕ)
     (hn : 1 ≤ n) (hℓ : 1 ≤ correlationLength) :
     residualDiscreteness correlationLength n ≤
@@ -450,40 +481,52 @@ theorem residualDiscreteness_le_exp (correlationLength : ℝ) (n : ℕ)
         rw [hcast]
         ring_nf
 
-/-- **The block-count Berry–Esseen bound is exactly `√ℓ` times the marker-count bound.**
+/-- **The excursion-shape factor.** The third-moment ratio of a block's summed weight
+    against an equal-weight independent panel. Measured `2.09` for geometric block lengths,
+    `0.63` for half-normal effect weights, `1.31` for both; `1` exactly for block-constant
+    haplotypes with equal weights, which is the only case in which the naive `√ℓ` holds. -/
+noncomputable def excursionShapeFactor (blockThirdMoment blockSecondMoment : ℝ) : ℝ :=
+  blockThirdMoment / blockSecondMoment ^ (3 / 2 : ℝ)
 
-    Writing the marker count as `b · ℓ` for `b` blocks at correlation length `ℓ`, the bound
-    computed from blocks is `√ℓ` times the bound computed from markers. The marker-count
-    figure is therefore an understatement whenever there is any linkage at all. -/
-theorem berry_esseen_block_bound_eq (C ρ σ_sq b ℓ : ℝ)
+/-- **The block bound is `√ℓ · κ` times the marker bound.**
+
+    `κ` appears explicitly. Setting `κ = 1` recovers the equal-weight block-constant case and
+    nothing else; for a genuine renewal chain `κ ≈ 2.09`, and for heterogeneous effect sizes
+    `κ ≈ 0.63`. -/
+theorem berry_esseen_block_bound_eq (C ρ σ_sq b ℓ κ : ℝ)
     (hb : 0 < b) (hℓ : 0 < ℓ) (hσ : 0 < σ_sq) :
-    C * ρ / (σ_sq * Real.sqrt b) =
-      Real.sqrt ℓ * (C * ρ / (σ_sq * Real.sqrt (b * ℓ))) := by
+    κ * (C * ρ) / (σ_sq * Real.sqrt b) =
+      Real.sqrt ℓ * (κ * (C * ρ)) / (σ_sq * Real.sqrt (b * ℓ)) := by
   have hsb : 0 < Real.sqrt b := Real.sqrt_pos.mpr hb
   have hsl : 0 < Real.sqrt ℓ := Real.sqrt_pos.mpr hℓ
   rw [Real.sqrt_mul (le_of_lt hb) ℓ]
   field_simp
+  ring
 
-/-- **The marker count is anti-conservative**: at any correlation length above one the true
-    bound strictly exceeds the one the marker count reports.
+/-- **When the marker count is anti-conservative, and when it is not.**
 
-    This is the statement to carry into study design. It says the failure of a
-    marker-counted normal approximation is not a small correction to be absorbed into
-    constants — it is a `√ℓ` inflation whose size is set by the LD structure of the panel,
-    and it runs in the direction that makes an unsafe approximation look safe. -/
-theorem marker_count_understates_berry_esseen (C ρ σ_sq b ℓ : ℝ)
-    (hC : 0 < C) (hρ : 0 < ρ) (hb : 0 < b) (hσ : 0 < σ_sq) (hℓ : 1 < ℓ) :
-    C * ρ / (σ_sq * Real.sqrt (b * ℓ)) < C * ρ / (σ_sq * Real.sqrt b) := by
-  have hℓ0 : (0 : ℝ) < ℓ := by linarith
+    The marker-count bound understates the true one exactly when `κ√ℓ > 1`. That covers the
+    renewal-chain case, where `κ ≈ 2.09` makes the understatement *worse* than `√ℓ`. It does
+    **not** cover every case: heterogeneous effect sizes give `κ ≈ 0.63`, so at small `ℓ` the
+    marker count can be conservative instead. The hypothesis is stated rather than assumed
+    because the measurement found both signs. -/
+theorem marker_count_understates_berry_esseen (C ρ σ_sq b ℓ κ : ℝ)
+    (hC : 0 < C) (hρ : 0 < ρ) (hb : 0 < b) (hσ : 0 < σ_sq) (hℓ : 0 < ℓ)
+    (hκ : 0 < κ) (hgap : 1 < κ * Real.sqrt ℓ) :
+    C * ρ / (σ_sq * Real.sqrt (b * ℓ)) <
+      κ * (C * ρ) / (σ_sq * Real.sqrt b) := by
   have hsb : 0 < Real.sqrt b := Real.sqrt_pos.mpr hb
-  have hlt : Real.sqrt b < Real.sqrt (b * ℓ) := by
-    have : b < b * ℓ := by nlinarith
-    exact Real.sqrt_lt_sqrt (le_of_lt hb) this
-  apply div_lt_div_of_pos_left (mul_pos hC hρ) (mul_pos hσ hsb)
-  exact mul_lt_mul_of_pos_left hlt hσ
+  have hsl : 0 < Real.sqrt ℓ := Real.sqrt_pos.mpr hℓ
+  have hnum : 0 < C * ρ := mul_pos hC hρ
+  have hsplit : Real.sqrt (b * ℓ) = Real.sqrt b * Real.sqrt ℓ :=
+    Real.sqrt_mul (le_of_lt hb) ℓ
+  rw [hsplit, div_lt_div_iff₀ (by positivity) (by positivity)]
+  have hexpand : C * ρ * (σ_sq * Real.sqrt b) * (κ * Real.sqrt ℓ)
+      = κ * (C * ρ) * (σ_sq * (Real.sqrt b * Real.sqrt ℓ)) := by ring
+  nlinarith [mul_pos hnum (mul_pos hσ hsb), hgap, hexpand]
 
 /-- The effective block count is what the corrected bound consumes: at `markers = b · ℓ` it
-    returns `b`. Recorded so that the two vocabularies cannot drift apart. -/
+    returns `b`. -/
 theorem effectiveBlockCount_of_blocks (b ℓ : ℝ) (hℓ : ℓ ≠ 0) :
     effectiveBlockCount (b * ℓ) ℓ = b := by
   unfold effectiveBlockCount

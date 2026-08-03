@@ -1,0 +1,131 @@
+=== witness legality ===
+  n=  1 m=    2 trace(perturbed)=         3/2  == m? False
+  n=  2 m=    6 trace(perturbed)=        14/3  == m? False
+  n=  3 m=   12 trace(perturbed)=        39/4  == m? False
+  n=  4 m=   20 trace(perturbed)=        84/5  == m? False
+
+=== error floor vs actual error (o=2, tightest valid L) ===
+
+-- normalization: raw --
+functional                         n        L*     floor     max_err  err/floor  holds
+cheverud_nyholt                    4    0.5067    0.3493          19      54.39  True
+cheverud_nyholt                   16    0.8335    0.4461         271      607.5  True
+cheverud_nyholt                   32    0.9118    0.4710        1055       2240  True
+cheverud_nyholt_trace1             4    0.9500    0.3050          19       62.3  True
+cheverud_nyholt_trace1            16    0.9963    0.4413         271      614.1  True
+cheverud_nyholt_trace1            32    0.9991    0.4697        1055       2246  True
+li_ji                              4   16.6667   -1.2667          19        nan  True
+li_ji                             16  256.8889   -7.0850         271        nan  True
+li_ji                             32 1024.9412  -15.0446        1055        nan  True
+participation_ratio                4   13.2013   -0.9201          19        nan  True
+participation_ratio               16  241.7255   -6.6390         271        nan  True
+participation_ratio               32  993.8538  -14.5735        1055        nan  True
+galwey                             4    6.0630   -0.2063          19        nan  True
+galwey                            16  156.0289   -4.1185         271        nan  True
+galwey                            32  720.3279  -10.4292        1055        nan  True
+
+-- normalization: over_m --
+functional                         n        L*     floor     max_err  err/floor  holds
+cheverud_nyholt                    4    0.0253    0.3975      0.8049      2.025  True
+cheverud_nyholt                   16    0.0031    0.4705      0.9414      2.001  True
+cheverud_nyholt                   32    0.0009    0.4848      0.9697          2  True
+cheverud_nyholt_trace1             4    0.0475    0.3952      0.7909      2.001  True
+cheverud_nyholt_trace1            16    0.0037    0.4705       0.941          2  True
+cheverud_nyholt_trace1            32    0.0009    0.4848      0.9697          2  True
+li_ji                              4    0.8333    0.3167        0.96      3.032  True
+li_ji                             16    0.9444    0.4428      0.9965       2.25  True
+li_ji                             32    0.9706    0.4701      0.9991      2.125  True
+participation_ratio                4    0.6601    0.3340      0.9267      2.775  True
+participation_ratio               16    0.8887    0.4445      0.9933      2.235  True
+participation_ratio               32    0.9411    0.4706      0.9982      2.121  True
+galwey                             4    0.3031    0.3697      0.8582      2.321  True
+galwey                            16    0.5736    0.4537      0.9748      2.148  True
+galwey                            32    0.6821    0.4745      0.9903      2.087  True
+
+-- normalization: m_over --
+functional                         n        L*     floor     max_err  err/floor  holds
+cheverud_nyholt                    4    0.0255    0.3975      0.7951      2.001  True
+cheverud_nyholt                   16    0.0031    0.4705       0.941          2  True
+cheverud_nyholt                   32    0.0009    0.4848      0.9697          2  True
+cheverud_nyholt_trace1             4    0.0471    0.3953       0.809      2.047  True
+cheverud_nyholt_trace1            16    0.0037    0.4705      0.9414      2.001  True
+cheverud_nyholt_trace1            32    0.0009    0.4848      0.9697          2  True
+li_ji                              4    0.9921    0.3008      0.6095      2.026  True
+li_ji                             16    0.9998    0.4412      0.8826          2  True
+li_ji                             32    1.0000    0.4697      0.9394          2  True
+participation_ratio                4    0.7559    0.3244      0.6549      2.019  True
+participation_ratio               16    0.9375    0.4430      0.8862          2  True
+participation_ratio               32    0.9688    0.4702      0.9404          2  True
+galwey                             4    0.3219    0.3678      0.7382      2.007  True
+galwey                            16    0.5936    0.4531      0.9064          2  True
+galwey                            32    0.6965    0.4743      0.9486          2  True
+
+=== global Lipschitz lower bounds (random legal spectra, m=20) ===
+  cheverud_nyholt_trace1|m_over            L >= 0.05058
+  cheverud_nyholt_trace1|over_m            L >= 0.0475
+  cheverud_nyholt_trace1|raw               L >= 0.95
+  cheverud_nyholt|m_over                   L >= 0.0501
+  cheverud_nyholt|over_m                   L >= 0.0475
+  cheverud_nyholt|raw                      L >= 0.95
+  galwey|m_over                            L >= 17.59
+  galwey|over_m                            L >= 11.95
+  galwey|raw                               L >= 139.2
+  li_ji|m_over                             L >= 276
+  li_ji|over_m                             L >= 91.17
+  li_ji|raw                                L >= 8954
+  participation_ratio|m_over               L >= 1
+  participation_ratio|over_m               L >= 0.7475
+  participation_ratio|raw                  L >= 15.44
+
+=== CN has no finite global L over unrestricted moment sequences ===
+  mu1=      1  secant ratio = 0.9509
+  mu1=     10  secant ratio = 18.05
+  mu1=    100  secant ratio = 189.1
+  mu1=   1000  secant ratio = 1899
+  mu1=  10000  secant ratio = 1.9e+04
+
+=== trace-normalized repair of the witness ===
+  n=  1 cert gap: original 0.500000  rescaled 0.125000  max moment gap 4.013870
+  n=  2 cert gap: original 0.666667  rescaled 0.296296  max moment gap 3.978489
+  n=  3 cert gap: original 0.750000  rescaled 0.421875  max moment gap 2.948903
+  n=  4 cert gap: original 0.800000  rescaled 0.512000  max moment gap 2.227424
+  n=  6 cert gap: original 0.857143  rescaled 0.629738  max moment gap 1.437105
+  n=  8 cert gap: original 0.888889  rescaled 0.702332  max moment gap 1.042419
+  n= 12 cert gap: original 0.923077  rescaled 0.786527  max moment gap 0.663927
+  n= 16 cert gap: original 0.941176  rescaled 0.833706  max moment gap 0.484406
+  n= 24 cert gap: original 0.960000  rescaled 0.884736  max moment gap 0.313154
+  n= 32 cert gap: original 0.969697  rescaled 0.911818  max moment gap 0.231003
+
+=== Li-Ji: no finite Lipschitz constant ===
+  delta=        1/10  jump=1.0000  momentDist=4.158e-02  secant=24.05
+  delta=       1/100  jump=1.0000  momentDist=4.205e-03  secant=237.8
+  delta=     1/10000  jump=1.0000  momentDist=4.210e-05  secant=2.375e+04
+  delta= 1/100000000  jump=1.0000  momentDist=4.211e-09  secant=2.375e+08
+
+=== TRACE-LEGAL witness (rescaled to trace = m) ===
+functional|norm                            n          L*     floor     max_err  err/floor  holds
+cheverud_nyholt|raw                        4      0.9500    0.3050          19       62.3  True
+cheverud_nyholt|raw                       16      0.9963    0.4413         271      614.1  True
+cheverud_nyholt|raw                       32      0.9991    0.4697        1055       2246  True
+cheverud_nyholt|over_m                     4      0.0475    0.3953      0.5189      1.313  True
+cheverud_nyholt|over_m                    16      0.0037    0.4705      0.8339      1.772  True
+cheverud_nyholt|over_m                    32      0.0009    0.4848      0.9118      1.881  True
+li_ji|raw                                  4      0.0000    0.4000          19       47.5  True
+li_ji|raw                                 16      0.0000    0.4706         271      575.9  True
+li_ji|raw                                 32      0.0000    0.4848        1055       2176  True
+li_ji|over_m                               4      0.0000    0.4000       0.512       1.28  True
+li_ji|over_m                              16      0.0000    0.4706      0.8337      1.772  True
+li_ji|over_m                              32      0.0000    0.4848      0.9118      1.881  True
+participation_ratio|over_m                 4      0.8733    0.3127      0.6387      2.043  True
+participation_ratio|over_m                16      0.9479    0.4427      0.8858      2.001  True
+participation_ratio|over_m                32      0.9715    0.4701      0.9403          2  True
+galwey|over_m                              4      0.4011    0.3599      0.5702      1.584  True
+galwey|over_m                             16      0.6119    0.4526      0.8673      1.916  True
+galwey|over_m                             32      0.7041    0.4742      0.9325      1.966  True
+
+  order-resolved momentDist for the trace-legal witness (claimed countGap = 1/(n+1)):
+    n=  4 claimed=0.20000  o=1:0.00000 o=2:0.14512 o=4:0.60748 o=8:2.22742   certGap=0.51200
+    n= 16 claimed=0.05882  o=1:0.00000 o=2:0.05496 o=4:0.18199 o=8:0.48441   certGap=0.83371
+    n= 32 claimed=0.03030  o=1:0.00000 o=2:0.02933 o=4:0.09257 o=8:0.23100   certGap=0.91182
+
+wrote /projects/standard/hsiehph/sauer354/meff_error_floor_results.json

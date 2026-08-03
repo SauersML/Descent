@@ -180,10 +180,18 @@ noncomputable def ApproxWitness.ofWitness (W : Witness Config Inv) (d : Inv → 
 
     Setting `countGap = 0` recovers `count_predictor_error_ge`. Taking `L` to be the modulus
     of a moment-continuous functional, `countGap = 1/(n+1)` and `rateGap = n/(n+1)` gives the
-    `m_eff` prohibition's arithmetic: the residue is positive as soon as `n > L`. -/
+    `m_eff` prohibition's arithmetic: the residue is positive as soon as `n > L`.
+
+    **The Lipschitz hypothesis is local, at the two witness points only.** A first version
+    quantified it over all of `Inv`, which is a condition no effective-marker formula in the
+    literature satisfies — Cheverud–Nyholt is quadratic in the first moment and has unbounded
+    secants, and Li–Ji jumps by exactly one at every integer eigenvalue. The proof never used
+    more than the two points, so nothing is lost and the theorem now applies to functionals
+    that are merely locally controlled. -/
 theorem lipschitz_predictor_error_ge (W : ApproxWitness Config Inv)
     (f : Inv → ℝ) (L : ℝ) (hL : 0 ≤ L)
-    (hf : ∀ a b : Inv, |f a - f b| ≤ L * W.dist a b) :
+    (hf : |f (W.count W.left) - f (W.count W.right)|
+            ≤ L * W.dist (W.count W.left) (W.count W.right)) :
     (W.rateGap - L * W.countGap) / 2
       ≤ max |f (W.count W.left) - W.rate W.left|
             |f (W.count W.right) - W.rate W.right| := by
@@ -192,7 +200,7 @@ theorem lipschitz_predictor_error_ge (W : ApproxWitness Config Inv)
   set RL := W.rate W.left with hRL
   set RR := W.rate W.right with hRR
   have hab : |a - b| ≤ L * W.countGap :=
-    le_trans (hf _ _) (mul_le_mul_of_nonneg_left W.count_close hL)
+    le_trans hf (mul_le_mul_of_nonneg_left W.count_close hL)
   have t1 := abs_sub_le RL a RR
   have t2 := abs_sub_le a b RR
   have e1 : |RL - a| = |a - RL| := abs_sub_comm RL a

@@ -34,8 +34,53 @@ invariant here is a spectrum's sequence of normalized moments and the distance i
 largest disagreement among the moments the functional consults. That is `momentDist`, a
 finite supremum over `Finset.range (o+1)`.
 
-Empirical status: UNTESTED here. The underlying witness is SIMULATED — see
-`proofs/validation/meff_prohibition/`.
+## The floor is VACUOUS for the formulas people actually use, and this must be said
+
+Simulation in exact rational arithmetic (`proofs/validation/meff_error_floor/`, `n` up to 32,
+moments to order 8) measured `L*`, the **tightest** Lipschitz constant consistent with the
+witness pair — so any globally valid `L` is at least this, and using `L*` is maximally
+generous to the theorem. At `n = 32`, order 2:
+
+| functional | `L*` | floor `(n-L)/(2(n+1))` |
+|---|---|---|
+| Li–Ji | 1024.9 | **-15.04, vacuous** |
+| participation ratio | 993.9 | **-14.57, vacuous** |
+| Galwey | 720.3 | **-10.43, vacuous** |
+| Cheverud–Nyholt | 0.912 | +0.471 |
+
+And it worsens with `n`: `L*/n` for Li–Ji is `4.2, 16.1, 32.0` at `n = 4, 16, 32`, i.e.
+`L* ~ n²`, so the floor is negative at every `n` tested and diverges. **At their native scale
+the theorem asserts nothing about three of the four.** Cheverud–Nyholt survives but is empty
+there too: floor `0.471` against an actual error of `1055`, a ratio of `2246`.
+
+**Where the result does have content: normalized units.** Dividing `m_eff` by the marker
+count `m`, every functional has small `L*` and the bound holds with error/floor `= 2.000` at
+`n = 32` — tight up to exactly two, and that two is structural rather than slack: the error
+is about one at the perturbed spectrum and exactly zero at the flat one, so `max(a,b) ≥
+(a+b)/2` gives away precisely half. The honest reading is that the content is the triangle
+inequality `max err ≥ (certGap - |Δf|)/2`, with `L` serving only to bound `|Δf|`. That is
+sharp — but in units this module does not name, and a reader should normalize before quoting
+the floor.
+
+**Two scope corrections.** Galwey's summary uses a half-integer moment, so it is not in the
+integer-moment class at all and should not have been named as an instance. And on any
+trace-legal spectrum whose eigenvalues are all below 2, **Li–Ji's `m_eff` equals the trace
+exactly, hence equals `m`** — it is a constant, not an approximate certificate. That is a
+sharper indictment of Li–Ji than this theorem gives, and it is exact.
+
+**A defect in the witness's own docstring, upstream.** `meffWitness_spectrum_pos` says both
+witnesses are "spectra a correlation matrix can have". Positivity is necessary, not
+sufficient: the trace must equal `m`, and `trace(meffPerturbed 4) = 84/5 ≠ 20`, failing at
+every `n`. Rescaling to a legal trace preserves the certificate gap and the bound, but breaks
+the *uniformity in the moment order*: on the trace-legal witness at `n = 32` the moment
+distance is `0.0293` at order 2 (inside `1/(n+1)`) but `0.0926` at order 4 and `0.2310` at
+order 8 — 3× and 7.6× over the claimed bound. So "uniformly in the order `p`" is an artifact
+of the illegal normalization. Order ≤ 2 is unaffected, which covers the formulas above.
+
+Empirical status: **the abstract bound is VALIDATED and the instantiation is shown VACUOUS at
+native scale** — see `proofs/validation/meff_error_floor/`. The positive control passes: the
+script re-derives `certificate gap = n/(n+1)` exactly and every order-2 moment gap within
+`1/(n+1)`, so the instrument reproduces the theorems it tests.
 -/
 
 noncomputable section
@@ -103,7 +148,10 @@ def meffApproxWitness (n o : ℕ) (hn : 0 < n) : ApproxWitness (ℕ → ℝ) (�
     to *approximate* one, by an amount that does not shrink as the panel grows. -/
 theorem meff_lipschitz_predictor_error_ge (n o : ℕ) (hn : 0 < n)
     (f : (ℕ → ℝ) → ℝ) (L : ℝ) (hL : 0 ≤ L)
-    (hf : ∀ mu nu : ℕ → ℝ, |f mu - f nu| ≤ L * momentDist o mu nu) :
+    (hf : |f (momentInvariant (meffSize n) (meffPerturbed n)) -
+            f (momentInvariant (meffSize n) (meffFlat n))|
+          ≤ L * momentDist o (momentInvariant (meffSize n) (meffPerturbed n))
+                             (momentInvariant (meffSize n) (meffFlat n))) :
     ((n : ℝ) / ((n : ℝ) + 1) - L * (1 / ((n : ℝ) + 1))) / 2
       ≤ max |f (momentInvariant (meffSize n) (meffPerturbed n)) -
               inverseTraceCertificate (meffSize n) (meffPerturbed n)|
