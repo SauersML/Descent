@@ -4,13 +4,21 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Sauers
 -/
 import Lake
+
+/-!
+# Gnomon build configuration
+
+Defines the proof library and validation executables against a pinned Mathlib revision.
+-/
+
 open Lake DSL
 
 package calibration where
 
 -- Pin to a specific Mathlib commit for reproducible builds.
-  -- Using Aristotle's Mathlib version for compatibility
-  require mathlib from git "https://github.com/leanprover-community/mathlib4.git" @ "f897ebcf72cd16f89ab4577d0c826cd14afaafc7"
+require mathlib from git
+  "https://github.com/leanprover-community/mathlib4.git" @
+    "f897ebcf72cd16f89ab4577d0c826cd14afaafc7"
 
 @[default_target]
 lean_lib Calibrator where
