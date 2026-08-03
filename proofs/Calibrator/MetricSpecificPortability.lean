@@ -454,9 +454,9 @@ theorem neutralAF_benchmark_auc_depends_only_on_attenuated_signal
 
     Discrimination half: if two configurations agree in attenuated signal variance -- which
     is what "sharing the same drift level" delivers -- the equal-variance AUC is unchanged.
-    This is now a hypothesis-carrying claim rather than the `rfl` it used to be; see
-    `neutralAF_benchmark_auc_depends_only_on_attenuated_signal` for why the previous form
-    was empty.
+    This is a hypothesis-carrying claim, not an identity: see
+    `neutralAF_benchmark_auc_depends_only_on_attenuated_signal` for why a form provable by
+    `rfl` here would be empty.
 
     Calibration half: if the source is calibrated in the large and the target mean
     prediction is shifted by a nonzero `δ`, target absolute CITL becomes strictly worse.
@@ -953,11 +953,10 @@ theorem ppv_increases_with_prevalence
 /-- **The sensitivity gap between a use case and itself is zero, definitionally.**
 
 `sensitivityPortabilityGap` takes the source and target sensitivities as two separate
-arguments, so passing the same `se` twice gives `|se - se|`. This is stated as its own
-lemma because it used to be buried inside the conclusion of
-`ppv_gap_pos_under_prevalence_shift` below, where `sensitivityPortabilityGap se se`
-read as a *proved* consequence of a prevalence shift rather than as the definitional
-zero it is. Nothing about prevalence enters here, and nothing can: prevalence is not an
+arguments, so passing the same `se` twice gives `|se - se|`. **Keep it as its own lemma
+rather than folding it into the conclusion of `ppv_gap_pos_under_prevalence_shift`
+below**, where `sensitivityPortabilityGap se se` would read as a *proved* consequence of a
+prevalence shift rather than as the definitional zero it is. Nothing about prevalence enters here, and nothing can: prevalence is not an
 argument of `sensitivityPortabilityGap`. -/
 @[simp] theorem sensitivityPortabilityGap_self (se : ℝ) :
     sensitivityPortabilityGap se se = 0 := by
@@ -973,10 +972,9 @@ provable here; it is `sensitivityPortabilityGap_self`, an identity, and holds be
 sensitivity is defined without reference to prevalence. Keeping the two apart is the
 point: one is a fact about `metricPPV`, the other is a fact about an argument list.
 
-RENAMED from `sensitivity_more_portable_than_ppv`, whose conclusion was
-`sensitivityPortabilityGap se se < ppvPortabilityGap …`. That is this statement with `0`
-spelled as `|se - se|`, and the old name and docstring presented the resulting inequality
-as a comparison of two measured gaps. -/
+**Do not restate this as `sensitivityPortabilityGap se se < ppvPortabilityGap …`.** That
+is this statement with `0` spelled as `|se - se|`, and it reads as a comparison of two
+measured gaps when only one side is measured at all. -/
 theorem ppv_gap_pos_under_prevalence_shift
     (se sp K_source K_target : ℝ)
     (h_se : 0 < se) (h_sp1 : sp < 1)
@@ -1008,10 +1006,9 @@ theorem nns_increases_with_ppv_drop
 `F1 = 2 × PPV × sensitivity / (PPV + sensitivity)`, and F1 portability reflects
 both precision and recall portability.
 
-This file used to restate the formula as `f1ScoreMetric`. It is `f1Score` from
-`Calibrator.OpenQuestions`, which this file already imports, so the restatement
-has been deleted and the theorem below is stated about that one definition; the
-`Empirical status: UNTESTED` marker travelled with it. -/
+The theorem below is stated about `f1Score` from `Calibrator.OpenQuestions`, which this
+file imports. Do not restate the formula here; its `Empirical status: UNTESTED` marker
+belongs with that one definition. -/
 
 /-- F1 is bounded above by 1 when both precision and sensitivity lie in `(0,1]`. -/
 theorem f1_le_one
@@ -1042,10 +1039,10 @@ section MetricAndClinicalDecisions
     higher PPV. This is the metric split relevant to screening versus case-finding use
     cases.
 
-    The first conjunct used to be written `sensitivityPortabilityGap se se <
-    ppvPortabilityGap …`, which is this statement with `0` spelled as `|se - se|`; the
-    sensitivity half is `sensitivityPortabilityGap_self` and is an identity, not a
-    consequence of the prevalence shift. -/
+    Do not write the first conjunct as `sensitivityPortabilityGap se se <
+    ppvPortabilityGap …`: that spells `0` as `|se - se|`. The sensitivity half is
+    `sensitivityPortabilityGap_self`, an identity, not a consequence of the prevalence
+    shift. -/
 theorem different_uses_different_metrics
     (se sp K_source K_target : ℝ)
     (h_se : 0 < se) (h_sp1 : sp < 1)
@@ -1404,11 +1401,9 @@ theorem ldKernelSymbol_mono_in_cos {decay angle₁ angle₂ : ℝ}
 AR(1) chromosome, as a function of the per-site LD retention `decay` and the
 fraction `kappa` of directions kept.
 
-This is the closed form of the harmonic-measure integral of the Poisson kernel:
-`(2/π) · arctan( ((1+ρ)/(1-ρ)) · tan(πκ/2) )`.  That it equals the integral is
-not proved here: it is the `reconstruction` field of
-`LDBandIntegralIdentification`, which any result relying on the identification
-must take as a hypothesis.  This definition on its own asserts nothing.
+This is the candidate closed form of the harmonic-measure integral of the Poisson kernel:
+`(2/π) · arctan( ((1+ρ)/(1-ρ)) · tan(πκ/2) )`.  The present module proves
+its algebraic boundary checks but does not export an integral-identification theorem.
 
 Valid for `0 ≤ kappa < 1`.  At `kappa = 1` the expression is not the limit —
 `Real.tan (π/2) = 0` under Mathlib's junk-value convention — so the endpoint
@@ -1426,9 +1421,7 @@ pruning down to a fraction `kappa` of the directions.
 Closed form `κ - 2ρ sin(πκ) / (π(1 + ρ²))`, obtained by integrating the
 reciprocal symbol; the `1 + ρ²` is the numerator of
 `Calibrator.ImitationRigidity.ldWhiteningGain`, the per-variant inverse-kernel
-trace.  That it equals the integral ratio is not proved here: it is the
-`detection` field of `LDBandIntegralIdentification`, carried as a hypothesis by
-every result that relies on the identification.
+trace.  The integral evaluation itself is not packaged as a caller-supplied theorem.
 
 Empirical status: UNTESTED. -/
 noncomputable def ldBandDetectionShare (decay kappa : ℝ) : ℝ :=
@@ -1550,57 +1543,6 @@ theorem ldBandReconstructionShare_of_no_ld {kappa : ℝ}
     show ((1 + (0:ℝ)) / (1 - 0)) = 1 by norm_num, one_mul,
     Real.arctan_tan hx1 hx2]
   ring
-
-/-- **Identification of the closed forms with the band integrals they are named
-for.**
-
-`ldBandDetectionShare` and `ldBandReconstructionShare` are closed forms.  Naming
-them after integrals of the LD symbol is a *claim*, and this structure is that
-claim, carried as a hypothesis so that every result depending on the
-identification says so in its signature rather than relying on the reader to
-notice.
-
-The two obligations are:
-
-* `detection` — the evaluation of `∫₀^a (1 - 2ρ cos θ + ρ²) dθ =
-  (1 + ρ²)a - 2ρ sin a`, followed by cancellation of the constant `(1 - ρ²)⁻¹`
-  between numerator and denominator.  Elementary `intervalIntegral` API for
-  `cos`.
-* `reconstruction` — the harmonic-measure evaluation
-  `∫₀^a P_ρ(θ) dθ = 2 arctan( ((1+ρ)/(1-ρ)) tan(a/2) )` with the normalisation
-  `∫₀^π P_ρ = π`, the half-interval companion of
-  `ImitationRigidity.ldKernelSymbol_harmonicMean`.
-
-Neither is an empirical assumption and neither has genetic content: both are
-real-analysis evaluations of an explicit integrand.  Two independent internal
-checks on the `detection` formula are already proved without it —
-`ldBandDetectionShare_one` reproduces the full inverse-kernel trace of
-`ldWhiteningGain` at `κ = 1`, and `ldBandDetectionShare_zero` the empty band.
-
-Empirical status: UNTESTED. -/
-structure LDBandIntegralIdentification (decay : ℝ) : Prop where
-  detection : ∀ kappa : ℝ, 0 ≤ kappa → kappa ≤ 1 →
-    (∫ angle in (0:ℝ)..(Real.pi * kappa), (ldKernelSymbol decay angle)⁻¹) /
-        (∫ angle in (0:ℝ)..Real.pi, (ldKernelSymbol decay angle)⁻¹) =
-      ldBandDetectionShare decay kappa
-  reconstruction : ∀ kappa : ℝ, 0 ≤ kappa → kappa < 1 →
-    (∫ angle in (0:ℝ)..(Real.pi * kappa), ldKernelSymbol decay angle) /
-        (∫ angle in (0:ℝ)..Real.pi, ldKernelSymbol decay angle) =
-      ldBandReconstructionShare decay kappa
-
-/-- **The band integral itself loses detection weight faster than markers.**
-
-The conclusion of `ldBandDetectionShare_le_retention` transported from the
-closed form to the quantity it names: under the identification, the fraction of
-the inverse-symbol integral retained by a low-frequency band of relative width
-`κ` is at most `κ`. -/
-theorem ldBand_detection_integral_ratio_le_retention {decay kappa : ℝ}
-    (hid : LDBandIntegralIdentification decay)
-    (hd0 : 0 ≤ decay) (hk0 : 0 ≤ kappa) (hk1 : kappa ≤ 1) :
-    (∫ angle in (0:ℝ)..(Real.pi * kappa), (ldKernelSymbol decay angle)⁻¹) /
-        (∫ angle in (0:ℝ)..Real.pi, (ldKernelSymbol decay angle)⁻¹) ≤ kappa := by
-  rw [hid.detection kappa hk0 hk1]
-  exact ldBandDetectionShare_le_retention hd0 hk0 hk1
 
 end ARoneFrontier
 
@@ -1966,31 +1908,6 @@ theorem clumping_maximizes_reconstruction_on_ld_kernel
     exact ldKernelSymbol_mono_in_cos habs hp0 (hin i hi)
   · intro i hi
     exact ldKernelSymbol_mono_in_cos habs hp0 (hout i hi)
-
-/-- **The whitened-weight integral of a clumped panel, at a named recombination
-rate and effective size.**
-
-The endpoint of the whole chain: under the named integral identification, the
-fraction of the inverse-LD-kernel integral that a clumped panel retains is at
-most the fraction of markers it retained, where the kernel is the Ohta–Kimura
-one with decay `ldRetentionPerGen recomb Ne`.  Every object in the statement is
-either an integral of the LD symbol or a marker count. -/
-theorem ldBlock_detection_integral_ratio_le_retention {recomb Ne : ℝ}
-    {retainedMarkers totalMarkers : ℕ}
-    (hid : LDBandIntegralIdentification (ldRetentionPerGen recomb Ne))
-    (hr0 : 0 ≤ recomb) (hr1 : recomb ≤ 1) (hNe : 1 < Ne)
-    (h0 : 0 < retainedMarkers) (h1 : retainedMarkers < totalMarkers) :
-    (∫ angle in (0:ℝ)..(Real.pi *
-        ldPanelRetentionFraction retainedMarkers totalMarkers),
-      (ldKernelSymbol (ldRetentionPerGen recomb Ne) angle)⁻¹) /
-        (∫ angle in (0:ℝ)..Real.pi,
-          (ldKernelSymbol (ldRetentionPerGen recomb Ne) angle)⁻¹) ≤
-      ldPanelRetentionFraction retainedMarkers totalMarkers := by
-  obtain ⟨hkpos, hklt⟩ := ldPanelRetentionFraction_mem h0 h1
-  have hp0 : 0 ≤ ldRetentionPerGen recomb Ne :=
-    ld_retention_nonneg recomb Ne hr0 hr1 (le_of_lt hNe)
-  exact ldBand_detection_integral_ratio_le_retention hid hp0
-    (le_of_lt hkpos) (le_of_lt hklt)
 
 end GeneticFrontier
 
