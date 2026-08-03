@@ -591,7 +591,19 @@ of the numerical construction, not a validity field supplied by the caller. -/
 theorem architecture_mem_effects {q n : ℕ}
     (P : MeanAbsoluteEffectCertificateProblem q n) (i : Fin (n + 1)) :
     P.architecture i ∈ P.effects := by
-  sorry
+  rw [effects, boundedEffectCarrier, Metric.mem_closedBall,
+    abs_of_nonneg P.architectureRadius_nonneg,
+    dist_pi_le_iff P.architectureRadius_nonneg]
+  intro j
+  simp only [Pi.zero_apply, dist_zero_right]
+  calc
+    |P.architecture i j| ≤ ∑ k, |P.architecture i k| :=
+      Finset.single_le_sum (fun k _ ↦ abs_nonneg (P.architecture i k))
+        (Finset.mem_univ j)
+    _ ≤ P.architectureRadius :=
+      Finset.single_le_sum
+        (fun l _ ↦ Finset.sum_nonneg fun k _ ↦ abs_nonneg (P.architecture l k))
+        (Finset.mem_univ i)
 
 /-- Signed effect moment used by grade matching.  Grade two, for example,
 matches the catalogue-average signed effect and squared-effect mass before it
