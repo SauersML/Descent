@@ -373,12 +373,16 @@ section StalenessCrossover
     relaxation rate: `(2e^{-λτ} - 1)·V`. -/
 noncomputable def stalePremium (lam τ V : ℝ) : ℝ := (2 * Real.exp (-(lam * τ)) - 1) * V
 
-/-- The crossover horizon: `log 2 / λ`. -/
-noncomputable def stalenessCrossover (lam : ℝ) : ℝ := Real.log 2 / lam
+/-- The crossover horizon: `log 2 / λ` for a positive relaxation rate.
+
+The positivity argument is part of the definition's interface so that `λ = 0`
+cannot silently acquire crossover zero through real division by zero. -/
+noncomputable def stalenessCrossover (lam : ℝ) (_hlam : 0 < lam) : ℝ :=
+  Real.log 2 / lam
 
 /-- At the crossover the stale design is exactly as good as not adapting. -/
 theorem stalePremium_zero_at_crossover (lam V : ℝ) (hlam : 0 < lam) :
-    stalePremium lam (stalenessCrossover lam) V = 0 := by
+    stalePremium lam (stalenessCrossover lam hlam) V = 0 := by
   unfold stalePremium stalenessCrossover
   have hne : lam ≠ 0 := ne_of_gt hlam
   have : lam * (Real.log 2 / lam) = Real.log 2 := by field_simp
@@ -390,7 +394,7 @@ theorem stalePremium_zero_at_crossover (lam V : ℝ) (hlam : 0 < lam) :
     The premium over the blind design is strictly negative for every horizon beyond
     `log 2 / λ`. -/
 theorem stalePremium_neg_beyond_crossover (lam τ V : ℝ)
-    (hlam : 0 < lam) (hV : 0 < V) (hτ : stalenessCrossover lam < τ) :
+    (hlam : 0 < lam) (hV : 0 < V) (hτ : stalenessCrossover lam hlam < τ) :
     stalePremium lam τ V < 0 := by
   have hne : lam ≠ 0 := ne_of_gt hlam
   have hgt : Real.log 2 < lam * τ := by
@@ -457,7 +461,7 @@ theorem dampedPremium_pos (lam τ V : ℝ) (hV : 0 < V) : 0 < dampedPremium lam 
     adjustment is strictly better. This is the falsifiable content of the horizon calculus and
     the reason the one-line change is worth making. -/
 theorem damped_beats_stale_beyond_crossover (lam τ V : ℝ)
-    (hlam : 0 < lam) (hV : 0 < V) (hτ : stalenessCrossover lam < τ) :
+    (hlam : 0 < lam) (hV : 0 < V) (hτ : stalenessCrossover lam hlam < τ) :
     stalePremium lam τ V < 0 ∧ 0 < dampedPremium lam τ V :=
   ⟨stalePremium_neg_beyond_crossover lam τ V hlam hV hτ, dampedPremium_pos lam τ V hV⟩
 
