@@ -521,8 +521,18 @@ section DisjointWindowDesigns
 
     Each of `w` non-overlapping windows contributes a nonnegative share of the
     total normalised variance, and the shares add, because disjoint windows are
-    independent. The limit law of the pooled statistic is the centred Gaussian
-    with this variance.
+    independent.
+
+    **This definition is `∑ j, share j` and nothing more.** The sentence that used to
+    close this docstring -- "the limit law of the pooled statistic is the centred
+    Gaussian with this variance" -- is not established anywhere in this corpus. It is
+    the conclusion of the disjoint licence (Theorem D in `Calibrator.EpistaticChaos`),
+    which is *not formalized*: it needs a central limit theorem for low-influence
+    multilinear forms, and the interface that used to carry it as a hypothesis-field was
+    removed rather than proved. Naming a sum "limit variance" does not supply it.
+
+    So read this as the variance *parameter* of a hypothesised Gaussian limit, not as
+    evidence that the limit is Gaussian.
 
     Empirical status: UNTESTED. -/
 noncomputable def disjointWindowLimitVariance {w : ℕ} (share : Fin w → ℝ) : ℝ :=
@@ -547,10 +557,20 @@ theorem disjointWindowLimitVariance_attains (s : ℝ) (h0 : 0 ≤ s) (h1 : s ≤
 segment.**
 
 Set equality, both inclusions: nothing outside `[0, 1]` is achievable, and
-nothing inside it is missed. Together with the vanishing of the Lévy measure
-this is the statement that a partitioned-window design has the Gaussian segment
-as its set of limit laws, so a result about such a design stated with a
-normal-approximation caveat can be restated without one. -/
+nothing inside it is missed.
+
+**What this is, stated exactly.** Unfolding `disjointWindowLimitVariance`, the claim is
+that the set of sums of finitely many nonnegative reals with total at most one is
+`[0, 1]`. That is arithmetic about the real line. No genotype, no design, no
+independence and no limit theorem enters the proof, and none could -- there is no
+probabilistic object in the statement.
+
+**It therefore does not license dropping a normal-approximation caveat**, which is what
+this docstring used to claim. That licence is the disjoint-limit theorem (Theorem D in
+`Calibrator.EpistaticChaos`), whose Gaussian conclusion is not formalized in this corpus;
+this result supplies only the range of the variance parameter *given* that conclusion.
+Keeping the two apart is the point: one is a fact about `Set.Icc`, the other is a central
+limit theorem nobody here has proved. -/
 theorem disjointWindow_limit_variances_eq_segment :
     {v : ℝ | ∃ (w : ℕ) (share : Fin w → ℝ),
         (∀ j, 0 ≤ share j) ∧ (∑ j, share j) ≤ 1 ∧
