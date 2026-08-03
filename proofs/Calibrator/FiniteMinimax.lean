@@ -209,11 +209,11 @@ theorem exists_risk_lower_bound :
     then the minimax value equals the mixture-certificate value, and that common value is the
     rule's risk. This is the standard sufficient condition, and it is proved here.
 
-    It also locates exactly what the general theorem needs beyond weak duality: the EXISTENCE
-    of such an equalizer, equivalently of a least-favourable prior. That existence is the
-    minimax theorem proper -- a Sion- or von-Neumann-style compactness-and-convexity argument
-    which Mathlib does not carry (its `Probability.Decision.Risk` file defines Bayes and
-    minimax risk but proves no duality). Nothing below assumes it. -/
+    An equalizer is stronger than a general saddle point: a least-favourable prior can be
+    supported only on parameters attaining the worst risk, while other parameters have strictly
+    smaller risk. Thus this lemma proves a useful sufficient condition but does not reduce the
+    general theorem to equalizer existence. General duality still needs a finite-game separation
+    argument, which Mathlib's decision-risk development does not currently provide. -/
 theorem minimax_eq_of_equalizer (δstar : Rule actionCount observationCount)
     (πstar : FinitePrior parameterCount) (value : ℝ)
     (hconst : ∀ θ, E.risk δstar θ = value)
