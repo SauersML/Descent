@@ -75,7 +75,7 @@ theorem dependent_channel_symbol_positive {x : ℝ} (hx₀ : -1 ≤ x) (hx₁ : 
 
 /-! ## The finite arrow-of-time quotient
 
-The fourth-order witness above refutes the old one-number description of an unordered
+The fourth-order witness above refutes any one-number description of an unordered
 panel, but it does not refute the elementary symmetry that remains: an order-free
 observation is invariant under every permutation and therefore under time reversal.
 The next results isolate that exact wall without claiming that a particular collection of

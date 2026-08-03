@@ -189,9 +189,9 @@ exist iff the product is one. That needs strong closure as a real hypothesis: wi
 branch of some `t_s` reaches a modulus value covered nowhere else in the cycle, that value
 is singly covered, the peeling lemma kills the weight at `t_s`, and no kernel element
 survives however the product comes out. Stating that in Lean requires either formalizing
-value-closedness properly or carrying it as an unproved parameter. The second is no longer
-permitted, and rightly, so the kernel-element form of Theorem D is **absent from this
-module** rather than present in weakened dress.
+value-closedness properly or carrying it as an unproved parameter. This module admits no
+unproved parameters, so the kernel-element form of Theorem D is **absent** here rather
+than present in weakened dress.
 
 The classical closed-path criterion this transports (Diliberto–Straus, Marshall–O'Farrell,
 Ismailov) is cited in the header as background, not claimed as formalized. -/

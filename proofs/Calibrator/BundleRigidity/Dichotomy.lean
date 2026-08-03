@@ -31,9 +31,9 @@ constant is strictly positive for *every* choice of weights. So the kernel is no
 while no relation has weight product one. **Relations alone suffice; the weight condition
 is not part of the criterion.**
 
-The superseded statement is kept below as `weightProductOne_conjecture`, immediately under
-its refutation, so that a reader who encounters the old form elsewhere can see it named
-and struck rather than quietly absent.
+The refuted statement stays below as `weightProductOne_conjecture`, immediately under its
+refutation, so that a reader who meets that form elsewhere finds it named and struck
+rather than quietly absent.
 
 ### The arithmetic of the falsifier, checked here
 
@@ -83,7 +83,7 @@ it before any weight is chosen.
   normalized regime `P + Q = 1` with `P < Q`, the weight condition is *automatic* — this
   is `weight_condition_automatic`, and it is proved here in full.
 * **Theorem 3.** *Any* relation gives an infinite-dimensional kernel, unconditionally on
-  the weights. This is the theorem that kills the old conjecture.
+  the weights. This is the theorem that refutes `weightProductOne_conjecture`.
 * **Theorem 4.** `(Q_min/P_max)^N > m N` for the overlap multiplicity `m` gives zero
   kernel.
 * **Zero or infinite.** On every decided stratum the kernel is either zero or

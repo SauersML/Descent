@@ -1683,14 +1683,13 @@ is short and it is exact, not asymptotic:
   `sharedCorrection_capacity_deficit` gives the price of sharing in the LP's own
   units: exactly variance divided by spike load.
 
-**A correction to the conjecture I first offered.**  I guessed the deficit was
-the load-weighted variance of the per-target *exit levels*, to second order in
-their spread.  That was wrong in form.  The deficit of a minimum against a mean
-is first order in the spread, not second, so no variance can equal it; and the
-variance in the degradation law is a variance of *corrections*, not of exit
-levels.  The correct statement is the one proved here, and it is better than
-the conjecture: the variance enters the numerator of the LP additively and the
-deficit is exactly `V / load`, with no approximation and no order condition.
+**Why the deficit is not a variance of exit levels.**  The load-weighted variance
+of the per-target *exit levels*, taken to second order in their spread, cannot
+be the deficit.  The deficit of a minimum against a mean is first order in the
+spread, not second, so no variance matches it.  The variance in the degradation
+law is a variance of *corrections*, not of exit levels.  The statement proved
+here needs no approximation and no order condition: the variance enters the
+numerator of the LP additively and the deficit is exactly `V / load`.
 
 **Why sharing is cheap and rotation is not.**  The two operations enter the LP
 in different places, which is a structural explanation of the measured

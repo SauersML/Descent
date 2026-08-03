@@ -127,7 +127,7 @@ supplies `0 < (η/C)^k` for every `k` whenever `0 < η` and `0 < C`
 (`CoverageInvariance.sigmaMin_pos`), so the hypothesis fires and the conclusion follows at
 order one.
 
-This is the first conjunct of the boxed characterization, no longer assumed. -/
+This is the first conjunct of the boxed characterization, proved rather than assumed. -/
 theorem perpRisk_eq_zero_of_eta_pos (η C : ℝ) (hη : 0 < η) (hC : 0 < C)
     (hdetect : ∀ k : ℕ, 0 < (η / C) ^ k → M.blind k = 0) :
     M.perpRisk = 0 :=

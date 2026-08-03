@@ -12,8 +12,7 @@ noncomputable section
 /-!
 # End-to-end correctability theorems
 
-This module connects the previously separate spectral, second-moment, and
-application-risk layers.  Its statements expose exactly where the rank-one
+This module connects the spectral, second-moment, and application-risk layers.  Its statements expose exactly where the rank-one
 overlap model is used and where a distribution-free discrepancy bound can be
 substituted instead.
 -/

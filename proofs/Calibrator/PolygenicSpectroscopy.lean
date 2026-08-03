@@ -1342,9 +1342,9 @@ theorem balanced_locus_drift_separates :
 
 The Tower Rigidity Theorem says a symmetric unit-variance law with `E[x ^ 4] = 3` whose
 floor-two and floor-three laws carry the Gaussian's odd parts *is* the Gaussian. **It is
-not proved in this development** — there is no such theorem in `proofs/Calibrator`, and
-earlier text here that called it "proved elsewhere in this development" was wrong. It is
-cited only to say which hypotheses are being ruled out.
+not proved in this development** — there is no such theorem anywhere in
+`proofs/Calibrator`, so no text may cite it as proved here. It is cited only to say
+which hypotheses are being ruled out.
 
 Nothing below depends on it. This section computes the fourth moment of a standardized
 genotype from scratch and shows that symmetry and `E[x ^ 4] = 3` are jointly

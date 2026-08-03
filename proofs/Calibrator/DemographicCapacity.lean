@@ -79,11 +79,11 @@ theorem neiContrastSpike_eq_contrastSpikeLevel_mul_spikeLoad
 
 /-- **The exact Nei contrast spike written without a free coefficient.**
 
-The spike level is the standardized contrast variance — pinned by
-`four_neiGst_eq_standardizedContrastVariance`, so the old constant `2`
-cannot be substituted — and the load is the trace-window spike load of the
+The spike level is the standardized contrast variance, pinned by
+`four_neiGst_eq_standardizedContrastVariance`, so a bare constant such as `2`
+cannot stand in for it. The load is the trace-window spike load of the
 subgroup-contrast direction, pinned by `dot_demographicSpikeDirection`.  Both
-factors are now quantities rather than names, and their equality is proved directly. -/
+factors are quantities rather than names, and their equality is proved directly. -/
 theorem neiContrastSpike_eq_contrastVariance_mul_spikeLoad
     {N : ℕ} (m : ℕ) (p₁ p₂ : ℝ) (hmn : m ≤ N) (hN : 0 < N)
     (h : meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) ≠ 0)

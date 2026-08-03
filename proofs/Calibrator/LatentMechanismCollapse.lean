@@ -35,17 +35,16 @@ only the convex hull, and hulls of smooth curves are as large as hulls of Borel 
 That is the moment-curve phenomenon, and it is why the smooth category buys nothing
 here.
 
-## The architecture, and the error it repairs
+## The architecture, and the failure it avoids
 
-An earlier construction assigned direction `j` an arc of width `w_j ~ 2 ^ (-j)` and
-needed dial amplitude `a_j ~ κ_j / w_j = 2 ^ j * κ_j`. The coefficients `κ_j` of a
-general smooth family decay **rapidly** (faster than any polynomial) but **not
-exponentially** — `κ_j = exp (-(log j) ^ 2)` is rapid — so `2 ^ j * κ_j` explodes and
-positivity of the mechanism dies; shrinking the arcs instead makes the `u`-derivatives
-`a_j * w_j ^ (-k)` explode. *Rapid decay is not exponential decay.* The architecture,
-not the estimates, was wrong.
-
-The repair splits the family:
+A single geometrically shrinking arc schedule cannot carry the whole family. Give
+direction `j` an arc of width `w_j ~ 2 ^ (-j)` and the dial amplitude must be
+`a_j ~ κ_j / w_j = 2 ^ j * κ_j`. The coefficients `κ_j` of a general smooth family decay
+**rapidly**, faster than any polynomial, but **not** exponentially: `κ_j =
+exp (-(log j) ^ 2)` is rapid. So `2 ^ j * κ_j` explodes and positivity of the mechanism
+dies. Shrinking the arcs instead makes the `u`-derivatives `a_j * w_j ^ (-k)` explode.
+*Rapid decay is not exponential decay*, and no sharper estimate rescues that schedule.
+The architecture below splits the family instead:
 
 * a finite **head**, handled by convex geometry with no frequencies at all — the large
   coefficients are carried by an exact finite mixture over the vertices of a polytope
