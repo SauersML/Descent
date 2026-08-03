@@ -452,7 +452,7 @@ theorem mul_lt_mul_left_of_lt_of_pos
     Since most of the genome is neutral and selected loci are rare,
     genome-wide Fst reflects drift, not selection.
     But portability loss at selected loci can exceed the neutral prediction. -/
-theorem abs_sub_lt_of_small_mixture
+theorem abs_mixture_sub_lt_of_weight_lt
     (fst_gw fst_neutral fst_selected : ℝ)
     (f_sel : ℝ) -- fraction of selected loci
     (h_gw : fst_gw = (1 - f_sel) * fst_neutral + f_sel * fst_selected)
