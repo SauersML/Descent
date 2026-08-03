@@ -291,12 +291,82 @@ noncomputable def totalVariation
   (1 / 2 : ℝ) * ∑ x,
     |(E.mixture P).probability x - (E.mixture Q).probability x|
 
+theorem totalVariation_nonneg (P Q : FinitePrior parameterCount) :
+    0 ≤ E.totalVariation P Q := by
+  unfold totalVariation
+  positivity
+
+/-- **Total variation never exceeds one**, because it halves a difference of two
+probability vectors and each has mass one.
+
+This is the ordinary bound, and it is stated because of what it does to the
+feasibility constraint at radius `1`; see `feasible_one_iff_momentMatched`. -/
+theorem totalVariation_le_one (P Q : FinitePrior parameterCount) :
+    E.totalVariation P Q ≤ 1 := by
+  unfold totalVariation
+  have hP : ∑ x, FinitePrior.probability (E.mixture P) x = 1 :=
+    (finitePrior_probability_mem (E.mixture P)).2
+  have hQ : ∑ x, FinitePrior.probability (E.mixture Q) x = 1 :=
+    (finitePrior_probability_mem (E.mixture Q)).2
+  have hsplit : ∑ x, |FinitePrior.probability (E.mixture P) x -
+        FinitePrior.probability (E.mixture Q) x| ≤ 2 := by
+    calc ∑ x, |FinitePrior.probability (E.mixture P) x -
+            FinitePrior.probability (E.mixture Q) x|
+        ≤ ∑ x, (FinitePrior.probability (E.mixture P) x +
+            FinitePrior.probability (E.mixture Q) x) :=
+          Finset.sum_le_sum fun x _ ↦ by
+            refine (abs_sub _ _).trans ?_
+            rw [abs_of_nonneg (FinitePrior.probability_nonneg _ x),
+              abs_of_nonneg (FinitePrior.probability_nonneg _ x)]
+      _ = 2 := by rw [Finset.sum_add_distrib, hP, hQ]; norm_num
+  linarith
+
+/-- **At radius one the discrepancy constraint is vacuous.**
+
+`Feasible K h` asks for moment matching AND `|discrepancy| ≤ |h|`. The
+discrepancy here is total variation, which lies in `[0, 1]` for every pair of
+priors and every observation kernel whatsoever. So at `h = 1` the second
+conjunct holds always, and feasibility collapses to moment matching.
+
+WHAT THIS COSTS. A modulus evaluated at `h = 1` sees no observation kernel at
+all: the same value is obtained from an informative experiment and from the
+constant kernel that maps every parameter to one fixed law. Any theorem whose
+content is supposed to come from the information structure -- a
+`Donoho--Liu`-type rate, in which the graded modulus is small *because* the
+discrepancy constraint forces the prior-predictive laws close together --
+cannot be expressed at this radius. Expressing it needs a radius that shrinks
+with the sample size, so that the constraint binds.
+
+This is why `fixedGrade_incompleteness` and its biology twin remain admitted
+rather than proved: at `h = 1` they are provable by a construction with no
+statistical content, and a proof of the statement as written would not be a
+proof of the claim the name makes. -/
+theorem totalVariation_le_one' (P Q : FinitePrior parameterCount) :
+    |E.totalVariation P Q| ≤ |(1 : ℝ)| := by
+  rw [abs_of_nonneg (E.totalVariation_nonneg P Q), abs_one]
+  exact E.totalVariation_le_one P Q
+
 /-- The corresponding graded certificate problem. -/
 noncomputable def certificateProblem :
     FiniteMomentCertificateProblem parameterCount where
   target := E.target
   moment := E.moment
   pairDiscrepancy := E.totalVariation
+
+/-- **At radius one, feasibility IS moment matching**, for every experiment.
+
+The consequence is that a modulus evaluated at `h = 1` sees no observation
+kernel at all: an informative experiment and the constant kernel that sends
+every parameter to one fixed law give the same value. So a claim whose content
+is supposed to come from the information structure -- a `Donoho--Liu`-type rate,
+where the graded modulus is small *because* the discrepancy constraint pushes
+the prior-predictive laws together -- cannot be expressed at this radius, and a
+proof of such a statement would not be a proof of the claim its name makes.
+Expressing it needs a radius that shrinks with the sample size. -/
+theorem feasible_one_iff_momentMatched (K : ℕ) (P Q : FinitePrior parameterCount) :
+    E.certificateProblem.Feasible K 1 P Q ↔
+      E.certificateProblem.MomentMatched K P Q :=
+  ⟨fun h ↦ h.1, fun h ↦ ⟨h, E.totalVariation_le_one' P Q⟩⟩
 
 /-- Grade exponent used in the fixed-grade gap theorem.  Writing `K + 1`
 makes the theorem total at grade zero while retaining order `1/K`. -/
@@ -336,23 +406,42 @@ noncomputable def certificationGap (K : ℕ) (h : ℝ) : ℝ :=
   E.certificateProblem.modulus 0 h /
     E.certificateProblem.modulus K h
 
-/-- **Fixed-grade incompleteness.**  At every fixed positive grade there is a
-sequence of finite mixture experiments whose ungraded-to-graded modulus ratio
-is at least
+/-- The only unproved mathematical construction needed by the finite fixed-grade theorem:
+at every fixed positive grade there is a sequence of actual finite mixture experiments whose
+ungraded-to-graded modulus ratio is at least
 
 `n^(b_K/2) / sqrt(log n)`, with `b_K = 1/(K+1) = Θ(1/K)`.
 
 Its proof must construct moment-matching priors in a concrete growing-data experiment and compare
 their actual prior-predictive total variation laws. The experiment, target, and probes may not be
 tuned after reading the desired bound. A constant observation kernel or a residual chosen as the
-reciprocal of the conclusion would prove only that this interface is underconstrained. -/
+reciprocal of the conclusion would prove only that this interface is underconstrained.
+
+The automatic convexity of the finite probability simplex is deliberately absent from this
+admission. It is proved separately and attached by `fixedGrade_incompleteness`, so the visible
+`sorry` covers exactly the missing statistical construction and nothing routine. -/
+theorem exists_fixedGrade_gap (K : ℕ) :
+    ∀ᶠ n : ℕ in Filter.atTop,
+      ∃ observationCount : ℕ,
+        ∃ E : FiniteMixtureExperiment n observationCount,
+          fixedGradeGapScale K n ≤ E.certificationGap (K + 1) 1 := by
+  sorry
+
+/-- **Fixed-grade incompleteness on a convex problem.**
+
+The substantive gap comes only from `exists_fixedGrade_gap`; convexity is not accepted as part of
+that witness. Every finite prior lies in Mathlib's probability simplex, and
+`finitePriorCarrier_convex` proves that simplex convex for every catalogue size. Thus this theorem
+records the striking convexity clause without enlarging the admitted mathematical core. -/
 theorem fixedGrade_incompleteness (K : ℕ) :
     ∀ᶠ n : ℕ in Filter.atTop,
       ∃ observationCount : ℕ,
         ∃ E : FiniteMixtureExperiment n observationCount,
           Convex ℝ (finitePriorCarrier n) ∧
             fixedGradeGapScale K n ≤ E.certificationGap (K + 1) 1 := by
-  sorry
+  filter_upwards [exists_fixedGrade_gap K] with n hn
+  rcases hn with ⟨observationCount, E, hgap⟩
+  exact ⟨observationCount, E, finitePriorCarrier_convex n, hgap⟩
 
 end FiniteMixtureExperiment
 
