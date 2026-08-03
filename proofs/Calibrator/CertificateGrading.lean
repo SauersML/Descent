@@ -216,6 +216,24 @@ theorem admissibleGaps_bddAbove (K : ℕ) (h : ℝ) :
   · rcases hd with ⟨P, Q, _, rfl⟩
     exact E.targetGap_le_catalogueBound P Q
 
+/-- A witnessed feasible pair bounds the modulus from below.
+
+    The modulus is a supremum, so exhibiting one feasible pair is the only way to bound it
+    below without evaluating it. -/
+theorem le_modulus_of_feasible (K : ℕ) (h : ℝ) (P Q : FinitePrior n)
+    (hPQ : E.Feasible K h P Q) :
+    E.targetGap P Q ≤ E.modulus K h :=
+  le_csSup (E.admissibleGaps_bddAbove K h)
+    (Set.mem_insert_iff.mpr (Or.inr ⟨P, Q, hPQ, rfl⟩))
+
+/-- The modulus is bounded above by twice the catalogue's absolute target mass. -/
+theorem modulus_le_catalogueBound (K : ℕ) (h : ℝ) :
+    E.modulus K h ≤ 2 * ∑ i, |E.target i| := by
+  refine csSup_le ⟨0, Set.mem_insert _ _⟩ ?_
+  rintro d (rfl | ⟨P, Q, -, rfl⟩)
+  · positivity
+  · exact E.targetGap_le_catalogueBound P Q
+
 theorem modulus_nonneg (K : ℕ) (h : ℝ) : 0 ≤ E.modulus K h := by
   apply le_csSup (E.admissibleGaps_bddAbove K h)
   exact Set.mem_insert 0 _
