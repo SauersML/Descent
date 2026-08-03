@@ -515,6 +515,32 @@ def Informative : Prop :=
   ∀ i j : Fin (parameterCount + 1), i ≠ j →
     0 < E.totalVariation (PMF.pure i) (PMF.pure j)
 
+/-- **Informative at a stated scale**: distinct parameters are separated by at
+least `c`, not merely by something positive.
+
+`Informative` is not enough, and the gap is not a technicality.  It asks only
+that each pairwise total variation be nonzero, with no floor, so an experiment
+may satisfy it while every pair sits far below the radius.
+`totalVariation_le_two_mul_of_close` shows what that buys the witness: if every
+kernel law lies within `ε` of one fixed law then every pair of priors is
+`2ε`-indistinguishable, so taking `ε` to be half the radius makes `TV ≤ h` hold
+for all pairs and feasibility collapses to moment matching -- the same collapse
+`Informative` was introduced to prevent, one step further back.
+
+The witness chooses the kernel after seeing `n`, so it can always shrink the
+kernel's spread faster than the radius shrinks.  Only a floor stated at the
+radius scale closes that, which is what this predicate supplies and what
+`proofs/validation/FIXED_GRADE_AUDIT.md` asks for in its item 2. -/
+def SeparatedBy (c : ℝ) : Prop :=
+  ∀ i j : Fin (parameterCount + 1), i ≠ j →
+    c ≤ E.totalVariation (PMF.pure i) (PMF.pure j)
+
+/-- A positive separation floor is informative; the converse fails, which is the
+whole reason the graded statement asks for the floor. -/
+theorem informative_of_separatedBy {c : ℝ} (hc : 0 < c) (h : E.SeparatedBy c) :
+    E.Informative :=
+  fun i j hij ↦ lt_of_lt_of_le hc (h i j hij)
+
 @[simp] theorem constantObservationExperiment_totalVariation
     (target : Fin (parameterCount + 1) → ℝ)
     (moment : ℕ → Fin (parameterCount + 1) → ℝ)
@@ -534,7 +560,7 @@ theorem constantObservationExperiment_not_informative
     ¬ (constantObservationExperiment target moment law).Informative := by
   intro hinf
   have h01 : (0 : Fin (parameterCount + 2)) ≠ 1 := by
-    simp [Fin.ext_iff]
+    simp
   have := hinf 0 1 h01
   rw [constantObservationExperiment_totalVariation] at this
   exact lt_irrefl 0 this
@@ -660,7 +686,7 @@ theorem exists_fixedGrade_gap (K : ℕ) :
     ∀ᶠ n : ℕ in Filter.atTop,
       ∃ observationCount : ℕ,
         ∃ E : FiniteMixtureExperiment n observationCount,
-          E.Informative ∧
+          E.SeparatedBy (fixedGradeInformationRadius n) ∧
             fixedGradeGapScale K n ≤
               E.certificationGap (K + 1) (fixedGradeInformationRadius n) := by
   sorry
@@ -675,7 +701,7 @@ theorem fixedGrade_incompleteness (K : ℕ) :
     ∀ᶠ n : ℕ in Filter.atTop,
       ∃ observationCount : ℕ,
         ∃ E : FiniteMixtureExperiment n observationCount,
-          Convex ℝ (finitePriorCarrier n) ∧ E.Informative ∧
+          Convex ℝ (finitePriorCarrier n) ∧ E.SeparatedBy (fixedGradeInformationRadius n) ∧
             fixedGradeGapScale K n ≤
               E.certificationGap (K + 1) (fixedGradeInformationRadius n) := by
   filter_upwards [exists_fixedGrade_gap K] with n hn

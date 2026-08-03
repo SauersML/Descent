@@ -716,9 +716,10 @@ and convexity are theorems of the numerical construction and are attached below.
 theorem exists_fixedGrade_gap_biology (K : ℕ) :
     ∀ᶠ n : ℕ in Filter.atTop,
       ∃ P : MeanAbsoluteEffectCertificateProblem (n + 1) n,
-        FiniteMixtureExperiment.fixedGradeGapScale K n ≤
-          P.certificationGap (K + 1)
-            (FiniteMixtureExperiment.fixedGradeInformationRadius n) := by
+        P.mixtureExperiment.Informative ∧
+          FiniteMixtureExperiment.fixedGradeGapScale K n ≤
+            P.certificationGap (K + 1)
+              (FiniteMixtureExperiment.fixedGradeInformationRadius n) := by
   sorry
 
 /-- **Fixed-grade incompleteness for polygenic architecture transport.**
@@ -732,13 +733,14 @@ theorem fixedGrade_incompleteness_biology (K : ℕ) :
       ∃ P : MeanAbsoluteEffectCertificateProblem (n + 1) n,
         (∀ i, P.architecture i ∈ P.effects) ∧
           P.effects.Nonempty ∧ Convex ℝ P.effects ∧
+          P.mixtureExperiment.Informative ∧
           FiniteMixtureExperiment.fixedGradeGapScale K n ≤
             P.certificationGap (K + 1)
               (FiniteMixtureExperiment.fixedGradeInformationRadius n) := by
   filter_upwards [exists_fixedGrade_gap_biology K] with n hn
-  rcases hn with ⟨P, hgap⟩
+  rcases hn with ⟨P, hinf, hgap⟩
   exact ⟨P, fun i ↦ P.architecture_mem_effects i, P.effects_nonempty,
-    P.effects_convex, hgap⟩
+    P.effects_convex, hinf, hgap⟩
 
 end MeanAbsoluteEffectCertificateProblem
 
