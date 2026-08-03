@@ -1794,6 +1794,41 @@ section SharedCorrectionFamily
 
 variable {ι J : Type*} [Fintype ι] [Fintype J] [DecidableEq J]
 
+/-- **Curvature of a target's recalibration objective**: how hard target `i`
+pulls on the shared correction.  Deployment weight times the energy of the
+transported direction in that target's own second-moment matrix.
+
+**DO NOT DELETE AS UNUSED.**  Restored: `ec74a6a8` removed this and
+`targetCorrectionOptimum` as "no use anywhere and no theorem about them", on an
+identifier grep.  Nothing applies them, and that is the point of them.
+`sharedCorrectionConsensus` and `sharedCorrectionSpread` below take `curvature`
+and `optimum` as arbitrary functions `ι → ℝ`; these two are what say which
+functions the section is about.  The section docstring three lines above the
+deletion site states the claim that depends on them -- "the curvature weight is
+not a free parameter ... which is the right behaviour and is FORCED rather than
+stipulated".  Without these definitions the weight is exactly a free parameter,
+the spread law holds for any weights whatsoever, and that sentence is false.
+The deletion did not break elaboration, because the arguments were already
+abstract; it hollowed the claim and left the file green.
+
+Empirical status: UNTESTED. -/
+def targetCorrectionCurvature (weight : ι → ℝ) (B : ι → Matrix J J ℝ)
+    (beta : J → ℝ) : ι → ℝ :=
+  fun i => weight i * coefficientEnergy (B i) beta
+
+/-- **The correction each target would choose alone**, as a family indexed by
+deployment target.
+
+**DO NOT DELETE AS UNUSED** -- see `targetCorrectionCurvature` above.  This is
+the `optimum` that `sharedCorrectionConsensus` and `sharedCorrectionSpread`
+average and take the variance of; without it the "per-target optimal
+corrections" their docstrings name have no referent in the corpus.
+
+Empirical status: UNTESTED. -/
+def targetCorrectionOptimum (B : ι → Matrix J J ℝ) (beta theta : J → ℝ) :
+    ι → ℝ :=
+  fun i => sharedCorrectionOptimum (B i) beta theta
+
 /-- The curvature-weighted mean of the per-target optimal corrections: the
 shared correction that a weighted-least-squares compromise selects.
 

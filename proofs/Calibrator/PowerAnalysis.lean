@@ -257,6 +257,31 @@ theorem GWASObservationModel.observation_decomposition (m : GWASObservationModel
   unfold GWASObservationModel.observedBeta
   ring
 
+/-- **Selection event: significance thresholding.**
+    A variant is selected (declared significant) when |β̂ / SE| > z_α,
+    equivalently when |β + ε| > z_α · SE. This predicate defines the
+    selection event.
+
+    **DO NOT DELETE AS UNUSED.**  Restored: `ec74a6a8` removed this as "no use
+    anywhere and no theorem about them", on an identifier grep of `.lean` files.
+    It is a `Prop`-valued convention, so its existence is the result -- the same
+    category as `extra_algebraic_guard_adds_nothing`, which that same commit
+    correctly declined to remove.  Two live consumers name it:
+
+      * the note immediately below, which justifies the removal of
+        `truncationBias` on the grounds that it "is the one-sided result while
+        `GWASObservationModel.isSelected` is two-sided".  Delete this and the
+        recorded reason for that deletion has no referent;
+      * `validation/differential/cluster/fam_ascertainment.py`, whose `wc_exact`
+        is built on "the TWO-SIDED event `GWASObservationModel.isSelected`
+        states".  The differential family validates against this definition.
+
+    Neither reference is an application, so nothing failed to elaborate and the
+    build stayed green.  Both are prose, and a grep for the identifier in
+    `.lean` alone reaches neither. -/
+def GWASObservationModel.isSelected (m : GWASObservationModel) (epsilon z_alpha : ℝ) : Prop :=
+  z_alpha * m.standardError < |m.true_beta + epsilon|
+
 /-! ### Truncation bias under selection
 
 Removed.  This defined `truncationBias se beta z_alpha` as `se · φ(z_α - β/se)`,
