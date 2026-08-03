@@ -183,17 +183,18 @@ def corpus_capitalized_identifiers() -> frozenset:
 # Check repository Lean sources against the local mathlib style policy.
 # ======================================================================================
 
-# The header is checked for SHAPE, not for a particular name.  Pinning the
-# author made the rule reject every file a second contributor wrote, and the only
-# way to satisfy it was to rewrite someone else's attribution -- which is worse
-# than the defect it was guarding against.  What matters is that the block is
-# present, is the mathlib form, and names somebody.
-STYLE_COPYRIGHT_HEADER = re.compile(
-    r"\A/-\n"
-    r"Copyright \(c\) \d{4} [^\n]+\. All rights reserved\.\n"
-    r"Released under Apache 2\.0 license as described in the file LICENSE\.\n"
-    r"Authors: [^\n]+\n"
-    r"-/\n"
+# The header names the project's author, deliberately.  A shape-only regex was
+# tried and reverted: it was loosened to accept a file whose header credited a
+# person who appears nowhere else in the repository and authored no commit --
+# a fabricated attribution, which is exactly what a fixed name catches.  If a
+# real second author ever appears, widen this to a set of known names rather
+# than to "anybody".
+STYLE_COPYRIGHT_HEADER = (
+    "/-\n"
+    "Copyright (c) 2026 Sauers. All rights reserved.\n"
+    "Released under Apache 2.0 license as described in the file LICENSE.\n"
+    "Authors: Sauers\n"
+    "-/\n"
 )
 
 
@@ -217,7 +218,7 @@ def style_check_file(path: Path) -> list[str]:
     rel = path.relative_to(CORPUS_BASE)
     errors: list[str] = []
 
-    if not STYLE_COPYRIGHT_HEADER.match(source):
+    if not source.startswith(STYLE_COPYRIGHT_HEADER):
         errors.append(f"{rel}:1: missing or nonstandard copyright header")
 
     lines = source.splitlines()
@@ -246,8 +247,7 @@ def style_check_file(path: Path) -> list[str]:
         errors.append(f"{rel}:{style_line_number(source, module_doc)}: module docstring precedes an import")
 
     if import_lines:
-        # The header block is five lines: `/-`, three body lines, `-/`.
-        expected_first_import = 6
+        expected_first_import = STYLE_COPYRIGHT_HEADER.count("\n") + 1
         if import_lines[0] != expected_first_import:
             errors.append(
                 f"{rel}:{import_lines[0]}: imports must immediately follow the copyright header"
