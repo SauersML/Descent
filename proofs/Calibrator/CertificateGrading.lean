@@ -296,11 +296,114 @@ noncomputable def mixture (P : FinitePrior parameterCount) :
     FinitePrior observationCount :=
   P.bind E.observation
 
+/-- The prior-predictive mass is the prior-weighted average of the kernel masses.
+
+`PMF.bind` is defined by a `tsum` in `ℝ≥0∞`; over a finite index this is the
+ordinary weighted sum after `toReal`, and every factor is finite so the
+conversion distributes. -/
+theorem mixture_probability (P : FinitePrior parameterCount)
+    (x : Fin (observationCount + 1)) :
+    FinitePrior.probability (E.mixture P) x =
+      ∑ i, FinitePrior.probability P i *
+        FinitePrior.probability (E.observation i) x := by
+  unfold FinitePrior.probability mixture
+  rw [PMF.bind_apply, tsum_fintype,
+    ENNReal.toReal_sum (fun i _ ↦ ENNReal.mul_ne_top (P.apply_ne_top i)
+      ((E.observation i).apply_ne_top x))]
+  exact Finset.sum_congr rfl fun i _ ↦ ENNReal.toReal_mul
+
 /-- Total-variation distance between the two prior-predictive laws. -/
 noncomputable def totalVariation
     (P Q : FinitePrior parameterCount) : ℝ :=
   (1 / 2 : ℝ) * ∑ x,
     |(E.mixture P).probability x - (E.mixture Q).probability x|
+
+/-- **A kernel whose laws all sit within `ε` of one fixed law makes every pair of
+priors `2ε`-indistinguishable**, no matter how many parameters it has.
+
+WHY THIS MATTERS FOR THE ADMITTED RATE THEOREM. `fixedGradeInformationRadius`
+replaced radius one precisely so that the discrepancy constraint would bind and
+the observation kernel would stay part of the modulus. A shrinking radius is
+necessary for that, and this says it is not sufficient: taking `ε` to be half
+the radius makes `totalVariation ≤ radius` for EVERY pair, so feasibility
+collapses to moment matching again and the kernel drops out exactly as it did at
+radius one.
+
+The witness is free to choose the kernel after seeing `n`, so it can always
+shrink the kernel's spread faster than the radius shrinks. Closing that needs a
+LOWER bound on informativeness -- distinct parameters separated by at least some
+fixed total variation, or the explicit product kernel that
+`proofs/validation/FIXED_GRADE_AUDIT.md` asks for in its item 2 -- not merely an
+upper bound on the radius.
+
+The proof is the triangle inequality after subtracting `L`, which is legitimate
+because the prior differences sum to zero and so annihilate the constant. -/
+theorem totalVariation_le_two_mul_of_close
+    (L : FinitePrior observationCount) (ε : ℝ)
+    (hclose : ∀ i, (1 / 2 : ℝ) * ∑ x, |FinitePrior.probability (E.observation i) x -
+        FinitePrior.probability L x| ≤ ε)
+    (P Q : FinitePrior parameterCount) :
+    E.totalVariation P Q ≤ 2 * ε := by
+  classical
+  have hdiff_sum : ∑ i, (FinitePrior.probability P i - FinitePrior.probability Q i) = 0 := by
+    rw [Finset.sum_sub_distrib, (finitePrior_probability_mem P).2,
+      (finitePrior_probability_mem Q).2, sub_self]
+  have hpoint : ∀ x, FinitePrior.probability (E.mixture P) x -
+      FinitePrior.probability (E.mixture Q) x =
+      ∑ i, (FinitePrior.probability P i - FinitePrior.probability Q i) *
+        (FinitePrior.probability (E.observation i) x - FinitePrior.probability L x) := by
+    intro x
+    have hexp : ∑ i, (FinitePrior.probability P i - FinitePrior.probability Q i) *
+        (FinitePrior.probability (E.observation i) x - FinitePrior.probability L x) =
+        (∑ i, (FinitePrior.probability P i - FinitePrior.probability Q i) *
+          FinitePrior.probability (E.observation i) x) -
+        (∑ i, (FinitePrior.probability P i - FinitePrior.probability Q i)) *
+          FinitePrior.probability L x := by
+      rw [Finset.sum_mul, ← Finset.sum_sub_distrib]
+      exact Finset.sum_congr rfl fun i _ ↦ by ring
+    rw [hexp, hdiff_sum, zero_mul, sub_zero, E.mixture_probability P x,
+      E.mixture_probability Q x, ← Finset.sum_sub_distrib]
+    exact Finset.sum_congr rfl fun i _ ↦ by ring
+  have hmass : ∑ i, |FinitePrior.probability P i - FinitePrior.probability Q i| ≤ 2 := by
+    calc ∑ i, |FinitePrior.probability P i - FinitePrior.probability Q i|
+        ≤ ∑ i, (FinitePrior.probability P i + FinitePrior.probability Q i) :=
+          Finset.sum_le_sum fun i _ ↦ by
+            refine (abs_sub _ _).trans ?_
+            rw [abs_of_nonneg (FinitePrior.probability_nonneg P i),
+              abs_of_nonneg (FinitePrior.probability_nonneg Q i)]
+      _ = 2 := by
+          rw [Finset.sum_add_distrib, (finitePrior_probability_mem P).2,
+            (finitePrior_probability_mem Q).2]; norm_num
+  have hεnn : 0 ≤ ε := le_trans (by positivity) (hclose 0)
+  unfold totalVariation
+  rw [show (2 : ℝ) * ε = (1 / 2 : ℝ) * (2 * (2 * ε)) by ring]
+  refine mul_le_mul_of_nonneg_left ?_ (by norm_num)
+  calc ∑ x, |FinitePrior.probability (E.mixture P) x -
+          FinitePrior.probability (E.mixture Q) x|
+      = ∑ x, |∑ i, (FinitePrior.probability P i - FinitePrior.probability Q i) *
+          (FinitePrior.probability (E.observation i) x -
+            FinitePrior.probability L x)| := by
+        exact Finset.sum_congr rfl fun x _ ↦ by rw [hpoint x]
+    _ ≤ ∑ x, ∑ i, |FinitePrior.probability P i - FinitePrior.probability Q i| *
+          |FinitePrior.probability (E.observation i) x -
+            FinitePrior.probability L x| := by
+        refine Finset.sum_le_sum fun x _ ↦ ?_
+        refine (Finset.abs_sum_le_sum_abs _ _).trans_eq ?_
+        exact Finset.sum_congr rfl fun i _ ↦ abs_mul _ _
+    _ = ∑ i, |FinitePrior.probability P i - FinitePrior.probability Q i| *
+          ∑ x, |FinitePrior.probability (E.observation i) x -
+            FinitePrior.probability L x| := by
+        rw [Finset.sum_comm]
+        exact Finset.sum_congr rfl fun i _ ↦ (Finset.mul_sum _ _ _).symm
+    _ ≤ ∑ i, |FinitePrior.probability P i - FinitePrior.probability Q i| * (2 * ε) := by
+        refine Finset.sum_le_sum fun i _ ↦ ?_
+        refine mul_le_mul_of_nonneg_left ?_ (abs_nonneg _)
+        linarith [hclose i]
+    _ = (∑ i, |FinitePrior.probability P i - FinitePrior.probability Q i|) * (2 * ε) := by
+        rw [Finset.sum_mul]
+    _ ≤ 2 * (2 * ε) := by
+        refine mul_le_mul_of_nonneg_right hmass ?_
+        linarith
 
 theorem totalVariation_nonneg (P Q : FinitePrior parameterCount) :
     0 ≤ E.totalVariation P Q := by
@@ -401,6 +504,17 @@ noncomputable def constantObservationExperiment
     (constantObservationExperiment target moment law).mixture P = law := by
   exact PMF.bind_const P law
 
+/-- **An experiment is informative when distinct parameters emit distinguishable laws.**
+
+    Without this the discrepancy radius is decoration: a constant kernel has total variation
+    zero between every pair, so `TV ≤ h` holds at every radius and feasibility collapses to
+    moment matching however fast `h` shrinks. Any rate whose content is that the constraint
+    pushes the prior-predictive laws together has to exclude such experiments in the
+    STATEMENT, not in a docstring. -/
+def Informative : Prop :=
+  ∀ i j : Fin (parameterCount + 1), i ≠ j →
+    0 < E.totalVariation (PMF.pure i) (PMF.pure j)
+
 @[simp] theorem constantObservationExperiment_totalVariation
     (target : Fin (parameterCount + 1) → ℝ)
     (moment : ℕ → Fin (parameterCount + 1) → ℝ)
@@ -408,6 +522,22 @@ noncomputable def constantObservationExperiment
     (constantObservationExperiment target moment law).totalVariation P Q = 0 := by
   unfold totalVariation
   simp
+
+/-- **The constant-channel experiment is not informative**, whenever there are at least two
+    parameters. This is the negative control the `Informative` hypothesis exists to exclude:
+    it satisfies every discrepancy radius vacuously, so any gap bound proved with it says
+    nothing about grading. -/
+theorem constantObservationExperiment_not_informative
+    (target : Fin (parameterCount + 2) → ℝ)
+    (moment : ℕ → Fin (parameterCount + 2) → ℝ)
+    (law : FinitePrior observationCount) :
+    ¬ (constantObservationExperiment target moment law).Informative := by
+  intro hinf
+  have h01 : (0 : Fin (parameterCount + 2)) ≠ 1 := by
+    simp [Fin.ext_iff]
+  have := hinf 0 1 h01
+  rw [constantObservationExperiment_totalVariation] at this
+  exact lt_irrefl 0 this
 
 /-- In a constant channel, feasibility is only moment matching at every information radius.
 The data-radius constraint contributes nothing because the prior-predictive laws are identical. -/
@@ -530,8 +660,9 @@ theorem exists_fixedGrade_gap (K : ℕ) :
     ∀ᶠ n : ℕ in Filter.atTop,
       ∃ observationCount : ℕ,
         ∃ E : FiniteMixtureExperiment n observationCount,
-          fixedGradeGapScale K n ≤
-            E.certificationGap (K + 1) (fixedGradeInformationRadius n) := by
+          E.Informative ∧
+            fixedGradeGapScale K n ≤
+              E.certificationGap (K + 1) (fixedGradeInformationRadius n) := by
   sorry
 
 /-- **Fixed-grade incompleteness on a convex problem.**
@@ -544,12 +675,12 @@ theorem fixedGrade_incompleteness (K : ℕ) :
     ∀ᶠ n : ℕ in Filter.atTop,
       ∃ observationCount : ℕ,
         ∃ E : FiniteMixtureExperiment n observationCount,
-          Convex ℝ (finitePriorCarrier n) ∧
+          Convex ℝ (finitePriorCarrier n) ∧ E.Informative ∧
             fixedGradeGapScale K n ≤
               E.certificationGap (K + 1) (fixedGradeInformationRadius n) := by
   filter_upwards [exists_fixedGrade_gap K] with n hn
-  rcases hn with ⟨observationCount, E, hgap⟩
-  exact ⟨observationCount, E, finitePriorCarrier_convex n, hgap⟩
+  rcases hn with ⟨observationCount, E, hinf, hgap⟩
+  exact ⟨observationCount, E, finitePriorCarrier_convex n, hinf, hgap⟩
 
 end FiniteMixtureExperiment
 
