@@ -6,7 +6,7 @@
   :2424 neutralAFBenchmarkRatio        = (1-fstT)/(1-fstS)
 
 `fstFromTau` is a THIRD formula for F_ST after a split, alongside coalFst
-(t/(t+2Ne), validated) and fstDerived (1-(1-1/2Ne)^t, falsified at +15-28%).
+(t/(t+2Ne), validated) and heterozygosityLossDerived (1-(1-1/2Ne)^t, falsified at +15-28%).
 With tau = t/(2Ne), coalFst is tau/(1+tau) while fstFromTau is 1-exp(-tau);
 1-exp(-tau) is the continuous limit of the falsified form, so this checks
 whether the same error recurs a third time.

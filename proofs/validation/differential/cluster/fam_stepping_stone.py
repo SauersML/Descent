@@ -7,7 +7,7 @@ replicates so the whole file runs in minutes rather than the ~25 the msprime
 script `heavy/h1_stepping_stone_length.py` was budgeted for.
 
     steppingStoneCharacteristicLength   L = sqrt(m / (2 mu))
-    steppingStoneCoalescenceTime        T(d) = d / (2 sigma^2 m)
+    steppingStoneDiffusionTimescale        T(d) = d / (2 sigma^2 m)
     demoSteppingStoneFst                d / (d + 4 Ne m sigma^2)
     steppingStoneFstQuadratic           d / (d + 4 Ne sigma^4 m^2)
     steppingStoneFst                    min 1 (f_nb * (1 + alpha (d-1)))
@@ -101,7 +101,7 @@ ENGINE 2 -- TWO-LINEAGE COALESCENT ON THE CIRCLE, array shape (reps,)
   out of the array, so total work is O(reps * E[T]).
 
   Measures E[T(d)] for every d, hence
-      H(d)    = E[T(d)] - E[T(0)]        DECIDES `steppingStoneCoalescenceTime`
+      H(d)    = E[T(d)] - E[T(0)]        DECIDES `steppingStoneDiffusionTimescale`
       F_ST(d) = H(d) / (H(d) + E[T(0)])  Hudson; DECIDES `demoSteppingStoneFst`,
                                          `steppingStoneFstQuadratic`,
                                          `steppingStoneFst`, and the deleted

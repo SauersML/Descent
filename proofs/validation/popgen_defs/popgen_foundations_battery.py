@@ -5,7 +5,7 @@
   :463  fstMutationDriftEquilibrium theta   = 1 / (1 + theta)
   :409  heterozygosityLossFromDrift Ne t    = 1 - (1 - 1/(2Ne))^t
   :982  effectiveMigration m12 m21          = (m12 + m21) / 2
-  :1015 ldCorrelationFromMigration M        = M^2 / (1 + M)^2
+  :1015 ldCorrelationMigrationAnsatz M        = M^2 / (1 + M)^2
   :219  continentIslandStepSelectionFirst   (added in response to finding #16)
   :226  continentIslandStepMigrationFirst
 

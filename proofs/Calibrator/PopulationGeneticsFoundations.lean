@@ -55,6 +55,17 @@ theorem nei_fst_in_unit (H_T H_S : ℝ)
 /-- **Nei's `G_ST` for two equally weighted subgroups, from allele
     frequencies:** `G_ST = (p₁ - p₂)² / (4·p̄·(1-p̄))`.
 
+    THIRD COPY, CORRECTLY NAMED, DO NOT DELETE ON DISCOVERY. This is algebraically
+    identical to `Conventions.neiGst`, which is written in the heterozygosity form
+    `1 - (p₁(1-p₁) + p₂(1-p₂))/(2·p̄(1-p̄))`. The two agree because
+    `p₁(1-p₁) + p₂(1-p₂) = 2p̄(1-p̄) - (p₁-p₂)²/2`, so
+    `1 - H_S/H_T = (p₁-p₂)²/(4p̄(1-p̄))` exactly; `Conventions.neiGst_eq_varianceRatio`
+    relates the two shapes. A name audit checked both against Nei's definition and
+    found both correct, so if a duplication scan reports this pair, the resolution is
+    to repoint one at the other, NOT to delete whichever is found second -- and note
+    that `Conventions.hudsonFst` is a genuinely different estimator that only looks
+    like a third spelling of the same thing.
+
     RENAMED from `simpleFst`, which named no estimator and so left the reader
     to supply one. It is Nei's `G_ST` -- `1 - H_S/H_T` with `H_T = 2p̄(1-p̄)`
     the total-pool heterozygosity and `H_S` the mean within-subgroup
@@ -462,7 +473,7 @@ theorem wright_decomposition (f_IS f_ST : ℝ) :
     quantity is `coalFst t Ne = t / (t + 2 Nₑ)`: that is unbiased across the
     tested grid, while this formula is biased upward in eleven of twelve cells
     by up to 28 percent. The formula is correct for what it now says, and
-    `fstDerived_eq_het_loss` is the theorem that says it; only the name and
+    `heterozygosityLossDerived_eq_het_loss` is the theorem that says it; only the name and
     docstring were reassigning it to a different observable.
 
     Regime: closed population, no mutation. See `Calibrator.DriftRegime`.
@@ -475,8 +486,10 @@ theorem wright_decomposition (f_IS f_ST : ℝ) :
     and carries no empirical weight on its own — a cross-check cannot measure the
     premise it shares, `DriftRegime.crossChecks_blind_to_retention`.
 
-    Denotes: the reading its name carries. The same formula appears under
-    names from 'fst', 'heterozygosity', and the formula alone does not fix which is meant. -/
+    Denotes: within-population heterozygosity loss. The same formula appears under
+    `heterozygosityLossFromDrift` here and `founderHeterozygosityLoss` in
+    `DemographicHistory`; all three now name the quantity rather than leaving the
+    formula to fix it, which it cannot. -/
 noncomputable def heterozygosityLossFromDrift (t : ℕ) (Ne : ℝ) : ℝ :=
   1 - (1 - 1 / (2 * Ne)) ^ t
 
@@ -1070,7 +1083,7 @@ theorem fstMigrationMutation_lt_mutationOnly (Ne m μ : ℝ)
     body takes `σ² = 1` and says so nowhere -- there is no `σ_sq` argument for
     it to say it with, while BOTH siblings in this family carry one explicitly:
     `DemographicHistory.demoSteppingStoneFst (d Ne m σ_sq)` and
-    `DemographicHistory.steppingStoneCoalescenceTime (d σ_sq m)`. A mentions
+    `DemographicHistory.steppingStoneDiffusionTimescale (d σ_sq m)`. A mentions
     query over all 22 occurrences found no call site that supplies a dispersal
     variance and no docstring that states the assumption, so the assumption was
     being made by every caller and written down by none. `L` scales as `σ`, so
@@ -1107,7 +1120,7 @@ theorem fstMigrationMutation_lt_mutationOnly (Ne m μ : ℝ)
 
     Signature consistency: both siblings already carry a dispersal variance --
     `DemographicHistory.demoSteppingStoneFst (d Ne m σ_sq)` and
-    `DemographicHistory.steppingStoneCoalescenceTime (d σ_sq m)` -- so this
+    `DemographicHistory.steppingStoneDiffusionTimescale (d σ_sq m)` -- so this
     restores the family rather than adding a novelty. A mentions query found no
     call site supplying one, so no caller was silently wrong and all become
     able to express it. -/
@@ -1272,28 +1285,36 @@ theorem asymmetric_fst_difference_sign (Ne m₁₂ m₂₁ : ℝ)
     LD_correlation(M) = M² / (1 + M)² (proportion of LD that is shared).
     This accounts for both allele frequency sharing and haplotype sharing.
 
-    Empirical status: UNTESTED. -/
-noncomputable def ldCorrelationFromMigration (M : ℝ) : ℝ :=
+    RENAMED from `ldCorrelationFromMigration`. The `From` asserted a derivation and
+    the body is a stipulation -- the docstring's own "we model the LD correlation as"
+    is the tell. No source is cited, nothing derives this shape from a migration
+    process, and no theorem here constrains it beyond monotonicity and range. `Ansatz`
+    says what it is, so a reader does not mistake a modelling choice for a result.
+    If it is ever derived, the name should change back.
+
+    Empirical status: UNTESTED, and untested here means unfalsified rather than
+    supported: it is a functional form nobody has compared to a simulation. -/
+noncomputable def ldCorrelationMigrationAnsatz (M : ℝ) : ℝ :=
   M ^ 2 / (1 + M) ^ 2
 
 /-- LD correlation from migration is nonneg. -/
 theorem ldCorrelationFromMigration_nonneg (M : ℝ) :
-    0 ≤ ldCorrelationFromMigration M := by
-  unfold ldCorrelationFromMigration
+    0 ≤ ldCorrelationMigrationAnsatz M := by
+  unfold ldCorrelationMigrationAnsatz
   exact div_nonneg (sq_nonneg M) (sq_nonneg (1 + M))
 
 /-- LD correlation from migration is at most 1. -/
 theorem ldCorrelationFromMigration_le_one (M : ℝ) (hM : 0 ≤ M) :
-    ldCorrelationFromMigration M ≤ 1 := by
-  unfold ldCorrelationFromMigration
+    ldCorrelationMigrationAnsatz M ≤ 1 := by
+  unfold ldCorrelationMigrationAnsatz
   rw [div_le_one (sq_pos_of_pos (by linarith : 0 < 1 + M))]
   exact sq_le_sq' (by linarith) (by linarith)
 
 /-- **LD correlation increases with migration rate.** -/
 theorem ldCorrelationFromMigration_increases (M₁ M₂ : ℝ)
     (hM₁ : 0 < M₁) (hM₂ : 0 < M₂) (h_more : M₁ < M₂) :
-    ldCorrelationFromMigration M₁ < ldCorrelationFromMigration M₂ := by
-  unfold ldCorrelationFromMigration
+    ldCorrelationMigrationAnsatz M₁ < ldCorrelationMigrationAnsatz M₂ := by
+  unfold ldCorrelationMigrationAnsatz
   have h1M₁ : 0 < 1 + M₁ := by linarith
   have h1M₂ : 0 < 1 + M₂ := by linarith
   have h_ratio : M₁ / (1 + M₁) < M₂ / (1 + M₂) := by
@@ -1359,8 +1380,13 @@ theorem hetRecurrence_closed_form (Ne H₀ : ℝ) (t : ℕ) :
 
 /-! ### Fst derived from heterozygosity loss -/
 
-/-- **Fst derived from heterozygosity decay.**
-    Fst(t) = 1 - H(t)/H₀ = 1 - (1 - 1/(2Ne))^t.
+/-- **Within-population heterozygosity loss, derived from the decay recurrence.**
+    `L(t) = 1 - H(t)/H₀ = 1 - (1 - 1/(2Ne))^t`.
+
+    RENAMED from `fstDerived`. The docstring below already said this is not a split
+    `F_ST`; the identifier went on asserting one, which is the same
+    convention-identified-name-uncorrected state `hudsonFst` was in. For
+    between-population `F_ST` after a split use `coalFst t Ne = t / (t + 2 Nₑ)`.
 
     Regime: closed population, no mutation. The previous sentence here read
     "This is not a definition imposed from outside; it is the fractional loss
@@ -1383,28 +1409,28 @@ theorem hetRecurrence_closed_form (Ne H₀ : ℝ) (t : ℕ) :
 
     Denotes: the reading its name carries. The same formula appears under
     names from 'fst', 'heterozygosity', and the formula alone does not fix which is meant. -/
-noncomputable def fstDerived (Ne : ℝ) (t : ℕ) : ℝ :=
+noncomputable def heterozygosityLossDerived (Ne : ℝ) (t : ℕ) : ℝ :=
   1 - (1 - 1 / (2 * Ne)) ^ t
 
 /-- **Fst matches heterozygosity loss.**
-    When H₀ > 0, fstDerived Ne t = 1 - hetRecurrence Ne H₀ t / H₀. -/
-theorem fstDerived_eq_het_loss (Ne H₀ : ℝ) (t : ℕ) (hH₀ : H₀ ≠ 0) :
-    fstDerived Ne t = 1 - hetRecurrence Ne H₀ t / H₀ := by
-  unfold fstDerived
+    When H₀ > 0, heterozygosityLossDerived Ne t = 1 - hetRecurrence Ne H₀ t / H₀. -/
+theorem heterozygosityLossDerived_eq_het_loss (Ne H₀ : ℝ) (t : ℕ) (hH₀ : H₀ ≠ 0) :
+    heterozygosityLossDerived Ne t = 1 - hetRecurrence Ne H₀ t / H₀ := by
+  unfold heterozygosityLossDerived
   rw [hetRecurrence_closed_form]
   field_simp
 
 /-- **Fst(0) = 0**: populations start undifferentiated. -/
-theorem fstDerived_zero (Ne : ℝ) : fstDerived Ne 0 = 0 := by
-  unfold fstDerived
+theorem heterozygosityLossDerived_zero (Ne : ℝ) : heterozygosityLossDerived Ne 0 = 0 := by
+  unfold heterozygosityLossDerived
   simp
 
 /-- **Fst is monotonically increasing in t.**
     More generations of drift → more differentiation. -/
-theorem fstDerived_mono (Ne : ℝ) (t₁ t₂ : ℕ) (hNe : 2 < Ne)
+theorem heterozygosityLossDerived_mono (Ne : ℝ) (t₁ t₂ : ℕ) (hNe : 2 < Ne)
     (h_lt : t₁ < t₂) :
-    fstDerived Ne t₁ < fstDerived Ne t₂ := by
-  unfold fstDerived
+    heterozygosityLossDerived Ne t₁ < heterozygosityLossDerived Ne t₂ := by
+  unfold heterozygosityLossDerived
   have h_base_pos : 0 < 1 - 1 / (2 * Ne) := by
     rw [sub_pos, div_lt_one (by linarith)]; linarith
   have h_base_lt : 1 - 1 / (2 * Ne) < 1 := by
@@ -1412,28 +1438,28 @@ theorem fstDerived_mono (Ne : ℝ) (t₁ t₂ : ℕ) (hNe : 2 < Ne)
   linarith [pow_lt_pow_right_of_lt_one₀ h_base_pos h_base_lt h_lt]
 
 /-- **0 ≤ Fst(t) for all t when Ne ≥ 2.** -/
-theorem fstDerived_nonneg (Ne : ℝ) (t : ℕ) (hNe : 2 ≤ Ne) :
-    0 ≤ fstDerived Ne t := by
-  unfold fstDerived
+theorem heterozygosityLossDerived_nonneg (Ne : ℝ) (t : ℕ) (hNe : 2 ≤ Ne) :
+    0 ≤ heterozygosityLossDerived Ne t := by
+  unfold heterozygosityLossDerived
   rw [sub_nonneg]
   apply pow_le_one₀
   · rw [sub_nonneg, div_le_one (by linarith)]; linarith
   · rw [sub_le_self_iff]; positivity
 
 /-- **Fst(t) < 1 for all t when Ne ≥ 2.** -/
-theorem fstDerived_lt_one (Ne : ℝ) (t : ℕ) (hNe : 2 ≤ Ne) :
-    fstDerived Ne t < 1 := by
-  unfold fstDerived
+theorem heterozygosityLossDerived_lt_one (Ne : ℝ) (t : ℕ) (hNe : 2 ≤ Ne) :
+    heterozygosityLossDerived Ne t < 1 := by
+  unfold heterozygosityLossDerived
   linarith [pow_pos (show 0 < 1 - 1 / (2 * Ne) by
     rw [sub_pos, div_lt_one (by linarith)]; linarith) t]
 
 /-- **Fst increases faster with smaller Ne.**
-    For t ≥ 1 and Ne₁ < Ne₂, we have fstDerived Ne₁ t > fstDerived Ne₂ t.
+    For t ≥ 1 and Ne₁ < Ne₂, we have heterozygosityLossDerived Ne₁ t > heterozygosityLossDerived Ne₂ t.
     Smaller populations drift faster. -/
-theorem fstDerived_faster_small_Ne (Ne₁ Ne₂ : ℝ) (t : ℕ) (ht : 1 ≤ t)
+theorem heterozygosityLossDerived_faster_small_Ne (Ne₁ Ne₂ : ℝ) (t : ℕ) (ht : 1 ≤ t)
     (hNe₁ : 2 < Ne₁) (hNe₂ : 2 < Ne₂) (h_lt : Ne₁ < Ne₂) :
-    fstDerived Ne₂ t < fstDerived Ne₁ t := by
-  unfold fstDerived
+    heterozygosityLossDerived Ne₂ t < heterozygosityLossDerived Ne₁ t := by
+  unfold heterozygosityLossDerived
   -- Need (1 - 1/(2Ne₂))^t > (1 - 1/(2Ne₁))^t, i.e. larger base → larger power
   -- which means 1 - (larger)^t < 1 - (smaller)^t
   have h_base₁_pos : 0 < 1 - 1 / (2 * Ne₁) := by
@@ -1445,11 +1471,11 @@ theorem fstDerived_faster_small_Ne (Ne₁ Ne₂ : ℝ) (t : ℕ) (ht : 1 ≤ t)
     exact div_lt_div_of_pos_left one_pos (by linarith) (by linarith)
   linarith [pow_lt_pow_left₀ h_base_lt (le_of_lt h_base₁_pos) (Nat.not_eq_zero_of_lt (by omega : 0 < t))]
 
-/-- **Consistency check: fstDerived agrees with the earlier heterozygosityLossFromDrift.**
+/-- **Consistency check: heterozygosityLossDerived agrees with the earlier heterozygosityLossFromDrift.**
     The derivation produces the same formula as the direct definition. -/
-theorem fstDerived_eq_fstFromDrift (Ne : ℝ) (t : ℕ) :
-    fstDerived Ne t = heterozygosityLossFromDrift t Ne := by
-  unfold fstDerived heterozygosityLossFromDrift
+theorem heterozygosityLossDerived_eq_fstFromDrift (Ne : ℝ) (t : ℕ) :
+    heterozygosityLossDerived Ne t = heterozygosityLossFromDrift t Ne := by
+  unfold heterozygosityLossDerived heterozygosityLossFromDrift
   rfl
 
 /-! ### Mutation-drift recurrence and equilibrium -/

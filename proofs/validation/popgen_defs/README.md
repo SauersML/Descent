@@ -53,7 +53,7 @@ theory at a null or control point in the same run.
 
 ### Root cause: drift without mutation
 
-`fstDerived`, `fstFromDrift`, `fstFromTau`, `targetHetFromFst` and
+`heterozygosityLossDerived`, `fstFromDrift`, `fstFromTau`, `targetHetFromFst` and
 `neutralAFBenchmarkRatio` are not five independent errors. They form one cluster
 resting on the closed-population recurrence `H_t = H_0 (1 − 1/2N)^t`, and
 `targetHetFromFst` is *tautologically* true given the F_ST that recurrence

@@ -8,7 +8,7 @@ mathematics, not about Monte Carlo error.
 Each reference carries `MODEL`, the assumptions under which it is exact.  A
 mismatch between a definition's model and the reference's model is a MODEL
 error and is reported separately from a FORMULA error -- the distinction the
-`fstDerived`/`fstFromTau`/`targetHetFromFst` cluster turns on.
+`heterozygosityLossDerived`/`fstFromTau`/`targetHetFromFst` cluster turns on.
 """
 
 from __future__ import annotations

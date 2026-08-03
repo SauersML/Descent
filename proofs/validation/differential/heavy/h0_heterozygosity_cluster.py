@@ -9,7 +9,7 @@ The corpus's worst defect cluster, now precisely localized. These definitions
 are all exact functions of the single number (1 - 1/(2 Ne))^t:
 
     Calibrator.hetRecurrence                  PopulationGeneticsFoundations.lean:1186   ROOT
-    Calibrator.fstDerived                     PopulationGeneticsFoundations.lean:1212
+    Calibrator.heterozygosityLossDerived                     PopulationGeneticsFoundations.lean:1212
     Calibrator.heterozygosityLossFromDrift    PopulationGeneticsFoundations.lean:454
     Calibrator.wrightFisherDriftRetention     PortabilityDrift.lean:710
     Calibrator.wrightFisherHeterozygosityLoss PortabilityDrift.lean:730

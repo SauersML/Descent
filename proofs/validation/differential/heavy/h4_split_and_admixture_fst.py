@@ -5,7 +5,7 @@ TWO JOBS, one msprime setup.
 
 JOB A -- GUARD THE ORACLE THAT THE WHOLE ANALYTIC TIER RESTS ON
     `refs.split_fst_hudson` is the reference against which `coalFst`,
-    `fstFromGenerations`, `fstDerived` and `pairwiseFstFromBranches` were all
+    `fstFromGenerations`, `heterozygosityLossDerived` and `pairwiseFstFromBranches` were all
     judged.  It is derived, not measured.  If it is wrong, four analytic
     verdicts are wrong with it.  This job measures Hudson F_ST after a clean
     split directly and compares.

@@ -37,7 +37,7 @@ SIMULATED = {
     'effectGeneticCorrelation',
     'expectedHeterozygosity',
     'expectedSegmentLength',
-    'fstDerived',
+    'heterozygosityLossDerived',
     'heterozygosityLossFromDrift',
     'islandModelFst',
     'kinshipInflation',

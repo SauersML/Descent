@@ -609,9 +609,9 @@ theorem ldRetainedFraction_uses_timeScale (r Ne : ℝ) (t : ℕ) :
       = ((1 - r) * (1 - 1 / coalescentTimeScale Ne)) ^ t := by
   unfold ldRetainedFraction ldRetentionPerGen; rw [coalescentTimeScale_eq]
 
-theorem fstDerived_uses_timeScale (Ne : ℝ) (t : ℕ) :
-    fstDerived Ne t = 1 - (1 - 1 / coalescentTimeScale Ne) ^ t := by
-  unfold fstDerived; rw [coalescentTimeScale_eq]
+theorem heterozygosityLossDerived_uses_timeScale (Ne : ℝ) (t : ℕ) :
+    heterozygosityLossDerived Ne t = 1 - (1 - 1 / coalescentTimeScale Ne) ^ t := by
+  unfold heterozygosityLossDerived; rw [coalescentTimeScale_eq]
 
 theorem wrightFisherDriftRetention_uses_timeScale (N : ℕ) (t : ℕ) :
     wrightFisherDriftRetention N t
@@ -1038,23 +1038,23 @@ theorem heterozygosityLossFromDrift_eq_closedPopulation_measuredLoss
 
 /-- **The same body, read as a between-population `F_ST`.**
 
-`fstDerived` and `heterozygosityLossFromDrift` share a body, and `DriftRegime` names that
+`heterozygosityLossDerived` and `heterozygosityLossFromDrift` share a body, and `DriftRegime` names that
 coincidence as the defect rather than a convenience: a within-population heterozygosity
 loss and a between-population variance ratio are different quantities, and the shared body
 is what let one be substituted for the other. They are deliberately *not* merged. This
-theorem records that `fstDerived` inherits the closed-population regime through that
+theorem records that `heterozygosityLossDerived` inherits the closed-population regime through that
 shared body — which is the fact a reader needs in order to see that its `F_ST` reading is
 only available in the regime where the loss reading is.
 
 Note the argument orders differ: `heterozygosityLossFromDrift` takes `(t, Ne)` and
-`fstDerived` takes `(Ne, t)`, so the same call spelled the same way means different things
+`heterozygosityLossDerived` takes `(Ne, t)`, so the same call spelled the same way means different things
 depending on which is in scope. That is the hazard `equilibriumFst` carried before it was
 collapsed, still live here because these two must *not* be collapsed. -/
-theorem fstDerived_eq_closedPopulation_measuredLoss
+theorem heterozygosityLossDerived_eq_closedPopulation_measuredLoss
     (t : ℕ) (Ne H₀ : ℝ) (hH : 0 < H₀) :
-    fstDerived Ne t = (closedPopulation Ne H₀ hH).measuredLoss t := by
+    heterozygosityLossDerived Ne t = (closedPopulation Ne H₀ hH).measuredLoss t := by
   rw [measuredLoss_closedPopulation]
-  unfold fstDerived
+  unfold heterozygosityLossDerived
   rfl
 
 /-- **The Wright-Fisher loss is the same regime again**, at an integer effective size.

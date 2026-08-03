@@ -257,17 +257,17 @@ check(
 )
 
 check(
-    id="fstDerived-is-not-split-fst",
-    fqn="Calibrator.PopulationGeneticsFoundations.fstDerived",
+    id="heterozygosityLossDerived-is-not-split-fst",
+    fqn="Calibrator.PopulationGeneticsFoundations.heterozygosityLossDerived",
     claim="MODEL: the drift recurrence is not the F_ST of a split",
     model_lean="closed population, NO mutation: 1-(1-1/2Ne)^t",
     model_ref="clean split at mutation-drift equilibrium, infinite sites",
     reference="refs.split_fst_hudson",
     grid=_SPLIT,
-    lean=lambda D, t, Ne: D["fstDerived"](Ne, int(t)),
+    lean=lambda D, t, Ne: D["heterozygosityLossDerived"](Ne, int(t)),
     ref=lambda t, Ne: refs.split_fst_hudson(t, Ne, Ne, Ne),
     kind="model",
-    note="root of the fstDerived/fstFromTau/targetHetFromFst cluster",
+    note="root of the heterozygosityLossDerived/fstFromTau/targetHetFromFst cluster",
     canfail_clause=(
         "REQUIRES t/(2Ne) >= ~0.5. Both sides are t/(2Ne) + O(t^2/Ne^2), so at "
         "t << Ne they agree to <1% and the test is vacuous."
@@ -275,22 +275,22 @@ check(
 )
 
 check(
-    id="fstDerived-is-coalescence-prob",
-    fqn="Calibrator.PopulationGeneticsFoundations.fstDerived",
-    claim="what fstDerived actually computes: P(coalesce within t) in a closed pop",
+    id="heterozygosityLossDerived-is-coalescence-prob",
+    fqn="Calibrator.PopulationGeneticsFoundations.heterozygosityLossDerived",
+    claim="what heterozygosityLossDerived actually computes: P(coalesce within t) in a closed pop",
     model_lean="closed population, no mutation",
     model_ref="same",
     reference="refs.prob_coalesce_within",
     grid=_SPLIT,
-    lean=lambda D, t, Ne: D["fstDerived"](Ne, int(t)),
+    lean=lambda D, t, Ne: D["heterozygosityLossDerived"](Ne, int(t)),
     ref=lambda t, Ne: refs.prob_coalesce_within(t, Ne),
     canfail_clause="t >= 1 and Ne finite; at t=0 both sides are 0",
 )
 
 check(
-    id="hetLossFromDrift-duplicates-fstDerived",
+    id="hetLossFromDrift-duplicates-heterozygosityLossDerived",
     fqn="Calibrator.PopulationGeneticsFoundations.heterozygosityLossFromDrift",
-    claim="DUPLICATE: identical body to fstDerived under a different name",
+    claim="DUPLICATE: identical body to heterozygosityLossDerived under a different name",
     model_lean="closed population, no mutation",
     model_ref="same",
     reference="refs.prob_coalesce_within",
@@ -310,7 +310,7 @@ check(
     grid=_SPLIT,
     lean=lambda D, t, Ne: D["fstFromGenerations"](t, Ne),
     ref=lambda t, Ne: refs.split_fst_hudson(t, Ne, Ne, Ne),
-    canfail_clause="t of order Ne (see fstDerived-is-not-split-fst)",
+    canfail_clause="t of order Ne (see heterozygosityLossDerived-is-not-split-fst)",
 )
 
 check(
@@ -561,7 +561,7 @@ def _ss_lattice_meeting_time(d: float, D: float, sigma_sq: float, m: float) -> f
     dispersal variance sigma^2.  The separation is a random walk absorbed at 0
     and D, so the expected absorption time is d(D-d)/(2 sigma^2 m).
 
-    Note what the corpus's `steppingStoneCoalescenceTime` is instead: this
+    Note what the corpus's `steppingStoneDiffusionTimescale` is instead: this
     divided by (D-d).  That is not a small correction -- at d=1, D=256 the
     corpus value is 5.0 against a measured 1344.2.
     """
@@ -605,7 +605,7 @@ check(
         "the history stays attached to it and the sigma^2 axis cannot quietly "
         "stop being swept.\n\n"
         "The two siblings in the same family, demoSteppingStoneFst "
-        "(d Ne m sigma_sq) and steppingStoneCoalescenceTime (d sigma_sq m), "
+        "(d Ne m sigma_sq) and steppingStoneDiffusionTimescale (d sigma_sq m), "
         "both took sigma_sq explicitly all along; the family is no longer "
         "split on whether its lattice has one.\n\n"
         "Lean-side companion: steppingStoneCharacteristicLength_at_unit_"
@@ -633,7 +633,7 @@ check(
     id="steppingStoneMeetingTime-lattice-form",
     fqn="Calibrator.DemographicHistory.steppingStoneMeetingTimeOnLattice",
     claim="the lattice meeting time is d(D-d)/(2 sigma^2 m), and the corpus's "
-          "per-deme steppingStoneCoalescenceTime is that divided by (D-d)",
+          "per-deme steppingStoneDiffusionTimescale is that divided by (D-d)",
     model_lean="random walk on D demes absorbed at 0 and D",
     model_ref="same, computed independently in refs",
     reference="_ss_lattice_meeting_time",
@@ -644,7 +644,7 @@ check(
     ref=lambda d, D, sigma_sq, m: _ss_lattice_meeting_time(d, D, sigma_sq, m),
     note=(
         "Added because this definition had NO simulation behind it at all "
-        "while carrying a numerical claim: `steppingStoneCoalescenceTime` "
+        "while carrying a numerical claim: `steppingStoneDiffusionTimescale` "
         "gives 5.0 at d=1, D=256 where the measured meeting time is 1344.2, a "
         "factor of (D-d) = 255. That factor was recorded in a docstring and "
         "nowhere else.\n\n"
@@ -727,8 +727,8 @@ check(
 
 
 check(
-    id="steppingStoneCoalescenceTime-lattice-scale",
-    fqn="Calibrator.DemographicHistory.steppingStoneCoalescenceTime",
+    id="steppingStoneDiffusionTimescale-lattice-scale",
+    fqn="Calibrator.DemographicHistory.steppingStoneDiffusionTimescale",
     claim="d/(2 sigma^2 m) is not the meeting time in generations; the "
           "meeting time is d(D-d)/(2 sigma^2 m) and depends on lattice size",
     model_lean="T(d) = d/(2 sigma^2 m), a quantity with no lattice size in "
@@ -748,7 +748,7 @@ check(
     grid=[g for g in grid(d=[1.0, 4.0, 16.0, 64.0], sigma_sq=[1.0, 4.0],
                           m=[0.025, 0.1], n_demes=[64.0, 256.0])
           if g["d"] <= g["n_demes"] / 2],
-    lean=lambda D, d, sigma_sq, m, n_demes: D["steppingStoneCoalescenceTime"](
+    lean=lambda D, d, sigma_sq, m, n_demes: D["steppingStoneDiffusionTimescale"](
         d, sigma_sq, m),
     ref=lambda d, sigma_sq, m, n_demes: (
         d * (n_demes - d) / (2.0 * m * sigma_sq)),
@@ -1040,7 +1040,7 @@ check(
 #
 # A NOTE ON THE THREE CHECKS ADDED HERE AND IN SECTION 5 THAT ARE MEANT TO
 # DISAGREE (admixedFst-over-a-spectrum, admixtureLDDecay-is-the-infinite-Ne-limit,
-# steppingStoneCoalescenceTime-lattice-scale).
+# steppingStoneDiffusionTimescale-lattice-scale).
 #
 # run.py's vacuity test asks whether a check separates the real definition from
 # deliberately wrong ones. For a check whose verdict is AGREE that is the right
@@ -1053,7 +1053,7 @@ check(
 # reference is REACHABLE, i.e. that some body would make it AGREE. Verified
 # exactly (max relative error 0 at every grid point):
 #
-#   steppingStoneCoalescenceTime  d(D-d)/(2 sigma^2 m)
+#   steppingStoneDiffusionTimescale  d(D-d)/(2 sigma^2 m)
 #   admixtureLDDecay              ((1-r)(1-1/(2Ne)))^g
 #   admixedFst                    (1-alpha)^2 * F_ST(A,B) * den_AB/den_CA
 #
@@ -1242,18 +1242,18 @@ check(
 )
 
 check(
-    id="ldCorrelationFromMigration-vs-sharedLD-squared",
-    fqn="Calibrator.PopulationGeneticsFoundations.ldCorrelationFromMigration",
+    id="ldCorrelationMigrationAnsatz-vs-sharedLD-squared",
+    fqn="Calibrator.PopulationGeneticsFoundations.ldCorrelationMigrationAnsatz",
     claim="M^2/(1+M)^2 is exactly the square of PortabilityDrift.sharedLDFromMigration",
     model_lean="proportion of LD that is shared, as a function of M=4Nm",
     model_ref="sharedLDFromMigration(M)^2 = (1 - islandModelFst)^2",
     reference="Calibrator.PortabilityDrift.sharedLDFromMigration ** 2",
     grid=grid(M=[0.1, 1.0, 4.0, 40.0]),
-    lean=lambda D, M: D["ldCorrelationFromMigration"](M),
+    lean=lambda D, M: D["ldCorrelationMigrationAnsatz"](M),
     ref=lambda D, M: D["sharedLDFromMigration"](M) ** 2,
     kind="internal",
     note=(
-        "CONSISTENT: PopulationGeneticsFoundations.ldCorrelationFromMigration "
+        "CONSISTENT: PopulationGeneticsFoundations.ldCorrelationMigrationAnsatz "
         "is exactly the square of PortabilityDrift.sharedLDFromMigration, i.e. "
         "(1 - islandModelFst)^2. Both are 'shared LD' but one is a correlation "
         "and the other its square; the relation is exact and now recorded."
@@ -1474,7 +1474,7 @@ check(
     tol=1e-3,
     kind="model",
     note=(
-        "shares the closed-population no-mutation model of the fstDerived "
+        "shares the closed-population no-mutation model of the heterozygosityLossDerived "
         "cluster; this check tests only the approximation, NOT whether the "
         "quantity is a split F_ST -- see hetRecurrence-at-mutation-drift-balance "
         "for that, which is the larger error"

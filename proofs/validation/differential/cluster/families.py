@@ -161,7 +161,7 @@ FAMILIES = [
                 "measurement about the FORMULA'S PREMISE (segregating-site "
                 "conditioning), and the mentions query has to be run before "
                 "any claim that the corpus is wrong.",
-        "members": ["fstDerived", "heterozygosityLossFromDrift",
+        "members": ["heterozygosityLossDerived", "heterozygosityLossFromDrift",
                     "ldRetainedFraction", "neutralDriftFactor",
                     "wrightFisherDriftRetention",
                     "wrightFisherHeterozygosityLoss", "hetRecurrence",
@@ -199,7 +199,7 @@ FAMILIES = [
                     "effectiveMigration",
                     "fstMigDriftEq", "fstMigrationMutationEquilibrium",
                     "fstEqLimitLowMutationManyDemes",
-                    "ldCorrelationFromMigration", "sharedLDFromMigration",
+                    "ldCorrelationMigrationAnsatz", "sharedLDFromMigration",
                     "signalRetentionMigrationDrift",
                     "retainedSignalVarianceMigrationDrift",
                     "migrationSharedBoostAt", "migBoost", "migrationLDBoost"],
@@ -320,7 +320,7 @@ FAMILIES = [
                 "candidate decay law is linear on the sampled range.",
         "members": ["steppingStoneCharacteristicLength",
                     "continuousSteppingStoneFst", "demoSteppingStoneFst",
-                    "steppingStoneCoalescenceTime", "steppingStoneFst",
+                    "steppingStoneDiffusionTimescale", "steppingStoneFst",
                     "steppingStoneFstQuadratic",
                     # newly classified
                     "ldCorrelationDecay"],
