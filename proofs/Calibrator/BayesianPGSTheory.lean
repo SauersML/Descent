@@ -286,38 +286,45 @@ theorem ld_mismatch_bias_proportional
     nlinarith
   nlinarith [abs_nonneg (σ_ref - σ_true), h_den_bound]
 
-/-- **Cross-ancestry LD reference introduces systematic bias.**
-    Using EUR LD reference for AFR GWAS summary statistics introduces
-    bias. We model cross-ancestry LD divergence: if the within-population
-    LD entry is σ and the cross-population LD entry differs by δ = c·Fst·σ
-    (LD diverges proportionally to Fst and the LD magnitude), then
-    by ld_mismatch_bias_proportional the shrinkage bias is at most
-    c·Fst·σ/τ. This theorem establishes that cross-ancestry bias is
-    positive and scales with Fst: for matched LD (Fst=0) the bias
-    contribution c·Fst·σ vanishes, while for diverged populations it
-    grows linearly. -/
-theorem cross_ancestry_ld_bias
+/-- **The expression `c·Fst·σ/τ` is positive and homogeneous of degree one in `Fst`.**
+
+    That is the whole content, and the name now says so. Previously
+    `cross_ancestry_ld_bias`, documented as establishing "that cross-ancestry bias is
+    positive and scales with Fst" by way of `ld_mismatch_bias_proportional`. It does no
+    such thing: `snpShrinkage` never appears in the statement, so nothing links this
+    arithmetic to the shrinkage bias that `ld_mismatch_bias_proportional` actually bounds.
+    The identification of `c·Fst·σ` with the cross-population LD perturbation `|σ_ref −
+    σ_true|` is a modelling posit made in prose only.
+
+    The second conjunct is strengthened rather than restated: the docstring claimed
+    "doubling Fst doubles the bias bound" while the statement proved only the strict
+    inequality `bound(fst) < bound(2·fst)`, which is compatible with any growth at all.
+    The equality is what "doubles" means and it is what is proved. -/
+theorem ld_bias_bound_pos_and_doubles_with_fst
     (σ τ c fst : ℝ)
     (h_σ : 0 < σ) (h_τ : 0 < τ)
     (h_c : 0 < c) (h_fst : 0 < fst) :
-    -- The bias bound is positive (nonzero bias for diverged populations)
     0 < c * fst * σ / τ ∧
-    -- Bias grows with Fst: doubling Fst doubles the bias bound
-    c * fst * σ / τ < c * (2 * fst) * σ / τ := by
-  constructor
-  · apply div_pos _ h_τ; positivity
-  · apply div_lt_div_of_pos_right _ h_τ
-    nlinarith [mul_pos h_c (mul_pos h_fst h_σ)]
+    c * (2 * fst) * σ / τ = 2 * (c * fst * σ / τ) := by
+  refine ⟨div_pos (by positivity) h_τ, by ring⟩
 
-/-- **In-sample LD reference is optimal.**
-    Using LD reference from the same population as GWAS minimizes bias.
-    Cross-population bias = base_bias + c · fst where fst > 0 between
-    populations, so cross-population bias strictly exceeds in-sample bias. -/
-theorem in_sample_ld_optimal
+/-- **In the additive bias model, a positive Fst offset strictly increases bias.**
+
+    Previously `in_sample_ld_optimal`, "Using LD reference from the same population as GWAS
+    minimizes bias". Optimality is a statement about a minimum over a set of reference
+    panels; no set of panels is quantified over here, so no optimality is proved. What is
+    proved is that the posited expression `base_bias + c·fst` is larger at `fst > 0` than
+    at `fst = 0`.
+
+    Two smaller repairs. The conclusion was `≤` while the docstring said "strictly
+    exceeds"; it is now `<`, which is what the positive hypotheses give. And
+    `h_base_nn : 0 ≤ base_bias` was an unused hypothesis of the misleading kind — it made
+    the statement look like it was about a magnitude, when the inequality holds for any
+    `base_bias` whatsoever. It is gone. -/
+theorem cross_population_bias_gt_base_bias_of_positive_fst
     (base_bias c fst : ℝ)
-    (h_base_nn : 0 ≤ base_bias)
     (h_c_pos : 0 < c) (h_fst_pos : 0 < fst) :
-    base_bias ≤ base_bias + c * fst := by
+    base_bias < base_bias + c * fst := by
   linarith [mul_pos h_c_pos h_fst_pos]
 
 /-- **Multi-ancestry LD reference reduces cross-population bias.**
@@ -325,12 +332,20 @@ theorem in_sample_ld_optimal
     that partially matches each population.  If single-ancestry bias
     is c · fst and multi-ancestry bias is c · α · fst where α ∈ (0,1)
     is the attenuation from partial ancestry matching, then
-    multi-ancestry bias < single-ancestry bias. -/
+    multi-ancestry bias < single-ancestry bias.
+
+    The attenuation factor `α < 1` is posited, not derived: nothing here shows that mixing
+    reference panels attenuates rather than amplifies bias. Given that posit the conclusion
+    is now the strict inequality the docstring always claimed — it previously proved only
+    `≤`, which is also what an `α` of exactly `1` (no attenuation at all) would give.
+
+    `_h_α_pos` is deliberately unused and marked as such: `α > 0` is part of the modelled
+    range of an attenuation factor, but the inequality does not need it. -/
 theorem multi_ancestry_reference_reduces_bias
     (c fst α : ℝ)
     (h_c : 0 < c) (h_fst : 0 < fst)
-    (h_α_pos : 0 < α) (h_α_lt : α < 1) :
-    c * α * fst ≤ c * fst := by
+    (_h_α_pos : 0 < α) (h_α_lt : α < 1) :
+    c * α * fst < c * fst := by
   have h_cf : 0 < c * fst := mul_pos h_c h_fst
   nlinarith
 
@@ -458,16 +473,19 @@ theorem portability_prior_interaction
   have key : π_poly * (1 - π_poly) < π_sparse * (1 - π_sparse) := by nlinarith
   nlinarith
 
-/-- **Empirical Bayes estimation of prior parameters.**
-    Estimating π and σ²_slab from data is population-specific,
-    so the prior learned in EUR may not suit AFR. -/
-theorem empirical_bayes_population_specific
+/-- **Distinct causal fractions give distinct spike-and-slab prior variances at unit slab
+    variance.** `π ↦ π · 1²` is injective; that is the entire content.
+
+    Previously `empirical_bayes_population_specific`, whose docstring concluded that "the
+    prior learned in EUR may not suit AFR". That is a claim about estimation from data and
+    about transfer between populations. Neither an estimator nor a transfer criterion
+    appears in the statement, which is a one-line injectivity fact about a product. -/
+theorem spikeAndSlabPriorVariance_ne_of_pi_ne
     (π_eur π_afr : ℝ)
     (h_diff : π_eur ≠ π_afr) :
     spikeAndSlabPriorVariance π_eur 1 ≠ spikeAndSlabPriorVariance π_afr 1 := by
   unfold spikeAndSlabPriorVariance
-  simp
-  exact h_diff
+  simpa using h_diff
 
 end PriorSpecification
 
@@ -541,7 +559,12 @@ section PRSCS
     Large φ → less shrinkage (denser model).
     The effective number of nonzero coefficients is approximately
     n_eff ≈ M · φ/(1+φ) where M is total SNPs. Since φ/(1+φ)
-    is monotonically increasing in φ, larger φ yields more nonzero effects. -/
+    is monotonically increasing in φ, larger φ yields more nonzero effects.
+
+    What is proved is only the monotonicity of `M · φ/(1+φ)` in `φ`. The identification of
+    that expression with an effective number of nonzero coefficients is an approximation
+    asserted in this docstring and derived nowhere, so the theorem carries no information
+    about sparsity beyond the arithmetic. -/
 theorem global_shrinkage_controls_sparsity
     (M φ₁ φ₂ : ℝ)
     (hM : 0 < M) (hφ₁ : 0 < φ₁) (hφ₂ : 0 < φ₂)
@@ -551,19 +574,31 @@ theorem global_shrinkage_controls_sparsity
   rw [div_lt_div_iff₀ (by linarith) (by linarith)]
   nlinarith
 
-/-- **PRS-CS performance relative to C+T.**
-    PRS-CS uniformly dominates C+T in in-sample prediction.
-    The advantage is largest for polygenic traits.
-    Model: C+T uses only p SNPs passing threshold and ignores LD;
-    PRS-CS uses all M SNPs with optimal shrinkage.
-    R²_CT = h² · p/M · (1-noise_CT), R²_PRS-CS = h² · (1-noise_CS).
-    Since p ≤ M and noise_CS ≤ noise_CT, PRS-CS dominates. -/
-theorem prs_cs_dominates_ct
+/-- **Under an assumed noise ordering, the modelled C+T accuracy does not exceed the
+    modelled PRS-CS accuracy.**
+
+    Previously `prs_cs_dominates_ct`, "PRS-CS uniformly dominates C+T in in-sample
+    prediction". Nothing is uniform and nothing is dominated: `h_cs_better : noise_cs ≤
+    noise_ct` is the assumption that PRS-CS is the better method, supplied by hand, and the
+    theorem propagates it through the posited accuracy formulae `h²·(p/M)·(1−noise_CT)` and
+    `h²·(1−noise_CS)`. Those formulae are written down here, not derived from any estimator.
+    The claim "the advantage is largest for polygenic traits" appears nowhere in the
+    statement and is dropped.
+
+    What the theorem does contribute is that the two modelled advantages — using all `M`
+    SNPs rather than `p`, and the assumed lower noise — compose in the same direction
+    rather than cancelling.
+
+    Four hypotheses are marked unused rather than left to the linter: the accuracy
+    comparison needs neither `p > 0`, nor that either noise level is nonnegative, nor that
+    the PRS-CS noise is below one. They describe the modelled ranges of the quantities and
+    are kept for that reason, but they carry no weight in the proof. -/
+theorem ct_r2_le_prs_cs_r2_of_assumed_noise_ordering
     (h_sq p M noise_ct noise_cs : ℝ)
-    (h_hsq : 0 < h_sq) (h_p : 0 < p) (h_M : 0 < M)
+    (h_hsq : 0 < h_sq) (_h_p : 0 < p) (h_M : 0 < M)
     (h_pM : p ≤ M)
-    (h_noise_ct : 0 ≤ noise_ct) (h_noise_ct1 : noise_ct < 1)
-    (h_noise_cs : 0 ≤ noise_cs) (h_noise_cs1 : noise_cs < 1)
+    (_h_noise_ct : 0 ≤ noise_ct) (h_noise_ct1 : noise_ct < 1)
+    (_h_noise_cs : 0 ≤ noise_cs) (_h_noise_cs1 : noise_cs < 1)
     (h_cs_better : noise_cs ≤ noise_ct) :
     h_sq * (p / M) * (1 - noise_ct) ≤ h_sq * (1 - noise_cs) := by
   have h_pM_ratio : p / M ≤ 1 := by rwa [div_le_one (by linarith : (0:ℝ) < M)]
@@ -579,13 +614,18 @@ theorem prs_cs_dominates_ct
     is more robust to LD misspecification.
     Model: PRS-CS accuracy = base_r2 - mismatch_penalty.
     C+T accuracy = base_r2 · (p/M) but is unaffected by LD mismatch.
-    When mismatch_penalty > base_r2 · (1 - p/M), PRS-CS is worse. -/
+    When mismatch_penalty > base_r2 · (1 - p/M), PRS-CS is worse.
+
+    The reversal is a rearrangement of `h_penalty_large`, which is the modelling assumption
+    that the mismatch penalty exceeds the SNP-count advantage; the theorem does not
+    establish that any real LD mismatch is that large. `_h_r2`, `_h_p` and `_h_pen_lt` are
+    unused: the rearrangement holds without them. -/
 theorem ld_mismatch_can_reverse_advantage
     (base_r2 p M mismatch_penalty : ℝ)
-    (h_r2 : 0 < base_r2) (h_p : 0 < p) (h_M : 0 < M)
+    (_h_r2 : 0 < base_r2) (_h_p : 0 < p) (h_M : 0 < M)
     (h_pM : p ≤ M)
     (h_penalty_large : base_r2 * (1 - p / M) < mismatch_penalty)
-    (h_pen_lt : mismatch_penalty < base_r2) :
+    (_h_pen_lt : mismatch_penalty < base_r2) :
     base_r2 - mismatch_penalty < base_r2 * (p / M) := by
   have : p / M ≤ 1 := by rwa [div_le_one (by linarith : (0:ℝ) < M)]
   nlinarith
@@ -602,16 +642,18 @@ framework to improve portability.
 
 section MultiAncestryBayesian
 
-/-- **Genetic correlation determines information borrowing.**
-    If rg = 1 (same effects), full information is shared.
-    If rg = 0 (independent effects), no borrowing occurs. -/
-theorem info_borrowing_proportional_to_rg
-    (rg info_gain : ℝ)
-    (h_relation : info_gain = rg ^ 2)
-    (h_rg : 0 ≤ rg) (h_rg_le : rg ≤ 1) :
-    0 ≤ info_gain ∧ info_gain ≤ 1 := by
-  rw [h_relation]
-  exact ⟨sq_nonneg _, by nlinarith [sq_nonneg rg]⟩
+/-- **`rg²` lies in `[0,1]` whenever `rg` does.**
+
+    Previously `info_borrowing_proportional_to_rg`, "Genetic correlation determines
+    information borrowing". It introduced a second variable `info_gain` and pinned it with
+    `h_relation : info_gain = rg ^ 2`, then proved bounds on it. Naming a quantity and
+    supplying its definition as a hypothesis adds nothing to the bound on `rg ^ 2`, and it
+    makes an unproved modelling identification — that squared genetic correlation *is* the
+    fraction of information shared — look like part of the theorem. -/
+theorem rg_sq_mem_unit_interval
+    (rg : ℝ) (h_rg : 0 ≤ rg) (h_rg_le : rg ≤ 1) :
+    0 ≤ rg ^ 2 ∧ rg ^ 2 ≤ 1 :=
+  ⟨sq_nonneg _, by nlinarith [sq_nonneg rg]⟩
 
 /-- **Effective sample size in multi-ancestry setting.**
     n_eff = n_target + Σ_k (rg_k² × n_k × h_k / h_target)
@@ -622,14 +664,25 @@ noncomputable def multiAncestryEffectiveN
     (n_target rg n_other : ℝ) : ℝ :=
   n_target + rg ^ 2 * n_other
 
-/-- **Multi-ancestry PGS is at least as good as single-ancestry.**
-    With well-specified models, combining data cannot hurt.
-    The effective sample size is n_target + rg² · n_other where rg ∈ [0,1].
-    Since rg² · n_other ≥ 0, the effective n is at least n_target,
-    and R² = n_eff · h²/(n_eff · h² + 1) is monotone in n_eff. -/
-theorem multi_ancestry_at_least_as_good
+/-- **The Gaussian shrinkage factor is monotone in the multi-ancestry effective sample
+    size.**
+
+    Previously `multi_ancestry_at_least_as_good`, "Multi-ancestry PGS is at least as good
+    as single-ancestry. With well-specified models, combining data cannot hurt." Two
+    things were being conflated. `gaussianPosteriorShrinkage n h = n·h/(n·h+1)` is the
+    factor by which the posterior mean shrinks the observation toward zero; the docstring
+    read it as `R²`. They are the same expression, but the identification of shrinkage
+    factor with predictive `R²` is a modelling step taken nowhere in this file, so the
+    theorem does not say a PGS is more accurate — it says a shrinkage factor is larger.
+
+    The effective-sample-size formula `n_target + rg²·n_other` is likewise posited
+    (`multiAncestryEffectiveN`) and not derived from any multi-ancestry estimator.
+
+    `_h_rg` is deliberately unused: because the formula uses `rg ^ 2`, the sign of the
+    genetic correlation is irrelevant, so the monotonicity holds for negative `rg` too. -/
+theorem gaussianPosteriorShrinkage_mono_in_multiAncestryEffectiveN
     (n_target rg n_other h_sq : ℝ)
-    (h_nt : 0 < n_target) (h_rg : 0 ≤ rg) (h_no : 0 ≤ n_other)
+    (h_nt : 0 < n_target) (_h_rg : 0 ≤ rg) (h_no : 0 ≤ n_other)
     (h_hsq : 0 < h_sq) :
     gaussianPosteriorShrinkage n_target h_sq ≤
       gaussianPosteriorShrinkage (multiAncestryEffectiveN n_target rg n_other) h_sq := by
@@ -637,10 +690,13 @@ theorem multi_ancestry_at_least_as_good
   rw [div_le_div_iff₀ (by positivity) (by positivity)]
   nlinarith [sq_nonneg rg, mul_nonneg (sq_nonneg rg) h_no]
 
-/-- Multi-ancestry effective N ≥ single-ancestry N. -/
+/-- Multi-ancestry effective N ≥ single-ancestry N.
+
+    `_h_rg` is deliberately unused, for the same reason as above: the contribution enters
+    squared. -/
 theorem multi_ancestry_effective_n_ge
     (n_target rg n_other : ℝ)
-    (h_rg : 0 ≤ rg) (h_n : 0 ≤ n_other) :
+    (_h_rg : 0 ≤ rg) (h_n : 0 ≤ n_other) :
     n_target ≤ multiAncestryEffectiveN n_target rg n_other := by
   unfold multiAncestryEffectiveN
   linarith [mul_nonneg (sq_nonneg rg) h_n]
@@ -659,20 +715,24 @@ theorem diminishing_returns_from_majority
   have h_sq_lt : rg ^ 2 < 1 := by nlinarith [sq_abs rg, sq_nonneg rg]
   nlinarith
 
-/-- **Optimal allocation of GWAS resources across ancestries.**
-    For a fixed total budget N, the optimal allocation maximizes
-    the minimum R² across populations. This generally requires
-    oversampling underrepresented populations. -/
-theorem optimal_allocation_oversamples_minority
-    (n_majority n_minority n_total : ℝ)
-    (h_total : n_majority + n_minority = n_total)
-    (h_optimal_minority_share proportion : ℝ)
-    (h_oversampled : proportion < h_optimal_minority_share)
-    (h_prop_def : proportion = n_minority / n_total)
-    (h_pos : 0 < n_total)
-    (h_minority_share : n_minority / n_total < 1/2) :
-    -- The optimal minority share exceeds the population proportion
-    n_minority / n_total < h_optimal_minority_share := by linarith
+/-
+`optimal_allocation_oversamples_minority` was deleted here rather than renamed.
+
+It was documented as "For a fixed total budget N, the optimal allocation maximizes the
+minimum R² across populations. This generally requires oversampling underrepresented
+populations." No allocation was optimised, no budget constraint was used, and no R²
+appeared. The statement assumed `proportion < h_optimal_minority_share` and
+`proportion = n_minority / n_total`, and concluded
+`n_minority / n_total < h_optimal_minority_share` — the first hypothesis with the second
+substituted into it, closed by `linarith`. `h_total`, `h_pos` and `h_minority_share` were
+never used, and `h_optimal_minority_share` was not a hypothesis at all but a free real
+variable wearing an `h_` prefix, which is what made the conclusion read as a derived
+optimum rather than as the assumption it was.
+
+Per the corpus proof policy, a conclusion that repackages a premise by substitution is
+deleted, not retained under a better name: there is no weaker true statement here worth
+keeping.
+-/
 
 end MultiAncestryBayesian
 
