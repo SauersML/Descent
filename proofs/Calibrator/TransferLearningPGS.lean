@@ -3007,21 +3007,36 @@ different claim from robustness to having estimated it. -/
 
 section OperatorError
 
-/-- From linkage-disequilibrium model error to deployment loss. Instance of
-    `transplant_excess_le`. `margin` is the gap between the selected panel and the
-    runner-up in the fitted objective; `modelError` bounds the operator error; `misalignment` is
-    the overlap deficit between the transplanted and true optima. The loss is quadratic in the
-    model error with constant `8/margin`.
+open Matrix
 
-    Empirical status: DERIVED. The two inequalities are the modelling inputs; `margin` is a
-    quantity a fit already produces and this result asks to be reported. -/
-theorem ldModelError_to_deploymentLoss
-    (margin modelError misalignment loss : ℝ)
-    (hmargin : 0 < margin) (hmis : 0 ≤ misalignment)
-    (hgap : margin * misalignment ^ 2 ≤ loss)
-    (hpert : loss ≤ 2 * Real.sqrt 2 * modelError * misalignment) :
-    loss ≤ 8 * modelError ^ 2 / margin :=
-  transplant_excess_le margin modelError misalignment loss hmargin hmis hgap hpert
+/-- From linkage-disequilibrium model error to deployment loss. Instance of
+    `transplant_excess_le`, in the eigenbasis of the true operator: `spectrum` carries its
+    eigenvalues with the deployed design at the ground direction, `weights` the fitted panel's
+    coefficients, `E` the operator error with quadratic form bounded by `modelError`, and
+    `margin` the gap between the selected panel and the runner-up. The excess loss is quadratic
+    in the model error with constant `8/margin`.
+
+    Note what this inherits: `transplant_excess_le` rests on
+    `excess_le_perturbation_mul_misalignment`, whose proof is an open `sorry`. The gap half of
+    the argument is proved; the perturbation half is not, and that gap is visible here rather
+    than hidden in a hypothesis.
+
+    Empirical status: DERIVED from one proved and one unproved input; `margin` is a quantity a
+    fit already produces and this result asks to be reported. -/
+theorem ldModelError_to_deploymentLoss {n : ℕ}
+    (spectrum weights : Fin (n + 1) → ℝ)
+    (E : Matrix (Fin (n + 1)) (Fin (n + 1)) ℝ) (margin modelError : ℝ)
+    (hmargin : 0 < margin) (herr : 0 ≤ modelError) (hEsymm : E.IsSymm)
+    (hEbound : ∀ v : Fin (n + 1) → ℝ, (∑ i, v i ^ 2) = 1 →
+      |v ⬝ᵥ (E *ᵥ v)| ≤ modelError)
+    (hunit : ∑ i, weights i ^ 2 = 1)
+    (hgap : ∀ i ∈ Finset.univ.erase (0 : Fin (n + 1)),
+      spectrum 0 + margin ≤ spectrum i)
+    (hmin : ∀ v : Fin (n + 1) → ℝ, (∑ i, v i ^ 2) = 1 →
+      perturbedEnergy spectrum E weights ≤ perturbedEnergy spectrum E v) :
+    spectralEnergy spectrum weights - spectrum 0 ≤ 8 * modelError ^ 2 / margin :=
+  transplant_excess_le spectrum weights E margin modelError hmargin herr hEsymm hEbound
+    hunit hgap hmin
 
 /-- The quadratic branch applies only while the model error is small against the margin.
 
