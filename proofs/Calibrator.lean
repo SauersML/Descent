@@ -48,6 +48,7 @@ import Calibrator.PowerAnalysis
 import Calibrator.CovarianceStructure
 import Calibrator.CausalInference
 import Calibrator.CertificateGrading
+import Calibrator.PencilEnvironment
 import Calibrator.CountingInvariantBlindness
 import Calibrator.CountingInvariantInstances
 import Calibrator.PolygenicArchitecture
