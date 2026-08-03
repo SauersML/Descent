@@ -917,7 +917,7 @@ carried implicitly. -/
 noncomputable def islandDemeCorrection (d : ℝ) : ℝ := (d / (d - 1)) ^ 2
 
 /-! **`PortabilityDrift.finiteIslandCorrection` is this same quantity written a second
-time, and the identity is NOT stated here because it cannot yet be compiled.**
+time, and `islandDemeCorrection_eq_finiteIslandCorrection` below is what says so.**
 
 Both are `(d/(d-1))²`, both are documented as *the* standard finite-island correction
 factor in the number of demes, and both exist to isolate the entire gap between the
@@ -925,13 +925,29 @@ infinite-island limit and the finite-`d` result.  This is one quantity defined t
 two quantities that coincide — the failure mode this corpus already hit with three
 definitions of `F_ST`, where repairing one left the other two standing.
 
-The identity theorem was written and then withdrawn: `finiteIslandCorrection` is present in
-`PortabilityDrift.lean`'s source but **absent from its compiled `olean`**, so
-`islandDemeCorrection d = finiteIslandCorrection d` does not elaborate.  It fails loudly
-rather than silently only because it applies the name to an argument; a bare occurrence
-would have been auto-bound as an implicit variable and stayed green, which is the hazard
-`DGP.LDDecayMechanism` documents.  Restore the theorem, or delete one of the two
-definitions outright, once `PortabilityDrift` is rebuilt. -/
+The identity theorem was written and then withdrawn once, because `finiteIslandCorrection`
+was present in `PortabilityDrift.lean`'s source but absent from its compiled `olean`, so
+the statement did not elaborate against a stale build.  That was a build-cache condition,
+not a defect in either definition, and it is gone: `PortabilityDrift` compiles and this
+file imports it.  The withdrawal is worth recording because of *how* it failed — loudly,
+and only because the statement applies the name to an argument.  A bare occurrence would
+have been auto-bound as an implicit variable and stayed green, which is the hazard
+`DGP.LDDecayMechanism` documents.
+
+Stating the identity is the weaker of the two available repairs.  The stronger one is to
+delete a definition and have the survivor's callers move over; that is a cross-module
+rename this pass did not attempt.  What the theorem buys in the meantime is the property
+the duplicate-body guard exists to enforce: if either body is edited, this line stops
+compiling. -/
+
+/-- **The two finite-island corrections are one quantity.**  `islandDemeCorrection` here
+and `PortabilityDrift.finiteIslandCorrection` are both `(d/(d-1))²` under two names in two
+modules; until one of them is retired, this is what makes a divergence between them a
+compile error rather than a silent fork. -/
+theorem islandDemeCorrection_eq_finiteIslandCorrection (d : ℝ) :
+    islandDemeCorrection d = finiteIslandCorrection d := by
+  unfold islandDemeCorrection finiteIslandCorrection
+  ring
 
 /-- **Finite-island `F_ST` for `d` demes** (Wright; Nei):
 `F_ST = 1/(1 + 4·Nₑ·m·(d/(d-1))²)`.
@@ -1152,7 +1168,9 @@ theorem fstMigrationMutation_lt_mutationOnly (Ne m μ : ℝ)
     Signature consistency: both siblings carry a dispersal variance --
     `DemographicHistory.demoSteppingStoneFst (d Ne m σ_sq)` and
     `DemographicHistory.steppingStoneDiffusionTimescale (d σ_sq m)` -- so this
-    signature matches the family. -/
+    signature matches the family.
+
+        Empirical status: UNTESTED. -/
 noncomputable def steppingStoneCharacteristicLength (m σ_sq μ : ℝ) : ℝ :=
   Real.sqrt (m * σ_sq / (2 * μ))
 
