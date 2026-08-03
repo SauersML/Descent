@@ -4507,21 +4507,12 @@ theorem ibdRecurrenceFixedPoint_isFixedPoint (Ne rate : ℝ)
       ring
     rw [hbridge]
     exact hd'
-  have hdNormalized :
-      (1 - rate) ^ 2 + rate * 2 * Ne * (2 - rate) ≠ 0 := by
-    have hbridge :
-        (1 - rate) ^ 2 + rate * 2 * Ne * (2 - rate) =
-          (1 - rate) ^ 2 + 2 * Ne * rate * (2 - rate) := by
-      ring
-    rw [hbridge]
-    exact hd'
   unfold ibdRecurrenceStep ibdRecurrenceFixedPoint
   -- Clear the fixed-point denominator while it is still in its factored form;
   -- only then clear the coalescence denominator. Expanding first made the
   -- nonzero hypothesis syntactically unusable and left an inverse in the goal.
   apply (eq_div_iff hd').2
   field_simp [h2Ne', hdExpanded]
-  field_simp [hdNormalized]
   ring
 
 /-- **Total isolation is a boundary the rest point attains.**  With `rate = 0`
