@@ -93,6 +93,83 @@ known link, an invariant distribution — is an empirical question this asks to 
 than assumed.
 -/
 
+/-! ## Probit rigidity, in the finite form that is available
+
+The continuum classification named in the scope note needs diffusion generators and
+Fréchet curve spaces and is not stated anywhere here. What IS available, and is proved
+below, is the rigidity that makes the classification worth wanting: a probit response
+curve is pinned by its values at two distinct covariate points, so the two-parameter
+probit family admits no deformation at all once two observations are fixed.
+
+The consequence for a drifting cohort is the one the scope note gestures at. If a
+response curve is probit at each time and the drift moves it continuously, then the
+whole trajectory is carried by two numbers, and any two time points that agree in the
+curve at two covariate values agree in the curve everywhere. Rigidity is what makes
+"the curve drifted" a two-parameter statement rather than an infinite-dimensional one.
+
+What is NOT proved: that the drift preserves the probit family. That is the
+classification, and it needs the continuum objects. These theorems say what rigidity
+buys IF the family is preserved; they do not establish the preservation.
+-/
+
+section ProbitRigidity
+
+/-- The probit response curve: `Φ (a x + b)` in the covariate `x`. -/
+noncomputable def probitCurve (a b x : ℝ) : ℝ := Phi (a * x + b)
+
+/-- **Probit rigidity: two points determine the curve.**
+
+`Φ` is strictly monotone hence injective, so agreement of two probit curves at a single
+covariate value already forces their linear arguments to agree there. Two distinct
+values then pin both parameters.
+
+This is the identifiability statement behind reading a slope and a threshold off a
+fitted curve: nothing else in the family passes through the same two points. -/
+theorem probitCurve_params_eq_of_two_points {a b a' b' x y : ℝ} (hxy : x ≠ y)
+    (hx : probitCurve a b x = probitCurve a' b' x)
+    (hy : probitCurve a b y = probitCurve a' b' y) :
+    a = a' ∧ b = b' := by
+  have hlx : a * x + b = a' * x + b' := strictMono_Phi.injective hx
+  have hly : a * y + b = a' * y + b' := strictMono_Phi.injective hy
+  have hsub : (a - a') * (x - y) = 0 := by nlinarith [hlx, hly]
+  have hxy' : x - y ≠ 0 := sub_ne_zero.mpr hxy
+  have ha : a = a' := by
+    rcases mul_eq_zero.mp hsub with h | h
+    · linarith [sub_eq_zero.mp h]
+    · exact absurd h hxy'
+  refine ⟨ha, ?_⟩
+  rw [ha] at hlx
+  linarith
+
+/-- **Agreement at two points is agreement everywhere.**  The curve, not just its
+parameters, is determined. -/
+theorem probitCurve_eq_of_two_points {a b a' b' x y : ℝ} (hxy : x ≠ y)
+    (hx : probitCurve a b x = probitCurve a' b' x)
+    (hy : probitCurve a b y = probitCurve a' b' y) :
+    ∀ z, probitCurve a b z = probitCurve a' b' z := by
+  obtain ⟨ha, hb⟩ := probitCurve_params_eq_of_two_points hxy hx hy
+  intro z
+  rw [ha, hb]
+
+/-- **The threshold gauge acts on the probit family by shifting the intercept.**
+
+`indicator_lt_eq_of_strictMono` says a monotone relabelling of the liability axis is
+invisible. Here is the same gauge freedom inside the probit family: moving the threshold
+by `c` and the intercept by `-c` is the identity on the curve. Combined with rigidity,
+this is exactly the statement that slope is identified and intercept is identified only
+relative to a threshold convention. -/
+theorem probitCurve_shift (a b c x : ℝ) :
+    probitCurve a (b + c) x = probitCurve a b (x + c / a) ∨ a = 0 := by
+  rcases eq_or_ne a 0 with h | h
+  · exact Or.inr h
+  · refine Or.inl ?_
+    unfold probitCurve
+    congr 1
+    field_simp
+    ring
+
+end ProbitRigidity
+
 /-! ## The threshold gauge -/
 
 /-- **A monotone relabelling of the liability axis is invisible.** Applying any strictly
@@ -441,15 +518,65 @@ visible obligation instead of a paragraph of prose, and everything the analysis 
 Theorem 3 downstream is connected to that one obligation. -/
 
 open MeasureTheory ProbabilityTheory in
-/-- **The Gaussian averaging identity.** Averaging the standard normal cdf over a Gaussian shift
-returns the cdf at a contracted argument: `E[Φ(α + βZ)] = Φ(α / √(1 + β²))`.
+/-- **Standardisation of a centred Gaussian cdf.** The distribution function of `N(0, v)` is the
+standard one evaluated at the scaled argument.
 
-    NOT PROVED HERE. The argument is the coupling described above; the missing step is the
-    conditioning that rewrites `E[Φ(α + βZ)]` as `P(W - βZ ≤ α)` for an independent standard
-    normal `W`. -/
+    This is one of the two halves of `gaussianAverage_probit`, and it is the half that is pure
+    change of variable: `N(0,v)` is the pushforward of `N(0,1)` under multiplication by `√v`, so
+    the measure of a half-line is the standard measure of the scaled half-line. -/
+theorem cdf_gaussianReal_zero_mean (v : NNReal) (hv : v ≠ 0) (x : ℝ) :
+    cdf (gaussianReal 0 v) x = Phi (x / Real.sqrt (v : ℝ)) := by
+  have hvpos : (0 : ℝ) < (v : ℝ) := by
+    rcases v.coe_nonneg.lt_or_eq with h | h
+    · exact h
+    · exact absurd (NNReal.coe_eq_zero.mp h.symm) hv
+  have hs : 0 < Real.sqrt (v : ℝ) := Real.sqrt_pos.mpr hvpos
+  have hsq : (⟨Real.sqrt (v : ℝ) ^ 2, sq_nonneg _⟩ : NNReal) * 1 = v := by
+    ext
+    simp [Real.sq_sqrt hvpos.le]
+  have hmap : (gaussianReal 0 1).map (fun y => Real.sqrt (v : ℝ) * y) = gaussianReal 0 v := by
+    have h := gaussianReal_map_const_mul (μ := (0 : ℝ)) (v := (1 : NNReal))
+      (Real.sqrt (v : ℝ))
+    rw [mul_zero, hsq] at h
+    exact h
+  have hpre : (fun y => Real.sqrt (v : ℝ) * y) ⁻¹' Set.Iic x = Set.Iic (x / Real.sqrt (v : ℝ)) := by
+    ext y
+    simp only [Set.mem_preimage, Set.mem_Iic]
+    rw [le_div_iff₀' hs]
+  show cdf (gaussianReal 0 v) x = cdf (gaussianReal 0 1) (x / Real.sqrt (v : ℝ))
+  rw [cdf_eq_real, cdf_eq_real, measureReal_def, measureReal_def, ← hmap,
+    Measure.map_apply (measurable_const_mul _) measurableSet_Iic, hpre]
+
+open MeasureTheory ProbabilityTheory in
+/-- **The conditioning step, and the only gap left in Theorem 3.**
+
+    Averaging the standard cdf over a Gaussian shift is the law of a difference: `E[Φ(α + βZ)]`
+    is `P(W ≤ α + βZ)` for an independent standard normal `W`, which is `P(W - βZ ≤ α)`, and
+    `W - βZ` is centred Gaussian with variance `1 + β²`.
+
+    NOT PROVED HERE. Both ingredients exist in Mathlib — `Measure.prod_apply` slices the product
+    measure into exactly this average, and `gaussianReal_add_gaussianReal_of_indepFun` with
+    `gaussianReal_map_const_mul` gives the law of the difference. What is missing is the
+    assembly, including the passage from the lower integral of measures to the Bochner integral
+    of the cdf. -/
+theorem gaussianAverage_eq_cdf_sum (α β : ℝ) :
+    ∫ z, Phi (α + β * z) ∂(gaussianReal 0 1)
+      = cdf (gaussianReal 0 ⟨1 + β ^ 2, by positivity⟩) α := by
+  sorry
+
+open MeasureTheory ProbabilityTheory in
+/-- **The Gaussian averaging identity**, `E[Φ(α + βZ)] = Φ(α / √(1 + β²))`.
+
+    Now derived rather than assumed: the conditioning step above identifies the average as a
+    centred Gaussian cdf, and `cdf_gaussianReal_zero_mean` — which IS proved — standardises it.
+    So Theorem 3 rests on one measure-theoretic assembly, not on the identity as a whole. -/
 theorem gaussianAverage_probit (α β : ℝ) :
     ∫ z, Phi (α + β * z) ∂(gaussianReal 0 1) = Phi (α / Real.sqrt (1 + β ^ 2)) := by
-  sorry
+  have hne : (⟨1 + β ^ 2, by positivity⟩ : NNReal) ≠ 0 := by
+    simp only [ne_eq, ← NNReal.coe_eq_zero, NNReal.coe_mk]
+    positivity
+  rw [gaussianAverage_eq_cdf_sum, cdf_gaussianReal_zero_mean _ hne]
+  norm_num
 
 open MeasureTheory ProbabilityTheory in
 /-- **Probit is exactly invariant under one Ornstein-Uhlenbeck step**, with the slope contracted
