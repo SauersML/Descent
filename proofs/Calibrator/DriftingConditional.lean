@@ -1364,6 +1364,80 @@ theorem link_average_as_convolution (ν : Measure ℝ) [IsFiniteMeasure ν]
   simp only [measureReal_univ_eq_one, one_smul, add_right_inj]
   rfl
 
+open MeasureTheory ProbabilityTheory in
+/-- The liability distribution `ν` blurred by an independent Gaussian of scale `s`: the law
+of `Y - s Z` for `Y ∼ ν` and `Z` standard normal.  Since the standard normal is symmetric
+this is `ν` convolved with `N(0, s²)`. -/
+noncomputable def convolvedLiability (ν : Measure ℝ) (s : ℝ) : Measure ℝ :=
+  ((gaussianReal 0 1).prod ν).map fun q ↦ q.2 - s * q.1
+
+open MeasureTheory ProbabilityTheory in
+instance convolvedLiability_isFiniteMeasure (ν : Measure ℝ) [IsFiniteMeasure ν] (s : ℝ) :
+    IsFiniteMeasure (convolvedLiability ν s) :=
+  ⟨by
+    rw [convolvedLiability, Measure.map_apply (by fun_prop) MeasurableSet.univ,
+      Set.preimage_univ]
+    exact measure_lt_top _ _⟩
+
+open MeasureTheory ProbabilityTheory in
+/-- **The Gaussian average of the link is the cdf of the blurred liability distribution.**
+
+Combining the half-plane form with the pushforward along `(z, y) ↦ y - s z`: averaging `L`
+at scale `s` is `p` plus the cdf of `convolvedLiability ν s`. -/
+theorem link_average_eq_convolved_cdf (ν : Measure ℝ) [IsFiniteMeasure ν]
+    (L : ℝ → ℝ) (p : ℝ) (hrep : ∀ u, L u = p + (ν (Set.Iic u)).toReal) (s x : ℝ) :
+    ∫ z, L (x + s * z) ∂(gaussianReal 0 1)
+      = p + ((convolvedLiability ν s) (Set.Iic x)).toReal := by
+  rw [link_average_as_convolution ν L p hrep s x]
+  congr 2
+  rw [convolvedLiability, Measure.map_apply (by fun_prop) measurableSet_Iic]
+  congr 1
+  refine Set.ext fun q ↦ ?_
+  simp only [Set.mem_preimage, Set.mem_Iic, Set.mem_setOf_eq]
+  constructor <;> intro h <;> linarith
+
+open MeasureTheory ProbabilityTheory in
+/-- **The invariance, stated as self-similarity of one measure.**
+
+This is the reduction the section was built for.  If the link's averaging family is closed
+at scale `s` with parameters `(α, β)`, `α > 0`, then the liability distribution satisfies
+
+`ν ⋆ N(0, s²)  =  ν pushed forward by  y ↦ (y - β)/α`.
+
+No integral and no unknown function survive in it: an equation between two finite measures
+on the line, holding at every scale.  The two sides are compared through their cdfs and
+`Measure.ext_of_Iic` finishes, which is legitimate precisely because both are finite.
+
+What is left of `link_rigidity` is exactly the classical statement that a finite measure
+reproducing itself, up to affine change of variable, under convolution with every Gaussian
+is Gaussian — on characteristic functions, `φ(ξ) e^{-s²ξ²/2} = e^{iβξ} φ(αξ)`.  That gap is
+now self-contained, and is about characteristic functions rather than about an arbitrary
+monotone link. -/
+theorem liability_selfSimilar_of_invariance (ν : Measure ℝ) [IsFiniteMeasure ν]
+    (L : ℝ → ℝ) (p : ℝ) (hrep : ∀ u, L u = p + (ν (Set.Iic u)).toReal)
+    {s α β : ℝ} (hα : 0 < α)
+    (hinv : ∀ x, ∫ z, L (x + s * z) ∂(gaussianReal 0 1) = L (α * x + β)) :
+    convolvedLiability ν s = ν.map fun y ↦ (y - β) / α := by
+  haveI : IsFiniteMeasure (ν.map fun y : ℝ ↦ (y - β) / α) :=
+    ⟨by
+      rw [Measure.map_apply (by fun_prop) MeasurableSet.univ, Set.preimage_univ]
+      exact measure_lt_top _ _⟩
+  refine Measure.ext_of_Iic _ _ fun x ↦ ?_
+  have hcdf : ((convolvedLiability ν s) (Set.Iic x)).toReal
+      = (ν (Set.Iic (α * x + β))).toReal := by
+    have h := hinv x
+    rw [link_average_eq_convolved_cdf ν L p hrep s x, hrep (α * x + β)] at h
+    linarith
+  have hmap : (ν.map fun y ↦ (y - β) / α) (Set.Iic x) = ν (Set.Iic (α * x + β)) := by
+    rw [Measure.map_apply (by fun_prop) measurableSet_Iic]
+    congr 1
+    refine Set.ext fun y ↦ ?_
+    simp only [Set.mem_preimage, Set.mem_Iic]
+    rw [div_le_iff₀ hα, sub_le_iff_le_add]
+    constructor <;> intro h <;> linarith
+  rw [hmap]
+  exact (ENNReal.toReal_eq_toReal (measure_ne_top _ _) (measure_ne_top _ _)).1 hcdf
+
 /-! ### Step one: the affine-probit parameters are identifiable
 
 `link_rigidity` asserts an affine-probit representation exists. Before that is worth proving it
