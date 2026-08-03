@@ -64,19 +64,16 @@ theorem ultra_rare_not_shared
   rw [lt_div_iff₀ h2Ne_pos] at h_ultra_rare
   linarith [mul_comm p (2 * Ne)]
 
-/-- **Rare variant contribution to heritability.**
-    Under the LDAK-thin model with negative selection (α < 0),
-    E[β²] ∝ [p(1-p)]^(1+α). For rare variants (small p), the
-    contribution to h² per variant is β²·2p(1-p) ∝ [p(1-p)]^α
-    which is large when α < 0.
+/-- **One positive summand's share of a sum of two is strictly between `0` and
+    `1`.**
 
-    Concretely: if there are n_rare rare variants each contributing
-    average variance v_rare, and n_common common variants contributing
-    v_common, then h²_rare = n_rare·v_rare. We show that when
-    n_rare·v_rare > 0 and n_common·v_common > 0, the rare fraction
-    h²_rare / h²_total is well-defined and h²_rare is a strictly
-    positive component of h²_total. -/
-theorem rare_variants_substantial_heritability
+    Read as genetics the two summands are rare and common contributions to
+    heritability, so the rare share is neither nothing nor everything. The
+    LDAK-thin scaling `E[β²] ∝ [p(1-p)]^(1+α)` that would make the rare
+    contribution *substantial* rather than merely positive appears nowhere: no
+    `α`, no frequency and no effect size occurs below, and "substantial" is not
+    a formal claim about a quantity bounded only by `0` and `1`. -/
+theorem div_add_mem_Ioo_of_pos
     (n_rare v_rare n_common v_common : ℝ)
     (h_nr : 0 < n_rare) (h_vr : 0 < v_rare)
     (h_nc : 0 < n_common) (h_vc : 0 < v_common) :
@@ -89,19 +86,28 @@ theorem rare_variants_substantial_heritability
   · rw [div_lt_one (by positivity : 0 < n_rare * v_rare + n_common * v_common)]
     linarith [mul_pos h_nc h_vc]
 
-/-- **Rare variant PGS has zero cross-population portability.**
-    If a variant exists only in population A (MAF_B = 0),
-    it contributes zero to PGS prediction in population B. -/
-theorem rare_variant_zero_portability
+/-- **A product with a zero factor is zero:** `maf_B = 0` gives
+    `β²·(2·maf_B·(1 - maf_B)) = 0`.
+
+    The reading is that a variant absent from a population contributes nothing
+    to a score there. That the contribution IS `β²·2p(1-p)` is the modelling
+    step and is stipulated by writing it; no population, no score and no
+    variant appears below. -/
+theorem mul_genotype_variance_eq_zero_of_freq_zero
     (β maf_B : ℝ) (h_absent : maf_B = 0) :
     β ^ 2 * (2 * maf_B * (1 - maf_B)) = 0 := by
   rw [h_absent]; ring
 
 
-/-- **African populations have the most rare variants.**
-    Due to larger long-term Ne and no out-of-Africa bottleneck,
-    African populations have ~3x more rare variants than European. -/
-theorem african_populations_most_diverse
+/-- **A ratio above two means the numerator is above twice the denominator**,
+    for a positive denominator.
+
+    Cross-multiplication. The demographic reading — larger long-term `Nₑ` and no
+    out-of-Africa bottleneck, hence more rare variants — is the reason someone
+    might assert the hypothesis `2 < ratio`, and is not derived here. Nothing
+    below names a population, and the factor claimed in prose was three while
+    the hypothesis says two. -/
+theorem two_mul_lt_of_two_lt_div
     (n_rare_afr n_rare_eur ratio : ℝ)
     (h_ratio : ratio = n_rare_afr / n_rare_eur)
     (h_more : 2 < ratio)
@@ -197,13 +203,15 @@ but the portability implications are complex.
 section WGSBasedPGS
 
 
-/-- **Common variant component ports better.**
-    PGS_common has moderate portability (shared variants, LD issues).
-    PGS_rare has very poor portability (population-specific variants).
-    If common variants have sharing rate s_c and rare variants s_r < s_c,
-    then for the same effect size β, the expected cross-population
-    signal β²·2p(1-p)·s is larger for common variants. -/
-theorem common_component_more_portable
+/-- **`β²·2p(1-p)·s` is monotone in `p` below `1/2` and in `s`:** raising both
+    the frequency and the sharing rate does not decrease the product.
+
+    The reading is that the common-variant part of a score ports better than
+    the rare part. Below there is no score, no component and no population, and
+    the expression `β²·2p(1-p)·s` being the cross-population signal is
+    stipulated rather than derived. Two monotonicity steps in a product of
+    nonnegatives. -/
+theorem mul_genotype_variance_mul_le_of_le
     (β p_common p_rare s_common s_rare : ℝ)
     (h_β : β ≠ 0)
     (h_pc : 0 < p_common) (h_pc1 : p_common < 1)
@@ -442,14 +450,15 @@ theorem haploinsufficiency_consistent_direction
   · exact mul_pos h1 h2
   · exact mul_pos_of_neg_of_neg h1 h2
 
-/-- **Gene-based LoF PGS as maximally portable rare variant PGS.**
-    Aggregating LoF variants by gene and using functional annotations
-    gives the most portable rare variant PGS component. -/
-theorem gene_lof_maximally_portable_rare
-    (port_single_rare port_burden port_lof_burden : ℝ)
-    (h₁ : port_single_rare ≤ port_burden)
-    (h₂ : port_burden ≤ port_lof_burden) :
-    port_single_rare ≤ port_lof_burden := le_trans h₁ h₂
+/-! **Deleted: `gene_lof_maximally_portable_rare`.**
+
+This declaration is absent on purpose. It took `a ≤ b` and `b ≤ c` and returned
+`le_trans h₁ h₂`: transitivity of `≤` on three reals, which is Mathlib's
+`le_trans`, under a name asserting that gene-level loss-of-function aggregation
+is the most portable rare-variant construction. Nothing in it referred to a
+gene, a variant, an annotation or a score, and "maximally portable" is not a
+statement two applications of `≤` can carry — a maximum needs a set to be
+maximal over, and none was given. -/
 
 end LossOfFunction
 
@@ -463,13 +472,13 @@ variants, affecting both PGS construction and portability.
 
 section EffectSizeDistribution
 
-/-- **Negative selection constrains common variant effects.**
-    E[|β|² | MAF] decreases with MAF because purifying selection
-    removes large-effect alleles that reach high frequency.
-    Under the LDAK model, β² ∝ [p(1-p)]^(1+α) with α < 0,
-    so expected β² ∝ 1/[p(1-p)]^|α|. For rare variants (smaller p(1-p)),
-    the expected effect size is larger. -/
-theorem negative_selection_constraint
+/-- **`2p(1-p)` is strictly increasing below `1/2`.**
+
+    The selection reading — purifying selection removing large-effect alleles
+    that reach high frequency, so `E[β²|MAF]` falls with `MAF` — is about effect
+    sizes, and no effect size appears below. This is the heterozygosity
+    expression alone, monotone on the left half of the frequency range. -/
+theorem two_mul_mul_one_sub_lt_of_lt
     (maf_rare maf_common : ℝ)
     (h_common_lt : maf_common ≤ 1/2)
     (h_rare_maf : maf_rare < maf_common) :
@@ -511,11 +520,14 @@ theorem alpha_model_portability_impact
     linarith
   exact Real.rpow_lt_rpow_of_neg h_rare_het_pos h_het_lt h_exp_neg
 
-/-- **Rare variant PGS R² increases slowly with sample size.**
-    For rare variants, R²_rare ∝ n × MAF × β².
-    With very small MAF, enormous samples are needed.
-    n > 1/(MAF × β²) for adequate power per variant. -/
-theorem rare_variant_needs_large_n
+/-- **A reciprocal of a product below `1/100` exceeds `100`:** for
+    `0 < maf < 1/100` and `|β| ≤ 1` with `β ≠ 0`, `100 < 1/(maf·β²)`.
+
+    The reading is that a rare variant needs a large sample, via
+    `R² ∝ n·MAF·β²` and a power threshold. Neither the proportionality nor the
+    threshold appears below: there is no sample size, no power and no `R²`, and
+    `100` is a numeral rather than a required `n`. -/
+theorem hundred_lt_one_div_mul_sq
     (maf β : ℝ) (h_maf : 0 < maf) (h_maf_small : maf < 1 / 100)
     (h_β : β ≠ 0) (h_β_le : |β| ≤ 1) :
     100 < 1 / (maf * β ^ 2) := by
