@@ -717,6 +717,41 @@ modules are UNWIRED under the deletion test.
 object or biological claim depends on. Row 10 is the only upstream retraction in the seed
 list with formalized downstream consequences, and it has been cleanly executed: the retracted definitions and numbers are absent from Lean, the validation script's corresponding arm is removed under a do-not-resurrect header, and both affected files carry matching notes. The two things to watch instead are the *naming hazard* in row 20 (a live "exposure correction" that greps identically to the dead one) and the *duplication* in rows 5 and 13 (one result formalized twice, in files that never cite each other).
 
+### Rows 54–55: the graded certificate calculus, and counting-invariant blindness
+
+> **BUILD STATUS: COMPILED on acn112, 2026-08-03.** `lake build` reports
+> `✔ Built Calibrator.CertificateGrading`, `✔ Built Calibrator.CountingInvariantInstances`
+> and `✔ Built Calibrator.PolygenicArchitecture`, against a Mathlib with 7002 oleans. Per
+> the verification hazard recorded in `Calibrator.lean`, the tree was confirmed rather than
+> assumed: the uploaded sources were checksum-matched against the local copies
+> (`md5sum` equal on both ends) and `PolygenicArchitecture.olean` carried an mtime one
+> second behind the wall clock at build time. 0 `sorry`s, 0 `axiom`s.
+>
+> **One correction to how this block was first written, recorded because it is the same
+> disease the hazard note describes.** The first attempt to check whether the cluster tree
+> matched local ran `git diff --name-only <cluster-HEAD> HEAD 2>/dev/null`. The cluster's
+> HEAD **does not exist in the local object store** — it is a merge made on the cluster from
+> an `origin/main` that is behind local unpushed work — so the command *failed* and printed
+> nothing, and the empty output was read as "the trees agree". They did not: the cluster's
+> `PolygenicArchitecture` was 904 lines against local's 1000. The check that actually
+> settled it was a line-count and checksum comparison, which can report its own absence.
+> **Fifth specimen.**
+
+| # | RESULT | STATUS UPSTREAM | WHERE IN CORPUS | BIOLOGY | EVIDENCE | GAP |
+|---|---|---|---|---|---|---|
+| 54 | **The graded certificate calculus (upstream Q4a), parts (I), (II), (IV) proved and (III) reduced to two named inputs.** Grade `K` is complete iff the modulus is grade-insensitive; the certification deficit is a **modulus ratio**, with the value formula's constant cancelling identically. | standing | **NEW: `proofs/Calibrator/CertificateGrading.lean`** (self-contained, Mathlib only): `GradedModulus`, `CertificateCalculus`, `ungraded_deficit_eq_one` (I), `deficit_eq_modulus_ratio_sq` and `isComplete_iff_gradeInsensitive` (IV), `DonohoLiuFragment` + `donohoLiu_modulus_ratio_le` (II), `NonsmoothIncompleteness` + `gradeGap_lower_bound` (III). **Wired** into `PolygenicArchitecture` §NonsmoothSummaries: `architectureModulus`, `architectureCalculus`, `architectureCalculus_ungradedRisk`, `architectureCalculus_certifiedRisk`, `certificateDeficit_eq_calculus_deficit`. | Row 18's licence, now with its reason attached: a sample size for a nonsmooth architecture summary read off a two-point, Assouad or Fano argument is polynomially optimistic, **and the shortfall cannot be reduced by sharpening the argument's constants**, because the constant cancels out of the deficit. | (I), (II), (IV) and the deficit identity **PROVED** (pending build). (III) is PROVED **from two structure fields** — a `K`-free envelope and a grade-`K` upper bound — neither of which is derived here. | **This closes the "modulus-ratio identification is prose only" half of row 18's gap and closes nothing else.** The two rates are still stipulated: `architectureModulus` is *read off* them rather than derived from a construction, and the module says so in its own docstring. What is now a theorem is the structure (scale-cancellation, the completeness equivalence), not the rates. Also: `GradeSound` is deliberately **not** a structure field — see the module header for why monotonicity in the grade is not assumed — so every use site must discharge it. **That discharge now exists**: `architecture_gradeSound_eventually` proves the ordering holds past a variant count and *not identically*, which is exactly the eventual quantifier a structure field would have hidden. It fixes no crossing point, so it licenses no claim about any particular panel. |
+| 55 | **Counting invariants are blind to the quantity that sets the rate.** Two configurations agreeing in an effective count and disagreeing in the rate admit **no** function of the count reproducing the rate; quantitatively, any count-based predictor is off by at least half the separation at one of the two. | standing | **NEW: `proofs/Calibrator/CountingInvariantBlindness.lean`** (self-contained): `Witness`, `no_function_of_count_determines_rate`, `count_predictor_error_ge`, `gains_separate`, `ghostWitness`. | **This is row 17 arrived at a second time, by an unrelated argument.** Row 17's `m_eff` prohibition is a statement about weak continuity of spectral functionals; the heavy-tail ghost is a statement about renewal sharing capped by a single-big-block event. Both say every "effective number of independent X" — markers, tests, sample size — is a counting invariant and counting invariants do not see the rate. **Two independent derivations of one moral, and that is the argument for stating the moral separately.** | Abstract theorems **PROVED** (pending build) and unconditional. `gains_separate` **PROVED** via `isLittleO_log_rpow_atTop`. | **The two gains are inputs, not derivations** — `ghostGain = α log n` and `countPredictedGain = n^α` are supplied at the values the upstream statement gives them, and the renewal/one-big-jump estimates behind them are not in this corpus. So the instance is conditional on its two rates and says so. **Now wired, and the wiring changed the theorem.** `proofs/Calibrator/CountingInvariantInstances.lean` imports both this module and `ImitationCapacity` and exhibits the corpus's own `m_eff` witness as an instance, so deleting the general module breaks row 17's neighbourhood. **The attempt to wire it is what found the defect in the first statement:** the `m_eff` pair does *not* satisfy the exact `Witness` — its two spectra agree only to within `1/(n+1)` in the moments, not exactly — so the general object had to be weakened to `ApproxWitness`, with the exact form recovered as the `countGap = 0` case (`ApproxWitness.ofWitness`). Had the instance not been attempted, the module would have shipped a general theorem that its own motivating example fails to satisfy. **The result is strictly stronger than what it generalises:** `certificate_not_momentContinuous` derives `False` from an *equality* with the certificate; `meff_lipschitz_predictor_error_ge` gives every Lipschitz function of the moments — equality claimed or not — an error floor of `(n − L)/(2(n+1))`, positive once the marker count exceeds the modulus (`meff_error_floor_pos`). An effective-marker count does not merely fail to *be* a detection threshold; it fails to *approximate* one, by an amount that does not shrink as the panel grows. |
+
+**A compendium claim that contradicts this corpus, recorded before it propagates.** The
+upstream Part XV design theorem states a Tier-1 rule with an **inflated** ridge,
+`η* = τ²(1 + r/a)`. `TransportedMinimax.lean`:26 derives the reciprocal —
+`η = τ²·a/(a+r) < τ²`, `transportedRidgeParameter_lt_source` — and already carries a note
+saying it "corrects the inverse factor `τ²(1+r/a)` in the proposed design manuscript".
+**The two differ in direction, not in constants:** transport uncertainty makes residual
+bias costlier and therefore calls for *less* shrinkage, not more. Whoever holds the
+upstream record should settle which is right before either is quoted; the corpus's version
+is the one with a derivation in the tree.
+
 ---
 
 ## Top ten gaps, ranked by biological licence
