@@ -448,8 +448,12 @@ noncomputable def gainBounded : ℝ → ℝ := fun _ => 1
 /-- Row two: logarithmic gain. The heavy-tail ghost and the equicorrelated copula live here. -/
 noncomputable def gainLog (n : ℝ) : ℝ := Real.log n
 
-/-- Row three: `n^β log n`, the long-range copula row. -/
-noncomputable def gainPower (β n : ℝ) : ℝ := n ^ β * Real.log n
+/-- Row three: `n^β log n`, the long-range copula row.
+
+    Named for the **power law in `n`**, not for statistical power: this is a conditional-gain
+    rate and takes no significance threshold, because none enters it. The earlier name
+    `gainPower` invited exactly that misreading. -/
+noncomputable def gainPolynomialRow (β n : ℝ) : ℝ := n ^ β * Real.log n
 
 /-- Row four: linear gain, the fully fresh case. -/
 noncomputable def gainLinear (n : ℝ) : ℝ := n
@@ -462,14 +466,14 @@ theorem gainBounded_lt_gainLog :
 
 /-- Row two is eventually below row three, for every positive exponent. -/
 theorem gainLog_lt_gainPower (β : ℝ) (hβ : 0 < β) :
-    ∀ᶠ n : ℝ in Filter.atTop, gainLog n < gainPower β n := by
+    ∀ᶠ n : ℝ in Filter.atTop, gainLog n < gainPolynomialRow β n := by
   filter_upwards [Filter.eventually_gt_atTop (1 : ℝ)] with n hn1
   have hx : (0 : ℝ) < n := by linarith
   have hlog : 0 < Real.log n := Real.log_pos hn1
   have hpow : 1 < n ^ β := by
     rw [Real.rpow_def_of_pos hx, ← Real.exp_zero]
     exact Real.exp_lt_exp.mpr (mul_pos hlog hβ)
-  unfold gainLog gainPower
+  unfold gainLog gainPolynomialRow
   nlinarith [hlog, hpow]
 
 /-- Row three is eventually below row four, for every exponent strictly below one.
@@ -478,7 +482,7 @@ theorem gainLog_lt_gainPower (β : ℝ) (hβ : 0 < β) :
     `n^β log n < n` needs `log n < n^(1-β)`, which is the same little-o fact that drives the
     certificate gap elsewhere in this corpus. -/
 theorem gainPower_lt_gainLinear (β : ℝ) (hβ0 : 0 < β) (hβ1 : β < 1) :
-    ∀ᶠ n : ℝ in Filter.atTop, gainPower β n < gainLinear n := by
+    ∀ᶠ n : ℝ in Filter.atTop, gainPolynomialRow β n < gainLinear n := by
   have hgap : 0 < 1 - β := by linarith
   have hbound := (isLittleO_log_rpow_atTop hgap).bound (by norm_num : (0:ℝ) < 1 / 2)
   filter_upwards [hbound, Filter.eventually_gt_atTop (1 : ℝ)] with n hn hn1
@@ -493,7 +497,7 @@ theorem gainPower_lt_gainLinear (β : ℝ) (hβ0 : 0 < β) (hβ1 : β < 1) :
   have hsplit : n ^ β * n ^ (1 - β) = n := by
     rw [← Real.rpow_add hn0]
     simp
-  unfold gainPower gainLinear
+  unfold gainPolynomialRow gainLinear
   calc n ^ β * Real.log n < n ^ β * n ^ (1 - β) :=
         mul_lt_mul_of_pos_left hstrict hpowpos
     _ = n := hsplit
@@ -503,8 +507,8 @@ theorem gainPower_lt_gainLinear (β : ℝ) (hβ0 : 0 < β) (hβ1 : β < 1) :
     than four names for one. -/
 theorem gainLandscape_strictly_ordered (β : ℝ) (hβ0 : 0 < β) (hβ1 : β < 1) :
     ∀ᶠ n : ℝ in Filter.atTop,
-      gainBounded n < gainLog n ∧ gainLog n < gainPower β n ∧
-        gainPower β n < gainLinear n := by
+      gainBounded n < gainLog n ∧ gainLog n < gainPolynomialRow β n ∧
+        gainPolynomialRow β n < gainLinear n := by
   filter_upwards [gainBounded_lt_gainLog, gainLog_lt_gainPower β hβ0,
     gainPower_lt_gainLinear β hβ0 hβ1] with n h1 h2 h3
   exact ⟨h1, h2, h3⟩

@@ -78,8 +78,12 @@ factorization algebra are PROVED. No numerical claim is made here.
 section DirichletTransfer
 
 /-- The first-order efficiency ratio of a weighting scheme after drift time `τ`:
-    `1 + τ·D` with `D` the Dirichlet energy. -/
-noncomputable def dirichletEfficiency (τ D : ℝ) : ℝ := 1 + τ * D
+    `1 + τ·energy`.
+
+    Convention: the second argument is a **Dirichlet energy** — a carré du champ of the weight
+    functional under the coupling generator. It was previously written `D`, which in this
+    corpus means linkage disequilibrium, and the two are unrelated quantities. -/
+noncomputable def dirichletEfficiency (τ energy : ℝ) : ℝ := 1 + τ * energy
 
 /-- At zero drift every scheme is at its source performance. -/
 @[simp] theorem dirichletEfficiency_zero (D : ℝ) : dirichletEfficiency 0 D = 1 := by
