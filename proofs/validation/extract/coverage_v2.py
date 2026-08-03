@@ -116,6 +116,18 @@ def mutants(body: str):
         if idx >= 0:
             add(f"last '{a}'->'{b}'", body[:idx] + f" {b} " + body[idx + 3:])
     add("negate body", f"-({body.strip()})")
+    # RELATIONAL mutants, for Prop-valued bodies.  Only BOUNDARY-tightening ones
+    # are offered.  The complement operators (`=`->`≠`, `<`->`≥`, `≤`->`>`) are
+    # deliberately NOT here: a complemented predicate differs from the real one
+    # at every point where the real one is defined, so it is killed by any
+    # sampling whatsoever.  Including it would make every non-constant predicate
+    # score COVERED on the strength of a mutant that tests nothing -- the same
+    # trap as a range check that certifies its own codomain.
+    for a, b in (("≤", "<"), ("≥", ">"), ("<", "≤"), (">", "≥")):
+        idx = body.find(f" {a} ")
+        if idx >= 0:
+            add(f"relation '{a}'->'{b}'",
+                body[:idx] + f" {b} " + body[idx + len(a) + 2:])
     add("drop '1 -' complement", re.sub(r"\b1 - ", "1 + ", body, count=1))
     add("square -> linear", re.sub(r"\^\s*2\b", "^ 1", body, count=1))
     add("linear -> square", re.sub(r"\^\s*1\b", "^ 2", body, count=1))
@@ -358,6 +370,26 @@ def main(argv=None):
                                "others, and this docstring does not say which")
             continue
         vecspec = entry.get("vector_args")
+        # REFUSE TO GRADE A DEFINITION WHOSE ARGUMENTS CANNOT BE INHABITED.
+        # `admissible.type_value` raises `Uninhabitable` for a Lean type this
+        # harness does not model, and it refuses rather than substituting a
+        # scalar precisely so that no check runs on a fabricated value.  A check
+        # graded on a fabricated inhabitant is not merely unreliable, it is
+        # reliably vacuous: it tests the stand-in.  `liabilitySensitivity` and
+        # `liabilitySpecificity` were scored COVERED on a range that was Phi's
+        # codomain rather than anything about their bodies, and that only became
+        # visible once the input was real.  Refusing is louder and cheaper.
+        try:
+            pt0, sv0, at0 = pts[0]
+            admissible.build_args(argnames, pt0, sv0, vecspec,
+                                  random.Random(SEED), _ALL_STRUCTS, at0)
+        except admissible.Uninhabitable as e:
+            rec["reason"] = (f"refusing to grade: an argument type has no "
+                             f"modelled inhabitant ({e}); any verdict here "
+                             f"would be about the stand-in, not the body")
+            continue
+        except Exception:                                       # noqa: BLE001
+            pass            # a genuine evaluation failure is handled below
         base_vals = values(fn, argnames, pts, random.Random(SEED), vecspec)
         if all(v is None for v in base_vals):
             rec["reason"] = "no admissible point evaluates"
@@ -437,29 +469,79 @@ def main(argv=None):
                                     "value": viol[1], "why": viol[2]}
                 continue
 
-        else:                                    # STRUCTURAL
-            truthy = [v for v in base_vals if isinstance(v, bool)]
-            if not truthy:
-                rec["reason"] = "predicate did not evaluate to a Bool/Prop witness"
+        else:                                    # STRUCTURAL: the predicate gate
+            # A predicate has no range, so the range gate cannot touch it.  The
+            # falsifiability criterion is the same one though: a check earns
+            # coverage only if a NEARBY WRONG BODY would be caught.  For a
+            # predicate that means a mutated predicate must DISAGREE with the
+            # real one on at least one admissible point.
+            truth = [v for v in base_vals if isinstance(v, bool)]
+            if not truth:
+                rec["reason"] = ("predicate did not evaluate to a Bool/Prop "
+                                 "witness at any admissible point")
                 continue
-            has_w, has_nw = any(truthy), not all(truthy)
-            rec["check"] = {"kind": "witness/non-witness",
-                            "witness": has_w, "non_witness": has_nw}
-            if not (has_w and has_nw):
+            const = all(truth) or not any(truth)
+            rec["check"] = {"kind": "predicate/mutation",
+                            "n_points": len(pts),
+                            "true_at": sum(1 for v in truth if v),
+                            "of_points": len(truth),
+                            "hypotheses": hyps,
+                            "hypotheses_not_enforced": dropped}
+            if const:
+                # THE FAILURE MODE THIS GATE MUST NOT HIDE.  A predicate that is
+                # constant over the whole admissible box cannot be flipped by
+                # ANY mutation -- every mutant agrees with it everywhere, so it
+                # would sail through a naive mutation gate while testing
+                # nothing.  It is reported, not scored.
                 rec["status"] = "VACUOUS"
-                rec["reason"] = ("predicate is constant over the admissible box "
-                                 f"({'always true' if has_w else 'always false'})")
+                rec["reason"] = (
+                    "predicate is constant over the admissible box (always "
+                    f"{'true' if all(truth) else 'false'} at {len(truth)} "
+                    "points): no mutation can disagree with it, so no check "
+                    "here can fail")
+                continue
+            killed, tried, survivors = [], 0, []
+            for tag, mbody in mutants(d["body"]):
+                try:
+                    mfn, man = compile_variant(d, mbody, fname + "_mut",
+                                               struct_args)
+                except Exception:                               # noqa: BLE001
+                    continue
+                mvals = values(mfn, man, pts, random.Random(SEED), vecspec)
+                diff = None
+                for i, (a_, b_) in enumerate(zip(base_vals, mvals)):
+                    if isinstance(a_, bool) and isinstance(b_, bool) and a_ != b_:
+                        diff = (i, a_, b_)
+                        break
+                if diff is None:
+                    if any(isinstance(b_, bool) for b_ in mvals):
+                        tried += 1
+                        survivors.append(tag)
+                    continue
+                tried += 1
+                i, a_, b_ = diff
+                pt_i = pts[i][0]
+                killed.append({
+                    "mutation": tag,
+                    "mutant_body": " ".join(mbody.split()),
+                    "witness": {k: round(v, 6) for k, v in pt_i.items()
+                                if isinstance(v, (int, float))},
+                    "mutant_value": b_,
+                    "violates": f"real predicate is {a_} here, mutant is {b_}",
+                })
+            rec["mutants_tried"] = tried
+            rec["mutants_killed"] = len(killed)
+            rec["killed"] = killed
+            rec["survived"] = survivors
+            rec["falsifiability"] = (len(killed) / tried if tried else None)
+            if not killed:
+                rec["reason"] = (
+                    f"predicate varies over the box but no mutant disagrees "
+                    f"with it ({tried} distinguishable mutant(s) tried): the "
+                    "check cannot detect a wrong body")
+                rec["status"] = "VACUOUS" if tried else "UNCOVERED"
                 continue
             rec["status"] = "COVERED"
-            rec["killed"] = [{"mutation": "witness/non-witness",
-                              "mutant_body": None,
-                              "witness": "predicate is true somewhere in the "
-                                         "admissible box and false elsewhere",
-                              "mutant_value": None,
-                              "violates": "constancy"}]
-            rec["mutants_tried"] = 2
-            rec["mutants_killed"] = 1
-            rec["falsifiability"] = 0.5
             continue
 
         # ---- falsifiability: does the check kill a nearby wrong body?
