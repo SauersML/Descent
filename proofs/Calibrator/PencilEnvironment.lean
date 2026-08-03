@@ -223,6 +223,41 @@ theorem ababFinite_pos (Eα Eβ Eα2 Eβ2 m : ℝ)
   unfold ababFinite
   linarith
 
+/-- **The two finite-panel deficits are exactly proportional, at every panel length.**
+
+    Both certificates in this module are quoted at a finite number of sites `m`, and both
+    fall short of their `m → ∞` value by a term that is exactly first order in `1/m`: the
+    path count by `(2·E[α²]E[β²] + 8·(Eα)²(Eβ)²)/m`, and the whitening trace by
+    `(ldWhiteningGain - 1)/m` (`whiteningGain_finite_trace`). So the ratio of the two
+    deficits does not depend on `m`, which is what this equation says in cross-multiplied
+    form.
+
+    The content is the shared order, not the shared sign. If either deficit were `O(1/m²)`,
+    or carried a different coefficient, the equation fails at every `m`; and it is the
+    statement that ties `ababFinite` to a quantity defined outside this module, so a change
+    to `ldWhiteningGain` cannot leave the path count's finite-`m` correction unexamined.
+
+    Empirical status: UNTESTED as a joint statement. Each half is separately measured --
+    the whitening deficit against an explicit tridiagonal inverse trace, the path count
+    against 42 ensembles -- and both measurements are described above. -/
+theorem ababFinite_deficit_proportional_to_whiteningGain_deficit_of_length_ne_zero
+    (Eα Eβ Eα2 Eβ2 decay m : ℝ) (hm : m ≠ 0) :
+    ((2 * Eα2 * Eβ2 + 4 * Eα ^ 2 * Eβ ^ 2) - ababFinite Eα Eβ Eα2 Eβ2 m)
+        * (ldWhiteningGain decay - 1)
+      = (2 * Eα2 * Eβ2 + 8 * Eα ^ 2 * Eβ ^ 2)
+        * (ldWhiteningGain decay - (1 + (m - 1) * ldWhiteningGain decay) / m) := by
+  have hnum : (2 * Eα2 * Eβ2 + 4 * Eα ^ 2 * Eβ ^ 2) - ababFinite Eα Eβ Eα2 Eβ2 m
+      = (2 * Eα2 * Eβ2 + 8 * Eα ^ 2 * Eβ ^ 2) / m := by
+    unfold ababFinite
+    field_simp
+    ring
+  have hden : ldWhiteningGain decay - (1 + (m - 1) * ldWhiteningGain decay) / m
+      = (ldWhiteningGain decay - 1) / m := by
+    field_simp
+    ring
+  rw [hnum, hden]
+  ring
+
 end PencilEnvironment
 
 end Calibrator
