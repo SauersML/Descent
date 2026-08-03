@@ -1613,6 +1613,22 @@ structure LDPanelRetention where
   retained_le_total : retainedMarkers ≤ totalMarkers
   totalMarkers_pos : 0 < totalMarkers
 
+/-- **The panel class is inhabited**, so the six theorems taking an
+`LDPanelRetention` are statements about something rather than about an empty
+class. One marker of two retained is chosen deliberately over the degenerate
+fills: it satisfies `0 < retainedMarkers` and `retainedMarkers < totalMarkers`
+as well, which are the side conditions those theorems carry, so the witness
+exercises the interval case rather than an endpoint where the fraction is `0`
+or `1`. -/
+def LDPanelRetention.halfRetained : LDPanelRetention where
+  retainedMarkers := 1
+  totalMarkers := 2
+  retained_le_total := by norm_num
+  totalMarkers_pos := by norm_num
+
+theorem LDPanelRetention.nonempty : Nonempty LDPanelRetention :=
+  ⟨LDPanelRetention.halfRetained⟩
+
 noncomputable def ldPanelRetentionFraction (panel : LDPanelRetention) : ℝ :=
   (panel.retainedMarkers : ℝ) / (panel.totalMarkers : ℝ)
 
