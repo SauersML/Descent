@@ -451,7 +451,26 @@ def part_a(out):
 # B. THE BRIER DECOMPOSITION ON THE REAL RUNS
 # ===========================================================================
 
+class StudyDataMissing(Exception):
+    """The study CSVs parts B and C read are not on this machine.
+
+    Not a bug and not a failure of the calculation: `/sims/results_hpc/` is
+    gitignored, so no checkout contains it and no clone ever will. Raised as a
+    distinct type so that main can tell "the study data is not mounted here"
+    apart from a real error, and record the former rather than dying of it.
+    """
+
+
+def missing_inputs():
+    """Which of the input CSVs are absent, as full paths."""
+    return [os.path.join(RES, n) for n in INPUT_CSVS
+            if not os.path.exists(os.path.join(RES, n))]
+
+
 def _load():
+    missing = missing_inputs()
+    if missing:
+        raise StudyDataMissing("; ".join(missing))
     acc = list(csv.DictReader(open(os.path.join(RES, "accuracy_binary.csv"))))
     cal = list(csv.DictReader(open(os.path.join(RES,
                                                 "calibration_binary.csv"))))
@@ -864,7 +883,22 @@ def main(argv=None):
     ap.add_argument("--output", default="fam_serial_founder_results.json",
                     help="results JSON (default %(default)s, relative to the "
                          "working directory)")
+    ap.add_argument("--results-dir", default=None,
+                    help="directory holding the study CSVs that parts B and C "
+                         "read (env GNOMON_RESULTS_DIR). Default is derived "
+                         "from this file's location, which is WRONG if the "
+                         "script has been copied out of the repository.")
     args = ap.parse_args(argv)
+
+    # RES is derived from __file__ by walking four directories up, so running
+    # from a copied tree silently resolves it to a plausible-looking absolute
+    # path in the wrong place -- which is exactly how a missing dataset
+    # presented as /projects/sims/... on a cluster that has no such tree. An
+    # explicit override means the path can be stated rather than inferred.
+    global RES
+    override = args.results_dir or os.environ.get("GNOMON_RESULTS_DIR")
+    if override:
+        RES = os.path.abspath(override)
 
     out = {}
     # Written first so that a run which dies partway still leaves a file
@@ -876,14 +910,62 @@ def main(argv=None):
         # code and the input CSVs. Recorded as null rather than omitted, so a
         # reader does not have to wonder whether a seed was forgotten.
         None, None)
+
+    # PART A IS SELF-CONTAINED AND MUST NOT BE LOST TO PART B'S INPUTS.
+    # Part A is an exact 56-state calculation that needs no data files at all,
+    # and it is the part the website cites. Parts B and C read study CSVs from
+    # /sims/results_hpc/, which is GITIGNORED: no checkout contains it, so on
+    # any machine without that private tree they cannot run. Until now the
+    # missing file raised inside part_b, which is called before the write, so
+    # the exception took part A's result with it and the script produced no
+    # file at all. The absence of a dataset nobody can clone is a fact to
+    # record, not a reason to discard a computation that already succeeded.
     part_a(out)
-    runs = part_b(out)
-    part_c(out, runs)
+
+    runs = None
+    try:
+        runs = part_b(out)
+        part_c(out, runs)
+    except StudyDataMissing as e:
+        # Recorded, never stubbed. No number is invented for B or C: the keys
+        # are simply absent, and this block says why they are absent and what
+        # would have to be true for them to appear.
+        note = {
+            "ran": False,
+            "reason": "study data not present on this machine",
+            "missing": str(e).split("; "),
+            "expected_under": RES,
+            "why_no_checkout_has_it": "/sims/results_hpc/ is gitignored, so it "
+                                      "is not distributed with the repository "
+                                      "and a fresh clone will never contain it",
+            "consequence": "B_brier and C_prevalence are ABSENT from this file, "
+                           "not zero and not defaulted. Any B_brier or "
+                           "C_prevalence you have came from a run on a machine "
+                           "with that tree mounted, and this run neither "
+                           "confirms nor contradicts it.",
+            "override": "point this run at the data with --results-dir",
+        }
+        out["B_brier_skipped"] = note
+        out["C_prevalence_skipped"] = note
+        print("")
+        print("=" * 78)
+        print("B AND C SKIPPED: STUDY DATA NOT ON THIS MACHINE")
+        print("=" * 78)
+        for p in note["missing"]:
+            print("  missing: %s" % p)
+        print("  /sims/results_hpc/ is gitignored, so no checkout contains it.")
+        print("  Part A above is unaffected: it reads no data files and its")
+        print("  result is written below. B_brier and C_prevalence are OMITTED")
+        print("  from the output rather than filled in.")
+        print("  To run them, pass --results-dir pointing at the study tree.")
+
     fh = open(args.output, "w")
     json.dump(out, fh, indent=1)
     fh.close()
     print("")
     print("-> %s" % args.output)
+    # Exit 0. Part A succeeded and was written; a dataset that no clone can
+    # contain being absent is not this script failing.
     return 0
 
 
