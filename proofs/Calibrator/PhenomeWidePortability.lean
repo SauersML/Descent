@@ -516,19 +516,17 @@ three reals gives the same theorem. Its docstring asserted a mechanism ("due to
 balancing/diversifying selection") and quoted numbers ("<1% of SNPs but >10% of immune
 trait variance") that no part of the statement computes or constrains.
 
-`threshold_sandwich_implies_observed_portability_below_neutral` immediately below is the
-same transitivity step under a name that claims only transitivity, so the inference stays
-available. A result that repackages a premise is deleted, not renamed. -/
+A result that repackages a premise is deleted, not renamed. -/
 
-/-- **A threshold sandwich implies observed portability is below neutral.**
-    This is the literal transitivity fact `port_observed < threshold < port_neutral
-    -> port_observed < port_neutral`. It is useful as a small inference step,
-    but it is not by itself a mechanistic theorem about why the gap exists. -/
-theorem threshold_sandwich_implies_observed_portability_below_neutral
-    (port_observed port_neutral threshold : ℝ)
-    (h_observed : port_observed < threshold)
-    (h_neutral : threshold < port_neutral) :
-    port_observed < port_neutral := by linarith
+/-! **Deleted: `threshold_sandwich_implies_observed_portability_below_neutral`.**
+
+This declaration is absent on purpose, and for the same reason as the one above. It took
+`port_observed < threshold` and `threshold < port_neutral` and concluded
+`port_observed < port_neutral`: transitivity of `<` on three reals, which is Mathlib's
+`lt_trans`. It was kept as "a small inference step", used by nothing, under a name that
+reads as a claim about observed and neutral portability. A genetics name on `lt_trans` is
+the whole of the defect the deletion above describes, so keeping one instance of it to
+document the other was not a distinction worth drawing. -/
 
 /-! **Deleted: `zero_portability_component_lowers_weighted_average`.**
 
