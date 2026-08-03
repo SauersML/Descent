@@ -176,7 +176,7 @@ noncomputable def liabilitySpecificity
     We state this as: for R₁ < R₂ (both in [0,1]), the z-score at R₂ exceeds
     that at R₁. The formal proof uses monotonicity of √· and positivity of
     the model parameters. -/
-theorem liabilitySensitivity_zScore_monotone_in_R_of_threshold_le
+theorem liabilitySensitivity_zScore_monotone_in_R_of_num_nonneg
     (m : LiabilityThresholdModel) (T' : ℝ)
     (R₁ R₂ : ℝ) (hR₁ : 0 ≤ R₁) (hR₂ : R₂ ≤ 1)
     (hR : R₁ < R₂)
@@ -244,7 +244,7 @@ theorem liabilitySensitivity_zScore_monotone_in_R_of_threshold_le
     The proof structure:
     1. `Φ` is strictly monotone (standard normal CDF property from Mathlib)
     2. The z-score `(R·h·μ_case − T') / σ_resid` is monotone in R²
-       (from `liabilitySensitivity_zScore_monotone_in_R_of_threshold_le`)
+       (from `liabilitySensitivity_zScore_monotone_in_R_of_num_nonneg`)
     3. Composition of monotone functions is monotone -/
 theorem liabilitySensitivity_monotone_in_R2_of_threshold_le
     (Φ : ℝ → ℝ) (m : LiabilityThresholdModel) (T' : ℝ)
@@ -262,7 +262,7 @@ theorem liabilitySensitivity_monotone_in_R2_of_threshold_le
   -- Reduce to the z-score monotonicity in R.
   -- We need: (√R2₁ · h · μ - T') / σ₁ < (√R2₂ · h · μ - T') / σ₂
   -- with the same structure as
-  -- liabilitySensitivity_zScore_monotone_in_R_of_threshold_le.
+  -- liabilitySensitivity_zScore_monotone_in_R_of_num_nonneg.
   -- σ₂ > 0: derived from the model, not assumed.
   have h_σ_pos : 0 < Real.sqrt (m.h_sq * (1 - R2₂) + (1 - m.h_sq)) :=
     sigmaResid_pos m R2₂ (le_of_lt (lt_of_le_of_lt hR2₁ hR2)) hR2₂
@@ -936,9 +936,14 @@ theorem lower_portability_lower_cost_effectiveness
     linarith
   linarith
 
-/-- **There exists a portability threshold below which PGS is not cost-effective.**
-    If the R² is too low, the QALY gain is negative (more harm than benefit). -/
-theorem cost_effectiveness_threshold_exists
+/-- **At zero sensitivity and zero specificity the QALY gain is negative**: all benefit
+    comes from true positives, of which there are none, while the false positives keep
+    their harm.
+
+    This is the endpoint, not the threshold. A portability threshold below which PGS stops
+    being cost-effective would need the gain to be monotone in `R²` and a crossing to be
+    located; neither is established here, which is why the name no longer says `_exists`. -/
+theorem screeningQalyGain_neg_at_zero_sensitivity
     (π benefit harm : ℝ)
     (h_π : 0 < π) (h_π1 : π < 1)
     (h_benefit : 0 < benefit) (h_harm : 0 < harm) :

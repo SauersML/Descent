@@ -212,6 +212,19 @@ theorem fstFromDriftFactor_eq_freqCorrFromFst (driftFactor : ℝ) :
     fstFromDriftFactor driftFactor = freqCorrFromFst driftFactor := by
   unfold fstFromDriftFactor freqCorrFromFst; ring
 
+/-- **The third spelling of the same involution.**
+
+`DriftRegime.lossOfRetention` sends a closed-population retention to the heterozygosity
+lost with it. It is `1 - ·` again, so it agrees numerically with the two `F_ST` readings
+above. The three readings stay separate on purpose — a within-population loss, a
+between-population `F_ST`, and a retained frequency correlation are different quantities,
+and `DriftRegime` records what substituting one for another cost — but the map they share
+is written down here, so a convention change in any one of them contradicts this. This
+module is where all three are visible at once. -/
+theorem lossOfRetention_eq_fstFromDriftFactor_eq_freqCorrFromFst (r : ℝ) :
+    lossOfRetention r = fstFromDriftFactor r ∧ lossOfRetention r = freqCorrFromFst r :=
+  ⟨rfl, rfl⟩
+
 /-- **`F_ST` from an admissible drift factor lies in `[0, 1)`.**
     The range constraint, stated so that a replacement body producing values
     outside it does not typecheck as this definition. -/
@@ -305,9 +318,8 @@ theorem fst_causal_lt_fst_neutral_of_stabilizing_selection
     (h_s_lt : s_correction < 1 / (2 * Ne))
     (h_t_pos : 1 ≤ t)
     (h_base_pos : 0 < 1 - 1 / (2 * Ne)) :
-    let fst_causal := fstFromDriftFactor (selectedDriftFactor Ne t s_correction)
-    let fst_neutral := fstFromDriftFactor (neutralDriftFactor Ne t)
-    fst_causal < fst_neutral := by
+    fstFromDriftFactor (selectedDriftFactor Ne t s_correction) <
+      fstFromDriftFactor (neutralDriftFactor Ne t) := by
   exact stabilizing_selection_reduces_fst Ne t s_correction
     h_s_pos h_s_lt h_t_pos h_base_pos
 
@@ -420,7 +432,7 @@ fluctuating/diversifying selection regime.**
     observed summary is matched by a fluctuating-selection regime and by no
     stabilizing regime. For fixed drift coordinates, that same observed effect
     correlation forces the portability ratio below the neutral drift baseline. -/
-theorem worse_than_neutral_implies_diversifying_selection
+theorem worse_than_neutral_implies_fluctuating_regime
     (v_mutation s t rho_obs v_selected_obs V_A V_E fstS fstT : ℝ)
     (h_t : 0 < t)
     (h_rho : 0 < rho_obs) (h_rho_lt : rho_obs < 1)
@@ -643,7 +655,7 @@ chart.**
     exactly `1 / n_loci` of the total, hence strictly less than `1 / n_threshold`
     whenever `n_threshold < n_loci`. This is a counting identity, not by itself
     a mechanistic portability theorem. -/
-theorem per_locus_variance_share_bounded_by_locus_count
+theorem equal_share_lt_one_div_of_lt
     (n_loci n_threshold : ℕ) (per_locus_var total_var : ℝ)
     (h_many : n_threshold < n_loci) (h_thresh_pos : 0 < n_threshold)
     (h_total : total_var = n_loci * per_locus_var)
@@ -662,7 +674,7 @@ theorem per_locus_variance_share_bounded_by_locus_count
 /-- **An `α < 1` upper bound forces portability below the reference trait.**
     If `port_selected < α * port_reference` with `0 < α < 1`, then the selected
     trait's portability is strictly below the reference portability. -/
-theorem alpha_bound_forces_portability_below_reference
+theorem lt_of_lt_mul_of_lt_one
     (port_reference port_selected α : ℝ)
     (h_much_worse : port_selected < α * port_reference)
     (h_ref_pos : 0 < port_reference) (h_α_lt : α < 1) (h_α_pos : 0 < α) :

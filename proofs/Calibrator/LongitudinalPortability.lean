@@ -276,7 +276,7 @@ noncomputable def ageDependentMetricProfile
     Model: the observed effect β_obs = β_genetic × env_modifier, where
     env_modifier differs between cohorts due to changing environments.
     If env₁ ≠ env₂ and β_genetic ≠ 0, then the observed effects differ. -/
-theorem cohort_specific_effects
+theorem mul_ne_mul_left_of_ne_of_ne_zero
     (beta_genetic env₁ env₂ : ℝ)
     (h_beta : beta_genetic ≠ 0)
     (h_env_diff : env₁ ≠ env₂) :
@@ -554,7 +554,7 @@ open scoped BigOperators in
     estimator is a property of the study design.
 
     Empirical status: DERIVED. -/
-theorem stationaryCohortSplit_shows_no_decay {ι : Type*} [Fintype ι]
+theorem stationaryAverage_indep_of_gap {ι : Type*} [Fintype ι]
     (π : ι → ℝ) (P : ℝ → ι → ι → ℝ) (accuracy : ι → ℝ)
     (h : ∀ t, IsStationaryKernel π (P t)) (gap₁ gap₂ : ℝ) :
     ∑ x, π x * ∑ y, P gap₁ x y * accuracy y = ∑ x, π x * ∑ y, P gap₂ x y * accuracy y :=
@@ -567,7 +567,7 @@ theorem stationaryCohortSplit_shows_no_decay {ι : Type*} [Fintype ι]
     definition, changing ascertainment, a non-stationary environment — are distinct and testable.
 
     Empirical status: DERIVED; the shape constraint is the testable content. -/
-theorem cohortDecayRate_cannot_steepen
+theorem twoMode_effectiveRate_nonincreasing
     (slowWeight fastWeight slowRate fastRate gap₁ gap₂ : ℝ)
     (hs : 0 ≤ slowWeight) (hf : 0 ≤ fastWeight) (hrate : slowRate ≤ fastRate)
     (hgap : gap₁ ≤ gap₂) :

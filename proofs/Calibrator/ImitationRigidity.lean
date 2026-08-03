@@ -1191,7 +1191,7 @@ genotype covariances differ in the functional the fixed point sees, the two
 group-level scalars cannot coincide: no single scalar equivalent exists, and the
 theory becomes function-valued in the ancestry profile. This is the boundary of
 the scalar theory, and it lies inside the design, not between design and loss. -/
-theorem ancestry_profile_scalars_differ
+theorem ne_of_strictMono_of_lt
     {profileMap : ℝ → ℝ → ℝ} {scale₁ scale₂ η₁ η₂ : ℝ}
     (hmono : ∀ {a b c : ℝ}, a < b → profileMap a c < profileMap b c)
     (hscale : scale₁ < scale₂)

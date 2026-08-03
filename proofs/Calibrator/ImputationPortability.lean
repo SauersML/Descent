@@ -168,7 +168,7 @@ theorem shorter_ld_worse_imputation
     Variants with r²_imp < threshold (e.g., 0.3) are excluded.
     Different thresholds in different populations create
     non-overlapping variant sets → PGS incomparability. -/
-theorem filtering_creates_variant_asymmetry
+theorem le_trans_of_le_of_le
     (n_eur_pass n_afr_pass n_shared : ℕ)
     (h_eur_more : n_afr_pass ≤ n_eur_pass)
     (h_shared_le : n_shared ≤ n_afr_pass) :
@@ -193,7 +193,7 @@ section RareVariantImputation
     Missing from panel → imputation r² = 0.
     Model: imputation r² = r²_LD × I(variant_in_panel). If the variant
     is absent from the panel, the indicator is 0 and r²_imp = 0. -/
-theorem missing_variant_zero_imputation
+theorem mul_eq_zero_of_right_eq_zero
     (r2_LD : ℝ) (variant_in_panel : ℝ)
     (h_missing : variant_in_panel = 0) :
     r2_LD * variant_in_panel = 0 := by

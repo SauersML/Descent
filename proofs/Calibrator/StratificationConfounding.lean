@@ -269,7 +269,7 @@ downward, hiding portability loss rather than manufacturing it.
 its first, so it proves `h → ¬¬h` for every choice of the four reals, and the conclusion
 "apparent portability drop is larger than true portability drop" is the branch it
 refutes. -/
-theorem apparent_portability_drop_gt_true_iff_target_more_ascertained
+theorem sub_gt_sub_iff_sub_lt_sub
     (r2_source_pop r2_target_pop r2_source_asc r2_target_asc : ℝ) :
     r2_source_asc - r2_target_asc > r2_source_pop - r2_target_pop ↔
       r2_source_pop - r2_source_asc < r2_target_pop - r2_target_asc :=
@@ -953,7 +953,7 @@ The corpus's own `ldWhiteningGain`, `(1+ρ²)/(1-ρ²)`, is the right one for
 exactly the complementary reason: it is the value of the trace-window
 certificate, edge-sensitive, and *not* weakly continuous.  Those two facts are
 consistent, and their consistency is the content of this pairing. -/
-theorem effective_marker_count_cannot_set_threshold
+theorem momentContinuousFunctional_ne_inverseTraceCertificate
     (Φ : MomentContinuousFunctional)
     (hΦ : ∀ (m : ℕ) (lam : ℕ → ℝ), Φ.value m lam = inverseTraceCertificate m lam) :
     False :=

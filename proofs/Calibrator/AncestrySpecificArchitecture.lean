@@ -254,7 +254,7 @@ section AllelicHeterogeneity
     Derived: r2_causal * r2_tag * ρ < r2_causal * r2_tag because
     multiplying the positive quantity r2_causal * r2_tag by ρ < 1
     strictly reduces it. -/
-theorem allelic_heterogeneity_reduces_portability
+theorem mul_lt_self_of_lt_one
     (r2_causal r2_tag ρ : ℝ)
     (h_causal : 0 < r2_causal) (h_tag : 0 < r2_tag) (h_tag_le : r2_tag ≤ 1)
     (h_ρ : 0 < ρ) (h_ρ_lt : ρ < 1) :
@@ -278,7 +278,7 @@ theorem allelic_heterogeneity_reduces_portability
     rare variants contribute genuine additional signal in each population.
     A PGS trained in EUR captures v_shared + v_eur_specific but only
     v_shared transfers to AFR, missing v_afr_specific entirely. -/
-theorem gene_shared_variants_specific
+theorem lt_add_pos_and_div_lt_one
     (v_shared v_eur_specific v_afr_specific : ℝ)
     (h_shared : 0 < v_shared)
     (h_eur : 0 < v_eur_specific) (h_afr : 0 < v_afr_specific) :

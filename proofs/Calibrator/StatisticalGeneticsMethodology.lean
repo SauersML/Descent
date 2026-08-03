@@ -397,7 +397,7 @@ section GeneticCorrelationMethods
     No such theorem exists in this corpus, and the disjoint licence it would appeal to is
     not proved here. What is formalized below is the variance *parameter* of a hypothesised
     Gaussian limit. -/
-theorem local_genetic_correlation_varies
+theorem lt_weightedAverage_of_lt
     (rho_chr1 rho_chr6 : ℝ) (w₁ w₆ : ℝ)
     (h_chr6_lower : rho_chr6 < rho_chr1) -- HLA region has lower correlation
     (h_w1 : 0 < w₁) (h_w6 : 0 < w₆) :
@@ -530,7 +530,7 @@ drops to `3/4`.
 
 This formalizes the biological point that equal source `R²` does not determine
 cross-population portability without locus-resolved transport state. -/
-theorem same_source_r2_different_portability_two_locus_witness :
+theorem same_sourceR2_different_targetR2_two_signal_witness :
     let sourceSignal : Fin 2 → ℝ := fun _ ↦ 1
     let stableTransport : Fin 2 → ℝ := fun _ ↦ 1
     let brokenTransport : Fin 2 → ℝ := fun i ↦ if i = 0 then 1 else 0
