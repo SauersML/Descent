@@ -18,6 +18,15 @@ the derivation is stated.
   on the cluster. All six parse as valid JSON; none is a stub or partial write.
 - scikit-allel 1.3.13, as recorded by the cross-check file itself.
 
+**Pin comparison baselines by commit, not by branch name.** An earlier version
+of this review reported that `fam_ascertainment` reproduced its stored result
+bit for bit. That was a circular comparison: `origin/main` had already been
+updated with this very run's output five minutes earlier, so the diff compared
+the file to itself. `origin/main` moved repeatedly while these results were
+being produced. Every stored-result comparison below is pinned to an explicit
+commit. Corrected in section 6, and the corrected comparison is more
+informative than the wrong one was.
+
 **Provenance gap, uniform across all six files.** Not one results file records
 the repository revision it was produced from, or whether the tree was clean.
 The revision above is known only because it was read out of the job's own log
@@ -81,12 +90,19 @@ ratio as 50/41. 50/41 = 1.2195121951219512, matching the simulated value to full
 double precision. An independent implementation has now confirmed a Lean theorem
 pointwise.
 
-**Action required — in the simulator, not the corpus.** The module docstring of
-`fam_fst_allel_crosscheck.py` misquotes `Conventions.neiGst`, and its C3 `ok`
-criterion (`abs(f - g) <= 1e-9`) is inverted relative to the claim the corpus
-actually makes. As written, this family reports RED whenever the corpus is
-RIGHT. Until it is fixed, `cells_red` and `c3_docstring_claim_supported` from
-this file must not be quoted as corpus status. I have not changed the file.
+**Action required — in the simulator, not the corpus.** The mechanism is worth
+stating precisely, because it decides the fix. The C3 criterion is **not**
+inverted: it correctly encodes "the estimators agree", and the comment above it
+in `fam_fst_allel_crosscheck.py` reads "This row is OK if the claim HOLDS. It is
+written so that it can fail, and it is expected to." Red is the *intended*
+outcome of a deliberate demonstration. The two real defects are that (a) a
+designed demonstration is scored and printed identically to a genuine failure,
+so it inflates `cells_red` and reads as a regression to anything downstream, and
+(b) the module header still quotes a docstring the corpus stopped carrying at
+**f5904202**. The fix is a distinct DEMONSTRATED status plus a corrected header,
+not a flipped comparison. Until then, `cells_red` and
+`c3_docstring_claim_supported` from this file must not be quoted as corpus
+status. I have not changed the file.
 
 **Instrument weakness.** C1 compares a *sample* estimate from scikit-allel
 against the corpus's *parametric* value, so the residual is sampling error of
@@ -258,22 +274,45 @@ agree and **all 6** mismatched cells are caught at tolerance 0.1
 (`mismatched_caught: 6` of `mismatched_cells: 6`). The family can detect the
 defect it is built to detect.
 
-**Comparison against the stored result — exact.** This is the only family of the
-six with a prior stored result. The fresh run was compared against
-`proofs/validation/empirical/differential/cluster/fam_ascertainment_results.json`
-at `origin/main` by full recursive walk of the JSON:
+**Comparison against the stored result.** This is the only family of the six
+with a prior stored result, and the comparison must be pinned to the right
+baseline. The genuine prior stored result is the version at **48e75241^**
+(15984 bytes, content sha a20f695db6626990); commit 48e75241 at 14:36:20
+replaced it with this very run's output (23627 bytes, sha f0924e22439fb6fc).
+Diffing the fresh run against `origin/main` therefore compares the file to
+itself and proves nothing. The comparison below is against 48e75241^.
 
-- structural differences: **0** (no key, length, or type differences)
-- worst absolute numeric difference: **0.0**
-- worst relative numeric difference: **0.0**
-- both files 23627 bytes, identical SHA
+*Numerically, the family reproduces.* Of **250 common numeric fields, 11 differ
+as floats**, worst relative difference **4.7e-13** (`control_ld_attenuation[0]`
+`rel_err`, 0.0005027761835818648 stored against 0.0005027761835816278 fresh),
+the rest at 1e-16 to 1e-14. That is floating-point reduction order, the same
+regime as the 1.8e-14 and 3.3e-13 agreements recorded for other families. **No
+measured quantity disagrees.**
 
-Bit-for-bit reproducible — stronger than the 1.8e-14 and 3.3e-13 agreements
-recorded for other families, which are floating-point reduction order. Note that
-the stored result at the *run clone's* revision bb0d1f6 was a different, smaller
-file (15984 bytes); the fresh run reproduces `origin/main`'s current version
-exactly, so the modification flag seen in that clone reflects the clone being
-behind, not a changed measurement.
+*Structurally, it is a different file* — **47 structural differences**, from a
+script revision and not from the simulation:
+
+- `covers[2]` renamed `effectiveSampleSize` to `effectiveFisherInformation`, and
+  the corresponding per-cell key renamed in all six `control_sampling_variance`
+  rows. Commit **20734dc8** ("Remove the effectiveSampleSize orphan, and stop
+  certifying a falsified pairing") edited `fam_ascertainment.py` accordingly.
+- `frequency_mismatch` expanded from 3 rows to 9.
+- `control_power` restructured from a list to a dict.
+- the `winners_curse/simulation_control` rows swapped fields, dropping
+  `deviation_in_sems`, `sem`, `selected`, `selection_rate` and
+  `simulated_E_in_SE` for `z_known_SE` and `t_estimated_SE`.
+
+*The status changed, and the cause is the script, not the measurement.*
+`READ_THE_TEST` went **false to true**, and three controls flipped false to
+true: `power`, `positive_control_mismatch_axis`, and
+`winners_curse_exact_matches_simulated_gwas`. Most consequentially
+`control_positive/mismatched_cells` and `mismatched_caught` both went **0 to
+6** — in the stored baseline the positive control had no cells and caught
+nothing, so that earlier file recorded a family that had *not* demonstrated
+detection power. The current run has 6 of 6 caught. This is a real improvement
+in the instrument, but it is an improvement delivered by editing the simulator,
+so it is not independent evidence that the corpus is right; only the 4.7e-13
+agreement on the 250 common fields is a reproducibility statement.
 
 ---
 
@@ -293,8 +332,16 @@ weaker evidence and should not be quoted as confirmations.
 
 **One instrument is failing and one is mislabelled.** `ld_decay` fails its null
 control and its bottleneck arm should not be used. `fam_fst_allel_crosscheck.py`
-misquotes `Conventions.neiGst` and reports RED when the corpus is right; its
-summary fields are unsafe to quote until its C3 criterion is corrected.
+scores a deliberate demonstration as a red cell and quotes a withdrawn
+docstring; its summary fields are unsafe to quote until that demonstration gets
+a status of its own.
+
+**One family's pass is newer than its evidence.** `ascertainment` reads as
+fully passing, but its stored predecessor at 48e75241^ had `READ_THE_TEST`
+false and a positive control catching 0 of 0 cells. The flip to passing came
+from a simulator revision (20734dc8 and the grid expansion), not from a changed
+measurement — the 250 common numeric fields agree to 4.7e-13. Worth knowing
+before this family is cited as a long-standing confirmation.
 
 **Recommended re-runs**, for the team lead to schedule with cluster-owner; I ran
 nothing and am not requesting cluster access:
