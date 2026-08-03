@@ -36,9 +36,9 @@ the infimum ranging over pairs whose *spike load* `ℓ_a(vvᵀ)` is positive.
 constraint is *active* at `Σ₀` and has positive spike load, the capacity is
 zero and no positive spike level is imitable.  The constraint index is a
 Hahn–Banach certificate the machine returns rather than merely proves to
-exist.  It had been conjectured that rigidity requires a transitive symmetry
-group on the class; `traceWindow_rigid` refutes that by construction, with a
-generic positive-definite `A` and no symmetry whatsoever.
+exist.  **Rigidity does not require a transitive symmetry group on the class**;
+`traceWindow_rigid` refutes that by construction, with a generic positive-definite `A` and
+no symmetry whatsoever.
 
 **On the equi-exit class the detection threshold equals the capacity.**
 Equi-exit — the binding constraint's spike load is constant over the prior's
@@ -757,9 +757,8 @@ end EquiExitClass
 /-!
 ## Rigidity is not a symmetry condition
 
-It had been conjectured that a background class can be rigid only if it has a
-transitive symmetry group — that rigidity is a consequence of the class being
-"the same in every direction".  It is not.  Rigidity is the normal-cone
+**A background class does not need a transitive symmetry group to be rigid.** Rigidity is
+not a consequence of the class being "the same in every direction": it is the normal-cone
 condition of the previous section, and the following class witnesses it with a
 completely generic positive-definite `A` and no symmetry at all: one linear
 constraint, active at the baseline by construction, with spike load `vᵀAv > 0`
@@ -980,8 +979,8 @@ with per-site retention `ρ`, the per-variant limit of `tr K⁻¹`:
 
     ldWhiteningGain ρ = (1 + ρ²) / (1 - ρ²),
 
-the harmonic mean of the LD symbol.  That quantity was previously *related to*
-detection thresholds.  It is now *identified* as one: it is the spike load of
+the harmonic mean of the LD symbol.  That quantity IS a detection threshold, not merely
+related to one: it is the spike load of
 the whitened trace-window constraint under an isotropic effect prior, hence the
 denominator of the linear program's value.  The isotropic prior is what
 supplies equi-exit — the load is the same in every direction — so the threshold
@@ -1288,7 +1287,7 @@ baseline's own certificate value, so the headroom is zero — the sign of
 `pcCorrectabilityMargin` is precisely the statement that the alternative's
 certificate value clears the null ceiling by more than the sampling
 fluctuation.  This is the hypothesis under which the existing docstring's claim
-is true, and it was not previously stated. -/
+is true. -/
 theorem rigid_certificate_exceeds_ceiling_iff_pcCorrectabilityMargin_pos
     {N : ℕ} (m : ℕ) (F markerCount : ℝ) (hmn : m ≤ N) (hN : 0 < N)
     (base S₀ : Matrix (Fin N) (Fin N) ℝ) (a : Unit) :
