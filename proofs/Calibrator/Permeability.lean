@@ -63,7 +63,6 @@ theorem covarianceScoreInformation_gaussian
   unfold covarianceScoreInformationFromMoments scalarPermeability
   rw [centeredSquareVariance_gaussian]
   field_simp [hcovariance]
-  ring
 
 /-- Permeability is non-negative. -/
 theorem scalarPermeability_nonneg (covariance covarianceDerivative : ℝ) :
@@ -172,7 +171,6 @@ theorem totalGaussianInformation_mul_estimatorVariance
   unfold totalGaussianInformation scalarPermeability
     gaussianCovarianceTangentEstimatorVariance
   field_simp [hm, hcovariance, hderivative]
-  ring
 
 /-- Equivalent reciprocal form of
 `totalGaussianInformation_mul_estimatorVariance`. -/
