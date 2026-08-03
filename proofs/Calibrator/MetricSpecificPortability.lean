@@ -1678,31 +1678,36 @@ theorem ldRetentionPerGen_strictAnti_recomb {r₁ r₂ Ne : ℝ}
   unfold ldRetentionPerGen
   nlinarith [hlt, hfac]
 
-/-- **Detection share of a clumped panel**: the fraction of the whitened
-detection weight — the inverse-LD-kernel trace whose per-variant limit is
-`ImitationRigidity.ldWhiteningGain` — that survives clumping, as a function of
-recombination rate, effective size and marker counts.
+/-- **Detection share of a clumped panel**: the fraction of the whitened detection weight — the
+inverse-LD-kernel trace whose per-variant limit is `ImitationRigidity.ldWhiteningGain` — that
+survives clumping, as a function of the band kernel's decay and the marker counts.
+
+`decay` is the AR(1) decay of the LD band, indexed by MARKER SEPARATION along the chromosome.
+It is deliberately not computed here from a recombination rate and an effective size:
+`ldRetentionPerGen` is a per-GENERATION retention, and feeding it here would make linkage
+disequilibrium decay with physical distance at the rate it decays with time. The stationary law
+relating separation to LD is Sved's, which this corpus carries as
+`LDDecayTheory.ohtaKimuraSigmaDSq`; supplying `decay` from it is a modelling step and belongs at
+the call site, where it can be named.
 
 Empirical status: UNTESTED. -/
-noncomputable def ldBlockDetectionShare (recomb Ne : ℝ)
+noncomputable def ldBlockDetectionShare (decay : ℝ)
     (panel : LDPanelRetention) : ℝ :=
-  ldBandDetectionShare (ldRetentionPerGen recomb Ne)
-    (ldPanelRetentionFraction panel)
+  ldBandDetectionShare decay (ldPanelRetentionFraction panel)
 
-/-- **Detection weight surrendered to clumping**, over and above the fraction of
-markers discarded, as a function of recombination rate and effective size.  This
-is the price the frontier puts on the pruning convention.
+/-- **Detection weight surrendered to clumping**, over and above the fraction of markers
+discarded, as a function of the band kernel's decay.  This is the price the frontier puts on the
+pruning convention.
 
 Empirical status: UNTESTED. -/
-noncomputable def ldBlockPruningDeficit (recomb Ne : ℝ)
+noncomputable def ldBlockPruningDeficit (decay : ℝ)
     (panel : LDPanelRetention) : ℝ :=
-  ldPruningDetectionDeficit (ldRetentionPerGen recomb Ne)
-    (ldPanelRetentionFraction panel)
+  ldPruningDetectionDeficit decay (ldPanelRetentionFraction panel)
 
-/-- **Tight-linkage floor on the detection share**, `κ - sin(πκ)/π`.  It carries
-no recombination rate because it is the value the frontier saturates to as the
-retention approaches one, and `ldTightLinkage_le_ldBlockDetectionShare` shows it
-bounds the detection share at every recombination rate and effective size.
+/-- **Tight-linkage floor on the detection share**, `κ - sin(πκ)/π`.  It carries no decay
+parameter because it is the value the frontier saturates to as the band decay approaches one,
+and `ldTightLinkage_le_ldBlockDetectionShare` shows it bounds the detection share at every
+decay.
 
 Empirical status: UNTESTED. -/
 noncomputable def ldTightLinkageDetectionShare (panel : LDPanelRetention) : ℝ :=
@@ -1711,26 +1716,23 @@ noncomputable def ldTightLinkageDetectionShare (panel : LDPanelRetention) : ℝ 
 
 /-- Accounting identity: what clumping keeps plus what it surrenders is the
 fraction of markers it retained. -/
-theorem ldBlockDetectionShare_add_deficit (recomb Ne : ℝ)
+theorem ldBlockDetectionShare_add_deficit (decay : ℝ)
     (panel : LDPanelRetention) :
-    ldBlockDetectionShare recomb Ne panel + ldBlockPruningDeficit recomb Ne panel =
+    ldBlockDetectionShare decay panel + ldBlockPruningDeficit decay panel =
       ldPanelRetentionFraction panel := by
   unfold ldBlockDetectionShare ldBlockPruningDeficit ldBandDetectionShare
     ldPruningDetectionDeficit
   ring
 
-/-- **Clumping loses detection weight faster than it loses markers**, at every
-recombination rate and effective size. -/
-theorem ldBlockDetectionShare_le_retention {recomb Ne : ℝ}
+/-- **Clumping loses detection weight faster than it loses markers**, at every band decay. -/
+theorem ldBlockDetectionShare_le_retention {decay : ℝ}
     {panel : LDPanelRetention}
-    (hr0 : 0 ≤ recomb) (hr1 : recomb ≤ 1) (hNe : 1 < Ne)
+    (hd0 : 0 ≤ decay)
     (h0 : 0 < panel.retainedMarkers) (h1 : panel.retainedMarkers < panel.totalMarkers) :
-    ldBlockDetectionShare recomb Ne panel ≤ ldPanelRetentionFraction panel := by
+    ldBlockDetectionShare decay panel ≤ ldPanelRetentionFraction panel := by
   obtain ⟨hkpos, hklt⟩ := ldPanelRetentionFraction_mem panel h0 h1
-  have hp0 : 0 ≤ ldRetentionPerGen recomb Ne :=
-    ld_retention_nonneg recomb Ne hr0 hr1 (le_of_lt hNe)
   unfold ldBlockDetectionShare
-  exact ldBandDetectionShare_le_retention hp0 (le_of_lt hkpos) (le_of_lt hklt)
+  exact ldBandDetectionShare_le_retention hd0 (le_of_lt hkpos) (le_of_lt hklt)
 
 /-- The whitening gain exceeds its no-linkage value exactly when there is
 linkage to exploit. -/
@@ -1784,22 +1786,18 @@ detection weight strictly faster than it loses markers.
 This is the implication the inverse-ordering result explains: the inverse-kernel
 trace is built out of the small-eigenvalue directions, clumping keeps the large
 ones, so the gain being larger than one and the pruning deficit being positive
-are the same fact seen from two sides.  Everything on both sides is an explicit
-function of the recombination rate and the effective population size. -/
+are the same fact seen from two sides.  Both sides are functions of the band decay; what that
+decay is in terms of a recombination rate and an effective size is a separate modelling step,
+and it is not the per-generation retention. -/
 theorem pruning_loses_detection_iff_whiteningGain_exceeds_one
-    {recomb Ne : ℝ} {panel : LDPanelRetention}
-    (hr0 : 0 ≤ recomb) (hr1 : recomb ≤ 1) (hNe : 1 < Ne)
+    {decay : ℝ} {panel : LDPanelRetention}
+    (hd0 : 0 ≤ decay) (hd1 : decay < 1)
     (h0 : 0 < panel.retainedMarkers) (h1 : panel.retainedMarkers < panel.totalMarkers) :
-    1 < ldWhiteningGain (ldRetentionPerGen recomb Ne) ↔
-      0 < ldBlockPruningDeficit recomb Ne panel := by
+    1 < ldWhiteningGain decay ↔ 0 < ldBlockPruningDeficit decay panel := by
   obtain ⟨hkpos, hklt⟩ := ldPanelRetentionFraction_mem panel h0 h1
-  have hp0 : 0 ≤ ldRetentionPerGen recomb Ne :=
-    ld_retention_nonneg recomb Ne hr0 hr1 (le_of_lt hNe)
-  have hp1 : ldRetentionPerGen recomb Ne < 1 :=
-    (abs_lt.mp (ldRetentionPerGen_abs_lt_one hr0 hr1 hNe)).2
   unfold ldBlockPruningDeficit
-  rw [ldWhiteningGain_one_lt_iff hp0 hp1,
-    ldPruningDetectionDeficit_pos_iff hp0 hkpos hklt]
+  rw [ldWhiteningGain_one_lt_iff hd0 hd1,
+    ldPruningDetectionDeficit_pos_iff hd0 hkpos hklt]
 
 /-- The deficit is strictly increasing in the AR(1) decay. -/
 theorem ldPruningDetectionDeficit_strictMono {p₁ p₂ kappa : ℝ}
@@ -1819,26 +1817,19 @@ theorem ldPruningDetectionDeficit_strictMono {p₁ p₂ kappa : ℝ}
   rw [div_lt_div_iff₀ hd1 hd2]
   nlinarith [mul_pos (mul_pos (mul_pos hsin hpi) (sub_pos.mpr hlt)) hprod]
 
-/-- **Tighter linkage, larger surrendered detection power.**  Lowering the
-recombination rate between adjacent markers at fixed effective size strictly
-increases the detection weight a clumped panel gives up.  This is the frontier's
-dependence on `r`, and it runs in the same direction as
-`ImitationRigidity.ldWhiteningGain_of_ldRetention_antitone`: the tighter the
-block, the more there was to lose. -/
-theorem ldBlockPruningDeficit_antitone_in_recombination
-    {r₁ r₂ Ne : ℝ} {panel : LDPanelRetention}
-    (hr₁ : 0 ≤ r₁) (hr₂ : r₂ ≤ 1) (hNe : 1 < Ne) (hlt : r₁ < r₂)
+/-- **Tighter linkage, larger surrendered detection power**, stated on the band decay: a panel
+whose LD band decays more slowly gives up strictly more detection weight to clumping. It runs in
+the same direction as `ImitationRigidity.ldWhiteningGain_of_ldRetention_antitone` — the tighter
+the block, the more there was to lose. What a recombination rate and an effective size imply for
+`decay` is the modelling step named at `ldBlockDetectionShare`, and is not supplied here. -/
+theorem ldBlockPruningDeficit_strictMono_in_decay
+    {d₁ d₂ : ℝ} {panel : LDPanelRetention}
+    (hd₁ : 0 ≤ d₁) (hd₂ : d₂ < 1) (hlt : d₁ < d₂)
     (h0 : 0 < panel.retainedMarkers) (h1 : panel.retainedMarkers < panel.totalMarkers) :
-    ldBlockPruningDeficit r₂ Ne panel < ldBlockPruningDeficit r₁ Ne panel := by
+    ldBlockPruningDeficit d₁ panel < ldBlockPruningDeficit d₂ panel := by
   obtain ⟨hkpos, hklt⟩ := ldPanelRetentionFraction_mem panel h0 h1
-  have hp2nn : 0 ≤ ldRetentionPerGen r₂ Ne :=
-    ld_retention_nonneg r₂ Ne (by linarith) hr₂ (le_of_lt hNe)
-  have hp1lt : ldRetentionPerGen r₁ Ne < 1 :=
-    (abs_lt.mp (ldRetentionPerGen_abs_lt_one hr₁ (by linarith) hNe)).2
-  have hret : ldRetentionPerGen r₂ Ne < ldRetentionPerGen r₁ Ne :=
-    ldRetentionPerGen_strictAnti_recomb hNe hlt
   unfold ldBlockPruningDeficit
-  exact ldPruningDetectionDeficit_strictMono hp2nn hp1lt hret hkpos hklt
+  exact ldPruningDetectionDeficit_strictMono hd₁ hd₂ hlt hkpos hklt
 
 /-- The deficit never exceeds `sin(πκ)/π`, at any decay. -/
 theorem ldPruningDetectionDeficit_le_sin_div_pi {decay kappa : ℝ}
@@ -1855,19 +1846,18 @@ theorem ldPruningDetectionDeficit_le_sin_div_pi {decay kappa : ℝ}
   rw [div_le_div_iff₀ hden hpi]
   nlinarith [mul_nonneg (mul_nonneg hsin (le_of_lt hpi)) (sq_nonneg (1 - decay))]
 
-/-- **The tight-linkage floor.**  At every recombination rate and effective
-size, a clumped panel retaining `retainedMarkers` of `totalMarkers` keeps at
-least `κ - sin(πκ)/π` of the detection weight, and no more than `κ`.  The lower
-end is approached as linkage tightens, so on a dense panel the detection share
-is pinned near a curve carrying no free parameters at all — which is what makes
+/-- **The tight-linkage floor.**  At every band decay, a clumped panel retaining
+`retainedMarkers` of `totalMarkers` keeps at least `κ - sin(πκ)/π` of the detection weight, and
+no more than `κ`.  The lower end is approached as linkage tightens, so on a dense panel the
+detection share is pinned near a curve carrying no free parameters at all — which is what makes
 the prediction cheap to test. -/
-theorem ldTightLinkage_le_ldBlockDetectionShare {recomb Ne : ℝ}
+theorem ldTightLinkage_le_ldBlockDetectionShare {decay : ℝ}
     {panel : LDPanelRetention}
     (h0 : 0 < panel.retainedMarkers) (h1 : panel.retainedMarkers < panel.totalMarkers) :
-    ldTightLinkageDetectionShare panel ≤ ldBlockDetectionShare recomb Ne panel := by
+    ldTightLinkageDetectionShare panel ≤ ldBlockDetectionShare decay panel := by
   obtain ⟨hkpos, hklt⟩ := ldPanelRetentionFraction_mem panel h0 h1
   have hbound := ldPruningDetectionDeficit_le_sin_div_pi
-    (decay := ldRetentionPerGen recomb Ne)
+    (decay := decay)
     (kappa := ldPanelRetentionFraction panel)
     (le_of_lt hkpos) (le_of_lt hklt)
   unfold ldTightLinkageDetectionShare ldBlockDetectionShare
@@ -1884,32 +1874,30 @@ reductions of the same kernel — every linear dimension reduction with the same
 budget, fractional ones included — the clumped panel has the minimum detection
 efficiency.
 
-The kernel is the Ohta–Kimura one: its decay is `ldRetentionPerGen recomb Ne`,
-so the statement is about a chromosome with a named recombination rate and a
-named effective population size, not an abstract spectrum.
+The kernel is the AR(1) LD band at decay `decay`, indexed by marker separation. What that decay
+is in terms of a recombination rate and an effective size is a modelling step named at
+`ldBlockDetectionShare`; the per-generation retention is not it.
 
 Scope: relaxed projection-type reductions.  This is not a statement about
 arbitrary measurable summaries of the genotypes, and no joint data-processing
 inequality is available that would make it one. -/
 theorem clumping_minimizes_detection_on_ld_kernel
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (angle : ι → ℝ) (recomb Ne cutAngle : ℝ) (S : Finset ι) (M : ι → ℝ)
-    (hr0 : 0 ≤ recomb) (hr1 : recomb ≤ 1) (hNe : 1 < Ne)
+    (angle : ι → ℝ) (decay cutAngle : ℝ) (S : Finset ι) (M : ι → ℝ)
+    (hd0 : 0 ≤ decay) (hdabs : |decay| < 1)
     (hM : IsRankAllocation (S.card : ℝ) M)
     (hin : ∀ i ∈ S, Real.cos cutAngle ≤ Real.cos (angle i))
     (hout : ∀ i ∉ S, Real.cos (angle i) ≤ Real.cos cutAngle) :
     detectionEfficiency
-        (fun i ↦ ldKernelSymbol (ldRetentionPerGen recomb Ne) (angle i))
+        (fun i ↦ ldKernelSymbol decay (angle i))
         (pruneAllocation S) ≤
       detectionEfficiency
-        (fun i ↦ ldKernelSymbol (ldRetentionPerGen recomb Ne) (angle i)) M := by
-  have habs : |ldRetentionPerGen recomb Ne| < 1 :=
-    ldRetentionPerGen_abs_lt_one hr0 hr1 hNe
-  have hp0 : 0 ≤ ldRetentionPerGen recomb Ne :=
-    ld_retention_nonneg recomb Ne hr0 hr1 (le_of_lt hNe)
+        (fun i ↦ ldKernelSymbol decay (angle i)) M := by
+  have habs : |decay| < 1 := hdabs
+  have hp0 : 0 ≤ decay := hd0
   refine topVariance_minimizes_detection
-    (fun i ↦ ldKernelSymbol (ldRetentionPerGen recomb Ne) (angle i)) M S
-    (ldKernelSymbol (ldRetentionPerGen recomb Ne) cutAngle)
+    (fun i ↦ ldKernelSymbol decay (angle i)) M S
+    (ldKernelSymbol decay cutAngle)
     (fun i ↦ ldKernelSymbol_pos habs) (ldKernelSymbol_pos habs)
     hM ?_ ?_
   · intro i hi
@@ -1924,23 +1912,21 @@ detection, it is bad for detection *because* it is optimal for reconstruction,
 and the two conclusions come from the one threshold hypothesis. -/
 theorem clumping_maximizes_reconstruction_on_ld_kernel
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (angle : ι → ℝ) (recomb Ne cutAngle : ℝ) (S : Finset ι) (M : ι → ℝ)
-    (hr0 : 0 ≤ recomb) (hr1 : recomb ≤ 1) (hNe : 1 < Ne)
+    (angle : ι → ℝ) (decay cutAngle : ℝ) (S : Finset ι) (M : ι → ℝ)
+    (hd0 : 0 ≤ decay) (hdabs : |decay| < 1)
     (hM : IsRankAllocation (S.card : ℝ) M)
     (hin : ∀ i ∈ S, Real.cos cutAngle ≤ Real.cos (angle i))
     (hout : ∀ i ∉ S, Real.cos (angle i) ≤ Real.cos cutAngle) :
     reconstructionEfficiency
-        (fun i ↦ ldKernelSymbol (ldRetentionPerGen recomb Ne) (angle i)) M ≤
+        (fun i ↦ ldKernelSymbol decay (angle i)) M ≤
       reconstructionEfficiency
-        (fun i ↦ ldKernelSymbol (ldRetentionPerGen recomb Ne) (angle i))
+        (fun i ↦ ldKernelSymbol decay (angle i))
         (pruneAllocation S) := by
-  have habs : |ldRetentionPerGen recomb Ne| < 1 :=
-    ldRetentionPerGen_abs_lt_one hr0 hr1 hNe
-  have hp0 : 0 ≤ ldRetentionPerGen recomb Ne :=
-    ld_retention_nonneg recomb Ne hr0 hr1 (le_of_lt hNe)
+  have habs : |decay| < 1 := hdabs
+  have hp0 : 0 ≤ decay := hd0
   refine topVariance_maximizes_reconstruction
-    (fun i ↦ ldKernelSymbol (ldRetentionPerGen recomb Ne) (angle i)) M S
-    (ldKernelSymbol (ldRetentionPerGen recomb Ne) cutAngle)
+    (fun i ↦ ldKernelSymbol decay (angle i)) M S
+    (ldKernelSymbol decay cutAngle)
     (fun i ↦ ldKernelSymbol_pos habs) hM ?_ ?_
   · intro i hi
     exact ldKernelSymbol_mono_in_cos habs hp0 (hin i hi)
