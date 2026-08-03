@@ -871,9 +871,9 @@ statement that the Pareto frontier is the concave envelope of the
 coordinate-split values.
 
 The existence of the threshold set is supplied by
-`hasThresholdSetAtEveryRank_of_fintype`, which is admitted; this theorem
-therefore depends on `sorryAx`, and that visible dependence is the honest form of
-the debt an `hsplit` premise would conceal. -/
+`hasThresholdSetAtEveryRank_of_fintype`, which is proved: a maximum-total-score
+`k`-set has its own minimum as a cut, since swapping in any higher-scoring
+outsider would raise the total. -/
 theorem exists_split_attaining_scalarized_optimum
     (spectrum : ι → ℝ) (k : ℕ) (lam mu : ℝ) (hk : k ≤ Fintype.card ι) :
     ∃ S : Finset ι, S.card = k ∧

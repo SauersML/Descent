@@ -759,8 +759,9 @@ theorem smaller_ne_more_drift {T : ℕ} (hT : 0 < T)
   unfold cumulativeDrift
   apply Finset.sum_lt_sum
   · intro i _
-    exact le_of_lt (div_lt_div_of_pos_left one_pos (by linarith [hNe₂ i]) (by linarith [h_smaller
-        i]))
+    have h_pos : 0 < Ne₂ i := hNe₂ i
+    have h_lt : Ne₂ i < Ne₁ i := h_smaller i
+    exact le_of_lt (div_lt_div_of_pos_left one_pos (by linarith) (by linarith))
   · let j : Fin T := ⟨0, hT⟩
     exact ⟨j, Finset.mem_univ j,
       div_lt_div_of_pos_left one_pos (by linarith [hNe₂ j]) (by linarith [h_smaller j])⟩

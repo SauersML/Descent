@@ -88,10 +88,44 @@ noncomputable def optimalBayesRisk (π : FinitePrior parameterCount) : ℝ :=
 noncomputable def mixtureDualRisk : ℝ :=
   sSup (Set.range E.optimalBayesRisk)
 
+/-- **Half of duality, proved: a prior-averaged risk never exceeds the worst case.**
+
+    `bayesRisk π δ` is an average of `risk δ θ` against a probability vector, and every
+    term is at most `worstRisk δ`, which is the supremum over `θ`. The supremum is attained
+    on a finite range, so it is a genuine bound rather than a formal `sSup`.
+
+    This is the inequality that makes the mixture certificate sound: no prior can certify
+    more than the minimax value. It is stated separately from the duality below because it
+    is true unconditionally and needs no minimax theorem. -/
+theorem bayesRisk_le_worstRisk (π : FinitePrior parameterCount)
+    (δ : Rule actionCount observationCount) :
+    E.bayesRisk π δ ≤ E.worstRisk δ := by
+  have hbdd : BddAbove (Set.range (E.risk δ)) := (Set.finite_range _).bddAbove
+  have hle : ∀ θ, E.risk δ θ ≤ E.worstRisk δ := fun θ ↦ le_csSup hbdd ⟨θ, rfl⟩
+  have hmass : ∑ θ, FinitePrior.probability π θ = 1 :=
+    (finitePrior_probability_mem π).2
+  calc E.bayesRisk π δ = ∑ θ, FinitePrior.probability π θ * E.risk δ θ := rfl
+    _ ≤ ∑ θ, FinitePrior.probability π θ * E.worstRisk δ :=
+        Finset.sum_le_sum fun θ _ ↦
+          mul_le_mul_of_nonneg_left (hle θ) (FinitePrior.probability_nonneg π θ)
+    _ = E.worstRisk δ := by rw [← Finset.sum_mul, hmass, one_mul]
+
 /-- **Finite minimax duality.**  Ungraded mixture-versus-mixture reasoning is
 complete because the primal minimax value equals the optimization over all
 Bayes priors.  This is the real theorem, not a definitional equality and not a
-caller-supplied proposition. -/
+caller-supplied proposition.
+
+    WHAT IS PROVED, AND WHAT IS NOT.  `bayesRisk_le_worstRisk` above gives the sound
+    direction unconditionally: an average against a prior never exceeds the worst case, so
+    no mixture can certify more than the minimax value.  Lifting that to
+    `mixtureDualRisk ≤ minimaxRisk` additionally needs the risk range to be bounded below
+    over the rule space, which is a continuum here; and the reverse inequality is the
+    minimax theorem itself, which needs a Sion- or von-Neumann-style argument this corpus
+    does not carry.
+
+    The `sorry` is the whole equality rather than the missing half, because splitting it
+    into a proved inequality plus an assumed one would put the hard direction in a
+    hypothesis, where no audit reads it.  Here `AxiomScan` reports it. -/
 theorem finite_minimax_duality : E.minimaxRisk = E.mixtureDualRisk := by
   sorry
 
