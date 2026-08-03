@@ -61,6 +61,26 @@ and fails on the continuum, while resonance is present for realized panels and a
 the continuum. Theorems about mixing measures and theorems about realized panels are
 different theorems, and neither should be quoted for the other.
 
+## ZERO CONSUMERS, DELIBERATELY. Do not "fix" this.
+
+Nothing in the corpus imports this module, and that is a judgment rather than an
+oversight. `intensity` here is `|Psi|^2` and `CramerStratum.charFnSq` is `|phi|^2`: the
+same object in two encodings. `resonance_of_aligned` and
+`CramerStratum.charFnSq_eq_one_of_lattice` are the same mechanism -- phases realign, the
+sum returns to its full size.
+
+The binary lattice/non-lattice fact the biological core actually needs is delivered by
+`CramerStratum`, which is wired in: `PolygenicSpectroscopy.hardCall_not_cramer_at_critical_maf`
+consumes it to prove hard calls sit outside the Cramer stratum at `q*`. Wiring this module
+in as well would give a second route to a conclusion already reached, which is worse than an
+honest zero -- it would read as integration while adding no dependence, and it would create
+two places to maintain one argument.
+
+**What would make it matter.** A core result needing the *graded* spectrum -- the masses
+strictly between `0` and `1`, which the lattice/non-lattice dichotomy cannot express and
+which `CramerStratum` does not compute. There is no such result today. If one appears, this
+is the module to reach for; until then the right consumer count is zero.
+
 ## What is measurable, which makes this an instrument rather than a definition
 
 Between recurrences the intensity of an `n`-locus panel does not fall to zero. It settles

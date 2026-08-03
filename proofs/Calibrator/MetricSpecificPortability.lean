@@ -6,6 +6,10 @@ import Calibrator.OpenQuestions
 import Calibrator.ProjectionShiftBounds
 import Calibrator.ImitationRigidity
 import Calibrator.SpectralDegradation
+-- `FoldedSpectrum` supplies the Gaussian level-set collapse used in
+-- "What the metric split is, and is not" below. That section is the reason this
+-- import exists: `levelSet_metrics_agree_of_coords_eq` is not provable here.
+import Calibrator.FoldedSpectrum
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Inverse
 
 namespace Calibrator
@@ -565,6 +569,92 @@ theorem fisherTraceMSELowerBound_le_target_iff
     rw [div_le_iff₀ h_target] at h
     simpa [mul_comm, mul_left_comm, mul_assoc] using h
 
+/-! ### The other half of a deployment budget, and the one that binds
+
+`requiredEffectiveSampleSizeForTraceMSE` is a budget for *estimating target parameters*:
+`(d/I)/tau`, which grows like `1/tau` as the target tightens. That is not the only budget a
+deployment of the curve-prior dissolution has to meet, and it is not the binding one.
+
+`Calibrator.FoldedSpectrum.RecoveryAttenuation.panels_suffice_iff` supplies the other:
+averaging `B` order-free panels per cohort attains reliability `tau` **iff**
+`B >= c*tau/(p*(1-tau))`. These are budgets for different quantities and neither implies
+the other -- one is per-sample Fisher information for a parameter vector, the other is
+replication of a variance estimate -- so the composite below is a conjunction, not a
+derivation of one from the other. Do not collapse it into one bound.
+
+**What the pairing shows is the asymmetry in `tau`.** The Fisher budget carries `1/tau`;
+the panel budget carries `1/(1-tau)`. The first is bounded as the target tightens and the
+second is not: each additional nine of reliability costs another factor of ten in panels.
+So a design that budgets only along the Fisher axis will underprovision, and it will do so
+by more the better the design is meant to be. The measured run reached reliability `0.153`
+at `B = 16`, which puts `c/p` near `88` and the `tau = 0.8` requirement near **350 panels
+per cohort** -- two orders of magnitude above what was tried.
+
+This is why the dissolution is not yet usable, and the reason is worth stating precisely:
+not that the population identity is false -- it is exact -- but that the reliability it
+needs was never budgeted for. -/
+
+/-- **A deployment must clear both budgets, and they are independent conditions.**
+
+The estimation budget in effective sample size and the replication budget in panels per
+cohort, stated as one iff so that neither can be quietly dropped. The panel half is
+`FoldedSpectrum.RecoveryAttenuation.panels_suffice_iff` and is not provable in this file. -/
+theorem deployment_meets_both_budgets
+    (nEff nParams infoPerSample targetTraceMSE : ℝ)
+    (p c tau B : ℝ)
+    (h_nEff : 0 < nEff) (h_target : 0 < targetTraceMSE)
+    (hp : 0 < p) (hc : 0 < c) (htau0 : 0 < tau) (htau1 : tau < 1) (hB : 0 < B) :
+    (fisherTraceMSELowerBound nEff nParams infoPerSample ≤ targetTraceMSE ∧
+        tau ≤ p / (p + c / B)) ↔
+      (requiredEffectiveSampleSizeForTraceMSE nParams infoPerSample targetTraceMSE ≤ nEff ∧
+        c * tau / (p * (1 - tau)) ≤ B) := by
+  constructor
+  · rintro ⟨hfisher, hrel⟩
+    exact ⟨(fisherTraceMSELowerBound_le_target_iff nEff nParams infoPerSample targetTraceMSE
+        h_nEff h_target).1 hfisher,
+      (RecoveryAttenuation.panels_suffice_iff p c tau B hp hc htau0 htau1 hB).1 hrel⟩
+  · rintro ⟨hsample, hpanels⟩
+    exact ⟨(fisherTraceMSELowerBound_le_target_iff nEff nParams infoPerSample targetTraceMSE
+        h_nEff h_target).2 hsample,
+      (RecoveryAttenuation.panels_suffice_iff p c tau B hp hc htau0 htau1 hB).2 hpanels⟩
+
+/-- **The panel budget is unbounded in the reliability target; the Fisher budget is not.**
+
+For any panel count `M` however large there is a reliability target below one that needs
+more than `M` panels. That is the `1/(1-tau)` blow-up, and it is the formal content of "each
+additional nine costs a factor of ten". Nothing analogous holds for
+`requiredEffectiveSampleSizeForTraceMSE`, whose dependence on its own target is `1/tau` and
+therefore bounded as the target tightens toward its best value.
+
+The design reading: reliability, not per-sample information, is the constraint that decides
+whether this method is affordable. -/
+theorem panel_budget_unbounded_in_reliability (p c M : ℝ)
+    (hp : 0 < p) (hc : 0 < c) (hM : 0 < M) :
+    ∃ tau : ℝ, 0 < tau ∧ tau < 1 ∧ M < c * tau / (p * (1 - tau)) := by
+  -- Take `1 - tau` small enough that `c*tau/(p*(1-tau))` exceeds `M`; `tau = 1/2` already
+  -- fixes the numerator away from zero, so only the denominator has to be driven down.
+  set eps : ℝ := min (1 / 2) (c / (2 * (M * p + c))) with heps
+  have hMp : 0 < M * p + c := by positivity
+  have heps_pos : 0 < eps := by
+    rw [heps]; exact lt_min (by norm_num) (by positivity)
+  have heps_half : eps ≤ 1 / 2 := min_le_left _ _
+  have heps_le : eps ≤ c / (2 * (M * p + c)) := min_le_right _ _
+  refine ⟨1 - eps, by linarith, by linarith, ?_⟩
+  have hden : 0 < p * (1 - (1 - eps)) := by
+    have : (1 : ℝ) - (1 - eps) = eps := by ring
+    rw [this]; positivity
+  rw [lt_div_iff₀ hden]
+  have hsimp : (1 : ℝ) - (1 - eps) = eps := by ring
+  rw [hsimp]
+  -- Goal: `M * (p * eps) < c * (1 - eps)`. Use `eps ≤ c/(2(Mp+c))` and `eps ≤ 1/2`.
+  have hkey : eps * (2 * (M * p + c)) ≤ c := by
+    rw [heps] at heps_le ⊢
+    calc min (1 / 2) (c / (2 * (M * p + c))) * (2 * (M * p + c))
+        ≤ (c / (2 * (M * p + c))) * (2 * (M * p + c)) := by
+          exact mul_le_mul_of_nonneg_right (min_le_right _ _) (by positivity)
+      _ = c := by field_simp
+  nlinarith [hkey, heps_pos, heps_half, hp, hc, hM]
+
 /-- If the rediscovery task has both more free parameters and no more
     per-sample Fisher information than recalibration, then its
     dimension-to-information ratio is strictly larger. -/
@@ -934,6 +1024,87 @@ theorem different_uses_different_metrics
       se sp K_source K_target h_se h_sp1 h_Ks h_Ks' h_Kt' h_order
   · exact ppv_increases_with_prevalence
       se sp K_source K_target h_se h_sp1 h_Ks h_Ks' h_Kt' h_order
+
+/-! ### What the metric split is, and is not
+
+This module's headline is that metric choice changes the portability verdict, and
+`different_uses_different_metrics` is the exhibit. The Gaussian level-set collapse of
+`Calibrator.FoldedSpectrum` sharpens that claim, and in doing so narrows it.
+
+**The collapse.** Every *level-set functional* -- any threshold-based readout metric:
+sensitivity, specificity, any exceedance probability, any quantile -- factors through
+exactly two numbers of the transferred pair, the correlation drop and the variance ratio
+(`LevelSetCoordinates`). So two deployments whose readouts agree in those two coordinates
+agree in **every** threshold metric at once (`levelSet_metrics_agree_of_coords_eq`). No
+choice among threshold metrics can separate them.
+
+**What that does to the headline.** Prevalence is not one of the two coordinates. It is a
+property of the outcome marginal, not of the readout. `metricPPV` reads it; sensitivity and
+specificity do not. So the split this module exhibits is **not** a disagreement between
+metrics at fixed readout -- the collapse forbids that -- it is the difference between a
+metric that reads prevalence and metrics that do not.
+
+That is a real narrowing, and it is the useful form for a reader deciding what to report:
+holding the readout fixed, swapping one threshold metric for another cannot reverse a
+portability verdict. To get a reversal you need either a prevalence shift (this module's
+route) or the two coordinates to order oppositely
+(`FoldedSpectrum.no_levelSet_reversal_of_aligned_coordinates`, the "only if" half). Metric
+choice on its own is not a mechanism.
+
+The theorem below states exactly this and no more. Note which parts come from where: the
+first two conjuncts are the collapse and are **not provable in this file**; the last two are
+this file's own `metricPPV` facts. -/
+
+/-- A screening deployment: the two readout-side coordinates a threshold metric can see,
+plus the prevalence, which is outcome-side and which the collapse does not contain. -/
+structure ScreeningDeployment where
+  /-- The readout-side coordinates: correlation drop and variance ratio. -/
+  readout : LevelSetCoordinates
+  /-- Outcome-side base rate. Deliberately **not** part of `readout`. -/
+  prevalence : ℝ
+
+/-- **The metric split is a prevalence effect, not a metric-choice effect.**
+
+`sens` and `spec` are any threshold metrics of the readout, i.e. any level-set functionals
+of the two coordinates. Given two deployments with the *same* readout coordinates:
+
+* they agree in sensitivity and in specificity -- and this is the part that needs
+  `Calibrator.FoldedSpectrum`, since it holds for *every* level-set functional at once, not
+  because of anything about these two in particular;
+* at equal prevalence they therefore agree in PPV as well, so no threshold metric separates
+  them at all;
+* and a strict prevalence increase strictly raises PPV, which is the split
+  `different_uses_different_metrics` reports.
+
+Read together: everything that moves here moves because prevalence moved. Delete
+`FoldedSpectrum` and the first conjunct has no proof. -/
+theorem metric_split_is_prevalence_not_metric_choice
+    (sens spec : ScreeningDeployment → ℝ)
+    (hsens : IsLevelSetFunctional sens ScreeningDeployment.readout)
+    (hspec : IsLevelSetFunctional spec ScreeningDeployment.readout)
+    (d₁ d₂ : ScreeningDeployment)
+    (hreadout : d₁.readout = d₂.readout) :
+    sens d₁ = sens d₂ ∧
+    spec d₁ = spec d₂ ∧
+    (d₁.prevalence = d₂.prevalence →
+      metricPPV (sens d₁) (spec d₁) d₁.prevalence =
+        metricPPV (sens d₂) (spec d₂) d₂.prevalence) ∧
+    (0 < sens d₁ → spec d₁ < 1 →
+      0 < d₁.prevalence → d₁.prevalence < 1 → d₂.prevalence < 1 →
+      d₁.prevalence < d₂.prevalence →
+      metricPPV (sens d₁) (spec d₁) d₁.prevalence <
+        metricPPV (sens d₂) (spec d₂) d₂.prevalence) := by
+  -- The two agreements are the collapse, instantiated at this deployment type.
+  have hs : sens d₁ = sens d₂ :=
+    levelSet_metrics_agree_of_coords_eq ScreeningDeployment.readout sens hsens d₁ d₂ hreadout
+  have hp : spec d₁ = spec d₂ :=
+    levelSet_metrics_agree_of_coords_eq ScreeningDeployment.readout spec hspec d₁ d₂ hreadout
+  refine ⟨hs, hp, ?_, ?_⟩
+  · intro hK
+    rw [hs, hp, hK]
+  · intro h_se h_sp1 h_K1 h_K1' h_K2' h_order
+    rw [← hs, ← hp]
+    exact ppv_increases_with_prevalence _ _ _ _ h_se h_sp1 h_K1 h_K1' h_K2' h_order
 
 /-- **Decision curve analysis: Brier score is population-specific (from definition).**
     At fixed prevalence, any nonzero `R²` shift induces a strictly positive
