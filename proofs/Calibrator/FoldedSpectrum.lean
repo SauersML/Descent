@@ -1430,7 +1430,12 @@ Thus the gain equals the variance of the visible-predictable part only when the 
 center agrees with the target-ensemble mean. The second term is population-level mean
 architecture shift; omitting it can make a reported "fraction of blind variance recovered"
 exceed one. `EnsembleChannel.ensemblePredictorSquaredLoss_decomposition` proves the finite
-orthogonal identity.
+orthogonal identity. `EnsembleChannel.weightedBandEnsembleLoss_decomposition` proves the
+actual spectral version simultaneously across targets and genomic bands: instantiate its
+weight with each target population's feature spectrum times the task weight, and its
+target with that population's optimal readout. The resulting recoverable term retains
+target-specific LD, genotype variance, imputation quality, and low-/high-frequency task
+emphasis rather than replacing them by a common scalar.
 
 For a prior supported on a curve, the residual fibre variance is zero only if the chosen
 visible summaries identify position on that curve. That injectivity is a substantive
