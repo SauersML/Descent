@@ -84,7 +84,26 @@ from pathlib import Path
 # The one answer to "where is the corpus".  check.py lives at
 # proofs/validation/code/check.py, so parents[3] is the repository root.
 REPO = Path(__file__).resolve().parents[3]
-PROOFS = REPO / "proofs"
+
+# GNOMON_CORPUS points every guard at a different tree, and exists so the guards
+# can be CALIBRATED against fixtures rather than only ever run against the corpus.
+#
+# This is not a convenience.  A detector that reports nothing is
+# indistinguishable from a clean corpus, so a guard's clean report is not
+# evidence until it has been shown to fire on a planted defect AND stay silent on
+# clean input.  Six of the seven guards here had no such control, and the cost was
+# paid: a refactor rewrote the word `declarations` inside the wiring guard's own
+# JSON keys and printed label, changing a machine-readable contract, and every
+# guard still passed.  Nothing in the repository could have caught it.
+#
+# Unset, this is `<repo>/proofs` and nothing changes.
+PROOFS = Path(os.environ.get("GNOMON_CORPUS") or (REPO / "proofs"))
+
+# What findings are reported relative to.  It must track the tree actually
+# scanned: `relative_to` RAISES on a path outside its argument, so a guard
+# reporting relative to REPO aborts outright on any corpus outside the
+# repository -- which is every fixture.
+CORPUS_BASE = PROOFS.parent
 
 
 def lean_sources(root: Path) -> list:
@@ -118,7 +137,7 @@ def read_source(path: Path) -> str:
         return path.read_text(encoding="utf-8")
     except UnicodeDecodeError as exc:
         raise ValueError(
-            f"{path.relative_to(REPO)}: not valid UTF-8 ({exc.reason} at byte "
+            f"{path.relative_to(CORPUS_BASE)}: not valid UTF-8 ({exc.reason} at byte "
             f"{exc.start}); a corpus file must be UTF-8"
         ) from exc
 
@@ -175,9 +194,11 @@ STYLE_COPYRIGHT_HEADER = (
 
 def style_lean_files() -> list[Path]:
     """Return source-controlled Lean-shaped files, excluding macOS resource forks."""
-    files = [REPO / "lakefile.lean"]
+    # The lakefile is corpus for style purposes but sits beside `proofs/`
+    # rather than inside it, and a fixture tree has none.
+    files = [f for f in [CORPUS_BASE / "lakefile.lean"] if f.is_file()]
     files.extend(
-        path for path in lean_sources(REPO / "proofs")
+        path for path in lean_sources(PROOFS)
     )
     return sorted(files)
 
@@ -188,7 +209,7 @@ def style_line_number(source: str, offset: int) -> int:
 
 def style_check_file(path: Path) -> list[str]:
     source = path.read_text()
-    rel = path.relative_to(REPO)
+    rel = path.relative_to(CORPUS_BASE)
     errors: list[str] = []
 
     if not source.startswith(STYLE_COPYRIGHT_HEADER):
@@ -1757,11 +1778,57 @@ def run_identifications() -> int:
             for fm in re.finditer(r"^[ \t]+([A-Za-z_][A-Za-z_0-9'₀-₉]*)[ \t]*:",
                                   m.group(1), re.M):
                 corpus_vocab.add(fm.group(1))
+    # `global_theorems` cuts each declaration at its FIRST `:=`, which is the
+    # proof's only when the conclusion has no `let`. A conclusion of the form
+    #
+    #     let sourceProfile := cal.identityCalibrationProfile Pop.source
+    #     ...
+    #
+    # owns that `:=`, so the statement is truncated to `let sourceProfile` and
+    # the goal comes out empty -- which reads to this guard as "mentions no
+    # constant this corpus defines" and reports a theorem written entirely in
+    # corpus vocabulary. `cross_ancestry_exact_metric_profile` is one such.
+    #
+    # With the budget at zero a false positive here is not noise, it is pressure
+    # to rename a correct name, so this guard splits at the PROOF's `:=`: scan at
+    # depth zero and let each `let`/`have`/`fun` binder consume the next one.
+    def statement_of(decl):
+        depth, pending, i = 0, 0, 0
+        while i < len(decl):
+            ch = decl[i]
+            if ch in OPENB:
+                depth += 1
+            elif ch in CLOSEB:
+                depth -= 1
+            elif depth == 0:
+                if decl.startswith(":=", i):
+                    if pending == 0:
+                        return decl[:i]
+                    pending -= 1
+                    i += 2
+                    continue
+                m = re.match(r"\b(let|have)\b", decl[i:])
+                if m and (i == 0 or not decl[i - 1].isalnum()):
+                    pending += 1
+                    i += m.end()
+                    continue
+            i += 1
+        return decl
+
+    full_decl = {}
+    for f in ident_lean_files():
+        src = ident_strip_comments(open(f).read())
+        for t in re.finditer(r"^(?:@\[[^\]]*\]\s*\n)?(?:private )?theorem "
+                             r"([A-Za-z_0-9'.]+)(?:.*?)(?=\n(?:@\[|theorem |"
+                             r"noncomputable |def |abbrev |structure |section |end |"
+                             r"namespace |/-))", src, re.S | re.M):
+            full_decl[t.group(1).split(".")[-1]] = t.group(0)
+
     domain_named_arithmetic = []
     for tname, stmt in global_theorems:
         if not DOMAIN_WORD.search(tname):
             continue
-        goal = goal_of(stmt)
+        goal = goal_of(statement_of(full_decl.get(tname, stmt)))
         if set(re.findall(IDENT, goal)) & corpus_vocab:
             continue
         domain_named_arithmetic.append(
@@ -2252,7 +2319,7 @@ def parse_file(path: Path) -> tuple[list[Decl], list[tuple[int, str]]]:
     # temp dir, and a detector that only runs on the corpus it judges cannot be tested
     # against known answers.
     try:
-        rel = str(path.relative_to(REPO))
+        rel = str(path.relative_to(CORPUS_BASE))
     except ValueError:
         rel = str(path)
 
@@ -2760,16 +2827,32 @@ def check_decl(d: Decl, c: Corpus, proved_props: set[str]) -> list[Finding]:
         # parameter as an unguarded denominator. Only a bare variable qualifies: a
         # projection like `m.V_P` is guarded by its own structure's invariants
         # (`V_P_pos`), and the structure parameter is judged by F4 and F22 instead.
-        for m in re.finditer(rf"/\s*({IDENT}(?:\.{IDENT})*)", concl):
+        # ONLY INEQUALITIES. An EQUATION whose denominator appears on both sides is an
+        # identity that also holds at zero -- `(lam*c)^2 / (lam^2*V) = c^2/V` is true at
+        # `V = 0` because both sides are `0`, and demanding `V ≠ 0` would weaken a
+        # correct theorem for nothing. What goes silently true is a BOUND: `0 ≤ x / d`
+        # and `x / d < 1` claim nothing at `d = 0`, where the quotient collapses to `0`.
+        concl_is_bound = any(op in concl for op in ("≤", "<", "≥", ">"))
+        for m in (re.finditer(rf"/\s*({IDENT}(?:\.{IDENT})*)", concl)
+                  if concl_is_bound else []):
             den = m.group(1)
             if "." in den:
                 continue
             if den not in {b.name for b in d.binders if b.name}:
                 continue
-            guarded = any(
-                re.search(rf"(?:{re.escape(den)}\s*(?:≠|>)\s*0|0\s*(?:<|≠)\s*{re.escape(den)})",
-                          b.type)
-                for b in d.binders)
+            # GUARDED means "some premise constrains this quantity", not "some premise
+            # literally reads `den ≠ 0`". Two real shapes are missed by the literal test:
+            #   * transitively: `(h : v_total = v_add + v_epi)` with both summands
+            #     positive forces `0 < v_total`, and no premise names `v_total ≠ 0`;
+            #   * by application: the denominator is `y 0`, and the premise is
+            #     `hy0 : y 0 ≠ 0` -- about the applied term, not the bare `y`.
+            # Deciding either needs a prover, so the rule is the conservative one: report
+            # only when NO premise mentions the quantity at all. That under-reports a
+            # denominator constrained nowhere near zero, and it never cries wolf over a
+            # theorem whose hypotheses do pin the denominator down.
+            guarded = any(re.search(rf"(?<![.\w']){re.escape(den)}(?![\w'])", b.type)
+                          for b in d.binders
+                          if is_prop_type(b.type, c.prop_aliases, c.prop_structs))
             if not guarded:
                 add("F21", f"conclusion divides by `{den}`, which no premise shows is "
                            f"nonzero; `x / 0 = 0` in Lean, so the claim is silently true "
@@ -2945,7 +3028,7 @@ def check_files(c: Corpus) -> list[Finding]:
     out: list[Finding] = []
     seen_files = {d.file for d in c.decls}
     for rel in sorted(seen_files):
-        src = (REPO / rel).read_text(encoding="utf-8", errors="replace")  # abs rel is a no-op
+        src = (CORPUS_BASE / rel).read_text(encoding="utf-8", errors="replace")  # abs rel is a no-op
         m = mask(src)
         for pat, fam, msg in [
             (r"\bnative_decide\b", "F24", "`native_decide` moves the compiler into the "
@@ -2968,7 +3051,7 @@ def check_files(c: Corpus) -> list[Finding]:
     # That checks how the proposition was CONSTRUCTED; it says nothing about whether
     # anything proves it, while reading exactly like a clean audit of a theorem.
     for rel in sorted({d.file for d in c.decls}):
-        src = (REPO / rel).read_text(encoding="utf-8", errors="replace")
+        src = (CORPUS_BASE / rel).read_text(encoding="utf-8", errors="replace")
         for mo in re.finditer(rf"#print\s+axioms\s+({IDENT}(?:\.{IDENT})*)", mask(src)):
             target = mo.group(1).split(".")[-1]
             if target in c.prop_aliases:
@@ -3099,7 +3182,7 @@ def run_laundering(argv: list[str]) -> int:
 # new edit.
 # ======================================================================================
 
-REGIMES_SOURCE_ROOT = REPO / "proofs" / "Calibrator"
+REGIMES_SOURCE_ROOT = PROOFS / "Calibrator"
 
 # Names used by the historical result-as-data interfaces.  Exact matching keeps
 # legitimate algebraic fields such as ``stationary`` and ``mass_sum`` legal.
@@ -3186,7 +3269,7 @@ def run_regimes() -> int:
         text = REGIMES_BLOCK_COMMENT.sub("", read_source(path))
         for match in REGIMES_STRUCTURE.finditer(text):
             structure = match.group(1)
-            rel = path.relative_to(REPO)
+            rel = path.relative_to(CORPUS_BASE)
             if structure in REGIMES_FORBIDDEN_STRUCTURES:
                 violations.append(f"{rel}: forbidden result carrier {structure}")
             for field, type_text in REGIMES_FIELD.findall(match.group(2)):
@@ -3263,7 +3346,7 @@ def closure_root_closure():
 def run_closure() -> int:
     sources = closure_calibrator_sources()
     closure = closure_root_closure()
-    absent = sorted(path.relative_to(REPO) for path in sources - closure)
+    absent = sorted(path.relative_to(CORPUS_BASE) for path in sources - closure)
     print(f"CALIBRATOR_SOURCES\t{len(sources)}")
     print(f"ROOT_CLOSURE\t{len(closure & sources)}")
     for path in absent:
@@ -3441,7 +3524,7 @@ def run_wiring(argv: list[str]) -> int:
     args = ap.parse_args(argv)
 
     here = os.path.dirname(os.path.abspath(__file__))
-    calibrator = os.path.normpath(os.path.join(here, "..", "..", "Calibrator"))
+    calibrator = str(PROOFS / "Calibrator")
     if not os.path.isdir(calibrator):
         print(f"cannot find {calibrator}", file=sys.stderr)
         return 2
