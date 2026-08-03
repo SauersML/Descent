@@ -1,4 +1,9 @@
 /-
+Copyright (c) 2026 Sauers. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Sauers
+-/
+/-
 Report the transitive axiom closure of every `Calibrator` declaration, and fail
 on anything outside the three foundations Lean's own standard library rests on.
 
@@ -28,8 +33,15 @@ any module, or a `native_decide` anywhere, would be reported by no guard.
 Run:
   lake env lean proofs/validation/invariants/AxiomScan.lean
 
-Exit is nonzero when a declaration depends on anything outside ALLOWED, so this
-can be wired into the same job as the build.
+Exit is nonzero when a declaration depends on a custom axiom or on a compiler
+axiom, so this can be wired into the same job as the build.  It is NOT nonzero
+for `sorryAx`, which is reported as an admission and counted; see `admissible`
+below for why closing that exit too would select for laundering rather than for
+proof.  The source-level counterpart is the admissions list in
+`scripts/check-identifications.py`, which likewise reports `sorry` and fails on
+`admit`.  The two are not redundant: the text scan names the line a person
+typed, and this scan names every declaration the KERNEL knows to be incomplete,
+including the error-recovery cases whose source contains no such word.
 -/
 import Calibrator
 import Lean.Util.CollectAxioms
@@ -41,12 +53,42 @@ namespace AxiomScan
 /-- The axioms a Mathlib development is entitled to.  `propext`, `Classical.choice`
 and `Quot.sound` are Lean's foundations, not assumptions this corpus is making.
 
-Deliberately absent, and each one a different failure:
-`sorryAx` (an unfinished or error-recovered proof), `Lean.ofReduceBool` and
+Deliberately absent, and each one a different failure: `Lean.ofReduceBool` and
 `Lean.trustCompiler` (`native_decide`, which moves the compiler into the trusted
 base), and every axiom declared in this repository. -/
 def allowed : List Name :=
   [``propext, ``Classical.choice, ``Quot.sound]
+
+/-- `sorryAx` is an ADMISSION, not an offence, and this scan reports it without
+failing.  That is a deliberate asymmetry, and it is the whole point of the split.
+
+A guard that fails the build on `sorryAx` while also failing it on custom axioms,
+`native_decide` and rebound notation has closed every exit at once.  What it has
+actually done is make the honest admission the MOST expensive option available:
+writing `sorry` breaks CI, whereas weakening the statement until it is provable,
+moving the hard half into a hypothesis nobody discharges, or proving the theorem
+about a degenerate surrogate all leave a green build.  The guard then selects for
+exactly the four laundering families the rest of this directory exists to detect.
+
+So the order of preference this file encodes, worst to best:
+
+  * a custom axiom, a compiler-backed proof, a rebound `+` -- REJECTED, always;
+  * a theorem whose statement was quietly weakened to fit the proof available --
+    not visible here at all, which is why `Inflation.lean` and the vacuity and
+    range detectors exist;
+  * an admitted proof obligation, named and counted -- REPORTED, and allowed to
+    stay in the corpus for as long as it takes to discharge;
+  * a proof.
+
+An admission is a debt with the debtor's name on it.  The closure is transitive,
+so every downstream consumer reports it too and the printed list is the blast
+radius, not a single line.  That is the property that makes it safe to permit:
+nothing that rests on an admission can look finished.
+
+`ADMISSION_SCAN_COUNT` is printed unconditionally, including when it is zero, so
+that "no admissions" is a measurement rather than the absence of a line. -/
+def admissible : List Name :=
+  [``sorryAx]
 
 /-- Lean's own generated equation and match lemmas: `f.eq_def`, `f.eq_1`,
 `f.match_1`, `f.proof_2`.  The suffix is `eq_` or `match_` or `proof_` followed
@@ -89,12 +131,29 @@ def userWritten (env : Environment) (n : Name) : Bool :=
                         "mk.sizeOf_spec", "ext", "ext_iff"].contains f)
       | _ => false)
 
+/-- Classify one declaration's axiom closure.
+
+`none` means clean.  `some (false, bad)` is an ADMISSION: everything outside the
+foundations is admissible, i.e. the closure's only extra entry is `sorryAx`.
+`some (true, bad)` is an OFFENCE and fails the run.
+
+A declaration that depends on BOTH `sorryAx` and a custom axiom is an offence,
+not an admission -- otherwise adding one `sorry` anywhere in a proof would buy
+silence for every axiom it also happens to rest on. -/
+def classify (allowed admissible : List Name) (ax : Array Name) :
+    Option (Bool × Array Name) :=
+  let bad := ax.filter fun a => !(allowed.contains a)
+  if bad.isEmpty then none
+  else some (bad.any fun a => !(admissible.contains a), bad)
+
 end AxiomScan
 
 run_cmd do
   let env ← getEnv
   let allowed := AxiomScan.allowed
+  let admissible := AxiomScan.admissible
   let mut offenders : Array (Name × Name × Array Name) := #[]
+  let mut admissions : Array (Name × Name × Array Name) := #[]
   let mut scanned := 0
   for (name, ci) in env.constants.toList do
     unless (`Calibrator).isPrefixOf name do continue
@@ -106,21 +165,36 @@ run_cmd do
     | .axiomInfo _ =>
       scanned := scanned + 1
       let ax ← Lean.collectAxioms name
-      let bad := ax.filter fun a => !(allowed.contains a)
-      if !bad.isEmpty then
+      match AxiomScan.classify allowed admissible ax with
+      | none => pure ()
+      | some (hard, bad) =>
         let m := (env.getModuleFor? name).getD `«unknown»
-        offenders := offenders.push (m, name, bad)
+        if hard then offenders := offenders.push (m, name, bad)
+        else admissions := admissions.push (m, name, bad)
     | .thmInfo _ | .defnInfo _ | .opaqueInfo _ =>
       unless AxiomScan.userWritten env name do continue
       scanned := scanned + 1
       let ax ← Lean.collectAxioms name
-      let bad := ax.filter fun a => !(allowed.contains a)
-      if !bad.isEmpty then
+      match AxiomScan.classify allowed admissible ax with
+      | none => pure ()
+      | some (hard, bad) =>
         let m := (env.getModuleFor? name).getD `«unknown»
-        offenders := offenders.push (m, name, bad)
+        if hard then offenders := offenders.push (m, name, bad)
+        else admissions := admissions.push (m, name, bad)
     | _ => pure ()
+  -- `logError` is what makes the run exit nonzero, so it marks offences only.
   for (m, name, bad) in offenders do
     logError m!"AXIOM\t{m}\t{name}\t{bad.toList}"
+  -- Admissions are printed one per declaration, at the same volume and in the
+  -- same format.  The transitive closure means this list names every consumer
+  -- as well as the admitted declaration itself, which is the intended reading:
+  -- it is the blast radius of the debt, not a single site.
+  for (m, name, bad) in admissions do
+    logInfo m!"ADMISSION\t{m}\t{name}\t{bad.toList}"
   logInfo m!"AXIOM_SCAN_SCANNED\t{scanned}"
   logInfo m!"AXIOM_SCAN_OFFENDERS\t{offenders.size}"
+  -- Printed even at zero: a missing line reads as "not measured", and the whole
+  -- reason admissions are permitted is that they are counted in the open.
+  logInfo m!"ADMISSION_SCAN_COUNT\t{admissions.size}"
   logInfo m!"AXIOM_SCAN_ALLOWED\t{allowed}"
+  logInfo m!"AXIOM_SCAN_ADMISSIBLE\t{admissible}"
