@@ -320,6 +320,26 @@ theorem covarianceTangentEstimatorVariance_kurtosis_eq_gaussian_factor
   unfold covarianceTangentEstimatorVarianceFromMoments centeredSquareVarianceFromMoments
   ring
 
+/-- **Joint rarity/tagging design law.** If a coordinate has fourth-moment ratio `κ` and
+tagging, assay, or support attenuates its covariance response linearly by `η`, then its
+known-mean covariance-tangent estimator variance is
+
+`(κ-1)/(2η²)`
+
+times the Gaussian, unattenuated variance. Heavy genotype tails and incomplete tagging
+therefore multiply rather than add. -/
+theorem covarianceTangentEstimatorVariance_kurtosis_attenuation
+    (m covariance covarianceDerivative kurtosis η : ℝ)
+    (hm : m ≠ 0) (hderivative : covarianceDerivative ≠ 0) (hη : η ≠ 0) :
+    covarianceTangentEstimatorVarianceFromMoments m (η * covarianceDerivative)
+        covariance (kurtosis * covariance ^ 2) =
+      ((kurtosis - 1) / (2 * η ^ 2)) *
+        gaussianCovarianceTangentEstimatorVariance m covariance covarianceDerivative := by
+  rw [gaussianCovarianceTangentEstimatorVariance_eq]
+  unfold covarianceTangentEstimatorVarianceFromMoments centeredSquareVarianceFromMoments
+  field_simp [hm, hderivative, hη]
+  ring
+
 /-- The named Gaussian tangent-estimator variance is positive for a positive replicate
 budget, positive covariance, and a nonzero covariance response. -/
 theorem gaussianCovarianceTangentEstimatorVariance_pos
