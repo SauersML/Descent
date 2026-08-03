@@ -710,12 +710,30 @@ section BottleneckLDExcess
     proves the closed form that results, and it saturates at the *gap between
     two equilibria* rather than at `1`.
 
-    Empirical status: UNTESTED.  The falsification that removed its predecessor
-    (up to 3.3-fold overstatement, from the missing `c`) does not apply to this
-    body, because `c` is present and the process demonstrably saturates
-    (`driftLDEquilibrium_le_one`); but no simulation has been run against this
-    two-phase construction, and the amplitude it predicts is a prediction, not a
-    measurement. -/
+    **The UNTESTED marker was STALE and there is a LIVE DISAGREEMENT.** A simulation against
+    this body already exists — `validation/differential/cluster/fam_ld_decay.py` section C,
+    measuring two-locus Wright–Fisher `σ_d²` — and it does **not** agree:
+
+    | `ρ` | `t_b` | measured amplification | this body |
+    |---|---|---|---|
+    | 2 | 25 | 2.66 | 5.16 |
+    | 10 | 25 | 11.70 | 7.81 |
+    | 10 | 100 | 3.68 | 8.25 |
+
+    The disagreement runs in **both** directions, so it is not a single missing factor, and
+    the run's null arm passes, so it is not an engine artefact. `bottleneckExcessLD`
+    (`DemographicHistory`) is proved equal to this at `t_r = 0` and inherits the finding.
+
+    What is *not* established is which side is wrong: the measurement targets `σ_d²` while
+    this body is a `D`-scale trajectory, and nobody has checked that the two are the same
+    observable. That check is the next step and it has not been done.
+
+    The falsification that removed this definition's predecessor (up to 3.3-fold
+    overstatement, from the missing `c`) does not apply here, because `c` is present and the
+    process demonstrably saturates (`driftLDEquilibrium_le_one`).
+
+    Empirical status: **DISAGREES WITH AN EXISTING MEASUREMENT**, direction unresolved
+    (`validation/differential/cluster/fam_ld_decay.py`, `proofs/validation/coalescent_diff/`). -/
 noncomputable def excessLDAfterBottleneck (N_b N_r c : ℝ) (t_b t_r : ℕ) : ℝ :=
   driftLDTrajectory N_r c
       (driftLDTrajectory N_b c (driftLDEquilibrium N_r c) t_b) t_r -

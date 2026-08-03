@@ -233,6 +233,32 @@ noncomputable def steppingStoneDiffusionTimescale (d σ_sq m : ℝ) : ℝ :=
 noncomputable def steppingStoneMeetingTimeOnLattice (d D σ_sq m : ℝ) : ℝ :=
   d * (D - d) / (2 * σ_sq * m)
 
+/-- **The guard this definition was missing.**
+
+    A meeting time is nonnegative on the admissible range `0 ≤ d ≤ D`. Its siblings carry a
+    positivity fact; this one did not, and the omission had teeth: the `d`/`D` arguments differ
+    only in case, and a swap **always flips the sign** when `d < D`, so it returns a *negative
+    expected time*. In exact rationals at `D = 256`: `d = 1` gives `1275` correct against
+    `-326400` swapped, `d = 8` gives `9920` against `-317440`, `d = 128` gives `81920` against
+    `-163840`. Nothing in the corpus caught that, because nothing asserted the sign.
+
+    Verified numerically at `D = 64`: measured over predicted is `1.026, 1.027, 1.006, 1.004`
+    at `d = 4, 8, 16, 32`.
+
+    **A worse collision remains, and no theorem can guard it.** `σ_sq` and `m` enter only
+    through the product `2·σ_sq·m`, so a `σ_sq ↔ m` swap is *exactly invisible* — no test,
+    simulation or theorem can detect it — and the three siblings in this file order them
+    inconsistently: `demoSteppingStoneFst (d Ne m σ_sq)`, `steppingStoneDiffusionTimescale
+    (d σ_sq m)`, and this one `(d D σ_sq m)`. `demoSteppingStoneFst` is symmetric in the two
+    as well. That hazard is documentation-only by construction. -/
+theorem steppingStoneMeetingTimeOnLattice_nonneg (d D σ_sq m : ℝ)
+    (hd : 0 ≤ d) (hdD : d ≤ D) (hσ : 0 < σ_sq) (hm : 0 < m) :
+    0 ≤ steppingStoneMeetingTimeOnLattice d D σ_sq m := by
+  unfold steppingStoneMeetingTimeOnLattice
+  have hden : 0 < 2 * σ_sq * m := by positivity
+  apply div_nonneg _ (le_of_lt hden)
+  exact mul_nonneg hd (by linarith)
+
 /-- **The exact factor between the two**, which is `(D - d)` and nothing else.
     Proving it as an equation is what stops the per-deme convention from being
     reintroduced silently: any future body for either one that does not differ
