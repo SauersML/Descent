@@ -405,6 +405,7 @@ theorem not_atomFeasible_of_grade_lt_two {K : ℕ} (hK : K < 2) (h : ℝ)
   intro hfeas
   have hP := P.atomCount_pos
   have hQ := Q.atomCount_pos
+  have hsum := hfeas.1
   omega
 
 /-- Grade two contains every ordinary point-versus-point certificate. -/
@@ -702,7 +703,7 @@ theorem constantObservationExperiment_not_separatesAtRadius
     ¬ (constantObservationExperiment target moment law).SeparatedBy h := by
   intro hsep
   have h01 : (0 : Fin (parameterCount + 2)) ≠ 1 := by
-    simp [Fin.ext_iff]
+    simp
   have hle := hsep 0 1 h01
   rw [constantObservationExperiment_totalVariation] at hle
   linarith

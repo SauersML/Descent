@@ -3,6 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Calibrator.Condensation
 import Calibrator.ObservationalCeiling
+import Calibrator.VarianceComponents
 import Mathlib.Data.Real.Sqrt
 import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 import Mathlib.Tactic.Linarith
@@ -254,19 +255,20 @@ theorem abs_sum_mul_mul_le
     _ ≤ M * (Real.sqrt (∑ i ∈ s, a i ^ 2) * Real.sqrt (∑ i ∈ s, b i ^ 2)) :=
         mul_le_mul_of_nonneg_left step3 hM0
 
-/-- **Theorem 3 (diagonal contraction bound).** For a diagonal cumulant tensor with
-common diagonal entry `kappa`, the `r`-th order normalized contraction against
-unit-`L2` test vectors `a`, `b` and `r - 2` further vectors each bounded by
-`sqrt tau` in the sup norm satisfies
+/-- A scalar multiple of a weighted inner product is bounded by the scalar times the weight
+bound, when the two vectors have `L2` norm at most one.
 
-`|contraction| ≤ |kappa| * M`,
+**This is Cauchy-Schwarz and a sup bound, and that is all it is.** There is no tensor here,
+no cumulant, no order `r`, and no independence hypothesis. The reading under which it is a
+diagonal contraction bound needs one further step -- that an i.i.d. coordinate law makes the
+cumulant tensor supported on the diagonal, so that an `r`-th order contraction collapses to
+this single sum -- and THAT STEP IS NOT PROVED ANYWHERE IN THIS CORPUS. It is the reason the
+name says `weighted_inner` rather than `contraction`.
 
-where `M` bounds the product of the remaining factors, i.e. `M = tau ^ ((r-2)/2)`.
-
-Since `tau → 0` under the problem's low-influence hypothesis, every fixed-order
-normalized contraction vanishes — for **every** i.i.d. coordinate law, including
-those which fail universality. -/
-theorem diagonal_contraction_bound
+What the reading buys, if the missing step is supplied elsewhere: with `M = tau ^ ((r-2)/2)`
+and `tau -> 0` under low influence, every fixed-order normalized contraction vanishes, for
+every i.i.d. coordinate law including those failing universality. -/
+theorem abs_smul_weighted_inner_le
     (s : Finset ι) (κ : ℝ) (a b w : ι → ℝ) (M : ℝ) (hM0 : 0 ≤ M)
     (hM : ∀ i ∈ s, |w i| ≤ M)
     (ha : ∑ i ∈ s, a i ^ 2 ≤ 1) (hb : ∑ i ∈ s, b i ^ 2 ≤ 1) :
@@ -414,7 +416,7 @@ contraction bound of Section 2 tends to zero.
 
 The conclusion runs the opposite way from how such a diagnostic is normally read. A
 vanishing contraction is not evidence that the score's law is Gaussian: the bound is
-driven to zero by polygenicity alone, and `diagonal_contraction_bound` holds for every
+driven to zero by polygenicity alone, and `abs_smul_weighted_inner_le` holds for every
 coordinate law, including the ones that fail universality. So the diagnostic reports the
 same vanishing value whether or not the score is asymptotically Gaussian, and therefore
 cannot certify the score-distribution assumption it is usually invoked to certify. -/
@@ -431,6 +433,59 @@ theorem pgs_contraction_bound_tendsto_zero {k : ℕ} (hk : 1 ≤ k) (κ c d : �
     continuous_const.mul (Real.continuous_sqrt.pow k)
   have := (hcont.tendsto 0).comp hzero
   simpa [Function.comp, Real.sqrt_zero, zero_pow hk0] using this
+
+/-! ### Wiring to the corpus's additive-variance model
+
+The section above is stated for an arbitrary per-locus variance `h`.  This ties it to
+`Calibrator.additiveVariance`, the corpus's own linkage-equilibrium additive variance
+`∑ᵢ 2 pᵢ (1 - pᵢ) αᵢ²`, so the influence bound is a statement about allele frequencies
+and effect sizes rather than about an abstract weight vector.
+
+`additiveVariance` carries its own empirical status -- VALIDATED at linkage
+equilibrium, and FALSIFIED read unconditionally, because it drops the LD cross term.
+That status transfers to everything below: these are statements about a score at
+linkage equilibrium, and the influence shares are not the true shares when `D ≠ 0`. -/
+
+/-- The abstract score variance at Hardy--Weinberg genotype variances IS the corpus's
+`additiveVariance`. -/
+theorem scoreVariance_eq_additiveVariance {m : ℕ} (p α : Fin m → ℝ) :
+    scoreVariance α (fun j ↦ 2 * p j * (1 - p j)) = additiveVariance p α := by
+  unfold scoreVariance locusVarianceShare additiveVariance
+  exact Finset.sum_congr rfl fun j _ ↦ by ring
+
+/-- A locus's influence, written in allele frequency and effect size against the
+corpus's additive variance. -/
+theorem locusInfluence_eq_hwe_share {m : ℕ} (p α : Fin m → ℝ) (j : Fin m) :
+    locusInfluence α (fun i ↦ 2 * p i * (1 - p i)) j =
+      2 * p j * (1 - p j) * α j ^ 2 / additiveVariance p α := by
+  unfold locusInfluence locusVarianceShare
+  rw [scoreVariance_eq_additiveVariance]
+  ring_nf
+
+/-- **The low-influence hypothesis, at a Hardy--Weinberg panel.**
+
+If every locus contributes between `d > 0` and `c` to the additive variance, no locus
+influence exceeds `c / (m · d)`.  Composed with `pgs_contraction_bound_tendsto_zero`
+this is Section 2's conclusion stated entirely in genetic quantities: allele
+frequencies, effect sizes, and the number of loci.
+
+Interior frequencies are what make `d > 0` available -- a monomorphic locus
+contributes exactly zero and would break the lower bound, which is the same
+polymorphism condition the rest of the corpus carries. -/
+theorem hwe_locusInfluence_le
+    {m : ℕ} (p α : Fin m → ℝ) (c d : ℝ) (hd : 0 < d) (hm : 0 < m)
+    (hupper : ∀ j, 2 * p j * (1 - p j) * α j ^ 2 ≤ c)
+    (hlower : ∀ j, d ≤ 2 * p j * (1 - p j) * α j ^ 2) (j : Fin m) :
+    locusInfluence α (fun i ↦ 2 * p i * (1 - p i)) j ≤ c / (m * d) := by
+  refine locusInfluence_le_of_shares_bounded α (fun i ↦ 2 * p i * (1 - p i)) c d hd hm
+    (fun i ↦ ?_) (fun i ↦ ?_) j
+  · unfold locusVarianceShare
+    calc α i ^ 2 * (2 * p i * (1 - p i))
+        = 2 * p i * (1 - p i) * α i ^ 2 := by ring
+      _ ≤ c := hupper i
+  · unfold locusVarianceShare
+    calc d ≤ 2 * p i * (1 - p i) * α i ^ 2 := hlower i
+      _ = α i ^ 2 * (2 * p i * (1 - p i)) := by ring
 
 end PolygenicScoreInfluence
 

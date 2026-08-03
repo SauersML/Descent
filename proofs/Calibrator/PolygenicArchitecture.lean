@@ -702,7 +702,6 @@ theorem momentConstraint_deficit_eq_modulusRatio_sq {q n : ℕ}
         P.momentConstraintCalculus.modulus.Δ K h) ^ 2 :=
   deficit_eq_modulus_ratio_sq P.momentConstraintCalculus K h
 
-/-- Modulus ratio for the biological mean-absolute-effect experiment. -/
 /-- Method-complexity gap for mean-absolute-effect lower bounds.  The numerator
 allows arbitrary finite mixing priors on the architecture catalogue; the
 denominator allows at most `K` atoms across the two priors. -/
