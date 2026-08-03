@@ -169,6 +169,42 @@ theorem mixtureDualRisk_le_minimaxRisk : E.mixtureDualRisk ≤ E.minimaxRisk := 
   rcases hworst with ⟨δ, rfl⟩
   exact E.optimalBayesRisk_le_worstRisk π δ
 
+/-- Every risk is bounded below by the smallest loss value, uniformly in the rule.
+
+    Risk is a double average of loss values against probability vectors, so it cannot fall
+    below their minimum. This is what makes the infima below genuine rather than formal:
+    the rule space is a continuum, and without a floor `sInf` would carry no information. -/
+theorem exists_risk_lower_bound :
+    ∃ m : ℝ, ∀ (δ : Rule actionCount observationCount) (θ : Fin (parameterCount + 1)),
+      m ≤ E.risk δ θ := by
+  obtain ⟨q, -, hq⟩ :=
+    (Finset.univ : Finset (Fin (parameterCount + 1) × Fin (actionCount + 1))).exists_min_image
+      (fun q ↦ E.loss q.1 q.2) ⟨(0, 0), Finset.mem_univ _⟩
+  refine ⟨E.loss q.1 q.2, fun δ θ ↦ ?_⟩
+  have hinner : ∀ x : Fin (observationCount + 1),
+      E.loss q.1 q.2 ≤ ∑ a, FinitePrior.probability (δ x) a * E.loss θ a := by
+    intro x
+    have hmass : ∑ a, FinitePrior.probability (δ x) a = 1 :=
+      (finitePrior_probability_mem (δ x)).2
+    calc E.loss q.1 q.2
+        = ∑ a, FinitePrior.probability (δ x) a * E.loss q.1 q.2 := by
+          rw [← Finset.sum_mul, hmass, one_mul]
+      _ ≤ ∑ a, FinitePrior.probability (δ x) a * E.loss θ a :=
+          Finset.sum_le_sum fun a _ ↦
+            mul_le_mul_of_nonneg_left (hq (θ, a) (Finset.mem_univ _))
+              (FinitePrior.probability_nonneg (δ x) a)
+  have hmassObs : ∑ x, FinitePrior.probability (E.observation θ) x = 1 :=
+    (finitePrior_probability_mem (E.observation θ)).2
+  calc E.loss q.1 q.2
+      = ∑ x, FinitePrior.probability (E.observation θ) x * E.loss q.1 q.2 := by
+        rw [← Finset.sum_mul, hmassObs, one_mul]
+    _ ≤ ∑ x, FinitePrior.probability (E.observation θ) x *
+          ∑ a, FinitePrior.probability (δ x) a * E.loss θ a :=
+        Finset.sum_le_sum fun x _ ↦
+          mul_le_mul_of_nonneg_left (hinner x)
+            (FinitePrior.probability_nonneg (E.observation θ) x)
+    _ = E.risk δ θ := rfl
+
 /-- **Finite minimax duality.**  Ungraded mixture-versus-mixture reasoning is
 complete because the primal minimax value equals the optimization over all
 Bayes priors.  This is the real theorem, not a definitional equality and not a
