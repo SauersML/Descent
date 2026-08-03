@@ -323,9 +323,9 @@ in this file, and neither is asserted. -/
 theorem inverseSquare_linearises_probit_flow
     (a : ℝ → ℝ) (lam t : ℝ) (hne : a t ≠ 0)
     (hderiv : HasDerivAt a (-(lam * a t) - a t ^ 3 / 2) t) :
-    HasDerivAt (fun s => ((a s) ^ 2)⁻¹) (2 * lam * ((a t) ^ 2)⁻¹ + 1) t := by
+    HasDerivAt (fun s ↦ ((a s) ^ 2)⁻¹) (2 * lam * ((a t) ^ 2)⁻¹ + 1) t := by
   have hsqne : (a t) ^ 2 ≠ 0 := pow_ne_zero 2 hne
-  have hsq : HasDerivAt (fun s => (a s) ^ 2)
+  have hsq : HasDerivAt (fun s ↦ (a s) ^ 2)
       (2 * a t ^ 1 * (-(lam * a t) - a t ^ 3 / 2)) t := hderiv.pow 2
   have hinv := hsq.inv hsqne
   have hval : -(2 * a t ^ 1 * (-(lam * a t) - a t ^ 3 / 2)) / ((a t) ^ 2) ^ 2
