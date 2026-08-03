@@ -520,7 +520,7 @@ end FiberCoupling
 namespace FiniteCoupledPhaseLaw
 
 /-- Forget phases while retaining the coupling whose support controls coverage. -/
-def toFiberCoupling (C : FiniteCoupledPhaseLaw n d) : FiberCoupling n d where
+def toFiberCoupling {n d : ℕ} (C : FiniteCoupledPhaseLaw n d) : FiberCoupling n d where
   mass := C.mass
 
 /-- Both binary witnesses charge every genotype cell. -/
