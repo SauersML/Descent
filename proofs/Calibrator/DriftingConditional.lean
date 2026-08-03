@@ -562,7 +562,72 @@ open MeasureTheory ProbabilityTheory in
 theorem gaussianAverage_eq_cdf_sum (α β : ℝ) :
     ∫ z, Phi (α + β * z) ∂(gaussianReal 0 1)
       = cdf (gaussianReal 0 ⟨1 + β ^ 2, by positivity⟩) α := by
-  sorry
+  set γ : Measure ℝ := gaussianReal 0 1 with hγdef
+  set S : Set (ℝ × ℝ) := {p : ℝ × ℝ | p.2 - β * p.1 ≤ α} with hSdef
+  have hdiff : Measurable (fun p : ℝ × ℝ => p.2 - β * p.1) := by fun_prop
+  have hSmeas : MeasurableSet S := hdiff measurableSet_Iic
+  -- Slicing the product measure is exactly the average of the cdf.
+  have hslice : (γ.prod γ) S = ∫⁻ z, γ (Set.Iic (α + β * z)) ∂γ := by
+    rw [Measure.prod_apply hSmeas]
+    refine lintegral_congr fun z => ?_
+    congr 1
+    ext w
+    simp only [hSdef, Set.mem_preimage, Set.mem_setOf_eq, Set.mem_Iic]
+    constructor
+    · intro h; linarith
+    · intro h; linarith
+  have hPhi : ∀ t : ℝ, Phi t = (γ (Set.Iic t)).toReal := by
+    intro t
+    show cdf (gaussianReal 0 1) t = _
+    rw [cdf_eq_real, measureReal_def]
+  have hmono : Monotone (fun t : ℝ => γ (Set.Iic t)) := fun a b hab =>
+    measure_mono (Set.Iic_subset_Iic.mpr hab)
+  have hlhs : ∫ z, Phi (α + β * z) ∂γ
+      = (∫⁻ z, γ (Set.Iic (α + β * z)) ∂γ).toReal := by
+    have hfun : (fun z => Phi (α + β * z))
+        = fun z => (γ (Set.Iic (α + β * z))).toReal := funext fun z => hPhi _
+    rw [hfun]
+    refine integral_toReal ?_ ?_
+    · exact (hmono.measurable.comp (by fun_prop)).aemeasurable
+    · filter_upwards with z
+      exact measure_lt_top _ _
+  -- The difference of the two coordinates is centred Gaussian with variance `1 + β²`.
+  have hX : (γ.prod γ).map (fun p : ℝ × ℝ => p.2) = gaussianReal 0 1 := by
+    have := Measure.snd_prod (μ := γ) (ν := γ)
+    simpa [Measure.snd, hγdef] using this
+  have hfst : (γ.prod γ).map (fun p : ℝ × ℝ => p.1) = gaussianReal 0 1 := by
+    have := Measure.fst_prod (μ := γ) (ν := γ)
+    simpa [Measure.fst, hγdef] using this
+  have hY : (γ.prod γ).map (fun p : ℝ × ℝ => -β * p.1)
+      = gaussianReal 0 ⟨β ^ 2, sq_nonneg β⟩ := by
+    have hcomp : (fun p : ℝ × ℝ => -β * p.1) = (fun y : ℝ => -β * y) ∘ (fun p : ℝ × ℝ => p.1) :=
+      rfl
+    rw [hcomp, ← Measure.map_map (by fun_prop) (by fun_prop), hfst]
+    have h := gaussianReal_map_const_mul (μ := (0 : ℝ)) (v := (1 : NNReal)) (-β)
+    have hv : (⟨(-β) ^ 2, sq_nonneg _⟩ : NNReal) * 1 = ⟨β ^ 2, sq_nonneg β⟩ := by
+      ext; simp
+    rw [mul_zero, hv] at h
+    exact h
+  have hindep : IndepFun (fun p : ℝ × ℝ => p.2) (fun p : ℝ × ℝ => -β * p.1) (γ.prod γ) := by
+    have h := ProbabilityTheory.indepFun_prod₀ (μ := γ) (ν := γ)
+      (X := fun y : ℝ => -β * y) (Y := fun y : ℝ => y)
+      (by fun_prop) (by fun_prop)
+    exact h.symm
+  have hsum := gaussianReal_add_gaussianReal_of_indepFun hindep hX hY
+  have hfunsum : ((fun p : ℝ × ℝ => p.2) + fun p : ℝ × ℝ => -β * p.1)
+      = fun p : ℝ × ℝ => p.2 - β * p.1 := by
+    funext p
+    simp [sub_eq_add_neg]
+  rw [hfunsum] at hsum
+  have hvar : (0 : ℝ) + 0 = 0 := by norm_num
+  have hnn : (1 : NNReal) + ⟨β ^ 2, sq_nonneg β⟩ = ⟨1 + β ^ 2, by positivity⟩ := by
+    ext; simp
+  rw [hvar, hnn] at hsum
+  -- Put the two readings of the same probability together.
+  have hSpre : S = (fun p : ℝ × ℝ => p.2 - β * p.1) ⁻¹' Set.Iic α := rfl
+  have hRHS : (γ.prod γ) S = gaussianReal 0 ⟨1 + β ^ 2, by positivity⟩ (Set.Iic α) := by
+    rw [hSpre, ← Measure.map_apply hdiff measurableSet_Iic, hsum]
+  rw [hlhs, ← hslice, hRHS, cdf_eq_real, measureReal_def]
 
 open MeasureTheory ProbabilityTheory in
 /-- **The Gaussian averaging identity**, `E[Φ(α + βZ)] = Φ(α / √(1 + β²))`.
