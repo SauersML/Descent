@@ -676,6 +676,18 @@ section LocalAncestryHaplotypes
 noncomputable def ancestrySpecificEffect (beta_pop1 beta_pop2 alpha : ℝ) : ℝ :=
   alpha * beta_pop1 + (1 - alpha) * beta_pop2
 
+/-- **The ancestry-averaged effect is a convex combination: it interpolates and it reverses under
+relabelling.** At the two pure ancestries it returns the corresponding effect, and swapping the
+two populations together with the ancestry fraction leaves it unchanged. A body that was not
+affine in the fraction would fail the endpoints. -/
+theorem ancestrySpecificEffect_endpoints (b₁ b₂ : ℝ) :
+    ancestrySpecificEffect b₁ b₂ 1 = b₁ ∧ ancestrySpecificEffect b₁ b₂ 0 = b₂ := by
+  constructor <;> unfold ancestrySpecificEffect <;> ring
+
+theorem ancestrySpecificEffect_relabel (b₁ b₂ alpha : ℝ) :
+    ancestrySpecificEffect b₂ b₁ (1 - alpha) = ancestrySpecificEffect b₁ b₂ alpha := by
+  unfold ancestrySpecificEffect; ring
+
 /-- Ancestry-specific effect is a weighted average. -/
 theorem ancestry_effect_between_pops (beta₁ beta₂ alpha : ℝ)
     (h_alpha : 0 ≤ alpha) (h_alpha_le : alpha ≤ 1)

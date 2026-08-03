@@ -533,6 +533,20 @@ theorem two_mul_mul_one_sub_lt_of_lt
 noncomputable def expectedEffectMultiplier (p α : ℝ) : ℝ :=
   (p * (1 - p)) ^ (1 + α)
 
+/-- **The multiplier is symmetric about even frequency and neutral at `α = -1`.** It depends on
+the allele only through the heterozygosity `p(1-p)`, so relabelling which allele is counted
+cannot change it, and the exponent `1 + α` is zero exactly at the selection parameter where
+frequency drops out entirely. -/
+theorem expectedEffectMultiplier_symm (p α : ℝ) :
+    expectedEffectMultiplier (1 - p) α = expectedEffectMultiplier p α := by
+  unfold expectedEffectMultiplier
+  rw [show (1 - p) * (1 - (1 - p)) = p * (1 - p) by ring]
+
+theorem expectedEffectMultiplier_neutral_exponent (p : ℝ) (hp : 0 < p * (1 - p)) :
+    expectedEffectMultiplier p (-1) = 1 := by
+  unfold expectedEffectMultiplier
+  rw [show (1 : ℝ) + -1 = 0 by ring, Real.rpow_zero]
+
 theorem alpha_model_portability_impact
     (p_rare p_common α : ℝ)
     (h_rare_pos : 0 < p_rare)

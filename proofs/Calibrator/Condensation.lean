@@ -203,6 +203,22 @@ above it, the variance is carried by values too large ever to be witnessed among
 samples and the observed sum is empty. -/
 noncomputable def criticalDegree (N c : ℝ) : ℝ := Real.log N / c
 
+/-- **The critical degree scales logarithmically in the panel and inversely in the coupling.**
+Squaring the panel size doubles the critical degree at fixed coupling, and halving the coupling
+doubles it at fixed panel: the two enter at different orders, which is the content a body
+multiplying them symmetrically would lose. -/
+theorem criticalDegree_square (N c : ℝ) (hN : 0 < N) :
+    criticalDegree (N ^ 2) c = 2 * criticalDegree N c := by
+  unfold criticalDegree
+  rw [Real.log_pow]
+  push_cast
+  ring
+
+theorem criticalDegree_halve_coupling (N c : ℝ) (hc : c ≠ 0) :
+    criticalDegree N (c / 2) = 2 * criticalDegree N c := by
+  unfold criticalDegree
+  field_simp
+
 /-- Subcriticality is exactly `c * m < log N`. -/
 theorem subcritical_iff {N c m : ℝ} (hc : 0 < c) :
     m < criticalDegree N c ↔ c * m < Real.log N := by
