@@ -149,7 +149,7 @@ theorem gene_level_share_gt_single_share
     earlier docstring described as the object of interest never appears, here or
     anywhere else in the corpus. What is proved is that multiplying a positive
     number by something larger than one increases it. -/
-theorem sq_lt_nsmul_sq_of_two_le
+theorem sq_lt_cast_mul_sq_of_two_le
     (β : ℝ) (k : ℕ)
     (h_β : β ≠ 0)
     (h_k : 2 ≤ k) :
