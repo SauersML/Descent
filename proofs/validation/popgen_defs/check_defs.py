@@ -9,6 +9,31 @@ refers to.
 
 Ground truth is msprime for coalescent quantities and an exact vectorized
 Wright-Fisher forward simulation for the two-locus LD quantities.
+
+HOW TO RUN IT.  There is exactly one interpreter on this cluster that works:
+
+    /projects/standard/hsiehph/sauer354/popgen_venv/bin/python check_defs.py all out.json
+    /projects/standard/hsiehph/sauer354/popgen_venv/bin/python report.py out.json
+
+Built with `/usr/bin/python3.12 -m venv`, then `pip install numpy msprime`
+(numpy 2.5.1, msprime 1.4.2).  It lives on /projects/standard, not in a
+RAM-backed directory, so it survives.  The three obvious alternatives are all
+dead ends, and this note exists so the next person does not rediscover them:
+
+    /usr/bin/python3.12                      has no numpy
+    system python3                           numpy 1.19.5, but Python 3.6.8
+    module load python3/3.10.9_anaconda...   numpy 1.23.5, but the install is
+                                             broken: `ImportError: numpy._core
+                                             .multiarray failed to import`
+
+THE DESIGN PROPERTY THAT MATTERS.  Each check simulates THE QUANTITY THE NAME
+ASSERTS, never the quantity the body computes.  A check written from the body
+agrees with the body by construction and passes green no matter what the name
+claims -- which is precisely how a name is able to drift away from its formula
+without anything noticing.  `founderFst` is the specimen: a check comparing it
+against simulated heterozygosity loss agrees with it perfectly, while the name
+says F_ST and the measurable F_ST is a different number entirely.  So
+`check_founder_fst` below compares it against BOTH and reports both directions.
 """
 from __future__ import annotations
 
@@ -66,9 +91,88 @@ def lean_ldAfterGenerations(D0, r, Ne, t):
     return D0 * lean_ldRetentionPerGen(r, Ne) ** t
 
 
-def lean_ldHalfLife(Ne):
-    """LDDecayTheory.lean:423  `2 * Ne * Real.log 2`"""
-    return 2 * Ne * np.log(2)
+def lean_ldHalfLife(r, Ne):
+    """LDDecayTheory.lean:906  `Real.log 2 / (-Real.log (ldRetentionPerGen r Ne))`
+
+    WAS TRANSCRIBED AS `2 * Ne * Real.log 2`, taking one argument.  That is the
+    drift-only half-life; the corpus now divides by the log of the FULL
+    per-generation retention, which includes recombination, and takes `r` as
+    well.  The transcription was never exercised by a check, so the arity change
+    did not even raise -- it simply sat here being wrong.  That is the failure
+    mode a transcription registry is meant to end; see TRANSCRIBED_FROM.
+    """
+    return np.log(2) / (-np.log(lean_ldRetentionPerGen(r, Ne)))
+
+
+def lean_neiGstFromFrequencies(p1, p2):
+    """PopulationGeneticsFoundations.lean:87
+    `let p_bar := (p1 + p2) / 2; (p1 - p2)^2 / (4 * p_bar * (1 - p_bar))`"""
+    pbar = (p1 + p2) / 2
+    return (p1 - p2) ** 2 / (4 * pbar * (1 - pbar))
+
+
+def lean_hudsonFst(p1, p2):
+    """Conventions.lean:246
+    `(p1 - p2)^2 / (p1 * (1 - p2) + p2 * (1 - p1))`"""
+    return (p1 - p2) ** 2 / (p1 * (1 - p2) + p2 * (1 - p1))
+
+
+def lean_founderFst(k, t):
+    """DemographicHistory.lean:598  `1 - (1 - 1 / (2 * k)) ^ t`
+
+    THE NAME SAYS F_ST.  This formula is the accumulated inbreeding / expected
+    heterozygosity loss inside ONE population of size k after t generations.
+    `check_founder_fst` simulates both quantities and reports both distances.
+    """
+    return 1 - (1 - 1 / (2 * k)) ** t
+
+
+def lean_expectedHeterozygosity(theta):
+    """PopulationGeneticsFoundations.lean:127  `theta / (1 + theta)`"""
+    return theta / (1 + theta)
+
+
+# Every hand transcription above, paired with the fully-qualified Lean name it
+# claims to transcribe.  `verify_transcriptions.py` reads this and compares each
+# one against the body the extractor pulled out of the Lean, so a transcription
+# that goes stale -- or names a definition that has been renamed out of the
+# corpus -- is caught mechanically instead of quietly comparing simulation
+# against a formula the development no longer contains.
+TRANSCRIBED_FROM = {
+    "lean_coalFst": "Calibrator.coalFst",
+    "lean_admixedFst": "Calibrator.admixedFst",
+    "lean_ldRetentionPerGen": "Calibrator.ldRetentionPerGen",
+    "lean_ldAfterGenerations": "Calibrator.ldAfterGenerations",
+    "lean_ldHalfLife": "Calibrator.ldHalfLife",
+    "lean_neiGstFromFrequencies": "Calibrator.neiGstFromFrequencies",
+    "lean_hudsonFst": "Calibrator.hudsonFst",
+    "lean_founderFst": "Calibrator.founderFst",
+    "lean_expectedHeterozygosity": "Calibrator.expectedHeterozygosity",
+}
+
+# Transcriptions that named a definition the corpus NO LONGER CONTAINS.  They
+# are recorded rather than deleted: each one is a check that silently stopped
+# testing anything, and the list is the evidence for why TRANSCRIBED_FROM has to
+# be verified rather than trusted.
+RETIRED_TRANSCRIPTIONS = {
+    "lean_fstFromDrift": "Calibrator.fstFromDrift -- ABSENT from the corpus",
+    "lean_islandModelFst": "Calibrator.islandModelFst -- ABSENT from the corpus",
+    "lean_singletonProportion": "Calibrator.singletonProportion -- ABSENT",
+}
+
+# Definitions the coordinator asked for that have NO check here yet, recorded
+# explicitly so the comparison set cannot shrink silently again.
+GAPS = {
+    "Calibrator.steppingStoneFst": "min 1 (fst_neighbor * (1 + alpha*(d-1))) -- a "
+        "phenomenological interpolation, not a coalescent quantity; needs a "
+        "stepping-stone lattice simulation to have any ground truth at all",
+    "Calibrator.ohtaKimuraSigmaDSq": "needs two-locus sigma_d^2 under drift-"
+        "recombination equilibrium; the WF engine below tracks E[D] and E[D^2] "
+        "but not the ratio E[D^2]/E[p(1-p)q(1-q)]",
+    "Calibrator.driftLDEquilibrium": "same engine gap as ohtaKimuraSigmaDSq",
+    "Calibrator.cumulativeDrift": "sum over a per-generation Ne vector; needs a "
+        "variable-size WF run, which the current engine does not take",
+}
 
 
 # --------------------------------------------------------------------------
@@ -211,6 +315,77 @@ def check_ld_decay(args):
 
 
 # --------------------------------------------------------------------------
+# check 5: founderFst  ->  simulate BOTH quantities the name could mean
+# --------------------------------------------------------------------------
+
+def check_founder_fst(args):
+    """`founderFst k t` against the two quantities its name and body suggest.
+
+    WRITTEN FROM THE NAME.  A founder population of k diploids is drawn from a
+    large source population and drifts for t generations.  Two things can be
+    measured, and the corpus formula is compared against BOTH:
+
+      truth_hetloss : 1 - H_t / H_0 inside the founded population.  This is
+                      what the BODY computes.
+      truth_fst     : Hudson F_ST between the founded population and the
+                      unbottlenecked source.  This is what the NAME says.
+
+    Reporting only the first is what let the name drift: it agrees to three
+    decimals and the check goes green while the name is wrong.
+    """
+    k, t, nloci, seed = args
+    rng = np.random.default_rng(seed)
+    p0 = rng.uniform(0.05, 0.95, size=nloci)      # source allele frequencies
+    twok = 2 * k
+    p = p0.copy()
+    for _ in range(t):
+        p = rng.binomial(twok, p) / twok          # WF drift in the founded pop
+    H0 = 2 * p0 * (1 - p0)
+    Ht = 2 * p * (1 - p)
+    truth_hetloss = float(1 - Ht.mean() / H0.mean())
+    # Hudson F_ST between founded (p) and source (p0), the ratio-of-averages
+    # estimator, which is the one the corpus's own hudsonFst matches.
+    num = (p - p0) ** 2
+    den = p * (1 - p0) + p0 * (1 - p)
+    ok = den > 0
+    truth_fst = float(num[ok].sum() / den[ok].sum())
+    lean = float(lean_founderFst(k, t))
+    return dict(check="founder_fst", k=k, t=t,
+                lean_founderFst=lean,
+                truth_hetloss=truth_hetloss,
+                truth_fst=truth_fst,
+                err_vs_hetloss=lean - truth_hetloss,
+                err_vs_fst=lean - truth_fst)
+
+
+# --------------------------------------------------------------------------
+# check 6: hudsonFst vs neiGst  ->  the conversion identity, as a regression
+# --------------------------------------------------------------------------
+
+def check_hudson_vs_neigst(args):
+    """`hudsonFst = 2*G/(1+G)` where `G = neiGstFromFrequencies`.
+
+    This is an exact algebraic identity, not an approximation:
+        4*p_bar*(1-p_bar) + (p1-p2)^2 = 2*(p1*(1-p2) + p2*(1-p1)),
+    so 2G/(1+G) collapses to Hudson's ratio term by term.
+
+    It is wired in as a REGRESSION.  These two definitions have been renamed
+    across each other before -- `hudsonFst` once carried Nei's G_ST, and the
+    corpus recorded the correction in a docstring rather than in a check.  A
+    docstring cannot fail.  This can: if a future rename swaps them back, the
+    identity breaks and this row goes red.
+    """
+    p1, p2, seed = args
+    G = float(lean_neiGstFromFrequencies(p1, p2))
+    H = float(lean_hudsonFst(p1, p2))
+    pred = 2 * G / (1 + G)
+    return dict(check="hudson_vs_neigst", p1=p1, p2=p2,
+                neiGst=G, hudsonFst=H, from_identity=pred,
+                abs_err=abs(H - pred),
+                rel_err=abs(H - pred) / max(abs(H), 1e-300))
+
+
+# --------------------------------------------------------------------------
 
 def main():
     which = sys.argv[1] if len(sys.argv) > 1 else "all"
@@ -239,6 +414,17 @@ def main():
         for N in (500, 2000):
             for r in (0.0, 0.001, 0.01):
                 jobs.append((check_ld_decay, (N, r, 101, 4000, 900 + N + int(r * 1e4))))
+
+    if which in ("all", "founder"):
+        for k in (20, 50, 200, 1000):
+            for t in (5, 20, 50, 100):
+                jobs.append((check_founder_fst, (k, t, 20000, 4242 + k + t)))
+
+    if which in ("all", "identity"):
+        for p1 in (0.05, 0.2, 0.5, 0.8):
+            for p2 in (0.1, 0.3, 0.6, 0.9):
+                if p1 != p2:
+                    jobs.append((check_hudson_vs_neigst, (p1, p2, 0)))
 
     with ProcessPoolExecutor(max_workers=int(os.environ.get("NPROC", "24"))) as ex:
         futs = [ex.submit(fn, a) for fn, a in jobs]
