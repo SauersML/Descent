@@ -1,0 +1,133 @@
+{
+ "target": "proofs/Calibrator/TransportedMinimax.lean, section 'The width law'",
+ "question": "is the w^-3 the width law produces the same object as the delta^-3 in longMemoryMetric? (a) category error, or (b) wrong exponent in the width law",
+ "verdict": "(a). The width law's exponents are CORRECT and shape-free; the identification theorem connects two different objects. There is also a separate, smaller defect in the shape-freedom claim -- see widthLaw_ratio below.",
+ "method": "exact symbolic integration (sympy) for five band shapes plus a rectangular band handled analytically; independent quadrature cross-check on a width sweep. No exponent is fitted where it can be read off exactly.",
+ "W1_W2_band_exponents": {
+  "claim": "||B||^2 = shape/w and ||dB||^2 = shape/w^3, whatever the shape",
+  "normalisation_required": "bands must be L^1-normalised, B_w(lam) = (1/w) psi(lam/w); this is the only normalisation under which both hold, and it is not stated in the module",
+  "exact_results": {
+   "gaussian": {
+    "normSq": "1/(2*sqrt(pi)*w)",
+    "gradNormSq": "1/(4*sqrt(pi)*w**3)"
+   },
+   "lorentzian": {
+    "normSq": "1/(2*pi*w)",
+    "gradNormSq": "1/(4*pi*w**3)"
+   },
+   "raised_cosine": {
+    "normSq": "3/(2*w)",
+    "gradNormSq": "2*pi**2/w**3"
+   },
+   "triangular": {
+    "normSq": "2/(3*w)",
+    "gradNormSq": "2/w**3"
+   },
+   "asymmetric_gamma": {
+    "normSq": "1/(4*w)",
+    "gradNormSq": "1/(4*w**3)"
+   }
+  },
+  "exponents": "w^-1 and w^-3 exactly, for all five shapes; quadrature cross-check reproduces -1.000000000 and -3.000000000",
+  "verdict": "CONFIRMED. The exponents are right and are shape-free."
+ },
+ "W3_widthLaw_ratio_and_shape_freedom": {
+  "claim": "gradNormSq/normSq = 1/w^2 exactly, the shape constant cancelling because one `shape` field supplies both norms",
+  "measured_ratio_times_w2": {
+   "gaussian": 0.5,
+   "lorentzian": 0.5,
+   "raised_cosine": 13.159473,
+   "triangular": 3.0,
+   "asymmetric_gamma": 1.0
+  },
+  "exact_values": {
+   "gaussian": "1/2",
+   "lorentzian": "1/2",
+   "raised_cosine": "4*pi**2/3",
+   "triangular": "3",
+   "asymmetric_gamma": "1"
+  },
+  "verdict": "FALSE as stated. The EXPONENT -2 is shape-free; the CONSTANT is not. Measured 0.5 to 13.16 here (factor 26), and 0.333 to 13.16 (factor 39.5) once coverage-closer's independently computed gamma(3) and skew-normal bands are included. Only the gamma(2) band gives 1, by coincidence. The structure's single `shape` field is the error: the two norms have different shape constants, int psi^2 and int psi'^2, and forcing them equal is what makes the ratio come out as exactly 1/w^2. Equivalently the structure is only instantiable after rescaling the width variable per shape by sqrt(C1/C2), i.e. a fitted per-family constant.",
+  "rectangular_band": {
+   "normSq": "1/w exactly",
+   "gradNormSq": "+infinity (the derivative is a pair of Dirac deltas)",
+   "numerical_signature": "finite-difference values 3.33e2, 1.333e3, 5.333e3, 2.133e4 at n = 1000, 4000, 16000, 64000 -- diverging linearly in grid resolution, exactly as a delta pair must",
+   "verdict": "the phrase 'whatever the band's shape' is false for the most canonical band shape of all; W2 needs a finite Sobolev seminorm, i.e. a smoothness side condition the structure does not carry"
+  },
+  "correction_note": "an earlier run of this script reported 3/4 for the triangular band. The symbol `lambda` had been declared positive, which collapses Abs(lambda) to lambda and corrupted the only shape defined with an absolute value. Corrected to 3, which agrees with coverage-closer's independent quadrature. No other shape and neither identification computation used Abs, so nothing else moved."
+ },
+ "W4_the_identification": {
+  "claim": "widthLaw_gives_longMemoryMetric: with eps^2 as the shape constant, ||dB||^2 = longMemoryMetric eps w = eps^2/w^3, so the exponent 3 is derived rather than assumed",
+  "on_the_actual_spectral_family": {
+   "family": "f_delta(lam) = eps^2/(delta^2 + lam^2), the OU/Lorentzian spectral density whose memory rate is delta",
+   "A_width_law_object_int_df_dlam_squared": {
+    "exact": "pi*eps^4/(4*delta^5)",
+    "delta_exponent": -5,
+    "eps_exponent": 4
+   },
+   "P_L2_parameter_derivative": {
+    "exact": "5*pi*eps^4/(4*delta^5)",
+    "delta_exponent": -5,
+    "eps_exponent": 4
+   },
+   "W_whittle_information_for_delta": {
+    "exact": "(pi*delta + (delta^2+pi^2)*atan(pi/delta))/(pi*delta*(delta^2+pi^2))",
+    "leading_behaviour": "1/(2*delta) as delta -> 0",
+    "delta_exponent": -1,
+    "eps_exponent": 0
+   },
+   "note": "none of these is eps^2/delta^3. The width-law object on a genuine spectral density is eps^4/delta^5, because that density is height-normalised, not mass-normalised; its mass pi*eps^2/delta grows as memory lengthens."
+  },
+  "three_exponents_on_a_scale_family": {
+   "setup": "B_delta(lam) = (1/delta) psi(lam/delta), exact, for gaussian / lorentzian / asymmetric gamma",
+   "U_unweighted_L2_of_the_delta_derivative": {
+    "gaussian": "3/(8*sqrt(pi)*delta^3)",
+    "lorentzian": "1/(4*pi*delta^3)",
+    "asymmetric_gamma": "1/(4*delta^3)",
+    "exponent": -3
+   },
+   "F_fisher_information_of_the_band_as_a_density": {
+    "gaussian": "2/delta^2",
+    "lorentzian": "1/(2*delta^2)",
+    "asymmetric_gamma": "2/delta^2",
+    "exponent": -2
+   },
+   "W_whittle_information_for_a_memory_rate": {
+    "value": "1/(2*delta)",
+    "exponent": -1
+   },
+   "reading": "three objects, three exponents, all shape-free. The width law measures the first. A transported estimation floor needs the third. They are two powers of delta apart, and the gap is exactly the weighting by the model: the width law takes an unweighted L^2 norm of a derivative, a Fisher metric takes the norm of the SCORE, the derivative of the LOG."
+  },
+  "what_the_theorem_actually_does": "widthLaw_gives_longMemoryMetric is discharged by `rw [W.gradNormSq_eq w hw, longMemoryMetric, he]`. Its hypothesis he : eps^2 = W.shape RENAMES the shape constant to eps^2; the exponent 3 is already the content of the gradNormSq_eq field. So the theorem restates an assumption with a substituted symbol. It cannot derive the exponent 3, because the 3 goes in as a hypothesis and comes out unchanged.",
+  "verdict": "CATEGORY ERROR. Two independent reasons: (i) the width law's derivative is with respect to FREQUENCY in an unweighted L^2 norm, while a conformal estimation metric needs the score, the log-derivative with respect to the PARAMETER -- different objects with different exponents, -3 versus -1; (ii) forcing eps^2 to be the shape constant makes eps a pure number attached to a unit-mass band, not the amplitude of a spectral density, so the eps^2 in eps^2/delta^3 is not the eps of longMemoryVariance either. The identification is true as algebra and empty as a derivation.",
+  "additional_ambiguity_raised_by_coverage_closer": "with two distinct shape constants C1 = int psi^2 and C2 = int psi'^2, the hypothesis he : eps^2 = W.shape does not even say WHICH constant eps^2 is meant to be. The Whittle information fixes only the exponent, not the constant, so the identification is loose in the constant as well as wrong in the object."
+ },
+ "consistency_with_the_earlier_simulation": "the Whittle information 1/(2delta) derived exactly here is the same quantity measured by simulation in findings.json: n*(1/2)*I_true*Var was flat at 0.500, i.e. Var = 1/(n*I) with I = 1/(2delta). The symbolic and Monte-Carlo arms agree.",
+ "recommendation": [
+  "cutting widthLaw_gives_longMemoryMetric is correct -- it derives nothing",
+  "the width law itself is worth keeping, with two repairs: separate shape constants for the two norms, and a finite-Sobolev-seminorm side condition (a rectangular band has ||dB||^2 = +infinity)",
+  "widthLaw_ratio should assert the EXPONENT -2, not the value 1/w^2; widthLaw_ratio_shape_free as stated is false and is what the separate-constants repair removes",
+  "the exponent 3 in longMemoryMetric remains unsupported after the cut, and separately remains contradicted by the measurement that the information for a memory rate goes as 1/delta and cannot depend on eps"
+ ],
+ "not_tested": [
+  "whether some other reading of 'band' -- e.g. a projection operator norm on a band-limited subspace rather than an L^2 function norm -- would make the width law's object a Fisher metric; only L^2 function norms were computed",
+  "bands in more than one dimension"
+ ],
+ "cross_validation": "width exponents and shape constants were computed independently by coverage-closer (proofs/validation/width_law/) by quadrature over 24 widths; agreement is exact on gaussian (0.5), lorentzian (0.5) and hann/raised-cosine (13.1595), and on the divergence of the rectangular band. Their triangular value caught an error in mine. Their gamma(3) = 0.333 and my gamma(2) = 1 are different shapes, not a disagreement.",
+ "two_independent_edits": {
+  "note": "the two defects are independent and neither subsumes the other; boundary agreed with coverage-closer",
+  "edit_1_widthLaw_ratio": {
+   "defect": "the shape constant does not cancel: C1 = int psi^2 and C2 = int psi'^2 are different functionals, C2/C1 measured over 0.333 to 13.16",
+   "fix": "split the single `shape` field into two constants; restate widthLaw_ratio as the exponent -2 rather than the value 1/w^2; drop widthLaw_ratio_shape_free; add a finite-Sobolev-seminorm side condition (rectangular has ||dB||^2 = +infinity)",
+   "established_by": "coverage-closer, quadrature over 24 widths; cross-confirmed here symbolically",
+   "scope": "repairs widthLaw_ratio and the structure. Does NOT touch the identification."
+  },
+  "edit_2_widthLaw_gives_longMemoryMetric": {
+   "defect": "the w^-3 object is not the object a transported estimation floor needs: unweighted L^2 derivative norm gives delta^-3, density Fisher delta^-2, Whittle information for a memory rate delta^-1; and on a genuine spectral density the width-law object is eps^4/delta^5, not eps^2/delta^3",
+   "fix": "cut the theorem; the two-constant split does not repair it",
+   "established_by": "this file",
+   "scope": "strictly upstream of edit 1 - it would apply even if the shape constant did cancel"
+  }
+ },
+ "consequence_for_transportedFloor_eq": "transportedFloor_eq is algebra and remains correct as algebra. What changes is that BOTH of its named inputs are now shown wrong: the variance field (measured delta^1, no eps dependence, not 3 delta^3/(n eps^2)) and now the metric field (delta^-1 for the Whittle information, not eps^2/delta^3, and the width law does not derive the 3). The conclusion 3/(2n) survives and was confirmed by simulation (1.4969-1.5151 across delta at n=65536), but by Cramer-Rao reciprocity with p = 3 parameters, not by these two inputs cancelling. Nothing further to re-examine: the cancellation was already re-derived from the true information in the earlier arm."
+}

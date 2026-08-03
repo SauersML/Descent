@@ -195,9 +195,11 @@ section LongMemoryGeometry
 
 /-- The conformal metric coefficient as originally posited: `ε²/δ³`.
 
-    **Retained as a named object, not endorsed.** Measurement shows this is not the Fisher
-    information for a memory rate — the information is `ε`-free for structural reasons and
-    scales as `1/δ`, not `1/δ³`. See the section header. -/
+    **Retained as a named object, not endorsed.** Both of its features are now refuted: the
+    information for a memory rate is `ε`-free for structural reasons and scales as `1/δ`
+    (Whittle, symbolic and Monte-Carlo agreeing), and the width law does **not** supply the
+    exponent `3` — that identification was a category error, withdrawn below. So the exponent
+    here is unsupported as well as contradicted. -/
 noncomputable def longMemoryMetric (ε δ : ℝ) : ℝ := ε ^ 2 / δ ^ 3
 
 /-- The parameter variance as originally posited: `3δ³/(nε²)`.
@@ -289,15 +291,45 @@ discontinuous band. That is a scope restriction, not a rounding error.
 shape — that is the shape-free content and it is what `widthLaw_scaleInvariant` states. The
 *value* of that constant is a property of the band's profile.
 
-**The identification with the estimation metric is withdrawn.** A previous theorem here,
-`widthLaw_gives_longMemoryMetric`, identified the conformal coefficient `ε²/δ³` with the band
-derivative norm at shape `ε²`, in order to make the exponent `3` "derived rather than
-assumed". That was a **category error**, and it is wrong twice over: measurement shows
-`ε²/δ³` is not the Fisher information for a memory rate (see the section above — the
-information is `ε`-free and scales as `1/δ`), and the width-law constant is not universal, so
-there is no canonical `ε²` to identify it with. The `w^{-3}` of a band norm and the `δ^{-3}`
-that was posited in the metric are different objects that happened to share an exponent. The
-theorem is deleted rather than weakened, because its only purpose was the identification.
+**The bands must be `L¹`-normalised**, which an earlier version of this section failed to
+state. Writing `B_w(λ) = (1/w)·ψ(λ/w)`, both scalings hold — and *only* under that
+normalisation. Exact symbolic values: Gaussian `1/(2√π w)` and `1/(4√π w³)`; Lorentzian
+`1/(2π w)` and `1/(4π w³)`; raised cosine `3/(2w)` and `2π²/w³`; triangular `2/(3w)` and
+`2/w³`; asymmetric gamma `1/(4w)` and `1/(4w³)`.
+
+**A finite Sobolev seminorm is a side condition, not a technicality.** The rectangular band
+has `‖B‖² = 1/w` exactly and `‖dB‖² = +∞`: finite-difference approximations give
+`3.33e2, 1.33e3, 5.33e3, 2.13e4` at grid resolutions `1000, 4000, 16000, 64000`, diverging
+linearly as a Dirac pair must. `WidthLaw` simply has no instance for such a band, and that is
+the honest encoding.
+
+**The identification with the estimation metric is withdrawn — a category error, established
+independently of the constant.** A previous theorem here identified the conformal coefficient
+`ε²/δ³` with the band derivative norm at shape `ε²`, to make the exponent `3` "derived rather
+than assumed". Two exact computations kill it, and the first is *upstream* of the
+shape-constant defect above — it would hold even if the constant cancelled cleanly:
+
+* **Three different objects, three different exponents, all shape-free.** On a scale family
+  the unweighted `L²` derivative norm `∫(∂B/∂δ)²` goes as `δ^{-3}`; the density Fisher
+  information `∫(∂ log B/∂δ)²B` as `δ^{-2}`; and the Whittle information for a memory rate as
+  `δ^{-1}`, exactly `1/(2δ)`. The width law measures the **first**; a transported estimation
+  floor needs the **third**. The gap is precisely the weighting: an unweighted norm of a
+  derivative versus the norm of a **score**, the derivative of the *log*. Two powers of `δ`.
+* **On a genuine spectral density nothing gives `ε²/δ³`.** For the OU/Lorentzian density
+  `f = ε²/(δ²+λ²)`, whose memory rate is `δ`, the width-law object is `πε⁴/(4δ⁵)` — because
+  that density is height-normalised, not mass-normalised, and its mass `πε²/δ` *grows* as
+  memory lengthens. Recovering `δ^{-3}` requires renormalising to unit mass, after which the
+  shape constant is a pure number and setting it to `ε²` makes `ε` a shape constant of a
+  unit-mass band, **not** the amplitude of a spectral density. So the `ε²` there was never the
+  `ε` of `longMemoryVariance`; the hypothesis was performing that rename silently.
+
+The `1/(2δ)` above was derived symbolically and matches the Monte-Carlo arm that found
+`n·(1/2)·I·V` flat at `0.500` — symbolic and simulation agreeing.
+
+And the theorem was discharged by `rw [gradNormSq_eq, longMemoryMetric, hε]`: the exponent `3`
+went in as a structure field and came out with a substituted symbol. True as algebra, empty as
+a derivation. It is deleted rather than weakened because its only purpose was the
+identification.
 
 Empirical status: **exponents VALIDATED to 15 digits across seven shapes; shape-freedom of
 the constant FALSIFIED (spread 0.333–13.16, infinite for rectangular); the metric

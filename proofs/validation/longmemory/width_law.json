@@ -1,0 +1,116 @@
+{
+ "bands": [
+  {
+   "shape": "gaussian",
+   "mass": "1",
+   "normSq": "1/(2*sqrt(pi)*w)",
+   "gradNormSq": "1/(4*sqrt(pi)*w**3)",
+   "normSq_exponent": "-1",
+   "gradNormSq_exponent": "-3",
+   "ratio_times_w2": "1/2",
+   "ratio_times_w2_float": 0.5
+  },
+  {
+   "shape": "lorentzian",
+   "mass": "1",
+   "normSq": "1/(2*pi*w)",
+   "gradNormSq": "1/(4*pi*w**3)",
+   "normSq_exponent": "-1",
+   "gradNormSq_exponent": "-3",
+   "ratio_times_w2": "1/2",
+   "ratio_times_w2_float": 0.5
+  },
+  {
+   "shape": "raised_cosine",
+   "mass": "1",
+   "normSq": "3/(2*w)",
+   "gradNormSq": "2*pi**2/w**3",
+   "normSq_exponent": "-1",
+   "gradNormSq_exponent": "-3",
+   "ratio_times_w2": "4*pi**2/3",
+   "ratio_times_w2_float": 13.159472534785811
+  },
+  {
+   "shape": "triangular",
+   "mass": "1",
+   "normSq": "2/(3*w)",
+   "gradNormSq": "2/w**3",
+   "normSq_exponent": "-1",
+   "gradNormSq_exponent": "-3",
+   "ratio_times_w2": "3",
+   "ratio_times_w2_float": 3.0
+  },
+  {
+   "shape": "asymmetric_gamma",
+   "mass": "1",
+   "normSq": "1/(4*w)",
+   "gradNormSq": "1/(4*w**3)",
+   "normSq_exponent": "-1",
+   "gradNormSq_exponent": "-3",
+   "ratio_times_w2": "1",
+   "ratio_times_w2_float": 1.0
+  },
+  {
+   "shape": "rectangular",
+   "normSq": "1/w",
+   "gradNormSq": "+oo",
+   "normSq_exponent": "-1",
+   "gradNormSq_exponent": "undefined",
+   "ratio_times_w2": "+oo",
+   "ratio_times_w2_float": Infinity
+  }
+ ],
+ "identification": {
+  "A = int (df/dlam)^2  [width law, frequency derivative]": {
+   "expr": "pi*epsilon**4/(4*delta**5)",
+   "delta_exponent": "-5",
+   "eps_exponent": "4"
+  },
+  "P = int (df/ddelta)^2 [L2 parameter derivative]": {
+   "expr": "5*pi*epsilon**4/(4*delta**5)",
+   "delta_exponent": "-5",
+   "eps_exponent": "4"
+  },
+  "F = Whittle information for delta over a FIXED band": {
+   "expr": "(pi*delta + (delta**2 + pi**2)*atan(pi/delta))/(pi*delta*(delta**2 + pi**2))",
+   "delta_exponent": "log(((delta**2 + pi**2)*(2*pi*delta + (4*delta**2 + pi**2)*atan(pi/(2*delta)))/(2*(4*delta**2 + pi**2)*(pi*delta + (delta**2 + pi**2)*atan(pi/delta))))**(1/log(2)))",
+   "eps_exponent": "0"
+  },
+  "F_leading": "1/2"
+ },
+ "numeric": {
+  "gaussian": {
+   "normSq_exponent": -0.9999999999999998,
+   "gradNormSq_exponent": -3.0,
+   "ratio_times_w2": 0.5000000000000002
+  },
+  "lorentzian": {
+   "normSq_exponent": -0.9999999999999998,
+   "gradNormSq_exponent": -2.999999999999992,
+   "ratio_times_w2": 0.5000000000033192
+  },
+  "asymmetric_gamma": {
+   "normSq_exponent": -0.9999999999999998,
+   "gradNormSq_exponent": -3.0,
+   "ratio_times_w2": 1.0000000000000004
+  },
+  "rectangular_divergence": [
+   {
+    "npoints": 1000,
+    "value": 332.9999999999905
+   },
+   {
+    "npoints": 4000,
+    "value": 1333.00000000006
+   },
+   {
+    "npoints": 16000,
+    "value": 5332.999999998215
+   },
+   {
+    "npoints": 64000,
+    "value": 21333.00000007359
+   }
+  ]
+ }
+}
