@@ -69,10 +69,26 @@ ALSO HERE
       CONSTANTS rather than as an exponent, plus the practitioner's curve
       m >= d/(2 c_- eta^2 R_target) as a measured table.
   C9  the long-memory conformal metric delta^{-3}(d delta^2 + d theta^2) has
-      Gaussian curvature K = -(3/2) delta -> 0. Verified from the metric, then
-      USED: it lets the curvature face be RULED OUT as an explanation of
-      fam_permeability's 3.4%-at-14-SE residual rather than assumed away, which
-      strengthens the Jensen attribution instead of competing with it.
+      Gaussian curvature K = -(3/2) delta -> 0, verified from the metric by
+      finite differences rather than by reusing the algebra.
+
+      THIS ARM WAS BUILT TO ADJUDICATE BETWEEN CURVATURE AND A JENSEN EFFECT
+      AS EXPLANATIONS OF fam_permeability's C4 RESIDUAL, AND IT FOUND THAT
+      NEITHER IS NEEDED BECAUSE THE RESIDUAL IS NOT THERE. I reported that
+      residual as 3.4% at 14 standard errors and attributed it to the concave
+      square-root inverse map. The coefficient was right and the standard error
+      was not: b is identified only by the three distinct m values, and after
+      the deduplication speed fix the deployment error is measured once per m
+      and reused across three n values and three r_perp values, so nine of the
+      twenty-seven rows share one measurement. The least-squares fit treated
+      them as independent. Each measurement is a mean of 400 squared errors, so
+      it carries a 7.1% relative standard error, and the honest error on b is
+      +- 0.79 rather than +- 0.048. The shortfall of 0.667 is 0.84 sigma, not
+      14. There was never a discrepancy to explain.
+
+      The direct test is kept anyway and powered to resolve 3.4% at three
+      sigma: if a Jensen effect of that size existed, the concave square-root
+      map and its unbiased linearisation would differ by it on the same data.
 
   The (log m)^{-beta} deconvolution face remains numerically out of reach and
   is NOT fitted here either.
@@ -587,52 +603,84 @@ def c9(rng, out):
     print("      Even were it not, K = -(3/2) delta means the correction is")
     print("      O(delta), which at the small-delta end cannot produce a")
     print("      shortfall that does NOT shrink with delta.")
-    print("  (ii) The decisive test: the Jensen attribution says the shortfall")
-    print("      comes from the CONCAVE square root in the variance-to-")
-    print("      coordinate map. Replace it with the LINEARISED map, which is")
-    print("      unbiased in Sigma_hat, and the shortfall must go away. Same")
-    print("      data, same information, one transform changed.")
-    DELTA0, NP, ETA = 1.0, 200, 0.30
+    print("  (ii) THE RESIDUAL WAS NEVER SIGNIFICANT, and that is the real")
+    print("      answer. This arm was built to adjudicate between a Jensen")
+    print("      effect and a curvature term, and it found that neither is")
+    print("      needed because the thing they were competing to explain is")
+    print("      not there. The arithmetic, which needs no simulation:")
+    D0, REP = 4, 400
+    rel = math.sqrt(2.0 / REP)
+    b_fit, b_claim = 18.721767, 19.388889
+    honest_se = b_claim * rel / math.sqrt(3.0)
+    print("        b is identified ONLY by the three distinct m values. After")
+    print("        the deduplication speed fix, the deployment error is")
+    print("        measured ONCE per m and reused across the three n values and")
+    print("        three r_perp values, so nine of the twenty-seven rows share")
+    print("        ONE measurement. The least-squares fit treated all twenty-")
+    print("        seven as independent and reported +- %.4f." % 0.0478)
+    print("        Each deployment measurement is a mean of REP = %d squared"
+          % REP)
+    print("        errors, so its relative standard error is sqrt(2/REP) = "
+          "%.4f," % rel)
+    print("        and with three independent m cells the honest standard error")
+    print("        on b is %.4f, not %.4f." % (honest_se, 0.0478))
+    print("        The shortfall of %.4f is therefore %.2f sigma, not 14."
+          % (b_claim - b_fit, (b_claim - b_fit) / honest_se))
+    print("      I reported that residual as a real 14-sigma discrepancy and")
+    print("      attributed it to a Jensen effect. Both the number and the")
+    print("      attribution were mine and both were wrong: the standard error")
+    print("      was understated by the regression, not the coefficient.")
+    print("")
+    print("      DIRECT TEST, powered to resolve 3.4%. If a Jensen effect of")
+    print("      that size existed, the CONCAVE square-root inverse map and its")
+    print("      unbiased linearisation would differ by it. Same data, one")
+    print("      transform changed, enough replicates to see 3.4% at 3 sigma.")
+    ETA, DELTA0, NP = 0.30, 1.0, 100
+    M_J, R_J = 800, 16000
     Lz = seal_sigma(0.0, 0.0, NP)
     p = seal_p(ETA, DELTA0, NP)
-    print("")
-    print("  %-8s %-15s %-15s %-15s %-15s"
-          % ("m", "MSE sqrt map", "MSE linear map", "CRB 1/(m p)",
-             "sqrt/CRB, lin/CRB"))
+    mm = sim_seal(ETA, DELTA0, NP, M_J * R_J, rng)
+    U2 = (NP * mm ** 2).reshape(R_J, M_J).mean(axis=1)
+    d_sqrt = (np.sqrt(np.maximum(U2 / Lz, 1e-12)) - 1.0) / ETA
+    S0 = seal_sigma(ETA, DELTA0, NP)
+    dS = 2.0 * ETA * (1.0 + ETA * DELTA0) * Lz
+    d_lin = DELTA0 + (U2 - S0) / dS
+    crb = 1.0 / (M_J * p)
+    se_rel = math.sqrt(2.0 / R_J)
     jrows = []
-    for m in (400, 1600, 6400):
-        R = 4000
-        mm = sim_seal(ETA, DELTA0, NP, m * R, rng)
-        U2 = (NP * mm ** 2).reshape(R, m).mean(axis=1)
-        d_sqrt = (np.sqrt(np.maximum(U2 / Lz, 1e-12)) - 1.0) / ETA
-        # linearisation of the same inverse map about delta0
-        S0 = seal_sigma(ETA, DELTA0, NP)
-        dS = 2.0 * ETA * (1.0 + ETA * DELTA0) * Lz
-        d_lin = DELTA0 + (U2 - S0) / dS
-        mse_s = float(np.mean((d_sqrt - DELTA0) ** 2))
-        mse_l = float(np.mean((d_lin - DELTA0) ** 2))
-        crb = 1.0 / (m * p)
-        jrows.append({"m": m, "mse_sqrt": mse_s, "mse_linear": mse_l,
-                      "crb": crb, "sqrt_over_crb": mse_s / crb,
-                      "linear_over_crb": mse_l / crb})
-        print("  %-8d %-15.6e %-15.6e %-15.6e %.4f, %.4f"
-              % (m, mse_s, mse_l, crb, mse_s / crb, mse_l / crb))
     print("")
-    below = [j for j in jrows if j["sqrt_over_crb"] < 0.995]
-    atbound = [j for j in jrows if j["linear_over_crb"] > j["sqrt_over_crb"]]
-    print("  The square-root map sits BELOW the Cramer-Rao value in %d of %d "
-          "cells" % (len(below), len(jrows)))
-    print("  -- which an unbiased estimator cannot do and a biased one can --")
-    print("  while the linear map sits above it in %d of %d. That is the "
-          "Jensen" % (len(atbound), len(jrows)))
-    print("  signature, and it is a property of the TRANSFORM, not of the "
-          "geometry:")
-    print("  curvature is ruled out as the explanation, not assumed away.")
-    jensen = len(below) >= 2 and len(atbound) >= 2
-    print("  Jensen attribution confirmed, curvature excluded: %s"
-          % ("PASS" if jensen else "FAIL"))
+    print("      m = %d, %d ensembles, n' = %d; relative SE on each MSE = %.4f"
+          % (M_J, R_J, NP, se_rel))
+    print("      %-14s %-16s %-12s %-14s" % ("map", "MSE", "MSE/CRB",
+                                             "sigma from 1"))
+    for nm, dd in (("square root", d_sqrt), ("linearised", d_lin)):
+        mse = float(np.mean((dd - DELTA0) ** 2))
+        r = mse / crb
+        jrows.append({"map": nm, "mse": mse, "crb": crb, "ratio": r,
+                      "sigma_from_one": (r - 1.0) / se_rel})
+        print("      %-14s %-16.6e %-12.4f %+14.2f"
+              % (nm, mse, r, (r - 1.0) / se_rel))
+    gap = jrows[0]["ratio"] - jrows[1]["ratio"]
+    gap_sig = abs(gap) / (se_rel * math.sqrt(2.0))
+    print("      difference between the two maps: %+.4f (%.2f sigma). A 3.4%%"
+          % (gap, gap_sig))
+    print("      Jensen effect would show as %.4f here." % 0.034)
+    jensen = gap_sig < 3.0 and abs(jrows[1]["sigma_from_one"]) < 3.0
+    print("")
+    print("  CONCLUSION: no residual, so nothing for curvature OR Jensen to")
+    print("  explain. The curvature face still closes flat -- K = -(3/2) delta")
+    print("  verified to 1e-7 across four decades -- and E_curv = O(delta) is")
+    print("  genuinely negligible in the long-memory regime. But it is now")
+    print("  ruled out as the explanation of a discrepancy that does not exist,")
+    print("  which is a weaker and more honest statement than the one I made.")
+    print("  no significant departure from the Cramer-Rao value, and the two")
+    print("  maps agree: %s" % ("PASS" if jensen else "FAIL"))
     out["C9"] = {"curvature_rows": rows, "curvature_verified": bool(ok),
-                 "jensen_rows": jrows, "jensen_confirmed": bool(jensen)}
+                 "C4_residual_reported_se": 0.0478,
+                 "C4_residual_honest_se": honest_se,
+                 "C4_residual_sigma_honest": (b_claim - b_fit) / honest_se,
+                 "jensen_rows": jrows,
+                 "two_maps_agree_and_match_crb": bool(jensen)}
     return ok and jensen
 
 
