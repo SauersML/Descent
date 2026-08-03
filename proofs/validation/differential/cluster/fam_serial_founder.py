@@ -927,11 +927,15 @@ def main(argv=None):
     # file at all. The absence of a dataset nobody can clone is a fact to
     # record, not a reason to discard a computation that already succeeded.
     part_a(out)
+    out["_provenance"]["partsComputed"] = ["A_serial_founder"]
+    out["_provenance"]["partsSkipped"] = []
+    out["_provenance"]["allPartsComputed"] = True
 
     runs = None
     try:
         runs = part_b(out)
         part_c(out, runs)
+        out["_provenance"]["partsComputed"] += ["B_brier", "C_prevalence"]
     except StudyDataMissing as e:
         # Recorded, never stubbed. No number is invented for B or C: the keys
         # are simply absent, and this block says why they are absent and what
@@ -953,6 +957,15 @@ def main(argv=None):
         }
         out["B_brier_skipped"] = note
         out["C_prevalence_skipped"] = note
+        # AN OMISSION A CONSUMER CANNOT SEE IS THE SAME DEFECT AS A STUB, one
+        # level further out. A reader doing out.get("B_brier") gets nothing
+        # back and cannot tell "not computed" from "computed as nothing", so
+        # the skip is ALSO recorded in the provenance header, in one
+        # authoritative place, as a positive assertion rather than an absence:
+        # allPartsComputed goes false and the part is named in partsSkipped.
+        # Check that flag, not the presence of a key.
+        out["_provenance"]["partsSkipped"] = ["B_brier", "C_prevalence"]
+        out["_provenance"]["allPartsComputed"] = False
         print("")
         print("=" * 78)
         print("B AND C SKIPPED: STUDY DATA NOT ON THIS MACHINE")
