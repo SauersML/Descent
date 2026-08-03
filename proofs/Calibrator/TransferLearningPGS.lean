@@ -650,12 +650,11 @@ theorem importanceWeightESS_nonneg {n : ℕ} (w : Fin n → ℝ)
     since all-zero weights leave the ESS a `0/0`. -/
 theorem importanceWeightESS_of_const {n : ℕ} (c : ℝ) (hc : c ≠ 0) (hn : 0 < n) :
     importanceWeightESS (∑ _i : Fin n, c) (∑ _i : Fin n, c ^ 2) = (n : ℝ) := by
-  have hn' : (n : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr (Nat.pos_iff.mp hn).ne'
+  have hn' : (n : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr hn.ne'
   unfold importanceWeightESS
   simp only [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]
   rw [mul_pow]
   field_simp
-  ring
 
 /-! **Deleted: `iw_ess_decreases_with_divergence` and
 `iw_positive_weight_variance_reduces_ess`.**

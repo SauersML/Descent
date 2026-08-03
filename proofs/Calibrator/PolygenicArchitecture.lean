@@ -583,10 +583,10 @@ theorem momentMatched_two_iff {q n : ℕ}
     (P : MeanAbsoluteEffectCertificateProblem q n)
     (A B : FinitePrior n) :
     P.finiteProblem.MomentMatched 2 A B ↔
-      FinitePrior.mean A (fun i ⇒ ∑ j, P.architecture i j) =
-          FinitePrior.mean B (fun i ⇒ ∑ j, P.architecture i j) ∧
-        FinitePrior.mean A (fun i ⇒ ∑ j, (P.architecture i j) ^ 2) =
-          FinitePrior.mean B (fun i ⇒ ∑ j, (P.architecture i j) ^ 2) := by
+      FinitePrior.mean A (fun i => ∑ j, P.architecture i j) =
+          FinitePrior.mean B (fun i => ∑ j, P.architecture i j) ∧
+        FinitePrior.mean A (fun i => ∑ j, (P.architecture i j) ^ 2) =
+          FinitePrior.mean B (fun i => ∑ j, (P.architecture i j) ^ 2) := by
   constructor
   · intro h
     constructor
