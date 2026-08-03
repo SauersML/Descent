@@ -57,11 +57,12 @@ def _overflow_pair(x, y):
 def main():
     ref, err = load_reference()
     if ref is None:
-        # Not a failure: the reference is another agent's file and may be
-        # absent.  But say so loudly rather than reporting a silent pass.
+        # This test is a trust-boundary gate: without the independent runtime
+        # there was no comparison, so success would turn an unverified result
+        # into a false green in `cluster/run_all.py` and CI.
         print(f"SKIPPED - {err}")
         print("The totality conventions in backends.py are then UNVERIFIED.")
-        return 0
+        return 2
 
     pairs = [
         ("Real.log", backends.FLOAT.log, ref.rlog, 1),

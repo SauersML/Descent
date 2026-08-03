@@ -105,6 +105,13 @@ jobs:
       - name: Structural guards
         run: python3 scripts/check-identifications.py
 
+      - name: Verify root import closure
+        run: python3 proofs/validation/invariants/module_closure.py
+
+      - name: Verify arithmetic runtime semantics
+        working-directory: proofs/validation/invariants
+        run: python3 test_lean_semantics.py
+
       - name: Executable correctability contract
         run: cargo test --manifest-path proofs/validation/correctability_calculator/Cargo.toml
 
