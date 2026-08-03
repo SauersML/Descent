@@ -33,6 +33,23 @@ the corner of the box.  Both axes are now swept log-spaced -- R2 over more than
 two decades, prevalence over more than three -- so the shape of the residual
 is visible and the worst cell is a maximum rather than an edge.
 
+TWO DEFINITIONS ADDED BECAUSE NOTHING ELSE MEASURED THEM.  The reconciliation
+found 22 in-slice statements belonging to no model family at all, and two of
+them were reachable from here at no extra cost, because the exact
+bivariate-normal AUC this file already computes is their oracle too:
+
+  liabilityThresholdAUCFromExplainedR2       PortabilityDrift.lean:3032
+  equalVarianceGaussianAUCFromSignalVariance DGP.lean:2465
+
+The first is the binary-trait formula the retired names promised, and
+PortabilityDrift.lean:967 quotes it at RMSE 0.0121 against a 0.0120
+seed-to-seed noise floor -- a number measured elsewhere, on a handful of
+points, which this file now measures on the whole grid.  The second is
+algebraically the SNR chart at snr = vSignal / vNoise and is tested anyway,
+because it is a separate definition in a separate file and can drift from the
+chart it currently equals.  The printed gap between them is a transcription
+check, not a discovery: anything above rounding means one of the two moved.
+
 WHERE THE ERROR BARS COME FROM, AND WHERE THEY DO NOT.  `exact` is a
 quadrature, not a sample: its uncertainty is discretisation, so it is computed
 at two grid resolutions and the difference is reported as `exact_grid_delta`.
@@ -269,6 +286,7 @@ def main(argv=None):
         blk = records[ci * reps:(ci + 1) * reps] if reps else []
         mc = simprov.summarize([b["mc"] for b in blk])
         lean_r2 = lean_equalVarianceGaussianAUCFromExplainedR2(r2)
+        lt = lean_liabilityThresholdAUCFromExplainedR2(r2, K)
         resid = lean_r2 - ex_hi
         cell = dict(
             r2=r2, K=K, reps=reps,
@@ -284,6 +302,11 @@ def main(argv=None):
             mc_minus_exact=(None if mc["mean"] is None else mc["mean"] - ex_hi),
             lean_fromR2=lean_r2,
             lean_fromSNR=lean_equalVarianceGaussianAUCFromSNR(r2 / (1 - r2)),
+            lean_fromSignalVariance=(
+                lean_equalVarianceGaussianAUCFromSignalVariance(r2, 1 - r2)),
+            # The chart that DOES take a prevalence, against the same oracle.
+            lean_liabilityThreshold=lt,
+            residual_liabilityThreshold=lt - ex_hi,
             residual=resid,
             rel_err_pct=100.0 * resid / ex_hi)
         cells.append(cell)
@@ -294,11 +317,27 @@ def main(argv=None):
               % (r2, K, ex_hi, mcs, lean_r2, resid, cell["rel_err_pct"]))
 
     rmse = math.sqrt(sum(c["residual"] ** 2 for c in cells) / len(cells))
+    rmse_lt = math.sqrt(sum(c["residual_liabilityThreshold"] ** 2
+                            for c in cells) / len(cells))
+    worst_lt = max(cells, key=lambda c: abs(c["residual_liabilityThreshold"]))
+    sv_gap = max(abs(c["lean_fromSignalVariance"] - c["lean_fromSNR"])
+                 for c in cells)
     worst = max(cells, key=lambda c: abs(c["rel_err_pct"]))
     grid_worst = max(abs(c["exact_grid_delta"]) for c in cells)
     print("")
     print("pooled RMSE of the chart against the exact AUC: %.4f over %d cells"
           % (rmse, len(cells)))
+    print("pooled RMSE of liabilityThresholdAUCFromExplainedR2, the chart that "
+          "DOES take a prevalence: %.4f over the same cells" % rmse_lt)
+    print("  worst cell: R2 = %.4f, K = %g, exact %.4f, chart %.4f"
+          % (worst_lt["r2"], worst_lt["K"], worst_lt["exact"],
+             worst_lt["lean_liabilityThreshold"]))
+    print("  PortabilityDrift.lean:967 quotes 0.0121 against a 0.0120 noise "
+          "floor. That was measured elsewhere on a handful of points; the "
+          "number above is this grid.")
+    print("equalVarianceGaussianAUCFromSignalVariance vs FromSNR, largest gap "
+          "over the grid: %.2e (they are algebraically equal, so anything "
+          "above rounding is a transcription drift)" % sv_gap)
     print("worst cell: R2 = %.4f, K = %g, exact %.4f, chart %.4f, %.1f%% off"
           % (worst["r2"], worst["K"], worst["exact"], worst["lean_fromR2"],
              worst["rel_err_pct"]))
