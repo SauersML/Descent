@@ -191,8 +191,8 @@ theorem covarianceTangentEstimatorVariance_kurtosis_eq_gaussian_factor
         (kurtosis * covariance ^ 2) =
       ((kurtosis - 1) / 2) *
         gaussianCovarianceTangentEstimatorVariance m covariance covarianceDerivative := by
-  unfold covarianceTangentEstimatorVarianceFromMoments
-    gaussianCovarianceTangentEstimatorVariance centeredSquareVarianceFromMoments
+  rw [gaussianCovarianceTangentEstimatorVariance_eq]
+  unfold covarianceTangentEstimatorVarianceFromMoments centeredSquareVarianceFromMoments
   ring
 
 /-- The named Gaussian tangent-estimator variance is positive for a positive replicate
@@ -203,8 +203,7 @@ theorem gaussianCovarianceTangentEstimatorVariance_pos
     (hderivative : covarianceDerivative ≠ 0) :
     0 < gaussianCovarianceTangentEstimatorVariance
       m covariance covarianceDerivative := by
-  unfold gaussianCovarianceTangentEstimatorVariance
-    covarianceTangentEstimatorVarianceFromMoments
+  rw [gaussianCovarianceTangentEstimatorVariance_eq]
   positivity
 
 /-- **Exact information--variance reciprocity.** In the centered Gaussian covariance
@@ -222,10 +221,10 @@ theorem totalGaussianInformation_mul_estimatorVariance
     totalGaussianInformation m covariance covarianceDerivative *
       gaussianCovarianceTangentEstimatorVariance
         m covariance covarianceDerivative = 1 := by
+  rw [gaussianCovarianceTangentEstimatorVariance_eq]
   unfold totalGaussianInformation scalarPermeability
-    gaussianCovarianceTangentEstimatorVariance
-    covarianceTangentEstimatorVarianceFromMoments centeredSquareVarianceFromMoments
   field_simp [hm, hcovariance, hderivative]
+  norm_num
 
 /-- Equivalent reciprocal form of
 `totalGaussianInformation_mul_estimatorVariance`. -/
