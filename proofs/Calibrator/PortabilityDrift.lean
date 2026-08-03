@@ -2954,6 +2954,27 @@ explained-risk coordinates. -/
 abbrev brierFromR2 (π r2 : ℝ) : ℝ :=
   TransportedMetrics.calibratedBrier π r2
 
+/-- **Target AUC from the neutral allele-frequency benchmark, for a DICHOTOMISED trait.**
+
+Prevalence `K` is a **required argument**, and that is the whole design. The failure this
+replaces was not that someone chose a wrong prevalence — it was that no prevalence was ever
+named, so a drift-induced `R²` drop was converted into AUC units by a formula that has no
+place to put one. Making `K` mandatory turns a silently biased number into a call that does
+not elaborate until whoever owns the call site supplies the prevalence, which is the person
+who knows it.
+
+This is the conversion to use for a binary trait. For a genuinely **continuous** outcome the
+equal-variance chart is correct and `presentDayGaussianAUC` is the one to call. -/
+noncomputable def targetLiabilityAUCFromNeutralAFBenchmark
+    (V_A V_E fstTarget K : ℝ) : ℝ :=
+  liabilityThresholdAUCFromExplainedR2 (presentDayR2 V_A V_E fstTarget) K
+
+/-- The same quantity written through the explicit benchmark `R²`, so the two cannot drift
+apart. -/
+theorem targetLiabilityAUCFromNeutralAFBenchmark_eq (V_A V_E fstTarget K : ℝ) :
+    targetLiabilityAUCFromNeutralAFBenchmark V_A V_E fstTarget K =
+      liabilityThresholdAUCFromExplainedR2 (presentDayR2 V_A V_E fstTarget) K := rfl
+
 /-- Exact target AUC from the neutral allele-frequency benchmark state.
 
 **INHERITED ASSUMPTION, AND THIS IS THE DANGEROUS KIND.** This delegates to
@@ -3001,10 +3022,43 @@ noncomputable def targetBrierFromNeutralAFBenchmark
   targetExactCalibratedBrierRisk π V_A V_E fstTarget
 
 /-- Canonical bundled deployed metrics under the neutral allele-frequency
-benchmark state. -/
+benchmark state.
+
+**FOR A CONTINUOUS OUTCOME. On a dichotomised trait this record is internally
+inconsistent, and that inconsistency is the clearest statement of the defect in this
+family:** it takes a prevalence `π`, uses it to compute the Brier risk, and then computes
+the AUC with a formula that has no prevalence argument at all. The same record therefore
+treats the trait as binary for one metric and as continuous for another.
+
+`neutralAFBenchmarkLiabilityMetricProfile` is the dichotomised-trait version, which spends
+the `π` it was already given on both. -/
 noncomputable def neutralAFBenchmarkMetricProfile
     (π V_A V_E fstTarget : ℝ) : TransportedMetrics.Profile :=
   TransportedMetrics.profileFromSignalVariance π V_E (presentDayPGSVariance V_A fstTarget)
+
+/-- **Bundled deployed metrics for a DICHOTOMISED trait**, with the prevalence used for the
+AUC as well as for the Brier risk.
+
+No new modelling input is required to build this: `π` is already an argument of the profile
+it replaces. The old record simply declined to use it for the discrimination metric, which
+is how a `-0.068` AUC bias survived beside a Brier risk computed correctly at the same
+prevalence. -/
+noncomputable def neutralAFBenchmarkLiabilityMetricProfile
+    (π V_A V_E fstTarget : ℝ) : TransportedMetrics.Profile :=
+  { r2 := targetR2FromNeutralAFBenchmark V_A V_E fstTarget
+  , auc := targetLiabilityAUCFromNeutralAFBenchmark V_A V_E fstTarget π
+  , brier := targetBrierFromNeutralAFBenchmark π V_A V_E fstTarget }
+
+/-- The two profiles agree on `R²` and Brier and differ **only** in the AUC field, which
+localises the defect to one coordinate rather than leaving it diffuse. -/
+theorem liabilityProfile_differs_only_in_auc (π V_A V_E fstTarget : ℝ) :
+    (neutralAFBenchmarkLiabilityMetricProfile π V_A V_E fstTarget).r2 =
+      targetR2FromNeutralAFBenchmark V_A V_E fstTarget ∧
+    (neutralAFBenchmarkLiabilityMetricProfile π V_A V_E fstTarget).brier =
+      targetBrierFromNeutralAFBenchmark π V_A V_E fstTarget ∧
+    (neutralAFBenchmarkLiabilityMetricProfile π V_A V_E fstTarget).auc =
+      liabilityThresholdAUCFromExplainedR2 (presentDayR2 V_A V_E fstTarget) π :=
+  ⟨rfl, rfl, rfl⟩
 
 /-- The bundled neutral allele-frequency benchmark metrics reproduce the file's public
 `R²`, AUC, and Brier surfaces exactly. -/
