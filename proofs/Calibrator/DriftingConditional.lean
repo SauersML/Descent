@@ -861,7 +861,10 @@ the measure is a probability measure, and by `link_discontinuity_null` the point
 holds for almost every noise value.
 
 This is the first regularity gained from the invariance rather than assumed, and it is
-the step the classification needs before anything can be differentiated. -/
+the step the classification needs before anything can be differentiated. Biologically,
+cohort mixing smooths even a response curve with threshold jumps: discontinuities in
+individual liability occupy zero mass after a continuously distributed environmental or
+ancestry shift. -/
 theorem link_average_continuous (L : ℝ → ℝ) (hmono : StrictMono L)
     (hbdd : ∀ u, 0 < L u ∧ L u < 1) {a σ : ℝ} (ha : a ≠ 0) (hσ : σ ≠ 0) (b : ℝ) :
     Continuous (fun x ↦ ∫ z, L (a * (x + σ * z) + b) ∂(gaussianReal 0 1)) := by
@@ -875,7 +878,7 @@ theorem link_average_continuous (L : ℝ → ℝ) (hmono : StrictMono L)
     rw [Real.norm_eq_abs, abs_of_pos (hbdd _).1]
     exact le_of_lt (hbdd _).2
   · exact integrable_const 1
-  · filter_upwards [measure_zero_iff_ae_nmem.mp
+  · filter_upwards [measure_eq_zero_iff_ae_notMem.mp
       (link_discontinuity_null L hmono ha hσ b x)] with z hz
     exact (not_not.mp hz).tendsto.comp
       ((by fun_prop : Continuous fun y : ℝ ↦ a * (y + σ * z) + b).tendsto x)
@@ -923,51 +926,6 @@ theorem link_average_eq_gaussian_integral (L : ℝ → ℝ) (hmono : StrictMono 
     integral_map (by fun_prop) hmono.monotone.measurable.aestronglyMeasurable]
 
 open MeasureTheory ProbabilityTheory in
-/-- **Gaussian population averaging regularizes every bounded monotone response curve.**
-
-No continuity of `L` is assumed. A monotone real function has only countably many discontinuities.
-For a nondegenerate Gaussian displacement, the set of noise values that land on those points has
-measure zero. Dominated convergence then makes the averaged response continuous in the covariate.
-
-Biologically, cohort mixing smooths even a response curve with threshold jumps: discontinuities in
-individual liability occupy zero mass after a continuously distributed environmental or ancestry
-shift. This regularity is derived from the observation mechanism, not supplied as a model axiom. -/
-theorem link_average_continuous (L : ℝ → ℝ) (hmono : StrictMono L)
-    (hbdd : ∀ u, 0 < L u ∧ L u < 1) {a σ : ℝ} (ha : 0 < a) (hσ : 0 < σ) (b : ℝ) :
-    Continuous (fun x ↦ ∫ z, L (a * (x + σ * z) + b) ∂(gaussianReal 0 1)) := by
-  rw [continuous_iff_continuousAt]
-  intro x₀
-  refine continuousAt_of_dominated (bound := fun _ ↦ (1 : ℝ)) ?_ ?_
-      (integrable_const (1 : ℝ)) ?_
-  · exact Filter.Eventually.of_forall fun x ↦
-      (hmono.monotone.measurable.comp (by fun_prop)).aestronglyMeasurable
-  · exact Filter.Eventually.of_forall fun x ↦ Filter.Eventually.of_forall fun z ↦ by
-      rw [Real.norm_eq_abs, abs_of_pos (hbdd _).1]
-      exact (hbdd _).2.le
-  · rw [ae_iff]
-    let φ : ℝ → ℝ := fun z ↦ a * (x₀ + σ * z) + b
-    have hφinj : Function.Injective φ := by
-      intro z w hzw
-      have has : 0 < a * σ := mul_pos ha hσ
-      rw [show φ z = a * σ * z + (a * x₀ + b) by simp [φ]; ring,
-        show φ w = a * σ * w + (a * x₀ + b) by simp [φ]; ring] at hzw
-      nlinarith
-    have hdisc : Set.Countable {u : ℝ | ¬ContinuousAt L u} :=
-      hmono.monotone.countable_not_continuousAt
-    have hpreZero : gaussianReal 0 1 (φ ⁻¹' {u : ℝ | ¬ContinuousAt L u}) = 0 := by
-      apply gaussianReal_absolutelyContinuous 0 one_ne_zero
-      exact (hdisc.preimage hφinj).measure_zero volume
-    apply measure_mono_null (μ := gaussianReal 0 1) _ hpreZero
-    intro z hz
-    simp only [Set.mem_setOf_eq, Set.mem_preimage]
-    intro hL
-    change ContinuousAt L (a * (x₀ + σ * z) + b) at hL
-    apply hz
-    have hcomp := ContinuousAt.comp (f := fun x : ℝ ↦ a * (x + σ * z) + b)
-      (x := x₀) hL (by fun_prop)
-    simpa only [Function.comp_apply] using hcomp
-
-open MeasureTheory ProbabilityTheory in
 /-- **Closure forces continuity of the original link.**
 
 If one nondegenerate Gaussian averaging step lands back in the affine family of `L`, the output
@@ -979,7 +937,7 @@ theorem link_continuous_of_invariance (L : ℝ → ℝ) (hmono : StrictMono L)
     (heq : ∀ x, ∫ z, L (a * (x + σ * z) + b) ∂(gaussianReal 0 1) = L (a' * x + b')) :
     Continuous L := by
   have ha' : 0 < a' := link_invariance_slope_pos L hmono hbdd ha heq
-  have havg_cont := link_average_continuous L hmono hbdd ha hσ b
+  have havg_cont := link_average_continuous L hmono hbdd ha.ne' hσ.ne' b
   have hrepl : L = fun u ↦ ∫ z, L (a * ((u - b') / a' + σ * z) + b)
       ∂(gaussianReal 0 1) := by
     funext u
@@ -1030,9 +988,11 @@ theorem gaussian_two_scale_map (x s t : ℝ) :
       = gaussianReal x ⟨s ^ 2 + t ^ 2, by positivity⟩ := by
   set γ : Measure ℝ := gaussianReal 0 1 with hγ
   have hfst : (γ.prod γ).map (fun p : ℝ × ℝ ↦ p.1) = γ := by
-    simpa [Measure.fst, hγ] using Measure.fst_prod (μ := γ) (ν := γ)
+    change Measure.fst (γ.prod γ) = γ
+    rw [Measure.fst_prod]
   have hsnd : (γ.prod γ).map (fun p : ℝ × ℝ ↦ p.2) = γ := by
-    simpa [Measure.snd, hγ] using Measure.snd_prod (μ := γ) (ν := γ)
+    change Measure.snd (γ.prod γ) = γ
+    rw [Measure.snd_prod]
   have hX : (γ.prod γ).map (fun p : ℝ × ℝ ↦ x + s * p.1)
       = gaussianReal x ⟨s ^ 2, sq_nonneg s⟩ := by
     have hcomp : (fun p : ℝ × ℝ ↦ x + s * p.1)
@@ -1067,6 +1027,40 @@ theorem gaussian_two_scale_map (x s t : ℝ) :
   rwa [hm, hv] at hsum
 
 open MeasureTheory ProbabilityTheory in
+/-- **Averaging twice is averaging once at the combined scale.**
+
+The operator form of `gaussian_two_scale_map`: both sides are `L` integrated against
+`N(x, s² + t²)`, reached by `integral_map` from the two pushforwards.
+
+This is the identity the classification runs on.  Combined with the invariance it forces a
+composition law on the induced parameter map, and that law is an equation in one real
+variable — which is why no further analysis of `L` itself is needed once regularity is in
+hand. -/
+theorem link_average_two_scale (L : ℝ → ℝ) (hmono : StrictMono L) (x s t : ℝ) :
+    ∫ p, L (x + s * p.1 + t * p.2) ∂((gaussianReal 0 1).prod (gaussianReal 0 1))
+      = ∫ w, L (x + Real.sqrt (s ^ 2 + t ^ 2) * w) ∂(gaussianReal 0 1) := by
+  have hnn : (0 : ℝ) ≤ s ^ 2 + t ^ 2 := by positivity
+  have hR : (gaussianReal 0 1).map (fun w : ℝ ↦ x + Real.sqrt (s ^ 2 + t ^ 2) * w)
+      = gaussianReal x ⟨s ^ 2 + t ^ 2, hnn⟩ := by
+    have h := link_average_pushforward 1 (Real.sqrt (s ^ 2 + t ^ 2)) 0 x
+    have hvar : (⟨(1 * Real.sqrt (s ^ 2 + t ^ 2)) ^ 2, sq_nonneg _⟩ : NNReal)
+        = ⟨s ^ 2 + t ^ 2, hnn⟩ := by
+      ext; simp [Real.sq_sqrt hnn]
+    rw [hvar] at h
+    simpa using h
+  calc
+    ∫ p, L (x + s * p.1 + t * p.2) ∂((gaussianReal 0 1).prod (gaussianReal 0 1)) =
+        ∫ y, L y ∂(((gaussianReal 0 1).prod (gaussianReal 0 1)).map
+          (fun p : ℝ × ℝ ↦ x + s * p.1 + t * p.2)) := by
+      symm
+      exact integral_map (by fun_prop) hmono.monotone.measurable.aestronglyMeasurable
+    _ = ∫ y, L y ∂(gaussianReal x ⟨s ^ 2 + t ^ 2, hnn⟩) := by
+      rw [gaussian_two_scale_map]
+    _ = ∫ w, L (x + Real.sqrt (s ^ 2 + t ^ 2) * w) ∂(gaussianReal 0 1) := by
+      rw [← hR]
+      exact integral_map (by fun_prop) hmono.monotone.measurable.aestronglyMeasurable
+
+open MeasureTheory ProbabilityTheory in
 /-- **The link is continuous — derived from the invariance, not assumed.**
 
 `link_rigidity` assumes only that `L` is strictly monotone and bounded.  A monotone
@@ -1084,21 +1078,7 @@ theorem link_continuous (L : ℝ → ℝ) (hmono : StrictMono L)
       ∀ x, ∫ z, L (a * (x + σ * z) + b) ∂(gaussianReal 0 1) = L (a' * x + b')) :
     Continuous L := by
   obtain ⟨a', b', heq⟩ := hinv 1 0 1 one_pos one_pos
-  have hpos : 0 < a' := link_invariance_slope_pos L hmono hbdd one_pos heq
-  have hne : a' ≠ 0 := ne_of_gt hpos
-  have hA : Continuous (fun x ↦ L (a' * x + b')) := by
-    have hc := link_average_continuous L hmono hbdd (a := 1) (σ := 1) one_ne_zero one_ne_zero 0
-    have hfun : (fun x ↦ ∫ z, L (1 * (x + 1 * z) + 0) ∂(gaussianReal 0 1))
-        = fun x ↦ L (a' * x + b') := funext heq
-    rwa [hfun] at hc
-  have hcomp : Continuous (fun u : ℝ ↦ L (a' * ((u - b') / a') + b')) := hA.comp (by fun_prop)
-  have hid : (fun u : ℝ ↦ L (a' * ((u - b') / a') + b')) = L := by
-    funext u
-    have harg : a' * ((u - b') / a') + b' = u := by
-      rw [mul_comm, div_mul_cancel₀ _ hne]
-      ring
-    rw [harg]
-  rwa [hid] at hcomp
+  exact link_continuous_of_invariance L hmono hbdd one_pos one_pos heq
 
 /-- **Boundedness really does exclude the affine stratum.**
 
