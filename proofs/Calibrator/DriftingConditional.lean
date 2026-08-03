@@ -534,12 +534,12 @@ theorem cdf_gaussianReal_zero_mean (v : NNReal) (hv : v ≠ 0) (x : ℝ) :
   have hsq : (⟨Real.sqrt (v : ℝ) ^ 2, sq_nonneg _⟩ : NNReal) * 1 = v := by
     ext
     simp [Real.sq_sqrt hvpos.le]
-  have hmap : (gaussianReal 0 1).map (fun y => Real.sqrt (v : ℝ) * y) = gaussianReal 0 v := by
+  have hmap : (gaussianReal 0 1).map (fun y ↦ Real.sqrt (v : ℝ) * y) = gaussianReal 0 v := by
     have h := gaussianReal_map_const_mul (μ := (0 : ℝ)) (v := (1 : NNReal))
       (Real.sqrt (v : ℝ))
     rw [mul_zero, hsq] at h
     exact h
-  have hpre : (fun y => Real.sqrt (v : ℝ) * y) ⁻¹' Set.Iic x = Set.Iic (x / Real.sqrt (v : ℝ)) := by
+  have hpre : (fun y ↦ Real.sqrt (v : ℝ) * y) ⁻¹' Set.Iic x = Set.Iic (x / Real.sqrt (v : ℝ)) := by
     ext y
     simp only [Set.mem_preimage, Set.mem_Iic]
     rw [le_div_iff₀' hs]
@@ -564,12 +564,12 @@ theorem gaussianAverage_eq_cdf_sum (α β : ℝ) :
       = cdf (gaussianReal 0 ⟨1 + β ^ 2, by positivity⟩) α := by
   set γ : Measure ℝ := gaussianReal 0 1 with hγdef
   set S : Set (ℝ × ℝ) := {p : ℝ × ℝ | p.2 - β * p.1 ≤ α} with hSdef
-  have hdiff : Measurable (fun p : ℝ × ℝ => p.2 - β * p.1) := by fun_prop
+  have hdiff : Measurable (fun p : ℝ × ℝ ↦ p.2 - β * p.1) := by fun_prop
   have hSmeas : MeasurableSet S := hdiff measurableSet_Iic
   -- Slicing the product measure is exactly the average of the cdf.
   have hslice : (γ.prod γ) S = ∫⁻ z, γ (Set.Iic (α + β * z)) ∂γ := by
     rw [Measure.prod_apply hSmeas]
-    refine lintegral_congr fun z => ?_
+    refine lintegral_congr fun z ↦ ?_
     congr 1
     ext w
     simp only [hSdef, Set.mem_preimage, Set.mem_setOf_eq, Set.mem_Iic]
@@ -580,27 +580,28 @@ theorem gaussianAverage_eq_cdf_sum (α β : ℝ) :
     intro t
     show cdf (gaussianReal 0 1) t = _
     rw [cdf_eq_real, measureReal_def]
-  have hmono : Monotone (fun t : ℝ => γ (Set.Iic t)) := fun a b hab =>
+  have hmono : Monotone (fun t : ℝ ↦ γ (Set.Iic t)) := fun a b hab ↦
     measure_mono (Set.Iic_subset_Iic.mpr hab)
   have hlhs : ∫ z, Phi (α + β * z) ∂γ
       = (∫⁻ z, γ (Set.Iic (α + β * z)) ∂γ).toReal := by
-    have hfun : (fun z => Phi (α + β * z))
-        = fun z => (γ (Set.Iic (α + β * z))).toReal := funext fun z => hPhi _
+    have hfun : (fun z ↦ Phi (α + β * z))
+        = fun z ↦ (γ (Set.Iic (α + β * z))).toReal := funext fun z ↦ hPhi _
     rw [hfun]
     refine integral_toReal ?_ ?_
     · exact (hmono.measurable.comp (by fun_prop)).aemeasurable
     · filter_upwards with z
       exact measure_lt_top _ _
   -- The difference of the two coordinates is centred Gaussian with variance `1 + β²`.
-  have hX : (γ.prod γ).map (fun p : ℝ × ℝ => p.2) = gaussianReal 0 1 := by
+  have hX : (γ.prod γ).map (fun p : ℝ × ℝ ↦ p.2) = gaussianReal 0 1 := by
     have := Measure.snd_prod (μ := γ) (ν := γ)
     simpa [Measure.snd, hγdef] using this
-  have hfst : (γ.prod γ).map (fun p : ℝ × ℝ => p.1) = gaussianReal 0 1 := by
+  have hfst : (γ.prod γ).map (fun p : ℝ × ℝ ↦ p.1) = gaussianReal 0 1 := by
     have := Measure.fst_prod (μ := γ) (ν := γ)
     simpa [Measure.fst, hγdef] using this
-  have hY : (γ.prod γ).map (fun p : ℝ × ℝ => -β * p.1)
+  have hY : (γ.prod γ).map (fun p : ℝ × ℝ ↦ -β * p.1)
       = gaussianReal 0 ⟨β ^ 2, sq_nonneg β⟩ := by
-    have hcomp : (fun p : ℝ × ℝ => -β * p.1) = (fun y : ℝ => -β * y) ∘ (fun p : ℝ × ℝ => p.1) :=
+    have hcomp : (fun p : ℝ × ℝ ↦ -β * p.1) = (fun y : ℝ ↦ -β * y) ∘
+        (fun p : ℝ × ℝ ↦ p.1) :=
       rfl
     rw [hcomp, ← Measure.map_map (by fun_prop) (by fun_prop), hfst]
     have h := gaussianReal_map_const_mul (μ := (0 : ℝ)) (v := (1 : NNReal)) (-β)
@@ -608,14 +609,15 @@ theorem gaussianAverage_eq_cdf_sum (α β : ℝ) :
       ext; simp
     rw [mul_zero, hv] at h
     exact h
-  have hindep : IndepFun (fun p : ℝ × ℝ => p.2) (fun p : ℝ × ℝ => -β * p.1) (γ.prod γ) := by
+  have hindep : IndepFun (fun p : ℝ × ℝ ↦ p.2) (fun p : ℝ × ℝ ↦ -β * p.1)
+      (γ.prod γ) := by
     have h := ProbabilityTheory.indepFun_prod₀ (μ := γ) (ν := γ)
-      (X := fun y : ℝ => -β * y) (Y := fun y : ℝ => y)
+      (X := fun y : ℝ ↦ -β * y) (Y := fun y : ℝ ↦ y)
       (by fun_prop) (by fun_prop)
     exact h.symm
   have hsum := gaussianReal_add_gaussianReal_of_indepFun hindep hX hY
-  have hfunsum : ((fun p : ℝ × ℝ => p.2) + fun p : ℝ × ℝ => -β * p.1)
-      = fun p : ℝ × ℝ => p.2 - β * p.1 := by
+  have hfunsum : ((fun p : ℝ × ℝ ↦ p.2) + fun p : ℝ × ℝ ↦ -β * p.1)
+      = fun p : ℝ × ℝ ↦ p.2 - β * p.1 := by
     funext p
     simp [sub_eq_add_neg]
   rw [hfunsum] at hsum
@@ -624,7 +626,7 @@ theorem gaussianAverage_eq_cdf_sum (α β : ℝ) :
     ext; simp
   rw [hvar, hnn] at hsum
   -- Put the two readings of the same probability together.
-  have hSpre : S = (fun p : ℝ × ℝ => p.2 - β * p.1) ⁻¹' Set.Iic α := rfl
+  have hSpre : S = (fun p : ℝ × ℝ ↦ p.2 - β * p.1) ⁻¹' Set.Iic α := rfl
   have hRHS : (γ.prod γ) S = gaussianReal 0 ⟨1 + β ^ 2, by positivity⟩ (Set.Iic α) := by
     rw [hSpre, ← Measure.map_apply hdiff measurableSet_Iic, hsum]
   rw [hlhs, ← hslice, hRHS, cdf_eq_real, measureReal_def]
@@ -657,8 +659,8 @@ theorem probit_invariant_under_ou (lam t a₀ b₀ x sigma : ℝ) :
     ∫ z, Phi (a₀ * (Real.exp (-(lam * t)) * x + sigma * z) + b₀) ∂(gaussianReal 0 1)
       = Phi ((a₀ * Real.exp (-(lam * t)) * x + b₀)
           / Real.sqrt (1 + a₀ ^ 2 * sigma ^ 2)) := by
-  have hshape : (fun z => Phi (a₀ * (Real.exp (-(lam * t)) * x + sigma * z) + b₀))
-      = fun z => Phi ((a₀ * Real.exp (-(lam * t)) * x + b₀) + (a₀ * sigma) * z) := by
+  have hshape : (fun z ↦ Phi (a₀ * (Real.exp (-(lam * t)) * x + sigma * z) + b₀))
+      = fun z ↦ Phi ((a₀ * Real.exp (-(lam * t)) * x + b₀) + (a₀ * sigma) * z) := by
     funext z
     congr 1
     ring
@@ -666,13 +668,19 @@ theorem probit_invariant_under_ou (lam t a₀ b₀ x sigma : ℝ) :
   congr 2
   ring_nf
 
-/-! ## Rigidity of the probit link
+/-! ## Rigidity of the probit shape
 
-Theorem 4. Theorem 3 says the probit family is invariant; rigidity says nothing else is. Among
-bounded strictly increasing links, the normal cdf is the only one whose two-parameter family
-survives Gaussian averaging, so the response scale is DERIVED by the dynamics rather than chosen
-by the statistician — which is the claim that makes "use a probit link" a consequence instead of
-a convention.
+Theorem 4. Theorem 3 says the probit family is invariant. The correct rigidity target is an
+**affine-probit** link `p + q * Φ (αu + β)`, not a bare probit: Gaussian averaging acts on the
+argument and therefore cannot identify a vertical offset `p` or scale `q`. The earlier bare-probit
+target was false; for example `1 / 4 + (1 / 2) * Φ u` is strictly increasing, takes values in
+`(0,1)`, and has the same closure property.
+
+This correction matters biologically. A nonzero floor and a ceiling below one represent persistent
+case-label contamination, incomplete ascertainment, or penetrance bounded away from one. Population
+drift can determine the Gaussian latent-response *shape*, but it cannot manufacture the two
+external anchors needed to identify those observation-channel limits. A bare probit follows only
+after the scientifically separate tail calibration `p = 0`, `p + q = 1`.
 
 The two directions are on different footings here. Sufficiency is `probit_link_invariant` and it
 is proved, because it is Theorem 3 rearranged: the averaged probit is a probit, and the new
@@ -681,10 +689,9 @@ parameters are exhibited. Necessity is `link_rigidity` and it is a `sorry`.
 That asymmetry is the honest state of the argument. The necessity proof runs through a functional
 equation — differentiate the invariance in the intercept, divide, and the logarithmic derivative
 of the link's density is forced to be affine, after which integrability over the whole line
-forces the leading coefficient negative and the link Gaussian. Each of those steps is real
-analysis this file does not set up, and the unbounded strata the source analysis identifies (the
-affine link, and the exponential link on a half-line) are exactly what the boundedness hypothesis
-excludes. -/
+forces the leading coefficient negative and the link's nonconstant part Gaussian. Each of those
+steps is real analysis this file does not set up. The vertical offset and scale survive that
+argument and must remain in the conclusion. -/
 
 open MeasureTheory ProbabilityTheory in
 /-- **Sufficiency: the probit family is closed under Gaussian averaging**, with the new
@@ -695,12 +702,137 @@ theorem probit_link_invariant (lam t a₀ b₀ σ : ℝ) :
       ∫ z, Phi (a₀ * (Real.exp (-(lam * t)) * x + σ * z) + b₀) ∂(gaussianReal 0 1)
         = Phi (a' * x + b') := by
   refine ⟨a₀ * Real.exp (-(lam * t)) / Real.sqrt (1 + a₀ ^ 2 * σ ^ 2),
-    b₀ / Real.sqrt (1 + a₀ ^ 2 * σ ^ 2), fun x => ?_⟩
+    b₀ / Real.sqrt (1 + a₀ ^ 2 * σ ^ 2), fun x ↦ ?_⟩
   rw [probit_invariant_under_ou]
   congr 1
   ring
 
 open MeasureTheory ProbabilityTheory in
+/-- **The observation-channel floor and ceiling survive Gaussian averaging.**
+
+If the biological response curve is `p + q Φ(a₀x + b₀)`, averaging latent liability over a
+Gaussian population displacement changes only its horizontal slope and intercept. The vertical
+offset `p` and scale `q` are untouched. Thus dynamics can identify the affine-probit shape, but
+cannot distinguish a genuine penetrance ceiling from persistent label noise or incomplete case
+ascertainment without separate tail calibration. -/
+theorem affineProbit_link_invariant (p q a₀ b₀ σ : ℝ) :
+    ∃ a' b' : ℝ, ∀ x,
+      ∫ z, (p + q * Phi (a₀ * (x + σ * z) + b₀)) ∂(gaussianReal 0 1)
+        = p + q * Phi (a' * x + b') := by
+  refine ⟨a₀ / Real.sqrt (1 + a₀ ^ 2 * σ ^ 2),
+    b₀ / Real.sqrt (1 + a₀ ^ 2 * σ ^ 2), fun x ↦ ?_⟩
+  have hPhiMeas : Measurable (fun z : ℝ ↦ Phi (a₀ * (x + σ * z) + b₀)) :=
+    strictMono_Phi.monotone.measurable.comp (by fun_prop)
+  have hPhiInt : Integrable (fun z : ℝ ↦ Phi (a₀ * (x + σ * z) + b₀))
+      (gaussianReal 0 1) := by
+    refine Integrable.mono' (integrable_const (1 : ℝ)) hPhiMeas.aestronglyMeasurable ?_
+    filter_upwards with z
+    rw [Real.norm_eq_abs, abs_of_nonneg]
+    · exact ProbabilityTheory.cdf_le_one _ _
+    · exact ProbabilityTheory.cdf_nonneg _ _
+  rw [integral_add (integrable_const p) (hPhiInt.const_mul q), integral_const,
+    integral_const_mul]
+  simp only [measureReal_def, measure_univ, ENNReal.toReal_one, one_smul]
+  have hshape : (fun z ↦ Phi (a₀ * (x + σ * z) + b₀)) =
+      fun z ↦ Phi ((a₀ * x + b₀) + (a₀ * σ) * z) := by
+    funext z
+    congr 1
+    ring
+  rw [hshape, gaussianAverage_probit]
+  congr 2
+  ring
+
+/-- A positive horizontal and vertical scaling preserves the strict ordering of genetic or
+environmental liability. -/
+theorem affineProbit_strictMono (p q α β : ℝ) (hq : 0 < q) (hα : 0 < α) :
+    StrictMono (fun u ↦ p + q * Phi (α * u + β)) := by
+  intro u v huv
+  apply add_lt_add_left
+  apply mul_lt_mul_of_pos_left _ hq
+  apply strictMono_Phi
+  nlinarith
+
+/-- The natural floor/ceiling constraints put every affine-probit risk strictly between zero and
+one. Endpoints may equal zero and one because `Phi` never attains either at a finite liability. -/
+theorem affineProbit_mem_Ioo (p q α β : ℝ) (hp : 0 ≤ p) (hq : 0 < q)
+    (hpq : p + q ≤ 1) (u : ℝ) :
+    0 < p + q * Phi (α * u + β) ∧ p + q * Phi (α * u + β) < 1 := by
+  have hPhiPos : 0 < Phi (α * u + β) := by
+    have hnonneg : 0 ≤ Phi (α * u + β - 1) := ProbabilityTheory.cdf_nonneg _ _
+    exact lt_of_le_of_lt hnonneg (strictMono_Phi (by linarith))
+  have hPhiLtOne : Phi (α * u + β) < 1 := by
+    have hle : Phi (α * u + β + 1) ≤ 1 := ProbabilityTheory.cdf_le_one _ _
+    exact lt_of_lt_of_le (strictMono_Phi (by linarith)) hle
+  constructor <;> nlinarith
+
+open MeasureTheory ProbabilityTheory in
+open MeasureTheory ProbabilityTheory in
+/-- A bounded monotone link composed with an affine map is integrable against a Gaussian.
+
+Monotone functions are measurable, the link is bounded by `1`, and the Gaussian is a
+probability measure, so there is nothing to check beyond assembling those three. -/
+theorem link_integrable (L : ℝ → ℝ) (hmono : StrictMono L) (hbdd : ∀ u, 0 < L u ∧ L u < 1)
+    (a b σ c : ℝ) :
+    Integrable (fun z : ℝ ↦ L (a * (c + σ * z) + b)) (gaussianReal 0 1) := by
+  refine ⟨(hmono.monotone.measurable.comp (by fun_prop)).aestronglyMeasurable, ?_⟩
+  refine hasFiniteIntegral_of_bounded (C := 1) ?_
+  filter_upwards with z
+  rw [Real.norm_eq_abs, abs_of_pos (hbdd _).1]
+  exact le_of_lt (hbdd _).2
+
+open MeasureTheory ProbabilityTheory in
+/-- **The averaged link is strictly increasing in the covariate.**
+
+Pointwise in the noise the integrand is strictly increasing in `x`, and the integral of a
+strictly positive integrable function against a probability measure is strictly positive,
+so the average inherits strictness rather than only monotonicity.
+
+This is the step that makes the orientation of the induced parameter map forced rather
+than assumed; see `link_invariance_slope_pos`. -/
+theorem link_average_strictMono (L : ℝ → ℝ) (hmono : StrictMono L)
+    (hbdd : ∀ u, 0 < L u ∧ L u < 1) {a σ : ℝ} (ha : 0 < a) (b : ℝ) :
+    StrictMono (fun x ↦ ∫ z, L (a * (x + σ * z) + b) ∂(gaussianReal 0 1)) := by
+  intro x y hxy
+  have hix := link_integrable L hmono hbdd a b σ x
+  have hiy := link_integrable L hmono hbdd a b σ y
+  have hpos : 0 < ∫ z, (L (a * (y + σ * z) + b) - L (a * (x + σ * z) + b))
+      ∂(gaussianReal 0 1) := by
+    have hstrict : ∀ z : ℝ, 0 < L (a * (y + σ * z) + b) - L (a * (x + σ * z) + b) := by
+      intro z
+      have : a * (x + σ * z) + b < a * (y + σ * z) + b := by nlinarith
+      linarith [hmono this]
+    rw [integral_pos_iff_support_of_nonneg (fun z ↦ le_of_lt (hstrict z)) (hiy.sub hix)]
+    have hsupp : (Function.support fun z : ℝ ↦
+        L (a * (y + σ * z) + b) - L (a * (x + σ * z) + b)) = Set.univ := by
+      ext z
+      simp only [Function.mem_support, Set.mem_univ, iff_true]
+      exact ne_of_gt (hstrict z)
+    rw [hsupp, measure_univ]
+    norm_num
+  rw [integral_sub hiy hix] at hpos
+  linarith
+
+open MeasureTheory ProbabilityTheory in
+/-- **The induced parameter map preserves orientation: `a' > 0` is forced.**
+
+`link_rigidity`'s invariance hypothesis produces `a'` and `b'` with no sign constraint.
+There is none to impose: the left side is strictly increasing in `x` by
+`link_average_strictMono`, so `x ↦ L (a' x + b')` is too, and a strictly monotone `L`
+then forces `a' > 0`.
+
+Stating it separately keeps the hypothesis honest. A version of `link_rigidity` that
+assumed `0 < a'` would be assuming part of what the invariance already delivers, which is
+the failure mode this corpus keeps finding elsewhere. -/
+theorem link_invariance_slope_pos (L : ℝ → ℝ) (hmono : StrictMono L)
+    (hbdd : ∀ u, 0 < L u ∧ L u < 1) {a b σ a' b' : ℝ} (ha : 0 < a)
+    (heq : ∀ x, ∫ z, L (a * (x + σ * z) + b) ∂(gaussianReal 0 1) = L (a' * x + b')) :
+    0 < a' := by
+  have hlt : L (a' * 0 + b') < L (a' * 1 + b') := by
+    rw [← heq 0, ← heq 1]
+    exact link_average_strictMono L hmono hbdd ha b (by norm_num)
+  have := hmono.lt_iff_lt.mp hlt
+  linarith
+
 /-- **Boundedness really does exclude the affine stratum.**
 
 The classification below says its boundedness hypothesis is load-bearing because it rules
@@ -718,20 +850,20 @@ theorem not_bounded_of_affine (c d : ℝ) (hc : 0 < c) :
   linarith
 
 open MeasureTheory ProbabilityTheory in
-/-- **Necessity: no other bounded link survives.** A strictly increasing link onto `(0,1)` whose
-two-parameter family is closed under Gaussian averaging is the normal cdf composed with an affine
-map — the gauge freedom, and nothing more.
+/-- **Necessity: no other bounded link shape survives.** A strictly increasing bounded link whose
+two-parameter family is closed under Gaussian averaging is a positive vertical affine transform
+of the normal cdf composed with a positive affine map.
 
     NOT PROVED HERE. Differentiating the invariance in the intercept and dividing forces the
     logarithmic derivative of the link's density to be affine; integrability over the whole line
-    then forces its leading coefficient negative, which is exactly a Gaussian density. The
-    boundedness hypothesis is what excludes the other two strata — the affine link, and the
-    exponential link viable only on a half-line — so it is load-bearing rather than cosmetic. -/
+    then forces its leading coefficient negative, which is exactly a Gaussian density after
+    allowing the vertical offset and scale. The boundedness hypothesis excludes the affine and
+    half-line-exponential strata, but does not fix the observation-channel floor and ceiling. -/
 theorem link_rigidity (L : ℝ → ℝ) (hmono : StrictMono L)
     (hbdd : ∀ u, 0 < L u ∧ L u < 1)
     (hinv : ∀ a b σ : ℝ, 0 < a → 0 < σ → ∃ a' b' : ℝ,
       ∀ x, ∫ z, L (a * (x + σ * z) + b) ∂(gaussianReal 0 1) = L (a' * x + b')) :
-    ∃ α β : ℝ, 0 < α ∧ ∀ u, L u = Phi (α * u + β) := by
+    ∃ p q α β : ℝ, 0 < q ∧ 0 < α ∧ ∀ u, L u = p + q * Phi (α * u + β) := by
   sorry
 
 /-! ## The evolution law of the response curve
