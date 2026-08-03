@@ -48,18 +48,41 @@ base), and every axiom declared in this repository. -/
 def allowed : List Name :=
   [``propext, ``Classical.choice, ``Quot.sound]
 
+/-- Lean's own generated equation and match lemmas: `f.eq_def`, `f.eq_1`,
+`f.match_1`, `f.proof_2`.  The suffix is `eq_` or `match_` or `proof_` followed
+by *digits*, or the literal `eq_def`.
+
+MATCHING ON THE BARE PREFIX IS WRONG AND WAS WRONG HERE.  `startsWith "eq_"`
+excludes every hand-written theorem in the ordinary Mathlib naming style
+`eq_<conclusion>_of_<hypothesis>`, and this corpus has four:
+`Calibrator.eq_of_ae_eq_of_continuous` and, in `BundleRigidity`,
+`eq_zero_of_tauOdd_of_tauEven`, `eq_empty_of_core_empty` and
+`eq_zero_of_bounded_by_linear`.  A guard that silently drops four theorems from
+the scan is worse than no guard, because its clean report is read as coverage. -/
+def isGeneratedEquation (f : String) : Bool :=
+  f == "eq_def" ||
+  (["eq_", "match_", "proof_"].any f.startsWith &&
+    (f.dropWhile (· != '_') |>.drop 1 |>.all Char.isDigit) &&
+    f.any Char.isDigit)
+
 /-- Whether a value-bearing declaration was authored in the corpus rather
 than generated automatically for an inductive type or structure.  Generated
 recursors, projections, `injEq` declarations, and extensionality lemmas are
 already in the dependency closure of their user-authored roots; asking
 `collectAxioms` to recompute their closures individually is redundant and was
-large enough to exhaust the CI job after a successful full build. -/
+large enough to exhaust the CI job after a successful full build.
+
+The redundancy argument is what makes the filter safe, and it is worth stating
+precisely: a generated declaration is elaborated from a user-authored root, so
+its axiom closure is contained in that root's.  Skipping it therefore cannot
+hide an axiom the scan would otherwise report.  That argument covers exactly
+the names below and nothing else, which is why the equation-lemma test above is
+by shape rather than by prefix. -/
 def userWritten (env : Environment) (n : Name) : Bool :=
   !n.isInternalDetail
   && !(env.isProjectionFn n)
   && (match n with
-      | .str _ f => !(f.startsWith "eq_" || f.startsWith "proof_" ||
-                       f.startsWith "match_" ||
+      | .str _ f => !(isGeneratedEquation f ||
                        ["mk", "injEq", "eta", "sizeOf", "noConfusion",
                         "noConfusionType", "rec", "recOn", "casesOn", "brecOn",
                         "below", "ndrec", "toCtorIdx", "ofNat", "sizeOf_spec",

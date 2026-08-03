@@ -124,12 +124,18 @@ theorem overlap_bias
   · exact div_pos h_p h_n
   · rw [div_lt_one h_n]; exact h_n_large
 
-/-- **Blocked cross-validation for family structure.**
-    When evaluating PGS in populations with family structure,
-    standard CV overestimates R² due to shared segments.
-    Family-blocked CV is closer to the true R² because it removes
-    the upward bias from family sharing, so its absolute error is smaller. -/
-theorem blocked_cv_less_biased
+/-- **The middle of three ordered reals is nearer the lowest, in absolute
+    value:** from `t ≤ b < s` and `t < s`, conclude `|b - t| < |s - t|`.
+
+    **The claim is the hypothesis `h_blocked_closer_to_true`.** Read as
+    methodology this says family-blocked cross-validation lands between the
+    truth and the optimistic standard-CV estimate, so its absolute error is
+    smaller. But "blocked lands below standard" is assumed by name, and
+    "blocked is not below the truth" is assumed too; what the proof adds is that
+    an ordering between three reals can be rewritten with absolute values. It
+    does not derive the ordering from family sharing, from segment sharing, or
+    from any property of a cross-validation scheme, none of which occur below. -/
+theorem abs_sub_lt_abs_sub_of_between
     (r2_standard_cv r2_blocked_cv r2_true : ℝ)
     (h_standard_biased : r2_true < r2_standard_cv)
     (h_blocked_between : r2_true ≤ r2_blocked_cv)

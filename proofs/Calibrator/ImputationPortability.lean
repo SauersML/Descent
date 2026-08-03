@@ -90,17 +90,22 @@ PGS quality across populations.
 
 section ReferencePanel
 
-/-- **Population-specific reference panels are optimal.**
-    A reference panel from the same population gives the best
-    imputation because LD patterns match perfectly.
-    Model: imputation r² = r²_LD × panel_match where panel_match ∈ (0, 1].
-    Matched panels have panel_match = 1; unmatched have panel_match < 1. -/
-theorem matched_panel_optimal
+/-- **Scaling a nonnegative number by at most one does not increase it:**
+    `r2_LD * panel_match ≤ r2_LD` for `0 ≤ r2_LD` and `panel_match ≤ 1`.
+
+    The reading is that a same-population reference panel imputes best, under
+    the model `imputation r² = r²_LD × panel_match` with `panel_match ∈ (0,1]`
+    and `= 1` exactly when the panel matches. That model is the whole claim and
+    it is stipulated, not derived: no panel, no LD, no imputation and no
+    population appears below, and nothing here says a matched panel *attains*
+    the bound — `panel_match = 1` is not among the hypotheses, so the statement
+    is a bound, not an optimality result. -/
+theorem mul_le_self_of_le_one
     (r2_LD panel_match : ℝ)
     (h_r2 : 0 ≤ r2_LD) (h_pm_le : panel_match ≤ 1) :
     r2_LD * panel_match ≤ r2_LD := by
-  calc r2_LD * panel_match ≤ r2_LD * 1 := by
-        exact mul_le_mul_of_nonneg_left h_pm_le h_r2
+  calc r2_LD * panel_match ≤ r2_LD * 1 :=
+        mul_le_mul_of_nonneg_left h_pm_le h_r2
     _ = r2_LD := mul_one _
 
 /-- **Mean imputation quality as a function of LD extent.**

@@ -383,8 +383,8 @@ theorem more_polygenic_more_portable
   have h_M₂_pos : 0 < (M₂ : ℝ) := Nat.cast_pos.mpr h_M₂_pos_nat
   have h_div :
       (mismatched₁.card : ℝ) / (M₂ : ℝ) <
-        (mismatched₁.card : ℝ) / (M₁ : ℝ) := by
-    exact (div_lt_div_iff_of_pos_left h_k_pos h_M₂_pos h_M₁_pos).2 (by exact_mod_cast h_M)
+        (mismatched₁.card : ℝ) / (M₁ : ℝ) :=
+    (div_lt_div_iff_of_pos_left h_k_pos h_M₂_pos h_M₁_pos).2 (by exact_mod_cast h_M)
   have h_same_card_cast : (mismatched₂.card : ℝ) = (mismatched₁.card : ℝ) := by
     exact_mod_cast h_same_card.symm
   rw [h_same_card_cast]
@@ -401,8 +401,8 @@ theorem height_polygenic_good_portability
     (h_same_card : mismatchedBMI.card = mismatchedHeight.card)
     (h_loss : 0 < mismatchedBMI.card) :
     uniformCatastrophicPortabilityScore M_bmi mismatchedBMI <
-      uniformCatastrophicPortabilityScore M_height mismatchedHeight := by
-  exact more_polygenic_more_portable mismatchedBMI mismatchedHeight h_M h_same_card h_loss
+      uniformCatastrophicPortabilityScore M_height mismatchedHeight :=
+  more_polygenic_more_portable mismatchedBMI mismatchedHeight h_M h_same_card h_loss
 
 /-- **Selection can outweigh a polygenicity advantage.**
 
@@ -887,16 +887,18 @@ theorem region_heritability_enrichment
   rw [hsimpl, div_lt_div_iff₀ h_α_pos (mul_pos h_mc h_ht)]
   nlinarith
 
-/-- **Coding variants more portable than regulatory (from functional constraint).**
-    Coding regions are under stronger purifying selection across all
-    populations (protein sequences are conserved), so effect sizes at
-    coding variants are more correlated cross-population: rg_coding > rg_reg.
-    Since portability ∝ rg², and x ↦ x² is strictly monotone on [0,∞),
-    higher rg implies higher portability.
+/-- **Squaring is strictly monotone on the nonnegatives:** `0 ≤ a`, `0 ≤ b`,
+    `b < a` give `b² < a²`.
 
-    Derived: from rg_regulatory < rg_coding (both ≥ 0),
-    the strict monotonicity of squaring on nonneg reals gives the result. -/
-theorem coding_more_portable_than_regulatory
+    **Both halves of the genetics are hypotheses.** The reading is that coding
+    regions are under stronger purifying selection, hence effect sizes there are
+    more correlated across populations (`rg_coding > rg_regulatory`), hence —
+    since portability goes as `rg²` — coding variants port better. The first
+    implication is assumed outright as `h_coding_higher`, and the second is
+    assumed by choosing to square. No selection, no region annotation, and no
+    portability measure appears below. What remains is `x ↦ x²` monotone on
+    `[0, ∞)`. -/
+theorem sq_lt_sq_of_nonneg_of_lt
     (rg_coding rg_regulatory : ℝ)
     (h_coding_nn : 0 ≤ rg_coding) (h_reg_nn : 0 ≤ rg_regulatory)
     (h_coding_higher : rg_regulatory < rg_coding) :

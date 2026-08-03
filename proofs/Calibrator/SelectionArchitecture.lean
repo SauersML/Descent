@@ -99,17 +99,21 @@ theorem effect_correlation_increases_with_Ns
   rw [sub_lt_sub_iff_left]
   exact div_lt_div_of_pos_left one_pos (by linarith) (by linarith)
 
-/-- **Highly polygenic traits have better portability.**
-    When trait is highly polygenic (many small effects), each locus
-    contributes little, and the overall signal is robust to per-locus changes.
-    This is essentially a law of large numbers argument. -/
-theorem polygenicity_improves_portability
+/-- **`c/m` is decreasing in `m`**, for `c > 0` and `0 < m₁ < m₂`.
+
+    The reading is a law-of-large-numbers argument: with many small effects each
+    locus matters less, so a portability estimate is more robust. The
+    proportionality that carries that reading — that the estimator's variance
+    goes as `1/m` — is written into the statement rather than derived, and no
+    estimator, locus or trait appears below. A law of large numbers is a
+    statement about a sequence of random variables; this is division. -/
+theorem div_cast_lt_div_cast_of_lt
     (m₁ m₂ : ℕ) (var_per_locus : ℝ)
     (h_m₁ : 0 < m₁) (h_more : m₁ < m₂)
     (h_var : 0 < var_per_locus) :
     -- Variance of portability ratio estimate ∝ 1/m
-    var_per_locus / (m₂ : ℝ) < var_per_locus / (m₁ : ℝ) := by
-  exact div_lt_div_of_pos_left h_var (Nat.cast_pos.mpr h_m₁) (Nat.cast_lt.mpr h_more)
+    var_per_locus / (m₂ : ℝ) < var_per_locus / (m₁ : ℝ) :=
+  div_lt_div_of_pos_left h_var (Nat.cast_pos.mpr h_m₁) (Nat.cast_lt.mpr h_more)
 
 /-- **Highly polygenic architecture: total heritability sums from small effects.**
     With M causal loci each contributing h²/M, the total heritability
@@ -238,15 +242,15 @@ theorem fluctuatingCorrelation_lt_stabilizing_of_tau_lt_threshold
   have h_rho_lt_one : effectCorrelationStabilizing Ns < 1 :=
     effectCorrelationStabilizing_lt_one Ns hNs
   have h_log_neg : Real.log (effectCorrelationStabilizing Ns) < 0 := by
-    have h_log_lt : Real.log (effectCorrelationStabilizing Ns) < Real.log 1 := by
-      exact Real.log_lt_log h_rho_pos h_rho_lt_one
+    have h_log_lt : Real.log (effectCorrelationStabilizing Ns) < Real.log 1 :=
+      Real.log_lt_log h_rho_pos h_rho_lt_one
     simpa using h_log_lt
   have h_neglog_pos : 0 < -Real.log (effectCorrelationStabilizing Ns) := by
     linarith
-  have h_mul_lt : tau * (-Real.log (effectCorrelationStabilizing Ns)) < t := by
-    exact (lt_div_iff₀ h_neglog_pos).mp h_tau_lt
-  have h_neglog_lt_div : -Real.log (effectCorrelationStabilizing Ns) < t / tau := by
-    exact (lt_div_iff₀ h_tau).2 (by simpa [mul_comm] using h_mul_lt)
+  have h_mul_lt : tau * (-Real.log (effectCorrelationStabilizing Ns)) < t :=
+    (lt_div_iff₀ h_neglog_pos).mp h_tau_lt
+  have h_neglog_lt_div : -Real.log (effectCorrelationStabilizing Ns) < t / tau :=
+    (lt_div_iff₀ h_tau).2 (by simpa [mul_comm] using h_mul_lt)
   have h_exp_lt_log' : -(t / tau) < Real.log (effectCorrelationStabilizing Ns) := by
     linarith
   have h_exp_lt_log : -t / tau < Real.log (effectCorrelationStabilizing Ns) := by
@@ -286,8 +290,8 @@ theorem tauFromObservedEffectCorrelation_pos
     (h_t : 0 < t) (h_rho : 0 < rho) (h_rho_lt : rho < 1) :
     0 < tauFromObservedEffectCorrelation t rho := by
   have h_log_neg : Real.log rho < 0 := by
-    have h_log_lt : Real.log rho < Real.log 1 := by
-      exact Real.log_lt_log h_rho h_rho_lt
+    have h_log_lt : Real.log rho < Real.log 1 :=
+      Real.log_lt_log h_rho h_rho_lt
     simpa using h_log_lt
   unfold tauFromObservedEffectCorrelation
   exact div_pos_of_neg_of_neg (by linarith) h_log_neg
@@ -300,8 +304,8 @@ theorem fluctuatingEffectCorrelation_eq_observedCorrelation_of_recoveredTau
     fluctuatingEffectCorrelation t (tauFromObservedEffectCorrelation t rho) = rho := by
   have h_t_ne : t ≠ 0 := ne_of_gt h_t
   have h_log_neg : Real.log rho < 0 := by
-    have h_log_lt : Real.log rho < Real.log 1 := by
-      exact Real.log_lt_log h_rho h_rho_lt
+    have h_log_lt : Real.log rho < Real.log 1 :=
+      Real.log_lt_log h_rho h_rho_lt
     simpa using h_log_lt
   have h_log_ne : Real.log rho ≠ 0 := ne_of_lt h_log_neg
   unfold fluctuatingEffectCorrelation tauFromObservedEffectCorrelation
@@ -604,8 +608,8 @@ theorem polygenic_more_portable_than_oligogenic
     (h_oligo : 0 < m_oligo)
     (h_more_loci : m_oligo < m_poly) :
     -- Per-locus contribution is smaller for polygenic traits
-    h2 / (m_poly : ℝ) < h2 / (m_oligo : ℝ) := by
-  exact div_lt_div_of_pos_left h_h2 (Nat.cast_pos.mpr h_oligo) (Nat.cast_lt.mpr h_more_loci)
+    h2 / (m_poly : ℝ) < h2 / (m_oligo : ℝ) :=
+  div_lt_div_of_pos_left h_h2 (Nat.cast_pos.mpr h_oligo) (Nat.cast_lt.mpr h_more_loci)
 
 end ArchitecturePredictions
 
