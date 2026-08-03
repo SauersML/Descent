@@ -273,8 +273,8 @@ structure LDSCModel (m : ℕ) where
   h_ld_adj_pos : ∀ i, 0 ≤ ld_adj i
   h_ld_adj_le_one : ∀ i, ld_adj i ≤ 1
 
-/-! **Deleted: `geneticCorrelationLDSC` — later renamed `geneticCorrelationLDSC`
-— together with `genetic_correlation_predicts_portability` and
+/-! **Deleted: `geneticCorrelationLDSC`, together with
+`genetic_correlation_predicts_portability` and
 `genetic_correlation_portability_bound_attained`.**
 
 The body was
