@@ -348,23 +348,19 @@ theorem olsEffectEstimationVariance_eq_haplotypeEffectVarianceOLS
       haplotypeEffectVarianceOLS σ2 n freq := by
   unfold olsEffectEstimationVariance haplotypeEffectVarianceOLS; ring
 
-/-! **RESTATED, because the old form encoded a falsified identification.** This theorem
-used to read
+/-! **Do not equate `olsEffectEstimationVariance σ2 varX n` with
+`haplotypeEffectEstimationVariance σ2 n varX`.** That is true as arithmetic — both sides
+are `σ2 / (n · varX)` — and false as a claim, because it is reached only by passing a
+haplotype FREQUENCY where a genotype VARIANCE belongs. For a binary indicator of frequency
+`f` the variance is `f(1-f)`, not `f`, and that missing `(1-f)` is the defect
+`HaplotypeTheory` measures: the uncorrected body understates the estimation variance by
+50.4% at `f = 1/2`, worst for COMMON haplotypes, the opposite of the rarity intuition the
+surrounding prose appeals to.
 
-    olsEffectEstimationVariance σ2 varX n = haplotypeEffectEstimationVariance σ2 n varX
-
-which is true as arithmetic — both sides are `σ2 / (n · varX)` — and false as a claim,
-because it is only reached by passing a haplotype FREQUENCY where a genotype VARIANCE
-belongs. For a binary indicator of frequency `f` the variance is `f(1-f)`, not `f`, and
-that missing `(1-f)` is exactly the defect measured in `HaplotypeTheory`: the uncorrected
-body understates the estimation variance by 50.4% at `f = 1/2`, worst for COMMON
-haplotypes, which is the opposite of the rarity intuition its own prose appeals to.
-
-So the old theorem was a cross-check that certified the wrong pairing. It is restated
-against `haplotypeEffectVarianceOLS`, the VALIDATED form, with the variance supplied as
-`freq * (1 - freq)` — which is what makes the substitution legitimate rather than a
-coincidence of two symbols both named for a spread. `olsEffectEstimationVariance` itself
-was correct throughout and is unchanged; only what it was being equated to has moved. -/
+The theorem above is the correct pairing: `haplotypeEffectVarianceOLS`, the VALIDATED
+form, with the variance supplied explicitly as `freq * (1 - freq)` — which is what makes
+the substitution legitimate rather than two symbols sharing a slot.
+`olsEffectEstimationVariance` is correct as it stands and needs no change. -/
 
 /-- The set of loci retained by a hard-threshold sparse estimator such as
 LASSO, modeled here by the loci whose marginal effect magnitude clears the
