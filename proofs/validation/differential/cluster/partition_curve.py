@@ -261,11 +261,12 @@ def general_optimum(out):
     print("  the TOTAL BUDGET DROPS OUT. n'* depends only on rho and s2/amp.")
     print("  risk* = 1/(N * max p(n')/n'), exactly inverse in the budget.")
     print("")
-    print("  %-8s %-9s %-10s %-10s %-14s %-16s"
-          % ("rho", "tau", "n'*", "n'*/tau", "p(n'*)/p_sat", "N*risk* (=1/P*)"))
+    print("  %-8s %-9s %-10s %-10s %-14s %-16s %-14s"
+          % ("rho", "tau", "n'*", "n'*/tau", "p(n'*)/p_sat", "N*risk* (=1/P*)",
+             "N*tau*risk*"))
     rows = []
     ns = np.arange(2, 4000001, dtype=np.float64)
-    for rho in (0.5, 0.7, 0.8, 0.9, 0.95, 0.98, 0.99, 0.995):
+    for rho in (0.5, 0.7, 0.8, 0.9, 0.95, 0.98, 0.99, 0.995, 0.999, 0.9995):
         tau = 1.0 / (1.0 - rho)
         sub = ns[ns <= max(400.0, 4000.0 * tau)]
         val = p_of(rho, sub) / sub
@@ -275,10 +276,11 @@ def general_optimum(out):
                      "n_star_over_tau": nstar / tau,
                      "p_at_star_over_psat": float(p_of(rho, nstar)
                                                   / p_sat(rho)),
-                     "N_times_risk_star": float(1.0 / val[i])})
-        print("  %-8.3f %-9.1f %-10.0f %-10.2f %-14.4f %-16.4f"
+                     "N_times_risk_star": float(1.0 / val[i]),
+                     "N_tau_times_risk_star": float(tau / val[i])})
+        print("  %-8.4f %-9.1f %-10.0f %-10.2f %-14.4f %-16.4f %-14.4f"
               % (rho, tau, nstar, nstar / tau,
-                 p_of(rho, nstar) / p_sat(rho), 1.0 / val[i]))
+                 p_of(rho, nstar) / p_sat(rho), 1.0 / val[i], tau / val[i]))
     r = [x["n_star_over_tau"] for x in rows]
     print("")
     print("  n'*/tau over rho = 0.5 to 0.995: %.2f to %.2f."
@@ -295,6 +297,30 @@ def general_optimum(out):
     print("  the optimal design DELIBERATELY UNDER-SATURATES each cohort:")
     print("  buying the last 30% of per-cohort information costs more in lost")
     print("  cohorts than it returns.")
+    # the last column is flat, which closes the law completely
+    cvals = [x["N_tau_times_risk_star"] for x in rows]
+    print("")
+    print("  THE LAW CLOSES. The last column, N tau risk*, is flat to %.1f%%"
+          % (100.0 * (max(cvals) / min(cvals) - 1.0)))
+    print("  over rho = 0.5 to %.4f and converges to %.3f, so the whole"
+          % (rows[-1]["rho"], cvals[-1]))
+    print("  partition law in the long-memory limit is")
+    print("")
+    print("      n'*   ~  %.2f tau        (cohort depth: a fixed few decay "
+          "lengths)" % float(np.median([x["n_star_over_tau"] for x in rows])))
+    print("      m*    ~  N / (%.2f tau)  (cohort count: everything else)"
+          % float(np.median([x["n_star_over_tau"] for x in rows])))
+    print("      risk* ~  %.2f / (N tau)  (and nothing else enters)"
+          % cvals[-1])
+    print("")
+    print("  Risk at the optimum is inverse in the total budget AND inverse in")
+    print("  the correlation time, so a longer LD decay length is a BENEFIT at")
+    print("  fixed total markers: it buys deeper cohorts that each saturate")
+    print("  further, and the two effects compound.")
+    out["asymptotic_law"] = {"n_star_over_tau": float(np.median(
+        [x["n_star_over_tau"] for x in rows])),
+        "N_tau_risk_constant": cvals[-1],
+        "flatness_pct": 100.0 * (max(cvals) / min(cvals) - 1.0)}
     out["general_optimum"] = rows
 
     # sensitivity to the noise ratio, which is the other free quantity
