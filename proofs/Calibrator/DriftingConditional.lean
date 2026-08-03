@@ -129,17 +129,25 @@ theorem linkedCurve_identified_modulo_constants {ι : Type*}
 def IsInvariantWeight {n : ℕ} (ϖ : Fin n → ℝ) (L : Fin n → Fin n → ℝ) : Prop :=
   ∀ j, ∑ i, ϖ i * L i j = 0
 
-/-- **An invariant weight exists**, so the theorems assuming `IsInvariantWeight` are about
-something rather than vacuously true.
-
-    The zero weight is invariant for every generator. That is the cheapest possible witness
-    and it is deliberately the one stated: it establishes non-vacuity without smuggling in
-    any claim about which distributions are invariant for a given generator, which is a
-    separate question this module does not answer. -/
+/-- The zero weight is invariant for every generator. This is a useful algebraic base case, but
+it is not a probability weight because its total mass is zero. -/
 theorem isInvariantWeight_zero {n : ℕ} (L : Fin n → Fin n → ℝ) :
     IsInvariantWeight (fun _ ↦ (0 : ℝ)) L := by
   intro j
   simp
+
+/-- **The invariant-probability assumptions used below are jointly satisfiable.**
+
+    On the nonempty state space `Fin (n + 1)`, put unit mass at state zero and take the zero
+    generator. The weight has total mass one and is invariant. This explicit witness rules out
+    vacuity without assuming that an arbitrary biological generator has a stationary law. -/
+theorem exists_invariantProbabilityWeight (n : ℕ) :
+    ∃ ϖ : Fin (n + 1) → ℝ, ∃ L : Fin (n + 1) → Fin (n + 1) → ℝ,
+      (∑ i, ϖ i = 1) ∧ IsInvariantWeight ϖ L := by
+  refine ⟨fun i ↦ if i = 0 then 1 else 0, fun _ _ ↦ 0, ?_, ?_⟩
+  · simp
+  · intro j
+    simp
 
 /-- A generator whose columns sum to zero admits the uniform weight as invariant, which is
     the witness that matters for a symmetric biological generator. -/
