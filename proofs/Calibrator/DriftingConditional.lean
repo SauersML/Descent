@@ -258,7 +258,7 @@ theorem generator_linkedCurve_eq_generator {n : ℕ}
     the linked-curve equation; invariant averaging then removes `Lm` and returns `-thetaDot`.
     Unlike `invariantAverage_eq_neg_of_affine_evolution`, this theorem does not take the desired
     linked evolution as an input. -/
-theorem invariantAverage_linkedCurveVelocity_eq_neg_thresholdVelocity {n : ℕ}
+theorem invariantAverage_velocity_eq_neg_shift {n : ℕ}
     (ϖ : Fin n → ℝ) (L : Fin n → Fin n → ℝ) (m dm : Fin n → ℝ)
     (theta thetaDot : ℝ) (hmass : ∑ i, ϖ i = 1)
     (hinv : IsInvariantWeight ϖ L) (hconst : KillsConstants L)

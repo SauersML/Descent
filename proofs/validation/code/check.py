@@ -1767,7 +1767,9 @@ def run_identifications() -> int:
         # `variant` must not fire inside `invariant`: an invariant measure, an
         # invariant subspace and an invariant average are mathematics, not genetics,
         # and flagging them asks for a rename away from the standard term.
-        r"portab|drift|heritab|genetic|genom|(?<!in)variant|locus|loci|allele|pgs|"
+        # `loci` and `locus` are genetics only as whole words: they also sit inside
+        # `velocity` and `locusOfControl`-style names, so require a boundary.
+        r"portab|drift|heritab|genetic|genom|(?<!in)variant|\blocus\b|\bloci\b|allele|pgs|"
         r"ancestr|gwas|snp|calibrat|imputation|selection|polygenic|epistas|"
         r"cohort|population|panel|fst|prevalence|phenotype|trait|marker|"
         r"burden|gene_|_gene(?!rat)|kinship|admixture|coalescent|bottleneck|founder|"

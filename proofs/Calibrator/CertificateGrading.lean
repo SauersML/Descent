@@ -95,6 +95,17 @@ theorem abs_mean_le_sum_abs (P : FinitePrior n) (f : Fin (n + 1) → ℝ) :
       exact mul_le_mul_of_nonneg_right (P.probability_le_one i) (abs_nonneg _)
     _ = ∑ i, |f i| := by simp
 
+/-- The mean under a point mass is the value at that point. -/
+@[simp] theorem mean_pure (i : Fin (n + 1)) (f : Fin (n + 1) → ℝ) :
+    FinitePrior.mean (PMF.pure i) f = f i := by
+  unfold FinitePrior.mean FinitePrior.probability
+  rw [Finset.sum_eq_single i]
+  · simp [PMF.pure_apply]
+  · intro j _ hj
+    simp [PMF.pure_apply, hj]
+  · intro h
+    exact absurd (Finset.mem_univ i) h
+
 end FinitePrior
 
 /-- The finite probability simplex.  This is the convex parameter class on
@@ -367,6 +378,75 @@ theorem feasible_one_iff_momentMatched (K : ℕ) (P Q : FinitePrior parameterCou
     E.certificateProblem.Feasible K 1 P Q ↔
       E.certificateProblem.MomentMatched K P Q :=
   ⟨fun h ↦ h.1, fun h ↦ ⟨h, E.totalVariation_le_one' P Q⟩⟩
+
+/-! ### The constant-channel falsifier, formalized -/
+
+/-- An experiment whose observation law contains no parameter information.
+
+This is a useful negative control, not a witness for an incompleteness rate: target and moment
+functions may vary, but every parameter emits the same law. -/
+noncomputable def constantObservationExperiment
+    (target : Fin (parameterCount + 1) → ℝ)
+    (moment : ℕ → Fin (parameterCount + 1) → ℝ)
+    (law : FinitePrior observationCount) :
+    FiniteMixtureExperiment parameterCount observationCount where
+  target := target
+  moment := moment
+  observation := fun _ ↦ law
+
+@[simp] theorem constantObservationExperiment_mixture
+    (target : Fin (parameterCount + 1) → ℝ)
+    (moment : ℕ → Fin (parameterCount + 1) → ℝ)
+    (law : FinitePrior observationCount) (P : FinitePrior parameterCount) :
+    (constantObservationExperiment target moment law).mixture P = law := by
+  exact PMF.bind_const P law
+
+@[simp] theorem constantObservationExperiment_totalVariation
+    (target : Fin (parameterCount + 1) → ℝ)
+    (moment : ℕ → Fin (parameterCount + 1) → ℝ)
+    (law : FinitePrior observationCount) (P Q : FinitePrior parameterCount) :
+    (constantObservationExperiment target moment law).totalVariation P Q = 0 := by
+  unfold totalVariation
+  simp
+
+/-- In a constant channel, feasibility is only moment matching at every information radius.
+The data-radius constraint contributes nothing because the prior-predictive laws are identical. -/
+theorem constantObservationExperiment_feasible_iff
+    (target : Fin (parameterCount + 1) → ℝ)
+    (moment : ℕ → Fin (parameterCount + 1) → ℝ)
+    (law : FinitePrior observationCount) (K : ℕ) (h : ℝ)
+    (P Q : FinitePrior parameterCount) :
+    (constantObservationExperiment target moment law).certificateProblem.Feasible K h P Q ↔
+      (constantObservationExperiment target moment law).certificateProblem.MomentMatched K P Q := by
+  constructor
+  · exact fun hfeasible ↦ hfeasible.1
+  · intro hmatched
+    exact ⟨hmatched, by simp⟩
+
+/-- Consequently the modulus of a constant channel is independent of the information radius.
+
+This is the exact reason such a channel cannot establish a sample-size law: changing the nominal
+noise level does not change the optimization problem at all. -/
+theorem constantObservationExperiment_modulus_eq
+    (target : Fin (parameterCount + 1) → ℝ)
+    (moment : ℕ → Fin (parameterCount + 1) → ℝ)
+    (law : FinitePrior observationCount) (K : ℕ) (h₁ h₂ : ℝ) :
+    (constantObservationExperiment target moment law).certificateProblem.modulus K h₁ =
+      (constantObservationExperiment target moment law).certificateProblem.modulus K h₂ := by
+  congr 1
+  ext d
+  simp only [FiniteMomentCertificateProblem.admissibleGaps, Set.mem_setOf_eq]
+  constructor
+  · rintro ⟨P, Q, hfeasible, rfl⟩
+    exact ⟨P, Q,
+      (constantObservationExperiment_feasible_iff target moment law K h₂ P Q).2
+        ((constantObservationExperiment_feasible_iff target moment law K h₁ P Q).1 hfeasible),
+      rfl⟩
+  · rintro ⟨P, Q, hfeasible, rfl⟩
+    exact ⟨P, Q,
+      (constantObservationExperiment_feasible_iff target moment law K h₁ P Q).2
+        ((constantObservationExperiment_feasible_iff target moment law K h₂ P Q).1 hfeasible),
+      rfl⟩
 
 /-- Grade exponent used in the fixed-grade gap theorem.  Writing `K + 1`
 makes the theorem total at grade zero while retaining order `1/K`. -/
