@@ -208,6 +208,17 @@ structure FiniteBoundedDeviation (Ω : Type*) [Fintype Ω] where
   radius_nonneg : 0 ≤ radius
   bound : ∀ ω, |deviation ω| ≤ radius
 
+/-- **The class is inhabited**: a point mass, zero deviation, zero radius. -/
+noncomputable def FiniteBoundedDeviation.witness (n : ℕ) :
+    FiniteBoundedDeviation (Fin (n + 1)) where
+  weight := fun ω ↦ if ω = 0 then 1 else 0
+  weight_nonneg := fun ω ↦ by by_cases h : ω = 0 <;> simp [h]
+  weight_sum := by simp
+  deviation := fun _ ↦ 0
+  radius := 0
+  radius_nonneg := le_rfl
+  bound := fun _ ↦ by simp
+
 /-- **Nonemptiness of `FiniteBoundedDeviation` is ADMITTED, not proved.**  Every theorem quantified
 over it is vacuous if this fails, so the claim is stated and left open rather than left
 implicit.  Discharging it means exhibiting a point-mass weight, zero deviation and zero radius, and evaluating the sum.

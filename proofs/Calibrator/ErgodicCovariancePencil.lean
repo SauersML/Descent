@@ -89,6 +89,21 @@ structure StationarySpaceTimeField (Ω K E : Type*)
   /-- Time stationarity at the level of the full spatial process law. -/
   stationary : ∀ t, Measure.map (slice t) probability = Measure.map (slice 0) probability
 
+/-- **The class is inhabited**, by the constant field on a one-point realization
+space.
+
+    Stationarity is the field with content, and a slice that does not depend on
+    `t` satisfies it by reflexivity. This establishes only that the theorems
+    below are about something; a field with genuine time dependence is what they
+    are for. -/
+noncomputable def StationarySpaceTimeField.witness (K : Type*) :
+    StationarySpaceTimeField Unit K Unit where
+  probability := Measure.dirac ()
+  isProbability := by infer_instance
+  slice := fun _ _ _ ↦ ()
+  measurable_slice := fun _ ↦ measurable_const
+  stationary := fun _ ↦ rfl
+
 namespace StationarySpaceTimeField
 
 /-- Extract the source/target coupling at time separation `tau`.  Both slices live on the

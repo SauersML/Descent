@@ -49,8 +49,7 @@ noncomputable def PCCorrectionModel.witness : PCCorrectionModel where
     have hj : j.val < 2 := j.isLt
     have hi0 : i.val = 0 := by omega
     have hj0 : j.val ≠ 0 := by omega
-    simp [hi0, hj0]
-    norm_num
+    simp [hi0, hj0] <;> norm_num
   c := 1
   c_pos := by norm_num
   k := 0
@@ -186,6 +185,26 @@ structure RecentFineScaleConfounding where
   minLoading : ℝ
   minLoading_pos : 0 < minLoading
   loading_ge : minLoading ≤ |direction witness|
+
+/-- **The class is inhabited**, on the two-component model correcting the leading PC.
+
+    The confounding sits entirely on coordinate `1`, which `k = 0` leaves
+    uncorrected, so `fineScale` holds and the loading there is `1`. This is the
+    smallest configuration in which the omitted direction exists at all: `k_lt`
+    is what guarantees a coordinate above `k` for it to live on. -/
+noncomputable def RecentFineScaleConfounding.witness : RecentFineScaleConfounding where
+  pc := PCCorrectionModel.witness
+  direction := fun i ↦ if i.val = 0 then 0 else 1
+  fineScale := by
+    intro i hi
+    have hi0 : i.val = 0 := by
+      simpa [PCCorrectionModel.witness] using Nat.le_zero.mp hi
+    simp [hi0]
+  witness := ⟨1, by simp [PCCorrectionModel.witness]⟩
+  witness_omitted := by simp [PCCorrectionModel.witness]
+  minLoading := 1
+  minLoading_pos := by norm_num
+  loading_ge := by norm_num
 
 /-- Recent fine-scale confounding cannot lie in the span of the corrected top PCs. -/
 theorem RecentFineScaleConfounding.not_mem_topPCSpan

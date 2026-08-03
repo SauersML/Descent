@@ -463,8 +463,9 @@ error was reproduced independently several times.
 This section makes the assumption an object rather than a habit.
 `hetStepWithMutation` is the recurrence *with* mutation; the closed-population
 recurrence is its `mu = 0` case (`hetTrajectory_of_no_mutation`);
-`hetMutationFloor` is the heterozygosity that the mutation term holds the
-population above forever (`hetTrajectory_ge_hetMutationFloor`); and
+`hetMutationFloor` is the heterozygosity that the mutation term holds a
+population above forever *once it is above it*
+(`hetTrajectory_ge_hetMutationFloor_of_init_ge_floor`); and
 `driftOnly_lt_hetTrajectory_of_below_floor` is the quantitative cost -- once the
 drift-only prediction dips below that floor it is strictly wrong, with no appeal
 to simulation. `ClosedPopulationNoMutation` carries the assumption in a field, so
@@ -549,7 +550,7 @@ theorem hetTrajectory_of_no_mutation (Ne H₀ : ℝ) (t : ℕ) :
 state at or above the floor lands at or above the floor. The contraction
 hypothesis `1/(2 Nₑ) + 2 mu ≤ 1` says only that the two forces together do not
 overshoot in a single generation. -/
-theorem hetStepWithMutation_ge_hetMutationFloor (Ne mu H : ℝ)
+theorem hetStepWithMutation_ge_hetMutationFloor_of_ge_floor (Ne mu H : ℝ)
     (hNe : 0 < Ne) (hmu : 0 ≤ mu)
     (hcontract : 1 / (2 * Ne) + 2 * mu ≤ 1)
     (hH : hetMutationFloor Ne mu ≤ H) :
@@ -571,7 +572,7 @@ theorem hetStepWithMutation_ge_hetMutationFloor (Ne mu H : ℝ)
 This is the qualitative fact the closed-population model denies: it predicts
 decay to zero, and the simulated population at demographic equilibrium loses
 nothing in four thousand generations. -/
-theorem hetTrajectory_ge_hetMutationFloor (Ne mu H₀ : ℝ)
+theorem hetTrajectory_ge_hetMutationFloor_of_init_ge_floor (Ne mu H₀ : ℝ)
     (hNe : 0 < Ne) (hmu : 0 ≤ mu)
     (hcontract : 1 / (2 * Ne) + 2 * mu ≤ 1)
     (hH₀ : hetMutationFloor Ne mu ≤ H₀) (t : ℕ) :
@@ -580,7 +581,7 @@ theorem hetTrajectory_ge_hetMutationFloor (Ne mu H₀ : ℝ)
   | zero => simpa [hetTrajectory] using hH₀
   | succ n ih =>
       simp only [hetTrajectory]
-      exact hetStepWithMutation_ge_hetMutationFloor Ne mu _ hNe hmu hcontract ih
+      exact hetStepWithMutation_ge_hetMutationFloor_of_ge_floor Ne mu _ hNe hmu hcontract ih
 
 /-- **The quantitative cost of the closed-population assumption.**
 
@@ -597,7 +598,7 @@ theorem driftOnly_lt_hetTrajectory_of_below_floor (Ne mu H₀ : ℝ) (t : ℕ)
     (hbelow : (1 - 1 / (2 * Ne)) ^ t * H₀ < hetMutationFloor Ne mu) :
     (1 - 1 / (2 * Ne)) ^ t * H₀ < hetTrajectory Ne mu H₀ t :=
   lt_of_lt_of_le hbelow
-    (hetTrajectory_ge_hetMutationFloor Ne mu H₀ hNe hmu hcontract hH₀ t)
+    (hetTrajectory_ge_hetMutationFloor_of_init_ge_floor Ne mu H₀ hNe hmu hcontract hH₀ t)
 
 /-- **The regime, as an object a use site must construct.**
 
@@ -630,6 +631,27 @@ structure ClosedPopulationNoMutation where
   `Ne = 1000` and the mutation rate of the simulation this fails outright: the
   floor is the whole of `H₀`, which is why the measured retention is `1.025`. -/
   mutation_negligible : hetMutationFloor Ne mu ≤ tolerance * H₀
+
+/-- **The regime is inhabited**, at zero mutation rate.
+
+    `mutation_negligible` is the field that makes this structure a regime rather
+    than a wrapper, and at `mu = 0` the floor `4·Ne·mu/(1 + 4·Ne·mu)` is exactly
+    `0`, so it holds with room to spare. That is the regime's interior, not its
+    boundary: a closed population with no mutation is precisely what the name
+    says, and the falsified callers are the ones at `Ne = 1000` and a nonzero
+    rate where the floor is the whole of `H₀`. -/
+noncomputable def ClosedPopulationNoMutation.witness : ClosedPopulationNoMutation where
+  Ne := 1
+  mu := 0
+  H₀ := 1
+  horizon := 0
+  tolerance := 1
+  Ne_pos := by norm_num
+  mu_nonneg := le_rfl
+  H₀_pos := by norm_num
+  tolerance_pos := by norm_num
+  forces_contract := by norm_num
+  mutation_negligible := by norm_num [hetMutationFloor]
 
 /-- The closed-population retention over the model's horizon.
 
@@ -910,7 +932,7 @@ noncomputable def presentDayR2 (V_A V_E fst : ℝ) : ℝ :=
 
 /-- Exact bridge theorem: the dashboard algebraic `presentDayR2` equals statistical
 `rsquared` when the relevant second-moment identities hold. -/
-theorem presentDayR2_eq_statistical_rsquared
+theorem presentDayR2_eq_statistical_rsquared_of_moments
     {k : ℕ} [Fintype (Fin k)]
     (dgp : DataGeneratingProcess k)
     (signal : Predictor k)
@@ -2825,9 +2847,17 @@ theorem portability_ratio_lt_one_of_positive_drift
     (V_A V_E fstS fstT : ℝ)
     (hVA : 0 < V_A) (hVE : 0 < V_E)
     (hfst : fstS < fstT)
-    (hfstT_le_one : fstT ≤ 1)
-    (hsrc_pos : 0 < presentDayR2 V_A V_E fstS) :
+    (hfstT_le_one : fstT ≤ 1) :
     presentDayR2 V_A V_E fstT / presentDayR2 V_A V_E fstS < 1 := by
+  -- Source positivity is not a hypothesis: `fstS < fstT ≤ 1` already forces
+  -- `0 < 1 - fstS`, and the signal variance is `V_A * (1 - fstS)`.
+  have hsrc_pos : 0 < presentDayR2 V_A V_E fstS := by
+    unfold presentDayR2 r2FromSignalVariance
+    have hv_pos : 0 < presentDayPGSVariance V_A fstS := by
+      unfold presentDayPGSVariance pgsVarianceFromHet
+      have h_one_minus : 0 < 1 - fstS := by linarith
+      exact mul_pos hVA h_one_minus
+    exact div_pos hv_pos (by linarith)
   have hdrop : presentDayR2 V_A V_E fstT < presentDayR2 V_A V_E fstS :=
     drift_degrades_R2 V_A V_E fstS fstT hVA hVE hfst hfstT_le_one
   exact portability_ratio_lt_one_of_drop (presentDayR2 V_A V_E fstS)
@@ -3208,33 +3238,30 @@ theorem equalVarianceGaussianAUCFromSNR_strictMonoOn_nonneg :
   have hxy2 : x / 2 < y / 2 := by nlinarith
   exact Real.sqrt_lt_sqrt hx2 hxy2
 
-/-- Exact liability-threshold AUC as a direct chart map on an already-specified
-deployed `R²`.
+/-- Equal-variance Gaussian AUC as a direct chart on deployed `R²`.
 
-This is not a transport law and does not recover a latent biological signal
-from source `R²`; it is just the closed-form coordinate map induced by the
-equal-variance Gaussian model, which the previous name obscured while the
-docstring named the right model out loud.
+On `r2 < 1` this is `Φ (sqrt (r2 / (2 * (1 - r2))))`. At and above the perfect-prediction
+boundary it is `1`, so totalized real division cannot turn `r2 = 1` into chance discrimination.
+Values above one are outside the statistical model and are clamped rather than extrapolated.
 
-    Regime: `r2 ∈ [0, 1)`. The boundary `r2 = 1` is attainable, has a defined
-    limit -- a score explaining all the variance discriminates perfectly, so
-    AUC tends to `1` -- and is NOT in this function's domain. There the body
-    divides by zero, Lean's division returns `0`, `Real.sqrt 0 = 0`, and the
-    value collapses to `Phi 0 = 1/2`: chance discrimination assigned to a
-    perfect predictor, the opposite extreme from the limit, silently and with
-    no type error. `equalVarianceGaussianAUCFromExplainedR2_at_one` exhibits
-    it, and `equalVarianceGaussianAUCFromExplainedR2_endpoint_lt_interior`
-    proves the endpoint value is strictly below *every* interior value, so the
-    map is not monotone on `[0, 1]` although it is on `[0, 1)`.
-    `equalVarianceGaussianAUCChart` is the continuous extension and is what a
-    caller who can reach the boundary should use.
+This is not a liability-threshold AUC: that chart also requires prevalence.
 
-    Empirical status: VALIDATED for the equal-variance Gaussian model on
-    `[0, 1)`; FALSIFIED at `r2 = 1`, where it returns `1/2` and the AUC is `1`.
-    FALSIFIED as the liability-threshold AUC: takes no prevalence, so it cannot
-    express the observable it was named for. -/
+    Empirical status: VALIDATED for the equal-variance Gaussian model on `[0, 1]`;
+    FALSIFIED as the liability-threshold AUC. -/
 noncomputable def equalVarianceGaussianAUCFromExplainedR2 (r2 : ℝ) : ℝ :=
-  Phi (Real.sqrt (r2 / (2 * (1 - r2))))
+  if 1 ≤ r2 then 1 else Phi (Real.sqrt (r2 / (2 * (1 - r2))))
+
+/-- Below the perfect-prediction boundary, the total chart is the Gaussian closed form. -/
+theorem equalVarianceGaussianAUCFromExplainedR2_eq_formula_of_lt_one
+    (r2 : ℝ) (h : r2 < 1) :
+    equalVarianceGaussianAUCFromExplainedR2 r2 =
+      Phi (Real.sqrt (r2 / (2 * (1 - r2)))) := by
+  simp [equalVarianceGaussianAUCFromExplainedR2, not_le.mpr h]
+
+/-- Perfect prediction gives perfect discrimination. -/
+@[simp] theorem equalVarianceGaussianAUCFromExplainedR2_at_one :
+    equalVarianceGaussianAUCFromExplainedR2 1 = 1 := by
+  simp [equalVarianceGaussianAUCFromExplainedR2]
 
 /-! ### WHY A RANGE CHECK COULD NOT CATCH THIS, WHICH IS THE POINT
 
@@ -3369,13 +3396,17 @@ reduces to the one already discharged.
 Stating it as a chart identity prevents it from being read as a general biological
 conversion.  No Gaussian-process theorem is accepted as an argument. -/
 theorem equalVarianceGaussianAUCFromExplainedR2_eq_variance
-    (vSignal vEnv : ℝ) (h_total : vSignal + vEnv ≠ 0) (h_env : vEnv ≠ 0) :
+    (vSignal vEnv : ℝ) (h_signal : 0 ≤ vSignal) (h_env : 0 < vEnv) :
     equalVarianceGaussianAUCFromExplainedR2
         (r2FromSignalVariance vSignal vEnv) =
       equalVarianceGaussianAUCFromSignalVariance vSignal vEnv := by
+  have h_total : 0 < vSignal + vEnv := add_pos_of_nonneg_of_pos h_signal h_env
+  have h_r2_lt : r2FromSignalVariance vSignal vEnv < 1 := by
+    unfold r2FromSignalVariance
+    exact (div_lt_one h_total).2 (lt_add_of_pos_right vSignal h_env)
+  rw [equalVarianceGaussianAUCFromExplainedR2_eq_formula_of_lt_one _ h_r2_lt]
   rw [← equalVarianceGaussianAUCFromSNR_eq_variance vSignal vEnv]
-  unfold equalVarianceGaussianAUCFromExplainedR2 equalVarianceGaussianAUCFromSNR
-    r2FromSignalVariance
+  unfold equalVarianceGaussianAUCFromSNR r2FromSignalVariance
   congr 2
   -- `field_simp` was called without the two nonzero facts proved directly
   -- above, so it could not cancel `vEnv` and left `X * Y * Y⁻¹ = X` for
@@ -3383,87 +3414,20 @@ theorem equalVarianceGaussianAUCFromExplainedR2_eq_variance
   -- never consults hypotheses. Whether the fed version closes the goal
   -- outright or leaves a polynomial identity is not knowable in advance, so
   -- `first` takes neither bet.
-  field_simp [h_total, h_env]
+  field_simp [ne_of_gt h_total, ne_of_gt h_env]
   ring
-
-/-- **The boundary escape, exhibited.**  At perfect prediction the chart
-returns `Phi 0`, which for the standard normal `Phi` of
-`Calibrator.Probability` is `1/2`. Stated so that the value at the endpoint is
-a proved fact of the development rather than an accident of how `ℝ` division
-is totalised. -/
-theorem equalVarianceGaussianAUCFromExplainedR2_at_one :
-    equalVarianceGaussianAUCFromExplainedR2 1 = Phi 0 := by
-  unfold equalVarianceGaussianAUCFromExplainedR2
-  norm_num
-
-/-- **The endpoint value is strictly below every interior value.**
-
-This is the defect in its sharpest provable form: the chart is strictly
-increasing on `[0, 1)` and then drops, at `r2 = 1`, to a value below everything
-it has already taken. A quantity whose maximum is at the endpoint is here
-attaining its minimum there. No range guard on `[0, 1]` would catch this --
-`Phi 0` is a perfectly legal AUC -- which is why it needed exhibiting rather
-than bounding. -/
-theorem equalVarianceGaussianAUCFromExplainedR2_endpoint_lt_interior
-    (x : ℝ) (hx0 : 0 < x) (hx1 : x < 1) :
-    equalVarianceGaussianAUCFromExplainedR2 1 <
-      equalVarianceGaussianAUCFromExplainedR2 x := by
-  rw [equalVarianceGaussianAUCFromExplainedR2_at_one]
-  unfold equalVarianceGaussianAUCFromExplainedR2
-  apply strictMono_Phi
-  have hden : (0 : ℝ) < 2 * (1 - x) := by linarith
-  have harg : 0 < x / (2 * (1 - x)) := div_pos hx0 hden
-  exact Real.sqrt_pos.mpr harg
-
-/-- **The equal-variance Gaussian AUC chart, extended to the closed interval.**
-
-Identical to `equalVarianceGaussianAUCFromExplainedR2` on `[0, 1)` and equal to
-the limit `1` at and beyond `r2 = 1`, so the boundary that the underlying chart
-cannot represent is given the value the quantity actually takes there. The
-extension is the honest one for the standard normal: `Phi` tends to `1` at
-`+∞`, and `r2/(2(1-r2))` tends to `+∞` as `r2 → 1⁻`.
-
-    Regime: `r2 ∈ [0, 1]`; values above `1` are outside the model and are
-    clamped rather than extrapolated.
-
-    Empirical status: UNTESTED as an extension. On `[0, 1)` it inherits
-    whatever `equalVarianceGaussianAUCFromExplainedR2` has, by
-    `equalVarianceGaussianAUCChart_eq_of_lt_one` -- including its
-    inapplicability to dichotomised traits. Binary-trait counterpart:
-    `liabilityThresholdAUCFromExplainedR2`. -/
-noncomputable def equalVarianceGaussianAUCChart (r2 : ℝ) : ℝ :=
-  if 1 ≤ r2 then 1 else equalVarianceGaussianAUCFromExplainedR2 r2
-
-/-- On the interior the extension is the original chart, so nothing downstream
-changes meaning. -/
-theorem equalVarianceGaussianAUCChart_eq_of_lt_one (r2 : ℝ) (h : r2 < 1) :
-    equalVarianceGaussianAUCChart r2 = equalVarianceGaussianAUCFromExplainedR2 r2 := by
-  unfold equalVarianceGaussianAUCChart
-  rw [if_neg (not_le.mpr h)]
-
-/-- **Perfect prediction gives perfect discrimination**, which is the value the
-unextended chart could not return. -/
-@[simp] theorem equalVarianceGaussianAUCChart_at_one :
-    equalVarianceGaussianAUCChart 1 = 1 := by
-  unfold equalVarianceGaussianAUCChart
-  norm_num
-
-/-- The extension and the original disagree exactly at the boundary, for the
-standard normal: `1` against `Phi 0`. -/
-theorem equalVarianceGaussianAUCChart_ne_chart_at_one (hPhi0 : Phi 0 ≠ 1) :
-    equalVarianceGaussianAUCChart 1 ≠ equalVarianceGaussianAUCFromExplainedR2 1 := by
-  rw [equalVarianceGaussianAUCChart_at_one, equalVarianceGaussianAUCFromExplainedR2_at_one]
-  exact fun h ↦ hPhi0 h.symm
 
 /-- **Cross-check: the `R²` form and the SNR form are the same map.**
 
 Under `snr = R²/(1 - R²)` the two agree exactly. Stated because they were
 written separately and never related, which is the condition under which the
 whole family could be misnamed without any of them contradicting the others. -/
-theorem equalVarianceGaussianAUCFromExplainedR2_eq_fromSNR (r2 : ℝ) :
+theorem equalVarianceGaussianAUCFromExplainedR2_eq_fromSNR
+    (r2 : ℝ) (h : r2 < 1) :
     equalVarianceGaussianAUCFromExplainedR2 r2 =
       equalVarianceGaussianAUCFromSNR (r2 / (1 - r2)) := by
-  unfold equalVarianceGaussianAUCFromExplainedR2 equalVarianceGaussianAUCFromSNR
+  rw [equalVarianceGaussianAUCFromExplainedR2_eq_formula_of_lt_one r2 h]
+  unfold equalVarianceGaussianAUCFromSNR
   congr 2
   rw [div_div, mul_comm]
 
@@ -3472,7 +3436,8 @@ increasing whenever `Phi` is strictly increasing. -/
 theorem equalVarianceGaussianAUCFromExplainedR2_strictMonoOn_unitInterval :
     StrictMonoOn equalVarianceGaussianAUCFromExplainedR2 (Set.Ico 0 1) := by
   intro x hx y hy hxy
-  unfold equalVarianceGaussianAUCFromExplainedR2
+  rw [equalVarianceGaussianAUCFromExplainedR2_eq_formula_of_lt_one x hx.2,
+    equalVarianceGaussianAUCFromExplainedR2_eq_formula_of_lt_one y hy.2]
   apply strictMono_Phi
   have hx_one_sub : 0 < 1 - x := by linarith [hx.2]
   have hy_one_sub : 0 < 1 - y := by linarith [hy.2]
@@ -3519,14 +3484,15 @@ same source explained-signal and total-variance decomposition.
 This is only a derived coordinate identity; it is not the defining
 construction of source AUC. -/
 theorem sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart {p q : ℕ}
-    (m : CrossPopulationMetricModel p q) :
+    (m : CrossPopulationMetricModel p q)
+    (h_r2 : r2FromSourceWeights m Pop.source < 1) :
     equalVarianceGaussianAUCFromSourceWeights m Pop.source =
       equalVarianceGaussianAUCFromExplainedR2 (r2FromSourceWeights m Pop.source) := by
   have h_source_ne : (m.outcomeVariance Pop.source) ≠ 0 :=
     ne_of_gt (m.outcomeVariance_pos Pop.source)
+  rw [equalVarianceGaussianAUCFromExplainedR2_eq_formula_of_lt_one _ h_r2]
   unfold equalVarianceGaussianAUCFromSourceWeights equalVarianceGaussianAUCFromSignalVariance
-    residualVarianceFromSourceWeights equalVarianceGaussianAUCFromExplainedR2
-    r2FromSourceWeights
+    residualVarianceFromSourceWeights r2FromSourceWeights
   congr 1
   congr 1
   field_simp [h_source_ne]
@@ -3581,14 +3547,15 @@ same target explained-signal and total-variance decomposition.
 This is only a derived coordinate identity; it is not the defining
 construction of target AUC. -/
 theorem targetEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart {p q : ℕ}
-    (m : CrossPopulationMetricModel p q) :
+    (m : CrossPopulationMetricModel p q)
+    (h_r2 : r2FromSourceWeights m Pop.target < 1) :
     equalVarianceGaussianAUCFromSourceWeights m Pop.target =
       equalVarianceGaussianAUCFromExplainedR2 (r2FromSourceWeights m Pop.target) := by
   have h_eff_ne : effectiveOutcomeVariance m Pop.target ≠ 0 :=
     ne_of_gt (effectiveTargetOutcomeVariance_pos m)
+  rw [equalVarianceGaussianAUCFromExplainedR2_eq_formula_of_lt_one _ h_r2]
   unfold equalVarianceGaussianAUCFromSourceWeights equalVarianceGaussianAUCFromSignalVariance
-    residualVarianceFromSourceWeights equalVarianceGaussianAUCFromExplainedR2
-    r2FromSourceWeights
+    residualVarianceFromSourceWeights r2FromSourceWeights
   congr 1
   congr 1
   field_simp [h_eff_ne]
@@ -3809,13 +3776,17 @@ theorem equalVarianceGaussianAUCFromExplainedR2_eq_presentDayAUC
   have hsum_ne : presentDayPGSVariance V_A fst + V_E ≠ 0 := by
     linarith
   have hve_ne : V_E ≠ 0 := ne_of_gt hVE
+  have hr2_lt : presentDayR2 V_A V_E fst < 1 := by
+    unfold presentDayR2 r2FromSignalVariance
+    exact (div_lt_one (add_pos hv_pos hVE)).2 (lt_add_of_pos_right _ hVE)
   have hchart :
       presentDayR2 V_A V_E fst / (2 * (1 - presentDayR2 V_A V_E fst)) =
         presentDaySignalToNoise V_A V_E fst / 2 := by
     unfold presentDayR2 r2FromSignalVariance presentDaySignalToNoise
     field_simp [hsum_ne, hve_ne]
     ring
-  unfold equalVarianceGaussianAUCFromExplainedR2 presentDayEqualVarianceGaussianAUC
+  rw [equalVarianceGaussianAUCFromExplainedR2_eq_formula_of_lt_one _ hr2_lt]
+  unfold presentDayEqualVarianceGaussianAUC
   rw [hchart]
 
 /-- Full neutral allele-frequency benchmark liability-AUC degradation theorem
@@ -4908,7 +4879,7 @@ for `h → h`. -/
     Under pure drift, Fst approaches 1 as t → ∞. Under migration-drift balance,
     Fst is bounded above by 1/(1+4Nm) < 1. This means migration establishes
     a ceiling on differentiation. -/
-theorem migration_bounds_fst_below_one (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 < m)
+theorem migration_bounds_fst_below_one_of_le_equilibrium (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 < m)
     (fst_observed : ℝ) (h_le : fst_observed ≤ fstMigrationDriftEquilibrium Ne m) :
     fst_observed < 1 := by
   have h_eq_lt := fstMigrationDriftEquilibrium_lt_one Ne m hNe hm
@@ -5479,7 +5450,7 @@ noncomputable def admixtureLDBoost (r : ℝ) (t_since : ℕ) (equilibrium_ld : �
   admixtureLDDecay r t_since / equilibrium_ld
 
 /-- Admixture LD boost exceeds 1 when admixture LD is above equilibrium. -/
-theorem admixtureLDBoost_gt_one (r : ℝ) (t_since : ℕ) (equilibrium_ld : ℝ)
+theorem admixtureLDBoost_gt_one_of_above_equilibrium (r : ℝ) (t_since : ℕ) (equilibrium_ld : ℝ)
     (heq_pos : 0 < equilibrium_ld)
     (h_recent : equilibrium_ld < admixtureLDDecay r t_since) :
     1 < admixtureLDBoost r t_since equilibrium_ld := by
@@ -5490,7 +5461,8 @@ theorem admixtureLDBoost_gt_one (r : ℝ) (t_since : ℕ) (equilibrium_ld : ℝ)
 /-- **Transient admixture portability is higher than equilibrium portability.**
     When admixture is recent, the transient shared LD exceeds equilibrium shared LD,
     and thus portability is temporarily enhanced. -/
-theorem admixture_portability_above_equilibrium (V_A fst r : ℝ) (t_since : ℕ)
+theorem admixture_portability_above_equilibrium_of_ld_above_equilibrium
+    (V_A fst r : ℝ) (t_since : ℕ)
     (equilibrium_ld : ℝ)
     (hVA : 0 < V_A) (hfst_lt : fst < 1)
     (h_recent : equilibrium_ld < admixtureLDDecay r t_since) :

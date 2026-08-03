@@ -288,6 +288,16 @@ structure LDSCModel (m : ℕ) where
   h_ld_adj_pos : ∀ i, 0 ≤ ld_adj i
   h_ld_adj_le_one : ∀ i, ld_adj i ≤ 1
 
+/-- **The class is inhabited at every panel size**, so the results over it are not
+vacuous. `ld_adj = 1` is the no-LD-adjustment panel: the two bounds on `ld_adj`
+are the only constraints the structure imposes, and both are attained there. -/
+noncomputable def LDSCModel.witness (m : ℕ) : LDSCModel m where
+  beta_s := fun _ ↦ 0
+  beta_t := fun _ ↦ 0
+  ld_adj := fun _ ↦ 1
+  h_ld_adj_pos := fun _ ↦ by norm_num
+  h_ld_adj_le_one := fun _ ↦ by norm_num
+
 /-! **Deleted: `geneticCorrelationLDSC`, together with
 `genetic_correlation_predicts_portability` and
 `genetic_correlation_portability_bound_attained`.**
