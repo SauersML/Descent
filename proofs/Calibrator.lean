@@ -190,6 +190,30 @@ one asked:
     were three, and the third would have died on an unexplained ImportError.
       The count was stated as fact in a commit message.
 
+THE FIFTH SHAPE HAS A SECOND AND MORE DANGEROUS FACE:
+A SEARCH STRING THAT DOES NOT MATCH IS INDISTINGUISHABLE FROM AN ABSENT
+FEATURE. The first face over-counts or under-counts, and you notice eventually
+because the number looks wrong. This one returns ZERO, and zero reads as
+knowledge rather than as a failed query.
+
+  * `git log -S` returned nothing for `LDDecayMechanism` and was read as "this
+    never existed". It existed. That nearly deleted a valid theorem and
+    rewrote a correct citation to point at a weaker result.
+  * Verifying that a note had landed, a grep for the ALL-CAPS phrasing from the
+    commit message found 0 against mixed-case text in the file -- twice read as
+    "the edit did not land", inside the very commit that documents this class.
+    Writing the lesson down is not the same as being protected by it.
+  * And once more, verifying THAT paragraph: a line-oriented `grep` for a
+    phrase that WRAPS ACROSS TWO LINES in this file returned 0. Not case, not
+    truncation -- line breaks. Three different mechanisms, all reporting the
+    same confident zero, within one hour.
+
+THE DISCRIMINATOR IS THE SAME FOR BOTH FACES, AND IT IS CHEAP: RUN THE QUERY A
+SECOND WAY AND REQUIRE THE TWO TO AGREE. Case-insensitively as well as
+case-sensitively; by content as well as by name; without the pipe as well as
+with it. A single query answering zero is a hypothesis, not a result. Two
+queries of different shape agreeing on zero is a result.
+
 TWO GUARDS THAT CHECK SOMETHING ADJACENT TO WHAT THEY ARE NAMED FOR, both
 verified the hard way:
   * `$?` AFTER A PIPE REPORTS THE PIPE. `cmd | head; echo $?` gives head's
