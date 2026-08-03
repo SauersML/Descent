@@ -27,7 +27,8 @@ Checks performed
     across the predicted boundary m* = log N / c.
 9.  The covariance-channel kurtosis penalty: direct Hardy-Weinberg summation and a
     fixed-seed genotype simulation verify the exact `4901/198` variance multiplier at
-    one-percent MAF.
+    one-percent MAF, and its multiplicative combination with inverse-square response
+    attenuation (`9802/99` at half response).
 
 Run:  python3 proofs/validation/condensation/check_condensation.py
 """
@@ -303,17 +304,26 @@ def hwe_standardized_square_variance(q: float) -> float:
 
 
 def check_one_percent_covariance_penalty() -> None:
-    """Validate the exact one-percent-MAF multiplier in `FoldedSpectrum`.
+    """Validate the exact one-percent-MAF and half-response multipliers.
 
     A Gaussian unit-variance coordinate has Var(X^2)=2. The standardized diploid
     coordinate has Var(X^2)=1/[2q(1-q)]-1, so the ratio at q=0.01 is 4901/198.
+    Dividing a covariance fluctuation by a response attenuated by `eta` multiplies
+    estimator variance by `1/eta^2`.
     """
     q = 0.01
+    response_fraction = 0.5
     exact_multiplier = 4901.0 / 198.0
+    exact_joint_multiplier = 9802.0 / 99.0
     summed_multiplier = hwe_standardized_square_variance(q) / 2.0
     assert abs(summed_multiplier - exact_multiplier) < 1e-12, (
         summed_multiplier,
         exact_multiplier,
+    )
+    summed_joint_multiplier = summed_multiplier / response_fraction**2
+    assert abs(summed_joint_multiplier - exact_joint_multiplier) < 1e-12, (
+        summed_joint_multiplier,
+        exact_joint_multiplier,
     )
 
     rng = np.random.default_rng(20260802)
@@ -322,11 +332,23 @@ def check_one_percent_covariance_penalty() -> None:
     sampled_multiplier = float(standardized_squares.var() / 2.0)
     relative_error = abs(sampled_multiplier / exact_multiplier - 1.0)
     assert relative_error < 0.02, (sampled_multiplier, exact_multiplier, relative_error)
+    sampled_joint_multiplier = sampled_multiplier / response_fraction**2
+    joint_relative_error = abs(sampled_joint_multiplier / exact_joint_multiplier - 1.0)
+    assert joint_relative_error < 0.02, (
+        sampled_joint_multiplier,
+        exact_joint_multiplier,
+        joint_relative_error,
+    )
 
     print(f"  q = 0.01 exact covariance-variance multiplier = {exact_multiplier:.6f}")
     print(
         "  fixed-seed HWE simulation multiplier "
         f"= {sampled_multiplier:.6f} (relative error {relative_error:.3%})"
+    )
+    print(
+        "  q = 0.01, half-response joint multiplier "
+        f"= {exact_joint_multiplier:.6f}; simulation {sampled_joint_multiplier:.6f} "
+        f"(relative error {joint_relative_error:.3%})"
     )
 
 

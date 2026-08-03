@@ -551,10 +551,15 @@ theorem onePercentMaf_halfResponse_covariance_estimator_variance
       (9802 / 99 : ℝ) *
         gaussianCovarianceTangentEstimatorVariance m 1 covarianceDerivative := by
   rw [diploid_fourth_moment (1 / 100) (by norm_num) (by norm_num)]
-  rw [covarianceTangentEstimatorVariance_kurtosis_attenuation
-    m 1 covarianceDerivative (invHeterozygosity (1 / 100)) (1 / 2)
-    hm hderivative (by norm_num)]
-  norm_num [invHeterozygosity]
+  calc
+    _ = ((invHeterozygosity (1 / 100) - 1) / (2 * (1 / 2) ^ 2)) *
+        gaussianCovarianceTangentEstimatorVariance m 1 covarianceDerivative := by
+      simpa using covarianceTangentEstimatorVariance_kurtosis_attenuation
+        m 1 covarianceDerivative (invHeterozygosity (1 / 100)) (1 / 2)
+        hm hderivative (by norm_num)
+    _ = (9802 / 99 : ℝ) *
+        gaussianCovarianceTangentEstimatorVariance m 1 covarianceDerivative := by
+      norm_num [invHeterozygosity]
 
 /-- **Level one, what escapes: the dispersion.**
 
@@ -1766,6 +1771,13 @@ when estimator noise separates quotient fibres is the continuation, not a theore
   `diploid_covariance_estimator_variance_eq_gaussian_factor` specializes the corresponding
   sampling law to standardized Hardy--Weinberg dosage: its covariance-estimation variance
   is inflated by exactly `(1/[2q(1-q)]-1)/2`, which diverges at the rare-variant boundary.
+  `covarianceTangentEstimatorVariance_kurtosis_attenuation` proves that this tail cost and
+  an attenuated covariance response multiply rather than add.  The concrete theorem
+  `onePercentMaf_halfResponse_covariance_estimator_variance` gives the portability-design
+  consequence: one-percent MAF with half-strength tagging costs exactly
+  `9802/99 ≈ 99.01` times the Gaussian, perfectly tagged covariance experiment.  This is
+  a conditional law for a named response attenuation, not a claim that MAF alone fixes
+  tagging quality or that every LD proxy induces the same scalar attenuation.
   Correlated probes are now handled by
   `multivariateGaussianPermeability = (1/2)‖Σ⁻¹ᐟ²ΓΣ⁻¹ᐟ²‖²_F` once the named model supplies
   the whitening. `multivariateGaussianPermeability_diagonal` proves that the earlier
