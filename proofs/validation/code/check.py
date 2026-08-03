@@ -1767,7 +1767,7 @@ def run_identifications() -> int:
         r"portab|drift|heritab|genetic|genom|(?<!in)variant|locus|loci|allele|pgs|"
         r"ancestr|gwas|snp|calibrat|imputation|selection|polygenic|epistas|"
         r"cohort|population|panel|fst|prevalence|phenotype|trait|marker|"
-        r"burden|gene_|_gene|kinship|admixture|coalescent|bottleneck|founder|"
+        r"burden|gene_|_gene(?!rat)|kinship|admixture|coalescent|bottleneck|founder|"
         r"heterozyg|linkage|haplotype|ld_|_ld_|_ld$", re.I)
     corpus_vocab = set(global_defs)
     for f in ident_lean_files():
