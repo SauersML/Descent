@@ -325,6 +325,22 @@ def IsCompleteCatalogue {α Invariant : Type*} (E : α → α → Prop)
     (label : α → Invariant) : Prop :=
   ∀ x y, E x y ↔ label x = label y
 
+/-- Every labelling is a complete catalogue of the equivalence it induces.
+
+    Two results assumed `IsCompleteCatalogue` and nothing concluded it, which
+    left `IsCompleteCatalogue.separates` -- the bound on what a catalogue may be
+    built from -- quantified over a class nothing was known to inhabit.
+
+    The witness carries the real content: completeness is not a property a
+    labelling has or lacks in isolation, it is a relation between a labelling and
+    an equivalence, and every labelling is complete for exactly one equivalence.
+    So the force of the hypothesis elsewhere is never "such a catalogue exists"
+    but "THIS `E` is the one this `label` catalogues", and the impossibility
+    results are about `E` being given in advance. -/
+theorem isCompleteCatalogue_kernel {α Invariant : Type*} (label : α → Invariant) :
+    IsCompleteCatalogue (fun x y ↦ label x = label y) label :=
+  fun _ _ ↦ Iff.rfl
+
 /-- **A catalogue must separate every inequivalent pair.** Exhibiting an inequivalent
 pair that some probe cannot separate therefore bounds what a catalogue may be built
 from. -/

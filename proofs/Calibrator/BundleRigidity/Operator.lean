@@ -247,6 +247,19 @@ every continuous function. -/
 def SameTransfer (F : BundleFamily T d) (t₁ t₂ : T) : Prop :=
   ∀ f : C(ℝ, ℝ), F.coTransfer f t₁ = F.coTransfer f t₂
 
+/-- A parameter has the same transfer as itself.
+
+    Lemma 4 assumed `SameTransfer` and nothing concluded it, so the cheapest
+    source of non-rigidity was stated about a relation nothing was known to
+    satisfy. Reflexivity is the honest witness and it is also the sharp one: at
+    `t₁ = t₂` the conclusion `F.transfer (diracAt t₁ - diracAt t₂) = 0` is the
+    trivial instance, so Lemma 4 has content exactly when the caller supplies
+    `t₁ ≠ t₂` -- which is why the informal statement says "two DISTINCT
+    parameters". Nothing here establishes that a distinct such pair exists for
+    any particular family; that is what makes non-rigidity a property of `F`. -/
+theorem sameTransfer_refl (F : BundleFamily T d) (t : T) : F.SameTransfer t t :=
+  fun _ ↦ rfl
+
 /-- **Lemma 4.** If two distinct parameters have the same transfer measure then their
 difference of point masses is a kernel element. This is the cheapest possible source of
 non-rigidity: an exact coincidence of whole bundles. -/

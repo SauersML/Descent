@@ -824,6 +824,19 @@ def ReadsThroughFunctionals {n m : ℕ} (T : Panel n → ℝ) (φ : Fin m → �
   ∃ c : Fin m → ℝ, ∀ panel : Panel n,
     T panel = ∑ a : Fin m, c a * ∑ i : Fin n, panel.weight i * φ a (panel.support i)
 
+/-- Every fixed linear combination of panel averages reads through its functionals.
+
+    The docstring above says most summary-statistic methods are of this shape by
+    construction; this is that sentence as a theorem. Two results assume the
+    class and nothing concluded it, so "no leakage" was being asserted about an
+    estimator family that nothing had been shown to belong to. -/
+theorem readsThroughFunctionals_of_linearCombination {n m : ℕ} (c : Fin m → ℝ)
+    (φ : Fin m → ℝ → ℝ) :
+    ReadsThroughFunctionals
+      (fun panel : Panel n ↦
+        ∑ a : Fin m, c a * ∑ i : Fin n, panel.weight i * φ a (panel.support i)) φ :=
+  ⟨c, fun _ ↦ rfl⟩
+
 /-- **No leakage: matching finitely many functionals matches every estimator built from
 them.** -/
 theorem matched_functionals_give_equal_estimates {n m : ℕ} (T : Panel n → ℝ)
@@ -1317,6 +1330,19 @@ def IsLevelSetFunctional {Pair : Type*} (metric : Pair → ℝ)
     (coords : Pair → LevelSetCoordinates) : Prop :=
   ∃ g : LevelSetCoordinates → ℝ, ∀ p : Pair, metric p = g (coords p)
 
+/-- Anything computed from the two coordinates is a level-set functional.
+
+    This is the converse direction of the collapse and the reason the class is
+    nonempty: three theorems below assume `IsLevelSetFunctional` and none
+    concluded it, so all three were statements about a possibly empty class. The
+    witness is not degenerate -- it says precisely which metrics qualify, namely
+    every metric that factors through `coords`, which is what "threshold-based"
+    means operationally. -/
+theorem isLevelSetFunctional_comp {Pair : Type*} (coords : Pair → LevelSetCoordinates)
+    (g : LevelSetCoordinates → ℝ) :
+    IsLevelSetFunctional (fun p ↦ g (coords p)) coords :=
+  ⟨g, fun _ ↦ rfl⟩
+
 /-- **The collapse, in its usable form: two pairs agreeing in both coordinates agree in
 every threshold metric at once** — every quantile, every exceedance-overlap probability. No
 threshold-based comparison can separate them. -/
@@ -1557,6 +1583,35 @@ def ReversalOdd (φ : Symbol → ℝ) : Prop := ∀ s : Symbol, φ (T.rev s) = -
 /-- A symbol is **reversible** when it is its own time reverse. -/
 def Reversible (s : Symbol) : Prop := T.rev s = s
 
+/-- Constant statistics are reversal-even, and the zero statistic is reversal-odd.
+
+    Both classes are otherwise assumed and never concluded anywhere in the corpus,
+    which would leave `odd_vanishes_on_reversible` and its consumers vacuous. The
+    two witnesses are deliberately the degenerate ones: for an ABSTRACT involution
+    `T` nothing richer is available, because a reversal-odd statistic that is not
+    identically zero exists only once `rev` is known to have a free orbit. That is
+    a property of the particular `T`, not of involutions, so it belongs to the
+    caller and not here. Stating that boundary is the point -- the algebra below
+    is real, and it is thin. -/
+theorem reversalEven_const (c : ℝ) : T.ReversalEven (fun _ ↦ c) := fun _ ↦ rfl
+
+theorem reversalOdd_zero : T.ReversalOdd (fun _ ↦ (0 : ℝ)) := fun _ ↦ (neg_zero).symm
+
+/-- The trivial time reversal: the involution that reverses nothing. -/
+def idReversal (Symbol : Type*) : TimeReversal Symbol where
+  rev := id
+  rev_involutive := Function.involutive_id
+
+/-- Under the trivial reversal every symbol is its own reverse, so `Reversible` is
+    inhabited and `odd_vanishes_on_reversible` is not a theorem about nothing.
+
+    This is also the sharpest reading of that theorem: when reversal is trivial,
+    every reversal-odd statistic vanishes everywhere. The arrow of time is not
+    detectable because there is no arrow, which is the degenerate end of the
+    scale the Arrow Theorem measures. -/
+theorem reversible_idReversal {Symbol : Type*} (s : Symbol) :
+    (idReversal Symbol).Reversible s := rfl
+
 /-- Every reversal-odd statistic vanishes on a reversible symbol.  This algebraic fact does
 not assert that a selected order-free experiment identifies every other model coordinate. -/
 theorem odd_vanishes_on_reversible {φ : Symbol → ℝ} (h : T.ReversalOdd φ)
@@ -1624,9 +1679,9 @@ structure ScalarSecondMoments where
 over it is a true statement about an empty class: kernel-checked, clean axiom report,
 and no content.  See `scripts/check-laundering.py` family F4. -/
 noncomputable def ScalarSecondMoments.witness : ScalarSecondMoments where
-  moment := fun _ _ => 0
-  moment_comm := fun _ _ => rfl
-  stationary := fun _ _ _ => rfl
+  moment := fun _ _ ↦ 0
+  moment_comm := fun _ _ ↦ rfl
+  stationary := fun _ _ _ ↦ rfl
 
 namespace ScalarSecondMoments
 

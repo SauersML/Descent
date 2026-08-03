@@ -32,6 +32,34 @@ def quadraticRisk (outcomeSecondMoment : ℝ) (B : Matrix ι ι ℝ)
 def IsSymmetricBilinearMatrix (B : Matrix ι ι ℝ) : Prop :=
   ∀ x y : ι → ℝ, dot x (B.mulVec y) = dot y (B.mulVec x)
 
+/-- Every symmetric matrix represents a symmetric bilinear form.
+
+    Fourteen theorems in this file take `IsSymmetricBilinearMatrix B` as a
+    hypothesis, and until this lemma nothing in the corpus ever concluded it.
+    That is the configuration where a hypothesis class can be empty and nobody
+    notices: all fourteen would hold vacuously, and the excess-risk identity
+    they build would be a statement about no matrix at all.
+
+    The remedy is not to weaken the fourteen but to say which matrices they are
+    about. Every second-moment matrix is symmetric, which is why the hypothesis
+    was reasonable in the first place; this states that connection rather than
+    leaving it in the prose. -/
+theorem isSymmetricBilinearMatrix_of_isSymm {B : Matrix ι ι ℝ} (hB : B.IsSymm) :
+    IsSymmetricBilinearMatrix B := by
+  intro x y
+  simp only [dot, Matrix.mulVec, dotProduct, Finset.mul_sum]
+  rw [Finset.sum_comm]
+  refine Finset.sum_congr rfl fun j _ ↦ Finset.sum_congr rfl fun i _ ↦ ?_
+  rw [hB.apply i j]
+  ring
+
+/-- A concrete inhabitant, so the hypothesis class is demonstrably nonempty and
+    the fourteen results above are not vacuous. -/
+theorem isSymmetricBilinearMatrix_one :
+    IsSymmetricBilinearMatrix (1 : Matrix ι ι ℝ) := by
+  intro x y
+  simp [dot, Matrix.one_mulVec, mul_comm]
+
 omit [DecidableEq ι] in
 theorem matrix_mulVec_sub (B : Matrix ι ι ℝ) (x y : ι → ℝ) :
     B.mulVec (fun i ↦ x i - y i) =
