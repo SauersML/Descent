@@ -78,14 +78,12 @@ discrepancy and residual nonlinearity before optimizing over directions. -/
 theorem weighted_residual_moment_directional_bound
     (P : ExpFunctional Ω) (densityRatio : Ω → ℝ)
     (X : Ω → ι → ℝ) (residual : Ω → ℝ) (direction : ι → ℝ)
-    (hCauchySchwarz : ∀ f g : Ω → ℝ,
-      P (fun ω ↦ f ω * g ω) ^ 2 ≤
-        P (fun ω ↦ f ω ^ 2) * P (fun ω ↦ g ω ^ 2)) :
+ :
     dot direction (weightedResidualMoment P densityRatio X residual) ^ 2 ≤
       chiSquareBudget P densityRatio *
         directionalResidualCurvature P X residual direction := by
   rw [dot_weightedResidualMoment]
-  exact hCauchySchwarz
+  exact P.cauchy_schwarz
     (fun ω ↦ densityRatio ω - 1)
     (fun ω ↦ dot direction (X ω) * residual ω)
 
@@ -109,9 +107,7 @@ theorem projection_artifact_energy_le_chiSquare_mul_curvature
     (B : Matrix ι ι ℝ) (artifact : ι → ℝ) (Λ : ℝ)
     (hmoment : B.mulVec artifact =
       weightedResidualMoment P densityRatio X residual)
-    (hCauchySchwarz : ∀ f g : Ω → ℝ,
-      P (fun ω ↦ f ω * g ω) ^ 2 ≤
-        P (fun ω ↦ f ω ^ 2) * P (fun ω ↦ g ω ^ 2))
+
     (henergy : 0 ≤ coefficientEnergy B artifact)
     (hchiSquare : 0 ≤ chiSquareBudget P densityRatio)
     (hΛ : 0 ≤ Λ)
@@ -119,7 +115,7 @@ theorem projection_artifact_energy_le_chiSquare_mul_curvature
       Λ * coefficientEnergy B artifact) :
     coefficientEnergy B artifact ≤ chiSquareBudget P densityRatio * Λ := by
   have hdirectional := weighted_residual_moment_directional_bound
-    P densityRatio X residual artifact hCauchySchwarz
+    P densityRatio X residual artifact
   have hpairing :
       dot artifact (weightedResidualMoment P densityRatio X residual) =
         coefficientEnergy B artifact := by

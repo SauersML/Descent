@@ -504,42 +504,21 @@ noncomputable def constantObservationExperiment
     (constantObservationExperiment target moment law).mixture P = law := by
   exact PMF.bind_const P law
 
-/-- **An experiment is informative when distinct parameters emit distinguishable laws.**
+/-- **An experiment separates at radius `h` when distinct parameters emit laws at least `h`
+    apart in total variation.**
 
-    Without this the discrepancy radius is decoration: a constant kernel has total variation
-    zero between every pair, so `TV ≤ h` holds at every radius and feasibility collapses to
-    moment matching however fast `h` shrinks. Any rate whose content is that the constraint
-    pushes the prior-predictive laws together has to exclude such experiments in the
-    STATEMENT, not in a docstring. -/
-def Informative : Prop :=
+    Strict positivity is not enough. A channel whose parameters differ by some tiny `δ > 0`
+    is "informative" in the bare sense, but once `δ < h` every pair still satisfies
+    `TV ≤ h`, feasibility collapses to moment matching exactly as in the constant channel,
+    and the discrepancy radius does no work. The degenerate witness survives with `δ` in
+    place of `0`.
+
+    Tying the separation to the SAME `h` the feasibility constraint uses is what makes the
+    constraint live: distinct parameters are then distinguishable at precisely the scale the
+    radius operates on. -/
+def SeparatesAtRadius (h : ℝ) : Prop :=
   ∀ i j : Fin (parameterCount + 1), i ≠ j →
-    0 < E.totalVariation (PMF.pure i) (PMF.pure j)
-
-/-- **Informative at a stated scale**: distinct parameters are separated by at
-least `c`, not merely by something positive.
-
-`Informative` is not enough, and the gap is not a technicality.  It asks only
-that each pairwise total variation be nonzero, with no floor, so an experiment
-may satisfy it while every pair sits far below the radius.
-`totalVariation_le_two_mul_of_close` shows what that buys the witness: if every
-kernel law lies within `ε` of one fixed law then every pair of priors is
-`2ε`-indistinguishable, so taking `ε` to be half the radius makes `TV ≤ h` hold
-for all pairs and feasibility collapses to moment matching -- the same collapse
-`Informative` was introduced to prevent, one step further back.
-
-The witness chooses the kernel after seeing `n`, so it can always shrink the
-kernel's spread faster than the radius shrinks.  Only a floor stated at the
-radius scale closes that, which is what this predicate supplies and what
-`proofs/validation/FIXED_GRADE_AUDIT.md` asks for in its item 2. -/
-def SeparatedBy (c : ℝ) : Prop :=
-  ∀ i j : Fin (parameterCount + 1), i ≠ j →
-    c ≤ E.totalVariation (PMF.pure i) (PMF.pure j)
-
-/-- A positive separation floor is informative; the converse fails, which is the
-whole reason the graded statement asks for the floor. -/
-theorem informative_of_separatedBy {c : ℝ} (hc : 0 < c) (h : E.SeparatedBy c) :
-    E.Informative :=
-  fun i j hij ↦ lt_of_lt_of_le hc (h i j hij)
+    h ≤ E.totalVariation (PMF.pure i) (PMF.pure j)
 
 @[simp] theorem constantObservationExperiment_totalVariation
     (target : Fin (parameterCount + 1) → ℝ)
@@ -549,21 +528,21 @@ theorem informative_of_separatedBy {c : ℝ} (hc : 0 < c) (h : E.SeparatedBy c) 
   unfold totalVariation
   simp
 
-/-- **The constant-channel experiment is not informative**, whenever there are at least two
-    parameters. This is the negative control the `Informative` hypothesis exists to exclude:
-    it satisfies every discrepancy radius vacuously, so any gap bound proved with it says
-    nothing about grading. -/
-theorem constantObservationExperiment_not_informative
+/-- **The constant channel separates at no positive radius**, whenever there are at least
+    two parameters. It is the negative control the hypothesis exists to exclude: its total
+    variation is zero between every pair, so it satisfies every discrepancy constraint
+    vacuously and any gap proved with it says nothing about grading. -/
+theorem constantObservationExperiment_not_separatesAtRadius
     (target : Fin (parameterCount + 2) → ℝ)
     (moment : ℕ → Fin (parameterCount + 2) → ℝ)
-    (law : FinitePrior observationCount) :
-    ¬ (constantObservationExperiment target moment law).Informative := by
-  intro hinf
+    (law : FinitePrior observationCount) {h : ℝ} (hh : 0 < h) :
+    ¬ (constantObservationExperiment target moment law).SeparatesAtRadius h := by
+  intro hsep
   have h01 : (0 : Fin (parameterCount + 2)) ≠ 1 := by
-    simp
-  have := hinf 0 1 h01
-  rw [constantObservationExperiment_totalVariation] at this
-  exact lt_irrefl 0 this
+    simp [Fin.ext_iff]
+  have hle := hsep 0 1 h01
+  rw [constantObservationExperiment_totalVariation] at hle
+  linarith
 
 /-- In a constant channel, feasibility is only moment matching at every information radius.
 The data-radius constraint contributes nothing because the prior-predictive laws are identical. -/

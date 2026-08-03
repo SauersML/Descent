@@ -70,14 +70,12 @@ theorem rawCrossMoment_annihilates_secondMoment_kernel_of_cauchySchwarz
     (E : ExpFunctional Ω) (X : Ω → ι → ℝ)
     (Y : Ω → ℝ) (kernelDirection : ι → ℝ)
     (hkernel : (secondMomentMatrix E X).mulVec kernelDirection = 0)
-    (hCauchySchwarz : ∀ f g : Ω → ℝ,
-      E (fun ω ↦ f ω * g ω) ^ 2 ≤
-        E (fun ω ↦ f ω ^ 2) * E (fun ω ↦ g ω ^ 2)) :
+ :
     dot kernelDirection (rawCrossMoment E X Y) = 0 := by
   apply rawCrossMoment_annihilates_secondMoment_kernel
     E X Y kernelDirection hkernel
   intro f g hf
-  have hbound := hCauchySchwarz f g
+  have hbound := E.cauchy_schwarz f g
   rw [hf, zero_mul] at hbound
   exact sq_eq_zero_iff.mp (le_antisymm hbound (sq_nonneg _))
 

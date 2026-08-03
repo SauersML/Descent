@@ -116,9 +116,7 @@ theorem projection_artifact_implies_standardized_bias_bound
       countInflation confounding : ℝ)
     (hmoment : B.mulVec artifact =
       weightedResidualMoment P densityRatio X residual)
-    (hCauchySchwarz : ∀ f g : Ω → ℝ,
-      P (fun ω ↦ f ω * g ω) ^ 2 ≤
-        P (fun ω ↦ f ω ^ 2) * P (fun ω ↦ g ω ^ 2))
+
     (henergy : 0 ≤ coefficientEnergy B artifact)
     (hchiSquare : 0 ≤ chiSquareBudget P densityRatio)
     (hcurvatureBound : 0 ≤ curvatureBound)
@@ -138,7 +136,7 @@ theorem projection_artifact_implies_standardized_bias_bound
         directionalAmplification countInflation confounding := by
   have hartifact := projection_artifact_energy_le_chiSquare_mul_curvature
     P densityRatio X residual B artifact curvatureBound hmoment
-    hCauchySchwarz henergy hchiSquare hcurvatureBound hcurvature
+    henergy hchiSquare hcurvatureBound hcurvature
   apply standardizedResidualPGSBias_mono_susceptibility
   · exact mul_le_mul_of_nonneg_left hartifact hmarkerAxis
   · exact heffectSD
