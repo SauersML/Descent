@@ -42,7 +42,19 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 EXTRACT = os.path.abspath(os.path.join(HERE, "..", "..", "extract"))
 sys.path.insert(0, EXTRACT)
 
-import lean_defs as L  # noqa: E402
+# The generated tables are untracked by design (see any producer's header in
+# validation/extract/). A missing table must stop this script with the command
+# rather than let it start on a stale copy from another worktree.
+try:
+    import lean_defs as L  # noqa: E402
+except ImportError as _exc:
+    raise SystemExit(
+        "auc_collapse_check: cannot import the generated table `lean_defs`.\n"
+        "  looked in: %s\n"
+        "  reason:    %s\n"
+        "  These tables are DELIBERATELY NOT IN GIT -- regenerate them:\n"
+        "      python3 proofs/validation/extract/emit.py\n"
+        "  (about a minute; writes only inside your worktree)" % (EXTRACT, _exc))
 
 OUT = os.path.join(HERE, "auc_collapse_check_results.json")
 
