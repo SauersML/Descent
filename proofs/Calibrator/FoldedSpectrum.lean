@@ -1738,8 +1738,14 @@ when estimator noise separates quotient fibres is the continuation, not a theore
   `diploid_covariance_estimator_variance_eq_gaussian_factor` specializes the corresponding
   sampling law to standardized Hardy--Weinberg dosage: its covariance-estimation variance
   is inflated by exactly `(1/[2q(1-q)]-1)/2`, which diverges at the rare-variant boundary.
-  The same module proves coding-scale
-  invariance and additivity over independent channels, and supplies both the
+  Correlated probes are now handled by
+  `multivariateGaussianPermeability = (1/2)‖Σ⁻¹ᐟ²ΓΣ⁻¹ᐟ²‖²_F` once the named model supplies
+  the whitening. `multivariateGaussianPermeability_diagonal` proves that the earlier
+  independent-channel sum is exactly its diagonal face, while
+  `twoChannelWhitenedDerivative_permeability` shows that a shared whitened response adds
+  `shared²` information beyond the diagonal terms. Thus overlapping LD, haplotype, tract,
+  or longitudinal probes are not silently counted as independent. The same module proves
+  coding-scale invariance and supplies both the
   completion-count lower bound and a constructive finite-dimensional criterion:
   selected lag summaries complete a deployment family when their sensitivity matrix is
   nonsingular. `firstTwoLags_complete_geometric_dependence` verifies the criterion for
