@@ -215,6 +215,72 @@ theorem dotProduct_mulVec_comm_of_isSymm {m : ℕ} {E : Matrix (Fin m) (Fin m) �
   rw [h]
   ring
 
+/-- Bilinearity of the quadratic form on a sum, for a symmetric matrix. -/
+theorem quadForm_add {m : ℕ} {E : Matrix (Fin m) (Fin m) ℝ} (hE : E.IsSymm)
+    (u v : Fin m → ℝ) :
+    (fun i ↦ u i + v i) ⬝ᵥ (E *ᵥ fun i ↦ u i + v i)
+      = u ⬝ᵥ (E *ᵥ u) + 2 * (u ⬝ᵥ (E *ᵥ v)) + v ⬝ᵥ (E *ᵥ v) := by
+  have hcross : v ⬝ᵥ (E *ᵥ u) = u ⬝ᵥ (E *ᵥ v) :=
+    dotProduct_mulVec_comm_of_isSymm hE v u
+  simp only [dotProduct, Matrix.mulVec] at *
+  have hexpand : ∀ i : Fin m,
+      (u i + v i) * ∑ j, E i j * (u j + v j)
+        = (u i * ∑ j, E i j * u j) + (u i * ∑ j, E i j * v j)
+          + (v i * ∑ j, E i j * u j) + (v i * ∑ j, E i j * v j) := by
+    intro i
+    have : ∑ j, E i j * (u j + v j) = (∑ j, E i j * u j) + ∑ j, E i j * v j := by
+      rw [← Finset.sum_add_distrib]
+      exact Finset.sum_congr rfl fun j _ ↦ by ring
+    rw [this]; ring
+  simp_rw [hexpand]
+  rw [Finset.sum_add_distrib, Finset.sum_add_distrib, Finset.sum_add_distrib, hcross]
+  ring
+
+/-- **Polarization: the bilinear form is bounded by the quadratic bound.**
+
+    For a symmetric `E` whose quadratic form is at most `δ` on unit states,
+    `|⟨u, Ev⟩| ≤ δ` whenever `u` and `v` are unit. This is the step that converts a bound on
+    the diagonal into a bound off it, and it is where the square root in the sharp estimate
+    comes from once one of the two vectors is rescaled to unit length. -/
+theorem bilinear_le_of_unit {n : ℕ} {E : Matrix (Fin (n + 1)) (Fin (n + 1)) ℝ} {δ : ℝ}
+    (hE : E.IsSymm)
+    (hEbound : ∀ v : Fin (n + 1) → ℝ, (∑ i, v i ^ 2) = 1 → |v ⬝ᵥ (E *ᵥ v)| ≤ δ)
+    (u v : Fin (n + 1) → ℝ) (hu : ∑ i, u i ^ 2 = 1) (hv : ∑ i, v i ^ 2 = 1) :
+    |u ⬝ᵥ (E *ᵥ v)| ≤ δ := by
+  have hplus := quadForm_add hE u v
+  have hminus := quadForm_add hE u (fun i ↦ -v i)
+  have hnegquad : (fun i ↦ -v i) ⬝ᵥ (E *ᵥ fun i ↦ -v i) = v ⬝ᵥ (E *ᵥ v) := by
+    simpa using quadForm_smul E (-1) v
+  have hnegcross : u ⬝ᵥ (E *ᵥ fun i ↦ -v i) = -(u ⬝ᵥ (E *ᵥ v)) := by
+    simp only [dotProduct, Matrix.mulVec, Finset.mul_sum]
+    rw [← Finset.sum_neg_distrib]
+    refine Finset.sum_congr rfl fun i _ ↦ ?_
+    rw [← Finset.sum_neg_distrib]
+    exact Finset.sum_congr rfl fun j _ ↦ by ring
+  rw [hnegquad, hnegcross] at hminus
+  have hcross : ∑ i, u i * -v i = -∑ i, u i * v i := by
+    rw [← Finset.sum_neg_distrib]
+    exact Finset.sum_congr rfl fun i _ ↦ by ring
+  have hsumplus : ∑ i, (u i + v i) ^ 2 = 2 + 2 * ∑ i, u i * v i := by
+    have h1 : ∀ i : Fin (n + 1), (u i + v i) ^ 2 = u i ^ 2 + 2 * (u i * v i) + v i ^ 2 :=
+      fun i ↦ by ring
+    simp_rw [h1]
+    rw [Finset.sum_add_distrib, Finset.sum_add_distrib, hu, hv, ← Finset.mul_sum]
+    ring
+  have hsumminus : ∑ i, (u i + -v i) ^ 2 = 2 - 2 * ∑ i, u i * v i := by
+    have h1 : ∀ i : Fin (n + 1), (u i + -v i) ^ 2 = u i ^ 2 + 2 * (u i * -v i) + v i ^ 2 :=
+      fun i ↦ by ring
+    simp_rw [h1]
+    rw [Finset.sum_add_distrib, Finset.sum_add_distrib, hu, hv, ← Finset.mul_sum, hcross]
+    ring
+  have hbp := quadForm_le_mul_sumSq E δ hEbound (fun i ↦ u i + v i)
+  have hbm := quadForm_le_mul_sumSq E δ hEbound (fun i ↦ u i + -v i)
+  rw [hplus, hsumplus] at hbp
+  rw [hminus, hsumminus] at hbm
+  have h1 := abs_le.mp hbp
+  have h2 := abs_le.mp hbm
+  rcases abs_cases (u ⬝ᵥ (E *ᵥ v)) with ⟨heq, _⟩ | ⟨heq, _⟩ <;> rw [heq] <;> linarith [h1.1, h1.2, h2.1, h2.2]
+
 /-- **The sharp bound holds outright once the misalignment is at least one half.**
 
     At `misalignmentSq c ≥ 1/2` the sharp right-hand side `2√2 δ √s` is already at least
