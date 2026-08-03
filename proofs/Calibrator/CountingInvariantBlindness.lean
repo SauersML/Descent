@@ -255,4 +255,21 @@ noncomputable def ghostWitness (α n u : ℝ)
   count_eq := rfl
   rate_ne := by simpa using hne
 
+/-- The separation hypothesis of `ghostWitness` is satisfiable, so the witness type is
+    inhabited and the blindness theorems applied to it are not conditioned on an empty
+    hypothesis.
+
+    The scale used here is degenerate — at `n = 1` the logarithm vanishes while the power is
+    one — and it is offered as a **consistency witness only**. The substantive statement,
+    that the two gains separate without bound at every tail index, is `gains_separate`; this
+    lemma establishes only that there is something to separate. -/
+theorem ghostGain_ne_countPredicted_at_one :
+    ghostGain 1 1 ≠ countPredictedGain 1 1 := by
+  unfold ghostGain countPredictedGain
+  simp
+
+/-- `ghostWitness` is inhabited. -/
+noncomputable def ghostWitnessExample (u : ℝ) : Witness Bool ℝ :=
+  ghostWitness 1 1 u ghostGain_ne_countPredicted_at_one
+
 end Calibrator.CountingInvariantBlindness
