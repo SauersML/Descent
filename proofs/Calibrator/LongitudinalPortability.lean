@@ -523,31 +523,29 @@ end CrossTemporalValidation
 /-! ## The shape of the measured decay curve, and what a crossover does not identify
 
 `temporal_split_more_conservative` above models cohort decay as `exp(-λ Δt)` and reads a single
-rate off it. `Calibrator.HorizonCurve` supplies the two facts that decide when that reading is
-legitimate, and both bind here rather than upstream.
+rate off it. `Calibrator.HorizonCurve` supplies three facts that decide when that reading is
+legitimate.
 
-The first is a **measurement** result: the estimator that averages a one-endpoint accuracy profile
-over the invariant cohort law returns the same number at every gap. A temporal split that
-resamples the evaluation set from the stationary law and evaluates a fixed profile therefore
-cannot show decay at all, and a decay it does show came from the sampling, the refitting, or the
-non-stationarity — not from the coupling. What must vary with the gap is the *starting* cohort of
-the design, which is the regret, not the average.
+First, a measurement result: averaging a one-endpoint accuracy profile over the invariant cohort
+law returns the same number at every gap. A temporal split that resamples the evaluation set from
+the stationary law and evaluates a fixed profile cannot show decay, and a decay it does show came
+from the sampling, the refitting or the non-stationarity. What varies with the gap is the starting
+cohort of the design — the regret, not the average.
 
-The second is a **shape** result and it is falsifiable on published curves: under a stationary
-reversible coupling the effective decay rate is nonincreasing in the gap. A cohort curve that
-steepens as the gap grows is not relaxation.
+Second, a shape result, falsifiable on published curves: under a stationary reversible coupling
+the effective decay rate is nonincreasing in the gap, so a cohort curve that steepens is not
+relaxation.
 
-The third is a **negative** result about `stalenessCrossover`: a single crossover does not pin a
-relaxation time, because a multi-mode value signal can cross three times. -/
+Third, a negative result about `stalenessCrossover`: a single crossover does not pin a relaxation
+time, because a multi-mode value signal can cross three times. -/
 
 section HorizonShape
 
 open scoped BigOperators in
-/-- **A stationary-law temporal split shows no decay, by construction.**
-
-    Direct instance of `naiveHorizonCurve_independent_of_horizon`: for a fixed accuracy profile
-    averaged over the invariant cohort law, two different cohort gaps give the same number. Any
-    decay reported from this estimator is a property of the study design.
+/-- A stationary-law temporal split shows no decay by construction. Instance of
+    `naiveHorizonCurve_independent_of_horizon`: for a fixed accuracy profile averaged over the
+    invariant cohort law, two cohort gaps give the same number, so any decay reported from this
+    estimator is a property of the study design.
 
     Empirical status: DERIVED. -/
 theorem stationaryCohortSplit_shows_no_decay {ι : Type*} [Fintype ι]
@@ -556,13 +554,11 @@ theorem stationaryCohortSplit_shows_no_decay {ι : Type*} [Fintype ι]
     ∑ x, π x * ∑ y, P gap₁ x y * accuracy y = ∑ x, π x * ∑ y, P gap₂ x y * accuracy y :=
   naiveHorizonCurve_independent_of_horizon π P accuracy h gap₁ gap₂
 
-/-- **A cohort accuracy curve cannot steepen.**
-
-    Instance of `effectiveRate_nonincreasing` at a two-mode value signal: if cross-cohort decay is
-    the relaxation of a stationary reversible coupling, the effective decay rate falls with the
-    cohort gap. A measured curve whose apparent rate rises falsifies the relaxation model, and the
-    alternatives it leaves — drifting phenotype definition, changing ascertainment, a
-    non-stationary environment — are testable and distinct.
+/-- A cohort accuracy curve cannot steepen. Instance of `effectiveRate_nonincreasing` at a
+    two-mode value signal: if cross-cohort decay is the relaxation of a stationary reversible
+    coupling, the effective rate falls with the cohort gap. A measured curve whose apparent rate
+    rises falsifies the relaxation model; the alternatives it leaves — drifting phenotype
+    definition, changing ascertainment, a non-stationary environment — are distinct and testable.
 
     Empirical status: DERIVED; the shape constraint is the testable content. -/
 theorem cohortDecayRate_cannot_steepen
@@ -579,12 +575,10 @@ theorem cohortDecayRate_cannot_steepen
           fastWeight * Real.exp (-(fastRate * gap₂))) :=
   effectiveRate_nonincreasing slowWeight fastWeight slowRate fastRate gap₁ gap₂ hs hf hrate hgap
 
-/-- **A measured crossover does not identify a relaxation time.**
-
-    The four-mode premium of `HorizonCurve.horizonPolynomial` changes sign three times, so a study
-    that observes one crossing of "stale design" against "environment-blind design" and inverts
-    `stalenessCrossover` to recover `λ` has recovered nothing unless it has separately established
-    that the value signal is single-signed in the rate ordering.
+/-- A measured crossover does not identify a relaxation time. The four-mode premium of
+    `HorizonCurve.horizonPolynomial` changes sign three times, so observing one crossing of stale
+    against environment-blind and inverting `stalenessCrossover` recovers nothing unless the value
+    signal has separately been shown to be single-signed in the rate ordering.
 
     Empirical status: DERIVED. -/
 theorem cohortCrossover_may_be_threefold :

@@ -557,18 +557,18 @@ def benDavidUpperBound (err_source divergence lambda_star : ℝ) : ℝ :=
 
 /-! **Deleted: `divergence_increases_with_fst`.**
 
-Its statement was `c * fst₁ < c * fst₂` from `0 < c` and `fst₁ < fst₂` — Mathlib's
-`mul_lt_mul_of_pos_left`, applied verbatim as the entire proof. The H-divergence it was
-named for occurs nowhere in it; `fst₁` and `fst₂` are unconstrained reals, so the theorem
-holds at negative `F_ST` as readily as at admissible values.
+This theorem is absent on purpose. Its statement is `c * fst₁ < c * fst₂` from `0 < c` and
+`fst₁ < fst₂` — Mathlib's `mul_lt_mul_of_pos_left`, applied verbatim as the entire proof.
+The H-divergence the name promises occurs nowhere in it. `fst₁` and `fst₂` are
+unconstrained reals, so the theorem holds at negative `F_ST` as readily as at admissible
+values.
 
-The claim the name made — that H-divergence between ancestry populations is monotone in
-`F_ST` — was carried entirely by the docstring, together with the linear model
-`divergence = c * F_ST` that would have made it precise. Neither is derived anywhere in
-this corpus, and asserting the *shape* of that relation is not a small assumption: it is
-what would let a measured `F_ST` be converted into a term of the Ben-David bound at all.
-Deleting the theorem does not remove a result, because multiplying an inequality by a
-positive constant was the only result present. -/
+The name's claim — that H-divergence between ancestry populations is monotone in `F_ST` —
+lives entirely in prose, together with the linear model `divergence = c * F_ST` that would
+make it precise. Neither is derived anywhere in this corpus, and asserting the *shape* of
+that relation is not a small assumption: it is what would let a measured `F_ST` be
+converted into a term of the Ben-David bound at all. Multiplying an inequality by a
+positive constant is the only result such a theorem holds. -/
 
 /-- **Larger `λ*` worsens the Ben-David upper bound.**
     `λ*` is the irreducible source-target approximation gap appearing in the
