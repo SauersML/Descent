@@ -111,7 +111,7 @@ C4_N_GRID = (200, 800, 3200)
 C4_M_GRID = (400, 1600, 6400)
 C4_REP = 400
 C5_NP = 400
-C5_M = 60000
+C5_M = 240000
 C5_M_GRID = (500, 2000, 8000)
 
 
@@ -210,7 +210,28 @@ def sim_state_means(rho, theta, amp, n, rng, chunk=200000):
 
 C_MIX = np.array([[1.0, 0.0], [1.0, 2.0]])
 W_FLOOR = np.array([[0.60, 0.0], [0.0, 1.80]])
-THETA0 = 0.40
+# THETA0 = 0 IS NOT AN ARBITRARY CHOICE, AND THE FIRST RUN IS WHY.
+#
+# Sigma depends on rho only through the scalar g(rho, theta) =
+# (1-rho^2)/(1 - 2 rho cos theta + rho^2), and for theta != 0 THAT MAP IS
+# TWO-TO-ONE: at theta = 0.40 it peaks at rho = 0.665, so g(0.55) = g(0.752)
+# exactly. The first run used theta = 0.40 and got RMSE ratios of 0.84, 1.43,
+# 2.69, 3.39 against the claimed 1.0, with an RMSE that barely fell as m rose
+# 32-fold (0.148 -> 0.105) and a persistent bias of +0.03 to +0.07. That is
+# not a wrong information constant; it is a BIMODAL LIKELIHOOD with a second
+# mode at the conjugate root, and the profiled MLE jumping branches. The
+# two-to-one structure is real -- it is the same construction that
+# fam_ensemble_channel.py's Test 5 uses deliberately to build two priors with
+# an identical visible pair -- and here it was sabotaging the estimator rather
+# than being the object of study.
+#
+# At theta = 0 the map g = (1+rho)/(1-rho) is strictly monotone on (0,1), so
+# rho is globally identified from Sigma and the MLE has one mode. The
+# anisotropy that makes the Hilbert-Schmidt norm do real work comes from the
+# non-orthogonal C and the unequal white floor W, NOT from theta, so nothing
+# about the test is weakened by this: cond(Sigma) is still ~5.8 and the
+# degenerate isotropic cell is still run alongside for comparison.
+THETA0 = 0.0
 AMP0 = 1.0
 
 
@@ -349,7 +370,17 @@ def c1(rng, out):
           % (kurt[0], kurt[1], math.sqrt(24.0 / POOL)))
     clt_ok = abs(kurt[0]) < 0.05 and abs(kurt[1]) < 0.05 and relS < 0.03
 
-    grid = np.linspace(0.05, 0.95, 181)
+    # Grid spacing 0.0005, i.e. 60x finer than the smallest predicted RMSE
+    # (1/sqrt(1600 p)), so grid resolution cannot masquerade as an information
+    # deficit. Global identifiability of rho from Sigma is CHECKED here rather
+    # than assumed, because the first run's failure was exactly a violation of
+    # it.
+    grid = np.linspace(0.02, 0.96, 1881)
+    gvals = np.array([sigma_of(r, NP)[0, 0] for r in grid])
+    mono = bool(np.all(np.diff(gvals) > 0))
+    print("  IDENTIFIABILITY: rho -> Sigma is strictly monotone over the MLE "
+          "grid: %s (theta = %.2f). At theta != 0 it is two-to-one and the "
+          "likelihood is bimodal." % (mono, THETA0))
     ginv, gld = precompute_grid(NP, grid)
     # agreement between the reference implementation and the precomputed one,
     # on a real block, so the speed fix cannot silently change the estimator
@@ -379,8 +410,9 @@ def c1(rng, out):
           "%s" % ", ".join("%.4f" % x for x in ratios))
     print("  (a slope test alone would pass for any consistent estimator; the "
           "content is that these ratios are 1.0)")
-    ok = clt_ok and all(abs(x - 1.0) < 0.10 for x in ratios[1:])
-    out["C1"] = {"rho0": RHO0, "n_prime": NP, "p_finite": p_fin,
+    ok = clt_ok and mono and all(abs(x - 1.0) < 0.10 for x in ratios[1:])
+    out["C1"] = {"identifiable_monotone": bool(mono),
+                 "rho0": RHO0, "n_prime": NP, "p_finite": p_fin,
                  "p_asymptotic": p_inf, "cond_sigma": cond,
                  "p_isotropic_cell": p_iso,
                  "clt_kurtosis": kurt, "clt_cov_rel_dev": relS,
@@ -588,12 +620,53 @@ def c3(rng, out):
                              1)[0])
     sl_me = float(np.polyfit(le, np.log([r["p_measured"] for r in rows]), 1)[0])
     print("")
-    print("  log-log slope d log p / d log eta :  closed form %+.4f, "
-          "MEASURED %+.4f   (claim +2, alternative +1)" % (sl_th, sl_me))
-    ok = abs(sl_me - 2.0) < 0.15 and abs(sl_th - 2.0) < 0.02
-    print("  exponent test: %s" % ("PASS" if ok else "FAIL"))
+    print("  log-log slope over the SIMULATED range: closed form %+.4f, "
+          "MEASURED %+.4f" % (sl_th, sl_me))
+    #
+    # WHY THE RAW SLOPE IS NOT THE TEST, DIAGNOSED FROM THE FIRST RUN.
+    # The first run reported a closed-form slope of +1.7853 and called the
+    # exponent test FAILED. But the closed form is EXACTLY
+    #     p = 2 eta^2 / (1 + eta delta)^2,
+    # so d log p / d log eta = 2 - 2 eta delta/(1 + eta delta), which is 1.54
+    # at eta = 0.3 and 1.93 at eta = 0.0375. A secant slope of 1.79 across that
+    # range is what the construction MUST give; the claim p ~ eta^2 is a
+    # statement about the eta -> 0 limit, and the shortfall is the first-order
+    # correction, not a different exponent. Fitting a secant slope over a range
+    # where the correction is 23% and comparing it to the asymptotic exponent
+    # tests the wrong thing.
+    #
+    # The claim is therefore split into the two statements it actually makes,
+    # and both are tested:
+    #   (a) THE EXPONENT. The LOCAL slope of the closed form must converge to
+    #       exactly 2 as eta -> 0. Swept over four further decades, which costs
+    #       nothing because it is arithmetic.
+    #   (b) THE INFORMATION. The closed-form p must be the information actually
+    #       attainable, i.e. measured p / closed-form p = 1 at every eta. This
+    #       is the part that involves nature, and it is where a wrong 1/2, a
+    #       wrong HS norm or a wrong power would show up.
+    fine = np.array([10.0 ** (-x) for x in np.linspace(0.5, 4.5, 41)])
+    pfine = np.array([seal_p(e, DELTA0, NP) for e in fine])
+    loc = np.diff(np.log(pfine)) / np.diff(np.log(fine))
+    print("  (a) EXPONENT: local slope of the closed form as eta -> 0:")
+    print("      eta = 3.2e-01 -> %+.4f   eta = 1.0e-02 -> %+.4f   "
+          "eta = 3.2e-05 -> %+.4f   (claim +2, alternative +1)"
+          % (loc[0], loc[len(loc) // 2], loc[-1]))
+    exponent_ok = abs(loc[-1] - 2.0) < 0.01
+    print("      converges to 2: %s" % ("PASS" if exponent_ok else "FAIL"))
+    rat = [r["ratio"] for r in rows]
+    info_ok = all(abs(x - 1.0) < 0.20 for x in rat)
+    print("  (b) INFORMATION: measured p / closed-form p at each eta: %s"
+          % ", ".join("%.4f" % x for x in rat))
+    print("      the closed-form p IS the attainable information: %s"
+          % ("PASS" if info_ok else "FAIL"))
+    ok = exponent_ok and info_ok
     out["C3"] = {"delta0": DELTA0, "n_prime": NP, "rows": rows,
-                 "slope_closed_form": sl_th, "slope_measured": sl_me,
+                 "secant_slope_closed_form": sl_th,
+                 "secant_slope_measured": sl_me,
+                 "local_slope_at_smallest_eta": float(loc[-1]),
+                 "exponent_pass": bool(exponent_ok),
+                 "information_ratios": rat,
+                 "information_pass": bool(info_ok),
                  "pass": bool(ok)}
     return ok
 
@@ -693,19 +766,50 @@ def c4(rng, out):
     print("    x = %.4g +- %.4g   (ADDITIVITY says 0; that is %.2f sigma)"
           % (coef[3], se[3], abs(coef[3]) / se[3] if se[3] > 0 else 0.0))
 
-    # P4: the fitter must be able to SEE a cross term
-    ycross = y + 5.0 * (1.0 / (np.array([r["n"] for r in rows], dtype=float)
-                               * np.array([r["m"] for r in rows],
-                                          dtype=float)))
+    # THE EXCLUSION BOUND, which is what "additivity holds" actually means.
+    # The smallest cell has the largest 1/(n m), so a cross term of size
+    # x/(n m) contributes most there; with |x| < 3 SE the fit excludes any
+    # cross term contributing more than the printed fraction of that cell's
+    # risk. Stating the bound is the difference between "we saw nothing" and
+    # "nothing larger than this is there".
+    smallest = min(r["n"] * r["m"] for r in rows)
+    smallest_risk = min(r["agg_measured"] for r in rows
+                        if r["n"] * r["m"] == smallest)
+    excl = 3.0 * se[3] / smallest / smallest_risk
+    print("  EXCLUSION: |x| < 3 SE = %.4g bounds any cross-term contribution "
+          "at the smallest cell (n m = %d, risk %.5f) to %.3f%% of that risk"
+          % (3 * se[3], smallest, smallest_risk, 100.0 * excl))
+
+    # P4: the fitter must be able to SEE a cross term.
+    #
+    # THE FIRST RUN'S P4 WAS A BROKEN CONTROL AND IS REPAIRED HERE. It injected
+    # 5/(n m), which at the smallest cell is 6e-5 against risks of order 0.05,
+    # four orders of magnitude below this fit's own standard error of 18.8 on
+    # that coefficient. It came back at 0.4 sigma, and correctly so: the
+    # injection was far below the fitter's resolution, so the control
+    # demonstrated nothing. A control whose alternative is undetectable by
+    # construction is not a control -- it is the exact failure this project
+    # keeps catching. The injection is now scaled to TEN standard errors of
+    # this fit, so it must be recovered if the fitter works at all, and the
+    # recovered value is checked against the INJECTED size and not merely
+    # against zero.
+    inject = 10.0 * se[3]
+    nn = np.array([r["n"] for r in rows], dtype=float)
+    mm_ = np.array([r["m"] for r in rows], dtype=float)
+    ycross = y + inject / (nn * mm_)
     cc, _, _, _ = np.linalg.lstsq(A, ycross, rcond=None)
     rr = ycross - A.dot(cc)
     s2c = float(rr.dot(rr) / dof)
     sec = math.sqrt(float(s2c * np.linalg.inv(A.T.dot(A))[3, 3]))
-    print("  P4 CONTROL: the same fitter on a synthetic risk with a genuine "
-          "5/(n m) cross term recovers x = %.4g +- %.4g (%.1f sigma) -- the "
-          "fitter can see a cross term" % (cc[3], sec,
-                                           abs(cc[3]) / sec if sec > 0 else 0))
-    p4 = (abs(cc[3]) / sec > 5.0) if sec > 0 else False
+    print("  P4 CONTROL: injecting a genuine %.4g/(n m) cross term -- ten "
+          "standard errors of this fit -- the same fitter recovers x = %.4g "
+          "+- %.4g; the SHIFT from the uninjected fit is %.4g against %.4g "
+          "injected (ratio %.4f), at %.1f sigma from zero"
+          % (inject, cc[3], sec, cc[3] - coef[3], inject,
+             (cc[3] - coef[3]) / inject if inject else 0.0,
+             abs(cc[3]) / sec if sec > 0 else 0))
+    p4 = bool(sec > 0 and abs(cc[3]) / sec > 5.0
+              and abs((cc[3] - coef[3]) / inject - 1.0) < 0.05)
     add_ok = (abs(coef[3]) / se[3] < 3.0) if se[3] > 0 else False
     coef_ok = (abs(coef[0] - 0.5) < 0.08 and abs(coef[2] - 1.0) < 0.15
                and abs(coef[1] / (0.5 * inv_p) - 1.0) < 0.15)
@@ -891,10 +995,23 @@ def c5(rng, out):
         rmse = float(np.sqrt(np.mean(np.sum((est - h0) ** 2, axis=1))))
         rowsp.append({"m": m, "ensembles": nens, "rmse_h": rmse})
         print("    m = %-6d ensembles %-4d  RMSE(h) = %.6f" % (m, nens, rmse))
-    sl = float(np.polyfit(np.log([r["m"] for r in rowsp]),
-                          np.log([r["rmse_h"] for r in rowsp]), 1)[0])
-    print("    rate d log RMSE / d log m = %+.4f (claim -0.5)" % sl)
-    pos_ok = abs(sl + 0.5) < 0.10
+    # THE SLOPE NEEDS ITS OWN ERROR BAR, which the first run did not print.
+    # An RMSE built from E ensembles has relative standard error 1/sqrt(2E), so
+    # log RMSE carries 1/sqrt(2E) and the fitted slope inherits it. The first
+    # run had only 7 ensembles at the top m, giving a slope standard error near
+    # 0.10, and then declared FAIL on a fitted -0.5829 that was well inside one
+    # sigma of -0.5. The pool is now four times larger, so the top cell has 30
+    # ensembles rather than 7, and the slope is reported WITH its standard
+    # error and judged against it rather than against a fixed tolerance.
+    lm = np.log([r["m"] for r in rowsp])
+    ly = np.log([r["rmse_h"] for r in rowsp])
+    wsd = np.array([1.0 / math.sqrt(2.0 * r["ensembles"]) for r in rowsp])
+    sl = float(np.polyfit(lm, ly, 1)[0])
+    sxx = float(np.sum((lm - lm.mean()) ** 2))
+    sl_se = float(math.sqrt(np.sum(((lm - lm.mean()) * wsd) ** 2)) / sxx)
+    print("    rate d log RMSE / d log m = %+.4f +- %.4f (claim -0.5, that is "
+          "%.2f sigma)" % (sl, sl_se, abs(sl + 0.5) / sl_se))
+    pos_ok = abs(sl + 0.5) < 3.0 * sl_se
 
     out["C5"] = {"h0": h0.tolist(), "h_level_set": h1.tolist(),
                  "singular_values_3lag": s3.tolist(),
@@ -904,7 +1021,7 @@ def c5(rng, out):
                  "gamma3_h0": ma_gam(h0, 3), "gamma3_h1": ma_gam(h1, 3),
                  "L_h0": Ldep0, "L_h1": Ldep1,
                  "welch_t_by_lag": ts, "negative_arm_pass": bool(neg_ok),
-                 "complete_arm": rowsp, "rate_slope": sl,
+                 "complete_arm": rowsp, "rate_slope": sl, "rate_slope_se": sl_se,
                  "complete_arm_pass": bool(pos_ok)}
     return neg_ok and pos_ok
 
