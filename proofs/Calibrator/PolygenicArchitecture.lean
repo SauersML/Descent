@@ -600,6 +600,10 @@ noncomputable def calculus {q n : ℕ}
     (P : MeanAbsoluteEffectCertificateProblem q n) (i : Fin (n + 1)) :
     P.finiteProblem.target i = meanAbsoluteEffect (P.architecture i) := rfl
 
+@[simp] theorem finiteProblem_moment {q n : ℕ}
+    (P : MeanAbsoluteEffectCertificateProblem q n) (r : ℕ) (i : Fin (n + 1)) :
+    P.finiteProblem.moment r i = P.architectureMoment r i := rfl
+
 @[simp] theorem architectureMoment_zero {q n : ℕ}
     (P : MeanAbsoluteEffectCertificateProblem q n) (i : Fin (n + 1)) :
     P.architectureMoment 0 i = ∑ j, P.architecture i j := by
@@ -625,16 +629,14 @@ theorem momentMatched_two_iff {q n : ℕ}
   constructor
   · intro h
     constructor
-    · simpa [finiteProblem, mixtureExperiment, FiniteMixtureExperiment.certificateProblem,
-        FinitePrior.mean, architectureMoment] using h 0 (by omega)
-    · simpa [finiteProblem, mixtureExperiment, FiniteMixtureExperiment.certificateProblem,
-        FinitePrior.mean, architectureMoment] using h 1 (by omega)
+    · simpa only [FinitePrior.mean, finiteProblem_moment, architectureMoment_zero] using
+        h 0 (by omega)
+    · simpa only [FinitePrior.mean, finiteProblem_moment, architectureMoment_one] using
+        h 1 (by omega)
   · rintro ⟨h0, h1⟩ r hr
     interval_cases r
-    · simpa [finiteProblem, mixtureExperiment, FiniteMixtureExperiment.certificateProblem,
-        FinitePrior.mean, architectureMoment] using h0
-    · simpa [finiteProblem, mixtureExperiment, FiniteMixtureExperiment.certificateProblem,
-        FinitePrior.mean, architectureMoment] using h1
+    · simpa only [FinitePrior.mean, finiteProblem_moment, architectureMoment_zero] using h0
+    · simpa only [FinitePrior.mean, finiteProblem_moment, architectureMoment_one] using h1
 
 theorem effects_nonempty {q n : ℕ} (P : MeanAbsoluteEffectCertificateProblem q n) :
     P.effects.Nonempty := boundedEffectCarrier_nonempty q P.effectRadius
