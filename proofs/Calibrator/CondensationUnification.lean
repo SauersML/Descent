@@ -91,11 +91,14 @@ criterion rather than by assertion.
 /-- **The additive polygenic score is subcritical.** Whenever the number of terms
 exceeds `exp (c(q))` — which for common variants means about three variants, and for a
 variant at MAF `10 ^ (-4)` still only about five thousand — the additive score sits
-strictly below the condensation boundary and the Gaussian surrogate is valid.
+strictly below the condensation boundary, `1 < maxSafeEpistaticOrder N q`.
 
-Genome-wide scores clear this by many orders of magnitude. The condensation theory
-does not weaken the additive PGS apparatus; it bounds the degree to which that
-apparatus may be extrapolated to interaction models. -/
+That is an inequality between two real numbers; validity of the Gaussian surrogate at
+degree one is the Berry-Esseen apparatus of `Calibrator.Probability`, not this. Genome-wide
+scores clear the boundary by many orders of magnitude, and the simulation reported at
+`maxSafeEpistaticOrder` confirms genotype and surrogate score laws are indistinguishable at
+`m = 1`. The condensation theory does not weaken the additive PGS apparatus; it bounds the
+degree to which that apparatus may be extrapolated to interaction models. -/
 theorem additive_score_is_subcritical {N q : ℝ}
     (hc : 0 < hweMellinDrift q) (hN : hweMellinDrift q < Real.log N) :
     1 < maxSafeEpistaticOrder N q := by
@@ -117,13 +120,15 @@ theorem epistatic_order_unsafe_iff {N q m : ℝ} (hc : 0 < hweMellinDrift q) :
 
 `Calibrator.ImputationPortability` models the dosage/hard-call difference as an
 attenuation of the second moment by the imputation `r ^ 2`, and that attenuation is
-repaired exactly by rescaling. The lattice discrepancy is not: by
-`standardizedSquare_scale_invariant` the observable triple is rescaling-invariant, so
-for every rescaling factor the inflation factor at the hard-call lattice point stays
-strictly above one.
+repaired exactly by rescaling. The Mellin triple is rescaling-invariant
+(`standardizedSquare_scale_invariant`), and the inflation factor at the hard-call lattice
+point exceeds one (`hardCall_intensity_inflated`).
 
-Stated concretely: no choice of rescaling makes the hard-call intensity match a
-nonlattice surrogate's. -/
+**The statement is the conjunction of those two facts and no more.** It does not prove
+that no rescaling makes the hard-call intensity match a nonlattice surrogate's: that would
+need the inflation factor to *be* an intensity ratio, which is the unproved local-limit
+step of `Calibrator.JetBarrier`. Read it as: rescaling cannot move the quantity the lattice
+mechanism is stated in terms of. -/
 theorem imputation_rescaling_cannot_repair_lattice (lam : ℝ) (hlam : lam ≠ 0) :
     1 < latticeInflation hardCallLatticeSpan ∧
       ∀ c V : ℝ, V ≠ 0 → (lam * c) ^ 2 / (lam ^ 2 * V) = c ^ 2 / V :=
@@ -246,168 +251,13 @@ theorem no_signSymmetric_nondegenerate_locus
     exact hweMellinJetVariance_half
 
 /-!
-## 5c. The two gates on a set-based test, and where each comes from
+## 5c. Set-based null limits
 
-The corpus already had one gate on an interaction analysis: `maxSafeEpistaticOrder`,
-`log N / c(q)`, the interaction order past which condensation destroys the Gaussian
-surrogate. That gate is about *order*. The overlap results supply a second gate, about
-*structure*, and the two are logically independent — which is exactly why the first was
-not enough.
-
-`Calibrator.EpistaticChaos.GenotypeChaosLimits` states both directions over genotype
-panels: `disjoint_segment` (Theorem D) says a design whose tested locus-sets are
-pairwise disjoint has a Gaussian null with only the variance free, and
-`maximal_spectrum` (Theorem S) says that at any prescribed polymorphic allele-frequency
-family the non-disjoint designs realize the entire moment body. The theorems below weld
-those to the drift and safe-order machinery of `Calibrator.PolygenicSpectroscopy`.
+The former bridge from genotype-design algebra to Gaussian/maximal-spectrum limits depended
+entirely on theorem-valued `GenotypeChaosLimits` fields.  Those bridge theorems are removed.
+The directly proved drift, safe-order, overlap, and finite cycle computations remain, but
+none is advertised as a null-limit theorem without its analytic proof.
 -/
-
-/-- **Both gates, for a disjoint design.** Take a pairwise-disjoint admissible design
-over polymorphic loci in linkage equilibrium, and a tested set `s` whose interaction
-order `GenotypeDesign.interactionOrder` sits below the condensation boundary at the
-allele frequency of one of its loci. Then both gates pass: the null is a centered
-Gaussian with variance in `[0, 1]` (Theorem D), and the order is subcritical,
-`c(q) * m < log N` (`epistatic_order_safe_iff`, hence `criticalDegree` through
-`maxSafeEpistaticOrder_eq_criticalDegree`).
-
-The conjuncts answer different questions and neither implies the other.
-`maxSafeEpistaticOrder` says the aggregate has not condensed onto a few terms; Theorem D
-says the surviving limit is Gaussian at all. Before the overlap results the corpus
-carried only the first, and a reader could take "subcritical order" to mean "Gaussian
-null". The next theorem shows that reading is wrong. -/
-theorem disjoint_design_gaussian_null_below_condensation
-    {ι : Type*} [Fintype ι] {n : ℕ} {Limit : Type*}
-    (Sp : GenotypeChaosLimits n ι Limit) (design : GenotypeDesign n ι)
-    (hadmissible : Sp.isAdmissible design) (hpolymorphic : design.Polymorphic)
-    (hindependent : design.InLinkageEquilibrium) (hdisjoint : design.VariantDisjoint)
-    (s : ι) (i : Fin n) {N : ℝ}
-    (hdrift : 0 < hweMellinDrift (design.model i).altFreq)
-    (hsafe : (design.interactionOrder s : ℝ) <
-      maxSafeEpistaticOrder N (design.model i).altFreq) :
-    (∃ s2 : ℝ, 0 ≤ s2 ∧ s2 ≤ 1 ∧ Sp.IsCenteredGaussian (Sp.limitLaw design) s2) ∧
-      hweMellinDrift (design.model i).altFreq * design.interactionOrder s < Real.log N :=
-  ⟨Sp.gaussian_null_licensed_of_disjoint design hadmissible hpolymorphic hindependent
-      hdisjoint,
-    (epistatic_order_safe_iff hdrift).mp hsafe⟩
-
-/-- **A subcritical interaction order does not license an overlapping design.**
-
-The hypotheses give a panel whose loci are polymorphic and an interaction order
-strictly below the condensation boundary — everything the existing safe-order criterion
-asks for. The conclusion is that the same panel still carries admissible designs whose
-null is arbitrarily weakly close to *any* centered law with second moment at most one.
-
-So `m < maxSafeEpistaticOrder N q` is necessary but not sufficient for a Gaussian null,
-and the missing hypothesis is `GenotypeDesign.VariantDisjoint`. This is the precise
-sense in which the safe-order table of `Calibrator.PolygenicSpectroscopy` must not be
-read as a Gaussianity certificate for sliding-window or overlapping-panel scans. -/
-theorem subcritical_order_does_not_license_overlapping_design
-    {ι : Type*} [Fintype ι] {n : ℕ} {Limit : Type*}
-    (Sp : GenotypeChaosLimits n ι Limit) (model : Fin n → HardyWeinbergModel)
-    (hpolymorphic : ∀ i : Fin n, 0 < (model i).altFreq ∧ (model i).altFreq < 1)
-    {N q m : ℝ} (hdrift : 0 < hweMellinDrift q) (hsafe : m < maxSafeEpistaticOrder N q)
-    (target : Limit) (htarget : Sp.InMomentBody target) (ε : ℝ) (hε : 0 < ε) :
-    hweMellinDrift q * m < Real.log N ∧
-      ∃ design : GenotypeDesign n ι, design.model = model ∧
-        design.InLinkageEquilibrium ∧ Sp.isAdmissible design ∧
-        Sp.weakDistance (Sp.limitLaw design) target < ε :=
-  ⟨(epistatic_order_safe_iff hdrift).mp hsafe,
-    Sp.maximal_spectrum model hpolymorphic target htarget ε hε⟩
-
-/-- **The moment body is reached at every drift profile.**
-
-The design realizing an arbitrary target law sits on the *prescribed* panel, so its
-per-locus Mellin drift is the panel's own `HardyWeinbergModel.mellinDrift`, equal in
-closed form to `hweMellinDrift (q_i)` at each locus by
-`HardyWeinbergModel.mellinDrift_eq`. The drift profile is therefore an arbitrary input
-to the construction rather than an output of it: no value of `c(q)`, common or rare,
-excludes any centered law with second moment at most one from being an overlapping
-design's null.
-
-This is the sharpest statement of how the two theories divide. The drift governs *when*
-a high-order aggregate condenses; it says nothing whatever about the shape of the null
-once the tested sets share variants. -/
-theorem moment_body_reached_at_every_drift
-    {ι : Type*} [Fintype ι] {n : ℕ} {Limit : Type*}
-    (Sp : GenotypeChaosLimits n ι Limit) (model : Fin n → HardyWeinbergModel)
-    (hpolymorphic : ∀ i : Fin n, 0 < (model i).altFreq ∧ (model i).altFreq < 1)
-    (target : Limit) (htarget : Sp.InMomentBody target) (ε : ℝ) (hε : 0 < ε) :
-    ∃ design : GenotypeDesign n ι, Sp.isAdmissible design ∧
-      Sp.weakDistance (Sp.limitLaw design) target < ε ∧
-      ∀ i : Fin n, (design.model i).mellinDrift = hweMellinDrift (model i).altFreq := by
-  obtain ⟨design, hmodel, _, hadmissible, hclose⟩ :=
-    Sp.maximal_spectrum model hpolymorphic target htarget ε hε
-  refine ⟨design, hadmissible, hclose, fun i => ?_⟩
-  rw [hmodel]
-  exact (model i).mellinDrift_eq (hpolymorphic i).1 (hpolymorphic i).2
-
-/-!
-## 5d. Which set-based tests have a licensed Gaussian null
-
-The practical output, derivable from the statements above rather than asserted here.
-
-* **Licensed.** A gene-based burden or kernel test in which every variant is assigned
-  to one gene: `Calibrator.EpistaticChaos.geneBurdenDesign_variantDisjoint` discharges
-  disjointness, and `GenotypeChaosLimits.geneBurden_gaussian_null` returns a centered
-  Gaussian null with the variance the only free parameter — at every allele frequency,
-  needing polymorphism and linkage equilibrium and no symmetry.
-* **Not licensed.** A sliding-window scan of width at least two:
-  `Calibrator.EpistaticChaos.slidingWindowDesign_not_variantDisjoint` proves the tested
-  sets share variants, so the licence does not apply, and by
-  `subcritical_order_does_not_license_overlapping_design` the achievable nulls on that
-  panel fill the whole moment body however low the interaction order is. The same holds
-  for overlapping pathway or gene-set panels and for any pleiotropic variant recurring
-  across tested sets, by `GenotypeDesign.not_variantDisjoint_of_recurrent`.
-
-The gap between the two is not a variance mixture, which is what the folklore correction
-for overlap supplies. A variance mixture of centered Gaussians is symmetric, unimodal
-and has non-negative fourth cumulant; the moment body contains laws with none of those
-properties, and the two-pool interaction statistic already leaves the mixture class with
-fourth cumulant `6` at every allele frequency.
-
-## 5e. Permutation and resampling calibration of overlapping designs
-
-A set-based or interaction scan over overlapping locus-sets is routinely calibrated by
-resampling: permute phenotypes, or reshuffle the variant-to-set assignment, recompute,
-and read the null off the resampled distribution. The justification offered is that the
-resampled design has *the same overlap statistics* — same number of sets, same set
-sizes, same variant-recurrence profile.
-
-That justification does not work, and the reason is structural rather than Monte Carlo
-error. The null of an admissible overlapping design is a **spectral** invariant of its
-overlap structure: `∑_k λ_k (W_k² - 1)` in the eigenvalues of the overlap operator.
-Variant recurrence is a **profile** functional, and profile does not determine spectrum
-— `Calibrator.EpistaticChaos.palindromic_circulant_spectra_differ` exhibits two `8 × 8`
-palindromic circulants with the same entry multiset in every row and the same row sums
-whose eigenvalue functions have different ranges, the first attaining `-4` where the
-second cannot at any angle.
--/
-
-/-- **Recurrence-preserving resampling is not a calibration.**
-
-`resample` is any scheme preserving the variant-recurrence profile
-`GenotypeDesign.variantRecurrence` — the summary a reshuffling scheme is designed to
-hold fixed. If the null changes under it for even one design, then recurrence does not
-determine the null, and no argument of the form "the resampled design has the same
-overlap statistics" can justify the calibration.
-
-The hypothesis `hnull` is what the spectral witness supplies: a resampling can move the
-overlap spectrum while fixing every recurrence count. The theorem is silent on whether
-a particular scheme is in fact miscalibrated, which is an empirical question about that
-scheme. -/
-theorem recurrence_preserving_resampling_is_not_a_calibration
-    {ι : Type*} [Fintype ι] {n : ℕ} {Limit : Type*}
-    (Sp : GenotypeChaosLimits n ι Limit)
-    (resample : GenotypeDesign n ι → GenotypeDesign n ι)
-    (hprofile : ∀ (design : GenotypeDesign n ι) (i : Fin n),
-      (resample design).variantRecurrence i = design.variantRecurrence i)
-    (start : GenotypeDesign n ι)
-    (hnull : Sp.limitLaw (resample start) ≠ Sp.limitLaw start) :
-    ¬ ∀ designOne designTwo : GenotypeDesign n ι,
-        (∀ i : Fin n, designOne.variantRecurrence i = designTwo.variantRecurrence i) →
-        Sp.limitLaw designOne = Sp.limitLaw designTwo := by
-  intro hcomplete
-  exact hnull (hcomplete (resample start) start (fun i => hprofile start i))
 
 /-!
 ## 5f. The observable tower, and the fourth channel in closed form
@@ -430,8 +280,10 @@ tempered class of `Calibrator.EpistaticChaos.GenotypeDesign.Tempered`, and in th
 the limit is governed by the conditional-variance array rather than by cumulant rates —
 an array that forgets them. So the naive list `{two-jet, arithmetic type, symmetry,
 cumulants of x²}` overstates what is observable, and this file no longer asserts it. The
-obstruction is exactly the hub-energy divergence already formalized here, which is why
-`ObservableTower` carries it as a field rather than as a remark.
+obstruction is the hub-energy divergence already formalized here. (An `ObservableTower`
+record once carried it as a field; that record accepted the Vertex-Weight Law and the
+exposure correction as fields too, and has been removed, so this paragraph is a note and
+nothing in the file enforces it.)
 
 **A later correction, recorded here because this section is where a reader meets the
 list.** §5i's rigidity theorem shows the floor-one channels are reconstructible from four
@@ -451,8 +303,9 @@ law of `x²` — so the observable algebra is self-similar:
 to finite depth. The naive list is the shadow of the first two floors: `κ₂(x²)` is
 exposed precisely because it is the *variance* of level two, which is what a second floor
 reads. Whether the tower has a genuine second floor or truncates at depth one is **open
-upstream** — the reachability computation that decides it is outstanding — so `depth` is
-a parameter here and `TruncatesAtDepthOne` is a hypothesis, never an assertion.
+upstream** — the reachability computation that decides it is outstanding. The recursion
+itself is not formalized in this file: there is no depth parameter and no truncation
+hypothesis, only the explicit floor-one and panel-mixture calculations below.
 
 **The fourth channel, exactly.** For a standardized Hardy-Weinberg genotype the fourth
 moment is the reciprocal of the genotype variance,
@@ -658,8 +511,8 @@ theorem standardizedGenotype_kurtosis_gaussian_at_blind_maf (h : HardyWeinbergMo
 ### The tower itself
 
 `LevelChannels` is one floor: the two-jet, the arithmetic type, the symmetry verdict.
-`ObservableTower` is the recursion, with the depth a parameter and the truncation a
-hypothesis.
+The recursion above it is not formalized — the record that once stood for it took the
+Vertex-Weight Law as a field and was removed — so what follows is floor one only.
 -/
 
 /-- The channels available at one floor of the observable tower. -/
@@ -669,9 +522,9 @@ structure LevelChannels where
   /-- The size-biased increment variance `v` of that floor's coordinate. -/
   jetVariance : ℝ
   /-- Whether that floor's `log x²` is supported on an arithmetic progression. -/
-  IsLattice : Prop
+  isLattice : Bool
   /-- Whether that floor's coordinate admits a value-negating relabelling. -/
-  IsSignSymmetric : Prop
+  isSignSymmetric : Bool
 
 /-- Floor one of the tower for a Hardy-Weinberg locus, assembled from quantities this
 corpus computes in closed form.
@@ -680,11 +533,13 @@ Empirical status: DERIVED from `hweMellinDrift`, `hweMellinJetVariance` and
 `hweLatticeCondition`, each derived elsewhere in the corpus, together with the symmetry
 characterization `standardizedGenotype_symmetric_iff`; no free parameter and nothing
 fitted. -/
-noncomputable def hweLevelOne (q : ℝ) : LevelChannels where
-  drift := hweMellinDrift q
-  jetVariance := hweMellinJetVariance q
-  IsLattice := hweLatticeCondition q
-  IsSignSymmetric := q = 1 / 2
+noncomputable def hweLevelOne (q : ℝ) : LevelChannels := by
+  classical
+  exact
+    { drift := hweMellinDrift q
+      jetVariance := hweMellinJetVariance q
+      isLattice := decide (hweLatticeCondition q)
+      isSignSymmetric := decide (q = 1 / 2) }
 
 /-- **Floor one is built from the corpus's own quantities**, component by component: the
 over-determination guard for the completeness claim. If anyone changes what
@@ -693,31 +548,41 @@ compiling rather than drifting. -/
 theorem hweLevelOne_components (q : ℝ) :
     (hweLevelOne q).drift = hweMellinDrift q ∧
       (hweLevelOne q).jetVariance = hweMellinJetVariance q ∧
-      (hweLevelOne q).IsLattice = hweLatticeCondition q ∧
-      (hweLevelOne q).IsSignSymmetric = (q = 1 / 2) :=
-  ⟨rfl, rfl, rfl, rfl⟩
+      ((hweLevelOne q).isLattice = true ↔ hweLatticeCondition q) ∧
+      ((hweLevelOne q).isSignSymmetric = true ↔ q = 1 / 2) := by
+  classical
+  refine ⟨rfl, rfl, ?_, ?_⟩
+  · change decide (hweLatticeCondition q) = true ↔ hweLatticeCondition q
+    exact ⟨of_decide_eq_true, decide_eq_true⟩
+  · change decide (q = 1 / 2) = true ↔ q = 1 / 2
+    exact ⟨of_decide_eq_true, decide_eq_true⟩
 
 /-- **The symmetry slot of floor one is the corpus's proved characterization**, so it is
 not a slot awaiting work: it is decided, and decided negatively away from `q = 1/2`. -/
 theorem hweLevelOne_symmetry (h : HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
-    (hweLevelOne h.altFreq).IsSignSymmetric ↔
+    (hweLevelOne h.altFreq).isSignSymmetric = true ↔
       (∃ coding : SymmetricCoding DiploidGenotype,
         (∀ g, coding.weight g = h.genotypeProb g) ∧
         (∀ g, coding.value g = h.standardizedGenotype g)) := by
-  have hcomponent : (hweLevelOne h.altFreq).IsSignSymmetric = (h.altFreq = 1 / 2) := rfl
-  rw [hcomponent]
-  exact (standardizedGenotype_symmetric_iff h hq0 hq1).symm
+  change decide (h.altFreq = 1 / 2) = true ↔ _
+  constructor
+  · intro hdecide
+    exact (standardizedGenotype_symmetric_iff h hq0 hq1).mpr
+      (of_decide_eq_true hdecide)
+  · intro hcoding
+    exact decide_eq_true
+      ((standardizedGenotype_symmetric_iff h hq0 hq1).mp hcoding)
 
 /-- Where floor one is symmetric its jet variance vanishes: two of its channels collapse
 together, which is `no_signSymmetric_nondegenerate_locus` read off the tower. -/
 theorem hweLevelOne_symmetric_jetVariance_zero (q : ℝ)
-    (hsymmetric : (hweLevelOne q).IsSignSymmetric) :
+    (hsymmetric : (hweLevelOne q).isSignSymmetric = true) :
     (hweLevelOne q).jetVariance = 0 := by
-  have hcomponent : (hweLevelOne q).IsSignSymmetric = (q = 1 / 2) := rfl
-  rw [hcomponent] at hsymmetric
+  have hcomponent : q = 1 / 2 := by
+    exact of_decide_eq_true hsymmetric
   have hjet : (hweLevelOne q).jetVariance = hweMellinJetVariance q := rfl
-  rw [hjet, hsymmetric]
+  rw [hjet, hcomponent]
   exact hweMellinJetVariance_half
 
 /-- Re-model a design: the same tested locus-sets, coefficients and joint law, at a
@@ -730,105 +595,9 @@ def GenotypeDesign.reModel {ι : Type*} {n : ℕ} (design : GenotypeDesign n ι)
     (model : Fin n → HardyWeinbergModel) : GenotypeDesign n ι :=
   { design with model := model }
 
-/-- The observable tower over a genotype panel, with its depth a parameter.
-
-`levelChannels design floor i` is the channel data of locus `i` at that floor. The
-Vertex-Weight field says the limit depends on the allele-frequency family only through
-the channels, floor by floor, up to the tower's depth — and through nothing else.
-
-The `higher_cumulants_need_divergent_hub` field carries the correction: a design that
-exposes a cumulant of `x²` beyond the second cannot have bounded hub recurrence, so it
-sits outside the tempered class where cycle densities determine the limit. That is why
-the naive list is not the answer and the recursion is. -/
-structure ObservableTower (n : ℕ) (ι : Type*) [Fintype ι] (Limit : Type*) where
-  /-- Minimum interaction order diverging, influence vanishing, unit variance. -/
-  isAdmissible : GenotypeDesign n ι → Prop
-  /-- The limit law of a design's statistic. -/
-  limitLaw : GenotypeDesign n ι → Limit
-  /-- How many floors the tower is taken to. -/
-  depth : ℕ
-  /-- The channel data of one locus at one floor: floor `0` is `hweLevelOne`. -/
-  levelChannels : ℕ → ℝ → LevelChannels
-  /-- Floor zero is the level-one channel data of the corpus. -/
-  levelChannels_zero : ∀ q : ℝ, levelChannels 0 q = hweLevelOne q
-  /-- Which square-cumulant order a design exposes. -/
-  Exposes : GenotypeDesign n ι → ℕ → Prop
-  /-- **The Vertex-Weight Law (analytic input).** Two allele-frequency families whose
-  channels agree at every floor up to the depth give the same limit, for every design. -/
-  vertex_weight : ∀ (design : GenotypeDesign n ι) (model model' : Fin n → HardyWeinbergModel),
-    isAdmissible (design.reModel model) → isAdmissible (design.reModel model') →
-    (∀ (floor : ℕ) (i : Fin n), floor ≤ depth →
-      levelChannels floor (model i).altFreq = levelChannels floor (model' i).altFreq) →
-    limitLaw (design.reModel model) = limitLaw (design.reModel model')
-  /-- **The exposure correction (analytic input).** Exposing a square cumulant of order
-  three or more forces the second hub energy to diverge, so no hub bound survives. -/
-  higher_cumulants_need_divergent_hub : ∀ (design : GenotypeDesign n ι) (order : ℕ),
-    3 ≤ order → Exposes design order → ∀ bound : ℕ, ¬ design.BoundedHubRecurrence bound
-
-namespace ObservableTower
-
-variable {n : ℕ} {ι : Type*} {Limit : Type*} [Fintype ι]
-    (T : ObservableTower n ι Limit)
-
-/-- **Observability completeness, to the tower's depth.** Any experiment reporting a
-function of a design's limit is a function of the channel data alone: two panels agreeing
-floor by floor are indistinguishable by every admissible design, at every interaction
-order, through every diagram. -/
-theorem experiment_factors_through_channels
-    {Report : Type*} (experiment : Limit → Report)
-    (design : GenotypeDesign n ι) (model model' : Fin n → HardyWeinbergModel)
-    (hadmissible : T.isAdmissible (design.reModel model))
-    (hadmissible' : T.isAdmissible (design.reModel model'))
-    (hchannels : ∀ (floor : ℕ) (i : Fin n), floor ≤ T.depth →
-      T.levelChannels floor (model i).altFreq = T.levelChannels floor (model' i).altFreq) :
-    experiment (T.limitLaw (design.reModel model)) =
-      experiment (T.limitLaw (design.reModel model')) := by
-  rw [T.vertex_weight design model model' hadmissible hadmissible' hchannels]
-
-/-- **A design that reaches past the second square cumulant has left the tempered class.**
-The contrapositive of the exposure correction, in the form a practitioner meets it: if
-every variant is tested a bounded number of times, no cumulant of `x²` beyond the second
-is exposed, whatever the design does. -/
-theorem boundedHub_exposes_no_higher_cumulant
-    (design : GenotypeDesign n ι) (bound : ℕ)
-    (hhub : design.BoundedHubRecurrence bound) (order : ℕ) (horder : 3 ≤ order) :
-    ¬ T.Exposes design order := by
-  intro hexposes
-  exact T.higher_cumulants_need_divergent_hub design order horder hexposes bound hhub
-
-/-- **If the tower truncates at depth one, the complete observable content of a genotype
-coding is a four-element list**: the drift, the jet variance, the arithmetic type and the
-symmetry verdict of floor one, together with the fourth moment `E[x⁴] = 1/(2q(1-q))`
-which is the variance of floor two.
-
-The truncation is the hypothesis `htruncates`, stated in the type rather than assumed in
-prose, because the reachability computation that decides it is open upstream. If the tower
-has a genuine second floor, this theorem is silent and the extra floors are given by
-`levelChannels 1`, `levelChannels 2`, … applied to the law of `x²`. -/
-theorem complete_content_of_truncation
-    (htruncates : T.depth = 0)
-    (design : GenotypeDesign n ι) (model model' : Fin n → HardyWeinbergModel)
-    (hadmissible : T.isAdmissible (design.reModel model))
-    (hadmissible' : T.isAdmissible (design.reModel model'))
-    (hdrift : ∀ i : Fin n, hweMellinDrift (model i).altFreq =
-      hweMellinDrift (model' i).altFreq)
-    (hjet : ∀ i : Fin n, hweMellinJetVariance (model i).altFreq =
-      hweMellinJetVariance (model' i).altFreq)
-    (hlattice : ∀ i : Fin n, hweLatticeCondition (model i).altFreq =
-      hweLatticeCondition (model' i).altFreq)
-    (hsymmetry : ∀ i : Fin n, ((model i).altFreq = 1 / 2) = ((model' i).altFreq = 1 / 2)) :
-    T.limitLaw (design.reModel model) = T.limitLaw (design.reModel model') := by
-  refine T.vertex_weight design model model' hadmissible hadmissible' ?_
-  intro floor i hfloor
-  rw [htruncates] at hfloor
-  have hzero : floor = 0 := Nat.le_zero.mp hfloor
-  subst floor
-  rw [T.levelChannels_zero (model i).altFreq,
-    T.levelChannels_zero (model' i).altFreq]
-  unfold hweLevelOne
-  rw [hdrift i, hjet i, hlattice i, hsymmetry i]
-
-end ObservableTower
+/-! The former observable-tower record accepted the Vertex-Weight Law and the exposure
+correction as fields. It is removed; the explicit panel-mixture calculations below do not
+depend on those unproved analytic claims. -/
 
 /-!
 ## 5g. Panels are mixtures, and that is where the tower bites
@@ -855,9 +624,12 @@ and differ at floor two, hence give different nulls for the *same* interaction s
 
 That is a difference between things that genuinely differ between studies: MAF spectra
 differ between populations, between arrays and sequencing platforms, and after any
-frequency-based filtering. So the operational statement is the one below — matching
-floor-one invariants across two panels does not license transporting a calibration
-between them.
+frequency-based filtering. The operational reading — that matching floor-one invariants
+across two panels does not license transporting a calibration between them — is what the
+mechanism suggests. What is proved below is one step of it: the floor-two datum of a panel
+is the across-locus spread of `1/(2q(1-q))`, and two spectra can match at floor one and
+differ there. The step from a floor-two difference to a difference in null laws is not
+available in this corpus.
 -/
 
 /-- A panel's **allele-frequency spectrum**: the loci it contains and their weights. The
@@ -1024,32 +796,17 @@ theorem centeredSquareThirdMoment_differs_of_sixth (spectrum spectrum' : MafSpec
 
 end MafSpectrum
 
-/-- **Matching floor one across two panels does not license transporting a calibration.**
+/-! A theorem named `floorOne_match_does_not_transport_calibration` stood here. Its three
+floor-one hypotheses were unused — they were spelled `_hdrift`, `_hjet`, `_hfourth` — and
+its proof was `floorTwo_separates spectrum spectrum' hfloorTwo`, i.e. the application of a
+hypothesis stating that differing floor-two data give differing nulls, which is the
+conclusion the name claims. Nothing about floor one entered the proof, so the name asserted
+a non-transport result the statement did not contain. It is removed.
 
-`floorOneMatched` is the conjunction a study would check before reusing a calibration:
-the two panels agree in the drift, the jet variance, the lattice type and the fourth
-moment — every floor-one invariant, locus-weighted. `hfloorTwo` says they differ at floor
-two, which by `centeredSquareThirdMoment_differs_of_sixth` needs only a difference in the
-sixth moment. The conclusion is that the null laws differ, so a calibration valid for one
-panel is not valid for the other.
-
-The transport step itself — that different floor-two data give different nulls — is the
-`floorTwo_separates` hypothesis, which is the second floor of the tower doing its work.
-It is an argument rather than an assertion, because whether a *particular* pair of spectra
-realizes the difference is a numerical question about MAF spectra, not a theorem. -/
-theorem floorOne_match_does_not_transport_calibration
-    {m : ℕ} {Limit : Type*} (nullLaw : MafSpectrum m → Limit)
-    (spectrum spectrum' : MafSpectrum m)
-    (_hdrift : ∀ j, hweMellinDrift (spectrum.model j).altFreq =
-      hweMellinDrift (spectrum'.model j).altFreq)
-    (_hjet : ∀ j, hweMellinJetVariance (spectrum.model j).altFreq =
-      hweMellinJetVariance (spectrum'.model j).altFreq)
-    (_hfourth : spectrum.moment 4 = spectrum'.moment 4)
-    (floorTwo_separates : ∀ s s' : MafSpectrum m,
-      s.centeredSquareThirdMoment ≠ s'.centeredSquareThirdMoment → nullLaw s ≠ nullLaw s')
-    (hfloorTwo : spectrum.centeredSquareThirdMoment ≠ spectrum'.centeredSquareThirdMoment) :
-    nullLaw spectrum ≠ nullLaw spectrum' :=
-  floorTwo_separates spectrum spectrum' hfloorTwo
+The proved content of this section is `centeredSquareThirdMoment_differs_of_sixth`: two
+spectra agreeing in the fourth moment and differing in the sixth differ in the floor-two
+datum. Turning that into a statement about calibrations needs a theorem sending floor-two
+data to null laws, which this corpus does not have. -/
 
 /-!
 ## 5h. The squaring flow, its scale sequence, and why the tower is unreachable
@@ -1069,10 +826,21 @@ The first two values are computed here outright, from the standard normal moment
 * the next floor's fourth moment is `E[(X²-1)⁴]/σ₁⁴ = (105 - 60 + 18 - 4 + 1)/4 = 15`,
   so `σ₂² = 15 - 1 = 14` and `σ₂ = √14 = 3.74166…`.
 
-Numerically the sequence continues `19.07, 294.1, 72756, 4.699·10⁹, 2.005·10¹⁹`: the
-logarithm doubles at each floor, so `σ_k ≈ exp(c · 2^k)`. That growth is carried as a
-named hypothesis (`ScaleSequence.doubly_exponential`) with the two closed forms above as
-its anchor, because a general proof is not in reach here.
+Numerically the sequence continues `19.07, 294.1, 72756, 4.699·10⁹, 2.005·10¹⁹`.
+
+**All seven figures reproduce exactly; the description attached to them did not.** The
+claim was that the logarithm doubles at each floor to four significant figures, so that
+`σ_k ≈ exp(c · 2^k)` with a clean constant. The measured ratios
+`log σ_{k+1} / log σ_k` are
+
+  `3.807, 2.234, 1.928, 1.970, 1.989, 1.996`,
+
+which approach `2` from both sides and are nowhere near `2` at the bottom of the tower —
+the first ratio is off by `90%`. So the doubling is an asymptotic tendency, not a
+per-floor identity, and the low floors are exactly the ones the reachability argument of
+this section is about. The growth is doubly exponential in the limit; the constant `c` is
+not pinned by these seven terms, and nothing here proves the limit exists. It is carried
+as an unproved asymptotic claim with the two closed forms above as its only anchor.
 
 ### What the divergence does, and it is a rigidity mechanism rather than a defect
 
@@ -1269,92 +1037,21 @@ theorem scale_le_squaringFixedPoint {scale : ℝ} (hscale : 0 ≤ scale) :
   unfold squaringFixedPoint
   nlinarith [hsq, hnonneg, hscale]
 
-/-- The scale sequence of a tower, with the growth carried as a named hypothesis.
-
-The two anchor values are theorems (`gaussianFloorOneScaleSq`, `gaussianFloorTwoScaleSq`);
-the growth law is quadrature evidence, exact through floor seven, and is a hypothesis here
-rather than an assertion. -/
-structure ScaleSequence where
-  /-- The scale at each floor. -/
-  scale : ℕ → ℝ
-  /-- Scales are positive. -/
-  scale_pos : ∀ k, 0 < scale k
-  /-- Floor one is the Gaussian's `√2`, squared. -/
-  scale_one_sq : scale 1 ^ 2 = 2
-  /-- Floor two is the Gaussian's `√14`, squared. -/
-  scale_two_sq : scale 2 ^ 2 = 14
-  /-- **The growth law (numerical input).** `exp(c · 2^k) ≤ σ_k` for some positive `c`;
-  Gauss-Hermite quadrature at 200 nodes, exact through floor seven, gives
-  `1.414, 3.742, 19.07, 294.1, 7.276·10⁴, 4.699·10⁹, 2.005·10¹⁹`.
-
-  **All seven figures are CONFIRMED**, by exact rational arithmetic rather than quadrature —
-  `σ_k²` is rational at every floor, so the table computes in `Fraction` with zero error
-  (`σ_7²` has a 214-digit numerator). Controls: `σ_1² = 2` and `σ_2² = 14` exactly, matching
-  the two theorems above. The stated *method* also checks out: independent Gauss–Hermite
-  reproduces all seven at 200 nodes to `≤ 2.2e-15` relative error, while 100 nodes is 30%
-  wrong at floor 7 and 50 nodes is 100% wrong — so 200 is near the minimum that works and
-  floor 8 would need more.
-
-  **The doubling claim was FALSE and is withdrawn.** This field previously read "whose
-  logarithms double at each floor to four significant figures". Successive ratios of
-  `log σ_k` are `3.807, 2.234, 1.928, 1.970, 1.989, 1.996`: the ratio *approaches* two and
-  never attains it to four figures anywhere in the table, the best pair (floors 6→7) matching
-  to three at most, with a maximum deviation of `1.807`. The growth is doubly exponential
-  asymptotically; it is not doubling at each floor.
-
-  **And this field is weaker than the prose it supports.** `exp(growthRate · 2^k) ≤ σ_k` is
-  satisfiable but **binds at floor 1**, forcing `growthRate ≤ 0.17329` — exactly half the
-  asymptotic rate `log σ_k / 2^k → 0.3472`. So `sampleSize_doubly_exponential` guarantees
-  only `15.9` at floor 3 and `6.6·10⁴` at floor 5, against the `≈4·10²` and `≈5·10⁹` the
-  prose quotes straight off `σ_k²`. The prose numbers are right and truncation at floor three
-  is sound, but **the theorem does not deliver them** — it is about 23× weaker at floor 3 and
-  8·10⁴× weaker at floor 5. Anyone quoting a sample size should quote the table, not this
-  bound.
-
-  Empirical status: **VALIDATED** (`proofs/validation/scale_tower/`). -/
-  growthRate : ℝ
-  growthRate_pos : 0 < growthRate
-  doubly_exponential : ∀ k : ℕ, Real.exp (growthRate * 2 ^ k) ≤ scale k
-
-namespace ScaleSequence
-
-variable (S : ScaleSequence)
-
-/-- **No fixed threshold escapes.** For every radius `R` there is a floor beyond which the
-flow maps the ball of radius `R` into itself, provided the scale has reached
-`(R² + 1)/R` — which a diverging scale sequence does.
-
-The hypothesis `hreached` is what the growth law supplies; the conclusion is that the
-escape region below `R` is empty from that floor on. -/
-theorem no_escape_below_radius {R : ℝ} (hR : 0 < R) (k : ℕ)
-    (hreached : (R ^ 2 + 1) / R ≤ S.scale k) {x : ℝ} (hx : |x| ≤ R) :
-    |(x ^ 2 - 1) / S.scale k| ≤ R :=
-  squaringFlow_maps_ball_into_itself hR (S.scale_pos k) hx hreached
-
-/-- **The sample size needed at floor `k` grows doubly exponentially.** If floor `k`'s
-datum needs a sample of order `σ_k²`, then it needs at least `exp(2c · 2^k)`.
-
-With the quadrature values this is about `4·10²` at floor three, `9·10⁴` at floor four and
-`5·10⁹` at floor five: the tower is observationally truncated at about floor three for any
-study that will ever be run. -/
-theorem sampleSize_doubly_exponential (k : ℕ) :
-    Real.exp (S.growthRate * 2 ^ k + S.growthRate * 2 ^ k) ≤ S.scale k ^ 2 := by
-  have hbound := S.doubly_exponential k
-  have hpos : 0 < Real.exp (S.growthRate * 2 ^ k) := Real.exp_pos _
-  rw [Real.exp_add, pow_two]
-  exact mul_le_mul hbound hbound hpos.le (le_trans hpos.le hbound)
-
-end ScaleSequence
+/-! The tower-scale growth law is not represented by an externally populated record.
+Exact low-floor identities remain above; asymptotic growth awaits a proof from a defined
+scale recursion. -/
 
 /-!
 ## 5i. The rigidity phase boundary, and where genotypes sit on it
 
-The founding dichotomy of this arc is settled upstream: **universality holds exactly when
-the coordinate law is Gaussian**, proved at the tower level from four data — symmetry,
-`σ₁ = √2` (equivalently `E[x⁴] = 3`), and the odd parts of the floor-two and floor-three
-laws. The mechanism is contraction: matched odd parts confine the difference measure to a
-small interval, the next floor's map sends that interval strictly negative, and a signed
-measure supported on a strictly negative interval with vanishing odd part is zero.
+The founding dichotomy of this arc — **universality holds exactly when the coordinate law
+is Gaussian**, at the tower level from four data (symmetry, `σ₁ = √2`, equivalently
+`E[x⁴] = 3`, and the odd parts of the floor-two and floor-three laws) — is **not proved
+in this repository**. There is no such theorem in `proofs/Calibrator`; the claimed
+mechanism is a contraction argument, and it is cited here, as it is in
+`Calibrator.PolygenicSpectroscopy` §4c, only to name the hypotheses being ruled out.
+Everything proved in this section is a moment computation about genotypes that stands
+whatever becomes of the rigidity claim.
 
 A *corollary* of the same proof gives rigidity of the tower fibre at any base law with
 `E[x⁴] > 2`, the condition that keeps the confined squares below one — `1/σ₁² < 1`, that
@@ -1418,10 +1115,15 @@ The load in the rigidity argument is carried by the odd part of the *squared* la
 moment list mentions — which is why four successive finite lists failed to close the
 question.
 
-The corpus already owns the decisive fact and it was filed as a side note:
-`standardizedSquare_never_symmetric` proves the odd part of the floor-two law is nonzero at
-every polymorphic frequency, including `q = 1/2`. That is precisely the datum the rigidity
-theorem consumes.
+A note that stood here claimed the corpus already owns the decisive datum, on the ground
+that `standardizedSquare_never_symmetric` makes the odd part of the floor-two law nonzero
+at every polymorphic frequency including `q = 1/2`. **That is false**, and it is the exact
+misreading that theorem's own docstring warns against: it is about the *uncentered* square
+`x²`, which is non-negative and so trivially never symmetric, while floor two is the
+*centered* square, which at `q = 1/2` is Rademacher and symmetric
+(`Calibrator.EpistaticChaos.centeredSquare_rademacher_at_half`). Away from `q = 1/2` the
+floor-two odd part is indeed nonzero (`centeredSquare_third_moment_zero_iff_balanced`);
+at the balanced locus it vanishes, and the corpus has no floor-two separation there.
 
 ### The horizon problem does not bite
 
@@ -1587,61 +1289,8 @@ theorem balanced_locus_is_reflection_fixed_point (h : HardyWeinbergModel) :
     rw [hhalf]
     norm_num
 
-/-- Tower rigidity, carried as a named hypothesis with its phase condition in the type.
-
-`IsGaussianCoordinate` and the two odd-part data are abstract because the tower's floors
-are not objects of this corpus; what is concrete is the phase hypothesis
-`2 < fourthMoment`, which `hwe_phase_inequality_off_balanced` discharges for every
-polymorphic genotype except the balanced one — though discharging that one hypothesis is
-not applying the theorem, and for genotypes the hypotheses are never jointly satisfiable
-(`hwe_rigidity_hypotheses_unsatisfiable`).
-
-**Scope.** This is a statement about complete invariants of a coordinate law. It is not a
-statement about what any design can observe; that bridge is open upstream. -/
-structure TowerRigidity (Law : Type*) where
-  /-- The fourth moment of the coordinate law. -/
-  fourthMoment : Law → ℝ
-  /-- The law admits a value-negating relabelling. -/
-  IsSymmetric : Law → Prop
-  /-- The odd part of the floor-two law. -/
-  floorTwoOddPart : Law → ℝ
-  /-- The odd part of the floor-three law. -/
-  floorThreeOddPart : Law → ℝ
-  /-- The law is the standard Gaussian. -/
-  IsGaussianCoordinate : Law → Prop
-  /-- **Rigidity (analytic input).** Above the phase boundary `E[x⁴] > 2`, a symmetric
-  unit-variance law with the Gaussian's fourth moment and the Gaussian's floor-two and
-  floor-three odd parts is Gaussian. Four data, and the phase hypothesis is an argument
-  because below it the mechanism's images straddle zero. -/
-  rigidity : ∀ ν gaussian : Law, IsGaussianCoordinate gaussian →
-    2 < fourthMoment ν → IsSymmetric ν → fourthMoment ν = fourthMoment gaussian →
-    floorTwoOddPart ν = floorTwoOddPart gaussian →
-    floorThreeOddPart ν = floorThreeOddPart gaussian →
-    IsGaussianCoordinate ν
-
-namespace TowerRigidity
-
-variable {Law : Type*} (R : TowerRigidity Law)
-
-/-- **The redundancy corollary.** Every other tower datum is reconstructible from the four,
-so any further invariant — Mellin drift, jet variance, arithmetic type, higher floors — is
-determined once the four match. Stated as the factoring it is: a report of any function of
-the law agrees on two laws that agree in the four, at the Gaussian fiber.
-
-The corpus's `hweMellinDrift` and `hweMellinJetVariance` are therefore complete-but-
-redundant rather than wrong. They remain the computable handles; the load is carried by the
-odd part of the squared law. -/
-theorem redundant_invariant_of_matched_four {Report : Type*} (report : Law → Report)
-    (ν gaussian : Law) (hgauss : R.IsGaussianCoordinate gaussian)
-    (hphase : 2 < R.fourthMoment ν) (hsym : R.IsSymmetric ν)
-    (hfourth : R.fourthMoment ν = R.fourthMoment gaussian)
-    (htwo : R.floorTwoOddPart ν = R.floorTwoOddPart gaussian)
-    (hthree : R.floorThreeOddPart ν = R.floorThreeOddPart gaussian)
-    (hreport : ∀ μ : Law, R.IsGaussianCoordinate μ → report μ = report gaussian) :
-    report ν = report gaussian :=
-  hreport ν (R.rigidity ν gaussian hgauss hphase hsym hfourth htwo hthree)
-
-end TowerRigidity
+/-! Tower rigidity remains an analytic target. The former theorem-valued record and its
+projection consequence are removed. -/
 
 /-!
 ## 5j. The sign bias, and a retracted exposure mechanism
@@ -1745,7 +1394,7 @@ the divergence.
 So the doubly-exponential sample cost is not an accident of how the floors were normalized.
 It is dyadic rung spacing measured against a polynomial sample budget: reachable floors go
 like `log log n` because the ladder's rungs are dyadic in moment order and the budget is
-not. `ScaleSequence.sampleSize_doubly_exponential` is that statement's quantitative form,
+not. A quantitative asymptotic theorem is not exported until the scale recursion is formalized,
 and `ladderMomentOrder` below names the spacing it comes from.
 
 The biology reads off the table. `E[x⁴] = 1/(2q(1-q))` already diverges as a variant gets
@@ -1830,12 +1479,13 @@ merely outside the proved stratum; they are the canonical member of the class th
 carved out. **Nothing in the blindness theorem transfers to genotype data**, and this file
 asserts no such transfer.
 
-The corpus's own results point the same way from the other side. `Calibrator.JetBarrier`
-proves `one_lt_latticeInflation` and `lattice_detection`: at a lattice-aligned threshold a
-lattice law's exceedance intensity exceeds the nonlattice one by `h/(1 - e^(-h)) > 1`, so
-its prefactor is *not* universal and it carries information a design can read. That is a
-worked example, already proved here, of exactly the mechanism blindness requires to be
-absent. Whether reflection data leaks through resonance-type window structure at atomic
+The corpus's own results point the same way from the other side, though more weakly than
+once claimed here. `Calibrator.JetBarrier` proves `one_lt_latticeInflation`: the factor
+`h/(1 - e^(-h))` exceeds one. Reading that factor as a ratio of exceedance intensities at
+a lattice-aligned threshold — hence as information a design can read — is the conjecture,
+and it is a hypothesis of `inflated_intensity_ne_of_injective`, not a theorem. So this is a
+worked *candidate* for the mechanism blindness requires to be absent, not a worked example
+of it. Whether reflection data leaks through resonance-type window structure at atomic
 modulus is open — and if it does, the odd parts are readable from genotype data, which is
 the interesting direction rather than the disappointing one.
 
@@ -2035,12 +1685,12 @@ So the four checkable zeros are three constraints plus one free rider:
 
 ### Scope, in the signature and not only in prose
 
-`LadderObservability` below carries `CramerModulus` as a field and the blindness input
-takes it as a hypothesis at both laws. That is deliberate: the general
-ladder-measurability claim re-scopes to the smooth-modulus stratum, the non-Cramér
-frontier is open, and a Lean statement asserting the general form when only the scoped
-form is proved would be the exact class of defect this corpus exists to eliminate. See
-§5l for why genotypes sit outside the scope.
+A `LadderObservability` record once stood below carrying `CramerModulus` as a field, with
+the blindness input taken as a hypothesis at both laws. Record and hypothesis are gone —
+they held the blindness theorem itself as a parameter — so the scope note survives only as
+prose: the general ladder-measurability claim re-scopes to the smooth-modulus stratum and
+the non-Cramér frontier is open. See §5l for why genotypes sit outside that scope. What
+remains formalized below is the profile arithmetic, which needs no scope condition at all.
 
 ### The portable statement
 
@@ -2144,95 +1794,31 @@ theorem FiberSplitting.fourthMoment_free {k : ℕ} (F : FiberSplitting k)
   simp_rw [hterm]
   rw [← Finset.mul_sum, hvariance, mul_zero]
 
-/-- Ladder observability: what separates laws, what experiments can read, and the
-scope on which the second is proved.
-
-`towerData` is the complete invariant — modulus data at every floor **and** the odd
-parts. `ladderData` is the modulus part alone. `CramerModulus` is the smoothness
-hypothesis the blindness argument needs, carried as a field because the general claim
-does not hold without it. -/
-structure LadderObservability (Law Experiment Report TowerDatum LadderDatum : Type*) where
-  /-- The complete tower invariant, odd parts included. -/
-  towerData : Law → TowerDatum
-  /-- The modulus data alone, at every floor. -/
-  ladderData : Law → LadderDatum
-  /-- The law's log-square modulus satisfies Cramér's condition. -/
-  CramerModulus : Law → Prop
-  /-- What an admissible experiment reports about a law. -/
-  reading : Experiment → Law → Report
-  /-- **Tower Rigidity (analytic input).** The tower data separates laws. -/
-  rigidity : ∀ ν ν' : Law, towerData ν = towerData ν' → ν = ν'
-  /-- **Blindness (analytic input), scoped.** On the Cramér stratum, experiments read
-  the ladder and nothing more: laws agreeing in the modulus data agree in every
-  admissible reading. The hypothesis is on both laws because the Edgeworth expansion is
-  applied at each. -/
-  blindness : ∀ ν ν' : Law, CramerModulus ν → CramerModulus ν' →
-    ladderData ν = ladderData ν' → ∀ e : Experiment, reading e ν = reading e ν'
-
-namespace LadderObservability
-
-variable {Law Experiment Report TowerDatum LadderDatum : Type*}
-  (S : LadderObservability Law Experiment Report TowerDatum LadderDatum)
-
-/-- **An invariant that determines the object and is invisible to every admissible
-measurement of it.**
-
-Given two distinct laws on the Cramér stratum that agree in their modulus data, the
-conclusion has two halves and they point opposite ways: their tower data **differs**, so
-the tower invariant does determine the law; and every admissible experiment **agrees** on
-them, so no measurement recovers what the invariant knows.
-
-Complete for objects, strictly incomplete for experiments. The gap between the two is
-exactly the freedom of the fiber splitting — the odd parts, which the surgery moves and
-the modulus data does not see.
-
-Stated without any of this development's machinery: there is a quantity that pins down
-which law you have, and no experiment in the class can measure it. -/
-theorem complete_for_laws_but_invisible_to_experiments (ν ν' : Law)
-    (hcramer : S.CramerModulus ν) (hcramer' : S.CramerModulus ν')
-    (hladder : S.ladderData ν = S.ladderData ν') (hdistinct : ν ≠ ν') :
-    S.towerData ν ≠ S.towerData ν' ∧
-      ∀ e : Experiment, S.reading e ν = S.reading e ν' :=
-  ⟨fun hsame => hdistinct (S.rigidity ν ν' hsame),
-    S.blindness ν ν' hcramer hcramer' hladder⟩
-
-/-- **Covariance universality does not characterize the Gaussian**, in the form the
-witness supplies: a law distinct from the Gaussian, on the Cramér stratum, agreeing with
-it in all modulus data, is indistinguishable from it by every admissible experiment.
-
-The universality class is therefore not `{Gaussian}` but the ladder fiber, and the
-witness is the fiber-surgery construction above rather than an existence claim. -/
-theorem chameleon_indistinguishable_from_gaussian (gaussian chameleon : Law)
-    (hcramer : S.CramerModulus gaussian) (hcramer' : S.CramerModulus chameleon)
-    (hladder : S.ladderData chameleon = S.ladderData gaussian)
-    (hdistinct : chameleon ≠ gaussian) :
-    S.towerData chameleon ≠ S.towerData gaussian ∧
-      ∀ e : Experiment, S.reading e chameleon = S.reading e gaussian :=
-  S.complete_for_laws_but_invisible_to_experiments chameleon gaussian hcramer' hcramer
-    hladder hdistinct
-
-end LadderObservability
+/-! Ladder observability and rigidity are not exported as theorem parameters.  The explicit
+fiber-splitting identities above remain proved; their global experimental interpretation
+awaits a formal blindness theorem. -/
 
 /-!
 ## 6. Where the whole development now stands
 
-Four negative results, each with its positive complement, and each attached to a
-module that was already here:
+Six threads, each attached to a module that was already here. The middle column is what
+the thread *claims* fails; the status column says whether this corpus proves it.
 
-| result | what fails | what still holds | module |
+| thread | what is claimed to fail | proved here? | module |
 |---|---|---|---|
-| condensation | the Gaussian genotype surrogate above degree `log N / c(q)` | the additive score and its Berry-Esseen certificate | `ScoreDistribution` |
-| jet barrier | every cumulant/moment diagnostic of Gaussianity | the trichotomy `(c, v, lattice)` is computable in closed form, for disjoint designs | `EpistasisAndNonAdditivity` |
-| overlap spectrum | the Gaussian null for any design whose tested locus-sets share variants, and every calibration justified by a preserved overlap profile | the Gaussian segment for pairwise-disjoint designs, with variance the only free parameter | `EpistaticChaos` |
-| local-to-global | bounded-radius coherence audits of summary statistics | coherence established by design | `LocalToGlobalCoherence` |
-| hidden cones | any complete catalogue of loading-decay invariants | identifiability when loadings are bounded below | `PCCorrectability` |
-| latent collapse | the number of latent GxE mechanisms | boundary/archetypal factorizations | `GeneEnvironmentInterplay` |
+| condensation | the Gaussian genotype surrogate above degree `log N / c(q)` | **no** — the boundary algebra is proved, the limit laws are BBM/BKL, and the degree is measured optimistic by up to `2.64x` on common variants | `ScoreDistribution` |
+| jet barrier | every cumulant/moment diagnostic of Gaussianity | **no** — the barrier is absent; the lattice arithmetic is proved | `EpistasisAndNonAdditivity` |
+| overlap spectrum | the Gaussian null for any design whose tested locus-sets share variants | **partly** — `sign_symmetry_does_not_license_disjoint_reduction` exhibits limiting fourth cumulant `6` inside the symmetric class; the maximal-spectrum claim is a conjecture | `EpistaticChaos` |
+| local-to-global | bounded-radius coherence audits of summary statistics | yes | `LocalToGlobalCoherence` |
+| hidden cones | any complete catalogue of loading-decay invariants | yes | `PCCorrectability` |
+| latent collapse | the number of latent GxE mechanisms | yes | `GeneEnvironmentInterplay` |
 
 The shared shape is worth naming, because it is the same shape each time: a quantity
 that is routinely *estimated* turns out not to be a function of the observables at all,
 and the honest replacement is a convention plus a theorem about what the convention
-buys. That is the programme `Calibrator.Conventions` already states; these five results
-extend it from constants to structural quantities.
+buys. That is the programme `Calibrator.Conventions` already states, and the three
+proved rows extend it from constants to structural quantities. The first two rows are
+where the programme is aimed, not where it has landed.
 -/
 
 end Calibrator

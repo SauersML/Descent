@@ -42,12 +42,18 @@ score is as polygenic as any theory could ask, and the additive apparatus of
 
   `maxSafeEpistaticOrder N q = log N / c(q)`.
 
-* **Below it** the score's law is the same whether one models genotypes by their true
-  discrete law or by the Gaussian surrogate. The infinitesimal approximation is valid
-  uniformly over coefficient patterns.
-* **Above it** the Gaussian surrogate's chaos condenses onto a point mass while the
-  true genotype chaos does not. The surrogate does not mis-estimate a tail; it
-  converges to a *different limit*.
+The claim attached to that quantity was: below it the two score laws agree, above it
+the Gaussian surrogate condenses onto a point mass while the true genotype chaos does
+not.
+
+**Read the MEASURED block on `maxSafeEpistaticOrder` before quoting any of this.** That
+claim has been simulated and is falsified in two of its three parts. The common-variant
+column is optimistic by up to `2.64x` — the true genotype chaos leaves the Gaussian
+limit at `log N / log(1/V)`, below `log N / c(q)` everywhere except `q = 1/2` — and the
+direction is backwards: participation ratio says the **surrogate** condenses first at
+`q = 0.2764` and the **genotype** first at `q = 0.5`, with the side set by the sign of
+`c(q) - c_G`, which flips inside the common range. What survives is the rare-variant
+tail, where the gap falls to `0.0035` and the boundary is correct to `0.4%`.
 
 Because `c(q)` is not constant across the frequency spectrum, the safe order is
 frequency-dependent. The rare-variant asymptotic is now pinned from both sides:
@@ -84,10 +90,12 @@ percentiles — is converging to the wrong limit, and no amount of sample size r
 it. This is a statement about the *surrogate*, not about the biology: the true
 genotype aggregate is perfectly well behaved. It is the Gaussian stand-in that fails.
 
-Note the direction of the effect: the Gaussian side condenses, so the surrogate
-*under*-disperses relative to truth. Interaction statistics calibrated against it will
-be anticonservative in exactly the regime — rare variants, high interaction order —
-where the literature is least able to check them empirically.
+The direction of the effect is **not** the one this section used to assert. "The
+Gaussian side condenses, so the surrogate under-disperses" holds in one of the two
+regimes measured and reverses in the other; see the MEASURED block on
+`maxSafeEpistaticOrder`. What is not in doubt is that a surrogate converging to a
+different limit is a calibration problem in exactly the regime — rare variants, high
+interaction order — where the literature is least able to check it empirically.
 
 ## The drift is non-monotone, and it crosses the Gaussian constant
 
@@ -109,16 +117,15 @@ nothing to say, and the genotype law is distinguished from its Gaussian surrogat
 by the second observable (the jet variance, through the condensation-window profile)
 and the third (the lattice datum).
 
-That is why the trichotomy of `Calibrator.JetBarrier` is a biological necessity rather
-than a technical refinement. There is a band of allele frequencies — squarely inside
-the frequency range that dominates real polygenic scores — where the leading-order
-diagnostic cannot see the difference at all, and the only remaining separations are
-the two that no moment-based or cumulant-based method can compute.
+That is the motivation for looking past the drift at all: there is a band of allele
+frequencies — squarely inside the range that dominates real polygenic scores — where
+the leading-order diagnostic cannot see the difference. That the remaining two channels
+*do* see it is the trichotomy conjecture of `Calibrator.JetBarrier`, which that file
+does not prove and this one does not use.
 
 ## The second biological claim: hard calls are lattice, dosages are not
 
-`Calibrator.JetBarrier` shows that independent-design chaos observes exactly the
-triple `(c, v, lattice datum)`. Hard-called genotypes take three values, so `log x ^ 2`
+Hard-called genotypes take three values, so `log x ^ 2`
 has **finite support** and the coordinate law is not absolutely continuous; imputed
 dosages have a density and are nonlattice. `hardCall_arithmeticProgression_at_critical_maf`
 below exhibits an explicit allele frequency,
@@ -127,16 +134,19 @@ below exhibits an explicit allele frequency,
 
 at which the three values of `log x ^ 2` form an **exact arithmetic progression** with
 span `h = log ((1 - q*) / q*) = log (3 + 2 sqrt 2) = 1.7627...`, so the hard-call law
-is lattice with that span. By `Calibrator.JetBarrier.one_lt_latticeInflation` the
-Poisson exceedance intensity is then inflated by `h / (1 - exp (-h)) = 2.128...`
-relative to any nonlattice law with the same 2-jet.
+is lattice with that span. `Calibrator.JetBarrier.one_lt_latticeInflation` gives
+`h / (1 - exp (-h)) = 2.128... > 1` for that span — an inequality about a real function,
+which is all it is. Reading it as a *Poisson exceedance intensity* inflated relative to
+a nonlattice law with the same 2-jet is the conjectured interpretation and requires two
+local limit theorems that are not proved anywhere in this corpus.
 
-Consequence: **hard calls and imputed dosages are not exchangeable at high epistatic
-order, even after matching every moment.** This is a distinct mechanism from the
-`r ^ 2`-attenuation of `Calibrator.ImputationPortability`, which is an additive,
-second-moment effect and is fully repaired by rescaling. Lattice detection is not
-repairable by rescaling: it is a property of the support, and moment matching cannot
-remove it.
+Under that interpretation the consequence would be that hard calls and imputed dosages
+are not exchangeable at high epistatic order even after matching every moment — a
+distinct mechanism from the `r ^ 2`-attenuation of
+`Calibrator.ImputationPortability`, which is an additive second-moment effect fully
+repaired by rescaling, whereas support is invariant under rescaling
+(`CondensationUnification.standardizedSquare_scale_invariant`). The rescaling-invariance
+is proved; the intensity reading is not.
 
 ## The third claim: the loading-decay convention is irreducible
 
@@ -244,9 +254,8 @@ theorem standardizedSquare_values (h : HardyWeinbergModel)
     unfold HardyWeinbergModel.standardizedSquare
     rw [hwe_centered, hwe_variance_eq]
     simp only [altAlleleCount]
-    first
-      | (field_simp; ring)
-      | field_simp
+    field_simp
+    ring
   · -- het: `(1 - 2q)² / (2q(1-q))` is already the target, up to `altAlleleCount het = 1`
     unfold HardyWeinbergModel.standardizedSquare
     rw [hwe_centered, hwe_variance_eq]
@@ -255,9 +264,7 @@ theorem standardizedSquare_values (h : HardyWeinbergModel)
     unfold HardyWeinbergModel.standardizedSquare
     rw [hwe_centered, hwe_variance_eq]
     simp only [altAlleleCount]
-    first
-      | (field_simp; ring)
-      | field_simp
+    field_simp
 
 /-- The three Hardy-Weinberg genotype probabilities in terms of `q`. -/
 theorem genotypeProb_values (h : HardyWeinbergModel) :
@@ -293,26 +300,19 @@ theorem HardyWeinbergModel.mellinDrift_eq (h : HardyWeinbergModel)
     · intro hc; exact hpne (by linarith [hc])
     · exact hqne
   have hprod : (2 * q / (1 - q)) * (2 * (1 - q) / q) = 4 := by
-    first
-      | (field_simp; ring)
-      | field_simp
+    field_simp
+    ring
   have hL : Real.log (2 * q / (1 - q)) + Real.log (2 * (1 - q) / q) = 2 * Real.log 2 := by
     rw [← Real.log_mul hne0 hne2, hprod]
     rw [show (4 : ℝ) = 2 ^ 2 by norm_num, Real.log_pow]
     norm_num
   -- coefficient collapses
   have hA : (1 - q) ^ 2 * (2 * q / (1 - q)) = 2 * q * (1 - q) := by
-    first
-      | (field_simp; ring)
-      | field_simp
+    field_simp
   have hB : 2 * (1 - q) * q * ((1 - 2 * q) ^ 2 / (2 * q * (1 - q))) = (1 - 2 * q) ^ 2 := by
-    first
-      | (field_simp; ring)
-      | field_simp
+    field_simp
   have hC : q ^ 2 * (2 * (1 - q) / q) = 2 * q * (1 - q) := by
-    first
-      | (field_simp; ring)
-      | field_simp
+    field_simp
   unfold HardyWeinbergModel.mellinDrift hweMellinDrift
   rw [sum_diploidGenotype, hX0, hX1, hX2, hP0, hP1, hP2, hA, hB, hC]
   linear_combination (2 * q * (1 - q)) * hL
@@ -382,9 +382,8 @@ theorem rare_variant_drift_lower_bound {q : ℝ} (hq0 : 0 < q) (hq : q ≤ 1 / 8
     rw [← sub_nonneg]
     have hfac : (1 - 2 * q) ^ 2 / (2 * q * (1 - q)) - 1 / (8 * q)
         = (2 * q * (3 - 15 * q + 16 * q ^ 2)) / ((8 * q) * (2 * q * (1 - q))) := by
-      first
-        | (field_simp; ring)
-        | field_simp
+      field_simp
+      ring
     rw [hfac]
     refine div_nonneg ?_ (by positivity)
     have hbracket : (0 : ℝ) ≤ 3 - 15 * q + 16 * q ^ 2 := by
@@ -437,9 +436,8 @@ theorem rare_variant_drift_upper_bound {q : ℝ} (hq0 : 0 < q) (hq : q ≤ 1 / 8
     rw [← sub_nonneg]
     have hfac : 1 / (2 * q) - (1 - 2 * q) ^ 2 / (2 * q * (1 - q))
         = (q * (3 - 4 * q)) / (2 * q * (1 - q)) := by
-      first
-        | (field_simp; ring)
-        | field_simp
+      field_simp
+      ring
     rw [hfac]
     refine div_nonneg ?_ hden.le
     exact mul_nonneg hq0.le (by linarith : (0 : ℝ) ≤ 3 - 4 * q)
@@ -507,9 +505,7 @@ theorem rare_variant_drift_sharp_lower_bound {q : ℝ} (hq0 : 0 < q) (hq : q ≤
   -- Split the heterozygote logarithm into the leading term and a remainder.
   have hsplit : (1 - 2 * q) ^ 2 / (2 * q * (1 - q))
       = (1 / (2 * q)) * ((1 - 2 * q) ^ 2 / (1 - q)) := by
-    first
-      | (field_simp; ring)
-      | field_simp
+    field_simp
   have hlogsplit : Real.log ((1 - 2 * q) ^ 2 / (2 * q * (1 - q)))
       = Real.log (1 / (2 * q)) + Real.log ((1 - 2 * q) ^ 2 / (1 - q)) := by
     rw [hsplit, Real.log_mul (ne_of_gt hBpos) (ne_of_gt hRpos)]
@@ -688,9 +684,7 @@ theorem maxSafeEpistaticOrder_lt_gaussian_of_drift_excess
     (hlt : condensationConstant < hweMellinDrift q) :
     maxSafeEpistaticOrder N q < criticalDegree N condensationConstant := by
   unfold maxSafeEpistaticOrder criticalDegree
-  first
-    | exact div_lt_div_of_pos_left hN condensationConstant_pos hlt
-    | exact div_lt_div_of_lt_left hN condensationConstant_pos hlt
+  exact div_lt_div_of_pos_left hN condensationConstant_pos hlt
 
 /-- **The rare-variant drift is more than seven times the Gaussian constant.**
 
@@ -795,17 +789,16 @@ theorem exists_maf_supercritical {N m : ℝ} (hm : 0 < m) (hN : 1 ≤ N) :
       simp
     rw [harg, Real.log_exp, ht]
     have : m / 4 * (4 * Real.log N / m + 1) = Real.log N + m / 4 := by
-      first
-        | (field_simp; ring)
-        | field_simp
+      field_simp
     rw [this]
     linarith
 
 /-!
 ## 4. Hard calls are lattice: an exact allele frequency where the span is explicit
 
-`Calibrator.JetBarrier` shows the third observable of independent-design chaos is the
-lattice datum of `log x ^ 2`. A hard-called genotype has three-point support, so its
+The lattice datum of `log x ^ 2` is the third slot of the Mellin triple that
+`Calibrator.JetBarrier` conjectures to be observable. A hard-called genotype has
+three-point support, so its
 `log x ^ 2` is finitely supported; it is a lattice law precisely when the two log-gaps
 are commensurable. The cleanest such point is where they are *equal*.
 -/
@@ -836,11 +829,11 @@ theorem latticeCriticalMaf_lt_one : latticeCriticalMaf < 1 := by
 `log x ^ 2` for a hard-called Hardy-Weinberg locus form an exact arithmetic
 progression: the coordinate law is *lattice*.
 
-By `Calibrator.JetBarrier.lattice_detection` this locus is therefore separated from
-every nonlattice law with the same Mellin 2-jet — in particular from any imputed-dosage
-or Gaussian surrogate — by an explicit high-degree design, with Poisson intensity
-inflated by `latticeInflation h > 1`. Moment matching cannot remove the effect, because
-it is a property of the support. -/
+This is an identity among three real numbers. It does not by itself separate the locus
+from a nonlattice law with the same Mellin 2-jet: that step is
+`Calibrator.JetBarrier.inflated_intensity_ne_of_injective`, whose local-limit and
+Gnedenko-Kolmogorov inputs are hypotheses rather than theorems of this corpus. What is
+proved is the progression, and that the associated inflation factor exceeds one. -/
 theorem hardCall_arithmeticProgression_at_critical_maf :
     hweLatticeCondition latticeCriticalMaf := by
   have hsq : Real.sqrt 2 ^ 2 = 2 := Real.sq_sqrt (by norm_num)
@@ -850,11 +843,11 @@ theorem hardCall_arithmeticProgression_at_critical_maf :
 /-!
 ### The second Mellin observable of a genotype, and the full triple
 
-`Calibrator.JetBarrier` says independent designs observe exactly `(c, v, lattice)`. The
-first component is `hweMellinDrift`; this section supplies the second in the same closed
-form, so the **entire observable triple of a hard-called locus is computable from the
-allele frequency alone**. That is what makes the abstract trichotomy an instrument here
-rather than a classification scheme with no instances.
+The first component of the Mellin triple is `hweMellinDrift`; this section supplies the
+second in the same closed form, so the **whole triple of a hard-called locus is
+computable from the allele frequency alone**. Computability of the triple is what is
+established. Whether the triple is what a design observes — and whether it is all a
+design observes — is the `Calibrator.JetBarrier` conjecture, which is not proved.
 -/
 
 namespace HardyWeinbergModel
@@ -885,17 +878,11 @@ theorem HardyWeinbergModel.mellinJetVariance_eq (h : HardyWeinbergModel)
   obtain ⟨hX0, hX1, hX2⟩ := standardizedSquare_values h hq0 hq1
   obtain ⟨hP0, hP1, hP2⟩ := genotypeProb_values h
   have hA : (1 - q) ^ 2 * (2 * q / (1 - q)) = 2 * q * (1 - q) := by
-    first
-      | (field_simp; ring)
-      | field_simp
+    field_simp
   have hB : 2 * (1 - q) * q * ((1 - 2 * q) ^ 2 / (2 * q * (1 - q))) = (1 - 2 * q) ^ 2 := by
-    first
-      | (field_simp; ring)
-      | field_simp
+    field_simp
   have hC : q ^ 2 * (2 * (1 - q) / q) = 2 * q * (1 - q) := by
-    first
-      | (field_simp; ring)
-      | field_simp
+    field_simp
   have hdrift : h.mellinDrift = hweMellinDrift q := h.mellinDrift_eq hq0 hq1
   unfold HardyWeinbergModel.mellinJetVariance hweMellinJetVariance
   rw [sum_diploidGenotype, hX0, hX1, hX2, hP0, hP1, hP2, hA, hB, hC, hdrift]
@@ -941,7 +928,7 @@ by `hweMellinDrift_half`, not zero, since the standardized coordinate takes the 
 window theory and the barrier that have nothing to work with.
 
 The consequence is a genuine caveat on the spectroscopy, and it is worth stating
-plainly: `MellinProfile.jetVariance_pos` **fails** at exactly `q = 1/2`. The
+plainly: the proposed positive-jet regime **fails** at exactly `q = 1/2`. The
 condensation-window theory of `Calibrator.Condensation` — which needs a non-degenerate
 size-biased increment to have a window at all — does not apply at a perfectly balanced
 locus. Drift separation still does, since `hweMellinDrift_half` gives `log 2 ≠ c_G`.
@@ -953,15 +940,16 @@ whole separates genotypes from their Gaussian surrogate across the spectrum. -/
 @[simp] theorem hweMellinJetVariance_half : hweMellinJetVariance (1 / 2) = 0 := by
   unfold hweMellinJetVariance
   rw [hweMellinDrift_half]
-  first
-    | (norm_num; ring)
-    | norm_num
+  norm_num
+  ring
 
-/-- **The complete observable triple of a hard-called locus at the lattice frequency.**
+/-- **The Mellin triple of a hard-called locus at the lattice frequency.**
 
-Every component is a closed-form function of the allele frequency, and the third
-component is `lattice` because the three values of `log x ^ 2` form an exact arithmetic
-progression there (`hardCall_arithmeticProgression_at_critical_maf`). -/
+The first two components are the closed forms proved above. The third is `lattice`
+because the three values of `log x ^ 2` form an exact arithmetic progression there
+(`hardCall_arithmeticProgression_at_critical_maf`) — but note the record *stipulates*
+that constructor rather than deriving it, so the tie to that theorem is by inspection,
+not by proof. Nothing here claims the triple is a complete observable. -/
 noncomputable def hardCallObservables : MellinObservables where
   drift := hweMellinDrift latticeCriticalMaf
   jetVariance := hweMellinJetVariance latticeCriticalMaf
@@ -969,13 +957,12 @@ noncomputable def hardCallObservables : MellinObservables where
     LatticeDatum.lattice hardCallLatticeSpan
       (Real.log (2 * latticeCriticalMaf / (1 - latticeCriticalMaf)))
 
-/-- **A hard-called locus is observationally distinct from the Gaussian, whatever its
-2-jet.** The third observable separates them outright — no moment computation, no
-window tuning, and nothing a cumulant can see.
+/-- The hard-call triple at `q*` is not the Gaussian triple.
 
-This is the instantiation that makes `Calibrator.JetBarrier` bite: the abstract
-trichotomy is not merely a classification, it has a concrete genotype in the lattice
-stratum. -/
+The proof is constructor disjointness on the third slot, and both slots are stipulated
+in the definitions being compared, so what this establishes is that the corpus files a
+hard-called locus at `q*` in the lattice stratum and the Gaussian in the nonlattice one.
+"Observationally distinct" would need the barrier, which is absent. -/
 theorem hardCallObservables_ne_gaussian : hardCallObservables ≠ gaussianObservables :=
   lattice_observables_ne_gaussian _ _ _ _
 
@@ -985,20 +972,22 @@ the additive apparatus is populated by imputed dosages, not by genotypes.
 
 **Applicability note.** This theorem is a comparison of observable triples and needs no
 symmetry: it holds at `q* = 0.1464...`, where the genotype law is *not* sign-symmetric.
-What does need symmetry is the surrounding *completeness* reading — "and nothing else is
-observable" — since that is the `ChaosSpectroscopy.barrier` field, whose `Law` parameter
-ranges over symmetric laws and which a genotype satisfies only at `q = 1/2`
-(`Calibrator.EpistaticChaos.standardizedGenotype_symmetric_iff`). So the licensed claim
-here is the positive one, "this locus is separated from the Gaussian", and not the
-negative one, "these three numbers are all that a design can see about this locus". -/
+The surrounding *completeness* reading — "and nothing else is observable" — has been
+withdrawn because its analytic barrier was supplied as a structure field.  The licensed
+claim here is only the proved positive one: this observable triple differs from the
+Gaussian triple. -/
 theorem hardCall_not_chameleon : ¬ IsChameleonObservable hardCallObservables := by
   rw [isChameleonObservable_iff]
   exact hardCallObservables_ne_gaussian
 
 
-/-- **Hard calls are separated from dosage surrogates at high epistatic order.**
-The inflation factor at `q*` is strictly above one, so the Poisson exceedance
-intensities differ and the compound-Poisson limits differ. -/
+/-- The inflation factor at `q*` is strictly above one.
+
+That is the entire statement: `one_lt_latticeInflation` at `hardCallLatticeSpan`. The
+step from "the factor exceeds one" to "the exceedance intensities differ" to "the
+compound-Poisson limits differ" is two unproved local limit theorems and
+Gnedenko-Kolmogorov, so this is not a separation of hard calls from dosage
+surrogates. -/
 theorem hardCall_intensity_inflated :
     1 < latticeInflation hardCallLatticeSpan :=
   one_lt_latticeInflation hardCallLatticeSpan_pos
@@ -1036,8 +1025,8 @@ and available for imputed dosages, which are continuous per locus.
 
 Note what is and is not proved. The lattice route gives the failure of (C) at *this*
 frequency, unconditionally. The claim that a hard call is outside the stratum at *every*
-polymorphic frequency is stronger, and it still needs the Kronecker field
-`AtomicCramerFailure.recurrence`; it is not obtained here.
+polymorphic frequency is stronger and is not exported until its simultaneous-approximation
+argument is formalized.
 -/
 
 /-- The integer position of each genotype in the arithmetic progression that
@@ -1076,9 +1065,8 @@ theorem hweLatticeCondition_het_standardizedSquare (h : HardyWeinbergModel)
   have hlat' : (1 - 2 * h.altFreq) ^ 2 = 4 * h.altFreq * (1 - h.altFreq) := hlat
   obtain ⟨_, hX1, _⟩ := standardizedSquare_values h hq0 hq1
   rw [hX1, hlat']
-  first
-    | (field_simp; ring)
-    | field_simp
+  field_simp
+  ring
 
 /-- **The three logarithms, in closed form, at any lattice frequency.**
 
@@ -1163,10 +1151,14 @@ theorem hardCall_not_cramer_at_critical_maf (h : HardyWeinbergModel)
     (hardCall_logSquare_lattice_at_critical_maf h hq)
 
 /-!
-## 4b. The complete invariant list of a genotype coding
+## 4b. The proposed invariant list of a genotype coding, and what of it is proved
 
-The Vertex-Weight Law — proved elsewhere in this development, and carried here as a
-structure field rather than reproved — says that in the diagram expansion of a truncated
+Nothing in this section establishes that any list of invariants is complete. What is
+proved is that four named quantities are computable in closed form from `q`. The
+completeness framing below is the *proposal* it came from, retained because the reader
+needs it to know why these four and not others.
+
+The proposed Vertex-Weight Law says that in the diagram expansion of a truncated
 joint cumulant of an admissible design, the coordinate law enters only through window
 factors (functions of the Mellin 2-jet and the arithmetic type of `log x ^ 2`), even
 vertex weights (polynomials in the cumulants of `x ^ 2`), and odd vertex weights
@@ -1178,13 +1170,14 @@ transmissible invariants is
 This upgrades the status of what this file computes. The drift `hweMellinDrift`, the jet
 variance `hweMellinJetVariance`, and the symmetry verdict
 `Calibrator.EpistaticChaos.standardizedGenotype_symmetric_iff` were three quantities that
-happened to be computable in closed form; under the Vertex-Weight Law they are three of
-the four things about a genotype coding that any design can see *at all*.
+happened to be computable in closed form.  The exhaustive observability conclusion is not
+exported until its proof is present in Lean.
 
 ### Complete, but not minimal — and the distinction is not academic
 
 The four-item list is **complete and redundant**, not complete and minimal, and the
-corpus should say which is which. The Tower Rigidity Theorem gives a strictly smaller
+corpus should say which is which. The Tower Rigidity Theorem — an external claim, not
+proved in this development; see §4c — gives a strictly smaller
 sufficient set: a symmetric unit-variance law with `E[x ^ 4] = 3` whose floor-two and
 floor-three laws carry the Gaussian's odd parts *is* the Gaussian. Four data — symmetry,
 `sigma_1 = sqrt 2`, and two odd parts — then determine every Mellin jet, every arithmetic
@@ -1206,12 +1199,17 @@ unsatisfiable for a genotype. Hence for the objects this file is about, `hweMell
 and `hweMellinJetVariance` remain independently informative and the critical-degree
 results are untouched — the redundancy never gets a chance to bite.
 
-What rigidity does buy here is the *converse* reading, and it is a real gain. It supplies
-a decisive test for non-Gaussianity, and the decisive datum is already proved:
+A converse reading was asserted here and is **false**. It said that
 `Calibrator.CondensationUnification.standardizedSquare_never_symmetric` shows the odd part
-of the floor-two law is nonzero at **every** polymorphic frequency, `q = 1/2` included.
-That fills exactly the hole this file otherwise has, since symmetry at floor one goes dark
-at `q = 1/2` and can separate nothing there. Symmetry fails one floor up, always.
+of the floor-two law nonzero at every polymorphic frequency including `q = 1/2`, hence
+that symmetry fails one floor up, always. That theorem is about the *uncentered* square
+`x²`, which is non-negative and so trivially never symmetric; its own docstring says in
+terms that it does not settle the floor-two question. The tower's floor-two coordinate is
+the *centered* square `u = (x² - 1)/σ₁`, and at `q = 1/2` that is Rademacher, which **is**
+symmetric (`Calibrator.EpistaticChaos.centeredSquare_rademacher_at_half`,
+`centeredSquare_third_moment_zero_iff_balanced`). So the balanced locus is symmetric at
+both floors, and floor two supplies no separation there either. The gap that leaves at
+`q = 1/2` is filled by the drift instead: `hweMellinDrift_half_lt_condensationConstant`.
 
 ### The horizon problem dissolves for rigidity
 
@@ -1250,8 +1248,9 @@ definition — but the completeness list does not license "the drift is the fast
 invariant", only "the drift is the one that sets the condensation boundary".
 -/
 
-/-- The four invariants of a coordinate law that the Vertex-Weight Law identifies as its
-complete observable content.
+/-- Four invariants of a coordinate law, the ones the proposed Vertex-Weight Law
+nominates. It is a record for carrying them together; no theorem here says they are
+complete, observable, or independent.
 
 `squareCumulant n` is the `n`-th cumulant of `x ^ 2`; `symmetric` is the sign-coupling
 datum, which by `Calibrator.EpistaticChaos.standardizedGenotype_symmetric_iff` holds for a
@@ -1263,43 +1262,14 @@ structure CodingInvariants where
   jetVariance : ℝ
   /-- The arithmetic type (lattice datum) of `log x ^ 2`. -/
   arithmeticType : LatticeDatum
-  /-- Whether the coordinate law is sign-symmetric. -/
-  symmetric : Prop
+  /-- Data-valued indicator of sign symmetry; this is not a theorem field. -/
+  symmetric : Bool
   /-- The cumulant sequence of `x ^ 2`. -/
   squareCumulant : ℕ → ℝ
 
-/-- **The Vertex-Weight Law, carried as a hypothesis.**
-
-The `complete` field is the content: two coordinate laws agreeing in all four invariants
-are indistinguishable by every admissible design at every interaction degree. It is
-proved elsewhere in this development and is *not* reproved here; it is a named field so
-that every consumer has to say it is assuming it, in the style of
-`Calibrator.JetBarrier.ChaosSpectroscopy`. -/
-structure VertexWeightCompleteness (Law Design Observation : Type*) where
-  /-- The four invariants of a coordinate law. -/
-  invariants : Law → CodingInvariants
-  /-- What a design observes under a coordinate law. -/
-  observe : Law → Design → Observation
-  /-- **Completeness (analytic input).** Nothing outside the four invariants is
-  transmissible through any diagram of any admissible design. -/
-  complete : ∀ ν ν' : Law, invariants ν = invariants ν' →
-    ∀ D : Design, observe ν D = observe ν' D
-
-namespace VertexWeightCompleteness
-
-variable {Law Design Observation : Type*} (W : VertexWeightCompleteness Law Design Observation)
-
-/-- **Every experiment factors through the four invariants.** Any report computed from
-the design observations is a function of the invariant quadruple alone. -/
-theorem experiment_factors_through_invariants
-    {Report : Type*} (experiment : (Design → Observation) → Report)
-    (ν ν' : Law) (hinv : W.invariants ν = W.invariants ν') :
-    experiment (W.observe ν) = experiment (W.observe ν') := by
-  congr 1
-  funext D
-  exact W.complete ν ν' hinv D
-
-end VertexWeightCompleteness
+/-! The proposed Vertex-Weight completeness law is not represented by a theorem-valued
+record.  The numerical invariants remain available, but exhaustive observability will be
+exported only after its diagram argument is formalized in this repository. -/
 
 /-- The invariant quadruple of a hard-called Hardy-Weinberg locus.
 
@@ -1320,29 +1290,8 @@ noncomputable def hweCodingInvariants (h : HardyWeinbergModel)
   drift := hweMellinDrift h.altFreq
   jetVariance := hweMellinJetVariance h.altFreq
   arithmeticType := arithmeticType
-  symmetric := h.altFreq = 1 / 2
+  symmetric := if h.altFreq = 1 / 2 then true else false
   squareCumulant := squareCumulant
-
-/-- **The observable content of a hard-called locus is exhausted by four numbers-worth
-of data, two of which are computed here.**
-
-Given the Vertex-Weight Law, two Hardy-Weinberg loci whose invariant quadruples agree are
-indistinguishable by every admissible design at every interaction degree. Since the first
-two components are closed-form functions of the allele frequency, this is the sense in
-which the spectroscopy of this file is *complete* rather than merely *available*. -/
-theorem hwe_observables_exhausted_by_invariants
-    {Law Design Observation Report : Type*}
-    (W : VertexWeightCompleteness Law Design Observation)
-    (experiment : (Design → Observation) → Report)
-    (ν ν' : Law) (h h' : HardyWeinbergModel)
-    (arithmeticType arithmeticType' : LatticeDatum)
-    (squareCumulant squareCumulant' : ℕ → ℝ)
-    (hν : W.invariants ν = hweCodingInvariants h arithmeticType squareCumulant)
-    (hν' : W.invariants ν' = hweCodingInvariants h' arithmeticType' squareCumulant')
-    (hmatch : hweCodingInvariants h arithmeticType squareCumulant
-      = hweCodingInvariants h' arithmeticType' squareCumulant') :
-    experiment (W.observe ν) = experiment (W.observe ν') :=
-  W.experiment_factors_through_invariants experiment ν ν' (by rw [hν, hν', hmatch])
 
 /-- **At the balanced locus, symmetry is the invariant that stops separating.**
 
@@ -1354,10 +1303,10 @@ the Gaussian matches it exactly where the jet variance is unusable. -/
 theorem balanced_locus_symmetric_component
     (h : HardyWeinbergModel) (hhalf : h.altFreq = 1 / 2)
     (arithmeticType : LatticeDatum) (squareCumulant : ℕ → ℝ) :
-    (hweCodingInvariants h arithmeticType squareCumulant).symmetric ∧
+    (hweCodingInvariants h arithmeticType squareCumulant).symmetric = true ∧
       (hweCodingInvariants h arithmeticType squareCumulant).drift = Real.log 2 ∧
       (hweCodingInvariants h arithmeticType squareCumulant).jetVariance = 0 := by
-  refine ⟨hhalf, ?_, ?_⟩
+  refine ⟨by simp [hweCodingInvariants, hhalf], ?_, ?_⟩
   · show hweMellinDrift h.altFreq = Real.log 2
     rw [hhalf]
     exact hweMellinDrift_half
@@ -1391,11 +1340,16 @@ theorem balanced_locus_drift_separates :
 /-!
 ## 4c. The fourth moment, and why no genotype sits at the Gaussian fiber
 
-The Tower Rigidity Theorem (proved elsewhere in this development) says a symmetric
-unit-variance law with `E[x ^ 4] = 3` whose floor-two and floor-three laws carry the
-Gaussian's odd parts *is* the Gaussian. The hypotheses of that theorem are the "Gaussian
-fiber". This section computes the fourth moment of a standardized genotype and shows the
-fiber is unreachable.
+The Tower Rigidity Theorem says a symmetric unit-variance law with `E[x ^ 4] = 3` whose
+floor-two and floor-three laws carry the Gaussian's odd parts *is* the Gaussian. **It is
+not proved in this development** — there is no such theorem in `proofs/Calibrator`, and
+earlier text here that called it "proved elsewhere in this development" was wrong. It is
+cited only to say which hypotheses are being ruled out.
+
+Nothing below depends on it. This section computes the fourth moment of a standardized
+genotype from scratch and shows that symmetry and `E[x ^ 4] = 3` are jointly
+unsatisfiable for a genotype — a statement about genotypes alone, true whatever becomes
+of the rigidity claim.
 -/
 
 /-- The fourth moment `E[x ^ 4]` of the standardized genotype. Equivalently `1 + Var(x²)`,
@@ -1422,9 +1376,8 @@ theorem HardyWeinbergModel.standardizedFourthMoment_eq (h : HardyWeinbergModel)
   obtain ⟨hP0, hP1, hP2⟩ := genotypeProb_values h
   unfold HardyWeinbergModel.standardizedFourthMoment
   rw [sum_diploidGenotype, hX0, hX1, hX2, hP0, hP1, hP2]
-  first
-    | (field_simp; ring)
-    | field_simp
+  field_simp
+  ring
 
 /-- **Every polymorphic locus has `E[x ^ 4] ≥ 2`,** because `4q(1-q) ≤ 1`. The bound is
 the standardized restatement of the fact that a three-point law cannot be less
@@ -1455,9 +1408,7 @@ theorem standardizedFourthMoment_eq_two_iff_half (h : HardyWeinbergModel)
     rw [div_eq_iff (ne_of_gt hden)] at heq
     have hsq : (1 - 2 * h.altFreq) ^ 2 = 0 := by nlinarith [heq]
     have hzero : 1 - 2 * h.altFreq = 0 := by
-      first
-        | exact sq_eq_zero_iff.mp hsq
-        | exact pow_eq_zero_iff (two_ne_zero).mp hsq
+      exact sq_eq_zero_iff.mp hsq
     linarith
   · intro hhalf
     rw [hhalf]
@@ -1516,9 +1467,9 @@ Proved here: the closed form of the Mellin drift, its value at `q = 1/2`, the
 rare-variant bounds in both directions (hence the asymptotic
 `c(q) = log (1/(2q)) + O(q log (1/q))`), the supercriticality criteria, the sevenfold
 drift excess and safe-order collapse at `q = 1/1024`, the arithmetic-progression
-identity at `q*`, and the strict inflation factor. Carried as named hypotheses in
-`Calibrator.JetBarrier`: the local-CLT and Gnedenko-Kolmogorov inputs that convert an
-intensity gap into a limit-law gap. Not proved anywhere in this development: that the
+identity at `q*`, and the strict inflation factor. The local-CLT and
+Gnedenko-Kolmogorov inputs that would convert an intensity gap into a limit-law gap are
+not exported as results. Not proved anywhere in this development: that the
 same conclusions survive linkage disequilibrium between the loci entering one monomial.
 Every design here uses disjoint variant sets, which is the independent-design regime;
 overlapping designs are the open direction, and in the genetics reading overlap is
@@ -1529,21 +1480,17 @@ exactly LD.
 None of the quantitative results in this file depend on the coordinate law being
 sign-symmetric: the Mellin drift, the jet variance, the lattice datum and the
 condensation boundary are all computed by direct summation over the three genotypes,
-and `Calibrator.Condensation`'s `MellinProfile` carries no symmetry field. That is
+and the direct formulas in `Calibrator.Condensation` require no symmetry field. That is
 deliberate and it is what makes them quotable at any allele frequency.
 
-The symmetry hypothesis enters one door only: the *completeness* half of
-`Calibrator.JetBarrier`, whose `Law` parameter is symmetric unit-variance laws, and the
-sign-erasure reduction of `Calibrator.EpistaticChaos` that discharges it. A
-standardized Hardy-Weinberg genotype is sign-symmetric **iff `q = 1/2`**
-(`EpistaticChaos.standardizedGenotype_symmetric_iff`), and `hweMellinJetVariance_half`
-shows that is exactly where the second observable vanishes. So the statements of the
-form "and nothing else is observable" are licensed for genotypes at a single frequency
-where they are also vacuous, while the statements of the form "this locus is separated
-from its Gaussian surrogate" are licensed everywhere. The overlapping-design (LD)
-direction named above is, in the same reading, the direction in which the missing
-symmetry actually bites: sign erasure is what would have collapsed overlapping monomial
-designs onto disjoint ones, and for genotypes it does not.
+The withdrawn completeness claim required symmetry. A standardized Hardy-Weinberg
+genotype is sign-symmetric **iff `q = 1/2`**
+(`EpistaticChaos.standardizedGenotype_symmetric_iff`), and
+`hweMellinJetVariance_half` shows that the second observable vanishes there.  Thus no
+"and nothing else is observable" statement is licensed by this corpus.  The proved
+positive comparisons — explicit drift, arithmetic progression, and inflation — remain
+valid at their displayed allele frequencies.  Extension to overlapping LD designs is
+still open.
 -/
 
 end Calibrator

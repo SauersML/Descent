@@ -76,8 +76,10 @@ specializations. The proposed completeness-of-blindness theorem is not exported.
 * `condensationConstant` (`c_G = 2 - gamma - log 2`) with rigorous two-sided bounds
   and strict positivity, from mathlib's Euler-Mascheroni and `log 2` bounds.
 * `gaussianJetVariance` (`v_G = pi ^ 2 / 2 - 4`) with strict positivity.
-* `criticalDegree` and `subcritical_iff` — the sharp phase boundary
-  `m* = log N / c`.
+* `criticalDegree` and `subcritical_iff` — the algebraic boundary `m* = log N / c`.
+  `subcritical_iff` is the division rearrangement `m < log N / c ↔ c * m < log N` and
+  nothing more; that this boundary is *sharp* — that the limit laws differ across it —
+  is the BBM/BKL analysis, which is not formalized here.
 * `windowVariance` and its monotonicity/limits — the condensation-window law
   `N(0, Phi(w / sqrt v))`, whose variance interpolates `0 -> 1` through the error
   function of the window position.
@@ -295,15 +297,14 @@ theorem windowVariance_mono {v : ℝ} (hv : 0 < v) :
   have : a / Real.sqrt v ≤ b / Real.sqrt v := by gcongr
   exact monotone_Phi this
 
-/-- **The window separates laws with different jet variance.** Two laws with the same
-drift `c` but different jet variances `v ≠ v'` retain different variance fractions at
-the same window position `w ≠ 0`, provided the Gaussian cdf is strictly increasing on
-the relevant range. We record the separation in the form actually used: distinct
-window arguments give the separation whenever `Phi` is injective there. -/
-theorem windowVariance_ne_of_arg_ne {w v v' : ℝ}
-    (hinj : Function.Injective Phi)
-    (h : w / Real.sqrt v ≠ w / Real.sqrt v') :
-    windowVariance w v ≠ windowVariance w v' := fun hEq => h (hinj hEq)
+/-! A separation statement — "two laws with the same drift and different jet variances
+retain different variance fractions" — was carried here as `windowVariance_ne_of_arg_ne`,
+which took `Function.Injective Phi` as a hypothesis and transported an assumed
+disequality through it. Injectivity of the standard normal cdf is a real fact and is not
+proved in this corpus, so it was an external result carried as a parameter, and the
+remaining content was `fun hEq => h (hinj hEq)`. Both are removed. A window separation
+result belongs here only once `Phi` is proved strictly monotone from the Gaussian
+measure. -/
 
 /-!
 ## 5. What the condensation theorems say about a polygenic score
@@ -313,14 +314,17 @@ is formalized in `Calibrator.PolygenicSpectroscopy`; this is the bridge sentence
 
 Let a score aggregate `N` disjoint epistatic terms, each a product of `m` standardized
 genotypes. Influence per variant is `1 / N`, so the score is as polygenic as one could
-ask. The theorems above say:
+ask. The BBM/BKL phase picture predicts a transition at `m = (1 / c) * log N`, below
+which the true and surrogate score laws agree and above which they do not.
 
-* if `m < (1 / c) * log N` the score's law is the same whether one models genotypes by
-  their true discrete law or by the Gaussian surrogate — the standard infinitesimal
-  approximation is valid, uniformly over coefficient patterns;
-* if `m > (1 / c) * log N`, the Gaussian surrogate's chaos **condenses to a point
-  mass** while the true genotype chaos does not. The surrogate does not merely
-  mis-estimate a tail; it converges to a different limit.
+**None of that is a theorem of this file.** What is proved above is the constant
+algebra (`condensationConstant_bounds`, `gaussianJetVariance_pos`), the division
+rearrangement `subcritical_iff`, and the elementary properties of `windowVariance`.
+The limit laws on either side of the boundary are the analysis of Ben Arous-Bogachev-
+Molchanov, not formalized here, and the direction of the effect — which side condenses
+first — has been *measured to be the reverse of the obvious reading* in two of the
+regimes tested; see the MEASURED block on
+`Calibrator.PolygenicSpectroscopy.maxSafeEpistaticOrder`.
 
 `c` here is the *genotype* drift `E[x ^ 2 log x ^ 2]`, computed in closed form as a
 function of allele frequency in `Calibrator.PolygenicSpectroscopy`. It is **not**

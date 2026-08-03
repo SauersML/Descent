@@ -7,10 +7,12 @@ import Mathlib.Tactic.Linarith
 namespace Calibrator
 
 /-!
-# The Jet Barrier trichotomy: exactly what independent chaos designs can measure
+# Lattice arithmetic from the withdrawn Jet Barrier program
 
-This file formalizes the **completeness-of-blindness** statement for independent
-(disjoint-support) monomial designs, in its corrected trichotomy form.
+This file proves the lattice-inflation arithmetic used by the Jet Barrier program.
+The nonlattice completeness theorem is not formalized here: its former
+`ChaosSpectroscopy` record accepted Stone/local-limit conclusions from the caller and has
+been removed together with every projection theorem.
 
 ## The correction that produced the trichotomy
 
@@ -19,7 +21,7 @@ low-influence chaos over a symmetric product law is the **Mellin 2-jet**
 `(c, v) = (E[x² log x²], Var_tilde(log x²))` and nothing else. That statement is
 **false as stated**: lattice laws are a live counterexample class. Working the lattice
 case out shows it is not an exception to be excluded but a *third observable*.
-The corrected statement:
+The historical conjecture was:
 
 > Independent low-influence chaos over a symmetric product law observes exactly the
 > triple `(c, v, lattice datum of log x²)` — and nothing else.
@@ -29,31 +31,24 @@ The corrected statement:
 * the **lattice datum** via the Poisson-intensity oscillation of Theorem 1b below;
 * nothing else, by the nonlattice barrier, Theorem 1a.
 
-The chameleon stratum — laws that pass *every* independent-design experiment — is
-therefore the **nonlattice, 2-jet-matched** class. The chameleon construction (an
-exponential-family perturbation of a continuous log-density) lives there, so the
-calibration object survives with its domain corrected.
+This corpus does not prove the “nothing else” clause, so it does not export the claimed
+classification or a chameleon-completeness theorem.  It retains only directly proved
+arithmetic and explicitly conditional finite implications.
 
-**Two completeness claims, and they are not the same claim.** This file's trichotomy says
-what a *disjoint design* can see: the triple, and nothing else. It does not say the triple
-is a minimal invariant of the coordinate law, and it is not one —
-`Calibrator.CondensationUnification`'s tower rigidity shows `(c, v, lattice)` is
-reconstructible from four data **at the Gaussian fiber, and only there** — off it the four
-determine nothing, and no polymorphic genotype is on it, so for genotype data the triple
-remains independently informative. What the corollary demotes is the triple's claim to
-minimality for a general coordinate law, with the load there carried by the odd part of the
-squared law. The two statements live at
-different levels and the bridge between them, from tower data to design-observable data, is
-open upstream. Nothing here should be read as "a design can measure the four".
+Two distinct research questions remain: what a disjoint design can observe and whether a
+candidate observable tuple determines the coordinate law.  Neither completeness direction
+is exported from this file.  The proved lattice formulas below are positive separation
+tools, not a classification of all observations.
 
 ## Status labels
 
-* Theorem 1a (nonlattice barrier): the slab-comparison step is discharged by **Stone's
-  local CLT** for nonlattice sums with finite variance. That analytic input is carried
-  here as a named hypothesis field, not hidden inside a proof.
-* Theorem 1b (lattice detection): the intensity-inflation factor
-  `h / (1 - exp (-h)) > 1` is proved outright below; the local-CLT and
-  Gnedenko-Kolmogorov inputs are again named hypotheses.
+* Theorem 1a (nonlattice barrier) is absent pending a repository proof of the required
+  uniform local limit theorem.
+* Theorem 1b (lattice detection) is likewise absent. What is proved below is the
+  arithmetic inequality `h / (1 - exp (-h)) > 1` and its bracket. Identifying that
+  ratio with a ratio of exceedance intensities needs two local limit theorems, and
+  converting an intensity gap into a limit-law gap needs Gnedenko-Kolmogorov; all three
+  are hypotheses of `inflated_intensity_ne_of_injective`, never conclusions.
 * To our knowledge the *completeness* formulation — quantifying over designs rather
   than fixing a test law — is not stated in the Ben Arous-Bogachev-Molchanov /
   Bovier-Kurkova-Loewe / Huang-Austern-Orbanz literature, whose theorems fix the test
@@ -62,17 +57,18 @@ open upstream. Nothing here should be read as "a design can measure the four".
 
 ## Why a polygenic-score development needs this
 
-The trichotomy is a *calibration instrument*. Any proposed criterion for "is this
-genotype/score model Gaussian enough?" can be evaluated on a chameleon: if it
-certifies the chameleon, the criterion carries at most 2-jet information and the
-barrier bounds its power exactly.
+The lattice factor is a *calibration instrument*: a proposed Gaussian approximation for a
+hard-called epistatic score must account for threshold alignment.  This is a necessary
+diagnostic, not a complete criterion for Gaussianity.
 
 And the lattice observable is not a technicality in genetics — it is the whole
 difference between two data types. **Hard-called genotypes are lattice**: the
 standardized dosage takes three values, so `log x²` has finite support. **Imputed
-dosages are nonlattice**: they have a density. Theorem 1b therefore says that hard
-calls and imputed dosages are distinguishable by high-degree epistatic aggregates
-*even after matching every moment*, with an explicit inflation factor. See
+dosages are nonlattice**: they have a density. Neither of those two sentences is proved
+here either — they are read off the support of the respective coordinate laws. The
+*conjecture* they feed is that hard calls and imputed dosages stay distinguishable by
+high-degree epistatic aggregates even after matching every moment; what this file
+contributes to it is the inflation factor's arithmetic and nothing else. See
 `Calibrator.PolygenicSpectroscopy`.
 
 ## Which half of this file applies to genotypes, and where
@@ -80,16 +76,12 @@ calls and imputed dosages are distinguishable by high-degree epistatic aggregate
 The file splits cleanly along the symmetry hypothesis, and the split is worth
 stating once because it decides what may be quoted about real data.
 
-* **Symmetry-gated.** Everything in the `ChaosSpectroscopy` namespace — the
-  barrier, the factorization, the chameleon calibration, the undecidability of
-  Gaussianity — quantifies over *symmetric* unit-variance laws. A standardized
-  Hardy-Weinberg genotype is symmetric at `q = 1/2` and nowhere else in the
-  polymorphic range (`Calibrator.EpistaticChaos.standardizedGenotype_symmetric_iff`),
-  so these results are licensed for genotypes at that one frequency, which is
-  also the frequency where the jet variance vanishes.
+* **Symmetry-gated.** The withdrawn completeness claim required symmetric coordinate
+  laws. A standardized Hardy-Weinberg genotype is symmetric only at `q = 1/2`; no
+  completeness claim is exported even there.
 * **Symmetry-free.** The lattice arithmetic (`one_lt_latticeInflation`,
-  `latticeBracket_antitone`, `latticeInflation_normalization`) and
-  `lattice_detection` never mention symmetry, and neither does the drift theory
+  `latticeBracket_antitone`, `latticeInflation_normalization`) never mentions
+  symmetry, and neither does the drift theory
   of `Calibrator.Condensation`. These are the parts that apply to genotypes at
   every allele frequency — and they are the parts
   `Calibrator.PolygenicSpectroscopy` actually instantiates.
@@ -103,9 +95,8 @@ frequencies where their hypothesis is false.
 
 The title of this file says "independent chaos designs", and independence there
 means *disjoint variable supports*. That condition used to live only in prose.
-It is now the `isDisjoint` field of `ChaosSpectroscopy`, a hypothesis of the
-`barrier` field, and a restriction on the type of every experiment in the
-namespace, because it is not a technical convenience:
+It would have to be an explicit hypothesis of any future barrier theorem, because it is
+not a technical convenience:
 
 * on disjoint designs the achievable limits are the Gaussian segment
   `{N(0, s²) : 0 ≤ s² ≤ 1}`, so the trichotomy has something to be complete
@@ -113,7 +104,7 @@ namespace, because it is not a technical convenience:
 * on designs whose tested locus-sets share variants the achievable limits are
   weakly dense in the entire moment body — every centered law with second moment
   at most one — uniformly over the coordinate law. See
-  `Calibrator.EpistaticChaos.GenotypeChaosLimits`.
+  the corresponding maximal-spectrum conjecture (also not exported as a theorem here).
 
 Genetically this is the difference between burden or kernel statistics over
 non-overlapping genes and partitioned windows (gated in), and sliding windows,
@@ -137,7 +128,12 @@ inductive LatticeDatum where
   | nonlattice : LatticeDatum
   | lattice (span offset : ℝ) : LatticeDatum
 
-/-- The complete observable triple of an independent-design chaos experiment. -/
+/-- A triple of Mellin data for a coordinate law: drift, jet variance, lattice datum.
+
+It is a record for carrying those three numbers together, and nothing here shows it is
+*complete* — that an independent design observes these and nothing else is exactly the
+clause this file does not prove (see the header). Two laws with equal triples are not
+thereby shown to be indistinguishable. -/
 structure MellinObservables where
   /-- `c = E[x² log x²] = psi'(1)`, the size-biased drift. -/
   drift : ℝ
@@ -220,183 +216,54 @@ theorem latticeBracket_antitone {h : ℝ} (hh : 0 < h) :
   exact mul_le_mul_of_nonneg_right key (inv_nonneg.mpr hden.le)
 
 /-!
-## 2. The barrier, as a spectroscopy structure
+## 2. The barrier is absent
 
-We package the analytic content — Stone's local CLT for nonlattice sums, the lattice
-local CLT, and Gnedenko-Kolmogorov triangular-array convergence — as *fields* of a
-structure, and prove the consequences. This keeps the unproved analytic inputs visible
-at the type level rather than buried, matching the convention in
-`Calibrator.Identification`.
+A `ChaosSpectroscopy` record once stood here holding Stone's local CLT, the lattice
+local CLT and Gnedenko-Kolmogorov triangular-array convergence as *fields*, with a
+`barrier` field carrying the central indistinguishability claim; its projection
+theorems then closed by `exact S.barrier`. The record and every projection are gone,
+and nothing replaces them — no barrier, no factorization, no chameleon-completeness
+theorem is exported by this file.
+
+Two conditions any future barrier statement must carry explicitly, recorded because
+both once lived only in prose:
+
+* **disjoint variable supports**, i.e.
+  `Calibrator.EpistaticChaos.GenotypeDesign.VariantDisjoint` — non-overlapping genes,
+  disjoint LD blocks, partitioned windows, and not sliding windows or overlapping
+  pathway panels;
+* **sign symmetry of the coordinate law**, which for a standardized Hardy-Weinberg
+  genotype holds at `q = 1/2` and nowhere else in the polymorphic range
+  (`EpistaticChaos.standardizedGenotype_symmetric_iff`), and where
+  `Calibrator.PolygenicSpectroscopy.hweMellinJetVariance_half` gives `v(1/2) = 0`, so
+  the symmetric branch meets the genotypes only at a jet-variance-free point. The
+  drift does not degenerate there: `c(1/2) = log 2`.
+
+The results that do apply to genotypes across the whole frequency spectrum are the ones
+that never invoke symmetry: the lattice arithmetic of Section 1 and the
+drift/condensation machinery of `Calibrator.Condensation`.
 -/
-
-/-- An independent-design chaos spectroscopy over a class of coordinate laws.
-
-`Law` ranges over symmetric unit-variance coordinate laws with all moments finite;
-`Design` over admissible multilinear designs (arbitrary degrees, arbitrary
-coefficients with unit `L2` norm and vanishing max coefficient); `Limit` over
-limit laws.
-
-**Disjointness is a field, not a comment.** An earlier version of this structure
-said in prose that `Design` ranged over *disjoint-support* designs while the
-`barrier` field quantified over every `D : Design`. Read literally that asserted
-the barrier for overlapping designs too, which is false:
-`Calibrator.EpistaticChaos.GenotypeChaosLimits.admissibility_alone_certifies_only_the_moment_body`
-shows that once tested locus-sets share variants the achievable limits fill the
-whole moment body, so a pair of laws with equal observable triples has no reason
-to produce equal limits there. The support condition is now the `isDisjoint`
-field and `barrier` carries it as a hypothesis; every consequence below is
-restricted to the disjoint sub-family accordingly. In genetics the restriction is
-exactly the one of `Calibrator.EpistaticChaos.GenotypeDesign.VariantDisjoint`:
-non-overlapping genes, disjoint LD blocks, partitioned windows — and not sliding
-windows or overlapping pathway panels.
-
-**Genotype applicability — read this before instantiating `Law` at a genotype.**
-The symmetry restriction on `Law` is not decoration; the barrier field is
-discharged through the sign-erasure reduction of `Calibrator.EpistaticChaos`,
-which needs `E[x | |x|] = 0`. A standardized Hardy-Weinberg genotype satisfies
-that at **exactly one allele frequency, `q = 1/2`**, and at no other polymorphic
-frequency (`EpistaticChaos.standardizedGenotype_symmetric_iff`; the obstruction
-is the third central moment `2q(1-q)(1-2q)`). So every theorem in this namespace
-— `experiment_factors_through_observables`,
-`chameleon_passes_every_independent_criterion`,
-`no_independent_design_criterion_decides_gaussianity` — is licensed for genotype
-coordinate laws only at `q = 1/2`.
-
-That single licensed frequency is also where the second observable dies:
-`Calibrator.PolygenicSpectroscopy.hweMellinJetVariance_half` gives `v(1/2) = 0`,
-because `log x ^ 2` collapses to one point. The symmetric branch of this theory
-therefore meets the genotypes only at a maximally lattice, jet-variance-free
-point. Note that the *drift* does not degenerate there: `c(1/2) = log 2`, not
-zero. The theorems below are correct as stated; what this note records is that
-their genotype instantiation is a single frequency wide.
-
-The results that do apply to genotypes across the whole frequency spectrum are
-the ones that never invoke symmetry: the lattice arithmetic of Section 1 and
-`lattice_detection` in Section 3, and the drift/condensation machinery of
-`Calibrator.Condensation`, whose `MellinProfile` carries no symmetry field. -/
-structure ChaosSpectroscopy (Law Design Limit : Type*) where
-  /-- The observable triple of a coordinate law. -/
-  observables : Law → MellinObservables
-  /-- The tested monomials have pairwise disjoint variable sets. This is the
-  hypothesis the barrier depends on, and it is a field so that it appears in the
-  type of every result below. -/
-  isDisjoint : Design → Prop
-  /-- The limit law of a design under a coordinate law, when it exists. -/
-  limitLaw : Law → Design → Limit
-  /-- **Theorem 1a, nonlattice barrier (analytic input).** Two laws agreeing in the
-  full observable triple are indistinguishable by every **disjoint** design.
-  Discharged for nonlattice laws by Stone's local CLT via the unit-slab decomposition
-  of the exact tilt identity `P(L > y) = Etilde[exp(-(Ltilde - y)); Ltilde > y]`.
-
-  The disjointness hypothesis is not removable: for overlapping designs the
-  achievable limits are dense in the whole moment body over any fixed coordinate
-  law, so equal observables cannot force equal limits. -/
-  barrier : ∀ ν ν' : Law, observables ν = observables ν' →
-    ∀ D : Design, isDisjoint D → limitLaw ν D = limitLaw ν' D
-
-namespace ChaosSpectroscopy
-
-variable {Law Design Limit : Type*} (S : ChaosSpectroscopy Law Design Limit)
-
-/-- The record an experimenter obtains from a coordinate law when restricted to
-disjoint designs: the limit law of each disjoint design.
-
-Every completeness statement below is about this record and not about the full
-design-indexed family, which is the type-level form of the disjointness licence.
-
-Empirical status: DERIVED. A restriction of the `limitLaw` field to a
-sub-family; no modelling content and no free parameter. -/
-def disjointRecord (ν : Law) : {D : Design // S.isDisjoint D} → Limit :=
-  fun D => S.limitLaw ν D.1
-
-/-- **The observable algebra is exactly three-dimensional: nothing beyond the triple
-is measurable by disjoint designs.** Any experiment that reports a function of the
-*disjoint*-design limits is a function of the observable triple alone.
-
-The experiment is typed as a function of `S.disjointRecord`, so it can only read
-limits of designs whose tested locus-sets are pairwise disjoint. That restriction
-is the content of the correction recorded in the `ChaosSpectroscopy` docstring: an
-experiment allowed to use overlapping designs is not covered, and by
-`Calibrator.EpistaticChaos` its reports are not constrained by the triple.
-
-Genotype applicability: inherits the symmetry restriction on `Law`, so the
-genotype instantiation is licensed only at `q = 1/2`. See the `ChaosSpectroscopy`
-docstring. -/
-theorem experiment_factors_through_observables
-    {Report : Type*} (experiment : ({D : Design // S.isDisjoint D} → Limit) → Report)
-    (ν ν' : Law) (h : S.observables ν = S.observables ν') :
-    experiment (S.disjointRecord ν) = experiment (S.disjointRecord ν') := by
-  congr 1
-  funext D
-  exact S.barrier ν ν' h D.1 D.2
-
-/-- **Chameleon calibration.** A *chameleon* is a coordinate law that is not the
-Gaussian but has the Gaussian's observable triple. Every independent-design criterion
-that certifies the Gaussian also certifies the chameleon — so any criterion in this
-family carries at most `(c, v, lattice)` information, and the barrier bounds its power
-exactly.
-
-This is the calibration instrument: feed a candidate criterion a chameleon.
-
-Genotype applicability: inherits the symmetry restriction on `Law`, so the
-genotype instantiation is licensed only at `q = 1/2`. See the `ChaosSpectroscopy`
-docstring. This is not a limitation on the instrument's use against *dosage*
-surrogates, which is its intended use — it is a limitation on reading the
-conclusion back onto hard-called genotypes at an arbitrary allele frequency. -/
-theorem chameleon_passes_every_independent_criterion
-    {Report : Type*} (experiment : ({D : Design // S.isDisjoint D} → Limit) → Report)
-    (accept : Report → Prop)
-    (gaussianLaw chameleon : Law)
-    (hjet : S.observables chameleon = S.observables gaussianLaw)
-    (hgauss : accept (experiment (S.disjointRecord gaussianLaw))) :
-    accept (experiment (S.disjointRecord chameleon)) := by
-  rwa [S.experiment_factors_through_observables experiment chameleon gaussianLaw hjet]
-
-/-- **No independent-design criterion decides Gaussianity.** If a chameleon exists
-(non-Gaussian, matched triple) then no decision rule built from independent-design
-limits can have "is the Gaussian" as its acceptance set.
-
-Genotype applicability: inherits the symmetry restriction on `Law`, so the
-genotype instantiation is licensed only at `q = 1/2`. See the `ChaosSpectroscopy`
-docstring. -/
-theorem no_independent_design_criterion_decides_gaussianity
-    {Report : Type*} (experiment : ({D : Design // S.isDisjoint D} → Limit) → Report)
-    (gaussianLaw chameleon : Law)
-    (hne : chameleon ≠ gaussianLaw)
-    (hjet : S.observables chameleon = S.observables gaussianLaw) :
-    ¬ ∃ accept : Report → Prop,
-        ∀ ν : Law, ν = gaussianLaw ↔ accept (experiment (S.disjointRecord ν)) :=
-  ({ positive := gaussianLaw
-     negative := chameleon
-     same_data :=
-       (S.experiment_factors_through_observables experiment chameleon gaussianLaw hjet).symm
-     holds := rfl
-     fails := hne } :
-      ProbeBlindness (fun ν => experiment (S.disjointRecord ν))
-        (fun ν => ν = gaussianLaw)).no_criterion
-
-end ChaosSpectroscopy
 
 /-!
-## 3. Theorem 1b: lattice detection
+## 3. The inflation factor transported through an injection
 
-The lattice case is not covered by the barrier because the lattice datum differs.
-The separation is quantitative, and this is where `one_lt_latticeInflation` is used.
+The only analytic content available here is `one_lt_latticeInflation`. The statement
+below carries it into an abstract limit space and is recorded for what it is: an
+arithmetic transport, not a detection theorem.
 -/
 
-/-- **Theorem 1b (lattice detection), separation form.**
+/-- Given an injection `limitOfIntensity` from intensities to limit laws, an intensity
+`μ₀ > 0` and a span `h > 0`, the images of `μ₀` and of `latticeInflation h * μ₀` differ.
+The proof is `1 < latticeInflation h` (`one_lt_latticeInflation`) transported through
+the injection; the remaining hypotheses merely name the two images.
 
-Suppose a coordinate law `ν` has lattice increments with span `h > 0` and matches the
-Gaussian in the full 2-jet `(c, v)`. Choose the equal-coefficient one-degree design
-with the exceedance threshold placed *on* the lattice, and tune `N` so that the
-Gaussian exceedance intensity converges to `mu₀ > 0`. Then the `ν`-intensity converges
-to `latticeInflation h * mu₀`, which is strictly larger. Distinct nondegenerate
-compound-Poisson components with different total rates give distinct laws.
-
-The hypotheses `hIntensityGauss`/`hIntensityLattice` are the local-CLT inputs; the
-hypothesis `hInjective` is Gnedenko-Kolmogorov (distinct intensities ⇒ distinct
-limits). The strict inequality is proved. -/
-theorem lattice_detection
+**This is not lattice detection and must not be cited as such.** The three facts that
+would make it one — that a lattice law's exceedance intensity at an aligned threshold is
+`latticeInflation h` times the nonlattice one (the two local CLTs), and that distinct
+intensities give distinct compound-Poisson limits (Gnedenko-Kolmogorov) — are the
+hypotheses `hIntensityLattice`, `hIntensityGauss` and `hInjective`. None is proved in
+this corpus, and supplying them is the whole difficulty. -/
+theorem inflated_intensity_ne_of_injective
     {Limit : Type*} (limitOfIntensity : ℝ → Limit)
     (hInjective : Function.Injective limitOfIntensity)
     (μ₀ h : ℝ) (hμ : 0 < μ₀) (hh : 0 < h)
@@ -410,15 +277,20 @@ theorem lattice_detection
   have h2 : 1 < latticeInflation h := one_lt_latticeInflation hh
   nlinarith [h1, h2, hμ]
 
-/-- The Gaussian's own lattice datum: `log g²` has a density, so the Gaussian is
-nonlattice. Recorded as the definitional fact it is. -/
+/-- The Gaussian's Mellin triple. The drift and jet variance are the constants proved in
+`Calibrator.Condensation`; the `nonlattice` datum is **stipulated**, not derived — that
+`log g²` has a density is true and is not proved anywhere in this corpus. Every
+comparison against this record inherits that stipulation. -/
 noncomputable def gaussianObservables : MellinObservables where
   drift := condensationConstant
   jetVariance := gaussianJetVariance
   latticeDatum := LatticeDatum.nonlattice
 
-/-- A lattice law is never observationally equal to the Gaussian, whatever its 2-jet:
-the third observable already separates them. This is the corrected barrier boundary. -/
+/-- A triple with a `lattice` datum is not the Gaussian triple, whatever its 2-jet.
+
+The content is constructor disjointness on the `latticeDatum` field. It says two records
+differ, not that two *laws* are distinguishable by any experiment: both lattice data
+here are stipulated by the definitions being compared. -/
 theorem lattice_observables_ne_gaussian (c v span offset : ℝ) :
     (⟨c, v, LatticeDatum.lattice span offset⟩ : MellinObservables) ≠ gaussianObservables := by
   intro h
@@ -426,9 +298,11 @@ theorem lattice_observables_ne_gaussian (c v span offset : ℝ) :
     simpa [gaussianObservables] using congrArg MellinObservables.latticeDatum h
   exact LatticeDatum.noConfusion h2
 
-/-- The **chameleon stratum**, corrected: nonlattice laws matching the Gaussian 2-jet.
-Membership is exactly the condition under which the barrier applies and the law is
-certified Gaussian by every independent-design experiment. -/
+/-- Nonlattice triples matching the Gaussian 2-jet. With the barrier gone this predicate
+carries no experimental meaning — nothing here says a law with this triple is
+indistinguishable from the Gaussian — and `isChameleonObservable_iff` shows it is just
+record equality spelled out field by field. It is kept only because
+`Calibrator.PolygenicSpectroscopy` states its hard-call comparison in this vocabulary. -/
 def IsChameleonObservable (O : MellinObservables) : Prop :=
   O.drift = condensationConstant ∧
   O.jetVariance = gaussianJetVariance ∧
