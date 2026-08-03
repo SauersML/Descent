@@ -418,15 +418,16 @@ MONO_THM = re.compile(
 
 def _monotone_claims(d, names):
     """(param_index, +1/-1, evidence) for every asserted direction."""
-    out = []
+    doc_claims = []
     doc = d.get("doc", "") or ""
     for m in MONO_DOC.finditer(doc):
         word, p = m.group(1).lower(), m.group(2)
         if p not in names:
             continue
         sign = 1 if word.startswith(("increas", "grow", "rise", "larger")) else -1
-        out.append((names.index(p), sign,
-                    f"the docstring says the value {m.group(1)} with `{p}`"))
+        doc_claims.append((names.index(p), sign,
+                           f"the docstring says the value {m.group(1)} with `{p}`"))
+    theorem_claims = []
     stem = d["name"].lower()
     for t in d.get("theorem_hyps", []):
         # A theorem may mention several definitions; only one of them is the
@@ -441,8 +442,17 @@ def _monotone_claims(d, names):
             if p not in names:
                 continue
             sign = 1 if word.startswith("increas") else -1
-            out.append((names.index(p), sign,
-                        f"theorem `{t['thm']}` asserts the direction"))
+            theorem_claims.append((names.index(p), sign,
+                                   f"theorem `{t['thm']}` asserts the direction"))
+    # A theorem named for this definition and parameter identifies its subject;
+    # an English sentence may instead describe an error, bias, bound, or other
+    # nearby noun.  For example, "the omitted bias grows with t" is not a claim
+    # that the definition itself grows with t.  Once an adjacent theorem gives
+    # the direction, do not manufacture a contradictory claim from a pronoun in
+    # the prose.
+    theorem_params = {i for i, _, _ in theorem_claims}
+    out = [c for c in doc_claims if c[0] not in theorem_params]
+    out.extend(theorem_claims)
     # dedupe on (index, sign)
     seen, ded = set(), []
     for i, s, w in out:
