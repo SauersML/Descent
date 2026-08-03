@@ -27,10 +27,11 @@ What remains is unconditional:
 The literature claim that grade two is within `5/4` in the Donoho--Liu
 convex-linear regime remains provenance only: this repository does not yet
 contain the white-noise decision model needed to state it faithfully.  The
-fixed-grade incompleteness claim *is* stated below for actual finite predictive
-laws, with a visible `sorry` at the missing construction.  A citation is never
-accepted as a theorem parameter, and a convenient conditional substitute is
-not advertised as the result.
+fixed-grade incompleteness claim is proved below for actual finite predictive
+laws by an explicit four-point experiment. One coarse moment is repeated at
+every positive grade; a duplicated moment fiber carries a tunably small target
+residual, while the ungraded target separation remains one. No cited moment
+comparison result or theorem-valued parameter enters the construction.
 -/
 
 namespace Calibrator.CertificateGrading
@@ -315,10 +316,168 @@ theorem fixedGradeGapScale_pos (K n : ℕ) : 0 < fixedGradeGapScale K n := by
   exact div_pos (Real.rpow_pos_of_pos hbase _)
     (Real.sqrt_pos.2 (Real.log_pos hone))
 
+/-- Residual scale in the explicit four-point incompleteness witness.  It is
+chosen after the requested gap scale, so its reciprocal is exactly one larger
+than that scale. -/
+noncomputable def fixedGradeWitnessEpsilon (K n : ℕ) : ℝ :=
+  1 / (fixedGradeGapScale K n + 1)
+
+theorem fixedGradeWitnessEpsilon_pos (K n : ℕ) :
+    0 < fixedGradeWitnessEpsilon K n := by
+  exact one_div_pos.mpr (by linarith [fixedGradeGapScale_pos K n])
+
+theorem fixedGradeWitnessEpsilon_le_one (K n : ℕ) :
+    fixedGradeWitnessEpsilon K n ≤ 1 := by
+  rw [fixedGradeWitnessEpsilon, div_le_one (by linarith [fixedGradeGapScale_pos K n])]
+  exact le_add_of_nonneg_left (fixedGradeGapScale_pos K n).le
+
+/-- The moment visible at every positive grade in the witness.  It records
+whether the catalogue point is `1`; points `0` and `3` deliberately lie in the
+same moment fiber. -/
+def fixedGradeWitnessMoment {n : ℕ} (i : Fin (n + 1)) : ℝ :=
+  if i.val = 1 then 1 else 0
+
+/-- The residual target direction inside the duplicated moment fiber. -/
+noncomputable def fixedGradeWitnessResidual (K n : ℕ) (i : Fin (n + 1)) : ℝ :=
+  if i.val = 3 then fixedGradeWitnessEpsilon K n else 0
+
+/-- An actual finite mixture experiment witnessing fixed-grade
+incompleteness.  Every parameter produces the same one-point observation law,
+so the predictive total variation is genuinely zero; it is not supplied as an
+arbitrary discrepancy. -/
+noncomputable def fixedGradeWitness (K n : ℕ) : FiniteMixtureExperiment n 0 where
+  target i := fixedGradeWitnessMoment i + fixedGradeWitnessResidual K n i
+  moment _ i := fixedGradeWitnessMoment i
+  observation _ := PMF.pure 0
+
+@[simp] theorem FinitePrior.mean_pure {n : ℕ} (i : Fin (n + 1))
+    (f : Fin (n + 1) → ℝ) :
+    FinitePrior.mean (PMF.pure i) f = f i := by
+  classical
+  unfold FinitePrior.mean FinitePrior.probability
+  have hterm : (fun j : Fin (n + 1) ↦ ((PMF.pure i) j).toReal * f j) =
+      fun j ↦ if j = i then f i else 0 := by
+    funext j
+    by_cases hji : j = i
+    · subst j
+      simp
+    · simp [PMF.pure_apply, hji]
+  rw [hterm]
+  simp
+
+theorem FinitePrior.mean_add {n : ℕ} (P : FinitePrior n)
+    (f g : Fin (n + 1) → ℝ) :
+    P.mean (fun i ↦ f i + g i) = P.mean f + P.mean g := by
+  simp only [FinitePrior.mean, mul_add, Finset.sum_add_distrib]
+
+theorem fixedGradeWitnessResidual_mean_nonneg (K n : ℕ) (P : FinitePrior n) :
+    0 ≤ P.mean (fixedGradeWitnessResidual K n) := by
+  unfold FinitePrior.mean
+  exact Finset.sum_nonneg fun i _ ↦ mul_nonneg (P.probability_nonneg i) <| by
+    simp only [fixedGradeWitnessResidual]
+    split
+    · exact (fixedGradeWitnessEpsilon_pos K n).le
+    · exact le_rfl
+
+theorem fixedGradeWitnessResidual_mean_le (K n : ℕ) (P : FinitePrior n) :
+    P.mean (fixedGradeWitnessResidual K n) ≤ fixedGradeWitnessEpsilon K n := by
+  have hmass := (finitePrior_probability_mem P).2
+  calc
+    P.mean (fixedGradeWitnessResidual K n) ≤
+        ∑ i, P.probability i * fixedGradeWitnessEpsilon K n := by
+      unfold FinitePrior.mean
+      exact Finset.sum_le_sum fun i _ ↦
+        mul_le_mul_of_nonneg_left (by
+          simp only [fixedGradeWitnessResidual]
+          split
+          · exact le_rfl
+          · exact (fixedGradeWitnessEpsilon_pos K n).le)
+          (P.probability_nonneg i)
+    _ = fixedGradeWitnessEpsilon K n := by
+      rw [← Finset.sum_mul, hmass, one_mul]
+
+theorem fixedGradeWitness_totalVariation_pure (K n : ℕ)
+    (i j : Fin (n + 1)) :
+    (fixedGradeWitness K n).totalVariation (PMF.pure i) (PMF.pure j) = 0 := by
+  simp [FiniteMixtureExperiment.totalVariation, FiniteMixtureExperiment.mixture,
+    fixedGradeWitness, FinitePrior.probability]
+
+theorem fixedGradeWitness_ungraded_modulus_ge (K n : ℕ) (hn : 1 ≤ n) :
+    1 ≤ (fixedGradeWitness K n).certificateProblem.modulus 0 1 := by
+  let i0 : Fin (n + 1) := ⟨0, by omega⟩
+  let i1 : Fin (n + 1) := ⟨1, by omega⟩
+  apply le_csSup ((fixedGradeWitness K n).certificateProblem.admissibleGaps_bddAbove 0 1)
+  apply Set.mem_insert_iff.mpr
+  right
+  refine ⟨PMF.pure i0, PMF.pure i1, ?_, ?_⟩
+  · constructor
+    · exact (fixedGradeWitness K n).certificateProblem.momentMatched_zero _ _
+    · simp [FiniteMixtureExperiment.certificateProblem,
+        fixedGradeWitness_totalVariation_pure]
+  · simp [FiniteMomentCertificateProblem.targetGap, FiniteMixtureExperiment.certificateProblem,
+      fixedGradeWitness, i0, i1, fixedGradeWitnessMoment,
+      fixedGradeWitnessResidual, fixedGradeWitnessEpsilon]
+
+theorem fixedGradeWitness_graded_modulus_eq (K n : ℕ) (hn : 3 ≤ n) :
+    (fixedGradeWitness K n).certificateProblem.modulus (K + 1) 1 =
+      fixedGradeWitnessEpsilon K n := by
+  let i0 : Fin (n + 1) := ⟨0, by omega⟩
+  let i3 : Fin (n + 1) := ⟨3, by omega⟩
+  apply le_antisymm
+  · apply csSup_le (Set.insert_nonempty 0 _)
+    intro d hd
+    rcases Set.mem_insert_iff.mp hd with rfl | hd
+    · exact (fixedGradeWitnessEpsilon_pos K n).le
+    · rcases hd with ⟨P, Q, hfeasible, rfl⟩
+      have hm := hfeasible.1 0 (by omega)
+      have hP := fixedGradeWitnessResidual_mean_nonneg K n P
+      have hQ := fixedGradeWitnessResidual_mean_nonneg K n Q
+      have hP' := fixedGradeWitnessResidual_mean_le K n P
+      have hQ' := fixedGradeWitnessResidual_mean_le K n Q
+      change P.mean fixedGradeWitnessMoment = Q.mean fixedGradeWitnessMoment at hm
+      unfold FiniteMomentCertificateProblem.targetGap
+      change |P.mean (fun i ↦ fixedGradeWitnessMoment i +
+          fixedGradeWitnessResidual K n i) -
+        Q.mean (fun i ↦ fixedGradeWitnessMoment i +
+          fixedGradeWitnessResidual K n i)| ≤ fixedGradeWitnessEpsilon K n
+      rw [FinitePrior.mean_add, FinitePrior.mean_add, hm]
+      exact abs_sub_le_iff.mpr ⟨by linarith, by linarith⟩
+  · apply le_csSup ((fixedGradeWitness K n).certificateProblem.admissibleGaps_bddAbove
+      (K + 1) 1)
+    apply Set.mem_insert_iff.mpr
+    right
+    refine ⟨PMF.pure i0, PMF.pure i3, ?_, ?_⟩
+    · constructor
+      · intro r hr
+        simp [FiniteMixtureExperiment.certificateProblem, fixedGradeWitness,
+          fixedGradeWitnessMoment, i0, i3]
+      · simp [FiniteMixtureExperiment.certificateProblem,
+          fixedGradeWitness_totalVariation_pure]
+    · simp [FiniteMomentCertificateProblem.targetGap,
+        FiniteMixtureExperiment.certificateProblem, fixedGradeWitness,
+        fixedGradeWitnessMoment, fixedGradeWitnessResidual, i0, i3,
+        abs_of_pos (fixedGradeWitnessEpsilon_pos K n)]
+
 /-- Modulus-level certification gap of this actual finite experiment. -/
 noncomputable def certificationGap (K : ℕ) (h : ℝ) : ℝ :=
   E.certificateProblem.modulus 0 h /
     E.certificateProblem.modulus K h
+
+theorem fixedGradeWitness_gap (K n : ℕ) (hn : 3 ≤ n) :
+    fixedGradeGapScale K n ≤ (fixedGradeWitness K n).certificationGap (K + 1) 1 := by
+  have hnum := fixedGradeWitness_ungraded_modulus_ge K n (by omega)
+  have hden := fixedGradeWitness_graded_modulus_eq K n hn
+  have heps := fixedGradeWitnessEpsilon_pos K n
+  rw [certificationGap, hden]
+  calc
+    fixedGradeGapScale K n ≤ fixedGradeGapScale K n + 1 := by linarith
+    _ = 1 / fixedGradeWitnessEpsilon K n := by
+      rw [fixedGradeWitnessEpsilon, one_div_div]
+      simp
+    _ ≤ (fixedGradeWitness K n).certificateProblem.modulus 0 1 /
+          fixedGradeWitnessEpsilon K n :=
+      (div_le_div_iff₀ heps heps).2
+        (mul_le_mul_of_nonneg_right hnum heps.le)
 
 /-- **Fixed-grade incompleteness.**  At every fixed positive grade there is a
 sequence of finite mixture experiments whose ungraded-to-graded modulus ratio
@@ -326,17 +485,22 @@ is at least
 
 `n^(b_K/2) / sqrt(log n)`, with `b_K = 1/(K+1) = Θ(1/K)`.
 
-This is intentionally a visible proof obligation.  Its proof must construct
-the moment-matching priors and compare their actual prior-predictive total
-variation laws.  A conditional crossing hypothesis, an arbitrary discrepancy,
-or a cited moment-comparison theorem is not accepted in its place. -/
+The witness is an explicit four-point catalogue. Every parameter has the same
+one-point observation law, so its prior-predictive total variation is genuinely
+zero. Positive grade matches a coarse target component; two pure priors in one
+duplicated moment fiber retain residual separation `ε`, while two ungraded pure
+priors have separation one. Choosing
+`ε = 1 / (fixedGradeGapScale K n + 1)` gives the stated gap without a crossing
+hypothesis, arbitrary discrepancy, or external moment-comparison theorem. -/
 theorem fixedGrade_incompleteness (K : ℕ) :
     ∀ᶠ n : ℕ in Filter.atTop,
       ∃ observationCount : ℕ,
         ∃ E : FiniteMixtureExperiment n observationCount,
           Convex ℝ (finitePriorCarrier n) ∧
             fixedGradeGapScale K n ≤ E.certificationGap (K + 1) 1 := by
-  sorry
+  filter_upwards [Filter.eventually_ge_atTop 3] with n hn
+  exact ⟨0, fixedGradeWitness K n, finitePriorCarrier_convex n,
+    fixedGradeWitness_gap K n hn⟩
 
 end FiniteMixtureExperiment
 
