@@ -171,6 +171,35 @@ def SinglyCoveredBy {k n : ℕ} (family : BundleFamily k) (panel : Panel n) (i :
   Covers family panel i v ∧
     ∀ l : Fin n, l ≠ i → family.massAt (panel.support l) v = 0
 
+/-- One atom of unit mass, whose value `0` puts its modulus at `|0² - 1| = 1`. -/
+noncomputable def singleAtomFamily : BundleFamily 1 where
+  atomValue := fun _ _ ↦ 0
+  atomMass := fun _ _ ↦ 1
+
+/-- One locus of unit weight. -/
+noncomputable def singleLocusPanel : Panel 1 where
+  support := fun _ ↦ 0
+  weight := fun _ ↦ 1
+
+/-- **Single coverage is inhabited**, on the one-atom, one-locus panel at modulus `1`.
+
+    The forcing step is the whole mechanism of this file and it assumed
+    `SinglyCoveredBy`, which nothing established -- so the peeling argument ran
+    on a condition the corpus never exhibited.
+
+    The witness is minimal in a way that is worth being explicit about: with a
+    single locus the second clause is vacuous, because there is no other locus
+    to trade with. That is the degenerate end of exactly the phenomenon the
+    docstring describes, where for a diploid panel the largest modulus value is
+    singly covered by the rarest locus. It establishes non-vacuity; it does not
+    establish that single coverage occurs on a panel with competitors, which is
+    the case the peeling argument is actually for. -/
+theorem singlyCoveredBy_singleAtom :
+    SinglyCoveredBy singleAtomFamily singleLocusPanel 0 1 := by
+  refine ⟨?_, fun l hl ↦ absurd (Subsingleton.elim l 0) hl⟩
+  norm_num [Covers, BundleFamily.massAt, BundleFamily.modulus, singleAtomFamily,
+    singleLocusPanel]
+
 /-- **The forcing step, which is the whole mechanism.**
 
 If a modulus value is produced by exactly one locus, then the modulus law at that value

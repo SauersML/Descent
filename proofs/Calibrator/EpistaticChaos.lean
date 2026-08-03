@@ -1504,6 +1504,32 @@ def InLinkageEquilibrium : Prop :=
   ∀ x : Fin n → DiploidGenotype,
     design.jointGenotypeProb x = ∏ i, (design.model i).genotypeProb (x i)
 
+/-- The design carrying the product law over its own per-locus models.
+
+    The structure's docstring says the joint law is carried alongside the
+    per-locus models so that linkage equilibrium is a checkable relation rather
+    than a silent assumption. That cuts both ways: because the joint law is a
+    free field, nothing forced any design to satisfy the relation, and the three
+    theorems assuming `InLinkageEquilibrium` were quantified over a class the
+    corpus never exhibited a member of.
+
+    This is the equilibrium design by construction, and it is the only witness
+    that is honest here -- linkage equilibrium IS the product law, so there is
+    nothing to prove beyond writing it down. A design in linkage DISequilibrium
+    is equally easy to write and is what the disjoint-licence results are about
+    failing on. -/
+def equilibriumDesign (model : Fin n → HardyWeinbergModel)
+    (locusSet : ι → Finset (Fin n)) (coefficient : ι → ℝ) : GenotypeDesign n ι where
+  model := model
+  locusSet := locusSet
+  coefficient := coefficient
+  jointGenotypeProb := fun x ↦ ∏ i, (model i).genotypeProb (x i)
+
+theorem inLinkageEquilibrium_equilibriumDesign (model : Fin n → HardyWeinbergModel)
+    (locusSet : ι → Finset (Fin n)) (coefficient : ι → ℝ) :
+    (equilibriumDesign model locusSet coefficient).InLinkageEquilibrium :=
+  fun _ ↦ rfl
+
 /-- Every panel locus is polymorphic, so the standardized coordinate exists and
 has unit variance.
 
@@ -1573,6 +1599,33 @@ def IsTwoPoolInteraction (poolOne poolTwo : Finset (Fin n)) : Prop :=
   Disjoint poolOne poolTwo ∧ poolOne.Nonempty ∧ poolTwo.Nonempty ∧
     (∀ s : ι, ∃ i ∈ poolOne, ∃ j ∈ poolTwo, design.locusSet s = {i, j}) ∧
     (∀ i ∈ poolOne, ∀ j ∈ poolTwo, ∃ s : ι, design.locusSet s = {i, j})
+
+/-- The smallest two-pool design: two loci, one tested set, one pool each.
+
+    `IsTwoPoolInteraction` demands that the tested sets be exactly the
+    cross-pairs of the two pools, which pins the index type to a copy of
+    `poolOne × poolTwo`. Nothing in the corpus ever built such a design, so the
+    theorem assuming it was about a class with no known member.
+
+    Two loci over a single tested set is the minimal instance and the fourth and
+    fifth clauses become the same statement, which is exactly why it is minimal:
+    with one pair there is only one cross-pair to hit. Larger designs exist and
+    are not harder in principle; they need `ι` to enumerate the product, which is
+    bookkeeping rather than content. -/
+def twoPoolDesign (model : Fin 2 → HardyWeinbergModel) : GenotypeDesign 2 Unit where
+  model := model
+  locusSet := fun _ ↦ {0, 1}
+  coefficient := fun _ ↦ 1
+  jointGenotypeProb := fun x ↦ ∏ i, (model i).genotypeProb (x i)
+
+theorem isTwoPoolInteraction_twoPoolDesign (model : Fin 2 → HardyWeinbergModel) :
+    (twoPoolDesign model).IsTwoPoolInteraction {0} {1} := by
+  refine ⟨by decide, ⟨0, Finset.mem_singleton_self 0⟩, ⟨1, Finset.mem_singleton_self 1⟩,
+    fun _ ↦ ⟨0, Finset.mem_singleton_self 0, 1, Finset.mem_singleton_self 1, rfl⟩,
+    fun i hi j hj ↦ ⟨(), ?_⟩⟩
+  rw [Finset.mem_singleton] at hi hj
+  rw [hi, hj]
+  rfl
 
 end Definitions
 
