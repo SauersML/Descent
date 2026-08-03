@@ -2398,7 +2398,13 @@ theorem r2FromSignalVariance_eq_rsquared {k : ℕ} [Fintype (Fin k)]
     `1.000000/1.000000` at `vNoise = 1, 0.25, 0.04, 0.01` with `vSignal = 1`;
     largest absolute difference `2.1e-4`. Power: the prediction spans `0.760`
     to `1.000` across that design, so a wrong functional form of this shape
-    would separate. At the boundary itself it is FALSIFIED, as above. -/
+    would separate. At the boundary itself it is FALSIFIED, as above.
+
+    Correct as it stands: this is a genuine two-Gaussian model and the
+    validation above is against that model, not against a dichotomised trait.
+    The binary-trait counterpart is
+    `PortabilityDrift.liabilityThresholdAUCFromExplainedR2`, which takes a
+    prevalence; do not substitute this one for it. -/
 noncomputable def gaussianAUCFromSignalVariance (vSignal vNoise : ℝ) : ℝ :=
   Phi (Real.sqrt (vSignal / (2 * vNoise)))
 

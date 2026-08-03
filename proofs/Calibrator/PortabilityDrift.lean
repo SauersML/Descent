@@ -3151,7 +3151,22 @@ docstring named the right model out loud.
 noncomputable def equalVarianceGaussianAUCFromExplainedR2 (r2 : ℝ) : ℝ :=
   Phi (Real.sqrt (r2 / (2 * (1 - r2))))
 
-/-! ### The liability-threshold AUC, which is the one binary traits need
+/-! ### WHY A RANGE CHECK COULD NOT CATCH THIS, WHICH IS THE POINT
+
+Ten definitions in this AUC family were flagged by the range checker as **provably unable
+to fail**: their bound is `Φ`'s codomain, so "the result lies in `[0,1]`" is a fact about
+`Phi` and says nothing whatever about the body. They were counted as covered while being
+structurally incapable of detecting the defect below.
+
+**A check that verifies "is it a probability" cannot catch "is it the right probability."**
+The equal-variance form returns a perfectly well-formed number in `[0,1]` and is biased by
+seven AUC points on dichotomised traits. Every range check passes; the biology is wrong.
+
+This is the concrete instance the vacuity investigation was looking for. The general lesson
+is that a bound inherited from a codomain is not evidence about a definition, and a coverage
+count that credits such bounds is counting something other than what its name says.
+
+### The liability-threshold AUC, which is the one binary traits need
 
 `equalVarianceGaussianAUCFromExplainedR2` is a true theorem about the equal-variance
 Gaussian model and the **wrong formula for a dichotomised trait**, which is most of what
