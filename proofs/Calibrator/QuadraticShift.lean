@@ -33,18 +33,24 @@ def quadraticRisk (outcomeSecondMoment : ℝ) (B : Matrix ι ι ℝ)
 def IsSymmetricBilinearMatrix (B : Matrix ι ι ℝ) : Prop :=
   ∀ x y : ι → ℝ, dot x (B.mulVec y) = dot y (B.mulVec x)
 
+omit [DecidableEq ι] in
 /-- Every symmetric matrix represents a symmetric bilinear form.
 
     Fourteen theorems in this file take `IsSymmetricBilinearMatrix B` as a
     hypothesis. This says which matrices satisfy it: every symmetric one, and so
-    every second-moment matrix, which is the case those theorems are for. -/
-theorem isSymmetricBilinearMatrix_of_isSymm {B : Matrix ι ι ℝ} (hB : B.IsSymm) :
+    every second-moment matrix, which is the case those theorems are for.
+
+    `Matrix.IsSymm B` is spelled out rather than written `B.IsSymm`: dot
+    notation there resolves against the unfolded function type and asks for
+    `Function.IsSymm`, which does not exist. -/
+theorem isSymmetricBilinearMatrix_of_isSymm {B : Matrix ι ι ℝ}
+    (hB : Matrix.IsSymm B) :
     IsSymmetricBilinearMatrix B := by
   intro x y
   simp only [dot, Matrix.mulVec, dotProduct, Finset.mul_sum]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun j _ ↦ Finset.sum_congr rfl fun i _ ↦ ?_
-  rw [hB.apply i j]
+  rw [Matrix.IsSymm.apply hB i j]
   ring
 
 /-- A concrete inhabitant, so the hypothesis class is demonstrably nonempty and
