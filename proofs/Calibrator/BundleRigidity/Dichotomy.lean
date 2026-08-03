@@ -168,14 +168,15 @@ value reported by the source. -/
 theorem defect_witness :
     defect falsifierP falsifierQ [0, 0] [1] = 98 / 27 := by
   unfold defect weightRatio falsifierP falsifierQ
-  simp only [prodWeight_cons, prodWeight_nil, mul_one, Matrix.cons_val_zero, Matrix.cons_val_one,
-    Matrix.head_cons]
+  simp only [prodWeight_cons, prodWeight_nil, mul_one, Matrix.cons_val_zero,
+    Matrix.cons_val_one]
   norm_num
 
 /-- The falsifier's defect is not one, which is the whole point of it. -/
 theorem defect_witness_ne_one :
     defect falsifierP falsifierQ [0, 0] [1] ≠ 1 := by
-  rw [defect_witness]; norm_num
+  rw [defect_witness]
+  norm_num
 
 /-! ## The character `χ` and the Bézout constant -/
 
@@ -227,7 +228,7 @@ theorem bezout_witness :
     bezout falsifierP falsifierQ [1] [0, 0] = 125 / 147 := by
   unfold bezout chi falsifierP falsifierQ
   simp only [prodWeight_cons, prodWeight_nil, mul_one, List.length_cons, List.length_nil,
-    Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons]
+    Matrix.cons_val_zero, Matrix.cons_val_one]
   norm_num
 
 /-- **Parity forbids the cancellation: the Bézout constant cannot vanish.**
