@@ -1,4 +1,25 @@
 {
+ "_provenance": {
+  "generator": "proofs/validation/differential/cluster/fam_serial_founder.py",
+  "note": "ADDED AFTER THE FACT, BY READING GIT, NOT BY THE RUN. This file was written before the script stamped its own output, so nothing below was reported by the process that produced the numbers. Every field here is either derived from git history, and says so, or is null. No value in this block was guessed, and today's revision is deliberately absent: writing it here would claim this file describes a tree it has never been compared against.",
+  "revision": null,
+  "revisionKnown": false,
+  "runAt": null,
+  "seed": null,
+  "seedNote": "The script draws no random numbers. Its output is a function of the code and of sims/results_hpc/ancestry_calibration/results/{accuracy_binary.csv,calibration_binary.csv} alone, so a disagreement with a re-run is NOT explainable as a seed change.",
+  "numpy": null,
+  "numpyConstraint": "numpy 1.x. The run predates commit db344f43 and used the bare np.trapz at line 312, which numpy 2 removed, so it cannot have executed on numpy 2. A re-run on the current venv is on numpy 2.5.1, which makes the numpy version a live candidate for any small disagreement.",
+  "producedBetween": {
+   "after": "c35cecb57b83adec13c3935a6fa651509d8318e1",
+   "afterAt": "2026-08-03T09:28:49-05:00",
+   "afterWhy": "the commit that introduced the np.trapz call this run executed",
+   "before": "9fe80ca5d0e81d324c416fa8c5a7024d3549c84e",
+   "beforeAt": "2026-08-03T09:32:49-05:00",
+   "beforeWhy": "the single commit that added this file; it has never been modified since"
+  },
+  "howToVerifyThisBlock": "git log --format='%H %ad' --date=iso -- proofs/validation/differential/cluster/fam_serial_founder_results.json  and  git show c35cecb5:proofs/validation/differential/cluster/fam_serial_founder.py | grep -n trapz",
+  "supersededBy": "Any future run writes a real _provenance block from proofs/validation/simprov.py. If this after-the-fact block is still here, this file is still the original run."
+ },
  "A_serial_founder": {
   "demography": {
    "D": 10,
