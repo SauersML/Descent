@@ -126,7 +126,24 @@ def maximize(f, box, names, budget=20000, seed=0, feasible=None):
 def prove_contained(fiv, box, names, lo, hi, max_boxes=3000):
     """Interval branch-and-bound proof that f(box) is inside [lo, hi].
 
-    Returns 'proved', 'refuted' (with a witness sub-box), or 'inconclusive'.
+    Returns 'proved' or 'inconclusive'.  THERE IS NO 'refuted' VERDICT and
+    there never was: this routine is SOUND, not complete.  An interval
+    evaluation that straddles the bound may do so because the body really
+    escapes, or because interval arithmetic over-approximated it, and those
+    two are indistinguishable here -- so a box it cannot close is returned as
+    `inconclusive` with the worst sub-box, never as a refutation.  Refuting a
+    bound needs a concrete witness, which is `maximize`'s job.
+
+    The docstring used to promise 'refuted'.  Nothing in production read it --
+    `check_ranges` branches only on 'proved' -- but a NEW caller written from
+    this docstring gets a branch that is silently dead, and its counts then
+    look like measurements.  That happened on 2026-08-02: a vacuity sweep
+    classified 0 of 137 definitions as able to violate their bound, which read
+    as a dramatic finding and was an artefact of a branch that cannot be
+    taken.  The positive control that caught it -- force an absurd bound of
+    [0.499, 0.5001], on which essentially every definition must escape, and
+    check that SOMETHING is refuted -- returned 0 of 120, which is the shape
+    of a check that cannot fire rather than one that found nothing.
     """
     root = [Iv(max(box[n]["lo"], -1e12), min(box[n]["hi"], 1e12)) for n in names]
     stack = [root]
