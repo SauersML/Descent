@@ -593,6 +593,85 @@ theorem onePercentMaf_halfResponse_covariance_moment_permeability
     _ = (99 / 9802 : ℝ) * scalarPermeability 1 covarianceDerivative := by
       norm_num [invHeterozygosity]
 
+/-! ### Independent Hardy--Weinberg panel permeability -/
+
+/-- Order-two covariance-moment information contributed by one standardized
+Hardy--Weinberg locus.  This is a covariance-summary experiment, not the raw-dosage
+linear-regression information of `AncestrySpecificPower`: standardization fixes the
+second moment at one, while the MAF dependence enters through the fourth moment. -/
+noncomputable def diploidCovarianceMomentPermeability
+    (q covarianceDerivative : ℝ) : ℝ :=
+  covarianceMomentPermeability covarianceDerivative 1
+    (∑ j : Fin 3, diploidAtomMass j q * diploidAtomValue j q ^ 4)
+
+/-- **Single-locus Hardy--Weinberg information law.**  At an interior MAF, a standardized
+locus with covariance response `Γ` contributes
+
+`Γ² / (1/[2q(1-q)] - 1)`.
+
+The denominator is the variance of the squared standardized dosage.  It diverges at the
+rare-variant boundary, so equal standardized covariance responses do not imply equal
+information across the allele-frequency spectrum. -/
+theorem diploidCovarianceMomentPermeability_eq
+    (q covarianceDerivative : ℝ) (hq0 : 0 < q) (hq1 : q < 1) :
+    diploidCovarianceMomentPermeability q covarianceDerivative =
+      covarianceDerivative ^ 2 / (invHeterozygosity q - 1) := by
+  unfold diploidCovarianceMomentPermeability covarianceMomentPermeability
+    centeredSquareVarianceFromMoments
+  rw [diploid_fourth_moment q hq0 hq1]
+  ring
+
+/-- Independent panel information with locus-specific MAF, covariance response, and
+correlation-scale tagging response `η`.  The definition is deliberately diagonal:
+genotype LD between loci invalidates the sum and requires the full covariance of the
+quadratic summaries. -/
+noncomputable def diploidPanelCovarianceMomentPermeability {n : ℕ}
+    (q covarianceDerivative taggingResponse : Fin n → ℝ) : ℝ :=
+  diagonalCovarianceMomentPermeability
+    (fun i => taggingResponse i * covarianceDerivative i)
+    (fun _ => 1)
+    (fun i => ∑ j : Fin 3,
+      diploidAtomMass j (q i) * diploidAtomValue j (q i) ^ 4)
+
+/-- **Exact multi-locus design law.** Under independent loci, the panel information is
+the sum of per-locus contributions
+
+`ηᵢ² Γᵢ² / (1/[2qᵢ(1-qᵢ)] - 1)`.
+
+Thus MAF, tagging, and biological covariance response interact multiplicatively at each
+locus and add only after forming the correctly normalized information contributions. -/
+theorem diploidPanelCovarianceMomentPermeability_eq {n : ℕ}
+    (q covarianceDerivative taggingResponse : Fin n → ℝ)
+    (hq0 : ∀ i, 0 < q i) (hq1 : ∀ i, q i < 1) :
+    diploidPanelCovarianceMomentPermeability q covarianceDerivative taggingResponse =
+      ∑ i, (taggingResponse i * covarianceDerivative i) ^ 2 /
+        (invHeterozygosity (q i) - 1) := by
+  unfold diploidPanelCovarianceMomentPermeability
+    diagonalCovarianceMomentPermeability
+  apply Finset.sum_congr rfl
+  intro i _
+  simpa [diploidCovarianceMomentPermeability] using
+    diploidCovarianceMomentPermeability_eq
+      (q i) (taggingResponse i * covarianceDerivative i) (hq0 i) (hq1 i)
+
+/-- **Rare/tagged versus balanced information ratio.**  For the same unattenuated
+standardized covariance response, a one-percent-MAF locus observed at half response has
+exactly `99/19604 ≈ 0.00505` times the covariance-moment information of a balanced
+`q=1/2` locus observed perfectly.  Equivalently, matching the balanced locus requires
+`19604/99 ≈ 198.02` times as many independent observations in this named experiment. -/
+theorem onePercentMaf_halfResponse_vs_balanced_permeability
+    (covarianceDerivative : ℝ) :
+    diploidCovarianceMomentPermeability
+        (1 / 100) ((1 / 2) * covarianceDerivative) =
+      (99 / 19604 : ℝ) *
+        diploidCovarianceMomentPermeability (1 / 2) covarianceDerivative := by
+  rw [diploidCovarianceMomentPermeability_eq
+      (1 / 100) ((1 / 2) * covarianceDerivative) (by norm_num) (by norm_num),
+    diploidCovarianceMomentPermeability_eq
+      (1 / 2) covarianceDerivative (by norm_num) (by norm_num)]
+  norm_num [invHeterozygosity]
+  ring
+
 /-- **Level one, what escapes: the dispersion.**
 
 Two panels can agree exactly in mean inverse heterozygosity and differ in its variance
@@ -1822,6 +1901,14 @@ separates quotient fibres remains the continuation. -/
   `onePercentMaf_halfResponse_covariance_moment_permeability`.  This is
   a conditional law for a named response attenuation, not a claim that MAF alone fixes
   tagging quality or that every LD proxy induces the same scalar attenuation.
+  For an independent panel,
+  `diploidPanelCovarianceMomentPermeability_eq` gives the complete locus-wise law
+  `Σᵢ ηᵢ²Γᵢ²/(1/[2qᵢ(1-qᵢ)]-1)`.  Relative to a balanced, perfectly observed standardized
+  genotype, a one-percent-MAF half-response channel retains exactly `99/19604` of the
+  information, requiring `19604/99 ≈ 198.02` times the observations.  This stronger
+  comparison is to a balanced **genotype moment experiment**, not to Gaussian data and
+  not to raw-dosage regression.  Genotype LD invalidates the diagonal sum and requires the
+  covariance matrix of the quadratic summaries.
   `AncestrySpecificPower.ld_r2_matches_covariance_response_retention` fixes the convention
   bridge: a tag retaining correlation-scale response `η` has conventional LD
   `r² = η²`, so regression information and covariance permeability retain the same

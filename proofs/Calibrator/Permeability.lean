@@ -141,6 +141,75 @@ noncomputable def totalCovarianceMomentInformation
   m * covarianceMomentPermeability
     covarianceDerivative secondMoment fourthMoment
 
+/-- Total covariance-moment permeability of finitely many independent channels.  Each
+channel may have its own response and second/fourth moments.  Independence is the
+load-bearing premise: correlated quadratic summaries require their full noise covariance,
+not this diagonal sum. -/
+noncomputable def diagonalCovarianceMomentPermeability {ι : Type*} [Fintype ι]
+    (covarianceDerivative secondMoment fourthMoment : ι → ℝ) : ℝ :=
+  ∑ i, covarianceMomentPermeability
+    (covarianceDerivative i) (secondMoment i) (fourthMoment i)
+
+/-- A common linear response attenuation multiplies the information of the whole
+independent non-Gaussian panel by `η²`. -/
+theorem diagonalCovarianceMomentPermeability_derivative_scale
+    {ι : Type*} [Fintype ι]
+    (covarianceDerivative secondMoment fourthMoment : ι → ℝ) (η : ℝ) :
+    diagonalCovarianceMomentPermeability
+        (fun i => η * covarianceDerivative i) secondMoment fourthMoment =
+      η ^ 2 * diagonalCovarianceMomentPermeability
+        covarianceDerivative secondMoment fourthMoment := by
+  unfold diagonalCovarianceMomentPermeability
+  simp_rw [covarianceMomentPermeability_derivative_scale]
+  rw [Finset.mul_sum]
+
+/-- A covariance-moment channel with nonzero square-noise variance seals exactly when
+its covariance response is zero. -/
+theorem covarianceMomentPermeability_eq_zero_iff
+    {covarianceDerivative secondMoment fourthMoment : ℝ}
+    (hnoise : centeredSquareVarianceFromMoments secondMoment fourthMoment ≠ 0) :
+    covarianceMomentPermeability covarianceDerivative secondMoment fourthMoment = 0 ↔
+      covarianceDerivative = 0 := by
+  unfold covarianceMomentPermeability
+  rw [div_eq_zero_iff]
+  simp [hnoise]
+
+/-- With positive square-noise variance in every independent channel, panel moment
+permeability is zero exactly when every channel's response vanishes. -/
+theorem diagonalCovarianceMomentPermeability_eq_zero_iff
+    {ι : Type*} [Fintype ι]
+    (covarianceDerivative secondMoment fourthMoment : ι → ℝ)
+    (hnoise : ∀ i,
+      0 < centeredSquareVarianceFromMoments (secondMoment i) (fourthMoment i)) :
+    diagonalCovarianceMomentPermeability
+        covarianceDerivative secondMoment fourthMoment = 0 ↔
+      ∀ i, covarianceDerivative i = 0 := by
+  classical
+  constructor
+  · intro hsum i
+    have hnonneg : ∀ j,
+        0 ≤ covarianceMomentPermeability
+          (covarianceDerivative j) (secondMoment j) (fourthMoment j) := by
+      intro j
+      unfold covarianceMomentPermeability
+      exact div_nonneg (sq_nonneg _) (le_of_lt (hnoise j))
+    have hle : covarianceMomentPermeability
+        (covarianceDerivative i) (secondMoment i) (fourthMoment i) ≤
+        diagonalCovarianceMomentPermeability
+          covarianceDerivative secondMoment fourthMoment := by
+      unfold diagonalCovarianceMomentPermeability
+      exact Finset.single_le_sum (fun j _ => hnonneg j) (Finset.mem_univ i)
+    have hzero : covarianceMomentPermeability
+        (covarianceDerivative i) (secondMoment i) (fourthMoment i) = 0 := by
+      apply le_antisymm
+      · simpa [hsum] using hle
+      · exact hnonneg i
+    exact (covarianceMomentPermeability_eq_zero_iff
+      (ne_of_gt (hnoise i))).mp hzero
+  · intro hresponse
+    unfold diagonalCovarianceMomentPermeability
+    simp [hresponse, covarianceMomentPermeability]
+
 /-- Permeability is non-negative. -/
 theorem scalarPermeability_nonneg (covariance covarianceDerivative : ℝ) :
     0 ≤ scalarPermeability covariance covarianceDerivative := by
@@ -186,6 +255,21 @@ theorem scalarPermeability_derivative_scale
 noncomputable def diagonalPermeability {ι : Type*} [Fintype ι]
     (covariance covarianceDerivative : ι → ℝ) : ℝ :=
   ∑ i, scalarPermeability (covariance i) (covarianceDerivative i)
+
+/-- The independent non-Gaussian panel law reduces exactly to the existing independent
+Gaussian permeability when every channel has Gaussian fourth moment. -/
+theorem diagonalCovarianceMomentPermeability_gaussian
+    {ι : Type*} [Fintype ι]
+    (covariance covarianceDerivative : ι → ℝ)
+    (hcovariance : ∀ i, covariance i ≠ 0) :
+    diagonalCovarianceMomentPermeability covarianceDerivative covariance
+        (fun i => 3 * covariance i ^ 2) =
+      diagonalPermeability covariance covarianceDerivative := by
+  unfold diagonalCovarianceMomentPermeability diagonalPermeability
+  apply Finset.sum_congr rfl
+  intro i _
+  exact covarianceMomentPermeability_gaussian
+    (covariance i) (covarianceDerivative i) (hcovariance i)
 
 /-- A common tagging or assay attenuation acts on every independent completion channel
 by the same inverse-square law.  This is useful for panels in which the same call-rate,

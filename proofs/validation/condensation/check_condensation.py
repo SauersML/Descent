@@ -27,8 +27,10 @@ Checks performed
     across the predicted boundary m* = log N / c.
 9.  The covariance-channel kurtosis penalty: direct Hardy-Weinberg summation and a
     fixed-seed genotype simulation verify the exact `4901/198` variance multiplier at
-    one-percent MAF, and its multiplicative combination with inverse-square response
-    attenuation (`9802/99` at half response).
+    one-percent MAF, its multiplicative combination with inverse-square response
+    attenuation (`9802/99` at half response), and the exact independent-panel sum.  The
+    same one-percent/half-response channel retains `99/19604` of the moment information
+    of a balanced, perfectly observed standardized genotype.
 
 Run:  python3 proofs/validation/condensation/check_condensation.py
 """
@@ -315,6 +317,7 @@ def check_one_percent_covariance_penalty() -> None:
     response_fraction = 0.5
     exact_multiplier = 4901.0 / 198.0
     exact_joint_multiplier = 9802.0 / 99.0
+    exact_information_vs_balanced = 99.0 / 19604.0
     summed_multiplier = hwe_standardized_square_variance(q) / 2.0
     assert abs(summed_multiplier - exact_multiplier) < 1e-12, (
         summed_multiplier,
@@ -324,6 +327,32 @@ def check_one_percent_covariance_penalty() -> None:
     assert abs(summed_joint_multiplier - exact_joint_multiplier) < 1e-12, (
         summed_joint_multiplier,
         exact_joint_multiplier,
+    )
+    balanced_square_variance = hwe_standardized_square_variance(0.5)
+    summed_information_vs_balanced = (
+        response_fraction**2 / hwe_standardized_square_variance(q)
+    ) / (1.0 / balanced_square_variance)
+    assert abs(summed_information_vs_balanced - exact_information_vs_balanced) < 1e-12, (
+        summed_information_vs_balanced,
+        exact_information_vs_balanced,
+    )
+
+    panel_q = np.array([0.01, 0.10, 0.50])
+    panel_response = np.array([0.50, 0.80, 1.00])
+    panel_derivative = np.array([1.00, 0.70, 1.20])
+    direct_panel_information = sum(
+        (eta * derivative) ** 2 / hwe_standardized_square_variance(maf)
+        for maf, eta, derivative in zip(panel_q, panel_response, panel_derivative)
+    )
+    closed_panel_information = float(
+        np.sum(
+            (panel_response * panel_derivative) ** 2
+            / (1.0 / (2.0 * panel_q * (1.0 - panel_q)) - 1.0)
+        )
+    )
+    assert abs(direct_panel_information - closed_panel_information) < 1e-12, (
+        direct_panel_information,
+        closed_panel_information,
     )
 
     rng = np.random.default_rng(20260802)
@@ -349,6 +378,15 @@ def check_one_percent_covariance_penalty() -> None:
         "  q = 0.01, half-response joint multiplier "
         f"= {exact_joint_multiplier:.6f}; simulation {sampled_joint_multiplier:.6f} "
         f"(relative error {joint_relative_error:.3%})"
+    )
+    print(
+        "  information retained versus balanced/perfectly tagged genotype "
+        f"= {exact_information_vs_balanced:.8f} "
+        f"(sample-cost ratio {1.0 / exact_information_vs_balanced:.6f})"
+    )
+    print(
+        "  three-locus direct/closed panel information "
+        f"= {direct_panel_information:.12f} / {closed_panel_information:.12f}"
     )
 
 
