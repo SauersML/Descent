@@ -38,8 +38,9 @@ concrete bridges to the four existing modules the new results touch.
 1. `additive_score_is_subcritical` — the additive apparatus is untouched.
 2. `imputation_rescaling_cannot_repair_lattice` — a second, non-additive
    imputation discrepancy.
-3. `scree_invariant_incomplete` — the number-of-PCs choice is a convention.
-4. `mechanism_count_not_identifiable` — the number of GxE mechanisms is a convention.
+3. The number-of-PCs and GxE-mechanism-count readings, stated as readings. The three
+   theorems that once carried them here were re-exports of imported results under
+   genetics names, with no instance supplied, and are removed; see sections 4-5.
 -/
 
 open scoped BigOperators
@@ -135,66 +136,44 @@ theorem imputation_rescaling_cannot_repair_lattice (lam : ℝ) (hlam : lam ≠ 0
   ⟨hardCall_intensity_inflated, fun c V _hV => standardizedSquare_scale_invariant c V lam hlam⟩
 
 /-!
-## 4. The number of principal components is a convention
+## 4-5. Two abstract results this file used to re-export under genetics names
+
+Three theorems stood here: `scree_invariant_incomplete`,
+`pc_loadings_identifiable_of_bounded_below` and `mechanism_count_not_identifiable`.
+Each had the *identical* statement and hypotheses of an imported theorem, and a proof
+consisting of applying it:
+
+* `scree_invariant_incomplete` was `HiddenConeAmbiguity.catalogue_induces_reduction`,
+  with `inv` renamed `screeLabel`;
+* `pc_loadings_identifiable_of_bounded_below` was
+  `HiddenConeAmbiguity.rigidity_of_boundedBelowAbove`, unchanged;
+* `mechanism_count_not_identifiable` was
+  `LatentMechanismCollapse.minimal_latent_dimension_is_constant`, with `Family`
+  renamed `KernelFamily`.
+
+**All three are removed.** The genetics names asserted a domain applicability that no
+instance established. Nothing was instantiated: `Family` was never given the type of
+context-specific genotype-phenotype kernels, `screeLabel` was never given an
+eigenvalue-gap rule, and a reader could not tell a re-export from a derivation. Renaming
+each to something non-asserting would leave `foo := bar`, which is noise; the imported
+theorems are what a caller should use.
+
+The readings those names carried are still what this corpus believes, and they are
+stated here as readings rather than as theorems. If a complete scree-type invariant of a
+loading-decay profile existed it would have to separate profiles with identical complete
+second-order observables, so the number of principal components to retain is a convention
+in the sense of `Calibrator.Conventions`; `Calibrator.PCCorrectability` answers the
+different question of what correction achieves *given* one. Where the ancestry loadings
+are bounded below the latent coordinates are recoverable and the convention is forced.
+And if every non-constant family of context-specific kernels admits a dimension-one
+factorization, then minimal latent dimension is constant and so measures nothing about
+how many biological mechanisms generated the data; the repaired question is the
+boundary (Choquet-extreme) factorization, in genetics the archetypal-analysis
+requirement that mechanisms be extremal profiles rather than interior blends.
+
+Turning any of these into a theorem *about genotypes* means supplying the instance.
+None is supplied here.
 -/
-
-/-- **No scree-type invariant is complete.**
-
-A "scree invariant" is any assignment of a label to a loading-decay profile — an
-eigenvalue-gap rule, an effective rank, a broken-stick cutoff, a parallel-analysis
-threshold. If such an invariant were complete for the hidden-model equivalence, it
-would separate every pair of profiles that are genuinely inequivalent. The theorem
-says it must separate the coded profiles of any two `ℓ∞`-divergent sequences — while
-those profiles have, by `Calibrator.HiddenConeAmbiguity`, *identical* complete
-second-order observables.
-
-So a complete scree invariant would be a function of data it provably does not see.
-The number of principal components to retain is therefore a convention in the exact
-sense of `Calibrator.Conventions`, and `Calibrator.PCCorrectability` correctly answers
-the different question of what correction achieves *given* a convention. -/
-theorem scree_invariant_incomplete
-    {Invariant : Type*} (screeLabel : (ℕ → ℝ) → Invariant)
-    (hcomplete : ∀ t t', BoundedLogDistortion t t' ↔ screeLabel t = screeLabel t')
-    (B x y : ℕ → ℝ)
-    (hdiv : ∀ C : ℝ, ∃ n : ℕ, C < |x n - y n|) :
-    screeLabel (codedDecayProfile B x) ≠ screeLabel (codedDecayProfile B y) :=
-  catalogue_induces_reduction screeLabel hcomplete B x y hdiv
-
-/-- The positive half of the same dichotomy, in genetics vocabulary: if the ancestry
-loadings are bounded below — finitely many components with a bounded condition number
-— then the latent coordinates *are* recoverable and the convention is forced rather
-than chosen. This is the regime in which PC correction is an inference. -/
-theorem pc_loadings_identifiable_of_bounded_below
-    {t t' : ℕ → ℝ} {a b a' b' : ℝ}
-    (h : BoundedBelowAbove t a b) (h' : BoundedBelowAbove t' a' b') :
-    BoundedLogDistortion t t' :=
-  rigidity_of_boundedBelowAbove h h'
-
-/-!
-## 5. The number of gene-environment mechanisms is a convention
--/
-
-/-- **Mechanism count is not identifiable from context variation.**
-
-Instantiating `Calibrator.LatentMechanismCollapse.minimal_latent_dimension_is_constant`
-with `Family` = smooth families of context-specific genotype-phenotype kernels: the
-minimal latent dimension is `1` for every non-constant family, so it separates no two
-families and carries no information about how many biological mechanisms generated the
-data.
-
-The repaired question, which does have content, is the boundary (Choquet-extreme)
-factorization — in genetics, the archetypal-analysis requirement that mechanisms be
-extremal profiles rather than interior blends. -/
-theorem mechanism_count_not_identifiable
-    {KernelFamily : Type*} (admitsDim : KernelFamily → ℕ → Prop)
-    (minimalDim : KernelFamily → ℕ) (isContextInvariant : KernelFamily → Prop)
-    (hminimal : ∀ F, admitsDim F (minimalDim F))
-    (hleast : ∀ F r, admitsDim F r → minimalDim F ≤ r)
-    (hcollapse : ∀ F, admitsDim F 1)
-    (hnonzero : ∀ F, ¬ isContextInvariant F → ¬ admitsDim F 0) :
-    ∀ F, ¬ isContextInvariant F → minimalDim F = 1 :=
-  minimal_latent_dimension_is_constant admitsDim minimalDim isContextInvariant
-    hminimal hleast hcollapse hnonzero
 
 /-!
 ## 5b. Overlap is not free for genotypes
@@ -486,9 +465,17 @@ theorem gaussianKurtosisMaf_genotypeVariance :
 /-- **The standardized genotype has exactly Gaussian kurtosis at `MAF = (3 - √3)/6`.**
 
 At that frequency `E[x⁴] = 3`, so the fourth-cumulant channel cannot separate a genotype
-coordinate from a Gaussian one, and an interaction statistic whose power comes from
-fourth-cumulant separation — the two-pool witness of `Calibrator.EpistaticChaos` is the
-model case, with its limiting fourth cumulant `6` — has no hub-channel signal there.
+*coordinate* from a Gaussian one.
+
+**Do not extend that to interaction tests; the extension was measured and is refuted.**
+The sentence that stood here said an interaction statistic drawing its power from
+fourth-cumulant separation has no signal at `q*`. Simulation says the opposite: on a
+measured locus the natural fourth-order test `cum(y,y,x,x)` holds power `0.47`–`0.80`
+flat, *higher* at MAF `0.21` (`0.712`) than at `0.05` (`0.554`), with no dip. What
+happens at `q*` is that the same test, calibrated against the Gaussian surrogate, has
+type-I error `1.000` almost everywhere and `0.051` only there — `q*` is the one
+frequency at which such a test is **valid**. The blindness is real for the latent-locus
+channel and does not transfer. See the MEASURED block at `gaussianKurtosisMaf`.
 
 Read alongside the other two channels this gives a frequency-by-frequency map: symmetry
 is available only at `MAF = 1/2` (`standardizedGenotype_symmetric_iff`), the drift grows
