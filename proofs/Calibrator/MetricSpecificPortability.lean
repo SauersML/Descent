@@ -1629,6 +1629,9 @@ def LDPanelRetention.halfRetained : LDPanelRetention where
 theorem LDPanelRetention.nonempty : Nonempty LDPanelRetention :=
   ⟨LDPanelRetention.halfRetained⟩
 
+/-- Fraction of a panel's markers that survive pruning.
+
+    Empirical status: UNTESTED. -/
 noncomputable def ldPanelRetentionFraction (panel : LDPanelRetention) : ℝ :=
   (panel.retainedMarkers : ℝ) / (panel.totalMarkers : ℝ)
 
