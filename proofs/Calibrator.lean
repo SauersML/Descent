@@ -109,7 +109,6 @@ import Calibrator.UnifiedBiology
 -- closure distinguishes an orphan from a module someone else already imports;
 -- `DeploymentCeiling`, added above, was the only real one.
 import Calibrator.ResonanceSpectrum
-import Calibrator.Identification
 import Calibrator.BundleRigidity.Coverage
 import Calibrator.BundleRigidity.Cycles
 import Calibrator.BundleRigidity.DeploymentCeiling
