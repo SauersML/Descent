@@ -85,6 +85,25 @@ theorem whiteningGain_ergodic_mean_eq_of_constant (decay : ℝ) (n : ℕ) (hn : 
   simp only [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]
   field_simp
 
+/-- **The exact finite-`m` trace, boundary term included.**
+
+    The chain contributes one leading `1` and `m-1` interior summands, so
+    `κ_m = (1 + (m-1)·gain)/m`, which is the gain **minus** an `O(1/m)` boundary deficit. The
+    theorem above averages a constant and is therefore silent about that deficit; this one is
+    the statement the object actually satisfies, and it is what simulation matches.
+
+    Measured against an explicit tridiagonal inverse trace the deficit is reproduced to
+    machine precision at every `ρ` and every `m`: at `ρ = 0.9`, `gain = 9.5263`, the measured
+    `κ_m - gain` runs `-0.8526, -0.08526, -0.0008526, -8.526e-6` at `m = 10, 10², 10⁴, 10⁶`,
+    against this formula's `-(gain-1)/m` to `~1e-15`. So the convergence `κ_m → gain` is exact
+    and its rate is `1/m` with the constant `gain - 1` — which diverges as `ρ → 1`, meaning the
+    finite-panel bias is worst exactly where LD is strongest. -/
+theorem whiteningGain_finite_trace (decay : ℝ) (m : ℝ) (hm : m ≠ 0) :
+    (1 + (m - 1) * ldWhiteningGain decay) / m
+      = ldWhiteningGain decay - (ldWhiteningGain decay - 1) / m := by
+  field_simp
+  ring
+
 /-- **The summand is unbounded on the admissible range.**
 
     For every target `M` there is an admissible correlation whose whitening gain exceeds it.

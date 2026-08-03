@@ -1,0 +1,42 @@
+[
+ {
+  "m": 800,
+  "s": 0.0,
+  "t": 0.0,
+  "chunks": 4,
+  "mean": -0.0016168356918735893,
+  "sem_from_chunk_scatter": 0.004615936197858061,
+  "free_prediction": 0.0,
+  "unrotated": 5.9875
+ },
+ {
+  "m": 800,
+  "s": 1.0,
+  "t": 1.0,
+  "chunks": 4,
+  "mean": 4.994450222713157,
+  "sem_from_chunk_scatter": 0.005749123642664396,
+  "free_prediction": 4.995,
+  "unrotated": 18.9725
+ },
+ {
+  "m": 1600,
+  "s": 0.0,
+  "t": 0.0,
+  "chunks": 3,
+  "mean": 0.001385688394705734,
+  "sem_from_chunk_scatter": 0.00439187516209289,
+  "free_prediction": 0.0,
+  "unrotated": 5.99375
+ },
+ {
+  "m": 1600,
+  "s": 1.0,
+  "t": 1.0,
+  "chunks": 3,
+  "mean": 5.008134658897546,
+  "sem_from_chunk_scatter": 0.010779263766663792,
+  "free_prediction": 4.9975000000000005,
+  "unrotated": 18.98625
+ }
+]
