@@ -266,13 +266,19 @@ half, and four things only this half can see:
 
 WHAT IS REPORTED
 
-  LAUNDER_TAUTOLOGY   the conclusion is definitionally one of the premises: `P → P`
+  LAUNDER_TAUTOLOGY   the conclusion is syntactically one of the premises: `P → P`
                       under a name that claims `P`.
+  LAUNDER_DEFEQ_BRIDGE a premise and conclusion become equal only after unfolding.
+                      Reported, not fatal: named representation bridges are useful.
   LAUNDER_PROJECTION  the proof term, after stripping lambdas, is a projection or
-                      application of a bound premise.  The mathematics is the caller's.
-  LAUNDER_CERT        a parameter is a structure with Prop-valued fields and the
-                      environment holds no closed term of that type.  Conditional on a
-                      certificate the corpus never builds, and possibly vacuous.
+                      application of a bound premise.  Reported for review; not fatal
+                      by itself because elimination and representation lemmas have
+                      exactly this proof shape.
+  LAUNDER_CERT        a corpus-defined parameter structure has Prop-valued fields and
+                      the environment holds no closed term of that type.  Reported for
+                      review, not fatal by shape alone: model domains and algebraic
+                      interfaces also package laws in Prop-valued fields.  The source
+                      guard separately rejects advertised theorem carriers.
   LAUNDER_PREMISE     a Prop-valued premise, explicit or implicit or instance.  The
                       conditionality ledger: its count is the size of what is assumed.
   LAUNDER_EMPTY       a parameter type proved uninhabited, or `Empty` / `PEmpty` / `Fin 0`.
@@ -306,29 +312,41 @@ def certificateFields (env : Environment) (S : Name) : MetaM (Array Name) := do
     if isP then out := out.push f
   return out
 
-/-- Is there a closed term of type `S ..` anywhere in the environment -- that is, does
-the corpus CONSTRUCT one of these, or only consume them?
+/-- Every structure the corpus exhibits a closed term of, in ONE pass.
 
-A witness may take data parameters and may not take Prop-valued ones: a family of
-models indexed by a frequency inhabits the class, while a "witness" that first demands
-the hard theorem inhabits nothing and merely relocates the obligation. -/
-def hasWitness (env : Environment) (S : Name) : MetaM Bool := do
+`hasWitness S` used to walk `env.constants` for each `S` it was asked about.
+The environment holds the whole of Mathlib, and the walk runs
+`forallTelescopeReducing` on every constant in it, so the cost is
+(structures asked about) x (constants in Mathlib) x (one telescope each).
+
+That cost was invisible while `S.mk.inj` was passing the generated-declaration
+filter: the scan reached the 100-error ceiling and exited long before it had
+asked about many structures. With the filter corrected the scan runs to the end
+of the corpus, and at that point it does not finish inside fifteen minutes.
+
+One pass, building the set. The predicate is unchanged: a closed term of `S ..`,
+or a proof of `Nonempty (S ..)`, with no `Prop` argument in its telescope --
+a witness that itself needs a hypothesis discharged is not a closed term. Thus
+this distinguishes structures the corpus constructs from structures it only
+consumes without relocating the mathematical obligation into a premise. -/
+def witnessedStructures (env : Environment) : MetaM NameSet := do
+  let mut out : NameSet := {}
   for (n, ci) in env.constants.toList do
     unless Check.isOurs n do continue
     unless ci.isDefinition || ci.isCtor || ci.isTheorem do continue
     if n.isInternalDetail then continue
-    let ok ← forallTelescopeReducing ci.type fun args body ↦ do
+    let s? ← forallTelescopeReducing ci.type fun args body ↦ do
       -- Either a term of `S ..`, or a proof of `Nonempty (S ..)`.  A theorem witnesses
       -- a Prop-valued structure; a `Nonempty` proof witnesses a data one.
       let body := match body.getAppFn.constName? with
         | some ``Nonempty => (body.getAppArgs[0]?).getD body
         | _ => body
-      if Check.headConst? body != some S then return false
+      let some h := Check.headConst? body | return none
       for a in args do
-        if ← isProp (← inferType a) then return false
-      return true
-    if ok then return true
-  return false
+        if ← isProp (← inferType a) then return none
+      return some h
+    if let some h := s? then out := out.insert h
+  return out
 
 /-- After stripping leading lambdas, is the proof term an application or projection of a
 BOUND VARIABLE?  Then the mathematics arrived as an argument. -/
@@ -492,6 +510,9 @@ run_cmd do
   let mut premises := 0
   -- structure name -> (Prop fields, is inhabited); computed once, not per use site
   let mut certCache : Std.HashMap Name (Array Name × Bool) := {}
+  -- The inhabited half comes from one environment pass rather than one per
+  -- structure; see `Laundering.witnessedStructures` for why that matters.
+  let witnessed ← liftTermElabM <| Laundering.witnessedStructures env
 
   for (name, ci) in env.constants.toList do
     unless isOurs name do continue
@@ -511,10 +532,15 @@ run_cmd do
           let nm := (← a.fvarId!.getUserName)
           if ← isProp ty then
             prems := prems + 1
-            -- TAUTOLOGY: this premise IS the conclusion.
-            if ← isDefEq ty concl then
+            -- A literal P → P is fatal.  Definitional equality after unfolding
+            -- is not: representation bridges deliberately expose the same fact
+            -- through two public interfaces.
+            if ty == concl then
               fs := fs.push ⟨"LAUNDER_TAUTOLOGY", true, mod, name,
                 s!"premise `{nm}` is the conclusion; this proves P → P"⟩
+            else if ← isDefEq ty concl then
+              fs := fs.push ⟨"LAUNDER_DEFEQ_BRIDGE", false, mod, name,
+                s!"premise `{nm}` and conclusion agree after unfolding"⟩
             else
               let kind := match bi with
                 | .instImplicit => "instance"
@@ -543,13 +569,12 @@ run_cmd do
                   | some e => pure e
                   | none => do
                       let flds ← Laundering.certificateFields env h
-                      let wit ← Laundering.hasWitness env h
-                      let e := (flds, wit)
+                      let e := (flds, witnessed.contains h)
                       cache := cache.insert h e
                       pure e
                 let (flds, wit) := entry
                 if !flds.isEmpty && !wit then
-                  fs := fs.push ⟨"LAUNDER_CERT", true, mod, name,
+                  fs := fs.push ⟨"LAUNDER_CERT", false, mod, name,
                     s!"parameter `{nm} : {h}` bundles the premises {flds.toList}, and no \
                        closed term of `{h}` exists in the corpus: nothing shows this \
                        theorem is about anything"⟩
@@ -561,7 +586,7 @@ run_cmd do
     -- PROJECTION: the proof term bottoms out in one of its own parameters.
     if let some val := ci.value? then
       if Laundering.endsInParameter val then
-        findings := findings.push ⟨"LAUNDER_PROJECTION", true, mod, name,
+        findings := findings.push ⟨"LAUNDER_PROJECTION", false, mod, name,
           "proof term is an application or projection of a parameter"⟩
 
   let fatal := findings.filter (·.fatal)
