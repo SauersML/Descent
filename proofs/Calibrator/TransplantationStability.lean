@@ -282,6 +282,14 @@ theorem bilinear_le_of_unit {n : ℕ} {E : Matrix (Fin (n + 1)) (Fin (n + 1)) �
   rcases abs_cases (u ⬝ᵥ (E *ᵥ v)) with ⟨heq, _⟩ | ⟨heq, _⟩ <;> rw [heq] <;>
     linarith [h1.1, h1.2, h2.1, h2.2]
 
+/-- Scaling the left argument of the bilinear form. -/
+theorem bilinear_smul_left {m : ℕ} (E : Matrix (Fin m) (Fin m) ℝ) (t : ℝ)
+    (u w : Fin m → ℝ) :
+    (fun i ↦ t * u i) ⬝ᵥ (E *ᵥ w) = t * (u ⬝ᵥ (E *ᵥ w)) := by
+  simp only [dotProduct, Matrix.mulVec, Finset.mul_sum]
+  refine Finset.sum_congr rfl fun i _ ↦ ?_
+  refine Finset.sum_congr rfl fun j _ ↦ by ring
+
 /-- Scaling the right argument of the bilinear form. -/
 theorem bilinear_smul_right {m : ℕ} (E : Matrix (Fin m) (Fin m) ℝ) (t : ℝ)
     (u w : Fin m → ℝ) :
@@ -355,7 +363,92 @@ theorem excess_le_perturbation_mul_misalignment {n : ℕ}
     (hmin : ∀ v : Fin (n + 1) → ℝ, (∑ i, v i ^ 2) = 1 →
       perturbedEnergy μ E c ≤ perturbedEnergy μ E v) :
     spectralEnergy μ c - μ 0 ≤ 2 * Real.sqrt 2 * δ * Real.sqrt (misalignmentSq c) := by
-  sorry
+  classical
+  set e : Fin (n + 1) → ℝ := fun i ↦ if i = 0 then (1 : ℝ) else 0 with he
+  set w : Fin (n + 1) → ℝ := fun i ↦ if i = 0 then (0 : ℝ) else c i with hw
+  set s : ℝ := misalignmentSq c with hs
+  have hsnn : 0 ≤ s := Finset.sum_nonneg fun i _ ↦ sq_nonneg _
+  have heunit : ∑ i, e i ^ 2 = 1 := by simp [he, Finset.sum_ite_eq']
+  have hwsum : ∑ i, w i ^ 2 = s := by
+    rw [hs, misalignmentSq,
+      ← Finset.sum_erase_add Finset.univ (fun i ↦ w i ^ 2)
+        (Finset.mem_univ (0 : Fin (n + 1)))]
+    have h0 : w 0 ^ 2 = 0 := by simp [hw]
+    rw [h0, add_zero]
+    refine Finset.sum_congr rfl fun i hi ↦ ?_
+    have hne : i ≠ 0 := Finset.ne_of_mem_erase hi
+    simp [hw, hne]
+  have hdecomp : c = fun i ↦ c 0 * e i + w i := by
+    funext i
+    by_cases h0 : i = 0 <;> simp [he, hw, h0]
+  have halpha : c 0 ^ 2 + s = 1 := by
+    rw [← hunit, hs, misalignmentSq,
+      ← Finset.sum_erase_add _ _ (Finset.mem_univ (0 : Fin (n + 1)))]
+    ring
+  -- minimality against the ground direction
+  have hcomp := hmin e heunit
+  have heenergy : spectralEnergy μ e = μ 0 := by
+    simp [spectralEnergy, he, Finset.sum_ite_eq']
+  unfold perturbedEnergy at hcomp
+  rw [heenergy] at hcomp
+  -- expand the perturbation quadratic form along the decomposition
+  have hexp : c ⬝ᵥ (E *ᵥ c)
+      = c 0 ^ 2 * (e ⬝ᵥ (E *ᵥ e)) + 2 * (c 0 * (e ⬝ᵥ (E *ᵥ w))) + w ⬝ᵥ (E *ᵥ w) := by
+    conv_lhs => rw [hdecomp]
+    rw [quadForm_add hEsymm (fun i ↦ c 0 * e i) w, quadForm_smul E (c 0) e,
+      bilinear_smul_left E (c 0) e w]
+  -- the three pieces
+  have hEe : |e ⬝ᵥ (E *ᵥ e)| ≤ δ := hEbound e heunit
+  have hEw : |w ⬝ᵥ (E *ᵥ w)| ≤ δ * s := by
+    have := quadForm_le_mul_sumSq E δ hEbound w
+    rwa [hwsum] at this
+  have hcross : |e ⬝ᵥ (E *ᵥ w)| ≤ δ * Real.sqrt s := by
+    rcases eq_or_lt_of_le hsnn with hzero | hpos
+    · have hw0 : w = fun _ ↦ (0 : ℝ) := by
+        funext i
+        have hsum : ∑ j, w j ^ 2 = 0 := by rw [hwsum, ← hzero]
+        have := (Finset.sum_eq_zero_iff_of_nonneg
+          (fun j _ ↦ sq_nonneg (w j))).mp hsum i (Finset.mem_univ i)
+        exact pow_eq_zero_iff (n := 2) (by norm_num) |>.mp this
+      rw [hw0]
+      simp [dotProduct, Matrix.mulVec, ← hzero]
+    · have hsq : 0 < Real.sqrt s := Real.sqrt_pos.mpr hpos
+      set z : Fin (n + 1) → ℝ := fun i ↦ (Real.sqrt s)⁻¹ * w i with hz
+      have hzunit : ∑ i, z i ^ 2 = 1 := by
+        rw [hz, sumSq_smul, hwsum, inv_pow, Real.sq_sqrt (le_of_lt hpos)]
+        field_simp
+      have hbz := bilinear_le_of_unit hEsymm hEbound e z heunit hzunit
+      have hzw : e ⬝ᵥ (E *ᵥ z) = (Real.sqrt s)⁻¹ * (e ⬝ᵥ (E *ᵥ w)) := by
+        rw [hz]; exact bilinear_smul_right E _ e w
+      rw [hzw, abs_mul, abs_of_pos (by positivity : (0:ℝ) < (Real.sqrt s)⁻¹)] at hbz
+      calc |e ⬝ᵥ (E *ᵥ w)| = Real.sqrt s * ((Real.sqrt s)⁻¹ * |e ⬝ᵥ (E *ᵥ w)|) := by
+            field_simp
+        _ ≤ Real.sqrt s * δ := mul_le_mul_of_nonneg_left hbz (le_of_lt hsq)
+        _ = δ * Real.sqrt s := by ring
+  -- assemble
+  have hsqrt_sq : Real.sqrt s ^ 2 = s := Real.sq_sqrt hsnn
+  have hsqrtnn : 0 ≤ Real.sqrt s := Real.sqrt_nonneg s
+  have hab : Real.sqrt s + |c 0| ≤ Real.sqrt 2 := sqrt_add_abs_le_sqrt_two hsnn halpha
+  have hEe' := abs_le.mp hEe
+  have hEw' := abs_le.mp hEw
+  have habs0 : |c 0 * (e ⬝ᵥ (E *ᵥ w))| ≤ |c 0| * (δ * Real.sqrt s) := by
+    rw [abs_mul]
+    exact mul_le_mul_of_nonneg_left hcross (abs_nonneg _)
+  have habs0' := abs_le.mp habs0
+  have hEeq : c 0 ^ 2 = 1 - s := by linarith
+  have hterm1 : s * (e ⬝ᵥ (E *ᵥ e)) ≤ s * δ := mul_le_mul_of_nonneg_left hEe'.2 hsnn
+  have hfinal : 2 * δ * s + 2 * (|c 0| * (δ * Real.sqrt s))
+      ≤ 2 * Real.sqrt 2 * δ * Real.sqrt s := by
+    have hcoef : 0 ≤ 2 * δ * Real.sqrt s := by positivity
+    have hrw : 2 * δ * s + 2 * (|c 0| * (δ * Real.sqrt s))
+        = 2 * δ * Real.sqrt s * (Real.sqrt s + |c 0|) := by
+      linear_combination (-(2 * δ)) * hsqrt_sq
+    rw [hrw]
+    calc 2 * δ * Real.sqrt s * (Real.sqrt s + |c 0|)
+        ≤ 2 * δ * Real.sqrt s * Real.sqrt 2 := mul_le_mul_of_nonneg_left hab hcoef
+      _ = 2 * Real.sqrt 2 * δ * Real.sqrt s := by ring
+  rw [hEeq] at hexp
+  linarith [hcomp, hexp, hterm1, habs0'.1, habs0'.2, hEw'.1, hfinal]
 
 /-! ## The elimination step -/
 
