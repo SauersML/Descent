@@ -329,6 +329,32 @@ theorem disjoint_riskProfiles_belowLevel :
   have hge : E.minimaxRisk ≤ E.worstRisk δ := csInf_le hbdd ⟨δ, rfl⟩
   linarith
 
+/-- The half-space below a level is open: a finite intersection of coordinate half-spaces. -/
+theorem isOpen_belowLevel (v : ℝ) :
+    IsOpen (belowLevel (parameterCount := parameterCount) v) := by
+  have hset : belowLevel (parameterCount := parameterCount) v
+      = ⋂ θ, {y : Fin (parameterCount + 1) → ℝ | y θ < v} := by
+    ext y
+    simp [belowLevel]
+  rw [hset]
+  exact isOpen_iInter_of_finite fun θ ↦ isOpen_lt (continuous_apply θ) continuous_const
+
+/-- A continuous functional on a finite product of lines is its coordinate expansion.
+
+    This is what lets a separating functional be read as a weight vector on parameters, and
+    hence normalised to a prior. -/
+theorem apply_eq_sum_coef
+    (f : (Fin (parameterCount + 1) → ℝ) →L[ℝ] ℝ) (y : Fin (parameterCount + 1) → ℝ) :
+    f y = ∑ θ, y θ * f (Pi.single θ (1 : ℝ)) := by
+  conv_lhs => rw [← Finset.univ_sum_single y]
+  rw [map_sum]
+  refine Finset.sum_congr rfl fun θ _ ↦ ?_
+  have hsingle : (Pi.single θ (y θ) : Fin (parameterCount + 1) → ℝ)
+      = (y θ) • (Pi.single θ (1 : ℝ) : Fin (parameterCount + 1) → ℝ) := by
+    funext j
+    by_cases h : j = θ <;> simp [Pi.single_apply, h]
+  rw [hsingle, map_smul, smul_eq_mul]
+
 /-- **The equalizer theorem: a constant-risk Bayes rule closes duality.**
 
     If a rule has the same risk at every parameter value and is Bayes against some prior,
