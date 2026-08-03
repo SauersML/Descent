@@ -561,6 +561,38 @@ theorem onePercentMaf_halfResponse_covariance_estimator_variance
         gaussianCovarianceTangentEstimatorVariance m 1 covarianceDerivative := by
       norm_num [invHeterozygosity]
 
+/-- **The same joint law on the information scale.**  A one-percent-MAF covariance
+channel retaining half the deployment-relevant response has exactly `99/9802 ≈ 0.0101`
+times the order-two information of a perfectly tagged Gaussian channel with the same
+unattenuated response.  Thus the approximately `99×` sample-cost law above is not a
+Gaussian-score heuristic: it is the reciprocal information of the named non-Gaussian
+covariance-moment experiment. -/
+theorem onePercentMaf_halfResponse_covariance_moment_permeability
+    (covarianceDerivative : ℝ) :
+    covarianceMomentPermeability ((1 / 2) * covarianceDerivative) 1
+        (∑ j : Fin 3,
+          diploidAtomMass j (1 / 100) * diploidAtomValue j (1 / 100) ^ 4) =
+      (99 / 9802 : ℝ) * scalarPermeability 1 covarianceDerivative := by
+  rw [diploid_fourth_moment (1 / 100) (by norm_num) (by norm_num)]
+  calc
+    _ = (1 / 2) ^ 2 * covarianceMomentPermeability covarianceDerivative 1
+        (invHeterozygosity (1 / 100)) := by
+      exact covarianceMomentPermeability_derivative_scale covarianceDerivative 1
+        (invHeterozygosity (1 / 100)) (1 / 2)
+    _ = (1 / 2) ^ 2 * (2 / (invHeterozygosity (1 / 100) - 1)) *
+        scalarPermeability 1 covarianceDerivative := by
+      have hkurtosis : covarianceMomentPermeability covarianceDerivative 1
+          (invHeterozygosity (1 / 100)) =
+          (2 / (invHeterozygosity (1 / 100) - 1)) *
+            scalarPermeability 1 covarianceDerivative := by
+        simpa using covarianceMomentPermeability_kurtosis_eq_gaussian_factor
+          1 covarianceDerivative (invHeterozygosity (1 / 100))
+          (by norm_num) (by norm_num [invHeterozygosity])
+      rw [hkurtosis]
+      ring
+    _ = (99 / 9802 : ℝ) * scalarPermeability 1 covarianceDerivative := by
+      norm_num [invHeterozygosity]
+
 /-- **Level one, what escapes: the dispersion.**
 
 Two panels can agree exactly in mean inverse heterozygosity and differ in its variance
@@ -1767,7 +1799,11 @@ when estimator noise separates quotient fibres is the continuation, not a theore
   exactly `1/(2mp)`, matching the permeability simulator's unit-Hessian loss
   `½‖error‖²`. Outside Gaussianity,
   `covarianceScoreInformation_kurtosis` gives the fourth-moment correction and labels it a
-  quasi-score variance rather than silently calling it likelihood information.
+  quasi-score variance rather than silently calling it likelihood information.  The
+  distribution-robust replacement is now explicit:
+  `covarianceMomentPermeability = Γ²/Var(X²)`, and
+  `totalCovarianceMomentInformation_mul_estimatorVariance` proves exact reciprocal
+  variance for the named covariance-moment experiment without a Gaussian likelihood.
   `diploid_covariance_estimator_variance_eq_gaussian_factor` specializes the corresponding
   sampling law to standardized Hardy--Weinberg dosage: its covariance-estimation variance
   is inflated by exactly `(1/[2q(1-q)]-1)/2`, which diverges at the rare-variant boundary.
@@ -1776,6 +1812,8 @@ when estimator noise separates quotient fibres is the continuation, not a theore
   `onePercentMaf_halfResponse_covariance_estimator_variance` gives the portability-design
   consequence: one-percent MAF with half-strength tagging costs exactly
   `9802/99 ≈ 99.01` times the Gaussian, perfectly tagged covariance experiment.  This is
+  equivalently an information retention of exactly `99/9802`, proved by
+  `onePercentMaf_halfResponse_covariance_moment_permeability`.  This is
   a conditional law for a named response attenuation, not a claim that MAF alone fixes
   tagging quality or that every LD proxy induces the same scalar attenuation.
   Correlated probes are now handled by

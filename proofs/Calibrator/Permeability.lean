@@ -83,6 +83,64 @@ theorem covarianceScoreInformation_kurtosis
   field_simp [hcovariance]
   ring
 
+/-! ## Distribution-robust covariance-moment permeability -/
+
+/-- **Permeability of the named covariance-moment experiment.**  A centered-square
+summary has noise variance `Var(X²)` and response `Γ`, so its local signal-to-noise
+information is `Γ² / Var(X²)`.
+
+Unlike `covarianceScoreInformationFromMoments`, this is not the variance of a Gaussian
+quasi-score applied to non-Gaussian data.  It is the exact reciprocal-variance geometry
+of the method-of-moments covariance estimator.  This is the relevant order-two design
+quantity for discrete genotype, haplotype, burden, and ancestry-summary channels when
+only their second and fourth moments are being used. -/
+noncomputable def covarianceMomentPermeability
+    (covarianceDerivative secondMoment fourthMoment : ℝ) : ℝ :=
+  covarianceDerivative ^ 2 /
+    centeredSquareVarianceFromMoments secondMoment fourthMoment
+
+/-- The covariance-moment permeability of a Gaussian coordinate is exactly the scalar
+Gaussian permeability already used by the completed-channel theory. -/
+theorem covarianceMomentPermeability_gaussian
+    (covariance covarianceDerivative : ℝ) (hcovariance : covariance ≠ 0) :
+    covarianceMomentPermeability covarianceDerivative covariance
+        (3 * covariance ^ 2) =
+      scalarPermeability covariance covarianceDerivative := by
+  unfold covarianceMomentPermeability scalarPermeability
+  rw [centeredSquareVariance_gaussian]
+  field_simp [hcovariance]
+
+/-- For fourth-moment ratio `κ`, covariance-moment information is
+`2/(κ-1)` times Gaussian permeability at the same covariance response.  Heavy tails
+therefore reduce information; this is the reciprocal counterpart of the estimator-
+variance inflation law. -/
+theorem covarianceMomentPermeability_kurtosis_eq_gaussian_factor
+    (covariance covarianceDerivative kurtosis : ℝ)
+    (hcovariance : covariance ≠ 0) (hkurtosis : kurtosis ≠ 1) :
+    covarianceMomentPermeability covarianceDerivative covariance
+        (kurtosis * covariance ^ 2) =
+      (2 / (kurtosis - 1)) *
+        scalarPermeability covariance covarianceDerivative := by
+  unfold covarianceMomentPermeability centeredSquareVarianceFromMoments
+    scalarPermeability
+  field_simp [hcovariance, sub_ne_zero.mpr hkurtosis]
+
+/-- Linear attenuation of the covariance response reduces distribution-robust moment
+permeability quadratically, independently of the feature's fourth moment. -/
+theorem covarianceMomentPermeability_derivative_scale
+    (covarianceDerivative secondMoment fourthMoment η : ℝ) :
+    covarianceMomentPermeability (η * covarianceDerivative) secondMoment fourthMoment =
+      η ^ 2 * covarianceMomentPermeability
+        covarianceDerivative secondMoment fourthMoment := by
+  unfold covarianceMomentPermeability
+  ring
+
+/-- Information in `m` independent covariance-moment summaries. -/
+noncomputable def totalCovarianceMomentInformation
+    (m covarianceDerivative secondMoment fourthMoment : ℝ) : ℝ :=
+  m * covarianceMomentPermeability
+    covarianceDerivative secondMoment fourthMoment
+
 /-- Permeability is non-negative. -/
 theorem scalarPermeability_nonneg (covariance covarianceDerivative : ℝ) :
     0 ≤ scalarPermeability covariance covarianceDerivative := by
@@ -281,6 +339,20 @@ noncomputable def covarianceTangentEstimatorVarianceFromMoments
     (m covarianceDerivative secondMoment fourthMoment : ℝ) : ℝ :=
   centeredSquareVarianceFromMoments secondMoment fourthMoment /
     (m * covarianceDerivative ^ 2)
+
+/-- **Exact non-Gaussian information--variance reciprocity.** For the named
+covariance-moment experiment, total moment permeability times the known-mean tangent
+estimator variance is one.  No Gaussian likelihood or kurtosis approximation enters. -/
+theorem totalCovarianceMomentInformation_mul_estimatorVariance
+    (m covarianceDerivative secondMoment fourthMoment : ℝ)
+    (hm : m ≠ 0) (hderivative : covarianceDerivative ≠ 0)
+    (hnoise : centeredSquareVarianceFromMoments secondMoment fourthMoment ≠ 0) :
+    totalCovarianceMomentInformation m covarianceDerivative secondMoment fourthMoment *
+        covarianceTangentEstimatorVarianceFromMoments
+          m covarianceDerivative secondMoment fourthMoment = 1 := by
+  unfold totalCovarianceMomentInformation covarianceMomentPermeability
+    covarianceTangentEstimatorVarianceFromMoments
+  field_simp [hm, hderivative, hnoise]
 
 /-- Variance of the known-mean Gaussian method-of-moments estimator for a one-dimensional
 covariance tangent, based on `m` independent draws. Since `Var(X²)=2Σ²`, dividing the
