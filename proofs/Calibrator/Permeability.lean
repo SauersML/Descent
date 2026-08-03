@@ -1,5 +1,6 @@
 import Mathlib
 import Calibrator.DGP
+import Calibrator.EnsembleChannel
 
 namespace Calibrator
 
@@ -21,6 +22,12 @@ The known-mean centered Gaussian covariance experiment is derived below from its
 and fourth moments, including its exact information--variance constant. No CLT-to-LAN
 transfer, Edgeworth hierarchy, universal support-floor model, or general minimax constant
 is asserted. Those require a separately named experiment and uniform regularity.
+
+The module also contains one exact direction-sensitive completion: the two-orientation
+binary transition experiment from `EnsembleChannel`.  Every order-free readout collapses
+the two orientations, while the ordered arrow has unit response, variance `1-θ²`, and
+per-pair permeability `1/(1-θ²)`.  This supplies a concrete haplotype/ancestry-transition
+assay law without promoting it to a theorem about arbitrary non-reversible chains.
 -/
 
 open scoped BigOperators
@@ -85,6 +92,12 @@ theorem covarianceScoreInformation_kurtosis
 
 /-! ## Distribution-robust covariance-moment permeability -/
 
+/-- Response-to-noise permeability of a scalar moment experiment.  If a retained summary
+has local mean derivative `Γ` and variance `V`, then averaging independent copies estimates
+the tangent with reciprocal-variance information `Γ²/V`. -/
+noncomputable def momentPermeability (response noiseVariance : ℝ) : ℝ :=
+  response ^ 2 / noiseVariance
+
 /-- **Permeability of the named covariance-moment experiment.**  A centered-square
 summary has noise variance `Var(X²)` and response `Γ`, so its local signal-to-noise
 information is `Γ² / Var(X²)`.
@@ -98,6 +111,46 @@ noncomputable def covarianceMomentPermeability
     (covarianceDerivative secondMoment fourthMoment : ℝ) : ℝ :=
   covarianceDerivative ^ 2 /
     centeredSquareVarianceFromMoments secondMoment fourthMoment
+
+/-- Covariance-moment permeability is the generic scalar moment law applied to the
+centered-square channel. -/
+theorem covarianceMomentPermeability_eq_momentPermeability
+    (covarianceDerivative secondMoment fourthMoment : ℝ) :
+    covarianceMomentPermeability covarianceDerivative secondMoment fourthMoment =
+      momentPermeability covarianceDerivative
+        (centeredSquareVarianceFromMoments secondMoment fourthMoment) := rfl
+
+/-! ### Exact permeability of the two-orientation arrow experiment -/
+
+/-- Per-ordered-pair permeability for the binary orientation experiment from
+`EnsembleChannel`.  The ordered arrow has unit mean response and variance `1 - θ²`. -/
+noncomputable def binaryOrientationArrowPermeability (θ : ℝ) : ℝ :=
+  momentPermeability 1 (binaryOrientationArrowVariance θ)
+
+/-- **Closed arrow information law.** One ordered adjacent pair carries permeability
+`1/(1-θ²)` for the orientation-imbalance coordinate.  This is an exact law for the named
+two-orientation experiment, not a universal claim about arbitrary non-reversible chains. -/
+theorem binaryOrientationArrowPermeability_eq (θ : ℝ) :
+    binaryOrientationArrowPermeability θ = 1 / (1 - θ ^ 2) := by
+  simp [binaryOrientationArrowPermeability, momentPermeability,
+    binaryOrientationArrowVariance]
+
+/-- At the reversible center `θ = 0`, one ordered pair carries one unit of arrow
+information in the natural normalization. -/
+theorem binaryOrientationArrowPermeability_zero :
+    binaryOrientationArrowPermeability 0 = 1 := by
+  norm_num [binaryOrientationArrowPermeability, momentPermeability,
+    binaryOrientationArrowVariance]
+
+/-- `m` independent ordered pairs carry `m/(1-θ²)` total arrow permeability. -/
+noncomputable def totalBinaryOrientationArrowPermeability (m θ : ℝ) : ℝ :=
+  m * binaryOrientationArrowPermeability θ
+
+theorem totalBinaryOrientationArrowPermeability_eq (m θ : ℝ) :
+    totalBinaryOrientationArrowPermeability m θ = m / (1 - θ ^ 2) := by
+  rw [totalBinaryOrientationArrowPermeability,
+    binaryOrientationArrowPermeability_eq]
+  ring
 
 /-- The covariance-moment permeability of a Gaussian coordinate is exactly the scalar
 Gaussian permeability already used by the completed-channel theory. -/
@@ -559,6 +612,24 @@ theorem augmented_informationPerUnitCost_gt_iff
     rw [div_lt_div_iff₀ hbaseCost haddedCost] at h
     rw [div_lt_div_iff₀ hbaseCost (add_pos hbaseCost haddedCost)]
     nlinarith
+
+/-- **Ordered-transition assay threshold.** Adding one binary arrow readout per unit is
+worth its acquisition cost exactly when its permeability per added cost exceeds the
+baseline experiment's information per cost.  This turns the one-versus-two-unit arrow
+distinction into an actionable study-design comparison. -/
+theorem binaryOrientationArrowAssay_moreEfficient_iff
+    (baseInformation baseCost arrowCost θ : ℝ)
+    (hbaseCost : 0 < baseCost) (harrowCost : 0 < arrowCost) :
+    informationPerUnitCost baseInformation baseCost <
+        informationPerUnitCost
+          (baseInformation + binaryOrientationArrowPermeability θ)
+          (baseCost + arrowCost) ↔
+      informationPerUnitCost baseInformation baseCost <
+        informationPerUnitCost (1 / (1 - θ ^ 2)) arrowCost := by
+  rw [← binaryOrientationArrowPermeability_eq]
+  exact augmented_informationPerUnitCost_gt_iff
+    baseInformation (binaryOrientationArrowPermeability θ) baseCost arrowCost
+      hbaseCost harrowCost
 
 /-- Conditional information supplied by the second correlated moment probe. -/
 noncomputable def twoChannelMomentInnovationInformation

@@ -138,6 +138,67 @@ theorem twoUnitArrow_distinguishes_orientation {α : Type*} (f g : α → ℝ)
   apply harrow
   linarith
 
+/-! ### A two-orientation transition experiment -/
+
+/-- Indicator of the first state in the binary transition model. -/
+noncomputable def binaryFirstAnnotation (x : Bool) : ℝ := if x then 0 else 1
+
+/-- Indicator of the second state in the binary transition model. -/
+noncomputable def binarySecondAnnotation (x : Bool) : ℝ := if x then 1 else 0
+
+/-- The forward binary transition has arrow `+1`. -/
+theorem binaryTransitionArrow_forward :
+    twoUnitArrow binaryFirstAnnotation binarySecondAnnotation false true = 1 := by
+  norm_num [twoUnitArrow, binaryFirstAnnotation, binarySecondAnnotation]
+
+/-- The reversed binary transition has arrow `-1`. -/
+theorem binaryTransitionArrow_reverse :
+    twoUnitArrow binaryFirstAnnotation binarySecondAnnotation true false = -1 := by
+  norm_num [twoUnitArrow, binaryFirstAnnotation, binarySecondAnnotation]
+
+/-- Ordered-pair arrow readout, extended by zero away from two-unit panels. -/
+noncomputable def binaryTransitionArrowStatistic (xs : List Bool) : ℝ :=
+  match xs with
+  | [x₀, x₁] => twoUnitArrow binaryFirstAnnotation binarySecondAnnotation x₀ x₁
+  | _ => 0
+
+/-- Mean of a statistic in the two-orientation experiment.  The forward orientation has
+weight `(1 + θ)/2` and the reverse orientation `(1 - θ)/2`; `|θ| ≤ 1` is needed only when
+interpreting those algebraic weights as probabilities. -/
+noncomputable def binaryOrientationStatisticMean
+    (statistic : List Bool → ℝ) (θ : ℝ) : ℝ :=
+  ((1 + θ) / 2) * statistic [false, true] +
+    ((1 - θ) / 2) * statistic [true, false]
+
+/-- **Order-free wall in the named experiment.** The expectation of every order-free
+statistic is independent of the orientation imbalance `θ`.  Pooling more such unordered
+pairs can estimate the common value more precisely but cannot create an arrow response. -/
+theorem binaryOrientation_orderFree_mean
+    {statistic : List Bool → ℝ} (hstatistic : IsOrderFreeStatistic statistic) (θ : ℝ) :
+    binaryOrientationStatisticMean statistic θ = statistic [false, true] := by
+  have hswap := orderFreeStatistic_pair_swap hstatistic false true
+  unfold binaryOrientationStatisticMean
+  rw [← hswap]
+  ring
+
+/-- The ordered arrow has mean exactly `θ` in the two-orientation experiment. -/
+theorem binaryOrientation_arrow_mean (θ : ℝ) :
+    binaryOrientationStatisticMean binaryTransitionArrowStatistic θ = θ := by
+  norm_num [binaryOrientationStatisticMean, binaryTransitionArrowStatistic,
+    twoUnitArrow, binaryFirstAnnotation, binarySecondAnnotation]
+  ring
+
+/-- Since the ordered arrow is always `±1`, its variance at orientation imbalance `θ` is
+`1 - θ²`. -/
+noncomputable def binaryOrientationArrowVariance (θ : ℝ) : ℝ := 1 - θ ^ 2
+
+/-- The arrow variance is positive in the interior probability model `|θ| < 1`. -/
+theorem binaryOrientationArrowVariance_pos {θ : ℝ} (hθ : |θ| < 1) :
+    0 < binaryOrientationArrowVariance θ := by
+  unfold binaryOrientationArrowVariance
+  have hbounds := abs_lt.mp hθ
+  nlinarith
+
 /-- Total squared deployment loss for a scalar spectral coordinate across a finite target
 ensemble. The vector-valued/bandwise identity follows by summing this theorem by band. -/
 noncomputable def ensembleSquaredLoss {ι : Type*} [Fintype ι]

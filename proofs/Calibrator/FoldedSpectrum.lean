@@ -1997,10 +1997,13 @@ readout has mean independent of the forward/reverse imbalance `θ`, while
 `binaryOrientationArrowVariance_pos` gives variance `1 - θ² > 0` for `|θ| < 1`.
 `Permeability.binaryOrientationArrowPermeability_eq` therefore yields the exact per-pair
 law `p(θ) = 1/(1-θ²)`, with one information unit at the reversible center and `m`-pair
-information `m/(1-θ²)`.  This is the first non-Gaussian, direction-sensitive permeability
-calculation in the strand.  It says exactly what a deployment study can buy by retaining
-an oriented adjacent haplotype/ancestry transition; extension to a multistate chain still
-requires its transition law and noise covariance.
+information `m/(1-θ²)`. `binaryOrientationArrowAssay_moreEfficient_iff` then gives the
+fixed-budget assay rule: retain the ordered transition exactly when this arrow information
+per added cost exceeds the baseline design's information per cost.  This is the first
+non-Gaussian, direction-sensitive permeability calculation in the strand.  It says exactly
+what a deployment study can buy by retaining an oriented adjacent haplotype/ancestry
+transition; extension to a multistate chain still requires its transition law and noise
+covariance.
 
 /-! ### 14b. Per-target invisibility and compound prediction
 
