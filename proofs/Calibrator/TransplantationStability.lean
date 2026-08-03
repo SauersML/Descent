@@ -224,12 +224,18 @@ noncomputable def approxDesignValue (δ : ℝ) (i : Fin 2) : ℝ := if i = 0 the
 /-- The approximate model never undervalues a design by more than `δ`. -/
 theorem approxDesignValue_lower (δ : ℝ) (hδ : 0 ≤ δ) (i : Fin 2) :
     trueDesignValue δ i - δ ≤ approxDesignValue δ i := by
-  by_cases h : i = 0 <;> simp [trueDesignValue, approxDesignValue, h] <;> linarith
+  by_cases h : i = 0
+  · simp [trueDesignValue, approxDesignValue, h]
+  · simp [trueDesignValue, approxDesignValue, h]
+    linarith
 
 /-- The approximate model never overvalues a design by more than `δ`. -/
 theorem approxDesignValue_upper (δ : ℝ) (hδ : 0 ≤ δ) (i : Fin 2) :
     approxDesignValue δ i ≤ trueDesignValue δ i + δ := by
-  by_cases h : i = 0 <;> simp [trueDesignValue, approxDesignValue, h] <;> linarith
+  by_cases h : i = 0
+  · simp [trueDesignValue, approxDesignValue, h]
+    linarith
+  · simp [trueDesignValue, approxDesignValue, h]
 
 /-- At a degeneracy the loss is linear in the model error: the approximate model prefers design
     `1`, the truth prefers design `0`, and deploying the approximate choice costs exactly `δ`. -/
