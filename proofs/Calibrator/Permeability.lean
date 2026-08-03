@@ -162,7 +162,7 @@ theorem multivariateGaussianPermeability_nonneg {d : ℕ}
     (whitenedCovarianceDerivative : Matrix (Fin d) (Fin d) ℝ) :
     0 ≤ multivariateGaussianPermeability whitenedCovarianceDerivative := by
   unfold multivariateGaussianPermeability
-  positivity
+  exact mul_nonneg (by norm_num) (frobeniusNormSq_nonneg _)
 
 /-- The correlated Gaussian channel seals exactly when the entire whitened covariance
 response vanishes. -/
@@ -189,9 +189,20 @@ theorem multivariateGaussianPermeability_scale {d : ℕ}
     (whitenedCovarianceDerivative : Matrix (Fin d) (Fin d) ℝ) (η : ℝ) :
     multivariateGaussianPermeability (η • whitenedCovarianceDerivative) =
       η ^ 2 * multivariateGaussianPermeability whitenedCovarianceDerivative := by
-  unfold multivariateGaussianPermeability frobeniusNormSq
-  simp_rw [Matrix.smul_apply, smul_eq_mul, mul_pow]
-  rw [← Finset.mul_sum, ← Finset.mul_sum]
+  have hfrob : frobeniusNormSq (η • whitenedCovarianceDerivative) =
+      η ^ 2 * frobeniusNormSq whitenedCovarianceDerivative := by
+    unfold frobeniusNormSq
+    simp only [Matrix.smul_apply, smul_eq_mul, mul_pow]
+    calc
+      ∑ i, ∑ j, η ^ 2 * whitenedCovarianceDerivative i j ^ 2 =
+          ∑ i, η ^ 2 * ∑ j, whitenedCovarianceDerivative i j ^ 2 := by
+            apply Finset.sum_congr rfl
+            intro i _
+            rw [Finset.mul_sum]
+      _ = η ^ 2 * ∑ i, ∑ j, whitenedCovarianceDerivative i j ^ 2 := by
+        rw [Finset.mul_sum]
+  unfold multivariateGaussianPermeability
+  rw [hfrob]
   ring
 
 /-- The pre-existing independent-channel formula is exactly the diagonal face of the
