@@ -38,17 +38,41 @@ found 22 in-slice statements belonging to no model family at all, and two of
 them were reachable from here at no extra cost, because the exact
 bivariate-normal AUC this file already computes is their oracle too:
 
-  liabilityThresholdAUCFromExplainedR2       PortabilityDrift.lean:3032
-  equalVarianceGaussianAUCFromSignalVariance DGP.lean:2465
+  liabilityThresholdAUCFromExplainedR2        in PortabilityDrift.lean
+  equalVarianceGaussianAUCFromSignalVariance  in DGP.lean
+
+AND THEY ARE CLAIMS ABOUT DIFFERENT ESTIMANDS.  This is the exact pair that
+caused the confusion these names were renamed to end, so it is stated here
+rather than left to be rediscovered:
+
+  liabilityThresholdAUCFromExplainedR2 TAKES A PREVALENCE and is the AUC of a
+  score against case/control status for a BINARY trait under the
+  liability-threshold model.  Its oracle is the exact bivariate-normal AUC at
+  that prevalence, which is what `exact_auc` computes here.
+
+  equalVarianceGaussianAUCFromSignalVariance TAKES NO PREVALENCE and is
+  correct for the equal-variance Gaussian model, where the score
+  distributions differ only in mean.  It is not a binary-trait formula and it
+  is not wrong for failing to be one.
+
+Compare either against the other's oracle and you get a large disagreement and
+conclude you have found a defect.  That is what happened, and it is why four
+declarations were renamed rather than repaired.
 
 The first is the binary-trait formula the retired names promised, and
-PortabilityDrift.lean:967 quotes it at RMSE 0.0121 against a 0.0120
-seed-to-seed noise floor -- a number measured elsewhere, on a handful of
-points, which this file now measures on the whole grid.  The second is
-algebraically the SNR chart at snr = vSignal / vNoise and is tested anyway,
-because it is a separate definition in a separate file and can drift from the
-chart it currently equals.  The printed gap between them is a transcription
-check, not a discovery: anything above rounding means one of the two moved.
+PortabilityDrift.lean quotes it at RMSE 0.0121 against a 0.0120 seed-to-seed
+noise floor -- a number measured elsewhere, on a handful of points, which this
+file now measures on the whole grid.  The second is algebraically the SNR
+chart at snr = vSignal / vNoise and is tested anyway, because it is a separate
+definition in a separate file and can drift from the chart it currently
+equals.  The printed gap between them is a transcription check, not a
+discovery: anything above rounding means one of the two moved.
+
+NO LINE NUMBERS ANYWHERE IN THIS FILE, DELIBERATELY.  This file cited four
+declarations by line number, those lines came to hold unrelated text, and a
+reader checking whether the finding still applied could not tell a fixed
+defect from a lost name.  A declaration name is greppable and survives an edit
+above it.
 
 WHERE THE ERROR BARS COME FROM, AND WHERE THEY DO NOT.  `exact` is a
 quadrature, not a sample: its uncertainty is discretisation, so it is computed
@@ -111,7 +135,8 @@ def lean_equalVarianceGaussianAUCFromSNR(snr):
 
 
 def lean_equalVarianceGaussianAUCFromSignalVariance(vSignal, vNoise):
-    """DGP.lean:2465  `Phi (Real.sqrt (vSignal / (2 * vNoise)))`
+    """DGP.lean, equalVarianceGaussianAUCFromSignalVariance
+    `Phi (Real.sqrt (vSignal / (2 * vNoise)))`
 
     Algebraically the SNR chart at snr = vSignal / vNoise, and tested anyway:
     it is a separate definition in a separate file, so it can drift from the
@@ -122,41 +147,46 @@ def lean_equalVarianceGaussianAUCFromSignalVariance(vSignal, vNoise):
 
 
 def lean_liabilityThreshold(K):
-    """PortabilityDrift.lean:3001  `Function.invFun Phi (1 - K)`"""
+    """PortabilityDrift.lean, liabilityThreshold
+    `Function.invFun Phi (1 - K)`"""
     return float(stats.norm.ppf(1 - K))
 
 
 def lean_liabilityCaseMean(K):
-    """PortabilityDrift.lean:3006  `standardNormalPdf (liabilityThreshold K) / K`"""
+    """PortabilityDrift.lean, liabilityCaseMean
+    `standardNormalPdf (liabilityThreshold K) / K`"""
     return float(phi(lean_liabilityThreshold(K)) / K)
 
 
 def lean_liabilityControlMean(K):
-    """PortabilityDrift.lean:3012  `-liabilityCaseMean K * K / (1 - K)`"""
+    """PortabilityDrift.lean, liabilityControlMean
+    `-liabilityCaseMean K * K / (1 - K)`"""
     return float(-lean_liabilityCaseMean(K) * K / (1 - K))
 
 
 def lean_liabilityCaseVariance(r2, K):
-    """PortabilityDrift.lean:3018
+    """PortabilityDrift.lean, liabilityCaseVariance
     `1 - r2 * liabilityCaseMean K * (liabilityCaseMean K - liabilityThreshold K)`"""
     i = lean_liabilityCaseMean(K)
     return float(1 - r2 * i * (i - lean_liabilityThreshold(K)))
 
 
 def lean_liabilityControlVariance(r2, K):
-    """PortabilityDrift.lean:3024
+    """PortabilityDrift.lean, liabilityControlVariance
     `1 - r2 * liabilityControlMean K * (liabilityControlMean K - liabilityThreshold K)`"""
     ic = lean_liabilityControlMean(K)
     return float(1 - r2 * ic * (ic - lean_liabilityThreshold(K)))
 
 
 def lean_liabilityThresholdAUCFromExplainedR2(r2, K):
-    """PortabilityDrift.lean:3032, the chart that DOES take a prevalence.
+    """PortabilityDrift.lean, liabilityThresholdAUCFromExplainedR2.
+
+    The chart that DOES take a prevalence.
 
     `Phi ((liabilityCaseMean K - liabilityControlMean K) * Real.sqrt r2 /
       Real.sqrt (liabilityCaseVariance r2 K + liabilityControlVariance r2 K))`
 
-    PortabilityDrift.lean:967 quotes this at RMSE 0.0121 against a 0.0120
+    PortabilityDrift.lean quotes this at RMSE 0.0121 against a 0.0120
     seed-to-seed noise floor. That number came from elsewhere; this is the
     first instrument to hold it to the exact bivariate-normal oracle, on a
     grid rather than at a handful of points.
@@ -332,7 +362,7 @@ def main(argv=None):
     print("  worst cell: R2 = %.4f, K = %g, exact %.4f, chart %.4f"
           % (worst_lt["r2"], worst_lt["K"], worst_lt["exact"],
              worst_lt["lean_liabilityThreshold"]))
-    print("  PortabilityDrift.lean:967 quotes 0.0121 against a 0.0120 noise "
+    print("  PortabilityDrift.lean quotes 0.0121 against a 0.0120 noise "
           "floor. That was measured elsewhere on a handful of points; the "
           "number above is this grid.")
     print("equalVarianceGaussianAUCFromSignalVariance vs FromSNR, largest gap "
