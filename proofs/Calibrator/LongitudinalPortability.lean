@@ -620,14 +620,14 @@ section CriterionDrift
 
 /-- **Threshold drift is recoverable from cohort motion.**
 
-    Instance of `threshold_velocity_eq_neg_invariantAverage_drift`: with the linked response curve
+    Instance of `invariantAverage_eq_neg_of_affine_evolution`: with the linked response curve
     observed across a stratified population, its velocity averaged against the population's
     invariant distribution equals minus the velocity of the diagnostic threshold. The population's
     own dynamics drop out because a generator annihilates constants.
 
     Empirical status: DERIVED. The generator, the invariant distribution and the link are
     modelling commitments; given them the threshold path is identified up to its starting value. -/
-theorem criterionDrift_from_cohortMotion {n : ℕ}
+theorem invariantAverage_recovers_additive_constant {n : ℕ}
     (stratumWeight : Fin n → ℝ) (populationGenerator : Fin n → Fin n → ℝ)
     (linkedCurve linkedVelocity : Fin n → ℝ) (criterionVelocity : ℝ)
     (hmass : ∑ i, stratumWeight i = 1)
@@ -635,7 +635,7 @@ theorem criterionDrift_from_cohortMotion {n : ℕ}
     (hdyn : ∀ i, linkedVelocity i =
       (∑ j, populationGenerator i j * linkedCurve j) - criterionVelocity) :
     ∑ i, stratumWeight i * linkedVelocity i = -criterionVelocity :=
-  threshold_velocity_eq_neg_invariantAverage_drift stratumWeight populationGenerator
+  invariantAverage_eq_neg_of_affine_evolution stratumWeight populationGenerator
     linkedCurve linkedVelocity criterionVelocity hmass hinv hdyn
 
 /-- **A population model with uniform forcing destroys the separation.**
@@ -643,7 +643,7 @@ theorem criterionDrift_from_cohortMotion {n : ℕ}
     Instance of `constantForcing_conflates_threshold`: the same average now returns the difference
     of the two velocities, so no amount of cohort data separates a secular phenotype shift that is
     uniform across strata from a moving diagnostic criterion. This is the hypothesis of
-    `criterionDrift_from_cohortMotion` failing, and it fails loudly rather than silently.
+    `invariantAverage_recovers_additive_constant` failing, and it fails loudly rather than silently.
 
     Empirical status: DERIVED. -/
 theorem uniformSecularShift_conflated_with_criterion {n : ℕ}

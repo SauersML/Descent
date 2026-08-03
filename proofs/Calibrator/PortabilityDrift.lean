@@ -315,7 +315,8 @@ noncomputable def SplitMigrationModel.witness : SplitMigrationModel where
   mu_nonneg := by norm_num
 
 /-- Empirical status: UNTESTED. -/
-noncomputable def SplitMigrationModel.fstEqLimitLowMutationManyDemes (m : SplitMigrationModel) : ℝ :=
+noncomputable def SplitMigrationModel.fstEqLimitLowMutationManyDemes (m :
+    SplitMigrationModel) : ℝ :=
   1 / (1 + scaledMigrationRate m.Ne m.mig)
 
 /-- Hudson's `F_ST` estimator from mean coalescence times: one minus the ratio
@@ -980,7 +981,8 @@ theorem expected_abs_mean_shift_of_wrightFisher
           (Real.pi * (1 - wrightFisherHeterozygosityLoss NS tS))) := by
   apply expected_abs_mean_shift_ratio_eq
   · exact hVA_pos
-  · exact add_nonneg (wrightFisherHeterozygosityLoss_nonneg NS tS hNS) (wrightFisherHeterozygosityLoss_nonneg NT tT hNT)
+  · exact add_nonneg (wrightFisherHeterozygosityLoss_nonneg NS tS
+      hNS) (wrightFisherHeterozygosityLoss_nonneg NT tT hNT)
   · exact wrightFisherHeterozygosityLoss_lt_one NS tS hNS
 
 /-- Present-day signal-to-noise ratio for prediction under drift. -/
@@ -1154,7 +1156,8 @@ theorem drift_degrades_AUC_of_strictMono
     (hVA : 0 < V_A) (hVE : 0 < V_E)
     (hfst : fstS < fstT)
     (hfstT_le_one : fstT ≤ 1) :
-    presentDayEqualVarianceGaussianAUC V_A V_E fstT < presentDayEqualVarianceGaussianAUC V_A V_E fstS := by
+    presentDayEqualVarianceGaussianAUC V_A V_E fstT <
+      presentDayEqualVarianceGaussianAUC V_A V_E fstS := by
   rw [presentDayEqualVarianceGaussianAUC_eq _ _ _ (ne_of_gt hVE),
     presentDayEqualVarianceGaussianAUC_eq _ _ _ (ne_of_gt hVE)]
   apply strictMono_Phi
@@ -1179,7 +1182,8 @@ theorem drift_degrades_equalVarianceGaussianAUC
     (hVA : 0 < V_A) (hVE : 0 < V_E)
     (hfst : fstS < fstT)
     (hfstT_le_one : fstT ≤ 1) :
-    presentDayEqualVarianceGaussianAUC V_A V_E fstT < presentDayEqualVarianceGaussianAUC V_A V_E fstS := by
+    presentDayEqualVarianceGaussianAUC V_A V_E fstT <
+      presentDayEqualVarianceGaussianAUC V_A V_E fstS := by
   rw [presentDayEqualVarianceGaussianAUC_eq _ _ _ (ne_of_gt hVE),
     presentDayEqualVarianceGaussianAUC_eq _ _ _ (ne_of_gt hVE)]
   apply strictMono_Phi
@@ -1382,7 +1386,8 @@ hypotheses rather than written into a separate definition. This is the equation 
 to be the *body* of `sigmaTagCausalSourceAt`; making it a theorem is what stops the source
 and target forms from drifting apart silently. -/
 @[simp] theorem sigmaTagCausal_source {p q : ℕ} (m : CrossPopulationMetricModel p q) :
-    sigmaTagCausalSourceAt m Pop.source = m.directCausal Pop.source + m.proxyTagging Pop.source := by
+    sigmaTagCausalSourceAt m Pop.source = m.directCausal Pop.source +
+      m.proxyTagging Pop.source := by
   simp [sigmaTagCausalSourceAt, m.novelDirectCausal_source, m.novelProxyTagging_source]
 
 /-- Likewise the source effect vector is the standing one. -/
@@ -1440,15 +1445,19 @@ theorem source_target_erm_differ_dense_witness_proved :
   refine ⟨?_, ?_, ?_⟩
   · ext i
     fin_cases i
-    · simp [witnessW_opt, witnessSigmaObs, witnessCross, Matrix.mulVec, Matrix.cons_val', Matrix.cons_val_fin_one, dotProduct, Pop.pair]
+    · simp [witnessW_opt, witnessSigmaObs, witnessCross, Matrix.mulVec, Matrix.cons_val',
+      Matrix.cons_val_fin_one, dotProduct, Pop.pair]
       norm_num
-    · simp [witnessW_opt, witnessSigmaObs, witnessCross, Matrix.mulVec, Matrix.cons_val', Matrix.cons_val_fin_one, dotProduct, Pop.pair]
+    · simp [witnessW_opt, witnessSigmaObs, witnessCross, Matrix.mulVec, Matrix.cons_val',
+      Matrix.cons_val_fin_one, dotProduct, Pop.pair]
       norm_num
   · ext i
     fin_cases i
-    · simp [witnessW_opt, witnessSigmaObs, witnessCross, Matrix.mulVec, Matrix.cons_val', Matrix.cons_val_fin_one, dotProduct, Pop.pair]
+    · simp [witnessW_opt, witnessSigmaObs, witnessCross, Matrix.mulVec, Matrix.cons_val',
+      Matrix.cons_val_fin_one, dotProduct, Pop.pair]
       norm_num
-    · simp [witnessW_opt, witnessSigmaObs, witnessCross, Matrix.mulVec, Matrix.cons_val', Matrix.cons_val_fin_one, dotProduct, Pop.pair]
+    · simp [witnessW_opt, witnessSigmaObs, witnessCross, Matrix.mulVec, Matrix.cons_val',
+      Matrix.cons_val_fin_one, dotProduct, Pop.pair]
       norm_num
   · intro heq
     have h : (witnessW_opt Pop.source) 0 = (witnessW_opt Pop.target) 0 := congrFun heq 0
@@ -1721,7 +1730,7 @@ theorem targetCalibrationSlopeFromSourceWeights_exact_direct_proxy_context_law
 /-- The target predictive covariance decomposes into the transported source-
 stable effect projection, the projection of effect-size heterogeneity, and the
 target context term. -/
-theorem targetPredictiveCovarianceFromSourceWeights_eq_source_effect_plus_effectHeterogeneity_plus_context_scores
+theorem targetPredictiveCovariance_eq_sourceEffect_plus_heterogeneity_plus_context
     {p q : ℕ} (m : CrossPopulationMetricModel p q) :
     predictiveCovarianceFromSourceWeights m Pop.target =
       sourceWeightedTagScore m (targetSourceEffectProjection m) +
@@ -1741,11 +1750,11 @@ theorem targetCalibrationSlopeFromSourceWeights_exact_effect_heterogeneity_law
         sourceWeightedTagScore m (m.contextCross Pop.target)) /
           scoreVarianceFromSourceWeights m Pop.target := by
   rw [targetCalibrationSlopeFromSourceWeights_exact_metric_portability_law,
-    targetPredictiveCovarianceFromSourceWeights_eq_source_effect_plus_effectHeterogeneity_plus_context_scores]
+    targetPredictiveCovariance_eq_sourceEffect_plus_heterogeneity_plus_context]
 
 /-- The target predictive covariance also decomposes into standing target
 effects, target-only novel mutation effects, and the target context term. -/
-theorem targetPredictiveCovarianceFromSourceWeights_eq_standing_plus_novelMutationEffect_plus_context_scores
+theorem targetPredictiveCovariance_eq_standing_plus_novelMutation_plus_context
     {p q : ℕ} (m : CrossPopulationMetricModel p q) :
     predictiveCovarianceFromSourceWeights m Pop.target =
       sourceWeightedTagScore m ((sigmaTagCausalSourceAt m Pop.target).mulVec (m.beta Pop.target)) +
@@ -1760,7 +1769,8 @@ This is the squared target-effect distortion induced by the gap between the
 source and target tag-to-causal alignment matrices. -/
 noncomputable def brokenTaggingResidual {p q : ℕ}
     (m : CrossPopulationMetricModel p q) : ℝ :=
-  let delta := ((sigmaTagCausalSourceAt m Pop.source) - (sigmaTagCausalSourceAt m Pop.target)).mulVec (totalEffect m Pop.target)
+  let delta := ((sigmaTagCausalSourceAt m Pop.source) - (sigmaTagCausalSourceAt m
+      Pop.target)).mulVec (totalEffect m Pop.target)
   dotProduct delta delta
 
 theorem brokenTaggingResidual_nonneg {p q : ℕ}
@@ -2194,7 +2204,8 @@ transported score equation divided by the effective target outcome variance. -/
 theorem targetR2FromSourceWeights_eq_signalVariance_ratio {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
     r2FromSourceWeights m Pop.target =
-      explainedSignalVarianceFromSourceWeights m Pop.target / effectiveOutcomeVariance m Pop.target := by
+      explainedSignalVarianceFromSourceWeights m Pop.target /
+        effectiveOutcomeVariance m Pop.target := by
   rfl
 
 /-- Exact mechanistic target `R²` portability law from transported score
@@ -2282,7 +2293,7 @@ theorem targetR2FromSourceWeights_exact_effect_heterogeneity_law {p q : ℕ}
           sourceWeightedTagScore m (m.contextCross Pop.target)) ^ 2) /
         (scoreVarianceFromSourceWeights m Pop.target * effectiveOutcomeVariance m Pop.target) := by
   rw [targetR2FromSourceWeights_exact_metric_portability_law,
-    targetPredictiveCovarianceFromSourceWeights_eq_source_effect_plus_effectHeterogeneity_plus_context_scores]
+    targetPredictiveCovariance_eq_sourceEffect_plus_heterogeneity_plus_context]
 
 /-- Ohta-Kimura-style closed-form LD-correlation decay law across populations:
 correlation decays exponentially with recombination distance and divergence.
@@ -2307,7 +2318,8 @@ theorem ldCorrelationDecay_strictAnti_fst
     (hDist : 0 < distance)
     (hLambda : 0 < lambda)
     (hFst : fstSource < fstTarget) :
-    ldCorrelationDecay distance fstTarget lambda < ldCorrelationDecay distance fstSource lambda := by
+    ldCorrelationDecay distance fstTarget lambda <
+      ldCorrelationDecay distance fstSource lambda := by
   unfold ldCorrelationDecay
   apply Real.exp_lt_exp.mpr
   have h_pos : 0 < lambda * distance := mul_pos hLambda hDist
@@ -2449,7 +2461,8 @@ noncomputable def PGSEvolutionaryModel.toGenerationalPopGenParameters
 @[simp] theorem PGSEvolutionaryModel.toGenerationalPopGenParameters_hetDecayFactor
     (m : PGSEvolutionaryModel) :
     (m.toGenerationalPopGenParameters).hetDecayFactor = m.hetDecayFactor := by
-  unfold GenerationalPopGenParameters.hetDecayFactor PGSEvolutionaryModel.hetDecayFactor hetDecayFromScaled
+  unfold GenerationalPopGenParameters.hetDecayFactor PGSEvolutionaryModel.hetDecayFactor
+    hetDecayFromScaled
   rw [PGSEvolutionaryModel.toGenerationalPopGenParameters_theta]
   rfl
 
@@ -3003,8 +3016,10 @@ theorem portability_ratio_with_ld_decay
         r2FromSignalVariance (presentDayPGSVariance V_A fstT) V_E /
           r2FromSignalVariance (presentDayPGSVariance V_A fstS) V_E := by
     have hmul :
-        r2FromSignalVariance (realWorldPGSVariance V_A fstT rhoT) V_E * (r2FromSignalVariance (presentDayPGSVariance V_A fstS) V_E)⁻¹ <
-          r2FromSignalVariance (presentDayPGSVariance V_A fstT) V_E * (r2FromSignalVariance (presentDayPGSVariance V_A fstS) V_E)⁻¹ :=
+        r2FromSignalVariance (realWorldPGSVariance V_A fstT rhoT) V_E * (r2FromSignalVariance
+            (presentDayPGSVariance V_A fstS) V_E)⁻¹ <
+          r2FromSignalVariance (presentDayPGSVariance V_A fstT) V_E * (r2FromSignalVariance
+              (presentDayPGSVariance V_A fstS) V_E)⁻¹ :=
       mul_lt_mul_of_pos_right hR2Target_lt (inv_pos.mpr hR2Source_pos)
     simpa [div_eq_mul_inv] using hmul
   -- `hL` is phrased with `presentDayPGSVariance`; with `rhoS = 1` the goal
@@ -3348,7 +3363,8 @@ theorem neutralAFBenchmarkMetricProfile_eq
     unfold targetR2FromNeutralAFBenchmark TransportedMetrics.r2FromSignalVariance presentDayR2
     rfl
   · change
-      TransportedMetrics.equalVarianceGaussianAUCFromSignalVariance (presentDayPGSVariance V_A fstTarget) V_E =
+      TransportedMetrics.equalVarianceGaussianAUCFromSignalVariance (presentDayPGSVariance V_A
+          fstTarget) V_E =
         presentDayEqualVarianceGaussianAUC V_A V_E fstTarget
     rfl
   · change
@@ -3433,7 +3449,8 @@ distributional model rather than supplied as a theorem-bearing parameter. -/
 
 /-- With `vEnv = 1`, variance form equals SNR form exactly. -/
 theorem equalVarianceGaussianAUCFromVariances_scaleOne (vSignal : ℝ) :
-    equalVarianceGaussianAUCFromSignalVariance vSignal 1 = equalVarianceGaussianAUCFromSNR vSignal := by
+    equalVarianceGaussianAUCFromSignalVariance vSignal 1 =
+      equalVarianceGaussianAUCFromSNR vSignal := by
   rw [equalVarianceGaussianAUCFromSignalVariance_eq_formula_of_ne_noise _ _ (by norm_num)]
   unfold equalVarianceGaussianAUCFromSNR
   ring_nf
@@ -3873,7 +3890,8 @@ noncomputable def targetMetricProfileFromSourceWeights {p q : ℕ}
 
 @[simp] theorem targetMetricProfileFromSourceWeights_auc {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
-    (targetMetricProfileFromSourceWeights m).auc = equalVarianceGaussianAUCFromSourceWeights m Pop.target := by
+    (targetMetricProfileFromSourceWeights
+        m).auc = equalVarianceGaussianAUCFromSourceWeights m Pop.target := by
   rfl
 
 @[simp] theorem targetMetricProfileFromSourceWeights_brier {p q : ℕ}
@@ -3942,7 +3960,8 @@ state. -/
 noncomputable def sourceNormalizedTargetR2AtGeneration {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (sourceBaseline : ℝ) (t : ℕ) : ℝ :=
   sourceBaseline *
-    (r2FromSourceWeights (m.toMetricModelAt t) Pop.target / r2FromSourceWeights (m.toMetricModelAt t) Pop.source)
+    (r2FromSourceWeights (m.toMetricModelAt t) Pop.target / r2FromSourceWeights (m.toMetricModelAt
+        t) Pop.source)
 
 /-- Exact mechanistic law for display-normalized target `R²` at generation `t`.
 

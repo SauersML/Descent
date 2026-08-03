@@ -1761,7 +1761,10 @@ def run_identifications() -> int:
     #     Pinned, not zero. The survivors are grandfathered so the budget can
     #     ratchet down as they are renamed; what it forbids is adding more.
     DOMAIN_WORD = re.compile(
-        r"portab|drift|heritab|genetic|genom|variant|locus|loci|allele|pgs|"
+        # `variant` must not fire inside `invariant`: an invariant measure, an
+        # invariant subspace and an invariant average are mathematics, not genetics,
+        # and flagging them asks for a rename away from the standard term.
+        r"portab|drift|heritab|genetic|genom|(?<!in)variant|locus|loci|allele|pgs|"
         r"ancestr|gwas|snp|calibrat|imputation|selection|polygenic|epistas|"
         r"cohort|population|panel|fst|prevalence|phenotype|trait|marker|"
         r"burden|gene_|_gene|kinship|admixture|coalescent|bottleneck|founder|"

@@ -485,7 +485,8 @@ theorem standardizedGenotype_kurtosis_gaussian_at_blind_maf (h : HardyWeinbergMo
   have hq1 : h.altFreq < 1 := by
     rw [hmaf]
     exact gaussianKurtosisMaf_lt_one
-  rw [hweStandardizedFourthMoment_eq_inv_hweGenotypeVariance h hq0 hq1, hmaf, gaussianKurtosisMaf_genotypeVariance]
+  rw [hweStandardizedFourthMoment_eq_inv_hweGenotypeVariance h hq0 hq1, hmaf,
+    gaussianKurtosisMaf_genotypeVariance]
   norm_num
 
 /-!

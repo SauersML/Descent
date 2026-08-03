@@ -374,7 +374,8 @@ theorem optimalWeightsFromMoments_decomposition
   unfold optimalWeightsFromMoments
   rw [crossCovVector_decomposition]
   simpa [Pi.add_apply] using
-    matrix_mulVec_add sigmaInv ((predictorCausalCovariance E X C).mulVec β) (contextCrossCovVector E X h)
+    matrix_mulVec_add sigmaInv ((predictorCausalCovariance E X C).mulVec β) (contextCrossCovVector E
+        X h)
 
 theorem secondMoment_quadratic_form
     (E : ExpFunctional Ω) (X : Ω → J → ℝ) (u : J → ℝ) :
@@ -685,7 +686,8 @@ theorem explainable_fraction_bound_of_noise_floor
   unfold explainableFraction
   by_cases hbetween_zero : between = 0
   · simp [hbetween_zero]
-  · have hbetween_pos : 0 < between := lt_of_le_of_ne hbetween_nonneg (by simpa [eq_comm] using hbetween_zero)
+  · have hbetween_pos : 0 < between :=
+    lt_of_le_of_ne hbetween_nonneg (by simpa [eq_comm] using hbetween_zero)
     have hden_pos : 0 < between + noiseFloor := by
       linarith
     rw [htotal]

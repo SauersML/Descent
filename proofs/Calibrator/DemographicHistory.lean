@@ -671,7 +671,8 @@ theorem smaller_founder_larger_heterozygosity_loss
     derived in `PopulationGeneticsFoundations`. -/
 theorem founderHeterozygosityLoss_eq_derived (k : ℕ) (t : ℕ) :
     founderHeterozygosityLoss k t = fstMutationDriftTransientDiscrete 0 (k : ℝ) t := by
-  unfold founderHeterozygosityLoss fstMutationDriftTransientDiscrete fstMutationDriftEquilibrium hetDecayFactor hetDecayFromScaled
+  unfold founderHeterozygosityLoss fstMutationDriftTransientDiscrete fstMutationDriftEquilibrium
+    hetDecayFactor hetDecayFromScaled
   simp
 
 end FounderEffects
@@ -758,7 +759,8 @@ theorem smaller_ne_more_drift {T : ℕ} (hT : 0 < T)
   unfold cumulativeDrift
   apply Finset.sum_lt_sum
   · intro i _
-    exact le_of_lt (div_lt_div_of_pos_left one_pos (by linarith [hNe₂ i]) (by linarith [h_smaller i]))
+    exact le_of_lt (div_lt_div_of_pos_left one_pos (by linarith [hNe₂ i]) (by linarith [h_smaller
+        i]))
   · let j : Fin T := ⟨0, hT⟩
     exact ⟨j, Finset.mem_univ j,
       div_lt_div_of_pos_left one_pos (by linarith [hNe₂ j]) (by linarith [h_smaller j])⟩

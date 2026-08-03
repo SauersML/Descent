@@ -26,7 +26,7 @@ in principle, what survives the drift, and how much an interior estimate can be 
 
 In a liability-threshold model `Y = 1[Z > θ]` — the standard reading of a polygenic score, with
 `Z` liability and `θ` a diagnostic threshold — apply any strictly increasing `h` to the liability
-axis. `threshold_gauge_invisible` records that the indicator is unchanged. Every observable is
+axis. `indicator_lt_eq_of_strictMono` records that the indicator is unchanged. Every observable is
 unchanged; the threshold path is changed into an arbitrary increasing relabelling, and can be
 flattened to zero. **From response curves alone the threshold path is identifiable at most up to
 monotone relabelling**, so a study reporting that diagnostic thresholds moved, on the strength of
@@ -40,12 +40,12 @@ the same observation, forever, at any density of sampling.
 
 ## The dynamics break it, because a generator kills constants
 
-`invariantAverage_annihilates_generator` is the mechanism: averaging against an invariant
+`sum_invariantWeight_mul_generator_eq_zero` is the mechanism: averaging against an invariant
 distribution annihilates the population's own dynamics. So if the linked curve moves by a Markov
 generator plus a spatially constant threshold velocity, the invariant average of its motion sees
 only the threshold:
 
-`threshold_velocity_eq_neg_invariantAverage_drift`: `Σ ϖ ∂ₜu = -θ̇`.
+`invariantAverage_eq_neg_of_affine_evolution`: `Σ ϖ ∂ₜu = -θ̇`.
 
 Everything on the right is observable. This is the whole content: **statics can never separate a
 moving threshold from a moving population, and dynamics always can — provided the population
@@ -99,7 +99,7 @@ than assumed.
 /-- **A monotone relabelling of the liability axis is invisible.** Applying any strictly
 increasing map to liability and threshold together leaves the case indicator unchanged, so no
 observable distinguishes them. -/
-theorem threshold_gauge_invisible (h : ℝ → ℝ) (hmono : StrictMono h) (Z θ : ℝ) :
+theorem indicator_lt_eq_of_strictMono (h : ℝ → ℝ) (hmono : StrictMono h) (Z θ : ℝ) :
     (if θ < Z then (1 : ℝ) else 0) = (if h θ < h Z then (1 : ℝ) else 0) := by
   by_cases hlt : θ < Z
   · simp [hlt, hmono hlt]
@@ -129,9 +129,29 @@ theorem linkedCurve_identified_modulo_constants {ι : Type*}
 def IsInvariantWeight {n : ℕ} (ϖ : Fin n → ℝ) (L : Fin n → Fin n → ℝ) : Prop :=
   ∀ j, ∑ i, ϖ i * L i j = 0
 
+/-- **An invariant weight exists**, so the theorems assuming `IsInvariantWeight` are about
+something rather than vacuously true.
+
+    The zero weight is invariant for every generator. That is the cheapest possible witness
+    and it is deliberately the one stated: it establishes non-vacuity without smuggling in
+    any claim about which distributions are invariant for a given generator, which is a
+    separate question this module does not answer. -/
+theorem isInvariantWeight_zero {n : ℕ} (L : Fin n → Fin n → ℝ) :
+    IsInvariantWeight (fun _ ↦ (0 : ℝ)) L := by
+  intro j
+  simp
+
+/-- A generator whose columns sum to zero admits the uniform weight as invariant, which is
+    the witness that matters for a symmetric biological generator. -/
+theorem isInvariantWeight_one_of_colSum_zero {n : ℕ} (L : Fin n → Fin n → ℝ)
+    (hcol : ∀ j, ∑ i, L i j = 0) :
+    IsInvariantWeight (fun _ ↦ (1 : ℝ)) L := by
+  intro j
+  simpa using hcol j
+
 /-- **Averaging against an invariant distribution annihilates the population dynamics.** This is
 the projection that exposes the exogenous constant. -/
-theorem invariantAverage_annihilates_generator {n : ℕ}
+theorem sum_invariantWeight_mul_generator_eq_zero {n : ℕ}
     (ϖ : Fin n → ℝ) (L : Fin n → Fin n → ℝ) (u : Fin n → ℝ)
     (hinv : IsInvariantWeight ϖ L) :
     ∑ i, ϖ i * (∑ j, L i j * u j) = 0 := by
@@ -152,7 +172,7 @@ theorem invariantAverage_annihilates_generator {n : ℕ}
     This is the exact separation that `linkedCurve_identified_modulo_constants` shows is
     impossible from statics: there the constant direction is unreachable at every fixed time, and
     here it is the only direction that survives. -/
-theorem threshold_velocity_eq_neg_invariantAverage_drift {n : ℕ}
+theorem invariantAverage_eq_neg_of_affine_evolution {n : ℕ}
     (ϖ : Fin n → ℝ) (L : Fin n → Fin n → ℝ) (u du : Fin n → ℝ) (thetaDot : ℝ)
     (hmass : ∑ i, ϖ i = 1) (hinv : IsInvariantWeight ϖ L)
     (hdyn : ∀ i, du i = (∑ j, L i j * u j) - thetaDot) :
@@ -163,7 +183,7 @@ theorem threshold_velocity_eq_neg_invariantAverage_drift {n : ℕ}
     rw [hdyn i]
     ring
   rw [Finset.sum_congr rfl fun i _ ↦ hsplit i, Finset.sum_sub_distrib,
-    invariantAverage_annihilates_generator ϖ L u hinv, ← Finset.mul_sum, hmass]
+    sum_invariantWeight_mul_generator_eq_zero ϖ L u hinv, ← Finset.mul_sum, hmass]
   ring
 
 /-- **Sharpness: a spatially uniform forcing is conflated with the threshold forever.**
@@ -183,7 +203,7 @@ theorem constantForcing_conflates_threshold {n : ℕ}
     rw [hdyn i]
     ring
   rw [Finset.sum_congr rfl fun i _ ↦ hsplit i, Finset.sum_add_distrib,
-    invariantAverage_annihilates_generator ϖ L u hinv, ← Finset.mul_sum, hmass]
+    sum_invariantWeight_mul_generator_eq_zero ϖ L u hinv, ← Finset.mul_sum, hmass]
   ring
 
 /-! ## What survives a mixing drift -/

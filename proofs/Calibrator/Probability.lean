@@ -126,7 +126,8 @@ standard Gaussian measure. This is foundational for all L² projection arguments
 -/
 
 /-- The standard Gaussian measure μ = N(0,1). -/
-noncomputable def stdGaussianMeasure : MeasureTheory.Measure Real := ProbabilityTheory.gaussianReal 0 1
+noncomputable def stdGaussianMeasure : MeasureTheory.Measure Real :=
+  ProbabilityTheory.gaussianReal 0 1
 
 /-- Polynomial function x^n. -/
 def poly_n (n : Nat) (x : Real) : Real := x ^ n
@@ -134,7 +135,8 @@ def poly_n (n : Nat) (x : Real) : Real := x ^ n
 /-- For any natural number n, x^n is integrable with respect to the standard Gaussian measure.
     This follows from the finiteness of Gaussian moments. -/
 theorem integrable_poly_n (n : Nat) : MeasureTheory.Integrable (poly_n n) stdGaussianMeasure := by
-  have h_gauss_integral : ∀ n : ℕ, MeasureTheory.IntegrableOn (fun x : ℝ ↦ x^n * Real.exp (-x^2 / 2)) (Set.univ : Set ℝ) := by
+  have h_gauss_integral : ∀ n : ℕ, MeasureTheory.IntegrableOn (fun x : ℝ ↦ x^n * Real.exp (-x^2 /
+      2)) (Set.univ : Set ℝ) := by
     intro n
     have := @integrable_rpow_mul_exp_neg_mul_sq
     simpa [ div_eq_inv_mul ] using @this ( 1 / 2 ) ( by norm_num ) n ( by linarith )
@@ -145,7 +147,8 @@ theorem integrable_poly_n (n : Nat) : MeasureTheory.Integrable (poly_n n) stdGau
   refine' fun x ↦ |x ^ n|
   · refine' MeasureTheory.Integrable.abs _
     rw [ MeasureTheory.integrable_withDensity_iff ]
-    · convert h_gauss_integral n |> fun h ↦ h.div_const ( Real.sqrt ( 2 * Real.pi ) ) using 2 ; norm_num [ ProbabilityTheory.gaussianPDF ] ; ring
+    · convert h_gauss_integral n |> fun h ↦ h.div_const ( Real.sqrt ( 2 * Real.pi )
+        ) using 2 ; norm_num [ ProbabilityTheory.gaussianPDF ] ; ring
       norm_num [ ProbabilityTheory.gaussianPDFReal ] ; ring
       rw [ ENNReal.toReal_ofReal ( Real.exp_nonneg _ ) ]
     · fun_prop
@@ -164,7 +167,8 @@ theorem integrable_id_gaussian : MeasureTheory.Integrable (fun x ↦ x) stdGauss
   simp only [pow_one] at h
   exact h
 
-/-- x^4 is integrable with respect to the standard Gaussian measure (useful for variance calculations). -/
+/-- x^4 is integrable with respect to the standard Gaussian measure (useful for variance
+    calculations). -/
 theorem integrable_pow4_gaussian : MeasureTheory.Integrable (fun x ↦ x ^ 4) stdGaussianMeasure := by
   apply integrable_poly_n 4
 
@@ -502,9 +506,11 @@ distinction the names were there to make. Callers use `approximationInterval` an
 own statement which functional they mean. -/
 
 noncomputable def stdNormalProdMeasure (k : ℕ) [Fintype (Fin k)] : Measure (ℝ × (Fin k → ℝ)) :=
-  (ProbabilityTheory.gaussianReal 0 1).prod (Measure.pi (fun (_ : Fin k) ↦ ProbabilityTheory.gaussianReal 0 1))
+  (ProbabilityTheory.gaussianReal 0 1).prod (Measure.pi (fun (_ : Fin k) ↦
+      ProbabilityTheory.gaussianReal 0 1))
 
-instance stdNormalProdMeasure_is_prob {k : ℕ} [Fintype (Fin k)] : IsProbabilityMeasure (stdNormalProdMeasure k) := by
+instance stdNormalProdMeasure_is_prob {k : ℕ} [Fintype (Fin
+    k)] : IsProbabilityMeasure (stdNormalProdMeasure k) := by
   unfold stdNormalProdMeasure
   infer_instance
 
@@ -605,7 +611,8 @@ theorem noise_integrated_cdf {k : ℕ} (hN : GaussianNoiseAssumption k)
           simpa using (ProbabilityTheory.ofReal_cdf
             (μ := ProbabilityTheory.gaussianReal μ (hN.sigma2 x)) t)
 
-/-- In particular at threshold `0`, integrating out `E` yields a probit-form conditional probability. -/
+/-- In particular at threshold `0`, integrating out `E` yields a probit-form conditional
+    probability. -/
 theorem noise_integrated_cdf_zero {k : ℕ} (hN : GaussianNoiseAssumption k)
     (x : Fin k → ℝ) (μ : ℝ) :
     noiseMeasureGivenX hN x {e : ℝ | μ + e ≤ 0} =
@@ -720,7 +727,8 @@ structure DataGeneratingProcess (k : ℕ) where
   jointMeasure : Measure (ℝ × (Fin k → ℝ))
   is_prob : IsProbabilityMeasure jointMeasure := by infer_instance
 
-instance dgp_is_prob {k : ℕ} (dgp : DataGeneratingProcess k) : IsProbabilityMeasure dgp.jointMeasure := dgp.is_prob
+instance dgp_is_prob {k : ℕ} (dgp : DataGeneratingProcess
+    k) : IsProbabilityMeasure dgp.jointMeasure := dgp.is_prob
 
 /-! ### Predictor Abstraction and Proper Risk
 
@@ -733,7 +741,8 @@ not on how it is represented. -/
 abbrev Predictor (k : ℕ) := ℝ → (Fin k → ℝ) → ℝ
 
 /-- MSE risk of a predictor relative to the conditional mean E[Y|P,C]. -/
-noncomputable def mseRisk {k : ℕ} [Fintype (Fin k)] (dgp : DataGeneratingProcess k) (f : Predictor k) : ℝ :=
+noncomputable def mseRisk {k : ℕ} [Fintype (Fin k)] (dgp : DataGeneratingProcess k) (f : Predictor
+    k) : ℝ :=
   ∫ x, (dgp.trueExpectation x.1 x.2 - f x.1 x.2)^2 ∂dgp.jointMeasure
 
 /-- Upgraded DGP that explicitly names the conditional mean and provides
@@ -788,7 +797,8 @@ noncomputable def predictionRiskY {k : ℕ} [Fintype (Fin k)]
 
 /-- Convert a ConditionalMeanDGP to the simpler DataGeneratingProcess format.
     The marginal on (P,C) is obtained by mapping out Y. -/
-noncomputable def ConditionalMeanDGP.toDGP {k : ℕ} (cmdgp : ConditionalMeanDGP k) : DataGeneratingProcess k where
+noncomputable def ConditionalMeanDGP.toDGP {k : ℕ} (cmdgp : ConditionalMeanDGP
+    k) : DataGeneratingProcess k where
   trueExpectation := cmdgp.m
   jointMeasure := cmdgp.μ.map (fun x ↦ (x.1, x.2.1))
   is_prob := by

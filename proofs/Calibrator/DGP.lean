@@ -641,7 +641,8 @@ theorem target_r2_drop_of_twoLocusCoalescent
     (twoLocusCoalescentCovarianceMatrix ht ibdWeight recombRate tTarget)
     h_mse_gap_lb h_lam_pos h_mismatch h_varY_pos
 
-/-- If the demographic lower bound is available and strictly positive, covariance mismatch is strict. -/
+/-- If the demographic lower bound is available and strictly positive, covariance mismatch is
+    strict. -/
 theorem covariance_mismatch_pos_of_fst_and_sparse_array
     {t : ℕ}
     (sigmaSource sigmaTarget : Matrix (Fin t) (Fin t) ℝ)
@@ -659,7 +660,8 @@ theorem covariance_mismatch_pos_of_fst_and_sparse_array
     exact mul_pos h_recomb_pos h_sparse_pos
   have h_delta_pos : 0 < fstTarget - fstSource := sub_pos.mpr h_fst
   have h_lb_pos :
-      0 < demographicCovarianceGapLowerBound fstSource fstTarget recombRate arraySparsity kappa := by
+      0 < demographicCovarianceGapLowerBound fstSource fstTarget recombRate arraySparsity
+            kappa := by
     unfold demographicCovarianceGapLowerBound
     exact mul_pos (mul_pos h_kappa_pos h_scale_pos) h_delta_pos
   exact lt_of_lt_of_le h_lb_pos h_cov_lb
@@ -788,7 +790,8 @@ from simulation studies. For general proofs, use `dgpAdditiveBias` with arbitrar
 
 /-- General interaction-bias DGP:
     phenotype = P * (1 + β_int * Σ C). -/
-noncomputable def dgpInteractiveBias (k : ℕ) [Fintype (Fin k)] (β_int : ℝ) : DataGeneratingProcess k := {
+noncomputable def dgpInteractiveBias (k : ℕ) [Fintype (Fin k)] (β_int :
+    ℝ) : DataGeneratingProcess k := {
   trueExpectation := fun p pc ↦ p * (1 + β_int * (∑ l, pc l)),
   jointMeasure := stdNormalProdMeasure k
 }
@@ -805,7 +808,8 @@ The following definitions support a cleaner, more general proof approach:
 
     The key insight: the raw model (span{1, P}) cannot capture the β_env * C term,
     so the projection leaves a residual of exactly β_env * C. -/
-noncomputable def dgpAdditiveBias (k : ℕ) [Fintype (Fin k)] (β_env : ℝ) : DataGeneratingProcess k := {
+noncomputable def dgpAdditiveBias (k : ℕ) [Fintype (Fin k)] (β_env : ℝ) : DataGeneratingProcess k :=
+  {
   trueExpectation := fun p pc ↦ p + β_env * (∑ l, pc l),
   jointMeasure := stdNormalProdMeasure k
 }
@@ -858,7 +862,8 @@ theorem scenarios_are_distinct (k : ℕ) (hk_pos : 0 < k) :
 
 theorem necessity_of_phenotype_data :
   ∃ (dgp_A dgp_B : DataGeneratingProcess 1),
-    dgp_A.jointMeasure = dgp_B.jointMeasure ∧ hasInteraction dgp_A.trueExpectation ∧ ¬ hasInteraction dgp_B.trueExpectation := by
+    dgp_A.jointMeasure = dgp_B.jointMeasure ∧ hasInteraction dgp_A.trueExpectation ∧
+      ¬ hasInteraction dgp_B.trueExpectation := by
   use dgpInteractiveBias 1 0.1, dgpAdditiveBias 1 (-0.8)
   constructor; rfl
   have h_distinct := scenarios_are_distinct 1 (by norm_num)
@@ -972,7 +977,8 @@ structure GeneticArchitecture (k : ℕ) where
 noncomputable def totalVariance {k : ℕ} (arch : GeneticArchitecture k) (c : Fin k → ℝ) : ℝ :=
   arch.V_genic c + arch.V_cov c
 
-noncomputable def optimalSlopeFromVariance {k : ℕ} (arch : GeneticArchitecture k) (c : Fin k → ℝ) : ℝ :=
+noncomputable def optimalSlopeFromVariance {k : ℕ} (arch : GeneticArchitecture k) (c : Fin k →
+    ℝ) : ℝ :=
   (totalVariance arch c) / (arch.V_genic c)
 
 theorem directionalLD_nonzero_implies_slope_ne_one {k : ℕ} [Fintype (Fin k)]
@@ -1089,7 +1095,8 @@ noncomputable def prevalenceDGP_trueExpectation {k : ℕ} (pdgp : PrevalenceDGP 
   pdgp.prevalence c + pdgp.pgs_effect * p
 
 /-- Convert a PrevalenceDGP to a standard DataGeneratingProcess. -/
-noncomputable def PrevalenceDGP.toDGP {k : ℕ} (pdgp : PrevalenceDGP k) : DataGeneratingProcess k where
+noncomputable def PrevalenceDGP.toDGP {k : ℕ} (pdgp : PrevalenceDGP
+    k) : DataGeneratingProcess k where
   trueExpectation := prevalenceDGP_trueExpectation pdgp
   jointMeasure := pdgp.jointMeasure
   is_prob := pdgp.is_prob
@@ -1926,7 +1933,8 @@ theorem fstEquilibrium_isFixedPoint (p : EvolutionaryParameters) :
     linarith [p.theta_nonneg, p.bigM_nonneg]
   have hd' : (1 : ℝ) + p.theta + p.bigM ≠ 0 := ne_of_gt hd
   have hscaled : 1 + p.theta + p.bigM = 1 + 4 * p.Ne * (p.mig + p.mu) := by
-    unfold EvolutionaryParameters.theta EvolutionaryParameters.bigM scaledMutationRate scaledMigrationRate
+    unfold EvolutionaryParameters.theta EvolutionaryParameters.bigM scaledMutationRate
+      scaledMigrationRate
     ring
   unfold fstDriftFlowStep fstEquilibrium
   rw [hscaled] at hd' ⊢
@@ -2163,11 +2171,14 @@ theorem fstEquilibrium_decreasing_in_theta
     (hNe : 0 < Ne) (hmu₁ : 0 ≤ mu₁) (hmu₂ : 0 ≤ mu₂) (hmig : 0 ≤ mig)
     (ht : 0 ≤ t_div) (hr : 0 ≤ recomb) (hr2 : recomb ≤ 1/2) (hV : 0 < V_A)
     (h_mu : mu₁ < mu₂) :
-    let p₁ : EvolutionaryParameters := ⟨Ne, mu₁, mig, t_div, recomb, V_A, hNe, hmu₁, hmig, ht, hr, hr2, hV⟩
-    let p₂ : EvolutionaryParameters := ⟨Ne, mu₂, mig, t_div, recomb, V_A, hNe, hmu₂, hmig, ht, hr, hr2, hV⟩
+    let p₁ : EvolutionaryParameters :=
+      ⟨Ne, mu₁, mig, t_div, recomb, V_A, hNe, hmu₁, hmig, ht, hr, hr2, hV⟩
+    let p₂ : EvolutionaryParameters :=
+      ⟨Ne, mu₂, mig, t_div, recomb, V_A, hNe, hmu₂, hmig, ht, hr, hr2, hV⟩
     fstEquilibrium p₂ < fstEquilibrium p₁ := by
   simp only
-  unfold fstEquilibrium EvolutionaryParameters.theta EvolutionaryParameters.bigM scaledMutationRate scaledMigrationRate
+  unfold fstEquilibrium EvolutionaryParameters.theta EvolutionaryParameters.bigM scaledMutationRate
+    scaledMigrationRate
   simp only
   rw [div_lt_div_iff₀
     (by nlinarith : 0 < 1 + 4 * Ne * mu₂ + 4 * Ne * mig)
@@ -2179,11 +2190,14 @@ theorem fstEquilibrium_decreasing_in_migration
     (hNe : 0 < Ne) (hmu : 0 ≤ mu) (hmig₁ : 0 ≤ mig₁) (hmig₂ : 0 ≤ mig₂)
     (ht : 0 ≤ t_div) (hr : 0 ≤ recomb) (hr2 : recomb ≤ 1/2) (hV : 0 < V_A)
     (h_mig : mig₁ < mig₂) :
-    let p₁ : EvolutionaryParameters := ⟨Ne, mu, mig₁, t_div, recomb, V_A, hNe, hmu, hmig₁, ht, hr, hr2, hV⟩
-    let p₂ : EvolutionaryParameters := ⟨Ne, mu, mig₂, t_div, recomb, V_A, hNe, hmu, hmig₂, ht, hr, hr2, hV⟩
+    let p₁ : EvolutionaryParameters :=
+      ⟨Ne, mu, mig₁, t_div, recomb, V_A, hNe, hmu, hmig₁, ht, hr, hr2, hV⟩
+    let p₂ : EvolutionaryParameters :=
+      ⟨Ne, mu, mig₂, t_div, recomb, V_A, hNe, hmu, hmig₂, ht, hr, hr2, hV⟩
     fstEquilibrium p₂ < fstEquilibrium p₁ := by
   simp only
-  unfold fstEquilibrium EvolutionaryParameters.theta EvolutionaryParameters.bigM scaledMutationRate scaledMigrationRate
+  unfold fstEquilibrium EvolutionaryParameters.theta EvolutionaryParameters.bigM scaledMutationRate
+    scaledMigrationRate
   simp only
   rw [div_lt_div_iff₀
     (by nlinarith : 0 < 1 + 4 * Ne * mu + 4 * Ne * mig₂)
@@ -2799,7 +2813,8 @@ noncomputable def PGSEvolutionaryModel.metricProfileFromTargetSignalWithPenalty
     (m : PGSEvolutionaryModel) (vSignalTarget : ℝ)
     (penalty : TransportedMetrics.IrreducibleTargetPenalty) :
     (m.metricProfileFromTargetSignalWithPenalty vSignalTarget penalty).auc =
-      TransportedMetrics.equalVarianceGaussianAUCFromSignalVariance vSignalTarget (m.V_E + penalty.total) := by
+      TransportedMetrics.equalVarianceGaussianAUCFromSignalVariance vSignalTarget (m.V_E +
+          penalty.total) := by
   rfl
 
 @[simp] theorem PGSEvolutionaryModel.metricProfileFromTargetSignalWithPenalty_brier

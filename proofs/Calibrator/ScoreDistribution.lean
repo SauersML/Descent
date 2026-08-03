@@ -121,15 +121,22 @@ noncomputable def benchmarkHighScoreRate (threshold μ σ : ℝ) : ℝ :=
   1 - Phi (thresholdStandardizedCoordinate threshold μ σ)
 
 /-- **Tail probability increases with mean shift toward the tail.**
-    If the score distribution shifts right, more individuals
-    exceed a fixed threshold → higher tail probability. -/
+
+    A right shift of the score distribution puts strictly more of it above a fixed threshold.
+    The conclusion is stated on `benchmarkHighScoreRate`, the tail rate itself, rather than on
+    the standardized coordinate: the coordinate inequality is the step of the proof, and a
+    statement about it alone would leave `Phi` and the tail rate out of a claim whose whole
+    content is that the tail rate moves. -/
 theorem mean_shift_increases_tail
     (threshold μ₁ μ₂ σ : ℝ)
     (h_σ : 0 < σ)
     (h_shift : μ₁ < μ₂) :
-    -- z-score for threshold decreases
-    (threshold - μ₂) / σ < (threshold - μ₁) / σ := by
-  exact div_lt_div_of_pos_right (by linarith) h_σ
+    benchmarkHighScoreRate threshold μ₁ σ < benchmarkHighScoreRate threshold μ₂ σ := by
+  have hz : (threshold - μ₂) / σ < (threshold - μ₁) / σ :=
+    div_lt_div_of_pos_right (by linarith) h_σ
+  have hPhi := strictMono_Phi hz
+  unfold benchmarkHighScoreRate thresholdStandardizedCoordinate
+  linarith
 
 /-- **Variance increase thickens tails.**
     Larger variance → more probability in both tails → more individuals

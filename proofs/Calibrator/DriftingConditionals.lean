@@ -111,6 +111,84 @@ theorem transportedResponse_prevalence_conserved
     _ = ∑ x, markedMass population response x :=
       transportMass_total P (markedMass population response) hP
 
+/-! ## Composition and the reconstruction tower law -/
+
+/-- Composition of two finite transport kernels. -/
+noncomputable def composeKernel (P Q : ι → ι → ℝ) (x z : ι) : ℝ :=
+  ∑ y, P x y * Q y z
+
+/-- Transporting mass through a composed kernel is the same as transporting it
+through the two kernels in sequence. -/
+theorem transportMass_compose (P Q : ι → ι → ℝ) (mass : ι → ℝ) (z : ι) :
+    transportMass (composeKernel P Q) mass z =
+      transportMass Q (transportMass P mass) z := by
+  unfold transportMass composeKernel
+  calc
+    ∑ x, mass x * ∑ y, P x y * Q y z =
+        ∑ x, ∑ y, mass x * P x y * Q y z := by
+      refine Finset.sum_congr rfl fun x _ ↦ ?_
+      rw [Finset.mul_sum]
+      refine Finset.sum_congr rfl fun y _ ↦ ?_
+      ring
+    _ = ∑ y, ∑ x, mass x * P x y * Q y z := Finset.sum_comm
+    _ = ∑ y, (∑ x, mass x * P x y) * Q y z := by
+      refine Finset.sum_congr rfl fun y _ ↦ ?_
+      rw [Finset.sum_mul]
+
+/-- Composition preserves row-mass normalization. -/
+theorem composeKernel_mass_preserving (P Q : ι → ι → ℝ)
+    (hP : IsMassPreservingKernel P) (hQ : IsMassPreservingKernel Q) :
+    IsMassPreservingKernel (composeKernel P Q) := by
+  intro x
+  unfold composeKernel
+  rw [Finset.sum_comm]
+  calc
+    ∑ y, ∑ z, P x y * Q y z = ∑ y, P x y * ∑ z, Q y z := by
+      refine Finset.sum_congr rfl fun y _ ↦ ?_
+      rw [Finset.mul_sum]
+    _ = ∑ y, P x y := by
+      refine Finset.sum_congr rfl fun y _ ↦ ?_
+      rw [hQ y, mul_one]
+    _ = 1 := hP x
+
+/-- Destination positivity after two steps supplies positivity for the composed
+transport without a new model assumption. -/
+theorem transportMass_compose_pos (P Q : ι → ι → ℝ) (population : ι → ℝ)
+    (hpositive : ∀ z, 0 < transportMass Q (transportMass P population) z) :
+    ∀ z, 0 < transportMass (composeKernel P Q) population z := by
+  intro z
+  rw [transportMass_compose]
+  exact hpositive z
+
+/-- **Exact tower law for drifting conditionals.**
+
+    Reconstructing the frozen-mark conditional after the composed transport is
+    identical to reconstructing after `P` and then after `Q`. This is the finite
+    semigroup/tower-property form of forward time-reversal reconstruction. -/
+theorem transportedResponse_compose
+    (P Q : ι → ι → ℝ) (population response : ι → ℝ)
+    (hPpositive : ∀ y, 0 < transportMass P population y)
+    (hQpositive : ∀ z, 0 < transportMass Q (transportMass P population) z)
+    (z : ι) :
+    transportedResponse (composeKernel P Q) population response
+        (transportMass_compose_pos P Q population hQpositive) z =
+      transportedResponse Q (transportMass P population)
+        (transportedResponse P population response hPpositive) hQpositive z := by
+  have hmarked :
+      markedMass (transportMass P population)
+          (transportedResponse P population response hPpositive) =
+        transportMass P (markedMass population response) := by
+    funext y
+    exact transportedResponse_mul_population P population response hPpositive y
+  change
+    transportMass (composeKernel P Q) (markedMass population response) z /
+          transportMass (composeKernel P Q) population z =
+      transportMass Q
+          (markedMass (transportMass P population)
+            (transportedResponse P population response hPpositive)) z /
+        transportMass Q (transportMass P population) z
+  rw [transportMass_compose, transportMass_compose, hmarked]
+
 /-! ## The population-built reverse bridge -/
 
 /-- Bayes' reverse transition from destination `y` back to source `x`.

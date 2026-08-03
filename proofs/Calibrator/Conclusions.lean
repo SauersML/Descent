@@ -97,13 +97,16 @@ theorem expectedBrierScore_deriv (p π : ℝ) :
       exact differentiableAt_id
   have hd2 : DifferentiableAt ℝ (fun x : ℝ ↦ x ^ 2) p :=
     differentiableAt_id.pow 2
-  have h_deriv_add : deriv (fun x : ℝ ↦ (π - 2 * π * x) + x ^ 2) p = deriv (fun x : ℝ ↦ π - 2 * π * x) p + deriv (fun x : ℝ ↦ x ^ 2) p :=
+  have h_deriv_add : deriv (fun x : ℝ ↦ (π - 2 * π * x) + x ^ 2) p = deriv (fun x : ℝ ↦ π - 2 * π *
+      x) p + deriv (fun x : ℝ ↦ x ^ 2) p :=
     deriv_add hd1 hd2
   have h_eq_add : (fun x : ℝ ↦ π - 2 * π * x + x ^ 2) = (fun x : ℝ ↦ (π - 2 * π * x) + x ^ 2) := rfl
   rw [h_eq_add, h_deriv_add]
   have hd1_sub1 : DifferentiableAt ℝ (fun x : ℝ ↦ π) p := differentiableAt_const π
-  have hd1_sub2 : DifferentiableAt ℝ (fun x : ℝ ↦ 2 * π * x) p := differentiableAt_id.const_mul (2 * π)
-  have h_deriv_sub : deriv (fun x : ℝ ↦ π - 2 * π * x) p = deriv (fun x : ℝ ↦ π) p - deriv (fun x : ℝ ↦ 2 * π * x) p :=
+  have hd1_sub2 : DifferentiableAt ℝ (fun x : ℝ ↦ 2 * π * x) p :=
+    differentiableAt_id.const_mul (2 * π)
+  have h_deriv_sub : deriv (fun x : ℝ ↦ π - 2 * π * x) p = deriv (fun x : ℝ ↦ π) p - deriv (fun x :
+      ℝ ↦ 2 * π * x) p :=
     deriv_sub hd1_sub1 hd1_sub2
   rw [h_deriv_sub]
   rw [deriv_const]
@@ -161,7 +164,8 @@ noncomputable def exactBrierRiskOfCalibrated {Z : Type*} [MeasurableSpace Z]
     (μ : Measure Z) (η : Z → ℝ) : ℝ :=
   ∫ z, expectedBrierScore (η z) (η z) ∂μ
 
-/-- Exact calibrated Brier-risk identity: pointwise Bernoulli variance integrated over the population. -/
+/-- Exact calibrated Brier-risk identity: pointwise Bernoulli variance integrated over the
+    population. -/
 theorem exactBrierRiskOfCalibrated_eq_integral {Z : Type*} [MeasurableSpace Z]
     (μ : Measure Z) (η : Z → ℝ) :
     exactBrierRiskOfCalibrated μ η = ∫ z, η z * (1 - η z) ∂μ := by
@@ -345,7 +349,8 @@ lemma deriv_sigmoid (x : ℝ) : deriv sigmoid x = sigmoid x * (1 - sigmoid x) :=
   field_simp [h_ne]
   ring
 
-lemma deriv2_sigmoid (x : ℝ) : deriv (deriv sigmoid) x = sigmoid x * (1 - sigmoid x) * (1 - 2 * sigmoid x) := by
+lemma deriv2_sigmoid (x : ℝ) : deriv (deriv sigmoid) x = sigmoid x * (1 - sigmoid x) * (1 - 2 *
+    sigmoid x) := by
   have h_eq : deriv sigmoid = fun x ↦ sigmoid x * (1 - sigmoid x) := by
     ext y; rw [deriv_sigmoid]
   rw [h_eq]
@@ -353,7 +358,8 @@ lemma deriv2_sigmoid (x : ℝ) : deriv (deriv sigmoid) x = sigmoid x * (1 - sigm
   have h_has_deriv_sig : HasDerivAt sigmoid (sigmoid x * (1 - sigmoid x)) x := by
     rw [← deriv_sigmoid]
     exact DifferentiableAt.hasDerivAt (differentiable_sigmoid x)
-  convert HasDerivAt.mul h_has_deriv_sig (HasDerivAt.sub (hasDerivAt_const x (1:ℝ)) h_has_deriv_sig) using 1
+  convert HasDerivAt.mul h_has_deriv_sig (HasDerivAt.sub (hasDerivAt_const x (1:ℝ))
+      h_has_deriv_sig) using 1
   simp; ring
 
 lemma sigmoid_strictConcaveOn_Ici : StrictConcaveOn ℝ (Set.Ici 0) sigmoid := by
@@ -394,7 +400,8 @@ lemma sigmoid_strictConcaveOn_Ici : StrictConcaveOn ℝ (Set.Ici 0) sigmoid := b
     have h_diff : Differentiable ℝ sigmoid := fun x ↦ differentiable_sigmoid x
     have h_cont : ContinuousOn sigmoid (Set.Ici 0) := h_diff.continuous.continuousOn
     have h_int_sigmoid : Integrable (sigmoid ∘ X) P := by
-      have h_cont_sig : Continuous sigmoid := Differentiable.continuous (fun x ↦ differentiable_sigmoid x)
+      have h_cont_sig : Continuous sigmoid :=
+        Differentiable.continuous (fun x ↦ differentiable_sigmoid x)
       refine Integrable.of_bound (h_cont_sig.comp_aestronglyMeasurable h_ae_meas) (1:ℝ) ?_
       filter_upwards with ω
       rw [Real.norm_eq_abs]
@@ -402,7 +409,8 @@ lemma sigmoid_strictConcaveOn_Ici : StrictConcaveOn ℝ (Set.Ici 0) sigmoid := b
       constructor
       · apply le_trans (by norm_num : (-1:ℝ) ≤ 0) (le_of_lt (sigmoid_pos _))
       · exact le_of_lt (sigmoid_lt_one _)
-    rcases sigmoid_strictConcaveOn_Ici.ae_eq_const_or_lt_map_average h_cont isClosed_Ici h_mem h_integrable h_int_sigmoid with h_eq | h_lt
+    rcases sigmoid_strictConcaveOn_Ici.ae_eq_const_or_lt_map_average h_cont isClosed_Ici
+      h_mem h_integrable h_int_sigmoid with h_eq | h_lt
     · exfalso
       simp only [average_eq_integral] at h_eq
       rw [h_mean] at h_eq
@@ -520,7 +528,8 @@ theorem bernoulliKLReal_nonneg (p q : ℝ) (hp0 : 0 < p) (hp1 : p < 1) (hq0 : 0 
   have hp1_pos : 0 < 1 - p := by linarith
   have h1_neg : - (p * Real.log (q / p)) ≥ - p * (q / p - 1) := by
     linarith [mul_le_mul_of_nonneg_left h1 (le_of_lt hp_pos)]
-  have h2_neg : - ((1 - p) * Real.log ((1 - q) / (1 - p))) ≥ - (1 - p) * ((1 - q) / (1 - p) - 1) := by
+  have h2_neg : - ((1 - p) * Real.log ((1 - q) / (1 - p))) ≥ - (1 - p) * ((1 - q) / (1 - p) -
+      1) := by
     linarith [mul_le_mul_of_nonneg_left h2 (le_of_lt hp1_pos)]
   have h_log_inv1 : Real.log (p / q) = - Real.log (q / p) := by
     rw [Real.log_div (hp0.ne') (hq0.ne'), Real.log_div (hq0.ne') (hp0.ne')]
