@@ -4512,7 +4512,8 @@ theorem ibdRecurrenceFixedPoint_isFixedPoint (Ne rate : ℝ)
   -- only then clear the coalescence denominator. Expanding first made the
   -- nonzero hypothesis syntactically unusable and left an inverse in the goal.
   apply (eq_div_iff hd').2
-  field_simp only [h2Ne', hdExpanded]
+  field_simp [h2Ne', hdExpanded]
+  field_simp [hd']
   ring
 
 /-- **Total isolation is a boundary the rest point attains.**  With `rate = 0`
