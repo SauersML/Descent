@@ -365,13 +365,17 @@ otherwise the moduli is the two-parameter family of admissible endpoint pairs.
 -/
 
 /-- **Boundary factorization at latent dimension one, uniqueness criterion.**
-A segment `[lo, hi]` enclosing the data segment `[dlo, dhi]` inside the positivity
-window `[0, cap]` is *minimal* exactly when its endpoints coincide with the data
-endpoints; otherwise every admissible endpoint pair gives another enclosing segment,
-so the moduli is two-parameter. -/
+A segment `[lo, hi]` enclosing the data segment `[dlo, dhi]` is *minimal* exactly when
+its endpoints coincide with the data endpoints; otherwise every admissible endpoint pair
+gives another enclosing segment, so the moduli is two-parameter.
+
+The positivity window `[0, cap]` plays no part in this. Carrying `0 ≤ lo ∧ hi ≤ cap` as a
+hypothesis — and `cap` as a variable only that hypothesis mentions — would make the
+statement read as a fact about admissible enclosures inside the window, when what is proved
+is the enclosure order alone. Callers needing the window must state it themselves. -/
 theorem boundary_factorization_dim_one_unique_iff
-    (dlo dhi lo hi cap : ℝ)
-    (hdata : lo ≤ dlo ∧ dhi ≤ hi) (hwindow : 0 ≤ lo ∧ hi ≤ cap) :
+    (dlo dhi lo hi : ℝ)
+    (hdata : lo ≤ dlo ∧ dhi ≤ hi) :
     (lo = dlo ∧ hi = dhi) ↔ ¬ (lo < dlo ∨ dhi < hi) := by
   obtain ⟨h1, h2⟩ := hdata
   constructor
