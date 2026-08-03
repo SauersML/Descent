@@ -104,11 +104,17 @@ theorem between_group_variance_fraction_le_one
   rw [div_le_one h_varZ_pos, h_decomp]
   linarith
 
-/-- **When within-group variance dominates, R² is small.**
-    If E[Var(Z|D)] ≥ (1 - δ)·Var(Z), then R²(Z,D) ≤ δ.
+/-- **The complementary share of a two-part decomposition:** if
+    `varZ = a + b` with `varZ > 0` and `a ≥ (1 - δ)·varZ`, then `b/varZ ≤ δ`.
 
-    Worked example: For height, Wang et al. find δ ≈ 0.005 (R² = 0.51%). -/
-theorem r2_small_when_within_dominates
+    Read as the law of total variance, `a` is `E[Var(Z|D)]`, `b` is
+    `Var(E[Z|D])`, and the conclusion is a bound on `R²(Z,D)`. That reading is
+    supplied entirely by `h_decomp`, which stipulates the decomposition: there
+    is no `Z`, no `D`, no conditional expectation and no `R²` below, and the
+    law of total variance is not invoked, only assumed in the shape of an
+    equation between three reals. A measured `δ` for a fitted model is not an
+    instance of this, whose variables are free. -/
+theorem div_le_of_ge_one_sub_mul
     (varZ eVarZgivenD varEZgivenD δ : ℝ)
     (h_decomp : varZ = eVarZgivenD + varEZgivenD)
     (h_varZ_pos : 0 < varZ)
@@ -374,8 +380,14 @@ theorem relative_error_increases_with_turnover
   nlinarith [sq_nonneg β, sq_nonneg δ, mul_pos hρ₁ hβ, mul_pos hρ₂ hβ,
              mul_pos hβ hδ, mul_pos hρ₁ hδ, mul_pos hρ₂ hδ]
 
-/-- **Heterozygosity increase → PGS variance increase at a single locus.** -/
-theorem het_increase_implies_locus_var_increase
+/-- **Multiplying by a positive number preserves strict order:**
+    `H_s < H_t` gives `β²·H_s < β²·H_t`.
+
+    Read as genetics the two sides are one locus's contribution to score
+    variance at two heterozygosities. That reading is the choice to call the
+    factors `beta_sq` and `H`; no locus, no genotype and no score appears
+    below. -/
+theorem mul_lt_mul_left_of_pos'
     (beta_sq H_s H_t : ℝ) (hβ : 0 < beta_sq) (hH : H_s < H_t) :
     beta_sq * H_s < beta_sq * H_t :=
   mul_lt_mul_of_pos_left hH hβ
@@ -396,11 +408,16 @@ theorem variance_decomposition
   rw [← Finset.sum_union disjoint_compl_right]
   congr 1; exact (Finset.union_compl S).symm
 
-/-- **Sufficient condition for PGS variance increase.**
-    Partition loci into a highlighted subset `S` and its complement.
-    If the variance gain on `S` exceeds the variance loss on `Sᶜ`,
-    the total predictor variance increases. -/
-theorem variance_increase_sufficient
+/-- **A net gain on a subset raises the total:** if the increase over `S`
+    exceeds the decrease over `Sᶜ`, then `∑ w_s < ∑ w_t`.
+
+    The genetics reading partitions loci into a highlighted set and its
+    complement and reads the sums as predictor variance. Below there are no
+    loci and no variance — `w_s` and `w_t` are arbitrary functions into `ℝ`,
+    not constrained to be nonnegative or to be per-locus contributions of
+    anything. Splitting a sum over a finset and its complement, plus
+    `linarith`. -/
+theorem sum_lt_sum_of_net_gain_on_subset
     {m : ℕ} (w_s w_t : Fin m → ℝ) (S : Finset (Fin m))
     (h_net :
       (∑ i ∈ S, w_t i) - (∑ i ∈ S, w_s i) >
@@ -763,13 +780,16 @@ theorem locus_heterogeneity_creates_weighted_gap
     exact hsum_strict
   linarith
 
-/-- **Local ancestry captures LD-relevant information.**
-    Global Fst averages over the whole genome, but PGS accuracy depends on
-    LD at specific index SNPs. Local Fst at those SNPs is more relevant.
+/-- **A weighted average exceeds a constant when the weighted deviations from
+    it are positive:** `c < (∑ β² x) / (∑ β²)`.
 
-    If the weighted average of local Fst (weighted by squared effects)
-    differs from global Fst, global Fst is a biased proxy. -/
-theorem local_fst_more_informative
+    The genetics reading is that a genome-wide `F_ST` is a biased proxy for the
+    effect-weighted average of local `F_ST`, so global and local carry
+    different information. What is proved is that the weighted mean of `x`
+    exceeds `c` when `∑ β²(x - c) > 0` — an arithmetic fact about weights, with
+    no ancestry, no locus, no LD and no accuracy in it, and in particular no
+    comparison of how informative two quantities are. -/
+theorem lt_weighted_mean_of_weighted_deviation_pos
     {m : ℕ} (β : Fin m → ℝ) (fst_local : Fin m → ℝ) (fst_global : ℝ)
     (h_nonneg : ∀ i, 0 ≤ β i ^ 2 * (fst_local i - fst_global))
     (i₀ : Fin m)
