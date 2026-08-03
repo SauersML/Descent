@@ -21,10 +21,18 @@ Key results:
 1. Incremental R² and its standard error
 2. Cross-validation design for portability studies
 3. Summary statistic-based PGS construction
-4. LD score regression for cross-population analysis
-5. Genetic correlation estimation methods
+4. `LDSCModel` as a data record, and root-`n` standard-error shape results stated
+   against it. **No LD score regression is formalized here** — nothing in this file
+   regresses chi-squared statistics on LD scores or estimates an intercept.
+5. **No genetic-correlation estimator survives in this file.** The one that stood here
+   was cosine similarity of effect vectors under an LDSC name; it is deleted, with the
+   measurements that killed it recorded at the deletion site. Do not read items 4 and 5
+   as capabilities this module provides.
 
-Reference: Wang et al. (2026), Nature Communications 17:942.
+Reference: Wang et al. (2026), Nature Communications 17:942 -- for the three open
+questions these methods are aimed at, not for the methods themselves. Incremental
+R-squared, LD score regression and genetic-correlation estimation are standard, and
+what is proved about them here is derived here; that paper contains none of it.
 -/
 
 
@@ -143,38 +151,35 @@ individual-level data. This introduces specific challenges.
 section SummaryStatPGS
 
 
-/-- **FALSIFIED as a sample size — this is the inverse-variance meta-analysis weight.**
+/-! **Deleted: `effectiveSampleSizeSE se = 1/se^2`, together with
+`effectiveSampleSizeSE_lt_corrected` and the positivity lemma stated about it.**
 
-    `1/SE²` is not `n_eff`. For a standardized trait `SE² = σ_y²/(n · Var(g))` with
-    `Var(g) = 2p(1-p)`, so the allele frequency does not cancel and this body **always
-    understates** the sample size, by exactly the factor `2p(1-p)`.
+`1/SE²` is not `n_eff`. For a standardized trait `SE² = σ_y²/(n · Var(g))` with
+`Var(g) = 2p(1-p)`, so the allele frequency does not cancel and that body **always
+understated** the sample size, by exactly the factor `2p(1-p)`. Measured against
+Monte-Carlo GWAS regressions at a true `n = 2000`:
 
-    Measured against Monte-Carlo GWAS regressions at a true `n = 2000`:
+| `p` | deleted body | `effectiveSampleSizeFromSE` | error |
+|---|---|---|---|
+| 0.5 | 996 | 1992 | −50.2% |
+| 0.3 | 838 | 1996 | −58.1% |
+| 0.1 | 359 | 1994 | −82.1% |
+| 0.05 | 189 | 1993 | −90.5% |
+| 0.01 | 39 | 1976 | **−98.0%** |
 
-    | `p` | this body | corrected | error |
-    |---|---|---|---|
-    | 0.5 | 996 | 1992 | −50.2% |
-    | 0.3 | 838 | 1996 | −58.1% |
-    | 0.1 | 359 | 1994 | −82.1% |
-    | 0.05 | 189 | 1993 | −90.5% |
-    | 0.01 | 39 | 1976 | **−98.0%** |
+This was the missing-parameter class: no allele frequency appeared in the signature, so no
+constant could repair it — the same defect that falsified `ridgeBalance`. The expression
+`1/SE²` is a correct inverse-variance meta-analysis **weight**, and where a weight is wanted
+`fixed_weights` below is the declaration that says so; nothing in the corpus consumed the
+deleted name. Measured in `proofs/validation/popgen_diff2/`.
 
-    The corrected form recovers `n` to 0.2–1.2% in every cell. This is the
-    missing-parameter class: no allele frequency appears in the signature, so no constant
-    repairs it — the same defect that falsified `ridgeBalance`. The docstring's own first
-    sentence, `(Z/β)²`, is right for a standardized effect; its second sentence states the
-    error.
+`effectiveSampleSizeFromSE` is the sample size. -/
 
-    Retained under its own name because the body **is** the correct inverse-variance weight
-    and is used as such; `effectiveSampleSizeFromSE` is the sample size.
-
-    Empirical status: **FALSIFIED** (`proofs/validation/popgen_diff2/`). -/
-noncomputable def effectiveSampleSizeSE (se : ℝ) : ℝ := 1 / se ^ 2
-
-/-- **Effective sample size from a standard error, corrected.**
+/-- **Effective sample size from a standard error.**
 
     `n_eff = 1/(SE² · 2p(1-p))` for a standardized trait. Recovers the true `n` to about 1%
-    across allele frequencies from 0.5 down to 0.01.
+    across allele frequencies from 0.5 down to 0.01, where the superseded `1/SE²` understated
+    it by 50% at `p = 0.5` and by 98% at `p = 0.01` (`proofs/validation/popgen_diff2/`).
 
     **Scope caveat, found by a later sweep and absent from the first version of this
     docstring:** it overstates `N` for large-effect SNPs, by `+27%` at `h²_snp = 0.10` and
@@ -187,27 +192,13 @@ noncomputable def effectiveSampleSizeSE (se : ℝ) : ℝ := 1 / se ^ 2
 noncomputable def effectiveSampleSizeFromSE (se p : ℝ) : ℝ :=
   1 / (se ^ 2 * (2 * p * (1 - p)))
 
-/-- **The weight understates the sample size at every polymorphic frequency.**
-
-    The gap is not a constant: it is `2p(1-p)`, which is at most `1/2` and tends to zero at
-    rare variants, so the understatement is worst exactly where summary-statistic methods are
-    most fragile. -/
-theorem effectiveSampleSizeSE_lt_corrected (se p : ℝ)
-    (hse : se ≠ 0) (hp0 : 0 < p) (hp1 : p < 1) :
-    effectiveSampleSizeSE se < effectiveSampleSizeFromSE se p := by
-  have hse2 : 0 < se ^ 2 := by positivity
+/-- The effective sample size is positive at any polymorphic frequency. -/
+theorem effective_n_pos (se p : ℝ) (h_se : 0 < se) (hp0 : 0 < p) (hp1 : p < 1) :
+    0 < effectiveSampleSizeFromSE se p := by
   have hc : 0 < 2 * p * (1 - p) := by nlinarith
-  have hc1 : 2 * p * (1 - p) < 1 := by nlinarith [sq_nonneg (2 * p - 1)]
-  have h : se ^ 2 * (2 * p * (1 - p)) < se ^ 2 := by
-    nlinarith [hse2, hc1]
-  unfold effectiveSampleSizeSE effectiveSampleSizeFromSE
-  exact one_div_lt_one_div_of_lt (by positivity) h
-
-/-- Effective sample size is positive. -/
-theorem effective_n_pos (se : ℝ) (h_se : 0 < se) :
-    0 < effectiveSampleSizeSE se := by
-  unfold effectiveSampleSizeSE
-  exact div_pos one_pos (sq_pos_of_pos h_se)
+  have hse2 : 0 < se ^ 2 := by positivity
+  unfold effectiveSampleSizeFromSE
+  exact div_pos one_pos (by positivity)
 
 /-- **Meta-analysis model definition.**
     Contains properties of the model, specifically:
@@ -282,128 +273,41 @@ structure LDSCModel (m : ℕ) where
   h_ld_adj_pos : ∀ i, 0 ≤ ld_adj i
   h_ld_adj_le_one : ∀ i, ld_adj i ≤ 1
 
-/-- **NAME WRONG — this is cosine similarity, not LD score regression.**
+/-! **Deleted: `geneticCorrelationLDSC` — later renamed `geneticCorrelationLDSC`
+— together with `genetic_correlation_predicts_portability` and
+`genetic_correlation_portability_bound_attained`.**
 
-    There is no LD score, no chi-squared, no regression and no intercept in this body, and
-    `LDSCModel.ld_adj` is never touched by it. This is the `hudsonFst` shape: a name asserting
-    a method the body does not implement. Unlike `hudsonFst` it has **no downstream consumer**
-    — grep finds no use outside its own two theorems — so no propagated error exists today and
-    the exposure is prospective.
+The body was
+`(∑ β_s β_t) / √((∑ β_s²)(∑ β_t²))`: cosine similarity. There is no LD score, no
+chi-squared, no regression and no intercept in it, and `LDSCModel.ld_adj` was never touched
+by it. It had no downstream consumer outside its own two theorems, so nothing propagated,
+and no reading of it survives measurement as a summary-statistic estimator
+(`proofs/validation/ldsc_diff/`):
 
-    **It is the right estimand under conventions nothing states.** Cosine of the *true* effect
-    vectors returns the designed `ρ_g` in every arm (`0.60` designed → `0.591`–`0.605`
-    measured). But that holds only under standardized genotypes, mean-zero effects and linkage
-    equilibrium, none of which is stated, and two exact-rational results show what breaks:
+* **LD alone breaks it.** Two SNPs at `r = 1/2` with joint effects `(1,0)` and `(0,1)` are
+  exactly orthogonal, `ρ_g = 0`. The *marginal* effects are `(1,1/2)` and `(1/2,1)`, giving
+  `cos = 0.8` exactly — and marginal effects are what summary statistics supply.
+* **It clashes with this corpus's own weighting.** `additiveVariance` weights per-allele
+  effects by `2p(1-p)`; this body weighted uniformly: `0.4714` unweighted against `0.3739`
+  HWE-weighted on the same vectors. `LDSCModel` carries no allele frequencies, so neither
+  weighted estimand is even expressible.
+* **It attenuates where LDSC does not.** At true `ρ_g = 0.60` with block-AR(1) LD and no
+  overlap it returned `0.529, 0.461, 0.373, 0.161, 0.076` at `M/N = 0.2, 0.5, 1, 4, 10` —
+  **13% of the truth at the realistic ratio** — following `ρ_g·∏ₖ√(h²L̄/(h²L̄ + M/Nₖ))`.
+  Genuine bivariate LDSC does not: genetic covariance `0.311 ± 0.120` against a true `0.304`
+  at `M/N = 10`. The attenuation is a pure noise effect, not an LD effect.
+* **Sample overlap manufactures signal.** At true `ρ_g = 0`, `ρ_e = 0.8` it returned `0.007`
+  at no overlap, `0.153` at 50%, and **`0.282` at full overlap — out of nothing** — while
+  LDSC's intercept absorbs the overlap and its slope reads `-0.002`. On a real signal
+  (`ρ_g = 0.30`) full overlap inflated it to `0.479`, **+60%**, in the direction of
+  `sign(ρ_e)`. The bias is `(M/N)·ρ_pheno/(h²L̄ + M/N)`. A negative control confirms the
+  mechanism: 100% overlap with `ρ_e = 0` gives `-0.003 ± 0.012`, so it is overlap **times**
+  phenotypic correlation that bites, not overlap alone.
 
-    * **LD alone breaks it.** Two SNPs at `r = 1/2` with joint effects `(1,0)` and `(0,1)` are
-      exactly orthogonal, `ρ_g = 0`. The *marginal* effects are `(1,1/2)` and `(1/2,1)`, giving
-      `cos = 0.8` exactly — and marginal effects are what summary statistics supply.
-    * **It clashes with this corpus's own weighting.** `additiveVariance` weights per-allele
-      effects by `2p(1-p)`; this body weights uniformly. On the same vectors: `0.4714`
-      unweighted against `0.3739` HWE-weighted. `LDSCModel` carries no allele frequencies, so
-      neither weighted estimand is even expressible.
-
-    **It attenuates where LDSC does not.** At true `ρ_g = 0.60` with block-AR(1) LD and no
-    overlap, this body returns `0.529, 0.461, 0.373, 0.161, 0.076` at `M/N = 0.2, 0.5, 1, 4,
-    10` — **13% of the truth at the realistic ratio** — following
-    `ρ_g·∏ₖ√(h²L̄/(h²L̄ + M/Nₖ))`. Genuine bivariate LDSC does not: genetic covariance `0.311 ±
-    0.120` against a true `0.304` at `M/N = 10`. The attenuation is a pure noise effect, not an
-    LD effect; no-LD arms follow the same law.
-
-    **Sample overlap makes this a user-facing error rather than a naming quibble.** At true
-    `ρ_g = 0`, `ρ_e = 0.8`: this body returns `0.007` at no overlap, `0.153` at 50%, and
-    **`0.282` at full overlap — manufactured out of nothing** — while LDSC's intercept absorbs
-    it and its slope reads `-0.002`. On top of a real signal (`ρ_g = 0.30`) full overlap
-    inflates this body to `0.479`, **+60%**, in the direction of `sign(ρ_e)`. The bias is
-    `(M/N)·ρ_pheno/(h²L̄ + M/N)`, growing toward `ρ_pheno` as `M/N` grows. A negative control
-    confirms the mechanism: 100% overlap with `ρ_e = 0` gives `-0.003 ± 0.012`, so it is
-    overlap **times** phenotypic correlation that bites, not overlap alone.
-
-    Empirical status: **NAME FALSIFIED; body VALIDATED as `ρ_g` on true effects under
-    unstated conventions; FALSIFIED as an estimator from summary statistics**
-    (`proofs/validation/ldsc_diff/`). -/
-noncomputable def geneticCorrelationLDSC {m : ℕ} (model : LDSCModel m) : ℝ :=
-  (∑ i, model.beta_s i * model.beta_t i) /
-    Real.sqrt ((∑ i, model.beta_s i ^ 2) * (∑ i, model.beta_t i ^ 2))
-
-/-- **Genetic correlation bounds portability ratio.**
-    The portability ratio R²_target / R²_source is bounded by ρ_g² × ld_adj.
-    Since |ρ_g| ≤ 1 implies ρ_g² ≤ 1, and ld_adj ∈ [0,1], the product
-    is at most 1. This gives the rg-based bound on portability.
-    We formally define this using a rigorous structure. -/
-theorem genetic_correlation_predicts_portability {m : ℕ} (hm : 0 < m)
-    (model : LDSCModel m)
-    (h_pos_s : 0 < ∑ i, model.beta_s i ^ 2)
-    (h_pos_t : 0 < ∑ i, model.beta_t i ^ 2) :
-    (geneticCorrelationLDSC model) ^ 2 * ((∑ i, model.ld_adj i) / m) ≤ 1 := by
-  have hm_pos : 0 < (m : ℝ) := Nat.cast_pos.mpr hm
-
-  have h_cauchy : (∑ i, model.beta_s i * model.beta_t i) ^ 2 ≤
-      (∑ i, model.beta_s i ^ 2) * (∑ i, model.beta_t i ^ 2) := by
-    exact sum_mul_sq_le_sq_mul_sq univ model.beta_s model.beta_t
-
-  have h_rho_sq_le_one : (geneticCorrelationLDSC model) ^ 2 ≤ 1 := by
-    unfold geneticCorrelationLDSC
-    rw [div_pow]
-    have h_sqrt_sq : (Real.sqrt ((∑ i, model.beta_s i ^ 2) * (∑ i, model.beta_t i ^ 2))) ^ 2 =
-        (∑ i, model.beta_s i ^ 2) * (∑ i, model.beta_t i ^ 2) := by
-      apply Real.sq_sqrt
-      positivity
-    rw [h_sqrt_sq]
-    rw [div_le_one]
-    · exact h_cauchy
-    · positivity
-
-  have h_ld_sum_le_m : ∑ i, model.ld_adj i ≤ m := by
-    calc ∑ i, model.ld_adj i
-      _ ≤ ∑ _i : Fin m, (1 : ℝ) := sum_le_sum (fun i _ => model.h_ld_adj_le_one i)
-      _ = m := by simp
-
-  have h_ld_avg_le_one : (∑ i, model.ld_adj i) / m ≤ 1 := by
-    rw [div_le_one hm_pos]
-    exact h_ld_sum_le_m
-
-  have h_ld_avg_nonneg : 0 ≤ (∑ i, model.ld_adj i) / m := by
-    apply div_nonneg
-    · apply sum_nonneg
-      intro i _
-      exact model.h_ld_adj_pos i
-    · positivity
-
-  calc (geneticCorrelationLDSC model) ^ 2 * ((∑ i, model.ld_adj i) / m)
-    _ ≤ 1 * ((∑ i, model.ld_adj i) / m) := mul_le_mul_of_nonneg_right h_rho_sq_le_one h_ld_avg_nonneg
-    _ = (∑ i, model.ld_adj i) / m := one_mul _
-    _ ≤ 1 := h_ld_avg_le_one
-
-/-- **The portability bound is attained: threshold equals capacity.**
-
-The companion to `genetic_correlation_predicts_portability`, which gives only
-`≤ 1` and so leaves open whether the bound is ever met. It is met, and the
-condition is that both constraints be active at once: the effect vectors
-perfectly aligned, and the LD adjustment saturated at every variant. This makes
-the `≤ 1` statement sharp rather than merely true, and it identifies the
-configuration a portability calculation must rule out before treating the bound
-as informative. No symmetry or exchangeability of the LD structure is used; the
-activity of the two constraints is the whole hypothesis. -/
-theorem genetic_correlation_portability_bound_attained {m : ℕ} (hm : 0 < m)
-    (model : LDSCModel m)
-    (h_same : ∀ i, model.beta_t i = model.beta_s i)
-    (h_ld_one : ∀ i, model.ld_adj i = 1)
-    (h_pos_s : 0 < ∑ i, model.beta_s i ^ 2) :
-    (geneticCorrelationLDSC model) ^ 2 * ((∑ i, model.ld_adj i) / m) = 1 := by
-  have hm_pos : 0 < (m : ℝ) := Nat.cast_pos.mpr hm
-  have hnum : ∑ i, model.beta_s i * model.beta_t i = ∑ i, model.beta_s i ^ 2 :=
-    Finset.sum_congr rfl (fun i _ => by rw [h_same i]; ring)
-  have hden : ∑ i, model.beta_t i ^ 2 = ∑ i, model.beta_s i ^ 2 :=
-    Finset.sum_congr rfl (fun i _ => by rw [h_same i])
-  have h_rho : geneticCorrelationLDSC model = 1 := by
-    unfold geneticCorrelationLDSC
-    rw [hnum, hden, ← pow_two, Real.sqrt_sq (le_of_lt h_pos_s),
-      div_self (ne_of_gt h_pos_s)]
-  have h_ldsum : ∑ i, model.ld_adj i = (m : ℝ) := by
-    rw [Finset.sum_congr rfl (fun i _ => h_ld_one i)]
-    simp
-  rw [h_rho, h_ldsum, one_pow, div_self (ne_of_gt hm_pos), mul_one]
+The two deleted theorems bounded `ρ_g² · (∑ ld_adj)/m ≤ 1` and gave its attainment. Both were
+Cauchy–Schwarz on the cosine, so neither said anything about a genetic correlation estimated
+from summary statistics; they are gone with the definition they were about. `LDSCModel`
+itself is retained: the LDSC standard-error results below use it. -/
 
 /-- **LDSC standard error for ρ_g.**
     SE(ρ̂_g) depends on sample sizes, LD structure, and polygenicity.

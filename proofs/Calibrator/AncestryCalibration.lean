@@ -13,7 +13,10 @@ This file formalizes the theory of calibrating PGS across ancestry groups,
 including optimal recalibration strategies, transfer learning bounds,
 and the fundamental limits of what calibration can and cannot recover.
 
-Reference: Wang et al. (2026), Nature Communications 17:942.
+Reference: Wang et al. (2026), Nature Communications 17:942 -- for the measured
+portability gap, and for the R2/AUC divergence, which the docstrings below cite by
+specific finding. The recalibration algebra and the transfer bounds are derived
+here, not imported from it.
 -/
 
 

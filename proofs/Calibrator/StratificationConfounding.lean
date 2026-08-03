@@ -22,7 +22,9 @@ References:
 - Zaidi and Mathieson (2020), eLife 9:e61548.
 - Blanc and Berg (2025), Genetics 230(2):iyaf071.
 - Blanc, Mawass, and Berg (2025), bioRxiv 2025.12.04.692430.
-- Wang et al. (2026), Nature Communications 17:942.
+- Wang et al. (2026), Nature Communications 17:942 -- for the measured portability
+  gap cited in one docstring below, not for the stratification results, which the
+  three references above cover.
 -/
 
 

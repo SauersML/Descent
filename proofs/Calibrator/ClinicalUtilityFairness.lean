@@ -21,7 +21,10 @@ Key results:
 4. Risk stratification accuracy across populations
 5. Cost-effectiveness depends on portability
 
-Reference: Wang et al. (2026), Nature Communications 17:942.
+Reference: Wang et al. (2026), Nature Communications 17:942 -- for the portability
+gap itself and its clinical-equity motivation, which that paper measures. It does
+not contain the liability-threshold derivation, the decision-curve results or the
+fairness impossibility statement below; those are derived here.
 -/
 
 

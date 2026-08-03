@@ -529,7 +529,11 @@ Key results:
 4. Feature representation learning across ancestries
 5. Sample complexity for target-domain fine-tuning
 
-Reference: Wang et al. (2026), Nature Communications 17:942.
+Reference: Ben-David, Blitzer, Crammer, Kulesza, Pereira and Vaughan (2010),
+"A theory of learning from different domains", Machine Learning 79:151-175 -- the
+source of the eps_S(h) + d_H(S,T) + lambda* bound formalized below. The mapping of
+that bound onto ancestry domains, and the relation between H-divergence and Fst,
+are derived here, not imported from it.
 -/
 
 

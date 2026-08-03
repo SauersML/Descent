@@ -21,7 +21,10 @@ Key results:
 4. Clinical implementation guidelines
 5. Regulatory and return-of-results considerations
 
-Reference: Wang et al. (2026), Nature Communications 17:942.
+Reference: Wang et al. (2026), Nature Communications 17:942 -- for the portability
+gap and the equity motivation, which that paper measures and argues. The
+decision-theoretic, allocation and implementation results below are derived here;
+that paper does not contain them.
 -/
 
 
