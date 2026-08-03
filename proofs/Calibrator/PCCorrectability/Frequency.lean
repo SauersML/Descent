@@ -47,6 +47,17 @@ noncomputable def FrequencyResolvedCohort.classMargin {classes : ℕ}
   pcCorrectabilityMargin cohort.sampleSize (cohort.effectiveMarkers i)
     (cohort.differentiation i) cohort.subgroupSize
 
+/-- The frequency-resolved diagnostic is exactly the shared rank-one
+correctability margin evaluated with the marker count and differentiation of
+one frequency class.  This theorem is the cross-module contract: changing the
+global threshold changes every class diagnostic rather than leaving a parallel
+formula behind. -/
+theorem FrequencyResolvedCohort.classMargin_eq_pcCorrectabilityMargin
+    {classes : ℕ} (cohort : FrequencyResolvedCohort classes) (i : Fin classes) :
+    cohort.classMargin i =
+      pcCorrectabilityMargin cohort.sampleSize (cohort.effectiveMarkers i)
+        (cohort.differentiation i) cohort.subgroupSize := rfl
+
 noncomputable def FrequencyResolvedCohort.correctableClasses {classes : ℕ}
     (cohort : FrequencyResolvedCohort classes) : Finset (Fin classes) :=
   Finset.univ.filter (fun i ↦ 0 < cohort.classMargin i)
