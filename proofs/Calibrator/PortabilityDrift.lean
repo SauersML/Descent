@@ -2589,9 +2589,6 @@ theorem alleleFreqMismatchPenalty_le_one (pSource pTarget : ℝ) :
   rw [Real.exp_le_one_iff]
   simpa using abs_nonneg (pTarget - pSource)
 
-theorem alleleFreqMismatchPenalty_self (p : ℝ) : alleleFreqMismatchPenalty p p = 1 := by
-  unfold alleleFreqMismatchPenalty; simp
-
 @[simp] theorem alleleFreqMismatchPenalty_self (p : ℝ) :
     alleleFreqMismatchPenalty p p = 1 := by
   simp [alleleFreqMismatchPenalty]
