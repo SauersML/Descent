@@ -2,7 +2,6 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Mathlib
-import Calibrator.CertificateGrading
 
 namespace Calibrator
 
@@ -223,17 +222,8 @@ three-state cycle is the smallest explicit positive control.
 /-- First annotation on a three-state cycle: present only in state `0`. -/
 noncomputable def threeCycleFeatureA (i : Fin 3) : ℝ := if i.val = 0 then 1 else 0
 
-/-- Second annotation on a three-state cycle: present only in state `1`.
-
-    This is `CertificateGrading.fixedGradeWitnessMoment` at three states -- the same
-    indicator of state one. The identity is stated as
-    `threeCycleFeatureB_eq_fixedGradeWitnessMoment` below rather than left implicit, so an
-    edit to either body is a compile error instead of a silent divergence. -/
+/-- Second annotation on a three-state cycle: present only in state `1`. -/
 noncomputable def threeCycleFeatureB (i : Fin 3) : ℝ := if i.val = 1 then 1 else 0
-
-/-- The three-cycle annotation is the fixed-grade witness moment at three states. -/
-theorem threeCycleFeatureB_eq_fixedGradeWitnessMoment :
-    threeCycleFeatureB = CertificateGrading.fixedGradeWitnessMoment (n := 2) := rfl
 
 /-- Uniform lag-one cross moment along the deterministic cycle `0 → 1 → 2 → 0`.
 Choosing the initial phase uniformly makes this a stationary finite process. -/
