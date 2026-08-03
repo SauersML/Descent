@@ -11,10 +11,12 @@ This file states the genuine finite decision problem behind the slogan
 contains only an observation kernel and a numerical loss.  In particular, it
 does not accept duality, compactness, convexity, or a lower bound as a field.
 
-The sound inequality `mixtureDualRisk ≤ minimaxRisk` is proved from finite loss bounds. The
-reverse inequality is the finite minimax theorem and remains an explicit `sorry`: importing a
-literature theorem, assuming a duality proposition, or defining the dual value to equal the
-primal value would make the file green while deleting its mathematical content.
+Both inequalities are proved. `mixtureDualRisk ≤ minimaxRisk` follows from finite loss
+bounds, which make every infimum genuine and keep an average against a prior below the worst
+case. The reverse is the finite minimax theorem, proved here by separation: the achievable
+risk profiles form a convex subset of `ℝ^Θ` disjoint from the open convex half-space below
+the minimax level, so `geometric_hahn_banach_open` yields a functional whose coordinate
+weights are nonnegative, and normalising them produces a least-favourable prior.
 -/
 
 namespace Calibrator.FiniteMinimax
@@ -218,7 +220,7 @@ theorem mixRule_apply (t : NNReal) (ht : t ≤ 1)
     (a : Fin (actionCount + 1)) :
     (mixRule t ht δ₁ δ₂ x) a
       = (t : ENNReal) * (δ₁ x) a + (1 - (t : ENNReal)) * (δ₂ x) a := by
-  simp only [mixRule, PMF.bind_apply, PMF.bernoulli_apply, tsum_bool, if_true, if_false]
+  simp only [mixRule, PMF.bind_apply, PMF.bernoulli_apply, tsum_bool, if_true]
   exact add_comm _ _
 
 /-- The mixed rule's action probabilities are the real mixture of the two rules'. -/
@@ -355,6 +357,92 @@ theorem apply_eq_sum_coef
     by_cases h : j = θ <;> simp [Pi.single_apply, h]
   rw [hsingle, map_smul, smul_eq_mul]
 
+/-- **Separation yields a nonnegative weight vector certifying the minimax value.**
+
+    There are weights, none negative and not all zero, against which every rule's average
+    risk is at least the minimax value. Normalising them gives a least-favourable prior, so
+    this is the analytic content of strong duality; what follows it is bookkeeping.
+
+    Nonnegativity is forced because the half-space below the minimax level is closed under
+    decreasing any single coordinate: a negative weight would drive the separating
+    functional past its own level along that ray. -/
+theorem exists_nonneg_weights_certifying_minimax :
+    ∃ c : Fin (parameterCount + 1) → ℝ, (∀ θ, 0 ≤ c θ) ∧ 0 < ∑ θ, c θ ∧
+      ∀ δ : Rule actionCount observationCount,
+        E.minimaxRisk * (∑ θ, c θ) ≤ ∑ θ, c θ * E.risk δ θ := by
+  classical
+  set v : ℝ := E.minimaxRisk with hv
+  obtain ⟨f, u, hopen, hprof⟩ :=
+    geometric_hahn_banach_open (convex_belowLevel (parameterCount := parameterCount) v)
+      (isOpen_belowLevel (parameterCount := parameterCount) v) E.convex_riskProfiles
+      E.disjoint_riskProfiles_belowLevel.symm
+  set c : Fin (parameterCount + 1) → ℝ :=
+    fun θ ↦ f (Pi.single θ (1 : ℝ) : Fin (parameterCount + 1) → ℝ) with hc
+  have hf : ∀ y, f y = ∑ θ, y θ * c θ := fun y ↦ apply_eq_sum_coef f y
+  set y₀ : Fin (parameterCount + 1) → ℝ := fun _ ↦ v - 1 with hy₀
+  have hy₀mem : y₀ ∈ belowLevel (parameterCount := parameterCount) v := by
+    intro θ; simp only [hy₀]; linarith
+  have hnonneg : ∀ θ₀, 0 ≤ c θ₀ := by
+    intro θ₀
+    by_contra hneg
+    push_neg at hneg
+    obtain ⟨s, hs⟩ := exists_gt ((u - f y₀) / (-c θ₀))
+    set r : ℝ := max s 0 with hr
+    have hrnn : 0 ≤ r := le_max_right _ _
+    set y : Fin (parameterCount + 1) → ℝ :=
+      y₀ - r • (Pi.single θ₀ (1 : ℝ) : Fin (parameterCount + 1) → ℝ) with hy
+    have hymem : y ∈ belowLevel (parameterCount := parameterCount) v := by
+      intro θ
+      by_cases h : θ = θ₀
+      · subst h
+        simp only [hy, hy₀, Pi.sub_apply, Pi.smul_apply, Pi.single_eq_same, smul_eq_mul,
+          mul_one]
+        linarith
+      · simp only [hy, hy₀, Pi.sub_apply, Pi.smul_apply, Pi.single_eq_of_ne h, smul_eq_mul,
+          mul_zero, sub_zero]
+        linarith
+    have hlt := hopen y hymem
+    rw [hy, map_sub, map_smul, smul_eq_mul] at hlt
+    have hbig : (u - f y₀) / (-c θ₀) < r := lt_of_lt_of_le hs (le_max_left _ _)
+    rw [div_lt_iff₀ (by linarith)] at hbig
+    linarith
+  have hsum_nonneg : 0 ≤ ∑ θ, c θ := Finset.sum_nonneg fun θ _ ↦ hnonneg θ
+  have hsum_pos : 0 < ∑ θ, c θ := by
+    rcases lt_or_eq_of_le hsum_nonneg with h | h
+    · exact h
+    · exfalso
+      have hallzero : ∀ θ, c θ = 0 := fun θ ↦
+        (Finset.sum_eq_zero_iff_of_nonneg (fun θ _ ↦ hnonneg θ)).mp h.symm θ
+          (Finset.mem_univ θ)
+      have hf0 : ∀ y, f y = 0 := fun y ↦ by
+        rw [hf]; exact Finset.sum_eq_zero fun θ _ ↦ by rw [hallzero θ, mul_zero]
+      have h1 : (0 : ℝ) < u := by have := hopen y₀ hy₀mem; rwa [hf0] at this
+      have h2 : u ≤ (0 : ℝ) := by
+        have := hprof (E.risk (fun _ ↦ PMF.pure 0)) ⟨fun _ ↦ PMF.pure 0, rfl⟩
+        rwa [hf0] at this
+      linarith
+  have hvS : v * (∑ θ, c θ) ≤ u := by
+    by_contra hcon
+    push_neg at hcon
+    have hwlt : u / (∑ θ, c θ) < v := by rw [div_lt_iff₀ hsum_pos]; linarith
+    obtain ⟨w, hw1, hw2⟩ := exists_between hwlt
+    have hmem : (fun _ : Fin (parameterCount + 1) ↦ w)
+        ∈ belowLevel (parameterCount := parameterCount) v := fun θ ↦ hw2
+    have hlt := hopen _ hmem
+    rw [hf] at hlt
+    have hval : ∑ θ, (fun _ : Fin (parameterCount + 1) ↦ w) θ * c θ = w * ∑ θ, c θ := by
+      rw [Finset.mul_sum]
+    rw [hval] at hlt
+    rw [div_lt_iff₀ hsum_pos] at hw1
+    linarith
+  refine ⟨c, hnonneg, hsum_pos, fun δ ↦ ?_⟩
+  have h1 : u ≤ ∑ θ, E.risk δ θ * c θ := by
+    have := hprof (E.risk δ) ⟨δ, rfl⟩; rwa [hf] at this
+  have h2 : ∑ θ, E.risk δ θ * c θ = ∑ θ, c θ * E.risk δ θ :=
+    Finset.sum_congr rfl fun θ _ ↦ mul_comm _ _
+  rw [← h2]
+  linarith
+
 /-- **The equalizer theorem: a constant-risk Bayes rule closes duality.**
 
     If a rule has the same risk at every parameter value and is Bayes against some prior,
@@ -415,16 +503,52 @@ complete because the primal minimax value equals the optimization over all
 Bayes priors.  This is the real theorem, not a definitional equality and not a
 caller-supplied proposition.
 
-    WHAT IS PROVED, AND WHAT IS NOT. `mixtureDualRisk_le_minimaxRisk` proves the sound
-    direction unconditionally: finite loss bounds make every real infimum genuine, and an
-    average against a prior never exceeds the worst case. The reverse inequality is the minimax
-    theorem itself and needs a finite-game separation argument this corpus does not yet carry.
-
-    The `sorry` is the whole equality rather than the missing half, because splitting it
-    into a proved inequality plus an assumed one would put the hard direction in a
-    hypothesis, where no audit reads it.  Here `AxiomScan` reports it. -/
+    Both directions are proved. `mixtureDualRisk_le_minimaxRisk` gives the sound one from
+    finite loss bounds. The reverse comes from
+    `exists_nonneg_weights_certifying_minimax`, which separates the convex set of achievable
+    risk profiles from the open convex half-space below the minimax level and reads the
+    least-favourable prior off the separating functional; normalising its weights and
+    testing every rule against the resulting prior closes the equality. -/
 theorem finite_minimax_duality : E.minimaxRisk = E.mixtureDualRisk := by
-  sorry
+  classical
+  obtain ⟨c, hcnn, hSpos, hcert⟩ := E.exists_nonneg_weights_certifying_minimax
+  set S : ℝ := ∑ θ, c θ with hS
+  -- normalise the weights into an actual prior
+  have hmass : ∑ θ, ENNReal.ofReal (c θ / S) = 1 := by
+    rw [← ENNReal.ofReal_sum_of_nonneg fun θ _ ↦ div_nonneg (hcnn θ) (le_of_lt hSpos)]
+    rw [← Finset.sum_div, ← hS, div_self (ne_of_gt hSpos), ENNReal.ofReal_one]
+  set π : FinitePrior parameterCount :=
+    PMF.ofFintype (fun θ ↦ ENNReal.ofReal (c θ / S)) hmass with hπ
+  have hprob : ∀ θ, FinitePrior.probability π θ = c θ / S := by
+    intro θ
+    rw [hπ, FinitePrior.probability, PMF.ofFintype_apply,
+      ENNReal.toReal_ofReal (div_nonneg (hcnn θ) (le_of_lt hSpos))]
+  -- the prior certifies the minimax value against every rule
+  have hbayes : ∀ δ : Rule actionCount observationCount, E.minimaxRisk ≤ E.bayesRisk π δ := by
+    intro δ
+    have hval : E.bayesRisk π δ = (∑ θ, c θ * E.risk δ θ) / S := by
+      unfold bayesRisk
+      rw [Finset.sum_div]
+      exact Finset.sum_congr rfl fun θ _ ↦ by rw [hprob θ]; ring
+    rw [hval, le_div_iff₀ hSpos]
+    have := hcert δ
+    linarith
+  -- hence the mixture value is at least the minimax value
+  have hdual_ge : E.minimaxRisk ≤ E.mixtureDualRisk := by
+    have hobr : E.minimaxRisk ≤ E.optimalBayesRisk π := by
+      unfold optimalBayesRisk
+      refine le_csInf (Set.range_nonempty (E.bayesRisk π)) ?_
+      rintro y ⟨δ, rfl⟩
+      exact hbayes δ
+    have hbdd : BddAbove (Set.range E.optimalBayesRisk) := by
+      refine ⟨E.minimaxRisk, ?_⟩
+      rintro y ⟨π', rfl⟩
+      unfold minimaxRisk
+      refine le_csInf (Set.range_nonempty E.worstRisk) ?_
+      rintro z ⟨δ, rfl⟩
+      exact E.optimalBayesRisk_le_worstRisk π' δ
+    exact le_trans hobr (le_csSup hbdd ⟨π, rfl⟩)
+  exact le_antisymm hdual_ge E.mixtureDualRisk_le_minimaxRisk
 
 /-- The program's "vacuous ungraded completeness" statement, now tied to an
 actual decision problem rather than to a value defined to equal itself. -/
