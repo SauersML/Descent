@@ -1,4 +1,10 @@
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+-- `phase_of_abs_neg` uses `Real.log`, which lives here and is not reachable from the
+-- trigonometric import. Without it `Real.log` resolves as an Unknown constant -- the
+-- same missing-Mathlib-import shape as `Finset.sum_nonneg` in `SpectralDegradation`.
+-- This went unnoticed because nothing imports this module and the `Calibrator` root
+-- does not list it, so `lake build Calibrator` never compiled the file at all.
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
 import Mathlib.Algebra.BigOperators.Group.Finset.Basic
 import Mathlib.Tactic.Ring
 import Mathlib.Tactic.Linarith

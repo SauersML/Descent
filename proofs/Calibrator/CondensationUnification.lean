@@ -965,7 +965,15 @@ theorem sixthMoment_eq_floorOne_plus_dispersion (spectrum : MafSpectrum m)
       ← Finset.mul_sum, spectrum.weight_sum, mul_one]
     congr 2
     rw [hdef4]
-    exact Finset.sum_congr rfl (fun j _ => hfour j)
+    -- `congr 2` stops above the `10 *`, so the goal here is `10 * X = 10 * Y` and not
+    -- `X = Y`; handing it the bare `Finset.sum_congr` gives a Type mismatch whose printed
+    -- types differ only by that factor, which is easy to misread as a summand mismatch.
+    -- Descend the extra level. The alternatives are kept because how many levels `congr`
+    -- peels depends on the surrounding `+`/`-` shape, which has changed here before.
+    first
+      | exact congrArg (fun s => 10 * s) (Finset.sum_congr rfl (fun j _ => hfour j))
+      | (congr 1; exact Finset.sum_congr rfl (fun j _ => hfour j))
+      | exact Finset.sum_congr rfl (fun j _ => hfour j)
   rw [hsplit]
   unfold fourthMomentDispersion
   ring
