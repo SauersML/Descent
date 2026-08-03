@@ -250,7 +250,8 @@ noncomputable def steppingStoneMeetingTimeOnLattice
     only in case, and a swap **always flips the sign** when `d < D`, so it returns a *negative
     expected time*. In exact rationals at `D = 256`: `d = 1` gives `1275` correct against
     `-326400` swapped, `d = 8` gives `9920` against `-317440`, `d = 128` gives `81920` against
-    `-163840`. Nothing in the corpus caught that, because nothing asserted the sign.
+    `-163840`. Nothing catches that unless something asserts the sign, which is what this
+    theorem does.
 
     Verified numerically at `D = 64`: measured over predicted is `1.026, 1.027, 1.006, 1.004`
     at `d = 4, 8, 16, 32`.
