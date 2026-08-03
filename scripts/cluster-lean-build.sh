@@ -68,6 +68,50 @@
 #                        symptom is not a diagnosis. BUILD SOMETHING SMALL --
 #                        one leaf module -- and see whether it is clean. That
 #                        test takes minutes and settles it.
+#
+#                        AUTO-BINDING RECURRED TWICE ON 2026-08-02 EVENING, and
+#                        the two cases wanted OPPOSITE repairs. Test which you
+#                        have with a two-second grep for the bare name before
+#                        theorising -- that grep settles it either way, and it
+#                        correctly falsified this hypothesis for four other
+#                        files the same evening.
+#
+#                          CausalInference: 35 errors, two texts, one cause.
+#                          `r2FromSignalVariance` moved into
+#                          `Calibrator.TransportedMetrics`, and OPEN DOES NOT
+#                          TRAVEL THROUGH IMPORT -- the `open` that
+#                          `OpenQuestions` added for itself did nothing for a
+#                          file that imports `OpenQuestions`. That is how a
+#                          consumer gets missed. Repair: add the `open`.
+#
+#                          Conventions: same two texts, and `open` would have
+#                          been WRONG. The bare name was the left side of a
+#                          bridge theorem `bare = TransportedMetrics.bare`
+#                          whose local definition had been deleted. Adding the
+#                          `open` would have made it
+#                          `TransportedMetrics.X = TransportedMetrics.X`, i.e.
+#                          silently converted a build error into a VACUOUS
+#                          theorem -- and its neighbour was already exactly
+#                          that, `X = X` proved by `unfold X X`. Repair:
+#                          delete the dead bridge.
+#
+#                        So: `open` is right only when the bare name has a real
+#                        referent AND the statement stays non-vacuous. CHECK
+#                        THAT THE TWO SIDES STILL DIFFER before adding it.
+#
+#   A FILE THAT FAILS TO PARSE HAS NO ERROR COUNT. `unexpected token 'end';
+#                        expected 'lemma'` and friends TRUNCATE the measured
+#                        region: everything below the parse error is never
+#                        elaborated, so the file's error count is a FLOOR, not
+#                        a measurement. On 2026-08-02 `DemographicHistory`
+#                        reported "2 errors" while everything below line 69 was
+#                        unmeasured. This is the same defect as an error count
+#                        without a commit and an error count without a
+#                        MODULE_STATUS: a number that looks like a measurement
+#                        and is a lower bound. Grep the error list for parse
+#                        errors FIRST -- `unexpected token`, `expected` -- and
+#                        treat any file carrying one as UNMEASURED, not as
+#                        nearly clean.
 #   no LAKE_EXIT      -> lake was killed or is still running. INCOMPLETE, not
 #                        clean; a truncated log with few errors is not a result.
 #   LAKE_EXIT=0       -> build succeeded.
@@ -82,6 +126,20 @@
 #
 #     (a) THE NAME MOVED.       A definition no longer routes through the name
 #                               being unfolded. Repair: restore the routing.
+#                               Canonical instance, 2026-08-02:
+#                               `PopulationGeneticsFoundations.hetDecayFactor`
+#                               still RE-TYPED the body of
+#                               `hetDecayFromScaled` instead of delegating to
+#                               it, so `unfold hetDecayFactor
+#                               hetDecayFromScaled` unfolded the copy and then
+#                               found no second name left in the goal. A
+#                               half-done "one home each" move looks exactly
+#                               like a missing reducibility attribute. Repair
+#                               is to DELEGATE, not to drop the second name --
+#                               dropping it hides the duplicated body, which
+#                               was the actual defect, and the same latent
+#                               break was sitting in `Conventions` and
+#                               `DemographicHistory`.
 #     (b) THE REQUEST IS
 #         IMPOSSIBLE.           The name is an inductive CONSTRUCTOR, e.g.
 #                               `Pop.source`. Constructors have no body, so this
