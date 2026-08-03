@@ -73,6 +73,7 @@ existing claim weaker than it should be.
 Written for Python 3.6.8 with numpy only.
 """
 
+import argparse
 import csv
 import json
 import math
@@ -85,6 +86,15 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.normpath(os.path.join(HERE, "..", "..", "..", ".."))
 RES = os.path.join(REPO, "sims", "results_hpc", "ancestry_calibration",
                    "results")
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(HERE)))
+
+import simprov  # noqa: E402
+
+# The CSVs this file reads. Its output is a function of these and of the code,
+# and of nothing else -- there is no RNG anywhere in this script -- so naming
+# them is what makes a disagreement between two runs diagnosable.
+INPUT_CSVS = ("accuracy_binary.csv", "calibration_binary.csv")
 
 # ---- constants transcribed from sims/ancestry_calibration/gen_real_pt.py ----
 PREV = 0.15
@@ -824,16 +834,56 @@ def _lookup_r2(key):
     return _R2CACHE.get(key)
 
 
-def main():
+def input_fingerprints():
+    """Size and mtime of each input CSV, so two runs can be told apart.
+
+    This script draws no random numbers. Its output is determined entirely by
+    the code and by these files, so if a re-run disagrees with a stored result
+    the candidates are the revision, the numpy version and these inputs -- and
+    without recording them the third is invisible.
+    """
     out = {}
+    for name in INPUT_CSVS:
+        p = os.path.join(RES, name)
+        try:
+            st = os.stat(p)
+            out[name] = {"bytes": st.st_size, "mtime": int(st.st_mtime)}
+        except OSError:
+            out[name] = None
+    return out
+
+
+def main(argv=None):
+    ap = argparse.ArgumentParser(
+        description="Serial founder chain, the Brier identity, and the "
+                    "prevalence localisation.",
+        epilog="The default output path OVERWRITES the stored result in the "
+               "working directory. Pass --output when re-running for "
+               "comparison, or the number you are checking against is the "
+               "first casualty of checking it.")
+    ap.add_argument("--output", default="fam_serial_founder_results.json",
+                    help="results JSON (default %(default)s, relative to the "
+                         "working directory)")
+    args = ap.parse_args(argv)
+
+    out = {}
+    # Written first so that a run which dies partway still leaves a file
+    # saying which revision died.
+    out["_provenance"] = simprov.stamp(
+        "differential/cluster/fam_serial_founder.py",
+        {"RES": RES, "input_csvs": input_fingerprints()},
+        # No RNG in this script: the computation is deterministic given the
+        # code and the input CSVs. Recorded as null rather than omitted, so a
+        # reader does not have to wonder whether a seed was forgotten.
+        None, None)
     part_a(out)
     runs = part_b(out)
     part_c(out, runs)
-    fh = open("fam_serial_founder_results.json", "w")
+    fh = open(args.output, "w")
     json.dump(out, fh, indent=1)
     fh.close()
     print("")
-    print("-> fam_serial_founder_results.json")
+    print("-> %s" % args.output)
     return 0
 
 
