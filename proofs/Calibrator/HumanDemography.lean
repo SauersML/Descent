@@ -203,6 +203,7 @@ theorem taggedDriftR2Ratio_ge_retention (V_A V_E fst shared_ld : ℝ)
     unfold taggedDriftR2Ratio presentDayR2MutationDrift presentDayR2
       presentDayPGSVariance TransportedMetrics.r2FromSignalVariance
     rw [presentDayPGSVarianceMutationDrift_eq]
+    unfold pgsVarianceFromHet
     field_simp [ne_of_gt hden, hsum, hVA']
     ring
   rw [key, le_div_iff₀ hden]
