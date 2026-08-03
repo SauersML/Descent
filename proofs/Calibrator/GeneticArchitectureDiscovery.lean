@@ -799,8 +799,9 @@ theorem wgs_eliminates_ld_mismatch
   have h_sigma :
       sigmaTagCausalSourceAt m Pop.source = sigmaTagCausalSourceAt m Pop.target := by
     ext i j
-    simp [sigmaTagCausalSourceAt, h_direct,
-      h_novelDirect, h_proxySource, h_proxyTarget, h_novelProxy]
+    simp [sigmaTagCausalSourceAt, h_direct, m.novelDirectCausal_source,
+      m.novelProxyTagging_source, h_novelDirect, h_proxySource, h_proxyTarget,
+      h_novelProxy]
   unfold brokenTaggingResidual
   rw [h_sigma]
   simp

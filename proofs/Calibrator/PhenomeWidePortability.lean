@@ -463,7 +463,8 @@ theorem worse_than_neutral_implies_diversifying_selection
           r2FromSignalVariance (presentDayPGSVariance V_A fstS) V_E <
         r2FromSignalVariance (presentDayPGSVariance V_A fstT) V_E /
           r2FromSignalVariance (presentDayPGSVariance V_A fstS) V_E := by
-    simpa [realWorldPGSVariance, presentDayPGSVariance] using
+    simpa [realWorldPGSVariance, presentDayPGSVariance, pgsVarianceFromHet,
+      mul_comm] using
       portability_ratio_with_ld_decay V_A V_E fstS fstT 1 rho_obs
         hVA hVE hfst hfstT_lt_one rfl ⟨h_rho, h_rho_lt⟩
   exact ⟨h_match, h_port, h_not_stab⟩

@@ -5,6 +5,16 @@ import Calibrator.OpenQuestions
 namespace Calibrator
 
 open MeasureTheory
+-- `r2FromSignalVariance` lives in `Calibrator.TransportedMetrics` (in `DGP`) since the
+-- namespace was resolved. `open` does not travel through `import`, so the line
+-- `OpenQuestions` added for itself does nothing for this file even though this file
+-- imports it -- which is why this consumer was missed by the migration.
+--
+-- Without it the 35 bare occurrences below do not fail as "unknown identifier": Lean
+-- AUTO-BINDS an unresolved bare name as an implicit variable, so each one became a local
+-- of unknown type applied to two arguments. That is the source of both error shapes seen
+-- here, `Function expected at` and `Local variable 'r2FromSignalVariance' has no
+-- definition` -- one cause, two texts, 35 errors.
 open TransportedMetrics (r2FromSignalVariance)
 
 /-!
@@ -83,9 +93,9 @@ theorem selection_dominant_for_immune
       r2FromSignalVariance (presentDayPGSVariance V_A fst) V_E := by
   apply expectedR2_strictMono_nonneg V_E _ _ hVE
   · exact le_of_lt (mul_pos (sq_pos_of_pos hρ_pos)
-      (by unfold presentDayPGSVariance pgsVarianceFromHet; exact mul_pos (by linarith) hVA))
+      (by unfold presentDayPGSVariance pgsVarianceFromHet; exact mul_pos hVA (by linarith)))
   · have h_pdv_pos : 0 < presentDayPGSVariance V_A fst := by
-      unfold presentDayPGSVariance pgsVarianceFromHet; exact mul_pos (by linarith) hVA
+      unfold presentDayPGSVariance pgsVarianceFromHet; exact mul_pos hVA (by linarith)
     calc ρ ^ 2 * presentDayPGSVariance V_A fst
         < 1 * presentDayPGSVariance V_A fst := by
           apply mul_lt_mul_of_pos_right _ h_pdv_pos
@@ -204,7 +214,7 @@ theorem counterfactual_same_ancestry_perfect
       r2FromSignalVariance (presentDayPGSVariance V_A 0) V_E := by
   apply expectedR2_strictMono_nonneg V_E _ _ hVE
   · unfold presentDayPGSVariance pgsVarianceFromHet
-    exact le_of_lt (mul_pos (by linarith) hVA)
+    exact le_of_lt (mul_pos hVA (by linarith))
   · unfold presentDayPGSVariance pgsVarianceFromHet
     simp only [sub_zero]
     have : (1 - fst) * V_A < 1 * V_A := by
