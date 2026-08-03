@@ -991,12 +991,26 @@ theorem nns_higher_in_target
   · exact mul_pos h_sens_t h_π
   · exact mul_lt_mul_of_pos_right h_lower h_π
 
-/-- **Population Attributable Fraction (PAF) from PGS-guided intervention.**
-    PAF = P(disease | high risk) × P(high risk) × (1 - 1/RR)
-    where RR is the relative risk reduction from intervention. -/
+/-- **Exposed fraction times the relative-risk factor `1 - 1/RR`.**
+
+    The body is `p_high * (1 - 1/rr)` and the second argument is a relative risk, not a relative
+    risk reduction: `paf_lower_in_target` below requires `1 < rr`, and at `rr = 1` the factor is
+    zero as it should be for an intervention that changes nothing.
+
+    This is **not** Levin's population attributable fraction, which is
+    `p(RR-1) / (1 + p(RR-1))`, and it is not the Miettinen form either: Miettinen's `1 - 1/RR`
+    multiplies the exposure fraction among CASES, whereas `p_high` here is the fraction at high
+    risk in the population. A `P(disease | high risk)` factor appears in neither the body nor the
+    signature, so the earlier docstring equation named a quantity this function does not take.
+
+    What it supports is a comparison at fixed `p_high` between two relative risks, which is what
+    the theorem below does. Reading its value as a population attributable fraction requires the
+    missing factor.
+
+    Empirical status: UNTESTED. -/
 noncomputable def populationAttributableFraction
-    (p_high rr_reduction : ℝ) : ℝ :=
-  p_high * (1 - 1 / rr_reduction)
+    (p_high rr : ℝ) : ℝ :=
+  p_high * (1 - 1 / rr)
 
 /-- **PAF is lower in target populations.**
     When PGS is less accurate, the high-risk group is less enriched
