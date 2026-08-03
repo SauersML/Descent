@@ -1034,7 +1034,7 @@ theorem link_two_scale_integrable (L : ℝ → ℝ) (hmono : StrictMono L)
     Integrable (fun p : ℝ × ℝ ↦ L (x + s * p.1 + t * p.2))
       ((gaussianReal 0 1).prod (gaussianReal 0 1)) := by
   refine ⟨(hmono.monotone.measurable.comp (by fun_prop)).aestronglyMeasurable, ?_⟩
-  refine hasFiniteIntegral_of_bounded (C := 1) ?_
+  refine HasFiniteIntegral.of_bounded (C := 1) ?_
   filter_upwards with p
   rw [Real.norm_eq_abs, abs_of_pos (hbdd _).1]
   exact le_of_lt (hbdd _).2
@@ -1321,6 +1321,48 @@ theorem link_stieltjes_representation (L : ℝ → ℝ) (hmono : StrictMono L)
     ciInf_le ⟨0, by rintro _ ⟨v, rfl⟩; exact (hbdd v).1.le⟩ u
   rw [hIic, ENNReal.toReal_ofReal (by linarith)]
   ring
+
+open MeasureTheory ProbabilityTheory in
+/-- **Averaging the link is convolving its liability distribution.**
+
+Through the representation `L u = p + ν (-∞, u]`, the Gaussian average of `L` at scale `s`
+is the joint mass of the half-plane `{y ≤ x + s z}` under `ν ⊗ γ` — that is, the cdf at `x`
+of `ν` convolved with `N(0, s²)`.
+
+This is the change of viewpoint the classification needs.  On the left is an integral of an
+unknown function; on the right is a measure evaluated on a half-plane, and the invariance
+hypothesis of `link_rigidity` becomes: for every `s`, convolving `ν` with `N(0, s²)`
+returns `ν` up to an affine change of variable.  Stated that way it is a self-similarity
+condition on one measure, which is the form in which "only the Gaussian" is provable.
+
+The proof is Fubini in its measure form — `Measure.prod_apply` slices the half-plane at
+each `z` into exactly `Iic (x + s z)` — with the passage between the Bochner integral of
+`toReal` and the lower integral justified by finiteness of `ν`. -/
+theorem link_average_as_convolution (ν : Measure ℝ) [IsFiniteMeasure ν]
+    (L : ℝ → ℝ) (p : ℝ) (hrep : ∀ u, L u = p + (ν (Set.Iic u)).toReal) (s x : ℝ) :
+    ∫ z, L (x + s * z) ∂(gaussianReal 0 1)
+      = p + (((gaussianReal 0 1).prod ν) {q : ℝ × ℝ | q.2 ≤ x + s * q.1}).toReal := by
+  have hmeasS : MeasurableSet {q : ℝ × ℝ | q.2 ≤ x + s * q.1} :=
+    measurableSet_le (by fun_prop) (by fun_prop)
+  have hmonoIic : Monotone fun u : ℝ ↦ ν (Set.Iic u) :=
+    fun _ _ hab ↦ measure_mono (Set.Iic_subset_Iic.2 hab)
+  have hmeasg : Measurable fun z : ℝ ↦ ν (Set.Iic (x + s * z)) :=
+    hmonoIic.measurable.comp (by fun_prop)
+  have hlt : ∀ z : ℝ, ν (Set.Iic (x + s * z)) < ⊤ :=
+    fun z ↦ lt_of_le_of_lt (measure_mono (Set.subset_univ _)) (measure_lt_top ν _)
+  have hInt : Integrable (fun z : ℝ ↦ (ν (Set.Iic (x + s * z))).toReal)
+      (gaussianReal 0 1) := by
+    refine ⟨hmeasg.ennreal_toReal.aestronglyMeasurable, ?_⟩
+    refine HasFiniteIntegral.of_bounded (C := (ν Set.univ).toReal) ?_
+    filter_upwards with z
+    rw [Real.norm_eq_abs, abs_of_nonneg ENNReal.toReal_nonneg]
+    exact ENNReal.toReal_mono (measure_ne_top ν _) (measure_mono (Set.subset_univ _))
+  simp_rw [hrep]
+  rw [integral_add (integrable_const p) hInt, integral_const,
+    integral_toReal hmeasg.aemeasurable (Filter.Eventually.of_forall hlt),
+    Measure.prod_apply hmeasS]
+  simp only [measureReal_univ_eq_one, one_smul, add_right_inj]
+  rfl
 
 open MeasureTheory ProbabilityTheory in
 /-- **Necessity: no other bounded link shape survives.** A strictly increasing bounded link whose
