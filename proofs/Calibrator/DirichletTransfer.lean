@@ -310,17 +310,21 @@ theorem sharpFloor_ge_spectralGap (lmin : ℝ)
     resolvent-smoothed extremal one is nonnegative, and it vanishes exactly when the value
     signal relaxes at a single rate. The conflict is the **dispersion of the relaxation-rate
     distribution**, nothing else. -/
-theorem conflict_nonneg (hw : ∀ i ∈ s, 0 ≤ w i) :
+theorem conflict_nonneg (hw : ∀ i ∈ s, 0 ≤ w i) (hlam : ∀ i ∈ s, 0 < lam i) :
     (∑ i ∈ s, w i / lam i) ^ 2 ≤ (∑ i ∈ s, w i) * (∑ i ∈ s, w i / lam i ^ 2) := by
   have key := Finset.sum_mul_sq_le_sq_mul_sq s
     (fun i ↦ Real.sqrt (w i)) (fun i ↦ Real.sqrt (w i) / lam i)
   have e1 : ∀ i ∈ s, Real.sqrt (w i) * (Real.sqrt (w i) / lam i) = w i / lam i := by
     intro i hi
-    rw [← mul_div_assoc, Real.mul_self_sqrt (hw i hi)]
+    have hlam_ne : lam i ≠ 0 := ne_of_gt (hlam i hi)
+    field_simp [hlam_ne]
+    exact Real.sq_sqrt (hw i hi)
   have e2 : ∀ i ∈ s, Real.sqrt (w i) ^ 2 = w i := fun i hi ↦ Real.sq_sqrt (hw i hi)
   have e3 : ∀ i ∈ s, (Real.sqrt (w i) / lam i) ^ 2 = w i / lam i ^ 2 := by
     intro i hi
-    rw [div_pow, Real.sq_sqrt (hw i hi)]
+    have hlam_ne : lam i ≠ 0 := ne_of_gt (hlam i hi)
+    field_simp [hlam_ne]
+    exact Real.sq_sqrt (hw i hi)
   rw [Finset.sum_congr rfl e1, Finset.sum_congr rfl e2, Finset.sum_congr rfl e3] at key
   exact key
 

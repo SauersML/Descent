@@ -139,6 +139,38 @@ structure BundleFamily (T : Type*) [TopologicalSpace T] (d : ℕ) where
 
 namespace BundleFamily
 
+/-- **The symmetric two-atom family**, and with it the fact that the fifteen
+theorems taking a `BundleFamily` parameter are about something.
+
+`BundleFamily` bundles four `Prop` fields holding at every parameter
+simultaneously, so a theorem taking one is conditional on a caller producing all
+four at once. Until a closed term of the type exists, none of those theorems is
+known to be non-vacuous — which is the difference between a hypothesis and a
+class with no members.
+
+Rademacher: two atoms at `+1` and `-1`, each of constant mass `1/2`. The four
+identities are then arithmetic and hold at every `t` because nothing here
+depends on `t`. This is the smallest family satisfying the standing identities:
+one atom cannot have mean zero and variance one at once, since mass `1` forces
+the atom to `0` and then the variance is `0`.
+
+Constant in `t` on purpose. What is being discharged is inhabitation, and a
+`t`-dependent witness would suggest the results below turn on the parameter
+space, which they do not. -/
+noncomputable def rademacher (T : Type*) [TopologicalSpace T] : BundleFamily T 2 where
+  atom := ![ContinuousMap.const T (1 : ℝ), ContinuousMap.const T (-1 : ℝ)]
+  mass := ![ContinuousMap.const T (1 / 2 : ℝ), ContinuousMap.const T (1 / 2 : ℝ)]
+  -- `<;>` and not `;`: `simp` closes some of these four outright and leaves the
+  -- rest as numerals, and a bare `; norm_num` fails with "no goals to be solved"
+  -- on the ones it closed.
+  mass_pos j _ := by fin_cases j <;> norm_num
+  mass_sum _ := by simp [Fin.sum_univ_two] <;> norm_num
+  mean_zero _ := by simp [Fin.sum_univ_two] <;> norm_num
+  var_one _ := by simp [Fin.sum_univ_two] <;> norm_num
+
+instance {T : Type*} [TopologicalSpace T] : Nonempty (BundleFamily T 2) :=
+  ⟨rademacher T⟩
+
 variable (F : BundleFamily T d)
 
 /-- The **modulus curve** of atom `j`: `|atom j t ^ 2 - 1|`, the value taken by `|U|`

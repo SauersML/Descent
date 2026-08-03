@@ -1656,6 +1656,25 @@ structure HeterogeneousEffectDGP (k : ℕ) where
   jointMeasure : Measure (ℝ × (Fin k → ℝ))
   is_prob : IsProbabilityMeasure jointMeasure
 
+/-- **A heterogeneous-effect DGP exists.**
+
+The `is_prob` field is a `Prop` the caller must discharge, so without a closed
+term of this type the theorems taking one are conditional on a process nobody
+exhibits. A Dirac measure at the origin is a probability measure, and the two
+function fields are unconstrained, so constants serve.
+
+Degenerate deliberately: the obligation is inhabitation. Every theorem below
+quantifies over all `HeterogeneousEffectDGP k`, so one witness settles that the
+class is nonempty without suggesting the results turn on which one. -/
+noncomputable def HeterogeneousEffectDGP.witness (k : ℕ) : HeterogeneousEffectDGP k where
+  alpha := fun _ ↦ 0
+  baseline := fun _ ↦ 0
+  jointMeasure := Measure.dirac (0, 0)
+  is_prob := inferInstance
+
+instance {k : ℕ} : Nonempty (HeterogeneousEffectDGP k) :=
+  ⟨HeterogeneousEffectDGP.witness k⟩
+
 /-- True expectation for heterogeneous effect DGP. -/
 def HeterogeneousEffectDGP.trueExp {k : ℕ} (hdgp : HeterogeneousEffectDGP k) :
     ℝ → (Fin k → ℝ) → ℝ := fun p c ↦ hdgp.alpha c * p + hdgp.baseline c

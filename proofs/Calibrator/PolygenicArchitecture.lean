@@ -506,29 +506,26 @@ theorem meanAbsoluteEffect_nonneg {q : ℕ} (beta : Fin q → ℝ) :
   unfold meanAbsoluteEffect
   exact div_nonneg (Finset.sum_nonneg fun j _ ↦ abs_nonneg _) (Nat.cast_nonneg q)
 
-/-- **The nonsmooth summary is dominated by the smooth one.**
+/-- **On a nonempty catalogue, the nonsmooth summary is dominated by the smooth one.**
 
     `(q⁻¹ ∑ |β_j|)² ≤ q⁻¹ ∑ β_j²` by Cauchy–Schwarz. The point of recording it
     is the contrast it sets up: the smaller quantity is the harder one to
     estimate, so the ordering of the two summaries by magnitude runs opposite to
     their ordering by statistical difficulty. -/
-theorem meanAbsoluteEffect_sq_le_meanSquaredEffect {q : ℕ} (beta : Fin q → ℝ) :
+theorem meanAbsoluteEffect_sq_le_meanSquaredEffect {q : ℕ} (beta : Fin q → ℝ) (hq : 0 < q) :
     (meanAbsoluteEffect beta) ^ 2 ≤ (∑ j, beta j ^ 2) / q := by
-  by_cases hq : q = 0
-  · subst q
-    simp [meanAbsoluteEffect]
-  · have hq' : (0 : ℝ) < q := Nat.cast_pos.mpr (Nat.pos_of_ne_zero hq)
-    have h := Finset.sum_mul_sq_le_sq_mul_sq (Finset.univ : Finset (Fin q))
-      (fun _ ↦ (1 : ℝ)) (fun j ↦ |beta j|)
-    have h3 : ∑ j : Fin q, |beta j| ^ 2 = ∑ j, beta j ^ 2 :=
-      Finset.sum_congr rfl (fun j _ ↦ sq_abs _)
-    simp only [one_mul, one_pow, Finset.sum_const, Finset.card_univ,
-      Fintype.card_fin, nsmul_eq_mul, mul_one] at h
-    rw [h3] at h
-    unfold meanAbsoluteEffect
-    rw [div_pow, div_le_div_iff₀ (by positivity) hq']
-    have hmul := mul_le_mul_of_nonneg_right h (le_of_lt hq')
-    nlinarith [hmul]
+  have hq' : (0 : ℝ) < q := Nat.cast_pos.mpr hq
+  have h := Finset.sum_mul_sq_le_sq_mul_sq (Finset.univ : Finset (Fin q))
+    (fun _ ↦ (1 : ℝ)) (fun j ↦ |beta j|)
+  have h3 : ∑ j : Fin q, |beta j| ^ 2 = ∑ j, beta j ^ 2 :=
+    Finset.sum_congr rfl (fun j _ ↦ sq_abs _)
+  simp only [one_mul, one_pow, Finset.sum_const, Finset.card_univ,
+    Fintype.card_fin, nsmul_eq_mul, mul_one] at h
+  rw [h3] at h
+  unfold meanAbsoluteEffect
+  rw [div_pow, div_le_div_iff₀ (by positivity) hq']
+  have hmul := mul_le_mul_of_nonneg_right h (le_of_lt hq')
+  nlinarith [hmul]
 
 /-! ### A biological certificate problem with no theorem fields
 

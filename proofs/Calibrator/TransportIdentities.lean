@@ -38,6 +38,31 @@ structure ExpFunctional (Ω : Type*) where
 instance {Ω : Type*} : CoeFun (ExpFunctional Ω) (fun _ ↦ (Ω → ℝ) → ℝ) :=
   ⟨ExpFunctional.eval⟩
 
+/-- **Evaluation at a point is an expectation functional**, and this is what makes
+the fifty-five theorems taking an `ExpFunctional Ω` parameter statements about
+something.
+
+`ExpFunctional` bundles three `Prop` fields — additivity, homogeneity, and
+normalisation at the constant `1`. A theorem taking one as a hypothesis is
+conditional on a caller supplying all three, and until some closed term of the
+type exists, no theorem over it is known to be non-vacuous. The Dirac functional
+`f ↦ f ω` satisfies all three definitionally: pointwise addition and scalar
+multiplication are what `Pi.add_apply` and `Pi.smul_apply` say, and the constant
+`1` evaluates to `1` at every point.
+
+It is deliberately the *degenerate* expectation rather than a general one. The
+obligation this discharges is inhabitation, not richness; a witness that needed
+a measure would make the corpus's linear-functional results depend on measure
+theory they do not use. -/
+def ExpFunctional.evalAt {Ω : Type*} (ω : Ω) : ExpFunctional Ω where
+  eval f := f ω
+  add_eval _ _ := rfl
+  smul_eval _ _ := rfl
+  const_one := rfl
+
+instance {Ω : Type*} [Nonempty Ω] : Nonempty (ExpFunctional Ω) :=
+  ⟨ExpFunctional.evalAt (Classical.arbitrary Ω)⟩
+
 namespace ExpFunctional
 
 variable {Ω : Type*}

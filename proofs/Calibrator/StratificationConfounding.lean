@@ -219,6 +219,27 @@ structure ColliderModel where
   σ2_E_pos : 0 < σ2_E
   β_G_pos : 0 < β_G
 
+/-- **A collider model exists**, so the results below are about something.
+
+`ColliderModel` carries three positivity hypotheses. A theorem taking one as a
+parameter is conditional on a caller producing all three, and a bundle nothing
+inhabits makes every such theorem vacuously true. Unit variances and unit effect
+satisfy them.
+
+Degenerate on purpose: what this discharges is inhabitation. The theorems below
+quantify over every `ColliderModel`, so a single witness is enough to show the
+class is not empty, and a more elaborate one would suggest the results depend on
+its particulars. -/
+def ColliderModel.witness : ColliderModel where
+  σ2_G := 1
+  σ2_E := 1
+  β_G := 1
+  σ2_G_pos := one_pos
+  σ2_E_pos := one_pos
+  β_G_pos := one_pos
+
+instance : Nonempty ColliderModel := ⟨ColliderModel.witness⟩
+
 /-- **Selection on G + E induces negative covariance in selected sample.**
     In the selected subsample, Cov(G, E | S=1) = -σ²_G · σ²_E / (σ²_G + σ²_E).
     This is the classical "explaining away" effect. -/
@@ -647,11 +668,17 @@ structure MRInstrumentModel where
   p_source : ℝ
   /-- Allele frequency in target -/
   p_target : ℝ
-  /-- Outcome variance -/
-  σ2_Y : ℝ
+  /-- Residual variance of the EXPOSURE given the instrument.
+
+      Not the outcome variance. The first-stage F of a Mendelian-randomisation
+      instrument is `n β² Var(G) / σ²_{X|G}`: it measures how well the instrument
+      predicts the exposure, so the denominator is the exposure residual, and pairing
+      the exposure effect `β_inst` with an outcome variance would divide two different
+      regressions' quantities. -/
+  σ2_X_resid : ℝ
   n_pos : 0 < n
   β_inst_ne : β_inst ≠ 0
-  σ2_Y_pos : 0 < σ2_Y
+  σ2_X_resid_pos : 0 < σ2_X_resid
   p_source_pos : 0 < p_source
   p_source_lt : p_source < 1
   p_target_pos : 0 < p_target
@@ -665,23 +692,29 @@ noncomputable def MRInstrumentModel.witness : MRInstrumentModel where
   β_inst := 1
   p_source := 1 / 2
   p_target := 1 / 2
-  σ2_Y := 1
+  σ2_X_resid := 1
   n_pos := by norm_num
   β_inst_ne := by norm_num
-  σ2_Y_pos := by norm_num
+  σ2_X_resid_pos := by norm_num
   p_source_pos := by norm_num
   p_source_lt := by norm_num
   p_target_pos := by norm_num
   p_target_lt := by norm_num
 
-/-- F-statistic of an instrument at a given allele frequency.
+/-- **First-stage F-statistic** of a Mendelian-randomisation instrument at a given allele
+    frequency: `n β² Var(G) / σ²_{X|G}`.
 
     What enters the noncentrality is the genotype *variance*, which
     `hweHeterozygosity_eq_genotypeVarianceHWE` identifies with `hweHeterozygosity p`.
 
+    The denominator is the exposure residual variance, matching `β_inst`, which is the
+    instrument's effect on the exposure. Both belong to the first-stage regression; an outcome
+    variance here would divide one regression's numerator by another's denominator and the
+    quantity would not be an F-statistic of anything.
+
     Empirical status: UNTESTED. -/
 noncomputable def MRInstrumentModel.fStat (m : MRInstrumentModel) (p : ℝ) : ℝ :=
-  m.n * m.β_inst ^ 2 * hweHeterozygosity p / m.σ2_Y
+  m.n * m.β_inst ^ 2 * hweHeterozygosity p / m.σ2_X_resid
 
 /-- Heterozygosity is maximized at p = 0.5 and decreasing as p moves away. -/
 theorem hweHeterozygosity_pos (p : ℝ) (hp : 0 < p) (hp1 : p < 1) :
@@ -697,7 +730,7 @@ theorem instrument_strength_decreases (m : MRInstrumentModel)
     (h_het : hweHeterozygosity m.p_target < hweHeterozygosity m.p_source) :
     m.fStat m.p_target < m.fStat m.p_source := by
   unfold MRInstrumentModel.fStat
-  apply div_lt_div_of_pos_right _ m.σ2_Y_pos
+  apply div_lt_div_of_pos_right _ m.σ2_X_resid_pos
   apply mul_lt_mul_of_pos_left h_het
   exact mul_pos m.n_pos (sq_pos_of_ne_zero m.β_inst_ne)
 

@@ -203,6 +203,24 @@ theorem exists_risk_lower_bound :
             (FinitePrior.probability_nonneg (E.observation θ) x)
     _ = E.risk δ θ := rfl
 
+/-- Mix two decision rules with weight `t`, as a Bernoulli choice between them.
+
+    The rule space has to be convex for the separation argument that would close duality:
+    the set of achievable risk profiles is the image of this space under an affine map, and
+    a separating hyperplane needs that image to be convex. -/
+noncomputable def mixRule (t : NNReal) (ht : t ≤ 1)
+    (δ₁ δ₂ : Rule actionCount observationCount) : Rule actionCount observationCount :=
+  fun x ↦ (PMF.bernoulli t ht).bind fun b ↦ if b then δ₁ x else δ₂ x
+
+/-- The mixed rule's action law is the corresponding mixture of the two action laws. -/
+theorem mixRule_apply (t : NNReal) (ht : t ≤ 1)
+    (δ₁ δ₂ : Rule actionCount observationCount) (x : Fin (observationCount + 1))
+    (a : Fin (actionCount + 1)) :
+    (mixRule t ht δ₁ δ₂ x) a
+      = (t : ENNReal) * (δ₁ x) a + (1 - (t : ENNReal)) * (δ₂ x) a := by
+  simp only [mixRule, PMF.bind_apply, PMF.bernoulli_apply, tsum_bool, if_true, if_false]
+  exact add_comm _ _
+
 /-- **The equalizer theorem: a constant-risk Bayes rule closes duality.**
 
     If a rule has the same risk at every parameter value and is Bayes against some prior,
