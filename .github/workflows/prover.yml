@@ -102,6 +102,19 @@ jobs:
         if: steps.lake-deps-cache.outputs.cache-hit != 'true'
         run: lake exe cache get
 
+      # Compile first so syntax/elaboration/axiom failures are never hidden by
+      # an independent provenance or validation-ratchet failure below.  Every
+      # gate remains mandatory; this ordering maximizes diagnostic signal from
+      # a single remote run.
+      - name: Build project
+        run: lake build Calibrator
+
+      - name: Verify transitive axiom closure
+        run: lake env lean proofs/validation/invariants/AxiomScan.lean
+
+      - name: Audit theorem-valued structure fields
+        run: lake env lean proofs/validation/inflation/Inflation.lean
+
       - name: Structural guards
         run: python3 scripts/check-identifications.py
 
@@ -157,15 +170,6 @@ jobs:
 
       - name: Executable correctability contract
         run: cargo test --manifest-path proofs/validation/correctability_calculator/Cargo.toml
-
-      - name: Build project
-        run: lake build Calibrator
-
-      - name: Verify transitive axiom closure
-        run: lake env lean proofs/validation/invariants/AxiomScan.lean
-
-      - name: Audit theorem-valued structure fields
-        run: lake env lean proofs/validation/inflation/Inflation.lean
 
   auto-close-failed-proof-pr:
     runs-on: ubuntu-latest
