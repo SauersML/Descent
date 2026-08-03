@@ -518,6 +518,7 @@ section GenerationalMechanisticValidation
 -- the concrete witnesses below.  Registering them locally prevents exact
 -- generation checks from getting stuck at an otherwise opaque `4 * Nₑ * rate`.
 attribute [local simp] scaledMutationRate scaledMigrationRate hetDecayFromScaled
+  novelDirectCausalTargetAt novelProxyTaggingTargetAt
 
 /-- Simple generation-indexed population-genetic parameters used to validate
 that the mechanistic target state can vary with time. Recombination, mutation,
