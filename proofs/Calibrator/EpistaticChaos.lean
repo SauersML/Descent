@@ -203,11 +203,11 @@ structure SymmetricCoding (V : Type*) [Fintype V] where
 over it is a true statement about an empty class: kernel-checked, clean axiom report,
 and no content.  See `scripts/check-laundering.py` family F4. -/
 noncomputable def SymmetricCoding.witness (V : Type*) [Fintype V] : SymmetricCoding V where
-  weight := fun _ => 0
-  value := fun _ => 0
+  weight := fun _ ↦ 0
+  value := fun _ ↦ 0
   flip := Equiv.refl V
-  weight_flip := fun _ => rfl
-  value_flip := fun _ => by norm_num
+  weight_flip := fun _ ↦ rfl
+  value_flip := fun _ ↦ by norm_num
 
 /-- Probability of a genotype configuration under independence across loci. -/
 def configurationWeight (coding : SymmetricCoding V) (x : Fin n → V) : ℝ :=
@@ -2128,6 +2128,21 @@ Empirical status: UNTESTED. A bound on the design's own recurrence profile;
 checkable by inspection. -/
 def BoundedHubRecurrence (design : GenotypeDesign nx ιx) (bound : ℕ) : Prop :=
   ∀ i : Fin nx, design.variantRecurrence i ≤ bound
+
+/-- Every design has bounded hub recurrence at the number of tested sets, since a
+    variant cannot be tested more often than there are tests.
+
+    This is the trivial bound and it is stated as such: it inhabits the class so
+    the theorem assuming `BoundedHubRecurrence` is not vacuous, while making
+    plain that the hypothesis carries no information until `bound` is taken
+    strictly below `Fintype.card ιx`. That is exactly the regime the docstring
+    describes as failing for a lead variant in a dense sliding scan, where
+    recurrence reaches the ceiling `variantRecurrence_eq_card_of_ubiquitous`
+    computes. -/
+theorem boundedHubRecurrence_card (design : GenotypeDesign nx ιx) :
+    BoundedHubRecurrence design (Fintype.card ιx) := fun i ↦ by
+  simpa [GenotypeDesign.variantRecurrence, Finset.card_univ] using
+    Finset.card_filter_le (Finset.univ : Finset ιx) (fun s ↦ i ∈ design.locusSet s)
 
 /-- A variant entering *every* tested set has recurrence equal to the number of
 tested sets. -/

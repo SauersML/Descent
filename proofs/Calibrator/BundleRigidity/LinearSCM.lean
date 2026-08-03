@@ -75,6 +75,14 @@ structure LinearSCM (n : ℕ) where
   /-- Acyclicity, as topological indexing: no dependence on equal or higher indices. -/
   triangular : ∀ i j : Fin n, i ≤ j → coef i j = 0
 
+/-- **The class is inhabited at every size**, by the model with no structural edges.
+Eight theorems quantify over `LinearSCM n`; this is what keeps them from being vacuous.
+The empty model is the honest witness here: `triangular` forbids dependence on equal or
+higher indices, so a nonzero constant `coef` inhabits nothing. -/
+def LinearSCM.witness (n : ℕ) : LinearSCM n where
+  coef := fun _ _ ↦ 0
+  triangular := fun _ _ _ ↦ rfl
+
 namespace LinearSCM
 
 variable {n : ℕ} (S : LinearSCM n)
@@ -97,6 +105,20 @@ def IsInterventionalSolution (k : Fin n) (v : ℝ) (noise x : Fin n → ℝ) : P
 Stated so that the surgery is visible as a lemma rather than only as a field. -/
 theorem interventional_value (k : Fin n) (v : ℝ) (noise x : Fin n → ℝ)
     (h : S.IsInterventionalSolution k v noise x) : x k = v := h.1
+
+/-- **Interventional solutions exist**, in the edgeless model of `LinearSCM.witness`:
+set the intervened variable to `v` and every other variable to its own noise.
+
+`interventional_value` assumed `IsInterventionalSolution` and nothing concluded it, so
+the surgery lemma held of a relation nothing was known to satisfy. The edgeless model is
+the same witness `LinearSCM.witness` uses and for the same reason: `triangular` forbids
+dependence on equal or higher indices, so no nonzero constant coefficient inhabits the
+structure. With no edges the post-surgery system is already solved coordinatewise, which
+is what makes the witness checkable without a triangular back-substitution. -/
+theorem isInterventionalSolution_witness (k : Fin n) (v : ℝ) (noise : Fin n → ℝ) :
+    (witness n).IsInterventionalSolution k v noise (fun i ↦ if i = k then v else noise i) := by
+  refine ⟨by simp, fun i hi ↦ ?_⟩
+  simp [witness, hi]
 
 end LinearSCM
 

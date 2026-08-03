@@ -310,6 +310,19 @@ with a bounded condition number. -/
 def BoundedBelowAbove (t : ℕ → ℝ) (a b : ℝ) : Prop :=
   0 < a ∧ ∀ n : ℕ, a ≤ t n ∧ t n ≤ b
 
+/-- Constant positive profiles are non-degenerate, so the rigidity side of the
+    boundary is not a statement about an empty class.
+
+    In the genetics reading this is the profile with a single, unchanging mixing
+    scale -- the best-conditioned case, where the fiber collapse is easiest to
+    believe. The interesting instances are the non-constant ones; what this
+    settles is only that the class is inhabited, which is what
+    `inequivalent_of_unbounded_coding` needs on the other side to be a real
+    dichotomy rather than a vacuous one. -/
+theorem boundedBelowAbove_const {c : ℝ} (hc : 0 < c) :
+    BoundedBelowAbove (fun _ ↦ c) c c :=
+  ⟨hc, fun _ ↦ ⟨le_rfl, le_rfl⟩⟩
+
 /-- **Rigidity holds exactly when the mixing is bounded below.** Any two profiles
 bounded between positive constants are equivalent — the fiber collapses to a point,
 and the hidden coordinates are recoverable from the observable.

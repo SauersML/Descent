@@ -771,6 +771,27 @@ def HasThresholdSetAtEveryRank (score : ι → ℝ) : Prop :=
     ∃ (S : Finset ι) (t : ℝ), S.card = k ∧
       (∀ i ∈ S, t ≤ score i) ∧ (∀ i ∉ S, score i ≤ t)
 
+/-- Constant scores have a threshold set at every rank, so the hypothesis class
+    is inhabited and the frontier theorem is not vacuous.
+
+    This deliberately does NOT prove the general claim the docstring above
+    describes -- that every score on a finite type has threshold sets at every
+    rank, by sorting and cutting at rank `k`. That statement is true and its
+    proof is simply not written here, which is why it remains a hypothesis. A
+    constant score is the degenerate case where every subset of the right size
+    works and the cut is at the common value.
+
+    The distinction matters for reading the results downstream: they are not
+    known to be about arbitrary scores. Replacing this with the general lemma
+    would let the hypothesis be discharged at every call site, and that is the
+    improvement to make, not a wider-looking witness here. -/
+theorem hasThresholdSetAtEveryRank_const (c : ℝ) :
+    HasThresholdSetAtEveryRank (fun _ : ι ↦ c) := by
+  intro k hk
+  obtain ⟨S, -, hS⟩ :=
+    Finset.exists_smaller_set (Finset.univ : Finset ι) k (by simpa [Finset.card_univ] using hk)
+  exact ⟨S, c, hS, fun _ _ ↦ le_rfl, fun _ _ ↦ le_rfl⟩
+
 /-- **The frontier is carried by coordinate splits of the prescribed rank.**
 
 Under the named threshold hypothesis, for every pair of task priorities there is
