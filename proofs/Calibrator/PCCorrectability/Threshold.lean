@@ -76,6 +76,19 @@ alongside it was conservative, so the two partially masked each other. -/
 noncomputable def bbpProxyThreshold (n M : ℝ) : ℝ :=
   Real.sqrt (n / M)
 
+/-- **The threshold depends only on the aspect ratio.** Growing the sample and the panel together
+leaves it unchanged: what matters is `n/M`, not either count alone, which is the whole content of
+a proportional-regime threshold. Squaring recovers that ratio exactly. -/
+theorem bbpProxyThreshold_aspect_invariant (n M t : ℝ) (ht : t ≠ 0) :
+    bbpProxyThreshold (t * n) (t * M) = bbpProxyThreshold n M := by
+  unfold bbpProxyThreshold
+  rw [mul_div_mul_left _ _ ht]
+
+theorem bbpProxyThreshold_sq (n M : ℝ) (h : 0 ≤ n / M) :
+    bbpProxyThreshold n M ^ 2 = n / M := by
+  unfold bbpProxyThreshold
+  exact Real.sq_sqrt h
+
 /-- Signed distance from the spike to the spectral proxy threshold.  A positive
 value is the detectable side of the phase diagram. -/
 noncomputable def pcCorrectabilityMargin (n M F m : ℝ) : ℝ :=

@@ -262,6 +262,15 @@ noncomputable def ageDependentSignalVariance
     (sourceSignalPeak age age_peak width : ℝ) : ℝ :=
   sourceSignalPeak * ageDependentSignalShape age age_peak width
 
+/-- **The peak sets the scale and the shape sets the age dependence, separately.** Doubling the
+peak doubles the variance at every age without moving where the maximum sits. A body that mixed
+the two would make the age of peak signal depend on its magnitude, which is not what a peak
+amplitude means. -/
+theorem ageDependentSignalVariance_scale (sourceSignalPeak age age_peak width c : ℝ) :
+    ageDependentSignalVariance (c * sourceSignalPeak) age age_peak width
+      = c * ageDependentSignalVariance sourceSignalPeak age age_peak width := by
+  unfold ageDependentSignalVariance; ring
+
 /-- Canonical age-indexed deployment metrics from the explicit age-indexed
     signal profile. -/
 noncomputable def ageDependentMetricProfile

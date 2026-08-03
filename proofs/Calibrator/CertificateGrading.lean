@@ -6,7 +6,7 @@ import Mathlib.Analysis.SpecialFunctions.Exp
 import Mathlib.Probability.ProbabilityMassFunction.Constructions
 
 /-!
-# Graded certificate calculus without theorem-valued inputs
+# Certificate calculus without theorem-valued inputs
 
 This module formalizes the algebra common to mixture-versus-mixture minimax
 certificates.  It deliberately does **not** encode minimax duality, the
@@ -16,25 +16,31 @@ envelope as fields of a structure.  Those are theorems, not data, and accepting 
 
 What remains is unconditional:
 
-* a modulus is nonnegative by construction;
-* the value-formula scale is positive by construction;
-* the ungraded calculus is complete relative to its own value definition;
-* the deficit is exactly the square of a modulus ratio; and
-* exact grade completeness is equivalent to grade-insensitivity.
+* every modulus is nonnegative by construction;
+* matching more moments can only shrink a moment-constrained modulus;
+* allowing more atoms can only enlarge a certificate-complexity modulus;
+* the value-formula scale is positive by construction; and
+* equality with the unrestricted modulus is exactly modulus insensitivity.
 
-The literature claim that grade two is within `5/4` in the Donoho--Liu
-convex-linear regime remains provenance only: this repository does not yet
-contain the white-noise decision model needed to state it faithfully.  The
-fixed-grade incompleteness claim is stated below for actual finite predictive
-laws, with a visible `sorry` at the missing construction. A citation is never
-accepted as a theorem parameter.
+The literature claim that two-point certificates are within `5/4` in the
+Donoho--Liu convex-linear regime remains provenance only: this repository does
+not yet contain the white-noise decision model needed to state it faithfully.
+A citation is never accepted as a theorem parameter.
 
-## Why that `sorry` stays, and what closing it needs
+## The formulation repair
 
-The witness chooses the target, every moment probe, every parameter's
-observation law, and the observation-space size, all after seeing `n`, the grade
-and the desired bound.  Three successive guards against that turned out to be
-insufficient, and each is now a theorem here rather than a remark:
+An earlier version called the number of moments the priors were *forced* to
+match a certificate grade.  That reverses method power: increasing that number
+removes feasible pairs, as `modulus_antitone_grade` proves.  It is a useful
+approximation hierarchy, but it is not a hierarchy of increasingly powerful
+lower-bound methods.  The repaired method grade is the total number of atoms
+available to the two mixing priors.  Increasing it enlarges the feasible
+family, and grade two is literally a point-versus-point certificate.
+
+The removed fixed-grade rate statement also let its witness choose the target,
+every moment probe, every parameter's observation law, and the observation
+space after seeing `n`, the grade, and the requested bound.  Three guards were
+not enough, and each failure remains a theorem here:
 
 1. At radius `1` the discrepancy constraint is free, because total variation
    never exceeds one -- `feasible_one_iff_momentMatched`.  Feasibility is moment
@@ -45,18 +51,13 @@ insufficient, and each is now a theorem here rather than a remark:
    the radius and the collapse returns.
 3. Requiring `Informative`, i.e. nonzero pairwise separation, is still not
    enough: it carries no floor, so every pair may sit far below the radius.
-   The statements therefore ask for `SeparatedBy (fixedGradeInformationRadius n)`.
+   A quantitative floor such as `SeparatedBy` excludes that collapse, but does
+   not turn catalogue size into sample size.
 
-A proof that evades these is kernel-valid and statement-valid while failing
-mathematical intent, and must not replace the admission.  Closing it honestly
-needs, before the bound is stated: a fixed normalized architecture class; a
-specified one-observation kernel and its `n`-fold product, or another explicit
-growing-data construction; target and moment probes fixed independently of the
-desired bound; explicit moment-matched priors in that model; and a proved
-total-variation comparison of their prior-predictive laws.
-
-Note also that `n` indexes the parameter catalogue, not a count of independent
-observations, so no sample-size rate follows from increasing it on its own.
+Consequently this module proves the calculus laws and the falsifiers, but makes
+no polynomial-rate claim without a fixed growing-data experiment.  In
+particular, `n` below indexes a parameter catalogue, not independent
+observations.
 -/
 
 namespace Calibrator.CertificateGrading
@@ -100,6 +101,15 @@ theorem probability_le_one (P : FinitePrior n) (i : Fin (n + 1)) :
     FinitePrior.probability P i ≤ 1 := by
   simpa [FinitePrior.probability] using
     ENNReal.toReal_le_coe_of_le_coe (P.coe_le_one i)
+
+/-- Atoms carrying positive mass.  This is derived from the PMF; callers do not
+supply a support set. -/
+noncomputable def activeAtoms (P : FinitePrior n) : Finset (Fin (n + 1)) :=
+  Finset.univ.filter fun i ↦ P.probability i ≠ 0
+
+/-- Number of atoms actually used by a finite prior. -/
+noncomputable def atomCount (P : FinitePrior n) : ℕ :=
+  P.activeAtoms.card
 
 /-- Expectation of a function under the derived prior. -/
 noncomputable def mean (P : FinitePrior n) (f : Fin (n + 1) → ℝ) : ℝ :=

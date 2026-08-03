@@ -142,14 +142,21 @@ section LDTagging
 noncomputable def tagR2 (D_sq var_tag var_causal : ℝ) : ℝ :=
   D_sq / (var_tag * var_causal)
 
-/-- Tag r² is bounded by 1. -/
+/-- Tag r² is bounded by 1, given that the squared disequilibrium does not exceed the
+    variance product.
+
+    The hypothesis was named `h_cauchy_schwarz`, which made this read as an analytic result
+    about linkage disequilibrium. It is not: it is `div_le_one` applied to three reals, and
+    the inequality it needs is supplied, not proved. That Cauchy-Schwarz is what supplies it
+    for actual second moments is true and is a statement about `ldCorrelationSq`, not about
+    this arithmetic. -/
 theorem tag_r2_le_one (D_sq var_tag var_causal : ℝ)
-    (h_cauchy_schwarz : D_sq ≤ var_tag * var_causal)
+    (h_dsq_le : D_sq ≤ var_tag * var_causal)
     (h_vt : 0 < var_tag) (h_vc : 0 < var_causal) :
     tagR2 D_sq var_tag var_causal ≤ 1 := by
   unfold tagR2
   rw [div_le_one (mul_pos h_vt h_vc)]
-  exact h_cauchy_schwarz
+  exact h_dsq_le
 
 /-- **Tag r² decreases when LD structure changes.**
     In the target population, D² between tag and causal may be different. -/

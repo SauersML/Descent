@@ -30,9 +30,20 @@ Both results below are **negative** results whose force is deliberately understa
   decisiveness against the exact question asked ("does vanishing of a family of
   normalized cumulant contractions characterize universality?"), not depth.
 
-The load-bearing negative result of the arc is not here; it is the condensation
-mechanism in `Calibrator.Condensation` and the completeness statement in
-`Calibrator.JetBarrier`.
+**The load-bearing negative result of the arc is not here, and it is not anywhere.** This
+paragraph used to send the reader to `Calibrator.Condensation` for the condensation
+mechanism and to `Calibrator.JetBarrier` for the completeness statement. Both files
+disclaim exactly those results in their own headers: Condensation says "THAT PROPOSAL IS
+NOT PROVED IN THIS FILE" and "NOT ONE THEOREM HERE MENTIONS CHAOS, UNIVERSALITY, OR A LIMIT
+LAW", and JetBarrier says its nonlattice completeness theorem "is not formalized here" and
+that nothing replaces the removed barrier.
+
+What those files do contain is real and much smaller: Condensation has rigorous two-sided
+bounds on `condensationConstant = 2 - gamma - log 2` and on `gaussianJetVariance`, from
+Mathlib's Euler-Mascheroni and `log 2` brackets, plus the window algebra; JetBarrier has the
+lattice-inflation arithmetic `h / (1 - exp (-h)) > 1` and its bracket. Neither carries a
+mechanism, and a citation chain that ends at a disclaimer is worse than no citation, because
+it reads as a discharged obligation.
 
 ## Genetics reading
 
@@ -256,6 +267,125 @@ theorem contraction_bound_tendsto_zero {k : ℕ} (hk : 1 ≤ k) (κ : ℝ) :
   exact hcont.mono_left nhdsWithin_le_nhds
 
 end DiagonalContraction
+
+/-!
+## 2b. The low-influence parameter, in score units
+
+Section 2 bounds a normalized contraction by `|κ| · τ^(k/2)` where `τ` bounds the
+remaining factors, and observes that `τ → 0` "under the problem's low-influence
+hypothesis". That hypothesis was stated about an abstract index set. Nothing above
+named a locus, an effect size or an allele frequency, so the genetics reading in the
+header was carried entirely by prose.
+
+This section supplies the missing object. For an additive score `∑_j β_j g_j` at
+linkage equilibrium, locus `j` contributes `β_j² · h_j` to the score variance, where
+`h_j` is the genotype variance at that locus — `2 p_j (1 - p_j)` for a Hardy--Weinberg
+locus, but nothing here needs that form. The **influence** of locus `j` is its share of
+the total, and polygenicity is the statement that no share is large.
+
+What is proved: the shares are nonnegative and sum to one, and if every share lies
+between `d > 0` and `c` then no influence exceeds `c / (m · d)`. Composing that with
+Section 2 gives the bound in score units — as a score is spread over more loci, the
+fixed-order normalized contraction bound tends to zero, whatever the per-locus law is.
+
+The direction of the conclusion is worth stating plainly, because it is the reverse of
+how such diagnostics are normally used. A vanishing bound is not evidence that the score
+is Gaussian. It says the diagnostic cannot tell, because it is driven to zero by
+polygenicity alone and would report the same value for a law that is not Gaussian at all.
+-/
+
+section PolygenicScoreInfluence
+
+variable {m : ℕ}
+
+/-- Variance contributed by locus `j` to an additive score: squared effect times
+genotype variance.  At linkage equilibrium the score variance is the sum of these. -/
+noncomputable def locusVarianceShare (β h : Fin m → ℝ) (j : Fin m) : ℝ :=
+  β j ^ 2 * h j
+
+/-- Additive score variance at linkage equilibrium. -/
+noncomputable def scoreVariance (β h : Fin m → ℝ) : ℝ :=
+  ∑ j, locusVarianceShare β h j
+
+/-- **The influence of a locus**: its share of the score variance.  This is the
+quantity Section 2's `τ` bounds, and polygenicity is the statement that it is small
+for every locus. -/
+noncomputable def locusInfluence (β h : Fin m → ℝ) (j : Fin m) : ℝ :=
+  locusVarianceShare β h j / scoreVariance β h
+
+theorem locusVarianceShare_nonneg (β h : Fin m → ℝ) (hh : ∀ j, 0 ≤ h j) (j : Fin m) :
+    0 ≤ locusVarianceShare β h j :=
+  mul_nonneg (sq_nonneg _) (hh j)
+
+theorem scoreVariance_nonneg (β h : Fin m → ℝ) (hh : ∀ j, 0 ≤ h j) :
+    0 ≤ scoreVariance β h :=
+  Finset.sum_nonneg fun j _ ↦ locusVarianceShare_nonneg β h hh j
+
+theorem locusInfluence_nonneg (β h : Fin m → ℝ) (hh : ∀ j, 0 ≤ h j) (j : Fin m) :
+    0 ≤ locusInfluence β h j :=
+  div_nonneg (locusVarianceShare_nonneg β h hh j) (scoreVariance_nonneg β h hh)
+
+/-- **The influences are shares**: they sum to one whenever the score has positive
+variance.  Without this the word "influence" would be decoration. -/
+theorem sum_locusInfluence (β h : Fin m → ℝ) (hpos : 0 < scoreVariance β h) :
+    ∑ j, locusInfluence β h j = 1 := by
+  unfold locusInfluence
+  rw [← Finset.sum_div]
+  exact div_self (ne_of_gt hpos)
+
+/-- **Polygenicity bounds every influence by `c / (m · d)`.**
+
+If each locus contributes at most `c` and at least `d > 0` to the score variance, then
+the total is at least `m · d` and no single share exceeds `c`, so no influence exceeds
+`c / (m · d)`.  This is the hypothesis Section 2 needs, now expressed in effect sizes
+and genotype variances rather than assumed about an abstract index. -/
+theorem locusInfluence_le_of_shares_bounded
+    (β h : Fin m → ℝ) (c d : ℝ) (hd : 0 < d) (hm : 0 < m)
+    (hupper : ∀ j, locusVarianceShare β h j ≤ c)
+    (hlower : ∀ j, d ≤ locusVarianceShare β h j) (j : Fin m) :
+    locusInfluence β h j ≤ c / (m * d) := by
+  have hmd : (0 : ℝ) < m * d := by
+    have : (0 : ℝ) < m := by exact_mod_cast hm
+    positivity
+  have htotal : (m : ℝ) * d ≤ scoreVariance β h := by
+    unfold scoreVariance
+    calc (m : ℝ) * d = ∑ _j : Fin m, d := by
+          rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]
+      _ ≤ ∑ j, locusVarianceShare β h j := Finset.sum_le_sum fun j _ ↦ hlower j
+  have hposV : 0 < scoreVariance β h := lt_of_lt_of_le hmd htotal
+  unfold locusInfluence
+  rw [div_le_div_iff₀ hposV hmd]
+  calc locusVarianceShare β h j * ((m : ℝ) * d)
+      ≤ c * ((m : ℝ) * d) := mul_le_mul_of_nonneg_right (hupper j) (le_of_lt hmd)
+    _ ≤ c * scoreVariance β h := by
+        refine mul_le_mul_of_nonneg_left htotal ?_
+        exact le_trans (le_trans (le_of_lt hd) (hlower j)) (hupper j)
+
+/-- **Cumulant blindness in score units.**  As a score is spread over more loci with
+per-locus variance shares between `d > 0` and `c`, the fixed-order normalized
+contraction bound of Section 2 tends to zero.
+
+The conclusion runs the opposite way from how such a diagnostic is normally read. A
+vanishing contraction is not evidence that the score's law is Gaussian: the bound is
+driven to zero by polygenicity alone, and `diagonal_contraction_bound` holds for every
+coordinate law, including the ones that fail universality. So the diagnostic reports the
+same vanishing value whether or not the score is asymptotically Gaussian, and therefore
+cannot certify the score-distribution assumption it is usually invoked to certify. -/
+theorem pgs_contraction_bound_tendsto_zero {k : ℕ} (hk : 1 ≤ k) (κ c d : ℝ) (hd : 0 < d) :
+    Filter.Tendsto (fun m : ℕ ↦ |κ| * Real.sqrt (c / (m * d)) ^ k)
+      Filter.atTop (nhds 0) := by
+  have hk0 : k ≠ 0 := by omega
+  have hshape : ∀ m : ℕ, c / ((m : ℝ) * d) = (c / d) / (m : ℝ) := by
+    intro m; rw [mul_comm, ← div_div]
+  have hzero : Filter.Tendsto (fun m : ℕ ↦ c / ((m : ℝ) * d)) Filter.atTop (nhds 0) := by
+    simp only [hshape]
+    exact tendsto_const_div_atTop_nhds_zero_nat (c / d)
+  have hcont : Continuous fun τ : ℝ ↦ |κ| * Real.sqrt τ ^ k :=
+    continuous_const.mul (Real.continuous_sqrt.pow k)
+  have := (hcont.tendsto 0).comp hzero
+  simpa [Function.comp, Real.sqrt_zero, zero_pow hk0] using this
+
+end PolygenicScoreInfluence
 
 /-!
 ## 3. What survives

@@ -1323,6 +1323,17 @@ Empirical status: DERIVED from `alleleLossProbability`; the monotonicity
 statements below are the proof that this is the maximizer. -/
 def informationCrossoverTime (initial : ℝ) : ℝ := initial / 2
 
+/-- **The crossover is at half the initial information, linearly.** Doubling the starting
+information doubles the crossover level, and nothing is left at zero: the quantity is a fixed
+fraction of what was there, not an absolute scale. -/
+theorem informationCrossoverTime_linear (initial c : ℝ) :
+    informationCrossoverTime (c * initial) = c * informationCrossoverTime initial := by
+  unfold informationCrossoverTime; ring
+
+theorem informationCrossoverTime_half (initial : ℝ) :
+    2 * informationCrossoverTime initial = initial := by
+  unfold informationCrossoverTime; ring
+
 theorem hasDerivAt_absorptionChannelWeight {initial time : ℝ} (htime : 0 < time) :
     HasDerivAt (fun t ↦ absorptionChannelWeight initial t)
       (initial * alleleLossProbability initial time *

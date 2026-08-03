@@ -920,6 +920,18 @@ noncomputable def Var_Delta_Mu (V_A fst : ℝ) : ℝ :=
 noncomputable def Expected_Abs_Shift (V_A fstS fstT : ℝ) : ℝ :=
   Real.sqrt (Var_Delta_Mu V_A (fstS + fstT)) * Real.sqrt (2 / Real.pi)
 
+/-- **The half-normal relation between the mean absolute shift and its variance.** Squaring
+returns exactly `2/π` times the variance, which is the identity that makes this the mean of a
+folded normal rather than any other summary of the same spread. A body carrying a different
+constant would fail here and nowhere else. -/
+theorem Expected_Abs_Shift_sq (V_A fstS fstT : ℝ)
+    (hvar : 0 ≤ Var_Delta_Mu V_A (fstS + fstT)) :
+    Expected_Abs_Shift V_A fstS fstT ^ 2
+      = 2 / Real.pi * Var_Delta_Mu V_A (fstS + fstT) := by
+  unfold Expected_Abs_Shift
+  rw [mul_pow, Real.sq_sqrt hvar, Real.sq_sqrt (by positivity : (0:ℝ) ≤ 2 / Real.pi)]
+  ring
+
 /-- Variance identity used by the dashboard mean-shift card. -/
 theorem variance_mean_pgs_diff (V_A fst : ℝ) :
     Var_Delta_Mu V_A fst = 2 * fst * V_A := by

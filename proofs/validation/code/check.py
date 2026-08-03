@@ -1832,6 +1832,49 @@ def run_identifications() -> int:
                              r"namespace |/-))", src, re.S | re.M):
             full_decl[t.group(1).split(".")[-1]] = t.group(0)
 
+    # ---- 3d-ter. A citation that lands on a disclaimer ---------------------
+    #
+    # `CumulantBlindness` said the load-bearing negative result "is the
+    # condensation mechanism in `Calibrator.Condensation`".  Condensation's own
+    # header says, in capitals, "THAT PROPOSAL IS NOT PROVED IN THIS FILE".  The
+    # arc therefore claimed a result that exists in neither file, and the claim
+    # survived because nothing follows a pointer.
+    #
+    # A citation chain ending at a disclaimer is worse than no citation: it reads
+    # as a discharged obligation.
+    DISCLAIMER = re.compile(
+        r"NOT PROVED IN THIS FILE|not proved in this file|"
+        r"is not formalized here|are not proved here|is not proved here|"
+        r"not exported from this file|is absent pending", re.I)
+    LOAD_BEARING = re.compile(
+        r"(load-bearing|substantive|decisive|the real (result|theorem)|"
+        r"the hard content)[^.]{0,160}?`Calibrator\.([A-Za-z_0-9.]+)`", re.I | re.S)
+    disclaiming = set()
+    for path in lean_sources(PROOFS / "Calibrator"):
+        try:
+            text = read_source(path)
+        except ValueError:
+            continue
+        if DISCLAIMER.search(text):
+            disclaiming.add(path.stem)
+    dead_pointers = []
+    for path in lean_sources(PROOFS / "Calibrator"):
+        try:
+            text = read_source(path)
+        except ValueError:
+            continue
+        for match in LOAD_BEARING.finditer(text):
+            target = match.group(3).split(".")[-1]
+            if target in disclaiming and target != path.stem:
+                dead_pointers.append(
+                    "%s cites `Calibrator.%s` for load-bearing content, and that file "
+                    "disclaims having it" % (path.relative_to(REPO), match.group(3)))
+    if dead_pointers:
+        bad.append("citations landing on a disclaimer: %d, budget 0; say what the cited "
+                   "file actually contains, or drop the claim"
+                   % len(dead_pointers))
+        bad.extend("    " + x for x in dict.fromkeys(dead_pointers))
+
     # ---- 3d-bis. A named mathematical law supplied as a hypothesis ----------
     #
     # "Given Cauchy-Schwarz, apply Cauchy-Schwarz" is a modularisation, not a
