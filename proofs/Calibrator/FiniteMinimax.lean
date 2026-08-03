@@ -13,10 +13,10 @@ This file states the genuine finite decision problem behind the slogan
 contains only an observation kernel and a numerical loss.  In particular, it
 does not accept duality, compactness, convexity, or a lower bound as a field.
 
-The minimax theorem is currently an explicit `sorry`.  That visible obligation
-is intentional: importing a literature theorem, assuming a duality proposition,
-or defining the dual value to equal the primal value would all make the file
-green while deleting its mathematical content.
+The sound inequality `mixtureDualRisk ≤ minimaxRisk` is proved from finite loss bounds. The
+reverse inequality is the finite minimax theorem and remains an explicit `sorry`: importing a
+literature theorem, assuming a duality proposition, or defining the dual value to equal the
+primal value would make the file green while deleting its mathematical content.
 -/
 
 namespace Calibrator.FiniteMinimax
@@ -119,7 +119,7 @@ noncomputable def pointRiskAbsBound (θ : Fin (parameterCount + 1)) : ℝ :=
 noncomputable def riskAbsBound : ℝ := ∑ θ, E.pointRiskAbsBound θ
 
 /-- Every pointwise risk is bounded by the finite absolute loss table. -/
-theorem abs_risk_le_riskAbsBound (δ : Rule actionCount observationCount)
+theorem abs_risk_le_pointRiskAbsBound (δ : Rule actionCount observationCount)
     (θ : Fin (parameterCount + 1)) :
     |E.risk δ θ| ≤ E.pointRiskAbsBound θ := by
   have houter := FinitePrior.abs_mean_le_sum_abs (E.observation θ)
@@ -144,7 +144,7 @@ theorem bayesRisk_bddBelow (π : FinitePrior parameterCount) :
   have hmean := FinitePrior.abs_mean_le_sum_abs π (E.risk δ)
   have hrisk : ∑ θ, |E.risk δ θ| ≤ E.riskAbsBound := by
     unfold riskAbsBound
-    exact Finset.sum_le_sum fun θ _ ↦ E.abs_risk_le_riskAbsBound δ θ
+    exact Finset.sum_le_sum fun θ _ ↦ E.abs_risk_le_pointRiskAbsBound δ θ
   exact neg_le_of_abs_le (hmean.trans hrisk)
 
 /-- A fixed prior's optimal Bayes value is below every rule's worst-case risk. -/
@@ -174,13 +174,10 @@ complete because the primal minimax value equals the optimization over all
 Bayes priors.  This is the real theorem, not a definitional equality and not a
 caller-supplied proposition.
 
-    WHAT IS PROVED, AND WHAT IS NOT.  `bayesRisk_le_worstRisk` above gives the sound
-    direction unconditionally: an average against a prior never exceeds the worst case, so
-    no mixture can certify more than the minimax value.  Lifting that to
-    `mixtureDualRisk ≤ minimaxRisk` additionally needs the risk range to be bounded below
-    over the rule space, which is a continuum here; and the reverse inequality is the
-    minimax theorem itself, which needs a Sion- or von-Neumann-style argument this corpus
-    does not carry.
+    WHAT IS PROVED, AND WHAT IS NOT. `mixtureDualRisk_le_minimaxRisk` proves the sound
+    direction unconditionally: finite loss bounds make every real infimum genuine, and an
+    average against a prior never exceeds the worst case. The reverse inequality is the minimax
+    theorem itself and needs a finite-game separation argument this corpus does not yet carry.
 
     The `sorry` is the whole equality rather than the missing half, because splitting it
     into a proved inequality plus an assumed one would put the hard direction in a
