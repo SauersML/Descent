@@ -3,6 +3,7 @@ import Calibrator.PortabilityDrift
 import Calibrator.OpenQuestions
 import Calibrator.HaplotypeTheory
 import Calibrator.CertificateGrading
+import Calibrator.TransportedMinimax
 import Mathlib.Analysis.SpecialFunctions.Pow.Asymptotics
 
 namespace Calibrator
@@ -771,39 +772,6 @@ section MomentBodyEntropy
     comparison reduces to a comparison of exponents. -/
 noncomputable def logCoveringAtExponent (t e : ℝ) : ℝ := t ^ e
 
-/-- The moment body's entropy exponent, `1/α`. -/
-noncomputable def momentBodyExponent (α : ℝ) : ℝ := 1 / α
-
-/-- The enclosing hyperrectangle's entropy exponent, `2/(2α-1)`. -/
-noncomputable def hyperrectangleExponent (α : ℝ) : ℝ := 2 / (2 * α - 1)
-
-/-! **These two exponents are `TransportedMinimax`'s two exponents, copied, and the
-identity is NOT stated here because it cannot yet be compiled.**
-
-Not two quantities that happen to coincide: `momentBodyEntropyExponent` and
-`hyperrectangleEntropyExponent` are the same `1/α` and `2/(2α-1)`, introduced there for the
-same moment-body-versus-hyperrectangle comparison, and the comparison theorem is proved
-twice as well.  This file imports `TransportedMinimax`, so the duplication was avoidable.
-
-The identity theorem was written and withdrawn: both names are present in
-`TransportedMinimax.lean`'s source but **absent from its compiled `olean`**, so
-`momentBodyExponent α = momentBodyEntropyExponent α` does not elaborate.  Restore it, or
-better, redefine this file's two as calls to `TransportedMinimax`'s, once that module is
-rebuilt. -/
-
-/-- **The moment body's exponent is strictly smaller, at every admissible `α`.**
-
-    `1/α < 2/(2α-1)` for every `α > 1/2`. The inequality is equivalent to `2α - 1 < 2α`, so
-    it has no exceptional range and no asymptotic caveat: positivity is worth a strictly
-    better exponent everywhere. -/
-theorem momentBodyExponent_lt_hyperrectangle (α : ℝ) (hα : 1 / 2 < α) :
-    momentBodyExponent α < hyperrectangleExponent α := by
-  have hα0 : 0 < α := by linarith
-  have hden : 0 < 2 * α - 1 := by linarith
-  unfold momentBodyExponent hyperrectangleExponent
-  rw [div_lt_div_iff₀ hα0 hden]
-  linarith
-
 /-- **Strictly fewer distinguishable architectures, at every resolution finer than `M`.**
 
     Once the resolution ratio exceeds one — that is, once `ε < M`, the only regime in which
@@ -814,20 +782,20 @@ theorem momentBodyExponent_lt_hyperrectangle (α : ℝ) (hα : 1 / 2 < α) :
     resolution `ε` faces strictly fewer alternatives than a box-shaped class of the same
     tail order would present. -/
 theorem momentBody_logCovering_lt (t α : ℝ) (ht : 1 < t) (hα : 1 / 2 < α) :
-    logCoveringAtExponent t (momentBodyExponent α) <
-      logCoveringAtExponent t (hyperrectangleExponent α) := by
+    logCoveringAtExponent t (momentBodyEntropyExponent α) <
+      logCoveringAtExponent t (hyperrectangleEntropyExponent α) := by
   unfold logCoveringAtExponent
   exact Real.rpow_lt_rpow_left_iff ht |>.mpr
-    (momentBodyExponent_lt_hyperrectangle α hα)
+    (momentBody_entropy_exponent_lt α hα)
 
 /-- The covering-number gap is a strict inequality of positive quantities, so the ratio of
     required alternative counts exceeds one. Recorded in the form a power calculation
     consumes. -/
 theorem momentBody_logCovering_ratio_gt_one (t α : ℝ) (ht : 1 < t) (hα : 1 / 2 < α) :
-    1 < logCoveringAtExponent t (hyperrectangleExponent α) /
-      logCoveringAtExponent t (momentBodyExponent α) := by
+    1 < logCoveringAtExponent t (hyperrectangleEntropyExponent α) /
+      logCoveringAtExponent t (momentBodyEntropyExponent α) := by
   have ht0 : (0 : ℝ) < t := by linarith
-  have hpos : 0 < logCoveringAtExponent t (momentBodyExponent α) :=
+  have hpos : 0 < logCoveringAtExponent t (momentBodyEntropyExponent α) :=
     Real.rpow_pos_of_pos ht0 _
   rw [lt_div_iff₀ hpos, one_mul]
   exact momentBody_logCovering_lt t α ht hα
