@@ -29,6 +29,14 @@ No value of the free parameter rescues either law, because exp(-strength*fst)
 tends to 1 as fst tends to 0, so both predict 0.98 of source R^2 at F_ST
 0.0099 where the simulation gives 0.55. Keep these transcriptions. Deleting
 them removes the only reproducible record of why the two laws are absent.
+
+AND THIS SCRIPT IS NOT ONLY A FALSIFIER.  The same run CONFIRMED pgsVariance:
+across the 18 replicates in port.json the linkage-equilibrium formula sits at a
+mean ratio of 0.969 to the actual score variance, range 0.813 to 1.072, about
+three per cent low, which is the direction and size its stated assumption
+predicts.  That makes this file the only instrument that holds pgsVariance to a
+measurement, so deleting it as "the script for two dead laws" would silently
+retire a confirmation as well.
 """
 from __future__ import annotations
 
