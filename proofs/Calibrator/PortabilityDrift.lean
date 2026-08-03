@@ -4513,7 +4513,14 @@ theorem ibdRecurrenceFixedPoint_isFixedPoint (Ne rate : ℝ)
   -- nonzero hypothesis syntactically unusable and left an inverse in the goal.
   apply (eq_div_iff hd').2
   field_simp [h2Ne', hdExpanded]
-  ring
+  have hinv :
+      ((1 : ℝ) - rate * 2 + rate * Ne * 4 +
+          (rate ^ 2 - rate ^ 2 * Ne * 2))⁻¹ *
+        ((1 : ℝ) - rate * 2 + rate * Ne * 4 +
+          (rate ^ 2 - rate ^ 2 * Ne * 2)) = 1 :=
+    inv_mul_cancel₀ hdExpanded
+  ring_nf at hinv ⊢
+  nlinarith [hinv]
 
 /-- **Total isolation is a boundary the rest point attains.**  With `rate = 0`
 nothing separates the lineages and the recurrence rests at `1`. -/
