@@ -195,22 +195,23 @@ quantitative form of "the loss is in the linkage disequilibrium".
 presentDayR2MutationDrift V_A V_E fst shared_ld / presentDayR2 V_A V_E 0`, together with
 `taggedDriftR2Ratio_ge_retention`.**
 
-It applied the tagging factor to the denominator as well. Loss of shared LD attenuates the
-score's covariance with the phenotype; it does **not** reduce the target population's genetic
-variance. The target's phenotypic variance is `(1-F)·V_A + V_E`, not
-`(1-F)·shared_ld·V_A + V_E`. That body shrank phenotypic variance along with the signal and
-therefore **overstated portability**. Wright–Fisher simulation with genotype sampling noise
-removed, every frequency an exact rational and every comparison in exact arithmetic:
+This definition is absent on purpose. It applies the tagging factor to the denominator as
+well. Loss of shared LD attenuates the score's covariance with the phenotype. It does
+**not** reduce the target population's genetic variance. The target's phenotypic variance
+is `(1-F)·V_A + V_E`, not `(1-F)·shared_ld·V_A + V_E`, so that body shrinks phenotypic
+variance along with the signal and **overstates portability**. Wright–Fisher simulation
+with genotype sampling noise removed, every frequency an exact rational and every
+comparison in exact arithmetic:
 
-| design | `shared_ld` | simulated | deleted body | error |
+| design | `shared_ld` | simulated | `taggedDriftR2Ratio` | error |
 |---|---|---|---|---|
 | symmetric, `2N=2000`, `t=250` | 0.739 | 0.7407 | 0.8522 | **+15.1%** |
 | strong, `2N=400`, `t=100` | 0.583 | 0.5826 | 0.7328 | **+26.4%** |
 | the docstring's own example | 0.34 | 0.3183 | 0.4606 | **+44.7%** |
 | `h²=0.8`, `shared_ld=0.34` | 0.34 | 0.3400 | 0.7203 | **+111.9%** |
 
-The error was exactly zero iff `shared_ld = 1` — which is precisely why the sibling
-`neutralDriftR2Ratio` validates at `0.0%` and this did not. It grew with heritability:
+The error is exactly zero iff `shared_ld = 1`, which is why the sibling
+`neutralDriftR2Ratio` validates at `0.0%` and this one does not. It grows with heritability:
 `+9`–`15%` at `h² = 0.2`, `+28`–`49%` at `0.5`, `+60`–`112%` at `0.8`.
 Measured in `proofs/validation/drift_diff/`. Use `taggedDriftR2RatioCorrected` below. -/
 
@@ -219,8 +220,8 @@ Measured in `proofs/validation/drift_diff/`. Use `taggedDriftR2RatioCorrected` b
     `k·(V_A + V_E) / ((1-F)·V_A + V_E)` with `k = (1-F)·shared_ld`. The tagging factor
     multiplies the signal only; the target's phenotypic variance carries `(1-F)·V_A + V_E`.
     A closed form of this shape reproduced the simulation **exactly** — `0.00000` in exact
-    rationals, 12 of 12 replicates across two independent designs — where the superseded form
-    that also shrank the denominator ran `+15%` to `+112%` high.
+    rationals, 12 of 12 replicates across two independent designs — where a form that also
+    shrinks the denominator runs `+15%` to `+112%` high.
 
     Empirical status: **VALIDATED** (`proofs/validation/drift_diff/`). -/
 noncomputable def taggedDriftR2RatioCorrected (V_A V_E fst shared_ld : ℝ) : ℝ :=
@@ -274,33 +275,32 @@ end AttributionToTagging
 
 The results above attribute the portability gap between measured parameters: `F_ST`, effective
 size, migration rate, shared tagging. `Calibrator.LumpedRateBlindness` marks off a parameter that
-is not merely hard to measure but **absent from the observable law**.
+is not merely hard to measure but absent from the observable law.
 
 Take three demes in which two share a covariance signature. The direct exchange rate between those
 two is invisible: the observable class is closed under the dynamics, and on that class the
-generator does not depend on the exchange rate at all. Every moment of every order at every set of
-times is identical across the whole family. The identified set is the full range.
+generator does not depend on the exchange rate at all, so every generator-polynomial observable is
+identical across the whole family and the identified set is the full range.
 
-Three practical consequences. A demographic fit that reports such a rate is reporting its prior,
-because the likelihood is flat along that coordinate. The blindness is exact, so it is also a
-test: a method that returns different rates for datasets with the same observable law is defective
-in a way detectable without new data. And it is symmetry rather than degeneracy — the invisible
-direction is the antisymmetric mode of the two lumped demes — so the repair is to break the
-lumping with any observable that separates them, not to collect more samples under it.
+Three consequences. A fit reporting such a rate is reporting its prior, because the likelihood is
+flat along that coordinate. The blindness is exact, so it is also a test: a method returning
+different rates for datasets with the same observable law is defective, detectably and without new
+data. And it is symmetry rather than degeneracy — the invisible direction is the antisymmetric
+mode of the two lumped demes — so the repair is to break the lumping with any observable that
+separates them, not to collect more samples under it.
 
-This is `Calibrator.DeclaredInteractionClass` arriving in demography: identification here is
-relative to a declaration or it does not exist. -/
+This is `Calibrator.DeclaredInteractionClass` in demography: identification here is relative to a
+declaration or it does not exist. -/
 
 section UnidentifiableExchange
 
-/-- **The exchange rate between two covariance-indistinguishable demes is unidentifiable.**
-
-    Instance of `lumped_dynamics_blind_to_exchange`: the entire observable trajectory, at every
-    order, is constant along the exchange-rate coordinate. Not poorly estimated — not estimated.
+/-- The exchange rate between two covariance-indistinguishable demes is unidentifiable. Instance
+    of `lumped_dynamics_blind_to_exchange`: every generator iterate is constant along the
+    exchange-rate coordinate, so the observable is too at that order.
 
     Empirical status: DERIVED. Whether a given pair of human populations is lumpable at the
-    resolution of the observable is the empirical question this result asks to be answered
-    explicitly rather than assumed. -/
+    resolution of the observable is the empirical question this asks to be answered explicitly
+    rather than assumed. -/
 theorem indistinguishableDemes_exchangeRate_unidentifiable
     (hubRate exchange exchange' : ℝ) (observable : Fin 3 → ℝ) (hlump : Lumped observable)
     (order : ℕ) :

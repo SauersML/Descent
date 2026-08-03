@@ -154,12 +154,12 @@ section SummaryStatPGS
 /-! **Deleted: `effectiveSampleSizeSE se = 1/se^2`, together with
 `effectiveSampleSizeSE_lt_corrected` and the positivity lemma stated about it.**
 
-`1/SE²` is not `n_eff`. For a standardized trait `SE² = σ_y²/(n · Var(g))` with
-`Var(g) = 2p(1-p)`, so the allele frequency does not cancel and that body **always
-understated** the sample size, by exactly the factor `2p(1-p)`. Measured against
-Monte-Carlo GWAS regressions at a true `n = 2000`:
+These definitions are absent on purpose. `1/SE²` is not `n_eff`. For a standardized trait
+`SE² = σ_y²/(n · Var(g))` with `Var(g) = 2p(1-p)`, so the allele frequency does not cancel
+and `1/SE²` **always understates** the sample size, by exactly the factor `2p(1-p)`.
+Measured against Monte-Carlo GWAS regressions at a true `n = 2000`:
 
-| `p` | deleted body | `effectiveSampleSizeFromSE` | error |
+| `p` | `1/SE²` | `effectiveSampleSizeFromSE` | error |
 |---|---|---|---|
 | 0.5 | 996 | 1992 | −50.2% |
 | 0.3 | 838 | 1996 | −58.1% |
@@ -167,22 +167,21 @@ Monte-Carlo GWAS regressions at a true `n = 2000`:
 | 0.05 | 189 | 1993 | −90.5% |
 | 0.01 | 39 | 1976 | **−98.0%** |
 
-This was the missing-parameter class: no allele frequency appeared in the signature, so no
-constant could repair it — the same defect that falsified `ridgeBalance`. The expression
-`1/SE²` is a correct inverse-variance meta-analysis **weight**, and where a weight is wanted
-`fixed_weights` below is the declaration that says so; nothing in the corpus consumed the
-deleted name. Measured in `proofs/validation/popgen_diff2/`.
+This is the missing-parameter class: no allele frequency appears in the signature, so no
+constant repairs it. The same defect falsifies `ridgeBalance`. The expression `1/SE²` is a
+correct inverse-variance meta-analysis **weight**, and where a weight is wanted
+`fixed_weights` below is the declaration that says so. Measured in
+`proofs/validation/popgen_diff2/`.
 
 `effectiveSampleSizeFromSE` is the sample size. -/
 
 /-- **Effective sample size from a standard error.**
 
     `n_eff = 1/(SE² · 2p(1-p))` for a standardized trait. Recovers the true `n` to about 1%
-    across allele frequencies from 0.5 down to 0.01, where the superseded `1/SE²` understated
+    across allele frequencies from 0.5 down to 0.01, where `1/SE²` alone understates
     it by 50% at `p = 0.5` and by 98% at `p = 0.01` (`proofs/validation/popgen_diff2/`).
 
-    **Scope caveat, found by a later sweep and absent from the first version of this
-    docstring:** it overstates `N` for large-effect SNPs, by `+27%` at `h²_snp = 0.10` and
+    **Scope caveat:** it overstates `N` for large-effect SNPs, by `+27%` at `h²_snp = 0.10` and
     `+64%` at `0.20`. The derivation assumes the SNP explains a negligible share of variance,
     which is exactly where a GWAS hit does not sit. Ratios to the true `N` at small effect:
     `0.9965, 1.0065, 1.0966, 1.0283`.
@@ -277,11 +276,10 @@ structure LDSCModel (m : ℕ) where
 `genetic_correlation_predicts_portability` and
 `genetic_correlation_portability_bound_attained`.**
 
-The body was
-`(∑ β_s β_t) / √((∑ β_s²)(∑ β_t²))`: cosine similarity. There is no LD score, no
-chi-squared, no regression and no intercept in it, and `LDSCModel.ld_adj` was never touched
-by it. It had no downstream consumer outside its own two theorems, so nothing propagated,
-and no reading of it survives measurement as a summary-statistic estimator
+These definitions are absent on purpose. The body
+`(∑ β_s β_t) / √((∑ β_s²)(∑ β_t²))` is cosine similarity. It carries no LD score, no
+chi-squared, no regression and no intercept, and it never touches `LDSCModel.ld_adj`.
+No reading of it survives measurement as a summary-statistic estimator
 (`proofs/validation/ldsc_diff/`):
 
 * **LD alone breaks it.** Two SNPs at `r = 1/2` with joint effects `(1,0)` and `(0,1)` are
@@ -334,10 +332,10 @@ theorem ldsc_se_decreases_with_n
 
 /-- **`k` parameters cost less than `k+1`, at any positive per-parameter price.**
 
-    The name used to be `constrained_intercept_more_powerful`, which is the LDSC
-    claim this arithmetic was standing in for. The claim is not proved here and
-    the name is gone; what follows is the record of what the theorem does and
-    does not reach.
+    The name `constrained_intercept_more_powerful` is absent on purpose. That name
+    asserts an LDSC claim, and this arithmetic does not reach it. The claim is
+    proved nowhere here. What follows states what the theorem does and does not
+    reach.
 
     The statement contains no standard error. `se_per_param` is a variable name, not a
     quantity the theorem constrains, so what is proved is that `k` parameters cost less than
@@ -411,12 +409,10 @@ Lévy measure carrying jumps.
 
 It is often said that for a disjoint design the Lévy measure vanishes, so the
 achievable limit laws are exactly `{ N(0, s²) : 0 ≤ s² ≤ 1 }` — the Gaussian
-segment, with nothing outside it. **This corpus does not prove that**, and an
-earlier version of this section asserted it as "a theorem, not an
-approximation" while the declaration below simultaneously recorded that no
-probabilistic object occurs in the formal statement and that the central limit
-theorem is not formalized. The file contradicted itself; the local docstring
-was repaired and this surrounding narrative was not.
+segment, with nothing outside it. **This corpus does not prove that.** No
+probabilistic object occurs in the formal statement below and the central limit
+theorem is not formalized here, so nothing in this file may call the
+Gaussian-segment claim a theorem rather than an approximation.
 
 What is formalized here is only the **variance parameter** of a hypothesised
 Gaussian limit: the achievable values of `∑ⱼ share j` for a disjoint-window

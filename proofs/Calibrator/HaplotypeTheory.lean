@@ -517,13 +517,13 @@ theorem haplotype_less_portable_when_effects_shift
 /-! **Deleted: `haplotypeEffectEstimationVariance σ2 n freq = σ2 / (n * freq)`, together with
 `haplotypeEffectEstimationVariance_lt_ols`.**
 
-Regressing on a binary haplotype indicator of frequency `f` gives
-`Var(β̂) = σ²/(n·f·(1-f))`, not `σ²/(n·f)`. The missing `(1-f)` made that body
-**understate** the estimation variance — hence **overstate** precision — and it did so worst
-for **common** haplotypes, the opposite of the rarity intuition the surrounding prose appeals
-to. Monte-Carlo at `n = 1000`, 3000 replicates, MC standard error about 2.6%:
+This definition is absent on purpose. Regressing on a binary haplotype indicator of
+frequency `f` gives `Var(β̂) = σ²/(n·f·(1-f))`, not `σ²/(n·f)`. Dropping the `(1-f)`
+**understates** the estimation variance and so **overstates** precision, worst of all for
+**common** haplotypes, which is the opposite of the rarity intuition the surrounding prose
+appeals to. Monte-Carlo at `n = 1000`, 3000 replicates, MC standard error about 2.6%:
 
-| `f` | measured | deleted body | `haplotypeEffectVarianceOLS` |
+| `f` | measured | `σ²/(n·f)` | `haplotypeEffectVarianceOLS` |
 |---|---|---|---|
 | 0.02 | 0.05286 | −5.4% | −3.5% |
 | 0.1 | 0.011255 | −11.2% | −1.3% |
@@ -535,8 +535,8 @@ Measured in `proofs/validation/popgen_diff2/`. -/
 /-- **The OLS estimation variance for a binary haplotype indicator.**
 
     `Var(β̂) = σ²/(n·f·(1-f))`. Monte-Carlo at `n = 1000`, 3000 replicates: within 0.8–3.5% of
-    the measured variance across `f ∈ {0.02, 0.1, 0.3, 0.5}`, where the superseded `σ²/(n·f)`
-    ran −5% to −50%.
+    the measured variance across `f ∈ {0.02, 0.1, 0.3, 0.5}`, where `σ²/(n·f)`
+    runs −5% to −50%.
 
     Note the shape is **U-shaped in `f`**, not monotone: the variance is largest at the two
     extremes and smallest at `f = 1/2`. The rarity intuition holds only below `f = 1/2`.
@@ -552,7 +552,8 @@ noncomputable def haplotypeEffectVarianceOLS
     adding a rarer haplotype strictly increases the total estimation-noise burden. The
     hypothesis `freq_common ≤ 1/2` is load-bearing rather than cosmetic: `f(1-f)` is U-shaped,
     so above one half the *commoner* haplotype is the noisier one and the conclusion reverses.
-    The superseded `σ²/(n·f)` was monotone everywhere and so hid that. -/
+    A body of the form `σ²/(n·f)` is monotone everywhere and cannot express that
+    reversal. -/
 theorem haplotype_pgs_overfitting_risk
     (σ2 n freq_common freq_rare : ℝ)
     (h_sigma : 0 < σ2)
@@ -711,27 +712,27 @@ theorem la_deconvolution_improves_pgs
     exact div_pos (mul_pos h_mix h_gap) h_total
   linarith
 
-/-- **The admixture tract length, corrected.**
+/-- **The admixture tract length.**
 
     For a single-pulse hybrid-isolation model the ancestry-1 tracts are exponential with mean
     `1/(g(1-α))` Morgans, where `α` is the admixture fraction (Pool & Nielsen 2009; Liang &
     Nielsen 2014). The map length does **not** appear.
 
-    The superseded form, `1/(g·r_total)`, took a total map length `r_total` that is spurious
-    and omitted `α` entirely; it has been deleted. A forward pedigree simulation with explicit
-    Poisson crossovers settled it decisively — holding `α = 0.5, g = 10` and varying chromosome
-    length, the truth is asymptotically **independent** of map length while the superseded
-    form moves 16-fold:
+    **The admixture fraction is mandatory and the map length does not enter.** The form
+    `1/(g·r_total)` takes a total map length `r_total` that is spurious and omits `α`
+    entirely. A forward pedigree simulation with explicit Poisson crossovers settles that
+    decisively: holding `α = 0.5, g = 10` and varying chromosome length, the truth is
+    asymptotically **independent** of map length while `1/(g·r_total)` moves 16-fold.
 
-    | map length | simulated | superseded |
+    | map length | simulated | `1/(g·r_total)` |
     |---|---|---|
     | 1 M | 0.1462 ± 0.0043 | 0.1000 |
     | 4 M | 0.1728 ± 0.0023 | 0.0250 |
     | 16 M | 0.1913 ± 0.0013 | 0.00625 |
 
     (The simulated value rises toward `1/(g(1-α)) = 0.20` as edge censoring vanishes.) Across
-    `α ∈ {0.2,0.5,0.8} × g ∈ {5,10,20}` the uncorrected form runs −78% to −95%; the corrected
-    one matches to 0.1–7% where censoring is small. **No choice of units repairs it** — one
+    `α ∈ {0.2,0.5,0.8} × g ∈ {5,10,20}` the map-length form runs −78% to −95%, while this
+    body matches to 0.1–7% where censoring is small. **No choice of units repairs it:** one
     argument is spurious and another is missing.
 
     Empirical status: **VALIDATED**; the form below is FALSIFIED
@@ -740,9 +741,9 @@ noncomputable def expectedTractLength (g admixtureFraction : ℝ) : ℝ :=
   1 / (g * (1 - admixtureFraction))
 
 /-! **Deleted: `expectedSegmentLength g r_total = 1 / (g * r_total)`, together with
-`segments_shorten_with_time`.** The measurement is in `expectedTractLength` above: one
-argument was spurious and another missing, so no choice of units repaired it. The
-"segments shorten with more generations" content survives as
+`segments_shorten_with_time`.** These are absent on purpose. The measurement is in
+`expectedTractLength` above: one argument is spurious and another is missing, so no choice
+of units repairs the form. The "segments shorten with more generations" content lives in
 `tract_length_shortens_with_time` below, stated about the validated body. -/
 
 /-- Tracts get shorter with more generations, at fixed admixture fraction. -/
