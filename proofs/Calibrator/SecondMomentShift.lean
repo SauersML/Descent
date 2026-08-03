@@ -162,6 +162,7 @@ theorem projection_movement_under_measure_shift
       residualScoreMoment P X h u = 0 := by
   exact ⟨residual_score_identifies_projection_shift Q X h u v htarget, hsource⟩
 
+omit [DecidableEq ι] in
 /-- Residual scores are additive in the outcome function.  This is the
 algebraic step separating conditional-mean change from projection movement. -/
 theorem residualScoreMoment_outcome_change
@@ -170,6 +171,7 @@ theorem residualScoreMoment_outcome_change
     residualScoreMoment E X hNew w =
       residualScoreMoment E X hOld w +
         rawCrossMoment E X (fun ω ↦ hNew ω - hOld ω) := by
+  classical
   ext i
   unfold residualScoreMoment rawCrossMoment
   have hexpand :
