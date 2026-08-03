@@ -15,6 +15,22 @@ from pathlib import Path
 
 from paths import CALIBRATOR, require, ARTIFACTS as ART  # noqa: E402
 
+
+def _lean_sources(_r):
+    # `rglob` under Calibrator/ does NOT reach `proofs/Calibrator.lean`, the corpus
+    # ROOT, which sits one level above it. A scan blind to the root reported
+    # `decaySlope` unreferenced; it was deleted, and `LDDecayMechanism` was then
+    # deleted for having lost its only consumer. Both consumers were in the root.
+    # `lean_parse.build` carries this `extra` idiom -- keep every scanner in step.
+    import pathlib as _pl
+    _r = _pl.Path(_r)
+    _fs = sorted(_r.rglob("*.lean"))
+    _x = _r.parent / (_r.name + ".lean")
+    if _x.exists():
+        _fs.append(_x)
+    return _fs
+
+
 require(CALIBRATOR, "proofs/Calibrator")
 
 # A new top-level declaration starts at column 0 with one of these.
@@ -163,7 +179,12 @@ def parse_file(path: Path) -> list[Decl]:
     raw = path.read_text(encoding="utf-8")
     text = _strip_block_comments(raw)
     lines = text.split("\n")
-    module = "Calibrator." + str(path.relative_to(CALIBRATOR)).replace(".lean", "").replace("/", ".")
+    # The corpus ROOT `proofs/Calibrator.lean` is a SIBLING of Calibrator/, so
+    # `relative_to(CALIBRATOR)` raises on it. Its module name is just `Calibrator`.
+    if path.resolve() == (CALIBRATOR.parent / "Calibrator.lean").resolve():
+        module = "Calibrator"
+    else:
+        module = "Calibrator." + str(path.relative_to(CALIBRATOR)).replace(".lean", "").replace("/", ".")
     decls: list[Decl] = []
 
     for start, blk, doc in _merge_docstrings(_split_blocks(lines)):
@@ -211,7 +232,7 @@ def parse_file(path: Path) -> list[Decl]:
 
 def parse_all(root: Path = CALIBRATOR) -> list[Decl]:
     out = []
-    for p in sorted(root.rglob("*.lean")):
+    for p in _lean_sources(root):
         if ".lake" in p.parts:
             continue
         out.extend(parse_file(p))

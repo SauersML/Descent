@@ -18,6 +18,21 @@ import json
 import pathlib
 import re
 
+
+def _lean_sources(_r):
+    # `rglob` under Calibrator/ does NOT reach `proofs/Calibrator.lean`, the corpus
+    # ROOT, which sits one level above it. A scan blind to the root reported
+    # `decaySlope` unreferenced; it was deleted, and `LDDecayMechanism` was then
+    # deleted for having lost its only consumer. Both consumers were in the root.
+    # `lean_parse.build` carries this `extra` idiom -- keep every scanner in step.
+    _r = pathlib.Path(_r)
+    _fs = sorted(_r.rglob("*.lean"))
+    _x = _r.parent / (_r.name + ".lean")
+    if _x.exists():
+        _fs.append(_x)
+    return _fs
+
+
 CAL = pathlib.Path(__file__).resolve().parents[2] / "Calibrator"
 
 DEF_RE = re.compile(
@@ -181,7 +196,7 @@ def extract_file(path: pathlib.Path):
 
 def extract_all():
     defs = []
-    for p in sorted(CAL.rglob("*.lean")):
+    for p in _lean_sources(CAL):
         defs.extend(extract_file(p))
     return defs
 
@@ -233,7 +248,7 @@ def harvest_hypotheses(defs):
     """
     by_name = {d["name"]: d for d in defs}
     boxes = {d["name"]: [] for d in defs}
-    for p in sorted(CAL.rglob("*.lean")):
+    for p in _lean_sources(CAL):
         text = p.read_text(errors="ignore")
         blocks = re.split(r"\n(?=(?:@\[[^\]]*\]\n)?(?:theorem|lemma)\s)", text)
         for b in blocks:

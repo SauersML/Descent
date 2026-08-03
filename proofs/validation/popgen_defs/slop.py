@@ -23,6 +23,21 @@ import pathlib
 import re
 import sys
 
+
+def _lean_sources(_r):
+    # `rglob` under Calibrator/ does NOT reach `proofs/Calibrator.lean`, the corpus
+    # ROOT, which sits one level above it. A scan blind to the root reported
+    # `decaySlope` unreferenced; it was deleted, and `LDDecayMechanism` was then
+    # deleted for having lost its only consumer. Both consumers were in the root.
+    # `lean_parse.build` carries this `extra` idiom -- keep every scanner in step.
+    _r = pathlib.Path(_r)
+    _fs = sorted(_r.rglob("*.lean"))
+    _x = _r.parent / (_r.name + ".lean")
+    if _x.exists():
+        _fs.append(_x)
+    return _fs
+
+
 DEF = re.compile(r"^(?:noncomputable\s+)?def\s+([A-Za-z_][\w.']*)")
 THM = re.compile(r"^(?:private\s+)?(?:theorem|lemma)\s+([A-Za-z_][\w.']*)")
 TRIVIAL_TACTICS = re.compile(
@@ -32,7 +47,7 @@ TRIVIAL_TACTICS = re.compile(
 
 def blocks(root):
     """Yield (kind, name, file, start_line, text) for every declaration."""
-    for path in sorted(pathlib.Path(root).rglob("*.lean")):
+    for path in _lean_sources(pathlib.Path(root)):
         lines = path.read_text(errors="ignore").splitlines()
         i = 0
         while i < len(lines):
@@ -60,7 +75,7 @@ def blocks(root):
 def main(root):
     decls = list(blocks(root))
     text = "\n".join(p.read_text(errors="ignore")
-                     for p in pathlib.Path(root).rglob("*.lean"))
+                     for p in _lean_sources(pathlib.Path(root)))
 
     defs = [d for d in decls if d[0] == "def"]
     thms = [d for d in decls if d[0] == "thm"]

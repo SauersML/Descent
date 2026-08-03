@@ -23,6 +23,22 @@ from pathlib import Path
 
 from paths import CALIBRATOR as CAL, require, ARTIFACTS as ART
 
+
+def _lean_sources(_r):
+    # `rglob` under Calibrator/ does NOT reach `proofs/Calibrator.lean`, the corpus
+    # ROOT, which sits one level above it. A scan blind to the root reported
+    # `decaySlope` unreferenced; it was deleted, and `LDDecayMechanism` was then
+    # deleted for having lost its only consumer. Both consumers were in the root.
+    # `lean_parse.build` carries this `extra` idiom -- keep every scanner in step.
+    import pathlib as _pl
+    _r = _pl.Path(_r)
+    _fs = sorted(_r.rglob("*.lean"))
+    _x = _r.parent / (_r.name + ".lean")
+    if _x.exists():
+        _fs.append(_x)
+    return _fs
+
+
 require(CAL, "proofs/Calibrator")
 
 DEF = re.compile(
@@ -63,7 +79,7 @@ def scan_file(path: Path):
 
 def run():
     sites = defaultdict(list)
-    for p in sorted(CAL.rglob("*.lean")):
+    for p in _lean_sources(CAL):
         if ".lake" in p.parts:
             continue
         for fq, short, line, priv, kind in scan_file(p):

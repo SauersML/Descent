@@ -29,6 +29,8 @@ failures = []
 # indistinguishable from "the fix was never applied".  Clear it before anything
 # imports the generated module, so a green run cannot be a stale one.
 import shutil
+
+
 shutil.rmtree(HERE / "__pycache__", ignore_errors=True)
 
 
@@ -193,6 +195,12 @@ def no_swallowed_declarations():
         r"^(?:(?:noncomputable|private|protected|partial|unsafe|scoped|local|nonrec)\s+)*"
         r"(?:def|abbrev)\s+\S")
     raw = collections.Counter()
+    # NOT root-inclusive, deliberately. Adding `proofs/Calibrator.lean` here is
+    # correct for a reference scan and WRONG here: this list feeds test_parser.py
+    # and leanexpr.extract_file, which rebuild a path as `Calibrator/<rel>` and
+    # raise FileNotFoundError on the root, and the per-file declaration
+    # reconciliation reports 8 source declarations against 4 table rows for it.
+    # Include the root here only together with the downstream module-path fix.
     sources = sorted((PROOFS / "Calibrator").rglob("*.lean"))
     root = PROOFS / "Calibrator.lean"
     if root.exists():
