@@ -90,26 +90,26 @@ theorem expectedBrierScore_deriv (p π : ℝ) :
     · exact differentiableAt_const π
     · apply DifferentiableAt.const_mul
       exact differentiableAt_id
-  have hd2 : DifferentiableAt ℝ (fun x : ℝ => x ^ 2) p := by
-    exact differentiableAt_id.pow 2
-  have h_deriv_add : deriv (fun x : ℝ => (π - 2 * π * x) + x ^ 2) p = deriv (fun x : ℝ => π - 2 * π * x) p + deriv (fun x : ℝ => x ^ 2) p := by
-    exact deriv_add hd1 hd2
+  have hd2 : DifferentiableAt ℝ (fun x : ℝ => x ^ 2) p :=
+    differentiableAt_id.pow 2
+  have h_deriv_add : deriv (fun x : ℝ => (π - 2 * π * x) + x ^ 2) p = deriv (fun x : ℝ => π - 2 * π * x) p + deriv (fun x : ℝ => x ^ 2) p :=
+    deriv_add hd1 hd2
   have h_eq_add : (fun x : ℝ => π - 2 * π * x + x ^ 2) = (fun x : ℝ => (π - 2 * π * x) + x ^ 2) := rfl
   rw [h_eq_add, h_deriv_add]
   have hd1_sub1 : DifferentiableAt ℝ (fun x : ℝ => π) p := differentiableAt_const π
   have hd1_sub2 : DifferentiableAt ℝ (fun x : ℝ => 2 * π * x) p := differentiableAt_id.const_mul (2 * π)
-  have h_deriv_sub : deriv (fun x : ℝ => π - 2 * π * x) p = deriv (fun x : ℝ => π) p - deriv (fun x : ℝ => 2 * π * x) p := by
-    exact deriv_sub hd1_sub1 hd1_sub2
+  have h_deriv_sub : deriv (fun x : ℝ => π - 2 * π * x) p = deriv (fun x : ℝ => π) p - deriv (fun x : ℝ => 2 * π * x) p :=
+    deriv_sub hd1_sub1 hd1_sub2
   rw [h_deriv_sub]
   rw [deriv_const]
-  have h_deriv_const_mul : deriv (fun x : ℝ => 2 * π * x) p = 2 * π * deriv (fun x : ℝ => x) p := by
-    exact deriv_const_mul (2 * π) differentiableAt_id
+  have h_deriv_const_mul : deriv (fun x : ℝ => 2 * π * x) p = 2 * π * deriv (fun x : ℝ => x) p :=
+    deriv_const_mul (2 * π) differentiableAt_id
   rw [h_deriv_const_mul]
-  have h_deriv_id : deriv (fun x : ℝ => x) p = 1 := by
-    exact deriv_id p
+  have h_deriv_id : deriv (fun x : ℝ => x) p = 1 :=
+    deriv_id p
   rw [h_deriv_id]
-  have h_deriv_pow : deriv (fun x : ℝ => x ^ 2) p = 2 * p ^ (2 - 1) * deriv (fun x : ℝ => x) p := by
-    exact deriv_pow (n := 2) differentiableAt_id
+  have h_deriv_pow : deriv (fun x : ℝ => x ^ 2) p = 2 * p ^ (2 - 1) * deriv (fun x : ℝ => x) p :=
+    deriv_pow (n := 2) differentiableAt_id
   rw [h_deriv_pow]
   rw [h_deriv_id]
   ring
@@ -482,8 +482,8 @@ theorem BayesRisk_mono {α : Type u} (R : α → ℝ) (F G : Set α)
     (hFG : F ⊆ G)
     (h_bdd : BddBelow (R '' G))
     (h_nonempty : (R '' F).Nonempty) :
-    BayesRisk R G ≤ BayesRisk R F := by
-  exact oracleRisk_mono (R := R) (Fyours := G) (Fbaseline := F) hFG h_bdd h_nonempty
+    BayesRisk R G ≤ BayesRisk R F :=
+  oracleRisk_mono (R := R) (Fyours := G) (Fbaseline := F) hFG h_bdd h_nonempty
 
 /-! ### Magnitude Certificates: Log Loss (KL) and Brier (L²) -/
 
@@ -631,8 +631,8 @@ theorem logRisk_regret_zero_iff_ae_eq {Z : Type u} [MeasurableSpace Z] (μ : Mea
   rw [logRisk_regret_eq_expected_klBernReal μ p q hp hq]
   constructor
   · intro h0
-    have h_ae_zero : (fun z => klBernReal (p z) (q z)) =ᵐ[μ] 0 := by
-      exact (integral_eq_zero_iff_of_nonneg h_kl_nonneg h_int).mp h0
+    have h_ae_zero : (fun z => klBernReal (p z) (q z)) =ᵐ[μ] 0 :=
+      (integral_eq_zero_iff_of_nonneg h_kl_nonneg h_int).mp h0
     filter_upwards [h_ae_zero] with z hz
     exact (h_kl_zero_iff z).1 hz
   · intro hqeqp
@@ -723,8 +723,8 @@ theorem brierRisk_target_le_mul_source_of_withDensity
     unfold brierRisk
     simp [ℓ]
     rw [h_density]
-    have h_lt_top : ∀ᵐ z ∂μS, ENNReal.ofReal (w z) < ⊤ := by
-      exact Filter.Eventually.of_forall (fun _ => ENNReal.ofReal_lt_top)
+    have h_lt_top : ∀ᵐ z ∂μS, ENNReal.ofReal (w z) < ⊤ :=
+      Filter.Eventually.of_forall (fun _ => ENNReal.ofReal_lt_top)
     calc
       ∫ z, ℓ z ∂μS.withDensity (fun z => ENNReal.ofReal (w z))
           = ∫ z, ((ENNReal.ofReal (w z)).toReal) • ℓ z ∂μS := by
@@ -751,21 +751,21 @@ theorem brierRisk_target_le_mul_source_of_withDensity
 /-- **Log-loss Bayes-optimality: `η` minimizes risk among competitors that are open-valued
 and integrable against it.**
 
-The side conditions used to be quantified over the whole predictor type:
+Do not quantify the side conditions over the whole predictor type:
 
     (h_int_q : ∀ q : ProbPredictor Z, Integrable (fun z => bernoulliLogLoss (η z).1 (q z).1) μ)
     (h_q_open : ∀ q : ProbPredictor Z, ∀ z, 0 < (q z).1 ∧ (q z).1 < 1)
 
 `h_q_open` in that form **cannot be satisfied**. `ProbPredictor Z` is `Z → Set.Icc (0:ℝ) 1`,
 a closed interval, so for any inhabited `Z` the constant predictor `fun _ => ⟨0, _⟩` is a
-term of the type and refutes it. Every instance of the theorem therefore had a false
-hypothesis, and the theorem was vacuous rather than merely over-strong. `h_int_q` was
+term of the type and refutes it. Every instance of such a theorem carries a false
+hypothesis, which makes the theorem vacuous rather than merely over-strong. `h_int_q` is
 unsatisfiable in the same style for any `μ` and `Z` admitting a non-measurable function,
 since `ProbPredictor` carries no measurability requirement and `Integrable` demands
 `AEStronglyMeasurable`.
 
-Both conditions are now demanded of the competitor `q` actually being compared against,
-which is all the proof ever used them for, and which is satisfiable. -/
+Both conditions are demanded of the competitor `q` actually being compared against, which
+is all the proof uses them for, and which is satisfiable. -/
 theorem logRisk_minimized_at_eta {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
     (η : ProbPredictor Z)
     (hη_open : ∀ z, 0 < (η z).1 ∧ (η z).1 < 1)
@@ -778,8 +778,8 @@ theorem logRisk_minimized_at_eta {Z : Type u} [MeasurableSpace Z] (μ : Measure 
   have hreg :
       0 ≤
         (∫ z,
-          bernoulliLogLoss (η z).1 (q z).1 - bernoulliLogLoss (η z).1 (η z).1 ∂μ) := by
-    exact logRisk_regret_nonneg μ η q hη_open hq_open
+          bernoulliLogLoss (η z).1 (q z).1 - bernoulliLogLoss (η z).1 (η z).1 ∂μ) :=
+    logRisk_regret_nonneg μ η q hη_open hq_open
   have hsub :
       (∫ z,
         bernoulliLogLoss (η z).1 (q z).1 - bernoulliLogLoss (η z).1 (η z).1 ∂μ)
@@ -801,8 +801,8 @@ theorem logRisk_eq_iff_ae_eq_eta {Z : Type u} [MeasurableSpace Z] (μ : Measure 
   have hzero :
       (∫ z,
         bernoulliLogLoss (η z).1 (q z).1 - bernoulliLogLoss (η z).1 (η z).1 ∂μ) = 0
-        ↔ q =ᵐ[μ] η := by
-    exact logRisk_regret_zero_iff_ae_eq μ η q hη_open hq_open h_int_kl h_kl_zero_iff
+        ↔ q =ᵐ[μ] η :=
+    logRisk_regret_zero_iff_ae_eq μ η q hη_open hq_open h_int_kl h_kl_zero_iff
   have hsub :
       (∫ z,
         bernoulliLogLoss (η z).1 (q z).1 - bernoulliLogLoss (η z).1 (η z).1 ∂μ)
@@ -833,10 +833,10 @@ theorem brierRisk_minimized_at_eta {Z : Type u} [MeasurableSpace Z] (μ : Measur
       brierRisk μ η η ≤ brierRisk μ η q := by
   intro q h_int_q
   have hreg : (∫ z, expectedBrierScore (q z).1 (η z).1 - expectedBrierScore (η z).1 (η z).1 ∂μ)
-      = ∫ z, ((η z).1 - (q z).1) ^ 2 ∂μ := by
-    exact brier_regret_eq_l2_probPredictor μ η q
-  have hnonneg : 0 ≤ ∫ z, ((η z).1 - (q z).1) ^ 2 ∂μ := by
-    exact integral_nonneg (μ := μ) (fun z => sq_nonneg ((η z).1 - (q z).1))
+      = ∫ z, ((η z).1 - (q z).1) ^ 2 ∂μ :=
+    brier_regret_eq_l2_probPredictor μ η q
+  have hnonneg : 0 ≤ ∫ z, ((η z).1 - (q z).1) ^ 2 ∂μ :=
+    integral_nonneg (μ := μ) (fun z => sq_nonneg ((η z).1 - (q z).1))
   have hsub :
       (∫ z, expectedBrierScore (q z).1 (η z).1 - expectedBrierScore (η z).1 (η z).1 ∂μ)
         = brierRisk μ η q - brierRisk μ η η := by
@@ -854,8 +854,8 @@ theorem brierRisk_eq_iff_ae_eq_eta {Z : Type u} [MeasurableSpace Z] (μ : Measur
     (h_int_sq : Integrable (fun z => ((η z).1 - (q z).1) ^ 2) μ) :
     brierRisk μ η q = brierRisk μ η η ↔ q =ᵐ[μ] η := by
   have hreg : (∫ z, expectedBrierScore (q z).1 (η z).1 - expectedBrierScore (η z).1 (η z).1 ∂μ)
-      = ∫ z, ((η z).1 - (q z).1) ^ 2 ∂μ := by
-    exact brier_regret_eq_l2_probPredictor μ η q
+      = ∫ z, ((η z).1 - (q z).1) ^ 2 ∂μ :=
+    brier_regret_eq_l2_probPredictor μ η q
   have hsub :
       (∫ z, expectedBrierScore (q z).1 (η z).1 - expectedBrierScore (η z).1 (η z).1 ∂μ)
         = brierRisk μ η q - brierRisk μ η η := by
@@ -863,8 +863,8 @@ theorem brierRisk_eq_iff_ae_eq_eta {Z : Type u} [MeasurableSpace Z] (μ : Measur
     simpa [sub_eq_add_neg] using integral_sub h_int_q h_int_eta
   have hzero_sq :
       (∫ z, ((η z).1 - (q z).1) ^ 2 ∂μ) = 0
-      ↔ (fun z => ((η z).1 - (q z).1) ^ 2) =ᵐ[μ] 0 := by
-    exact integral_eq_zero_iff_of_nonneg (fun z => sq_nonneg ((η z).1 - (q z).1)) h_int_sq
+      ↔ (fun z => ((η z).1 - (q z).1) ^ 2) =ᵐ[μ] 0 :=
+    integral_eq_zero_iff_of_nonneg (fun z => sq_nonneg ((η z).1 - (q z).1)) h_int_sq
   constructor
   · intro hEq
     have h0 : (∫ z, ((η z).1 - (q z).1) ^ 2 ∂μ) = 0 := by
@@ -1048,8 +1048,8 @@ theorem logBayesRisk_full_le_baseline {Z : Type u} [MeasurableSpace Z] (μ : Mea
     (h_sub : Fbase ⊆ Ffull)
     (h_bdd_full : BddBelow ((logRisk μ η) '' Ffull))
     (h_nonempty_base : ((logRisk μ η) '' Fbase).Nonempty) :
-    logBayesRisk μ η Ffull ≤ logBayesRisk μ η Fbase := by
-  exact BayesRisk_mono (R := logRisk μ η) Fbase Ffull h_sub h_bdd_full h_nonempty_base
+    logBayesRisk μ η Ffull ≤ logBayesRisk μ η Fbase :=
+  BayesRisk_mono (R := logRisk μ η) Fbase Ffull h_sub h_bdd_full h_nonempty_base
 
 /-- Strict full-vs-baseline theorem under a margin nondegeneracy condition. -/
 theorem logBayesRisk_full_lt_baseline_of_margin {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)

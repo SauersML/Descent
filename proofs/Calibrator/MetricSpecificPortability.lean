@@ -533,8 +533,8 @@ theorem mechanistic_transport_disrupts_calibration_slope_and_brier
     linarith
   have hslope_dev :
       calibrationSlopeDeviation ((cal.identityCalibrationProfile Pop.target)).slope =
-        1 - ((cal.identityCalibrationProfile Pop.target)).slope := by
-    exact calibrationSlopeDeviation_eq_one_sub_of_lt_one
+        1 - ((cal.identityCalibrationProfile Pop.target)).slope :=
+    calibrationSlopeDeviation_eq_one_sub_of_lt_one
       ((cal.identityCalibrationProfile Pop.target)).slope hslope_lt
   have hslope_eq :
       ((cal.identityCalibrationProfile Pop.target)).slope =
@@ -683,8 +683,8 @@ theorem panel_budget_unbounded_in_reliability (p c M : ℝ)
   have hkey : eps * (2 * (M * p + c)) ≤ c := by
     rw [heps] at heps_le ⊢
     calc min (1 / 2) (c / (2 * (M * p + c))) * (2 * (M * p + c))
-        ≤ (c / (2 * (M * p + c))) * (2 * (M * p + c)) := by
-          exact mul_le_mul_of_nonneg_right (min_le_right _ _) (by positivity)
+        ≤ (c / (2 * (M * p + c))) * (2 * (M * p + c)) :=
+          mul_le_mul_of_nonneg_right (min_le_right _ _) (by positivity)
       _ = c := by field_simp
   nlinarith [hkey, heps_pos, heps_half, hp, hc, hM]
 
@@ -700,13 +700,13 @@ theorem adaptationDifficultyIndex_recal_lt_rediscovery
       adaptationDifficultyIndex m infoDisc := by
   unfold adaptationDifficultyIndex
   have h_two_over_cal_le_disc : 2 / infoCal ≤ 2 / infoDisc := by
-    have h_inv : 1 / infoCal ≤ 1 / infoDisc := by
-      exact one_div_le_one_div_of_le h_infoDisc h_info_order
+    have h_inv : 1 / infoCal ≤ 1 / infoDisc :=
+      one_div_le_one_div_of_le h_infoDisc h_info_order
     have h_mul :=
       mul_le_mul_of_nonneg_left h_inv (show (0 : ℝ) ≤ 2 by norm_num)
     simpa [div_eq_mul_inv] using h_mul
-  have h_two_over_disc_lt_m_over_disc : 2 / infoDisc < m / infoDisc := by
-    exact div_lt_div_of_pos_right h_more_params h_infoDisc
+  have h_two_over_disc_lt_m_over_disc : 2 / infoDisc < m / infoDisc :=
+    div_lt_div_of_pos_right h_more_params h_infoDisc
   exact lt_of_le_of_lt h_two_over_cal_le_disc h_two_over_disc_lt_m_over_disc
 
 /-- **Recalibration is easier than rediscovery at the same precision target.**
@@ -997,8 +997,8 @@ theorem nns_increases_with_ppv_drop
     (ppv₁ ppv₂ : ℝ)
     (h_ppv₂ : 0 < ppv₂)
     (h_drop : ppv₂ < ppv₁) :
-    1 / ppv₁ < 1 / ppv₂ := by
-  exact div_lt_div_of_pos_left one_pos h_ppv₂ h_drop
+    1 / ppv₁ < 1 / ppv₂ :=
+  div_lt_div_of_pos_left one_pos h_ppv₂ h_drop
 
 /-! **F1 score captures precision-recall balance.**
 `F1 = 2 × PPV × sensitivity / (PPV + sensitivity)`, and F1 portability reflects
@@ -1189,8 +1189,8 @@ theorem clinical_utility_threshold
       decisionCurveNetBenefit (sens_source * π) ((1 - spec_source) * (1 - π)) 1 t := by
   rw [decisionCurveNetBenefit_eq_formula, decisionCurveNetBenefit_eq_formula]
   have h_threshold_weight_pos : 0 < t / (1 - t) := div_pos ht (by linarith)
-  have h_tp : sens_target * π < sens_source * π := by
-    exact mul_lt_mul_of_pos_right h_sens h_π
+  have h_tp : sens_target * π < sens_source * π :=
+    mul_lt_mul_of_pos_right h_sens h_π
   have h_fp :
       (1 - spec_source) * (1 - π) <
         (1 - spec_target) * (1 - π) := by
@@ -1208,7 +1208,7 @@ theorem clinical_utility_threshold
 `R²`, AUC, and Brier.**
 
 This theorem is stated on the explicit SNP-level transport model rather than on
-the old drift benchmark. If the transported source weights lose explained
+a drift benchmark. If the transported source weights lose explained
 signal in the target population, then:
 
 - target `R²` is strictly lower;
@@ -1292,8 +1292,8 @@ theorem brier_score_bounded
   have h_one_minus_pi : 0 ≤ 1 - π := by linarith
   have h2 : 0 ≤ 1 - r2 := by linarith
   have h3 : 1 - r2 ≤ 1 := by linarith
-  have h_nonneg : 0 ≤ π * (1 - π) * (1 - r2) := by
-    exact mul_nonneg (mul_nonneg h_π h_one_minus_pi) h2
+  have h_nonneg : 0 ≤ π * (1 - π) * (1 - r2) :=
+    mul_nonneg (mul_nonneg h_π h_one_minus_pi) h2
   nlinarith
 
 /-- **Brier portability decomposition as the exact proper-score result on the

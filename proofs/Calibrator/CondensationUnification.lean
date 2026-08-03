@@ -258,11 +258,11 @@ some design, and the cumulants beyond the second are not: exposing the `j`-th fo
 tempered class of `Calibrator.EpistaticChaos.GenotypeDesign.Tempered`, and in that phase
 the limit is governed by the conditional-variance array rather than by cumulant rates —
 an array that forgets them. So the naive list `{two-jet, arithmetic type, symmetry,
-cumulants of x²}` overstates what is observable, and this file no longer asserts it. The
-obstruction is the hub-energy divergence already formalized here. (An `ObservableTower`
-record once carried it as a field; that record accepted the Vertex-Weight Law and the
-exposure correction as fields too, and has been removed, so this paragraph is a note and
-nothing in the file enforces it.)
+cumulants of x²}` overstates what is observable, and this file asserts no such list. The
+obstruction is the hub-energy divergence already formalized here. An `ObservableTower`
+record carrying that obstruction as a field is absent on purpose, because such a record
+takes the Vertex-Weight Law and the exposure correction as fields too. This paragraph is
+therefore a note, and nothing in the file enforces it.
 
 **A later correction, recorded here because this section is where a reader meets the
 list.** §5i's rigidity theorem shows the floor-one channels are reconstructible from four
@@ -566,8 +566,8 @@ together, which is `no_signSymmetric_nondegenerate_locus` read off the tower. -/
 theorem hweLevelOne_symmetric_jetVariance_zero (q : ℝ)
     (hsymmetric : (hweLevelOne q).isSignSymmetric = true) :
     (hweLevelOne q).jetVariance = 0 := by
-  have hcomponent : q = 1 / 2 := by
-    exact of_decide_eq_true hsymmetric
+  have hcomponent : q = 1 / 2 :=
+    of_decide_eq_true hsymmetric
   have hjet : (hweLevelOne q).jetVariance = hweMellinJetVariance q := rfl
   rw [hjet, hcomponent]
   exact hweMellinJetVariance_half
@@ -1167,8 +1167,8 @@ theorem standardizedGenotype_fourth_moment_eq_two_iff (h : HardyWeinbergModel)
   · intro heq
     rw [hveq] at heq
     have hsq : (2 * h.altFreq - 1) ^ 2 = 0 := by nlinarith [heq]
-    have hzero : 2 * h.altFreq - 1 = 0 := by
-      exact pow_eq_zero_iff (n := 2) (by norm_num) |>.mp hsq
+    have hzero : 2 * h.altFreq - 1 = 0 :=
+      pow_eq_zero_iff (n := 2) (by norm_num) |>.mp hsq
     linarith [hzero]
   · intro hhalf
     rw [hveq, hhalf]
@@ -1280,27 +1280,26 @@ theorem balanced_locus_is_reflection_fixed_point (h : HardyWeinbergModel) :
 projection consequence are removed. -/
 
 /-!
-## 5j. The sign bias, and a retracted exposure mechanism
+## 5j. The sign bias, and the exposure mechanism it does not give
 
-### What was claimed here, and is withdrawn
+### The claim this section rules out
 
-An earlier version of this section asserted a **coupling channel** separate from the hub
-channel: that a sliding-window design carries a tuned-sector variance inflation
-`2b²/(1 - b²)` in the conditional sign bias `b`, tunable through a window tilt `θ*`, and
-therefore that a bounded hub energy is no reassurance for a rare-variant window scan. It
-gave the inflation in closed form, `2(1-2q)⁴/(1-(1-2q)⁴)`, and as exact rationals at MAF
-0.05 and 0.01.
+There is **no coupling channel** separate from the hub channel. A sliding-window design
+carries no tuned-sector variance inflation `2b²/(1 - b²)` in the conditional sign bias
+`b`, tunable through a window tilt `θ*`, and a bounded hub energy is therefore exactly as
+much reassurance for a rare-variant window scan as it is anywhere else. The closed form
+`2(1-2q)⁴/(1-(1-2q)⁴)`, and its exact rationals at MAF 0.05 and 0.01, describe nothing.
 
-**That mechanism is retracted.** Its author's own audit found a tilt-bookkeeping error: the
-vanishing-first-order argument used a `θ = 1/2` weight, mixing a level-two normalization
-into a level-one computation. At the correct weights the solo-factor mean is
+**Why the mechanism fails.** A tilt-bookkeeping error produces it. The
+vanishing-first-order argument uses a `θ = 1/2` weight, which mixes a level-two
+normalization into a level-one computation. At the correct weights the solo-factor mean is
 
 > `E[u e^λ] / E[e^λ] = E[(x² - 1) x²] = σ₁² = 2`,
 
-not zero. So the first-order cross term does not vanish, and what it exposes is `Λ(2)` data
-— that is `E[x⁴]` — which the hub channel already exposes. The term is **hub-redundant
-rather than a new channel**, the separation between the two channels was the premise the
-audit removed, and every quantitative consequence drawn from it goes with it.
+not zero. The first-order cross term therefore does not vanish, and what it exposes is
+`Λ(2)` data — that is `E[x⁴]` — which the hub channel already exposes. The term is
+**hub-redundant rather than a new channel**. Separation between the two channels is the
+premise the mechanism needs, and no quantitative consequence survives without it.
 
 A second retraction landed at the same time and is recorded here because this file leaned
 on it: the jet-to-strip upgrade is false, since the window channel's exposed functional is
@@ -1466,8 +1465,8 @@ merely outside the proved stratum; they are the canonical member of the class th
 carved out. **Nothing in the blindness theorem transfers to genotype data**, and this file
 asserts no such transfer.
 
-The corpus's own results point the same way from the other side, though more weakly than
-once claimed here. `Calibrator.JetBarrier` proves `one_lt_latticeInflation`: the factor
+The corpus's own results point the same way from the other side, though weakly.
+`Calibrator.JetBarrier` proves `one_lt_latticeInflation`: the factor
 `h/(1 - e^(-h))` exceeds one. Reading that factor as a ratio of exceedance intensities at
 a lattice-aligned threshold — hence as information a design can read — is the conjecture,
 and it is a hypothesis of `inflated_intensity_ne_of_injective`, not a theorem. So this is a

@@ -706,13 +706,13 @@ theorem asymptoticallyZero_of_abs_le_mul
   intro n hn
   have hf_small : |f n| < ε / (C + 1) := hN n hn
   have hg_le : |g n| ≤ C := hgC n
-  have h_mul_le : |f n| * |g n| ≤ |f n| * C := by
-    exact mul_le_mul_of_nonneg_left hg_le (abs_nonneg _)
-  have h_mul_le' : |f n| * C ≤ (ε / (C + 1)) * C := by
-    exact mul_le_mul_of_nonneg_right hf_small.le hC_nn
+  have h_mul_le : |f n| * |g n| ≤ |f n| * C :=
+    mul_le_mul_of_nonneg_left hg_le (abs_nonneg _)
+  have h_mul_le' : |f n| * C ≤ (ε / (C + 1)) * C :=
+    mul_le_mul_of_nonneg_right hf_small.le hC_nn
   have hC_lt : C < C + 1 := by linarith
-  have h_scaled_lt : (ε / (C + 1)) * C < (ε / (C + 1)) * (C + 1) := by
-    exact mul_lt_mul_of_pos_left hC_lt h_scaled_pos
+  have h_scaled_lt : (ε / (C + 1)) * C < (ε / (C + 1)) * (C + 1) :=
+    mul_lt_mul_of_pos_left hC_lt h_scaled_pos
   have h_cancel : (ε / (C + 1)) * (C + 1) = ε := by
     field_simp [ne_of_gt hC1_pos]
   calc
@@ -910,8 +910,8 @@ theorem pca_tradeoff_threshold_on_lossWeight
       have hmul :
           (pcaBiasReduction ancestry_bias_with ancestry_bias_without /
               (signal_with - signal_without)) * (signal_with - signal_without) ≤
-            lossWeight * (signal_with - signal_without) := by
-        exact mul_le_mul_of_nonneg_right hge hgap_pos.le
+            lossWeight * (signal_with - signal_without) :=
+        mul_le_mul_of_nonneg_right hge hgap_pos.le
       have hdiv :
           (pcaBiasReduction ancestry_bias_with ancestry_bias_without /
               (signal_with - signal_without)) * (signal_with - signal_without) =
@@ -925,8 +925,8 @@ theorem pca_tradeoff_threshold_on_lossWeight
         have hmul :
             lossWeight * (signal_with - signal_without) <
               (pcaBiasReduction ancestry_bias_with ancestry_bias_without /
-                  (signal_with - signal_without)) * (signal_with - signal_without) := by
-          exact mul_lt_mul_of_pos_right h hgap_pos
+                  (signal_with - signal_without)) * (signal_with - signal_without) :=
+          mul_lt_mul_of_pos_right h hgap_pos
         have hdiv :
             (pcaBiasReduction ancestry_bias_with ancestry_bias_without /
                 (signal_with - signal_without)) * (signal_with - signal_without) =
@@ -944,8 +944,8 @@ theorem pca_tradeoff_threshold_on_lossWeight
         simpa [sub_eq_add_neg, mul_comm, mul_left_comm, mul_assoc] using hpenalty)
     · have hpenalty :
           lossWeight * (signal_with - signal_without) =
-            pcaBiasReduction ancestry_bias_with ancestry_bias_without := by
-        exact (eq_div_iff hgap_ne).1 h
+            pcaBiasReduction ancestry_bias_with ancestry_bias_without :=
+        (eq_div_iff hgap_ne).1 h
       exact hNeutral.mpr (by
         unfold pcaSignalLossPenalty
         simpa [sub_eq_add_neg, mul_comm, mul_left_comm, mul_assoc] using hpenalty)
@@ -958,8 +958,8 @@ theorem local_pc_removal_minimum_beats_adjacent_choices
     (err_k err_k_plus_1 err_k_minus_1 : ℝ)
     (h_local_min_right : err_k ≤ err_k_plus_1)
     (h_local_min_left : err_k ≤ err_k_minus_1) :
-    err_k ≤ min err_k_plus_1 err_k_minus_1 := by
-  exact le_min h_local_min_right h_local_min_left
+    err_k ≤ min err_k_plus_1 err_k_minus_1 :=
+  le_min h_local_min_right h_local_min_left
 
 /-- Information-bottleneck objective `I(φ(X); Y) - λ I(φ(X); A)`. -/
 def infoBottleneckObjective (I_phi_Y I_phi_A lam : ℝ) : ℝ :=
@@ -1378,8 +1378,8 @@ theorem scratch_beats_fine_tuning_iff_target_sample_exceeds_critical
       nTarget := by
   have h_gap_pos :
       0 < oracle_target_r2 -
-        fineTunedTargetR2 r2_source divergence_penalty adaptation_gain := by
-    exact sub_pos.mpr h_gap
+        fineTunedTargetR2 r2_source divergence_penalty adaptation_gain :=
+    sub_pos.mpr h_gap
   constructor
   · intro h
     unfold sampleLimitedScratchTargetR2 scratchVsFineTuningCriticalSampleSize
@@ -1489,17 +1489,17 @@ theorem optimalSourceShrinkageWeight_minimizes_mse
         (optimalSourceShrinkageWeight gapSq noiseVar nTarget) ≤
       sourceShrinkageMSE gapSq noiseVar nTarget lam := by
   have hcoeff_nonneg : 0 ≤ gapSq + noiseVar / nTarget := by
-    have hdiv_nonneg : 0 ≤ noiseVar / nTarget := by
-      exact div_nonneg h_noise (le_of_lt h_n)
+    have hdiv_nonneg : 0 ≤ noiseVar / nTarget :=
+      div_nonneg h_noise (le_of_lt h_n)
     linarith
   by_cases h_curv : gapSq + noiseVar / nTarget = 0
   · have hdiv_zero : noiseVar / nTarget = 0 := by
-      have hdiv_nonneg : 0 ≤ noiseVar / nTarget := by
-        exact div_nonneg h_noise (le_of_lt h_n)
+      have hdiv_nonneg : 0 ≤ noiseVar / nTarget :=
+        div_nonneg h_noise (le_of_lt h_n)
       linarith
     have h_gap_zero : gapSq = 0 := by
-      have hdiv_nonneg : 0 ≤ noiseVar / nTarget := by
-        exact div_nonneg h_noise (le_of_lt h_n)
+      have hdiv_nonneg : 0 ≤ noiseVar / nTarget :=
+        div_nonneg h_noise (le_of_lt h_n)
       linarith
     have h_noise_zero : noiseVar = 0 := by
       have hn_ne : nTarget ≠ 0 := ne_of_gt h_n
@@ -1513,8 +1513,8 @@ theorem optimalSourceShrinkageWeight_minimizes_mse
   · rw [sourceShrinkageMSE_eq_optimal_plus_square gapSq noiseVar nTarget lam h_curv]
     have hsquare_nonneg :
         0 ≤ (gapSq + noiseVar / nTarget) *
-          (lam - optimalSourceShrinkageWeight gapSq noiseVar nTarget)^2 := by
-      exact mul_nonneg hcoeff_nonneg (sq_nonneg _)
+          (lam - optimalSourceShrinkageWeight gapSq noiseVar nTarget)^2 :=
+      mul_nonneg hcoeff_nonneg (sq_nonneg _)
     have h_at_opt :
         sourceShrinkageMSE gapSq noiseVar nTarget
             (optimalSourceShrinkageWeight gapSq noiseVar nTarget) =
@@ -1543,15 +1543,15 @@ theorem optimal_lambda_decreases_with_n
   have h_curv₁ : gapSq + noiseVar / (n₁ : ℝ) ≠ 0 := by
     have h_pos : 0 < gapSq + noiseVar / (n₁ : ℝ) := by
       have hn₁_real : 0 < (n₁ : ℝ) := Nat.cast_pos.mpr h_n₁
-      have hdiv_pos : 0 < noiseVar / (n₁ : ℝ) := by
-        exact div_pos h_noise hn₁_real
+      have hdiv_pos : 0 < noiseVar / (n₁ : ℝ) :=
+        div_pos h_noise hn₁_real
       linarith
     linarith
   have h_curv₂ : gapSq + noiseVar / (n₂ : ℝ) ≠ 0 := by
     have hn₂_real : 0 < (n₂ : ℝ) := Nat.cast_pos.mpr h_n₂
     have h_pos : 0 < gapSq + noiseVar / (n₂ : ℝ) := by
-      have hdiv_pos : 0 < noiseVar / (n₂ : ℝ) := by
-        exact div_pos h_noise hn₂_real
+      have hdiv_pos : 0 < noiseVar / (n₂ : ℝ) :=
+        div_pos h_noise hn₂_real
       linarith
     linarith
   rw [optimalSourceShrinkageWeight_eq_closed_form gapSq noiseVar (n₂ : ℝ)
@@ -1578,16 +1578,16 @@ theorem optimalSourceShrinkageWeight_le_half_iff_target_samples_dominate_gap
     optimalSourceShrinkageWeight gapSq noiseVar nTarget ≤ 1 / 2 ↔
       noiseVar ≤ nTarget * gapSq := by
   have h_curv : gapSq + noiseVar / nTarget ≠ 0 := by
-    have h_pos : 0 < gapSq + noiseVar / nTarget := by
-      exact add_pos h_gapSq (div_pos h_noise h_n)
+    have h_pos : 0 < gapSq + noiseVar / nTarget :=
+      add_pos h_gapSq (div_pos h_noise h_n)
     linarith
   have h_denom_pos : 0 < nTarget * gapSq + noiseVar := by
     nlinarith
   rw [optimalSourceShrinkageWeight_eq_closed_form gapSq noiseVar nTarget h_n h_curv]
   constructor
   · intro h
-    have h_cross : noiseVar ≤ (1 / 2 : ℝ) * (nTarget * gapSq + noiseVar) := by
-      exact (div_le_iff₀ h_denom_pos).1 h
+    have h_cross : noiseVar ≤ (1 / 2 : ℝ) * (nTarget * gapSq + noiseVar) :=
+      (div_le_iff₀ h_denom_pos).1 h
     nlinarith
   · intro h
     exact (div_le_iff₀ h_denom_pos).2 (by nlinarith)
@@ -1808,8 +1808,8 @@ theorem populationDeviationSum_squaredNorm_eq_mul {p : ℕ}
         populationDeviationSum_squaredNorm_eq_mul deviation populationSpecificGap k
           h_norm_prev h_pair_prev
       have h_last_norm :
-          dotProduct (deviation k) (deviation k) = populationSpecificGap := by
-        exact h_norm k (Nat.lt_succ_self k)
+          dotProduct (deviation k) (deviation k) = populationSpecificGap :=
+        h_norm k (Nat.lt_succ_self k)
       have h_cross_left :
           dotProduct (populationDeviationSum deviation k) (deviation k) = 0 := by
         apply dotProduct_populationDeviationSum_last_eq_zero
@@ -1919,12 +1919,12 @@ theorem metaLearnedTransferGapSq_eq_irreducible_plus_populationSpecificGap_div_k
     simpa [sharedResidual, coefficientGapSq] using h_shared
   have h_mean_norm :
       dotProduct (meanPopulationDeviation deviation k) (meanPopulationDeviation deviation k) =
-        populationSpecificGap / k := by
-    exact meanPopulationDeviation_squaredNorm_eq_populationSpecificGap_div_k
+        populationSpecificGap / k :=
+    meanPopulationDeviation_squaredNorm_eq_populationSpecificGap_div_k
       deviation populationSpecificGap k h_k h_norm h_pair
   have h_cross :
-      dotProduct sharedResidual (meanPopulationDeviation deviation k) = 0 := by
-    exact dotProduct_meanPopulationDeviation_eq_zero
+      dotProduct sharedResidual (meanPopulationDeviation deviation k) = 0 :=
+    dotProduct_meanPopulationDeviation_eq_zero
       sharedResidual deviation k h_shared_orth
   have h_sub :
       (fun i =>
@@ -2005,14 +2005,14 @@ theorem metaLearnedTransferGapSq_strictMono {p : ℕ}
   have h_k₂ : 0 < k₂ := lt_trans h_k₁ h_more
   have h_formula₂ :
       metaLearnedTransferGapSq wShared wTarget deviation k₂ =
-        irreducibleGap + populationSpecificGap / k₂ := by
-    exact metaLearnedTransferGapSq_eq_irreducible_plus_populationSpecificGap_div_k
+        irreducibleGap + populationSpecificGap / k₂ :=
+    metaLearnedTransferGapSq_eq_irreducible_plus_populationSpecificGap_div_k
       wShared wTarget deviation irreducibleGap populationSpecificGap
       k₂ h_k₂ h_shared h_shared_orth h_norm h_pair
   have h_formula₁ :
       metaLearnedTransferGapSq wShared wTarget deviation k₁ =
-        irreducibleGap + populationSpecificGap / k₁ := by
-    exact metaLearnedTransferGapSq_eq_irreducible_plus_populationSpecificGap_div_k
+        irreducibleGap + populationSpecificGap / k₁ :=
+    metaLearnedTransferGapSq_eq_irreducible_plus_populationSpecificGap_div_k
       wShared wTarget deviation irreducibleGap populationSpecificGap
       k₁ h_k₁ h_shared
       (by
@@ -2028,8 +2028,8 @@ theorem metaLearnedTransferGapSq_strictMono {p : ℕ}
   have hk₁ : 0 < (k₁ : ℝ) := Nat.cast_pos.mpr h_k₁
   have hcast : (k₁ : ℝ) < (k₂ : ℝ) := by
     exact_mod_cast h_more
-  have hdiv : populationSpecificGap / (k₂ : ℝ) < populationSpecificGap / (k₁ : ℝ) := by
-    exact div_lt_div_of_pos_left h_pop hk₁ hcast
+  have hdiv : populationSpecificGap / (k₂ : ℝ) < populationSpecificGap / (k₁ : ℝ) :=
+    div_lt_div_of_pos_left h_pop hk₁ hcast
   linarith
 
 /-- Positivity of the exact shared-feature meta-learning transfer gap. -/
@@ -2053,8 +2053,8 @@ theorem metaLearnedTransferGapSq_pos {p : ℕ}
     wShared wTarget deviation irreducibleGap populationSpecificGap
     k h_k h_shared h_shared_orth h_norm h_pair]
   have hk : 0 < (k : ℝ) := Nat.cast_pos.mpr h_k
-  have hdiv : 0 < populationSpecificGap / (k : ℝ) := by
-    exact div_pos h_pop hk
+  have hdiv : 0 < populationSpecificGap / (k : ℝ) :=
+    div_pos h_pop hk
   linarith
 
 /-- Weighted population-specific deviation around the shared representation
@@ -2250,8 +2250,8 @@ theorem weightedMetaTransferGapSq_eq_irreducible_plus_populationSpecificGap_mul_
   have h_weighted_norm :
       dotProduct (weightedPopulationDeviation deviation weight)
         (weightedPopulationDeviation deviation weight) =
-          populationSpecificGap * ∑ j : Fin k, weight j ^ 2 := by
-    exact weightedPopulationDeviation_squaredNorm_eq_populationSpecificGap_mul_sum_sq
+          populationSpecificGap * ∑ j : Fin k, weight j ^ 2 :=
+    weightedPopulationDeviation_squaredNorm_eq_populationSpecificGap_mul_sum_sq
       deviation weight populationSpecificGap h_norm h_pair
   have h_cross :
       dotProduct sharedResidual (weightedPopulationDeviation deviation weight) = 0 := by
@@ -2309,8 +2309,8 @@ theorem one_div_card_le_sum_sq_of_affine_weights
     simpa [h_sum, h_card] using h_sq
   have hk : 0 < (k : ℝ) := Nat.cast_pos.mpr h_k
   by_contra h_contra
-  have hlt : ∑ j : Fin k, weight j ^ 2 < 1 / (k : ℝ) := by
-    exact not_le.mp h_contra
+  have hlt : ∑ j : Fin k, weight j ^ 2 < 1 / (k : ℝ) :=
+    not_le.mp h_contra
   have hmul_lt : (k : ℝ) * ∑ j : Fin k, weight j ^ 2 < 1 := by
     have := mul_lt_mul_of_pos_left hlt hk
     simpa [div_eq_mul_inv, one_div, hk.ne'] using this
@@ -2368,8 +2368,8 @@ theorem weightedMetaTransferGapSq_ge_uniform_of_affine_weights
     weightedMetaTransferGapSq_eq_irreducible_plus_populationSpecificGap_mul_sum_sq
       wShared wTarget deviation weight irreducibleGap populationSpecificGap
       h_shared h_shared_orth h_norm h_pair]
-  have h_sq_lb : 1 / (k : ℝ) ≤ ∑ j : Fin k, weight j ^ 2 := by
-    exact one_div_card_le_sum_sq_of_affine_weights weight h_k h_sum
+  have h_sq_lb : 1 / (k : ℝ) ≤ ∑ j : Fin k, weight j ^ 2 :=
+    one_div_card_le_sum_sq_of_affine_weights weight h_k h_sum
   have hmul :
       populationSpecificGap / k ≤
         populationSpecificGap * ∑ j : Fin k, weight j ^ 2 := by
@@ -2422,8 +2422,8 @@ theorem optimalFineTuningMSE_strictMono_in_gapSq
     exact div_pos h_noise h_n
   change gap₁ * b / (gap₁ + b) < gap₂ * b / (gap₂ + b)
   apply (div_lt_div_iff₀ (by linarith) (by linarith)).2
-  have h_sq_term : gap₁ * (b * b) < gap₂ * (b * b) := by
-    exact mul_lt_mul_of_pos_right h_gap (mul_pos hb_pos hb_pos)
+  have h_sq_term : gap₁ * (b * b) < gap₂ * (b * b) :=
+    mul_lt_mul_of_pos_right h_gap (mul_pos hb_pos hb_pos)
   nlinarith
 
 /-- Target sample size needed for the optimal fine-tuning MSE to reach a target
@@ -2446,8 +2446,8 @@ theorem requiredTargetSamplesForOptimalFineTuningMSE_pos
   have h_num : 0 < noiseVar * (gapSq - tau) := by
     have : 0 < gapSq - tau := by linarith
     exact mul_pos h_noise this
-  have h_den : 0 < tau * gapSq := by
-    exact mul_pos h_tau h_gap_pos
+  have h_den : 0 < tau * gapSq :=
+    mul_pos h_tau h_gap_pos
   exact div_pos h_num h_den
 
 /-- For a fixed MSE tolerance, reducing the transfer gap strictly lowers the
@@ -2472,8 +2472,8 @@ theorem requiredTargetSamplesForOptimalFineTuningMSE_strictMono_in_gapSq
     unfold requiredTargetSamplesForOptimalFineTuningMSE
     field_simp [ne_of_gt h_tau, ne_of_gt h_gap₂]
   rw [h_rewrite₁, h_rewrite₂]
-  have hdiv : noiseVar / gap₂ < noiseVar / gap₁ := by
-    exact div_lt_div_of_pos_left h_noise h_gap₁ h_gap
+  have hdiv : noiseVar / gap₂ < noiseVar / gap₁ :=
+    div_lt_div_of_pos_left h_noise h_gap₁ h_gap
   nlinarith
 
 /-- Exact target excess quadratic risk of using `w` instead of the
@@ -2525,8 +2525,8 @@ theorem targetLinearExcessRisk_eq_quadratic_gap
         dotProduct u crossTarget := by
     calc
       dotProduct wStar (sigmaObsTarget.mulVec u) =
-          dotProduct u (sigmaObsTarget.mulVec wStar) := by
-            exact dotProduct_mulVec_swap_of_isSymm sigmaObsTarget h_symm wStar u
+          dotProduct u (sigmaObsTarget.mulVec wStar) :=
+            dotProduct_mulVec_swap_of_isSymm sigmaObsTarget h_symm wStar u
       _ = dotProduct u crossTarget := by simp [h_opt]
   let a : ℝ := dotProduct wStar crossTarget
   let b : ℝ := dotProduct wStar (sigmaObsTarget.mulVec u)
@@ -2731,8 +2731,8 @@ theorem fineTunedTargetR2_eq_oracle_minus_postGap_isotropic
               oracle_target_r2 -
             coefficientGapSq wAfter wStar)
           0 := by rw [h_oracle_gap]
-    _ = oracle_target_r2 - coefficientGapSq wAfter wStar - 0 := by
-      exact deployedTransferTargetR2_eq_oracle_minus_residualGap_minus_estimationPenalty
+    _ = oracle_target_r2 - coefficientGapSq wAfter wStar - 0 :=
+      deployedTransferTargetR2_eq_oracle_minus_residualGap_minus_estimationPenalty
         (oracle_target_r2 - coefficientGapSq wBefore wStar)
         oracle_target_r2
         (coefficientGapSq wAfter wStar)
@@ -2798,13 +2798,13 @@ theorem amortized_per_population_adaptation_cost_falls_with_task_count
   have h_k₂ : 0 < k₂ := lt_trans h_k₁ h_more_tasks
   have h_gap_order :
       metaLearnedTransferGapSq wShared wTarget deviation k₂ <
-        metaLearnedTransferGapSq wShared wTarget deviation k₁ := by
-    exact metaLearnedTransferGapSq_strictMono
+        metaLearnedTransferGapSq wShared wTarget deviation k₁ :=
+    metaLearnedTransferGapSq_strictMono
       wShared wTarget deviation irreducibleGap populationSpecificGap
       k₁ k₂ h_pop h_k₁ h_more_tasks h_shared h_shared_orth h_norm h_pair
   have h_gap₂_pos :
-      0 < metaLearnedTransferGapSq wShared wTarget deviation k₂ := by
-    exact metaLearnedTransferGapSq_pos
+      0 < metaLearnedTransferGapSq wShared wTarget deviation k₂ :=
+    metaLearnedTransferGapSq_pos
       wShared wTarget deviation irreducibleGap populationSpecificGap
       k₂ h_irred h_pop h_k₂ h_shared h_shared_orth h_norm h_pair
   have h_mse_order :
@@ -2813,8 +2813,8 @@ theorem amortized_per_population_adaptation_cost_falls_with_task_count
           noiseVar nTarget <
         optimalFineTuningMSE
           (metaLearnedTransferGapSq wShared wTarget deviation k₁)
-          noiseVar nTarget := by
-    exact optimalFineTuningMSE_strictMono_in_gapSq
+          noiseVar nTarget :=
+    optimalFineTuningMSE_strictMono_in_gapSq
       (metaLearnedTransferGapSq wShared wTarget deviation k₂)
       (metaLearnedTransferGapSq wShared wTarget deviation k₁)
       noiseVar nTarget (le_of_lt h_gap₂_pos) h_gap_order h_noise h_n
@@ -2822,8 +2822,8 @@ theorem amortized_per_population_adaptation_cost_falls_with_task_count
       0 <
         requiredTargetSamplesForOptimalFineTuningMSE
           (metaLearnedTransferGapSq wShared wTarget deviation k₂)
-          noiseVar tau := by
-    exact requiredTargetSamplesForOptimalFineTuningMSE_pos
+          noiseVar tau :=
+    requiredTargetSamplesForOptimalFineTuningMSE_pos
       (metaLearnedTransferGapSq wShared wTarget deviation k₂)
       noiseVar tau h_noise h_tau h_tau_small
   have h_req_order :
@@ -2832,8 +2832,8 @@ theorem amortized_per_population_adaptation_cost_falls_with_task_count
           noiseVar tau <
         requiredTargetSamplesForOptimalFineTuningMSE
           (metaLearnedTransferGapSq wShared wTarget deviation k₁)
-          noiseVar tau := by
-    exact requiredTargetSamplesForOptimalFineTuningMSE_strictMono_in_gapSq
+          noiseVar tau :=
+    requiredTargetSamplesForOptimalFineTuningMSE_strictMono_in_gapSq
       (metaLearnedTransferGapSq wShared wTarget deviation k₂)
       (metaLearnedTransferGapSq wShared wTarget deviation k₁)
       noiseVar tau h_gap₂_pos h_gap_order h_noise h_tau
@@ -2871,8 +2871,8 @@ theorem metaLearned_deployedTransferTargetR2_strictMono
         estimation_penalty := by
   have h_gap_order :
       metaLearnedTransferGapSq wShared wTarget deviation k₂ <
-        metaLearnedTransferGapSq wShared wTarget deviation k₁ := by
-    exact metaLearnedTransferGapSq_strictMono
+        metaLearnedTransferGapSq wShared wTarget deviation k₁ :=
+    metaLearnedTransferGapSq_strictMono
       wShared wTarget deviation irreducibleGap populationSpecificGap
       k₁ k₂ h_pop h_k₁ h_more_tasks h_shared h_shared_orth h_norm h_pair
   unfold deployedTransferTargetR2 oracleTransportAdaptationGain
@@ -2953,13 +2953,13 @@ theorem private_causal_fraction_lowers_transfer_ceiling
       privateArchitectureTransferCeiling h2_target f_private M <
         privateArchitectureTransferCeiling h2_target 0 M := by
     unfold privateArchitectureTransferCeiling
-    have h_base_pos : 0 < h2_target * sharedLDFromMigration M := by
-      exact mul_pos h_h2 h_shared_pos
+    have h_base_pos : 0 < h2_target * sharedLDFromMigration M :=
+      mul_pos h_h2 h_shared_pos
     calc
       h2_target * (1 - f_private) * sharedLDFromMigration M
           = (h2_target * sharedLDFromMigration M) * (1 - f_private) := by ring
-      _ < h2_target * sharedLDFromMigration M := by
-        exact mul_lt_of_lt_one_right h_base_pos h_one_minus_lt_one
+      _ < h2_target * sharedLDFromMigration M :=
+        mul_lt_of_lt_one_right h_base_pos h_one_minus_lt_one
       _ = h2_target * (1 - (0 : ℝ)) * sharedLDFromMigration M := by ring
   have h_no_private_lt_h2 :
       privateArchitectureTransferCeiling h2_target 0 M < h2_target := by
@@ -2967,8 +2967,8 @@ theorem private_causal_fraction_lowers_transfer_ceiling
     calc
       h2_target * (1 - (0 : ℝ)) * sharedLDFromMigration M
           = h2_target * sharedLDFromMigration M := by ring
-      _ < h2_target := by
-        exact mul_lt_of_lt_one_right h_h2 h_shared_lt_one
+      _ < h2_target :=
+        mul_lt_of_lt_one_right h_h2 h_shared_lt_one
   have h_r2_lt_no_private :
       r2_target < privateArchitectureTransferCeiling h2_target 0 M :=
     lt_of_le_of_lt h_bound h_ceiling_lt_no_private
@@ -2981,29 +2981,28 @@ end TransferLimits
 /-! ## What it costs to have fitted against the wrong linkage-disequilibrium operator
 
 Every bound above takes the operator as given. In practice the panel is optimised against an
-*estimated* reference linkage structure and deployed against the target's true one, and the
-question that decides whether that is tolerable is not the error in the estimated objective —
-which moves at first order and always will — but the loss from **transplanting the optimizer**.
+estimated reference linkage structure and deployed against the target's true one, and what decides
+whether that is tolerable is not the error in the estimated objective — which moves at first order
+and always will — but the loss from transplanting the optimizer.
 
-`Calibrator.TransplantationStability` answers it with one number the fit already contains: `γ`,
-the margin by which the selected panel beats the runner-up in the fitted objective. With `δ` an
-error budget for the operator, the deployment loss is `min(2δ, 8δ²/γ)`, and the quadratic branch —
-the reassuring one — binds exactly when `4δ < γ`.
+`Calibrator.TransplantationStability` answers with one number the fit already contains: `γ`, the
+margin by which the selected panel beats the runner-up in the fitted objective. With `δ` an error
+budget for the operator, the deployment loss is `min(2δ, 8δ²/γ)`, and the quadratic branch binds
+exactly when `4δ < γ`.
 
 The degenerate branch is not hypothetical. Near-ties between candidate panels, shrinkage levels
-and ancestry-weighting schemes are the normal case, and precisely there the standard reassurance
-that "the objective is stationary at the optimum so small model error costs second order" fails:
-the transplanted choice lands on the wrong branch and pays the full `δ`.
+and ancestry-weighting schemes are the normal case, and there the standard argument — the
+objective is stationary at the optimum, so small model error costs second order — fails: the
+transplanted choice lands on the wrong branch and pays the full `δ`.
 
-Operationally: **a transferred score should be reported with its margin.** Without `γ` there is no
-route from an operator error budget to a deployment-loss bound, and optimality under one estimated
-operator is a different claim from robustness to having estimated it. -/
+So a transferred score should be reported with its margin. Without `γ` there is no route from an
+operator error budget to a deployment-loss bound, and optimality under one estimated operator is a
+different claim from robustness to having estimated it. -/
 
 section OperatorError
 
-/-- **From linkage-disequilibrium model error to deployment loss.**
-
-    Instance of `transplant_excess_le`. `margin` is the gap between the selected panel and the
+/-- From linkage-disequilibrium model error to deployment loss. Instance of
+    `transplant_excess_le`. `margin` is the gap between the selected panel and the
     runner-up in the fitted objective; `modelError` bounds the operator error; `misalignment` is
     the overlap deficit between the transplanted and true optima. The loss is quadratic in the
     model error with constant `8/margin`.
@@ -3018,8 +3017,7 @@ theorem ldModelError_to_deploymentLoss
     loss ≤ 8 * modelError ^ 2 / margin :=
   transplant_excess_le margin modelError misalignment loss hmargin hmis hgap hpert
 
-/-- **Where the quadratic reassurance stops applying**: only while the model error is small
-    against the margin.
+/-- The quadratic branch applies only while the model error is small against the margin.
 
     Empirical status: DERIVED. -/
 theorem quadraticLoss_binds_iff_error_small (margin modelError : ℝ)
@@ -3027,7 +3025,7 @@ theorem quadraticLoss_binds_iff_error_small (margin modelError : ℝ)
     8 * modelError ^ 2 / margin < 2 * modelError ↔ 4 * modelError < margin :=
   quadratic_beats_linear_iff margin modelError hmargin herr
 
-/-- **At a tie between candidate panels the loss is the full model error.**
+/-- At a tie between candidate panels the loss is the full model error.
 
     Empirical status: DERIVED. -/
 theorem tiedPanels_lose_the_whole_error (modelError : ℝ) (herr : 0 < modelError) :

@@ -167,8 +167,8 @@ theorem integrable_pow4_gaussian : MeasureTheory.Integrable (fun x => x ^ 4) std
 theorem integrable_prod_mul {X Y : Type*} [MeasurableSpace X] [MeasurableSpace Y]
     {μ : Measure X} {ν : Measure Y} [SigmaFinite μ] [SigmaFinite ν]
     (f : X → ℝ) (g : Y → ℝ) (hf : Integrable f μ) (hg : Integrable g ν) :
-    Integrable (fun p : X × Y => f p.1 * g p.2) (μ.prod ν) := by
-  exact hf.mul_prod hg
+    Integrable (fun p : X × Y => f p.1 * g p.2) (μ.prod ν) :=
+  hf.mul_prod hg
 
 /-!
 =================================================================
@@ -226,8 +226,8 @@ def DiploidGenotype.equivFin3 : DiploidGenotype ≃ Fin 3 where
   fin_cases i <;> rfl
 
 @[simp] theorem DiploidGenotype.equivFin3_symm_apply_apply (g : DiploidGenotype) :
-    DiploidGenotype.equivFin3.symm (DiploidGenotype.equivFin3 g) = g := by
-  exact DiploidGenotype.equivFin3.left_inv g
+    DiploidGenotype.equivFin3.symm (DiploidGenotype.equivFin3 g) = g :=
+  DiploidGenotype.equivFin3.left_inv g
 
 /-- **A sum over genotypes is its three terms.**
 
@@ -308,8 +308,8 @@ theorem HardyWeinbergModel.genotypeProb_sum (h : HardyWeinbergModel) :
     ring
   have hrewrite :
       (∑ g : DiploidGenotype, h.genotypeProb g) =
-        ∑ i : Fin 3, h.genotypeProb (DiploidGenotype.equivFin3.symm i) := by
-    exact Fintype.sum_equiv DiploidGenotype.equivFin3 _ _ (by
+        ∑ i : Fin 3, h.genotypeProb (DiploidGenotype.equivFin3.symm i) :=
+    Fintype.sum_equiv DiploidGenotype.equivFin3 _ _ (by
       intro x
       rw [DiploidGenotype.equivFin3_symm_apply_apply])
   rw [hrewrite]
@@ -336,8 +336,8 @@ theorem HardyWeinbergModel.expectedAltAlleleCount_eq
   have hrewrite :
       (∑ g : DiploidGenotype, altAlleleCount g * h.genotypeProb g) =
         ∑ i : Fin 3, altAlleleCount (DiploidGenotype.equivFin3.symm i) *
-          h.genotypeProb (DiploidGenotype.equivFin3.symm i) := by
-    exact Fintype.sum_equiv DiploidGenotype.equivFin3 _ _ (by
+          h.genotypeProb (DiploidGenotype.equivFin3.symm i) :=
+    Fintype.sum_equiv DiploidGenotype.equivFin3 _ _ (by
       intro x
       rw [DiploidGenotype.equivFin3_symm_apply_apply])
   rw [hrewrite]
@@ -461,8 +461,8 @@ noncomputable def HWEScoreModel.berryEsseenErrorBound {m : ℕ} [Fintype (Fin m)
 theorem HWEScoreModel.berryEsseenErrorBound_nonneg {m : ℕ} [Fintype (Fin m)]
     (model : HWEScoreModel m) (berryEsseenConstant : ℝ)
     (hC : 0 ≤ berryEsseenConstant) :
-    0 ≤ model.berryEsseenErrorBound berryEsseenConstant := by
-  exact Calibrator.berryEsseenErrorBound_nonneg
+    0 ≤ model.berryEsseenErrorBound berryEsseenConstant :=
+  Calibrator.berryEsseenErrorBound_nonneg
     berryEsseenConstant model.scoreVariance model.scoreThirdAbsMomentBound
     hC (model.scoreVariance_nonneg) (model.scoreThirdAbsMomentBound_nonneg)
 
@@ -511,10 +511,10 @@ noncomputable def Phi : ℝ → ℝ := ProbabilityTheory.cdf (ProbabilityTheory.
 /-- **`Φ` is strictly monotone.**
 
 `Φ` is not an opaque function: it is the CDF of `gaussianReal 0 1`, so this is a theorem,
-not an assumption. It was previously carried as a hypothesis `hPhiStrict : StrictMono Phi`
-at 27 sites across seven files, making every theorem downstream of an AUC or threshold
-chart conditional on a fact the corpus could simply have. Proving it here discharges all
-of them.
+not an assumption. Carrying it as a hypothesis `hPhiStrict : StrictMono Phi` — which 27
+sites across seven files would otherwise need — makes every theorem downstream of an AUC
+or threshold chart conditional on a fact the corpus simply has. This theorem discharges
+all of them.
 
 The argument: `Φ b - Φ a` is the Gaussian mass of `Ioc a b`, and the Gaussian measure
 gives positive mass to every nonempty interval because Lebesgue measure is absolutely
@@ -694,8 +694,8 @@ theorem etaLiabilityThreshold_eq_gaussian_threshold {k : ℕ} (hN : GaussianNois
     (T : (Fin k → ℝ) → ℝ) (s : ℝ) (x : Fin k → ℝ) :
     etaLiabilityThreshold hN T s x =
       1 - ProbabilityTheory.cdf
-        (ProbabilityTheory.gaussianReal s (hN.sigma2 x)) (T x) := by
-  exact liability_threshold_probit_real hN T x s
+        (ProbabilityTheory.gaussianReal s (hN.sigma2 x)) (T x) :=
+  liability_threshold_probit_real hN T x s
 
 /-- A data generating process parametrized by k principal components.
 
@@ -861,8 +861,8 @@ a.e. equality implies pointwise equality. -/
 theorem eq_of_ae_eq_of_continuous {α : Type*} [TopologicalSpace α]
     [MeasurableSpace α] {μ : Measure α} [μ.IsOpenPosMeasure] {f g : α → ℝ}
     (hf : Continuous f) (hg : Continuous g)
-    (h_ae : f =ᵐ[μ] g) : f = g := by
-  exact Measure.eq_of_ae_eq h_ae hf hg
+    (h_ae : f =ᵐ[μ] g) : f = g :=
+  Measure.eq_of_ae_eq h_ae hf hg
 
 
 end Calibrator

@@ -833,8 +833,8 @@ theorem expected_abs_mean_shift_bound_proved
   rw [h5]
   have h4_nonneg : (0 : ℝ) ≤ 4 := by norm_num
   rw [Real.sqrt_mul h4_nonneg]
-  have hsqrt_four : Real.sqrt (4 : ℝ) = 2 := by
-    exact (Real.sqrt_eq_iff_eq_sq (by norm_num) (by norm_num)).2 (by norm_num)
+  have hsqrt_four : Real.sqrt (4 : ℝ) = 2 :=
+    (Real.sqrt_eq_iff_eq_sq (by norm_num) (by norm_num)).2 (by norm_num)
   rw [hsqrt_four]
 
 /-- Exact discrete Wright-Fisher mean-shift formula in source-standard-deviation units. -/
@@ -1761,8 +1761,8 @@ construction of source Brier. -/
       TransportedMetrics.calibratedBrier π (r2FromSourceWeights m Pop.source) := by
   rw [sourceCalibratedBrierFromSourceWeightsAtPrevalence_eq_explicit_source_variances]
   rw [TransportedMetrics.calibratedBrierFromVariances_eq_chart]
-  have h_source_ne : (m.outcomeVariance Pop.source) ≠ 0 := by
-    exact ne_of_gt (m.outcomeVariance_pos Pop.source)
+  have h_source_ne : (m.outcomeVariance Pop.source) ≠ 0 :=
+    ne_of_gt (m.outcomeVariance_pos Pop.source)
   have hr2 :
       TransportedMetrics.r2FromSignalVariance
           (explainedSignalVarianceFromSourceWeights m Pop.source)
@@ -1884,8 +1884,8 @@ construction of transported Brier. -/
         m.targetPrevalence (r2FromSourceWeights m Pop.target) := by
   rw [targetCalibratedBrierFromSourceWeights_eq_explicit_target_variances]
   rw [TransportedMetrics.calibratedBrierFromVariances_eq_chart]
-  have h_eff_ne : effectiveOutcomeVariance m Pop.target ≠ 0 := by
-    exact ne_of_gt (effectiveTargetOutcomeVariance_pos m)
+  have h_eff_ne : effectiveOutcomeVariance m Pop.target ≠ 0 :=
+    ne_of_gt (effectiveTargetOutcomeVariance_pos m)
   have hr2 :
       TransportedMetrics.r2FromSignalVariance
           (explainedSignalVarianceFromSourceWeights m Pop.target)
@@ -2736,8 +2736,8 @@ theorem portability_ratio_lt_one_of_drop
     (srcR2 tgtR2 : ℝ)
     (hsrc_pos : 0 < srcR2)
     (hdrop : tgtR2 < srcR2) :
-    tgtR2 / srcR2 < 1 := by
-  exact (_root_.div_lt_iff₀ hsrc_pos).2 (by simpa using hdrop)
+    tgtR2 / srcR2 < 1 :=
+  (_root_.div_lt_iff₀ hsrc_pos).2 (by simpa using hdrop)
 
 /-- Headline portability theorem: positive drift implies `R²` ratio is strictly below `1`. -/
 theorem portability_ratio_lt_one_of_positive_drift
@@ -3123,8 +3123,8 @@ theorem equalVarianceGaussianAUCFromSNR_strictMonoOn_nonneg :
   intro x hx y hy hxy
   unfold equalVarianceGaussianAUCFromSNR
   apply strictMono_Phi
-  have hx2 : 0 ≤ x / 2 := by
-    exact div_nonneg hx (by positivity)
+  have hx2 : 0 ≤ x / 2 :=
+    div_nonneg hx (by positivity)
   have hxy2 : x / 2 < y / 2 := by nlinarith
   exact Real.sqrt_lt_sqrt hx2 hxy2
 
@@ -3221,8 +3221,8 @@ theorem liabilityControlMean_lt_caseMean {K : ℝ} (hK0 : 0 < K) (hK1 : K < 1) :
   have hpdf : 0 < standardNormalPdf (liabilityThreshold K) := by
     unfold standardNormalPdf
     exact div_pos (Real.exp_pos _) (Real.sqrt_pos.2 (by positivity))
-  have hi : 0 < liabilityCaseMean K := by
-    exact div_pos hpdf hK0
+  have hi : 0 < liabilityCaseMean K :=
+    div_pos hpdf hK0
   have h1K : 0 < 1 - K := by linarith
   have hneg : liabilityControlMean K < 0 := by
     unfold liabilityControlMean
@@ -3392,12 +3392,12 @@ theorem equalVarianceGaussianAUCFromExplainedR2_strictMonoOn_unitInterval :
   apply strictMono_Phi
   have hx_one_sub : 0 < 1 - x := by linarith [hx.2]
   have hy_one_sub : 0 < 1 - y := by linarith [hy.2]
-  have hx_den : 0 < 2 * (1 - x) := by
-    exact mul_pos (by norm_num) hx_one_sub
-  have hy_den : 0 < 2 * (1 - y) := by
-    exact mul_pos (by norm_num) hy_one_sub
-  have hx_arg_nonneg : 0 ≤ x / (2 * (1 - x)) := by
-    exact div_nonneg hx.1 (le_of_lt hx_den)
+  have hx_den : 0 < 2 * (1 - x) :=
+    mul_pos (by norm_num) hx_one_sub
+  have hy_den : 0 < 2 * (1 - y) :=
+    mul_pos (by norm_num) hy_one_sub
+  have hx_arg_nonneg : 0 ≤ x / (2 * (1 - x)) :=
+    div_nonneg hx.1 (le_of_lt hx_den)
   have harg_lt : x / (2 * (1 - x)) < y / (2 * (1 - y)) := by
     rw [div_lt_div_iff₀ hx_den hy_den]
     nlinarith
@@ -3434,8 +3434,8 @@ theorem sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart {p 
     (m : CrossPopulationMetricModel p q) :
     equalVarianceGaussianAUCFromSourceWeights m Pop.source =
       equalVarianceGaussianAUCFromExplainedR2 (r2FromSourceWeights m Pop.source) := by
-  have h_source_ne : (m.outcomeVariance Pop.source) ≠ 0 := by
-    exact ne_of_gt (m.outcomeVariance_pos Pop.source)
+  have h_source_ne : (m.outcomeVariance Pop.source) ≠ 0 :=
+    ne_of_gt (m.outcomeVariance_pos Pop.source)
   unfold equalVarianceGaussianAUCFromSourceWeights equalVarianceGaussianAUCFromSignalVariance
     residualVarianceFromSourceWeights equalVarianceGaussianAUCFromExplainedR2
     r2FromSourceWeights
@@ -3496,8 +3496,8 @@ theorem targetEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart {p 
     (m : CrossPopulationMetricModel p q) :
     equalVarianceGaussianAUCFromSourceWeights m Pop.target =
       equalVarianceGaussianAUCFromExplainedR2 (r2FromSourceWeights m Pop.target) := by
-  have h_eff_ne : effectiveOutcomeVariance m Pop.target ≠ 0 := by
-    exact ne_of_gt (effectiveTargetOutcomeVariance_pos m)
+  have h_eff_ne : effectiveOutcomeVariance m Pop.target ≠ 0 :=
+    ne_of_gt (effectiveTargetOutcomeVariance_pos m)
   unfold equalVarianceGaussianAUCFromSourceWeights equalVarianceGaussianAUCFromSignalVariance
     residualVarianceFromSourceWeights equalVarianceGaussianAUCFromExplainedR2
     r2FromSourceWeights
@@ -4261,8 +4261,8 @@ theorem covarianceDivergence_le_one (fst_drift shared_ld : ℝ)
     (hld : 0 ≤ shared_ld) :
     covarianceDivergenceMutationDrift fst_drift shared_ld ≤ 1 := by
   rw [covarianceDivergenceMutationDrift_eq]
-  have h1 : 0 ≤ (1 - fst_drift) * shared_ld := by
-    exact mul_nonneg (by linarith) hld
+  have h1 : 0 ≤ (1 - fst_drift) * shared_ld :=
+    mul_nonneg (by linarith) hld
   linarith
 
 /-- **Generalized signal retention under mutation-drift.**
@@ -4306,8 +4306,8 @@ theorem mutationDrift_signal_lt_puredrift (V_A fst_drift shared_ld : ℝ)
   rw [presentDayPGSVarianceMutationDrift_eq]
   unfold presentDayPGSVariance pgsVarianceFromHet
   have h1 : 0 < 1 - fst_drift := by linarith
-  have h_factor : (1 - fst_drift) * shared_ld < (1 - fst_drift) * 1 := by
-    exact mul_lt_mul_of_pos_left hld_lt h1
+  have h_factor : (1 - fst_drift) * shared_ld < (1 - fst_drift) * 1 :=
+    mul_lt_mul_of_pos_left hld_lt h1
   nlinarith
 
 /-- **R² under mutation-drift balance.**
@@ -4330,8 +4330,8 @@ theorem mutationDrift_R2_lt_puredrift_R2 (V_A V_E fst_drift shared_ld : ℝ)
   unfold presentDayR2MutationDrift presentDayR2 r2FromSignalVariance
   have h_sig_lt := mutationDrift_signal_lt_puredrift V_A fst_drift shared_ld
     hVA hfst_lt hld_lt
-  have h_md_nonneg : 0 ≤ presentDayPGSVarianceMutationDrift V_A fst_drift shared_ld := by
-    exact presentDayPGSVarianceMutationDrift_nonneg V_A fst_drift shared_ld
+  have h_md_nonneg : 0 ≤ presentDayPGSVarianceMutationDrift V_A fst_drift shared_ld :=
+    presentDayPGSVarianceMutationDrift_nonneg V_A fst_drift shared_ld
       (le_of_lt hVA) (le_of_lt hfst_lt) (le_of_lt hld)
   exact expectedR2_strictMono_nonneg V_E
     (presentDayPGSVarianceMutationDrift V_A fst_drift shared_ld)
@@ -4372,8 +4372,8 @@ theorem neutralAFSharedLDBenchmarkRatio_lt_pure_drift_form
     rwa [div_lt_one hldS] at hld_decay
   have hnum_lt :
       ((1 - fstSource) * (1 - fstTarget)) * shared_ld_target <
-        ((1 - fstSource) * (1 - fstTarget)) * shared_ld_source := by
-    exact mul_lt_mul_of_pos_left h_ld_ratio (mul_pos h1 (by linarith))
+        ((1 - fstSource) * (1 - fstTarget)) * shared_ld_source :=
+    mul_lt_mul_of_pos_left h_ld_ratio (mul_pos h1 (by linarith))
   simpa [mul_assoc, mul_left_comm, mul_comm] using hnum_lt
 
 
@@ -5405,8 +5405,8 @@ theorem admixture_portability_above_equilibrium (V_A fst r : ℝ) (t_since : ℕ
       presentDayPGSVarianceMutationDrift V_A fst (admixtureLDDecay r t_since) := by
   rw [presentDayPGSVarianceMutationDrift_eq, presentDayPGSVarianceMutationDrift_eq]
   have h1 : 0 < (1 - fst) * V_A := mul_pos (by linarith) hVA
-  have h_factor : (1 - fst) * equilibrium_ld < (1 - fst) * admixtureLDDecay r t_since := by
-    exact mul_lt_mul_of_pos_left h_recent (by linarith)
+  have h_factor : (1 - fst) * equilibrium_ld < (1 - fst) * admixtureLDDecay r t_since :=
+    mul_lt_mul_of_pos_left h_recent (by linarith)
   nlinarith
 
 end MigrationDriftPortability
@@ -5627,31 +5627,27 @@ end PortabilityDrift
 
 Everything above this point models divergence with reversible machinery — drift, symmetric
 migration, coalescent times. Real gene flow is not reversible: expansions, admixture pulses and
-sex-biased migration carry probability around cycles. `Calibrator.CirculationDefect` shows what
-that changes and, more usefully, what it does not.
+sex-biased migration carry probability around cycles. `Calibrator.CirculationDefect` separates
+what that changes from what it does not.
 
 It does not change the degradation calculus: the Dirichlet energy annihilates the circulation, so
 every ordering of weighting schemes by that energy survives unchanged.
 
-It does change what a **measured** mixing time means. Circulation accelerates ergodic averaging
-without contributing to the frontier, so a mixing-time diagnostic reports a shorter time than the
-one that governs transfer. The gap is exact, and at equal circulation and dissipation the
-transfer-relevant time is **twice** what the diagnostic reports.
+It does change what a measured mixing time means. Circulation accelerates ergodic averaging
+without contributing to the frontier, so the diagnostic reports a shorter time than the one
+governing transfer — at equal circulation and dissipation, half of it.
 
-That is a third mechanism, separate from the two this file already carries: allele-frequency
-divergence says how far apart populations are, tagging mismatch says how much of the linkage
-structure carries over, and this says that a population which *looks* well mixed can still be a
-bad transfer target because the rate at which its environment forgets is not the rate at which a
-design degrades. -/
+That is a third mechanism alongside the two this file carries. Allele-frequency divergence says
+how far apart populations are, tagging mismatch says how much linkage structure carries over, and
+this says a well-mixed-looking population can still be a bad transfer target because the rate at
+which its environment forgets is not the rate at which a design degrades. -/
 
 section NonreversibleFlow
 
-/-- **A mixing-time diagnostic understates the transfer-relevant time.**
-
-    Instance of `apparentMixingTime_lt_frontierTime`: whenever gene flow has any cyclic component,
-    the time constant an ergodic-averaging diagnostic measures is strictly shorter than the one
-    that sets the transfer frontier. Substituting the measured value into a horizon calculus
-    overstates transportability.
+/-- A mixing-time diagnostic understates the transfer-relevant time. Instance of
+    `apparentMixingTime_lt_frontierTime`: with any cyclic component to gene flow, the time
+    constant an ergodic-averaging diagnostic measures is strictly shorter than the one setting the
+    transfer frontier, so substituting it into a horizon calculus overstates transportability.
 
     Empirical status: DERIVED; the circulation-to-dissipation ratio of a real demography is the
     unmeasured input this asks for. -/
@@ -5660,7 +5656,7 @@ theorem geneFlowMixingTime_understates_transferTime
     apparentMixingTime dissipation circulation < frontierTime dissipation :=
   apparentMixingTime_lt_frontierTime dissipation circulation hd hc
 
-/-- **The overstatement is a factor of two at equal circulation and dissipation**, and grows
+/-- The overstatement is a factor of two at equal circulation and dissipation, and grows
     quadratically in the ratio beyond that.
 
     Empirical status: DERIVED. -/

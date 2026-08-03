@@ -589,8 +589,8 @@ theorem onePercentMaf_halfResponse_covariance_moment_permeability
   rw [diploid_fourth_moment (1 / 100) (by norm_num) (by norm_num)]
   calc
     _ = (1 / 2) ^ 2 * covarianceMomentPermeability covarianceDerivative 1
-        (invHeterozygosity (1 / 100)) := by
-      exact covarianceMomentPermeability_derivative_scale covarianceDerivative 1
+        (invHeterozygosity (1 / 100)) :=
+      covarianceMomentPermeability_derivative_scale covarianceDerivative 1
         (invHeterozygosity (1 / 100)) (1 / 2)
     _ = (1 / 2) ^ 2 * (2 / (invHeterozygosity (1 / 100) - 1)) *
         scalarPermeability 1 covarianceDerivative := by
@@ -901,10 +901,10 @@ theorem spectrum_recoverable_architecture_not {n : ℕ} (panel : Panel n)
 
 /-! ## 7b. THE HEADLINE: every finite MAF panel is identifiable, with no exceptional set
 
-The generic version of this statement — identifiable off a measure-zero *cycle variety* cut
-out by closed cycles of signed weight product one — has been superseded for **this** family
-by a computation of the variety itself: **on `(0, 1/2]` it is empty.** So there is no
-genericity clause, no cycle hypothesis to check, and no exceptional set.
+The generic version of this statement puts identifiability off a measure-zero *cycle
+variety*, cut out by closed cycles of signed weight product one. For **this** family the
+variety itself is computed: **on `(0, 1/2]` it is empty.** So there is no genericity
+clause, no cycle hypothesis to check, and no exceptional set.
 
 > **The minor-allele-frequency spectrum of any finite marker panel is identifiable from
 > modulus data.**
@@ -1068,9 +1068,8 @@ theorem twoPointModulusLaw_add {K m : ℕ} (family : BundleFamily K)
 
 /-! ## 9. The coupled core: gain and support are different biological axes
 
-The earlier version of this section tried to make one scalar `D` control decay,
-transfer, and rigidity. That is too strong. The corrected core is split in exactly the
-way the biology is split.
+No single scalar `D` controls decay, transfer and rigidity at once. That is too strong a
+demand on one number. The core below is split in exactly the way the biology is split.
 
 **Oscillatory gain.** `FiniteCoupledPhaseLaw.conditionalGainFunctional` is computed from
 the actual joint characteristic function of a multilocus score. Sequential freshness is
@@ -1127,8 +1126,8 @@ theorem diploid_coverage_invariant_of_joint_floor {k : ℕ} (fiber value : Fin k
     (J J' : FiberCoupling k 3) (η η' : ℝ) (hη : 0 < η) (hη' : 0 < η')
     (hfloor : ∀ x, η ≤ J.mass x) (hfloor' : ∀ x, η' ≤ J'.mass x) :
     FiberCoupling.CoversTuple diploidFamily fiber J value ↔
-      FiberCoupling.CoversTuple diploidFamily fiber J' value := by
-  exact FiberCoupling.coverage_invariant diploidFamily fiber J J'
+      FiberCoupling.CoversTuple diploidFamily fiber J' value :=
+  FiberCoupling.coverage_invariant diploidFamily fiber J J'
     (FiberCoupling.fullSupport_of_uniform_floor J η hη hfloor)
     (FiberCoupling.fullSupport_of_uniform_floor J' η' hη' hfloor') value
 
@@ -2135,10 +2134,10 @@ separates quotient fibres remains the continuation. -/
   classification open off the smooth and translation strata. Every negative result quoted
   here therefore covers atomic kernels only.
 
-  A superseded form of the criterion should not be quoted: it was conjectured that
-  non-identifiability additionally requires a relation whose weight product equals one.
-  **That is refuted** — a counterexample has a kernel with weight product `98/27`.
-  Relations alone suffice, with no condition on weights.
+  Do not quote a form of the criterion in which non-identifiability additionally requires
+  a relation whose weight product equals one. **That is refuted** — a counterexample has a
+  kernel with weight product `98/27`. Relations alone suffice, with no condition on
+  weights.
 * **The tail regime.** The exponentially tilted versions of these statements are the ones
   that govern large deviations — polygenic score tails and quadratic-form statistics such
   as heritability estimators and GRM spectra, which is the regime clinical risk

@@ -432,8 +432,8 @@ theorem CrossPopulationCalibrationShiftModel.targetCalibrationMoments_eq_shifted
     (m : CrossPopulationCalibrationShiftModel) :
     (m.calibrationMoments Pop.target) =
       (m.calibrationMoments Pop.source).shifted
-        m.observedMeanShift m.predictedMeanShift (m.slope Pop.target) := by
-  exact CrossPopulationCalibrationShiftModel.targetCalibrationMoments_eq_shifted m
+        m.observedMeanShift m.predictedMeanShift (m.slope Pop.target) :=
+  CrossPopulationCalibrationShiftModel.targetCalibrationMoments_eq_shifted m
 
 @[simp] theorem CrossPopulationCalibrationShiftModel.sourceCalibrationProfile_eq_toProfile
     (m : CrossPopulationCalibrationShiftModel) (link : CalibrationLink) :
@@ -809,13 +809,10 @@ transport of a hypothesis, not a discovery:
   assumes the source is perfectly calibrated in the large, together with
   `h_shift_nonzero`. Against a source CITL pinned to `0`, any nonzero shift is worse.
 
-The `hPhiStrict : StrictMono Phi` hypothesis this theorem used to carry is **gone**, and
-the paragraph that used to be here — noting that it was a provable fact assumed in this
-file and six others — has been discharged rather than merely noted.
+This theorem carries **no** `hPhiStrict : StrictMono Phi` hypothesis, and needs none.
 `Probability.strictMono_Phi` proves it: `Phi` is `ProbabilityTheory.cdf (gaussianReal 0 1)`,
-and its
-strict monotonicity follows from the Gaussian density being positive.  Every use below now
-resolves against that theorem. -/
+and its strict monotonicity follows from the Gaussian density being positive.  Every use
+below resolves against that theorem. -/
 theorem cross_ancestry_exact_metric_profile_from_shift_budget
     {p q : ℕ}
     (metric : CrossPopulationMetricModel p q)
@@ -852,12 +849,12 @@ theorem cross_ancestry_exact_metric_profile_from_shift_budget
       h_target_r2_unit h_source_r2_unit h_r2_drop
   have h_citl_eq :
       ((cal.identityCalibrationProfile Pop.target)).citl =
-        cal.observedMeanShift - cal.predictedMeanShift := by
-    exact source_calibrated_target_citl_eq_shift_budget cal h_src_cal
+        cal.observedMeanShift - cal.predictedMeanShift :=
+    source_calibrated_target_citl_eq_shift_budget cal h_src_cal
   have h_abs_eq :
       |((cal.identityCalibrationProfile Pop.target)).citl| =
-        |cal.observedMeanShift - cal.predictedMeanShift| := by
-    exact source_calibrated_target_abs_citl_eq_abs_shift_budget cal h_src_cal
+        |cal.observedMeanShift - cal.predictedMeanShift| :=
+    source_calibrated_target_abs_citl_eq_abs_shift_budget cal h_src_cal
   have h_tgt_ne_zero : ((cal.identityCalibrationProfile Pop.target)).citl ≠ 0 := by
     rw [h_citl_eq]
     exact h_shift_nonzero
@@ -1182,12 +1179,12 @@ discrimination term is the mechanistic AUC from the explicit SNP-level
 transport model, and the calibration term is the full observed-minus-predicted
 target shift budget.
 
-The name used to be `cross_ancestry_auc_drops_and_citl_worsens_from_explicit_shift_budget`,
-which asserted that cross-ancestry AUC drops. It does not show that. `h_r2_drop` assumes
-the R² drop and the monotone chart carries it to AUC; `h_src_cal` and `h_shift_nonzero`
-assume a perfectly calibrated source and a nonzero budget, against which any shift is
-worse. The qualifier `from_explicit_shift_budget` covered only the calibration half, which
-is why the R² input is now named too. -/
+The name `cross_ancestry_auc_drops_and_citl_worsens_from_explicit_shift_budget` is absent
+on purpose. It asserts that cross-ancestry AUC drops, and this theorem does not show that.
+`h_r2_drop` assumes the R² drop and the monotone chart carries it to AUC. `h_src_cal` and
+`h_shift_nonzero` assume a perfectly calibrated source and a nonzero budget, against which
+any shift is worse. The qualifier `from_explicit_shift_budget` covers the calibration half
+alone, so the name must state the R² input too. -/
 theorem cross_ancestry_auc_drop_and_citl_worsening_of_r2_drop_and_shift_budget
     {p q : ℕ}
     (metric : CrossPopulationMetricModel p q)
@@ -1219,12 +1216,12 @@ theorem cross_ancestry_auc_drop_and_citl_worsening_of_r2_drop_and_shift_budget
       h_target_r2_unit h_source_r2_unit h_r2_drop
   have h_citl_eq :
       ((cal.identityCalibrationProfile Pop.target)).citl =
-        cal.observedMeanShift - cal.predictedMeanShift := by
-    exact source_calibrated_target_citl_eq_shift_budget cal h_src_cal
+        cal.observedMeanShift - cal.predictedMeanShift :=
+    source_calibrated_target_citl_eq_shift_budget cal h_src_cal
   have h_abs_eq :
       |((cal.identityCalibrationProfile Pop.target)).citl| =
-        |cal.observedMeanShift - cal.predictedMeanShift| := by
-    exact source_calibrated_target_abs_citl_eq_abs_shift_budget cal h_src_cal
+        |cal.observedMeanShift - cal.predictedMeanShift| :=
+    source_calibrated_target_abs_citl_eq_abs_shift_budget cal h_src_cal
   have h_tgt_ne_zero : ((cal.identityCalibrationProfile Pop.target)).citl ≠ 0 := by
     rw [h_citl_eq]
     exact h_shift_nonzero
@@ -1355,8 +1352,8 @@ theorem citl_shift_positive_higher_prevalence
   have h_t_pos : 0 < pi_t := lt_trans h_s h_higher
   have h_den_s : 0 < 1 - pi_s := by linarith
   have h_den_t : 0 < 1 - pi_t := by linarith
-  have h_odds_pos_s : 0 < pi_s / (1 - pi_s) := by
-    exact div_pos h_s h_den_s
+  have h_odds_pos_s : 0 < pi_s / (1 - pi_s) :=
+    div_pos h_s h_den_s
   have h_odds_lt : pi_s / (1 - pi_s) < pi_t / (1 - pi_t) := by
     rw [div_lt_div_iff₀ h_den_s h_den_t]
     nlinarith
@@ -1884,8 +1881,8 @@ theorem positive_nri_iff_reclassifiedBandEventPrevalence_below_cohort_prevalence
       nlinarith
     have h_scaled :
         π * (1 - π) * thresholdBandRate μevent threshold δ <
-          π * (1 - π) * thresholdBandRate μnonevent threshold δ := by
-      exact mul_lt_mul_of_pos_left h h_scale_pos
+          π * (1 - π) * thresholdBandRate μnonevent threshold δ :=
+      mul_lt_mul_of_pos_left h h_scale_pos
     rw [div_lt_iff₀ h_band]
     nlinarith [h_scaled]
   · intro h
@@ -1893,8 +1890,8 @@ theorem positive_nri_iff_reclassifiedBandEventPrevalence_below_cohort_prevalence
         π * thresholdBandRate μevent threshold δ <
           π *
             (π * thresholdBandRate μevent threshold δ +
-              (1 - π) * thresholdBandRate μnonevent threshold δ) := by
-      exact (div_lt_iff₀ h_band).1 h
+              (1 - π) * thresholdBandRate μnonevent threshold δ) :=
+      (div_lt_iff₀ h_band).1 h
     have h_scale_pos : 0 < π * (1 - π) := by
       nlinarith
     have h_scaled :
@@ -2000,30 +1997,30 @@ theorem qalyLoss_eq_qalyDecisionRegretMargin
   by_cases h_pred : receivesTreatment model predictedPath
   · by_cases h_true : receivesTreatment model truePath
     · have h_true_pos : 0 < treatmentMargin model truePath := h_true
-      have h_max : max (-treatmentMargin model truePath) 0 = 0 := by
-        exact max_eq_right (by linarith)
+      have h_max : max (-treatmentMargin model truePath) 0 = 0 :=
+        max_eq_right (by linarith)
       unfold qalyLoss qalyGainUnderDecision qalyDecisionRegretMargin
       rw [if_pos h_true, if_pos h_pred, if_pos h_pred, h_max]
       ring
     · have h_true_nonpos : treatmentMargin model truePath ≤ 0 := not_lt.mp h_true
       have h_max :
           max (-treatmentMargin model truePath) 0 =
-            -treatmentMargin model truePath := by
-        exact max_eq_left (by linarith)
+            -treatmentMargin model truePath :=
+        max_eq_left (by linarith)
       unfold qalyLoss qalyGainUnderDecision qalyDecisionRegretMargin
       rw [if_neg h_true, if_pos h_pred, if_pos h_pred, h_max]
       ring
   · by_cases h_true : receivesTreatment model truePath
     · have h_max :
           max (treatmentMargin model truePath) 0 =
-            treatmentMargin model truePath := by
-        exact max_eq_left (le_of_lt h_true)
+            treatmentMargin model truePath :=
+        max_eq_left (le_of_lt h_true)
       unfold qalyLoss qalyGainUnderDecision qalyDecisionRegretMargin
       rw [if_pos h_true, if_neg h_pred, if_neg h_pred, h_max]
       ring
     · have h_true_nonpos : treatmentMargin model truePath ≤ 0 := not_lt.mp h_true
-      have h_max : max (treatmentMargin model truePath) 0 = 0 := by
-        exact max_eq_right h_true_nonpos
+      have h_max : max (treatmentMargin model truePath) 0 = 0 :=
+        max_eq_right h_true_nonpos
       unfold qalyLoss qalyGainUnderDecision qalyDecisionRegretMargin
       rw [if_neg h_true, if_neg h_pred, if_neg h_pred, h_max]
       ring
@@ -2092,8 +2089,8 @@ theorem receivesTreatment_iff_of_margin_error_lt_abs_true_margin
   by_cases h_true : 0 < mTrue
   · have h_pred : 0 < mPred := by
       by_cases h_pred_nonpos : mPred ≤ 0
-      · have h_abs_eq : |mPred - mTrue| = -(mPred - mTrue) := by
-          exact abs_of_nonpos (by linarith)
+      · have h_abs_eq : |mPred - mTrue| = -(mPred - mTrue) :=
+          abs_of_nonpos (by linarith)
         have h_true_abs : |mTrue| = mTrue := abs_of_pos h_true
         rw [h_abs_eq, h_true_abs] at h_margin
         linarith
@@ -2149,29 +2146,29 @@ theorem qalyLoss_le_abs_margin_error
   by_cases h_pred : 0 < mPred
   · rw [if_pos h_pred]
     by_cases h_true : 0 < mTrue
-    · have h_max : max (-mTrue) 0 = 0 := by
-        exact max_eq_right (by linarith)
+    · have h_max : max (-mTrue) 0 = 0 :=
+        max_eq_right (by linarith)
       rw [h_max]
       exact abs_nonneg (mPred - mTrue)
     · have h_true_nonpos : mTrue ≤ 0 := not_lt.mp h_true
-      have h_max : max (-mTrue) 0 = -mTrue := by
-        exact max_eq_left (by linarith)
-      have h_abs_eq : |mPred - mTrue| = mPred - mTrue := by
-        exact abs_of_nonneg (by linarith)
+      have h_max : max (-mTrue) 0 = -mTrue :=
+        max_eq_left (by linarith)
+      have h_abs_eq : |mPred - mTrue| = mPred - mTrue :=
+        abs_of_nonneg (by linarith)
       rw [h_max, h_abs_eq]
       linarith
   · rw [if_neg h_pred]
     have h_pred_nonpos : mPred ≤ 0 := not_lt.mp h_pred
     by_cases h_true : 0 < mTrue
-    · have h_max : max mTrue 0 = mTrue := by
-        exact max_eq_left (le_of_lt h_true)
-      have h_abs_eq : |mPred - mTrue| = -(mPred - mTrue) := by
-        exact abs_of_nonpos (by linarith)
+    · have h_max : max mTrue 0 = mTrue :=
+        max_eq_left (le_of_lt h_true)
+      have h_abs_eq : |mPred - mTrue| = -(mPred - mTrue) :=
+        abs_of_nonpos (by linarith)
       rw [h_max, h_abs_eq]
       linarith
     · have h_true_nonpos : mTrue ≤ 0 := not_lt.mp h_true
-      have h_max : max mTrue 0 = 0 := by
-        exact max_eq_right h_true_nonpos
+      have h_max : max mTrue 0 = 0 :=
+        max_eq_right h_true_nonpos
       rw [h_max]
       exact abs_nonneg (mPred - mTrue)
 
@@ -2280,40 +2277,40 @@ theorem abs_treatmentMargin_error_le_componentwise_calibration_bound
         refine Finset.sum_le_sum ?_
         intro t _
         have hdisc : 0 ≤ model.discount t := model.discount_nonneg t
-        have hεWeight_nonneg : 0 ≤ εWeight t := by
-          exact le_trans (abs_nonneg _) (h_weight_err t)
-        have hεEvent_nonneg : 0 ≤ εEvent t := by
-          exact le_trans (abs_nonneg _) (h_event_err t)
-        have hεBenefit_nonneg : 0 ≤ εBenefit t := by
-          exact le_trans (abs_nonneg _) (h_benefit_err t)
-        have hεHarm_nonneg : 0 ≤ εHarm t := by
-          exact le_trans (abs_nonneg _) (h_harm_err t)
-        have hWeight_nonneg : 0 ≤ weightBound t := by
-          exact le_trans (abs_nonneg _) (h_weight_bound t)
-        have hEvent_nonneg : 0 ≤ eventBound t := by
-          exact le_trans (abs_nonneg _) (h_event_bound t)
-        have hBenefit_nonneg : 0 ≤ benefitBound t := by
-          exact le_trans (abs_nonneg _) (h_benefit_bound t)
-        have hNet_nonneg : 0 ≤ netBound t := by
-          exact le_trans (abs_nonneg _) (h_net_bound t)
+        have hεWeight_nonneg : 0 ≤ εWeight t :=
+          le_trans (abs_nonneg _) (h_weight_err t)
+        have hεEvent_nonneg : 0 ≤ εEvent t :=
+          le_trans (abs_nonneg _) (h_event_err t)
+        have hεBenefit_nonneg : 0 ≤ εBenefit t :=
+          le_trans (abs_nonneg _) (h_benefit_err t)
+        have hεHarm_nonneg : 0 ≤ εHarm t :=
+          le_trans (abs_nonneg _) (h_harm_err t)
+        have hWeight_nonneg : 0 ≤ weightBound t :=
+          le_trans (abs_nonneg _) (h_weight_bound t)
+        have hEvent_nonneg : 0 ≤ eventBound t :=
+          le_trans (abs_nonneg _) (h_event_bound t)
+        have hBenefit_nonneg : 0 ≤ benefitBound t :=
+          le_trans (abs_nonneg _) (h_benefit_bound t)
+        have hNet_nonneg : 0 ≤ netBound t :=
+          le_trans (abs_nonneg _) (h_net_bound t)
         have h_term1 :
             |predictedPath.followupWeight t - truePath.followupWeight t| *
                 |truePath.eventProb t * truePath.treatmentBenefit t -
                   truePath.treatmentHarm t| ≤
-              εWeight t * netBound t := by
-          exact mul_le_mul (h_weight_err t) (h_net_bound t)
+              εWeight t * netBound t :=
+          mul_le_mul (h_weight_err t) (h_net_bound t)
             (abs_nonneg _) hεWeight_nonneg
         have h_term2a :
             |predictedPath.eventProb t - truePath.eventProb t| *
                 |truePath.treatmentBenefit t| ≤
-              εEvent t * benefitBound t := by
-          exact mul_le_mul (h_event_err t) (h_benefit_bound t)
+              εEvent t * benefitBound t :=
+          mul_le_mul (h_event_err t) (h_benefit_bound t)
             (abs_nonneg _) hεEvent_nonneg
         have h_term2b :
             |predictedPath.eventProb t| *
                 |predictedPath.treatmentBenefit t - truePath.treatmentBenefit t| ≤
-              eventBound t * εBenefit t := by
-          exact mul_le_mul (h_event_bound t) (h_benefit_err t)
+              eventBound t * εBenefit t :=
+          mul_le_mul (h_event_bound t) (h_benefit_err t)
             (abs_nonneg _) hEvent_nonneg
         have h_nested :
             |(predictedPath.eventProb t - truePath.eventProb t) *
@@ -2334,8 +2331,8 @@ theorem abs_treatmentMargin_error_le_componentwise_calibration_bound
                     truePath.treatmentBenefit t| +
                   |predictedPath.eventProb t *
                     (predictedPath.treatmentBenefit t -
-                      truePath.treatmentBenefit t)| := by
-            exact abs_add_le _ _
+                      truePath.treatmentBenefit t)| :=
+            abs_add_le _ _
           calc
             |(predictedPath.eventProb t - truePath.eventProb t) *
                 truePath.treatmentBenefit t +
@@ -2398,8 +2395,8 @@ theorem abs_treatmentMargin_error_le_componentwise_calibration_bound
                   rw [abs_mul, abs_mul]
                   have hharm :
                       |truePath.treatmentHarm t - predictedPath.treatmentHarm t| =
-                        |predictedPath.treatmentHarm t - truePath.treatmentHarm t| := by
-                    exact abs_sub_comm _ _
+                        |predictedPath.treatmentHarm t - truePath.treatmentHarm t| :=
+                    abs_sub_comm _ _
                   simp [hharm]
             _ ≤ εEvent t * benefitBound t +
                 eventBound t * εBenefit t + εHarm t := by
@@ -2497,8 +2494,8 @@ theorem abs_treatmentMargin_error_le_componentwise_calibration_bound
                 (εWeight t * netBound t +
                   weightBound t *
                     (εEvent t * benefitBound t +
-                      eventBound t * εBenefit t + εHarm t)) := by
-                exact mul_le_mul_of_nonneg_left h_inner_bound hdisc
+                      eventBound t * εBenefit t + εHarm t)) :=
+                mul_le_mul_of_nonneg_left h_inner_bound hdisc
 
 /-- **Exact longitudinal QALY-loss bound from calibration errors in the event
     process, heterogeneous treatment effects, harms, and censoring weights.** -/
@@ -2527,8 +2524,8 @@ theorem qalyLoss_le_componentwise_calibration_bound
           (εWeight t * netBound t +
             weightBound t *
               (εEvent t * benefitBound t +
-                eventBound t * εBenefit t + εHarm t))) := by
-  exact le_trans (qalyLoss_le_abs_margin_error model truePath predictedPath)
+                eventBound t * εBenefit t + εHarm t))) :=
+  le_trans (qalyLoss_le_abs_margin_error model truePath predictedPath)
     (abs_treatmentMargin_error_le_componentwise_calibration_bound
       model truePath predictedPath εWeight εEvent εBenefit εHarm
       weightBound eventBound benefitBound netBound
@@ -2715,8 +2712,8 @@ theorem qalyGainUnderDecision_screening_case_treat
         model.benefit := by
   have h_treat :
       receivesTreatment (screeningLongitudinalModel model)
-        (screeningClinicalPathway model decisionRisk) := by
-    exact (receivesTreatment_screeningClinicalPathway_iff
+        (screeningClinicalPathway model decisionRisk) :=
+    (receivesTreatment_screeningClinicalPathway_iff
       model decisionRisk h_total_pos h_threshold).2 h_decision
   unfold qalyGainUnderDecision
   rw [if_pos h_treat, treatmentMargin_screeningClinicalPathway model 1 h_threshold]
@@ -2736,8 +2733,8 @@ theorem qalyGainUnderDecision_screening_control_treat
         -model.harm := by
   have h_treat :
       receivesTreatment (screeningLongitudinalModel model)
-        (screeningClinicalPathway model decisionRisk) := by
-    exact (receivesTreatment_screeningClinicalPathway_iff
+        (screeningClinicalPathway model decisionRisk) :=
+    (receivesTreatment_screeningClinicalPathway_iff
       model decisionRisk h_total_pos h_threshold).2 h_decision
   unfold qalyGainUnderDecision
   rw [if_pos h_treat, treatmentMargin_screeningClinicalPathway model 0 h_threshold]
@@ -2966,16 +2963,16 @@ theorem qalyGainUnderDecision_threshold_eq_thresholdQalyGainUnderDecision
   by_cases h : model.threshold < decisionRisk
   · have h_treat :
         receivesTreatment (thresholdLongitudinalModel model)
-          (thresholdClinicalPathway model decisionRisk) := by
-      exact (receivesTreatment_thresholdClinicalPathway_iff model decisionRisk).2 h
+          (thresholdClinicalPathway model decisionRisk) :=
+      (receivesTreatment_thresholdClinicalPathway_iff model decisionRisk).2 h
     unfold qalyGainUnderDecision
     rw [if_pos h_treat, treatmentMargin_thresholdClinicalPathway]
     simp [thresholdQalyGainUnderDecision, h, model.harm_eq_threshold]
     ring
   · have h_not_treat :
         ¬ receivesTreatment (thresholdLongitudinalModel model)
-          (thresholdClinicalPathway model decisionRisk) := by
-      exact fun h_treat =>
+          (thresholdClinicalPathway model decisionRisk) :=
+      fun h_treat =>
         h ((receivesTreatment_thresholdClinicalPathway_iff model decisionRisk).1 h_treat)
     unfold qalyGainUnderDecision
     rw [if_neg h_not_treat]
@@ -3038,8 +3035,8 @@ theorem thresholdQalyLoss_eq_benefit_mul_thresholdDecisionRegretMargin
     · unfold thresholdDecisionRegretMargin
       rw [if_pos h_pred]
       rw [thresholdQalyLoss_false_positive_exact model trueRisk predictedRisk h_true_low h_pred]
-      have hmax : max (model.threshold - trueRisk) 0 = model.threshold - trueRisk := by
-        exact max_eq_left (by linarith)
+      have hmax : max (model.threshold - trueRisk) 0 = model.threshold - trueRisk :=
+        max_eq_left (by linarith)
       rw [hmax]
     · have h_true_high : model.threshold < trueRisk := by linarith
       have h_pred_high' : model.threshold < predictedRisk := by
@@ -3050,16 +3047,16 @@ theorem thresholdQalyLoss_eq_benefit_mul_thresholdDecisionRegretMargin
       unfold thresholdDecisionRegretMargin
       rw [if_pos h_pred]
       rw [h_zero]
-      have hmax : max (model.threshold - trueRisk) 0 = 0 := by
-        exact max_eq_right (by linarith)
+      have hmax : max (model.threshold - trueRisk) 0 = 0 :=
+        max_eq_right (by linarith)
       rw [hmax]
       ring
   · by_cases h_true_high : model.threshold < trueRisk
     · unfold thresholdDecisionRegretMargin
       rw [if_neg h_pred]
       rw [thresholdQalyLoss_false_negative_exact model trueRisk predictedRisk h_true_high h_pred]
-      have hmax : max (trueRisk - model.threshold) 0 = trueRisk - model.threshold := by
-        exact max_eq_left (by linarith)
+      have hmax : max (trueRisk - model.threshold) 0 = trueRisk - model.threshold :=
+        max_eq_left (by linarith)
       rw [hmax]
     · have h_true_low : trueRisk ≤ model.threshold := by linarith
       have h_pred_not_high' : ¬ model.threshold < predictedRisk := by
@@ -3070,8 +3067,8 @@ theorem thresholdQalyLoss_eq_benefit_mul_thresholdDecisionRegretMargin
       unfold thresholdDecisionRegretMargin
       rw [if_neg h_pred]
       rw [h_zero]
-      have hmax : max (trueRisk - model.threshold) 0 = 0 := by
-        exact max_eq_right (by linarith)
+      have hmax : max (trueRisk - model.threshold) 0 = 0 :=
+        max_eq_right (by linarith)
       rw [hmax]
       ring
 

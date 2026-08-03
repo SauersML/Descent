@@ -406,7 +406,7 @@ theorem mutationSelectionBalanceRecessive_sq_le (mu s : ℝ)
     dominant mutation-selection balance derived above, at a common dominance
     coefficient `h`, so both arms are frequencies in `[0, 1]` whatever the
     selection coefficients are — including the weakly constrained arm with
-    `s < mu`, where the previously stated `mu / s` was not a frequency.
+    `s < mu`, where `mu / s` exceeds one and is therefore not a frequency at all.
 
     Worked example: Genes with high constraint (e.g., pLI > 0.9) show
     this pattern most clearly, and `haploinsufficiency_consistent_direction`
@@ -492,12 +492,12 @@ theorem alpha_model_portability_impact
     (h_alpha : α < -1) :
     expectedEffectMultiplier p_common α < expectedEffectMultiplier p_rare α := by
   unfold expectedEffectMultiplier
-  have h_common_pos : 0 < p_common := by
-    exact lt_trans h_rare_pos h_rare_lt
+  have h_common_pos : 0 < p_common :=
+    lt_trans h_rare_pos h_rare_lt
   have h_common_lt_one : p_common < 1 := by
     linarith
-  have h_rare_lt_half : p_rare < 1 / 2 := by
-    exact lt_of_lt_of_le h_rare_lt h_common_le
+  have h_rare_lt_half : p_rare < 1 / 2 :=
+    lt_of_lt_of_le h_rare_lt h_common_le
   have h_rare_het_pos : 0 < p_rare * (1 - p_rare) := by
     apply mul_pos h_rare_pos
     linarith

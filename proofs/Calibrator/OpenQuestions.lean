@@ -41,8 +41,8 @@ theorem scalar_summary_insufficient_for_accuracy
     {V : Type*} [AddCommGroup V] [Module ℝ V]
     (distance accuracy : V →ₗ[ℝ] ℝ)
     (hnot : ¬ ∃ c : ℝ, accuracy = c • distance) :
-    ∀ θ : V, ∃ θ' : V, distance θ' = distance θ ∧ accuracy θ' ≠ accuracy θ := by
-  exact scalar_summary_insufficient_of_not_scalar_factorization distance accuracy hnot
+    ∀ θ : V, ∃ θ' : V, distance θ' = distance θ ∧ accuracy θ' ≠ accuracy θ :=
+  scalar_summary_insufficient_of_not_scalar_factorization distance accuracy hnot
 
 theorem explainable_fraction_bound_of_conditional_noise_floor_exact
     {Ω : Type*} {mΩ : MeasurableSpace Ω}
@@ -56,8 +56,8 @@ theorem explainable_fraction_bound_of_conditional_noise_floor_exact
     (hNoise_nonneg : 0 ≤ μ[noiseFloor])
     (hNoise_le : noiseFloor ≤ᵐ[μ] conditionalVariance μ m L) :
     explainableFraction (Var[conditionalMean μ m L; μ]) (Var[L; μ])
-      ≤ Var[conditionalMean μ m L; μ] / (Var[conditionalMean μ m L; μ] + μ[noiseFloor]) := by
-  exact explainable_fraction_bound_of_conditional_noise_floor hm hL hVar_pos
+      ≤ Var[conditionalMean μ m L; μ] / (Var[conditionalMean μ m L; μ] + μ[noiseFloor]) :=
+  explainable_fraction_bound_of_conditional_noise_floor hm hL hVar_pos
     hNoise_int hNoise_nonneg hNoise_le
 
 theorem explainable_fraction_bound_of_conditional_gaussian_floor_exact
@@ -72,8 +72,8 @@ theorem explainable_fraction_bound_of_conditional_gaussian_floor_exact
     (hsigma4_nonneg : 0 ≤ μ[sigma4])
     (hGaussianFloor : (fun ω => (2 : ℝ) * sigma4 ω) ≤ᵐ[μ] conditionalVariance μ m L) :
     explainableFraction (Var[conditionalMean μ m L; μ]) (Var[L; μ])
-      ≤ Var[conditionalMean μ m L; μ] / (Var[conditionalMean μ m L; μ] + 2 * μ[sigma4]) := by
-  exact explainable_fraction_bound_of_conditional_gaussian_floor hm hL hVar_pos
+      ≤ Var[conditionalMean μ m L; μ] / (Var[conditionalMean μ m L; μ] + 2 * μ[sigma4]) :=
+  explainable_fraction_bound_of_conditional_gaussian_floor hm hL hVar_pos
     hsigma4_int hsigma4_nonneg hGaussianFloor
 
 /-- **The between-group fraction of an assumed variance decomposition is at most one.**
@@ -231,8 +231,8 @@ theorem compound_r2_drop
   calc cov_t ^ 2 / (vpgs_t * vy)
       ≤ cov_t ^ 2 / (vpgs_s * vy) := by
         rwa [div_le_div_iff₀ h_denom_t h_denom_s]
-    _ < cov_s ^ 2 / (vpgs_s * vy) := by
-        exact div_lt_div_of_pos_right h_cov_drop h_denom_s
+    _ < cov_s ^ 2 / (vpgs_s * vy) :=
+        div_lt_div_of_pos_right h_cov_drop h_denom_s
 
 /-- **Sign-flip probability.**
     Effect in target ~ N(ρ·β, σ²). Z-score for sign concordance = ρ·β/σ.
@@ -242,8 +242,8 @@ theorem sign_flip_z_decreases_with_turnover
     (β σ ρ₁ ρ₂ : ℝ)
     (hβ : 0 < β) (hσ : 0 < σ)
     (hρ : ρ₂ < ρ₁) :
-    ρ₂ * β / σ < ρ₁ * β / σ := by
-  exact div_lt_div_of_pos_right (by nlinarith) hσ
+    ρ₂ * β / σ < ρ₁ * β / σ :=
+  div_lt_div_of_pos_right (by nlinarith) hσ
 
 end Question2
 
@@ -264,8 +264,8 @@ theorem binary_precision_formula_exact (c : ConfusionMatrix) :
     ConfusionMatrix.precision c =
       (ConfusionMatrix.prevalence c * ConfusionMatrix.recallRate c) /
         (ConfusionMatrix.prevalence c * ConfusionMatrix.recallRate c +
-          (1 - ConfusionMatrix.prevalence c) * ConfusionMatrix.fpr c) := by
-  exact ConfusionMatrix.precision_eq_prevalence_recall_fpr c
+          (1 - ConfusionMatrix.prevalence c) * ConfusionMatrix.fpr c) :=
+  ConfusionMatrix.precision_eq_prevalence_recall_fpr c
 
 /-- **Precision-recall divergence is consistent.**
     There exist parameter configurations with fixed prevalence and fixed target
@@ -390,8 +390,8 @@ theorem relative_error_increases_with_turnover
 /-- **Heterozygosity increase → PGS variance increase at a single locus.** -/
 theorem het_increase_implies_locus_var_increase
     (beta_sq H_s H_t : ℝ) (hβ : 0 < beta_sq) (hH : H_s < H_t) :
-    beta_sq * H_s < beta_sq * H_t := by
-  exact mul_lt_mul_of_pos_left hH hβ
+    beta_sq * H_s < beta_sq * H_t :=
+  mul_lt_mul_of_pos_left hH hβ
 
 end Question5
 
@@ -453,8 +453,8 @@ theorem closer_to_half_more_uncertainty
 theorem interval_width_increases
     (r2₁ r2₂ : ℝ)
     (hr2₁ : r2₂ < r2₁) (hr2₁_lt : r2₁ < 1) (_hr2₂_nn : 0 ≤ r2₂) :
-    Real.sqrt (1 - r2₁) < Real.sqrt (1 - r2₂) := by
-  exact Real.sqrt_lt_sqrt (by linarith) (by linarith)
+    Real.sqrt (1 - r2₁) < Real.sqrt (1 - r2₂) :=
+  Real.sqrt_lt_sqrt (by linarith) (by linarith)
 
 end Question7
 
@@ -700,8 +700,8 @@ theorem heteroscedasticity_inflates_loss
     (h_sig : 0 < v_sig)
     (h_ns : 0 < v_noise_s) (_h_nt : 0 < v_noise_t)
     (h_more_noise : v_noise_s < v_noise_t) :
-    v_sig / (v_sig + v_noise_t) < v_sig / (v_sig + v_noise_s) := by
-  exact div_lt_div_of_pos_left h_sig (by linarith) (by linarith)
+    v_sig / (v_sig + v_noise_t) < v_sig / (v_sig + v_noise_s) :=
+  div_lt_div_of_pos_left h_sig (by linarith) (by linarith)
 
 /-- **Corrected portability ratio accounts for noise differences.**
     The "true" portability ratio should compare signal-to-noise ratios,
@@ -788,8 +788,8 @@ theorem local_fst_more_informative
     (i₀ : Fin m)
     (h_strict : 0 < β i₀ ^ 2 * (fst_local i₀ - fst_global))
     (hweight_pos : 0 < ∑ i, β i ^ 2) :
-    fst_global < (∑ i, β i ^ 2 * fst_local i) / (∑ i, β i ^ 2) := by
-  exact (lt_div_iff₀ hweight_pos).2
+    fst_global < (∑ i, β i ^ 2 * fst_local i) / (∑ i, β i ^ 2) :=
+  (lt_div_iff₀ hweight_pos).2
     (locus_heterogeneity_creates_weighted_gap β fst_local fst_global h_nonneg i₀ h_strict)
 
 end LocalAncestry
@@ -819,10 +819,10 @@ theorem f1_symmetric (p r : ℝ) : f1Score p r = f1Score r p := by
 /-- **F1 score ≤ arithmetic mean of precision and recall**, the harmonic-arithmetic mean
     inequality for two positive reals.
 
-    The docstring previously headed this "F1 score ≤ max(precision, recall)" and gave
-    `harmonic ≤ arithmetic ≤ max` as the reason. Only the first of those two inequalities
-    is proved; the bound by the max is a strictly weaker statement that no theorem here
-    establishes. The name was always the honest one, and the docstring now agrees with it. -/
+    Do not head this "F1 score ≤ max(precision, recall)". Of the chain
+    `harmonic ≤ arithmetic ≤ max`, only the first inequality is proved. The bound by the
+    max is strictly weaker and no theorem here establishes it. The name states exactly
+    what is proved. -/
 theorem f1_le_arithmetic_mean (p r : ℝ)
     (hp : 0 < p) (hr : 0 < r) :
     f1Score p r ≤ (p + r) / 2 := by
@@ -888,7 +888,7 @@ it, and `recalibration_needs_events` prices the target data needed to estimate i
 
     Kept, unlike `mean_shift_recoverable` above, because the nonvanishing hypothesis is
     real content: no rescaling recovers a slope that has been multiplied by zero. Read the
-    name narrowly all the same — "recoverable by re-calibration" was the old framing, and
+    name narrowly all the same. This is not recoverability by re-calibration, because
     recovering the slope requires knowing `r`, which this statement supplies to itself. -/
 theorem slope_rescaling_inverts_slope_change
     (b r pgs : ℝ) (hr : r ≠ 0) :
