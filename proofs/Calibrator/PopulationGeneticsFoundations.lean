@@ -220,9 +220,12 @@ variation. It is central to predicting portability.
 section EffectivePopulationSize
 
 
-/-- **Ne affects PGS variance.**
-    Var(PGS_drift) = V_A × Fst = V_A × t / (2Ne).
-    Smaller Ne → faster drift → more PGS variance. -/
+/-- **`V_A · t / (2 Nₑ)` decreases as `Nₑ` grows.**
+
+    Read as drift variance of a polygenic score this says smaller effective size means faster
+    drift and more variance. That the drift variance IS `V_A × F_ST` with `F_ST = t/(2Nₑ)` is
+    the modelling step, supplied by writing the expression rather than derived below: no score,
+    no allele frequency and no genealogy appears in the statement. -/
 theorem ne_affects_pgs_variance
     (V_A t Ne₁ Ne₂ : ℝ)
     (h_VA : 0 < V_A) (h_t : 0 < t)

@@ -956,16 +956,21 @@ theorem bottleneck_excess_ld_pos (Ne_b Ne_stable c : ℝ) (t_b : ℕ)
     linarith
   exact mul_pos h_gap h_amp
 
-/-- **Different demographic histories break the Fst-portability relationship.**
-    Derived from `bottleneckExcessLD`: for two source-target pairs with the same Fst,
-    the pair where the target went through a bottleneck has worse portability
-    because `bottleneckExcessLD > 0` adds additional LD mismatch on top of Fst.
-    The total mismatch = Fst-based mismatch + bottleneck excess LD. -/
+/-- **A bottleneck adds mismatch on top of whatever `F_ST` already contributes.**
+
+    The content is `bottleneck_excess_ld_pos` above, which is where the demography is: it proves
+    the excess linkage disequilibrium a bottleneck leaves is strictly positive. This composes it
+    with the fact that adding a positive quantity increases a total, so two source-target pairs
+    at the same `F_ST` are not interchangeable when one target was bottlenecked.
+
+    The hypothesis `0 ≤ fst_mismatch` was doing no work — a positive addend raises any total —
+    and is removed, so what is left in the signature is exactly what
+    `bottleneck_excess_ld_pos` needs. -/
 theorem bottleneck_worsens_portability
     (Ne_b Ne_stable c : ℝ) (t_b : ℕ)
     (hNb : 1 ≤ Ne_b) (h_bottle : Ne_b < Ne_stable)
     (hc : 0 < c) (hc1 : c < 1)
-    (ht : 0 < t_b) (fst_mismatch : ℝ) (h_fst_nn : 0 ≤ fst_mismatch) :
+    (ht : 0 < t_b) (fst_mismatch : ℝ) :
     fst_mismatch < fst_mismatch + bottleneckExcessLD Ne_b Ne_stable c t_b := by
   linarith [bottleneck_excess_ld_pos Ne_b Ne_stable c t_b hNb h_bottle hc hc1 ht]
 

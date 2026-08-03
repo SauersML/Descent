@@ -299,6 +299,36 @@ theorem convex_belowLevel (v : ℝ) :
     rw [hp0, hq1]
     simpa using hy2
 
+/-- A rule whose risk is everywhere below a level has worst-case risk below it.
+
+    The supremum over a finite range is attained, so a strict bound at every parameter is a
+    strict bound on the supremum -- which a formal `sSup` would not give. -/
+theorem worstRisk_lt_of_forall_lt (δ : Rule actionCount observationCount) (v : ℝ)
+    (h : ∀ θ, E.risk δ θ < v) : E.worstRisk δ < v := by
+  obtain ⟨θ, hθ⟩ :=
+    (Set.range_nonempty (E.risk δ)).csSup_mem (Set.finite_range _)
+  unfold worstRisk
+  rw [← hθ]
+  exact h θ
+
+/-- **The two sets are disjoint at the minimax level.**
+
+    No achievable risk profile lies strictly below the minimax value in every coordinate:
+    such a profile would give a rule with worst-case risk below the infimum of worst-case
+    risks. This is the emptiness hypothesis the separation theorem needs. -/
+theorem disjoint_riskProfiles_belowLevel :
+    Disjoint E.riskProfiles (belowLevel E.minimaxRisk) := by
+  obtain ⟨m, hm⟩ := E.exists_risk_lower_bound
+  have hbdd : BddBelow (Set.range E.worstRisk) := by
+    refine ⟨m, ?_⟩
+    rintro y ⟨δ, rfl⟩
+    exact le_trans (hm δ 0) (le_csSup (Set.finite_range _).bddAbove ⟨0, rfl⟩)
+  rw [Set.disjoint_left]
+  rintro y ⟨δ, rfl⟩ hy
+  have hlt : E.worstRisk δ < E.minimaxRisk := E.worstRisk_lt_of_forall_lt δ _ hy
+  have hge : E.minimaxRisk ≤ E.worstRisk δ := csInf_le hbdd ⟨δ, rfl⟩
+  linarith
+
 /-- **The equalizer theorem: a constant-risk Bayes rule closes duality.**
 
     If a rule has the same risk at every parameter value and is Bayes against some prior,
