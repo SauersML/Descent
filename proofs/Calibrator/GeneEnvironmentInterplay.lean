@@ -341,8 +341,8 @@ section CounterfactualFramework
     R²_other loses both partially. The gap is the sum of losses.
 
     **This does NOT attribute the gap to either factor, and the conclusion is why.**
-    The docstring here used to say "each component is the R² loss attributable to that
-    factor". It is not: the conclusion is a function of `loss_genetic + loss_env`, so every
+    **Do not describe either component as "the R² loss attributable to that factor".**
+    The conclusion is a function of `loss_genetic + loss_env`, so every
     split with the same total yields the same `gap`, exactly. `loss_genetic` and `loss_env`
     are free parameters of the statement, not quantities it measures, and no choice of
     either is contradicted by any value of `gap`.
