@@ -101,7 +101,9 @@ noncomputable def sourceTruthR2SharedLD {m : ℕ}
     (sharedLDGeneticVariance β_source ld) var_y
 
 /-- Target-population transported `R²` of the source-weighted score under a
-    shared LD kernel. -/
+    shared LD kernel.
+
+    Empirical status: UNTESTED. -/
 noncomputable def transportedTargetR2SharedLD {m : ℕ}
     (β_source β_target : Fin m → ℝ) (ld : Fin m → Fin m → ℝ) (var_y : ℝ) : ℝ :=
   pgsR2 (pgsPhenoCov β_source β_target ld)
@@ -124,7 +126,9 @@ noncomputable def effectGeneticCorrelation {m : ℕ} (β_source β_target : Fin 
   (∑ i : Fin m, β_source i * β_target i) /
     Real.sqrt ((∑ i : Fin m, β_source i ^ 2) * (∑ i : Fin m, β_target i ^ 2))
 
-/-- Standardized diagonal LD operator: independent variants with unit variance. -/
+/-- Standardized diagonal LD operator: independent variants with unit variance.
+
+    Empirical status: UNTESTED. -/
 def standardizedDiagonalLD {m : ℕ} : Fin m → Fin m → ℝ :=
   fun i j ↦ if i = j then 1 else 0
 
@@ -139,12 +143,16 @@ noncomputable def additiveHeritability {m : ℕ} (β : Fin m → ℝ) (var_y : �
   additiveGeneticVariance β / var_y
 
 /-- Source-population `R²` of the score that uses source effect sizes as weights in the
-    standardized diagonal-LD model. -/
+    standardized diagonal-LD model.
+
+    Empirical status: UNTESTED. -/
 noncomputable def sourceSelfR2DiagonalLD {m : ℕ} (β_source : Fin m → ℝ) (var_y : ℝ) : ℝ :=
   sourceTruthR2SharedLD β_source standardizedDiagonalLD var_y
 
 /-- Target-population transported `R²` of the source-weighted score in the
-    standardized diagonal-LD model. -/
+    standardized diagonal-LD model.
+
+    Empirical status: UNTESTED. -/
 noncomputable def transportedTargetR2DiagonalLD {m : ℕ}
     (β_source β_target : Fin m → ℝ) (var_y : ℝ) : ℝ :=
   transportedTargetR2SharedLD β_source β_target standardizedDiagonalLD var_y
@@ -1607,6 +1615,17 @@ noncomputable def coefficientGapSq {p : ℕ}
     (wSource wTarget : Fin p → ℝ) : ℝ :=
   dotProduct (fun i ↦ wSource i - wTarget i) (fun i ↦ wSource i - wTarget i)
 
+/-- The squared coefficient gap is a sum of squares, so it is never negative.
+    Proved here rather than assumed, so no downstream theorem has to receive
+    `0 ≤ irreducibleGap` as a gift. -/
+theorem coefficientGapSq_nonneg {p : ℕ} (wSource wTarget : Fin p → ℝ) :
+    0 ≤ coefficientGapSq wSource wTarget := by
+  have h :
+      coefficientGapSq wSource wTarget =
+        ∑ i : Fin p, (wSource i - wTarget i) * (wSource i - wTarget i) := rfl
+  rw [h]
+  exact Finset.sum_nonneg fun i _ ↦ mul_self_nonneg _
+
 /-- Sum of the first `k` population-specific deviations around a shared
     representation center. -/
 noncomputable def populationDeviationSum {p : ℕ}
@@ -1902,18 +1921,18 @@ theorem dotProduct_meanPopulationDeviation_eq_zero {p : ℕ}
   ring
 
 /-- Exact transfer-gap formula for the shared-feature meta-learning model.
-    If the shared center has residual gap `irreducibleGap`, each population-
-    specific deviation has squared norm `populationSpecificGap`, those
-    deviations are pairwise orthogonal, and each is orthogonal to the shared
-    residual, then averaging over `k` source populations yields the exact
-    residual gap `irreducibleGap + populationSpecificGap / k`. -/
+    The shared center's own residual gap is `coefficientGapSq wShared wTarget`
+    — computed, not assumed. If in addition each population-specific deviation
+    has squared norm `populationSpecificGap`, those deviations are pairwise
+    orthogonal, and each is orthogonal to the shared residual, then averaging
+    over `k` source populations yields the exact residual gap
+    `coefficientGapSq wShared wTarget + populationSpecificGap / k`. -/
 theorem metaLearnedTransferGapSq_eq_irreducible_plus_populationSpecificGap_div_k {p : ℕ}
     (wShared wTarget : Fin p → ℝ)
     (deviation : ℕ → Fin p → ℝ)
-    (irreducibleGap populationSpecificGap : ℝ)
+    (populationSpecificGap : ℝ)
     (k : ℕ)
     (h_k : 0 < k)
-    (h_shared : coefficientGapSq wShared wTarget = irreducibleGap)
     (h_shared_orth :
       ∀ j < k, dotProduct (fun i ↦ wShared i - wTarget i) (deviation j) = 0)
     (h_norm :
@@ -1921,7 +1940,10 @@ theorem metaLearnedTransferGapSq_eq_irreducible_plus_populationSpecificGap_div_k
     (h_pair :
       ∀ j < k, ∀ l < k, j ≠ l → dotProduct (deviation j) (deviation l) = 0) :
     metaLearnedTransferGapSq wShared wTarget deviation k =
-      irreducibleGap + populationSpecificGap / k := by
+      coefficientGapSq wShared wTarget + populationSpecificGap / k := by
+  obtain ⟨irreducibleGap, h_shared⟩ :
+      ∃ g : ℝ, coefficientGapSq wShared wTarget = g := ⟨_, rfl⟩
+  rw [h_shared]
   let sharedResidual : Fin p → ℝ := fun i ↦ wShared i - wTarget i
   have h_shared_norm : dotProduct sharedResidual sharedResidual = irreducibleGap := by
     simpa [sharedResidual, coefficientGapSq] using h_shared
@@ -1962,16 +1984,15 @@ theorem metaLearnedTransferGapSq_eq_irreducible_plus_populationSpecificGap_div_k
 /-- Exact population-genetic bridge for meta-learning: if the source
     population effect vectors decompose into a shared center plus orthogonal
     centered deviations, then the mean source effect vector itself has exact
-    transfer gap `irreducibleGap + populationSpecificGap / k` to the target
-    optimum. -/
+    transfer gap `coefficientGapSq wShared wTarget + populationSpecificGap / k`
+    to the target optimum. -/
 theorem sourcePopulationMeanEffectGapSq_eq_irreducible_plus_populationSpecificGap_div_k
     {p : ℕ}
     (wShared wTarget : Fin p → ℝ)
     (wSource : ℕ → Fin p → ℝ)
-    (irreducibleGap populationSpecificGap : ℝ)
+    (populationSpecificGap : ℝ)
     (k : ℕ)
     (h_k : 0 < k)
-    (h_shared : coefficientGapSq wShared wTarget = irreducibleGap)
     (h_shared_orth :
       ∀ j < k, dotProduct (fun i ↦ wShared i - wTarget i)
         (centeredPopulationEffectDeviation wShared wSource j) = 0)
@@ -1983,12 +2004,12 @@ theorem sourcePopulationMeanEffectGapSq_eq_irreducible_plus_populationSpecificGa
         dotProduct (centeredPopulationEffectDeviation wShared wSource j)
           (centeredPopulationEffectDeviation wShared wSource l) = 0) :
     coefficientGapSq (sourcePopulationMeanWeights wSource k) wTarget =
-      irreducibleGap + populationSpecificGap / k := by
+      coefficientGapSq wShared wTarget + populationSpecificGap / k := by
   rw [← metaLearnedTransferGapSq_eq_sourcePopulationMeanEffectGapSq
     wShared wTarget wSource k h_k]
   exact metaLearnedTransferGapSq_eq_irreducible_plus_populationSpecificGap_div_k
     wShared wTarget (centeredPopulationEffectDeviation wShared wSource)
-    irreducibleGap populationSpecificGap k h_k h_shared h_shared_orth h_norm h_pair
+    populationSpecificGap k h_k h_shared_orth h_norm h_pair
 
 /-- More source populations strictly reduce the exact residual transfer gap in
     the shared-feature meta-learning model, because the averaged population-
@@ -1996,12 +2017,11 @@ theorem sourcePopulationMeanEffectGapSq_eq_irreducible_plus_populationSpecificGa
 theorem metaLearnedTransferGapSq_strictMono {p : ℕ}
     (wShared wTarget : Fin p → ℝ)
     (deviation : ℕ → Fin p → ℝ)
-    (irreducibleGap populationSpecificGap : ℝ)
+    (populationSpecificGap : ℝ)
     (k₁ k₂ : ℕ)
     (h_pop : 0 < populationSpecificGap)
     (h_k₁ : 0 < k₁)
     (h_more : k₁ < k₂)
-    (h_shared : coefficientGapSq wShared wTarget = irreducibleGap)
     (h_shared_orth :
       ∀ j < k₂, dotProduct (fun i ↦ wShared i - wTarget i) (deviation j) = 0)
     (h_norm :
@@ -2013,16 +2033,16 @@ theorem metaLearnedTransferGapSq_strictMono {p : ℕ}
   have h_k₂ : 0 < k₂ := lt_trans h_k₁ h_more
   have h_formula₂ :
       metaLearnedTransferGapSq wShared wTarget deviation k₂ =
-        irreducibleGap + populationSpecificGap / k₂ :=
+        coefficientGapSq wShared wTarget + populationSpecificGap / k₂ :=
     metaLearnedTransferGapSq_eq_irreducible_plus_populationSpecificGap_div_k
-      wShared wTarget deviation irreducibleGap populationSpecificGap
-      k₂ h_k₂ h_shared h_shared_orth h_norm h_pair
+      wShared wTarget deviation populationSpecificGap
+      k₂ h_k₂ h_shared_orth h_norm h_pair
   have h_formula₁ :
       metaLearnedTransferGapSq wShared wTarget deviation k₁ =
-        irreducibleGap + populationSpecificGap / k₁ :=
+        coefficientGapSq wShared wTarget + populationSpecificGap / k₁ :=
     metaLearnedTransferGapSq_eq_irreducible_plus_populationSpecificGap_div_k
-      wShared wTarget deviation irreducibleGap populationSpecificGap
-      k₁ h_k₁ h_shared
+      wShared wTarget deviation populationSpecificGap
+      k₁ h_k₁
       (by
         intro j hj
         exact h_shared_orth j (lt_trans hj h_more))
@@ -2044,12 +2064,10 @@ theorem metaLearnedTransferGapSq_strictMono {p : ℕ}
 theorem metaLearnedTransferGapSq_pos {p : ℕ}
     (wShared wTarget : Fin p → ℝ)
     (deviation : ℕ → Fin p → ℝ)
-    (irreducibleGap populationSpecificGap : ℝ)
+    (populationSpecificGap : ℝ)
     (k : ℕ)
-    (h_irred : 0 ≤ irreducibleGap)
     (h_pop : 0 < populationSpecificGap)
     (h_k : 0 < k)
-    (h_shared : coefficientGapSq wShared wTarget = irreducibleGap)
     (h_shared_orth :
       ∀ j < k, dotProduct (fun i ↦ wShared i - wTarget i) (deviation j) = 0)
     (h_norm :
@@ -2058,8 +2076,10 @@ theorem metaLearnedTransferGapSq_pos {p : ℕ}
       ∀ j < k, ∀ l < k, j ≠ l → dotProduct (deviation j) (deviation l) = 0) :
     0 < metaLearnedTransferGapSq wShared wTarget deviation k := by
   rw [metaLearnedTransferGapSq_eq_irreducible_plus_populationSpecificGap_div_k
-    wShared wTarget deviation irreducibleGap populationSpecificGap
-    k h_k h_shared h_shared_orth h_norm h_pair]
+    wShared wTarget deviation populationSpecificGap
+    k h_k h_shared_orth h_norm h_pair]
+  have h_irred : 0 ≤ coefficientGapSq wShared wTarget :=
+    coefficientGapSq_nonneg wShared wTarget
   have hk : 0 < (k : ℝ) := Nat.cast_pos.mpr h_k
   have hdiv : 0 < populationSpecificGap / (k : ℝ) :=
     div_pos h_pop hk
@@ -2244,14 +2264,17 @@ theorem weightedMetaTransferGapSq_eq_irreducible_plus_populationSpecificGap_mul_
     (wShared wTarget : Fin p → ℝ)
     (deviation : Fin k → Fin p → ℝ)
     (weight : Fin k → ℝ)
-    (irreducibleGap populationSpecificGap : ℝ)
-    (h_shared : coefficientGapSq wShared wTarget = irreducibleGap)
+    (populationSpecificGap : ℝ)
     (h_shared_orth :
       ∀ j, dotProduct (fun i ↦ wShared i - wTarget i) (deviation j) = 0)
     (h_norm : ∀ j, dotProduct (deviation j) (deviation j) = populationSpecificGap)
     (h_pair : ∀ j l, j ≠ l → dotProduct (deviation j) (deviation l) = 0) :
     weightedMetaTransferGapSq wShared wTarget deviation weight =
-      irreducibleGap + populationSpecificGap * ∑ j : Fin k, weight j ^ 2 := by
+      coefficientGapSq wShared wTarget +
+        populationSpecificGap * ∑ j : Fin k, weight j ^ 2 := by
+  obtain ⟨irreducibleGap, h_shared⟩ :
+      ∃ g : ℝ, coefficientGapSq wShared wTarget = g := ⟨_, rfl⟩
+  rw [h_shared]
   let sharedResidual : Fin p → ℝ := fun i ↦ wShared i - wTarget i
   have h_shared_norm : dotProduct sharedResidual sharedResidual = irreducibleGap := by
     simpa [sharedResidual, coefficientGapSq] using h_shared
@@ -2329,18 +2352,17 @@ theorem weightedMetaTransferGapSq_eq_irreducible_plus_populationSpecificGap_div_
     {p k : ℕ}
     (wShared wTarget : Fin p → ℝ)
     (deviation : Fin k → Fin p → ℝ)
-    (irreducibleGap populationSpecificGap : ℝ)
+    (populationSpecificGap : ℝ)
     (h_k : 0 < k)
-    (h_shared : coefficientGapSq wShared wTarget = irreducibleGap)
     (h_shared_orth :
       ∀ j, dotProduct (fun i ↦ wShared i - wTarget i) (deviation j) = 0)
     (h_norm : ∀ j, dotProduct (deviation j) (deviation j) = populationSpecificGap)
     (h_pair : ∀ j l, j ≠ l → dotProduct (deviation j) (deviation l) = 0) :
     weightedMetaTransferGapSq wShared wTarget deviation (uniformMetaWeight k) =
-      irreducibleGap + populationSpecificGap / k := by
+      coefficientGapSq wShared wTarget + populationSpecificGap / k := by
   rw [weightedMetaTransferGapSq_eq_irreducible_plus_populationSpecificGap_mul_sum_sq
     wShared wTarget deviation (uniformMetaWeight k)
-    irreducibleGap populationSpecificGap h_shared h_shared_orth h_norm h_pair]
+    populationSpecificGap h_shared_orth h_norm h_pair]
   have hcard : (∑ j : Fin k, ((uniformMetaWeight k) j) ^ 2) = k * ((k : ℝ)⁻¹ ^ 2) := by
     simp [uniformMetaWeight]
   rw [hcard]
@@ -2352,17 +2374,16 @@ theorem weightedMetaTransferGapSq_eq_irreducible_plus_populationSpecificGap_div_
     aggregators under the shared-feature geometry.**
     Under orthogonal population-specific deviations of equal squared norm,
     every affine combination of the `k` source-specific models has exact
-    transfer gap `irreducibleGap + gap × Σ_j w_j²`, so the uniform average
-    minimizes the exact transfer gap because `Σ_j w_j² ≥ 1 / k`. -/
+    transfer gap `coefficientGapSq wShared wTarget + gap × Σ_j w_j²`, so the
+    uniform average minimizes the exact transfer gap because `Σ_j w_j² ≥ 1 / k`. -/
 theorem weightedMetaTransferGapSq_ge_uniform_of_affine_weights
     {p k : ℕ}
     (wShared wTarget : Fin p → ℝ)
     (deviation : Fin k → Fin p → ℝ)
     (weight : Fin k → ℝ)
-    (irreducibleGap populationSpecificGap : ℝ)
+    (populationSpecificGap : ℝ)
     (h_k : 0 < k)
     (h_sum : ∑ j : Fin k, weight j = 1)
-    (h_shared : coefficientGapSq wShared wTarget = irreducibleGap)
     (h_shared_orth :
       ∀ j, dotProduct (fun i ↦ wShared i - wTarget i) (deviation j) = 0)
     (h_norm : ∀ j, dotProduct (deviation j) (deviation j) = populationSpecificGap)
@@ -2371,11 +2392,11 @@ theorem weightedMetaTransferGapSq_ge_uniform_of_affine_weights
     weightedMetaTransferGapSq wShared wTarget deviation (uniformMetaWeight k) ≤
       weightedMetaTransferGapSq wShared wTarget deviation weight := by
   rw [weightedMetaTransferGapSq_eq_irreducible_plus_populationSpecificGap_div_k_of_uniform
-      wShared wTarget deviation irreducibleGap populationSpecificGap
-      h_k h_shared h_shared_orth h_norm h_pair,
+      wShared wTarget deviation populationSpecificGap
+      h_k h_shared_orth h_norm h_pair,
     weightedMetaTransferGapSq_eq_irreducible_plus_populationSpecificGap_mul_sum_sq
-      wShared wTarget deviation weight irreducibleGap populationSpecificGap
-      h_shared h_shared_orth h_norm h_pair]
+      wShared wTarget deviation weight populationSpecificGap
+      h_shared_orth h_norm h_pair]
   have h_sq_lb : 1 / (k : ℝ) ≤ ∑ j : Fin k, weight j ^ 2 :=
     one_div_card_le_sum_sq_of_affine_weights weight h_k h_sum
   have hmul :
@@ -2697,28 +2718,28 @@ theorem fineTunedTargetR2_eq_deployedTransferTargetR2_gapDrop_isotropic
   unfold deployedTransferTargetR2
   ring
 
-/-- If the transported baseline equals the target oracle ceiling minus the
-    pre-adaptation coefficient gap, then isotropic fine-tuning reduces the
-    deployed target `R²` exactly to the oracle ceiling minus the residual
+/-- Taking the transported baseline to be the target oracle ceiling minus the
+    pre-adaptation coefficient gap — written out in the statement rather than
+    assumed of a free variable — isotropic fine-tuning reduces the deployed
+    target `R²` exactly to the oracle ceiling minus the residual
     post-adaptation gap. This is the clean residual-gap form of the canonical
     deployed-transfer theorem. -/
 theorem fineTunedTargetR2_eq_oracle_minus_postGap_isotropic
     {p : ℕ}
-    (source_r2 transported_r2 oracle_target_r2 : ℝ)
+    (source_r2 oracle_target_r2 : ℝ)
     (crossTarget : Fin p → ℝ)
     (noiseVar : ℝ)
     (wBefore wAfter wStar : Fin p → ℝ)
-    (h_opt : (1 : Matrix (Fin p) (Fin p) ℝ).mulVec wStar = crossTarget)
-    (h_transport :
-      transported_r2 = oracle_target_r2 - coefficientGapSq wBefore wStar) :
+    (h_opt : (1 : Matrix (Fin p) (Fin p) ℝ).mulVec wStar = crossTarget) :
     fineTunedTargetR2 source_r2
-        (transportPenalty source_r2 transported_r2)
+        (transportPenalty source_r2
+          (oracle_target_r2 - coefficientGapSq wBefore wStar))
         (exactAdaptationGain (1 : Matrix (Fin p) (Fin p) ℝ)
           crossTarget noiseVar wBefore wAfter wStar) =
       oracle_target_r2 - coefficientGapSq wAfter wStar := by
   rw [fineTunedTargetR2_eq_deployedTransferTargetR2_gapDrop_isotropic
-    source_r2 transported_r2 crossTarget noiseVar wBefore wAfter wStar h_opt]
-  rw [h_transport]
+    source_r2 (oracle_target_r2 - coefficientGapSq wBefore wStar)
+    crossTarget noiseVar wBefore wAfter wStar h_opt]
   have h_oracle_gap :
       oracleTransportAdaptationGain
           (oracle_target_r2 - coefficientGapSq wBefore wStar)
@@ -2767,16 +2788,14 @@ theorem amortized_per_population_adaptation_cost_falls_with_task_count
     {p : ℕ}
     (wShared wTarget : Fin p → ℝ)
     (deviation : ℕ → Fin p → ℝ)
-    (irreducibleGap populationSpecificGap noiseVar nTarget tau : ℝ)
+    (populationSpecificGap noiseVar nTarget tau : ℝ)
     (k₁ k₂ : ℕ)
-    (h_shared : coefficientGapSq wShared wTarget = irreducibleGap)
     (h_shared_orth :
       ∀ j < k₂, dotProduct (fun i ↦ wShared i - wTarget i) (deviation j) = 0)
     (h_norm :
       ∀ j < k₂, dotProduct (deviation j) (deviation j) = populationSpecificGap)
     (h_pair :
       ∀ j < k₂, ∀ l < k₂, j ≠ l → dotProduct (deviation j) (deviation l) = 0)
-    (h_irred : 0 ≤ irreducibleGap)
     (h_pop : 0 < populationSpecificGap)
     (h_noise : 0 < noiseVar)
     (h_n : 0 < nTarget)
@@ -2808,13 +2827,13 @@ theorem amortized_per_population_adaptation_cost_falls_with_task_count
       metaLearnedTransferGapSq wShared wTarget deviation k₂ <
         metaLearnedTransferGapSq wShared wTarget deviation k₁ :=
     metaLearnedTransferGapSq_strictMono
-      wShared wTarget deviation irreducibleGap populationSpecificGap
-      k₁ k₂ h_pop h_k₁ h_more_tasks h_shared h_shared_orth h_norm h_pair
+      wShared wTarget deviation populationSpecificGap
+      k₁ k₂ h_pop h_k₁ h_more_tasks h_shared_orth h_norm h_pair
   have h_gap₂_pos :
       0 < metaLearnedTransferGapSq wShared wTarget deviation k₂ :=
     metaLearnedTransferGapSq_pos
-      wShared wTarget deviation irreducibleGap populationSpecificGap
-      k₂ h_irred h_pop h_k₂ h_shared h_shared_orth h_norm h_pair
+      wShared wTarget deviation populationSpecificGap
+      k₂ h_pop h_k₂ h_shared_orth h_norm h_pair
   have h_mse_order :
       optimalFineTuningMSE
           (metaLearnedTransferGapSq wShared wTarget deviation k₂)
@@ -2857,9 +2876,8 @@ theorem metaLearned_deployedTransferTargetR2_strictMono
     (transported_r2 oracle_target_r2 estimation_penalty : ℝ)
     (wShared wTarget : Fin p → ℝ)
     (deviation : ℕ → Fin p → ℝ)
-    (irreducibleGap populationSpecificGap : ℝ)
+    (populationSpecificGap : ℝ)
     (k₁ k₂ : ℕ)
-    (h_shared : coefficientGapSq wShared wTarget = irreducibleGap)
     (h_shared_orth :
       ∀ j < k₂, dotProduct (fun i ↦ wShared i - wTarget i) (deviation j) = 0)
     (h_norm :
@@ -2881,8 +2899,8 @@ theorem metaLearned_deployedTransferTargetR2_strictMono
       metaLearnedTransferGapSq wShared wTarget deviation k₂ <
         metaLearnedTransferGapSq wShared wTarget deviation k₁ :=
     metaLearnedTransferGapSq_strictMono
-      wShared wTarget deviation irreducibleGap populationSpecificGap
-      k₁ k₂ h_pop h_k₁ h_more_tasks h_shared h_shared_orth h_norm h_pair
+      wShared wTarget deviation populationSpecificGap
+      k₁ k₂ h_pop h_k₁ h_more_tasks h_shared_orth h_norm h_pair
   unfold deployedTransferTargetR2 oracleTransportAdaptationGain
   linarith
 

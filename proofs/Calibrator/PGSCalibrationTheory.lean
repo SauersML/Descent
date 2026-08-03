@@ -864,8 +864,10 @@ theorem cross_ancestry_exact_metric_profile_from_shift_budget
           metric (cal.observedMean Pop.target)).auc := by
     rw [targetMetricProfileFromSourceWeights_auc,
       sourceMetricProfileFromSourceWeightsAtPrevalence_auc,
-      targetEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart,
-      sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart]
+      targetEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart
+        metric h_target_r2_unit.2,
+      sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart
+        metric h_source_r2_unit.2]
     exact equalVarianceGaussianAUCFromExplainedR2_strictMonoOn_unitInterval
       h_target_r2_unit h_source_r2_unit h_r2_drop
   have h_citl_eq :
@@ -1231,8 +1233,10 @@ theorem cross_ancestry_auc_drop_and_citl_worsening_of_r2_drop_and_shift_budget
         (sourceMetricProfileFromSourceWeightsAtTargetPrevalence metric).auc := by
     rw [targetMetricProfileFromSourceWeights_auc,
       sourceMetricProfileFromSourceWeightsAtTargetPrevalence_auc,
-      targetEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart,
-      sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart]
+      targetEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart
+        metric h_target_r2_unit.2,
+      sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart
+        metric h_source_r2_unit.2]
     exact equalVarianceGaussianAUCFromExplainedR2_strictMonoOn_unitInterval
       h_target_r2_unit h_source_r2_unit h_r2_drop
   have h_citl_eq :

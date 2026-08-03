@@ -111,7 +111,7 @@ arbitrary: overlapping windows, whole-genome interaction scans, anything with
 Empirical status: DERIVED. The per-monomial tail bound is a hypothesis, not a
 claim about genotypes; what is proved here is that it propagates from one
 monomial to a whole design without any loss beyond the minimum order. -/
-theorem no_macroscopic_interaction_term
+theorem no_macroscopic_interaction_term_of_tilted_tail
     (coefficient jumpProbability : S → ℝ) (interactionOrder : S → ℕ)
     (tiltConstant threshold : ℝ) (minimumOrder : ℕ)
     (hthreshold : 0 < threshold)
@@ -683,8 +683,9 @@ it, and the reason is visible in the inputs its proof route uses:
 2. the coordinates are independent across loci — the linkage-equilibrium
    hypothesis `GenotypeDesign.InLinkageEquilibrium`, an argument of the licence,
    not an assumption about the coding;
-3. no monomial is macroscopic — `no_macroscopic_interaction_term` of §`NoJump`,
-   which carries no symmetry hypothesis and holds for any design and any coding.
+3. no monomial is macroscopic — `no_macroscopic_interaction_term_of_tilted_tail`
+   of §`NoJump`, which carries no symmetry hypothesis and holds for any design
+   and any coding that supplies the per-monomial tilted tail bound.
 
 Sign symmetry belongs to the *other* route, the one that tries to reduce
 overlapping designs to disjoint skeletons by killing cross-moments. That route
@@ -1703,8 +1704,10 @@ theorem unique_set_of_variantDisjoint {design : GenotypeDesign n ι}
   by_contra hne
   exact (Finset.disjoint_left.mp (hdisjoint s t hne) hs) ht
 
-/-- Disjointness is the statement that every variant is tested at most once,
-which is how a practitioner would check it on a panel. -/
+/-- Disjointness implies that every variant is tested at most once. The converse
+holds too (`variantDisjoint_iff_variantRecurrence_le_one`), which is what makes
+the recurrence profile a *check* on disjointness rather than a consequence of
+it. -/
 theorem variantRecurrence_le_one_of_disjoint {design : GenotypeDesign n ι}
     (hdisjoint : design.VariantDisjoint)
     (i : Fin n) : design.variantRecurrence i ≤ 1 := by
@@ -1714,6 +1717,31 @@ theorem variantRecurrence_le_one_of_disjoint {design : GenotypeDesign n ι}
   intro s hs t ht
   exact unique_set_of_variantDisjoint hdisjoint
     (Finset.mem_filter.mp hs).2 (Finset.mem_filter.mp ht).2
+
+/-- **Disjointness is exactly a recurrence bound**, which is how a practitioner
+would check it on a panel: count, for each variant, how many tested sets contain
+it, and disjointness holds iff no count exceeds one.
+
+This is the discharge route for every `VariantDisjoint` hypothesis below. Without
+it the predicate is a global condition on pairs of tested sets that a caller must
+supply; with it the condition is a per-variant count read off the design, and the
+two `_of_disjoint` results become consequences of a measurement rather than of a
+gift. -/
+theorem variantDisjoint_iff_variantRecurrence_le_one {design : GenotypeDesign n ι} :
+    design.VariantDisjoint ↔ ∀ i : Fin n, design.variantRecurrence i ≤ 1 := by
+  constructor
+  · intro hdisjoint
+    exact variantRecurrence_le_one_of_disjoint hdisjoint
+  · intro hrecurrence s t hst
+    rw [Finset.disjoint_left]
+    intro i hi hi'
+    have hcard : (Finset.univ.filter (fun u ↦ i ∈ design.locusSet u)).card ≤ 1 :=
+      hrecurrence i
+    have hs : s ∈ Finset.univ.filter (fun u ↦ i ∈ design.locusSet u) :=
+      Finset.mem_filter.mpr ⟨Finset.mem_univ s, hi⟩
+    have ht : t ∈ Finset.univ.filter (fun u ↦ i ∈ design.locusSet u) :=
+      Finset.mem_filter.mpr ⟨Finset.mem_univ t, hi'⟩
+    exact hst (Finset.card_le_one.mp hcard s hs t ht)
 
 /-- **A recurrent variant refutes disjointness.** If one variant enters two
 distinct tested sets — one SNP in two sliding windows, one gene in two pathways,
@@ -2372,20 +2400,25 @@ theorem palindromic_fourth_cycle_densities_differ (s : ℝ) (hs : s ^ 2 = 2) :
   rw [palindromicCycleDensityA_four s hs, palindromicCycleDensityB_four s hs]
   norm_num
 
-/-- **Matching the recurrence profile leaves the fourth cycle density free.**
+/-- **Matching the recurrence profile leaves the fourth cycle density free**, on
+the palindromic witness pair.
 
-Two designs whose overlap structures are the two palindromic circulants have
-equal second cycle densities and unequal fourth ones. The hypothesis
-`hrecurrence` — that the two agree in the whole variant-recurrence profile — is
-an argument of the theorem and is *never used in the proof*. That is the content:
-recurrence is a star density, it is compatible with either value of the fourth
-cycle density, and a scheme that preserves it has preserved nothing the limit law
-depends on.
+The name carries `_of_palindromic_pair` because that is the whole of what is
+proved: `hdesign` and `hresampled` pin the two designs' fourth cycle densities to
+the two palindromic circulants' values, and the separation is then
+`palindromic_fourth_cycle_densities_differ`. There is no claim here about an
+arbitrary recurrence-matched pair.
+
+Within that scope the point stands. The hypothesis `hrecurrence` — that the two
+agree in the whole variant-recurrence profile — is an argument of the theorem and
+is *never used in the proof*. That is the content: recurrence is a star density,
+it is compatible with either value of the fourth cycle density, and a scheme that
+preserves it has preserved nothing the limit law depends on.
 
 The prescription is `CycleDeterminacy.cycle_preserving_resampling_is_a_calibration`:
 preserve the cycle densities, of which the fourth is the first that bites in the
 quadratic sector. -/
-theorem recurrence_matching_leaves_fourth_cycle_density_free
+theorem recurrence_matching_leaves_fourth_cycle_density_free_of_palindromic_pair
     (design resampled : GenotypeDesign nx ιx) (s : ℝ) (hs : s ^ 2 = 2)
     (_hrecurrence : ∀ i : Fin nx,
       resampled.variantRecurrence i = design.variantRecurrence i)

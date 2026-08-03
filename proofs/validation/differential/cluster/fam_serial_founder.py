@@ -91,9 +91,11 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(HERE)))
 
 import simprov  # noqa: E402
 
-# The CSVs this file reads. Its output is a function of these and of the code,
-# and of nothing else -- there is no RNG anywhere in this script -- so naming
-# them is what makes a disagreement between two runs diagnosable.
+# The CSVs PARTS B AND C read. Part A reads NOTHING: it is a function of the
+# code alone, which is why it reproduces exactly across machines and numpy
+# versions and why part B's missing inputs cannot contaminate it. There is no
+# RNG anywhere in this script, so between the code and these two files there is
+# nothing else that can move a number.
 INPUT_CSVS = ("accuracy_binary.csv", "calibration_binary.csv")
 
 # ---- constants transcribed from sims/ancestry_calibration/gen_real_pt.py ----

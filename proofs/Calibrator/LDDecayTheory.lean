@@ -484,9 +484,11 @@ theorem driftLD_one_sub_retention_pos (Ne c : ℝ)
 /-- Clearing the denominator: `Q* · (1 - retention)` is the per-generation
     coalescence input `(1 - c)²/(2 Nₑ)`. -/
 theorem driftLDEquilibrium_mul_one_sub_retention (Ne c : ℝ)
-    (h_ne : 1 - driftLDRetention Ne c ≠ 0) :
+    (hNe : 1 ≤ Ne) (hc : 0 ≤ c) (hc1 : c ≤ 1) :
     driftLDEquilibrium Ne c * (1 - driftLDRetention Ne c) =
       (1 - c) ^ 2 * (1 / (2 * Ne)) := by
+  have h_ne : 1 - driftLDRetention Ne c ≠ 0 :=
+    ne_of_gt (driftLD_one_sub_retention_pos Ne c hNe hc hc1)
   unfold driftLDEquilibrium
   field_simp
 
@@ -496,9 +498,10 @@ theorem driftLDEquilibrium_mul_one_sub_retention (Ne c : ℝ)
     deleted `bottleneckLDAmplification` had no such theorem, and no map it could
     have been a fixed point of, because it had no `c`. -/
 theorem driftLDEquilibrium_isFixedPoint (Ne c : ℝ)
-    (h_ne : 1 - driftLDRetention Ne c ≠ 0) :
+    (hNe : 1 ≤ Ne) (hc : 0 ≤ c) (hc1 : c ≤ 1) :
     driftLDStep Ne c (driftLDEquilibrium Ne c) = driftLDEquilibrium Ne c := by
-  rw [driftLDStep_affine, ← driftLDEquilibrium_mul_one_sub_retention Ne c h_ne]
+  rw [driftLDStep_affine,
+    ← driftLDEquilibrium_mul_one_sub_retention Ne c hNe hc hc1]
   ring
 
 /-- **Without recombination the equilibrium really is `1`.**  `c = 0` is the only
@@ -596,7 +599,7 @@ noncomputable def driftLDTrajectory (Ne c Q₀ : ℝ) : ℕ → ℝ
     `Q*` and not `1`.  This identity is what the deleted formula asserted
     without a process to assert it about. -/
 theorem driftLDTrajectory_closedForm (Ne c Q₀ : ℝ)
-    (h_ne : 1 - driftLDRetention Ne c ≠ 0) (t : ℕ) :
+    (hNe : 1 ≤ Ne) (hc : 0 ≤ c) (hc1 : c ≤ 1) (t : ℕ) :
     driftLDTrajectory Ne c Q₀ t =
       driftLDEquilibrium Ne c +
         (Q₀ - driftLDEquilibrium Ne c) * driftLDRetention Ne c ^ t := by
@@ -606,7 +609,7 @@ theorem driftLDTrajectory_closedForm (Ne c Q₀ : ℝ)
       ring
   | succ n ih =>
       rw [driftLDTrajectory_succ, ih, driftLDStep_affine,
-        ← driftLDEquilibrium_mul_one_sub_retention Ne c h_ne]
+        ← driftLDEquilibrium_mul_one_sub_retention Ne c hNe hc hc1]
       ring
 
 end BottleneckLD
@@ -768,15 +771,14 @@ noncomputable def excessLDAfterBottleneck (N_b N_r c : ℝ) (t_b t_r : ℕ) : �
     two equilibria, approached over the bottleneck and decaying over the
     recovery.  Unlike its predecessor, the amplitude is bounded by that gap. -/
 theorem excessLDAfterBottleneck_closedForm (N_b N_r c : ℝ) (t_b t_r : ℕ)
-    (h_b : 1 - driftLDRetention N_b c ≠ 0)
-    (h_r : 1 - driftLDRetention N_r c ≠ 0) :
+    (hNb : 1 ≤ N_b) (hNr : 1 ≤ N_r) (hc : 0 ≤ c) (hc1 : c ≤ 1) :
     excessLDAfterBottleneck N_b N_r c t_b t_r =
       (driftLDEquilibrium N_b c - driftLDEquilibrium N_r c) *
         (1 - driftLDRetention N_b c ^ t_b) *
         driftLDRetention N_r c ^ t_r := by
   unfold excessLDAfterBottleneck
-  rw [driftLDTrajectory_closedForm N_r c _ h_r t_r,
-    driftLDTrajectory_closedForm N_b c _ h_b t_b]
+  rw [driftLDTrajectory_closedForm N_r c _ hNr hc hc1 t_r,
+    driftLDTrajectory_closedForm N_b c _ hNb hc hc1 t_b]
   ring
 
 /-- Excess LD is nonneg for reasonable parameters. -/
@@ -785,10 +787,7 @@ theorem excess_ld_nonneg (N_b N_r c : ℝ) (t_b t_r : ℕ)
     (hc : 0 ≤ c) (hc1 : c ≤ 1) :
     0 ≤ excessLDAfterBottleneck N_b N_r c t_b t_r := by
   have hNr : (1 : ℝ) ≤ N_r := le_trans hNb h_bottle
-  have h_b := driftLD_one_sub_retention_pos N_b c hNb hc hc1
-  have h_r := driftLD_one_sub_retention_pos N_r c hNr hc hc1
-  rw [excessLDAfterBottleneck_closedForm N_b N_r c t_b t_r
-    (ne_of_gt h_b) (ne_of_gt h_r)]
+  rw [excessLDAfterBottleneck_closedForm N_b N_r c t_b t_r hNb hNr hc hc1]
   have h_gap : 0 ≤ driftLDEquilibrium N_b c - driftLDEquilibrium N_r c := by
     have := driftLDEquilibrium_antitone N_b N_r c hNb h_bottle hc hc1
     linarith
@@ -810,13 +809,8 @@ theorem more_severe_bottleneck_more_ld (N₁ N₂ N_r c : ℝ) (t_b t_r : ℕ)
   have hNr : (1 : ℝ) ≤ N_r := le_trans hN₁ h_bound
   have hc0 : (0 : ℝ) ≤ c := le_of_lt hc
   have hc1' : c ≤ 1 := le_of_lt hc1
-  have h₁ := driftLD_one_sub_retention_pos N₁ c hN₁ hc0 hc1'
-  have h₂ := driftLD_one_sub_retention_pos N₂ c hN₂ hc0 hc1'
-  have h_r := driftLD_one_sub_retention_pos N_r c hNr hc0 hc1'
-  rw [excessLDAfterBottleneck_closedForm N₁ N_r c t_b t_r
-      (ne_of_gt h₁) (ne_of_gt h_r),
-    excessLDAfterBottleneck_closedForm N₂ N_r c t_b t_r
-      (ne_of_gt h₂) (ne_of_gt h_r)]
+  rw [excessLDAfterBottleneck_closedForm N₁ N_r c t_b t_r hN₁ hNr hc0 hc1',
+    excessLDAfterBottleneck_closedForm N₂ N_r c t_b t_r hN₂ hNr hc0 hc1']
   -- the two equilibrium gaps
   have h_gap₁ : 0 ≤ driftLDEquilibrium N₁ c - driftLDEquilibrium N_r c := by
     have := driftLDEquilibrium_antitone N₁ N_r c hN₁ h_bound hc0 hc1'
@@ -867,12 +861,8 @@ theorem excess_ld_decays_after_recovery (N_b N_r c : ℝ) (t_b : ℕ) (t₁ t₂
   have hNr : (1 : ℝ) ≤ N_r := by linarith
   have hc0 : (0 : ℝ) ≤ c := le_of_lt hc
   have hc1' : c ≤ 1 := le_of_lt hc1
-  have h_b := driftLD_one_sub_retention_pos N_b c hNb hc0 hc1'
-  have h_r := driftLD_one_sub_retention_pos N_r c hNr hc0 hc1'
-  rw [excessLDAfterBottleneck_closedForm N_b N_r c t_b t₂
-      (ne_of_gt h_b) (ne_of_gt h_r),
-    excessLDAfterBottleneck_closedForm N_b N_r c t_b t₁
-      (ne_of_gt h_b) (ne_of_gt h_r)]
+  rw [excessLDAfterBottleneck_closedForm N_b N_r c t_b t₂ hNb hNr hc0 hc1',
+    excessLDAfterBottleneck_closedForm N_b N_r c t_b t₁ hNb hNr hc0 hc1']
   have h_gap_pos : 0 < driftLDEquilibrium N_b c - driftLDEquilibrium N_r c := by
     have := driftLDEquilibrium_strictAnti N_b N_r c hNb h_bottle hc hc1
     linarith
@@ -984,8 +974,14 @@ noncomputable def ldHalfLife (r Ne : ℝ) : ℝ :=
     the half-life is not an integer. This is the property the name asserts, and
     a body that omits the recombination rate satisfies it only at `r = 0`. -/
 theorem ldHalfLife_halves_retention (r Ne : ℝ)
-    (h0 : 0 < ldRetentionPerGen r Ne) (h1 : ldRetentionPerGen r Ne < 1) :
+    (hr : 0 < r) (hr1 : r < 1) (hNe : 1 < Ne) :
     (ldRetentionPerGen r Ne) ^ (ldHalfLife r Ne) = 1 / 2 := by
+  have h0 : 0 < ldRetentionPerGen r Ne := by
+    unfold ldRetentionPerGen
+    apply mul_pos
+    · linarith
+    · rw [sub_pos, div_lt_one (by linarith)]; linarith
+  have h1 : ldRetentionPerGen r Ne < 1 := ld_retention_lt_one r Ne hr hr1 hNe
   have hlog : Real.log (ldRetentionPerGen r Ne) < 0 := Real.log_neg h0 h1
   have hne : Real.log (ldRetentionPerGen r Ne) ≠ 0 := ne_of_lt hlog
   rw [Real.rpow_def_of_pos h0]

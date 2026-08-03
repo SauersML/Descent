@@ -544,6 +544,30 @@ theorem bernoulliKLReal_nonneg (p q : ℝ) (hp0 : 0 < p) (hp1 : p < 1) (hq0 : 0 
       rw [hqp, h1qp]
     _ = 0 := by ring
 
+/-- **Strict Gibbs inequality for the Bernoulli KL divergence.**
+
+`bernoulliKLReal_nonneg` above gives one half of Gibbs' inequality; this is the strictness
+half, that the log-sum bound is tight only at `q = p`. Three theorems below used to take
+this as a caller-supplied premise `h_kl_zero_iff`; it is not a restriction on the inputs
+but a universally true fact about a divergence this corpus defines, so it is stated here
+and admitted, leaving the debt visible to `AxiomScan`. -/
+theorem bernoulliKLReal_eq_zero_iff (p q : ℝ)
+    (hp0 : 0 < p) (hp1 : p < 1) (hq0 : 0 < q) (hq1 : q < 1) :
+    bernoulliKLReal p q = 0 ↔ q = p := by
+  sorry
+
+/-- `UnitProb` form of `bernoulliKLReal_eq_zero_iff`. -/
+theorem klBernReal_eq_zero_iff (p q : UnitProb)
+    (hp : 0 < p.1 ∧ p.1 < 1) (hq : 0 < q.1 ∧ q.1 < 1) :
+    klBernReal p q = 0 ↔ q = p := by
+  unfold klBernReal
+  rw [bernoulliKLReal_eq_zero_iff p.1 q.1 hp.1 hp.2 hq.1 hq.2]
+  constructor
+  · intro h
+    exact Subtype.ext h
+  · intro h
+    rw [h]
+
 /-- Pointwise log-loss regret equals Bernoulli KL. -/
 theorem logLoss_regret_eq_kl_pointwise (p q : ℝ)
     (hp0 : 0 < p) (hp1 : p < 1) (hq0 : 0 < q) (hq1 : q < 1) :
@@ -620,15 +644,18 @@ theorem logRisk_regret_nonneg {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
   exact integral_nonneg h_kl_nonneg
 
 /-- Corollary: strictness criterion.
-Regret is zero iff `q = p` almost everywhere, assuming pointwise KL characterization. -/
+Regret is zero iff `q = p` almost everywhere. The pointwise KL characterization it needs
+is `klBernReal_eq_zero_iff`, proved (modulo the admitted strictness half) above rather
+than assumed here. -/
 theorem logRisk_regret_zero_iff_ae_eq {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
     (p q : ProbPredictor Z)
     (hp : ∀ z, 0 < (p z).1 ∧ (p z).1 < 1)
     (hq : ∀ z, 0 < (q z).1 ∧ (q z).1 < 1)
-    (h_int : Integrable (fun z ↦ klBernReal (p z) (q z)) μ)
-    (h_kl_zero_iff : ∀ z, klBernReal (p z) (q z) = 0 ↔ q z = p z) :
+    (h_int : Integrable (fun z ↦ klBernReal (p z) (q z)) μ) :
     (∫ z, bernoulliLogLoss (p z).1 (q z).1 - bernoulliLogLoss (p z).1 (p z).1 ∂μ) = 0
       ↔ q =ᵐ[μ] p := by
+  have h_kl_zero_iff : ∀ z, klBernReal (p z) (q z) = 0 ↔ q z = p z := fun z ↦
+    klBernReal_eq_zero_iff (p z) (q z) (hp z) (hq z)
   have h_kl_nonneg : ∀ z, 0 ≤ klBernReal (p z) (q z) := by
     intro z
     unfold klBernReal
@@ -799,7 +826,6 @@ theorem logRisk_eq_iff_ae_eq_eta {Z : Type u} [MeasurableSpace Z] (μ : Measure 
     (hη_open : ∀ z, 0 < (η z).1 ∧ (η z).1 < 1)
     (hq_open : ∀ z, 0 < (q z).1 ∧ (q z).1 < 1)
     (h_int_kl : Integrable (fun z ↦ klBernReal (η z) (q z)) μ)
-    (h_kl_zero_iff : ∀ z, klBernReal (η z) (q z) = 0 ↔ q z = η z)
     (h_int_eta : Integrable (fun z ↦ bernoulliLogLoss (η z).1 (η z).1) μ)
     (h_int_q : Integrable (fun z ↦ bernoulliLogLoss (η z).1 (q z).1) μ) :
     logRisk μ η q = logRisk μ η η ↔ q =ᵐ[μ] η := by
@@ -807,7 +833,7 @@ theorem logRisk_eq_iff_ae_eq_eta {Z : Type u} [MeasurableSpace Z] (μ : Measure 
       (∫ z,
         bernoulliLogLoss (η z).1 (q z).1 - bernoulliLogLoss (η z).1 (η z).1 ∂μ) = 0
         ↔ q =ᵐ[μ] η :=
-    logRisk_regret_zero_iff_ae_eq μ η q hη_open hq_open h_int_kl h_kl_zero_iff
+    logRisk_regret_zero_iff_ae_eq μ η q hη_open hq_open h_int_kl
   have hsub :
       (∫ z,
         bernoulliLogLoss (η z).1 (q z).1 - bernoulliLogLoss (η z).1 (η z).1 ∂μ)
@@ -933,9 +959,10 @@ theorem logBernoulliRisk_min (η q : ℝ)
   linarith
 
 theorem logBernoulliRisk_eq_iff (η q : ℝ)
-    (hη0 : 0 < η) (hη1 : η < 1) (hq0 : 0 < q) (hq1 : q < 1)
-    (h_kl_zero_iff : bernoulliKLReal η q = 0 ↔ q = η) :
+    (hη0 : 0 < η) (hη1 : η < 1) (hq0 : 0 < q) (hq1 : q < 1) :
     logBernoulliRisk η q = logBernoulliRisk η η ↔ q = η := by
+  have h_kl_zero_iff : bernoulliKLReal η q = 0 ↔ q = η :=
+    bernoulliKLReal_eq_zero_iff η q hη0 hη1 hq0 hq1
   have h_kl_nonneg : 0 ≤ bernoulliKLReal η q := bernoulliKLReal_nonneg η q hη0 hη1 hq0 hq1
   have hreg := logLoss_regret_eq_kl_pointwise η q hη0 hη1 hq0 hq1
   unfold logBernoulliRisk at *

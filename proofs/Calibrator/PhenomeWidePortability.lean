@@ -41,7 +41,9 @@ section TraitClassification
     coarse transport summary `(1 - Fst_additional) * ld_factor`.
 
     This is a trait-level scalar baseline for downstream comparisons, not a
-    literal theorem that the deployed `R²` ratio equals this product. -/
+    literal theorem that the deployed `R²` ratio equals this product.
+
+    Empirical status: UNTESTED. -/
 noncomputable def neutralPortabilityRatioLD (fst_additional ld_factor : ℝ) : ℝ :=
   (1 - fst_additional) * ld_factor
 

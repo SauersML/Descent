@@ -898,12 +898,12 @@ noncomputable def bottleneckExcessLD (Ne_b Ne_stable c : ℝ) (t_b : ℕ) : ℝ 
     bottleneck. This is the theorem the deleted `derivation_matches_bottleneckExcessLD`
     was named for and did not state. -/
 theorem bottleneckExcessLD_eq_closedForm (Ne_b Ne_stable c : ℝ) (t_b : ℕ)
-    (h_b : 1 - driftLDRetention Ne_b c ≠ 0) :
+    (hNb : 1 ≤ Ne_b) (hc : 0 ≤ c) (hc1 : c ≤ 1) :
     bottleneckExcessLD Ne_b Ne_stable c t_b =
       (driftLDEquilibrium Ne_b c - driftLDEquilibrium Ne_stable c) *
         (1 - driftLDRetention Ne_b c ^ t_b) := by
   unfold bottleneckExcessLD
-  rw [driftLDTrajectory_closedForm Ne_b c _ h_b t_b]
+  rw [driftLDTrajectory_closedForm Ne_b c _ hNb hc hc1 t_b]
   ring
 
 /-- **One quantity, one definition**: the bottleneck excess is the zero-recovery
@@ -931,8 +931,7 @@ theorem bottleneck_excess_ld_pos (Ne_b Ne_stable c : ℝ) (t_b : ℕ)
     0 < bottleneckExcessLD Ne_b Ne_stable c t_b := by
   have hc0 : (0 : ℝ) ≤ c := le_of_lt hc
   have hc1' : c ≤ 1 := le_of_lt hc1
-  have h_b := driftLD_one_sub_retention_pos Ne_b c hNb hc0 hc1'
-  rw [bottleneckExcessLD_eq_closedForm Ne_b Ne_stable c t_b (ne_of_gt h_b)]
+  rw [bottleneckExcessLD_eq_closedForm Ne_b Ne_stable c t_b hNb hc0 hc1']
   have h_gap : 0 < driftLDEquilibrium Ne_b c - driftLDEquilibrium Ne_stable c := by
     have := driftLDEquilibrium_strictAnti Ne_b Ne_stable c hNb h_bottle hc hc1
     linarith
@@ -969,8 +968,7 @@ theorem bottleneck_reduces_portability_ratio
     (hNb : 1 ≤ Ne_b) (h_bottle : Ne_b < Ne_stable)
     (hc : 0 < c) (hc1 : c < 1)
     (ht : 0 < t_b)
-    (hfst : 0 ≤ fst) (hfst1 : fst < 1)
-    (h_pen_bound : bottleneckExcessLD Ne_b Ne_stable c t_b < 1 - fst) :
+    (hfst : 0 ≤ fst) (hfst1 : fst < 1) :
     R2_source * ((1 - fst) - bottleneckExcessLD Ne_b Ne_stable c t_b) <
     R2_source * (1 - fst) := by
   apply mul_lt_mul_of_pos_left _ hR2

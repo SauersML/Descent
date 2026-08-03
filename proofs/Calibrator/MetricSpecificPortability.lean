@@ -1254,8 +1254,10 @@ theorem metrics_both_degrade_under_drift
         (sourceMetricProfileFromSourceWeightsAtTargetPrevalence m).auc := by
     rw [targetMetricProfileFromSourceWeights_auc,
       sourceMetricProfileFromSourceWeightsAtTargetPrevalence_auc,
-      targetEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart,
-      sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart]
+      targetEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart
+        m h_target_r2_unit.2,
+      sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart
+        m h_source_r2_unit.2]
     exact equalVarianceGaussianAUCFromExplainedR2_strictMonoOn_unitInterval
       h_target_r2_unit h_source_r2_unit h_r2_drop
   have h_brier :
@@ -1870,9 +1872,7 @@ theorem clumping_minimizes_detection_on_ld_kernel
     (hr0 : 0 ≤ recomb) (hr1 : recomb ≤ 1) (hNe : 1 < Ne)
     (hM : IsRankAllocation (S.card : ℝ) M)
     (hin : ∀ i ∈ S, Real.cos cutAngle ≤ Real.cos (angle i))
-    (hout : ∀ i ∉ S, Real.cos (angle i) ≤ Real.cos cutAngle)
-    (htotal : 0 < spectralTotal (fun i ↦
-      detectionWeight (ldKernelSymbol (ldRetentionPerGen recomb Ne) (angle i)))) :
+    (hout : ∀ i ∉ S, Real.cos (angle i) ≤ Real.cos cutAngle) :
     detectionEfficiency
         (fun i ↦ ldKernelSymbol (ldRetentionPerGen recomb Ne) (angle i))
         (pruneAllocation S) ≤
@@ -1886,7 +1886,7 @@ theorem clumping_minimizes_detection_on_ld_kernel
     (fun i ↦ ldKernelSymbol (ldRetentionPerGen recomb Ne) (angle i)) M S
     (ldKernelSymbol (ldRetentionPerGen recomb Ne) cutAngle)
     (fun i ↦ ldKernelSymbol_pos habs) (ldKernelSymbol_pos habs)
-    hM ?_ ?_ htotal
+    hM ?_ ?_
   · intro i hi
     exact ldKernelSymbol_mono_in_cos habs hp0 (hin i hi)
   · intro i hi
@@ -1903,10 +1903,7 @@ theorem clumping_maximizes_reconstruction_on_ld_kernel
     (hr0 : 0 ≤ recomb) (hr1 : recomb ≤ 1) (hNe : 1 < Ne)
     (hM : IsRankAllocation (S.card : ℝ) M)
     (hin : ∀ i ∈ S, Real.cos cutAngle ≤ Real.cos (angle i))
-    (hout : ∀ i ∉ S, Real.cos (angle i) ≤ Real.cos cutAngle)
-    (htotal : 0 < spectralTotal (fun i ↦
-      reconstructionWeight
-        (ldKernelSymbol (ldRetentionPerGen recomb Ne) (angle i)))) :
+    (hout : ∀ i ∉ S, Real.cos (angle i) ≤ Real.cos cutAngle) :
     reconstructionEfficiency
         (fun i ↦ ldKernelSymbol (ldRetentionPerGen recomb Ne) (angle i)) M ≤
       reconstructionEfficiency
@@ -1919,7 +1916,7 @@ theorem clumping_maximizes_reconstruction_on_ld_kernel
   refine topVariance_maximizes_reconstruction
     (fun i ↦ ldKernelSymbol (ldRetentionPerGen recomb Ne) (angle i)) M S
     (ldKernelSymbol (ldRetentionPerGen recomb Ne) cutAngle)
-    (fun i ↦ ldKernelSymbol_pos habs) hM ?_ ?_ htotal
+    (fun i ↦ ldKernelSymbol_pos habs) hM ?_ ?_
   · intro i hi
     exact ldKernelSymbol_mono_in_cos habs hp0 (hin i hi)
   · intro i hi

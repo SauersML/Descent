@@ -223,7 +223,9 @@ noncomputable def SourceTaggedMoments.sigmaTagCausal {c t : ℕ}
   mom.directCausalSource + mom.proxyTaggingSource
 
 /-- Closed-form source best linear predictor weights:
-`w*_S = Σ_tag,S^{-1} Σ_tc,S β_c`. -/
+`w*_S = Σ_tag,S^{-1} Σ_tc,S β_c`.
+
+    Empirical status: UNTESTED. -/
 noncomputable def sourceBestLinearWeightsFromLD {c t : ℕ}
     (mom : SourceTaggedMoments c t) (betaCausal : CausalVec c) : TagVec t :=
   mom.sigmaTagSource⁻¹.mulVec (mom.sigmaTagCausal.mulVec betaCausal)
@@ -401,11 +403,15 @@ noncomputable def demographicCovarianceGapLowerBound
     (fstSource fstTarget recombRate arraySparsity kappa : ℝ) : ℝ :=
   kappa * taggingMismatchScale recombRate arraySparsity * (fstTarget - fstSource)
 
-private def twoLocusIdx0 {t : ℕ} [Fact (2 ≤ t)] : Fin t :=
-  ⟨0, lt_of_lt_of_le (by decide : 0 < 2) Fact.out⟩
+/-- The two linked loci need two distinct indices, so the block size must be at least two.
+That is carried as an ordinary explicit argument `ht : 2 ≤ t` rather than a `Fact` instance:
+the bound is a premise of every statement below, and instance syntax would hide it from
+their signatures. -/
+private def twoLocusIdx0 {t : ℕ} (ht : 2 ≤ t) : Fin t :=
+  ⟨0, lt_of_lt_of_le (by decide : 0 < 2) ht⟩
 
-private def twoLocusIdx1 {t : ℕ} [Fact (2 ≤ t)] : Fin t :=
-  ⟨1, lt_of_lt_of_le (by decide : 1 < 2) Fact.out⟩
+private def twoLocusIdx1 {t : ℕ} (ht : 2 ≤ t) : Fin t :=
+  ⟨1, lt_of_lt_of_le (by decide : 1 < 2) ht⟩
 
 /-- Survival of two linked loci to the MRCA under discrete recombination.
 
@@ -422,28 +428,30 @@ The diagonal is normalized to `1`; the linked pair `(0,1)` and `(1,0)` carries
 the covariance implied by the recombination-survival probability.
 
     Empirical status: UNTESTED. -/
-noncomputable def twoLocusCoalescentCovarianceMatrix {t : ℕ} [Fact (2 ≤ t)]
+noncomputable def twoLocusCoalescentCovarianceMatrix {t : ℕ} (ht : 2 ≤ t)
     (ibdWeight recombRate : ℝ) (tmrca : ℕ) : Matrix (Fin t) (Fin t) ℝ :=
   fun i j ↦
-    if i = twoLocusIdx0 ∧ j = twoLocusIdx1 then twoLocusIBDCovariance ibdWeight recombRate tmrca
-    else if i = twoLocusIdx1 ∧ j = twoLocusIdx0 then twoLocusIBDCovariance ibdWeight recombRate tmrca
+    if i = twoLocusIdx0 ht ∧ j = twoLocusIdx1 ht then
+      twoLocusIBDCovariance ibdWeight recombRate tmrca
+    else if i = twoLocusIdx1 ht ∧ j = twoLocusIdx0 ht then
+      twoLocusIBDCovariance ibdWeight recombRate tmrca
     else if i = j then 1 else 0
 
 private theorem twoLocusCoalescentCovarianceMatrix_diff_lower_bound
-    {t : ℕ} [Fact (2 ≤ t)]
+    {t : ℕ} (ht : 2 ≤ t)
     (ibdWeightS recombRateS : ℝ) (tmrcaS : ℕ)
     (ibdWeightT recombRateT : ℝ) (tmrcaT : ℕ) :
     2 *
         (twoLocusIBDCovariance ibdWeightS recombRateS tmrcaS -
           twoLocusIBDCovariance ibdWeightT recombRateT tmrcaT) ^ 2 ≤
       frobeniusNormSq
-        (twoLocusCoalescentCovarianceMatrix (t := t) ibdWeightS recombRateS tmrcaS -
-          twoLocusCoalescentCovarianceMatrix (t := t) ibdWeightT recombRateT tmrcaT) := by
-  let i0 : Fin t := twoLocusIdx0
-  let i1 : Fin t := twoLocusIdx1
+        (twoLocusCoalescentCovarianceMatrix ht ibdWeightS recombRateS tmrcaS -
+          twoLocusCoalescentCovarianceMatrix ht ibdWeightT recombRateT tmrcaT) := by
+  let i0 : Fin t := twoLocusIdx0 ht
+  let i1 : Fin t := twoLocusIdx1 ht
   let A :=
-    twoLocusCoalescentCovarianceMatrix (t := t) ibdWeightS recombRateS tmrcaS -
-      twoLocusCoalescentCovarianceMatrix (t := t) ibdWeightT recombRateT tmrcaT
+    twoLocusCoalescentCovarianceMatrix ht ibdWeightS recombRateS tmrcaS -
+      twoLocusCoalescentCovarianceMatrix ht ibdWeightT recombRateT tmrcaT
   have hi_ne : i0 ≠ i1 := by
     intro h
     have hval := congrArg Fin.val h
@@ -511,7 +519,7 @@ theorem twoLocusIBDCovariance_gap_eq
 The `N × N` matrix mismatch is therefore controlled by recombination and the MRCA time gap,
 not by an arbitrary covariance witness. -/
 theorem twoLocusCoalescent_covariance_gap_lower_bound
-    {t : ℕ} [Fact (2 ≤ t)]
+    {t : ℕ} (ht : 2 ≤ t)
     (ibdWeight recombRate : ℝ)
     (tSource tTarget : ℕ)
     (h_time : tSource ≤ tTarget) :
@@ -519,8 +527,8 @@ theorem twoLocusCoalescent_covariance_gap_lower_bound
         (ibdWeight * discreteRecombinationSurvival recombRate tSource *
           (1 - discreteRecombinationSurvival recombRate (tTarget - tSource))) ^ 2 ≤
       frobeniusNormSq
-        (twoLocusCoalescentCovarianceMatrix (t := t) ibdWeight recombRate tSource -
-          twoLocusCoalescentCovarianceMatrix (t := t) ibdWeight recombRate tTarget) := by
+        (twoLocusCoalescentCovarianceMatrix ht ibdWeight recombRate tSource -
+          twoLocusCoalescentCovarianceMatrix ht ibdWeight recombRate tTarget) := by
   have h_gap :
       twoLocusIBDCovariance ibdWeight recombRate tSource -
           twoLocusIBDCovariance ibdWeight recombRate tTarget =
@@ -532,11 +540,10 @@ theorem twoLocusCoalescent_covariance_gap_lower_bound
           (twoLocusIBDCovariance ibdWeight recombRate tSource -
             twoLocusIBDCovariance ibdWeight recombRate tTarget) ^ 2 ≤
         frobeniusNormSq
-          (twoLocusCoalescentCovarianceMatrix (t := t) ibdWeight recombRate tSource -
-            twoLocusCoalescentCovarianceMatrix (t := t) ibdWeight recombRate tTarget) := by
+          (twoLocusCoalescentCovarianceMatrix ht ibdWeight recombRate tSource -
+            twoLocusCoalescentCovarianceMatrix ht ibdWeight recombRate tTarget) := by
     simpa using
-      (twoLocusCoalescentCovarianceMatrix_diff_lower_bound
-        (t := t)
+      (twoLocusCoalescentCovarianceMatrix_diff_lower_bound ht
         ibdWeight recombRate tSource
         ibdWeight recombRate tTarget)
   rw [h_gap] at h_matrix
@@ -545,7 +552,7 @@ theorem twoLocusCoalescent_covariance_gap_lower_bound
 /-- Strict positivity of the covariance mismatch when the target population has a larger
 expected MRCA time and recombination is non-degenerate. -/
 theorem covariance_mismatch_pos_of_twoLocusCoalescent
-    {t : ℕ} [Fact (2 ≤ t)]
+    {t : ℕ} (ht : 2 ≤ t)
     (ibdWeight recombRate : ℝ)
     (tSource tTarget : ℕ)
     (h_ibd_pos : 0 < ibdWeight)
@@ -554,11 +561,11 @@ theorem covariance_mismatch_pos_of_twoLocusCoalescent
     (h_time : tSource < tTarget) :
     0 <
       frobeniusNormSq
-        (twoLocusCoalescentCovarianceMatrix (t := t) ibdWeight recombRate tSource -
-          twoLocusCoalescentCovarianceMatrix (t := t) ibdWeight recombRate tTarget) := by
+        (twoLocusCoalescentCovarianceMatrix ht ibdWeight recombRate tSource -
+          twoLocusCoalescentCovarianceMatrix ht ibdWeight recombRate tTarget) := by
   have h_gap_lb :=
     twoLocusCoalescent_covariance_gap_lower_bound
-      (t := t) ibdWeight recombRate tSource tTarget h_time.le
+      ht ibdWeight recombRate tSource tTarget h_time.le
   have h_base_nonneg : 0 ≤ 1 - recombRate := by linarith
   have h_base_pos : 0 < 1 - recombRate := by linarith
   have h_base_lt_one : 1 - recombRate < 1 := by linarith
@@ -595,15 +602,15 @@ theorem covariance_mismatch_pos_of_twoLocusCoalescent
 once source-trained ERM incurs target excess MSE proportional to covariance mismatch,
 an increase in expected MRCA time in the target population forces `R²_target < R²_source`. -/
 theorem target_r2_drop_of_twoLocusCoalescent
-    {t : ℕ} [Fact (2 ≤ t)]
+    {t : ℕ} (ht : 2 ≤ t)
     (mseSource mseTarget varY lam : ℝ)
     (ibdWeight recombRate : ℝ)
     (tSource tTarget : ℕ)
     (h_mse_gap_lb :
       lam *
           frobeniusNormSq
-            (twoLocusCoalescentCovarianceMatrix (t := t) ibdWeight recombRate tSource -
-              twoLocusCoalescentCovarianceMatrix (t := t) ibdWeight recombRate tTarget) ≤
+            (twoLocusCoalescentCovarianceMatrix ht ibdWeight recombRate tSource -
+              twoLocusCoalescentCovarianceMatrix ht ibdWeight recombRate tTarget) ≤
         mseTarget - mseSource)
     (h_lam_pos : 0 < lam)
     (h_varY_pos : 0 < varY)
@@ -615,15 +622,15 @@ theorem target_r2_drop_of_twoLocusCoalescent
   have h_mismatch :
       0 <
         frobeniusNormSq
-          (twoLocusCoalescentCovarianceMatrix (t := t) ibdWeight recombRate tSource -
-            twoLocusCoalescentCovarianceMatrix (t := t) ibdWeight recombRate tTarget) :=
+          (twoLocusCoalescentCovarianceMatrix ht ibdWeight recombRate tSource -
+            twoLocusCoalescentCovarianceMatrix ht ibdWeight recombRate tTarget) :=
     covariance_mismatch_pos_of_twoLocusCoalescent
-      (t := t) ibdWeight recombRate tSource tTarget
+      ht ibdWeight recombRate tSource tTarget
       h_ibd_pos h_recomb_pos h_recomb_lt_one h_time
   exact target_r2_strictly_decreases_of_covariance_mismatch
     mseSource mseTarget varY lam
-    (twoLocusCoalescentCovarianceMatrix (t := t) ibdWeight recombRate tSource)
-    (twoLocusCoalescentCovarianceMatrix (t := t) ibdWeight recombRate tTarget)
+    (twoLocusCoalescentCovarianceMatrix ht ibdWeight recombRate tSource)
+    (twoLocusCoalescentCovarianceMatrix ht ibdWeight recombRate tTarget)
     h_mse_gap_lb h_lam_pos h_mismatch h_varY_pos
 
 /-- If the demographic lower bound is available and strictly positive, covariance mismatch is strict. -/
@@ -1089,35 +1096,43 @@ noncomputable def PrevalenceDGP.toDGP {k : ℕ} (pdgp : PrevalenceDGP k) : DataG
     - Too low for ancestry groups with π(C) > π̄ (under-prediction)
 
     This is the mathematical basis for why mean-centering PGS across ancestries
-    produces biased risk estimates when disease prevalences differ. -/
+    produces biased risk estimates when disease prevalences differ.
+
+    **Both former hypotheses are gone, and the statement is stronger for it.**
+    `_h_pi_bar` pinned `π̄` to the training-distribution average of `π`; it was
+    already dead (note the underscore) and the identity holds for *any* centering
+    constant, which is the sharper reading — no choice of single intercept
+    escapes the residual `π(C) - π̄`.  `f_norm` plus `h_norm` was a free function
+    together with an equation defining it pointwise; since `h_norm` determines
+    `f_norm` at every argument, quantifying over such an `f_norm` says exactly
+    what naming the predictor inline says, while making the caller supply the
+    definition. -/
 theorem normalization_prevalence_bias {k : ℕ} [Fintype (Fin k)]
     (pdgp : PrevalenceDGP k)
-    (pi_bar : ℝ)
-    -- π̄ is the population-average prevalence under the training distribution
-    (_h_pi_bar : pi_bar = ∫ pc, pdgp.prevalence pc.2 ∂pdgp.jointMeasure)
-    -- The normalized predictor uses π̄ as its intercept (ignoring ancestry-specific π)
-    (f_norm : ℝ → (Fin k → ℝ) → ℝ)
-    (h_norm : ∀ p c, f_norm p c = pi_bar + pdgp.pgs_effect * p) :
-    ∀ p c, prevalenceDGP_trueExpectation pdgp p c - f_norm p c =
+    (pi_bar : ℝ) :
+    ∀ p c, prevalenceDGP_trueExpectation pdgp p c -
+        (pi_bar + pdgp.pgs_effect * p) =
       pdgp.prevalence c - pi_bar := by
   intro p c
-  simp [prevalenceDGP_trueExpectation, h_norm]
+  unfold prevalenceDGP_trueExpectation
+  ring
 
 /-- Corollary: The MSE of the normalized predictor decomposes into a pure
     prevalence-mismatch term. If π is constant across ancestries, normalization
-    incurs zero bias. Otherwise, the bias equals Var(π(C)) under the measure. -/
+    incurs zero bias. Otherwise, the bias equals Var(π(C)) under the measure.
+
+    Stated for an arbitrary intercept `π̄` for the same reason as
+    `normalization_prevalence_bias`: nothing in the proof used the assumption
+    that `π̄` was the training-distribution average. -/
 theorem normalization_prevalence_mse {k : ℕ} [Fintype (Fin k)]
     (pdgp : PrevalenceDGP k)
-    (pi_bar : ℝ)
-    (h_pi_bar : pi_bar = ∫ pc, pdgp.prevalence pc.2 ∂pdgp.jointMeasure)
-    (f_norm : ℝ → (Fin k → ℝ) → ℝ)
-    (h_norm : ∀ p c, f_norm p c = pi_bar + pdgp.pgs_effect * p) :
-    mseRisk pdgp.toDGP f_norm =
+    (pi_bar : ℝ) :
+    mseRisk pdgp.toDGP (fun p _ ↦ pi_bar + pdgp.pgs_effect * p) =
       ∫ pc, (pdgp.prevalence pc.2 - pi_bar)^2 ∂pdgp.jointMeasure := by
   unfold mseRisk PrevalenceDGP.toDGP
   simp only
   congr 1; ext pc
-  rw [normalization_prevalence_bias pdgp pi_bar h_pi_bar f_norm h_norm]
+  rw [normalization_prevalence_bias pdgp pi_bar pc.1 pc.2]
 
 /-- **No-bias condition**: If prevalence is constant across ancestries (π(c) = π₀ for all c),
     then normalization introduces zero bias. This characterizes when normalization is safe. -/
@@ -1910,6 +1925,17 @@ theorem fstEquilibrium_pos (p : EvolutionaryParameters) :
   apply div_pos one_pos
   linarith [p.theta_nonneg, p.bigM_nonneg]
 
+/-- **Full equilibrium Fst never exceeds one**, unconditionally.  `θ` and `M`
+are nonnegative by construction, so the denominator `1 + θ + M` is at least one
+and the reciprocal is at most one.  No force needs to be present: the no-flow
+boundary `θ = M = 0` attains the value `1` rather than exceeding it. -/
+theorem fstEquilibrium_le_one (p : EvolutionaryParameters) :
+    fstEquilibrium p ≤ 1 := by
+  unfold fstEquilibrium
+  rw [div_le_one (by linarith [p.theta_nonneg, p.bigM_nonneg] :
+    (0 : ℝ) < 1 + p.theta + p.bigM)]
+  linarith [p.theta_nonneg, p.bigM_nonneg]
+
 /-- Full equilibrium Fst < 1 when either θ > 0 or M > 0. -/
 theorem fstEquilibrium_lt_one (p : EvolutionaryParameters)
     (h : 0 < p.theta + p.bigM) :
@@ -2063,15 +2089,18 @@ noncomputable def EvolutionaryParameters.coordinateSummary
     p.coordinateSummary.migrationCoordinate = migrationLDBoost p := by
   rfl
 
-/-- The allele-frequency coordinate is nonnegative when mutation and
-migration keep equilibrium `F_ST` below one. -/
+/-- The allele-frequency coordinate is nonnegative, unconditionally.
+
+This used to carry `0 < θ + M` and route through `fstEquilibrium_lt_one`, which
+is the strict bound and needs a force present.  Nonnegativity only needs the
+non-strict `fstEquilibrium_le_one`, which holds at the no-flow boundary too, so
+the hypothesis was never a restriction on the statement — it was a restriction
+on the proof that had been pushed onto the caller. -/
 theorem EvolutionaryParameters.coordinateSummary_alleleFreqCoordinate_nonneg
-    (p : EvolutionaryParameters) (h_forces : 0 < p.theta + p.bigM) :
+    (p : EvolutionaryParameters) :
     0 ≤ p.coordinateSummary.alleleFreqCoordinate := by
   rw [EvolutionaryParameters.coordinateSummary_alleleFreqCoordinate]
-  have h_fst_lt := fstEquilibrium_lt_one p h_forces
-  have h_fst_pos := fstEquilibrium_pos p
-  linarith
+  linarith [fstEquilibrium_le_one p]
 
 /-- The shared-LD coordinate is strictly positive. -/
 theorem EvolutionaryParameters.coordinateSummary_sharedLDCoordinate_pos

@@ -197,14 +197,16 @@ noncomputable def standardErrorSq (n : ℕ) (p r2_ld : ℝ) : ℝ :=
 
 /-- **NCP from the Wald test.**
     NCP = (β / SE)² = β² / SE² = β² × I_eff = β² × n_eff.
-    This is derived, not assumed: it follows from SE² = 1/I_eff. -/
-theorem ncp_from_wald_test (n : ℕ) (p r2_ld β : ℝ)
-    (h_info_pos : 0 < effectiveFisherInformation n p r2_ld) :
+    This is derived, not assumed: it follows from SE² = 1/I_eff. No positivity of the
+    information is needed -- at `I_eff = 0` both sides are `0` under Lean's junk-value
+    convention for division -- so the identity holds for every `n`, `p`, `r2_ld`. -/
+theorem ncp_from_wald_test (n : ℕ) (p r2_ld β : ℝ) :
     β ^ 2 / standardErrorSq n p r2_ld =
       β ^ 2 * effectiveFisherInformation n p r2_ld := by
   unfold standardErrorSq
-  have h_ne : effectiveFisherInformation n p r2_ld ≠ 0 := ne_of_gt h_info_pos
-  field_simp
+  rcases eq_or_ne (effectiveFisherInformation n p r2_ld) 0 with h_zero | h_ne
+  · simp [h_zero]
+  · field_simp
 
 /-- **NCP equals n_eff × β², linking Fisher information to the test statistic.**
     Combines the Wald test derivation with the effective sample size formula. -/

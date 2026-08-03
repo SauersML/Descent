@@ -262,7 +262,9 @@ theorem AssortativeMatingModel.variance_inflation_factor (m : AssortativeMatingM
 /-- **AM-induced LD between loci i and j.**
     Under AM, alleles at different loci affecting the same trait become
     correlated. The equilibrium LD is proportional to the product of
-    effect sizes: D_ij = beta_i * beta_j * r * h2 / (1 - r*h2). -/
+    effect sizes: D_ij = beta_i * beta_j * r * h2 / (1 - r*h2).
+
+    Empirical status: UNTESTED. -/
 noncomputable def amInducedLD (beta_i beta_j r h2 : ℝ) : ℝ :=
   beta_i * beta_j * r * h2 / (1 - r * h2)
 

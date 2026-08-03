@@ -495,10 +495,11 @@ theorem target_metric_profile_auc_uses_explicit_target_moments {p q : ℕ}
 explicit target explained-signal and total-variance decomposition. This is a
 derived chart identity, not the definition of transported AUC. -/
 theorem target_liability_auc_eq_explainedR2_chart {p q : ℕ}
-    (m : CrossPopulationMetricModel p q) :
+    (m : CrossPopulationMetricModel p q)
+    (h_r2 : r2FromSourceWeights m Pop.target < 1) :
     equalVarianceGaussianAUCFromSourceWeights m Pop.target =
       equalVarianceGaussianAUCFromExplainedR2 (r2FromSourceWeights m Pop.target) := by
-  simpa using targetEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart m
+  simpa using targetEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart m h_r2
 
 /-- When target LD among scored SNPs changes, the deployed liability-threshold
 AUC changes because the explicit target score moments, and therefore the
@@ -508,8 +509,10 @@ theorem target_ld_shift_changes_liability_auc :
       equalVarianceGaussianAUCFromSourceWeights baselineMetricModel Pop.target := by
   rcases target_ld_shift_changes_portability_without_changing_source_r2 with
     ⟨_, _, h_target_shift, h_target_base, _⟩
-  rw [target_liability_auc_eq_explainedR2_chart,
-    target_liability_auc_eq_explainedR2_chart,
+  rw [target_liability_auc_eq_explainedR2_chart _ (by simpa [h_target_shift] using
+      (show (1 / 6 : ℝ) < 1 by norm_num)),
+    target_liability_auc_eq_explainedR2_chart _ (by simpa [h_target_base] using
+      (show (1 / 2 : ℝ) < 1 by norm_num)),
     h_target_shift, h_target_base]
   exact equalVarianceGaussianAUCFromExplainedR2_strictMonoOn_unitInterval
     ⟨by norm_num, by norm_num⟩

@@ -393,6 +393,20 @@ theorem captureRatio_le_of_le {a b c : ℝ} (h : a ≤ b) (hc : 0 < c) :
   rw [div_eq_mul_inv, div_eq_mul_inv]
   exact mul_le_mul_of_nonneg_right h (le_of_lt (inv_pos.mpr hc))
 
+/-- A profile of nonnegative weights has nonnegative total.
+
+This is what replaces the caller-supplied positivity of the efficiency
+denominator in `topVariance_maximizes_reconstruction` and
+`topVariance_minimizes_detection`: on a positive spectrum the total is never
+negative, and in the degenerate case where it vanishes — only possible when `ι`
+is empty — both efficiencies are `0` by `div_zero`, so the comparison holds
+anyway.  The positivity of the denominator was never a restriction on the
+inputs, so it should not have been a premise. -/
+theorem spectralTotal_nonneg {w : ι → ℝ} (hw : ∀ i, 0 ≤ w i) :
+    0 ≤ spectralTotal w := by
+  unfold spectralTotal
+  exact Finset.sum_nonneg (fun i _ ↦ hw i)
+
 theorem spectralCapture_pruneAllocation (w : ι → ℝ) (S : Finset ι) :
     spectralCapture w (pruneAllocation S) = ∑ i ∈ S, w i := by
   have hzero : ∀ i, i ∉ S → pruneAllocation S i * w i = 0 := by
@@ -553,8 +567,7 @@ theorem topVariance_maximizes_reconstruction
     (hpos : ∀ i, 0 < spectrum i)
     (hM : IsRankAllocation (S.card : ℝ) M)
     (hin : ∀ i ∈ S, t ≤ spectrum i)
-    (hout : ∀ i ∉ S, spectrum i ≤ t)
-    (htotal : 0 < spectralTotal (fun i ↦ reconstructionWeight (spectrum i))) :
+    (hout : ∀ i ∉ S, spectrum i ≤ t) :
     reconstructionEfficiency spectrum M ≤
       reconstructionEfficiency spectrum (pruneAllocation S) := by
   have hin' : ∀ i ∈ S, t ≤ reconstructionWeight (spectrum i) := by
@@ -571,7 +584,13 @@ theorem topVariance_maximizes_reconstruction
     rw [spectralCapture_pruneAllocation]
     exact spectralCapture_le_of_threshold
       (fun i ↦ reconstructionWeight (spectrum i)) M S t hM hin' hout'
-  exact captureRatio_le_of_le hcap htotal
+  have hnonneg : 0 ≤ spectralTotal (fun i ↦ reconstructionWeight (spectrum i)) :=
+    spectralTotal_nonneg (fun i ↦ le_of_lt (hpos i))
+  unfold reconstructionEfficiency
+  rcases eq_or_lt_of_le hnonneg with hzero | htotal
+  · rw [← hzero]
+    simp
+  · exact captureRatio_le_of_le hcap htotal
 
 /-- **Variance-greedy reduction minimises detection efficiency.**
 
@@ -589,8 +608,7 @@ theorem topVariance_minimizes_detection
     (hpos : ∀ i, 0 < spectrum i) (ht : 0 < t)
     (hM : IsRankAllocation (S.card : ℝ) M)
     (hin : ∀ i ∈ S, t ≤ spectrum i)
-    (hout : ∀ i ∉ S, spectrum i ≤ t)
-    (htotal : 0 < spectralTotal (fun i ↦ detectionWeight (spectrum i))) :
+    (hout : ∀ i ∉ S, spectrum i ≤ t) :
     detectionEfficiency spectrum (pruneAllocation S) ≤
       detectionEfficiency spectrum M := by
   obtain ⟨hlow, hhigh⟩ :=
@@ -601,7 +619,13 @@ theorem topVariance_minimizes_detection
     rw [spectralCapture_pruneAllocation]
     exact spectralCapture_ge_of_threshold
       (fun i ↦ detectionWeight (spectrum i)) M S (detectionWeight t) hM hlow hhigh
-  exact captureRatio_le_of_le hcap htotal
+  have hnonneg : 0 ≤ spectralTotal (fun i ↦ detectionWeight (spectrum i)) :=
+    spectralTotal_nonneg (fun i ↦ le_of_lt (inv_pos.mpr (hpos i)))
+  unfold detectionEfficiency
+  rcases eq_or_lt_of_le hnonneg with hzero | htotal
+  · rw [← hzero]
+    simp
+  · exact captureRatio_le_of_le hcap htotal
 
 /-!
 ### The frontier itself
@@ -758,11 +782,12 @@ is a set of `k` indices, no more and no fewer, separated from its complement by
 a cut value.
 
 This is the one ingredient the frontier packaging needs beyond what is proved
-here, and it is carried as a named hypothesis rather than discharged, so that
-every consumer states its dependence on it.  It is not an empirical assumption
-and not an external input: it holds for every score on a finite type, by sorting
-the values and cutting at rank `k`.  It is a hypothesis here only because that
-sorting argument is not written.
+here.  It is not an empirical assumption and not an external input: it holds for
+every score on a finite type, by sorting the values and cutting at rank `k`.
+That sorting argument is not written, so the general statement is admitted in
+`hasThresholdSetAtEveryRank_of_fintype` below and the admission is visible to
+`AxiomScan` as a `sorryAx`.  It used to be a premise of
+`exists_split_attaining_scalarized_optimum`, which made the same debt invisible.
 
 What is proved without it: every threshold set is a scalarised optimum
 (`scalarized_optimum_is_coordinate_split`), so every supporting line of the
@@ -779,39 +804,51 @@ def HasThresholdSetAtEveryRank (score : ι → ℝ) : Prop :=
     ∃ (S : Finset ι) (t : ℝ), S.card = k ∧
       (∀ i ∈ S, t ≤ score i) ∧ (∀ i ∉ S, score i ≤ t)
 
-/-- Constant scores have a threshold set at every rank, so the hypothesis class
-    is inhabited and the frontier theorem is not vacuous.
-
-    This deliberately does NOT prove the general claim the docstring above
-    describes -- that every score on a finite type has threshold sets at every
-    rank, by sorting and cutting at rank `k`. That statement is true and its
-    proof is simply not written here, which is why it remains a hypothesis. A
-    constant score is the degenerate case where every subset of the right size
-    works and the cut is at the common value.
-
-    The distinction matters for reading the results downstream: they are not
-    known to be about arbitrary scores. Replacing this with the general lemma
-    would let the hypothesis be discharged at every call site, and that is the
-    improvement to make, not a wider-looking witness here. -/
+/-- Constant scores have a threshold set at every rank.  This is the
+`sorry`-free instance of `HasThresholdSetAtEveryRank`: the degenerate case where
+every subset of the right size works and the cut is at the common value.  It is
+kept alongside the admitted general statement
+`hasThresholdSetAtEveryRank_of_fintype` so that at least one member of the class
+is exhibited by a complete proof. -/
 theorem hasThresholdSetAtEveryRank_const (c : ℝ) :
     HasThresholdSetAtEveryRank (fun _ : ι ↦ c) := by
   intro k hk
   obtain ⟨S, -, hS⟩ :=
-    Finset.exists_smaller_set (Finset.univ : Finset ι) k (by simpa [Finset.card_univ] using hk)
+    Finset.exists_subset_card_eq
+      (s := (Finset.univ : Finset ι)) (n := k) (by simpa [Finset.card_univ] using hk)
   exact ⟨S, c, hS, fun _ _ ↦ le_rfl, fun _ _ ↦ le_rfl⟩
+
+/-- **Every score on a finite type has a threshold set at every rank.**
+
+ADMITTED (`sorry`).  What is admitted is exactly this: for a score `score : ι →
+ℝ` on a `Fintype` and every `k ≤ Fintype.card ι`, there is a set `S` with
+`S.card = k` and a cut value `t` with `score ≥ t` on `S` and `score ≤ t` off it.
+The proof is to sort the values of `score` in decreasing order and cut after the
+`k`-th; it is a finite-combinatorial fact with no analytic content and no
+empirical content, and it is unwritten only because the sorting bookkeeping is.
+
+This used to be a hypothesis `hsplit` on
+`exists_split_attaining_scalarized_optimum`, i.e. an assumption about a
+predicate this file itself defines, handed in by callers.  As a `sorry` it is
+reported by `AxiomScan`; as a premise nothing reported it at all. -/
+theorem hasThresholdSetAtEveryRank_of_fintype (score : ι → ℝ) :
+    HasThresholdSetAtEveryRank score := by
+  sorry
 
 /-- **The frontier is carried by coordinate splits of the prescribed rank.**
 
-Under the named threshold hypothesis, for every pair of task priorities there is
-a single set of exactly `k` retained directions whose scalarised value is at
-least that of *every* relaxed rank-`k` allocation.  Combined with convexity of
-the achievable region this is the statement that the Pareto frontier is the
-concave envelope of the coordinate-split values. -/
+For every pair of task priorities there is a single set of exactly `k` retained
+directions whose scalarised value is at least that of *every* relaxed rank-`k`
+allocation.  Combined with convexity of the achievable region this is the
+statement that the Pareto frontier is the concave envelope of the
+coordinate-split values.
+
+The existence of the threshold set is supplied by
+`hasThresholdSetAtEveryRank_of_fintype`, which is admitted; this theorem
+therefore depends on `sorryAx`, and that dependence is the honest form of what
+used to be an `hsplit` premise. -/
 theorem exists_split_attaining_scalarized_optimum
-    (spectrum : ι → ℝ) (k : ℕ) (lam mu : ℝ) (hk : k ≤ Fintype.card ι)
-    (hsplit : HasThresholdSetAtEveryRank
-      (fun i ↦ lam * reconstructionWeight (spectrum i) +
-        mu * detectionWeight (spectrum i))) :
+    (spectrum : ι → ℝ) (k : ℕ) (lam mu : ℝ) (hk : k ≤ Fintype.card ι) :
     ∃ S : Finset ι, S.card = k ∧
       ∀ M : ι → ℝ, IsRankAllocation (k : ℝ) M →
         lam * spectralCapture (fun i ↦ reconstructionWeight (spectrum i)) M +
@@ -820,7 +857,10 @@ theorem exists_split_attaining_scalarized_optimum
               (pruneAllocation S) +
             mu * spectralCapture (fun i ↦ detectionWeight (spectrum i))
               (pruneAllocation S) := by
-  obtain ⟨S, t, hcard, hin, hout⟩ := hsplit k hk
+  obtain ⟨S, t, hcard, hin, hout⟩ :=
+    hasThresholdSetAtEveryRank_of_fintype
+      (fun i ↦ lam * reconstructionWeight (spectrum i) +
+        mu * detectionWeight (spectrum i)) k hk
   refine ⟨S, hcard, ?_⟩
   intro M hM
   have hM' : IsRankAllocation (S.card : ℝ) M := by

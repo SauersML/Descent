@@ -97,6 +97,25 @@ noncomputable def LiabilityThresholdModel.witness : LiabilityThresholdModel wher
   prev_lt_one := by norm_num
   case_mean_pos := by norm_num
 
+/-- **Residual variance is positive on [0,1].**
+    The residual variance σ²_resid = h²(1 − R²) + (1 − h²) is strictly positive
+    for R² ∈ [0, 1] and h² ∈ (0, 1), since (1 − h²) > 0. -/
+theorem residualVariance_pos (m : LiabilityThresholdModel)
+    (R2 : ℝ) (hR2 : 0 ≤ R2) (hR2' : R2 ≤ 1) :
+    0 < m.h_sq * (1 - R2) + (1 - m.h_sq) := by
+  have h1 : 0 ≤ m.h_sq * (1 - R2) :=
+    mul_nonneg (le_of_lt m.h_sq_pos) (by linarith)
+  have h2 : 0 < 1 - m.h_sq := by linarith [m.h_sq_lt_one]
+  linarith
+
+/-- **Corollary: σ_resid = √(residual variance) is positive on [0,1].**
+    This is what makes the residual-positivity side condition of every
+    monotonicity theorem below a derived fact rather than a hypothesis. -/
+theorem sigmaResid_pos (m : LiabilityThresholdModel)
+    (R2 : ℝ) (hR2 : 0 ≤ R2) (hR2' : R2 ≤ 1) :
+    0 < Real.sqrt (m.h_sq * (1 - R2) + (1 - m.h_sq)) :=
+  Real.sqrt_pos_of_pos (residualVariance_pos m R2 hR2 hR2')
+
 /-- **Liability sensitivity.**
     Under the liability threshold model, the sensitivity of a PGS-based
     classifier at classification threshold `T'` is:
@@ -157,13 +176,11 @@ noncomputable def liabilitySpecificity
     We state this as: for R₁ < R₂ (both in [0,1]), the z-score at R₂ exceeds
     that at R₁. The formal proof uses monotonicity of √· and positivity of
     the model parameters. -/
-theorem liabilitySensitivity_zScore_monotone_in_R
+theorem liabilitySensitivity_zScore_monotone_in_R_of_threshold_le
     (m : LiabilityThresholdModel) (T' : ℝ)
     (R₁ R₂ : ℝ) (hR₁ : 0 ≤ R₁) (hR₂ : R₂ ≤ 1)
     (hR : R₁ < R₂)
     (hR2₁ : 0 ≤ R₁ ^ 2) (hR2₂ : R₂ ^ 2 ≤ 1)
-    -- σ_resid is positive at R₂ (the tighter bound)
-    (h_σ_pos : 0 < Real.sqrt (m.h_sq * (1 - R₂ ^ 2) + (1 - m.h_sq)))
     -- The z-score numerator is nonneg at the lower R value.
     -- This is the clinically relevant regime: the PGS classification
     -- threshold T' is at or below the expected PGS among cases at R₁.
@@ -178,6 +195,9 @@ theorem liabilitySensitivity_zScore_monotone_in_R
   --   num₁ · σ₂ ≤ num₁ · σ₁ < num₂ · σ₁
   -- giving num₁ · σ₂ < num₂ · σ₁, hence num₁/σ₁ < num₂/σ₂.
   simp only
+  -- σ_resid at R₂ is positive: derived, not assumed.
+  have h_σ_pos : 0 < Real.sqrt (m.h_sq * (1 - R₂ ^ 2) + (1 - m.h_sq)) :=
+    sigmaResid_pos m (R₂ ^ 2) (sq_nonneg R₂) hR2₂
   -- Establish σ₁ > 0
   have h_rv₁_pos : 0 < m.h_sq * (1 - R₁ ^ 2) + (1 - m.h_sq) := by
     have : R₁ ^ 2 ≤ R₂ ^ 2 := by nlinarith
@@ -224,15 +244,13 @@ theorem liabilitySensitivity_zScore_monotone_in_R
     The proof structure:
     1. `Φ` is strictly monotone (standard normal CDF property from Mathlib)
     2. The z-score `(R·h·μ_case − T') / σ_resid` is monotone in R²
-       (from `liabilitySensitivity_zScore_monotone_in_R`)
+       (from `liabilitySensitivity_zScore_monotone_in_R_of_threshold_le`)
     3. Composition of monotone functions is monotone -/
-theorem liabilitySensitivity_monotone_in_R2
+theorem liabilitySensitivity_monotone_in_R2_of_threshold_le
     (Φ : ℝ → ℝ) (m : LiabilityThresholdModel) (T' : ℝ)
     (hΦ_mono : StrictMono Φ)
     (R2₁ R2₂ : ℝ) (hR2₁ : 0 ≤ R2₁) (hR2₂ : R2₂ ≤ 1)
     (hR2 : R2₁ < R2₂)
-    -- σ_resid remains positive throughout the range
-    (h_σ_pos : 0 < Real.sqrt (m.h_sq * (1 - R2₂) + (1 - m.h_sq)))
     -- The z-score numerator is nonneg at the lower R² value (clinically
     -- relevant regime: classification threshold T' ≤ expected PGS among cases).
     (h_num_nonneg : 0 ≤ Real.sqrt R2₁ * Real.sqrt m.h_sq * m.case_mean - T') :
@@ -243,7 +261,11 @@ theorem liabilitySensitivity_monotone_in_R2
   apply hΦ_mono
   -- Reduce to the z-score monotonicity in R.
   -- We need: (√R2₁ · h · μ - T') / σ₁ < (√R2₂ · h · μ - T') / σ₂
-  -- with the same structure as liabilitySensitivity_zScore_monotone_in_R.
+  -- with the same structure as
+  -- liabilitySensitivity_zScore_monotone_in_R_of_threshold_le.
+  -- σ₂ > 0: derived from the model, not assumed.
+  have h_σ_pos : 0 < Real.sqrt (m.h_sq * (1 - R2₂) + (1 - m.h_sq)) :=
+    sigmaResid_pos m R2₂ (le_of_lt (lt_of_le_of_lt hR2₁ hR2)) hR2₂
   -- σ₁ > 0
   have h_σ₁_pos : 0 < Real.sqrt (m.h_sq * (1 - R2₁) + (1 - m.h_sq)) := by
     apply Real.sqrt_pos_of_pos
@@ -281,13 +303,12 @@ theorem liabilitySensitivity_monotone_in_R2
     Since μ_control < 0 (controls have below-average liability),
     −R·h·μ_control > 0 and increases with R, and σ_resid decreases,
     so the z-score increases → Φ(z) increases. -/
-theorem liabilitySpecificity_monotone_in_R2
+theorem liabilitySpecificity_monotone_in_R2_of_threshold_le
     (Φ : ℝ → ℝ) (m : LiabilityThresholdModel) (T' μ_control : ℝ)
     (hΦ_mono : StrictMono Φ)
     (hμ_control_neg : μ_control < 0)
     (R2₁ R2₂ : ℝ) (hR2₁ : 0 ≤ R2₁) (hR2₂ : R2₂ ≤ 1)
     (hR2 : R2₁ < R2₂)
-    (h_σ_pos : 0 < Real.sqrt (m.h_sq * (1 - R2₂) + (1 - m.h_sq)))
     -- The specificity z-score numerator is nonneg at R2₁.
     -- Since μ_control < 0, the term -R·h·μ_control ≥ 0, so this holds
     -- whenever T' ≥ 0 (which is the standard clinical regime).
@@ -300,6 +321,9 @@ theorem liabilitySpecificity_monotone_in_R2
   -- The numerator T' - R·h·μ_control increases with R (since h > 0, μ_control < 0,
   -- so -h·μ_control > 0 and the numerator grows with R).
   -- The denominator σ_resid decreases with R². Same cross-multiply argument.
+  -- σ₂ > 0: derived from the model, not assumed.
+  have h_σ_pos : 0 < Real.sqrt (m.h_sq * (1 - R2₂) + (1 - m.h_sq)) :=
+    sigmaResid_pos m R2₂ (le_of_lt (lt_of_le_of_lt hR2₁ hR2)) hR2₂
   -- σ₁ > 0
   have h_σ₁_pos : 0 < Real.sqrt (m.h_sq * (1 - R2₁) + (1 - m.h_sq)) := by
     apply Real.sqrt_pos_of_pos
@@ -344,9 +368,6 @@ theorem liabilitySpecificity_monotone_in_R2
 theorem liability_model_provides_sensitivityCurve
     (Φ : ℝ → ℝ) (m : LiabilityThresholdModel) (T' : ℝ)
     (hΦ_mono : StrictMono Φ)
-    -- Residual variance stays positive across [0,1]
-    (h_σ_pos : ∀ R2, 0 ≤ R2 → R2 ≤ 1 →
-      0 < Real.sqrt (m.h_sq * (1 - R2) + (1 - m.h_sq)))
     -- Classification threshold is in the clinically relevant regime:
     -- T' ≤ expected PGS among cases even at R² = 0 (i.e., T' ≤ 0).
     -- This ensures the z-score numerator is nonneg throughout [0,1].
@@ -354,8 +375,8 @@ theorem liability_model_provides_sensitivityCurve
       0 ≤ Real.sqrt R2 * Real.sqrt m.h_sq * m.case_mean - T') :
     StrictMonoOn (fun R2 ↦ liabilitySensitivity Φ m R2 T') (Set.Icc 0 1) := by
   intro R2₁ hR2₁ R2₂ hR2₂ hlt
-  exact liabilitySensitivity_monotone_in_R2 Φ m T' hΦ_mono R2₁ R2₂
-    hR2₁.1 hR2₂.2 hlt (h_σ_pos R2₂ hR2₂.1 hR2₂.2)
+  exact liabilitySensitivity_monotone_in_R2_of_threshold_le Φ m T' hΦ_mono R2₁ R2₂
+    hR2₁.1 hR2₂.2 hlt
     (h_T' R2₁ hR2₁.1 (le_trans (le_of_lt hlt) hR2₂.2))
 
 /-- **Derived monotone specificity curve.**
@@ -365,34 +386,15 @@ theorem liability_model_provides_specificityCurve
     (Φ : ℝ → ℝ) (m : LiabilityThresholdModel) (T' μ_control : ℝ)
     (hΦ_mono : StrictMono Φ)
     (hμ_control_neg : μ_control < 0)
-    (h_σ_pos : ∀ R2, 0 ≤ R2 → R2 ≤ 1 →
-      0 < Real.sqrt (m.h_sq * (1 - R2) + (1 - m.h_sq)))
     -- The specificity z-score numerator is nonneg across [0,1].
     -- Since μ_control < 0, this holds whenever T' ≥ 0.
     (h_T' : ∀ R2, 0 ≤ R2 → R2 ≤ 1 →
       0 ≤ T' - Real.sqrt R2 * Real.sqrt m.h_sq * μ_control) :
     StrictMonoOn (fun R2 ↦ liabilitySpecificity Φ m R2 T' μ_control) (Set.Icc 0 1) := by
   intro R2₁ hR2₁ R2₂ hR2₂ hlt
-  exact liabilitySpecificity_monotone_in_R2 Φ m T' μ_control hΦ_mono hμ_control_neg R2₁ R2₂
-    hR2₁.1 hR2₂.2 hlt (h_σ_pos R2₂ hR2₂.1 hR2₂.2)
+  exact liabilitySpecificity_monotone_in_R2_of_threshold_le Φ m T' μ_control hΦ_mono
+    hμ_control_neg R2₁ R2₂ hR2₁.1 hR2₂.2 hlt
     (h_T' R2₁ hR2₁.1 (le_trans (le_of_lt hlt) hR2₂.2))
-
-/-- **Residual variance is positive on [0,1].**
-    The residual variance σ²_resid = h²(1 − R²) + (1 − h²) is strictly positive
-    for R² ∈ [0, 1] and h² ∈ (0, 1), since (1 − h²) > 0. -/
-theorem residualVariance_pos (m : LiabilityThresholdModel)
-    (R2 : ℝ) (hR2 : 0 ≤ R2) (hR2' : R2 ≤ 1) :
-    0 < m.h_sq * (1 - R2) + (1 - m.h_sq) := by
-  have h1 : 0 ≤ m.h_sq * (1 - R2) :=
-    mul_nonneg (le_of_lt m.h_sq_pos) (by linarith)
-  have h2 : 0 < 1 - m.h_sq := by linarith [m.h_sq_lt_one]
-  linarith
-
-/-- **Corollary: σ_resid = √(residual variance) is positive on [0,1].** -/
-theorem sigmaResid_pos (m : LiabilityThresholdModel)
-    (R2 : ℝ) (hR2 : 0 ≤ R2) (hR2' : R2 ≤ 1) :
-    0 < Real.sqrt (m.h_sq * (1 - R2) + (1 - m.h_sq)) :=
-  Real.sqrt_pos_of_pos (residualVariance_pos m R2 hR2 hR2')
 
 end LiabilityThresholdModel
 
@@ -438,20 +440,19 @@ noncomputable def specFromR2
 
 /-- Exact liability-threshold sensitivity is strictly increasing in `R²`
     on `[0,1]` under the clinically relevant threshold regime. -/
-theorem sensFromR2_strictMono
+theorem sensFromR2_strictMono_of_threshold_le
     (m : LiabilityThresholdModel) (T' R2₁ R2₂ : ℝ)
     (hR2₁ : 0 ≤ R2₁) (hR2₂ : R2₂ ≤ 1)
     (hR2 : R2₁ < R2₂)
     (h_num_nonneg : 0 ≤ Real.sqrt R2₁ * Real.sqrt m.h_sq * m.case_mean - T') :
     sensFromR2 m R2₁ T' < sensFromR2 m R2₂ T' := by
   unfold sensFromR2
-  exact liabilitySensitivity_monotone_in_R2 Phi m T' strictMono_Phi
-    R2₁ R2₂ hR2₁ hR2₂ hR2 (sigmaResid_pos m R2₂ (le_trans hR2₁ (le_of_lt hR2)) hR2₂)
-    h_num_nonneg
+  exact liabilitySensitivity_monotone_in_R2_of_threshold_le Phi m T' strictMono_Phi
+    R2₁ R2₂ hR2₁ hR2₂ hR2 h_num_nonneg
 
 /-- Exact liability-threshold specificity is strictly increasing in `R²`
     on `[0,1]` under the clinically relevant threshold regime. -/
-theorem specFromR2_strictMono
+theorem specFromR2_strictMono_of_threshold_le
     (m : LiabilityThresholdModel) (T' μ_control R2₁ R2₂ : ℝ)
     (hμ_control_neg : μ_control < 0)
     (hR2₁ : 0 ≤ R2₁) (hR2₂ : R2₂ ≤ 1)
@@ -459,10 +460,8 @@ theorem specFromR2_strictMono
     (h_num_nonneg : 0 ≤ T' - Real.sqrt R2₁ * Real.sqrt m.h_sq * μ_control) :
     specFromR2 m R2₁ T' μ_control < specFromR2 m R2₂ T' μ_control := by
   unfold specFromR2
-  exact liabilitySpecificity_monotone_in_R2 Phi m T' μ_control strictMono_Phi hμ_control_neg
-    R2₁ R2₂ hR2₁ hR2₂ hR2
-    (sigmaResid_pos m R2₂ (le_trans hR2₁ (le_of_lt hR2)) hR2₂)
-    h_num_nonneg
+  exact liabilitySpecificity_monotone_in_R2_of_threshold_le Phi m T' μ_control strictMono_Phi
+    hμ_control_neg R2₁ R2₂ hR2₁ hR2₂ hR2 h_num_nonneg
 
 /-- **NRI is positive when PGS adds value.**
     If a higher-`R²` model is evaluated at the same classification threshold in
@@ -482,12 +481,12 @@ theorem nri_positive_when_pgs_adds_value
   unfold netReclassificationImprovement
   have h1 :
       sensFromR2 m r2_old T' < sensFromR2 m r2_new T' := by
-    exact sensFromR2_strictMono m T' r2_old r2_new
+    exact sensFromR2_strictMono_of_threshold_le m T' r2_old r2_new
       h_r2_old h_r2_new h_r2_improves h_sens_num_nonneg
   have h2 :
       specFromR2 m r2_old T' μ_control <
         specFromR2 m r2_new T' μ_control := by
-    exact specFromR2_strictMono m T' μ_control r2_old r2_new
+    exact specFromR2_strictMono_of_threshold_le m T' μ_control r2_old r2_new
       hμ_control_neg h_r2_old h_r2_new h_r2_improves h_spec_num_nonneg
   linarith
 
@@ -514,12 +513,12 @@ theorem nri_decreases_with_portability_loss
   unfold netReclassificationImprovement
   have h1 :
       sensFromR2 m r2_target T' < sensFromR2 m r2_source T' := by
-    exact sensFromR2_strictMono m T' r2_target r2_source
+    exact sensFromR2_strictMono_of_threshold_le m T' r2_target r2_source
       h_r2_target h_r2_source h_r2_loss h_sens_num_nonneg
   have h2 :
       specFromR2 m r2_target T' μ_control <
         specFromR2 m r2_source T' μ_control := by
-    exact specFromR2_strictMono m T' μ_control r2_target r2_source
+    exact specFromR2_strictMono_of_threshold_le m T' μ_control r2_target r2_source
       hμ_control_neg h_r2_target h_r2_source h_r2_loss h_spec_num_nonneg
   linarith
 
@@ -548,12 +547,12 @@ theorem nri_can_be_negative
   unfold netReclassificationImprovement
   have h1 :
       sensFromR2 m r2_target T' < sensFromR2 m r2_old T' := by
-    exact sensFromR2_strictMono m T' r2_target r2_old
+    exact sensFromR2_strictMono_of_threshold_le m T' r2_target r2_old
       h_r2_target h_r2_old h_r2_below h_sens_num_nonneg
   have h2 :
       specFromR2 m r2_target T' μ_control <
         specFromR2 m r2_old T' μ_control := by
-    exact specFromR2_strictMono m T' μ_control r2_target r2_old
+    exact specFromR2_strictMono_of_threshold_le m T' μ_control r2_target r2_old
       hμ_control_neg h_r2_target h_r2_old h_r2_below h_spec_num_nonneg
   linarith
 
@@ -668,22 +667,19 @@ theorem portability_narrows_useful_range
     (h_sens_num_nonneg :
       0 ≤ Real.sqrt r2_target * Real.sqrt m.h_sq * m.case_mean - T')
     (h_spec_num_nonneg :
-      0 ≤ T' - Real.sqrt r2_target * Real.sqrt m.h_sq * μ_control)
-    (h_sens_t : 0 ≤ sensFromR2 m r2_target T')
-    (h_spec_t : 0 ≤ specFromR2 m r2_target T' μ_control)
-    (h_spec_s1 : specFromR2 m r2_source T' μ_control ≤ 1) :
+      0 ≤ T' - Real.sqrt r2_target * Real.sqrt m.h_sq * μ_control) :
     decisionCurveNetBenefit (sensFromR2 m r2_target T' * π)
         ((1 - specFromR2 m r2_target T' μ_control) * (1 - π)) 1 t <
       decisionCurveNetBenefit (sensFromR2 m r2_source T' * π)
         ((1 - specFromR2 m r2_source T' μ_control) * (1 - π)) 1 t := by
   have h_sens :
       sensFromR2 m r2_target T' < sensFromR2 m r2_source T' := by
-    exact sensFromR2_strictMono m T' r2_target r2_source
+    exact sensFromR2_strictMono_of_threshold_le m T' r2_target r2_source
       h_r2_target h_r2_source h_r2 h_sens_num_nonneg
   have h_spec :
       specFromR2 m r2_target T' μ_control <
         specFromR2 m r2_source T' μ_control := by
-    exact specFromR2_strictMono m T' μ_control r2_target r2_source
+    exact specFromR2_strictMono_of_threshold_le m T' μ_control r2_target r2_source
       hμ_control_neg h_r2_target h_r2_source h_r2 h_spec_num_nonneg
   repeat rw [decisionCurveNetBenefit_eq_formula]
   have htt : 0 < t / (1 - t) := div_pos ht (by linarith)
@@ -781,7 +777,7 @@ theorem portability_violates_equalized_odds
     sensFromR2 m r2_target T' ≠ sensFromR2 m r2_source T' := by
   have h_sens_lt :
       sensFromR2 m r2_target T' < sensFromR2 m r2_source T' := by
-    exact sensFromR2_strictMono m T' r2_target r2_source
+    exact sensFromR2_strictMono_of_threshold_le m T' r2_target r2_source
       h_r2_target h_r2_source h_r2_gap h_sens_num_nonneg
   linarith
 
