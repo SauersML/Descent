@@ -50,6 +50,11 @@ condition; mass conservation needs only this normalization equation. -/
 def IsMassPreservingKernel (P : ι → ι → ℝ) : Prop :=
   ∀ x, ∑ y, P x y = 1
 
+/-- Every transition weight is nonnegative. Together with
+`IsMassPreservingKernel`, this is the finite Markov-kernel condition. -/
+def IsNonnegativeKernel (P : ι → ι → ℝ) : Prop :=
+  ∀ x y, 0 ≤ P x y
+
 /-- Row-stochastic transport preserves total mass. -/
 theorem transportMass_total (P : ι → ι → ℝ) (mass : ι → ℝ)
     (hP : IsMassPreservingKernel P) :
@@ -104,6 +109,78 @@ theorem transportedResponse_prevalence_conserved
           exact transportedResponse_mul_population P population response hpositive y
     _ = ∑ x, markedMass population response x :=
       transportMass_total P (markedMass population response) hP
+
+/-- **Transported response is a weighted average of source responses.**
+
+    If source responses lie in `[lower, upper]`, nonnegative transport and
+    population weights keep every reconstructed response in that same
+    interval. This is the finite maximum principle behind stable forward
+    reconstruction. -/
+theorem transportedResponse_mem_Icc
+    (P : ι → ι → ℝ) (population response : ι → ℝ)
+    (hkernel : IsNonnegativeKernel P) (hpopulation : ∀ x, 0 ≤ population x)
+    (hpositive : ∀ y, 0 < transportMass P population y)
+    (lower upper : ℝ) (hlower : ∀ x, lower ≤ response x)
+    (hupper : ∀ x, response x ≤ upper) (y : ι) :
+    transportedResponse P population response hpositive y ∈ Set.Icc lower upper := by
+  constructor
+  · unfold transportedResponse
+    rw [le_div_iff₀ (hpositive y)]
+    unfold transportMass markedMass
+    rw [Finset.mul_sum]
+    refine Finset.sum_le_sum fun x _ ↦ ?_
+    have hweight : 0 ≤ population x * P x y :=
+      mul_nonneg (hpopulation x) (hkernel x y)
+    calc
+      lower * (population x * P x y) ≤ response x * (population x * P x y) :=
+        mul_le_mul_of_nonneg_right (hlower x) hweight
+      _ = population x * response x * P x y := by ring
+  · unfold transportedResponse
+    rw [div_le_iff₀ (hpositive y)]
+    unfold transportMass markedMass
+    rw [Finset.mul_sum]
+    refine Finset.sum_le_sum fun x _ ↦ ?_
+    have hweight : 0 ≤ population x * P x y :=
+      mul_nonneg (hpopulation x) (hkernel x y)
+    calc
+      population x * response x * P x y =
+          response x * (population x * P x y) := by ring
+      _ ≤ upper * (population x * P x y) :=
+        mul_le_mul_of_nonneg_right (hupper x) hweight
+
+/-- Reconstruction is linear in the marked response when the population and
+transport kernel are fixed. -/
+theorem transportedResponse_sub
+    (P : ι → ι → ℝ) (population response₁ response₂ : ι → ℝ)
+    (hpositive : ∀ y, 0 < transportMass P population y) (y : ι) :
+    transportedResponse P population response₁ hpositive y -
+        transportedResponse P population response₂ hpositive y =
+      transportedResponse P population (fun x ↦ response₁ x - response₂ x)
+        hpositive y := by
+  unfold transportedResponse transportMass markedMass
+  rw [← sub_div]
+  congr 1
+  rw [← Finset.sum_sub_distrib]
+  refine Finset.sum_congr rfl fun x _ ↦ ?_
+  ring
+
+/-- **Forward reconstruction is sup-norm non-expansive.**
+
+    If two source response curves differ by at most `ε` pointwise, their
+    transported reconstructions differ by at most `ε` in every destination
+    cell. The constant one is exact: a constant perturbation is preserved. -/
+theorem transportedResponse_dist_le
+    (P : ι → ι → ℝ) (population response₁ response₂ : ι → ℝ)
+    (hkernel : IsNonnegativeKernel P) (hpopulation : ∀ x, 0 ≤ population x)
+    (hpositive : ∀ y, 0 < transportMass P population y)
+    (ε : ℝ) (hε : ∀ x, |response₁ x - response₂ x| ≤ ε) (y : ι) :
+    |transportedResponse P population response₁ hpositive y -
+        transportedResponse P population response₂ hpositive y| ≤ ε := by
+  rw [transportedResponse_sub]
+  have hbounds := transportedResponse_mem_Icc P population
+    (fun x ↦ response₁ x - response₂ x) hkernel hpopulation hpositive
+    (-ε) ε (fun x ↦ (abs_le.mp (hε x)).1) (fun x ↦ (abs_le.mp (hε x)).2) y
+  exact abs_le.mpr hbounds
 
 /-! ## A stationary marginal does not identify the conditional -/
 
