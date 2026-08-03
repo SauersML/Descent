@@ -49,6 +49,7 @@ import Calibrator.CovarianceStructure
 import Calibrator.CausalInference
 import Calibrator.CertificateGrading
 import Calibrator.PencilEnvironment
+import Calibrator.DirichletTransfer
 import Calibrator.CountingInvariantBlindness
 import Calibrator.CountingInvariantInstances
 import Calibrator.PolygenicArchitecture
@@ -72,6 +73,7 @@ import Calibrator.FoldedSpectrum
 import Calibrator.SpectralDegradation
 import Calibrator.EnsembleChannel
 import Calibrator.Permeability
+import Calibrator.ErgodicCovariancePencil
 -- THE BUILD MUST COVER ITS OWN CORPUS. Everything below was outside this root's import
 -- closure, so `lake build Calibrator` never compiled it -- and a module the build never
 -- reaches is not clean, it is UNBUILT. That is not a hypothetical: `ResonanceSpectrum`
