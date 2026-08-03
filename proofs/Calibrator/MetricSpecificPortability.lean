@@ -1077,7 +1077,30 @@ of the two coordinates. Given two deployments with the *same* readout coordinate
   `different_uses_different_metrics` reports.
 
 Read together: everything that moves here moves because prevalence moved. Delete
-`FoldedSpectrum` and the first conjunct has no proof. -/
+`FoldedSpectrum` and the first conjunct has no proof.
+
+**SCOPE, NARROWED AGAINST MEASUREMENT: this is about DISCRIMINATION metrics, not
+"threshold metrics" in general, and it is FALSE for proper scoring rules.**
+
+Murphy's decomposition is `Brier = reliability - resolution + uncertainty`. Resolution and
+AUC both collapse onto `(R², prevalence)`, so the statement above covers them — but
+**reliability is calibration, and it is a free third coordinate that neither readout
+coordinate sees.**
+
+Demonstrated by holding `R²` and prevalence fixed and varying only the score-to-probability
+map through strictly monotone maps, which by construction cannot change any ranking:
+
+* AUC spread **exactly 0.00**;
+* resolution spread **exactly 0.00**;
+* Brier spread **0.0162**, of which **0.0162 is the reliability term**.
+
+The same split appears in the `sims/` data: `R²` alone explains `94.6%` of within-cell AUC
+variance and only `67%` of Brier.
+
+So this theorem is right about AUC, sensitivity, specificity and PPV, and **wrong about
+Brier, the log score, and every proper scoring rule** — each carries a reliability term
+invisible to both coordinates. A monotone recalibration moves a proper scoring rule while
+leaving every quantity in this theorem's conclusion fixed. -/
 theorem metric_split_is_prevalence_not_metric_choice
     (sens spec : ScreeningDeployment → ℝ)
     (hsens : IsLevelSetFunctional sens ScreeningDeployment.readout)

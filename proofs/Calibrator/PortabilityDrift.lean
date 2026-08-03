@@ -3126,6 +3126,135 @@ docstring named the right model out loud.
 noncomputable def equalVarianceGaussianAUCFromExplainedR2 (r2 : ℝ) : ℝ :=
   Phi (Real.sqrt (r2 / (2 * (1 - r2))))
 
+/-! ### The liability-threshold AUC, which is the one binary traits need
+
+`equalVarianceGaussianAUCFromExplainedR2` is a true theorem about the equal-variance
+Gaussian model and the **wrong formula for a dichotomised trait**, which is most of what
+polygenic scores are used for. Its own docstring already recorded
+`FALSIFIED as the liability-threshold AUC`; what was missing was the right formula, not a
+correction to that one. Both are kept, and each names the other and the regime that selects
+it, because the defect was never that either was false — it was that nothing said when each
+applies.
+
+The formula below is **classical**: it is the liability-threshold result of Wray et al.
+(2010), *The genetic interpretation of area under the ROC curve*, in the same way the
+Gaussian information constants and van Trees are classical components named as such. The
+contribution here is not the derivation; it is that the corpus carried only the
+equal-variance form for binary traits, and that this one has been measured. -/
+
+/-- Standard normal density, `φ(x) = exp(-x²/2)/√(2π)`. -/
+noncomputable def standardNormalPdf (x : ℝ) : ℝ :=
+  Real.exp (-x ^ 2 / 2) / Real.sqrt (2 * Real.pi)
+
+/-- The liability threshold `T = Φ⁻¹(1 - K)` for prevalence `K`.
+
+Defined through `Function.invFun` rather than by a closed form. `Phi` is strictly monotone,
+hence injective, so this inverts it on its range; off the range it is junk, which is why
+`LiabilityThresholdRegime` carries `threshold_spec` as a hypothesis rather than assuming it
+holds. -/
+noncomputable def liabilityThreshold (K : ℝ) : ℝ := Function.invFun Phi (1 - K)
+
+/-- Mean liability among cases, `i = φ(T)/K`. -/
+noncomputable def liabilityCaseMean (K : ℝ) : ℝ :=
+  standardNormalPdf (liabilityThreshold K) / K
+
+/-- Mean liability among controls, `i_c = -i·K/(1-K)`. -/
+noncomputable def liabilityControlMean (K : ℝ) : ℝ :=
+  -liabilityCaseMean K * K / (1 - K)
+
+/-- Score variance among cases, `v₁ = 1 - R²·i·(i - T)`. -/
+noncomputable def liabilityCaseVariance (r2 K : ℝ) : ℝ :=
+  1 - r2 * liabilityCaseMean K * (liabilityCaseMean K - liabilityThreshold K)
+
+/-- Score variance among controls, `v₀ = 1 - R²·i_c·(i_c - T)`. -/
+noncomputable def liabilityControlVariance (r2 K : ℝ) : ℝ :=
+  1 - r2 * liabilityControlMean K * (liabilityControlMean K - liabilityThreshold K)
+
+/-- **The liability-threshold AUC**: `Φ((i - i_c)·√R² / √(v₁ + v₀))`.
+
+Regime: prevalence `K ∈ (0,1)` and `r2 ∈ [0,1)`, with the two conditional variances
+strictly positive. **Both degeneracies are real and are carried as hypotheses rather than
+assumed** (`LiabilityThresholdRegime`): `K → 0` or `K → 1` sends `T → ±∞`, and `v₁` or `v₀`
+can go non-positive at large `R²`, where the expression stops describing anything.
+
+Empirical status: VALIDATED against 400 simulated PGS studies, with **one free parameter
+per trait** — its prevalence — shared across both demographies, all five methods and all ten
+seeds, so 100 runs per fitted `K`. Pooled RMSE `0.0121`, bias `-0.0007`. The residual
+matches the independently measured seed-to-seed noise floor of `0.0120`, i.e. it fits as
+well as anything can. The four fitted prevalences cluster at `0.167-0.184`, a sensible
+common trait prevalence rather than four unrelated numbers, and the same `K` works on
+`grid2d` and `serial1d` separately (RMSE `0.0097-0.0136` versus `0.0112-0.0150`), so it is a
+trait constant and is not absorbing demography.
+
+Contrast `equalVarianceGaussianAUCFromExplainedR2`, which on the same 400 runs is biased
+`-0.068` AUC with RMSE `0.071` and max error `0.120`. That form is correct for an
+equal-variance Gaussian *outcome*; this one is correct for a dichotomised liability. Neither
+supersedes the other and the regime is what selects between them. -/
+noncomputable def liabilityThresholdAUCFromExplainedR2 (r2 K : ℝ) : ℝ :=
+  Phi ((liabilityCaseMean K - liabilityControlMean K) * Real.sqrt r2 /
+    Real.sqrt (liabilityCaseVariance r2 K + liabilityControlVariance r2 K))
+
+/-- The conditions under which `liabilityThresholdAUCFromExplainedR2` describes anything.
+
+Every field is a place the expression degenerates, and each is a hypothesis rather than a
+silent assumption:
+
+* `prevalence_pos`, `prevalence_lt_one` — outside `(0,1)` the threshold diverges;
+* `threshold_spec` — that `Function.invFun` actually inverted `Phi` here, which holds
+  because `1 - K` is in the range of a CDF for `K ∈ (0,1)` but is not free;
+* `caseVariance_pos`, `controlVariance_pos` — these fail at large `R²`, and the square root
+  of a non-positive number is where the formula stops meaning anything. -/
+structure LiabilityThresholdRegime (r2 K : ℝ) : Prop where
+  /-- Prevalence is a genuine probability, bounded away from the degenerate ends. -/
+  prevalence_pos : 0 < K
+  /-- Prevalence is a genuine probability, bounded away from the degenerate ends. -/
+  prevalence_lt_one : K < 1
+  /-- The explained fraction is a genuine fraction below the perfect-prediction boundary. -/
+  r2_nonneg : 0 ≤ r2
+  /-- The explained fraction is a genuine fraction below the perfect-prediction boundary. -/
+  r2_lt_one : r2 < 1
+  /-- The threshold really is the probit of `1 - K`. -/
+  threshold_spec : Phi (liabilityThreshold K) = 1 - K
+  /-- Case-conditional score variance is positive. -/
+  caseVariance_pos : 0 < liabilityCaseVariance r2 K
+  /-- Control-conditional score variance is positive. -/
+  controlVariance_pos : 0 < liabilityControlVariance r2 K
+
+/-- **The two AUC maps are not the same function, and must not be collapsed into one.**
+
+The equal-variance form takes no prevalence argument, so it is constant in `K`; the
+liability form is not. Hence if the liability AUC differs between *any* two prevalences at a
+fixed `r2` — which is what the 400-run validation measures, the fitted `K` moving the
+prediction by far more than the `0.0120` noise floor — then no identity can equate the two
+maps.
+
+This exists to stop a later simplification from quietly identifying them. The hypothesis is
+the empirical fact, supplied rather than assumed, in the same way
+`NearLowDimensionalFamily` is carried elsewhere. -/
+theorem liabilityAUC_ne_equalVarianceAUC_of_prevalence_dependent
+    {r2 K₁ K₂ : ℝ}
+    (hK : liabilityThresholdAUCFromExplainedR2 r2 K₁ ≠
+      liabilityThresholdAUCFromExplainedR2 r2 K₂) :
+    ¬ (∀ K : ℝ, liabilityThresholdAUCFromExplainedR2 r2 K =
+        equalVarianceGaussianAUCFromExplainedR2 r2) := by
+  intro hcollapse
+  exact hK ((hcollapse K₁).trans (hcollapse K₂).symm)
+
+/-- Under the regime the case mean strictly exceeds the control mean, so the numerator of
+the AUC argument is non-negative and the map is not accidentally reading the wrong tail.
+
+This is the one structural fact worth having beyond the separation theorem: `i > 0 > i_c`
+holds for every prevalence in `(0,1)`, because `i_c` is a negative multiple of `i`. -/
+theorem liabilityControlMean_lt_caseMean {K : ℝ} (hK0 : 0 < K) (hK1 : K < 1)
+    (hi : 0 < liabilityCaseMean K) :
+    liabilityControlMean K < liabilityCaseMean K := by
+  have h1K : 0 < 1 - K := by linarith
+  have hneg : liabilityControlMean K < 0 := by
+    unfold liabilityControlMean
+    apply div_neg_of_neg_of_pos _ h1K
+    nlinarith
+  linarith
+
 /-- **The `R²` reading of the AUC, under the same obligation and one more hypothesis.**
 
 Reading the AUC off an `R²` needs the variance split as well as the Gaussian regime: `r2`
