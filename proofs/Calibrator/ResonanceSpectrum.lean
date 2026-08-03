@@ -7,8 +7,9 @@ import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
 -- `phase_of_abs_neg` uses `Real.log`, which lives here and is not reachable from the
 -- trigonometric import. Without it `Real.log` resolves as an Unknown constant -- the
 -- same missing-Mathlib-import shape as `Finset.sum_nonneg` in `SpectralDegradation`.
--- This went unnoticed because nothing imports this module and the `Calibrator` root
--- does not list it, so `lake build Calibrator` never compiled the file at all.
+-- A missing import here is invisible to any build that does not reach this file, which is
+-- why the `Calibrator` root lists this module: being compiled is what makes the import
+-- list answerable to the proofs below.
 import Mathlib.Analysis.SpecialFunctions.Log.Basic
 import Mathlib.Algebra.BigOperators.Group.Finset.Basic
 import Mathlib.Tactic.Ring
@@ -68,9 +69,10 @@ different theorems, and neither should be quoted for the other.
 
 ## ZERO CONSUMERS, DELIBERATELY. Do not "fix" this.
 
-Nothing in the corpus imports this module, and that is a judgment rather than an
-oversight. `intensity` here is `|Psi|^2` and `CramerStratum.charFnSq` is `|phi|^2`: the
-same object in two encodings. `resonance_of_aligned` and
+The `Calibrator` root lists this module so that it is compiled, and nothing consumes its
+conclusions. That is a judgment rather than an oversight. `intensity` here is `|Psi|^2` and
+`CramerStratum.charFnSq` is `|phi|^2`: the same object in two encodings, and the root's
+`intensity_eq_charFnSq` proves it. `resonance_of_aligned` and
 `CramerStratum.charFnSq_eq_one_of_lattice` are the same mechanism -- phases realign, the
 sum returns to its full size.
 
