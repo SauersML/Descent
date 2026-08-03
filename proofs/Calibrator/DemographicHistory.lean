@@ -227,8 +227,9 @@ noncomputable def steppingStoneDiffusionTimescale (d σ_sq m : ℝ) : ℝ :=
     Stated so that the corpus contains the lattice-level time under a name,
     rather than only the rescaled one under a name that does not say it is
     rescaled. -/
-noncomputable def steppingStoneMeetingTimeOnLattice (d D σ_sq m : ℝ) : ℝ :=
-  d * (D - d) / (2 * σ_sq * m)
+noncomputable def steppingStoneMeetingTimeOnLattice
+    (d demeCount σ_sq m : ℝ) : ℝ :=
+  d * (demeCount - d) / (2 * σ_sq * m)
 
 /-- **The guard this definition was missing.**
 
@@ -248,9 +249,9 @@ noncomputable def steppingStoneMeetingTimeOnLattice (d D σ_sq m : ℝ) : ℝ :=
     inconsistently: `demoSteppingStoneFst (d Ne m σ_sq)`, `steppingStoneDiffusionTimescale
     (d σ_sq m)`, and this one `(d D σ_sq m)`. `demoSteppingStoneFst` is symmetric in the two
     as well. That hazard is documentation-only by construction. -/
-theorem steppingStoneMeetingTimeOnLattice_nonneg (d D σ_sq m : ℝ)
-    (hd : 0 ≤ d) (hdD : d ≤ D) (hσ : 0 < σ_sq) (hm : 0 < m) :
-    0 ≤ steppingStoneMeetingTimeOnLattice d D σ_sq m := by
+theorem steppingStoneMeetingTimeOnLattice_nonneg (d demeCount σ_sq m : ℝ)
+    (hd : 0 ≤ d) (hdD : d ≤ demeCount) (hσ : 0 < σ_sq) (hm : 0 < m) :
+    0 ≤ steppingStoneMeetingTimeOnLattice d demeCount σ_sq m := by
   unfold steppingStoneMeetingTimeOnLattice
   have hden : 0 < 2 * σ_sq * m := by positivity
   apply div_nonneg _ (le_of_lt hden)
@@ -260,9 +261,9 @@ theorem steppingStoneMeetingTimeOnLattice_nonneg (d D σ_sq m : ℝ)
     Proving it as an equation is what stops the per-deme convention from being
     reintroduced silently: any future body for either one that does not differ
     by exactly this factor stops compiling. -/
-theorem steppingStoneMeetingTime_eq_scaled (d D σ_sq m : ℝ) :
-    steppingStoneMeetingTimeOnLattice d D σ_sq m
-      = (D - d) * steppingStoneDiffusionTimescale d σ_sq m := by
+theorem steppingStoneMeetingTime_eq_scaled (d demeCount σ_sq m : ℝ) :
+    steppingStoneMeetingTimeOnLattice d demeCount σ_sq m
+      = (demeCount - d) * steppingStoneDiffusionTimescale d σ_sq m := by
   unfold steppingStoneMeetingTimeOnLattice steppingStoneDiffusionTimescale
   ring
 
@@ -270,17 +271,19 @@ theorem steppingStoneMeetingTime_eq_scaled (d D σ_sq m : ℝ) :
     lattice worth modelling. Stated as the contrapositive of the regime: if a
     reader takes `steppingStoneDiffusionTimescale` for the meeting time, this is
     the assumption they have made without writing it down. -/
-theorem steppingStoneMeetingTime_eq_perDeme_iff (d D σ_sq m : ℝ)
+theorem steppingStoneMeetingTime_eq_perDeme_iff (d demeCount σ_sq m : ℝ)
     (hd : 0 < d) (hσ : 0 < σ_sq) (hm : 0 < m) :
-    steppingStoneMeetingTimeOnLattice d D σ_sq m
-      = steppingStoneDiffusionTimescale d σ_sq m ↔ D - d = 1 := by
+    steppingStoneMeetingTimeOnLattice d demeCount σ_sq m
+      = steppingStoneDiffusionTimescale d σ_sq m ↔ demeCount - d = 1 := by
   rw [steppingStoneMeetingTime_eq_scaled]
   constructor
   · intro h
     have hpos : 0 < steppingStoneDiffusionTimescale d σ_sq m := by
       unfold steppingStoneDiffusionTimescale
       apply div_pos hd; have := mul_pos hσ hm; linarith
-    have := mul_right_cancel₀ (ne_of_gt hpos) (by linarith : (D - d) * steppingStoneDiffusionTimescale d σ_sq m = 1 * steppingStoneDiffusionTimescale d σ_sq m)
+    have := mul_right_cancel₀ (ne_of_gt hpos) (by linarith :
+      (demeCount - d) * steppingStoneDiffusionTimescale d σ_sq m =
+        1 * steppingStoneDiffusionTimescale d σ_sq m)
     linarith
   · intro h; rw [h, one_mul]
 

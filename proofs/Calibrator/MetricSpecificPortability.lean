@@ -1946,7 +1946,7 @@ and `optimum` as arbitrary functions `ι → ℝ`; these two are what say which
 functions the section is about.  The section docstring three lines above the
 deletion site states the claim that depends on them -- "the curvature weight is
 not a free parameter ... which is the right behaviour and is FORCED rather than
-stipulated".  Without these definitions the weight is exactly a free parameter,
+stipulated".  Without these definitions the weight becomes a free parameter,
 the spread law holds for any weights whatsoever, and that sentence is false.
 The deletion did not break elaboration, because the arguments were already
 abstract; it hollowed the claim and left the file green.
