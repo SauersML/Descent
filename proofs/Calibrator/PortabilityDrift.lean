@@ -3923,11 +3923,16 @@ theorem neutralAFBenchmarkRatio_lt_one
   simp [neutralAFBenchmarkRatio]
   exact div_self (by linarith : (1 : ℝ) - fst ≠ 0)
 
-/-- At zero divergence, the neutral allele-frequency benchmark target `R²` is
-the literal present-day `R²` evaluated at the same population state. -/
-theorem targetR2FromNeutralAFBenchmark_self (V_A V_E fst : ℝ) :
-    targetR2FromNeutralAFBenchmark V_A V_E fst = presentDayR2 V_A V_E fst := by
-  rfl
+/-! `targetR2FromNeutralAFBenchmark_self` used to sit here, stating that "at zero
+divergence" the benchmark target `R²` is the present-day `R²`. It is deleted because the
+condition it advertises does not exist: `targetR2FromNeutralAFBenchmark` is DEFINED as
+`presentDayR2`, so the equality holds at every `fst`, and the proof was `rfl`. The name
+`_self` and the phrase "at zero divergence" both point at a special case that is not
+special -- the same defect as a hypothesis that appears to do work and does not.
+
+`targetR2FromNeutralAFBenchmark_eq_presentDayR2` above states the same equality without
+the false condition and is the edge that keeps the two names tied, so nothing is
+disconnected by this. -/
 
 /-- For valid prevalence `0 < π < 1`, the linear Brier approximation `π(1-π)(1-R²)`
 is strictly decreasing in `R²`. -/
@@ -4746,9 +4751,16 @@ identical.
 noncomputable def islandFstMultiplicativeStep (Ne m F : ℝ) : ℝ :=
   ibdRecurrenceStep Ne m F
 
-/-- One map, one name: the island reading is the recurrence. -/
-theorem islandFstMultiplicativeStep_eq_ibdRecurrenceStep (Ne m F : ℝ) :
-    islandFstMultiplicativeStep Ne m F = ibdRecurrenceStep Ne m F := rfl
+/-! `islandFstMultiplicativeStep_eq_ibdRecurrenceStep` used to sit here, proved by `rfl`.
+It restated the declaration immediately above it: `islandFstMultiplicativeStep` IS
+`ibdRecurrenceStep` by definition, so the theorem asserted what the definition already
+shows and could not have failed.
+
+The DEFINITION stays, and deliberately. `LDDecayTheory.driftLDStep_eq_islandFstMultiplicativeStep`
+proves the independently written `driftLDStep` equal to it by `ring` -- that one is a
+genuine guard between two bodies, not a restatement of an alias, and deleting this name
+would disconnect `driftLDStep` from the recurrence it is being held to. Connectivity to
+the hub, not theorem count, is what makes a removal safe here. -/
 
 /-- **Fixed point of the island-model recursion.**
 
