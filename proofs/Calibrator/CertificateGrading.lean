@@ -27,8 +27,36 @@ convex-linear regime remains provenance only: this repository does not yet
 contain the white-noise decision model needed to state it faithfully.  The
 fixed-grade incompleteness claim is stated below for actual finite predictive
 laws, with a visible `sorry` at the missing construction. A citation is never
-accepted as a theorem parameter, and the underconstrained four-point witness
-identified in `proofs/validation/FIXED_GRADE_AUDIT.md` is explicitly rejected.
+accepted as a theorem parameter.
+
+## Why that `sorry` stays, and what closing it needs
+
+The witness chooses the target, every moment probe, every parameter's
+observation law, and the observation-space size, all after seeing `n`, the grade
+and the desired bound.  Three successive guards against that turned out to be
+insufficient, and each is now a theorem here rather than a remark:
+
+1. At radius `1` the discrepancy constraint is free, because total variation
+   never exceeds one -- `feasible_one_iff_momentMatched`.  Feasibility is moment
+   matching, and the observation kernel drops out entirely.
+2. A shrinking radius does not repair that by itself.  If every kernel law lies
+   within `ε` of one fixed law, every pair of priors is `2ε`-indistinguishable
+   -- `totalVariation_le_two_mul_of_close` -- so a witness takes `ε` to be half
+   the radius and the collapse returns.
+3. Requiring `Informative`, i.e. nonzero pairwise separation, is still not
+   enough: it carries no floor, so every pair may sit far below the radius.
+   The statements therefore ask for `SeparatedBy (fixedGradeInformationRadius n)`.
+
+A proof that evades these is kernel-valid and statement-valid while failing
+mathematical intent, and must not replace the admission.  Closing it honestly
+needs, before the bound is stated: a fixed normalized architecture class; a
+specified one-observation kernel and its `n`-fold product, or another explicit
+growing-data construction; target and moment probes fixed independently of the
+desired bound; explicit moment-matched priors in that model; and a proved
+total-variation comparison of their prior-predictive laws.
+
+Note also that `n` indexes the parameter catalogue, not a count of independent
+observations, so no sample-size rate follows from increasing it on its own.
 -/
 
 namespace Calibrator.CertificateGrading
@@ -332,9 +360,9 @@ radius one.
 The witness is free to choose the kernel after seeing `n`, so it can always
 shrink the kernel's spread faster than the radius shrinks. Closing that needs a
 LOWER bound on informativeness -- distinct parameters separated by at least some
-fixed total variation, or the explicit product kernel that
-`proofs/validation/FIXED_GRADE_AUDIT.md` asks for in its item 2 -- not merely an
-upper bound on the radius.
+fixed total variation, or an explicit one-observation kernel and its `n`-fold
+product -- not merely an upper bound on the radius. `SeparatedBy` below is that
+floor, and the module docstring lists what a rate theorem still needs beyond it.
 
 The proof is the triangle inequality after subtracting `L`, which is legitimate
 because the prior differences sum to zero and so annihilate the constant. -/
@@ -409,6 +437,32 @@ theorem totalVariation_nonneg (P Q : FinitePrior parameterCount) :
     0 ≤ E.totalVariation P Q := by
   unfold totalVariation
   positivity
+
+/-- **Informative at a stated scale**: distinct parameters are separated by at
+least `c`, not merely by something positive.
+
+A predicate asking only that each pairwise total variation be nonzero carries no
+floor, so an experiment may satisfy it while every pair sits far below the
+information radius. `totalVariation_le_two_mul_of_close` shows what that buys a
+witness: if every kernel law lies within `ε` of one fixed law then every pair of
+priors is `2ε`-indistinguishable, so taking `ε` to be half the radius makes
+`TV ≤ h` hold for all pairs and feasibility collapses to moment matching -- the
+collapse that a shrinking radius was introduced to prevent, one step further
+back.
+
+The witness chooses the kernel after seeing `n`, so it can always shrink the
+kernel's spread faster than the radius shrinks. Only a floor stated at the
+radius scale closes that, which is what this supplies. -/
+def SeparatedBy (c : ℝ) : Prop :=
+  ∀ i j : Fin (parameterCount + 1), i ≠ j →
+    c ≤ E.totalVariation (PMF.pure i) (PMF.pure j)
+
+/-- A positive separation floor gives nonzero pairwise separation.  The converse
+fails, which is the whole reason the graded statements ask for the floor. -/
+theorem pos_totalVariation_of_separatedBy {c : ℝ} (hc : 0 < c) (h : E.SeparatedBy c)
+    {i j : Fin (parameterCount + 1)} (hij : i ≠ j) :
+    0 < E.totalVariation (PMF.pure i) (PMF.pure j) :=
+  lt_of_lt_of_le hc (h i j hij)
 
 /-- **Total variation never exceeds one**, because it halves a difference of two
 probability vectors and each has mass one.
@@ -504,22 +558,6 @@ noncomputable def constantObservationExperiment
     (constantObservationExperiment target moment law).mixture P = law := by
   exact PMF.bind_const P law
 
-/-- **An experiment separates at radius `h` when distinct parameters emit laws at least `h`
-    apart in total variation.**
-
-    Strict positivity is not enough. A channel whose parameters differ by some tiny `δ > 0`
-    is "informative" in the bare sense, but once `δ < h` every pair still satisfies
-    `TV ≤ h`, feasibility collapses to moment matching exactly as in the constant channel,
-    and the discrepancy radius does no work. The degenerate witness survives with `δ` in
-    place of `0`.
-
-    Tying the separation to the SAME `h` the feasibility constraint uses is what makes the
-    constraint live: distinct parameters are then distinguishable at precisely the scale the
-    radius operates on. -/
-def SeparatesAtRadius (h : ℝ) : Prop :=
-  ∀ i j : Fin (parameterCount + 1), i ≠ j →
-    h ≤ E.totalVariation (PMF.pure i) (PMF.pure j)
-
 @[simp] theorem constantObservationExperiment_totalVariation
     (target : Fin (parameterCount + 1) → ℝ)
     (moment : ℕ → Fin (parameterCount + 1) → ℝ)
@@ -536,7 +574,7 @@ theorem constantObservationExperiment_not_separatesAtRadius
     (target : Fin (parameterCount + 2) → ℝ)
     (moment : ℕ → Fin (parameterCount + 2) → ℝ)
     (law : FinitePrior observationCount) {h : ℝ} (hh : 0 < h) :
-    ¬ (constantObservationExperiment target moment law).SeparatesAtRadius h := by
+    ¬ (constantObservationExperiment target moment law).SeparatedBy h := by
   intro hsep
   have h01 : (0 : Fin (parameterCount + 2)) ≠ 1 := by
     simp [Fin.ext_iff]
