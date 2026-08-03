@@ -28,13 +28,25 @@ Two natural choices:
 
 These are NOT equal due to Jensen's inequality (sigmoid is nonlinear).
 
-### The Result
+### What is actually proved
 
-We prove that under **Brier Score** loss (squared error on probabilities),
-the Posterior Mean strictly dominates the Mode when there's parameter uncertainty.
+Two separate things, and it matters which is which.
 
-So a predictor that integrates over posterior uncertainty — by quadrature or by
-posterior sampling — is strictly preferable to plugging in the MAP estimate.
+1. **Properness of the Brier score** (`brierScore_minimized_at_true_prob`,
+   `brierScore_strict_minimum`): among all constant predictions `p`, the expected
+   Bernoulli(π) squared error is uniquely minimised at `p = π`. This is proved outright.
+2. **Strict concavity of `sigmoid` on `[0, ∞)`** (`calibration_shrinkage`): for a
+   non-degenerate `X > 0`, `E[σ(X)] < σ(E[X])`, by Jensen. Also proved outright.
+
+Composing the two gives `posterior_mean_strictly_beats_mode_of_jensen`: the mean
+prediction strictly beats the mode prediction, with the *gap* between them derived
+rather than assumed.
+
+What is **not** proved anywhere in this file is the law of iterated expectations
+`π = E[σ(η)]`. No outcome variable and no conditional expectation is formalised here,
+so that identification enters as an explicit hypothesis of the composed theorem. The
+decision-theoretic reading — "integrate over posterior uncertainty rather than plugging
+in the MAP estimate" — is therefore conditional on that hypothesis.
 -/
 
 section BrierScore
@@ -183,24 +195,32 @@ noncomputable def PosteriorPrediction.prob_mode (pred : PosteriorPrediction) : �
 theorem PosteriorPrediction.mode_is_sigmoid_of_mean (pred : PosteriorPrediction) :
     pred.prob_mode = 1 / (1 + Real.exp (-pred.η_mean)) := rfl
 
-/-- **Main Theorem**: The Posterior Mean is the Bayes-optimal predictor under Brier Score.
+/-- **Brier properness, specialised to a predictor whose value is assumed to be the true
+probability. NOT the Bayesian posterior-mean theorem, which this file does not prove.**
 
-    Given:
-    - A true conditional probability π = P(Y=1|X)
-    - Uncertainty about η with posterior mean E[η] and E[sigmoid(η)]
+This was called `posterior_mean_optimal` and documented as "**Main Theorem**: The Posterior
+Mean is the Bayes-optimal predictor under Brier Score", with a proof sketch whose step 2 was
+"the true `π = E[sigmoid(η)]` **by the law of iterated expectations**". That step is not
+proved here. **It is the hypothesis `h_true`.**
 
-    The posterior mean prediction E[sigmoid(η)] achieves lower expected Brier score
-    than the mode prediction sigmoid(E[η]) whenever there is parameter uncertainty
-    (i.e., when E[sigmoid(η)] ≠ sigmoid(E[η])).
+What is actually established: if `π` happens to equal `pred.prob_mean`, then predicting
+`pred.prob_mean` beats predicting anything else — which is the properness of the Brier
+score, already available as `brierScore_minimized_at_true_prob`, with `prob_mean`
+substituted for the true probability. `prob_mean` is a bare real field of
+`PosteriorPrediction`; nothing in this development makes it an expectation of anything.
 
-    **Proof sketch**:
-    1. By the proper scoring rule property, the optimal prediction is p* = π
-    2. The true π = E[sigmoid(η)] (by the law of iterated expectations)
-    3. Therefore E[sigmoid(η)] is optimal, and sigmoid(E[η]) is suboptimal
+**What would close the gap**, so a reader knows what is missing rather than believing it
+closed:
 
-    This establishes the decision-theoretic reason to integrate predictive
-    probabilities over parameter uncertainty. -/
-theorem posterior_mean_optimal (pred : PosteriorPrediction)
+1. a formalised posterior distribution over `η` — a measure, not a pair of reals;
+2. `prob_mean` *defined* as `∫ sigmoid(η) dμ(η)` rather than posited;
+3. the law of iterated expectations, `E[Y | X] = E[E[Y | X, η] | X]`, proved for that
+   measure, which is what would discharge `h_true` instead of assuming it.
+
+Until those exist, this is a correct conditional theorem about Brier scores and carries no
+Bayesian content. The rename is the point: the previous name asserted the conclusion that
+steps 1–3 would have licensed. -/
+theorem brier_le_at_prob_mean_when_mean_is_true (pred : PosteriorPrediction)
     (π : ℝ) (_hπ : 0 ≤ π ∧ π ≤ 1)
     (h_true : π = pred.prob_mean) :
     expectedBrierScore pred.prob_mean π ≤ expectedBrierScore pred.prob_mode π := by
@@ -209,8 +229,12 @@ theorem posterior_mean_optimal (pred : PosteriorPrediction)
   rw [← h_true]
   exact brierScore_minimized_at_true_prob π pred.prob_mode
 
-/-- Strict optimality: if there's genuine uncertainty (Mode ≠ Mean), Mode is strictly worse. -/
-theorem posterior_mean_strictly_better (pred : PosteriorPrediction)
+/-- Strict Brier properness under the same assumed identification: if `π` is assumed equal
+to `pred.prob_mean` and the mode differs from it, the mode scores strictly worse.
+
+Same scope as the theorem above, and the same gap: `h_true` is the law of iterated
+expectations supplied as a hypothesis, not derived. This says nothing about posteriors. -/
+theorem brier_lt_at_prob_mean_when_mean_is_true (pred : PosteriorPrediction)
     (π : ℝ) (h_true : π = pred.prob_mean)
     (h_uncertainty : pred.prob_mean ≠ pred.prob_mode) :
     expectedBrierScore pred.prob_mean π < expectedBrierScore pred.prob_mode π := by

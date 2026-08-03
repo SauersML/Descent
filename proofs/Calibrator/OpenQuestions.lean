@@ -153,14 +153,46 @@ theorem heterozygosity_increases_toward_half
     2 * p₁ * (1 - p₁) < 2 * p₂ * (1 - p₂) := by
   nlinarith [sq_nonneg (p₂ - p₁), sq_nonneg (1/2 - p₂)]
 
-/-- **If large-effect heterozygosity increases more than small-effect decreases,
-    total PGS variance increases.** This is the mechanism for WBC/lymphocyte count. -/
-theorem pgs_variance_can_increase
-    (v_large_s v_large_t v_small_s v_small_t : ℝ)
-    (_h_large_up : v_large_s < v_large_t)
-    (h_net : v_large_t - v_large_s > v_small_s - v_small_t) :
-    v_large_s + v_small_s < v_large_t + v_small_t := by
-  linarith
+/-- **PGS variance increases when the large-effect locus gains more heterozygosity than the
+small-effect locus loses.** This is the mechanism proposed for WBC/lymphocyte count.
+
+    This replaces `pgs_variance_can_increase`, which was not a mechanism. That theorem took
+    `h_net : v_large_t - v_large_s > v_small_s - v_small_t` and concluded
+    `v_large_s + v_small_s < v_large_t + v_small_t` by `linarith` — but those two
+    inequalities are the *same inequality rearranged*, so the hypothesis was the conclusion
+    and the proof was the rearrangement. Replacing the proof body with the hypothesis would
+    have given the same theorem, which is the test for having no theorem at all.
+
+    The version below cannot be rearranged into its own hypotheses, because the hypotheses
+    are about **effect sizes and heterozygosities separately** and the conclusion is about
+    the variance sum they generate. A locus at frequency `p` with effect `β` contributes
+    `2β²p(1-p)` to score variance, so the claim has content precisely when the weighting by
+    `β²` is doing work: the large-effect locus must actually be the larger-effect one
+    (`hβ`), and its heterozygosity gain must exceed the small locus's loss
+    (`hlarge_gains_more`). Neither follows from the conclusion.
+
+    Use `heterozygosity_increases_toward_half` to discharge the gain hypothesis from allele
+    frequencies moving toward `1/2` under divergent selection, which is the biological step
+    the prose describes. -/
+theorem pgs_variance_increases_of_large_effect_heterozygosity_gain
+    (βL βS pL pL' pS pS' : ℝ)
+    (hβ : βS ^ 2 ≤ βL ^ 2)
+    (hβL : 0 < βL ^ 2)
+    (hsmall_loses : pS' * (1 - pS') ≤ pS * (1 - pS))
+    (hlarge_gains_more :
+      pS * (1 - pS) - pS' * (1 - pS') < pL' * (1 - pL') - pL * (1 - pL)) :
+    2 * βS ^ 2 * (pS * (1 - pS)) + 2 * βL ^ 2 * (pL * (1 - pL)) <
+      2 * βS ^ 2 * (pS' * (1 - pS')) + 2 * βL ^ 2 * (pL' * (1 - pL')) := by
+  have hloss_nonneg : 0 ≤ pS * (1 - pS) - pS' * (1 - pS') := by linarith
+  -- The small locus's loss is weighted by the smaller squared effect ...
+  have hweighted : βS ^ 2 * (pS * (1 - pS) - pS' * (1 - pS'))
+      ≤ βL ^ 2 * (pS * (1 - pS) - pS' * (1 - pS')) :=
+    mul_le_mul_of_nonneg_right hβ hloss_nonneg
+  -- ... and that loss is strictly smaller than the large locus's gain.
+  have hgain : βL ^ 2 * (pS * (1 - pS) - pS' * (1 - pS'))
+      < βL ^ 2 * (pL' * (1 - pL') - pL * (1 - pL)) :=
+    (mul_lt_mul_left hβL).mpr hlarge_gains_more
+  nlinarith [hweighted, hgain]
 
 /-- **PGS variance increase + effect decorrelation = compounded R² drop.**
     R² ∝ Cov²/(Var_PGS · Var_Y). If Var_PGS↑ and Cov↓, R² drops faster
