@@ -120,31 +120,30 @@ coordinate, but it is still only a benchmark score-distribution quantity. -/
 noncomputable def benchmarkHighScoreRate (threshold μ σ : ℝ) : ℝ :=
   1 - Phi (thresholdStandardizedCoordinate threshold μ σ)
 
-/-- **Tail probability increases with mean shift toward the tail.**
+/-- **A rightward mean shift lowers the standardized threshold coordinate.**
 
-    A right shift of the score distribution puts strictly more of it above a fixed threshold.
-    The conclusion is stated on `benchmarkHighScoreRate`, the tail rate itself, rather than on
-    the standardized coordinate: the coordinate inequality is the step of the proof, and a
-    statement about it alone would leave `Phi` and the tail rate out of a claim whose whole
-    content is that the tail rate moves. -/
+    This is the coordinate step, and it says nothing about probability: `Phi` and
+    `benchmarkHighScoreRate` do not appear. The tail-rate claim — that a rightward shift puts
+    strictly more of the distribution above a fixed raw threshold — is
+    `mean_shift_changes_benchmark_high_score_rate` below, which is this lemma composed with
+    strict monotonicity of `Phi`. Read this one as arithmetic on a z-score. -/
 theorem mean_shift_increases_tail
     (threshold μ₁ μ₂ σ : ℝ)
     (h_σ : 0 < σ)
     (h_shift : μ₁ < μ₂) :
-    benchmarkHighScoreRate threshold μ₁ σ < benchmarkHighScoreRate threshold μ₂ σ := by
-  have hz : (threshold - μ₂) / σ < (threshold - μ₁) / σ :=
-    div_lt_div_of_pos_right (by linarith) h_σ
-  have hPhi := strictMono_Phi hz
-  unfold benchmarkHighScoreRate thresholdStandardizedCoordinate
-  linarith
+    (threshold - μ₂) / σ < (threshold - μ₁) / σ := by
+  exact div_lt_div_of_pos_right (by linarith) h_σ
 
-/-- **Variance increase thickens tails.**
-    Larger variance → more probability in both tails → more individuals
-    in extreme risk categories. -/
+/-- **A larger standard deviation lowers the standardized coordinate of a point above the
+    mean.**
+
+    Again the coordinate step only. "More probability in both tails" is a statement about two
+    tail rates and needs `Phi` at two arguments; neither appears here, and the second tail is
+    not reached by this inequality at all. The upper-tail consequence is
+    `variance_change_changes_benchmark_high_score_rate` below. -/
 theorem variance_increase_thickens_tails
     (x σ₁ σ₂ : ℝ) (h₁ : 0 < σ₁)
     (h_larger : σ₁ < σ₂) (h_x : 0 < x) :
-    -- z-score of x decreases with larger variance
     x / σ₂ < x / σ₁ := by
   exact div_lt_div_of_pos_left h_x h₁ h_larger
 
