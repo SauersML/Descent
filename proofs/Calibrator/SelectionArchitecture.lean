@@ -598,7 +598,7 @@ section ArchitecturePredictions
     The characteristic timescale for portability decay is 1/(2s) generations,
     where s is the selection coefficient.
     Smaller `s` gives slower change; larger `s` gives faster change. -/
-theorem one_div_two_mul_antitone
+theorem one_div_two_mul_strictAnti_of_pos
     (s₁ s₂ : ℝ) (h₁ : 0 < s₁) (h₂ : 0 < s₂)
     (h_stronger : s₁ < s₂) :
     1 / (2 * s₂) < 1 / (2 * s₁) := by
@@ -635,7 +635,7 @@ section Pleiotropy
     If two traits share many pleiotropic loci, their portability
     patterns are correlated. Specifically, if turnover affects
     the shared loci, both traits suffer. -/
-theorem both_mul_one_sub_lt_self
+theorem both_mul_one_sub_lt_self_of_pos
     (r2_t1_source r2_t1_target r2_t2_source r2_t2_target ρ_shared : ℝ)
     (h_shared : 0 < ρ_shared) (h_shared_le : ρ_shared ≤ 1)
     -- Both traits drop proportionally to the shared component
