@@ -1091,13 +1091,17 @@ FAMILIES = [
                  "innovation, and the tag-causal LD kernels rebuilt at "
                  "generation t, feeding the deployed metrics at that "
                  "generation",
-        "simulator": None,
-        "status": "NO SIMULATOR. The single largest unassigned block: the "
-                  "whole `...At` / `...AtGeneration` layer. It is the "
-                  "composition of the popgen families with the metric "
-                  "families, so it is the one place where a compensating pair "
-                  "of errors in the two halves would be invisible to either "
-                  "half's own simulator.",
+        "simulator": "cluster/fam_generational_transport.py",
+        "status": "SIMULATOR PRESENT, NOT YET RUN. Covers the whole `...At` / "
+                  "`...AtGeneration` layer, the composition of the popgen "
+                  "families with the metric families. Because it is a "
+                  "composition, a compensating pair of errors in the two "
+                  "halves would be invisible to either half's own simulator, "
+                  "so the script runs every check three ways: kernel layer "
+                  "alone, metric layer alone, and the composite the corpus "
+                  "actually claims. A composite that agrees while one half "
+                  "disagrees is the compensating-error signature, and it is "
+                  "reported explicitly.",
         "found_by": "manual",
         "spec": "Run a two-population forward simulation (drift + mutation + "
                 "migration, vectorised over loci and replicates) for t "
