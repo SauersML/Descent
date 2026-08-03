@@ -15,27 +15,14 @@ import Mathlib.GroupTheory.Perm.Basic
 # Discharging the deployment-ceiling premise, and the cost it actually carries
 
 This module is **self-contained: it imports only Mathlib.** It does not import
-`FoldedSpectrum`, which is large and under concurrent edit; the correspondence with
-`AssumedDeploymentCeiling` is stated here in prose and the shapes are matched deliberately.
+`FoldedSpectrum`; all ceiling statements here are derived from the concrete model below.
 
 ## What was assumed, and what is discharged here
 
-`Calibrator.AssumedDeploymentCeiling` carries as a **structure field**
-
-```
-characterization : perpRisk = 0 ↔ (0 < eta ∧ (reversible ∨ arrowBit))
-```
-
-and its own docstring says this "requires a separate identifiability theorem showing that
-positive conditional support removes every remaining deployment-blind direction". The
-second conjunct is already discharged by the reversal calculation. **The first conjunct is
-the open item**, and it is what this module addresses.
-
-Note first why it cannot be discharged *inside* that structure: `perpRisk` and `eta` are
-unconstrained real fields there. A biconditional between two arbitrary reals is not
-provable, and nothing is wrong with the structure — it is a record of a premise. To
-discharge the premise one must supply a **model** in which the two have definitions. That
-is what `DeploymentModel` is.
+An earlier interface accepted the desired ceiling characterization as a structure field.
+That interface has been removed: a biconditional between unconstrained reals is not a
+scientific theorem.  `DeploymentModel` instead defines the quantities and proves the
+forward implication internally.
 
 ## The model, and the forward direction
 
@@ -177,19 +164,38 @@ That is a second and orthogonal kind of wall: this theorem is about how *expensi
 visible direction is to resolve, and says nothing about a direction a design confined to one
 ancestry axis cannot resolve at all. `η > 0` does not cover it, and `r⊥ = 0 ⟺ η > 0` must
 not be read as covering it. -/
-theorem characterization_of_model (η C : ℝ) (hηnonneg : 0 ≤ η) (hC : 0 < C)
-    (hdetect : ∀ k : ℕ, 0 < (η / C) ^ k → M.blind k = 0)
-    (hzero : η = 0 → 0 < M.perpRisk) :
-    M.perpRisk = 0 ↔ 0 < η := by
-  constructor
-  · intro hperp
-    rcases lt_or_eq_of_le hηnonneg with h | h
-    · exact h
-    · exact absurd hperp (ne_of_gt (hzero h.symm))
-  · intro hpos
-    exact M.perpRisk_eq_zero_of_eta_pos η C hpos hC hdetect
+theorem perpRisk_eq_zero_of_eta_pos' (η C : ℝ) (hη : 0 < η) (hC : 0 < C)
+    (hdetect : ∀ k : ℕ, 0 < (η / C) ^ k → M.blind k = 0) :
+    M.perpRisk = 0 :=
+  M.perpRisk_eq_zero_of_eta_pos η C hη hC hdetect
 
 end DeploymentModel
+
+/-! ## The converse is not a theorem here, and saying why is the point
+
+An earlier revision of this module stated the full biconditional
+`perpRisk = 0 ↔ 0 < η` as `characterization_of_model`, taking
+`hzero : η = 0 → 0 < perpRisk` as a hypothesis. **It is removed**, and the reason is the
+standard now applied corpus-wide: *if deleting the proof body and replacing it with the
+hypothesis would produce the same theorem, there is no theorem.*
+
+The two halves are not alike, and packaging them together disguised that:
+
+* **`0 < η ⟹ perpRisk = 0` is derived.** It runs through
+  `perpRisk_eq_zero_of_blind_eq_zero` — blindness vanishing at any *single* finite order
+  kills the absolutely-blind residual — fed by coverage invariance, which supplies
+  `σ_min ≥ (η/C)^k > 0` at every order. That is real content and it keeps a theorem's name
+  (`perpRisk_eq_zero_of_eta_pos`, and its positive-`η` restatement above).
+* **`perpRisk = 0 ⟹ 0 < η` was not.** Its entire content was the contrapositive of
+  `hzero`. The proof case-split on `η = 0` and applied the hypothesis. Stating it as half
+  of a biconditional made the derived half look stronger than it is, which is exactly the
+  defect the sweep is removing elsewhere.
+
+**What a proof of the converse would need.** The modulus-copy falsifier: at `η = 0` there
+is an infinite-dimensional two-point kernel even when `T` is injective, so vanishing
+support leaves genuine blindness. The corpus states that as a construction rather than a
+hypothesis, so it is not obviously out of reach — but it is not formalized, and until it is
+there is no biconditional here, only the forward implication and a named gap. -/
 
 /-! ## The cost, which is where the interesting correction lives -/
 
@@ -234,8 +240,6 @@ theorem sampleCost_unbounded (η C : ℝ) (hη : 0 < η) (hlt : η < C) (B : ℝ
 regime the published formula describes, and stating it beside `sampleCost_unbounded` is the
 point — the two together say exactly which claim is safe to quote. -/
 theorem sampleCost_one (η C : ℝ) : sampleCost η C 1 = (C / η) ^ 2 := by
-  first
-    | (rw [sampleCost]; norm_num)
-    | rw [sampleCost]
+  rw [sampleCost]
 
 end Calibrator.BundleRigidity
