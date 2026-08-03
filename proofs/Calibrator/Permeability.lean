@@ -106,6 +106,13 @@ the tangent with reciprocal-variance information `Γ²/V`. -/
 noncomputable def momentPermeability (response noiseVariance : ℝ) : ℝ :=
   response ^ 2 / noiseVariance
 
+/-- **The permeability's junk branch, named.** At zero noise the permeability diverges and Lean
+returns `0`, so a noiseless channel is reported as carrying no information. Consumers must
+require `noiseVariance ≠ 0`. -/
+theorem momentPermeability_zero_noise_is_junk (response : ℝ) :
+    momentPermeability response 0 = 0 := by
+  unfold momentPermeability; simp
+
 /-- Rescaling a scalar moment and its response by the same nonzero factor leaves
 permeability unchanged: response squares and noise variance scale together. -/
 theorem momentPermeability_scale

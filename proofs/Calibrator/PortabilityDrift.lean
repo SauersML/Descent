@@ -4810,6 +4810,11 @@ own scientifically justified tolerance. -/
 noncomputable def finiteIslandCorrection (demes : ℝ) : ℝ :=
   (demes / (demes - 1)) ^ 2
 
+/-- **The finite-island correction's junk branch, named.** At a single deme the correction
+diverges and Lean returns `0`. Consumers must require `demes ≠ 1`. -/
+theorem finiteIslandCorrection_one_deme_is_junk : finiteIslandCorrection 1 = 0 := by
+  unfold finiteIslandCorrection; norm_num
+
 /-- With two demes the finite-island correction is exactly four. -/
 @[simp] theorem finiteIslandCorrection_two : finiteIslandCorrection 2 = 4 := by
   norm_num [finiteIslandCorrection]

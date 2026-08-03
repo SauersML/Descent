@@ -716,6 +716,12 @@ with the symbol integral, and `ldPrecisionTrace_div_sites_tendsto` proves it is
 the per-variant limit of the exact finite-chromosome trace. -/
 def ldWhiteningGain (decay : ℝ) : ℝ := (1 + decay ^ 2) / (1 - decay ^ 2)
 
+/-- **The whitening gain's junk branch, named.** At perfect retention the denominator vanishes
+and Lean returns `0`, where the gain diverges: total linkage is reported as no whitening
+advantage at all, the reverse of the truth. Consumers must require `|decay| < 1`. -/
+theorem ldWhiteningGain_one_is_junk : ldWhiteningGain 1 = 0 := by
+  unfold ldWhiteningGain; norm_num
+
 theorem stationaryLDEntry_eq_ldAfterGenerations (r Ne : ℝ) (separation : ℕ) :
     stationaryLDEntry (ldRetentionPerGen r Ne) separation =
       ldAfterGenerations 1 r Ne separation := by
@@ -876,6 +882,12 @@ tridiagonal inverse at every separation.  The Python validation remains an
 independent numerical check, not part of the proof. -/
 def ldPrecisionTrace (decay : ℝ) (nSites : ℕ) : ℝ :=
   ((nSites : ℝ) * (1 + decay ^ 2) - 2 * decay ^ 2) / (1 - decay ^ 2)
+
+/-- **The precision trace's junk branch, named.** At perfect retention the trace diverges and
+Lean returns `0`, so a maximally collinear panel is reported as carrying no inverse-LD weight.
+Consumers must require `|decay| < 1`. -/
+theorem ldPrecisionTrace_one_is_junk (nSites : ℕ) : ldPrecisionTrace 1 nSites = 0 := by
+  unfold ldPrecisionTrace; norm_num
 
 /-- Separation from a boundary row to the adjacent row.  At the diagonal the
 adjacent entry is one step away; off the diagonal at separation `d+1`, it is

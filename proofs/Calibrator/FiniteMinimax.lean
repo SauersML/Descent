@@ -205,6 +205,61 @@ theorem exists_risk_lower_bound :
             (FinitePrior.probability_nonneg (E.observation θ) x)
     _ = E.risk δ θ := rfl
 
+/-- **The equalizer theorem: a constant-risk Bayes rule closes duality.**
+
+    If a rule has the same risk at every parameter value and is Bayes against some prior,
+    then the minimax value equals the mixture-certificate value, and that common value is the
+    rule's risk. This is the standard sufficient condition, and it is proved here.
+
+    It also locates exactly what the general theorem needs beyond weak duality: the EXISTENCE
+    of such an equalizer, equivalently of a least-favourable prior. That existence is the
+    minimax theorem proper -- a Sion- or von-Neumann-style compactness-and-convexity argument
+    which Mathlib does not carry (its `Probability.Decision.Risk` file defines Bayes and
+    minimax risk but proves no duality). Nothing below assumes it. -/
+theorem minimax_eq_of_equalizer (δstar : Rule actionCount observationCount)
+    (πstar : FinitePrior parameterCount) (value : ℝ)
+    (hconst : ∀ θ, E.risk δstar θ = value)
+    (hbayes : E.optimalBayesRisk πstar = E.bayesRisk πstar δstar) :
+    E.minimaxRisk = E.mixtureDualRisk ∧ E.minimaxRisk = value := by
+  obtain ⟨m, hm⟩ := E.exists_risk_lower_bound
+  have hworst : E.worstRisk δstar = value := by
+    unfold worstRisk
+    have hrange : Set.range (E.risk δstar) = {value} := by
+      ext y
+      constructor
+      · rintro ⟨θ, rfl⟩; exact hconst θ
+      · rintro rfl; exact ⟨0, hconst 0⟩
+    rw [hrange, csSup_singleton]
+  have hbayesValue : E.bayesRisk πstar δstar = value := by
+    have hmass : ∑ θ, FinitePrior.probability πstar θ = 1 :=
+      (finitePrior_probability_mem πstar).2
+    calc E.bayesRisk πstar δstar
+        = ∑ θ, FinitePrior.probability πstar θ * E.risk δstar θ := rfl
+      _ = ∑ θ, FinitePrior.probability πstar θ * value := by
+          exact Finset.sum_congr rfl fun θ _ ↦ by rw [hconst θ]
+      _ = value := by rw [← Finset.sum_mul, hmass, one_mul]
+  have hworstBdd : BddBelow (Set.range E.worstRisk) := by
+    refine ⟨m, ?_⟩
+    rintro y ⟨δ, rfl⟩
+    exact le_trans (hm δ 0) (le_csSup (Set.finite_range _).bddAbove ⟨0, rfl⟩)
+  have hminimax_le : E.minimaxRisk ≤ value := by
+    rw [← hworst]
+    exact csInf_le hworstBdd ⟨δstar, rfl⟩
+  have hdualBdd : BddAbove (Set.range E.optimalBayesRisk) := by
+    refine ⟨E.minimaxRisk, ?_⟩
+    rintro y ⟨π, rfl⟩
+    unfold minimaxRisk
+    refine le_csInf (Set.range_nonempty E.worstRisk) ?_
+    rintro z ⟨δ, rfl⟩
+    exact E.optimalBayesRisk_le_worstRisk π δ
+  have hvalue_le : value ≤ E.mixtureDualRisk := by
+    rw [← hbayesValue, ← hbayes]
+    exact le_csSup hdualBdd ⟨πstar, rfl⟩
+  have hweak := E.mixtureDualRisk_le_minimaxRisk
+  constructor
+  · linarith
+  · linarith
+
 /-- **Finite minimax duality.**  Ungraded mixture-versus-mixture reasoning is
 complete because the primal minimax value equals the optimization over all
 Bayes priors.  This is the real theorem, not a definitional equality and not a

@@ -291,6 +291,11 @@ theorem, and it holds at every admissible `α` with no exceptional range. -/
 /-- Entropy exponent of the moment body: `log N(ε) = Θ((M/ε)^(1/α))`. -/
 noncomputable def momentBodyEntropyExponent (α : ℝ) : ℝ := 1 / α
 
+/-- **The entropy exponent's junk branch, named.** At `α = 0` the exponent diverges and Lean
+returns `0`. Consumers must require `α ≠ 0`. -/
+theorem momentBodyEntropyExponent_zero_is_junk : momentBodyEntropyExponent 0 = 0 := by
+  unfold momentBodyEntropyExponent; simp
+
 /-- Entropy exponent of the enclosing hyperrectangle: `ε^(-2/(2α-1))`. -/
 noncomputable def hyperrectangleEntropyExponent (α : ℝ) : ℝ := 2 / (2 * α - 1)
 

@@ -273,6 +273,13 @@ theorem fluctuatingCorrelation_lt_stabilizing_of_tau_lt_threshold
 noncomputable def stabilizingNsFromObservedCorrelation (rho : ℝ) : ℝ :=
   1 / (2 * (1 - rho))
 
+/-- **The recovered selection strength's junk branch, named.** At a perfectly preserved
+correlation the implied `Ns` diverges and Lean returns `0`, reporting no selection where the
+data imply unbounded selection. Consumers must require `rho ≠ 1`. -/
+theorem stabilizingNsFromObservedCorrelation_perfect_is_junk :
+    stabilizingNsFromObservedCorrelation 1 = 0 := by
+  unfold stabilizingNsFromObservedCorrelation; norm_num
+
 /-- The inverse map for the stabilizing effect-correlation formula is exact on
     the biologically relevant region `ρ < 1`. -/
 theorem effectCorrelationStabilizing_eq_observedCorrelation_of_recoveredNs
@@ -289,6 +296,14 @@ theorem effectCorrelationStabilizing_eq_observedCorrelation_of_recoveredNs
     Empirical status: UNTESTED. -/
 noncomputable def tauFromObservedEffectCorrelation (t rho : ℝ) : ℝ :=
   -t / Real.log rho
+
+/-- **The recovered autocorrelation time's junk branch, named.** At `rho = 1` the logarithm is
+zero and Lean returns `0`, reporting instantaneous decorrelation where a perfectly preserved
+correlation implies an infinite autocorrelation time — the reverse of the truth. `Real.log` is
+also junk at `rho ≤ 0`. Consumers must require `0 < rho` and `rho ≠ 1`. -/
+theorem tauFromObservedEffectCorrelation_perfect_is_junk (t : ℝ) :
+    tauFromObservedEffectCorrelation t 1 = 0 := by
+  unfold tauFromObservedEffectCorrelation; simp
 
 /-- The recovered OU autocorrelation time is positive for a genuine observed
     effect correlation in `(0, 1)`. -/

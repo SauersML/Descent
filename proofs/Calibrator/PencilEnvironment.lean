@@ -157,6 +157,14 @@ theorem whiteningGain_finite_trace (decay : ℝ) (m : ℝ) (hm : m ≠ 0) :
 noncomputable def perSitePrecisionTrace (decay m : ℝ) : ℝ :=
   (1 + (m - 1) * ldWhiteningGain decay) / m
 
+/-- **The per-site trace's junk branches, named.** At `m = 0` there are no sites to average over
+and Lean's `x / 0 = 0` reports zero per-site weight rather than an undefined average; at
+`|decay| = 1` it inherits `ldWhiteningGain_one_is_junk`. Consumers must require `0 < m` and
+`|decay| < 1`. -/
+theorem perSitePrecisionTrace_zero_sites_is_junk (decay : ℝ) :
+    perSitePrecisionTrace decay 0 = 0 := by
+  unfold perSitePrecisionTrace; simp
+
 /-- **The corpus's finite-chromosome precision trace, per site, is that object.**
 
 `ImitationRigidity.ldPrecisionTrace` is derived there from the tridiagonal stencil

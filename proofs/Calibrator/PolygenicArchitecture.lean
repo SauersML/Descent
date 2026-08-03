@@ -181,6 +181,14 @@ section PolygenicityAndPortability
 noncomputable def effectivePolygenicity (sum_beta_sq sum_beta_fourth : ℝ) : ℝ :=
   sum_beta_sq^2 / sum_beta_fourth
 
+/-- **The participation ratio's junk branch, named.** With no effects the fourth-moment sum
+vanishes and Lean returns `0`, reporting an effective polygenicity of zero where the ratio is
+undefined — and where every theorem below claims it is at least one. Consumers must require
+`sum_beta_fourth ≠ 0`, which is exactly "some variant has a nonzero effect". -/
+theorem effectivePolygenicity_no_effects_is_junk (sum_beta_sq : ℝ) :
+    effectivePolygenicity sum_beta_sq 0 = 0 := by
+  unfold effectivePolygenicity; simp
+
 /-- Effective polygenicity ≥ 1.
 
     The hypothesis `h_cs` is not free: on a genuine effect vector it is a
