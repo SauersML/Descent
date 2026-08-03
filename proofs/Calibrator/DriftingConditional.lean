@@ -1027,6 +1027,19 @@ theorem gaussian_two_scale_map (x s t : ℝ) :
   rwa [hm, hv] at hsum
 
 open MeasureTheory ProbabilityTheory in
+/-- The two-scale integrand is integrable on the product: bounded by `1`, measurable, and
+the product of two probability measures is a probability measure. -/
+theorem link_two_scale_integrable (L : ℝ → ℝ) (hmono : StrictMono L)
+    (hbdd : ∀ u, 0 < L u ∧ L u < 1) (x s t : ℝ) :
+    Integrable (fun p : ℝ × ℝ ↦ L (x + s * p.1 + t * p.2))
+      ((gaussianReal 0 1).prod (gaussianReal 0 1)) := by
+  refine ⟨(hmono.monotone.measurable.comp (by fun_prop)).aestronglyMeasurable, ?_⟩
+  refine hasFiniteIntegral_of_bounded (C := 1) ?_
+  filter_upwards with p
+  rw [Real.norm_eq_abs, abs_of_pos (hbdd _).1]
+  exact le_of_lt (hbdd _).2
+
+open MeasureTheory ProbabilityTheory in
 /-- **Averaging twice is averaging once at the combined scale.**
 
 The operator form of `gaussian_two_scale_map`: both sides are `L` integrated against
@@ -1059,6 +1072,26 @@ theorem link_average_two_scale (L : ℝ → ℝ) (hmono : StrictMono L) (x s t :
     _ = ∫ w, L (x + Real.sqrt (s ^ 2 + t ^ 2) * w) ∂(gaussianReal 0 1) := by
       rw [← hR]
       exact integral_map (by fun_prop) hmono.monotone.measurable.aestronglyMeasurable
+
+open MeasureTheory ProbabilityTheory in
+/-- **The averaging operator is a semigroup in the scale, in iterated form.**
+
+Fubini turns the product integral of `link_average_two_scale` into an average at scale `t`
+of an average at scale `s`.  This is the shape the classification uses: applying the
+invariance to the inner average and then to the outer one produces the induced parameters
+of the two steps composed, while the right-hand side produces the induced parameters at the
+single combined scale.  Uniqueness (`link_invariance_params_unique`) then equates them, and
+what is left is an equation in one real variable.
+
+For the probit the resulting law is `α(√(s²+t²)) = α(s) · α(α(s) t)` with
+`α(s) = 1/√(1+s²)`, which one verifies directly:
+`α(s) · α(α(s) t) = (1/√(1+s²)) · √(1+s²)/√(1+s²+t²)`.  Pinning `α` pins the link. -/
+theorem link_average_semigroup (L : ℝ → ℝ) (hmono : StrictMono L)
+    (hbdd : ∀ u, 0 < L u ∧ L u < 1) (x s t : ℝ) :
+    ∫ z₁, (∫ z₂, L (x + s * z₁ + t * z₂) ∂(gaussianReal 0 1)) ∂(gaussianReal 0 1)
+      = ∫ w, L (x + Real.sqrt (s ^ 2 + t ^ 2) * w) ∂(gaussianReal 0 1) := by
+  rw [integral_integral (link_two_scale_integrable L hmono hbdd x s t)]
+  exact link_average_two_scale L hmono x s t
 
 open MeasureTheory ProbabilityTheory in
 /-- **The link is continuous — derived from the invariance, not assumed.**
