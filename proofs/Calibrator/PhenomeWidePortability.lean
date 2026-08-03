@@ -500,24 +500,21 @@ neutral expectation, reflecting pathogen-driven divergent selection.
 
 section ImmuneTraits
 
-/-- **Genomic region dominates trait architecture disproportionately.**
-    A genomic region that occupies a small fraction of the genome can
-    contribute a disproportionately large fraction of genetic variance
-    for traits under strong selection in that region. When the region's
-    SNP fraction is below some bound and its variance fraction exceeds
-    that bound, the region is enriched.
+/-! **Deleted: `region_disproportionate_variance`.**
 
-    Worked example: HLA region (~6p21) contains <1% of SNPs but >10%
-    of immune trait variance due to balancing/diversifying selection. -/
-theorem region_disproportionate_variance
-    (r2_region r2_genome_wide n_region_snps n_total_snps bound : ℝ)
-    (h_snp_fraction : n_region_snps / n_total_snps < bound)
-    (h_var_fraction : bound < r2_region / r2_genome_wide)
-    (_h_r2_gw : 0 < r2_genome_wide) (_h_snps : 0 < n_total_snps) :
-    -- Region contributes more variance per SNP than genome average
-    n_region_snps / n_total_snps < r2_region / r2_genome_wide := by
-  linarith
+It took `snpFraction < bound` and `bound < varianceFraction` and concluded
+`snpFraction < varianceFraction` by `linarith` — transitivity of `<`, with two further
+hypotheses (`0 < r2_genome_wide`, `0 < n_total_snps`) that the proof never used and that
+were there to make the statement look like it was about genomes. Nothing in it referred to
+a region, a SNP count, or selection: substituting any three reals gives the same theorem.
+The docstring nonetheless asserted a mechanism ("due to balancing/diversifying selection")
+and quoted numbers ("<1% of SNPs but >10% of immune trait variance") that no part of the
+statement computes or constrains.
 
+`threshold_sandwich_implies_observed_portability_below_neutral` immediately below is the
+same transitivity step, already stated under a name that claims only transitivity, so the
+inference remains available. Per the corpus policy on results that repackage a premise,
+the inflated copy is deleted rather than renamed. -/
 
 /-- **A threshold sandwich implies observed portability is below neutral.**
     This is the literal transitivity fact `port_observed < threshold < port_neutral
@@ -529,17 +526,14 @@ theorem threshold_sandwich_implies_observed_portability_below_neutral
     (h_neutral : threshold < port_neutral) :
     port_observed < port_neutral := by linarith
 
-/-- **A zero-portability component lowers a weighted portability average.**
-    If a trait keeps only the `(1 - f)` fraction of its remaining portable
-    signal, then the resulting weighted average is strictly below the residual
-    portability level whenever `0 < f < 1`. -/
-theorem zero_portability_component_lowers_weighted_average
-    (f port_rest : ℝ)
-    (h_f : 0 < f) (_h_f_le : f < 1)
-    (h_port : 0 < port_rest) (_h_port_le : port_rest ≤ 1) :
-    (1 - f) * port_rest < port_rest := by
-  have : 0 < f * port_rest := mul_pos h_f h_port
-  linarith [mul_comm f port_rest]
+/-! **Deleted: `zero_portability_component_lowers_weighted_average`.**
+
+It proved `(1 - f) * port_rest < port_rest` from `0 < f` and `0 < port_rest` — Mathlib's
+`sub_lt_self`, with `f < 1` and `port_rest ≤ 1` carried as hypotheses the proof never used.
+The name promised a *weighted average over two components*, one of them at zero
+portability; the statement has one component, no weights, and no averaging, and it is the
+unused `f < 1` that would have been needed for `(1 - f)` to be a weight at all. Nothing
+about immunity, portability, or components is formalized. Nothing in the corpus used it. -/
 
 end ImmuneTraits
 
@@ -608,28 +602,31 @@ variants captured by GWAS.
 
 section AnthropometricTraits
 
-/-- **Near-neutral portability for highly polygenic traits.**
-    For highly polygenic traits under stabilizing selection toward
-    a shared optimum, effect correlation ρ ≈ 1. The portability
-    gap from neutral is determined by (1 - ρ²).
+/-- **`1 - (1 - c/n)² < 2c/n`.**
 
-    If the per-locus selection coefficient is s and there are n loci,
-    the deviation of ρ from 1 scales as O(1/n) under the infinitesimal
-    model, because the per-locus selection effect on divergence is
-    proportional to s/n which → 0.
+    Renamed from `near_neutral_portability_highly_polygenic`, which claimed a
+    population-genetic result the statement does not contain. What is proved is the
+    algebraic fact that expanding `1 - (1 - δ)²` leaves `2δ - δ²`, strictly below `2δ`
+    whenever `δ ≠ 0`. It holds for every real `c` and every `n ≥ 2`; nothing in it is
+    specific to portability, and nothing in it degrades as `n` grows.
 
-    We model: ρ = 1 - δ where δ = c/n for some constant c.
-    Then 1 - ρ² = 1 - (1-δ)² = 2δ - δ² < 2δ = 2c/n.
-    For large n, this gap is small. -/
-theorem near_neutral_portability_highly_polygenic
+    The former docstring supplied the missing half as prose: that under the infinitesimal
+    model with a per-locus selection coefficient `s` across `n` loci, the cross-population
+    effect correlation is `ρ = 1 - c/n`, so that `1 - ρ²` is the portability gap. That
+    identification is the entire scientific claim and it is **assumed, not derived** —
+    there is no `s` in the statement, no locus count beyond a bare `n : ℕ`, no effect
+    correlation, and no derivation anywhere in this corpus fixing `ρ` to that form. The
+    unused `c ≤ 1` was the only thing tying `c` to a correlation scale, and dropping it
+    costs the theorem nothing, which is the measure of how little the model was doing.
+
+    Read as an inequality it is correct and cheap. Read as "highly polygenic traits are
+    near-neutrally portable" it was an unproved population-genetic assertion resting on an
+    `O(1/n)` scaling argument that appears in no statement. -/
+theorem one_sub_sq_one_sub_div_lt_two_mul_div
     (c : ℝ) (n : ℕ)
-    (h_c_pos : 0 < c) (_h_c_le : c ≤ 1)
+    (h_c_pos : 0 < c)
     (h_n_large : 1 < n) :
-    let delta := c / n
-    let rho := 1 - delta
-    let gap := 1 - rho ^ 2  -- portability gap proportional to 1 - ρ²
-    gap < 2 * c / n := by
-  simp only
+    1 - (1 - c / n) ^ 2 < 2 * c / n := by
   have h_n_pos : (0 : ℝ) < (n : ℝ) := Nat.cast_pos.mpr (by omega)
   -- gap = 1 - (1 - c/n)² = 2c/n - (c/n)²
   have h_expand : 1 - (1 - c / ↑n) ^ 2 = 2 * c / ↑n - (c / ↑n) ^ 2 := by ring
@@ -681,36 +678,25 @@ genetic architecture show similar portability patterns.
 
 section PhenomeWideStructure
 
-/-- **A bounded portability-correlation coordinate stays in `[-1,1]`.**
-    If `|port_corr| ≤ |rg|` and `|rg| ≤ 1`, then `|port_corr| ≤ 1`. This is the
-    exact boundedness fact used by any downstream interpretation. -/
-theorem bounded_portability_correlation_stays_within_unit_interval
-    (rg port_corr : ℝ)
-    (h_relation : |port_corr| ≤ |rg|)
-    (h_rg_bounded : |rg| ≤ 1) :
-    |port_corr| ≤ 1 := le_trans h_relation h_rg_bounded
+/-! **Deleted: three Mathlib lemmas wearing phenome-wide names.**
 
-/-- **Lower bounds on two factor contributions imply a lower bound on their
-sum.**
-    This is the exact additive lower-bound step `lb₁ < f₁` and `lb₂ < f₂`
-    imply `lb₁ + lb₂ < f₁ + f₂`. -/
-theorem factor_lower_bounds_sum_strictly_below_total
-    (var_explained_f1 var_explained_f2 lb₁ lb₂ : ℝ)
-    (h_f1 : lb₁ < var_explained_f1)
-    (h_f2 : lb₂ < var_explained_f2)
-    (_h_total : var_explained_f1 + var_explained_f2 ≤ 1)
-    (_h_f1_nn : 0 ≤ var_explained_f1) (_h_f2_nn : 0 ≤ var_explained_f2) :
-    lb₁ + lb₂ < var_explained_f1 + var_explained_f2 := by linarith
+This section held `bounded_portability_correlation_stays_within_unit_interval`
+(`le_trans`), `factor_lower_bounds_sum_strictly_below_total` (`add_lt_add`), and
+`prediction_error_bounded_by_looser_tolerance` (`lt_of_le_of_lt`). Each was proved in one
+step, each was applied nowhere in the corpus, and in each the domain vocabulary lived
+entirely in the binder names: rename `port_corr` to `x` and the statement is a Mathlib
+lemma with no phenome-wide content left to lose.
 
-/-- **A prediction error bound implies any looser tolerance bound.**
-    If `|actual - predicted| ≤ ε` and `ε < bound`, then the prediction error is
-    strictly below `bound`. This is only the final inequality step, not the
-    derivation of the predictor itself. -/
-theorem prediction_error_bounded_by_looser_tolerance
-    (_polygenicity _selection_signal predicted_port actual_port ε bound : ℝ)
-    (h_prediction : |actual_port - predicted_port| ≤ ε)
-    (h_small_error : ε < bound) :
-    |actual_port - predicted_port| < bound := by linarith
+Two carried the tell beyond naming. `factor_lower_bounds_sum_strictly_below_total` took
+`f₁ + f₂ ≤ 1` and `0 ≤ fᵢ` — the conditions that would make the two numbers *variance
+shares* — and used none of them, so nothing in it was about a decomposition.
+`prediction_error_bounded_by_looser_tolerance` took `polygenicity` and `selection_signal`
+as real arguments that appear nowhere in its statement: a predictor built from
+architecture, named in the signature and absent from the theorem.
+
+That is the shape worth naming, since it is not an unused *hypothesis*: a phantom value
+parameter is invisible to the unused-variable linter's usual reading and to any reviewer
+skimming the conclusion, because the conclusion is where it fails to appear. -/
 
 /-- **Pearson `R²` is strictly below `1` under additive prediction noise.**
     For the scalar model `Y = aX + ε` with `σ²_ε > 0`, the induced
@@ -718,13 +704,9 @@ theorem prediction_error_bounded_by_looser_tolerance
     This file does not prove a separate rank-correlation theorem here; it only
     proves the Pearson bound. -/
 theorem pearson_r2_below_one_under_additive_noise
-    (a sigma_x sigma_eps : ℝ)
-    (h_a_pos : 0 < a) (_h_a_le : a ≤ 1)
-    (h_sx_pos : 0 < sigma_x) (h_se_pos : 0 < sigma_eps) :
+    (a sigma_x sigma_eps : ℝ) (h_se_pos : 0 < sigma_eps) :
     -- Pearson r² for Y = aX + ε is a²σ²_X / (a²σ²_X + σ²_ε) < 1
     let pearson_r2 := (a * sigma_x) ^ 2 / ((a * sigma_x) ^ 2 + sigma_eps ^ 2)
-    -- Pearson R² is strictly less than 1 — rank correlation preserves
-    -- more of the monotone signal (Kruskal 1958).
     pearson_r2 < 1 := by
   simp only
   rw [div_lt_one (by positivity)]

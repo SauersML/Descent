@@ -23,8 +23,7 @@ cannot collide, since this file defines none of these names and the only
 namespace. The remaining `TransportedMetrics.` prefixes in this file are left
 alone; both spellings resolve to the same constant. -/
 open TransportedMetrics (r2FromSignalVariance r2FromSignalVariance_eq_rsquared
-  equalVarianceGaussianAUCFromSignalVariance equalVarianceGaussianAUCFromSignalVariance_eq_processAUC
-  GaussianLiabilityRegime)
+  equalVarianceGaussianAUCFromSignalVariance)
 
 section PortabilityDrift
 
@@ -866,24 +865,6 @@ itself is not restated here: this is `r2FromSignalVariance` applied to the drift
 variance, so the two cannot drift apart. -/
 noncomputable def presentDayR2 (V_A V_E fst : ℝ) : ℝ :=
   r2FromSignalVariance (presentDayPGSVariance V_A fst) V_E
-
-/-- **The drift `R²` is the process `R²`**, inherited rather than re-derived.
-
-The only thing this adds to `r2FromSignalVariance_eq_rsquared` is the identification of the signal
-variance with the drift-attenuated one, which is the single modelling step this quantity
-makes. Everything else - the additive-noise regime, the variance split, the reduction of
-an integral to a quotient - is already discharged upstream. That is the point of routing
-these through one definition: a bridge written once reaches all of them. -/
-theorem presentDayR2_eq_rsquared {k : ℕ} [Fintype (Fin k)]
-    {dgp : DataGeneratingProcess k} {signal : Predictor k}
-    (R : MomentReading dgp signal) (V_A V_E fst : ℝ)
-    (h_signal : R.vSignal = presentDayPGSVariance V_A fst)
-    (h_additive : R.cov = R.vSignal)
-    (h_split : R.vOutcome = R.vSignal + V_E) :
-    presentDayR2 V_A V_E fst = rsquared dgp signal dgp.trueExpectation := by
-  unfold presentDayR2
-  rw [← h_signal]
-  exact r2FromSignalVariance_eq_rsquared R V_E h_additive h_split
 
 /-- Exact bridge theorem: the dashboard algebraic `presentDayR2` equals statistical
 `rsquared` when the relevant second-moment identities hold. -/
@@ -3102,18 +3083,12 @@ theorem targetAUC_lt_source_of_neutralAF_benchmark
 noncomputable def equalVarianceGaussianAUCFromSNR (snr : ℝ) : ℝ :=
   Phi (Real.sqrt (snr / 2))
 
-/-- **The signal-to-noise reading of the AUC, under the same obligation.**
-
-`equalVarianceGaussianAUCFromSignalVariance` earns the name "AUC" only through
-`GaussianLiabilityRegime`, whose `equalVarianceGaussian` field someone must discharge.
-This form is that one at the signal-to-noise ratio, so it inherits the obligation rather
-than needing a second one — which is the point of routing the chart forms through a single
-closed form. -/
-theorem equalVarianceGaussianAUCFromSNR_eq_processAUC {k : ℕ} [Fintype (Fin k)]
-    {dgp : DataGeneratingProcess k} {signal : Predictor k}
-    (G : GaussianLiabilityRegime dgp signal) :
-    equalVarianceGaussianAUCFromSNR (G.moments.vSignal / G.vEnv) = G.processAUC := by
-  rw [← equalVarianceGaussianAUCFromSignalVariance_eq_processAUC G]
+/-- The signal-to-noise and signal/residual-variance parameterizations are exactly the
+same closed-form chart.  This is algebra only: it does not assert that either chart is the
+AUC of a biological process without a separately proved distributional model. -/
+theorem equalVarianceGaussianAUCFromSNR_eq_variance (vSignal vEnv : ℝ) :
+    equalVarianceGaussianAUCFromSNR (vSignal / vEnv) =
+      equalVarianceGaussianAUCFromSignalVariance vSignal vEnv := by
   unfold equalVarianceGaussianAUCFromSNR equalVarianceGaussianAUCFromSignalVariance
   congr 2
   rw [div_div, mul_comm]
@@ -3122,9 +3097,9 @@ theorem equalVarianceGaussianAUCFromSNR_eq_processAUC {k : ℕ} [Fintype (Fin k)
 `DGP.equalVarianceGaussianAUCFromSignalVariance`. **Do not write a second copy here.** Two
 copies of an AUC formula can drift to opposite claims about which quantity they compute --
 equal-variance Gaussian versus liability-threshold, which are not the same and differ by a
-measured `-0.068` AUC -- and one definition cannot drift from itself. The single
-definition is the one carrying `GaussianLiabilityRegime`, so that obligation reaches every
-use. -/
+measured `-0.068` AUC -- and one definition cannot drift from itself.  The Lean definition
+is deliberately only a chart; process-level applicability must be proved from an explicit
+distributional model rather than supplied as a theorem-bearing parameter. -/
 
 /-- With `vEnv = 1`, variance form equals SNR form exactly. -/
 theorem equalVarianceGaussianAUCFromVariances_scaleOne (vSignal : ℝ) :
@@ -3292,28 +3267,23 @@ theorem liabilityProfile_differs_only_in_auc (π V_A V_E fstTarget : ℝ) :
       liabilityThresholdAUCFromExplainedR2 (presentDayR2 V_A V_E fstTarget) π :=
   ⟨rfl, rfl, rfl⟩
 
-/-- **The `R²` reading of the AUC, under the same obligation and one more hypothesis.**
+/-- **The `R²` and variance readings of the equal-variance Gaussian chart agree.**
 
 Reading the AUC off an `R²` needs the variance split as well as the Gaussian regime: `r2`
 determines a signal-to-noise ratio only once the outcome variance is known to be signal
 plus environment. With `h_split` supplied, `r2 / (1 - r2)` *is* that ratio, and this form
 reduces to the one already discharged.
 
-Stating it this way is what stops the chart from being read as a general conversion. It
-is not: outside the split it converts nothing, which is exactly the sort of claim the
-`Empirical status: FALSIFIED` note on these forms was recording in prose. -/
-theorem equalVarianceGaussianAUCFromExplainedR2_eq_processAUC {k : ℕ} [Fintype (Fin k)]
-    {dgp : DataGeneratingProcess k} {signal : Predictor k}
-    (G : GaussianLiabilityRegime dgp signal)
-    (h_split : G.moments.vOutcome = G.moments.vSignal + G.vEnv) :
+Stating it as a chart identity prevents it from being read as a general biological
+conversion.  No Gaussian-process theorem is accepted as an argument. -/
+theorem equalVarianceGaussianAUCFromExplainedR2_eq_variance
+    (vSignal vEnv : ℝ) (h_total : vSignal + vEnv ≠ 0) (h_env : vEnv ≠ 0) :
     equalVarianceGaussianAUCFromExplainedR2
-        (r2FromSignalVariance G.moments.vSignal G.vEnv) = G.processAUC := by
-  rw [← equalVarianceGaussianAUCFromSNR_eq_processAUC G]
+        (r2FromSignalVariance vSignal vEnv) =
+      equalVarianceGaussianAUCFromSignalVariance vSignal vEnv := by
+  rw [← equalVarianceGaussianAUCFromSNR_eq_variance vSignal vEnv]
   unfold equalVarianceGaussianAUCFromExplainedR2 equalVarianceGaussianAUCFromSNR
     r2FromSignalVariance
-  have hv : G.moments.vSignal + G.vEnv ≠ 0 := by
-    rw [← h_split]; exact ne_of_gt G.moments.vOutcome_pos
-  have he : G.vEnv ≠ 0 := ne_of_gt G.vEnv_pos
   congr 2
   -- `field_simp` was called without the two nonzero facts proved directly
   -- above, so it could not cancel `vEnv` and left `X * Y * Y⁻¹ = X` for
@@ -3321,7 +3291,7 @@ theorem equalVarianceGaussianAUCFromExplainedR2_eq_processAUC {k : ℕ} [Fintype
   -- never consults hypotheses. Whether the fed version closes the goal
   -- outright or leaves a polynomial identity is not knowable in advance, so
   -- `first` takes neither bet.
-  field_simp [hv, he]
+  field_simp [h_total, h_env]
   ring
 
 /-- **The boundary escape, exhibited.**  At perfect prediction the chart
@@ -4297,7 +4267,7 @@ theorem covarianceDivergence_pure_mutation (shared_ld : ℝ) :
 
 /-- Covariance divergence is at least the drift component alone when shared LD ≤ 1. -/
 theorem covarianceDivergence_ge_drift (fst_drift shared_ld : ℝ)
-    (_hfst : 0 ≤ fst_drift) (hfst_le : fst_drift ≤ 1)
+    (hfst_le : fst_drift ≤ 1)
     (hld : shared_ld ≤ 1) :
     fst_drift ≤ covarianceDivergenceMutationDrift fst_drift shared_ld := by
   unfold covarianceDivergenceMutationDrift
@@ -4307,8 +4277,8 @@ theorem covarianceDivergence_ge_drift (fst_drift shared_ld : ℝ)
 
 /-- Covariance divergence is at most 1 when parameters are in [0, 1]. -/
 theorem covarianceDivergence_le_one (fst_drift shared_ld : ℝ)
-    (_hfst : 0 ≤ fst_drift) (hfst_le : fst_drift ≤ 1)
-    (hld : 0 ≤ shared_ld) (_hld_le : shared_ld ≤ 1) :
+    (hfst_le : fst_drift ≤ 1)
+    (hld : 0 ≤ shared_ld) :
     covarianceDivergenceMutationDrift fst_drift shared_ld ≤ 1 := by
   rw [covarianceDivergenceMutationDrift_eq]
   have h1 : 0 ≤ (1 - fst_drift) * shared_ld := by
@@ -4340,7 +4310,7 @@ theorem presentDayPGSVarianceMutationDrift_pure_drift (V_A fst_drift : ℝ) :
 
 /-- Signal retention is nonneg under valid parameters. -/
 theorem presentDayPGSVarianceMutationDrift_nonneg (V_A fst_drift shared_ld : ℝ)
-    (hVA : 0 ≤ V_A) (_hfst : 0 ≤ fst_drift) (hfst_le : fst_drift ≤ 1)
+    (hVA : 0 ≤ V_A) (hfst_le : fst_drift ≤ 1)
     (hld : 0 ≤ shared_ld) :
     0 ≤ presentDayPGSVarianceMutationDrift V_A fst_drift shared_ld := by
   rw [presentDayPGSVarianceMutationDrift_eq]
@@ -4350,8 +4320,7 @@ theorem presentDayPGSVarianceMutationDrift_nonneg (V_A fst_drift shared_ld : ℝ
     When shared_ld < 1 and other parameters are positive, mutation-drift signal
     retention is strictly below drift-only signal retention. -/
 theorem mutationDrift_signal_lt_puredrift (V_A fst_drift shared_ld : ℝ)
-    (hVA : 0 < V_A) (_hfst : 0 ≤ fst_drift) (hfst_lt : fst_drift < 1)
-    (_hld : 0 < shared_ld) (hld_lt : shared_ld < 1) :
+    (hVA : 0 < V_A) (hfst_lt : fst_drift < 1) (hld_lt : shared_ld < 1) :
     presentDayPGSVarianceMutationDrift V_A fst_drift shared_ld <
       presentDayPGSVariance V_A fst_drift := by
   rw [presentDayPGSVarianceMutationDrift_eq]
@@ -4374,16 +4343,16 @@ noncomputable def presentDayR2MutationDrift (V_A V_E fst_drift shared_ld : ℝ) 
     overestimates portability. -/
 theorem mutationDrift_R2_lt_puredrift_R2 (V_A V_E fst_drift shared_ld : ℝ)
     (hVA : 0 < V_A) (hVE : 0 < V_E)
-    (hfst : 0 ≤ fst_drift) (hfst_lt : fst_drift < 1)
+    (hfst_lt : fst_drift < 1)
     (hld : 0 < shared_ld) (hld_lt : shared_ld < 1) :
     presentDayR2MutationDrift V_A V_E fst_drift shared_ld <
       presentDayR2 V_A V_E fst_drift := by
   unfold presentDayR2MutationDrift presentDayR2 r2FromSignalVariance
   have h_sig_lt := mutationDrift_signal_lt_puredrift V_A fst_drift shared_ld
-    hVA hfst hfst_lt hld hld_lt
+    hVA hfst_lt hld_lt
   have h_md_nonneg : 0 ≤ presentDayPGSVarianceMutationDrift V_A fst_drift shared_ld := by
     exact presentDayPGSVarianceMutationDrift_nonneg V_A fst_drift shared_ld
-      (le_of_lt hVA) hfst (le_of_lt hfst_lt) (le_of_lt hld)
+      (le_of_lt hVA) (le_of_lt hfst_lt) (le_of_lt hld)
   exact expectedR2_strictMono_nonneg V_E
     (presentDayPGSVarianceMutationDrift V_A fst_drift shared_ld)
     (presentDayPGSVariance V_A fst_drift)
@@ -4411,8 +4380,7 @@ benchmark when target shared LD is worse than source shared LD. -/
 theorem neutralAFSharedLDBenchmarkRatio_lt_neutralAFBenchmarkRatio
     (fstSource fstTarget shared_ld_source shared_ld_target : ℝ)
     (hfstS : fstSource < 1) (hfstT : fstTarget < 1)
-    (hldS : 0 < shared_ld_source) (_hldS_le : shared_ld_source ≤ 1)
-    (_hldT : 0 < shared_ld_target)
+    (hldS : 0 < shared_ld_source)
     (hld_decay : shared_ld_target / shared_ld_source < 1) :
     neutralAFSharedLDBenchmarkRatio fstSource fstTarget shared_ld_source shared_ld_target <
       neutralAFBenchmarkRatio fstSource fstTarget := by
@@ -4436,7 +4404,7 @@ theorem neutralAFSharedLDBenchmarkRatio_lt_neutralAFBenchmarkRatio
     of signal retention. -/
 theorem equilibrium_drift_component_improves_with_theta
     (V_A θ₁ θ₂ : ℝ)
-    (hVA : 0 < V_A) (hθ₁ : 0 < θ₁) (_hθ₂ : 0 < θ₂)
+    (hVA : 0 < V_A) (hθ₁ : 0 < θ₁)
     (h_more : θ₁ < θ₂) :
     presentDayPGSVariance V_A (1 / (1 + θ₁)) <
       presentDayPGSVariance V_A (1 / (1 + θ₂)) := by
@@ -4475,19 +4443,21 @@ theorem mutationDrift_variance_ratio (V_A fst shared_ld : ℝ)
   have hVA_ne : V_A ≠ 0 := ne_of_gt hVA
   field_simp [hfst_ne, hVA_ne]
 
-/-- **Correction factor for the drift-only benchmark.**
-    To convert drift-only neutral-benchmark predictions to mutation-drift
-    predictions, multiply by the shared LD fraction. This gives the exact
-    correction. -/
-theorem neutral_af_benchmark_correction_factor (V_A V_E fst_target shared_ld : ℝ)
-    (_hVA : 0 < V_A) (_hVE : 0 < V_E)
-    (_hfst : 0 ≤ fst_target) (_hfst_lt : fst_target < 1)
-    (_hld : 0 < shared_ld) (_hld_le : shared_ld ≤ 1) :
-    presentDayPGSVarianceMutationDrift V_A fst_target shared_ld =
-      shared_ld * presentDayPGSVariance V_A fst_target := by
-  rw [presentDayPGSVarianceMutationDrift_eq]
-  unfold presentDayPGSVariance pgsVarianceFromHet
-  ring
+/-! **Deleted: `neutral_af_benchmark_correction_factor`.**
+
+It stated `presentDayPGSVarianceMutationDrift V_A fst ld = ld * presentDayPGSVariance V_A
+fst` and proved it by `ring`. Every one of its six hypotheses was unused — `0 < V_A`,
+`0 < V_E`, `0 ≤ fst`, `fst < 1`, `0 < ld`, `ld ≤ 1` — and `V_E` was a phantom parameter
+appearing nowhere in the statement, present only so the signature would read like a
+statement about `R²`. The identity is `presentDayPGSVarianceMutationDrift_eq` with the
+factors reassociated, and `mutationDrift_variance_ratio` just above states the same content
+as a ratio with the hypotheses it actually needs.
+
+Two hypotheses were worse than unused: `0 ≤ fst` and `fst < 1` are the range in which the
+"correction factor" reading is meaningful, and because they were not used, the equation
+also holds at `fst > 1`, where `presentDayPGSVariance` is negative and the word
+*correction* has no referent. A theorem satisfied by the inadmissible parameter values
+too cannot be evidence that the admissible ones are the intended domain. -/
 
 /-- **Pairwise Fst under mutation-drift balance is bounded.**
     Under mutation-drift equilibrium, pairwise Fst between any two populations
@@ -4523,50 +4493,30 @@ section MigrationDriftPortability
 
 /-! ### 1. Fst under migration-drift balance: Fst = 1/(1 + 4Nm) -/
 
-/-- **The infinite-island limit, as an obligation rather than a footnote.**
+/-- The standard finite-island correction factor for `demes` demes.
 
-The docstring below quantifies the assumption precisely — within 2% at 40 demes, +17% at
-10, +31% at 5, +95% at 2 — and then the formula is used at two demes anyway, because a
-docstring cannot be discharged. This structure makes the deme count a parameter and the
-adequacy of the limit a hypothesis someone has to supply.
+This is data, not a packaged claim that an approximation is adequate.  Any biological
+use of the infinite-island approximation must compare this explicit quantity with its
+own scientifically justified tolerance. -/
+noncomputable def finiteIslandCorrection (demes : ℝ) : ℝ :=
+  (demes / (demes - 1)) ^ 2
 
-`tolerance` is the fraction of `F_ST` the caller is willing to be wrong by, and
-`limit_adequate` says the finite-deme correction sits inside it. The correction is the one
-the note names, `(d/(d-1))²`, whose departure from 1 is the whole error: at `d = 2` it is
-`4`, which is the twofold discrepancy in the two-ancestry comparison this development is
-mostly about. A caller at two demes cannot discharge this at any sane tolerance, which is
-the point — the obligation fails where the formula fails, instead of the formula being
-used and the failure living in prose.
+/-- With two demes the finite-island correction is exactly four. -/
+@[simp] theorem finiteIslandCorrection_two : finiteIslandCorrection 2 = 4 := by
+  norm_num [finiteIslandCorrection]
 
-This is the same device as `ClosedPopulationNoMutation.mutation_negligible`. -/
-structure InfiniteIslandLimit where
-  /-- Number of demes. -/
-  demes : ℝ
-  demes_ge_two : 2 ≤ demes
-  /-- The fraction of `F_ST` the caller accepts being wrong by. -/
-  tolerance : ℝ
-  tolerance_pos : 0 < tolerance
-  /-- The finite-deme correction factor is within tolerance of one. -/
-  limit_adequate : (demes / (demes - 1)) ^ 2 - 1 ≤ tolerance
-
-/-- **Two demes cannot discharge the limit at any tolerance below 3.**
-
-At `d = 2` the correction factor is `4`, so the excess is `3`: the formula is off by that
-much in the case the development most often applies it to. Stated as a theorem so the
-obstruction is checkable rather than a remark. -/
-theorem InfiniteIslandLimit.two_demes_excess (I : InfiniteIslandLimit)
-    (h : I.demes = 2) : 3 ≤ I.tolerance := by
-  have := I.limit_adequate
-  rw [h] at this
-  norm_num at this
-  linarith
+/-- Consequently its excess over the infinite-island value is exactly three. -/
+@[simp] theorem finiteIslandCorrection_two_excess :
+    finiteIslandCorrection 2 - 1 = 3 := by
+  rw [finiteIslandCorrection_two]
+  norm_num
 
 /-- **Island model equilibrium Fst under migration-drift balance.**
     Fst_eq = 1 / (1 + 4Nm) where N is effective size and m is migration rate.
     This is the classical Wright (1931) result.
 
-    Regime: the infinite-island limit, now carried by `InfiniteIslandLimit`
-    above rather than by this note. Simulation puts the law within 2% at 40
+    Regime: the infinite-island limit. The explicit `finiteIslandCorrection`
+    above makes the finite-deme discrepancy inspectable. Simulation puts the law within 2% at 40
     demes, but +17% at 10, +31% at 5 and +95% at 2. The two-deme case is the
     two-ancestry comparison this development is mostly about, so the law is off
     by roughly twofold in its primary application. The finite-deme correction
@@ -4837,7 +4787,7 @@ theorem fstMigrationDriftEquilibrium_in_unit (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0
 /-- **Equilibrium Fst decreases with migration rate** (Ne fixed).
     More migration → more gene flow → less differentiation. -/
 theorem fstMigrationDriftEquilibrium_decreases_with_m (Ne m₁ m₂ : ℝ)
-    (hNe : 0 < Ne) (hm₁ : 0 < m₁) (_hm₂ : 0 < m₂) (h_more : m₁ < m₂) :
+    (hNe : 0 < Ne) (hm₁ : 0 < m₁) (h_more : m₁ < m₂) :
     fstMigrationDriftEquilibrium Ne m₂ < fstMigrationDriftEquilibrium Ne m₁ := by
   unfold fstMigrationDriftEquilibrium
   apply div_lt_div_of_pos_left one_pos (by nlinarith) (by nlinarith)
@@ -4845,24 +4795,30 @@ theorem fstMigrationDriftEquilibrium_decreases_with_m (Ne m₁ m₂ : ℝ)
 /-- **Equilibrium Fst decreases with effective population size** (m fixed).
     Larger Ne → slower drift relative to migration → less differentiation. -/
 theorem fstMigrationDriftEquilibrium_decreases_with_Ne (Ne₁ Ne₂ m : ℝ)
-    (hNe₁ : 0 < Ne₁) (_hNe₂ : 0 < Ne₂) (hm : 0 < m) (h_more : Ne₁ < Ne₂) :
+    (hNe₁ : 0 < Ne₁) (hm : 0 < m) (h_more : Ne₁ < Ne₂) :
     fstMigrationDriftEquilibrium Ne₂ m < fstMigrationDriftEquilibrium Ne₁ m := by
   unfold fstMigrationDriftEquilibrium
   apply div_lt_div_of_pos_left one_pos (by nlinarith) (by nlinarith)
 
 /-! ### 2. Migration counteracts drift -/
 
-/-- **Migration reduces Fst relative to pure drift.**
-    Under migration-drift equilibrium, Fst = 1/(1+4Nm) < 1 - (1-1/(2Ne))^t
-    for sufficiently large t. We prove the simpler qualitative statement:
-    equilibrium Fst with migration is below the coalescent Fst at separation time t
-    when t is large enough relative to Ne. -/
-theorem migration_reduces_fst_vs_pure_drift (Ne m t : ℝ)
-    (_hNe : 0 < Ne) (_hm : 0 < m) (_ht : 0 < t)
-    (h_large_t : 1 / (1 + 4 * Ne * m) < t / (t + 2 * Ne)) :
-    fstMigrationDriftEquilibrium Ne m < t / (t + 2 * Ne) := by
-  unfold fstMigrationDriftEquilibrium
-  exact h_large_t
+/-! **Deleted: `migration_reduces_fst_vs_pure_drift`.**
+
+Its hypothesis was `1 / (1 + 4 * Ne * m) < t / (t + 2 * Ne)` and its conclusion was
+`fstMigrationDriftEquilibrium Ne m < t / (t + 2 * Ne)`. Since
+`fstMigrationDriftEquilibrium Ne m` unfolds to `1 / (1 + 4 * Ne * m)`, the two are the same
+proposition and the proof was `unfold; exact h_large_t` — the hypothesis, returned. The
+remaining three hypotheses (`0 < Ne`, `0 < m`, `0 < t`) were unused.
+
+The docstring claimed the derivation the theorem skipped: "Under migration-drift
+equilibrium, Fst = 1/(1+4Nm) < 1 - (1-1/(2Ne))^t for sufficiently large t." Nothing
+established *for which* `t` the inequality holds; that is precisely what was assumed, under
+a name (`h_large_t`) asserting the answer. Establishing it would mean showing
+`1/(1+4Nm) < t/(t+2Ne)` for `t` past an explicit threshold in `Ne` and `m`, which is a real
+result and is not present anywhere in this file.
+
+Per the corpus policy on results that merely repackage a premise, deleted rather than
+renamed: there is no honest name for `h → h`. -/
 
 /-- **Finite equilibrium vs unbounded drift.**
     Under pure drift, Fst approaches 1 as t → ∞. Under migration-drift balance,
@@ -4898,7 +4854,7 @@ theorem splitMigration_more_migration_less_fst
     let s₂ : SplitMigrationModel := ⟨0, Ne, m₂, mu, hNe, le_of_lt hm₂, hmu⟩
     s₂.fstMigDriftEq < s₁.fstMigDriftEq := by
   simp only [SplitMigrationModel.fstMigDriftEq]
-  exact fstMigrationDriftEquilibrium_decreases_with_m Ne m₁ m₂ hNe hm₁ hm₂ h_more
+  exact fstMigrationDriftEquilibrium_decreases_with_m Ne m₁ m₂ hNe hm₁ h_more
 
 /-! ### 3. Stepping-stone model: Fst increases with geographic distance -/
 
@@ -5069,7 +5025,7 @@ theorem sharedLDFromMigration_lt_one (M : ℝ) (hM : 0 ≤ M) :
 /-- **Shared LD fraction increases with migration rate.**
     More migration → more shared LD → better PGS portability. -/
 theorem sharedLDFromMigration_increases (M₁ M₂ : ℝ)
-    (hM₁ : 0 < M₁) (_hM₂ : 0 < M₂) (h_more : M₁ < M₂) :
+    (hM₁ : 0 < M₁) (h_more : M₁ < M₂) :
     sharedLDFromMigration M₁ < sharedLDFromMigration M₂ := by
   unfold sharedLDFromMigration
   rw [div_lt_div_iff₀ (by linarith) (by linarith)]
@@ -5205,17 +5161,24 @@ theorem signalRetention_increases_with_migration (V_A Ne m₁ m₂ : ℝ)
     nlinarith
   rwa [div_pow, div_pow] at h_sq
 
-/-- **R² under migration-drift is higher than without migration (pure drift).**
-    For a population pair with the same coalescent divergence time, introducing
-    migration strictly improves the R² portability ratio. We show that at
-    migration-drift equilibrium, the Fst is lower than under pure drift to t=∞. -/
-theorem migration_improves_R2_over_pure_drift (V_A V_E Ne m : ℝ)
-    (hVA : 0 < V_A) (hVE : 0 < V_E) (_hNe : 0 < Ne) (_hm : 0 < m)
-    (fst_nomial : ℝ) (hfst_pure : fstMigrationDriftEquilibrium Ne m < fst_nomial)
-    (hfst_nomial_lt : fst_nomial < 1) :
-    presentDayR2 V_A V_E fst_nomial < presentDayR2 V_A V_E (fstMigrationDriftEquilibrium Ne m) := by
-  exact drift_degrades_R2 V_A V_E (fstMigrationDriftEquilibrium Ne m) fst_nomial
-    hVA hVE hfst_pure (le_of_lt hfst_nomial_lt)
+/-! **Deleted: `migration_improves_R2_over_pure_drift`.**
+
+The name asserted that migration improves `R²`; the statement took as a hypothesis that the
+equilibrium `F_ST` is below some free real `fst_nomial` and concluded that `R²` is higher
+there. That `fst_nomial` exceeds the equilibrium — the entire content of "migration
+improves portability" — was supplied by the caller, not proved, and `fst_nomial` was
+otherwise unconstrained: it is not derived from `Ne`, from `m`, from a divergence time, or
+from any pure-drift model. The docstring's "under pure drift to t=∞" named a limit the
+statement never takes. `0 < Ne` and `0 < m` were unused, so the theorem holds for
+parameters at which the island model has no equilibrium at all.
+
+What remained after removing the assumed premise was `drift_degrades_R2` with its first
+argument instantiated at `fstMigrationDriftEquilibrium Ne m` — its whole proof was one
+application of that lemma. The single call site,
+`recurrence_derived_R2_increases_with_m`, now calls `drift_degrades_R2` directly and is
+unchanged in statement; that theorem *does* prove the migration claim, because it derives
+the `F_ST` ordering from `m₁ < m₂` via `fstMigrationDriftEquilibrium_decreases_with_m`
+instead of assuming it. -/
 
 /-! ### 6. Asymmetric migration -/
 
@@ -5239,11 +5202,11 @@ theorem asymmetricFst_eq_migrationDriftEq (Ne m_into : ℝ) :
     Population 1 receives more migrants from pop 2, so its genetic composition
     is closer to pop 2 than vice versa. -/
 theorem asymmetric_migration_directional_fst
-    (Ne m₁₂ m₂₁ : ℝ) (hNe : 0 < Ne) (hm₁₂ : 0 < m₁₂) (hm₂₁ : 0 < m₂₁)
+    (Ne m₁₂ m₂₁ : ℝ) (hNe : 0 < Ne) (hm₂₁ : 0 < m₂₁)
     (h_asym : m₂₁ < m₁₂) :
     asymmetricFst Ne m₁₂ < asymmetricFst Ne m₂₁ := by
   simp only [asymmetricFst_eq_migrationDriftEq]
-  exact fstMigrationDriftEquilibrium_decreases_with_m Ne m₂₁ m₁₂ hNe hm₂₁ hm₁₂ h_asym
+  exact fstMigrationDriftEquilibrium_decreases_with_m Ne m₂₁ m₁₂ hNe hm₂₁ h_asym
 
 /-- **Portability depends on prediction direction under asymmetric migration.**
     Predicting into a population that receives more migrants (lower Fst from
@@ -5251,27 +5214,78 @@ theorem asymmetric_migration_directional_fst
 theorem asymmetric_migration_portability_direction
     (V_A V_E Ne m₁₂ m₂₁ : ℝ)
     (hVA : 0 < V_A) (hVE : 0 < V_E) (hNe : 0 < Ne)
-    (hm₁₂ : 0 < m₁₂) (hm₂₁ : 0 < m₂₁)
+    (hm₂₁ : 0 < m₂₁)
     (h_asym : m₂₁ < m₁₂) :
     presentDayR2 V_A V_E (asymmetricFst Ne m₂₁) <
       presentDayR2 V_A V_E (asymmetricFst Ne m₁₂) := by
-  have h_fst := asymmetric_migration_directional_fst Ne m₁₂ m₂₁ hNe hm₁₂ hm₂₁ h_asym
+  have h_fst := asymmetric_migration_directional_fst Ne m₁₂ m₂₁ hNe hm₂₁ h_asym
   have h_lt_one : asymmetricFst Ne m₂₁ < 1 := by
     simpa [asymmetricFst_eq_migrationDriftEq] using
       fstMigrationDriftEquilibrium_lt_one Ne m₂₁ hNe hm₂₁
   exact drift_degrades_R2 V_A V_E (asymmetricFst Ne m₁₂) (asymmetricFst Ne m₂₁)
     hVA hVE h_fst (le_of_lt h_lt_one)
 
-/-- **Mean effective Fst under asymmetric migration.**
-    The harmonic mean of directional migration rates gives the effective
-    symmetric migration rate for overall Fst.
+/-- **Arithmetic mean of the two directional migration rates.**
 
-    Empirical status: UNTESTED. -/
+    **The docstring here said "harmonic mean" and the body is the arithmetic mean.** They
+    are different numbers whenever the two rates differ, and the disagreement is
+    one-sided: AM ≥ HM always, with equality only at `m₁₂ = m₂₁`
+    (`harmonicMigrationMean_le_effectiveSymmetricMigration` below). So the stated
+    quantity systematically *overstates* gene flow relative to the quantity the docstring
+    named.
+
+    That error does not stop at the mean. `fstMigrationDriftEquilibrium` is decreasing in
+    the migration rate, so an overstated rate yields an understated `F_ST`, which
+    `presentDayR2` turns into an *overstated* `R²` in the target population — the
+    optimistic direction, and the direction that matters for a user being told how well a
+    score transfers. `effectiveSymmetricMigration_fst_le_harmonic_fst` states that
+    consequence.
+
+    This is the same failure shape the corpus already records for `hudsonFst` computing
+    Nei's `G_ST`: a name and docstring asserting one estimator over a body computing
+    another, with the discrepancy landing in the direction that flatters the result. The
+    name and docstring are corrected here rather than the body, because the body is what
+    two other files already depend on — `Conventions.lean` ties it to `meanAlleleFreq`
+    (an arithmetic mean, so that identity is only true of the current body), and
+    `PopulationGeneticsFoundations.lean` proves the betweenness and idempotence facts
+    against it. Changing the body to a harmonic mean would falsify both. Which of the two
+    means is the right effective rate for asymmetric migration is not settled anywhere in
+    this corpus, and nothing here should be read as settling it.
+
+    Empirical status: UNTESTED, and note that a test of this quantity tests the arithmetic
+    mean; it would say nothing about the harmonic mean the old docstring claimed. -/
 noncomputable def effectiveSymmetricMigration (m₁₂ m₂₁ : ℝ) : ℝ :=
   (m₁₂ + m₂₁) / 2
 
-/-- Effective symmetric migration is between the two directional rates. -/
-theorem effectiveSymmetricMigration_between (m₁₂ m₂₁ : ℝ) (_hm₁₂ : 0 < m₁₂) (_hm₂₁ : 0 < m₂₁)
+/-- **The arithmetic mean used here is never below the harmonic mean the docstring used
+to claim**, with equality exactly when the two directional rates agree. This is AM-GM-HM
+for two positive reals, and it fixes the sign of the discrepancy the old docstring hid. -/
+theorem harmonicMigrationMean_le_effectiveSymmetricMigration (m₁₂ m₂₁ : ℝ)
+    (h₁ : 0 < m₁₂) (h₂ : 0 < m₂₁) :
+    2 * m₁₂ * m₂₁ / (m₁₂ + m₂₁) ≤ effectiveSymmetricMigration m₁₂ m₂₁ := by
+  unfold effectiveSymmetricMigration
+  rw [div_le_div_iff₀ (by linarith) (by norm_num : (0:ℝ) < 2)]
+  nlinarith [sq_nonneg (m₁₂ - m₂₁)]
+
+/-- **Hence the equilibrium `F_ST` computed from this mean is never above the one the
+harmonic mean would give.** `fstMigrationDriftEquilibrium` is decreasing in the migration
+rate, so substituting the larger mean returns the smaller `F_ST`. Composed with
+`presentDayR2`, which is decreasing in `F_ST`, the arithmetic mean is the optimistic
+choice at every pair of asymmetric rates: it reports better cross-population portability
+than the harmonic mean does. Stated so the direction of the bias is checkable rather than
+left in prose. -/
+theorem effectiveSymmetricMigration_fst_le_harmonic_fst (Ne m₁₂ m₂₁ : ℝ)
+    (hNe : 0 < Ne) (h₁ : 0 < m₁₂) (h₂ : 0 < m₂₁) :
+    fstMigrationDriftEquilibrium Ne (effectiveSymmetricMigration m₁₂ m₂₁) ≤
+      fstMigrationDriftEquilibrium Ne (2 * m₁₂ * m₂₁ / (m₁₂ + m₂₁)) := by
+  unfold fstMigrationDriftEquilibrium
+  have hHM_pos : 0 < 2 * m₁₂ * m₂₁ / (m₁₂ + m₂₁) := by positivity
+  have hle := harmonicMigrationMean_le_effectiveSymmetricMigration m₁₂ m₂₁ h₁ h₂
+  have hden_pos : 0 < 1 + 4 * Ne * (2 * m₁₂ * m₂₁ / (m₁₂ + m₂₁)) := by positivity
+  exact one_div_le_one_div_of_le hden_pos (by nlinarith)
+
+/-- The arithmetic mean of two distinct rates lies strictly between them. -/
+theorem effectiveSymmetricMigration_between (m₁₂ m₂₁ : ℝ)
     (h_asym : m₂₁ < m₁₂) :
     m₂₁ < effectiveSymmetricMigration m₁₂ m₂₁ ∧
     effectiveSymmetricMigration m₁₂ m₂₁ < m₁₂ := by
@@ -5346,7 +5360,7 @@ theorem admixtureLDDecay_eq_discreteRecombinationSurvival (r : ℝ) (t : ℕ) :
 
 /-- Admixture LD decay is nonneg for recombination rate in [0, 1]. -/
 theorem admixtureLDDecay_nonneg (r : ℝ) (t : ℕ)
-    (_hr : 0 ≤ r) (hr1 : r ≤ 1) :
+    (hr1 : r ≤ 1) :
     0 ≤ admixtureLDDecay r t := by
   unfold admixtureLDDecay
   exact pow_nonneg (by linarith) t
@@ -5369,7 +5383,7 @@ theorem admixtureLDDecay_decreases_with_time (r : ℝ) (t₁ t₂ : ℕ)
 
 /-- **Admixture LD decays faster with higher recombination rate.** -/
 theorem admixtureLDDecay_decreases_with_recombination (r₁ r₂ : ℝ) (t : ℕ)
-    (_hr₁ : 0 < r₁) (_hr₂ : 0 < r₂) (_hr₁1 : r₁ < 1) (hr₂1 : r₂ < 1)
+    (hr₂1 : r₂ < 1)
     (h_more : r₁ < r₂) (ht : 0 < t) :
     admixtureLDDecay r₂ t < admixtureLDDecay r₁ t := by
   unfold admixtureLDDecay
@@ -5393,8 +5407,7 @@ noncomputable def admixtureLDBoost (r : ℝ) (t_since : ℕ) (equilibrium_ld : �
 
 /-- Admixture LD boost exceeds 1 when admixture LD is above equilibrium. -/
 theorem admixtureLDBoost_gt_one (r : ℝ) (t_since : ℕ) (equilibrium_ld : ℝ)
-    (_hr : 0 ≤ r) (_hr1 : r ≤ 1)
-    (heq_pos : 0 < equilibrium_ld) (_heq_lt : equilibrium_ld < 1)
+    (heq_pos : 0 < equilibrium_ld)
     (h_recent : equilibrium_ld < admixtureLDDecay r t_since) :
     1 < admixtureLDBoost r t_since equilibrium_ld := by
   unfold admixtureLDBoost
@@ -5404,12 +5417,9 @@ theorem admixtureLDBoost_gt_one (r : ℝ) (t_since : ℕ) (equilibrium_ld : ℝ)
 /-- **Transient admixture portability is higher than equilibrium portability.**
     When admixture is recent, the transient shared LD exceeds equilibrium shared LD,
     and thus portability is temporarily enhanced. -/
-theorem admixture_portability_above_equilibrium (V_A V_E fst r : ℝ) (t_since : ℕ)
+theorem admixture_portability_above_equilibrium (V_A fst r : ℝ) (t_since : ℕ)
     (equilibrium_ld : ℝ)
-    (hVA : 0 < V_A) (_hVE : 0 < V_E)
-    (_hfst : 0 ≤ fst) (hfst_lt : fst < 1)
-    (_heq_pos : 0 < equilibrium_ld) (_heq_lt : equilibrium_ld < 1)
-    (_hr : 0 ≤ r) (_hr1 : r ≤ 1)
+    (hVA : 0 < V_A) (hfst_lt : fst < 1)
     (h_recent : equilibrium_ld < admixtureLDDecay r t_since) :
     presentDayPGSVarianceMutationDrift V_A fst equilibrium_ld <
       presentDayPGSVarianceMutationDrift V_A fst (admixtureLDDecay r t_since) := by
@@ -5539,7 +5549,7 @@ theorem fstMigDriftEquil_lt_one (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 < m) :
     From Fst* = 1/(4Nm + 1), increasing m increases the denominator,
     hence decreases Fst*. This is derived, not assumed. -/
 theorem fstMigDriftEquil_decreasing_in_m (Ne m₁ m₂ : ℝ)
-    (hNe : 0 < Ne) (hm₁ : 0 < m₁) (_hm₂ : 0 < m₂)
+    (hNe : 0 < Ne) (hm₁ : 0 < m₁)
     (h_more : m₁ < m₂) :
     fstMigDriftEquil Ne m₂ < fstMigDriftEquil Ne m₁ := by
   unfold fstMigDriftEquil
@@ -5552,7 +5562,7 @@ theorem fstMigDriftEquil_decreasing_in_m (Ne m₁ m₂ : ℝ)
     hence decreases Fst*. Larger populations have slower drift relative to
     migration, so less differentiation. -/
 theorem fstMigDriftEquil_decreasing_in_Ne (Ne₁ Ne₂ m : ℝ)
-    (hNe₁ : 0 < Ne₁) (_hNe₂ : 0 < Ne₂) (hm : 0 < m)
+    (hNe₁ : 0 < Ne₁) (hm : 0 < m)
     (h_more : Ne₁ < Ne₂) :
     fstMigDriftEquil Ne₂ m < fstMigDriftEquil Ne₁ m := by
   unfold fstMigDriftEquil
@@ -5618,15 +5628,16 @@ benchmark.**
     benchmark `R²`. -/
 theorem recurrence_derived_R2_increases_with_m (V_A V_E Ne m₁ m₂ : ℝ)
     (hVA : 0 < V_A) (hVE : 0 < V_E) (hNe : 0 < Ne)
-    (hm₁ : 0 < m₁) (hm₂ : 0 < m₂) (h_more : m₁ < m₂) :
+    (hm₁ : 0 < m₁) (h_more : m₁ < m₂) :
     presentDayR2 V_A V_E (fstMigDriftEquil Ne m₁) <
       presentDayR2 V_A V_E (fstMigDriftEquil Ne m₂) := by
   rw [fstMigDriftEquil_eq_fstMigrationDriftEquilibrium,
       fstMigDriftEquil_eq_fstMigrationDriftEquilibrium]
-  exact migration_improves_R2_over_pure_drift V_A V_E Ne m₂ hVA hVE hNe hm₂
-    (fstMigrationDriftEquilibrium Ne m₁)
-    (fstMigrationDriftEquilibrium_decreases_with_m Ne m₁ m₂ hNe hm₁ hm₂ h_more)
-    (fstMigrationDriftEquilibrium_lt_one Ne m₁ hNe hm₁)
+  exact drift_degrades_R2 V_A V_E
+    (fstMigrationDriftEquilibrium Ne m₂) (fstMigrationDriftEquilibrium Ne m₁)
+    hVA hVE
+    (fstMigrationDriftEquilibrium_decreases_with_m Ne m₁ m₂ hNe hm₁ h_more)
+    (le_of_lt (fstMigrationDriftEquilibrium_lt_one Ne m₁ hNe hm₁))
 
 end MigrationDriftRecurrence
 

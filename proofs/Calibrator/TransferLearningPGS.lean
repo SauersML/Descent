@@ -546,49 +546,24 @@ The PGS portability problem maps to domain adaptation:
 
 section DomainAdaptation
 
-/-- Hypothesis-specific Ben-David certificate for a transferred PGS.
-
-    This is an explicit assumption boundary: proving the certificate requires
-    external domain-adaptation arguments, but once it is available we can
-    derive concrete target-error bounds from separate caps on its components. -/
-structure PGSBenDavidCertificate where
-  err_source : ℝ
-  err_target : ℝ
-  divergence : ℝ
-  lambda_star : ℝ
-  target_le_source_plus_divergence_plus_lambda :
-    err_target ≤ err_source + divergence + lambda_star
-
 /-- Ben-David upper-bound functional `ε_S(h) + d_H(S,T) + λ*`. -/
 def benDavidUpperBound (err_source divergence lambda_star : ℝ) : ℝ :=
   err_source + divergence + lambda_star
 
-/-- **Ben-David bound for PGS portability.**
-    For a fixed transferred PGS hypothesis `h`, suppose a Ben-David certificate
-    establishes `ε_T(h) ≤ ε_S(h) + d_H(S,T) + λ*`. If the source error,
-    divergence term, and irreducible gap are separately upper-bounded by
-    `source_err_ub`, `div_ub`, and `lambda_ub`, then the target error is at
-    most the sum of those component caps. -/
-theorem ben_david_pgs_bound
-    (cert : PGSBenDavidCertificate)
-    (source_err_ub div_ub lambda_ub : ℝ)
-    (h_source : cert.err_source ≤ source_err_ub)
-    (h_div : cert.divergence ≤ div_ub)
-    (h_lambda : cert.lambda_star ≤ lambda_ub) :
-    cert.err_target ≤ benDavidUpperBound source_err_ub div_ub lambda_ub := by
-  unfold benDavidUpperBound
-  linarith [cert.target_le_source_plus_divergence_plus_lambda, h_source, h_div, h_lambda]
+/-! **Deleted: `divergence_increases_with_fst`.**
 
-/-- **The divergence term relates to Fst.**
-    The H-divergence between two genetic ancestry populations
-    is monotonically related to Fst. Modeled as divergence = c * Fst
-    for a positive proportionality constant c. -/
-theorem divergence_increases_with_fst
-    (fst₁ fst₂ c : ℝ)
-    (h_c : 0 < c)
-    (h_fst : fst₁ < fst₂) :
-    c * fst₁ < c * fst₂ := by
-  exact mul_lt_mul_of_pos_left h_fst h_c
+Its statement was `c * fst₁ < c * fst₂` from `0 < c` and `fst₁ < fst₂` — Mathlib's
+`mul_lt_mul_of_pos_left`, applied verbatim as the entire proof. The H-divergence it was
+named for occurs nowhere in it; `fst₁` and `fst₂` are unconstrained reals, so the theorem
+holds at negative `F_ST` as readily as at admissible values.
+
+The claim the name made — that H-divergence between ancestry populations is monotone in
+`F_ST` — was carried entirely by the docstring, together with the linear model
+`divergence = c * F_ST` that would have made it precise. Neither is derived anywhere in
+this corpus, and asserting the *shape* of that relation is not a small assumption: it is
+what would let a measured `F_ST` be converted into a term of the Ben-David bound at all.
+Deleting the theorem does not remove a result, because multiplying an inequality by a
+positive constant was the only result present. -/
 
 /-- **Larger `λ*` worsens the Ben-David upper bound.**
     `λ*` is the irreducible source-target approximation gap appearing in the
@@ -648,21 +623,38 @@ theorem iw_ess_le_n
   rw [div_le_iff₀ h_sw_pos]
   exact h_cauchy_schwarz
 
-/-- **IW ESS decreases with population divergence.**
-    As Fst increases, the importance weights become more variable,
-    reducing the effective sample size. Modeled: weight variance
-    grows with Fst, and ESS = n / (1 + Var(w)). -/
-theorem iw_ess_decreases_with_divergence
+/-! **Two ESS formulas, and these theorems are about the other one.**
+
+`importanceWeightESS` — the definition this section is built around, and the one
+`validation/popgen_defs/transfer_battery.py` exercises — is `(Σw)² / Σw²`. The two
+theorems below are about `n / (1 + v)`. That expression is not `importanceWeightESS`, is
+not defined anywhere in this file, and is not proved equal to anything that is: the
+identification `(Σw)²/Σw² = n/(1 + Var(w))` holds when the weights are normalized to mean
+one, and no such normalization is stated or assumed here.
+
+So the theorems are true and the names below now say what they are about. What they do not
+do — despite the names they previously carried, `iw_ess_decreases_with_divergence` and
+`iw_positive_weight_variance_reduces_ess` — is establish anything about the effective
+sample size this file defines. `iw_ess_le_n` above is the only result here that mentions
+`importanceWeightESS`, and it takes the Cauchy-Schwarz step as a hypothesis rather than
+proving it.
+
+Divergence, and `F_ST`, appear in neither statement. The chain from ancestry divergence to
+weight variance was prose in the old docstrings ("as Fst increases, the importance weights
+become more variable") and is formalized nowhere. -/
+
+/-- **`n / (1 + v)` is strictly decreasing in `v` above `-1`.** Renamed from
+`iw_ess_decreases_with_divergence`; see the note above for why the old name overstated it. -/
+theorem div_one_add_strictAnti
     (n var_w₁ var_w₂ : ℝ)
     (h_n : 0 < n) (h_v1 : 0 ≤ var_w₁)
     (h_more_divergent : var_w₁ < var_w₂) :
     n / (1 + var_w₂) < n / (1 + var_w₁) := by
   apply div_lt_div_of_pos_left h_n (by linarith) (by linarith)
 
-/-- **Any positive weight variance strictly reduces the IW effective sample size.**
-    In the explicit model `ESS = n / (1 + Var(w))`, positive weight variance
-    forces the effective sample size below the unweighted sample size. -/
-theorem iw_positive_weight_variance_reduces_ess
+/-- **`n / (1 + v) < n` for positive `v`.** Renamed from
+`iw_positive_weight_variance_reduces_ess`; see the note above. -/
+theorem div_one_add_lt_self
     (n var_w : ℝ)
     (h_n : 0 < n)
     (h_var : 0 < var_w) :
@@ -1054,44 +1046,6 @@ theorem higher_info_bottleneck_objective_tightens_ben_david_bound
   exact more_label_info_less_ancestry_info_tightens_ben_david_bound
     I_phi_Y_standard I_phi_Y_new I_phi_A I_phi_A
     lambda_standard lambda_new h_IY (le_rfl) h_lambda
-
-/-- **A better information-bottleneck representation certifies a lower target-error cap.**
-    If a learned representation `φ` comes with a Ben-David certificate whose
-    source error is bounded by the exact Gaussian residual-risk formula and
-    whose domain divergence is bounded by the Pinsker ancestry-leakage cap,
-    then improving the information-bottleneck objective at fixed ancestry
-    leakage strictly lowers the certified target-error cap. -/
-theorem higher_info_bottleneck_objective_lowers_target_error_cap
-    (cert_new : PGSBenDavidCertificate)
-    (I_phi_Y_standard I_phi_Y_new I_phi_A : ℝ)
-    (lambda_standard lam : ℝ)
-    (h_source :
-      cert_new.err_source ≤ gaussianSourceResidualRisk I_phi_Y_new)
-    (h_div :
-      cert_new.divergence ≤ pinskerAncestryDivergenceCap I_phi_A)
-    (h_lambda : cert_new.lambda_star ≤ lambda_standard)
-    (h_obj :
-      infoBottleneckObjective I_phi_Y_new I_phi_A lam >
-        infoBottleneckObjective I_phi_Y_standard I_phi_A lam) :
-    cert_new.err_target <
-      infoCertifiedBenDavidUpperBound I_phi_Y_standard I_phi_A lambda_standard := by
-  have h_cert_le :
-      benDavidUpperBound cert_new.err_source cert_new.divergence cert_new.lambda_star ≤
-        infoCertifiedBenDavidUpperBound I_phi_Y_new I_phi_A cert_new.lambda_star := by
-    exact benDavidUpperBound_le_infoCertifiedBenDavidUpperBound
-      cert_new.err_source cert_new.divergence cert_new.lambda_star
-      I_phi_Y_new I_phi_A h_source h_div
-  have h_info_lt :
-      infoCertifiedBenDavidUpperBound I_phi_Y_new I_phi_A cert_new.lambda_star <
-        infoCertifiedBenDavidUpperBound I_phi_Y_standard I_phi_A lambda_standard := by
-    exact higher_info_bottleneck_objective_tightens_ben_david_bound
-      I_phi_Y_standard I_phi_Y_new I_phi_A
-      lambda_standard cert_new.lambda_star lam h_lambda h_obj
-  have h_target :
-      cert_new.err_target ≤
-        benDavidUpperBound cert_new.err_source cert_new.divergence cert_new.lambda_star := by
-    exact cert_new.target_le_source_plus_divergence_plus_lambda
-  linarith
 
 end FeatureRepresentation
 
@@ -2770,96 +2724,6 @@ theorem fineTunedTargetR2_eq_oracle_minus_postGap_isotropic
         (coefficientGapSq wAfter wStar)
         0
     _ = oracle_target_r2 - coefficientGapSq wAfter wStar := by ring
-
-/-- **A better information-bottleneck representation lowers target sample needs.**
-    The statement rests on an exact estimator-level model rather than an affine
-    bridge from a domain-adaptation bound:
-
-    - target prediction risk is the literal quadratic risk
-      `targetLinearRisk Σ_T c_T σ²`;
-    - in the isotropic target design (`Σ_T = I`), the exact excess risk of the
-      transported source weights equals the squared coefficient mismatch
-      `coefficientGapSq`;
-    - the source-shrinkage fine-tuning MSE uses that exact squared mismatch as
-      its transfer-bias term.
-
-    Therefore, if the transported source predictor's exact target excess risk is
-    certified to lie below its Ben-David target-error certificate, then a better
-    information-bottleneck representation yields a strictly smaller exact target
-    sample requirement to hit any fixed fine-tuning MSE tolerance. -/
-theorem higher_info_bottleneck_objective_reduces_required_target_samples
-    {p : ℕ}
-    (cert_new : PGSBenDavidCertificate)
-    (crossTarget wSourceNew wTarget : Fin p → ℝ)
-    (I_phi_Y_standard I_phi_Y_new I_phi_A : ℝ)
-    (lambda_standard lam : ℝ)
-    (targetNoiseVar noiseVar tau : ℝ)
-    (h_noise : 0 < noiseVar)
-    (h_tau : 0 < tau)
-    (h_opt : (1 : Matrix (Fin p) (Fin p) ℝ).mulVec wTarget = crossTarget)
-    (h_excess :
-      targetLinearExcessRisk (1 : Matrix (Fin p) (Fin p) ℝ)
-        crossTarget targetNoiseVar wSourceNew wTarget ≤ cert_new.err_target)
-    (h_source :
-      cert_new.err_source ≤ gaussianSourceResidualRisk I_phi_Y_new)
-    (h_div :
-      cert_new.divergence ≤ pinskerAncestryDivergenceCap I_phi_A)
-    (h_lambda : cert_new.lambda_star ≤ lambda_standard)
-    (h_obj :
-      infoBottleneckObjective I_phi_Y_new I_phi_A lam >
-        infoBottleneckObjective I_phi_Y_standard I_phi_A lam)
-    (h_tau_small :
-      tau < coefficientGapSq wSourceNew wTarget) :
-    0 <
-      requiredTargetSamplesForOptimalFineTuningMSE
-        (coefficientGapSq wSourceNew wTarget)
-        noiseVar tau ∧
-    requiredTargetSamplesForOptimalFineTuningMSE
-        (coefficientGapSq wSourceNew wTarget)
-        noiseVar tau <
-      requiredTargetSamplesForOptimalFineTuningMSE
-        (infoCertifiedBenDavidUpperBound
-          I_phi_Y_standard I_phi_A lambda_standard)
-        noiseVar tau := by
-  have h_gap_le_err :
-      coefficientGapSq wSourceNew wTarget ≤ cert_new.err_target := by
-    exact coefficientGapSq_le_of_targetLinearExcessRisk_le
-      crossTarget targetNoiseVar cert_new.err_target wSourceNew wTarget h_opt h_excess
-  have h_target_cap_lt :
-      cert_new.err_target <
-        infoCertifiedBenDavidUpperBound I_phi_Y_standard I_phi_A lambda_standard := by
-    exact higher_info_bottleneck_objective_lowers_target_error_cap
-      cert_new I_phi_Y_standard I_phi_Y_new I_phi_A
-      lambda_standard lam h_source h_div h_lambda h_obj
-  have h_gap_order :
-      coefficientGapSq wSourceNew wTarget <
-        infoCertifiedBenDavidUpperBound I_phi_Y_standard I_phi_A lambda_standard := by
-    linarith
-  have h_gap_new_pos :
-      0 < coefficientGapSq wSourceNew wTarget := by
-    linarith
-  have h_required_new_pos :
-      0 <
-        requiredTargetSamplesForOptimalFineTuningMSE
-          (coefficientGapSq wSourceNew wTarget)
-          noiseVar tau := by
-    exact requiredTargetSamplesForOptimalFineTuningMSE_pos
-      (coefficientGapSq wSourceNew wTarget)
-      noiseVar tau h_noise h_tau h_tau_small
-  have h_required_lt :
-      requiredTargetSamplesForOptimalFineTuningMSE
-          (coefficientGapSq wSourceNew wTarget)
-          noiseVar tau <
-        requiredTargetSamplesForOptimalFineTuningMSE
-          (infoCertifiedBenDavidUpperBound
-            I_phi_Y_standard I_phi_A lambda_standard)
-          noiseVar tau := by
-    exact requiredTargetSamplesForOptimalFineTuningMSE_strictMono_in_gapSq
-      (coefficientGapSq wSourceNew wTarget)
-      (infoCertifiedBenDavidUpperBound
-        I_phi_Y_standard I_phi_A lambda_standard)
-      noiseVar tau h_gap_new_pos h_gap_order h_noise h_tau
-  exact ⟨h_required_new_pos, h_required_lt⟩
 
 /-- **More source populations reduce the target fine-tuning burden.**
     This is an explicit shared-feature meta-learning theorem, not a hard-coded
