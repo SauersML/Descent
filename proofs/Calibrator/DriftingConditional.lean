@@ -701,6 +701,23 @@ theorem probit_link_invariant (lam t a₀ b₀ σ : ℝ) :
   ring
 
 open MeasureTheory ProbabilityTheory in
+/-- **Boundedness really does exclude the affine stratum.**
+
+The classification below says its boundedness hypothesis is load-bearing because it rules
+out the affine and half-line-exponential links. For the affine stratum that is provable
+outright, and is proved here: a strictly increasing affine map is unbounded above, so it
+cannot land in `(0, 1)`.
+
+Small, but it is the difference between a hypothesis that does work and one asserted to
+work. The exponential stratum needs the half-line restriction and is not settled here. -/
+theorem not_bounded_of_affine (c d : ℝ) (hc : 0 < c) :
+    ¬ ∀ u : ℝ, 0 < c * u + d ∧ c * u + d < 1 := by
+  intro h
+  have hval := (h ((1 - d) / c)).2
+  rw [mul_div_cancel₀ _ (ne_of_gt hc)] at hval
+  linarith
+
+open MeasureTheory ProbabilityTheory in
 /-- **Necessity: no other bounded link survives.** A strictly increasing link onto `(0,1)` whose
 two-parameter family is closed under Gaussian averaging is the normal cdf composed with an affine
 map — the gauge freedom, and nothing more.
