@@ -146,8 +146,8 @@ theorem integrable_poly_n (n : Nat) : MeasureTheory.Integrable (poly_n n) stdGau
   · refine' MeasureTheory.Integrable.abs _
     rw [ MeasureTheory.integrable_withDensity_iff ]
     · convert h_gauss_integral n |> fun h ↦ h.div_const ( Real.sqrt ( 2 * Real.pi )
-        ) using 2 ; norm_num [ ProbabilityTheory.gaussianPDF ] ; ring
-      norm_num [ ProbabilityTheory.gaussianPDFReal ] ; ring
+        ) using 2 ; norm_num [ ProbabilityTheory.gaussianPDF ] ; ring_nf
+      norm_num [ ProbabilityTheory.gaussianPDFReal ] ; ring_nf
       rw [ ENNReal.toReal_ofReal ( Real.exp_nonneg _ ) ]
     · fun_prop
     · simp [ProbabilityTheory.gaussianPDF]
