@@ -446,6 +446,48 @@ def finite_index_types_translate_correctly():
     print("  ok  api.vector_args reports the abstract-index Matrix as rank 2")
 
 
+def bounded_quantifiers_decide_only_what_they_can():
+    """POSITIVE CONTROLS for `∀`/`∃` translation.
+
+    The safety property is the REFUSAL, so it is asserted first: a quantifier
+    over an infinite domain cannot be settled by sampling, and reporting True
+    because no counterexample was drawn would be a verdict with nothing behind
+    it.  The translator must refuse those and decide only the finite ones.
+    """
+    import translate
+    ok = translate.translate_body(
+        "∀ i, 0 ≤ w i", locals_=["w"], vector_args={"w": ("n", 1)},
+        dims={"n": "len(w)"})[1]
+    assert "all(" in ok and "range(" in ok, ok
+    print("  ok  `∀ i, 0 ≤ w i` over a finite table compiles to an enumeration")
+    # NOTE: the vector must go in GLOBALS.  A generator expression does not see
+    # eval's separate locals mapping, so passing it as locals raises NameError
+    # from inside the comprehension -- which looks exactly like a translator bug.
+    def ev(src, w):
+        return eval(src, {"_rt": __import__("lean_rt"), "w": w})
+    assert ev(ok, [0.1, 0.2, 0.3]) is True
+    assert ev(ok, [0.1, -0.2, 0.3]) is False
+    print("  ok  it is TRUE on a nonnegative table and FALSE on one with -0.2")
+    ex = translate.translate_body(
+        "∃ i, 1 < w i", locals_=["w"], vector_args={"w": ("n", 1)},
+        dims={"n": "len(w)"})[1]
+    assert ev(ex, [0.5, 2.0]) is True
+    assert ev(ex, [0.5, 0.9]) is False
+    print("  ok  `∃ i, 1 < w i` is TRUE with a 2.0 present and FALSE without")
+    for src in ("∀ r : ℝ, 0 ≤ r", "∃ t : ℕ, 0 < t"):
+        try:
+            translate.translate_body(src)
+        except translate.Untranslatable as e:
+            assert "infinite domain" in str(e), str(e)
+            print(f"  ok  refuses {src!r}: an infinite domain cannot be sampled")
+        else:
+            raise AssertionError(f"{src!r} was decided by sampling")
+
+
+step("bounded quantifiers decide the finite and refuse the infinite",
+     bounded_quantifiers_decide_only_what_they_can)
+
+
 step("finite index types: enums, inferred ∑ ranges, Mathlib linear algebra",
      finite_index_types_translate_correctly)
 
@@ -455,6 +497,13 @@ step("shape-directed inhabitants (positive controls)",
 
 
 step("collision handling is exercised, not assumed", collision_handling_actually_works)
+# A SECOND, INDEPENDENT PATH for the vector definitions.  This is not a
+# duplicate of the mutation gate: that gate runs its check through the same
+# translator it is testing, so a translator bug is invisible to it.  This
+# compares against references transcribed by hand from the Lean.  It has already
+# caught one silent elementwise-arithmetic failure -- see xcheck_vector.py.
+step("independent second path for the vector definitions",
+     lambda: run("xcheck_vector.py"))
 step("mechanical extraction ceiling", lambda: run("ceiling.py"))
 step("parser reconciliation against the other tables", lambda: run("reconcile.py"))
 if not QUICK:

@@ -40,7 +40,7 @@ TOKEN_RE = re.compile(r"""
   | (?P<num>\d+\.\d+(?:[eE][-+]?\d+)?|\d+(?:[eE][-+]?\d+)?)
   | (?P<ident>[A-Za-z_Α-ωϑ-ϵᴀ-ᵿ℀-⅏Ḁ-ỿ][A-Za-z0-9_'Α-ωϑ-ϵ₀-₉ₐ-ₜḀ-ỿ]*(?:\.[A-Za-z0-9_'₀-₉]+)*)
   | (?P<proj>\.[A-Za-z_][A-Za-z0-9_'₀-₉]*|\.[0-9]+)
-  | (?P<op>⁻¹|<=|>=|!=|:=|=>|<\||\|>|\.\.|[-+*/%^()\[\]{},:;<>=|↦→←≤≥≠∧∨¬⁻¹↑√⌊⌋‖∑∏∫∘⟨⟩·×∙∈∉⊆∩∪ℝℕℤ∞πΦ⁻¹])
+  | (?P<op>⁻¹|<=|>=|!=|:=|=>|<\||\|>|\.\.|[-+*/%^()\[\]{},:;<>=|↦→←≤≥≠∧∨¬⁻¹↑√⌊⌋‖∑∏∫∘⟨⟩·×∙∈∉⊆∩∪ℝℕℤ∞πΦ∀∃⁻¹])
   | (?P<other>.)
 """, re.X)
 
@@ -109,7 +109,6 @@ HARD_STOP = {
 # "unrecognised character '∂'" does not.
 NONARITH = {
     "∂": "measure-theoretic integral (∫ … ∂μ)",
-    "∀": "universal quantifier", "∃": "existential quantifier",
     "!": "Matrix/vector literal (![…])",
     "μ": "measure argument", "σ": "sigma-algebra / measure argument",
     "ω": "sample-space argument", "η": "measure-theoretic predictor",
@@ -335,6 +334,15 @@ class Parser:
                 raise Untranslatable(
                     f"{name}: indexed with {len(args)} of {rank} indices "
                     "(partial application of a vector is not modelled)")
+            # A DECLARED vector is also a place a binder's range can be read
+            # from, and it was the one place that was not recorded -- so
+            # `∀ i, 0 ≤ w i` over a declared `w : Fin n → ℝ` refused for want of
+            # a range that was sitting right there in the argument.
+            for pos, a in enumerate(args):
+                for i in self.sum_vars:
+                    if a == pyname(i):
+                        self.index_apply.setdefault(i, []).append(
+                            (pyname(name), pos))
             idx = "".join(f"[int({a})]" for a in args)
             return f"{pyname(name)}{idx}"
         dot = self._dot(head, len(args))
@@ -365,6 +373,8 @@ class Parser:
             raise Untranslatable("unexpected end of body")
         if p.text in HARD_STOP:
             raise Untranslatable(HARD_STOP[p.text])
+        if p.text in ("∀", "∃"):
+            return self.bounded_quantifier(p.text)
         if p.text == "∑":
             self.next()
             if self.peek() is None or self.peek().kind != "ident":
@@ -524,6 +534,96 @@ class Parser:
                 return pyname(name)
             return f"_DEP:{name}"
         raise Untranslatable(f"unsupported token {p.text!r}")
+
+    def bounded_quantifier(self, sym):
+        """`∀ i, P i` and `∃ i, P i` over a FINITE index set, or refuse.
+
+        Decidable by enumeration exactly when the index set is finite and its
+        size is known: an annotation (`Fin n`, an enumeration), or -- as for `∑`
+        -- the length of whatever the index is applied to.
+
+        A QUANTIFIER OVER AN INFINITE DOMAIN IS REFUSED, and this is the whole
+        safety property of the feature.  `∀ r : ℝ, P r` cannot be settled by
+        sampling: checking a hundred points and reporting True would state that
+        a universally quantified proposition holds when all that was observed is
+        that no counterexample was drawn.  That is a plausible verdict with
+        nothing behind it, which is worse than refusing to answer.  So an index
+        whose range cannot be pinned to a finite set raises `Untranslatable`,
+        and the definition stays NOT-EXTRACTABLE with the reason.
+        """
+        self.next()
+        idxs = []
+        while self.peek() is not None and self.peek().kind == "ident":
+            idxs.append(self.next().text)
+        if not idxs:
+            raise Untranslatable(f"{sym} without a simple index binder")
+        annot_dim, annot = None, ""
+        if self.at(":"):
+            self.next()
+            toks = []
+            while self.peek() and self.peek().text not in (",",):
+                toks.append(self.next().text)
+            annot = " ".join(toks)
+            # EXACTLY `Fin n`, not merely starting with it: the annotation on
+            # `∃ x : Fin k → Fin d` also begins with `Fin`, and reading its
+            # first two tokens would quantify over `Fin k` -- k integers -- in
+            # place of the d^k functions the Lean actually ranges over.
+            if len(toks) == 2 and toks[0] == "Fin":
+                annot_dim = self.dims.get(toks[1]) or (
+                    toks[1] if toks[1].isdigit() else None)
+            elif len(toks) == 1 and toks[0].split(".")[-1] in self.enums:
+                annot_dim = str(len(self.enums[toks[0].split(".")[-1]]))
+            elif len(toks) == 1 and toks[0] in ("ℝ", "ℕ", "ℤ", "ℚ"):
+                raise Untranslatable(
+                    f"{sym} over the infinite domain {annot!r}: sampling it "
+                    "would report a verdict no finite check can support")
+            if annot_dim is None:
+                # THE ANNOTATION IS AUTHORITATIVE.  If it is present and names
+                # something we cannot enumerate, REFUSE -- do not fall through
+                # to the range-inference below.  `∀ x : ι → ℝ, 0 ≤ quadForm A x`
+                # quantifies over every real vector; falling back to "the length
+                # of the one declared vector argument" would enumerate FOUR
+                # vectors and report True, which states positive-semidefiniteness
+                # on the strength of four samples.  A predicate handed an
+                # invalid inhabitant looks decisive while testing nothing, and
+                # that is worse than leaving the definition unreached.
+                raise Untranslatable(
+                    f"{sym} over {annot!r}: "
+                    + ("a function space, which has no finite enumeration"
+                       if "→" in annot else
+                       "not a finite index set this translator can enumerate"))
+        if annot_dim is None:
+            cand = {dv for dv, _ in self.vector_args.values()}
+            if len(cand) == 1:
+                annot_dim = self.dims.get(next(iter(cand)))
+        self.expect(",")
+        saved = {i: self.index_apply.pop(i, None) for i in idxs}
+        for i in idxs:
+            self.locals.add(i)
+        self.sum_vars.extend(idxs)
+        body = self.expr()
+        uses = {i: self.index_apply.pop(i, []) for i in idxs}
+        for i in idxs:
+            self.sum_vars.remove(i)
+            self.locals.discard(i)
+            if saved[i] is not None:
+                self.index_apply[i] = saved[i]
+        agg = "all" if sym == "∀" else "any"
+        out = f"({body})"
+        for i in reversed(idxs):
+            rng = annot_dim
+            if rng is None:
+                if not uses[i]:
+                    raise Untranslatable(
+                        f"{sym} over {annot or 'an unannotated index'} whose "
+                        f"index {i!r} is never applied to a local value: its "
+                        "range is unknown, and a quantifier with an unknown "
+                        "range cannot be decided by enumeration")
+                lens = ", ".join(f"len({h}{'[0]' * pos})"
+                                 for h, pos in _dedup(uses[i]))
+                rng = f"_rt.sumdim({pyname(i)!r}, {lens})"
+            out = f"{agg}({out} for {pyname(i)} in range(int({rng})))"
+        return out
 
     def let_tail(self):
         raise Untranslatable("internal: let handled at statement level")
