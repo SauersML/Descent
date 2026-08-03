@@ -2958,16 +2958,43 @@ noncomputable def liabilityThresholdAUCFromExplainedR2 (r2 K : ℝ) : ℝ :=
   Phi ((liabilityCaseMean K - liabilityControlMean K) * Real.sqrt r2 /
     Real.sqrt (liabilityCaseVariance r2 K + liabilityControlVariance r2 K))
 
-/-- The regime in which the liability-threshold AUC formula has its stated
-biological meaning. Every degeneracy is an explicit field. -/
-structure LiabilityThresholdRegime (r2 K : ℝ) : Prop where
-  prevalence_pos : 0 < K
-  prevalence_lt_one : K < 1
-  r2_nonneg : 0 ≤ r2
-  r2_lt_one : r2 < 1
-  threshold_spec : Phi (liabilityThreshold K) = 1 - K
-  caseVariance_pos : 0 < liabilityCaseVariance r2 K
-  controlVariance_pos : 0 < liabilityControlVariance r2 K
+/-! **Deleted: `LiabilityThresholdRegime`.**
+
+It read "the regime in which the liability-threshold AUC formula has its stated biological
+meaning. Every degeneracy is an explicit field", and it had seven fields. It was also
+**never constructed and never consumed** — not by a theorem in this file, not anywhere in
+the corpus, not by the validation harness. Meanwhile
+`liabilityThresholdAUCFromExplainedR2` is used freely and without it, including in
+`presentDayLiabilityThresholdAUC` and the metric-profile results below, and in
+`liabilityThresholdAUC_not_prevalence_free`, which reasons about
+`standardNormalPdf (liabilityThreshold K)` directly with its own local hypotheses.
+
+So the degeneracies were named in a place that guarded nothing. That is worth separating
+from an unused lemma: an *obligation* structure with no consumer does not merely fail to
+help, it misrepresents the development, because the claim it makes is precisely that
+somebody has to discharge these before using the formula, and nobody does. It reads as
+rigour from the outside while every real use site bypasses it.
+
+Three of the seven fields were results rather than domain conditions, so had it been used
+it would have imported them unproved:
+
+* `threshold_spec : Phi (liabilityThreshold K) = 1 - K`. Since `liabilityThreshold K` is
+  `Function.invFun Phi (1 - K)`, this says `Phi` hits `1 - K`, i.e. that the standard
+  normal CDF is onto `(0, 1)`. That is a theorem — continuity plus the limits at `±∞` plus
+  the intermediate value theorem — and it is *derivable* from `prevalence_pos` and
+  `prevalence_lt_one`, which is exactly why it should not have been assumed alongside
+  them. `Calibrator.Probability` defines `Phi` and proves nothing about it, so the
+  derivation is not currently available; supplying it is the honest way to reinstate this.
+* `caseVariance_pos` and `controlVariance_pos`. These are not conditions a caller can
+  choose to meet: `liabilityCaseVariance r2 K` is a closed formula in `r2` and `K`, so its
+  positivity is true or false once those are fixed. Both follow from `0 ≤ r2 < 1` together
+  with the truncated-normal bound `0 ≤ i·(i - T) ≤ 1` on the selection intensity, which is
+  the standard fact that truncation cannot increase variance. That bound is a real result
+  and the corpus does not have it.
+
+Reinstating this regime honestly means proving those three, not restating them. Until
+then, the four genuine domain conditions (`0 < K < 1`, `0 ≤ r2 < 1`) are what the
+individual theorems below already take as explicit hypotheses where they need them. -/
 
 /-- Source Brier chart as a function of prevalence and source `R²`. -/
 noncomputable def sourceBrierFromR2 (π r2Source : ℝ) : ℝ :=
