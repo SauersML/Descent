@@ -325,7 +325,8 @@ The proof is the third-moment detector of `symmetricCoding_third_moment_zero`: a
 symmetric coding has vanishing third moment, while `E[(x²)³]` is a sum of non-negative
 terms with a strictly positive one.
 
-**Read the scope of this theorem carefully.** It is about the *uncentered* square `x²`, which is non-negative and therefore trivially never
+**Read the scope of this theorem carefully.** It is about the *uncentered* square `x²`, which is
+non-negative and therefore trivially never
 symmetric. It is **not** about the tower's floor-two coordinate, which is the *centered*
 square `u = (x² - 1)/σ₁`, and it does not settle the floor-two symmetry question.
 
@@ -426,7 +427,8 @@ valid**, not one at which it is blind.
 So the blindness is real for the latent-locus channel and does **not** transfer to interaction
 tests on genotyped loci. What needed narrowing was this gloss, not the constant.
 
-Empirical status: **VALIDATED** (`proofs/validation/empirical/blind_maf/`). Scope caveat: HWE, unlinked
+Empirical status: **VALIDATED** (`proofs/validation/empirical/blind_maf/`). Scope caveat: HWE,
+unlinked
 loci, no LD or structure, and not every statistic that could be called fourth-cumulant-based
 was constructed. -/
 noncomputable def gaussianKurtosisMaf : ℝ := (3 - Real.sqrt 3) / 6

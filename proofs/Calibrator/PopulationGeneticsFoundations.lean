@@ -517,7 +517,8 @@ theorem wrightFIT_eq_pairwiseFstFromBranches (a b : ℝ) :
 /-- **Within-population heterozygosity loss after `t` generations of drift.**
     `1 - (1 - 1/(2 Nₑ))^t`.
 
-    **This is *not* between-population `F_ST` after a split.** Coalescent simulation with branch-mode
+    **This is *not* between-population `F_ST` after a split.** Coalescent simulation with
+    branch-mode
     divergence, which removes mutational noise analytically, shows the split
     quantity is `coalFst t Ne = t / (t + 2 Nₑ)`: that is unbiased across the
     tested grid, while this formula is biased upward in eleven of twelve cells
@@ -1511,7 +1512,8 @@ theorem heterozygosityLossDerived_lt_one (Ne : ℝ) (t : ℕ) (hNe : 2 ≤ Ne) :
     rw [sub_pos, div_lt_one (by linarith)]; linarith) t]
 
 /-- **Fst increases faster with smaller Ne.**
-    For t ≥ 1 and Ne₁ < Ne₂, we have heterozygosityLossDerived Ne₁ t > heterozygosityLossDerived Ne₂ t.
+    For t ≥ 1 and Ne₁ < Ne₂, we have heterozygosityLossDerived Ne₁ t > heterozygosityLossDerived Ne₂
+    t.
     Smaller populations drift faster. -/
 theorem heterozygosityLossDerived_faster_small_Ne (Ne₁ Ne₂ : ℝ) (t : ℕ) (ht : 1 ≤ t)
     (hNe₁ : 2 < Ne₁) (hNe₂ : 2 < Ne₂) (h_lt : Ne₁ < Ne₂) :

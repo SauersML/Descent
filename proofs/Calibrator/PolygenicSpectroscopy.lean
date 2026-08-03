@@ -664,7 +664,8 @@ safe order `33.22` vs `33.2`); at `m = 1` the genotype and surrogate laws are in
 `additive_score_is_subcritical`.
 
 Empirical status: **FALSIFIED on the common-variant column and on the condensation
-direction; VALIDATED on the rare-variant tail** (`proofs/validation/empirical/safe_order/`). Scope: HWE,
+direction; VALIDATED on the rare-variant tail** (`proofs/validation/empirical/safe_order/`). Scope:
+HWE,
 unlinked loci, disjoint monomials as defined — no LD, no real genotypes, no structure. -/
 noncomputable def maxSafeEpistaticOrder (N q : ℝ) : ℝ :=
   Real.log N / hweMellinDrift q

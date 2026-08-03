@@ -97,7 +97,8 @@ section SteppingStone
     handed — a factor of `D = 64`. It cancels against the `(D-d) ≈ D` dropped from the meeting
     time, which is exactly why this definition is right anyway.
 
-    Empirical status: **VALIDATED in its stated regime** (`proofs/validation/empirical/coalescent_diff/`),
+    Empirical status: **VALIDATED in its stated regime**
+    (`proofs/validation/empirical/coalescent_diff/`),
     with the untruncated `d(D-d)/D` form recorded as the available improvement. -/
 noncomputable def demoSteppingStoneFst (d Ne m σ_sq : ℝ) : ℝ :=
   d / (d + 4 * Ne * m * σ_sq)

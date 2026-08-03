@@ -263,7 +263,8 @@ equally frequent. -/
 /-- Genotypic values: homozygotes at `∓a`, heterozygote displaced by `d` from their
 midpoint.
 
-    Empirical status: UNTESTED. Definitional within the model declared above: it fixes a contrast rather than predicting an observable. -/
+    Empirical status: UNTESTED. Definitional within the model declared above: it
+    fixes a contrast rather than predicting an observable. -/
 def OneLocusArchitecture.genotypicValue (m : OneLocusArchitecture) : DiploidGenotype → ℝ
   | .homRef => -m.a
   | .het => m.d

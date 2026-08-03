@@ -747,7 +747,8 @@ hypothesis deleted rather than assumed. The comparison is between the transporte
 source-optimal readout and the refitted target-optimal readout, both evaluated on the
 target, which is the transfer comparison a deployment actually makes.
 
-Deleting `Calibrator.SpectralDegradation` breaks this theorem: `excess_target_risk_pos_of_bandwise_readout_mismatch`
+Deleting `Calibrator.SpectralDegradation` breaks this theorem:
+`excess_target_risk_pos_of_bandwise_readout_mismatch`
 is its only source of strict positivity, and that in turn is
 `degradation_eq_zero_iff`. -/
 theorem target_r2_drop_of_bandwise_readout_mismatch
@@ -995,7 +996,8 @@ the mechanism, and neither LD, distance nor decay appears in the statement, whic
 hypothesis-weakening
 wrapper for `linear_noise_implies_nonlinear_slope` with the positivity side conditions
 discharged from nonnegativity.  The LD-decay statement that *is* proved is
-`Calibrator.ld_decay_implies_nonlinear_calibration_of_exp_tagging` in the corpus root, which supplies
+`Calibrator.ld_decay_implies_nonlinear_calibration_of_exp_tagging` in the corpus root, which
+supplies
 three explicit distances through an `LDDecayMechanism`. -/
 
 theorem optimalSlopeLinearNoise_not_affine_of_nonneg_errors

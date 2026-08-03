@@ -196,8 +196,16 @@ def style_check_file(path: Path) -> list[str]:
 
     lines = source.splitlines()
     for number, line in enumerate(lines, 1):
-        if len(line) > 100:
-            errors.append(f"{rel}:{number}: line has {len(line)} characters")
+        if len(line) <= 100:
+            continue
+        # A markdown table row is atomic: wrapping it moves cells onto their own
+        # lines and destroys the table, so reporting it asks for a change that
+        # makes the docstring worse.  The rule is about lines a reader could
+        # reflow; a row that opens and closes with `|` is not one.
+        stripped = line.strip()
+        if stripped.startswith("|") and stripped.endswith("|"):
+            continue
+        errors.append(f"{rel}:{number}: line has {len(line)} characters")
 
     module_doc = source.find("/-!")
     import_lines = [
@@ -2747,8 +2755,15 @@ def check_decl(d: Decl, c: Corpus, proved_props: set[str]) -> list[Finding]:
         # defects.  The vacuity lives in a THEOREM: Lean's `x / 0 = 0` makes a claim about
         # a ratio silently true wherever the denominator vanishes, so a theorem whose
         # conclusion divides by a quantity it never constrains proves nothing there.
-        for m in re.finditer(rf"/\s*({IDENT})", concl):
+        # Capture the WHOLE dotted path. `m.V_A / m.V_P` divides by `m.V_P`, but a bare
+        # `{IDENT}` captured the prefix `m` -- which IS a binder -- and reported the model
+        # parameter as an unguarded denominator. Only a bare variable qualifies: a
+        # projection like `m.V_P` is guarded by its own structure's invariants
+        # (`V_P_pos`), and the structure parameter is judged by F4 and F22 instead.
+        for m in re.finditer(rf"/\s*({IDENT}(?:\.{IDENT})*)", concl):
             den = m.group(1)
+            if "." in den:
+                continue
             if den not in {b.name for b in d.binders if b.name}:
                 continue
             guarded = any(

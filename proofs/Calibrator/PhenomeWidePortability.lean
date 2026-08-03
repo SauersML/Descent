@@ -97,7 +97,8 @@ most 1. Both halves of that range are load-bearing and both are now hypotheses
 of every theorem below: the lower bound gives the strict inequality, the upper
 bound is what keeps `fstFromDriftFactor` from returning a negative F_ST.
 
-Since heterozygosity_selected = H_0 * selectedDriftFactor > H_0 * neutralDriftFactor = heterozygosity_neutral,
+Since heterozygosity_selected = H_0 * selectedDriftFactor > H_0 * neutralDriftFactor =
+heterozygosity_neutral,
 and Fst = 1 - H_between / H_total = 1 - driftFactor (in the island model),
 we get:
 

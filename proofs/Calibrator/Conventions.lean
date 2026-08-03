@@ -209,7 +209,8 @@ corpus into status reporting before anyone tested the slice it names.
 
     The old `hudsonFst` name on the Nei body was removed rather than retained as
     a compatibility alias: that alias would preserve the biological category
-    error. The genuine Hudson body now owns `hudsonFst`. Read every `neiGst` in the *contrast-normalization* chain --
+    error. The genuine Hudson body now owns `hudsonFst`. Read every `neiGst` in the
+    *contrast-normalization* chain --
     including `four_neiGst_eq_standardizedContrastVariance` -- as Nei's `G_ST`.
     The algebra is unaffected: `4·G_ST` is the standardized allele-frequency
     contrast variance for THIS body. It is not the empirically calibrated BBP
@@ -1064,7 +1065,8 @@ theorem heterozygosityLossFromDrift_eq_closedPopulation_measuredLoss
 
 /-- **The same body, read as a between-population `F_ST`.**
 
-`heterozygosityLossDerived` and `heterozygosityLossFromDrift` share a body, and `DriftRegime` names that
+`heterozygosityLossDerived` and `heterozygosityLossFromDrift` share a body, and `DriftRegime` names
+that
 coincidence as the defect rather than a convenience: a within-population heterozygosity
 loss and a between-population variance ratio are different quantities, and the shared body
 is what let one be substituted for the other. They are deliberately *not* merged. This
@@ -1073,7 +1075,8 @@ shared body — which is the fact a reader needs in order to see that its `F_ST`
 only available in the regime where the loss reading is.
 
 Note the argument orders differ: `heterozygosityLossFromDrift` takes `(t, Ne)` and
-`heterozygosityLossDerived` takes `(Ne, t)`, so the same call spelled the same way means different things
+`heterozygosityLossDerived` takes `(Ne, t)`, so the same call spelled the same way means different
+things
 depending on which is in scope. That is the hazard `equilibriumFst` carried before it was
 collapsed, still live here because these two must *not* be collapsed. -/
 theorem heterozygosityLossDerived_eq_closedPopulation_measuredLoss

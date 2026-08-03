@@ -40,7 +40,8 @@ states that the transplanted state's excess is at most `2√2 δ s`, which is wh
 ground state in the approximate problem gives, and its proof is a `sorry`. That is deliberate.
 The alternative — carrying the bound as a hypothesis of the theorem that needs it — would make
 this file's headline a conditional whose antecedent nothing in the corpus ever discharges, which
-is the shape `proofs/validation/empirical/invariants/hypothetical.py` exists to detect. A visible `sorry`
+is the shape `proofs/validation/empirical/invariants/hypothetical.py` exists to detect. A visible
+`sorry`
 is an honest gap; an invisible hypothesis is a laundered import.
 
 `excess_le_of_two_bounds` is the elimination step between the two, and it is pure real

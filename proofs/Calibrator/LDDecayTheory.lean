@@ -792,7 +792,8 @@ section BottleneckLDExcess
     process demonstrably saturates (`driftLDEquilibrium_le_one`).
 
     Empirical status: **DISAGREES WITH AN EXISTING MEASUREMENT**, direction unresolved
-    (`validation/differential/cluster/fam_ld_decay.py`, `proofs/validation/empirical/coalescent_diff/`). -/
+    (`validation/differential/cluster/fam_ld_decay.py`,
+    `proofs/validation/empirical/coalescent_diff/`). -/
 noncomputable def excessLDAfterBottleneck (N_b N_r c : ℝ) (t_b t_r : ℕ) : ℝ :=
   driftLDTrajectory N_r c
       (driftLDTrajectory N_b c (driftLDEquilibrium N_r c) t_b) t_r -

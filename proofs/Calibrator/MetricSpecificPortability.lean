@@ -973,7 +973,8 @@ theorem ppv_increases_with_prevalence
 arguments, so passing the same `se` twice gives `|se - se|`. **Keep it as its own lemma
 rather than folding it into the conclusion of `ppv_gap_pos_under_prevalence_shift`
 below**, where `sensitivityPortabilityGap se se` would read as a *proved* consequence of a
-prevalence shift rather than as the definitional zero it is. Nothing about prevalence enters here, and nothing can: prevalence is not an
+prevalence shift rather than as the definitional zero it is. Nothing about prevalence enters here,
+and nothing can: prevalence is not an
 argument of `sensitivityPortabilityGap`. -/
 @[simp] theorem sensitivityPortabilityGap_self (se : ℝ) :
     sensitivityPortabilityGap se se = 0 := by

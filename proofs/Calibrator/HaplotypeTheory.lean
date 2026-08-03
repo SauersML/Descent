@@ -216,7 +216,8 @@ dosage class uses the population-average interaction, leaving this residual
 phase-misspecification error. -/
 noncomputable def dosagePhaseMisspecificationError
     (freq_cis interaction_cis interaction_trans : ℝ) : ℝ :=
-  freq_cis * (interaction_cis - averagePhaseInteraction freq_cis interaction_cis interaction_trans) ^ 2 +
+  freq_cis *
+      (interaction_cis - averagePhaseInteraction freq_cis interaction_cis interaction_trans) ^ 2 +
     (1 - freq_cis) *
       (interaction_trans - averagePhaseInteraction freq_cis interaction_cis interaction_trans) ^ 2
 

@@ -110,8 +110,13 @@ theorem finitePrior_probability_mem {n : ℕ} (P : FinitePrior n) :
     (fun i ↦ P.probability i) ∈ finitePriorCarrier n := by
   constructor
   · exact fun i ↦ P.probability_nonneg i
-  · rw [← ENNReal.toReal_sum]
-    simp [FinitePrior.probability]
+  · simp only [FinitePrior.probability]
+    rw [← ENNReal.toReal_sum (fun i _ ↦ P.apply_ne_top i)]
+    have hsum : (∑ i : Fin (n + 1), P i) = 1 := by
+      rw [← tsum_fintype]
+      exact P.tsum_coe
+    rw [hsum]
+    norm_num
 
 /-- The prior class underlying every finite mixture experiment is convex;
 convexity is proved from the simplex equations, not accepted as an experiment
