@@ -488,7 +488,7 @@ theorem mechanistic_transport_disrupts_calibration_slope_and_brier
   have hslope_dev_pos :
       calibrationSlopeDeviation 1 <
         calibrationSlopeDeviation ((cal.identityCalibrationProfile Pop.target)).slope := by
-    unfold calibrationSlopeDeviation calibrationSlopeDeviation
+    unfold calibrationSlopeDeviation
     rw [show (1 : ℝ) - 1 = 0 by ring, abs_zero]
     have hneg : ((cal.identityCalibrationProfile Pop.target)).slope - 1 < 0 := by
       linarith
@@ -1186,7 +1186,7 @@ Valid for `0 ≤ kappa < 1`.  At `kappa = 1` the expression is not the limit —
 must be read off from the integral rather than from the formula.
 
 Empirical status: UNTESTED. -/
-def ldBandReconstructionShare (decay kappa : ℝ) : ℝ :=
+noncomputable def ldBandReconstructionShare (decay kappa : ℝ) : ℝ :=
   2 * Real.arctan (((1 + decay) / (1 - decay)) *
     Real.tan (Real.pi * kappa / 2)) / Real.pi
 
@@ -1202,14 +1202,14 @@ trace.  That it equals the integral ratio is not proved here: it is the
 every result that relies on the identification.
 
 Empirical status: UNTESTED. -/
-def ldBandDetectionShare (decay kappa : ℝ) : ℝ :=
+noncomputable def ldBandDetectionShare (decay kappa : ℝ) : ℝ :=
   kappa - 2 * decay * Real.sin (Real.pi * kappa) / (Real.pi * (1 + decay ^ 2))
 
 /-- **The detection weight pruning throws away**, over and above the fraction of
 directions it discards.  This is the quantity the frontier prices.
 
 Empirical status: UNTESTED. -/
-def ldPruningDetectionDeficit (decay kappa : ℝ) : ℝ :=
+noncomputable def ldPruningDetectionDeficit (decay kappa : ℝ) : ℝ :=
   2 * decay * Real.sin (Real.pi * kappa) / (Real.pi * (1 + decay ^ 2))
 
 theorem ldBandDetectionShare_eq_sub_deficit (decay kappa : ℝ) :
@@ -1413,7 +1413,7 @@ section GeneticFrontier
 reduction, expressed in the units a clumping tool reports.
 
 Empirical status: UNTESTED. -/
-def ldPanelRetentionFraction (retainedMarkers totalMarkers : ℕ) : ℝ :=
+noncomputable def ldPanelRetentionFraction (retainedMarkers totalMarkers : ℕ) : ℝ :=
   (retainedMarkers : ℝ) / (totalMarkers : ℝ)
 
 theorem ldPanelRetentionFraction_mem {retainedMarkers totalMarkers : ℕ}
@@ -1465,7 +1465,7 @@ detection weight — the inverse-LD-kernel trace whose per-variant limit is
 recombination rate, effective size and marker counts.
 
 Empirical status: UNTESTED. -/
-def ldBlockDetectionShare (recomb Ne : ℝ)
+noncomputable def ldBlockDetectionShare (recomb Ne : ℝ)
     (retainedMarkers totalMarkers : ℕ) : ℝ :=
   ldBandDetectionShare (ldRetentionPerGen recomb Ne)
     (ldPanelRetentionFraction retainedMarkers totalMarkers)
@@ -1475,7 +1475,7 @@ markers discarded, as a function of recombination rate and effective size.  This
 is the price the frontier puts on the pruning convention.
 
 Empirical status: UNTESTED. -/
-def ldBlockPruningDeficit (recomb Ne : ℝ)
+noncomputable def ldBlockPruningDeficit (recomb Ne : ℝ)
     (retainedMarkers totalMarkers : ℕ) : ℝ :=
   ldPruningDetectionDeficit (ldRetentionPerGen recomb Ne)
     (ldPanelRetentionFraction retainedMarkers totalMarkers)
@@ -1486,7 +1486,7 @@ retention approaches one, and `ldTightLinkage_le_ldBlockDetectionShare` shows it
 bounds the detection share at every recombination rate and effective size.
 
 Empirical status: UNTESTED. -/
-def ldTightLinkageDetectionShare (retainedMarkers totalMarkers : ℕ) : ℝ :=
+noncomputable def ldTightLinkageDetectionShare (retainedMarkers totalMarkers : ℕ) : ℝ :=
   ldPanelRetentionFraction retainedMarkers totalMarkers -
     Real.sin (Real.pi *
       ldPanelRetentionFraction retainedMarkers totalMarkers) / Real.pi
@@ -1798,14 +1798,14 @@ variable {ι J : Type*} [Fintype ι] [Fintype J] [DecidableEq J]
 shared correction that a weighted-least-squares compromise selects.
 
 Empirical status: UNTESTED. -/
-def sharedCorrectionConsensus (curvature optimum : ι → ℝ) : ℝ :=
+noncomputable def sharedCorrectionConsensus (curvature optimum : ι → ℝ) : ℝ :=
   (∑ i, curvature i * optimum i) / ∑ i, curvature i
 
 /-- **The spread law's right-hand side**: the curvature-weighted variance of the
 per-target optimal corrections.
 
 Empirical status: UNTESTED. -/
-def sharedCorrectionSpread (curvature optimum : ι → ℝ) : ℝ :=
+noncomputable def sharedCorrectionSpread (curvature optimum : ι → ℝ) : ℝ :=
   ∑ i, curvature i *
     (optimum i - sharedCorrectionConsensus curvature optimum) ^ 2
 

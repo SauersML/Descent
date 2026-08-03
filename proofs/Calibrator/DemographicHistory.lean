@@ -66,7 +66,6 @@ separately, the constant, with no theorem saying the constant is a fixed point o
 so the status was "unverified but probably true" rather than "derived". That theorem now
 exists: `fstMigrationDriftEquilibrium_isFixedPoint`. -/
 
-/-- Equivalent formulation: `fstMigrationDriftEquilibrium` = 1/(1 + M) where M = `scaledMigrationRate`. -/
 end IslandModel
 
 
@@ -151,7 +150,6 @@ theorem demoSteppingStoneFst_indistinguishable_from_quadratic
   have hm' : m ≠ 0 := ne_of_gt hm
   congr 2
   field_simp
-  ring
 
 /-- Stepping-stone F_ST increases with geographic distance. -/
 theorem stepping_stone_fst_increasing (d₁ d₂ Ne m σ_sq : ℝ)

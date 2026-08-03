@@ -979,6 +979,7 @@ theorem standardizedGenotype_sixth_moment (h : HardyWeinbergModel)
     rw [hsum, div_mul_cancel₀ _ (pow_ne_zero 3 hne)]
   refine mul_right_cancel₀ (pow_ne_zero 3 hne) ?_
   rw [hcancel]
+  symm
   calc ((1 / h.genotypeVariance) ^ 2 + 10 * (1 / h.genotypeVariance) - 20) *
         h.genotypeVariance ^ 3
       = ((1 / h.genotypeVariance) * h.genotypeVariance) ^ 2 * h.genotypeVariance +
@@ -1148,7 +1149,6 @@ theorem standardizedGenotype_even_moment_lower_bound (h : HardyWeinbergModel)
       unfold HardyWeinbergModel.centeredAltAlleleCount
       rw [h.expectedAltAlleleCount_eq]
       simp only [altAlleleCount]
-      ring
     rw [hcentered, h.genotypeVariance_eq]
     simp only [HardyWeinbergModel.genotypeProb, HardyWeinbergModel.refFreq]
     ring
@@ -1234,12 +1234,10 @@ theorem hweSignBias_eq (h : HardyWeinbergModel) (hq0 : 0 < h.altFreq)
     unfold HardyWeinbergModel.centeredAltAlleleCount
     rw [h.expectedAltAlleleCount_eq]
     simp only [altAlleleCount]
-    ring
   have hchet : h.centeredAltAlleleCount DiploidGenotype.het = 1 - 2 * h.altFreq := by
     unfold HardyWeinbergModel.centeredAltAlleleCount
     rw [h.expectedAltAlleleCount_eq]
     simp only [altAlleleCount]
-    ring
   have hcalt : h.centeredAltAlleleCount DiploidGenotype.homAlt = 2 - 2 * h.altFreq := by
     unfold HardyWeinbergModel.centeredAltAlleleCount
     rw [h.expectedAltAlleleCount_eq]
@@ -1306,7 +1304,6 @@ theorem reflect_genotypeProb (h : HardyWeinbergModel) (g : DiploidGenotype) :
     · simp only [genotypeFlip_homRef, genotypeFlip_het, genotypeFlip_homAlt,
         HardyWeinbergModel.genotypeProb, HardyWeinbergModel.refFreq,
         HardyWeinbergModel.reflect_altFreq]
-      ring
 
 /-- Reflection preserves the genotype variance: `2(1-q)q = 2q(1-q)`. -/
 theorem reflect_genotypeVariance (h : HardyWeinbergModel) :

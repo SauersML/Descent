@@ -1298,7 +1298,7 @@ theorem rigid_certificate_exceeds_ceiling_iff_pcCorrectabilityMargin_pos
           ((traceWindowBudgetClass base (traceForm S₀)).spiked S₀ (4 * F)
             (demographicSpikeDirection N m)) := by
   rw [BackgroundClass.form_spiked, traceWindowBudgetClass_form,
-    traceWindowBudgetClass_form, traceWindowBudgetClass_bound,
+    traceWindowBudgetClass_bound,
     ← demographicSpike_eq_level_mul_spikeLoad m F hmn hN base (traceForm S₀) a]
   unfold pcCorrectabilityMargin
   constructor
@@ -1318,7 +1318,8 @@ theorem bbpProxyThreshold_tendsto_zero (n : ℝ) :
   have hdiv : Filter.Tendsto (fun M : ℕ => n / (M : ℝ)) Filter.atTop (nhds 0) :=
     tendsto_const_div_atTop_nhds_zero_nat n
   have hcomp := (Real.continuous_sqrt.tendsto (0 : ℝ)).comp hdiv
-  simpa [bbpProxyThreshold, Function.comp] using hcomp
+  change Filter.Tendsto (fun M : ℕ => Real.sqrt (n / (M : ℝ))) Filter.atTop (nhds 0)
+  simpa only [Function.comp_apply] using hcomp
 
 end DemographicInstance
 
