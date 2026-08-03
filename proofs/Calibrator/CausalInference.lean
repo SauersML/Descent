@@ -10,11 +10,11 @@ open MeasureTheory
 -- `OpenQuestions` added for itself does nothing for this file even though this file
 -- imports it -- which is why this consumer was missed by the migration.
 --
--- Without it the 35 bare occurrences below do not fail as "unknown identifier": Lean
--- AUTO-BINDS an unresolved bare name as an implicit variable, so each one became a local
--- of unknown type applied to two arguments. That is the source of both error shapes seen
--- here, `Function expected at` and `Local variable 'r2FromSignalVariance' has no
--- definition` -- one cause, two texts, 35 errors.
+-- Without this line the 35 bare occurrences below did not fail as "unknown identifier":
+-- Lean AUTO-BINDS an unresolved bare name as an implicit variable, so each became a local
+-- of unknown type applied to two arguments. That is why one cause produced two error
+-- texts here, `Function expected at` and `Local variable ... has no definition`, across
+-- 35 sites. Do not delete this line to "clean up an unused open".
 open TransportedMetrics (r2FromSignalVariance)
 
 /-!
