@@ -630,7 +630,7 @@ makes the theorems below statements about something. -/
 noncomputable def MafSpectrum.witness (m : ℕ) : MafSpectrum (m + 1) where
   model := fun _ => HardyWeinbergModel.witness
   weight := fun j => if j = 0 then 1 else 0
-  weight_nonneg := fun j => by dsimp only; split <;> norm_num
+  weight_nonneg := fun j => by split <;> norm_num
   weight_sum := by simp
 
 namespace MafSpectrum
