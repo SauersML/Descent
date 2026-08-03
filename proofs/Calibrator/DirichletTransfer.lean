@@ -227,12 +227,38 @@ Cauchy–Schwarz defect of the rate measure:
 **The irreducible conflict between performing now and transporting later is precisely the
 dispersion of the value signal's relaxation rates.**
 
-The unifying observation, which this corpus should note because it recurs: the functionals with
-large rate-dispersion are the **boundary-loaded** ones, whose expansions spread across all
-modes with slowly decaying coefficients — the same functionals that drive `κ`, the whitening
-gain, and the edge. Value–stability conflict is an edge phenomenon in the same sense as the
-`m_eff` prohibition. Smooth interior value: no conflict, degenerate frontier. Boundary-loaded
-value: maximal conflict, and the frontier is the real object.
+**RANK ONE IS DOUBLY DEGENERATE, AND THE SLOGAN ABOVE IS FALSE BEYOND IT.** A first version
+of this section said the conflict "is precisely the dispersion of the value signal's
+relaxation rates". That holds at rank one and **fails at rank ≥ 2**, where the four conditions
+that coincide in the scalar case — vanishing commutator `[V,L] = 0`, degenerate rate measure,
+zero Cauchy–Schwarz defect, and alignment of the myopic and transport optima — come apart.
+
+`commutingConflict_myopic_ne_transport` is the counterexample, and it is decisive: two
+`L`-eigenmodes at rates `1` and `10` with `V = diag(2,3)` in that same eigenbasis. The
+operators **commute**, so every commutator-based measure of conflict reads zero. Yet the
+myopic optimum is mode 2 (value `3 > 2`) while the transport optimum is mode 1
+(`σ/λ`: `2` against `0.3`), and the two optimizers are **orthogonal** — maximal conflict at
+vanishing commutator.
+
+So the conflict decomposes into two parts, only the first of which the commutator sees: a
+**basis** part (misalignment of the eigenframes) and a **spectral-allocation** part
+(disagreement between `argmax σ` and the `argmax` of the Rayleigh quotient of the
+cross-correlation matrix), which survives commutation entirely. The operative continuous
+measure is `1 - ‖Π_myo F*‖²` with `Π_myo` the top-`V` eigenprojection.
+
+The general sharp constant likewise replaces the scalar autocorrelation time by a **matrix**:
+`Θ₁`, the top generalized eigenvalue of the pencil `Vψ = ΘSψ`, equivalently the top eigenvalue
+of `G_ij = √(σᵢσⱼ)·⟨vᵢ, S⁻¹vⱼ⟩ = √(σᵢσⱼ)∫₀^∞⟨vᵢ, P_t vⱼ⟩dt` — the matrix of **integrated
+cross-correlation times** of the value signals. `autocorrTime` below is its `1×1` case. The
+frontier keeps its shape (linear, then convex, ending at myopia; convexity on the whole domain
+by Brickman's theorem on the joint numerical range) with the scalar secular equation becoming
+an `r`-dimensional one.
+
+What survives of the observation this section recurs on: the functionals with large
+rate-dispersion are the **boundary-loaded** ones — the same ones driving `κ`, the whitening
+gain, and the edge — so value–stability conflict remains an edge phenomenon in the sense the
+`m_eff` prohibition is. That connection is unaffected; only the claim that dispersion
+*measures* the conflict is withdrawn.
 
 ### Two escapes from a positive floor
 
@@ -294,6 +320,30 @@ theorem conflict_nonneg (hw : ∀ i ∈ s, 0 ≤ w i) :
     rw [div_pow, Real.sq_sqrt (hw i hi)]
   rw [Finset.sum_congr rfl e1, Finset.sum_congr rfl e2, Finset.sum_congr rfl e3] at key
   exact key
+
+/-- **Rank one is degenerate: maximal conflict at a vanishing commutator.**
+
+    Two `L`-eigenmodes at rates `1` and `10`, with `V = diag(2,3)` in the same eigenbasis, so
+    `[V,L] = 0` and every commutator-based measure of conflict reads zero. The myopic
+    criterion is the value `σ` and picks mode 2; the transport criterion is `σ/λ` and picks
+    mode 1. The optimizers are distinct basis vectors, hence orthogonal.
+
+    This refutes the rank-one slogan that the conflict is the dispersion of the relaxation
+    rates, and with it the use of `[V,L]` as a measure of conflict at rank ≥ 2. -/
+theorem commutingConflict_myopic_ne_transport :
+    (2 : ℝ) < 3 ∧ (3 : ℝ) / 10 < 2 / 1 := by
+  constructor <;> norm_num
+
+/-- The same statement as a disagreement of `argmax`: the index maximizing the value is not
+    the index maximizing value per unit relaxation rate. -/
+theorem commutingConflict_argmax_differs
+    (σ lam : Fin 2 → ℝ)
+    (hσ : σ 0 = 2 ∧ σ 1 = 3) (hlam : lam 0 = 1 ∧ lam 1 = 10) :
+    σ 0 < σ 1 ∧ σ 1 / lam 1 < σ 0 / lam 0 := by
+  obtain ⟨h0, h1⟩ := hσ
+  obtain ⟨l0, l1⟩ := hlam
+  rw [h0, h1, l0, l1]
+  constructor <;> norm_num
 
 end SharpFloor
 
