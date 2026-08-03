@@ -1434,7 +1434,7 @@ orthogonal identity. `EnsembleChannel.weightedBandEnsembleLoss_decomposition` pr
 actual spectral version simultaneously across targets and genomic bands: instantiate its
 weight with each target population's feature spectrum times the task weight, and its
 target with that population's optimal readout. The resulting recoverable term retains
-target-specific LD, genotype variance, imputation quality, and low-/high-frequency task
+target-specific LD, genotype variance, imputation quality, and low- and high-frequency task
 emphasis rather than replacing them by a common scalar.
 
 For a prior supported on a curve, the residual fibre variance is zero only if the chosen
