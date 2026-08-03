@@ -3,6 +3,7 @@ import Calibrator.PortabilityDrift
 import Calibrator.PGSCalibrationTheory
 import Calibrator.OpenQuestions
 import Calibrator.LDDecayTheory
+import Calibrator.HorizonCurve
 
 namespace Calibrator
 
@@ -82,26 +83,26 @@ theorem portability_decreases_with_time (r2_initial lambda_total t₁ t₂ : ℝ
     meant.
 
 This file used to restate `1 / (2 Nₑ)` as `longitudinalDriftDecayRate`. It is
-`ldDecayRatePerGen` from `Calibrator.LDDecayTheory` — one per-generation drift
+`driftRatePerGen` from `Calibrator.LDDecayTheory` — one per-generation drift
 rate — and the restatement has been deleted in favour of that one.
 
-Note that the "fraction of LD lost per generation" reading of that name is FALSIFIED
-there, by up to 201x, because recombination dominates `1 / (2 Nₑ)`. What is imported here
-is the drift rate itself. Whether it is the fraction of ancestral score variance lost per
+Note that the "fraction of LD lost per generation" reading is FALSIFIED there, by up to
+201x, because recombination dominates `1 / (2 Nₑ)`; that reading is why the declaration was
+renamed from `ldDecayRatePerGen`. What is imported here is the drift rate itself. Whether it is the fraction of ancestral score variance lost per
 generation is a separate claim, and it is UNTESTED. -/
 
 /-- Drift decay rate is positive for positive Ne. -/
 theorem drift_decay_rate_pos (Ne : ℝ) (h : 0 < Ne) :
-    0 < ldDecayRatePerGen Ne := by
-  unfold ldDecayRatePerGen
+    0 < driftRatePerGen Ne := by
+  unfold driftRatePerGen
   positivity
 
 /-- **Larger populations drift slower.**
     If Ne₁ < Ne₂, then λ_drift₁ > λ_drift₂. -/
 theorem larger_Ne_slower_drift (Ne₁ Ne₂ : ℝ)
     (h₁ : 0 < Ne₁) (h₂ : 0 < Ne₂) (h_lt : Ne₁ < Ne₂) :
-    ldDecayRatePerGen Ne₂ < ldDecayRatePerGen Ne₁ := by
-  unfold ldDecayRatePerGen
+    driftRatePerGen Ne₂ < driftRatePerGen Ne₁ := by
+  unfold driftRatePerGen
   have h1' : 0 < 2 * Ne₁ := by positivity
   have h2' : 0 < 2 * Ne₂ := by positivity
   apply (div_lt_div_iff₀ h2' h1').2
@@ -519,5 +520,80 @@ theorem temporal_split_more_conservative
 
 
 end CrossTemporalValidation
+
+/-! ## The shape of the measured decay curve, and what a crossover does not identify
+
+`temporal_split_more_conservative` above models cohort decay as `exp(-λ Δt)` and reads a single
+rate off it. `Calibrator.HorizonCurve` supplies the two facts that decide when that reading is
+legitimate, and both bind here rather than upstream.
+
+The first is a **measurement** result: the estimator that averages a one-endpoint accuracy profile
+over the invariant cohort law returns the same number at every gap. A temporal split that
+resamples the evaluation set from the stationary law and evaluates a fixed profile therefore
+cannot show decay at all, and a decay it does show came from the sampling, the refitting, or the
+non-stationarity — not from the coupling. What must vary with the gap is the *starting* cohort of
+the design, which is the regret, not the average.
+
+The second is a **shape** result and it is falsifiable on published curves: under a stationary
+reversible coupling the effective decay rate is nonincreasing in the gap. A cohort curve that
+steepens as the gap grows is not relaxation.
+
+The third is a **negative** result about `stalenessCrossover`: a single crossover does not pin a
+relaxation time, because a multi-mode value signal can cross three times. -/
+
+section HorizonShape
+
+open scoped BigOperators in
+/-- **A stationary-law temporal split shows no decay, by construction.**
+
+    Direct instance of `naiveHorizonCurve_independent_of_horizon`: for a fixed accuracy profile
+    averaged over the invariant cohort law, two different cohort gaps give the same number. Any
+    decay reported from this estimator is a property of the study design.
+
+    Empirical status: DERIVED. -/
+theorem stationaryCohortSplit_shows_no_decay {ι : Type*} [Fintype ι]
+    (π : ι → ℝ) (P : ℝ → ι → ι → ℝ) (accuracy : ι → ℝ)
+    (h : ∀ t, IsStationaryKernel π (P t)) (gap₁ gap₂ : ℝ) :
+    ∑ x, π x * ∑ y, P gap₁ x y * accuracy y = ∑ x, π x * ∑ y, P gap₂ x y * accuracy y :=
+  naiveHorizonCurve_independent_of_horizon π P accuracy h gap₁ gap₂
+
+/-- **A cohort accuracy curve cannot steepen.**
+
+    Instance of `effectiveRate_nonincreasing` at a two-mode value signal: if cross-cohort decay is
+    the relaxation of a stationary reversible coupling, the effective decay rate falls with the
+    cohort gap. A measured curve whose apparent rate rises falsifies the relaxation model, and the
+    alternatives it leaves — drifting phenotype definition, changing ascertainment, a
+    non-stationary environment — are testable and distinct.
+
+    Empirical status: DERIVED; the shape constraint is the testable content. -/
+theorem cohortDecayRate_cannot_steepen
+    (slowWeight fastWeight slowRate fastRate gap₁ gap₂ : ℝ)
+    (hs : 0 ≤ slowWeight) (hf : 0 ≤ fastWeight) (hrate : slowRate ≤ fastRate)
+    (hgap : gap₁ ≤ gap₂) :
+    (slowWeight * slowRate * Real.exp (-(slowRate * gap₂)) +
+        fastWeight * fastRate * Real.exp (-(fastRate * gap₂))) *
+        (slowWeight * Real.exp (-(slowRate * gap₁)) +
+          fastWeight * Real.exp (-(fastRate * gap₁)))
+      ≤ (slowWeight * slowRate * Real.exp (-(slowRate * gap₁)) +
+          fastWeight * fastRate * Real.exp (-(fastRate * gap₁))) *
+        (slowWeight * Real.exp (-(slowRate * gap₂)) +
+          fastWeight * Real.exp (-(fastRate * gap₂))) :=
+  effectiveRate_nonincreasing slowWeight fastWeight slowRate fastRate gap₁ gap₂ hs hf hrate hgap
+
+/-- **A measured crossover does not identify a relaxation time.**
+
+    The four-mode premium of `HorizonCurve.horizonPolynomial` changes sign three times, so a study
+    that observes one crossing of "stale design" against "environment-blind design" and inverts
+    `stalenessCrossover` to recover `λ` has recovered nothing unless it has separately established
+    that the value signal is single-signed in the rate ordering.
+
+    Empirical status: DERIVED. -/
+theorem cohortCrossover_may_be_threefold :
+    horizonPolynomial (3 / 10) < 0 ∧ 0 < horizonPolynomial (9 / 20) ∧
+      horizonPolynomial (11 / 20) < 0 := by
+  obtain ⟨-, -, -, h1, h2, h3, -⟩ := horizon_three_crossings
+  exact ⟨h1, h2, h3⟩
+
+end HorizonShape
 
 end Calibrator

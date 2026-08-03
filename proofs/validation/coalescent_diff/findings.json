@@ -37,7 +37,7 @@
   },
   {
    "rank": 2,
-   "decl": "Calibrator.LDDecayTheory.ldDecayRatePerGen  (and its identical twin Calibrator.DemographicHistory.driftLDCreationRate)",
+   "decl": "Calibrator.LDDecayTheory.driftRatePerGen  (and its identical twin Calibrator.DemographicHistory.driftLDCreationRate)",
    "site": "proofs/Calibrator/LDDecayTheory.lean:872 ; proofs/Calibrator/DemographicHistory.lean:841",
    "lean": "1 / (2 Ne)",
    "docstring_claim": "the fraction of LD that decays per generation is 1/(2Ne)",

@@ -5,7 +5,7 @@ The largest unsimulated family in the slice, 13 in-slice definitions, and it
 carries the two largest analytic errors found anywhere in the corpus. One
 two-locus Wright-Fisher engine settles all of them.
 
-    ldRetentionPerGen  ldAfterGenerations  ldRecurrence  ldDecayRatePerGen
+    ldRetentionPerGen  ldAfterGenerations  ldRecurrence  driftRatePerGen
     ldHalfLife         driftLDStep         driftLDRetention
     driftLDEquilibrium driftLDTrajectory   excessLDAfterBottleneck
     bottleneckExcessLD driftLDCreationRate tagR2
@@ -15,7 +15,7 @@ WHAT IS MEASURED, AND WHICH DEFINITION EACH SETTLES
   A. E[D_t]/D_0 per generation.  Hill & Robertson: E[D] decays by exactly
      (1-r)(1 - 1/(2Ne)) per generation. Settles ldRetentionPerGen,
      ldAfterGenerations, ldRecurrence, and -- since it is the same quantity
-     inverted -- ldHalfLife and ldDecayRatePerGen.
+     inverted -- ldHalfLife and driftRatePerGen.
 
      ldHalfLife and ldRetainedFraction were REPAIRED this session, having been
      2110x and 37000x wrong by dropping the recombination argument entirely.

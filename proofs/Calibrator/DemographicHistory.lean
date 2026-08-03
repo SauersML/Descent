@@ -817,10 +817,12 @@ trajectory of that process and its closed form is proved, not asserted.
     the honest accumulation is `driftLDStep` in `LDDecayTheory.lean`, in which
     this rate appears multiplied by the non-recombinant fraction `(1-c)²`.
 
-    **Identical twin of `LDDecayTheory.ldDecayRatePerGen`, whose LD reading is
-    FALSIFIED at up to 201x** (`proofs/validation/coalescent_diff/`): `1/(2Ne)` is not
-    the fraction of LD lost per generation, because recombination dominates it. The
-    same caution applies to any LD reading of this body. As a bare drift rate it stands.
+    **Identical twin of `LDDecayTheory.driftRatePerGen`**, which was named
+    `ldDecayRatePerGen` until its LD reading was FALSIFIED at up to 201x
+    (`proofs/validation/coalescent_diff/`): `1/(2Ne)` is not the fraction of LD lost per
+    generation, because recombination dominates it. The same caution applies to any LD
+    reading of this body -- the `LD` in this name is about where the rate is *used*, not
+    about what it measures. As a bare drift rate it stands.
 
     Empirical status: UNTESTED as a drift rate; the LD reading of the shared formula is
     FALSIFIED at the twin.
@@ -831,16 +833,16 @@ noncomputable def driftLDCreationRate (Ne : ℝ) : ℝ :=
   1 / (2 * Ne)
 
 /-- **Cross-check: this is the same per-generation drift rate that
-`LDDecayTheory` calls `ldDecayRatePerGen`.** One rate under two names.
+`LDDecayTheory` calls `driftRatePerGen`.** One rate under two names.
 
-The "fraction of LD lost per generation" reading at the other name is FALSIFIED —
-recombination dominates `1/(2Ne)`, by up to 201x — so this equality ties two names for a
-drift rate, not two readings of an LD rate. It is worth keeping precisely because the two
+The "fraction of LD lost per generation" reading is FALSIFIED — recombination dominates
+`1/(2Ne)`, by up to 201x — so this equality ties two names for a drift rate, not two
+readings of an LD rate. It is worth keeping precisely because the two
 names sit in different concept families and identical magnitudes are where a divergence
 goes unnoticed. -/
-theorem driftLDCreationRate_eq_ldDecayRatePerGen (Ne : ℝ) :
-    driftLDCreationRate Ne = ldDecayRatePerGen Ne := by
-  unfold driftLDCreationRate ldDecayRatePerGen; ring
+theorem driftLDCreationRate_eq_driftRatePerGen (Ne : ℝ) :
+    driftLDCreationRate Ne = driftRatePerGen Ne := by
+  unfold driftLDCreationRate driftRatePerGen; ring
 
 end BottleneckExcessLD_Derivation
 

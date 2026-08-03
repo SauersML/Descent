@@ -886,13 +886,15 @@ section ExpansionLD
 /-- **Per-generation drift rate at effective size Ne**, `1/(2Ne)`. Larger Ne means
     slower drift.
 
-    **This is not the fraction of LD lost per generation**, which is what the name and
-    the original headline said; for that use `ldRetentionPerGen`, which takes the
-    recombination rate this body omits.
+    **This is not the fraction of LD lost per generation**, which is what this
+    declaration used to be called -- `ldDecayRatePerGen` -- and what its headline used to
+    say. For that use `ldRetentionPerGen`, which takes the recombination rate this body
+    omits.
 
-    **The docstring's numeric reading is FALSIFIED; the body survives as a bare drift rate.**
-    "The fraction of LD that decays per generation is `1/(2Ne)`" omits recombination, which
-    dominates it. This file's own `ldRetentionPerGen r Ne = (1-r)(1-1/(2Ne))` is VALIDATED to
+    **The LD reading was FALSIFIED and the name has been changed to match the body, which
+    survives as a bare drift rate.** "The fraction of LD that decays per generation is
+    `1/(2Ne)`" omits recombination, which dominates it. This file's own
+    `ldRetentionPerGen r Ne = (1-r)(1-1/(2Ne))` is VALIDATED to
     `0.7%`, and it makes the fraction of `E[D]` lost per generation
     `r + 1/(2Ne) - r/(2Ne)`. In exact rational arithmetic:
 
@@ -906,8 +908,11 @@ section ExpansionLD
     The error is unbounded in `r/(1/(2Ne))` and the claim holds only on the `r = 0` slice.
     **This is the same defect class, in the same file, as the already-repaired `ldHalfLife`
     (2110×) and `ldRetainedFraction` (37000×): the recombination argument is absent from the
-    signature, so no constant repairs it.** The body is retained as the drift-only rate it
-    actually is; for the fraction of LD lost, use `ldRetentionPerGen`.
+    signature, so no constant repairs it.** The body is retained under a name that says
+    drift, because it is genuinely consumed as a drift rate -- by
+    `LongitudinalPortability` and by `Conventions.driftRatePerGen_eq_inv_timeScale`, which
+    identifies it as the reciprocal coalescent time scale. For the fraction of LD lost, use
+    `ldRetentionPerGen`.
 
     An identical twin carries the same reading at `DemographicHistory.driftLDCreationRate`.
 
@@ -916,16 +921,16 @@ section ExpansionLD
 
     Denotes: a per-generation rate. Other definitions share this formula under names from a
     different concept family; the formula does not fix which is meant. -/
-noncomputable def ldDecayRatePerGen (Ne : ℝ) : ℝ :=
+noncomputable def driftRatePerGen (Ne : ℝ) : ℝ :=
   1 / (2 * Ne)
 
-/-- Larger population has a slower per-generation drift rate. The name says "LD decay
-rate", which is the reading falsified at `ldDecayRatePerGen`: without a recombination
-argument this is drift only. The monotonicity proved here is a fact about `1/(2Ne)`. -/
-theorem larger_pop_slower_ld_decay (Ne₁ Ne₂ : ℝ)
+/-- Larger population has a slower per-generation drift rate. This is drift only: without
+a recombination argument it is not an LD decay rate, which is the reading falsified at
+`driftRatePerGen`. The monotonicity proved here is a fact about `1/(2Ne)`. -/
+theorem larger_pop_slower_drift_rate (Ne₁ Ne₂ : ℝ)
     (hNe₁ : 0 < Ne₁) (hNe₂ : 0 < Ne₂) (h_larger : Ne₁ < Ne₂) :
-    ldDecayRatePerGen Ne₂ < ldDecayRatePerGen Ne₁ := by
-  unfold ldDecayRatePerGen
+    driftRatePerGen Ne₂ < driftRatePerGen Ne₁ := by
+  unfold driftRatePerGen
   exact div_lt_div_of_pos_left one_pos (by linarith) (by linarith)
 
 /-- **LD half-life at recombination rate `r` and effective size `Nₑ`.**
