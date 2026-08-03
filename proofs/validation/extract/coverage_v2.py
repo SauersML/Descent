@@ -143,10 +143,30 @@ def base_ns():
     return _BASE_NS
 
 
-def compile_variant(d, body, fname, struct_args):
-    dd = dict(d)
-    dd["body"] = body
-    src, argnames = translate_def(dd, struct_args, fname=fname)
+_CTX = None
+
+
+def context():
+    """The ONE translation context, shared with emit.py.
+
+    Re-translating a body with a different configuration than the table was
+    built with does not produce a stricter check; it produces a check on a
+    different function, or -- far more often -- no check at all.  168
+    definitions reported "could not compile body" here purely because this file
+    called translate_def bare.
+    """
+    global _CTX
+    if _CTX is None:
+        import emit
+        _CTX = emit.build_context(
+            json.loads((HERE / "defs.json").read_text()))
+    return _CTX
+
+
+def compile_variant(d, body, fname, struct_args=None):
+    import emit
+    src, argnames = emit.translate_in_context(context(), d, body=body,
+                                              fname=fname)
     ns = dict(base_ns())
     exec(compile(src, "<variant>", "exec"), ns)
     return ns[fname], argnames
@@ -182,6 +202,13 @@ def make_points(entry, defs_by_name, structs, rng, theorem=None):
             base = admissible.sample(box, rng)
             draws += 1
         pt = {pyname(k): v for k, v in base.items()}
+        # A BOX IS A PRODUCT AND SOME DOMAINS ARE NOT.  Cauchy-Schwarz relates
+        # a covariance to its two variances, and a part cannot exceed its whole;
+        # neither constraint is expressible as a per-argument range, so the
+        # point is clamped onto the set after it is drawn.  `joint_repair` only
+        # shrinks coordinates towards the admissible set, so it can lose a
+        # finding but cannot manufacture one.
+        pt = admissible.joint_repair(pt)
         if preds and not admissible.satisfies(preds, pt):
             continue
         pts.append((pt, structval, argtypes))
@@ -316,6 +343,19 @@ def main(argv=None):
         if not pts:
             rec["reason"] = ("mined hypotheses admit no sampled point; "
                              f"constraints: {hyps[:4]}")
+            continue
+        # REFUSE BEFORE SAMPLING when an argument name does not determine the
+        # quantity's domain.  `m` is a migration rate in `geneFlowFstStep` and a
+        # subgroup size in `effectiveSubgroupSize`; drawing it from the count
+        # range gave m = 999.999 and an F_ST of -99.48 that read as the corpus's
+        # most convincing defect and was a fabricated input.  Not grading is the
+        # correct outcome: only a graded point can be mistaken for a finding.
+        amb = admissible.ambiguous_args(d)
+        if amb:
+            rec["reason"] = ("argument name does not determine a domain: "
+                             + ", ".join(amb)
+                             + " is a rate in some definitions and a count in "
+                               "others, and this docstring does not say which")
             continue
         vecspec = entry.get("vector_args")
         base_vals = values(fn, argnames, pts, random.Random(SEED), vecspec)

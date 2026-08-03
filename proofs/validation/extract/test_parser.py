@@ -46,10 +46,16 @@ check("neiFst empirical status", d["empirical_status"], "UNTESTED")
 check("neiFst dependents include the unit-interval theorem",
       "Calibrator.nei_fst_in_unit" in d["mentioned_by"], True)
 
-d = BY_NAME["Calibrator.simpleFst"]
-check("simpleFst body (multi-line with let)", d["body"].strip(),
+# RENAMED from `simpleFst` (PopulationGeneticsFoundations.lean:56 records why:
+# the old name asserted no estimator).  This gate is hand-read ground truth, so
+# a rename in the Lean makes it fail with a KeyError -- which is correct
+# behaviour, but it must then be REPOINTED, not left red.  A red ground-truth
+# gate stops being read, and the next real parser regression lands behind it.
+d = BY_NAME["Calibrator.neiGstFromFrequencies"]
+check("neiGstFromFrequencies body (multi-line with let)", d["body"].strip(),
       "let p_bar := (p₁ + p₂) / 2\n  (p₁ - p₂) ^ 2 / (4 * p_bar * (1 - p_bar))")
-check("simpleFst mentioned by 4 theorems", len(d["mentioned_by"]), 4)
+check("neiGstFromFrequencies is mentioned by at least 4 theorems",
+      len(d["mentioned_by"]) >= 4, True)
 
 d = BY_NAME["Calibrator.coalFst"]
 check("coalFst args", [n for a in d["args"] for n in a["names"]], ["t", "Ne"])

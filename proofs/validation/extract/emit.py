@@ -235,12 +235,21 @@ import lean_rt as _rt
 '''
 
 
-def main():
-    root = PROOFS / "Calibrator"
-    defs, thms, structs, failures = lean_parse.build(root)
-    blob = lean_parse.to_json(defs, structs, failures, thms)
-    (HERE / "defs.json").write_text(json.dumps(blob, indent=1, ensure_ascii=False))
+def build_context(blob):
+    """Everything `translate_def` needs, built once from a parsed corpus.
 
+    THIS IS SHARED ON PURPOSE.  It used to live inside `emit.main`, so
+    `coverage_v2.compile_variant` -- which re-translates a body in order to
+    mutate it -- called `translate_def` with NONE of it: no call resolver, no
+    structure types, no field table, no dot resolver, no vector arguments, no
+    dimensions, no enumerations.  The consequence was that 168 definitions the
+    extractor had translated perfectly well reported "could not compile body"
+    inside the coverage gate and were scored UNCOVERED.  That is not a property
+    of the corpus; it is two callers disagreeing about what a definition means.
+
+    Anything that translates a Lean body must go through here, so that the body
+    a check runs is the body the table describes.
+    """
     D = blob["definitions"]
     struct_names = {s["short"] for s in blob["structures"]} | \
                    {s["name"] for s in blob["structures"]}
@@ -343,34 +352,82 @@ def main():
             + ("no such definition" if not group else
                f"ambiguous among {[g['name'] for g in group]}"))
 
+
+    return {
+        "blob": blob, "D": D, "struct_names": struct_names,
+        "def_names": def_names, "by_short": by_short, "pynames": pynames,
+        "by_name": by_name, "make_resolver": make_resolver, "enums": enums,
+        "qualified_resolver": qualified_resolver, "fields_of": fields_of,
+        "dot_resolver": dot_resolver,
+        "structs_by_short": {sd["short"]: sd for sd in blob["structures"]},
+    }
+
+
+def per_def(ctx, d):
+    """(fname, struct_args, translate_def kwargs) for one definition."""
+    struct_types = {}
+    for a in d["args"]:
+        head = a["type"].split()[0] if a["type"].split() else ""
+        if head in ctx["struct_names"]:
+            for n in a["names"]:
+                struct_types[n] = head.split(".")[-1]
+    # Vector / matrix arguments: a finite table becomes a Python sequence, and a
+    # matrix a sequence of sequences.  Purely additive: a definition with only
+    # scalar arguments is unaffected.
+    vector_args, dims = {}, {}
+    for a in d["args"]:
+        if a["implicit"]:
+            continue
+        idxs = sequence_shape(a["type"])
+        for n in a["names"]:
+            if not idxs:
+                continue
+            vector_args[n] = (idxs[0], len(idxs))
+            dims.setdefault(idxs[0], f"len({pyname(n)})")
+            if len(idxs) == 2:
+                dims.setdefault(idxs[1], f"len({pyname(n)}[0])")
+    struct_args = list(struct_types)
+    struct_args += [n for a in d["args"] for n in a["names"] if "×" in a["type"]]
+    kw = dict(resolver=ctx["make_resolver"](d), struct_types=struct_types,
+              fields_of=ctx["fields_of"], dot_resolver=ctx["dot_resolver"],
+              vector_args=vector_args, dims=dims, enums=ctx["enums"],
+              qualified_resolver=ctx["qualified_resolver"])
+    return ctx["pynames"].get(d["name"], pyname(d["short"])), struct_args, kw
+
+
+def translate_in_context(ctx, d, body=None, fname=None):
+    """Translate `d` (or `d` with `body` substituted) the way emit.py does.
+
+    `body` is the hook the mutation gate needs: a mutant is the real definition
+    with one token changed, and it must be translated under exactly the same
+    resolution as the real one or the comparison is between two different
+    things rather than between a body and its perturbation.
+    """
+    f, struct_args, kw = per_def(ctx, d)
+    if body is not None:
+        d = dict(d)
+        d["body"] = body
+        d["equations"] = []
+    return translate_def(d, struct_args, fname=fname or f, **kw)
+
+
+def main():
+    root = PROOFS / "Calibrator"
+    defs, thms, structs, failures = lean_parse.build(root)
+    blob = lean_parse.to_json(defs, structs, failures, thms)
+    (HERE / "defs.json").write_text(json.dumps(blob, indent=1, ensure_ascii=False))
+
+    ctx = build_context(blob)
+    D = ctx["D"]
+    struct_names = ctx["struct_names"]
+    def_names = ctx["def_names"]
+    pynames = ctx["pynames"]
+
     sources, translated, reasons, standins = {}, {}, {}, {}
     vector_arity = {}
     for d in D:
-        struct_types = {}
-        for a in d["args"]:
-            head = a["type"].split()[0] if a["type"].split() else ""
-            if head in struct_names:
-                for n in a["names"]:
-                    struct_types[n] = head.split(".")[-1]
-        # Vector / matrix arguments: `Fin n → ℝ` becomes a Python sequence, and
-        # `Matrix (Fin p) (Fin q) ℝ` a sequence of sequences.  Purely additive:
-        # a definition with only scalar arguments is unaffected.
-        vector_args, dims = {}, {}
-        for a in d["args"]:
-            if a["implicit"]:
-                continue
-            idxs = sequence_shape(a["type"])
-            for n in a["names"]:
-                if not idxs:
-                    continue
-                vector_args[n] = (idxs[0], len(idxs))
-                dims.setdefault(idxs[0], f"len({pyname(n)})")
-                if len(idxs) == 2:
-                    dims.setdefault(idxs[1], f"len({pyname(n)}[0])")
-        struct_args = list(struct_types)
-        struct_args += [n for a in d["args"] for n in a["names"]
-                        if "×" in a["type"]]
-        fname = pynames[d["name"]]
+        fname, struct_args, kw = per_def(ctx, d)
+        vector_args = kw["vector_args"]
         if d["name"] in NUMERIC_STANDINS:
             src, argnames, why = NUMERIC_STANDINS[d["name"]]
             sources[fname] = src.replace("def Phi(", f"def {fname}(")
@@ -378,11 +435,7 @@ def main():
             standins[d["name"]] = why
             continue
         try:
-            src, argnames = translate_def(
-                d, struct_args, fname=fname, resolver=make_resolver(d),
-                struct_types=struct_types, fields_of=fields_of,
-                dot_resolver=dot_resolver, vector_args=vector_args, dims=dims,
-                enums=enums, qualified_resolver=qualified_resolver)
+            src, argnames = translate_def(d, struct_args, fname=fname, **kw)
         except Untranslatable as e:
             reasons[d["name"]] = str(e)
             continue
