@@ -43,15 +43,27 @@ diversity. This affects PGS portability.
 
 section HaplotypeDiversity
 
-/-- Empirical status: UNTESTED. -/
-noncomputable def expectedDistinctHaplotypes (k n : ℕ) : ℝ :=
+/-- **Expected distinct haplotypes under UNIFORM occupancy**: `k` sites give `2^k` possible
+haplotypes, each equally frequent, and `n` chromosomes are drawn independently.
+
+    The name carries the assumption because the formula cannot carry the alternative. The
+    observable "expected number of distinct haplotypes in a `k`-SNP window from `n` sampled
+    chromosomes" depends on the haplotype frequency spectrum, hence on effective size,
+    recombination and demographic history, and this signature takes none of them: it is
+    demography-free by construction. So it cannot support the section's opening remark that
+    populations with older demographic history carry more haplotype diversity — that statement
+    is about a dependence this function does not have. `haplotypeHomozygosity` below takes the
+    frequency vector and shows what the required input looks like.
+
+    Empirical status: UNTESTED. -/
+noncomputable def uniformOccupancyDistinctHaplotypes (k n : ℕ) : ℝ :=
   (2 : ℝ) ^ k * (1 - (1 - 1 / ((2 : ℝ) ^ k)) ^ n)
 
 /-- The occupancy-model expectation is strictly increasing in the number of sampled haplotypes
     whenever at least two haplotypes are possible in the region (`k > 0`). -/
-theorem expectedDistinctHaplotypes_strictMono
+theorem uniformOccupancyDistinctHaplotypes_strictMono
     (k : ℕ) (h_k : 0 < k) :
-    StrictMono (expectedDistinctHaplotypes k) := by
+    StrictMono (uniformOccupancyDistinctHaplotypes k) := by
   refine strictMono_nat_of_lt_succ fun n ↦ ?_
   let m : ℝ := (2 : ℝ) ^ k
   have h_m_pos : 0 < m := by
@@ -72,18 +84,18 @@ theorem expectedDistinctHaplotypes_strictMono
       exact h_m_gt_one
     exact sub_pos.mpr h_inv_lt_one
   have h_step :
-      expectedDistinctHaplotypes k (n + 1) =
-        expectedDistinctHaplotypes k n + (1 - 1 / m) ^ n := by
-    unfold expectedDistinctHaplotypes
+      uniformOccupancyDistinctHaplotypes k (n + 1) =
+        uniformOccupancyDistinctHaplotypes k n + (1 - 1 / m) ^ n := by
+    unfold uniformOccupancyDistinctHaplotypes
     dsimp [m]
     rw [pow_succ]
     field_simp [h_m_pos.ne']
     ring
   have h_increment_pos : 0 < (1 - 1 / m) ^ n := pow_pos h_q_pos n
   calc
-    expectedDistinctHaplotypes k n
-      < expectedDistinctHaplotypes k n + (1 - 1 / m) ^ n := by linarith
-    _ = expectedDistinctHaplotypes k (n + 1) := h_step.symm
+    uniformOccupancyDistinctHaplotypes k n
+      < uniformOccupancyDistinctHaplotypes k n + (1 - 1 / m) ^ n := by linarith
+    _ = uniformOccupancyDistinctHaplotypes k (n + 1) := h_step.symm
 
 /-- **Haplotype homozygosity.**
     H = Σ f_i² where f_i are haplotype frequencies.
