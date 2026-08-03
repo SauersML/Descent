@@ -165,9 +165,9 @@ FAMILIES = [
                     "ldRetainedFraction", "neutralDriftFactor",
                     "wrightFisherDriftRetention",
                     "wrightFisherHeterozygosityLoss", "hetRecurrence",
-                    "cumulativeDrift", "fstVariableNe",
+                    "cumulativeDrift", "heterozygosityLossVariableNe",
                     # newly classified
-                    "founderFst", "harmonicMeanNe", "fstFromDriftFactor",
+                    "founderHeterozygosityLoss", "harmonicMeanNe", "fstFromDriftFactor",
                     "targetHetFromFst", "targetHet", "retention",
                     "heterozygosityLoss", "alleleFreqDivergenceRate"],
     },

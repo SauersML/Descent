@@ -4,7 +4,7 @@
 
 WHY THIS EXISTS, AND WHY IT IS NOT REDUNDANT WITH coverage_v2.py.
 
-Four definitions -- cumulativeDrift, fstVariableNe, harmonicMeanNe,
+Four definitions -- cumulativeDrift, heterozygosityLossVariableNe, harmonicMeanNe,
 ldMismatchFrobenius -- take vector or matrix arguments, and for a long time
 exactly ONE translator could reach them.  Everything downstream of that
 translator agreed with it by construction, so if it were wrong about them,
@@ -44,7 +44,7 @@ sys.path.insert(0, str(HERE))
 import api                                                       # noqa: E402
 
 # The Lean each reference below implements, printed for audit.
-QUOTED = ["cumulativeDrift", "fstVariableNe", "harmonicMeanNe",
+QUOTED = ["cumulativeDrift", "heterozygosityLossVariableNe", "harmonicMeanNe",
           "ldMismatchFrobenius", "frobeniusNormSq"]
 
 
@@ -54,8 +54,8 @@ def ref_cumulativeDrift(Ne):
     return float(np.sum([1.0 / (2.0 * x) if x != 0 else 0.0 for x in Ne]))
 
 
-# Lean: fstVariableNe (Ne) : R := 1 - Real.exp (-(cumulativeDrift Ne))
-def ref_fstVariableNe(Ne):
+# Lean: heterozygosityLossVariableNe (Ne) : R := 1 - Real.exp (-(cumulativeDrift Ne))
+def ref_heterozygosityLossVariableNe(Ne):
     return 1.0 - math.exp(-ref_cumulativeDrift(Ne))
 
 
@@ -81,7 +81,7 @@ def ref_ldMismatchFrobenius(S, T):
 CONTROLS = [
     ("Calibrator.cumulativeDrift", ([1.0, 1.0, 1.0],), 1.5),        # 3 * 1/2
     ("Calibrator.cumulativeDrift", ([0.5],), 1.0),                  # 1/(2*0.5)
-    ("Calibrator.fstVariableNe", ([1.0, 1.0, 1.0],), 1.0 - math.exp(-1.5)),
+    ("Calibrator.heterozygosityLossVariableNe", ([1.0, 1.0, 1.0],), 1.0 - math.exp(-1.5)),
     ("Calibrator.harmonicMeanNe", ([1.0, 2.0, 4.0],), 3.0 / 1.75),
     ("Calibrator.harmonicMeanNe", ([5.0, 5.0],), 5.0),   # HM of equals is equal
     ("Calibrator.ldMismatchFrobenius",
@@ -94,7 +94,7 @@ CONTROLS = [
 
 PAIRS = [
     ("Calibrator.cumulativeDrift", ref_cumulativeDrift, "vec"),
-    ("Calibrator.fstVariableNe", ref_fstVariableNe, "vec"),
+    ("Calibrator.heterozygosityLossVariableNe", ref_heterozygosityLossVariableNe, "vec"),
     ("Calibrator.harmonicMeanNe", ref_harmonicMeanNe, "vec"),
     ("Calibrator.ldMismatchFrobenius", ref_ldMismatchFrobenius, "matpair"),
 ]

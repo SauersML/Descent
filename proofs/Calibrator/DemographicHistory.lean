@@ -592,19 +592,49 @@ end ArchaicIntrogression
 
 section FounderEffects
 
-/-- Founder F_ST after t generations: 1 - (1 - 1/(2k))^t.
+/-- **Within-population heterozygosity loss after `t` generations in a founding
+    population of size `k`**: `1 - (1 - 1/(2k))^t`.
 
-    Empirical status: UNTESTED. -/
-noncomputable def founderFst (k : ℕ) (t : ℕ) : ℝ :=
+    RENAMED from `founderFst`. This is *not* between-population `F_ST`, and the
+    difference is not a convention fork or a factor of two -- they are different
+    quantities with different limits. `PopulationGeneticsFoundations` records the
+    measurement: at `Nₑ = 1000`, `t = 4000` this expression's retention factor gives
+    `0.135` against a measured `1.025 ± 0.020`, and the `F_ST` its cluster reports is
+    approximately zero where the measurable between-population `F_ST` at that design
+    point is `0.50`. Anything reading this as a differentiation measure is not slightly
+    off; it is on the wrong axis.
+
+    **If you want between-population `F_ST` after a split, use
+    `PopulationGeneticsFoundations.coalFst t Ne = t / (t + 2 Nₑ)`**, which coalescent
+    simulation in branch mode -- which removes mutational noise analytically -- finds
+    unbiased across the tested grid. That sentence is here rather than in a commit
+    message so the next reader who wants an `F_ST` finds the right object in this
+    paragraph instead of reaching for this one out of habit.
+
+    The identifier was the last part of this defect to be corrected. The corpus had
+    already written the right semantics down in its own check:
+    `validation/popgen_defs/battery2.py` compares this body against
+    `truth = 1 - H/H₀`, simulated heterozygosity loss, and passes -- so the test
+    agreed with the body while the name contradicted both, and nothing in the
+    pipeline compared the two. `heterozygosityLossFromDrift` and
+    `heterozygosityLossDerived` in `PopulationGeneticsFoundations` are the same
+    quantity and were repaired earlier; that sweep did not cross into this file.
+
+    Regime: closed population, no mutation. `founderHeterozygosityLoss_eq_derived`
+    below pins it to the `θ = 0` slice of the general transient, which is what makes
+    the no-mutation premise explicit rather than implied.
+
+    Empirical status: correct for what it now says; FALSIFIED as an `F_ST`. -/
+noncomputable def founderHeterozygosityLoss (k : ℕ) (t : ℕ) : ℝ :=
   1 - (1 - 1 / (2 * (k : ℝ))) ^ t
 
-/-- Smaller founding population → larger F_ST (more drift). -/
-theorem smaller_founder_larger_fst
+/-- Smaller founding population → larger heterozygosity loss (more drift). -/
+theorem smaller_founder_larger_heterozygosity_loss
     (k₁ k₂ : ℕ) (t : ℕ)
     (hk₁ : 2 < k₁) (hk₂ : 2 < k₂)
     (h_smaller : k₂ < k₁) (ht : 0 < t) :
-    founderFst k₁ t < founderFst k₂ t := by
-  unfold founderFst
+    founderHeterozygosityLoss k₁ t < founderHeterozygosityLoss k₂ t := by
+  unfold founderHeterozygosityLoss
   have h_base : 1 - 1 / (2 * (k₂ : ℝ)) < 1 - 1 / (2 * (k₁ : ℝ)) := by
     rw [sub_lt_sub_iff_left]
     apply div_lt_div_of_pos_left one_pos
@@ -616,7 +646,7 @@ theorem smaller_founder_larger_fst
     linarith
   linarith [pow_lt_pow_left₀ h_base h_nn (by omega : t ≠ 0)]
 
-/-- **Connection to derived formula**: `founderFst` equals the pure-drift
+/-- **Connection to derived formula**: `founderHeterozygosityLoss` equals the pure-drift
     specialization of `fstMutationDriftTransientDiscrete` from
     `PopulationGeneticsFoundations.lean`.
 
@@ -626,23 +656,32 @@ theorem smaller_founder_larger_fst
     - `fstMutationDriftTransientDiscrete 0 k t = 1 · (1 - (1 - 1/(2k))^t)`
                                                 = 1 - (1 - 1/(2k))^t
 
-    This is exactly `founderFst k t`, confirming that the founder effect
+    This is exactly `founderHeterozygosityLoss k t`, confirming that the founder effect
     formula is the pure-drift case of the general heterozygosity recurrence
     derived in `PopulationGeneticsFoundations`. -/
-theorem founderFst_eq_derived (k : ℕ) (t : ℕ) :
-    founderFst k t = fstMutationDriftTransientDiscrete 0 (k : ℝ) t := by
-  unfold founderFst fstMutationDriftTransientDiscrete fstMutationDriftEquilibrium hetDecayFactor hetDecayFromScaled
+theorem founderHeterozygosityLoss_eq_derived (k : ℕ) (t : ℕ) :
+    founderHeterozygosityLoss k t = fstMutationDriftTransientDiscrete 0 (k : ℝ) t := by
+  unfold founderHeterozygosityLoss fstMutationDriftTransientDiscrete fstMutationDriftEquilibrium hetDecayFactor hetDecayFromScaled
   simp
 
 end FounderEffects
 
 
 /-!
-## Fst Under Variable Population Size
+## Heterozygosity Loss Under Variable Population Size
 
-When Ne changes over time, Fst accumulates as:
-  Fst(T) = 1 - exp(-Σ_{t=0}^{T-1} 1/(2·Ne(t)))
-replacing the constant-size formula Fst = 1 - exp(-T/(2·Ne)).
+When Ne changes over time, the drift-accumulated loss of within-population
+heterozygosity is
+  L(T) = 1 - exp(-Σ_{t=0}^{T-1} 1/(2·Ne(t)))
+replacing the constant-size form L = 1 - exp(-T/(2·Ne)).
+
+This section used to say `Fst` in every one of those places. It is heterozygosity
+loss, not between-population `F_ST` -- see the note on `founderHeterozygosityLoss`
+above for the measurement that separates them, and use
+`PopulationGeneticsFoundations.coalFst` if differentiation after a split is what is
+wanted. The constant-size form named above as the thing being "replaced" is itself
+the falsified expression, which is how the error propagated into the variable-Ne
+case unremarked.
 -/
 
 section VariableNeFst
@@ -653,15 +692,28 @@ section VariableNeFst
 noncomputable def cumulativeDrift {T : ℕ} (Ne : Fin T → ℝ) : ℝ :=
   ∑ i, 1 / (2 * Ne i)
 
-/-- **Fst under variable Ne**: 1 - exp(-Σ 1/(2·Ne(t))). -/
-noncomputable def fstVariableNe {T : ℕ} (Ne : Fin T → ℝ) : ℝ :=
+/-- **Within-population heterozygosity loss under variable Nₑ**:
+    `1 - exp(-Σ 1/(2·Nₑ(t)))`.
+
+    RENAMED from `fstVariableNe`. The continuous-time form of
+    `founderHeterozygosityLoss`; see that docstring for the measurement showing this
+    family is not between-population `F_ST` (`≈ 0` here against a measured `0.50` at
+    `Nₑ = 1000`, `t = 4000`) and for `coalFst t Ne = t / (t + 2 Nₑ)`, which is the
+    between-population quantity.
+
+    `validation/popgen_defs/battery2.py` already checked this body against
+    `truth = 1 - H_t/H_0` and carried the note "drift-only heterozygosity loss", so
+    the test named the quantity correctly while the identifier did not.
+
+    Empirical status: correct for what it now says; FALSIFIED as an `F_ST`. -/
+noncomputable def heterozygosityLossVariableNe {T : ℕ} (Ne : Fin T → ℝ) : ℝ :=
   1 - Real.exp (-(cumulativeDrift Ne))
 
-/-- Fst under variable Ne is nonneg when all Ne are positive. -/
-theorem fst_variable_ne_nonneg {T : ℕ} (hT : 0 < T)
+/-- Heterozygosity loss under variable Nₑ is nonneg when all Nₑ are positive. -/
+theorem heterozygosityLossVariableNe_nonneg {T : ℕ} (hT : 0 < T)
     (Ne : Fin T → ℝ) (hNe : ∀ i, 0 < Ne i) :
-    0 ≤ fstVariableNe Ne := by
-  unfold fstVariableNe
+    0 ≤ heterozygosityLossVariableNe Ne := by
+  unfold heterozygosityLossVariableNe
   rw [sub_nonneg, ← Real.exp_zero]
   apply Real.exp_le_exp.mpr
   have hcum_nonneg : 0 ≤ cumulativeDrift Ne := by
@@ -671,19 +723,19 @@ theorem fst_variable_ne_nonneg {T : ℕ} (hT : 0 < T)
     exact le_of_lt (div_pos one_pos (by linarith [hNe i]))
   simpa using hcum_nonneg
 
-/-- Fst under variable Ne is strictly less than 1. -/
-theorem fst_variable_ne_lt_one {T : ℕ} (Ne : Fin T → ℝ) :
-    fstVariableNe Ne < 1 := by
-  unfold fstVariableNe
+/-- Heterozygosity loss under variable Nₑ is strictly less than 1. -/
+theorem heterozygosityLossVariableNe_lt_one {T : ℕ} (Ne : Fin T → ℝ) :
+    heterozygosityLossVariableNe Ne < 1 := by
+  unfold heterozygosityLossVariableNe
   linarith [Real.exp_pos (-(cumulativeDrift Ne))]
 
-/-- Larger cumulative drift yields higher Fst. -/
-theorem more_drift_higher_fst {T : ℕ}
+/-- Larger cumulative drift yields higher heterozygosity loss. -/
+theorem more_drift_higher_heterozygosity_loss {T : ℕ}
     (Ne₁ Ne₂ : Fin T → ℝ)
     (hNe₁ : ∀ i, 0 < Ne₁ i) (hNe₂ : ∀ i, 0 < Ne₂ i)
     (h_more_drift : cumulativeDrift Ne₁ < cumulativeDrift Ne₂) :
-    fstVariableNe Ne₁ < fstVariableNe Ne₂ := by
-  unfold fstVariableNe
+    heterozygosityLossVariableNe Ne₁ < heterozygosityLossVariableNe Ne₂ := by
+  unfold heterozygosityLossVariableNe
   -- Need: 1 - exp(-d₁) < 1 - exp(-d₂) ↔ exp(-d₂) < exp(-d₁) ↔ -d₂ < -d₁ ↔ d₁ < d₂ ✓
   have h_exp : Real.exp (-(cumulativeDrift Ne₂)) < Real.exp (-(cumulativeDrift Ne₁)) := by
     apply Real.exp_lt_exp.mpr

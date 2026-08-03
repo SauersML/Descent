@@ -148,7 +148,7 @@ approx("Real.log of a negative is log|x|", __import__("lean_rt").rlog(-math.e), 
 CROSSVALIDATE_FLOOR = 40
 # 43 -> 40 is NOT a regression. Four definitions in the battery take
 # `Fin n -> R` or matrix arguments, which the independent translator refuses
-# by design rather than guessing: cumulativeDrift, fstVariableNe,
+# by design rather than guessing: cumulativeDrift, heterozygosityLossVariableNe,
 # harmonicMeanNe, ldMismatchFrobenius. They are extractable by THIS tier
 # alone and have no independent check, so if the vector evaluator is wrong
 # about them nothing in this project would catch it. Raise this when the

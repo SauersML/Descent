@@ -1462,14 +1462,14 @@ check(
 )
 
 check(
-    id="fstVariableNe-vs-exact-product",
-    fqn="Calibrator.fstVariableNe",
+    id="heterozygosityLossVariableNe-vs-exact-product",
+    fqn="Calibrator.heterozygosityLossVariableNe",
     claim="1 - exp(-sum 1/(2Ne_i)) vs the exact 1 - prod(1 - 1/(2Ne_i))",
     model_lean="exponential approximation of a product of survival terms",
     model_ref="exact Wright-Fisher non-coalescence product",
     reference="refs.cumulative_inbreeding_exact",
     grid=[{"nes": _BOTTLENECK}, {"nes": _RAMP}, {"nes": _MILD}, {"nes": _SEVERE}],
-    lean=lambda D, nes: D["fstVariableNe"](nes),
+    lean=lambda D, nes: D["heterozygosityLossVariableNe"](nes),
     ref=lambda nes: refs.cumulative_inbreeding_exact(nes),
     tol=1e-3,
     kind="model",
@@ -1486,15 +1486,15 @@ check(
 )
 
 check(
-    id="fstVariableNe-equals-harmonic-mean-substitution",
-    fqn="Calibrator.fstVariableNe",
+    id="heterozygosityLossVariableNe-equals-harmonic-mean-substitution",
+    fqn="Calibrator.heterozygosityLossVariableNe",
     claim="the variable-Ne F equals the constant-Ne exponential form evaluated "
           "at the harmonic mean",
     model_lean="1 - exp(-cumulativeDrift Ne)",
     model_ref="1 - exp(-T/(2 * harmonicMeanNe Ne)), same file",
     reference="Calibrator.harmonicMeanNe substituted into the exponential form",
     grid=[{"nes": _BOTTLENECK}, {"nes": _RAMP}, {"nes": _MILD}, {"nes": _SEVERE}],
-    lean=lambda D, nes: D["fstVariableNe"](nes),
+    lean=lambda D, nes: D["heterozygosityLossVariableNe"](nes),
     ref=lambda D, nes: 1.0 - math.exp(-len(nes) / (2.0 * D["harmonicMeanNe"](nes))),
     kind="identity",
     note=(

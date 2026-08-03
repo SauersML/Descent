@@ -14,7 +14,7 @@ are all exact functions of the single number (1 - 1/(2 Ne))^t:
     Calibrator.wrightFisherDriftRetention     PortabilityDrift.lean:710
     Calibrator.wrightFisherHeterozygosityLoss PortabilityDrift.lean:730
     Calibrator.cumulativeDrift                DemographicHistory.lean:506    (vector form)
-    Calibrator.fstVariableNe                  DemographicHistory.lean:510    (vector form)
+    Calibrator.heterozygosityLossVariableNe                  DemographicHistory.lean:510    (vector form)
     Calibrator.targetHetFromFst               PortabilityDrift.lean:653      (consumer)
 
 The extraction layer already localized the fault precisely: the mutation-drift

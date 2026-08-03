@@ -4,9 +4,9 @@
   PopulationGeneticsFoundations.lean:791  alleleFreqAfterMigration
                                             = p_c + (p0-p_c)(1-m)^t
   PopulationGeneticsFoundations.lean:188  selectionMigrationEquilibrium = s/(s+m)
-  DemographicHistory.lean:480             fstVariableNe = 1-exp(-sum 1/(2Ne_t))
+  DemographicHistory.lean:480             heterozygosityLossVariableNe = 1-exp(-sum 1/(2Ne_t))
   LDDecayTheory.lean:275                  harmonicMeanNe = T / sum(1/Ne_i)
-  DemographicHistory.lean:423             founderFst k t = 1-(1-1/(2k))^t
+  DemographicHistory.lean:423             founderHeterozygosityLoss k t = 1-(1-1/(2k))^t
   RareVariantPortability.lean:324         expectedEffectMultiplier
                                             = (p(1-p))^(1+alpha)
   ImputationPortability.lean:40           attenuatedVariance = beta_sq*het*r2_imp
@@ -35,7 +35,7 @@ def rec(name, source, lean, truth, params, note=""):
 
 # --------------------------------------------------------------------------
 def wf_drift_fst(args):
-    """fstVariableNe = 1 - exp(-sum 1/(2 Ne_t)); ground truth = 1 - H_t/H_0."""
+    """heterozygosityLossVariableNe = 1 - exp(-sum 1/(2 Ne_t)); ground truth = 1 - H_t/H_0."""
     Ne_schedule, reps, seed = args
     rng = np.random.default_rng(seed)
     p = np.full(reps, 0.5)
@@ -45,15 +45,15 @@ def wf_drift_fst(args):
     H = float(np.mean(2 * p * (1 - p)))
     truth = 1 - H / H0
     lean = 1 - np.exp(-sum(1.0 / (2 * Ne) for Ne in Ne_schedule))
-    return dict(name="fstVariableNe", source="DemographicHistory.lean:480",
+    return dict(name="heterozygosityLossVariableNe", source="DemographicHistory.lean:480",
                 lean=float(lean), truth=float(truth),
                 params=dict(T=len(Ne_schedule), Ne_min=min(Ne_schedule),
                             Ne_max=max(Ne_schedule)),
                 note="drift-only heterozygosity loss")
 
 
-def wf_founder_fst(args):
-    """founderFst k t = 1-(1-1/(2k))^t against simulated heterozygosity loss."""
+def wf_founder_heterozygosity_loss(args):
+    """founderHeterozygosityLoss k t = 1-(1-1/(2k))^t against simulated heterozygosity loss."""
     k, t, reps, seed = args
     rng = np.random.default_rng(seed)
     p = np.full(reps, 0.5)
@@ -61,7 +61,7 @@ def wf_founder_fst(args):
     for _ in range(t):
         p = rng.binomial(2 * k, p) / (2 * k)
     H = float(np.mean(2 * p * (1 - p)))
-    return dict(name="founderFst", source="DemographicHistory.lean:423",
+    return dict(name="founderHeterozygosityLoss", source="DemographicHistory.lean:423",
                 lean=float(1 - (1 - 1 / (2 * k)) ** t), truth=float(1 - H / H0),
                 params=dict(k=k, t=t), note="")
 
@@ -107,7 +107,7 @@ def main():
                   [200] * 100):
         jobs.append((wf_drift_fst, (sched, 40000, 11 + len(sched) + int(sched[0]))))
     for k, t in [(10, 5), (50, 20), (200, 100)]:
-        jobs.append((wf_founder_fst, (k, t, 40000, 7 + k + t)))
+        jobs.append((wf_founder_heterozygosity_loss, (k, t, 40000, 7 + k + t)))
     for p0, p_c, m, t in [(0.8, 0.2, 0.01, 50), (0.2, 0.9, 0.05, 20),
                           (0.5, 0.1, 0.002, 200)]:
         jobs.append((wf_migration, (p0, p_c, m, t, 4000, 3 + int(p0 * 10) + t)))

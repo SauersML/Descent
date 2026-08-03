@@ -92,7 +92,7 @@
 ## Single-sourced definitions
 
 Four definitions in the cross-validation battery — `cumulativeDrift`,
-`fstVariableNe`, `harmonicMeanNe`, `ldMismatchFrobenius` — take `Fin n → ℝ` or
+`heterozygosityLossVariableNe`, `harmonicMeanNe`, `ldMismatchFrobenius` — take `Fin n → ℝ` or
 matrix arguments, which the independent translator refuses by design rather
 than guessing. **They are extractable by this tier alone.** If the finite-vector
 evaluator is wrong about them, nothing in this project would catch it, which is

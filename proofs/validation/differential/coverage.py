@@ -106,7 +106,7 @@ SIMULATION_COVERED = {
         # recursion / vector forms of the same quantity, outside the scalar sweep
         "hetRecurrence",
         "cumulativeDrift",
-        "fstVariableNe",
+        "heterozygosityLossVariableNe",
     })
 }
 
