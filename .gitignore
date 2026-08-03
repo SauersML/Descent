@@ -119,3 +119,10 @@ proofs/validation/extract/ceiling.json
 proofs/validation/extract/regime.json
 proofs/validation/extract/reconcile.json
 proofs/validation/extract/coverage.json
+
+# Per-run validator output. These files are regenerated from the current Lean
+# sources and must not masquerade as versioned evidence from an older revision.
+proofs/validation/differential/results.json
+proofs/validation/drift_diff/results_migration_mean.json
+proofs/validation/invariants/defs.json
+proofs/validation/invariants/results_ranges.json
