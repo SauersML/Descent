@@ -274,12 +274,13 @@ structure SNPArchitecturePortabilityModel (q : ℕ) where
 Sixteen theorems quantify over `SNPArchitecturePortabilityModel q`.  The witness retains
 half of each source effect, so it sits strictly inside the `targetRetained_le_source`
 constraint rather than on its boundary. -/
-def SNPArchitecturePortabilityModel.witness (q : ℕ) : SNPArchitecturePortabilityModel q where
-  sourceSquaredEffect := fun _ => 1
-  targetRetainedSquaredEffect := fun _ => 1 / 2
-  sourceSquaredEffect_nonneg := fun _ => by norm_num
-  targetRetained_nonneg := fun _ => by norm_num
-  targetRetained_le_source := fun _ => by norm_num
+noncomputable def SNPArchitecturePortabilityModel.witness
+    (q : ℕ) : SNPArchitecturePortabilityModel q where
+  sourceSquaredEffect := fun _ ↦ 1
+  targetRetainedSquaredEffect := fun _ ↦ 1 / 2
+  sourceSquaredEffect_nonneg := fun _ ↦ by norm_num
+  targetRetained_nonneg := fun _ ↦ by norm_num
+  targetRetained_le_source := fun _ ↦ by norm_num
 
 namespace SNPArchitecturePortabilityModel
 
@@ -528,6 +529,8 @@ fixed-grade gap by projection from an assumption field.
 -/
 
 /-- Bounded additive-effect architectures.  The absolute radius makes the set
+
+    Empirical status: UNTESTED.
 nonempty and convex for every input, without a validity theorem parameter. -/
 noncomputable def boundedEffectCarrier (q : ℕ) (B : ℝ) : Set (Fin q → ℝ) :=
   Metric.closedBall 0 |B|
@@ -614,12 +617,16 @@ theorem momentMatched_two_iff {q n : ℕ}
   constructor
   · intro h
     constructor
-    · simpa [finiteProblem, FinitePrior.mean, architectureMoment] using h 0 (by omega)
-    · simpa [finiteProblem, FinitePrior.mean, architectureMoment] using h 1 (by omega)
+    · simpa [finiteProblem, mixtureExperiment, FiniteMixtureExperiment.certificateProblem,
+        FinitePrior.mean, architectureMoment] using h 0 (by omega)
+    · simpa [finiteProblem, mixtureExperiment, FiniteMixtureExperiment.certificateProblem,
+        FinitePrior.mean, architectureMoment] using h 1 (by omega)
   · rintro ⟨h0, h1⟩ r hr
     interval_cases r
-    · simpa [finiteProblem, FinitePrior.mean, architectureMoment] using h0
-    · simpa [finiteProblem, FinitePrior.mean, architectureMoment] using h1
+    · simpa [finiteProblem, mixtureExperiment, FiniteMixtureExperiment.certificateProblem,
+        FinitePrior.mean, architectureMoment] using h0
+    · simpa [finiteProblem, mixtureExperiment, FiniteMixtureExperiment.certificateProblem,
+        FinitePrior.mean, architectureMoment] using h1
 
 theorem effects_nonempty {q n : ℕ} (P : MeanAbsoluteEffectCertificateProblem q n) :
     P.effects.Nonempty := boundedEffectCarrier_nonempty q P.effectRadius

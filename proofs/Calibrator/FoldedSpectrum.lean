@@ -104,6 +104,8 @@ per-locus Hardy-Weinberg laws.
 This is the hypothesis under which a panel may be read as a mixture over loci, which is
 what `spectrumModulusLaw` computes. It is carried explicitly by the headline theorems
 below. Under linkage disequilibrium the joint law is not of this form, the factorization
+
+    Empirical status: UNTESTED.
 the surrounding theory relies on fails, and none of the statements below are claimed. -/
 def InLinkageEquilibrium {k n : ℕ} (family : BundleFamily k) (panel : Panel n)
     (joint : (Fin n → Fin k) → ℝ) : Prop :=
@@ -128,7 +130,9 @@ noncomputable def diploidAtomMass (j : Fin 3) (q : ℝ) : ℝ :=
 noncomputable def diploidFamily : BundleFamily 3 :=
   { atomValue := diploidAtomValue, atomMass := diploidAtomMass }
 
-/-- Relabelling which allele is called the alternate one: genotype `j ↦ 2 - j`. -/
+/-- Relabelling which allele is called the alternate one: genotype `j ↦ 2 - j`.
+
+    Empirical status: UNTESTED. Definitional within the model declared above: it fixes a contrast rather than predicting an observable. -/
 def genotypeFlip3 : Fin 3 → Fin 3 := ![2, 1, 0]
 
 theorem genotypeFlip3_involutive : Function.Involutive genotypeFlip3 := by
@@ -733,6 +737,8 @@ theorem onePercentMaf_halfResponse_vs_balanced_permeability
   ring
 
 /-- Total covariance-moment information from `m` independent observations of one
+
+    Empirical status: UNTESTED.
 standardized Hardy--Weinberg locus. -/
 noncomputable def totalDiploidCovarianceMomentInformation
     (m q covarianceDerivative : ℝ) : ℝ :=
@@ -1600,7 +1606,7 @@ theorem reversalOdd_zero : T.ReversalOdd (fun _ ↦ (0 : ℝ)) := fun _ ↦ (neg
 /-- The trivial time reversal: the involution that reverses nothing. -/
 def idReversal (Symbol : Type*) : TimeReversal Symbol where
   rev := id
-  rev_involutive := Function.involutive_id
+  rev_involutive := fun _ ↦ rfl
 
 /-- Under the trivial reversal every symbol is its own reverse, so `Reversible` is
     inhabited and `odd_vanishes_on_reversible` is not a theorem about nothing.

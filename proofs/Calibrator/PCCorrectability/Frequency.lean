@@ -35,12 +35,12 @@ noncomputable def FrequencyResolvedCohort.witness (classes : ℕ) :
     FrequencyResolvedCohort classes where
   sampleSize := 1
   subgroupSize := 1
-  effectiveMarkers := fun _ => 1
-  differentiation := fun _ => 0
+  effectiveMarkers := fun _ ↦ 1
+  differentiation := fun _ ↦ 0
   sampleSize_pos := by norm_num
   subgroupSize_pos := by norm_num
-  effectiveMarkers_pos := fun _ => by norm_num
-  differentiation_nonneg := fun _ => by norm_num
+  effectiveMarkers_pos := fun _ ↦ by norm_num
+  differentiation_nonneg := fun _ ↦ by norm_num
 
 noncomputable def FrequencyResolvedCohort.classMargin {classes : ℕ}
     (cohort : FrequencyResolvedCohort classes) (i : Fin classes) : ℝ :=
