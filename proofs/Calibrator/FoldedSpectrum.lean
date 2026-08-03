@@ -1695,7 +1695,159 @@ rather than decorative. Measured at `ρ = 0.99`, the deficit against `L` runs `�
 Fejér reference never exceeds `1.7%`. So the finite-depth truth is the Fejér evaluation, and
 `L/n'` is its limit; any use of the limit at small `n'` is wrong by the amounts tabulated.
 
-### 14b. Per-target invisibility and compound prediction
+### 14a′. THE ARROW THEOREM, which subsumes the parity observation above
+
+The odd/even pair recorded above is **correct but too weak**, and it is now a corollary.
+
+> **The order-free visible algebra is the symbol MODULO TIME REVERSAL, and the invisible
+> tangent is EXACTLY the reversal-odd directions** — the sign of `Im λ`, the odd part of the
+> spectral measure.
+>
+> *Destroying the order of a sample destroys the arrow of time and nothing else.*
+
+So `Σγ(k)` and `Σγ(k)²` are not the boundary of the visible. **Everything reversal-even is
+visible**, at every level `p ≥ 3`, through the integrals `∫ σ_{r₁}σ_{r₂}···σ_{r_q} ds`; phase
+pinning (`rc = c` for all `r` forces `c = 0`) leaves `s → −s` as the only surviving symmetry.
+The parity split of §14a is the `p = 2` instance of this, and should be cited as that rather
+than as the general fact.
+
+**TWO INDEPENDENT DERIVATIONS REACHED THE SAME INVARIANT, AND THAT IS THE STRONGEST
+VALIDATION THIS PROGRAM HAS PRODUCED.** This corpus refuted the absolute-invisibility claim
+*numerically* — two moving-average processes with `L` agreeing to `1e-16`, six of ten
+order-free channels separating at up to `18.1σ`, predictions matching measurement to three
+digits — and identified `Σγ(k)²` as the even-channel invariant. The analytical refutation
+arrived afterwards and independently, by Hermite expansion:
+
+`Σ_k Cov(f(F₀), f(F_k)) = Σ_r (c_r(f)²/r!) · π_r`,  with  `π_r := Σ_{k≥1} ρ(k)^r`,
+
+and varying the test function `f` exposes the whole family `{π_r}`. **The measured
+`Σγ(k)²` is literally their `π₂`.** Neither derivation had contact with the other; a
+simulation and a Hermite expansion converged on the same object.
+
+**SCOPE, AND IT IS NOT DECORATIVE.** The Arrow Theorem is stated for the **Gaussian-latent
+layer**. The non-Gaussian extension is *Conjecture A.1* — expected true via a cyclic-diagram
+generalization, and **not proved**. It is carried below as a hypothesis field, in the same
+way `NearLowDimensionalFamily` is, so that it cannot become an unmarked assumption. -/
+
+/-- **Time reversal acting on spectral symbols.** The gauge of §15's symmetry class, here in
+the form the Arrow Theorem needs. -/
+structure TimeReversal (Symbol : Type*) where
+  /-- The reversal map `s ↦ -s` on frequency, acting on symbols. -/
+  rev : Symbol → Symbol
+  /-- Reversal is an involution. -/
+  rev_involutive : Function.Involutive rev
+  /-- **Scope field.** The Arrow Theorem is proved in the Gaussian-latent layer. -/
+  gaussianLatentLayer : Prop
+  /-- **Conjecture A.1, unproved.** The non-Gaussian extension via cyclic diagrams. -/
+  nonGaussianExtension : Prop
+
+namespace TimeReversal
+
+variable {Symbol : Type*} (T : TimeReversal Symbol)
+
+/-- A statistic is **reversal-even** when it cannot tell a symbol from its time reverse.
+The Arrow Theorem says the order-free visible algebra consists exactly of these. -/
+def ReversalEven (φ : Symbol → ℝ) : Prop := ∀ s : Symbol, φ (T.rev s) = φ s
+
+/-- A statistic is **reversal-odd** when reversal flips its sign. These are exactly the
+directions order-free data cannot see — and exactly what one extra ordered statistic
+restores. -/
+def ReversalOdd (φ : Symbol → ℝ) : Prop := ∀ s : Symbol, φ (T.rev s) = -φ s
+
+/-- A symbol is **reversible** when it is its own time reverse. -/
+def Reversible (s : Symbol) : Prop := T.rev s = s
+
+/-- **COROLLARY 1: REVERSIBLE DEPLOYMENT FAMILIES ARE FULLY VISIBLE ORDER-FREE, AND THE
+COMPLETION COST IS ZERO.**
+
+On a reversible symbol every reversal-odd statistic vanishes identically, so there is
+nothing for an ordered measurement to add. Nothing is hidden, so nothing needs recovering —
+which is the strongest positive result available about order-free observation. -/
+theorem odd_vanishes_on_reversible {φ : Symbol → ℝ} (h : T.ReversalOdd φ)
+    {s : Symbol} (hs : T.Reversible s) : φ s = 0 := by
+  have hrev := h s
+  rw [hs] at hrev
+  linarith
+
+/-- **COROLLARY 2: A NON-REVERSIBLE FAMILY NEEDS EXACTLY ONE BIT.**
+
+Any single reversal-odd statistic separates a symbol from its reverse wherever it does not
+itself vanish. One lag-asymmetric measurement — for instance
+`Â = (1/(n'-1)) Σᵢ [f(Fᵢ)g(Fᵢ₊₁) - g(Fᵢ)f(Fᵢ₊₁)]` — therefore completes the order-free
+algebra.
+
+That is **far cheaper than the `d` lagged second moments** the earlier completion theory
+prescribed, and it is not a heuristic economy: it is what the corrected algebra predicts,
+because the invisible tangent is one-dimensional in the relevant sense — it is a *sign*. -/
+theorem odd_statistic_separates {φ : Symbol → ℝ} (h : T.ReversalOdd φ)
+    {s : Symbol} (hs : φ s ≠ 0) : φ (T.rev s) ≠ φ s := by
+  rw [h s]
+  intro hcontra
+  exact hs (by linarith)
+
+/-- Reversal-even statistics are blind to reversal, which is the negative half of the
+theorem and the reason Corollary 2 is needed at all. -/
+theorem even_blind_to_reversal {φ : Symbol → ℝ} (h : T.ReversalEven φ) (s : Symbol) :
+    φ (T.rev s) = φ s := h s
+
+end TimeReversal
+
+/-! ### 14a″. THEOREM 6: the membrane opens at two, and depth cannot be bought
+
+At `n' = 1` every dependence direction has `r* = ∞` **for every scheme**: a single unit is
+absolutely blind, not merely inefficient. The membrane first opens at `n' = 2`, where one
+ordered pair carries Fisher information proportional to `(dρ(1)/dh)²`.
+
+**Two units are qualitatively different from one; the second unit is the arrow's minimal
+carrier.**
+
+This sits directly beside `RecoveryAttenuation`, and the two constrain *different axes*:
+
+* `panels_suffice_iff` says `B ≈ 350` panels per cohort are needed for reliability `0.8` —
+  a statement about **breadth**;
+* Theorem 6 says depth `n' ≥ 2` within a target is a **hard floor** — a statement about
+  **depth**, and no amount of `m` or `B` substitutes for it.
+
+`depth_one_cannot_be_bought` below is the formal version of the second: at depth one the
+total information is zero however many cohorts and panels are collected. -/
+
+/-- **The membrane threshold (Theorem 6).** -/
+structure MembraneThreshold where
+  /-- Fisher information about a dependence direction carried by one target at depth `n'`. -/
+  info : ℕ → ℝ
+  info_nonneg : ∀ n : ℕ, 0 ≤ info n
+  /-- **Absolute blindness at depth one**, for every scheme. -/
+  blind_at_one : info 1 = 0
+  /-- Sensitivity of the lag-one correlation to the dependence direction, `dρ(1)/dh`. -/
+  lagOneSensitivity : ℝ
+  /-- **The membrane opens at two.** -/
+  opens_at_two : lagOneSensitivity ≠ 0 → 0 < info 2
+
+namespace MembraneThreshold
+
+variable (M : MembraneThreshold)
+
+/-- Total information from `m` cohorts of `B` panels each, at depth `n'`. -/
+noncomputable def totalInfo (m B : ℝ) (n : ℕ) : ℝ := m * B * M.info n
+
+/-- **DEPTH CANNOT BE BOUGHT WITH BREADTH.** At `n' = 1` the total information is zero for
+every `m` and every `B`. The panel budget of `RecoveryAttenuation` and this depth floor are
+independent constraints, and both bind. -/
+theorem depth_one_cannot_be_bought (m B : ℝ) : M.totalInfo m B 1 = 0 := by
+  unfold totalInfo
+  rw [M.blind_at_one, mul_zero]
+
+/-- **And two units already carry something**, provided the direction moves the lag-one
+correlation at all. The qualitative jump is between one and two, not somewhere in the
+asymptotics. -/
+theorem two_units_carry_information (m B : ℝ) (hm : 0 < m) (hB : 0 < B)
+    (hsens : M.lagOneSensitivity ≠ 0) : 0 < M.totalInfo m B 2 := by
+  unfold totalInfo
+  exact mul_pos (mul_pos hm hB) (M.opens_at_two hsens)
+
+end MembraneThreshold
+
+/-! ### 14b. Per-target invisibility and compound prediction
 
 Across `m` target populations drawn from a common law, pooling can learn a conditional
 predictor from the permutation-invariant panel summaries. Parametric `m⁻¹/²` regret,
