@@ -48,7 +48,40 @@ import sys
 import time
 from pathlib import Path
 
-REPO = Path(__file__).resolve().parents[2]
+def _find_repo():
+    """The repository root, found by walking up to the `.git` directory.
+
+    NOT a fixed number of `parents[]`, and the difference is not academic.
+    This module was written at `proofs/validation/simprov.py` and used
+    `parents[2]`. It was then moved one level deeper, to
+    `proofs/validation/empirical/`, and `parents[2]` silently became
+    `<repo>/proofs`.
+
+    Nothing crashed. What broke instead was the dirty-tree exclusion below:
+    a pathspec of `proofs/validation/**/*.json` evaluated from inside
+    `proofs/` means `proofs/proofs/validation/...`, matches nothing, and every
+    sweep's own JSON output starts counting as a dirty path. Measured at the
+    moment of the move: 83 JSON paths leaked into the list. The stamp would
+    have gone on reporting `workingTreeClean: false` with a list of files that
+    had nothing to do with the code under test, which is precisely the failure
+    `Shared.Results.gitDirtyPaths` documents -- reporting a corruption that did
+    not happen, and training a reader to ignore the field.
+
+    A count of parent directories is a hidden dependency on where a file sits.
+    The `.git` directory is the thing actually being asked about.
+    """
+    here = Path(__file__).resolve()
+    for cand in here.parents:
+        if (cand / ".git").exists():
+            return cand
+    # No .git: a tarball or an exported tree. Fall back to the old assumption
+    # rather than raising, because losing a measurement to a provenance helper
+    # is worse than a degraded stamp -- and `_git` already degrades to
+    # "unknown" when git cannot answer.
+    return here.parents[2] if len(here.parents) > 2 else here.parent
+
+
+REPO = _find_repo()
 
 # The sweeps write their own JSON, so a sweep that runs after another one would
 # otherwise see the first one's output and report a dirty tree that has nothing

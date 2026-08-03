@@ -83,7 +83,31 @@ import sys
 import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-REPO = os.path.normpath(os.path.join(HERE, "..", "..", "..", ".."))
+
+
+def _find_repo(start):
+    """Repository root by walking up to `.git`, not by counting directories.
+
+    This file used four `..` segments, which was right when it lived at
+    `proofs/validation/differential/cluster/`. The tree was then reorganised
+    and it moved one level deeper, so the same four segments now land on
+    `<repo>/proofs` and RES points at a directory that has never existed.
+
+    The failure mode is the one already seen once here: an inferred path that
+    LOOKS plausible. A wrong absolute path reports as a missing dataset and
+    sends the reader looking for the data rather than for the path bug.
+    """
+    cur = start
+    while True:
+        if os.path.exists(os.path.join(cur, ".git")):
+            return cur
+        parent = os.path.dirname(cur)
+        if parent == cur:
+            return os.path.normpath(os.path.join(start, "..", "..", "..", ".."))
+        cur = parent
+
+
+REPO = _find_repo(HERE)
 RES = os.path.join(REPO, "sims", "results_hpc", "ancestry_calibration",
                    "results")
 

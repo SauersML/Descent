@@ -1,0 +1,100 @@
+{
+  "question": "Conventions/PortabilityDrift effectiveSymmetricMigration: is the right effective symmetric rate for asymmetric two-deme migration the arithmetic mean (the body), the harmonic mean (the old docstring), some other single summary, or does no scalar summary exist?",
+  "verdict": "(a) THE ARITHMETIC MEAN IS RIGHT. Not approximately -- exactly. Two-deme equilibrium F_ST depends on (m12, m21) ONLY through their sum. The current body (m12+m21)/2 is the correct argument; the harmonic mean the old docstring named is wrong and would introduce errors up to -48% (simulated) / -80% (exact) at ratios inside one order of magnitude.",
+  "scope_caveat": "Established for EQUAL deme sizes. With unequal deme sizes the cancellation shown below is not expected to hold; that case was not tested.",
+
+  "run": {
+    "date": "2026-08-03",
+    "host": "MSI acn112",
+    "python": "/usr/bin/python3.12, stdlib only",
+    "script": "migmean.py",
+    "raw": ["exact_sweep.json", "sim_sweep.json"]
+  },
+
+  "instruments": [
+    {"name": "exact IBD recursion",
+     "detail": "Two demes of 2N gene copies, backward migration m1/m2, infinite-alleles mutation u. States Q1, Q2, Q12; linear fixed point solved by exact Gaussian elimination in fractions.Fraction. No floats, no approximation."},
+    {"name": "direct Wright-Fisher forward simulation",
+     "detail": "Same migration convention, symmetric two-way biallelic mutation, L=400 loci, 2N=200 per deme, t=2000 generations, 50% burn-in, 10 post-burn samples, 6 replicates. Hudson F_ST from exact integer allele counts (frequencies exact rationals c/(2N))."}
+  ],
+
+  "positive_control": {
+    "ran": "FIRST",
+    "test": "exact IBD recursion at symmetric rates vs the two-deme coalescent value 1/(1+8*N*m)",
+    "rows": [
+      {"m": "1/50",   "fst_exact": 0.055379, "coalescent_1_over_1p8Nm": 0.058824, "rel_err_pct": -5.9},
+      {"m": "1/100",  "fst_exact": 0.107663, "coalescent_1_over_1p8Nm": 0.111111, "rel_err_pct": -3.1},
+      {"m": "1/200",  "fst_exact": 0.196016, "coalescent_1_over_1p8Nm": 0.200000, "rel_err_pct": -2.0},
+      {"m": "1/500",  "fst_exact": 0.377361, "coalescent_1_over_1p8Nm": 0.384615, "rel_err_pct": -1.9},
+      {"m": "1/1000", "fst_exact": 0.542719, "coalescent_1_over_1p8Nm": 0.555556, "rel_err_pct": -2.3}
+    ],
+    "result": "PASSED. Residual is the discrete-generation/finite-N correction the coalescent limit drops."
+  },
+
+  "decisive_test_hold_candidate_fixed_vary_ratio": {
+    "AM_held_fixed": {
+      "exact": [
+        {"target_AM": 0.0025, "ratios": [1,3,9,19,99], "fst_exact": [0.327278,0.327278,0.327278,0.327278,0.327278], "swing_pct": 0.0},
+        {"target_AM": 0.0100, "ratios": [1,3,9,19,99], "fst_exact": [0.107663,0.107663,0.107663,0.107663,0.107663], "swing_pct": 0.0}
+      ],
+      "simulated": [
+        {"label": "AM-fix r=1",  "m1": 0.002500, "m2": 0.002500, "HM": 0.002500, "fst_sim": 0.1999, "se": 0.0014},
+        {"label": "AM-fix r=9",  "m1": 0.004500, "m2": 0.000500, "HM": 0.000900, "fst_sim": 0.2020, "se": 0.0012},
+        {"label": "AM-fix r=99", "m1": 0.004950, "m2": 0.000050, "HM": 0.000099, "fst_sim": 0.2025, "se": 0.0022}
+      ],
+      "simulated_spread": "0.0026 = 1.57 pooled SE while HM varies 25-fold. FLAT."
+    },
+    "HM_held_fixed": {
+      "exact": {"target_HM": 0.0025, "ratios": [1,4,9,16,25],
+                "fst_exact": [0.327278,0.237945,0.148929,0.096261,0.065443], "swing_pct": -80.0},
+      "simulated": [
+        {"label": "HM-fix r=9",  "m1": 0.012500, "m2": 0.001389, "fst_sim": 0.1179, "se": 0.0013},
+        {"label": "HM-fix r=25", "m1": 0.032500, "m2": 0.001300, "fst_sim": 0.0618, "se": 0.0008}
+      ],
+      "simulated_swing": "-47.6% between two points that share the same harmonic mean, about 43 SE. HM is REFUTED."
+    },
+    "GM_held_fixed": {
+      "exact": {"target_GM": 0.0025, "ratios": [1,4,9,16,100],
+                "fst_exact": [0.327278,0.280572,0.226442,0.186582,0.086671], "swing_pct": -73.5},
+      "simulated": [{"label": "GM-fix r=100", "m1": 0.025000, "m2": 0.000250, "fst_sim": 0.0784, "se": 0.0008}],
+      "note": "0.0784 against 0.1999 at r=1 with the same geometric mean: -61%. GM is REFUTED."
+    }
+  },
+
+  "exhaustive_invariance_check": {
+    "design": "24 level sets of m1+m2 (three deme sizes 2N in {100,200,1000} x four sums in {1/50,1/100,1/200,1/1000} x two mutation rates u in {1/10000,1/400}), 6 split points each spanning m1/m2 from 1:1 to 999:1",
+    "result": "In every one of the 24 level sets, all 6 F_ST values are BITWISE IDENTICAL as exact rationals.",
+    "conclusion": "F_ST is a function of m1+m2 alone, exactly, over the whole tested domain."
+  },
+
+  "why": {
+    "derivation": "Coalescent for two demes of N diploids, scaled a = 2N*m1, b = 2N*m2, s = a+b, P = a*b. Solving the three-state system gives tau_between = (1+3s+2s^2)/(s+2s^2-4P) -- which DOES depend on the product P -- and tau_within = [1+s+tau_between*(s+4P)]/(1+2s+4P), which also depends on P. But in the ratio the P-dependence cancels identically: tau_within/tau_between = 2s/(1+2s), so F_ST = 1 - tau_w/tau_b = 1/(1+2s) = 1/(1 + 8*N*AM). Both coalescence times individually depend on the asymmetry; their ratio does not. That cancellation is why a single scalar summary exists at all, and why it is the arithmetic mean specifically.",
+    "closed_form_check": [
+      {"twoN": 200,  "sum_m": "1/100",  "AM": 0.005,   "exact": 0.196016, "one_over_1p8N_AM": 0.200000, "err_pct": -1.99},
+      {"twoN": 200,  "sum_m": "1/200",  "AM": 0.0025,  "exact": 0.327278, "one_over_1p8N_AM": 0.333333, "err_pct": -1.82},
+      {"twoN": 200,  "sum_m": "1/1000", "AM": 0.0005,  "exact": 0.694113, "one_over_1p8N_AM": 0.714286, "err_pct": -2.82},
+      {"twoN": 1000, "sum_m": "1/100",  "AM": 0.005,   "exact": 0.046494, "one_over_1p8N_AM": 0.047619, "err_pct": -2.36},
+      {"twoN": 1000, "sum_m": "1/200",  "AM": 0.0025,  "exact": 0.088672, "one_over_1p8N_AM": 0.090909, "err_pct": -2.46},
+      {"twoN": 1000, "sum_m": "1/1000", "AM": 0.0005,  "exact": 0.312165, "one_over_1p8N_AM": 0.333333, "err_pct": -6.35}
+    ]
+  },
+
+  "recommendations": [
+    "KEEP the body (m12+m21)/2. Do NOT delete effectiveSymmetricMigration -- the quantity it asserts does exist and is exactly the one it computes. The prior that no scalar summary exists is refuted.",
+    "The corrected name and docstring are right; the added sign lemmas harmonicMigrationMean_le_effectiveSymmetricMigration and effectiveSymmetricMigration_fst_le_harmonic_fst are correct but should be re-read as bounding the error of a REFUTED alternative, not as leaving the choice open. The docstring's 'Which of the two means is the right effective rate for asymmetric migration is not settled anywhere in this corpus' can now be settled: it is the arithmetic mean, for equal deme sizes.",
+    "The Conventions.lean identity effectiveSymmetricMigration = meanAlleleFreq and the PopulationGeneticsFoundations betweenness/idempotence facts all survive, since they were proved against the arithmetic body.",
+    "Empirical status can move from UNTESTED to VALIDATED, with the power statement: the prediction is invariant along level sets of the argument, and the design spans a 99:1 rate ratio at fixed AM (flat to 1.57 SE) while the two rival summaries swing -48% and -61% across the same design."
+  ],
+
+  "separate_observation_not_part_of_the_question": {
+    "issue": "Composition convention: fstMigrationDriftEquilibrium Ne m = 1/(1 + 4*Ne*m) is the n->infinity island-model form, where m is immigration from the pooled population. Both instruments here give 1/(1 + 8*Ne*AM) for TWO demes exchanging at pairwise rates. Feeding effectiveSymmetricMigration (manifestly two directional rates between two named populations) into fstMigrationDriftEquilibrium therefore understates gene flow by a factor of 2 and overstates F_ST by roughly 2x.",
+    "direction": "OPPOSITE to the AM/HM concern the docstring raised: this one is PESSIMISTIC -- higher F_ST, lower predicted target R2.",
+    "status": "FLAGGED, NOT DECIDED. This is a question about which model fstMigrationDriftEquilibrium is meant to be, not a demonstrated error. It deserves its own check and I did not run one."
+  },
+
+  "not_reached": [
+    "Unequal deme sizes (N1 != N2). The cancellation that makes a scalar summary exist is not expected to survive it, and asymmetric backward rates with equal N already imply non-conservative migration; a proper unequal-size test is the obvious follow-up.",
+    "More than two demes.",
+    "Level agreement between the two instruments: simulated F_ST (0.20) sits ~20% below the exact IBD value (0.248) at the low-migration point because the simulation uses biallelic two-way mutation at 4Nu=1 with Hudson's estimator while the recursion is infinite-alleles IBD. The two agree closely at the higher-migration points (0.1179 vs 0.1298; 0.0618 vs 0.0613; 0.0784 vs 0.0797). The level offset does not bear on the question, which is entirely about SHAPE -- whether F_ST moves along level sets -- and both instruments agree on that."
+  ]
+}

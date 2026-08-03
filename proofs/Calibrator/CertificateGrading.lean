@@ -24,11 +24,13 @@ What remains is unconditional:
 * the deficit is exactly the square of a modulus ratio; and
 * exact grade completeness is equivalent to grade-insensitivity.
 
-The literature claims that grade two is within `5/4` in the Donoho--Liu
-convex-linear regime and that some nonsmooth problems exhibit fixed-grade
-incompleteness are recorded only as provenance in the surrounding research
-documents.  They become Lean theorems here only when their proofs are present
-in the repository.  A citation is never accepted as a theorem parameter.
+The literature claim that grade two is within `5/4` in the Donoho--Liu
+convex-linear regime remains provenance only: this repository does not yet
+contain the white-noise decision model needed to state it faithfully.  The
+fixed-grade incompleteness claim *is* stated below for actual finite predictive
+laws, with a visible `sorry` at the missing construction.  A citation is never
+accepted as a theorem parameter, and a convenient conditional substitute is
+not advertised as the result.
 -/
 
 namespace Calibrator.CertificateGrading
