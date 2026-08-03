@@ -451,9 +451,11 @@ theorem exists_nonneg_weights_certifying_minimax :
 
     An equalizer is stronger than a general saddle point: a least-favourable prior can be
     supported only on parameters attaining the worst risk, while other parameters have strictly
-    smaller risk. Thus this lemma proves a useful sufficient condition but does not reduce the
-    general theorem to equalizer existence. General duality still needs a finite-game separation
-    argument, which Mathlib's decision-risk development does not currently provide. -/
+    smaller risk. So this does not reduce the general theorem to equalizer existence, and it is
+    not how `finite_minimax_duality` is proved -- that goes through
+    `exists_nonneg_weights_certifying_minimax`. What this lemma adds is a witness: separation
+    produces a least-favourable prior but exhibits no rule attaining the value, while an
+    equalizer names one and identifies the common value as its risk. -/
 theorem minimax_eq_of_equalizer (δstar : Rule actionCount observationCount)
     (πstar : FinitePrior parameterCount) (value : ℝ)
     (hconst : ∀ θ, E.risk δstar θ = value)

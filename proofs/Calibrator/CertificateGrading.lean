@@ -895,4 +895,295 @@ noncomputable def explicitCalculus
     (raw : ℕ → ℝ → ℝ) (logScale : ℝ) (K : ℕ) (h : ℝ) :
     (explicitCalculus raw logScale).modulus.Δ K h = |raw K h| := rfl
 
+/-! ## Two-point certificates are strictly incomplete
+
+`atomModulus_mono` says allowing more atoms cannot hurt. On its own that is
+compatible with the hierarchy being constant, in which case `atomCertificationGap`
+is one everywhere and grading a certificate by its atom count distinguishes
+nothing. Ruling that out needs an experiment where a higher grade strictly wins,
+and this section exhibits one.
+
+Three parameters emit an observation whose success probability is `0`, `1/2` and
+`1`, and the target is `1` at the two extremes and `0` in the middle. The target
+is therefore a strictly convex function of the observable, so it is not a
+function of the prior-predictive law's mean.
+
+At information radius zero, feasibility says the two prior-predictive laws
+coincide. A point-versus-point certificate must then use the same parameter
+twice, because the three success probabilities are distinct, and it carries no
+target separation at all. Splitting one side across the two extremes holds the
+predictive law fixed and moves the target by a full unit. So
+
+    atomModulus 2 0 = 0 < 1 ≤ modulus 0 0
+
+and the two-atom method misses the entire available separation.
+
+Empirical status: DERIVED. The experiment is exhibited, not measured; the claim
+is about what the certificate calculus can express.
+-/
+
+namespace FinitePrior
+
+/-- **A one-atom law is a point mass.** This is what makes grade two literally the
+point-versus-point method rather than merely containing it. -/
+theorem eq_pure_of_atomCount_eq_one {n : ℕ} (P : FinitePrior n)
+    (h : P.atomCount = 1) : ∃ i, P = PMF.pure i := by
+  classical
+  have hcard : P.activeAtoms.card = 1 := h
+  obtain ⟨i, hi⟩ := Finset.card_eq_one.mp hcard
+  have hzero : ∀ j, j ≠ i → P.probability j = 0 := by
+    intro j hj
+    by_contra hne
+    have hmem : j ∈ P.activeAtoms := by simp [activeAtoms, hne]
+    rw [hi, Finset.mem_singleton] at hmem
+    exact hj hmem
+  have hone : P.probability i = 1 := by
+    have hsum := (finitePrior_probability_mem P).2
+    rwa [Finset.sum_eq_single i (fun j _ hj ↦ hzero j hj)
+      (fun hc ↦ absurd (Finset.mem_univ i) hc)] at hsum
+  refine ⟨i, PMF.ext fun j ↦ ?_⟩
+  by_cases hj : j = i
+  · subst hj
+    have hPj : P j = 1 := by
+      have h1 : (P j).toReal = 1 := hone
+      exact (ENNReal.toReal_eq_one_iff _).mp h1
+    simp [hPj, PMF.pure_apply]
+  · have hPj : P j = 0 := by
+      have h0 : (P j).toReal = 0 := hzero j hj
+      rcases (ENNReal.toReal_eq_zero_iff _).mp h0 with hz | ht
+      · exact hz
+      · exact absurd ht (P.apply_ne_top j)
+    simp [hPj, PMF.pure_apply, hj]
+
+end FinitePrior
+
+namespace FiniteMomentCertificateProblem
+
+/-! ### The moment probes are invisible to both ends of the hierarchy
+
+Grade zero imposes no moment equality and `AtomFeasible` never mentions the
+moment field at all, so the two moduli compared below depend only on the target
+and the discrepancy. Without this, a client with its own moment probes would
+have to redo the whole computation to inherit the separation. -/
+
+theorem admissibleGaps_zero_congr {n : ℕ} (E F : FiniteMomentCertificateProblem n)
+    (ht : E.target = F.target) (hd : E.pairDiscrepancy = F.pairDiscrepancy) (h : ℝ) :
+    E.admissibleGaps 0 h = F.admissibleGaps 0 h := by
+  have hgap : ∀ P Q, E.targetGap P Q = F.targetGap P Q := by
+    intro P Q; unfold targetGap; rw [ht]
+  ext d
+  constructor
+  · rintro ⟨P, Q, hf, rfl⟩
+    exact ⟨P, Q, ⟨F.momentMatched_zero P Q, by rw [← hd]; exact hf.2⟩, hgap P Q⟩
+  · rintro ⟨P, Q, hf, rfl⟩
+    exact ⟨P, Q, ⟨E.momentMatched_zero P Q, by rw [hd]; exact hf.2⟩, (hgap P Q).symm⟩
+
+theorem modulus_zero_congr {n : ℕ} (E F : FiniteMomentCertificateProblem n)
+    (ht : E.target = F.target) (hd : E.pairDiscrepancy = F.pairDiscrepancy) (h : ℝ) :
+    E.modulus 0 h = F.modulus 0 h := by
+  unfold modulus
+  rw [admissibleGaps_zero_congr E F ht hd h]
+
+theorem admissibleAtomGaps_congr {n : ℕ} (E F : FiniteMomentCertificateProblem n)
+    (ht : E.target = F.target) (hd : E.pairDiscrepancy = F.pairDiscrepancy)
+    (K : ℕ) (h : ℝ) :
+    E.admissibleAtomGaps K h = F.admissibleAtomGaps K h := by
+  have hgap : ∀ P Q, E.targetGap P Q = F.targetGap P Q := by
+    intro P Q; unfold targetGap; rw [ht]
+  ext d
+  constructor
+  · rintro ⟨P, Q, hf, rfl⟩
+    exact ⟨P, Q, ⟨hf.1, by rw [← hd]; exact hf.2⟩, hgap P Q⟩
+  · rintro ⟨P, Q, hf, rfl⟩
+    exact ⟨P, Q, ⟨hf.1, by rw [hd]; exact hf.2⟩, (hgap P Q).symm⟩
+
+theorem atomModulus_congr {n : ℕ} (E F : FiniteMomentCertificateProblem n)
+    (ht : E.target = F.target) (hd : E.pairDiscrepancy = F.pairDiscrepancy)
+    (K : ℕ) (h : ℝ) :
+    E.atomModulus K h = F.atomModulus K h := by
+  unfold atomModulus
+  rw [admissibleAtomGaps_congr E F ht hd K h]
+
+end FiniteMomentCertificateProblem
+
+namespace FiniteMixtureExperiment
+
+/-- Total variation is a function of the observation kernel alone. -/
+theorem totalVariation_congr {p o : ℕ} (E F : FiniteMixtureExperiment p o)
+    (h : E.observation = F.observation) (P Q : FinitePrior p) :
+    E.totalVariation P Q = F.totalVariation P Q := by
+  unfold totalVariation mixture
+  rw [h]
+
+end FiniteMixtureExperiment
+
+/-- Observation laws whose success probabilities are `0`, `1/2`, `1`. The third
+observation point carries no mass; it is present only so the observation space
+matches the parameter space, which is the shape a catalogue-indexed biological
+experiment has. -/
+noncomputable def convexTargetObservation : Fin (2 + 1) → FinitePrior 2 :=
+  ![PMF.pure 0,
+    PMF.ofFintype ![1 / 2, 1 / 2, 0] (by
+      rw [Fin.sum_univ_three]
+      simp
+      exact ENNReal.inv_two_add_inv_two),
+    PMF.pure 1]
+
+/-- The separating experiment: a strictly convex target over a one-dimensional
+observable. -/
+noncomputable def convexTargetExperiment : FiniteMixtureExperiment 2 2 where
+  target := ![1, 0, 1]
+  moment := fun _ _ ↦ 0
+  observation := convexTargetObservation
+
+/-- Prior-predictive probability of the observation `1`. -/
+noncomputable def predictiveOne (P : FinitePrior 2) : ℝ :=
+  P.probability 1 / 2 + P.probability 2
+
+theorem convexTargetExperiment_mixture_one (P : FinitePrior 2) :
+    (convexTargetExperiment.mixture P).probability 1 = predictiveOne P := by
+  rw [convexTargetExperiment.mixture_probability P 1]
+  simp [convexTargetExperiment, convexTargetObservation, predictiveOne,
+    Fin.sum_univ_three, FinitePrior.probability, PMF.pure_apply,
+    PMF.ofFintype_apply]
+  ring
+
+theorem convexTargetExperiment_mixture_zero (P : FinitePrior 2) :
+    (convexTargetExperiment.mixture P).probability 0 = 1 - predictiveOne P := by
+  have hmass : P.probability 0 + P.probability 1 + P.probability 2 = 1 := by
+    have := (finitePrior_probability_mem P).2
+    rwa [Fin.sum_univ_three] at this
+  simp only [FinitePrior.probability] at hmass
+  rw [convexTargetExperiment.mixture_probability P 0]
+  simp [convexTargetExperiment, convexTargetObservation, predictiveOne,
+    Fin.sum_univ_three, FinitePrior.probability, PMF.pure_apply,
+    PMF.ofFintype_apply]
+  linarith
+
+theorem convexTargetExperiment_mixture_two (P : FinitePrior 2) :
+    (convexTargetExperiment.mixture P).probability 2 = 0 := by
+  rw [convexTargetExperiment.mixture_probability P 2]
+  simp [convexTargetExperiment, convexTargetObservation,
+    Fin.sum_univ_three, FinitePrior.probability, PMF.pure_apply,
+    PMF.ofFintype_apply]
+
+/-- The discrepancy of this experiment is the gap between prior-predictive
+success probabilities. -/
+theorem convexTargetExperiment_totalVariation (P Q : FinitePrior 2) :
+    convexTargetExperiment.totalVariation P Q = |predictiveOne P - predictiveOne Q| := by
+  unfold FiniteMixtureExperiment.totalVariation
+  rw [Fin.sum_univ_three, convexTargetExperiment_mixture_zero,
+    convexTargetExperiment_mixture_zero, convexTargetExperiment_mixture_one,
+    convexTargetExperiment_mixture_one, convexTargetExperiment_mixture_two,
+    convexTargetExperiment_mixture_two]
+  rw [show (1 - predictiveOne P) - (1 - predictiveOne Q)
+      = -(predictiveOne P - predictiveOne Q) by ring, abs_neg]
+  simp
+  ring
+
+/-- The target mean is the mass at the two extreme parameters. -/
+theorem convexTargetExperiment_mean (P : FinitePrior 2) :
+    P.mean convexTargetExperiment.target = P.probability 0 + P.probability 2 := by
+  unfold FinitePrior.mean
+  simp [convexTargetExperiment, Fin.sum_univ_three]
+
+theorem predictiveOne_pure (i : Fin (2 + 1)) :
+    predictiveOne (PMF.pure i) = ![0, 1 / 2, 1] i := by
+  fin_cases i <;>
+    simp [predictiveOne, FinitePrior.probability, PMF.pure_apply]
+
+/-- The three success probabilities are distinct, so equal prior-predictive laws
+force the same parameter. -/
+theorem pure_eq_of_predictiveOne_eq {i j : Fin (2 + 1)}
+    (h : predictiveOne (PMF.pure i) = predictiveOne (PMF.pure j)) : i = j := by
+  rw [predictiveOne_pure, predictiveOne_pure] at h
+  fin_cases i <;> fin_cases j <;> first | rfl | (exfalso; norm_num at h)
+
+/-! ### The two sides of the separation -/
+
+/-- The certificate that splits one side across both extremes. -/
+noncomputable def splitCertificate : FinitePrior 2 :=
+  PMF.ofFintype ![1 / 2, 0, 1 / 2] (by
+    rw [Fin.sum_univ_three]
+    simp
+    exact ENNReal.inv_two_add_inv_two)
+
+theorem splitCertificate_probability :
+    splitCertificate.probability 0 = 1 / 2 ∧ splitCertificate.probability 1 = 0 ∧
+      splitCertificate.probability 2 = 1 / 2 := by
+  refine ⟨?_, ?_, ?_⟩ <;>
+    simp [splitCertificate, FinitePrior.probability, PMF.ofFintype_apply]
+
+/-- **A grade-three certificate carries the full unit of separation.** -/
+theorem one_le_convexTarget_modulus :
+    (1 : ℝ) ≤ convexTargetExperiment.certificateProblem.modulus 0 0 := by
+  obtain ⟨h0, h1, h2⟩ := splitCertificate_probability
+  have hpsplit : predictiveOne splitCertificate = 1 / 2 := by
+    unfold predictiveOne; rw [h1, h2]; norm_num
+  have hppure : predictiveOne (PMF.pure (1 : Fin (2 + 1))) = 1 / 2 := by
+    rw [predictiveOne_pure]; norm_num
+  have hfeas : convexTargetExperiment.certificateProblem.Feasible 0 0
+      splitCertificate (PMF.pure 1) := by
+    refine ⟨convexTargetExperiment.certificateProblem.momentMatched_zero _ _, ?_⟩
+    show |convexTargetExperiment.totalVariation splitCertificate (PMF.pure 1)| ≤ |(0 : ℝ)|
+    rw [convexTargetExperiment_totalVariation, hpsplit, hppure]
+    norm_num
+  have hgap : convexTargetExperiment.certificateProblem.targetGap
+      splitCertificate (PMF.pure 1) = 1 := by
+    unfold FiniteMomentCertificateProblem.targetGap
+    have h21 : ¬((2 : Fin (2 + 1)) = 1) := by decide
+    show |FinitePrior.mean splitCertificate convexTargetExperiment.target -
+      FinitePrior.mean (PMF.pure (1 : Fin (2 + 1))) convexTargetExperiment.target| = 1
+    rw [convexTargetExperiment_mean, convexTargetExperiment_mean, h0, h2]
+    norm_num [FinitePrior.probability, PMF.pure_apply, h21]
+  have := convexTargetExperiment.certificateProblem.le_modulus_of_feasible 0 0
+    splitCertificate (PMF.pure 1) hfeas
+  rwa [hgap] at this
+
+/-- **Every grade-two certificate carries none.** Both sides are point masses, the
+discrepancy constraint forces the same parameter, and a parameter does not
+separate from itself. -/
+theorem convexTarget_atomModulus_two :
+    convexTargetExperiment.certificateProblem.atomModulus 2 0 = 0 := by
+  refine le_antisymm ?_ (convexTargetExperiment.certificateProblem.atomModulus_nonneg 2 0)
+  refine csSup_le ⟨0, Set.mem_insert _ _⟩ ?_
+  rintro d (rfl | ⟨P, Q, hfeas, rfl⟩)
+  · exact le_rfl
+  · have hPpos := P.atomCount_pos
+    have hQpos := Q.atomCount_pos
+    have hPone : P.atomCount = 1 := by have := hfeas.1; omega
+    have hQone : Q.atomCount = 1 := by have := hfeas.1; omega
+    obtain ⟨i, rfl⟩ := P.eq_pure_of_atomCount_eq_one hPone
+    obtain ⟨j, rfl⟩ := Q.eq_pure_of_atomCount_eq_one hQone
+    have hd : |convexTargetExperiment.totalVariation (PMF.pure i) (PMF.pure j)| ≤ |(0 : ℝ)| :=
+      hfeas.2
+    rw [convexTargetExperiment_totalVariation, abs_abs] at hd
+    norm_num at hd
+    have hij : i = j := pure_eq_of_predictiveOne_eq (by linarith)
+    subst hij
+    unfold FiniteMomentCertificateProblem.targetGap
+    simp
+
+/-- **The certificate hierarchy is strict**: for this experiment the
+point-versus-point method certifies nothing while the unrestricted method
+certifies a full unit. This is what `atomModulus_mono` alone does not give, and
+without it the atom grade would be a distinction with no difference. -/
+theorem twoAtom_certificates_incomplete :
+    convexTargetExperiment.certificateProblem.atomModulus 2 0 <
+      convexTargetExperiment.certificateProblem.modulus 0 0 := by
+  rw [convexTarget_atomModulus_two]
+  linarith [one_le_convexTarget_modulus]
+
+/-- **The ratio form of the gap is junk exactly where the gap is largest.**
+
+`atomCertificationGap` divides by `atomModulus`, and Lean's `x / 0 = 0`, so at the
+one experiment where the two-atom method fails completely the ratio reports zero
+-- its smallest possible value -- rather than the unbounded loss it is meant to
+name. `twoAtom_certificates_incomplete` is the statement to read; this theorem
+exists so the ratio is not read instead. -/
+theorem convexTarget_atomCertificationGap_is_junk :
+    convexTargetExperiment.atomCertificationGap 2 0 = 0 := by
+  unfold FiniteMixtureExperiment.atomCertificationGap
+  rw [convexTarget_atomModulus_two, div_zero]
+
 end Calibrator.CertificateGrading

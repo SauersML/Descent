@@ -742,6 +742,76 @@ exactly the difference in mean absolute causal effect. -/
         meanAbsoluteEffect (P.architecture j)| := by
   simp [FiniteMomentCertificateProblem.targetGap]
 
+/-! #### The architecture hierarchy is strict
+
+`atomModulus_mono` and `atomModulus_le_unrestricted` order the biological
+certificate methods but permit the order to be flat, in which case
+`atomCertificationGap` is one for every catalogue and grading a certificate by
+how many architectures it mixes buys nothing. The catalogue below settles it.
+
+Three one-locus architectures: a unit effect, the null, and the sign-flip of the
+first. The target is mean **absolute** effect, so the two nonnull architectures
+are indistinguishable targets and the null sits a full unit away. Their
+observation laws are not indistinguishable -- the three emit the observation with
+probabilities `0`, `1/2` and `1` -- and at information radius zero a certificate
+must hold the prior-predictive law fixed.
+
+A point-versus-point certificate then has to compare an architecture with itself,
+because the three emission probabilities are distinct, so it certifies nothing.
+Mixing the sign pair in equal parts reproduces the null's emission law exactly
+while carrying the full unit of mean-absolute-effect separation. The sign
+degeneracy of the target is what makes this possible, and it is the reason the
+nonsmooth summary needs a method that mixes architectures rather than one that
+compares them pairwise.
+-/
+
+/-- Unit effect, null, and sign-flip, emitting at rates `0`, `1/2`, `1`. -/
+noncomputable def signPairCatalogue : MeanAbsoluteEffectCertificateProblem 1 2 where
+  architecture := ![![1], ![0], ![-1]]
+  observation := convexTargetObservation
+  logScale := 0
+
+theorem signPairCatalogue_target :
+    signPairCatalogue.finiteProblem.target =
+      convexTargetExperiment.certificateProblem.target := by
+  funext i
+  fin_cases i <;>
+    simp [signPairCatalogue, finiteProblem, mixtureExperiment,
+      FiniteMixtureExperiment.certificateProblem, meanAbsoluteEffect,
+      convexTargetExperiment]
+
+theorem signPairCatalogue_discrepancy :
+    signPairCatalogue.finiteProblem.pairDiscrepancy =
+      convexTargetExperiment.certificateProblem.pairDiscrepancy := by
+  funext P Q
+  exact FiniteMixtureExperiment.totalVariation_congr _ _ rfl P Q
+
+/-- **Comparing architectures pairwise is strictly weaker than mixing them.**
+
+For this catalogue the point-versus-point method certifies no
+mean-absolute-effect separation at all, while the unrestricted mixture method
+certifies a full unit. So the atom grade is a real hierarchy of biological
+lower-bound methods, not a relabelling of one method. -/
+theorem architecture_pairwise_certificates_incomplete :
+    signPairCatalogue.finiteProblem.atomModulus 2 0 <
+      signPairCatalogue.finiteProblem.modulus 0 0 := by
+  rw [FiniteMomentCertificateProblem.atomModulus_congr _ _
+        signPairCatalogue_target signPairCatalogue_discrepancy 2 0,
+    FiniteMomentCertificateProblem.modulus_zero_congr _ _
+        signPairCatalogue_target signPairCatalogue_discrepancy 0]
+  exact twoAtom_certificates_incomplete
+
+/-- The ratio form of the biological gap is junk at the catalogue that exhibits
+the gap: `atomCertificationGap` divides by an atom modulus that is zero here, and
+Lean's `x / 0 = 0` reports the smallest possible value for the largest possible
+loss. `architecture_pairwise_certificates_incomplete` is the statement to read. -/
+theorem signPairCatalogue_atomCertificationGap_is_junk :
+    signPairCatalogue.atomCertificationGap 2 0 = 0 := by
+  unfold atomCertificationGap
+  rw [FiniteMomentCertificateProblem.atomModulus_congr _ _
+    signPairCatalogue_target signPairCatalogue_discrepancy 2 0,
+    convexTarget_atomModulus_two, div_zero]
+
 end MeanAbsoluteEffectCertificateProblem
 
 /-! ### Positivity buys an exponent: the moment body of architecture spectra
