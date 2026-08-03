@@ -259,63 +259,104 @@ theorem longMemoryVariance_strictMono (ε n : ℝ) (hε : ε ≠ 0) (hn : 0 < n)
   apply div_lt_div_of_pos_right _ hden
   nlinarith [hfac]
 
-/-! ### The width law, and where the exponent three comes from
+/-! ### The width law: the exponents are shape-free, the constant is not
 
-The conformal metric above was posited with exponent `3`. It is not arbitrary: it is forced
-by the **width law**, which says that for a spectral band of width `w` the squared norm goes
-like `1/w` and the squared norm of its derivative like `1/w³`, **whatever the band's shape**.
+For a spectral band of width `w`, `‖B‖² ~ 1/w` and `‖dB‖² ~ 1/w³`. **Measured across seven
+shapes, the exponents hold to fifteen digits** — fitted slopes `-1.0000000000000002` and
+`-3.0000000000000013`, ratio `-2.0000000000000004`, with a planted-exponent control on the
+fitter passing exactly.
 
-The shape-freedom is the content, and it is what `widthLaw_ratio_shape_free` records: two
-bands with different shape constants have the *same* ratio `1/w²`, so the exponent in the
-induced metric is a property of the width variable alone. That is why the same `w^{-3}`
-appears for every family in this arc rather than being fitted per family.
+**But the ratio constant is not shape-free, and a first version of this section asserted that
+it was.** That version gave `WidthLaw` a *single* shape constant appearing in both norms,
+which made `widthLaw_ratio_shape_free` true by construction — a tautology resting on a false
+premise. The two constants are independent and their ratio `C₂/C₁` measures:
 
-`widthLaw_gives_longMemoryMetric` closes the loop: the metric coefficient of the
-long-memory geometry **is** the width law's `gradNormSq`, with the amplitude `ε²` playing the
-role of the shape constant. The exponent `3` in `longMemoryMetric` is therefore derived, not
-assumed.
+| shape | `C₁` | `C₂` | `C₂/C₁` |
+|---|---|---|---|
+| Gaussian | 0.2821 | 0.1410 | **0.500** |
+| Lorentzian | 0.1592 | 0.0796 | **0.500** |
+| gamma-3 (asymmetric) | 0.1875 | 0.0625 | **0.333** |
+| triangular | 0.6667 | 2.0 | **3.00** |
+| skew-normal (asymmetric) | 0.4946 | 1.0952 | **2.21** |
+| Hann | 1.5 | 19.739 | **13.16** |
+| rectangular | 1.0 | **∞** | **∞** |
 
-Empirical status: UNTESTED. The two scalings are named inputs. -/
+A factor of forty across the smooth shapes, and the rectangular band has no finite `‖dB‖²`
+at all — its derivative is a pair of Dirac deltas, so the theorem simply does not apply to a
+discontinuous band. That is a scope restriction, not a rounding error.
 
-/-- **A band obeying the width law.** The shape constant is carried explicitly so that the
-    shape-freedom of the ratio can be stated as a theorem rather than asserted. -/
+**What survives is the scale invariance.** `w²·(‖dB‖²/‖B‖²)` is independent of `w` for every
+shape — that is the shape-free content and it is what `widthLaw_scaleInvariant` states. The
+*value* of that constant is a property of the band's profile.
+
+**The identification with the estimation metric is withdrawn.** A previous theorem here,
+`widthLaw_gives_longMemoryMetric`, identified the conformal coefficient `ε²/δ³` with the band
+derivative norm at shape `ε²`, in order to make the exponent `3` "derived rather than
+assumed". That was a **category error**, and it is wrong twice over: measurement shows
+`ε²/δ³` is not the Fisher information for a memory rate (see the section above — the
+information is `ε`-free and scales as `1/δ`), and the width-law constant is not universal, so
+there is no canonical `ε²` to identify it with. The `w^{-3}` of a band norm and the `δ^{-3}`
+that was posited in the metric are different objects that happened to share an exponent. The
+theorem is deleted rather than weakened, because its only purpose was the identification.
+
+Empirical status: **exponents VALIDATED to 15 digits across seven shapes; shape-freedom of
+the constant FALSIFIED (spread 0.333–13.16, infinite for rectangular); the metric
+identification WITHDRAWN.** See `proofs/validation/width_law/`. -/
+
+/-- **A band obeying the width law.**
+
+    The two constants are **independent**. An earlier version used one constant for both,
+    which silently forced the ratio to `1/w²` and made shape-freedom a tautology. -/
 structure WidthLaw where
-  /-- The band's shape constant. -/
-  shape : ℝ
-  /-- Shape constants are positive. -/
-  shape_pos : 0 < shape
+  /-- The constant in `‖B‖² = C₁/w`. -/
+  normConst : ℝ
+  /-- The constant in `‖dB‖² = C₂/w³`. Independent of `normConst`; measured ratios
+      `C₂/C₁` range from `0.333` to `13.16` across shapes. -/
+  gradConst : ℝ
+  /-- Norm constants are positive. -/
+  normConst_pos : 0 < normConst
+  /-- Derivative-norm constants are positive on the shapes where they are finite at all;
+      a rectangular band has none. -/
+  gradConst_pos : 0 < gradConst
   /-- Squared norm of the band at width `w`. -/
   normSq : ℝ → ℝ
   /-- Squared norm of the band's derivative at width `w`. -/
   gradNormSq : ℝ → ℝ
-  /-- The width law for the band: `‖B‖² ~ 1/w`. -/
-  normSq_eq : ∀ w, 0 < w → normSq w = shape / w
-  /-- The width law for its derivative: `‖dB‖² ~ 1/w³`. -/
-  gradNormSq_eq : ∀ w, 0 < w → gradNormSq w = shape / w ^ 3
+  /-- The width law for the band. -/
+  normSq_eq : ∀ w, 0 < w → normSq w = normConst / w
+  /-- The width law for its derivative. -/
+  gradNormSq_eq : ∀ w, 0 < w → gradNormSq w = gradConst / w ^ 3
 
-/-- **The width-law ratio is `1/w²`, and the shape constant cancels.** -/
+/-- **The width-law ratio is `(C₂/C₁)/w²`.** The `w`-dependence is universal; the constant
+    is not. -/
 theorem widthLaw_ratio (W : WidthLaw) (w : ℝ) (hw : 0 < w) :
-    W.gradNormSq w / W.normSq w = 1 / w ^ 2 := by
-  have hs : W.shape ≠ 0 := ne_of_gt W.shape_pos
+    W.gradNormSq w / W.normSq w = (W.gradConst / W.normConst) / w ^ 2 := by
+  have hn : W.normConst ≠ 0 := ne_of_gt W.normConst_pos
   have hwne : w ≠ 0 := ne_of_gt hw
   rw [W.gradNormSq_eq w hw, W.normSq_eq w hw]
   field_simp
 
-/-- **Shape-freedom, as a theorem.** Two bands of different shape have the same ratio, so
-    the exponent of the induced metric is a property of the width variable alone. -/
-theorem widthLaw_ratio_shape_free (W W' : WidthLaw) (w : ℝ) (hw : 0 < w) :
-    W.gradNormSq w / W.normSq w = W'.gradNormSq w / W'.normSq w := by
-  rw [widthLaw_ratio W w hw, widthLaw_ratio W' w hw]
+/-- **The shape-free content, stated correctly: scale invariance.**
 
-/-- **The long-memory metric is the width law's derivative norm.**
+    `w²` times the ratio is independent of `w`, for every shape. This is what makes the
+    exponent a property of the width variable alone — and it is all that does. -/
+theorem widthLaw_scaleInvariant (W : WidthLaw) (w : ℝ) (hw : 0 < w) :
+    w ^ 2 * (W.gradNormSq w / W.normSq w) = W.gradConst / W.normConst := by
+  have hwne : w ≠ 0 := ne_of_gt hw
+  rw [widthLaw_ratio W w hw]
+  field_simp
 
-    With the amplitude `ε²` as the shape constant, `longMemoryMetric ε w = W.gradNormSq w`.
-    So the exponent `3` in the conformal metric — the one that cancels against the parameter
-    variance in `transportedFloor_eq` — is supplied by the width law rather than assumed. -/
-theorem widthLaw_gives_longMemoryMetric (W : WidthLaw) (ε w : ℝ) (hw : 0 < w)
-    (hε : ε ^ 2 = W.shape) :
-    W.gradNormSq w = longMemoryMetric ε w := by
-  rw [W.gradNormSq_eq w hw, longMemoryMetric, hε]
+/-- **Two bands agree in the exponent at every width**, which is the honest form of the
+    shape-freedom claim: their scale-invariant constants may differ, but neither depends on
+    `w`. -/
+theorem widthLaw_exponent_shape_free (W W' : WidthLaw) (w w' : ℝ)
+    (hw : 0 < w) (hw' : 0 < w') :
+    w ^ 2 * (W.gradNormSq w / W.normSq w) = w' ^ 2 * (W.gradNormSq w' / W.normSq w') ∧
+      w ^ 2 * (W'.gradNormSq w / W'.normSq w) =
+        w' ^ 2 * (W'.gradNormSq w' / W'.normSq w') := by
+  refine ⟨?_, ?_⟩
+  · rw [widthLaw_scaleInvariant W w hw, widthLaw_scaleInvariant W w' hw']
+  · rw [widthLaw_scaleInvariant W' w hw, widthLaw_scaleInvariant W' w' hw']
 
 /-! ### Positivity buys an exponent
 
