@@ -1,6 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Calibrator.Probability
 import Mathlib.Algebra.BigOperators.Fin
 import Mathlib.Analysis.SpecialFunctions.Exp
 import Mathlib.Analysis.SpecialFunctions.Sqrt
@@ -13,7 +14,7 @@ open scoped BigOperators
 /-!
 # A drifting response curve: what a moving threshold hides, and what the dynamics give back
 
-Self-contained: imports only Mathlib.
+Imports Mathlib and `Calibrator.Probability`, for the standard normal `Phi`.
 
 A response curve is `c_t(s) = P(Y = 1 | S = s)` at time `t` — disease risk as a function of a
 polygenic score, ancestry coordinate, or any covariate, in a population that is itself moving.
@@ -418,6 +419,59 @@ theorem singleMode_interiorError_eq (w lam t₁ t₂ : ℝ) :
       = w ^ 2 * Real.exp (-(2 * lam * ((t₁ + t₂) / 2))) ^ 2 := by ring
     _ = w ^ 2 * (Real.exp (-(2 * lam * t₁)) * Real.exp (-(2 * lam * t₂))) := by rw [hexp]
     _ = (w * Real.exp (-(2 * lam * t₁))) * (w * Real.exp (-(2 * lam * t₂))) := by ring
+
+/-! ## Probit invariance under Ornstein-Uhlenbeck drift
+
+Theorem 3. Averaging the probit link against a Gaussian returns a probit link with a rescaled
+slope, so the two-parameter family `Φ(a x + b)` is exactly invariant under the OU semigroup. That
+is why the realization is two-dimensional and curved rather than linear, which is the escape from
+the spectral obstruction: no bounded link has a finite-dimensional invariant SUBSPACE, and this
+one has an invariant MANIFOLD.
+
+The whole content sits in one Gaussian identity, `gaussianAverage_probit`, and that identity is
+the gap: it is stated here and not proved. The proof is the standard coupling — `E[Φ(α + βZ)]` is
+`P(W ≤ α + βZ)` for an independent standard normal `W`, and `W - βZ` is centred Gaussian with
+variance `1 + β²` — and Mathlib has the convolution step
+(`gaussianReal_add_gaussianReal_of_indepFun`); what it needs on top is the conditioning that turns
+the expectation of a cdf into a probability of a linear combination.
+
+`probit_invariant_under_ou` is then derived rather than assumed: given the identity, the
+invariance and the exact new slope follow by algebra, which is proved. So the module carries one
+visible obligation instead of a paragraph of prose, and everything the analysis draws from
+Theorem 3 downstream is connected to that one obligation. -/
+
+open MeasureTheory ProbabilityTheory in
+/-- **The Gaussian averaging identity.** Averaging the standard normal cdf over a Gaussian shift
+returns the cdf at a contracted argument: `E[Φ(α + βZ)] = Φ(α / √(1 + β²))`.
+
+    NOT PROVED HERE. The argument is the coupling described above; the missing step is the
+    conditioning that rewrites `E[Φ(α + βZ)]` as `P(W - βZ ≤ α)` for an independent standard
+    normal `W`. -/
+theorem gaussianAverage_probit (α β : ℝ) :
+    ∫ z, Phi (α + β * z) ∂(gaussianReal 0 1) = Phi (α / Real.sqrt (1 + β ^ 2)) := by
+  sorry
+
+open MeasureTheory ProbabilityTheory in
+/-- **Probit is exactly invariant under one Ornstein-Uhlenbeck step**, with the slope contracted
+by `a ↦ a e^{-λt} / √(1 + a²σ²)`.
+
+    Derived from `gaussianAverage_probit` by algebra: the OU transition sends `x` to
+    `e^{-λt} x + σ z`, so the probit argument `a₀(e^{-λt}x + σz) + b₀` is exactly
+    `α + βz` at `α = a₀ e^{-λt} x + b₀` and `β = a₀ σ`, and the identity contracts it. The
+    resulting slope is the one whose inverse square linearises to `Ȧ = 2λA + 1`, which is
+    `inverseSquare_linearises_probit_flow` below. -/
+theorem probit_invariant_under_ou (lam t a₀ b₀ x sigma : ℝ) :
+    ∫ z, Phi (a₀ * (Real.exp (-(lam * t)) * x + sigma * z) + b₀) ∂(gaussianReal 0 1)
+      = Phi ((a₀ * Real.exp (-(lam * t)) * x + b₀)
+          / Real.sqrt (1 + a₀ ^ 2 * sigma ^ 2)) := by
+  have hshape : (fun z => Phi (a₀ * (Real.exp (-(lam * t)) * x + sigma * z) + b₀))
+      = fun z => Phi ((a₀ * Real.exp (-(lam * t)) * x + b₀) + (a₀ * sigma) * z) := by
+    funext z
+    congr 1
+    ring
+  rw [hshape, gaussianAverage_probit]
+  congr 2
+  ring_nf
 
 /-! ## The evolution law of the response curve
 
