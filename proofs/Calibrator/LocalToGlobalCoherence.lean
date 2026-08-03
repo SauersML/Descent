@@ -123,6 +123,24 @@ theorem expanderAgreementFloor_lt : expanderAgreementFloor < (0.1274 : ℝ) := b
   unfold expanderAgreementFloor
   linarith
 
+/-- **The prescribed edge law sits below the frustration floor.**
+
+This is the contradiction the module is about, and until now it lived only in
+the prose above: the graph forces at least `expanderAgreementFloor` of edges to
+agree, while the prescribed law makes a given edge agree with probability
+`2 * Phi (-10)`, about `1.5 * 10 ^ (-23)`. No sign configuration can meet the
+prescription, because the floor is a property of the graph and holds of every
+configuration whatsoever.
+
+The remaining step is a Gaussian tail bound at ten standard deviations, which
+this development does not have; `Phi` is `cdf (gaussianReal 0 1)` and Mathlib
+carries no numeric bound on it. Admitted rather than weakened: the statement
+below is the one the argument needs, and a version restricted to whatever is
+currently provable would not contradict the prescription. -/
+theorem prescribedAgreement_lt_expanderAgreementFloor :
+    2 * Phi (-10) < expanderAgreementFloor := by
+  sorry
+
 theorem expanderAgreementFloor_pos : 0 < expanderAgreementFloor := by
   have := expanderAgreementFloor_gt
   linarith

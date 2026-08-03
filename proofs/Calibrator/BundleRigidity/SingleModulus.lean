@@ -155,14 +155,24 @@ structure SingleModulus (d : ℕ) (v : ℝ) where
   /-- Every modulus value equals `v`: the transfer measure is `δ v`. -/
   modulus_eq : ∀ j, |atom j ^ 2 - 1| = v
 
-/-- **Nonemptiness of `SingleModulus` is ADMITTED, not proved.**  Every theorem quantified
-over it is vacuous if this fails, so the claim is stated and left open rather than left
-implicit.  Discharging it means the two-atom law at `±1` with mass `1/2` each: it is injective, centred, has unit variance, and has modulus `0`.
+/-- The standardized two-atom law at `±1`, with mass `1/2` at each atom. -/
+noncomputable def SingleModulus.witness : SingleModulus 2 0 where
+  atom := fun j ↦ if j = 0 then -1 else 1
+  mass := fun _ ↦ 1 / 2
+  atom_inj := by
+    intro i j h
+    fin_cases i <;> fin_cases j <;> norm_num at h ⊢
+  mass_pos := fun _ ↦ by norm_num
+  mass_sum := by norm_num [Fin.sum_univ_two]
+  mean_zero := by norm_num [Fin.sum_univ_two]
+  var_one := by norm_num [Fin.sum_univ_two]
+  modulus_eq := by
+    intro j
+    fin_cases j <;> norm_num
 
-Admitted rather than assumed: `sorry` is visible to `AxiomScan.lean` as `sorryAx` and to
-`check-identifications.py`, whereas a certificate parameter nothing constructs is visible
-to neither. -/
-theorem SingleModulus.nonempty : Nonempty (SingleModulus 2 0) := sorry
+/-- `SingleModulus 2 0` is inhabited by the explicit symmetric two-atom law. -/
+theorem SingleModulus.nonempty : Nonempty (SingleModulus 2 0) :=
+  ⟨SingleModulus.witness⟩
 
 namespace SingleModulus
 

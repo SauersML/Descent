@@ -519,7 +519,7 @@ theorem neutralAF_benchmark_discrimination_preserved_calibration_lost
       law from the mechanistic portability model; and
     - exact target calibrated Brier is strictly worse than the source score
       evaluated on the same target prevalence scale. -/
-theorem mechanistic_transport_disrupts_calibration_slope_and_brier
+theorem mechanistic_transport_disrupts_slope_and_brier
     {p q : ℕ} (cal : CrossPopulationMechanisticCalibrationModel p q)
     (h_target_slope_lt : calibrationSlopeFromSourceWeights cal.metric Pop.target < 1)
     (h_r2_drop :
@@ -1238,7 +1238,7 @@ signal in the target population, then:
 The point is that the repository's deployed metric profile can report joint
 deterioration across discrimination- and calibration-sensitive metrics from the
 same mechanistic target state. -/
-theorem metrics_both_degrade_under_drift
+theorem target_metrics_worse_of_r2_drop
     {p q : ℕ} (m : CrossPopulationMetricModel p q)
     (h_source_r2_unit : r2FromSourceWeights m Pop.source ∈ Set.Ico 0 1)
     (h_target_r2_unit : r2FromSourceWeights m Pop.target ∈ Set.Ico 0 1)

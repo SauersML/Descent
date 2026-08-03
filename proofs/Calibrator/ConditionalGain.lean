@@ -219,15 +219,10 @@ noncomputable def FiniteBoundedDeviation.witness (n : ℕ) :
   radius_nonneg := le_rfl
   bound := fun _ ↦ by simp
 
-/-- **Nonemptiness of `FiniteBoundedDeviation` is ADMITTED, not proved.**  Every theorem quantified
-over it is vacuous if this fails, so the claim is stated and left open rather than left
-implicit.  Discharging it means exhibiting a point-mass weight, zero deviation and zero radius, and evaluating the sum.
-
-Admitted rather than assumed: `sorry` is visible to `AxiomScan.lean` as `sorryAx` and to
-`check-identifications.py`, whereas a certificate parameter nothing constructs is visible
-to neither. -/
+/-- `FiniteBoundedDeviation` is inhabited by the explicit point-mass witness. -/
 theorem FiniteBoundedDeviation.nonempty (n : ℕ) :
-    Nonempty (FiniteBoundedDeviation (Fin (n + 1))) := sorry
+    Nonempty (FiniteBoundedDeviation (Fin (n + 1))) :=
+  ⟨FiniteBoundedDeviation.witness n⟩
 
 namespace FiniteBoundedDeviation
 

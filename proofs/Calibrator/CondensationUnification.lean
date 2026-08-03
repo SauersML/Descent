@@ -574,6 +574,14 @@ def GenotypeDesign.reModel {ι : Type*} {n : ℕ} (design : GenotypeDesign n ι)
     (model : Fin n → HardyWeinbergModel) : GenotypeDesign n ι :=
   { design with model := model }
 
+/-- **What "holding the design fixed" means**, stated rather than left to the field update:
+re-modelling moves the coordinate law and leaves the combinatorics alone, so the
+interaction order of every tested set is unchanged. Without this, `reModel` is a record
+update no statement distinguishes from an arbitrary design. -/
+@[simp] theorem GenotypeDesign.reModel_interactionOrder {ι : Type*} {n : ℕ}
+    (design : GenotypeDesign n ι) (model : Fin n → HardyWeinbergModel) (s : ι) :
+    (design.reModel model).interactionOrder s = design.interactionOrder s := rfl
+
 /-! No observable-tower record is exported: accepting the Vertex-Weight Law and the
 exposure correction as fields would assume unproved analytic claims, and the explicit
 panel-mixture calculations below do not depend on them. -/

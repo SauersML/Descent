@@ -159,7 +159,7 @@ variable [Fintype J] [DecidableEq J] [Fintype L] [DecidableEq L]
     Under divergent selection, allele freq p moves from extreme to
     intermediate → H = 2p(1-p) increases.
     This drives PGS variance increase for immune traits. -/
-theorem heterozygosity_increases_toward_half
+theorem two_mul_one_sub_lt_of_lt_of_le_half
     (p₁ p₂ : ℝ)
     (_hp₁_pos : 0 < p₁)
     (hp₁_lt_p₂ : p₁ < p₂)
@@ -183,10 +183,10 @@ small-effect locus loses.** This is the mechanism proposed for WBC/lymphocyte co
     (`hβ`), and its heterozygosity gain must exceed the small locus's loss
     (`hlarge_gains_more`). Neither follows from the conclusion.
 
-    Use `heterozygosity_increases_toward_half` to discharge the gain hypothesis from allele
+    Use `two_mul_one_sub_lt_of_lt_of_le_half` to discharge the gain hypothesis from allele
     frequencies moving toward `1/2` under divergent selection, which is the biological step
     the prose describes. -/
-theorem pgs_variance_increases_of_large_effect_heterozygosity_gain
+theorem two_term_weighted_sum_lt_of_larger_weight_gain
     (βL βS pL pL' pS pS' : ℝ)
     (hβ : βS ^ 2 ≤ βL ^ 2)
     (hβL : 0 < βL ^ 2)
@@ -339,7 +339,7 @@ theorem omitted_variable_bias
   · exact h_corr h
 
 /-- **Portability drop decomposes into genetic + environmental parts.** -/
-theorem portability_drop_decomp
+theorem both_le_of_add_eq_of_nonneg
     (r2s r2t Δg Δe : ℝ)
     (h_eq : r2s - r2t = Δg + Δe)
     (hΔg : 0 ≤ Δg) (hΔe : 0 ≤ Δe) :
@@ -533,7 +533,7 @@ section SelectionModel
 
 /-- **Effect retention under selection.**
     ρ ≤ selection correlation. Low selection correlation → low ρ → low portability. -/
-theorem selection_bounds_effect_retention
+theorem mul_sq_le_mul_sq_of_le_of_nonneg
     (r2_src ρ_eff ρ_sel : ℝ)
     (hr2 : 0 ≤ r2_src)
     (h_bound : ρ_eff ≤ ρ_sel)
@@ -740,7 +740,7 @@ section LocalAncestry
 /-- **Variance in local Fst across loci creates additional prediction error.**
     If local Fst varies (some loci have high Fst, others low), the prediction
     error has a "locus heterogeneity" component not captured by global Fst. -/
-theorem locus_heterogeneity_creates_weighted_gap
+theorem mul_sum_lt_sum_mul_of_nonneg_of_strict
     {m : ℕ} (β : Fin m → ℝ) (fst : Fin m → ℝ) (fst_global : ℝ)
     (h_nonneg : ∀ i, 0 ≤ β i ^ 2 * (fst i - fst_global))
     (i₀ : Fin m)
@@ -797,7 +797,7 @@ theorem lt_weighted_mean_of_weighted_deviation_pos
     (hweight_pos : 0 < ∑ i, β i ^ 2) :
     fst_global < (∑ i, β i ^ 2 * fst_local i) / (∑ i, β i ^ 2) :=
   (lt_div_iff₀ hweight_pos).2
-    (locus_heterogeneity_creates_weighted_gap β fst_local fst_global h_nonneg i₀ h_strict)
+    (mul_sum_lt_sum_mul_of_nonneg_of_strict β fst_local fst_global h_nonneg i₀ h_strict)
 
 end LocalAncestry
 
@@ -893,7 +893,7 @@ theorem slope_rescaling_inverts_slope_change
     If the LD structure changes, the normal equations have a different solution.
     No linear transformation of the source weights can recover the target optimum.
     (This reuses the existing source_erm_is_ld_specific_proved.) -/
-theorem ld_mismatch_not_linearly_recoverable
+theorem mulVec_smul_ne_of_not_aligned
     (w_source : Fin 2 → ℝ)
     (σ_target : Matrix (Fin 2) (Fin 2) ℝ)
     (cross_target : Fin 2 → ℝ)
@@ -918,7 +918,7 @@ theorem ld_mismatch_not_linearly_recoverable
 
     This does say something the section wants — the discrepancy does not vanish, so no
     amount of rescaling the *genotype* hides it — and unlike
-    `ld_mismatch_not_linearly_recoverable` above, which quantifies over all linear
+    `mulVec_smul_ne_of_not_aligned` above, which quantifies over all linear
     recalibrations `α` and shows none succeeds, it never quantifies over corrections at
     all. That is the difference between the two, and it is why only one of them keeps a
     non-recoverability name. -/

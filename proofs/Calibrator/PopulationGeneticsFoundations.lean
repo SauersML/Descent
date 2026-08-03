@@ -440,7 +440,7 @@ theorem selectionMigrationEquilibrium_orderings (s m : ℝ)
     The weighted Fst contribution of selected loci (fraction × fst_selected)
     can exceed their fraction of the genome, showing disproportionate impact
     when fst_selected > fst_neutral. -/
-theorem selected_loci_disproportionate_impact
+theorem mul_lt_mul_left_of_lt_of_pos
     (fst_selected fst_neutral fraction_selected : ℝ)
     (h_higher : fst_neutral < fst_selected)
     (h_pos : 0 < fraction_selected) :
@@ -452,7 +452,7 @@ theorem selected_loci_disproportionate_impact
     Since most of the genome is neutral and selected loci are rare,
     genome-wide Fst reflects drift, not selection.
     But portability loss at selected loci can exceed the neutral prediction. -/
-theorem genome_wide_fst_neutral_dominated
+theorem abs_sub_lt_of_small_mixture
     (fst_gw fst_neutral fst_selected : ℝ)
     (f_sel : ℝ) -- fraction of selected loci
     (h_gw : fst_gw = (1 - f_sel) * fst_neutral + f_sel * fst_selected)

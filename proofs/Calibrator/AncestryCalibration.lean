@@ -38,7 +38,7 @@ section LinearRecalibration
 /-- **Recalibration slope under drift model.**
     If effects change by factor ρ and variance changes by factor α,
     optimal slope = ρ × b_source / α. -/
-theorem recalibration_slope_under_drift
+theorem mul_div_sq_eq_div
     (b_source ρ α : ℝ) (h_α : α ≠ 0) :
     ρ * (b_source * α) / (α ^ 2) = ρ * b_source / α := by
   field_simp
@@ -52,7 +52,7 @@ theorem recalibration_slope_under_drift
     The turnover loss = r2_source × (1 - ρ²) is the non-recoverable part.
     These two components sum to r2_source by algebraic decomposition:
       r2_source × ρ² + r2_source × (1 - ρ²) = r2_source × (ρ² + 1 - ρ²) = r2_source. -/
-theorem recalibration_recovers_up_to_turnover
+theorem mul_add_mul_one_sub_eq_self
     (r2_source ρ_sq : ℝ) :
     let r2_recalibrated := r2_source * ρ_sq
     let r2_loss_turnover := r2_source * (1 - ρ_sq)
@@ -347,7 +347,7 @@ theorem epistatic_changes_faster
 /-- **Additive PGS misses epistatic signal → portability of epistatic component is zero.**
     An additive PGS captures V_A but not V_epistasis. The "missing heritability"
     from epistasis doesn't port because it was never captured. -/
-theorem additive_pgs_misses_epistasis
+theorem div_lt_one_of_eq_add_pos
     (v_additive v_epistatic v_total : ℝ)
     (h_total : v_total = v_additive + v_epistatic)
     (h_epi_pos : 0 < v_epistatic) (h_add_pos : 0 < v_additive) :

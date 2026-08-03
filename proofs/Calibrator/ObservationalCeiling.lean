@@ -178,6 +178,16 @@ def and {D₁ D₂ : Type*} {p₁ : Object → D₁} {p₂ : Object → D₂} {P
   holds := B₁.holds
   fails := B₁.fails
 
+/-- **Running both checks decides nothing either.** The law applied to `and`: the
+combined probe reports the pair of answers, and no predicate on that pair separates the
+shared witness pair. This is what makes `and` a statement about criteria rather than a
+record-building convenience. -/
+theorem and_no_criterion {D₁ D₂ : Type*} {p₁ : Object → D₁} {p₂ : Object → D₂}
+    {P : Object → Prop} (B₁ : ProbeBlindness p₁ P) (B₂ : ProbeBlindness p₂ P)
+    (hpos : B₂.positive = B₁.positive) (hneg : B₂.negative = B₁.negative) :
+    ¬ ∃ decide : D₁ × D₂ → Prop, ∀ o : Object, P o ↔ decide (p₁ o, p₂ o) :=
+  (B₁.and B₂ hpos hneg).no_criterion
+
 /-- **A single witness pair blinds an entire family of probes at once.**
 
 This is the general form: give one pair of objects that every member of the family
@@ -679,6 +689,13 @@ def duplicate_separation {Object : Type*} [MetricSpace Object] (f : Object → �
     intro o o'
     rw [duplicate_dist]
     exact S.separates o o'
+
+/-- The claim the paragraph above makes, as a theorem rather than as a remark about
+definitional unfolding: duplicating a channel leaves the separation modulus exactly where
+it was. -/
+@[simp] theorem duplicate_separation_sigma {Object : Type*} [MetricSpace Object]
+    (f : Object → ℝ) (S : ProbeSeparation f) :
+    (duplicate_separation f S).sigma = S.sigma := rfl
 
 end EffectiveSeparation
 

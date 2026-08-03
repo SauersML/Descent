@@ -2922,7 +2922,7 @@ theorem portability_ratio_with_ld_decay_general
     hVA hVE hfst hfstT_lt_one hRhoS ⟨hRhoT_pos, hRhoT_lt_rhoS⟩
 
 /-- If target `R²` is strictly below source `R²`, the portability ratio is strictly below `1`. -/
-theorem portability_ratio_lt_one_of_drop
+theorem ratio_lt_one_of_lt_of_pos
     (srcR2 tgtR2 : ℝ)
     (hsrc_pos : 0 < srcR2)
     (hdrop : tgtR2 < srcR2) :
@@ -2947,7 +2947,7 @@ theorem portability_ratio_lt_one_of_positive_drift
     exact div_pos hv_pos (by linarith)
   have hdrop : presentDayR2 V_A V_E fstT < presentDayR2 V_A V_E fstS :=
     drift_degrades_R2 V_A V_E fstS fstT hVA hVE hfst hfstT_le_one
-  exact portability_ratio_lt_one_of_drop (presentDayR2 V_A V_E fstS)
+  exact ratio_lt_one_of_lt_of_pos (presentDayR2 V_A V_E fstS)
     (presentDayR2 V_A V_E fstT) hsrc_pos hdrop
 
 /-- Neutral allele-frequency benchmark `R²`.
@@ -2979,7 +2979,7 @@ theorem targetR2FromNeutralAFBenchmark_ratio_lt_one
       targetR2FromNeutralAFBenchmark V_A V_E fstTarget < presentDayR2 V_A V_E fstSource := by
     simpa [targetR2FromNeutralAFBenchmark] using
       drift_degrades_R2 V_A V_E fstSource fstTarget hVA hVE h_fst (le_of_lt h_fst_bounds.2)
-  exact portability_ratio_lt_one_of_drop
+  exact ratio_lt_one_of_lt_of_pos
     (presentDayR2 V_A V_E fstSource)
     (targetR2FromNeutralAFBenchmark V_A V_E fstTarget)
     hsrc_pos hdrop
@@ -4645,8 +4645,7 @@ is no evidence that the admissible ones are the intended domain. -/
     Under mutation-drift equilibrium, pairwise Fst between any two populations
     is bounded above by 2 × Fst_eq (since each branch contributes at most Fst_eq). -/
 theorem pairwise_fst_mutationDrift_bound (θ : ℝ) (hθ : 0 < θ) :
-    let fst_eq := 1 / (1 + θ)
-    pairwiseFstFromBranches fst_eq fst_eq ≤ 2 / (1 + θ) := by
+    pairwiseFstFromBranches (1 / (1 + θ)) (1 / (1 + θ)) ≤ 2 / (1 + θ) := by
   simp [pairwiseFstFromBranches]
   ring_nf
   have h1 : 0 < 1 + θ := by linarith
@@ -5007,7 +5006,7 @@ for `h → h`. -/
     Under pure drift, Fst approaches 1 as t → ∞. Under migration-drift balance,
     Fst is bounded above by 1/(1+4Nm) < 1. This means migration establishes
     a ceiling on differentiation. -/
-theorem migration_bounds_fst_below_one_of_le_equilibrium (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 < m)
+theorem lt_one_of_le_migrationEquilibrium (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 < m)
     (fst_observed : ℝ) (h_le : fst_observed ≤ fstMigrationDriftEquilibrium Ne m) :
     fst_observed < 1 := by
   have h_eq_lt := fstMigrationDriftEquilibrium_lt_one Ne m hNe hm

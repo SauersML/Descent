@@ -834,7 +834,7 @@ This theorem carries **no** `hPhiStrict : StrictMono Phi` hypothesis, and needs 
 `Probability.strictMono_Phi` proves it: `Phi` is `ProbabilityTheory.cdf (gaussianReal 0 1)`,
 and its strict monotonicity follows from the Gaussian density being positive.  Every use
 below resolves against that theorem. -/
-theorem cross_ancestry_exact_metric_profile_from_shift_budget
+theorem source_to_target_exact_metric_profile_from_shift_budget
     {p q : ℕ}
     (metric : CrossPopulationMetricModel p q)
     (cal : CrossPopulationCalibrationShiftModel)
@@ -916,13 +916,13 @@ This is the headline law surface for deployed metrics:
 - Brier is the mechanistic source-vs-target calibrated Brier comparison on the
   target-population observed prevalence scale.
 
-The same reading applies as for `cross_ancestry_exact_metric_profile_from_shift_budget`,
+The same reading applies as for `source_to_target_exact_metric_profile_from_shift_budget`,
 which this theorem is a mechanistic instance of: the AUC drop and the Brier worsening are
 carried by the hypothesis `h_r2_drop`, and the calibration worsening by `h_src_cal`
 together with `h_shift_nonzero`. "Exact" qualifies the formulae for CITL and slope, which
 are computed from the SNP-level state, not the direction of the metric changes, which are
 assumed. -/
-theorem cross_ancestry_exact_metric_profile
+theorem source_to_target_exact_metric_profile
     {p q : ℕ}
     (cal : CrossPopulationMechanisticCalibrationModel p q)
     (h_target_mean_eq_prevalence :
@@ -968,7 +968,7 @@ theorem cross_ancestry_exact_metric_profile
       CrossPopulationCalibrationShiftModel.predictedMeanShift,
       sub_eq_add_neg, add_assoc] using h_shift_nonzero
   have h_main :=
-    cross_ancestry_exact_metric_profile_from_shift_budget cal.metric cal.toShiftModel
+    source_to_target_exact_metric_profile_from_shift_budget cal.metric cal.toShiftModel
       h_target_mean_eq_prevalence_shift h_source_r2_unit h_target_r2_unit h_r2_drop
       h_src_cal_shift h_shift_nonzero_shift
   dsimp at h_main ⊢
@@ -1229,7 +1229,7 @@ on purpose. It asserts that cross-ancestry AUC drops, and this theorem does not 
 `h_shift_nonzero` assume a perfectly calibrated source and a nonzero budget, against which
 any shift is worse. The qualifier `from_explicit_shift_budget` covers the calibration half
 alone, so the name must state the R² input too. -/
-theorem cross_ancestry_auc_drop_and_citl_worsening_of_r2_drop_and_shift_budget
+theorem auc_drop_and_citl_worsening_of_r2_drop_and_shift_budget
     {p q : ℕ}
     (metric : CrossPopulationMetricModel p q)
     (cal : CrossPopulationCalibrationShiftModel)
@@ -1287,7 +1287,7 @@ as a benchmark special case rather than a general SNP-level deployment law.
 
 As above, the AUC drop is `h_r2_drop` transported through the monotone chart, not a
 consequence of ancestry distance; the name now says so. -/
-theorem cross_ancestry_auc_drop_and_prevalence_only_citl_worsening_of_r2_drop
+theorem auc_drop_and_baseRate_only_citl_worsening_of_r2_drop
     {p q : ℕ}
     (metric : CrossPopulationMetricModel p q)
     (cal : CrossPopulationCalibrationShiftModel)
@@ -1315,7 +1315,7 @@ theorem cross_ancestry_auc_drop_and_prevalence_only_citl_worsening_of_r2_drop
       CrossPopulationCalibrationShiftModel.predictedMeanShift,
       h_env, h_genetic, h_score, h_intercept, h_prev_shift]
   have h_main :=
-    cross_ancestry_auc_drop_and_citl_worsening_of_r2_drop_and_shift_budget
+    auc_drop_and_citl_worsening_of_r2_drop_and_shift_budget
       metric cal h_source_r2_unit h_target_r2_unit h_r2_drop
       h_src_cal h_shift_nonzero
   dsimp at h_main ⊢
@@ -1567,7 +1567,7 @@ theorem logistic_recalibration_corrects_slope
     rw [div_self h_slope_nonzero, sub_self, abs_zero]
 
 /-- Shared logistic calibration profile of the fully recalibrated predictor. -/
-theorem logistic_recalibrated_profile_corrects_citl_and_slope
+theorem logistic_refit_profile_corrects_citl_and_slope
     (mean_obs mean_pgs slope : ℝ)
     (h_slope_nonzero : slope ≠ 0) :
     let profile :=
@@ -1591,7 +1591,7 @@ theorem logistic_recalibration_corrects_citl_and_slope
       calibrationSlopeDeviation
         (recalibratedCalibrationSlope slope slope) = 0 := by
   simpa [calibrationSlopeDeviation] using
-    logistic_recalibrated_profile_corrects_citl_and_slope
+    logistic_refit_profile_corrects_citl_and_slope
       mean_obs mean_pgs slope h_slope_nonzero
 
 /-- Logistic recalibration preserves AUC because it is a strictly increasing

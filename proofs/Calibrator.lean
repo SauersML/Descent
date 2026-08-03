@@ -270,7 +270,7 @@ verified the hard way:
 two-locus coalescent theorems in `Calibrator.DGP` is discharged here by computation.
 It was previously supplied as a `local instance : Fact (2 ≤ 2)`; a `Fact` instance is
 resolved silently and so kept the premise out of every signature that depended on it. -/
-private theorem twoLocusBlockSize : (2 : ℕ) ≤ 2 := le_refl 2
+theorem twoLocusBlockSize : (2 : ℕ) ≤ 2 := le_refl 2
 
 /-
 Proof policy: do not add theorems whose conclusion merely repackages a premise

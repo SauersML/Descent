@@ -827,10 +827,9 @@ The proof is to sort the values of `score` in decreasing order and cut after the
 `k`-th; it is a finite-combinatorial fact with no analytic content and no
 empirical content, and it is unwritten only because the sorting bookkeeping is.
 
-This used to be a hypothesis `hsplit` on
-`exists_split_attaining_scalarized_optimum`, i.e. an assumption about a
-predicate this file itself defines, handed in by callers.  As a `sorry` it is
-reported by `AxiomScan`; as a premise nothing reported it at all. -/
+An admission rather than a premise, because the two are reported differently: a
+`sorry` reaches `AxiomScan` as `sorryAx` and is counted, whereas the same claim
+carried as a hypothesis on the consumers is visible to no guard at all. -/
 theorem hasThresholdSetAtEveryRank_of_fintype (score : ι → ℝ) :
     HasThresholdSetAtEveryRank score := by
   sorry
