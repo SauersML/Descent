@@ -33,7 +33,7 @@ simulated split), `targetHetFromFst`, `mutationSelectionStepRare`,
 under viability selection then mutation), `twoDemeIMEquilibriumETss`,
 `twoDemeIMEquilibriumETst` (exact two-lineage structured coalescent),
 `optimumOUVariance` (SDE integrated forward), plus `hweGenotypeVariance` and
-`hudsonFst` from the same batch.
+`neiGst` from the same batch.
 
 ## B. Simulatable, spec not yet written (11)
 

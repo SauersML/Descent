@@ -54,13 +54,13 @@ Of 402 `Empirical status:` markers, 323 are `UNTESTED`, ~28 `DERIVED`, ~20 `VALI
 | 20 | **Exposure correction.** Exposing a square cumulant of order ≥3 forces the second hub energy to diverge, so no hub bound survives. | standing | `CondensationUnification.ObservableTower.higher_cumulants_need_divergent_hub` (field, :738); corollary `boundedHub_exposes_no_higher_cumulant` (:764, PROVED) | If every variant is tested a bounded number of times, no cumulant of `x²` beyond the second is exposed, whatever the design does. This is what makes row 5's naive four-element list wrong and the recursion right. | HYPOTHESIS + PROVED corollary | Analytic input. **Naming hazard:** this "exposure correction" is a *different* object from the retracted "exposure claim" of row 10 and is easily confused with it in a grep. |
 | 21 | **AR(1) whitening gain as the certificate value.** `traceWindowSpikeLoad → (1+ρ²)/(1−ρ²)`; capacity = headroom × (1−ρ²)/(1+ρ²). | standing | **PROVED.** `ImitationCapacity.traceWindowSpikeLoad` (:1000), `traceWindowSpikeLoad_tendsto_ldWhiteningGain` (:1007), `whitenedCapacity_closedForm` (:1023), `imitationCapacity_eq_whitenedCapacity` (:1034), `whitenedCapacity_strictAnti` (:1049), `inverseTraceCertificate_tendsto_ldWhiteningGain` (:1430) | LD decay sets the detection threshold in closed form: stronger LD (larger ρ) strictly lowers imitation capacity, so a more correlated panel is easier, not harder, to defend against stratification imitating a polygenic spike. | **PROVED + SIMULATED.** `validation/imitation_rigidity/README.md`: `ldWhiteningGain` = harmonic mean of the symbol exact to 2e-16; `ldPrecisionTrace = tr K⁻¹` exact to 1e-16 at k = 8, 64, 512 including the finite-size boundary correction; `ldHardEdge` = symbol minimum exact to 1.7e-16, and = smallest eigenvalue to 6e-4 at 64 variants approaching from above | None material. |
 | 22 | **`ridgeBalance` — FALSIFIED and repaired.** | falsified upstream, repaired | `ImitationRigidity` (see `validation/imitation_rigidity/README.md`) | — | **SIMULATED falsification.** Took no variants-per-individual ratio although the ridge fixed point depends on it; the resolvent functional came out **34% too large at aspect 0.3** (1.452 predicted vs 0.957 simulated). Repaired by adding an `aspect` argument; agreement now 2e-4. | Kept as the precedent for the missing-argument failure class that `scripts/check-identifications.py` screens for statically — no constant repairs it, because the signature could not express the dependence. |
-| 23 | **Spike constant and effective-marker count for PC correctability.** `demographicSpike = 4 F · m(n−m)/n`. **`F` is Nei's `G_ST`, NOT Hudson's `F_ST`** — see the correction block below. | standing; the arithmetic is sound, the estimator label was wrong, and the direction of the resulting user error is **the opposite of what was first reported** | `PCCorrectability/Threshold.lean:31`; the estimator is `Conventions.hudsonFst` (misnamed) | The sharp criterion `1 < M F² n` is the Patterson–Price–Reich boundary. | **VALIDATED**: BBP inversion recovers **3.9920 ± 0.0045** against the derived 4 — but see the provenance finding below for *which* estimator that inversion used. Separately measured: supplying a **raw** variant count for `M` overstates correctability ~20-fold in `M`, predicting eigenvector overlap **0.87** at `F_ST = 0.001` where the observed value is **0.014**. | See the correction block. `validation/pc_correctability/analyze.py` still documents `KAPPA = 2` in its module docstring — **stale**, contradicting `Threshold.lean` and `analyze_b.py`, both of which use 4. |
+| 23 | **Spike constant and effective-marker count for PC correctability.** `demographicSpike = 4 F · m(n−m)/n`. **`F` is Nei's `G_ST`, NOT Hudson's `F_ST`** — see the correction block below. | standing; the arithmetic is sound, the estimator label was wrong, and the direction of the resulting user error is **the opposite of what was first reported** | `PCCorrectability/Threshold.lean:31`; the estimator is `Conventions.neiGst` (misnamed) | The sharp criterion `1 < M F² n` is the Patterson–Price–Reich boundary. | **VALIDATED**: BBP inversion recovers **3.9920 ± 0.0045** against the derived 4 — but see the provenance finding below for *which* estimator that inversion used. Separately measured: supplying a **raw** variant count for `M` overstates correctability ~20-fold in `M`, predicting eigenvector overlap **0.87** at `F_ST = 0.001` where the observed value is **0.014**. | See the correction block. `validation/pc_correctability/analyze.py` still documents `KAPPA = 2` in its module docstring — **stale**, contradicting `Threshold.lean` and `analyze_b.py`, both of which use 4. |
 
 #### Correction to row 23 — which `F_ST`, and which way the error runs
 
 **Nothing below deletes the superseded wording; it is preserved at the end of this block.**
 
-**1. The estimator is Nei's `G_ST`.** `Conventions.hudsonFst` divides by the total-pool
+**1. The estimator is Nei's `G_ST`.** `Conventions.neiGst` divides by the total-pool
 heterozygosity `2 p̄(1−p̄)`; Hudson divides by the between-subgroup heterozygosity
 `p₁(1−p₂) + p₂(1−p₁)`. The denominators differ by exactly `(p₁−p₂)²/2`. At
 `p₁ = 0.2, p₂ = 0.6`: Nei `0.1667`, Hudson `0.2857` — Hudson 71.4% larger, matching the
@@ -68,7 +68,7 @@ heterozygosity `2 p̄(1−p̄)`; Hudson divides by the between-subgroup heterozy
 `validation/pc_correctability/which_fst.py` reproduces that point value exactly
 (`ratio = 1.7143`), which is what establishes its implementation is right.
 
-**2. The Lean is sound; `simpleFst_eq_hudsonFst` is a true theorem with a false name.**
+**2. The Lean is sound; `simpleFst_eq_neiGst` is a true theorem with a false name.**
 `4F =` contrast variance is a true identity for the Nei quantity. What was wrong is every
 claim about *which* `F_ST` a user must supply.
 
@@ -96,27 +96,27 @@ mechanism outright. Under aggregation the two functionals never coincide.
 Balding–Nichols identity `E[(p₁−p₂)²] = 2 F p(1−p)`. Hudson's denominator tends to
 `2p(1−p)`, so **Hudson estimates the BN parameter `F`**; Nei's numerator carries the extra
 `½`, so **Nei estimates `F/2`**. Confirmed to four digits above: at target `F = 0.01`,
-Hudson reads `0.01001` and Nei `0.00503`. So `Conventions.hudsonFst` is not merely a
+Hudson reads `0.01001` and Nei `0.00503`. So `Conventions.neiGst` is not merely a
 different estimator — **it is asymptotically half the Balding–Nichols `F_ST`.**
 
 **5. Consequence, and it reverses the reported direction of user risk.** The `3.9920`
 calibration was performed against Hudson. So `κ = 4` is the constant that goes with
 **genuine Hudson**, and a user supplying scikit-allel's `hudson_fst` gets the **validated,
-correct** spike. It is supplying the corpus's own `Conventions.hudsonFst` — the Nei
+correct** spike. It is supplying the corpus's own `Conventions.neiGst` — the Nei
 quantity — that understates the spike by ≈ 2×. The first report had this backwards.
 **CONFIRMED** — see rows 42–45, "Row 23's provenance question — now CLOSED": the
 upstream `trueHudsonFst` conversion `Hudson = 2G/(1+G)` reproduces the measured ratio
 table to 5–7 decimals, so the direction above is established by derivation and simulation
 agreeing, not by inference alone.
 
-**6. Sweep for the same conflation.** `four_hudsonFst_eq_standardizedContrastVariance` and
-`contrastSpikeLevel_eq_four_hudsonFst` (`DemographicCapacity`:50, and the `hudsonFst`
+**6. Sweep for the same conflation.** `four_neiGst_eq_standardizedContrastVariance` and
+`contrastSpikeLevel_eq_four_neiGst` (`DemographicCapacity`:50, and the `neiGst`
 applications at :67–:136) all inherit the misnomer — they are true statements about the
 Nei quantity under a Hudson name. **Checked and clean:** `driftVariance = p₀(1−p₀)F`,
 `twoPopDriftVariance`, `expectedFreqDiffSq = 2F p₀(1−p₀)`
 (`AncestrySpecificArchitecture`), `fstFromDriftFactor`, `freqCorrFromFst`,
 `neutralPortability` — these take `F` as a *model parameter* and assert no estimator
-provenance, so they carry no conflation. The defect is confined to the `hudsonFst` name
+provenance, so they carry no conflation. The defect is confined to the `neiGst` name
 and its dependents.
 
 > **SUPERSEDED WORDING, PRESERVED.** The original row 23 read: *"`demographicSpike =
@@ -420,7 +420,7 @@ useful observation.
 |---|---|---|---|---|---|---|
 | 42 | **The `878%` contradiction is decided AGAINST the exponential — by derivation, not by preference.** The meeting-time argument gives `d/(d + 4·Ne·σ²·m)` **exactly**, and cannot produce `1 − exp(−d/L)` for any `L`. | decided | `4b9f5562`: `steppingStoneCharacteristicLength` corrected to `√(m/(2μ))`; `continuousSteppingStoneFst` **deleted** with its three theorems. `3616b3c4`: the falsifier now writes per replicate, so a killed run still yields data. | The stepping-stone `F_ST` at separation `d` is hyperbolic, not exponential. Anything that read a characteristic length off the exponential form was reading a parameter of a formula that was never derived. | **DERIVED.** The decisive fact is not that two formulas disagreed by 878% — it is that **one of them has a derivation and the other never had one anywhere in the corpus.** | None on the decision. Recorded this way deliberately: *"two formulas disagreed"* is not a finding; *"this one was derived and that one was not"* is. |
 | 43 | **A theorem that could not fail, found and deleted.** The three `continuousSteppingStoneFst` theorems were **deleted rather than weakened**, with the reason recorded in-file: their sign and monotonicity facts are satisfied **equally well by the hyperbolic form**, so **none of them could ever have caught the error**. | corrected | `4b9f5562` | — | A vacuity finding, of the same family the corpus already tracks. | **Belongs with the other instances, and they should be read together:** `unionOfCertificates_vacuous` (`ObservationalCeiling` — the bare union shape is satisfied by every relation whatsoever); the `countablyCertified_of_reduction` preservation hypothesis whose omission made an earlier theorem "consequently free"; `recurrence_matching_leaves_fourth_cycle_density_free` (row 4), where the *unused* hypothesis **is** the content; and `imitable_despite_positive_pcCorrectabilityMargin` (row 16), same pattern. **The recurring lesson: a theorem whose hypotheses are satisfied by the wrong answer too is not evidence, and the corpus now has four independent instances.** |
-| 44 | **`F_ST` estimator repairs.** `hudsonFst` documented as **Nei's `G_ST`**; **`trueHudsonFst` added** with the exact conversion **`Hudson = 2G/(1+G)`** and a witness that the two differ; `simpleFst` renamed `neiGstFromFrequencies`. | corrected | `9c409c84`, `771e9dcb` | Fixes what a user must supply. See row 23 and its correction block. | The conversion is **independently confirmed by simulation** — see below. | The `hudsonFst` **name** is still uncorrected on the Nei body; only the docstring was fixed. Its dependents in `DemographicCapacity` (row 23, sweep item 6) still read as Hudson. |
+| 44 | **`F_ST` estimator repairs.** `neiGst` documented as **Nei's `G_ST`**; **`trueHudsonFst` added** with the exact conversion **`Hudson = 2G/(1+G)`** and a witness that the two differ; `simpleFst` renamed `neiGstFromFrequencies`. | corrected | `9c409c84`, `771e9dcb` | Fixes what a user must supply. See row 23 and its correction block. | The conversion is **independently confirmed by simulation** — see below. | The `neiGst` **name** is still uncorrected on the Nei body; only the docstring was fixed. Its dependents in `DemographicCapacity` (row 23, sweep item 6) still read as Hudson. |
 | 45 | **Other repairs.** `ldRetainedFraction` and `ldHalfLife` re-signatured to depend on **recombination**; `driftLDEquilibrium` docstring now carries the measured **+76% / +45%**; `ohtaKimuraSigmaDSq` added; the island model now **declares that it is a limit**, with `islandFstFiniteDemes` and four theorems making the regime **machine-checked** rather than assumed. | corrected | `4b9f5562`, `7b7a0054`, `71d2308c` | A missing-argument fix of the same class as `ridgeBalance` (row 22): no constant repairs it, because the signature could not express the dependence. | Measured numbers now in-docstring. | The island-model regime declaration is the right pattern — **the regime is now a hypothesis in the type rather than a remark** — and is worth copying wherever a limit is used as though it were exact. |
 
 #### Row 23's provenance question — now CLOSED, by two independent routes agreeing

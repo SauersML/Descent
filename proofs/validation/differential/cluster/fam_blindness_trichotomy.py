@@ -62,7 +62,7 @@ WITNESS PLACEMENT: THE CLAIM SAYS "EXCEPT ON S", SO THE WITNESS GOES IN S
     witness below therefore sits AT q = 1/2, with the off-witnesses placed
     immediately beside it to measure how fast the coincidence dies.
 
-    This is the defect that `hudsonFst_ne_trueHudsonFst` had: it sat at
+    This is the defect that `neiGst_ne_trueHudsonFst` had: it sat at
     pbar = 2/5 and so could not exclude the pbar = 1/2 slice its own claim
     named.  It failed fine -- at a point nobody disputed.
 
@@ -336,7 +336,7 @@ def mutation_gate(grid):
                     "expected_rejected": True})
 
     # M3: resonance witness moved OUT of the excepted set S = {1/2}.  This is
-    # the hudsonFst defect reproduced deliberately: a probe at q = 0.3 cannot
+    # the neiGst defect reproduced deliberately: a probe at q = 0.3 cannot
     # distinguish the corpus from its negation, so a test sited there is
     # uninformative and must NOT be counted as evidence.
     deg = degeneracy(0.3)

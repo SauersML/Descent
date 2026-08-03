@@ -36,7 +36,7 @@ allele-frequency spectrum to the law of `|U|` across the panel.
 below is the **mean inverse heterozygosity** `E_q[1/(2q(1-q))]`. No statement here is
 about "F_ST": estimators of differentiation differ in their denominators and disagree by
 large factors away from the symmetric point, so an identifiability claim is meaningful
-only relative to a named functional. (`Conventions.hudsonFst`, whatever its name says,
+only relative to a named functional. (`Conventions.neiGst`, whatever its name says,
 computes Nei's `G_ST`; nothing in this file depends on it.)
 
 ## THE STANDING HYPOTHESIS: INDEPENDENT LOCI. IT IS IN THE SIGNATURES.

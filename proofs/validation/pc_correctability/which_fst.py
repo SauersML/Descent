@@ -3,7 +3,7 @@
 
 THE QUESTION
 
-`Calibrator/Conventions.lean`'s `hudsonFst` computes Nei's `G_ST`, not Hudson's
+`Calibrator/Conventions.lean`'s `neiGst` computes Nei's `G_ST`, not Hudson's
 `F_ST`: it divides by the total-pool heterozygosity `2 p̄(1-p̄)` where Hudson
 divides by the between-subgroup heterozygosity `p₁(1-p₂) + p₂(1-p₁)`.  The Lean
 identity `4F = standardized contrast variance` was derived for the Nei quantity.
@@ -61,7 +61,7 @@ def nei_gst_ratio_of_averages(p1, p2):
     """The corpus quantity: 1 - mean-within / total, aggregated as a ratio of
     averages so the comparison is like-for-like with Hudson above.
 
-    `Conventions.hudsonFst p1 p2 = 1 - (p1(1-p1) + p2(1-p2)) / (2 p̄ (1-p̄))`.
+    `Conventions.neiGst p1 p2 = 1 - (p1(1-p1) + p2(1-p2)) / (2 p̄ (1-p̄))`.
     As a ratio of averages that is 1 - sum(within)/sum(total).
     """
     pbar = 0.5 * (p1 + p2)

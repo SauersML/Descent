@@ -16,7 +16,7 @@ is how the spike constant was able to be wrong by a factor of two.
 
 This module composes the two.  `Conventions` pins the level: four times Hudson
 `F_ST` is the variance of the standardized subgroup contrast, which is
-`four_hudsonFst_eq_standardizedContrastVariance`.  `ImitationCapacity` pins the
+`four_neiGst_eq_standardizedContrastVariance`.  `ImitationCapacity` pins the
 load: it is the squared length of the contrast direction.  Their product is the
 certificate increment, and the composition below has no free constant and no
 free `F` anywhere in it.
@@ -35,8 +35,8 @@ standardized allele-frequency contrast between the two subgroups.
 This is the level, in the linear program's sense, that a demographic spike
 enters at — the multiplier on the spike load.  It is written as a quantity
 rather than as a numeral times `F_ST` for the reason that the numeral is what
-was wrong before: `contrastSpikeLevel_eq_four_hudsonFst` derives it from
-`Conventions.four_hudsonFst_eq_standardizedContrastVariance` instead of
+was wrong before: `contrastSpikeLevel_eq_four_neiGst` derives it from
+`Conventions.four_neiGst_eq_standardizedContrastVariance` instead of
 stipulating it, so a spike level built on `2 F_ST` is unprovable here rather
 than merely differently calibrated.
 
@@ -47,11 +47,11 @@ noncomputable def contrastSpikeLevel (p₁ p₂ : ℝ) : ℝ :=
   (p₁ - p₂) ^ 2 / (meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂))
 
 /-- **The level is four times Hudson `F_ST`, derived rather than stipulated.** -/
-theorem contrastSpikeLevel_eq_four_hudsonFst (p₁ p₂ : ℝ)
+theorem contrastSpikeLevel_eq_four_neiGst (p₁ p₂ : ℝ)
     (h : meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) ≠ 0) :
-    contrastSpikeLevel p₁ p₂ = 4 * hudsonFst p₁ p₂ := by
+    contrastSpikeLevel p₁ p₂ = 4 * neiGst p₁ p₂ := by
   unfold contrastSpikeLevel
-  exact (four_hudsonFst_eq_standardizedContrastVariance p₁ p₂ h).symm
+  exact (four_neiGst_eq_standardizedContrastVariance p₁ p₂ h).symm
 
 /-- **The linear program's two factors, for a stratified genotype panel.**
 
@@ -64,11 +64,11 @@ theorem demographicSpike_eq_contrastSpikeLevel_mul_spikeLoad
     {N : ℕ} (m : ℕ) (p₁ p₂ : ℝ) (hmn : m ≤ N) (hN : 0 < N)
     (h : meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) ≠ 0)
     (base : Matrix (Fin N) (Fin N) ℝ) (budget : ℝ) (a : Unit) :
-    demographicSpike (N : ℝ) (hudsonFst p₁ p₂) (m : ℝ) =
+    demographicSpike (N : ℝ) (neiGst p₁ p₂) (m : ℝ) =
       contrastSpikeLevel p₁ p₂ *
         (traceWindowBudgetClass base budget).spikeLoad a
           (demographicSpikeDirection N m) := by
-  rw [contrastSpikeLevel_eq_four_hudsonFst p₁ p₂ h,
+  rw [contrastSpikeLevel_eq_four_neiGst p₁ p₂ h,
     traceWindow_spikeLoad_demographic m hmn hN base budget a]
   unfold demographicSpike
   ring
@@ -77,7 +77,7 @@ theorem demographicSpike_eq_contrastSpikeLevel_mul_spikeLoad
 Hudson `F_ST` and no numeral anywhere on the right.**
 
 The spike level is the standardized contrast variance — pinned by
-`four_hudsonFst_eq_standardizedContrastVariance`, so the old constant `2`
+`four_neiGst_eq_standardizedContrastVariance`, so the old constant `2`
 cannot be substituted — and the load is the trace-window spike load of the
 subgroup-contrast direction, pinned by `dot_demographicSpikeDirection`.  Both
 factors are now quantities rather than names, which is the whole point of the
@@ -86,7 +86,7 @@ theorem demographicSpike_eq_contrastVariance_mul_spikeLoad
     {N : ℕ} (m : ℕ) (p₁ p₂ : ℝ) (hmn : m ≤ N) (hN : 0 < N)
     (h : meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) ≠ 0)
     (base : Matrix (Fin N) (Fin N) ℝ) (budget : ℝ) (a : Unit) :
-    demographicSpike (N : ℝ) (hudsonFst p₁ p₂) (m : ℝ) =
+    demographicSpike (N : ℝ) (neiGst p₁ p₂) (m : ℝ) =
       ((p₁ - p₂) ^ 2 / (meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂))) *
         (traceWindowBudgetClass base budget).spikeLoad a
           (demographicSpikeDirection N m) := by
@@ -102,18 +102,18 @@ inside the budget.  Nothing here is a spectral quantity: `bbpProxyThreshold`
 does not appear, because the imitation question does not involve it. -/
 theorem stratification_imitable_iff_within_budget
     {N : ℕ} (m : ℕ) (p₁ p₂ : ℝ) (hmn : m ≤ N) (hN : 0 < N)
-    (hfst : 0 ≤ hudsonFst p₁ p₂)
+    (hfst : 0 ≤ neiGst p₁ p₂)
     (base S₀ : Matrix (Fin N) (Fin N) ℝ) (budget : ℝ)
     (hbase : VarianceNonneg (S₀ - base))
     (markerCount : ℝ)
     (hmargin : 0 < pcCorrectabilityMargin (N : ℝ) markerCount
-      (hudsonFst p₁ p₂) (m : ℝ))
+      (neiGst p₁ p₂) (m : ℝ))
     (hbudget : traceForm S₀ +
-      demographicSpike (N : ℝ) (hudsonFst p₁ p₂) (m : ℝ) ≤ budget) :
+      demographicSpike (N : ℝ) (neiGst p₁ p₂) (m : ℝ) ≤ budget) :
     (traceWindowBudgetClass base budget).IsNull
-      ((traceWindowBudgetClass base budget).spiked S₀ (4 * hudsonFst p₁ p₂)
+      ((traceWindowBudgetClass base budget).spiked S₀ (4 * neiGst p₁ p₂)
         (demographicSpikeDirection N m)) :=
-  imitable_despite_positive_pcCorrectabilityMargin m (hudsonFst p₁ p₂) markerCount
+  imitable_despite_positive_pcCorrectabilityMargin m (neiGst p₁ p₂) markerCount
     hfst hmn hN base S₀ budget hbase hbudget hmargin
 
 /-- **The correction to `pcCorrectabilityMargin`, stated on genotypes.**
@@ -126,14 +126,14 @@ quantity omits. -/
 theorem rigid_pcCorrectabilityMargin_is_the_criterion
     {N : ℕ} (m : ℕ) (p₁ p₂ markerCount : ℝ) (hmn : m ≤ N) (hN : 0 < N)
     (base S₀ : Matrix (Fin N) (Fin N) ℝ) (a : Unit) :
-    0 < pcCorrectabilityMargin (N : ℝ) markerCount (hudsonFst p₁ p₂) (m : ℝ) ↔
+    0 < pcCorrectabilityMargin (N : ℝ) markerCount (neiGst p₁ p₂) (m : ℝ) ↔
       (traceWindowBudgetClass base (traceForm S₀)).bound a +
           bbpProxyThreshold (N : ℝ) markerCount <
         (traceWindowBudgetClass base (traceForm S₀)).form a
           ((traceWindowBudgetClass base (traceForm S₀)).spiked S₀
-            (4 * hudsonFst p₁ p₂) (demographicSpikeDirection N m)) :=
+            (4 * neiGst p₁ p₂) (demographicSpikeDirection N m)) :=
   rigid_certificate_exceeds_ceiling_iff_pcCorrectabilityMargin_pos m
-    (hudsonFst p₁ p₂) markerCount hmn hN base S₀ a
+    (neiGst p₁ p₂) markerCount hmn hN base S₀ a
 
 end DemographicCapacity
 

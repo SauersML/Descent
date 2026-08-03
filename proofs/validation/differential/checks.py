@@ -126,7 +126,7 @@ check(
     canfail_clause=(
         "needs p1 != p2. CORRECTED: this clause used to read 'needs pbar != "
         "0.5; Nei and Hudson coincide exactly at pbar=0.5', copying the same "
-        "disjunct from the Conventions.hudsonFst docstring. It is FALSE and "
+        "disjunct from the Conventions.neiGst docstring. It is FALSE and "
         "cluster/fam_fst_allel_crosscheck.py cell C3 measures it: the exact "
         "conversion Hudson = 2G/(1+G) has 2G/(1+G) = G only at G in {0,1}, so "
         "the two coincide only at p1 = p2 (or complete fixation). At pbar=0.5 "

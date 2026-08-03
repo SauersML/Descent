@@ -49,7 +49,7 @@ exactly that.
 
 `Conventions.demographicSpike_eq_contrastVariance_mul_effectiveSize` is the
 motivating case, and the nuance is worth preserving: it CONSTRAINS
-`demographicSpike` and `hudsonFst`, and pins the spike constant that was this
+`demographicSpike` and `neiGst`, and pins the spike constant that was this
 project's historical factor-of-two error, which is the job it was built for.
 It is VACUOUS_FOR `effectiveSubgroupSize`, which occurs on both sides and
 cancels.  That is an overclaim of scope in a certificate, not a false

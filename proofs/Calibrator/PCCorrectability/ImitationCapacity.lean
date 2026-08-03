@@ -1085,7 +1085,7 @@ trace window, exactly:
 * `demographicSpike n F m` is the *certificate increment* — the spike level
   times that load (`demographicSpike_eq_level_mul_spikeLoad`), with the level
   being the standardized contrast variance and the level's pinning to Hudson
-  `F_ST` supplied by `Conventions.four_hudsonFst_eq_standardizedContrastVariance`
+  `F_ST` supplied by `Conventions.four_neiGst_eq_standardizedContrastVariance`
   and composed in `Calibrator.DemographicCapacity`.
 
 So the left-hand side of the existing comparison sits in exactly the place the
@@ -1196,7 +1196,7 @@ theorem traceWindow_spikeLoad_demographic {N : ℕ} (m : ℕ) (hmn : m ≤ N) (h
 existing quantity is the amount by which a demographic spike at level `4F`
 raises the certificate: level times load, which is exactly the linear program's
 left-hand side.  The level is the standardized contrast variance, pinned to
-Hudson `F_ST` by `Conventions.four_hudsonFst_eq_standardizedContrastVariance`. -/
+Hudson `F_ST` by `Conventions.four_neiGst_eq_standardizedContrastVariance`. -/
 theorem demographicSpike_eq_level_mul_spikeLoad {N : ℕ} (m : ℕ) (F : ℝ)
     (hmn : m ≤ N) (hN : 0 < N)
     (base : Matrix (Fin N) (Fin N) ℝ) (budget : ℝ) (a : Unit) :
