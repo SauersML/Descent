@@ -1598,22 +1598,30 @@ for the detection/reconstruction pair, which does not exist.
 
 section GeneticFrontier
 
-/-- **Fraction of the marker panel retained** by a pruning or clumping pass:
-`retainedMarkers` of `totalMarkers` survive.  This is the rank budget of the
-reduction, expressed in the units a clumping tool reports.
+/-- A valid marker-panel reduction has a nonempty original panel and cannot
+retain more markers than the panel contains. `retainedMarkers` of `totalMarkers`
+survive; this is the rank budget in the units a clumping tool reports. Carrying
+the validity facts as data keeps division by zero and fractions above one out of
+the LD-frontier interface.
 
 Empirical status: UNTESTED. -/
-noncomputable def ldPanelRetentionFraction (retainedMarkers totalMarkers : ℕ) : ℝ :=
-  (retainedMarkers : ℝ) / (totalMarkers : ℝ)
+structure LDPanelRetention where
+  retainedMarkers : ℕ
+  totalMarkers : ℕ
+  retained_le_total : retainedMarkers ≤ totalMarkers
+  totalMarkers_pos : 0 < totalMarkers
 
-theorem ldPanelRetentionFraction_mem {retainedMarkers totalMarkers : ℕ}
-    (h0 : 0 < retainedMarkers) (h1 : retainedMarkers < totalMarkers) :
-    0 < ldPanelRetentionFraction retainedMarkers totalMarkers ∧
-      ldPanelRetentionFraction retainedMarkers totalMarkers < 1 := by
-  have hr : (0 : ℝ) < (retainedMarkers : ℝ) := by exact_mod_cast h0
-  have htotal : 0 < totalMarkers := lt_trans h0 h1
-  have ht : (0 : ℝ) < (totalMarkers : ℝ) := by exact_mod_cast htotal
-  have hlt : (retainedMarkers : ℝ) < (totalMarkers : ℝ) := by exact_mod_cast h1
+noncomputable def ldPanelRetentionFraction (panel : LDPanelRetention) : ℝ :=
+  (panel.retainedMarkers : ℝ) / (panel.totalMarkers : ℝ)
+
+theorem ldPanelRetentionFraction_mem (panel : LDPanelRetention)
+    (h0 : 0 < panel.retainedMarkers) (h1 : panel.retainedMarkers < panel.totalMarkers) :
+    0 < ldPanelRetentionFraction panel ∧ ldPanelRetentionFraction panel < 1 := by
+  have hr : (0 : ℝ) < (panel.retainedMarkers : ℝ) := by exact_mod_cast h0
+  have ht : (0 : ℝ) < (panel.totalMarkers : ℝ) := by
+    exact_mod_cast panel.totalMarkers_pos
+  have hlt : (panel.retainedMarkers : ℝ) < (panel.totalMarkers : ℝ) := by
+    exact_mod_cast h1
   unfold ldPanelRetentionFraction
   exact ⟨div_pos hr ht, (div_lt_one ht).mpr hlt⟩
 
@@ -1656,9 +1664,9 @@ recombination rate, effective size and marker counts.
 
 Empirical status: UNTESTED. -/
 noncomputable def ldBlockDetectionShare (recomb Ne : ℝ)
-    (retainedMarkers totalMarkers : ℕ) : ℝ :=
+    (panel : LDPanelRetention) : ℝ :=
   ldBandDetectionShare (ldRetentionPerGen recomb Ne)
-    (ldPanelRetentionFraction retainedMarkers totalMarkers)
+    (ldPanelRetentionFraction panel)
 
 /-- **Detection weight surrendered to clumping**, over and above the fraction of
 markers discarded, as a function of recombination rate and effective size.  This
@@ -1666,9 +1674,9 @@ is the price the frontier puts on the pruning convention.
 
 Empirical status: UNTESTED. -/
 noncomputable def ldBlockPruningDeficit (recomb Ne : ℝ)
-    (retainedMarkers totalMarkers : ℕ) : ℝ :=
+    (panel : LDPanelRetention) : ℝ :=
   ldPruningDetectionDeficit (ldRetentionPerGen recomb Ne)
-    (ldPanelRetentionFraction retainedMarkers totalMarkers)
+    (ldPanelRetentionFraction panel)
 
 /-- **Tight-linkage floor on the detection share**, `κ - sin(πκ)/π`.  It carries
 no recombination rate because it is the value the frontier saturates to as the
@@ -1676,18 +1684,16 @@ retention approaches one, and `ldTightLinkage_le_ldBlockDetectionShare` shows it
 bounds the detection share at every recombination rate and effective size.
 
 Empirical status: UNTESTED. -/
-noncomputable def ldTightLinkageDetectionShare (retainedMarkers totalMarkers : ℕ) : ℝ :=
-  ldPanelRetentionFraction retainedMarkers totalMarkers -
-    Real.sin (Real.pi *
-      ldPanelRetentionFraction retainedMarkers totalMarkers) / Real.pi
+noncomputable def ldTightLinkageDetectionShare (panel : LDPanelRetention) : ℝ :=
+  ldPanelRetentionFraction panel -
+    Real.sin (Real.pi * ldPanelRetentionFraction panel) / Real.pi
 
 /-- Accounting identity: what clumping keeps plus what it surrenders is the
 fraction of markers it retained. -/
 theorem ldBlockDetectionShare_add_deficit (recomb Ne : ℝ)
-    (retainedMarkers totalMarkers : ℕ) :
-    ldBlockDetectionShare recomb Ne retainedMarkers totalMarkers +
-        ldBlockPruningDeficit recomb Ne retainedMarkers totalMarkers =
-      ldPanelRetentionFraction retainedMarkers totalMarkers := by
+    (panel : LDPanelRetention) :
+    ldBlockDetectionShare recomb Ne panel + ldBlockPruningDeficit recomb Ne panel =
+      ldPanelRetentionFraction panel := by
   unfold ldBlockDetectionShare ldBlockPruningDeficit ldBandDetectionShare
     ldPruningDetectionDeficit
   ring
@@ -1695,12 +1701,11 @@ theorem ldBlockDetectionShare_add_deficit (recomb Ne : ℝ)
 /-- **Clumping loses detection weight faster than it loses markers**, at every
 recombination rate and effective size. -/
 theorem ldBlockDetectionShare_le_retention {recomb Ne : ℝ}
-    {retainedMarkers totalMarkers : ℕ}
+    {panel : LDPanelRetention}
     (hr0 : 0 ≤ recomb) (hr1 : recomb ≤ 1) (hNe : 1 < Ne)
-    (h0 : 0 < retainedMarkers) (h1 : retainedMarkers < totalMarkers) :
-    ldBlockDetectionShare recomb Ne retainedMarkers totalMarkers ≤
-      ldPanelRetentionFraction retainedMarkers totalMarkers := by
-  obtain ⟨hkpos, hklt⟩ := ldPanelRetentionFraction_mem h0 h1
+    (h0 : 0 < panel.retainedMarkers) (h1 : panel.retainedMarkers < panel.totalMarkers) :
+    ldBlockDetectionShare recomb Ne panel ≤ ldPanelRetentionFraction panel := by
+  obtain ⟨hkpos, hklt⟩ := ldPanelRetentionFraction_mem panel h0 h1
   have hp0 : 0 ≤ ldRetentionPerGen recomb Ne :=
     ld_retention_nonneg recomb Ne hr0 hr1 (le_of_lt hNe)
   unfold ldBlockDetectionShare
@@ -1761,12 +1766,12 @@ ones, so the gain being larger than one and the pruning deficit being positive
 are the same fact seen from two sides.  Everything on both sides is an explicit
 function of the recombination rate and the effective population size. -/
 theorem pruning_loses_detection_iff_whiteningGain_exceeds_one
-    {recomb Ne : ℝ} {retainedMarkers totalMarkers : ℕ}
+    {recomb Ne : ℝ} {panel : LDPanelRetention}
     (hr0 : 0 ≤ recomb) (hr1 : recomb ≤ 1) (hNe : 1 < Ne)
-    (h0 : 0 < retainedMarkers) (h1 : retainedMarkers < totalMarkers) :
+    (h0 : 0 < panel.retainedMarkers) (h1 : panel.retainedMarkers < panel.totalMarkers) :
     1 < ldWhiteningGain (ldRetentionPerGen recomb Ne) ↔
-      0 < ldBlockPruningDeficit recomb Ne retainedMarkers totalMarkers := by
-  obtain ⟨hkpos, hklt⟩ := ldPanelRetentionFraction_mem h0 h1
+      0 < ldBlockPruningDeficit recomb Ne panel := by
+  obtain ⟨hkpos, hklt⟩ := ldPanelRetentionFraction_mem panel h0 h1
   have hp0 : 0 ≤ ldRetentionPerGen recomb Ne :=
     ld_retention_nonneg recomb Ne hr0 hr1 (le_of_lt hNe)
   have hp1 : ldRetentionPerGen recomb Ne < 1 :=
@@ -1800,12 +1805,11 @@ dependence on `r`, and it runs in the same direction as
 `ImitationRigidity.ldWhiteningGain_of_ldRetention_antitone`: the tighter the
 block, the more there was to lose. -/
 theorem ldBlockPruningDeficit_antitone_in_recombination
-    {r₁ r₂ Ne : ℝ} {retainedMarkers totalMarkers : ℕ}
+    {r₁ r₂ Ne : ℝ} {panel : LDPanelRetention}
     (hr₁ : 0 ≤ r₁) (hr₂ : r₂ ≤ 1) (hNe : 1 < Ne) (hlt : r₁ < r₂)
-    (h0 : 0 < retainedMarkers) (h1 : retainedMarkers < totalMarkers) :
-    ldBlockPruningDeficit r₂ Ne retainedMarkers totalMarkers <
-      ldBlockPruningDeficit r₁ Ne retainedMarkers totalMarkers := by
-  obtain ⟨hkpos, hklt⟩ := ldPanelRetentionFraction_mem h0 h1
+    (h0 : 0 < panel.retainedMarkers) (h1 : panel.retainedMarkers < panel.totalMarkers) :
+    ldBlockPruningDeficit r₂ Ne panel < ldBlockPruningDeficit r₁ Ne panel := by
+  obtain ⟨hkpos, hklt⟩ := ldPanelRetentionFraction_mem panel h0 h1
   have hp2nn : 0 ≤ ldRetentionPerGen r₂ Ne :=
     ld_retention_nonneg r₂ Ne (by linarith) hr₂ (le_of_lt hNe)
   have hp1lt : ldRetentionPerGen r₁ Ne < 1 :=
@@ -1837,14 +1841,13 @@ end is approached as linkage tightens, so on a dense panel the detection share
 is pinned near a curve carrying no free parameters at all — which is what makes
 the prediction cheap to test. -/
 theorem ldTightLinkage_le_ldBlockDetectionShare {recomb Ne : ℝ}
-    {retainedMarkers totalMarkers : ℕ}
-    (h0 : 0 < retainedMarkers) (h1 : retainedMarkers < totalMarkers) :
-    ldTightLinkageDetectionShare retainedMarkers totalMarkers ≤
-      ldBlockDetectionShare recomb Ne retainedMarkers totalMarkers := by
-  obtain ⟨hkpos, hklt⟩ := ldPanelRetentionFraction_mem h0 h1
+    {panel : LDPanelRetention}
+    (h0 : 0 < panel.retainedMarkers) (h1 : panel.retainedMarkers < panel.totalMarkers) :
+    ldTightLinkageDetectionShare panel ≤ ldBlockDetectionShare recomb Ne panel := by
+  obtain ⟨hkpos, hklt⟩ := ldPanelRetentionFraction_mem panel h0 h1
   have hbound := ldPruningDetectionDeficit_le_sin_div_pi
     (decay := ldRetentionPerGen recomb Ne)
-    (kappa := ldPanelRetentionFraction retainedMarkers totalMarkers)
+    (kappa := ldPanelRetentionFraction panel)
     (le_of_lt hkpos) (le_of_lt hklt)
   unfold ldTightLinkageDetectionShare ldBlockDetectionShare
     ldBandDetectionShare
