@@ -508,6 +508,53 @@ Integrating out `E` then yields conditional probabilities through Gaussian CDFs 
 /-- Standard normal CDF, written as `Φ`. -/
 noncomputable def Phi : ℝ → ℝ := ProbabilityTheory.cdf (ProbabilityTheory.gaussianReal 0 1)
 
+/-- **`Φ` is strictly monotone.**
+
+`Φ` is not an opaque function: it is the CDF of `gaussianReal 0 1`, so this is a theorem,
+not an assumption. It was previously carried as a hypothesis `hPhiStrict : StrictMono Phi`
+at 27 sites across seven files, making every theorem downstream of an AUC or threshold
+chart conditional on a fact the corpus could simply have. Proving it here discharges all
+of them.
+
+The argument: `Φ b - Φ a` is the Gaussian mass of `Ioc a b`, and the Gaussian measure
+gives positive mass to every nonempty interval because Lebesgue measure is absolutely
+continuous with respect to it (`gaussianReal_absolutelyContinuous'`, which holds because
+the Gaussian density is everywhere positive). Finiteness of a probability measure then
+carries the strict inequality through `ENNReal.toReal`. -/
+theorem strictMono_Phi : StrictMono Phi := by
+  intro a b hab
+  have hv : (1 : NNReal) ≠ 0 := one_ne_zero
+  have hpos : 0 < (ProbabilityTheory.gaussianReal 0 1) (Set.Ioc a b) := by
+    rw [pos_iff_ne_zero]
+    intro h0
+    have hac : (volume : Measure ℝ) ≪ ProbabilityTheory.gaussianReal 0 1 :=
+      ProbabilityTheory.gaussianReal_absolutelyContinuous' 0 hv
+    have hvol : (volume : Measure ℝ) (Set.Ioc a b) = 0 := hac h0
+    rw [Real.volume_Ioc] at hvol
+    have hba : (0 : ℝ) < b - a := by linarith
+    exact (ENNReal.ofReal_pos.mpr hba).ne' hvol
+  have hsplit :
+      (ProbabilityTheory.gaussianReal 0 1) (Set.Iic b)
+        = (ProbabilityTheory.gaussianReal 0 1) (Set.Iic a)
+          + (ProbabilityTheory.gaussianReal 0 1) (Set.Ioc a b) := by
+    rw [← measure_union (Set.Iic_disjoint_Ioc le_rfl) measurableSet_Ioc,
+      Set.Iic_union_Ioc_eq_Iic hab.le]
+  have hlt :
+      (ProbabilityTheory.gaussianReal 0 1) (Set.Iic a)
+        < (ProbabilityTheory.gaussianReal 0 1) (Set.Iic b) := by
+    rw [hsplit]
+    exact ENNReal.lt_add_right (measure_ne_top _ _) hpos.ne'
+  show Phi a < Phi b
+  unfold Phi
+  rw [ProbabilityTheory.cdf_eq_real, ProbabilityTheory.cdf_eq_real,
+    measureReal_def, measureReal_def]
+  exact ENNReal.toReal_lt_toReal (measure_ne_top _ _) (measure_ne_top _ _) |>.mpr hlt
+
+/- No `Monotone Phi` corollary is stated here, deliberately: `Calibrator.monotone_Phi`
+already exists in `Condensation` and `Calibrator.Phi_monotone` in `DGP`, both proved
+independently. Either could now be `strictMono_Phi.monotone`; collapsing the two of them
+onto this lemma is a separate change in files this one does not own. -/
+
 /-- Heteroscedastic Gaussian noise assumption:
 for each ancestry coordinate `x`, the environmental noise follows `N(0, σ²(x))`. -/
 structure GaussianNoiseAssumption (k : ℕ) where
