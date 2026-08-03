@@ -1,3 +1,8 @@
+/-
+Copyright (c) 2026 Sauers. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Sauers
+-/
 import Calibrator.Probability
 import Calibrator.TransportIdentities
 -- Step 4b below needs `FiniteSpectralModel.degradation_eq_zero_iff`, which supplies a
@@ -1004,31 +1009,33 @@ The score drifts with ancestry while true liability does not.
 The calibrator must subtract the drift term (PC main effects). -/
 
 
-/-! ### Biological Mechanisms → Statistical DGPs
+/-! ### Biological mechanisms, and why there is no mechanism sum type here
 
-These lightweight structures capture the causal story and map it into the
-statistical DGPs used in the main proofs. -/
+`BiologicalMechanism`, an inductive over `DifferentialTagging`,
+`StratifiedEnvironment` and `BiologicalGxE`, is absent on purpose. Its section
+header read "These lightweight structures capture the causal story and map it
+into the statistical DGPs used in the main proofs", and no such map existed: no
+value of any of the four was ever constructed, no theorem in the corpus
+mentioned one, and the three carried one data field each. The declarations
+asserted a correspondence between a causal story and the statistical DGPs, and
+discharged it by being declared.
 
-structure DifferentialTagging (k : ℕ) where
-  /-- Tagging efficiency as a function of ancestry (LD decay). -/
-  tagging_efficiency : (Fin k → ℝ) → ℝ
+That is the shape worth naming, because it survives every check that reads
+proofs. There was nothing to verify: no `sorry`, no axiom, no weakened
+statement, no hypothesis anyone had to discharge -- just four names whose
+existence stood in for the reduction the prose claimed. A reader scanning this
+file for "does the development connect mechanism to DGP" found four structures
+and a sum type and stopped there.
 
-
-structure StratifiedEnvironment (k : ℕ) where
-  /-- Additive environmental bias correlated with ancestry. -/
-  beta_env : ℝ
-
-
-structure BiologicalGxE (k : ℕ) where
-  /-- Multiplicative environmental scaling of genetic effect. -/
-  scaling : (Fin k → ℝ) → ℝ
-
-
-inductive BiologicalMechanism (k : ℕ)
-  | taggingDecay (m : DifferentialTagging k)
-  | stratifiedEnv (m : StratifiedEnvironment k)
-  | gxe (m : BiologicalGxE k)
-
+The mechanisms that are actually load-bearing are declared where they are used
+and are consumed by theorems: `LDDecayMechanism` below carries `distance` as
+well as `tagging_efficiency`, and `decaySlope` over it is what
+`ld_decay_implies_nonlinear_calibration_proved` in `proofs/Calibrator.lean`
+shows is not affine. GxE likewise enters through `GeneEnvironmentInterplay` and
+`CausalInference` as variance terms in theorems rather than as a constructor.
+Re-adding a mechanism type is
+fine once a theorem consumes it; a taxonomy no proof reads is a claim, not a
+formalization. -/
 
 /-! ### Normalization-Prevalence Bias (Cross-Ancestry Calibration)
 
@@ -2644,10 +2651,12 @@ theorem PGSEvolutionaryModel.coordinateSummary_explicit
       PGSEvolutionaryModel.toEvo,
       sharedLDRetention, mutationLDErosion, migrationLDBoost, fstEquilibrium]
 
-/-- Phi is monotone increasing because it is the standard normal CDF. -/
-theorem Phi_monotone : Monotone Phi := by
-  simpa [Phi] using
-    (ProbabilityTheory.monotone_cdf (μ := ProbabilityTheory.gaussianReal 0 1))
+/-- Monotonicity of `Phi`, derived from the strict statement rather than proved again.
+
+    This was the second of two independent appeals to `ProbabilityTheory.monotone_cdf`
+    in the corpus, alongside `Condensation.monotone_Phi`. Both now go through
+    `strictMono_Phi`, so there is one derivation and the spellings cannot drift. -/
+theorem Phi_monotone : Monotone Phi := strictMono_Phi.monotone
 
 /-! ### Step 3: Metric evaluation from explicit target signal and additive losses
 
