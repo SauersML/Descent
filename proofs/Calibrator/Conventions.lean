@@ -78,10 +78,10 @@ section Ploidy
 
 /-- Number of homologous copies per locus. Every non-exponent factor of two in
 this development traces to this constant, and every factor of four to twice
-it. The corpus currently restates the convention inline at ninety-nine
-definition sites: seventy-eight carrying a two and twenty-one a four. The
-theorems in this section tie the independently written ones back here, so that
-drift between them is a compile error rather than a silent disagreement. -/
+it. Forty-eight definition bodies outside this file carry such a two and
+fourteen carry such a four. The theorems in this file tie the independently
+written ones back here, so that drift between them is a compile error rather
+than a silent disagreement. -/
 noncomputable def ploidy : ℝ := 2
 
 /-- Genotype variance at a locus in Hardy-Weinberg proportions, for dosage
@@ -274,7 +274,16 @@ second is ours.
     `0.050` simulated). The identity is exact in practice as well as in Lean,
     which is the strongest form this kind of claim can take: a conversion that
     is proved and then found to hold to the last reported digit on data it was
-    not fitted to. -/
+    not fitted to.
+
+    Power: across the eight frequency cells of
+    `validation/empirical/differential/cluster/fam_fst_allel_crosscheck.py`
+    (`(p₁, p₂)` from `(0.70, 0.75)` to `(0.10, 0.90)`) the predicted Nei
+    estimate spans `0.0031` to `0.6400` and the Hudson estimate `0.0063` to
+    `0.7805`, so the ratio between the conventions runs from `2.0` at the
+    small-divergence end to `1.22` at the large one. A conversion off by any
+    constant factor, and any conversion linear in `G`, separates on that
+    design. -/
 theorem hudsonFst_eq_of_neiGst (p₁ p₂ : ℝ)
     (hpos : 0 < p₁ * (1 - p₂) + p₂ * (1 - p₁))
     (hbar : meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) ≠ 0) :
@@ -1111,5 +1120,190 @@ theorem pcTargetAxisEfficacy_eq_proportionalReduction (residual baseline : ℝ) 
   refine ⟨rfl, rfl, rfl⟩
 
 end EquilibriumAgreements
+
+section InlinedConstants
+
+/-! ## The remaining inline restatements, tied back
+
+Each definition below spells a `2` or a `4` out in its own body, in its own module. The
+theorems here are the edges between those literals and `ploidy`: rewrite `ploidy` and each
+one stops compiling, which is the whole of their purpose. They are not restatements of the
+definitions — the left-hand sides do not mention `ploidy`, so the equality holds only
+because `ploidy` reduces to `2`.
+
+Where the constant is a coalescent scaling the tie goes through `coalescentTimeScale`,
+which is `ploidy · Nₑ`; where it is the diploid genotype variance it goes through
+`hweGenotypeVariance`; where it is a scaled rate it goes through `scaledMigrationRate`,
+which `scaledMigrationRate_eq_ploidy_form` already forces. -/
+
+/-- **The `2 p (1 - p)` in the effective sample size is the diploid genotype variance.**
+`StatisticalGeneticsMethodology.effectiveSampleSizeFromSE` inverts `SE² · Var(dosage)`, and
+`Var(dosage)` under Hardy-Weinberg proportions is `hweGenotypeVariance`. Written inline the
+two was free; here it is the ploidy, and an SE reported on a haploid dosage scale would
+have to change this file rather than that definition. -/
+theorem effectiveSampleSizeFromSE_uses_hweGenotypeVariance (se p : ℝ) :
+    effectiveSampleSizeFromSE se p = 1 / (se ^ 2 * hweGenotypeVariance p) := by
+  unfold effectiveSampleSizeFromSE hweGenotypeVariance ploidy; ring
+
+/-- **Both twos in the mutation-drift heterozygosity step are the ploidy.** The drift term
+loses a fraction `1 / (ploidy · Nₑ)` per generation — the reciprocal coalescent time scale —
+and the mutation term gains `ploidy · mu` because both copies at the locus are exposed. A
+haploid recursion would carry neither. -/
+theorem hetStepWithMutation_uses_coalescentTimeScale (Ne mu H : ℝ) :
+    hetStepWithMutation Ne mu H
+      = (1 - 1 / coalescentTimeScale Ne) * H + ploidy * mu * (1 - H) := by
+  unfold hetStepWithMutation ploidy; rw [coalescentTimeScale_eq]
+
+/-- **The closed-population retention is the coalescent retention over the horizon.** -/
+theorem retention_uses_coalescentTimeScale (r : ClosedPopulationNoMutation) :
+    r.retention = (1 - 1 / coalescentTimeScale r.Ne) ^ r.horizon := by
+  unfold ClosedPopulationNoMutation.retention; rw [coalescentTimeScale_eq]
+
+/-- **Both twos in the identity-flow step are the ploidy.** Identity is created at
+`1 / (ploidy · Nₑ)` per generation, and destroyed at `ploidy · rate` because either of the
+two lineages of a sampled pair can be hit by the homogenising force. That second two is
+what makes the fixed point `1 / (1 + 4 Nₑ · rate)` rather than `1 / (1 + 2 Nₑ · rate)`, so
+it is the one a reader most needs pinned. -/
+theorem ibdFlowStep_uses_coalescentTimeScale (Ne rate F : ℝ) :
+    ibdFlowStep Ne rate F
+      = F + (1 - F) / coalescentTimeScale Ne - ploidy * rate * F := by
+  unfold ibdFlowStep ploidy; rw [coalescentTimeScale_eq]
+
+/-- **The multiplicative identity recurrence carries the same coalescent scale.** -/
+theorem ibdRecurrenceStep_uses_coalescentTimeScale (Ne rate x : ℝ) :
+    ibdRecurrenceStep Ne rate x
+      = (1 - rate) ^ 2 * (1 / coalescentTimeScale Ne
+          + (1 - 1 / coalescentTimeScale Ne) * x) := by
+  unfold ibdRecurrenceStep; rw [coalescentTimeScale_eq]
+
+/-- **The rest point of that recurrence carries it too**, in both of its constants: the
+`2 Nₑ` is the coalescent time scale and the `2 - rate` is `ploidy - rate`, the two lineages
+less the one disrupting event they share. -/
+theorem ibdRecurrenceFixedPoint_uses_coalescentTimeScale (Ne rate : ℝ) :
+    ibdRecurrenceFixedPoint Ne rate
+      = (1 - rate) ^ 2
+          / ((1 - rate) ^ 2 + coalescentTimeScale Ne * rate * (ploidy - rate)) := by
+  unfold ibdRecurrenceFixedPoint ploidy; rw [coalescentTimeScale_eq]
+
+/-- **Both denominators in the scaled heterozygosity decay are the coalescent time
+scale**, so `θ / (2 Nₑ)` is `θ` measured in coalescent units and not a second convention. -/
+theorem hetDecayFromScaled_uses_coalescentTimeScale (Ne θ : ℝ) :
+    hetDecayFromScaled Ne θ
+      = (1 - 1 / coalescentTimeScale Ne) * (1 - θ / coalescentTimeScale Ne) := by
+  unfold hetDecayFromScaled; rw [coalescentTimeScale_eq]
+
+/-- **The `F_ST` flow step is `ibdFlowStep` at the summed rate, with the same two twos.**
+Migration and mutation enter through their sum, and the `ploidy` in front of that sum is
+the same "either lineage" factor as in `ibdFlowStep`. -/
+theorem fstDriftFlowStep_uses_coalescentTimeScale (p : EvolutionaryParameters) (F : ℝ) :
+    fstDriftFlowStep p F
+      = F + (1 - F) / coalescentTimeScale p.Ne - ploidy * (p.mig + p.mu) * F := by
+  unfold fstDriftFlowStep ploidy; rw [coalescentTimeScale_eq]
+
+/-- **The `2 p` in Fisher's average effect is the expected diploid dosage.** The dominance
+deviation is weighted by `1 - ploidy · p`, which is `q - p`, and `ploidy · p` is `E[X]` for
+a dosage `X` on `0, 1, …, ploidy` in Hardy-Weinberg proportions. On a haploid scale the
+weight is not this expression, so the constant is forced by the coding and belongs here. -/
+theorem averageEffect_uses_ploidy (m : OneLocusArchitecture) :
+    m.averageEffect = m.a + m.d * (1 - ploidy * m.p) := by
+  unfold OneLocusArchitecture.averageEffect ploidy; ring
+
+/-- **The four in the quadratic stepping-stone form is twice the ploidy**, the same
+`4 Nₑ` scaling as every other migration-drift denominator in the corpus. Only the powers of
+`m` and `σ²` distinguish this form from `demoSteppingStoneFst`; the constant does not. -/
+theorem steppingStoneFstQuadratic_uses_ploidy (d Ne m σ_sq : ℝ) :
+    steppingStoneFstQuadratic d Ne m σ_sq
+      = d / (d + 2 * ploidy * Ne * σ_sq ^ 2 * m ^ 2) := by
+  unfold steppingStoneFstQuadratic ploidy; ring
+
+/-- **The two-locus drift step carries the coalescent time scale.** `driftLDStep` creates
+identity at `1 / (ploidy · Nₑ)`, the same rate `driftLDCreationRate` names. -/
+theorem driftLDStep_uses_coalescentTimeScale (Ne c Q : ℝ) :
+    driftLDStep Ne c Q
+      = (1 - c) ^ 2 * (1 / coalescentTimeScale Ne
+          + (1 - 1 / coalescentTimeScale Ne) * Q) := by
+  unfold driftLDStep; rw [coalescentTimeScale_eq]
+
+/-- **Its slope in `Q` carries it too.** -/
+theorem driftLDRetention_uses_coalescentTimeScale (Ne c : ℝ) :
+    driftLDRetention Ne c = (1 - c) ^ 2 * (1 - 1 / coalescentTimeScale Ne) := by
+  unfold driftLDRetention; rw [coalescentTimeScale_eq]
+
+/-- **And so does its equilibrium**, which is a ratio of two expressions in that one
+scale rather than an independently chosen constant. -/
+theorem driftLDEquilibrium_uses_coalescentTimeScale (Ne c : ℝ) :
+    driftLDEquilibrium Ne c
+      = (1 - c) ^ 2 * (1 / coalescentTimeScale Ne) / (1 - driftLDRetention Ne c) := by
+  unfold driftLDEquilibrium; rw [coalescentTimeScale_eq]
+
+/-- **The `ρ` of the Ohta-Kimura approximation is the coalescent-scaled recombination
+rate**, `2 · ploidy · Nₑ · c`, the same scaling `scaledMutationRate` applies to `μ` and
+`scaledMigrationRate` to `m`. The remaining `2`, `10` and `11` are coefficients of the
+moment recursion and are deliberately left as literals: they are not conventions, and
+tying them to `ploidy` would assert a derivation this corpus does not have. -/
+theorem ohtaKimuraSigmaDSq_uses_ploidy (Ne c : ℝ) :
+    ohtaKimuraSigmaDSq Ne c
+      = (10 + 2 * ploidy * Ne * c)
+          / ((2 + 2 * ploidy * Ne * c) * (11 + 2 * ploidy * Ne * c)) := by
+  simp only [ohtaKimuraSigmaDSq, ploidy]
+  ring
+
+/-- **The finite-deme island `F_ST` is the identity fraction at the deme-corrected scaled
+migration rate.** Its `4 Nₑ m` is `scaledMigrationRate`, which
+`scaledMigrationRate_eq_ploidy_form` already forces to `2 · ploidy · Nₑ · m`; the deme
+correction multiplies that rate and does not touch the constant. This is the second
+consumer of the one bridge, so the finite-`d` form and its `d → ∞` limit cannot acquire
+different conventions. -/
+theorem islandFstFiniteDemes_eq_scaled (Ne m d : ℝ) :
+    islandFstFiniteDemes Ne m d
+      = fstMutationDriftEquilibrium (scaledMigrationRate Ne m * islandDemeCorrection d) := by
+  unfold islandFstFiniteDemes fstMutationDriftEquilibrium scaledMigrationRate; ring
+
+/-- **The `2 μ` in the stepping-stone characteristic length counts the two lineages of a
+sampled pair.** Mutation destroys the identity of a pair at rate `ploidy · μ`, so
+`1 / (ploidy · μ)` is the time available to the diffusion and `L² = m σ² / (ploidy · μ)`
+is the balance. Written inline the two read as arbitrary; it is the same two that
+`coalescentTimeScale` puts in front of `Nₑ`. -/
+theorem steppingStoneCharacteristicLength_uses_ploidy (m σ_sq μ : ℝ) :
+    steppingStoneCharacteristicLength m σ_sq μ = Real.sqrt (m * σ_sq / (ploidy * μ)) := by
+  unfold steppingStoneCharacteristicLength ploidy; ring
+
+/-- **All three twos in the serial-founder within-deme time are coalescent time scales.**
+A pair either coalesces inside the chain, on the scale `coalescentTimeScale N`, or survives
+into the ancestral population and waits a further `coalescentTimeScale Nanc`. Three literal
+twos in one body is exactly the shape in which one of them gets changed alone. -/
+theorem serialFounderWithinTime_uses_coalescentTimeScale (N Nanc tAnc : ℝ) :
+    serialFounderWithinTime N Nanc tAnc
+      = coalescentTimeScale N * (1 - Real.exp (-tAnc / coalescentTimeScale N))
+          + Real.exp (-tAnc / coalescentTimeScale N) * (tAnc + coalescentTimeScale Nanc) := by
+  unfold serialFounderWithinTime coalescentTimeScale ploidy; ring
+
+/-- **Nei's `G_ST` between a frequency and its fold is the squared contrast.** At
+`p₂ = 1 - p` the mean frequency is `1/2`, the total heterozygosity `ploidy · p̄ (1 - p̄)`
+is `1/2`, and `G_ST` collapses to `(1 - ploidy · p)²`. This is the only place the
+denominator's `ploidy` is visible as a number, and it is what makes the next theorem an
+identity rather than a proportionality. -/
+theorem neiGst_at_fold (p : ℝ) : neiGst p (1 - p) = (1 - ploidy * p) ^ 2 := by
+  unfold neiGst meanAlleleFreq ploidy; ring
+
+/-- **The two-atom modulus curves are Nei's `G_ST` at the fold, divided by the product of
+the two masses.**
+
+`BundleRigidity.mOne` and `BundleRigidity.mTwo` share the numerator `|1 - 2p|`, and their
+product is `(1 - 2p)² / (p (1 - p))`. The numerator is `neiGst p (1 - p)` by `neiGst_at_fold`
+and the denominator is the product of the family's two masses, so the constant inside the
+modulus curves is forced by the `ploidy` in `neiGst`'s normalisation rather than chosen.
+
+This is the folded-spectrum reading of that module stated as an equation: `τ p = 1 - p` is
+the ancestral/derived swap, `neiGst p (1 - p)` is symmetric under it, and the two modulus
+curves are exchanged by it. `TwoAtom` imports only Mathlib and that is deliberate; the
+statement therefore lives here, where both sides are visible. -/
+theorem mOne_mul_mTwo_eq_neiGst_at_fold (p : ℝ) :
+    BundleRigidity.mOne p * BundleRigidity.mTwo p = neiGst p (1 - p) / (p * (1 - p)) := by
+  rw [neiGst_at_fold]
+  unfold BundleRigidity.mOne BundleRigidity.mTwo ploidy
+  rw [div_mul_div_comm, ← sq_abs (1 - 2 * p), pow_two]
+
+end InlinedConstants
 
 end Calibrator

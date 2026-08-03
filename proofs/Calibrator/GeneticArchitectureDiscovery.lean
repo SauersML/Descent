@@ -64,7 +64,13 @@ section GWASDiscovery
     `RareVariantPortability` reasons about.
 
     Empirical status: VALIDATED under this convention (matches simulated NCP to
-    three significant figures across mismatched tag and causal frequencies). -/
+    three significant figures across mismatched tag and causal frequencies).
+
+    Power: the design is the frequency mismatch itself. Read against the tag's
+    frequency instead of the causal one, the predicted NCP is a factor of
+    `0.76` to `1.33` of this form across that design, and exactly `1.00` where
+    the two frequencies coincide, so a grid at matched frequencies would have
+    had no power and this one does. -/
 def discoveryNCP (n β maf_causal ld : ℝ) : ℝ :=
   n * β ^ 2 * ld ^ 2 * genotypeVarianceHWE maf_causal
 

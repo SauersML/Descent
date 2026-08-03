@@ -58,7 +58,7 @@ theorem clinical_benefit_increases_with_r2
     If R²_EUR > R²_AFR and benefit = α × R² with α > 0, then
     clinical benefit for EUR patients exceeds that for AFR patients.
     The benefit gap α × (R²_EUR - R²_AFR) > 0 follows from the R² gap. -/
-theorem portability_creates_benefit_gap
+theorem mul_sub_mul_pos_of_lt
     (α r2_eur r2_afr : ℝ)
     (h_α : 0 < α)
     (h_r2_gap : r2_afr < r2_eur)
@@ -218,7 +218,15 @@ section ResourceAllocation
     exceed heritability does not typecheck as this one.
 
     Empirical status: VALIDATED (out-of-sample GWAS simulation, n = 500 to
-    50000, agreement to 3-4 decimals). -/
+    50000, agreement to 3-4 decimals).
+
+    Power: the prediction is nowhere near constant on that sweep. Over the
+    hundredfold range of `n` the predicted `R²` climbs from a small fraction of
+    `h²` towards its ceiling, so it ranges within `0.000` to `0.500` at
+    `h² = 0.5` and within `0.000` to `0.300` at `h² = 0.3`, while the form
+    without the prefactor runs over the same sweep up to `1.000`. The endpoints
+    quoted are the law's own limits as `n → 0` and `n → ∞`; the simulation
+    sampled inside them. -/
 noncomputable def expectedR2FromN (n h2 M : ℝ) : ℝ :=
   h2 * (n * h2 / (n * h2 + M))
 

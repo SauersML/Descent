@@ -578,8 +578,12 @@ theorem belowCeiling_add_rankOne_iff
 covariance of the *signal-carrying* genotype matrix is itself a legal member of
 the background class: the polygenic signal has been absorbed into background
 structure exactly at the level of second moments. This alone does not identify
-the full probability laws outside a Gaussian model. -/
-theorem spiked_genotype_covariance_belowCeiling
+the full probability laws outside a Gaussian model.
+
+The threshold is in the name because it is not a technicality: above it the
+conclusion is false, and `belowCeiling_add_rankOne_iff` is the equivalence that
+says so. -/
+theorem spiked_genotype_covariance_belowCeiling_of_threshold
     {Ω : Type*} (E : ExpFunctional Ω)
     (noise : Ω → ι → ℝ) (factor : Ω → ℝ)
     (scale : ℝ) (loading witness : ι → ℝ) (ceiling : ℝ)
@@ -1047,7 +1051,14 @@ resolvent functional by 34 percent at `aspect = 0.3`, as
 Empirical status: VALIDATED. Simulated ridge regression on genotype-like
 designs matches `tr(B (S + ridge)⁻¹)/k` computed from this fixed point, for
 evaluation geometries that commute with the design and for ones in general
-position alike. -/
+position alike.
+
+Power: the check separates this equation from the aspect-free rival by a wide
+margin at the design it runs on (`k = 120`, `n = 400`, `ridge = 0.35`, so
+`aspect = 0.30`): taking the resolvent functional this fixed point predicts as
+`1.00`, the equation without the aspect term predicts `1.34` there. The two
+evaluation geometries, commuting and general position, are checked against the
+same fixed point, so the agreement is not an artifact of one alignment. -/
 def ridgeBalance (aspect : ℝ) (eig : ι → ℝ) (ridge u : ℝ) : ℝ :=
   (1 - 1 / u) -
     aspect * ((∑ i, eig i / (eig i + ridge * u)) / (Fintype.card ι : ℝ))

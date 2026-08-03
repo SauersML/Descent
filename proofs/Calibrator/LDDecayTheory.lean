@@ -50,7 +50,15 @@ section OhtaKimuraDecay
     three or four significant figures across the tested range of `Ne`, `r` and
     `t` (for instance `0.3312` predicted against `0.3308` observed). The
     specific concern that this conflates decay of `D` with decay of `r²` was
-    tested and is unfounded. -/
+    tested and is unfounded.
+
+    Power: the `r` grid of
+    `validation/empirical/differential/cluster/fam_ld_decay.py` straddles
+    `1/(2Ne) = 0.00250` at `Ne = 200`, and the predicted per-generation
+    retention runs from `0.9975` at `r = 0` to `0.8978` at `r = 0.1` across it.
+    Two controls pin the factors separately — no recombination isolates
+    `(1 - 1/(2Ne))`, enormous `Ne` isolates `(1 - r)` — so a product that came
+    out right through compensating errors in its two factors would fail. -/
 noncomputable def ldRetentionPerGen (r Ne : ℝ) : ℝ :=
   (1 - r) * (1 - 1 / (2 * Ne))
 
@@ -81,7 +89,17 @@ theorem ld_retention_nonneg (r Ne : ℝ)
 /-- **LD after t generations.**
     D(t) = D(0) · (ldRetention)^t.
 
-    Empirical status: VALIDATED alongside `ldRetentionPerGen`. -/
+    Empirical status: VALIDATED against the two-locus Wright-Fisher
+    trajectories of
+    `validation/empirical/differential/cluster/fam_ld_decay.py`, which measure
+    `E[D_t]/D₀` over a 60-generation window. That measured quantity is the
+    `t`-generation retention this definition computes, so the tag rests on a
+    measurement rather than on the per-generation sibling.
+
+    Power: over that window at `Ne = 200` the predicted retention spans
+    `0.8605` at `r = 0`, `0.7405` at `r = 0.0025`, `0.2561` at `r = 0.02` and
+    `0.0015` at `r = 0.1` — nearly three orders of magnitude, so a wrong
+    exponent in `t` cannot survive the grid. -/
 noncomputable def ldAfterGenerations (D₀ r Ne : ℝ) (t : ℕ) : ℝ :=
   D₀ * (ldRetentionPerGen r Ne) ^ t
 
@@ -331,7 +349,14 @@ noncomputable def driftLDRetention (Ne c : ℝ) : ℝ :=
     Empirical status: VALIDATED as the two-locus identity measure -- it is the
     exact fixed point of `driftLDStep` and simulation confirms the family's
     `E[D]` retention to within 0.07%. MEASURED to differ from `σ_d²` by +76%
-    at `ρ = 0.5`. -/
+    at `ρ = 0.5`.
+
+    Power: over the `ρ` grid `0.5`, `2`, `10`, `40` at `Nₑ = 150` this form
+    predicts `0.6664`, `0.3322`, `0.0888` and `0.0220`, a thirtyfold span, while
+    the `σ_d²` approximation predicts `0.3652`, `0.2308`, `0.0794` and `0.0233`
+    on the same grid. Because the grid reaches below `ρ = 10`, where the two
+    part company by a factor of nearly two, it can tell them apart; a
+    loosely-linked grid could not. -/
 noncomputable def driftLDEquilibrium (Ne c : ℝ) : ℝ :=
   (1 - c) ^ 2 * (1 / (2 * Ne)) / (1 - driftLDRetention Ne c)
 
@@ -358,7 +383,13 @@ not justified.
     Empirical status: VALIDATED against two-locus Wright-Fisher simulation --
     within 3.5% at `ρ = 0.5` and 1% at `ρ = 2`, where the identity measure
     `driftLDEquilibrium` is +76% and +45%. The differential check
-    `ohtaKimuraSigmaDSq-matches-simulation` is the standing check. -/
+    `ohtaKimuraSigmaDSq-matches-simulation` is the standing check.
+
+    Power: over the same `ρ` grid `0.5`, `2`, `10`, `40` at `Nₑ = 150` this
+    approximation predicts `0.3652`, `0.2308`, `0.0794` and `0.0233`, a
+    fifteenfold span, against the identity measure's `0.6664`, `0.3322`,
+    `0.0888` and `0.0220`. The tightly-linked end of the grid is where the two
+    separate, and it is included. -/
 noncomputable def ohtaKimuraSigmaDSq (Ne c : ℝ) : ℝ :=
   let ρ := 4 * Ne * c
   (10 + ρ) / ((2 + ρ) * (11 + ρ))

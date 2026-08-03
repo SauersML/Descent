@@ -80,7 +80,7 @@ theorem allelic_variance_zero_at_fixation_one :
     More directly, D ≤ p_i·p_j because P(AB) ≤ 1 and p_i·p_j > 0.
     We prove the weaker statement: |D| ≤ p_i·p_j when D² ≤ p_i·p_j·(1-p_i)·(1-p_j)
     (which is the requirement that r² ≤ 1). -/
-theorem ld_bounded_by_freq (D p_i p_j : ℝ)
+theorem abs_le_sqrt_of_sq_le (D p_i p_j : ℝ)
     (h_pi : 0 < p_i) (h_pi1 : p_i < 1)
     (h_pj : 0 < p_j) (h_pj1 : p_j < 1)
     (h_r2_le_one : D ^ 2 ≤ p_i * p_j * ((1 - p_i) * (1 - p_j))) :
@@ -130,7 +130,14 @@ convention requires. Use this when the input came from
 
     Empirical status: VALIDATED (direct simulation of r² agrees with the
     dosage-covariance reading to four decimals; the haplotype reading is
-    exactly one quarter of it). -/
+    exactly one quarter of it).
+
+    Power: the four `(p_A, p_B, D)` cells of
+    `validation/empirical/popgen_defs/check_ldsc.py` put the predicted `r²` at
+    `0.6400`, `0.1984`, `0.0744` and `0.0000`, while the rival haplotype
+    reading predicts `0.1600`, `0.0496`, `0.0186` and `0.0000` on the same
+    cells. The span is most of the unit interval, so the factor of four is read
+    off the spread rather than off one point. -/
 noncomputable def ldCorrelationSqOfHaplotypeD (D p_i p_j : ℝ) : ℝ :=
   ldCorrelationSq (2 * D) p_i p_j
 
@@ -231,7 +238,7 @@ section BlockDiagonalLD
     Populations with older haplotype structure have smaller LD blocks.
     Populations that experienced bottlenecks have larger blocks
     due to bottleneck-induced LD. -/
-theorem shorter_ld_smaller_blocks
+theorem blockSize_div_lt_one_of_lt
     (block_pop₁ block_pop₂ : ℝ)
     (h_smaller : block_pop₁ < block_pop₂)
     (h_nn : 0 < block_pop₁) :
@@ -261,7 +268,7 @@ theorem smaller_blocks_more_segments
     each block's contribution shrinks, but the total depends on the product.
     We show: if two populations have the same total signal but different
     block counts, the per-block contribution is inversely proportional. -/
-theorem total_portability_from_blocks
+theorem div_lt_div_of_lt_denom
     (total_signal n₁ n₂ : ℝ)
     (h_signal : 0 < total_signal)
     (h_n₁ : 0 < n₁) (h_n₂ : 0 < n₂)
@@ -365,7 +372,13 @@ noncomputable def ldsrExpectedBetaSq (h2 M ell_j N : ℝ) : ℝ :=
     stratification invisible at any severity.
 
     Empirical status: VALIDATED in the corrected form (implied `a` constant to
-    within 15 percent across a sixteenfold range of `M`). -/
+    within 15 percent across a sixteenfold range of `M`).
+
+    Power: the design separates the two candidate forms by orders of magnitude
+    rather than by a margin. At `N = 8·10⁵` and `M = 9·10⁵` the corrected form
+    predicts `420.8` where the divided form predicts `1.32`; the sixteenfold
+    sweep of `M` moves the divided form's implied `a` by that whole factor
+    while the corrected form's stays flat. -/
 noncomputable def ldsrExpectedChi2 (N h2 M ell_j a : ℝ) : ℝ :=
   N * h2 / M * ell_j + N * a + 1
 
@@ -392,7 +405,7 @@ theorem ldsr_with_confounding_eq (N h2 M ell_j a : ℝ)
 /-- **LD score varies across populations.**
     Populations with longer LD blocks have higher average LD scores
     due to more extensive correlation. -/
-theorem higher_ld_scores_ratio
+theorem scoreRatio_lt_one_of_lt
     (ell_high ell_low : ℝ)
     (h_higher : ell_low < ell_high)
     (h_nn : 0 < ell_low) :
@@ -413,7 +426,7 @@ theorem ldsr_increases_with_ell (N h2 M ell₁ ell₂ a : ℝ)
     Using LD scores from population A to analyze GWAS from B
     produces biased h² estimates. The bias direction depends on
     whether LD_A > LD_B or LD_A < LD_B. -/
-theorem cross_ancestry_ldsr_biased
+theorem mul_div_ne_self_of_ne
     (h2_true h2_estimated ell_discovery ell_reference : ℝ)
     (h_formula : h2_estimated = h2_true * ell_discovery / ell_reference)
     (h_mismatch : ell_discovery ≠ ell_reference)
@@ -636,11 +649,8 @@ theorem admixture_ld_confounds_pgs
     (h_diff : p_A ≠ p_B)
     (h_r : 0 ≤ r) (h_r_lt : r < 1)
     (h_γ : γ ≠ 0) :
-    -- The confounding bias = γ × D is nonzero
-    let D := admixtureLDMagnitude alpha p_A p_B r g
-    let observed_effect := β + γ * D
-    observed_effect ≠ β := by
-  simp only
+    -- The observed effect carries the confounding bias γ × D
+    β + γ * admixtureLDMagnitude alpha p_A p_B r g ≠ β := by
   intro h
   have h_prod : γ * admixtureLDMagnitude alpha p_A p_B r g = 0 := by linarith
   rcases mul_eq_zero.mp h_prod with h1 | h2

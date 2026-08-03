@@ -69,8 +69,9 @@ that the formula is right — it is evidence that the design could not tell. Sec
 proves the point exactly: on any symmetric design the benchmark ratio and its *square*
 are indistinguishable, so no symmetric grid can ever separate them.
 
-The obligation this creates: `Empirical status: VALIDATED` must record the spread of the
-predicted quantity across the design. `scripts/check-identifications.py` now enforces it.
+The obligation this creates: a docstring claiming an empirical status of `VALIDATED` must
+record the spread of the predicted quantity across the design, in a `Power:` clause.
+`scripts/check-identifications.py` now enforces it.
 -/
 
 open scoped BigOperators
@@ -395,7 +396,8 @@ mechanically checkable, and each is now checked.
    never inherit the tag from a sibling identity. Guard 3j enforces the no-inheritance
    half.
 
-3. **A validation must report its power.** `Empirical status: VALIDATED` must record the
+3. **A validation must report its power.** A docstring claiming an empirical status of
+   `VALIDATED` must record, in a `Power:` clause, the
    spread of the predicted quantity across the design; a prediction that is constant on
    the design tests nothing about shape (`symmetric_design_has_no_power`). Guard 3k
    rejects validation notes whose recorded predictions are all equal.
