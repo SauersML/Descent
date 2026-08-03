@@ -99,6 +99,19 @@ theorem abs_mean_le_sum_abs (P : FinitePrior n) (f : Fin (n + 1) → ℝ) :
 
 end FinitePrior
 
+/-- The finite probability simplex, represented by the probability vectors of
+actual `PMF`s.  This is the convex parameter class on which the certificate
+calculus acts; convexity is not inferred from a suggestive file-level comment. -/
+noncomputable def finitePriorCarrier (n : ℕ) : Set (Fin (n + 1) → ℝ) :=
+  Set.range fun P : FinitePrior n ↦ fun i ↦ P.probability i
+
+/-- The prior class underlying every finite mixture experiment is convex.
+The proof obligation is visible until the `PMF` convex-mixture construction is
+developed locally; convexity is not accepted as an experiment field. -/
+theorem finitePriorCarrier_convex (n : ℕ) :
+    Convex ℝ (finitePriorCarrier n) := by
+  sorry
+
 /-- Numerical ingredients of a finite fuzzy-hypothesis problem.  There are no
 `Prop` fields: validity conditions are derived predicates below. -/
 structure FiniteMomentCertificateProblem (n : ℕ) where
@@ -240,6 +253,20 @@ makes the theorem total at grade zero while retaining order `1/K`. -/
 noncomputable def fixedGradeExponent (K : ℕ) : ℝ :=
   1 / (K + 1 : ℝ)
 
+/-- The chosen exponent is quantitatively of order `1 / K`, with explicit
+constants, rather than merely described by asymptotic notation. -/
+theorem fixedGradeExponent_bounds (K : ℕ) (hK : 1 ≤ K) :
+    1 / (2 * (K : ℝ)) ≤ fixedGradeExponent K ∧
+      fixedGradeExponent K ≤ 1 / (K : ℝ) := by
+  have hk : (1 : ℝ) ≤ K := by exact_mod_cast hK
+  have hkpos : (0 : ℝ) < K := lt_of_lt_of_le zero_lt_one hk
+  unfold fixedGradeExponent
+  constructor
+  · rw [div_le_div_iff₀ (mul_pos (by norm_num) hkpos) (by positivity)]
+    nlinarith
+  · rw [div_le_div_iff₀ (by positivity) hkpos]
+    nlinarith
+
 /-- The explicit polynomial-over-logarithmic factor from the program. -/
 noncomputable def fixedGradeGapScale (K n : ℕ) : ℝ :=
   (n + 2 : ℝ) ^ (fixedGradeExponent K / 2) /
@@ -264,7 +291,8 @@ theorem fixedGrade_incompleteness (K : ℕ) :
     ∀ᶠ n : ℕ in Filter.atTop,
       ∃ observationCount : ℕ,
         ∃ E : FiniteMixtureExperiment n observationCount,
-          fixedGradeGapScale K n ≤ E.certificationGap (K + 1) 1 := by
+          Convex ℝ (finitePriorCarrier n) ∧
+            fixedGradeGapScale K n ≤ E.certificationGap (K + 1) 1 := by
   sorry
 
 end FiniteMixtureExperiment
