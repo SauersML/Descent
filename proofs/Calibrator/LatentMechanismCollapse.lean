@@ -33,6 +33,30 @@ Hence: the minimal latent dimension is `1` for every non-constant family; it is
 factorizations form a continuum of inequivalent solutions; and the exceptional set for
 uniqueness is everything.
 
+## WHAT IS AND IS NOT IN LEAN HERE, BECAUSE THE TWO WERE READING AS ONE
+
+The paragraph above states the collapse theorem. **This file does not prove it, and does
+not state it in Lean at all.** What is proved here is the algebra of the construction's
+ingredients: exactness of the head mixture against a positivity floor, positivity of the
+head and tail densities, the tail coefficient identity, and the perturbative margin.
+Those are real lemmas and they are the parts of the argument that arithmetic can carry.
+
+The construction itself — that every uniformly smooth strictly positive family over
+compact manifolds admits a factorization with `r = 1` — needs kernels, mixing measures
+and compact manifolds as formal objects, and none of that is set up here. It is an OPEN
+GAP, and it is not carried as a `sorry` for a specific reason: a `sorry` needs a
+statement, and the statement needs the definitions this file does not have. Writing
+`sorry` against an abstract predicate standing in for the notion would be worse than the
+gap, because the resulting theorem would be false or vacuous depending on how the
+predicate were instantiated.
+
+Consequently `minimalDim_eq_one_of_collapse` below is a CONDITIONAL, and it is order
+theory rather than geometry: given a minimal-dimension function, given that the minimum
+is attained and least, and given the collapse, the minimum is `1` on non-constant
+families. Its `hcollapse` argument is the collapse theorem, and nothing in this corpus
+discharges it. The name says so. Do not read the module title as something Lean has
+checked.
+
 The guard clause that was supposed to prevent this — "Borel encodings that collapse
 every latent space to one dimension are forbidden by the smooth category" — fails for a
 precise reason. **Sard's theorem bounds the image of a smooth curve, but mixtures see
@@ -243,14 +267,18 @@ theorem head_piece_pos (ε δ₀ g gTail : ℝ)
   nlinarith [hmargin, hεsmall, hδ, hε, hε1]
 
 /-!
-## 4. The collapse consequence: minimal latent dimension measures nothing
+## 4. The collapse consequence, conditional on the collapse
 -/
 
-/-- **Minimal latent dimension is not an observable.** If every non-constant family in
-the class admits a factorization of latent dimension one, then the minimum is the
-constant function `1` on non-constant families: it separates no two families, so it
-cannot be a nontrivial invariant of the observed kernels. -/
-theorem minimal_latent_dimension_is_constant
+/-- **Conditional on the collapse, minimal latent dimension is not an observable.** If
+every non-constant family in the class admits a factorization of latent dimension one,
+then the minimum is the constant function `1` on non-constant families: it separates no
+two families, so it cannot be a nontrivial invariant of the observed kernels.
+
+    `hcollapse` IS the collapse theorem. It is not proved anywhere in this corpus, and
+    this theorem is order theory conditional on it -- a least element of a set that
+    contains `1` and omits `0` is `1`. The biology is entirely in the antecedent. -/
+theorem minimalDim_eq_one_of_collapse
     {Family : Type*} (admitsDim : Family → ℕ → Prop) (minimalDim : Family → ℕ)
     (isConstantFamily : Family → Prop)
     (hminimal : ∀ F : Family, admitsDim F (minimalDim F))
