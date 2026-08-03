@@ -742,6 +742,71 @@ exactly the difference in mean absolute causal effect. -/
         meanAbsoluteEffect (P.architecture j)| := by
   simp [FiniteMomentCertificateProblem.targetGap]
 
+/-! #### Two architecture moments do not identify mean absolute effect
+
+The following pair is a finite, exact witness to the biological obstruction behind the
+moment-constrained calculus. Both three-locus architectures have total signed effect zero
+and total squared-effect mass two:
+
+* `β₀ = (1, -1, 0)`;
+* `β₁ = (3/7, -8/7, 5/7)`.
+
+Nevertheless their mean absolute effects are `2/3` and `16/21`. Thus even exact knowledge
+of the first two architecture moments does not identify a nonsmooth sparsity/effect-size
+summary. No asymptotics, literature theorem, or caller-supplied proposition enters this
+witness.
+-/
+
+/-- Two three-locus architectures with the same first two power sums. Their observation
+laws are deliberately identical, so every separation below comes from the biological
+target rather than an arbitrary observation discrepancy. -/
+noncomputable def orderTwoMomentTwinCatalogue :
+    MeanAbsoluteEffectCertificateProblem 3 1 where
+  architecture := ![![1, -1, 0], ![3 / 7, -8 / 7, 5 / 7]]
+  observation := fun _ ↦ PMF.pure 0
+  logScale := 0
+
+/-- The two architectures have the same total signed effect. -/
+theorem orderTwoMomentTwin_signedEffect :
+    orderTwoMomentTwinCatalogue.architectureMoment 0 0 =
+      orderTwoMomentTwinCatalogue.architectureMoment 0 1 := by
+  norm_num [orderTwoMomentTwinCatalogue, architectureMoment, Fin.sum_univ_succ]
+
+/-- The two architectures have the same total squared-effect mass. -/
+theorem orderTwoMomentTwin_squaredEffect :
+    orderTwoMomentTwinCatalogue.architectureMoment 1 0 =
+      orderTwoMomentTwinCatalogue.architectureMoment 1 1 := by
+  norm_num [orderTwoMomentTwinCatalogue, architectureMoment, Fin.sum_univ_succ]
+
+/-- Hence the corresponding point priors match every architecture moment of order below
+two. -/
+theorem orderTwoMomentTwin_momentMatched :
+    orderTwoMomentTwinCatalogue.finiteProblem.MomentMatched 2
+      (PMF.pure 0) (PMF.pure 1) := by
+  rw [momentMatched_order_two_iff]
+  constructor
+  · simpa only [FinitePrior.mean_pure, architectureMoment_zero] using
+      orderTwoMomentTwin_signedEffect
+  · simpa only [FinitePrior.mean_pure, architectureMoment_one] using
+      orderTwoMomentTwin_squaredEffect
+
+/-- Their mean absolute causal effects differ by exactly `2/21`. -/
+theorem orderTwoMomentTwin_targetGap :
+    orderTwoMomentTwinCatalogue.finiteProblem.targetGap (PMF.pure 0) (PMF.pure 1) =
+      2 / 21 := by
+  rw [targetGap_two_architectures]
+  norm_num [orderTwoMomentTwinCatalogue, meanAbsoluteEffect, Fin.sum_univ_succ,
+    abs_of_nonneg, abs_of_nonpos]
+
+/-- **Biological non-identification at moment order two.** Equal mean signed effect and
+equal additive variance do not determine mean absolute effect, even for two explicit
+three-locus architectures. -/
+theorem orderTwoMomentTwin_target_not_identified :
+    orderTwoMomentTwinCatalogue.finiteProblem.MomentMatched 2
+        (PMF.pure 0) (PMF.pure 1) ∧
+      orderTwoMomentTwinCatalogue.finiteProblem.targetGap (PMF.pure 0) (PMF.pure 1) > 0 := by
+  exact ⟨orderTwoMomentTwin_momentMatched, by rw [orderTwoMomentTwin_targetGap]; norm_num⟩
+
 /-! #### The architecture hierarchy is strict
 
 `atomModulus_mono` and `atomModulus_le_unrestricted` order the biological
