@@ -25,6 +25,9 @@ Checks performed
 8.  A direct Monte-Carlo of the condensation phase transition: the variance of the
     normalized chaos under Gaussian versus hard-called-genotype coordinates, swept
     across the predicted boundary m* = log N / c.
+9.  The covariance-channel kurtosis penalty: direct Hardy-Weinberg summation and a
+    fixed-seed genotype simulation verify the exact `4901/198` variance multiplier at
+    one-percent MAF.
 
 Run:  python3 proofs/validation/condensation/check_condensation.py
 """
@@ -32,6 +35,7 @@ Run:  python3 proofs/validation/condensation/check_condensation.py
 from __future__ import annotations
 
 import math
+import sys
 
 import numpy as np
 from scipy import integrate, special
@@ -282,6 +286,50 @@ def check_phase_transition() -> None:
         print("  NOTE: sampled separation not resolved at this N; increase n or reps")
 
 
+# --------------------------------------------------------------------------------
+# 9. Rare-variant covariance-channel sample cost
+# --------------------------------------------------------------------------------
+
+
+def hwe_standardized_square_variance(q: float) -> float:
+    """Direct genotype-sum value of Var(X^2) for standardized diploid dosage."""
+    p = 1.0 - q
+    genotype_variance = 2.0 * q * p
+    probabilities = np.array([p * p, 2.0 * p * q, q * q])
+    counts = np.array([0.0, 1.0, 2.0])
+    standardized_squares = (counts - 2.0 * q) ** 2 / genotype_variance
+    mean_square = float(probabilities @ standardized_squares)
+    return float(probabilities @ (standardized_squares - mean_square) ** 2)
+
+
+def check_one_percent_covariance_penalty() -> None:
+    """Validate the exact one-percent-MAF multiplier in `FoldedSpectrum`.
+
+    A Gaussian unit-variance coordinate has Var(X^2)=2. The standardized diploid
+    coordinate has Var(X^2)=1/[2q(1-q)]-1, so the ratio at q=0.01 is 4901/198.
+    """
+    q = 0.01
+    exact_multiplier = 4901.0 / 198.0
+    summed_multiplier = hwe_standardized_square_variance(q) / 2.0
+    assert abs(summed_multiplier - exact_multiplier) < 1e-12, (
+        summed_multiplier,
+        exact_multiplier,
+    )
+
+    rng = np.random.default_rng(20260802)
+    counts = rng.binomial(2, q, size=1_000_000).astype(float)
+    standardized_squares = (counts - 2.0 * q) ** 2 / (2.0 * q * (1.0 - q))
+    sampled_multiplier = float(standardized_squares.var() / 2.0)
+    relative_error = abs(sampled_multiplier / exact_multiplier - 1.0)
+    assert relative_error < 0.02, (sampled_multiplier, exact_multiplier, relative_error)
+
+    print(f"  q = 0.01 exact covariance-variance multiplier = {exact_multiplier:.6f}")
+    print(
+        "  fixed-seed HWE simulation multiplier "
+        f"= {sampled_multiplier:.6f} (relative error {relative_error:.3%})"
+    )
+
+
 def main() -> None:
     print("[1-2] Gaussian Mellin 2-jet")
     check_gaussian_jet()
@@ -295,8 +343,13 @@ def main() -> None:
     check_lattice_point()
     print("[8] Phase transition, sampled")
     check_phase_transition()
+    print("[9] One-percent-MAF covariance-channel penalty")
+    check_one_percent_covariance_penalty()
     print("\nAll deterministic checks passed.")
 
 
 if __name__ == "__main__":
-    main()
+    if "--kurtosis-only" in sys.argv[1:]:
+        check_one_percent_covariance_penalty()
+    else:
+        main()
