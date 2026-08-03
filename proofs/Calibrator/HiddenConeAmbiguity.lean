@@ -28,7 +28,8 @@ change of hidden coordinates, `(T, A) ~ (T S⁻¹, S A S*)`.
 `S⁻¹ = T⁻¹ T'`. The witness is *canonical*: the equivalence is a groupoid with at most
 one arrow between any two objects. There is no existential freedom beyond the pair.
 
-Three consequences follow, and one earlier claim had to be retracted.
+Three consequences follow, and one tempting claim is false; it is stated and refuted at
+point 4 below.
 
 1. **Douglas form.** Equivalence is: mutual Douglas majorization of `T T*` and
    `T' T'*` with a constant `C` (equal operator ranges with bounded distortion), plus

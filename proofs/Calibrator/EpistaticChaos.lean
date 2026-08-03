@@ -1147,7 +1147,7 @@ whatever the order, because `(√V)^(2m) = V^m`. This is the general-`m` stateme
 the three computed orders are instances of, and it needs no case analysis.
 
 Verified symbolically for `m = 1..5` against the three-point law by
-`proofs/validation/coupling/ladder_moments.py`, which reproduces the corpus's closed
+`proofs/validation/empirical/coupling/ladder_moments.py`, which reproduces the corpus's closed
 forms at `m = 1, 2, 3` as its positive control. -/
 theorem standardizedGenotype_even_moment_mul (h : HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) (m : ℕ) :
@@ -1311,8 +1311,7 @@ symmetric. So the Sign-Erasure Lemma is the zero fibre of `b` rather than an
 independent phenomenon.
 
 This is the whole of what `b` is currently known to do for genotypes. Whether any
-admissible design exposes `b` is open; the mechanism this file once asserted for that
-was retracted, and no replacement has been supplied. -/
+admissible design exposes `b` is open, and no mechanism for it is supplied here. -/
 theorem hweSignBias_zero_iff_balanced (h : HardyWeinbergModel) (hq0 : 0 < h.altFreq)
     (hhalf : h.altFreq ≤ 1 / 2) : h.signBias = 0 ↔ h.altFreq = 1 / 2 := by
   rw [hweSignBias_eq h hq0 hhalf]

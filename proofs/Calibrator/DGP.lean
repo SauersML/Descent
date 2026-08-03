@@ -1177,12 +1177,12 @@ identifier: this paragraph named the consumer the whole time. -/
 **DO NOT DELETE AS UNUSED.** Its consumer is
 `Calibrator.ld_decay_implies_nonlinear_calibration_of_exp_tagging`, which lives in
 `proofs/Calibrator.lean` — the corpus ROOT, one directory *above* `proofs/Calibrator/`.
-Two dead-code scans (`ec74a6a8`, `4815481c`) reported this and `decaySlope` as having no
-consumer, because the root file is outside the directory they walked. Deleting them did
-not break the build either, because Lean **auto-bound the now-undefined names as implicit
-variables**, so the consuming theorem kept elaborating as a vacuous statement about an
-arbitrary term until an application finally forced the error. Absence of a build failure
-is therefore not evidence that a deletion here was safe. -/
+A dead-code scan that walks only `proofs/Calibrator/` reports this and `decaySlope` as
+having no consumer, because the root file is outside that directory. Deleting them does
+not break the build either, because Lean **auto-binds the now-undefined names as implicit
+variables**, so the consuming theorem keeps elaborating as a vacuous statement about an
+arbitrary term until an application finally forces the error. Absence of a build failure
+is therefore not evidence that a deletion here is safe. -/
 structure LDDecayMechanism (k : ℕ) where
   /-- Genetic distance proxy (e.g., PC-distance from training centroid). -/
   distance : (Fin k → ℝ) → ℝ
@@ -1911,7 +1911,7 @@ not see docstrings — a third instance left an orphaned doc comment above the
 (That sentence originally quoted the doc-comment opener literally. Lean nests
 block comments, so the quoted opener opened one, the closer below shut only
 that, and this note left its own module unterminated — the failure
-`check-identifications.py` counts delimiters for. Do not write the opener
+the `identifications` guard in check.py counts delimiters for. Do not write the opener
 literally in prose here.)
 -/
 

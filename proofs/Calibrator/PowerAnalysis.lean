@@ -263,11 +263,10 @@ theorem GWASObservationModel.observation_decomposition (m : GWASObservationModel
     equivalently when |β + ε| > z_α · SE. This predicate defines the
     selection event.
 
-    **DO NOT DELETE AS UNUSED.**  Restored: `ec74a6a8` removed this as "no use
-    anywhere and no theorem about them", on an identifier grep of `.lean` files.
-    It is a `Prop`-valued convention, so its existence is the result -- the same
-    category as `extra_algebraic_guard_adds_nothing`, which that same commit
-    correctly declined to remove.  Two live consumers name it:
+    **DO NOT DELETE AS UNUSED.**  It is a `Prop`-valued convention, so its
+    existence is the result -- the same category as
+    `extra_algebraic_guard_adds_nothing`.  An identifier grep of `.lean` files
+    finds no application, but two live consumers name it:
 
       * the note immediately below, which justifies the removal of
         `truncationBias` on the grounds that it "is the one-sided result while
@@ -277,8 +276,8 @@ theorem GWASObservationModel.observation_decomposition (m : GWASObservationModel
         is built on "the TWO-SIDED event `GWASObservationModel.isSelected`
         states".  The differential family validates against this definition.
 
-    Neither reference is an application, so nothing failed to elaborate and the
-    build stayed green.  Both are prose, and a grep for the identifier in
+    Neither reference is an application, so removing this breaks no elaboration
+    and leaves the build green.  Both are prose, and a grep for the identifier in
     `.lean` alone reaches neither. -/
 def GWASObservationModel.isSelected (m : GWASObservationModel) (epsilon z_alpha : ℝ) : Prop :=
   z_alpha * m.standardError < |m.true_beta + epsilon|

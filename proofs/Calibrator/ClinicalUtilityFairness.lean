@@ -942,7 +942,8 @@ theorem lower_portability_lower_cost_effectiveness
 
     This is the endpoint, not the threshold. A portability threshold below which PGS stops
     being cost-effective would need the gain to be monotone in `R²` and a crossing to be
-    located; neither is established here, which is why the name no longer says `_exists`. -/
+    located; neither is established here, which is why this claims an endpoint and not an
+    existence. -/
 theorem screeningQalyGain_neg_at_zero_sensitivity
     (π benefit harm : ℝ)
     (h_π : 0 < π) (h_π1 : π < 1)

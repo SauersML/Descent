@@ -366,8 +366,8 @@ look legitimate: the equation `olsEffectEstimationVariance σ2 varX n = σ2 / (n
 true as arithmetic, and false as a claim, because it is reached only by that swap. For a
 binary indicator of frequency `f` the variance is `f(1-f)`, not `f`, and that missing `(1-f)`
 was measured at −50.4% at `f = 1/2`, worst for COMMON haplotypes, the opposite of the rarity
-intuition the surrounding prose appeals to. The wrong body has since been deleted; this note
-stands so the pairing is not re-derived.
+intuition the surrounding prose appeals to. This note stands so the pairing is not
+re-derived.
 
 The theorem above is the correct pairing: `haplotypeEffectVarianceOLS`, the VALIDATED
 form, with the variance supplied explicitly as `freq * (1 - freq)` — which is what makes

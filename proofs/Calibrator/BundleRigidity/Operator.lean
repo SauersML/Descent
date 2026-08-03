@@ -41,9 +41,8 @@ three reasons, in increasing order of importance:
 3. *these modules are now foundational.* Files outside this directory are being wired to
    depend on them, so their import structure is load-bearing rather than local.
 
-The root olean has since been rebuilt and the wholesale form would work again. That does
-not restore the argument for it; reason 2 is about what happens the next time, not this
-time.
+That the wholesale form would work whenever the root olean is present is not an argument
+for it; reason 2 is about what happens the next time it is absent.
 
 ## What is here
 

@@ -1954,18 +1954,16 @@ variable {ι J : Type*} [Fintype ι] [Fintype J] [DecidableEq J]
 pulls on the shared correction.  Deployment weight times the energy of the
 transported direction in that target's own second-moment matrix.
 
-**DO NOT DELETE AS UNUSED.**  Restored: `ec74a6a8` removed this and
-`targetCorrectionOptimum` as "no use anywhere and no theorem about them", on an
-identifier grep.  Nothing applies them, and that is the point of them.
+**DO NOT DELETE AS UNUSED.**  Nothing applies this, and that is the point of it.
 `sharedCorrectionConsensus` and `sharedCorrectionSpread` below take `curvature`
-and `optimum` as arbitrary functions `ι → ℝ`; these two are what say which
-functions the section is about.  The section docstring three lines above the
-deletion site states the claim that depends on them -- "the curvature weight is
-not a free parameter ... which is the right behaviour and is FORCED rather than
-stipulated".  Without these definitions the weight becomes a free parameter,
-the spread law holds for any weights whatsoever, and that sentence is false.
-The deletion did not break elaboration, because the arguments were already
-abstract; it hollowed the claim and left the file green.
+and `optimum` as arbitrary functions `ι → ℝ`; this definition and
+`targetCorrectionOptimum` are what say which functions the section is about.  The
+section's claim that the curvature weight is FORCED rather than stipulated depends
+on them: without them the weight is a free parameter, the spread law holds for any
+weights whatsoever, and that claim is false.  Deleting them does not break
+elaboration, because the arguments are already abstract — it hollows the claim and
+leaves the file green, which is why an identifier grep is not enough to justify
+removing them.
 
 Empirical status: UNTESTED. -/
 def targetCorrectionCurvature (weight : ι → ℝ) (B : ι → Matrix J J ℝ)
