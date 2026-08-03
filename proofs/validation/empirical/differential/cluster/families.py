@@ -298,7 +298,14 @@ FAMILIES = [
                     "bottleneckExcessLD", "driftLDCreationRate", "tagR2",
                     # newly classified
                     "ldRetention", "ldBreakageRate", "sharedLDRetention",
-                    "taggingMismatchScale", "ohtaKimuraSigmaDSq", "decaySlope"],
+                    "taggingMismatchScale", "ohtaKimuraSigmaDSq"],
+        # decaySlope is NOT a member and was removed after being read. Its body
+        # composes two arbitrary caller-supplied functions of LDDecayMechanism
+        # and contains no LD, no decay and no recombination; it reached this
+        # family on the strength of its own name and its structure's name.
+        # It also reaches the family through a consumer that elaborates
+        # VACUOUSLY, so this family's simulator could not have covered it under
+        # any membership list. Re-add it only with a body that a run can reach.
     },
     {
         "name": "stepping_stone",
@@ -1323,11 +1330,28 @@ FAMILIES = [
                  "tagging, heterogeneous effects; and the recalibration slope "
                  "that a linear score is left with",
         "simulator": None,
-        "status": "NO SIMULATOR. The corpus's non-additive DGPs are stated as "
-                  "structures with a `trueExpectation` field and never "
-                  "sampled, so the claim that a linear score's optimal "
+        "status": "NO SIMULATOR, AND THIS FAMILY IS MIS-GROUPED. Its members "
+                  "split three ways and only the first is worth simulating. "
+                  "SAMPLEABLE: dgpInteractiveBias, dgpAdditiveBias, "
+                  "hasInteraction, HeterogeneousEffectDGP.trueExp. These are "
+                  "genuine processes carrying a jointMeasure that nothing has "
+                  "ever drawn from, so the claim that a linear score's optimal "
                   "recalibration slope takes the stated form has never met a "
-                  "sample.",
+                  "sample. NEEDS A BRIDGE THE CORPUS DOES NOT SUPPLY: "
+                  "optimalSlopeLinearNoise, whose two theorems claim only that "
+                  "it is not affine in c, which is algebra. The claim its NAME "
+                  "makes is simulatable, but the bridge from the name to a "
+                  "regression slope would be supplied by whoever writes the "
+                  "simulator, not by the corpus, and must be declared as such. "
+                  "UNREACHABLE: optimalSlopeFromVariance, totalVariance and "
+                  "GeneticArchitecture. GeneticArchitecture is never "
+                  "constructed anywhere in the corpus, so V_genic and V_cov "
+                  "are arbitrary caller-supplied reals and ANY measurement can "
+                  "be fitted by choosing them. Same call as selectedDriftFactor "
+                  "in the selection family. Note the two slopes point in "
+                  "opposite directions -- (V_genic+V_cov)/V_genic is at least 1, "
+                  "the linear-noise slope is at most 1 -- so they were grouped "
+                  "by their names rather than by a shared process.",
         "found_by": "manual",
         "spec": "Instantiate each non-additive DGP concretely -- interactive "
                 "Y = G(1 + b sum C), additive-environment Y = G + b sum C, "
