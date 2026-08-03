@@ -1244,6 +1244,84 @@ theorem not_bounded_of_affine (c d : ℝ) (hc : 0 < c) :
   rw [mul_div_cancel₀ _ (ne_of_gt hc)] at hval
   linarith
 
+/-! ### The link is a liability distribution
+
+The classification's remaining step is an argument about measures, not about functions: a
+bounded increasing `L` is the cdf of a finite measure on the liability axis, and the
+averaging invariance says that measure reproduces itself, up to an affine change of
+variable, under convolution with every Gaussian.  Only Gaussians do that.
+
+This section builds the dictionary.  It is the step at which "link function" becomes
+"distribution of the unmodelled liability", which is also what the object means
+biologically: `L u` is the probability that total liability `u` plus everything the score
+does not capture clears the threshold. -/
+
+/-- The link is bounded above by its own supremum bound, so its limit at `+∞` exists. -/
+theorem link_tendsto_atTop (L : ℝ → ℝ) (hmono : StrictMono L)
+    (hbdd : ∀ u, 0 < L u ∧ L u < 1) :
+    Filter.Tendsto L Filter.atTop (nhds (⨆ u, L u)) :=
+  tendsto_atTop_ciSup hmono.monotone ⟨1, by rintro _ ⟨u, rfl⟩; exact (hbdd u).2.le⟩
+
+/-- ... and at `-∞`, by the floor at `0`. -/
+theorem link_tendsto_atBot (L : ℝ → ℝ) (hmono : StrictMono L)
+    (hbdd : ∀ u, 0 < L u ∧ L u < 1) :
+    Filter.Tendsto L Filter.atBot (nhds (⨅ u, L u)) :=
+  tendsto_atBot_ciInf hmono.monotone ⟨0, by rintro _ ⟨u, rfl⟩; exact (hbdd u).1.le⟩
+
+/-- **The link's two asymptotes are distinct.**
+
+Strict monotonicity separates them, so the vertical scale `q = sup L - inf L` that
+`link_rigidity` asks to be positive is positive for structural reasons: it is the total
+mass of the liability distribution below.  A link with `q = 0` is a constant, which is not
+strictly increasing. -/
+theorem link_iInf_lt_iSup (L : ℝ → ℝ) (hmono : StrictMono L)
+    (hbdd : ∀ u, 0 < L u ∧ L u < 1) :
+    (⨅ u, L u) < ⨆ u, L u := by
+  have hbelow : BddBelow (Set.range L) := ⟨0, by rintro _ ⟨u, rfl⟩; exact (hbdd u).1.le⟩
+  have habove : BddAbove (Set.range L) := ⟨1, by rintro _ ⟨u, rfl⟩; exact (hbdd u).2.le⟩
+  calc (⨅ u, L u) ≤ L 0 := ciInf_le hbelow 0
+    _ < L 1 := hmono (by norm_num)
+    _ ≤ ⨆ u, L u := le_ciSup habove 1
+
+/-- **The link is the cdf of a finite measure on the liability axis.**
+
+A continuous increasing bounded `L` is a Stieltjes function; its Lebesgue–Stieltjes measure
+`ν` is finite with total mass `sup L - inf L`, and `L u = inf L + ν (-∞, u]`.
+
+This is the representation the classification runs on.  Once `L` is `inf L + ν(Iic ·)`, the
+averaging identity
+`∫ L (x + s z) dγ(z) = L (α x + β)`
+says `ν` convolved with `N(0, s²)` equals `ν` pushed forward by an affine map — for every
+`s`.  Reading it that way is what makes "only the Gaussian" a statement one can attack,
+because self-similarity under all Gaussian convolutions is a condition on `ν`, not on `L`.
+
+Biologically `ν` is the distribution of the liability the score does not model. The theorem
+says that object always exists; `link_rigidity` is the claim that the invariance forces it
+to be Gaussian. -/
+theorem link_stieltjes_representation (L : ℝ → ℝ) (hmono : StrictMono L)
+    (hbdd : ∀ u, 0 < L u ∧ L u < 1) (hcont : Continuous L) :
+    ∃ ν : MeasureTheory.Measure ℝ, MeasureTheory.IsFiniteMeasure ν ∧
+      ν Set.univ = ENNReal.ofReal ((⨆ u, L u) - ⨅ u, L u) ∧
+      ∀ u, L u = (⨅ v, L v) + (ν (Set.Iic u)).toReal := by
+  classical
+  set f : StieltjesFunction :=
+    ⟨L, hmono.monotone, fun u ↦ (hcont.tendsto u).mono_left nhdsWithin_le_nhds⟩ with hf
+  have hbot : Filter.Tendsto f Filter.atBot (nhds (⨅ u, L u)) :=
+    link_tendsto_atBot L hmono hbdd
+  have htop : Filter.Tendsto f Filter.atTop (nhds (⨆ u, L u)) :=
+    link_tendsto_atTop L hmono hbdd
+  have huniv : f.measure Set.univ = ENNReal.ofReal ((⨆ u, L u) - ⨅ u, L u) :=
+    f.measure_univ hbot htop
+  have hfin : MeasureTheory.IsFiniteMeasure f.measure :=
+    ⟨by rw [huniv]; exact ENNReal.ofReal_lt_top⟩
+  refine ⟨f.measure, hfin, huniv, fun u ↦ ?_⟩
+  have hIic : f.measure (Set.Iic u) = ENNReal.ofReal (L u - ⨅ v, L v) :=
+    f.measure_Iic hbot u
+  have hle : (⨅ v, L v) ≤ L u :=
+    ciInf_le ⟨0, by rintro _ ⟨v, rfl⟩; exact (hbdd v).1.le⟩ u
+  rw [hIic, ENNReal.toReal_ofReal (by linarith)]
+  ring
+
 open MeasureTheory ProbabilityTheory in
 /-- **Necessity: no other bounded link shape survives.** A strictly increasing bounded link whose
 two-parameter family is closed under Gaussian averaging is a positive vertical affine transform
