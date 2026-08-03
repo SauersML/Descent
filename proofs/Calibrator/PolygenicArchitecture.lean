@@ -470,15 +470,20 @@ polynomial. It is the natural measure of total additive signal and the closest
 kin in this file to a polygenicity or sparsity summary, and it is far harder to
 estimate than the variance-type summaries standing beside it.
 
-The second half of the picture is about certificates rather than estimators.
-The unconditional result is algebraic: completeness at grade `K` is equivalent
-to grade-insensitivity of the modulus, and the deficit is the squared modulus
-ratio. The polynomial fixed-grade gap is stated below for an actual biological
-experiment, with an explicit `sorry`: the first Gaussian-location-mixture audit
-found that its grade-8 modulus recovered 99.93% of the ungraded one, so that
-experiment is evidence neither for the general theorem nor for its biological
-specialization. In particular the gap is never accepted as a theorem-valued
-field of a biological model.
+The second half is about certificates rather than estimators. Two hierarchies
+must be kept separate. Forcing more architecture moments to agree shrinks the
+moment-constrained modulus; allowing more atoms in the two mixing priors grows
+the class of lower-bound certificates. The latter is method power. Grade two
+contains the ordinary architecture-versus-architecture comparison, while
+higher grades permit genuinely fuzzy hypotheses.
+
+The earlier polynomial fixed-grade claim was removed rather than proved: its
+finite interface treated catalogue size as sample size and chose the target,
+moment probes, and observation kernel after seeing the requested bound. The
+Gaussian-location-mixture audit also found that its order-eight
+moment-constrained modulus recovered 99.93% of the unrestricted one. Neither
+fact supports a biological rate law. What remains below is the exact,
+experiment-derived calculus a future GWAS observation model must evaluate.
 
 `Calibrator.PowerAnalysis` compares the logarithmic and polynomial benchmark
 curves conditionally. Those comparisons are useful for falsifying a proposed
@@ -531,8 +536,8 @@ theorem meanAbsoluteEffect_sq_le_meanSquaredEffect {q : ℕ} (beta : Fin q → �
 
 The parameter is an additive-effect vector, the carrier is a closed ball, and
 the target is `meanAbsoluteEffect`.  The structure below contains numerical
-data only.  It cannot claim minimax duality, Donoho--Liu tightness, or a
-fixed-grade gap by projection from an assumption field.
+data only.  It cannot claim minimax duality, Donoho--Liu tightness, or a rate
+gap by projection from an assumption field.
 -/
 
 /-- Bounded additive-effect architectures.  The absolute radius makes the set
@@ -553,9 +558,9 @@ theorem boundedEffectCarrier_convex (q : ℕ) (B : ℝ) :
 
 open Calibrator.CertificateGrading in
 /-- A finite catalogue of additive architectures and a numerical discrepancy
-between mixture experiments.  No field has type `Prop`, and in particular the
-graded modulus is not supplied by the caller: it is derived below as a
-supremum over moment-matched prior pairs. -/
+between mixture experiments.  No field has type `Prop`; both the
+moment-constrained modulus and the atom-complexity modulus are derived below
+from the observation laws. -/
 structure MeanAbsoluteEffectCertificateProblem (q n : ℕ) where
   architecture : Fin (n + 1) → Fin q → ℝ
   /-- Actual catalogue-indexed observation laws.  Prior discrepancies are
@@ -608,7 +613,7 @@ theorem architecture_mem_effects {q n : ℕ}
         (fun l _ ↦ Finset.sum_nonneg fun k _ ↦ abs_nonneg (P.architecture l k))
         (Finset.mem_univ i)
 
-/-- Signed effect moment used by grade matching.  Grade two, for example,
+/-- Signed effect moment used by moment matching.  Order two, for example,
 matches the catalogue-average signed effect and squared-effect mass before it
 tries to separate the nonsmooth mean-absolute-effect target. -/
 noncomputable def architectureMoment {q n : ℕ}
@@ -628,7 +633,7 @@ noncomputable def finiteProblem {q n : ℕ}
     FiniteMomentCertificateProblem n :=
   P.mixtureExperiment.certificateProblem
 
-noncomputable def calculus {q n : ℕ}
+noncomputable def momentConstraintCalculus {q n : ℕ}
     (P : MeanAbsoluteEffectCertificateProblem q n) : CertificateCalculus :=
   explicitCalculus P.finiteProblem.modulus P.logScale
 
@@ -650,11 +655,11 @@ noncomputable def calculus {q n : ℕ}
     P.architectureMoment 1 i = ∑ j, (P.architecture i j) ^ 2 := by
   simp [architectureMoment]
 
-/-- **What grade two means biologically.**  It is not a label or a theorem
-parameter: the two mixture priors have equal expected signed-effect sum and
-equal expected squared-effect mass across the architecture catalogue.  The
-nonsmooth target they may still separate is mean absolute effect. -/
-theorem momentMatched_two_iff {q n : ℕ}
+/-- **What moment order two means biologically.**  It is not method power: the
+two mixture priors have equal expected signed-effect sum and equal expected
+squared-effect mass across the architecture catalogue.  The nonsmooth target
+they may still separate is mean absolute effect. -/
+theorem momentMatched_order_two_iff {q n : ℕ}
     (P : MeanAbsoluteEffectCertificateProblem q n)
     (A B : FinitePrior n) :
     P.finiteProblem.MomentMatched 2 A B ↔
@@ -680,69 +685,63 @@ theorem effects_nonempty {q n : ℕ} (P : MeanAbsoluteEffectCertificateProblem q
 theorem effects_convex {q n : ℕ} (P : MeanAbsoluteEffectCertificateProblem q n) :
     Convex ℝ P.effects := boundedEffectCarrier_convex q P.architectureRadius
 
-/-- Exact biological specialization of the completeness criterion. -/
-theorem complete_iff_gradeInsensitive {q n : ℕ}
+/-- Exact biological specialization of the moment-constraint equality
+criterion. -/
+theorem momentConstraint_complete_iff_insensitive {q n : ℕ}
     (P : MeanAbsoluteEffectCertificateProblem q n) (K : ℕ) (h : ℝ) :
-    P.calculus.IsComplete K h ↔ P.calculus.GradeInsensitive K h :=
-  isComplete_iff_gradeInsensitive P.calculus K h
+    P.momentConstraintCalculus.IsComplete K h ↔
+      P.momentConstraintCalculus.GradeInsensitive K h :=
+  isComplete_iff_gradeInsensitive P.momentConstraintCalculus K h
 
-/-- Exact Bernstein-type invariant for the mean-absolute-effect problem. -/
-theorem deficit_eq_modulusRatio_sq {q n : ℕ}
+/-- Exact modulus-ratio identity for the mean-absolute-effect
+moment-constraint problem. -/
+theorem momentConstraint_deficit_eq_modulusRatio_sq {q n : ℕ}
     (P : MeanAbsoluteEffectCertificateProblem q n) (K : ℕ) (h : ℝ) :
-    P.calculus.deficit K h =
-      (P.calculus.modulus.Δ 0 h / P.calculus.modulus.Δ K h) ^ 2 :=
-  deficit_eq_modulus_ratio_sq P.calculus K h
+    P.momentConstraintCalculus.deficit K h =
+      (P.momentConstraintCalculus.modulus.Δ 0 h /
+        P.momentConstraintCalculus.modulus.Δ K h) ^ 2 :=
+  deficit_eq_modulus_ratio_sq P.momentConstraintCalculus K h
 
 /-- Modulus ratio for the biological mean-absolute-effect experiment. -/
-noncomputable def certificationGap {q n : ℕ}
+/-- Method-complexity gap for mean-absolute-effect lower bounds.  The numerator
+allows arbitrary finite mixing priors on the architecture catalogue; the
+denominator allows at most `K` atoms across the two priors. -/
+noncomputable def atomCertificationGap {q n : ℕ}
     (P : MeanAbsoluteEffectCertificateProblem q n) (K : ℕ) (h : ℝ) : ℝ :=
-  P.finiteProblem.modulus 0 h / P.finiteProblem.modulus K h
+  P.finiteProblem.modulus 0 h / P.finiteProblem.atomModulus K h
 
-/-- The unproved biological construction isolated from its automatic carrier facts.
+/-- Allowing more architecture atoms can only improve the certificate
+modulus. -/
+theorem atomModulus_mono {q n : ℕ}
+    (P : MeanAbsoluteEffectCertificateProblem q n) {K L : ℕ}
+    (hKL : K ≤ L) (h : ℝ) :
+    P.finiteProblem.atomModulus K h ≤ P.finiteProblem.atomModulus L h :=
+  P.finiteProblem.atomModulus_mono hKL h
 
-For every fixed grade, sufficiently large architecture catalogues contain an
-actual finite observation experiment on a convex bounded effect carrier whose
-ungraded-to-graded modulus ratio is at least
-`n^(b_K/2) / sqrt(log n)`, with `b_K = 1/(K+1)`.
+/-- Every bounded-complexity biological certificate is available to the
+unrestricted mixture calculus. -/
+theorem atomModulus_le_unrestricted {q n : ℕ}
+    (P : MeanAbsoluteEffectCertificateProblem q n) (K : ℕ) (h : ℝ) :
+    P.finiteProblem.atomModulus K h ≤ P.finiteProblem.modulus 0 h :=
+  P.finiteProblem.atomModulus_le_unrestricted K h
 
-The target is the mean absolute causal effect, grade two matches signed-effect mass and
-squared-effect mass, and discrepancy is total variation between the prior-predictive observation
-laws. The proof is admitted openly: it must construct the moment-matching architecture priors.
-No benchmark curve, crossing hypothesis, or external moment-comparison theorem substitutes for
-that construction.
+/-- Grade two is the ordinary comparison of two concrete genetic
+architectures, evaluated with the actual prior-predictive total variation. -/
+theorem atomFeasible_two_architectures_iff {q n : ℕ}
+    (P : MeanAbsoluteEffectCertificateProblem q n) (h : ℝ)
+    (i j : Fin (n + 1)) :
+    P.finiteProblem.AtomFeasible 2 h (PMF.pure i) (PMF.pure j) ↔
+      |P.mixtureExperiment.totalVariation (PMF.pure i) (PMF.pure j)| ≤ |h| :=
+  P.finiteProblem.atomFeasible_two_pure_iff h i j
 
-Only existence of the catalogue and its gap is admitted here. Catalogue membership, nonemptiness,
-and convexity are theorems of the numerical construction and are attached below. -/
-theorem exists_fixedGrade_gap_biology (K : ℕ) :
-    ∀ᶠ n : ℕ in Filter.atTop,
-      ∃ P : MeanAbsoluteEffectCertificateProblem (n + 1) n,
-        P.mixtureExperiment.SeparatedBy
-          (FiniteMixtureExperiment.fixedGradeInformationRadius n) ∧
-          FiniteMixtureExperiment.fixedGradeGapScale K n ≤
-            P.certificationGap (K + 1)
-              (FiniteMixtureExperiment.fixedGradeInformationRadius n) := by
-  sorry
-
-/-- **Fixed-grade incompleteness for polygenic architecture transport.**
-
-This is the biology-facing theorem. Its hard content is exactly
-`exists_fixedGrade_gap_biology`; the remaining clauses are discharged by the already-proved
-geometry of the data-derived effect carrier. In particular, convexity is a conclusion, never a
-field or premise supplied by a caller. -/
-theorem fixedGrade_incompleteness_biology (K : ℕ) :
-    ∀ᶠ n : ℕ in Filter.atTop,
-      ∃ P : MeanAbsoluteEffectCertificateProblem (n + 1) n,
-        (∀ i, P.architecture i ∈ P.effects) ∧
-          P.effects.Nonempty ∧ Convex ℝ P.effects ∧
-          P.mixtureExperiment.SeparatedBy
-          (FiniteMixtureExperiment.fixedGradeInformationRadius n) ∧
-          FiniteMixtureExperiment.fixedGradeGapScale K n ≤
-            P.certificationGap (K + 1)
-              (FiniteMixtureExperiment.fixedGradeInformationRadius n) := by
-  filter_upwards [exists_fixedGrade_gap_biology K] with n hn
-  rcases hn with ⟨P, hinf, hgap⟩
-  exact ⟨P, fun i ↦ P.architecture_mem_effects i, P.effects_nonempty,
-    P.effects_convex, hinf, hgap⟩
+/-- The target separation of a point-versus-point biological certificate is
+exactly the difference in mean absolute causal effect. -/
+@[simp] theorem targetGap_two_architectures {q n : ℕ}
+    (P : MeanAbsoluteEffectCertificateProblem q n) (i j : Fin (n + 1)) :
+    P.finiteProblem.targetGap (PMF.pure i) (PMF.pure j) =
+      |meanAbsoluteEffect (P.architecture i) -
+        meanAbsoluteEffect (P.architecture j)| := by
+  simp [FiniteMomentCertificateProblem.targetGap]
 
 end MeanAbsoluteEffectCertificateProblem
 

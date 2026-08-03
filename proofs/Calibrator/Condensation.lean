@@ -49,6 +49,15 @@ phase transition is the BBM result cited below, not something proved here. The n
 carries the physics and the proof carries the arithmetic, and the two must not be
 read as one.
 
+What the arithmetic does deliver, and it is a study-design statement rather than a
+limit theorem: `subcritical_iff_exp_lt` puts the boundary in panel units, as
+`exp (c * m) < N`, and `two_pow_le_gaussian_panel_requirement` shows that requirement
+exceeds `2 ^ m` at the Gaussian coupling because `log 2 < condensationConstant`. So
+admissible interaction degree grows like the logarithm of the panel, and each further
+unit of degree more than doubles the panel needed. That consequence is unconditional
+on the transition: it is what the definition costs, whatever the definition turns out
+to mark.
+
 The failure is not additive and is therefore invisible to every additive diagnostic
 (cumulants, influences, mixing). It is multiplicative: a product of `m` independent
 standardized factors converts the *diagonal* data of the coordinate law into an

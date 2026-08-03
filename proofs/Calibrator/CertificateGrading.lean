@@ -70,15 +70,15 @@ The numerical calculus below is useful only after saying what its modulus is.
 The following definitions make the usual mixture-versus-mixture construction
 literal.  A prior is Mathlib's canonical probability mass function on a
 nonempty finite support, including boundary priors with zero-mass atoms.  Thus
-there is no caller-supplied mass or positivity theorem.  Grade `K` means equality of
-the moments with indices `< K`.  The statistical experiment enters only
+there is no caller-supplied mass or positivity theorem.  Moment order `K` means
+equality of the moments with indices `< K`.  The statistical experiment enters only
 through a numerical discrepancy, and the modulus is the supremum of target
 separations among feasible pairs.
 
-This is the non-vacuous grading interface: removing the grade constraint gives
-the ungraded optimization, while increasing the grade shrinks the feasible
-set.  Any claim about the *value* or *rate* of the resulting modulus still has
-to be proved for the particular experiment.
+Removing the moment constraint gives the unrestricted optimization, while
+increasing the order shrinks the feasible set.  Any claim about the *value* or
+*rate* of the resulting modulus still has to be proved for the particular
+experiment.
 -/
 
 /-- A probability law on `n + 1` support points.  This is an alias of
@@ -180,6 +180,45 @@ theorem finitePrior_probability_mem {n : ℕ} (P : FinitePrior n) :
       rwa [tsum_fintype] at hcoe
     rw [hsum]
     norm_num
+
+namespace FinitePrior
+
+variable {n : ℕ}
+
+/-- A probability law uses at least one atom. -/
+theorem atomCount_pos (P : FinitePrior n) : 0 < P.atomCount := by
+  classical
+  by_contra h
+  have hcard : P.activeAtoms.card = 0 := by
+    exact Nat.eq_zero_of_not_pos h
+  have hempty : P.activeAtoms = ∅ := Finset.card_eq_zero.mp hcard
+  have hz : ∀ i, P.probability i = 0 := by
+    intro i
+    by_contra hi
+    have himem : i ∈ P.activeAtoms := by
+      simp [activeAtoms, hi]
+    rw [hempty] at himem
+    simp at himem
+  have hsum := (finitePrior_probability_mem P).2
+  simp only [hz, Finset.sum_const_zero] at hsum
+  norm_num at hsum
+
+/-- A point mass uses exactly one atom. -/
+@[simp] theorem atomCount_pure (i : Fin (n + 1)) :
+    atomCount (PMF.pure i) = 1 := by
+  classical
+  unfold atomCount activeAtoms probability
+  have hfilter : Finset.univ.filter
+      (fun j : Fin (n + 1) ↦ ((PMF.pure i) j).toReal ≠ 0) = {i} := by
+    ext j
+    by_cases hji : j = i
+    · subst j
+      simp [PMF.pure_apply]
+    · simp [PMF.pure_apply, hji]
+  rw [hfilter]
+  simp
+
+end FinitePrior
 
 /-- The prior class underlying every finite mixture experiment is convex;
 convexity is proved from the simplex equations, not accepted as an experiment
@@ -306,6 +345,86 @@ theorem modulus_antitone_grade {K L : ℕ} (hKL : K ≤ L) (h : ℝ) :
     exact Set.mem_insert_iff.mpr <| Or.inr
       ⟨P, Q, E.feasible_mono hKL h hfeas, rfl⟩
 
+/-! ## Certificate complexity: atoms, not forced equalities
+
+`modulus` above is the modulus after imposing `K` moment equalities.  It is
+antitone in `K`, so `K` there is an approximation order, not method power.
+The definitions below grade a mixture-versus-mixture certificate by the total
+number of atoms in its two priors.  This feasible family grows with `K`.
+-/
+
+/-- A grade-`K` certificate uses at most `K` atoms across its two mixing
+priors and satisfies the experiment's information constraint. -/
+def AtomFeasible (K : ℕ) (h : ℝ) (P Q : FinitePrior n) : Prop :=
+  P.atomCount + Q.atomCount ≤ K ∧ |E.pairDiscrepancy P Q| ≤ |h|
+
+/-- Target gaps carried by certificates of atom complexity at most `K`. -/
+noncomputable def admissibleAtomGaps (K : ℕ) (h : ℝ) : Set ℝ :=
+  {d : ℝ | ∃ P Q, E.AtomFeasible K h P Q ∧ d = E.targetGap P Q}
+
+/-- Certificate-complexity modulus.  Unlike the moment-constrained modulus,
+this is monotone increasing in its grade. -/
+noncomputable def atomModulus (K : ℕ) (h : ℝ) : ℝ :=
+  sSup (insert 0 (E.admissibleAtomGaps K h))
+
+theorem admissibleAtomGaps_bddAbove (K : ℕ) (h : ℝ) :
+    BddAbove (insert 0 (E.admissibleAtomGaps K h)) := by
+  refine ⟨2 * ∑ i, |E.target i|, ?_⟩
+  intro d hd
+  rcases hd with (rfl | ⟨P, Q, _, rfl⟩)
+  · positivity
+  · exact E.targetGap_le_catalogueBound P Q
+
+theorem atomModulus_nonneg (K : ℕ) (h : ℝ) : 0 ≤ E.atomModulus K h := by
+  apply le_csSup (E.admissibleAtomGaps_bddAbove K h)
+  exact Set.mem_insert 0 _
+
+/-- Increasing certificate complexity preserves every feasible certificate. -/
+theorem atomFeasible_mono {K L : ℕ} (hKL : K ≤ L) (h : ℝ)
+    {P Q : FinitePrior n} (hfeas : E.AtomFeasible K h P Q) :
+    E.AtomFeasible L h P Q :=
+  ⟨hfeas.1.trans hKL, hfeas.2⟩
+
+/-- Method power is monotone: allowing more atoms can only enlarge the
+certificate modulus. -/
+theorem atomModulus_mono {K L : ℕ} (hKL : K ≤ L) (h : ℝ) :
+    E.atomModulus K h ≤ E.atomModulus L h := by
+  unfold atomModulus
+  apply csSup_le_csSup (E.admissibleAtomGaps_bddAbove L h)
+    ⟨0, Set.mem_insert 0 (E.admissibleAtomGaps K h)⟩
+  intro d hd
+  rcases hd with (rfl | ⟨P, Q, hfeas, rfl⟩)
+  · exact Set.mem_insert 0 _
+  · exact Set.mem_insert_iff.mpr <| Or.inr
+      ⟨P, Q, E.atomFeasible_mono hKL h hfeas, rfl⟩
+
+/-- No certificate can use fewer than two atoms: each probability law uses at
+least one. -/
+theorem not_atomFeasible_of_grade_lt_two {K : ℕ} (hK : K < 2) (h : ℝ)
+    (P Q : FinitePrior n) : ¬ E.AtomFeasible K h P Q := by
+  intro hfeas
+  have hP := P.atomCount_pos
+  have hQ := Q.atomCount_pos
+  omega
+
+/-- Grade two contains every ordinary point-versus-point certificate. -/
+theorem atomFeasible_two_pure_iff (h : ℝ) (i j : Fin (n + 1)) :
+    E.AtomFeasible 2 h (PMF.pure i) (PMF.pure j) ↔
+      |E.pairDiscrepancy (PMF.pure i) (PMF.pure j)| ≤ |h| := by
+  simp [AtomFeasible]
+
+/-- Every atom-bounded certificate is an unrestricted certificate. -/
+theorem atomModulus_le_unrestricted (K : ℕ) (h : ℝ) :
+    E.atomModulus K h ≤ E.modulus 0 h := by
+  unfold atomModulus modulus
+  apply csSup_le_csSup (E.admissibleGaps_bddAbove 0 h)
+    ⟨0, Set.mem_insert 0 (E.admissibleAtomGaps K h)⟩
+  intro d hd
+  rcases hd with (rfl | ⟨P, Q, hfeas, rfl⟩)
+  · exact Set.mem_insert 0 _
+  · exact Set.mem_insert_iff.mpr <| Or.inr
+      ⟨P, Q, ⟨E.momentMatched_zero P Q, hfeas.2⟩, rfl⟩
+
 end FiniteMomentCertificateProblem
 
 /-! ## A genuine finite experiment, rather than an arbitrary discrepancy
@@ -359,13 +478,11 @@ noncomputable def totalVariation
 /-- **A kernel whose laws all sit within `ε` of one fixed law makes every pair of
 priors `2ε`-indistinguishable**, no matter how many parameters it has.
 
-WHY THIS MATTERS FOR THE ADMITTED RATE THEOREM. `fixedGradeInformationRadius`
-replaced radius one precisely so that the discrepancy constraint would bind and
-the observation kernel would stay part of the modulus. A shrinking radius is
-necessary for that, and this says it is not sufficient: taking `ε` to be half
-the radius makes `totalVariation ≤ radius` for EVERY pair, so feasibility
-collapses to moment matching again and the kernel drops out exactly as it did at
-radius one.
+WHY THIS MATTERS FOR RATE THEOREMS. A shrinking radius is necessary for the
+discrepancy constraint to bind, but this says it is not sufficient: taking `ε`
+to be half the radius makes `totalVariation ≤ radius` for EVERY pair, so
+feasibility collapses to its algebraic constraints and the kernel drops out
+exactly as it does at radius one.
 
 The witness is free to choose the kernel after seeing `n`, so it can always
 shrink the kernel's spread faster than the radius shrinks. Closing that needs a
@@ -515,10 +632,8 @@ discrepancy constraint forces the prior-predictive laws close together --
 cannot be expressed at this radius. Expressing it needs a radius that shrinks
 with the sample size, so that the constraint binds.
 
-This is why `fixedGrade_incompleteness` and its biology twin remain admitted
-rather than proved: at `h = 1` they are provable by a construction with no
-statistical content, and a proof of the statement as written would not be a
-proof of the claim the name makes. -/
+This is why no sample-size incompleteness theorem is stated at `h = 1`: it
+would be provable by a construction with no statistical content. -/
 theorem totalVariation_le_one' (P Q : FinitePrior parameterCount) :
     |E.totalVariation P Q| ≤ |(1 : ℝ)| := by
   rw [abs_of_nonneg (E.totalVariation_nonneg P Q), abs_one]
@@ -637,103 +752,23 @@ theorem constantObservationExperiment_modulus_eq
           ((constantObservationExperiment_feasible_iff target moment law K h₂ P Q).1 hfeasible),
         rfl⟩
 
-/-- Grade exponent used in the fixed-grade gap theorem.  Writing `K + 1`
-makes the theorem total at grade zero while retaining order `1/K`. -/
-noncomputable def fixedGradeExponent (K : ℕ) : ℝ :=
-  1 / (K + 1 : ℝ)
-
-/-- The chosen exponent is quantitatively of order `1 / K`, with explicit
-constants, rather than merely described by asymptotic notation. -/
-theorem fixedGradeExponent_bounds (K : ℕ) (hK : 1 ≤ K) :
-    1 / (2 * (K : ℝ)) ≤ fixedGradeExponent K ∧
-      fixedGradeExponent K ≤ 1 / (K : ℝ) := by
-  have hk : (1 : ℝ) ≤ K := by exact_mod_cast hK
-  have hkpos : (0 : ℝ) < K := lt_of_lt_of_le zero_lt_one hk
-  unfold fixedGradeExponent
-  constructor
-  · rw [div_le_div_iff₀ (mul_pos (by norm_num) hkpos) (by positivity)]
-    nlinarith
-  · rw [div_le_div_iff₀ (by positivity) hkpos]
-    nlinarith
-
-/-- The explicit polynomial-over-logarithmic factor from the program. -/
-noncomputable def fixedGradeGapScale (K n : ℕ) : ℝ :=
-  (n + 2 : ℝ) ^ (fixedGradeExponent K / 2) /
-    Real.sqrt (Real.log (n + 2 : ℝ))
-
-/-- Statistical indistinguishability radius for `n` independent observations.
-
-The `+ 2` makes the definition total while preserving the canonical `n⁻¹ʲ²` scale. Unlike
-radius one, this radius is strictly below one, so total variation is not automatically feasible
-and the observation kernel remains part of the modulus. -/
-noncomputable def fixedGradeInformationRadius (n : ℕ) : ℝ :=
-  1 / Real.sqrt (n + 2 : ℝ)
-
-theorem fixedGradeInformationRadius_pos (n : ℕ) :
-    0 < fixedGradeInformationRadius n := by
-  unfold fixedGradeInformationRadius
-  exact div_pos zero_lt_one (Real.sqrt_pos.2 (by positivity))
-
-theorem fixedGradeInformationRadius_lt_one (n : ℕ) :
-    fixedGradeInformationRadius n < 1 := by
-  unfold fixedGradeInformationRadius
-  have hbase : (1 : ℝ) < n + 2 := by exact_mod_cast (show 1 < n + 2 by omega)
-  have hsqrt : 1 < Real.sqrt (n + 2 : ℝ) := (Real.lt_sqrt (by norm_num)).2 (by nlinarith)
-  exact (div_lt_one (by positivity)).2 hsqrt
-
-/-- The proposed fixed-grade scale is strictly positive for every grade and catalogue size. -/
-theorem fixedGradeGapScale_pos (K n : ℕ) : 0 < fixedGradeGapScale K n := by
-  unfold fixedGradeGapScale fixedGradeExponent
-  have hbase : (0 : ℝ) < n + 2 := by positivity
-  have honeNat : 1 < n + 2 := by omega
-  have hone : (1 : ℝ) < n + 2 := by exact_mod_cast honeNat
-  exact div_pos (Real.rpow_pos_of_pos hbase _)
-    (Real.sqrt_pos.2 (Real.log_pos hone))
-
-/-- Modulus-level certification gap of this actual finite experiment. -/
-noncomputable def certificationGap (K : ℕ) (h : ℝ) : ℝ :=
+/-- Ratio between the unrestricted modulus and the certificates available with
+at most `K` total atoms.  A quantitative incompleteness theorem for a concrete
+experiment is a lower bound on this derived number; it is not an input field. -/
+noncomputable def atomCertificationGap (K : ℕ) (h : ℝ) : ℝ :=
   E.certificateProblem.modulus 0 h /
-    E.certificateProblem.modulus K h
+    E.certificateProblem.atomModulus K h
 
-/-- The only unproved mathematical construction needed by the finite fixed-grade theorem:
-at every fixed positive grade there is a sequence of actual finite mixture experiments whose
-ungraded-to-graded modulus ratio is at least
-
-`n^(b_K/2) / sqrt(log n)`, with `b_K = 1/(K+1) = Θ(1/K)`.
-
-Its proof must construct moment-matching priors in a concrete growing-data experiment and compare
-their actual prior-predictive total variation laws. The experiment, target, and probes may not be
-tuned after reading the desired bound. A constant observation kernel or a residual chosen as the
-reciprocal of the conclusion would prove only that this interface is underconstrained.
-
-The automatic convexity of the finite probability simplex is deliberately absent from this
-admission. It is proved separately and attached by `fixedGrade_incompleteness`, so the visible
-`sorry` covers exactly the missing statistical construction and nothing routine. -/
-theorem exists_fixedGrade_gap (K : ℕ) :
-    ∀ᶠ n : ℕ in Filter.atTop,
-      ∃ observationCount : ℕ,
-        ∃ E : FiniteMixtureExperiment n observationCount,
-          E.SeparatedBy (fixedGradeInformationRadius n) ∧
-            fixedGradeGapScale K n ≤
-              E.certificationGap (K + 1) (fixedGradeInformationRadius n) := by
-  sorry
-
-/-- **Fixed-grade incompleteness on a convex problem.**
-
-The substantive gap comes only from `exists_fixedGrade_gap`; convexity is not accepted as part of
-that witness. Every finite prior lies in Mathlib's probability simplex, and
-`finitePriorCarrier_convex` proves that simplex convex for every catalogue size. Thus this theorem
-records the striking convexity clause without enlarging the admitted mathematical core. -/
-theorem fixedGrade_incompleteness (K : ℕ) :
-    ∀ᶠ n : ℕ in Filter.atTop,
-      ∃ observationCount : ℕ,
-        ∃ E : FiniteMixtureExperiment n observationCount,
-          Convex ℝ (finitePriorCarrier n) ∧ E.SeparatedBy (fixedGradeInformationRadius n) ∧
-            fixedGradeGapScale K n ≤
-              E.certificationGap (K + 1) (fixedGradeInformationRadius n) := by
-  filter_upwards [exists_fixedGrade_gap K] with n hn
-  rcases hn with ⟨observationCount, E, hinf, hgap⟩
-  exact ⟨observationCount, E, finitePriorCarrier_convex n, hinf, hgap⟩
+/-- The two notions of grade have opposite monotonicity.  Moment order is
+antitone because it imposes constraints; certificate complexity is monotone
+because it permits constructions.  This is the formal reason they cannot be
+identified. -/
+theorem grading_direction_repair {K L : ℕ} (hKL : K ≤ L) (h : ℝ) :
+    E.certificateProblem.modulus L h ≤ E.certificateProblem.modulus K h ∧
+      E.certificateProblem.atomModulus K h ≤
+        E.certificateProblem.atomModulus L h :=
+  ⟨E.certificateProblem.modulus_antitone_grade hKL h,
+    E.certificateProblem.atomModulus_mono hKL h⟩
 
 end FiniteMixtureExperiment
 

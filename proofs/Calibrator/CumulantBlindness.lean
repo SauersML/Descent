@@ -57,6 +57,14 @@ the normalization forced by polygenicity (`max_i Influence_i → 0`) crushes eve
 diagonal cumulant by `tau ^ ((r - 2) / 2)`. Diagnostics of this family cannot certify
 the score-distribution assumptions they are usually used to certify.
 
+Section 2b makes that reading a theorem rather than a gloss. It defines the influence
+of a locus as its share `β_j² h_j / ∑_i β_i² h_i` of the score variance, proves the
+shares sum to one, proves that per-locus shares bounded between `d > 0` and `c` force
+every influence below `c / (m · d)`, and concludes that the Section 2 bound therefore
+tends to zero as the score spreads over more loci. Before that section the file
+contained no locus, no effect size and no score, and the genetics reading was carried
+entirely by this paragraph.
+
 ## Applicability to genotypes: unrestricted
 
 Unlike the sign-erasure results of `Calibrator.EpistaticChaos` and the completeness
@@ -155,6 +163,45 @@ theorem no_fixed_order_cumulant_criterion
     ({ positive := m₀, negative := m₁, same_data := hmatch, holds := h₀, fails := h₁ } :
         ProbeBlindness cumulantsUpTo universal).no_criterion_of_factors decide
       ⟨accept, hdec⟩
+
+/-- **The witness pair exists**, so the blindness theorem above is about something.
+
+    `no_fixed_order_cumulant_criterion` takes `m₀ m₁` and their matching as hypotheses,
+    and its docstring says "all this theorem contributes is the witness pair". It did not
+    contribute one: with no instance the statement is a conditional nobody had discharged,
+    and a blindness claim with no witnessing pair is vacuous in the direction that matters.
+
+    Here is one. Models are tilt-moment sequences, `universal` means untilted, and the data
+    a decision rule sees is the sequence truncated at order `K`. The tilted model agrees
+    with the Gaussian at every order it is allowed to see and differs at order `K + 1`. -/
+theorem exists_cumulantBlind_pair (K : ℕ) :
+    ∃ (Model Cumulants : Type) (cumulantsUpTo : Model → Cumulants)
+      (universal : Model → Prop) (m₀ m₁ : Model),
+      cumulantsUpTo m₀ = cumulantsUpTo m₁ ∧ universal m₀ ∧ ¬ universal m₁ := by
+  classical
+  refine ⟨ℕ → ℝ, ℕ → ℝ, fun m n ↦ if n ≤ K then m n else 0, fun m ↦ m = 0,
+    (fun _ ↦ 0), (fun n ↦ if n = K + 1 then 1 else 0), ?_, rfl, ?_⟩
+  · funext n
+    by_cases hn : n ≤ K
+    · have hne : n ≠ K + 1 := by omega
+      simp [hn, hne]
+    · simp [hn]
+  · intro hzero
+    have := congrFun hzero (K + 1)
+    simp at this
+
+/-- **The blindness is realized**: at every fixed order there is a genuine pair no
+    order-`≤ K` cumulant criterion can separate. This is the previous theorem applied to the
+    witness, so the negative result no longer rests on an undischarged hypothesis. -/
+theorem cumulant_criterion_blind (K : ℕ) :
+    ∃ (Model Cumulants : Type) (cumulantsUpTo : Model → Cumulants)
+      (universal : Model → Prop),
+      ¬ ∃ decide : Cumulants → Prop, ∃ accept : Prop → Prop,
+          ∀ m : Model, universal m ↔ accept (decide (cumulantsUpTo m)) := by
+  obtain ⟨Model, Cumulants, cumulantsUpTo, universal, m₀, m₁, hmatch, h₀, h₁⟩ :=
+    exists_cumulantBlind_pair K
+  exact ⟨Model, Cumulants, cumulantsUpTo, universal,
+    no_fixed_order_cumulant_criterion cumulantsUpTo universal m₀ m₁ hmatch h₀ h₁⟩
 
 end HiddenTilt
 
