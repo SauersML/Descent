@@ -269,6 +269,68 @@ theorem invariantAverage_velocity_eq_neg_shift {n : ℕ}
   intro i
   rw [hmotion i, generator_linkedCurve_eq_generator L m theta hconst i]
 
+/-! ## Reconstruction: transporting a conditional through the observed marginal
+
+Theorem 14. The marked subpopulation `q` and the population `p` are pushed forward by the SAME
+one-step coupling, so a conditional observed at one time can be transported to the next by
+pushing forward `κ p` and dividing by the pushed-forward marginal. That ratio is Bayes' rule
+built from the observed marginals, and it is exact rather than approximate: nothing is estimated
+in `reconstruct_eq_of_pushed_marked`, the two sides are the same number.
+
+`reconstruct_between` is the half that makes it usable. The operator is a weighted average of the
+conditional's own values, so it cannot leave their range: an error in the observed conditional is
+never amplified by transporting it forward. That is the forward direction of the asymmetry the
+analysis turns on, and the backward direction — where the same structure inverts and amplifies —
+is not proved here. -/
+
+/-- One step of the coupling applied to a nonnegative density on a finite state space. -/
+noncomputable def pushForward {n : ℕ} (M : Fin n → Fin n → ℝ) (f : Fin n → ℝ) (i : Fin n) : ℝ :=
+  ∑ j, M i j * f j
+
+/-- Transport a conditional through one step: push the marked subpopulation forward and divide
+by the pushed-forward marginal. -/
+noncomputable def reconstruct {n : ℕ} (M : Fin n → Fin n → ℝ) (p κ : Fin n → ℝ)
+    (i : Fin n) : ℝ :=
+  pushForward M (fun j => κ j * p j) i / pushForward M p i
+
+/-- **Exactness.** If the marked subpopulation is `κ p`, the transported conditional is the ratio
+of the two pushed-forward densities. Both are pushed by the same coupling, which is the whole
+reason this is an identity and not an estimate. -/
+theorem reconstruct_eq_of_pushed_marked {n : ℕ} (M : Fin n → Fin n → ℝ)
+    (p κ q : Fin n → ℝ) (i : Fin n) (hq : ∀ j, q j = κ j * p j) :
+    reconstruct M p κ i = pushForward M q i / pushForward M p i := by
+  unfold reconstruct
+  congr 1
+  unfold pushForward
+  exact Finset.sum_congr rfl fun j _ => by rw [hq j]
+
+/-- **Transport never amplifies.** The reconstructed conditional is a weighted average of the
+conditional's own values, so it stays inside their range. An error in the observed conditional is
+carried forward, never magnified — which is why forward reconstruction is the cheap direction. -/
+theorem reconstruct_between {n : ℕ} (M : Fin n → Fin n → ℝ) (p κ : Fin n → ℝ) (i : Fin n)
+    (lo hi : ℝ) (hM : ∀ j, 0 ≤ M i j) (hp : ∀ j, 0 ≤ p j)
+    (hpos : 0 < pushForward M p i)
+    (hlo : ∀ j, lo ≤ κ j) (hhi : ∀ j, κ j ≤ hi) :
+    lo ≤ reconstruct M p κ i ∧ reconstruct M p κ i ≤ hi := by
+  have hnum_lo : lo * pushForward M p i ≤ pushForward M (fun j => κ j * p j) i := by
+    unfold pushForward
+    rw [Finset.mul_sum]
+    refine Finset.sum_le_sum fun j _ => ?_
+    have hstep : lo * p j ≤ κ j * p j := mul_le_mul_of_nonneg_right (hlo j) (hp j)
+    calc lo * (M i j * p j) = M i j * (lo * p j) := by ring
+      _ ≤ M i j * (κ j * p j) := mul_le_mul_of_nonneg_left hstep (hM j)
+  have hnum_hi : pushForward M (fun j => κ j * p j) i ≤ hi * pushForward M p i := by
+    unfold pushForward
+    rw [Finset.mul_sum]
+    refine Finset.sum_le_sum fun j _ => ?_
+    have hstep : κ j * p j ≤ hi * p j := mul_le_mul_of_nonneg_right (hhi j) (hp j)
+    calc M i j * (κ j * p j) ≤ M i j * (hi * p j) := mul_le_mul_of_nonneg_left hstep (hM j)
+      _ = hi * (M i j * p j) := by ring
+  unfold reconstruct
+  constructor
+  · rw [le_div_iff₀ hpos]; linarith
+  · rw [div_le_iff₀ hpos]; linarith
+
 /-! ## What survives a mixing drift -/
 
 /-- **A continuous invariant of the drift is determined by the drift's limit.**
