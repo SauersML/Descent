@@ -97,9 +97,16 @@ Written for Python 3.6.8 with numpy only.
 import argparse
 import json
 import math
+import os
+import sys
 import time
 
 import numpy as np
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(
+    os.path.abspath(__file__)))))
+
+import simprov  # noqa: E402
 
 SEED = 20260803
 
@@ -112,6 +119,7 @@ C2_DRAW_BUDGET = 2000000
 C3_NP = 200
 C3_M = 20000
 C3_R = 200
+C3_ETAS = (0.30, 0.15, 0.075, 0.0375)
 C4_NP = 200
 C4_N_GRID = (200, 800, 3200)
 C4_M_GRID = (400, 1600, 6400)
@@ -120,24 +128,109 @@ C5_NP = 400
 C5_M = 240000
 C5_M_GRID = (500, 2000, 8000)
 
+# The knobs `--set` may override, each with a one-line meaning, so that
+# `--help` is a complete account of what can be widened without reading the
+# source.  Everything here is either a sample count (more replicates, smaller
+# error bar) or a grid (more cells, visible curve); nothing here changes an
+# estimand.
+TUNABLES = {
+    "C1_NP": "C1 chain depth n'",
+    "C1_R_ENS": "C1 ensembles at the largest m (sets the total cohort pool)",
+    "C1_M_MAX": "C1 largest draw count m",
+    "C1_M_GRID": "C1 sweep over m",
+    "C2_N_GRID": "C2 sweep over sample size n",
+    "C2_DRAW_BUDGET": "C2 total one-unit draws per cell",
+    "C3_NP": "C3 chain depth n'",
+    "C3_M": "C3 draws per ensemble",
+    "C3_R": "C3 ensembles per eta (the replicate count of the sealing law)",
+    "C3_ETAS": "C3 sweep over the support floor eta",
+    "C4_NP": "C4 chain depth n'",
+    "C4_N_GRID": "C4 sweep over source sample size n",
+    "C4_M_GRID": "C4 sweep over channel draw count m",
+    "C4_REP": "C4 replicates per factorial cell",
+    "C5_NP": "C5 chain depth n'",
+    "C5_M": "C5 draws for the identifiability arm",
+    "C5_M_GRID": "C5 sweep over m",
+}
+
 
 def configure_profile(profile):
-    """Use a bounded development experiment by default; preserve the registered full run."""
+    """Use a bounded development experiment by default; preserve the registered full run.
+
+    `deep` is the full experiment with the SAMPLING widened and nothing else
+    touched: more cells on the m and eta axes so the constants are read off a
+    curve, and more ensembles per cell so the error bar is small against the
+    deviation from 1.0 that each check is testing for.  Every estimand -- rho0,
+    theta0, the paths, the closed forms -- is identical to `full`.
+    """
     global C1_NP, C1_R_ENS, C1_M_MAX, C1_M_GRID
-    global C2_N_GRID, C2_DRAW_BUDGET, C3_NP, C3_M, C3_R
+    global C2_N_GRID, C2_DRAW_BUDGET, C3_NP, C3_M, C3_R, C3_ETAS
     global C4_NP, C4_N_GRID, C4_M_GRID, C4_REP
     global C5_NP, C5_M, C5_M_GRID
     if profile == "full":
         return
+    if profile == "deep":
+        C1_R_ENS, C1_M_MAX = 600, 3200
+        C1_M_GRID = (25, 50, 100, 200, 400, 800, 1600, 3200)
+        C2_DRAW_BUDGET = 8000000
+        C2_N_GRID = (300, 1000, 3000, 10000, 30000, 100000, 300000, 1000000)
+        C3_M, C3_R = 20000, 800
+        # Nine etas over a 16x range: the local slope of the closed form moves
+        # from about 1.54 to about 1.96 across it, so the curvature that the
+        # secant slope hides is directly visible.
+        C3_ETAS = tuple(simprov.log_grid(0.30, 0.01875, 9))
+        C4_N_GRID = (100, 200, 400, 800, 1600, 3200)
+        C4_M_GRID = (200, 400, 800, 1600, 3200, 6400)
+        C4_REP = 1200
+        C5_M_GRID = (250, 500, 1000, 2000, 4000, 8000)
+        return
     if profile != "quick":
-        raise ValueError("profile must be 'quick' or 'full'")
+        raise ValueError("profile must be 'quick', 'full' or 'deep'")
     C1_NP, C1_R_ENS, C1_M_MAX = 256, 40, 400
     C1_M_GRID = (25, 100, 400)
     C2_N_GRID, C2_DRAW_BUDGET = (500, 5000, 50000), 200000
     C3_NP, C3_M, C3_R = 128, 3000, 60
+    C3_ETAS = (0.30, 0.15, 0.075, 0.0375)
     C4_NP = 128
     C4_N_GRID, C4_M_GRID, C4_REP = (100, 400, 1600), (100, 400, 1600), 80
     C5_NP, C5_M, C5_M_GRID = 200, 24000, (200, 800, 3200)
+
+
+def apply_overrides(settings):
+    """Apply `--set NAME=VALUE` after the profile, so a profile stays a baseline.
+
+    Scalars parse as ints; anything with a comma or a decimal point becomes a
+    tuple, which is how the grids are spelled.
+    """
+    applied = {}
+    for s in settings:
+        if "=" not in s:
+            raise SystemExit("--set expects NAME=VALUE, got %r" % s)
+        name, _, raw = s.partition("=")
+        name = name.strip().upper()
+        if name not in TUNABLES:
+            raise SystemExit("--set: unknown knob %r; see --help for the list"
+                             % name)
+        parts = [p for p in raw.replace(",", " ").split() if p]
+        vals = [float(p) if ("." in p or "e" in p.lower()) else int(p)
+                for p in parts]
+        value = vals[0] if len(vals) == 1 and "," not in raw else tuple(vals)
+        globals()[name] = value
+        applied[name] = value
+    return applied
+
+
+def resolved_config():
+    """Every tunable's value as it stands, for the results file.
+
+    A sweep that records its profile name but not the numbers behind it cannot
+    be re-run from its own output, and the profile names have already been
+    edited once.
+    """
+    return {name: (list(globals()[name])
+                   if isinstance(globals()[name], tuple)
+                   else globals()[name])
+            for name in TUNABLES}
 
 
 # ===========================================================================
@@ -405,17 +498,34 @@ def c1(rng, out):
             est[e] = mle_rho_fast(U[e * m:(e + 1) * m], grid, ginv, gld)
         rmse = float(np.sqrt(np.mean((est - RHO0) ** 2)))
         pred = 1.0 / math.sqrt(m * p_fin)
+        # RMSE over nens ensembles has relative standard error 1/sqrt(2 nens),
+        # and the claim under test is that rmse/pred equals 1.0, so this is the
+        # bar that the deviation has to clear. Reported per row rather than
+        # left for the reader to reconstruct.
         rows.append({"m": m, "ensembles": nens, "rmse": rmse,
                      "rmse_predicted": pred, "ratio": rmse / pred,
-                     "bias": float(est.mean() - RHO0)})
+                     "ratio_se": (rmse / pred) / math.sqrt(2.0 * nens)
+                     if nens > 0 else None,
+                     "bias": float(est.mean() - RHO0),
+                     "bias_se": float(est.std(ddof=1) / math.sqrt(nens))
+                     if nens > 1 else None,
+                     "estimates": [float(x) for x in est]})
         print("  %-8d %-8d %-13.6f %-13.6f %-11.4f %+9.5f"
               % (m, nens, rmse, pred, rmse / pred, est.mean() - RHO0))
     ratios = [r["ratio"] for r in rows]
+    zs = [((r["ratio"] - 1.0) / r["ratio_se"]) if r["ratio_se"] else None
+          for r in rows]
     print("")
     print("  CONSTANT CHECK: measured RMSE / (m p)^{-1/2}, over the m grid: "
           "%s" % ", ".join("%.4f" % x for x in ratios))
+    print("  with standard errors:  %s"
+          % ", ".join("%.4f" % (r["ratio_se"] or float("nan")) for r in rows))
+    print("  deviations from 1.0 in SE: %s"
+          % ", ".join("n/a" if z is None else "%+.2f" % z for z in zs))
     print("  (a slope test alone would pass for any consistent estimator; the "
-          "content is that these ratios are 1.0)")
+          "content is that these ratios are 1.0. Read the SE column first: a "
+          "10 per cent tolerance applied to a ratio whose SE is 12 per cent "
+          "is a check that cannot fail.)")
     ok = clt_ok and mono and all(abs(x - 1.0) < 0.10 for x in ratios[1:])
     out["C1"] = {"identifiable_monotone": bool(mono),
                  "rho0": RHO0, "n_prime": NP, "p_finite": p_fin,
@@ -423,7 +533,7 @@ def c1(rng, out):
                  "p_isotropic_cell": p_iso,
                  "clt_kurtosis": kurt, "clt_cov_rel_dev": relS,
                  "clt_ok": bool(clt_ok), "rows": rows,
-                 "ratios": ratios, "pass": bool(ok)}
+                 "ratios": ratios, "ratio_z": zs, "pass": bool(ok)}
     return ok
 
 
@@ -591,7 +701,7 @@ def c3(rng, out):
     print("=" * 78)
     DELTA0 = 1.0
     NP = C3_NP
-    etas = (0.30, 0.15, 0.075, 0.0375)
+    etas = tuple(C3_ETAS)
     print("  F_t = z_t + eta * delta * z_{t-1}, z ~ AR(1) phi = %.2f, "
           "delta0 = %.1f, n' = %d (mixing time %.1f)"
           % (PHI_Z, DELTA0, NP, 1.0 / (1 - PHI_Z)))
@@ -616,9 +726,23 @@ def c3(rng, out):
         dhat = (ratio - 1.0) / eta
         rmse = float(np.sqrt(np.mean((dhat - DELTA0) ** 2)))
         pmeas = 1.0 / (M * rmse ** 2)
+        # The information ratio is a function of an RMSE over R ensembles, so
+        # its own uncertainty is the uncertainty of that RMSE: 1/sqrt(2R) in
+        # relative terms for the RMSE, hence twice that for p ~ 1/RMSE^2. Below
+        # about R = 200 the "measured p / closed form = 1.0 within 20 per cent"
+        # tolerance is looser than the error bar it is applied to, which makes
+        # the check pass by construction.
+        rel_se_p = 2.0 / math.sqrt(2.0 * R)
         rows.append({"eta": eta, "p_closed_form": pth, "p_measured": pmeas,
                      "rmse": rmse, "ratio": pmeas / pth,
-                     "bias": float(dhat.mean() - DELTA0)})
+                     "ratio_se": (pmeas / pth) * rel_se_p,
+                     "ensembles": int(R),
+                     "bias": float(dhat.mean() - DELTA0),
+                     "bias_se": float(dhat.std(ddof=1) / math.sqrt(R))
+                     if R > 1 else None,
+                     # One row per ensemble, so the scatter behind the RMSE is
+                     # in the file and not only its second moment.
+                     "delta_hat": [float(x) for x in dhat]})
         print("  %-9.4f %-13.6f %-13.6f %-13.6f %-11.4f"
               % (eta, pth, pmeas, rmse, pmeas / pth))
     le = np.log([r["eta"] for r in rows])
@@ -660,9 +784,15 @@ def c3(rng, out):
     exponent_ok = abs(loc[-1] - 2.0) < 0.01
     print("      converges to 2: %s" % ("PASS" if exponent_ok else "FAIL"))
     rat = [r["ratio"] for r in rows]
+    rat_z = [((r["ratio"] - 1.0) / r["ratio_se"]) if r["ratio_se"] else None
+             for r in rows]
     info_ok = all(abs(x - 1.0) < 0.20 for x in rat)
     print("  (b) INFORMATION: measured p / closed-form p at each eta: %s"
           % ", ".join("%.4f" % x for x in rat))
+    print("      standard errors: %s"
+          % ", ".join("%.4f" % (r["ratio_se"] or float("nan")) for r in rows))
+    print("      deviations from 1.0 in SE: %s"
+          % ", ".join("n/a" if z is None else "%+.2f" % z for z in rat_z))
     print("      the closed-form p IS the attainable information: %s"
           % ("PASS" if info_ok else "FAIL"))
     ok = exponent_ok and info_ok
@@ -672,6 +802,7 @@ def c3(rng, out):
                  "local_slope_at_smallest_eta": float(loc[-1]),
                  "exponent_pass": bool(exponent_ok),
                  "information_ratios": rat,
+                 "information_ratio_z": rat_z,
                  "information_pass": bool(info_ok),
                  "pass": bool(ok)}
     return ok
@@ -1136,9 +1267,21 @@ def c6(out):
 # ===========================================================================
 
 def main(argv=None):
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--profile", choices=("quick", "full"), default="quick",
-                        help="bounded development signal or registered full experiment")
+    parser = argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="tunable knobs for --set NAME=VALUE:\n" +
+               "\n".join("  %-16s %s" % (k, v) for k, v in TUNABLES.items()))
+    parser.add_argument("--profile", choices=("quick", "full", "deep"),
+                        default="quick",
+                        help="bounded development signal, the registered full "
+                             "experiment, or the same experiment with the "
+                             "sampling widened (deep)")
+    parser.add_argument("--set", dest="settings", action="append", default=[],
+                        metavar="NAME=VALUE",
+                        help="override one knob after the profile; repeatable")
+    parser.add_argument("--seed", type=int, default=SEED,
+                        help="master seed (default %d)" % SEED)
     parser.add_argument("--output", default="fam_permeability_results.json")
     parser.add_argument("--innovation-only", action="store_true",
                         help="run only the fast deterministic correlated-probe check")
@@ -1146,9 +1289,24 @@ def main(argv=None):
     if args.innovation_only:
         return 0 if c6({}) else 1
     configure_profile(args.profile)
+    overrides = apply_overrides(args.settings)
     t0 = time.time()
-    rng = np.random.default_rng(SEED)
-    out = {"profile": args.profile, "seed": SEED}
+    rng = np.random.default_rng(args.seed)
+    config = resolved_config()
+    print("profile %s, seed %d" % (args.profile, args.seed))
+    if overrides:
+        print("overrides: %s" % ", ".join("%s=%s" % kv
+                                          for kv in overrides.items()))
+    # The provenance header is written from the same module the popgen sweeps
+    # use, and carries the same field names as `Shared.Results.write` on the
+    # Lean side, so a reader can tell a current result from a stale one without
+    # trusting whoever quoted it.
+    out = {"_provenance": simprov.stamp(
+        "differential/cluster/fam_permeability.py", config, args.seed,
+        {"C1_ensembles_at_max_m": C1_R_ENS, "C3_ensembles_per_eta": C3_R,
+         "C4_reps_per_cell": C4_REP}),
+        "profile": args.profile, "seed": args.seed,
+        "overrides": overrides, "config": config}
     r1 = c1(rng, out)
     r2 = c2(rng, out)
     r3 = c3(rng, out)
@@ -1179,6 +1337,7 @@ def main(argv=None):
         print("  %-30s %s" % (tag, v))
     ok = bool(r1 and r2 and r3 and r4 and r5 and r6)
     out["READ_THE_TEST"] = ok
+    out["runtime_sec"] = time.time() - t0
     print("  READ_THE_TEST: %s" % ok)
     print("  runtime %.1f s" % (time.time() - t0))
     fh = open(args.output, "w")
