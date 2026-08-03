@@ -1049,6 +1049,37 @@ def hardCallLatticeIndex : DiploidGenotype → ℤ
   | DiploidGenotype.het => 0
   | DiploidGenotype.homAlt => 1
 
+/-- **The heterozygote's squared standardized value is exactly `2` at a lattice frequency.**
+
+This is the referent of the literal `2` in the conclusion of
+`hardCall_logSquare_eq_of_latticeCondition` below, and it is stated rather than left buried
+inside that proof on the `_uses_ploidy` reasoning: a literal that no theorem ties to the
+quantity it stands for silently stops tracking when the quantity changes, and no inspection
+of the proof term distinguishes "true today" from "load-bearing tomorrow".
+
+Note what the `2` is and is not. It is **not** the ploidy convention `Calibrator.ploidy`
+restated: it is `4q(1-q) / (2q(1-q))`, the ratio the lattice condition forces, where the
+denominator is `HardyWeinbergModel.genotypeVariance` -- itself a sum over `DiploidGenotype`
+rather than an inlined constant, and pinned to the convention by
+`Calibrator.mellinDrift_uses_ploidy`. So the chain from this `2` down to `ploidy` is
+guarded at exactly one place, which is where it should be.
+
+What this lemma buys is the other half: if the heterozygote's standardized square ever
+stops being `2` -- a different genotype coding, a polyploid generalisation -- this breaks
+here, loudly, instead of the arithmetic progression quietly ceasing to be one. -/
+theorem hweLatticeCondition_het_standardizedSquare (h : HardyWeinbergModel)
+    (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1)
+    (hlat : hweLatticeCondition h.altFreq) :
+    h.standardizedSquare DiploidGenotype.het = 2 := by
+  have hqne : h.altFreq ≠ 0 := ne_of_gt hq0
+  have hpne : (1 : ℝ) - h.altFreq ≠ 0 := by intro hc; exact absurd hq1 (by linarith)
+  have hlat' : (1 - 2 * h.altFreq) ^ 2 = 4 * h.altFreq * (1 - h.altFreq) := hlat
+  obtain ⟨_, hX1, _⟩ := standardizedSquare_values h hq0 hq1
+  rw [hX1, hlat']
+  first
+    | (field_simp; ring)
+    | field_simp
+
 /-- **The three logarithms, in closed form, at any lattice frequency.**
 
 `log x_g ^ 2 = log 2 + log ((1 - q) / q) * index g`, whenever `hweLatticeCondition q`
@@ -1080,12 +1111,7 @@ theorem hardCall_logSquare_eq_of_latticeCondition (h : HardyWeinbergModel)
   | het =>
     -- The lattice condition is precisely `x_het ^ 2 = 2`: the numerator becomes
     -- `4 q (1 - q)` and the denominator is `2 q (1 - q)`.
-    have hval : h.standardizedSquare DiploidGenotype.het = 2 := by
-      rw [hX1, hlat']
-      first
-        | (field_simp; ring)
-        | field_simp
-    rw [hval]
+    rw [hweLatticeCondition_het_standardizedSquare h hq0 hq1 hlat]
     simp only [hardCallLatticeIndex]
     push_cast
     ring
