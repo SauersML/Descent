@@ -1523,6 +1523,48 @@ theorem recovered_lt_predictable (h : 0 < R.estimationNoise) :
         exact (mul_lt_mul_left hpos).mpr hfrac
     _ = R.predictableVariance := mul_one _
 
+/-- **How many panels per cohort are enough?**
+
+The attenuation law answers this directly, and the answer is the actionable output of the
+whole arc. Averaging `B` order-free panels divides the estimation noise by `B`: writing the
+one-panel noise as `c`, the noise at `B` panels is `c/B` and the reliability ratio is
+`p/(p + c/B)`.
+
+Requiring reliability at least `τ` is then a **linear** condition on `B`:
+
+`B ≥ c·τ / (p·(1-τ))`.
+
+The measured run had reliability `0.153` at `B = 16`, so `c/p ≈ 16·(1/0.153 - 1) ≈ 88`.
+Reaching `τ = 0.8` from there needs `B ≈ 88 · 0.8/0.2 ≈ 350` panels per cohort, and `τ = 0.9`
+needs about `790`. **That is the design number, and it is two orders of magnitude above what
+was tried.** It is also why the curve-prior dissolution is not yet usable: not because it is
+false — the population identity is exact — but because the reliability it needs was never
+budgeted for.
+
+The `1/(1-τ)` blow-up is the shape to remember: each additional nine of reliability costs a
+factor of ten in panels. -/
+theorem panels_suffice_iff (p c τ B : ℝ) (hp : 0 < p) (hc : 0 < c)
+    (hτ0 : 0 < τ) (hτ1 : τ < 1) (hB : 0 < B) :
+    τ ≤ p / (p + c / B) ↔ c * τ / (p * (1 - τ)) ≤ B := by
+  have hCB : 0 < c / B := div_pos hc hB
+  have hden : 0 < p + c / B := by linarith
+  have h1τ : 0 < 1 - τ := by linarith
+  rw [le_div_iff₀ hden]
+  rw [div_le_iff₀ (mul_pos hp h1τ)]
+  constructor
+  · intro h
+    have hstep : τ * (c / B) ≤ p * (1 - τ) := by nlinarith
+    have := mul_le_mul_of_nonneg_right hstep (le_of_lt hB)
+    rw [div_mul_cancel₀ _ (ne_of_gt hB)] at this
+    linarith [this]
+  · intro h
+    have hstep : τ * c ≤ p * (1 - τ) * B := by linarith
+    have hdiv : τ * (c / B) ≤ p * (1 - τ) := by
+      rw [mul_div_assoc'] at *
+      rw [div_le_iff₀ hB]
+      linarith
+    nlinarith
+
 end RecoveryAttenuation
 
 /-! Resuming the design discussion.
