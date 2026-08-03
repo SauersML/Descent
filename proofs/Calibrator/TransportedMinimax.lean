@@ -108,7 +108,7 @@ theorem transportedRidgeParameter_eq_deflated (τ a r : ℝ) (ha : 0 < a) (har :
   have hsum : 1 + r / a = (a + r) / a := by field_simp
   unfold transportedRidgeParameter
   rw [hsum]
-  field_simp <;> ring
+  field_simp
 
 /-- **The two candidates are reciprocal about `τ²`**, which is the fingerprint of a single
     inversion rather than of a competing derivation. -/
@@ -116,7 +116,7 @@ theorem inflated_mul_deflated (τ a r : ℝ) (ha : 0 < a) (har : a + r ≠ 0) :
     inflatedRidgeParameter τ a r * transportedRidgeParameter τ a r = τ ^ 2 * τ ^ 2 := by
   have hane : a ≠ 0 := ne_of_gt ha
   unfold inflatedRidgeParameter transportedRidgeParameter
-  field_simp <;> ring
+  field_simp
 
 /-- **The inflated parameter fails the stationarity condition, at explicit rationals.**
 
@@ -133,5 +133,108 @@ theorem inflatedRidge_violates_stationarity :
       (1 + 1 : ℝ) * (1 / (1 + 2) - 1) * 1 ^ 2 + 1 ^ 2 * 1 * (1 / (1 + 2)) = -1 := by
   refine ⟨by norm_num [inflatedRidgeParameter], by norm_num [transportedRidgeParameter],
     by norm_num, by norm_num⟩
+
+/-! ## Long-memory geometry: why the sample cost of long memory is zero
+
+The design arc's most surprising corollary is that long memory is **free**: the estimation
+floor is `3/(2n)` uniformly in the memory parameter `δ`, even though the variance of the
+memory parameter's own estimator is anything but uniform in `δ`. The mechanism is that loss
+and information are the *same* metric at leading order, so the `δ` and `ε` factors appear
+once in each and cancel.
+
+The cancellation is the part worth having, and it is exact algebra once the two inputs are
+named: the conformal metric `ε²δ^{-3}` and the parameter variance `3δ³/(nε²)`. Both are
+analytic inputs — a Whittle-Fisher computation and a variance calculation — and neither is
+derived here.
+
+**A discrepancy in the upstream gloss, recorded rather than resolved.** The upstream text
+describes the parameter variance as one that "blows up" as memory lengthens, while giving it
+as `δ³/(nε²)`. Long memory is `δ → 0`, and `δ³/(nε²) → 0` there — the stated formula shrinks
+where the prose says it grows. `longMemoryVariance_strictMono` below records which way the
+stated formula actually runs. **The cancellation theorem is untouched either way**, since it
+only needs the product, which is why it is stated separately from the gloss. Whoever holds
+the upstream derivation should reconcile the word with the formula; nothing here depends on
+the outcome.
+
+Empirical status: UNTESTED. The two inputs are named hypotheses; the algebra is PROVED. -/
+
+section LongMemoryGeometry
+
+/-- The conformal metric coefficient of the generative geometry: `ε²/δ³`. -/
+noncomputable def longMemoryMetric (ε δ : ℝ) : ℝ := ε ^ 2 / δ ^ 3
+
+/-- The variance of the memory-parameter estimator at sample size `n`: `3δ³/(nε²)`. -/
+noncomputable def longMemoryVariance (ε δ n : ℝ) : ℝ := 3 * δ ^ 3 / (n * ε ^ 2)
+
+/-- **The transported estimation floor is `3/(2n)`, with `δ` and `ε` cancelling.**
+
+    Loss is the information metric at leading order, so the geometry enters the loss once
+    and the variance once, with opposite exponents. The floor a practitioner faces is
+    therefore free of both the memory parameter and the amplitude.
+
+    This is the exact statement behind "long memory has zero marginal sample cost". -/
+theorem transportedFloor_eq (ε δ n : ℝ) (hε : ε ≠ 0) (hδ : δ ≠ 0) (hn : n ≠ 0) :
+    (1 / 2) * longMemoryMetric ε δ * longMemoryVariance ε δ n = 3 / (2 * n) := by
+  unfold longMemoryMetric longMemoryVariance
+  field_simp
+
+/-- **The floor does not depend on the memory parameter at all**: two panels with different
+    memory lengths face the same estimation floor at the same sample size. -/
+theorem transportedFloor_indep_of_memory (ε δ₁ δ₂ n : ℝ)
+    (hε : ε ≠ 0) (hδ₁ : δ₁ ≠ 0) (hδ₂ : δ₂ ≠ 0) (hn : n ≠ 0) :
+    (1 / 2) * longMemoryMetric ε δ₁ * longMemoryVariance ε δ₁ n =
+      (1 / 2) * longMemoryMetric ε δ₂ * longMemoryVariance ε δ₂ n := by
+  rw [transportedFloor_eq ε δ₁ n hε hδ₁ hn, transportedFloor_eq ε δ₂ n hε hδ₂ hn]
+
+/-- **Which way the stated variance formula actually runs.**
+
+    It is strictly increasing in `δ`, so it *shrinks* as memory lengthens (`δ → 0`). Recorded
+    because the upstream prose says the opposite; see the section header. -/
+theorem longMemoryVariance_strictMono (ε n : ℝ) (hε : ε ≠ 0) (hn : 0 < n)
+    (δ₁ δ₂ : ℝ) (h₁ : 0 < δ₁) (h₁₂ : δ₁ < δ₂) :
+    longMemoryVariance ε δ₁ n < longMemoryVariance ε δ₂ n := by
+  have hε2 : 0 < ε ^ 2 := by positivity
+  have hden : 0 < n * ε ^ 2 := mul_pos hn hε2
+  unfold longMemoryVariance
+  have hδ₂ : 0 < δ₂ := lt_trans h₁ h₁₂
+  have hquad : (0:ℝ) < δ₂ ^ 2 + δ₂ * δ₁ + δ₁ ^ 2 := by
+    nlinarith [mul_pos hδ₂ h₁, sq_nonneg δ₁, sq_nonneg δ₂]
+  have hfac : (0:ℝ) < (δ₂ - δ₁) * (δ₂ ^ 2 + δ₂ * δ₁ + δ₁ ^ 2) :=
+    mul_pos (by linarith) hquad
+  apply div_lt_div_of_pos_right _ hden
+  nlinarith [hfac]
+
+/-! ### Positivity buys an exponent
+
+The metric-entropy side of the same arc. A moment body — the set of moment sequences of
+positive measures — has entropy exponent `1/α`, strictly below the `2/(2α-1)` of the
+hyperrectangle that contains it. The two exponents are named inputs; the comparison is the
+theorem, and it holds at every admissible `α` with no exceptional range. -/
+
+/-- Entropy exponent of the moment body: `log N(ε) = Θ((M/ε)^(1/α))`. -/
+noncomputable def momentBodyEntropyExponent (α : ℝ) : ℝ := 1 / α
+
+/-- Entropy exponent of the enclosing hyperrectangle: `ε^(-2/(2α-1))`. -/
+noncomputable def hyperrectangleEntropyExponent (α : ℝ) : ℝ := 2 / (2 * α - 1)
+
+/-- **Positivity buys an exponent, at every admissible `α`.**
+
+    The moment body's entropy exponent is strictly smaller than the hyperrectangle's
+    whenever `α > 1/2`, which is the whole admissible range. The gap is not asymptotic and
+    has no exceptional interval: positivity of the underlying measure is worth a strictly
+    better exponent everywhere, not merely a better constant.
+
+    Statistically: rates over a moment body are entropy-standard and strictly faster than
+    the coordinatewise bound suggests, so a sample-size calculation that treats the class as
+    a hyperrectangle is conservative by a power. -/
+theorem momentBody_entropy_exponent_lt (α : ℝ) (hα : 1 / 2 < α) :
+    momentBodyEntropyExponent α < hyperrectangleEntropyExponent α := by
+  have hα0 : 0 < α := by linarith
+  have hden : 0 < 2 * α - 1 := by linarith
+  unfold momentBodyEntropyExponent hyperrectangleEntropyExponent
+  rw [div_lt_div_iff₀ hα0 hden]
+  linarith
+
+end LongMemoryGeometry
 
 end Calibrator
