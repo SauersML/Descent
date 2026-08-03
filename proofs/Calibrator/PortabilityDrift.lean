@@ -2990,42 +2990,6 @@ structure LiabilityThresholdRegime (r2 K : ℝ) : Prop where
   caseVariance_pos : 0 < liabilityCaseVariance r2 K
   controlVariance_pos : 0 < liabilityControlVariance r2 K
 
-/-- Exact target AUC from the neutral allele-frequency benchmark state.
-
-**INHERITED ASSUMPTION, AND THIS IS THE DANGEROUS KIND.** This delegates to
-`presentDayEqualVarianceGaussianAUC`, so it silently carries the equal-variance Gaussian outcome
-assumption. It converts a drift-induced drop into **AUC units**, which means the `-0.068`
-bias measured on dichotomised traits does not surface here as a wrong formula — it surfaces
-as a wrong *portability conclusion*, with the arithmetic intact throughout. For a binary
-trait, convert with `liabilityThresholdAUCFromExplainedR2` at the trait's prevalence
-instead.
-
-**DEFINITIONALLY `presentDayEqualVarianceGaussianAUC` AT THE BENCHMARK DRIFT LEVEL, AND
-MEASURED AS SUCH: max spread `0.000e+00` over the admissible box.**
-
-The name is retained because it records *provenance* — that `fstTarget` comes from the
-neutral allele-frequency benchmark — which is information a reader needs and the arithmetic
-does not carry. But it is the same function, and that must be visible here rather than
-discovered later by someone stating a theorem across the pair.
-
-**No theorem should be stated relating this to `presentDayEqualVarianceGaussianAUC`.** Such
-a theorem is `rfl` and says nothing, however much it may read as "the benchmark preserves
-discrimination". That is precisely the defect that
-`neutralAF_benchmark_discrimination_preserved_calibration_lost` carried until its
-discrimination conjunct was replaced by a claim that can fail. `auc_collapse_check.py` is
-the instrument that finds this class. -/
-noncomputable def targetEqualVarianceGaussianAUCFromNeutralAFBenchmark
-    (V_A V_E fstTarget : ℝ) : ℝ :=
-  presentDayEqualVarianceGaussianAUC V_A V_E fstTarget
-
-/-- The neutral allele-frequency benchmark target AUC is definitionally the
-literal present-day AUC in this coarse chart. -/
-theorem targetAUCFromNeutralAFBenchmark_eq_presentDayAUC
-    (V_A V_E fstTarget : ℝ) :
-    targetEqualVarianceGaussianAUCFromNeutralAFBenchmark V_A V_E fstTarget =
-      presentDayEqualVarianceGaussianAUC V_A V_E fstTarget := by
-  rfl
-
 /-- Source Brier chart as a function of prevalence and source `R²`. -/
 noncomputable def sourceBrierFromR2 (π r2Source : ℝ) : ℝ :=
   TransportedMetrics.calibratedBrier π r2Source
@@ -3072,7 +3036,7 @@ theorem neutralAFBenchmarkMetricProfile_eq
     (π V_A V_E fstTarget : ℝ) :
     neutralAFBenchmarkMetricProfile π V_A V_E fstTarget =
       { r2 := targetR2FromNeutralAFBenchmark V_A V_E fstTarget
-      , auc := targetEqualVarianceGaussianAUCFromNeutralAFBenchmark V_A V_E fstTarget
+      , auc := presentDayEqualVarianceGaussianAUC V_A V_E fstTarget
       , brier := targetBrierFromNeutralAFBenchmark π V_A V_E fstTarget } := by
   ext
   · change
@@ -3082,8 +3046,8 @@ theorem neutralAFBenchmarkMetricProfile_eq
     rfl
   · change
       TransportedMetrics.equalVarianceGaussianAUCFromSignalVariance (presentDayPGSVariance V_A fstTarget) V_E =
-        targetEqualVarianceGaussianAUCFromNeutralAFBenchmark V_A V_E fstTarget
-    unfold targetEqualVarianceGaussianAUCFromNeutralAFBenchmark TransportedMetrics.equalVarianceGaussianAUCFromSignalVariance
+        presentDayEqualVarianceGaussianAUC V_A V_E fstTarget
+    unfold presentDayEqualVarianceGaussianAUC TransportedMetrics.equalVarianceGaussianAUCFromSignalVariance
       presentDayEqualVarianceGaussianAUC presentDaySignalToNoise
     congr 1
     congr 1
@@ -3110,9 +3074,9 @@ theorem targetAUC_lt_source_of_neutralAF_benchmark
     (h_fst : fstSource < fstTarget)
     (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1)
     (hPhiStrict : StrictMono Phi) :
-    targetEqualVarianceGaussianAUCFromNeutralAFBenchmark V_A V_E fstTarget <
+    presentDayEqualVarianceGaussianAUC V_A V_E fstTarget <
       presentDayEqualVarianceGaussianAUC V_A V_E fstSource := by
-  simpa [targetEqualVarianceGaussianAUCFromNeutralAFBenchmark] using
+  simpa [presentDayEqualVarianceGaussianAUC] using
     drift_degrades_AUC_of_strictMono
       V_A V_E fstSource fstTarget hVA hVE h_fst (le_of_lt h_fst_bounds.2) hPhiStrict
 
@@ -3800,9 +3764,9 @@ theorem targetLiabilityAUC_lt_source_of_neutralAF_benchmark
     (h_fst : fstSource < fstTarget)
     (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1)
     (hPhiStrict : StrictMono Phi) :
-    targetEqualVarianceGaussianAUCFromNeutralAFBenchmark V_A V_E fstTarget <
+    presentDayEqualVarianceGaussianAUC V_A V_E fstTarget <
       presentDayEqualVarianceGaussianAUC V_A V_E fstSource := by
-  simpa [targetEqualVarianceGaussianAUCFromNeutralAFBenchmark] using
+  simpa [presentDayEqualVarianceGaussianAUC] using
     drift_degrades_equalVarianceGaussianAUC
       V_A V_E fstSource fstTarget hVA hVE h_fst (le_of_lt h_fst_bounds.2) hPhiStrict
 

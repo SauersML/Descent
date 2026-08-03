@@ -6,7 +6,7 @@
   <title>Gnomon · Generational Portability Dashboard</title>
   <meta
     name="description"
-    content="Generation-indexed scalarized portability dashboard for illustrative R², calibration slope, liability AUC, and Brier curves driven by popgen coordinates and transport channels."
+    content="Generation-indexed scalarized portability dashboard for illustrative R², calibration slope, liability AUC, and perfect-calibration Brier curves driven by popgen coordinates and transport channels."
   >
   <style>
     :root {
@@ -503,7 +503,7 @@
       <h1>Generational Portability Dashboard</h1>
       <p class="lead">
         Scalarized portability curves should be read across generations, not across arbitrary covariance sweeps.
-        This page shows how <code>R²</code>, calibration slope, liability ROC area, and Brier score change as divergence,
+        This page shows how <code>R²</code>, calibration slope, liability ROC area, and perfect-calibration Brier score change as divergence,
         LD decay, mutation, migration, allele-frequency mismatch, direct causal transport, proxy tagging, and target-only novelty evolve over time.
       </p>
       <div class="hero-actions">
@@ -702,7 +702,7 @@
               <code>R²_T(t) = Cov_T(t)^2 / (Var_T(score_S,t) · V_eff,T(t))</code>,
               <code>slope_T(t) = Cov_T(t) / Var_T(score_S,t)</code>,
               <code>AUC_T(t) = Φ((i − i_c)·√R²_T / √(v₁ + v₀))</code> at the target prevalence,
-              <code>Brier_T(t) = π_T(t)(1-π_T(t))(1-R²_T(t))</code>.
+              <code>Brier_T(t) = π_T(t)(1-π_T(t))(1-R²_T(t))</code> &mdash; <strong>Brier under perfect calibration</strong>. This is Murphy&rsquo;s resolution term with the reliability term dropped; a miscalibrated score scores worse than this curve shows. Murphy: <code>Brier = reliability &minus; resolution + uncertainty</code>. Reliability is a free third coordinate that neither R² nor prevalence determines &mdash; in the <code>sims/</code> runs it separates methods that share an R² (<code>rawpgs</code> BSS &minus;0.005 against <code>gamfit</code> 0.048), so this curve ranks methods only if they are equally calibrated..
               The defaults are chosen to satisfy the basic sanity checks <code>target = source</code> at generation <code>0</code> and worsening transport under continued divergence.
             </div>
 
@@ -766,7 +766,7 @@
                 <p class="metric-subtitle">Source AUC: <span id="stat-auc-source">0</span> · Change: <span id="stat-delta-auc">0</span></p>
               </article>
               <article class="metric-card">
-                <p class="metric-label">Target Brier Score</p>
+                <p class="metric-label">Target Brier Score <span style="font-weight:400">(perfect calibration)</span></p>
                 <p class="metric-value" id="stat-brier-target">0</p>
                 <p class="metric-subtitle">Comparable source Brier on the target prevalence scale: <span id="stat-brier-source">0</span> · Change: <span id="stat-delta-brier">0</span></p>
               </article>
@@ -920,7 +920,7 @@
             <h3>Generation-indexed driver laws</h3>
             <p class="figure-caption"><code>τ(t) = t / (2Ne)</code></p>
             <p class="figure-caption"><code>θ = 4Neμ</code>, <code>M = 4Nem</code></p>
-            <p class="figure-caption"><code>F_ST(t) = (1 / (1 + θ + M)) (1 - hetDecay^t)</code></p>
+            <p class="figure-caption"><code>F_ST(t) = min( t/(t+2N<sub>e</sub>), 1/(1+4N<sub>e</sub>m) )</code> &mdash; coalescent F_ST capped by the island equilibrium. The former law here was heterozygosity loss, not F_ST.</p>
             <p class="figure-caption"><code>mutationSharedRetention(t) = exp(-θτ(t))</code></p>
             <p class="figure-caption"><code>migrationSharedBoost(t) = 1 + Mτ(t) / (1 + M)</code></p>
             <p class="figure-caption"><code>ldCorrelationDecay(distance, F_ST(t), recomb) = exp(-(recomb · F_ST(t) · distance))</code></p>
@@ -949,7 +949,7 @@
             <p class="figure-caption"><code>R²_T(t) = signal_T(t) / V_eff,T(t)</code></p>
             <p class="figure-caption"><code>slope_T(t) = Cov_T(t) / Var_T(score_S, t)</code></p>
             <p class="figure-caption"><code>AUC_T(t) = Φ((i − i_c)·√R²_T / √(v₁ + v₀))</code>, liability-threshold</p>
-            <p class="figure-caption"><code>Brier_T(t) = π_T(t)(1-π_T(t))(1-R²_T(t))</code></p>
+            <p class="figure-caption"><code>Brier_T(t) = π_T(t)(1-π_T(t))(1-R²_T(t))</code> &mdash; <strong>Brier under perfect calibration</strong>. This is Murphy&rsquo;s resolution term with the reliability term dropped; a miscalibrated score scores worse than this curve shows.</p>
           </article>
         </div>
       </section>
@@ -1322,7 +1322,25 @@
         const bigM = 4 * cfg.ne * cfg.mig;
         const tau = t / (2 * cfg.ne);
         const hetDecay = (1 - 1 / (2 * cfg.ne)) * (1 - theta / (2 * cfg.ne));
-        const fst = (1 / (1 + theta + bigM)) * (1 - Math.pow(hetDecay, t));
+        // HETEROZYGOSITY LOSS IS NOT F_ST. The previous law here was
+        //   (1/(1+theta+bigM)) * (1 - hetDecay^t)
+        // whose time factor is exactly Conventions.heterozygosityLossFromDrift,
+        // 1 - (1 - 1/(2Ne))^t. The corpus keeps these apart deliberately and the
+        // dashboard was reporting one under the other's name.
+        //
+        // Corpus laws used instead:
+        //   PopulationGeneticsFoundations.coalFst t Ne = t / (t + 2 Ne)
+        //   PortabilityDrift.fstMigrationDriftEquilibrium Ne m = 1 / (1 + 4 Ne m)
+        // and PortabilityDrift.migration_reduces_fst_vs_pure_drift, which proves the
+        // migration equilibrium sits BELOW the pure-drift coalescent F_ST once t is
+        // large -- i.e. migration caps the trajectory rather than rescaling it.
+        //
+        // The mutation term theta is dropped from the cap: the corpus's equilibrium
+        // is 1/(1+4Nm) with no theta, and no proved law here supports 1/(1+theta+bigM).
+        const heterozygosityLoss = 1 - Math.pow(hetDecay, t);
+        const coalFst = t / (t + 2 * cfg.ne);
+        const migrationEquilibriumFst = 1 / (1 + bigM);
+        const fst = cfg.mig > 0 ? Math.min(coalFst, migrationEquilibriumFst) : coalFst;
         const mutationSharedRetention = Math.exp(-theta * tau);
         const migrationSharedBoost = 1 + (bigM * tau) / (1 + bigM);
         const novelInnovation = 1 - mutationSharedRetention;

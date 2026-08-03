@@ -1243,7 +1243,7 @@ theorem neutralAF_benchmark_cross_ancestry_auc_drops_and_brier_worsens
     (h_fst : fstSource < fstTarget)
     (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1)
     (hPhiStrict : StrictMono Phi) :
-    targetEqualVarianceGaussianAUCFromNeutralAFBenchmark V_A V_E fstTarget <
+    presentDayEqualVarianceGaussianAUC V_A V_E fstTarget <
       presentDayEqualVarianceGaussianAUC V_A V_E fstSource ∧
     sourceBrierFromR2 π (presentDayR2 V_A V_E fstSource) <
       targetExactCalibratedBrierRisk π V_A V_E fstTarget := by

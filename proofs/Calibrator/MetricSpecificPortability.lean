@@ -360,7 +360,7 @@ theorem neutralAF_benchmark_liability_auc_sensitive_to_drift
     (h_fst_bounds : 0 ≤ fstS ∧ fstT < 1)
     (hPhiStrict : StrictMono Phi) :
     0 < presentDayEqualVarianceGaussianAUC V_A V_E fstS -
-      targetEqualVarianceGaussianAUCFromNeutralAFBenchmark V_A V_E fstT := by
+      presentDayEqualVarianceGaussianAUC V_A V_E fstT := by
   have h_drop :=
     targetLiabilityAUC_lt_source_of_neutralAF_benchmark
       V_A V_E fstS fstT hVA hVE h_fst h_fst_bounds hPhiStrict
@@ -424,17 +424,17 @@ THIS IS WHAT IT SHOULD HAVE SAID.**
 
 The deleted conjunct was
 
-`targetEqualVarianceGaussianAUCFromNeutralAFBenchmark V_A V_E fst =
+`presentDayEqualVarianceGaussianAUC V_A V_E fst =
    presentDayEqualVarianceGaussianAUC V_A V_E fst`
 
 and it was proved by `rfl`, because those two names denote **the same function**:
-`targetEqualVarianceGaussianAUCFromNeutralAFBenchmark` delegates to
-`targetEqualVarianceGaussianAUCFromNeutralAFBenchmark`, which delegates to `presentDayEqualVarianceGaussianAUC`, of
+`presentDayEqualVarianceGaussianAUC` delegates to
+`presentDayEqualVarianceGaussianAUC`, which delegates to `presentDayEqualVarianceGaussianAUC`, of
 which `presentDayEqualVarianceGaussianAUC` is a one-line alias. It was `f x = f x` wearing
 two names, and it would have held equally well had AUC been wildly *not* preserved. Nothing
 in reading the statement revealed this; the name structure concealed it.
 
-Note what did **not** help: the docstring on `targetEqualVarianceGaussianAUCFromNeutralAFBenchmark`
+Note what did **not** help: the docstring on `presentDayEqualVarianceGaussianAUC`
 had already been corrected to say "equal-variance Gaussian" and to record the `-0.068`
 bias. A docstring cannot repair a statement built out of identifiers.
 
