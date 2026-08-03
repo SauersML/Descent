@@ -573,6 +573,28 @@ noncomputable def logarithmicRiskBenchmark (n : ℝ) : ℝ := 1 / Real.log n
     Empirical status: UNTESTED. -/
 noncomputable def fixedGradeRiskBenchmark (n K c : ℝ) : ℝ := n ^ (-(c / K))
 
+/-- **The logarithmic benchmark's junk point, named rather than left to be found.**
+
+    `Real.log 1 = 0` and Lean totalises `1 / 0 = 0`, so at a single sample the benchmark returns
+    `0` — perfect accuracy — where the quantity it names diverges. The point is inside the
+    admissible range of `n`, so this is a wrong value in the domain rather than a harmless
+    artifact, and consumers must require `1 < n`. `logarithmicBenchmarkSampleSize_inverts` does,
+    through `exp (1/ε)` at `0 < ε`. -/
+theorem logarithmicRiskBenchmark_one_is_junk : logarithmicRiskBenchmark 1 = 0 := by
+  unfold logarithmicRiskBenchmark
+  rw [Real.log_one]
+  simp
+
+/-- **The fixed-grade benchmark's junk point.**
+
+    At `K = 0` the exponent `-(c/K)` is Lean's `0`, so the benchmark returns `1` at every sample
+    size — accuracy never improves — regardless of `c`. Consumers must require `K ≠ 0`;
+    `fixedGradeBenchmarkSampleSize_inverts` does. -/
+theorem fixedGradeRiskBenchmark_zero_grade_is_junk (n c : ℝ) :
+    fixedGradeRiskBenchmark n 0 c = 1 := by
+  unfold fixedGradeRiskBenchmark
+  rw [div_zero, neg_zero, Real.rpow_zero]
+
 /-- **Sample size that inverts the logarithmic risk benchmark at `ε`.**
 
     `exp (1/ε)`. This is a benchmark inversion, not an asserted sample-size
