@@ -311,7 +311,6 @@ theorem selectionMigrationEquilibriumMigrationFirst_isFixedPoint (s m : ℝ)
     ring
   rw [hden]
   field_simp
-  ring
 
 /-- Loss is absorbing: an allele absent from the island stays absent. -/
 @[simp] theorem continentIslandStep_zero (s m : ℝ) :
@@ -943,6 +942,7 @@ theorem islandDemeCorrection_tendsto_one :
     filter_upwards [Filter.eventually_gt_atTop (1 : ℝ)] with d hd
     have hne : d - 1 ≠ 0 := by intro h; linarith [sub_eq_zero.mp h]
     field_simp
+    ring
   simpa [islandDemeCorrection] using h4.pow 2
 
 /-- Island model Fst is the reciprocal of (1 + 4Nm). -/
@@ -1163,7 +1163,9 @@ theorem steppingStoneCharacteristicLength_strictAnti_mutation (m σ_sq μ₁ μ�
     steppingStoneCharacteristicLength m σ_sq μ₂
       < steppingStoneCharacteristicLength m σ_sq μ₁ := by
   unfold steppingStoneCharacteristicLength
-  apply Real.sqrt_lt_sqrt (by positivity)
+  have hμ₂ : 0 < μ₂ := lt_trans hμ₁ h
+  apply Real.sqrt_lt_sqrt
+    (div_nonneg (mul_nonneg hm.le hσ.le) (mul_nonneg (by norm_num) hμ₂.le))
   exact div_lt_div_of_pos_left (by positivity) (by linarith) (by linarith)
 
 /-- The decay scale grows with the migration rate. -/
@@ -1600,9 +1602,18 @@ section TransientFstDerivation
     the second captures the approximate mutation effect:
     two lineages both fail to mutate with probability (1-μ)² ≈ 1 - 2μ = 1 - θ/(2N).
 
+    **This is `Calibrator.hetDecayFromScaled` applied, not a second copy of its body.**
+    It used to re-type the product `(1 - 1/(2Ne)) * (1 - θ/(2Ne))`, which is the same
+    two-bodies-for-one-quantity failure `presentDayPGSVariance` records above it. Every
+    call site here already unfolds the pair `hetDecayFactor hetDecayFromScaled` — as do
+    `Calibrator.Conventions` and `Calibrator.DemographicHistory` — and those unfolds
+    failed against the re-typed body, because after unfolding the copy there was no
+    `hetDecayFromScaled` left in the goal to unfold. So the two-name unfold is the
+    contract: if you inline this definition again, five proofs in three files break.
+
     Empirical status: UNTESTED. -/
 noncomputable def hetDecayFactor (Ne θ : ℝ) : ℝ :=
-  (1 - 1 / (2 * Ne)) * (1 - θ / (2 * Ne))
+  hetDecayFromScaled Ne θ
 
 /-- **Heterozygosity recurrence with mutation (affine recurrence).**
     H(t+1) = λ H(t) + c, where λ = hetDecayFactor and
@@ -1714,11 +1725,11 @@ theorem fstTransientDiscrete_nonneg (θ Ne : ℝ) (t : ℕ)
   · exact le_of_lt (fstMutationDriftEquilibrium_pos θ hθ)
   · rw [sub_nonneg]
     apply pow_le_one₀
-    · unfold hetDecayFactor
+    · unfold hetDecayFactor hetDecayFromScaled
       apply mul_nonneg
       · rw [sub_nonneg, div_le_one (by linarith)]; linarith
       · rw [sub_nonneg, div_le_one (by linarith)]; linarith
-    · unfold hetDecayFactor
+    · unfold hetDecayFactor hetDecayFromScaled
       have h1 : 1 - 1 / (2 * Ne) < 1 := by rw [sub_lt_self_iff]; positivity
       have h2 : 1 - θ / (2 * Ne) ≤ 1 := by rw [sub_le_self_iff]; positivity
       nlinarith [mul_le_of_le_one_right
@@ -1735,7 +1746,7 @@ theorem fstTransientDiscrete_le_equilibrium (θ Ne : ℝ) (t : ℕ)
         apply mul_le_mul_of_nonneg_left _ (le_of_lt hfeq)
         have hpow_nonneg : 0 ≤ hetDecayFactor Ne θ ^ t := by
           apply pow_nonneg
-          unfold hetDecayFactor hetDecayFromScaled
+          unfold hetDecayFactor
           apply mul_nonneg
           · rw [sub_nonneg, div_le_one (by linarith)]
             linarith
@@ -1751,7 +1762,7 @@ theorem fstTransientDiscrete_le_equilibrium (θ Ne : ℝ) (t : ℕ)
     (1-1/(2N))(1-θ/(2N)) = 1 - (1+θ)/(2N) + θ/(4N²). -/
 theorem hetDecayFactor_expansion (Ne θ : ℝ) (hNe : Ne ≠ 0) :
     hetDecayFactor Ne θ = 1 - (1 + θ) / (2 * Ne) + θ / (4 * Ne ^ 2) := by
-  unfold hetDecayFactor hetDecayFromScaled
+  unfold hetDecayFactor
   field_simp
   ring
 
@@ -1775,7 +1786,7 @@ theorem hetDecayFactor_approx_error (Ne θ : ℝ) (hNe : 0 < Ne) (hθ : 0 ≤ θ
 theorem fstTransientDiscrete_eq_explicit (θ Ne : ℝ) (t : ℕ) :
     fstMutationDriftTransientDiscrete θ Ne t =
       1 / (1 + θ) * (1 - ((1 - 1 / (2 * Ne)) * (1 - θ / (2 * Ne))) ^ t) := by
-  unfold fstMutationDriftTransientDiscrete fstMutationDriftEquilibrium hetDecayFactor hetDecayFromScaled
+  unfold fstMutationDriftTransientDiscrete fstMutationDriftEquilibrium hetDecayFactor
   rfl
 
 end TransientFstDerivation

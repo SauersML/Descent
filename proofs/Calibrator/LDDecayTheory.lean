@@ -271,7 +271,8 @@ and the same map, so the `1/(2 Nₑ)` inside them has to be the same
 `1/(2 Nₑ)`. -/
 theorem driftLDStep_eq_islandFstMultiplicativeStep (Ne c Q : ℝ) :
     driftLDStep Ne c Q = islandFstMultiplicativeStep Ne c Q := by
-  unfold driftLDStep islandFstMultiplicativeStep; ring
+  unfold driftLDStep islandFstMultiplicativeStep ibdRecurrenceStep
+  ring
 
 /-- **Per-generation retention factor of the two-locus identity measure**,
     `(1 - c)² · (1 - 1/(2 Nₑ))`: the slope of `driftLDStep` in `Q`.
@@ -385,16 +386,10 @@ inspection. -/
 theorem driftLDEquilibrium_eq_fstIslandMultiplicativeEquilibrium (Ne c : ℝ)
     (hNe : Ne ≠ 0) :
     driftLDEquilibrium Ne c = fstIslandMultiplicativeEquilibrium Ne c := by
-  have h2Ne : (2 * Ne : ℝ) ≠ 0 := mul_ne_zero two_ne_zero hNe
-  have hlink : (1 - c) ^ 2 + 2 * Ne * c * (2 - c)
-      = 2 * Ne * (1 - driftLDRetention Ne c) := by
-    unfold driftLDRetention
-    field_simp
-    ring
-  unfold driftLDEquilibrium fstIslandMultiplicativeEquilibrium
-  rw [hlink,
-    show (1 - c) ^ 2 * (1 / (2 * Ne)) = (1 - c) ^ 2 / (2 * Ne) from by ring,
-    div_div]
+  unfold driftLDEquilibrium driftLDRetention fstIslandMultiplicativeEquilibrium
+    ibdRecurrenceFixedPoint
+  field_simp [hNe]
+  ring
 
 /-- The retention factor is a genuine per-generation probability: it lies in
     `[0, 1]` whenever `Nₑ ≥ 1` and `c ∈ [0, 1]`. -/

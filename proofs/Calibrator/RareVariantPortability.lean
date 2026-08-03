@@ -300,10 +300,11 @@ theorem mutationSelectionBalance_isFixedPoint (mu s h : ℝ)
     | field_simp
 
 /-- The dominant balance is a frequency: it lies in `[0, 1]` for every
-nonnegative mutation rate and positive selective load. The quoted `mu / s` has no
-such bound, and exceeds `1` whenever `s < mu`. -/
+nonnegative mutation rate, nonnegative selective component `h*s`, and positive
+total load. The quoted `mu / s` has no such bound, and exceeds `1` whenever
+`s < mu`. -/
 theorem mutationSelectionBalance_mem_unit (mu s h : ℝ)
-    (h_mu : 0 ≤ mu) (h_load : 0 < h * s + mu) :
+    (h_mu : 0 ≤ mu) (h_hs : 0 ≤ h * s) (h_load : 0 < h * s + mu) :
     0 ≤ mutationSelectionBalance mu s h ∧ mutationSelectionBalance mu s h ≤ 1 := by
   unfold mutationSelectionBalance
   refine ⟨div_nonneg h_mu h_load.le, ?_⟩

@@ -98,9 +98,13 @@ theorem AssortativeMatingModel.rh2_pos (m : AssortativeMatingModel) : 0 < m.r * 
 theorem AssortativeMatingModel.rh2_nonneg (m : AssortativeMatingModel) : 0 ≤ m.r * m.h2 :=
   le_of_lt m.rh2_pos
 
+/-- Stability expressed using the computed heritability coordinate. -/
+theorem AssortativeMatingModel.rh2_lt_one (m : AssortativeMatingModel) : m.r * m.h2 < 1 := by
+  simpa [AssortativeMatingModel.h2] using m.stability
+
 /-- The denominator 1 - r*h2 is strictly positive. -/
 theorem AssortativeMatingModel.denom_pos (m : AssortativeMatingModel) : 0 < 1 - m.r * m.h2 := by
-  linarith [m.stability]
+  linarith [m.rh2_lt_one]
 
 
 section AMVarianceInflation
@@ -171,7 +175,7 @@ theorem amEquilibriumVariance_isFixedPoint (V_A r h2 : ℝ) (h_stab : r * h2 < 1
 theorem AssortativeMatingModel.equilibriumVariance_isFixedPoint
     (m : AssortativeMatingModel) :
     amVarianceStep m.V_A m.r m.h2 m.equilibriumVariance = m.equilibriumVariance :=
-  amEquilibriumVariance_isFixedPoint m.V_A m.r m.h2 m.stability
+  amEquilibriumVariance_isFixedPoint m.V_A m.r m.h2 m.rh2_lt_one
 
 /-- **The zero-variance boundary is absorbing.**  A trait with no additive
 genetic variance acquires none under assortative mating: AM redistributes
@@ -232,7 +236,7 @@ theorem am_variance_finite
 theorem AssortativeMatingModel.variance_inflation_factor (m : AssortativeMatingModel) :
     m.equilibriumVariance / m.V_A = 1 / (1 - m.r * m.h2) := by
   unfold equilibriumVariance
-  have hden : 1 - m.r * m.h2 ≠ 0 := by linarith [m.stability]
+  have hden : 1 - m.r * m.h2 ≠ 0 := ne_of_gt m.denom_pos
   field_simp [hden, ne_of_gt m.V_A_pos]
 
 /-- **AM-induced LD between loci i and j.**
@@ -326,7 +330,7 @@ theorem AssortativeMatingModel.pgs_r2_inflation_eq_h2_inflation
     (m : AssortativeMatingModel) (R2_rm : ℝ) (hR2 : 0 < R2_rm) :
     m.pgsR2AM R2_rm / R2_rm = m.observedH2 / m.h2 := by
   unfold pgsR2AM observedH2
-  have hden : 1 - m.r * m.h2 ≠ 0 := by linarith [m.stability]
+  have hden : 1 - m.r * m.h2 ≠ 0 := ne_of_gt m.denom_pos
   field_simp [hden, ne_of_gt hR2, ne_of_gt m.h2_pos]
 
 /-- **The PGS R² inflation gap under assortative mating.**
@@ -349,7 +353,7 @@ theorem AssortativeMatingModel.am_gap_formula
     (m : AssortativeMatingModel) (R2_rm : ℝ) :
     m.amGap R2_rm = R2_rm * (m.r * m.h2) / (1 - m.r * m.h2) := by
   unfold amGap pgsR2AM
-  have hden : 1 - m.r * m.h2 ≠ 0 := by linarith [m.stability]
+  have hden : 1 - m.r * m.h2 ≠ 0 := ne_of_gt m.denom_pos
   field_simp [hden]
   ring_nf
 
