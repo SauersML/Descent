@@ -279,6 +279,22 @@
 set -uo pipefail
 
 ROOT=${GNOMON_ROOT:-/projects/standard/hsiehph/sauer354}
+# The cluster's default python3 is 3.6.8 and predates `from __future__ import
+# annotations`, so a guard written against a modern Python dies with a
+# SyntaxError and reports a NONZERO exit. A guard that never ran is then
+# indistinguishable from a guard that failed, unless somebody reads the
+# traceback. Pin the interpreter, and fail loudly if it is missing rather than
+# falling back to one that cannot run the guards.
+GUARD_PY=${GNOMON_PY:-/usr/bin/python3.12}
+if ! "$GUARD_PY" -c 'import sys; assert sys.version_info >= (3, 9)' 2>/dev/null; then
+  echo "GUARD_PY_UNUSABLE=$GUARD_PY"
+  echo "!!! No usable Python for the guards. Set GNOMON_PY to a 3.9+ interpreter."
+  echo "!!! Guard results below would be interpreter failures, not findings."
+  exit 4
+fi
+echo "GUARD_PY=$GUARD_PY"
+
+
 # The shared checkout runs many commits behind and carries dirty files, so a
 # build of it reports the state of that tree rather than the state of the
 # corpus. Point GNOMON_REPO at a clean clone at a named revision when you want
@@ -350,16 +366,19 @@ if [ ! -f "$MLROOT" ] || [ "$OLEANS" -lt 2900 ]; then
   fi
 fi
 
-python3 -S scripts/check-identifications.py > "$ROOT/guard-${SLURM_JOB_ID:-manual}.txt" 2>&1
+"$GUARD_PY" -S proofs/validation/code/check.py --only identifications \
+  > "$ROOT/guard-${SLURM_JOB_ID:-manual}.txt" 2>&1
 echo "GUARD_EXIT=$?"
 
 # Laundering guard.  Runs BEFORE lake, like the structural guard, because it reads
 # source text and therefore needs no oleans -- a build that dies in the toolchain
-# still gets this answer.  The elaborated-telescope half (LaunderingScan.lean) needs
-# the oleans and runs after the build, below.
-python3 -S scripts/check-laundering.py > "$ROOT/launder-${SLURM_JOB_ID:-manual}.txt" 2>&1
+# still gets this answer.  The elaborated-telescope half (the LAUNDERING scan in
+# Check.lean) needs the oleans and runs after the build, below.
+"$GUARD_PY" -S proofs/validation/code/check.py --only laundering \
+  > "$ROOT/launder-${SLURM_JOB_ID:-manual}.txt" 2>&1
 echo "LAUNDER_GUARD_EXIT=$?"
-python3 -S scripts/check-laundering.py --summary 2>&1 | sed -n '3,20p' | sed 's/^/LAUNDER_/'
+"$GUARD_PY" -S proofs/validation/code/check.py --only laundering --summary 2>&1 \
+  | sed -n '3,20p' | sed 's/^/LAUNDER_/'
 
 lake build "${TARGETS[@]}"
 _lake_exit=$?
@@ -370,7 +389,7 @@ echo "LAKE_EXIT=$_lake_exit"
 # SKIPPED when the build failed matters -- an absent scan must not read as a
 # clean one, which is the rule the rest of this file was written around.
 if [ "$_lake_exit" -eq 0 ]; then
-  lake env lean proofs/validation/invariants/LaunderingScan.lean \
+  lake env lean proofs/validation/code/Check.lean \
     > "$ROOT/launder-env-${SLURM_JOB_ID:-manual}.txt" 2>&1
   echo "LAUNDER_ENV_EXIT=$?"
   grep -E '^LAUNDER_(SCANNED|PREMISES|FATAL|TOTAL)' \
