@@ -183,17 +183,14 @@ def corpus_capitalized_identifiers() -> frozenset:
 # Check repository Lean sources against the local mathlib style policy.
 # ======================================================================================
 
-# The header names the project's author, deliberately.  A shape-only regex was
-# tried and reverted: it was loosened to accept a file whose header credited a
-# person who appears nowhere else in the repository and authored no commit --
-# a fabricated attribution, which is exactly what a fixed name catches.  If a
-# real second author ever appears, widen this to a set of known names rather
-# than to "anybody".
+# The header carries the LICENSE pointer and no authorship. The corpus is
+# unattributed by choice, so a rule that demanded a specific name would now fail
+# every file. What still matters -- and what this checks -- is that the licence
+# notice is present and in the mathlib block form; a file with no header, or one
+# that reintroduces a copyright holder, still fails.
 STYLE_COPYRIGHT_HEADER = (
     "/-\n"
-    "Copyright (c) 2026 Sauers. All rights reserved.\n"
     "Released under Apache 2.0 license as described in the file LICENSE.\n"
-    "Authors: Sauers\n"
     "-/\n"
 )
 

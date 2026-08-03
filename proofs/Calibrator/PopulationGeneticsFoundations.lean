@@ -1,7 +1,5 @@
 /-
-Copyright (c) 2026 Sauers. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Sauers
 -/
 import Calibrator.Probability
 import Calibrator.PortabilityDrift
@@ -988,6 +986,19 @@ theorem islandDemeCorrection_eq_finiteIslandCorrection (d : ℝ) :
     the corpus's limit form. -/
 noncomputable def islandFstFiniteDemes (Ne m d : ℝ) : ℝ :=
   1 / (1 + 4 * Ne * m * islandDemeCorrection d)
+
+/-- **The junk value here is not merely wrong, it is inverted.**
+
+    At a single deme the correction is Lean's `0` rather than divergent, so the whole
+    denominator collapses to `1` and this reports `F_ST = 1`: complete differentiation, at the
+    one configuration where there is nothing to differentiate from and the true value is `0`.
+    That is the difference between a harmless artifact and a wrong answer inside the domain, and
+    it is why `d ≠ 1` is a condition on the quantity existing rather than a modelling choice. -/
+theorem islandFstFiniteDemes_one_deme_is_junk (Ne m : ℝ) :
+    islandFstFiniteDemes Ne m 1 = 1 := by
+  unfold islandFstFiniteDemes
+  rw [islandDemeCorrection_one_deme_is_junk]
+  norm_num
 
 /-- At two demes the correction is exactly `4`: the scaled migration rate is
 `16·Nₑ·m`, not `4·Nₑ·m`. Stated as an equation because `d = 2` is the case the

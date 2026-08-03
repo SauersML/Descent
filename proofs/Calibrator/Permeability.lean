@@ -1,7 +1,5 @@
 /-
-Copyright (c) 2026 Sauers. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Sauers
 -/
 import Mathlib
 import Calibrator.DGP
@@ -150,6 +148,15 @@ theorem covarianceMomentPermeability_eq_momentPermeability
 `EnsembleChannel`.  The ordered arrow has unit mean response and variance `1 - θ²`. -/
 noncomputable def binaryOrientationArrowPermeability (θ : ℝ) : ℝ :=
   momentPermeability 1 (binaryOrientationArrowVariance θ)
+
+/-- **The arrow permeability inherits the junk branch of `momentPermeability`.** Wherever the
+orientation variance vanishes the permeability diverges and Lean returns `0`, reporting a
+noiseless arrow as carrying no information. Consumers must exclude those `θ`. -/
+theorem binaryOrientationArrowPermeability_zero_variance_is_junk (θ : ℝ)
+    (hθ : binaryOrientationArrowVariance θ = 0) :
+    binaryOrientationArrowPermeability θ = 0 := by
+  unfold binaryOrientationArrowPermeability
+  rw [hθ, momentPermeability_zero_noise_is_junk]
 
 /-- **Closed arrow information law.** One ordered adjacent pair carries permeability
 `1/(1-θ²)` for the orientation-imbalance coordinate.  This is an exact law for the named

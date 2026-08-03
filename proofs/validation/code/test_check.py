@@ -34,6 +34,7 @@ obvious simplification of its rules:
 
 Run:  python3 proofs/validation/code/test_check.py
 """
+import json
 import subprocess
 import sys
 import tempfile
@@ -267,6 +268,192 @@ def families(out: str) -> set[str]:
     return {l.strip().split()[1] for l in out.splitlines() if l.strip().startswith("=== F")}
 
 
+# ======================================================================================
+# Calibration for the other six guards
+# ======================================================================================
+#
+# WHY THIS EXISTS.  Until now only the laundering guard had a control.  The other
+# six were run in CI, reported clean, and that clean report was treated as
+# evidence -- which it was not, because nothing had ever shown they could fail.
+#
+# The cost was paid before this was written.  A refactor rewrote the word
+# `declarations` inside the wiring guard's own JSON keys and printed label,
+# changing a machine-readable contract that `--json` consumers parse.  Every
+# guard passed.  CI passed.  It was found by reading output by eye.
+#
+# Each guard below gets BOTH directions, because they fail differently and only
+# one of the two is visible in ordinary use:
+#
+#   POSITIVE  a planted defect IS reported.  Without this a guard that silently
+#             stopped matching -- a regex that no longer fires, a root that
+#             resolves to an empty tree -- is indistinguishable from a clean
+#             corpus, and reports success forever.
+#   NEGATIVE  clean input is NOT reported.  Without this a guard can be "fixed"
+#             into firing on everything, which trains readers to ignore it, and
+#             an ignored guard is the same as a deleted one.
+#
+# The fixtures are a whole miniature corpus under GNOMON_CORPUS, not the real
+# one, so a control cannot be broken by ordinary corpus edits and cannot be made
+# to pass by changing the corpus.
+
+HEADER = """/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Mathlib
+
+/-! # Fixture -/
+"""
+
+
+def write_corpus(root: Path, files: dict) -> None:
+    """Materialise a fixture corpus: `root` plays the part of `proofs/`."""
+    for rel, text in files.items():
+        path = root / rel
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(text, encoding="utf-8")
+
+
+def run_guard(guard: str, files: dict, *args: str):
+    """Run one guard against a fixture corpus. Returns (exit code, output)."""
+    import os
+    with tempfile.TemporaryDirectory() as td:
+        corpus = Path(td) / "proofs"
+        corpus.mkdir()
+        write_corpus(corpus, files)
+        env = dict(os.environ, GNOMON_CORPUS=str(corpus))
+        r = subprocess.run(
+            [sys.executable, str(CHECK), "--only", guard, *args],
+            capture_output=True, text=True, env=env)
+        return r.returncode, r.stdout + r.stderr
+
+
+# A minimal corpus every guard is willing to call clean: correct header, module
+# docstring, short lines, one imported module, no forbidden shapes.
+CLEAN_ROOT = HEADER + """
+import Calibrator.Sub
+
+namespace Calibrator
+
+/-- A definition with a declared status. -/
+noncomputable def cleanRate (x : ℝ) : ℝ := x
+
+theorem clean_rate_eq (x : ℝ) : cleanRate x = x := rfl
+
+end Calibrator
+"""
+
+CLEAN_SUB = HEADER + """
+namespace Calibrator
+
+/-- A model carrying data, not a conclusion. -/
+structure CleanModel where
+  rate : ℝ
+
+end Calibrator
+"""
+
+CLEAN = {
+    "Calibrator.lean": CLEAN_ROOT,
+    "Calibrator/Sub.lean": CLEAN_SUB,
+}
+
+
+def clean_plus(rel: str, text: str) -> dict:
+    files = dict(CLEAN)
+    files[rel] = text
+    return files
+
+
+CASES = [
+    # (guard, label, files, must_appear_in_output)
+    ("style", "line over 100 characters",
+     clean_plus("Calibrator/Sub.lean",
+                CLEAN_SUB + "\n-- " + "x" * 120 + "\n"),
+     "characters"),
+    ("style", "missing copyright header",
+     clean_plus("Calibrator/Sub.lean", CLEAN_SUB.replace("Copyright (c) 2026", "Copr 2026")),
+     "copyright header"),
+    ("style", "lambda written with =>",
+     clean_plus("Calibrator/Sub.lean", CLEAN_SUB + "\ndef f := fun x => x\n"),
+     "rather than `=>`"),
+    ("style", "documentation narrating development history",
+     clean_plus("Calibrator/Sub.lean", CLEAN_SUB + "\n-- A previous version of this used a different form.\n"),
+     "development history"),
+    ("regimes", "forbidden result-carrier structure",
+     clean_plus("Calibrator/Sub.lean", CLEAN_SUB + """
+structure ChaosSpectroscopy where
+  value : ℝ
+"""),
+     "forbidden result carrier"),
+    ("regimes", "bare Prop switch field",
+     clean_plus("Calibrator/Sub.lean", CLEAN_SUB + """
+structure Switchy where
+  flag : Prop
+"""),
+     "bare Prop switch"),
+    ("regimes", "field packaging an advertised result",
+     clean_plus("Calibrator/Sub.lean", CLEAN_SUB + """
+structure Carrier where
+  identification : ℝ
+"""),
+     "packages an advertised result"),
+    ("closure", "module outside the root import closure",
+     clean_plus("Calibrator/Orphan.lean", CLEAN_SUB),
+     "MODULE_ABSENT"),
+]
+
+
+def calibrate_others() -> list:
+    """Both directions for every guard that has a fixture. Returns failures."""
+    failures = []
+
+    # NEGATIVE, run once per guard: the clean fixture must satisfy all of them.
+    # If this fails the positives below prove nothing, because a guard that
+    # reports everything reports the planted defect too.
+    for guard in ("style", "regimes", "closure", "wiring"):
+        code, out = run_guard(guard, CLEAN)
+        if code != 0:
+            failures.append(
+                f"FALSE POSITIVE  {guard}: clean fixture corpus rejected\n"
+                + "\n".join("      " + l for l in out.strip().split("\n")[:12]))
+
+    # POSITIVE: each planted defect must be reported, by the right guard.
+    for guard, label, files, expected in CASES:
+        code, out = run_guard(guard, files)
+        if code == 0:
+            failures.append(f"FALSE NEGATIVE  {guard}: {label} not reported at all")
+        elif expected not in out:
+            failures.append(
+                f"MISREPORTED     {guard}: {label} reported, but not as {expected!r}")
+
+    # The wiring guard's --json keys are a machine-readable contract. This is the
+    # exact defect that shipped undetected, so it is asserted by name.
+    code, out = run_guard("wiring", CLEAN, "--json")
+    try:
+        report = json.loads(out)
+    except json.JSONDecodeError:
+        failures.append("CONTRACT        wiring --json did not emit parseable JSON")
+    else:
+        for module, entry in report.items():
+            missing = {"declarations", "dependents", "wired"} - set(entry)
+            if missing:
+                failures.append(
+                    f"CONTRACT        wiring --json entry {module!r} is missing "
+                    f"{sorted(missing)}; these keys are what consumers read")
+            break
+
+    # --list must name every guard the runner can dispatch, or a guard can be
+    # dropped from the default set and nothing says so.
+    r = subprocess.run([sys.executable, str(CHECK), "--list"],
+                       capture_output=True, text=True)
+    for guard in ("style", "identifications", "laundering", "regimes",
+                  "closure", "wiring", "field-proofs"):
+        if guard not in r.stdout:
+            failures.append(f"DISPATCH        --list does not name the {guard!r} guard")
+
+    return failures
+
+
 def main() -> int:
     failures: list[str] = []
 
@@ -287,15 +474,21 @@ def main() -> int:
     for bad in sorted(families(run(NEGATIVE, "--severity", "conditional"))):
         failures.append(f"FALSE POSITIVE  {bad} reported on clean mathematics")
 
+    # The other six guards, both directions, against fixture corpora.
+    failures.extend(calibrate_others())
+
     for f in failures:
         print(f"FAIL  {f}")
     if failures:
         print(f"\n{len(failures)} calibration failure(s).  Until these pass the "
               f"detector's report is not evidence, in either direction.")
         return 1
-    print("laundering-guard calibration PASSED")
-    print(f"  {len(POSITIVE_EXPECTED)} planted patterns, each reported in the right family")
-    print("  0 findings at FATAL or CONDITIONAL severity on clean mathematics")
+    print("guard calibration PASSED")
+    print(f"  laundering: {len(POSITIVE_EXPECTED)} planted patterns, each in the right family")
+    print("  laundering: 0 findings at FATAL or CONDITIONAL severity on clean mathematics")
+    print(f"  style/regimes/closure/wiring: {len(CASES)} planted defects reported, "
+          f"clean fixture corpus accepted by all four")
+    print("  wiring --json keys asserted by name; --list names all seven guards")
     return 0
 
 

@@ -1,7 +1,5 @@
 /-
-Copyright (c) 2026 Sauers. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Sauers
 -/
 import Calibrator.Conclusions
 import Calibrator.DGP
@@ -4676,6 +4674,15 @@ mechanistic SNP-level transport law.
 noncomputable def neutralAFSharedLDBenchmarkRatio
     (fstSource fstTarget shared_ld_source shared_ld_target : ℝ) : ℝ :=
   ((1 - fstTarget) * shared_ld_target) / ((1 - fstSource) * shared_ld_source)
+
+/-- **The benchmark ratio's junk branch, named.** A source that shares no linkage structure, or
+one at complete differentiation, zeroes the denominator and Lean returns `0`: the ratio reports
+total loss of transfer where it is undefined, since there was no source performance to transfer.
+Consumers must require the source denominator nonzero. -/
+theorem neutralAFSharedLDBenchmarkRatio_no_source_is_junk
+    (fstSource fstTarget shared_ld_target : ℝ) :
+    neutralAFSharedLDBenchmarkRatio fstSource fstTarget 0 shared_ld_target = 0 := by
+  unfold neutralAFSharedLDBenchmarkRatio; simp
 
 /-- The shared-LD benchmark reduces to the neutral allele-frequency benchmark
 when shared LD is perfect in both populations. -/
