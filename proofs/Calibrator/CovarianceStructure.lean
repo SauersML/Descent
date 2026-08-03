@@ -54,225 +54,6 @@ variance is `p(1-p)`. Reading it as allelic is what produces the `r²/4` defect:
 `ldCorrelationSq` divides by the product of two of these, which is right for a
 genotype-scale `D` and wrong by four for the allele-scale `D` this same file produces. -/
 
-/-- Allelic variance is maximized at p = 0.5. -/
-theorem allelic_variance_max_at_half (p : ℝ)
-    (h_p : 0 ≤ p) (h_p_le : p ≤ 1) :
-    genotypeVarianceHWE p ≤ genotypeVarianceHWE (1/2) := by
-  unfold genotypeVarianceHWE
-  have : (p - 1/2) ^ 2 ≤ 1/4 := by nlinarith
-  nlinarith [sq_nonneg (p - 1/2)]
-
-/-- Allelic variance is zero at fixation. -/
-theorem allelic_variance_zero_at_fixation_zero :
-    genotypeVarianceHWE 0 = 0 := by
-  unfold genotypeVarianceHWE; ring
-
-theorem allelic_variance_zero_at_fixation_one :
-    genotypeVarianceHWE 1 = 0 := by
-  unfold genotypeVarianceHWE; ring
-
-/-- **Off-diagonal LD is bounded.**
-    |D_ij| ≤ min(p_i p_j, (1-p_i)(1-p_j), p_i(1-p_j), (1-p_i)p_j).
-    Since D = P(AB) - p_i·p_j and P(AB) ∈ [0, min(p_i, p_j)],
-    we have D ≤ p_i·p_j (because P(AB) ≤ min(p_i,p_j) ≤ p_i and D = P(AB) - p_i·p_j).
-    More directly, D ≤ p_i·p_j because P(AB) ≤ 1 and p_i·p_j > 0.
-    We prove the weaker statement: |D| ≤ p_i·p_j when D² ≤ p_i·p_j·(1-p_i)·(1-p_j)
-    (which is the requirement that r² ≤ 1). -/
-theorem abs_le_sqrt_of_sq_le (D p_i p_j : ℝ)
-    (h_pi : 0 < p_i) (h_pi1 : p_i < 1)
-    (h_pj : 0 < p_j) (h_pj1 : p_j < 1)
-    (h_r2_le_one : D ^ 2 ≤ p_i * p_j * ((1 - p_i) * (1 - p_j))) :
-    |D| ≤ Real.sqrt (p_i * p_j * ((1 - p_i) * (1 - p_j))) := by
-  have h_rhs_nonneg : 0 ≤ p_i * p_j * ((1 - p_i) * (1 - p_j)) := by
-    nlinarith
-  have h_abs_sq : |D| ^ 2 ≤ p_i * p_j * ((1 - p_i) * (1 - p_j)) := by
-    simpa [abs_sq] using h_r2_le_one
-  have h_sqrt_nonneg : 0 ≤ Real.sqrt (p_i * p_j * ((1 - p_i) * (1 - p_j))) := by
-    exact Real.sqrt_nonneg (p_i * p_j * ((1 - p_i) * (1 - p_j)))
-  nlinarith [h_abs_sq, Real.sq_sqrt h_rhs_nonneg, abs_nonneg D, h_sqrt_nonneg]
-
-/-- **LD correlation r² is in [0,1].**
-    r²_ij = D²_ij / (p_i(1-p_i) × p_j(1-p_j)).
-
-    Empirical status: UNTESTED.
-
-    Convention: `D` is a dosage covariance, twice the haplotype `D`. The
-    denominator `genotypeVarianceHWE p_i * genotypeVarianceHWE p_j` cancels only under
-    that reading; feeding a haplotype `D` yields `r²/4`. Use
-    `ldCorrelationSqOfHaplotypeD` for the other convention. -/
-noncomputable def ldCorrelationSq (D p_i p_j : ℝ) : ℝ :=
-  D^2 / (genotypeVarianceHWE p_i * genotypeVarianceHWE p_j)
-
-/-! **Convention of `D` in `ldCorrelationSq`.**
-
-The denominator is `genotypeVarianceHWE p_i * genotypeVarianceHWE p_j = 4 p_i q_i p_j q_j`,
-which cancels only when `D` is a *dosage* covariance, that is twice the
-haplotype `D`. `admixtureLDTwoLocus` in this same file produces the haplotype
-`D`, so composing the two — the obvious move, since one produces `D` and the
-other consumes it — yields `r²/4` rather than `r²`.
-
-Both definitions are defensible in isolation and Lean cannot object, because
-both arguments are `ℝ` and nothing records which convention each carries. This
-is the first defect found here that is not local to a single definition: it
-lives in the composition. `tagR2` carries the same hazard if its variance
-arguments are read as `genotypeVarianceHWE`.
-
-The convention is therefore stated: `ldCorrelationSq` expects a dosage
-covariance. `ldCorrelationSq_of_haplotypeD` below converts. -/
-
-/-- Haplotype `D` to squared correlation, with the factor the dosage
-convention requires. Use this when the input came from
-`admixtureLDTwoLocus`.
-
-    Convention: consumes haplotype `D`, produces `r²`.
-
-    Empirical status: VALIDATED (direct simulation of r² agrees with the
-    dosage-covariance reading to four decimals; the haplotype reading is
-    exactly one quarter of it).
-
-    Power: the four `(p_A, p_B, D)` cells of
-    `validation/empirical/popgen_defs/check_ldsc.py` put the predicted `r²` at
-    `0.6400`, `0.1984`, `0.0744` and `0.0000`, while the rival haplotype
-    reading predicts `0.1600`, `0.0496`, `0.0186` and `0.0000` on the same
-    cells. The span is most of the unit interval, so the factor of four is read
-    off the spread rather than off one point. -/
-noncomputable def ldCorrelationSqOfHaplotypeD (D p_i p_j : ℝ) : ℝ :=
-  ldCorrelationSq (2 * D) p_i p_j
-
-/-- The two differ by exactly the square of the ploidy factor, which is the
-whole content of the hazard. -/
-theorem ldCorrelationSqOfHaplotypeD_eq (D p_i p_j : ℝ) :
-    ldCorrelationSqOfHaplotypeD D p_i p_j = 4 * ldCorrelationSq D p_i p_j := by
-  unfold ldCorrelationSqOfHaplotypeD ldCorrelationSq
-  ring_nf
-
-/-- LD correlation squared is nonneg. -/
-theorem ld_correlation_sq_nonneg (D p_i p_j : ℝ)
-    (h_pi : 0 < p_i) (h_pi_lt : p_i < 1)
-    (h_pj : 0 < p_j) (h_pj_lt : p_j < 1) :
-    0 ≤ ldCorrelationSq D p_i p_j := by
-  unfold ldCorrelationSq
-  apply div_nonneg (sq_nonneg D)
-  apply mul_nonneg
-  · unfold genotypeVarianceHWE; nlinarith
-  · unfold genotypeVarianceHWE; nlinarith
-
-end LDMatrixProperties
-
-
-/-!
-## LD Mismatch Quantification
-
-Different populations have different LD matrices. The magnitude
-of this mismatch directly predicts PGS portability loss.
--/
-
-section LDMismatch
-
-/-- **PGS R² loss is bounded by LD mismatch.**
-    When R²_target = R²_source × (1 - c × frob_sq) for LD mismatch
-    frob_sq and coupling constant c, the R² loss equals R²_source × c × frob_sq,
-    and this loss is strictly positive when all parameters are positive. -/
-theorem r2_loss_bounded_by_ld_mismatch
-    (r2_source c frob_sq : ℝ)
-    (h_r2 : 0 < r2_source) (h_c : 0 < c) (h_frob : 0 < frob_sq)
-    (h_product_lt : c * frob_sq < 1) :
-    let r2_target := r2_source * (1 - c * frob_sq)
-    r2_target < r2_source ∧ r2_source - r2_target = r2_source * c * frob_sq := by
-  constructor
-  · -- r2_source * (1 - c * frob_sq) < r2_source because c * frob_sq > 0
-    nlinarith [mul_pos h_c h_frob, mul_pos h_r2 (mul_pos h_c h_frob)]
-  · ring
-
-/-- **Spectral norm bound.**
-    The largest eigenvalue difference between LD matrices
-    gives a tighter bound on PGS loss for sparse PGS.
-    The Frobenius loss = spectral_loss · sqrt(rank), while for
-    a sparse PGS touching only k of M SNPs, the effective loss
-    is spectral_loss · sparsity where sparsity = k/M ≤ 1.
-    Since sparsity ≤ 1 and spectral_loss ≤ frob_loss, the
-    spectral bound is tighter for sparse models. -/
-theorem mul_le_of_le_of_le_one
-    (frob_loss spectral_loss sparsity : ℝ)
-    (h_frob : 0 < frob_loss)
-    (h_spectral_nn : 0 ≤ spectral_loss)
-    (h_spectral : spectral_loss ≤ frob_loss)
-    (h_sparse : 0 < sparsity) (h_sparse_le : sparsity ≤ 1) :
-    spectral_loss * sparsity ≤ frob_loss := by
-  calc spectral_loss * sparsity
-      ≤ spectral_loss * 1 := by nlinarith
-    _ = spectral_loss := mul_one _
-    _ ≤ frob_loss := h_spectral
-
-/-- **LD mismatch decomposes into local and long-range components.**
-    Given local and long-range mismatch components (both nonneg),
-    each component is at most the total, and the total is strictly
-    greater than either component when both are positive.
-    This captures the key insight that long-range LD (population-specific)
-    and local LD (partially shared) contribute independently. -/
-theorem ld_mismatch_decomposition
-    (local_mismatch lr_mismatch : ℝ)
-    (h_local : 0 < local_mismatch) (h_lr : 0 < lr_mismatch) :
-    let total := local_mismatch + lr_mismatch
-    local_mismatch < total ∧ lr_mismatch < total ∧
-    local_mismatch / total < 1 ∧ lr_mismatch / total < 1 := by
-  refine ⟨by linarith, by linarith, ?_, ?_⟩
-  · rw [div_lt_one (by linarith)]; linarith
-  · rw [div_lt_one (by linarith)]; linarith
-
-end LDMismatch
-
-
-/-!
-## Block Diagonal LD Structure
-
-LD is approximately block diagonal, with blocks corresponding
-to genomic regions separated by recombination hotspots.
--/
-
-section BlockDiagonalLD
-
-/-- **LD block size is population-dependent.**
-    Populations with older haplotype structure have smaller LD blocks.
-    Populations that experienced bottlenecks have larger blocks
-    due to bottleneck-induced LD. -/
-theorem blockSize_div_lt_one_of_lt
-    (block_pop₁ block_pop₂ : ℝ)
-    (h_smaller : block_pop₁ < block_pop₂)
-    (h_nn : 0 < block_pop₁) :
-    block_pop₁ / block_pop₂ < 1 := by
-  rw [div_lt_one (by linarith)]
-  exact h_smaller
-
-/-- **Number of independent LD blocks.**
-    n_blocks ≈ genome_length / mean_block_size.
-    More blocks → more independent segments → PGS has more
-    independent contributions → better CLT approximation. -/
-noncomputable def numBlocks (genome_length mean_block_size : ℝ) : ℝ :=
-  genome_length / mean_block_size
-
-/-- Smaller blocks → more blocks. -/
-theorem smaller_blocks_more_segments
-    (L block₁ block₂ : ℝ)
-    (h_L : 0 < L) (h_b₁ : 0 < block₁) (h_b₂ : 0 < block₂)
-    (h_smaller : block₁ < block₂) :
-    numBlocks L block₂ < numBlocks L block₁ := by
-  unfold numBlocks
-  exact div_lt_div_iff_of_pos_left h_L h_b₂ h_b₁ |>.mpr h_smaller
-
-/-- **Block-wise portability contribution.**
-    If each of n LD blocks contributes port_per_block to total PGS variance,
-    total portability = n × port_per_block. With more blocks (smaller LD),
-    each block's contribution shrinks, but the total depends on the product.
-    We show: if two populations have the same total signal but different
-    block counts, the per-block contribution is inversely proportional. -/
-theorem div_lt_div_of_lt_denom
-    (total_signal n₁ n₂ : ℝ)
-    (h_signal : 0 < total_signal)
-    (h_n₁ : 0 < n₁) (h_n₂ : 0 < n₂)
-    (h_more_blocks : n₁ < n₂) :
-    total_signal / n₂ < total_signal / n₁ := by
-  exact div_lt_div_of_pos_left h_signal h_n₁ (by linarith)
 
 /-- **Recombination hotspots define block boundaries.**
     Hotspot density varies across populations, affecting
@@ -289,7 +70,7 @@ theorem hotspot_density_affects_blocks
     L / n_hotspots_afr < L / n_hotspots_eur :=
   div_lt_div_of_pos_left hL h_eur_pos h_more_hotspots
 
-end BlockDiagonalLD
+end LDMatrixProperties
 
 
 /-!
@@ -513,6 +294,13 @@ from first principles, starting with haplotype frequency dynamics.
     Empirical status: UNTESTED. -/
 noncomputable def haplotypeFreqAdmixed (alpha p_A q_A p_B q_B : ℝ) : ℝ :=
   alpha * p_A * q_A + (1 - alpha) * p_B * q_B
+
+/-- **Two identical source populations admix to themselves.** When both parental populations
+carry the same haplotype frequency the admixed frequency is that value at every mixing
+proportion, so admixture cannot create haplotype structure that neither source had. -/
+theorem haplotypeFreqAdmixed_same (alpha p q : ℝ) :
+    haplotypeFreqAdmixed alpha p q p q = p * q := by
+  unfold haplotypeFreqAdmixed; ring
 
 /-! **Marginal allele frequency at either locus in the admixed population.**
 

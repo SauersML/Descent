@@ -2628,6 +2628,15 @@ chart is a derived algebraic identity.
 noncomputable def calibratedBrierFromVariances (π vSignal vResidual : ℝ) : ℝ :=
   π * (1 - π) * (1 - vSignal / (vSignal + vResidual))
 
+/-- **A residual-free signal drives the calibrated risk to zero.** With no residual variance the
+explained fraction is one and the Brier risk vanishes, which is the endpoint that pins the
+`1 - r²` factor: a body missing it would leave the prevalence variance behind. -/
+theorem calibratedBrierFromVariances_no_residual (π vSignal : ℝ) (hv : vSignal ≠ 0) :
+    calibratedBrierFromVariances π vSignal 0 = 0 := by
+  unfold calibratedBrierFromVariances
+  rw [add_zero, div_self hv]
+  ring
+
 @[simp] theorem calibratedBrierFromVariances_eq_chart
     (π vSignal vResidual : ℝ) :
     calibratedBrierFromVariances π vSignal vResidual =

@@ -334,6 +334,13 @@ noncomputable def expectedLinearEffectEstimate
     (β_true meanEstimationError : ℝ) : ℝ :=
   β_true + meanEstimationError
 
+/-- **An unbiased estimator recovers the truth.** With zero mean estimation error the expected
+estimate is the true effect, which is what makes the second argument a bias rather than a
+variance. -/
+theorem expectedLinearEffectEstimate_unbiased (β_true : ℝ) :
+    expectedLinearEffectEstimate β_true 0 = β_true := by
+  unfold expectedLinearEffectEstimate; ring
+
 /-- One-locus OLS effect-estimation variance under genotype variance `varX` and
 sample size `n`.
 

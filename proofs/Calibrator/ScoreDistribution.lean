@@ -146,19 +146,6 @@ theorem mean_shift_increases_tail
     (threshold - μ₂) / σ < (threshold - μ₁) / σ := by
   exact div_lt_div_of_pos_right (by linarith) h_σ
 
-/-- **A larger standard deviation lowers the standardized coordinate of a point above the
-    mean.**
-
-    Again the coordinate step only. "More probability in both tails" is a statement about two
-    tail rates and needs `Phi` at two arguments; neither appears here, and the second tail is
-    not reached by this inequality at all. The upper-tail consequence is
-    `variance_change_changes_benchmark_high_score_rate` below. -/
-theorem div_lt_div_of_lt_denom
-    (x σ₁ σ₂ : ℝ) (h₁ : 0 < σ₁)
-    (h_larger : σ₁ < σ₂) (h_x : 0 < x) :
-    x / σ₂ < x / σ₁ := by
-  exact div_lt_div_of_pos_left h_x h₁ h_larger
-
 /-- **Threshold standardized coordinate changes under mean shift.**
     When population means differ, the standardized location of a fixed raw
     threshold differs as long as the standard deviation is shared. This is a
@@ -229,7 +216,7 @@ theorem variance_change_changes_benchmark_high_score_rate
       benchmarkHighScoreRate threshold μ σ_T := by
   unfold benchmarkHighScoreRate thresholdStandardizedCoordinate
   have hz : (threshold - μ) / σ_T < (threshold - μ) / σ_S := by
-    exact div_lt_div_of_lt_denom (threshold - μ) σ_S σ_T h_σS h_larger h_thr
+    exact div_lt_div_of_pos_left h_thr h_σS h_larger
   have hphi : Phi ((threshold - μ) / σ_T) < Phi ((threshold - μ) / σ_S) := by
     exact strictMono_Phi hz
   linarith

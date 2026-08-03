@@ -112,20 +112,6 @@ theorem squared_error_expansion (μ μ_hat ε : ℝ) :
     (μ + ε - μ_hat) ^ 2 = (μ - μ_hat) ^ 2 + 2 * (μ - μ_hat) * ε + ε ^ 2 := by
   ring
 
-/-- **Expected squared error given X = x.**
-    E[(Y - Ŷ)² | X = x] = (μ(x) - μ̂(x))² + σ².
-    The first term is the squared bias, the second is irreducible noise. -/
-theorem expected_squared_error_given_x (bias σ_sq : ℝ) :
-    bias ^ 2 + σ_sq ≥ σ_sq := by
-  linarith [sq_nonneg bias]
-
-/-- **Variance of squared error given X = x.**
-    Var((Y - Ŷ)² | X = x) ≈ 4·bias²·σ² + 2·σ⁴.
-    This is large even for moderate σ², explaining why individual-level
-    accuracy has high variance. -/
-theorem variance_of_squared_error_lower_bound (σ_sq : ℝ) (hσ : 0 < σ_sq) :
-    0 < 2 * σ_sq ^ 2 := by positivity
-
 /-- **Conditional variance is large relative to conditional mean squared.**
     For ε ~ N(0, σ²), we have E[ε²] = σ² and Var(ε²) = 2σ⁴.
     Therefore CV² = Var(ε²)/E[ε²]² = 2σ⁴/σ⁴ = 2.

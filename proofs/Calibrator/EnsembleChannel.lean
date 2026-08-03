@@ -53,6 +53,12 @@ lag covariances. -/
 noncomputable def gaussianPairSquareChannel3 (γ₀ γ₁ γ₂ : ℝ) : ℝ :=
   3 * γ₀ ^ 2 + 4 * γ₁ ^ 2 + 2 * γ₂ ^ 2
 
+/-- **The channel is nonnegative: it is a positive combination of squares.** A body that lost a
+square, or carried a negative weight, would fail here on the coordinate it broke. -/
+theorem gaussianPairSquareChannel3_nonneg (γ₀ γ₁ γ₂ : ℝ) :
+    0 ≤ gaussianPairSquareChannel3 γ₀ γ₁ γ₂ := by
+  unfold gaussianPairSquareChannel3; positivity
+
 /-- The flat covariance profile and a dependent profile have exactly the same Fejér
 sample-mean channel. -/
 theorem equal_fejer_channel_witness :
