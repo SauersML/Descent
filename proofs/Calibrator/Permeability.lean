@@ -16,8 +16,9 @@ method-design score: among candidate LD, haplotype, ancestry-tract, or longitudi
 prefer directions with large covariance sensitivity relative to their own noise.  The
 score is invariant to changing genotype coding units and adds across independent probes.
 
-No CLT-to-LAN transfer, Edgeworth hierarchy, support-floor scaling, or minimax constant is
-asserted here. Those require a named statistical experiment and uniform regularity.
+No CLT-to-LAN transfer, Edgeworth hierarchy, universal support-floor model, or minimax
+constant is asserted here. Those require a named statistical experiment and uniform
+regularity.
 -/
 
 open scoped BigOperators
@@ -55,6 +56,17 @@ theorem scalarPermeability_rescale (covariance covarianceDerivative scale : ℝ)
   have hscaled : scale * covariance ≠ 0 := mul_ne_zero hscale hcovariance
   congr 1
   field_simp
+
+/-- If a support, assay, or tagging factor `η` attenuates the covariance derivative
+linearly, it attenuates Gaussian permeability quadratically. This is the exact algebraic
+core of the sealing law; proving that a biological support floor actually enters the
+derivative linearly is a separate model-specific obligation. -/
+theorem scalarPermeability_derivative_scale
+    (covariance covarianceDerivative η : ℝ) :
+    scalarPermeability covariance (η * covarianceDerivative) =
+      η ^ 2 * scalarPermeability covariance covarianceDerivative := by
+  unfold scalarPermeability
+  ring
 
 /-- Total order-two permeability of finitely many independent scalar estimator channels. -/
 noncomputable def diagonalPermeability {ι : Type*} [Fintype ι]
