@@ -310,6 +310,41 @@ theorem mechanismCount_not_identified :
   constructor <;> refine ⟨?_, ?_, ?_⟩ <;>
     simp [threeMechanismMixture, twoMechanismMixture] <;> norm_num
 
+/-- **Two mechanisms reach every achievable observation.**
+
+    `twoMechanismMixture w = 9/10 - w · (7/10)` is affine and strictly decreasing in `w`,
+    so as `w` sweeps `[0,1]` the mixture sweeps the whole interval `[2/10, 9/10]`.  The
+    witness is explicit: `w = (9 - 10 t) / 7`. -/
+theorem exists_twoMechanismMixture_eq {t : ℝ}
+    (hlo : 2 / 10 ≤ t) (hhi : t ≤ 9 / 10) :
+    ∃ w : ℝ, 0 ≤ w ∧ w ≤ 1 ∧ twoMechanismMixture w = t := by
+  refine ⟨(9 - 10 * t) / 7, by linarith, by linarith, ?_⟩
+  unfold twoMechanismMixture
+  ring_nf
+
+/-- **The mechanism count is not identified by ANY observed family, not just by one.**
+
+    `mechanismCount_not_identified` exhibits a single three-context family fit by both a
+    three-mechanism and a two-mechanism model.  This is the universally quantified form,
+    and it is what the collapse theorem's moral actually asserts: *whatever* family of
+    context probabilities is observed, so long as each lies in the achievable range, a
+    two-mechanism model reproduces it exactly, with genuine mixing weights.
+
+    So no observation can support a claim that more than two mechanisms are at work.  A
+    study reporting `k` pathways is reporting a modelling choice; the data are silent on
+    the count, for every dataset rather than for a lucky one.
+
+    This is the finite shadow of the collapse theorem sharpened from an instance to a
+    universal.  It is still not the general theorem, which quantifies over smooth families
+    on compact manifolds and drives the minimal count to `1` rather than `2`; that remains
+    the open gap the module docstring describes, and needs kernels and mixing measures as
+    formal objects. -/
+theorem mechanismCount_not_identified_of_range {ι : Type*} (obs : ι → ℝ)
+    (hrange : ∀ i, 2 / 10 ≤ obs i ∧ obs i ≤ 9 / 10) :
+    ∃ w : ι → ℝ, (∀ i, 0 ≤ w i ∧ w i ≤ 1) ∧ ∀ i, twoMechanismMixture (w i) = obs i := by
+  choose w hw0 hw1 hwe using fun i ↦ exists_twoMechanismMixture_eq (hrange i).1 (hrange i).2
+  exact ⟨w, fun i ↦ ⟨hw0 i, hw1 i⟩, hwe⟩
+
 /-- Every weight used in `mechanismCount_not_identified` is a genuine mixing weight: in
     `[0,1]`, and in the three-mechanism model the third weight `1 - u - v` is positive too,
     so all three mechanisms are actually in use. -/
