@@ -1911,7 +1911,7 @@ not see docstrings — a third instance left an orphaned doc comment above the
 (That sentence originally quoted the doc-comment opener literally. Lean nests
 block comments, so the quoted opener opened one, the closer below shut only
 that, and this note left its own module unterminated — the failure
-the `identifications` guard in check.py counts delimiters for. Do not write the opener
+`check-identifications.py` counts delimiters for. Do not write the opener
 literally in prose here.)
 -/
 
