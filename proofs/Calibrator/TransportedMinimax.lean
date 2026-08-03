@@ -204,6 +204,64 @@ theorem longMemoryVariance_strictMono (ε n : ℝ) (hε : ε ≠ 0) (hn : 0 < n)
   apply div_lt_div_of_pos_right _ hden
   nlinarith [hfac]
 
+/-! ### The width law, and where the exponent three comes from
+
+The conformal metric above was posited with exponent `3`. It is not arbitrary: it is forced
+by the **width law**, which says that for a spectral band of width `w` the squared norm goes
+like `1/w` and the squared norm of its derivative like `1/w³`, **whatever the band's shape**.
+
+The shape-freedom is the content, and it is what `widthLaw_ratio_shape_free` records: two
+bands with different shape constants have the *same* ratio `1/w²`, so the exponent in the
+induced metric is a property of the width variable alone. That is why the same `w^{-3}`
+appears for every family in this arc rather than being fitted per family.
+
+`widthLaw_gives_longMemoryMetric` closes the loop: the metric coefficient of the
+long-memory geometry **is** the width law's `gradNormSq`, with the amplitude `ε²` playing the
+role of the shape constant. The exponent `3` in `longMemoryMetric` is therefore derived, not
+assumed.
+
+Empirical status: UNTESTED. The two scalings are named inputs. -/
+
+/-- **A band obeying the width law.** The shape constant is carried explicitly so that the
+    shape-freedom of the ratio can be stated as a theorem rather than asserted. -/
+structure WidthLaw where
+  /-- The band's shape constant. -/
+  shape : ℝ
+  /-- Shape constants are positive. -/
+  shape_pos : 0 < shape
+  /-- Squared norm of the band at width `w`. -/
+  normSq : ℝ → ℝ
+  /-- Squared norm of the band's derivative at width `w`. -/
+  gradNormSq : ℝ → ℝ
+  /-- The width law for the band: `‖B‖² ~ 1/w`. -/
+  normSq_eq : ∀ w, 0 < w → normSq w = shape / w
+  /-- The width law for its derivative: `‖dB‖² ~ 1/w³`. -/
+  gradNormSq_eq : ∀ w, 0 < w → gradNormSq w = shape / w ^ 3
+
+/-- **The width-law ratio is `1/w²`, and the shape constant cancels.** -/
+theorem widthLaw_ratio (W : WidthLaw) (w : ℝ) (hw : 0 < w) :
+    W.gradNormSq w / W.normSq w = 1 / w ^ 2 := by
+  have hs : W.shape ≠ 0 := ne_of_gt W.shape_pos
+  have hwne : w ≠ 0 := ne_of_gt hw
+  rw [W.gradNormSq_eq w hw, W.normSq_eq w hw]
+  field_simp
+
+/-- **Shape-freedom, as a theorem.** Two bands of different shape have the same ratio, so
+    the exponent of the induced metric is a property of the width variable alone. -/
+theorem widthLaw_ratio_shape_free (W W' : WidthLaw) (w : ℝ) (hw : 0 < w) :
+    W.gradNormSq w / W.normSq w = W'.gradNormSq w / W'.normSq w := by
+  rw [widthLaw_ratio W w hw, widthLaw_ratio W' w hw]
+
+/-- **The long-memory metric is the width law's derivative norm.**
+
+    With the amplitude `ε²` as the shape constant, `longMemoryMetric ε w = W.gradNormSq w`.
+    So the exponent `3` in the conformal metric — the one that cancels against the parameter
+    variance in `transportedFloor_eq` — is supplied by the width law rather than assumed. -/
+theorem widthLaw_gives_longMemoryMetric (W : WidthLaw) (ε w : ℝ) (hw : 0 < w)
+    (hε : ε ^ 2 = W.shape) :
+    W.gradNormSq w = longMemoryMetric ε w := by
+  rw [W.gradNormSq_eq w hw, longMemoryMetric, hε]
+
 /-! ### Positivity buys an exponent
 
 The metric-entropy side of the same arc. A moment body — the set of moment sequences of

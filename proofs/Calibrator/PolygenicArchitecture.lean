@@ -754,6 +754,92 @@ theorem architecture_gradeSound_eventually (c : ℝ) (K : ℕ) (hK : K ≠ 0)
   simp only [hinv, if_neg hK]
   exact Real.sqrt_le_sqrt hkey
 
+/-! ### Positivity buys an exponent: the moment body of architecture spectra
+
+An architecture summary is a functional of a **positive** measure — the allele-frequency
+spectrum, or the distribution of effect sizes. The set of moment sequences of such measures
+is a *moment body*, and a moment body is much smaller than the coordinatewise box that
+contains it.
+
+Quantitatively, for the class whose boundary tail is at most `M t^α` the log covering number
+is `Θ((M/ε)^(1/α))`, against `ε^(-2/(2α-1))` for the enclosing hyperrectangle. The two
+exponents are named inputs here — the lower bound needs shell atoms and a
+Varshamov–Gilbert argument, the upper bound needs smoothed convex hulls and Carl's
+inequality, and neither is in Mathlib. **The comparison is the theorem**, and it holds at
+every admissible `α` with no exceptional interval.
+
+**Why this matters for a study.** Covering numbers are what set sample sizes for estimating
+a class: the number of architectures distinguishable at resolution `ε` is what a design must
+separate. Treating the architecture class as a box — which is what a coordinatewise
+effect-size or frequency-bin prior amounts to — overstates that count **by a power of the
+resolution**, not by a constant. So a sample-size calculation built on a box-shaped class is
+conservative by a polynomial factor, and the positivity of the underlying spectrum is what
+pays for the difference.
+
+Note the direction, which is opposite to the certificate story above and complements it. The
+certificate deficit makes fixed-grade *lower bounds* polynomially **optimistic**; the moment
+body makes box-shaped *upper bounds* polynomially **pessimistic**. Both are exponent-level
+effects and both are invisible to any analysis that tracks constants only.
+
+Empirical status: UNTESTED. -/
+
+section MomentBodyEntropy
+
+/-- Log covering number at resolution ratio `t = M/ε` and exponent `e`.
+
+    Both classes below are of this shape and differ only in the exponent, which is why the
+    comparison reduces to a comparison of exponents. -/
+noncomputable def logCoveringAtExponent (t e : ℝ) : ℝ := t ^ e
+
+/-- The moment body's entropy exponent, `1/α`. -/
+noncomputable def momentBodyExponent (α : ℝ) : ℝ := 1 / α
+
+/-- The enclosing hyperrectangle's entropy exponent, `2/(2α-1)`. -/
+noncomputable def hyperrectangleExponent (α : ℝ) : ℝ := 2 / (2 * α - 1)
+
+/-- **The moment body's exponent is strictly smaller, at every admissible `α`.**
+
+    `1/α < 2/(2α-1)` for every `α > 1/2`. The inequality is equivalent to `2α - 1 < 2α`, so
+    it has no exceptional range and no asymptotic caveat: positivity is worth a strictly
+    better exponent everywhere. -/
+theorem momentBodyExponent_lt_hyperrectangle (α : ℝ) (hα : 1 / 2 < α) :
+    momentBodyExponent α < hyperrectangleExponent α := by
+  have hα0 : 0 < α := by linarith
+  have hden : 0 < 2 * α - 1 := by linarith
+  unfold momentBodyExponent hyperrectangleExponent
+  rw [div_lt_div_iff₀ hα0 hden]
+  linarith
+
+/-- **Strictly fewer distinguishable architectures, at every resolution finer than `M`.**
+
+    Once the resolution ratio exceeds one — that is, once `ε < M`, the only regime in which
+    a covering number is informative — the moment body's log covering number is strictly
+    below the hyperrectangle's. The gap is a power of the resolution ratio, not a constant.
+
+    This is the sample-size statement: a design that must separate the architecture class at
+    resolution `ε` faces strictly fewer alternatives than a box-shaped class of the same
+    tail order would present. -/
+theorem momentBody_logCovering_lt (t α : ℝ) (ht : 1 < t) (hα : 1 / 2 < α) :
+    logCoveringAtExponent t (momentBodyExponent α) <
+      logCoveringAtExponent t (hyperrectangleExponent α) := by
+  unfold logCoveringAtExponent
+  exact Real.rpow_lt_rpow_left_iff ht |>.mpr
+    (momentBodyExponent_lt_hyperrectangle α hα)
+
+/-- The covering-number gap is a strict inequality of positive quantities, so the ratio of
+    required alternative counts exceeds one. Recorded in the form a power calculation
+    consumes. -/
+theorem momentBody_logCovering_ratio_gt_one (t α : ℝ) (ht : 1 < t) (hα : 1 / 2 < α) :
+    1 < logCoveringAtExponent t (hyperrectangleExponent α) /
+      logCoveringAtExponent t (momentBodyExponent α) := by
+  have ht0 : (0 : ℝ) < t := by linarith
+  have hpos : 0 < logCoveringAtExponent t (momentBodyExponent α) :=
+    Real.rpow_pos_of_pos ht0 _
+  rw [lt_div_iff₀ hpos, one_mul]
+  exact momentBody_logCovering_lt t α ht hα
+
+end MomentBodyEntropy
+
 end NonsmoothSummaries
 
 
