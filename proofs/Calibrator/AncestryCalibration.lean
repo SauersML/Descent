@@ -262,15 +262,16 @@ theorem measurement_invariance_violation
       nlinarith [sq_nonneg (scale - 1)]
     exact h_scale this
 
-/-- **Liability threshold model for binary traits.**
-    Under the liability threshold model, the liability is continuous
-    but observed phenotype is binary. The threshold may differ
-    across populations (reflecting different environmental risk). -/
+/-- **A higher liability mean puts the threshold lower relative to it.**
+
+    Subtraction, and nothing more: no distribution, no prevalence, and no liability-threshold
+    model appears below. The prevalence reading — that a higher mean puts more of the population
+    above a fixed threshold — needs a distribution function, and
+    `Calibrator.ScoreDistribution.mean_shift_changes_benchmark_high_score_rate` is where that
+    step is taken, against the Gaussian benchmark. -/
 theorem threshold_shift_changes_prevalence
     (liability_mean₁ liability_mean₂ threshold : ℝ)
     (h_mean_shift : liability_mean₁ < liability_mean₂) :
-    -- With fixed threshold, higher mean → higher prevalence
-    -- (proportion above threshold increases)
     threshold - liability_mean₂ < threshold - liability_mean₁ := by linarith
 
 /-- **Different prevalence → different R² even with same AUC.**

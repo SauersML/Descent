@@ -380,12 +380,16 @@ theorem fluctuating_selection_worst_portability
   · -- 1 - d(1 + fN) < 1 - d, since d(1 + fN) > d
     nlinarith [mul_pos h_d_pos h_fN]
 
-/-- **Selection strength determines portability impact.**
-    Weak selection (s << 1/(2Ne)): alleles behave neutrally → portable.
-    Strong selection (s >> 1/(2Ne)): alleles are population-specific → not portable.
-    Weak and strong selection regimes cannot overlap: if s < ne_inv
-    and ne_inv * 10 < s both held, we would get ne_inv * 10 < ne_inv,
-    which is impossible for positive ne_inv. -/
+/-- **The weak and strong selection regimes are disjoint.**
+
+    If `s < ne_inv` and `ne_inv * 10 < s` both held we would have `ne_inv * 10 < ne_inv`, which
+    a positive `ne_inv` forbids. That is the whole content: two thresholds on one number cannot
+    both be met.
+
+    The portability reading — that near-neutral alleles transfer and strongly selected ones are
+    population-specific — is why one would draw the boundary at `1/(2Nₑ)`, and it is not derived
+    here. No allele, no population and no portability quantity appears below, so this cannot be
+    cited as showing that selection strength determines portability. -/
 theorem selection_strength_determines_portability
     (s ne_inv : ℝ) -- s = selection coefficient, ne_inv = 1/(2Ne)
     (h_ne_inv_pos : 0 < ne_inv) :

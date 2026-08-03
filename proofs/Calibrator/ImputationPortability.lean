@@ -202,10 +202,13 @@ theorem mul_eq_zero_of_right_eq_zero
     r2_LD * variant_in_panel = 0 := by
   rw [h_missing, mul_zero]
 
-/-- **WGS eliminates imputation artifacts.**
-    With WGS, all variants are directly genotyped → r²_imp = 1.
-    This removes imputation-related portability artifacts
-    but doesn't fix LD mismatch or effect size differences. -/
+/-- **At unit imputation quality the attenuation factor is one.**
+
+    `attenuatedVariance a b c = a * b * c`, so with all three arguments one this is `1 * 1 * 1`.
+    That whole-genome sequencing achieves `r²_imp = 1` is supplied as the hypothesis, not
+    derived, and that it therefore removes imputation-related portability artifacts is a reading
+    of the arithmetic rather than a consequence of it: no sequencing platform, no variant and no
+    portability quantity appears below. -/
 theorem wgs_perfect_imputation
     (r2_imp_wgs : ℝ) (h_perfect : r2_imp_wgs = 1) :
     attenuatedVariance 1 1 r2_imp_wgs = 1 := by

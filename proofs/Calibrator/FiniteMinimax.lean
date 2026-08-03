@@ -260,6 +260,45 @@ theorem risk_mixRule (t : NNReal) (ht : t ≤ 1)
   rw [hinner]
   ring
 
+/-- The set of risk profiles achievable by some rule, as a subset of `ℝ^Θ`. -/
+def riskProfiles : Set (Fin (parameterCount + 1) → ℝ) :=
+  Set.range fun δ : Rule actionCount observationCount ↦ E.risk δ
+
+/-- **The achievable risk profiles form a convex set.**
+
+    Directly from `risk_mixRule`: a convex combination of two profiles is the profile of the
+    correspondingly mixed rule. This is the hypothesis a separating-hyperplane argument
+    consumes, and it is the reason the rule space had to admit mixtures. -/
+theorem convex_riskProfiles : Convex ℝ E.riskProfiles := by
+  rintro y₁ ⟨δ₁, rfl⟩ y₂ ⟨δ₂, rfl⟩ p q hp hq hpq
+  have hple : p ≤ 1 := by linarith
+  refine ⟨mixRule ⟨p, hp⟩ (by exact_mod_cast hple) δ₁ δ₂, ?_⟩
+  funext θ
+  have hq' : q = 1 - p := by linarith
+  simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul]
+  rw [risk_mixRule, hq']
+  norm_num
+
+/-- The open half-space of profiles strictly below a given level in every coordinate. -/
+def belowLevel (v : ℝ) : Set (Fin (parameterCount + 1) → ℝ) :=
+  {y | ∀ θ, y θ < v}
+
+theorem convex_belowLevel (v : ℝ) :
+    Convex ℝ (belowLevel (parameterCount := parameterCount) v) := by
+  intro y₁ h₁ y₂ h₂ p q hp hq hpq θ
+  have hy1 : y₁ θ < v := h₁ θ
+  have hy2 : y₂ θ < v := h₂ θ
+  simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul]
+  rcases lt_or_eq_of_le hp with hp' | hp'
+  · have h1 : p * y₁ θ < p * v := mul_lt_mul_of_pos_left hy1 hp'
+    have h2 : q * y₂ θ ≤ q * v := mul_le_mul_of_nonneg_left (le_of_lt hy2) hq
+    have hsum : p * v + q * v = v := by rw [← add_mul, hpq, one_mul]
+    linarith
+  · have hp0 : p = 0 := hp'.symm
+    have hq1 : q = 1 := by linarith
+    rw [hp0, hq1]
+    simpa using hy2
+
 /-- **The equalizer theorem: a constant-risk Bayes rule closes duality.**
 
     If a rule has the same risk at every parameter value and is Bayes against some prior,
