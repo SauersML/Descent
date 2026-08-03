@@ -488,7 +488,8 @@ theorem am_correction_increases_portability
   unfold amCorrectedPortability
   have h_denom : 0 < 1 - r_t * h2 := by nlinarith [mul_nonneg h_rt (le_of_lt h_h2)]
   rw [div_lt_iff₀ h_denom]
-  have : (1 - r_s * h2) < (1 - r_t * h2) := by nlinarith [mul_pos (by linarith : 0 < r_s - r_t) h_h2]
+  have : (1 - r_s * h2) < (1 - r_t * h2) := by
+    nlinarith [mul_pos (by linarith : 0 < r_s - r_t) h_h2]
   nlinarith [mul_pos h_port h_denom]
 
 /-- **AM correction recovers true portability.**

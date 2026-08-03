@@ -305,14 +305,17 @@ noncomputable def effectCorrelationFluctuating (d f N : ℝ) : ℝ :=
   max (-1) (1 - d * (1 + f * N))
 
 /-- Both selected correlations are in `[-1, 1]` by construction, for any
-decorrelation `0 ≤ d ≤ 1` and nonnegative scaled selection. **Do not supply this bound as
-a hypothesis**; it is a theorem, and assuming it would let a model set it inconsistently. -/
+decorrelation `0 ≤ d ≤ 1` and nonnegative scaled selection. **Do not supply this
+bound as a hypothesis**; it is a theorem, and assuming it would let a model set it
+inconsistently. -/
 theorem effectCorrelation_mem_range
     (d s f N : ℝ)
     (h_d_nonneg : 0 ≤ d) (h_d_le : d ≤ 1)
     (h_sN : 0 ≤ s * N) (h_fN : 0 ≤ f * N) :
-    (-1 ≤ effectCorrelationStabilizingDriftSelection d s N ∧ effectCorrelationStabilizingDriftSelection d s N ≤ 1) ∧
-      (-1 ≤ effectCorrelationFluctuating d f N ∧ effectCorrelationFluctuating d f N ≤ 1) := by
+    (-1 ≤ effectCorrelationStabilizingDriftSelection d s N ∧
+      effectCorrelationStabilizingDriftSelection d s N ≤ 1) ∧
+    (-1 ≤ effectCorrelationFluctuating d f N ∧
+      effectCorrelationFluctuating d f N ≤ 1) := by
   have h_denom_pos : (0 : ℝ) < 1 + s * N := by linarith
   have h_frac_nonneg : 0 ≤ d / (1 + s * N) := div_nonneg h_d_nonneg h_denom_pos.le
   have h_frac_le : d / (1 + s * N) ≤ 1 := by

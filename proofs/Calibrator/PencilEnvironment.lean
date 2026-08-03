@@ -142,6 +142,40 @@ theorem whiteningGain_finite_trace (decay : ℝ) (m : ℝ) (hm : m ≠ 0) :
   field_simp
   ring
 
+/-- **The per-site precision trace of the chain at finite length**, the `κ_m` the analysis
+    above is about.
+
+    One unconstrained leading variant contributes `1` and the remaining `m - 1` each
+    contribute `ldWhiteningGain`, so `κ_m = (1 + (m-1)·gain)/m`. The gain itself is the
+    `m → ∞` limit of this, and `whiteningGain_finite_trace` states the deficit between them;
+    naming the finite-`m` object is what stops that deficit being carried by prose.
+
+    Empirical status: MEASURED. Matches an explicit `Tr(Σ⁻¹)/m` on the inhomogeneous chain
+    to `9.4e-16` over fifteen cases, and at `decay = 0.99, m = 100` it sits `0.985` below
+    the gain, so the finite-`m` distinction is not a rounding effect. -/
+noncomputable def perSitePrecisionTrace (decay m : ℝ) : ℝ :=
+  (1 + (m - 1) * ldWhiteningGain decay) / m
+
+/-- **The corpus's finite-chromosome precision trace, per site, is that object.**
+
+`ImitationRigidity.ldPrecisionTrace` is derived there from the tridiagonal stencil
+identities, with no ergodic input at all. `perSitePrecisionTrace` is written the other way
+round, from the decomposition into one boundary variant and `m - 1` interior variants each
+whitened against its neighbour. They agree at every admissible correlation and every chain
+length.
+
+That agreement is what makes the ergodic reading of the certificate a theorem instead of a
+numerical coincidence. The prose above says the summand *is* `ldWhiteningGain` and that the
+sum formula matches `Tr(Σ⁻¹)/m` to `9.4e-16`; a measurement at fifteen cases is evidence for
+that and not a proof of it, and this is the proof. -/
+theorem ldPrecisionTrace_div_eq_perSitePrecisionTrace (decay : ℝ) (nSites : ℕ)
+    (hd : 1 - decay ^ 2 ≠ 0) (hm : (nSites : ℝ) ≠ 0) :
+    ldPrecisionTrace decay nSites / (nSites : ℝ)
+      = perSitePrecisionTrace decay (nSites : ℝ) := by
+  unfold ldPrecisionTrace perSitePrecisionTrace ldWhiteningGain
+  field_simp
+  ring
+
 /-- **The summand is unbounded on the admissible range.**
 
     For every target `M` there is an admissible correlation whose whitening gain exceeds it.
@@ -206,6 +240,19 @@ theorem tridiagonalABAB_pathExpression_pos
     confirmed them. -/
 noncomputable def ababFinite (Eα Eβ Eα2 Eβ2 m : ℝ) : ℝ :=
   2 * (1 - 1 / m) * Eα2 * Eβ2 + 4 * (1 - 2 / m) * Eα ^ 2 * Eβ ^ 2
+
+/-- **The deterministic case reproduces the raw path count.**
+
+    The docstring above claims the finite-`m` expression "reproduces
+    `(2(m-1) + 4(m-2))/m` exactly" in the deterministic case, where every moment
+    is one. That is a checkable arithmetic claim about this body and it was
+    prose, so nothing could contradict it: an edge correction could be dropped
+    from either factor and the sentence would still read true. -/
+theorem ababFinite_deterministic (m : ℝ) (hm : m ≠ 0) :
+    ababFinite 1 1 1 1 m = (2 * (m - 1) + 4 * (m - 2)) / m := by
+  unfold ababFinite
+  field_simp
+  ring
 
 /-- **The path expression is positive at every finite chain length past two**, so the
     obstruction to freeness is not an asymptotic artifact. -/

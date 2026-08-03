@@ -216,7 +216,7 @@ for one root, later roots reaching it add nothing.  Attribution is `witnessesOf`
 below, and it runs only when there is something to attribute. -/
 def unionOfClosures (env : Environment) (names : Array Name) : Array Name :=
   let st := names.foldl
-    (fun st n => (((CollectAxioms.collect n).run env).run st).2)
+    (fun st n ↦ (((CollectAxioms.collect n).run env).run st).2)
     ({} : CollectAxioms.State)
   st.axioms
 
@@ -311,7 +311,7 @@ def hasWitness (env : Environment) (S : Name) : MetaM Bool := do
     unless Check.isOurs n do continue
     unless ci.isDefinition || ci.isCtor || ci.isTheorem do continue
     if n.isInternalDetail then continue
-    let ok ← forallTelescopeReducing ci.type fun args body => do
+    let ok ← forallTelescopeReducing ci.type fun args body ↦ do
       -- Either a term of `S ..`, or a proof of `Nonempty (S ..)`.  A theorem witnesses
       -- a Prop-valued structure; a `Nonempty` proof witnesses a data one.
       let body := match body.getAppFn.constName? with
@@ -452,9 +452,9 @@ run_cmd do
   let names := Axioms.roots env
   let scanned := names.size
   let union := Axioms.unionOfClosures env names
-  let extra := union.filter fun a => !(allowed.contains a)
-  let offending := extra.filter fun a => !(admissible.contains a)
-  let admitted := extra.filter fun a => admissible.contains a
+  let extra := union.filter fun a ↦ !(allowed.contains a)
+  let offending := extra.filter fun a ↦ !(admissible.contains a)
+  let admitted := extra.filter fun a ↦ admissible.contains a
   let mut offenders : Array (Name × Name × Array Name) := #[]
   let mut admissions : Array (Name × Name × Array Name) := #[]
   for a in offending do
@@ -496,7 +496,7 @@ run_cmd do
     let mod := (env.getModuleFor? name).getD `«unknown»
 
     let (newFindings, newPremises, cache) ←
-      liftTermElabM <| Meta.forallTelescopeReducing ci.type fun args concl => do
+      liftTermElabM <| Meta.forallTelescopeReducing ci.type fun args concl ↦ do
         let mut fs : Array Laundering.Finding := #[]
         let mut prems := 0
         let mut cache := certCache
@@ -705,11 +705,11 @@ run_cmd do
   Shared.Results.write "proofs/validation/code/results/axioms.json" "AxiomScan"
     [ ("scanned", toJson scanned),
       ("offenderCount", toJson offenders.size),
-      ("offenders", Json.arr (offenders.map fun (m, n, bad) => Json.mkObj
+      ("offenders", Json.arr (offenders.map fun (m, n, bad) ↦ Json.mkObj
         [ ("module", toJson m.toString), ("declaration", toJson n.toString),
           ("axioms", toJson (bad.map (·.toString))) ])),
       ("admissionCount", toJson admissions.size),
-      ("admissions", Json.arr (admissions.map fun (m, n, bad) => Json.mkObj
+      ("admissions", Json.arr (admissions.map fun (m, n, bad) ↦ Json.mkObj
         [ ("module", toJson m.toString), ("declaration", toJson n.toString),
           ("axioms", toJson (bad.map (·.toString))) ])),
       ("allowed", toJson (allowed.map (·.toString))),
@@ -720,7 +720,7 @@ run_cmd do
       ("premises", toJson premises),
       ("fatalCount", toJson fatal.size),
       ("totalCount", toJson findings.size),
-      ("findings", Json.arr (findings.map fun f => Json.mkObj
+      ("findings", Json.arr (findings.map fun f ↦ Json.mkObj
         [ ("tag", toJson f.tag), ("fatal", toJson f.fatal),
           ("module", toJson f.mod.toString), ("declaration", toJson f.decl.toString),
           ("detail", toJson f.detail) ])) ]

@@ -306,7 +306,8 @@ theorem diversity_has_higher_marginal_value
   rw [← mul_sub, ← mul_sub]
   refine mul_lt_mul_of_pos_left ?_ h_h2
   have h1 : 0 < n_underrep * h2 + M := by nlinarith [mul_pos h_underrep h_h2]
-  have h2' : 0 < (n_underrep + dn) * h2 + M := by nlinarith [mul_pos (by linarith : 0 < n_underrep + dn) h_h2]
+  have h2' : 0 < (n_underrep + dn) * h2 + M := by
+    nlinarith [mul_pos (by linarith : 0 < n_underrep + dn) h_h2]
   have h3 : 0 < n_eur * h2 + M := by nlinarith [mul_pos h_eur h_h2]
   have h4 : 0 < (n_eur + dn) * h2 + M := by nlinarith [mul_pos (by linarith : 0 < n_eur + dn) h_h2]
   rw [div_sub_div _ _ h4.ne' h3.ne', div_sub_div _ _ h2'.ne' h1.ne']

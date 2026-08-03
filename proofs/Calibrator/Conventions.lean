@@ -176,8 +176,8 @@ the total-pool `2·p̄·(1-p̄)`. The two denominators differ by exactly
 agree iff `G_ST = 0` or `G_ST = 1` -- that is, only where the differentiation
 is degenerate.
 
-**A previous version of this docstring said they agree when `p₁ = p₂` OR
-`p̄ = 1/2`. THE SECOND DISJUNCT IS FALSE**, and it is false in both readings.
+**They agree when `p₁ = p₂`, and NOT when `p̄ = 1/2`**; the second is a tempting
+disjunct and it is false in both readings.
 The denominators differ by `(p₁-p₂)²/2`, which does not vanish at `p̄ = 1/2`;
 and by the corpus's own `hudsonFst_eq_of_neiGst`, Hudson `= 2G/(1+G)`,
 which equals `G` only at `G = 0` or `G = 1`. So there is no interior

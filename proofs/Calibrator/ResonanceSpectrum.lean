@@ -117,9 +117,9 @@ structure PhasePanel (n : ℕ) where
 true and empty: kernel-checked, clean axiom report, no content.  This is the witness that
 makes the theorems below statements about something. -/
 noncomputable def PhasePanel.witness (n : ℕ) : PhasePanel (n + 1) where
-  phase := fun _ => 0
-  weight := fun i => if i = 0 then 1 else 0
-  weight_nonneg := fun i => by split <;> norm_num
+  phase := fun _ ↦ 0
+  weight := fun i ↦ if i = 0 then 1 else 0
+  weight_nonneg := fun i ↦ by split <;> norm_num
   weight_sum := by simp
 
 namespace PhasePanel

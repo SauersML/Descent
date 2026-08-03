@@ -96,8 +96,8 @@ true and empty: kernel-checked, clean axiom report, no content.  This is the wit
 makes the theorems below statements about something. -/
 noncomputable def HWEPolygenicScoreDGP.witness (m : ℕ) : HWEPolygenicScoreDGP m where
   scoreModel :=
-    { alleleFreq := fun _ => HardyWeinbergModel.witness
-      effect := fun _ => 0 }
+    { alleleFreq := fun _ ↦ HardyWeinbergModel.witness
+      effect := fun _ ↦ 0 }
   berryEsseenConstant := 0
   berryEsseenConstant_nonneg := le_refl 0
 
@@ -375,8 +375,7 @@ theorem target_r2_strictly_decreases_of_covariance_mismatch
       mseSource mseTarget lam sigmaSource sigmaTarget h_gap_lb hlam h_mismatch
   unfold r2FromMSE
   have h_inv_pos : 0 < (1 / varY) := one_div_pos.mpr h_varY_pos
-  have hdiv : mseSource / varY < mseTarget / varY :=
-    by
+  have hdiv : mseSource / varY < mseTarget / varY := by
       have hmul : mseSource * (1 / varY) < mseTarget * (1 / varY) :=
         mul_lt_mul_of_pos_right hmse h_inv_pos
       simpa [div_eq_mul_inv] using hmul
@@ -1075,7 +1074,7 @@ structure PrevalenceDGP (k : ℕ) where
 true and empty: kernel-checked, clean axiom report, no content.  This is the witness that
 makes the theorems below statements about something. -/
 noncomputable def PrevalenceDGP.witness (k : ℕ) : PrevalenceDGP k where
-  prevalence := fun _ => 0
+  prevalence := fun _ ↦ 0
   pgs_effect := 0
   jointMeasure := Measure.dirac 0
 

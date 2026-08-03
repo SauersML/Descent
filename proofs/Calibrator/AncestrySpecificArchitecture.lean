@@ -125,7 +125,9 @@ theorem twoPopDriftVariance_eq_expectedFreqDiffSq (p0 fst : ℝ) :
 theorem expected_freq_diff_nonneg (fst p0 : ℝ)
     (h_fst : 0 ≤ fst) (h_p0 : 0 ≤ p0) (h_p0_le : p0 ≤ 1) :
     0 ≤ expectedFreqDiffSq fst p0 := by
-  unfold expectedFreqDiffSq; nlinarith [mul_nonneg h_fst h_p0, mul_nonneg (mul_nonneg h_fst h_p0) (by linarith : 0 ≤ 1 - p0)]
+  unfold expectedFreqDiffSq
+  nlinarith [mul_nonneg h_fst h_p0,
+    mul_nonneg (mul_nonneg h_fst h_p0) (by linarith : 0 ≤ 1 - p0)]
 
 /-- **Expected frequency difference increases with FST.**
     Derived from drift variance formula: E[(p₁-p₂)²] = 2·Fst·p₀(1-p₀).
@@ -478,8 +480,10 @@ theorem portability_bounded_by_rg_sq
     (h_tag : 0 ≤ tagging_ratio) (h_tag_le : tagging_ratio ≤ 1) :
     portabilityFromArchitecture rg fst tagging_ratio ≤ rg^2 := by
   unfold portabilityFromArchitecture
-  have h1 : (1 - fst) * tagging_ratio ≤ 1 := by nlinarith [mul_nonneg (by linarith : 0 ≤ 1 - fst) h_tag]
-  nlinarith [sq_nonneg rg, mul_nonneg (sq_nonneg rg) (mul_nonneg (by linarith : 0 ≤ 1 - fst) h_tag)]
+  have h1 : (1 - fst) * tagging_ratio ≤ 1 := by
+    nlinarith [mul_nonneg (by linarith : 0 ≤ 1 - fst) h_tag]
+  nlinarith [sq_nonneg rg,
+    mul_nonneg (sq_nonneg rg) (mul_nonneg (by linarith : 0 ≤ 1 - fst) h_tag)]
 
 end ArchitectureConvergence
 

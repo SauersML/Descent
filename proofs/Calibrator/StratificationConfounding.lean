@@ -76,10 +76,10 @@ structure StratificationModel (p : ℕ) where
 true and empty: kernel-checked, clean axiom report, no content.  This is the witness that
 makes the theorems below statements about something. -/
 noncomputable def StratificationModel.witness (p : ℕ) : StratificationModel (p + 1) where
-  β := fun _ => 0
-  b := fun _ => 1
-  H := fun _ => 1
-  H_pos := fun _ => by norm_num
+  β := fun _ ↦ 0
+  b := fun _ ↦ 1
+  H := fun _ ↦ 1
+  H_pos := fun _ ↦ by norm_num
   bias_nonzero := ⟨0, by norm_num⟩
 
 /-- True PGS variance component: Σ β_i² · H_i -/
@@ -601,8 +601,8 @@ true and empty: kernel-checked, clean axiom report, no content.  This is the wit
 makes the theorems below statements about something. -/
 noncomputable def TransportabilityModel.witness (n : ℕ) : TransportabilityModel (n + 1) where
   r2_source := 1
-  δ := fun _ => 1
-  δ_nonneg := fun _ => by norm_num
+  δ := fun _ ↦ 1
+  δ_nonneg := fun _ ↦ by norm_num
   violated := ⟨0, by norm_num⟩
   r2_source_pos := by norm_num
 

@@ -236,8 +236,8 @@ structure ApproxProbeBlindness {Object Data : Type*}
 true and empty: kernel-checked, clean axiom report, no content.  This is the witness that
 makes the theorems below statements about something. -/
 def ApproxProbeBlindness.witness :
-    ApproxProbeBlindness (fun _ _ : Unit => True) (fun _ : Bool => ())
-      (fun b => b = true) where
+    ApproxProbeBlindness (fun _ _ : Unit ↦ True) (fun _ : Bool ↦ ())
+      (fun b ↦ b = true) where
   positive := true
   negative := false
   close_data := trivial
@@ -300,10 +300,10 @@ structure LeveledBlindness {Level Object Data : Type*}
 true and empty: kernel-checked, clean axiom report, no content.  This is the witness that
 makes the theorems below statements about something. -/
 def LeveledBlindness.witness :
-    LeveledBlindness (fun (_ : Unit) (_ : Bool) => ()) (fun b => b = true) where
+    LeveledBlindness (fun (_ : Unit) (_ : Bool) ↦ ()) (fun b ↦ b = true) where
   positive := true
   negative := false
-  same_data := fun _ => rfl
+  same_data := fun _ ↦ rfl
   holds := rfl
   fails := by decide
 
@@ -487,13 +487,12 @@ If `E` reduces to `F` via `f`, `F` is countably certified over `BaseB`, and pull
 `BaseB` condition back along `f` lands in `BaseA`, then `E` is countably certified over
 `BaseA` by the pullback certificates.
 
-`hpull` is the hypothesis the previous version of this theorem omitted, and it is the
-whole mathematical content: in the topological reading it says exactly that `f` is
+`hpull` carries the whole mathematical content and cannot be omitted: in the
+topological reading it says exactly that `f` is
 continuous, since the preimage of a closed set under a continuous map is closed; in the
 measurable reading, that `f` is measurable. Without it the conclusion does not follow —
-an arbitrary `f` pulls a closed condition back to an arbitrary one — and the theorem
-that omitted it was not a ceiling argument but a restatement of
-`unionOfCertificates_of_reduction`.
+an arbitrary `f` pulls a closed condition back to an arbitrary one — and what remains is
+not a ceiling argument but a restatement of `unionOfCertificates_of_reduction`.
 
 Consequence, used to refute representation-theoretic wildness: a *structure-preserving*
 reduction of a relation into a countably certified one makes the source countably
@@ -610,7 +609,7 @@ makes the theorems below statements about something. -/
 noncomputable def ProbeSeparation.witness : ProbeSeparation (id : ℝ → ℝ) where
   sigma := 1
   sigma_pos := by norm_num
-  separates := fun _ _ => by simp
+  separates := fun _ _ ↦ by simp
 
 /-- **What separation buys: an object is pinned by its data to within `resolution / σ`.**
 

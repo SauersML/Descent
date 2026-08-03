@@ -595,7 +595,7 @@ noncomputable def CrossPopulationMechanisticCalibrationModel.witness (p q : ℕ)
   geneticObservedShift := 0
   baseDeploymentIntercept := 0
   deploymentInterceptShift := 0
-  tagMean := fun _ => 0
+  tagMean := fun _ ↦ 0
 
 /-- **Deployment intercept in a population.** The shift applies at the target only. -/
 noncomputable def CrossPopulationMechanisticCalibrationModel.deploymentIntercept
@@ -1995,8 +1995,7 @@ def receivesTreatment {T : ℕ}
     net benefit; realized utility is then evaluated under the true pathway. -/
 noncomputable def qalyGainUnderDecision {T : ℕ}
     (model : LongitudinalTreatmentModel T)
-    (truePath predictedPath : ClinicalPathway T) : ℝ :=
-  by
+    (truePath predictedPath : ClinicalPathway T) : ℝ := by
     classical
     exact if receivesTreatment model predictedPath then
       treatmentMargin model truePath
@@ -2017,8 +2016,7 @@ noncomputable def qalyLoss {T : ℕ}
     negatives pay the positive part, and correct decisions pay zero. -/
 noncomputable def qalyDecisionRegretMargin {T : ℕ}
     (model : LongitudinalTreatmentModel T)
-    (truePath predictedPath : ClinicalPathway T) : ℝ :=
-  by
+    (truePath predictedPath : ClinicalPathway T) : ℝ := by
     classical
     exact if receivesTreatment model predictedPath then
         max (-treatmentMargin model truePath) 0
@@ -3017,8 +3015,7 @@ noncomputable def thresholdQalyLoss
 
     Empirical status: UNTESTED. -/
 noncomputable def thresholdDecisionRegretMargin
-    (model : ThresholdTreatmentModel) (trueRisk predictedRisk : ℝ) : ℝ :=
-  by
+    (model : ThresholdTreatmentModel) (trueRisk predictedRisk : ℝ) : ℝ := by
     classical
     exact if classifiedHighRisk model.threshold predictedRisk then
         max (model.threshold - trueRisk) 0

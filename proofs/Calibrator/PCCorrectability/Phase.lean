@@ -29,8 +29,8 @@ makes the theorems below statements about something. -/
 noncomputable def EmpiricalPCOverlapModel.witness : EmpiricalPCOverlapModel where
   k := 1
   confoundingEnergy := 1
-  overlapSq := fun _ => 0
-  overlapSq_nonneg := fun _ => le_refl 0
+  overlapSq := fun _ ↦ 0
+  overlapSq_nonneg := fun _ ↦ le_refl 0
   overlapSq_sum_le := by simp
 
 /-- Confounding energy left after removing the fitted PCs. -/

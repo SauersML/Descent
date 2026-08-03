@@ -220,11 +220,11 @@ true and empty: kernel-checked, clean axiom report, no content.  This is the wit
 makes the theorems below statements about something. -/
 noncomputable def MetaAnalysisModel.witness : MetaAnalysisModel where
   k := 1
-  variances := fun _ => 1
+  variances := fun _ ↦ 1
   tau_sq := 1
   h_k := by norm_num
   h_tau_sq := by norm_num
-  h_variances := fun _ => by norm_num
+  h_variances := fun _ ↦ by norm_num
 
 noncomputable def fixed_weights (m : MetaAnalysisModel) (i : Fin m.k) : ℝ :=
   1 / m.variances i

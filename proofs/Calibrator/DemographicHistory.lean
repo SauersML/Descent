@@ -171,10 +171,9 @@ which is `demoSteppingStoneFst d Ne m σ_sq`, and is what
 Fst/(1 - Fst) = d/(4·Ne·m·σ²), the standard Malécot/Rousset linear
 isolation-by-distance relation in one dimension.
 
-This is a correction. The previous version of this block wrote
-T(d) = d/(σ²·m), dropping the factor 2 from the relative diffusion, and then
-recovered the factor 4 by passing `2·Ne·σ²·m` as the effective size to
-`coalFst` -- which is not an effective size. The result was
+Writing T(d) = d/(σ²·m) drops the factor 2 from the relative diffusion, and
+recovering the factor 4 by passing `2·Ne·σ²·m` as the effective size to
+`coalFst` -- which is not an effective size -- gives
 d/(d + 4·Ne·σ⁴·m²), a different function of the parameters from the definition
 it claimed to derive, and no theorem related the two. The 1/2 belongs in the
 meeting time and the effective size argument is Ne.

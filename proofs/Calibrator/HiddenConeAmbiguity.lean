@@ -382,8 +382,7 @@ theorem catalogue_induces_reduction
     (hcomplete : ∀ t t', BoundedLogDistortion t t' ↔ inv t = inv t')
     (B x y : ℕ → ℝ)
     (hdiv : ∀ C : ℝ, ∃ n : ℕ, C < |x n - y n|) :
-    inv (codedDecayProfile B x) ≠ inv (codedDecayProfile B y) :=
-  by
+    inv (codedDecayProfile B x) ≠ inv (codedDecayProfile B y) := by
   have hcatalogue : IsCompleteCatalogue BoundedLogDistortion inv := hcomplete
   exact IsCompleteCatalogue.separates hcatalogue
     (inequivalent_of_unbounded_coding B x y hdiv)

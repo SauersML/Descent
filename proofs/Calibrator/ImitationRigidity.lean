@@ -1355,7 +1355,8 @@ theorem absorptionChannelWeight_strictMonoOn {initial : ℝ} (hinitial : 0 < ini
       (Set.Ioc 0 (informationCrossoverTime initial)) := by
   apply strictMonoOn_of_deriv_pos (convex_Ioc _ _)
   · intro t ht
-    exact ((hasDerivAt_absorptionChannelWeight ht.1).differentiableAt.continuousAt).continuousWithinAt
+    exact
+      ((hasDerivAt_absorptionChannelWeight ht.1).differentiableAt.continuousAt).continuousWithinAt
   · intro t ht
     rw [interior_Ioc] at ht
     have htpos : 0 < t := ht.1
@@ -1380,7 +1381,8 @@ theorem absorptionChannelWeight_strictAntiOn {initial : ℝ} (hinitial : 0 < ini
     have hcrossover : 0 < informationCrossoverTime initial := by
       simpa [informationCrossoverTime] using half_pos hinitial
     have htpos : 0 < t := lt_of_lt_of_le hcrossover ht
-    exact ((hasDerivAt_absorptionChannelWeight htpos).differentiableAt.continuousAt).continuousWithinAt
+    exact
+      ((hasDerivAt_absorptionChannelWeight htpos).differentiableAt.continuousAt).continuousWithinAt
   · intro t ht
     rw [interior_Ici] at ht
     have hgt : initial / 2 < t := by

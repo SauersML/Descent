@@ -194,7 +194,7 @@ theorem meffApproxWitness_error_floor_pos (n o : ℕ) (L : ℝ) (hn : 0 < n) (hL
     (W : ApproxWitness (ℕ → ℝ) (ℕ → ℝ)) (hW : W = meffApproxWitness n o hn) :
     0 < (W.rateGap - L * W.countGap) / 2 := by
   subst hW
-  simpa [meffApproxWitness] using meff_error_floor_pos n L hn
+  simpa [meffApproxWitness] using meff_error_floor_pos n L hn hL
 
 end
 

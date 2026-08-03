@@ -99,18 +99,31 @@ theorem abs_mean_le_sum_abs (P : FinitePrior n) (f : Fin (n + 1) → ℝ) :
 
 end FinitePrior
 
-/-- The finite probability simplex, represented by the probability vectors of
-actual `PMF`s.  This is the convex parameter class on which the certificate
-calculus acts; convexity is not inferred from a suggestive file-level comment. -/
+/-- The finite probability simplex.  This is the convex parameter class on
+which the certificate calculus acts; convexity is not inferred from a
+suggestive file-level comment. -/
 noncomputable def finitePriorCarrier (n : ℕ) : Set (Fin (n + 1) → ℝ) :=
-  Set.range fun P : FinitePrior n ↦ fun i ↦ P.probability i
+  {w | (∀ i, 0 ≤ w i) ∧ ∑ i, w i = 1}
 
-/-- The prior class underlying every finite mixture experiment is convex.
-The proof obligation is visible until the `PMF` convex-mixture construction is
-developed locally; convexity is not accepted as an experiment field. -/
+/-- Every actual finite prior has a probability vector in the simplex. -/
+theorem finitePrior_probability_mem {n : ℕ} (P : FinitePrior n) :
+    (fun i ↦ P.probability i) ∈ finitePriorCarrier n := by
+  constructor
+  · exact fun i ↦ P.probability_nonneg i
+  · rw [← ENNReal.toReal_sum]
+    simp [FinitePrior.probability]
+
+/-- The prior class underlying every finite mixture experiment is convex;
+convexity is proved from the simplex equations, not accepted as an experiment
+field. -/
 theorem finitePriorCarrier_convex (n : ℕ) :
     Convex ℝ (finitePriorCarrier n) := by
-  sorry
+  intro x hx y hy a b ha hb hab
+  constructor
+  · intro i
+    exact add_nonneg (mul_nonneg ha (hx.1 i)) (mul_nonneg hb (hy.1 i))
+  · simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul, Finset.sum_add_distrib,
+      ← Finset.mul_sum, hx.2, hy.2, mul_one, hab]
 
 /-- Numerical ingredients of a finite fuzzy-hypothesis problem.  There are no
 `Prop` fields: validity conditions are derived predicates below. -/

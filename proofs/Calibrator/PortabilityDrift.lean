@@ -1246,21 +1246,21 @@ true and empty: kernel-checked, clean axiom report, no content.  This is the wit
 makes the theorems below statements about something. -/
 noncomputable def CrossPopulationMetricModel.witness (p q : ℕ) :
     CrossPopulationMetricModel p q where
-  beta := fun _ => 0
-  sigmaTag := fun _ => 0
-  directCausal := fun _ => 0
-  proxyTagging := fun _ => 0
-  novelDirectCausal := fun _ => 0
-  novelProxyTagging := fun _ => 0
-  novelCausalEffect := fun _ => 0
-  contextCross := fun _ => 0
-  outcomeVariance := fun _ => 1
+  beta := fun _ ↦ 0
+  sigmaTag := fun _ ↦ 0
+  directCausal := fun _ ↦ 0
+  proxyTagging := fun _ ↦ 0
+  novelDirectCausal := fun _ ↦ 0
+  novelProxyTagging := fun _ ↦ 0
+  novelCausalEffect := fun _ ↦ 0
+  contextCross := fun _ ↦ 0
+  outcomeVariance := fun _ ↦ 1
   novelUntaggablePhenotypeVarianceTarget := 0
   targetPrevalence := 1 / 2
   novelDirectCausal_source := rfl
   novelProxyTagging_source := rfl
   novelCausalEffect_source := rfl
-  outcomeVariance_pos := fun _ => by norm_num
+  outcomeVariance_pos := fun _ ↦ by norm_num
   novelUntaggablePhenotypeVarianceTarget_nonneg := le_refl 0
   targetPrevalence_pos := by norm_num
   targetPrevalence_lt_one := by norm_num

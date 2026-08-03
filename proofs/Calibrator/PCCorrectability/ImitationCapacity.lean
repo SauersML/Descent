@@ -1621,11 +1621,11 @@ structure MomentContinuousFunctional where
 true and empty: kernel-checked, clean axiom report, no content.  This is the witness that
 makes the theorems below statements about something. -/
 noncomputable def MomentContinuousFunctional.witness : MomentContinuousFunctional where
-  value := fun _ _ => 0
+  value := fun _ _ ↦ 0
   order := 0
   modulus := 0
   modulus_nonneg := le_refl 0
-  moment_lipschitz := fun _ _ _ _ _ _ => by simp
+  moment_lipschitz := fun _ _ _ _ _ _ ↦ by simp
 
 /-- **The `m_eff` prohibition.**  No weakly continuous functional of the
 spectral law can equal the inverse-trace certificate — hence no

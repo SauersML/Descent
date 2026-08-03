@@ -233,10 +233,9 @@ closed form is `haplotypePhasePredictionError_correctSpec_eq` below.
 
 Nothing here is zero by construction. The error vanishes only when the predictor
 is correctly specified *and* phasing never switches, and both of those are
-hypotheses of theorems below rather than parts of this definition. That is the
-whole difference from the previous version of this file, in which the haplotype
-error was the literal `0` and every comparison against the dosage predictor was
-therefore a tautology.
+hypotheses of theorems below rather than parts of this definition. Defining the
+haplotype error as the literal `0` instead would make every comparison against
+the dosage predictor a tautology.
 
     Empirical status: UNTESTED. -/
 noncomputable def haplotypePhasePredictionError

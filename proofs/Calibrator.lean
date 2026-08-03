@@ -672,6 +672,31 @@ theorem sampleCost_eq_fixedGradeBenchmarkSampleSize (η C : ℝ) (k : ℕ)
   rw [div_one, Real.rpow_neg (div_pos hη hC).le, Real.rpow_natCast,
     div_pow, div_pow, inv_div]
 
+/-- **The panel intensity and the squared characteristic function are one object.**
+
+`ResonanceSpectrum.PhasePanel.intensity` is `|Ψ|²` written as `(∑ w cos)² + (∑ w sin)²`;
+`CramerStratum.charFnSq` is `|φ|²` written as `∑ᵤ ∑ᵥ wᵤ wᵥ cos(t(aᵤ − aᵥ))`. Expanding the
+two squares and pairing the terms by `cos (x − y) = cos x cos y + sin x sin y` turns one
+into the other exactly, at every panel and every frequency.
+
+`ResonanceSpectrum` says in prose that these are the same object in two encodings, and that
+the biological core is served by `CramerStratum` alone so that one argument has one home.
+Both halves are better off with the identity written down: it is what makes "two encodings"
+checkable, and it is what makes a divergence between them a failure here rather than two
+files quietly computing different numbers under one name. It adds no dependence — the root
+already imports both — and it gives `ResonanceSpectrum`'s graded spectrum a stated relation
+to the dichotomy `CramerStratum` decides, should a result ever need the finer invariant. -/
+theorem intensity_eq_charFnSq {n : ℕ} (P : PhasePanel n) (s : ℝ) :
+    P.intensity s = charFnSq P.weight P.phase s := by
+  unfold PhasePanel.intensity PhasePanel.cosPart PhasePanel.sinPart charFnSq
+  rw [pow_two, pow_two, Finset.sum_mul_sum, Finset.sum_mul_sum,
+    ← Finset.sum_add_distrib]
+  refine Finset.sum_congr rfl fun u _ ↦ ?_
+  rw [← Finset.sum_add_distrib]
+  refine Finset.sum_congr rfl fun v _ ↦ ?_
+  rw [mul_sub, Real.cos_sub]
+  ring
+
 end Condensation
 
 end Calibrator

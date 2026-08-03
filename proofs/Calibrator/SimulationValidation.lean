@@ -120,19 +120,22 @@ theorem identityDirectMetricModel_metrics {q : ℕ}
     ext i
     simp [m, identityDirectMetricModel, crossCovariance, sigmaTagCausal,
       totalEffect, Matrix.one_mulVec]
-  have h_source_score : scoreVarianceFromSourceWeights m Pop.source = sourceSquaredEffectMass β := by
+  have h_source_score :
+      scoreVarianceFromSourceWeights m Pop.source = sourceSquaredEffectMass β := by
     rw [scoreVarianceFromSourceWeights_source_eq_score_on_covariance_action]
     unfold sourceWeightedTagScore
     rw [h_weights]
     change dotProduct β ((m.sigmaTag Pop.source).mulVec β) = sourceSquaredEffectMass β
     simpa [m, identityDirectMetricModel, sourceSquaredEffectMass, Matrix.one_mulVec,
       dotProduct, pow_two]
-  have h_source_cov : predictiveCovarianceFromSourceWeights m Pop.source = sourceSquaredEffectMass β := by
+  have h_source_cov :
+      predictiveCovarianceFromSourceWeights m Pop.source = sourceSquaredEffectMass β := by
     rw [sourcePredictiveCovarianceFromSourceWeights_eq_score_on_source_crossCov]
     unfold sourceWeightedTagScore
     rw [h_weights, h_source_cross]
     simpa [sourceSquaredEffectMass, dotProduct, pow_two]
-  have h_source_signal : explainedSignalVarianceFromSourceWeights m Pop.source = sourceSquaredEffectMass β := by
+  have h_source_signal :
+      explainedSignalVarianceFromSourceWeights m Pop.source = sourceSquaredEffectMass β := by
     unfold explainedSignalVarianceFromSourceWeights
     rw [h_source_cov, h_source_score]
     field_simp [ne_of_gt h_mass]
@@ -140,19 +143,22 @@ theorem identityDirectMetricModel_metrics {q : ℕ}
       r2FromSourceWeights m Pop.source = sourceSquaredEffectMass β / outcomeVariance := by
     rw [r2FromSourceWeights, h_source_signal]
     simp [m, identityDirectMetricModel]
-  have h_target_score : scoreVarianceFromSourceWeights m Pop.target = sourceSquaredEffectMass β := by
+  have h_target_score :
+      scoreVarianceFromSourceWeights m Pop.target = sourceSquaredEffectMass β := by
     rw [targetScoreVarianceFromSourceWeights_eq_score_on_target_covariance_action]
     unfold sourceWeightedTagScore
     rw [h_weights]
     change dotProduct β ((m.sigmaTag Pop.target).mulVec β) = sourceSquaredEffectMass β
     simpa [m, identityDirectMetricModel, sourceSquaredEffectMass, Matrix.one_mulVec,
       dotProduct, pow_two]
-  have h_target_cov : predictiveCovarianceFromSourceWeights m Pop.target = sourceSquaredEffectMass β := by
+  have h_target_cov :
+      predictiveCovarianceFromSourceWeights m Pop.target = sourceSquaredEffectMass β := by
     rw [targetPredictiveCovarianceFromSourceWeights_eq_score_on_target_crossCov]
     unfold sourceWeightedTagScore
     rw [h_weights, h_target_cross]
     simpa [sourceSquaredEffectMass, dotProduct, pow_two]
-  have h_target_signal : explainedSignalVarianceFromSourceWeights m Pop.target = sourceSquaredEffectMass β := by
+  have h_target_signal :
+      explainedSignalVarianceFromSourceWeights m Pop.target = sourceSquaredEffectMass β := by
     unfold explainedSignalVarianceFromSourceWeights
     rw [h_target_cov, h_target_score]
     field_simp [ne_of_gt h_mass]
@@ -657,7 +663,8 @@ theorem popgenDrivenProxyGenerationalModel_source_weights (t : ℕ) :
 /-- At generation `0`, the nondegenerate proxy witness still matches its source
 state exactly, so the target deployed `R²` equals the source-side value `1/2`. -/
 theorem popgenDrivenProxyGenerationalModel_target_r2_at_zero :
-    r2FromSourceWeights (popgenDrivenProxyGenerationalModel.toMetricModelAt 0) Pop.target = 1 / 2 := by
+    r2FromSourceWeights
+      (popgenDrivenProxyGenerationalModel.toMetricModelAt 0) Pop.target = 1 / 2 := by
   simp [r2FromSourceWeights, popgenDrivenProxyGenerationalModel,
     CrossPopulationGenerationalModel.toMetricModelAt,
     sigmaTagTargetAt, directCausalTargetAt, proxyTaggingTargetAt, sigmaTagCausalTargetAt,
@@ -666,7 +673,8 @@ theorem popgenDrivenProxyGenerationalModel_target_r2_at_zero :
     r2FromSourceWeights, explainedSignalVarianceFromSourceWeights,
     predictiveCovarianceFromSourceWeights, scoreVarianceFromSourceWeights,
     sigmaTagCausal,
-    sourceWeightsFromExplicitDrivers, sourceERMWeights, crossCovariance, effectiveOutcomeVariance, irreducibleTargetResidualBurden,
+    sourceWeightsFromExplicitDrivers, sourceERMWeights, crossCovariance,
+    effectiveOutcomeVariance, irreducibleTargetResidualBurden,
     brokenTaggingResidual, ancestrySpecificLDResidual, sourceSpecificOverfitResidual,
     novelUntaggablePhenotypeResidual,
     GenerationalPopGenParameters.theta, GenerationalPopGenParameters.bigM,
@@ -853,7 +861,8 @@ theorem popgenDrivenProxyGenerationalModel_target_r2_strictly_decreases_at_one :
   have h_exp_neg_one_le_half : Real.exp (-(1 : ℝ)) ≤ (1 / 2 : ℝ) := by
     have h_mul :
         (2 : ℝ) * Real.exp (-(1 : ℝ)) ≤ 1 := by
-      have h_mul' := mul_le_mul_of_nonneg_right h_exp_one_ge_two (by positivity : 0 ≤ Real.exp (-(1 : ℝ)))
+      have h_mul' := mul_le_mul_of_nonneg_right h_exp_one_ge_two
+        (by positivity : 0 ≤ Real.exp (-(1 : ℝ)))
       have h_cancel : Real.exp (1 : ℝ) * Real.exp (-(1 : ℝ)) = 1 := by
         rw [← Real.exp_add]
         norm_num
@@ -894,7 +903,8 @@ theorem popgenDrivenProxyGenerationalModel_target_r2_strictly_decreases_at_one :
     rw [h_eq]
     nlinarith
   have h_r2_lt_half :
-      r2FromSourceWeights (popgenDrivenProxyGenerationalModel.toMetricModelAt 1) Pop.target < 1 / 2 := by
+      r2FromSourceWeights
+        (popgenDrivenProxyGenerationalModel.toMetricModelAt 1) Pop.target < 1 / 2 := by
     rw [targetR2FromSourceWeights_eq_signalVariance_ratio]
     have h_eff_half_ge_two : 2 ≤ effectiveOutcomeVariance m1 Pop.target / 2 := by
       nlinarith
@@ -902,7 +912,8 @@ theorem popgenDrivenProxyGenerationalModel_target_r2_strictly_decreases_at_one :
         explainedSignalVarianceFromSourceWeights m1 Pop.target <
           effectiveOutcomeVariance m1 Pop.target / 2 := by
       exact lt_of_lt_of_le h_signal_lt_two h_eff_half_ge_two
-    have h_eff_pos : 0 < effectiveOutcomeVariance m1 Pop.target := effectiveTargetOutcomeVariance_pos m1
+    have h_eff_pos : 0 < effectiveOutcomeVariance m1 Pop.target :=
+      effectiveTargetOutcomeVariance_pos m1
     rw [div_lt_iff₀ h_eff_pos]
     nlinarith
   rw [popgenDrivenProxyGenerationalModel_target_r2_at_zero]
@@ -1138,8 +1149,10 @@ theorem target_effect_heterogeneity_changes_generation_path_without_ld_or_af_cha
     targetEffectHeterogeneityProjectionAt timeVaryingEffectGenerationalModel 1 0 = -(1 / 2) ∧
     betaTargetAt timeVaryingEffectGenerationalModel 0 0 = 1 ∧
     betaTargetAt timeVaryingEffectGenerationalModel 1 0 = 1 / 2 ∧
-    r2FromSourceWeights (timeVaryingEffectGenerationalModel.toMetricModelAt 0) Pop.target = 1 / 2 ∧
-    r2FromSourceWeights (timeVaryingEffectGenerationalModel.toMetricModelAt 1) Pop.target = 1 / 8 := by
+    r2FromSourceWeights
+      (timeVaryingEffectGenerationalModel.toMetricModelAt 0) Pop.target = 1 / 2 ∧
+    r2FromSourceWeights
+      (timeVaryingEffectGenerationalModel.toMetricModelAt 1) Pop.target = 1 / 8 := by
   repeat' constructor
   · ext i j
     fin_cases i

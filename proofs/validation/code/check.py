@@ -74,7 +74,9 @@ import json
 import os
 import re
 import subprocess
+import functools
 import sys
+import traceback
 from collections import defaultdict
 from dataclasses import dataclass, field as dc_field
 from pathlib import Path
@@ -83,6 +85,75 @@ from pathlib import Path
 # proofs/validation/code/check.py, so parents[3] is the repository root.
 REPO = Path(__file__).resolve().parents[3]
 PROOFS = REPO / "proofs"
+
+
+def lean_sources(root: Path) -> list:
+    """Every Lean source under `root`, in a stable order, excluding junk.
+
+    One place decides what counts as a corpus file, because the alternative is
+    what this replaced: four separate `rglob("*.lean")` walks, exactly one of
+    which skipped AppleDouble `._*` files.  Those are resource forks written by
+    macOS tar and by some copy tools; they are not UTF-8, they are not Lean, and
+    a walk that includes them either crashes on decode or reports findings for a
+    file nobody wrote.  Dotfiles are excluded for the same reason -- editor swap
+    files and `.#` locks are not corpus.
+    """
+    return sorted(
+        path
+        for path in root.rglob("*.lean")
+        if not any(part.startswith(".") for part in path.parts)
+    )
+
+
+def read_source(path: Path) -> str:
+    """Decode a corpus file, or fail with the file named.
+
+    `read_text(encoding="utf-8")` raises `UnicodeDecodeError`, whose message
+    names a byte offset and no path.  When that escapes a guard it aborts the
+    whole run, and -- because the runner reported only the first failure -- every
+    guard after it was silently skipped.  A decode failure is a finding about one
+    file, so it is raised as one.
+    """
+    try:
+        return path.read_text(encoding="utf-8")
+    except UnicodeDecodeError as exc:
+        raise ValueError(
+            f"{path.relative_to(REPO)}: not valid UTF-8 ({exc.reason} at byte "
+            f"{exc.start}); a corpus file must be UTF-8"
+        ) from exc
+
+@functools.lru_cache(maxsize=1)
+def corpus_capitalized_identifiers() -> frozenset:
+    """Capitalised names the corpus itself defines.
+
+    Mathlib names a declaration after the objects it mentions, so a capitalised
+    head is correct exactly when it IS an identifier -- `Phi_nonneg` is about the
+    definition `Phi`, `V_P_pos` about the field `V_P`,
+    `GenerationalPopGenParameters_theta_eq_ploidy_form` about that structure.
+    Rejecting every capitalised head therefore fails on correct names and would
+    be "fixed" by renaming the theorem away from the thing it is about.
+
+    The exemption is earned, not listed: a head is allowed only when some `def`,
+    `structure`, `inductive`, `abbrev`, `class` or structure field in the corpus
+    declares it.  A capitalised head that names nothing still fails.
+    """
+    names = set()
+    decl = re.compile(
+        r"(?m)^\s*(?:private\s+|protected\s+)?(?:noncomputable\s+)?"
+        r"(?:def|structure|inductive|abbrev|class)\s+([A-Za-z_][A-Za-z_0-9'.]*)"
+    )
+    field = re.compile(r"(?m)^\s{2,}([A-Z][A-Za-z_0-9']*)\s*:")
+    for path in lean_sources(PROOFS):
+        try:
+            src = read_source(path)
+        except ValueError:
+            continue  # decode failures are reported by the guard that reads it
+        for match in decl.finditer(src):
+            names.add(match.group(1).rsplit(".", 1)[-1])
+        for match in field.finditer(src):
+            names.add(match.group(1))
+    return frozenset(n for n in names if n and n[0].isupper())
+
 
 
 # ======================================================================================
@@ -106,7 +177,7 @@ def style_lean_files() -> list[Path]:
     """Return source-controlled Lean-shaped files, excluding macOS resource forks."""
     files = [REPO / "lakefile.lean"]
     files.extend(
-        path for path in (REPO / "proofs").rglob("*.lean") if not path.name.startswith("._")
+        path for path in lean_sources(REPO / "proofs")
     )
     return sorted(files)
 
@@ -155,7 +226,11 @@ def style_check_file(path: Path) -> list[str]:
     )
     for match in theorem_pattern.finditer(source):
         local_name = match.group(1).rsplit(".", 1)[-1]
-        if local_name and local_name[0].isupper():
+        known = corpus_capitalized_identifiers()
+        names_an_identifier = any(
+            local_name == ident or local_name.startswith(ident + "_") for ident in known
+        )
+        if local_name and local_name[0].isupper() and not names_an_identifier:
             errors.append(
                 f"{rel}:{style_line_number(source, match.start())}: theorem name `{local_name}` "
                 "must use snake_case"
@@ -1857,11 +1932,21 @@ def run_identifications() -> int:
 #     F10  vacuity: quantification over a domain with no inhabitant proved in-corpus.
 #     F12  subtype laundering: domain is `{x // DesiredProperty x}`.
 #     F13  a `.range`/image construction named as if it were the canonical object.
-#     F14  concrete-looking dead end: a concrete construction no headline theorem uses.
+#     F15  prose claims one definition induces another and no theorem states the bridge.
 #     F17  name inflation: `_complete`, `_proved`, `_exists`, `explicit_` on a
 #          declaration that still carries premises.
+#     F18  `#print axioms` aimed at a Prop DEFINITION rather than at a proof of it.
 #     F20  semantic shadowing: a corpus predicate reusing a standard name.
-#     F21  degenerate normalization: division by a quantity not proved nonzero.
+#     F21  degenerate normalization: a THEOREM whose conclusion divides by a quantity
+#          no premise shows is nonzero. Not definitions -- they have nothing to guard.
+#     F22  the noun does the work: a parameter structure whose field IS the conclusion.
+#
+#   NOT DETECTED, deliberately -- listed so a clean report is not read as covering it:
+#     F14  concrete-looking dead end. Every mechanical proxy is a reference count, and
+#          a reference count cannot distinguish a dead end from a definition that is
+#          unreferenced BY DESIGN (`X.witness`, `targetCorrectionCurvature`). Reference
+#          counting has twice deleted correct work in this repository. See the comment
+#          at the F14 site in `check_files`.
 #
 # USAGE
 #     proofs/validation/code/check.py                  # whole corpus, human report
@@ -2921,7 +3006,7 @@ def run_laundering(argv: list[str]) -> int:
     if args.paths:
         files = [Path(p).resolve() for p in args.paths]
     else:
-        files = sorted(PROOFS.rglob("*.lean"))
+        files = lean_sources(PROOFS)
     files = [f for f in files if f.is_file()]
 
     corpus = build_corpus(files)
@@ -3082,8 +3167,8 @@ REGIMES_FIELD = re.compile(r"^[ \t]+([A-Za-z_][A-Za-z0-9_']*)\s*:\s*([^\n]+)$", 
 
 def run_regimes() -> int:
     violations = []
-    for path in sorted(REGIMES_SOURCE_ROOT.rglob("*.lean")):
-        text = REGIMES_BLOCK_COMMENT.sub("", path.read_text(encoding="utf-8"))
+    for path in lean_sources(REGIMES_SOURCE_ROOT):
+        text = REGIMES_BLOCK_COMMENT.sub("", read_source(path))
         for match in REGIMES_STRUCTURE.finditer(text):
             structure = match.group(1)
             rel = path.relative_to(REPO)
@@ -3127,7 +3212,7 @@ def closure_module_path(module):
 
 def closure_direct_imports(path):
     imports = set()
-    for line in path.read_text(encoding="utf-8").splitlines():
+    for line in read_source(path).splitlines():
         match = CLOSURE_IMPORT.match(line)
         if match is not None:
             imports.add(match.group(1))
@@ -3137,7 +3222,7 @@ def closure_direct_imports(path):
 def closure_calibrator_sources():
     modules = {
         path
-        for path in (PROOFS / "Calibrator").rglob("*.lean")
+        for path in lean_sources(PROOFS / "Calibrator")
         if not any(part.startswith("._") for part in path.parts)
     }
     return {CLOSURE_ROOT, *modules}
@@ -3310,7 +3395,7 @@ def wiring_analyze(files: dict[str, str]) -> dict:
     report = {}
     for s, names in decls.items():
         if not names:
-            report[s] = {"wiring_declarations": 0, "dependents": {}, "wired": False}
+            report[s] = {"declarations": 0, "dependents": {}, "wired": False}
             continue
         # One alternation pass per consumer beats len(names) passes per consumer.
         pattern = re.compile(
@@ -3322,7 +3407,7 @@ def wiring_analyze(files: dict[str, str]) -> dict:
             if hits:
                 dependents[consumer] = hits
         report[s] = {
-            "wiring_declarations": len(names),
+            "declarations": len(names),
             "dependents": dependents,
             "wired": bool(dependents),
         }
@@ -3352,12 +3437,12 @@ def run_wiring(argv: list[str]) -> int:
     if args.json:
         print(json.dumps(report, indent=1, sort_keys=True))
     else:
-        total_decls = sum(r["wiring_declarations"] for r in report.values())
+        total_decls = sum(r["declarations"] for r in report.values())
         total_edges = sum(
             len(hits) for r in report.values() for hits in r["dependents"].values()
         )
         print(f"upstream-arc modules:      {len(report)}")
-        print(f"upstream-arc wiring_declarations: {total_decls}")
+        print(f"upstream-arc declarations: {total_decls}")
         print(f"cross-boundary references: {total_edges}")
         print()
         width = max(len(s) for s in report)
@@ -3369,7 +3454,7 @@ def run_wiring(argv: list[str]) -> int:
                 detail = "  <- " + ", ".join(
                     f"{k}({','.join(v)})" for k, v in sorted(r["dependents"].items())
                 )
-            print(f"  {mark} {s:{width}s} {r['wiring_declarations']:4d} decls{detail}")
+            print(f"  {mark} {s:{width}s} {r['declarations']:4d} decls{detail}")
 
     failures = [m for m in args.require if not report.get(m, {}).get("wired")]
     if failures:
@@ -3586,7 +3671,20 @@ def main(argv: list[str] | None = None) -> int:
     for name in selected:
         spec = GUARDS[name]
         print(f"\n{'=' * 78}\n== {name}\n{'=' * 78}")
-        code = spec["fn"](rest) if spec["takes_argv"] else spec["fn"]()
+        # A guard that raises is a failing guard, not a failing RUN.  Letting the
+        # exception escape aborted the sweep at the first crash, so every guard
+        # after it never ran and the output ended in a traceback that looked like
+        # a tooling problem rather than a corpus one.  Worse, a caller piping
+        # this through `tail` saw the pipeline's exit status and read the whole
+        # thing as a pass.  Each guard is now isolated: the crash is reported
+        # against that guard, and the remaining guards still run.
+        try:
+            code = spec["fn"](rest) if spec["takes_argv"] else spec["fn"]()
+        except Exception as exc:  # noqa: BLE001 -- a guard may fail any way it likes
+            traceback.print_exc()
+            print(f"GUARD CRASHED: {name}: {exc}")
+            failures.append(name)
+            continue
         if code:
             failures.append(name)
 

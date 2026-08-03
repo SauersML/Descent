@@ -344,9 +344,9 @@ structure IsRankAllocation (k : ℝ) (M : ι → ℝ) : Prop where
 /-- **The predicate is satisfiable.**  Every theorem below assumes an allocation
 exists; the zero allocation at budget `0` is one.  Without this they are conditional on
 a hypothesis nothing in the corpus discharges. -/
-theorem IsRankAllocation.witness : IsRankAllocation (ι := ι) 0 (fun _ => 0) where
-  lower := fun _ => le_refl 0
-  upper := fun _ => by norm_num
+theorem IsRankAllocation.witness : IsRankAllocation (ι := ι) 0 (fun _ ↦ 0) where
+  lower := fun _ ↦ le_refl 0
+  upper := fun _ ↦ by norm_num
   trace := by simp
 
 /-- Weight captured by an allocation: the linear functional both task
@@ -786,8 +786,9 @@ here.  It is not an empirical assumption and not an external input: it holds for
 every score on a finite type, by sorting the values and cutting at rank `k`.
 That sorting argument is not written, so the general statement is admitted in
 `hasThresholdSetAtEveryRank_of_fintype` below and the admission is visible to
-`AxiomScan` as a `sorryAx`.  It used to be a premise of
-`exists_split_attaining_scalarized_optimum`, which made the same debt invisible.
+`AxiomScan` as a `sorryAx`.  Carrying it instead as a premise of
+`exists_split_attaining_scalarized_optimum` would hide the same debt in a
+hypothesis, where no audit reports it.
 
 What is proved without it: every threshold set is a scalarised optimum
 (`scalarized_optimum_is_coordinate_split`), so every supporting line of the
@@ -844,8 +845,8 @@ coordinate-split values.
 
 The existence of the threshold set is supplied by
 `hasThresholdSetAtEveryRank_of_fintype`, which is admitted; this theorem
-therefore depends on `sorryAx`, and that dependence is the honest form of what
-used to be an `hsplit` premise. -/
+therefore depends on `sorryAx`, and that visible dependence is the honest form of
+the debt an `hsplit` premise would conceal. -/
 theorem exists_split_attaining_scalarized_optimum
     (spectrum : ι → ℝ) (k : ℕ) (lam mu : ℝ) (hk : k ≤ Fintype.card ι) :
     ∃ S : Finset ι, S.card = k ∧

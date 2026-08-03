@@ -636,9 +636,9 @@ structure MafSpectrum (m : ℕ) where
 true and empty: kernel-checked, clean axiom report, no content.  This is the witness that
 makes the theorems below statements about something. -/
 noncomputable def MafSpectrum.witness (m : ℕ) : MafSpectrum (m + 1) where
-  model := fun _ => HardyWeinbergModel.witness
-  weight := fun j => if j = 0 then 1 else 0
-  weight_nonneg := fun j => by split <;> norm_num
+  model := fun _ ↦ HardyWeinbergModel.witness
+  weight := fun j ↦ if j = 0 then 1 else 0
+  weight_nonneg := fun j ↦ by split <;> norm_num
   weight_sum := by simp
 
 namespace MafSpectrum
@@ -1762,10 +1762,10 @@ structure FiberSplitting (k : ℕ) where
 true and empty: kernel-checked, clean axiom report, no content.  This is the witness that
 makes the theorems below statements about something. -/
 noncomputable def FiberSplitting.witness (k : ℕ) : FiberSplitting k where
-  location := fun _ => 1 / 2
-  mass := fun _ => 0
-  location_pos := fun _ => by norm_num
-  location_lt_one := fun _ => by norm_num
+  location := fun _ ↦ 1 / 2
+  mass := fun _ ↦ 0
+  location_pos := fun _ ↦ by norm_num
+  location_lt_one := fun _ ↦ by norm_num
 
 /-- The displacement a splitting produces in the moment whose profile is `profile`. -/
 noncomputable def FiberSplitting.displacement {k : ℕ} (F : FiberSplitting k)
