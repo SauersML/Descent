@@ -5,6 +5,7 @@ Authors: Sauers
 -/
 import Calibrator.HorizonCurve
 import Calibrator.ReversibleMarkovSpectrum
+import Calibrator.DriftingConditional
 
 /-!
 # Drifting conditionals in finite biological state spaces
@@ -20,9 +21,8 @@ results below need only finite sums and are proved directly:
 * a frozen binary mark and the population mass are transported by one kernel;
 * row-stochastic transport preserves marked prevalence exactly;
 * the transported response curve reconstructs the transported marked mass;
-* shifting a latent population mean and its threshold together is invisible;
-* an invariant population mean identifies threshold velocity when the biological
-  generator has no constant forcing; and
+* the imported identification layer separates static threshold gauge from
+  dynamically identifiable threshold motion; and
 * symmetric two-state ancestry switching acts on the ancestry contrast through
   the persistence eigenvalue already used by `ReversibleMarkovSpectrum`.
 
@@ -105,57 +105,6 @@ theorem transportedResponse_prevalence_conserved
     _ = ∑ x, markedMass population response x :=
       transportMass_total P (markedMass population response) hP
 
-/-! ## Static threshold gauge and dynamic identification -/
-
-/-- A latent-threshold response with a fixed link. -/
-def latentThresholdResponse {κ : Type*} (link : ℝ → ℝ) (populationMean : κ → ℝ)
-    (threshold : ℝ) (x : κ) : ℝ :=
-  link (populationMean x - threshold)
-
-/-- A common shift of the latent population mean and threshold is statically
-invisible to the entire response curve. -/
-theorem latentThresholdResponse_add_gauge {κ : Type*}
-    (link : ℝ → ℝ) (populationMean : κ → ℝ) (threshold shift : ℝ) :
-    latentThresholdResponse link (fun x ↦ populationMean x + shift)
-        (threshold + shift) =
-      latentThresholdResponse link populationMean threshold := by
-  funext x
-  simp only [latentThresholdResponse]
-  congr 1
-  ring
-
-/-- A population law has total mass one. -/
-def IsProbabilityMass (population : ι → ℝ) : Prop :=
-  ∑ x, population x = 1
-
-/-- The population mean is invariant under a biological generator. -/
-def HasInvariantMean (population : ι → ℝ)
-    (generator : (ι → ℝ) → ι → ℝ) : Prop :=
-  ∀ f, ∑ x, population x * generator f x = 0
-
-/-- If linked-response velocity equals autonomous population drift minus one
-threshold velocity, invariant averaging isolates the threshold velocity. This
-is the finite algebraic form of the dynamic identification argument; allowing
-an extra constant biological forcing would invalidate the conclusion. -/
-theorem thresholdVelocity_eq_neg_invariantMean
-    (population : ι → ℝ) (generator : (ι → ℝ) → ι → ℝ)
-    (linkedResponse linkedResponseVelocity : ι → ℝ) (thresholdVelocity : ℝ)
-    (hpopulation : IsProbabilityMass population)
-    (hinvariant : HasInvariantMean population generator)
-    (hevolution : ∀ x,
-      linkedResponseVelocity x = generator linkedResponse x - thresholdVelocity) :
-    thresholdVelocity = -∑ x, population x * linkedResponseVelocity x := by
-  have hsum :
-      ∑ x, population x * linkedResponseVelocity x =
-        ∑ x, population x * (generator linkedResponse x - thresholdVelocity) := by
-    apply Finset.sum_congr rfl
-    intro x _
-    rw [hevolution x]
-  simp only [mul_sub] at hsum
-  rw [hsum, Finset.sum_sub_distrib, hinvariant linkedResponse,
-    ← Finset.sum_mul, hpopulation, one_mul]
-  ring
-
 /-! ## Two-state local-ancestry switching -/
 
 /-- Symmetric switching between two local-ancestry or haplotype states. -/
@@ -189,6 +138,79 @@ theorem symmetricTwoStateKernel_contrast (switch : ℝ) (i : Fin 2) :
       Fin.sum_univ_two] <;>
     ring
 
+/-! ## The portability law: which half of a calibration curve survives drift
+
+A response curve on two ancestry states splits into a baseline (its mean) and a
+score-dependent part (its contrast component). Repeated ancestry switching fixes the first
+exactly and damps the second geometrically. That asymmetry is the portability law, and it
+is the structural reason a recalibration that models the score distribution but not the
+baseline loses the component with the longer half-life.
+-/
+
+/-- Act on a response curve by a transition kernel: `(applyKernel P f) i = ∑ j P i j * f j`.
+
+    This is the action on functions, dual to `transportMass`'s action on masses. -/
+noncomputable def applyKernel (P : ι → ι → ℝ) (f : ι → ℝ) (i : ι) : ℝ :=
+  ∑ j, P i j * f j
+
+/-- Repeated ancestry switching, `n` steps of drift. -/
+noncomputable def applyKernelIter (P : ι → ι → ℝ) : ℕ → (ι → ℝ) → (ι → ℝ)
+  | 0, f => f
+  | n + 1, f => applyKernel P (applyKernelIter P n f)
+
+/-- **The baseline is exactly conserved.** A row-stochastic kernel fixes constants, at every
+    number of steps, so the durable part of a calibration curve is its level. -/
+theorem applyKernelIter_const (P : ι → ι → ℝ) (hP : IsMassPreservingKernel P) (c : ℝ) :
+    ∀ n, applyKernelIter P n (fun _ ↦ c) = fun _ ↦ c := by
+  intro n
+  induction n with
+  | zero => rfl
+  | succ n ih =>
+      funext i
+      simp only [applyKernelIter, ih, applyKernel]
+      rw [← Finset.sum_mul, hP i, one_mul]
+
+/-- Two-state response curves decompose as baseline plus a multiple of the ancestry
+    contrast. This is the split whose two halves have different fates. -/
+noncomputable def twoStateCurve (baseline amplitude : ℝ) (i : Fin 2) : ℝ :=
+  baseline + amplitude * twoStateContrast i
+
+/-- **The score-dependent half decays geometrically.** One step of symmetric switching
+    multiplies the contrast amplitude by the persistence eigenvalue and leaves the baseline
+    alone. -/
+theorem applyKernel_twoStateCurve (switch baseline amplitude : ℝ) :
+    applyKernel (symmetricTwoStateKernel switch) (twoStateCurve baseline amplitude) =
+      twoStateCurve baseline (twoStatePersistence switch switch * amplitude) := by
+  funext i
+  simp only [applyKernel, twoStateCurve]
+  fin_cases i <;>
+    simp only [symmetricTwoStateKernel, twoStateContrast, twoStatePersistence,
+      Fin.sum_univ_two] <;>
+    norm_num <;>
+    ring
+
+/-- **The portability law on two ancestry states.**
+
+    After `n` steps of drift the baseline is untouched and the score-dependent amplitude
+    carries a factor `persistence ^ n`. So the two halves of a calibration curve have
+    different fates: the level is durable, the slope is perishable, and the curve flattens
+    toward local prevalence at a geometric rate set by how fast ancestry mixes.
+
+    The practical reading, which is why this is stated about a curve rather than about an
+    eigenvalue: a recalibration that adjusts the score distribution but does not model the
+    baseline discards precisely the component that survives longest. Far from training, the
+    surviving content of a score is the local base rate. -/
+theorem applyKernelIter_twoStateCurve (switch baseline amplitude : ℝ) (n : ℕ) :
+    applyKernelIter (symmetricTwoStateKernel switch) n
+        (twoStateCurve baseline amplitude) =
+      twoStateCurve baseline (twoStatePersistence switch switch ^ n * amplitude) := by
+  induction n with
+  | zero => simp [applyKernelIter]
+  | succ n ih =>
+      rw [applyKernelIter, ih, applyKernel_twoStateCurve]
+      congr 1
+      ring
+
 /-! ## The drifting probit index, and the constraint tying its two surfaces
 
 Under Ornstein-Uhlenbeck drift of the covariate the probit single-index family
@@ -202,29 +224,46 @@ about the Gaussian semigroup which is NOT proved here; what is proved here is th
 consequence, and it is the part a fitted model can be tested against.
 -/
 
-/-- Variance accumulated by an Ornstein-Uhlenbeck bridge over drift time `t` at rate `lam`.
+/-- A positive Ornstein-Uhlenbeck rate and a nonnegative biological drift
+horizon. Keeping the domain facts in the data prevents the variance formula
+from silently dividing by zero or describing negative time. -/
+structure OUHorizon where
+  rate : ℝ
+  time : ℝ
+  rate_pos : 0 < rate
+  time_nonneg : 0 ≤ time
+
+/-- The zero drift horizon at a positive relaxation rate. -/
+def OUHorizon.zero (rate : ℝ) (hrate : 0 < rate) : OUHorizon where
+  rate := rate
+  time := 0
+  rate_pos := hrate
+  time_nonneg := le_rfl
+
+/-- Variance accumulated by an Ornstein-Uhlenbeck bridge over a valid horizon.
 
     Empirical status: UNTESTED. -/
-noncomputable def ouVariance (lam t : ℝ) : ℝ :=
-  (1 - Real.exp (-(2 * lam * t))) / (2 * lam)
+noncomputable def ouVariance (horizon : OUHorizon) : ℝ :=
+  (1 - Real.exp (-(2 * horizon.rate * horizon.time))) / (2 * horizon.rate)
 
 /-- The denominator shared by both surfaces of the drifting probit index.
 
     Empirical status: UNTESTED. -/
-noncomputable def probitScaleFactor (a0 lam t : ℝ) : ℝ :=
-  Real.sqrt (1 + a0 ^ 2 * ouVariance lam t)
+noncomputable def probitScaleFactor (a0 : ℝ) (horizon : OUHorizon) : ℝ :=
+  Real.sqrt (1 + a0 ^ 2 * ouVariance horizon)
 
 /-- Slope surface of the drifting probit index.
 
     Empirical status: UNTESTED. -/
-noncomputable def probitSlope (a0 lam t : ℝ) : ℝ :=
-  a0 * Real.exp (-(lam * t)) / probitScaleFactor a0 lam t
+noncomputable def probitSlope (a0 : ℝ) (horizon : OUHorizon) : ℝ :=
+  a0 * Real.exp (-(horizon.rate * horizon.time)) /
+    probitScaleFactor a0 horizon
 
 /-- Intercept surface of the drifting probit index.
 
     Empirical status: UNTESTED. -/
-noncomputable def probitIntercept (a0 b0 lam t : ℝ) : ℝ :=
-  b0 / probitScaleFactor a0 lam t
+noncomputable def probitIntercept (a0 b0 : ℝ) (horizon : OUHorizon) : ℝ :=
+  b0 / probitScaleFactor a0 horizon
 
 /-- **The intercept and slope surfaces are not independent.**
 
@@ -244,10 +283,11 @@ noncomputable def probitIntercept (a0 b0 lam t : ℝ) : ℝ :=
     data the corpus already produces.
 
     Empirical status: UNTESTED, and the test just described is how that changes. -/
-theorem probitIntercept_div_probitSlope (a0 b0 lam t : ℝ) (ha : a0 ≠ 0)
-    (hS : probitScaleFactor a0 lam t ≠ 0) :
-    probitIntercept a0 b0 lam t / probitSlope a0 lam t = b0 / a0 * Real.exp (lam * t) := by
-  have hE : Real.exp (lam * t) ≠ 0 := Real.exp_ne_zero _
+theorem probitIntercept_div_probitSlope (a0 b0 : ℝ) (horizon : OUHorizon)
+    (ha : a0 ≠ 0) (hS : probitScaleFactor a0 horizon ≠ 0) :
+    probitIntercept a0 b0 horizon / probitSlope a0 horizon =
+      b0 / a0 * Real.exp (horizon.rate * horizon.time) := by
+  have hE : Real.exp (horizon.rate * horizon.time) ≠ 0 := Real.exp_ne_zero _
   unfold probitIntercept probitSlope
   rw [Real.exp_neg]
   field_simp
@@ -255,10 +295,11 @@ theorem probitIntercept_div_probitSlope (a0 b0 lam t : ℝ) (ha : a0 ≠ 0)
 /-- At drift time zero the ratio is the ratio of the initial parameters, so the invariant
     is anchored rather than merely proportional. -/
 theorem probitIntercept_div_probitSlope_zero (a0 b0 lam : ℝ) (ha : a0 ≠ 0)
-    (hS : probitScaleFactor a0 lam 0 ≠ 0) :
-    probitIntercept a0 b0 lam 0 / probitSlope a0 lam 0 = b0 / a0 := by
-  rw [probitIntercept_div_probitSlope a0 b0 lam 0 ha hS]
-  simp
+    (hlam : 0 < lam) (hS : probitScaleFactor a0 (OUHorizon.zero lam hlam) ≠ 0) :
+    probitIntercept a0 b0 (OUHorizon.zero lam hlam) /
+        probitSlope a0 (OUHorizon.zero lam hlam) = b0 / a0 := by
+  simpa [OUHorizon.zero] using
+    probitIntercept_div_probitSlope a0 b0 (OUHorizon.zero lam hlam) ha hS
 
 /-- The scale parameter `A = a ^ (-2)` linearizes the slope dynamics: if
     `a' = -lam * a - a ^ 3 / 2` then `A' = 2 * lam * A + 1`.
