@@ -87,6 +87,60 @@ Both directions fail, which is why the mechanical flag cannot be the verdict:
   MISTAKING D FOR B IS THE OPPOSITE ERROR AND IS WORSE: it preserves, and
   thereby certifies, a wrong identification.
 
+=== WORKED VERDICTS: THE POPGEN SLICE, 8 OF 8 ===
+
+From `RflScan.lean` at the elaborated environment, not from text.
+
+  A (structural, nothing can drift) -- 2
+    temporalMetricProfile_brier      the RHS, `temporalExactBrierRisk`, is
+                                     DEFINED as the LHS. A name for a
+                                     projection restated as a theorem.
+    hetMutationRecurrence_zero       hand-written restatement of the base case
+                                     Lean already generates as
+                                     `hetMutationRecurrence.eq_1`, which the
+                                     same scan found among the 11 generated.
+
+  B (load-bearing, do not delete) -- 6
+    neutralPortability_uses_ploidy      \
+    stabilizingPortability_uses_ploidy   >  see below
+    diversifyingPortability_uses_ploidy /
+    temporalMetricProfile_r2         pins the profile's `r2` FIELD against the
+                                     separately written `temporalR2`, argument
+                                     order included; neither references the
+                                     other, both wrap a common primitive
+    ageDependentMetricProfile_r2     same shape
+    temporalExactBrierRisk_eq_prevalence_scale
+                                     asserts the profile's brier field IS the
+                                     Bernoulli closed form pi(1-pi)(1-R2)
+
+  C -- 0.   D -- 0 in this slice.
+
+=== THE PLOIDY FAMILY REFINES THE DISCRIMINATOR, AGAINST MY OWN EXPECTATION ===
+
+I expected the three `*_uses_ploidy` theorems to come out A -- "a definition
+related to the convention it is built from" sounds structural. THEY ARE B, and
+the reason is worth stating because it sharpens the test.
+
+    neutralPortability r2_0 fst  =  r2_0 * max 0 (1 - 2 * fst)     -- LITERAL 2
+    ploidy : R := 2
+    neutralPortability_uses_ploidy : ... = r2_0 * max 0 (1 - ploidy * fst)
+
+The definition does NOT reference `ploidy`. It hardcodes `2`. The theorem is
+the ONLY thing tying that literal to the convention, so it is a tripwire: change
+`ploidy` and it breaks, which is exactly the alarm wanted. Delete it and the
+literal silently stops tracking the convention.
+
+ITS TRIVIALITY IS WHAT MAKES IT WORK. `rfl` closes it because `ploidy` reduces
+to `2` -- and that is the point, not a defect. A theorem can be trivial NOW and
+be the only thing that would become FALSE later. "Provable by rfl" measures
+today; "load-bearing" is a claim about what breaks tomorrow, and no proof-term
+inspection can see that.
+
+So the discriminator was right and my prior was wrong: it asks whether either
+BODY references the other, and here neither does. The lesson is to run the test
+rather than predict it -- I would have filed three guards under "safe to
+collapse" on the strength of a plausible-sounding description.
+
 === ONE CASE THE BUCKETS DO NOT COVER, DECLARED RATHER THAN FORCED ===
 
   VACUOUS ON PURPOSE. `cluster_identities_hold_at_every_retention` is vacuous

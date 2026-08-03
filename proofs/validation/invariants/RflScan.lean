@@ -35,7 +35,8 @@ private def rflScanModules : List Name :=
   [`Calibrator.LDDecayTheory, `Calibrator.Conventions,
    `Calibrator.PopulationGeneticsFoundations, `Calibrator.DemographicHistory,
    `Calibrator.DriftRegime, `Calibrator.LongitudinalPortability,
-   `Calibrator.HumanDemography, `Calibrator.AncestrySpecificArchitecture]
+   `Calibrator.HumanDemography, `Calibrator.AncestrySpecificArchitecture,
+   `Calibrator.AncestrySpecificPower, `Calibrator.GeneticArchitectureDiscovery]
 
 /-- Compiler-generated theorems: equation lemmas (`f.eq_1`), `sizeOf_spec`,
 `injEq`, and friends. They are `rfl` by construction and are not written by
