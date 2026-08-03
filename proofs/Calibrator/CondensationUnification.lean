@@ -968,12 +968,10 @@ theorem sixthMoment_eq_floorOne_plus_dispersion (spectrum : MafSpectrum m)
     -- `congr 2` stops above the `10 *`, so the goal here is `10 * X = 10 * Y` and not
     -- `X = Y`; handing it the bare `Finset.sum_congr` gives a Type mismatch whose printed
     -- types differ only by that factor, which is easy to misread as a summand mismatch.
-    -- Descend the extra level. The alternatives are kept because how many levels `congr`
-    -- peels depends on the surrounding `+`/`-` shape, which has changed here before.
-    first
-      | exact congrArg (fun s => 10 * s) (Finset.sum_congr rfl (fun j _ => hfour j))
-      | (congr 1; exact Finset.sum_congr rfl (fun j _ => hfour j))
-      | exact Finset.sum_congr rfl (fun j _ => hfour j)
+    -- Descend the extra level explicitly. Keeping alternative proof branches here hid two
+    -- unreachable tactics from the linter; the goal shape is part of the checked theorem,
+    -- so the exact congruence is the stronger and more maintainable proof.
+    exact congrArg (fun s => 10 * s) (Finset.sum_congr rfl (fun j _ => hfour j))
   rw [hsplit]
   unfold fourthMomentDispersion
   ring
@@ -1928,7 +1926,7 @@ forces its weight, and by induction the whole spectrum.
 This is the peeling step, and with it the matrix sending MAF weights to the `|u|` law has
 trivial nullspace: **no fiber splitting exists over genotype panels**. -/
 theorem rarest_locus_owns_largest_atom (h h' : HardyWeinbergModel)
-    (hq0 : 0 < h.altFreq) (hhalf : h.altFreq ≤ 1 / 2)
+    (hq0 : 0 < h.altFreq)
     (hq0' : 0 < h'.altFreq) (hhalf' : h'.altFreq ≤ 1 / 2)
     (hrarer : h.altFreq < h'.altFreq) (g : DiploidGenotype) :
     |h'.centeredSquare g| < h.centeredSquare DiploidGenotype.homAlt := by
