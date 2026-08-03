@@ -224,7 +224,6 @@ theorem totalGaussianInformation_mul_estimatorVariance
   rw [gaussianCovarianceTangentEstimatorVariance_eq]
   unfold totalGaussianInformation scalarPermeability
   field_simp [hm, hcovariance, hderivative]
-  norm_num
 
 /-- Equivalent reciprocal form of
 `totalGaussianInformation_mul_estimatorVariance`. -/
