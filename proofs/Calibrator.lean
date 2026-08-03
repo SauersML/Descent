@@ -54,6 +54,7 @@ import Calibrator.CovarianceStructure
 import Calibrator.CausalInference
 import Calibrator.CertificateGrading
 import Calibrator.FiniteMinimax
+import Calibrator.FiniteMinimaxBoundary
 import Calibrator.PencilEnvironment
 import Calibrator.DirichletTransfer
 import Calibrator.DeclaredInteractionClass
