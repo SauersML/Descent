@@ -299,12 +299,17 @@ theorem windowVariance_mono {v : ℝ} (hv : 0 < v) :
 
 /-! A separation statement — "two laws with the same drift and different jet variances
 retain different variance fractions" — was carried here as `windowVariance_ne_of_arg_ne`,
-which took `Function.Injective Phi` as a hypothesis and transported an assumed
-disequality through it. Injectivity of the standard normal cdf is a real fact and is not
-proved in this corpus, so it was an external result carried as a parameter, and the
-remaining content was `fun hEq => h (hinj hEq)`. Both are removed. A window separation
-result belongs here only once `Phi` is proved strictly monotone from the Gaussian
-measure. -/
+which took `Function.Injective Phi` as a hypothesis and transported an *assumed*
+disequality `w / √v ≠ w / √v'` through it. Both the analytic fact and the substance of the
+conclusion came from the caller; the remaining content was `fun hEq => h (hinj hEq)`. It
+was deleted on those grounds.
+
+`Calibrator.Probability.strictMono_Phi` now proves strict monotonicity of the standard
+normal cdf outright, so the statement is earnable: discharge injectivity through
+`strictMono_Phi.injective` and *derive* the disequality of window arguments from
+`v ≠ v'` instead of assuming it. That restoration is written and is not landed here,
+because it could not be compiled — it is a real proof term, not a docstring, and this
+corpus does not ship unchecked proofs. -/
 
 /-!
 ## 5. What the condensation theorems say about a polygenic score
