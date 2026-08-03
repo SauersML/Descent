@@ -2999,6 +2999,20 @@ bias measured on dichotomised traits does not surface here as a wrong formula �
 as a wrong *portability conclusion*, with the arithmetic intact throughout. For a binary
 trait, convert with `liabilityThresholdAUCFromExplainedR2` at the trait's prevalence
 instead. -/
+/-- **DEFINITIONALLY `presentDayEqualVarianceGaussianAUC` AT THE BENCHMARK DRIFT LEVEL, AND
+MEASURED AS SUCH: max spread `0.000e+00` over the admissible box.**
+
+The name is retained because it records *provenance* — that `fstTarget` comes from the
+neutral allele-frequency benchmark — which is information a reader needs and the arithmetic
+does not carry. But it is the same function, and that must be visible here rather than
+discovered later by someone stating a theorem across the pair.
+
+**No theorem should be stated relating this to `presentDayEqualVarianceGaussianAUC`.** Such
+a theorem is `rfl` and says nothing, however much it may read as "the benchmark preserves
+discrimination". That is precisely the defect that
+`neutralAF_benchmark_discrimination_preserved_calibration_lost` carried until its
+discrimination conjunct was replaced by a claim that can fail. `auc_collapse_check.py` is
+the instrument that finds this class. -/
 noncomputable def targetEqualVarianceGaussianAUCFromNeutralAFBenchmark
     (V_A V_E fstTarget : ℝ) : ℝ :=
   presentDayEqualVarianceGaussianAUC V_A V_E fstTarget

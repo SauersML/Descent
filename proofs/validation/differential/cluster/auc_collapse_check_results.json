@@ -1,0 +1,124 @@
+{
+  "collapsed_pairs": [
+    {
+      "group": "V_A_V_E_fst",
+      "a": "presentDayEqualVarianceGaussianAUC",
+      "b": "presentDayGaussianAUC"
+    },
+    {
+      "group": "V_A_V_E_fst",
+      "a": "presentDayEqualVarianceGaussianAUC",
+      "b": "targetExactGaussianAUCFromNeutralAFBenchmark"
+    },
+    {
+      "group": "V_A_V_E_fst",
+      "a": "presentDayEqualVarianceGaussianAUC",
+      "b": "targetGaussianAUCFromNeutralAFBenchmark"
+    },
+    {
+      "group": "V_A_V_E_fst",
+      "a": "presentDayGaussianAUC",
+      "b": "targetExactGaussianAUCFromNeutralAFBenchmark"
+    },
+    {
+      "group": "V_A_V_E_fst",
+      "a": "presentDayGaussianAUC",
+      "b": "targetGaussianAUCFromNeutralAFBenchmark"
+    },
+    {
+      "group": "V_A_V_E_fst",
+      "a": "targetExactGaussianAUCFromNeutralAFBenchmark",
+      "b": "targetGaussianAUCFromNeutralAFBenchmark"
+    }
+  ],
+  "values": {
+    "signal_noise": {
+      "gaussianAUCFromSignalVariance": [
+        0.9230604612373661,
+        0.8248465929172808,
+        0.8063130304234112,
+        0.6106083946900371,
+        0.7165943777065846,
+        0.9668457608036182,
+        0.839132292476527,
+        0.8781370479598208
+      ]
+    },
+    "V_A_V_E_fst": {
+      "presentDayGaussianAUC": [
+        0.6770004725692012,
+        0.7066867645358329,
+        0.5772105506152845,
+        0.6356133388051282,
+        0.709495589586762,
+        0.5927514913639117,
+        0.7851091841569969,
+        0.6478031349962804
+      ],
+      "presentDayEqualVarianceGaussianAUC": [
+        0.6770004725692012,
+        0.7066867645358329,
+        0.5772105506152845,
+        0.6356133388051282,
+        0.709495589586762,
+        0.5927514913639117,
+        0.7851091841569969,
+        0.6478031349962804
+      ],
+      "targetGaussianAUCFromNeutralAFBenchmark": [
+        0.6770004725692012,
+        0.7066867645358329,
+        0.5772105506152845,
+        0.6356133388051282,
+        0.709495589586762,
+        0.5927514913639117,
+        0.7851091841569969,
+        0.6478031349962804
+      ],
+      "targetExactGaussianAUCFromNeutralAFBenchmark": [
+        0.6770004725692012,
+        0.7066867645358329,
+        0.5772105506152845,
+        0.6356133388051282,
+        0.709495589586762,
+        0.5927514913639117,
+        0.7851091841569969,
+        0.6478031349962804
+      ]
+    },
+    "r2": {
+      "equalVarianceGaussianAUCFromExplainedR2": [
+        0.6656008376378887,
+        0.7713021503417832,
+        0.7665121370794872,
+        0.7721564074700452,
+        0.5,
+        0.5,
+        0.5,
+        0.5
+      ],
+      "equalVarianceGaussianAUCChart": [
+        0.6656008376378887,
+        0.7713021503417832,
+        0.7665121370794872,
+        0.7721564074700452,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    "snr": {
+      "equalVarianceGaussianAUCFromSNR": [
+        0.6255490707660583,
+        0.9979544200336226,
+        0.9990856116642952,
+        0.789271542328038,
+        0.9966610369803234,
+        0.9966983165612893,
+        0.997726140797902,
+        0.9930485542925551
+      ]
+    }
+  }
+}
