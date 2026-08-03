@@ -677,7 +677,8 @@ theorem sampleCost_eq_fixedGradeBenchmarkSampleSize (η C : ℝ) (k : ℕ)
 /-- **The panel intensity and the squared characteristic function are one object.**
 
 `ResonanceSpectrum.PhasePanel.intensity` is `|Ψ|²` written as `(∑ w cos)² + (∑ w sin)²`;
-`CramerStratum.charFnSq` is `|φ|²` written as `∑ᵤ ∑ᵥ wᵤ wᵥ cos(t(aᵤ − aᵥ))`. Expanding the
+`CramerStratum.charFnSq` is `|φ|²` written as
+`∑ᵤ ∑ᵥ wᵤ wᵥ cos(t(aᵤ − aᵥ))`. Expanding the
 two squares and pairing the terms by `cos (x − y) = cos x cos y + sin x sin y` turns one
 into the other exactly, at every panel and every frequency.
 
