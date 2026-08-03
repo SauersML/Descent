@@ -2945,7 +2945,7 @@ theorem portability_ratio_with_ld_decay_general
     hVA hVE hfst hfstT_lt_one hRhoS ⟨hRhoT_pos, hRhoT_lt_rhoS⟩
 
 /-- If target `R²` is strictly below source `R²`, the portability ratio is strictly below `1`. -/
-theorem ratio_lt_one_of_lt_of_pos
+theorem div_lt_one_of_lt_of_pos
     (srcR2 tgtR2 : ℝ)
     (hsrc_pos : 0 < srcR2)
     (hdrop : tgtR2 < srcR2) :
@@ -2970,7 +2970,7 @@ theorem portability_ratio_lt_one_of_positive_drift
     exact div_pos hv_pos (by linarith)
   have hdrop : presentDayR2 V_A V_E fstT < presentDayR2 V_A V_E fstS :=
     drift_degrades_R2 V_A V_E fstS fstT hVA hVE hfst hfstT_le_one
-  exact ratio_lt_one_of_lt_of_pos (presentDayR2 V_A V_E fstS)
+  exact div_lt_one_of_lt_of_pos (presentDayR2 V_A V_E fstS)
     (presentDayR2 V_A V_E fstT) hsrc_pos hdrop
 
 /-- Neutral allele-frequency benchmark `R²`.
@@ -3002,7 +3002,7 @@ theorem targetR2FromNeutralAFBenchmark_ratio_lt_one
       targetR2FromNeutralAFBenchmark V_A V_E fstTarget < presentDayR2 V_A V_E fstSource := by
     simpa [targetR2FromNeutralAFBenchmark] using
       drift_degrades_R2 V_A V_E fstSource fstTarget hVA hVE h_fst (le_of_lt h_fst_bounds.2)
-  exact ratio_lt_one_of_lt_of_pos
+  exact div_lt_one_of_lt_of_pos
     (presentDayR2 V_A V_E fstSource)
     (targetR2FromNeutralAFBenchmark V_A V_E fstTarget)
     hsrc_pos hdrop
