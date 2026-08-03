@@ -70,11 +70,10 @@ structure AssortativeMatingModel where
 
 /-- **Narrow-sense heritability**, the ratio of additive to total variance.
 
-This used to be a field of the structure carrying a hypothesis `h2_def : h2 = V_A / V_P`
-that pinned it. A parameter fixed by an equation is not a parameter: it could be supplied
-inconsistently only by supplying a false proof, and every model had to carry the equation
-around. It is now computed, so `h2_def` is `rfl` and the positivity and upper bound are
-theorems rather than assumptions. -/
+**Computed, not a field pinned by a hypothesis.** A parameter fixed by an equation is
+not a parameter: it can be supplied inconsistently only by supplying a false proof, and
+every model then carries the equation around. Because this is computed, `h2_def` is `rfl`
+and positivity and the upper bound are theorems rather than assumptions. -/
 noncomputable def AssortativeMatingModel.h2 (m : AssortativeMatingModel) : ℝ :=
   m.V_A / m.V_P
 
@@ -388,10 +387,10 @@ structure DifferentialAMModel where
   /-- Source has more AM than target -/
   more_am_in_source : r_t < r_s
 
-/-- **Target stability follows from source stability.** It used to be assumed separately.
+/-- **Target stability follows from source stability, so do not assume it separately.**
 With less assortative mating in the target and a positive heritability, `r_t * h2` is
-strictly below `r_s * h2`, which is already below one — so assuming it again was a free
-parameter that a model could only have set inconsistently by assuming something false. -/
+strictly below `r_s * h2`, which is already below one; a separate assumption would be a
+free parameter a model could set only by assuming something false. -/
 theorem DifferentialAMModel.stability_t (d : DifferentialAMModel) : d.r_t * d.h2 < 1 := by
   have h : d.r_t * d.h2 < d.r_s * d.h2 :=
     mul_lt_mul_of_pos_right d.more_am_in_source d.h2_pos
