@@ -71,9 +71,9 @@ def constsOf (e : Expr) : NameSet :=
         generated for it, and each of those mentions `S.mk` -- so scanning all
         constants for the constructor marks every structure as built.
 
-    The definition itself now lives in `Shared.DeclFilter`, shared with the
-    detectors under `proofs/validation/invariants/`.  It used to be a private
-    copy here, one of three that disagreed; see `CROSSCHECK.md` §4. -/
+    The definition itself lives in `Shared.DeclFilter`, shared with the
+    detectors under `proofs/validation/invariants/`.  Do not keep a private copy
+    here: three copies of this filter disagree, as `CROSSCHECK.md` §4 records. -/
 abbrev userWritten (env : Environment) (n : Name) : Bool := Shared.userWritten env n
 
 /-- Record every carrier whose CONSTRUCTOR appears among these constants.
