@@ -720,6 +720,40 @@ theorem certificateDeficit_eq_calculus_deficit (q c : ℝ) (K : ℕ) (hK : K ≠
   rw [architectureCalculus_ungradedRisk q c hq,
     architectureCalculus_certifiedRisk q c K hK hq]
 
+open Calibrator.CertificateGrading in
+/-- **Grade soundness holds eventually, and not identically.**
+
+    `CertificateGrading` deliberately declines to make grade-ordering a structure field, so
+    every instance owes a discharge of it. This is that discharge, and the shape of the
+    statement is the reason the field was refused: the grade-`K` modulus sits below the
+    ungraded one **past a variant count**, not at every scale, because the ordering here is
+    the statement that a positive power eventually beats a logarithm. Had the ordering been
+    a field, this eventual quantifier would have vanished into an axiom and the scales at
+    which the ordering fails would have become invisible.
+
+    Note what this does *not* say: it fixes no crossing point, so it licenses no claim about
+    any particular panel. It says only that the ordering is not vacuous. -/
+theorem architecture_gradeSound_eventually (c : ℝ) (K : ℕ) (hK : K ≠ 0)
+    (hc : 0 < c / (K : ℝ)) :
+    ∀ᶠ q : ℝ in Filter.atTop, (architectureCalculus c).GradeSound K (1 / q) := by
+  have hbound := (isLittleO_log_rpow_atTop hc).bound one_pos
+  filter_upwards [hbound, Filter.eventually_ge_atTop (2 : ℝ)] with q hq hq2
+  have hq0 : (0 : ℝ) < q := by linarith
+  have hlog : 0 < Real.log q := Real.log_pos (by linarith)
+  have hrpow : 0 < q ^ (c / (K : ℝ)) := Real.rpow_pos_of_pos hq0 _
+  have hle : Real.log q ≤ q ^ (c / (K : ℝ)) := by
+    rw [Real.norm_of_nonneg (le_of_lt hlog), Real.norm_of_nonneg (le_of_lt hrpow),
+      one_mul] at hq
+    exact hq
+  have hinv : (1 : ℝ) / (1 / q) = q := by field_simp
+  have hkey : gradeCertifiedRisk q (K : ℝ) c ≤ nonsmoothSummaryRisk q := by
+    unfold gradeCertifiedRisk nonsmoothSummaryRisk
+    rw [Real.rpow_neg (le_of_lt hq0), inv_eq_one_div]
+    exact one_div_le_one_div_of_le hlog hle
+  unfold CertificateCalculus.GradeSound architectureCalculus architectureModulus
+  simp only [hinv, if_neg hK]
+  exact Real.sqrt_le_sqrt hkey
+
 end NonsmoothSummaries
 
 

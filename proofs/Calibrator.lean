@@ -49,6 +49,7 @@ import Calibrator.CovarianceStructure
 import Calibrator.CausalInference
 import Calibrator.CertificateGrading
 import Calibrator.CountingInvariantBlindness
+import Calibrator.CountingInvariantInstances
 import Calibrator.PolygenicArchitecture
 import Calibrator.SampleOverlapBias
 import Calibrator.HaplotypeTheory
@@ -83,7 +84,7 @@ import Calibrator.Permeability
 -- make the root build green -- that restores the blindness rather than fixing the break.
 --
 -- Check for new orphans with the closure of this file's imports against the files on
--- disk; the count is 100 modules, 100 in closure.
+-- disk; the count is 104 modules including this root, all 104 in its closure.
 import Calibrator.ResonanceSpectrum
 import Calibrator.BundleRigidity.Coverage
 import Calibrator.BundleRigidity.Cycles

@@ -238,17 +238,11 @@ theorem log_two_lt_condensationConstant : Real.log 2 < condensationConstant := b
   have hlog16 : Real.log 16 = 4 * Real.log 2 := by
     rw [show (16 : ℝ) = 2 ^ (4 : ℕ) by norm_num, Real.log_pow]
     norm_num
-  -- `H_16 - log 16` in closed form. Whether `norm_num` leaves the logarithm as
-  -- `log 16` or folds the cast differently is not something we rely on: both
-  -- routes are tried.
+  -- `H_16 - log 16` in closed form. The power-of-two identity above reduces
+  -- the only transcendental term to `log 2` before normalization.
   have hseq : Real.eulerMascheroniSeq' 16 = (2436559 : ℝ) / 720720 - 4 * Real.log 2 := by
     rw [Real.eulerMascheroniSeq']
-    first
-      | norm_num [hlog16]
-      | (norm_num; rw [hlog16])
-      | (rw [if_neg (by norm_num : ¬((16 : ℕ) = 0)),
-             show ((16 : ℕ) : ℝ) = 2 ^ (4 : ℕ) by norm_num, Real.log_pow]
-         norm_num)
+    norm_num [hlog16]
   have hγ : Real.eulerMascheroniConstant < (2436559 : ℝ) / 720720 - 4 * Real.log 2 := by
     have h := Real.eulerMascheroniConstant_lt_eulerMascheroniSeq' 16
     rwa [hseq] at h
