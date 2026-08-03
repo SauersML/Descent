@@ -7,6 +7,7 @@ import Calibrator.Probability
 import Calibrator.PortabilityDrift
 import Calibrator.OpenQuestions
 import Calibrator.PolygenicArchitecture
+import Calibrator.BundleRigidity.DeploymentCeiling
 
 namespace Calibrator
 
@@ -603,6 +604,31 @@ theorem fixedGradeBenchmarkSampleSize_inverts (epsilon K c : ℝ)
   have hexp : (-(K / c)) * (-(c / K)) = 1 := by
     rw [neg_mul_neg, div_mul_div_comm, mul_comm c K, div_self (mul_ne_zero hK hc)]
   rw [← Real.rpow_mul (le_of_lt h_eps), hexp, Real.rpow_one]
+
+/-- **The deployment sample cost lands exactly on the polynomial benchmark, at grade `2k`.**
+
+`BundleRigidity.sampleCost η C k` is the sample size the coverage guarantee
+`σ_min ≥ (η/C)^k` forces on a deployment direction of coupling order `k`, namely
+`(C/η)^(2k)`. Spending it drives the fixed-grade risk benchmark at grade ratio `2k` down
+to accuracy `η/C` — no more and no less. So the deployment ceiling is not a new cost law:
+it is the corpus's power-law benchmark read at grade `2k`, with the coupling order
+appearing as the grade exponent rather than as a separate constant.
+
+That is where the cost qualifier of `sampleCost_unbounded` bites. A benchmark of grade
+`2k` needs accuracy-to-the-power `2k` many samples, so an order-`k` direction is charged
+exponentially in `k`, while the published quadratic formula is this identity at `k = 1`.
+Either definition changing its exponent convention breaks this. -/
+theorem fixedGradeRiskBenchmark_sampleCost (η C : ℝ) (hη : 0 < η) (hC : 0 < C)
+    (k : ℕ) (hk : 0 < k) :
+    fixedGradeRiskBenchmark (BundleRigidity.sampleCost η C k) (2 * k) 1 = η / C := by
+  have hpos : (0 : ℝ) < C / η := div_pos hC hη
+  have hk0 : ((k : ℝ)) ≠ 0 := Nat.cast_ne_zero.mpr hk.ne'
+  unfold fixedGradeRiskBenchmark BundleRigidity.sampleCost
+  rw [← Real.rpow_natCast (C / η) (2 * k), ← Real.rpow_mul hpos.le]
+  have hexp : ((2 * k : ℕ) : ℝ) * (-(1 / (2 * (k : ℝ)))) = -(1 : ℝ) := by
+    push_cast
+    field_simp
+  rw [hexp, Real.rpow_neg hpos.le, Real.rpow_one, inv_div]
 
 /-- **Conditional comparison of the polynomial and logarithmic sample-size benchmarks.**
 
