@@ -6,7 +6,7 @@
   "revisionKnown": false,
   "runAt": null,
   "seed": null,
-  "seedNote": "The script draws no random numbers. Its output is a function of the code and of sims/results_hpc/ancestry_calibration/results/{accuracy_binary.csv,calibration_binary.csv} alone, so a disagreement with a re-run is NOT explainable as a seed change.",
+  "seedNote": "The script draws no random numbers anywhere, so a disagreement with a re-run is NEVER explainable as a seed change. The remaining dependencies differ by part: A_serial_founder reads no files at all and is a function of the code alone, which is why it reproduces exactly across machines and numpy versions; B_brier and C_prevalence additionally depend on sims/results_hpc/ancestry_calibration/results/{accuracy_binary.csv,calibration_binary.csv}, which part B loads and part C consumes through part B's return value.",
   "numpy": null,
   "numpyConstraint": "numpy 1.x. The run predates commit db344f43 and used the bare np.trapz that numpy 2 removed, so it cannot have executed on numpy 2.",
   "reproduction": {

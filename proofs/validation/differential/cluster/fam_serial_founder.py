@@ -858,10 +858,14 @@ def _lookup_r2(key):
 def input_fingerprints():
     """Size and mtime of each input CSV, so two runs can be told apart.
 
-    This script draws no random numbers. Its output is determined entirely by
-    the code and by these files, so if a re-run disagrees with a stored result
-    the candidates are the revision, the numpy version and these inputs -- and
-    without recording them the third is invisible.
+    These are PART B AND C's inputs, not part A's. Part A reads no files, so a
+    disagreement there is down to the revision alone -- and a run on numpy
+    2.5.1 has now reproduced part A against numbers produced on numpy 1.x,
+    which retires the version as a candidate for that part.
+
+    For B and C the candidates are the revision and these two files, and
+    without recording them the second is invisible. There is no RNG anywhere in
+    this script, so a seed is never among the explanations.
     """
     out = {}
     for name in INPUT_CSVS:
