@@ -221,6 +221,45 @@ theorem mixRule_apply (t : NNReal) (ht : t ≤ 1)
   simp only [mixRule, PMF.bind_apply, PMF.bernoulli_apply, tsum_bool, if_true, if_false]
   exact add_comm _ _
 
+/-- The mixed rule's action probabilities are the real mixture of the two rules'. -/
+theorem probability_mixRule (t : NNReal) (ht : t ≤ 1)
+    (δ₁ δ₂ : Rule actionCount observationCount) (x : Fin (observationCount + 1))
+    (a : Fin (actionCount + 1)) :
+    FinitePrior.probability (mixRule t ht δ₁ δ₂ x) a
+      = (t : ℝ) * FinitePrior.probability (δ₁ x) a
+        + (1 - (t : ℝ)) * FinitePrior.probability (δ₂ x) a := by
+  have htle : (t : ENNReal) ≤ 1 := by exact_mod_cast ht
+  have h1 : ((t : ENNReal) * (δ₁ x) a) ≠ ⊤ :=
+    ENNReal.mul_ne_top (by simp) (PMF.apply_ne_top _ _)
+  have h2 : ((1 - (t : ENNReal)) * (δ₂ x) a) ≠ ⊤ :=
+    ENNReal.mul_ne_top (by simp) (PMF.apply_ne_top _ _)
+  unfold FinitePrior.probability
+  rw [mixRule_apply, ENNReal.toReal_add h1 h2, ENNReal.toReal_mul, ENNReal.toReal_mul,
+    ENNReal.toReal_sub_of_le htle (by simp)]
+  simp
+
+/-- **Risk is affine in the rule.** Mixing two rules mixes their risks with the same
+    weight, at every parameter value.
+
+    This is what makes the set of achievable risk profiles convex, which is the hypothesis
+    a separating-hyperplane argument needs. -/
+theorem risk_mixRule (t : NNReal) (ht : t ≤ 1)
+    (δ₁ δ₂ : Rule actionCount observationCount) (θ : Fin (parameterCount + 1)) :
+    E.risk (mixRule t ht δ₁ δ₂) θ
+      = (t : ℝ) * E.risk δ₁ θ + (1 - (t : ℝ)) * E.risk δ₂ θ := by
+  unfold risk
+  rw [Finset.mul_sum, Finset.mul_sum, ← Finset.sum_add_distrib]
+  refine Finset.sum_congr rfl fun x _ ↦ ?_
+  have hinner : ∑ a, FinitePrior.probability (mixRule t ht δ₁ δ₂ x) a * E.loss θ a
+      = (t : ℝ) * ∑ a, FinitePrior.probability (δ₁ x) a * E.loss θ a
+        + (1 - (t : ℝ)) * ∑ a, FinitePrior.probability (δ₂ x) a * E.loss θ a := by
+    rw [Finset.mul_sum, Finset.mul_sum, ← Finset.sum_add_distrib]
+    refine Finset.sum_congr rfl fun a _ ↦ ?_
+    rw [probability_mixRule]
+    ring
+  rw [hinner]
+  ring
+
 /-- **The equalizer theorem: a constant-risk Bayes rule closes duality.**
 
     If a rule has the same risk at every parameter value and is Bayes against some prior,

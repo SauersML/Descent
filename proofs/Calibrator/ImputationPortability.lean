@@ -111,7 +111,12 @@ theorem mul_le_self_of_le_one
         mul_le_mul_of_nonneg_left h_pm_le h_r2
     _ = r2_LD := mul_one _
 
-/-- **Mean imputation quality as a function of LD extent.**
+/-- **Imputation quality as a function of LD extent alone.**
+
+    The name carries the restriction because the signature cannot carry the alternative.
+    Realised imputation `r²` is dominated by reference-panel size and by minor-allele
+    frequency, and neither appears here: this is the LD-extent dependence with everything else
+    held fixed, so it cannot be read as a predicted `r²` for a given panel.
 
     `1 - c / ld_extent` is an `r²` and must lie in `[0, 1]`, but the bare
     expression goes negative for `ld_extent < c` — which is the short-LD limit
@@ -120,16 +125,16 @@ theorem mul_le_self_of_le_one
     that need the unclamped branch say so with a hypothesis `c < ld_extent`.
 
     Empirical status: UNTESTED. -/
-noncomputable def meanImputationR2 (c ld_extent : ℝ) : ℝ :=
+noncomputable def ldExtentImputationQuality (c ld_extent : ℝ) : ℝ :=
   max 0 (1 - c / ld_extent)
 
 /-- The clamped quality measure is an `r²`: it lies in `[0, 1]` for every
 positive tagging constant and LD extent, with no side condition. -/
-theorem meanImputationR2_mem_unit (c ld_extent : ℝ)
+theorem ldExtentImputationQuality_mem_unit (c ld_extent : ℝ)
     (h_c : 0 < c) (h_ld : 0 < ld_extent) :
-    0 ≤ meanImputationR2 c ld_extent ∧ meanImputationR2 c ld_extent ≤ 1 := by
+    0 ≤ ldExtentImputationQuality c ld_extent ∧ ldExtentImputationQuality c ld_extent ≤ 1 := by
   have h_frac_pos : 0 < c / ld_extent := div_pos h_c h_ld
-  unfold meanImputationR2
+  unfold ldExtentImputationQuality
   refine ⟨le_max_left _ _, ?_⟩
   apply max_le
   · norm_num
@@ -139,7 +144,7 @@ theorem meanImputationR2_mem_unit (c ld_extent : ℝ)
     In populations with shorter LD (e.g., AFR), tagging is worse,
     so imputation quality is systematically lower.
     This creates a baseline portability artifact.
-    Model: mean imputation r² = `meanImputationR2 c ld_extent`, monotone
+    Model: mean imputation r² = `ldExtentImputationQuality c ld_extent`, monotone
     increasing in LD extent. Shorter LD → smaller LD_extent → lower mean
     imputation r². The hypothesis `c < ld_extent_short` is what puts both
     populations on the unclamped branch; below it the measure is `0` in both and
@@ -148,7 +153,7 @@ theorem shorter_ld_worse_imputation
     (c ld_extent_long ld_extent_short : ℝ)
     (h_c : 0 < c) (h_long : c < ld_extent_long) (h_short : c < ld_extent_short)
     (h_shorter : ld_extent_short < ld_extent_long) :
-    meanImputationR2 c ld_extent_short < meanImputationR2 c ld_extent_long := by
+    ldExtentImputationQuality c ld_extent_short < ldExtentImputationQuality c ld_extent_long := by
   have h_short_pos : 0 < ld_extent_short := by linarith
   have h_long_pos : 0 < ld_extent_long := by linarith
   have h1 : c / ld_extent_long < c / ld_extent_short :=
@@ -157,7 +162,7 @@ theorem shorter_ld_worse_imputation
     rw [div_lt_one h_short_pos]; linarith
   have h_long_lt_one : c / ld_extent_long < 1 := by
     rw [div_lt_one h_long_pos]; linarith
-  unfold meanImputationR2
+  unfold ldExtentImputationQuality
   rw [max_eq_right (by linarith : (0 : ℝ) ≤ 1 - c / ld_extent_short),
     max_eq_right (by linarith : (0 : ℝ) ≤ 1 - c / ld_extent_long)]
   linarith

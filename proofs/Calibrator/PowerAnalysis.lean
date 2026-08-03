@@ -372,31 +372,32 @@ allocated across ancestries to maximize global PGS utility?
 
 section OptimalAllocation
 
-/-- **R² in the infinitesimal model: R² ≈ n/(n + M/h²).**
-    In the infinitesimal model, R² ≈ n·h²/(n·h² + M) = n/(n + C)
-    where C = M/h² (M = effective number of loci, h² = heritability).
-    This is a concave function of n, giving diminishing returns. -/
-noncomputable def r2ScalingModel (n C : ℝ) : ℝ := n / (n + C)
+/-- **Fraction of heritability attained at sample size `n`**: `n / (n + C)` with `C = M/h²`
+    (`M` the effective number of loci, `h²` the heritability).
 
-/-! `r2ScalingModel` is the saturating fraction `n / (n + C)` with `C = M/h²`,
-not an `R²`. It carries no heritability prefactor, so it saturates at one where
-`R²` must cap at `h²`; the same defect that
-`Calibrator.expectedR2FromN` carried before correction. It is kept as the
-shape, and anything reading it as a predicted `R²` must multiply by `h²`. -/
+    This is a fraction, not an `R²`. It carries no heritability prefactor, so it saturates at
+    one where `R²` must cap at `h²`, and anything reading it as a predicted `R²` must multiply
+    by `h²` — which is what `Calibrator.expectedR2FromN` does. The name says fraction because
+    the signature cannot say `R²`: no heritability enters it.
 
-/-- R² scaling model is increasing in n. -/
+    Concave in `n`, so the returns diminish.
+
+    Empirical status: UNTESTED. -/
+noncomputable def heritabilityFractionFromN (n C : ℝ) : ℝ := n / (n + C)
+
+/-- The attained fraction of heritability is increasing in `n`. -/
 theorem r2_scaling_increasing (n₁ n₂ C : ℝ)
     (h_C : 0 < C) (h_n₁ : 0 ≤ n₁) (h_n₂ : 0 ≤ n₂) (h_n : n₁ < n₂) :
-    r2ScalingModel n₁ C < r2ScalingModel n₂ C := by
-  unfold r2ScalingModel
+    heritabilityFractionFromN n₁ C < heritabilityFractionFromN n₂ C := by
+  unfold heritabilityFractionFromN
   rw [div_lt_div_iff₀ (by linarith) (by linarith)]
   nlinarith
 
 /-- R² scaling model is bounded by 1. -/
 theorem r2_scaling_bounded (n C : ℝ)
     (h_C : 0 < C) (h_n : 0 ≤ n) :
-    r2ScalingModel n C < 1 := by
-  unfold r2ScalingModel
+    heritabilityFractionFromN n C < 1 := by
+  unfold heritabilityFractionFromN
   rw [div_lt_one (by linarith)]
   linarith
 
@@ -407,9 +408,9 @@ theorem r2_scaling_bounded (n C : ℝ)
 theorem diminishing_returns (n₁ n₂ delta C : ℝ)
     (h_C : 0 < C) (h_n₁ : 0 ≤ n₁) (h_n₂ : 0 ≤ n₂)
     (h_delta : 0 < delta) (h_n : n₁ < n₂) :
-    r2ScalingModel (n₂ + delta) C - r2ScalingModel n₂ C <
-      r2ScalingModel (n₁ + delta) C - r2ScalingModel n₁ C := by
-  unfold r2ScalingModel
+    heritabilityFractionFromN (n₂ + delta) C - heritabilityFractionFromN n₂ C <
+      heritabilityFractionFromN (n₁ + delta) C - heritabilityFractionFromN n₁ C := by
+  unfold heritabilityFractionFromN
   -- Need: (n₂+δ)/(n₂+δ+C) - n₂/(n₂+C) < (n₁+δ)/(n₁+δ+C) - n₁/(n₁+C)
   -- Each difference = δC/((n+δ+C)(n+C))
   -- Since n₁ < n₂, denominator is smaller for n₁ → larger fraction
@@ -437,8 +438,8 @@ theorem diminishing_returns (n₁ n₂ delta C : ℝ)
 theorem invest_in_undersampled (n_large n_small delta C : ℝ)
     (h_C : 0 < C) (h_small : 0 ≤ n_small) (h_large : 0 ≤ n_large)
     (h_delta : 0 < delta) (h_gap : n_small < n_large) :
-    r2ScalingModel (n_large + delta) C - r2ScalingModel n_large C <
-      r2ScalingModel (n_small + delta) C - r2ScalingModel n_small C :=
+    heritabilityFractionFromN (n_large + delta) C - heritabilityFractionFromN n_large C <
+      heritabilityFractionFromN (n_small + delta) C - heritabilityFractionFromN n_small C :=
   diminishing_returns n_small n_large delta C h_C h_small h_large h_delta h_gap
 
 /-- **Multi-ancestry GWAS sum of R² is maximized by balanced allocation.**
@@ -450,21 +451,21 @@ theorem invest_in_undersampled (n_large n_small delta C : ℝ)
 theorem balanced_allocation_maximizes_total_utility
     (n delta C : ℝ)
     (h_C : 0 < C) (h_delta : 0 < delta) (h_n : delta < n) :
-    r2ScalingModel (n - delta) C + r2ScalingModel (n + delta) C <
-      2 * r2ScalingModel n C := by
+    heritabilityFractionFromN (n - delta) C + heritabilityFractionFromN (n + delta) C <
+      2 * heritabilityFractionFromN n C := by
   have h_n_nonneg : 0 ≤ n := by
     linarith
   have h_n_minus_delta_nonneg : 0 ≤ n - delta := by
     linarith
   have h_marginal :
-      r2ScalingModel (n + delta) C - r2ScalingModel n C <
-        r2ScalingModel n C - r2ScalingModel (n - delta) C := by
+      heritabilityFractionFromN (n + delta) C - heritabilityFractionFromN n C <
+        heritabilityFractionFromN n C - heritabilityFractionFromN (n - delta) C := by
     simpa [sub_eq_add_neg, add_assoc, add_comm, add_left_comm] using
       (diminishing_returns (n - delta) n delta C h_C
         h_n_minus_delta_nonneg h_n_nonneg h_delta (by linarith))
   have h_sum :
-      r2ScalingModel (n - delta) C + r2ScalingModel (n + delta) C <
-        r2ScalingModel n C + r2ScalingModel n C := by
+      heritabilityFractionFromN (n - delta) C + heritabilityFractionFromN (n + delta) C <
+        heritabilityFractionFromN n C + heritabilityFractionFromN n C := by
     linarith
   simpa [two_mul] using h_sum
 
@@ -525,7 +526,7 @@ end EffectSizeHeterogeneity
 /-!
 ## Conditional Sample-Size Benchmarks for Nonsmooth Architecture Summaries
 
-Every sample-size law in this file is polynomial: `r2ScalingModel` saturates as
+Every sample-size law in this file is polynomial: `heritabilityFractionFromN` saturates as
 `n / (n + C)`, the noncentrality grows linearly in `n`, and the allocation
 results are concavity statements about that shape. All of it is correct for the
 targets those laws are about — `R²`, a per-variant association test, a variance
