@@ -2047,3 +2047,234 @@ check(
         "about the shape and not an overall offset."
     ),
 )
+
+
+# --- 15. The order-free ensemble channel: what cluster/fam_ensemble_channel.py
+#         established. --------------------------------------------------------
+#
+# FIRST CONTACT between Sec. 14 of FoldedSpectrum.lean / EnsembleChannel.lean
+# and any number. The simulator is a latent 2-D chain with eigenvalue
+# lambda = rho e^{i theta}; because rho R(theta) is a scaled rotation the
+# stationary state covariance is exactly isotropic, so gamma(k) =
+# amp rho^k cos(k theta) and L = whiteFloor + longRunVariance are closed form
+# and every prediction below carries NO FREE CONSTANT.
+#
+# FINDING 1 (the channel is real, and it is the FEJER sum, not L).
+#   Measured n' Var(sample mean) against BOTH references over a rho grid from
+#   0 to 0.995 and theta from 0 to pi, 20000 replicates per cell at n' = 4000:
+#     - against the exact finite-depth Fejer sum: worst disagreement 1.55
+#       sigma over 14 cells. The instrument is sound.
+#     - against L, the n' -> infinity limit: 12 of 14 cells inside 2%, worst
+#       3.5% at rho = 0.995 where n'/tau = 20.
+#   The two cells that miss L are exactly the two with the least depth per
+#   mixing time, and the depth sweep pins the mechanism: at rho = 0.99 the
+#   deficit against L runs -84.9%, -73.8%, -56.4%, -36.1%, -19.8%, -9.1%,
+#   -4.4%, -3.0% as n' runs 32 -> 4096, while the deficit against the Fejer
+#   sum stays inside +-1.7% at every one of those depths. So `SampleBudget`'s
+#   `depthSufficient` is not a technicality: at n'/tau = 0.3 the channel reads
+#   15% of L. The corpus's own Sec. 14c claim that depth past the mixing scale
+#   "buys nothing" is confirmed from the other side -- past n'/tau ~ 40 the
+#   remaining deficit is at the 1% sampling floor.
+#
+# FINDING 2 (THE REFUTATION -- Sec. 14a is too strong, and EnsembleChannel.lean
+#   is right). Sec. 14a says an order-free sample carries "EXACTLY ONE spectral
+#   functional beyond the marginal" and that perturbing off zero frequency
+#   "leaves the order-free law unchanged AT EVERY SYMMETRIC ORDER".
+#   EnsembleChannel.lean's docstring says the opposite. MEASURED, on two
+#   Gaussian MA processes with marginal EXACTLY N(0,1) and L identical to
+#   machine precision (b = (1,0,0) against b = (2/3,2/3,-1/3), spectral density
+#   at pi of 1 against 1/9), 40000 replicates at n' = 2000:
+#     mean channel     1.00060 vs 1.00095   agree     (+0.0 sigma)
+#     third moment    15.00608 vs 15.05506  agree     (+0.3 sigma)
+#     SECOND moment    1.98537 vs  2.38248  SEPARATE (+18.1 sigma, 20.0%)
+#     FOURTH moment   95.65702 vs 110.36811 SEPARATE (+14.2 sigma, 15.4%)
+#     mean |F|         0.36166 vs  0.42183  SEPARATE (+15.3 sigma, 16.6%)
+#     sample variance  1.98299 vs  2.38136  SEPARATE (+18.2 sigma, 20.1%)
+#     empirical CDF at -1 and +1             SEPARATE (+4.9, +4.4 sigma)
+#   Six of ten order-free channels separate two processes that share the
+#   marginal and share L. The Isserlis closed forms predict all of it with no
+#   free constant -- 2*sum gamma^2 = 2.000 against 2.395, and
+#   72*sum gamma^2 + 24*sum gamma^4 = 96.00 against 110.46 -- and the
+#   measurements sit on those numbers. The pattern is exactly the parity
+#   structure of the two files: ODD-order channels see only sum gamma(k), which
+#   is L and therefore agrees; EVEN-order channels see sum gamma(k)^2, which L
+#   does not determine. The corollary is that Sec. 14a's tangent-space
+#   invisibility claim is false as stated and must be restricted to the
+#   sample-MEAN channel, which is what `three_mul_sampleMeanVariance3` actually
+#   proves.
+#
+# FINDING 3 (Sec. 14b's rate holds; Sec. 14c's identity holds).
+#   Ensemble deconvolution of the chi^2_1 mixing kernel across m cohorts
+#   recovers E[L] and Var[L] at fitted rates -0.5167 and -0.4807 against the
+#   claimed -1/2, over m = 25 -> 6400 with 640000 cohorts in the pool. The
+#   `EnsembleTransfer` variance identity Var(b) = Var(E[b|v]) + E[Var(b|v)]
+#   holds to 1e-17 on oracle visibles, with the curve arm's fiber variance
+#   exactly 0 (0.043780 = 0.043780 + 0.000000) and the sheet arm's strictly
+#   positive (0.023488 = 0.006633 + 0.016855). The sheet arm is what makes the
+#   curve arm a result rather than a degeneracy.
+
+check(
+    id="fejerChannel3-is-the-depth-3-sample-mean-channel",
+    fqn="Calibrator.fejerChannel3",
+    claim="the three-locus Fejer channel is exactly 3 Var(sample mean) at "
+          "depth 3, i.e. the general Fejer sum "
+          "gamma0 + 2 sum_{k=1}^{n-1} (1-k/n) gamma(k) evaluated at n = 3",
+    model_lean="gamma0 + (4/3) gamma1 + (2/3) gamma2",
+    model_ref="the finite-depth Fejer sum at n = 3, computed from the general "
+              "formula rather than from the three-term expansion",
+    reference="n Var(mean) = gamma0 + 2 sum_{k=1}^{n-1} (1-k/n) gamma(k), "
+              "cluster/fam_ensemble_channel.py fejer_channel",
+    grid=grid(g0=[1.0, 2.0, 5.0],
+              g1=[0.0, 0.2222222222222222, -0.4, 0.48],
+              g2=[0.0, -0.2222222222222222, 0.3]),
+    lean=lambda D, g0, g1, g2: D["fejerChannel3"](g0, g1, g2),
+    ref=lambda g0, g1, g2: g0 + 2 * (1 - 1 / 3) * g1 + 2 * (1 - 2 / 3) * g2,
+    kind="identity",
+    note=(
+        "POSITIVE CONTROL for the pair below, and the anchor that makes the "
+        "simulator's reference the corpus's own. cluster/fam_ensemble_channel.py "
+        "measured the same quantity at n' = 4000 across 14 cells and hit the "
+        "general Fejer sum to within 1.55 sigma everywhere, so the formula the "
+        "corpus states at n = 3 is the formula the process obeys at every "
+        "depth. It is registered separately from the L check because the whole "
+        "attribution of Sec. 14's depth hypothesis rests on the two being "
+        "DIFFERENT quantities."
+    ),
+    canfail_clause=(
+        "the grid must contain profiles with gamma1 and gamma2 of OPPOSITE "
+        "sign, and in particular the (1, 2/9, -2/9) profile whose Fejer value "
+        "coincides with the white profile's. Without a sign change the two "
+        "lag coefficients 4/3 and 2/3 cannot be separated from each other or "
+        "from the 2 and 2 of the untruncated sum, and a check restricted to "
+        "positive profiles would pass for the long-run variance as well."
+    ),
+)
+
+check(
+    id="fejerChannel3-is-not-the-long-run-variance",
+    fqn="Calibrator.fejerChannel3",
+    claim="REGIME: the depth-3 channel is NOT the zero-frequency evaluation. "
+          "Sec. 14a states the channel as Var(sample mean) -> L/n' with "
+          "L = whiteFloor + longRunVariance, but at finite depth the sample "
+          "mean sees the FEJER sum, which weights lag k by (1 - k/n) and "
+          "therefore depends on rho and theta separately rather than on L "
+          "alone. The gap is the content of `SampleBudget.depthSufficient`",
+    model_lean="gamma0 + (4/3) gamma1 + (2/3) gamma2, the depth-3 channel",
+    model_ref="L = gamma0 + 2 gamma1 + 2 gamma2, the zero-frequency "
+              "evaluation the channel is claimed to converge to",
+    reference="cluster/fam_ensemble_channel_results.json, T1b_depth_sweep",
+    grid=[
+        {"g0": 2.0, "g1": 1.8, "g2": 1.62, "note_n": 3},
+        {"g0": 2.0, "g1": 0.9, "g2": 0.405, "note_n": 3},
+        {"g0": 1.0, "g1": 0.2222222222222222, "g2": -0.2222222222222222,
+         "note_n": 3},
+    ],
+    lean=lambda D, g0, g1, g2, note_n: D["fejerChannel3"](g0, g1, g2),
+    ref=lambda g0, g1, g2, note_n: g0 + 2 * g1 + 2 * g2,
+    kind="model",
+    expected_verdict="MODEL",
+    tol=1e-3,
+    note=(
+        "EXPECTED TO DISAGREE, and the disagreement IS the result. The two "
+        "sides are the same quantity only in the n' -> infinity limit, and "
+        "nothing in `OrderFreeChannel` records the finite-depth form: its "
+        "`variance_eq` field asserts meanVariance = (whiteFloor + "
+        "longRunVariance)/sampleSize as an EQUATION at finite sampleSize, "
+        "with `fluctuationUniformity` left as an opaque audit Prop.\n\n"
+        "MEASURED, cluster/fam_ensemble_channel.py, 20000 replicates per cell. "
+        "At rho = 0.99, theta = 0 (L = 200.0) the measured n' Var(mean) runs\n"
+        "  n' =   32 (n'/tau = 0.3):  30.25   vs Fejer  29.83   vs L  -84.9%\n"
+        "  n' =  128 (n'/tau = 1.3):  87.19   vs Fejer  88.05   vs L  -56.4%\n"
+        "  n' =  512 (n'/tau = 5.1): 160.42   vs Fejer 161.55   vs L  -19.8%\n"
+        "  n' = 4096 (n'/tau =  41): 194.01   vs Fejer 195.17   vs L   -3.0%\n"
+        "so the Fejer sum is hit to better than 1.7% at EVERY depth while L is "
+        "missed by up to 85%. The repair is a regime declaration, not new "
+        "arithmetic: `variance_eq` is an asymptotic statement and the finite-n' "
+        "channel is the Fejer sum. The third grid row is the (1, 2/9, -2/9) "
+        "profile where the two sides agree exactly, which is what shows this "
+        "is a shape disagreement and not an offset."
+    ),
+    canfail_clause=(
+        "The grid MUST contain the (1, 2/9, -2/9) profile, where the depth-3 "
+        "channel and L are both exactly 1 and the check reports agreement. "
+        "Without it a reader could not tell this check from one that always "
+        "disagrees, and the whole point is that the two quantities coincide on "
+        "a codimension-one set and differ by up to 85% off it. The other two "
+        "rows must be strongly persistent (gamma1, gamma2 > 0 and decaying "
+        "slowly), because for a rapidly decaying profile the truncation is "
+        "invisible and the check would report agreement for the wrong reason."
+    ),
+)
+
+check(
+    id="gaussianPairSquareChannel3-separates-equal-fejer-profiles",
+    fqn="Calibrator.gaussianPairSquareChannel3",
+    claim="THE REFUTATION OF Sec. 14a. The symmetric fourth-order Gaussian "
+          "channel separates two covariance profiles with the SAME Fejer "
+          "channel, so an order-free sample carries strictly MORE than the "
+          "zero-frequency evaluation. Sec. 14a's claim that off-zero "
+          "perturbation 'leaves the order-free law unchanged at every "
+          "symmetric order' is false as stated",
+    model_lean="3 gamma0^2 + 4 gamma1^2 + 2 gamma2^2, the Isserlis pair-square "
+               "channel at depth 3",
+    model_ref="the MEASURED n' Var of a symmetric fourth-order order-free "
+              "statistic, rescaled to depth 3, on two Gaussian MA processes "
+              "with marginal exactly N(0,1) and L identical to machine "
+              "precision",
+    reference="cluster/fam_ensemble_channel_results.json, T2_channels",
+    grid=[
+        {"g0": 1.0, "g1": 0.0, "g2": 0.0, "measured_ratio": 1.0},
+        {"g0": 1.0, "g1": 0.1, "g2": -0.2, "measured_ratio": 1.0},
+    ],
+    lean=lambda D, g0, g1, g2, measured_ratio: (
+        D["gaussianPairSquareChannel3"](g0, g1, g2)
+        / D["gaussianPairSquareChannel3"](1.0, 0.0, 0.0)),
+    ref=lambda g0, g1, g2, measured_ratio: measured_ratio,
+    kind="model",
+    expected_verdict="MODEL",
+    tol=1e-3,
+    note=(
+        "EXPECTED TO DISAGREE ON THE SECOND ROW, and that disagreement is the "
+        "finding. The two grid rows are exactly the profiles of "
+        "`equal_fejer_channel_witness`: fejerChannel3 1 0 0 = "
+        "fejerChannel3 1 (1/10) (-1/5) = 1, proved in EnsembleChannel.lean, "
+        "while `unequal_symmetric_fourth_channel_witness` proves the "
+        "fourth-order values differ (3 against 3 + 4/100 + 2/25 = 3.12, a 4% "
+        "separation). The reference column pins BOTH rows at ratio 1, which is "
+        "what Sec. 14a of FoldedSpectrum.lean asserts, so the check agrees on "
+        "the white row and disagrees on the dependent one.\n\n"
+        "MEASURED INDEPENDENTLY, cluster/fam_ensemble_channel.py, 40000 "
+        "replicates at n' = 2000 on b = (1,0,0) against b = (2/3,2/3,-1/3) -- "
+        "marginal exactly N(0,1) for both, L identical to 1e-16, spectral "
+        "density at pi of 1.000 against 0.111:\n"
+        "  second-moment channel   1.98537 vs 2.38248, +18.1 sigma, +20.0%; "
+        "Isserlis predicts 2.000 vs 2.395\n"
+        "  fourth-moment channel  95.65702 vs 110.36811, +14.2 sigma, +15.4%; "
+        "Isserlis predicts 96.00 vs 110.46\n"
+        "  sample variance         1.98299 vs 2.38136, +18.2 sigma\n"
+        "  mean |F|                0.36166 vs 0.42183, +15.3 sigma\n"
+        "  empirical CDF at -1     0.13287 vs 0.13952, +4.9 sigma\n"
+        "and the ODD channels agree, as the parity structure requires: mean "
+        "1.00060 vs 1.00095 (+0.0 sigma), third moment 15.00608 vs 15.05506 "
+        "(+0.3 sigma). Odd-order channels see sum gamma(k), which is L; "
+        "even-order channels see sum gamma(k)^2, which L does not determine.\n\n"
+        "The repair is a restriction, not a rescaling. Sec. 14a is correct "
+        "about the sample-MEAN channel and wrong about 'every symmetric "
+        "order'; the invisible set is the tangent space of the mean channel "
+        "only, and the fourth-order channel is a second, independent "
+        "functional that an order-free panel also carries."
+    ),
+    canfail_clause=(
+        "The grid must hold the WHITE row (1,0,0) as well as the dependent "
+        "one. On the white row both sides are 1 and the check AGREES; that "
+        "agreement is the control showing the check is not one that fires on "
+        "everything. The dependent row must also be a profile whose Fejer "
+        "value is unchanged -- gamma1 = 1/10, gamma2 = -1/5 gives "
+        "1 + 4/30 - 2/15 = 1 exactly -- because on a profile that moves the "
+        "Fejer value too, a fourth-order separation would prove nothing about "
+        "off-zero invisibility. It must further be a profile with a positive "
+        "trigonometric symbol, which `dependent_channel_symbol_positive` "
+        "proves for this one and which is what makes it a stationary "
+        "covariance profile at all rather than an arbitrary triple."
+    ),
+)
