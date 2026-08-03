@@ -25,17 +25,60 @@ takes prevalence and measures at pooled RMSE 0.0121.  Keep running this: it is
 the instrument that holds the equal-variance charts to the model they now name,
 and its failure against the liability-threshold oracle is the expected result,
 not a regression.
+
+TWENTY-FIVE CELLS WAS TOO COARSE FOR THE CLAIM MADE FROM IT.  "Every cell
+biased low, worst at R2 = 0.20 and prevalence 0.001" is a statement about where
+a SURFACE peaks, and a 5x5 grid cannot locate a peak; the worst cell was simply
+the corner of the box.  Both axes are now swept log-spaced -- R2 over more than
+two decades, prevalence over more than three -- so the shape of the residual
+is visible and the worst cell is a maximum rather than an edge.
+
+WHERE THE ERROR BARS COME FROM, AND WHERE THEY DO NOT.  `exact` is a
+quadrature, not a sample: its uncertainty is discretisation, so it is computed
+at two grid resolutions and the difference is reported as `exact_grid_delta`.
+The residual against the Lean chart therefore has NO Monte Carlo error at all,
+which is the whole reason the quadrature is the oracle.  The Monte Carlo is an
+INDEPENDENT CHECK ON THE QUADRATURE, run over several seeds so it carries a
+standard error of its own; where the prevalence is so low that a feasible
+sample yields too few cases to estimate anything, the Monte Carlo is recorded
+as skipped WITH ITS REASON rather than quietly returning a number nobody should
+believe.
 """
 from __future__ import annotations
 
-import json
+import argparse
+import math
+import os
 import sys
+import time
+from concurrent.futures import ProcessPoolExecutor
 
-import numpy as np
-from scipy import stats, integrate
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+import numpy as np  # noqa: E402
+from scipy import stats, integrate  # noqa: E402
+
+import simprov  # noqa: E402
 
 Phi = stats.norm.cdf
 phi = stats.norm.pdf
+
+# Default grid.  The five old R2 values (0.01 .. 0.30) and the five old
+# prevalences (0.5 .. 0.001) sit inside these ranges, so the retired numbers
+# stay comparable to the swept surface.
+DEFAULT_R2 = [round(x, 6) for x in simprov.log_grid(0.002, 0.5, 15)]
+DEFAULT_K = [float("%.6g" % x) for x in simprov.log_grid(0.5, 1e-4, 13)]
+DEFAULT_REPS = 20
+DEFAULT_SEED = 7
+
+# Monte Carlo sizing.  The sample is grown as the prevalence falls so that the
+# case arm keeps enough members to estimate an AUC, and capped so that one cell
+# cannot eat the run.
+MC_TARGET_CASES = 20000
+MC_N_MIN = 4_000_000
+MC_N_MAX = 40_000_000
+MC_MIN_CASES = 1000
+MC_CHUNK = 2_000_000
 
 
 def lean_equalVarianceGaussianAUCFromExplainedR2(r2):
@@ -50,7 +93,7 @@ def lean_equalVarianceGaussianAUCFromSNR(snr):
     return float(Phi(np.sqrt(snr / 2)))
 
 
-def exact_auc(rho, K):
+def exact_auc(rho, K, npts=20001):
     """AUC of score S (corr rho with liability L) for cases L > T, P(L>T)=K.
 
     P(S_case > S_ctrl) = E_{s}[ f_case(s) * F_ctrl(s) ] integrated exactly.
@@ -71,48 +114,155 @@ def exact_auc(rho, K):
         return phi(s) * (1 - p_case_given_s(s)) / (1 - K)
 
     # F_ctrl(s) via cumulative integration on a fine grid, then integrate
-    grid = np.linspace(-9, 9, 20001)
+    grid = np.linspace(-9, 9, npts)
     fc = f_ctrl(grid)
     Fctrl = integrate.cumulative_trapezoid(fc, grid, initial=0.0)
     Fctrl /= Fctrl[-1]
     return float(np.trapezoid(f_case(grid) * Fctrl, grid))
 
 
-def mc_auc(rho, K, seed, n=4_000_000):
+def mc_n_for(K):
+    """Sample size that puts about MC_TARGET_CASES individuals in the case arm."""
+    return int(min(MC_N_MAX, max(MC_N_MIN, math.ceil(MC_TARGET_CASES / K))))
+
+
+def mc_auc(rho, K, seed, n=None, cap=400_000):
+    """Monte Carlo AUC, chunked so a 4e7-draw cell does not hold 4e7 floats.
+
+    Returns (auc, n_cases_kept, n_drawn) or (nan, cases, n) when the case arm is
+    too thin to estimate anything.
+    """
+    n = mc_n_for(K) if n is None else int(n)
     rng = np.random.default_rng(seed)
-    s = rng.standard_normal(n)
-    l = rho * s + np.sqrt(1 - rho**2) * rng.standard_normal(n)
     T = stats.norm.isf(K)
-    case = s[l > T]
-    ctrl = s[l <= T]
-    m = min(len(case), len(ctrl), 400_000)
-    if m < 1000:
-        return float("nan")
-    a = rng.choice(case, m, replace=False)
-    b = rng.choice(ctrl, m, replace=False)
-    return float((a > b).mean() + 0.5 * (a == b).mean())
+    r = math.sqrt(max(0.0, 1 - rho**2))
+    case_parts, ctrl_parts = [], []
+    n_case = n_ctrl = 0
+    drawn = 0
+    while drawn < n:
+        k = min(MC_CHUNK, n - drawn)
+        drawn += k
+        s = rng.standard_normal(k)
+        l = rho * s + r * rng.standard_normal(k)
+        hit = l > T
+        c = s[hit]
+        n_case += len(c)
+        if sum(len(x) for x in case_parts) < cap:
+            case_parts.append(c)
+        d = s[~hit]
+        n_ctrl += len(d)
+        if sum(len(x) for x in ctrl_parts) < cap:
+            ctrl_parts.append(d[:cap])
+    if n_case < MC_MIN_CASES:
+        return float("nan"), n_case, drawn
+    a = np.concatenate(case_parts)[:cap]
+    b = np.sort(np.concatenate(ctrl_parts)[:cap])
+    # P(a > b) + 1/2 P(a == b), by rank rather than by an m x m comparison
+    lo = np.searchsorted(b, a, side="left")
+    hi = np.searchsorted(b, a, side="right")
+    auc = float((lo.mean() + hi.mean()) / (2.0 * len(b)))
+    return auc, n_case, drawn
 
 
-def main():
-    rows = []
-    for r2 in (0.01, 0.05, 0.1, 0.2, 0.3):
-        rho = np.sqrt(r2)
-        for K in (0.5, 0.2, 0.05, 0.01, 0.001):
-            rows.append(dict(
-                r2=r2, K=K,
-                exact=exact_auc(rho, K),
-                mc=mc_auc(rho, K, seed=7 + int(r2 * 1000) + int(K * 10000)),
-                lean_fromR2=lean_equalVarianceGaussianAUCFromExplainedR2(r2),
-                lean_fromSNR=lean_equalVarianceGaussianAUCFromSNR(r2 / (1 - r2)),
-            ))
-    with open(sys.argv[1] if len(sys.argv) > 1 else "auc.json", "w") as fh:
-        json.dump(rows, fh)
+def _job(args):
+    r2, K, rep, seed = args
+    rho = math.sqrt(r2)
+    auc, n_case, drawn = mc_auc(rho, K, seed)
+    return dict(r2=r2, K=K, rep=rep, seed=seed, mc=auc,
+                mc_cases=n_case, mc_draws=drawn)
 
-    print(f"{'R2':>6} {'K':>7} {'exact AUC':>10} {'MC':>9} {'lean':>9} {'err%':>8}")
-    for r in rows:
-        e = 100 * (r["lean_fromR2"] - r["exact"]) / r["exact"]
-        print(f"{r['r2']:6.2f} {r['K']:7.3f} {r['exact']:10.4f} {r['mc']:9.4f} "
-              f"{r['lean_fromR2']:9.4f} {e:8.1f}")
+
+def main(argv=None):
+    ap = argparse.ArgumentParser(
+        description="Sweep the equal-variance Gaussian AUC charts against the "
+                    "exact liability-threshold AUC.")
+    ap.add_argument("--r2", type=simprov.parse_floats, default=DEFAULT_R2,
+                    help="variance explained values, comma separated")
+    ap.add_argument("--prevalence", type=simprov.parse_floats, default=DEFAULT_K,
+                    help="prevalence values, comma separated")
+    ap.add_argument("--no-mc", action="store_true",
+                    help="quadrature only; skips the Monte Carlo cross-check")
+    simprov.add_sweep_args(ap, DEFAULT_REPS, "auc.json", DEFAULT_SEED)
+    args = ap.parse_args(argv)
+
+    cells_spec = [(r2, K) for r2 in args.r2 for K in args.prevalence]
+    reps = 0 if args.no_mc else args.reps
+    jobs = [(r2, K, rep, args.seed + 7919 * rep + int(round(1e6 * r2)) * 31
+             + int(round(1e7 * K)))
+            for (r2, K) in cells_spec for rep in range(reps)]
+    print("%d cells x %d Monte Carlo replicates = %d samples on %d workers"
+          % (len(cells_spec), reps, len(jobs), args.jobs), flush=True)
+
+    t0 = time.time()
+    if jobs:
+        with ProcessPoolExecutor(max_workers=args.jobs) as ex:
+            records = list(ex.map(_job, jobs, chunksize=1))
+    else:
+        records = []
+    print("Monte Carlo wall time %.1f s" % (time.time() - t0), flush=True)
+
+    cells = []
+    print("%6s %8s %10s %11s %10s %9s %8s"
+          % ("R2", "K", "exact AUC", "MC +/- SE", "lean", "resid", "err%"))
+    for ci, (r2, K) in enumerate(cells_spec):
+        rho = math.sqrt(r2)
+        ex_lo = exact_auc(rho, K, npts=20001)
+        ex_hi = exact_auc(rho, K, npts=80001)
+        blk = records[ci * reps:(ci + 1) * reps] if reps else []
+        mc = simprov.summarize([b["mc"] for b in blk])
+        lean_r2 = lean_equalVarianceGaussianAUCFromExplainedR2(r2)
+        resid = lean_r2 - ex_hi
+        cell = dict(
+            r2=r2, K=K, reps=reps,
+            exact=ex_hi,
+            exact_coarse=ex_lo,
+            # The oracle's own error bar: discretisation, not sampling.
+            exact_grid_delta=ex_hi - ex_lo,
+            mc=mc["mean"], mc_se=mc["se"], mc_sd=mc["sd"], mc_n=mc["n"],
+            mc_skipped=(mc["n"] == 0),
+            mc_skip_reason=(None if mc["n"] else
+                            ("--no-mc" if args.no_mc else
+                             "case arm below %d at K=%g" % (MC_MIN_CASES, K))),
+            mc_minus_exact=(None if mc["mean"] is None else mc["mean"] - ex_hi),
+            lean_fromR2=lean_r2,
+            lean_fromSNR=lean_equalVarianceGaussianAUCFromSNR(r2 / (1 - r2)),
+            residual=resid,
+            rel_err_pct=100.0 * resid / ex_hi)
+        cells.append(cell)
+        mcs = ("%.4f+/-%.4f" % (mc["mean"], mc["se"])
+               if mc["mean"] is not None and mc["se"] is not None
+               else ("%.4f" % mc["mean"] if mc["mean"] is not None else "skipped"))
+        print("%6.4f %8.5f %10.4f %11s %10.4f %9.4f %8.1f"
+              % (r2, K, ex_hi, mcs, lean_r2, resid, cell["rel_err_pct"]))
+
+    rmse = math.sqrt(sum(c["residual"] ** 2 for c in cells) / len(cells))
+    worst = max(cells, key=lambda c: abs(c["rel_err_pct"]))
+    grid_worst = max(abs(c["exact_grid_delta"]) for c in cells)
+    print("")
+    print("pooled RMSE of the chart against the exact AUC: %.4f over %d cells"
+          % (rmse, len(cells)))
+    print("worst cell: R2 = %.4f, K = %g, exact %.4f, chart %.4f, %.1f%% off"
+          % (worst["r2"], worst["K"], worst["exact"], worst["lean_fromR2"],
+             worst["rel_err_pct"]))
+    print("largest quadrature grid delta: %.2e  (the oracle's own uncertainty; "
+          "it must be small against the residual above)" % grid_worst)
+    if reps:
+        devs = [abs(c["mc_minus_exact"]) / c["mc_se"]
+                for c in cells
+                if c["mc_minus_exact"] is not None and c["mc_se"]]
+        if devs:
+            print("Monte Carlo vs quadrature: worst |MC - exact| / SE = %.2f "
+                  "over %d cells with a usable case arm"
+                  % (max(devs), len(devs)))
+
+    p = simprov.write(args.output, "popgen_defs/check_auc.py",
+                      dict(r2=args.r2, prevalence=args.prevalence,
+                           mc_target_cases=MC_TARGET_CASES,
+                           mc_n_min=MC_N_MIN, mc_n_max=MC_N_MAX,
+                           mc_min_cases=MC_MIN_CASES, no_mc=args.no_mc),
+                      args.seed, reps, cells, records)
+    print("-> %s (%d cells, %d replicate records)"
+          % (p, len(cells), len(records)))
 
 
 if __name__ == "__main__":
