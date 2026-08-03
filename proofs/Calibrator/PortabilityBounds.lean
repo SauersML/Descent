@@ -25,9 +25,19 @@ Reference: Wang et al. (2026), Nature Communications 17:942.
 /-!
 ## Fst-Based Neutral Benchmarks
 
-Under neutral evolution, the coarse allele-frequency benchmark ratio is exactly
-determined by `F_ST`. Under selection, that benchmark provides only an upper
-bound and is not a mechanistic portability law.
+**`neutralAFBenchmarkRatio` is FALSIFIED**, and the theorems in this section are
+statements about the expression, not about a measured quantity. It is not "exactly
+determined by `F_ST`", which is what this section used to say: at the measured
+`fstSource = 0.3577` the expression cannot exceed `1.557` for any target `F_ST` at all
+(`PortabilityDrift.neutralAFBenchmarkRatio_cannot_reach_measured`), while the measurement
+at that design point is `3.79 ± 0.25`. The observable is outside the formula's range, and
+no calibration of `fstTarget` repairs it; heterozygosity is governed by `Nₑ` and the
+mutation floor, not by a between-population variance ratio.
+
+What survives is the algebra: the expression equals one at equal `F_ST`, decreases in the
+target, lies in `(0,1)` when the target has diverged further, and can only shrink under a
+scalar selection factor. Those are proved below and each is a fact about
+`(1 - fstT)/(1 - fstS)`. Do not read a portability prediction off any of them.
 -/
 
 section FstBounds
@@ -70,9 +80,16 @@ theorem selection_worsens_neutral_af_benchmark
     and decreasing in `(Fst_T - Fst_S)`. The ratio equals
     `(1 - Fst_T)/(1 - Fst_S)`.
 
-    Worked example: With Fst ≈ 0.12 (EUR→EAS), ratio ≈ 0.88.
-    Worked example: With Fst ≈ 0.15 (EUR→YRI), ratio ≈ 0.85.
-    Observed R² drops are often larger, confirming non-neutral effects. -/
+    **The worked examples that stood here are withdrawn.** They read `ratio ≈ 0.88` at
+    `Fst ≈ 0.12` and `≈ 0.85` at `Fst ≈ 0.15`, and concluded that larger observed `R²`
+    drops confirm non-neutral effects. That inference ran through a formula measured to
+    be out of range — `3.79 ± 0.25` observed against a ceiling of `1.557` — so a gap
+    between it and the data is not evidence about selection. `Calibrator.HumanDemography`
+    reaches the neutral-floor conclusion by a route that survives measurement, and gets
+    `0.985` rather than `0.88` for the continental case, because the floor must be
+    computed from the branch quantity `1 - H_T/H_S` and not from a pairwise `F_ST`.
+
+    The bounds below are proved and are about the expression itself. -/
 theorem neutral_af_benchmark_bounded_by_fst
     (fstS fstT : ℝ)
     (h_fstS_lt : fstS < 1)
