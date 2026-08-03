@@ -335,9 +335,9 @@ theorem mutationSelectionBalance_eq_identityFraction (mu s h : ℝ) (hmu : mu �
     mutationSelectionBalance mu s h = fstMutationDriftEquilibrium (h * s / mu) := by
   have hsum : (1 : ℝ) + h * s / mu = (h * s + mu) / mu := by
     field_simp
+    ring
   unfold mutationSelectionBalance fstMutationDriftEquilibrium
   rw [hsum, one_div_div]
-  ring
 
 /-- **The dominant balance is a fixed point of the dominant map.** This is what
 makes the closed form above impossible to stipulate: it is derived from the
