@@ -4,7 +4,6 @@ import Calibrator.ImitationRigidity
 import Calibrator.DemographicHistory
 import Calibrator.AncestrySpecificArchitecture
 import Calibrator.PCCorrectability.Threshold
-import Calibrator.Identification
 import Calibrator.AssortativeMatingPGS
 import Calibrator.CovarianceStructure
 import Calibrator.AncestrySpecificPower
@@ -66,8 +65,8 @@ The two failures therefore need two different mechanisms.
 * Against a wrong signature: an obligation attached to the name. A named
   empirical quantity must be introduced together with the observable it claims
   to be, and a proof that the two agree. Then a formula that cannot depend on
-  `n` cannot be offered as an observable that does. That is `Identification`
-  in `Calibrator.Identification`.
+  `n` cannot identify an observable that does. Claims whose signatures omit
+  required variables are not exported as theorems.
 -/
 
 section Ploidy
@@ -144,9 +143,7 @@ They are deliberately *not* collapsed into one definition. The bodies coincide, 
 allele frequency and a migration rate are not the same quantity, and a single name would
 let a proof about one be applied to the other without anything failing. The theorem below
 records the coincidence, which is what a shared convention deserves — as against the
-island-model `F_ST`, where four names really did denote one quantity and are now one.
-
-There used to be two copies of this theorem, one per copy of the migration average. -/
+island-model `F_ST`, where four names really did denote one quantity and are now one. -/
 
 theorem effectiveSymmetricMigration_eq_meanAlleleFreq_map (m₁₂ m₂₁ : ℝ) :
     effectiveSymmetricMigration m₁₂ m₂₁ = meanAlleleFreq m₁₂ m₂₁ := by
@@ -154,8 +151,7 @@ theorem effectiveSymmetricMigration_eq_meanAlleleFreq_map (m₁₂ m₂₁ : ℝ
 
 /-- **Nei's `G_ST`, explicitly distinguished from Hudson's `F_ST`.** One minus the ratio
 of mean within-subgroup heterozygosity to TOTAL heterozygosity is the
-definition of `G_ST`; the docstring said exactly that and nobody noticed it
-described a different estimator from the one in the name. Hudson's `F_ST`
+definition of `G_ST`. Hudson's `F_ST`
 divides by the BETWEEN-subgroup heterozygosity `p₁(1-p₂) + p₂(1-p₁)`, not by
 the total-pool `2·p̄·(1-p̄)`. The two denominators differ by exactly
 `(p₁-p₂)²/2`, so THE DENOMINATORS agree iff `p₁ = p₂`, and the two ESTIMATORS
@@ -204,24 +200,18 @@ corpus into status reporting before anyone tested the slice it names.
     `neiContrastSpike`; silently exchanging them is therefore a biologically
     material error, not a harmless change of notation.
 
-    **This sentence used to end "at `p̄ ≠ 1/2`", which is the third instance of
-    one false claim in this file** and the last to be found. It implies the
-    factor VANISHES at `p̄ = 1/2`. It does not: measured ratios along that
-    exact slice are `1.995`, `1.923`, `1.724`, `1.220` -- monotone in
-    `|p₁ - p₂|` and never reaching `1`. The identity already in this file
-    settles it without any measurement: `hudsonFst_eq_of_neiGst` gives
-    `Hudson = 2G/(1+G)`, which equals `G` only at `G = 0` or `G = 1`, so the
-    exception named here is empty apart from the endpoints.
-    `neiGst_ne_hudsonFst_at_mean_half` certifies it at
-    `(9/10, 1/10)` -- `p̄ = 1/2` exactly, ratio `50/41`.
+    **There is no exception at `p̄ = 1/2`. Do not add one.** The factor does not
+    vanish there: measured ratios along that exact slice are `1.995`, `1.923`,
+    `1.724`, `1.220` -- monotone in `|p₁ - p₂|` and never reaching `1`. The
+    identity in this file settles it without any measurement:
+    `hudsonFst_eq_of_neiGst` gives `Hudson = 2G/(1+G)`, which equals `G` only at
+    `G = 0` or `G = 1`. `neiGst_ne_hudsonFst_at_mean_half` certifies it at
+    `(9/10, 1/10)` -- `p̄ = 1/2` exactly, ratio `50/41` -- and exists to stop an
+    "except at `p̄ = 1/2`" caveat being reintroduced.
 
-    Why it took three passes to remove: the pre-existing witness
-    `neiGst_ne_hudsonFst` sits at `p̄ = 2/5`, OUTSIDE the slice the claim
-    names, so the claim looked checked while nothing tested it. A witness
-    outside the exception cannot refute the exception. If you are ever tempted
-    to reintroduce an "except at `p̄ = 1/2`" caveat,
-    `neiGst_ne_hudsonFst_at_mean_half` below is what will stop you, and
-    it is placed there for that purpose.
+    Note which witness does the work: `neiGst_ne_hudsonFst` sits at `p̄ = 2/5`,
+    OUTSIDE that slice, and cannot refute a claim about it. A witness outside an
+    exception never refutes the exception.
 
     Empirical status: CONVENTION IDENTIFIED and NAME CORRECTED (Nei `G_ST`). -/
 noncomputable def neiGst (p₁ p₂ : ℝ) : ℝ :=
@@ -317,8 +307,8 @@ theorem neiGst_ne_hudsonFst :
   unfold neiGst hudsonFst ploidy meanAlleleFreq
   norm_num
 
-/-- **A witness ON the `p̄ = 1/2` slice**, which two docstrings and three
-`checks.py` clauses used to name as a place where the estimators agree.
+/-- **A witness ON the `p̄ = 1/2` slice**, where the estimators are sometimes
+claimed to agree. They do not.
 
 `p₁ = 9/10, p₂ = 1/10` has `p̄ = 1/2` exactly. `neiGst` (Nei's `G_ST`) is
 `16/25` and `hudsonFst` is `(16/25)/(41/50)`, a ratio of `50/41 ≈ 1.22`.
@@ -359,12 +349,10 @@ theorem neiGst_eq_varianceRatio (p₁ p₂ : ℝ)
 
 /-- **Cross-check: the two spellings of Nei's `G_ST` in this corpus agree.**
 
-RENAMED from `neiGstFromFrequencies_eq_hudsonFst`. That name asserted that
-`PopulationGeneticsFoundations.simpleFst` is Hudson's `F_ST`. The theorem is
-true and the name was the defect: what it proves is that two independently
-written spellings of NEI's `G_ST` coincide. Neither side is Hudson's estimator; that one is
-`hudsonFst`, and `neiGst_ne_hudsonFst` exhibits a point where it
-differs from both of these. -/
+What this proves is that two independently written spellings of NEI's `G_ST`
+coincide. **Neither side is Hudson's estimator.** That one is `hudsonFst`, and
+`neiGst_ne_hudsonFst` exhibits a point where it differs from both of these, so
+do not read either name here as Hudson's. -/
 theorem neiGstFromFrequencies_eq_neiGst (p₁ p₂ : ℝ)
     (h : meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) ≠ 0) :
     neiGstFromFrequencies p₁ p₂ = neiGst p₁ p₂ := by
@@ -443,34 +431,13 @@ theorem hudsonBbpSpike_ne_neiContrastSpike_at_mean_half :
     effectiveSubgroupSize ploidy meanAlleleFreq
   norm_num
 
-/-- **The Nei contrast spike, as an identification rather than a definition.**
-
-This is the mechanism of `Calibrator.Identification` applied to the quantity
-that motivated it. It identifies the per-frequency contrast normalization; it
-does not claim that the BBP experiment used Nei's estimator.
-
-    Empirical status: UNTESTED. -/
-noncomputable def neiContrastSpikeIdentification (n m p₁ p₂ : ℝ)
-    (h : meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) ≠ 0) :
-    Identification ℝ where
-  formula := neiContrastSpike n m p₁ p₂
-  observable :=
-    ((p₁ - p₂) ^ 2 / (meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂))) *
-      effectiveSubgroupSize n m
-  derivation := neiContrastSpike_eq_contrastVariance_mul_effectiveSize n m p₁ p₂ h
-  evidence := Evidence.derived
-
 end Differentiation
 
 section EquilibriumAgreements
 
-/-! **The island-model `F_ST` is now one definition.** It used to be written out
-independently in several modules — `DemographicHistory.demoIslandModelFst`,
-`PopulationGeneticsFoundations.islandModelFst`, `AncestrySpecificArchitecture.equilibriumFst`
-and `PortabilityDrift.fstMigrationDriftEquilibrium` — each spelling out its own factor of
-four, and this file carried a cross-check theorem per pair to keep them in step. The copies
-are gone in favour of the single `fstMigrationDriftEquilibrium`, so the cross-checks have
-nothing left to relate.
+/-! **The island-model `F_ST` is one definition, `fstMigrationDriftEquilibrium`.**
+Write new uses against it rather than spelling out `1 / (1 + 4 Nₑ m)` again; a second
+spelling would carry its own factor of four with nothing to hold it in step.
 
 `equilibriumFst` is worth recording as a hazard: it took its arguments in the opposite
 order to the other two, so the same call spelled the same way meant different things
@@ -510,17 +477,19 @@ theorem amEquilibrium_then_drift (V_A r h2 fst : ℝ) :
 
 /-! ### Tying the inlined genotype-variance restatements back to `ploidy`
 
-Five definitions across five modules used to spell out `2 p (1 - p)`
-independently, and none was related to any other, so a change to the ploidy
-convention in one would have left the others silently disagreeing. Four of the
-five are gone: `CovarianceStructure.genotypeVarianceAtLocus`,
-`GeneticArchitectureDiscovery.tagGenotypeVariance` and
-`StratificationConfounding.heterozygosity` were deleted and their references
-repointed, and `AncestrySpecificPower.ancestryHeterozygosity` was renamed
-`hweHeterozygosity`. What survives is one genotype variance and one
-heterozygote frequency, both in `AncestrySpecificPower`, related there by
-`hweHeterozygosity_eq_genotypeVarianceHWE`. These two theorems tie that pair
-back to `ploidy`, so the convention still has exactly one place to change. -/
+**A definition that INLINES the literal `2` is tied to the ploidy convention by
+nothing but the theorem that says so.** Those theorems are below, one per inlining
+definition, and each is the only edge between a literal and the named convention:
+change `ploidy` and they fail, which is their entire purpose. Do not delete one as a
+trivial restatement -- the definitions on their left-hand sides do not reference
+`ploidy`, so the equality holds only because `rfl` reduces `ploidy` to `2`.
+
+Prefer calling `hweGenotypeVariance` in new code, so no new edge is needed.
+
+The two inlinings are `genotypeVarianceHWE` and `hweHeterozygosity`, both in
+`AncestrySpecificPower` and related to each other there by
+`hweHeterozygosity_eq_genotypeVarianceHWE`. The two theorems below tie that pair back to
+`ploidy`, so the convention has exactly one place to change. -/
 
 theorem genotypeVarianceHWE_eq_hwe (p : ℝ) :
     genotypeVarianceHWE p = hweGenotypeVariance p := by
@@ -532,10 +501,9 @@ theorem hweHeterozygosity_eq_hwe (p : ℝ) :
 
 /-! ### Tying the island-model equilibrium back to the scaled rate
 
-`1 / (1 + 4 Nₑ m)` used to be spelled out by several definitions across several modules,
-and this section carried one bridge theorem per copy — three of them with identical
-statements and identical proofs. There is now a single definition, so there is a single
-bridge: it is the migration-drift equilibrium at the scaled migration rate. -/
+One definition, one bridge: the island-model equilibrium is the migration-drift
+equilibrium at the scaled migration rate. A second spelling of `1 / (1 + 4 Nₑ m)` would
+need its own bridge theorem, which is a reason not to add one. -/
 
 theorem fstMigrationDriftEquilibrium_eq_scaled (Ne m : ℝ) :
     fstMigrationDriftEquilibrium Ne m =
@@ -598,12 +566,10 @@ theorem neutralDriftFactor_uses_timeScale (Ne : ℝ) (t : ℕ) :
     neutralDriftFactor Ne t = (1 - 1 / coalescentTimeScale Ne) ^ t := by
   unfold neutralDriftFactor; rw [coalescentTimeScale_eq]
 
-/-- RESTATED. This used to read
-`ldRetainedFraction Ne t = (1 - 1/coalescentTimeScale Ne)^t`, which was true of
-a body that had dropped the recombination factor and false of the corrected
-one. It is restated rather than deleted because the convention it was pinning
--- that the drift channel enters through `2·Nₑ` -- is still present and still
-worth pinning; what changed is that drift is no longer the whole retention. -/
+/-- **The drift channel enters through `2·Nₑ`, and drift is not the whole retention.**
+The recombination factor `(1 - r)` is part of the retained fraction, so
+`(1 - 1/coalescentTimeScale Ne)^t` alone is NOT this quantity -- it is the `r = 0`
+slice. This theorem pins the `2·Nₑ` convention inside the full expression. -/
 theorem ldRetainedFraction_uses_timeScale (r Ne : ℝ) (t : ℕ) :
     ldRetainedFraction r Ne t
       = ((1 - r) * (1 - 1 / coalescentTimeScale Ne)) ^ t := by
@@ -709,10 +675,9 @@ theorem expectedPGSDiffVariance_eq_ploidy_form (V_A fst : ℝ) :
 Each of these uses the ploidy convention once, with no sibling to disagree
 with, so only a derivation from `ploidy` ties them down. -/
 
-/-- RESTATED. This used to read `ldHalfLife Ne = coalescentTimeScale Ne * log 2`,
-which is the `r → 0` limit and is false of the corrected body at every `r > 0`.
-The `2·Nₑ` convention still appears, now inside the retention whose logarithm
-sets the half-life, and that is what this states. -/
+/-- **Do not simplify this to `coalescentTimeScale Ne * log 2`.** That is the `r → 0`
+limit and is false at every `r > 0`. The `2·Nₑ` convention appears inside the retention
+whose logarithm sets the half-life, which is what this states. -/
 theorem ldHalfLife_uses_timeScale (r Ne : ℝ) :
     ldHalfLife r Ne
       = Real.log 2 / (-Real.log ((1 - r) * (1 - 1 / coalescentTimeScale Ne))) := by
@@ -918,30 +883,25 @@ them. Three are kept, immediately below: each ties one spelling to this primitiv
 together they make a divergence between any two spellings a failed proof. The other three
 were pairwise restatements implied by these by transitivity, and are deleted.
 
-**CORRECTION, and this paragraph used to say the opposite.** It read: "the collapse to
-one name is the fix and has not been done ... `geometricDecay` is the name to keep ...
-the other three can each be a *use* of it without loss." That instruction was wrong and
-is withdrawn. `PortabilityDrift.lean` became editable and the four were read against the
-criterion instead of counted, which reversed the call:
+**DO NOT FOLD THESE FOUR NAMES INTO ONE.** They are one FUNCTION under four
+REFERENTS, and a name census sees only the arithmetic:
 
-  * `PortabilityDrift.admixtureLDDecay` MUST NOT be folded. It is `VALIDATED` as the
-    `Nₑ → ∞` limit and `MEASURED` high by `+0.24%` to `+0.37%` against finite-population
-    retention, with `admixtureLDDecay_ge_finitePopulation` proving the bias is one-sided
-    rather than leaving it to the runs that happened to be done. Folding it into a bare
-    primitive would detach a measured regime and a proved error direction from the name
-    they describe.
-  * `DGP.discreteRecombinationSurvival` is the survival of two linked loci to the MRCA --
-    a genealogical probability, not an LD quantity.
-  * `LongitudinalPortability.ldDecayPerGeneration` is per-generation LD decay.
+  * `geometricDecay` -- the bare primitive, and the hub.
+  * `PortabilityDrift.admixtureLDDecay` -- admixture LD decay. VALIDATED as the
+    `Nₑ → ∞` limit and MEASURED high by `+0.24%` to `+0.37%` against
+    finite-population retention, with `admixtureLDDecay_ge_finitePopulation`
+    proving the bias is one-sided. Folding it into a bare primitive would detach
+    a measured regime and a proved error direction from the name they describe.
+  * `DGP.discreteRecombinationSurvival` -- survival of two linked loci to the
+    MRCA, a genealogical probability rather than an LD quantity.
+  * `LongitudinalPortability.ldDecayPerGeneration` -- per-generation LD decay.
 
-So this is not one function under four names. It is one FUNCTION under four REFERENTS,
-three correctly named and one carrying measurements -- the same shape as
-`hweHeterozygosity` and `genotypeVarianceHWE`, which are both `2p(1-p)` and are
-heterozygosity and dosage variance respectively. Identical arithmetic is not identical
-meaning, and a name census counts only the arithmetic.
+Identical arithmetic is not identical meaning. `hweHeterozygosity` and
+`genotypeVarianceHWE` are both `2p(1-p)` and are heterozygosity and dosage
+variance respectively; the same holds here at larger scale.
 
-What the hub theorems below are for is unchanged, and three is the right amount of
-machinery: a divergence between any two spellings fails one of them. -/
+The three hub theorems below are the right amount of machinery: a divergence
+between any two spellings fails one of them. -/
 noncomputable def geometricDecay (r : ℝ) (t : ℕ) : ℝ := (1 - r) ^ t
 
 theorem ldDecayPerGeneration_eq_geometricDecay (r : ℝ) (t : ℕ) :
@@ -1002,16 +962,8 @@ theorem presentDayPGSVariance_eq_retainedFraction (V_A fst : ℝ) :
     presentDayPGSVariance V_A fst = retainedFraction fst V_A := by
   unfold presentDayPGSVariance pgsVarianceFromHet retainedFraction; ring
 
-/-! `explainedR2FromTransportMoments_eq_pgsR2` used to sit here. It was the `Eq.symm` of
-`TransferLearningPGS.pgsR2_eq_explainedR2FromTransportMoments`, which states the same
-identity and proves it by `rfl` — the two bodies are the same term, not merely `ring`-equal.
-Two names for one restatement is one restatement too many, and nothing referenced either,
-so the copy in this file is deleted and the identity is stated once, next to `pgsR2`. -/
-
-/-! The two portability ratios were the same quotient of transported metrics,
-written once in `SimulationValidation` and once in
-`GeneticArchitectureDiscovery`. `sourceTargetPortabilityRatio` has been deleted
-and `GeneticArchitectureDiscovery` now calls `mechanisticPortabilityRatio`. -/
+/-! `explainedR2FromTransportMoments` and `pgsR2` are the same term; the identity is
+stated once, next to `pgsR2` in `TransferLearningPGS`. -/
 
 /-! ### The regime obligation, stated once
 
@@ -1027,19 +979,17 @@ mechanisms. Recorded here so that a new one added without any of them is visibly
 departure rather than an oversight:
 
 * **In the signature.** The definition takes a structure whose fields include the
-  assumption: `ClosedPopulationNoMutation.mutation_negligible`,
-  `InfiniteIslandLimit.limit_adequate`.
+  regime definition: `ClosedPopulationNoMutation` has mutation fixed to zero,
+  an explicitly stated approximation inequality.
 * **Tied to a regime object.** A theorem identifies the bare formula with a quantity of a
   named regime: `closedPopulation_het_eq_neutralDriftFactor`,
   `heterozygosityLossFromDrift_eq_closedPopulation_measuredLoss` and its two siblings.
-* **As an external obligation.** The quantity the closed form claims to be is a field
-  supplied by the caller, and the regime is the hypothesis that they agree:
-  `PowerAgreement`, `GaussianLiabilityRegime`, `FittedSelectionLaw`. Used where the
-  development has no derivation available, so that asserting one would be the
-  `singletonProportion` failure.
+* **Never as an external theorem field.** If the development has no derivation connecting
+  a numerical chart to a scientific observable, no identification theorem is exported.
+  A citation or caller-supplied proposition cannot manufacture that theorem.
 * **As a proved failure.** The departure is itself a theorem, so the limit is checkable
   rather than described: `neutralAFBenchmarkRatio_cannot_reach_measured`,
-  `InfiniteIslandLimit.two_demes_excess`,
+  `finiteIslandCorrection_two_excess`,
   `demoSteppingStoneFst_indistinguishable_from_quadratic`,
   `pairwiseFstFromBranches_eq_fstFromTau_add_mul`,
   `sampleLimitedScratchTargetR2_negative_of_small_sample`.
