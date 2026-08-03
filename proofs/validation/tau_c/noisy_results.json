@@ -1,0 +1,132 @@
+{
+ "meta": {
+  "python": "3.12.13",
+  "nproc": 16,
+  "M": 6000000,
+  "lam": 1.0,
+  "V": 1.0,
+  "note": "tau_c where premium of c=alpha*(x_S+eps) over blind crosses zero; predicted log(1/(alpha(1+s2/V)/2))/lam"
+ },
+ "rows": [
+  {
+   "s2_over_V": 0.0,
+   "alpha": 1.0,
+   "measured_tau_c": 0.6921408775242384,
+   "ci95": [
+    0.6907463328410106,
+    0.6934954049968014
+   ],
+   "n_boot_crossed": 1500,
+   "predicted_tau_c": 0.6931471805599453,
+   "baseline_log2_over_lam": 0.6931471805599453
+  },
+  {
+   "s2_over_V": 0.0,
+   "alpha": 0.5,
+   "measured_tau_c": 1.3840451800467055,
+   "ci95": [
+    1.3809314757673854,
+    1.387073132301452
+   ],
+   "n_boot_crossed": 1500,
+   "predicted_tau_c": 1.3862943611198906,
+   "baseline_log2_over_lam": 0.6931471805599453
+  },
+  {
+   "s2_over_V": 0.1,
+   "alpha": 1.0,
+   "measured_tau_c": 0.5971253743825631,
+   "ci95": [
+    0.5957777682837673,
+    0.5983526703084434
+   ],
+   "n_boot_crossed": 1500,
+   "predicted_tau_c": 0.5978370007556204,
+   "baseline_log2_over_lam": 0.6931471805599453
+  },
+  {
+   "s2_over_V": 0.1,
+   "alpha": 0.5,
+   "measured_tau_c": 1.289302389505261,
+   "ci95": [
+    1.2863161944964947,
+    1.2921394442955614
+   ],
+   "n_boot_crossed": 1500,
+   "predicted_tau_c": 1.2909841813155658,
+   "baseline_log2_over_lam": 0.6931471805599453
+  },
+  {
+   "s2_over_V": 0.25,
+   "alpha": 1.0,
+   "measured_tau_c": 0.468880523899441,
+   "ci95": [
+    0.46775478199166054,
+    0.47006977706342123
+   ],
+   "n_boot_crossed": 1500,
+   "predicted_tau_c": 0.47000362924573563,
+   "baseline_log2_over_lam": 0.6931471805599453
+  },
+  {
+   "s2_over_V": 0.25,
+   "alpha": 0.5,
+   "measured_tau_c": 1.1609685597363342,
+   "ci95": [
+    1.1582830114286975,
+    1.1637151838603743
+   ],
+   "n_boot_crossed": 1500,
+   "predicted_tau_c": 1.1631508098056809,
+   "baseline_log2_over_lam": 0.6931471805599453
+  },
+  {
+   "s2_over_V": 0.5,
+   "alpha": 1.0,
+   "measured_tau_c": 0.2869718476987114,
+   "ci95": [
+    0.28596202731227105,
+    0.28794495788163543
+   ],
+   "n_boot_crossed": 1500,
+   "predicted_tau_c": 0.28768207245178085,
+   "baseline_log2_over_lam": 0.6931471805599453
+  },
+  {
+   "s2_over_V": 0.5,
+   "alpha": 0.5,
+   "measured_tau_c": 0.9792090228911876,
+   "ci95": [
+    0.9767625905378905,
+    0.9815250293165092
+   ],
+   "n_boot_crossed": 1500,
+   "predicted_tau_c": 0.9808292530117262,
+   "baseline_log2_over_lam": 0.6931471805599453
+  },
+  {
+   "s2_over_V": 1.0,
+   "alpha": 1.0,
+   "measured_tau_c": 0.00014391497044493056,
+   "ci95": [
+    1.443959090930838e-05,
+    0.0009364031276624864
+   ],
+   "n_boot_crossed": 967,
+   "predicted_tau_c": null,
+   "baseline_log2_over_lam": 0.6931471805599453
+  },
+  {
+   "s2_over_V": 1.0,
+   "alpha": 0.5,
+   "measured_tau_c": 0.6920256316838493,
+   "ci95": [
+    0.6898236199542356,
+    0.6941043193928167
+   ],
+   "n_boot_crossed": 1500,
+   "predicted_tau_c": 0.6931471805599453,
+   "baseline_log2_over_lam": 0.6931471805599453
+  }
+ ]
+}

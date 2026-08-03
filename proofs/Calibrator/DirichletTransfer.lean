@@ -465,6 +465,84 @@ theorem myopiaPrice_nonneg (lam τ V : ℝ) (hV : 0 ≤ V) : 0 ≤ myopiaPrice l
   unfold myopiaPrice
   simp
 
+
+/-! ### Measured, and what the measurement changed
+
+All five claims of this section hold **quantitatively**, to `|z| ≤ 2.7` across 22 horizons
+with no free parameters, on both an exact-transition multi-mode Ornstein–Uhlenbeck harness and
+a forward Wright–Fisher one (bounded, non-Gaussian, discrete population). The crossing
+measures `0.69411`, CI95 `[0.69289, 0.69524]`, against `log 2 = 0.693147`.
+
+**A positive control I stated was wrong, and its failure is the claim working.** I wrote that
+as `τ → ∞` all three designs converge to blind. False: damped → blind (`5.4e-12`), but stale
+→ `-V` and oracle → `+V`. It *has* to be false — if the stale design converged to blind there
+would be no sign flip to claim.
+
+**Three things that would burn a practitioner**, none of which the algebra sees:
+
+* **`λ` belongs to the value signal, not the environment.** In one Wright–Fisher population
+  (`N = 500`, `u = 0.005`) the linear allele-frequency signal relaxes at `0.01005`/gen
+  (mutation only), giving `τ_c = 69`; the quadratic heterozygosity signal in the *same*
+  process relaxes at `≈ 4u + 1/(2N) = 0.0211`/gen (mutation *and* drift), giving `τ_c = 32.8`.
+  Two signals, one environment, `2.1×` apart. The obvious process-level guess `λ = 1/(2N)`
+  gives `693` — `10×` and `21×` too long.
+* **`τ` is total path length, not divergence depth.** For two sister populations diverging for
+  `d` generations, the measured crossing is `34.20` against `34.48` predicted at `τ = 2d` and
+  `68.97` at `τ = d`. Reading `τ` off a divergence time is wrong by exactly a factor of two.
+* **A real stale design is fitted, hence noisy, and that moves `τ_c` earlier.** With fitting
+  noise `s²`, the crossing moves to `ρ = (1 + s²/V)/2`: measured `0.4689` at `s²/V = 0.25`,
+  `0.2870` at `0.5`, and at `s²/V = 1` **the stale design never beats blind at any horizon**.
+  So `log 2/λ` is an *upper bound* on the real crossover, not the crossover.
+
+**And the single-rate formula is not conservative.** With value spread over several rates the
+crossing solves `E[2e^{-λτ_c}] = 1`, which the measurement confirms; quoting `log 2/λ_slowest`
+overstates `τ_c` by `+71%`, `+285%` and `+715%` in the three configurations tested.
+
+**Estimating `λ` inherits its whole sampling error.** From 50 observations of an AR(1) with
+`λ = 1`, `τ_c` has a 95% range of `[0.18, 2.29]` — a factor of `12.7`; even 1000 observations
+give `[0.51, 0.92]`.
+
+**Which is why the rule to carry is the damping, not the threshold.** The safe shrinkage region
+is `0 < α < 2ρ`, so **over-estimating `λ` is always safe** and under-estimating is safe up to
+`log 2/τ`. `shrinkage_safe_of_overestimated_rate` proves it: damping by a rate at least the
+true one strictly beats not adapting, at every horizon, whatever the true rate is. The
+threshold does not survive a badly estimated `λ`; the damping does.
+
+Empirical status: **VALIDATED** (`proofs/validation/tau_c/`). Untested: non-reversible
+couplings, value functionals not linear-quadratic in the metric that diagonalises `L`,
+non-stationary environments, and continuum spectral measures. -/
+
+/-- Premium of an **arbitrary** shrinkage `α` over the blind design, where `ρ = e^{-λτ}` is the
+    correct damping factor: `α(2ρ - α)V`. Measured across 32 cells at `|z| < 1.3`. -/
+noncomputable def shrinkagePremium (α ρ V : ℝ) : ℝ := α * (2 * ρ - α) * V
+
+/-- **The safe region is `0 < α < 2ρ`.** Damping helps for any shrinkage strictly between zero
+    and twice the correct factor — a wide target, which is why the rule tolerates a
+    mis-estimated rate. -/
+theorem shrinkagePremium_pos (α ρ V : ℝ) (hV : 0 < V) (hα : 0 < α) (hlt : α < 2 * ρ) :
+    0 < shrinkagePremium α ρ V := by
+  unfold shrinkagePremium
+  have h : 0 < 2 * ρ - α := by linarith
+  exact mul_pos (mul_pos hα h) hV
+
+/-- **Over-estimating the relaxation rate is always safe.**
+
+    If the rate used is at least the true one, the resulting damping factor lands in `(0, ρ]`,
+    inside the safe region, so the damped design strictly beats not adapting — at every
+    horizon and whatever the true rate is. This is the sense in which the shrinkage rule
+    survives a badly estimated `λ` while the threshold `τ < log 2/λ` does not. -/
+theorem shrinkage_safe_of_overestimated_rate (lam lamHat τ V : ℝ)
+    (hV : 0 < V) (hτ : 0 < τ) (hge : lam ≤ lamHat) :
+    0 < shrinkagePremium (Real.exp (-(lamHat * τ))) (Real.exp (-(lam * τ))) V := by
+  refine shrinkagePremium_pos _ _ V hV (Real.exp_pos _) ?_
+  have hmono : Real.exp (-(lamHat * τ)) ≤ Real.exp (-(lam * τ)) := by
+    apply Real.exp_le_exp.mpr
+    have : lam * τ ≤ lamHat * τ := mul_le_mul_of_nonneg_right hge (le_of_lt hτ)
+    linarith
+  have hpos : 0 < Real.exp (-(lam * τ)) := Real.exp_pos _
+  linarith
+
+
 end ShrinkageRule
 
 end DirichletTransfer

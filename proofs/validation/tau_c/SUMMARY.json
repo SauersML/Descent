@@ -1,0 +1,100 @@
+{
+ "target": "proofs/Calibrator/DirichletTransfer.lean, sections StalenessCrossover and ShrinkageRule",
+ "date": "2026-08-03",
+ "model": "LQ design problem J(c; x_T) = 2<c, x_T>_w - ||c||^2_w on a reversible environment; blind c=0, stale c=x_S, damped c=P_tau x_S, oracle c=x_T. Payoffs evaluated on simulated states; the premium formulas are never fed into the payoff computation.",
+ "harnesses": {
+  "A": "exact-transition multi-mode OU (no time discretisation); tau_c_sim.py -> tau_c_results.json",
+  "A_prime": "common-random-number crossing root-find + block bootstrap; tau_c_sim.py",
+  "B": "AR(1) estimation of lambda from finite series; tau_c_sim.py",
+  "C": "forward Wright-Fisher with symmetric mutation (bounded, non-Gaussian, discrete population); tau_c_sim.py + refine.py -> refine_results.json",
+  "D": "Wright-Fisher SPLIT (two sister populations from a stationary ancestor); split_sim.py -> split_results.json",
+  "E": "measured shrinkage-alpha sweep; refine.py",
+  "F": "noisy (estimated) source design; noisy.py -> noisy_results.json"
+ },
+ "positive_controls": {
+  "tau_0": "PASS. stale = damped = oracle = 0.99917 +/- 0.00100, blind = 0, V = 1.",
+  "tau_infinity": "damped -> 5.4e-12 (= blind) PASS. stale -> -1.0024 +/- 0.0017 (= -V, NOT blind). oracle -> +1.0001 +/- 0.0010 (= +V, NOT blind). The stated control 'all three converge to blind' is WRONG for stale and oracle; if stale converged to blind the sign-flip claim would be false."
+ },
+ "verdicts": {
+  "1_horizon_optimal_is_P_tau_g": "SUPPORTED (damped attains the max of the measured value over the alpha sweep at alpha = rho, all horizons).",
+  "2_damped_premium_exp_neg_2_lam_tau_V": "CONFIRMED. |z| <= 2.3 over 22 horizons; positive at every horizon tested out to lam*tau = 7.",
+  "3_stale_premium_2exp_neg_lam_tau_minus_1_V": "CONFIRMED. |z| <= 2.7 over 22 horizons; strictly negative past tau_c.",
+  "4_sign_flip_at_tau_c": "CONFIRMED. Measured crossing 0.69411, bootstrap CI95 [0.69289, 0.69524], M = 8e6; log 2 = 0.693147 lies inside.",
+  "5_myopia_price_1_minus_exp_squared_V": "CONFIRMED. |z| <= 2.5 over 22 horizons.",
+  "d_multi_rate": "CONFIRMED and MATERIAL. The mixture equation E[2 exp(-lam tau_c)] = 1 is right in all three configurations; log2/lam_slowest overstates tau_c by 71% to 715%.",
+  "damping_never_hurts": "TRUE ONLY FOR alpha < 2 rho. Measured premium of shrinkage alpha is alpha(2 rho - alpha) V (32/32 cells, |z| < 1.3). Damping with the CORRECT factor never hurts; damping with alpha > 2 rho does hurt."
+ },
+ "single_rate": {
+  "lam": 1.0, "V": 1.0, "M": 8000000,
+  "tau_c_measured": 0.6941136, "tau_c_ci95": [0.6928937, 0.6952432],
+  "tau_c_theory": 0.6931472
+ },
+ "multi_rate": [
+  {"w": [1,1], "lam": [1,10], "measured": 0.18018, "ci95": [0.17975, 0.18063],
+   "mixture_theory": 0.18023, "naive_log2_over_slowest": 0.69315, "naive_rel_error": "+284.6%"},
+  {"w": [3,1], "lam": [0.5,20], "measured": 0.81155, "ci95": [0.80930, 0.81382],
+   "mixture_theory": 0.81093, "naive_log2_over_slowest": 1.38629, "naive_rel_error": "+71.0%"},
+  {"w": [1,1,1], "lam": [0.3,2,15], "measured": 0.28366, "ci95": [0.28287, 0.28446],
+   "mixture_theory": 0.28345, "naive_log2_over_slowest": 2.31049, "naive_rel_error": "+715.1%"}
+ ],
+ "lambda_identification": {
+  "finding_1_lambda_belongs_to_the_signal_not_the_process": {
+   "process": "Wright-Fisher, N=500, u=0.005 (theta=4Nu=10), 5920 chains, T=1492 gens",
+   "linear_signal_q_eq_p_minus_half": {"lam_exact": 0.010050, "lam_identity": "-log(1-2u), MUTATION only",
+    "tau_c_exact": 68.97, "tau_c_measured": 69.18, "ci95": [68.43, 70.04]},
+   "quadratic_signal_q_squared": {"lam_exact": 0.021101, "lam_identity": "-log[(1-2u)^2 (1-1/2N)] ~ 4u + 1/(2N), MUTATION and DRIFT",
+    "tau_c_exact": 32.85, "tau_c_measured": 32.81, "ci95": [32.35, 33.25]},
+   "naive_process_level_guess": {"lam": 0.001, "identity": "1/(2N), the drift/coalescent rate",
+    "tau_c": 693.1, "error_vs_linear": "10.0x too long", "error_vs_quadratic": "21.1x too long"},
+   "reading": "Same environment, two value signals, tau_c differing by 2.1x; the plausible process-level guess is off by 10-21x."
+  },
+  "finding_2_tau_is_path_length_not_divergence_depth": {
+   "model": "stationary ancestor splits; two descendants evolve independently for d generations",
+   "configs": [
+    {"N": 500, "u": 0.005, "measured_depth_crossing": 34.20, "ci95": [33.30, 35.21],
+     "pred_if_tau_eq_2d": 34.48, "pred_if_tau_eq_d": 68.97},
+    {"N": 1000, "u": 0.002, "measured_depth_crossing": 86.99, "ci95": [84.24, 89.79],
+     "pred_if_tau_eq_2d": 86.47, "pred_if_tau_eq_d": 172.94}
+   ],
+   "reading": "tau is the total path length between source and target, = 2 x divergence depth. Reading tau off the split time halves tau and doubles the apparent tau_c."
+  },
+  "finding_3_estimating_lambda_from_data": {
+   "method": "AR(1) regression on a finite series of the environment, lam_true = 1, dt = 0.1",
+   "rows": [
+    {"n_obs": 50, "lam_mean": 1.4038, "lam_ci95": [0.2793, 3.7658], "tau_c_ci95": [0.1795, 2.2870]},
+    {"n_obs": 200, "lam_mean": 1.0957, "lam_ci95": [0.5576, 1.9506], "tau_c_ci95": [0.3559, 1.2461]},
+    {"n_obs": 1000, "lam_mean": 1.0197, "lam_ci95": [0.7574, 1.3613], "tau_c_ci95": [0.5096, 0.9165]},
+    {"n_obs": 5000, "lam_mean": 1.0043, "lam_ci95": [0.8812, 1.1470], "tau_c_ci95": [0.6045, 0.7867]}
+   ],
+   "reading": "tau_c inherits the full sampling error of lam and is biased high at small n. At 50 observations the 95% interval for tau_c spans a factor of 12.7."
+  },
+  "finding_4_shrinkage_is_robust_where_tau_c_is_not": {
+   "law": "premium of shrinkage alpha over blind = alpha(2 rho - alpha) V, measured over 32 (tau, alpha) cells, |z| < 1.3",
+   "safe_region": "0 < alpha < 2 rho, equivalently lam_hat > lam - log2/tau",
+   "reading": "OVER-estimating lambda is always safe (any alpha in (0, rho) strictly beats blind). UNDER-estimating is safe only within log2/tau. So the shrinkage rule tolerates a mis-identified lambda far better than the tau_c threshold does; the threshold is the fragile part of the result, the rule is not."
+  },
+  "finding_5_a_real_stale_design_is_noisy": {
+   "model": "c = alpha (x_S + eps), eps ~ N(0, s2) independent of the environment",
+   "law": "premium = 2 alpha rho V - alpha^2 (V + s2); crossing at rho = alpha (1 + s2/V)/2",
+   "rows": [
+    {"s2_over_V": 0.00, "alpha": 1.0, "measured": 0.6921, "ci95": [0.6907, 0.6935], "predicted": 0.6931},
+    {"s2_over_V": 0.10, "alpha": 1.0, "measured": 0.5971, "ci95": [0.5958, 0.5984], "predicted": 0.5978},
+    {"s2_over_V": 0.25, "alpha": 1.0, "measured": 0.4689, "ci95": [0.4678, 0.4701], "predicted": 0.4700},
+    {"s2_over_V": 0.50, "alpha": 1.0, "measured": 0.2870, "ci95": [0.2860, 0.2879], "predicted": 0.2877},
+    {"s2_over_V": 1.00, "alpha": 1.0, "measured": 0.0001, "ci95": [0.0000, 0.0009], "predicted": "no positive horizon"},
+    {"s2_over_V": 0.00, "alpha": 0.5, "measured": 1.3840, "ci95": [1.3809, 1.3871], "predicted": 1.3863},
+    {"s2_over_V": 1.00, "alpha": 0.5, "measured": 0.6920, "ci95": [0.6898, 0.6941], "predicted": 0.6931}
+   ],
+   "reading": "Fitting noise moves tau_c EARLIER, never later: log2/lam is an UPPER bound on the real crossover. A design with s2 >= V never beats blind at any horizon. Existing shrinkage (alpha<1) pushes it later. log2/lam is exact only for a noiselessly-estimated, unshrunk design."
+  }
+ },
+ "residual_tensions": {
+  "wf_theta_0.6_linear": "measured 470.81, CI95 [464.23, 477.55] vs exact 461.75 -- +2.0%, about 2.5 sigma high. The lowest-theta (most U-shaped, heaviest-tailed) configuration. The two higher-precision configurations agree to 0.3% and 0.1%, so this is read as Monte Carlo, not a defect in the law.",
+  "not_tested": [
+   "non-reversible couplings (every claim rests on reversibility; nothing here probes what breaks without it)",
+   "value functionals that are not linear-quadratic in the SAME metric that diagonalises L",
+   "non-stationary environments (all harnesses start from the stationary law)",
+   "the continuum/infinite-rank spectral measure -- only finite rate mixtures up to 3 modes"
+  ]
+ }
+}
