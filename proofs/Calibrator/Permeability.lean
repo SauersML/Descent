@@ -73,6 +73,44 @@ noncomputable def diagonalPermeability {ι : Type*} [Fintype ι]
     (covariance covarianceDerivative : ι → ℝ) : ℝ :=
   ∑ i, scalarPermeability (covariance i) (covarianceDerivative i)
 
+/-- A common tagging or assay attenuation acts on every independent completion channel
+by the same inverse-square law.  This is useful for panels in which the same call-rate,
+imputation-quality, or conditional-support factor multiplies every covariance response.
+
+The premise is deliberately algebraic: a biological model must still prove that its
+channel derivatives are multiplied by `η`. -/
+theorem diagonalPermeability_derivative_scale {ι : Type*} [Fintype ι]
+    (covariance covarianceDerivative : ι → ℝ) (η : ℝ) :
+    diagonalPermeability covariance (fun i => η * covarianceDerivative i) =
+      η ^ 2 * diagonalPermeability covariance covarianceDerivative := by
+  unfold diagonalPermeability
+  simp_rw [scalarPermeability_derivative_scale]
+  rw [Finset.mul_sum]
+
+/-- Information in `m` independent Gaussian estimator draws for one completed
+deployment coordinate.  Here `m` is real-valued so the exact design law can also describe
+effective cohort size; an actual study rounds the resulting requirement upward. -/
+noncomputable def totalGaussianInformation
+    (m covariance covarianceDerivative : ℝ) : ℝ :=
+  m * scalarPermeability covariance covarianceDerivative
+
+/-- **Exact inverse-square cohort law.** If imperfect tagging, assay sensitivity, or
+conditional support attenuates a covariance derivative by a nonzero factor `η`, then
+`m / η²` estimator replicates recover exactly the information supplied by `m` unattenuated
+replicates.
+
+Thus a model-specific proof of linear derivative attenuation immediately yields the
+portable method-design rule: halving the usable LD/haplotype signal requires four times
+as many independent target cohorts or estimator draws.  The theorem does not assert that
+every biological support mechanism is linear. -/
+theorem inverse_square_replicates_compensate_attenuation
+    (m covariance covarianceDerivative η : ℝ) (hη : η ≠ 0) :
+    totalGaussianInformation (m / η ^ 2) covariance (η * covarianceDerivative) =
+      totalGaussianInformation m covariance covarianceDerivative := by
+  unfold totalGaussianInformation
+  rw [scalarPermeability_derivative_scale]
+  field_simp [hη]
+
 /-- Independent channels have zero total permeability exactly when every covariance
 derivative vanishes. -/
 theorem diagonalPermeability_eq_zero_iff {ι : Type*} [Fintype ι]
