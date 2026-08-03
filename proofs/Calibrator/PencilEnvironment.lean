@@ -67,10 +67,43 @@ finite-path enumeration identifying it with the mixed trace is validated computa
 it is not encoded by that Lean theorem. Thus the refutation applies to this positive i.i.d.
 tridiagonal model, not automatically to every bounded-bandwidth ensemble.
 
-Empirical status: the identity `κ = E[ldWhiteningGain]` is DERIVED and its constant case is
-VALIDATED upstream to `2e-16`. The finite path count is tested by
-`validation/pencil/pencil_freeness.py`; Lean proves positivity of the resulting expression.
-The heavy-tail trichotomy is ASSERTED from the external analysis and is not proved here.
+## Measured
+
+**The `κ` identification is exact where it is claimed to be.** The summand is bit-identical
+to `ldWhiteningGain ρ` at every `ρ` tested (`0, 0.1, 0.5, 0.9, 0.99, -0.7`), and the sum
+formula matches an explicit `Tr(Σ⁻¹)/m` on the inhomogeneous chain to `9.4e-16` over 15 cases.
+`κ_m` itself is **not** equal to the gain at finite `m` — the boundary term makes
+`κ_m - g = (1-g)/m` exactly — which `whiteningGain_finite_trace` states and which the prose
+above states as a limit. At `ρ = 0.99, m = 100` that deficit is `0.985`, a full 1%, so the
+finite-`m` distinction must not be allowed to drift into an equality in later prose.
+
+**The path-count coefficients are confirmed**, fitted over 16 distribution pairs and three
+chain lengths including `expo(1)` against `const(√2)`, which share `E[α²] = 2` but differ in
+mean so the two terms are separately identified (design-column correlation `0.88`, carried in
+the errors): `c₁ = 2.0033 ± 0.0051` and `c₂ = 3.9917 ± 0.0086`, the latter `0.97σ` from `4`.
+The exact finite-`m` form `ababFinite` below matches 42 ensembles at `max|z| = 2.07`.
+
+**The control was made harder so it could not be dismissed.** Beyond a Haar-rotated pair
+returning `0` (`-0.0016 ± 0.0046` at `m = 800`), shifting both matrices by the identity gives
+a case where freeness predicts a **nonzero** `4.995`: the rotated pair returns
+`4.9945 ± 0.0057` while the banded pair sits at `18.97`. The harness reproduces the free
+formula when freeness holds and separates the two by about 1000σ.
+
+**The trichotomy's scale exponents are measured**, drawing `ε = 1 - U^{1/b}` so the boundary
+tail is exact: `+0.996 ± 0.013` against `+1.0` at `b = 0.5` (divergence confirmed);
+`-0.324 ± 0.011` against `-1/3` at `b = 1.5`; `-0.463 ± 0.015` against `-1/2` at `b = 2.5`,
+with the top two decades at `-0.488` and `-0.492`; `-0.493 ± 0.012` at `b = 4`. The `b = 2.5`
+shortfall is finite-`m`: the correction to the Gaussian scale decays only as `m^{-0.1}`.
+
+**What remains untested, recorded as such.** Only the *scale* exponents were measured. That
+the `b ∈ (1,2)` limit is a totally skewed `b`-stable law, that the `b > 2` limit is Gaussian,
+the marginal `b = 1`, and the claim that these fluctuations are governed by *the same
+excursions* that set the extreme eigenvalue — none involved an eigenvalue computation and all
+remain assertions.
+
+Empirical status: `κ` identification **VALIDATED**; path count **VALIDATED**; freeness
+**REFUTED** at ~1000σ against a control that reproduces the free value when freeness holds;
+trichotomy **scale exponents VALIDATED**, limit laws untested. See `proofs/validation/pencil/`.
 -/
 
 section PencilEnvironment
@@ -154,6 +187,35 @@ theorem tridiagonalABAB_pathExpression_pos
     0 < 2 * Eα2 * Eβ2 + 4 * Eα ^ 2 * Eβ ^ 2 := by
   have h1 : 0 < 2 * Eα2 * Eβ2 := mul_pos (mul_pos two_pos hα2) hβ2
   have h2 : 0 ≤ 4 * Eα ^ 2 * Eβ ^ 2 := by positivity
+  linarith
+
+/-- **The exact finite-`m` path count**, derived from the six four-step patterns rather than
+    fitted: the edge corrections come from the index ranges.
+
+    `φ_m(abab) = 2(1 - 1/m)·E[α²]E[β²] + 4(1 - 2/m)·(Eα)²(Eβ)²`, whose `m → ∞` limit is the
+    expression above. Forty-two ensembles match it at `max|z| = 2.07`, and the deterministic
+    case reproduces `(2(m-1) + 4(m-2))/m` exactly.
+
+    Prefer this whenever a finite-`m` number is quoted: at `m = 200` it differs from the
+    asymptotic form by about 1% in each term, which exceeds the error of the fit that
+    confirmed them. -/
+noncomputable def ababFinite (Eα Eβ Eα2 Eβ2 m : ℝ) : ℝ :=
+  2 * (1 - 1 / m) * Eα2 * Eβ2 + 4 * (1 - 2 / m) * Eα ^ 2 * Eβ ^ 2
+
+/-- **The path expression is positive at every finite chain length past two**, so the
+    obstruction to freeness is not an asymptotic artifact. -/
+theorem ababFinite_pos (Eα Eβ Eα2 Eβ2 m : ℝ)
+    (hα2 : 0 < Eα2) (hβ2 : 0 < Eβ2) (hm : 2 < m) :
+    0 < ababFinite Eα Eβ Eα2 Eβ2 m := by
+  have hm0 : (0 : ℝ) < m := by linarith
+  have h1 : 0 < 1 - 1 / m := by
+    rw [sub_pos, div_lt_one hm0]; linarith
+  have h2 : 0 ≤ 1 - 2 / m := by
+    rw [sub_nonneg, div_le_one hm0]; linarith
+  have hA : 0 < 2 * (1 - 1 / m) * Eα2 * Eβ2 :=
+    mul_pos (mul_pos (by linarith) hα2) hβ2
+  have hB : 0 ≤ 4 * (1 - 2 / m) * Eα ^ 2 * Eβ ^ 2 := by positivity
+  unfold ababFinite
   linarith
 
 end PencilEnvironment
