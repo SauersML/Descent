@@ -1298,6 +1298,27 @@ FAMILIES = [
                     "ensembleSquaredLoss", "ensemblePredictorSquaredLoss",
                     "scalarPermeability"],
     },
+    {
+        "name": "portability_permeability_and_completion",
+        "model": "Gaussian estimator-covariance channels, support-floor sealing, and "
+                 "finite-dimensional lag completion",
+        "simulator": "cluster/fam_permeability.py",
+        "status": "IMPLEMENTED, NOT YET RUN. The formal core proves the scalar Gaussian "
+                  "permeability constant, coding-scale invariance, independent-channel "
+                  "additivity, and a completion-count lower bound. The simulator tests "
+                  "the matrix constant, an explicit quadratic sealing family, additive "
+                  "risk in a flat experiment, and a finite MA lag-completion example. "
+                  "It does not promote these examples to an Edgeworth, monodromy, or "
+                  "universal minimax theorem.",
+        "found_by": "manual",
+        "spec": "Measure constants rather than slopes alone. Verify the estimator-draw "
+                "CLT before using Gaussian covariance information; keep a level-0 positive "
+                "control; distinguish p proportional to eta squared from a linear law; "
+                "fit source, ensemble, residual, and cross terms on a factorial grid; and "
+                "construct two distinct histories left unidentified by d-1 lag probes.",
+        "members": ["scalarPermeability", "diagonalPermeability",
+                    "completion_count_lower_bound", "quadraticChannel"],
+    },
 ]
 
 # ---------------------------------------------------------------------------

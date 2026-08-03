@@ -88,14 +88,50 @@ CONTROLS THAT MUST BE SHOWN FIRING
 Written for Python 3.6.8 with numpy only.
 """
 
+import argparse
 import json
 import math
-import sys
 import time
 
 import numpy as np
 
 SEED = 20260803
+
+C1_NP = 800
+C1_R_ENS = 200
+C1_M_MAX = 1600
+C1_M_GRID = (50, 200, 800, 1600)
+C2_N_GRID = (1000, 10000, 100000, 1000000)
+C2_DRAW_BUDGET = 2000000
+C3_NP = 200
+C3_M = 20000
+C3_R = 200
+C4_NP = 200
+C4_N_GRID = (200, 800, 3200)
+C4_M_GRID = (400, 1600, 6400)
+C4_REP = 400
+C5_NP = 400
+C5_M = 60000
+C5_M_GRID = (500, 2000, 8000)
+
+
+def configure_profile(profile):
+    """Use a bounded development experiment by default; preserve the registered full run."""
+    global C1_NP, C1_R_ENS, C1_M_MAX, C1_M_GRID
+    global C2_N_GRID, C2_DRAW_BUDGET, C3_NP, C3_M, C3_R
+    global C4_NP, C4_N_GRID, C4_M_GRID, C4_REP
+    global C5_NP, C5_M, C5_M_GRID
+    if profile == "full":
+        return
+    if profile != "quick":
+        raise ValueError("profile must be 'quick' or 'full'")
+    C1_NP, C1_R_ENS, C1_M_MAX = 256, 40, 400
+    C1_M_GRID = (25, 100, 400)
+    C2_N_GRID, C2_DRAW_BUDGET = (500, 5000, 50000), 200000
+    C3_NP, C3_M, C3_R = 128, 3000, 60
+    C4_NP = 128
+    C4_N_GRID, C4_M_GRID, C4_REP = (100, 400, 1600), (100, 400, 1600), 80
+    C5_NP, C5_M, C5_M_GRID = 200, 24000, (200, 800, 3200)
 
 
 # ===========================================================================
@@ -261,7 +297,7 @@ def c1(rng, out):
     print("C1  THE PERMEABILITY CONSTANT   p = 1/2 ||S^-1/2 Gamma S^-1/2||^2_HS")
     print("=" * 78)
     RHO0 = 0.55
-    NP = 800
+    NP = C1_NP
     S = sigma_of(RHO0, NP)
     G = gamma_of(RHO0, NP)
     cond = float(np.linalg.cond(S))
@@ -289,8 +325,8 @@ def c1(rng, out):
           % (float(np.linalg.cond(Siso)), p_iso, 1.0 * scalar_ratio ** 2))
 
     # ---- the estimator draws ---------------------------------------------
-    R_ENS = 200
-    M_MAX = 1600
+    R_ENS = C1_R_ENS
+    M_MAX = C1_M_MAX
     POOL = R_ENS * M_MAX
     print("")
     print("  simulating a pool of %d independent cohorts at depth %d ..."
@@ -325,7 +361,7 @@ def c1(rng, out):
     print("")
     print("  %-8s %-8s %-13s %-13s %-11s %-9s"
           % ("m", "ens", "RMSE meas", "RMSE pred", "ratio", "bias"))
-    for m in (50, 200, 800, 1600):
+    for m in C1_M_GRID:
         nens = POOL // m
         est = np.empty(nens)
         for e in range(nens):
@@ -339,7 +375,7 @@ def c1(rng, out):
               % (m, nens, rmse, pred, rmse / pred, est.mean() - RHO0))
     ratios = [r["ratio"] for r in rows]
     print("")
-    print("  CONSTANT CHECK: measured RMSE / (m p)^{-1/2}, over m = 50..1600: "
+    print("  CONSTANT CHECK: measured RMSE / (m p)^{-1/2}, over the m grid: "
           "%s" % ", ".join("%.4f" % x for x in ratios))
     print("  (a slope test alone would pass for any consistent estimator; the "
           "content is that these ratios are 1.0)")
@@ -419,8 +455,8 @@ def c2(rng, out):
           "like sqrt(n).")
     print("  %-10s %-9s %-16s %-16s"
           % ("n", "reps", "WALL arm", "P2 control arm"))
-    for n in (1000, 10000, 100000, 1000000):
-        reps = max(6, int(2000000 / n))
+    for n in C2_N_GRID:
+        reps = max(6, int(C2_DRAW_BUDGET / n))
         w_stats, c_stats = [], []
         for _ in range(reps):
             x0 = one_unit_draws(b0, n, rng)
@@ -446,7 +482,7 @@ def c2(rng, out):
     print("  P2 CONTROL  grows by %.1fx over the same range (sqrt(n) would be "
           "%.1fx): %s"
           % (rows[-1]["control_stat"] / rows[0]["control_stat"],
-             math.sqrt(1000000.0 / 1000.0),
+             math.sqrt(float(C2_N_GRID[-1]) / C2_N_GRID[0]),
              "FIRED" if ctl_grows else "DEAD"))
     out["C2"] = {"rows": rows, "wall_flat": bool(wall_flat),
                  "control_fired": bool(ctl_grows),
@@ -516,7 +552,7 @@ def c3(rng, out):
     print("C3  THE SEALING LAW:  p(delta) ~ eta^2 as eta -> 0")
     print("=" * 78)
     DELTA0 = 1.0
-    NP = 200
+    NP = C3_NP
     etas = (0.30, 0.15, 0.075, 0.0375)
     print("  F_t = z_t + eta * delta * z_{t-1}, z ~ AR(1) phi = %.2f, "
           "delta0 = %.1f, n' = %d (mixing time %.1f)"
@@ -525,8 +561,8 @@ def c3(rng, out):
           "exponent 1 predicts %.1fx. The arms are far apart."
           % (etas[0] / etas[-1], (etas[0] / etas[-1]) ** 2,
              etas[0] / etas[-1]))
-    M = 20000
-    R = 200
+    M = C3_M
+    R = C3_R
     rows = []
     print("")
     print("  %-9s %-13s %-13s %-13s %-11s"
@@ -588,7 +624,7 @@ def c4(rng, out):
     print("C4  ADDITIVITY OF THE CLOSING LAW")
     print("=" * 78)
     D0 = 4
-    NP = 200
+    NP = C4_NP
     ETAS = (0.30, 0.15)
     DELTA0 = 1.0
     ps = [seal_p(e, DELTA0, NP) for e in ETAS]
@@ -598,10 +634,10 @@ def c4(rng, out):
     print("  loss is exactly quadratic with unit Hessian: kappa = 0 by "
           "construction, so (1 + O(kappa .)) is exactly 1 and IS NOT TESTED "
           "HERE.")
-    n_grid = (200, 800, 3200)
-    m_grid = (400, 1600, 6400)
+    n_grid = C4_N_GRID
+    m_grid = C4_M_GRID
     rp_grid = (0.0, 0.05, 0.10)
-    REP = 400
+    REP = C4_REP
     rows = []
     Lz = seal_sigma(0.0, 0.0, NP)
     print("")
@@ -658,7 +694,6 @@ def c4(rng, out):
           % (coef[3], se[3], abs(coef[3]) / se[3] if se[3] > 0 else 0.0))
 
     # P4: the fitter must be able to SEE a cross term
-    ycross = y + 40.0 / (A[:, 0] / float(D0)) ** 0  # placeholder, replaced below
     ycross = y + 5.0 * (1.0 / (np.array([r["n"] for r in rows], dtype=float)
                                * np.array([r["m"] for r in rows],
                                           dtype=float)))
@@ -815,7 +850,7 @@ def c5(rng, out):
           % (Ldep0, Ldep1, 100.0 * abs(Ldep1 - Ldep0) / Ldep0))
 
     # measured: do the two-lag observables actually fail to separate?
-    NP, M = 400, 60000
+    NP, M = C5_NP, C5_M
     a0 = sim_ma_autocov(h0, NP, M, rng, [1, 2, 3])
     a1 = sim_ma_autocov(h1, NP, M, rng, [1, 2, 3])
     print("")
@@ -839,7 +874,7 @@ def c5(rng, out):
     print("  COMPLETE ARM: recover h from three lags, %d cohorts per ensemble"
           % 2000)
     rowsp = []
-    for m in (500, 2000, 8000):
+    for m in C5_M_GRID:
         nens = M // m
         blk = a0[:nens * m].reshape(nens, m, 3).mean(axis=1)
         tgt = np.array([ma_gam(h0, k) for k in (1, 2, 3)])
@@ -876,10 +911,16 @@ def c5(rng, out):
 
 # ===========================================================================
 
-def main():
+def main(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--profile", choices=("quick", "full"), default="quick",
+                        help="bounded development signal or registered full experiment")
+    parser.add_argument("--output", default="fam_permeability_results.json")
+    args = parser.parse_args(argv)
+    configure_profile(args.profile)
     t0 = time.time()
     rng = np.random.default_rng(SEED)
-    out = {"seed": SEED}
+    out = {"profile": args.profile, "seed": SEED}
     r1 = c1(rng, out)
     r2 = c2(rng, out)
     r3 = c3(rng, out)
@@ -910,12 +951,12 @@ def main():
     out["READ_THE_TEST"] = ok
     print("  READ_THE_TEST: %s" % ok)
     print("  runtime %.1f s" % (time.time() - t0))
-    fh = open("fam_permeability_results.json", "w")
+    fh = open(args.output, "w")
     json.dump(out, fh, indent=1)
     fh.close()
-    print("-> fam_permeability_results.json")
+    print("-> %s" % args.output)
     return 0 if ok else 1
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    raise SystemExit(main())
