@@ -2163,10 +2163,39 @@ theorem EvolutionaryParameters.tau_nonneg (p : EvolutionaryParameters) :
 
 
 /-- **Drift-migration equilibrium Fst**: Fst = 1/(1 + M).
-    Migration homogenizes populations, reducing Fst.
+    Migration homogenizes populations, reducing Fst. 
+    Empirical status: **VALIDATED as the many-deme limit, and FALSIFIED as the
+    island equilibrium simpliciter** -- which is why the name now says which
+    (`proofs/validation/empirical/simcov/battery_bulk18b.py`). Island model with
+    the TOTAL emigration rate held fixed at `4 Ne m = 2.0`, deme count swept,
+    `F_ST` from coalescence times:
 
-        Empirical status: UNTESTED. -/
-noncomputable def fstDriftMigration (p : EvolutionaryParameters) : ℝ :=
+      demes    this def    simulated             sems
+        2       0.33333    0.18634 ± 0.00832    17.66
+        3       0.33333    0.22334 ± 0.00972    11.31
+        5       0.33333    0.28418 ± 0.01266     3.88
+       10       0.33333    0.31609 ± 0.00907     1.90
+       25       0.33333    0.32598 ± 0.01121     0.65
+
+    The prediction is constant by construction while the measurement climbs
+    toward it, so the agreement at 25 demes is not a coincidence of scale: this
+    body IS the limit, and it is wrong by 79% at two demes.
+
+    Renamed from `fstDriftMigration` for the same reason and by the same
+    reasoning as `PopulationGeneticsFoundations.fstMigrationMutationEquilibriumManyDemes`.
+    The signature is `(p : EvolutionaryParameters)` and reads `p.bigM` alone, so
+    no edit to the body can express a deme count; what could be fixed is the
+    claim the name makes. The deme-carrying form is
+    `fstIslandEquilibriumFiniteDemes`, whose `islandDemeCorrection = d/(d-1)` is
+    validated on these same five deme counts at worst 2.74 sems -- and whose
+    squared variant is excluded at 9.04 sems.
+
+    This is the third definition in this corpus found to be deme-count blind,
+    after `fstMigrationMutationEquilibriumManyDemes` and `asymmetricFst`. The
+    first two could be repaired by naming the limit; `asymmetricFst` could not,
+    because its name commits it to exactly two demes.
+-/
+noncomputable def fstDriftMigrationManyDemes (p : EvolutionaryParameters) : ℝ :=
   1 / (1 + p.bigM)
 
 /-- **One generation of the identity-by-descent balance under all three
@@ -2228,7 +2257,7 @@ moves have not been catching them.
 **Stale unfold targets.** `unfold X` is an error, not a no-op, when `X` does not
 occur in the goal. So when a definition stops routing through another, *every*
 `unfold` list naming the inner one breaks at once. `fstEquilibrium` above is
-`1 / (1 + θ + M)` and `fstDriftMigration` is `1 / (1 + M)`; neither calls
+`1 / (1 + θ + M)` and `fstDriftMigrationManyDemes` is `1 / (1 + M)`; neither calls
 `fstMutationDriftEquilibrium`, and only `fstDriftMutation` did. One stale name
 in the lists below produced seven simultaneous failures, which reads like a
 change of shape in the definition itself and is not one — the definition is a
@@ -2322,8 +2351,8 @@ theorem fstEquilibrium_le_driftMutation (p : EvolutionaryParameters) :
 
 /-- Full equilibrium Fst ≤ drift-migration Fst (mutation only helps). -/
 theorem fstEquilibrium_le_driftMigration (p : EvolutionaryParameters) :
-    fstEquilibrium p ≤ fstDriftMigration p := by
-  unfold fstEquilibrium fstDriftMigration
+    fstEquilibrium p ≤ fstDriftMigrationManyDemes p := by
+  unfold fstEquilibrium fstDriftMigrationManyDemes
   apply one_div_le_one_div_of_le
   · linarith [p.bigM_nonneg]
   · linarith [p.theta_nonneg]
@@ -3379,9 +3408,9 @@ theorem frobeniusNormSq_at_two_by_two :
 /-- Reference values for the scaled evolutionary quantities at the structure witness, whose
 parameters are unit population size, mutation and migration, quarter recombination and unit
 divergence time. -/
-theorem fstDriftMigration_at_witness :
-    fstDriftMigration EvolutionaryParameters.witness = 1 / 5 := by
-  norm_num [fstDriftMigration, EvolutionaryParameters.bigM,
+theorem fstDriftMigrationManyDemes_at_witness :
+    fstDriftMigrationManyDemes EvolutionaryParameters.witness = 1 / 5 := by
+  norm_num [fstDriftMigrationManyDemes, EvolutionaryParameters.bigM,
     EvolutionaryParameters.witness, scaledMigrationRate]
 
 theorem migrationLDBoost_at_witness :

@@ -75,6 +75,29 @@ theorem nei_fst_in_unit (H_T H_S : ℝ)
   · exact div_nonneg (by linarith) (le_of_lt h_HT)
   · rw [div_le_one h_HT]; linarith
 
+/-- **Exact fiber of Nei's heterozygosity `F_ST`.**  Once total heterozygosity is nonzero, an
+observed `F_ST` value determines the retained within-population heterozygosity exactly. -/
+theorem neiFst_eq_iff_within_heterozygosity_eq
+    (H_T H_S fst : ℝ) (h_HT : H_T ≠ 0) :
+    neiFst H_T H_S = fst ↔ H_S = (1 - fst) * H_T := by
+  unfold neiFst
+  rw [div_eq_iff h_HT]
+  constructor <;> intro h <;> nlinarith
+
+/-- With nonzero total heterozygosity, Nei's `F_ST` vanishes exactly when subpopulations retain
+all of the pooled heterozygosity. -/
+theorem neiFst_eq_zero_iff
+    (H_T H_S : ℝ) (h_HT : H_T ≠ 0) :
+    neiFst H_T H_S = 0 ↔ H_S = H_T := by
+  simpa using neiFst_eq_iff_within_heterozygosity_eq H_T H_S 0 h_HT
+
+/-- With nonzero total heterozygosity, Nei's `F_ST` equals one exactly when no within-population
+heterozygosity remains. -/
+theorem neiFst_eq_one_iff
+    (H_T H_S : ℝ) (h_HT : H_T ≠ 0) :
+    neiFst H_T H_S = 1 ↔ H_S = 0 := by
+  simpa using neiFst_eq_iff_within_heterozygosity_eq H_T H_S 1 h_HT
+
 
 /-- **Nei's `G_ST` for two equally weighted subgroups, from allele
     frequencies:** `G_ST = (p₁ - p₂)² / (4·p̄·(1-p̄))`.
