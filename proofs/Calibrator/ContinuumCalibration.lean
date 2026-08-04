@@ -60,6 +60,15 @@ noncomputable def aggregateCalibrationEnergy (covariateWeight : Covariate → �
     (predictor : Covariate → ℝ) : ℝ :=
   ∑ x, covariateWeight x * (posteriorMean posterior conditional x - predictor x) ^ 2
 
+/-- Reference evaluation: with no covariate weight there is no calibration energy to spend. -/
+theorem aggregateCalibrationEnergy_at_zero_weight
+    (posterior : Covariate → Index → ℝ) (conditional : Index → Covariate → ℝ)
+    (predictor : Covariate → ℝ) :
+    aggregateCalibrationEnergy 0 posterior conditional predictor = 0 := by
+  unfold aggregateCalibrationEnergy
+  simp
+
+
 /-- Irreducible posterior-drift energy: conditional variance across indices at each covariate.
 
 Empirical status: NOT AN EMPIRICAL CLAIM -- this is an exact finite weighted sum. -/
@@ -634,6 +643,15 @@ noncomputable def indexWiseCalibrationMoment (covariateWeight : Covariate → �
     (predictor kernel : Covariate → ℝ) : ℝ :=
   ∑ t, ∑ x, covariateWeight x * posterior x t *
     (conditional t x - predictor x) * kernel x
+
+/-- Reference evaluation: with no covariate weight every index-wise moment vanishes. -/
+theorem indexWiseCalibrationMoment_at_zero_weight
+    (posterior : Covariate → Index → ℝ) (conditional : Index → Covariate → ℝ)
+    (predictor : Covariate → ℝ) (kernel : Covariate → ℝ) :
+    indexWiseCalibrationMoment 0 posterior conditional predictor kernel = 0 := by
+  unfold indexWiseCalibrationMoment
+  simp
+
 
 /-- **Nested demands.**  The aggregate calibration moment is the sum of the index-wise moments.
 Thus exact index-wise calibration implies exact aggregate calibration; these constraints are

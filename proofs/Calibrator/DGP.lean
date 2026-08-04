@@ -243,16 +243,45 @@ noncomputable def causalMean {c t : ℕ}
     (dgp : TaggedDataGeneratingProcess c t) (i : Fin c) : ℝ :=
   ∫ x : CausalVec c × TagVec t, x.1 i ∂dgp.jointMeasureCT
 
+/-- Reference evaluation: under the zero joint law every causal mean is zero.  The tagged
+process carries no probability constraint, so this is a point of its parameter space rather
+than an excluded case. -/
+theorem causalMean_at_zero_law {c t : ℕ} (dgp : TaggedDataGeneratingProcess c t) (i : Fin c)
+    (hzero : dgp.jointMeasureCT = 0) :
+    causalMean dgp i = 0 := by
+  unfold causalMean
+  rw [hzero]
+  simp
+
+
 /-- Mean of tag coordinate `j` under the joint tagged law. -/
 noncomputable def tagMean {c t : ℕ}
     (dgp : TaggedDataGeneratingProcess c t) (j : Fin t) : ℝ :=
   ∫ x : CausalVec c × TagVec t, x.2 j ∂dgp.jointMeasureCT
+
+/-- The same for the tag coordinates. -/
+theorem tagMean_at_zero_law {c t : ℕ} (dgp : TaggedDataGeneratingProcess c t) (j : Fin t)
+    (hzero : dgp.jointMeasureCT = 0) :
+    tagMean dgp j = 0 := by
+  unfold tagMean
+  rw [hzero]
+  simp
+
 
 /-- Causal-tag cross-covariance entry `Cov(X_causal[i], X_tag[j])`. -/
 noncomputable def crossCovEntry {c t : ℕ}
     (dgp : TaggedDataGeneratingProcess c t) (i : Fin c) (j : Fin t) : ℝ :=
   ∫ x : CausalVec c × TagVec t,
       (x.1 i - causalMean dgp i) * (x.2 j - tagMean dgp j) ∂dgp.jointMeasureCT
+
+/-- And for the cross-covariance entries. -/
+theorem crossCovEntry_at_zero_law {c t : ℕ} (dgp : TaggedDataGeneratingProcess c t)
+    (i : Fin c) (j : Fin t) (hzero : dgp.jointMeasureCT = 0) :
+    crossCovEntry dgp i j = 0 := by
+  unfold crossCovEntry
+  rw [hzero]
+  simp
+
 
 
 /-- Cross-covariance matrix `Σ_tc` between tag and causal coordinates. -/
@@ -1176,6 +1205,15 @@ structure GeneticArchitecture (k : ℕ) where
 noncomputable def totalVariance {k : ℕ} (arch : GeneticArchitecture k) (c : Fin k → ℝ) : ℝ :=
   arch.V_genic c + arch.V_cov c
 
+/-- Reference evaluation: an architecture with no genic and no covariance component has no
+total variance. -/
+theorem totalVariance_at_zero_components {k : ℕ} (arch : GeneticArchitecture k)
+    (c : Fin k → ℝ) (hgenic : arch.V_genic c = 0) (hcov : arch.V_cov c = 0) :
+    totalVariance arch c = 0 := by
+  unfold totalVariance
+  rw [hgenic, hcov, add_zero]
+
+
 noncomputable def optimalSlopeFromVariance {k : ℕ} (arch : GeneticArchitecture k) (c : Fin k →
     ℝ) : ℝ :=
   (totalVariance arch c) / (arch.V_genic c)
@@ -1413,6 +1451,15 @@ structure LDDecayMechanism (k : ℕ) where
 function that `ld_decay_implies_nonlinear_calibration_of_exp_tagging` shows is not affine. -/
 def decaySlope {k : ℕ} (mech : LDDecayMechanism k) (c : Fin k → ℝ) : ℝ :=
   mech.tagging_efficiency (mech.distance c)
+
+/-- Reference evaluation: a mechanism whose tagging efficiency vanishes at the realised
+distance has zero decay slope there. -/
+theorem decaySlope_at_zero_efficiency {k : ℕ} (mech : LDDecayMechanism k) (c : Fin k → ℝ)
+    (hzero : mech.tagging_efficiency (mech.distance c) = 0) :
+    decaySlope mech c = 0 := by
+  unfold decaySlope
+  exact hzero
+
 
 theorem optimal_slope_trace_variance {k : ℕ} [Fintype (Fin k)]
     (arch : GeneticArchitecture k) (c : Fin k → ℝ)
@@ -1736,10 +1783,30 @@ noncomputable def irreduciblePredictionRisk {k : ℕ} [Fintype (Fin k)]
     (cmdgp : ConditionalMeanDGP k) : ℝ :=
   ∫ x, (x.2.2 - cmdgp.m x.1 x.2.1) ^ 2 ∂cmdgp.μ
 
+/-- Reference evaluation: a noiseless process, where the outcome equals its conditional mean at
+every point, carries no irreducible risk. -/
+theorem irreduciblePredictionRisk_at_noiseless {k : ℕ} [Fintype (Fin k)]
+    (cmdgp : ConditionalMeanDGP k)
+    (hexact : ∀ x : ℝ × (Fin k → ℝ) × ℝ, x.2.2 = cmdgp.m x.1 x.2.1) :
+    irreduciblePredictionRisk cmdgp = 0 := by
+  unfold irreduciblePredictionRisk
+  simp [hexact]
+
+
 /-- Approximation risk of a deployed predictor relative to the exact conditional mean. -/
 noncomputable def conditionalMeanApproximationRisk {k : ℕ} [Fintype (Fin k)]
     (cmdgp : ConditionalMeanDGP k) (pred : Predictor k) : ℝ :=
   ∫ x, (cmdgp.m x.1 x.2.1 - pred x.1 x.2.1) ^ 2 ∂cmdgp.μ
+
+/-- Reference evaluation: a predictor equal to the conditional mean has no approximation risk.
+That is the point the definition exists to locate, and it holds pointwise rather than only
+almost everywhere. -/
+theorem conditionalMeanApproximationRisk_at_conditional_mean {k : ℕ} [Fintype (Fin k)]
+    (cmdgp : ConditionalMeanDGP k) :
+    conditionalMeanApproximationRisk cmdgp cmdgp.m = 0 := by
+  unfold conditionalMeanApproximationRisk
+  simp
+
 
 theorem ConditionalMeanDGP.predictionRiskY_eq_irreducible_plus_conditionalMeanApproximationRisk
     {k : ℕ} [Fintype (Fin k)]
