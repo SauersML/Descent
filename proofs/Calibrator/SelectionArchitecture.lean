@@ -888,14 +888,24 @@ parameters for different trait classes.
 
 section ArchitecturePredictions
 
+/-- Characteristic generation timescale `1/(2s)` for selection-driven portability decay. -/
+noncomputable def selectionPortabilityTimescale (selectionCoefficient : ℝ) : ℝ :=
+  1 / (2 * selectionCoefficient)
+
+/-- The selection-decay timescale is pinned at `s = 1/2`. -/
+theorem selectionPortabilityTimescale_at_reference_point :
+    selectionPortabilityTimescale (1 / 2) = 1 := by
+  norm_num [selectionPortabilityTimescale]
+
 /-- **Selection coefficient determines portability timescale.**
     The characteristic timescale for portability decay is 1/(2s) generations,
     where s is the selection coefficient.
     Smaller `s` gives slower change; larger `s` gives faster change. -/
-theorem one_div_two_mul_strictAnti_of_pos
+theorem selectionPortabilityTimescale_lt_of_selection_lt
     (s₁ s₂ : ℝ) (h₁ : 0 < s₁)
     (h_stronger : s₁ < s₂) :
-    1 / (2 * s₂) < 1 / (2 * s₁) := by
+    selectionPortabilityTimescale s₂ < selectionPortabilityTimescale s₁ := by
+  unfold selectionPortabilityTimescale
   apply div_lt_div_of_pos_left one_pos (by linarith) (by linarith)
 
 /-- **Number of independent loci matters more than heritability for portability.**
@@ -908,9 +918,9 @@ theorem polygenic_more_portable_than_oligogenic
     (h_h2 : 0 < h2)
     (h_oligo : 0 < m_oligo)
     (h_more_loci : m_oligo < m_poly) :
-    -- Per-locus contribution is smaller for polygenic traits
-    h2 / (m_poly : ℝ) < h2 / (m_oligo : ℝ) :=
-  div_lt_div_of_pos_left h_h2 (Nat.cast_pos.mpr h_oligo) (Nat.cast_lt.mpr h_more_loci)
+    polygenicAveragingVariance h2 m_poly < polygenicAveragingVariance h2 m_oligo :=
+  polygenicAveragingVariance_lt_of_locusCount_lt m_oligo m_poly h2
+    h_oligo h_more_loci h_h2
 
 end ArchitecturePredictions
 
@@ -925,26 +935,44 @@ through shared pleiotropic architecture.
 
 section Pleiotropy
 
+/-- Target R² after a shared pleiotropic component undergoes trait-specific turnover. -/
+noncomputable def pleiotropicTargetR2
+    (sourceR2 sharedFraction turnover : ℝ) : ℝ :=
+  sourceR2 * (1 - sharedFraction * turnover)
+
+/-- The pleiotropic loss model is pinned at an interior reference point. -/
+theorem pleiotropicTargetR2_at_reference_point :
+    pleiotropicTargetR2 1 (1 / 2) (1 / 2) = 3 / 4 := by
+  norm_num [pleiotropicTargetR2]
+
 /-- **Shared portability through pleiotropy.**
     If two traits share many pleiotropic loci, their portability
     patterns are correlated. Specifically, if turnover affects
     the shared loci, both traits suffer. -/
-theorem both_mul_one_sub_lt_self_of_pos
-    (r2_t1_source r2_t1_target r2_t2_source r2_t2_target ρ_shared : ℝ)
-    (h_shared : 0 < ρ_shared)
-    -- Both traits drop proportionally to the shared component
-    (d₁ d₂ : ℝ) (h_d₁ : 0 < d₁) (h_d₂ : 0 < d₂)
-    (h_t1_drop : r2_t1_target = r2_t1_source * (1 - ρ_shared * d₁))
-    (h_t2_drop : r2_t2_target = r2_t2_source * (1 - ρ_shared * d₂))
-    (h_t1_pos : 0 < r2_t1_source) (h_t2_pos : 0 < r2_t2_source) :
-    r2_t1_target < r2_t1_source ∧ r2_t2_target < r2_t2_source := by
+theorem pleiotropicTargetR2_lt_source
+    (sourceR2 sharedFraction turnover : ℝ)
+    (h_source : 0 < sourceR2) (h_shared : 0 < sharedFraction)
+    (h_turnover : 0 < turnover) :
+    pleiotropicTargetR2 sourceR2 sharedFraction turnover < sourceR2 := by
+  unfold pleiotropicTargetR2
+  have h_retention : 1 - sharedFraction * turnover < 1 := by nlinarith
+  exact mul_lt_of_lt_one_right h_source h_retention
+
+/-- For a nonzero source signal, pleiotropic transfer preserves source R² exactly when
+there is no shared component or no turnover on that component. -/
+theorem pleiotropicTargetR2_eq_source_iff
+    (sourceR2 sharedFraction turnover : ℝ) (h_source : sourceR2 ≠ 0) :
+    pleiotropicTargetR2 sourceR2 sharedFraction turnover = sourceR2 ↔
+      sharedFraction = 0 ∨ turnover = 0 := by
+  unfold pleiotropicTargetR2
   constructor
-  · rw [h_t1_drop]
-    have : 1 - ρ_shared * d₁ < 1 := by nlinarith
-    exact mul_lt_of_lt_one_right h_t1_pos this
-  · rw [h_t2_drop]
-    have : 1 - ρ_shared * d₂ < 1 := by nlinarith
-    exact mul_lt_of_lt_one_right h_t2_pos this
+  · intro h
+    have h_retention : 1 - sharedFraction * turnover = 1 := by
+      apply mul_left_cancel₀ h_source
+      simpa using h
+    have h_product : sharedFraction * turnover = 0 := by linarith
+    exact mul_eq_zero.mp h_product
+  · rintro (rfl | rfl) <;> ring
 
 /-- **Cross-trait portability prediction.**
     The portability ratio of trait 1's PGS for predicting trait 2 in
