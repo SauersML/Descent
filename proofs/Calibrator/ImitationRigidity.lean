@@ -692,7 +692,12 @@ a per-generation retention instead gives a numerically different kernel; that
 reading is `ldAfterGenerations`, and
 `stationaryLDEntry_eq_ldAfterGenerations` is the bridge between them.
 
-Empirical status: UNTESTED. -/
+Empirical status: NOT AN EMPIRICAL CLAIM. This body IS the first-order Markov model -- the
+Chapman-Kolmogorov step with normalisation at separation zero -- so it declares the process
+rather than predicting its output. The empirical claim is `stationaryLDEntry`, whether real
+LD along a chromosome is geometric in separation, and that one is falsifiable; everything
+this file derives downstream of the step is a consequence of the declaration and is proved
+rather than measured. -/
 def markovLDStep (decay : ℝ) (c : ℕ → ℝ) (separation : ℕ) : ℝ :=
   if separation = 0 then 1 else decay * c (separation - 1)
 
@@ -735,10 +740,56 @@ kernel: the Fourier transform of the geometric correlation sequence. Its values
 are the limiting eigenvalues of the LD matrix, so the symbol replaces every
 appeal to unknown spectral data.
 
-Empirical status: DERIVED from `stationaryLDEntry` by summation of the
-two-sided geometric series; the identities below are proved, not fitted. -/
+Empirical status: NOT AN EMPIRICAL CLAIM -- DERIVED from `stationaryLDEntry` by summation of
+the two-sided geometric series; the identities below are proved, not fitted. Given the
+Markov kernel the symbol is its Fourier transform, and a Fourier transform of a declared
+sequence is not something a genotype panel could contradict. The falsifiable claim upstream
+is `stationaryLDEntry`: whether real LD decays geometrically in separation. The numerical
+warning below is a claim about FLOATING POINT, and it was measured -- see the grid.
+
+**Numerical warning -- this body must not be evaluated as written.** The
+divisor `1 - 2 · decay · cos angle + decay²` is a sum of three terms each of
+size `O(1)` whose true value near the singularity is `(1 - decay)² + O(angle²)`,
+so in floating point it is a catastrophic cancellation exactly where the
+quantity matters. Measured over a `decay × angle` grid (14 decays approaching
+`1`, 19 angles approaching `0`), float64 against a 60-digit reference with the
+arguments rounded to float64 FIRST so input representation cannot be charged to
+the formula: **82 of 266 cells exceed 1e-6 relative error, worst `+∞`** -- the
+divisor rounds to exactly zero and the symbol is reported as a division by
+zero at frequencies where it is finite and large. Below `(1-decay)² + angle² ≲
+2·10⁻¹⁰` there are no correct significant digits left, and that region is
+realistic: `decay = ldRetentionPerGen r Nₑ` is `1 - 5·10⁻⁶` already at
+`Nₑ = 10⁵`, and the low-frequency modes are the ones the whitening-gain
+integral is dominated by.
+
+Consumers must evaluate through `ldKernelSymbol_eq_halfAngle` instead, whose
+divisor is a sum of two nonnegative terms with no cancellation. The same grid
+gives **0 of 266 cells over tolerance, worst 4.4·10⁻¹⁶** for that form. The two
+bodies are equal over `ℝ`; only their floating-point evaluations differ. -/
 def ldKernelSymbol (decay angle : ℝ) : ℝ :=
   (1 - decay ^ 2) / (1 - 2 * decay * Real.cos angle + decay ^ 2)
+
+/-- **The half-angle form of the symbol: the cancellation-free way to evaluate it.**
+
+`1 - 2 d cos θ + d² = (1 - d)² + 4 d sin²(θ/2)`, because `cos θ = 1 - 2 sin²(θ/2)`.
+At `0 ≤ decay` both summands on the right are nonnegative, so no digits are lost
+to cancellation and the divisor can never round below its true magnitude. This is
+an identity over `ℝ`, so it changes nothing that is proved about `ldKernelSymbol`;
+what it changes is what a program computing the symbol should evaluate. See the
+measured precision map in the docstring of `ldKernelSymbol`. -/
+theorem ldKernelSymbol_eq_halfAngle (decay angle : ℝ) :
+    ldKernelSymbol decay angle =
+      ((1 - decay) * (1 + decay)) /
+        ((1 - decay) ^ 2 + 4 * decay * Real.sin (angle / 2) ^ 2) := by
+  unfold ldKernelSymbol
+  have hcos : Real.cos angle = 1 - 2 * Real.sin (angle / 2) ^ 2 := by
+    have hpy := Real.sin_sq_add_cos_sq (angle / 2)
+    have hdouble := Real.cos_two_mul (angle / 2)
+    rw [show (2 : ℝ) * (angle / 2) = angle by ring] at hdouble
+    rw [hdouble]
+    linarith
+  rw [hcos]
+  congr 1 <;> ring
 
 /-- **ldKernelSymbol at its junk point, named.** At unit decay and zero angle the Poisson kernel
 is on its singularity, where it diverges. Numerator and denominator vanish together and Lean
@@ -753,8 +804,11 @@ theorem ldKernelSymbol_unit_decay_is_junk :
 stationary LD matrix, attained at the highest frequency. It is the conditioning
 bottleneck of any whitening or LD-pruning step.
 
-Empirical status: DERIVED. `ldKernelSymbol_ge_hardEdge` proves it is a lower
-bound and `ldKernelSymbol_pi` proves it is attained. -/
+Empirical status: NOT AN EMPIRICAL CLAIM -- DERIVED, and PROVED rather than measured:
+`ldKernelSymbol_ge_hardEdge` proves it is a lower bound and `ldKernelSymbol_pi` proves it is
+attained. The minimum of a declared function has no residual for a simulation to find; the
+falsifiable claim upstream is `stationaryLDEntry`, whether real LD is geometric in
+separation. -/
 def ldHardEdge (decay : ℝ) : ℝ := (1 - decay) / (1 + decay)
 
 /-- **ldHardEdge at its junk point, named.** At `decay = -1` the edge sharpness diverges. The
@@ -771,9 +825,11 @@ kernel, equal to the harmonic mean of the symbol. Every whitened detection
 threshold in the second-moment-shift program is stated in terms of this
 quantity, which is otherwise treated as unknown.
 
-Empirical status: DERIVED. `ldKernelSymbol_harmonicMean` proves the identity
-with the symbol integral, and `ldPrecisionTrace_div_sites_tendsto` proves it is
-the per-variant limit of the exact finite-chromosome trace. -/
+Empirical status: NOT AN EMPIRICAL CLAIM -- DERIVED, with both halves proved:
+`ldKernelSymbol_harmonicMean` proves the identity with the symbol integral, and
+`ldPrecisionTrace_div_sites_tendsto` proves it is the per-variant limit of the exact
+finite-chromosome trace. A harmonic mean of a declared symbol is arithmetic; what a real
+panel could contradict is `stationaryLDEntry`, not this. -/
 def ldWhiteningGain (decay : ℝ) : ℝ := (1 + decay ^ 2) / (1 - decay ^ 2)
 
 /-- **ldWhiteningGain pinned at a reference point.** No theorem in the corpus evaluated this
@@ -943,8 +999,8 @@ theorem ldWhiteningGain_of_ldRetention_antitone
 stationary LD kernel on `nSites` variants, in closed form at every finite size
 rather than only in the limit.
 
-Empirical status: DERIVED from the first-order Markov structure — one
-unconstrained variant plus `nSites - 1` variants each whitened against its
+Empirical status: NOT AN EMPIRICAL CLAIM -- DERIVED from the first-order Markov structure —
+one unconstrained variant plus `nSites - 1` variants each whitened against its
 neighbour, which is the content of `ldPrecisionTrace_eq_boundary_add_interior`.
 The stencil identities below verify both boundary and interior rows of the
 tridiagonal inverse at every separation.  The Python validation remains an

@@ -1595,9 +1595,55 @@ theorem freeRecombinationStep_jointGenotypeProb_of_inLinkageEquilibrium
 /-- Every panel locus is polymorphic, so the standardized coordinate exists and
 has unit variance.
 
+The second clause of that sentence is a claim, not a restatement, and it is
+discharged one theorem below by `polymorphic_standardizedGenotype_second_moment_one`
+rather than left in prose. A monomorphic locus has `genotypeVariance = 0`, and
+`HardyWeinbergModel.standardizedGenotype` divides by its square root; Mathlib
+totalises that division to zero, so the coordinate at such a locus is the
+constant `0` and has second moment `0`, not `1`. Nothing in the type system
+rules it out, which is why the panel-level condition has to be carried as a
+hypothesis and named.
+
 Empirical status: UNTESTED. A range condition on the panel's allele frequencies. -/
 def Polymorphic : Prop :=
   ∀ i : Fin n, 0 < (design.model i).altFreq ∧ (design.model i).altFreq < 1
+
+omit [Fintype ι] in
+/-- **A polymorphic panel has a nondegenerate coordinate at every locus.** The
+per-locus genotype variance `2q(1-q)` is strictly positive exactly on the open
+interval `Polymorphic` names, so the normalization the standardized coordinate
+divides by is a real division and not Mathlib's totalisation of one. -/
+theorem polymorphic_genotypeVariance_pos (h : design.Polymorphic) (i : Fin n) :
+    0 < (design.model i).genotypeVariance :=
+  (design.model i).genotypeVariance_pos (h i).1 (h i).2
+
+omit [Fintype ι] in
+/-- **The panel-level unit-variance guarantee**: on a polymorphic panel every
+coordinate of the design has second moment exactly one.
+
+This is the design-level form of `standardizedGenotype_second_moment_one`, which
+is stated one locus at a time. The chaos results of this module quantify over a
+`GenotypeDesign`, so the hypothesis they actually need is the panel-level one;
+carrying it as `Polymorphic` rather than as a pair of inequalities per locus is
+what lets a licence state its frequency requirement once. -/
+theorem polymorphic_standardizedGenotype_second_moment_one
+    (h : design.Polymorphic) (i : Fin n) :
+    ∑ g : DiploidGenotype,
+      (design.model i).genotypeProb g *
+        (design.model i).standardizedGenotype g ^ 2 = 1 :=
+  standardizedGenotype_second_moment_one (design.model i) (h i).1 (h i).2
+
+omit [Fintype ι] in
+/-- **Centering needs no polymorphism.** The companion first-moment fact holds at
+every locus of every design, polymorphic or not, so the two coordinate-level
+inputs of the disjoint licence are not symmetric in what they cost: only the
+variance normalization is frequency-gated. Recording that asymmetry here is what
+keeps `Polymorphic` from being attached to results that do not need it. -/
+theorem standardizedGenotype_expectation_zero_of_design (i : Fin n) :
+    ∑ g : DiploidGenotype,
+      (design.model i).genotypeProb g *
+        (design.model i).standardizedGenotype g = 0 :=
+  standardizedGenotype_expectation_zero (design.model i)
 
 /-- **The disjointness hypothesis, as a property of the design.** No variant
 enters two tested sets.
@@ -1647,6 +1693,21 @@ def flipOrientation (locus : Fin n) : GenotypeDesign n ι where
   coefficient := fun s ↦
     if locus ∈ design.locusSet s then -design.coefficient s else design.coefficient s
   jointGenotypeProb := design.jointGenotypeProb
+
+omit [Fintype ι] in
+/-- **Polymorphism is a gauge invariant.** Re-choosing which allele is called
+reference at one locus is `flipOrientation`, which moves the design's
+coefficients and leaves its per-locus models alone; so a panel polymorphic in
+one orientation is polymorphic in every orientation.
+
+Without this the frequency condition would be a property of a labelling rather
+than of the population, and the orientation-equivariance section below would
+carry a hypothesis its own gauge transformation could break. The proof is
+`Iff.rfl` because `flipOrientation` does not touch `model` — which is the
+content: the gauge acts on coefficients only. -/
+theorem polymorphic_flipOrientation (locus : Fin n) :
+    (design.flipOrientation locus).Polymorphic ↔ design.Polymorphic :=
+  Iff.rfl
 
 /-- **The two-pool interaction design**: two disjoint pools of loci, with the
 tested sets being the cross-pool pairs and at least one tested set per pair.
@@ -2017,9 +2078,25 @@ theorem twoPool_not_variantDisjoint {design : GenotypeDesign n ι}
 /-- Fourth cumulant of a centered law in terms of its second and fourth moments,
 `κ₄ = m₄ - 3 m₂²`.
 
-Empirical status: UNTESTED as a claim about any particular statistic; as an
-identity it is the definition of the fourth cumulant of a centered law, with no
-free parameter. -/
+**Numerical warning, and this one cannot be rewritten away.** The whole use of
+`κ₄` is to detect departure from Gaussianity, and `fourthCumulantFromMoments_gaussian`
+below says that the Gaussian case is exactly `m₄ = 3 m₂²`. So the interesting
+regime IS the regime in which the two terms cancel: the quantity being estimated
+is the small residue of a subtraction of nearly equal numbers, and its
+floating-point relative error is machine epsilon divided by the relative excess
+kurtosis. Measured float64 against a 60-digit reference, arguments rounded to
+float64 first, along `m₄ = 3 m₂²(1 + δ)` for `m₂ ∈ {0.01, 1, 100}` and `δ` from
+`10⁻¹` down to `10⁻¹⁶`: **7 of 48 cells exceed 1e-6 relative error, worst 2.5**
+-- a 250% error, i.e. the reported cumulant has the wrong magnitude and can have
+the wrong sign. The failing region is `δ ≲ 10⁻¹⁰`.
+
+No algebraic rewrite fixes this, because the two RAW moments are the only inputs
+this body has and the cancellation is already complete in them. The fix belongs
+to the consumer, and there are only two honest ones: estimate `κ₄` from CENTERED
+sample data by the k-statistic `k₄`, which never forms `m₄ - 3m₂²` in floating
+point; or restrict the domain, and report `κ₄` as indistinguishable from zero
+whenever `|m₄ - 3m₂²| ≲ 10⁻¹⁰ · m₄`. Any consumer that takes a sign or a ratio of
+this body below that threshold is reading rounding noise. -/
 def fourthCumulantFromMoments (secondMoment fourthMoment : ℝ) : ℝ :=
   fourthMoment - 3 * secondMoment ^ 2
 

@@ -88,6 +88,50 @@ theorem discoveryNCP_at_reference_point :
 def gwasDiscovered (n β maf_causal ld z : ℝ) : Prop :=
   z ^ 2 ≤ discoveryNCP n β maf_causal ld
 
+/-! ### Metamorphic relations the noncentrality parameter must satisfy
+
+These are transformations of the INPUT whose effect on the output is known exactly,
+so a body that fails one is defective whatever convention it claims. They are stated
+here because `discoveryNCP` is the corpus's power currency and every one of them is a
+statement about the arithmetic rather than about a simulated number: no measurement can
+excuse a failure and none is needed to establish a pass. -/
+
+/-- **Reference/alternate allele swap leaves discovery power alone.** Relabelling the
+alleles at a variant sends `β ↦ -β` and `maf ↦ 1 - maf` TOGETHER -- never one without
+the other -- and the noncentrality parameter is even in the first and, through
+`genotypeVarianceHWE`, even about one half in the second. Discovery power is a property
+of the variant, and which allele the assembly happens to call reference is not. -/
+theorem discoveryNCP_allele_swap (n β maf ld : ℝ) :
+    discoveryNCP n (-β) (1 - maf) ld = discoveryNCP n β maf ld := by
+  unfold discoveryNCP genotypeVarianceHWE
+  ring
+
+/-- **Rescaling every effect size by `c` scales the noncentrality parameter by `c²`.**
+This is the relation that fixes the exponent on `β`: a body linear in `β` would scale
+by `c`, and only the quadratic one scales by `c²`. It is also what makes the trait's
+unit of measurement drop out of any power calculation that divides by a variance in the
+same unit. -/
+theorem discoveryNCP_scale_effect (n β maf ld c : ℝ) :
+    discoveryNCP n (c * β) maf ld = c ^ 2 * discoveryNCP n β maf ld := by
+  unfold discoveryNCP
+  ring
+
+/-- **Rescaling the tagging correlation by `c` scales the noncentrality parameter by
+`c²`.** The same quadratic exponent on the LD term, which is what makes the power loss
+from imperfect tagging `r²` rather than `r`. -/
+theorem discoveryNCP_scale_ld (n β maf ld c : ℝ) :
+    discoveryNCP n β maf (c * ld) = c ^ 2 * discoveryNCP n β maf ld := by
+  unfold discoveryNCP
+  ring
+
+/-- **Doubling the sample doubles the noncentrality parameter.** Linear, not quadratic:
+the `√n` in the standard error becomes `n` in the squared statistic. Stated as a scaling
+so it constrains the exponent, which the monotonicity result below does not. -/
+theorem discoveryNCP_scale_n (n β maf ld c : ℝ) :
+    discoveryNCP (c * n) β maf ld = c * discoveryNCP n β maf ld := by
+  unfold discoveryNCP
+  ring
+
 /-- **The GWAS noncentrality parameter increases with sample size.** -/
 theorem discoveryNCP_increases_with_n
     (β p ld : ℝ) (n₁ n₂ : ℕ)
@@ -107,7 +151,6 @@ theorem discoveryNCP_increases_with_n
 strictly increasing as the allele frequency moves toward `1/2`. -/
 theorem genotypeVarianceHWE_strictMono_left_half
     (maf₁ maf₂ : ℝ)
-    (h_maf₂_pos : 0 < maf₂)
     (h_order : maf₂ < maf₁)
     (h_maf₁_half : maf₁ ≤ 1 / 2) :
     genotypeVarianceHWE maf₂ < genotypeVarianceHWE maf₁ := by
@@ -142,7 +185,7 @@ theorem different_populations_different_hits
   have h_var :
       genotypeVarianceHWE maf₂ < genotypeVarianceHWE maf₁ := by
     exact genotypeVarianceHWE_strictMono_left_half
-      maf₁ maf₂ h_maf₂_pos h_maf_order h_maf₁_half
+      maf₁ maf₂ h_maf_order h_maf₁_half
   have h_var_pos : 0 < genotypeVarianceHWE maf₂ := by
     unfold genotypeVarianceHWE
     have h_maf₂_lt_one : maf₂ < 1 := by

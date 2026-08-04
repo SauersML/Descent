@@ -508,7 +508,25 @@ theorem bernoulliLogLoss_certain_correct : bernoulliLogLoss 1 1 = 0 := by
   unfold bernoulliLogLoss
   norm_num
 
-/-- Real-valued Bernoulli KL divergence formula. -/
+/-- Real-valued Bernoulli KL divergence formula.
+
+**Numerical warning -- this body must not be evaluated as written near `p = q`.**
+The divergence is second order in `p - q` (`KL ≈ (p-q)² / (2q(1-q))`), but the body
+computes it as a sum of two logarithms each of which is first order in `p - q`, so
+the first-order parts cancel between the summands and the answer is what survives
+the cancellation. Measured float64 against a 60-digit reference, arguments rounded
+to float64 first so input representation cannot be charged to the formula, along
+`q = p + δ` for `p ∈ {0.001, 0.1, 0.5, 0.9}` and `δ` from `10⁻²` down to `10⁻¹⁴`:
+**34 of 52 cells exceed 1e-6 relative error, worst 2.4·10⁹.**
+
+That region is not exotic -- it is the calibrated regime, where a forecaster is
+nearly right and the divergence is being used as a small penalty. A consumer that
+compares two nearly calibrated forecasters by this body below `|p - q| ≈ 10⁻⁵` is
+ranking rounding noise. Either restrict the domain to `|p - q|` above that, or
+compute the divergence from `δ = p - q` in a form that does the cancellation
+symbolically before evaluating; the raw two-logarithm form cannot be rescued by
+`log1p` alone, because the cancellation is between the two terms and not inside
+either one. -/
 noncomputable def bernoulliKLReal (p q : ℝ) : ℝ :=
   p * Real.log (p / q) + (1 - p) * Real.log ((1 - p) / (1 - q))
 

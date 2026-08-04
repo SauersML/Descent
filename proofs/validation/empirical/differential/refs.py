@@ -27,6 +27,29 @@ def fst_nei_gst(p1: float, p2: float) -> float:
     MODEL: parametric (infinite sample), biallelic, equal subpopulation
     weights.  G_ST = 1 - H_S/H_T with H_S the mean within-deme expected
     heterozygosity and H_T the heterozygosity of the pooled allele frequency.
+
+    DOMAIN, and why this body is deliberately NOT written in the stable form.
+    `1 - H_S/H_T` is a catastrophic cancellation as p1 -> p2: the ratio tends to
+    1 and the answer is what survives the subtraction, so the float64 relative
+    error is machine epsilon divided by G_ST itself.  Measured against a
+    60-digit reference over p2 = p1 + delta with p1 in {0.01, 0.1, 0.3, 0.5} and
+    delta from 1e-2 down to 1e-14 (arguments rounded to float64 first, so input
+    representation is not charged to the formula): 36 of 52 cells exceed 1e-6
+    relative error, worst 9.3e11.  Below delta ~ 1e-8 the return value is
+    rounding noise of either sign.
+
+    The stable algebraic form is (p1-p2)**2 / (4*pbar*(1-pbar)), and that is
+    exactly the Lean body this reference is used to CHECK
+    (Calibrator.PopulationGeneticsFoundations.neiGstFromFrequencies).  Rewriting
+    this function into that form would make the oracle algebraically identical to
+    the definition under test, and an oracle pinned to the formula under test
+    cannot reject a competing formula -- the check would still pass and would
+    stop meaning anything.  So the textbook form stays, and the constraint moves
+    to the grid instead: `_PQ` in checks.py keeps |p1-p2| >= 0.02, which is nine
+    orders of magnitude above the failure region.  Do not extend any grid using
+    this reference toward p1 == p2; at that end it is the REFERENCE that is
+    wrong, not the corpus, and a disagreement there would be a false
+    falsification.
     """
     pbar = (p1 + p2) / 2.0
     h_s = (2 * p1 * (1 - p1) + 2 * p2 * (1 - p2)) / 2.0

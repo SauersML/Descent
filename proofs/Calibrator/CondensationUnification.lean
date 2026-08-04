@@ -889,7 +889,26 @@ theorem squaringScaleSq_add_one (fourthMoment : ℝ) :
 floor's even moments: `(m₈ - 4m₆ + 6m₄ - 4m₂ + 1) / (m₄ - 1)²`.
 
 Empirical status: DERIVED. The binomial expansion of `(X² - 1)⁴` divided by `σ⁴`; no free
-parameter and nothing fitted. -/
+parameter and nothing fitted.
+
+**Numerical warning -- the expanded form must not be evaluated as written.** The
+numerator is `E[(X² - 1)⁴]` with the fourth power multiplied out, so it is an
+alternating sum of raw moments with binomial coefficients `1, -4, 6, -4, 1`. Raw
+moments of a unit-variance coordinate are all `O(1)` while their alternating
+combination is `O(σ⁸)`, and `σ² = m₄ - 1` is small precisely on the descent this
+recurrence is built to follow. Measured float64 against a 60-digit reference,
+arguments rounded to float64 first, along a Gaussian family and a near-two-point
+family approaching `m₄ = 1`: **6 of 25 cells exceed 1e-6 relative error, worst
+1.0** -- 100%, i.e. the next floor's fourth moment is returned as pure noise.
+The divisor `(m₄ - 1)²` then squares the damage.
+
+The stable evaluation never expands the power: form `Y = X² - 1` first and take
+`E[Y⁴] / (E[Y²])²` from CENTERED moments of `Y`. That is the same number and it
+has no cancellation in it. This body states which number is meant; it is not the
+recipe for computing it. Consumers restricted to raw moments must additionally
+require `m₄ - 1` bounded away from zero -- `nextFloorFourthMoment_unit_m4_is_junk`
+below names the exact-zero case, but the whole neighbourhood is unusable, not
+just the point. -/
 noncomputable def nextFloorFourthMoment (m2 m4 m6 m8 : ℝ) : ℝ :=
   (m8 - 4 * m6 + 6 * m4 - 4 * m2 + 1) / (m4 - 1) ^ 2
 

@@ -548,7 +548,24 @@ theorem dampedPremium_eq_sq (lam τ V : ℝ) :
   rw [← Real.exp_nat_mul]
   ring_nf
 
-/-- Cost of deploying the stale oracle rather than the damped one: `(1 - e^{-λτ})²·V`. -/
+/-- Cost of deploying the stale oracle rather than the damped one: `(1 - e^{-λτ})²·V`.
+
+**Numerical warning -- the short-horizon regime, which is the one this price is
+about, is where the written form fails.** As `λτ → 0` the exponential tends to `1`
+and `1 - e^{-λτ}` is a catastrophic cancellation; the true value is `λτ + O((λτ)²)`
+but every digit of it has to survive a subtraction of two numbers near `1`.
+Measured float64 against a 60-digit reference, argument rounded to float64 first,
+over `λτ` from `10` down to `10⁻¹⁸`: **7 of 20 cells exceed 1e-6 relative error,
+worst 1.0** -- at `λτ ≲ 10⁻⁸` the price is returned as `0`, i.e. a freshly
+refreshed oracle is reported as costing exactly nothing rather than a little,
+which is the sign error that makes a staleness budget look free.
+
+The stable evaluation is `expm1(-λτ)² · V`, using the library primitive that
+computes `eˣ - 1` without forming `eˣ` first; `(1 - e^{-x})² = (e^{-x} - 1)²`, so
+this is the same number. On the same 20 cells it gives **0 over tolerance, worst
+1.9·10⁻¹⁶**. Mathlib carries no `Real.expm1`, so the stable form cannot be stated
+as a Lean term here and this note is the whole of the record: any implementation
+of this body must use its language's `expm1`, not `1 - exp`. -/
 noncomputable def myopiaPrice (lam τ V : ℝ) : ℝ :=
   (1 - Real.exp (-(lam * τ))) ^ 2 * V
 

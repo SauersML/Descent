@@ -302,6 +302,26 @@ theorem OneLocusArchitecture.averageEffect_at_half (m : OneLocusArchitecture) (h
   rw [h]
   ring
 
+/-- **Relabelling the alleles at the locus negates the average effect.**
+
+Swapping which allele is called reference sends the frequency `p ↦ 1 - p` and the
+homozygote contrast `a ↦ -a`, while the dominance deviation `d` is unchanged: `d`
+measures the heterozygote's displacement from the midpoint of the two homozygotes, and
+exchanging the two homozygotes moves neither the heterozygote nor the midpoint.
+
+Fisher's average effect is the coefficient a DOSAGE regression recovers, and dosage is
+counted in the allele the assembly calls alternate, so `α` must be ODD under the swap --
+the same substitution described from the other end. That is the relation to check, and it
+is the one that fixes the sign structure: a body carrying `1 + 2p`, or `|1 - 2p|`, or an
+even function of `a`, would still vanish nowhere in particular and still reduce to `a` at
+`p = 1/2`, and would still be wrong. Note that this is a stronger constraint than
+`averageEffect_at_half`, which any multiple of `d` times an odd-about-one-half factor
+satisfies; here the coefficient on `d` is pinned to exactly `1 - 2p`. -/
+theorem OneLocusArchitecture.averageEffect_allele_swap (m : OneLocusArchitecture) :
+    OneLocusArchitecture.averageEffect ⟨-m.a, m.d, 1 - m.p⟩ = -m.averageEffect := by
+  simp only [OneLocusArchitecture.averageEffect]
+  ring
+
 /-! ### Wiring to the genotype core
 
 The claim that the average effect is "what a dosage regression recovers" was carried by
