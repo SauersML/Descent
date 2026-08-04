@@ -1344,7 +1344,8 @@ noncomputable def lagObservationDerivative {d : ℕ}
 locally distinguishes all `d` deployment directions when the model-supplied
 sensitivity matrix is nonsingular.  The converse holds by
 finite-dimensional linear algebra and is not proved here, so read this as the
-sufficient direction the determinant check actually certifies.  This is the actionable form of lag completion:
+sufficient direction the determinant check actually certifies.  This is the actionable form
+of lag completion:
 candidate lags are accepted by a determinant check, not merely by counting them.
 
 For PGS portability the coordinates can represent, for example, ancestry-tract age,
