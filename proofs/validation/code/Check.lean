@@ -500,7 +500,23 @@ def exempt : List (Name × String) :=
     (`Calibrator.characteristicAmplitude, "a sum of squares is nonnegative"),
     (`Calibrator.gaussianCriticalMultiplier, "condensationConstant is proved positive"),
     (`Calibrator.chain, "2 * k + 1 ≠ 0 for k : ℕ"),
-    (`Calibrator.uniformOccupancyDistinctHaplotypes, "(2 : ℝ) ^ k ≠ 0") ]
+    (`Calibrator.uniformOccupancyDistinctHaplotypes, "(2 : ℝ) ^ k ≠ 0"),
+    (`Calibrator.chain, "2 * k + 1 ≥ 1 for k : ℕ"),
+    (`Calibrator.meffPerturbed, "((n : ℝ) + 1)⁻¹ with n : ℕ, so the base is ≥ 1"),
+    (`Calibrator.probitScaleFactor,
+      "1 + a0 ^ 2 * ouVariance ≥ 1, since ouVariance_nonneg"),
+    (`Calibrator.probitIntercept, "divides by probitScaleFactor, proved positive"),
+    (`Calibrator.BoundedLogDistortion, "a Prop, not a value: the log sits under a binder"),
+    (`Calibrator.fairTwoPointVariance, "divides by the numeral 4"),
+    (`Calibrator.informationCrossoverTime, "divides by the numeral 2"),
+    (`Calibrator.horizonPolynomial, "coefficients are numerals"),
+    (`Calibrator.copiedBinaryJointExpectation, "divides by the numeral 2"),
+    (`Calibrator.twoMechanismMixture, "coefficients are numerals"),
+    (`Calibrator.threeMechanismMixture, "coefficients are numerals"),
+    (`Calibrator.condensationConstant, "Real.log 2 with a numeral argument"),
+    (`Calibrator.gaussianJetVariance, "Real.pi ^ 2 / 2 with numeral divisor"),
+    (`Calibrator.gaussianKurtosisMaf, "Real.sqrt 3 with a numeral argument"),
+    (`Calibrator.expanderAgreementFloor, "Real.sqrt 5 with a numeral argument") ]
 
 /-- Is this a numeric literal, or a ratio or negation of them?
 

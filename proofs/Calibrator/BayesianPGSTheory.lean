@@ -153,6 +153,15 @@ end BayesianLinearModel
 noncomputable def gaussianPosteriorShrinkage (n h : ℝ) : ℝ :=
   n * h / (n * h + 1)
 
+/-- **gaussianPosteriorShrinkage at its junk point, named.** The divisor `n * h + 1` vanishes
+when the sample size times the prior precision is minus one. A negative precision is
+inadmissible, so this is a caller error, and it is returned as `0`: complete shrinkage to the
+prior, a perfectly ordinary posterior weight. Consumers must exclude it by hypothesis. -/
+theorem gaussianPosteriorShrinkage_cancelling_precision_is_junk :
+    gaussianPosteriorShrinkage 1 (-1) = 0 := by
+  unfold gaussianPosteriorShrinkage
+  norm_num
+
 /-- **Connection theorem:** The shrinkage factor derived from the Bayesian
     linear model is exactly `gaussianPosteriorShrinkage n h`, deriving that
     formula from first principles rather than positing it. -/

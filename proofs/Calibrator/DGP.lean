@@ -73,6 +73,16 @@ not find it.
 noncomputable def fstMutationDriftEquilibrium (θ : ℝ) : ℝ :=
   1 / (1 + θ)
 
+/-- **fstMutationDriftEquilibrium at its junk point, named.** A negative scaled mutation rate is
+inadmissible, and the divisor `1 + θ` vanishes exactly there. Lean returns `0`: no
+differentiation at mutation-drift equilibrium, which is what an infinite mutation rate also
+gives. The two ends of the parameter range meet at the same reported value. Consumers must
+exclude it by hypothesis. -/
+theorem fstMutationDriftEquilibrium_negative_unit_theta_is_junk :
+    fstMutationDriftEquilibrium (-1) = 0 := by
+  unfold fstMutationDriftEquilibrium
+  norm_num
+
 /-- **The mutation-drift equilibrium `Fst`, pinned.** This definition carries no theorem of its
 own. At `θ = 1` mutation and drift contribute equally and the equilibrium differentiation is one
 half, which fixes the `1 + θ` denominator against `1 / (1 + 2 * θ)` and `1 / (1 + θ) ^ 2`. -/
