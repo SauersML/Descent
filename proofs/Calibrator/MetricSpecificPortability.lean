@@ -611,7 +611,10 @@ noncomputable def fisherTraceMSELowerBound
     (nEff nParams infoPerSample : ℝ) : ℝ :=
   adaptationDifficultyIndex nParams infoPerSample / nEff
 
-/-- **fisherTraceMSELowerBound at zero nEff, named.** With zero effective sample size the trace-MSE bound diverges: nothing is estimable. Lean returns `0`, a floor of zero, which certifies perfect estimation from no effective data. A lower bound that vanishes where estimation is impossible certifies rather than warns. Consumers must require `nEff ≠ 0`. -/
+/-- **fisherTraceMSELowerBound at zero nEff, named.** With zero effective sample size the
+trace-MSE bound diverges: nothing is estimable. Lean returns `0`, a floor of zero, which
+certifies perfect estimation from no effective data. A lower bound that vanishes where
+estimation is impossible certifies rather than warns. Consumers must require `nEff ≠ 0`. -/
 theorem fisherTraceMSELowerBound_zero_neff_is_junk (nParams infoPerSample : ℝ) :
     fisherTraceMSELowerBound 0 nParams infoPerSample = 0 := by
   unfold fisherTraceMSELowerBound
@@ -626,8 +629,11 @@ noncomputable def requiredEffectiveSampleSizeForTraceMSE
     (nParams infoPerSample targetTraceMSE : ℝ) : ℝ :=
   adaptationDifficultyIndex nParams infoPerSample / targetTraceMSE
 
-/-- **requiredEffectiveSampleSizeForTraceMSE at zero targetTraceMSE, named.** A target trace-MSE of zero demands infinite data. Lean returns `0`, reporting that exact recovery is free. Consumers must require `targetTraceMSE ≠ 0`. -/
-theorem requiredEffectiveSampleSizeForTraceMSE_zero_targettracemse_is_junk (nParams infoPerSample : ℝ) :
+/-- **requiredEffectiveSampleSizeForTraceMSE at zero targetTraceMSE, named.** A target
+trace-MSE of zero demands infinite data. Lean returns `0`, reporting that exact recovery is
+free. Consumers must require `targetTraceMSE ≠ 0`. -/
+theorem requiredEffectiveSampleSizeForTraceMSE_zero_targettracemse_is_junk
+    (nParams infoPerSample : ℝ) :
     requiredEffectiveSampleSizeForTraceMSE nParams infoPerSample 0 = 0 := by
   unfold requiredEffectiveSampleSizeForTraceMSE
   simp
@@ -1572,7 +1578,8 @@ theorem uResolvedConditional_driftDefect_zero (u : Fin 2) :
 theorem vResolvedConditional_driftDefect_pos (v : Fin 2) :
     0 < driftDefect twoBitIndexWeights (vResolvedConditional v) := by
   unfold driftDefect pooledConditional vResolvedConditional
-  fin_cases v <;> norm_num [Fin.sum_univ_two, bitSign, driftFieldB, twoBitIndexWeights, binnedRiskByAncestry, Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons]
+  fin_cases v <;> norm_num [Fin.sum_univ_two, bitSign, driftFieldB, twoBitIndexWeights,
+    binnedRiskByAncestry, Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons]
 
 /-- **Resolving `U` has positive resolution**: the index-averaged conditional still varies across
 the bit, which is what resolution measures. -/
@@ -1580,7 +1587,8 @@ theorem uResolvedConditional_resolution_pos :
     0 < driftDefect twoBitIndexWeights
       (fun u ↦ pooledConditional twoBitIndexWeights (uResolvedConditional u)) := by
   unfold driftDefect pooledConditional uResolvedConditional
-  norm_num [Fin.sum_univ_two, bitSign, driftFieldB, twoBitIndexWeights, binnedRiskByAncestry, Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons]
+  norm_num [Fin.sum_univ_two, bitSign, driftFieldB, twoBitIndexWeights,
+    binnedRiskByAncestry, Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons]
 
 /-- **Resolving `V` has zero resolution.** The index average of the drifting part is constant, so
 a predictor that sees only `V` predicts the same value everywhere.
@@ -1591,7 +1599,8 @@ theorem vResolvedConditional_resolution_zero :
     driftDefect twoBitIndexWeights
       (fun v ↦ pooledConditional twoBitIndexWeights (vResolvedConditional v)) = 0 := by
   unfold driftDefect pooledConditional vResolvedConditional
-  norm_num [Fin.sum_univ_two, bitSign, driftFieldB, twoBitIndexWeights, binnedRiskByAncestry, Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons]
+  norm_num [Fin.sum_univ_two, bitSign, driftFieldB, twoBitIndexWeights,
+    binnedRiskByAncestry, Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons]
 
 /-! #### Drift invisible to genotype is irreducible by any amount of genotyping
 
