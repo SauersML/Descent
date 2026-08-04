@@ -445,16 +445,6 @@ theorem haplotypeTransportBias_pos_of_effects_not_portable
   rw [haplotypeTransportBias_eq]
   exact abs_pos.mpr h_gap
 
-/-- **Compound heterozygosity is invisible to a dosage score — but only when
-phasing is good enough.** The comparison is now quantitative: a correctly
-specified phase-aware predictor beats the dosage predictor exactly when its
-switch-error rate is below `freq_cis (1 − freq_cis)`, which is at most `1/4` and
-falls to zero as the configuration becomes monomorphic.
-
-This hypothesis is checkable and is not always satisfied. At `freq_cis = 0.05`
-the threshold is `0.0475`, comparable to reported switch-error rates in
-underrepresented populations, so the conclusion is not available there; see
-`dosage_beats_haplotype_when_phasing_poor` for the reversal. -/
 /-- Both error comparisons below reduce to this: the two closed forms differ only in a
 leading coefficient, and the shared factor `(δ_cis - δ_trans) ^ 2` is positive exactly when
 the two effects differ.  The comparison is therefore the coefficient comparison, in either
@@ -466,6 +456,16 @@ theorem mul_sq_sub_lt_of_lt_of_ne
       coeffLarge * (effectCis - effectTrans) ^ 2 :=
   mul_lt_mul_of_pos_right h_coeff (sq_pos_of_ne_zero (sub_ne_zero.mpr h_gap))
 
+/-- **Compound heterozygosity is invisible to a dosage score — but only when
+phasing is good enough.** The comparison is now quantitative: a correctly
+specified phase-aware predictor beats the dosage predictor exactly when its
+switch-error rate is below `freq_cis (1 − freq_cis)`, which is at most `1/4` and
+falls to zero as the configuration becomes monomorphic.
+
+This hypothesis is checkable and is not always satisfied. At `freq_cis = 0.05`
+the threshold is `0.0475`, comparable to reported switch-error rates in
+underrepresented populations, so the conclusion is not available there; see
+`dosage_beats_haplotype_when_phasing_poor` for the reversal. -/
 theorem compound_het_not_captured_by_dosage
     (freq_cis switch_err interaction_cis interaction_trans : ℝ)
     (h_phase_gap : interaction_cis ≠ interaction_trans)

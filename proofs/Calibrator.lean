@@ -425,51 +425,16 @@ section NoAxioms
 
 variable {t : ℕ}
 
-/-- Root-level restatement of `DGP.covariance_mismatch_pos_of_fst_and_sparse_array`, with
-    the same premises: a demographic covariance lower bound and its positivity side
-    conditions. It is primed rather than suffixed `_proved` because nothing here is
-    discharged -- the premises are the ones the `DGP` theorem already carries. -/
-theorem covariance_mismatch_pos_of_fst_and_sparse_array'
-    (sigmaSource sigmaTarget : Matrix (Fin t) (Fin t) ℝ)
-    (fstSource fstTarget recombRate arraySparsity kappa : ℝ)
-    (h_cov_lb :
-      demographicCovarianceGapLowerBound fstSource fstTarget recombRate arraySparsity kappa
-        ≤ frobeniusNormSq (sigmaSource - sigmaTarget))
-    (h_fst : fstSource < fstTarget)
-    (h_recomb_pos : 0 < recombRate)
-    (h_sparse_pos : 0 < arraySparsity)
-    (h_kappa_pos : 0 < kappa) :
-    0 < frobeniusNormSq (sigmaSource - sigmaTarget) := by
-  exact covariance_mismatch_pos_of_fst_and_sparse_array
-    sigmaSource sigmaTarget fstSource fstTarget recombRate arraySparsity kappa
-    h_cov_lb h_fst h_recomb_pos h_sparse_pos h_kappa_pos
+/-! `covariance_mismatch_pos_of_fst_and_sparse_array` and
+`target_r2_drop_of_fst_and_sparse_array` were each restated here under a primed name, with
+their binder blocks -- sixteen lines of hypotheses -- copied verbatim from `Calibrator.DGP`
+and a one-line proof citing the original.
 
-/-- Root-level restatement of `DGP.target_r2_drop_of_fst_and_sparse_array`: once covariance
-    and MSE lower bounds are supplied, target `R²` strictly drops in arbitrary matrix
-    dimension. Primed, not `_proved`: the covariance and MSE bounds remain premises. -/
-theorem target_r2_drop_of_fst_and_sparse_array'
-    (mseSource mseTarget varY lam : ℝ)
-    (sigmaSource sigmaTarget : Matrix (Fin t) (Fin t) ℝ)
-    (fstSource fstTarget recombRate arraySparsity kappa : ℝ)
-    (h_mse_gap_lb :
-      lam * frobeniusNormSq (sigmaSource - sigmaTarget) ≤ mseTarget - mseSource)
-    (h_cov_lb :
-      demographicCovarianceGapLowerBound fstSource fstTarget recombRate arraySparsity kappa
-        ≤ frobeniusNormSq (sigmaSource - sigmaTarget))
-    (h_lam_pos : 0 < lam)
-    (h_varY_pos : 0 < varY)
-    (h_fst : fstSource < fstTarget)
-    (h_recomb_pos : 0 < recombRate)
-    (h_sparse_pos : 0 < arraySparsity)
-    (h_kappa_pos : 0 < kappa) :
-    r2FromMSE mseTarget varY < r2FromMSE mseSource varY := by
-  have h_mismatch : 0 < frobeniusNormSq (sigmaSource - sigmaTarget) :=
-    covariance_mismatch_pos_of_fst_and_sparse_array'
-      sigmaSource sigmaTarget fstSource fstTarget recombRate arraySparsity kappa
-      h_cov_lb h_fst h_recomb_pos h_sparse_pos h_kappa_pos
-  exact target_r2_strictly_decreases_of_covariance_mismatch
-    mseSource mseTarget varY lam sigmaSource sigmaTarget
-    h_mse_gap_lb h_lam_pos h_mismatch h_varY_pos
+The restatements bought nothing.  Both originals are already in the `Calibrator` namespace,
+so every importer of this root module could always write the unprimed name and get the same
+theorem; what the copies added was two more places for a hypothesis to drift.  A restatement
+earns its keep when it discharges a premise or changes the dimension -- as the `_dim_two`
+specialisations above do, instantiating `t := 2` -- and these did neither. -/
 
 /-! ### `ld_decay_implies_nonlinear_calibration_of_exp_tagging` -- READ BEFORE TOUCHING ITS INPUTS
 
