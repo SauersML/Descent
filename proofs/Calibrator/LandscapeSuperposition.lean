@@ -769,6 +769,50 @@ theorem criticalMinorityProportion_at_zero_correlation_is_junk :
     criticalMinorityProportion 0 = 1 / 2 := by
   norm_num [criticalMinorityProportion]
 
+/-- For positive correlation, the critical minority share is the lower endpoint
+`(rho - rho_c) / (2 rho)` of the exact gap-closing interval. -/
+theorem criticalMinorityProportion_eq_ratio
+    (rho : ℝ) (hrho : 0 < rho) :
+    criticalMinorityProportion rho =
+      (rho - goldenCorrelationThreshold) / (2 * rho) := by
+  unfold criticalMinorityProportion
+  field_simp [hrho.ne']
+
+/-- The symmetric upper endpoint is `(rho + rho_c) / (2 rho)`. -/
+theorem one_sub_criticalMinorityProportion_eq_ratio
+    (rho : ℝ) (hrho : 0 < rho) :
+    1 - criticalMinorityProportion rho =
+      (rho + goldenCorrelationThreshold) / (2 * rho) := by
+  unfold criticalMinorityProportion
+  field_simp [hrho.ne']
+  ring
+
+/-- **Exact cancellation interval.**  For a positive pure-environment correlation, the pooled
+correlation lies on the non-gapped side exactly when the positive-environment mass lies between
+the two critical proportions. -/
+theorem mixedEnvironmentCorrelation_abs_le_golden_iff
+    (rho mix : ℝ) (hrho : 0 < rho) :
+    |mixedEnvironmentCorrelation rho mix| ≤ goldenCorrelationThreshold ↔
+      criticalMinorityProportion rho ≤ mix ∧
+        mix ≤ 1 - criticalMinorityProportion rho := by
+  rw [one_sub_criticalMinorityProportion_eq_ratio rho hrho,
+    criticalMinorityProportion_eq_ratio rho hrho, abs_le]
+  have htwoRho : 0 < 2 * rho := mul_pos (by norm_num) hrho
+  constructor
+  · rintro ⟨hlower, hupper⟩
+    constructor
+    · apply (div_le_iff₀ htwoRho).2
+      unfold mixedEnvironmentCorrelation at hlower
+      nlinarith
+    · apply (le_div_iff₀ htwoRho).2
+      unfold mixedEnvironmentCorrelation at hupper
+      nlinarith
+  · rintro ⟨hlower, hupper⟩
+    have hlower' := (div_le_iff₀ htwoRho).1 hlower
+    have hupper' := (le_div_iff₀ htwoRho).1 hupper
+    unfold mixedEnvironmentCorrelation
+    constructor <;> nlinarith
+
 
 /-- At the critical minority fraction, the effective correlation is exactly the golden
 threshold. -/
@@ -809,6 +853,36 @@ theorem mixedEnvironmentGapCertificate_nonneg_of_minority_ge_critical
   apply populationGapCertificate_nonneg_of_abs_le_golden
   rw [abs_of_nonneg heffectiveNonneg]
   exact heffectiveLe
+
+/-- **Complete two-environment population phase diagram.**  Inside the biological mixture and
+correlation ranges, the population gap certificate is nonnegative exactly on the symmetric
+critical interval.  Outside that interval each pure-sign side has a strictly negative
+certificate. -/
+theorem mixedEnvironmentGapCertificate_nonneg_iff
+    (rho mix : ℝ) (hrho : 0 < rho) (hrhoUpper : rho ≤ 1)
+    (hmix : mix ∈ Set.Icc (0 : ℝ) 1) :
+    0 ≤ populationGapCertificate (mixedEnvironmentCorrelation rho mix) ↔
+      criticalMinorityProportion rho ≤ mix ∧
+        mix ≤ 1 - criticalMinorityProportion rho := by
+  rw [← mixedEnvironmentCorrelation_abs_le_golden_iff rho mix hrho]
+  constructor
+  · intro hcertificate
+    have hcentered : |2 * mix - 1| ≤ 1 := by
+      rw [abs_le]
+      constructor <;> linarith [hmix.1, hmix.2]
+    have heffectiveBound : |mixedEnvironmentCorrelation rho mix| ≤ 1 := by
+      rw [mixedEnvironmentCorrelation, abs_mul, abs_of_pos hrho]
+      calc
+        rho * |2 * mix - 1| ≤ rho * 1 :=
+          mul_le_mul_of_nonneg_left hcentered hrho.le
+        _ ≤ 1 := by simpa using hrhoUpper
+    by_contra houtside
+    have hgolden : goldenCorrelationThreshold <
+        |mixedEnvironmentCorrelation rho mix| := lt_of_not_ge houtside
+    have hnegative := populationGapCertificate_neg_of_golden_lt_abs
+      (mixedEnvironmentCorrelation rho mix) heffectiveBound hgolden
+    linarith
+  · exact mixedEnvironmentGapCertificate_nonneg rho mix
 
 /-! ## Anisotropy separates Euclidean overlap from covariance energy -/
 
