@@ -455,8 +455,10 @@ noncomputable def portabilityFromArchitecture
 theorem portabilityFromArchitecture_eq_rg_sq_mul_retention
     (rg fst tagging_ratio : ℝ) :
     portabilityFromArchitecture rg fst tagging_ratio =
-      rg^2 * covarianceRetention (covarianceRetentionFactorFromFst fst) (ldOverlapFromSharedLD tagging_ratio) := by
-  unfold portabilityFromArchitecture covarianceRetention covarianceRetentionFactorFromFst ldOverlapFromSharedLD
+      rg ^ 2 * covarianceRetention (covarianceRetentionFactorFromFst fst)
+        (ldOverlapFromSharedLD tagging_ratio) := by
+  unfold portabilityFromArchitecture covarianceRetention covarianceRetentionFactorFromFst
+    ldOverlapFromSharedLD
   ring
 
 /-- **Portability equals rg² × (1 - divergence), where divergence is derived.**

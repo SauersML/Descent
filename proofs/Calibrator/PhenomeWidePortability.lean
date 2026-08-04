@@ -239,7 +239,8 @@ and `DriftRegime` records what substituting one for another cost — but the map
 is written down here, so a convention change in any one of them contradicts this. This
 module is where all three are visible at once. -/
 theorem lossOfRetention_eq_fstFromDriftFactor_eq_covarianceRetentionFactorFromFst (r : ℝ) :
-    lossOfRetention r = fstFromDriftFactor r ∧ lossOfRetention r = covarianceRetentionFactorFromFst r :=
+    lossOfRetention r = fstFromDriftFactor r ∧
+      lossOfRetention r = covarianceRetentionFactorFromFst r :=
   ⟨rfl, rfl⟩
 
 /-- **`F_ST` from an admissible drift factor lies in `[0, 1)`.**
