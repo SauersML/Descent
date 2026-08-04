@@ -157,6 +157,42 @@ theorem observationL1Distance_nonneg
     0 ≤ E.observationL1Distance θ₁ θ₂ := by
   exact Finset.sum_nonneg fun _ _ ↦ abs_nonneg _
 
+/-- An observation law has zero ℓ¹ distance from itself. -/
+@[simp] theorem observationL1Distance_self
+    (θ : Fin (parameterCount + 1)) :
+    E.observationL1Distance θ θ = 0 := by
+  simp [observationL1Distance]
+
+/-- Observation ℓ¹ distance is symmetric. -/
+theorem observationL1Distance_comm
+    (θ₁ θ₂ : Fin (parameterCount + 1)) :
+    E.observationL1Distance θ₁ θ₂ = E.observationL1Distance θ₂ θ₁ := by
+  unfold observationL1Distance
+  apply Finset.sum_congr rfl
+  intro observation _
+  exact abs_sub_comm _ _
+
+/-- Any two probability laws have ℓ¹ distance at most two. -/
+theorem observationL1Distance_le_two
+    (θ₁ θ₂ : Fin (parameterCount + 1)) :
+    E.observationL1Distance θ₁ θ₂ ≤ 2 := by
+  have hmass₁ : ∑ observation, (E.observation θ₁).probability observation = 1 :=
+    (finitePrior_probability_mem (E.observation θ₁)).2
+  have hmass₂ : ∑ observation, (E.observation θ₂).probability observation = 1 :=
+    (finitePrior_probability_mem (E.observation θ₂)).2
+  calc
+    E.observationL1Distance θ₁ θ₂ ≤
+        ∑ observation, ((E.observation θ₁).probability observation +
+          (E.observation θ₂).probability observation) := by
+      unfold observationL1Distance
+      refine Finset.sum_le_sum fun observation _ ↦ ?_
+      have h₁ := FinitePrior.probability_nonneg (E.observation θ₁) observation
+      have h₂ := FinitePrior.probability_nonneg (E.observation θ₂) observation
+      simpa [abs_of_nonneg h₁, abs_of_nonneg h₂] using
+        abs_sub_le ((E.observation θ₁).probability observation) 0
+          ((E.observation θ₂).probability observation)
+    _ = 2 := by rw [Finset.sum_add_distrib, hmass₁, hmass₂]; norm_num
+
 /-- **ℓ¹ data-processing inequality.** Every parameter-independent stochastic channel
 contracts observation-law distance. -/
 theorem observationL1Distance_garble_le
