@@ -1,6 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Mathlib.Analysis.Convex.SpecificFunctions.Basic
 import Calibrator.Probability
 import Calibrator.PortabilityDrift
 import Calibrator.PGSCalibrationTheory
@@ -1755,6 +1756,49 @@ theorem ogpMinorityFraction_at_unit_coupling :
     (1 - (Real.sqrt 5 - 1) / 2) / 2 = (3 - Real.sqrt 5) / 4 := by
   ring
 
+/-! #### The sign restriction the nineteen per cent depends on
+
+The construction above mixes couplings `ρ` and `-ρ`, and it closes the barrier by
+passing the mixed coupling through zero at `π = 1/2`. That is a cancellation of
+opposite signs, not an averaging of magnitudes, and the distinction decides
+whether the minority share means anything for study design: real ancestries
+usually differ in the *magnitude* of their linkage correlations, not the sign.
+Sign flips occur -- a variant arising on a different haplotype background -- but
+they are not the typical case.
+
+The two results below say exactly that: the mixed coupling is the convex
+combination of the two cohort couplings, and it reaches zero only at the balance
+point. The complementary half -- that same-sign cohorts keep their sign under
+every mixture, so no mixture reaches zero -- is
+`sameSignAncestryPooling_preservesActiveCorrelation` in `LandscapeSuperposition`,
+and is not restated here.
+
+So the demonstrated mechanism is narrower than "diversity helps", and whether
+same-sign cohorts of differing magnitude can also close a barrier is not settled
+by this construction. -/
+noncomputable def mixtureCoupling (ρ π : ℝ) : ℝ := ρ * (2 * π - 1)
+
+/-- **The mixed coupling is the convex combination of `ρ` and `-ρ`.** Written this
+way the mechanism is visible: the two cohorts enter with opposite signs. -/
+theorem mixtureCoupling_eq_convex (ρ π : ℝ) :
+    mixtureCoupling ρ π = π * ρ + (1 - π) * (-ρ) := by
+  unfold mixtureCoupling
+  ring
+
+/-- **Opposite signs close the barrier at the balance point, and only there.** -/
+theorem mixtureCoupling_eq_zero_iff (ρ π : ℝ) (hρ : ρ ≠ 0) :
+    mixtureCoupling ρ π = 0 ↔ π = 1 / 2 := by
+  unfold mixtureCoupling
+  constructor
+  · intro h
+    rcases mul_eq_zero.mp h with h' | h'
+    · exact absurd h' hρ
+    · linarith
+  · intro h
+    rw [h]
+    ring
+
+
 /-! #### A direction invisible to the pooled design is invisible to every cohort
 
 The exact-degeneracy counterpart, and it runs the other way from the barrier
@@ -1808,10 +1852,15 @@ theorem mixtureRate_le_averagedRate (π s₁ s₂ lam : ℝ)
     (hπ0 : 0 ≤ π) (hπ1 : π ≤ 1) (hs₁ : 0 < 1 + 2 * lam * s₁) (hs₂ : 0 < 1 + 2 * lam * s₂) :
     π * Real.log (1 + 2 * lam * s₁) + (1 - π) * Real.log (1 + 2 * lam * s₂)
       ≤ Real.log (1 + 2 * lam * (π * s₁ + (1 - π) * s₂)) := by
-  have hcon : ConcaveOn ℝ (Set.Ioi 0) Real.log :=
-    (Real.strictConcaveOn_log_Ioi).concaveOn
-  have h := hcon.2 (Set.mem_Ioi.mpr hs₁) (Set.mem_Ioi.mpr hs₂) hπ0 (by linarith) (by ring)
-  simpa [smul_eq_mul, mul_add, add_mul, mul_comm, mul_left_comm, mul_assoc] using h
+  have hcon : ConcaveOn ℝ (Set.Ioi 0) Real.log := strictConcaveOn_log_Ioi.concaveOn
+  have h := hcon.2 (Set.mem_Ioi.mpr hs₁) (Set.mem_Ioi.mpr hs₂) hπ0
+    (by linarith : (0:ℝ) ≤ 1 - π) (by ring : π + (1 - π) = 1)
+  have hmix : π • (1 + 2 * lam * s₁) + (1 - π) • (1 + 2 * lam * s₂)
+      = 1 + 2 * lam * (π * s₁ + (1 - π) * s₂) := by
+    simp only [smul_eq_mul]
+    ring
+  rw [hmix] at h
+  simpa [smul_eq_mul] using h
 
 /-! #### The frequency-spectrum inverse problem locks complexity to ill-posedness
 
