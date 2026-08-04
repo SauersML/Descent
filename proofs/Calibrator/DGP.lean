@@ -1077,7 +1077,7 @@ theorem linear_noise_implies_nonlinear_slope
   dsimp [optimalSlopeLinearNoise] at h0 h1 h2
 
   -- Simplify the equations
-  simp only [mul_zero, add_zero, zero_mul, mul_one] at h0 h1
+  simp only [mul_zero, add_zero, mul_one] at h0 h1
   have h2 : beta0 + 2 * beta1 = sigma_g_sq / (sigma_g_sq + base_error + slope_error * 2) := by
     convert h2 using 1
     ring
@@ -2073,7 +2073,13 @@ within-generation ordering does not matter.  This is the first-order
 `(1 - mig)²(1 - mu)²` against `1 - 1/(2 Nₑ)` and has a fixed point differing at
 `O(mig², mu², mig/Nₑ)`.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_bulk3.py`,
+    `test_ibd_flow_step_dgp`). One generation of drift with flow from a fixed
+    source pool, 4000 loci, 300 replicate populations, worst 0.24 sems over a
+    prediction spanning 0.02698 to 0.07078. Mutation and migration enter only
+    through their sum, and the design includes a cell where each supplies half
+    of it. -/
 noncomputable def fstDriftFlowStep (p : EvolutionaryParameters) (F : ℝ) : ℝ :=
   F + (1 - F) / (2 * p.Ne) - 2 * (p.mig + p.mu) * F
 
@@ -3100,9 +3106,9 @@ noncomputable def PGSEvolutionaryModel.metricProfileFromTargetSignalWithPenalty
     (m.metricProfileFromTargetSignalWithPenalty vSignalTarget penalty).brier =
       TransportedMetrics.calibratedBrier m.prevalence
         (TransportedMetrics.r2FromSignalVariance vSignalTarget (m.V_E + penalty.total)) := by
-  simpa [PGSEvolutionaryModel.metricProfileFromTargetSignalWithPenalty] using
-    TransportedMetrics.profileFromSignalVarianceWithPenalty_brier_eq_chart
-      m.prevalence m.V_E vSignalTarget penalty
+  unfold PGSEvolutionaryModel.metricProfileFromTargetSignalWithPenalty
+  exact TransportedMetrics.profileFromSignalVarianceWithPenalty_brier_eq_chart
+    m.prevalence m.V_E vSignalTarget penalty
 
 /-! ### Step 4: Coordinate-Rate Summaries
 
