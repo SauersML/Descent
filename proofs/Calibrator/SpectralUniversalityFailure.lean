@@ -49,7 +49,7 @@ that a spectral portability summary discards.
 
 open scoped BigOperators Matrix
 
-section ThirdMomentContraction
+section CumulantContractions
 
 variable {Row Locus : Type*} [Fintype Row] [Fintype Locus]
 
@@ -251,7 +251,7 @@ theorem entryFourthSum_eq_sum_ldPowerScore_four (covariance : Matrix Locus Locus
   unfold entryFourthSum ldPowerScore
   rw [Finset.sum_comm]
 
-end ThirdMomentContraction
+end CumulantContractions
 
 /-! ## An exactly isospectral two-dimensional witness -/
 
@@ -493,6 +493,30 @@ noncomputable def lowSNRFourthOrientationCoefficient
     (fourthCumulant h4 : ℝ) : ℝ :=
   -(fourthCumulant ^ 2 / 48 * h4)
 
+/-- The fourth spectral moment produced by the rectangular Gaussian design.  Here `c` is the
+inverse aspect ratio and `m1`, ..., `m4` are the first four covariance spectral moments. -/
+noncomputable def gaussianDesignFourthSpectralMoment
+    (c m1 m2 m3 m4 : ℝ) : ℝ :=
+  m4 + c * (4 * m1 * m3 + 2 * m2 ^ 2) +
+    6 * c ^ 2 * m1 ^ 2 * m2 + c ^ 3 * m1 ^ 4
+
+/-- Complete fourth low-SNR coefficient: a spectral Wishart term plus the fourth-cumulant
+traffic term.  This definition keeps the two information channels visibly separate. -/
+noncomputable def lowSNRFourthCoefficient
+    (c variance fourthCumulant m1 m2 m3 m4 h4 : ℝ) : ℝ :=
+  -(variance ^ 4 / 8 * gaussianDesignFourthSpectralMoment c m1 m2 m3 m4) -
+    fourthCumulant ^ 2 / 48 * h4
+
+/-- At fixed spectral moments, orientation changes the complete fourth coefficient by precisely
+the fourth-cumulant square times the change in fourth-power traffic. -/
+theorem lowSNRFourthCoefficient_sub_of_spectral_match
+    (c variance fourthCumulant m1 m2 m3 m4 h4Left h4Right : ℝ) :
+    lowSNRFourthCoefficient c variance fourthCumulant m1 m2 m3 m4 h4Right -
+        lowSNRFourthCoefficient c variance fourthCumulant m1 m2 m3 m4 h4Left =
+      fourthCumulant ^ 2 / 48 * (h4Left - h4Right) := by
+  unfold lowSNRFourthCoefficient
+  ring
+
 /-- For a Rademacher prior, whose fourth cumulant is `-2`, the rotated design's fourth-order
 mutual-information coefficient exceeds the localized design's by exactly `49 / 96`. -/
 theorem rademacher_lowSNRFourthCoefficient_rotated_sub_localized :
@@ -504,6 +528,17 @@ theorem rademacher_lowSNRFourthCoefficient_rotated_sub_localized :
           -((-2 : ℝ) ^ 2 / 48 * localizedUniformFourthInvariant) =
         (localizedUniformFourthInvariant - rotatedUniformFourthInvariant) / 12 := by ring
     _ = 49 / 96 := by rw [localizedUniformFourthInvariant_sub_rotated]; norm_num
+
+/-- The same `49 / 96` separation for the complete fourth coefficient, uniformly in the aspect
+ratio and all four common spectral moments. -/
+theorem rademacher_fullLowSNRFourthCoefficient_rotated_sub_localized
+    (c m1 m2 m3 m4 : ℝ) :
+    lowSNRFourthCoefficient c 1 (-2) m1 m2 m3 m4 rotatedUniformFourthInvariant -
+        lowSNRFourthCoefficient c 1 (-2) m1 m2 m3 m4 localizedUniformFourthInvariant =
+      49 / 96 := by
+  rw [lowSNRFourthCoefficient_sub_of_spectral_match]
+  rw [localizedUniformFourthInvariant_sub_rotated]
+  norm_num
 
 /-! ## The order-two coincidence -/
 

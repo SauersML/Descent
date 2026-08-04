@@ -809,8 +809,10 @@ structure UnifiedBiologyObstructions : Prop where
   /-- For a coding-symmetric Rademacher architecture, the missing LD orientation changes the
   fourth-order low-SNR information coefficient by exactly `49 / 96`. -/
   symmetricLDChangesLowSNRCoefficient :
-    lowSNRFourthOrientationCoefficient (-2) rotatedUniformFourthInvariant -
-        lowSNRFourthOrientationCoefficient (-2) localizedUniformFourthInvariant = 49 / 96
+    ∀ c m1 m2 m3 m4 : ℝ,
+      lowSNRFourthCoefficient c 1 (-2) m1 m2 m3 m4 rotatedUniformFourthInvariant -
+          lowSNRFourthCoefficient c 1 (-2) m1 m2 m3 m4 localizedUniformFourthInvariant =
+        49 / 96
   /-- A cross-state criterion is not a function of the target context: it fails to descend along
   the label the target-only annotation descends along. -/
   crossStateDoesNotDescend :
@@ -894,7 +896,7 @@ theorem unifiedBiology_obstructions : UnifiedBiologyObstructions := by
         ⟨localizedCovarianceBlock_isospectral_rotatedCovarianceBlock (3 / 2),
           midpoint_blockEntryFourthMean_ne⟩
       symmetricLDChangesLowSNRCoefficient :=
-        rademacher_lowSNRFourthCoefficient_rotated_sub_localized
+        rademacher_fullLowSNRFourthCoefficient_rotated_sub_localized
       crossStateDoesNotDescend := not_descends_contextMatchQuality_along_targetState
       marginalDescentDoesNotCompose := admissible_interaction_join_obstruction
       crudeReportingLosesDescent := admissible_confounding_meet_obstruction
