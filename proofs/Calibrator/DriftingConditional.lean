@@ -1934,6 +1934,83 @@ theorem norm_charFun_le_geometric (ν : Measure ℝ) [IsFiniteMeasure ν]
           push_cast
           ring
 
+/-! ### Step seven: iterating the equation evaluates the characteristic function
+
+One substitution of the functional equation into itself turns `α` into `α²` and leaves behind a
+Gaussian factor and a phase. Doing it `n` times leaves behind the two partial sums of a geometric
+series, and `α < 1` makes both converge while `αⁿ u` runs to zero. The value at zero is the total
+mass, so the limit is a closed form -- and the closed form is a Gaussian characteristic function
+with variance `s²α²/(1-α²)` and mean `β/(1-α)`. -/
+
+open MeasureTheory ProbabilityTheory Complex in
+/-- **One substitution.** The equation, rearranged into the direction the iteration runs. -/
+theorem charFun_selfSimilar_step (ν : Measure ℝ) [IsFiniteMeasure ν]
+    {s α β : ℝ} (hα : 0 < α)
+    (heq : ∀ t : ℝ, Complex.exp (-(((s * t) ^ 2 : ℝ) : ℂ) / 2) * charFun ν t
+      = charFun ν (t / α) * Complex.exp (((-(β * t / α) : ℝ) : ℂ) * Complex.I)) (u : ℝ) :
+    charFun ν u
+      = charFun ν (α * u) * Complex.exp ((-((s * (α * u)) ^ 2) / 2 : ℝ))
+        * Complex.exp (((β * u : ℝ) : ℂ) * Complex.I) := by
+  have hcancel : α * u / α = u := by field_simp
+  have h := heq (α * u)
+  rw [hcancel] at h
+  have hphase : β * (α * u) / α = β * u := by field_simp
+  rw [hphase] at h
+  have hcoe : (-(((s * (α * u)) ^ 2 : ℝ) : ℂ) / 2)
+      = (((-((s * (α * u)) ^ 2) / 2 : ℝ)) : ℂ) := by push_cast; ring
+  rw [hcoe] at h
+  have hunit : Complex.exp (((-(β * u) : ℝ) : ℂ) * Complex.I)
+      * Complex.exp (((β * u : ℝ) : ℂ) * Complex.I) = 1 := by
+    rw [← Complex.exp_add]
+    rw [show (((-(β * u) : ℝ) : ℂ) * Complex.I + ((β * u : ℝ) : ℂ) * Complex.I) = 0 by
+      push_cast; ring]
+    exact Complex.exp_zero
+  calc charFun ν u
+      = charFun ν u * (Complex.exp (((-(β * u) : ℝ) : ℂ) * Complex.I)
+          * Complex.exp (((β * u : ℝ) : ℂ) * Complex.I)) := by rw [hunit, mul_one]
+    _ = (charFun ν u * Complex.exp (((-(β * u) : ℝ) : ℂ) * Complex.I))
+          * Complex.exp (((β * u : ℝ) : ℂ) * Complex.I) := by ring
+    _ = (Complex.exp ((((-((s * (α * u)) ^ 2) / 2 : ℝ)) : ℂ)) * charFun ν (α * u))
+          * Complex.exp (((β * u : ℝ) : ℂ) * Complex.I) := by rw [← h]
+    _ = charFun ν (α * u) * Complex.exp ((-((s * (α * u)) ^ 2) / 2 : ℝ))
+          * Complex.exp (((β * u : ℝ) : ℂ) * Complex.I) := by ring
+
+open MeasureTheory ProbabilityTheory Complex in
+/-- **`n` substitutions.** The Gaussian exponents and the phases each accumulate as a partial sum
+of a geometric series; this is the identity the limit is taken in. -/
+theorem charFun_selfSimilar_iterate (ν : Measure ℝ) [IsFiniteMeasure ν]
+    {s α β : ℝ} (hα : 0 < α)
+    (heq : ∀ t : ℝ, Complex.exp (-(((s * t) ^ 2 : ℝ) : ℂ) / 2) * charFun ν t
+      = charFun ν (t / α) * Complex.exp (((-(β * t / α) : ℝ) : ℂ) * Complex.I))
+    (u : ℝ) (n : ℕ) :
+    charFun ν u
+      = charFun ν (α ^ n * u)
+        * Complex.exp ((-(s ^ 2 * u ^ 2 / 2)
+            * ∑ k ∈ Finset.range n, α ^ (2 * (k + 1)) : ℝ))
+        * Complex.exp (((β * u * ∑ k ∈ Finset.range n, α ^ k : ℝ) : ℂ) * Complex.I) := by
+  induction n with
+  | zero => simp
+  | succ n ih =>
+    have hpow : α ^ (n + 1) * u = α * (α ^ n * u) := by ring
+    have hA : Complex.exp ((-((s * (α * (α ^ n * u))) ^ 2) / 2 : ℝ))
+        * Complex.exp ((-(s ^ 2 * u ^ 2 / 2)
+            * ∑ k ∈ Finset.range n, α ^ (2 * (k + 1)) : ℝ))
+        = Complex.exp ((-(s ^ 2 * u ^ 2 / 2)
+            * ∑ k ∈ Finset.range (n + 1), α ^ (2 * (k + 1)) : ℝ)) := by
+      rw [← Complex.exp_add, Finset.sum_range_succ]
+      congr 1
+      push_cast
+      ring
+    have hB : Complex.exp (((β * (α ^ n * u) : ℝ) : ℂ) * Complex.I)
+        * Complex.exp (((β * u * ∑ k ∈ Finset.range n, α ^ k : ℝ) : ℂ) * Complex.I)
+        = Complex.exp (((β * u * ∑ k ∈ Finset.range (n + 1), α ^ k : ℝ) : ℂ) * Complex.I) := by
+      rw [← Complex.exp_add, Finset.sum_range_succ]
+      congr 1
+      push_cast
+      ring
+    rw [ih, charFun_selfSimilar_step ν hα heq (α ^ n * u), hpow, ← hA, ← hB]
+    ring
+
 open MeasureTheory ProbabilityTheory in
 /-- **Necessity: no other bounded link shape survives.** A strictly increasing bounded link whose
 two-parameter family is closed under Gaussian averaging is a positive vertical affine transform
