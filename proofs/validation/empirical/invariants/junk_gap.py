@@ -1,0 +1,128 @@
+"""List definitions that can hit a junk value and say nothing about it.
+
+WHAT A JUNK VALUE IS
+
+Mathlib totalises partial operations: `x / 0 = 0`, `Real.log 0 = 0`,
+`Real.sqrt x = 0` for `x < 0`, `x⁻¹` at `0`.  Nothing errors.  A definition
+built from these therefore returns a number at every point of its type, and at
+some of those points the number is not the modelled quantity but the totality
+convention showing through.
+
+`totality.py` finds the exact points by instrumenting the backend: it records
+every guard (divisor, `log` argument, `sqrt` argument) at each evaluation, looks
+for guards that CHANGE SIGN along a coordinate, and bisects to the crossing.
+That is the authority, and it applies the three-part test that makes a junk
+point a DEFECT rather than a curiosity:
+
+  * the point is attainable inside the definition's own admissible box, and
+  * the modelled quantity has a defined limit there, and
+  * the junk value differs from that limit.
+
+WHAT THIS SCRIPT DOES INSTEAD
+
+The same reason `eval_gap.py` exists: `totality.py` needs a compiled corpus and
+a full instrumented sweep, and this needs only the sources.  It reports every
+definition containing a junk-capable operation together with the guard it
+depends on, and whether the module states a theorem naming that definition's
+junk branch.
+
+It is a NECESSARY-CONDITION scan, not a defect list.  Most entries are fine:
+the divisor cannot vanish inside the admissible box, or the junk value happens
+to agree with the limit.  What the entries share is that nothing in the corpus
+SAYS so, and the corpus convention is to say so -- see
+`stabilizingNsFromObservedCorrelation_perfect_is_junk`, which names the branch,
+states the wrong value, and records what consumers must require.  That pattern
+is the deliverable for a real one:
+
+    theorem NAME_at_POINT_is_junk : NAME <args> = <the wrong value> := by ...
+
+with a docstring saying what the modelled quantity does at that point and what
+hypothesis consumers must carry.  A junk branch that is named cannot be reached
+by accident; one that is not is a wrong answer inside the domain, returned
+silently, that no type error will ever reveal.
+
+    python3 junk_gap.py                  # counts, and the worst files
+    python3 junk_gap.py --list           # every entry with its guards
+    python3 junk_gap.py --file NAME      # one module
+"""
+
+from __future__ import annotations
+
+import collections
+import pathlib
+import re
+import sys
+
+HERE = pathlib.Path(__file__).resolve()
+CORPUS = HERE.parents[3] / "Calibrator"
+
+DEF_RE = re.compile(
+    r"^\s*(?:noncomputable\s+)?def\s+([a-z][A-Za-z0-9_']*)"
+    r"((?:.|\n)*?):=\s*\n?((?:.|\n)*?)(?=\n\n)", re.M)
+THM_RE = re.compile(
+    r"^\s*(?:@\[[^\]]*\]\s*)?(?:theorem|lemma)\s+([A-Za-z0-9_']+)", re.M)
+
+# `/-` opens a doc comment, so a division must not be followed by `-`.
+DIV_RE = re.compile(r"/(?!-)")
+GUARDS = (
+    ("division", DIV_RE),
+    ("inverse", re.compile(r"⁻¹")),
+    ("log", re.compile(r"Real\.log")),
+    ("sqrt", re.compile(r"Real\.sqrt")),
+)
+
+
+def scan() -> tuple[int, int, list[tuple[str, str, str]]]:
+    total = 0
+    named = 0
+    gap: list[tuple[str, str, str]] = []
+    for f in sorted(CORPUS.rglob("*.lean")):
+        txt = f.read_text(encoding="utf-8")
+        junk_thms = {t for t in THM_RE.findall(txt) if "junk" in t.lower()}
+        for m in DEF_RE.finditer(txt):
+            name, body = m.group(1), m.group(3)
+            if len(body) > 1200:
+                continue
+            kinds = [k for k, rx in GUARDS if rx.search(body)]
+            if not kinds:
+                continue
+            total += 1
+            if any(name in t for t in junk_thms):
+                named += 1
+            else:
+                gap.append((name, f.relative_to(CORPUS).as_posix(),
+                            ",".join(kinds)))
+    return total, named, gap
+
+
+def main(argv: list[str]) -> int:
+    if not CORPUS.is_dir():
+        print(f"corpus not found at {CORPUS}", file=sys.stderr)
+        return 2
+    total, named, gap = scan()
+
+    want = None
+    if "--file" in argv:
+        want = argv[argv.index("--file") + 1]
+        gap = [g for g in gap if want in g[1]]
+
+    print(f"{total} definitions can hit a junk value; "
+          f"{named} name the branch; {len(gap)} do not")
+    if want is None:
+        print()
+        by_file = collections.Counter(f for _, f, _ in gap)
+        for f, c in by_file.most_common(15):
+            print(f"  {c:4d}  {f}")
+    if "--list" in argv or want is not None:
+        print()
+        for name, f, kinds in gap:
+            print(f"  {name:44s} {kinds:18s} {f}")
+    print()
+    print("A necessary condition, not a defect list: totality.py decides, by")
+    print("testing whether the junk point is attainable and disagrees with the")
+    print("limit. What these share is that nothing in the corpus says either way.")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main(sys.argv[1:]))
