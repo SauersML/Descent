@@ -98,6 +98,52 @@ theorem factoredDynamicsCorrection_add_contrast
   simp [dynamicsPoolingObservation, dynamicsContrast]
   ring
 
+/-- Pooling after canonical correction preserves exactly the observed biological total. -/
+theorem dynamicsPoolingObservation_projector (β : Bool → ℝ) :
+    dynamicsPoolingObservation (dynamicsPooledProjector β) =
+      dynamicsPoolingObservation β := by
+  simp [dynamicsPoolingObservation, dynamicsPooledProjector_apply]
+
+/-- **Canonicality of pooled biological correction.** Among all linear corrections that only use
+the pooled observation, broadcasting the pooled mean is the unique correction that fixes every
+field shared by persistence and switching. Thus the normal form is forced by the observation
+model and exactness on common biology; it is not merely a convenient choice of representative. -/
+theorem dynamicsPooledProjector_eq_of_factorsThrough_of_fixes_common
+    (C : (Bool → ℝ) →ₗ[ℝ] (Bool → ℝ))
+    (hC : FactorsThrough dynamicsPoolingObservation C)
+    (hcommon : ∀ c : ℝ, C (fun _ : Bool ↦ c) = fun _ : Bool ↦ c) :
+    C = dynamicsPooledProjector := by
+  apply LinearMap.ext
+  intro field
+  funext persists
+  have hdecomp := dynamics_common_contrast_decomposition field
+  have hblind := factoredDynamicsCorrection_add_contrast C hC
+    (dynamicsPooledProjector field) (dynamicsContrastCoefficient field)
+  have hCfield : C field = C (dynamicsPooledProjector field) := by
+    calc
+      C field = C (dynamicsPooledProjector field +
+          dynamicsContrastCoefficient field • dynamicsContrast) := congrArg C hdecomp
+      _ = C (dynamicsPooledProjector field) := hblind
+  have hprojector :
+      dynamicsPooledProjector field =
+        fun _ : Bool ↦ (field false + field true) / 2 := by
+    funext state
+    exact dynamicsPooledProjector_apply field state
+  have hCprojector : C (dynamicsPooledProjector field) = dynamicsPooledProjector field := by
+    rw [hprojector]
+    exact hcommon ((field false + field true) / 2)
+  exact congrFun (hCfield.trans hCprojector) persists
+
+/-- Every finite uniform correction that is exact on common biology is the canonical pooled
+projector, independently of dictionary order. -/
+theorem uniformDynamicsCorrection_eq_pooledProjector
+    (k : ℕ) (C : (Bool → ℝ) →ₗ[ℝ] (Bool → ℝ))
+    (hC : C ∈ UniformCorrectionFamily dynamicsPoolingObservation k)
+    (hcommon : ∀ c : ℝ, C (fun _ : Bool ↦ c) = fun _ : Bool ↦ c) :
+    C = dynamicsPooledProjector :=
+  dynamicsPooledProjector_eq_of_factorsThrough_of_fixes_common C
+    (uniformCorrectionFamily_subset_factorsThrough dynamicsPoolingObservation k hC) hcommon
+
 /-- Every finite uniform biological correction is constant along the entire contrast orbit. -/
 theorem uniformDynamicsCorrection_add_contrast
     (k : ℕ) (C : (Bool → ℝ) →ₗ[ℝ] (Bool → ℝ))
