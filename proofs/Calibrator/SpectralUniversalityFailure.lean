@@ -81,7 +81,8 @@ theorem thirdTensorEnergy_pushedThirdMomentTensor
   classical
   unfold thirdTensorEnergy pushedThirdMomentTensor entryCubeSum gramCovariance
   simp only [Matrix.mul_apply, Matrix.transpose_apply]
-  ring
+  simp only [pow_two, pow_three, Fintype.sum_mul_sum]
+  ring_nf
 
 end ThirdMomentContraction
 

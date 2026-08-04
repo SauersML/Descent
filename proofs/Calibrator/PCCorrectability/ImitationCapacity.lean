@@ -1951,6 +1951,30 @@ theorem isoBlock_charPoly_eq (a x : ℝ) :
   norm_num
   ring
 
+/-- Entrywise square sum. For a symmetric block this is `Tr Σ²`, so it is a
+spectral quantity and serves as the control. -/
+noncomputable def entrywiseSquareSum (M : Fin 2 → Fin 2 → ℝ) : ℝ :=
+  ∑ i, ∑ j, (M i j) ^ 2
+
+/-- **The diagonal block's square sum.** -/
+theorem entrywiseSquareSum_isoBlockD (a : ℝ) :
+    entrywiseSquareSum (isoBlockD a) = a ^ 2 + (a + 1) ^ 2 := by
+  unfold entrywiseSquareSum isoBlockD
+  simp [Fin.sum_univ_two]
+
+/-- **The rotated block's square sum.** -/
+theorem entrywiseSquareSum_isoBlockR (a : ℝ) :
+    entrywiseSquareSum (isoBlockR a) = 2 * (a + 1 / 2) ^ 2 + 2 * (1 / 2) ^ 2 := by
+  unfold entrywiseSquareSum isoBlockR
+  simp [Fin.sum_univ_two]
+  ring
+
+/-- **The square sums agree**, as they must: this is the second spectral moment. -/
+theorem entrywiseSquareSum_isoBlock_eq (a : ℝ) :
+    entrywiseSquareSum (isoBlockD a) = entrywiseSquareSum (isoBlockR a) := by
+  rw [entrywiseSquareSum_isoBlockD, entrywiseSquareSum_isoBlockR]
+  ring
+
 /-- **The diagonal block's entrywise cube sum.** -/
 theorem entrywiseCubeSum_isoBlockD (a : ℝ) :
     entrywiseCubeSum (isoBlockD a) = a ^ 3 + (a + 1) ^ 3 := by
@@ -2216,9 +2240,7 @@ theorem multiBlock_squareSum_eq {m : ℕ} (a : Fin m → ℝ) :
     multiEntrywisePow (multiBlockD a) 1 = multiEntrywisePow (multiBlockR a) 1 := by
   rw [multiEntrywisePow_multiBlockD, multiEntrywisePow_multiBlockR]
   refine Finset.sum_congr rfl fun i _ ↦ ?_
-  unfold isoBlockD isoBlockR
-  simp [Fin.sum_univ_two]
-  ring
+  exact entrywiseSquareSum_isoBlock_eq (a i)
 
 /-- **And the cube sums separate them, by a margin linear in the dimension.**
 
@@ -2232,9 +2254,7 @@ theorem multiBlock_cubeSum_gap {m : ℕ} (a : Fin m → ℝ) :
   rw [multiEntrywisePow_multiBlockD, multiEntrywisePow_multiBlockR,
     ← Finset.sum_sub_distrib]
   refine Finset.sum_congr rfl fun i _ ↦ ?_
-  unfold isoBlockD isoBlockR
-  simp [Fin.sum_univ_two]
-  ring
+  exact entrywiseCubeSum_gap (a i)
 
 
 end CapacityInvariant
