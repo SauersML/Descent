@@ -135,6 +135,33 @@ theorem independentSampleMultiplier_succ (K factor : ℕ) (hK : 2 ≤ K) :
   have hcount : 2 * (K + 1) - 3 = (2 * K - 3) + 2 := by omega
   rw [hcount, Nat.mul_add, pow_add]
 
+/-- Adding `extra` epochs adds exactly `2 * extra` independent spectrum coordinates. -/
+theorem epochSpectrumCoordinateCount_add_epochs (K extra : ℕ) (hK : 2 ≤ K) :
+    epochSpectrumCoordinateCount (K + extra) =
+      epochSpectrumCoordinateCount K + 2 * extra := by
+  unfold epochSpectrumCoordinateCount
+  omega
+
+/-- **General complexity law for spectrum precision.** Adding `extra` epochs multiplies the
+required spectrum precision by exactly `factor ^ (2 * extra)`.  This is the arbitrary-jump
+form of `spectrumPrecisionMultiplier_succ`. -/
+theorem spectrumPrecisionMultiplier_add_epochs (K extra factor : ℕ) (hK : 2 ≤ K) :
+    spectrumPrecisionMultiplier (K + extra) factor =
+      spectrumPrecisionMultiplier K factor * factor ^ (2 * extra) := by
+  unfold spectrumPrecisionMultiplier
+  rw [epochSpectrumCoordinateCount_add_epochs K extra hK, pow_add]
+
+/-- **General complexity law for independent data.** Under root-sample spectrum error,
+adding `extra` epochs multiplies the required independent data by exactly
+`factor ^ (4 * extra)`. -/
+theorem independentSampleMultiplier_add_epochs (K extra factor : ℕ) (hK : 2 ≤ K) :
+    independentSampleMultiplier (K + extra) factor =
+      independentSampleMultiplier K factor * factor ^ (4 * extra) := by
+  unfold independentSampleMultiplier
+  rw [epochSpectrumCoordinateCount_add_epochs K extra hK, Nat.mul_add, pow_add]
+  congr 2
+  omega
+
 /-- The actionable spectrum-precision table for halving history error. -/
 theorem spectrumPrecisionMultiplier_halving_table :
     spectrumPrecisionMultiplier 2 2 = 2 ∧
@@ -261,6 +288,24 @@ theorem fixedEpochInverseExponent_succ_lt (K : ℕ) (hK : 2 ≤ K) :
   have hp : (0 : ℝ) < epochSpectrumCoordinateCount K := by
     exact_mod_cast epochSpectrumCoordinateCount_pos K hK
   exact (inv_lt_inv₀ (by linarith) hp).2 (by linarith)
+
+/-- The deterministic inverse exponent is strictly decreasing across the entire fixed-epoch
+hierarchy, not only between adjacent epoch counts. -/
+theorem fixedEpochInverseExponent_strictAnti
+    {K L : ℕ} (hK : 2 ≤ K) (hKL : K < L) :
+    fixedEpochInverseExponent L < fixedEpochInverseExponent K := by
+  unfold fixedEpochInverseExponent
+  have hcountK : 0 < epochSpectrumCoordinateCount K :=
+    epochSpectrumCoordinateCount_pos K hK
+  have hcount : epochSpectrumCoordinateCount K < epochSpectrumCoordinateCount L := by
+    unfold epochSpectrumCoordinateCount
+    omega
+  have hcountKReal : (0 : ℝ) < epochSpectrumCoordinateCount K := by
+    exact_mod_cast hcountK
+  have hcountReal : (epochSpectrumCoordinateCount K : ℝ) <
+      epochSpectrumCoordinateCount L := by
+    exact_mod_cast hcount
+  exact (inv_lt_inv₀ (hcountKReal.trans hcountReal) hcountKReal).2 hcountReal
 
 /-! ## Intrinsic nullspace boundary for unrestricted history classes -/
 
