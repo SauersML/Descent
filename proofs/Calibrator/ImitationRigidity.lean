@@ -355,6 +355,13 @@ theorem scalarRowResolvent_mul_denom (latent quadraticForm : ℝ)
 /-- Variance of a fair two-point law. -/
 def fairTwoPointVariance (a b : ℝ) : ℝ := (a - b) ^ 2 / 4
 
+/-- Reference evaluation: the body is fixed at a point, not merely bounded or shown invariant.
+An inequality or an invariance leaves a family of bodies satisfying it; a value does not. -/
+theorem fairTwoPointVariance_at_reference_point :
+    fairTwoPointVariance 2 2 = 0 := by
+  norm_num [fairTwoPointVariance]
+
+
 /-- **Exact nonconcentration witness.** If the leave-one-out quadratic form is
 positive, an alive/dead row produces two separated resolvent values and hence
 a strictly positive fair-mixture variance. -/

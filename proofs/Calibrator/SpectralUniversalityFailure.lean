@@ -605,12 +605,26 @@ noncomputable def lowSNRFourthOrientationCoefficient
     (fourthCumulant h4 : ℝ) : ℝ :=
   -(fourthCumulant ^ 2 / 48 * h4)
 
+/-- Reference evaluation: the body is fixed at a point, not merely bounded or shown invariant.
+An inequality or an invariance leaves a family of bodies satisfying it; a value does not. -/
+theorem lowSNRFourthOrientationCoefficient_at_reference_point :
+    lowSNRFourthOrientationCoefficient 2 2 = -1 / 6 := by
+  norm_num [lowSNRFourthOrientationCoefficient]
+
+
 /-- The fourth spectral moment produced by the rectangular Gaussian design.  Here `c` is the
 inverse aspect ratio and `m1`, ..., `m4` are the first four covariance spectral moments. -/
 noncomputable def gaussianDesignFourthSpectralMoment
     (c m1 m2 m3 m4 : ℝ) : ℝ :=
   m4 + c * (4 * m1 * m3 + 2 * m2 ^ 2) +
     6 * c ^ 2 * m1 ^ 2 * m2 + c ^ 3 * m1 ^ 4
+
+/-- Reference evaluation: the body is fixed at a point, not merely bounded or shown invariant.
+An inequality or an invariance leaves a family of bodies satisfying it; a value does not. -/
+theorem gaussianDesignFourthSpectralMoment_at_reference_point :
+    gaussianDesignFourthSpectralMoment 2 2 2 2 2 = 370 := by
+  norm_num [gaussianDesignFourthSpectralMoment]
+
 
 /-- Complete fourth low-SNR coefficient: a spectral Wishart term plus the fourth-cumulant
 traffic term.  This definition keeps the two information channels visibly separate. -/

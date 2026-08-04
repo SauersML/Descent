@@ -418,6 +418,13 @@ noncomputable def componentRepresentationResidual (localValue : ℝ)
 noncomputable def localizationResidual (localValue mixtureValue : ℝ) : ℝ :=
   localValue - mixtureValue
 
+/-- Reference evaluation: the body is fixed at a point, not merely bounded or shown invariant.
+An inequality or an invariance leaves a family of bodies satisfying it; a value does not. -/
+theorem localizationResidual_at_reference_point :
+    localizationResidual 2 2 = 0 := by
+  norm_num [localizationResidual]
+
+
 /-- Failure of a functional to commute with component mixing. -/
 noncomputable def jensenResidual (mixtureValue : ℝ)
     (a componentValue : Component → ℝ) : ℝ :=

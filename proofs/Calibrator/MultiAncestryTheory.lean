@@ -433,6 +433,13 @@ section EquityImplications
 noncomputable def portabilityGap (r2_source r2_target : ℝ) : ℝ :=
   r2_source - r2_target
 
+/-- Reference evaluation: the body is fixed at a point, not merely bounded or shown invariant.
+An inequality or an invariance leaves a family of bodies satisfying it; a value does not. -/
+theorem portabilityGap_at_reference_point :
+    portabilityGap 2 2 = 0 := by
+  norm_num [portabilityGap]
+
+
 /-- **Portability gap is always non-negative under drift.** -/
 theorem portability_gap_nonneg
     (V_A V_E fstS fstT : ℝ)

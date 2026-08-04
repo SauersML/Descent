@@ -46,6 +46,13 @@ section ImputationQuality
 noncomputable def attenuatedVariance (beta_sq het r2_imp : ℝ) : ℝ :=
   beta_sq * het * r2_imp
 
+/-- Reference evaluation: the body is fixed at a point, not merely bounded or shown invariant.
+An inequality or an invariance leaves a family of bodies satisfying it; a value does not. -/
+theorem attenuatedVariance_at_reference_point :
+    attenuatedVariance 2 2 2 = 8 := by
+  norm_num [attenuatedVariance]
+
+
 /-- Attenuated ≤ true variance. -/
 theorem attenuated_le_true (beta_sq het r2_imp : ℝ)
     (h_bsq : 0 ≤ beta_sq) (h_het : 0 ≤ het)
@@ -62,6 +69,13 @@ theorem attenuated_le_true (beta_sq het r2_imp : ℝ)
     Var(PGS_error) = Σ β² × Var(error) = Σ β² × het × (1 - r²_imp). -/
 noncomputable def imputationErrorVariance (beta_sq het r2_imp : ℝ) : ℝ :=
   beta_sq * het * (1 - r2_imp)
+
+/-- Reference evaluation: the body is fixed at a point, not merely bounded or shown invariant.
+An inequality or an invariance leaves a family of bodies satisfying it; a value does not. -/
+theorem imputationErrorVariance_at_reference_point :
+    imputationErrorVariance 2 2 2 = -4 := by
+  norm_num [imputationErrorVariance]
+
 
 /-- Imputation error variance is nonneg. -/
 theorem imputation_error_nonneg (beta_sq het r2_imp : ℝ)
@@ -258,11 +272,25 @@ noncomputable def apparent_portability_loss
     (r2_source r2_target_array : ℝ) : ℝ :=
   r2_source - r2_target_array
 
+/-- Reference evaluation: the body is fixed at a point, not merely bounded or shown invariant.
+An inequality or an invariance leaves a family of bodies satisfying it; a value does not. -/
+theorem apparent_portability_loss_at_reference_point :
+    apparent_portability_loss 2 2 = 0 := by
+  norm_num [apparent_portability_loss]
+
+
 /-- Difference in `R²` corresponding to true biological portability loss,
     as measured with an ideal non-ascertained array or sequencing design. -/
 noncomputable def true_portability_loss
     (r2_source r2_target_ideal : ℝ) : ℝ :=
   r2_source - r2_target_ideal
+
+/-- Reference evaluation: the body is fixed at a point, not merely bounded or shown invariant.
+An inequality or an invariance leaves a family of bodies satisfying it; a value does not. -/
+theorem true_portability_loss_at_reference_point :
+    true_portability_loss 2 2 = 0 := by
+  norm_num [true_portability_loss]
+
 
 /-- **Ascertainment creates artificial portability loss.**
     Even with identical genetic architecture, the PGS computed
@@ -346,6 +374,13 @@ theorem multi_ethnic_arrays_reduce_bias
 /-- Total portability loss as the sum of biological and technical components. -/
 noncomputable def total_portability_loss (loss_genetic loss_technical : ℝ) : ℝ :=
   loss_genetic + loss_technical
+
+/-- Reference evaluation: the body is fixed at a point, not merely bounded or shown invariant.
+An inequality or an invariance leaves a family of bodies satisfying it; a value does not. -/
+theorem total_portability_loss_at_reference_point :
+    total_portability_loss 2 2 = 4 := by
+  norm_num [total_portability_loss]
+
 
 /-- **Decomposing portability loss: genetic vs technical.**
     Total portability loss = genetic loss + technical loss.
