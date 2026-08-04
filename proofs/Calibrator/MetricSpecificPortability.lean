@@ -1983,8 +1983,11 @@ quantiles, or full histogram -- can detect alignment.
 /-- Three ancestries at positions `0`, `1`, `3` on the line.
 
 Empirical status: NOT AN EMPIRICAL CLAIM -- this is a finite counterexample. -/
+noncomputable def ancestryPosition : Fin 3 → ℝ := ![0, 1, 3]
+
+/-- Distance between two ancestries on the line. -/
 noncomputable def threeAncestryDistance : Fin 3 → Fin 3 → ℝ :=
-  ![![0, 1, 3], ![1, 0, 2], ![3, 2, 0]]
+  fun i j ↦ |ancestryPosition i - ancestryPosition j|
 
 /-- A score assigning values `0, 1, 2` to the three ancestries.
 
@@ -2006,24 +2009,24 @@ noncomputable def ancestryAlignmentEnergy (m : Fin 3 → ℝ) : ℝ :=
 theorem ancestryScoreSwapped_is_permutation :
     ancestryScoreSwapped = ancestryScore ∘ ![0, 2, 1] := by
   funext i
-  fin_cases i <;>
-    simp [ancestryScore, ancestryScoreSwapped, threeAncestryConditional,
-      Matrix.cons_val_zero, Matrix.cons_val_one]
+  fin_cases i <;> rfl
 
 /-- **The aligned arrangement's energy.** -/
 theorem ancestryAlignmentEnergy_score : ancestryAlignmentEnergy ancestryScore = 10 / 3 := by
-  unfold ancestryAlignmentEnergy threeAncestryDistance ancestryScore threeAncestryConditional
-  norm_num [Fin.sum_univ_three, Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons,
-    Matrix.cons_val_two, Matrix.tail_cons]
+  unfold ancestryAlignmentEnergy threeAncestryDistance ancestryPosition ancestryScore
+  simp only [Fin.sum_univ_three, threeAncestryConditional, Matrix.cons_val_zero,
+    Matrix.cons_val_one, Matrix.head_cons, Matrix.cons_val_two, Matrix.tail_cons]
+  norm_num [abs_of_nonneg, abs_of_nonpos]
 
 /-- **The permuted arrangement's energy**, against the same metric and the same score values.
 
 With `ancestryScoreSwapped_is_permutation` this is the separation: identical ancestry geometry,
 identical score distribution, different alignment. -/
 theorem ancestryAlignmentEnergy_swapped : ancestryAlignmentEnergy ancestryScoreSwapped = 2 := by
-  unfold ancestryAlignmentEnergy threeAncestryDistance ancestryScoreSwapped
-  norm_num [Fin.sum_univ_three, Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons,
+  unfold ancestryAlignmentEnergy threeAncestryDistance ancestryPosition ancestryScoreSwapped
+  simp only [Fin.sum_univ_three, Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons,
     Matrix.cons_val_two, Matrix.tail_cons]
+  norm_num [abs_of_nonneg, abs_of_nonpos]
 
 
 /-! #### A rare ancestry is not proportionately harmless
