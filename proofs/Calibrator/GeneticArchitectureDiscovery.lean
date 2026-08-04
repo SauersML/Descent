@@ -72,6 +72,14 @@ section GWASDiscovery
 def discoveryNCP (n β maf_causal ld : ℝ) : ℝ :=
   n * β ^ 2 * ld ^ 2 * genotypeVarianceHWE maf_causal
 
+/-- Reference evaluation.  The value is computed through the definitions this body calls, but
+the theorem states a number: an inequality or an invariance leaves a family of bodies
+satisfying it, and a value does not. -/
+theorem discoveryNCP_at_reference_point :
+    discoveryNCP 1 1 1 1 = 0 := by
+  norm_num [discoveryNCP, genotypeVarianceHWE]
+
+
 /-- A locus is discovered when its test statistic crosses the genome-wide
     `z`-threshold. In the one-degree-of-freedom Gaussian approximation this is
     equivalent to `z^2 ≤ discoveryNCP`.
@@ -587,6 +595,15 @@ theorem multiTraitEffectiveSampleSize_eq_multiAncestryEffectiveN (n₁ n₂ rg :
 noncomputable def multiTraitDiscoveryNCP
     (n₁ n₂ rg β maf ld : ℝ) : ℝ :=
   discoveryNCP (multiTraitEffectiveSampleSize n₁ n₂ rg) β maf ld
+
+/-- Reference evaluation.  The value is computed through the definitions this body calls, but
+the theorem states a number: an inequality or an invariance leaves a family of bodies
+satisfying it, and a value does not. -/
+theorem multiTraitDiscoveryNCP_at_reference_point :
+    multiTraitDiscoveryNCP 1 1 1 1 1 1 = 0 := by
+  norm_num [multiTraitDiscoveryNCP, discoveryNCP, genotypeVarianceHWE,
+    multiTraitEffectiveSampleSize]
+
 
 /-- Genetic correlation is bounded by [-1, 1] (Cauchy-Schwarz). -/
 theorem genetic_correlation_bounded

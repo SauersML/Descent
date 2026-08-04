@@ -41,12 +41,21 @@ keeps the matched-Bayes hinge outside the proved statements.
   is sufficient, and every other invariant supporting one uniform risk
   reconstruction map refines it.
 
-* `rankOneGraphSum_le_inv` -- the arithmetic behind traffic-invisibility of a
-  rank-one spike. For a connected test graph in which every vertex has even
-  degree, the number of edges is at least the number of vertices, and the
-  normalised graph sum is then bounded by `1/p`. The graph-theoretic input
-  (`|E| ≥ |V|` for such graphs) is taken as a hypothesis here and the arithmetic
-  consequence is proved.
+* `rankOneGraphSum_le_inv`,
+  `finiteRankOneTrafficCorrection_tendsto_zero`, and
+  `finiteRankOneTraffic_invisible_variationalPressure_visible` -- the
+  arithmetic behind traffic-invisibility of a rank-one spike, closure under
+  the finite nonempty spike-edge expansion of every fixed graph, and its
+  direct combination with supercritical variational-pressure separation. The
+  graph-theoretic input (`|E| ≥ |V|` after contraction) is derived by
+  `vertices_le_edges_of_positive_evenDegrees_of_handshake` and propagated
+  termwise by
+  `finiteRankOneTrafficCorrection_tendsto_zero_of_positiveEvenDegreeData`.
+
+* `rankOneTraffic_groundState_pressure_counterexample` -- one positive spike
+  simultaneously has vanishing fixed-traffic correction, unchanged lower
+  ground state, a strictly raised aligned-state energy, and positive
+  supercritical variational pressure.
 
 * `cw_rate_lower_bound`, `cw_rate_upper_bound`, and
   `cwVariationalPressureGap_eq_zero_iff` -- Pinsker's inequality and a
@@ -316,6 +325,53 @@ theorem rankOneGraphSum_le_inv
     _ ≤ p ^ e * p := by nlinarith [hpe]
     _ = 1 * (p ^ e * p) := by ring
 
+/-- **The graph-count input follows from handshaking.**  A finite contracted
+graph in which every surviving vertex has degree at least two and whose degree
+sum is twice its edge count satisfies `|V| ≤ |E|`.  Connected all-even graphs
+with a nonempty edge set supply the minimum-degree premise automatically. -/
+theorem vertices_le_edges_of_minDegree_two_of_handshake
+    {Vertex : Type*} [Fintype Vertex]
+    (degree : Vertex → ℕ) (edges : ℕ)
+    (hminimum : ∀ vertex, 2 ≤ degree vertex)
+    (hhandshake : ∑ vertex, degree vertex = 2 * edges) :
+    Fintype.card Vertex ≤ edges := by
+  classical
+  have hsum : ∑ _vertex : Vertex, 2 ≤ ∑ vertex, degree vertex := by
+    apply Finset.sum_le_sum
+    intro vertex _hvertex
+    exact hminimum vertex
+  have htwice : 2 * Fintype.card Vertex ≤ 2 * edges := by
+    calc
+      2 * Fintype.card Vertex = ∑ _vertex : Vertex, 2 := by simp [mul_comm]
+      _ ≤ ∑ vertex, degree vertex := hsum
+      _ = 2 * edges := hhandshake
+  exact Nat.le_of_mul_le_mul_left htwice (by omega)
+
+/-- A positive even natural-number degree is at least two.  This is the local
+arithmetic that turns “connected/non-isolated and Eulerian” into the minimum
+degree premise used by the handshaking bound. -/
+theorem two_le_degree_of_positive_even
+    (degree : ℕ) (hpositive : 0 < degree) (heven : Even degree) :
+    2 ≤ degree := by
+  obtain ⟨half, hdegree⟩ := heven
+  omega
+
+/-- A finite graph with positive even degree at every surviving vertex and the
+handshaking identity satisfies `|V| ≤ |E|`.  Positivity is the only connectivity
+consequence needed by the count; evenness upgrades it to minimum degree two. -/
+theorem vertices_le_edges_of_positive_evenDegrees_of_handshake
+    {Vertex : Type*} [Fintype Vertex]
+    (degree : Vertex → ℕ) (edges : ℕ)
+    (hpositive : ∀ vertex, 0 < degree vertex)
+    (heven : ∀ vertex, Even (degree vertex))
+    (hhandshake : ∑ vertex, degree vertex = 2 * edges) :
+    Fintype.card Vertex ≤ edges := by
+  apply vertices_le_edges_of_minDegree_two_of_handshake degree edges
+  · intro vertex
+    exact two_le_degree_of_positive_even
+      (degree vertex) (hpositive vertex) (heven vertex)
+  · exact hhandshake
+
 /-- Closed evaluation of a balanced rank-one kernel on an all-even connected test graph after
 the vertex sums in the graph homomorphism count have factorized. -/
 noncomputable def balancedRankOneGraphSum (p : ℕ) (vertices edges : ℕ) : ℝ :=
@@ -366,14 +422,117 @@ noncomputable def balancedRankOneTrafficCoordinate
     (hasOddDegree : Bool) (p vertices edges : ℕ) : ℝ :=
   if hasOddDegree then 0 else balancedRankOneGraphSum p vertices edges
 
-/-- Every fixed connected graph coordinate of the balanced positive rank-one spike vanishes. -/
+/-- Every fixed connected graph coordinate of the balanced positive rank-one
+spike vanishes.  Odd-degree coordinates vanish identically; the edge bound is
+therefore required only in the all-even branch. -/
 theorem balancedRankOneTrafficCoordinate_tendsto_zero
-    (hasOddDegree : Bool) (vertices edges : ℕ) (hev : vertices ≤ edges) :
+    (hasOddDegree : Bool) (vertices edges : ℕ)
+    (hev : hasOddDegree = false → vertices ≤ edges) :
     Filter.Tendsto
       (fun p : ℕ ↦ balancedRankOneTrafficCoordinate hasOddDegree (p + 1) vertices edges)
       Filter.atTop (nhds 0) := by
-  cases hasOddDegree <;>
-    simp [balancedRankOneTrafficCoordinate, balancedRankOneGraphSum_tendsto_zero vertices edges hev]
+  cases hodd : hasOddDegree with
+  | false =>
+      simpa [balancedRankOneTrafficCoordinate, hodd] using
+        balancedRankOneGraphSum_tendsto_zero vertices edges (hev hodd)
+  | true =>
+      simp [balancedRankOneTrafficCoordinate]
+
+/-- A fixed graph expansion contains only finitely many nonempty choices of
+rank-one spike edges.  After contracting its identity edges, each choice has a
+coefficient and one balanced rank-one coordinate.  This definition records the
+complete correction obtained by summing those contracted terms. -/
+noncomputable def finiteRankOneTrafficCorrection
+    {Term : Type*} [Fintype Term]
+    (coefficient : Term → ℝ) (hasOddDegree : Term → Bool)
+    (vertices edges : Term → ℕ) (population : ℕ) : ℝ :=
+  ∑ term,
+    coefficient term *
+      balancedRankOneTrafficCoordinate (hasOddDegree term) population
+        (vertices term) (edges term)
+
+/-- **Finite expansion closes rank-one traffic invisibility.**  If every
+contracted nonempty spike graph satisfies the connected all-even edge bound
+`|V| ≤ |E|` whenever it is nonzero, then their entire fixed-graph correction
+vanishes.  This is the analytic step from one contracted term to the expansion
+of `(aI + λP)`; the graph contraction supplies `hconnected`. -/
+theorem finiteRankOneTrafficCorrection_tendsto_zero
+    {Term : Type*} [Fintype Term]
+    (coefficient : Term → ℝ) (hasOddDegree : Term → Bool)
+    (vertices edges : Term → ℕ)
+    (hconnected : ∀ term, hasOddDegree term = false → vertices term ≤ edges term) :
+    Filter.Tendsto
+      (fun population : ℕ ↦
+        finiteRankOneTrafficCorrection coefficient hasOddDegree vertices edges
+          (population + 1))
+      Filter.atTop (nhds 0) := by
+  classical
+  have hterm : ∀ term : Term,
+      Filter.Tendsto
+        (fun population : ℕ ↦ coefficient term *
+          balancedRankOneTrafficCoordinate (hasOddDegree term) (population + 1)
+            (vertices term) (edges term))
+        Filter.atTop (nhds 0) := by
+    intro term
+    simpa using
+      (balancedRankOneTrafficCoordinate_tendsto_zero
+        (hasOddDegree term) (vertices term) (edges term) (hconnected term)).const_mul
+          (coefficient term)
+  have hsum := tendsto_finset_sum Finset.univ
+    (fun term _hterm ↦ hterm term)
+  simpa [finiteRankOneTrafficCorrection] using hsum
+
+/-- The finite traffic correction vanishes from graph-local degree data, with
+no pre-assumed cardinal inequality.  Each all-even contracted term supplies
+its degree function, minimum degree two, and handshaking identity; odd-degree
+terms require no graph bound because balancedness kills them exactly. -/
+theorem finiteRankOneTrafficCorrection_tendsto_zero_of_degreeData
+    {Term : Type*} [Fintype Term]
+    (coefficient : Term → ℝ) (hasOddDegree : Term → Bool)
+    (vertices edges : Term → ℕ)
+    (degree : ∀ term, Fin (vertices term) → ℕ)
+    (hminimum : ∀ term, hasOddDegree term = false →
+      ∀ vertex, 2 ≤ degree term vertex)
+    (hhandshake : ∀ term, hasOddDegree term = false →
+      ∑ vertex, degree term vertex = 2 * edges term) :
+    Filter.Tendsto
+      (fun population : ℕ ↦
+        finiteRankOneTrafficCorrection coefficient hasOddDegree vertices edges
+          (population + 1))
+      Filter.atTop (nhds 0) := by
+  apply finiteRankOneTrafficCorrection_tendsto_zero
+  intro term heven
+  have hbound := vertices_le_edges_of_minDegree_two_of_handshake
+    (degree term) (edges term) (hminimum term heven) (hhandshake term heven)
+  simpa using hbound
+
+/-- **Connected-Eulerian degree data suffice for finite traffic
+invisibility.**  On every all-even contracted term, positive degrees exclude
+isolated vertices, degree parity supplies the minimum-degree-two bound, and
+handshaking supplies `|V| ≤ |E|`.  Odd-degree terms still vanish without any of
+these hypotheses. -/
+theorem finiteRankOneTrafficCorrection_tendsto_zero_of_positiveEvenDegreeData
+    {Term : Type*} [Fintype Term]
+    (coefficient : Term → ℝ) (hasOddDegree : Term → Bool)
+    (vertices edges : Term → ℕ)
+    (degree : ∀ term, Fin (vertices term) → ℕ)
+    (hpositive : ∀ term, hasOddDegree term = false →
+      ∀ vertex, 0 < degree term vertex)
+    (heven : ∀ term, hasOddDegree term = false →
+      ∀ vertex, Even (degree term vertex))
+    (hhandshake : ∀ term, hasOddDegree term = false →
+      ∑ vertex, degree term vertex = 2 * edges term) :
+    Filter.Tendsto
+      (fun population : ℕ ↦
+        finiteRankOneTrafficCorrection coefficient hasOddDegree vertices edges
+          (population + 1))
+      Filter.atTop (nhds 0) := by
+  apply finiteRankOneTrafficCorrection_tendsto_zero_of_degreeData
+    coefficient hasOddDegree vertices edges degree
+  · intro term hallEven vertex
+    exact two_le_degree_of_positive_even
+      (degree term vertex) (hpositive term hallEven vertex) (heven term hallEven vertex)
+  · exact hhandshake
 
 /-! ### Positive-cone and ground-state certificates -/
 
@@ -807,6 +966,97 @@ theorem cwVariationalPressureGap_eq_zero_iff (tlam : ℝ) :
     have hpositive := cwVariationalPressureGap_pos_of_supercritical tlam (lt_of_not_ge hnot)
     linarith
   · exact cwVariationalPressureGap_eq_zero_of_subcritical tlam
+
+/-- **Positive-cone traffic counterexample at the exact variational level.**
+Every fixed graph has finitely many nonempty spike-edge terms; once identity
+edges are contracted, their complete correction vanishes by the connected
+rank-one bound.  Nevertheless the Curie--Weiss variational pressure is strictly
+positive above `tλ = 1`.
+
+This theorem combines the two proved halves of the counterexample without
+claiming the separate model-specific LDP/Varadhan identification of a finite
+spin partition function with this variational pressure. -/
+theorem finiteRankOneTraffic_invisible_variationalPressure_visible
+    {Term : Type*} [Fintype Term]
+    (coefficient : Term → ℝ) (hasOddDegree : Term → Bool)
+    (vertices edges : Term → ℕ)
+    (hconnected : ∀ term, hasOddDegree term = false → vertices term ≤ edges term)
+    (tlam : ℝ) (hcritical : 1 < tlam) :
+    Filter.Tendsto
+        (fun population : ℕ ↦
+          finiteRankOneTrafficCorrection coefficient hasOddDegree vertices edges
+            (population + 1))
+        Filter.atTop (nhds 0) ∧
+      0 < cwVariationalPressureGap tlam :=
+  ⟨finiteRankOneTrafficCorrection_tendsto_zero
+      coefficient hasOddDegree vertices edges hconnected,
+    cwVariationalPressureGap_pos_of_supercritical tlam hcritical⟩
+
+/-- **The four properties one positive rank-one spike has at once**, as one proposition.
+
+The theorem below establishes it, `UnifiedBiology` restates it in genomic vocabulary and
+cites that theorem, and the obstruction registry carries it as a field.  Written out, the
+conjunction stood in the corpus three times, and a change to any one copy would have been a
+silent divergence between them rather than a build error.
+
+Empirical status: UNTESTED, and not the kind of thing a dataset tests: this names a
+conjunction of four claims, each proved below on an explicit spike.  What a measurement
+could bear on is whether a real LD spike is rank-one, which nothing here asserts. -/
+def RankOneSpikeRefutesBothDichotomies
+    {Term Spin : Type*} [Fintype Term]
+    (coefficient : Term → ℝ) (hasOddDegree : Term → Bool)
+    (vertices edges : Term → ℕ)
+    (alignment : Spin → ℝ) (orthogonal aligned : Spin)
+    (baseline spikeStrength population temperature : ℝ) : Prop :=
+  Filter.Tendsto
+      (fun size : ℕ ↦
+        finiteRankOneTrafficCorrection coefficient hasOddDegree vertices edges (size + 1))
+      Filter.atTop (nhds 0) ∧
+    (∀ state, baseline ≤
+      rankOneEnergyDensity baseline spikeStrength population (alignment state)) ∧
+    rankOneEnergyDensity baseline spikeStrength population (alignment orthogonal) =
+      baseline ∧
+    baseline <
+      rankOneEnergyDensity baseline spikeStrength population (alignment aligned) ∧
+    0 < cwVariationalPressureGap (temperature * spikeStrength)
+
+/-- **One exact witness refutes both the positive-cone traffic conjecture and
+the lower-ground-state dichotomy at the variational level.**  The same positive
+rank-one spike has all four properties:
+
+1. every fixed traffic correction vanishes after its finite contraction
+   expansion;
+2. no state has energy below the unspiked baseline;
+3. an orthogonal state attains that baseline exactly, while an aligned state
+   has strictly larger energy; and
+4. its Curie--Weiss variational pressure is positive when `temperature * λ > 1`.
+
+The population and aligned-state hypotheses exclude the zero-dimensional and
+zero-response junk cases explicitly. -/
+theorem rankOneTraffic_groundState_pressure_counterexample
+    {Term Spin : Type*} [Fintype Term]
+    (coefficient : Term → ℝ) (hasOddDegree : Term → Bool)
+    (vertices edges : Term → ℕ)
+    (hconnected : ∀ term, hasOddDegree term = false → vertices term ≤ edges term)
+    (alignment : Spin → ℝ) (orthogonal aligned : Spin)
+    (baseline spikeStrength population temperature : ℝ)
+    (hspike : 0 < spikeStrength) (hpopulation : population ≠ 0)
+    (horthogonal : alignment orthogonal = 0)
+    (haligned : alignment aligned = population)
+    (hcritical : 1 < temperature * spikeStrength) :
+    RankOneSpikeRefutesBothDichotomies coefficient hasOddDegree vertices edges
+      alignment orthogonal aligned baseline spikeStrength population temperature := by
+  have htraffic := finiteRankOneTrafficCorrection_tendsto_zero
+    coefficient hasOddDegree vertices edges hconnected
+  obtain ⟨hlower, hground⟩ := rankOne_groundState_certificate
+    alignment orthogonal baseline spikeStrength population hspike.le horthogonal
+  have hupper : baseline <
+      rankOneEnergyDensity baseline spikeStrength population (alignment aligned) := by
+    rw [haligned, rankOneEnergyDensity_aligned baseline spikeStrength population hpopulation]
+    linarith
+  exact ⟨htraffic, hlower, hground, hupper,
+    cwVariationalPressureGap_pos_of_supercritical
+      (temperature * spikeStrength) hcritical⟩
 
 end CurieWeissWindow
 

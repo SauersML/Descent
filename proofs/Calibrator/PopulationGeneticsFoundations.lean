@@ -1049,6 +1049,14 @@ theorem fstMutationDriftTransient_at_zero (θ Ne : ℝ) :
 noncomputable def expectedNewMutations (θ t : ℝ) : ℝ :=
   θ / 2 * t
 
+/-- Reference evaluation.  The value is computed through the definitions this body calls, but
+the theorem states a number: an inequality or an invariance leaves a family of bodies
+satisfying it, and a value does not. -/
+theorem expectedNewMutations_at_reference_point :
+    expectedNewMutations 1 1 = 1 / 2 := by
+  norm_num [expectedNewMutations]
+
+
 /-- Expected new mutations is nonneg for nonneg θ and t. -/
 theorem expectedNewMutations_nonneg (θ t : ℝ) (hθ : 0 ≤ θ) (ht : 0 ≤ t) :
     0 ≤ expectedNewMutations θ t := by
@@ -2197,6 +2205,15 @@ theorem het_ratio_prefactor_unit_H₀ (θ : ℝ) (hθ : 0 ≤ θ) :
     Empirical status: UNTESTED. -/
 noncomputable def fstMutationDriftTransientDiscrete (θ Ne : ℝ) (t : ℕ) : ℝ :=
   fstMutationDriftEquilibrium θ * (1 - hetDecayFactor Ne θ ^ t)
+
+/-- Reference evaluation.  The value is computed through the definitions this body calls, but
+the theorem states a number: an inequality or an invariance leaves a family of bodies
+satisfying it, and a value does not. -/
+theorem fstMutationDriftTransientDiscrete_at_reference_point :
+    fstMutationDriftTransientDiscrete 1 1 1 = 3 / 8 := by
+  norm_num [fstMutationDriftTransientDiscrete, fstMutationDriftEquilibrium, hetDecayFactor,
+    hetDecayFromScaled]
+
 
 /-- **Derivation of transient Fst from the heterozygosity recurrence.**
 

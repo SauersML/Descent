@@ -389,6 +389,29 @@ theorem genomicAlgorithmicRiskSignature_isCoarsestSufficientInvariant
               algorithmicRiskSignature risk right :=
   algorithmicRiskSignature_isCoarsestSufficientInvariant risk
 
+/-- **Contracted genomic traffic graphs supply their own rank-one decay
+bound.**  Positive even degrees and the handshaking identity imply `|V| ≤ |E|`
+for every all-even contracted term, hence the complete finite spike correction
+vanishes without assuming either the cardinal or minimum-degree inequality. -/
+theorem genomicRankOneTrafficCorrection_vanishes_of_positiveEvenDegreeData
+    {Term : Type*} [Fintype Term]
+    (coefficient : Term → ℝ) (hasOddDegree : Term → Bool)
+    (vertices edges : Term → ℕ)
+    (degree : ∀ term, Fin (vertices term) → ℕ)
+    (hpositive : ∀ term, hasOddDegree term = false →
+      ∀ vertex, 0 < degree term vertex)
+    (heven : ∀ term, hasOddDegree term = false →
+      ∀ vertex, Even (degree term vertex))
+    (hhandshake : ∀ term, hasOddDegree term = false →
+      ∑ vertex, degree term vertex = 2 * edges term) :
+    Filter.Tendsto
+      (fun population : ℕ ↦
+        finiteRankOneTrafficCorrection coefficient hasOddDegree vertices edges
+          (population + 1))
+      Filter.atTop (nhds 0) :=
+  finiteRankOneTrafficCorrection_tendsto_zero_of_positiveEvenDegreeData
+    coefficient hasOddDegree vertices edges degree hpositive heven hhandshake
+
 /-- **A rare LD subspace is invisible to every fixed traffic coordinate but survives a
 logarithmic number of power iterations.**  The exceptional fraction is `4⁻ᵏ`; each fixed graph
 sum loses it, while `k` iterations amplify its squared output by `4ᵏ`. -/
@@ -408,7 +431,7 @@ theorem positiveLDSpike_fixedTrafficInvisible_variationalPressureVisible
     {Term : Type*} [Fintype Term]
     (coefficient : Term → ℝ) (hasOddDegree : Term → Bool)
     (vertices edges : Term → ℕ)
-    (hconnected : ∀ term, vertices term ≤ edges term)
+    (hconnected : ∀ term, hasOddDegree term = false → vertices term ≤ edges term)
     (tlam : ℝ) (hcritical : 1 < tlam) :
     Filter.Tendsto
         (fun population : ℕ ↦
@@ -428,25 +451,15 @@ theorem positiveLDSpike_refutesTrafficAndGroundStateDichotomies
     {Term Genotype : Type*} [Fintype Term]
     (coefficient : Term → ℝ) (hasOddDegree : Term → Bool)
     (vertices edges : Term → ℕ)
-    (hconnected : ∀ term, vertices term ≤ edges term)
+    (hconnected : ∀ term, hasOddDegree term = false → vertices term ≤ edges term)
     (alignment : Genotype → ℝ) (orthogonal aligned : Genotype)
     (baseline spikeStrength population temperature : ℝ)
     (hspike : 0 < spikeStrength) (hpopulation : population ≠ 0)
     (horthogonal : alignment orthogonal = 0)
     (haligned : alignment aligned = population)
     (hcritical : 1 < temperature * spikeStrength) :
-    Filter.Tendsto
-        (fun size : ℕ ↦
-          finiteRankOneTrafficCorrection coefficient hasOddDegree vertices edges
-            (size + 1))
-        Filter.atTop (nhds 0) ∧
-      (∀ genotype, baseline ≤
-        rankOneEnergyDensity baseline spikeStrength population (alignment genotype)) ∧
-      rankOneEnergyDensity baseline spikeStrength population (alignment orthogonal) =
-        baseline ∧
-      baseline <
-        rankOneEnergyDensity baseline spikeStrength population (alignment aligned) ∧
-      0 < cwVariationalPressureGap (temperature * spikeStrength) :=
+    RankOneSpikeRefutesBothDichotomies coefficient hasOddDegree vertices edges
+      alignment orthogonal aligned baseline spikeStrength population temperature :=
   rankOneTraffic_groundState_pressure_counterexample
     coefficient hasOddDegree vertices edges hconnected alignment orthogonal aligned
     baseline spikeStrength population temperature hspike hpopulation horthogonal haligned
@@ -1491,6 +1504,24 @@ structure UnifiedBiologyObstructions : Prop where
             ∀ left right, invariant left = invariant right →
               algorithmicRiskSignature risk left =
                 algorithmicRiskSignature risk right
+  /-- Positive-even graph-local degrees and handshaking force the full finite
+  genomic rank-one traffic correction to vanish. -/
+  genomicRankOneTrafficExpansionFollowsFromHandshake :
+    ∀ (Term : Type) [Fintype Term]
+      (coefficient : Term → ℝ) (hasOddDegree : Term → Bool)
+      (vertices edges : Term → ℕ)
+      (degree : ∀ term, Fin (vertices term) → ℕ),
+      (∀ term, hasOddDegree term = false →
+        ∀ vertex, 0 < degree term vertex) →
+      (∀ term, hasOddDegree term = false →
+        ∀ vertex, Even (degree term vertex)) →
+      (∀ term, hasOddDegree term = false →
+        ∑ vertex, degree term vertex = 2 * edges term) →
+        Filter.Tendsto
+          (fun population : ℕ ↦
+            finiteRankOneTrafficCorrection coefficient hasOddDegree vertices edges
+              (population + 1))
+          Filter.atTop (nhds 0)
   /-- A mesoscopic LD block vanishes from every fixed traffic coordinate but has unit normalized
   energy after a logarithmic number of power iterations. -/
   rareLDSubspaceEvadesFixedTrafficAtLogRuntime :
@@ -1504,7 +1535,7 @@ structure UnifiedBiologyObstructions : Prop where
     ∀ (Term : Type) [Fintype Term]
       (coefficient : Term → ℝ) (hasOddDegree : Term → Bool)
       (vertices edges : Term → ℕ),
-      (∀ term, vertices term ≤ edges term) →
+      (∀ term, hasOddDegree term = false → vertices term ≤ edges term) →
       ∀ tlam : ℝ, 1 < tlam →
         Filter.Tendsto
             (fun population : ℕ ↦
@@ -1518,24 +1549,14 @@ structure UnifiedBiologyObstructions : Prop where
     ∀ (Term Genotype : Type) [Fintype Term]
       (coefficient : Term → ℝ) (hasOddDegree : Term → Bool)
       (vertices edges : Term → ℕ),
-      (∀ term, vertices term ≤ edges term) →
+      (∀ term, hasOddDegree term = false → vertices term ≤ edges term) →
       ∀ (alignment : Genotype → ℝ) (orthogonal aligned : Genotype)
         (baseline spikeStrength population temperature : ℝ),
         0 < spikeStrength → population ≠ 0 →
         alignment orthogonal = 0 → alignment aligned = population →
         1 < temperature * spikeStrength →
-          Filter.Tendsto
-              (fun size : ℕ ↦
-                finiteRankOneTrafficCorrection coefficient hasOddDegree vertices edges
-                  (size + 1))
-              Filter.atTop (nhds 0) ∧
-            (∀ genotype, baseline ≤
-              rankOneEnergyDensity baseline spikeStrength population (alignment genotype)) ∧
-            rankOneEnergyDensity baseline spikeStrength population (alignment orthogonal) =
-              baseline ∧
-            baseline <
-              rankOneEnergyDensity baseline spikeStrength population (alignment aligned) ∧
-            0 < cwVariationalPressureGap (temperature * spikeStrength)
+          RankOneSpikeRefutesBothDichotomies coefficient hasOddDegree vertices edges
+            alignment orthogonal aligned baseline spikeStrength population temperature
   /-- Positive-cone order and the lower genetic ground state do not determine exponential
   pressure: an orthogonal state preserves the minimum while an aligned state separates. -/
   positiveLDSpikeGroundStateDoesNotFixPressure :
@@ -1775,6 +1796,10 @@ theorem unifiedBiology_obstructions : UnifiedBiologyObstructions := by
       genomicAlgorithmicRiskSignatureIsCoarsest :=
         fun _Algorithm _Design _Model _Loss risk ↦
           genomicAlgorithmicRiskSignature_isCoarsestSufficientInvariant risk
+      genomicRankOneTrafficExpansionFollowsFromHandshake :=
+        fun _Term _ coefficient hasOddDegree vertices edges degree hpositive heven hhandshake ↦
+          genomicRankOneTrafficCorrection_vanishes_of_positiveEvenDegreeData
+            coefficient hasOddDegree vertices edges degree hpositive heven hhandshake
       rareLDSubspaceEvadesFixedTrafficAtLogRuntime :=
         rareLDSubspace_fixedTrafficInvisible_logRuntimeVisible
       positiveLDSpikeFixedTrafficInvisibleVariationalPressureVisible :=
