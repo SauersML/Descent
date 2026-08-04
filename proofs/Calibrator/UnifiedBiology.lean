@@ -187,6 +187,22 @@ theorem kingmanSpectrum_identifiabilityBoundary :
   ⟨SpectrumIdentifiability.summable_one_div_coalescentRate,
     fun _ observation ↦ SpectrumIdentifiability.exists_invisible_perturbation observation⟩
 
+/-- **The usable positive boundary for demographic inference.** A linear demographic target
+is determined by the SFS on an admissible history class exactly when every admissible history
+difference invisible to the SFS is also invisible to that target. Thus failure to identify the
+entire history does not automatically invalidate every demographic summary. -/
+theorem demographicTarget_identifiable_iff_nullDirections_annihilated
+    {V W Z : Type*}
+    [AddCommGroup V] [Module ℝ V] [AddCommGroup W] [Module ℝ W]
+    [AddCommGroup Z] [Module ℝ Z]
+    (spectrumObservation : V →ₗ[ℝ] W) (target : V →ₗ[ℝ] Z)
+    (historyClass : Set V) :
+    TargetIdentifiableUnderLinearObservation spectrumObservation target historyClass ↔
+      modelDifferenceSet historyClass ∩ LinearMap.ker spectrumObservation ⊆
+        LinearMap.ker target :=
+  targetIdentifiableUnderLinearObservation_iff_differenceSet_inter_kernel_subset_ker
+    spectrumObservation target historyClass
+
 /-- At the stationary Cauchy root, the per-dimension inverse-conditioning base is the exact
 ratio `(1 + θ²) / (1 - θ²)`. -/
 theorem demographicSieveConditioning_exactBase
