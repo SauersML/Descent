@@ -112,7 +112,8 @@ def scan() -> list[tuple[str, str, str]]:
             stem = name.split("_")[0]
             converse = any(
                 other != name and other.startswith(stem)
-                and ("_of_" in other or other.endswith("_converse"))
+                and ("_of_" in other or other.endswith("_converse")
+                     or "_iff" in other)
                 for other in names)
             if converse or name in ACKNOWLEDGED:
                 continue

@@ -2941,6 +2941,12 @@ theorem fineTunedTargetR2_eq_oracle_minus_postGap_isotropic
         (exactAdaptationGain (1 : Matrix (Fin p) (Fin p) ℝ)
           crossTarget noiseVar wBefore wAfter wStar) =
       oracle_target_r2 - coefficientGapSq wAfter wStar := by
+  -- The goal is `isotropicFineTunedTargetR2` unfolded. `rw` matches syntactically,
+  -- so fold it back before rewriting with the lemma stated about that name.
+  show isotropicFineTunedTargetR2 source_r2
+      (oracle_target_r2 - coefficientGapSq wBefore wStar)
+      crossTarget noiseVar wBefore wAfter wStar =
+    oracle_target_r2 - coefficientGapSq wAfter wStar
   rw [fineTunedTargetR2_eq_deployedTransferTargetR2_gapDrop_isotropic
     source_r2 (oracle_target_r2 - coefficientGapSq wBefore wStar)
     crossTarget noiseVar wBefore wAfter wStar h_opt]
