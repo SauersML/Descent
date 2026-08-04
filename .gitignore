@@ -126,3 +126,6 @@ proofs/validation/empirical/differential/results.json
 proofs/validation/empirical/drift_diff/results_migration_mean.json
 proofs/validation/empirical/invariants/defs.json
 proofs/validation/empirical/invariants/results_ranges.json
+
+# Local research notes, not versioned
+docs/mathlib-pr-review-observations.txt
