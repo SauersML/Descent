@@ -75,6 +75,21 @@ theorem equilibriumEffectVariance_mul_selection (v_mutation s : ℝ) (h : s ≠ 
   unfold equilibriumEffectVariance
   field_simp
 
+/-- The algebraic equilibrium vanishes exactly when mutational input or selection strength
+vanishes. The `s = 0` branch is the named junk boundary above, not a biological equilibrium. -/
+theorem equilibriumEffectVariance_eq_zero_iff (v_mutation s : ℝ) :
+    equilibriumEffectVariance v_mutation s = 0 ↔ v_mutation = 0 ∨ s = 0 := by
+  unfold equilibriumEffectVariance
+  constructor
+  · intro h
+    by_cases h_s : s = 0
+    · exact Or.inr h_s
+    · left
+      calc
+        v_mutation = v_mutation / s * s := (div_mul_cancel₀ v_mutation h_s).symm
+        _ = 0 := by rw [h]; norm_num
+  · rintro (rfl | rfl) <;> norm_num
+
 /-- **Mutation-selection balance recurrence.**
     Each generation, new mutational variance v_mut is added and selection
     of strength s removes a fraction s of the standing variance V.
@@ -84,28 +99,18 @@ theorem equilibriumEffectVariance_mul_selection (v_mutation s : ℝ) (h : s ≠ 
 noncomputable def effectVarianceRecurrence (V v_mut s : ℝ) : ℝ :=
   (1 - s) * V + v_mut
 
-/-- **The equilibrium variance is a fixed point of the recurrence.**
+/-- **The equilibrium variance is the unique fixed point of the recurrence.**
     Solving V* = (1 - s) × V* + v_mut gives V* = v_mut / s.
-    This verifies that `equilibriumEffectVariance` is the unique
-    fixed point of the mutation-selection balance recurrence. -/
-theorem effectVarianceRecurrence_fixedPoint
-    (v_mut s : ℝ) (hs : s ≠ 0) :
-    effectVarianceRecurrence (v_mut / s) v_mut s = v_mut / s := by
-  unfold effectVarianceRecurrence
-  field_simp
-  ring
-
-/-- **`equilibriumEffectVariance` is the fixed point of the recurrence.**
-    Connects the standalone definition to the recurrence derivation. -/
-theorem equilibriumEffectVariance_is_fixedPoint
-    (v_mut s : ℝ) (hs : s ≠ 0) :
-    effectVarianceRecurrence (equilibriumEffectVariance v_mut s) v_mut s
-      = equilibriumEffectVariance v_mut s := by
-  unfold equilibriumEffectVariance
-  exact effectVarianceRecurrence_fixedPoint v_mut s hs
+    The reverse implication rules out every other alleged balance point. -/
+theorem effectVarianceRecurrence_eq_self_iff
+    (V v_mut s : ℝ) (hs : s ≠ 0) :
+    effectVarianceRecurrence V v_mut s = V ↔ V = equilibriumEffectVariance v_mut s := by
+  unfold effectVarianceRecurrence equilibriumEffectVariance
+  rw [eq_div_iff hs]
+  constructor <;> intro h <;> nlinarith
 
 /-- Stronger stabilizing selection → smaller effect sizes. -/
-theorem stronger_stabilizing_smaller_effects
+theorem equilibriumEffectVariance_lt_of_selection_lt
     (v_mutation s₁ s₂ : ℝ)
     (h_vm : 0 < v_mutation)
     (h_s₁ : 0 < s₁)
@@ -135,7 +140,7 @@ theorem effectCorrelationStabilizing_zero_selection_is_junk :
   simp
 
 /-- Effect correlation increases with stronger selection (relative to drift). -/
-theorem effect_correlation_increases_with_Ns
+theorem effectCorrelationStabilizing_lt_of_Ns_lt
     (Ns₁ Ns₂ : ℝ)
     (h₁ : 1 < Ns₁) (h_more : Ns₁ < Ns₂) :
     effectCorrelationStabilizing Ns₁ < effectCorrelationStabilizing Ns₂ := by
@@ -143,28 +148,40 @@ theorem effect_correlation_increases_with_Ns
   rw [sub_lt_sub_iff_left]
   exact div_lt_div_of_pos_left one_pos (by linarith) (by linarith)
 
-/-- **`c/m` is decreasing in `m`**, for `c > 0` and `0 < m₁ < m₂`.
+/-- Per-locus contribution obtained by spreading a positive architecture-scale variance
+equally over `locusCount` causal loci. -/
+noncomputable def polygenicAveragingVariance (architectureVariance : ℝ)
+    (locusCount : ℕ) : ℝ :=
+  architectureVariance / locusCount
 
-    The reading is a law-of-large-numbers argument: with many small effects each
-    locus matters less, so a portability estimate is more robust. The
-    proportionality that carries that reading — that the estimator's variance
-    goes as `1/m` — is written into the statement rather than derived, and no
-    estimator, locus or trait appears below. A law of large numbers is a
-    statement about a sequence of random variables; this is division. -/
-theorem div_cast_lt_div_cast_of_lt
-    (m₁ m₂ : ℕ) (var_per_locus : ℝ)
+/-- The polygenic averaging scale is pinned at four equal loci. -/
+theorem polygenicAveragingVariance_at_reference_point :
+    polygenicAveragingVariance 1 4 = 1 / 4 := by
+  norm_num [polygenicAveragingVariance]
+
+/-- A positive architecture variance contributes strictly less per locus when spread over
+strictly more nonzero causal loci. -/
+theorem polygenicAveragingVariance_lt_of_locusCount_lt
+    (m₁ m₂ : ℕ) (architectureVariance : ℝ)
     (h_m₁ : 0 < m₁) (h_more : m₁ < m₂)
-    (h_var : 0 < var_per_locus) :
-    -- Variance of portability ratio estimate ∝ 1/m
-    var_per_locus / (m₂ : ℝ) < var_per_locus / (m₁ : ℝ) :=
+    (h_var : 0 < architectureVariance) :
+    polygenicAveragingVariance architectureVariance m₂ <
+      polygenicAveragingVariance architectureVariance m₁ :=
   div_lt_div_of_pos_left h_var (Nat.cast_pos.mpr h_m₁) (Nat.cast_lt.mpr h_more)
+
+/-- Equal per-locus heritability when total heritability is spread over a specified count. -/
+noncomputable def equalPerLocusHeritability (locusCount : ℕ) (totalHeritability : ℝ) : ℝ :=
+  totalHeritability / locusCount
 
 /-- **Highly polygenic architecture: total heritability sums from small effects.**
     With M causal loci each contributing h²/M, the total heritability
     is recovered as M × (h²/M) = h². -/
-theorem polygenic_h2_summation (M h2 : ℝ) (h_M : M ≠ 0) :
-    M * (h2 / M) = h2 := by
-  field_simp
+theorem equalPerLocusHeritability_sum (locusCount : ℕ) (totalHeritability : ℝ)
+    (h_count : 0 < locusCount) :
+    (locusCount : ℝ) * equalPerLocusHeritability locusCount totalHeritability =
+      totalHeritability := by
+  unfold equalPerLocusHeritability
+  exact mul_div_cancel₀ totalHeritability (Nat.cast_ne_zero.mpr (ne_of_gt h_count))
 
 end StabilizingSelection
 
