@@ -207,6 +207,7 @@ noncomputable def SymmetricCoding.witness (V : Type*) [Fintype V] : SymmetricCod
 def configurationWeight (coding : SymmetricCoding V) (x : Fin n → V) : ℝ :=
   ∏ i, coding.weight (x i)
 
+omit [DecidableEq V] in
 /-- Reference evaluation: an empty locus set has unit configuration weight, since the product
 is empty. -/
 theorem configurationWeight_at_reference_point (coding : SymmetricCoding V) (x : Fin 0 → V) :
@@ -236,6 +237,7 @@ def flipLocus (coding : SymmetricCoding V) (i : Fin n) :
     · subst hj; simp
     · simp [Function.update_of_ne hj]
 
+omit [Fintype V] [DecidableEq V] in
 /-- A product over a set containing `i`, of a function evaluated at a
 one-coordinate update, splits off the updated factor. -/
 private theorem prod_update_split {β : Type*} [CommMonoid β] (f : V → β)
@@ -248,6 +250,7 @@ private theorem prod_update_split {β : Type*} [CommMonoid β] (f : V → β)
     have hne : j ≠ i := Finset.notMem_singleton.mp (Finset.mem_sdiff.mp hj).2
     rw [Function.update_of_ne hne]
 
+omit [DecidableEq V] in
 theorem configurationWeight_flipLocus (coding : SymmetricCoding V) (i : Fin n)
     (x : Fin n → V) :
     configurationWeight coding (flipLocus coding i x) = configurationWeight coding x := by
@@ -259,6 +262,7 @@ theorem configurationWeight_flipLocus (coding : SymmetricCoding V) (i : Fin n)
       (fun j ↦ coding.weight (x j)),
     coding.weight_flip]
 
+omit [DecidableEq V] in
 theorem interactionMonomial_flipLocus_mem (coding : SymmetricCoding V)
     {i : Fin n} {locusSet : Finset (Fin n)} (hi : i ∈ locusSet) (x : Fin n → V) :
     interactionMonomial coding locusSet (flipLocus coding i x) =
@@ -270,6 +274,7 @@ theorem interactionMonomial_flipLocus_mem (coding : SymmetricCoding V)
     coding.value_flip]
   ring
 
+omit [DecidableEq V] in
 theorem interactionMonomial_flipLocus_not_mem (coding : SymmetricCoding V)
     {i : Fin n} {locusSet : Finset (Fin n)} (hi : i ∉ locusSet) (x : Fin n → V) :
     interactionMonomial coding locusSet (flipLocus coding i x) =
@@ -280,6 +285,7 @@ theorem interactionMonomial_flipLocus_not_mem (coding : SymmetricCoding V)
   have hne : j ≠ i := by rintro rfl; exact hi hj
   rw [Function.update_of_ne hne]
 
+omit [DecidableEq V] in
 /-- **Sign-Erasure Lemma.** For a sign-symmetric coding and any truncation that
 depends only on magnitudes, the truncated cross-moment of two interaction
 monomials vanishes exactly whenever some locus lies in one and not the other.
@@ -342,6 +348,7 @@ parameter. -/
 def magnitudeProfile (coding : SymmetricCoding V) (x : Fin n → V) : Fin n → ℝ :=
   fun j ↦ |coding.value (x j)|
 
+omit [DecidableEq V] in
 /-- **A one-locus flip does not move the magnitude profile**, since the flip
 negates the coded value and negation is invisible to `|·|`. -/
 theorem magnitudeProfile_flipLocus (coding : SymmetricCoding V) (i : Fin n)
@@ -355,6 +362,7 @@ theorem magnitudeProfile_flipLocus (coding : SymmetricCoding V) (i : Fin n)
     rw [Function.update_self, coding.value_flip, abs_neg]
   · rw [Function.update_of_ne hj]
 
+omit [DecidableEq V] in
 /-- **Sign erasure with the truncation hypothesis discharged.**
 
 `sign_erasure` takes the flip-invariance of the truncation as an argument, and
@@ -398,6 +406,7 @@ def SymmetricCoding.scale (coding : SymmetricCoding V) (a : ℝ) :
     rw [coding.value_flip]
     ring
 
+omit [DecidableEq V] in
 /-- A sign-symmetric coding has no odd moments. This is the finite-sample
 handle used below to decide which genotype codings are symmetric.
 
@@ -944,8 +953,7 @@ theorem uncentered_square_log_additive (x y : ℝ) (hx : x ≠ 0) (hy : y ≠ 0)
 
 This is the first floor-two datum that floor one does not already fix, and the
 one a panel-level construction should target. -/
-theorem centeredSquare_third_moment_eq (h : HardyWeinbergModel)
-    (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
+theorem centeredSquare_third_moment_eq (h : HardyWeinbergModel) :
     ∑ g : DiploidGenotype, h.genotypeProb g * h.centeredSquare g ^ 3 =
       (∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 6) -
         3 * (∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4) +
@@ -1092,7 +1100,7 @@ theorem centeredSquare_third_moment_factored (h : HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
     ∑ g : DiploidGenotype, h.genotypeProb g * h.centeredSquare g ^ 3 =
       (1 / h.genotypeVariance + 9) * (1 / h.genotypeVariance - 2) := by
-  rw [centeredSquare_third_moment_eq h hq0 hq1,
+  rw [centeredSquare_third_moment_eq h,
     standardizedGenotype_sixth_moment h hq0 hq1,
     standardizedGenotype_fourth_moment h hq0 hq1,
     standardizedGenotype_second_moment_one h hq0 hq1, h.genotypeProb_sum]
@@ -1560,11 +1568,13 @@ def equilibriumDesign (model : Fin n → HardyWeinbergModel)
   coefficient := coefficient
   jointGenotypeProb := fun x ↦ ∏ i, (model i).genotypeProb (x i)
 
+omit [Fintype ι] in
 theorem inLinkageEquilibrium_equilibriumDesign (model : Fin n → HardyWeinbergModel)
     (locusSet : ι → Finset (Fin n)) (coefficient : ι → ℝ) :
     (equilibriumDesign model locusSet coefficient).InLinkageEquilibrium :=
   fun _ ↦ rfl
 
+omit [Fintype ι] in
 /-- **The equilibrium design is the fixed point of free recombination.** One
     generation of `freeRecombinationStep` returns it unchanged, which is what
     entitles it to the name: the product law is where the recombination map
@@ -1574,6 +1584,7 @@ theorem equilibriumDesign_isFixedPoint (model : Fin n → HardyWeinbergModel)
     freeRecombinationStep (equilibriumDesign model locusSet coefficient) =
       equilibriumDesign model locusSet coefficient := rfl
 
+omit [Fintype ι] in
 /-- Being at linkage equilibrium is exactly being at rest under the step, on the
     field the step moves: the joint law of a design in linkage equilibrium
     survives a generation of free recombination. -/
@@ -1710,11 +1721,13 @@ two is untouched and remains never symmetric away from `q = 1/2`
 (`Calibrator.CondensationUnification.centeredSquare_third_moment_zero_iff_balanced`).
 -/
 
+omit [Fintype ι] in
 /-- Flipping preserves the tested locus-sets, so interaction order, the recurrence
 profile and disjointness are all untouched — each reads only `locusSet`. -/
 theorem flipOrientation_locusSet {design : GenotypeDesign n ι} (locus : Fin n) (s : ι) :
     (design.flipOrientation locus).locusSet s = design.locusSet s := rfl
 
+omit [Fintype ι] in
 /-- Disjointness is orientation-invariant. -/
 theorem flipOrientation_variantDisjoint_iff {design : GenotypeDesign n ι}
     (locus : Fin n) :
@@ -1753,6 +1766,7 @@ theorem flipOrientation_energy {design : GenotypeDesign n ι} (locus : Fin n) :
   · rw [if_pos hs, neg_sq]
   · rw [if_neg hs]
 
+omit [Fintype ι] in
 /-- Under disjointness a variant determines the tested set it belongs to. -/
 theorem unique_set_of_variantDisjoint {design : GenotypeDesign n ι}
     (hdisjoint : design.VariantDisjoint)
@@ -1802,6 +1816,7 @@ theorem variantDisjoint_iff_variantRecurrence_le_one {design : GenotypeDesign n 
       Finset.mem_filter.mpr ⟨Finset.mem_univ t, hi'⟩
     exact hst (Finset.card_le_one.mp hcard s hs t ht)
 
+omit [Fintype ι] in
 /-- **A recurrent variant refutes disjointness.** If one variant enters two
 distinct tested sets — one SNP in two sliding windows, one gene in two pathways,
 one pleiotropic variant in two panels — the design is not disjoint and the
@@ -1973,6 +1988,7 @@ theorem twoPool_pairs_overlap {poolOne poolTwo : Finset (Fin n)}
     · exact hjk (Finset.mem_singleton.mp hright)
   · refine Finset.not_disjoint_iff.mpr ⟨i, ?_, ?_⟩ <;> simp
 
+omit [Fintype ι] in
 /-- **The witness design is not disjoint**, as soon as the second pool holds two
 loci: the two cross-pairs at a fixed first locus are distinct tested sets sharing
 that locus. So the witness is an admissible design outside the reach of the
@@ -2203,6 +2219,7 @@ Empirical status: UNTESTED. A count matrix read off the design; no free paramete
 def overlapMatrix (design : GenotypeDesign nx ιx) : Matrix ιx ιx ℝ :=
   fun s t ↦ ((design.locusSet s ∩ design.locusSet t).card : ℝ)
 
+omit [Fintype ιx] [DecidableEq ιx] in
 /-- The overlap structure is symmetric: sharing is a symmetric relation. -/
 theorem overlapMatrix_symm (design : GenotypeDesign nx ιx) (s t : ιx) :
     design.overlapMatrix s t = design.overlapMatrix t s := by
@@ -2222,6 +2239,7 @@ Empirical status: UNTESTED. A trace of a power of the overlap count matrix; no -
 def cycleDensity (design : GenotypeDesign nx ιx) (p : ℕ) : ℝ :=
   Matrix.trace (design.overlapMatrix ^ p)
 
+omit [DecidableEq ιx] in
 /-- **Recurrence is a star density.** The row sum of the overlap structure at a
 tested set is the total recurrence of the variants in it. So the
 variant-recurrence profile is a functional of the row sums of `A` — a sum over
@@ -2269,6 +2287,7 @@ Empirical status: UNTESTED. A bound on the design's own recurrence profile; -/
 def BoundedHubRecurrence (design : GenotypeDesign nx ιx) (bound : ℕ) : Prop :=
   ∀ i : Fin nx, design.variantRecurrence i ≤ bound
 
+omit [DecidableEq ιx] in
 /-- Every design has bounded hub recurrence at the number of tested sets, since a
     variant cannot be tested more often than there are tests.
 
@@ -2284,6 +2303,7 @@ theorem boundedHubRecurrence_card (design : GenotypeDesign nx ιx) :
   simpa [GenotypeDesign.variantRecurrence, Finset.card_univ] using
     Finset.card_filter_le (Finset.univ : Finset ιx) (fun s ↦ i ∈ design.locusSet s)
 
+omit [DecidableEq ιx] in
 /-- A variant entering *every* tested set has recurrence equal to the number of
 tested sets. -/
 theorem variantRecurrence_eq_card_of_ubiquitous (design : GenotypeDesign nx ιx)
@@ -2295,6 +2315,7 @@ theorem variantRecurrence_eq_card_of_ubiquitous (design : GenotypeDesign nx ιx)
     Finset.filter_true_of_mem (fun s _ ↦ hall s)
   rw [hdef, hfilter, Finset.card_univ]
 
+omit [DecidableEq ιx] in
 /-- **A ubiquitous variant forces the hub bound up with the number of tested
 sets.** A lead variant present in every window of a dense scan, or a pleiotropic
 variant in every panel of a phenome-wide scan, makes any hub bound at least as
