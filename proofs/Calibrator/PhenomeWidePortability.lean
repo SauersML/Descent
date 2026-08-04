@@ -562,16 +562,17 @@ theorem worse_than_neutral_implies_fluctuating_regime
     portability law. -/
 theorem scalar_three_factor_portability_upper_bound
     (r2_source fst rho ld_factor : ℝ)
-    (h_r2 : 0 < r2_source)
-    (h_fst : 0 ≤ fst) (h_fst_le : fst ≤ 1)
+    (h_r2 : 0 ≤ r2_source)
+    (h_fst : 0 ≤ fst)
     (h_rho : 0 ≤ rho) (h_rho_le : rho ≤ 1)
     (h_ld : 0 ≤ ld_factor) (h_ld_le : ld_factor ≤ 1) :
     r2_source * (1 - fst) * rho ^ 2 * ld_factor ≤ r2_source := by
-  have h1 : 0 ≤ 1 - fst := by linarith
-  have h2 : rho ^ 2 ≤ 1 := pow_le_one₀ h_rho h_rho_le
-  have h3 : (1 - fst) * rho ^ 2 ≤ 1 := by nlinarith
-  have h4 : (1 - fst) * rho ^ 2 * ld_factor ≤ 1 := by nlinarith
-  nlinarith
+  have h_rho_sq_le : rho ^ 2 ≤ 1 := pow_le_one₀ h_rho h_rho_le
+  have h_rho_ld_le : rho ^ 2 * ld_factor ≤ 1 := by
+    nlinarith [mul_nonneg (sub_nonneg.mpr h_rho_sq_le) (sub_nonneg.mpr h_ld_le)]
+  have h_factor_le : (1 - fst) * rho ^ 2 * ld_factor ≤ 1 := by
+    nlinarith [mul_nonneg (mul_nonneg h_fst (sq_nonneg rho)) h_ld]
+  simpa [mul_assoc] using mul_le_mul_of_nonneg_left h_factor_le h_r2
 
 end TraitClassification
 
