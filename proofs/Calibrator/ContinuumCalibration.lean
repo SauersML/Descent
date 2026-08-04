@@ -260,6 +260,68 @@ theorem twoIndex_posteriorDriftEnergy_eq_zero_iff
     rw [h]
     ring
 
+/-! ## Clinical thresholds: a crossing has a quantitative calibration price -/
+
+/-- The binary action induced by a clinical risk threshold.
+
+Empirical status: NOT AN EMPIRICAL CLAIM -- this is a deterministic decision rule. -/
+noncomputable def thresholdDecision (cutoff risk : ℝ) : Bool :=
+  if cutoff ≤ risk then true else false
+
+/-- Risks on opposite sides of a clinical cutoff force opposite actions. -/
+theorem thresholdDecision_ne_of_crossing {cutoff lower upper : ℝ}
+    (hlower : lower < cutoff) (hupper : cutoff ≤ upper) :
+    thresholdDecision cutoff lower ≠ thresholdDecision cutoff upper := by
+  simp [thresholdDecision, not_le_of_gt hlower, hupper]
+
+/-- **No ancestry-blind action is correct across a threshold crossing.**  If the lower-risk
+environment lies below a clinical cutoff and the upper-risk environment lies above it, then every
+single binary action disagrees with at least one environment.  This is the decision-theoretic
+content hidden by pooled calibration. -/
+theorem no_common_thresholdDecision_of_crossing {cutoff lower upper : ℝ}
+    (hlower : lower < cutoff) (hupper : cutoff ≤ upper) (action : Bool) :
+    action ≠ thresholdDecision cutoff lower ∨
+      action ≠ thresholdDecision cutoff upper := by
+  by_cases h : action = thresholdDecision cutoff lower
+  · right
+    intro heq
+    exact thresholdDecision_ne_of_crossing hlower hupper (h.symm.trans heq)
+  · exact Or.inl h
+
+/-- **A threshold crossing with margin forces a positive drift price.**  If both environments
+remain posteriorly possible and their risks lie at least `margin` below and above the cutoff,
+then the local calibration defect is at least `q(1-q)(2 margin)²`.  This turns a clinical
+decision margin into an exact lower bound on the probability-estimation obstruction. -/
+theorem twoIndex_posteriorDriftEnergy_ge_thresholdMargin
+    (q upper lower : Covariate → ℝ) (x : Covariate) (cutoff margin : ℝ)
+    (hq₀ : 0 ≤ q x) (hq₁ : q x ≤ 1) (hmargin : 0 ≤ margin)
+    (hlower : lower x ≤ cutoff - margin)
+    (hupper : cutoff + margin ≤ upper x) :
+    q x * (1 - q x) * (2 * margin) ^ 2 ≤
+      ∑ t, twoIndexPosterior q x t *
+        posteriorDrift (twoIndexPosterior q) (twoIndexConditional upper lower) t x ^ 2 := by
+  rw [twoIndex_posteriorDriftEnergy_eq]
+  have hcoefficient : 0 ≤ q x * (1 - q x) :=
+    mul_nonneg hq₀ (sub_nonneg.mpr hq₁)
+  have hgap : 2 * margin ≤ upper x - lower x := by linarith
+  have hgap_nonneg : 0 ≤ upper x - lower x := le_trans hmargin (by linarith)
+  have hsquare : (2 * margin) ^ 2 ≤ (upper x - lower x) ^ 2 := by
+    nlinarith
+  exact mul_le_mul_of_nonneg_left hsquare hcoefficient
+
+/-- With positive posterior overlap and positive clinical margin, the threshold-crossing drift
+price is strictly positive. -/
+theorem twoIndex_posteriorDriftEnergy_pos_of_thresholdMargin
+    (q upper lower : Covariate → ℝ) (x : Covariate) (cutoff margin : ℝ)
+    (hq₀ : 0 < q x) (hq₁ : q x < 1) (hmargin : 0 < margin)
+    (hlower : lower x ≤ cutoff - margin)
+    (hupper : cutoff + margin ≤ upper x) :
+    0 < ∑ t, twoIndexPosterior q x t *
+      posteriorDrift (twoIndexPosterior q) (twoIndexConditional upper lower) t x ^ 2 := by
+  have hlower_lt_upper : lower x < upper x := by linarith
+  rw [twoIndex_posteriorDriftEnergy_eq]
+  exact mul_pos (mul_pos hq₀ (sub_pos.mpr hq₁)) (sq_pos_of_pos (sub_pos.mpr hlower_lt_upper))
+
 /-- **Exact two-index drift law, globally.**  The full calibration obstruction integrates the
 product of posterior heterogeneity and squared section width over biological covariates.  This
 bridges the section geometry of functional descent to the `L²` calibration defect. -/

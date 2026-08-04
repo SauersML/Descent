@@ -1516,11 +1516,39 @@ that portion is, and the empirical claim is that it may be the smaller one.
 -/
 
 /-- Two ancestries indistinguishable by genotype: any genotype-measurable statistic, and hence any
-inferred ancestry coordinate, assigns them the common value. -/
+inferred ancestry coordinate, assigns them the common value.
+
+Empirical status: NOT AN EMPIRICAL CLAIM -- these values define a nonidentifiability witness. -/
 noncomputable def genotypeVisibleRisk : Fin 2 → ℝ := ![1 / 2, 1 / 2]
 
-/-- Their true conditional risks, which differ. -/
+/-- Their true conditional risks, which differ.
+
+Empirical status: NOT AN EMPIRICAL CLAIM -- these values define a nonidentifiability witness. -/
 noncomputable def trueRiskUnderSocialDrift : Fin 2 → ℝ := ![4 / 5, 1 / 5]
+
+/-- The genotype-visible witness deliberately reuses the earlier coarsened risk field. -/
+theorem genotypeVisibleRisk_eq_binnedRiskByAncestry :
+    genotypeVisibleRisk = binnedRiskByAncestry := by
+  funext i
+  fin_cases i <;> norm_num [genotypeVisibleRisk, binnedRiskByAncestry]
+
+/-- The genotype-visible witness is also the earlier uniform two-ancestry vector. -/
+theorem genotypeVisibleRisk_eq_uniformTwoWeights :
+    genotypeVisibleRisk = uniformTwoWeights := by
+  funext i
+  fin_cases i <;> norm_num [genotypeVisibleRisk, uniformTwoWeights]
+
+/-- The social-drift witness deliberately reuses the earlier fine risk field. -/
+theorem trueRiskUnderSocialDrift_eq_fineRiskByAncestry :
+    trueRiskUnderSocialDrift = fineRiskByAncestry := by
+  funext i
+  fin_cases i <;> norm_num [trueRiskUnderSocialDrift, fineRiskByAncestry]
+
+/-- The same reversed conditional is also the repository's post-hoc-recalibration witness. -/
+theorem trueRiskUnderSocialDrift_eq_reorderTarget :
+    trueRiskUnderSocialDrift = reorderTarget := by
+  funext i
+  fin_cases i <;> norm_num [trueRiskUnderSocialDrift, reorderTarget]
 
 /-- **Genotype data sees no obstruction here.** -/
 theorem genotypeVisible_driftDefect_zero :
