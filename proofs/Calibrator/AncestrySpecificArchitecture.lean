@@ -361,6 +361,16 @@ causal variants due to independent mutation and selection.
 
 section AllelicHeterogeneity
 
+/-- Signal retained after causal tagging and allelic sharing are applied. -/
+noncomputable def allelicHeterogeneityRetainedSignal
+    (r2_causal r2_tag sharedFraction : ℝ) : ℝ :=
+  r2_causal * r2_tag * sharedFraction
+
+/-- The retained-signal definition is pinned at an interior reference point. -/
+theorem allelicHeterogeneityRetainedSignal_at_reference_point :
+    allelicHeterogeneityRetainedSignal (1 / 2) (1 / 2) (1 / 2) = 1 / 8 := by
+  norm_num [allelicHeterogeneityRetainedSignal]
+
 /-- **Allelic heterogeneity reduces portability via variance decomposition.**
     Total locus variance in source = V_shared + V_source_specific.
     The tag SNP captures r²_tag of source total variance.
@@ -371,15 +381,41 @@ section AllelicHeterogeneity
     Derived: r2_causal * r2_tag * ρ < r2_causal * r2_tag because
     multiplying the positive quantity r2_causal * r2_tag by ρ < 1
     strictly reduces it. -/
-theorem mul_lt_self_of_lt_one
+theorem allelicHeterogeneityRetainedSignal_lt_full
     (r2_causal r2_tag ρ : ℝ)
     (h_causal : 0 < r2_causal) (h_tag : 0 < r2_tag)
     (h_ρ_lt : ρ < 1) :
-    r2_causal * r2_tag * ρ < r2_causal * r2_tag := by
+    allelicHeterogeneityRetainedSignal r2_causal r2_tag ρ < r2_causal * r2_tag := by
+  unfold allelicHeterogeneityRetainedSignal
   have h_prod_pos : 0 < r2_causal * r2_tag := mul_pos h_causal h_tag
   calc r2_causal * r2_tag * ρ
       < r2_causal * r2_tag * 1 := by nlinarith
     _ = r2_causal * r2_tag := mul_one _
+
+/-- Retained signal equals the fully shared signal exactly when one upstream signal
+channel is already zero or the allelic component is completely shared. -/
+theorem allelicHeterogeneityRetainedSignal_eq_full_iff
+    (r2_causal r2_tag ρ : ℝ) :
+    allelicHeterogeneityRetainedSignal r2_causal r2_tag ρ = r2_causal * r2_tag ↔
+      r2_causal = 0 ∨ r2_tag = 0 ∨ ρ = 1 := by
+  unfold allelicHeterogeneityRetainedSignal
+  constructor
+  · intro h
+    have h_factor : r2_causal * r2_tag * (ρ - 1) = 0 := by nlinarith
+    rcases mul_eq_zero.mp h_factor with h | h
+    · rcases mul_eq_zero.mp h with h | h
+      · exact Or.inl h
+      · exact Or.inr (Or.inl h)
+    · exact Or.inr (Or.inr (by linarith))
+  · rintro (rfl | rfl | rfl) <;> ring
+
+/-- Total gene-level variance is the sum of shared and population-specific components. -/
+noncomputable def populationGeneVariance (shared specific : ℝ) : ℝ :=
+  shared + specific
+
+/-- Fraction of a target population's gene-level variance carried by shared variants. -/
+noncomputable def crossPopulationGeneTransferFraction (shared targetSpecific : ℝ) : ℝ :=
+  shared / populationGeneVariance shared targetSpecific
 
 /-- **Population-specific rare variants at shared loci.**
     A gene may be important for a trait in all populations,
@@ -395,18 +431,42 @@ theorem mul_lt_self_of_lt_one
     rare variants contribute genuine additional signal in each population.
     A PGS trained in EUR captures v_shared + v_eur_specific but only
     v_shared transfers to AFR, missing v_afr_specific entirely. -/
-theorem lt_add_pos_and_div_lt_one
-    (v_shared v_eur_specific v_afr_specific : ℝ)
-    (h_shared : 0 < v_shared)
-    (h_eur : 0 < v_eur_specific) (h_afr : 0 < v_afr_specific) :
-    -- Each population's gene-level variance exceeds the shared component
-    v_shared < v_shared + v_eur_specific ∧
-    v_shared < v_shared + v_afr_specific ∧
-    -- A EUR-trained PGS captures only v_shared in AFR, missing v_afr_specific
-    v_shared / (v_shared + v_afr_specific) < 1 := by
-  refine ⟨by linarith, by linarith, ?_⟩
+theorem populationGeneVariance_gt_shared
+    (shared specific : ℝ) (h_specific : 0 < specific) :
+    shared < populationGeneVariance shared specific := by
+  unfold populationGeneVariance
+  linarith
+
+/-- A positive target-specific component makes the shared transfer fraction strictly
+smaller than one. -/
+theorem crossPopulationGeneTransferFraction_lt_one
+    (shared targetSpecific : ℝ)
+    (h_shared : 0 < shared) (h_target : 0 < targetSpecific) :
+    crossPopulationGeneTransferFraction shared targetSpecific < 1 := by
+  unfold crossPopulationGeneTransferFraction populationGeneVariance
   rw [div_lt_one (by linarith)]
   linarith
+
+/-- With positive shared variance, full gene-level transfer occurs exactly when the target
+has no population-specific variance component. -/
+theorem crossPopulationGeneTransferFraction_eq_one_iff
+    (shared targetSpecific : ℝ) (h_shared : 0 < shared) :
+    crossPopulationGeneTransferFraction shared targetSpecific = 1 ↔ targetSpecific = 0 := by
+  unfold crossPopulationGeneTransferFraction populationGeneVariance
+  constructor
+  · intro h
+    by_cases h_denom : shared + targetSpecific = 0
+    · rw [h_denom, div_zero] at h
+      norm_num at h
+    · have h_eq : shared = shared + targetSpecific := (div_eq_one_iff_eq h_denom).1 h
+      linarith
+  · rintro rfl
+    simp [ne_of_gt h_shared]
+
+/-- Number of distinct causal signals across two populations after shared signals are
+counted only once. -/
+def distinctSignalCount (eur afr shared : ℕ) : ℕ :=
+  eur + afr - shared
 
 /-- **Inclusion-exclusion on signal counts.**
     Model: each population has `n_signals` independent signals at a locus, of
@@ -423,13 +483,20 @@ theorem lt_add_pos_and_div_lt_one
     appears in the statement — only counts. Whether a population-specific
     signal count is evidence of allelic heterogeneity is a modelling claim this
     theorem does not reach. -/
-theorem le_add_sub_of_le_of_le
+theorem eurSignalCount_le_distinctSignalCount
     (n_signals_eur n_signals_afr n_shared : ℕ)
-    (h_shared_le_eur : n_shared ≤ n_signals_eur)
     (h_shared_le_afr : n_shared ≤ n_signals_afr) :
-    -- The union of distinct signals exceeds either population alone
-    n_signals_eur ≤ n_signals_eur + n_signals_afr - n_shared ∧
-    n_signals_afr ≤ n_signals_eur + n_signals_afr - n_shared := by
+    n_signals_eur ≤ distinctSignalCount n_signals_eur n_signals_afr n_shared := by
+  unfold distinctSignalCount
+  omega
+
+/-- The distinct cross-population signal count is at least the AFR signal count when
+every shared signal is present in EUR. -/
+theorem afrSignalCount_le_distinctSignalCount
+    (n_signals_eur n_signals_afr n_shared : ℕ)
+    (h_shared_le_eur : n_shared ≤ n_signals_eur) :
+    n_signals_afr ≤ distinctSignalCount n_signals_eur n_signals_afr n_shared := by
+  unfold distinctSignalCount
   omega
 
 end AllelicHeterogeneity
