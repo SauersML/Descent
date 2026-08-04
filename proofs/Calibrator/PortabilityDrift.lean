@@ -3754,7 +3754,17 @@ noncomputable def liabilityThreshold (K : ℝ) : ℝ := Function.invFun Phi (1 -
 
 /-- Mean liability among cases, `i = φ(T)/K`.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_pgs.py`,
+    `test_liability_moments`). Four million explicit standard-normal liabilities
+    per cell with threshold ascertainment, mean taken among cases:
+
+      K       this def   simulated            sems
+      0.01     2.66521   2.66465±0.00156      0.36
+      0.05     2.06271   2.06447±0.00084      2.10
+      0.20     1.39981   1.39937±0.00052      0.85
+
+    Power: the prediction spans 1.39981 to 2.66521 across the design. -/
 noncomputable def liabilityCaseMean (K : ℝ) : ℝ :=
   standardNormalPdf (liabilityThreshold K) / K
 
@@ -3771,7 +3781,16 @@ theorem liabilityCaseMean_zero_prevalence_is_junk :
 
 /-- Mean liability among controls, `i_c = -i·K/(1-K)`.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_pgs.py`,
+    `test_liability_moments`). Same runs, mean among controls:
+
+      K       this def   simulated             sems
+      0.01    -0.02692  -0.02796±0.00049      2.13
+      0.05    -0.10856  -0.10775±0.00046      1.77
+      0.20    -0.34995  -0.34918±0.00043      1.81
+
+    Power: the prediction spans -0.34995 to -0.02692, a factor of thirteen. -/
 noncomputable def liabilityControlMean (K : ℝ) : ℝ :=
   -liabilityCaseMean K * K / (1 - K)
 
@@ -3786,7 +3805,19 @@ theorem liabilityControlMean_unit_prevalence_is_junk :
 
 /-- Score variance among cases, `v₁ = 1 - R²·i·(i - T)`.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED**, with the reading pinned
+    (`proofs/validation/empirical/simcov/battery_pgs.py`,
+    `test_liability_moments`). The design tested two candidate readings of what
+    this variance is OF, and they are not close:
+
+      K      r2     this def   var(PGS|case)/r2   var(liability|case)
+      0.05   0.3     0.74142   0.74137 (0.02σ)    0.13822 (1381σ)
+      0.20   0.3     0.76559   0.76419 (1.16σ)    0.21847 (1583σ)
+      0.05   0.6     0.48285   0.48252 (0.22σ)    0.13745 (796σ)
+
+    So this is the variance of the STANDARDISED SCORE among cases, not of the
+    liability. The name alone does not say which, and a consumer that took the
+    other reading would be wrong by a factor of five. -/
 noncomputable def liabilityCaseVariance (r2 K : ℝ) : ℝ :=
   1 - r2 * liabilityCaseMean K * (liabilityCaseMean K - liabilityThreshold K)
 

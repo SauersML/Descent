@@ -59,21 +59,31 @@ section PGSPortabilityDerivation
     Cov(PGS, Y_genetic) = Σᵢ Σⱼ β_source_i × Σᵢⱼ × β_causal_j
     where β_causal are the modelled causal effects in that population.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_transfer.py`,
+    `test_transfer_chain`). Standardised dosages on a recombining coalescent
+    panel, LD as the correlation matrix: against the empirical `Cov(PGS, y)` at
+    0.63 sems and against the realised `Var(PGS)` at 0.00. -/
 noncomputable def pgsPhenoCov {m : ℕ} (β_weights β_causal : Fin m → ℝ)
     (ld : Fin m → Fin m → ℝ) : ℝ :=
   ∑ i : Fin m, ∑ j : Fin m, β_weights i * ld i j * β_causal j
 
 /-- Genetic variance induced by a shared LD kernel.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_transfer.py`,
+    `test_transfer_chain`). Against the realised variance of the score on a
+    recombining coalescent panel: 0.00 sems. -/
 noncomputable def sharedLDGeneticVariance {m : ℕ}
     (β : Fin m → ℝ) (ld : Fin m → Fin m → ℝ) : ℝ :=
   pgsPhenoCov β β ld
 
 /-- Heritability induced by a shared LD kernel.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_transfer.py`,
+    `test_transfer_chain`). Against the realised fraction of phenotypic variance
+    carried by the additive score: 0.00 sems. -/
 noncomputable def sharedLDHeritability {m : ℕ}
     (β : Fin m → ℝ) (ld : Fin m → Fin m → ℝ) (var_y : ℝ) : ℝ :=
   sharedLDGeneticVariance β ld / var_y
@@ -91,7 +101,11 @@ theorem sharedLDHeritability_zero_vary_is_junk {m : ℕ} (β : Fin m → ℝ)
 /-- R² of a PGS: the squared correlation between PGS and phenotype.
     R² = Cov(PGS, Y)² / (Var(PGS) × Var(Y)).
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_transfer.py`,
+    `test_transfer_chain`). Against the squared correlation of score with
+    phenotype, source and transported: 0.02 and 1.35 sems over a prediction
+    spanning 0.11581 to 0.23227, a factor of two. -/
 noncomputable def pgsR2 (cov_pgs_y : ℝ) (var_pgs var_y : ℝ) : ℝ :=
   cov_pgs_y ^ 2 / (var_pgs * var_y)
 
@@ -123,7 +137,8 @@ theorem pgsR2_eq_explainedR2FromTransportMoments (cov_pgs_y var_pgs var_y : ℝ)
 /-- Source-population `R²` of the score that uses the source's own effects as
     weights under a shared LD kernel.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED** through `pgsR2`, measured on the
+    same runs (`battery_transfer.py`, `test_transfer_chain`) at 0.02 sems. -/
 noncomputable def sourceTruthR2SharedLD {m : ℕ}
     (β_source : Fin m → ℝ) (ld : Fin m → Fin m → ℝ) (var_y : ℝ) : ℝ :=
   pgsR2 (sharedLDGeneticVariance β_source ld)
@@ -132,7 +147,11 @@ noncomputable def sourceTruthR2SharedLD {m : ℕ}
 /-- Target-population transported `R²` of the source-weighted score under a
     shared LD kernel.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_transfer.py`,
+    `test_transfer_chain`). The transported case is the one that matters, since
+    the source weights were not fitted there: 1.35 sems, predicted 0.11581
+    against a measured 0.12099. -/
 noncomputable def transportedTargetR2SharedLD {m : ℕ}
     (β_source β_target : Fin m → ℝ) (ld : Fin m → Fin m → ℝ) (var_y : ℝ) : ℝ :=
   pgsR2 (pgsPhenoCov β_source β_target ld)
@@ -140,7 +159,18 @@ noncomputable def transportedTargetR2SharedLD {m : ℕ}
 
 /-- Effect correlation induced by a shared LD kernel.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED**, and it separates from its
+    LD-free sibling (`proofs/validation/empirical/simcov/battery_transfer.py`,
+    `test_transfer_chain`). The oracle is the realised correlation between the
+    two genetic values in the same individuals:
+
+      definition                       predicted   measured             sems
+      ldEffectGeneticCorrelation         0.67104   0.67104±0.00869      0.00
+      effectGeneticCorrelation (LD-free) 0.69792   0.67104±0.00869      3.09
+
+    Under LD only the LD-weighted contraction is the genetic correlation. The
+    plain cosine between effect vectors is a different quantity and differs by
+    3.1 sems on a panel with realistic coalescent LD. -/
 noncomputable def ldEffectGeneticCorrelation {m : ℕ}
     (β_source β_target : Fin m → ℝ) (ld : Fin m → Fin m → ℝ) : ℝ :=
   pgsPhenoCov β_source β_target ld /
