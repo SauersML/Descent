@@ -3301,6 +3301,56 @@ theorem tiedPanels_lose_the_whole_error (modelError : ℝ) (herr : 0 < modelErro
     trueDesignValue modelError 0 - trueDesignValue modelError 1 = modelError :=
   (crossing_loss_linear modelError herr).2.2
 
+/-! ### Junk-value boundaries
+
+Four bodies here divide, and one takes a square root that Mathlib sends to `0` on negative
+arguments.  Each branch is named so a consumer cannot read the returned `0` as a measurement. -/
+
+/-- A nonpositive product of shared-LD genetic variances sends the square root to Mathlib's
+junk `0`, and the correlation with it.  Zero correlation is a meaningful value, so this branch
+has to be named rather than detected. -/
+theorem ldEffectGeneticCorrelation_at_nonpositive_variance_is_junk
+    {m : ℕ} (β_source β_target : Fin m → ℝ) (ld : Fin m → Fin m → ℝ)
+    (hnonpos : sharedLDGeneticVariance β_source ld * sharedLDGeneticVariance β_target ld ≤ 0) :
+    ldEffectGeneticCorrelation β_source β_target ld = 0 := by
+  unfold ldEffectGeneticCorrelation
+  rw [Real.sqrt_eq_zero_of_nonpos hnonpos, div_zero]
+
+/-- With no target sample the noise-per-sample term is Mathlib's junk `0`, so the body reports
+the noiseless oracle rather than the correct limit of no information. -/
+theorem sampleLimitedScratchTargetR2_at_zero_sample_is_junk
+    (oracle_target_r2 noiseVar : ℝ) :
+    sampleLimitedScratchTargetR2 oracle_target_r2 noiseVar 0
+      = scratchTargetR2 oracle_target_r2 0 := by
+  unfold sampleLimitedScratchTargetR2
+  rw [div_zero]
+
+/-- When fine-tuning already matches the oracle there is no crossing sample size, and the
+quotient reports `0` -- the value that would mean "no samples needed", the opposite reading. -/
+theorem scratchVsFineTuningCriticalSampleSize_at_no_gap_is_junk
+    (r2_source divergence_penalty adaptation_gain oracle_target_r2 noiseVar : ℝ)
+    (hgap : oracle_target_r2
+      = fineTunedTargetR2 r2_source divergence_penalty adaptation_gain) :
+    scratchVsFineTuningCriticalSampleSize r2_source divergence_penalty adaptation_gain
+        oracle_target_r2 noiseVar = 0 := by
+  unfold scratchVsFineTuningCriticalSampleSize
+  rw [hgap, sub_self, div_zero]
+
+/-- Averaging over no populations divides by zero, and the mean deviation reports `0` rather
+than being undefined. -/
+theorem meanPopulationDeviation_at_zero_count_is_junk
+    {p : ℕ} (deviation : ℕ → Fin p → ℝ) (i : Fin p) :
+    meanPopulationDeviation deviation 0 i = 0 := by
+  unfold meanPopulationDeviation
+  simp
+
+/-- The same boundary for the averaged source weights. -/
+theorem sourcePopulationMeanWeights_at_zero_count_is_junk
+    {p : ℕ} (wSource : ℕ → Fin p → ℝ) (i : Fin p) :
+    sourcePopulationMeanWeights wSource 0 i = 0 := by
+  unfold sourcePopulationMeanWeights
+  simp
+
 end OperatorError
 
 end Calibrator

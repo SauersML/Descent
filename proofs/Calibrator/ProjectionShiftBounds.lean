@@ -1123,6 +1123,46 @@ theorem rescaled_eq_irreducible_iff_optimal
       norm_num
     linarith [hfactor, hzero]
 
+/-! ### Junk-value boundaries for the four quotients
+
+Each of these bodies is a quotient whose denominator can vanish, and Mathlib returns `0` for
+division by zero.  A vanishing denominator is a degenerate design -- no spectral weight to
+capture, or no coefficient energy to correct against -- so the returned value is not the
+quantity the name promises.  Naming the branch is what keeps a consumer from reading `0` as
+"perfectly inefficient" rather than "undefined here". -/
+
+/-- With no total reconstruction weight there is nothing to be efficient about, and the
+quotient reports `0` rather than being undefined. -/
+theorem reconstructionEfficiency_at_zero_total_is_junk (spectrum M : ι → ℝ)
+    (hzero : spectralTotal (fun i ↦ reconstructionWeight (spectrum i)) = 0) :
+    reconstructionEfficiency spectrum M = 0 := by
+  unfold reconstructionEfficiency
+  rw [hzero, div_zero]
+
+/-- The same boundary for the detection channel. -/
+theorem detectionEfficiency_at_zero_total_is_junk (spectrum M : ι → ℝ)
+    (hzero : spectralTotal (fun i ↦ detectionWeight (spectrum i)) = 0) :
+    detectionEfficiency spectrum M = 0 := by
+  unfold detectionEfficiency
+  rw [hzero, div_zero]
+
+/-- A coefficient direction with no energy in the `B` metric has no optimal shared correction;
+the quotient reports `0`, which is a legitimate correction value and so cannot be recognised
+as degenerate by its value alone. -/
+theorem sharedCorrectionOptimum_at_zero_energy_is_junk
+    (B : Matrix ι ι ℝ) (beta theta : ι → ℝ) (hzero : coefficientEnergy B beta = 0) :
+    sharedCorrectionOptimum B beta theta = 0 := by
+  unfold sharedCorrectionOptimum
+  rw [hzero, div_zero]
+
+/-- At the same degenerate point the irreducible degradation collapses to the whole target
+energy: no correction is subtracted, because the quotient that would subtract it is junk. -/
+theorem irreducibleDegradation_at_zero_energy_is_junk
+    (B : Matrix ι ι ℝ) (beta theta : ι → ℝ) (hzero : coefficientEnergy B beta = 0) :
+    irreducibleDegradation B beta theta = coefficientEnergy B theta := by
+  unfold irreducibleDegradation
+  rw [hzero, div_zero, sub_zero]
+
 end RescalingAndRotation
 
 end

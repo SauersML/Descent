@@ -53,7 +53,17 @@ haplotypes, each equally frequent, and `n` chromosomes are drawn independently.
     is about a dependence this function does not have. `haplotypeHomozygosity` below takes the
     frequency vector and shows what the required input looks like.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_bulk2.py`,
+    `test_haplotype_occupancy`). Exact Monte Carlo over 40000 replicate draws:
+
+      k    n      this def   simulated              sems
+      4    10      7.60863   7.60513±0.00527        0.67
+      4    40     14.78948   14.79735±0.00470       1.67
+      6    50     34.87883   34.86908±0.01163       0.84
+      8   200    138.97383   138.98490±0.02325      0.48
+
+    Power: the prediction spans 7.6 to 139.0, a factor of eighteen. -/
 noncomputable def uniformOccupancyDistinctHaplotypes (k n : ℕ) : ℝ :=
   (2 : ℝ) ^ k * (1 - (1 - 1 / ((2 : ℝ) ^ k)) ^ n)
 
@@ -179,7 +189,18 @@ theorem uniform_homozygosity_decreases_with_diversity (n₁ n₂ : ℕ)
 summary of haplotype diversity. Larger values correspond to more evenly spread
 haplotype mass across more distinct haplotypes.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_bulk2.py`,
+    `test_haplotype_occupancy`). Against the inverse probability that two
+    independent draws match, four million pairs per cell:
+
+      frequencies       this def   simulated            sems
+      uniform over 8     8.00000   8.00363±0.01059     0.34
+      skewed             2.90909   2.90686±0.00201     1.11
+      very skewed        1.22880   1.22869±0.00029     0.39
+
+    Power: the prediction spans 1.229 to 8.000, and the skewed cells are what
+    separate an inverse-Simpson reading from a plain type count. -/
 noncomputable def effectiveHaplotypeNumber {α : Type*} [Fintype α]
     (freq : α → ℝ) : ℝ :=
   1 / haplotypeHomozygosity freq
@@ -457,8 +478,7 @@ theorem mul_sq_sub_lt_of_lt_of_ne
   mul_lt_mul_of_pos_right h_coeff (sq_pos_of_ne_zero (sub_ne_zero.mpr h_gap))
 
 /-- **Compound heterozygosity is invisible to a dosage score — but only when
-phasing is good enough.** The comparison is now quantitative: a correctly
-specified phase-aware predictor beats the dosage predictor exactly when its
+phasing is good enough.** The comparison is now quantitative: a correctly specified phase-aware predictor beats the dosage predictor whenever its
 switch-error rate is below `freq_cis (1 − freq_cis)`, which is at most `1/4` and
 falls to zero as the configuration becomes monomorphic.
 

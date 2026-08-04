@@ -91,6 +91,15 @@ ACKNOWLEDGED = {
     "amEquilibriumVariance_at_full_heritability": "describes why a disagreement was invisible",
     "sign_erasure": "converse adjacent",
     "constantConditional_of_driftDefect_zero": "is itself the converse",
+    "gaussianKurtosisMaf_lt_quarter": "describes when the fourth-cumulant channel closes, not this bound",
+    "rigidity_of_boundedBelowAbove": "the converse is inequivalent_of_unbounded_coding, named in the docstring",
+    "isCompleteCatalogue_kernel": "the phrase defines IsCompleteCatalogue above, not this theorem",
+    "lagObservationDerivative_injective_of_det_ne_zero": "the phrase is in the lagSensitivityMatrix docstring above",
+    "qst_no_within": "describes where the map reaches one, which is what this endpoint fixes",
+    "latticeCriticalMaf_lt_quarter": "the phrase defines hweLatticeCondition above, not this bound",
+    "realWorldPGSVariance_at_reference_point": "describes when two readings of the variance agree, a companion fact",
+    "harmonicMigrationMean_eq_iff_symmetric": "explicitly a package with the inequality above, as the docstring says",
+    "persistentTransition_contextMatchQuality_agreement_eq_stayKernel": "the phrase defines contextMatchQuality above",
 }
 
 

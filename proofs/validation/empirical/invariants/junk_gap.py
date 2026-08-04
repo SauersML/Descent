@@ -196,6 +196,7 @@ UNREACHABLE_BY_HAND = {
     "squaringFixedPoint": "scale ^ 2 + 4 ≥ 4",
     "characteristicAmplitude": "a sum of squares is nonnegative",
     "fstMutationDriftEquilibrium": "1 + θ = 0 needs θ = -1, outside the domain",
+    "uniformMetaWeight": "the junk point k = 0 makes the index type Fin 0 empty, so no value is observable",
 }
 
 
