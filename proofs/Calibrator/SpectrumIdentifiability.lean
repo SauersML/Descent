@@ -338,6 +338,33 @@ theorem linearTargetDeterminedByObservation_id_iff
   · intro hinjective left right hequal
     simpa using hinjective hequal
 
+/-- **Observation data processing.** If a target remains identifiable after processing the
+observation, it was already identifiable from the original, more informative observation. -/
+theorem LinearTargetDeterminedByObservation.of_processedObservation
+    {R V W Y Z : Type*} [Ring R]
+    [AddCommGroup V] [Module R V] [AddCommGroup W] [Module R W]
+    [AddCommGroup Y] [Module R Y] [AddCommGroup Z] [Module R Z]
+    (observation : V →ₗ[R] W) (processing : W →ₗ[R] Y) (target : V →ₗ[R] Z)
+    (hdetermined :
+      LinearTargetDeterminedByObservation (processing.comp observation) target) :
+    LinearTargetDeterminedByObservation observation target := by
+  intro left right hequal
+  apply hdetermined left right
+  simp only [LinearMap.comp_apply, hequal]
+
+/-- **Target data processing.** Every linear summary of an identifiable target is itself
+identifiable from the same observation. -/
+theorem LinearTargetDeterminedByObservation.postcomp
+    {R V W Y Z : Type*} [Ring R]
+    [AddCommGroup V] [Module R V] [AddCommGroup W] [Module R W]
+    [AddCommGroup Y] [Module R Y] [AddCommGroup Z] [Module R Z]
+    {observation : V →ₗ[R] W} {target : V →ₗ[R] Y}
+    (hdetermined : LinearTargetDeterminedByObservation observation target)
+    (processing : Y →ₗ[R] Z) :
+    LinearTargetDeterminedByObservation observation (processing.comp target) := by
+  intro left right hequal
+  simp only [LinearMap.comp_apply, hdetermined left right hequal]
+
 /-! ## The constant minimax floor -/
 
 /-- **Two histories with the same expected spectrum are the same statistical experiment.**  If
