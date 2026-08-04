@@ -38,10 +38,12 @@ the results below say exactly what becomes identifiable once a normalized `Λ` l
 - `speedTilt_pairwise_blind_triple_separates`: three lineages are minimal for speed tilts.
 - `speedBiasParameterFromTripleRate_recovers`: exact inverse of the triple-rate chart.
 - `frontSpeedBias_tripleMergerRate_injective`: front-speed identification at fixed scale.
+- `tendsto_speedTiltBetaMergerRate_three_or_more_atTop`: multiple mergers vanish at Kingman.
 - `not_summable_one_div_bolthausenSznitmanTotalMergerRate`: the linear-rate contrast.
 -/
 
 open MeasureTheory
+open Filter
 
 /-- Rate at which a specified `k`-tuple among `b` active lineages merges in a
 `Λ`-coalescent.  Natural-number subtraction makes the definition total; the biological range
@@ -515,6 +517,54 @@ theorem one_sub_speedTiltBetaMergerRate_two_with_outside
     linarith
   field_simp
   ring
+
+/-- Every full merger involving at least three lineages vanishes at the Kingman endpoint
+`β → ∞`. -/
+theorem tendsto_speedTiltFullMergerRate_succ_atTop (extra : ℕ) :
+    Tendsto (fun β : ℝ ↦ speedTiltFullMergerRate β (extra + 1)) atTop (nhds 0) := by
+  have hden : Tendsto (fun β : ℝ ↦ β + 2) atTop atTop :=
+    tendsto_atTop_add_const_right atTop 2 tendsto_id
+  have hupper : Tendsto (fun β : ℝ ↦ 1 / (β + 2)) atTop (nhds 0) := by
+    simpa only [one_div] using tendsto_inv_atTop_zero.comp hden
+  refine squeeze_zero' ?_ ?_ hupper
+  · filter_upwards [eventually_gt_atTop (-1 : ℝ)] with β hβ
+    exact (speedTiltFullMergerRate_pos hβ (extra + 1)).le
+  · filter_upwards [eventually_gt_atTop (-1 : ℝ)] with β hβ
+    exact speedTiltFullMergerRate_succ_le_threeLineage hβ extra
+
+/-- In the complete rate chart, every specified merger of at least three lineages vanishes at
+the Kingman endpoint. -/
+theorem tendsto_speedTiltBetaMergerRate_three_or_more_atTop (b extra : ℕ) :
+    Tendsto (fun β : ℝ ↦ speedTiltBetaMergerRate β b (extra + 3)) atTop (nhds 0) := by
+  have hden : Tendsto (fun β : ℝ ↦ β + 2) atTop atTop :=
+    tendsto_atTop_add_const_right atTop 2 tendsto_id
+  have hupper : Tendsto (fun β : ℝ ↦ 1 / (β + 2)) atTop (nhds 0) := by
+    simpa only [one_div] using tendsto_inv_atTop_zero.comp hden
+  refine squeeze_zero' ?_ ?_ hupper
+  · filter_upwards [eventually_gt_atTop (-1 : ℝ)] with β hβ
+    exact (speedTiltBetaMergerRate_pos hβ (by omega : 2 ≤ extra + 3)).le
+  · filter_upwards [eventually_gt_atTop (-1 : ℝ)] with β hβ
+    exact speedTiltBetaMergerRate_three_or_more_le_triple hβ b extra
+
+/-- Specified binary-merger rates converge to one at the Kingman endpoint, regardless of the
+fixed number of outside lineages. -/
+theorem tendsto_speedTiltBetaMergerRate_two_with_outside_atTop (extra : ℕ) :
+    Tendsto (fun β : ℝ ↦ speedTiltBetaMergerRate β (extra + 2) 2) atTop (nhds 1) := by
+  have hden : Tendsto (fun β : ℝ ↦ β + (extra : ℝ) + 1) atTop atTop := by
+    convert tendsto_atTop_add_const_right atTop ((extra : ℝ) + 1) tendsto_id using 1
+    funext β
+    dsimp
+    ring
+  have hzero : Tendsto (fun β : ℝ ↦ (extra : ℝ) / (β + (extra : ℝ) + 1))
+      atTop (nhds 0) := by
+    simpa only [div_eq_mul_inv, mul_zero] using
+      (tendsto_inv_atTop_zero.comp hden).const_mul (extra : ℝ)
+  have hlimit : Tendsto (fun β : ℝ ↦ 1 - (extra : ℝ) / (β + (extra : ℝ) + 1))
+      atTop (nhds 1) := by
+    simpa using tendsto_const_nhds.sub hzero
+  apply hlimit.congr'
+  filter_upwards [eventually_gt_atTop (-1 : ℝ)] with β hβ
+  linarith [one_sub_speedTiltBetaMergerRate_two_with_outside hβ extra]
 
 /-! ### Raw regular-variation scale versus pair-rate normalization -/
 
