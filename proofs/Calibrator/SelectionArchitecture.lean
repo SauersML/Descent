@@ -3,6 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Calibrator.AncestrySpecificPower
 import Calibrator.LDDecayTheory
+import Calibrator.DemographicHistory
 
 namespace Calibrator
 
@@ -906,12 +907,13 @@ Denotes: a characteristic timescale indexed by selection strength. Its numerical
 matches a drift-rate chart, but the biological dimension is declared here rather than inferred
 from that coincidence. -/
 noncomputable def selectionPortabilityTimescale (selectionCoefficient : ℝ) : ℝ :=
-  driftRatePerGen selectionCoefficient
+  driftLDCreationRate selectionCoefficient
 
 /-- The selection-decay timescale is pinned at `s = 1/2`. -/
 theorem selectionPortabilityTimescale_at_reference_point :
     selectionPortabilityTimescale (1 / 2) = 1 := by
-  norm_num [selectionPortabilityTimescale, driftRatePerGen, alleleFreqDivergenceRate]
+  norm_num [selectionPortabilityTimescale, driftLDCreationRate, driftRatePerGen,
+    alleleFreqDivergenceRate]
 
 /-- **Selection coefficient determines portability timescale.**
     The characteristic timescale for portability decay is 1/(2s) generations,
@@ -922,7 +924,7 @@ theorem selectionPortabilityTimescale_lt_of_selection_lt
     (h_stronger : s₁ < s₂) :
     selectionPortabilityTimescale s₂ < selectionPortabilityTimescale s₁ := by
   unfold selectionPortabilityTimescale
-  unfold driftRatePerGen alleleFreqDivergenceRate
+  unfold driftLDCreationRate driftRatePerGen alleleFreqDivergenceRate
   apply div_lt_div_of_pos_left one_pos (by linarith) (by linarith)
 
 /-- **Number of independent loci matters more than heritability for portability.**

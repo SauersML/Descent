@@ -42,7 +42,32 @@ section FstDefinitions
     Fst = (H_T - H_S) / H_T where H_T is total heterozygosity
     and H_S is mean subpopulation heterozygosity.
 
-    Empirical status: UNTESTED. -/
+    Regime: a clean two-population split, no migration, equal sizes; both
+    heterozygosities as ratios of averages over segregating sites.
+
+    Empirical status: **MEASURED, and NOT interchangeable with Hudson's
+    `F_ST`** (`simcov/battery_bulk25.py`). This body is an identity in `H_T` and
+    `H_S`, so comparing it against a transcription of itself decides nothing.
+    What a simulation can decide is whether it obeys the split law
+    `τ/(1+τ)` that the rest of this corpus writes `F_ST` results in. It does
+    not. Over `τ` = 0.1, 0.25, 1, 3 the split law predicts 0.09091, 0.20000,
+    0.50000 and 0.75000, while Nei's estimator on the same genotype matrices
+    measures 0.05495 ± 0.00453, 0.11904 ± 0.00513, 0.34185 ± 0.00851 and
+    0.61182 ± 0.00905 -- FALSIFIED at up to 18.59 sems, low in every cell.
+
+    The control is what makes this a statement about the CONVENTION rather than
+    about the simulation: Hudson's estimator, computed from the SAME genotype
+    matrices through a separate code path, matches the same split law at 0.03
+    sems. One design, one dataset, two estimators, and only one of them follows
+    the law. So the oracle is not pinned to either body, and the discrepancy is
+    the convention gap and not an artefact.
+
+    The ratio `neiGst / hudsonFst` is not a constant either -- it runs 0.62,
+    0.60, 0.68, 0.81 across that sweep -- so no fixed factor converts between
+    them and a `1/2` or `1/4` correction is not available. Every `F_ST` result
+    in this corpus stated as `τ/(1+τ)`, or derived from it, is a HUDSON result;
+    substituting this body into one of them is the factor-of-two-to-four error
+    the corpus has already paid for once. -/
 noncomputable def neiFst (H_T H_S : ℝ) : ℝ :=
   (H_T - H_S) / H_T
 

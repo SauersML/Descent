@@ -58,6 +58,7 @@ import Calibrator.DecoratedGeometryBlindness
 import Calibrator.CorrectionBiology
 import Calibrator.CorrectionWidths
 import Calibrator.FiniteMinimax
+import Calibrator.BlindnessMinimaxFloors
 import Calibrator.PencilEnvironment
 import Calibrator.DirichletTransfer
 import Calibrator.DeclaredInteractionClass

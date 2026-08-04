@@ -42,6 +42,8 @@ the results below say exactly what becomes identifiable once a normalized `Λ` l
   the pair-collision timescale.
 - `tendsto_speedTiltBetaMergerRate_three_or_more_atTop`: multiple mergers vanish at Kingman.
 - `not_summable_one_div_bolthausenSznitmanTotalMergerRate`: the linear-rate contrast.
+- `pulled_semipushed_reciprocal_dichotomy`: linear pulled clocks have divergent reciprocal
+  ladders, while every superlinear stable clock has a summable reciprocal ladder.
 -/
 
 open MeasureTheory
@@ -907,5 +909,60 @@ theorem not_summable_one_div_bolthausenSznitmanTotalMergerRate :
   · intro n
     rw [bolthausenSznitmanTotalMergerRate_eq]
     norm_num
+
+/-! ## The Müntz inversion at the pulled/semipushed boundary -/
+
+/-- Canonical positive linear ladder representing a critically pulled total collision rate.
+The normalized `Beta(1, β + 1)` family has this order with coefficient `β + 1`; the analytic
+identification of that coefficient is separate from the summability argument. -/
+noncomputable def criticallyPulledLinearRateLadder
+    (coefficient : ℝ) (n : ℕ) : ℝ :=
+  coefficient * ((n : ℝ) + 1)
+
+/-- Every positive linear pulled ladder has a divergent reciprocal sum. -/
+theorem not_summable_one_div_criticallyPulledLinearRateLadder
+    (coefficient : ℝ) (hcoefficient : 0 < coefficient) :
+    ¬Summable fun n : ℕ ↦
+      1 / criticallyPulledLinearRateLadder coefficient n := by
+  apply not_summable_reciprocal_of_rate_le_scaled_natSucc _ coefficient
+  · intro n
+    exact mul_pos hcoefficient (by positivity)
+  · intro n
+    exact le_rfl
+
+/-- Canonical power-law ladder for an `α`-stable semipushed genealogy.  Multiplying this by a
+positive constant, such as `1 / Γ(α+1)`, does not change reciprocal summability.
+
+Empirical status: not an empirical claim; this is the comparison sequence used to formalize
+the reciprocal-rate summability boundary. -/
+noncomputable def stablePowerRateLadder (alpha : ℝ) (n : ℕ) : ℝ :=
+  ((n : ℝ) + 1) ^ alpha
+
+/-- Every superlinear stable ladder has a summable reciprocal series. -/
+theorem summable_one_div_stablePowerRateLadder
+    (alpha : ℝ) (halpha : 1 < alpha) :
+    Summable fun n : ℕ ↦ 1 / stablePowerRateLadder alpha n := by
+  have hseries := (Real.summable_one_div_nat_add_rpow 1 alpha).2 halpha
+  unfold stablePowerRateLadder
+  apply hseries.congr
+  intro n
+  rw [abs_of_nonneg]
+  positivity
+
+/-- The same power-law argument includes the quadratic Kingman order. -/
+theorem summable_one_div_quadraticRateLadder :
+    Summable fun n : ℕ ↦ 1 / stablePowerRateLadder 2 n := by
+  exact summable_one_div_stablePowerRateLadder 2 (by norm_num)
+
+/-- **Müntz-rate inversion.**  The critically pulled linear ladder is nonsummable, whereas every
+semipushed exponent `1 < α` is summable.  The statement is about completeness of the candidate
+exponential system only after a separate theorem identifies that system with these total rates. -/
+theorem pulled_semipushed_reciprocal_dichotomy
+    (coefficient alpha : ℝ) (hcoefficient : 0 < coefficient) (halpha : 1 < alpha) :
+    (¬Summable fun n : ℕ ↦
+        1 / criticallyPulledLinearRateLadder coefficient n) ∧
+      Summable fun n : ℕ ↦ 1 / stablePowerRateLadder alpha n :=
+  ⟨not_summable_one_div_criticallyPulledLinearRateLadder coefficient hcoefficient,
+    summable_one_div_stablePowerRateLadder alpha halpha⟩
 
 end Calibrator

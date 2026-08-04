@@ -5414,7 +5414,47 @@ theorem MutationDriftModelAssumptions.fstEquilibrium_lt_one
 /-- **Transient Fst under mutation-drift: approach to equilibrium.**
     Fst(t) = Fst_eq × (1 - exp(-(1+θ)t/(2Ne)))
 
-    Empirical status: UNTESTED. -/
+    Regime: two demes split from a common ancestor, no migration, mutation at
+    `θ = 4·Nₑ·μ`.
+
+    Empirical status: **VALIDATED on its RATE**
+    (`simcov/battery_bulk24.py`). The body makes two separable claims -- a
+    plateau `Fst_eq` and a time constant `τ = 2·Nₑ/(1+θ)` -- and only the second
+    is convention-free. Whether the plateau is Nei's `G_ST`, Hudson's `F_ST` or
+    a per-branch drift `F` moves it by factors of two and four, and this corpus
+    has already lost a factor of four to exactly that. Rescaling `F_ST` by any
+    constant leaves `τ` untouched. So the design fits `A·(1 - exp(-t/τ))` to the
+    measured trajectory, DISCARDS the amplitude `A`, and puts `τ` on trial:
+
+      Nₑ     θ      τ measured      2·Nₑ/(1+θ)    sems
+      500    0.5    668 ± 45        667           0.03
+      500    0.02   912 ± 61        980           1.13
+      1000   0.5    1333 ± 67       1333          0.00
+      500    1.0    658 ± 83        500           1.92
+      1000   0.1    1661 ± 71       1818          2.22
+
+    Worst cell 2.22 sems. `Nₑ` and `θ` are swept separately, so the two scalings
+    are separately falsifiable; holding `θ = 0.5` and doubling `Nₑ` moves `τ` by
+    a factor of 1.996 against 2.000 predicted.
+
+    Power, and why this is a measurement rather than an identity: the drift-only
+    rate `τ = 2·Nₑ`, which drops the mutation term, is carried on the SAME cells
+    and is FALSIFIED at up to 9.96 sems (50% relative). An oracle algebraically
+    pinned to the body could not reject a competing form -- the "measurement"
+    would move with whatever prediction was fed in -- so the rejection is what
+    establishes that `τ` was measured and not recomputed. The control, a
+    `θ = 0.02` cell where both candidate rates coincide, passed at 0.15 sems.
+
+    LIMITS OF THIS RUN, recorded rather than smoothed over. The `θ = 0.5` and
+    `θ = 1.0` cells fit amplitudes `A` of 1.13 and 1.59 -- an `F_ST` above one,
+    which is unphysical and marks Hudson's ratio-of-averages estimator degrading
+    under multiple hits. The `τ` estimate survives because `A` is discarded by
+    construction, but those cells are weaker than their error bars suggest.
+    Above `θ ≈ 1` the design fails outright: under infinite sites `θ` is set by
+    `μ` at fixed `Nₑ`, so `θ = 3` at `Nₑ = 500` needs `μ = 1.5e-3` per site,
+    five orders above realistic, and produces a genotype matrix too large to
+    build. Testing the `(1+θ)` factor further needs a finite-sites model or
+    branch-mode statistics, not this instrument. -/
 noncomputable def MutationDriftModelAssumptions.fstTransient
     (m : MutationDriftModelAssumptions) : ℝ :=
   m.fstEquilibrium * (1 - Real.exp (-(1 + m.theta) * m.t / (2 * m.Ne)))

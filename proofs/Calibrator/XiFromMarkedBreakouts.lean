@@ -62,11 +62,18 @@ two lineages see nothing, three see the merger rate, four see the number of orig
 The same theorem is the reason front convergence cannot prove a branching-selection genealogy
 result: however complete, it does not carry the ancestry-sensitive information.
 
-Two further pieces of the reduction are recorded.  `pioneerDisplacement_eq_logDisplacement`
-and `pioneerIntensity_jacobian` are the change of variables `w ↦ (w/(1+w), γ⁻¹log(1+w))` under
-which the `w⁻²dw` pioneer tail becomes exactly `x⁻²dx` and the response becomes exactly the
-logarithmic displacement law — so the two hypotheses of the reduction are a uniform `w⁻¹`
-pioneer tail and a uniform two-colour response, and nothing else.  And
+The final sections sharpen the reduction.  The derivative-martingale tail supplies the
+heavy-tailed subtree mark; the model-specific input is instead the normalized selected flux.
+`weightedParetoExceedanceMass_eq_flux` turns that flux into the first-order breakout law, while
+`distinctPairParetoExceedanceMass_le_flux_sq` makes two breakouts quadratic in the block scale.
+`oneSuccessfulAncestor_produces_onePaintboxAtom` then records the pathwise fact that later
+branching below one pioneer cannot create a second origin.  What remains independent is the
+common-profile estimate: `pioneerCountFraction_eq_of_commonProfile` derives `w/(1+w)` only after
+both colours share one amplitude-per-particle conversion.
+
+`pioneerDisplacement_eq_logDisplacement` and `pioneerIntensity_jacobian` are the change of
+variables `w ↦ (w/(1+w), γ⁻¹log(1+w))` under which the `w⁻²dw` pioneer intensity becomes exactly
+`x⁻²dx` and the response becomes the logarithmic displacement law.  And
 `logDisplacement_injOn` is the formulation correction for lattice models: the response map is
 injective, so distinct fractions demand distinct displacements, which a lattice-valued
 displacement cannot supply across a continuum of fractions.
@@ -80,6 +87,7 @@ estimate that is the open step.
 namespace XiFromMarks
 
 open MeasureTheory
+open Filter
 open scoped BigOperators ENNReal
 
 /-! ## The marked mass-partition measure -/
@@ -398,6 +406,245 @@ theorem front_does_not_determine_genealogy (x : ℝ) (hx : x ≠ 0) :
   have : 0 < (x / 2) ^ 4 := by positivity
   linarith
 
+/-! ## Boundary transform and derivative-subtree mark -/
+
+/-- Exponential mass of the binary one-step boundary transform.  With physical log-mgf
+`logMgf`, critical parameter `criticalParameter`, and critical speed `criticalSpeed`, this is
+`2 exp(-t⋆v⋆ + Λ(t⋆))`. -/
+noncomputable def boundaryTiltMass
+    (logMgf criticalParameter criticalSpeed : ℝ) : ℝ :=
+  2 * Real.exp (-criticalParameter * criticalSpeed + logMgf)
+
+/-- The branching-random-walk boundary equation makes the transformed additive mass one. -/
+theorem boundaryTiltMass_eq_one
+    (logMgf criticalParameter criticalSpeed : ℝ)
+    (hboundary : criticalParameter * criticalSpeed - logMgf = Real.log 2) :
+    boundaryTiltMass logMgf criticalParameter criticalSpeed = 1 := by
+  unfold boundaryTiltMass
+  rw [show -criticalParameter * criticalSpeed + logMgf = -Real.log 2 by linarith,
+    Real.exp_neg, Real.exp_log (by norm_num : (0 : ℝ) < 2)]
+  norm_num
+
+/-- Centered first derivative of the transformed one-step mass.  This is the scalar factor left
+after differentiating the log-mgf, and is the quantity in the derivative boundary equation. -/
+noncomputable def boundaryTiltCenteredFirstMoment
+    (logMgf logMgfDerivative criticalParameter criticalSpeed : ℝ) : ℝ :=
+  2 * criticalParameter *
+    Real.exp (-criticalParameter * criticalSpeed + logMgf) *
+      (criticalSpeed - logMgfDerivative)
+
+/-- Choosing the critical speed to be the log-mgf derivative centers the transformed BRW. -/
+@[simp] theorem boundaryTiltCenteredFirstMoment_eq_zero
+    (logMgf logMgfDerivative criticalParameter criticalSpeed : ℝ)
+    (hspeed : criticalSpeed = logMgfDerivative) :
+    boundaryTiltCenteredFirstMoment
+      logMgf logMgfDerivative criticalParameter criticalSpeed = 0 := by
+  simp [boundaryTiltCenteredFirstMoment, hspeed]
+
+/-- Finite-generation derivative contribution of one stopping-line subtree.  `basePotential`
+is the transformed position of its root; `additiveMass` and `derivativeMass` are the two
+descendant martingales measured relative to that root. -/
+noncomputable def derivativeSubtreeContribution
+    (basePotential additiveMass derivativeMass : ℝ) : ℝ :=
+  Real.exp (-basePotential) *
+    (basePotential * additiveMass + derivativeMass)
+
+/-- Once the additive martingale has vanished, the stopping-line vertex carries the derivative
+mark `exp(-V(u)) D∞⁽ᵘ⁾`. -/
+@[simp] theorem derivativeSubtreeContribution_zero_additive
+    (basePotential derivativeLimit : ℝ) :
+    derivativeSubtreeContribution basePotential 0 derivativeLimit =
+      Real.exp (-basePotential) * derivativeLimit := by
+  simp [derivativeSubtreeContribution]
+
+/-- The preceding mark is also the actual limit of the finite-generation decomposition. -/
+theorem derivativeSubtreeContribution_tendsto
+    (basePotential derivativeLimit : ℝ)
+    (additiveMass derivativeMass : ℕ → ℝ)
+    (hadditive : Tendsto additiveMass atTop (nhds 0))
+    (hderivative : Tendsto derivativeMass atTop (nhds derivativeLimit)) :
+    Tendsto
+      (fun generation ↦ derivativeSubtreeContribution basePotential
+        (additiveMass generation) (derivativeMass generation))
+      atTop (nhds (Real.exp (-basePotential) * derivativeLimit)) := by
+  unfold derivativeSubtreeContribution
+  have hscaled : Tendsto
+      (fun generation ↦ basePotential * additiveMass generation)
+      atTop (nhds (basePotential * 0)) :=
+    tendsto_const_nhds.mul hadditive
+  have hinner : Tendsto
+      (fun generation ↦
+        basePotential * additiveMass generation + derivativeMass generation)
+      atTop (nhds (basePotential * 0 + derivativeLimit)) :=
+    hscaled.add hderivative
+  have houter : Tendsto
+      (fun generation ↦ Real.exp (-basePotential) *
+        (basePotential * additiveMass generation + derivativeMass generation))
+      atTop (nhds (Real.exp (-basePotential) *
+        (basePotential * 0 + derivativeLimit))) :=
+    tendsto_const_nhds.mul hinner
+  simpa using houter
+
+/-! ## Selected weighted flux and automatic rarity of double breakouts -/
+
+/-- Reproductive-value flux through a finite selected stopping line. -/
+noncomputable def selectedPioneerFlux {Pioneer : Type*} [Fintype Pioneer]
+    (weight : Pioneer → ℝ) : ℝ :=
+  ∑ pioneer, weight pioneer
+
+/-- Exact Pareto first-order exceedance mass contributed by a vertex of normalized weight `q`.
+The derivative-martingale input says the true tail is asymptotic to this chart. -/
+noncomputable def paretoExceedanceMass
+    (tailConstant threshold weight : ℝ) : ℝ :=
+  tailConstant * weight / threshold
+
+/-- Weighted `1/w` tails add through the selected flux.  This is the deterministic kernel of
+weighted heavy-tail Poissonization; the diffuse-weight hypothesis is needed only for upgrading
+this first-order identity to point-process convergence. -/
+theorem weightedParetoExceedanceMass_eq_flux
+    {Pioneer : Type*} [Fintype Pioneer]
+    (tailConstant threshold : ℝ) (weight : Pioneer → ℝ) :
+    (∑ pioneer, paretoExceedanceMass tailConstant threshold (weight pioneer)) =
+      tailConstant / threshold * selectedPioneerFlux weight := by
+  unfold paretoExceedanceMass selectedPioneerFlux
+  calc
+    (∑ pioneer, tailConstant * weight pioneer / threshold) =
+        ∑ pioneer, (tailConstant / threshold) * weight pioneer := by
+          apply Finset.sum_congr rfl
+          intro pioneer _
+          ring
+    _ = tailConstant / threshold * ∑ pioneer, weight pioneer := by
+      rw [Finset.mul_sum]
+
+/-- Ordered distinct-pioneer factorial mass for two exceedances. -/
+noncomputable def distinctPairExceedanceMass
+    {Pioneer : Type*} [Fintype Pioneer] [DecidableEq Pioneer]
+    (mass : Pioneer → ℝ) : ℝ :=
+  ∑ first, ∑ second,
+    if first = second then 0 else mass first * mass second
+
+/-- The probability-scale contribution of two different pioneers is bounded by the square of
+the one-pioneer contribution. -/
+theorem distinctPairExceedanceMass_le_sum_sq
+    {Pioneer : Type*} [Fintype Pioneer] [DecidableEq Pioneer]
+    (mass : Pioneer → ℝ) (hmass : ∀ pioneer, 0 ≤ mass pioneer) :
+    distinctPairExceedanceMass mass ≤ (∑ pioneer, mass pioneer) ^ 2 := by
+  unfold distinctPairExceedanceMass
+  calc
+    (∑ first, ∑ second,
+      if first = second then 0 else mass first * mass second) ≤
+        ∑ first, ∑ second, mass first * mass second := by
+          apply Finset.sum_le_sum
+          intro first _
+          apply Finset.sum_le_sum
+          intro second _
+          split_ifs
+          · exact mul_nonneg (hmass first) (hmass second)
+          · exact le_rfl
+    _ = (∑ pioneer, mass pioneer) ^ 2 := by
+      rw [pow_two, Finset.sum_mul_sum]
+
+/-- Under nonnegative selected weights, the double-breakout factorial mass is bounded by the
+square of the selected Pareto flux. -/
+theorem distinctPairParetoExceedanceMass_le_flux_sq
+    {Pioneer : Type*} [Fintype Pioneer] [DecidableEq Pioneer]
+    (tailConstant threshold : ℝ) (weight : Pioneer → ℝ)
+    (htail : 0 ≤ tailConstant) (hthreshold : 0 < threshold)
+    (hweight : ∀ pioneer, 0 ≤ weight pioneer) :
+    distinctPairExceedanceMass
+        (fun pioneer ↦ paretoExceedanceMass tailConstant threshold (weight pioneer)) ≤
+      (tailConstant / threshold * selectedPioneerFlux weight) ^ 2 := by
+  calc
+    distinctPairExceedanceMass
+        (fun pioneer ↦ paretoExceedanceMass tailConstant threshold (weight pioneer)) ≤
+      (∑ pioneer,
+        paretoExceedanceMass tailConstant threshold (weight pioneer)) ^ 2 := by
+          apply distinctPairExceedanceMass_le_sum_sq
+          intro pioneer
+          exact div_nonneg (mul_nonneg htail (hweight pioneer)) hthreshold.le
+    _ = (tailConstant / threshold * selectedPioneerFlux weight) ^ 2 := by
+      rw [weightedParetoExceedanceMass_eq_flux]
+
+/-- If selected flux is `blockScale · fluxConstant`, the two-pioneer contribution is explicitly
+quadratic in the block scale. -/
+theorem distinctPairParetoExceedanceMass_le_blockScale_sq
+    {Pioneer : Type*} [Fintype Pioneer] [DecidableEq Pioneer]
+    (tailConstant threshold blockScale fluxConstant : ℝ)
+    (weight : Pioneer → ℝ)
+    (htail : 0 ≤ tailConstant) (hthreshold : 0 < threshold)
+    (hweight : ∀ pioneer, 0 ≤ weight pioneer)
+    (hflux : selectedPioneerFlux weight = blockScale * fluxConstant) :
+    distinctPairExceedanceMass
+        (fun pioneer ↦ paretoExceedanceMass tailConstant threshold (weight pioneer)) ≤
+      (blockScale * (tailConstant * fluxConstant / threshold)) ^ 2 := by
+  calc
+    distinctPairExceedanceMass
+        (fun pioneer ↦ paretoExceedanceMass tailConstant threshold (weight pioneer)) ≤
+      (tailConstant / threshold * selectedPioneerFlux weight) ^ 2 :=
+        distinctPairParetoExceedanceMass_le_flux_sq
+          tailConstant threshold weight htail hthreshold hweight
+    _ = (blockScale * (tailConstant * fluxConstant / threshold)) ^ 2 := by
+      rw [hflux]
+      ring
+
+/-- Quadratic double-breakout mass divided by a positive block scale vanishes whenever the
+block scale does.  This is the precise `O(h²) = o(h)` step. -/
+theorem quadraticBreakoutMass_over_scale_tendsto_zero
+    (coefficient : ℝ) (blockScale : ℕ → ℝ)
+    (hpositive : ∀ index, 0 < blockScale index)
+    (hzero : Tendsto blockScale atTop (nhds 0)) :
+    Tendsto (fun index ↦
+      (blockScale index * coefficient) ^ 2 / blockScale index)
+      atTop (nhds 0) := by
+  have heq : (fun index ↦
+      (blockScale index * coefficient) ^ 2 / blockScale index) =
+      fun index ↦ blockScale index * coefficient ^ 2 := by
+    funext index
+    field_simp [(hpositive index).ne']
+  rw [heq]
+  simpa using hzero.mul_const (coefficient ^ 2)
+
+/-- An exogenous full-tree flux decomposes into the flux retained by selection and the flux
+pruned before the stopping line. -/
+def IsSelectedFluxDecomposition
+    (exogenousFlux selectedFlux prunedFlux : ℕ → ℝ) : Prop :=
+  ∀ index, exogenousFlux index = selectedFlux index + prunedFlux index
+
+/-- Retaining every full-tree pioneer and pruning zero reproductive flux is a concrete selected
+flux decomposition.  This witnesses that the reduction predicate is inhabited without claiming
+that an endogenous selected system realizes this special case. -/
+theorem IsSelectedFluxDecomposition.self_zero (flux : ℕ → ℝ) :
+    IsSelectedFluxDecomposition flux flux 0 := by
+  intro index
+  simp
+
+/-- The full-tree flux law plus negligible reproductive-value pruning gives the endogenous
+selected-flux law.  This is the exact reduction from equations (27)--(28) to (26). -/
+theorem selectedFlux_tendsto_of_exogenous_of_pruned
+    (exogenousFlux selectedFlux prunedFlux : ℕ → ℝ) (fluxConstant : ℝ)
+    (hdecomposition :
+      IsSelectedFluxDecomposition exogenousFlux selectedFlux prunedFlux)
+    (hexogenous : Tendsto exogenousFlux atTop (nhds fluxConstant))
+    (hpruned : Tendsto prunedFlux atTop (nhds 0)) :
+    Tendsto selectedFlux atTop (nhds fluxConstant) := by
+  have heq : selectedFlux = fun index ↦ exogenousFlux index - prunedFlux index := by
+    funext index
+    linarith [hdecomposition index]
+  rw [heq]
+  simpa using hexogenous.sub hpruned
+
+/-! ## One successful ancestor gives one paintbox atom -/
+
+/-- **One successful ancestor produces one paintbox atom.**  The atom records its final
+descendant fraction.  Branching below that ancestor changes the number of descendants but
+cannot create a second ancestral label, so both the collision weight and the absence of a
+simultaneous disjoint merger hold pathwise. -/
+theorem oneSuccessfulAncestor_produces_onePaintboxAtom (x : ℝ) :
+    totalFamilyFraction ![x] = x ∧
+      paintboxWeight ![x] = x ^ 2 ∧
+        disjointPairMergeProbability ![x] = 0 := by
+  simp
+
 /-! ## The pioneer change of variables -/
 
 /-- Population fraction reached by a pioneer of reproductive weight `w`. -/
@@ -415,6 +662,11 @@ theorem pioneerWeightFraction_at_zero_denominator_is_junk (w : ℝ)
 /-- Front displacement produced by a pioneer of reproductive weight `w`, at rate constant `γ`. -/
 noncomputable def pioneerWeightDisplacement (gamma w : ℝ) : ℝ :=
   (1 / gamma) * Real.log (1 + w)
+
+/-- Real-valued front coordinate obtained from reproductive amplitude.  Unlike a literal
+particle quantile, this coordinate remains continuous for lattice displacement laws. -/
+noncomputable def amplitudeFront (gamma amplitude : ℝ) : ℝ :=
+  (1 / gamma) * Real.log amplitude
 
 /-- A zero rate constant sends `1 / gamma` to Mathlib's junk `0`, so a pioneer of any weight is
 reported as displacing the front by nothing. -/
@@ -438,12 +690,19 @@ theorem pioneerWeightFraction_one : pioneerWeightFraction 1 = 1 / 2 := by
 theorem pioneerWeightDisplacement_one : pioneerWeightDisplacement 1 1 = Real.log 2 := by
   norm_num [pioneerWeightDisplacement]
 
+/-- Adding pioneer amplitude `w` to a unit background shifts the amplitude front by
+`gamma⁻¹ log(1+w)`. -/
+theorem amplitudeFront_pioneerShift (gamma w : ℝ) :
+    amplitudeFront gamma (1 + w) - amplitudeFront gamma 1 =
+      pioneerWeightDisplacement gamma w := by
+  simp [amplitudeFront, pioneerWeightDisplacement]
+
 /-- **The response map is exactly the logarithmic displacement law.**  Converting reproductive
 weight to population fraction turns `γ⁻¹ log (1 + w)` into `-γ⁻¹ log (1 - x)`, which is the
 displacement law whose forward half `MarkedBreakoutUniversality` proves produces the Beta
 family.  The converse -- that no other law does -- needs uniqueness of Laplace transforms and
-is not formalised.
-So the reduction needs no further hypothesis about the response beyond this one map. -/
+is not formalised.  This identifies the displacement response; the population-fraction response
+still requires common-profile relaxation below. -/
 theorem pioneerDisplacement_eq_logDisplacement (gamma w : ℝ) (hw : 0 < w) :
     pioneerWeightDisplacement gamma w
       = MarkedBreakout.logDisplacement gamma (pioneerWeightFraction w) := by
@@ -457,16 +716,62 @@ theorem pioneerDisplacement_eq_logDisplacement (gamma w : ℝ) (hw : 0 < w) :
   rw [hsub, Real.log_inv]
   ring
 
-/-- **And the pioneer tail is exactly the inverse-square intensity.**  Under `w = x / (1 - x)`
-the Jacobian is `(1 - x)⁻²`, and `w⁻²` times it is `x⁻²` on the nose.  This is why the two
-hypotheses of the reduction are a uniform `w⁻¹` pioneer tail and a uniform response, with no
-third condition: the `x⁻²dx` shape is not an extra assumption but the image of the first. -/
+/-- **The pioneer intensity becomes the inverse-square family intensity.**  Under
+`w = x / (1 - x)` the Jacobian is `(1 - x)⁻²`, and `w⁻²` times it is `x⁻²` on the nose.
+The `w⁻²dw` intensity comes from the derivative-martingale tail after the selected weighted-flux
+estimate; it is not a second model-specific tail hypothesis. -/
 theorem pioneerIntensity_jacobian (x : ℝ) (hx0 : x ≠ 0) (hx1 : x ≠ 1) :
     1 / (x / (1 - x)) ^ 2 * (1 / (1 - x) ^ 2) = 1 / x ^ 2 := by
   have h1 := MarkedBreakout.pioneer_one_sub_ne_zero hx1
   field_simp
 
 /-! ## Rank-one two-colour response algebra -/
+
+/-- Both colours have relaxed to the same spatial profile when one conversion factor maps their
+particle counts to their reproductive amplitudes. -/
+def HasCommonProfileRelaxation
+    (conversion backgroundAmplitude pioneerAmplitude
+      backgroundCount pioneerCount : ℝ) : Prop :=
+  backgroundAmplitude = conversion * backgroundCount ∧
+    pioneerAmplitude = conversion * pioneerCount
+
+/-- Identical amplitude and count coordinates have the unit common profile.  This canonical
+algebraic witness does not assert that endogenous hard selection reaches that profile. -/
+theorem HasCommonProfileRelaxation.unit (background pioneer : ℝ) :
+    HasCommonProfileRelaxation 1 background pioneer background pioneer := by
+  simp [HasCommonProfileRelaxation]
+
+/-- Common-profile relaxation converts a count fraction into the corresponding amplitude
+fraction.  The hypothesis is load-bearing: uniqueness of the pioneer alone does not supply it. -/
+theorem countFraction_eq_amplitudeFraction_of_commonProfile
+    (conversion backgroundAmplitude pioneerAmplitude
+      backgroundCount pioneerCount : ℝ)
+    (hconversion : conversion ≠ 0)
+    (hcount : backgroundCount + pioneerCount ≠ 0)
+    (hprofile : HasCommonProfileRelaxation conversion backgroundAmplitude pioneerAmplitude
+      backgroundCount pioneerCount) :
+    pioneerCount / (backgroundCount + pioneerCount) =
+      pioneerAmplitude / (backgroundAmplitude + pioneerAmplitude) := by
+  rcases hprofile with ⟨hbackground, hpioneer⟩
+  have hamplitude : backgroundAmplitude + pioneerAmplitude ≠ 0 := by
+    rw [hbackground, hpioneer, ← mul_add]
+    exact mul_ne_zero hconversion hcount
+  field_simp [hcount, hamplitude]
+  rw [hbackground, hpioneer]
+  ring
+
+/-- With unit background amplitude and pioneer amplitude `w`, common-profile relaxation gives
+the Brunet--Derrida descendant fraction `w/(1+w)`. -/
+theorem pioneerCountFraction_eq_of_commonProfile
+    (conversion w backgroundCount pioneerCount : ℝ)
+    (hconversion : conversion ≠ 0)
+    (hcount : backgroundCount + pioneerCount ≠ 0)
+    (hprofile : HasCommonProfileRelaxation conversion 1 w
+      backgroundCount pioneerCount) :
+    pioneerCount / (backgroundCount + pioneerCount) = pioneerWeightFraction w := by
+  rw [pioneerWeightFraction]
+  exact countFraction_eq_amplitudeFraction_of_commonProfile
+    conversion 1 w backgroundCount pioneerCount hconversion hcount hprofile
 
 /-- If both colours share one reproductive conversion factor, their descendant fraction is the
 ratio of their reproductive amplitudes.  The open particle-system input is the uniform

@@ -3084,7 +3084,7 @@ theorem screeningQalyGain_neg_iff
   constructor <;> intro h <;> linarith
 
 /-- **Break-even prevalence for a screening operating point.**  This is the prevalence at which
-weighted true-positive benefit exactly balances weighted false-positive harm.
+weighted true-positive benefit balances weighted false-positive harm in the declared model.
 
 Empirical status: UNTESTED. The threshold is derived from the declared linear QALY model; its
 clinical adequacy is not established by data in this corpus. -/

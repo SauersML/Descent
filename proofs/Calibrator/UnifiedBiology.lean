@@ -66,7 +66,10 @@ This file does not promote the analytic claims in the motivating program to Lean
 In particular, Donsker--Varadhan regularity, infinite-volume density of states, a Thouless
 formula, Minami/Poisson statistics, and hard-edge random-operator limits require hypotheses
 and proofs absent from this corpus.  The formal content here is finite and exact; those
-claims remain research interfaces rather than axioms disguised as results.
+claims remain research interfaces rather than axioms disguised as results.  For the genuine
+hard-selection `N`-BRW, the selected derivative-martingale flux law, reproductive-value pruning
+estimate, and uniform two-colour common-profile relaxation are likewise not asserted.  The
+theorems below isolate what each would imply and keep the three inputs distinct.
 -/
 
 open scoped BigOperators
@@ -410,6 +413,97 @@ theorem twoColourPioneerResponse_exact
     spectralResponse_shift_restoresAmplitude gamma reproductiveWeight hgamma hweight⟩
   linarith
 
+/-- **The light-tailed BRW boundary transform is an algebraic identity.**  The critical
+log-mgf equation normalizes additive mass, while choosing speed equal to the log-mgf derivative
+centers the derivative mass.  What remains model-specific is passage through rightmost-`N`
+selection, not this transformation. -/
+theorem branchingRandomWalkBoundaryTransform_isCritical
+    (logMgf logMgfDerivative criticalParameter criticalSpeed : ℝ)
+    (hboundary : criticalParameter * criticalSpeed - logMgf = Real.log 2)
+    (hspeed : criticalSpeed = logMgfDerivative) :
+    boundaryTiltMass logMgf criticalParameter criticalSpeed = 1 ∧
+      boundaryTiltCenteredFirstMoment
+        logMgf logMgfDerivative criticalParameter criticalSpeed = 0 :=
+  ⟨boundaryTiltMass_eq_one logMgf criticalParameter criticalSpeed hboundary,
+    boundaryTiltCenteredFirstMoment_eq_zero
+      logMgf logMgfDerivative criticalParameter criticalSpeed hspeed⟩
+
+/-- **Selected derivative flux supplies the breakout tail and makes double breakouts
+quadratic.**  This is the finite-block kernel of weighted heavy-tail Poissonization.  The
+derivative-martingale theorem supplies the Pareto tail constant; the unresolved hard-selection
+input is the selected reproductive-value flux `blockScale · fluxConstant`. -/
+theorem selectedDerivativeFlux_controlsBreakouts
+    {Pioneer : Type*} [Fintype Pioneer] [DecidableEq Pioneer]
+    (tailConstant threshold blockScale fluxConstant : ℝ)
+    (weight : Pioneer → ℝ)
+    (htail : 0 ≤ tailConstant) (hthreshold : 0 < threshold)
+    (hweight : ∀ pioneer, 0 ≤ weight pioneer)
+    (hflux : selectedPioneerFlux weight = blockScale * fluxConstant) :
+    (∑ pioneer,
+        paretoExceedanceMass tailConstant threshold (weight pioneer)) =
+        blockScale * (tailConstant * fluxConstant / threshold) ∧
+      distinctPairExceedanceMass
+          (fun pioneer ↦ paretoExceedanceMass
+            tailConstant threshold (weight pioneer)) ≤
+        (blockScale * (tailConstant * fluxConstant / threshold)) ^ 2 := by
+  constructor
+  · rw [weightedParetoExceedanceMass_eq_flux, hflux]
+    ring
+  · exact distinctPairParetoExceedanceMass_le_blockScale_sq
+      tailConstant threshold blockScale fluxConstant weight
+      htail hthreshold hweight hflux
+
+/-- **Potential-pioneer survival is precisely the pruning gap.**  An exogenous full-tree flux
+law transfers to the selected system once the reproductive-value flux removed by intermediate
+rightmost-`N` pruning vanishes on the same scale.
+
+Assumes: `IsSelectedFluxDecomposition fullTreeFlux selectedFlux prunedFlux`. -/
+theorem selectedPioneerFlux_follows_from_fullTreeFlux_and_negligiblePruning
+    (fullTreeFlux selectedFlux prunedFlux : ℕ → ℝ) (fluxConstant : ℝ)
+    (hdecomposition :
+      IsSelectedFluxDecomposition fullTreeFlux selectedFlux prunedFlux)
+    (hfull : Filter.Tendsto fullTreeFlux Filter.atTop (nhds fluxConstant))
+    (hpruned : Filter.Tendsto prunedFlux Filter.atTop (nhds 0)) :
+    Filter.Tendsto selectedFlux Filter.atTop (nhds fluxConstant) :=
+  selectedFlux_tendsto_of_exogenous_of_pruned
+    fullTreeFlux selectedFlux prunedFlux fluxConstant hdecomposition hfull hpruned
+
+/-- **One pioneer gives one atom, but its sample fraction still needs common-profile
+relaxation.**  The first conjunct is pathwise ancestry bookkeeping.  The second consumes the
+separate two-colour profile hypothesis, and the third uses the real-valued amplitude front.
+
+Assumes: `HasCommonProfileRelaxation conversion 1 w backgroundCount pioneerCount`. -/
+theorem uniquePioneer_commonProfile_markedResponse
+    (conversion gamma w backgroundCount pioneerCount : ℝ)
+    (hconversion : conversion ≠ 0)
+    (hcount : backgroundCount + pioneerCount ≠ 0)
+    (hprofile : HasCommonProfileRelaxation conversion 1 w
+      backgroundCount pioneerCount) :
+    (totalFamilyFraction ![pioneerWeightFraction w] = pioneerWeightFraction w ∧
+      paintboxWeight ![pioneerWeightFraction w] = pioneerWeightFraction w ^ 2 ∧
+        disjointPairMergeProbability ![pioneerWeightFraction w] = 0) ∧
+      pioneerCount / (backgroundCount + pioneerCount) = pioneerWeightFraction w ∧
+        amplitudeFront gamma (1 + w) - amplitudeFront gamma 1 =
+          pioneerWeightDisplacement gamma w :=
+  ⟨oneSuccessfulAncestor_produces_onePaintboxAtom (pioneerWeightFraction w),
+    pioneerCountFraction_eq_of_commonProfile
+      conversion w backgroundCount pioneerCount hconversion hcount hprofile,
+    amplitudeFront_pioneerShift gamma w⟩
+
+/-- **The reciprocal-rate inversion is localized at the pulled boundary.**  Linear pulled
+clocks have divergent reciprocals; every stable exponent above one, including the quadratic
+Kingman order, has summable reciprocals.  This removes one Müntz obstruction only after the
+demographic observation operator is proved to use this exponential rate ladder. -/
+theorem selectedGenealogy_muntzRateDichotomy
+    (coefficient alpha : ℝ) (hcoefficient : 0 < coefficient) (halpha : 1 < alpha) :
+    (¬Summable fun n : ℕ ↦
+        1 / criticallyPulledLinearRateLadder coefficient n) ∧
+      Summable (fun n : ℕ ↦ 1 / stablePowerRateLadder alpha n) ∧
+        Summable (fun n : ℕ ↦ 1 / stablePowerRateLadder 2 n) :=
+  ⟨not_summable_one_div_criticallyPulledLinearRateLadder coefficient hcoefficient,
+    summable_one_div_stablePowerRateLadder alpha halpha,
+    summable_one_div_quadraticRateLadder⟩
+
 /-! ## Traffic depth, mesoscopic LD structure, and iterative genomic procedures -/
 
 /-- **The complete genomic procedure-risk signature is the canonical coarsest
@@ -474,6 +568,19 @@ sum loses it, while `k` iterations amplify its squared output by `4ᵏ`. -/
 theorem rareLDSubspace_fixedTrafficInvisible_logRuntimeVisible :
     FixedTrafficLogRuntimeSeparation :=
   fixedTraffic_invisible_logRuntime_visible
+
+/-- **Fixed polynomial degree is not a limiting-traffic guarantee.**  The
+degree-one normalized LD trace discrepancy vanishes, but multiplying it by
+the natural mesoscopic resolution `p_k / r_k = 4^k` keeps a separation of two
+at every dimension. -/
+theorem rareLDSubspace_limitingTrafficInsufficientForDegreeOne
+    (baseline : ℝ) :
+    Filter.Tendsto
+        (fun iteration ↦ diagonalTrafficCorrection baseline 1 iteration)
+        Filter.atTop (nhds 0) ∧
+      ∀ iteration,
+        amplifiedDegreeOneTrafficDifference baseline iteration = 2 :=
+  limitingTraffic_insufficient_for_unstableDegreeOne baseline
 
 /-- **Bulk LD spectrum does not determine extremal spectral or SDP behavior.**
 A single positive LD outlier vanishes from every normalized spectral test
@@ -1045,6 +1152,57 @@ theorem degreeLimitedGenomicRisk_fullGapHardness
     (algorithm : Algorithm) :
     bayesRight - bayesLeft ≤ (risk algorithm).evaluate left - bayesLeft :=
   truncatedTraffic_hardness risk left right htraffic bayesLeft bayesRight hoptimalRight algorithm
+
+/-- **The corrected stable low-degree theorem.**  A degree-`D` genomic graph
+polynomial is quantitatively controlled by the maximum retained LD-traffic
+error times its coefficient `ℓ¹` mass.  Thus exact finite factorization
+passes to limiting traffic only with a coefficient-growth/resolution bound. -/
+theorem stableDegreeLimitedGenomicRisk_quantitativeTrafficBound
+    {D : ℕ} (risk : TruncatedTrafficRisk D)
+    (left right : Fin (D + 1) → ℝ) (epsilon : ℝ)
+    (hcoordinate : ∀ graph, |left graph - right graph| ≤ epsilon) :
+    |risk.evaluate left - risk.evaluate right| ≤
+      (∑ graph, |risk.coefficient graph|) * epsilon :=
+  truncatedTrafficRisk_abs_sub_le_coefficientMass_mul
+    risk left right epsilon hcoordinate
+
+/-- Uniformly bounded coefficient mass turns quantitative LD-traffic
+convergence into convergence of the corresponding stable low-degree genomic
+procedure. -/
+theorem stableDegreeLimitedGenomicRisk_convergesOfBoundedCoefficientMass
+    {D : ℕ} (risk : ℕ → TruncatedTrafficRisk D)
+    (left right : ℕ → Fin (D + 1) → ℝ)
+    (discrepancy coefficientBound : ℝ)
+    (hdiscrepancy : ∀ index graph,
+      |left index graph - right index graph| ≤
+        discrepancy * (1 / 2 : ℝ) ^ index)
+    (hcoefficient : ∀ index,
+      (∑ graph, |(risk index).coefficient graph|) ≤ coefficientBound)
+    (hdiscrepancyNonneg : 0 ≤ discrepancy) :
+    Filter.Tendsto
+      (fun index ↦ (risk index).evaluate (left index) -
+        (risk index).evaluate (right index))
+      Filter.atTop (nhds 0) :=
+  truncatedTrafficRisk_tendsto_zero_of_boundedCoefficientMass
+    risk left right discrepancy coefficientBound hdiscrepancy hcoefficient
+      hdiscrepancyNonneg
+
+/-- **High-temperature matched free energies agree once the cluster
+expansion is certified.**  Equal finite LD-traffic truncations and a common
+geometric polymer tail force equality of the two limiting pressures.  The
+model-specific uniqueness/cluster-expansion certificate remains explicit. -/
+theorem highTemperatureTrafficLimitsAgree_ofGeometricCertificate
+    (leftLimit rightLimit C q : ℝ) (commonTruncation : ℕ → ℝ)
+    (hqNonneg : 0 ≤ q) (hq : q < 1)
+    (hleft : ∀ depth,
+      |leftLimit - commonTruncation depth| ≤
+        C * q ^ (depth + 1) / (1 - q))
+    (hright : ∀ depth,
+      |rightLimit - commonTruncation depth| ≤
+        C * q ^ (depth + 1) / (1 - q)) :
+    leftLimit = rightLimit :=
+  highTemperatureTrafficLimit_eq_of_geometricTruncation
+    leftLimit rightLimit C q commonTruncation hqNonneg hq hleft hright
 
 /-- **Every finite LD-traffic depth is strictly weaker than the next.**  For
 each `D`, two genuine probability laws on uniformly conditioned diagonal LD
@@ -2216,6 +2374,57 @@ structure UnifiedBiologyObstructions : Prop where
     ∀ conversion gamma w : ℝ, conversion ≠ 0 → gamma ≠ 0 → -1 < w →
       conversion * w / (conversion * 1 + conversion * w) = pioneerWeightFraction w ∧
         Real.exp (-(gamma * pioneerWeightDisplacement gamma w)) * (1 + w) = 1
+  /-- The critical log-mgf transform has unit additive mass and zero centered derivative mass. -/
+  branchingRandomWalkBoundaryTransformIsCritical :
+    ∀ logMgf logMgfDerivative criticalParameter criticalSpeed : ℝ,
+      criticalParameter * criticalSpeed - logMgf = Real.log 2 →
+      criticalSpeed = logMgfDerivative →
+        boundaryTiltMass logMgf criticalParameter criticalSpeed = 1 ∧
+          boundaryTiltCenteredFirstMoment
+            logMgf logMgfDerivative criticalParameter criticalSpeed = 0
+  /-- Selected derivative flux gives the one-breakout scale and a quadratic two-breakout bound. -/
+  selectedDerivativeFluxControlsBreakouts :
+    ∀ (Pioneer : Type) [Fintype Pioneer] [DecidableEq Pioneer]
+      (tailConstant threshold blockScale fluxConstant : ℝ)
+      (weight : Pioneer → ℝ),
+      0 ≤ tailConstant → 0 < threshold →
+      (∀ pioneer, 0 ≤ weight pioneer) →
+      selectedPioneerFlux weight = blockScale * fluxConstant →
+        (∑ pioneer,
+            paretoExceedanceMass tailConstant threshold (weight pioneer)) =
+            blockScale * (tailConstant * fluxConstant / threshold) ∧
+          distinctPairExceedanceMass
+              (fun pioneer ↦ paretoExceedanceMass
+                tailConstant threshold (weight pioneer)) ≤
+            (blockScale * (tailConstant * fluxConstant / threshold)) ^ 2
+  /-- A full-tree flux law transfers exactly when the flux discarded by selection vanishes. -/
+  selectedPioneerFluxFollowsFromNegligiblePruning :
+    ∀ (fullTreeFlux selectedFlux prunedFlux : ℕ → ℝ) (fluxConstant : ℝ),
+      IsSelectedFluxDecomposition fullTreeFlux selectedFlux prunedFlux →
+      Filter.Tendsto fullTreeFlux Filter.atTop (nhds fluxConstant) →
+      Filter.Tendsto prunedFlux Filter.atTop (nhds 0) →
+        Filter.Tendsto selectedFlux Filter.atTop (nhds fluxConstant)
+  /-- One pioneer gives one atom pathwise; `w/(1+w)` additionally consumes common-profile
+  relaxation, and the amplitude-front response is real-valued even on lattice BRWs. -/
+  uniquePioneerCommonProfileDeterminesMarkedResponse :
+    ∀ conversion gamma w backgroundCount pioneerCount : ℝ,
+      conversion ≠ 0 → backgroundCount + pioneerCount ≠ 0 →
+      HasCommonProfileRelaxation conversion 1 w backgroundCount pioneerCount →
+        (totalFamilyFraction ![pioneerWeightFraction w] = pioneerWeightFraction w ∧
+          paintboxWeight ![pioneerWeightFraction w] = pioneerWeightFraction w ^ 2 ∧
+            disjointPairMergeProbability ![pioneerWeightFraction w] = 0) ∧
+          pioneerCount / (backgroundCount + pioneerCount) = pioneerWeightFraction w ∧
+            amplitudeFront gamma (1 + w) - amplitudeFront gamma 1 =
+              pioneerWeightDisplacement gamma w
+  /-- Linear pulled clocks and superlinear stable clocks lie on opposite sides of reciprocal
+  summability; using this as an identifiability theorem still requires the transform-system
+  reduction. -/
+  selectedGenealogyHasMuntzRateDichotomy :
+    ∀ coefficient alpha : ℝ, 0 < coefficient → 1 < alpha →
+      (¬Summable fun n : ℕ ↦
+          1 / criticallyPulledLinearRateLadder coefficient n) ∧
+        Summable (fun n : ℕ ↦ 1 / stablePowerRateLadder alpha n) ∧
+          Summable (fun n : ℕ ↦ 1 / stablePowerRateLadder 2 n)
   /-- The complete uniform procedure-risk signature is sufficient and is
   coarser than every other sufficient genomic design invariant. -/
   genomicAlgorithmicRiskSignatureIsCoarsest :
@@ -2262,6 +2471,15 @@ structure UnifiedBiologyObstructions : Prop where
   energy after a logarithmic number of power iterations. -/
   rareLDSubspaceEvadesFixedTrafficAtLogRuntime :
     FixedTrafficLogRuntimeSeparation
+  /-- Even degree one can resolve a vanishing mesoscopic LD mass when its
+  coefficient grows at the reciprocal traffic resolution. -/
+  rareLDSubspaceEvadesLimitingTrafficAtDegreeOne :
+    ∀ baseline : ℝ,
+      Filter.Tendsto
+          (fun iteration ↦ diagonalTrafficCorrection baseline 1 iteration)
+          Filter.atTop (nhds 0) ∧
+        ∀ iteration,
+          amplifiedDegreeOneTrafficDifference baseline iteration = 2
   /-- The genuine finite diagonal iteration realizes the same separation with
   ambient dimension `16^k`, exceptional rank `4^k`, fixed-time decay, and
   unit logarithmic-time normalized output. -/
@@ -2657,6 +2875,42 @@ structure UnifiedBiologyObstructions : Prop where
         (∀ algorithm, bayesRight ≤ (risk algorithm).evaluate right) →
           ∀ algorithm,
             bayesRight - bayesLeft ≤ (risk algorithm).evaluate left - bayesLeft
+  /-- Stable low-degree passage is quantitative: traffic resolution is
+  multiplied by the coefficient `ℓ¹` mass. -/
+  stableDegreeLimitedGenomicRiskHasQuantitativeTrafficBound :
+    ∀ (D : ℕ) (risk : TruncatedTrafficRisk D)
+      (left right : Fin (D + 1) → ℝ) (epsilon : ℝ),
+      (∀ graph, |left graph - right graph| ≤ epsilon) →
+        |risk.evaluate left - risk.evaluate right| ≤
+          (∑ graph, |risk.coefficient graph|) * epsilon
+  /-- Uniform coefficient mass makes quantitative fixed-depth traffic
+  convergence sufficient for stable polynomial convergence. -/
+  stableDegreeLimitedGenomicRiskConvergesOfBoundedCoefficientMass :
+    ∀ (D : ℕ) (risk : ℕ → TruncatedTrafficRisk D)
+      (left right : ℕ → Fin (D + 1) → ℝ)
+      (discrepancy coefficientBound : ℝ),
+      (∀ index graph,
+        |left index graph - right index graph| ≤
+          discrepancy * (1 / 2 : ℝ) ^ index) →
+      (∀ index,
+        (∑ graph, |(risk index).coefficient graph|) ≤ coefficientBound) →
+      0 ≤ discrepancy →
+        Filter.Tendsto
+          (fun index ↦ (risk index).evaluate (left index) -
+            (risk index).evaluate (right index))
+          Filter.atTop (nhds 0)
+  /-- In the uniqueness regime, a certified common finite-traffic expansion
+  with a geometric tail determines the limiting matched pressure. -/
+  highTemperatureGenomicTrafficDeterminesCertifiedPressure :
+    ∀ (leftLimit rightLimit C q : ℝ) (commonTruncation : ℕ → ℝ),
+      0 ≤ q → q < 1 →
+      (∀ depth,
+        |leftLimit - commonTruncation depth| ≤
+          C * q ^ (depth + 1) / (1 - q)) →
+      (∀ depth,
+        |rightLimit - commonTruncation depth| ≤
+          C * q ^ (depth + 1) / (1 - q)) →
+        leftLimit = rightLimit
   /-- The diagonal genomic traffic hierarchy is strictly increasing at every
   finite edge depth, witnessed by probability laws on `[1,2]`. -/
   genomicLDTrafficHierarchyIsStrictAtEveryDegree :
@@ -3004,6 +3258,20 @@ theorem unifiedBiology_obstructions : UnifiedBiologyObstructions := by
         sweepTrajectory_does_not_determine_genealogy
       twoColourPioneerResponseIsExact :=
         twoColourPioneerResponse_exact
+      branchingRandomWalkBoundaryTransformIsCritical :=
+        branchingRandomWalkBoundaryTransform_isCritical
+      selectedDerivativeFluxControlsBreakouts :=
+        fun _Pioneer _ _ tailConstant threshold blockScale fluxConstant weight htail
+          hthreshold hweight hflux ↦
+            selectedDerivativeFlux_controlsBreakouts
+              tailConstant threshold blockScale fluxConstant weight
+              htail hthreshold hweight hflux
+      selectedPioneerFluxFollowsFromNegligiblePruning :=
+        selectedPioneerFlux_follows_from_fullTreeFlux_and_negligiblePruning
+      uniquePioneerCommonProfileDeterminesMarkedResponse :=
+        uniquePioneer_commonProfile_markedResponse
+      selectedGenealogyHasMuntzRateDichotomy :=
+        selectedGenealogy_muntzRateDichotomy
       genomicAlgorithmicRiskSignatureIsCoarsest :=
         fun _Algorithm _Design _Model _Loss risk ↦
           genomicAlgorithmicRiskSignature_isCoarsestSufficientInvariant risk
@@ -3019,6 +3287,8 @@ theorem unifiedBiology_obstructions : UnifiedBiologyObstructions := by
               hspike hcritical
       rareLDSubspaceEvadesFixedTrafficAtLogRuntime :=
         rareLDSubspace_fixedTrafficInvisible_logRuntimeVisible
+      rareLDSubspaceEvadesLimitingTrafficAtDegreeOne :=
+        rareLDSubspace_limitingTrafficInsufficientForDegreeOne
       rareLDSubspaceConcreteGFOMEvadesFixedTrafficAtLogRuntime :=
         concreteGFOM_fixedTrafficInvisible_logRuntimeVisible
       genomicBulkSpectralLawDoesNotDetermineExtremalSpectrumOrSDP :=
@@ -3158,6 +3428,18 @@ theorem unifiedBiology_obstructions : UnifiedBiologyObstructions := by
         fun _Algorithm _D risk left right htraffic bayesLeft bayesRight hoptimal algorithm ↦
           degreeLimitedGenomicRisk_fullGapHardness risk left right htraffic bayesLeft bayesRight
             hoptimal algorithm
+      stableDegreeLimitedGenomicRiskHasQuantitativeTrafficBound :=
+        fun _D risk left right epsilon hcoordinate ↦
+          stableDegreeLimitedGenomicRisk_quantitativeTrafficBound
+            risk left right epsilon hcoordinate
+      stableDegreeLimitedGenomicRiskConvergesOfBoundedCoefficientMass :=
+        fun _D risk left right discrepancy coefficientBound hdiscrepancy
+          hcoefficient hdiscrepancyNonneg ↦
+            stableDegreeLimitedGenomicRisk_convergesOfBoundedCoefficientMass
+              risk left right discrepancy coefficientBound hdiscrepancy
+              hcoefficient hdiscrepancyNonneg
+      highTemperatureGenomicTrafficDeterminesCertifiedPressure :=
+        highTemperatureTrafficLimitsAgree_ofGeometricCertificate
       genomicLDTrafficHierarchyIsStrictAtEveryDegree :=
         genomicLDTrafficHierarchy_strictAtEveryDegree
       genomicLDTrafficHasCommonBlindPairAtEveryDegree :=

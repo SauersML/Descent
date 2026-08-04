@@ -93,11 +93,26 @@ keeps the matched-Bayes hinge outside the proved statements.
   coordinate loses a block of mass `4⁻ᵏ`, while `k` power iterations amplify its
   normalized squared output back to one.
 
+* `limitingTraffic_insufficient_for_unstableDegreeOne` -- the same
+  mesoscopic block already defeats an unrestricted degree-one polynomial:
+  its normalized trace discrepancy vanishes, while coefficient growth at the
+  reciprocal resolution keeps an order-one separation.
+
 * `invariantPolynomial_graphSum_factorization` and `truncatedTraffic_hardness`
   -- an explicit permutation extending the occupied-label bijection proves
   coefficient constancy on equality-pattern graphs; equality of a truncated
   traffic profile then transfers the complete Bayes gap to the degree-limited
   class.
+
+* `truncatedTrafficRisk_abs_sub_le_coefficientMass_mul` -- the corrected
+  limiting theorem: traffic error is multiplied by coefficient `ℓ¹` mass.
+  Fixed degree is sufficient only after this quantitative stability is
+  controlled.
+
+* `highTemperatureTrafficLimit_eq_of_geometricTruncation` -- a common finite
+  traffic expansion with a uniform geometric polymer tail determines the
+  limiting pressure.  The model-specific cluster-expansion certificate is an
+  explicit hypothesis.
 
 * `exists_probabilityWeights_matchingMoments_through_degree` -- for every
   `D`, two explicit finite probability laws on `[1,2]` agree on moments
@@ -170,7 +185,10 @@ perturbation of rank `o(p)` moves the exponential pressure by order one and the
 matched mutual-information density by `o(1)`, so a negative witness there needs
 EXTENSIVE rank. That contrast -- one perturbation, four procedure classes, two
 of which see it and two of which do not -- is the reason the invariant hierarchy
-is procedure-dependent rather than a single chain.
+is procedure-dependent rather than a single chain.  No argument here treats
+Nishimori exchangeability as replica symmetry, overlap concentration, or
+analyticity; each of those would require an additional theorem and none is
+silently assumed by the matched-Bayes boundary results below.
 -/
 
 section InvariantSeparation
@@ -3707,6 +3725,46 @@ theorem concreteGFOM_fixedTrafficInvisible_logRuntimeVisible :
     mesoscopicGFOMActualEnergy_fixedPositiveRuntime_tendsto_zero,
     mesoscopicGFOMActualEnergy_logRuntime⟩
 
+/-! ### Coefficient amplification already breaks limiting traffic at degree one -/
+
+/-- A degree-one invariant polynomial may multiply its normalized trace
+coordinate by a size-dependent coefficient.  On the `16^k`-dimensional
+diagonal witness, the coefficient `4^k = p_k / r_k` exactly resolves the
+exceptional block of relative mass `4⁻ᵏ`. -/
+noncomputable def amplifiedDegreeOneTrafficDifference
+    (baseline : ℝ) (iteration : ℕ) : ℝ :=
+  (4 : ℝ) ^ iteration * diagonalTrafficCorrection baseline 1 iteration
+
+/-- The unamplified degree-one traffic discrepancy vanishes. -/
+theorem degreeOneTrafficDifference_tendsto_zero (baseline : ℝ) :
+    Filter.Tendsto
+      (fun iteration ↦ diagonalTrafficCorrection baseline 1 iteration)
+      Filter.atTop (nhds 0) :=
+  diagonalTrafficCorrection_tendsto_zero baseline 1
+
+/-- The growing coefficient recovers the spike height exactly at every size.
+This is the finite statement behind the correction that fixed degree alone
+does not imply factorization through *limiting* traffic. -/
+@[simp] theorem amplifiedDegreeOneTrafficDifference_eq_two
+    (baseline : ℝ) (iteration : ℕ) :
+    amplifiedDegreeOneTrafficDifference baseline iteration = 2 := by
+  rw [amplifiedDegreeOneTrafficDifference, diagonalTrafficCorrection]
+  rw [show (baseline + 2) ^ 1 - baseline ^ 1 = 2 by ring]
+  rw [← mul_assoc, ← mul_pow]
+  norm_num
+
+/-- **Unrestricted degree-one polynomials do not factor through limiting
+traffic.**  The normalized degree-one coordinate tends to zero, while the
+same coordinate with coefficient growth `4^k` remains equal to two. -/
+theorem limitingTraffic_insufficient_for_unstableDegreeOne (baseline : ℝ) :
+    Filter.Tendsto
+        (fun iteration ↦ diagonalTrafficCorrection baseline 1 iteration)
+        Filter.atTop (nhds 0) ∧
+      ∀ iteration,
+        amplifiedDegreeOneTrafficDifference baseline iteration = 2 :=
+  ⟨degreeOneTrafficDifference_tendsto_zero baseline,
+    amplifiedDegreeOneTrafficDifference_eq_two baseline⟩
+
 end MesoscopicAmplification
 
 section SpectralSDPSeparation
@@ -4459,6 +4517,131 @@ linkage-disequilibrium coefficient traditionally also denoted `D`. -/
 noncomputable def TruncatedTrafficRisk.evaluate
     {D : ℕ} (risk : TruncatedTrafficRisk D) (traffic : Fin (D + 1) → ℝ) : ℝ :=
   ∑ graph, risk.coefficient graph * traffic graph
+
+/-- **Quantitative finite-traffic stability.**  If every retained graph
+coordinate changes by at most `epsilon`, the value of a graph polynomial
+changes by at most `epsilon` times the coefficient `ℓ¹` mass.  This is the
+missing hypothesis when exact finite factorization is passed to a limiting
+traffic statement: fixed degree controls the number of coordinates, but not
+the size-dependent coefficients multiplying them. -/
+theorem truncatedTrafficRisk_abs_sub_le_coefficientMass_mul
+    {D : ℕ} (risk : TruncatedTrafficRisk D)
+    (left right : Fin (D + 1) → ℝ) (epsilon : ℝ)
+    (hcoordinate : ∀ graph, |left graph - right graph| ≤ epsilon) :
+    |risk.evaluate left - risk.evaluate right| ≤
+      (∑ graph, |risk.coefficient graph|) * epsilon := by
+  rw [TruncatedTrafficRisk.evaluate, TruncatedTrafficRisk.evaluate,
+    ← Finset.sum_sub_distrib]
+  calc
+    |∑ graph, (risk.coefficient graph * left graph -
+        risk.coefficient graph * right graph)| =
+        |∑ graph, risk.coefficient graph * (left graph - right graph)| := by
+          congr 1
+          apply Finset.sum_congr rfl
+          intro graph _hgraph
+          ring
+    _ ≤ ∑ graph, |risk.coefficient graph * (left graph - right graph)| :=
+      Finset.abs_sum_le_sum_abs _ _
+    _ = ∑ graph, |risk.coefficient graph| * |left graph - right graph| := by
+      apply Finset.sum_congr rfl
+      intro graph _hgraph
+      rw [abs_mul]
+    _ ≤ ∑ graph, |risk.coefficient graph| * epsilon := by
+      apply Finset.sum_le_sum
+      intro graph _hgraph
+      exact mul_le_mul_of_nonneg_left (hcoordinate graph) (abs_nonneg _)
+    _ = (∑ graph, |risk.coefficient graph|) * epsilon := by
+      rw [Finset.sum_mul]
+
+/-- A uniform coefficient-mass bound converts quantitative convergence of a
+fixed truncated traffic profile into convergence of every stable polynomial
+evaluation. -/
+theorem truncatedTrafficRisk_tendsto_zero_of_boundedCoefficientMass
+    {D : ℕ} (risk : ℕ → TruncatedTrafficRisk D)
+    (left right : ℕ → Fin (D + 1) → ℝ)
+    (discrepancy coefficientBound : ℝ)
+    (hdiscrepancy : ∀ index graph,
+      |left index graph - right index graph| ≤
+        discrepancy * (1 / 2 : ℝ) ^ index)
+    (hcoefficient : ∀ index,
+      (∑ graph, |(risk index).coefficient graph|) ≤ coefficientBound)
+    (hdiscrepancyNonneg : 0 ≤ discrepancy) :
+    Filter.Tendsto
+      (fun index ↦ (risk index).evaluate (left index) -
+        (risk index).evaluate (right index))
+      Filter.atTop (nhds 0) := by
+  apply (tendsto_zero_iff_abs_tendsto_zero _).mpr
+  apply squeeze_zero (fun index ↦ abs_nonneg _)
+  · intro index
+    calc
+      |(risk index).evaluate (left index) -
+          (risk index).evaluate (right index)| ≤
+          (∑ graph, |(risk index).coefficient graph|) *
+            (discrepancy * (1 / 2 : ℝ) ^ index) :=
+        truncatedTrafficRisk_abs_sub_le_coefficientMass_mul
+          (risk index) (left index) (right index)
+          (discrepancy * (1 / 2 : ℝ) ^ index) (hdiscrepancy index)
+      _ ≤ coefficientBound * (discrepancy * (1 / 2 : ℝ) ^ index) := by
+        exact mul_le_mul_of_nonneg_right (hcoefficient index)
+          (mul_nonneg hdiscrepancyNonneg (by positivity))
+  · have hpow : Filter.Tendsto (fun index : ℕ ↦ (1 / 2 : ℝ) ^ index)
+        Filter.atTop (nhds 0) :=
+      tendsto_pow_atTop_nhds_zero_of_abs_lt_one (by norm_num)
+    simpa [mul_assoc] using
+      hpow.const_mul (coefficientBound * discrepancy)
+
+/-! ### Certified high-temperature passage from traffic to pressure -/
+
+/-- **High-temperature traffic sufficiency from an absolutely convergent
+truncation certificate.**  Suppose both limiting pressures are approximated
+by the same depth-`D` traffic polynomial and both tails obey the uniform
+polymer bound `C q^(D+1)/(1-q)` with `0 ≤ q < 1`.  Then the two limiting
+pressures are equal.
+
+This theorem formalizes the analytic passage after a cluster expansion has
+supplied its certificate.  It deliberately does not assert that a biological
+posterior satisfies a Dobrushin or polymer condition; that model-specific
+step remains an explicit hypothesis rather than an imported axiom. -/
+theorem highTemperatureTrafficLimit_eq_of_geometricTruncation
+    (leftLimit rightLimit C q : ℝ) (commonTruncation : ℕ → ℝ)
+    (hqNonneg : 0 ≤ q) (hq : q < 1)
+    (hleft : ∀ depth,
+      |leftLimit - commonTruncation depth| ≤
+        C * q ^ (depth + 1) / (1 - q))
+    (hright : ∀ depth,
+      |rightLimit - commonTruncation depth| ≤
+        C * q ^ (depth + 1) / (1 - q)) :
+    leftLimit = rightLimit := by
+  have hbound : ∀ depth,
+      |leftLimit - rightLimit| ≤
+        2 * (C * q ^ (depth + 1) / (1 - q)) := by
+    intro depth
+    have htriangle : |leftLimit - rightLimit| ≤
+        |leftLimit - commonTruncation depth| +
+          |rightLimit - commonTruncation depth| := by
+      have h := abs_sub_le leftLimit (commonTruncation depth) rightLimit
+      rwa [abs_sub_comm (commonTruncation depth) rightLimit] at h
+    linarith [hleft depth, hright depth]
+  have hqAbs : |q| < 1 := by
+    rw [abs_of_nonneg hqNonneg]
+    exact hq
+  have hpow : Filter.Tendsto (fun depth : ℕ ↦ q ^ depth)
+      Filter.atTop (nhds 0) :=
+    tendsto_pow_atTop_nhds_zero_of_abs_lt_one hqAbs
+  have htail : Filter.Tendsto
+      (fun depth : ℕ ↦ 2 * (C * q ^ (depth + 1) / (1 - q)))
+      Filter.atTop (nhds 0) := by
+    convert hpow.const_mul (2 * C * q / (1 - q)) using 1
+    · funext depth
+      rw [pow_succ]
+      ring
+    · simp
+  have hconstant : Filter.Tendsto (fun _depth : ℕ ↦ |leftLimit - rightLimit|)
+      Filter.atTop (nhds 0) :=
+    squeeze_zero (fun _depth ↦ abs_nonneg _) hbound htail
+  have hzero : |leftLimit - rightLimit| = 0 :=
+    tendsto_nhds_unique tendsto_const_nhds hconstant
+  exact sub_eq_zero.mp (abs_eq_zero.mp hzero)
 
 /-- Equal traffic through degree `D` makes every degree-`D` graph-polynomial risk identical. -/
 theorem truncatedTrafficRisk_eq_of_profile_eq
