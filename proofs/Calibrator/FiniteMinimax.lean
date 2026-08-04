@@ -224,6 +224,21 @@ theorem observationL1Distance_eq_zero_iff
     rw [hobs]
     simp
 
+/-- Observation ℓ¹ distance is positive exactly when the two data laws differ. -/
+theorem observationL1Distance_pos_iff
+    (θ₁ θ₂ : Fin (parameterCount + 1)) :
+    0 < E.observationL1Distance θ₁ θ₂ ↔
+      E.observation θ₁ ≠ E.observation θ₂ := by
+  constructor
+  · intro hpos hobs
+    have hzero := (E.observationL1Distance_eq_zero_iff θ₁ θ₂).2 hobs
+    linarith
+  · intro hobs
+    have hne : E.observationL1Distance θ₁ θ₂ ≠ 0 := by
+      intro hzero
+      exact hobs ((E.observationL1Distance_eq_zero_iff θ₁ θ₂).1 hzero)
+    exact lt_of_le_of_ne (E.observationL1Distance_nonneg θ₁ θ₂) hne.symm
+
 /-- Any two probability laws have ℓ¹ distance at most two. -/
 theorem observationL1Distance_le_two
     (θ₁ θ₂ : Fin (parameterCount + 1)) :
@@ -610,6 +625,18 @@ theorem half_separation_le_minimaxRisk_of_observation_eq
   apply le_csInf (Set.range_nonempty E.worstRisk)
   rintro worstValue ⟨δ, rfl⟩
   exact E.half_separation_le_worstRisk_of_observation_eq θ₁ θ₂ separation hobs hloss δ
+
+/-- **Metric form of the exact minimax floor.** Zero observation ℓ¹ distance is already
+enough to invoke the exact nonidentifiability theorem; callers need not expose equality of
+the underlying probability laws. -/
+theorem half_separation_le_minimaxRisk_of_observationL1Distance_eq_zero
+    (θ₁ θ₂ : Fin (parameterCount + 1)) (separation : ℝ)
+    (hzero : E.observationL1Distance θ₁ θ₂ = 0)
+    (hloss : ∀ action : Fin (actionCount + 1),
+      separation ≤ E.loss θ₁ action + E.loss θ₂ action) :
+    separation / 2 ≤ E.minimaxRisk := by
+  exact E.half_separation_le_minimaxRisk_of_observation_eq θ₁ θ₂ separation
+    ((E.observationL1Distance_eq_zero_iff θ₁ θ₂).1 hzero) hloss
 
 /-- **Blackwell data processing for exact nonidentifiability.** Randomized downstream
 channels cannot repair observational equivalence: every garbled experiment retains the
