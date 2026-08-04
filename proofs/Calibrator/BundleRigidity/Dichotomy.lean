@@ -126,11 +126,29 @@ variable {ι : Type*}
 /-- The **weight ratio** of a word: `Q`-product over `P`-product. -/
 noncomputable def weightRatio (P Q : ι → ℝ) (w : List ι) : ℝ := prodWeight Q w / prodWeight P w
 
+/-- With a vanishing denominator Mathlib returns `0`, which is a value this quantity can also
+take legitimately, so the branch is named rather than left to be inferred from the result. -/
+theorem weightRatio_at_zero_denominator_is_junk (P Q : ι → ℝ) (w : List ι)
+    (hzero : prodWeight P w = 0) :
+    weightRatio P Q w = 0 := by
+  unfold weightRatio
+  rw [hzero, div_zero]
+
+
 /-- The **weight defect of a relation** `w ≈ u`: the ratio of the two words' weight
 ratios. The refuted conjecture asserted that a relation contributes to the kernel exactly
 when its defect is one. -/
 noncomputable def defect (P Q : ι → ℝ) (w u : List ι) : ℝ :=
   weightRatio P Q w / weightRatio P Q u
+
+/-- With a vanishing denominator Mathlib returns `0`, which is a value this quantity can also
+take legitimately, so the branch is named rather than left to be inferred from the result. -/
+theorem defect_at_zero_denominator_is_junk (P Q : ι → ℝ) (w u : List ι)
+    (hzero : weightRatio P Q u = 0) :
+    defect P Q w u = 0 := by
+  unfold defect
+  rw [hzero, div_zero]
+
 
 /-- **The commutation relation has defect one, identically.**
 
@@ -183,6 +201,15 @@ theorem defect_witness_ne_one :
 Both constants of the falsifier come from this one definition: the Bézout constant is an
 alternating combination of `χ` and the weight defect is a ratio of `χ`. -/
 noncomputable def chi (P Q : ι → ℝ) (w : List ι) : ℝ := prodWeight P w / prodWeight Q w
+
+/-- With a vanishing denominator Mathlib returns `0`, which is a value this quantity can also
+take legitimately, so the branch is named rather than left to be inferred from the result. -/
+theorem chi_at_zero_denominator_is_junk (P Q : ι → ℝ) (w : List ι)
+    (hzero : prodWeight Q w = 0) :
+    chi P Q w = 0 := by
+  unfold chi
+  rw [hzero, div_zero]
+
 
 /-- **The character and the weight ratio are one map, read in opposite directions.**
 

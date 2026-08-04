@@ -507,6 +507,15 @@ is the missed-support fraction and `q` is the squared active correlation. -/
 noncomputable def populationOverlapProfile (q x : ℝ) : ℝ :=
   x * (1 - q * x) / (1 - q * x * (1 - x))
 
+/-- With a vanishing denominator Mathlib returns `0`, which is a value this quantity can also
+take legitimately, so the branch is named rather than left to be inferred from the result. -/
+theorem populationOverlapProfile_at_zero_denominator_is_junk (q x : ℝ)
+    (hzero : (1 - q * x * (1 - x)) = 0) :
+    populationOverlapProfile q x = 0 := by
+  unfold populationOverlapProfile
+  rw [hzero, div_zero]
+
+
 /-- The far, disjoint candidate has normalized loss `1 - q`. -/
 @[simp] theorem populationOverlapProfile_one (q : ℝ) :
     populationOverlapProfile q 1 = 1 - q := by

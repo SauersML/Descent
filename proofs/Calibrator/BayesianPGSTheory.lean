@@ -94,6 +94,15 @@ theorem posteriorPrecision_pos (m : BayesianLinearModel) :
 noncomputable def posteriorVariance (m : BayesianLinearModel) : ℝ :=
   1 / m.posteriorPrecision
 
+/-- With a vanishing denominator Mathlib returns `0`, which is a value this quantity can also
+take legitimately, so the branch is named rather than left to be inferred from the result. -/
+theorem posteriorVariance_at_zero_denominator_is_junk (m : BayesianLinearModel)
+    (hzero : m.posteriorPrecision = 0) :
+    posteriorVariance m = 0 := by
+  unfold posteriorVariance
+  rw [hzero, div_zero]
+
+
 /-- Posterior variance is positive. -/
 theorem posteriorVariance_pos (m : BayesianLinearModel) :
     0 < m.posteriorVariance := by

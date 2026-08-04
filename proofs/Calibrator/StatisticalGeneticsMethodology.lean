@@ -269,14 +269,50 @@ noncomputable def MetaAnalysisModel.witness : MetaAnalysisModel where
 noncomputable def fixed_weights (m : MetaAnalysisModel) (i : Fin m.k) : ℝ :=
   1 / m.variances i
 
+/-- With a vanishing denominator Mathlib returns `0`, which is a value this quantity can also
+take legitimately, so the branch is named rather than left to be inferred from the result. -/
+theorem fixed_weights_at_zero_denominator_is_junk (m : MetaAnalysisModel) (i : Fin m.k)
+    (hzero : m.variances i = 0) :
+    fixed_weights m i = 0 := by
+  unfold fixed_weights
+  rw [hzero, div_zero]
+
+
 noncomputable def random_weights (m : MetaAnalysisModel) (i : Fin m.k) : ℝ :=
   1 / (m.variances i + m.tau_sq)
+
+/-- With a vanishing denominator Mathlib returns `0`, which is a value this quantity can also
+take legitimately, so the branch is named rather than left to be inferred from the result. -/
+theorem random_weights_at_zero_denominator_is_junk (m : MetaAnalysisModel) (i : Fin m.k)
+    (hzero : (m.variances i + m.tau_sq) = 0) :
+    random_weights m i = 0 := by
+  unfold random_weights
+  rw [hzero, div_zero]
+
 
 noncomputable def fixed_se_sq (m : MetaAnalysisModel) : ℝ :=
   1 / (∑ i, fixed_weights m i)
 
+/-- With a vanishing denominator Mathlib returns `0`, which is a value this quantity can also
+take legitimately, so the branch is named rather than left to be inferred from the result. -/
+theorem fixed_se_sq_at_zero_denominator_is_junk (m : MetaAnalysisModel)
+    (hzero : (∑ i, fixed_weights m i) = 0) :
+    fixed_se_sq m = 0 := by
+  unfold fixed_se_sq
+  rw [hzero, div_zero]
+
+
 noncomputable def random_se_sq (m : MetaAnalysisModel) : ℝ :=
   1 / (∑ i, random_weights m i)
+
+/-- With a vanishing denominator Mathlib returns `0`, which is a value this quantity can also
+take legitimately, so the branch is named rather than left to be inferred from the result. -/
+theorem random_se_sq_at_zero_denominator_is_junk (m : MetaAnalysisModel)
+    (hzero : (∑ i, random_weights m i) = 0) :
+    random_se_sq m = 0 := by
+  unfold random_se_sq
+  rw [hzero, div_zero]
+
 
 /-- **Fixed vs random effects meta-analysis.**
     Fixed effects: assumes same β across populations (tau² = 0).

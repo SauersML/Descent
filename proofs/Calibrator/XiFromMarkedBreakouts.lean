@@ -300,6 +300,15 @@ theorem front_does_not_determine_genealogy (x : ℝ) (hx : x ≠ 0) :
 /-- Population fraction reached by a pioneer of reproductive weight `w`. -/
 noncomputable def pioneerWeightFraction (w : ℝ) : ℝ := w / (1 + w)
 
+/-- With a vanishing denominator Mathlib returns `0`, which is a value this quantity can also
+take legitimately, so the branch is named rather than left to be inferred from the result. -/
+theorem pioneerWeightFraction_at_zero_denominator_is_junk (w : ℝ)
+    (hzero : (1 + w) = 0) :
+    pioneerWeightFraction w = 0 := by
+  unfold pioneerWeightFraction
+  rw [hzero, div_zero]
+
+
 /-- Front displacement produced by a pioneer of reproductive weight `w`, at rate constant `γ`. -/
 noncomputable def pioneerWeightDisplacement (gamma w : ℝ) : ℝ :=
   (1 / gamma) * Real.log (1 + w)

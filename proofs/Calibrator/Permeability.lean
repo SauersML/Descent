@@ -807,6 +807,15 @@ noncomputable def twoChannelMomentInnovationInformation
       firstNoise sharedNoise firstResponse secondResponse ^ 2 /
     twoChannelConditionalMomentNoise firstNoise secondNoise sharedNoise
 
+/-- With a vanishing denominator Mathlib returns `0`, which is a value this quantity can also
+take legitimately, so the branch is named rather than left to be inferred from the result. -/
+theorem twoChannelMomentInnovationInformation_at_zero_denominator_is_junk (firstNoise secondNoise sharedNoise firstResponse secondResponse : ℝ)
+    (hzero : twoChannelConditionalMomentNoise firstNoise secondNoise sharedNoise = 0) :
+    twoChannelMomentInnovationInformation firstNoise secondNoise sharedNoise firstResponse secondResponse = 0 := by
+  unfold twoChannelMomentInnovationInformation
+  rw [hzero, div_zero]
+
+
 /-- The base-plus-innovation theorem with the added probe's information exposed as a
 named method-design quantity. -/
 theorem twoChannelMomentInformation_eq_base_add_named_innovation

@@ -962,9 +962,36 @@ def prevalence (c : ConfusionMatrix) : ℝ := c.tp + c.fn
 
 def recallRate (c : ConfusionMatrix) : ℝ := c.tp / (c.tp + c.fn)
 
+/-- With a vanishing denominator Mathlib returns `0`, which is a value this quantity can also
+take legitimately, so the branch is named rather than left to be inferred from the result. -/
+theorem recallRate_at_zero_denominator_is_junk (c : ConfusionMatrix)
+    (hzero : (c.tp + c.fn) = 0) :
+    recallRate c = 0 := by
+  unfold recallRate
+  rw [hzero, div_zero]
+
+
 def fpr (c : ConfusionMatrix) : ℝ := c.fp / (c.fp + c.tn)
 
+/-- With a vanishing denominator Mathlib returns `0`, which is a value this quantity can also
+take legitimately, so the branch is named rather than left to be inferred from the result. -/
+theorem fpr_at_zero_denominator_is_junk (c : ConfusionMatrix)
+    (hzero : (c.fp + c.tn) = 0) :
+    fpr c = 0 := by
+  unfold fpr
+  rw [hzero, div_zero]
+
+
 def precision (c : ConfusionMatrix) : ℝ := c.tp / (c.tp + c.fp)
+
+/-- With a vanishing denominator Mathlib returns `0`, which is a value this quantity can also
+take legitimately, so the branch is named rather than left to be inferred from the result. -/
+theorem precision_at_zero_denominator_is_junk (c : ConfusionMatrix)
+    (hzero : (c.tp + c.fp) = 0) :
+    precision c = 0 := by
+  unfold precision
+  rw [hzero, div_zero]
+
 
 theorem one_sub_prevalence (c : ConfusionMatrix) :
     1 - prevalence c = c.fp + c.tn := by

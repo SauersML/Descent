@@ -78,6 +78,15 @@ noncomputable def transportedResponse (P : ι → ι → ℝ)
   transportMass P (markedMass population response) y /
     transportMass P population y
 
+/-- With a vanishing denominator Mathlib returns `0`, which is a value this quantity can also
+take legitimately, so the branch is named rather than left to be inferred from the result. -/
+theorem transportedResponse_at_zero_denominator_is_junk (P : ι → ι → ℝ) (population response : ι → ℝ) (_hpositive : ∀ y, 0 < transportMass P population y) (y : ι)
+    (hzero : transportMass P population y = 0) :
+    transportedResponse P population response _hpositive y = 0 := by
+  unfold transportedResponse
+  rw [hzero, div_zero]
+
+
 /-- Multiplying the reconstructed response by its transported population mass
 recovers the transported frozen-mark mass exactly. -/
 theorem transportedResponse_mul_population
@@ -197,6 +206,15 @@ theorem transportedResponse_compose
 noncomputable def reverseBridge (P : ι → ι → ℝ) (population : ι → ℝ)
     (_hpositive : ∀ y, 0 < transportMass P population y) (y x : ι) : ℝ :=
   population x * P x y / transportMass P population y
+
+/-- With a vanishing denominator Mathlib returns `0`, which is a value this quantity can also
+take legitimately, so the branch is named rather than left to be inferred from the result. -/
+theorem reverseBridge_at_zero_denominator_is_junk (P : ι → ι → ℝ) (population : ι → ℝ) (_hpositive : ∀ y, 0 < transportMass P population y) (y x : ι)
+    (hzero : transportMass P population y = 0) :
+    reverseBridge P population _hpositive y x = 0 := by
+  unfold reverseBridge
+  rw [hzero, div_zero]
+
 
 /-- Every row of the population-built reverse bridge has mass one. -/
 theorem reverseBridge_mass_preserving
@@ -584,6 +602,15 @@ def OUHorizon.zero (rate : ℝ) (hrate : 0 < rate) : OUHorizon where
 noncomputable def ouVariance (horizon : OUHorizon) : ℝ :=
   (1 - Real.exp (-(2 * horizon.rate * horizon.time))) / (2 * horizon.rate)
 
+/-- With a vanishing denominator Mathlib returns `0`, which is a value this quantity can also
+take legitimately, so the branch is named rather than left to be inferred from the result. -/
+theorem ouVariance_at_zero_denominator_is_junk (horizon : OUHorizon)
+    (hzero : (2 * horizon.rate) = 0) :
+    ouVariance horizon = 0 := by
+  unfold ouVariance
+  rw [hzero, div_zero]
+
+
 /-- A valid OU horizon accumulates nonnegative variance. -/
 theorem ouVariance_nonneg (horizon : OUHorizon) : 0 ≤ ouVariance horizon := by
   unfold ouVariance
@@ -623,11 +650,29 @@ noncomputable def probitSlope (a0 : ℝ) (horizon : OUHorizon) : ℝ :=
   a0 * Real.exp (-(horizon.rate * horizon.time)) /
     probitScaleFactor a0 horizon
 
+/-- With a vanishing denominator Mathlib returns `0`, which is a value this quantity can also
+take legitimately, so the branch is named rather than left to be inferred from the result. -/
+theorem probitSlope_at_zero_denominator_is_junk (a0 : ℝ) (horizon : OUHorizon)
+    (hzero : probitScaleFactor a0 horizon = 0) :
+    probitSlope a0 horizon = 0 := by
+  unfold probitSlope
+  rw [hzero, div_zero]
+
+
 /-- Intercept surface of the drifting probit index.
 
     Empirical status: UNTESTED. -/
 noncomputable def probitIntercept (a0 b0 : ℝ) (horizon : OUHorizon) : ℝ :=
   b0 / probitScaleFactor a0 horizon
+
+/-- With a vanishing denominator Mathlib returns `0`, which is a value this quantity can also
+take legitimately, so the branch is named rather than left to be inferred from the result. -/
+theorem probitIntercept_at_zero_denominator_is_junk (a0 b0 : ℝ) (horizon : OUHorizon)
+    (hzero : probitScaleFactor a0 horizon = 0) :
+    probitIntercept a0 b0 horizon = 0 := by
+  unfold probitIntercept
+  rw [hzero, div_zero]
+
 
 /-- **The intercept and slope surfaces are not independent.**
 

@@ -1154,6 +1154,16 @@ noncomputable def optimalSlopeFromVariance {k : ℕ} (arch : GeneticArchitecture
     ℝ) : ℝ :=
   (totalVariance arch c) / (arch.V_genic c)
 
+/-- With a vanishing genic variance the slope quotient divides by zero and Mathlib returns `0`,
+a slope value the model can also take legitimately, so the branch is named here rather than
+left to be inferred from the result. -/
+theorem optimalSlopeFromVariance_at_zero_genic_is_junk
+    {k : ℕ} (arch : GeneticArchitecture k) (c : Fin k → ℝ) (hzero : arch.V_genic c = 0) :
+    optimalSlopeFromVariance arch c = 0 := by
+  unfold optimalSlopeFromVariance
+  rw [hzero, div_zero]
+
+
 theorem directionalLD_nonzero_implies_slope_ne_one {k : ℕ} [Fintype (Fin k)]
     (arch : GeneticArchitecture k) (c : Fin k → ℝ)
     (h_genic_pos : arch.V_genic c ≠ 0)

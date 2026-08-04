@@ -54,6 +54,15 @@ variable {Band : Type*} [Fintype Band]
 noncomputable def optimalReadout (P : FiniteSpectralModel Band) (b : Band) : ℝ :=
   P.crossSpectrum b / P.featureSpectrum b
 
+/-- With a vanishing denominator Mathlib returns `0`, which is a value this quantity can also
+take legitimately, so the branch is named rather than left to be inferred from the result. -/
+theorem optimalReadout_at_zero_denominator_is_junk (P : FiniteSpectralModel Band) (b : Band)
+    (hzero : P.featureSpectrum b = 0) :
+    optimalReadout P b = 0 := by
+  unfold optimalReadout
+  rw [hzero, div_zero]
+
+
 /-- Population quadratic risk of a bandwise linear readout. -/
 -- The parentheses are load-bearing. `∑ b, x - y + z` binds the summation to `x` alone,
 -- so without them the second and third terms sit outside the binder and their `b` is a

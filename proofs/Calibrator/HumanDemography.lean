@@ -82,6 +82,15 @@ zero divergence.
 noncomputable def neutralDriftR2Ratio (V_A V_E fst : ℝ) : ℝ :=
   presentDayR2 V_A V_E fst / presentDayR2 V_A V_E 0
 
+/-- With a vanishing denominator Mathlib returns `0`, which is a value this quantity can also
+take legitimately, so the branch is named rather than left to be inferred from the result. -/
+theorem neutralDriftR2Ratio_at_zero_denominator_is_junk (V_A V_E fst : ℝ)
+    (hzero : presentDayR2 V_A V_E 0 = 0) :
+    neutralDriftR2Ratio V_A V_E fst = 0 := by
+  unfold neutralDriftR2Ratio
+  rw [hzero, div_zero]
+
+
 /-- Closed form for the neutral drift ratio. -/
 theorem neutralDriftR2Ratio_eq (V_A V_E fst : ℝ)
     (hVA : 0 < V_A) (hVE : 0 < V_E) (hfst1 : fst < 1) :

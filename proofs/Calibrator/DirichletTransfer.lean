@@ -431,6 +431,15 @@ cannot silently acquire crossover zero through real division by zero. -/
 noncomputable def stalenessCrossover (lam : ℝ) (_hlam : 0 < lam) : ℝ :=
   Real.log 2 / lam
 
+/-- With a vanishing denominator Mathlib returns `0`, which is a value this quantity can also
+take legitimately, so the branch is named rather than left to be inferred from the result. -/
+theorem stalenessCrossover_at_zero_denominator_is_junk (lam : ℝ) (_hlam : 0 < lam)
+    (hzero : lam = 0) :
+    stalenessCrossover lam _hlam = 0 := by
+  unfold stalenessCrossover
+  rw [hzero, div_zero]
+
+
 /-- At the crossover the stale design is exactly as good as not adapting. -/
 theorem stalePremium_zero_at_crossover (lam V : ℝ) (hlam : 0 < lam) :
     stalePremium lam (stalenessCrossover lam hlam) V = 0 := by

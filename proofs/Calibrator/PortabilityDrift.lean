@@ -2000,6 +2000,15 @@ noncomputable def calibrationSlopeFromSourceWeights {p q : ℕ}
     (m : CrossPopulationMetricModel p q) (P : Pop) : ℝ :=
   predictiveCovarianceFromSourceWeights m P / scoreVarianceFromSourceWeights m P
 
+/-- With a vanishing denominator Mathlib returns `0`, which is a value this quantity can also
+take legitimately, so the branch is named rather than left to be inferred from the result. -/
+theorem calibrationSlopeFromSourceWeights_at_zero_denominator_is_junk {p q : ℕ} (m : CrossPopulationMetricModel p q) (P : Pop)
+    (hzero : scoreVarianceFromSourceWeights m P = 0) :
+    calibrationSlopeFromSourceWeights m P = 0 := by
+  unfold calibrationSlopeFromSourceWeights
+  rw [hzero, div_zero]
+
+
 /-- The source predictive covariance is the transported score equation applied
 to the source score/outcome cross-covariance vector. -/
 theorem sourcePredictiveCovarianceFromSourceWeights_eq_score_on_source_crossCov {p q : ℕ}
@@ -2321,6 +2330,15 @@ noncomputable def explainedSignalVarianceFromSourceWeights {p q : ℕ}
     (m : CrossPopulationMetricModel p q) (P : Pop) : ℝ :=
   (predictiveCovarianceFromSourceWeights m P) ^ 2 / scoreVarianceFromSourceWeights m P
 
+/-- With a vanishing denominator Mathlib returns `0`, which is a value this quantity can also
+take legitimately, so the branch is named rather than left to be inferred from the result. -/
+theorem explainedSignalVarianceFromSourceWeights_at_zero_denominator_is_junk {p q : ℕ} (m : CrossPopulationMetricModel p q) (P : Pop)
+    (hzero : scoreVarianceFromSourceWeights m P = 0) :
+    explainedSignalVarianceFromSourceWeights m P = 0 := by
+  unfold explainedSignalVarianceFromSourceWeights
+  rw [hzero, div_zero]
+
+
 /-- **Exact `R²` in a population** under the full driver state, against the outcome
 variance that population is actually scored against. 
     Empirical status: **VALIDATED** (`proofs/validation/empirical/simcov/battery_transport.py`). One end-to-end
@@ -2341,6 +2359,15 @@ variance that population is actually scored against.
 noncomputable def r2FromSourceWeights {p q : ℕ}
     (m : CrossPopulationMetricModel p q) (P : Pop) : ℝ :=
   explainedSignalVarianceFromSourceWeights m P / effectiveOutcomeVariance m P
+
+/-- With a vanishing denominator Mathlib returns `0`, which is a value this quantity can also
+take legitimately, so the branch is named rather than left to be inferred from the result. -/
+theorem r2FromSourceWeights_at_zero_denominator_is_junk {p q : ℕ} (m : CrossPopulationMetricModel p q) (P : Pop)
+    (hzero : effectiveOutcomeVariance m P = 0) :
+    r2FromSourceWeights m P = 0 := by
+  unfold r2FromSourceWeights
+  rw [hzero, div_zero]
+
 
 /-- Exact unexplained source-side liability variance under the full explicit
 source-state score equation. This is the residual variance paired with the
@@ -2761,6 +2788,15 @@ noncomputable def bigM (g : GenerationalPopGenParameters) : ℝ :=
     Empirical status: UNTESTED. -/
 noncomputable def tauAt (g : GenerationalPopGenParameters) (t : ℕ) : ℝ :=
   (t : ℝ) / (2 * g.Ne)
+
+/-- With a vanishing denominator Mathlib returns `0`, which is a value this quantity can also
+take legitimately, so the branch is named rather than left to be inferred from the result. -/
+theorem tauAt_at_zero_denominator_is_junk (g : GenerationalPopGenParameters) (t : ℕ)
+    (hzero : (2 * g.Ne) = 0) :
+    tauAt g t = 0 := by
+  unfold tauAt
+  rw [hzero, div_zero]
+
 
 /-- Per-generation heterozygosity retention factor under drift + mutation. -/
 noncomputable def hetDecayFactor (g : GenerationalPopGenParameters) : ℝ :=
@@ -3595,6 +3631,15 @@ capped at `1.557`.
 noncomputable def hetRatioBetweenBranches (NeA NeB mu H₀ : ℝ) (t : ℕ) : ℝ :=
   hetTrajectory NeB mu H₀ t / hetTrajectory NeA mu H₀ t
 
+/-- With a vanishing denominator Mathlib returns `0`, which is a value this quantity can also
+take legitimately, so the branch is named rather than left to be inferred from the result. -/
+theorem hetRatioBetweenBranches_at_zero_denominator_is_junk (NeA NeB mu H₀ : ℝ) (t : ℕ)
+    (hzero : hetTrajectory NeA mu H₀ t = 0) :
+    hetRatioBetweenBranches NeA NeB mu H₀ t = 0 := by
+  unfold hetRatioBetweenBranches
+  rw [hzero, div_zero]
+
+
 /-- Equal effective sizes give a ratio of `1`, so the whole signal in this
 quantity is the asymmetry in `Nₑ` -- the variable the falsified form omits. -/
 theorem hetRatioBetweenBranches_self (Ne mu H₀ : ℝ) (t : ℕ)
@@ -3640,6 +3685,15 @@ though the eventual formula was present in the same file. -/
 /-- Standard normal density, `φ(x) = exp(-x²/2)/√(2π)`. -/
 noncomputable def standardNormalPdf (x : ℝ) : ℝ :=
   Real.exp (-x ^ 2 / 2) / Real.sqrt (2 * Real.pi)
+
+/-- With a vanishing denominator Mathlib returns `0`, which is a value this quantity can also
+take legitimately, so the branch is named rather than left to be inferred from the result. -/
+theorem standardNormalPdf_at_zero_denominator_is_junk (x : ℝ)
+    (hzero : Real.sqrt (2 * Real.pi) = 0) :
+    standardNormalPdf x = 0 := by
+  unfold standardNormalPdf
+  rw [hzero, div_zero]
+
 
 /-- **The mode height.** The density at the mean is the normalising constant, which pins the
 constant a body with the wrong normalisation would miss. -/
@@ -5085,6 +5139,15 @@ theorem covarianceRetentionFactorFromFst_at_reference_point :
 noncomputable def alleleFreqCorrelation (fst varAncestral meanHetAncestral : ℝ) : ℝ :=
   varAncestral / (varAncestral + fst * meanHetAncestral)
 
+/-- With a vanishing denominator Mathlib returns `0`, which is a value this quantity can also
+take legitimately, so the branch is named rather than left to be inferred from the result. -/
+theorem alleleFreqCorrelation_at_zero_denominator_is_junk (fst varAncestral meanHetAncestral : ℝ)
+    (hzero : (varAncestral + fst * meanHetAncestral) = 0) :
+    alleleFreqCorrelation fst varAncestral meanHetAncestral = 0 := by
+  unfold alleleFreqCorrelation
+  rw [hzero, div_zero]
+
+
 /-- **alleleFreqCorrelation pinned at a reference point.** No theorem in the corpus evaluated
 this definition, so every body agreeing with it in sign and monotonicity was indistinguishable
 from it. At all arguments equal to `1 / 2` it is `2 / 3`, which
@@ -5257,6 +5320,7 @@ theorem mutationDrift_signal_lt_puredrift (V_A fst_drift shared_ld : ℝ)
 noncomputable def presentDayR2MutationDrift (V_A V_E fst_drift shared_ld : ℝ) : ℝ :=
   let v := presentDayPGSVarianceMutationDrift V_A fst_drift shared_ld
   v / (v + V_E)
+
 
 /-- **Mutation-drift R² is below drift-only R².**
     When shared LD is imperfect, R² under mutation-drift is strictly below

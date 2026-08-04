@@ -1720,6 +1720,15 @@ strength squared `q`. -/
 noncomputable def ogpOverlapProfile (q x : ℝ) : ℝ :=
   x * (1 - q * x) / (1 - q * x * (1 - x))
 
+/-- With a vanishing denominator Mathlib returns `0`, which is a value this quantity can also
+take legitimately, so the branch is named rather than left to be inferred from the result. -/
+theorem ogpOverlapProfile_at_zero_denominator_is_junk (q x : ℝ)
+    (hzero : (1 - q * x * (1 - x)) = 0) :
+    ogpOverlapProfile q x = 0 := by
+  unfold ogpOverlapProfile
+  rw [hzero, div_zero]
+
+
 /-- **At zero overlap the profile is `1 - q`.** The best distant candidate keeps
 the fraction of the loss that the coupling cannot explain away. -/
 theorem ogpOverlapProfile_at_zero_overlap (q : ℝ) :
@@ -2924,6 +2933,15 @@ Empirical status: UNTESTED. -/
 noncomputable def ldPruningDetectionDeficit (decay kappa : ℝ) : ℝ :=
   2 * decay * Real.sin (Real.pi * kappa) / (Real.pi * (1 + decay ^ 2))
 
+/-- With a vanishing denominator Mathlib returns `0`, which is a value this quantity can also
+take legitimately, so the branch is named rather than left to be inferred from the result. -/
+theorem ldPruningDetectionDeficit_at_zero_denominator_is_junk (decay kappa : ℝ)
+    (hzero : (Real.pi * (1 + decay ^ 2)) = 0) :
+    ldPruningDetectionDeficit decay kappa = 0 := by
+  unfold ldPruningDetectionDeficit
+  rw [hzero, div_zero]
+
+
 theorem ldBandDetectionShare_eq_sub_deficit (decay kappa : ℝ) :
     ldBandDetectionShare decay kappa =
       kappa - ldPruningDetectionDeficit decay kappa := rfl
@@ -3103,6 +3121,15 @@ theorem LDPanelRetention.nonempty : Nonempty LDPanelRetention :=
     Empirical status: UNTESTED. -/
 noncomputable def ldPanelRetentionFraction (panel : LDPanelRetention) : ℝ :=
   (panel.retainedMarkers : ℝ) / (panel.totalMarkers : ℝ)
+
+/-- With a vanishing denominator Mathlib returns `0`, which is a value this quantity can also
+take legitimately, so the branch is named rather than left to be inferred from the result. -/
+theorem ldPanelRetentionFraction_at_zero_denominator_is_junk (panel : LDPanelRetention)
+    (hzero : (panel.totalMarkers : ℝ) = 0) :
+    ldPanelRetentionFraction panel = 0 := by
+  unfold ldPanelRetentionFraction
+  rw [hzero, div_zero]
+
 
 theorem ldPanelRetentionFraction_mem (panel : LDPanelRetention)
     (h0 : 0 < panel.retainedMarkers) (h1 : panel.retainedMarkers < panel.totalMarkers) :

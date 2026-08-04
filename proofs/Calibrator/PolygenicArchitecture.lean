@@ -332,11 +332,29 @@ noncomputable def relativePortabilityLoss {q : ℕ}
     (model : SNPArchitecturePortabilityModel q) : ℝ :=
   model.lostEffectMass / model.sourceEffectMass
 
+/-- With a vanishing denominator Mathlib returns `0`, which is a value this quantity can also
+take legitimately, so the branch is named rather than left to be inferred from the result. -/
+theorem relativePortabilityLoss_at_zero_denominator_is_junk {q : ℕ} (model : SNPArchitecturePortabilityModel q)
+    (hzero : model.sourceEffectMass = 0) :
+    relativePortabilityLoss model = 0 := by
+  unfold relativePortabilityLoss
+  rw [hzero, div_zero]
+
+
 /-- Retained portability score: retained target causal signal mass as a
 fraction of the source causal signal mass. -/
 noncomputable def portabilityScore {q : ℕ}
     (model : SNPArchitecturePortabilityModel q) : ℝ :=
   model.targetRetainedEffectMass / model.sourceEffectMass
+
+/-- With a vanishing denominator Mathlib returns `0`, which is a value this quantity can also
+take legitimately, so the branch is named rather than left to be inferred from the result. -/
+theorem portabilityScore_at_zero_denominator_is_junk {q : ℕ} (model : SNPArchitecturePortabilityModel q)
+    (hzero : model.sourceEffectMass = 0) :
+    portabilityScore model = 0 := by
+  unfold portabilityScore
+  rw [hzero, div_zero]
+
 
 theorem sourceEffectMass_nonneg {q : ℕ}
     (model : SNPArchitecturePortabilityModel q) :
@@ -1112,6 +1130,15 @@ noncomputable def weightedRetentionUpperBound {q : ℕ}
     (retentionUpper : Fin q → ℝ) : ℝ :=
   (∑ j, retentionUpper j * model.sourceSquaredEffect j) /
     model.sourceEffectMass
+
+/-- With a vanishing denominator Mathlib returns `0`, which is a value this quantity can also
+take legitimately, so the branch is named rather than left to be inferred from the result. -/
+theorem weightedRetentionUpperBound_at_zero_denominator_is_junk {q : ℕ} (model : SNPArchitecturePortabilityModel q) (retentionUpper : Fin q → ℝ)
+    (hzero : model.sourceEffectMass = 0) :
+    weightedRetentionUpperBound model retentionUpper = 0 := by
+  unfold weightedRetentionUpperBound
+  rw [hzero, div_zero]
+
 
 /-- Any locuswise retention upper envelope induces a global portability upper
 bound after weighting by source causal effect mass. -/

@@ -66,6 +66,15 @@ noncomputable def mechanisticPortabilityRatio {p q : ℕ}
     (m : CrossPopulationMetricModel p q) : ℝ :=
   r2FromSourceWeights m Pop.target / r2FromSourceWeights m Pop.source
 
+/-- With a vanishing denominator Mathlib returns `0`, which is a value this quantity can also
+take legitimately, so the branch is named rather than left to be inferred from the result. -/
+theorem mechanisticPortabilityRatio_at_zero_denominator_is_junk {p q : ℕ} (m : CrossPopulationMetricModel p q)
+    (hzero : r2FromSourceWeights m Pop.source = 0) :
+    mechanisticPortabilityRatio m = 0 := by
+  unfold mechanisticPortabilityRatio
+  rw [hzero, div_zero]
+
+
 /-- Total additive source squared-effect mass in a direct-causal witness.
 
     Empirical status: UNTESTED. -/
