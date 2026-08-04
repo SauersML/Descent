@@ -2944,7 +2944,8 @@ by zero and are junk-zero, so the net utility is exactly `0` -- the break-even v
 screening programme is reported as precisely neutral rather than as undefined, and neutral is a
 defensible-looking answer that no downstream check will question. Consumers must exclude the
 argument that makes the guard vanish. -/
-theorem screeningUtilityFromCounts_empty_cohort_is_junk (model : ScreeningDecisionModel) (tp fp : ℝ) :
+theorem screeningUtilityFromCounts_empty_cohort_is_junk
+    (model : ScreeningDecisionModel) (tp fp : ℝ) :
     screeningUtilityFromCounts model tp fp 0 = 0 := by
   unfold screeningUtilityFromCounts
   simp

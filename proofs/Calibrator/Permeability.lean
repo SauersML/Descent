@@ -525,8 +525,10 @@ determines its own moment exactly, so conditioning on it should remove the whole
 component. The divisor is zero, the regression coefficient is junk-zero, and the second response
 is returned UNCHANGED -- the value for two independent channels. Consumers must exclude the
 argument that makes the guard vanish. -/
-theorem twoChannelConditionalMomentResponse_noiseless_first_is_junk (sharedNoise firstResponse secondResponse : ℝ) :
-    twoChannelConditionalMomentResponse 0 sharedNoise firstResponse secondResponse = secondResponse := by
+theorem twoChannelConditionalMomentResponse_noiseless_first_is_junk
+    (sharedNoise firstResponse secondResponse : ℝ) :
+    twoChannelConditionalMomentResponse 0 sharedNoise firstResponse secondResponse =
+      secondResponse := by
   unfold twoChannelConditionalMomentResponse
   simp
 
