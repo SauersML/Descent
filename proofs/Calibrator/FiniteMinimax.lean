@@ -17,6 +17,11 @@ case. The reverse is the finite minimax theorem, proved here by separation: the 
 risk profiles form a convex subset of `ℝ^Θ` disjoint from the open convex half-space below
 the minimax level, so `geometric_hahn_banach_open` yields a functional whose coordinate
 weights are nonnegative, and normalising them produces a least-favourable prior.
+
+The exact two-point lower bound is also proved here. If two parameters induce the same
+observation law and their losses obey a pointwise separation inequality, every randomized
+rule—and hence the minimax value—pays at least half that separation. This is the common
+decision-theoretic endpoint of the corpus's exact biological nonidentifiability witnesses.
 -/
 
 namespace Calibrator.FiniteMinimax
@@ -66,6 +71,61 @@ noncomputable def risk
   ∑ x, (E.observation θ).probability x *
     ∑ a, (δ x).probability a * E.loss θ a
 
+/-- **Exact observational-equivalence lower bound for one rule.**  If two parameters emit the
+same observation law and every action incurs combined loss at least `separation`, then the sum
+of the two risks is at least `separation`.  Randomization cannot evade the pointwise loss
+inequality because both action and observation probabilities have total mass one. -/
+theorem separation_le_risk_add_of_observation_eq
+    (θ₁ θ₂ : Fin (parameterCount + 1)) (separation : ℝ)
+    (hobs : E.observation θ₁ = E.observation θ₂)
+    (hloss : ∀ action : Fin (actionCount + 1),
+      separation ≤ E.loss θ₁ action + E.loss θ₂ action)
+    (δ : Rule actionCount observationCount) :
+    separation ≤ E.risk δ θ₁ + E.risk δ θ₂ := by
+  have hinner : ∀ observation : Fin (observationCount + 1),
+      separation ≤
+        (∑ action, (δ observation).probability action * E.loss θ₁ action) +
+          ∑ action, (δ observation).probability action * E.loss θ₂ action := by
+    intro observation
+    have hmass : ∑ action, (δ observation).probability action = 1 :=
+      (finitePrior_probability_mem (δ observation)).2
+    calc
+      separation = ∑ action, (δ observation).probability action * separation := by
+        rw [← Finset.sum_mul, hmass, one_mul]
+      _ ≤ ∑ action, (δ observation).probability action *
+          (E.loss θ₁ action + E.loss θ₂ action) :=
+        Finset.sum_le_sum fun action _ ↦
+          mul_le_mul_of_nonneg_left (hloss action)
+            (FinitePrior.probability_nonneg (δ observation) action)
+      _ = (∑ action, (δ observation).probability action * E.loss θ₁ action) +
+          ∑ action, (δ observation).probability action * E.loss θ₂ action := by
+        rw [← Finset.sum_add_distrib]
+        apply Finset.sum_congr rfl
+        intro action _
+        ring
+  have hmassObservation :
+      ∑ observation, (E.observation θ₂).probability observation = 1 :=
+    (finitePrior_probability_mem (E.observation θ₂)).2
+  have hriskSum : E.risk δ θ₁ + E.risk δ θ₂ =
+      ∑ observation, (E.observation θ₂).probability observation *
+        ((∑ action, (δ observation).probability action * E.loss θ₁ action) +
+          ∑ action, (δ observation).probability action * E.loss θ₂ action) := by
+    unfold risk
+    rw [hobs, ← Finset.sum_add_distrib]
+    apply Finset.sum_congr rfl
+    intro observation _
+    ring
+  rw [hriskSum]
+  calc
+    separation = ∑ observation, (E.observation θ₂).probability observation * separation := by
+      rw [← Finset.sum_mul, hmassObservation, one_mul]
+    _ ≤ ∑ observation, (E.observation θ₂).probability observation *
+        ((∑ action, (δ observation).probability action * E.loss θ₁ action) +
+          ∑ action, (δ observation).probability action * E.loss θ₂ action) :=
+      Finset.sum_le_sum fun observation _ ↦
+        mul_le_mul_of_nonneg_left (hinner observation)
+          (FinitePrior.probability_nonneg (E.observation θ₂) observation)
+
 /-- Worst-case risk of a randomized rule. -/
 noncomputable def worstRisk (δ : Rule actionCount observationCount) : ℝ :=
   sSup (Set.range (E.risk δ))
@@ -73,6 +133,33 @@ noncomputable def worstRisk (δ : Rule actionCount observationCount) : ℝ :=
 /-- Primal minimax value. -/
 noncomputable def minimaxRisk : ℝ :=
   sInf (Set.range E.worstRisk)
+
+/-- Every rule pays at least half the separation of two observationally equivalent parameters. -/
+theorem half_separation_le_worstRisk_of_observation_eq
+    (θ₁ θ₂ : Fin (parameterCount + 1)) (separation : ℝ)
+    (hobs : E.observation θ₁ = E.observation θ₂)
+    (hloss : ∀ action : Fin (actionCount + 1),
+      separation ≤ E.loss θ₁ action + E.loss θ₂ action)
+    (δ : Rule actionCount observationCount) :
+    separation / 2 ≤ E.worstRisk δ := by
+  have hrisk := E.separation_le_risk_add_of_observation_eq θ₁ θ₂ separation hobs hloss δ
+  have hbdd : BddAbove (Set.range (E.risk δ)) := (Set.finite_range _).bddAbove
+  have h₁ : E.risk δ θ₁ ≤ E.worstRisk δ := le_csSup hbdd ⟨θ₁, rfl⟩
+  have h₂ : E.risk δ θ₂ ≤ E.worstRisk δ := le_csSup hbdd ⟨θ₂, rfl⟩
+  linarith
+
+/-- **Finite-sample minimax floor from exact nonidentifiability.**  Two observationally
+equivalent parameters separated by pointwise loss `separation` force minimax risk at least
+`separation / 2`, independently of sample size or the randomized decision rule. -/
+theorem half_separation_le_minimaxRisk_of_observation_eq
+    (θ₁ θ₂ : Fin (parameterCount + 1)) (separation : ℝ)
+    (hobs : E.observation θ₁ = E.observation θ₂)
+    (hloss : ∀ action : Fin (actionCount + 1),
+      separation ≤ E.loss θ₁ action + E.loss θ₂ action) :
+    separation / 2 ≤ E.minimaxRisk := by
+  apply le_csInf (Set.range_nonempty E.worstRisk)
+  rintro worstValue ⟨δ, rfl⟩
+  exact E.half_separation_le_worstRisk_of_observation_eq θ₁ θ₂ separation hobs hloss δ
 
 /-- Bayes risk of a rule under a finite prior. -/
 noncomputable def bayesRisk
