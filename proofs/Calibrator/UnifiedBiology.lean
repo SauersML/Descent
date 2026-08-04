@@ -15,6 +15,7 @@ import Calibrator.MultipleMergerBlindness
 import Calibrator.PencilEnvironment
 import Calibrator.FunctionalDescent
 import Calibrator.SpectralUniversalityFailure
+import Calibrator.SpectrumIdentifiability
 
 namespace Calibrator
 
@@ -151,6 +152,29 @@ theorem fixedEpochDemography_halving_budget :
 theorem fiveEpochDemography_sampleRateExponent :
     fixedEpochSampleRateExponent 5 = 1 / 14 :=
   fixedEpochSampleRateExponent_five
+
+/-- **Kingman SFS identifiability boundary.**  The complete quadratic rate ladder has a
+summable reciprocal, while every finite observation map has a nonzero direction on a sieve
+with one additional coefficient.  The first fact is the Müntz obstruction's spectral input;
+the second says finite-sample analyticity alone cannot restore identification. -/
+theorem kingmanSpectrum_identifiabilityBoundary :
+    Summable (fun k : ℕ ↦
+      1 / SpectrumIdentifiability.coalescentRate (k + 2)) ∧
+      ∀ n : ℕ, ∀ observation : (Fin (n + 1) → ℝ) →ₗ[ℝ] (Fin n → ℝ),
+        ∃ direction : Fin (n + 1) → ℝ,
+          direction ≠ 0 ∧ observation direction = 0 :=
+  ⟨SpectrumIdentifiability.summable_one_div_coalescentRate,
+    fun _ observation ↦ SpectrumIdentifiability.exists_invisible_perturbation observation⟩
+
+/-- At the stationary Cauchy root, the per-dimension inverse-conditioning base is the exact
+ratio `(1 + θ²) / (1 - θ²)`. -/
+theorem demographicSieveConditioning_exactBase
+    (θ : ℝ) (hθ0 : 0 < θ) (hθ1 : θ < 1)
+    (hstationary : SpectrumIdentifiability.CauchyConditioningStationary θ) :
+    Real.exp (SpectrumIdentifiability.cauchyConditioningProfile θ / 2) =
+      (1 + θ ^ 2) / (1 - θ ^ 2) :=
+  SpectrumIdentifiability.exp_half_cauchyConditioningProfile_at_stationary
+    θ hθ0 hθ1 hstationary
 
 /-! ## Multiple-merger genealogy: pairwise blindness -/
 
@@ -878,7 +902,7 @@ theorem geometry_and_effect_recovery_gates
 
 /-! ## The unified obstruction bundle -/
 
-/-- Twenty-two logically distinct failures and boundaries that a biological transport theory must
+/-- Twenty-three logically distinct failures and boundaries that a biological transport theory must
 not collapse into one scalar "portability" parameter.  The final six fields make continuum
 calibration and finite correction part of the core theorem rather than adjacent examples. -/
 structure UnifiedBiologyObstructions : Prop where
@@ -939,6 +963,14 @@ structure UnifiedBiologyObstructions : Prop where
   `sampleSize⁻¹ᐟ¹⁴` history-reconstruction exponent. -/
   fiveEpochDemographyIsSeverelyIllConditioned :
     fixedEpochSampleRateExponent 5 = 1 / 14
+  /-- Kingman's complete rate ladder has the convergent reciprocal sum behind the all-sample
+  Müntz obstruction, and every finite spectrum has an explicit rank null direction. -/
+  kingmanSpectrumHasIdentifiabilityBoundary :
+    Summable (fun k : ℕ ↦
+      1 / SpectrumIdentifiability.coalescentRate (k + 2)) ∧
+      ∀ n : ℕ, ∀ observation : (Fin (n + 1) → ℝ) →ₗ[ℝ] (Fin n → ℝ),
+        ∃ direction : Fin (n + 1) → ℝ,
+          direction ≠ 0 ∧ observation direction = 0
   /-- Normalized pairwise genealogy is speed-blind, while the three-lineage merger rate exactly
   recovers the speed-bias parameter. -/
   speedConditionedGenealogyNeedsThreeLineages :
@@ -1032,6 +1064,8 @@ theorem unifiedBiology_obstructions : UnifiedBiologyObstructions := by
         ancestryMixture_pure_gapped_balanced_ungapped
       fiveEpochDemographyIsSeverelyIllConditioned :=
         fiveEpochDemography_sampleRateExponent
+      kingmanSpectrumHasIdentifiabilityBoundary :=
+        kingmanSpectrum_identifiabilityBoundary
       speedConditionedGenealogyNeedsThreeLineages :=
         speedConditionedGenealogy_pairBlind_tripleRecovers
       crossStateDoesNotDescend := not_descends_contextMatchQuality_along_targetState
