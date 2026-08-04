@@ -762,7 +762,7 @@ theorem geometry_and_effect_recovery_gates
 
 /-! ## The unified obstruction bundle -/
 
-/-- Seventeen logically distinct failures and boundaries that a biological transport theory must
+/-- Eighteen logically distinct failures and boundaries that a biological transport theory must
 not collapse into one scalar "portability" parameter.  The final six fields make continuum
 calibration and finite correction part of the core theorem rather than adjacent examples. -/
 structure UnifiedBiologyObstructions : Prop where
@@ -799,6 +799,13 @@ structure UnifiedBiologyObstructions : Prop where
           (blockEntryCubeMean (rotatedCovarianceBlock (3 / 2))) -
         lowSNRThirdCoefficient aspect 2 2 m1 m2 m3
           (blockEntryCubeMean (localizedCovarianceBlock (3 / 2))) = 11 / 24
+  /-- Coding-symmetric sparse architectures still lose LD orientation: the third-order term
+  vanishes, but the exactly isospectral blocks differ in their fourth-cumulant invariant. -/
+  symmetricSparseLDLosesOrientation :
+    Isospectral2 (localizedCovarianceBlock (3 / 2))
+        (rotatedCovarianceBlock (3 / 2)) ∧
+      blockEntryFourthMean (localizedCovarianceBlock (3 / 2)) ≠
+        blockEntryFourthMean (rotatedCovarianceBlock (3 / 2))
   /-- A cross-state criterion is not a function of the target context: it fails to descend along
   the label the target-only annotation descends along. -/
   crossStateDoesNotDescend :
@@ -878,6 +885,9 @@ theorem unifiedBiology_obstructions : UnifiedBiologyObstructions := by
           norm_num at hzero⟩
       skewedLDChangesLowSNRCoefficient :=
         sparsePrior_lowSNRThirdCoefficient_rotated_sub_localized
+      symmetricSparseLDLosesOrientation :=
+        ⟨localizedCovarianceBlock_isospectral_rotatedCovarianceBlock (3 / 2),
+          midpoint_blockEntryFourthMean_ne⟩
       crossStateDoesNotDescend := not_descends_contextMatchQuality_along_targetState
       marginalDescentDoesNotCompose := admissible_interaction_join_obstruction
       crudeReportingLosesDescent := admissible_confounding_meet_obstruction

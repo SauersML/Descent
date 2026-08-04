@@ -373,6 +373,18 @@ theorem midpoint_blockEntryFourthMean_separation :
   rw [blockEntryFourthMean_localized_sub_rotated]
   norm_num
 
+/-- The midpoint blocks have unequal fourth-order orientation invariants. -/
+theorem midpoint_blockEntryFourthMean_ne :
+    blockEntryFourthMean (localizedCovarianceBlock (3 / 2)) ≠
+      blockEntryFourthMean (rotatedCovarianceBlock (3 / 2)) := by
+  intro heq
+  have hzero :
+      blockEntryFourthMean (localizedCovarianceBlock (3 / 2)) -
+          blockEntryFourthMean (rotatedCovarianceBlock (3 / 2)) = 0 := by
+    rw [heq, sub_self]
+  rw [midpoint_blockEntryFourthMean_separation] at hzero
+  norm_num at hzero
+
 /-- There is no characteristic-polynomial formula for the fourth-order invariant, even on the
 same well-conditioned positive covariance blocks used by the third-order witness. -/
 theorem no_isospectral_formula_for_blockEntryFourthMean :
