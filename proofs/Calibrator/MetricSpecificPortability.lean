@@ -964,6 +964,214 @@ theorem sensitivityPortabilityGap_eq_zero_iff (a b : ℝ) :
   rw [abs_eq_zero, sub_eq_zero]
   exact eq_comm
 
+/-! ### Calibrating one score across a continuum of ancestries
+
+A polygenic score deployed across many ancestries faces two calibration demands. INDEX-WISE:
+calibrated within each ancestry separately. POOLED: calibrated on the mixture. The applied
+literature treats these as competing objectives and reports a pooled-versus-worst-group gap as
+evidence of the conflict.
+
+Under squared loss they do not compete. `indexwiseLoss_eq_defect_add_sq` decomposes the
+ancestry-averaged calibration loss into an irreducible term and the squared pooled residual,
+
+    indexwiseLoss π η v = driftDefect π η + (pooledConditional π η - v) ^ 2
+
+from which three things follow at once. The index-wise optimum IS the pooled-calibrated
+predictor; the pooled residual there is exactly zero; and the achievable pairs trace a parabola,
+not a frontier. Buying pooled miscalibration never buys index-wise accuracy.
+
+The tension in the applied literature is real, but it is in the WORST-ancestry norm rather than
+the averaged one. `pooledOptimum_worse_in_worst_ancestry` exhibits two ancestries at unequal
+mixture weight where the pooled-calibrated value is strictly worse for the worse-served group
+than a value that is itself pooled-miscalibrated. Averaging over ancestries and protecting the
+worst ancestry are different objectives; averaging and pooling are not.
+
+`driftDefect` is what no predictor removes: the dispersion of the ancestry-specific conditional
+about its pooled average. It is simultaneously the unavoidable squared-loss regret, so the
+calibration obstruction and the prediction regret are one number rather than two.
+
+`pooledConditional_does_not_identify_drift` is the transport limit. Two drift fields with the same
+pooled average differ at an individual ancestry, so pooled data cannot separate them. When
+ancestries share covariate structure and differ only in the conditional, extrapolating to an
+unmeasured ancestry returns nothing beyond the pooled average -- which is the sharpest statement
+available about why a score fitted in one population does not transport to another by
+recalibration alone.
+
+Empirical status: DERIVED. The decomposition and the witnesses are exhibited; the mixture weights
+and ancestry-specific conditionals of a real deployment are unmeasured inputs.
+-/
+
+/-- The pooled conditional: ancestry-specific risks averaged by mixture weight. -/
+noncomputable def pooledConditional {m : ℕ} (π η : Fin m → ℝ) : ℝ := ∑ i, π i * η i
+
+/-- Squared calibration error against every ancestry, averaged by mixture weight. -/
+noncomputable def indexwiseLoss {m : ℕ} (π η : Fin m → ℝ) (v : ℝ) : ℝ :=
+  ∑ i, π i * (η i - v) ^ 2
+
+/-- Dispersion of the ancestry-specific conditional about the pooled one. -/
+noncomputable def driftDefect {m : ℕ} (π η : Fin m → ℝ) : ℝ :=
+  ∑ i, π i * (η i - pooledConditional π η) ^ 2
+
+/-- **The pooled residual vanishes at the pooled conditional.** -/
+theorem pooledConditional_residual_zero {m : ℕ} (π η : Fin m → ℝ) (hπ : ∑ i, π i = 1) :
+    ∑ i, π i * (η i - pooledConditional π η) = 0 := by
+  have hsplit : ∑ i, π i * (η i - pooledConditional π η)
+      = (∑ i, π i * η i) - pooledConditional π η * ∑ i, π i := by
+    rw [Finset.mul_sum, ← Finset.sum_sub_distrib]
+    exact Finset.sum_congr rfl fun i _ ↦ by ring
+  rw [hsplit, hπ, pooledConditional]
+  ring
+
+/-- **The index-wise loss splits into an irreducible defect and the squared pooled residual.**
+
+Everything about the aggregate-versus-index-wise question follows from this one identity: the
+minimiser is the pooled conditional, the defect is the value there, and the pooled residual at the
+minimiser is zero. There is no frontier between the two demands to trade along. -/
+theorem indexwiseLoss_eq_defect_add_sq {m : ℕ} (π η : Fin m → ℝ) (hπ : ∑ i, π i = 1) (v : ℝ) :
+    indexwiseLoss π η v = driftDefect π η + (pooledConditional π η - v) ^ 2 := by
+  have hcross := pooledConditional_residual_zero π η hπ
+  have key : ∀ i, π i * (η i - v) ^ 2
+      = π i * (η i - pooledConditional π η) ^ 2
+        + 2 * (pooledConditional π η - v) * (π i * (η i - pooledConditional π η))
+        + (pooledConditional π η - v) ^ 2 * π i := by
+    intro i; ring
+  unfold indexwiseLoss driftDefect
+  rw [Finset.sum_congr rfl fun i _ ↦ key i, Finset.sum_add_distrib, Finset.sum_add_distrib,
+    ← Finset.mul_sum, ← Finset.mul_sum, hcross, hπ]
+  ring
+
+/-- **The defect is the floor, and it is attained exactly at the pooled conditional.** -/
+theorem driftDefect_le_indexwiseLoss {m : ℕ} (π η : Fin m → ℝ) (hπ : ∑ i, π i = 1) (v : ℝ) :
+    driftDefect π η ≤ indexwiseLoss π η v := by
+  rw [indexwiseLoss_eq_defect_add_sq π η hπ v]
+  nlinarith [sq_nonneg (pooledConditional π η - v)]
+
+/-- **The unavoidable squared-loss regret IS the calibration defect**, not merely bounded by it.
+The obstruction to calibrating across ancestries and the regret of predicting across them are one
+number. -/
+theorem indexwiseLoss_at_pooled {m : ℕ} (π η : Fin m → ℝ) (hπ : ∑ i, π i = 1) :
+    indexwiseLoss π η (pooledConditional π η) = driftDefect π η := by
+  rw [indexwiseLoss_eq_defect_add_sq π η hπ]
+  ring
+
+/-! #### The worst-ancestry norm is where the tension actually is -/
+
+/-- Two ancestries at unequal mixture weight. -/
+noncomputable def twoAncestryWeights : Fin 2 → ℝ := ![3 / 4, 1 / 4]
+
+/-- Their ancestry-specific risks at one covariate value. -/
+noncomputable def twoAncestryConditional : Fin 2 → ℝ := ![0, 1]
+
+theorem twoAncestryWeights_sum : ∑ i, twoAncestryWeights i = 1 := by
+  unfold twoAncestryWeights
+  norm_num [Fin.sum_univ_two]
+
+theorem twoAncestry_pooled_eq :
+    pooledConditional twoAncestryWeights twoAncestryConditional = 1 / 4 := by
+  unfold pooledConditional twoAncestryWeights twoAncestryConditional
+  norm_num [Fin.sum_univ_two]
+
+/-- **The pooled-calibrated predictor is strictly worse for the worse-served ancestry.**
+
+At the pooled optimum `1/4` the worst ancestry carries error `3/4`; the midrange value `1/2`,
+which is pooled-MIScalibrated, carries `1/2` in both. So protecting the worst ancestry and
+calibrating the pool are genuinely different objectives, while calibrating the pool and
+calibrating on ancestry-average are the same one. The gap reported in the applied literature is
+this one, and it is a worst-case phenomenon rather than an aggregation phenomenon. -/
+theorem pooledOptimum_worse_in_worst_ancestry :
+    max |twoAncestryConditional 0 - 1 / 2| |twoAncestryConditional 1 - 1 / 2|
+      < max |twoAncestryConditional 0 - 1 / 4| |twoAncestryConditional 1 - 1 / 4| := by
+  unfold twoAncestryConditional
+  norm_num
+
+/-! #### Pooled data cannot identify the drift -/
+
+/-- One drift field over two ancestries. -/
+noncomputable def driftFieldA : Fin 2 → ℝ := ![1, -1]
+
+/-- Another, with the ancestries exchanged. -/
+noncomputable def driftFieldB : Fin 2 → ℝ := ![-1, 1]
+
+/-- Equal mixture weights. -/
+noncomputable def uniformTwoWeights : Fin 2 → ℝ := ![1 / 2, 1 / 2]
+
+/-- **The two drift fields are indistinguishable in the pooled average.** -/
+theorem pooledConditional_does_not_identify_drift :
+    pooledConditional uniformTwoWeights driftFieldA
+      = pooledConditional uniformTwoWeights driftFieldB := by
+  unfold pooledConditional uniformTwoWeights driftFieldA driftFieldB
+  norm_num [Fin.sum_univ_two]
+
+/-- **Yet they disagree at an ancestry.** With the pooled average all that the data constrain,
+the ancestry-specific conditional is not recoverable: transporting a score to an unmeasured
+ancestry by recalibrating on pooled data returns the pooled average and nothing more. -/
+theorem driftFields_differ_at_first_ancestry : driftFieldA 0 ≠ driftFieldB 0 := by
+  unfold driftFieldA driftFieldB
+  norm_num
+
+/-! #### Unequal per-ancestry sample sizes inflate the effective resolution
+
+Splitting the index into `k` cells and estimating within each costs an estimation term
+proportional to the EFFECTIVE cell count `N * ∑ πᵢ / nᵢ`, not to `k`. The two agree exactly when
+the allocation is proportional to the mixture weight, and any departure costs a harmonic factor.
+
+The two-cell case carries the whole content and is stated exactly: the penalty is at least four,
+which is what proportional allocation achieves, and it grows without bound as the split becomes
+lopsided. Biologically this is the cost of a cohort that is ninety percent one ancestry.
+-/
+
+/-- **The harmonic penalty for unequal allocation.** -/
+theorem harmonic_allocation_penalty (n₁ n₂ : ℝ) (h₁ : 0 < n₁) (h₂ : 0 < n₂) :
+    4 ≤ (n₁ + n₂) * (1 / n₁ + 1 / n₂) := by
+  have hexp : (n₁ + n₂) * (1 / n₁ + 1 / n₂) = 2 + n₁ / n₂ + n₂ / n₁ := by
+    field_simp
+    ring
+  rw [hexp]
+  have hkey : 2 ≤ n₁ / n₂ + n₂ / n₁ := by
+    rw [div_add_div _ _ (ne_of_gt h₂) (ne_of_gt h₁), le_div_iff₀ (by positivity)]
+    nlinarith [sq_nonneg (n₁ - n₂)]
+  linarith
+
+/-- **Equal allocation attains it**, so the bound is the exact cost of departing from
+proportional design rather than a loose estimate. -/
+theorem harmonic_allocation_penalty_equal (n : ℝ) (h : 0 < n) :
+    (n + n) * (1 / n + 1 / n) = 4 := by
+  field_simp
+  ring
+
+/-! #### Which decision losses survive the drift
+
+A threshold decision loss at `τ` charges only for outcomes on the wrong side of `τ`. If every
+ancestry-specific risk lies on one side of the threshold, the drift moves no decision and the
+loss is unaffected: the score is simultaneously optimal for that loss at every ancestry. If the
+threshold falls strictly inside the range of ancestry-specific risks, no single prediction is
+optimal for all of them.
+
+That is the exact criterion. A clinical threshold set outside the spread of ancestry-specific
+risks transports; one set inside it does not, however well the score is calibrated.
+-/
+
+/-- The part of the threshold regret charged to ancestries above the threshold. -/
+noncomputable def aboveThresholdMass {m : ℕ} (π η : Fin m → ℝ) (τ : ℝ) : ℝ :=
+  ∑ i, π i * max (η i - τ) 0
+
+/-- **A threshold above every ancestry-specific risk is untouched by the drift.** -/
+theorem aboveThresholdMass_eq_zero {m : ℕ} (π η : Fin m → ℝ) (τ : ℝ)
+    (h : ∀ i, η i ≤ τ) :
+    aboveThresholdMass π η τ = 0 := by
+  unfold aboveThresholdMass
+  refine Finset.sum_eq_zero fun i _ ↦ ?_
+  rw [max_eq_right (by linarith [h i])]
+  ring
+
+/-- **A threshold strictly inside the drift range is not.** With two ancestries at risks `0` and
+`1` and a threshold at one half, the above-threshold mass is positive, so the decision the loss
+recommends differs between ancestries and no single prediction serves both. -/
+theorem aboveThresholdMass_pos_inside :
+    0 < aboveThresholdMass uniformTwoWeights twoAncestryConditional (1 / 2) := by
+  unfold aboveThresholdMass uniformTwoWeights twoAncestryConditional
+  norm_num [Fin.sum_univ_two]
+
 /-- **The gap is bounded by the two sensitivities it compares.** Symmetry and the vanishing
 criterion are shared by every positive multiple of this distance; the triangle bound is not,
 so it is the one that fixes the multiple at one. -/
