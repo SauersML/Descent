@@ -202,6 +202,21 @@ theorem cumulantTensorEnergy_pushedCumulantTensor_zero
   rw [cumulantTensorEnergy_pushedCumulantTensor]
   simp
 
+/-- **Traffic is exactly the orientation information exposed by a nonzero cumulant.**  At
+every order with nonzero scalar cumulant, two mixing geometries have equal pushed-cumulant
+energy if and only if their Gram covariances have equal parallel-edge traffic observable. -/
+theorem cumulantTensorEnergy_eq_iff_entryPowerSum_eq
+    (order : ℕ) (left right : Matrix Row Locus ℝ) {kappa : ℝ} (hkappa : kappa ≠ 0) :
+    cumulantTensorEnergy order (pushedCumulantTensor order left kappa) =
+        cumulantTensorEnergy order (pushedCumulantTensor order right kappa) ↔
+      entryPowerSum (left.transpose * left) order =
+        entryPowerSum (right.transpose * right) order := by
+  rw [cumulantTensorEnergy_pushedCumulantTensor,
+    cumulantTensorEnergy_pushedCumulantTensor]
+  constructor
+  · exact mul_left_cancel₀ (pow_ne_zero 2 hkappa)
+  · exact congrArg (kappa ^ 2 * ·)
+
 /-- Expansion of the cube of a finite sum. -/
 private theorem sum_cube_expand {I : Type*} [Fintype I] (f : I → ℝ) :
     (∑ i, f i) ^ 3 = ∑ i, ∑ j, ∑ k, f i * f j * f k := by
