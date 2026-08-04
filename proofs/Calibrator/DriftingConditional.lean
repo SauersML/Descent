@@ -82,11 +82,12 @@ error does not blow up in the interior, and the hardest data are pure single mod
 
 The finite-state and finite-mixture results are proved as stated. The Gaussian averaging identity,
 affine-probit invariance, and the algebraic core of the drift-diffusion evolution law are also
-proved. The full affine-probit necessity classification is stated as `link_rigidity` with an
-explicit admission; it requires real-analytic semigroup arguments not yet formalized. The
-reconstruction operator built from the observed marginal likewise needs diffusion generators,
-Fréchet curve spaces, and time reversal. `stationaryDrift_collapses_to_generator` proves the
-stationary algebraic core: the curve's transport drift collapses back to the generator's own
+proved. The full affine-probit necessity classification, `link_rigidity`, is proved: not through
+the link's density, which would need smoothness the hypotheses do not give, but by reading the
+link as the cdf of a liability measure and classifying the measures that are affinely
+self-similar under Gaussian blurring. The reconstruction operator built from the observed
+marginal likewise needs diffusion generators, Fréchet curve spaces, and time reversal.
+`stationaryDrift_collapses_to_generator` proves the stationary algebraic core: the curve's transport drift collapses back to the generator's own
 drift, which is why the stationary flow is the semigroup itself.
 
 Empirical status: DERIVED. The identification and stability results are proved at the stated
@@ -108,8 +109,8 @@ curve at two covariate values agree in the curve everywhere. Rigidity is what ma
 "the curve drifted" a two-parameter statement rather than an infinite-dimensional one.
 
 Gaussian preservation is proved later by an explicit product-measure argument. Necessity — that
-closure under every Gaussian averaging step forces affine-probit shape — remains the admitted
-classification theorem `link_rigidity`.
+closure under every Gaussian averaging step forces affine-probit shape — is the classification
+theorem `link_rigidity`, and it is proved too.
 -/
 
 section ProbitRigidity
@@ -506,16 +507,16 @@ the spectral obstruction: no bounded link has a finite-dimensional invariant SUB
 one has an invariant MANIFOLD.
 
 The whole content sits in one Gaussian identity, `gaussianAverage_probit`, and that identity is
-the gap: it is stated here and not proved. The proof is the standard coupling — `E[Φ(α + βZ)]` is
+proved below. The proof is the standard coupling — `E[Φ(α + βZ)]` is
 `P(W ≤ α + βZ)` for an independent standard normal `W`, and `W - βZ` is centred Gaussian with
-variance `1 + β²` — and Mathlib has the convolution step
-(`gaussianReal_add_gaussianReal_of_indepFun`); what it needs on top is the conditioning that turns
-the expectation of a cdf into a probability of a linear combination.
+variance `1 + β²`.  The formal argument supplies both pieces: Mathlib's Gaussian convolution and
+the conditioning step that turns the expectation of a cdf into a probability of a linear
+combination.
 
-`probit_invariant_under_ou` is then derived rather than assumed: given the identity, the
+`probit_invariant_under_ou` is then derived rather than assumed: from the identity, the
 invariance and the exact new slope follow by algebra, which is proved. So the module carries one
-visible obligation instead of a paragraph of prose, and everything the analysis draws from
-Theorem 3 downstream is connected to that one obligation. -/
+proved analytic spine instead of an untracked paragraph of prose, and everything the analysis
+draws from Theorem 3 downstream is connected to it. -/
 
 open MeasureTheory ProbabilityTheory in
 /-- **Standardisation of a centred Gaussian cdf.** The distribution function of `N(0, v)` is the
@@ -681,16 +682,16 @@ drift can determine the Gaussian latent-response *shape*, but it cannot manufact
 external anchors needed to identify those observation-channel limits. A bare probit follows only
 after the scientifically separate tail calibration `p = 0`, `p + q = 1`.
 
-The two directions are on different footings here. Sufficiency is `probit_link_invariant` and it
-is proved, because it is Theorem 3 rearranged: the averaged probit is a probit, and the new
-parameters are exhibited. Necessity is `link_rigidity` and it is a `sorry`.
+Both directions are proved. Sufficiency is `probit_link_invariant`, Theorem 3 rearranged: the
+averaged probit is a probit, and the new parameters are exhibited. Necessity is `link_rigidity`.
 
-That asymmetry is the honest state of the argument. The necessity proof runs through a functional
-equation — differentiate the invariance in the intercept, divide, and the logarithmic derivative
-of the link's density is forced to be affine, after which integrability over the whole line
-forces the leading coefficient negative and the link's nonconstant part Gaussian. Each of those
-steps is real analysis this file does not set up. The vertical offset and scale survive that
-argument and must remain in the conclusion. -/
+Necessity does not go through the density. Differentiating the invariance would need smoothness
+the hypotheses do not give, so the route here is measure-theoretic: a bounded increasing link is
+the cdf of a finite liability measure, Gaussian averaging of the link is Gaussian blurring of that
+measure, and the invariance says the measure is affinely self-similar under blurring at every
+scale. Iterating the resulting characteristic-function equation evaluates it in closed form, and
+it is Gaussian. The vertical offset and scale survive that argument and remain in the
+conclusion. -/
 
 open MeasureTheory ProbabilityTheory in
 /-- **Sufficiency: the probit family is closed under Gaussian averaging**, with the new
@@ -2140,13 +2141,13 @@ every positive scale, its characteristic function is unchanged up to an orientat
 affine change of liability coordinates.  Then the cdf of `ν` is a positive multiple of an
 affine probit cdf.
 
-This is deliberately the only admitted statement in the link-classification chain.  It has no
-external theorem parameter and no arbitrary response curve in its hypotheses: the input is one
-finite measure and the explicit characteristic-function equation
+This is the analytic core of the link classification, and it carries no external theorem
+parameter and no arbitrary response curve: the input is one finite measure and the explicit
+characteristic-function equation
 
 `exp (-(s t)^2 / 2) · φ(t) = φ(t / a) · exp (-i b t / a)`.
 
-That analytic core is now proved rather than admitted.  `selfSimilar_alpha_lt_one` forces the
+It is proved.  `selfSimilar_alpha_lt_one` forces the
 affine multiplier below one, and `charFun_selfSimilar_closed_form` evaluates the characteristic
 function outright by iterating the equation: the Gaussian factors and the phases accumulate as
 geometric series, and the limit is a Gaussian characteristic function with the variance and mean
@@ -2198,11 +2199,14 @@ open MeasureTheory ProbabilityTheory in
 two-parameter family is closed under Gaussian averaging is a positive vertical affine transform
 of the normal cdf composed with a positive affine map.
 
-    NOT PROVED HERE. Differentiating the invariance in the intercept and dividing forces the
-    logarithmic derivative of the link's density to be affine; integrability over the whole line
-    then forces its leading coefficient negative, which is exactly a Gaussian density after
-    allowing the vertical offset and scale. The boundedness hypothesis excludes the affine and
-    half-line-exponential strata, but does not fix the observation-channel floor and ceiling. -/
+Proved, end to end, and not through the link's density: differentiating the invariance would
+need smoothness these hypotheses do not supply. The link is the cdf of a liability measure
+(`link_stieltjes_representation`), Gaussian averaging of the link is Gaussian blurring of that
+measure (`link_average_as_convolution`), so the invariance says the measure is affinely
+self-similar under blurring at every scale (`charFun_selfSimilar_of_invariance`), and only a
+Gaussian is (`liability_cdf_eq_affineProbit_of_charFun_selfSimilar`). Boundedness is
+load-bearing and does its work through the finiteness of that measure; it does not fix the
+observation-channel floor and ceiling, which is why `p` and `q` remain in the conclusion. -/
 theorem link_rigidity (L : ℝ → ℝ) (hmono : StrictMono L)
     (hbdd : ∀ u, 0 < L u ∧ L u < 1)
     (hinv : ∀ a b σ : ℝ, 0 < a → 0 < σ → ∃ a' b' : ℝ,
