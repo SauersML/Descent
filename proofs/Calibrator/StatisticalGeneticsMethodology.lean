@@ -162,38 +162,33 @@ estimation of PGS portability.
 
 section CrossValidation
 
-/-- **Overfitting bias from sample overlap.**
+/-- Approximate upward R² bias from using `predictorCount` fitted predictors in an
+evaluation sample with `overlapCount` overlapping observations. -/
+noncomputable def sampleOverlapBias (predictorCount overlapCount : ℝ) : ℝ :=
+  predictorCount / overlapCount
+
+/-- The overlap-bias scale is pinned away from both denominator boundaries. -/
+theorem sampleOverlapBias_at_reference_point : sampleOverlapBias 1 4 = 1 / 4 := by
+  norm_num [sampleOverlapBias]
+
+/-- **Overfitting bias from sample overlap is positive.**
     If the GWAS sample overlaps with the evaluation sample,
     R² is biased upward by approximately p/n where p is the
     number of SNPs in the PGS. -/
-theorem overlap_bias
+theorem sampleOverlapBias_pos
     (p_snps n_overlap : ℝ)
-    (h_p : 0 < p_snps) (h_n : 0 < n_overlap)
-    (h_n_large : p_snps < n_overlap) :
-    0 < p_snps / n_overlap ∧ p_snps / n_overlap < 1 := by
-  constructor
-  · exact div_pos h_p h_n
-  · rw [div_lt_one h_n]; exact h_n_large
+    (h_p : 0 < p_snps) (h_n : 0 < n_overlap) :
+    0 < sampleOverlapBias p_snps n_overlap := by
+  unfold sampleOverlapBias
+  exact div_pos h_p h_n
 
-/-- **The middle of three ordered reals is nearer the lowest, in absolute
-    value:** from `t ≤ b < s` and `t < s`, conclude `|b - t| < |s - t|`.
-
-    **The claim is the hypothesis `h_blocked_closer_to_true`.** Read as
-    methodology this says family-blocked cross-validation lands between the
-    truth and the optimistic standard-CV estimate, so its absolute error is
-    smaller. But "blocked lands below standard" is assumed by name, and
-    "blocked is not below the truth" is assumed too; what the proof adds is that
-    an ordering between three reals can be rewritten with absolute values. It
-    does not derive the ordering from family sharing, from segment sharing, or
-    from any property of a cross-validation scheme, none of which occur below. -/
-theorem abs_sub_lt_abs_sub_of_between
-    (r2_standard_cv r2_blocked_cv r2_true : ℝ)
-    (h_standard_biased : r2_true < r2_standard_cv)
-    (h_blocked_between : r2_true ≤ r2_blocked_cv)
-    (h_blocked_closer_to_true : r2_blocked_cv < r2_standard_cv) :
-    |r2_blocked_cv - r2_true| < |r2_standard_cv - r2_true| := by
-  rw [abs_of_nonneg (by linarith), abs_of_nonneg (by linarith)]
-  linarith
+/-- The approximate overlap bias is below one exactly when the number of fitted
+predictors is smaller than the positive overlap sample. -/
+theorem sampleOverlapBias_lt_one_iff
+    (p_snps n_overlap : ℝ) (h_n : 0 < n_overlap) :
+    sampleOverlapBias p_snps n_overlap < 1 ↔ p_snps < n_overlap := by
+  unfold sampleOverlapBias
+  rw [div_lt_one h_n]
 
 end CrossValidation
 
@@ -483,29 +478,6 @@ theorem ldsc_se_decreases_with_n
   apply div_lt_div_of_pos_left h_c
   · exact Real.sqrt_pos.mpr h_n₁
   · exact Real.sqrt_lt_sqrt (le_of_lt h_n₁) h_more
-
-/-- **`k` parameters cost less than `k+1`, at any positive per-parameter price.**
-
-    The statement contains no standard error. `se_per_param` is a variable name, not a
-    quantity the theorem constrains, so what is proved is that `k` parameters cost less than
-    `k+1` at any positive per-parameter price — arithmetic, not a statement about estimator
-    variance.
-
-    The empirical direction does hold **without** overlap: constrained was tighter in 6 of 7
-    simulated arms. But the docstring's premise, "when there's no sample overlap", is exactly
-    what a user cannot check from summary statistics — and constraining the intercept **under**
-    full overlap returns `ρ̂_g = 1.350` where the truth is `0`. The premise is the whole
-    content and it is unverifiable in the setting the definition serves.
-
-    Empirical status: theorem **PROVED** and trivial; the SE reading is **UNDERPOWERED**
-    (6/7 arms, unweighted OLS without jackknife) and the no-overlap premise is
-    **unverifiable from summary statistics** (`proofs/validation/empirical/ldsc_diff/`). -/
-theorem cost_of_k_params_lt_cost_of_k_succ
-    (se_per_param : ℝ) (k : ℕ)
-    (h_se : 0 < se_per_param) :
-    se_per_param * k < se_per_param * (k + 1) := by
-  have : (k : ℝ) < (k : ℝ) + 1 := lt_add_one _
-  exact mul_lt_mul_of_pos_left this h_se
 
 end LDScoreRegression
 
