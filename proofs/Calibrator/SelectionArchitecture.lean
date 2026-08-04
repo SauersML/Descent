@@ -1,9 +1,10 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Calibrator.Probability
-import Calibrator.PortabilityDrift
+import Calibrator.AncestrySpecificPower
 import Calibrator.OpenQuestions
+import Calibrator.PortabilityDrift
+import Calibrator.Probability
 
 namespace Calibrator
 
@@ -95,7 +96,13 @@ theorem equilibriumEffectVariance_eq_zero_iff (v_mutation s : ℝ) :
     of strength s removes a fraction s of the standing variance V.
     The recurrence is: V(t+1) = (1 - s) × V(t) + v_mut.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **NOT TESTED BY THE DESIGN THAT LOOKED LIKE IT WAS**
+    (`proofs/validation/empirical/simcov/battery_bulk9.py`). The oracle was one
+    step of this same recurrence applied to a state fifty iterations in, which is
+    this expression evaluated twice; the harness returns SELF-TEST. What would
+    test it is a simulated population under stabilising selection and recurrent
+    mutation, with the realised effect variance measured from generation to
+    generation. -/
 noncomputable def effectVarianceRecurrence (V v_mut s : ℝ) : ℝ :=
   (1 - s) * V + v_mut
 
@@ -797,30 +804,60 @@ section GWASPowerMAF
     realised Wald statistic minus one over 3000 replicate studies, worst 1.55
     sems over a prediction spanning 4.20000 to 8.40000.
 
-    This is the same body as `AncestrySpecificPower.ncp` under a second name in
-    a second file. Both are now measured against the same oracle, so a
-    divergence between them would show; no theorem relates them. -/
+    This is defined through the canonical `ncp` and `effectiveFisherInformation`
+    declarations, so the ancestry-power and selection APIs share one implementation. -/
 noncomputable def gwasNCP (n : ℕ) (β p : ℝ) : ℝ :=
-  n * β ^ 2 * (2 * p * (1 - p))
+  ncp (effectiveFisherInformation n p 1) β
 
 /-- Reference evaluation.  The value is computed through the definitions this body calls, but
 the theorem states a number: an inequality or an invariance leaves a family of bodies
 satisfying it, and a value does not. -/
 theorem gwasNCP_at_reference_point :
-    gwasNCP 1 1 1 = 0 := by
-  norm_num [gwasNCP]
+    gwasNCP 1 1 (1 / 2) = 1 / 2 := by
+  norm_num [gwasNCP, ncp, effectiveFisherInformation, fisherInformation, genotypeVarianceHWE]
 
 
-/-- NCP is positive for informative variants. -/
-theorem gwas_ncp_pos (n : ℕ) (β p : ℝ)
-    (hn : 0 < n) (hβ : β ≠ 0) (hp : 0 < p) (hp1 : p < 1) :
-    0 < gwasNCP n β p := by
+/-- GWAS non-centrality vanishes exactly for an empty study, null effect, or
+monomorphic locus. -/
+theorem gwasNCP_eq_zero_iff (n : ℕ) (β p : ℝ) :
+    gwasNCP n β p = 0 ↔ n = 0 ∨ β = 0 ∨ p = 0 ∨ p = 1 := by
   unfold gwasNCP
-  apply mul_pos
-  · apply mul_pos
-    · exact Nat.cast_pos.mpr hn
-    · exact sq_pos_of_ne_zero hβ
-  · nlinarith
+  constructor
+  · intro h
+    rcases (ncp_eq_zero_iff _ _).1 h with h_information | h_effect
+    · rcases (effectiveFisherInformation_eq_zero_iff n p 1).1 h_information with
+        h_n | h_p_zero | h_p_one | h_impossible
+      · exact Or.inl h_n
+      · exact Or.inr (Or.inr (Or.inl h_p_zero))
+      · exact Or.inr (Or.inr (Or.inr h_p_one))
+      · norm_num at h_impossible
+    · exact Or.inr (Or.inl h_effect)
+  · rintro (h_n | h_effect | h_p_zero | h_p_one)
+    · exact (ncp_eq_zero_iff _ _).2 <| Or.inl <|
+        (effectiveFisherInformation_eq_zero_iff n p 1).2 (Or.inl h_n)
+    · exact (ncp_eq_zero_iff _ _).2 (Or.inr h_effect)
+    · exact (ncp_eq_zero_iff _ _).2 <| Or.inl <|
+        (effectiveFisherInformation_eq_zero_iff n p 1).2 (Or.inr (Or.inl h_p_zero))
+    · exact (ncp_eq_zero_iff _ _).2 <| Or.inl <|
+        (effectiveFisherInformation_eq_zero_iff n p 1).2 (Or.inr (Or.inr (Or.inl h_p_one)))
+
+/-- GWAS non-centrality is positive exactly for a nonempty study, nonzero effect,
+and polymorphic locus. -/
+theorem gwasNCP_pos_iff (n : ℕ) (β p : ℝ) :
+    0 < gwasNCP n β p ↔ 0 < n ∧ β ≠ 0 ∧ 0 < p ∧ p < 1 := by
+  unfold gwasNCP ncp
+  constructor
+  · intro h
+    rcases mul_pos_iff.mp h with ⟨h_information, h_effect⟩ | ⟨_, h_effect⟩
+    · rcases (fullyTaggedFisherInformation_pos_iff n p).1 h_information with ⟨h_n, hp0, hp1⟩
+      refine ⟨h_n, ?_, hp0, hp1⟩
+      intro h_zero
+      rw [h_zero] at h_effect
+      norm_num at h_effect
+    · nlinarith [sq_nonneg β]
+  · rintro ⟨h_n, h_effect, hp0, hp1⟩
+    exact mul_pos ((fullyTaggedFisherInformation_pos_iff n p).2 ⟨h_n, hp0, hp1⟩)
+      (sq_pos_of_ne_zero h_effect)
 
 /-- **NCP depends on population-specific MAF.**
     A variant with MAF 0.3 in Europeans may have MAF 0.05 in
@@ -831,7 +868,10 @@ theorem ncp_ratio_from_maf
     (h_maf : p₁ < p₂) (h_half : p₂ ≤ 1/2) :
     gwasNCP n β p₁ < gwasNCP n β p₂ := by
   unfold gwasNCP
-  apply mul_lt_mul_of_pos_left _ (mul_pos (Nat.cast_pos.mpr hn) (sq_pos_of_pos hβ))
+  unfold ncp effectiveFisherInformation fisherInformation genotypeVarianceHWE
+  simp only [mul_one]
+  apply mul_lt_mul_of_pos_right _ (sq_pos_of_pos hβ)
+  apply mul_lt_mul_of_pos_left _ (Nat.cast_pos.mpr hn)
   -- 2p₁(1-p₁) < 2p₂(1-p₂) when p₁ < p₂ ≤ 1/2
   nlinarith [sq_nonneg (p₂ - p₁), sq_nonneg (1/2 - p₂)]
 

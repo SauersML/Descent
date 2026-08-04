@@ -203,6 +203,20 @@ theorem effectiveFisherInformation_eq_zero_iff (n : ℕ) (p r2_ld : ℝ) :
   simp [effectiveFisherInformation, fisherInformation, genotypeVariance_eq_zero_iff,
     mul_eq_zero, or_assoc]
 
+/-- With perfect tagging, Fisher information is positive exactly for a nonempty study
+at a polymorphic locus. -/
+theorem fullyTaggedFisherInformation_pos_iff (n : ℕ) (p : ℝ) :
+    0 < effectiveFisherInformation n p 1 ↔ 0 < n ∧ 0 < p ∧ p < 1 := by
+  unfold effectiveFisherInformation fisherInformation genotypeVarianceHWE
+  simp only [mul_one]
+  constructor
+  · intro h
+    rcases mul_pos_iff.mp h with ⟨h_n, h_frequency⟩ | ⟨h_n, _⟩
+    · exact ⟨Nat.cast_pos.mp h_n, by constructor <;> nlinarith⟩
+    · exact (not_lt_of_ge (Nat.cast_nonneg n) h_n).elim
+  · rintro ⟨h_n, hp0, hp1⟩
+    exact mul_pos (Nat.cast_pos.mpr h_n) (by nlinarith)
+
 /-- **Bridge between conventional LD `r²` and permeability attenuation.**
 If `η` is the correlation-scale response retained by a tag, conventional regression
 information is multiplied by `r² = η²`.  The covariance-channel permeability is
