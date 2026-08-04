@@ -1415,34 +1415,13 @@ theorem expectedR2_strictMono_nonneg
     ring
   simpa [hxrepr, hyrepr] using hsub
 
-/-- Drift strictly degrades the exact present-day AUC in the equal-variance
-Gaussian liability model. -/
-theorem drift_degrades_AUC_of_strictMono
-    (V_A V_E fstS fstT : ℝ)
-    (hVA : 0 < V_A) (hVE : 0 < V_E)
-    (hfst : fstS < fstT)
-    (hfstT_le_one : fstT ≤ 1) :
-    presentDayEqualVarianceGaussianAUC V_A V_E fstT <
-      presentDayEqualVarianceGaussianAUC V_A V_E fstS := by
-  rw [presentDayEqualVarianceGaussianAUC_eq _ _ _ (ne_of_gt hVE),
-    presentDayEqualVarianceGaussianAUC_eq _ _ _ (ne_of_gt hVE)]
-  apply strictMono_Phi
-  have hsnr := drift_degrades_signalToNoise V_A V_E fstS fstT hVA hVE hfst
-  have hhalf_nonneg : 0 ≤ presentDaySignalToNoise V_A V_E fstT / 2 := by
-    have hsnr_nonneg : 0 ≤ presentDaySignalToNoise V_A V_E fstT := by
-      unfold presentDaySignalToNoise presentDayPGSVariance pgsVarianceFromHet
-      have hnum : 0 ≤ V_A * (1 - fstT) := by
-        have h_one_minus : 0 ≤ 1 - fstT := by linarith
-        exact mul_nonneg (le_of_lt hVA) h_one_minus
-      exact div_nonneg hnum (le_of_lt hVE)
-    exact div_nonneg hsnr_nonneg (by positivity)
-  have hhalf_lt : presentDaySignalToNoise V_A V_E fstT / 2 <
-      presentDaySignalToNoise V_A V_E fstS / 2 := by
-    nlinarith
-  exact Real.sqrt_lt_sqrt hhalf_nonneg hhalf_lt
-
 /-- Drift strictly degrades the exact **equal-variance Gaussian** AUC whenever
-signal variance is positive and target drift exceeds source drift. -/
+signal variance is positive and target drift exceeds source drift.
+
+This statement was also carried by `drift_degrades_AUC_of_strictMono`, whose twenty-line
+proof was this one character for character.  The second name described the tactic used
+rather than the model, and the model is what a reader needs: the AUC here is the
+equal-variance Gaussian one, not the liability-threshold one. -/
 theorem drift_degrades_equalVarianceGaussianAUC
     (V_A V_E fstS fstT : ℝ)
     (hVA : 0 < V_A) (hVE : 0 < V_E)
@@ -3710,7 +3689,7 @@ theorem targetAUC_lt_source_of_neutralAF_benchmark
     presentDayEqualVarianceGaussianAUC V_A V_E fstTarget <
       presentDayEqualVarianceGaussianAUC V_A V_E fstSource := by
   simpa [presentDayEqualVarianceGaussianAUC] using
-    drift_degrades_AUC_of_strictMono
+    drift_degrades_equalVarianceGaussianAUC
       V_A V_E fstSource fstTarget hVA hVE h_fst (le_of_lt h_fst_bounds.2)
 
 /-- Exact **equal-variance Gaussian** AUC as a function of SNR:
@@ -4374,19 +4353,12 @@ theorem equalVarianceGaussianAUCFromExplainedR2_eq_presentDayAUC
   rw [equalVarianceGaussianAUCFromExplainedR2_eq_formula_of_lt_one _ hr2_lt]
   rw [presentDayEqualVarianceGaussianAUC_eq _ _ _ hve_ne, hchart]
 
-/-- Full neutral allele-frequency benchmark liability-AUC degradation theorem
-(exact LTM formula): if drift increases (`fstTarget > fstSource`), target AUC
-is strictly lower than source AUC within this benchmark. -/
-theorem targetLiabilityAUC_lt_source_of_neutralAF_benchmark
-    (V_A V_E fstSource fstTarget : ℝ)
-    (hVA : 0 < V_A) (hVE : 0 < V_E)
-    (h_fst : fstSource < fstTarget)
-    (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1) :
-    presentDayEqualVarianceGaussianAUC V_A V_E fstTarget <
-      presentDayEqualVarianceGaussianAUC V_A V_E fstSource := by
-  simpa [presentDayEqualVarianceGaussianAUC] using
-    drift_degrades_equalVarianceGaussianAUC
-      V_A V_E fstSource fstTarget hVA hVE h_fst (le_of_lt h_fst_bounds.2)
+/-! The benchmark AUC degradation theorem is
+`targetAUC_lt_source_of_neutralAF_benchmark`, above.  A second copy of it stood here as
+`targetLiabilityAUC_lt_source_of_neutralAF_benchmark`, with the same statement and the same
+proof, and its name claimed the liability-threshold model -- which
+`presentDayEqualVarianceGaussianAUC`'s own docstring records as the misidentification that
+understates AUC by 3% to 26%.  One theorem, under the name that says which model it is. -/
 
 /-- The exact target calibrated Brier risk is `TransportedMetrics.calibratedBrier`
 evaluated at the explicit target `R²` by definition. -/
@@ -4574,16 +4546,13 @@ theorem targetBrier_strict_gt_source_of_neutralAF_benchmark
 noncomputable def expectedSqMeanPGSDiff_pureSplit (V_A fstS fstT : ℝ) : ℝ :=
   Var_Delta_Mu V_A (fstS + fstT)
 
-/-- **The closed form: twice the summed differentiation times the additive variance.** -/
-theorem expectedSqMeanPGSDiff_pureSplit_closed (V_A fstS fstT : ℝ) :
+/-- **The closed form: twice the summed differentiation times the additive variance.**
+
+This was two theorems, `_closed` and `_eq`, with the same statement and two proofs of it. -/
+@[simp] theorem expectedSqMeanPGSDiff_pureSplit_closed (V_A fstS fstT : ℝ) :
     expectedSqMeanPGSDiff_pureSplit V_A fstS fstT = 2 * (fstS + fstT) * V_A := by
   unfold expectedSqMeanPGSDiff_pureSplit Var_Delta_Mu
   ring
-
-/-- The expected squared mean PGS difference equals `2(F_S + F_T) V_A`. -/
-@[simp] theorem expectedSqMeanPGSDiff_pureSplit_eq (V_A fstS fstT : ℝ) :
-    expectedSqMeanPGSDiff_pureSplit V_A fstS fstT = 2 * (fstS + fstT) * V_A := by
-  rfl
 
 /-- The expected squared mean PGS difference under the IM equilibrium model:
 `E[(Δμ)²] = 4δ V_A` where `δ = 1/(2M+1)`.
@@ -4897,8 +4866,8 @@ noncomputable def covarianceRetention (freq_corr ld_overlap : ℝ) : ℝ :=
     function of `F_ST` and no repair of the constant can make it one. The
     degenerate row is the clearest statement of the mechanism: when every locus
     starts at the same ancestral frequency there is no across-locus signal for
-    the two demes to share, and the correlation is exactly zero however little
-    they have diverged.
+    the two demes to share, and the correlation vanishes however little they
+    have diverged.
 
     What the quantity actually is:
     `corr(p1, p2) = Var(p0) / (Var(p0) + F * E[p0 (1 - p0)])`,
@@ -4920,7 +4889,12 @@ noncomputable def covarianceRetention (freq_corr ld_overlap : ℝ) : ℝ :=
 
     Empirical status: UNTESTED as a covariance-retention factor. Its former
     justification was the correlation identity, and that justification is gone;
-    retention needs a measurement of its own and has not had one. -/
+    retention needs a measurement of its own and has not had one.
+
+    Denotes: the covariance-retention factor, not the allele-frequency
+    correlation. The same body `1 - fst` appears under names from 'correlation',
+    'retention' and 'drift factor', and the formula alone does not fix which is
+    meant; `alleleFreqCorrelation` is the correlation. -/
 noncomputable def covarianceRetentionFactorFromFst (fst : ℝ) : ℝ := 1 - fst
 
 /-- **The allele-frequency correlation between two drifted demes.**
@@ -5323,8 +5297,9 @@ theorem fstMigrationDriftEquilibrium_balancing_negative_migration_is_junk :
 
 /-- **No migration leaves complete differentiation.** At `m = 0` the island model fixes
 populations entirely, so the equilibrium is one; that is the reference point which fixes the
-constant term, and it is what a body with the wrong intercept would miss. -/
-theorem fstMigrationDriftEquilibrium_no_migration (Ne : ℝ) :
+constant term, and it is what a body with the wrong intercept would miss. It is also the
+boundary the closed form attains, which was a second theorem with this statement. -/
+@[simp] theorem fstMigrationDriftEquilibrium_no_migration (Ne : ℝ) :
     fstMigrationDriftEquilibrium Ne 0 = 1 := by
   unfold fstMigrationDriftEquilibrium
   norm_num
@@ -5337,13 +5312,6 @@ theorem fstMigrationDriftEquilibrium_isFixedPoint (Ne m : ℝ)
     ibdFlowStep Ne m (fstMigrationDriftEquilibrium Ne m) =
       fstMigrationDriftEquilibrium Ne m :=
   ibdFlowStep_fixedPoint Ne m hNe hm
-
-/-- **Total isolation is a boundary the closed form attains.**  With `m = 0`
-the demes fix independently and F_ST is exactly `1`. -/
-@[simp] theorem fstMigrationDriftEquilibrium_of_no_migration (Ne : ℝ) :
-    fstMigrationDriftEquilibrium Ne 0 = 1 := by
-  unfold fstMigrationDriftEquilibrium
-  norm_num
 
 /-- **One generation of the identity-by-descent recurrence.**
 
@@ -5510,6 +5478,11 @@ event: the pair is identical only if neither lineage is a migrant, probability
 `(1 - m)²`, and the parental copies either coalesced in the deme or were already
 identical.
 
+    Regime: the many-deme symmetric island model. The deme count is not a
+    parameter here, and at small deme counts it must be: at fixed `4 Ne m`
+    the simulated `F_ST` runs 0.117 at two demes to 0.186 at twenty, against
+    a deme-blind 0.200. See `fstIslandEquilibriumFiniteDemes`.
+
     Empirical status: UNTESTED. -/
 noncomputable def islandFstMultiplicativeStep (Ne m F : ℝ) : ℝ :=
   ibdRecurrenceStep Ne m F
@@ -5532,6 +5505,11 @@ dropping terms of order `m²` and `m/Nₑ`; the two closed forms are never equal
 for `m > 0`, which `ibdRecurrenceFixedPoint_lt_linearisation` proves in general
 and `fstIslandMultiplicativeEquilibrium_ne_fstMigrationDriftEquilibrium`
 witnesses at a point.
+
+    Regime: the many-deme symmetric island model. The deme count is not a
+    parameter here, and at small deme counts it must be: at fixed `4 Ne m`
+    the simulated `F_ST` runs 0.117 at two demes to 0.186 at twenty, against
+    a deme-blind 0.200. See `fstIslandEquilibriumFiniteDemes`.
 
     Empirical status: UNTESTED. -/
 noncomputable def fstIslandMultiplicativeEquilibrium (Ne m : ℝ) : ℝ :=

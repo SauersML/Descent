@@ -1615,11 +1615,10 @@ theorem alleleFreq_deviation_decreases (p₀ p_c m : ℝ) (t₁ t₂ : ℕ)
 
 /-! ### Effective Migration Rate -/
 
-/-- Effective migration is between the two directional rates. -/
-theorem effectiveMigration_bounds (m₁₂ m₂₁ : ℝ) (h : m₂₁ < m₁₂) :
-    m₂₁ < effectiveSymmetricMigration m₁₂ m₂₁ ∧ effectiveSymmetricMigration m₁₂ m₂₁ < m₁₂ := by
-  unfold effectiveSymmetricMigration
-  constructor <;> linarith
+/-! **Effective migration is between the two directional rates** is
+`effectiveSymmetricMigration_between`, stated beside `effectiveSymmetricMigration` itself in
+`Calibrator.PortabilityDrift`, which this module imports.  It was restated here as
+`effectiveMigration_bounds` with the same statement and the same two-line proof. -/
 
 /-- Effective migration equals both rates when migration is symmetric. -/
 theorem effectiveMigration_symmetric (m : ℝ) :

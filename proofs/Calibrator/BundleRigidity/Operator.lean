@@ -480,26 +480,21 @@ theorem tauEven_eq_of_agree_on_symmetricFns {τ : C(T, T)} (hinv : ∀ t : T, τ
     simp only [hg, ContinuousMap.smul_apply, ContinuousMap.add_apply, pullback_apply,
       smul_eq_mul, hinv t]
     ring
-  have hkh : κ h = 0 := by
-    have h1 := congrArg (fun L ↦ L h) hκ
+  -- The odd part is antiinvariant under the pullback, and that computation is what makes
+  -- BOTH functionals vanish on it. It was written out once per functional, identically.
+  have hodd : pullback τ h = -h := by
+    ext t
+    simp only [hh, pullback_apply, ContinuousMap.smul_apply, ContinuousMap.sub_apply,
+      ContinuousMap.neg_apply, smul_eq_mul, hinv t]
+    ring
+  have vanishes_on_odd : ∀ L : C(T, ℝ) →ₗ[ℝ] ℝ, IsTauEven τ L → L h = 0 := by
+    intro L hL
+    have h1 := congrArg (fun M ↦ M h) hL
     simp only [LinearMap.comp_apply] at h1
-    have h2 : pullback τ h = -h := by
-      ext t
-      simp only [hh, pullback_apply, ContinuousMap.smul_apply, ContinuousMap.sub_apply,
-        ContinuousMap.neg_apply, smul_eq_mul, hinv t]
-      ring
-    rw [h2, map_neg] at h1
+    rw [hodd, map_neg] at h1
     linarith
-  have hk'h : κ' h = 0 := by
-    have h1 := congrArg (fun L ↦ L h) hκ'
-    simp only [LinearMap.comp_apply] at h1
-    have h2 : pullback τ h = -h := by
-      ext t
-      simp only [hh, pullback_apply, ContinuousMap.smul_apply, ContinuousMap.sub_apply,
-        ContinuousMap.neg_apply, smul_eq_mul, hinv t]
-      ring
-    rw [h2, map_neg] at h1
-    linarith
+  have hkh : κ h = 0 := vanishes_on_odd κ hκ
+  have hk'h : κ' h = 0 := vanishes_on_odd κ' hκ'
   calc κ f = κ (g + h) := by rw [hsum]
     _ = κ g + κ h := map_add _ _ _
     _ = κ' g + κ' h := by rw [hagree g hginv, hkh, hk'h]

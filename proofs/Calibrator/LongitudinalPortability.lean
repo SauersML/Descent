@@ -101,16 +101,11 @@ theorem drift_decay_rate_pos (Ne : ℝ) (h : 0 < Ne) :
   unfold driftRatePerGen
   positivity
 
-/-- **Larger populations drift slower.**
-    If Ne₁ < Ne₂, then λ_drift₁ > λ_drift₂. -/
-theorem larger_Ne_slower_drift (Ne₁ Ne₂ : ℝ)
-    (h₁ : 0 < Ne₁) (h₂ : 0 < Ne₂) (h_lt : Ne₁ < Ne₂) :
-    driftRatePerGen Ne₂ < driftRatePerGen Ne₁ := by
-  unfold driftRatePerGen
-  have h1' : 0 < 2 * Ne₁ := by positivity
-  have h2' : 0 < 2 * Ne₂ := by positivity
-  apply (div_lt_div_iff₀ h2' h1').2
-  nlinarith
+/-! **Larger populations drift slower** is `larger_pop_slower_drift_rate` in
+`Calibrator.LDDecayTheory`, which this module imports.  It was stated again here as
+`larger_Ne_slower_drift`, with the same statement and a second proof of it; the fact is
+about `1/(2Nₑ)` and belongs beside that definition rather than in each module that wants
+it. -/
 
 /-- **LD decay component.**
     LD between linked loci decays as (1-r)^t per generation,

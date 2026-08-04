@@ -1423,7 +1423,7 @@ theorem neutralAF_benchmark_cross_ancestry_auc_drops_and_brier_worsens
     sourceBrierFromR2 π (presentDayR2 V_A V_E fstSource) <
       targetExactCalibratedBrierRisk π V_A V_E fstTarget := by
   constructor
-  · exact targetLiabilityAUC_lt_source_of_neutralAF_benchmark
+  · exact targetAUC_lt_source_of_neutralAF_benchmark
       V_A V_E fstSource fstTarget hVA hVE h_fst h_fst_bounds
   · exact targetBrier_strict_gt_source_of_neutralAF_benchmark π V_A V_E fstSource fstTarget
       hπ0 hπ1 hVA hVE h_fst h_fst_bounds
