@@ -145,6 +145,32 @@ theorem hudsonBbpSpike_eq_nei_conversion_mul_spikeLoad
       (N : ℝ) (m : ℝ) p₁ p₂ hpos hbar,
     traceWindow_spikeLoad_demographic m hmn hN base budget a]
 
+/-- **Exact multiplicative convention gap at certificate level.** The Hudson-calibrated
+stratification spike is `2/(1+G_ST)` times the Nei-calibrated spike. Thus the estimator choice
+rescales the complete PC-correction certificate, not merely a descriptive scalar. -/
+theorem hudsonBbpSpike_eq_nei_multiplier_mul_neiContrastSpike
+    (N m p₁ p₂ : ℝ)
+    (hpos : 0 < p₁ * (1 - p₂) + p₂ * (1 - p₁))
+    (hbar : meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) ≠ 0) :
+    hudsonBbpSpike N m p₁ p₂ =
+      (2 / (1 + neiGst p₁ p₂)) * neiContrastSpike N m p₁ p₂ := by
+  rw [hudsonBbpSpike_eq_eight_neiGst_div_one_add_mul_effectiveSize
+    N m p₁ p₂ hpos hbar]
+  unfold neiContrastSpike demographicSpike
+  ring
+
+/-- On the biological range `0 ≤ G_ST ≤ 1`, the Hudson-to-Nei spike multiplier lies between one
+and two. Weak differentiation approaches the factor-two boundary; complete differentiation makes
+the two conventions agree. -/
+theorem neiSpikeMultiplier_mem_unit_two (G : ℝ) (hG0 : 0 ≤ G) (hG1 : G ≤ 1) :
+    1 ≤ 2 / (1 + G) ∧ 2 / (1 + G) ≤ 2 := by
+  have hden : 0 < 1 + G := by linarith
+  constructor
+  · rw [le_div_iff₀ hden]
+    linarith
+  · rw [div_le_iff₀ hden]
+    nlinarith
+
 /-- **The imitation criterion for the empirically calibrated stratification
 spike.**
 
