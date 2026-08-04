@@ -405,6 +405,19 @@ structure Carrier where
     ("closure", "module outside the root import closure",
      clean_plus("Calibrator/Orphan.lean", CLEAN_SUB),
      "MODULE_ABSENT"),
+    # Elaboration-time code, which can change what a declaration means.
+    ("identifications", "an elaborator installed in the corpus",
+     clean_plus("Calibrator/Sub.lean", CLEAN_SUB + """
+elab "cheat" : tactic => do
+  pure ()
+"""),
+     "installs custom syntax"),
+    # A macro at TERM level rewrites the statement a reader thinks they read.
+    ("identifications", "a term-level macro",
+     clean_plus("Calibrator/Sub.lean", CLEAN_SUB + """
+macro "myRate" x:term : term => `(cleanRate $x)
+"""),
+     "non-tactic macro"),
     # The three duplication shapes, one case each.  They are planted separately
     # because they have three different fixes, and a screen that reports the
     # wrong one of the three sends the reader to the wrong repair.
@@ -666,6 +679,18 @@ structure PairPanelB where
   residualVarianceEstimate : ℝ
   calibrationSlopeEstimate : ℝ
 """)),
+    # A tactic macro names a tactic call.  It cannot change what a theorem says
+    # and the proof still closes through the kernel; refusing it would push the
+    # corpus to copy the lemma list at every use site instead.
+    ("identifications", "a tactic macro naming a shared unfolding",
+     clean_plus("Calibrator/Sub.lean", CLEAN_SUB + """
+macro "clean_rate_simp" : tactic =>
+  `(tactic| simp [cleanRate])
+
+theorem clean_rate_via_macro (x : ℝ) : cleanRate x = x := by
+  clean_rate_simp
+"""),
+     "installs custom syntax"),
     # Long enough to clear the token floor and made entirely of closers: a reflex,
     # not a shared argument.
     ("duplication", "two long proofs made only of closing tactics",
@@ -706,12 +731,25 @@ def calibrate_others() -> list:
 
     # NEGATIVE, per planted trap: repetition that is idiom, an explicit tie, or
     # an accident of triviality must not be reported.
-    for guard, label, files in NEGATIVE_CASES:
+    # A trap may be written two ways. With no fourth element it asserts the guard
+    # is SILENT, which is the strongest form and the right one for a guard whose
+    # every screen the clean fixture satisfies. With one, it asserts that this
+    # particular message is absent -- necessary for `identifications`, which runs
+    # a dozen screens and whose isolated-module screen a two-module fixture
+    # cannot satisfy at all. Demanding a clean exit there would assert something
+    # about the fixture rather than about the rule under test.
+    for case in NEGATIVE_CASES:
+        guard, label, files = case[0], case[1], case[2]
+        forbidden = case[3] if len(case) > 3 else None
         code, out = run_guard(guard, files)
-        if code != 0:
+        if forbidden is None:
+            if code != 0:
+                failures.append(
+                    f"FALSE POSITIVE  {guard}: {label}\n"
+                    + "\n".join("      " + l for l in out.strip().split("\n")[:12]))
+        elif forbidden in out:
             failures.append(
-                f"FALSE POSITIVE  {guard}: {label}\n"
-                + "\n".join("      " + l for l in out.strip().split("\n")[:12]))
+                f"FALSE POSITIVE  {guard}: {label} -- reported as {forbidden!r}")
 
     # The wiring guard's --json keys are a machine-readable contract. This is the
     # exact defect that shipped undetected, so it is asserted by name.
@@ -773,10 +811,12 @@ def main() -> int:
     print("guard calibration PASSED")
     print(f"  laundering: {len(POSITIVE_EXPECTED)} planted patterns, each in the right family")
     print("  laundering: 0 findings at FATAL or CONDITIONAL severity on clean mathematics")
-    print(f"  style/regimes/closure/wiring/duplication: {len(CASES)} planted defects "
-          f"reported, clean fixture corpus accepted by all five")
-    print(f"  duplication: {len(NEGATIVE_CASES)} traps -- idiom, an explicit tie and a "
-          f"trivial coincidence -- each accepted")
+    guards_covered = sorted({guard for guard, *_ in CASES})
+    print(f"  {'/'.join(guards_covered)}: {len(CASES)} planted defects reported, "
+          f"clean fixture corpus accepted by style/regimes/closure/wiring/duplication")
+    print(f"  {len(NEGATIVE_CASES)} traps -- idiom, an explicit tie, a trivial "
+          f"coincidence, a specialisation, a type-forced field block and a tactic "
+          f"macro -- each accepted")
     print("  wiring --json keys asserted by name; --list names all eight guards")
     return 0
 

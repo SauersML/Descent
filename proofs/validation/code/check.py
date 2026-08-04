@@ -603,8 +603,23 @@ def run_identifications() -> int:
              "references a forbidden proof/compiler axiom directly"),
             (r"\b(?:implemented_by|csimp)\b",
              "changes the compiler implementation or simplification path"),
-            (r"(?m)^\s*(?:syntax|macro|macro_rules|elab|elab_rules|initialize|builtin_initialize|run_cmd|run_tac)\b",
+            # A TACTIC macro is exempt, and only a tactic macro.  What this screen
+            # is for is elaboration that can change what a declaration MEANS:
+            # `elab`, `macro_rules`, `initialize` and `run_cmd` all run code at
+            # elaboration time, and a term-level `macro` rewrites the statement a
+            # reader thinks they are reading.  `macro "t" : tactic => `(tactic|
+            # simp [...])` does none of that -- it names a tactic call, the
+            # statement is untouched, and the proof still has to close through the
+            # kernel.  Refusing it pushes the corpus to copy the lemma list at
+            # every use site instead, which is what the duplication guard is for.
+            #
+            # The escapes stay closed: `sorry`, `sorryAx` and `native_decide` are
+            # screened over the whole file text, so a tactic macro cannot smuggle
+            # one in.
+            (r"(?m)^\s*(?:syntax|macro_rules|elab|elab_rules|initialize|builtin_initialize|run_cmd|run_tac)\b",
              "installs custom syntax, elaboration, or initialization code"),
+            (r"(?m)^\s*macro\b(?![^\n]*:\s*tactic\s*=>)",
+             "installs a non-tactic macro, which rewrites what a reader reads"),
             # --- Below: patterns with ZERO occurrences in the corpus when added.
             # Each is a ratchet, not a cleanup. They cost nothing to adopt and
             # each closes a way to make the kernel accept something without the
