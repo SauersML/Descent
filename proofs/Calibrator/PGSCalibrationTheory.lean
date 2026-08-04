@@ -893,6 +893,28 @@ def AucDropsAndCitlWorsens (cal : CrossPopulationCalibrationShiftModel)
     |((cal.identityCalibrationProfile Pop.source)).citl| <
       |((cal.identityCalibrationProfile Pop.target)).citl|
 
+/-- **An `R²` drop transports to an AUC drop**, through the explained-`R²` chart and its
+strict monotonicity on the unit interval.
+
+This is the step both projection theorems below take to reach their AUC conjunct, and both
+took it inline: the same two chart rewrites and the same appeal to monotonicity, eight
+lines each.  The step is about the score's `R²`, not about which prevalence a source
+profile is read at, so it is stated here without either. -/
+theorem targetAUCFromSourceWeights_lt_source_of_r2_drop {p q : ℕ}
+    (metric : CrossPopulationMetricModel p q)
+    (h_source_r2_unit : r2FromSourceWeights metric Pop.source ∈ Set.Ico 0 1)
+    (h_target_r2_unit : r2FromSourceWeights metric Pop.target ∈ Set.Ico 0 1)
+    (h_r2_drop :
+      r2FromSourceWeights metric Pop.target < r2FromSourceWeights metric Pop.source) :
+    equalVarianceGaussianAUCFromSourceWeights metric Pop.target <
+      equalVarianceGaussianAUCFromSourceWeights metric Pop.source := by
+  rw [targetEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart_of_lt_one
+      metric h_target_r2_unit.2,
+    sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart_of_lt_one
+      metric h_source_r2_unit.2]
+  exact equalVarianceGaussianAUCFromExplainedR2_strictMonoOn_unitInterval
+    h_target_r2_unit h_source_r2_unit h_r2_drop
+
 /-- **What a perfectly calibrated source and a nonzero shift budget give at the target**:
 the target CITL is the budget, its size is the budget's size, and it is strictly worse than
 the source's, which is zero.
@@ -980,13 +1002,9 @@ theorem source_to_target_exact_metric_profile_from_shift_budget
         (sourceMetricProfileFromSourceWeightsAtPrevalence
           metric (cal.observedMean Pop.target)).auc := by
     rw [targetMetricProfileFromSourceWeights_auc,
-      sourceMetricProfileFromSourceWeightsAtPrevalence_auc,
-      targetEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart_of_lt_one
-        metric h_target_r2_unit.2,
-      sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart_of_lt_one
-        metric h_source_r2_unit.2]
-    exact equalVarianceGaussianAUCFromExplainedR2_strictMonoOn_unitInterval
-      h_target_r2_unit h_source_r2_unit h_r2_drop
+      sourceMetricProfileFromSourceWeightsAtPrevalence_auc]
+    exact targetAUCFromSourceWeights_lt_source_of_r2_drop metric
+      h_source_r2_unit h_target_r2_unit h_r2_drop
   obtain ⟨h_citl_eq, h_abs_eq, h_abs_worse⟩ :=
     source_calibrated_target_citl_facts cal h_src_cal h_shift_nonzero
   have h_brier :
@@ -1361,13 +1379,9 @@ theorem auc_drop_and_citl_worsening_of_r2_drop_and_shift_budget
       (targetMetricProfileFromSourceWeights metric).auc <
         (sourceMetricProfileFromSourceWeightsAtTargetPrevalence metric).auc := by
     rw [targetMetricProfileFromSourceWeights_auc,
-      sourceMetricProfileFromSourceWeightsAtTargetPrevalence_auc,
-      targetEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart_of_lt_one
-        metric h_target_r2_unit.2,
-      sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart_of_lt_one
-        metric h_source_r2_unit.2]
-    exact equalVarianceGaussianAUCFromExplainedR2_strictMonoOn_unitInterval
-      h_target_r2_unit h_source_r2_unit h_r2_drop
+      sourceMetricProfileFromSourceWeightsAtTargetPrevalence_auc]
+    exact targetAUCFromSourceWeights_lt_source_of_r2_drop metric
+      h_source_r2_unit h_target_r2_unit h_r2_drop
   obtain ⟨h_citl_eq, h_abs_eq, h_abs_worse⟩ :=
     source_calibrated_target_citl_facts cal h_src_cal h_shift_nonzero
   exact ⟨h_auc, h_citl_eq, h_abs_eq, h_abs_worse⟩
