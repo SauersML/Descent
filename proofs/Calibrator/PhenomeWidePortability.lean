@@ -384,7 +384,14 @@ theorem fst_causal_lt_fst_neutral_of_stabilizing_selection
 /-- Effect-size-weighted retained causal portability from a locus-specific
 causal-`F_ST` profile, resolved per locus rather than as a trait-wide scalar.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **NOT TESTED BY THE DESIGN THAT LOOKED LIKE IT WAS**
+    (`proofs/validation/empirical/simcov/battery_bulk6.py`). That battery built
+    the oracle by evaluating this same effect-mass-weighted average over drawn
+    per-locus drift indices, so the oracle WAS the formula: it agreed to machine
+    precision in every cell and the harness now returns SELF-TEST. An
+    independent test would have to drift the loci and measure the retained
+    causal signal, not recompute the weighted mean. Recorded so the same
+    non-test is not run again and read as a validation. -/
 noncomputable def causalPortabilityFromLocalFst {m : ℕ}
     (sourceSquaredEffect fstCausal : Fin m → ℝ) : ℝ :=
   (∑ i, sourceSquaredEffect i * (1 - fstCausal i)) /

@@ -34,7 +34,7 @@ macro "generational_witness_simp" ms:Lean.Parser.Tactic.simpLemma,* : tactic =>
       taggingProjection, directCausalProjection, proxyTaggingProjection,
       GenerationalPopGenParameters.theta, GenerationalPopGenParameters.bigM,
       GenerationalPopGenParameters.tauAt, GenerationalPopGenParameters.hetDecayFactor,
-      GenerationalPopGenParameters.fstTransientAt,
+      GenerationalPopGenParameters.fstTransientAt, fstTransientDecayFromScaled,
       GenerationalPopGenParameters.mutationSharedRetentionAt,
       GenerationalPopGenParameters.migrationSharedBoostAt,
       ldCorrelationDecay, Matrix.one_mulVec, Matrix.mulVec, dotProduct,
@@ -560,6 +560,7 @@ theorem nondegenerateGenerationalPopGen_coordinates_at_one :
   · norm_num [nondegenerateGenerationalPopGen, GenerationalPopGenParameters.bigM]
   · simp [nondegenerateGenerationalPopGen, GenerationalPopGenParameters.tauAt]
   · simp [nondegenerateGenerationalPopGen, GenerationalPopGenParameters.fstTransientAt,
+      fstTransientDecayFromScaled, hetDecayFromScaled,
       GenerationalPopGenParameters.hetDecayFactor,
       GenerationalPopGenParameters.theta, GenerationalPopGenParameters.bigM]
     norm_num
@@ -931,7 +932,7 @@ theorem target_r2_changes_along_generation_indexed_af_path :
       crossCovariance,
       effectiveOutcomeVariance, irreducibleTargetResidualBurden,
       brokenTaggingResidual, ancestrySpecificLDResidual, sourceSpecificOverfitResidual,
-      GenerationalPopGenParameters.fstTransientAt,
+      GenerationalPopGenParameters.fstTransientAt, fstTransientDecayFromScaled,
       GenerationalPopGenParameters.mutationSharedRetentionAt,
       GenerationalPopGenParameters.migrationSharedBoostAt,
       GenerationalPopGenParameters.bigM,

@@ -150,10 +150,8 @@ noncomputable def ldDecayPerGeneration (r : ℝ) (t : ℕ) : ℝ :=
 the theorem states a number: an inequality or an invariance leaves a family of bodies
 satisfying it, and a value does not. -/
 theorem ldDecayPerGeneration_at_reference_point :
-    ldDecayPerGeneration 1 1 = 0 := by
+    ldDecayPerGeneration (1 / 2) 2 = 1 / 4 := by
   norm_num [ldDecayPerGeneration]
-
-
 
 /-! **Cross-check: geometric LD decay, recombination survival along a genealogy, and
 admixture-LD decay are one map.** `ldDecayPerGeneration_eq_discreteRecombinationSurvival`
@@ -171,17 +169,55 @@ across Lean, Python and JSON string tables and is blocked on `PortabilityDrift.l
 which cannot currently be edited from this session without reverting another session's
 in-flight work. -/
 
-/-- LD decay is in [0,1] for r ∈ [0,1]. -/
-theorem ld_decay_in_unit (r : ℝ) (t : ℕ)
+/-- LD retention is nonnegative for a recombination fraction in `[0,1]`. -/
+theorem ldDecayPerGeneration_nonneg (r : ℝ) (t : ℕ)
+    (h_r_le : r ≤ 1) :
+    0 ≤ ldDecayPerGeneration r t := by
+  unfold ldDecayPerGeneration
+  exact pow_nonneg (by linarith) t
+
+/-- LD retention is at most one for a nonnegative recombination fraction. -/
+theorem ldDecayPerGeneration_le_one (r : ℝ) (t : ℕ)
     (h_r : 0 ≤ r) (h_r_le : r ≤ 1) :
-    0 ≤ ldDecayPerGeneration r t ∧ ldDecayPerGeneration r t ≤ 1 := by
+    ldDecayPerGeneration r t ≤ 1 := by
+  unfold ldDecayPerGeneration
+  exact pow_le_one₀ (by linarith) (by linarith)
+
+/-- Discrete LD retention vanishes exactly after positive time at complete recombination. -/
+theorem ldDecayPerGeneration_eq_zero_iff (r : ℝ) (t : ℕ) :
+    ldDecayPerGeneration r t = 0 ↔ r = 1 ∧ 0 < t := by
   unfold ldDecayPerGeneration
   constructor
-  · exact pow_nonneg (by linarith) t
-  · exact pow_le_one₀ (by linarith) (by linarith)
+  · intro h
+    have h_t : t ≠ 0 := by
+      intro h_zero
+      rw [h_zero] at h
+      norm_num at h
+    have h_base : 1 - r = 0 := (pow_eq_zero_iff h_t).1 h
+    exact ⟨by linarith, Nat.pos_of_ne_zero h_t⟩
+  · rintro ⟨rfl, h_t⟩
+    exact (zero_pow (Nat.ne_of_gt h_t) : (0 : ℝ) ^ t = 0)
+
+/-- On the biological recombination interval, LD retention equals one exactly with no
+recombination or at elapsed time zero. -/
+theorem ldDecayPerGeneration_eq_one_iff (r : ℝ) (t : ℕ)
+    (h_r : 0 ≤ r) (h_r_le : r ≤ 1) :
+    ldDecayPerGeneration r t = 1 ↔ r = 0 ∨ t = 0 := by
+  unfold ldDecayPerGeneration
+  constructor
+  · intro h
+    by_cases h_t : t = 0
+    · exact Or.inr h_t
+    by_cases h_r_zero : r = 0
+    · exact Or.inl h_r_zero
+    have h_r_pos : 0 < r := lt_of_le_of_ne h_r (Ne.symm h_r_zero)
+    have h_pow_lt : (1 - r) ^ t < 1 :=
+      pow_lt_one₀ (by linarith) (by linarith) h_t
+    linarith
+  · rintro (rfl | rfl) <;> simp
 
 /-- LD decays faster with higher recombination rate. -/
-theorem ld_decay_faster_with_higher_r (r₁ r₂ : ℝ) (t : ℕ)
+theorem ldDecayPerGeneration_lt_of_recombination_lt (r₁ r₂ : ℝ) (t : ℕ)
     (h_r₂ : r₂ ≤ 1)
     (h_lt : r₁ < r₂) (h_t : 0 < t) :
     ldDecayPerGeneration r₂ t < ldDecayPerGeneration r₁ t := by

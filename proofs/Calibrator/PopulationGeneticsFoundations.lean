@@ -1524,9 +1524,12 @@ theorem islandModelFst_eq_mutationForm (Ne m : ℝ) :
     now has to read a name that says the body does not apply to them, rather
     than a name that says it does. Documenting the restriction in prose while
     leaving the name unqualified is what let the two-deme error stand, and the
-    same pattern is recorded on `asymmetricFst` in `PortabilityDrift`, whose
-    name commits it to exactly two demes and which therefore cannot be repaired
-    this way at all.
+    same pattern was recorded on `asymmetricFst` in `PortabilityDrift`, whose
+    name commits it to exactly two demes and which therefore could not be
+    repaired this way at all. That one was repaired the other way instead: it
+    now takes BOTH migration rates and returns the two-deme value at their sum,
+    which is validated to 2.03 sems where the single-rate body it replaced was
+    excluded at 79.9.
 -/
 noncomputable def fstMigrationMutationEquilibriumManyDemes (Ne m μ : ℝ) : ℝ :=
   1 / (1 + 4 * Ne * m + 4 * Ne * μ)
@@ -1605,18 +1608,19 @@ theorem fstIslandEquilibriumFiniteDemes_eq_limit_of_unit_correction
   unfold fstIslandEquilibriumFiniteDemes fstMigrationMutationEquilibriumManyDemes
   rw [h]; ring_nf
 
-/-- **fstMigrationMutationEquilibriumManyDemes at the denominator, named.** Migration and mutation enter
-the divisor additively, so an inadmissible negative migration rate can cancel the leading one
-even with mutation absent. The equilibrium is reported as zero -- no differentiation -- where the
-formula has no value at all. Consumers must exclude it by hypothesis. -/
+/-- **`fstMigrationMutationEquilibriumManyDemes` at the denominator, named.**
+Migration and mutation enter the divisor additively, so an inadmissible negative migration rate
+can cancel the leading one even with mutation absent. The equilibrium is reported as zero -- no
+differentiation -- where the formula has no value at all. Consumers must exclude it by hypothesis. -/
 theorem fstMigrationMutationEquilibriumManyDemes_cancelling_terms_is_junk :
     fstMigrationMutationEquilibriumManyDemes 1 (-(1/4)) 0 = 0 := by
   unfold fstMigrationMutationEquilibriumManyDemes
   norm_num
 
-/-- **The migration term's coefficient, pinned.** `fstMigrationMutationEquilibriumManyDemes_isFixedPoint`
-is invariant under exactly the rescaling it should exclude. At `4 Ne m = 1` with no mutation the
-equilibrium `Fst` is one half, which fixes the factor four on the migration term. -/
+/-- **The migration term's coefficient, pinned.**
+`fstMigrationMutationEquilibriumManyDemes_isFixedPoint` is invariant under exactly the rescaling
+it should exclude. At `4 Ne m = 1` with no mutation the equilibrium `Fst` is one half, which fixes
+the factor four on the migration term. -/
 theorem fstMigrationMutationEquilibriumManyDemes_migration_only :
     fstMigrationMutationEquilibriumManyDemes 1 (1 / 4) 0 = 1 / 2 := by
   unfold fstMigrationMutationEquilibriumManyDemes

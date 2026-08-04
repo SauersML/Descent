@@ -187,7 +187,30 @@ locus-wise process it was supposed to summarise. This is that process, on the
 standardized scale where each locus contributes drift variance `fst` per unit
 squared effect:
 
-  `Var(ΔPGS) = Σᵢ fst × βᵢ²`.
+  `Var(ΔPGS) = 2 Σᵢ fst × βᵢ²`.
+
+**That displayed equation carried no factor of two and has been corrected.** It
+read `Var(ΔPGS) = Σᵢ fst × βᵢ²`, which is this body itself, and so said that this
+sum IS the drift variance. The theorem immediately below says it is HALF of it,
+and the paragraph after that explains why. The three could not all be right, and
+the docstring's own displayed equation was the one that was wrong -- which is
+worth recording rather than quietly fixing, because a definition whose summary
+line contradicts the theorem underneath it is exactly the shape a reader trusts
+and does not check.
+
+Measured (`proofs/validation/empirical/simcov/battery_dis1.py`): Wright-Fisher,
+`Ne = 200`, 400 loci, 2500 replicate populations, variance of ONE population's
+mean score about the ancestral mean, with the effects drawn on the standardized
+scale this docstring declares so that `Σ βᵢ²` is `V_A`:
+
+  generations   F       Σ fst βᵢ²    2 Σ fst βᵢ²   simulated
+     30         0.072      25.98        51.97      51.55 ± 1.46
+    100         0.221      91.79       183.58     181.14 ± 5.12
+    250         0.465     210.88       421.76     427.79 ± 12.10
+
+The sum alone is 50 percent low at up to 17.9 sems; twice the sum is within 0.5
+sems in every cell. The positive control is `pgsDriftVariance_one_pop = 2 fst
+V_A`, validated independently on this engine in `battery_bulk3.py`.
 
 `pgsDriftVarianceFromLoci_eq_closedForm` is the theorem that the sum and the
 closed form agree, so the closed form can now be contradicted by changing either
@@ -199,7 +222,9 @@ locus already carries its `2p(1-p)` inside `beta`, while
 two are the same quantity written in two units, and writing the identity without
 the factor -- as it stood -- asserted that the units agree.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED as half the one-branch drift variance** (worst
+    0.5 sems), and the reading its own summary line invited -- that the sum is
+    that variance -- **FALSIFIED at 17.9 sems**. -/
 noncomputable def pgsDriftVarianceFromLoci {n : ℕ} (fst : ℝ) (β : Fin n → ℝ) : ℝ :=
   ∑ i : Fin n, fst * β i ^ 2
 

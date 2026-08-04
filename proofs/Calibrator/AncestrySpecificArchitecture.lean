@@ -319,7 +319,32 @@ theorem taggedEffect_eq_iff
     how well the genotyped SNPs tag causal variants:
     h²_GWAS = h²_true × average_r²_tag.
 
-    Empirical status: UNTESTED. -/
+    Regime: `h²_true` is the heritability the effects actually carry, not a
+    nominal per-effect variance times a locus count. The distinction is not
+    pedantic and it is what a measurement of this definition turns on -- see
+    below.
+
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_dis1.py`). 100000 individuals,
+    300 causal variants each tagged by one variant at correlation `rho`,
+    heritability captured by regressing the outcome on the TAGS, with the
+    in-sample `R²` corrected for its `m/n` optimism:
+
+      design              this def   captured
+      h² = 0.5, rho = 0.9  0.40590   0.40681 ± 0.00257   (0.35 sems)
+      h² = 0.5, rho = 0.6  0.18777   0.18793 ± 0.00119   (0.14 sems)
+      h² = 0.8, rho = 0.8  0.51355   0.50972 ± 0.00322   (1.19 sems)
+
+    **A retraction** (`battery_bulk5.py`). That battery reported this definition
+    FALSIFIED at 42 sems and 23 percent low. The report is withdrawn: it drew 60
+    effects from `N(0, h²/M)` and then compared against the NOMINAL `h²`. The
+    realised heritability of 60 such draws scatters by `sqrt(2/60)`, about 18
+    percent, which is the whole of the reported error -- the same runs agree to
+    0.35 sems once `h²_true` is read as the heritability the drawn effects
+    actually produce. The definition never claimed to know what a finite draw
+    would realise.
+
+    Power: the prediction spans 0.18777 to 0.51355 across the design. -/
 noncomputable def gwasHeritability (h2_true avg_r2_tag : ℝ) : ℝ :=
   h2_true * avg_r2_tag
 

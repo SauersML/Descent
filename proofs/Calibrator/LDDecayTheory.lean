@@ -411,7 +411,33 @@ theorem driftLDStep_eq_ibdRecurrenceStep (Ne c Q : ℝ) :
     unbounded rise: with `c = 0` it is the pure-drift retention `1 - 1/(2 Nₑ)`,
     and only a positive `c` makes the process settle below `1`.
 
-    Empirical status: UNTESTED. -/
+    Regime: this is the SLOPE of `driftLDStep` in `Q`, not the ratio
+    `E[D²_{t+1}]/E[D²_t]`. Those are different numbers because the step also has
+    a drift CREATION term, which is what makes the ratio exceed one at `c = 0` --
+    drift manufactures `D²` out of nothing while destroying `D` -- and a
+    measurement that reads the ratio is not measuring this definition.
+
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_dis1.py`). Two-locus
+    Wright-Fisher, `p = q = 1/2`, 400000 replicates. The slope is obtained by
+    differencing two arms that share `p` and `q` and differ only in `D₀`, so the
+    creation term -- identical in both arms -- cancels exactly:
+
+      design              this def   measured slope
+      Ne = 100, c = 0.00   0.99500   0.98522 ± 0.00036
+      Ne = 100, c = 0.02   0.95560   0.94634 ± 0.00036
+      Ne = 100, c = 0.05   0.89799   0.88936 ± 0.00035
+      Ne = 500, c = 0.02   0.95944   0.95742 ± 0.00016
+
+    Within one percent everywhere, and the residual is the second-order term the
+    linearised step drops. The positive control is the `c = 0` cell against the
+    pure-drift retention `1 - 1/(2 Nₑ)`.
+
+    **A retraction** (`battery_core.py`). That battery reported this definition
+    FALSIFIED at 25.8 sems by measuring the raw ratio `E[D²_{t+1}]/E[D²_t]`,
+    which came out at `1.044` at `Ne = 100, c = 0` -- above one, which no
+    retention factor can be. That number was correct and was evidence about the
+    creation term, not about this slope. -/
 noncomputable def driftLDRetention (Ne c : ℝ) : ℝ :=
   (1 - c) ^ 2 * (1 - 1 / (2 * Ne))
 

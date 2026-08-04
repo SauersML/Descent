@@ -96,7 +96,18 @@ noncomputable def coalescenceCdfFromHazard (hazard : ℝ → ℝ) (t : ℝ) : �
 /-- Coalescent time `τ = t / (2·Nₑ)`: generations rescaled by the diploid
 coalescent timescale.
 
-    Empirical status: UNTESTED. -/
+    Regime: a clean two-population split with no migration and equal sizes.
+
+    Empirical status: **VALIDATED** (`simcov/battery_bulk20.py`, `group_a`).
+    The divisor is what a simulation can decide, so the body is read through the
+    saturation law it is paired with and inverted: `F_ST / (1 - F_ST)` estimates
+    `τ` directly, and `t / Nₑ` or `t / (4·Nₑ)` would miss it by exactly the
+    factor in the divisor. Across `Nₑ` and `t` chosen so `τ` runs 0.125, 0.25,
+    1, 2, 4 -- a thirtytwofold sweep, prediction spanning 97% -- the measured
+    odds are 0.2477 ± 0.0080, 1.0038 ± 0.0309, 0.1326 ± 0.0034, 1.9946 ±
+    0.0559 and 4.0164 ± 0.0799, worst cell 2.24 sems. `Nₑ` and `t` are moved
+    separately, so the two appear at the same `τ` by different routes and a
+    body that scaled by only one of them would separate. -/
 noncomputable def coalescentTau (t Ne : ℝ) : ℝ :=
   t / (2 * Ne)
 
@@ -163,7 +174,21 @@ theorem fstFromTau_negative_unit_tau_is_junk :
 /-- `F_ST` after `t` generations of drift at effective size `Nₑ`, obtained by
 rescaling to coalescent time and applying `fstFromTau`.
 
-    Empirical status: UNTESTED. -/
+    Regime: a clean two-population split with no migration and equal sizes;
+    `F_ST` is the pairwise Hudson estimator as a ratio of averages, which is the
+    convention every `F_ST` in this corpus is written for.
+
+    Empirical status: **VALIDATED** (`simcov/battery_bulk20.py`, `group_a`).
+    The composition, not either half alone, is what is measured: `τ` is never
+    read off, only `t` and `Nₑ` go in. Over `τ` = 0.125, 0.25, 1, 2, 4 the body
+    predicts 0.11111, 0.20000, 0.50000, 0.66667 and 0.80000 against measured
+    0.11708 ± 0.00264, 0.19851 ± 0.00511, 0.50095 ± 0.00770, 0.66607 ± 0.00624
+    and 0.80065 ± 0.00317, worst cell 2.26 sems at 5.1% relative. Power: the
+    prediction spans 86% of the unit interval and crosses the whole saturating
+    curve, so a form linear in `τ`, or one saturating at another rate, separates
+    on the grid rather than only at its ends. Simulated with recombination
+    (8 Mb at 1e-8): at zero recombination one genealogy per replicate makes the
+    error bar honest but far too wide to decide anything. -/
 noncomputable def fstFromGenerations (t Ne : ℝ) : ℝ :=
   fstFromTau (coalescentTau t Ne)
 
@@ -433,7 +458,20 @@ noncomputable def SplitMigrationModel.fstEqLimitLowMutationManyDemes (m :
 /-- Hudson's `F_ST` estimator from mean coalescence times: one minus the ratio
 of the within-population time to the total time.
 
-    Empirical status: UNTESTED. -/
+    Regime: a clean two-population split, no migration, equal sizes.
+
+    Empirical status: **VALIDATED** (`simcov/battery_bulk20.py`, `group_a`).
+    This body claims that the GENEALOGICAL quantity computes the FREQUENCY one,
+    so the two sides are taken from two engines that share no code: `ETss` and
+    `ETst` come from branch-mode diversity and divergence over the tree
+    sequence, and the value they are compared against is the site-frequency
+    Hudson estimator over mutations dropped on that same tree, as a ratio of
+    averages. Agreement is therefore evidence and not a transcription checked
+    against itself. Over `τ` = 0.125, 0.25, 1, 2, 4 the branch-time reading
+    gives 0.11571, 0.19622, 0.49809, 0.66453 and 0.79992 against the
+    frequency-based 0.11708 ± 0.00372, 0.19851 ± 0.00711, 0.50095 ± 0.01057,
+    0.66607 ± 0.00875 and 0.80065 ± 0.00447, worst cell 0.37 sems over a
+    prediction spanning 86%. -/
 noncomputable def hudsonFstFromCoalescenceTimes (ETss ETst : ℝ) : ℝ :=
   1 - ETss / ETst
 
@@ -793,9 +831,30 @@ This is the number the closed-population model sets to zero.
     Regime: none. Its `mu = 0` value is `0`, which is the closed-population
     assumption itself, and is why that model predicts unbounded loss.
 
-    Empirical status: UNTESTED as a formula, but the observation it explains is
-    measured: at demographic equilibrium the retention stays at `1.025 ± 0.020`
-    out to `T = 4000` where the floorless model predicts `0.135`. -/
+    Empirical status: **VALIDATED** (`simcov/battery_bulk20b.py`). The
+    saturation is an INFINITE-ALLELES statement, and reading it under infinite
+    sites is what an earlier attempt got wrong: per-site heterozygosity there is
+    approximately `θ` and the `1 / (1 + θ)` denominator never shows. Measured on
+    a single locus under `msprime`'s `InfiniteAlleles` model at `Nₑ = 1000` with
+    100 sampled chromosomes and 40 independent replicates, with heterozygosity
+    taken as the unbiased `1 - ∑ pᵢ²` over the WHOLE sample -- never conditioned
+    on the locus being polymorphic, which inflates it exactly where `θ` is
+    small. Over `θ` = 0.1, 0.5, 1, 3, 10 the body predicts 0.09091, 0.33333,
+    0.50000, 0.75000 and 0.90909 against measured 0.11943 ± 0.02958, 0.37403 ±
+    0.03421, 0.49994 ± 0.03388, 0.76355 ± 0.01782 and 0.91824 ± 0.00421, worst
+    cell 2.17 sems at 1.0% relative, over a prediction spanning 90%.
+
+    Control: Ewens' sampling formula for the expected number of distinct
+    alleles, `∑ᵢ θ/(θ+i-1)`, evaluated on the same samples. It shares no algebra
+    with the body and passed at worst 1.10 sems (1.50/1.53, 3.28/3.45,
+    5.19/5.38, 11.12/11.40, 24.44/25.05). It earned its place: on the first run
+    the control returned exactly 2 alleles in every cell, which the sampling
+    formula cannot produce, and it voided a design whose heterozygosity cells
+    would otherwise have been read as a 21-sem falsification of this body.
+
+    The observation the body explains is measured too: at demographic
+    equilibrium the retention stays at `1.025 ± 0.020` out to `T = 4000` where
+    the floorless model predicts `0.135`. -/
 noncomputable def hetMutationFloor (Ne mu : ℝ) : ℝ :=
   4 * Ne * mu / (1 + 4 * Ne * mu)
 
@@ -2993,9 +3052,24 @@ noncomputable def hetDecayFactor (g : GenerationalPopGenParameters) : ℝ :=
 discrete-time drift/mutation/migration coordinate used in the evolutionary
 layer, but now exposed directly to the mechanistic SNP/LD state.
 
-    Empirical status: UNTESTED. -/
+    **The decay base was `hetDecayFactor` and has been corrected to
+    `fstTransientDecayFromScaled`, which carries migration as well.** The level
+    this coordinate settles at is `1/(1 + θ + M)` and depends on the migration
+    rate; the rate at which it got there did not, and that is not a possible
+    process. Measured as a half-life, the superseded base overstates the time to
+    half the plateau by a factor of seventeen at `4 Nₑ m = 16`.
+
+    Note that `hetDecayFactor` itself is untouched and remains correct for what
+    it is: migration does not destroy heterozygosity, it relocates it. The error
+    was in using a within-deme decay for a between-deme transient.
+
+    Empirical status: **VALIDATED after correction; the superseded base
+    FALSIFIED at up to 2222 sems**
+    (`proofs/validation/empirical/simcov/battery_dis4.py`). The design and the
+    table are recorded on `DGP.fstTransientDecayFromScaled`. -/
 noncomputable def fstTransientAt (g : GenerationalPopGenParameters) (t : ℕ) : ℝ :=
-  (1 / (1 + g.theta + g.bigM)) * (1 - g.hetDecayFactor ^ t)
+  (1 / (1 + g.theta + g.bigM)) *
+    (1 - fstTransientDecayFromScaled g.Ne g.theta g.bigM ^ t)
 
 /-- Mutation-driven retention of shared ancestral variation after `t`
 generations.
@@ -3048,7 +3122,7 @@ noncomputable def migrationSharedBoostAt
 
 @[simp] theorem fstTransientAt_zero (g : GenerationalPopGenParameters) :
     g.fstTransientAt 0 = 0 := by
-  simp [fstTransientAt, hetDecayFactor]
+  simp [fstTransientAt, fstTransientDecayFromScaled, hetDecayFromScaled]
 
 @[simp] theorem mutationSharedRetentionAt_zero (g : GenerationalPopGenParameters) :
     g.mutationSharedRetentionAt 0 = 1 := by
@@ -3100,17 +3174,19 @@ noncomputable def PGSEvolutionaryModel.toGenerationalPopGenParameters
 
 /-- The transient `F_ST` coordinate in the coarse DGP block agrees exactly with
 the generation-indexed popgen bridge at `⌊t_div⌋`, because both use the same
-discrete heterozygosity recursion. -/
+discrete differentiation recursion. Both were corrected together: an identity
+between two coordinates survives a common wrong factor on both sides, so this
+theorem constrained them jointly and could not have caught the decay base. -/
 @[simp] theorem PGSEvolutionaryModel.toGenerationalPopGenParameters_fstTransientAt_floor
     (m : PGSEvolutionaryModel) :
     (m.toGenerationalPopGenParameters).fstTransientAt (Nat.floor m.t_div) =
       m.fstTransient := by
   unfold GenerationalPopGenParameters.fstTransientAt PGSEvolutionaryModel.fstTransient
-  rw [PGSEvolutionaryModel.toGenerationalPopGenParameters_hetDecayFactor,
-    PGSEvolutionaryModel.toGenerationalPopGenParameters_theta,
-    PGSEvolutionaryModel.toGenerationalPopGenParameters_bigM]
-  simp [fstEquilibrium, PGSEvolutionaryModel.toEvo,
-    EvolutionaryParameters.theta, EvolutionaryParameters.bigM]
+    fstTransientDecayFromScaled hetDecayFromScaled
+  simp [PGSEvolutionaryModel.toGenerationalPopGenParameters, fstEquilibrium,
+    GenerationalPopGenParameters.theta, GenerationalPopGenParameters.bigM,
+    PGSEvolutionaryModel.toEvo, EvolutionaryParameters.theta,
+    EvolutionaryParameters.bigM, scaledMutationRate, scaledMigrationRate]
 
 /-- When divergence time is an integer number of generations, the coarse
 mutation-history coordinate agrees exactly with the generational popgen bridge
@@ -6597,7 +6673,13 @@ theorem sharedLD_from_equilibrium_eq (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 ≤ m) 
     and `sharedLD_from_equilibrium_eq_sharedLDFromMigration` for the
     formal algebraic derivation.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **AN IDENTITY, NOT A MEASUREMENT**
+    (`proofs/validation/empirical/simcov/battery_bulk9.py`). This is the
+    algebraic complement of `fstMigrationDriftEquilibrium`, which is separately
+    measured, so a battery comparing the two reproduces `M/(1+M) = 1 - 1/(1+M)`
+    to machine precision and the harness returns SELF-TEST. The empirical content
+    is entirely in the equilibrium it complements -- including that equilibrium's
+    recorded deme-count blindness, which this inherits. -/
 noncomputable def sharedLDFromMigration (M : ℝ) : ℝ :=
   M / (1 + M)
 
@@ -6790,13 +6872,58 @@ That theorem *does* prove the migration claim, because it derives the `F_ST` ord
 
 /-! ### 6. Asymmetric migration -/
 
-/-- **Asymmetric migration Fst model.**
-    When migration is asymmetric (m₁₂ ≠ m₂₁), the effective Fst depends on
-    direction. The effective migration for population i is the rate at which
-    it receives migrants. The "effective Fst" from population 1's perspective
-    uses m₁₂ (rate of migrants into pop 1 from pop 2).
+/-- **Two demes exchanging migrants at two different rates.**
 
-    Empirical status: **FALSIFIED**, and by the same mechanism as
+    `1 / (1 + 4 Nₑ (m₁₂ + m₂₁))`: the differentiation between two demes is set by
+    the TOTAL rate at which they exchange lineages, and by nothing else. It does
+    not depend on the direction, and there is no such thing as "`F_ST` from
+    population 1's perspective" -- `F_ST` is a property of the pair.
+
+    **Both the signature and the body have been corrected, and the claim the old
+    ones made was excluded by measurement.** The definition read
+    `asymmetricFst (Ne m_into) = 1 / (1 + 4 Nₑ m_into)`: one rate, named as the
+    rate INTO the focal deme, with two theorems below asserting that the answer
+    moves when the direction is swapped. Two things were wrong with it at once.
+    It could not say which of the two rates `m_into` was, and at `m₁₂ = m₂₁`,
+    where that ambiguity does not arise, it still returned the many-deme limit
+    `1/(1 + 4 Nₑ m)` for a system its own name commits to exactly two demes.
+
+    Empirical status: **VALIDATED after correction; the superseded body
+    FALSIFIED at up to 80 sems**
+    (`proofs/validation/empirical/simcov/battery_dis2.py`). Two demes,
+    `Ne = 1000`, `F_ST` read as `1 - E[T_within]/E[T_between]` from branch
+    lengths so no estimator convention enters, 24 replicates of 4 Mb. Six
+    designs: the total rate spans a factor of four, and three of them share a
+    total while differing in asymmetry, so a law that depended on more than the
+    total would separate:
+
+      m12      m21      larger    smaller   this body   measured
+      5.0e-4   5.0e-4   0.33333   0.33333   0.20000     0.22086 ± 0.01028
+      1.0e-3   1.0e-3   0.20000   0.20000   0.11111     0.12226 ± 0.00576
+      2.0e-3   2.0e-3   0.11111   0.11111   0.05882     0.05748 ± 0.00331
+      1.5e-3   5.0e-4   0.14286   0.33333   0.11111     0.10395 ± 0.00570
+      1.8e-3   2.0e-4   0.12195   0.55556   0.11111     0.10281 ± 0.00567
+      3.5e-3   5.0e-4   0.06667   0.33333   0.05882     0.05717 ± 0.00383
+
+    This body's worst cell is 2.03 sems. The two readings of the old single
+    argument are excluded at 16.2 and 79.9 sems, and neither failure is a
+    constant: the smaller-rate reading is wrong by a factor of five at the most
+    asymmetric design and right to within a factor of two at the least, which is
+    what an underspecified signature looks like from the outside.
+
+    Note which rows carry the finding. The three symmetric rows alone would only
+    have shown the missing deme-count factor of two. The three rows sharing a
+    total of `2.0e-3` while running from mild to strong asymmetry are what
+    excludes any direction dependence: they agree with each other to 1.4 sems
+    while the two directional readings differ from each other by a factor of
+    four and a half across them.
+
+    The positive control is the symmetric cell at `m = 1.0e-3` against the
+    two-deme island value `1/(1 + 2 · 4 Nₑ m)`, validated independently in
+    `battery_correct.py`, and it passes at 1.93 sems.
+
+    Superseded, and recorded because it was believed: **FALSIFIED**, by the same
+    mechanism as
     `PopulationGeneticsFoundations.fstMigrationMutationEquilibriumManyDemes`: the
     deme-count factor is missing (`proofs/validation/empirical/simcov/battery_bulk13.py`).
     Two demes with asymmetric migration, `Ne = 1000`, `F_ST` read as
@@ -6826,61 +6953,68 @@ That theorem *does* prove the migration claim, because it derives the `F_ST` ord
     Wright-Fisher attempt at this same pair in `battery_bulk1.py` did not, and
     was correctly voided for.
 
-    Power: the measurement spans 0.10918 to 0.11538 while the two candidate
-    readings span 0.12195 to 0.55556, so the design separates them by a factor
-    of five. -/
-noncomputable def asymmetricFst (Ne m_into : ℝ) : ℝ :=
-  1 / (1 + 4 * Ne * m_into)
+    Power: the prediction spans 0.05882 to 0.20000 across the design, a factor
+    of three and a half. -/
+noncomputable def asymmetricFst (Ne m₁₂ m₂₁ : ℝ) : ℝ :=
+  1 / (1 + 4 * Ne * (m₁₂ + m₂₁))
 
-/-- **asymmetricFst at `4 * Ne * m_into = -1`, named.** The directional twin of
+/-- **asymmetricFst at `4 * Ne * (m₁₂ + m₂₁) = -1`, named.** The two-deme twin of
 `fstMigrationDriftEquilibrium_balancing_negative_migration_is_junk`, with the same divisor and
 the same collapse to no differentiation. Consumers must exclude it by hypothesis. -/
 theorem asymmetricFst_balancing_negative_migration_is_junk :
-    asymmetricFst 1 (-(1/4)) = 0 := by
+    asymmetricFst 1 (-(1/8)) (-(1/8)) = 0 := by
   unfold asymmetricFst
   norm_num
 
-/-- **Asymmetric Fst is just the island model Fst with directional migration.** -/
-theorem asymmetricFst_eq_migrationDriftEq (Ne m_into : ℝ) :
-    asymmetricFst Ne m_into = fstMigrationDriftEquilibrium Ne m_into := by
+/-- **Two demes at two rates are one deme pair at the total rate.** The limit form applied to
+the SUM of the two rates is the two-deme answer -- which is also why the deme-count factor of
+two appears in the symmetric case without being written anywhere: at `m₁₂ = m₂₁ = m` the sum is
+`2 m`. -/
+theorem asymmetricFst_eq_migrationDriftEq (Ne m₁₂ m₂₁ : ℝ) :
+    asymmetricFst Ne m₁₂ m₂₁ = fstMigrationDriftEquilibrium Ne (m₁₂ + m₂₁) := by
   unfold asymmetricFst fstMigrationDriftEquilibrium
   rfl
 
-/-- **The asymmetric `Fst`'s scale, pinned.** The identity with `migrationDriftEq` constrains the
+/-- **The two-deme `Fst`'s scale, pinned.** The identity with `migrationDriftEq` constrains the
 two definitions jointly: a common wrong factor in both cancels and the identity survives. This
-evaluates `asymmetricFst` alone, at the migration rate where drift and immigration balance, and
-fixes the `4 Ne m` normalisation that the identity leaves free. -/
+evaluates `asymmetricFst` alone, at the total exchange rate where drift and immigration balance,
+and fixes the `4 Ne m` normalisation that the identity leaves free. -/
 theorem asymmetricFst_at_balancing_migration :
-    asymmetricFst 1 (1 / 4) = 1 / 2 := by
+    asymmetricFst 1 (1 / 8) (1 / 8) = 1 / 2 := by
   unfold asymmetricFst
   norm_num
 
-/-- **When m₁₂ > m₂₁, Fst from perspective of pop 1 is lower.**
-    Population 1 receives more migrants from pop 2, so its genetic composition
-    is closer to pop 2 than vice versa. -/
-theorem asymmetric_migration_directional_fst
-    (Ne m₁₂ m₂₁ : ℝ) (hNe : 0 < Ne) (hm₂₁ : 0 < m₂₁)
-    (h_asym : m₂₁ < m₁₂) :
-    asymmetricFst Ne m₁₂ < asymmetricFst Ne m₂₁ := by
-  simp only [asymmetricFst_eq_migrationDriftEq]
-  exact fstMigrationDriftEquilibrium_decreases_with_m Ne m₂₁ m₁₂ hNe hm₂₁ h_asym
+/-- **There is no direction. Swapping the two rates changes nothing.**
 
-/-- **Portability depends on prediction direction under asymmetric migration.**
-    Predicting into a population that receives more migrants (lower Fst from
-    its perspective) yields higher R² than predicting the other way. -/
-theorem asymmetric_migration_portability_direction
-    (V_A V_E Ne m₁₂ m₂₁ : ℝ)
-    (hVA : 0 < V_A) (hVE : 0 < V_E) (hNe : 0 < Ne)
-    (hm₂₁ : 0 < m₂₁)
-    (h_asym : m₂₁ < m₁₂) :
-    presentDayR2 V_A V_E (asymmetricFst Ne m₂₁) <
-      presentDayR2 V_A V_E (asymmetricFst Ne m₁₂) := by
-  have h_fst := asymmetric_migration_directional_fst Ne m₁₂ m₂₁ hNe hm₂₁ h_asym
-  have h_lt_one : asymmetricFst Ne m₂₁ < 1 := by
-    simpa [asymmetricFst_eq_migrationDriftEq] using
-      fstMigrationDriftEquilibrium_lt_one Ne m₂₁ hNe hm₂₁
-  exact drift_degrades_R2 V_A V_E (asymmetricFst Ne m₁₂) (asymmetricFst Ne m₂₁)
-    hVA hVE h_fst (le_of_lt h_lt_one)
+    This replaces `asymmetric_migration_directional_fst`, which asserted the
+    opposite -- that when `m₁₂ > m₂₁` the `F_ST` "from population 1's
+    perspective" is strictly lower -- and which was excluded by measurement. The
+    design that excludes it is in the docstring above: three deme pairs sharing a
+    total exchange rate of `2.0e-3` while running from mild to strong asymmetry
+    agree with each other to 1.4 sems, where the directional reading requires
+    them to span a factor of four and a half.
+
+    A definition that returns different numbers for `(m₁₂, m₂₁)` and
+    `(m₂₁, m₁₂)` is making a claim, and it is not enough to note that the claim
+    is now absent from the body: stating the symmetry is what stops the
+    directional reading being reintroduced by someone who reads the name. -/
+theorem asymmetricFst_symm (Ne m₁₂ m₂₁ : ℝ) :
+    asymmetricFst Ne m₁₂ m₂₁ = asymmetricFst Ne m₂₁ m₁₂ := by
+  unfold asymmetricFst
+  ring_nf
+
+/-- **Portability does not depend on the prediction direction under asymmetric migration.**
+
+    The superseded `asymmetric_migration_portability_direction` said it does:
+    that predicting into the deme receiving more migrants yields a strictly
+    higher `R²`. That was a consequence of the directional `F_ST`, and it goes
+    with it. Drift degrades `R²` through `F_ST` alone, and `F_ST` here is a
+    property of the pair, so the two directions are worth exactly the same. -/
+theorem asymmetric_migration_portability_directionless
+    (V_A V_E Ne m₁₂ m₂₁ : ℝ) :
+    presentDayR2 V_A V_E (asymmetricFst Ne m₂₁ m₁₂) =
+      presentDayR2 V_A V_E (asymmetricFst Ne m₁₂ m₂₁) := by
+  rw [asymmetricFst_symm]
 
 /-- **Arithmetic mean of the two directional migration rates.**
 
@@ -7104,7 +7238,27 @@ theorem admixtureLDDecay_at_zero (r : ℝ) :
     from admixture LD relative to equilibrium LD is captured by the ratio
     of admixture LD retention to equilibrium LD fraction.
 
-    Empirical status: UNTESTED. -/
+    Regime: a one-pulse admixture event, read from the pulse forward.
+    `equilibrium_ld` is an INPUT and not modelled here, so what a simulation can
+    put on trial is the numerator and the fact that the body is a ratio in it --
+    not the baseline's value.
+
+    Empirical status: **VALIDATED** (`simcov/battery_bulk20c.py`, `group_d`).
+    A 50/50 pulse into a Wright-Fisher population at `Nₑ = 2000`, then
+    recombination and drift for 40 generations, over 400 independent
+    replicates; the observable is `E[D_t] / E[D_0]` divided by a baseline held
+    at 0.25. Across `r` = 0.005, 0.02, 0.05, 0.15 and `t` = 10, 40 the body
+    predicts 3.80444, 3.27327, 3.26828, 1.78280, 2.39497, 0.51402, 0.78749 and
+    0.00602 against measured 3.83190 ± 0.02512, 3.26726 ± 0.04721, 3.28631 ±
+    0.02277, 1.79945 ± 0.03596, 2.41661 ± 0.02143, 0.46521 ± 0.02707, 0.77093 ±
+    0.01663 and 0.01927 ± 0.01690, worst cell 1.80 sems.
+
+    Power: the prediction spans the full range from a 3.8-fold boost down to
+    essentially none -- three orders of magnitude -- and `r` and `t` are moved
+    separately, so the two cells that reach a similar boost by different routes
+    both have to hold. Control: the finite-`Nₑ` retention
+    `((1-r)(1 - 1/(2Nₑ)))^t`, derived independently of this body, passed on the
+    same code path. -/
 noncomputable def admixtureLDBoost (r : ℝ) (t_since : ℕ) (equilibrium_ld : ℝ) : ℝ :=
   admixtureLDDecay r t_since / equilibrium_ld
 

@@ -5,16 +5,22 @@ import Mathlib.Analysis.SpecialFunctions.Log.Basic
 import Mathlib.Analysis.SpecialFunctions.Log.Deriv
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
 import Mathlib.Analysis.Complex.ExponentialBounds
+import Mathlib.Analysis.Calculus.MeanValue
 import Mathlib.Analysis.MeanInequalities
 import Mathlib.Analysis.MeanInequalitiesPow
 import Mathlib.Analysis.Normed.Group.Tannery
 import Mathlib.Data.Nat.Choose.Sum
+import Mathlib.Data.Matrix.Mul
+import Mathlib.Data.Real.StarOrdered
 import Mathlib.Logic.Equiv.Fintype
 import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
+import Mathlib.LinearAlgebra.Matrix.DotProduct
+import Mathlib.LinearAlgebra.Matrix.PosDef
 import Mathlib.LinearAlgebra.Vandermonde
 import Mathlib.Topology.Sequences
 import Mathlib.Topology.ContinuousMap.Bounded.ArzelaAscoli
 import Mathlib.Topology.MetricSpace.UniformConvergence
+import Mathlib.Topology.Order.LeftRight
 import Mathlib.Tactic
 import Calibrator.ObservationalCeiling
 
@@ -22,8 +28,10 @@ namespace Calibrator
 
 namespace TrafficInvariantSeparation
 
+open scoped Matrix Topology
+
 /-!
-# Hardness by invariant separation, and the sub-critical traffic window
+# Hardness by invariant separation and exact finite Curie--Weiss pressure
 
 A procedure class that cannot tell two designs apart inherits, on the harder of
 the two, the whole gap between their optima. That template is what turns an
@@ -70,12 +78,15 @@ keeps the matched-Bayes hinge outside the proved statements.
 
 * `finiteLogSum_ge_weightedLogRatio`,
   `finiteCWPressureGap_ge_cwObjective`, and
-  `finiteRankOneTraffic_invisible_finitePressure_visible` -- the genuine
+  `finiteCWPressureGap_tendsto_variationalPressure` -- the genuine
   binomially grouped finite Rademacher partition function dominates every
-  interior Curie--Weiss objective by an exact biased-binomial Gibbs inequality.
-  Hence pressure is uniformly positive for every `tλ > 1` while fixed traffic
-  vanishes.  This refutes positive-cone traffic sufficiency at the actual
-  partition-function level without Stirling asymptotics, an LDP, or Varadhan.
+  Curie--Weiss objective by an exact biased-binomial Gibbs inequality, while
+  each type is bounded above by the exponential variational pressure.  The
+  resulting `log (p+1) / p` squeeze identifies the full finite pressure limit.
+  Since the error is coupling-independent, convergence is uniform on the whole
+  nonnegative half-line.  Hence pressure is uniformly positive for every
+  `tλ > 1` while fixed traffic vanishes, without Stirling asymptotics, an LDP,
+  or Varadhan.
 
 * `fixedTraffic_invisible_logRuntime_visible` -- every fixed diagonal traffic
   coordinate loses a block of mass `4⁻ᵏ`, while `k` power iterations amplify its
@@ -122,14 +133,21 @@ keeps the matched-Bayes hinge outside the proved statements.
   limit remains in the same family.
 
 * `randomDesign_gap_of_scalarGap` and
-  `randomDesign_eventually_separates_of_scalarGap` -- the matched random-design
+  `matchedInformationError_le_of_wishartFrobenius` -- the matched random-design
   question reduces to its scalar Gaussian counterpart with a sharp two-error
-  ledger, and every positive scalar gap eventually survives whenever that
-  comparison error vanishes.
+  ledger.  Matrix I--MMSE sensitivity, nuclear/Frobenius comparison, and the
+  Wishart Frobenius scale yield the explicit
+  `signal * variance * operatorBound / 2 * sqrt ((p+1)/n)` error, so every
+  positive scalar gap eventually survives as aspect ratio diverges.
 
-* `matchedDensity_lowRank_tendsto_zero_of_nuclearEstimate` -- the conditional
-  nuclear estimate implies the full asymptotic statement: a vanishing rank
-  fraction forces the matched information-density gap to vanish.
+* `matchedInformationPath_nuclear_bound`,
+  `matchedDensity_lowRank_tendsto_zero_of_nuclearEstimate`, and
+  `matchedDensity_eventualGap_not_sublinearRank` -- a certified matrix I--MMSE
+  path plus posterior-covariance trace control yields the nuclear estimate;
+  that estimate gives both directions of the extensive-rank boundary.  A
+  vanishing rank fraction forces the matched information-density gap to
+  vanish, while a persistent gap `delta` forces eventual rank fraction at
+  least `delta / constant`.
 
 ## Why the sub-critical statement matters
 
@@ -146,11 +164,7 @@ a probe returning one number on two objects certifies neither.
 ## What is NOT settled
 
 Matched Bayes traffic sufficiency at arbitrary signal-to-noise remains open, and
-nothing here asserts the sharper LDP/Varadhan identification of the finite
-pressure limit with the variational pressure at the exact threshold `tλ = 1`.
-That identification is no longer needed for the C2 counterexample: the finite
-Gibbs lower bound proves genuine pressure separation throughout `tλ > 1`.
-The rank-one construction cannot decide matched Bayes: a
+the rank-one construction cannot decide it: a
 perturbation of rank `o(p)` moves the exponential pressure by order one and the
 matched mutual-information density by `o(1)`, so a negative witness there needs
 EXTENSIVE rank. That contrast -- one perturbation, four procedure classes, two
@@ -580,6 +594,227 @@ theorem finiteRankOneTrafficCorrection_tendsto_zero_of_positiveEvenDegreeData
 
 /-! ### Positive-cone and ground-state certificates -/
 
+/-- Balanced finite coordinates: `p` positive-sign and `p` negative-sign
+locations. -/
+abbrev BalancedRankOneCoordinate (population : ℕ) :=
+  Sum (Fin population) (Fin population)
+
+/-- The balanced hidden sign vector. -/
+def balancedRankOneSign (population : ℕ) :
+    BalancedRankOneCoordinate population → ℝ
+  | Sum.inl _coordinate => 1
+  | Sum.inr _coordinate => -1
+
+/-- The hidden sign vector has exactly zero coordinate sum. -/
+theorem balancedRankOneSign_sum_eq_zero (population : ℕ) :
+    ∑ coordinate, balancedRankOneSign population coordinate = 0 := by
+  simp [balancedRankOneSign]
+
+/-- Its squared Euclidean norm is exactly the ambient dimension `2p`. -/
+theorem balancedRankOneSign_dot_self (population : ℕ) :
+    balancedRankOneSign population ⬝ᵥ balancedRankOneSign population =
+      (2 * population : ℕ) := by
+  simp [dotProduct, balancedRankOneSign]
+  ring
+
+/-- The normalized outer-product projector onto the balanced hidden
+direction.  The positive-population premise is imposed on the theorems that
+use its normalization. -/
+noncomputable def balancedRankOneProjector (population : ℕ) :
+    Matrix (BalancedRankOneCoordinate population)
+      (BalancedRankOneCoordinate population) ℝ :=
+  (((2 * population : ℕ) : ℝ)⁻¹) •
+    Matrix.vecMulVec (balancedRankOneSign population) (balancedRankOneSign population)
+
+/-- The normalized balanced outer product is positive semidefinite. -/
+theorem balancedRankOneProjector_posSemidef (population : ℕ) :
+    (balancedRankOneProjector population).PosSemidef := by
+  apply Matrix.PosSemidef.smul
+  · simpa using Matrix.posSemidef_vecMulVec_self_star
+      (balancedRankOneSign population)
+  · positivity
+
+/-- The concrete finite covariance witness `aI + λP`. -/
+noncomputable def balancedRankOneCovariance
+    (baseline spikeStrength : ℝ) (population : ℕ) :
+    Matrix (BalancedRankOneCoordinate population)
+      (BalancedRankOneCoordinate population) ℝ :=
+  Matrix.diagonal (fun _coordinate ↦ baseline) +
+    spikeStrength • balancedRankOneProjector population
+
+/-- For nonnegative baseline and spike strength, the concrete covariance lies
+in the positive-semidefinite cone. -/
+theorem balancedRankOneCovariance_posSemidef
+    (baseline spikeStrength : ℝ) (population : ℕ)
+    (hbaseline : 0 ≤ baseline) (hspike : 0 ≤ spikeStrength) :
+    (balancedRankOneCovariance baseline spikeStrength population).PosSemidef := by
+  apply Matrix.PosSemidef.add
+  · exact Matrix.PosSemidef.diagonal (fun _coordinate ↦ hbaseline)
+  · exact (balancedRankOneProjector_posSemidef population).smul hspike
+
+/-- Quadratic form of a real finite covariance matrix. -/
+noncomputable def finiteMatrixQuadraticForm
+    {Coordinate : Type*} [Fintype Coordinate]
+    (matrix : Matrix Coordinate Coordinate ℝ) (vector : Coordinate → ℝ) : ℝ :=
+  vector ⬝ᵥ (matrix *ᵥ vector)
+
+/-- The concrete rank-one covariance has exactly the baseline energy plus the
+squared hidden-direction alignment. -/
+theorem balancedRankOneCovariance_quadraticForm
+    (baseline spikeStrength : ℝ) (population : ℕ)
+    (vector : BalancedRankOneCoordinate population → ℝ) :
+    finiteMatrixQuadraticForm
+        (balancedRankOneCovariance baseline spikeStrength population) vector =
+      baseline * (∑ coordinate, vector coordinate ^ 2) +
+        spikeStrength * (((2 * population : ℕ) : ℝ)⁻¹) *
+          (balancedRankOneSign population ⬝ᵥ vector) ^ 2 := by
+  classical
+  have hdiagonalMulVec :
+      Matrix.diagonal (fun _coordinate ↦ baseline) *ᵥ vector =
+        baseline • vector := by
+    ext coordinate
+    simp [Matrix.mulVec]
+  have hdiagonal :
+      vector ⬝ᵥ
+          (Matrix.diagonal (fun _coordinate ↦ baseline) *ᵥ vector) =
+        baseline * ∑ coordinate, vector coordinate ^ 2 := by
+    rw [hdiagonalMulVec]
+    simp only [dotProduct, Pi.smul_apply, smul_eq_mul, pow_two]
+    rw [Finset.mul_sum]
+    apply Finset.sum_congr rfl
+    intro coordinate _hcoordinate
+    ring
+  rw [finiteMatrixQuadraticForm, balancedRankOneCovariance,
+    Matrix.add_mulVec, dotProduct_add, hdiagonal]
+  simp only [balancedRankOneProjector, Matrix.smul_mulVec,
+    Matrix.vecMulVec_mulVec, dotProduct_smul]
+  simp
+  rw [dotProduct_comm vector (balancedRankOneSign population)]
+  ring
+
+/-- A Rademacher-valued vector has squared norm equal to the ambient
+dimension `2p`. -/
+theorem balancedRademacher_squaredNorm
+    (population : ℕ) (vector : BalancedRankOneCoordinate population → ℝ)
+    (hrademacher : ∀ coordinate, vector coordinate ^ 2 = 1) :
+    ∑ coordinate, vector coordinate ^ 2 = (2 * population : ℕ) := by
+  calc
+    (∑ coordinate, vector coordinate ^ 2) = ∑ _coordinate, (1 : ℝ) := by
+      apply Finset.sum_congr rfl
+      intro coordinate _hcoordinate
+      exact hrademacher coordinate
+    _ = (2 * population : ℕ) := by
+      simp [BalancedRankOneCoordinate]
+      ring
+
+/-- On Rademacher vectors, the concrete covariance energy is exactly the
+baseline extensive term plus the normalized Curie--Weiss alignment energy. -/
+theorem balancedRankOneCovariance_rademacherEnergy
+    (baseline spikeStrength : ℝ) (population : ℕ)
+    (vector : BalancedRankOneCoordinate population → ℝ)
+    (hrademacher : ∀ coordinate, vector coordinate ^ 2 = 1) :
+    finiteMatrixQuadraticForm
+        (balancedRankOneCovariance baseline spikeStrength population) vector =
+      baseline * (2 * population : ℕ) +
+        spikeStrength * (((2 * population : ℕ) : ℝ)⁻¹) *
+          (balancedRankOneSign population ⬝ᵥ vector) ^ 2 := by
+  rw [balancedRankOneCovariance_quadraticForm,
+    balancedRademacher_squaredNorm population vector hrademacher]
+
+/-- **Hamiltonian bridge to finite Curie--Weiss pressure.**  After subtracting
+the baseline covariance energy and multiplying by `temperature/2`, the matrix
+Hamiltonian is exactly `tλ/(2N) * alignment²` with `N=2p`, the exponent used
+by `finiteCWPartition`. -/
+theorem balancedRankOneCovariance_rademacherExponent_eq_finiteCW
+    (baseline spikeStrength temperature : ℝ) (population : ℕ)
+    (vector : BalancedRankOneCoordinate population → ℝ)
+    (hrademacher : ∀ coordinate, vector coordinate ^ 2 = 1) :
+    temperature / 2 *
+        (finiteMatrixQuadraticForm
+            (balancedRankOneCovariance baseline spikeStrength population) vector -
+          baseline * (2 * population : ℕ)) =
+      (temperature * spikeStrength) /
+          (2 * ((2 * population : ℕ) : ℝ)) *
+        (balancedRankOneSign population ⬝ᵥ vector) ^ 2 := by
+  rw [balancedRankOneCovariance_rademacherEnergy
+    baseline spikeStrength population vector hrademacher]
+  ring
+
+/-- The all-one Rademacher vector is orthogonal to the balanced hidden
+direction. -/
+def balancedRankOneOrthogonalSpin (population : ℕ) :
+    BalancedRankOneCoordinate population → ℝ :=
+  fun _coordinate ↦ 1
+
+/-- The explicit orthogonal spin is genuinely Rademacher-valued. -/
+theorem balancedRankOneOrthogonalSpin_isRademacher (population : ℕ) :
+    ∀ coordinate, balancedRankOneOrthogonalSpin population coordinate ^ 2 = 1 := by
+  intro coordinate
+  simp [balancedRankOneOrthogonalSpin]
+
+/-- Balancedness makes the all-one spin exactly orthogonal to the hidden
+direction, at every finite population. -/
+theorem balancedRankOneOrthogonalSpin_alignment_eq_zero (population : ℕ) :
+    balancedRankOneSign population ⬝ᵥ
+        balancedRankOneOrthogonalSpin population = 0 := by
+  simpa [dotProduct, balancedRankOneOrthogonalSpin] using
+    balancedRankOneSign_sum_eq_zero population
+
+/-- The hidden sign vector itself is an explicit aligned Rademacher spin. -/
+theorem balancedRankOneSign_isRademacher (population : ℕ) :
+    ∀ coordinate, balancedRankOneSign population coordinate ^ 2 = 1 := by
+  intro coordinate
+  cases coordinate <;> simp [balancedRankOneSign]
+
+/-- **Concrete matrix-level ground-state certificate.**  Every Rademacher
+spin has energy at least the unspiked baseline, the explicit all-one spin
+attains it, and the explicit hidden-sign spin has strictly larger energy when
+the spike and population are positive.  Thus the lower ground state is
+unchanged even though the same covariance has a supercritical pressure
+transition. -/
+theorem balancedRankOneCovariance_groundState_certificate
+    (baseline spikeStrength : ℝ) (population : ℕ)
+    (hspike : 0 < spikeStrength) (hpopulation : 0 < population) :
+    (∀ vector : BalancedRankOneCoordinate population → ℝ,
+      (∀ coordinate, vector coordinate ^ 2 = 1) →
+        baseline * (2 * population : ℕ) ≤
+          finiteMatrixQuadraticForm
+            (balancedRankOneCovariance baseline spikeStrength population) vector) ∧
+      finiteMatrixQuadraticForm
+          (balancedRankOneCovariance baseline spikeStrength population)
+          (balancedRankOneOrthogonalSpin population) =
+        baseline * (2 * population : ℕ) ∧
+      baseline * (2 * population : ℕ) <
+        finiteMatrixQuadraticForm
+          (balancedRankOneCovariance baseline spikeStrength population)
+          (balancedRankOneSign population) := by
+  have hdimension : 0 < (((2 * population : ℕ) : ℝ)) := by
+    exact_mod_cast Nat.mul_pos (by norm_num : 0 < 2) hpopulation
+  constructor
+  · intro vector hrademacher
+    rw [balancedRankOneCovariance_rademacherEnergy
+      baseline spikeStrength population vector hrademacher]
+    have hcorrection : 0 ≤
+        spikeStrength * (((2 * population : ℕ) : ℝ)⁻¹) *
+          (balancedRankOneSign population ⬝ᵥ vector) ^ 2 := by
+      positivity
+    linarith
+  constructor
+  · rw [balancedRankOneCovariance_rademacherEnergy
+      baseline spikeStrength population (balancedRankOneOrthogonalSpin population)
+      (balancedRankOneOrthogonalSpin_isRademacher population),
+      balancedRankOneOrthogonalSpin_alignment_eq_zero]
+    ring
+  · rw [balancedRankOneCovariance_rademacherEnergy
+      baseline spikeStrength population (balancedRankOneSign population)
+      (balancedRankOneSign_isRademacher population),
+      balancedRankOneSign_dot_self]
+    have hcorrection : 0 <
+        spikeStrength * (((2 * population : ℕ) : ℝ)⁻¹) *
+          (((2 * population : ℕ) : ℝ)) ^ 2 := by
+      positivity
+    linarith
+
 /-- Per-coordinate quadratic energy of a rank-one positive spike, expressed through the spin's
 alignment with the hidden direction. -/
 noncomputable def rankOneEnergyDensity (baseline spikeStrength population alignment : ℝ) : ℝ :=
@@ -645,6 +880,12 @@ noncomputable def cwRate (m : ℝ) : ℝ :=
 
 /-- The endpoint rate is `log 2`; the vanishing factor multiplies `log 0` and contributes zero. -/
 @[simp] theorem cwRate_one : cwRate 1 = Real.log 2 := by
+  unfold cwRate
+  norm_num
+
+/-- The negative endpoint has the same Bernoulli rate as the positive
+endpoint. -/
+@[simp] theorem cwRate_neg_one : cwRate (-1) = Real.log 2 := by
   unfold cwRate
   norm_num
 
@@ -867,6 +1108,11 @@ theorem cwObjective_at_one (tlam : ℝ) :
     cwObjective tlam 1 = tlam / 2 - Real.log 2 := by
   simp [cwObjective]
 
+/-- The two fully aligned endpoints have the same Curie--Weiss objective. -/
+theorem cwObjective_at_neg_one (tlam : ℝ) :
+    cwObjective tlam (-1) = tlam / 2 - Real.log 2 := by
+  simp [cwObjective]
+
 /-- **A completely elementary positive-temperature separation.**  Whenever
 `2 log 2 < tλ`, the single fully aligned state already makes the overlap-pressure variational
 objective positive.  This weaker-than-sharp window is sufficient to refute positive-cone traffic
@@ -977,6 +1223,148 @@ theorem cwVariationalPressureGap_nonneg (tlam : ℝ) :
   apply le_csSup (cwPressureValueSet_bddAbove tlam)
   exact ⟨0, by norm_num, cwObjective_at_zero tlam⟩
 
+/-- Every admissible objective value lies below the variational pressure
+supremum by construction. -/
+theorem cwObjective_le_variationalPressureGap
+    (tlam m : ℝ) (hm : |m| ≤ 1) :
+    cwObjective tlam m ≤ cwVariationalPressureGap tlam := by
+  unfold cwVariationalPressureGap
+  apply le_csSup (cwPressureValueSet_bddAbove tlam)
+  exact ⟨m, (abs_le).1 hm, rfl⟩
+
+/-- Changing coupling changes each admissible Curie--Weiss objective by at
+most half the coupling displacement. -/
+theorem cwObjective_le_add_half_abs_coupling
+    (left right m : ℝ) (hm : |m| ≤ 1) :
+    cwObjective left m ≤ cwObjective right m + |left - right| / 2 := by
+  have hsqNonnegative : 0 ≤ m ^ 2 := sq_nonneg m
+  have hsqUpper : m ^ 2 ≤ 1 := by
+    rw [abs_le] at hm
+    nlinarith
+  have hcoupling : (left - right) / 2 ≤ |left - right| / 2 := by
+    linarith [le_abs_self (left - right)]
+  have habsHalf : 0 ≤ |left - right| / 2 :=
+    div_nonneg (abs_nonneg _) (by norm_num)
+  calc
+    cwObjective left m =
+        cwObjective right m + (left - right) / 2 * m ^ 2 := by
+      unfold cwObjective
+      ring
+    _ ≤ cwObjective right m + |left - right| / 2 * m ^ 2 := by
+      exact add_le_add_left
+        (mul_le_mul_of_nonneg_right hcoupling hsqNonnegative) _
+    _ ≤ cwObjective right m + |left - right| / 2 := by
+      simpa using add_le_add_left
+        (mul_le_mul_of_nonneg_left hsqUpper habsHalf) (cwObjective right m)
+
+/-- The variational pressure inherits the same one-sided coupling comparison
+after taking the supremum over magnetisations. -/
+theorem cwVariationalPressureGap_le_add_half_abs_coupling
+    (left right : ℝ) :
+    cwVariationalPressureGap left ≤
+      cwVariationalPressureGap right + |left - right| / 2 := by
+  unfold cwVariationalPressureGap
+  apply csSup_le (cwPressureValueSet_nonempty left)
+  intro value hvalue
+  rcases hvalue with ⟨m, hm, rfl⟩
+  have habs : |m| ≤ 1 := (abs_le).2 hm
+  exact (cwObjective_le_add_half_abs_coupling left right m habs).trans
+    (add_le_add_right (cwObjective_le_variationalPressureGap right m habs) _)
+
+/-- Sharp global modulus of continuity of the variational pressure. -/
+theorem cwVariationalPressureGap_abs_sub_le_half_abs
+    (left right : ℝ) :
+    |cwVariationalPressureGap left - cwVariationalPressureGap right| ≤
+      |left - right| / 2 := by
+  rw [abs_le]
+  constructor
+  · have hreverse :=
+      cwVariationalPressureGap_le_add_half_abs_coupling right left
+    rw [abs_sub_comm] at hreverse
+    linarith
+  · have hforward :=
+      cwVariationalPressureGap_le_add_half_abs_coupling left right
+    linarith
+
+/-- The variational pressure is globally `1/2`-Lipschitz in coupling. -/
+theorem cwVariationalPressureGap_lipschitzWith :
+    LipschitzWith (⟨1 / 2, by norm_num⟩ : NNReal) cwVariationalPressureGap := by
+  apply LipschitzWith.of_dist_le_mul
+  intro left right
+  rw [Real.dist_eq, Real.dist_eq]
+  simpa [abs_sub_comm, mul_comm] using
+    cwVariationalPressureGap_abs_sub_le_half_abs left right
+
+/-- In particular the variational pressure profile is continuous globally. -/
+theorem continuous_cwVariationalPressureGap :
+    Continuous cwVariationalPressureGap :=
+  cwVariationalPressureGap_lipschitzWith.continuous
+
+/-- Increasing the positive quadratic coupling cannot decrease any objective
+value. -/
+theorem cwObjective_mono_coupling {left right : ℝ} (hle : left ≤ right)
+    (m : ℝ) :
+    cwObjective left m ≤ cwObjective right m := by
+  unfold cwObjective
+  nlinarith [sq_nonneg m]
+
+/-- The variational pressure is monotone in coupling. -/
+theorem monotone_cwVariationalPressureGap :
+    Monotone cwVariationalPressureGap := by
+  intro left right hle
+  unfold cwVariationalPressureGap
+  apply csSup_le (cwPressureValueSet_nonempty left)
+  intro value hvalue
+  rcases hvalue with ⟨m, hm, rfl⟩
+  exact (cwObjective_mono_coupling hle m).trans
+    (cwObjective_le_variationalPressureGap right m ((abs_le).2 hm))
+
+/-- Each fixed-magnetisation objective is affine in the coupling parameter. -/
+theorem cwObjective_affine_coupling
+    (left right weightLeft weightRight m : ℝ)
+    (hweights : weightLeft + weightRight = 1) :
+    cwObjective (weightLeft * left + weightRight * right) m =
+      weightLeft * cwObjective left m +
+        weightRight * cwObjective right m := by
+  unfold cwObjective
+  have hrightWeight : weightRight = 1 - weightLeft := by linarith
+  rw [hrightWeight]
+  ring
+
+/-- The variational pressure satisfies the two-point Jensen inequality because
+it is the supremum of affine coupling objectives. -/
+theorem cwVariationalPressureGap_convexCombination
+    (left right weightLeft weightRight : ℝ)
+    (hleft : 0 ≤ weightLeft) (hright : 0 ≤ weightRight)
+    (hweights : weightLeft + weightRight = 1) :
+    cwVariationalPressureGap (weightLeft * left + weightRight * right) ≤
+      weightLeft * cwVariationalPressureGap left +
+        weightRight * cwVariationalPressureGap right := by
+  unfold cwVariationalPressureGap
+  apply csSup_le (cwPressureValueSet_nonempty
+    (weightLeft * left + weightRight * right))
+  intro value hvalue
+  rcases hvalue with ⟨m, hm, rfl⟩
+  have habs : |m| ≤ 1 := (abs_le).2 hm
+  rw [cwObjective_affine_coupling left right weightLeft weightRight m hweights]
+  exact add_le_add
+    (mul_le_mul_of_nonneg_left
+      (cwObjective_le_variationalPressureGap left m habs) hleft)
+    (mul_le_mul_of_nonneg_left
+      (cwObjective_le_variationalPressureGap right m habs) hright)
+
+/-- The complete variational pressure profile is convex on the real coupling
+line. -/
+theorem convexOn_cwVariationalPressureGap :
+    ConvexOn ℝ Set.univ cwVariationalPressureGap := by
+  constructor
+  · exact convex_univ
+  · intro left _hleft right _hright weightLeft weightRight
+      hweightLeft hweightRight hweights
+    simpa only [smul_eq_mul] using
+      cwVariationalPressureGap_convexCombination left right weightLeft weightRight
+        hweightLeft hweightRight hweights
+
 /-- Below and at the critical point, the supremum is exactly zero. -/
 theorem cwVariationalPressureGap_eq_zero_of_subcritical
     (tlam : ℝ) (hcritical : tlam ≤ 1) :
@@ -1013,13 +1401,12 @@ theorem cwVariationalPressureGap_eq_zero_iff (tlam : ℝ) :
 
 /-! ### A genuine finite-volume pressure counterexample
 
-The variational theorem above identifies the sharp threshold but, by itself,
-does not identify a finite-volume partition function with that variational
-value.  The development below avoids that identification: a biased-binomial
-trial law and the finite Gibbs variational inequality show directly that every
-interior objective lower-bounds the genuine finite partition function.  The
-aligned-state estimate is retained as a simpler explicit certificate, while
-the trial-law argument reaches the complete supercritical regime `tlam > 1`.
+The development below identifies the genuine finite-volume limit directly.
+A biased-binomial trial law gives the Gibbs lower bound, while the matching
+product-law factorisation bounds every type above by the exponential
+variational pressure.  Since there are only `population + 1` types, the two
+bounds differ by at most `log (population + 1) / population`.  The aligned-state
+estimate is retained as a simpler explicit certificate.
 -/
 
 /-- Magnetisation of the type with `upSpins` positive spins in a population of
@@ -1070,6 +1457,19 @@ theorem finiteCWEmpiricalMagnetization_abs_lt_one
   · unfold finiteCWEmpiricalMagnetization finiteCWMagnetization
     apply (div_lt_iff₀ hpopulation).mpr
     linarith
+
+/-- Every admissible finite magnetisation has magnitude at most the population
+size, hence squared energy at most `population²`. -/
+theorem finiteCWMagnetization_sq_le_population_sq
+    (population upSpins : ℕ)
+    (hupSpins : upSpins ∈ Finset.range (population + 1)) :
+    finiteCWMagnetization population upSpins ^ 2 ≤ (population : ℝ) ^ 2 := by
+  have hle : upSpins ≤ population :=
+    Nat.le_of_lt_succ (Finset.mem_range.mp hupSpins)
+  have hupNonnegative : (0 : ℝ) ≤ upSpins := by positivity
+  have hupUpper : (upSpins : ℝ) ≤ population := by exact_mod_cast hle
+  unfold finiteCWMagnetization
+  nlinarith
 
 /-- The positive-spin parameter induced by the empirical magnetisation is the
 observed positive-spin fraction. -/
@@ -1472,6 +1872,544 @@ theorem finiteCWTypeMass_logRatio
   rw [Nat.cast_sub hle]
   ring
 
+/-- At the empirical magnetisation of an interior type, its exact log
+likelihood ratio against the matching product law is the population-scaled
+Curie--Weiss objective. -/
+theorem finiteCWTypeMass_matched_logRatio_eq_objective
+    (population upSpins : ℕ) (tlam : ℝ)
+    (hpositive : 0 < upSpins) (hinterior : upSpins < population) :
+    Real.log
+        (finiteCWTypeMass population tlam upSpins /
+          biasedBinomialTypeWeight population
+            (cwPositiveTrialWeight
+              (finiteCWEmpiricalMagnetization population upSpins))
+            (cwNegativeTrialWeight
+              (finiteCWEmpiricalMagnetization population upSpins)) upSpins) =
+      (population : ℝ) *
+        cwObjective tlam
+          (finiteCWEmpiricalMagnetization population upSpins) := by
+  let m := finiteCWEmpiricalMagnetization population upSpins
+  let q := cwPositiveTrialWeight m
+  let r := cwNegativeTrialWeight m
+  have hpopulation : 0 < population := hpositive.trans_le hinterior.le
+  have hle : upSpins ≤ population := hinterior.le
+  have hm : |m| < 1 :=
+    finiteCWEmpiricalMagnetization_abs_lt_one population upSpins
+      hpositive hinterior
+  have hupSpins : upSpins ∈ Finset.range (population + 1) := by
+    exact Finset.mem_range.mpr (Nat.lt_succ_of_le hle)
+  have hscale : (population : ℝ) * m =
+      finiteCWMagnetization population upSpins :=
+    finiteCWEmpiricalMagnetization_scale population upSpins hpopulation
+  have hqScale : (population : ℝ) * q = upSpins := by
+    dsimp [q, m]
+    rw [cwPositiveTrialWeight_empirical population upSpins hpopulation]
+    field_simp
+  have hrScale : (population : ℝ) * r = population - upSpins := by
+    dsimp [r, m]
+    rw [cwNegativeTrialWeight_empirical population upSpins hpopulation hle]
+    rw [Nat.cast_sub hle]
+    field_simp
+  rw [finiteCWTypeMass_logRatio population upSpins tlam m hm hupSpins]
+  rw [← hqScale]
+  unfold cwObjective
+  rw [← cwTrialEntropy_eq_rate hm]
+  have hpopulationReal : (population : ℝ) ≠ 0 := by
+    exact_mod_cast hpopulation.ne'
+  rw [← hscale]
+  dsimp [m, q, r, cwPositiveTrialWeight, cwNegativeTrialWeight]
+  field_simp
+  ring
+
+/-- The matched biased-binomial type weight is a genuine probability mass and
+therefore is at most one. -/
+theorem biasedBinomialTypeWeight_le_one
+    (population upSpins : ℕ) (q r : ℝ)
+    (hq : 0 ≤ q) (hr : 0 ≤ r) (hqr : q + r = 1)
+    (hupSpins : upSpins ∈ Finset.range (population + 1)) :
+    biasedBinomialTypeWeight population q r upSpins ≤ 1 := by
+  have hnonnegative : ∀ index ∈ Finset.range (population + 1),
+      0 ≤ biasedBinomialTypeWeight population q r index := by
+    intro index _hindex
+    unfold biasedBinomialTypeWeight
+    positivity
+  have hsingle := Finset.single_le_sum hnonnegative hupSpins
+  rw [biasedBinomialTypeWeight_sum population q r hqr] at hsingle
+  exact hsingle
+
+/-- Exponentiating the matched log-ratio identity gives an exact factorisation
+of every interior Curie--Weiss type mass into a product-law probability and an
+exponential variational reward. -/
+theorem finiteCWTypeMass_eq_matchedWeight_mul_expObjective
+    (population upSpins : ℕ) (tlam : ℝ)
+    (hpositive : 0 < upSpins) (hinterior : upSpins < population) :
+    finiteCWTypeMass population tlam upSpins =
+      biasedBinomialTypeWeight population
+          (cwPositiveTrialWeight
+            (finiteCWEmpiricalMagnetization population upSpins))
+          (cwNegativeTrialWeight
+            (finiteCWEmpiricalMagnetization population upSpins)) upSpins *
+        Real.exp ((population : ℝ) *
+          cwObjective tlam
+            (finiteCWEmpiricalMagnetization population upSpins)) := by
+  let m := finiteCWEmpiricalMagnetization population upSpins
+  let weight := biasedBinomialTypeWeight population
+    (cwPositiveTrialWeight m) (cwNegativeTrialWeight m) upSpins
+  have hle : upSpins ≤ population := hinterior.le
+  have hupSpins : upSpins ∈ Finset.range (population + 1) := by
+    exact Finset.mem_range.mpr (Nat.lt_succ_of_le hle)
+  have hm : |m| < 1 :=
+    finiteCWEmpiricalMagnetization_abs_lt_one population upSpins
+      hpositive hinterior
+  have hweight : 0 < weight :=
+    biasedBinomialTypeWeight_pos population upSpins m hm hupSpins
+  have hmass : 0 < finiteCWTypeMass population tlam upSpins :=
+    finiteCWTypeMass_pos population upSpins tlam hupSpins
+  have hlog := finiteCWTypeMass_matched_logRatio_eq_objective
+    population upSpins tlam hpositive hinterior
+  have hexp := congrArg Real.exp hlog
+  have hratio : finiteCWTypeMass population tlam upSpins / weight =
+      Real.exp ((population : ℝ) * cwObjective tlam m) := by
+    simpa [weight, m, Real.exp_log (div_pos hmass hweight)] using hexp
+  have hmassEq : finiteCWTypeMass population tlam upSpins =
+      Real.exp ((population : ℝ) * cwObjective tlam m) * weight :=
+    (div_eq_iff hweight.ne').mp hratio
+  simpa [weight, m, mul_comm] using hmassEq
+
+/-- Every interior magnetisation type has mass at most one throughout the
+complete subcritical and critical regime. -/
+theorem finiteCWTypeMass_interior_le_one_of_subcritical
+    (population upSpins : ℕ) (tlam : ℝ)
+    (hcritical : tlam ≤ 1)
+    (hpositive : 0 < upSpins) (hinterior : upSpins < population) :
+    finiteCWTypeMass population tlam upSpins ≤ 1 := by
+  let m := finiteCWEmpiricalMagnetization population upSpins
+  let q := cwPositiveTrialWeight m
+  let r := cwNegativeTrialWeight m
+  let weight := biasedBinomialTypeWeight population q r upSpins
+  have hpopulation : 0 < population := hpositive.trans_le hinterior.le
+  have hm : |m| < 1 :=
+    finiteCWEmpiricalMagnetization_abs_lt_one population upSpins
+      hpositive hinterior
+  have hupSpins : upSpins ∈ Finset.range (population + 1) := by
+    exact Finset.mem_range.mpr (Nat.lt_succ_of_le hinterior.le)
+  have hweightNonnegative : 0 ≤ weight :=
+    (biasedBinomialTypeWeight_pos population upSpins m hm hupSpins).le
+  have hweightUpper : weight ≤ 1 :=
+    biasedBinomialTypeWeight_le_one population upSpins q r
+      (cwPositiveTrialWeight_pos hm).le (cwNegativeTrialWeight_pos hm).le
+      (cwTrialWeights_sum m) hupSpins
+  have hobjective : cwObjective tlam m ≤ 0 :=
+    curieWeiss_subcritical tlam hcritical m hm.le
+  have hpopulationNonnegative : (0 : ℝ) ≤ population := by positivity
+  have hscaled : (population : ℝ) * cwObjective tlam m ≤ 0 :=
+    mul_nonpos_of_nonneg_of_nonpos hpopulationNonnegative hobjective
+  have hexpUpper : Real.exp ((population : ℝ) * cwObjective tlam m) ≤ 1 := by
+    simpa using (Real.exp_le_one_iff.mpr hscaled)
+  rw [finiteCWTypeMass_eq_matchedWeight_mul_expObjective population upSpins
+    tlam hpositive hinterior]
+  exact (mul_le_mul hweightUpper hexpUpper (Real.exp_pos _).le (by norm_num)).trans_eq
+    (one_mul 1)
+
+/-- The fully aligned type mass is exactly the exponential of the endpoint
+variational objective times the population. -/
+theorem finiteCWTypeMass_aligned_eq_exp_objective
+    (population : ℕ) (tlam : ℝ) (hpopulation : 0 < population) :
+    finiteCWTypeMass population tlam population =
+      Real.exp ((population : ℝ) * cwObjective tlam 1) := by
+  have hpopulationReal : (population : ℝ) ≠ 0 := by
+    exact_mod_cast hpopulation.ne'
+  have htwoPow : (2 : ℝ) ^ population =
+      Real.exp ((population : ℝ) * Real.log 2) := by
+    rw [Real.exp_nat_mul, Real.exp_log (by norm_num : (0 : ℝ) < 2)]
+  calc
+    finiteCWTypeMass population tlam population =
+        ((2 : ℝ) ^ population)⁻¹ *
+          Real.exp (tlam * population / 2) := by
+      unfold finiteCWTypeMass
+      simp [finiteCWMagnetization]
+      field_simp
+      ring
+    _ = Real.exp (-((population : ℝ) * Real.log 2)) *
+          Real.exp (tlam * population / 2) := by
+      rw [htwoPow, Real.exp_neg]
+    _ = Real.exp ((population : ℝ) *
+          (tlam / 2 - Real.log 2)) := by
+      rw [← Real.exp_add]
+      congr 1
+      ring
+    _ = Real.exp ((population : ℝ) * cwObjective tlam 1) := by
+      rw [cwObjective_at_one]
+
+/-- The fully anti-aligned type has the same exact endpoint mass. -/
+theorem finiteCWTypeMass_zero_eq_exp_objective
+    (population : ℕ) (tlam : ℝ) (hpopulation : 0 < population) :
+    finiteCWTypeMass population tlam 0 =
+      Real.exp ((population : ℝ) * cwObjective tlam (-1)) := by
+  have hpopulationReal : (population : ℝ) ≠ 0 := by
+    exact_mod_cast hpopulation.ne'
+  have htwoPow : (2 : ℝ) ^ population =
+      Real.exp ((population : ℝ) * Real.log 2) := by
+    rw [Real.exp_nat_mul, Real.exp_log (by norm_num : (0 : ℝ) < 2)]
+  calc
+    finiteCWTypeMass population tlam 0 =
+        ((2 : ℝ) ^ population)⁻¹ *
+          Real.exp (tlam * population / 2) := by
+      unfold finiteCWTypeMass finiteCWMagnetization
+      simp
+      field_simp
+    _ = Real.exp (-((population : ℝ) * Real.log 2)) *
+          Real.exp (tlam * population / 2) := by
+      rw [htwoPow, Real.exp_neg]
+    _ = Real.exp ((population : ℝ) *
+          (tlam / 2 - Real.log 2)) := by
+      rw [← Real.exp_add]
+      congr 1
+      ring
+    _ = Real.exp ((population : ℝ) * cwObjective tlam (-1)) := by
+      unfold cwObjective
+      rw [cwRate_neg_one]
+      ring_nf
+
+/-- Endpoint types also have mass at most one at and below the critical
+coupling. -/
+theorem finiteCWTypeMass_endpoint_le_one_of_subcritical
+    (population : ℕ) (tlam : ℝ) (hpopulation : 0 < population)
+    (hcritical : tlam ≤ 1) :
+    finiteCWTypeMass population tlam 0 ≤ 1 ∧
+      finiteCWTypeMass population tlam population ≤ 1 := by
+  have hpopulationNonnegative : (0 : ℝ) ≤ population := by positivity
+  have hnegativeObjective : cwObjective tlam (-1) ≤ 0 :=
+    curieWeiss_subcritical tlam hcritical (-1) (by norm_num)
+  have hpositiveObjective : cwObjective tlam 1 ≤ 0 :=
+    curieWeiss_subcritical tlam hcritical 1 (by norm_num)
+  constructor
+  · rw [finiteCWTypeMass_zero_eq_exp_objective population tlam hpopulation]
+    apply Real.exp_le_one_iff.mpr
+    exact mul_nonpos_of_nonneg_of_nonpos hpopulationNonnegative hnegativeObjective
+  · rw [finiteCWTypeMass_aligned_eq_exp_objective population tlam hpopulation]
+    apply Real.exp_le_one_iff.mpr
+    exact mul_nonpos_of_nonneg_of_nonpos hpopulationNonnegative hpositiveObjective
+
+/-- An admissible Curie--Weiss type count never exceeds its population. -/
+theorem finiteCWUpSpins_le_population
+    (population upSpins : ℕ)
+    (hupSpins : upSpins ∈ Finset.range (population + 1)) :
+    upSpins ≤ population :=
+  Nat.le_of_lt_succ (Finset.mem_range.mp hupSpins)
+
+/-- At zero population, the unique admissible Curie--Weiss type is zero. -/
+theorem finiteCWUpSpins_eq_zero_of_population_eq_zero
+    (population upSpins : ℕ)
+    (hupSpins : upSpins ∈ Finset.range (population + 1))
+    (hpopulation : population = 0) :
+    upSpins = 0 := by
+  exact Nat.eq_zero_of_le_zero
+    (hpopulation ▸ finiteCWUpSpins_le_population population upSpins hupSpins)
+
+/-- The unique zero-population type has unit mass. -/
+theorem finiteCWTypeMass_eq_one_of_population_eq_zero
+    (population upSpins : ℕ) (tlam : ℝ)
+    (hupSpins : upSpins ∈ Finset.range (population + 1))
+    (hpopulation : population = 0) :
+    finiteCWTypeMass population tlam upSpins = 1 := by
+  have hupZero := finiteCWUpSpins_eq_zero_of_population_eq_zero
+    population upSpins hupSpins hpopulation
+  subst population
+  subst upSpins
+  simp [finiteCWTypeMass, finiteCWMagnetization]
+
+/-- Every admissible type mass is at most one throughout the complete
+subcritical/critical window. -/
+theorem finiteCWTypeMass_le_one_of_subcritical
+    (population upSpins : ℕ) (tlam : ℝ) (hcritical : tlam ≤ 1)
+    (hupSpins : upSpins ∈ Finset.range (population + 1)) :
+    finiteCWTypeMass population tlam upSpins ≤ 1 := by
+  have hle := finiteCWUpSpins_le_population population upSpins hupSpins
+  by_cases hpopulation : population = 0
+  · exact (finiteCWTypeMass_eq_one_of_population_eq_zero
+      population upSpins tlam hupSpins hpopulation).le
+  · have hpopulationPositive : 0 < population := Nat.pos_of_ne_zero hpopulation
+    by_cases hupZero : upSpins = 0
+    · subst upSpins
+      exact (finiteCWTypeMass_endpoint_le_one_of_subcritical population tlam
+        hpopulationPositive hcritical).1
+    · by_cases hupAligned : upSpins = population
+      · subst upSpins
+        exact (finiteCWTypeMass_endpoint_le_one_of_subcritical population tlam
+          hpopulationPositive hcritical).2
+      · exact finiteCWTypeMass_interior_le_one_of_subcritical population upSpins
+          tlam hcritical (Nat.pos_of_ne_zero hupZero)
+          (lt_of_le_of_ne hle hupAligned)
+
+/-- Every finite magnetisation type is bounded by the exponential of the
+population-scaled variational pressure.  For interior types this follows from
+the exact matched-product factorisation and the fact that a probability mass
+is at most one; the two endpoint identities close the boundary cases. -/
+theorem finiteCWTypeMass_le_exp_variationalPressure
+    (population upSpins : ℕ) (tlam : ℝ)
+    (hupSpins : upSpins ∈ Finset.range (population + 1)) :
+    finiteCWTypeMass population tlam upSpins ≤
+      Real.exp ((population : ℝ) * cwVariationalPressureGap tlam) := by
+  have hle := finiteCWUpSpins_le_population population upSpins hupSpins
+  by_cases hpopulation : population = 0
+  · rw [finiteCWTypeMass_eq_one_of_population_eq_zero
+      population upSpins tlam hupSpins hpopulation, hpopulation]
+    simp
+  · have hpopulationPositive : 0 < population := Nat.pos_of_ne_zero hpopulation
+    have hpopulationNonnegative : (0 : ℝ) ≤ population := by positivity
+    by_cases hupZero : upSpins = 0
+    · subst upSpins
+      rw [finiteCWTypeMass_zero_eq_exp_objective population tlam
+        hpopulationPositive]
+      apply Real.exp_le_exp.mpr
+      exact mul_le_mul_of_nonneg_left
+        (cwObjective_le_variationalPressureGap tlam (-1) (by norm_num))
+        hpopulationNonnegative
+    · by_cases hupAligned : upSpins = population
+      · subst upSpins
+        rw [finiteCWTypeMass_aligned_eq_exp_objective population tlam
+          hpopulationPositive]
+        apply Real.exp_le_exp.mpr
+        exact mul_le_mul_of_nonneg_left
+          (cwObjective_le_variationalPressureGap tlam 1 (by norm_num))
+          hpopulationNonnegative
+      · have hpositive : 0 < upSpins := Nat.pos_of_ne_zero hupZero
+        have hinterior : upSpins < population :=
+          lt_of_le_of_ne hle hupAligned
+        let m := finiteCWEmpiricalMagnetization population upSpins
+        let q := cwPositiveTrialWeight m
+        let r := cwNegativeTrialWeight m
+        let weight := biasedBinomialTypeWeight population q r upSpins
+        have hm : |m| < 1 :=
+          finiteCWEmpiricalMagnetization_abs_lt_one population upSpins
+            hpositive hinterior
+        have hweightUpper : weight ≤ 1 :=
+          biasedBinomialTypeWeight_le_one population upSpins q r
+            (cwPositiveTrialWeight_pos hm).le
+            (cwNegativeTrialWeight_pos hm).le
+            (cwTrialWeights_sum m) hupSpins
+        have hobjective : cwObjective tlam m ≤
+            cwVariationalPressureGap tlam :=
+          cwObjective_le_variationalPressureGap tlam m hm.le
+        have hscaled : (population : ℝ) * cwObjective tlam m ≤
+            (population : ℝ) * cwVariationalPressureGap tlam :=
+          mul_le_mul_of_nonneg_left hobjective hpopulationNonnegative
+        have hexpUpper : Real.exp ((population : ℝ) * cwObjective tlam m) ≤
+            Real.exp ((population : ℝ) * cwVariationalPressureGap tlam) :=
+          Real.exp_le_exp.mpr hscaled
+        rw [finiteCWTypeMass_eq_matchedWeight_mul_expObjective population
+          upSpins tlam hpositive hinterior]
+        exact (mul_le_mul hweightUpper hexpUpper (Real.exp_pos _).le
+          (by norm_num)).trans_eq (one_mul _)
+
+/-- Summing the termwise bound shows that the finite partition function has
+at most the number of magnetisation types, namely `population + 1`. -/
+theorem finiteCWPartition_le_typeCount_of_subcritical
+    (population : ℕ) (tlam : ℝ) (hcritical : tlam ≤ 1) :
+    finiteCWPartition population tlam ≤ population + 1 := by
+  rw [← finiteCWTypeMass_sum]
+  calc
+    (∑ upSpins ∈ Finset.range (population + 1),
+        finiteCWTypeMass population tlam upSpins) ≤
+        ∑ _upSpins ∈ Finset.range (population + 1), (1 : ℝ) := by
+      apply Finset.sum_le_sum
+      intro upSpins hupSpins
+      exact finiteCWTypeMass_le_one_of_subcritical population upSpins tlam
+        hcritical hupSpins
+    _ = population + 1 := by simp
+
+/-- The whole finite partition function is at most the number of
+magnetisation types times the exponential variational pressure. -/
+theorem finiteCWPartition_le_typeCount_mul_expVariational
+    (population : ℕ) (tlam : ℝ) :
+    finiteCWPartition population tlam ≤
+      (population + 1 : ℕ) *
+        Real.exp ((population : ℝ) * cwVariationalPressureGap tlam) := by
+  rw [← finiteCWTypeMass_sum]
+  calc
+    (∑ upSpins ∈ Finset.range (population + 1),
+        finiteCWTypeMass population tlam upSpins) ≤
+        ∑ _upSpins ∈ Finset.range (population + 1),
+          Real.exp ((population : ℝ) * cwVariationalPressureGap tlam) := by
+      apply Finset.sum_le_sum
+      intro upSpins hupSpins
+      exact finiteCWTypeMass_le_exp_variationalPressure population upSpins
+        tlam hupSpins
+    _ = (population + 1 : ℕ) *
+        Real.exp ((population : ℝ) * cwVariationalPressureGap tlam) := by
+      simp
+
+/-- At every positive population, the finite pressure exceeds the
+variational pressure by at most the normalized logarithm of the number of
+types. -/
+theorem finiteCWPressureGap_le_variational_add_typeCount
+    (population : ℕ) (tlam : ℝ) (hpopulation : 0 < population) :
+    finiteCWPressureGap population tlam ≤
+      cwVariationalPressureGap tlam +
+        Real.log ((population : ℝ) + 1) / (population : ℝ) := by
+  have hpopulationReal : (0 : ℝ) < population := by exact_mod_cast hpopulation
+  have htypeCountPositive : (0 : ℝ) < population + 1 := by positivity
+  have hpartitionPositive : 0 < finiteCWPartition population tlam := by
+    rw [← finiteCWTypeMass_sum]
+    exact Finset.sum_pos
+      (fun upSpins hupSpins ↦
+        finiteCWTypeMass_pos population upSpins tlam hupSpins)
+      ⟨0, by simp⟩
+  have hpartitionUpper : finiteCWPartition population tlam ≤
+      ((population : ℝ) + 1) *
+        Real.exp ((population : ℝ) * cwVariationalPressureGap tlam) := by
+    simpa [Nat.cast_add] using
+      finiteCWPartition_le_typeCount_mul_expVariational population tlam
+  have hlogUpper : Real.log (finiteCWPartition population tlam) ≤
+      Real.log (((population : ℝ) + 1) *
+        Real.exp ((population : ℝ) * cwVariationalPressureGap tlam)) :=
+    Real.log_le_log hpartitionPositive hpartitionUpper
+  rw [finiteCWPressureGap]
+  apply (div_le_iff₀ hpopulationReal).mpr
+  calc
+    Real.log (finiteCWPartition population tlam) ≤
+        Real.log (((population : ℝ) + 1) *
+          Real.exp ((population : ℝ) * cwVariationalPressureGap tlam)) :=
+      hlogUpper
+    _ = Real.log ((population : ℝ) + 1) +
+        (population : ℝ) * cwVariationalPressureGap tlam := by
+      rw [Real.log_mul htypeCountPositive.ne' (Real.exp_ne_zero _), Real.log_exp]
+    _ = (cwVariationalPressureGap tlam +
+        Real.log ((population : ℝ) + 1) / population) * population := by
+      field_simp
+      ring
+
+/-- Nonnegative coupling can only increase the normalized Rademacher
+partition function above its exactly normalized zero-coupling value. -/
+theorem finiteCWPartition_one_le_of_nonnegative
+    (population : ℕ) (tlam : ℝ) (htlam : 0 ≤ tlam) :
+    1 ≤ finiteCWPartition population tlam := by
+  have hzeroPartition : finiteCWPartition population 0 = 1 := by
+    have hsum :
+        (∑ upSpins ∈ Finset.range (population + 1),
+          (Nat.choose population upSpins : ℝ)) = (2 : ℝ) ^ population := by
+      exact_mod_cast Nat.sum_range_choose population
+    simp [finiteCWPartition, hsum]
+  rw [← hzeroPartition]
+  unfold finiteCWPartition
+  apply mul_le_mul_of_nonneg_left _ (by positivity)
+  apply Finset.sum_le_sum
+  intro upSpins _hupSpins
+  have henergy : 0 ≤ tlam / (2 * (population : ℝ)) *
+      finiteCWMagnetization population upSpins ^ 2 := by
+    positivity
+  have hexp : 1 ≤ Real.exp
+      (tlam / (2 * (population : ℝ)) *
+        finiteCWMagnetization population upSpins ^ 2) :=
+    Real.one_le_exp henergy
+  simp only [zero_div, zero_mul, Real.exp_zero, mul_one]
+  have hchoose : 0 ≤ (Nat.choose population upSpins : ℝ) := Nat.cast_nonneg _
+  simpa using mul_le_mul_of_nonneg_left hexp hchoose
+
+/-- The genuine finite-volume pressure is squeezed between zero and the log
+number of magnetisation types throughout the subcritical/critical regime. -/
+theorem finiteCWPressureGap_subcritical_bounds
+    (population : ℕ) (tlam : ℝ) (hpopulation : 0 < population)
+    (htlam : 0 ≤ tlam) (hcritical : tlam ≤ 1) :
+    0 ≤ finiteCWPressureGap population tlam ∧
+      finiteCWPressureGap population tlam ≤
+        Real.log (population + 1) / population := by
+  have hpopulationReal : (0 : ℝ) < population := by exact_mod_cast hpopulation
+  have hpartitionLower :=
+    finiteCWPartition_one_le_of_nonnegative population tlam htlam
+  have hpartitionUpper :=
+    finiteCWPartition_le_typeCount_of_subcritical population tlam hcritical
+  have hpartitionPositive : 0 < finiteCWPartition population tlam :=
+    lt_of_lt_of_le zero_lt_one hpartitionLower
+  constructor
+  · unfold finiteCWPressureGap
+    exact div_nonneg (Real.log_nonneg hpartitionLower) hpopulationReal.le
+  · unfold finiteCWPressureGap
+    exact div_le_div_of_nonneg_right
+      (Real.log_le_log hpartitionPositive hpartitionUpper) hpopulationReal.le
+
+/-- The normalized logarithm of the number of Curie--Weiss types vanishes.
+The proof factors the shifted ratio into `log x / x` and a shift ratio tending
+to one. -/
+theorem finiteCWTypeCount_log_div_tendsto_zero :
+    Filter.Tendsto
+      (fun population : ℕ ↦
+        Real.log (((population + 2 : ℕ) : ℝ)) /
+          ((population + 1 : ℕ) : ℝ))
+      Filter.atTop (nhds 0) := by
+  have hshiftTwo : Filter.Tendsto
+      (fun population : ℕ ↦ ((population + 2 : ℕ) : ℝ))
+      Filter.atTop Filter.atTop := by
+    convert (tendsto_natCast_atTop_atTop (R := ℝ)).comp
+      (Filter.tendsto_add_atTop_nat 2) using 1
+  have hshiftOne : Filter.Tendsto
+      (fun population : ℕ ↦ ((population + 1 : ℕ) : ℝ))
+      Filter.atTop Filter.atTop := by
+    convert (tendsto_natCast_atTop_atTop (R := ℝ)).comp
+      (Filter.tendsto_add_atTop_nat 1) using 1
+  have hlogDivReal : Filter.Tendsto
+      (fun x : ℝ ↦ Real.log x / x) Filter.atTop (nhds 0) := by
+    simpa only [id_eq] using
+      Real.isLittleO_log_id_atTop.tendsto_div_nhds_zero
+  have hlogDivShift : Filter.Tendsto
+      (fun population : ℕ ↦
+        Real.log (((population + 2 : ℕ) : ℝ)) /
+          ((population + 2 : ℕ) : ℝ))
+      Filter.atTop (nhds 0) :=
+    hlogDivReal.comp hshiftTwo
+  have hinvShiftOne : Filter.Tendsto
+      (fun population : ℕ ↦ (((population + 1 : ℕ) : ℝ))⁻¹)
+      Filter.atTop (nhds 0) :=
+    hshiftOne.inv_tendsto_atTop
+  have hshiftRatio : Filter.Tendsto
+      (fun population : ℕ ↦
+        ((population + 2 : ℕ) : ℝ) /
+          ((population + 1 : ℕ) : ℝ))
+      Filter.atTop (nhds 1) := by
+    have hone : Filter.Tendsto (fun _population : ℕ ↦ (1 : ℝ))
+        Filter.atTop (nhds 1) := tendsto_const_nhds
+    have hadd := hone.add hinvShiftOne
+    convert hadd using 1
+    · funext population
+      have hdenominator : (((population + 1 : ℕ) : ℝ)) ≠ 0 := by positivity
+      push_cast
+      field_simp
+      ring
+    · norm_num
+  have hproduct := hlogDivShift.mul hshiftRatio
+  convert hproduct using 1
+  · funext population
+    have hpositiveOne : (0 : ℝ) < population + 1 := by positivity
+    have hpositiveTwo : (0 : ℝ) < population + 2 := by positivity
+    field_simp
+  · norm_num
+
+/-- **Exact finite-pressure subcritical limit.**  At every nonnegative
+coupling at or below the Curie--Weiss threshold, the genuine normalized
+finite-volume pressure converges to zero. -/
+theorem finiteCWPressureGap_tendsto_zero_of_subcritical
+    (tlam : ℝ) (htlam : 0 ≤ tlam) (hcritical : tlam ≤ 1) :
+    Filter.Tendsto
+      (fun population : ℕ ↦ finiteCWPressureGap (population + 1) tlam)
+      Filter.atTop (nhds 0) := by
+  have hnonnegative : ∀ population : ℕ,
+      0 ≤ finiteCWPressureGap (population + 1) tlam := by
+    intro population
+    exact (finiteCWPressureGap_subcritical_bounds (population + 1) tlam
+      (Nat.succ_pos population) htlam hcritical).1
+  have hupper : ∀ population : ℕ,
+      finiteCWPressureGap (population + 1) tlam ≤
+        Real.log (((population + 2 : ℕ) : ℝ)) /
+          ((population + 1 : ℕ) : ℝ) := by
+    intro population
+    have hbound := (finiteCWPressureGap_subcritical_bounds (population + 1) tlam
+      (Nat.succ_pos population) htlam hcritical).2
+    convert hbound using 1
+    all_goals norm_num [Nat.cast_add]
+    all_goals ring
+  exact squeeze_zero hnonnegative hupper finiteCWTypeCount_log_div_tendsto_zero
+
 /-- **Finite-volume Curie--Weiss variational lower bound.**  Every interior
 magnetisation supplies its variational objective as a lower bound for the
 genuine normalized finite Rademacher pressure.  The proof is an exact biased
@@ -1668,6 +2606,25 @@ theorem finiteCWPressureGap_not_tendsto_zero_of_supercritical
   have hlt := hpopulation population le_rfl
   exact (not_lt_of_ge (hlower (population + 1) (Nat.succ_pos population))) hlt
 
+/-- **Exact phase boundary for the actual finite-volume pressure sequence.**
+For nonnegative coupling, convergence of the normalized pressure gap to zero
+is equivalent to lying at or below the Curie--Weiss threshold.  The reverse
+direction uses the population-uniform interior witness, not an unproved
+thermodynamic-limit identification. -/
+theorem finiteCWPressureGap_tendsto_zero_iff
+    (tlam : ℝ) (htlam : 0 ≤ tlam) :
+    Filter.Tendsto
+        (fun population : ℕ ↦ finiteCWPressureGap (population + 1) tlam)
+        Filter.atTop (nhds 0) ↔
+      tlam ≤ 1 := by
+  constructor
+  · intro hzero
+    by_contra hcritical
+    exact finiteCWPressureGap_not_tendsto_zero_of_supercritical tlam
+      (lt_of_not_ge hcritical) hzero
+  · intro hcritical
+    exact finiteCWPressureGap_tendsto_zero_of_subcritical tlam htlam hcritical
+
 /-- At zero coupling the binomially grouped partition function is normalized
 to one.  This also verifies that the `2^population` denominator is the genuine
 uniform Rademacher normalization. -/
@@ -1745,6 +2702,176 @@ theorem finiteCWPartition_pos (population : ℕ) (tlam : ℝ) :
           Real.exp (tlam * population / 2) by positivity).trans_le
       (finiteCWPartition_aligned_lower_bound population tlam hpopulation)
 
+/-- Typewise coupling comparison: changing coupling from `right` to `left`
+costs at most the maximal energy factor `exp (population * |left-right| / 2)`. -/
+theorem finiteCWTypeMass_le_exp_half_abs_mul_typeMass
+    (population upSpins : ℕ) (left right : ℝ)
+    (hpopulation : 0 < population)
+    (hupSpins : upSpins ∈ Finset.range (population + 1)) :
+    finiteCWTypeMass population left upSpins ≤
+      Real.exp (|left - right| * population / 2) *
+        finiteCWTypeMass population right upSpins := by
+  let magnetization := finiteCWMagnetization population upSpins
+  have hpopulationReal : (0 : ℝ) < population := by exact_mod_cast hpopulation
+  have hmagnetization : magnetization ^ 2 ≤ (population : ℝ) ^ 2 :=
+    finiteCWMagnetization_sq_le_population_sq population upSpins hupSpins
+  have hdiff : left - right ≤ |left - right| := le_abs_self _
+  have hscale : 0 ≤ magnetization ^ 2 / (2 * (population : ℝ)) := by
+    positivity
+  have hfirst : (left - right) *
+      (magnetization ^ 2 / (2 * (population : ℝ))) ≤
+      |left - right| *
+        (magnetization ^ 2 / (2 * (population : ℝ))) :=
+    mul_le_mul_of_nonneg_right hdiff hscale
+  have hsecond : |left - right| / (2 * (population : ℝ)) *
+      magnetization ^ 2 ≤ |left - right| * population / 2 := by
+    have hmul := mul_le_mul_of_nonneg_left hmagnetization
+      (show 0 ≤ |left - right| / (2 * (population : ℝ)) by positivity)
+    calc
+      |left - right| / (2 * (population : ℝ)) * magnetization ^ 2 ≤
+          |left - right| / (2 * (population : ℝ)) *
+            (population : ℝ) ^ 2 := hmul
+      _ = |left - right| * population / 2 := by
+        field_simp
+  have henergy : left / (2 * (population : ℝ)) * magnetization ^ 2 ≤
+      |left - right| * population / 2 +
+        right / (2 * (population : ℝ)) * magnetization ^ 2 := by
+    calc
+      left / (2 * (population : ℝ)) * magnetization ^ 2 =
+          right / (2 * (population : ℝ)) * magnetization ^ 2 +
+            (left - right) *
+              (magnetization ^ 2 / (2 * (population : ℝ))) := by ring
+      _ ≤ right / (2 * (population : ℝ)) * magnetization ^ 2 +
+            |left - right| *
+              (magnetization ^ 2 / (2 * (population : ℝ))) :=
+        add_le_add_left hfirst _
+      _ ≤ right / (2 * (population : ℝ)) * magnetization ^ 2 +
+            |left - right| * population / 2 :=
+        add_le_add_left (by
+          calc
+            |left - right| *
+                (magnetization ^ 2 / (2 * (population : ℝ))) =
+                |left - right| / (2 * (population : ℝ)) *
+                  magnetization ^ 2 := by ring
+            _ ≤ |left - right| * population / 2 := hsecond) _
+      _ = _ := by ring
+  have hexponential : Real.exp
+      (left / (2 * (population : ℝ)) * magnetization ^ 2) ≤
+      Real.exp (|left - right| * population / 2) *
+        Real.exp (right / (2 * (population : ℝ)) * magnetization ^ 2) := by
+    rw [← Real.exp_add]
+    exact Real.exp_le_exp.mpr henergy
+  unfold finiteCWTypeMass
+  dsimp [magnetization] at hexponential ⊢
+  calc
+    ((2 : ℝ) ^ population)⁻¹ * (Nat.choose population upSpins : ℝ) *
+        Real.exp (left / (2 * (population : ℝ)) *
+          finiteCWMagnetization population upSpins ^ 2) ≤
+      ((2 : ℝ) ^ population)⁻¹ * (Nat.choose population upSpins : ℝ) *
+        (Real.exp (|left - right| * population / 2) *
+          Real.exp (right / (2 * (population : ℝ)) *
+            finiteCWMagnetization population upSpins ^ 2)) :=
+      mul_le_mul_of_nonneg_left hexponential (by positivity)
+    _ = Real.exp (|left - right| * population / 2) *
+        (((2 : ℝ) ^ population)⁻¹ * (Nat.choose population upSpins : ℝ) *
+          Real.exp (right / (2 * (population : ℝ)) *
+            finiteCWMagnetization population upSpins ^ 2)) := by ring
+
+/-- Each finite type mass is monotone in coupling because its squared
+magnetisation energy is nonnegative. -/
+theorem finiteCWTypeMass_mono_coupling
+    (population upSpins : ℕ) {left right : ℝ}
+    (hpopulation : 0 < population) (hle : left ≤ right) :
+    finiteCWTypeMass population left upSpins ≤
+      finiteCWTypeMass population right upSpins := by
+  have hpopulationReal : (0 : ℝ) < population := by exact_mod_cast hpopulation
+  unfold finiteCWTypeMass
+  apply mul_le_mul_of_nonneg_left _ (by positivity)
+  apply Real.exp_le_exp.mpr
+  exact mul_le_mul_of_nonneg_right
+    (div_le_div_of_nonneg_right hle (by positivity)) (sq_nonneg _)
+
+/-- Summing the typewise comparison gives the corresponding exact partition
+function comparison. -/
+theorem finiteCWPartition_le_exp_half_abs_mul_partition
+    (population : ℕ) (left right : ℝ) (hpopulation : 0 < population) :
+    finiteCWPartition population left ≤
+      Real.exp (|left - right| * population / 2) *
+        finiteCWPartition population right := by
+  rw [← finiteCWTypeMass_sum, ← finiteCWTypeMass_sum, Finset.mul_sum]
+  apply Finset.sum_le_sum
+  intro upSpins hupSpins
+  exact finiteCWTypeMass_le_exp_half_abs_mul_typeMass
+    population upSpins left right hpopulation hupSpins
+
+/-- The finite partition function is monotone in coupling. -/
+theorem finiteCWPartition_mono_coupling
+    (population : ℕ) {left right : ℝ}
+    (hpopulation : 0 < population) (hle : left ≤ right) :
+    finiteCWPartition population left ≤ finiteCWPartition population right := by
+  rw [← finiteCWTypeMass_sum, ← finiteCWTypeMass_sum]
+  apply Finset.sum_le_sum
+  intro upSpins _hupSpins
+  exact finiteCWTypeMass_mono_coupling population upSpins hpopulation hle
+
+/-- One-sided finite pressure comparison in coupling. -/
+theorem finiteCWPressureGap_sub_le_half_abs
+    (population : ℕ) (left right : ℝ) (hpopulation : 0 < population) :
+    finiteCWPressureGap population left - finiteCWPressureGap population right ≤
+      |left - right| / 2 := by
+  have hpartition := finiteCWPartition_le_exp_half_abs_mul_partition
+    population left right hpopulation
+  have hlog := Real.log_le_log (finiteCWPartition_pos population left)
+    hpartition
+  rw [Real.log_mul (Real.exp_ne_zero _)
+      (finiteCWPartition_pos population right).ne', Real.log_exp] at hlog
+  have hpopulationReal : (0 : ℝ) < population := by exact_mod_cast hpopulation
+  rw [finiteCWPressureGap, finiteCWPressureGap]
+  calc
+    Real.log (finiteCWPartition population left) / population -
+        Real.log (finiteCWPartition population right) / population =
+      (Real.log (finiteCWPartition population left) -
+        Real.log (finiteCWPartition population right)) / population := by ring
+    _ ≤ (|left - right| * population / 2) / population :=
+      div_le_div_of_nonneg_right (by linarith) hpopulationReal.le
+    _ = |left - right| / 2 := by
+      field_simp
+
+/-- **Exact finite-volume regularity.**  At every positive population, the
+normalized Curie--Weiss pressure is globally `1/2`-Lipschitz in coupling. -/
+theorem finiteCWPressureGap_abs_sub_le_half_abs
+    (population : ℕ) (left right : ℝ) (hpopulation : 0 < population) :
+    |finiteCWPressureGap population left - finiteCWPressureGap population right| ≤
+      |left - right| / 2 := by
+  rw [abs_le]
+  constructor
+  · have hreverse := finiteCWPressureGap_sub_le_half_abs
+      population right left hpopulation
+    rw [abs_sub_comm] at hreverse
+    linarith
+  · exact finiteCWPressureGap_sub_le_half_abs population left right hpopulation
+
+/-- Bundled finite-volume half-Lipschitz regularity. -/
+theorem finiteCWPressureGap_lipschitzWith
+    (population : ℕ) (hpopulation : 0 < population) :
+    LipschitzWith (⟨1 / 2, by norm_num⟩ : NNReal)
+      (finiteCWPressureGap population) := by
+  apply LipschitzWith.of_dist_le_mul
+  intro left right
+  rw [Real.dist_eq, Real.dist_eq]
+  simpa [abs_sub_comm, mul_comm] using
+    finiteCWPressureGap_abs_sub_le_half_abs population left right hpopulation
+
+/-- Every positive finite-volume pressure is monotone in coupling. -/
+theorem monotone_finiteCWPressureGap
+    (population : ℕ) (hpopulation : 0 < population) :
+    Monotone (finiteCWPressureGap population) := by
+  intro left right hle
+  have hpartition := finiteCWPartition_mono_coupling population hpopulation hle
+  have hlog := Real.log_le_log (finiteCWPartition_pos population left) hpartition
+  unfold finiteCWPressureGap
+  exact div_le_div_of_nonneg_right hlog (by positivity)
+
 /-- The aligned-state contribution gives a finite-volume lower bound with no
 large-deviation or Varadhan premise. -/
 theorem finiteCWPressureGap_ge_aligned
@@ -1773,6 +2900,127 @@ theorem finiteCWPressureGap_ge_aligned
         Real.log_inv, Real.log_pow, Real.log_exp]
       ring
     _ ≤ Real.log (finiteCWPartition population tlam) := hlogBound
+
+/-- The genuine finite pressure dominates the complete variational supremum
+at every positive population and nonnegative coupling.  Interior objective
+values use the finite Gibbs inequality; both endpoints use the exact aligned
+state contribution. -/
+theorem cwVariationalPressureGap_le_finiteCWPressureGap
+    (population : ℕ) (tlam : ℝ)
+    (hpopulation : 0 < population) (htlam : 0 ≤ tlam) :
+    cwVariationalPressureGap tlam ≤ finiteCWPressureGap population tlam := by
+  unfold cwVariationalPressureGap
+  apply csSup_le (cwPressureValueSet_nonempty tlam)
+  intro value hvalue
+  rcases hvalue with ⟨m, hm, rfl⟩
+  by_cases hnegative : m = -1
+  · subst m
+    simpa [cwObjective_at_neg_one] using
+      finiteCWPressureGap_ge_aligned population tlam hpopulation
+  · by_cases hpositive : m = 1
+    · subst m
+      simpa [cwObjective_at_one] using
+        finiteCWPressureGap_ge_aligned population tlam hpopulation
+    · have hstrictLower : -1 < m :=
+        lt_of_le_of_ne hm.1 (Ne.symm hnegative)
+      have hstrictUpper : m < 1 :=
+        lt_of_le_of_ne hm.2 hpositive
+      exact finiteCWPressureGap_ge_cwObjective population tlam m hpopulation
+        htlam ((abs_lt).2 ⟨hstrictLower, hstrictUpper⟩)
+
+/-- The complete finite-to-variational squeeze: the only discrepancy is at
+most the logarithm of the number of magnetisation types divided by population. -/
+theorem finiteCWPressureGap_variational_bounds
+    (population : ℕ) (tlam : ℝ)
+    (hpopulation : 0 < population) (htlam : 0 ≤ tlam) :
+    cwVariationalPressureGap tlam ≤ finiteCWPressureGap population tlam ∧
+      finiteCWPressureGap population tlam ≤
+        cwVariationalPressureGap tlam +
+          Real.log (population + 1) / population :=
+  ⟨cwVariationalPressureGap_le_finiteCWPressureGap population tlam
+      hpopulation htlam,
+    finiteCWPressureGap_le_variational_add_typeCount population tlam hpopulation⟩
+
+/-- The finite pressure approximation has an explicit coupling-independent
+absolute error. -/
+theorem finiteCWPressureGap_abs_sub_variational_le_typeCount
+    (population : ℕ) (tlam : ℝ)
+    (hpopulation : 0 < population) (htlam : 0 ≤ tlam) :
+    |finiteCWPressureGap population tlam - cwVariationalPressureGap tlam| ≤
+      Real.log (population + 1) / population := by
+  obtain ⟨hlower, hupper⟩ :=
+    finiteCWPressureGap_variational_bounds population tlam hpopulation htlam
+  rw [abs_of_nonneg (sub_nonneg.mpr hlower)]
+  linarith
+
+/-- **Full thermodynamic-limit identification.**  For every nonnegative
+coupling, the genuine finite Rademacher pressure converges to the supremal
+Curie--Weiss variational pressure.  The proof is a finite type-count squeeze;
+no LDP, Stirling formula, or Varadhan lemma is assumed. -/
+theorem finiteCWPressureGap_tendsto_variationalPressure
+    (tlam : ℝ) (htlam : 0 ≤ tlam) :
+    Filter.Tendsto
+      (fun population : ℕ ↦ finiteCWPressureGap (population + 1) tlam)
+      Filter.atTop (nhds (cwVariationalPressureGap tlam)) := by
+  have herrorNonnegative : ∀ population : ℕ,
+      0 ≤ finiteCWPressureGap (population + 1) tlam -
+        cwVariationalPressureGap tlam := by
+    intro population
+    exact sub_nonneg.mpr
+      (cwVariationalPressureGap_le_finiteCWPressureGap (population + 1) tlam
+        (Nat.succ_pos population) htlam)
+  have herrorUpper : ∀ population : ℕ,
+      finiteCWPressureGap (population + 1) tlam -
+          cwVariationalPressureGap tlam ≤
+        Real.log (((population + 2 : ℕ) : ℝ)) /
+          ((population + 1 : ℕ) : ℝ) := by
+    intro population
+    have hupper := finiteCWPressureGap_le_variational_add_typeCount
+      (population + 1) tlam (Nat.succ_pos population)
+    have hraw : finiteCWPressureGap (population + 1) tlam -
+        cwVariationalPressureGap tlam ≤
+          Real.log (((population + 1 : ℕ) : ℝ) + 1) /
+            ((population + 1 : ℕ) : ℝ) :=
+      sub_le_iff_le_add.mpr (by simpa [add_comm] using hupper)
+    convert hraw using 1
+    all_goals norm_num [Nat.cast_add]
+    all_goals ring
+  have herror : Filter.Tendsto
+      (fun population : ℕ ↦ finiteCWPressureGap (population + 1) tlam -
+        cwVariationalPressureGap tlam)
+      Filter.atTop (nhds 0) :=
+    squeeze_zero herrorNonnegative herrorUpper
+      finiteCWTypeCount_log_div_tendsto_zero
+  have hconstant : Filter.Tendsto
+      (fun _population : ℕ ↦ cwVariationalPressureGap tlam)
+      Filter.atTop (nhds (cwVariationalPressureGap tlam)) :=
+    tendsto_const_nhds
+  convert hconstant.add herror using 1 <;> simp [add_comm]
+
+/-- **Uniform thermodynamic-limit identification on the whole positive
+cone.**  Because the type-count error is independent of coupling, finite
+Curie--Weiss pressure converges uniformly to the variational pressure on the
+entire half-line `[0,∞)`, not merely on compact coupling windows. -/
+theorem finiteCWPressureGap_tendstoUniformlyOn_nonnegative :
+    TendstoUniformlyOn
+      (fun population : ℕ ↦ fun tlam : ℝ ↦
+        finiteCWPressureGap (population + 1) tlam)
+      cwVariationalPressureGap Filter.atTop (Set.Ici 0) := by
+  rw [Metric.tendstoUniformlyOn_iff]
+  intro epsilon hepsilon
+  have hsmall : ∀ᶠ population : ℕ in Filter.atTop,
+      Real.log (((population + 2 : ℕ) : ℝ)) /
+          ((population + 1 : ℕ) : ℝ) < epsilon :=
+    finiteCWTypeCount_log_div_tendsto_zero.eventually_lt_const hepsilon
+  filter_upwards [hsmall] with population hpopulationSmall
+  intro tlam htlam
+  have herror := finiteCWPressureGap_abs_sub_variational_le_typeCount
+    (population + 1) tlam (Nat.succ_pos population) htlam
+  rw [Real.dist_eq, abs_sub_comm]
+  exact herror.trans_lt (by
+    convert hpopulationSmall using 1
+    all_goals norm_num [Nat.cast_add]
+    all_goals ring)
 
 /-- **Actual positive finite-volume pressure separation.**  Above the explicit
 aligned-state threshold, every positive population size already has strictly
@@ -1846,15 +3094,213 @@ theorem finiteRankOneRademacherPressure_gt_baseline
     (finiteCWPressureGap_pos_of_supercritical
       population (temperature * spikeStrength) hpopulation hcritical)
 
+/-- The exact-criticality statement for the finite rank-one pressure sequence. -/
+def FiniteRankOnePressureCriticalStatement
+    (baseline temperature spikeStrength : ℝ) : Prop :=
+  Filter.Tendsto
+      (fun population : ℕ ↦
+        finiteRankOneRademacherPressure baseline (population + 1)
+            temperature spikeStrength -
+          finiteBaselineRademacherPressure baseline temperature)
+      Filter.atTop (nhds 0) ↔
+    temperature * spikeStrength ≤ 1
+
+/-- The variational-limit statement for the complete finite rank-one pressure. -/
+def FiniteRankOnePressureVariationalLimitStatement
+    (baseline temperature spikeStrength : ℝ) : Prop :=
+  Filter.Tendsto
+    (fun population : ℕ ↦
+      finiteRankOneRademacherPressure baseline (population + 1)
+        temperature spikeStrength)
+    Filter.atTop
+    (nhds (finiteBaselineRademacherPressure baseline temperature +
+      cwVariationalPressureGap (temperature * spikeStrength)))
+
+/-- The uniform nonnegative-spike convergence statement. -/
+def FiniteRankOnePressureUniformLimitStatement
+    (baseline temperature : ℝ) : Prop :=
+  TendstoUniformlyOn
+    (fun population : ℕ ↦ fun spikeStrength : ℝ ↦
+      finiteRankOneRademacherPressure baseline (population + 1)
+        temperature spikeStrength)
+    (fun spikeStrength ↦
+      finiteBaselineRademacherPressure baseline temperature +
+        cwVariationalPressureGap (temperature * spikeStrength))
+    Filter.atTop (Set.Ici 0)
+
+/-- For nonnegative effective coupling, the genuine finite rank-one pressure
+difference converges to zero exactly at and below the Curie--Weiss threshold. -/
+theorem finiteRankOneRademacherPressure_difference_tendsto_zero_iff
+    (baseline temperature spikeStrength : ℝ)
+    (hcoupling : 0 ≤ temperature * spikeStrength) :
+    FiniteRankOnePressureCriticalStatement baseline temperature spikeStrength := by
+  unfold FiniteRankOnePressureCriticalStatement
+  simpa only [finiteRankOneRademacherPressure_sub_baseline] using
+    finiteCWPressureGap_tendsto_zero_iff
+      (temperature * spikeStrength) hcoupling
+
+/-- The complete finite rank-one pressure converges to the baseline plus the
+Curie--Weiss variational pressure at every nonnegative effective coupling. -/
+theorem finiteRankOneRademacherPressure_tendsto_variational
+    (baseline temperature spikeStrength : ℝ)
+    (hcoupling : 0 ≤ temperature * spikeStrength) :
+    FiniteRankOnePressureVariationalLimitStatement
+      baseline temperature spikeStrength := by
+  have hbaseline : Filter.Tendsto
+      (fun _population : ℕ ↦
+        finiteBaselineRademacherPressure baseline temperature)
+      Filter.atTop
+      (nhds (finiteBaselineRademacherPressure baseline temperature)) :=
+    tendsto_const_nhds
+  have hgap := finiteCWPressureGap_tendsto_variationalPressure
+    (temperature * spikeStrength) hcoupling
+  simpa only [finiteRankOneRademacherPressure] using hbaseline.add hgap
+
+/-- The same thermodynamic limit holds along the even dimensions `2(p+1)`
+used by the concrete balanced covariance matrices. -/
+theorem balancedRankOneCovariancePressure_tendsto_variational
+    (baseline temperature spikeStrength : ℝ)
+    (hcoupling : 0 ≤ temperature * spikeStrength) :
+    Filter.Tendsto
+      (fun population : ℕ ↦
+        finiteRankOneRademacherPressure baseline (2 * (population + 1))
+          temperature spikeStrength)
+      Filter.atTop
+      (nhds (finiteBaselineRademacherPressure baseline temperature +
+        cwVariationalPressureGap (temperature * spikeStrength))) := by
+  have hevenIndex : Filter.Tendsto (fun population : ℕ ↦ 2 * population + 1)
+      Filter.atTop Filter.atTop := by
+    rw [Filter.tendsto_atTop]
+    intro threshold
+    filter_upwards [Filter.eventually_ge_atTop threshold] with population hpopulation
+    omega
+  have hpressure := (finiteRankOneRademacherPressure_tendsto_variational
+    baseline temperature spikeStrength hcoupling).comp hevenIndex
+  simpa only [Function.comp_apply] using hpressure
+
+/-- The complete concrete positive-cone counterexample, packaged so that its
+matrix, traffic, ground-state, and thermodynamic statements cannot silently
+refer to different witnesses. -/
+structure ConcreteBalancedPSDPressureWitness
+    {Term : Type*} [Fintype Term]
+    (coefficient : Term → ℝ) (hasOddDegree : Term → Bool)
+    (vertices edges : Term → ℕ)
+    (baseline spikeStrength temperature : ℝ) : Prop where
+  covariancePSD : ∀ population : ℕ,
+    (balancedRankOneCovariance baseline spikeStrength (population + 1)).PosSemidef
+  trafficInvisible :
+    Filter.Tendsto
+      (fun population : ℕ ↦
+        finiteRankOneTrafficCorrection coefficient hasOddDegree vertices edges
+          (population + 1))
+      Filter.atTop (nhds 0)
+  finiteHamiltonian : ∀ population : ℕ,
+    ∀ vector : BalancedRankOneCoordinate (population + 1) → ℝ,
+      (∀ coordinate, vector coordinate ^ 2 = 1) →
+        temperature / 2 *
+            (finiteMatrixQuadraticForm
+                (balancedRankOneCovariance baseline spikeStrength (population + 1))
+                vector - baseline * (2 * (population + 1) : ℕ)) =
+          (temperature * spikeStrength) /
+              (2 * ((2 * (population + 1) : ℕ) : ℝ)) *
+            (balancedRankOneSign (population + 1) ⬝ᵥ vector) ^ 2
+  lowerGroundStateUnchanged : ∀ population : ℕ,
+    (∀ vector : BalancedRankOneCoordinate (population + 1) → ℝ,
+      (∀ coordinate, vector coordinate ^ 2 = 1) →
+        baseline * (2 * (population + 1) : ℕ) ≤
+          finiteMatrixQuadraticForm
+            (balancedRankOneCovariance baseline spikeStrength (population + 1))
+            vector) ∧
+      finiteMatrixQuadraticForm
+          (balancedRankOneCovariance baseline spikeStrength (population + 1))
+          (balancedRankOneOrthogonalSpin (population + 1)) =
+        baseline * (2 * (population + 1) : ℕ) ∧
+      baseline * (2 * (population + 1) : ℕ) <
+        finiteMatrixQuadraticForm
+          (balancedRankOneCovariance baseline spikeStrength (population + 1))
+          (balancedRankOneSign (population + 1))
+  pressureConverges :
+    Filter.Tendsto
+      (fun population : ℕ ↦
+        finiteRankOneRademacherPressure baseline (2 * (population + 1))
+          temperature spikeStrength)
+      Filter.atTop
+      (nhds (finiteBaselineRademacherPressure baseline temperature +
+        cwVariationalPressureGap (temperature * spikeStrength)))
+  pressureStrictlyPositive :
+    0 < cwVariationalPressureGap (temperature * spikeStrength)
+
+/-- **One actual balanced PSD covariance sequence refutes both proposed
+dichotomies.**  Under `a ≥ 0`, `λ > 0`, and `tλ > 1`, the same matrices
+`aI + λP` satisfy every field of `ConcreteBalancedPSDPressureWitness`. -/
+theorem concreteBalancedPSDPressureWitness
+    {Term : Type*} [Fintype Term]
+    (coefficient : Term → ℝ) (hasOddDegree : Term → Bool)
+    (vertices edges : Term → ℕ)
+    (hconnected : ∀ term, hasOddDegree term = false → vertices term ≤ edges term)
+    (baseline spikeStrength temperature : ℝ)
+    (hbaseline : 0 ≤ baseline) (hspike : 0 < spikeStrength)
+    (hcritical : 1 < temperature * spikeStrength) :
+    ConcreteBalancedPSDPressureWitness coefficient hasOddDegree vertices edges
+      baseline spikeStrength temperature := by
+  have hcoupling : 0 ≤ temperature * spikeStrength := by linarith
+  exact
+    { covariancePSD := fun population ↦
+        balancedRankOneCovariance_posSemidef baseline spikeStrength (population + 1)
+          hbaseline hspike.le
+      trafficInvisible :=
+        finiteRankOneTrafficCorrection_tendsto_zero coefficient hasOddDegree
+          vertices edges hconnected
+      finiteHamiltonian := fun population vector hrademacher ↦
+        balancedRankOneCovariance_rademacherExponent_eq_finiteCW
+          baseline spikeStrength temperature (population + 1) vector hrademacher
+      lowerGroundStateUnchanged := fun population ↦
+        balancedRankOneCovariance_groundState_certificate baseline spikeStrength
+          (population + 1) hspike (Nat.succ_pos population)
+      pressureConverges :=
+        balancedRankOneCovariancePressure_tendsto_variational
+          baseline temperature spikeStrength hcoupling
+      pressureStrictlyPositive :=
+        cwVariationalPressureGap_pos_of_supercritical
+          (temperature * spikeStrength) hcritical }
+
+/-- At fixed nonnegative temperature, convergence of the complete rank-one
+pressure is uniform over every nonnegative spike strength, including the
+unbounded half-line. -/
+theorem finiteRankOneRademacherPressure_tendstoUniformlyOn_nonnegativeSpike
+    (baseline temperature : ℝ) (htemperature : 0 ≤ temperature) :
+    FiniteRankOnePressureUniformLimitStatement baseline temperature := by
+  unfold FiniteRankOnePressureUniformLimitStatement
+  rw [Metric.tendstoUniformlyOn_iff]
+  intro epsilon hepsilon
+  have hsmall : ∀ᶠ population : ℕ in Filter.atTop,
+      Real.log (((population + 2 : ℕ) : ℝ)) /
+          ((population + 1 : ℕ) : ℝ) < epsilon :=
+    finiteCWTypeCount_log_div_tendsto_zero.eventually_lt_const hepsilon
+  filter_upwards [hsmall] with population hpopulationSmall
+  intro spikeStrength hspikeStrength
+  have hcoupling : 0 ≤ temperature * spikeStrength :=
+    mul_nonneg htemperature hspikeStrength
+  have herror := finiteCWPressureGap_abs_sub_variational_le_typeCount
+    (population + 1) (temperature * spikeStrength)
+    (Nat.succ_pos population) hcoupling
+  have hstrict : |finiteCWPressureGap (population + 1)
+      (temperature * spikeStrength) -
+        cwVariationalPressureGap (temperature * spikeStrength)| < epsilon :=
+    herror.trans_lt (by
+      convert hpopulationSmall using 1
+      all_goals norm_num [Nat.cast_add]
+      all_goals ring)
+  simpa [finiteRankOneRademacherPressure, Real.dist_eq, abs_sub_comm] using hstrict
+
 /-- **Positive-cone traffic counterexample at the exact variational level.**
 Every fixed graph has finitely many nonempty spike-edge terms; once identity
 edges are contracted, their complete correction vanishes by the connected
 rank-one bound.  Nevertheless the Curie--Weiss variational pressure is strictly
 positive above `tλ = 1`.
 
-This theorem combines the two proved halves of the counterexample without
-claiming the separate model-specific LDP/Varadhan identification of a finite
-spin partition function with this variational pressure. -/
+The full finite-pressure theorem below additionally identifies this
+variational pressure as the genuine thermodynamic limit. -/
 theorem finiteRankOneTraffic_invisible_variationalPressure_visible
     {Term : Type*} [Fintype Term]
     (coefficient : Term → ℝ) (hasOddDegree : Term → Bool)
@@ -1872,16 +3318,17 @@ theorem finiteRankOneTraffic_invisible_variationalPressure_visible
     cwVariationalPressureGap_pos_of_supercritical tlam hcritical⟩
 
 /-- **The finite-volume properties one rank-one spike has at once**, as one
-proposition: every fixed traffic correction vanishes and one positive interior
-variational witness uniformly lower-bounds the finite pressure at every
-population, so that pressure cannot vanish asymptotically.
+proposition: every fixed traffic correction vanishes, the genuine pressure
+converges to the variational value, and one positive interior witness uniformly
+lower-bounds every finite pressure, so that pressure cannot vanish
+asymptotically.
 
 Named for the same reason as `RankOneSpikeRefutesBothDichotomies`: the theorem that proves
 it, the genomic restatement that cites that theorem, and the obstruction registry each
 carried the conjunction in full, so a change to one copy would have been a silent divergence
 rather than a build error.
 
-Empirical status: UNTESTED, and not the kind of thing a dataset tests: this names three
+Empirical status: UNTESTED, and not the kind of thing a dataset tests: this names four
 claims, each proved below at finite volume on an explicit spike.  What a measurement could
 bear on is whether a real LD spike is rank-one, which nothing here asserts. -/
 def RankOneSpikeInvisibleWithFinitePressure {Term : Type*} [Fintype Term]
@@ -1892,6 +3339,9 @@ def RankOneSpikeInvisibleWithFinitePressure {Term : Type*} [Fintype Term]
         finiteRankOneTrafficCorrection coefficient hasOddDegree vertices edges
           (population + 1))
       Filter.atTop (nhds 0) ∧
+    Filter.Tendsto
+      (fun population : ℕ ↦ finiteCWPressureGap (population + 1) tlam)
+      Filter.atTop (nhds (cwVariationalPressureGap tlam)) ∧
     ∃ m : ℝ, |m| < 1 ∧ 0 < cwObjective tlam m ∧
       (∀ population : ℕ,
         cwObjective tlam m ≤ finiteCWPressureGap (population + 1) tlam) ∧
@@ -1903,8 +3353,8 @@ def RankOneSpikeInvisibleWithFinitePressure {Term : Type*} [Fintype Term]
 function throughout the full supercritical regime.**  Every fixed traffic
 correction vanishes, while for every coupling above `1` one interior trial law
 supplies a positive population-uniform lower bound on normalized Rademacher
-pressure.  This does not identify the full finite-volume limit or prove its
-subcritical convergence and requires no LDP or Varadhan premise. -/
+pressure.  The companion finite-pressure theorem proves convergence to zero
+at and below `1`; neither statement requires an LDP or Varadhan premise. -/
 theorem finiteRankOneTraffic_invisible_finitePressure_visible
     {Term : Type*} [Fintype Term]
     (coefficient : Term → ℝ) (hasOddDegree : Term → Bool)
@@ -1916,6 +3366,8 @@ theorem finiteRankOneTraffic_invisible_finitePressure_visible
     finiteCWPressureGap_supercritical_uniformWitness tlam hcritical
   exact ⟨finiteRankOneTrafficCorrection_tendsto_zero
       coefficient hasOddDegree vertices edges hconnected,
+    finiteCWPressureGap_tendsto_variationalPressure tlam
+      (le_trans (by norm_num) hcritical.le),
     ⟨m, hm, hobjective,
       ⟨fun population ↦ hlower (population + 1) (Nat.succ_pos population),
         finiteCWPressureGap_not_tendsto_zero_of_supercritical tlam hcritical⟩⟩⟩
@@ -2013,10 +3465,157 @@ theorem diagonalTrafficCorrection_tendsto_zero (baseline : ℝ) (edges : ℕ) :
   simpa [diagonalTrafficCorrection] using
     hpow.mul_const ((baseline + 2) ^ edges - baseline ^ edges)
 
+/-- A concrete `16^k`-coordinate realization of the mesoscopic example.  The
+second coordinate indexes `4^k` blocks; the exceptional subspace is the slice
+whose second coordinate has value zero and therefore has exactly `4^k`
+coordinates. -/
+abbrev MesoscopicGFOMCoordinate (iteration : ℕ) :=
+  Fin (4 ^ iteration) × Fin (4 ^ iteration)
+
+/-- The exceptional coordinate slice supporting the amplified output. -/
+abbrev MesoscopicGFOMExceptionalCoordinate (iteration : ℕ) :=
+  {coordinate : MesoscopicGFOMCoordinate iteration // coordinate.2.val = 0}
+
+/-- The concrete ambient dimension is exactly `16^k`. -/
+theorem mesoscopicGFOM_dimension (iteration : ℕ) :
+    Fintype.card (MesoscopicGFOMCoordinate iteration) = 16 ^ iteration := by
+  simp [MesoscopicGFOMCoordinate, ← mul_pow]
+
+/-- The concrete exceptional rank is exactly `4^k`. -/
+theorem mesoscopicGFOM_exceptionalRank (iteration : ℕ) :
+    Fintype.card (MesoscopicGFOMExceptionalCoordinate iteration) = 4 ^ iteration := by
+  classical
+  let equivalence : MesoscopicGFOMExceptionalCoordinate iteration ≃ Fin (4 ^ iteration) :=
+    { toFun := fun coordinate ↦ coordinate.1.1
+      invFun := fun coordinate ↦
+        ⟨(coordinate, ⟨0, pow_pos (by norm_num) iteration⟩), rfl⟩
+      left_inv := by
+        intro coordinate
+        apply Subtype.ext
+        apply Prod.ext
+        · rfl
+        · apply Fin.ext
+          exact coordinate.property.symm
+      right_inv := fun _coordinate ↦ rfl }
+  simpa using Fintype.card_congr equivalence
+
+/-- The actual diagonal GFOM step `(M-aI)x`: multiply the exceptional slice
+by two and annihilate the bulk. -/
+def mesoscopicGFOMStep (iteration : ℕ)
+    (vector : MesoscopicGFOMCoordinate iteration → ℝ) :
+    MesoscopicGFOMCoordinate iteration → ℝ :=
+  fun coordinate ↦ if coordinate.2.val = 0 then 2 * vector coordinate else 0
+
+/-- Repeated application of the concrete diagonal step. -/
+def mesoscopicGFOMIterate (iteration : ℕ) :
+    ℕ → (MesoscopicGFOMCoordinate iteration → ℝ) →
+      MesoscopicGFOMCoordinate iteration → ℝ
+  | 0, vector => vector
+  | runtime + 1, vector =>
+      mesoscopicGFOMStep iteration (mesoscopicGFOMIterate iteration runtime vector)
+
+/-- Every positive-time iterate has the exact expected coordinate formula:
+the exceptional slice is multiplied by `2^t` and every bulk coordinate is
+zero. -/
+theorem mesoscopicGFOMIterate_succ_apply
+    (iteration runtime : ℕ)
+    (vector : MesoscopicGFOMCoordinate iteration → ℝ)
+    (coordinate : MesoscopicGFOMCoordinate iteration) :
+    mesoscopicGFOMIterate iteration (runtime + 1) vector coordinate =
+      if coordinate.2.val = 0 then
+        (2 : ℝ) ^ (runtime + 1) * vector coordinate else 0 := by
+  induction runtime with
+  | zero =>
+      simp [mesoscopicGFOMIterate, mesoscopicGFOMStep]
+  | succ runtime ih =>
+      by_cases hexceptional : coordinate.2.val = 0
+      · rw [mesoscopicGFOMIterate]
+        simp only [mesoscopicGFOMStep, hexceptional, ↓reduceIte, ih, pow_succ]
+        ring
+      · rw [mesoscopicGFOMIterate]
+        simp only [mesoscopicGFOMStep, hexceptional, ↓reduceIte]
+
+/-- Deterministic unit input used to expose the exact normalized amplification
+without adding an unnecessary probabilistic layer. -/
+def mesoscopicGFOMUnitInput (iteration : ℕ) :
+    MesoscopicGFOMCoordinate iteration → ℝ :=
+  fun _coordinate ↦ 1
+
+/-- Normalized squared output of the genuine finite diagonal iteration. -/
+noncomputable def mesoscopicGFOMActualEnergy (iteration runtime : ℕ) : ℝ :=
+  (∑ coordinate : MesoscopicGFOMCoordinate iteration,
+    mesoscopicGFOMIterate iteration runtime
+      (mesoscopicGFOMUnitInput iteration) coordinate ^ 2) /
+    (16 : ℝ) ^ iteration
+
+/-- Exactly `4^k` coordinates lie in the exceptional slice. -/
+theorem mesoscopicGFOM_sum_exceptionalSlice
+    (iteration : ℕ) (value : ℝ) :
+    (∑ coordinate : MesoscopicGFOMCoordinate iteration,
+      if coordinate.2.val = 0 then value else 0) =
+      (4 : ℝ) ^ iteration * value := by
+  classical
+  have hsize : 0 < 4 ^ iteration := pow_pos (by norm_num) iteration
+  have hinner : ∀ first : Fin (4 ^ iteration),
+      (∑ second : Fin (4 ^ iteration),
+        if second.val = 0 then value else 0) = value := by
+    intro first
+    let zero : Fin (4 ^ iteration) := ⟨0, hsize⟩
+    rw [Finset.sum_eq_single zero]
+    · simp [zero]
+    · intro second _hsecond hne
+      have hnonzero : second.val ≠ 0 := by
+        intro hzero
+        apply hne
+        apply Fin.ext
+        exact hzero
+      simp [hnonzero]
+    · simp
+  rw [Fintype.sum_prod_type]
+  calc
+    (∑ first : Fin (4 ^ iteration),
+      ∑ second : Fin (4 ^ iteration),
+        if second.val = 0 then value else 0) =
+        ∑ _first : Fin (4 ^ iteration), value := by
+      apply Finset.sum_congr rfl
+      intro first _hfirst
+      exact hinner first
+    _ = (4 : ℝ) ^ iteration * value := by simp
+
 /-- Normalized squared output of the diagonal power iteration: the exceptional mass `4⁻ᵏ` is
 amplified by `4ᵗ`. -/
 noncomputable def mesoscopicGFOMEnergy (iteration runtime : ℕ) : ℝ :=
   (4 : ℝ) ^ runtime * (1 / 4 : ℝ) ^ iteration
+
+/-- At every positive runtime, the energy of the concrete `16^k`-dimensional
+iteration is exactly the scalar amplification ledger. -/
+theorem mesoscopicGFOMActualEnergy_succ_eq_proxy
+    (iteration runtime : ℕ) :
+    mesoscopicGFOMActualEnergy iteration (runtime + 1) =
+      mesoscopicGFOMEnergy iteration (runtime + 1) := by
+  have hsum :
+      (∑ coordinate : MesoscopicGFOMCoordinate iteration,
+        mesoscopicGFOMIterate iteration (runtime + 1)
+          (mesoscopicGFOMUnitInput iteration) coordinate ^ 2) =
+        (4 : ℝ) ^ iteration * ((2 : ℝ) ^ (runtime + 1)) ^ 2 := by
+    simpa [mesoscopicGFOMIterate_succ_apply, mesoscopicGFOMUnitInput] using
+      mesoscopicGFOM_sum_exceptionalSlice iteration
+        (((2 : ℝ) ^ (runtime + 1)) ^ 2)
+  have hamplification : ((2 : ℝ) ^ (runtime + 1)) ^ 2 =
+      (4 : ℝ) ^ (runtime + 1) := by
+    rw [pow_two, ← mul_pow]
+    norm_num
+  have hmass : (4 : ℝ) ^ iteration / (16 : ℝ) ^ iteration =
+      (1 / 4 : ℝ) ^ iteration := by
+    rw [← div_pow]
+    norm_num
+  rw [mesoscopicGFOMActualEnergy, hsum, hamplification, mesoscopicGFOMEnergy]
+  calc
+    (4 : ℝ) ^ iteration * (4 : ℝ) ^ (runtime + 1) /
+        (16 : ℝ) ^ iteration =
+      (4 : ℝ) ^ (runtime + 1) *
+        ((4 : ℝ) ^ iteration / (16 : ℝ) ^ iteration) := by ring
+    _ = (4 : ℝ) ^ (runtime + 1) * (1 / 4 : ℝ) ^ iteration := by rw [hmass]
 
 /-- At logarithmic runtime `t = k`, the vanishing mass and amplification cancel exactly. -/
 @[simp] theorem mesoscopicGFOMEnergy_logRuntime (iteration : ℕ) :
@@ -2033,6 +3632,25 @@ theorem mesoscopicGFOMEnergy_fixedRuntime_tendsto_zero (runtime : ℕ) :
     tendsto_pow_atTop_nhds_zero_of_abs_lt_one (by norm_num)
   simpa [mesoscopicGFOMEnergy] using hpow.const_mul ((4 : ℝ) ^ runtime)
 
+/-- Every fixed positive runtime of the actual finite diagonal iteration has
+vanishing normalized output energy. -/
+theorem mesoscopicGFOMActualEnergy_fixedPositiveRuntime_tendsto_zero
+    (runtime : ℕ) :
+    Filter.Tendsto
+      (fun iteration ↦ mesoscopicGFOMActualEnergy iteration (runtime + 1))
+      Filter.atTop (nhds 0) := by
+  simpa only [mesoscopicGFOMActualEnergy_succ_eq_proxy] using
+    mesoscopicGFOMEnergy_fixedRuntime_tendsto_zero (runtime + 1)
+
+/-- At the genuine logarithmic runtime `t=k`, for every positive `k`, the
+actual normalized squared output is exactly one. -/
+theorem mesoscopicGFOMActualEnergy_logRuntime (iteration : ℕ)
+    (hiteration : 0 < iteration) :
+    mesoscopicGFOMActualEnergy iteration iteration = 1 := by
+  obtain ⟨runtime, rfl⟩ := Nat.exists_eq_succ_of_ne_zero (Nat.ne_of_gt hiteration)
+  rw [mesoscopicGFOMActualEnergy_succ_eq_proxy]
+  exact mesoscopicGFOMEnergy_logRuntime (runtime + 1)
+
 /-- The dimensions `pₖ = 16ᵏ` and exceptional ranks `rₖ = 4ᵏ` have mass exactly `4⁻ᵏ`. -/
 theorem mesoscopic_rank_fraction (iteration : ℕ) :
     (4 : ℝ) ^ iteration / (16 : ℝ) ^ iteration = (1 / 4 : ℝ) ^ iteration := by
@@ -2047,15 +3665,303 @@ theorem limitingTraffic_does_not_control_logarithmicIteration (runtime : ℕ) :
   ⟨diagonalTrafficCorrection_tendsto_zero 1 runtime,
     mesoscopicGFOMEnergy_logRuntime runtime⟩
 
-/-- The complete fixed-coordinate/logarithmic-runtime separation in one statement. -/
-theorem fixedTraffic_invisible_logRuntime_visible :
+/-- The fixed-coordinate/logarithmic-runtime separation contract. -/
+def FixedTrafficLogRuntimeSeparation : Prop :=
     (∀ edges : ℕ,
       Filter.Tendsto (fun iteration ↦ diagonalTrafficCorrection 1 edges iteration)
         Filter.atTop (nhds 0)) ∧
-      ∀ iteration : ℕ, mesoscopicGFOMEnergy iteration iteration = 1 :=
+      ∀ iteration : ℕ, mesoscopicGFOMEnergy iteration iteration = 1
+
+/-- The complete fixed-coordinate/logarithmic-runtime separation in one statement. -/
+theorem fixedTraffic_invisible_logRuntime_visible : FixedTrafficLogRuntimeSeparation :=
   ⟨diagonalTrafficCorrection_tendsto_zero 1, mesoscopicGFOMEnergy_logRuntime⟩
 
+/-- The concrete finite-matrix version of the logarithmic-runtime separation. -/
+def ConcreteGFOMLogRuntimeSeparation : Prop :=
+  (∀ iteration : ℕ,
+    Fintype.card (MesoscopicGFOMCoordinate iteration) = 16 ^ iteration ∧
+      Fintype.card (MesoscopicGFOMExceptionalCoordinate iteration) = 4 ^ iteration) ∧
+  (∀ edges : ℕ,
+    Filter.Tendsto (fun iteration ↦ diagonalTrafficCorrection 1 edges iteration)
+      Filter.atTop (nhds 0)) ∧
+  (∀ runtime : ℕ,
+    Filter.Tendsto
+      (fun iteration ↦ mesoscopicGFOMActualEnergy iteration (runtime + 1))
+      Filter.atTop (nhds 0)) ∧
+  ∀ iteration : ℕ, 0 < iteration →
+    mesoscopicGFOMActualEnergy iteration iteration = 1
+
+/-- **Concrete matrix-iteration counterexample.**  The actual finite diagonal
+operator has dimension `16^k` and exceptional rank `4^k`; every fixed traffic
+coordinate and every fixed positive-time output energy vanish, while the
+positive logarithmic-time output energy is exactly one. -/
+theorem concreteGFOM_fixedTrafficInvisible_logRuntimeVisible :
+    ConcreteGFOMLogRuntimeSeparation :=
+  ⟨fun iteration ↦
+      ⟨mesoscopicGFOM_dimension iteration, mesoscopicGFOM_exceptionalRank iteration⟩,
+    diagonalTrafficCorrection_tendsto_zero 1,
+    mesoscopicGFOMActualEnergy_fixedPositiveRuntime_tendsto_zero,
+    mesoscopicGFOMActualEnergy_logRuntime⟩
+
 end MesoscopicAmplification
+
+section SpectralSDPSeparation
+
+/-- One distinguished outlier coordinate together with `population` bulk
+coordinates. -/
+abbrev FiniteOutlierCoordinate (population : ℕ) := Option (Fin population)
+
+/-- The baseline diagonal spectrum is constant. -/
+def finiteBulkDiagonal (baseline : ℝ) (population : ℕ) :
+    FiniteOutlierCoordinate population → ℝ :=
+  fun _coordinate ↦ baseline
+
+/-- A single positive spectral outlier, of normalized mass `1/(p+1)`. -/
+def finiteOutlierDiagonal (baseline spikeStrength : ℝ) (population : ℕ) :
+    FiniteOutlierCoordinate population → ℝ
+  | none => baseline + spikeStrength
+  | some _coordinate => baseline
+
+/-- Normalized spectral moment of a finite diagonal design. -/
+noncomputable def normalizedDiagonalSpectralMoment
+    (population edges : ℕ)
+    (diagonal : FiniteOutlierCoordinate population → ℝ) : ℝ :=
+  (∑ coordinate, diagonal coordinate ^ edges) / (population + 1 : ℕ)
+
+/-- Normalized empirical spectral average of an arbitrary fixed test
+function. -/
+noncomputable def normalizedDiagonalSpectralObservable
+    (population : ℕ) (observable : ℝ → ℝ)
+    (diagonal : FiniteOutlierCoordinate population → ℝ) : ℝ :=
+  (∑ coordinate, observable (diagonal coordinate)) / (population + 1 : ℕ)
+
+/-- The finite witness has exactly `p+1` spectral coordinates. -/
+theorem finiteOutlierCoordinate_card (population : ℕ) :
+    Fintype.card (FiniteOutlierCoordinate population) = population + 1 := by
+  simp [FiniteOutlierCoordinate]
+
+/-- A fixed numerator divided by the growing spectral dimension `p+1`
+vanishes.  Both moment and arbitrary-observable outlier corrections factor
+through this single limit theorem. -/
+theorem constant_div_natSucc_tendsto_zero (constant : ℝ) :
+    Filter.Tendsto
+      (fun population : ℕ ↦ constant / (((population + 1 : ℕ) : ℝ)))
+      Filter.atTop (nhds 0) := by
+  have hdenominator : Filter.Tendsto
+      (fun population : ℕ ↦ ((population + 1 : ℕ) : ℝ))
+      Filter.atTop Filter.atTop := by
+    convert (tendsto_natCast_atTop_atTop (R := ℝ)).comp
+      (Filter.tendsto_add_atTop_nat 1) using 1
+  have hinverse : Filter.Tendsto
+      (fun population : ℕ ↦ (((population + 1 : ℕ) : ℝ))⁻¹)
+      Filter.atTop (nhds 0) :=
+    hdenominator.inv_tendsto_atTop
+  simpa [div_eq_mul_inv] using hinverse.const_mul constant
+
+/-- The exact normalized-moment correction caused by the single outlier. -/
+theorem normalizedDiagonalSpectralMoment_outlier_sub_bulk
+    (baseline spikeStrength : ℝ) (population edges : ℕ) :
+    normalizedDiagonalSpectralMoment population edges
+        (finiteOutlierDiagonal baseline spikeStrength population) -
+      normalizedDiagonalSpectralMoment population edges
+        (finiteBulkDiagonal baseline population) =
+      ((baseline + spikeStrength) ^ edges - baseline ^ edges) /
+        (population + 1 : ℕ) := by
+  simp [normalizedDiagonalSpectralMoment, finiteOutlierDiagonal,
+    finiteBulkDiagonal]
+  field_simp
+  ring
+
+/-- Every fixed normalized spectral moment misses the bounded rank-one
+outlier asymptotically. -/
+theorem normalizedDiagonalSpectralMoment_outlier_sub_bulk_tendsto_zero
+    (baseline spikeStrength : ℝ) (edges : ℕ) :
+    Filter.Tendsto
+      (fun population ↦
+        normalizedDiagonalSpectralMoment population edges
+            (finiteOutlierDiagonal baseline spikeStrength population) -
+          normalizedDiagonalSpectralMoment population edges
+            (finiteBulkDiagonal baseline population))
+      Filter.atTop (nhds 0) := by
+  simpa only [normalizedDiagonalSpectralMoment_outlier_sub_bulk] using
+    constant_div_natSucc_tendsto_zero
+      ((baseline + spikeStrength) ^ edges - baseline ^ edges)
+
+/-- The exact empirical-average correction for any fixed spectral test
+function. -/
+theorem normalizedDiagonalSpectralObservable_outlier_sub_bulk
+    (baseline spikeStrength : ℝ) (population : ℕ) (observable : ℝ → ℝ) :
+    normalizedDiagonalSpectralObservable population observable
+        (finiteOutlierDiagonal baseline spikeStrength population) -
+      normalizedDiagonalSpectralObservable population observable
+        (finiteBulkDiagonal baseline population) =
+      (observable (baseline + spikeStrength) - observable baseline) /
+        (population + 1 : ℕ) := by
+  simp [normalizedDiagonalSpectralObservable, finiteOutlierDiagonal,
+    finiteBulkDiagonal]
+  field_simp
+  ring
+
+/-- The single outlier is invisible to every fixed empirical spectral
+observable, which directly expresses equality of the limiting bulk spectral
+law rather than only equality of its moments. -/
+theorem normalizedDiagonalSpectralObservable_outlier_sub_bulk_tendsto_zero
+    (baseline spikeStrength : ℝ) (observable : ℝ → ℝ) :
+    Filter.Tendsto
+      (fun population ↦
+        normalizedDiagonalSpectralObservable population observable
+            (finiteOutlierDiagonal baseline spikeStrength population) -
+          normalizedDiagonalSpectralObservable population observable
+            (finiteBulkDiagonal baseline population))
+      Filter.atTop (nhds 0) := by
+  simpa only [normalizedDiagonalSpectralObservable_outlier_sub_bulk] using
+    constant_div_natSucc_tendsto_zero
+      (observable (baseline + spikeStrength) - observable baseline)
+
+/-- A value is the maximum of a finite diagonal spectrum when it upper-bounds
+every coordinate and is attained. -/
+def IsDiagonalMaximum {Coordinate : Type*}
+    (diagonal : Coordinate → ℝ) (maximum : ℝ) : Prop :=
+  (∀ coordinate, diagonal coordinate ≤ maximum) ∧
+    ∃ coordinate, diagonal coordinate = maximum
+
+/-- The constant bulk spectrum has maximum equal to its baseline. -/
+theorem finiteBulkDiagonal_hasMaximum (baseline : ℝ) (population : ℕ) :
+    IsDiagonalMaximum (finiteBulkDiagonal baseline population) baseline := by
+  exact ⟨fun _coordinate ↦ le_rfl,
+    ⟨none, rfl⟩⟩
+
+/-- A nonnegative outlier raises the exact spectral maximum by its full
+strength, independently of its vanishing normalized mass. -/
+theorem finiteOutlierDiagonal_hasMaximum
+    (baseline spikeStrength : ℝ) (population : ℕ) (hspike : 0 ≤ spikeStrength) :
+    IsDiagonalMaximum
+      (finiteOutlierDiagonal baseline spikeStrength population)
+      (baseline + spikeStrength) := by
+  constructor
+  · intro coordinate
+    cases coordinate with
+    | none => exact le_rfl
+    | some coordinate =>
+        simp only [finiteOutlierDiagonal]
+        linarith
+  · exact ⟨none, rfl⟩
+
+/-- Feasible points of the trace-one positive-semidefinite matrix program. -/
+def IsTraceOnePSDMatrix {Coordinate : Type*} [Fintype Coordinate]
+    (matrix : Matrix Coordinate Coordinate ℝ) : Prop :=
+  matrix.PosSemidef ∧ Matrix.trace matrix = 1
+
+/-- Objective of the trace-one SDP with diagonal design spectrum. -/
+noncomputable def diagonalTraceOneSDPObjective
+    {Coordinate : Type*} [Fintype Coordinate] [DecidableEq Coordinate]
+    (diagonal : Coordinate → ℝ) (matrix : Matrix Coordinate Coordinate ℝ) : ℝ :=
+  Matrix.trace (Matrix.diagonal diagonal * matrix)
+
+/-- A number is the SDP optimum when it upper-bounds every feasible value and
+is attained by one feasible matrix. -/
+def IsDiagonalTraceOneSDPOptimum
+    {Coordinate : Type*} [Fintype Coordinate] [DecidableEq Coordinate]
+    (diagonal : Coordinate → ℝ) (optimum : ℝ) : Prop :=
+  (∀ matrix, IsTraceOnePSDMatrix matrix →
+    diagonalTraceOneSDPObjective diagonal matrix ≤ optimum) ∧
+  ∃ matrix, IsTraceOnePSDMatrix matrix ∧
+    diagonalTraceOneSDPObjective diagonal matrix = optimum
+
+/-- Every diagonal entry of a real positive-semidefinite matrix is
+nonnegative. -/
+theorem posSemidef_diagonalEntry_nonnegative
+    {Coordinate : Type*} [Fintype Coordinate] [DecidableEq Coordinate]
+    {matrix : Matrix Coordinate Coordinate ℝ} (hmatrix : matrix.PosSemidef)
+    (coordinate : Coordinate) :
+    0 ≤ matrix coordinate coordinate := by
+  simpa using hmatrix.2 (Pi.single coordinate 1)
+
+/-- The diagonal SDP objective is the diagonal weighted sum. -/
+theorem diagonalTraceOneSDPObjective_eq_sum
+    {Coordinate : Type*} [Fintype Coordinate] [DecidableEq Coordinate]
+    (diagonal : Coordinate → ℝ) (matrix : Matrix Coordinate Coordinate ℝ) :
+    diagonalTraceOneSDPObjective diagonal matrix =
+      ∑ coordinate, diagonal coordinate * matrix coordinate coordinate := by
+  unfold diagonalTraceOneSDPObjective
+  simp [Matrix.trace, Matrix.mul_apply, Matrix.diagonal_apply]
+
+/-- **Exact trace-one SDP solution for a diagonal objective.**  The optimum is
+the largest diagonal entry.  The upper bound uses PSD diagonal
+nonnegativity and trace one; a rank-one diagonal projector attains it. -/
+theorem diagonalTraceOneSDPOptimum_of_isDiagonalMaximum
+    {Coordinate : Type*} [Fintype Coordinate] [DecidableEq Coordinate]
+    (diagonal : Coordinate → ℝ) (maximum : ℝ)
+    (hmaximum : IsDiagonalMaximum diagonal maximum) :
+    IsDiagonalTraceOneSDPOptimum diagonal maximum := by
+  constructor
+  · intro matrix hfeasible
+    rw [diagonalTraceOneSDPObjective_eq_sum]
+    calc
+      (∑ coordinate, diagonal coordinate * matrix coordinate coordinate) ≤
+          ∑ coordinate, maximum * matrix coordinate coordinate := by
+        apply Finset.sum_le_sum
+        intro coordinate _hcoordinate
+        exact mul_le_mul_of_nonneg_right (hmaximum.1 coordinate)
+          (posSemidef_diagonalEntry_nonnegative hfeasible.1 coordinate)
+      _ = maximum * Matrix.trace matrix := by
+        rw [Matrix.trace, Finset.mul_sum]
+        rfl
+      _ = maximum := by rw [hfeasible.2, mul_one]
+  · obtain ⟨coordinate, hcoordinate⟩ := hmaximum.2
+    let witness : Matrix Coordinate Coordinate ℝ :=
+      Matrix.diagonal (Pi.single coordinate 1)
+    refine ⟨witness, ?_, ?_⟩
+    · constructor
+      · apply Matrix.PosSemidef.diagonal
+        intro index
+        by_cases hindex : index = coordinate <;> simp [Pi.single_apply, hindex]
+      · simp [witness, Matrix.trace]
+    · simp [witness, diagonalTraceOneSDPObjective_eq_sum, Pi.single_apply,
+        hcoordinate]
+
+/-- The full finite/infinite separation contract for a bulk-invisible spectral
+outlier and the trace-one SDP it changes. -/
+def BulkSpectralLawExtremalSDPSeparation
+    (baseline spikeStrength : ℝ) : Prop :=
+    (∀ observable : ℝ → ℝ,
+      Filter.Tendsto
+        (fun population ↦
+          normalizedDiagonalSpectralObservable population observable
+              (finiteOutlierDiagonal baseline spikeStrength population) -
+            normalizedDiagonalSpectralObservable population observable
+              (finiteBulkDiagonal baseline population))
+        Filter.atTop (nhds 0)) ∧
+    ∀ population : ℕ,
+      IsDiagonalMaximum (finiteBulkDiagonal baseline population) baseline ∧
+      IsDiagonalMaximum (finiteOutlierDiagonal baseline spikeStrength population)
+        (baseline + spikeStrength) ∧
+      IsDiagonalTraceOneSDPOptimum (finiteBulkDiagonal baseline population) baseline ∧
+      IsDiagonalTraceOneSDPOptimum
+        (finiteOutlierDiagonal baseline spikeStrength population)
+        (baseline + spikeStrength) ∧
+      baseline < baseline + spikeStrength
+
+/-- **Bulk spectral law does not determine extremal spectral or SDP data.**
+The baseline and one-outlier sequences have asymptotically identical averages
+for every fixed spectral test function.  Nevertheless, at every finite size,
+their spectral maxima and trace-one PSD SDP optima differ by exactly the
+positive spike strength. -/
+theorem bulkSpectralLaw_invisible_extremalSpectrumAndSDP_visible
+    (baseline spikeStrength : ℝ) (hspike : 0 < spikeStrength) :
+    BulkSpectralLawExtremalSDPSeparation baseline spikeStrength := by
+  rw [BulkSpectralLawExtremalSDPSeparation]
+  refine ⟨normalizedDiagonalSpectralObservable_outlier_sub_bulk_tendsto_zero
+      baseline spikeStrength, ?_⟩
+  intro population
+  have hbulk := finiteBulkDiagonal_hasMaximum baseline population
+  have houtlier := finiteOutlierDiagonal_hasMaximum baseline spikeStrength population
+    hspike.le
+  exact ⟨hbulk, houtlier,
+    diagonalTraceOneSDPOptimum_of_isDiagonalMaximum _ _ hbulk,
+    diagonalTraceOneSDPOptimum_of_isDiagonalMaximum _ _ houtlier, by linarith⟩
+
+end SpectralSDPSeparation
 
 section PolynomialTraffic
 
@@ -2072,6 +3978,60 @@ theorem sameEqualityPattern_refl
     SameEqualityPattern assignment assignment := by
   intro first second
   rfl
+
+/-- Equality-pattern equivalence is symmetric. -/
+theorem sameEqualityPattern_symm
+    {Slot Label : Type*} {left right : Slot → Label}
+    (hpattern : SameEqualityPattern left right) :
+    SameEqualityPattern right left := by
+  intro first second
+  exact (hpattern first second).symm
+
+/-- Equality-pattern equivalence is transitive. -/
+theorem sameEqualityPattern_trans
+    {Slot Label : Type*} {left middle right : Slot → Label}
+    (hleft : SameEqualityPattern left middle)
+    (hright : SameEqualityPattern middle right) :
+    SameEqualityPattern left right := by
+  intro first second
+  exact (hleft first second).trans (hright first second)
+
+/-- The canonical orbit relation on endpoint-label assignments. -/
+def sameEqualityPatternSetoid (Slot Label : Type*) : Setoid (Slot → Label) where
+  r := SameEqualityPattern
+  iseqv := ⟨sameEqualityPattern_refl, @sameEqualityPattern_symm Slot Label,
+    @sameEqualityPattern_trans Slot Label⟩
+
+/-- The canonical finite traffic-graph shape is the quotient of endpoint
+assignments by equality pattern.  It records precisely a directed multigraph
+with its ordered endpoint slots, and nothing about the particular labels. -/
+def EqualityPattern (Slot Label : Type*) :=
+  Quotient (sameEqualityPatternSetoid Slot Label)
+
+noncomputable instance equalityPatternFintype
+    (Slot Label : Type*) [Fintype Slot] [Fintype Label] :
+    Fintype (EqualityPattern Slot Label) := by
+  letI : DecidableEq (EqualityPattern Slot Label) := Classical.decEq _
+  letI : DecidableEq Slot := Classical.decEq _
+  exact Fintype.ofSurjective (Quotient.mk (sameEqualityPatternSetoid Slot Label))
+    Quotient.mk_surjective
+
+noncomputable instance equalityPatternDecidableEq
+    (Slot Label : Type*) : DecidableEq (EqualityPattern Slot Label) :=
+  Classical.decEq _
+
+/-- Send an assignment to its canonical equality-pattern traffic shape. -/
+def equalityPatternShape {Slot Label : Type*}
+    (assignment : Slot → Label) : EqualityPattern Slot Label :=
+  Quotient.mk (sameEqualityPatternSetoid Slot Label) assignment
+
+/-- Equality of canonical traffic shapes is exactly equality of endpoint
+partitions. -/
+theorem equalityPatternShape_eq_iff
+    {Slot Label : Type*} (left right : Slot → Label) :
+    equalityPatternShape left = equalityPatternShape right ↔
+      SameEqualityPattern left right := by
+  exact Quotient.eq
 
 /-- The occupied labels of two assignments with the same equality pattern are
 equivalent: send the label at a slot on the left to the label at
@@ -2220,6 +4180,251 @@ theorem invariantPolynomial_graphSum_factorization
   intro left right hsame
   exact coefficient_eq_of_sameEqualityPattern coefficient hinvariant left right
     (hshape left right hsame)
+
+/-- The equality asserted by canonical finite traffic factorization. -/
+noncomputable def CanonicalTrafficFactorizationStatement
+    {Slot Label : Type*} [Fintype Slot] [DecidableEq Slot] [Fintype Label]
+    (coefficient value : (Slot → Label) → ℝ) : Prop :=
+  (∑ monomial, coefficient monomial * value monomial) =
+    ∑ graph : EqualityPattern Slot Label,
+      graphShapeCoefficient equalityPatternShape coefficient graph *
+        ∑ monomial,
+          if equalityPatternShape monomial = graph then value monomial else 0
+
+/-- The equality asserted by the rooted canonical finite traffic factorization. -/
+noncomputable def RootedCanonicalTrafficFactorizationStatement
+    {Slot Label : Type*} [Fintype Slot] [DecidableEq Slot] [Fintype Label]
+    (coefficient value : (Option Slot → Label) → ℝ) : Prop :=
+  (∑ monomial, coefficient monomial * value monomial) =
+    ∑ graph : EqualityPattern (Option Slot) Label,
+      graphShapeCoefficient equalityPatternShape coefficient graph *
+        ∑ monomial,
+          if equalityPatternShape monomial = graph then value monomial else 0
+
+/-- **Canonical invariant-polynomial/traffic factorization.**  The graph index
+is now the actual quotient by endpoint equality pattern, so no external shape
+map or shape-completeness hypothesis remains.  Permutation invariance of the
+formal monomial coefficients alone yields exact finite factorization. -/
+theorem invariantPolynomial_canonicalTraffic_factorization
+    {Slot Label : Type*} [Fintype Slot] [DecidableEq Slot] [Fintype Label]
+    (coefficient value : (Slot → Label) → ℝ)
+    (hinvariant : ∀ (permutation : Equiv.Perm Label) monomial,
+      coefficient (permutation ∘ monomial) = coefficient monomial) :
+    CanonicalTrafficFactorizationStatement coefficient value := by
+  apply invariantPolynomial_graphSum_factorization equalityPatternShape
+    coefficient value
+  · intro left right hshape
+    exact (equalityPatternShape_eq_iff left right).mp hshape
+  · exact hinvariant
+
+/-- **Canonical rooted factorization.**  `none` is the distinguished output
+slot and `some slot` are matrix-entry endpoint slots.  Hence this is the exact
+finite rooted-traffic form used for permutation-equivariant vector outputs. -/
+theorem rootedInvariantPolynomial_canonicalTraffic_factorization
+    {Slot Label : Type*} [Fintype Slot] [DecidableEq Slot] [Fintype Label]
+    (coefficient value : (Option Slot → Label) → ℝ)
+    (hinvariant : ∀ (permutation : Equiv.Perm Label) monomial,
+      coefficient (permutation ∘ monomial) = coefficient monomial) :
+    RootedCanonicalTrafficFactorizationStatement coefficient value :=
+  invariantPolynomial_canonicalTraffic_factorization coefficient value hinvariant
+
+/-- The exact scalar degree-bounded traffic factorization statement. -/
+noncomputable def DegreeAtMostTrafficFactorizationStatement
+    {D : ℕ} {Label : Type*} [Fintype Label]
+    (coefficient value : (degree : Fin (D + 1)) →
+      ((Fin (degree : ℕ) × Bool → Label) → ℝ)) : Prop :=
+  (∑ degree : Fin (D + 1),
+    ∑ monomial, coefficient degree monomial * value degree monomial) =
+    ∑ degree : Fin (D + 1),
+      ∑ graph : EqualityPattern (Fin (degree : ℕ) × Bool) Label,
+        graphShapeCoefficient equalityPatternShape (coefficient degree) graph *
+          ∑ monomial,
+            if equalityPatternShape monomial = graph then value degree monomial else 0
+
+/-- The exact rooted degree-bounded traffic factorization statement. -/
+noncomputable def DegreeAtMostRootedTrafficFactorizationStatement
+    {D : ℕ} {Label : Type*} [Fintype Label]
+    (coefficient value : (degree : Fin (D + 1)) →
+      ((Option (Fin (degree : ℕ) × Bool) → Label) → ℝ)) : Prop :=
+  (∑ degree : Fin (D + 1),
+    ∑ monomial, coefficient degree monomial * value degree monomial) =
+    ∑ degree : Fin (D + 1),
+      ∑ graph : EqualityPattern (Option (Fin (degree : ℕ) × Bool)) Label,
+        graphShapeCoefficient equalityPatternShape (coefficient degree) graph *
+          ∑ monomial,
+            if equalityPatternShape monomial = graph then value degree monomial else 0
+
+/-- **Exact degree-at-most-`D` traffic factorization.**  The homogeneous
+degree `d` component uses endpoint slots `Fin d × Bool`, namely the ordered
+tail and head of each of its `d` matrix-entry factors.  Summing over
+`d : Fin (D + 1)` therefore proves factorization through canonical traffic
+graphs with at most `D` edges, rather than leaving the edge bound implicit. -/
+theorem degreeAtMostInvariantPolynomial_canonicalTraffic_factorization
+    {D : ℕ} {Label : Type*} [Fintype Label]
+    (coefficient value : (degree : Fin (D + 1)) →
+      ((Fin (degree : ℕ) × Bool → Label) → ℝ))
+    (hinvariant : ∀ degree (permutation : Equiv.Perm Label) monomial,
+      coefficient degree (permutation ∘ monomial) = coefficient degree monomial) :
+    DegreeAtMostTrafficFactorizationStatement coefficient value := by
+  apply Finset.sum_congr rfl
+  intro degree _hdegree
+  exact invariantPolynomial_canonicalTraffic_factorization
+    (coefficient degree) (value degree) (hinvariant degree)
+
+/-- **Rooted degree-at-most-`D` factorization.**  Adding one `Option` slot to
+each degree-`d` endpoint family marks the output coordinate, so the same exact
+edge bound holds for permutation-equivariant vector-polynomial coordinates. -/
+theorem degreeAtMostRootedInvariantPolynomial_canonicalTraffic_factorization
+    {D : ℕ} {Label : Type*} [Fintype Label]
+    (coefficient value : (degree : Fin (D + 1)) →
+      ((Option (Fin (degree : ℕ) × Bool) → Label) → ℝ))
+    (hinvariant : ∀ degree (permutation : Equiv.Perm Label) monomial,
+      coefficient degree (permutation ∘ monomial) = coefficient degree monomial) :
+    DegreeAtMostRootedTrafficFactorizationStatement coefficient value := by
+  apply Finset.sum_congr rfl
+  intro degree _hdegree
+  exact rootedInvariantPolynomial_canonicalTraffic_factorization
+    (coefficient degree) (value degree) (hinvariant degree)
+
+/-- The complete canonical traffic profile seen by scalar polynomials of total
+degree at most `D`.  At homogeneous degree `d`, it stores every graph sum on
+the equality-pattern quotient of the `2d` ordered matrix endpoints. -/
+def DegreeAtMostCanonicalTrafficProfile (D : ℕ) (Label : Type*) :=
+  (degree : Fin (D + 1)) →
+    EqualityPattern (Fin (degree : ℕ) × Bool) Label → ℝ
+
+/-- Evaluate the canonical degree-limited traffic profile of a family of
+monomial values. -/
+noncomputable def degreeAtMostCanonicalTrafficProfile
+    {D : ℕ} {Label : Type*} [Fintype Label]
+    (value : (degree : Fin (D + 1)) →
+      ((Fin (degree : ℕ) × Bool → Label) → ℝ)) :
+    DegreeAtMostCanonicalTrafficProfile D Label :=
+  fun degree graph ↦ ∑ monomial,
+    if equalityPatternShape monomial = graph then value degree monomial else 0
+
+/-- The rooted profile seen by degree-limited equivariant vector-polynomial
+coordinates.  The additional `Option` slot marks the output label. -/
+def DegreeAtMostRootedCanonicalTrafficProfile (D : ℕ) (Label : Type*) :=
+  (degree : Fin (D + 1)) →
+    EqualityPattern (Option (Fin (degree : ℕ) × Bool)) Label → ℝ
+
+/-- Evaluate the rooted canonical traffic profile of a family of rooted
+monomial values. -/
+noncomputable def degreeAtMostRootedCanonicalTrafficProfile
+    {D : ℕ} {Label : Type*} [Fintype Label]
+    (value : (degree : Fin (D + 1)) →
+      ((Option (Fin (degree : ℕ) × Bool) → Label) → ℝ)) :
+    DegreeAtMostRootedCanonicalTrafficProfile D Label :=
+  fun degree graph ↦ ∑ monomial,
+    if equalityPatternShape monomial = graph then value degree monomial else 0
+
+/-- The scalar factorization theorem expressed as literal factorization
+through the canonical profile map. -/
+theorem degreeAtMostInvariantPolynomial_factorsThroughCanonicalTrafficProfile
+    {D : ℕ} {Label : Type*} [Fintype Label]
+    (coefficient value : (degree : Fin (D + 1)) →
+      ((Fin (degree : ℕ) × Bool → Label) → ℝ))
+    (hinvariant : ∀ degree (permutation : Equiv.Perm Label) monomial,
+      coefficient degree (permutation ∘ monomial) = coefficient degree monomial) :
+    (∑ degree : Fin (D + 1),
+      ∑ monomial, coefficient degree monomial * value degree monomial) =
+      ∑ degree : Fin (D + 1),
+        ∑ graph : EqualityPattern (Fin (degree : ℕ) × Bool) Label,
+          graphShapeCoefficient equalityPatternShape (coefficient degree) graph *
+            degreeAtMostCanonicalTrafficProfile value degree graph := by
+  simpa only [degreeAtMostCanonicalTrafficProfile] using
+    degreeAtMostInvariantPolynomial_canonicalTraffic_factorization
+      coefficient value hinvariant
+
+/-- Equal canonical traffic profiles make every invariant scalar polynomial
+of degree at most `D` exactly equal.  This is the finite algorithmic
+indistinguishability statement, not only an expansion formula. -/
+theorem degreeAtMostInvariantPolynomial_eq_of_canonicalTrafficProfile_eq
+    {D : ℕ} {Label : Type*} [Fintype Label]
+    (coefficient leftValue rightValue : (degree : Fin (D + 1)) →
+      ((Fin (degree : ℕ) × Bool → Label) → ℝ))
+    (hinvariant : ∀ degree (permutation : Equiv.Perm Label) monomial,
+      coefficient degree (permutation ∘ monomial) = coefficient degree monomial)
+    (htraffic : degreeAtMostCanonicalTrafficProfile leftValue =
+      degreeAtMostCanonicalTrafficProfile rightValue) :
+    (∑ degree : Fin (D + 1),
+      ∑ monomial, coefficient degree monomial * leftValue degree monomial) =
+      ∑ degree : Fin (D + 1),
+        ∑ monomial, coefficient degree monomial * rightValue degree monomial := by
+  rw [degreeAtMostInvariantPolynomial_factorsThroughCanonicalTrafficProfile
+      coefficient leftValue hinvariant,
+    degreeAtMostInvariantPolynomial_factorsThroughCanonicalTrafficProfile
+      coefficient rightValue hinvariant,
+    htraffic]
+
+/-- Equal rooted profiles likewise make every rooted equivariant-polynomial
+coordinate of degree at most `D` exactly equal. -/
+theorem degreeAtMostRootedInvariantPolynomial_eq_of_canonicalTrafficProfile_eq
+    {D : ℕ} {Label : Type*} [Fintype Label]
+    (coefficient leftValue rightValue : (degree : Fin (D + 1)) →
+      ((Option (Fin (degree : ℕ) × Bool) → Label) → ℝ))
+    (hinvariant : ∀ degree (permutation : Equiv.Perm Label) monomial,
+      coefficient degree (permutation ∘ monomial) = coefficient degree monomial)
+    (htraffic : degreeAtMostRootedCanonicalTrafficProfile leftValue =
+      degreeAtMostRootedCanonicalTrafficProfile rightValue) :
+    (∑ degree : Fin (D + 1),
+      ∑ monomial, coefficient degree monomial * leftValue degree monomial) =
+      ∑ degree : Fin (D + 1),
+        ∑ monomial, coefficient degree monomial * rightValue degree monomial := by
+  have hleft := degreeAtMostRootedInvariantPolynomial_canonicalTraffic_factorization
+    coefficient leftValue hinvariant
+  have hright := degreeAtMostRootedInvariantPolynomial_canonicalTraffic_factorization
+    coefficient rightValue hinvariant
+  rw [hleft, hright]
+  apply Finset.sum_congr rfl
+  intro degree _hdegree
+  apply Finset.sum_congr rfl
+  intro graph _hgraph
+  have hcomponent := congrFun (congrFun htraffic degree) graph
+  dsimp only [degreeAtMostRootedCanonicalTrafficProfile] at hcomponent
+  rw [hcomponent]
+
+/-- **Direct fixed-degree invariant-separation hardness theorem.**  A single
+pair of equal canonical traffic profiles equalizes the risk of every uniform
+permutation-invariant degree-`D` polynomial procedure.  If the right Bayes risk
+is optimal there, the entire Bayes gap lower-bounds every procedure's excess
+risk on the left, with no factor loss and no prepackaged risk-factorization
+assumption. -/
+theorem degreeAtMostInvariantPolynomial_hardness_of_canonicalTrafficProfile_eq
+    {Algorithm : Type*} {D : ℕ} {Label : Type*} [Fintype Label]
+    (coefficient : Algorithm → (degree : Fin (D + 1)) →
+      ((Fin (degree : ℕ) × Bool → Label) → ℝ))
+    (leftValue rightValue : (degree : Fin (D + 1)) →
+      ((Fin (degree : ℕ) × Bool → Label) → ℝ))
+    (hinvariant : ∀ algorithm degree (permutation : Equiv.Perm Label) monomial,
+      coefficient algorithm degree (permutation ∘ monomial) =
+        coefficient algorithm degree monomial)
+    (htraffic : degreeAtMostCanonicalTrafficProfile leftValue =
+      degreeAtMostCanonicalTrafficProfile rightValue)
+    (bayesLeft bayesRight : ℝ)
+    (hoptimalRight : ∀ algorithm,
+      bayesRight ≤ ∑ degree : Fin (D + 1),
+        ∑ monomial,
+          coefficient algorithm degree monomial * rightValue degree monomial)
+    (algorithm : Algorithm) :
+    bayesRight - bayesLeft ≤
+      (∑ degree : Fin (D + 1),
+        ∑ monomial,
+          coefficient algorithm degree monomial * leftValue degree monomial) -
+        bayesLeft := by
+  apply suboptimal_of_invariant_separation
+    (fun candidate ↦ ∑ degree : Fin (D + 1),
+      ∑ monomial,
+        coefficient candidate degree monomial * leftValue degree monomial)
+    (fun candidate ↦ ∑ degree : Fin (D + 1),
+      ∑ monomial,
+        coefficient candidate degree monomial * rightValue degree monomial)
+    bayesLeft bayesRight
+  · intro candidate
+    exact degreeAtMostInvariantPolynomial_eq_of_canonicalTrafficProfile_eq
+      (coefficient candidate) leftValue rightValue (hinvariant candidate) htraffic
+  · exact hoptimalRight
 
 /-- A scalar risk that has access only to traffic coordinates with at most `D` edges. -/
 structure TruncatedTrafficRisk (D : ℕ) where
@@ -3313,21 +5518,614 @@ end ExponentialProfileCompactness
 
 section MatchedBayesBoundary
 
-/-- **Random-design reduction, as a sharp error ledger.**  If each random-design information
-density is within `ε` of its scalar matched-channel counterpart, a scalar gap `Δ` survives with
-loss at most `2ε`. -/
+/-- Primitive finite singular-value data sufficient for the standard
+nuclear-norm/rank inequality.  The active set contains every nonzero singular
+value, its cardinality is bounded by `rank`, and every singular value is at
+most the operator bound.  No nuclear inequality is included as a field. -/
+structure FiniteLowRankSingularSpectrum
+    (Coordinate : Type*) [Fintype Coordinate] where
+  singularValue : Coordinate → ℝ
+  active : Finset Coordinate
+  rank : ℕ
+  operatorBound : ℝ
+  operatorBound_nonnegative : 0 ≤ operatorBound
+  singularValue_nonnegative : ∀ coordinate, 0 ≤ singularValue coordinate
+  singularValue_le_operatorBound : ∀ coordinate,
+    singularValue coordinate ≤ operatorBound
+  inactive_zero : ∀ coordinate ∉ active, singularValue coordinate = 0
+  active_card_le_rank : active.card ≤ rank
+
+/-- Raw nuclear distance represented by the sum of the certified singular
+values. -/
+noncomputable def FiniteLowRankSingularSpectrum.rawNuclearDistance
+    {Coordinate : Type*} [Fintype Coordinate]
+    (spectrum : FiniteLowRankSingularSpectrum Coordinate) : ℝ :=
+  ∑ coordinate, spectrum.singularValue coordinate
+
+/-- Dimension-normalized nuclear distance. -/
+noncomputable def FiniteLowRankSingularSpectrum.normalizedNuclearDistance
+    {Coordinate : Type*} [Fintype Coordinate]
+    (spectrum : FiniteLowRankSingularSpectrum Coordinate) : ℝ :=
+  spectrum.rawNuclearDistance / Fintype.card Coordinate
+
+/-- Dimension-normalized rank. -/
+noncomputable def FiniteLowRankSingularSpectrum.rankFraction
+    {Coordinate : Type*} [Fintype Coordinate]
+    (spectrum : FiniteLowRankSingularSpectrum Coordinate) : ℝ :=
+  spectrum.rank / Fintype.card Coordinate
+
+/-- The primitive support and operator-bound facts imply the raw inequality
+`nuclear ≤ operatorBound * rank`. -/
+theorem FiniteLowRankSingularSpectrum.rawNuclearDistance_le_rank_mul_operatorBound
+    {Coordinate : Type*} [Fintype Coordinate] [DecidableEq Coordinate]
+    (spectrum : FiniteLowRankSingularSpectrum Coordinate) :
+    spectrum.rawNuclearDistance ≤ spectrum.operatorBound * spectrum.rank := by
+  rw [FiniteLowRankSingularSpectrum.rawNuclearDistance]
+  calc
+    (∑ coordinate, spectrum.singularValue coordinate) =
+        ∑ coordinate ∈ spectrum.active, spectrum.singularValue coordinate := by
+      symm
+      apply Finset.sum_subset spectrum.active.subset_univ
+      intro coordinate _hcoordinate hinactive
+      exact spectrum.inactive_zero coordinate hinactive
+    _ ≤ ∑ _coordinate ∈ spectrum.active, spectrum.operatorBound := by
+      apply Finset.sum_le_sum
+      intro coordinate _hcoordinate
+      exact spectrum.singularValue_le_operatorBound coordinate
+    _ = spectrum.active.card * spectrum.operatorBound := by simp
+    _ ≤ spectrum.rank * spectrum.operatorBound := by
+      exact mul_le_mul_of_nonneg_right
+        (mod_cast spectrum.active_card_le_rank) spectrum.operatorBound_nonnegative
+    _ = spectrum.operatorBound * spectrum.rank := by ring
+
+/-- After division by a positive dimension, the standard normalized inequality
+is exactly `normalizedNuclearDistance ≤ operatorBound * rankFraction`. -/
+theorem FiniteLowRankSingularSpectrum.normalizedNuclearDistance_le_operatorBound_mul_rankFraction
+    {Coordinate : Type*} [Fintype Coordinate] [DecidableEq Coordinate]
+    (spectrum : FiniteLowRankSingularSpectrum Coordinate)
+    (hdimension : 0 < Fintype.card Coordinate) :
+    spectrum.normalizedNuclearDistance ≤
+      spectrum.operatorBound * spectrum.rankFraction := by
+  have hdimensionReal : (0 : ℝ) < Fintype.card Coordinate := by exact_mod_cast hdimension
+  rw [FiniteLowRankSingularSpectrum.normalizedNuclearDistance,
+    FiniteLowRankSingularSpectrum.rankFraction]
+  calc
+    spectrum.rawNuclearDistance / Fintype.card Coordinate ≤
+        (spectrum.operatorBound * spectrum.rank) / Fintype.card Coordinate :=
+      div_le_div_of_nonneg_right
+        spectrum.rawNuclearDistance_le_rank_mul_operatorBound hdimensionReal.le
+    _ = spectrum.operatorBound *
+        (spectrum.rank / Fintype.card Coordinate) := by ring
+
+/-- The concrete singular-value spectrum of a rank-one perturbation on the
+`p+1`-dimensional outlier coordinate space. -/
+noncomputable def finiteRankOneSingularSpectrum
+    (population : ℕ) (spikeStrength : ℝ) (hspike : 0 ≤ spikeStrength) :
+    FiniteLowRankSingularSpectrum (FiniteOutlierCoordinate population) where
+  singularValue
+    | none => spikeStrength
+    | some _coordinate => 0
+  active := {none}
+  rank := 1
+  operatorBound := spikeStrength
+  operatorBound_nonnegative := hspike
+  singularValue_nonnegative := by
+    intro coordinate
+    cases coordinate <;> simp_all
+  singularValue_le_operatorBound := by
+    intro coordinate
+    cases coordinate <;> simp_all
+  inactive_zero := by
+    intro coordinate hinactive
+    cases coordinate with
+    | none => simp at hinactive
+    | some coordinate => rfl
+  active_card_le_rank := by simp
+
+/-- The rank-one spectrum has raw nuclear distance equal to its spike
+strength. -/
+theorem finiteRankOneSingularSpectrum_rawNuclearDistance
+    (population : ℕ) (spikeStrength : ℝ) (hspike : 0 ≤ spikeStrength) :
+    (finiteRankOneSingularSpectrum population spikeStrength hspike).rawNuclearDistance =
+      spikeStrength := by
+  simp [FiniteLowRankSingularSpectrum.rawNuclearDistance,
+    finiteRankOneSingularSpectrum, FiniteOutlierCoordinate]
+
+/-- Its normalized nuclear distance is exactly `spikeStrength/(p+1)`. -/
+theorem finiteRankOneSingularSpectrum_normalizedNuclearDistance
+    (population : ℕ) (spikeStrength : ℝ) (hspike : 0 ≤ spikeStrength) :
+    (finiteRankOneSingularSpectrum population spikeStrength hspike).normalizedNuclearDistance =
+      spikeStrength / (population + 1 : ℕ) := by
+  rw [FiniteLowRankSingularSpectrum.normalizedNuclearDistance,
+    finiteRankOneSingularSpectrum_rawNuclearDistance]
+  simp [FiniteOutlierCoordinate]
+
+/-- Its normalized rank is exactly `1/(p+1)`. -/
+theorem finiteRankOneSingularSpectrum_rankFraction
+    (population : ℕ) (spikeStrength : ℝ) (hspike : 0 ≤ spikeStrength) :
+    (finiteRankOneSingularSpectrum population spikeStrength hspike).rankFraction =
+      1 / (population + 1 : ℕ) := by
+  simp [FiniteLowRankSingularSpectrum.rankFraction,
+    finiteRankOneSingularSpectrum, FiniteOutlierCoordinate]
+
+/-- The normalized rank of the concrete rank-one spectrum vanishes as
+dimension grows. -/
+theorem finiteRankOneSingularSpectrum_rankFraction_tendsto_zero
+    (spikeStrength : ℝ) (hspike : 0 ≤ spikeStrength) :
+    Filter.Tendsto
+      (fun population ↦
+        (finiteRankOneSingularSpectrum population spikeStrength hspike).rankFraction)
+      Filter.atTop (nhds 0) := by
+  have hdenominator : Filter.Tendsto
+      (fun population : ℕ ↦ ((population + 1 : ℕ) : ℝ))
+      Filter.atTop Filter.atTop := by
+    convert (tendsto_natCast_atTop_atTop (R := ℝ)).comp
+      (Filter.tendsto_add_atTop_nat 1) using 1
+  have hinverse := hdenominator.inv_tendsto_atTop
+  simpa only [finiteRankOneSingularSpectrum_rankFraction, one_div] using hinverse
+
+/-- The exact model-side data needed to derive the matched scalar-channel
+nuclear Lipschitz estimate.  `informationPath` interpolates between two channel
+covariances, `tracePairing / 2` is the matrix I--MMSE directional derivative,
+and `posteriorCovarianceTraceBound` is the covariance-order plus trace-duality
+estimate.  Keeping these as named fields exposes the genuinely probabilistic
+premises instead of assuming their final consequence. -/
+structure MatchedInformationPathCertificate where
+  informationPath : ℝ → ℝ
+  tracePairing : ℝ → ℝ
+  variance : ℝ
+  nuclearDistance : ℝ
+  variance_nonnegative : 0 ≤ variance
+  nuclearDistance_nonnegative : 0 ≤ nuclearDistance
+  immseDerivative : ∀ interpolation ∈ Set.Icc (0 : ℝ) 1,
+    HasDerivWithinAt informationPath (tracePairing interpolation / 2)
+      (Set.Icc (0 : ℝ) 1) interpolation
+  posteriorCovarianceTraceBound : ∀ interpolation ∈ Set.Ico (0 : ℝ) 1,
+    |tracePairing interpolation| ≤ variance * nuclearDistance
+
+/-- **Matrix-path derivation of the nuclear estimate.**  The I--MMSE
+directional derivative and posterior-covariance trace bound imply that the
+matched information change along the covariance segment is at most
+`variance / 2` times nuclear distance. -/
+theorem matchedInformationPath_nuclear_bound
+    (certificate : MatchedInformationPathCertificate) :
+    |certificate.informationPath 1 - certificate.informationPath 0| ≤
+      certificate.variance / 2 * certificate.nuclearDistance := by
+  have hderivative : ∀ interpolation ∈ Set.Ico (0 : ℝ) 1,
+      ‖certificate.tracePairing interpolation / 2‖ ≤
+        certificate.variance / 2 * certificate.nuclearDistance := by
+    intro interpolation hinterpolation
+    rw [Real.norm_eq_abs, abs_div, abs_of_pos (by norm_num : (0 : ℝ) < 2)]
+    calc
+      |certificate.tracePairing interpolation| / 2 ≤
+          (certificate.variance * certificate.nuclearDistance) / 2 :=
+        div_le_div_of_nonneg_right
+          (certificate.posteriorCovarianceTraceBound interpolation hinterpolation)
+          (by norm_num)
+      _ = certificate.variance / 2 * certificate.nuclearDistance := by ring
+  have hpath := norm_image_sub_le_of_norm_deriv_le_segment_01'
+    certificate.immseDerivative hderivative
+  simpa only [Real.norm_eq_abs] using hpath
+
+/-- Combining the pathwise nuclear estimate with
+`nuclearDistance ≤ operatorBound * rankFraction` gives the normalized low-rank
+bound used in the matched-Bayes obstruction. -/
+theorem matchedInformationPath_lowRank_bound
+    (certificate : MatchedInformationPathCertificate)
+    (operatorBound rankFraction : ℝ)
+    (hnuclearRank : certificate.nuclearDistance ≤ operatorBound * rankFraction) :
+    |certificate.informationPath 1 - certificate.informationPath 0| ≤
+      certificate.variance * operatorBound / 2 * rankFraction := by
+  calc
+    |certificate.informationPath 1 - certificate.informationPath 0| ≤
+        certificate.variance / 2 * certificate.nuclearDistance :=
+      matchedInformationPath_nuclear_bound certificate
+    _ ≤ certificate.variance / 2 * (operatorBound * rankFraction) :=
+      mul_le_mul_of_nonneg_left hnuclearRank
+        (div_nonneg certificate.variance_nonnegative (by norm_num))
+    _ = certificate.variance * operatorBound / 2 * rankFraction := by ring
+
+/-- A uniform upper bound on prior variance is enough for the low-rank
+estimate.  Exact equality of variances across a model sequence is unnecessary.
+The nonnegativity needed to compare coefficients follows from the certified
+nuclear-distance inequality itself. -/
+theorem matchedInformationPath_lowRank_bound_of_varianceBound
+    (certificate : MatchedInformationPathCertificate)
+    (varianceBound operatorBound rankFraction : ℝ)
+    (hvarianceBound : certificate.variance ≤ varianceBound)
+    (hnuclearRank : certificate.nuclearDistance ≤ operatorBound * rankFraction) :
+    |certificate.informationPath 1 - certificate.informationPath 0| ≤
+      varianceBound * operatorBound / 2 * rankFraction := by
+  have hproduct : 0 ≤ operatorBound * rankFraction :=
+    certificate.nuclearDistance_nonnegative.trans hnuclearRank
+  calc
+    |certificate.informationPath 1 - certificate.informationPath 0| ≤
+        certificate.variance * operatorBound / 2 * rankFraction :=
+      matchedInformationPath_lowRank_bound certificate operatorBound rankFraction
+        hnuclearRank
+    _ = certificate.variance / 2 * (operatorBound * rankFraction) := by ring
+    _ ≤ varianceBound / 2 * (operatorBound * rankFraction) :=
+      mul_le_mul_of_nonneg_right
+        (div_le_div_of_nonneg_right hvarianceBound (by norm_num)) hproduct
+    _ = varianceBound * operatorBound / 2 * rankFraction := by ring
+
+/-- **I--MMSE low-rank bound derived from singular-value data.**  Once the
+path's normalized nuclear distance is identified with the sum of its certified
+singular values divided by dimension, the support/rank theorem above supplies
+the required nuclear inequality automatically. -/
+theorem matchedInformationPath_lowRank_bound_of_singularSpectrum
+    {Coordinate : Type*} [Fintype Coordinate] [DecidableEq Coordinate]
+    (certificate : MatchedInformationPathCertificate)
+    (spectrum : FiniteLowRankSingularSpectrum Coordinate)
+    (hdimension : 0 < Fintype.card Coordinate)
+    (hnuclear : certificate.nuclearDistance =
+      spectrum.normalizedNuclearDistance) :
+    |certificate.informationPath 1 - certificate.informationPath 0| ≤
+      certificate.variance * spectrum.operatorBound / 2 * spectrum.rankFraction := by
+  apply matchedInformationPath_lowRank_bound certificate spectrum.operatorBound
+    spectrum.rankFraction
+  rw [hnuclear]
+  exact spectrum.normalizedNuclearDistance_le_operatorBound_mul_rankFraction hdimension
+
+/-- A uniform prior-variance ceiling gives the corresponding singular-spectrum
+bound with `varianceBound` replacing the path's exact variance. -/
+theorem matchedInformationPath_lowRank_bound_of_singularSpectrum_of_varianceBound
+    {Coordinate : Type*} [Fintype Coordinate] [DecidableEq Coordinate]
+    (certificate : MatchedInformationPathCertificate)
+    (spectrum : FiniteLowRankSingularSpectrum Coordinate)
+    (varianceBound : ℝ) (hvarianceBound : certificate.variance ≤ varianceBound)
+    (hdimension : 0 < Fintype.card Coordinate)
+    (hnuclear : certificate.nuclearDistance =
+      spectrum.normalizedNuclearDistance) :
+    |certificate.informationPath 1 - certificate.informationPath 0| ≤
+      varianceBound * spectrum.operatorBound / 2 * spectrum.rankFraction := by
+  apply matchedInformationPath_lowRank_bound_of_varianceBound certificate
+    varianceBound spectrum.operatorBound spectrum.rankFraction hvarianceBound
+  rw [hnuclear]
+  exact spectrum.normalizedNuclearDistance_le_operatorBound_mul_rankFraction hdimension
+
+/-- The asymptotic zero-gap conclusion shared by low-rank path certificates. -/
+def MatchedInformationPathGapTendsToZero
+    {Index : Type*} (regime : Filter Index)
+    (certificate : Index → MatchedInformationPathCertificate) : Prop :=
+  Filter.Tendsto
+    (fun index ↦ (certificate index).informationPath 1 -
+      (certificate index).informationPath 0)
+    regime (nhds 0)
+
+/-- A family of certified matched-information paths with vanishing rank
+fraction has vanishing information-density gap whenever its prior variances
+are uniformly bounded.  Thus the asymptotic theorem needs no exact common
+variance. -/
+theorem matchedInformationPath_lowRank_tendsto_zero_of_varianceBound
+    {Index : Type*} (regime : Filter Index)
+    (certificate : Index → MatchedInformationPathCertificate)
+    (varianceBound operatorBound : ℝ) (rankFraction : Index → ℝ)
+    (hvarianceBound : ∀ index, (certificate index).variance ≤ varianceBound)
+    (hrankVanishing : Filter.Tendsto rankFraction regime (nhds 0))
+    (hnuclearRank : ∀ index,
+      (certificate index).nuclearDistance ≤ operatorBound * rankFraction index) :
+    MatchedInformationPathGapTendsToZero regime certificate := by
+  have hbound : Filter.Tendsto
+      (fun index ↦ varianceBound * operatorBound / 2 * rankFraction index)
+      regime (nhds 0) := by
+    simpa using hrankVanishing.const_mul (varianceBound * operatorBound / 2)
+  have habs : Filter.Tendsto
+      (fun index ↦ |(certificate index).informationPath 1 -
+        (certificate index).informationPath 0|)
+      regime (nhds 0) := by
+    apply squeeze_zero
+    · intro index
+      exact abs_nonneg _
+    · intro index
+      exact matchedInformationPath_lowRank_bound_of_varianceBound
+        (certificate index) varianceBound operatorBound (rankFraction index)
+        (hvarianceBound index) (hnuclearRank index)
+    · exact hbound
+  apply (tendsto_zero_iff_abs_tendsto_zero
+    (fun index ↦ (certificate index).informationPath 1 -
+      (certificate index).informationPath 0)).mpr
+  simpa [Function.comp_def] using habs
+
+/-- **Concrete bounded rank-one matched-Bayes invisibility.**  For the
+`p+1`-dimensional rank-one singular spectrum, bounded prior variance and exact
+identification of the normalized nuclear distance imply that the certified
+information-density gap vanishes.  The nuclear/rank estimate is derived above,
+not supplied by the caller. -/
+theorem matchedInformationPath_rankOne_tendsto_zero_of_varianceBound
+    (certificate : ℕ → MatchedInformationPathCertificate)
+    (varianceBound spikeStrength : ℝ) (hspike : 0 ≤ spikeStrength)
+    (hvarianceBound : ∀ population,
+      (certificate population).variance ≤ varianceBound)
+    (hnuclear : ∀ population,
+      (certificate population).nuclearDistance =
+        (finiteRankOneSingularSpectrum population spikeStrength hspike).normalizedNuclearDistance) :
+    Filter.Tendsto
+      (fun population ↦ (certificate population).informationPath 1 -
+        (certificate population).informationPath 0)
+      Filter.atTop (nhds 0) := by
+  apply matchedInformationPath_lowRank_tendsto_zero_of_varianceBound Filter.atTop
+    certificate varianceBound spikeStrength
+    (fun population ↦
+      (finiteRankOneSingularSpectrum population spikeStrength hspike).rankFraction)
+    hvarianceBound
+    (finiteRankOneSingularSpectrum_rankFraction_tendsto_zero spikeStrength hspike)
+  intro population
+  rw [hnuclear population]
+  exact
+    FiniteLowRankSingularSpectrum.normalizedNuclearDistance_le_operatorBound_mul_rankFraction
+      (finiteRankOneSingularSpectrum population spikeStrength hspike) (by simp)
+
+/-- The earlier common-variance formulation is a specialization of the
+uniform-variance theorem, rather than a separate proof path. -/
+theorem matchedInformationPath_lowRank_tendsto_zero
+    {Index : Type*} (regime : Filter Index)
+    (certificate : Index → MatchedInformationPathCertificate)
+    (operatorBound : ℝ) (rankFraction : Index → ℝ)
+    (hvariance : ∃ variance : ℝ, ∀ index, (certificate index).variance = variance)
+    (hrankVanishing : Filter.Tendsto rankFraction regime (nhds 0))
+    (hnuclearRank : ∀ index,
+      (certificate index).nuclearDistance ≤ operatorBound * rankFraction index) :
+    MatchedInformationPathGapTendsToZero regime certificate := by
+  obtain ⟨variance, hvariance⟩ := hvariance
+  exact matchedInformationPath_lowRank_tendsto_zero_of_varianceBound regime
+    certificate variance operatorBound rankFraction
+    (fun index ↦ (hvariance index).le) hrankVanishing hnuclearRank
+
+/-- The exact Wishart Frobenius second-moment identity plus operator-norm trace
+bounds gives the dimension-scale second-moment estimate. -/
+theorem wishartFrobeniusSecondMoment_le_dimensionScale
+    (dimension sampleSize operatorBound covarianceTrace covarianceTraceSq
+      frobeniusSecondMoment : ℝ)
+    (hdimension : 0 < dimension) (hsampleSize : 0 < sampleSize)
+    (hoperator : 0 ≤ operatorBound)
+    (htrace : |covarianceTrace| ≤ dimension * operatorBound)
+    (htraceSq : covarianceTraceSq ≤ dimension * operatorBound ^ 2)
+    (hmoment : frobeniusSecondMoment =
+      (covarianceTrace ^ 2 + covarianceTraceSq) / sampleSize) :
+    frobeniusSecondMoment ≤
+      operatorBound ^ 2 * dimension * (dimension + 1) / sampleSize := by
+  have hdimensionOperator : 0 ≤ dimension * operatorBound :=
+    mul_nonneg hdimension.le hoperator
+  have hproduct : 0 ≤
+      (dimension * operatorBound - |covarianceTrace|) *
+        (|covarianceTrace| + dimension * operatorBound) :=
+    mul_nonneg (sub_nonneg.mpr htrace)
+      (add_nonneg (abs_nonneg _) hdimensionOperator)
+  have htracePower : covarianceTrace ^ 2 ≤
+      (dimension * operatorBound) ^ 2 := by
+    nlinarith [hproduct, sq_abs covarianceTrace]
+  rw [hmoment]
+  apply (div_le_div_iff_of_pos_right hsampleSize).mpr
+  calc
+    covarianceTrace ^ 2 + covarianceTraceSq ≤
+        (dimension * operatorBound) ^ 2 +
+          dimension * operatorBound ^ 2 :=
+      add_le_add htracePower htraceSq
+    _ = operatorBound ^ 2 * dimension * (dimension + 1) := by ring
+
+/-- Taking square roots converts the Wishart second-moment estimate into the
+Frobenius-error scale used by the nuclear comparison. -/
+theorem wishartFrobeniusError_le_dimensionScale
+    (dimension sampleSize operatorBound frobeniusSecondMoment
+      frobeniusError : ℝ)
+    (hdimension : 0 < dimension) (hsampleSize : 0 < sampleSize)
+    (hoperator : 0 ≤ operatorBound)
+    (hfrobenius : frobeniusError ≤ Real.sqrt frobeniusSecondMoment)
+    (hsecondMoment : frobeniusSecondMoment ≤
+      operatorBound ^ 2 * dimension * (dimension + 1) / sampleSize) :
+    frobeniusError ≤ operatorBound *
+      Real.sqrt (dimension * ((dimension + 1) / sampleSize)) := by
+  have hratio : 0 ≤ dimension * ((dimension + 1) / sampleSize) := by positivity
+  calc
+    frobeniusError ≤ Real.sqrt frobeniusSecondMoment := hfrobenius
+    _ ≤ Real.sqrt
+        (operatorBound ^ 2 * dimension * (dimension + 1) / sampleSize) :=
+      Real.sqrt_le_sqrt hsecondMoment
+    _ = Real.sqrt (operatorBound ^ 2 *
+        (dimension * ((dimension + 1) / sampleSize))) := by
+      congr 1
+      ring
+    _ = Real.sqrt (dimension * ((dimension + 1) / sampleSize)) *
+        Real.sqrt (operatorBound ^ 2) := by
+      rw [mul_comm, Real.sqrt_mul hratio]
+    _ = operatorBound *
+        Real.sqrt (dimension * ((dimension + 1) / sampleSize)) := by
+      rw [Real.sqrt_sq hoperator]
+      ring
+
+/-- **Deterministic Wishart nuclear-error ledger.**  Combining
+`nuclearError ≤ sqrt dimension * frobeniusError` with the standard Wishart
+Frobenius scale gives the normalized nuclear scale
+`operatorBound * dimension * sqrt ((dimension + 1) / sampleSize)`. -/
+theorem wishartNuclearError_le_dimensionScale
+    (dimension sampleSize operatorBound nuclearError frobeniusError : ℝ)
+    (hdimension : 0 < dimension) (hsampleSize : 0 < sampleSize)
+    (hnuclear : nuclearError ≤ Real.sqrt dimension * frobeniusError)
+    (hfrobenius : frobeniusError ≤ operatorBound *
+      Real.sqrt (dimension * ((dimension + 1) / sampleSize))) :
+    nuclearError ≤ operatorBound * dimension *
+      Real.sqrt ((dimension + 1) / sampleSize) := by
+  have hratio : 0 ≤ (dimension + 1) / sampleSize := by positivity
+  have hsqrtIdentity : Real.sqrt dimension *
+      Real.sqrt (dimension * ((dimension + 1) / sampleSize)) =
+        dimension * Real.sqrt ((dimension + 1) / sampleSize) := by
+    rw [show Real.sqrt (dimension * ((dimension + 1) / sampleSize)) =
+        Real.sqrt ((dimension + 1) / sampleSize) * Real.sqrt dimension by
+      rw [mul_comm, Real.sqrt_mul hratio]]
+    calc
+      Real.sqrt dimension *
+          (Real.sqrt ((dimension + 1) / sampleSize) * Real.sqrt dimension) =
+          (Real.sqrt dimension * Real.sqrt dimension) *
+            Real.sqrt ((dimension + 1) / sampleSize) := by ring
+      _ = dimension * Real.sqrt ((dimension + 1) / sampleSize) := by
+        rw [Real.mul_self_sqrt hdimension.le]
+  calc
+    nuclearError ≤ Real.sqrt dimension * frobeniusError := hnuclear
+    _ ≤ Real.sqrt dimension * (operatorBound *
+        Real.sqrt (dimension * ((dimension + 1) / sampleSize))) :=
+      mul_le_mul_of_nonneg_left hfrobenius (Real.sqrt_nonneg _)
+    _ = operatorBound * dimension *
+        Real.sqrt ((dimension + 1) / sampleSize) := by
+      calc
+        Real.sqrt dimension *
+            (operatorBound *
+              Real.sqrt (dimension * ((dimension + 1) / sampleSize))) =
+            operatorBound *
+              (Real.sqrt dimension *
+                Real.sqrt (dimension * ((dimension + 1) / sampleSize))) := by ring
+        _ = _ := by rw [hsqrtIdentity]; ring
+
+/-- **Explicit matched random-design comparison rate.**  The normalized
+information-path nuclear estimate and the Wishart nuclear scale imply error at
+most `signal * variance * operatorBound / 2 * sqrt ((p+1)/n)`. -/
+theorem matchedInformationError_le_wishartScale
+    (dimension sampleSize signal variance operatorBound : ℝ)
+    (informationError nuclearError : ℝ)
+    (hdimension : 0 < dimension) (hsignal : 0 ≤ signal)
+    (hvariance : 0 ≤ variance)
+    (hinformation : |informationError| ≤
+      signal * variance / (2 * dimension) * nuclearError)
+    (hnuclear : nuclearError ≤ operatorBound * dimension *
+      Real.sqrt ((dimension + 1) / sampleSize)) :
+    |informationError| ≤ signal * variance * operatorBound / 2 *
+      Real.sqrt ((dimension + 1) / sampleSize) := by
+  have hcoefficient : 0 ≤ signal * variance / (2 * dimension) := by positivity
+  calc
+    |informationError| ≤ signal * variance / (2 * dimension) * nuclearError :=
+      hinformation
+    _ ≤ signal * variance / (2 * dimension) *
+        (operatorBound * dimension *
+          Real.sqrt ((dimension + 1) / sampleSize)) :=
+      mul_le_mul_of_nonneg_left hnuclear hcoefficient
+    _ = signal * variance * operatorBound / 2 *
+        Real.sqrt ((dimension + 1) / sampleSize) := by
+      field_simp
+
+/-- The full deterministic comparison chain in one theorem: matrix
+I--MMSE/nuclear sensitivity, nuclear-to-Frobenius control, and the Wishart
+Frobenius scale imply the explicit normalized information error. -/
+theorem matchedInformationError_le_of_wishartFrobenius
+    (dimension sampleSize signal variance operatorBound : ℝ)
+    (informationError nuclearError frobeniusError : ℝ)
+    (hdimension : 0 < dimension) (hsampleSize : 0 < sampleSize)
+    (hsignal : 0 ≤ signal) (hvariance : 0 ≤ variance)
+    (hinformation : |informationError| ≤
+      signal * variance / (2 * dimension) * nuclearError)
+    (hnuclear : nuclearError ≤ Real.sqrt dimension * frobeniusError)
+    (hfrobenius : frobeniusError ≤ operatorBound *
+      Real.sqrt (dimension * ((dimension + 1) / sampleSize))) :
+    |informationError| ≤ signal * variance * operatorBound / 2 *
+      Real.sqrt ((dimension + 1) / sampleSize) := by
+  have hnuclearScale := wishartNuclearError_le_dimensionScale
+    dimension sampleSize operatorBound nuclearError frobeniusError
+    hdimension hsampleSize hnuclear hfrobenius
+  exact matchedInformationError_le_wishartScale
+    dimension sampleSize signal variance operatorBound informationError nuclearError
+    hdimension hsignal hvariance hinformation hnuclearScale
+
+/-- **Complete Wishart-to-information comparison theorem.**  Starting from
+the exact Wishart second-moment identity and elementary trace bounds, this
+derives the normalized matched-information error in one chain. -/
+theorem matchedInformationError_le_of_wishartMomentIdentity
+    (dimension sampleSize signal variance operatorBound covarianceTrace
+      covarianceTraceSq frobeniusSecondMoment frobeniusError nuclearError
+      informationError : ℝ)
+    (hdimension : 0 < dimension) (hsampleSize : 0 < sampleSize)
+    (hsignal : 0 ≤ signal) (hvariance : 0 ≤ variance)
+    (hoperator : 0 ≤ operatorBound)
+    (htrace : |covarianceTrace| ≤ dimension * operatorBound)
+    (htraceSq : covarianceTraceSq ≤ dimension * operatorBound ^ 2)
+    (hmoment : frobeniusSecondMoment =
+      (covarianceTrace ^ 2 + covarianceTraceSq) / sampleSize)
+    (hfrobenius : frobeniusError ≤ Real.sqrt frobeniusSecondMoment)
+    (hnuclear : nuclearError ≤ Real.sqrt dimension * frobeniusError)
+    (hinformation : |informationError| ≤
+      signal * variance / (2 * dimension) * nuclearError) :
+    |informationError| ≤ signal * variance * operatorBound / 2 *
+      Real.sqrt ((dimension + 1) / sampleSize) := by
+  have hsecondMoment := wishartFrobeniusSecondMoment_le_dimensionScale
+    dimension sampleSize operatorBound covarianceTrace covarianceTraceSq
+    frobeniusSecondMoment hdimension hsampleSize hoperator htrace htraceSq hmoment
+  have hfrobeniusScale := wishartFrobeniusError_le_dimensionScale
+    dimension sampleSize operatorBound frobeniusSecondMoment frobeniusError
+    hdimension hsampleSize hoperator hfrobenius hsecondMoment
+  exact matchedInformationError_le_of_wishartFrobenius
+    dimension sampleSize signal variance operatorBound informationError nuclearError
+    frobeniusError hdimension hsampleSize hsignal hvariance hinformation
+    hnuclear hfrobeniusScale
+
+/-- The explicit Wishart comparison scale itself vanishes with the adjusted
+dimension/sample ratio.  This analytic fact is shared by information-error
+convergence and by the two-design separation theorem. -/
+theorem wishartSqrtComparisonError_tendsto_zero
+    {Index : Type*} (regime : Filter Index)
+    (adjustedRatio : Index → ℝ) (constant : ℝ)
+    (hratio : Filter.Tendsto adjustedRatio regime (nhds 0)) :
+    Filter.Tendsto (fun index ↦ constant * Real.sqrt (adjustedRatio index))
+      regime (nhds 0) := by
+  have hsqrt : Filter.Tendsto
+      (fun index ↦ Real.sqrt (adjustedRatio index)) regime (nhds 0) := by
+    simpa using hratio.sqrt
+  simpa using hsqrt.const_mul constant
+
+/-- A uniform Wishart-scale information bound vanishes whenever the adjusted
+dimension/sample ratio tends to zero. -/
+theorem matchedInformationError_tendsto_zero_of_wishartRatio
+    {Index : Type*} (regime : Filter Index)
+    (informationError adjustedRatio : Index → ℝ) (constant : ℝ)
+    (hratio : Filter.Tendsto adjustedRatio regime (nhds 0))
+    (herror : ∀ index,
+      |informationError index| ≤ constant * Real.sqrt (adjustedRatio index)) :
+    Filter.Tendsto informationError regime (nhds 0) := by
+  have hbound := wishartSqrtComparisonError_tendsto_zero
+    regime adjustedRatio constant hratio
+  have habs : Filter.Tendsto (fun index ↦ |informationError index|)
+      regime (nhds 0) :=
+    squeeze_zero (fun index ↦ abs_nonneg _) herror hbound
+  apply (tendsto_zero_iff_abs_tendsto_zero informationError).mpr
+  simpa [Function.comp_def] using habs
+
+/-- **Random-design reduction, as the sharp asymmetric error ledger.**  If the
+left and right random-design information densities have errors `εₗ` and `εᵣ`,
+the scalar gap `Δ` loses at most their sum. -/
+theorem randomDesign_gap_of_scalarGap_asymmetric
+    (scalarLeft scalarRight randomLeft randomRight leftError rightError delta : ℝ)
+    (hleft : |randomLeft - scalarLeft| ≤ leftError)
+    (hright : |randomRight - scalarRight| ≤ rightError)
+    (hgap : scalarRight - scalarLeft = delta) :
+    delta - (leftError + rightError) ≤ randomRight - randomLeft := by
+  have hlowerLeft : randomLeft ≤ scalarLeft + leftError := by
+    have := le_trans (le_abs_self (randomLeft - scalarLeft)) hleft
+    linarith
+  have hlowerRight : scalarRight - rightError ≤ randomRight := by
+    have := le_trans (neg_le_abs (randomRight - scalarRight)) hright
+    linarith
+  linarith
+
+/-- Equal comparison errors specialize the asymmetric ledger to the familiar
+loss `2ε`. -/
 theorem randomDesign_gap_of_scalarGap
     (scalarLeft scalarRight randomLeft randomRight epsilon delta : ℝ)
     (hleft : |randomLeft - scalarLeft| ≤ epsilon)
     (hright : |randomRight - scalarRight| ≤ epsilon)
     (hgap : scalarRight - scalarLeft = delta) :
     delta - 2 * epsilon ≤ randomRight - randomLeft := by
-  have hlowerLeft : randomLeft ≤ scalarLeft + epsilon := by
-    have := le_trans (le_abs_self (randomLeft - scalarLeft)) hleft
-    linarith
-  have hlowerRight : scalarRight - epsilon ≤ randomRight := by
-    have := le_trans (neg_le_abs (randomRight - scalarRight)) hright
-    linarith
+  simpa only [two_mul] using
+    randomDesign_gap_of_scalarGap_asymmetric scalarLeft scalarRight randomLeft randomRight
+      epsilon epsilon delta hleft hright hgap
+
+/-- A scalar gap larger than the sum of the two comparison errors forces a
+strict random-design gap. -/
+theorem randomDesign_separates_of_scalarGap_asymmetric
+    (scalarLeft scalarRight randomLeft randomRight leftError rightError delta : ℝ)
+    (hleft : |randomLeft - scalarLeft| ≤ leftError)
+    (hright : |randomRight - scalarRight| ≤ rightError)
+    (hgap : scalarRight - scalarLeft = delta)
+    (hpositive : leftError + rightError < delta) :
+    randomLeft < randomRight := by
+  have hbound := randomDesign_gap_of_scalarGap_asymmetric scalarLeft scalarRight
+    randomLeft randomRight leftError rightError delta hleft hright hgap
   linarith
 
 /-- In particular a scalar matched-channel gap larger than twice the comparison error forces a
@@ -3337,18 +6135,56 @@ theorem randomDesign_separates_of_scalarGap
     (hleft : |randomLeft - scalarLeft| ≤ epsilon)
     (hright : |randomRight - scalarRight| ≤ epsilon)
     (hgap : scalarRight - scalarLeft = delta) (hpositive : 2 * epsilon < delta) :
-    randomLeft < randomRight := by
-  have hbound := randomDesign_gap_of_scalarGap scalarLeft scalarRight randomLeft randomRight
-    epsilon delta hleft hright hgap
-  linarith
+    randomLeft < randomRight :=
+  randomDesign_separates_of_scalarGap_asymmetric scalarLeft scalarRight
+    randomLeft randomRight epsilon epsilon delta hleft hright hgap (by
+      simpa only [two_mul] using hpositive)
 
-/-- **A positive scalar matched-channel gap survives eventually along every
-regime in which the random-design comparison error vanishes.**  This is the
-asymptotic completion of the two-error ledger: it makes “all sufficiently large
-aspect ratios” precise without hard-coding a particular error formula.
+/-- **Finite large-aspect-ratio reduction.**  If both random-design channels
+are within `constant / sqrt aspectRatio` of their scalar counterparts, the
+scalar gap survives whenever it exceeds twice that explicit error. -/
+theorem randomDesign_separates_of_scalarGap_of_inverseSqrtAspect
+    (scalarLeft scalarRight randomLeft randomRight : ℝ)
+    (aspectRatio constant delta : ℝ)
+    (hleft : |randomLeft - scalarLeft| ≤ constant / Real.sqrt aspectRatio)
+    (hright : |randomRight - scalarRight| ≤ constant / Real.sqrt aspectRatio)
+    (hgap : scalarRight - scalarLeft = delta)
+    (hthreshold : 2 * (constant / Real.sqrt aspectRatio) < delta) :
+    randomLeft < randomRight :=
+  randomDesign_separates_of_scalarGap scalarLeft scalarRight randomLeft randomRight
+    (constant / Real.sqrt aspectRatio) delta hleft hright hgap hthreshold
 
-The model-specific work is exactly the convergence of `comparisonError`; no
-additional uniformity or hidden constant is assumed here. -/
+/-- **A positive scalar matched-channel gap survives eventually when the two
+possibly different comparison errors both vanish.**  This is the asymptotic
+completion of the sharp asymmetric ledger.
+
+The model-specific work is exactly the convergence of the two error functions;
+no additional uniformity or hidden constant is assumed here. -/
+theorem randomDesign_eventually_separates_of_scalarGap_asymmetric
+    {Index : Type*} (regime : Filter Index)
+    (scalarLeft scalarRight delta : ℝ)
+    (randomLeft randomRight leftError rightError : Index → ℝ)
+    (hleft : ∀ index,
+      |randomLeft index - scalarLeft| ≤ leftError index)
+    (hright : ∀ index,
+      |randomRight index - scalarRight| ≤ rightError index)
+    (hgap : scalarRight - scalarLeft = delta) (hpositive : 0 < delta)
+    (hleftVanishing : Filter.Tendsto leftError regime (nhds 0))
+    (hrightVanishing : Filter.Tendsto rightError regime (nhds 0)) :
+    ∀ᶠ index in regime, randomLeft index < randomRight index := by
+  have hsum : Filter.Tendsto (fun index ↦ leftError index + rightError index)
+      regime (nhds 0) := by
+    simpa using hleftVanishing.add hrightVanishing
+  have hbelow : ∀ᶠ index in regime, leftError index + rightError index < delta :=
+    hsum.eventually_lt_const hpositive
+  filter_upwards [hbelow] with index hthreshold
+  exact randomDesign_separates_of_scalarGap_asymmetric
+    scalarLeft scalarRight (randomLeft index) (randomRight index)
+    (leftError index) (rightError index) delta (hleft index) (hright index)
+    hgap hthreshold
+
+/-- The common-error asymptotic theorem is the equal-error specialization of
+the asymmetric result. -/
 theorem randomDesign_eventually_separates_of_scalarGap
     {Index : Type*} (regime : Filter Index)
     (scalarLeft scalarRight delta : ℝ)
@@ -3358,22 +6194,119 @@ theorem randomDesign_eventually_separates_of_scalarGap
     (hright : ∀ index,
       |randomRight index - scalarRight| ≤ comparisonError index)
     (hgap : scalarRight - scalarLeft = delta) (hpositive : 0 < delta)
-    (herrorVanishing :
-      Filter.Tendsto comparisonError regime (nhds 0)) :
-    ∀ᶠ index in regime, randomLeft index < randomRight index := by
-  have htwice :
-      Filter.Tendsto (fun index ↦ 2 * comparisonError index) regime (nhds 0) := by
-    simpa using herrorVanishing.const_mul 2
-  have hbelow : ∀ᶠ index in regime, 2 * comparisonError index < delta :=
-    htwice.eventually_lt_const hpositive
-  filter_upwards [hbelow] with index hthreshold
-  exact randomDesign_separates_of_scalarGap
-    scalarLeft scalarRight (randomLeft index) (randomRight index)
-    (comparisonError index) delta (hleft index) (hright index) hgap hthreshold
+    (herrorVanishing : Filter.Tendsto comparisonError regime (nhds 0)) :
+    ∀ᶠ index in regime, randomLeft index < randomRight index :=
+  randomDesign_eventually_separates_of_scalarGap_asymmetric regime
+    scalarLeft scalarRight delta randomLeft randomRight comparisonError comparisonError
+    hleft hright hgap hpositive herrorVanishing herrorVanishing
 
-/-- **Low-rank perturbations cannot solve the matched scalar problem, conditional only on the
-matrix I-MMSE/nuclear-norm estimate.**  Once that estimate bounds the information-density change
-by `constant * rank/p`, an `ε` rank fraction gives an `constant * ε` change. -/
+/-- Reciprocation identifies the large-aspect filter exactly with approach to
+zero from the positive side.  This is the precise bridge between the two
+large-sample parameterizations used below; no positivity hypothesis is hidden,
+because it is carried by the one-sided neighborhood `𝓝[>] 0`. -/
+theorem aspectAtTop_iff_inverseTendstoNhdsGTZero
+    {Index : Type*} (regime : Filter Index) (aspectRatio : Index → ℝ) :
+    Filter.Tendsto aspectRatio regime Filter.atTop ↔
+      Filter.Tendsto (fun index ↦ (aspectRatio index)⁻¹) regime (𝓝[>] 0) := by
+  constructor
+  · intro haspect
+    exact tendsto_inv_atTop_nhdsGT_zero.comp haspect
+  · intro hinverse
+    have hreciprocal := hinverse.inv_tendsto_nhdsGT_zero
+    convert hreciprocal using 1
+    funext index
+    simp
+
+/-- In particular, a diverging aspect ratio has a reciprocal converging to
+zero in the ordinary two-sided topology. -/
+theorem inverseAspect_tendsto_zero
+    {Index : Type*} (regime : Filter Index) (aspectRatio : Index → ℝ)
+    (haspect : Filter.Tendsto aspectRatio regime Filter.atTop) :
+    Filter.Tendsto (fun index ↦ (aspectRatio index)⁻¹) regime (nhds 0) :=
+  haspect.inv_tendsto_atTop
+
+/-- The inverse-square-root and square-root-of-reciprocal error formulas are
+identical, including at zero and for negative inputs under Lean's totalized
+real square root. -/
+theorem div_sqrt_eq_mul_sqrt_inv (constant aspectRatio : ℝ) :
+    constant / Real.sqrt aspectRatio =
+      constant * Real.sqrt (aspectRatio⁻¹) := by
+  rw [Real.sqrt_inv, div_eq_mul_inv]
+
+/-- **Sharp two-design Wishart reduction.**  The two channels may have
+different constants and different adjusted dimension/sample ratios.  If both
+Wishart scales vanish, every fixed positive scalar gap eventually transfers. -/
+theorem randomDesign_eventually_separates_of_scalarGap_of_asymmetricWishartRatios
+    {Index : Type*} (regime : Filter Index)
+    (scalarLeft scalarRight delta leftConstant rightConstant : ℝ)
+    (leftRatio rightRatio randomLeft randomRight : Index → ℝ)
+    (hleft : ∀ index,
+      |randomLeft index - scalarLeft| ≤
+        leftConstant * Real.sqrt (leftRatio index))
+    (hright : ∀ index,
+      |randomRight index - scalarRight| ≤
+        rightConstant * Real.sqrt (rightRatio index))
+    (hgap : scalarRight - scalarLeft = delta) (hpositive : 0 < delta)
+    (hleftRatio : Filter.Tendsto leftRatio regime (nhds 0))
+    (hrightRatio : Filter.Tendsto rightRatio regime (nhds 0)) :
+    ∀ᶠ index in regime, randomLeft index < randomRight index :=
+  randomDesign_eventually_separates_of_scalarGap_asymmetric regime
+    scalarLeft scalarRight delta randomLeft randomRight
+    (fun index ↦ leftConstant * Real.sqrt (leftRatio index))
+    (fun index ↦ rightConstant * Real.sqrt (rightRatio index))
+    hleft hright hgap hpositive
+    (wishartSqrtComparisonError_tendsto_zero regime leftRatio leftConstant hleftRatio)
+    (wishartSqrtComparisonError_tendsto_zero regime rightRatio rightConstant hrightRatio)
+
+/-- **Common-ratio Wishart reduction.**  This is the equal-constant,
+equal-ratio specialization of the sharp two-design theorem. -/
+theorem randomDesign_eventually_separates_of_scalarGap_of_wishartRatio
+    {Index : Type*} (regime : Filter Index)
+    (scalarLeft scalarRight delta constant : ℝ)
+    (adjustedRatio randomLeft randomRight : Index → ℝ)
+    (hleft : ∀ index,
+      |randomLeft index - scalarLeft| ≤
+        constant * Real.sqrt (adjustedRatio index))
+    (hright : ∀ index,
+      |randomRight index - scalarRight| ≤
+        constant * Real.sqrt (adjustedRatio index))
+    (hgap : scalarRight - scalarLeft = delta) (hpositive : 0 < delta)
+    (hratio : Filter.Tendsto adjustedRatio regime (nhds 0)) :
+    ∀ᶠ index in regime, randomLeft index < randomRight index :=
+  randomDesign_eventually_separates_of_scalarGap_of_asymmetricWishartRatios regime
+    scalarLeft scalarRight delta constant constant adjustedRatio adjustedRatio
+    randomLeft randomRight hleft hright hgap hpositive hratio hratio
+
+/-- **Concrete large-aspect-ratio asymptotic reduction.**  This is exactly the
+Wishart-ratio theorem above under the reciprocal reparameterization
+`adjustedRatio = aspectRatio⁻¹`.  Thus the two APIs have one proof path rather
+than independent asymptotic arguments. -/
+theorem randomDesign_eventually_separates_of_scalarGap_of_aspectAtTop
+    {Index : Type*} (regime : Filter Index)
+    (scalarLeft scalarRight delta constant : ℝ)
+    (aspectRatio randomLeft randomRight : Index → ℝ)
+    (hleft : ∀ index,
+      |randomLeft index - scalarLeft| ≤ constant / Real.sqrt (aspectRatio index))
+    (hright : ∀ index,
+      |randomRight index - scalarRight| ≤ constant / Real.sqrt (aspectRatio index))
+    (hgap : scalarRight - scalarLeft = delta) (hpositive : 0 < delta)
+    (haspectRatio : Filter.Tendsto aspectRatio regime Filter.atTop) :
+    ∀ᶠ index in regime, randomLeft index < randomRight index := by
+  apply randomDesign_eventually_separates_of_scalarGap_of_wishartRatio regime
+    scalarLeft scalarRight delta constant
+    (fun index ↦ (aspectRatio index)⁻¹) randomLeft randomRight
+  · intro index
+    simpa only [div_sqrt_eq_mul_sqrt_inv] using hleft index
+  · intro index
+    simpa only [div_sqrt_eq_mul_sqrt_inv] using hright index
+  · exact hgap
+  · exact hpositive
+  · exact inverseAspect_tendsto_zero regime aspectRatio haspectRatio
+
+/-- **Low-rank perturbations cannot solve the matched scalar problem once the
+nuclear estimate is available.**  The path-certificate theorem above derives
+that estimate from matrix I--MMSE and posterior-covariance trace control; this
+scalar corollary then turns rank fraction `ε` into error `constant * ε`. -/
 theorem matchedDensity_lowRank_bound_of_nuclearEstimate
     (densityGap constant rankFraction epsilon : ℝ)
     (hconstant : 0 ≤ constant) (hrank : rankFraction ≤ epsilon)
@@ -3387,8 +6320,9 @@ sequence theorem asserted by the low-rank boundary argument: once the rank
 fraction tends to zero, the absolute information-density gap is squeezed to
 zero by the same fixed nuclear-norm constant.
 
-The matrix I-MMSE inequality remains an explicit model-side premise; the
-asymptotic passage from that estimate to invisibility is proved here. -/
+The final nuclear estimate may either be supplied directly or obtained from
+`MatchedInformationPathCertificate`; the asymptotic passage from it to
+invisibility is proved here. -/
 theorem matchedDensity_lowRank_tendsto_zero_of_nuclearEstimate
     (densityGap rankFraction : ℕ → ℝ) (constant : ℝ)
     (hrankVanishing : Filter.Tendsto rankFraction Filter.atTop (nhds 0))
@@ -3398,7 +6332,9 @@ theorem matchedDensity_lowRank_tendsto_zero_of_nuclearEstimate
   have hbound :
       Filter.Tendsto (fun index ↦ constant * rankFraction index)
         Filter.atTop (nhds 0) := by
-    simpa using hrankVanishing.const_mul constant
+    have hconstant : Filter.Tendsto (fun _index : ℕ ↦ constant)
+        Filter.atTop (nhds constant) := tendsto_const_nhds
+    simpa using hconstant.mul hrankVanishing
   have habs :
       Filter.Tendsto (fun index ↦ |densityGap index|)
         Filter.atTop (nhds 0) :=
@@ -3407,6 +6343,118 @@ theorem matchedDensity_lowRank_tendsto_zero_of_nuclearEstimate
       hnuclear hbound
   apply (tendsto_zero_iff_abs_tendsto_zero densityGap).mpr
   simpa [Function.comp_def] using habs
+
+/-- **Finite extensive-rank certificate.**  Under the matrix
+I--MMSE/nuclear estimate, a matched information-density gap of magnitude at
+least `delta > 0` forces rank fraction at least `delta / constant`. -/
+theorem matchedDensity_positiveGap_forces_rankFraction
+    (densityGap constant rankFraction delta : ℝ)
+    (hconstant : 0 < constant) (hdelta : 0 < delta)
+    (hgap : delta ≤ |densityGap|)
+    (hnuclear : |densityGap| ≤ constant * rankFraction) :
+    0 < rankFraction ∧ delta / constant ≤ rankFraction := by
+  have hlower : delta / constant ≤ rankFraction :=
+    (div_le_iff₀ hconstant).mpr (by
+      calc
+        delta ≤ constant * rankFraction := hgap.trans hnuclear
+        _ = rankFraction * constant := mul_comm _ _)
+  exact ⟨(div_pos hdelta hconstant).trans_le hlower, hlower⟩
+
+/-- A persistent positive matched-density gap forces an eventual uniform
+lower bound on the perturbation rank fraction. -/
+theorem matchedDensity_eventualGap_forces_eventualRankFraction
+    {Index : Type*} (regime : Filter Index)
+    (densityGap rankFraction : Index → ℝ) (constant delta : ℝ)
+    (hconstant : 0 < constant) (hdelta : 0 < delta)
+    (hgap : ∀ᶠ index in regime, delta ≤ |densityGap index|)
+    (hnuclear : ∀ index,
+      |densityGap index| ≤ constant * rankFraction index) :
+    ∀ᶠ index in regime, delta / constant ≤ rankFraction index := by
+  filter_upwards [hgap] with index hindex
+  exact (matchedDensity_positiveGap_forces_rankFraction
+    (densityGap index) constant (rankFraction index) delta
+    hconstant hdelta hindex (hnuclear index)).2
+
+/-- Consequently a persistent order-one matched-density separation is
+incompatible with a rank fraction tending to zero.  This is the quantitative
+extensive-rank obstruction required of any negative matched-Bayes witness. -/
+theorem matchedDensity_eventualGap_not_sublinearRank
+    {Index : Type*} (regime : Filter Index) [regime.NeBot]
+    (densityGap rankFraction : Index → ℝ) (constant delta : ℝ)
+    (hconstant : 0 < constant) (hdelta : 0 < delta)
+    (hgap : ∀ᶠ index in regime, delta ≤ |densityGap index|)
+    (hnuclear : ∀ index,
+      |densityGap index| ≤ constant * rankFraction index) :
+    ¬ Filter.Tendsto rankFraction regime (nhds 0) := by
+  have hrankLower := matchedDensity_eventualGap_forces_eventualRankFraction
+    regime densityGap rankFraction constant delta hconstant hdelta hgap hnuclear
+  intro hrankZero
+  have hthreshold : 0 < delta / constant := div_pos hdelta hconstant
+  have hrankUpper : ∀ᶠ index in regime,
+      rankFraction index < delta / constant :=
+    hrankZero.eventually_lt_const hthreshold
+  obtain ⟨index, hlower, hupper⟩ := (hrankLower.and hrankUpper).exists
+  exact (not_lt_of_ge hlower) hupper
+
+/-- **Certified finite extensive-rank obstruction.**  A positive information
+gap along an I--MMSE path, a uniform variance bound, and a nuclear-to-rank
+comparison force an explicit positive rank fraction.  No final information
+Lipschitz inequality is accepted as an assumption. -/
+theorem matchedInformationPath_positiveGap_forces_rankFraction_of_varianceBound
+    (certificate : MatchedInformationPathCertificate)
+    (varianceBound operatorBound rankFraction delta : ℝ)
+    (hvarianceBound : certificate.variance ≤ varianceBound)
+    (hvariancePositive : 0 < varianceBound) (hoperator : 0 < operatorBound)
+    (hdelta : 0 < delta)
+    (hgap : delta ≤
+      |certificate.informationPath 1 - certificate.informationPath 0|)
+    (hnuclearRank : certificate.nuclearDistance ≤ operatorBound * rankFraction) :
+    0 < rankFraction ∧
+      delta / (varianceBound * operatorBound / 2) ≤ rankFraction := by
+  apply matchedDensity_positiveGap_forces_rankFraction
+    (certificate.informationPath 1 - certificate.informationPath 0)
+    (varianceBound * operatorBound / 2) rankFraction delta
+  · positivity
+  · exact hdelta
+  · exact hgap
+  · exact matchedInformationPath_lowRank_bound_of_varianceBound certificate
+      varianceBound operatorBound rankFraction hvarianceBound hnuclearRank
+
+/-- **Certified asymptotic extensive-rank obstruction.**  If a family of
+I--MMSE paths has uniformly bounded positive variance scale and a persistent
+order-one information gap, its perturbation rank fraction is eventually
+bounded below by the exact finite constant and cannot tend to zero. -/
+theorem matchedInformationPath_persistentGap_requires_extensiveRank
+    {Index : Type*} (regime : Filter Index) [regime.NeBot]
+    (certificate : Index → MatchedInformationPathCertificate)
+    (varianceBound operatorBound delta : ℝ) (rankFraction : Index → ℝ)
+    (hvariancePositive : 0 < varianceBound) (hoperator : 0 < operatorBound)
+    (hdelta : 0 < delta)
+    (hvarianceBound : ∀ index, (certificate index).variance ≤ varianceBound)
+    (hnuclearRank : ∀ index,
+      (certificate index).nuclearDistance ≤ operatorBound * rankFraction index)
+    (hgap : ∀ᶠ index in regime, delta ≤
+      |(certificate index).informationPath 1 -
+        (certificate index).informationPath 0|) :
+    (∀ᶠ index in regime,
+      delta / (varianceBound * operatorBound / 2) ≤ rankFraction index) ∧
+      ¬ Filter.Tendsto rankFraction regime (nhds 0) := by
+  let densityGap := fun index ↦
+    (certificate index).informationPath 1 - (certificate index).informationPath 0
+  let constant := varianceBound * operatorBound / 2
+  have hconstant : 0 < constant := by
+    dsimp only [constant]
+    positivity
+  have hinformation : ∀ index,
+      |densityGap index| ≤ constant * rankFraction index := by
+    intro index
+    exact matchedInformationPath_lowRank_bound_of_varianceBound
+      (certificate index) varianceBound operatorBound (rankFraction index)
+      (hvarianceBound index) (hnuclearRank index)
+  exact ⟨matchedDensity_eventualGap_forces_eventualRankFraction regime
+      densityGap rankFraction constant delta hconstant hdelta hgap hinformation,
+    matchedDensity_eventualGap_not_sublinearRank regime densityGap rankFraction
+      constant delta hconstant hdelta hgap hinformation⟩
 
 end MatchedBayesBoundary
 

@@ -840,9 +840,17 @@ theorem hetDecayFactor_uses_timeScale (Ne θ : ℝ) :
       = (1 - 1 / coalescentTimeScale Ne) * (1 - θ / coalescentTimeScale Ne) := by
   unfold hetDecayFactor hetDecayFromScaled; rw [coalescentTimeScale_eq]
 
-theorem asymmetricFst_eq_scaled (Ne m_into : ℝ) :
-    asymmetricFst Ne m_into
-      = fstMutationDriftEquilibrium (scaledMigrationRate Ne m_into) := by
+/-- The differentiation transient's decay factor is on the same coalescent clock as the
+heterozygosity one it extends: the migration channel divides by the timescale, not by a
+free constant. -/
+theorem fstTransientDecayFromScaled_uses_timeScale (Ne θ bigM : ℝ) :
+    fstTransientDecayFromScaled Ne θ bigM
+      = hetDecayFromScaled Ne θ * (1 - bigM / coalescentTimeScale Ne) := by
+  unfold fstTransientDecayFromScaled; rw [coalescentTimeScale_eq]
+
+theorem asymmetricFst_eq_scaled (Ne m₁₂ m₂₁ : ℝ) :
+    asymmetricFst Ne m₁₂ m₂₁
+      = fstMutationDriftEquilibrium (scaledMigrationRate Ne (m₁₂ + m₂₁)) := by
   unfold asymmetricFst fstMutationDriftEquilibrium
   rw [scaledMigrationRate_eq_ploidy_form]; unfold ploidy; ring_nf
 
@@ -936,14 +944,13 @@ theorem tauAt_uses_timeScale (g : GenerationalPopGenParameters) (t : ℕ) :
       = (t : ℝ) / coalescentTimeScale g.Ne := by
   unfold GenerationalPopGenParameters.tauAt; rw [coalescentTimeScale_eq]
 
+/-- The divergence rate is the reciprocal of the coalescent timescale, and the scaled mutation
+and migration rates do not appear. This theorem previously carried them in the denominator; the
+body they came from was falsified at up to 1620 sems and the convention statement follows it. -/
 theorem alleleFreqDivergenceRate_eq_scaled (Ne mu m_rate : ℝ) :
-    alleleFreqDivergenceRate Ne mu m_rate
-      = 1 / (coalescentTimeScale Ne *
-          (1 + scaledMutationRate Ne mu + scaledMigrationRate Ne m_rate)) := by
+    alleleFreqDivergenceRate Ne mu m_rate = 1 / coalescentTimeScale Ne := by
   unfold alleleFreqDivergenceRate
-  rw [coalescentTimeScale_eq, scaledMutationRate_eq_ploidy_form,
-    scaledMigrationRate_eq_ploidy_form]
-  unfold ploidy; ring_nf
+  rw [coalescentTimeScale_eq]
 
 theorem fstMutationDriftTransient_uses_timeScale (θ t Ne : ℝ) :
     fstMutationDriftTransient θ t Ne

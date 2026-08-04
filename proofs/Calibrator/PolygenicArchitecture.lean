@@ -73,7 +73,20 @@ theorem per_variant_h2_decreases_with_M (h2 M₁ M₂ : ℝ)
     (1-π) proportion have effect = 0 (or ~ N(0, σ²_small)).
     π is the polygenicity parameter.
 
-    Empirical status: UNTESTED.
+    Empirical status: **NOT EMPIRICALLY TESTABLE BY SIMULATION, and recorded as
+    such rather than left as UNTESTED.** The only simulation that would bear on
+    it draws effects from the very mixture whose variance this states, and then
+    measures their variance -- so the agreement is guaranteed by construction and
+    the residual is the random number generator's sampling noise.
+    `battery_ldsc.py` ran exactly that and reported FALSIFIED at 10.6 sems at
+    `π = 0.01`, which was noise judged against a Gaussian error bar: a
+    spike-and-slab at `π = 0.01` has enormous kurtosis, so `Var · sqrt(2/M)`
+    understates its own scatter badly. `battery_dis1.py` reruns it declaring the
+    oracle non-independent and the harness returns GENERATIVE SELF-TEST.
+
+    What could be tested is a claim this definition does not make: that the
+    two-component mixture describes real effect-size distributions. That is a
+    claim about data, not about arithmetic.
 
     Denotes: a variance. Other definitions share this formula under names from a
     different concept family; the formula does not fix which is meant. -/

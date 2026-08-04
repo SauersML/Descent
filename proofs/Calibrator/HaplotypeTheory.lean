@@ -358,7 +358,7 @@ population has.
 Unlike the dosage bias, this one does not move when only the configuration
 frequency moves. It is not zero by construction either: it vanishes just when the
 fitted cis/trans effects agree with the target's, which is the content of
-`haplotypeTransportBias_eq_zero_of_portable_effects`, and it is what fails when
+`haplotypeTransportBias_at_reference_point`, and it is what fails when
 the effects themselves do not transport — see
 `haplotype_less_portable_when_effects_shift`.
 
@@ -377,11 +377,8 @@ theorem haplotypeTransportBias_at_reference_point
   simp
 
 
--- **Predicting the true interaction leaves no transport bias** is
--- `haplotypeTransportBias_eq_zero_of_portable_effects` below, stated once. It was also
--- stated here, as `haplotypeTransportBias_self`, with the same statement and a different
--- proof; the closed form does not say where the bias vanishes, and saying it twice does
--- not say it twice as well.
+-- **Predicting the true interaction leaves no transport bias** is stated once
+-- by `haplotypeTransportBias_at_reference_point` above.
 
 /-- The dosage-only phase-misspecification error has the exact variance form
 `f(1-f)(δ_cis - δ_trans)^2`. -/
@@ -466,18 +463,6 @@ theorem haplotypeTransportBias_eq
           (1 - freq_cis_target) * (pred_trans - interaction_trans) := by
     ring
   rw [h_factor]
-
-/-- The phase-aware transport bias is zero when the cis and trans effects
-themselves transport. This is now a theorem with its hypothesis in the
-statement — the fitted pair is instantiated at the target's own effects — rather
-than a definitional `0`. -/
-theorem haplotypeTransportBias_eq_zero_of_portable_effects
-    (freq_cis_target interaction_cis interaction_trans : ℝ) :
-    haplotypeTransportBias freq_cis_target interaction_cis interaction_trans
-      interaction_cis interaction_trans = 0 :=
-  -- The same claim as the reference evaluation above, which is why it cites it rather than
-  -- proving it a second way: two proofs of one statement are one statement twice.
-  haplotypeTransportBias_at_reference_point freq_cis_target interaction_cis interaction_trans
 
 /-- And it is strictly positive as soon as the fitted effects miss the target's
 on average. -/
@@ -604,7 +589,7 @@ theorem haplotype_pgs_more_portable_for_cis
         interaction_cis interaction_trans <
       dosageTransportBias
         freq_cis_source freq_cis_target interaction_cis interaction_trans := by
-  rw [dosageTransportBias_eq, haplotypeTransportBias_eq_zero_of_portable_effects]
+  rw [dosageTransportBias_eq, haplotypeTransportBias_at_reference_point]
   exact mul_pos
     (abs_pos.mpr (sub_ne_zero.mpr h_freq_shift.symm))
     (abs_pos.mpr (sub_ne_zero.mpr h_phase_gap))

@@ -207,7 +207,20 @@ noncomputable def additiveGeneticVariance {m : ℕ} (β : Fin m → ℝ) : ℝ :
 
 /-- Additive heritability `h² = V_A / V_Y` in the standardized diagonal-LD model.
 
-    Empirical status: UNTESTED. -/
+    Regime: STANDARDIZED genotypes. That is the condition under which
+    `additiveGeneticVariance` is `∑ βᵢ²` at all; on a dosage scale the sum is
+    off by the allele-frequency factor and this ratio inherits the error.
+
+    Empirical status: **VALIDATED** (`simcov/battery_bulk18.py`,
+    `test_architecture_scalars`). Measured as a REALISED variance ratio and not
+    as the parameter it was simulated at: 40000 individuals are drawn with
+    standardized genotypes and effects at three architectures, and the body's
+    `∑ βᵢ² / var_y` is compared against `Var(g) / Var(y)` computed from the
+    realised phenotypes through an independent path. The body predicts 0.19968,
+    0.48808 and 0.76970 against measured 0.20023 ± 0.00142, 0.48524 ± 0.00343
+    and 0.76912 ± 0.00544, worst cell 0.83 sems at 0.59% relative, over a
+    prediction spanning 74%. The companion `additiveGeneticVariance` is measured
+    on the same runs at worst 0.83 sems. -/
 noncomputable def additiveHeritability {m : ℕ} (β : Fin m → ℝ) (var_y : ℝ) : ℝ :=
   additiveGeneticVariance β / var_y
 

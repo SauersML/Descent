@@ -256,6 +256,8 @@ noncomputable def spectralResidualBiasEnergy {p : ℕ}
     (retention bias : Fin p → ℝ) : ℝ :=
   ∑ i, (retention i * bias i) ^ 2
 
+
+
 /-- Any spectral correction retains a quantifiable amount of confounding
 whenever one demographic direction has nonzero loading and nonzero residual
 transfer.  For an LMM this is a constraint-induced floor, not a claim that the

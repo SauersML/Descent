@@ -121,6 +121,62 @@ theorem hetDecayFromScaled_no_mutation (Ne : ℝ) :
     hetDecayFromScaled Ne 0 = 1 - 1 / (2 * Ne) := by
   unfold hetDecayFromScaled; ring
 
+/-- **The per-generation decay factor of a DIFFERENTIATION transient**, as
+distinct from a heterozygosity one: `hetDecayFromScaled Nₑ θ · (1 - M/(2 Nₑ))`,
+a third channel multiplied onto the same two.
+
+`hetDecayFromScaled` is the decay of within-deme heterozygosity, and migration
+does not appear in it because migration does not destroy heterozygosity -- it
+moves it between demes. `F_ST` is a between-deme quantity, and migration is the
+force that removes between-deme differentiation, so it enters this factor and
+not that one. The two are different processes with different rates and the
+corpus previously used the first for both.
+
+**This exists because `fstTransientAt` and `PGSEvolutionaryModel.fstTransient`
+used `hetDecayFromScaled` as their decay base.** Doing so made them approach an
+equilibrium set by three forces at a rate set by two, which is not a possible
+process: a system whose plateau moves when you change `M` cannot reach that
+plateau at a rate that does not.
+
+Empirical status: **VALIDATED** (`proofs/validation/empirical/simcov/battery_dis4.py`).
+24-deme forward Wright-Fisher island model, no mutation so no mutation-model
+convention enters, started identical; the tested quantity is the HALF-LIFE of
+`F(t)` against its own plateau, a property of the shape, so no `F_ST` convention
+enters either:
+
+  Ne    M      superseded base   this base   measured
+   50   0.0       69.3             69.3      70.67 ± 0.49
+  100   2.0      138.6             46.2      46.88 ± 0.40
+  200   6.0      277.3             39.6      39.51 ± 0.39
+  400   16.0     554.5             32.6      33.02 ± 0.23
+
+Worst cell here is 2.77 sems and 2 percent, at the `M = 0` design where the two
+bases agree. The superseded base is wrong by a factor of seventeen at
+`M = 16` -- 2222 sems -- and the design sweeps `Ne` alongside `M` so that both
+candidates predict a moving half-life rather than one of them predicting a
+constant.
+
+The positive control is the `M = 0` cell against the exact deterministic
+two-moment recursion for this model, run through the identical half-life
+estimator, and it passes at 0.88 sems. That control is what makes the verdict
+usable: the estimator has a two percent bias of its own at `M = 0`, where the
+island model's two eigenvalues are closest and a single fitted exponential picks
+up a little of the slow one, and charging that bias to the definition rather
+than to the instrument is what an earlier run of this design did.
+
+Denotes: a per-generation retention factor for a BETWEEN-population quantity.
+Other definitions share the shape of this formula under names from the
+heterozygosity family; the formula does not fix which is meant, and the whole
+content of this one is that the two families take different forces. -/
+noncomputable def fstTransientDecayFromScaled (Ne θ bigM : ℝ) : ℝ :=
+  hetDecayFromScaled Ne θ * (1 - bigM / (2 * Ne))
+
+/-- **At zero migration the differentiation transient decays at the heterozygosity rate.**
+This is the boundary at which the superseded body was right, and it is the only one. -/
+theorem fstTransientDecayFromScaled_no_migration (Ne θ : ℝ) :
+    fstTransientDecayFromScaled Ne θ 0 = hetDecayFromScaled Ne θ := by
+  unfold fstTransientDecayFromScaled; ring
+
 
 open scoped InnerProductSpace
 open InnerProductSpace
@@ -309,7 +365,21 @@ noncomputable def SourceTaggedMoments.sigmaTagCausal {c t : ℕ}
 /-- Closed-form source best linear predictor weights:
 `w*_S = Σ_tag,S^{-1} Σ_tc,S β_c`.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_dis2.py`). 40000 individuals,
+    40 causal and 12 tag variants on standardised dosages with a dense
+    correlation structure, against the weights an explicit least-squares
+    regression of the outcome on the tags actually fits: worst coordinate 0.19
+    sems, and the three coordinates reported alongside it 0.04, 0.19 and 0.02.
+
+    **A retraction** (`battery_linalg.py`). That battery reported 8.07 sems and
+    78 percent relative error. Both numbers were computed from the WORST of
+    forty coordinates against a one-coordinate error bar, which is a maximum of
+    forty draws judged as though it were one: the selection correction is
+    `sqrt(2 log 40) = 2.72`, and `8.07 / 2.72 = 2.97` was inside the gate before
+    anything else is said. The 78 percent is the same artefact seen without the
+    error bar -- it is the relative error of whichever coordinate happened to be
+    smallest in magnitude, and a small denominator is not a large discrepancy. -/
 noncomputable def sourceBestLinearWeightsFromLD {c t : ℕ}
     (mom : SourceTaggedMoments c t) (betaCausal : CausalVec c) : TagVec t :=
   mom.sigmaTagSource⁻¹.mulVec (mom.sigmaTagCausal.mulVec betaCausal)
@@ -2192,8 +2262,9 @@ theorem EvolutionaryParameters.tau_nonneg (p : EvolutionaryParameters) :
 
     This is the third definition in this corpus found to be deme-count blind,
     after `fstMigrationMutationEquilibriumManyDemes` and `asymmetricFst`. The
-    first two could be repaired by naming the limit; `asymmetricFst` could not,
-    because its name commits it to exactly two demes.
+    first two were repaired by naming the limit; `asymmetricFst` could not be,
+    because its name commits it to exactly two demes, so it was repaired by
+    carrying both migration rates and returning the two-deme value at their sum.
 -/
 noncomputable def fstDriftMigrationManyDemes (p : EvolutionaryParameters) : ℝ :=
   1 / (1 + p.bigM)
@@ -2781,17 +2852,32 @@ noncomputable def PGSEvolutionaryModel.hetDecayFactor (m : PGSEvolutionaryModel)
 
 /-- **Transient Fst(t)**: Fst as a function of divergence time.
     Fst(t) = Fst_eq × (1 - λ^t)
-    where Fst_eq = 1/(1+θ+M) and λ = hetDecayFactor.
+    where Fst_eq = 1/(1+θ+M) and λ = `fstTransientDecayFromScaled`.
 
     At t=0: Fst = 0 (no divergence yet).
     As t → ∞: Fst → Fst_eq (equilibrium).
 
-    DERIVED from the heterozygosity recurrence H(t) = H* + (H₀ - H*) × λ^t
-    and Fst(t) = 1 - H(t)/H₀. See PopulationGeneticsFoundations.lean.
+    **The decay base was `hetDecayFactor` and has been corrected.** That base
+    carries drift and mutation but not migration, so this coordinate approached
+    an equilibrium that depends on `M` at a rate that does not -- and the error
+    is not small: at `4 Nₑ m = 16` it overstates the half-life by a factor of
+    seventeen. The derivation quoted below is where it came from and is the
+    error itself: `Fst(t) = 1 - H(t)/H₀` reads the transient off the WITHIN-deme
+    heterozygosity recurrence, which migration does not enter, and then attaches
+    it to a between-deme equilibrium, which migration does. See
+    `fstTransientDecayFromScaled` for the measurement.
 
-    Empirical status: UNTESTED. -/
+    DERIVED from the heterozygosity recurrence H(t) = H* + (H₀ - H*) × λ^t
+    and Fst(t) = 1 - H(t)/H₀ -- valid for the mutation-drift model, where
+    `MutationDriftModelAssumptions.fstTransient` still uses it and is right to,
+    because that model has no migration in it at all.
+
+    Empirical status: **VALIDATED after correction; the superseded base
+    FALSIFIED at up to 2222 sems**, on the runs recorded in
+    `fstTransientDecayFromScaled`. -/
 noncomputable def PGSEvolutionaryModel.fstTransient (m : PGSEvolutionaryModel) : ℝ :=
-  fstEquilibrium m.toEvo * (1 - m.hetDecayFactor ^ (Nat.floor m.t_div))
+  fstEquilibrium m.toEvo *
+    (1 - fstTransientDecayFromScaled m.Ne m.theta m.bigM ^ (Nat.floor m.t_div))
 
 /-! ### Step 2: Primitive evolutionary coordinate summaries
 
@@ -3230,7 +3316,8 @@ theorem PGSEvolutionaryModel.coordinateSummary_explicit
     (m : PGSEvolutionaryModel) :
     m.coordinateSummary =
       { alleleFreqCoordinate :=
-          1 - fstEquilibrium m.toEvo * (1 - m.hetDecayFactor ^ (Nat.floor m.t_div))
+          1 - fstEquilibrium m.toEvo *
+            (1 - fstTransientDecayFromScaled m.Ne m.theta m.bigM ^ (Nat.floor m.t_div))
         sharedLDCoordinate := Real.exp (-2 * m.recomb * m.t_div)
         ancestralVariantCoordinate := Real.exp (-m.theta * m.tau)
         migrationCoordinate := 1 + m.bigM * m.tau / (1 + m.bigM) } := by
@@ -3290,20 +3377,62 @@ The evolutionary block records per-force rate coordinates only. These rates are
 useful for comparing the timescales of distinct population-genetic drivers, but
 they are not added or multiplied into a single portability law. -/
 
-/-- Allele-frequency divergence rate summary from the transient `F_ST`
-coordinate.
+/-- **Allele-frequency divergence rate: the drift rate, and only the drift rate.**
 
-    Empirical status: UNTESTED. -/
-noncomputable def alleleFreqDivergenceRate (Ne mu m_rate : ℝ) : ℝ :=
-  let theta := 4 * Ne * mu
-  let bigM := 4 * Ne * m_rate
-  1 / (2 * Ne * (1 + theta + bigM))
+    `1 / (2 Nₑ)`. Two populations leaving a common ancestral state accumulate
+    frequency variance at the rate drift supplies it. Mutation and migration do
+    not slow that accumulation; they set the LEVEL it stops at, which is
+    `fstEquilibrium = 1/(1 + θ + M)`, and the two are different quantities.
+
+    **The body has been corrected and the arguments are now inert.** It read
+    `1 / (2 Nₑ (1 + θ + M))` -- the equilibrium divided by the coalescent
+    timescale -- which says a population under strong migration diverges from
+    its neighbours more slowly per generation. From a common start it cannot:
+    migration and mutation are deterministic maps applied identically to every
+    replicate, so in the first generation they move every replicate the same way
+    and contribute nothing at all to the across-replicate variance.
+
+    `alleleFreqDivergenceRate_independent_of_mutation_and_migration` states that
+    inertness, because a definition that takes three arguments and reads one is
+    otherwise indistinguishable from a definition that lost the other two.
+
+    Empirical status: **VALIDATED after correction; the superseded body
+    FALSIFIED at up to 1620 sems**
+    (`proofs/validation/empirical/simcov/battery_dis1.py`). Across-replicate
+    variance of the allele frequency after ONE generation from a common start,
+    normalised by `p₀(1-p₀)`, 20000 replicate populations and 400 loci:
+
+      Ne    θ     M     superseded   this body   measured
+      200   0.0   0.0   0.002500     0.002500    0.0025003
+      200   0.8   0.0   0.001389     0.002500    0.0025002
+      200   0.0   0.8   0.001389     0.002500    0.0025000
+      200   4.0   4.0   0.000278     0.002500    0.0025098
+      500   0.0   4.0   0.000200     0.001000    0.0010000
+
+    The superseded body is right in exactly one row -- the one where `θ` and `M`
+    are both zero and the two bodies are the same number. This body's worst cell
+    is 0.4 percent relative, at the design where `θ = M = 4`, and that residual
+    is the second-order term: over one generation the three forces compose
+    rather than add.
+
+    The positive control is that row, against the textbook drift variance
+    `p(1-p)/(2 Nₑ)`, and it passes at 0.36 sems.
+
+    Power: the superseded prediction spans a factor of nine across the design
+    while the measurement is flat, which is the whole finding.
+
+    Denotes: a per-generation RATE. Other definitions share this formula under
+    names from the timescale family -- `1/(2 Nₑ)` is also the reciprocal
+    coalescent timescale -- and the formula does not fix which is meant. That
+    those two coincide here is the content, not a collision: divergence
+    accumulates on the coalescent clock and on no other. -/
+noncomputable def alleleFreqDivergenceRate (Ne _mu _m_rate : ℝ) : ℝ :=
+  1 / (2 * Ne)
 
 /-- **The allele-frequency divergence rate at zero effective size, named.** Drift is
 instantaneous in an empty population, so the divergence rate diverges. The divisor is zero and
-Lean returns `0`: no divergence at all, indistinguishable from an infinite population. Scaled
-mutation and migration are themselves multiplied by `Ne`, so they vanish too and the denominator
-carries no trace of the degeneracy. Consumers must require `Ne ≠ 0`. -/
+Lean returns `0`: no divergence at all, indistinguishable from an infinite population. Consumers
+must require `Ne ≠ 0`. -/
 theorem alleleFreqDivergenceRate_zero_population_is_junk (mu m_rate : ℝ) :
     alleleFreqDivergenceRate 0 mu m_rate = 0 := by
   unfold alleleFreqDivergenceRate
@@ -3316,21 +3445,63 @@ theorem alleleFreqDivergenceRate_neutral_isolated (Ne : ℝ) :
   unfold alleleFreqDivergenceRate
   norm_num
 
-/-- **A second reference point, where the scaled mutation rate is one.**
+/-- **Mutation and migration do not enter the rate at all.**
 
-`alleleFreqDivergenceRate_neutral_isolated` fixes the outer `2 * Ne` and nothing else: at zero
-mutation and zero migration every body of the form `1 / (2 Ne (1 + c1 theta + c2 bigM))` agrees,
-whatever `c1` and `c2` are. Evaluating where `theta = 1` separates them, which is what a
-reference point has to do to be worth stating -- it only pins what varies at that point. -/
-theorem alleleFreqDivergenceRate_unit_theta (Ne : ℝ) (h : Ne ≠ 0) :
-    alleleFreqDivergenceRate Ne (1 / (4 * Ne)) 0 = 1 / (4 * Ne) := by
+This replaces `alleleFreqDivergenceRate_unit_theta`, which evaluated the superseded body at
+`theta = 1` and got `1 / (4 Ne)` -- half the drift rate. That theorem was stated as a second
+reference point, on the reasoning that `alleleFreqDivergenceRate_neutral_isolated` pins the
+outer `2 * Ne` and nothing else, so a point where `theta` is nonzero is needed to separate
+bodies of the form `1 / (2 Ne (1 + c₁ θ + c₂ M))`. The reasoning was right and the answer it
+pinned was wrong: measurement puts `c₁ = c₂ = 0` at up to 1620 sems, so the discriminating
+statement is not a second value but this invariance.
+
+It is stated over ALL arguments rather than at a point, because that is the claim: two
+populations diverge at the drift rate whatever the mutation and migration rates are. -/
+theorem alleleFreqDivergenceRate_independent_of_mutation_and_migration
+    (Ne mu m_rate mu' m_rate' : ℝ) :
+    alleleFreqDivergenceRate Ne mu m_rate = alleleFreqDivergenceRate Ne mu' m_rate' := by
   unfold alleleFreqDivergenceRate
-  field_simp
-  ring
+  rfl
 
 /-- LD breakage rate from recombination.
 
-    Empirical status: UNTESTED. -/
+    Regime: a RATE, first order in `r`. Two lineages each recombine with
+    probability `r`, and to first order the chance that either does is their sum.
+
+    Empirical status: **VALIDATED as a rate, FALSIFIED as an exact
+    per-generation probability** (`proofs/validation/empirical/simcov/battery_traj.py`).
+    The exact chance that a pair survives one meiosis intact is `(1-r)²`, so the
+    exact breakage probability is `2r - r²` and this body omits the `r²`. Read as
+    a survival law, `(1 - 2r)^t` against the exact `(1 - r)^(2t)`, the omission
+    compounds:
+
+      r      t     (1 - 2r)^t   simulated             relative
+      0.01   20     0.66761     0.66860 ± 0.00033      -0.1%
+      0.02   30     0.29386     0.29796 ± 0.00032      -1.4%
+      0.05   15     0.20589     0.21444 ± 0.00029      -4.0%
+
+    Four percent at `r = 0.05`. This is the discrete twin of the continuous
+    approximation recorded on `sharedLDRetention`, which errs in the other
+    direction and by the same second-order term; use
+    `discreteRecombinationSurvival` where `r` is not small.
+
+    Empirical status: **VALIDATED** as the RATE at which a sampled pair breaks,
+    and FALSIFIED as an exact per-generation probability -- the two readings are
+    the `r²` above, and the table there is the falsification of the second.
+
+    The rate reading is the one the `2` is about, and a simulation decides it
+    (`simcov/battery_bulk18.py`, `test_ld_breakage`): the survival of a pair in
+    which NEITHER of the two lineages has recombined between the loci, over
+    400000 replicate pairs per cell, with `2·r·t` swept over a factor of three
+    at two different `r`. The body predicts 0.60653, 0.36788, 0.36788 and
+    0.22313 against measured 0.60660 ± 0.00077, 0.36732 ± 0.00076, 0.36648 ±
+    0.00076 and 0.22293 ± 0.00066, worst cell 1.84 sems at 0.38% relative.
+
+    Power: the ONE-LINEAGE reading `r` is carried on the same cells, so the
+    factor of two is chosen by the data rather than by the name. It misses by
+    223, 314, 315 and 379 sems (up to 112% relative). The two `2·r·t = 1` cells
+    reach the same prediction from `r` and `t` moved in opposite directions, so
+    a body that depended on them separately would not survive both. -/
 noncomputable def ldBreakageRate (r : ℝ) : ℝ := 2 * r
 
 
@@ -3345,21 +3516,21 @@ theorem ldBreakageRate_at_reference_point :
 
 /-- LD breakage dominates the allele-frequency divergence rate when
 recombination exceeds the drift timescale. This is a comparison of component
-rates only, not a theorem about total portability. -/
+rates only, not a theorem about total portability.
+
+    The hypothesis `h_ld_fast` is now the conclusion up to unfolding: with the
+    divergence rate corrected to `1/(2 Nₑ)` there is no slack between them, where
+    the superseded body left the strict inequality holding a fortiori for any
+    mutation and migration rates. The `hmu` and `hm` hypotheses are kept because
+    they are the regime this comparison is stated in, not because the arithmetic
+    still needs them. -/
 theorem ld_breakage_dominates_alleleFreq_divergence
     (Ne mu m_rate r : ℝ)
-    (hNe : 0 < Ne) (hmu : 0 ≤ mu) (hm : 0 ≤ m_rate)
+    (_hNe : 0 < Ne) (_hmu : 0 ≤ mu) (_hm : 0 ≤ m_rate)
     (h_ld_fast : 1 / (2 * Ne) < 2 * r) :
     alleleFreqDivergenceRate Ne mu m_rate < ldBreakageRate r := by
   unfold alleleFreqDivergenceRate ldBreakageRate
-  have denom_pos : 0 < 2 * Ne * (1 + 4 * Ne * mu + 4 * Ne * m_rate) := by positivity
-  calc 1 / (2 * Ne * (1 + 4 * Ne * mu + 4 * Ne * m_rate))
-      ≤ 1 / (2 * Ne) := by
-        apply one_div_le_one_div_of_le (by linarith)
-        have : 0 ≤ 4 * Ne * mu := by positivity
-        have : 0 ≤ 4 * Ne * m_rate := by positivity
-        nlinarith
-    _ < 2 * r := h_ld_fast
+  exact h_ld_fast
 
 /-! ### Step 8: Coordinate comparisons inside the deployment summary
 

@@ -25,6 +25,7 @@ namespace Calibrator
 open MarkedBreakout
 open XiFromMarks
 open TrafficInvariantSeparation
+open scoped Matrix Topology
 
 /-!
 # Unified biology: state, geometry, value, and observation
@@ -412,15 +413,39 @@ theorem genomicRankOneTrafficCorrection_vanishes_of_positiveEvenDegreeData
   finiteRankOneTrafficCorrection_tendsto_zero_of_positiveEvenDegreeData
     coefficient hasOddDegree vertices edges degree hpositive heven hhandshake
 
+/-- **One concrete genomic LD covariance carries the whole counterexample.**
+The bundled witness certifies PSD order, fixed-traffic invisibility, the exact
+finite Rademacher Hamiltonian, an unchanged lower ground state, thermodynamic
+convergence, and strict supercritical pressure for the same matrices. -/
+theorem positiveLDBalancedRankOneCovariance_fullWitness
+    {Term : Type*} [Fintype Term]
+    (coefficient : Term → ℝ) (hasOddDegree : Term → Bool)
+    (vertices edges : Term → ℕ)
+    (hconnected : ∀ term, hasOddDegree term = false → vertices term ≤ edges term)
+    (baseline spikeStrength temperature : ℝ)
+    (hbaseline : 0 ≤ baseline) (hspike : 0 < spikeStrength)
+    (hcritical : 1 < temperature * spikeStrength) :
+    ConcreteBalancedPSDPressureWitness coefficient hasOddDegree vertices edges
+      baseline spikeStrength temperature :=
+  concreteBalancedPSDPressureWitness coefficient hasOddDegree vertices edges
+    hconnected baseline spikeStrength temperature hbaseline hspike hcritical
+
 /-- **A rare LD subspace is invisible to every fixed traffic coordinate but survives a
 logarithmic number of power iterations.**  The exceptional fraction is `4⁻ᵏ`; each fixed graph
 sum loses it, while `k` iterations amplify its squared output by `4ᵏ`. -/
 theorem rareLDSubspace_fixedTrafficInvisible_logRuntimeVisible :
-    (∀ edges : ℕ,
-      Filter.Tendsto (fun iteration ↦ diagonalTrafficCorrection 1 edges iteration)
-        Filter.atTop (nhds 0)) ∧
-      ∀ iteration : ℕ, mesoscopicGFOMEnergy iteration iteration = 1 :=
+    FixedTrafficLogRuntimeSeparation :=
   fixedTraffic_invisible_logRuntime_visible
+
+/-- **Bulk LD spectrum does not determine extremal spectral or SDP behavior.**
+A single positive LD outlier vanishes from every normalized spectral test
+average, while changing both the exact spectral maximum and the full
+trace-one positive-semidefinite SDP optimum by its complete strength. -/
+theorem genomicBulkSpectralLaw_invisible_extremalSpectrumAndSDP_visible
+    (baseline spikeStrength : ℝ) (hspike : 0 < spikeStrength) :
+    BulkSpectralLawExtremalSDPSeparation baseline spikeStrength :=
+  bulkSpectralLaw_invisible_extremalSpectrumAndSDP_visible
+    baseline spikeStrength hspike
 
 /-- **A positive LD rank-one perturbation is invisible to every fixed genomic
 traffic graph after the finite spike expansion, yet has strictly positive
@@ -442,32 +467,128 @@ theorem positiveLDSpike_fixedTrafficInvisible_variationalPressureVisible
   finiteRankOneTraffic_invisible_variationalPressure_visible
     coefficient hasOddDegree vertices edges hconnected tlam hcritical
 
-/-- **Actual finite-volume genomic pressure counterexample.**  Every fixed LD
-traffic correction vanishes, but above `2 log 2` the exact binomially grouped
-Rademacher pressure is positive at every nonzero population.  Unlike the sharp
-variational theorem, this conclusion uses no LDP or limiting identification. -/
+/-- **Actual finite-volume genomic pressure counterexample throughout the
+full supercritical regime.**  Every fixed LD traffic correction vanishes, but
+for every `tλ > 1` the exact binomially grouped Rademacher pressure has a
+positive population-uniform lower bound and converges to the strictly positive
+variational pressure.  Its companion theorem below proves the exact
+subcritical convergence boundary; no LDP is used. -/
 theorem positiveLDSpike_fixedTrafficInvisible_finitePressureVisible
     {Term : Type*} [Fintype Term]
     (coefficient : Term → ℝ) (hasOddDegree : Term → Bool)
     (vertices edges : Term → ℕ)
     (hconnected : ∀ term, hasOddDegree term = false → vertices term ≤ edges term)
-    (tlam : ℝ) (hlarge : 2 * Real.log 2 < tlam) :
+    (tlam : ℝ) (hcritical : 1 < tlam) :
     RankOneSpikeInvisibleWithFinitePressure coefficient hasOddDegree vertices edges tlam :=
   finiteRankOneTraffic_invisible_finitePressure_visible
-    coefficient hasOddDegree vertices edges hconnected tlam hlarge
+    coefficient hasOddDegree vertices edges hconnected tlam hcritical
+
+/-- **Finite genomic Gibbs lower bound.**  At every nonempty population, each
+interior LD magnetisation objective lower-bounds the genuine Rademacher
+pressure.  This is the exact finite change-of-measure theorem behind the sharp
+counterexample. -/
+theorem genomicFiniteCWPressure_dominatesVariationalObjective
+    (population : ℕ) (tlam m : ℝ)
+    (hpopulation : 0 < population) (htlam : 0 ≤ tlam) (hm : |m| < 1) :
+    cwObjective tlam m ≤ finiteCWPressureGap population tlam :=
+  finiteCWPressureGap_ge_cwObjective
+    population tlam m hpopulation htlam hm
+
+/-- Every admissible genomic magnetisation class has normalized Gibbs mass
+at most one at and below the Curie--Weiss threshold.  This is the finite
+typewise estimate that controls the full partition function without an LDP. -/
+theorem genomicFiniteCWTypeMass_le_one_of_subcritical
+    (population upSpins : ℕ) (tlam : ℝ) (hcritical : tlam ≤ 1)
+    (hupSpins : upSpins ∈ Finset.range (population + 1)) :
+    finiteCWTypeMass population tlam upSpins ≤ 1 :=
+  finiteCWTypeMass_le_one_of_subcritical population upSpins tlam
+    hcritical hupSpins
+
+/-- **Exact finite genomic pressure phase boundary.**  For nonnegative LD
+coupling, the genuine normalized finite-population Rademacher pressure tends
+to its unspiked value exactly when `tλ ≤ 1`; throughout `tλ > 1` a uniform
+interior genotype-frequency witness prevents convergence to zero. -/
+theorem genomicFiniteCWPressure_exactCriticalPoint
+    (tlam : ℝ) (htlam : 0 ≤ tlam) :
+    Filter.Tendsto
+        (fun population : ℕ ↦ finiteCWPressureGap (population + 1) tlam)
+        Filter.atTop (nhds 0) ↔
+      tlam ≤ 1 :=
+  finiteCWPressureGap_tendsto_zero_iff tlam htlam
+
+/-- The genuine finite genomic Curie--Weiss pressure converges to the complete
+variational LD pressure for every nonnegative coupling, with no asymptotic
+principle assumed beyond the proved finite type-count squeeze. -/
+theorem genomicFiniteCWPressure_convergesToVariational
+    (tlam : ℝ) (htlam : 0 ≤ tlam) :
+    Filter.Tendsto
+      (fun population : ℕ ↦ finiteCWPressureGap (population + 1) tlam)
+      Filter.atTop (nhds (cwVariationalPressureGap tlam)) :=
+  finiteCWPressureGap_tendsto_variationalPressure tlam htlam
+
+/-- Finite genomic Curie--Weiss pressure converges uniformly to its
+variational LD pressure over the entire nonnegative coupling half-line. -/
+theorem genomicFiniteCWPressure_convergesUniformlyOnNonnegative :
+    TendstoUniformlyOn
+      (fun population : ℕ ↦ fun tlam : ℝ ↦
+        finiteCWPressureGap (population + 1) tlam)
+      cwVariationalPressureGap Filter.atTop (Set.Ici 0) :=
+  finiteCWPressureGap_tendstoUniformlyOn_nonnegative
+
+/-- Every positive finite genomic population already has the same sharp
+half-Lipschitz pressure stability as the thermodynamic limit. -/
+theorem genomicFiniteCWPressure_isHalfLipschitz
+    (population : ℕ) (hpopulation : 0 < population) :
+    LipschitzWith (⟨1 / 2, by norm_num⟩ : NNReal)
+      (finiteCWPressureGap population) :=
+  finiteCWPressureGap_lipschitzWith population hpopulation
+
+/-- Every positive finite genomic population has pressure monotone in
+effective LD coupling. -/
+theorem genomicFiniteCWPressure_isMonotone
+    (population : ℕ) (hpopulation : 0 < population) :
+    Monotone (finiteCWPressureGap population) :=
+  monotone_finiteCWPressureGap population hpopulation
 
 /-- The same finite-volume statement in direct pressure language: the
 rank-one LD-spiked genomic pressure is strictly larger than the unspiked
-baseline at every nonempty population above the aligned-state threshold. -/
+baseline at every nonempty population throughout `tλ > 1`. -/
 theorem positiveLDSpike_finitePressureExceedsBaseline
     (baseline : ℝ) (population : ℕ)
     (temperature spikeStrength : ℝ) (hpopulation : 0 < population)
-    (hlarge : 2 * Real.log 2 < temperature * spikeStrength) :
+    (hcritical : 1 < temperature * spikeStrength) :
     finiteBaselineRademacherPressure baseline temperature <
       finiteRankOneRademacherPressure
         baseline population temperature spikeStrength :=
   finiteRankOneRademacherPressure_gt_baseline
-    baseline population temperature spikeStrength hpopulation hlarge
+    baseline population temperature spikeStrength hpopulation hcritical
+
+/-- The direct spiked-minus-baseline genomic pressure converges to zero
+exactly when the nonnegative effective LD coupling is at most one. -/
+theorem positiveLDSpike_pressureDifference_exactCriticalPoint
+    (baseline temperature spikeStrength : ℝ)
+    (hcoupling : 0 ≤ temperature * spikeStrength) :
+    FiniteRankOnePressureCriticalStatement baseline temperature spikeStrength :=
+  finiteRankOneRademacherPressure_difference_tendsto_zero_iff
+    baseline temperature spikeStrength hcoupling
+
+/-- The full finite LD-spiked genomic pressure converges to baseline plus the
+exact Curie--Weiss variational pressure. -/
+theorem positiveLDSpike_pressure_convergesToVariational
+    (baseline temperature spikeStrength : ℝ)
+    (hcoupling : 0 ≤ temperature * spikeStrength) :
+    FiniteRankOnePressureVariationalLimitStatement
+      baseline temperature spikeStrength :=
+  finiteRankOneRademacherPressure_tendsto_variational
+    baseline temperature spikeStrength hcoupling
+
+/-- At fixed nonnegative temperature, the finite LD-spiked genomic pressure
+converges uniformly over every nonnegative spike strength. -/
+theorem positiveLDSpike_pressure_convergesUniformlyOnNonnegativeStrength
+    (baseline temperature : ℝ) (htemperature : 0 ≤ temperature) :
+    FiniteRankOnePressureUniformLimitStatement baseline temperature :=
+  finiteRankOneRademacherPressure_tendstoUniformlyOn_nonnegativeSpike
+    baseline temperature htemperature
 
 /-- **Unified genomic counterexample to C2 and C3.**  A single positive LD
 rank-one spike is invisible to every fixed traffic graph, preserves the exact
@@ -525,9 +646,31 @@ theorem ldVariationalPressureGap_exactCriticalPoint (tlam : ℝ) :
     cwVariationalPressureGap tlam = 0 ↔ tlam ≤ 1 :=
   cwVariationalPressureGap_eq_zero_iff tlam
 
-/-- **The matched-Bayes random-design question reduces to its scalar channel with an explicit
-two-error ledger.**  A scalar mutual-information gap `Δ` loses at most `2ε` when each random
-design is within `ε` of its scalar counterpart. -/
+/-- The limiting LD pressure is globally stable under coupling changes: it is
+`1/2`-Lipschitz, continuous, monotone, and convex. -/
+theorem ldVariationalPressureGap_globalRegularity :
+    LipschitzWith (⟨1 / 2, by norm_num⟩ : NNReal) cwVariationalPressureGap ∧
+      Continuous cwVariationalPressureGap ∧
+        Monotone cwVariationalPressureGap ∧
+          ConvexOn ℝ Set.univ cwVariationalPressureGap :=
+  ⟨cwVariationalPressureGap_lipschitzWith,
+    continuous_cwVariationalPressureGap,
+    monotone_cwVariationalPressureGap,
+    convexOn_cwVariationalPressureGap⟩
+
+/-- **The matched-Bayes random-design question reduces to its scalar channel
+with the sharp two-error ledger.**  A scalar mutual-information gap `Δ` loses
+at most the sum of the independently certified left and right errors. -/
+theorem matchedBayes_randomDesignGap_fromScalarGap_asymmetric
+    (scalarLeft scalarRight randomLeft randomRight leftError rightError delta : ℝ)
+    (hleft : |randomLeft - scalarLeft| ≤ leftError)
+    (hright : |randomRight - scalarRight| ≤ rightError)
+    (hgap : scalarRight - scalarLeft = delta) :
+    delta - (leftError + rightError) ≤ randomRight - randomLeft :=
+  randomDesign_gap_of_scalarGap_asymmetric scalarLeft scalarRight randomLeft randomRight
+    leftError rightError delta hleft hright hgap
+
+/-- The equal-error specialization loses at most `2ε`. -/
 theorem matchedBayes_randomDesignGap_from_scalarGap
     (scalarLeft scalarRight randomLeft randomRight epsilon delta : ℝ)
     (hleft : |randomLeft - scalarLeft| ≤ epsilon)
@@ -536,6 +679,22 @@ theorem matchedBayes_randomDesignGap_from_scalarGap
     delta - 2 * epsilon ≤ randomRight - randomLeft :=
   randomDesign_gap_of_scalarGap scalarLeft scalarRight randomLeft randomRight epsilon delta
     hleft hright hgap
+
+/-- A positive genomic scalar-channel gap survives under independently
+vanishing left and right random-design comparison errors. -/
+theorem matchedBayes_randomDesignEventuallySeparates_fromAsymmetricErrors
+    {Index : Type*} (regime : Filter Index)
+    (scalarLeft scalarRight delta : ℝ)
+    (randomLeft randomRight leftError rightError : Index → ℝ)
+    (hleft : ∀ index, |randomLeft index - scalarLeft| ≤ leftError index)
+    (hright : ∀ index, |randomRight index - scalarRight| ≤ rightError index)
+    (hgap : scalarRight - scalarLeft = delta) (hpositive : 0 < delta)
+    (hleftVanishing : Filter.Tendsto leftError regime (nhds 0))
+    (hrightVanishing : Filter.Tendsto rightError regime (nhds 0)) :
+    ∀ᶠ index in regime, randomLeft index < randomRight index :=
+  randomDesign_eventually_separates_of_scalarGap_asymmetric regime
+    scalarLeft scalarRight delta randomLeft randomRight leftError rightError
+    hleft hright hgap hpositive hleftVanishing hrightVanishing
 
 /-- **A positive genomic scalar-channel information gap survives at all
 sufficiently advanced points of any regime whose random-design comparison
@@ -557,6 +716,207 @@ theorem matchedBayes_randomDesignEventuallySeparates_fromScalarGap
     scalarLeft scalarRight delta randomLeft randomRight comparisonError
     hleft hright hgap hpositive herrorVanishing
 
+/-- With the explicit inverse-square-root aspect-ratio comparison rate, a
+scalar genomic information gap transfers at every finite aspect ratio for
+which the gap exceeds twice the error. -/
+theorem matchedBayes_randomDesignSeparates_ofLargeAspect
+    (scalarLeft scalarRight randomLeft randomRight : ℝ)
+    (aspectRatio constant delta : ℝ)
+    (hleft : |randomLeft - scalarLeft| ≤ constant / Real.sqrt aspectRatio)
+    (hright : |randomRight - scalarRight| ≤ constant / Real.sqrt aspectRatio)
+    (hgap : scalarRight - scalarLeft = delta)
+    (hthreshold : 2 * (constant / Real.sqrt aspectRatio) < delta) :
+    randomLeft < randomRight :=
+  randomDesign_separates_of_scalarGap_of_inverseSqrtAspect
+    scalarLeft scalarRight randomLeft randomRight aspectRatio constant delta
+    hleft hright hgap hthreshold
+
+/-- The two large-sample genomic parameterizations are literally reciprocal:
+diverging sample/dimension aspect is equivalent to its inverse approaching
+zero from above, and their stated square-root error scales agree pointwise. -/
+theorem matchedBayes_aspectWishartRatioBridge
+    {Index : Type*} (regime : Filter Index)
+    (aspectRatio : Index → ℝ) (constant : ℝ) :
+    (Filter.Tendsto aspectRatio regime Filter.atTop ↔
+      Filter.Tendsto (fun index ↦ (aspectRatio index)⁻¹) regime (𝓝[>] 0)) ∧
+    (∀ index, constant / Real.sqrt (aspectRatio index) =
+      constant * Real.sqrt ((aspectRatio index)⁻¹)) := by
+  constructor
+  · exact aspectAtTop_iff_inverseTendstoNhdsGTZero regime aspectRatio
+  · intro index
+    exact div_sqrt_eq_mul_sqrt_inv constant (aspectRatio index)
+
+/-- A fixed positive scalar genomic information gap eventually survives
+whenever the random-design aspect ratio diverges and comparison error has the
+Wishart-scale `constant / sqrt aspectRatio` form. -/
+theorem matchedBayes_randomDesignEventuallySeparates_ofAspectAtTop
+    {Index : Type*} (regime : Filter Index)
+    (scalarLeft scalarRight delta constant : ℝ)
+    (aspectRatio randomLeft randomRight : Index → ℝ)
+    (hleft : ∀ index,
+      |randomLeft index - scalarLeft| ≤ constant / Real.sqrt (aspectRatio index))
+    (hright : ∀ index,
+      |randomRight index - scalarRight| ≤ constant / Real.sqrt (aspectRatio index))
+    (hgap : scalarRight - scalarLeft = delta) (hpositive : 0 < delta)
+    (haspectRatio : Filter.Tendsto aspectRatio regime Filter.atTop) :
+    ∀ᶠ index in regime, randomLeft index < randomRight index :=
+  randomDesign_eventually_separates_of_scalarGap_of_aspectAtTop regime
+    scalarLeft scalarRight delta constant aspectRatio randomLeft randomRight
+    hleft hright hgap hpositive haspectRatio
+
+/-- A genomic matched-information error bounded at the derived Wishart scale
+vanishes when the adjusted dimension/sample ratio tends to zero. -/
+theorem matchedBayes_wishartInformationErrorVanishes
+    {Index : Type*} (regime : Filter Index)
+    (informationError adjustedRatio : Index → ℝ) (constant : ℝ)
+    (hratio : Filter.Tendsto adjustedRatio regime (nhds 0))
+    (herror : ∀ index,
+      |informationError index| ≤ constant * Real.sqrt (adjustedRatio index)) :
+    Filter.Tendsto informationError regime (nhds 0) :=
+  matchedInformationError_tendsto_zero_of_wishartRatio
+    regime informationError adjustedRatio constant hratio herror
+
+/-- Two genomic design sequences may have different aspect ratios and
+different Wishart comparison constants.  Independent vanishing of their two
+explicit error scales still transfers every positive scalar information gap. -/
+theorem matchedBayes_randomDesignEventuallySeparates_ofAsymmetricWishartRatios
+    {Index : Type*} (regime : Filter Index)
+    (scalarLeft scalarRight delta leftConstant rightConstant : ℝ)
+    (leftRatio rightRatio randomLeft randomRight : Index → ℝ)
+    (hleft : ∀ index,
+      |randomLeft index - scalarLeft| ≤
+        leftConstant * Real.sqrt (leftRatio index))
+    (hright : ∀ index,
+      |randomRight index - scalarRight| ≤
+        rightConstant * Real.sqrt (rightRatio index))
+    (hgap : scalarRight - scalarLeft = delta) (hpositive : 0 < delta)
+    (hleftRatio : Filter.Tendsto leftRatio regime (nhds 0))
+    (hrightRatio : Filter.Tendsto rightRatio regime (nhds 0)) :
+    ∀ᶠ index in regime, randomLeft index < randomRight index :=
+  randomDesign_eventually_separates_of_scalarGap_of_asymmetricWishartRatios regime
+    scalarLeft scalarRight delta leftConstant rightConstant leftRatio rightRatio
+    randomLeft randomRight hleft hright hgap hpositive hleftRatio hrightRatio
+
+/-- At the explicit Wishart rate, every fixed positive scalar genomic
+information gap eventually transfers when `(p+1)/n` tends to zero. -/
+theorem matchedBayes_randomDesignEventuallySeparates_ofWishartRatio
+    {Index : Type*} (regime : Filter Index)
+    (scalarLeft scalarRight delta constant : ℝ)
+    (adjustedRatio randomLeft randomRight : Index → ℝ)
+    (hleft : ∀ index,
+      |randomLeft index - scalarLeft| ≤
+        constant * Real.sqrt (adjustedRatio index))
+    (hright : ∀ index,
+      |randomRight index - scalarRight| ≤
+        constant * Real.sqrt (adjustedRatio index))
+    (hgap : scalarRight - scalarLeft = delta) (hpositive : 0 < delta)
+    (hratio : Filter.Tendsto adjustedRatio regime (nhds 0)) :
+    ∀ᶠ index in regime, randomLeft index < randomRight index :=
+  randomDesign_eventually_separates_of_scalarGap_of_wishartRatio regime
+    scalarLeft scalarRight delta constant adjustedRatio randomLeft randomRight
+    hleft hright hgap hpositive hratio
+
+/-- A bounded genomic rank-one covariance perturbation has vanishing matched
+information-density effect once its certified path nuclear distance is
+identified with the concrete singular spectrum. -/
+theorem matchedBayes_certifiedRankOnePerturbation_isAsymptoticallyInvisible
+    (certificate : ℕ → MatchedInformationPathCertificate)
+    (varianceBound spikeStrength : ℝ) (hspike : 0 ≤ spikeStrength)
+    (hvarianceBound : ∀ population,
+      (certificate population).variance ≤ varianceBound)
+    (hnuclear : ∀ population,
+      (certificate population).nuclearDistance =
+        (finiteRankOneSingularSpectrum population spikeStrength hspike).normalizedNuclearDistance) :
+    Filter.Tendsto
+      (fun population ↦ (certificate population).informationPath 1 -
+        (certificate population).informationPath 0)
+      Filter.atTop (nhds 0) :=
+  matchedInformationPath_rankOne_tendsto_zero_of_varianceBound
+    certificate varianceBound spikeStrength hspike hvarianceBound hnuclear
+
+/-- The genomic matched-information nuclear estimate follows from a certified
+matrix I--MMSE interpolation path and its posterior-covariance trace bound. -/
+theorem matchedBayes_informationPath_nuclearBound
+    (certificate : MatchedInformationPathCertificate) :
+    |certificate.informationPath 1 - certificate.informationPath 0| ≤
+      certificate.variance / 2 * certificate.nuclearDistance :=
+  matchedInformationPath_nuclear_bound certificate
+
+/-- The complete genomic Wishart comparison ledger: I--MMSE sensitivity,
+nuclear-to-Frobenius control, and the Wishart Frobenius scale yield the exact
+normalized `sqrt ((p+1)/n)` information error. -/
+theorem matchedBayes_wishartFrobeniusComparisonRate
+    (dimension sampleSize signal variance operatorBound : ℝ)
+    (informationError nuclearError frobeniusError : ℝ)
+    (hdimension : 0 < dimension) (hsampleSize : 0 < sampleSize)
+    (hsignal : 0 ≤ signal) (hvariance : 0 ≤ variance)
+    (hinformation : |informationError| ≤
+      signal * variance / (2 * dimension) * nuclearError)
+    (hnuclear : nuclearError ≤ Real.sqrt dimension * frobeniusError)
+    (hfrobenius : frobeniusError ≤ operatorBound *
+      Real.sqrt (dimension * ((dimension + 1) / sampleSize))) :
+    |informationError| ≤ signal * variance * operatorBound / 2 *
+      Real.sqrt ((dimension + 1) / sampleSize) :=
+  matchedInformationError_le_of_wishartFrobenius
+    dimension sampleSize signal variance operatorBound informationError nuclearError
+    frobeniusError hdimension hsampleSize hsignal hvariance hinformation
+    hnuclear hfrobenius
+
+/-- Starting only from the exact Wishart second-moment identity, covariance
+trace bounds, and the I--MMSE/nuclear/Frobenius comparisons, the genomic
+matched-information error has the explicit normalized rate. -/
+theorem matchedBayes_wishartMomentIdentityComparisonRate
+    (dimension sampleSize signal variance operatorBound covarianceTrace
+      covarianceTraceSq frobeniusSecondMoment frobeniusError nuclearError
+      informationError : ℝ)
+    (hdimension : 0 < dimension) (hsampleSize : 0 < sampleSize)
+    (hsignal : 0 ≤ signal) (hvariance : 0 ≤ variance)
+    (hoperator : 0 ≤ operatorBound)
+    (htrace : |covarianceTrace| ≤ dimension * operatorBound)
+    (htraceSq : covarianceTraceSq ≤ dimension * operatorBound ^ 2)
+    (hmoment : frobeniusSecondMoment =
+      (covarianceTrace ^ 2 + covarianceTraceSq) / sampleSize)
+    (hfrobenius : frobeniusError ≤ Real.sqrt frobeniusSecondMoment)
+    (hnuclear : nuclearError ≤ Real.sqrt dimension * frobeniusError)
+    (hinformation : |informationError| ≤
+      signal * variance / (2 * dimension) * nuclearError) :
+    |informationError| ≤ signal * variance * operatorBound / 2 *
+      Real.sqrt ((dimension + 1) / sampleSize) :=
+  matchedInformationError_le_of_wishartMomentIdentity
+    dimension sampleSize signal variance operatorBound covarianceTrace
+    covarianceTraceSq frobeniusSecondMoment frobeniusError nuclearError
+    informationError hdimension hsampleSize hsignal hvariance hoperator htrace
+    htraceSq hmoment hfrobenius hnuclear hinformation
+
+/-- Certified genomic matched-information paths become asymptotically
+indistinguishable whenever their covariance perturbations have vanishing rank
+fraction and their prior variances admit one uniform bound. -/
+theorem matchedBayes_certifiedSublinearRank_isInvisible_ofVarianceBound
+    {Index : Type*} (regime : Filter Index)
+    (certificate : Index → MatchedInformationPathCertificate)
+    (varianceBound operatorBound : ℝ) (rankFraction : Index → ℝ)
+    (hvarianceBound : ∀ index, (certificate index).variance ≤ varianceBound)
+    (hrankVanishing : Filter.Tendsto rankFraction regime (nhds 0))
+    (hnuclearRank : ∀ index,
+      (certificate index).nuclearDistance ≤ operatorBound * rankFraction index) :
+    MatchedInformationPathGapTendsToZero regime certificate :=
+  matchedInformationPath_lowRank_tendsto_zero_of_varianceBound regime certificate
+    varianceBound operatorBound rankFraction hvarianceBound
+    hrankVanishing hnuclearRank
+
+/-- Exact common variance is only a specialization of uniform boundedness. -/
+theorem matchedBayes_certifiedSublinearRank_isInvisible
+    {Index : Type*} (regime : Filter Index)
+    (certificate : Index → MatchedInformationPathCertificate)
+    (operatorBound : ℝ) (rankFraction : Index → ℝ)
+    (hvariance : ∃ variance : ℝ, ∀ index, (certificate index).variance = variance)
+    (hrankVanishing : Filter.Tendsto rankFraction regime (nhds 0))
+    (hnuclearRank : ∀ index,
+      (certificate index).nuclearDistance ≤ operatorBound * rankFraction index) :
+    MatchedInformationPathGapTendsToZero regime certificate :=
+  matchedInformationPath_lowRank_tendsto_zero regime certificate operatorBound
+    rankFraction hvariance hrankVanishing hnuclearRank
+
 /-- **A genomic covariance perturbation occupying a vanishing rank fraction
 cannot create an order-one matched information-density separation under the
 matrix I-MMSE/nuclear estimate.**  Thus the extensive-rank requirement for a
@@ -570,6 +930,72 @@ theorem matchedBayes_sublinearRankPerturbation_isAsymptoticallyInvisible
     Filter.Tendsto densityGap Filter.atTop (nhds 0) :=
   matchedDensity_lowRank_tendsto_zero_of_nuclearEstimate
     densityGap rankFraction constant hrankVanishing hnuclear
+
+/-- A fixed positive matched genomic information-density gap forces an
+explicit positive covariance-rank fraction under the matrix I--MMSE/nuclear
+estimate. -/
+theorem matchedBayes_positiveGap_forcesExtensiveRank
+    (densityGap constant rankFraction delta : ℝ)
+    (hconstant : 0 < constant) (hdelta : 0 < delta)
+    (hgap : delta ≤ |densityGap|)
+    (hnuclear : |densityGap| ≤ constant * rankFraction) :
+    0 < rankFraction ∧ delta / constant ≤ rankFraction :=
+  matchedDensity_positiveGap_forces_rankFraction
+    densityGap constant rankFraction delta hconstant hdelta hgap hnuclear
+
+/-- A finite genomic information gap certified directly by an I--MMSE path
+forces an explicit rank fraction under only a prior-variance upper bound. -/
+theorem matchedBayes_certifiedPositiveGap_forcesExtensiveRank
+    (certificate : MatchedInformationPathCertificate)
+    (varianceBound operatorBound rankFraction delta : ℝ)
+    (hvarianceBound : certificate.variance ≤ varianceBound)
+    (hvariancePositive : 0 < varianceBound) (hoperator : 0 < operatorBound)
+    (hdelta : 0 < delta)
+    (hgap : delta ≤
+      |certificate.informationPath 1 - certificate.informationPath 0|)
+    (hnuclearRank : certificate.nuclearDistance ≤ operatorBound * rankFraction) :
+    0 < rankFraction ∧
+      delta / (varianceBound * operatorBound / 2) ≤ rankFraction :=
+  matchedInformationPath_positiveGap_forces_rankFraction_of_varianceBound
+    certificate varianceBound operatorBound rankFraction delta hvarianceBound
+    hvariancePositive hoperator hdelta hgap hnuclearRank
+
+/-- A persistent genomic information gap certified by I--MMSE paths forces
+the exact eventual extensive-rank lower bound and excludes sublinear rank. -/
+theorem matchedBayes_certifiedPersistentGap_requiresExtensiveRank
+    {Index : Type*} (regime : Filter Index) [regime.NeBot]
+    (certificate : Index → MatchedInformationPathCertificate)
+    (varianceBound operatorBound delta : ℝ) (rankFraction : Index → ℝ)
+    (hvariancePositive : 0 < varianceBound) (hoperator : 0 < operatorBound)
+    (hdelta : 0 < delta)
+    (hvarianceBound : ∀ index, (certificate index).variance ≤ varianceBound)
+    (hnuclearRank : ∀ index,
+      (certificate index).nuclearDistance ≤ operatorBound * rankFraction index)
+    (hgap : ∀ᶠ index in regime, delta ≤
+      |(certificate index).informationPath 1 -
+        (certificate index).informationPath 0|) :
+    (∀ᶠ index in regime,
+      delta / (varianceBound * operatorBound / 2) ≤ rankFraction index) ∧
+      ¬ Filter.Tendsto rankFraction regime (nhds 0) :=
+  matchedInformationPath_persistentGap_requires_extensiveRank regime certificate
+    varianceBound operatorBound delta rankFraction hvariancePositive hoperator
+    hdelta hvarianceBound hnuclearRank hgap
+
+/-- A persistent order-one matched genomic information gap cannot be produced
+by a perturbation whose covariance-rank fraction vanishes. -/
+theorem matchedBayes_persistentGap_requiresExtensiveRank
+    {Index : Type*} (regime : Filter Index) [regime.NeBot]
+    (densityGap rankFraction : Index → ℝ) (constant delta : ℝ)
+    (hconstant : 0 < constant) (hdelta : 0 < delta)
+    (hgap : ∀ᶠ index in regime, delta ≤ |densityGap index|)
+    (hnuclear : ∀ index,
+      |densityGap index| ≤ constant * rankFraction index) :
+    (∀ᶠ index in regime, delta / constant ≤ rankFraction index) ∧
+      ¬ Filter.Tendsto rankFraction regime (nhds 0) :=
+  ⟨matchedDensity_eventualGap_forces_eventualRankFraction
+      regime densityGap rankFraction constant delta hconstant hdelta hgap hnuclear,
+    matchedDensity_eventualGap_not_sublinearRank
+      regime densityGap rankFraction constant delta hconstant hdelta hgap hnuclear⟩
 
 /-- A degree-limited genomic risk functional cannot distinguish designs with the same truncated
 traffic profile, so the complete Bayes gap transfers to every procedure in the class. -/
@@ -618,6 +1044,117 @@ theorem permutationInvariantGenomicPolynomial_factorsThroughLDGraphs
       ∑ graph, graphShapeCoefficient shape coefficient graph *
         ∑ monomial, if shape monomial = graph then value monomial else 0 :=
   invariantPolynomial_graphSum_factorization shape coefficient value hshape hinvariant
+
+/-- **Canonical finite genomic traffic factorization.**  The graph index is
+the quotient of endpoint assignments by equality pattern, so callers need not
+provide or validate a separate graph-shape encoding. -/
+theorem permutationInvariantGenomicPolynomial_factorsThroughCanonicalLDGraphs
+    {Slot Locus : Type*} [Fintype Slot] [DecidableEq Slot] [Fintype Locus]
+    (coefficient value : (Slot → Locus) → ℝ)
+    (hinvariant : ∀ (permutation : Equiv.Perm Locus) monomial,
+      coefficient (permutation ∘ monomial) = coefficient monomial) :
+    CanonicalTrafficFactorizationStatement coefficient value :=
+  invariantPolynomial_canonicalTraffic_factorization coefficient value hinvariant
+
+/-- **Canonical rooted genomic traffic factorization.**  The distinguished
+`none` slot records the output locus, formally supplying the rooted graph
+version needed for permutation-equivariant vector estimators. -/
+theorem permutationEquivariantGenomicPolynomial_factorsThroughRootedLDGraphs
+    {Slot Locus : Type*} [Fintype Slot] [DecidableEq Slot] [Fintype Locus]
+    (coefficient value : (Option Slot → Locus) → ℝ)
+    (hinvariant : ∀ (permutation : Equiv.Perm Locus) monomial,
+      coefficient (permutation ∘ monomial) = coefficient monomial) :
+    RootedCanonicalTrafficFactorizationStatement coefficient value :=
+  rootedInvariantPolynomial_canonicalTraffic_factorization coefficient value hinvariant
+
+/-- A genomic polynomial of total degree at most `D`, decomposed into its
+homogeneous degrees, factors exactly through canonical LD traffic graphs with
+at most `D` ordered edges. -/
+theorem degreeLimitedGenomicPolynomial_factorsThroughCanonicalLDGraphs
+    {D : ℕ} {Locus : Type*} [Fintype Locus]
+    (coefficient value : (degree : Fin (D + 1)) →
+      ((Fin (degree : ℕ) × Bool → Locus) → ℝ))
+    (hinvariant : ∀ degree (permutation : Equiv.Perm Locus) monomial,
+      coefficient degree (permutation ∘ monomial) = coefficient degree monomial) :
+    DegreeAtMostTrafficFactorizationStatement coefficient value :=
+  degreeAtMostInvariantPolynomial_canonicalTraffic_factorization
+    coefficient value hinvariant
+
+/-- The corresponding degree-limited permutation-equivariant genomic vector
+polynomial factors through rooted LD graphs with the same edge bound. -/
+theorem degreeLimitedGenomicEquivariantPolynomial_factorsThroughRootedLDGraphs
+    {D : ℕ} {Locus : Type*} [Fintype Locus]
+    (coefficient value : (degree : Fin (D + 1)) →
+      ((Option (Fin (degree : ℕ) × Bool) → Locus) → ℝ))
+    (hinvariant : ∀ degree (permutation : Equiv.Perm Locus) monomial,
+      coefficient degree (permutation ∘ monomial) = coefficient degree monomial) :
+    DegreeAtMostRootedTrafficFactorizationStatement coefficient value :=
+  degreeAtMostRootedInvariantPolynomial_canonicalTraffic_factorization
+    coefficient value hinvariant
+
+/-- Equal canonical LD profiles make every invariant scalar genomic
+polynomial of degree at most `D` exactly equal on the two designs. -/
+theorem degreeLimitedGenomicPolynomial_eq_ofCanonicalLDProfileEq
+    {D : ℕ} {Locus : Type*} [Fintype Locus]
+    (coefficient leftValue rightValue : (degree : Fin (D + 1)) →
+      ((Fin (degree : ℕ) × Bool → Locus) → ℝ))
+    (hinvariant : ∀ degree (permutation : Equiv.Perm Locus) monomial,
+      coefficient degree (permutation ∘ monomial) = coefficient degree monomial)
+    (htraffic : degreeAtMostCanonicalTrafficProfile leftValue =
+      degreeAtMostCanonicalTrafficProfile rightValue) :
+    (∑ degree : Fin (D + 1),
+      ∑ monomial, coefficient degree monomial * leftValue degree monomial) =
+      ∑ degree : Fin (D + 1),
+        ∑ monomial, coefficient degree monomial * rightValue degree monomial :=
+  degreeAtMostInvariantPolynomial_eq_of_canonicalTrafficProfile_eq
+    coefficient leftValue rightValue hinvariant htraffic
+
+/-- Equal rooted LD profiles likewise make every equivariant genomic
+polynomial coordinate of degree at most `D` exactly equal. -/
+theorem degreeLimitedGenomicEquivariantPolynomial_eq_ofRootedLDProfileEq
+    {D : ℕ} {Locus : Type*} [Fintype Locus]
+    (coefficient leftValue rightValue : (degree : Fin (D + 1)) →
+      ((Option (Fin (degree : ℕ) × Bool) → Locus) → ℝ))
+    (hinvariant : ∀ degree (permutation : Equiv.Perm Locus) monomial,
+      coefficient degree (permutation ∘ monomial) = coefficient degree monomial)
+    (htraffic : degreeAtMostRootedCanonicalTrafficProfile leftValue =
+      degreeAtMostRootedCanonicalTrafficProfile rightValue) :
+    (∑ degree : Fin (D + 1),
+      ∑ monomial, coefficient degree monomial * leftValue degree monomial) =
+      ∑ degree : Fin (D + 1),
+        ∑ monomial, coefficient degree monomial * rightValue degree monomial :=
+  degreeAtMostRootedInvariantPolynomial_eq_of_canonicalTrafficProfile_eq
+    coefficient leftValue rightValue hinvariant htraffic
+
+/-- **Direct genomic fixed-degree hardness.**  Equal canonical LD profiles
+force every uniform invariant degree-`D` polynomial procedure to have the same
+risk on both designs, so right-design Bayes optimality transfers the complete
+Bayes gap to one common left-design hard instance. -/
+theorem degreeLimitedGenomicPolynomial_fullGapHardness_fromCanonicalLDProfile
+    {Algorithm : Type*} {D : ℕ} {Locus : Type*} [Fintype Locus]
+    (coefficient : Algorithm → (degree : Fin (D + 1)) →
+      ((Fin (degree : ℕ) × Bool → Locus) → ℝ))
+    (leftValue rightValue : (degree : Fin (D + 1)) →
+      ((Fin (degree : ℕ) × Bool → Locus) → ℝ))
+    (hinvariant : ∀ algorithm degree (permutation : Equiv.Perm Locus) monomial,
+      coefficient algorithm degree (permutation ∘ monomial) =
+        coefficient algorithm degree monomial)
+    (htraffic : degreeAtMostCanonicalTrafficProfile leftValue =
+      degreeAtMostCanonicalTrafficProfile rightValue)
+    (bayesLeft bayesRight : ℝ)
+    (hoptimalRight : ∀ algorithm,
+      bayesRight ≤ ∑ degree : Fin (D + 1),
+        ∑ monomial,
+          coefficient algorithm degree monomial * rightValue degree monomial)
+    (algorithm : Algorithm) :
+    bayesRight - bayesLeft ≤
+      (∑ degree : Fin (D + 1),
+        ∑ monomial,
+          coefficient algorithm degree monomial * leftValue degree monomial) -
+        bayesLeft :=
+  degreeAtMostInvariantPolynomial_hardness_of_canonicalTrafficProfile_eq
+    coefficient leftValue rightValue hinvariant htraffic bayesLeft bayesRight
+    hoptimalRight algorithm
 
 /-- **A finite tilt net quantitatively controls the full genomic pressure
 profile.**  Uniform `K`-Lipschitz control converts radius-`ρ` coordinate error
@@ -1670,13 +2207,34 @@ structure UnifiedBiologyObstructions : Prop where
             finiteRankOneTrafficCorrection coefficient hasOddDegree vertices edges
               (population + 1))
           Filter.atTop (nhds 0)
+  /-- The same concrete balanced matrices simultaneously certify PSD order,
+  traffic invisibility, the finite Hamiltonian, ground-state equality, and
+  supercritical pressure separation. -/
+  positiveLDBalancedRankOneCovarianceHasFullWitness :
+    ∀ (Term : Type) [Fintype Term]
+      (coefficient : Term → ℝ) (hasOddDegree : Term → Bool)
+      (vertices edges : Term → ℕ),
+      (∀ term, hasOddDegree term = false → vertices term ≤ edges term) →
+      ∀ baseline spikeStrength temperature : ℝ,
+        0 ≤ baseline → 0 < spikeStrength →
+        1 < temperature * spikeStrength →
+          ConcreteBalancedPSDPressureWitness coefficient hasOddDegree vertices edges
+            baseline spikeStrength temperature
   /-- A mesoscopic LD block vanishes from every fixed traffic coordinate but has unit normalized
   energy after a logarithmic number of power iterations. -/
   rareLDSubspaceEvadesFixedTrafficAtLogRuntime :
-    (∀ edges : ℕ,
-      Filter.Tendsto (fun iteration ↦ diagonalTrafficCorrection 1 edges iteration)
-        Filter.atTop (nhds 0)) ∧
-      ∀ iteration : ℕ, mesoscopicGFOMEnergy iteration iteration = 1
+    FixedTrafficLogRuntimeSeparation
+  /-- The genuine finite diagonal iteration realizes the same separation with
+  ambient dimension `16^k`, exceptional rank `4^k`, fixed-time decay, and
+  unit logarithmic-time normalized output. -/
+  rareLDSubspaceConcreteGFOMEvadesFixedTrafficAtLogRuntime :
+    ConcreteGFOMLogRuntimeSeparation
+  /-- A positive rank-one LD outlier is invisible to every limiting bulk
+  spectral observable but changes the spectral maximum and trace-one PSD SDP
+  optimum at every finite size. -/
+  genomicBulkSpectralLawDoesNotDetermineExtremalSpectrumOrSDP :
+    ∀ baseline spikeStrength : ℝ, 0 < spikeStrength →
+      BulkSpectralLawExtremalSDPSeparation baseline spikeStrength
   /-- Every finite contracted rank-one LD traffic expansion vanishes, while
   the associated variational pressure is positive above `tλ = 1`. -/
   positiveLDSpikeFixedTrafficInvisibleVariationalPressureVisible :
@@ -1692,25 +2250,88 @@ structure UnifiedBiologyObstructions : Prop where
             Filter.atTop (nhds 0) ∧
           0 < cwVariationalPressureGap tlam
   /-- Every fixed genomic traffic coordinate misses the positive LD spike, but
-  its genuine finite Rademacher pressure is positive above the explicit
-  aligned-state threshold, with no LDP premise. -/
+  its genuine finite Rademacher pressure has a positive uniform lower bound
+  throughout the exact supercritical regime, with no LDP premise. -/
   positiveLDSpikeFixedTrafficInvisibleFinitePressureVisible :
     ∀ (Term : Type) [Fintype Term]
       (coefficient : Term → ℝ) (hasOddDegree : Term → Bool)
       (vertices edges : Term → ℕ),
       (∀ term, hasOddDegree term = false → vertices term ≤ edges term) →
-      ∀ tlam : ℝ, 2 * Real.log 2 < tlam →
+      ∀ tlam : ℝ, 1 < tlam →
         RankOneSpikeInvisibleWithFinitePressure
           coefficient hasOddDegree vertices edges tlam
+  /-- Every interior magnetisation objective lower-bounds genuine finite
+  genomic pressure at each nonempty population. -/
+  genomicFiniteCWPressureDominatesVariationalObjective :
+    ∀ (population : ℕ) (tlam m : ℝ),
+      0 < population → 0 ≤ tlam → |m| < 1 →
+        cwObjective tlam m ≤ finiteCWPressureGap population tlam
+  /-- Every finite genotype-count type has mass at most one at and below the
+  critical LD coupling. -/
+  genomicFiniteCWTypeMassLeOneOfSubcritical :
+    ∀ (population upSpins : ℕ) (tlam : ℝ),
+      tlam ≤ 1 → upSpins ∈ Finset.range (population + 1) →
+        finiteCWTypeMass population tlam upSpins ≤ 1
+  /-- For nonnegative coupling, the actual finite genomic pressure converges
+  to baseline exactly at and below the Curie--Weiss threshold. -/
+  genomicFiniteCWPressureHasExactCriticalPoint :
+    ∀ tlam : ℝ, 0 ≤ tlam →
+      (Filter.Tendsto
+          (fun population : ℕ ↦ finiteCWPressureGap (population + 1) tlam)
+          Filter.atTop (nhds 0) ↔
+        tlam ≤ 1)
+  /-- The actual finite genomic pressure converges to its full variational LD
+  value for all nonnegative couplings. -/
+  genomicFiniteCWPressureConvergesToVariational :
+    ∀ tlam : ℝ, 0 ≤ tlam →
+      Filter.Tendsto
+        (fun population : ℕ ↦ finiteCWPressureGap (population + 1) tlam)
+        Filter.atTop (nhds (cwVariationalPressureGap tlam))
+  /-- The full finite genomic pressure limit is uniform over all nonnegative
+  LD couplings. -/
+  genomicFiniteCWPressureConvergesUniformlyOnNonnegative :
+    TendstoUniformlyOn
+      (fun population : ℕ ↦ fun tlam : ℝ ↦
+        finiteCWPressureGap (population + 1) tlam)
+      cwVariationalPressureGap Filter.atTop (Set.Ici 0)
+  /-- Every nonempty finite genomic population has globally half-Lipschitz
+  pressure in effective coupling. -/
+  genomicFiniteCWPressureIsHalfLipschitz :
+    ∀ population : ℕ, 0 < population →
+      LipschitzWith (⟨1 / 2, by norm_num⟩ : NNReal)
+        (finiteCWPressureGap population)
+  /-- Every nonempty finite genomic population has pressure monotone in
+  effective LD coupling. -/
+  genomicFiniteCWPressureIsMonotone :
+    ∀ population : ℕ, 0 < population →
+      Monotone (finiteCWPressureGap population)
   /-- At every nonempty population, the genuine rank-one-spiked genomic
-  pressure strictly exceeds the unspiked baseline above `2 log 2`. -/
+  pressure strictly exceeds the unspiked baseline throughout `tλ > 1`. -/
   positiveLDSpikeFinitePressureExceedsBaseline :
     ∀ (baseline : ℝ) (population : ℕ)
       (temperature spikeStrength : ℝ),
-      0 < population → 2 * Real.log 2 < temperature * spikeStrength →
+      0 < population → 1 < temperature * spikeStrength →
         finiteBaselineRademacherPressure baseline temperature <
           finiteRankOneRademacherPressure
             baseline population temperature spikeStrength
+  /-- The genuine spiked-minus-baseline genomic pressure has exact critical
+  effective coupling one. -/
+  positiveLDSpikePressureDifferenceHasExactCriticalPoint :
+    ∀ baseline temperature spikeStrength : ℝ,
+      0 ≤ temperature * spikeStrength →
+        FiniteRankOnePressureCriticalStatement baseline temperature spikeStrength
+  /-- The complete finite LD-spiked pressure converges to baseline plus its
+  variational pressure correction. -/
+  positiveLDSpikePressureConvergesToVariational :
+    ∀ baseline temperature spikeStrength : ℝ,
+      0 ≤ temperature * spikeStrength →
+        FiniteRankOnePressureVariationalLimitStatement
+          baseline temperature spikeStrength
+  /-- At fixed nonnegative temperature, finite LD-spiked pressure converges
+  uniformly over all nonnegative spike strengths. -/
+  positiveLDSpikePressureConvergesUniformlyOnNonnegativeStrength :
+    ∀ baseline temperature : ℝ, 0 ≤ temperature →
+      FiniteRankOnePressureUniformLimitStatement baseline temperature
   /-- One positive LD spike simultaneously defeats fixed traffic sufficiency
   and the lower-ground-state characterization. -/
   positiveLDSpikeRefutesTrafficAndGroundStateDichotomies :
@@ -1745,6 +2366,21 @@ structure UnifiedBiologyObstructions : Prop where
   below the Curie--Weiss threshold. -/
   ldVariationalPressureGapHasExactCriticalPoint :
     ∀ tlam : ℝ, cwVariationalPressureGap tlam = 0 ↔ tlam ≤ 1
+  /-- The genomic LD pressure profile is globally half-Lipschitz, continuous,
+  monotone, and convex in effective coupling. -/
+  ldVariationalPressureGapHasGlobalRegularity :
+    LipschitzWith (⟨1 / 2, by norm_num⟩ : NNReal) cwVariationalPressureGap ∧
+      Continuous cwVariationalPressureGap ∧
+        Monotone cwVariationalPressureGap ∧
+          ConvexOn ℝ Set.univ cwVariationalPressureGap
+  /-- The sharp scalar-to-random-design ledger subtracts the sum of two
+  independently certified comparison errors. -/
+  matchedBayesRandomDesignAsymmetricReduction :
+    ∀ scalarLeft scalarRight randomLeft randomRight leftError rightError delta : ℝ,
+      |randomLeft - scalarLeft| ≤ leftError →
+      |randomRight - scalarRight| ≤ rightError →
+      scalarRight - scalarLeft = delta →
+        delta - (leftError + rightError) ≤ randomRight - randomLeft
   /-- Scalar matched-channel separation transfers to random design with exactly two comparison
   errors and no hidden constant. -/
   matchedBayesRandomDesignReduction :
@@ -1753,6 +2389,18 @@ structure UnifiedBiologyObstructions : Prop where
       |randomRight - scalarRight| ≤ epsilon →
       scalarRight - scalarLeft = delta →
         delta - 2 * epsilon ≤ randomRight - randomLeft
+  /-- Independent vanishing comparison bounds on the two designs suffice for
+  eventual transfer of every positive scalar gap. -/
+  matchedBayesRandomDesignEventuallySeparatesWithAsymmetricErrors :
+    ∀ (Index : Type) (regime : Filter Index)
+      (scalarLeft scalarRight delta : ℝ)
+      (randomLeft randomRight leftError rightError : Index → ℝ),
+      (∀ index, |randomLeft index - scalarLeft| ≤ leftError index) →
+      (∀ index, |randomRight index - scalarRight| ≤ rightError index) →
+      scalarRight - scalarLeft = delta → 0 < delta →
+      Filter.Tendsto leftError regime (nhds 0) →
+      Filter.Tendsto rightError regime (nhds 0) →
+        ∀ᶠ index in regime, randomLeft index < randomRight index
   /-- Every positive scalar matched-channel gap eventually transfers along a
   regime whose random-design comparison error vanishes. -/
   matchedBayesRandomDesignEventuallySeparates :
@@ -1764,6 +2412,153 @@ structure UnifiedBiologyObstructions : Prop where
       scalarRight - scalarLeft = delta → 0 < delta →
       Filter.Tendsto comparisonError regime (nhds 0) →
         ∀ᶠ index in regime, randomLeft index < randomRight index
+  /-- The explicit `constant / sqrt aspectRatio` comparison rate transfers a
+  scalar gap once it is below half the gap. -/
+  matchedBayesRandomDesignSeparatesAtLargeAspect :
+    ∀ scalarLeft scalarRight randomLeft randomRight aspectRatio constant delta : ℝ,
+      |randomLeft - scalarLeft| ≤ constant / Real.sqrt aspectRatio →
+      |randomRight - scalarRight| ≤ constant / Real.sqrt aspectRatio →
+      scalarRight - scalarLeft = delta →
+      2 * (constant / Real.sqrt aspectRatio) < delta →
+        randomLeft < randomRight
+  /-- Every fixed positive scalar gap eventually transfers when aspect ratio
+  tends to infinity at the inverse-square-root comparison rate. -/
+  matchedBayesRandomDesignEventuallySeparatesAtDivergingAspect :
+    ∀ (Index : Type) (regime : Filter Index)
+      (scalarLeft scalarRight delta constant : ℝ)
+      (aspectRatio randomLeft randomRight : Index → ℝ),
+      (∀ index,
+        |randomLeft index - scalarLeft| ≤ constant / Real.sqrt (aspectRatio index)) →
+      (∀ index,
+        |randomRight index - scalarRight| ≤ constant / Real.sqrt (aspectRatio index)) →
+      scalarRight - scalarLeft = delta → 0 < delta →
+      Filter.Tendsto aspectRatio regime Filter.atTop →
+        ∀ᶠ index in regime, randomLeft index < randomRight index
+  /-- Diverging aspect and vanishing reciprocal Wishart ratio are the same
+  one-sided limit, with identical pointwise comparison-error formulas. -/
+  matchedBayesAspectWishartRatioBridge :
+    ∀ (Index : Type) (regime : Filter Index)
+      (aspectRatio : Index → ℝ) (constant : ℝ),
+      (Filter.Tendsto aspectRatio regime Filter.atTop ↔
+        Filter.Tendsto (fun index ↦ (aspectRatio index)⁻¹) regime (𝓝[>] 0)) ∧
+      (∀ index, constant / Real.sqrt (aspectRatio index) =
+        constant * Real.sqrt ((aspectRatio index)⁻¹))
+  /-- A genomic comparison error at Wishart scale vanishes with the adjusted
+  dimension/sample ratio. -/
+  matchedBayesWishartInformationErrorVanishes :
+    ∀ (Index : Type) (regime : Filter Index)
+      (informationError adjustedRatio : Index → ℝ) (constant : ℝ),
+      Filter.Tendsto adjustedRatio regime (nhds 0) →
+      (∀ index,
+        |informationError index| ≤ constant * Real.sqrt (adjustedRatio index)) →
+        Filter.Tendsto informationError regime (nhds 0)
+  /-- The two genomic designs may use distinct Wishart constants and ratios;
+  independent vanishing transfers the scalar gap. -/
+  matchedBayesRandomDesignEventuallySeparatesAtAsymmetricWishartRatios :
+    ∀ (Index : Type) (regime : Filter Index)
+      (scalarLeft scalarRight delta leftConstant rightConstant : ℝ)
+      (leftRatio rightRatio randomLeft randomRight : Index → ℝ),
+      (∀ index, |randomLeft index - scalarLeft| ≤
+        leftConstant * Real.sqrt (leftRatio index)) →
+      (∀ index, |randomRight index - scalarRight| ≤
+        rightConstant * Real.sqrt (rightRatio index)) →
+      scalarRight - scalarLeft = delta → 0 < delta →
+      Filter.Tendsto leftRatio regime (nhds 0) →
+      Filter.Tendsto rightRatio regime (nhds 0) →
+        ∀ᶠ index in regime, randomLeft index < randomRight index
+  /-- Every fixed positive scalar genomic gap transfers at the Wishart rate
+  when `(p+1)/n` tends to zero. -/
+  matchedBayesRandomDesignEventuallySeparatesAtWishartRatio :
+    ∀ (Index : Type) (regime : Filter Index)
+      (scalarLeft scalarRight delta constant : ℝ)
+      (adjustedRatio randomLeft randomRight : Index → ℝ),
+      (∀ index,
+        |randomLeft index - scalarLeft| ≤
+          constant * Real.sqrt (adjustedRatio index)) →
+      (∀ index,
+        |randomRight index - scalarRight| ≤
+          constant * Real.sqrt (adjustedRatio index)) →
+      scalarRight - scalarLeft = delta → 0 < delta →
+      Filter.Tendsto adjustedRatio regime (nhds 0) →
+        ∀ᶠ index in regime, randomLeft index < randomRight index
+  /-- Finite singular-value support, rank, and operator bounds derive the
+  normalized genomic nuclear-distance inequality. -/
+  matchedBayesSingularSpectrumHasNormalizedNuclearBound :
+    ∀ (Coordinate : Type) [Fintype Coordinate] [DecidableEq Coordinate]
+      (spectrum : FiniteLowRankSingularSpectrum Coordinate),
+      0 < Fintype.card Coordinate →
+        spectrum.normalizedNuclearDistance ≤
+          spectrum.operatorBound * spectrum.rankFraction
+  /-- A concrete bounded rank-one genomic covariance perturbation has
+  vanishing certified matched-information effect. -/
+  matchedBayesCertifiedRankOnePerturbationIsAsymptoticallyInvisible :
+    ∀ (certificate : ℕ → MatchedInformationPathCertificate)
+      (varianceBound spikeStrength : ℝ) (hspike : 0 ≤ spikeStrength),
+      (∀ population, (certificate population).variance ≤ varianceBound) →
+      (∀ population,
+        (certificate population).nuclearDistance =
+          FiniteLowRankSingularSpectrum.normalizedNuclearDistance
+            (finiteRankOneSingularSpectrum population spikeStrength hspike)) →
+        Filter.Tendsto
+          (fun population ↦ (certificate population).informationPath 1 -
+            (certificate population).informationPath 0)
+          Filter.atTop (nhds 0)
+  /-- Matrix I--MMSE plus posterior-covariance trace control yields the matched
+  genomic nuclear Lipschitz estimate. -/
+  matchedBayesInformationPathHasNuclearBound :
+    ∀ certificate : MatchedInformationPathCertificate,
+      |certificate.informationPath 1 - certificate.informationPath 0| ≤
+        certificate.variance / 2 * certificate.nuclearDistance
+  /-- The I--MMSE, nuclear/Frobenius, and Wishart ledgers imply the exact
+  normalized matched-information comparison rate. -/
+  matchedBayesHasWishartFrobeniusComparisonRate :
+    ∀ dimension sampleSize signal variance operatorBound informationError
+      nuclearError frobeniusError : ℝ,
+      0 < dimension → 0 < sampleSize → 0 ≤ signal → 0 ≤ variance →
+      |informationError| ≤ signal * variance / (2 * dimension) * nuclearError →
+      nuclearError ≤ Real.sqrt dimension * frobeniusError →
+      frobeniusError ≤ operatorBound *
+        Real.sqrt (dimension * ((dimension + 1) / sampleSize)) →
+        |informationError| ≤ signal * variance * operatorBound / 2 *
+          Real.sqrt ((dimension + 1) / sampleSize)
+  /-- The exact Wishart moment identity and trace bounds imply the complete
+  normalized matched-information comparison rate. -/
+  matchedBayesHasWishartMomentIdentityComparisonRate :
+    ∀ dimension sampleSize signal variance operatorBound covarianceTrace
+      covarianceTraceSq frobeniusSecondMoment frobeniusError nuclearError
+      informationError : ℝ,
+      0 < dimension → 0 < sampleSize → 0 ≤ signal → 0 ≤ variance →
+      0 ≤ operatorBound →
+      |covarianceTrace| ≤ dimension * operatorBound →
+      covarianceTraceSq ≤ dimension * operatorBound ^ 2 →
+      frobeniusSecondMoment =
+        (covarianceTrace ^ 2 + covarianceTraceSq) / sampleSize →
+      frobeniusError ≤ Real.sqrt frobeniusSecondMoment →
+      nuclearError ≤ Real.sqrt dimension * frobeniusError →
+      |informationError| ≤ signal * variance / (2 * dimension) * nuclearError →
+        |informationError| ≤ signal * variance * operatorBound / 2 *
+          Real.sqrt ((dimension + 1) / sampleSize)
+  /-- A certified matched-information family with uniformly bounded prior
+  variance and vanishing rank fraction has vanishing information gap. -/
+  matchedBayesCertifiedSublinearRankIsInvisibleUnderVarianceBound :
+    ∀ (Index : Type) (regime : Filter Index)
+      (certificate : Index → MatchedInformationPathCertificate)
+      (varianceBound operatorBound : ℝ) (rankFraction : Index → ℝ),
+      (∀ index, (certificate index).variance ≤ varianceBound) →
+      Filter.Tendsto rankFraction regime (nhds 0) →
+      (∀ index,
+        (certificate index).nuclearDistance ≤ operatorBound * rankFraction index) →
+        MatchedInformationPathGapTendsToZero regime certificate
+  /-- Exact common variance is a special case of the uniform-bound result. -/
+  matchedBayesCertifiedSublinearRankIsInvisible :
+    ∀ (Index : Type) (regime : Filter Index)
+      (certificate : Index → MatchedInformationPathCertificate)
+      (operatorBound : ℝ) (rankFraction : Index → ℝ),
+      (∃ variance : ℝ, ∀ index, (certificate index).variance = variance) →
+      Filter.Tendsto rankFraction regime (nhds 0) →
+      (∀ index,
+        (certificate index).nuclearDistance ≤ operatorBound * rankFraction index) →
+        MatchedInformationPathGapTendsToZero regime certificate
   /-- Under the nuclear estimate, a vanishing-rank-fraction genomic covariance
   perturbation has vanishing matched information-density effect. -/
   matchedBayesSublinearRankPerturbationsAreInvisible :
@@ -1771,6 +2566,50 @@ structure UnifiedBiologyObstructions : Prop where
       Filter.Tendsto rankFraction Filter.atTop (nhds 0) →
       (∀ index, |densityGap index| ≤ constant * rankFraction index) →
         Filter.Tendsto densityGap Filter.atTop (nhds 0)
+  /-- A positive finite matched-density gap forces a quantitatively extensive
+  genomic covariance-rank fraction. -/
+  matchedBayesPositiveGapForcesExtensiveRank :
+    ∀ densityGap constant rankFraction delta : ℝ,
+      0 < constant → 0 < delta → delta ≤ |densityGap| →
+      |densityGap| ≤ constant * rankFraction →
+        0 < rankFraction ∧ delta / constant ≤ rankFraction
+  /-- A certified finite I--MMSE path gap forces the explicit extensive-rank
+  lower bound without assuming the final nuclear information estimate. -/
+  matchedBayesCertifiedPositiveGapForcesExtensiveRank :
+    ∀ (certificate : MatchedInformationPathCertificate)
+      (varianceBound operatorBound rankFraction delta : ℝ),
+      certificate.variance ≤ varianceBound →
+      0 < varianceBound → 0 < operatorBound → 0 < delta →
+      delta ≤ |certificate.informationPath 1 - certificate.informationPath 0| →
+      certificate.nuclearDistance ≤ operatorBound * rankFraction →
+        0 < rankFraction ∧
+          delta / (varianceBound * operatorBound / 2) ≤ rankFraction
+  /-- Persistent certified I--MMSE path separation forces the exact eventual
+  rank lower bound and excludes vanishing rank fraction. -/
+  matchedBayesCertifiedPersistentGapRequiresExtensiveRank :
+    ∀ (Index : Type) (regime : Filter Index) [regime.NeBot]
+      (certificate : Index → MatchedInformationPathCertificate)
+      (varianceBound operatorBound delta : ℝ) (rankFraction : Index → ℝ),
+      0 < varianceBound → 0 < operatorBound → 0 < delta →
+      (∀ index, (certificate index).variance ≤ varianceBound) →
+      (∀ index,
+        (certificate index).nuclearDistance ≤ operatorBound * rankFraction index) →
+      (∀ᶠ index in regime, delta ≤
+        |(certificate index).informationPath 1 -
+          (certificate index).informationPath 0|) →
+        (∀ᶠ index in regime,
+          delta / (varianceBound * operatorBound / 2) ≤ rankFraction index) ∧
+          ¬ Filter.Tendsto rankFraction regime (nhds 0)
+  /-- A persistent matched-density gap forces an eventual positive rank
+  fraction and rules out sublinear-rank perturbations. -/
+  matchedBayesPersistentGapRequiresExtensiveRank :
+    ∀ (Index : Type) (regime : Filter Index) [regime.NeBot]
+      (densityGap rankFraction : Index → ℝ) (constant delta : ℝ),
+      0 < constant → 0 < delta →
+      (∀ᶠ index in regime, delta ≤ |densityGap index|) →
+      (∀ index, |densityGap index| ≤ constant * rankFraction index) →
+        (∀ᶠ index in regime, delta / constant ≤ rankFraction index) ∧
+          ¬ Filter.Tendsto rankFraction regime (nhds 0)
   /-- Every degree-limited genomic risk that factors through a common truncated traffic profile
   inherits the complete Bayes-risk gap on one shared design. -/
   degreeLimitedGenomicRiskHasFullGapHardness :
@@ -1806,6 +2645,92 @@ structure UnifiedBiologyObstructions : Prop where
         (∑ monomial, coefficient monomial * value monomial) =
           ∑ graph, graphShapeCoefficient shape coefficient graph *
             ∑ monomial, if shape monomial = graph then value monomial else 0
+  /-- Canonical unrooted factorization through the quotient by endpoint
+  equality pattern requires no caller-supplied graph encoding. -/
+  permutationInvariantGenomicPolynomialFactorsThroughCanonicalLDGraphs :
+    ∀ (Slot Locus : Type) [Fintype Slot] [DecidableEq Slot] [Fintype Locus]
+      (coefficient value : (Slot → Locus) → ℝ),
+      (∀ (permutation : Equiv.Perm Locus) monomial,
+        coefficient (permutation ∘ monomial) = coefficient monomial) →
+        CanonicalTrafficFactorizationStatement coefficient value
+  /-- Canonical rooted factorization uses `none` as the output locus and
+  `some slot` as matrix-entry endpoint slots. -/
+  permutationEquivariantGenomicPolynomialFactorsThroughRootedLDGraphs :
+    ∀ (Slot Locus : Type) [Fintype Slot] [DecidableEq Slot] [Fintype Locus]
+      (coefficient value : (Option Slot → Locus) → ℝ),
+      (∀ (permutation : Equiv.Perm Locus) monomial,
+        coefficient (permutation ∘ monomial) = coefficient monomial) →
+        RootedCanonicalTrafficFactorizationStatement coefficient value
+  /-- The homogeneous decomposition proves exact traffic factorization for
+  every scalar genomic polynomial of total degree at most `D`. -/
+  degreeLimitedGenomicPolynomialFactorsThroughCanonicalLDGraphs :
+    ∀ (D : ℕ) (Locus : Type) [Fintype Locus]
+      (coefficient value : (degree : Fin (D + 1)) →
+        ((Fin (degree : ℕ) × Bool → Locus) → ℝ)),
+      (∀ degree (permutation : Equiv.Perm Locus) monomial,
+        coefficient degree (permutation ∘ monomial) = coefficient degree monomial) →
+        DegreeAtMostTrafficFactorizationStatement coefficient value
+  /-- The rooted homogeneous decomposition gives the corresponding exact
+  degree-`D` statement for equivariant vector-polynomial coordinates. -/
+  degreeLimitedGenomicEquivariantPolynomialFactorsThroughRootedLDGraphs :
+    ∀ (D : ℕ) (Locus : Type) [Fintype Locus]
+      (coefficient value : (degree : Fin (D + 1)) →
+        ((Option (Fin (degree : ℕ) × Bool) → Locus) → ℝ)),
+      (∀ degree (permutation : Equiv.Perm Locus) monomial,
+        coefficient degree (permutation ∘ monomial) = coefficient degree monomial) →
+        DegreeAtMostRootedTrafficFactorizationStatement coefficient value
+  /-- Equality of canonical profiles implies exact equality of every invariant
+  scalar polynomial of degree at most `D`. -/
+  degreeLimitedGenomicPolynomialIsDeterminedByCanonicalLDProfile :
+    ∀ (D : ℕ) (Locus : Type) [Fintype Locus]
+      (coefficient leftValue rightValue : (degree : Fin (D + 1)) →
+        ((Fin (degree : ℕ) × Bool → Locus) → ℝ)),
+      (∀ degree (permutation : Equiv.Perm Locus) monomial,
+        coefficient degree (permutation ∘ monomial) = coefficient degree monomial) →
+      degreeAtMostCanonicalTrafficProfile leftValue =
+        degreeAtMostCanonicalTrafficProfile rightValue →
+        (∑ degree : Fin (D + 1),
+          ∑ monomial, coefficient degree monomial * leftValue degree monomial) =
+          ∑ degree : Fin (D + 1),
+            ∑ monomial, coefficient degree monomial * rightValue degree monomial
+  /-- Equality of rooted profiles determines every equivariant polynomial
+  coordinate of degree at most `D`. -/
+  degreeLimitedGenomicEquivariantPolynomialIsDeterminedByRootedLDProfile :
+    ∀ (D : ℕ) (Locus : Type) [Fintype Locus]
+      (coefficient leftValue rightValue : (degree : Fin (D + 1)) →
+        ((Option (Fin (degree : ℕ) × Bool) → Locus) → ℝ)),
+      (∀ degree (permutation : Equiv.Perm Locus) monomial,
+        coefficient degree (permutation ∘ monomial) = coefficient degree monomial) →
+      degreeAtMostRootedCanonicalTrafficProfile leftValue =
+        degreeAtMostRootedCanonicalTrafficProfile rightValue →
+        (∑ degree : Fin (D + 1),
+          ∑ monomial, coefficient degree monomial * leftValue degree monomial) =
+          ∑ degree : Fin (D + 1),
+            ∑ monomial, coefficient degree monomial * rightValue degree monomial
+  /-- Direct invariant separation transfers the complete Bayes gap to every
+  uniform invariant degree-limited genomic polynomial procedure. -/
+  degreeLimitedGenomicPolynomialHasDirectFullGapHardness :
+    ∀ (Algorithm : Type) (D : ℕ) (Locus : Type) [Fintype Locus]
+      (coefficient : Algorithm → (degree : Fin (D + 1)) →
+        ((Fin (degree : ℕ) × Bool → Locus) → ℝ))
+      (leftValue rightValue : (degree : Fin (D + 1)) →
+        ((Fin (degree : ℕ) × Bool → Locus) → ℝ)),
+      (∀ algorithm degree (permutation : Equiv.Perm Locus) monomial,
+        coefficient algorithm degree (permutation ∘ monomial) =
+          coefficient algorithm degree monomial) →
+      degreeAtMostCanonicalTrafficProfile leftValue =
+        degreeAtMostCanonicalTrafficProfile rightValue →
+      ∀ bayesLeft bayesRight : ℝ,
+        (∀ algorithm,
+          bayesRight ≤ ∑ degree : Fin (D + 1),
+            ∑ monomial,
+              coefficient algorithm degree monomial * rightValue degree monomial) →
+        ∀ algorithm,
+          bayesRight - bayesLeft ≤
+            (∑ degree : Fin (D + 1),
+              ∑ monomial,
+                coefficient algorithm degree monomial * leftValue degree monomial) -
+              bayesLeft
   /-- A finite tilt net controls the complete Lipschitz genomic pressure
   profile with explicit error `2Kρ + ε`. -/
   genomicPressureProfilesHaveQuantitativeTiltNetControl :
@@ -2048,18 +2973,48 @@ theorem unifiedBiology_obstructions : UnifiedBiologyObstructions := by
         fun _Term _ coefficient hasOddDegree vertices edges degree hpositive heven hhandshake ↦
           genomicRankOneTrafficCorrection_vanishes_of_positiveEvenDegreeData
             coefficient hasOddDegree vertices edges degree hpositive heven hhandshake
+      positiveLDBalancedRankOneCovarianceHasFullWitness :=
+        fun _Term _ coefficient hasOddDegree vertices edges hconnected baseline
+          spikeStrength temperature hbaseline hspike hcritical ↦
+            positiveLDBalancedRankOneCovariance_fullWitness coefficient hasOddDegree
+              vertices edges hconnected baseline spikeStrength temperature hbaseline
+              hspike hcritical
       rareLDSubspaceEvadesFixedTrafficAtLogRuntime :=
         rareLDSubspace_fixedTrafficInvisible_logRuntimeVisible
+      rareLDSubspaceConcreteGFOMEvadesFixedTrafficAtLogRuntime :=
+        concreteGFOM_fixedTrafficInvisible_logRuntimeVisible
+      genomicBulkSpectralLawDoesNotDetermineExtremalSpectrumOrSDP :=
+        genomicBulkSpectralLaw_invisible_extremalSpectrumAndSDP_visible
       positiveLDSpikeFixedTrafficInvisibleVariationalPressureVisible :=
         fun _Term _ coefficient hasOddDegree vertices edges hconnected tlam hcritical ↦
           positiveLDSpike_fixedTrafficInvisible_variationalPressureVisible
             coefficient hasOddDegree vertices edges hconnected tlam hcritical
       positiveLDSpikeFixedTrafficInvisibleFinitePressureVisible :=
-        fun _Term _ coefficient hasOddDegree vertices edges hconnected tlam hlarge ↦
+        fun _Term _ coefficient hasOddDegree vertices edges hconnected tlam hcritical ↦
           positiveLDSpike_fixedTrafficInvisible_finitePressureVisible
-            coefficient hasOddDegree vertices edges hconnected tlam hlarge
+            coefficient hasOddDegree vertices edges hconnected tlam hcritical
+      genomicFiniteCWPressureDominatesVariationalObjective :=
+        genomicFiniteCWPressure_dominatesVariationalObjective
+      genomicFiniteCWTypeMassLeOneOfSubcritical :=
+        genomicFiniteCWTypeMass_le_one_of_subcritical
+      genomicFiniteCWPressureHasExactCriticalPoint :=
+        genomicFiniteCWPressure_exactCriticalPoint
+      genomicFiniteCWPressureConvergesToVariational :=
+        genomicFiniteCWPressure_convergesToVariational
+      genomicFiniteCWPressureConvergesUniformlyOnNonnegative :=
+        genomicFiniteCWPressure_convergesUniformlyOnNonnegative
+      genomicFiniteCWPressureIsHalfLipschitz :=
+        genomicFiniteCWPressure_isHalfLipschitz
+      genomicFiniteCWPressureIsMonotone :=
+        genomicFiniteCWPressure_isMonotone
       positiveLDSpikeFinitePressureExceedsBaseline :=
         positiveLDSpike_finitePressureExceedsBaseline
+      positiveLDSpikePressureDifferenceHasExactCriticalPoint :=
+        positiveLDSpike_pressureDifference_exactCriticalPoint
+      positiveLDSpikePressureConvergesToVariational :=
+        positiveLDSpike_pressure_convergesToVariational
+      positiveLDSpikePressureConvergesUniformlyOnNonnegativeStrength :=
+        positiveLDSpike_pressure_convergesUniformlyOnNonnegativeStrength
       positiveLDSpikeRefutesTrafficAndGroundStateDichotomies :=
         fun _Term _Genotype _ coefficient hasOddDegree vertices edges hconnected alignment
           orthogonal aligned baseline spikeStrength population temperature hspike hpopulation
@@ -2074,16 +3029,93 @@ theorem unifiedBiology_obstructions : UnifiedBiologyObstructions := by
         ldOverlapPressure_exactCriticalPoint
       ldVariationalPressureGapHasExactCriticalPoint :=
         ldVariationalPressureGap_exactCriticalPoint
+      ldVariationalPressureGapHasGlobalRegularity :=
+        ldVariationalPressureGap_globalRegularity
+      matchedBayesRandomDesignAsymmetricReduction :=
+        matchedBayes_randomDesignGap_fromScalarGap_asymmetric
       matchedBayesRandomDesignReduction :=
         matchedBayes_randomDesignGap_from_scalarGap
+      matchedBayesRandomDesignEventuallySeparatesWithAsymmetricErrors :=
+        fun _Index regime scalarLeft scalarRight delta randomLeft randomRight
+          leftError rightError hleft hright hgap hpositive hleftVanishing
+          hrightVanishing ↦
+            matchedBayes_randomDesignEventuallySeparates_fromAsymmetricErrors
+              regime scalarLeft scalarRight delta randomLeft randomRight leftError
+              rightError hleft hright hgap hpositive hleftVanishing hrightVanishing
       matchedBayesRandomDesignEventuallySeparates :=
         fun _Index regime scalarLeft scalarRight delta randomLeft randomRight
           comparisonError hleft hright hgap hpositive herrorVanishing ↦
             matchedBayes_randomDesignEventuallySeparates_fromScalarGap
               regime scalarLeft scalarRight delta randomLeft randomRight
               comparisonError hleft hright hgap hpositive herrorVanishing
+      matchedBayesRandomDesignSeparatesAtLargeAspect :=
+        matchedBayes_randomDesignSeparates_ofLargeAspect
+      matchedBayesRandomDesignEventuallySeparatesAtDivergingAspect :=
+        fun _Index regime scalarLeft scalarRight delta constant aspectRatio
+          randomLeft randomRight hleft hright hgap hpositive haspectRatio ↦
+            matchedBayes_randomDesignEventuallySeparates_ofAspectAtTop regime
+              scalarLeft scalarRight delta constant aspectRatio randomLeft randomRight
+              hleft hright hgap hpositive haspectRatio
+      matchedBayesAspectWishartRatioBridge :=
+        fun _Index regime aspectRatio constant ↦
+          matchedBayes_aspectWishartRatioBridge regime aspectRatio constant
+      matchedBayesWishartInformationErrorVanishes :=
+        fun _Index regime informationError adjustedRatio constant hratio herror ↦
+          matchedBayes_wishartInformationErrorVanishes regime informationError
+            adjustedRatio constant hratio herror
+      matchedBayesRandomDesignEventuallySeparatesAtAsymmetricWishartRatios :=
+        fun _Index regime scalarLeft scalarRight delta leftConstant rightConstant
+          leftRatio rightRatio randomLeft randomRight hleft hright hgap hpositive
+          hleftRatio hrightRatio ↦
+            matchedBayes_randomDesignEventuallySeparates_ofAsymmetricWishartRatios
+              regime scalarLeft scalarRight delta leftConstant rightConstant leftRatio
+              rightRatio randomLeft randomRight hleft hright hgap hpositive hleftRatio
+              hrightRatio
+      matchedBayesRandomDesignEventuallySeparatesAtWishartRatio :=
+        fun _Index regime scalarLeft scalarRight delta constant adjustedRatio
+          randomLeft randomRight hleft hright hgap hpositive hratio ↦
+            matchedBayes_randomDesignEventuallySeparates_ofWishartRatio regime
+              scalarLeft scalarRight delta constant adjustedRatio randomLeft randomRight
+              hleft hright hgap hpositive hratio
+      matchedBayesSingularSpectrumHasNormalizedNuclearBound :=
+        fun _Coordinate _ _ spectrum hdimension ↦
+          spectrum.normalizedNuclearDistance_le_operatorBound_mul_rankFraction hdimension
+      matchedBayesCertifiedRankOnePerturbationIsAsymptoticallyInvisible :=
+        matchedBayes_certifiedRankOnePerturbation_isAsymptoticallyInvisible
+      matchedBayesInformationPathHasNuclearBound :=
+        matchedBayes_informationPath_nuclearBound
+      matchedBayesHasWishartFrobeniusComparisonRate :=
+        matchedBayes_wishartFrobeniusComparisonRate
+      matchedBayesHasWishartMomentIdentityComparisonRate :=
+        matchedBayes_wishartMomentIdentityComparisonRate
+      matchedBayesCertifiedSublinearRankIsInvisibleUnderVarianceBound :=
+        fun _Index regime certificate varianceBound operatorBound rankFraction
+          hvarianceBound hrankVanishing hnuclearRank ↦
+            matchedBayes_certifiedSublinearRank_isInvisible_ofVarianceBound
+              regime certificate varianceBound operatorBound rankFraction
+              hvarianceBound hrankVanishing hnuclearRank
+      matchedBayesCertifiedSublinearRankIsInvisible :=
+        fun _Index regime certificate operatorBound rankFraction hvariance
+          hrankVanishing hnuclearRank ↦
+            matchedBayes_certifiedSublinearRank_isInvisible regime certificate
+              operatorBound rankFraction hvariance hrankVanishing hnuclearRank
       matchedBayesSublinearRankPerturbationsAreInvisible :=
         matchedBayes_sublinearRankPerturbation_isAsymptoticallyInvisible
+      matchedBayesPositiveGapForcesExtensiveRank :=
+        matchedBayes_positiveGap_forcesExtensiveRank
+      matchedBayesCertifiedPositiveGapForcesExtensiveRank :=
+        matchedBayes_certifiedPositiveGap_forcesExtensiveRank
+      matchedBayesCertifiedPersistentGapRequiresExtensiveRank :=
+        fun _Index regime _hregime certificate varianceBound operatorBound delta rankFraction
+          hvariancePositive hoperator hdelta hvarianceBound hnuclearRank hgap ↦
+            matchedBayes_certifiedPersistentGap_requiresExtensiveRank regime
+              certificate varianceBound operatorBound delta rankFraction hvariancePositive
+              hoperator hdelta hvarianceBound hnuclearRank hgap
+      matchedBayesPersistentGapRequiresExtensiveRank :=
+        fun _Index regime _hregime densityGap rankFraction constant delta hconstant hdelta
+          hgap hnuclear ↦
+            matchedBayes_persistentGap_requiresExtensiveRank regime densityGap
+              rankFraction constant delta hconstant hdelta hgap hnuclear
       degreeLimitedGenomicRiskHasFullGapHardness :=
         fun _Algorithm _D risk left right htraffic bayesLeft bayesRight hoptimal algorithm ↦
           degreeLimitedGenomicRisk_fullGapHardness risk left right htraffic bayesLeft bayesRight
@@ -2096,6 +3128,36 @@ theorem unifiedBiology_obstructions : UnifiedBiologyObstructions := by
         fun _Slot _Locus _Graph _ _ _ _ _ shape coefficient value hshape hinvariant ↦
           permutationInvariantGenomicPolynomial_factorsThroughLDGraphs
             shape coefficient value hshape hinvariant
+      permutationInvariantGenomicPolynomialFactorsThroughCanonicalLDGraphs :=
+        fun _Slot _Locus _ _ _ coefficient value hinvariant ↦
+          permutationInvariantGenomicPolynomial_factorsThroughCanonicalLDGraphs
+            coefficient value hinvariant
+      permutationEquivariantGenomicPolynomialFactorsThroughRootedLDGraphs :=
+        fun _Slot _Locus _ _ _ coefficient value hinvariant ↦
+          permutationEquivariantGenomicPolynomial_factorsThroughRootedLDGraphs
+            coefficient value hinvariant
+      degreeLimitedGenomicPolynomialFactorsThroughCanonicalLDGraphs :=
+        fun _D _Locus _ coefficient value hinvariant ↦
+          degreeLimitedGenomicPolynomial_factorsThroughCanonicalLDGraphs
+            coefficient value hinvariant
+      degreeLimitedGenomicEquivariantPolynomialFactorsThroughRootedLDGraphs :=
+        fun _D _Locus _ coefficient value hinvariant ↦
+          degreeLimitedGenomicEquivariantPolynomial_factorsThroughRootedLDGraphs
+            coefficient value hinvariant
+      degreeLimitedGenomicPolynomialIsDeterminedByCanonicalLDProfile :=
+        fun _D _Locus _ coefficient leftValue rightValue hinvariant htraffic ↦
+          degreeLimitedGenomicPolynomial_eq_ofCanonicalLDProfileEq
+            coefficient leftValue rightValue hinvariant htraffic
+      degreeLimitedGenomicEquivariantPolynomialIsDeterminedByRootedLDProfile :=
+        fun _D _Locus _ coefficient leftValue rightValue hinvariant htraffic ↦
+          degreeLimitedGenomicEquivariantPolynomial_eq_ofRootedLDProfileEq
+            coefficient leftValue rightValue hinvariant htraffic
+      degreeLimitedGenomicPolynomialHasDirectFullGapHardness :=
+        fun _Algorithm _D _Locus _ coefficient leftValue rightValue hinvariant
+          htraffic bayesLeft bayesRight hoptimalRight algorithm ↦
+            degreeLimitedGenomicPolynomial_fullGapHardness_fromCanonicalLDProfile
+              coefficient leftValue rightValue hinvariant htraffic bayesLeft bayesRight
+              hoptimalRight algorithm
       genomicPressureProfilesHaveQuantitativeTiltNetControl :=
         fun _Parameter _ K left right hleft hright net radius coordinateError hnet hagrees ↦
           genomicPressureProfiles_dist_le_of_tiltNet

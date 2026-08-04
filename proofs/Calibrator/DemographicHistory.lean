@@ -510,7 +510,26 @@ noncomputable def admixedFst (α fst_AB : ℝ) : ℝ :=
     denominator heterozygosity of the (admixed, A) pair to that of the (A, B)
     pair. This is the quantity `admixedFst` computes when that ratio is `1`.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **EXACT BY CONSTRUCTION in the orientation stated above,
+    and therefore not an empirical claim.**
+    (`proofs/validation/empirical/simcov/battery_dis1.py`). Simulated one-pulse
+    admixture with no post-admixture drift, Nei `G_ST` as a ratio of averages
+    over 40000 loci: this body reproduces the measured `F_ST(adm, A)` to machine
+    precision at `α = 0.2, 0.5, 0.8`, and the harness returns SELF-TEST. That is
+    the right answer and not a disappointing one -- the numerator ratio being
+    exactly `(1-α)²` is a real measured fact, recorded on `admixedFst` above, and
+    once it holds this definition is that fact times an identity.
+
+    What the ratio's ORIENTATION is, however, is empirical, and getting it
+    backwards is a real error rather than a convention: `battery_max.py`
+    reported this body FALSIFIED at 21.3 sems while `admixedFst`, which assumes
+    the ratio is `1`, missed by only 14.2 -- a correction that made the answer
+    worse, which is the signature of a divisor applied upside down. Divide by
+    `p̄_adm(1-p̄_adm) / p̄_AB(1-p̄_AB)` and not by its reciprocal.
+
+    Still assumed, and not repaired by carrying the ratio: NO POST-ADMIXTURE
+    DRIFT, as recorded on `admixedFst`. Nothing in this expression carries a time
+    since admixture either. -/
 noncomputable def admixedFstExact (α fst_AB hetRatio : ℝ) : ℝ :=
   (1 - α) ^ 2 * fst_AB / hetRatio
 
