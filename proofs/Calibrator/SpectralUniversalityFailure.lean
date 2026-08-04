@@ -142,6 +142,12 @@ noncomputable def entryPowerSum
     (covariance : Matrix Locus Locus ℝ) (order : ℕ) : ℝ :=
   ∑ left, ∑ right, covariance left right ^ order
 
+/-- Reference evaluation on a concrete asymmetric block: the second-power entry sum is `30`. -/
+theorem entryPowerSum_at_reference_point :
+    entryPowerSum (!![1, 2; 3, 4] : Matrix (Fin 2) (Fin 2) ℝ) 2 = 30 := by
+  norm_num [entryPowerSum, Fin.sum_univ_two]
+
+
 /-- **All-order cumulant orientation identity.**  For every tensor order, the squared energy
 of the pushed-forward diagonal cumulant tensor is the corresponding parallel-edge traffic
 observable of the Gram covariance, multiplied by the squared scalar cumulant. -/
@@ -244,6 +250,12 @@ entries of a covariance matrix. -/
 noncomputable def entryCubeSum (covariance : Matrix Locus Locus ℝ) : ℝ :=
   ∑ i, ∑ j, covariance i j ^ 3
 
+/-- Reference evaluation on the same block: `1 + 8 + 27 + 64`. -/
+theorem entryCubeSum_at_reference_point :
+    entryCubeSum (!![1, 2; 3, 4] : Matrix (Fin 2) (Fin 2) ℝ) = 100 := by
+  norm_num [entryCubeSum, Fin.sum_univ_two]
+
+
 /-- The cubic observable is the order-three specialization of the all-order traffic sum. -/
 theorem entryPowerSum_three (covariance : Matrix Locus Locus ℝ) :
     entryPowerSum covariance 3 = entryCubeSum covariance :=
@@ -296,6 +308,12 @@ product priors: the sum of the fourth powers of all covariance entries. -/
 noncomputable def entryFourthSum (covariance : Matrix Locus Locus ℝ) : ℝ :=
   ∑ i, ∑ j, covariance i j ^ 4
 
+/-- Reference evaluation on the same block: `1 + 16 + 81 + 256`. -/
+theorem entryFourthSum_at_reference_point :
+    entryFourthSum (!![1, 2; 3, 4] : Matrix (Fin 2) (Fin 2) ℝ) = 354 := by
+  norm_num [entryFourthSum, Fin.sum_univ_two]
+
+
 /-- The quartic observable is the order-four specialization of the all-order traffic sum. -/
 theorem entryPowerSum_four (covariance : Matrix Locus Locus ℝ) :
     entryPowerSum covariance 4 = entryFourthSum covariance :=
@@ -337,6 +355,12 @@ development, and nothing below claims it has. -/
 noncomputable def ldPowerScore
     (covariance : Matrix Locus Locus ℝ) (power : ℕ) (j : Locus) : ℝ :=
   ∑ i, covariance i j ^ power
+
+/-- Reference evaluation: the squared column score at the first locus is `1 + 9`. -/
+theorem ldPowerScore_at_reference_point :
+    ldPowerScore (!![1, 2; 3, 4] : Matrix (Fin 2) (Fin 2) ℝ) 2 0 = 10 := by
+  norm_num [ldPowerScore, Fin.sum_univ_two]
+
 
 /-- The fourth-order orientation invariant is the sum of per-locus fourth-power LD scores. -/
 theorem entryFourthSum_eq_sum_ldPowerScore_four (covariance : Matrix Locus Locus ℝ) :
@@ -785,6 +809,12 @@ noncomputable def ldOrientationInvariant {Locus : Type*} [Fintype Locus]
     (order : ℕ) (ld : Matrix Locus Locus ℝ) : ℝ :=
   entryPowerSum ld order
 
+/-- Reference evaluation at second order. -/
+theorem ldOrientationInvariant_at_reference_point :
+    ldOrientationInvariant 2 (!![1, 2; 3, 4] : Matrix (Fin 2) (Fin 2) ℝ) = 30 := by
+  norm_num [ldOrientationInvariant, entryPowerSum, Fin.sum_univ_two]
+
+
 /-- **All-order architecture/LD contraction.**  An independent effect architecture with scalar
 order-`q` cumulant detects LD orientation through the `q`-parallel-edge traffic invariant.
 This contains both the skewed third-moment and symmetric fourth-cumulant mechanisms. -/
@@ -804,6 +834,12 @@ evaluated on a real one here. -/
 noncomputable def ldOrientationThirdInvariant {Locus : Type*} [Fintype Locus]
     (ld : Matrix Locus Locus ℝ) : ℝ :=
   entryCubeSum ld
+
+/-- Reference evaluation of the third-order orientation invariant. -/
+theorem ldOrientationThirdInvariant_at_reference_point :
+    ldOrientationThirdInvariant (!![1, 2; 3, 4] : Matrix (Fin 2) (Fin 2) ℝ) = 100 := by
+  norm_num [ldOrientationThirdInvariant, entryCubeSum, Fin.sum_univ_two]
+
 
 /-- A skewed independent effect architecture detects LD orientation through the general tensor
 identity.  The theorem is an exact finite-locus statement, not an asymptotic analogy. -/
@@ -833,6 +869,12 @@ at one dimension and one prior; it is not a measurement on genotype data. -/
 noncomputable def ldOrientationFourthInvariant {Locus : Type*} [Fintype Locus]
     (ld : Matrix Locus Locus ℝ) : ℝ :=
   entryFourthSum ld
+
+/-- Reference evaluation of the fourth-order orientation invariant. -/
+theorem ldOrientationFourthInvariant_at_reference_point :
+    ldOrientationFourthInvariant (!![1, 2; 3, 4] : Matrix (Fin 2) (Fin 2) ℝ) = 354 := by
+  norm_num [ldOrientationFourthInvariant, entryFourthSum, Fin.sum_univ_two]
+
 
 /-- A symmetric non-Gaussian effect architecture detects LD orientation through its fourth
 cumulant.  This is an exact finite-locus identity and covers the biologically standard case in

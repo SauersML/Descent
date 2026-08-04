@@ -483,6 +483,12 @@ noncomputable def interactionTraitLaw (theta : ℝ) (g : TwoLociTrait) : ℝ :=
 /-- The trait indicator, whose mean is the trait frequency. -/
 noncomputable def traitIndicator (g : TwoLociTrait) : ℝ := if g.2.2 = 1 then 1 else 0
 
+/-- Reference evaluations: the indicator is one exactly on the affected genotype. -/
+theorem traitIndicator_at_reference_point :
+    traitIndicator (0, 0, 1) = 1 ∧ traitIndicator (0, 0, 0) = 0 := by
+  constructor <;> norm_num [traitIndicator]
+
+
 /-- The interaction masses are normalized for every algebraic parameter value.  Nonnegativity,
 and hence the probability-law interpretation, is recorded separately because it genuinely
 requires the biological risk bound `|theta| ≤ 1 / 2`. -/
@@ -656,6 +662,12 @@ noncomputable def exposureGivenStratum (g : ExposureStratum) : ℝ :=
 /-- The stratum frequency, the only thing that varies across the family. -/
 noncomputable def stratumFrequency (beta : ℝ) (s : Fin 2) : ℝ := if s = 1 then beta else 1 - beta
 
+/-- Reference evaluations: the stratum frequencies are complementary. -/
+theorem stratumFrequency_at_reference_point :
+    stratumFrequency (1 / 4) 1 = 1 / 4 ∧ stratumFrequency (1 / 4) 0 = 3 / 4 := by
+  constructor <;> norm_num [stratumFrequency]
+
+
 /-- The confounded family: one within-stratum law, and a stratum composition that drifts. -/
 noncomputable def confoundedExposureLaw (beta : ℝ) (g : ExposureStratum) : ℝ :=
   stratumFrequency beta g.2 * exposureGivenStratum g
@@ -705,6 +717,12 @@ theorem kernelSufficient_confounded_stratum :
 
 /-- The exposure indicator, whose mean is the exposure frequency. -/
 noncomputable def exposureIndicator (g : ExposureStratum) : ℝ := if g.1 = 1 then 1 else 0
+
+/-- Reference evaluations: the indicator is one exactly on the exposed stratum. -/
+theorem exposureIndicator_at_reference_point :
+    exposureIndicator (1, 0) = 1 ∧ exposureIndicator (0, 0) = 0 := by
+  constructor <;> norm_num [exposureIndicator]
+
 
 /-- The trivial label: the meet of the exposure label and the stratum label.  Descent along it
 says the crude exposure frequency is the same in every population. -/
@@ -850,8 +868,20 @@ noncomputable def exampleComponent (k : Fin 2) (g : Fin 3) : ℝ :=
 a symmetry of the reference. -/
 noncomputable def exampleReference (k : Fin 2) : ℝ := if k = 0 then 1 / 3 else 2 / 3
 
+/-- Reference evaluations: the two reference masses are a third and two thirds. -/
+theorem exampleReference_at_reference_point :
+    exampleReference 0 = 1 / 3 ∧ exampleReference 1 = 2 / 3 := by
+  constructor <;> norm_num [exampleReference]
+
+
 /-- A trait value carried by each genome. -/
 noncomputable def exampleTrait (g : Fin 3) : ℝ := if g = 0 then -1 else if g = 2 then 1 else 0
+
+/-- Reference evaluations: the trait is the centred dosage contrast. -/
+theorem exampleTrait_at_reference_point :
+    exampleTrait 0 = -1 ∧ exampleTrait 1 = 0 ∧ exampleTrait 2 = 1 := by
+  refine ⟨?_, ?_, ?_⟩ <;> simp [exampleTrait]
+
 
 /-- Both components are probability laws over the three genomes. -/
 theorem exampleComponent_sum_eq_one (k : Fin 2) : ∑ g, exampleComponent k g = 1 := by
