@@ -57,6 +57,22 @@ singleton fraction runs `0.3544` for Kingman to `0.4017` at `α = 1.1`, total va
 to `0.047`, monotone in `α` -- because it reads branch lengths subtending three or more
 leaves, which a pairwise probe never sees.
 
+The merger sizes make the contrast as sharp as it can be made. Counting the arity of every
+coalescence node over 3000 genealogies of twenty samples, on the SAME five models:
+
+  model              binary   3-or-more    multiple-merger fraction
+  Kingman             57000           0    0.0000 ± 0.0000
+  Beta α = 1.9        54375        1186    0.0213 ± 0.0006
+  Beta α = 1.5        43775        5634    0.1140 ± 0.0014
+  Beta α = 1.1        33508        9397    0.2190 ± 0.0020
+  Dirac ψ = 0.3       56590         182    0.0032 ± 0.0002
+
+Kingman is exactly zero by construction and `α = 1.1` is more than a hundred sems away from
+it, on the same runs whose normalised pairwise laws agreed to within two. A probe reading
+three lineages at once separates what a probe reading two returns one number for. This is
+the `λ₂,₂ = 1` versus `λ₃,₃ = 1/(β+2)` structure: normalisation forces the pairwise rate to
+one for every measure, and the triple rate is what carries the regime.
+
 **Why this belongs in a registry rather than a footnote.** Every `F_ST` in
 `proofs/validation/empirical/simcov` is `1 - E[T_within] / E[T_between]`, a ratio of
 pairwise quantities. So every `VALIDATED` marker that harness issued is valid *within
