@@ -384,6 +384,14 @@ noncomputable def posteriorTilt (q : Component → Genome → ℝ)
     (w0 w : Component → ℝ) (g : Genome) : ℝ :=
   ∑ k, componentPosterior q w0 g k * (w k / w0 k)
 
+/-- Reference evaluation: a tilt toward the zero weighting is zero, whatever the posterior. -/
+theorem posteriorTilt_at_zero_target (q : Component → Genome → ℝ) (w0 : Component → ℝ)
+    (g : Genome) :
+    posteriorTilt q w0 0 g = 0 := by
+  unfold posteriorTilt
+  simp
+
+
 /-- A component with zero base weight contributes a junk ratio `w k / 0 = 0`, so the tilt drops
 that component silently rather than reporting an undefined reweighting. -/
 theorem posteriorTilt_at_zero_base_weight_is_junk
@@ -445,6 +453,13 @@ theorem localizationResidual_at_reference_point :
 noncomputable def jensenResidual (mixtureValue : ℝ)
     (a componentValue : Component → ℝ) : ℝ :=
   mixtureValue - ∑ k, a k * componentValue k
+
+/-- Reference evaluation: with no component weight the residual is the mixture value itself. -/
+theorem jensenResidual_at_zero_weights (componentValue : Component → ℝ) :
+    jensenResidual 5 (fun _ ↦ 0) componentValue = 5 := by
+  unfold jensenResidual
+  simp
+
 
 /-- Reference evaluation: with a two-component average the residual is the stated gap. -/
 theorem jensenResidual_at_reference_point (a componentValue : Component → ℝ)

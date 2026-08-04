@@ -269,6 +269,13 @@ def Feasible (K : ℕ) (h : ℝ) (P Q : FinitePrior n) : Prop :=
 noncomputable def targetGap (P Q : FinitePrior n) : ℝ :=
   |FinitePrior.mean P E.target - FinitePrior.mean Q E.target|
 
+/-- Reference evaluation: a prior compared with itself has no target gap. -/
+theorem targetGap_at_reference_point (P : FinitePrior n) :
+    E.targetGap P P = 0 := by
+  unfold targetGap
+  simp
+
+
 theorem targetGap_nonneg (P Q : FinitePrior n) : 0 ≤ E.targetGap P Q :=
   abs_nonneg _
 
@@ -475,6 +482,13 @@ noncomputable def totalVariation
     (P Q : FinitePrior parameterCount) : ℝ :=
   (1 / 2 : ℝ) * ∑ x,
     |(E.mixture P).probability x - (E.mixture Q).probability x|
+
+/-- Reference evaluation: a prior compared with itself has no total variation. -/
+theorem totalVariation_at_reference_point (P : FinitePrior parameterCount) :
+    E.totalVariation P P = 0 := by
+  unfold totalVariation
+  simp
+
 
 /-- **A kernel whose laws all sit within `ε` of one fixed law makes every pair of
 priors `2ε`-indistinguishable**, no matter how many parameters it has.
@@ -802,6 +816,10 @@ variable (C : CertificateCalculus)
 
 /-- Positive scale in `risk = scale · Δ²`. -/
 noncomputable def scale : ℝ := Real.exp C.logScale
+
+/-- Reference evaluation: the scale is the exponential of the recorded log scale. -/
+theorem scale_at_reference_point : C.scale = Real.exp C.logScale := rfl
+
 
 @[simp] theorem scale_pos : 0 < C.scale := Real.exp_pos _
 

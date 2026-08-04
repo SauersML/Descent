@@ -590,28 +590,52 @@ theorem half_separation_sub_l1_le_minimaxRisk
   exact E.half_separation_sub_l1_le_worstRisk
     θ₁ θ₂ separation maxLoss hloss hloss₂ δ
 
+/-- **A separated pair of parameters with a loss cap at each**, as one proposition.
+
+Both symmetric Le Cam floors below -- the plain one and the one under garbling -- are
+conditioned on exactly these three facts, and each wrote them out in the same six lines.
+They are one hypothesis about the pair, so they are one structure. -/
+structure SeparatedLossCaps (θ₁ θ₂ : Fin (parameterCount + 1))
+    (separation maxLoss₁ maxLoss₂ : ℝ) : Prop where
+  /-- The two losses cannot both be small at any action. -/
+  separated : ∀ action : Fin (actionCount + 1),
+    separation ≤ E.loss θ₁ action + E.loss θ₂ action
+  /-- The loss at the first parameter is nonnegative and capped. -/
+  capped₁ : ∀ action : Fin (actionCount + 1),
+    0 ≤ E.loss θ₁ action ∧ E.loss θ₁ action ≤ maxLoss₁
+  /-- The loss at the second parameter is nonnegative and capped. -/
+  capped₂ : ∀ action : Fin (actionCount + 1),
+    0 ≤ E.loss θ₂ action ∧ E.loss θ₂ action ≤ maxLoss₂
+
+/-- **The caps are inhabited.**  A zero-separation pair with any nonnegative caps satisfies
+them whenever the loss is a nonnegative function bounded by those caps; the constant-zero
+loss is the concrete case, and it keeps the floors below from being empty. -/
+theorem separatedLossCaps_of_loss_eq_zero
+    (θ₁ θ₂ : Fin (parameterCount + 1)) (maxLoss₁ maxLoss₂ : ℝ)
+    (hzero : ∀ θ action, E.loss θ action = 0)
+    (h₁ : 0 ≤ maxLoss₁) (h₂ : 0 ≤ maxLoss₂) :
+    E.SeparatedLossCaps θ₁ θ₂ 0 maxLoss₁ maxLoss₂ :=
+  ⟨fun action ↦ by simp [hzero], fun action ↦ by simp [hzero, h₁],
+    fun action ↦ by simp [hzero, h₂]⟩
+
 /-- **Symmetric quantitative Le Cam floor.** If the loss is bounded at both parameters, the
 optimal orientation charges the smaller of the two loss caps against observation ℓ¹ distance.
 The bound is clipped at zero and contains the one-sided theorem as the case where only the
 second cap is available. -/
 theorem symmetric_half_separation_sub_l1_le_minimaxRisk
     (θ₁ θ₂ : Fin (parameterCount + 1)) (separation maxLoss₁ maxLoss₂ : ℝ)
-    (hloss : ∀ action : Fin (actionCount + 1),
-      separation ≤ E.loss θ₁ action + E.loss θ₂ action)
-    (hloss₁ : ∀ action : Fin (actionCount + 1),
-      0 ≤ E.loss θ₁ action ∧ E.loss θ₁ action ≤ maxLoss₁)
-    (hloss₂ : ∀ action : Fin (actionCount + 1),
-      0 ≤ E.loss θ₂ action ∧ E.loss θ₂ action ≤ maxLoss₂) :
+    (hcaps : E.SeparatedLossCaps θ₁ θ₂ separation maxLoss₁ maxLoss₂) :
     max 0 ((separation - min maxLoss₁ maxLoss₂ *
       E.observationL1Distance θ₁ θ₂) / 2) ≤ E.minimaxRisk := by
-  rcases le_total maxLoss₁ maxLoss₂ with hcaps | hcaps
-  · rw [min_eq_left hcaps]
+  obtain ⟨hloss, hloss₁, hloss₂⟩ := hcaps
+  rcases le_total maxLoss₁ maxLoss₂ with hle | hle
+  · rw [min_eq_left hle]
     have hswapped := E.half_separation_sub_l1_le_minimaxRisk
       θ₂ θ₁ separation maxLoss₁
       (fun action ↦ by simpa [add_comm] using hloss action) hloss₁
     rw [E.observationL1Distance_comm θ₂ θ₁] at hswapped
     exact hswapped
-  · rw [min_eq_right hcaps]
+  · rw [min_eq_right hle]
     exact E.half_separation_sub_l1_le_minimaxRisk
       θ₁ θ₂ separation maxLoss₂ hloss hloss₂
 
@@ -645,23 +669,19 @@ theorem symmetric_half_separation_sub_l1_le_garbled_minimaxRisk
     {summaryCount : ℕ}
     (channel : Fin (observationCount + 1) → FinitePrior summaryCount)
     (θ₁ θ₂ : Fin (parameterCount + 1)) (separation maxLoss₁ maxLoss₂ : ℝ)
-    (hloss : ∀ action : Fin (actionCount + 1),
-      separation ≤ E.loss θ₁ action + E.loss θ₂ action)
-    (hloss₁ : ∀ action : Fin (actionCount + 1),
-      0 ≤ E.loss θ₁ action ∧ E.loss θ₁ action ≤ maxLoss₁)
-    (hloss₂ : ∀ action : Fin (actionCount + 1),
-      0 ≤ E.loss θ₂ action ∧ E.loss θ₂ action ≤ maxLoss₂) :
+    (hcaps : E.SeparatedLossCaps θ₁ θ₂ separation maxLoss₁ maxLoss₂) :
     max 0 ((separation - min maxLoss₁ maxLoss₂ *
       E.observationL1Distance θ₁ θ₂) / 2) ≤
         (E.garbleObservations summaryCount channel).minimaxRisk := by
-  rcases le_total maxLoss₁ maxLoss₂ with hcaps | hcaps
-  · rw [min_eq_left hcaps]
+  obtain ⟨hloss, hloss₁, hloss₂⟩ := hcaps
+  rcases le_total maxLoss₁ maxLoss₂ with hle | hle
+  · rw [min_eq_left hle]
     have hswapped := E.half_separation_sub_l1_le_garbled_minimaxRisk
       channel θ₂ θ₁ separation maxLoss₁
       (fun action ↦ by simpa [add_comm] using hloss action) hloss₁
     rw [E.observationL1Distance_comm θ₂ θ₁] at hswapped
     exact hswapped
-  · rw [min_eq_right hcaps]
+  · rw [min_eq_right hle]
     exact E.half_separation_sub_l1_le_garbled_minimaxRisk
       channel θ₁ θ₂ separation maxLoss₂ hloss hloss₂
 
@@ -785,6 +805,14 @@ noncomputable def bayesRisk
     (δ : Rule actionCount observationCount) : ℝ :=
   ∑ θ, π.probability θ * E.risk δ θ
 
+/-- Reference evaluation: a rule with no risk anywhere has no Bayes risk under any prior. -/
+theorem bayesRisk_at_zero_risk (π : FinitePrior parameterCount)
+    (δ : Rule actionCount observationCount) (hzero : ∀ θ, E.risk δ θ = 0) :
+    E.bayesRisk π δ = 0 := by
+  unfold bayesRisk
+  simp [hzero]
+
+
 /-- Optimal Bayes value at a fixed prior. -/
 noncomputable def optimalBayesRisk (π : FinitePrior parameterCount) : ℝ :=
   sInf (Set.range (E.bayesRisk π))
@@ -820,8 +848,23 @@ using normalization merely to optimize the constant. -/
 noncomputable def pointRiskAbsBound (θ : Fin (parameterCount + 1)) : ℝ :=
   ∑ _x : Fin (observationCount + 1), ∑ a, |E.loss θ a|
 
+/-- Reference evaluation: a lossless experiment has no point risk bound to spend. -/
+theorem pointRiskAbsBound_at_zero_loss (θ : Fin (parameterCount + 1))
+    (hzero : ∀ θ' a, E.loss θ' a = 0) :
+    E.pointRiskAbsBound θ = 0 := by
+  unfold pointRiskAbsBound
+  simp [hzero]
+
+
 /-- Uniform absolute risk bound for the whole finite decision problem. -/
 noncomputable def riskAbsBound : ℝ := ∑ θ, E.pointRiskAbsBound θ
+
+/-- And the total bound with it. -/
+theorem riskAbsBound_at_zero_loss (hzero : ∀ θ' a, E.loss θ' a = 0) :
+    E.riskAbsBound = 0 := by
+  unfold riskAbsBound
+  simp [pointRiskAbsBound_at_zero_loss (E := E) _ hzero]
+
 
 /-- Every pointwise risk is bounded by the finite absolute loss table. -/
 theorem abs_risk_le_pointRiskAbsBound (δ : Rule actionCount observationCount)
