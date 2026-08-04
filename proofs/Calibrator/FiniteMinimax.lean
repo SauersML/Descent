@@ -30,6 +30,7 @@ biological nonidentifiability witnesses.
 - `half_separation_le_minimaxRisk_of_observation_eq`: exact two-point minimax floor.
 - `indistinguishableBinaryProblem_minimaxRisk`: sharpness of the factor one-half.
 - `half_separation_sub_l1_le_minimaxRisk`: clipped quantitative finite Le Cam floor.
+- `symmetric_half_separation_sub_l1_le_minimaxRisk`: optimal two-sided loss cap.
 - `observationL1Distance_garble_le`: ℓ¹ data processing under stochastic channels.
 - `minimaxRisk_le_garbleObservations`: full minimax monotonicity under garbling.
 - `finite_minimax_duality`: equality of primal minimax and least-favourable-prior values.
@@ -589,6 +590,31 @@ theorem half_separation_sub_l1_le_minimaxRisk
   exact E.half_separation_sub_l1_le_worstRisk
     θ₁ θ₂ separation maxLoss hloss hloss₂ δ
 
+/-- **Symmetric quantitative Le Cam floor.** If the loss is bounded at both parameters, the
+optimal orientation charges the smaller of the two loss caps against observation ℓ¹ distance.
+The bound is clipped at zero and contains the one-sided theorem as the case where only the
+second cap is available. -/
+theorem symmetric_half_separation_sub_l1_le_minimaxRisk
+    (θ₁ θ₂ : Fin (parameterCount + 1)) (separation maxLoss₁ maxLoss₂ : ℝ)
+    (hloss : ∀ action : Fin (actionCount + 1),
+      separation ≤ E.loss θ₁ action + E.loss θ₂ action)
+    (hloss₁ : ∀ action : Fin (actionCount + 1),
+      0 ≤ E.loss θ₁ action ∧ E.loss θ₁ action ≤ maxLoss₁)
+    (hloss₂ : ∀ action : Fin (actionCount + 1),
+      0 ≤ E.loss θ₂ action ∧ E.loss θ₂ action ≤ maxLoss₂) :
+    max 0 ((separation - min maxLoss₁ maxLoss₂ *
+      E.observationL1Distance θ₁ θ₂) / 2) ≤ E.minimaxRisk := by
+  rcases le_total maxLoss₁ maxLoss₂ with hcaps | hcaps
+  · rw [min_eq_left hcaps]
+    have hswapped := E.half_separation_sub_l1_le_minimaxRisk
+      θ₂ θ₁ separation maxLoss₁
+      (fun action ↦ by simpa [add_comm] using hloss action) hloss₁
+    rw [E.observationL1Distance_comm θ₂ θ₁] at hswapped
+    exact hswapped
+  · rw [min_eq_right hcaps]
+    exact E.half_separation_sub_l1_le_minimaxRisk
+      θ₁ θ₂ separation maxLoss₂ hloss hloss₂
+
 /-- Garbling preserves the original quantitative Le Cam floor. Since the channel contracts
 ℓ¹ distance, the post-processed experiment is at least as hard as the original bound reports. -/
 theorem half_separation_sub_l1_le_garbled_minimaxRisk
@@ -612,6 +638,32 @@ theorem half_separation_sub_l1_le_garbled_minimaxRisk
           (E.garbleObservations summaryCount channel).observationL1Distance θ₁ θ₂) / 2 := by
     linarith [mul_le_mul_of_nonneg_left hcontract hmaxLoss]
   exact (max_le_max_left 0 hscalar).trans hgarbled
+
+/-- **Symmetric Le Cam data processing.** Randomized garbling preserves the optimally oriented
+two-cap minimax floor, with the smaller loss cap multiplying the original observation distance. -/
+theorem symmetric_half_separation_sub_l1_le_garbled_minimaxRisk
+    {summaryCount : ℕ}
+    (channel : Fin (observationCount + 1) → FinitePrior summaryCount)
+    (θ₁ θ₂ : Fin (parameterCount + 1)) (separation maxLoss₁ maxLoss₂ : ℝ)
+    (hloss : ∀ action : Fin (actionCount + 1),
+      separation ≤ E.loss θ₁ action + E.loss θ₂ action)
+    (hloss₁ : ∀ action : Fin (actionCount + 1),
+      0 ≤ E.loss θ₁ action ∧ E.loss θ₁ action ≤ maxLoss₁)
+    (hloss₂ : ∀ action : Fin (actionCount + 1),
+      0 ≤ E.loss θ₂ action ∧ E.loss θ₂ action ≤ maxLoss₂) :
+    max 0 ((separation - min maxLoss₁ maxLoss₂ *
+      E.observationL1Distance θ₁ θ₂) / 2) ≤
+        (E.garbleObservations summaryCount channel).minimaxRisk := by
+  rcases le_total maxLoss₁ maxLoss₂ with hcaps | hcaps
+  · rw [min_eq_left hcaps]
+    have hswapped := E.half_separation_sub_l1_le_garbled_minimaxRisk
+      channel θ₂ θ₁ separation maxLoss₁
+      (fun action ↦ by simpa [add_comm] using hloss action) hloss₁
+    rw [E.observationL1Distance_comm θ₂ θ₁] at hswapped
+    exact hswapped
+  · rw [min_eq_right hcaps]
+    exact E.half_separation_sub_l1_le_garbled_minimaxRisk
+      channel θ₁ θ₂ separation maxLoss₂ hloss hloss₂
 
 /-- Every rule pays at least half the separation of two observationally equivalent parameters. -/
 theorem half_separation_le_worstRisk_of_observation_eq
