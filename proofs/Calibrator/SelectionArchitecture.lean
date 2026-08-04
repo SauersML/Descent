@@ -142,7 +142,7 @@ theorem effectCorrelationStabilizing_zero_selection_is_junk :
 /-- Effect correlation increases with stronger selection (relative to drift). -/
 theorem effectCorrelationStabilizing_lt_of_Ns_lt
     (Ns₁ Ns₂ : ℝ)
-    (h₁ : 1 < Ns₁) (h_more : Ns₁ < Ns₂) :
+    (h₁ : 0 < Ns₁) (h_more : Ns₁ < Ns₂) :
     effectCorrelationStabilizing Ns₁ < effectCorrelationStabilizing Ns₂ := by
   unfold effectCorrelationStabilizing
   rw [sub_lt_sub_iff_left]
@@ -334,23 +334,19 @@ theorem fluctuatingSelectedArchitectureVariance_at_reference_point :
   norm_num [fluctuatingSelectedArchitectureVariance, equilibriumEffectVariance, optimumOUVariance]
 
 
-theorem effectCorrelationStabilizing_pos
-    (Ns : ℝ) (hNs : 1 < Ns) :
-    0 < effectCorrelationStabilizing Ns := by
+theorem effectCorrelationStabilizing_pos_iff
+    (Ns : ℝ) (hNs : 0 < Ns) :
+    0 < effectCorrelationStabilizing Ns ↔ 1 / 2 < Ns := by
   unfold effectCorrelationStabilizing
   have hden_pos : 0 < 2 * Ns := by linarith
-  have hfrac_lt_one : 1 / (2 * Ns) < 1 := by
-    rw [div_lt_iff₀ hden_pos]
-    linarith
-  linarith
+  rw [sub_pos, div_lt_one hden_pos]
+  constructor <;> intro h <;> linarith
 
-theorem effectCorrelationStabilizing_lt_one
-    (Ns : ℝ) (hNs : 1 < Ns) :
-    effectCorrelationStabilizing Ns < 1 := by
+theorem effectCorrelationStabilizing_lt_one_iff (Ns : ℝ) :
+    effectCorrelationStabilizing Ns < 1 ↔ 0 < Ns := by
   unfold effectCorrelationStabilizing
-  have hfrac_pos : 0 < 1 / (2 * Ns) := by
-    positivity
-  linarith
+  rw [sub_lt_self_iff, one_div_pos]
+  constructor <;> intro h <;> nlinarith
 
 theorem fluctuatingSelectedArchitectureVariance_gt_stabilizing
     (v_mutation s sigmaTheta tau : ℝ)
@@ -370,13 +366,13 @@ theorem fluctuatingSelectedArchitectureVariance_gt_stabilizing
     matching `exp(-t/τ)` to `1 - 1/(2Ns)`. -/
 theorem fluctuatingCorrelation_lt_stabilizing_of_tau_lt_threshold
     (t tau Ns : ℝ)
-    (h_tau : 0 < tau) (hNs : 1 < Ns)
+    (h_tau : 0 < tau) (hNs : 1 / 2 < Ns)
     (h_tau_lt : tau < t / (-Real.log (effectCorrelationStabilizing Ns))) :
     fluctuatingEffectCorrelation t tau < effectCorrelationStabilizing Ns := by
   have h_rho_pos : 0 < effectCorrelationStabilizing Ns :=
-    effectCorrelationStabilizing_pos Ns hNs
+    (effectCorrelationStabilizing_pos_iff Ns (by linarith)).2 hNs
   have h_rho_lt_one : effectCorrelationStabilizing Ns < 1 :=
-    effectCorrelationStabilizing_lt_one Ns hNs
+    (effectCorrelationStabilizing_lt_one_iff Ns).2 (by linarith)
   have h_log_neg : Real.log (effectCorrelationStabilizing Ns) < 0 := by
     have h_log_lt : Real.log (effectCorrelationStabilizing Ns) < Real.log 1 :=
       Real.log_lt_log h_rho_pos h_rho_lt_one
