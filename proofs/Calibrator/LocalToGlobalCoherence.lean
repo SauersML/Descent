@@ -95,6 +95,11 @@ signs agree with probability at most `2 * Phi (-10) < 10 ^ (-20)`. The differenc
 the total-variation gap. -/
 noncomputable def expanderAgreementFloor : ℝ := 1 / 2 - Real.sqrt 5 / 6
 
+/-- Reference evaluation in closed surd form. -/
+theorem expanderAgreementFloor_at_reference_point :
+    expanderAgreementFloor = 1 / 2 - Real.sqrt 5 / 6 := rfl
+
+
 /-- **The floor is below one half.** Positivity is already recorded; it is shared by the
 sign-flipped constant, which sits above one half. This bound is the half that excludes it. -/
 theorem expanderAgreementFloor_lt_half : expanderAgreementFloor < 1 / 2 := by

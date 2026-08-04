@@ -413,6 +413,14 @@ variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 def gramForm (A : Matrix ι ι ℝ) (x y : ι → ℝ) : ℝ :=
   ∑ i, ∑ j, x i * A i j * y j
 
+/-- Reference evaluation on a concrete asymmetric block and two distinct vectors. -/
+theorem gramForm_at_reference_point :
+    gramForm (!![1, 2; 3, 4] : Matrix (Fin 2) (Fin 2) ℝ) (![1, 3] : Fin 2 → ℝ)
+      (![2, 5] : Fin 2 → ℝ) = 90 := by
+  simp [gramForm, Fin.sum_univ_succ]
+  norm_num
+
+
 /-- Quadratic form `xᵀ A x`. When `A` is a genotype second-moment matrix this
 is the variance of the polygenic score with weights `x`, so every statement in
 this section is a statement about score variances. -/

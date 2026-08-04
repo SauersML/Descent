@@ -510,6 +510,14 @@ trace lemmas are needed.
     with the spike load is `frobeniusForm_spikeOuter`). -/
 def frobeniusForm (A M : Matrix ι ι ℝ) : ℝ := ∑ i, ∑ j, A i j * M i j
 
+/-- Reference evaluation on a concrete block against itself: the Frobenius energy. -/
+theorem frobeniusForm_at_reference_point :
+    frobeniusForm (!![1, 2; 3, 4] : Matrix (Fin 2) (Fin 2) ℝ)
+      (!![1, 2; 3, 4] : Matrix (Fin 2) (Fin 2) ℝ) = 30 := by
+  simp [frobeniusForm, Fin.sum_univ_succ]
+  norm_num
+
+
 theorem frobeniusForm_add (A M N : Matrix ι ι ℝ) :
     frobeniusForm A (M + N) = frobeniusForm A M + frobeniusForm A N := by
   unfold frobeniusForm

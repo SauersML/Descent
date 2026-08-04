@@ -64,6 +64,13 @@ directly between the two leaves. -/
 def demeRate (a b : ℝ) (i j : Fin 3) : ℝ :=
   if i = j then 0 else if i = 0 ∨ j = 0 then a else b
 
+/-- Reference evaluations across the three shapes the rate distinguishes: the diagonal, a hub
+pair, and a spoke pair.  Pinning one leaves the other two unconstrained. -/
+theorem demeRate_at_reference_point (a b : ℝ) :
+    demeRate a b 0 0 = 0 ∧ demeRate a b 0 1 = a ∧ demeRate a b 1 2 = b := by
+  refine ⟨?_, ?_, ?_⟩ <;> simp [demeRate]
+
+
 /-- Action of a rate matrix on a function of the state. -/
 def generatorApply (q : Fin 3 → Fin 3 → ℝ) (f : Fin 3 → ℝ) (i : Fin 3) : ℝ :=
   ∑ j, q i j * (f j - f i)

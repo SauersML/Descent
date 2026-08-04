@@ -207,6 +207,14 @@ noncomputable def SymmetricCoding.witness (V : Type*) [Fintype V] : SymmetricCod
 def configurationWeight (coding : SymmetricCoding V) (x : Fin n → V) : ℝ :=
   ∏ i, coding.weight (x i)
 
+/-- Reference evaluation: an empty locus set has unit configuration weight, since the product
+is empty. -/
+theorem configurationWeight_at_reference_point (coding : SymmetricCoding V) (x : Fin 0 → V) :
+    configurationWeight coding x = 1 := by
+  unfold configurationWeight
+  simp
+
+
 /-- The interaction monomial `∏_{i ∈ S} x_i` of a configuration. -/
 def interactionMonomial (coding : SymmetricCoding V) (locusSet : Finset (Fin n))
     (x : Fin n → V) : ℝ :=

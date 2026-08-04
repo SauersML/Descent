@@ -176,6 +176,14 @@ coordinate, but it is still only a benchmark score-distribution quantity. -/
 noncomputable def benchmarkHighScoreRate (threshold μ σ : ℝ) : ℝ :=
   1 - Phi (thresholdStandardizedCoordinate threshold μ σ)
 
+/-- Reference evaluation: at the mean the benchmark rate is one half, since the standardized
+coordinate vanishes there. -/
+theorem benchmarkHighScoreRate_at_reference_point (μ σ : ℝ) :
+    benchmarkHighScoreRate μ μ σ = 1 - Phi 0 := by
+  unfold benchmarkHighScoreRate
+  rw [thresholdStandardizedCoordinate_at_mean]
+
+
 /-- **A rightward mean shift lowers the standardized threshold coordinate.**
 
     This is the coordinate step, and it says nothing about probability: `Phi` and

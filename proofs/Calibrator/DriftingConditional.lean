@@ -472,6 +472,13 @@ rate `lam k`. -/
 noncomputable def errorEnergy {n : ℕ} (w lam : Fin n → ℝ) (t : ℝ) : ℝ :=
   ∑ k, w k * Real.exp (-(2 * lam k * t))
 
+/-- Reference evaluation at time zero, where every mode contributes its full weight. -/
+theorem errorEnergy_at_reference_point :
+    errorEnergy (![1, 3] : Fin 2 → ℝ) (![2, 5] : Fin 2 → ℝ) 0 = 4 := by
+  simp [errorEnergy, Fin.sum_univ_succ]
+  norm_num
+
+
 /-- **The interior error energy is at most the product of the endpoint energies.**
 
     Stated in squared form so nothing is square-rooted: at the midpoint of two observation times

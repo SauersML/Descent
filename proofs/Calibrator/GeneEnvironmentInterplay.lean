@@ -451,6 +451,13 @@ environmental contributions. `gamma` and `eta` are the per-unit effects to be at
 def cohortShift {n : ℕ} (G : CohortGradients n) (gamma eta : ℝ) (i : Fin n) : ℝ :=
   gamma * G.geneticGradient i + eta * G.environmentalGradient i
 
+/-- Reference evaluation: with no gradient loading there is no cohort shift. -/
+theorem cohortShift_at_reference_point {n : ℕ} (G : CohortGradients n) (i : Fin n) :
+    cohortShift G 0 0 i = 0 := by
+  unfold cohortShift
+  ring
+
+
 /-- **The negative result: under a collinear environmental gradient the split is invisible.**
 
 If environment varies across cohorts only as ancestry does (`environmental = c * genetic`),

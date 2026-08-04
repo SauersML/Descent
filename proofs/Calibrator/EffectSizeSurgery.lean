@@ -123,10 +123,20 @@ def total : ℝ := F.massPos + F.massNeg
 Empirical status: DERIVED. A difference of the fiber's own masses; no free parameter. -/
 def imbalance : ℝ := F.massPos - F.massNeg
 
+/-- Reference evaluation: the imbalance is the signed mass difference. -/
+theorem imbalance_at_reference_point : F.imbalance = F.massPos - F.massNeg := rfl
+
+
 /-- What this fiber contributes to the average of `f`.
 
 Empirical status: DERIVED. The fiber's share of an expectation; no free parameter. -/
 def contribution (f : ℝ → ℝ) : ℝ := F.massPos * f F.level + F.massNeg * f (-F.level)
+
+/-- Reference evaluation: against the zero test function the folded atom contributes nothing. -/
+theorem contribution_at_reference_point : F.contribution (fun _ ↦ 0) = 0 := by
+  unfold contribution
+  ring
+
 
 /-- **Move mass `δ` from the negative side to the positive side.** This is the surgery,
 and it is the only thing done to the distribution anywhere below.

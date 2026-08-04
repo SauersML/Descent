@@ -743,6 +743,14 @@ positive displacement scale. -/
 noncomputable def frontSpeedTiltFromTripleRate (rate γ : ℝ) : ℝ :=
   γ * speedBiasParameterFromTripleRate rate
 
+/-- Reference evaluation: at the Bolthausen--Sznitman triple rate the recovered front tilt is
+zero, which is the untilted genealogy. -/
+theorem frontSpeedTiltFromTripleRate_at_reference_point (γ : ℝ) :
+    frontSpeedTiltFromTripleRate (1 / 2) γ = 0 := by
+  unfold frontSpeedTiltFromTripleRate speedBiasParameterFromTripleRate
+  norm_num
+
+
 /-- **Exact dimensional speed recovery.** Once the displacement scale is known, the first
 non-pairwise genealogical coordinate recovers the original front-speed tilt exactly. -/
 theorem frontSpeedTiltFromTripleRate_recovers
