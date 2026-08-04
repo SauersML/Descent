@@ -439,20 +439,23 @@ theorem localizedUniformFourthInvariant_eq :
     funext a
     ring
   rw [hintegrand]
-  rw [intervalIntegral.integral_add
-    (Continuous.intervalIntegrable (by fun_prop) 1 2)
+  have hderiv : ∀ x ∈ Set.uIcc (1 : ℝ) 2,
+      HasDerivAt (fun a : ℝ ↦ a ^ 5 / 5 + a ^ 4 / 2 + a ^ 3 + a ^ 2 + a / 2)
+        (x ^ 4 + 2 * x ^ 3 + 3 * x ^ 2 + 2 * x + 1 / 2) x := by
+    intro x _
+    have h5 : HasDerivAt (fun a : ℝ ↦ a ^ 5 / 5) (x ^ 4) x := by
+      simpa using (hasDerivAt_pow 5 x).div_const 5
+    have h4 : HasDerivAt (fun a : ℝ ↦ a ^ 4 / 2) (2 * x ^ 3) x := by
+      simpa using (hasDerivAt_pow 4 x).div_const 2
+    have h3 : HasDerivAt (fun a : ℝ ↦ a ^ 3) (3 * x ^ 2) x := by
+      simpa using hasDerivAt_pow 3 x
+    have h2 : HasDerivAt (fun a : ℝ ↦ a ^ 2) (2 * x) x := by
+      simpa using hasDerivAt_pow 2 x
+    have h1 : HasDerivAt (fun a : ℝ ↦ a / 2) (1 / 2 : ℝ) x := by
+      simpa using (hasDerivAt_id x).div_const 2
+    exact (((h5.add h4).add h3).add h2).add h1
+  rw [intervalIntegral.integral_eq_sub_of_hasDerivAt hderiv
     (Continuous.intervalIntegrable (by fun_prop) 1 2)]
-  rw [intervalIntegral.integral_add
-    (Continuous.intervalIntegrable (by fun_prop) 1 2)
-    (Continuous.intervalIntegrable (by fun_prop) 1 2)]
-  rw [intervalIntegral.integral_add
-    (Continuous.intervalIntegrable (by fun_prop) 1 2)
-    (Continuous.intervalIntegrable (by fun_prop) 1 2)]
-  rw [intervalIntegral.integral_add
-    (Continuous.intervalIntegrable (by fun_prop) 1 2)
-    (Continuous.intervalIntegrable (by fun_prop) 1 2)]
-  simp only [intervalIntegral.integral_const_mul, intervalIntegral.integral_const, integral_pow]
-  rw [intervalIntegral.integral_const_mul, integral_id]
   norm_num
 
 /-- The rotated block family has fourth-order traffic invariant `723 / 40`. -/
@@ -466,20 +469,24 @@ theorem rotatedUniformFourthInvariant_eq :
     funext a
     ring
   rw [hintegrand]
-  rw [intervalIntegral.integral_add
-    (Continuous.intervalIntegrable (by fun_prop) 1 2)
+  have hderiv : ∀ x ∈ Set.uIcc (1 : ℝ) 2,
+      HasDerivAt (fun a : ℝ ↦ a ^ 5 / 5 + a ^ 4 / 2 + a ^ 3 / 2 + a ^ 2 / 4 + a / 8)
+        (x ^ 4 + 2 * x ^ 3 + 3 / 2 * x ^ 2 + 1 / 2 * x + 1 / 8) x := by
+    intro x _
+    have h5 : HasDerivAt (fun a : ℝ ↦ a ^ 5 / 5) (x ^ 4) x := by
+      simpa using (hasDerivAt_pow 5 x).div_const 5
+    have h4 : HasDerivAt (fun a : ℝ ↦ a ^ 4 / 2) (2 * x ^ 3) x := by
+      simpa using (hasDerivAt_pow 4 x).div_const 2
+    have h3 : HasDerivAt (fun a : ℝ ↦ a ^ 3 / 2) (3 / 2 * x ^ 2) x := by
+      simpa using (hasDerivAt_pow 3 x).div_const 2
+    have h2 : HasDerivAt (fun a : ℝ ↦ a ^ 2 / 4) (1 / 2 * x) x := by
+      have := (hasDerivAt_pow 2 x).div_const 4
+      simpa using this
+    have h1 : HasDerivAt (fun a : ℝ ↦ a / 8) (1 / 8 : ℝ) x := by
+      simpa using (hasDerivAt_id x).div_const 8
+    exact (((h5.add h4).add h3).add h2).add h1
+  rw [intervalIntegral.integral_eq_sub_of_hasDerivAt hderiv
     (Continuous.intervalIntegrable (by fun_prop) 1 2)]
-  rw [intervalIntegral.integral_add
-    (Continuous.intervalIntegrable (by fun_prop) 1 2)
-    (Continuous.intervalIntegrable (by fun_prop) 1 2)]
-  rw [intervalIntegral.integral_add
-    (Continuous.intervalIntegrable (by fun_prop) 1 2)
-    (Continuous.intervalIntegrable (by fun_prop) 1 2)]
-  rw [intervalIntegral.integral_add
-    (Continuous.intervalIntegrable (by fun_prop) 1 2)
-    (Continuous.intervalIntegrable (by fun_prop) 1 2)]
-  simp only [intervalIntegral.integral_const_mul, intervalIntegral.integral_const, integral_pow]
-  rw [intervalIntegral.integral_const_mul, integral_id]
   norm_num
 
 /-- Exact continuum separation of the fourth-order traffic invariant. -/
