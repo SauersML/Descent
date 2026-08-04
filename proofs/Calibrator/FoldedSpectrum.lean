@@ -1935,6 +1935,16 @@ namespace RecoveryAttenuation
 noncomputable def recoveredVariance (predictableVariance estimationNoise : ℝ) : ℝ :=
   predictableVariance * (predictableVariance / (predictableVariance + estimationNoise))
 
+/-- **recoveredVariance at no variance at all, named.** With neither predictable variance nor
+estimation noise the shrinkage factor is undefined. Numerator and denominator vanish together,
+the factor is junk-zero, and the recovered variance is `0` -- which is also the honest answer
+when there is no signal, so the degenerate case hides inside the legitimate one. Consumers must
+exclude it by hypothesis. -/
+theorem recoveredVariance_no_variance_is_junk :
+    recoveredVariance 0 0 = 0 := by
+  unfold recoveredVariance
+  simp
+
 /-- **The population identity is an upper bound on what any deployment recovers.** -/
 theorem recoveredVariance_le_predictable (predictableVariance estimationNoise : ℝ)
     (hp : 0 < predictableVariance) (hn : 0 ≤ estimationNoise) :

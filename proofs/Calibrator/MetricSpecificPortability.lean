@@ -2621,6 +2621,16 @@ noncomputable def ldBandReconstructionShare (decay kappa : ℝ) : ℝ :=
   2 * Real.arctan (((1 + decay) / (1 - decay)) *
     Real.tan (Real.pi * kappa / 2)) / Real.pi
 
+/-- **ldBandReconstructionShare at unit decay, named.** At `decay = 1` the band-edge ratio `(1 +
+decay) / (1 - decay)` diverges: the reconstruction covers the whole band. The divisor is zero,
+the ratio is junk-zero, and the share collapses to `2 * arctan 0` -- zero reconstruction at every
+`kappa`, the opposite limit, and with the dependence on `kappa` erased along the way. Consumers
+must exclude it by hypothesis. -/
+theorem ldBandReconstructionShare_unit_decay_is_junk (kappa : ℝ) :
+    ldBandReconstructionShare 1 kappa = 2 * Real.arctan 0 := by
+  unfold ldBandReconstructionShare
+  norm_num
+
 /-- **Detection share of a pruned (low-frequency) band** on a stationary AR(1)
 chromosome: the fraction of the total inverse-LD (whitened) weight that survives
 pruning down to a fraction `kappa` of the directions.

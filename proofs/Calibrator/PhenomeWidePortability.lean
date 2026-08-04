@@ -349,6 +349,15 @@ noncomputable def causalPortabilityFromLocalFst {m : ℕ}
   (∑ i, sourceSquaredEffect i * (1 - fstCausal i)) /
     (∑ i, sourceSquaredEffect i)
 
+/-- **causalPortabilityFromLocalFst at empty index, named.** With no causal variants both the
+retained and the total effect mass are empty sums. Lean returns `0`: no portability at all, which
+is what a score whose every effect fails to transfer also gives. A missing panel and a completely
+non-portable one are reported identically. Consumers must exclude it by hypothesis. -/
+theorem causalPortabilityFromLocalFst_empty_panel_is_junk (sourceSquaredEffect fstCausal : Fin 0 → ℝ) :
+    causalPortabilityFromLocalFst sourceSquaredEffect fstCausal = 0 := by
+  unfold causalPortabilityFromLocalFst
+  simp
+
 /-- The locus-level causal portability chart is exactly one minus the
 effect-size-weighted average causal `F_ST`. -/
 private theorem causalPortabilityFromLocalFst_eq_one_sub_weightedLocalFst {m : ℕ}

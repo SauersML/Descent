@@ -516,7 +516,11 @@ def exempt : List (Name × String) :=
     (`Calibrator.condensationConstant, "Real.log 2 with a numeral argument"),
     (`Calibrator.gaussianJetVariance, "Real.pi ^ 2 / 2 with numeral divisor"),
     (`Calibrator.gaussianKurtosisMaf, "Real.sqrt 3 with a numeral argument"),
-    (`Calibrator.expanderAgreementFloor, "Real.sqrt 5 with a numeral argument") ]
+    (`Calibrator.expanderAgreementFloor, "Real.sqrt 5 with a numeral argument"),
+    (`Calibrator.ldPruningDetectionDeficit, "divides by Real.pi * (1 + decay ^ 2) ≥ π"),
+    (`Calibrator.ldBandDetectionShare, "divides by Real.pi * (1 + decay ^ 2) ≥ π"),
+    (`Calibrator.posteriorPrecision, "1 / prior_var + data_precision; prior_var is a model field"),
+    (`Calibrator.standardNormalPdf, "Real.sqrt (2 * Real.pi) ≠ 0") ]
 
 /-- Is this a numeric literal, or a ratio or negation of them?
 
