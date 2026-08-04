@@ -3,6 +3,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Mathlib.MeasureTheory.Integral.Bochner.Basic
 import Mathlib.MeasureTheory.Measure.Dirac
+import Mathlib.Analysis.SpecificLimits.Basic
+import Mathlib.Analysis.PSeries
 import Mathlib.Tactic
 
 namespace Calibrator
@@ -109,5 +111,48 @@ theorem betaFamilyTripleMergerRate_strictAnti
   have hpos₁ : 0 < θ₁ + 2 := by linarith
   have hpos₂ : 0 < θ₂ + 2 := by linarith
   exact one_div_lt_one_div_of_lt hpos₁ (by linarith)
+
+/-! ## Bolthausen--Sznitman total-rate ladder -/
+
+/-- Telescoping collision-rate sum with `n + 1` active blocks.  For the uniform merger law,
+the total rate contributed by mergers of every possible size is this sum: the multiplicity
+times the rate for size `j + 2` reduces to
+`(n + 1) (1 / (j + 1) - 1 / (j + 2))`. -/
+noncomputable def bolthausenSznitmanTotalMergerRate (n : ℕ) : ℝ :=
+  ∑ j ∈ Finset.range n,
+    ((n : ℝ) + 1) * (1 / ((j : ℝ) + 1) - 1 / ((j : ℝ) + 2))
+
+/-- The reciprocal differences telescope exactly. -/
+theorem reciprocalDifference_sum (n : ℕ) :
+    ∑ j ∈ Finset.range n,
+      (1 / ((j : ℝ) + 1) - 1 / ((j : ℝ) + 2)) =
+        1 - 1 / ((n : ℝ) + 1) := by
+  induction n with
+  | zero => norm_num
+  | succ n ih =>
+      rw [Finset.sum_range_succ, ih]
+      push_cast
+      ring
+
+/-- **Exact BS rate law.**  With `n + 1` active blocks the next merger occurs at total rate
+`n`; equivalently, with `b` blocks the rate is `b - 1`. -/
+@[simp] theorem bolthausenSznitmanTotalMergerRate_eq (n : ℕ) :
+    bolthausenSznitmanTotalMergerRate n = n := by
+  unfold bolthausenSznitmanTotalMergerRate
+  rw [← Finset.mul_sum, reciprocalDifference_sum]
+  have hne : (n : ℝ) + 1 ≠ 0 := by positivity
+  field_simp
+  ring
+
+/-- **The BS reciprocal-rate ladder diverges.**  Unlike Kingman's quadratic ladder, the
+linear BS total rate does not satisfy the convergent reciprocal-sum condition that creates
+localized Müntz null directions.  This removes that particular obstruction; it does not by
+itself prove injectivity of a nonlinear demographic model. -/
+theorem not_summable_one_div_bolthausenSznitmanTotalMergerRate :
+    ¬ Summable fun n : ℕ ↦ 1 / bolthausenSznitmanTotalMergerRate (n + 1) := by
+  intro h
+  refine Real.not_summable_one_div_natCast ?_
+  refine (summable_nat_add_iff 1).mp ?_
+  simpa using h
 
 end Calibrator
