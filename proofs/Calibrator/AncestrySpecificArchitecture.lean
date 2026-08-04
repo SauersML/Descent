@@ -289,9 +289,28 @@ in different ancestries due to population-specific LD.
 
 section LDTagging
 
-/-- Apparent effect recovered through a tag with squared LD to the causal variant. -/
-noncomputable def taggedEffect (causalEffect tagR2 : ℝ) : ℝ :=
-  causalEffect * tagR2
+/-- Apparent effect recovered through a tag at LD correlation `tagR` to the
+causal variant.
+
+    Regime: one causal variant, one tag, both standardized; the apparent effect
+    is the tag's MARGINAL regression coefficient.
+
+    Empirical status: UNTESTED.
+
+    CORRECTED. This body previously took squared LD. Regressing the phenotype
+    on the tag recovers
+    `Cov(g_tag, y) = β_c · r`, and a standardized tag has unit variance, so no
+    second factor of `r` divides it out. Both forms were carried on the same
+    cells, so the exponent was chosen by the data and not by the parameter's
+    name.
+
+    `r²` remains the right argument for quantities QUADRATIC in the effect --
+    the variance a tag explains is `β_c² · r²`, and there the square belongs.
+    It is the linear effect that takes `r`. The sign matters too and `r²`
+    discards it: two tags in equal-magnitude but opposite-sign LD carry
+    apparent effects of opposite sign. -/
+noncomputable def taggedEffect (causalEffect tagR : ℝ) : ℝ :=
+  causalEffect * tagR
 
 /-- The tagged-effect scale is pinned at an interior reference point. -/
 theorem taggedEffect_at_reference_point : taggedEffect (1 / 2) (1 / 2) = 1 / 4 := by
@@ -301,11 +320,15 @@ theorem taggedEffect_at_reference_point : taggedEffect (1 / 2) (1 / 2) = 1 / 4 :
     If tag_source is the best proxy for causal variant C in the source,
     and tag_target is the best proxy in the target,
     these may be different SNPs entirely. Their apparent effects agree exactly
-    when the causal effect is null or the two tags have the same squared LD. -/
+    when the causal effect is null or the two tags have the same LD correlation.
+
+    The discriminating parameter is the CORRELATION and not its square: two tags
+    with equal `r²` but opposite sign carry apparent effects of opposite sign,
+    which this statement now separates and the `r²` form could not. -/
 theorem taggedEffect_eq_iff
-    (causalEffect sourceTagR2 targetTagR2 : ℝ) :
-    taggedEffect causalEffect sourceTagR2 = taggedEffect causalEffect targetTagR2 ↔
-      causalEffect = 0 ∨ sourceTagR2 = targetTagR2 := by
+    (causalEffect sourceTagR targetTagR : ℝ) :
+    taggedEffect causalEffect sourceTagR = taggedEffect causalEffect targetTagR ↔
+      causalEffect = 0 ∨ sourceTagR = targetTagR := by
   unfold taggedEffect
   constructor
   · intro h

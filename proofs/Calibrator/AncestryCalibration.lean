@@ -33,7 +33,9 @@ recalibration (a + b × PGS) for population T?
 section LinearRecalibration
 
 /-- Target-population slope obtained by transporting a source slope through effect correlation
-`rho` and score-variance ratio `alpha`. -/
+`rho` and score-variance ratio `alpha`.
+
+Empirical status: UNTESTED. -/
 noncomputable def ancestryRecalibratedSlope (bSource rho alpha : ℝ) : ℝ :=
   rho * (bSource * alpha) / alpha ^ 2
 
@@ -46,13 +48,23 @@ theorem ancestryRecalibratedSlope_eq
   unfold ancestryRecalibratedSlope
   field_simp
 
-/-- Source `R²` retained after linear recalibration at squared effect correlation `rhoSq`. -/
+/-- Source `R²` retained after linear recalibration at squared effect correlation `rhoSq`.
+
+Empirical status: UNTESTED. -/
 noncomputable def ancestryRecalibratedR2 (r2Source rhoSq : ℝ) : ℝ :=
   r2Source * rhoSq
 
-/-- Source `R²` lost to non-recoverable effect turnover. -/
+/-- Source `R²` lost to non-recoverable effect turnover.
+
+Empirical status: UNTESTED. -/
 noncomputable def effectTurnoverR2Loss (r2Source rhoSq : ℝ) : ℝ :=
   r2Source * (1 - rhoSq)
+
+/-- Effect-turnover loss and the retained-heterozygosity chart are the same
+two-argument arithmetic map, with different biological interpretations. -/
+theorem effectTurnoverR2Loss_eq_targetHetFromFst (r2Source rhoSq : ℝ) :
+    effectTurnoverR2Loss r2Source rhoSq = targetHetFromFst r2Source rhoSq := by
+  rfl
 
 /-- **Recalibration recovers R² up to effect turnover limit.**
     After optimal linear recalibration, the residual R² loss is
@@ -290,37 +302,57 @@ theorem threshold_shift_changes_prevalence
     (h_mean_shift : liability_mean₁ < liability_mean₂) :
     threshold - liability_mean₂ < threshold - liability_mean₁ := by linarith
 
-/-- Prevalence-dependent `R²` factor in the simplified liability-threshold chart. -/
-noncomputable def prevalenceScaledR2 (h2 prevalence : ℝ) : ℝ :=
-  h2 * (prevalence * (1 - prevalence))
+/-- Prevalence-dependent `R²` factor in the simplified liability-threshold chart.
 
-/-- **Exact prevalence ambiguity of the simplified liability `R²` chart.**
-    This is a key insight from Wang et al.: R² and AUC can disagree
-    about portability because R² depends on prevalence.
-    Under the liability threshold model, R² ≈ h² × f(K) where K is
-    prevalence and f(K) = K(1-K)/φ(Φ⁻¹(K))². Different K → different R²
-    even with identical genetic effects.
-    We model this: R² scales with K(1-K), so different prevalences yield
-    different R² values given the same underlying discrimination. -/
-theorem prevalenceScaledR2_eq_iff
-    (h2 π₁ π₂ : ℝ)
-    (h_h2 : h2 ≠ 0) :
-    prevalenceScaledR2 h2 π₁ = prevalenceScaledR2 h2 π₂ ↔
-      π₁ = π₂ ∨ π₁ + π₂ = 1 := by
-  unfold prevalenceScaledR2
-  constructor
-  · intro h_equal
-    have h_core := mul_left_cancel₀ h_h2 h_equal
-    have h_factor : (π₁ - π₂) * (1 - π₁ - π₂) = 0 := by nlinarith
-    rcases mul_eq_zero.mp h_factor with h_same | h_complement
-    · exact Or.inl (by linarith)
-    · exact Or.inr (by linarith)
-  · rintro (h_same | h_complement)
-    · subst π₂
-      rfl
-    · have hπ₂ : π₂ = 1 - π₁ := by linarith
-      rw [hπ₂]
-      ring
+    Regime: a liability-threshold model, liability = genetic value + noise, the
+    threshold placed to give prevalence `K`.
+
+    Empirical status: UNTESTED. The observed-scale `R²` of a
+    liability-threshold genetic value is the variance it explains,
+    `h2 · φ(t)²` with `t = Φ⁻¹(1-K)`, divided by the outcome variance
+    `K(1-K)`.
+
+    CORRECTED. The previous body multiplied by `K(1-K)`. That factor is the
+    denominator of observed-scale `R²`, while the threshold-density square is
+    part of its numerator.
+
+    The old docstring already carried the correct relation in prose -- "`f(K) =
+    K(1-K)/φ(Φ⁻¹(K))²`" -- and the body simplified it away. -/
+noncomputable def prevalenceScaledR2 (h2 prevalence : ℝ) : ℝ :=
+  h2 * standardNormalPdf (liabilityThreshold prevalence) ^ 2 /
+    (prevalence * (1 - prevalence))
+
+/-- **The prevalence chart is symmetric about `K = 1/2`**, given the
+standard-normal reflection at the threshold.
+
+    `R²` and `AUC` can disagree about portability because `R²` depends on
+    prevalence and `AUC` does not; that dependence is what this body carries.
+    The complement `K ↦ 1 - K` leaves it fixed, because the liability threshold
+    only changes sign there and both `φ` and `K(1-K)` are even under that
+    change.
+
+    The reflection `Φ⁻¹(K) = -Φ⁻¹(1-K)` is a fact about the standard normal, not
+    about this body, and it is taken as a HYPOTHESIS here rather than proved:
+    `liabilityThreshold` is defined through `Function.invFun Phi`, so deriving
+    it needs `Phi (-x) = 1 - Phi x` together with injectivity of `Phi`, neither
+    of which this development has. The hypothesis is in the statement so that
+    what is assumed is visible rather than described beside it.
+
+    WHAT IS NO LONGER CLAIMED. The previous statement here was an `iff`: that
+    two prevalences give the same value exactly when they are equal or sum to
+    one. Its forward direction was available only because the old body was the
+    quadratic `h2 · K(1-K)`, where `nlinarith` factors the difference. That body
+    is falsified (see `prevalenceScaledR2` above), and for the corrected one the
+    converse needs strict monotonicity of `φ(Φ⁻¹(1-K))² / (K(1-K))` on
+    `(0, 1/2]`. That is true and is not proved here. It is recorded as an open
+    item rather than restated in a form the corrected body happens to satisfy. -/
+theorem prevalenceScaledR2_symm_of_threshold_reflection
+    (h2 π : ℝ)
+    (h_reflect : liabilityThreshold (1 - π) = -liabilityThreshold π) :
+    prevalenceScaledR2 h2 (1 - π) = prevalenceScaledR2 h2 π := by
+  unfold prevalenceScaledR2 standardNormalPdf
+  rw [h_reflect, neg_sq]
+  ring
 
 end PhenotypeHeterogeneity
 

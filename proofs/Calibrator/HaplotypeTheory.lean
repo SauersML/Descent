@@ -131,7 +131,12 @@ theorem uniformOccupancyDistinctHaplotypes_strictMono
     Lower in more diverse populations → more unique haplotypes.
     With n haplotypes at equal frequency 1/n, H = n × (1/n)² = 1/n.
 
-    Empirical status: UNTESTED. -/
+    Regime: haplotypes drawn independently, so this is the identity-by-state
+    match probability and not an identity-by-descent one.
+
+    Empirical status: UNTESTED. The displayed formula follows algebraically from
+    independence: the probability that two draws match is the sum, over
+    haplotypes, of the product of their two marginal probabilities. -/
 noncomputable def haplotypeHomozygosity {α : Type*} [Fintype α] (freq : α → ℝ) : ℝ :=
   ∑ i, freq i ^ 2
 

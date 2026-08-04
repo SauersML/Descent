@@ -741,11 +741,18 @@ theorem balancedRankOneCovariance_rademacherExponent_eq_finiteCW
     baseline spikeStrength population vector hrademacher]
   ring
 
+/-- The constant-one vector on an arbitrary coordinate type. -/
+def constantOneVector {Coordinate : Type*} : Coordinate → ℝ :=
+  fun _coordinate ↦ 1
+
+@[simp] theorem constantOneVector_apply {Coordinate : Type*}
+    (coordinate : Coordinate) : constantOneVector coordinate = 1 := rfl
+
 /-- The all-one Rademacher vector is orthogonal to the balanced hidden
 direction. -/
 def balancedRankOneOrthogonalSpin (population : ℕ) :
     BalancedRankOneCoordinate population → ℝ :=
-  fun _coordinate ↦ 1
+  constantOneVector
 
 /-- The explicit orthogonal spin is genuinely Rademacher-valued. -/
 theorem balancedRankOneOrthogonalSpin_isRademacher (population : ℕ) :
@@ -2092,30 +2099,14 @@ theorem finiteCWTypeMass_endpoint_le_one_of_subcritical
     apply Real.exp_le_one_iff.mpr
     exact mul_nonpos_of_nonneg_of_nonpos hpopulationNonnegative hpositiveObjective
 
-/-- An admissible Curie--Weiss type count never exceeds its population. -/
-theorem finiteCWUpSpins_le_population
-    (population upSpins : ℕ)
-    (hupSpins : upSpins ∈ Finset.range (population + 1)) :
-    upSpins ≤ population :=
-  Nat.le_of_lt_succ (Finset.mem_range.mp hupSpins)
-
-/-- At zero population, the unique admissible Curie--Weiss type is zero. -/
-theorem finiteCWUpSpins_eq_zero_of_population_eq_zero
-    (population upSpins : ℕ)
-    (hupSpins : upSpins ∈ Finset.range (population + 1))
-    (hpopulation : population = 0) :
-    upSpins = 0 := by
-  exact Nat.eq_zero_of_le_zero
-    (hpopulation ▸ finiteCWUpSpins_le_population population upSpins hupSpins)
-
 /-- The unique zero-population type has unit mass. -/
 theorem finiteCWTypeMass_eq_one_of_population_eq_zero
     (population upSpins : ℕ) (tlam : ℝ)
     (hupSpins : upSpins ∈ Finset.range (population + 1))
     (hpopulation : population = 0) :
     finiteCWTypeMass population tlam upSpins = 1 := by
-  have hupZero := finiteCWUpSpins_eq_zero_of_population_eq_zero
-    population upSpins hupSpins hpopulation
+  have hupZero : upSpins = 0 := Nat.eq_zero_of_le_zero
+    (hpopulation ▸ Nat.le_of_lt_succ (Finset.mem_range.mp hupSpins))
   subst population
   subst upSpins
   simp [finiteCWTypeMass, finiteCWMagnetization]
@@ -2126,7 +2117,8 @@ theorem finiteCWTypeMass_le_one_of_subcritical
     (population upSpins : ℕ) (tlam : ℝ) (hcritical : tlam ≤ 1)
     (hupSpins : upSpins ∈ Finset.range (population + 1)) :
     finiteCWTypeMass population tlam upSpins ≤ 1 := by
-  have hle := finiteCWUpSpins_le_population population upSpins hupSpins
+  have hle : upSpins ≤ population :=
+    Nat.le_of_lt_succ (Finset.mem_range.mp hupSpins)
   by_cases hpopulation : population = 0
   · exact (finiteCWTypeMass_eq_one_of_population_eq_zero
       population upSpins tlam hupSpins hpopulation).le
@@ -2152,7 +2144,8 @@ theorem finiteCWTypeMass_le_exp_variationalPressure
     (hupSpins : upSpins ∈ Finset.range (population + 1)) :
     finiteCWTypeMass population tlam upSpins ≤
       Real.exp ((population : ℝ) * cwVariationalPressureGap tlam) := by
-  have hle := finiteCWUpSpins_le_population population upSpins hupSpins
+  have hle : upSpins ≤ population :=
+    Nat.le_of_lt_succ (Finset.mem_range.mp hupSpins)
   by_cases hpopulation : population = 0
   · rw [finiteCWTypeMass_eq_one_of_population_eq_zero
       population upSpins tlam hupSpins hpopulation, hpopulation]
@@ -3540,7 +3533,17 @@ theorem mesoscopicGFOMIterate_succ_apply
 without adding an unnecessary probabilistic layer. -/
 def mesoscopicGFOMUnitInput (iteration : ℕ) :
     MesoscopicGFOMCoordinate iteration → ℝ :=
-  fun _coordinate ↦ 1
+  constantOneVector
+
+/-- Both deterministic inputs are restrictions of the same constant-one
+vector, despite living on different finite coordinate spaces. -/
+theorem balancedRankOneOrthogonalSpin_eq_mesoscopicGFOMUnitInput
+    (population iteration : ℕ)
+    (balancedCoordinate : BalancedRankOneCoordinate population)
+    (mesoscopicCoordinate : MesoscopicGFOMCoordinate iteration) :
+    balancedRankOneOrthogonalSpin population balancedCoordinate =
+      mesoscopicGFOMUnitInput iteration mesoscopicCoordinate := by
+  rfl
 
 /-- Normalized squared output of the genuine finite diagonal iteration. -/
 noncomputable def mesoscopicGFOMActualEnergy (iteration runtime : ℕ) : ℝ :=
@@ -4213,7 +4216,9 @@ theorem rootedInvariantPolynomial_canonicalTraffic_factorization
     RootedCanonicalTrafficFactorizationStatement coefficient value :=
   invariantPolynomial_canonicalTraffic_factorization coefficient value hinvariant
 
-/-- The exact scalar degree-bounded traffic factorization statement. -/
+/-- The exact scalar degree-bounded traffic factorization statement.
+
+Convention: `D` is polynomial edge degree, not linkage-disequilibrium `D`. -/
 noncomputable def DegreeAtMostTrafficFactorizationStatement
     {D : ℕ} {Label : Type*} [Fintype Label]
     (coefficient value : (degree : Fin (D + 1)) →
@@ -4226,7 +4231,9 @@ noncomputable def DegreeAtMostTrafficFactorizationStatement
           ∑ monomial,
             if equalityPatternShape monomial = graph then value degree monomial else 0
 
-/-- The exact rooted degree-bounded traffic factorization statement. -/
+/-- The exact rooted degree-bounded traffic factorization statement.
+
+Convention: `D` is polynomial edge degree, not linkage-disequilibrium `D`. -/
 noncomputable def DegreeAtMostRootedTrafficFactorizationStatement
     {D : ℕ} {Label : Type*} [Fintype Label]
     (coefficient value : (degree : Fin (D + 1)) →
@@ -4273,36 +4280,65 @@ theorem degreeAtMostRootedInvariantPolynomial_canonicalTraffic_factorization
 
 /-- The complete canonical traffic profile seen by scalar polynomials of total
 degree at most `D`.  At homogeneous degree `d`, it stores every graph sum on
-the equality-pattern quotient of the `2d` ordered matrix endpoints. -/
+the equality-pattern quotient of the `2d` ordered matrix endpoints.
+
+Convention: `D` is polynomial edge degree, not linkage-disequilibrium `D`. -/
 def DegreeAtMostCanonicalTrafficProfile (D : ℕ) (Label : Type*) :=
   (degree : Fin (D + 1)) →
     EqualityPattern (Fin (degree : ℕ) × Bool) Label → ℝ
 
+/-- The equality-pattern sum common to scalar and rooted traffic profiles. -/
+noncomputable def equalityPatternProfile
+    {Slot Label : Type*} [Fintype Slot] [DecidableEq Slot] [Fintype Label]
+    (value : (Slot → Label) → ℝ) (graph : EqualityPattern Slot Label) : ℝ :=
+  ∑ monomial,
+    if equalityPatternShape monomial = graph then value monomial else 0
+
 /-- Evaluate the canonical degree-limited traffic profile of a family of
-monomial values. -/
+monomial values.
+
+Convention: `D` is polynomial edge degree, not linkage-disequilibrium `D`. -/
 noncomputable def degreeAtMostCanonicalTrafficProfile
     {D : ℕ} {Label : Type*} [Fintype Label]
     (value : (degree : Fin (D + 1)) →
       ((Fin (degree : ℕ) × Bool → Label) → ℝ)) :
     DegreeAtMostCanonicalTrafficProfile D Label :=
-  fun degree graph ↦ ∑ monomial,
-    if equalityPatternShape monomial = graph then value degree monomial else 0
+  fun degree graph ↦ equalityPatternProfile (value degree) graph
 
 /-- The rooted profile seen by degree-limited equivariant vector-polynomial
-coordinates.  The additional `Option` slot marks the output label. -/
+coordinates.  The additional `Option` slot marks the output label.
+
+Convention: `D` is polynomial edge degree, not linkage-disequilibrium `D`. -/
 def DegreeAtMostRootedCanonicalTrafficProfile (D : ℕ) (Label : Type*) :=
   (degree : Fin (D + 1)) →
     EqualityPattern (Option (Fin (degree : ℕ) × Bool)) Label → ℝ
 
 /-- Evaluate the rooted canonical traffic profile of a family of rooted
-monomial values. -/
+monomial values.
+
+Convention: `D` is polynomial edge degree, not linkage-disequilibrium `D`. -/
 noncomputable def degreeAtMostRootedCanonicalTrafficProfile
     {D : ℕ} {Label : Type*} [Fintype Label]
     (value : (degree : Fin (D + 1)) →
       ((Option (Fin (degree : ℕ) × Bool) → Label) → ℝ)) :
     DegreeAtMostRootedCanonicalTrafficProfile D Label :=
-  fun degree graph ↦ ∑ monomial,
-    if equalityPatternShape monomial = graph then value degree monomial else 0
+  fun degree graph ↦ equalityPatternProfile (value degree) graph
+
+/-- Scalar and rooted degree-limited profiles are the two endpoint-slot
+specializations of the same equality-pattern sum. -/
+theorem degreeAtMostTrafficProfiles_are_equalityPatternProfiles
+    {D : ℕ} {Label : Type*} [Fintype Label]
+    (value : (degree : Fin (D + 1)) →
+      ((Fin (degree : ℕ) × Bool → Label) → ℝ))
+    (rootedValue : (degree : Fin (D + 1)) →
+      ((Option (Fin (degree : ℕ) × Bool) → Label) → ℝ)) :
+    (∀ degree graph,
+      degreeAtMostCanonicalTrafficProfile value degree graph =
+        equalityPatternProfile (value degree) graph) ∧
+    (∀ degree graph,
+      degreeAtMostRootedCanonicalTrafficProfile rootedValue degree graph =
+        equalityPatternProfile (rootedValue degree) graph) := by
+  exact ⟨fun _degree _graph ↦ rfl, fun _degree _graph ↦ rfl⟩
 
 /-- The scalar factorization theorem expressed as literal factorization
 through the canonical profile map. -/
@@ -4318,7 +4354,7 @@ theorem degreeAtMostInvariantPolynomial_factorsThroughCanonicalTrafficProfile
         ∑ graph : EqualityPattern (Fin (degree : ℕ) × Bool) Label,
           graphShapeCoefficient equalityPatternShape (coefficient degree) graph *
             degreeAtMostCanonicalTrafficProfile value degree graph := by
-  simpa only [degreeAtMostCanonicalTrafficProfile] using
+  simpa only [degreeAtMostCanonicalTrafficProfile, equalityPatternProfile] using
     degreeAtMostInvariantPolynomial_canonicalTraffic_factorization
       coefficient value hinvariant
 
@@ -4368,6 +4404,7 @@ theorem degreeAtMostRootedInvariantPolynomial_eq_of_canonicalTrafficProfile_eq
   intro graph _hgraph
   have hcomponent := congrFun (congrFun htraffic degree) graph
   dsimp only [degreeAtMostRootedCanonicalTrafficProfile] at hcomponent
+  simp only [equalityPatternProfile] at hcomponent
   rw [hcomponent]
 
 /-- **Direct fixed-degree invariant-separation hardness theorem.**  A single
@@ -5315,6 +5352,20 @@ structure FiniteLowRankSingularSpectrum
   inactive_zero : ∀ coordinate ∉ active, singularValue coordinate = 0
   active_card_le_rank : active.card ≤ rank
 
+/-- The zero spectrum is a concrete inhabitant of the low-rank certificate
+type; its support, rank, and operator bound all vanish. -/
+noncomputable def zeroFiniteLowRankSingularSpectrum :
+    FiniteLowRankSingularSpectrum PUnit where
+  singularValue := fun _coordinate ↦ 0
+  active := ∅
+  rank := 0
+  operatorBound := 0
+  operatorBound_nonnegative := le_rfl
+  singularValue_nonnegative := by simp
+  singularValue_le_operatorBound := by simp
+  inactive_zero := by simp
+  active_card_le_rank := by simp
+
 /-- Raw nuclear distance represented by the sum of the certified singular
 values. -/
 noncomputable def FiniteLowRankSingularSpectrum.rawNuclearDistance
@@ -5462,6 +5513,22 @@ structure MatchedInformationPathCertificate where
       (Set.Icc (0 : ℝ) 1) interpolation
   posteriorCovarianceTraceBound : ∀ interpolation ∈ Set.Ico (0 : ℝ) 1,
     |tracePairing interpolation| ≤ variance * nuclearDistance
+
+/-- The constant zero path is a concrete matched-information certificate.  It
+anchors the abstract certificate API in an actual model with zero variance and
+zero covariance displacement. -/
+noncomputable def zeroMatchedInformationPathCertificate :
+    MatchedInformationPathCertificate where
+  informationPath := fun _interpolation ↦ 0
+  tracePairing := fun _interpolation ↦ 0
+  variance := 0
+  nuclearDistance := 0
+  variance_nonnegative := le_rfl
+  nuclearDistance_nonnegative := le_rfl
+  immseDerivative := by
+    intro interpolation _hinterpolation
+    simpa using (hasDerivAt_const interpolation (0 : ℝ)).hasDerivWithinAt
+  posteriorCovarianceTraceBound := by simp
 
 /-- **Matrix-path derivation of the nuclear estimate.**  The I--MMSE
 directional derivative and posterior-covariance trace bound imply that the
@@ -6057,8 +6124,8 @@ theorem randomDesign_eventually_separates_of_scalarGap_of_wishartRatio
     scalarLeft scalarRight delta constant constant adjustedRatio adjustedRatio
     randomLeft randomRight hleft hright hgap hpositive hratio hratio
 
-/-- **Concrete large-aspect-ratio asymptotic reduction.**  This is exactly the
-Wishart-ratio theorem above under the reciprocal reparameterization
+/-- **Concrete large-aspect-ratio asymptotic reduction.**  This applies the
+Wishart-ratio theorem above after the reciprocal reparameterization
 `adjustedRatio = aspectRatio⁻¹`.  Thus the two APIs have one proof path rather
 than independent asymptotic arguments. -/
 theorem randomDesign_eventually_separates_of_scalarGap_of_aspectAtTop

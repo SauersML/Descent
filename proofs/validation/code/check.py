@@ -40,6 +40,11 @@ THE GUARDS, and what each one catches:
                   different statements, and verbatim repeated blocks of source.
                   It complements the duplicate-BODY screen in `identifications`,
                   which sees `def` bodies and nothing else.
+  mathlib         a corpus declaration whose name Mathlib already uses, which
+                  means the corpus re-proved something upstream.  Name-based,
+                  so it is a lower bound: a duplicate under a different name is
+                  invisible to it.  It FAILS rather than passes when Mathlib's
+                  source is absent, because it cannot look.
   laundering      a valid proof of a weaker, conditional, vacuous or circular
                   statement advertised under the intended theorem's name.
   regimes         external theorem packaging in production structures: a
@@ -4627,6 +4632,513 @@ def run_duplication() -> int:
     return 0
 
 
+
+# ======================================================================================
+# MATHLIB: A CORPUS DECLARATION THAT ALREADY EXISTS UPSTREAM
+# ======================================================================================
+#
+# The corpus must never write something Mathlib already has.  Re-proving an
+# upstream lemma is not merely redundant: the local copy is the one that goes
+# stale, it is stated under whatever hypotheses the local proof happened to
+# need rather than the general ones, and every later reader has to establish
+# for themselves that the two agree.  Four cases were found and removed by
+# hand -- `one_sub_lt_exp_neg` (weaker than `Real.one_sub_lt_exp_neg`, which
+# needs only `x != 0`), `constant_div_natSucc_tendsto_zero`
+# (`tendsto_const_div_atTop_nhds_zero_nat`), `dotProduct_comm`, and the whole
+# `sigmoid` block (`Real.sigmoid`) -- and this guard exists so the fifth is
+# found by a machine.
+#
+# WHAT IT MEASURES.  A corpus declaration whose own name is, verbatim, the name
+# of a Mathlib declaration.  Name equality is the signal because Mathlib's
+# naming convention is generated from the statement: two declarations that
+# Mathlib would name identically state the same fact about the same operators
+# in the same order.  It is a lower bound, not a survey -- a duplicate written
+# under a different name is invisible here, and that is the honest limit of a
+# name-based screen.  It is stated so no reader mistakes a clean report for
+# "the corpus duplicates nothing".
+#
+# WHY NOT SUFFIX MATCHING.  Comparing bare final components (`Foo.mono` against
+# `Mathlib`'s `Bar.mono`) produces almost nothing but noise: structure
+# projections, `ext`, `mono`, `nonempty` and `symm` collide across every
+# namespace in both libraries and mean nothing.  Only dotless corpus names are
+# considered, which is exactly the set that lands in the `Calibrator` root.
+#
+# WHICH MATHLIB NAMES COUNT.  Mathlib's FULL name, namespace included, because
+# `CategoryTheory.core`, `SimpleGraph.Walk.transfer` and `Ordinal.gamma` are
+# not in scope for this corpus and a bare-name comparison reported all three.
+# A Mathlib declaration collides only if its full name is the corpus name
+# itself, or is that name inside a namespace THIS CORPUS OPENS -- which is read
+# off the corpus's own `open` lines rather than hardcoded, so it tracks the
+# corpus instead of drifting from it.  That is what keeps `Real.sigmoid` and
+# `Matrix.dotProduct_comm` findings while dropping the category theory.
+#
+# WHY IT CANNOT SILENTLY PASS.  The guard needs Mathlib's SOURCE, which lives
+# in `.lake/packages/mathlib` and is absent on a tree that has never been
+# built.  A guard that quietly reports zero findings when it could not look is
+# the failure mode this whole directory exists to prevent, so a missing Mathlib
+# is a FAILURE with the path it looked for, not a pass.  Point it elsewhere
+# with GNOMON_MATHLIB.
+
+# Every budget here is 0, like every other budget in this file.  Nothing is
+# grandfathered: the four known collisions were removed before the guard
+# landed, not pinned.
+MATHLIB_COLLISION_BUDGET = 0
+
+MATHLIB_DECL = re.compile(
+    r"^(?:@\[[^\]]*\][ \t]*)?"
+    r"(?:private |protected |noncomputable |nonrec |scoped |partial |unsafe |local )*"
+    r"(theorem|lemma|def|abbrev|instance)[ \t]+"
+    r"([A-Za-z_][A-Za-z0-9_'!?.]*)"
+)
+
+# Names that mean something different on each side of the boundary, or that are
+# too generic for name equality to be evidence.  Each one is here because it
+# was checked BY HAND and found not to be a duplicate; this list is not a place
+# to silence a finding that has not been read.
+MATHLIB_EXEMPT = {
+    # `Calibrator.covariance` is the covariance of an abstract `ExpFunctional`,
+    # a linear functional on `Omega -> R`.  Mathlib's `ProbabilityTheory.
+    # covariance` is the covariance of two functions against a MEASURE.  The
+    # corpus one is deliberately measure-free -- that is the point of
+    # `TransportIdentities` -- so neither can be expressed as the other.
+    "covariance",
+    "covariance_add_right",
+    "covariance_smul_right",
+    "variance",
+    "mean",
+}
+
+
+def mathlib_root() -> Path | None:
+    """Where Mathlib's source is, or `None`.
+
+    `GNOMON_MATHLIB` wins so the guard can be calibrated against a fixture
+    tree, exactly as `GNOMON_CORPUS` does for the corpus half.
+    """
+    override = os.environ.get("GNOMON_MATHLIB")
+    if override:
+        path = Path(override)
+        return path if path.is_dir() else None
+    path = REPO / ".lake" / "packages" / "mathlib" / "Mathlib"
+    return path if path.is_dir() else None
+
+
+def mathlib_declared_names(root: Path) -> dict:
+    """Every declaration name Mathlib writes, mapped to one source location.
+
+    Comments are stripped first for the same reason the corpus side strips
+    them: Mathlib's prose contains lines beginning `theorem ...` inside module
+    docstrings, and counting those would invent collisions.
+
+    This deliberately does NOT reuse `lean_sources`.  That walk drops any path
+    with a dot-prefixed component, which is right for the corpus and fatal
+    here: Mathlib lives under `.lake/packages/`, so every one of its files has
+    a dotted ancestor and the walk returned nothing.  The guard reported
+    "CANNOT RUN" rather than a clean zero, which is the only reason the bug was
+    visible at all.  Dot components are filtered relative to `root` instead.
+    """
+    names: dict = {}
+    for path in sorted(
+        candidate
+        for candidate in root.rglob("*.lean")
+        if not any(part.startswith(".")
+                   for part in candidate.relative_to(root).parts)
+    ):
+        try:
+            src = ident_strip_comments(read_source(path))
+        except ValueError:
+            continue
+        # `section`s are tracked as well as `namespace`s, and both are pushed on
+        # ONE stack, because `end` closes whichever is innermost.  Popping only
+        # on `namespace` was wrong in the direction that hides nothing and
+        # invents everything: a file with `namespace Stream'` followed by any
+        # `section ... end` had `Stream'` popped by the section's `end`, so the
+        # rest of the file's declarations were recorded as root-level and
+        # collided with every corpus name that happened to match.
+        stack: list[str | None] = []
+        for lineno, line in enumerate(src.split("\n"), start=1):
+            opened = MATHLIB_NAMESPACE_OPEN.match(line)
+            if opened:
+                stack.append(opened.group(1))
+                continue
+            if MATHLIB_SECTION_OPEN.match(line):
+                stack.append(None)
+                continue
+            if MATHLIB_NAMESPACE_CLOSE.match(line):
+                if stack:
+                    stack.pop()
+                continue
+            match = MATHLIB_DECL.match(line)
+            if match:
+                written = match.group(2)
+                if written.startswith("_root_."):
+                    full = written[len("_root_."):]
+                else:
+                    enclosing = [part for part in stack if part]
+                    full = ".".join(enclosing + [written]) if enclosing else written
+                names.setdefault(full,
+                                 f"{path.relative_to(root.parent)}:{lineno}")
+    return names
+
+
+# --------------------------------------------------------------------------------------
+# THE SECOND SCREEN: WHAT THE THEOREM SAYS, NOT WHAT IT IS CALLED
+#
+# Name equality is a lower bound and a narrow one.  A duplicate written under a
+# different name -- which is the common case, because a corpus author who knew
+# the Mathlib name would have used the Mathlib lemma -- is invisible to it.
+# `constant_div_natSucc_tendsto_zero` and `tendsto_const_div_atTop_nhds_zero_nat`
+# share no token at all, and were the same theorem.
+#
+# So the statement itself is normalised and compared.  The normal form is the
+# CONCLUSION with every bound variable replaced by `_` and every namespace
+# prefix dropped, so `Real.exp (-x)` and `exp (-h)` become the same text.  What
+# survives is the operator skeleton and the global constants, which is what
+# "the same theorem" means when the two libraries name their variables
+# differently and sit in different namespaces.
+#
+# WHAT IT DELIBERATELY DOES NOT DO.  It does not look at hypotheses.  A corpus
+# lemma whose conclusion matches a Mathlib lemma but which assumes more is
+# exactly the case worth reporting -- that is `one_sub_lt_exp_neg` requiring
+# `0 < h` where Mathlib requires `x != 0` -- and hiding it behind a hypothesis
+# comparison would have suppressed the first finding this guard was written
+# for.  Nor does it elaborate: it is source text, so `2⁻¹` and `1 / 2` are
+# different, and a statement phrased through a corpus abbreviation does not
+# match the unfolded Mathlib one.  Both limits cut the same way, toward missing
+# duplicates rather than inventing them.
+#
+# SIGNIFICANCE FLOOR.  A normal form has to carry at least
+# MATHLIB_SHAPE_MIN_CONSTANTS distinct global constants and
+# MATHLIB_SHAPE_MIN_LENGTH characters to be reported.  Without it every
+# `_ ≤ _` in the corpus matches a hundred Mathlib lemmas and the screen reports
+# noise at a volume that guarantees nobody reads it.
+# These three floors are MEASURED, not chosen.  Over the corpus and Mathlib as
+# they stand, `constants >= 3` reports nothing AND cannot report the known
+# duplicate the screen was written for -- `1 - _ < exp (-_)` names exactly one
+# constant -- so the floor that looked safe was the floor that made the screen
+# decorative.  At `constants >= 1, length >= 15` the corpus yields exactly one
+# match, `target = target`, which is a corpus field name equal to itself and
+# says nothing.  Hence the third floor: a normal form must also carry at least
+# MATHLIB_SHAPE_MIN_OPERATORS operator occurrences, which `X = X` fails with
+# one and `1 - _ < exp (-_)` passes with three.  The self-test below holds all
+# three to the known pair.
+MATHLIB_SHAPE_MIN_CONSTANTS = 1
+MATHLIB_SHAPE_MIN_LENGTH = 15
+MATHLIB_SHAPE_MIN_OPERATORS = 2
+
+# The operator occurrences that make a normal form say something.  Relations
+# and arithmetic only: brackets and commas appear in every statement and so
+# separate nothing.
+MATHLIB_SHAPE_OPERATORS = re.compile(
+    r"[+\-*/<>=^≤≥≠∑∏∫∈⊆∀∃¬∧∨→↔]|⁻¹|\|\|")
+MATHLIB_SHAPE_BUDGET = 0
+
+MATHLIB_IDENT = re.compile(r"[A-Za-z_][A-Za-z0-9_'!?]*(?:\.[A-Za-z_][A-Za-z0-9_'!?]*)*")
+
+# Tokens that carry no mathematical content for matching purposes: they are
+# either Lean syntax or so ubiquitous that their presence says nothing.
+MATHLIB_SHAPE_NOISE = frozenset("""
+fun forall exists let have show from this at in with by do match if then else
+Type Sort Prop and or not iff true false
+""".split())
+
+
+def mathlib_decl_headers(src: str):
+    """Yield `(lineno, kind, name, header)` for each declaration in `src`.
+
+    `header` is the text between the declaration's name and the start of its
+    proof, which is where the statement lives.
+    """
+    lines = src.split("\n")
+    starts = []
+    for index, line in enumerate(lines):
+        match = MATHLIB_DECL.match(line)
+        if match:
+            starts.append((index, match.group(1), match.group(2), match.end(2)))
+    for position, (index, kind, name, name_end) in enumerate(starts):
+        stop = starts[position + 1][0] if position + 1 < len(starts) else len(lines)
+        chunk = [lines[index][name_end:]] + lines[index + 1:stop]
+        header = []
+        for line in chunk:
+            cut = re.search(r":=", line)
+            if cut:
+                header.append(line[:cut.start()])
+                break
+            header.append(line)
+        yield index + 1, kind, name, "\n".join(header)
+
+
+def mathlib_statement_key(header: str) -> tuple[str, int]:
+    """Normalise a statement to its operator skeleton.
+
+    Returns the normal form and how many distinct global constants it mentions,
+    which is the significance measure the caller thresholds on.
+    """
+    text = header.replace("=>", "↦")
+    # Split binders from conclusion at the last colon outside every bracket.
+    depth, cut = 0, -1
+    for position, char in enumerate(text):
+        if char in "([{⟨⦃":
+            depth += 1
+        elif char in ")]}⟩⦄":
+            depth -= 1
+        elif char == ":" and depth == 0 and not text.startswith("::", position):
+            cut = position
+    binder_region, conclusion = (text[:cut], text[cut + 1:]) if cut >= 0 else ("", text)
+
+    # A bound variable is a lowercase, undotted identifier introduced on the
+    # left.  Types and structures are capitalised by convention, and dotted
+    # names are global, so neither is mistaken for a binder.
+    bound = {
+        token for token in MATHLIB_IDENT.findall(binder_region)
+        if "." not in token and token[:1].islower()
+    }
+    bound |= {
+        token for token in MATHLIB_IDENT.findall(conclusion)
+        if "." not in token and token[:1].islower() and len(token) <= 2
+    }
+
+    constants: set[str] = set()
+
+    def rewrite(match: re.Match) -> str:
+        token = match.group(0)
+        if token in bound or token in MATHLIB_SHAPE_NOISE:
+            return "_"
+        short = token.rsplit(".", 1)[-1]
+        if short in MATHLIB_SHAPE_NOISE:
+            return "_"
+        constants.add(short)
+        return short
+
+    skeleton = MATHLIB_IDENT.sub(rewrite, conclusion)
+    skeleton = re.sub(r"\s+", " ", skeleton).strip()
+    skeleton = re.sub(r"(?:_ )+_", "_", skeleton)
+    return skeleton, len(constants)
+
+
+MATHLIB_NAMESPACE_OPEN = re.compile(r"^namespace[ \t]+([A-Za-z_][A-Za-z0-9_'.]*)[ \t]*$")
+MATHLIB_SECTION_OPEN = re.compile(r"^(?:noncomputable[ \t]+)?section\b")
+MATHLIB_NAMESPACE_CLOSE = re.compile(r"^end\b")
+
+# `open` lines in the corpus, which is what decides whose short names are in
+# scope.  `open scoped Foo` counts too: it brings `Foo`'s scoped notation and
+# instances in, and a corpus name shadowing a `Foo` lemma is the same defect.
+CORPUS_OPEN = re.compile(r"^open[ \t]+(?:scoped[ \t]+)?(.+?)[ \t]*(?:\bin\b.*)?$")
+
+
+def corpus_open_namespaces() -> set:
+    """Every namespace the corpus opens, plus the root namespace as `""`.
+
+    Read from the corpus rather than hardcoded so the guard cannot drift away
+    from what the corpus actually has in scope.  A hardcoded list would go
+    stale in exactly the direction that hides findings.
+    """
+    namespaces = {""}
+    for path in ident_lean_files():
+        src = ident_strip_comments(read_source(Path(path)))
+        for line in src.split("\n"):
+            match = CORPUS_OPEN.match(line)
+            if not match:
+                continue
+            for token in match.group(1).split():
+                if re.fullmatch(r"[A-Za-z_][A-Za-z0-9_'.]*", token):
+                    namespaces.add(token)
+    return namespaces
+
+
+# The control for the shape screen.  A detector that reports nothing is
+# indistinguishable from a clean corpus, and this one reports nothing over the
+# corpus today, so its silence is worth exactly as much as this control.  The
+# pair is REAL: it is `one_sub_lt_exp_neg` as the corpus wrote it, against the
+# Mathlib lemma of the same content, which differ in variable names, in
+# namespace qualification and in hypothesis, and which the screen must
+# nonetheless identify.  The negative pair must NOT be identified.
+MATHLIB_SHAPE_CONTROL_SAME = (
+    "{h : ℝ} (hh : 0 < h) : 1 - h < Real.exp (-h)",
+    "{x : ℝ} (hx : x ≠ 0) : 1 - x < exp (-x)",
+)
+MATHLIB_SHAPE_CONTROL_DIFFERENT = (
+    "(a b : ℝ) : Real.exp (a + b) = Real.exp a * Real.exp b",
+    "(a b : ℝ) : Real.log (a * b) = Real.log a + Real.log b",
+)
+
+
+def mathlib_shape_is_significant(skeleton: str, constants: int) -> bool:
+    """Whether a normal form says enough for a match to be evidence."""
+    return (constants >= MATHLIB_SHAPE_MIN_CONSTANTS
+            and len(skeleton) >= MATHLIB_SHAPE_MIN_LENGTH
+            and len(MATHLIB_SHAPE_OPERATORS.findall(skeleton))
+            >= MATHLIB_SHAPE_MIN_OPERATORS)
+
+
+def mathlib_shape_selftest() -> list:
+    """Findings about the screen itself, empty when the screen works."""
+    problems = []
+    left, right = MATHLIB_SHAPE_CONTROL_SAME
+    left_key, left_constants = mathlib_statement_key(left)
+    right_key, _ = mathlib_statement_key(right)
+    if left_key != right_key:
+        problems.append(
+            "the shape normal form no longer identifies a known duplicate pair:\n"
+            f"      {left}\n        -> {left_key}\n"
+            f"      {right}\n        -> {right_key}")
+    if not mathlib_shape_is_significant(left_key, left_constants):
+        problems.append(
+            f"the significance floors ({MATHLIB_SHAPE_MIN_CONSTANTS} constants, "
+            f"{MATHLIB_SHAPE_MIN_LENGTH} characters, "
+            f"{MATHLIB_SHAPE_MIN_OPERATORS} operators) discard the known duplicate "
+            f"pair, whose normal form {left_key!r} carries {left_constants} "
+            f"constants, {len(left_key)} characters and "
+            f"{len(MATHLIB_SHAPE_OPERATORS.findall(left_key))} operators; the "
+            f"screen cannot report the very finding it was written for")
+    if mathlib_shape_is_significant(*mathlib_statement_key("(f : α → β) : target = target")):
+        problems.append(
+            "the significance floors admit `target = target`, a name equal to "
+            "itself, which matched a Mathlib field lemma and meant nothing")
+    first, second = MATHLIB_SHAPE_CONTROL_DIFFERENT
+    if mathlib_statement_key(first)[0] == mathlib_statement_key(second)[0]:
+        problems.append(
+            "the shape normal form identifies two DIFFERENT statements:\n"
+            f"      {first}\n      {second}")
+    return problems
+
+
+def mathlib_statement_shapes(root: Path) -> dict:
+    """Every Mathlib theorem's normalised conclusion, mapped to one location."""
+    shapes: dict = {}
+    for path in sorted(
+        candidate
+        for candidate in root.rglob("*.lean")
+        if not any(part.startswith(".")
+                   for part in candidate.relative_to(root).parts)
+    ):
+        try:
+            src = ident_strip_comments(read_source(path))
+        except ValueError:
+            continue
+        for lineno, kind, name, header in mathlib_decl_headers(src):
+            if kind not in ("theorem", "lemma"):
+                continue
+            skeleton, constants = mathlib_statement_key(header)
+            if not mathlib_shape_is_significant(skeleton, constants):
+                continue
+            shapes.setdefault(
+                skeleton, f"{name} ({path.relative_to(root.parent)}:{lineno})")
+    return shapes
+
+
+def run_mathlib() -> int:
+    root = mathlib_root()
+    if root is None:
+        looked = os.environ.get("GNOMON_MATHLIB") or str(
+            REPO / ".lake" / "packages" / "mathlib" / "Mathlib")
+        print("mathlib guard CANNOT RUN: no Mathlib source at " + looked)
+        print("  It compares corpus declaration names against Mathlib's, so with no "
+              "Mathlib it has nothing to compare against.  This is reported as a "
+              "failure rather than a pass because a screen that cannot look is not "
+              "a screen that found nothing.  Build the tree, or set GNOMON_MATHLIB.")
+        return 1
+
+    upstream = mathlib_declared_names(root)
+    if not upstream:
+        print(f"mathlib guard CANNOT RUN: no declarations found under {root}")
+        return 1
+
+    broken = mathlib_shape_selftest()
+    if broken:
+        print("mathlib guard CANNOT RUN: its own shape screen fails its control")
+        for problem in broken:
+            print(f"    {problem}")
+        return 1
+
+    upstream_shapes = mathlib_statement_shapes(root)
+
+    prefixes = sorted(corpus_open_namespaces())
+    collisions = []
+    scanned = 0
+    for path in ident_lean_files():
+        src = ident_strip_comments(read_source(Path(path)))
+        rel = os.path.relpath(path, IDENT_ROOT)
+        # The corpus nests too, and a declaration inside `namespace Foo` is
+        # `Foo.bar`, not `bar`: it neither shadows nor duplicates a root-level
+        # Mathlib name.  Ignoring this reported `CertificateCalculus.IsComplete`
+        # against the uniform-space `IsComplete`, `Fiber.total` against a
+        # homology `total`, and four more of the same shape.
+        stack: list[str | None] = []
+        for lineno, line in enumerate(src.split("\n"), start=1):
+            opened = MATHLIB_NAMESPACE_OPEN.match(line)
+            if opened:
+                stack.append(opened.group(1))
+                continue
+            if MATHLIB_SECTION_OPEN.match(line):
+                stack.append(None)
+                continue
+            if MATHLIB_NAMESPACE_CLOSE.match(line):
+                if stack:
+                    stack.pop()
+                continue
+            match = MATHLIB_DECL.match(line)
+            if not match:
+                continue
+            name = match.group(2)
+            scanned += 1
+            # `Calibrator` is the corpus root, so it is not a namespace that
+            # makes a name non-root for this purpose.
+            enclosing = [part for part in stack if part and part != "Calibrator"]
+            if enclosing or "." in name or name in MATHLIB_EXEMPT:
+                continue
+            for prefix in prefixes:
+                full = f"{prefix}.{name}" if prefix else name
+                if full in upstream:
+                    collisions.append((rel, lineno, name, f"{full} ({upstream[full]})"))
+                    break
+
+    restatements = []
+    for path in ident_lean_files():
+        src = ident_strip_comments(read_source(Path(path)))
+        rel = os.path.relpath(path, IDENT_ROOT)
+        for lineno, kind, name, header in mathlib_decl_headers(src):
+            if kind not in ("theorem", "lemma") or name in MATHLIB_EXEMPT:
+                continue
+            skeleton, constants = mathlib_statement_key(header)
+            if not mathlib_shape_is_significant(skeleton, constants):
+                continue
+            if skeleton in upstream_shapes:
+                restatements.append((rel, lineno, name, upstream_shapes[skeleton],
+                                     skeleton))
+
+    bad = False
+    if len(collisions) > MATHLIB_COLLISION_BUDGET:
+        bad = True
+        print(f"mathlib guard FAILS: corpus declarations whose name Mathlib already "
+              f"uses: {len(collisions)}, budget {MATHLIB_COLLISION_BUDGET}; import the "
+              f"Mathlib declaration and delete the local one, or -- if the two really "
+              f"state different things -- rename the local one and record why in "
+              f"MATHLIB_EXEMPT")
+        for rel, lineno, name, where in sorted(collisions):
+            print(f"  {rel}:{lineno}  {name}  <-  {where}")
+
+    if len(restatements) > MATHLIB_SHAPE_BUDGET:
+        bad = True
+        print(f"mathlib guard FAILS: corpus theorems whose CONCLUSION is a Mathlib "
+              f"theorem's, under a different name: {len(restatements)}, budget "
+              f"{MATHLIB_SHAPE_BUDGET}; use the Mathlib lemma. If the corpus one is "
+              f"genuinely different -- a different type, a stronger conclusion the "
+              f"normal form cannot see -- say which in MATHLIB_EXEMPT")
+        for rel, lineno, name, where, skeleton in sorted(restatements):
+            print(f"  {rel}:{lineno}  {name}  <-  {where}")
+            print(f"      shape: {skeleton}")
+
+    if bad:
+        return 1
+
+    print(f"mathlib guard passes: name collisions {len(collisions)}/"
+          f"{MATHLIB_COLLISION_BUDGET}, restated conclusions {len(restatements)}/"
+          f"{MATHLIB_SHAPE_BUDGET}, over {scanned} corpus declarations against "
+          f"{len(upstream)} Mathlib names and {len(upstream_shapes)} Mathlib "
+          f"statement shapes (read from {root})")
+    return 0
+
 # ======================================================================================
 # DISPATCHER
 # ======================================================================================
@@ -4645,6 +5157,7 @@ GUARDS = {
     "style":           dict(fn=run_style,           gated=True,  takes_argv=False),
     "identifications": dict(fn=run_identifications, gated=True,  takes_argv=False),
     "duplication":     dict(fn=run_duplication,     gated=True,  takes_argv=False),
+    "mathlib":         dict(fn=run_mathlib,         gated=True,  takes_argv=False),
     "laundering":      dict(fn=run_laundering,      gated=True,  takes_argv=True),
     "regimes":         dict(fn=run_regimes,         gated=True,  takes_argv=False),
     "closure":         dict(fn=run_closure,         gated=True,  takes_argv=False),

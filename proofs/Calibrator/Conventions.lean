@@ -117,7 +117,15 @@ theorem hweGenotypeVariance_at_half : hweGenotypeVariance (1 / 2) = 1 / 2 := by
 /-- Coalescent time scale: time measured in units of `ploidy · Nₑ`
 generations.
 
-    Empirical status: UNTESTED. -/
+    Regime: a single panmictic diploid population; the scale is the MEAN
+    PAIRWISE coalescence time, which is what makes it a time and not a rate.
+
+    Empirical status: UNTESTED.
+
+    This is the `2·Nₑ` in the corpus that is NOT the other one. The `4·Nₑ` that
+    appears throughout -- in `scaledMutationRate`, `scaledMigrationRate`,
+    `fstMutationDriftEquilibrium` -- is the scaling of a RATE, `θ = 4·Nₑ·μ` and
+    `M = 4·Nₑ·m`, and shares only its shape with this. -/
 noncomputable def coalescentTimeScale (Ne : ℝ) : ℝ := ploidy * Ne
 
 @[simp] theorem coalescentTimeScale_eq (Ne : ℝ) :
@@ -784,9 +792,7 @@ theorem noncentralityParam_uses_hwe (n : ℕ) (beta p : ℝ) :
 
 theorem gwasNCP_uses_hwe (n : ℕ) (β p : ℝ) :
     gwasNCP n β p = n * β ^ 2 * hweGenotypeVariance p := by
-  unfold gwasNCP ncp effectiveFisherInformation fisherInformation genotypeVarianceHWE
-    hweGenotypeVariance ploidy
-  ring
+  simp only [gwasNCP, hweGenotypeVariance, ploidy]
 
 theorem effectiveFisherInformation_uses_hwe (n : ℕ) (p r2_ld : ℝ) :
     effectiveFisherInformation n p r2_ld = n * hweGenotypeVariance p * r2_ld := by
