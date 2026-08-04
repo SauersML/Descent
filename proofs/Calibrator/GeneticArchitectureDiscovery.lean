@@ -392,6 +392,12 @@ noncomputable def perCausalLocusSignal
     (h2 k : ℝ) : ℝ :=
   h2 / k
 
+/-- **The loci partition the heritability.** -/
+theorem perCausalLocusSignal_mul_count (h2 k : ℝ) (hk : k ≠ 0) :
+    perCausalLocusSignal h2 k * k = h2 := by
+  unfold perCausalLocusSignal
+  field_simp
+
 /-- **OLS effect estimates are unbiased but noisy.**
     This theorem now includes the actual unbiasedness statement for the
     one-locus additive model:

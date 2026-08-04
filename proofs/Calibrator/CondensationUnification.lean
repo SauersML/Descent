@@ -871,6 +871,12 @@ Empirical status: DERIVED. The variance of the square of a unit-variance coordin
 no free parameter; for genotypes it is `standardizedSquare_second_cumulant`. -/
 noncomputable def squaringScaleSq (fourthMoment : ℝ) : ℝ := fourthMoment - 1
 
+/-- **The scale is the excess fourth moment over the Gaussian-normalised unit.** -/
+theorem squaringScaleSq_add_one (fourthMoment : ℝ) :
+    squaringScaleSq fourthMoment + 1 = fourthMoment := by
+  unfold squaringScaleSq
+  ring
+
 /-- The fourth moment of the next floor, `E[((X² - 1)/σ)⁴]`, expanded in the current
 floor's even moments: `(m₈ - 4m₆ + 6m₄ - 4m₂ + 1) / (m₄ - 1)²`.
 

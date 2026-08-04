@@ -625,6 +625,14 @@ theorem noise_integrated_cdf_zero {k : ℕ} (hN : GaussianNoiseAssumption k)
     Empirical status: UNTESTED. -/
 def latentLiability (s e : ℝ) : ℝ := s + e
 
+/-- **Liability is additive, so the genetic part is recoverable given the environment.** This is
+what makes the threshold model identifiable at all, and it is the decomposition a body carrying
+an interaction term would break. -/
+theorem latentLiability_sub_environment (s e : ℝ) :
+    latentLiability s e - e = s := by
+  unfold latentLiability
+  ring
+
 /-- Disease event under an ancestry-dependent threshold: `L > T(x)`. -/
 def diseaseEvent {k : ℕ} (T : (Fin k → ℝ) → ℝ) (x : Fin k → ℝ) (s : ℝ) : Set ℝ :=
   {e : ℝ | latentLiability s e > T x}

@@ -868,6 +868,15 @@ def hweLatticeCondition (q : ℝ) : Prop := (1 - 2 * q) ^ 2 = 4 * q * (1 - q)
 /-- The critical allele frequency `q* = (2 - sqrt 2) / 4 = 0.146447...`. -/
 noncomputable def latticeCriticalMaf : ℝ := (2 - Real.sqrt 2) / 4
 
+/-- **The critical frequency is below a quarter.** Positivity alone is shared by the sign-flipped
+constant, which sits above one half; this bound is not. -/
+theorem latticeCriticalMaf_lt_quarter : latticeCriticalMaf < 1 / 4 := by
+  have h2 : (1 : ℝ) < Real.sqrt 2 := by
+    have h : Real.sqrt 1 < Real.sqrt 2 := Real.sqrt_lt_sqrt (by norm_num) (by norm_num)
+    rwa [Real.sqrt_one] at h
+  unfold latticeCriticalMaf
+  linarith
+
 theorem latticeCriticalMaf_pos : 0 < latticeCriticalMaf := by
   have h : Real.sqrt 2 < 2 := by
     have : (2 : ℝ) < 2 ^ 2 := by norm_num

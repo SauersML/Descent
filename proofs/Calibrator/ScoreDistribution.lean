@@ -619,12 +619,25 @@ noncomputable def externallyStandardized
     (pgs μ_source σ_source : ℝ) : ℝ :=
   (pgs - μ_source) / σ_source
 
+/-- **The source scale recovers the raw deviation.** -/
+theorem externallyStandardized_mul_sd (pgs μ_source σ_source : ℝ) (h : σ_source ≠ 0) :
+    externallyStandardized pgs μ_source σ_source * σ_source = pgs - μ_source := by
+  unfold externallyStandardized
+  field_simp
+
 /-- **Internal standardization (to own population).**
     PGS_std = (PGS - μ_target) / σ_target.
     This always has mean 0 and variance 1 within the target. -/
 noncomputable def internallyStandardized
     (pgs μ_target σ_target : ℝ) : ℝ :=
   (pgs - μ_target) / σ_target
+
+/-- **The target scale recovers the raw deviation.** The pair with the theorem above is the
+content: the two standardisations differ only in which population supplies the moments. -/
+theorem internallyStandardized_mul_sd (pgs μ_target σ_target : ℝ) (h : σ_target ≠ 0) :
+    internallyStandardized pgs μ_target σ_target * σ_target = pgs - μ_target := by
+  unfold internallyStandardized
+  field_simp
 
 /-- **External and internal standardization differ: equal-σ case.**
     When μ differs between populations but σ is the same,

@@ -81,6 +81,13 @@ theorem markovPoissonKernel_nine_tenths :
 probabilities `a` and `b`. -/
 def twoStatePersistence (a b : ℝ) : ℝ := 1 - a - b
 
+/-- **Persistence and total switching probability partition one.** The vanishing criterion below
+holds for every body that is zero on `a + b = 1`; this fixes the slope as well. -/
+theorem twoStatePersistence_add_switch (a b : ℝ) :
+    twoStatePersistence a b + (a + b) = 1 := by
+  unfold twoStatePersistence
+  ring
+
 /-- Independent state draws are the zero-persistence point `a + b = 1`. -/
 theorem twoStatePersistence_eq_zero_iff (a b : ℝ) :
     twoStatePersistence a b = 0 ↔ a + b = 1 := by

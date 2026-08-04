@@ -460,6 +460,12 @@ section ShrinkageRule
 /-- **The shrinkage rule.** Damp the adjustment by `e^{-λτ}`, the expected separation. -/
 noncomputable def dampedAdjustment (lam τ g : ℝ) : ℝ := Real.exp (-(lam * τ)) * g
 
+/-- **No elapsed time is no damping.** The reference point that fixes the exponential's scale. -/
+theorem dampedAdjustment_zero_time (lam g : ℝ) :
+    dampedAdjustment lam 0 g = g := by
+  unfold dampedAdjustment
+  simp
+
 /-- Premium of the **damped** design over the environment-blind one: `e^{-2λτ}·V`. -/
 noncomputable def dampedPremium (lam τ V : ℝ) : ℝ := Real.exp (-(2 * lam * τ)) * V
 

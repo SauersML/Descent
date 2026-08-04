@@ -585,6 +585,14 @@ noncomputable def adaptationDifficultyIndex
     (nParams infoPerSample : ℝ) : ℝ :=
   nParams / infoPerSample
 
+/-- **The index times the information per sample is the parameter count.** That is what makes it
+a sample requirement rather than a bare ratio. -/
+theorem adaptationDifficultyIndex_mul_info (nParams infoPerSample : ℝ)
+    (h : infoPerSample ≠ 0) :
+    adaptationDifficultyIndex nParams infoPerSample * infoPerSample = nParams := by
+  unfold adaptationDifficultyIndex
+  field_simp
+
 /-- **Trace-MSE lower bound under an orthogonal Fisher model.**
     For an unbiased estimator of `d` orthogonal target parameters, the summed
     estimation variance is lower-bounded by `(d / I) / n_eff`, where `I` is the
