@@ -1,9 +1,9 @@
 /-
+Copyright (c) 2026 Gnomon contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Gnomon contributors
 -/
 import Mathlib.Analysis.Normed.Operator.Basic
-
-namespace Calibrator
 
 /-!
 # Correction widths: the exact algebraic core
@@ -24,6 +24,8 @@ a quantitative obstruction: every bounded correction is nearly blind on every ap
 vector.  This is the finite, theorem-kernel-safe core behind the infinite-dimensional 0--1 law;
 the analytic extraction of weakly-null depth cascades is intentionally not smuggled in here.
 -/
+
+namespace Calibrator
 
 open scoped BigOperators
 

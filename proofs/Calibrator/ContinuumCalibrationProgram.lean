@@ -1,13 +1,11 @@
 /-
+Copyright (c) 2026 Gnomon contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Gnomon contributors
 -/
 import Calibrator.ContinuumCalibration
 import Calibrator.EnsembleChannel
 import Calibrator.PGSCalibrationTheory
-
-namespace Calibrator
-
-open scoped BigOperators
 
 /-!
 # Resolving the drifting index: strata, gauge, unqueried populations, and decisions
@@ -79,6 +77,9 @@ the units of `decisionCurveNetBenefit` and agree with `thresholdDecision`, and t
 moment is identified with `calibrationInTheLarge`.
 -/
 
+namespace Calibrator
+
+open scoped BigOperators
 
 /-! ## The one lemma: cellwise balance is orthogonality to everything the cells can see
 

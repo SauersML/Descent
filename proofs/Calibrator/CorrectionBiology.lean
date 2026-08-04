@@ -1,9 +1,9 @@
 /-
+Copyright (c) 2026 Gnomon contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Gnomon contributors
 -/
 import Calibrator.UnifiedBiology
-
-namespace Calibrator
 
 /-!
 # Exact pooled-correction normal form in biology
@@ -14,6 +14,8 @@ is an idempotent projection, and every field has an exact and unique common/cont
 Thus the correction obstruction and the biological interpretation agree at the level of operators,
 not merely at the level of one numerical example.
 -/
+
+namespace Calibrator
 
 /-- The canonical correction that pools a biological field and broadcasts its mean back to both
 dynamics. -/
@@ -118,32 +120,39 @@ theorem dynamicsContrastCoefficient_contrast :
     dynamicsContrastCoefficient dynamicsContrast = 1 := by
   norm_num [dynamicsContrastCoefficient, dynamicsContrast]
 
-/-- The common and contrast coordinates are unique. -/
-theorem dynamics_common_contrast_coordinates_unique
+/-- The common coordinate in a common/contrast decomposition is the pooled mean. -/
+theorem dynamics_common_coordinate_eq
     (β : Bool → ℝ) (common coefficient : ℝ)
     (hβ : β = (fun _ ↦ common) + coefficient • dynamicsContrast) :
-    common = (β false + β true) / 2 ∧ coefficient = dynamicsContrastCoefficient β := by
+    common = (β false + β true) / 2 := by
   have hfalse := congrFun hβ false
   have htrue := congrFun hβ true
-  constructor
-  · simp [dynamicsContrast] at hfalse htrue
-    linarith
-  · simp [dynamicsContrast, dynamicsContrastCoefficient] at hfalse htrue ⊢
-    linarith
+  simp [dynamicsContrast] at hfalse htrue
+  linarith
+
+/-- The contrast coordinate in a common/contrast decomposition is the contrast coefficient. -/
+theorem dynamics_contrast_coordinate_eq
+    (β : Bool → ℝ) (common coefficient : ℝ)
+    (hβ : β = (fun _ ↦ common) + coefficient • dynamicsContrast) :
+    coefficient = dynamicsContrastCoefficient β := by
+  have hfalse := congrFun hβ false
+  have htrue := congrFun hβ true
+  simp [dynamicsContrast, dynamicsContrastCoefficient] at hfalse htrue ⊢
+  linarith
 
 /-- The exact normal form bundled as the biological correction theorem consumed by downstream
 applications. -/
 structure BiologicalCorrectionNormalForm : Prop where
-  projectorIdempotent :
+  projector_idempotent :
     dynamicsPooledProjector.comp dynamicsPooledProjector = dynamicsPooledProjector
-  fixedExactlyOnCommonFields :
+  fixed_exactly_on_common_fields :
     ∀ β, dynamicsPooledProjector β = β ↔ β false = β true
-  residualExactlyContrast :
+  residual_exactly_contrast :
     ∀ β, β - dynamicsPooledProjector β = dynamicsContrastCoefficient β • dynamicsContrast
-  representedAtEveryPositiveOrder :
+  represented_at_every_positive_order :
     ∀ k, 0 < k → dynamicsPooledProjector ∈
       UniformCorrectionFamily dynamicsPoolingObservation k
-  allUniformCorrectionsAreContrastBlind :
+  all_uniform_corrections_contrast_blind :
     ∀ (k : ℕ) (C : (Bool → ℝ) →ₗ[ℝ] (Bool → ℝ)),
       C ∈ UniformCorrectionFamily dynamicsPoolingObservation k →
         ∀ (β : Bool → ℝ) (c : ℝ), C (β + c • dynamicsContrast) = C β
@@ -152,10 +161,10 @@ structure BiologicalCorrectionNormalForm : Prop where
 entire complement is the one-dimensional dynamics contrast already identified with calibration
 drift in `UnifiedBiology`. -/
 theorem biologicalCorrectionNormalForm : BiologicalCorrectionNormalForm where
-  projectorIdempotent := dynamicsPooledProjector_idempotent
-  fixedExactlyOnCommonFields := dynamicsPooledProjector_fixed_iff
-  residualExactlyContrast := dynamicsPooledProjector_residual
-  representedAtEveryPositiveOrder := dynamicsPooledProjector_mem_uniformCorrectionFamily
-  allUniformCorrectionsAreContrastBlind := uniformDynamicsCorrection_add_contrast
+  projector_idempotent := dynamicsPooledProjector_idempotent
+  fixed_exactly_on_common_fields := dynamicsPooledProjector_fixed_iff
+  residual_exactly_contrast := dynamicsPooledProjector_residual
+  represented_at_every_positive_order := dynamicsPooledProjector_mem_uniformCorrectionFamily
+  all_uniform_corrections_contrast_blind := uniformDynamicsCorrection_add_contrast
 
 end Calibrator

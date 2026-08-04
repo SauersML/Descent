@@ -1,11 +1,11 @@
 /-
+Copyright (c) 2026 Gnomon contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Gnomon contributors
 -/
 import Calibrator.ContinuumCalibrationProgram
 import Calibrator.PGSCalibrationTheory
 import Calibrator.UnifiedBiology
-
-namespace Calibrator
 
 /-!
 # Polygenic-score calibration over an ancestry continuum
@@ -16,6 +16,8 @@ conditional field as ancestry-specific disease risk.  The resulting theorems dis
 calibration, ancestry-wise calibration, worst-ancestry error, and threshold utility without adding
 an empirical assumption about any particular biobank.
 -/
+
+namespace Calibrator
 
 section GeneralAncestryLaw
 
@@ -47,22 +49,22 @@ structure PolygenicContinuumCalibrationLaw
     (ancestryPosterior : Genotype → Ancestry → ℝ)
     (ancestryRisk : Ancestry → Genotype → ℝ) : Prop where
   /-- Ancestry-wise squared calibration error is pooled error plus an irreducible drift floor. -/
-  ancestryPythagoras :
+  ancestry_pythagoras :
     ∀ score,
       indexWiseCalibrationEnergy genotypeWeight ancestryPosterior ancestryRisk score =
         polygenicCalibrationFloor genotypeWeight ancestryPosterior ancestryRisk +
           aggregateCalibrationEnergy genotypeWeight ancestryPosterior ancestryRisk score
   /-- The posterior-mean score is pooled-calibrated and attains the ancestry-wise floor. -/
-  pooledScoreAttainsFloor :
+  pooled_score_attains_floor :
     indexWiseCalibrationEnergy genotypeWeight ancestryPosterior ancestryRisk
         (posteriorMean ancestryPosterior ancestryRisk) =
       polygenicCalibrationFloor genotypeWeight ancestryPosterior ancestryRisk
   /-- The floor is the weighted average of all pairwise ancestry-risk disagreements. -/
-  floorIsPairwiseDisagreement :
+  floor_is_pairwise_disagreement :
     polygenicCalibrationFloor genotypeWeight ancestryPosterior ancestryRisk =
       pairwiseCalibrationDriftEnergy genotypeWeight ancestryPosterior ancestryRisk
   /-- Zero floor means risk invariance only on represented ancestry/genotype support. -/
-  floorZeroIffSupportInvariant :
+  floor_eq_zero_iff_support_invariant :
     polygenicCalibrationFloor genotypeWeight ancestryPosterior ancestryRisk = 0 ↔
       ∀ x, 0 < genotypeWeight x → ∀ s t,
         0 < ancestryPosterior x s → 0 < ancestryPosterior x t →
@@ -79,10 +81,10 @@ theorem polygenicContinuumCalibrationLaw
     (hnonnegative : ∀ x t, 0 ≤ ancestryPosterior x t) :
     PolygenicContinuumCalibrationLaw genotypeWeight ancestryPosterior ancestryRisk := by
   refine
-    { ancestryPythagoras := ?_
-      pooledScoreAttainsFloor := ?_
-      floorIsPairwiseDisagreement := ?_
-      floorZeroIffSupportInvariant := ?_ }
+    { ancestry_pythagoras := ?_
+      pooled_score_attains_floor := ?_
+      floor_is_pairwise_disagreement := ?_
+      floor_eq_zero_iff_support_invariant := ?_ }
   · intro score
     rw [polygenicCalibrationFloor_eq_driftDefectSq]
     exact indexWiseCalibrationEnergy_eq_driftDefect_add_aggregate
@@ -133,14 +135,14 @@ by the ancestry-specific risks creates both positive calibration defect and posi
 regret for either ancestry-blind action. -/
 structure BinaryPolygenicDeploymentBoundary
     (q lower upper cutoff : ℝ) : Prop where
-  pooledMeanIsWorstAncestrySuboptimal :
+  pooled_mean_is_worst_ancestry_suboptimal :
     (upper - lower) / 2 <
       worstIndexError upper lower (q * upper + (1 - q) * lower)
-  crossingCreatesPositiveCalibrationFloor :
+  crossing_creates_positive_calibration_floor :
     0 < ∑ t, twoIndexPosterior (fun _ : Unit ↦ q) () t *
       posteriorDrift (twoIndexPosterior (fun _ : Unit ↦ q))
         (twoIndexConditional (fun _ : Unit ↦ upper) (fun _ : Unit ↦ lower)) t () ^ 2
-  noAncestryBlindActionIsRegretFree :
+  no_ancestry_blind_action_is_regret_free :
     ∀ action : Bool,
       0 < driftDecisionRegret (twoIndexPosterior (fun _ : Unit ↦ q) ())
         (fun t ↦ twoIndexConditional (fun _ : Unit ↦ upper)
@@ -158,10 +160,10 @@ theorem binaryPolygenicDeploymentBoundary
   have hcrossing :=
     crossing_forces_defect_and_regret q lower upper cutoff hq₀ hq₁ hcutoff hlower hupper
   exact
-    { pooledMeanIsWorstAncestrySuboptimal :=
+    { pooled_mean_is_worst_ancestry_suboptimal :=
         worstIndexError_posteriorMean_gt_half_width q upper lower hq₀ hq₁ hbalance hwidth
-      crossingCreatesPositiveCalibrationFloor := hcrossing.1
-      noAncestryBlindActionIsRegretFree := hcrossing.2 }
+      crossing_creates_positive_calibration_floor := hcrossing.1
+      no_ancestry_blind_action_is_regret_free := hcrossing.2 }
 
 /-! ## Recruitment objective matters -/
 
