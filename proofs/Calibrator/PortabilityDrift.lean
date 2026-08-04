@@ -2620,6 +2620,18 @@ theorem alleleFreqMismatchPenalty_le_one (pSource pTarget : ℝ) :
     alleleFreqMismatchPenalty p p = 1 := by
   simp [alleleFreqMismatchPenalty]
 
+/-- **The mismatch penalty's decay rate, pinned.** `alleleFreqMismatchPenalty_symm` and
+`alleleFreqMismatchPenalty_le_one` fix the symmetry and the ceiling, and both are satisfied by
+`exp (-2 * |Δp|)` and by `exp (-|Δp|) / 2`. Evaluating at a unit frequency gap fixes the
+coefficient in the exponent: one full unit of allele-frequency mismatch costs exactly one
+e-fold. -/
+theorem alleleFreqMismatchPenalty_unit_gap (pSource : ℝ) :
+    alleleFreqMismatchPenalty pSource (pSource + 1) = Real.exp (-1) := by
+  unfold alleleFreqMismatchPenalty
+  have h : pSource + 1 - pSource = 1 := by ring
+  rw [h]
+  norm_num
+
 /-- Generation-indexed cross-population state. Source quantities are fixed at
 training time; target quantities are explicit functions of generation. The
 time-varying target LD and tagging state is derived from:
@@ -5638,6 +5650,15 @@ theorem asymmetricFst_eq_migrationDriftEq (Ne m_into : ℝ) :
     asymmetricFst Ne m_into = fstMigrationDriftEquilibrium Ne m_into := by
   unfold asymmetricFst fstMigrationDriftEquilibrium
   rfl
+
+/-- **The asymmetric `Fst`'s scale, pinned.** The identity with `migrationDriftEq` constrains the
+two definitions jointly: a common wrong factor in both cancels and the identity survives. This
+evaluates `asymmetricFst` alone, at the migration rate where drift and immigration balance, and
+fixes the `4 Ne m` normalisation that the identity leaves free. -/
+theorem asymmetricFst_at_balancing_migration :
+    asymmetricFst 1 (1 / 4) = 1 / 2 := by
+  unfold asymmetricFst
+  norm_num
 
 /-- **When m₁₂ > m₂₁, Fst from perspective of pop 1 is lower.**
     Population 1 receives more migrants from pop 2, so its genetic composition

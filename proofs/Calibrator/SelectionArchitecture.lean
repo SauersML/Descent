@@ -349,6 +349,16 @@ theorem tauFromObservedEffectCorrelation_pos
   unfold tauFromObservedEffectCorrelation
   exact div_pos_of_neg_of_neg (by linarith) h_log_neg
 
+/-- **The recovered autocorrelation time's scale, pinned.** The junk-branch and positivity
+theorems fix where the recovery breaks and its sign, and both hold for `-2 * t / log ρ`. At the
+observed correlation `exp (-1)` the divergence time has fallen by exactly one autocorrelation
+time, so the recovered `τ` equals `t` — which fixes the constant. -/
+theorem tauFromObservedEffectCorrelation_at_one_efold (t : ℝ) :
+    tauFromObservedEffectCorrelation t (Real.exp (-1)) = t := by
+  unfold tauFromObservedEffectCorrelation
+  rw [Real.log_exp]
+  norm_num
+
 /-- The inverse map for the fluctuating-selection effect-correlation formula is
     exact on the biologically relevant region `ρ ∈ (0, 1)`. -/
 theorem fluctuatingEffectCorrelation_eq_observedCorrelation_of_recoveredTau
