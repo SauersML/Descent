@@ -514,20 +514,13 @@ theorem finiteEnvironmentCovariancePool_mulVec_eq_zero_iff_active
   classical
   constructor
   · intro hpool environment hactive
-    have henergySum :
-        ∑ environment, weight environment *
-          dot shift ((covariance environment).mulVec shift) = 0 := by
-      rw [← finiteEnvironmentCovariancePool_energy weight covariance shift, hpool]
+    have hpoolEnergy :
+        dot shift ((finiteEnvironmentCovariancePool weight covariance).mulVec shift) = 0 := by
+      rw [hpool]
       simp [dot]
-    have htermNonneg : ∀ environment ∈ (Finset.univ : Finset κ),
-        0 ≤ weight environment * dot shift ((covariance environment).mulVec shift) := by
-      intro environment _
-      exact mul_nonneg (hweight environment) (hpsd.energy_nonneg environment shift)
-    have hweightedZero :=
-      (Finset.sum_eq_zero_iff_of_nonneg htermNonneg).mp henergySum
-        environment (Finset.mem_univ environment)
-    have henergyZero : dot shift ((covariance environment).mulVec shift) = 0 :=
-      (mul_eq_zero.mp hweightedZero).resolve_left hactive.ne'
+    have henergyZero :=
+      (finiteEnvironmentCovariancePool_energy_eq_zero_iff_active
+        weight covariance hweight hpsd shift).mp hpoolEnergy environment hactive
     exact (hpsd.energy_eq_zero_iff environment shift).mp henergyZero
   · intro hkernel
     rw [finiteEnvironmentCovariancePool_mulVec]
