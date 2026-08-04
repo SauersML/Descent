@@ -781,67 +781,58 @@ noncomputable def commonOnlyPortableModel : CrossPopulationMetricModel 2 2 where
 locus and one source-specific rare causal locus. The target retains only the
 common locus, so the within-source `R²` rises while the transported target
 signal stays unchanged. -/
-noncomputable def commonAndRarePortableModel : CrossPopulationMetricModel 2 2 where
-  beta := Pop.pair (![1, 1]) (![1, 0])
-  sigmaTag := Pop.pair 1 1
-  directCausal := Pop.pair 1 1
-  proxyTagging := Pop.pair 0 0
-  contextCross := Pop.pair (![0, 0]) (![0, 0])
-  outcomeVariance := Pop.pair 4 4
-  novelDirectCausal := Pop.pair 0 0
-  novelProxyTagging := Pop.pair 0 0
-  novelCausalEffect := Pop.pair 0 (![0, 0])
-  novelUntaggablePhenotypeVarianceTarget := 0
-  targetPrevalence := 1 / 2
-  novelUntaggablePhenotypeVarianceTarget_nonneg := by norm_num
-  targetPrevalence_pos := by norm_num
-  targetPrevalence_lt_one := by norm_num
-  novelDirectCausal_source := rfl
-  novelProxyTagging_source := rfl
-  novelCausalEffect_source := rfl
-  outcomeVariance_pos := by intro P; cases P <;> norm_num
+noncomputable def commonAndRarePortableModel : CrossPopulationMetricModel 2 2 :=
+  -- Only the effect vector and the direct-causal covariance differ from the
+  -- common-variant-only witness; the other fifteen fields were copied verbatim, so the
+  -- two witnesses could drift apart in a field neither of them is about.  Stated as an
+  -- override, the comparison the section makes is what the definition says.
+  { commonOnlyPortableModel with
+    beta := Pop.pair (![1, 1]) (![1, 0])
+    directCausal := Pop.pair 1 1 }
+
+/-- Evaluate a witness model's SOURCE `R²` by unfolding the source-weight chain.
+
+The unfolding list is the same for every witness, and it was written out once per theorem:
+four copies here, differing only in which model name led the list.  A copy that drifts is a
+theorem that evaluates a different chain from its neighbour while reading identically. -/
+local macro "source_r2_of " m:term : tactic =>
+  `(tactic| norm_num [$m:term, r2FromSourceWeights,
+      commonOnlyPortableModel,
+      explainedSignalVarianceFromSourceWeights,
+      predictiveCovarianceFromSourceWeights,
+      scoreVarianceFromSourceWeights,
+      sourceWeightsFromExplicitDrivers, sourceERMWeights, crossCovariance,
+      sigmaTagCausal, dotProduct, totalEffect, Matrix.mulVec])
+
+/-- Evaluate a witness model's TARGET `R²`.  The target chain carries the residual burden
+terms the source chain has no need of, and is otherwise the same list. -/
+local macro "target_r2_of " m:term : tactic =>
+  `(tactic| norm_num [$m:term, r2FromSourceWeights,
+      commonOnlyPortableModel,
+      explainedSignalVarianceFromSourceWeights,
+      predictiveCovarianceFromSourceWeights,
+      scoreVarianceFromSourceWeights,
+      sourceWeightsFromExplicitDrivers, sourceERMWeights, crossCovariance,
+      effectiveOutcomeVariance, irreducibleTargetResidualBurden,
+      brokenTaggingResidual, ancestrySpecificLDResidual, sourceSpecificOverfitResidual,
+      novelUntaggablePhenotypeResidual, sigmaTagCausal,
+      dotProduct, totalEffect, Matrix.mulVec])
 
 theorem commonOnlyPortableModel_sourceR2 :
     r2FromSourceWeights commonOnlyPortableModel Pop.source = 1 / 4 := by
-  norm_num [commonOnlyPortableModel, r2FromSourceWeights,
-    explainedSignalVarianceFromSourceWeights,
-    predictiveCovarianceFromSourceWeights,
-    scoreVarianceFromSourceWeights,
-    sourceWeightsFromExplicitDrivers, sourceERMWeights, crossCovariance,
-    sigmaTagCausal, dotProduct, totalEffect, Matrix.mulVec]
+  source_r2_of commonOnlyPortableModel
 
 theorem commonOnlyPortableModel_targetR2 :
     r2FromSourceWeights commonOnlyPortableModel Pop.target = 1 / 4 := by
-  norm_num [commonOnlyPortableModel, r2FromSourceWeights,
-    explainedSignalVarianceFromSourceWeights,
-    predictiveCovarianceFromSourceWeights,
-    scoreVarianceFromSourceWeights,
-    sourceWeightsFromExplicitDrivers, sourceERMWeights, crossCovariance,
-    effectiveOutcomeVariance, irreducibleTargetResidualBurden,
-    brokenTaggingResidual, ancestrySpecificLDResidual, sourceSpecificOverfitResidual,
-    novelUntaggablePhenotypeResidual, sigmaTagCausal, sigmaTagCausal,
-    crossCovariance, dotProduct, totalEffect, Matrix.mulVec]
+  target_r2_of commonOnlyPortableModel
 
 theorem commonAndRarePortableModel_sourceR2 :
     r2FromSourceWeights commonAndRarePortableModel Pop.source = 1 / 2 := by
-  norm_num [commonAndRarePortableModel, r2FromSourceWeights,
-    explainedSignalVarianceFromSourceWeights,
-    predictiveCovarianceFromSourceWeights,
-    scoreVarianceFromSourceWeights,
-    sourceWeightsFromExplicitDrivers, sourceERMWeights, crossCovariance,
-    sigmaTagCausal, dotProduct, totalEffect, Matrix.mulVec]
+  source_r2_of commonAndRarePortableModel
 
 theorem commonAndRarePortableModel_targetR2 :
     r2FromSourceWeights commonAndRarePortableModel Pop.target = 1 / 8 := by
-  norm_num [commonAndRarePortableModel, r2FromSourceWeights,
-    explainedSignalVarianceFromSourceWeights,
-    predictiveCovarianceFromSourceWeights,
-    scoreVarianceFromSourceWeights,
-    sourceWeightsFromExplicitDrivers, sourceERMWeights, crossCovariance,
-    effectiveOutcomeVariance, irreducibleTargetResidualBurden,
-    brokenTaggingResidual, ancestrySpecificLDResidual, sourceSpecificOverfitResidual,
-    novelUntaggablePhenotypeResidual, sigmaTagCausal, sigmaTagCausal,
-    crossCovariance, dotProduct, totalEffect, Matrix.mulVec]
+  target_r2_of commonAndRarePortableModel
 
 /-- **WGS discovers causal variants directly (no tagging needed).**
     This theorem is now stated on the mechanistic portability model itself.

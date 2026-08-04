@@ -158,6 +158,15 @@ def bestScalarCorrection (B : Matrix ι ι ℝ)
     (u v : ι → ℝ) : ℝ :=
   dot u (B.mulVec v) / dot u (B.mulVec u)
 
+/-- **bestScalarCorrection at a null correction direction, named.** With the correction direction
+identically zero its energy `⟪u, B u⟫` vanishes, so the optimal scalar is undefined -- there is
+no direction to scale. Lean returns `0`, which reads as the correct answer being no correction at
+all, rather than as an ill-posed problem. Consumers must exclude it by hypothesis. -/
+theorem bestScalarCorrection_null_direction_is_junk (B : Matrix ι ι ℝ) (v : ι → ℝ) :
+    bestScalarCorrection B (fun _ ↦ 0) v = 0 := by
+  unfold bestScalarCorrection dot
+  simp
+
 /-- Irreducible quadratic risk after optimizing over scalar rescalings. -/
 def scalarCorrectionFloor (B : Matrix ι ι ℝ)
     (u v : ι → ℝ) : ℝ :=

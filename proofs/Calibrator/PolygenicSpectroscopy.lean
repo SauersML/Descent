@@ -219,6 +219,16 @@ noncomputable def hweMellinDrift (q : ℝ) : ℝ :=
   (1 - 2 * q) ^ 2 * Real.log ((1 - 2 * q) ^ 2 / (2 * q * (1 - q))) +
     4 * q * (1 - q) * Real.log 2
 
+/-- **hweMellinDrift at a balanced allele frequency, named.** At `q = 1/2` the leading factor `(1
+- 2q)²` vanishes, and it multiplies a logarithm whose argument is `0 / (2q(1-q))` -- junk-zero,
+so `Real.log 0` is junk-zero too. The product is zero for two independent reasons and the drift
+reduces to its mutation term alone. A balanced frequency is the most common case in a panel, so
+this branch is not a corner. Consumers must exclude it by hypothesis. -/
+theorem hweMellinDrift_balanced_frequency_is_junk :
+    hweMellinDrift (1/2) = 4 * (1/2) * (1 - 1/2) * Real.log 2 := by
+  unfold hweMellinDrift
+  norm_num
+
 section ClosedForm
 
 variable {h : HardyWeinbergModel}
@@ -661,6 +671,16 @@ HWE,
 unlinked loci, disjoint monomials as defined — no LD, no real genotypes, no structure. -/
 noncomputable def maxSafeEpistaticOrder (N q : ℝ) : ℝ :=
   Real.log N / hweMellinDrift q
+
+/-- **maxSafeEpistaticOrder at a monomorphic locus, named.** The order divides by
+`hweMellinDrift`, which vanishes at a monomorphic locus. Lean returns `0`: no epistatic order is
+safe, where in fact the constraint is vacuous because the locus carries no information. The guard
+is invisible here -- it lives inside the called definition. Consumers must exclude it by
+hypothesis. -/
+theorem maxSafeEpistaticOrder_vanishing_drift_is_junk (N : ℝ) :
+    maxSafeEpistaticOrder N 0 = 0 := by
+  unfold maxSafeEpistaticOrder hweMellinDrift
+  norm_num
 
 theorem maxSafeEpistaticOrder_eq_criticalDegree (N q : ℝ) :
     maxSafeEpistaticOrder N q = criticalDegree N (hweMellinDrift q) := rfl

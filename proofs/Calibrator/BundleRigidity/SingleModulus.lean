@@ -343,6 +343,17 @@ theorem two_atom_forces_v_zero (S : SingleModulus 2 v) : v = 0 := by
         have hm1 : S.mass 1 = 1 / 2 := by linarith
         rw [ha1, hm0, hm1] at hvar
         linarith [hvar]
+  -- The two opposite-sides cases differ only in which mass the variance identity leaves
+  -- on the left, and their tails were written out twice, line for line. Equal masses force
+  -- the atoms to be antipodal, hence equal squares, whichever way round the sides fell.
+  have equal_masses_forces_equal_squares :
+      S.mass 0 = S.mass 1 → S.atom 0 ^ 2 = S.atom 1 ^ 2 := by
+    intro hmass
+    have hm0 : S.mass 0 = 1 / 2 := by linarith
+    have hm1 : S.mass 1 = 1 / 2 := by linarith
+    rw [hm0, hm1] at hmean
+    have ha1 : S.atom 1 = -S.atom 0 := by linarith
+    rw [ha1]; ring
   rcases S.sq_cases 0 with e0 | e0 <;> rcases S.sq_cases 1 with e1 | e1
   · -- both on the `(1+v)` side
     have := same_side (by rw [e0, e1])
@@ -352,22 +363,14 @@ theorem two_atom_forces_v_zero (S : SingleModulus 2 v) : v = 0 := by
       rw [e0, e1] at hvar; linear_combination hvar - hsum
     rcases mul_eq_zero.mp hz with h | hp
     · exact h
-    · have hm0 : S.mass 0 = 1 / 2 := by linarith
-      have hm1 : S.mass 1 = 1 / 2 := by linarith
-      rw [hm0, hm1] at hmean
-      have ha1 : S.atom 1 = -S.atom 0 := by linarith
-      have hsq : S.atom 0 ^ 2 = S.atom 1 ^ 2 := by rw [ha1]; ring
+    · have hsq := equal_masses_forces_equal_squares (by linarith)
       rw [e0, e1] at hsq; linarith
   · -- opposite sides, the other way round
     have hz : v * (S.mass 1 - S.mass 0) = 0 := by
       rw [e0, e1] at hvar; linear_combination hvar - hsum
     rcases mul_eq_zero.mp hz with h | hp
     · exact h
-    · have hm0 : S.mass 0 = 1 / 2 := by linarith
-      have hm1 : S.mass 1 = 1 / 2 := by linarith
-      rw [hm0, hm1] at hmean
-      have ha1 : S.atom 1 = -S.atom 0 := by linarith
-      have hsq : S.atom 0 ^ 2 = S.atom 1 ^ 2 := by rw [ha1]; ring
+    · have hsq := equal_masses_forces_equal_squares (by linarith)
       rw [e0, e1] at hsq; linarith
   · -- both on the `(1-v)` side
     have := same_side (by rw [e0, e1])

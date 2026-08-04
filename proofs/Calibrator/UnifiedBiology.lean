@@ -254,6 +254,18 @@ theorem labelMass_binaryTransportFamily (persists : Bool) (y : BinaryBiologicalS
     norm_num [labelMass, binaryTransportFamily, jointTransportLaw, binaryStateWeight,
       persistentTransition, switchingTransition, Fintype.sum_prod_type, Fin.sum_univ_two]
 
+/-- Every fiber of either transport family carries mass, so the fiber conditional is
+defined at every state.
+
+Both diameter theorems below open by establishing this for `true` and for `false`, and both
+did it by rewriting `labelMass_binaryTransportFamily` and calling `norm_num`, twice each.
+Stated once, the four copies become four applications. -/
+theorem labelMass_binaryTransportFamily_ne_zero (persists : Bool)
+    (y : BinaryBiologicalState) :
+    labelMass (fun g : TransportPair ↦ g.2) (binaryTransportFamily persists) y ≠ 0 := by
+  rw [labelMass_binaryTransportFamily]
+  norm_num
+
 /-- A target-only annotation descends along the target context: it is reportable there. -/
 theorem descends_targetAnnotation_along_targetState :
     DescendsAlong (fun g : TransportPair ↦ g.2) binaryTransportFamily

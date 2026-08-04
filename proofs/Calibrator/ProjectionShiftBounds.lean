@@ -468,6 +468,29 @@ does, and none can capture less than `S` does when the ordering is reversed.
 Nothing here needs a sort, an eigenvector, or a compactness argument.
 -/
 
+/-- Recentring the profile at the threshold, on the whole index set: the allocation's
+capture of `w - t` is its capture of `w` less `t` times its trace.
+
+This and its companion below were each computed inline in both halves of the exchange
+lemma, `calc` step for `calc` step. Two copies of an arithmetic identity are two places for
+a `Finset.sum_sub_distrib` to be applied to the wrong side. -/
+theorem sum_mul_sub_const (w M : ι → ℝ) (t : ℝ) :
+    ∑ i, M i * (w i - t) = (∑ i, M i * w i) - t * ∑ i, M i := by
+  calc ∑ i, M i * (w i - t)
+      = ∑ i, (M i * w i - t * M i) :=
+        Finset.sum_congr rfl (fun i _ ↦ by ring)
+    _ = (∑ i, M i * w i) - ∑ i, t * M i := by rw [Finset.sum_sub_distrib]
+    _ = (∑ i, M i * w i) - t * ∑ i, M i := by rw [← Finset.mul_sum]
+
+/-- Recentring the profile at the threshold, on the chosen set: `t` leaves `|S|` copies of
+itself behind. -/
+theorem sum_sub_const_on (w : ι → ℝ) (S : Finset ι) (t : ℝ) :
+    ∑ i ∈ S, (w i - t) = (∑ i ∈ S, w i) - t * (S.card : ℝ) := by
+  calc ∑ i ∈ S, (w i - t)
+      = (∑ i ∈ S, w i) - ∑ i ∈ S, t := by rw [Finset.sum_sub_distrib]
+    _ = (∑ i ∈ S, w i) - t * (S.card : ℝ) := by
+        rw [Finset.sum_const, nsmul_eq_mul]; ring
+
 /-- **Threshold optimality.**  `S` is `w`-dominant above the threshold `t`; then
 `S` maximises captured `w`-weight over all relaxed rank-`|S|` allocations. -/
 theorem spectralCapture_le_of_threshold
@@ -490,17 +513,8 @@ theorem spectralCapture_le_of_threshold
     intro i hi
     have hw : 0 ≤ w i - t := sub_nonneg.mpr (hin i hi)
     nlinarith [mul_le_mul_of_nonneg_right (hM.upper i) hw]
-  have hL : ∑ i, M i * (w i - t) = (∑ i, M i * w i) - t * ∑ i, M i := by
-    calc ∑ i, M i * (w i - t)
-        = ∑ i, (M i * w i - t * M i) :=
-          Finset.sum_congr rfl (fun i _ ↦ by ring)
-      _ = (∑ i, M i * w i) - ∑ i, t * M i := by rw [Finset.sum_sub_distrib]
-      _ = (∑ i, M i * w i) - t * ∑ i, M i := by rw [← Finset.mul_sum]
-  have hR : ∑ i ∈ S, (w i - t) = (∑ i ∈ S, w i) - t * (S.card : ℝ) := by
-    calc ∑ i ∈ S, (w i - t)
-        = (∑ i ∈ S, w i) - ∑ i ∈ S, t := by rw [Finset.sum_sub_distrib]
-      _ = (∑ i ∈ S, w i) - t * (S.card : ℝ) := by
-          rw [Finset.sum_const, nsmul_eq_mul]; ring
+  have hL := sum_mul_sub_const w M t
+  have hR := sum_sub_const_on w S t
   rw [hL, hM.trace] at hstep1
   rw [hR] at hstep2
   unfold spectralCapture
@@ -526,17 +540,8 @@ theorem spectralCapture_ge_of_threshold
     intro i hi
     have hw : w i - t ≤ 0 := sub_nonpos.mpr (hin i hi)
     nlinarith [mul_le_mul_of_nonneg_right (hM.upper i) (neg_nonneg.mpr hw)]
-  have hL : ∑ i, M i * (w i - t) = (∑ i, M i * w i) - t * ∑ i, M i := by
-    calc ∑ i, M i * (w i - t)
-        = ∑ i, (M i * w i - t * M i) :=
-          Finset.sum_congr rfl (fun i _ ↦ by ring)
-      _ = (∑ i, M i * w i) - ∑ i, t * M i := by rw [Finset.sum_sub_distrib]
-      _ = (∑ i, M i * w i) - t * ∑ i, M i := by rw [← Finset.mul_sum]
-  have hR : ∑ i ∈ S, (w i - t) = (∑ i ∈ S, w i) - t * (S.card : ℝ) := by
-    calc ∑ i ∈ S, (w i - t)
-        = (∑ i ∈ S, w i) - ∑ i ∈ S, t := by rw [Finset.sum_sub_distrib]
-      _ = (∑ i ∈ S, w i) - t * (S.card : ℝ) := by
-          rw [Finset.sum_const, nsmul_eq_mul]; ring
+  have hL := sum_mul_sub_const w M t
+  have hR := sum_sub_const_on w S t
   rw [hL, hM.trace] at hstep1
   rw [hR] at hstep2
   unfold spectralCapture
