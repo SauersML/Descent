@@ -294,11 +294,52 @@ section NormedObstruction
 variable {H Y : Type*} [NormedAddCommGroup H] [NormedSpace ℝ H]
   [NormedAddCommGroup Y] [NormedSpace ℝ Y]
 
+/-- The observation has a strictly positive global lower stability bound. -/
+def HasPositiveLowerBound (A : H →L[ℝ] Y) : Prop :=
+  ∃ c : ℝ, 0 < c ∧ ∀ β : H, c * ‖β‖ ≤ ‖A β‖
+
 /-- The observation has unit vectors at arbitrarily small observed depth.  For a bounded linear
 operator this is the operational negation of a positive lower stability modulus, stated in the
 exact witness form used by correction lower bounds. -/
 def HasUnitApproxKernel (A : H →L[ℝ] Y) : Prop :=
   ∀ ε : ℝ, 0 < ε → ∃ β : H, ‖β‖ = 1 ∧ ‖A β‖ ≤ ε
+
+/-- **Stability/approximate-kernel dichotomy.**  Failure of every positive lower bound is
+equivalent to the existence of unit targets at arbitrarily small observation depth.  This is
+proved directly by normalization and does not import a closed-range theorem. -/
+theorem not_hasPositiveLowerBound_iff_hasUnitApproxKernel (A : H →L[ℝ] Y) :
+    ¬ HasPositiveLowerBound A ↔ HasUnitApproxKernel A := by
+  constructor
+  · intro hnot ε hε
+    have hfailure : ¬ ∀ β : H, ε * ‖β‖ ≤ ‖A β‖ := by
+      intro hbound
+      exact hnot ⟨ε, hε, hbound⟩
+    push_neg at hfailure
+    obtain ⟨x, hx⟩ := hfailure
+    have hxnorm : 0 < ‖x‖ := by
+      by_contra hzero
+      have hxzero : ‖x‖ = 0 := le_antisymm (le_of_not_gt hzero) (norm_nonneg x)
+      have hx_eq_zero : x = 0 := norm_eq_zero.mp hxzero
+      subst x
+      simp at hx
+    let β : H := (‖x‖)⁻¹ • x
+    refine ⟨β, ?_, ?_⟩
+    · simp only [β, norm_smul, Real.norm_eq_abs]
+      rw [abs_of_pos (inv_pos.mpr hxnorm)]
+      exact inv_mul_cancel₀ (ne_of_gt hxnorm)
+    · have hscale : ‖A β‖ = (‖x‖)⁻¹ * ‖A x‖ := by
+        simp only [β, map_smul, norm_smul, Real.norm_eq_abs]
+        rw [abs_of_pos (inv_pos.mpr hxnorm)]
+      rw [hscale]
+      have hmul := mul_le_mul_of_nonneg_left (le_of_lt hx) (le_of_lt (inv_pos.mpr hxnorm))
+      calc
+        (‖x‖)⁻¹ * ‖A x‖ ≤ (‖x‖)⁻¹ * (ε * ‖x‖) := hmul
+        _ = ε := by field_simp
+  · intro hdeep hstable
+    rcases hstable with ⟨c, hc, hbound⟩
+    obtain ⟨β, hunit, hdepth⟩ := hdeep (c / 2) (half_pos hc)
+    have hlower : c ≤ ‖A β‖ := by simpa [hunit] using hbound β
+    linarith
 
 /-- The zero observation on the real line is the simplest concrete approximate-kernel model. -/
 theorem hasUnitApproxKernel_zero_real :
