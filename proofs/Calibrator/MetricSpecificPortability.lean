@@ -3161,7 +3161,10 @@ theorem LDPanelRetention.nonempty : Nonempty LDPanelRetention :=
 
 /-- Fraction of a panel's markers that survive pruning.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: NOT AN EMPIRICAL CLAIM. Retained over total is the definition of a
+    retained FRACTION; the two counts are fields of the structure, so the quotient is fixed
+    once the panel is. What pruning actually retains on a real panel is empirical, but that
+    is a claim about `retainedMarkers`, not about this division. -/
 noncomputable def ldPanelRetentionFraction (panel : LDPanelRetention) : ℝ :=
   (panel.retainedMarkers : ℝ) / (panel.totalMarkers : ℝ)
 

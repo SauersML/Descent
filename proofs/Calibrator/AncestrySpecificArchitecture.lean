@@ -111,8 +111,8 @@ drift variances.
     is that Hudson agrees only to first order (`0.500` against `0.632` at
     `τ = 1`) and Nei's `G_ST` is exactly half of what this argument wants.
 
-    Empirical status: **the simulation MATCH is an algebraic identity and carries no
-    information.** `battery_bulk21` scored this MATCH against a Wright-Fisher simulation;
+    Empirical status: **VACUOUS** -- the simulation MATCH is an algebraic identity and
+    carries no information. `battery_bulk21` scored this MATCH against a Wright-Fisher simulation;
     the verdict is vacuous. The simulator estimates `F_ST` on the same run as
     `Var(p) / (p₀(1-p₀))`, and substituting that defining relation into this body gives
     `p₀(1-p₀) · Var(p) / (p₀(1-p₀)) = Var(p)` — the estimator itself, residual exactly `0`
@@ -120,9 +120,10 @@ drift variances.
     `E[p_t] = p₀`. On the same cells a competing body that is genuinely a different
     function of the same inputs is separable (a planted `p₀(1-p₀)·fst²` leaves the nonzero
     residual `Var(p)·(-Var(p) - p₀² + p₀)/(p₀(p₀-1))`), so the design had power it never
-    spent: it was pointed at a definition. The docstring's own first sentence says as much.
-    UNTESTED as a claim about the world; what is actually open is the convention question
-    the paragraph above states, and an identity cannot settle it. -/
+    spent: it was pointed at a definition rather than at a claim. UNTESTED as a claim about
+    the world. What is actually open is the convention question the paragraph above states --
+    which of the three `F`s the caller supplies -- and an identity cannot settle it, because
+    the estimator carries the same convention the body does. -/
 noncomputable def driftVariance (p0 fst : ℝ) : ℝ :=
   p0 * (1 - p0) * fst
 
@@ -162,8 +163,8 @@ theorem driftVariance_eq_zero_iff (p0 fst : ℝ) :
     ancestor, Var(p₁ - p₂) = Var(p₁) + Var(p₂) = 2·driftVariance.
     The factor of 2 comes from independence of drift.
 
-    Empirical status: **the simulation MATCH is an algebraic identity and carries no
-    information**, for the reason given at `driftVariance`, of which this is twice the body.
+    Empirical status: **VACUOUS** -- the simulation MATCH is an algebraic identity and
+    carries no information, for the reason given at `driftVariance`, of which this is twice the body.
     Substituting the simulator's own `F_ST := Var(p)/(p₀(1-p₀))` collapses this onto
     `2·Var(p)`, which is what the simulator computes for `Var(p₁ - p₂)` once the two
     lineages are drawn independently — residual exactly `0`. The factor of `2` the docstring
@@ -207,8 +208,8 @@ theorem twoPopDriftVariance_eq_zero_iff (p0 fst : ℝ) :
     `4·G_ST·p̄·(1-p̄)`, so `fst := neiGst p₁ p₂` halves this body. See the
     section note.
 
-    Empirical status: **the simulation MATCH is an algebraic identity and carries no
-    information.** `battery_bulk21` scored this MATCH; this body is `twoPopDriftVariance`
+    Empirical status: **VACUOUS** -- the simulation MATCH is an algebraic identity and
+    carries no information. `battery_bulk21` scored this MATCH; this body is `twoPopDriftVariance`
     with its arguments in the other order, so it collapses onto the simulator's `2·Var(p)`
     for the same reason and with the same exactly-`0` residual. Note what that means for the
     convention paragraph above: the factor-of-2 question and the Nei/Hudson question are

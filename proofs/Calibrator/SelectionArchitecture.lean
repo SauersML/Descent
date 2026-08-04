@@ -165,7 +165,11 @@ theorem effectCorrelationStabilizing_lt_of_Ns_lt
 /-- Per-locus contribution obtained by spreading a positive architecture-scale variance
 equally over `locusCount` causal loci.
 
-Empirical status: UNTESTED. Equal allocation is the model assumption encoded by the quotient. -/
+Empirical status: NOT AN EMPIRICAL CLAIM. Equal allocation is the model assumption encoded
+by the quotient, so the body is the DEFINITION of "spread equally" and not a prediction: no
+population can make `V/M` a different number once `V` and `M` are fixed. What is empirical
+is whether real architectures allocate equally, and that is a claim about the INPUTS this
+takes, not about this map. -/
 noncomputable def polygenicAveragingVariance (architectureVariance : ℝ)
     (locusCount : ℕ) : ℝ :=
   architectureVariance / locusCount
@@ -187,7 +191,12 @@ theorem polygenicAveragingVariance_lt_of_locusCount_lt
 
 /-- Equal per-locus heritability when total heritability is spread over a specified count.
 
-Empirical status: UNTESTED. Equal allocation across loci is assumed, not inferred. -/
+Empirical status: NOT AN EMPIRICAL CLAIM. Equal allocation across loci is assumed, not
+inferred; the quotient DEFINES the equal-allocation architecture rather than predicting one.
+`equalPerLocusHeritability_sum` below states the whole of its content -- that the M pieces
+add back to the total -- and that is arithmetic. The empirical question, whether per-locus
+heritability is in fact equal across loci, is answered by the effect-size distribution fed
+in, and `PolygenicArchitecture.spikeAndSlabVariance` is where the corpus says it is not. -/
 noncomputable def equalPerLocusHeritability (locusCount : ℕ) (totalHeritability : ℝ) : ℝ :=
   totalHeritability / locusCount
 

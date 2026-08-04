@@ -135,9 +135,12 @@ noncomputable def cumulantTensorEnergy
 
 /-- The two-vertex, `order`-parallel-edge traffic observable.
 
-Empirical status: UNTESTED. The sum is algebra on a covariance matrix. The empirical
-claim in its neighbourhood -- that this quantity separates LD matrices that the spectrum
-cannot tell apart -- is proved below on explicit witnesses, not measured on data. -/
+Empirical status: NOT AN EMPIRICAL CLAIM. The sum is algebra on a covariance matrix: given
+the matrix, the number is determined, and no population can make it come out otherwise. The
+empirical claim in its neighbourhood -- that this quantity separates LD matrices the
+spectrum cannot tell apart -- is proved below on explicit witnesses, which is a stronger
+settlement than a simulation would give, since a witness pair exhibits the separation rather
+than estimating it. -/
 noncomputable def entryPowerSum
     (covariance : Matrix Locus Locus ℝ) (order : ℕ) : ℝ :=
   ∑ left, ∑ right, covariance left right ^ order
@@ -364,9 +367,12 @@ theorem fourthTensorEnergy_pushedFourthCumulantTensor
 /-- The power-`power` LD score of one locus.  Power two is the usual LD score; power four is
 the per-locus statistic detecting symmetric non-Gaussian orientation effects.
 
-Empirical status: UNTESTED. Power two is the standard LD score and is measured routinely
-elsewhere; the fourth-power statistic named here has not been computed on any panel in this
-development, and nothing below claims it has. -/
+Empirical status: NOT AN EMPIRICAL CLAIM. Like `entryPowerSum`, the body is a column sum of
+matrix entries raised to a power: given the LD matrix the number is determined. Power two is
+the standard LD score and is measured routinely elsewhere; the fourth-power statistic named
+here has not been computed on any panel in this development, and nothing below claims it
+has. What would be empirical is a claim about the VALUE this statistic takes on real LD --
+that no definition in this file makes. -/
 noncomputable def ldPowerScore
     (covariance : Matrix Locus Locus ℝ) (power : ℕ) (j : Locus) : ℝ :=
   ∑ i, covariance i j ^ power
@@ -818,8 +824,9 @@ theorem exists_isospectral_blocks_with_distinct_entryCubeMean :
 
 /-- The order-`q` orientation-sensitive LD traffic invariant in the locus coordinate basis.
 
-Empirical status: UNTESTED. A renaming of `entryPowerSum` in biological vocabulary, carrying
-that definition's status: algebra, with no panel computation behind it. -/
+Empirical status: NOT AN EMPIRICAL CLAIM. A renaming of `entryPowerSum` in biological
+vocabulary, carrying that definition's status: algebra on a given matrix, with no panel
+computation behind it and none needed, since the value follows from the matrix. -/
 noncomputable def ldOrientationInvariant {Locus : Type*} [Fintype Locus]
     (order : ℕ) (ld : Matrix Locus Locus ℝ) : ℝ :=
   entryPowerSum ld order
@@ -844,8 +851,9 @@ theorem independentArchitecture_cumulantEnergy_eq_ldOrientationInvariant
 
 /-- The orientation-sensitive third-order LD invariant in the locus coordinate basis.
 
-Empirical status: UNTESTED, as for `ldOrientationInvariant`: algebra on the LD matrix, never
-evaluated on a real one here. -/
+Empirical status: NOT AN EMPIRICAL CLAIM, as for `ldOrientationInvariant`: algebra on the LD
+matrix, never evaluated on a real one here and not the kind of thing a real one could
+contradict. -/
 noncomputable def ldOrientationThirdInvariant {Locus : Type*} [Fintype Locus]
     (ld : Matrix Locus Locus ℝ) : ℝ :=
   entryCubeSum ld
@@ -879,8 +887,10 @@ theorem symmetricArchitecture_thirdMomentEnergy_eq_zero
 /-- The orientation-sensitive fourth-order LD invariant in the locus coordinate basis.  It is
 the summed fourth-power LD score and remains visible for symmetric sparse effect priors.
 
-Empirical status: UNTESTED. "Remains visible" is proved on the explicit witness pair below,
-at one dimension and one prior; it is not a measurement on genotype data. -/
+Empirical status: NOT AN EMPIRICAL CLAIM. The body is the summed fourth-power LD score, a
+function of the matrix alone. "Remains visible" is proved on the explicit witness pair
+below, at one dimension and one prior; it is not a measurement on genotype data, and a
+witness settles a separation more firmly than a measurement of it would. -/
 noncomputable def ldOrientationFourthInvariant {Locus : Type*} [Fintype Locus]
     (ld : Matrix Locus Locus ℝ) : ℝ :=
   entryFourthSum ld

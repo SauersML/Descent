@@ -415,7 +415,12 @@ theorem r2_increments_strictAnti_in_signal
     Computational corrections are cheap but limited.
     Optimal strategy depends on budget.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: NOT AN EMPIRICAL CLAIM. `improvement / cost` is the DEFINITION of a
+    ratio measure, the standard "benefit per unit spend", and a ratio of two given numbers
+    is not something a study could find wrong. Every empirical question here is a question
+    about the two ARGUMENTS -- how much a given intervention improves a score, and what it
+    costs -- and neither is fixed by this body. The docstring's ranking of strategies is
+    prose about plausible arguments, not a consequence of the quotient. -/
 noncomputable def costEffectiveness (improvement cost : ℝ) : ℝ :=
   improvement / cost
 

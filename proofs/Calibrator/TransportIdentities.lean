@@ -967,7 +967,12 @@ noncomputable def ConfusionMatrix.witness : ConfusionMatrix where
 
 namespace ConfusionMatrix
 
-/-- Empirical status: UNTESTED. -/
+/-- Empirical status: NOT AN EMPIRICAL CLAIM. A confusion matrix's four cells are declared to
+sum to one by `mass_one`, and the disease margin is the two cells in which the subject has
+the disease. Adding two entries of a table is bookkeeping: no population can make
+`tp + fn` a different number once the table is given. The empirical claims about prevalence
+live where a prevalence is PREDICTED -- `PGSCalibrationTheory.screeningBreakEvenPrevalence`
+and the liability-threshold quantities -- not here. -/
 def prevalence (c : ConfusionMatrix) : ℝ := c.tp + c.fn
 
 def recallRate (c : ConfusionMatrix) : ℝ := c.tp / (c.tp + c.fn)
