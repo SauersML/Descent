@@ -403,6 +403,62 @@ theorem finiteEnvironmentCovariancePool_mulVec_eq_zero_iff
     ext i
     simp [hkernel]
 
+omit [DecidableEq ι] in
+/-- A direction detected by at least one positively weighted environment cannot remain in the
+pooled nullspace. -/
+theorem finiteEnvironmentCovariancePool_mulVec_ne_zero_of_exists
+    {κ : Type*} [Fintype κ]
+    (weight : κ → ℝ) (covariance : κ → Matrix ι ι ℝ)
+    (hweight : ∀ environment, 0 < weight environment)
+    (hnonneg : ∀ environment shift,
+      0 ≤ dot shift ((covariance environment).mulVec shift))
+    (hzero : ∀ environment shift,
+      dot shift ((covariance environment).mulVec shift) = 0 ↔
+        (covariance environment).mulVec shift = 0)
+    (shift : ι → ℝ)
+    (hdetected : ∃ environment, (covariance environment).mulVec shift ≠ 0) :
+    (finiteEnvironmentCovariancePool weight covariance).mulVec shift ≠ 0 := by
+  intro hpool
+  obtain ⟨environment, hdetect⟩ := hdetected
+  exact hdetect ((finiteEnvironmentCovariancePool_mulVec_eq_zero_iff
+    weight covariance hweight hnonneg hzero shift).mp hpool environment)
+
+omit [DecidableEq ι] in
+/-- **Strict diversity gain.** The pooled nullspace is strictly smaller than a reference
+environment's nullspace whenever another environment detects at least one direction that the
+reference environment misses. This is the exact algebraic condition under which adding an
+ancestry removes a genuine nonidentifiability direction. -/
+theorem finiteEnvironmentCovariancePool_kernel_ssubset
+    {κ : Type*} [Fintype κ]
+    (weight : κ → ℝ) (covariance : κ → Matrix ι ι ℝ)
+    (reference : κ)
+    (hweight : ∀ environment, 0 < weight environment)
+    (hnonneg : ∀ environment shift,
+      0 ≤ dot shift ((covariance environment).mulVec shift))
+    (hzero : ∀ environment shift,
+      dot shift ((covariance environment).mulVec shift) = 0 ↔
+        (covariance environment).mulVec shift = 0)
+    (hseparates : ∃ shift : ι → ℝ,
+      (covariance reference).mulVec shift = 0 ∧
+        ∃ environment, (covariance environment).mulVec shift ≠ 0) :
+    {shift : ι → ℝ |
+      (finiteEnvironmentCovariancePool weight covariance).mulVec shift = 0} ⊂
+        {shift : ι → ℝ | (covariance reference).mulVec shift = 0} := by
+  apply Set.ssubset_iff_subset_ne.mpr
+  constructor
+  · intro shift hpool
+    exact (finiteEnvironmentCovariancePool_mulVec_eq_zero_iff
+      weight covariance hweight hnonneg hzero shift).mp hpool reference
+  · obtain ⟨shift, hreference, hdetected⟩ := hseparates
+    intro hequal
+    have hpool : (finiteEnvironmentCovariancePool weight covariance).mulVec shift = 0 := by
+      change shift ∈ {shift : ι → ℝ |
+        (finiteEnvironmentCovariancePool weight covariance).mulVec shift = 0}
+      rw [hequal]
+      exact hreference
+    exact finiteEnvironmentCovariancePool_mulVec_ne_zero_of_exists
+      weight covariance hweight hnonneg hzero shift hdetected hpool
+
 /-! ## Singular portability boundary -/
 
 /-- A uniform coefficient-space portability bound: target excess risk is at most `constant`
