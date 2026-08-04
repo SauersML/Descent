@@ -413,6 +413,17 @@ theorem ncp_at_reference_point :
     ncp 1 1 = 1 := by
   norm_num [ncp]
 
+/-- A non-centrality parameter vanishes exactly when information or effect size vanishes. -/
+theorem ncp_eq_zero_iff (n_eff β : ℝ) :
+    ncp n_eff β = 0 ↔ n_eff = 0 ∨ β = 0 := by
+  unfold ncp
+  constructor
+  · intro h
+    rcases mul_eq_zero.mp h with h_information | h_effect
+    · exact Or.inl h_information
+    · exact Or.inr (sq_eq_zero_iff.mp h_effect)
+  · rintro (rfl | rfl) <;> norm_num
+
 
 /-- NCP is monotone in effective sample size. -/
 theorem ncp_mono_neff (n1 n2 β : ℝ) (h_n : n1 < n2) (h_β : β ≠ 0) :
