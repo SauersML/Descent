@@ -536,6 +536,15 @@ theorem gainPolynomialRow_eq_mul (β n : ℝ) :
 /-- Row four: linear gain, the fully fresh case. -/
 noncomputable def gainLinear (n : ℝ) : ℝ := n
 
+/-- **gainLinear pinned at a reference point.** No theorem in the corpus evaluated this
+definition, so every body agreeing with it in sign and monotonicity was indistinguishable from
+it. At all arguments equal to `1 / 2` it is `1 / 2`, which fixes the coefficients a one-sided
+bound or an invariance leaves free. -/
+theorem gainLinear_at_reference_point :
+    gainLinear 1 / 2 = 1 / 2 := by
+  unfold gainLinear
+  norm_num
+
 /-- Row one is eventually below row two. -/
 theorem gainBounded_lt_gainLog :
     ∀ᶠ n : ℝ in Filter.atTop, gainBounded n < gainLog n := by

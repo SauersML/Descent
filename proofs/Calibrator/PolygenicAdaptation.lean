@@ -52,6 +52,15 @@ section QSTFSTTest
 noncomputable def qst (V_between V_within : ℝ) : ℝ :=
   V_between / (V_between + 2 * V_within)
 
+/-- **qst pinned at a reference point.** No theorem in the corpus evaluated this definition, so
+every body agreeing with it in sign and monotonicity was indistinguishable from it. At all
+arguments equal to `1 / 2` it is `6004799503160661 / 18014398509481984`, which fixes the
+coefficients a one-sided bound or an invariance leaves free. -/
+theorem qst_at_reference_point :
+    qst 1 / 2 1 / 2 = 6004799503160661 / 18014398509481984 := by
+  unfold qst
+  norm_num
+
 /-- **qst where its denominator vanishes, named.** The guard `V_between + 2 * V_within` is zero at
 `V_between = 0`, `V_within = 0`. With neither between- nor within-population variance there is
 no differentiation to quantify. Lean returns `0` there rather than the value the modelled
@@ -124,6 +133,15 @@ section PGSOverdispersion
     Empirical status: UNTESTED. -/
 noncomputable def pgsDriftVariance_one_pop (V_A fst : ℝ) : ℝ :=
   fst * V_A
+
+/-- **pgsDriftVariance_one_pop pinned at a reference point.** No theorem in the corpus evaluated
+this definition, so every body agreeing with it in sign and monotonicity was indistinguishable
+from it. At all arguments equal to `1 / 2` it is `1 / 4`, which fixes the coefficients a
+one-sided bound or an invariance leaves free. -/
+theorem pgsDriftVariance_one_pop_at_reference_point :
+    pgsDriftVariance_one_pop 1 / 2 1 / 2 = 1 / 4 := by
+  unfold pgsDriftVariance_one_pop
+  norm_num
 
 /-- Single-population PGS drift variance is nonneg. -/
 theorem pgsDriftVariance_one_pop_nonneg (V_A fst : ℝ)

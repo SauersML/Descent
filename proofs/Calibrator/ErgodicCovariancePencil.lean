@@ -266,6 +266,15 @@ anchor, `mean` is the invariant mean, and `source` is the time-zero coordinate. 
 def firstModeConditionalMean (mean r source : ℝ) : ℝ :=
   mean + r * (source - mean)
 
+/-- **firstModeConditionalMean pinned at a reference point.** No theorem in the corpus evaluated
+this definition, so every body agreeing with it in sign and monotonicity was indistinguishable
+from it. At all arguments equal to `1 / 2` it is `1 / 2`, which fixes the coefficients a
+one-sided bound or an invariance leaves free. -/
+theorem firstModeConditionalMean_at_reference_point :
+    firstModeConditionalMean 1 / 2 1 / 2 1 / 2 = 1 / 2 := by
+  unfold firstModeConditionalMean
+  norm_num
+
 /-- **Exact affine-exponential relaxation, pointwise.**  Substituting a first-eigenmode
 conditional mean splits the local trace contribution into its independent-slice value and a
 single correction proportional to `r`.  Averaging this identity gives the covariance term

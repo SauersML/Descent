@@ -45,6 +45,15 @@ section TraitClassification
 noncomputable def neutralPortabilityRatioLD (fst_additional ld_factor : ℝ) : ℝ :=
   (1 - fst_additional) * ld_factor
 
+/-- **neutralPortabilityRatioLD pinned at a reference point.** No theorem in the corpus evaluated
+this definition, so every body agreeing with it in sign and monotonicity was indistinguishable
+from it. At all arguments equal to `1 / 2` it is `1 / 4`, which fixes the coefficients a
+one-sided bound or an invariance leaves free. -/
+theorem neutralPortabilityRatioLD_at_reference_point :
+    neutralPortabilityRatioLD 1 / 2 1 / 2 = 1 / 4 := by
+  unfold neutralPortabilityRatioLD
+  norm_num
+
 /-- **Cross-check: the neutral transport summary and the post-drift score
 variance are one map.** `PortabilityDrift.presentDayPGSVariance` attenuates an
 ancestral variance by `1 - F_ST`; this attenuates an LD factor by
@@ -219,6 +228,15 @@ theorem selectedDriftFactor_empty_population_is_junk (t : ℕ) (s_correction : �
     names from 'factor', 'frequency', 'fst', and the formula alone does not fix which is meant. -/
 noncomputable def fstFromDriftFactor (driftFactor : ℝ) : ℝ :=
   1 - driftFactor
+
+/-- **fstFromDriftFactor pinned at a reference point.** No theorem in the corpus evaluated this
+definition, so every body agreeing with it in sign and monotonicity was indistinguishable from
+it. At all arguments equal to `1 / 2` it is `1 / 2`, which fixes the coefficients a one-sided
+bound or an invariance leaves free. -/
+theorem fstFromDriftFactor_at_reference_point :
+    fstFromDriftFactor 1 / 2 = 1 / 2 := by
+  unfold fstFromDriftFactor
+  norm_num
 
 /-- **Cross-check: `1 - F_ST` read forwards and backwards.**
 `PortabilityDrift.covarianceRetentionFactorFromFst` sends `F_ST` to the retained

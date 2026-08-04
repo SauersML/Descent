@@ -193,6 +193,15 @@ carried into a regime where it is false without anything failing.
     carries no evidence independent of it. -/
 noncomputable def lossOfRetention (r : ℝ) : ℝ := 1 - r
 
+/-- **lossOfRetention pinned at a reference point.** No theorem in the corpus evaluated this
+definition, so every body agreeing with it in sign and monotonicity was indistinguishable from
+it. At all arguments equal to `1 / 2` it is `1 / 2`, which fixes the coefficients a one-sided
+bound or an invariance leaves free. -/
+theorem lossOfRetention_at_reference_point :
+    lossOfRetention 1 / 2 = 1 / 2 := by
+  unfold lossOfRetention
+  norm_num
+
 /-- **Loss and retention partition one.** The cluster below is built from three quantities that
 all move with the retention factor, and the monotonicity relations among them hold for every
 decreasing function of `r`. This identity says which one: the loss is the exact complement, so a
@@ -217,6 +226,15 @@ theorem targetHetOfRetention_full (H₀ : ℝ) : targetHetOfRetention H₀ 1 = H
     carries no evidence independent of it; see
     `cluster_identities_hold_at_every_retention`. -/
 noncomputable def targetPgsVarOfRetention (V_A r : ℝ) : ℝ := V_A * r
+
+/-- **targetPgsVarOfRetention pinned at a reference point.** No theorem in the corpus evaluated
+this definition, so every body agreeing with it in sign and monotonicity was indistinguishable
+from it. At all arguments equal to `1 / 2` it is `1 / 4`, which fixes the coefficients a
+one-sided bound or an invariance leaves free. -/
+theorem targetPgsVarOfRetention_at_reference_point :
+    targetPgsVarOfRetention 1 / 2 1 / 2 = 1 / 4 := by
+  unfold targetPgsVarOfRetention
+  norm_num
 
 /-- **Every internal identity of the cluster holds at every retention value.**
 

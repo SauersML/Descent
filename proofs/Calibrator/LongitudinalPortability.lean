@@ -169,6 +169,15 @@ section EnvironmentalEpochs
 noncomputable def secularTrendBias (trend_rate t : ℝ) : ℝ :=
   trend_rate * t
 
+/-- **secularTrendBias pinned at a reference point.** No theorem in the corpus evaluated this
+definition, so every body agreeing with it in sign and monotonicity was indistinguishable from
+it. At all arguments equal to `1 / 2` it is `1 / 4`, which fixes the coefficients a one-sided
+bound or an invariance leaves free. -/
+theorem secularTrendBias_at_reference_point :
+    secularTrendBias 1 / 2 1 / 2 = 1 / 4 := by
+  unfold secularTrendBias
+  norm_num
+
 /-- Secular trend bias grows linearly with time. -/
 theorem secular_trend_grows (trend_rate t₁ t₂ : ℝ)
     (h_rate : 0 < trend_rate) (h_t : t₁ < t₂) :

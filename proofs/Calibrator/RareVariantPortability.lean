@@ -287,6 +287,15 @@ and is valid only while `h * s` dominates `mu` — see
 noncomputable def mutationSelectionStepRare (mu s h p : ℝ) : ℝ :=
   p * (1 - h * s) + mu * (1 - p)
 
+/-- **mutationSelectionStepRare pinned at a reference point.** No theorem in the corpus evaluated
+this definition, so every body agreeing with it in sign and monotonicity was indistinguishable
+from it. At all arguments equal to `1 / 2` it is `5 / 8`, which fixes the coefficients a
+one-sided bound or an invariance leaves free. -/
+theorem mutationSelectionStepRare_at_reference_point :
+    mutationSelectionStepRare 1 / 2 1 / 2 1 / 2 1 / 2 = 5 / 8 := by
+  unfold mutationSelectionStepRare
+  norm_num
+
 /-- **Mutation-selection balance for a partially dominant deleterious allele.**
 
 The fixed point of `mutationSelectionStepRare`. It is `mu / (h * s + mu)`, not
@@ -400,6 +409,15 @@ mutation replenishes as before.
     Empirical status: UNTESTED. -/
 noncomputable def mutationSelectionStepRecessive (mu s p : ℝ) : ℝ :=
   p - s * p ^ 2 + mu * (1 - p)
+
+/-- **mutationSelectionStepRecessive pinned at a reference point.** No theorem in the corpus
+evaluated this definition, so every body agreeing with it in sign and monotonicity was
+indistinguishable from it. At all arguments equal to `1 / 2` it is `5 / 8`, which fixes the
+coefficients a one-sided bound or an invariance leaves free. -/
+theorem mutationSelectionStepRecessive_at_reference_point :
+    mutationSelectionStepRecessive 1 / 2 1 / 2 1 / 2 = 5 / 8 := by
+  unfold mutationSelectionStepRecessive
+  norm_num
 
 /-- **Mutation-selection balance for a fully recessive deleterious allele**: the
 nonnegative root of `s p² + mu p − mu = 0`, the fixed point of

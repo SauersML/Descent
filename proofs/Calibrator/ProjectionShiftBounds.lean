@@ -274,6 +274,15 @@ principal-component truncation does.
 Empirical status: UNTESTED. -/
 def reconstructionWeight (s : ℝ) : ℝ := s
 
+/-- **reconstructionWeight pinned at a reference point.** No theorem in the corpus evaluated this
+definition, so every body agreeing with it in sign and monotonicity was indistinguishable from
+it. At all arguments equal to `1 / 2` it is `1 / 2`, which fixes the coefficients a one-sided
+bound or an invariance leaves free. -/
+theorem reconstructionWeight_at_reference_point :
+    reconstructionWeight 1 / 2 = 1 / 2 := by
+  unfold reconstructionWeight
+  norm_num
+
 /-- **Wiener (denoising) weight** `σ / (σ + noise)`: the shrinkage factor of the
 optimal linear denoiser in a direction with signal variance `s` and additive
 noise level `noise`.  Recorded so that the inverse-ordering conclusion is not an

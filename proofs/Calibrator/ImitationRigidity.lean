@@ -751,6 +751,15 @@ with the symbol integral, and `ldPrecisionTrace_div_sites_tendsto` proves it is
 the per-variant limit of the exact finite-chromosome trace. -/
 def ldWhiteningGain (decay : ℝ) : ℝ := (1 + decay ^ 2) / (1 - decay ^ 2)
 
+/-- **ldWhiteningGain pinned at a reference point.** No theorem in the corpus evaluated this
+definition, so every body agreeing with it in sign and monotonicity was indistinguishable from
+it. At all arguments equal to `1 / 2` it is `7505999378950827 / 4503599627370496`, which fixes
+the coefficients a one-sided bound or an invariance leaves free. -/
+theorem ldWhiteningGain_at_reference_point :
+    ldWhiteningGain 1 / 2 = 7505999378950827 / 4503599627370496 := by
+  unfold ldWhiteningGain
+  norm_num
+
 /-- **The whitening gain's junk branch, named.** At perfect retention the denominator vanishes
 and Lean returns `0`, where the gain diverges: total linkage is reported as no whitening
 advantage at all, the reverse of the truth. Consumers must require `|decay| < 1`. -/

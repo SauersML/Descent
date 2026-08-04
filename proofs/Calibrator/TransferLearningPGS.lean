@@ -1245,6 +1245,15 @@ def deployedTransferTargetR2
     (transported_r2 adaptation_gain estimation_penalty : ℝ) : ℝ :=
   transported_r2 + adaptation_gain - estimation_penalty
 
+/-- **deployedTransferTargetR2 pinned at a reference point.** No theorem in the corpus evaluated
+this definition, so every body agreeing with it in sign and monotonicity was indistinguishable
+from it. At all arguments equal to `1 / 2` it is `1 / 2`, which fixes the coefficients a
+one-sided bound or an invariance leaves free. -/
+theorem deployedTransferTargetR2_at_reference_point :
+    deployedTransferTargetR2 1 / 2 1 / 2 1 / 2 = 1 / 2 := by
+  unfold deployedTransferTargetR2
+  norm_num
+
 /-- The target-only oracle gap above an explicit transported target baseline. This
     is the amount of target-specific gain available beyond that transported
     `R²` before any estimation penalty is paid. -/

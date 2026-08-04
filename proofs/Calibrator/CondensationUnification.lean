@@ -1739,10 +1739,28 @@ Empirical status: DERIVED. The first-moment displacement of moving unit mass bet
 the two preimages of `|u| = s`; no free parameter. -/
 def varianceProfile (s : ℝ) : ℝ := (1 + s) - (1 - s)
 
+/-- **varianceProfile pinned at a reference point.** No theorem in the corpus evaluated this
+definition, so every body agreeing with it in sign and monotonicity was indistinguishable from
+it. At all arguments equal to `1 / 2` it is `1`, which fixes the coefficients a one-sided bound
+or an invariance leaves free. -/
+theorem varianceProfile_at_reference_point :
+    varianceProfile 1 / 2 = 1 := by
+  unfold varianceProfile
+  norm_num
+
 /-- The fourth-moment profile of a fiber transfer at `s`: `(1+s)² - (1-s)²`.
 
 Empirical status: DERIVED. As for `varianceProfile`, one order up; no free parameter. -/
 def fourthMomentProfile (s : ℝ) : ℝ := (1 + s) ^ 2 - (1 - s) ^ 2
+
+/-- **fourthMomentProfile pinned at a reference point.** No theorem in the corpus evaluated this
+definition, so every body agreeing with it in sign and monotonicity was indistinguishable from
+it. At all arguments equal to `1 / 2` it is `2`, which fixes the coefficients a one-sided bound
+or an invariance leaves free. -/
+theorem fourthMomentProfile_at_reference_point :
+    fourthMomentProfile 1 / 2 = 2 := by
+  unfold fourthMomentProfile
+  norm_num
 
 theorem varianceProfile_eq (s : ℝ) : varianceProfile s = 2 * s := by
   unfold varianceProfile

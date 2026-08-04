@@ -1110,6 +1110,15 @@ finite-island result, isolated so that it can be stated about rather than
 carried implicitly. -/
 noncomputable def islandDemeCorrection (d : ℝ) : ℝ := (d / (d - 1)) ^ 2
 
+/-- **islandDemeCorrection pinned at a reference point.** No theorem in the corpus evaluated this
+definition, so every body agreeing with it in sign and monotonicity was indistinguishable from
+it. At all arguments equal to `1 / 2` it is `1`, which fixes the coefficients a one-sided bound
+or an invariance leaves free. -/
+theorem islandDemeCorrection_at_reference_point :
+    islandDemeCorrection 1 / 2 = 1 := by
+  unfold islandDemeCorrection
+  norm_num
+
 /-- **The deme correction's junk branch, named.** At a single deme the correction diverges and
 Lean returns `0`. Consumers must require `d ≠ 1`, and `islandFstFiniteDemes_one_deme_is_junk`
 shows what the `0` does downstream. -/

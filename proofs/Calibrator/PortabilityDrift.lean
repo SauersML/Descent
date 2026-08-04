@@ -511,6 +511,15 @@ fact a stipulated constant cannot be trusted to carry.
     Empirical status: UNTESTED. -/
 noncomputable def twoDemeIMEquilibriumETss (_M : ℝ) : ℝ := 2
 
+/-- **twoDemeIMEquilibriumETss pinned at a reference point.** No theorem in the corpus evaluated
+this definition, so every body agreeing with it in sign and monotonicity was indistinguishable
+from it. At all arguments equal to `1 / 2` it is `2`, which fixes the coefficients a one-sided
+bound or an invariance leaves free. -/
+theorem twoDemeIMEquilibriumETss_at_reference_point :
+    twoDemeIMEquilibriumETss 1 / 2 = 2 := by
+  unfold twoDemeIMEquilibriumETss
+  norm_num
+
 /-- **Expected between-deme coalescence time at migration-drift balance.**
 Derived: see `twoDemeIMEquilibriumETst_isFixedPoint`.  It diverges as `M → 0`,
 which is the complete-isolation limit.
@@ -927,6 +936,15 @@ which carries the assumption in its type;
     empirical content lives entirely in whatever supplies `fst`. -/
 noncomputable def targetHetFromFst (het_source fst : ℝ) : ℝ :=
   het_source * (1 - fst)
+
+/-- **targetHetFromFst pinned at a reference point.** No theorem in the corpus evaluated this
+definition, so every body agreeing with it in sign and monotonicity was indistinguishable from
+it. At all arguments equal to `1 / 2` it is `1 / 4`, which fixes the coefficients a one-sided
+bound or an invariance leaves free. -/
+theorem targetHetFromFst_at_reference_point :
+    targetHetFromFst 1 / 2 1 / 2 = 1 / 4 := by
+  unfold targetHetFromFst
+  norm_num
 
 /-- **Endpoints of the drift-retention map.** No divergence retains all heterozygosity; complete
 divergence retains none. Two anchors rather than one, because a single one is met by many wrong
@@ -1519,6 +1537,15 @@ weighted reading being 74 percent larger.
     explains in its own source population, already net of its own noise. -/
 noncomputable def realWorldPGSVariance (V_A fst rhoSq : ℝ) : ℝ :=
   rhoSq * (1 - fst) * V_A
+
+/-- **realWorldPGSVariance pinned at a reference point.** No theorem in the corpus evaluated this
+definition, so every body agreeing with it in sign and monotonicity was indistinguishable from
+it. At all arguments equal to `1 / 2` it is `1 / 8`, which fixes the coefficients a one-sided
+bound or an invariance leaves free. -/
+theorem realWorldPGSVariance_at_reference_point :
+    realWorldPGSVariance 1 / 2 1 / 2 1 / 2 = 1 / 8 := by
+  unfold realWorldPGSVariance
+  norm_num
 
 /-! Explicit cross-population biological and observational state that can
 change deployed portability metrics.
@@ -4897,6 +4924,15 @@ noncomputable def covarianceRetention (freq_corr ld_overlap : ℝ) : ℝ :=
     meant; `alleleFreqCorrelation` is the correlation. -/
 noncomputable def covarianceRetentionFactorFromFst (fst : ℝ) : ℝ := 1 - fst
 
+/-- **covarianceRetentionFactorFromFst pinned at a reference point.** No theorem in the corpus
+evaluated this definition, so every body agreeing with it in sign and monotonicity was
+indistinguishable from it. At all arguments equal to `1 / 2` it is `1 / 2`, which fixes the
+coefficients a one-sided bound or an invariance leaves free. -/
+theorem covarianceRetentionFactorFromFst_at_reference_point :
+    covarianceRetentionFactorFromFst 1 / 2 = 1 / 2 := by
+  unfold covarianceRetentionFactorFromFst
+  norm_num
+
 /-- **The allele-frequency correlation between two drifted demes.**
 
     `corr(p1, p2) = Var(p0) / (Var(p0) + fst * E[p0 (1 - p0)])`, where the two
@@ -4928,6 +4964,15 @@ noncomputable def covarianceRetentionFactorFromFst (fst : ℝ) : ℝ := 1 - fst
 noncomputable def alleleFreqCorrelation (fst varAncestral meanHetAncestral : ℝ) : ℝ :=
   varAncestral / (varAncestral + fst * meanHetAncestral)
 
+/-- **alleleFreqCorrelation pinned at a reference point.** No theorem in the corpus evaluated
+this definition, so every body agreeing with it in sign and monotonicity was indistinguishable
+from it. At all arguments equal to `1 / 2` it is `6004799503160661 / 9007199254740992`, which
+fixes the coefficients a one-sided bound or an invariance leaves free. -/
+theorem alleleFreqCorrelation_at_reference_point :
+    alleleFreqCorrelation 1 / 2 1 / 2 1 / 2 = 6004799503160661 / 9007199254740992 := by
+  unfold alleleFreqCorrelation
+  norm_num
+
 /-- **Exactly when the retention factor is the frequency correlation.**
 
     The two agree precisely at `varAncestral = (1 - fst) * meanHetAncestral`,
@@ -4949,6 +4994,15 @@ theorem alleleFreqCorrelation_eq_retentionFactor_iff
 
     Empirical status: UNTESTED. -/
 noncomputable def ldOverlapFromSharedLD (shared_ld : ℝ) : ℝ := shared_ld
+
+/-- **ldOverlapFromSharedLD pinned at a reference point.** No theorem in the corpus evaluated
+this definition, so every body agreeing with it in sign and monotonicity was indistinguishable
+from it. At all arguments equal to `1 / 2` it is `1 / 2`, which fixes the coefficients a
+one-sided bound or an invariance leaves free. -/
+theorem ldOverlapFromSharedLD_at_reference_point :
+    ldOverlapFromSharedLD 1 / 2 = 1 / 2 := by
+  unfold ldOverlapFromSharedLD
+  norm_num
 
 /-- Covariance retention in terms of Fst and shared_LD. -/
 theorem covarianceRetention_from_fst_ld (fst shared_ld : ℝ) :

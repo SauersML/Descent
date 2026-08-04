@@ -302,6 +302,15 @@ theorem ascertainment_artificial_loss
 noncomputable def ascertainment_loss (coverage v_causal : ℝ) : ℝ :=
   (1 - coverage) * v_causal
 
+/-- **ascertainment_loss pinned at a reference point.** No theorem in the corpus evaluated this
+definition, so every body agreeing with it in sign and monotonicity was indistinguishable from
+it. At all arguments equal to `1 / 2` it is `1 / 4`, which fixes the coefficients a one-sided
+bound or an invariance leaves free. -/
+theorem ascertainment_loss_at_reference_point :
+    ascertainment_loss 1 / 2 1 / 2 = 1 / 4 := by
+  unfold ascertainment_loss
+  norm_num
+
 /-- **Cross-check: incomplete tagging attenuates exactly as drift does.**
 `PortabilityDrift.presentDayPGSVariance` and
 `PhenomeWidePortability.neutralPortabilityRatioLD` are the same

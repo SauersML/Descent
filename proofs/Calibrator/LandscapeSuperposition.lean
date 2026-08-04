@@ -42,7 +42,7 @@ open scoped BigOperators Matrix
 
 section LevelResolvedCalculus
 
-variable {Index Config Overlap R : Type*} [Ring R] [LinearOrder R] [IsStrictOrderedRing R]
+variable {Index Config Overlap R : Type*} [Ring R] [LinearOrder R]
 
 /-- Finite-support positive linear superposition of component landscapes.  The ambient index
 type need not be finite; `active` records the components actually used. -/
@@ -64,6 +64,7 @@ def AdmissibleLevels
 it lies above some admissible vector of component levels.  Nonnegative weights are precisely
 what makes the reverse implication valid. -/
 theorem nearOptimal_superposition_iff_exists_levels
+    [IsStrictOrderedRing R]
     (active : Finset Index) (weight : Index → R) (energy : Index → Config → R)
     (target : R) (hweight : ∀ k ∈ active, 0 ≤ weight k) (config : Config) :
     config ∈ NearOptimalSet (superposedLandscape active weight energy) target ↔
@@ -83,6 +84,7 @@ theorem nearOptimal_superposition_iff_exists_levels
 
 /-- Set-level form of the exact decomposition. -/
 theorem nearOptimalSet_superposition_eq_levelResolvedUnion
+    [IsStrictOrderedRing R]
     (active : Finset Index) (weight : Index → R) (energy : Index → Config → R)
     (target : R) (hweight : ∀ k ∈ active, 0 ≤ weight k) :
     NearOptimalSet (superposedLandscape active weight energy) target =
@@ -132,7 +134,6 @@ def LevelResolvedForbiddenCore
 
 /-- The forbidden core is exactly the complement of the achievable envelope.  This is the
 quantifier duality behind the unions-of-bands-inside-an-intersection formula. -/
-omit [IsStrictOrderedRing R] in
 theorem levelResolvedForbiddenCore_eq_compl_envelope
     (active : Finset Index) (weight : Index → R) (energy : Index → Config → R)
     (overlap : Config → Config → Overlap) (target : R) :
@@ -156,6 +157,7 @@ theorem levelResolvedForbiddenCore_eq_compl_envelope
 pair belongs simultaneously to every component's achievable set at some two admissible level
 vectors.  The component witnesses on the right may differ, so this is only an inclusion. -/
 theorem superposedAchievableOverlap_subset_levelResolved
+    [IsStrictOrderedRing R]
     (active : Finset Index) (weight : Index → R) (energy : Index → Config → R)
     (overlap : Config → Config → Overlap) (target : R)
     (hweight : ∀ k ∈ active, 0 ≤ weight k) (q : Overlap)
@@ -173,6 +175,7 @@ theorem superposedAchievableOverlap_subset_levelResolved
 
 /-- Set-level universal inclusion for achievable overlaps. -/
 theorem superposedAchievableOverlaps_subset_levelResolvedEnvelope
+    [IsStrictOrderedRing R]
     (active : Finset Index) (weight : Index → R) (energy : Index → Config → R)
     (overlap : Config → Config → Overlap) (target : R)
     (hweight : ∀ k ∈ active, 0 ≤ weight k) :
@@ -185,6 +188,7 @@ theorem superposedAchievableOverlaps_subset_levelResolvedEnvelope
 /-- A level-resolved cover by component forbidden sets certifies a forbidden overlap for the
 superposition.  This is the rigorous persistence direction. -/
 theorem forbiddenOverlap_of_levelResolved_cover
+    [IsStrictOrderedRing R]
     (active : Finset Index) (weight : Index → R) (energy : Index → Config → R)
     (overlap : Config → Config → Overlap) (target : R)
     (hweight : ∀ k ∈ active, 0 ≤ weight k) (q : Overlap)
@@ -200,6 +204,7 @@ theorem forbiddenOverlap_of_levelResolved_cover
 /-- Set-level dual inclusion: the level-resolved forbidden core is genuinely forbidden by the
 superposition. -/
 theorem levelResolvedForbiddenCore_subset_superposedComplement
+    [IsStrictOrderedRing R]
     (active : Finset Index) (weight : Index → R) (energy : Index → Config → R)
     (overlap : Config → Config → Overlap) (target : R)
     (hweight : ∀ k ∈ active, 0 ≤ weight k) :
@@ -212,7 +217,7 @@ theorem levelResolvedForbiddenCore_subset_superposedComplement
 /-- Interval version of the persistence theorem.  The order on overlaps is used only to name the
 candidate interval; the proof is pointwise. -/
 theorem forbiddenInterval_of_levelResolved_cover
-    [LinearOrder Overlap]
+    [IsStrictOrderedRing R] [LinearOrder Overlap]
     (active : Finset Index) (weight : Index → R) (energy : Index → Config → R)
     (overlap : Config → Config → Overlap) (target : R)
     (hweight : ∀ k ∈ active, 0 ≤ weight k) (lower upper : Overlap)
@@ -311,6 +316,15 @@ theorem migratingForbiddenBand_nonempty (mix : ℝ) :
 /-- Even mixed spherical covariance with a shared quadratic component and two tail terms. -/
 noncomputable def mixedSphericalCovariance (alpha beta q : ℝ) : ℝ :=
   q ^ 2 + alpha * q ^ 4 + beta * q ^ 6
+
+/-- **mixedSphericalCovariance pinned at a reference point.** No theorem in the corpus evaluated
+this definition, so every body agreeing with it in sign and monotonicity was indistinguishable
+from it. At all arguments equal to `1 / 2` it is `37 / 128`, which fixes the coefficients a
+one-sided bound or an invariance leaves free. -/
+theorem mixedSphericalCovariance_at_reference_point :
+    mixedSphericalCovariance 1 / 2 1 / 2 1 / 2 = 37 / 128 := by
+  unfold mixedSphericalCovariance
+  norm_num
 
 /-- Convex covariance mixing preserves the shared quadratic component and averages every
 idiosyncratic tail coefficient. -/
@@ -601,6 +615,29 @@ theorem overlapEnergyCandidates_energy_gap
   rw [(overlapEnergyCandidates_covariance_energy firstVariance secondVariance correlation).1,
     (overlapEnergyCandidates_covariance_energy firstVariance secondVariance correlation).2]
   ring
+
+/-- The same-overlap candidates are separated by covariance energy exactly when the covariance
+has a nonzero off-diagonal entry in the configuration basis. -/
+theorem overlapEnergyCandidates_energy_ne_iff
+    (firstVariance secondVariance correlation : ℝ) :
+    covarianceDisplacementEnergy
+        (symmetricTwoCoordinateCovariance firstVariance secondVariance correlation)
+        overlapEnergyNegative overlapEnergyTruth ≠
+      covarianceDisplacementEnergy
+        (symmetricTwoCoordinateCovariance firstVariance secondVariance correlation)
+        overlapEnergyPositive overlapEnergyTruth ↔ correlation ≠ 0 := by
+  constructor
+  · intro henergy hzero
+    apply henergy
+    rw [(overlapEnergyCandidates_covariance_energy firstVariance secondVariance correlation).1,
+      (overlapEnergyCandidates_covariance_energy firstVariance secondVariance correlation).2,
+      hzero]
+    ring
+  · intro hcorrelation henergy
+    apply hcorrelation
+    have hgap := overlapEnergyCandidates_energy_gap firstVariance secondVariance correlation
+    rw [henergy, sub_self] at hgap
+    linarith
 
 /-- The two candidates have the same Euclidean norm and the same overlap with the planted
 configuration, but different covariance energies.  Thus an anisotropic first-moment theory

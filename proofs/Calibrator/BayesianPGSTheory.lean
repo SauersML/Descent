@@ -547,6 +547,15 @@ noncomputable def posteriorPredictiveVariance
     (residual_var estimation_var : ℝ) : ℝ :=
   residual_var + estimation_var
 
+/-- **posteriorPredictiveVariance pinned at a reference point.** No theorem in the corpus
+evaluated this definition, so every body agreeing with it in sign and monotonicity was
+indistinguishable from it. At all arguments equal to `1 / 2` it is `1`, which fixes the
+coefficients a one-sided bound or an invariance leaves free. -/
+theorem posteriorPredictiveVariance_at_reference_point :
+    posteriorPredictiveVariance 1 / 2 1 / 2 = 1 := by
+  unfold posteriorPredictiveVariance
+  norm_num
+
 /-- **Removing the estimation variance leaves the residual variance.** The two sources of
 predictive uncertainty are separable, which is what licenses reporting them apart; a body that
 combined them any other way would not admit this decomposition. -/
@@ -711,6 +720,15 @@ theorem rg_sq_mem_unit_interval
 noncomputable def multiAncestryEffectiveN
     (n_target rg n_other : ℝ) : ℝ :=
   n_target + rg ^ 2 * n_other
+
+/-- **multiAncestryEffectiveN pinned at a reference point.** No theorem in the corpus evaluated
+this definition, so every body agreeing with it in sign and monotonicity was indistinguishable
+from it. At all arguments equal to `1 / 2` it is `5 / 8`, which fixes the coefficients a
+one-sided bound or an invariance leaves free. -/
+theorem multiAncestryEffectiveN_at_reference_point :
+    multiAncestryEffectiveN 1 / 2 1 / 2 1 / 2 = 5 / 8 := by
+  unfold multiAncestryEffectiveN
+  norm_num
 
 /-- **The Gaussian shrinkage factor is monotone in the multi-ancestry effective sample
     size.**

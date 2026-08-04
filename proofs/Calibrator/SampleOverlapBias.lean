@@ -185,6 +185,15 @@ section LOOCorrections
 noncomputable def approxLOOPGS (pgs_full leverage residual : ℝ) : ℝ :=
   pgs_full - leverage * residual
 
+/-- **approxLOOPGS pinned at a reference point.** No theorem in the corpus evaluated this
+definition, so every body agreeing with it in sign and monotonicity was indistinguishable from
+it. At all arguments equal to `1 / 2` it is `1 / 4`, which fixes the coefficients a one-sided
+bound or an invariance leaves free. -/
+theorem approxLOOPGS_at_reference_point :
+    approxLOOPGS 1 / 2 1 / 2 1 / 2 = 1 / 4 := by
+  unfold approxLOOPGS
+  norm_num
+
 /-- LOO correction reduces the PGS when leverage and residual
     have the same sign (overfitting case). -/
 theorem loo_reduces_overfitting
@@ -223,6 +232,15 @@ section CrypticRelatedness
     family-level environment and rare genetic variants. -/
 noncomputable def kinshipInflation (r2_true K h2_family : ℝ) : ℝ :=
   r2_true + K * h2_family
+
+/-- **kinshipInflation pinned at a reference point.** No theorem in the corpus evaluated this
+definition, so every body agreeing with it in sign and monotonicity was indistinguishable from
+it. At all arguments equal to `1 / 2` it is `3 / 4`, which fixes the coefficients a one-sided
+bound or an invariance leaves free. -/
+theorem kinshipInflation_at_reference_point :
+    kinshipInflation 1 / 2 1 / 2 1 / 2 = 3 / 4 := by
+  unfold kinshipInflation
+  norm_num
 
 /-- Kinship inflation exceeds true R² when K > 0. -/
 theorem kinship_inflates (r2_true K h2_family : ℝ)

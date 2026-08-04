@@ -81,6 +81,15 @@ drift variances.
 noncomputable def driftVariance (p0 fst : ℝ) : ℝ :=
   p0 * (1 - p0) * fst
 
+/-- **driftVariance pinned at a reference point.** No theorem in the corpus evaluated this
+definition, so every body agreeing with it in sign and monotonicity was indistinguishable from
+it. At all arguments equal to `1 / 2` it is `1 / 8`, which fixes the coefficients a one-sided
+bound or an invariance leaves free. -/
+theorem driftVariance_at_reference_point :
+    driftVariance 1 / 2 1 / 2 = 1 / 8 := by
+  unfold driftVariance
+  norm_num
+
 /-- Drift variance is nonneg. -/
 theorem drift_variance_nonneg (p0 fst : ℝ)
     (h_p0 : 0 ≤ p0) (h_p0_le : p0 ≤ 1) (h_fst : 0 ≤ fst) :
@@ -111,6 +120,15 @@ theorem twoPopDriftVariance_eq_sum (p0 fst : ℝ) :
     Empirical status: UNTESTED. -/
 noncomputable def expectedFreqDiffSq (fst p0 : ℝ) : ℝ :=
   2 * fst * p0 * (1 - p0)
+
+/-- **expectedFreqDiffSq pinned at a reference point.** No theorem in the corpus evaluated this
+definition, so every body agreeing with it in sign and monotonicity was indistinguishable from
+it. At all arguments equal to `1 / 2` it is `1 / 4`, which fixes the coefficients a one-sided
+bound or an invariance leaves free. -/
+theorem expectedFreqDiffSq_at_reference_point :
+    expectedFreqDiffSq 1 / 2 1 / 2 = 1 / 4 := by
+  unfold expectedFreqDiffSq
+  norm_num
 
 /-- **The two-population drift variance equals expectedFreqDiffSq.**
     This connects the derivation (summing independent drift variances)
@@ -223,6 +241,15 @@ theorem different_tags_different_weights
     Empirical status: UNTESTED. -/
 noncomputable def gwasHeritability (h2_true avg_r2_tag : ℝ) : ℝ :=
   h2_true * avg_r2_tag
+
+/-- **gwasHeritability pinned at a reference point.** No theorem in the corpus evaluated this
+definition, so every body agreeing with it in sign and monotonicity was indistinguishable from
+it. At all arguments equal to `1 / 2` it is `1 / 4`, which fixes the coefficients a one-sided
+bound or an invariance leaves free. -/
+theorem gwasHeritability_at_reference_point :
+    gwasHeritability 1 / 2 1 / 2 = 1 / 4 := by
+  unfold gwasHeritability
+  norm_num
 
 /-- GWAS heritability ≤ true heritability. -/
 theorem gwas_h2_le_true (h2_true avg_r2_tag : ℝ)
@@ -446,6 +473,15 @@ so retention = (1 - Fst) × shared_LD = (1 - Fst) × tagging_ratio.
 noncomputable def portabilityFromArchitecture
     (rg fst tagging_ratio : ℝ) : ℝ :=
   rg^2 * (1 - fst) * tagging_ratio
+
+/-- **portabilityFromArchitecture pinned at a reference point.** No theorem in the corpus
+evaluated this definition, so every body agreeing with it in sign and monotonicity was
+indistinguishable from it. At all arguments equal to `1 / 2` it is `1 / 16`, which fixes the
+coefficients a one-sided bound or an invariance leaves free. -/
+theorem portabilityFromArchitecture_at_reference_point :
+    portabilityFromArchitecture 1 / 2 1 / 2 1 / 2 = 1 / 16 := by
+  unfold portabilityFromArchitecture
+  norm_num
 
 /-- **portabilityFromArchitecture factors through covarianceRetention.**
     The (1 - Fst) × tagging_ratio component equals the covariance retention

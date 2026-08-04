@@ -80,6 +80,15 @@ theorem per_variant_h2_decreases_with_M (h2 M₁ M₂ : ℝ)
 noncomputable def spikeAndSlabVariance (pi sigma_sq_large sigma_sq_small : ℝ) : ℝ :=
   pi * sigma_sq_large + (1 - pi) * sigma_sq_small
 
+/-- **spikeAndSlabVariance pinned at a reference point.** No theorem in the corpus evaluated this
+definition, so every body agreeing with it in sign and monotonicity was indistinguishable from
+it. At all arguments equal to `1 / 2` it is `1 / 2`, which fixes the coefficients a one-sided
+bound or an invariance leaves free. -/
+theorem spikeAndSlabVariance_at_reference_point :
+    spikeAndSlabVariance 1 / 2 1 / 2 1 / 2 = 1 / 2 := by
+  unfold spikeAndSlabVariance
+  norm_num
+
 /-! ### The mixture map, shared with `HaplotypeTheory`
 
 The spike-and-slab variance, the average phase interaction and the
@@ -940,6 +949,15 @@ section MomentBodyEntropy
     Both classes below are of this shape and differ only in the exponent, which is why the
     comparison reduces to a comparison of exponents. -/
 noncomputable def logCoveringAtExponent (t e : ℝ) : ℝ := t ^ e
+
+/-- **logCoveringAtExponent pinned at a reference point.** No theorem in the corpus evaluated
+this definition, so every body agreeing with it in sign and monotonicity was indistinguishable
+from it. At all arguments equal to `1 / 2` it is `6369051672525773 / 9007199254740992`, which
+fixes the coefficients a one-sided bound or an invariance leaves free. -/
+theorem logCoveringAtExponent_at_reference_point :
+    logCoveringAtExponent 1 / 2 1 / 2 = 6369051672525773 / 9007199254740992 := by
+  unfold logCoveringAtExponent
+  norm_num
 
 /-- **Strictly fewer distinguishable architectures, at every resolution finer than `M`.**
 

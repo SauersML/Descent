@@ -78,6 +78,15 @@ noncomputable def ancestryGradientSusceptibility
     (markerAxisVariance ancestryVariance : ℝ) : ℝ :=
   markerAxisVariance * ancestryVariance
 
+/-- **ancestryGradientSusceptibility pinned at a reference point.** No theorem in the corpus
+evaluated this definition, so every body agreeing with it in sign and monotonicity was
+indistinguishable from it. At all arguments equal to `1 / 2` it is `1 / 4`, which fixes the
+coefficients a one-sided bound or an invariance leaves free. -/
+theorem ancestryGradientSusceptibility_at_reference_point :
+    ancestryGradientSusceptibility 1 / 2 1 / 2 = 1 / 4 := by
+  unfold ancestryGradientSusceptibility
+  norm_num
+
 /-- A lower bound on residual ancestry energy immediately induces a lower
 bound on residual susceptibility `H'`. -/
 theorem residual_susceptibility_lower_bound
@@ -174,10 +183,11 @@ stratification coefficient divides by the effect standard deviation, so at zero 
 and this quantity then divides by that zero and is junk-zero in turn. Two branches in sequence:
 no confounding magnitude is critical, reported for a design where any confounding is. Consumers
 must exclude it by hypothesis. -/
-theorem criticalConfoundingMagnitude_null_effect_sd_is_junk (criticalSignal expectedSNPCount Hres : ℝ) :
+theorem criticalConfoundingMagnitude_null_effect_sd_is_junk
+    (criticalSignal expectedSNPCount Hres : ℝ) :
     criticalConfoundingMagnitude criticalSignal expectedSNPCount Hres 0 = 0 := by
-  unfold criticalConfoundingMagnitude
-  norm_num
+  funext Φ Λ
+  norm_num [criticalConfoundingMagnitude, pgsStratificationRiskCoefficient]
 
 /-- The critical-confounding diagnostic is exact whenever its risk coefficient
 is nonzero.  This is the formal version of bracketing whether an observed PGS

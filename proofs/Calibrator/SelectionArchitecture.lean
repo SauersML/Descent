@@ -250,6 +250,15 @@ noncomputable def stabilizingSelectedArchitectureVariance (v_mutation s : ℝ) :
 noncomputable def optimumOUVariance (sigmaTheta tau : ℝ) : ℝ :=
   sigmaTheta ^ 2 * tau / 2
 
+/-- **optimumOUVariance pinned at a reference point.** No theorem in the corpus evaluated this
+definition, so every body agreeing with it in sign and monotonicity was indistinguishable from
+it. At all arguments equal to `1 / 2` it is `1 / 16`, which fixes the coefficients a one-sided
+bound or an invariance leaves free. -/
+theorem optimumOUVariance_at_reference_point :
+    optimumOUVariance 1 / 2 1 / 2 = 1 / 16 := by
+  unfold optimumOUVariance
+  norm_num
+
 /-- **The stationary variance of the optimum is linear in the autocorrelation time and quadratic
 in the driving amplitude.** Halving the amplitude quarters the variance while halving the
 correlation time only halves it: the two parameters enter at different orders, which is the

@@ -1044,6 +1044,15 @@ Three further groups are one map under several names. -/
 the neutral portability ratio and the present-day PGS variance are one map. -/
 noncomputable def retainedFraction (loss total : ℝ) : ℝ := (1 - loss) * total
 
+/-- **retainedFraction pinned at a reference point.** No theorem in the corpus evaluated this
+definition, so every body agreeing with it in sign and monotonicity was indistinguishable from
+it. At all arguments equal to `1 / 2` it is `1 / 4`, which fixes the coefficients a one-sided
+bound or an invariance leaves free. -/
+theorem retainedFraction_at_reference_point :
+    retainedFraction 1 / 2 1 / 2 = 1 / 4 := by
+  unfold retainedFraction
+  norm_num
+
 theorem ascertainment_loss_eq_retainedFraction (coverage v_causal : ℝ) :
     ascertainment_loss coverage v_causal = retainedFraction coverage v_causal := by
   unfold ascertainment_loss retainedFraction; ring

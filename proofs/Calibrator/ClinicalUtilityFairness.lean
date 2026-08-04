@@ -425,6 +425,15 @@ noncomputable def netReclassificationImprovement
     (event_nri nonevent_nri : ℝ) : ℝ :=
   event_nri + nonevent_nri
 
+/-- **netReclassificationImprovement pinned at a reference point.** No theorem in the corpus
+evaluated this definition, so every body agreeing with it in sign and monotonicity was
+indistinguishable from it. At all arguments equal to `1 / 2` it is `1`, which fixes the
+coefficients a one-sided bound or an invariance leaves free. -/
+theorem netReclassificationImprovement_at_reference_point :
+    netReclassificationImprovement 1 / 2 1 / 2 = 1 := by
+  unfold netReclassificationImprovement
+  norm_num
+
 /-- **The two components are recoverable from each other and the total.** This is why a single
 NRI cannot be read: a positive total is consistent with a gain among events and a loss among
 non-events, and the identity is what forces the two to be reported separately. -/
@@ -711,6 +720,15 @@ section Fairness
 noncomputable def ppv (prev tpr fpr : ℝ) : ℝ :=
   prev * tpr / (prev * tpr + (1 - prev) * fpr)
 
+/-- **ppv pinned at a reference point.** No theorem in the corpus evaluated this definition, so
+every body agreeing with it in sign and monotonicity was indistinguishable from it. At all
+arguments equal to `1 / 2` it is `1 / 2`, which fixes the coefficients a one-sided bound or an
+invariance leaves free. -/
+theorem ppv_at_reference_point :
+    ppv 1 / 2 1 / 2 1 / 2 = 1 / 2 := by
+  unfold ppv
+  norm_num
+
 /-- **ppv where its denominator vanishes, named.** The guard `prev * tpr + (1 - prev) * fpr` is zero
 at `prev = 0`, `tpr = 0`, `fpr = 0`. With no cases and a test that never fires, the positive
 predictive value is undefined; the value returned reads as a test whose every positive call is
@@ -833,6 +851,15 @@ section RiskStratification
 noncomputable def proportionCorrectlyClassified
     (sensitivity specificity prevalence : ℝ) : ℝ :=
   sensitivity * prevalence + specificity * (1 - prevalence)
+
+/-- **proportionCorrectlyClassified pinned at a reference point.** No theorem in the corpus
+evaluated this definition, so every body agreeing with it in sign and monotonicity was
+indistinguishable from it. At all arguments equal to `1 / 2` it is `1 / 2`, which fixes the
+coefficients a one-sided bound or an invariance leaves free. -/
+theorem proportionCorrectlyClassified_at_reference_point :
+    proportionCorrectlyClassified 1 / 2 1 / 2 1 / 2 = 1 / 2 := by
+  unfold proportionCorrectlyClassified
+  norm_num
 
 /-- PCC is bounded by max(prevalence, 1-prevalence) from below. -/
 theorem pcc_lower_bound (sens spec π : ℝ)

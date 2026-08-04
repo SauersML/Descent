@@ -82,6 +82,15 @@ theorem additive_pgs_ceiling
 noncomputable def fisherAverageEffect (a d p : ℝ) : ℝ :=
   a + d * (1 - 2 * p)
 
+/-- **fisherAverageEffect pinned at a reference point.** No theorem in the corpus evaluated this
+definition, so every body agreeing with it in sign and monotonicity was indistinguishable from
+it. At all arguments equal to `1 / 2` it is `1 / 2`, which fixes the coefficients a one-sided
+bound or an invariance leaves free. -/
+theorem fisherAverageEffect_at_reference_point :
+    fisherAverageEffect 1 / 2 1 / 2 1 / 2 = 1 / 2 := by
+  unfold fisherAverageEffect
+  norm_num
+
 /-- **The average effect is the additive effect plus a dominance term that vanishes at even
 frequency and reverses across it.** At `p = 1/2` the dominance contribution is exactly zero, and
 reflecting the frequency flips its sign: that is why dominance is invisible to an additive model
@@ -160,6 +169,15 @@ theorem additive_misses_epistasis
 noncomputable def epistaticVariance
     (beta12 p1 p2 : ℝ) : ℝ :=
   beta12 ^ 2 * (2 * p1 * (1 - p1)) * (2 * p2 * (1 - p2))
+
+/-- **epistaticVariance pinned at a reference point.** No theorem in the corpus evaluated this
+definition, so every body agreeing with it in sign and monotonicity was indistinguishable from
+it. At all arguments equal to `1 / 2` it is `1 / 16`, which fixes the coefficients a one-sided
+bound or an invariance leaves free. -/
+theorem epistaticVariance_at_reference_point :
+    epistaticVariance 1 / 2 1 / 2 1 / 2 = 1 / 16 := by
+  unfold epistaticVariance
+  norm_num
 
 /-- Epistatic variance is nonneg. -/
 theorem epistatic_variance_nonneg

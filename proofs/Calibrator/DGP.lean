@@ -3075,6 +3075,15 @@ theorem alleleFreqDivergenceRate_unit_theta (Ne : ℝ) (h : Ne ≠ 0) :
 noncomputable def ldBreakageRate (r : ℝ) : ℝ := 2 * r
 
 
+/-- **ldBreakageRate pinned at a reference point.** No theorem in the corpus evaluated this
+definition, so every body agreeing with it in sign and monotonicity was indistinguishable from
+it. At all arguments equal to `1 / 2` it is `1`, which fixes the coefficients a one-sided bound
+or an invariance leaves free. -/
+theorem ldBreakageRate_at_reference_point :
+    ldBreakageRate 1 / 2 = 1 := by
+  unfold ldBreakageRate
+  norm_num
+
 /-- LD breakage dominates the allele-frequency divergence rate when
 recombination exceeds the drift timescale. This is a comparison of component
 rates only, not a theorem about total portability. -/

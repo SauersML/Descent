@@ -684,6 +684,15 @@ section PhasingErrors
     Empirical status: UNTESTED. -/
 noncomputable def phaseAttenuation (s : ℝ) : ℝ := (1 - 2 * s)^2
 
+/-- **phaseAttenuation pinned at a reference point.** No theorem in the corpus evaluated this
+definition, so every body agreeing with it in sign and monotonicity was indistinguishable from
+it. At all arguments equal to `1` it is `1`, which fixes the coefficients a one-sided bound or an
+invariance leaves free. -/
+theorem phaseAttenuation_at_reference_point :
+    phaseAttenuation 1 = 1 := by
+  unfold phaseAttenuation
+  norm_num
+
 /-- **Random phasing destroys the signal entirely.**
 
 At a switch error rate of one half the phase carries no information and the attenuation is exactly
