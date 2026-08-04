@@ -80,6 +80,15 @@ This is the formula implemented below.
     the Fisher information is n × v (with σ² = 1). -/
 noncomputable def fisherInformation (n : ℕ) (v : ℝ) : ℝ := n * v
 
+/-- Reference evaluation.  The value is computed through the definitions this body calls, but
+the theorem states a number: an inequality or an invariance leaves a family of bodies
+satisfying it, and a value does not. -/
+theorem fisherInformation_at_reference_point :
+    fisherInformation 1 1 = 1 := by
+  norm_num [fisherInformation]
+
+
+
 /-- **Genotype variance under HWE.**
     For a biallelic locus with MAF p, the dosage G ∈ {0, 1, 2}
     follows Binomial(2, p). Its variance is 2p(1-p), and this equals the
@@ -149,6 +158,15 @@ theorem genotypeVariance_max (p : ℝ) (h_p : 0 ≤ p) (h_p_le : p ≤ 1) :
     Empirical status: UNTESTED. -/
 noncomputable def effectiveFisherInformation (n : ℕ) (p r2_ld : ℝ) : ℝ :=
   fisherInformation n (genotypeVarianceHWE p) * r2_ld
+
+/-- Reference evaluation.  The value is computed through the definitions this body calls, but
+the theorem states a number: an inequality or an invariance leaves a family of bodies
+satisfying it, and a value does not. -/
+theorem effectiveFisherInformation_at_reference_point :
+    effectiveFisherInformation 1 1 1 = 0 := by
+  norm_num [effectiveFisherInformation, fisherInformation, genotypeVarianceHWE]
+
+
 
 /-- Effective Fisher information equals n × 2p(1-p) × r²_LD. -/
 theorem effectiveFisherInfo_eq (n : ℕ) (p r2_ld : ℝ) :

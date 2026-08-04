@@ -440,6 +440,15 @@ theorem admixture_ld_at_gen_eq (alpha p_A q_A p_B q_B r : ℝ) (g : ℕ) :
 noncomputable def admixtureLDMagnitude (alpha p_A p_B r : ℝ) (g : ℕ) : ℝ :=
   alpha * (1 - alpha) * (p_A - p_B)^2 * (1 - r)^g
 
+/-- Reference evaluation.  The value is computed through the definitions this body calls, but
+the theorem states a number: an inequality or an invariance leaves a family of bodies
+satisfying it, and a value does not. -/
+theorem admixtureLDMagnitude_at_reference_point :
+    admixtureLDMagnitude 1 1 1 1 1 = 0 := by
+  norm_num [admixtureLDMagnitude]
+
+
+
 /-- **Connection to `admixtureLDMagnitude` (Step 6).**
     When both loci share the same frequency difference between populations
     (q_A − q_B = p_A − p_B), the general two-locus formula specializes to:

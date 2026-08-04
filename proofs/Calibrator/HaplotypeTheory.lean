@@ -832,6 +832,15 @@ noncomputable def globalAncestryAveragedEffect
     (beta₁ beta₂ alpha : ℝ) : ℝ :=
   ancestrySpecificEffect beta₁ beta₂ alpha
 
+/-- Reference evaluation.  The value is computed through the definitions this body calls, but
+the theorem states a number: an inequality or an invariance leaves a family of bodies
+satisfying it, and a value does not. -/
+theorem globalAncestryAveragedEffect_at_reference_point :
+    globalAncestryAveragedEffect 1 1 1 = 1 := by
+  norm_num [globalAncestryAveragedEffect, ancestrySpecificEffect]
+
+
+
 /-- Structural prediction error from using a single ancestry-averaged effect in
 an admixed population whose local ancestry really switches between ancestry 1
 and ancestry 2.

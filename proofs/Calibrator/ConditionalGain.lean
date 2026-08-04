@@ -202,11 +202,29 @@ likely.  The product is identically one. -/
 noncomputable def copiedBinaryJointExpectation : ℝ :=
   ((1 : ℝ) * 1 + (-1 : ℝ) * (-1)) / 2
 
+/-- Reference evaluation.  The value is computed through the definitions this body calls, but
+the theorem states a number: an inequality or an invariance leaves a family of bodies
+satisfying it, and a value does not. -/
+theorem copiedBinaryJointExpectation_at_reference_point :
+    copiedBinaryJointExpectation  = 1 := by
+  norm_num [copiedBinaryJointExpectation]
+
+
+
 /-- The proposed product of conditional factors for the same model.  The first factor is
 `E Y = 0`; the second is `Y`, so their product has expectation zero. -/
 noncomputable def copiedBinaryConditionalProductExpectation : ℝ :=
   ((((1 : ℝ) + (-1 : ℝ)) / 2) * 1 +
     (((1 : ℝ) + (-1 : ℝ)) / 2) * (-1)) / 2
+
+/-- Reference evaluation.  The value is computed through the definitions this body calls, but
+the theorem states a number: an inequality or an invariance leaves a family of bodies
+satisfying it, and a value does not. -/
+theorem copiedBinaryConditionalProductExpectation_at_reference_point :
+    copiedBinaryConditionalProductExpectation  = 0 := by
+  norm_num [copiedBinaryConditionalProductExpectation]
+
+
 
 /-- **Copied dependence refutes the claimed tautology:** the actual joint phase
 expectation is one while the product of the proposed conditional factors is zero. -/

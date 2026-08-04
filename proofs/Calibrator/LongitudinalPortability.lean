@@ -51,6 +51,15 @@ section GenerationalDecay
 noncomputable def portabilityAtTime (r2_initial lambda_total t : ℝ) : ℝ :=
   r2_initial * Real.exp (-lambda_total * t)
 
+/-- Reference evaluation.  The value is computed through the definitions this body calls, but
+the theorem states a number: an inequality or an invariance leaves a family of bodies
+satisfying it, and a value does not. -/
+theorem portabilityAtTime_at_reference_point :
+    portabilityAtTime 0 0 0 = 0 := by
+  norm_num [portabilityAtTime]
+
+
+
 /-- Portability at time 0 equals initial R². -/
 theorem portability_at_zero (r2_initial lambda_total : ℝ) :
     portabilityAtTime r2_initial lambda_total 0 = r2_initial := by
@@ -114,6 +123,15 @@ it. -/
     Empirical status: UNTESTED. -/
 noncomputable def ldDecayPerGeneration (r : ℝ) (t : ℕ) : ℝ :=
   (1 - r) ^ t
+
+/-- Reference evaluation.  The value is computed through the definitions this body calls, but
+the theorem states a number: an inequality or an invariance leaves a family of bodies
+satisfying it, and a value does not. -/
+theorem ldDecayPerGeneration_at_reference_point :
+    ldDecayPerGeneration 1 1 = 0 := by
+  norm_num [ldDecayPerGeneration]
+
+
 
 /-! **Cross-check: geometric LD decay, recombination survival along a genealogy, and
 admixture-LD decay are one map.** `ldDecayPerGeneration_eq_discreteRecombinationSurvival`
@@ -491,6 +509,15 @@ section RetrainingStrategies
     determines the optimal retraining schedule. -/
 noncomputable def modelStaleness (lambda t : ℝ) : ℝ :=
   1 - Real.exp (-lambda * t)
+
+/-- Reference evaluation.  The value is computed through the definitions this body calls, but
+the theorem states a number: an inequality or an invariance leaves a family of bodies
+satisfying it, and a value does not. -/
+theorem modelStaleness_at_reference_point :
+    modelStaleness 0 0 = 0 := by
+  norm_num [modelStaleness]
+
+
 
 /-- Staleness starts at 0. -/
 theorem staleness_at_zero (lambda : ℝ) :

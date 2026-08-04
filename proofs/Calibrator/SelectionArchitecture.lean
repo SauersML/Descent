@@ -254,6 +254,15 @@ theorem short_autocorrelation_lower_correlation
 noncomputable def stabilizingSelectedArchitectureVariance (v_mutation s : ℝ) : ℝ :=
   equilibriumEffectVariance v_mutation s
 
+/-- Reference evaluation.  The value is computed through the definitions this body calls, but
+the theorem states a number: an inequality or an invariance leaves a family of bodies
+satisfying it, and a value does not. -/
+theorem stabilizingSelectedArchitectureVariance_at_reference_point :
+    stabilizingSelectedArchitectureVariance 1 1 = 1 := by
+  norm_num [stabilizingSelectedArchitectureVariance, equilibriumEffectVariance]
+
+
+
 /-- Stationary variance of a fluctuating optimum under the OU model. -/
 noncomputable def optimumOUVariance (sigmaTheta tau : ℝ) : ℝ :=
   sigmaTheta ^ 2 * tau / 2

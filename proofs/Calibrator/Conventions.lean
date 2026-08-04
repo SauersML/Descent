@@ -86,6 +86,15 @@ written ones back here, so that drift between them is a compile error rather
 than a silent disagreement. -/
 noncomputable def ploidy : ℝ := 2
 
+/-- Reference evaluation.  The value is computed through the definitions this body calls, but
+the theorem states a number: an inequality or an invariance leaves a family of bodies
+satisfying it, and a value does not. -/
+theorem ploidy_at_reference_point :
+    ploidy  = 2 := by
+  norm_num [ploidy]
+
+
+
 /-- Genotype variance at a locus in Hardy-Weinberg proportions, for dosage
 coded `0, 1, …, ploidy`.
 
@@ -1010,6 +1019,15 @@ variance respectively; the same holds here at larger scale.
 The three hub theorems below are the right amount of machinery: a divergence
 between any two spellings fails one of them. -/
 noncomputable def geometricDecay (r : ℝ) (t : ℕ) : ℝ := (1 - r) ^ t
+
+/-- Reference evaluation.  The value is computed through the definitions this body calls, but
+the theorem states a number: an inequality or an invariance leaves a family of bodies
+satisfying it, and a value does not. -/
+theorem geometricDecay_at_reference_point :
+    geometricDecay 1 1 = 0 := by
+  norm_num [geometricDecay]
+
+
 
 theorem ldDecayPerGeneration_eq_geometricDecay (r : ℝ) (t : ℕ) :
     ldDecayPerGeneration r t = geometricDecay r t := by

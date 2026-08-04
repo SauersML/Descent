@@ -96,6 +96,15 @@ theorem overlap_inflation_positive (r2_true r2_observed : ℝ)
 noncomputable def partialOverlapR2 (r2_true h2 : ℝ) (f : ℝ) (_n_gwas : ℕ) : ℝ :=
   (1 - f) * r2_true + f * h2
 
+/-- Reference evaluation.  The value is computed through the definitions this body calls, but
+the theorem states a number: an inequality or an invariance leaves a family of bodies
+satisfying it, and a value does not. -/
+theorem partialOverlapR2_at_reference_point :
+    partialOverlapR2 1 1 1 1 = 1 := by
+  norm_num [partialOverlapR2]
+
+
+
 /-- Zero overlap gives unbiased estimate. -/
 theorem no_overlap_unbiased (r2_true h2 : ℝ) (n_gwas : ℕ) :
     partialOverlapR2 r2_true h2 0 n_gwas = r2_true := by

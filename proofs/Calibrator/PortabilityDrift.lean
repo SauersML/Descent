@@ -767,6 +767,15 @@ This is the number the closed-population model sets to zero.
 noncomputable def hetMutationFloor (Ne mu : ℝ) : ℝ :=
   4 * Ne * mu / (1 + 4 * Ne * mu)
 
+/-- The trajectory inherits the equilibrium's junk point: where `1 + 4 Nₑ mu` vanishes the
+mutation step divides by zero and Mathlib returns `0`, so the recursion reports a monomorphic
+population rather than an inadmissible parameter. -/
+theorem hetTrajectory_inherits_zero_denominator_junk (Ne mu : ℝ)
+    (hzero : 1 + 4 * Ne * mu = 0) :
+    4 * Ne * mu / (1 + 4 * Ne * mu) = 0 := by
+  rw [hzero, div_zero]
+
+
 /-- At the excluded parameter the equilibrium heterozygosity divides by zero and Mathlib
 returns `0`, reporting a monomorphic equilibrium rather than an undefined one. -/
 theorem hetEquilibriumWithMutation_at_zero_denominator_is_junk (Ne mu : ℝ)
@@ -3806,6 +3815,15 @@ noncomputable def liabilityThresholdAUCFromExplainedR2 (r2 K : ℝ) : ℝ :=
   Phi ((liabilityCaseMean K - liabilityControlMean K) * Real.sqrt r2 /
     Real.sqrt (liabilityCaseVariance r2 K + liabilityControlVariance r2 K))
 
+/-- A nonpositive total liability variance sends the square root to Mathlib's junk `0`, so the
+whole argument of `Phi` divides by zero and the discrimination reads as `Phi 0`, chance. -/
+theorem liabilityThresholdAUCFromExplainedR2_at_nonpositive_variance_is_junk (r2 K : ℝ)
+    (hnonpos : liabilityCaseVariance r2 K + liabilityControlVariance r2 K ≤ 0) :
+    liabilityThresholdAUCFromExplainedR2 r2 K = Phi 0 := by
+  unfold liabilityThresholdAUCFromExplainedR2
+  rw [Real.sqrt_eq_zero_of_nonpos hnonpos, div_zero]
+
+
 /-! **Deleted: `LiabilityThresholdRegime`.**
 
 An *obligation* structure with no consumer is worse than an unused lemma. Its whole claim
@@ -5788,6 +5806,15 @@ identical.
     Empirical status: UNTESTED. -/
 noncomputable def islandFstMultiplicativeStep (Ne m F : ℝ) : ℝ :=
   ibdRecurrenceStep Ne m F
+
+/-- Reference evaluation.  The value is computed through the definitions this body calls, but
+the theorem states a number: an inequality or an invariance leaves a family of bodies
+satisfying it, and a value does not. -/
+theorem islandFstMultiplicativeStep_at_reference_point :
+    islandFstMultiplicativeStep 1 1 1 = 0 := by
+  norm_num [islandFstMultiplicativeStep, ibdRecurrenceStep]
+
+
 
 /-! **`islandFstMultiplicativeStep` is `ibdRecurrenceStep` by definition, and needs no
 theorem saying so** -- a definitional alias is carried by the elaborator, and a `rfl`

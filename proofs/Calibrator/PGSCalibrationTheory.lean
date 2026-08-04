@@ -346,6 +346,15 @@ theorem prevalenceLogit_reflect (pi : ℝ) (h0 : pi ≠ 0) (h1 : pi ≠ 1) :
 noncomputable def prevalenceCITLShift (pi_source pi_target : ℝ) : ℝ :=
   prevalenceLogit pi_target - prevalenceLogit pi_source
 
+/-- Reference evaluation.  The value is computed through the definitions this body calls, but
+the theorem states a number: an inequality or an invariance leaves a family of bodies
+satisfying it, and a value does not. -/
+theorem prevalenceCITLShift_at_reference_point :
+    prevalenceCITLShift (1 / 2) (1 / 2) = 0 := by
+  norm_num [prevalenceCITLShift, prevalenceLogit]
+
+
+
 /-!
 ## Calibration vs Discrimination
 

@@ -326,10 +326,28 @@ pathways is a modelling choice, not an estimate" means at the scale a study work
 first. On a two-outcome space a kernel is one number, so this is the whole mixture. -/
 noncomputable def twoMechanismMixture (w : ℝ) : ℝ := w * (2 / 10) + (1 - w) * (9 / 10)
 
+/-- Reference evaluation.  The value is computed through the definitions this body calls, but
+the theorem states a number: an inequality or an invariance leaves a family of bodies
+satisfying it, and a value does not. -/
+theorem twoMechanismMixture_at_reference_point :
+    twoMechanismMixture 1 = 1 / 5 := by
+  norm_num [twoMechanismMixture]
+
+
+
 /-- Mixing three mechanisms at `2/10`, `5/10` and `9/10` with weights `u`, `v` and the
 remainder. -/
 noncomputable def threeMechanismMixture (u v : ℝ) : ℝ :=
   u * (2 / 10) + v * (5 / 10) + (1 - u - v) * (9 / 10)
+
+/-- Reference evaluation.  The value is computed through the definitions this body calls, but
+the theorem states a number: an inequality or an invariance leaves a family of bodies
+satisfying it, and a value does not. -/
+theorem threeMechanismMixture_at_reference_point :
+    threeMechanismMixture 1 1 = -1 / 5 := by
+  norm_num [threeMechanismMixture]
+
+
 
 /-- **The number of mechanisms is not identified, unconditionally.**
 

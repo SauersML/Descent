@@ -73,6 +73,15 @@ substituted for one another.
 noncomputable def demographicSpike (n F m : ℝ) : ℝ :=
   4 * F * effectiveSubgroupSize n m
 
+/-- Reference evaluation.  The value is computed through the definitions this body calls, but
+the theorem states a number: an inequality or an invariance leaves a family of bodies
+satisfying it, and a value does not. -/
+theorem demographicSpike_at_reference_point :
+    demographicSpike 1 1 1 = 0 := by
+  norm_num [demographicSpike, effectiveSubgroupSize]
+
+
+
 /-- BBP-style proxy threshold for `n` samples and `M` effectively independent
 markers.
 
@@ -111,5 +120,14 @@ theorem bbpProxyThreshold_sq (n M : ℝ) (h : 0 ≤ n / M) :
 value is the detectable side of the phase diagram. -/
 noncomputable def pcCorrectabilityMargin (n M F m : ℝ) : ℝ :=
   demographicSpike n F m - bbpProxyThreshold n M
+
+/-- Reference evaluation.  The value is computed through the definitions this body calls, but
+the theorem states a number: an inequality or an invariance leaves a family of bodies
+satisfying it, and a value does not. -/
+theorem pcCorrectabilityMargin_at_reference_point :
+    pcCorrectabilityMargin 1 1 1 1 = -1 := by
+  norm_num [pcCorrectabilityMargin, bbpProxyThreshold, demographicSpike, effectiveSubgroupSize]
+
+
 
 end Calibrator

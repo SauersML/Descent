@@ -58,6 +58,15 @@ section PowerSampleSize
 noncomputable def noncentralityParam (n : ℕ) (beta p : ℝ) : ℝ :=
   n * beta^2 * (2 * p * (1 - p))
 
+/-- Reference evaluation.  The value is computed through the definitions this body calls, but
+the theorem states a number: an inequality or an invariance leaves a family of bodies
+satisfying it, and a value does not. -/
+theorem noncentralityParam_at_reference_point :
+    noncentralityParam 1 1 1 = 0 := by
+  norm_num [noncentralityParam]
+
+
+
 /-- NCP is nonneg for valid parameters. -/
 theorem ncp_nonneg (n : ℕ) (beta p : ℝ)
     (h_p : 0 ≤ p) (h_p_le : p ≤ 1) :
