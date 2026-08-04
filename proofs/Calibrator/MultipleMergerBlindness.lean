@@ -524,6 +524,24 @@ theorem frontSpeedBias_tripleMergerRate_lt_half
 
 /-! ## Bolthausen--Sznitman total-rate ladder -/
 
+/-- Any positive merger-rate ladder bounded above by the linear ladder has a divergent
+reciprocal sum.  This is the reusable spectral criterion behind the Bolthausen--Sznitman
+comparison: linear-or-slower collision clocks cannot exhibit Kingman's summable reciprocal-rate
+obstruction. -/
+theorem not_summable_reciprocal_of_rate_le_natSucc
+    (rate : ℕ → ℝ) (hpos : ∀ n, 0 < rate n)
+    (hle : ∀ n, rate n ≤ (n : ℝ) + 1) :
+    ¬ Summable fun n ↦ 1 / rate n := by
+  intro hsummable
+  have hharmonic : Summable fun n : ℕ ↦ 1 / ((n : ℝ) + 1) :=
+    Summable.of_nonneg_of_le
+      (fun n ↦ by positivity)
+      (fun n ↦ one_div_le_one_div_of_le (hpos n) (hle n))
+      hsummable
+  refine Real.not_summable_one_div_natCast ?_
+  refine (summable_nat_add_iff 1).mp ?_
+  simpa only [Nat.cast_add, Nat.cast_one] using hharmonic
+
 /-- Telescoping collision-rate sum with `n + 1` active blocks.  For the uniform merger law,
 the total rate contributed by mergers of every possible size is this sum: the multiplicity
 times the rate for size `j + 2` reduces to
@@ -560,9 +578,12 @@ localized Müntz null directions.  This removes that particular obstruction; it 
 itself prove injectivity of a nonlinear demographic model. -/
 theorem not_summable_one_div_bolthausenSznitmanTotalMergerRate :
     ¬ Summable fun n : ℕ ↦ 1 / bolthausenSznitmanTotalMergerRate (n + 1) := by
-  intro h
-  refine Real.not_summable_one_div_natCast ?_
-  refine (summable_nat_add_iff 1).mp ?_
-  simpa using h
+  apply not_summable_reciprocal_of_rate_le_natSucc
+  · intro n
+    rw [bolthausenSznitmanTotalMergerRate_eq]
+    positivity
+  · intro n
+    rw [bolthausenSznitmanTotalMergerRate_eq]
+    norm_num
 
 end Calibrator
