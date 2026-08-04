@@ -493,6 +493,12 @@ section BlockCount
 noncomputable def effectiveBlockCount (markers correlationLength : ℝ) : ℝ :=
   markers / correlationLength
 
+/-- **effectiveBlockCount at zero correlationLength, named.** A correlation length of zero means every marker is independent, so the block count should be the marker count. Lean returns `0`: no blocks at all, and any per-block correction built on it silently divides by nothing. Consumers must require `correlationLength ≠ 0`. -/
+theorem effectiveBlockCount_zero_correlationlength_is_junk (markers : ℝ) :
+    effectiveBlockCount markers 0 = 0 := by
+  unfold effectiveBlockCount
+  simp
+
 /-- **The block count is a ratio of lengths, so it does not depend on the unit.** Counting
 markers and correlation length in units `t` times finer leaves the number of independent blocks
 unchanged, which is what makes it a count rather than a length. -/

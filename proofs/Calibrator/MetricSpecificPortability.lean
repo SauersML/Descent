@@ -611,6 +611,12 @@ noncomputable def fisherTraceMSELowerBound
     (nEff nParams infoPerSample : ℝ) : ℝ :=
   adaptationDifficultyIndex nParams infoPerSample / nEff
 
+/-- **fisherTraceMSELowerBound at zero nEff, named.** With zero effective sample size the trace-MSE bound diverges: nothing is estimable. Lean returns `0`, a floor of zero, which certifies perfect estimation from no effective data. A lower bound that vanishes where estimation is impossible certifies rather than warns. Consumers must require `nEff ≠ 0`. -/
+theorem fisherTraceMSELowerBound_zero_neff_is_junk (nParams infoPerSample : ℝ) :
+    fisherTraceMSELowerBound 0 nParams infoPerSample = 0 := by
+  unfold fisherTraceMSELowerBound
+  simp
+
 /-- **Effective sample size needed to beat a target trace-MSE threshold.**
     Solving `(d / I) / n_eff ≤ τ` for `n_eff` gives the closed-form threshold
     `(d / I) / τ` in the orthogonal Fisher model.
@@ -619,6 +625,12 @@ noncomputable def fisherTraceMSELowerBound
 noncomputable def requiredEffectiveSampleSizeForTraceMSE
     (nParams infoPerSample targetTraceMSE : ℝ) : ℝ :=
   adaptationDifficultyIndex nParams infoPerSample / targetTraceMSE
+
+/-- **requiredEffectiveSampleSizeForTraceMSE at zero targetTraceMSE, named.** A target trace-MSE of zero demands infinite data. Lean returns `0`, reporting that exact recovery is free. Consumers must require `targetTraceMSE ≠ 0`. -/
+theorem requiredEffectiveSampleSizeForTraceMSE_zero_targettracemse_is_junk (nParams infoPerSample : ℝ) :
+    requiredEffectiveSampleSizeForTraceMSE nParams infoPerSample 0 = 0 := by
+  unfold requiredEffectiveSampleSizeForTraceMSE
+  simp
 
 /-- The `requiredEffectiveSampleSizeForTraceMSE` definition is the exact
     threshold corresponding to the Fisher trace-MSE lower bound. -/

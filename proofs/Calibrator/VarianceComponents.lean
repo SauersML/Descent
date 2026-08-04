@@ -62,6 +62,12 @@ theorem narrow_h2_in_unit (V_A V_D V_I V_E : ℝ)
 noncomputable def snpH2 (V_A_tagged V_P : ℝ) : ℝ :=
   V_A_tagged / V_P
 
+/-- **snpH2 at zero V_P, named.** A trait with no phenotypic variance has no heritability to estimate. Lean returns `0`, reporting a trait with no genetic basis rather than a trait with no variance at all. Consumers must require `V_P ≠ 0`. -/
+theorem snpH2_zero_vp_is_junk (V_A_tagged : ℝ) :
+    snpH2 V_A_tagged 0 = 0 := by
+  unfold snpH2
+  simp
+
 /-- SNP heritability ≤ narrow-sense heritability. -/
 theorem snp_h2_le_narrow_h2
     (V_A_tagged V_A_total V_D V_I V_E : ℝ)
@@ -457,6 +463,12 @@ section LiabilityScale
 noncomputable def liabilityScaleH2
     (h2_observed prevalence z_height : ℝ) : ℝ :=
   h2_observed * prevalence * (1 - prevalence) / z_height ^ 2
+
+/-- **liabilityScaleH2 at zero z_height, named.** A zero threshold height makes the observed-to-liability conversion undefined. Lean returns `0`, reporting no heritability on the liability scale for any observed-scale estimate whatsoever. Consumers must require `z_height ≠ 0`. -/
+theorem liabilityScaleH2_zero_zheight_is_junk (h2_observed prevalence : ℝ) :
+    liabilityScaleH2 h2_observed prevalence 0 = 0 := by
+  unfold liabilityScaleH2
+  simp
 
 /-- **Liability h² is larger than observed h² for rare diseases.**
     When prevalence K is small, K(1-K)/z² > 1 because z is large

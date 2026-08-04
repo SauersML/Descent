@@ -651,6 +651,12 @@ section ImportanceWeighting
 noncomputable def importanceWeightESS (sum_w sum_w_sq : ℝ) : ℝ :=
   sum_w ^ 2 / sum_w_sq
 
+/-- **importanceWeightESS at zero sum_w_sq, named.** With zero total squared weight there are no samples and the effective sample size is undefined. Lean returns `0`, which is the correct-looking answer for the wrong reason and hides the empty-sample case inside the degenerate-weights case. Consumers must require `sum_w_sq ≠ 0`. -/
+theorem importanceWeightESS_zero_sumwsq_is_junk (sum_w : ℝ) :
+    importanceWeightESS sum_w 0 = 0 := by
+  unfold importanceWeightESS
+  simp
+
 /-- **The effective size recovers the squared total weight.** -/
 theorem importanceWeightESS_mul_sumSq (sum_w sum_w_sq : ℝ) (h : sum_w_sq ≠ 0) :
     importanceWeightESS sum_w sum_w_sq * sum_w_sq = sum_w ^ 2 := by

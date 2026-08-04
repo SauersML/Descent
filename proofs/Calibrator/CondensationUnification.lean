@@ -1019,6 +1019,12 @@ centering constant is forced by `E[X²] = 1` and the scale by `Var(X²)`, so the
 parameter. -/
 noncomputable def squaringStep (scale x : ℝ) : ℝ := (x ^ 2 - 1) / scale
 
+/-- **squaringStep at zero scale, named.** A zero scale leaves the squaring step undefined. Lean returns `0`, a fixed point of the recurrence, so an iteration through this branch stalls silently rather than failing. Consumers must require `scale ≠ 0`. -/
+theorem squaringStep_zero_scale_is_junk (x : ℝ) :
+    squaringStep 0 x = 0 := by
+  unfold squaringStep
+  simp
+
 /-- The positive fixed point of the normalized squaring flow, `(σ + √(σ² + 4))/2`.
 
 Empirical status: DERIVED. The positive root of `x² - σx - 1 = 0`, which is the fixed-point

@@ -882,6 +882,12 @@ trajectory of that process and its closed form is proved, not asserted.
 noncomputable def driftLDCreationRate (Ne : ℝ) : ℝ :=
   1 / (2 * Ne)
 
+/-- **driftLDCreationRate at zero Ne, named.** An empty population creates linkage disequilibrium instantly and the rate diverges. Lean returns `0`, reporting a population in which drift generates no disequilibrium at all. Consumers must require `Ne ≠ 0`. -/
+theorem driftLDCreationRate_zero_ne_is_junk :
+    driftLDCreationRate 0 = 0 := by
+  unfold driftLDCreationRate
+  simp
+
 /-- **Cross-check: this is the same per-generation drift rate that
 `LDDecayTheory` calls `driftRatePerGen`.** One rate under two names.
 

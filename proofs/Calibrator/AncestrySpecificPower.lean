@@ -461,6 +461,12 @@ theorem discovery_bias_inflates_source_r2
 noncomputable def portableFraction (r2_causal r2_total : ℝ) : ℝ :=
   r2_causal / r2_total
 
+/-- **portableFraction at zero r2_total, named.** With no total explained variance there is nothing to be portable, and the fraction is undefined. Lean returns `0`: none of the signal transfers, which is the reading a consumer takes for a score that transfers badly rather than for a score with nothing to transfer. Consumers must require `r2_total ≠ 0`. -/
+theorem portableFraction_zero_r2total_is_junk (r2_causal : ℝ) :
+    portableFraction r2_causal 0 = 0 := by
+  unfold portableFraction
+  simp
+
 /-- Portable fraction is ≤ 1. -/
 theorem portable_fraction_le_one (r2_causal r2_total : ℝ)
     (h_le : r2_causal ≤ r2_total) (h_total : 0 < r2_total) :

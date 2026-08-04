@@ -93,6 +93,12 @@ theorem incremental_r2_nonneg
 noncomputable def portabilityRatio (dr2_target dr2_source : ℝ) : ℝ :=
   dr2_target / dr2_source
 
+/-- **portabilityRatio at zero dr2_source, named.** A source cohort with no explained variance gives no baseline to be portable from. Lean returns `0`, complete failure to transfer, which is indistinguishable from a real transfer failure against a working source. Consumers must require `dr2_source ≠ 0`. -/
+theorem portabilityRatio_zero_dr2source_is_junk (dr2_target : ℝ) :
+    portabilityRatio dr2_target 0 = 0 := by
+  unfold portabilityRatio
+  simp
+
 /-- Portability ratio ≤ 1 when target PGS is weaker. -/
 theorem portability_ratio_le_one
     (dr2_t dr2_s : ℝ) (h_s : 0 < dr2_s) (h_weaker : dr2_t ≤ dr2_s) :

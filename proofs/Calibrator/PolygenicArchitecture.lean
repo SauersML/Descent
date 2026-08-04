@@ -52,6 +52,12 @@ section EffectSizeDistribution
     Empirical status: UNTESTED. -/
 noncomputable def expectedSquaredEffect (h2 M : ℝ) : ℝ := h2 / M
 
+/-- **expectedSquaredEffect at zero M, named.** With no causal variants the heritability has nowhere to sit and the per-variant squared effect diverges. Lean returns `0`, the infinitely polygenic limit. Consumers must require `M ≠ 0`. -/
+theorem expectedSquaredEffect_zero_m_is_junk (h2 : ℝ) :
+    expectedSquaredEffect h2 0 = 0 := by
+  unfold expectedSquaredEffect
+  simp
+
 /-- Per-variant heritability decreases with polygenicity. -/
 theorem per_variant_h2_decreases_with_M (h2 M₁ M₂ : ℝ)
     (h_h2 : 0 < h2) (h_M₁ : 0 < M₁) (h_M₂ : 0 < M₂)

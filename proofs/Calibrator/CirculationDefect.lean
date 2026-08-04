@@ -84,6 +84,12 @@ theorem driftGeneratorForm_independent_of_circulation (s a a' x y : ℝ) :
 /-- The time constant that sets the transfer frontier: the inverse dissipation. -/
 noncomputable def frontierTime (s : ℝ) : ℝ := 1 / s
 
+/-- **frontierTime at zero s, named.** A zero rate never reaches the frontier, so the time diverges. Lean returns `0`: arrival is instantaneous, the opposite end of the scale. Consumers must require `s ≠ 0`. -/
+theorem frontierTime_zero_s_is_junk :
+    frontierTime 0 = 0 := by
+  unfold frontierTime
+  simp
+
 /-- The integrated autocorrelation time an ergodic-averaging diagnostic actually measures: the
 symmetric part of the resolvent of `S + A`. -/
 noncomputable def apparentMixingTime (s a : ℝ) : ℝ := s / (s ^ 2 + a ^ 2)

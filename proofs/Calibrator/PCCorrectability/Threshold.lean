@@ -27,6 +27,12 @@ size `n`.
     transposed body cannot ride along. -/
 noncomputable def effectiveSubgroupSize (n m : ℝ) : ℝ := m * (n - m) / n
 
+/-- **effectiveSubgroupSize at zero n, named.** An empty cohort has no effective subgroup size and the quantity is undefined. Lean returns `0`, which is also what a genuinely balanced split of an empty design would give, so the degenerate case is not distinguishable. Consumers must require `n ≠ 0`. -/
+theorem effectiveSubgroupSize_zero_n_is_junk (m : ℝ) :
+    effectiveSubgroupSize 0 m = 0 := by
+  unfold effectiveSubgroupSize
+  simp
+
 /-- **The effective size is the harmonic combination of the two arms**: its reciprocal is
 the sum of the reciprocals of the subgroup and its complement. This pins the body — a
 scaled, shifted, negated or `n`/`m`-transposed version of `m(n-m)/n` fails it — which is

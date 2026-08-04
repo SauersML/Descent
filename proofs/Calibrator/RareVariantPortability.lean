@@ -411,6 +411,12 @@ by `1` for every positive `s`.
 noncomputable def mutationSelectionBalanceRecessive (mu s : ℝ) : ℝ :=
   (Real.sqrt (mu * (mu + 4 * s)) - mu) / (2 * s)
 
+/-- **mutationSelectionBalanceRecessive at zero s, named.** Without selection nothing holds a recessive allele down and the balance frequency is not given by this formula at all. The divisor `2 * s` is zero and Lean returns `0`, reporting the allele as absent where it is in fact free to drift to fixation. Consumers must require `s ≠ 0`. -/
+theorem mutationSelectionBalanceRecessive_zero_s_is_junk (mu : ℝ) :
+    mutationSelectionBalanceRecessive mu 0 = 0 := by
+  unfold mutationSelectionBalanceRecessive
+  simp
+
 /-- **The recessive balance is a fixed point of the recessive map.** -/
 theorem mutationSelectionBalanceRecessive_isFixedPoint (mu s : ℝ)
     (h_mu : 0 ≤ mu) (h_s : 0 < s) :
