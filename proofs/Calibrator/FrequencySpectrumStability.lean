@@ -28,6 +28,12 @@ The analytic Chebyshev-system upper bound and the calendar/coalescent-time bi-Li
 require a developed theory of bounded piecewise-constant histories and are not asserted here.
 The algebra below is unconditional and is the load-bearing sharpness mechanism those analytic
 steps consume.
+
+The last section records the exact operator boundary that separates this finite-epoch result
+from unrestricted smooth histories.  A linear observation identifies a model class exactly
+when the class difference set meets its kernel only at zero; with `n` coordinates, every
+`(n+1)`-dimensional sieve has a nonzero invisible direction.  Thus finite-sample analyticity
+alone cannot replace the finite-complexity hypothesis.
 -/
 
 open scoped BigOperators
@@ -168,5 +174,59 @@ theorem epochSpectrumCoordinateCount_succ (K : ℕ) (hK : 2 ≤ K) :
     epochSpectrumCoordinateCount (K + 1) = epochSpectrumCoordinateCount K + 2 := by
   unfold epochSpectrumCoordinateCount
   omega
+
+/-! ## Exact nullspace boundary for unrestricted history classes -/
+
+/-- A model class is identifiable under a linear observation when the observation is injective
+on that class. -/
+def IdentifiableUnderLinearObservation
+    {V W : Type*} [AddCommGroup V] [Module ℝ V] [AddCommGroup W] [Module ℝ W]
+    (observation : V →ₗ[ℝ] W) (modelClass : Set V) : Prop :=
+  Set.InjOn observation modelClass
+
+/-- **Intrinsic identifiability criterion.**  The data identify a class exactly when no
+nonzero difference of two admissible histories belongs to the observation kernel. -/
+theorem identifiableUnderLinearObservation_iff_difference_kernel
+    {V W : Type*} [AddCommGroup V] [Module ℝ V] [AddCommGroup W] [Module ℝ W]
+    (observation : V →ₗ[ℝ] W) (modelClass : Set V) :
+    IdentifiableUnderLinearObservation observation modelClass ↔
+      ∀ left ∈ modelClass, ∀ right ∈ modelClass,
+        left - right ∈ LinearMap.ker observation → left = right := by
+  constructor
+  · intro hinjective left hleft right hright hkernel
+    apply hinjective hleft hright
+    rw [LinearMap.mem_ker, map_sub, sub_eq_zero] at hkernel
+    exact hkernel
+  · intro hkernel left hleft right hright hequal
+    apply hkernel left hleft right hright
+    rw [LinearMap.mem_ker, map_sub, hequal, sub_self]
+
+/-- **Finite-spectrum nonidentifiability.**  Any linear observation with only `n` spectrum
+coordinates has a nonzero null direction on an `(n+1)`-dimensional coefficient sieve.
+
+Taking the coefficients to multiply `e⁻ᵗ, t e⁻ᵗ, …, tⁿ e⁻ᵗ` gives the finite-sample analytic
+counterexample: real analyticity does not make an infinite-dimensional history class
+identifiable at any fixed lineage sample size. -/
+theorem finiteSpectrumObservation_has_nonzero_nullDirection
+    (n : ℕ)
+    (observation : (Fin (n + 1) → ℝ) →ₗ[ℝ] (Fin n → ℝ)) :
+    ∃ direction : Fin (n + 1) → ℝ,
+      direction ≠ 0 ∧ observation direction = 0 := by
+  have hdim : Module.finrank ℝ (Fin n → ℝ) < Module.finrank ℝ (Fin (n + 1) → ℝ) := by
+    simp
+  have hkernel : LinearMap.ker observation ≠ ⊥ :=
+    LinearMap.ker_ne_bot_of_finrank_lt hdim
+  obtain ⟨direction, hdirectionKernel, hdirectionNonzero⟩ :=
+    Submodule.exists_mem_ne_zero_of_ne_bot hkernel
+  exact ⟨direction, hdirectionNonzero, LinearMap.mem_ker.mp hdirectionKernel⟩
+
+/-- Adding one observation coordinate and one free coefficient preserves the dimension-based
+nullspace obstruction; merely increasing finite sample size never identifies an
+infinite-dimensional analytic class. -/
+theorem everyFiniteSpectrumSize_has_nonzero_nullDirection :
+    ∀ n : ℕ, ∀ observation : (Fin (n + 1) → ℝ) →ₗ[ℝ] (Fin n → ℝ),
+      ∃ direction : Fin (n + 1) → ℝ,
+        direction ≠ 0 ∧ observation direction = 0 :=
+  finiteSpectrumObservation_has_nonzero_nullDirection
 
 end Calibrator
