@@ -38,6 +38,8 @@ the results below say exactly what becomes identifiable once a normalized `Λ` l
 - `speedTilt_pairwise_blind_triple_separates`: three lineages are minimal for speed tilts.
 - `speedBiasParameterFromTripleRate_recovers`: exact inverse of the triple-rate chart.
 - `frontSpeedBias_tripleMergerRate_injective`: front-speed identification at fixed scale.
+- `tendsto_speedTiltTwoFamilyToPairRatio_zero`: simultaneous disjoint mergers disappear on
+  the pair-collision timescale.
 - `tendsto_speedTiltBetaMergerRate_three_or_more_atTop`: multiple mergers vanish at Kingman.
 - `not_summable_one_div_bolthausenSznitmanTotalMergerRate`: the linear-rate contrast.
 -/
@@ -614,6 +616,49 @@ theorem speedTiltRawMergerCoefficient_div_pair
   rw [speedTiltRawMergerCoefficient_two_two]
   unfold speedTiltRawMergerCoefficient
   field_simp [(speedTiltCollisionScaleCoefficient_pos hβ).ne']
+
+/-! ### Why simultaneous disjoint mergers disappear -/
+
+/-- Pair-collision asymptotic at tail scale `d`. In the index-one regular-variation theorem
+this represents `c_(N,β) ∼ d_N / (β + 1)`. -/
+noncomputable def speedTiltPairCollisionScale (β d : ℝ) : ℝ :=
+  d * speedTiltCollisionScaleCoefficient β
+
+/-- Two-family pair-pair collision asymptotic at tail scale `d`. Its quadratic dependence on
+`d` is the mechanism excluding simultaneous disjoint mergers from the limiting coalescent. -/
+noncomputable def speedTiltTwoFamilyCollisionScale (β d : ℝ) : ℝ :=
+  d ^ 2 / ((β + 2) * (β + 3))
+
+/-- **Exact simultaneous-to-single collision ratio.** Relative to one pair collision, the
+two-family event carries one extra power of the rare-family scale. -/
+theorem speedTiltTwoFamilyCollisionScale_div_pair
+    {β d : ℝ} (hβ : -1 < β) (hd : d ≠ 0) :
+    speedTiltTwoFamilyCollisionScale β d / speedTiltPairCollisionScale β d =
+      d * (β + 1) / ((β + 2) * (β + 3)) := by
+  unfold speedTiltTwoFamilyCollisionScale speedTiltPairCollisionScale
+    speedTiltCollisionScaleCoefficient
+  have hβ1 : β + 1 ≠ 0 := by linarith
+  have hβ2 : β + 2 ≠ 0 := by linarith
+  have hβ3 : β + 3 ≠ 0 := by linarith
+  field_simp
+
+/-- **No simultaneous-merger limit.** The two-family event is negligible on the pair-collision
+clock as the regular-variation tail scale tends to zero. -/
+theorem tendsto_speedTiltTwoFamilyToPairRatio_zero (β : ℝ) :
+    Tendsto (fun d : ℝ ↦ d * (β + 1) / ((β + 2) * (β + 3)))
+      (nhds 0) (nhds 0) := by
+  have hid : Tendsto (fun d : ℝ ↦ d) (nhds 0) (nhds 0) := tendsto_id
+  simpa [div_eq_mul_inv, mul_comm, mul_left_comm, mul_assoc] using
+    hid.const_mul ((β + 1) / ((β + 2) * (β + 3)))
+
+/-- The same negligibility conclusion along any asymptotic tail-scale sequence. -/
+theorem tendsto_speedTiltTwoFamilyToPairRatio_comp
+    {ι : Type*} {l : Filter ι} (β : ℝ) {tailScale : ι → ℝ}
+    (hscale : Tendsto tailScale l (nhds 0)) :
+    Tendsto
+      (fun index ↦ tailScale index * (β + 1) / ((β + 2) * (β + 3)))
+      l (nhds 0) :=
+  (tendsto_speedTiltTwoFamilyToPairRatio_zero β).comp hscale
 
 /-- The complete rate chart retains the universal pairwise normalization. -/
 @[simp] theorem speedTiltBetaMergerRate_two_two (β : ℝ) :
