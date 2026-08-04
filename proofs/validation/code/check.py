@@ -3141,15 +3141,29 @@ def check_decl(d: Decl, c: Corpus, proved_props: set[str]) -> list[Finding]:
             if d.name.split(".")[-1] not in proved_props:
                 add("F2", "Prop named like a theorem, with no proof of it in-corpus")
         # F7 -- conclusion-by-definition.
+        #
+        # The conjunct must APPLY A NAMED PREDICATE of this corpus whose name is
+        # the claim -- `isCalibrated x`, `hasPortability p` -- because that is the
+        # shape where the content hides: the definition swallows the claim and a
+        # theorem "concluding" it only unfolds.  A conjunct that spells its claim
+        # out as an equation or an inequality hides nothing; whoever proves it has
+        # proved it, and naming the conjunction does not change that.
+        #
+        # Keying on the words alone read a FIELD ACCESSOR as a claim: a corpus
+        # about calibration mentions `identityCalibrationProfile` in most of its
+        # propositions, and every conjunction of equations over one was reported.
         if norm(d.conclusion) == "Prop":
             parts = _top_conjuncts(d.body)
             if len(parts) > 1:
                 for p in parts:
+                    head = _head_ident(p)
+                    if head not in c.prop_aliases:
+                        continue
                     # No leading `\b`: the telling word is usually INSIDE a camelCase
                     # identifier (`isCalibrated`, `hasPortability`), where no boundary
                     # precedes it.
                     if re.search(r"(?i)(correct|desired|conclusion|holds|valid|"
-                                 r"calibrat|portab|identif|sound|complete)", p):
+                                 r"calibrat|portab|identif|sound|complete)", head):
                         add("F7", f"predicate `{d.name}` has the advertised conclusion "
                                   f"as a conjunct: `{_clip(p)}`")
                         break
@@ -3273,7 +3287,15 @@ def check_files(c: Corpus) -> list[Finding]:
             (r"\bnative_decide\b", "F24", "`native_decide` moves the compiler into the "
                                           "trusted base"),
             (r"^\s*(unsafe|opaque)\s+", "F24", "unsafe/opaque declaration"),
-            (r"^\s*(macro|elab|syntax|macro_rules|elab_rules)\b", "F24",
+            # A TACTIC macro is exempt here for the same reason it is exempt from
+            # the `identifications` screen: it names a tactic call, leaves every
+            # statement untouched, and its proof still closes through the kernel,
+            # so it moves nothing into the trusted base.  `elab` and `macro_rules`
+            # run code at elaboration time and a term macro rewrites the statement
+            # a reader reads; those stay reported.
+            (r"^\s*macro\b(?![^\n]*:\s*tactic\s*=>)", "F24",
+             "custom syntax or elaborator"),
+            (r"^\s*(elab|syntax|macro_rules|elab_rules)\b", "F24",
              "custom syntax or elaborator"),
             (r"@\[implemented_by", "F24", "compiled implementation substituted for the "
                                           "definition"),
