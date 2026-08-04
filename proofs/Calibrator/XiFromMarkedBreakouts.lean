@@ -265,6 +265,73 @@ breakout and therefore assigns it probability zero. -/
 noncomputable def disjointPairMergeProbability {k : ℕ} (η : Fin k → ℝ) : ℝ :=
   3 * ∑ i, ∑ j, if i = j then 0 else η i ^ 2 * η j ^ 2
 
+/-- A mass partition has genuine simultaneous-family structure exactly when two distinct
+families carry positive mass. -/
+def HasTwoPositiveFamilies {k : ℕ} (η : Fin k → ℝ) : Prop :=
+  ∃ i j, i ≠ j ∧ 0 < η i ∧ 0 < η j
+
+/-- The simultaneous disjoint-pair event is strictly positive as soon as two distinct families
+carry positive mass.  This is the easy direction of the exact Λ/Ξ boundary below. -/
+theorem disjointPairMergeProbability_pos_of_hasTwoPositiveFamilies {k : ℕ}
+    (η : Fin k → ℝ) (h : HasTwoPositiveFamilies η) :
+    0 < disjointPairMergeProbability η := by
+  rcases h with ⟨i, j, hij, hi, hj⟩
+  unfold disjointPairMergeProbability
+  apply mul_pos (by norm_num)
+  apply Finset.sum_pos'
+  · intro i' _
+    exact Finset.sum_nonneg fun j' _ ↦ by positivity
+  · refine ⟨i, Finset.mem_univ _, ?_⟩
+    apply Finset.sum_pos'
+    · intro j' _
+      positivity
+    · refine ⟨j, Finset.mem_univ _, ?_⟩
+      simp only [hij, ↓reduceIte]
+      positivity
+
+/-- **Exact Λ/Ξ boundary.**  For a nonnegative finite mass partition, the probability of two
+simultaneous disjoint pair mergers vanishes exactly when at most one family has positive mass.
+Thus a one-family Λ event is not merely an example with zero probability: it is the whole zero
+set.  Any two macroscopic origins force a genuinely Ξ-shaped event. -/
+theorem disjointPairMergeProbability_eq_zero_iff_not_hasTwoPositiveFamilies {k : ℕ}
+    (η : Fin k → ℝ) (hη : ∀ i, 0 ≤ η i) :
+    disjointPairMergeProbability η = 0 ↔ ¬HasTwoPositiveFamilies η := by
+  constructor
+  · intro hzero htwo
+    have hpos := disjointPairMergeProbability_pos_of_hasTwoPositiveFamilies η htwo
+    linarith
+  · intro hnot
+    unfold disjointPairMergeProbability
+    rw [Finset.sum_eq_zero]
+    · simp
+    · intro i _
+      apply Finset.sum_eq_zero
+      intro j _
+      by_cases hij : i = j
+      · simp [hij]
+      · have hzero : η i = 0 ∨ η j = 0 := by
+          by_contra hboth
+          push_neg at hboth
+          exact hnot ⟨i, j, hij,
+            lt_of_le_of_ne (hη i) (Ne.symm hboth.1),
+            lt_of_le_of_ne (hη j) (Ne.symm hboth.2)⟩
+        rcases hzero with hi | hj
+        · simp [hij, hi]
+        · simp [hij, hj]
+
+/-- For nonnegative family masses, simultaneous disjoint mergers occur exactly when the
+breakout contains two distinct positive-mass families. -/
+theorem disjointPairMergeProbability_pos_iff_hasTwoPositiveFamilies {k : ℕ}
+    (η : Fin k → ℝ) (hη : ∀ i, 0 ≤ η i) :
+    0 < disjointPairMergeProbability η ↔ HasTwoPositiveFamilies η := by
+  constructor
+  · intro hpos
+    by_contra hnot
+    rw [(disjointPairMergeProbability_eq_zero_iff_not_hasTwoPositiveFamilies η hη).2 hnot]
+      at hpos
+    exact lt_irrefl 0 hpos
+  · exact disjointPairMergeProbability_pos_of_hasTwoPositiveFamilies η
+
 /-- A single-family breakout can never produce a simultaneous disjoint merger. -/
 @[simp] theorem disjointPairMerge_single_zero (x : ℝ) :
     disjointPairMergeProbability ![x] = 0 := by
