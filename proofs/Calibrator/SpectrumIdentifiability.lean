@@ -189,12 +189,13 @@ ladder growing linearly has a divergent reciprocal sum, and no such nullspace. -
 theorem not_summable_one_div_linearRate :
     ¬ Summable fun k : ℕ ↦ 1 / ((k : ℝ) + 1) :=
   -- The linear ladder is the extreme case of the merger-rate criterion, so this reads off
-  -- `not_summable_reciprocal_of_rate_le_natSucc` rather than repeating its plumbing.
-  not_summable_reciprocal_of_rate_le_natSucc _ (fun _ ↦ by positivity) (fun _ ↦ le_rfl)
+  -- the scale-invariant comparison theorem rather than repeating its plumbing.
+  not_summable_reciprocal_of_rate_le_scaled_natSucc _ 1
+    (fun _ ↦ by positivity) (fun _ ↦ by simp)
 
 /-- **Scale-invariant superlinear polynomial Müntz boundary.** Any rate ladder bounded below
 by `scale * (n + 1) ^ power`, with positive `scale` and `power > 1`, has a summable reciprocal
-spectrum. Combined with `not_summable_reciprocal_of_rate_le_natSucc`, this turns the
+spectrum. Combined with `not_summable_reciprocal_of_rate_le_scaled_natSucc`, this turns the
 Kingman-versus-Bolthausen--Sznitman contrast into a reusable growth criterion. -/
 theorem summable_one_div_of_scaled_natSucc_rpow_le_rate
     (rate : ℕ → ℝ) (scale power : ℝ) (hscale : 0 < scale) (hpower : 1 < power)
