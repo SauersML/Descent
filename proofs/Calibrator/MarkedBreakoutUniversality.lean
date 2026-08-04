@@ -45,10 +45,10 @@ open scoped BigOperators ENNReal
 abbrev SuccessfulFamilyMark := ℝ × ℝ
 
 /-- Eventual fraction of the population descended from a successful family. -/
-def familyFraction (mark : SuccessfulFamilyMark) : ℝ := mark.1
+def familyFraction : SuccessfulFamilyMark → ℝ := Prod.fst
 
 /-- Displacement of the front caused by a successful family. -/
-def frontDisplacement (mark : SuccessfulFamilyMark) : ℝ := mark.2
+def frontDisplacement : SuccessfulFamilyMark → ℝ := Prod.snd
 
 @[measurability, fun_prop]
 theorem measurable_familyFraction : Measurable familyFraction := measurable_fst
@@ -64,6 +64,16 @@ noncomputable def genealogyMeasure (ν : Measure SuccessfulFamilyMark) : Measure
   Measure.map familyFraction
     (ν.withDensity fun mark ↦ ENNReal.ofReal (familyFraction mark ^ 2))
 
+/-- The finite-second-moment hypothesis on the marked successful-family intensity.  It is exactly
+the condition ensuring that the induced genealogy measure has finite total mass. -/
+def HasFiniteGenealogicalIntensity (ν : Measure SuccessfulFamilyMark) : Prop :=
+  (∫⁻ mark, ENNReal.ofReal (familyFraction mark ^ 2) ∂ν) < ∞
+
+/-- The zero successful-family intensity is a concrete finite-rate instance. -/
+theorem hasFiniteGenealogicalIntensity_zero :
+    HasFiniteGenealogicalIntensity (0 : Measure SuccessfulFamilyMark) := by
+  simp [HasFiniteGenealogicalIntensity]
+
 /-- Evaluation of `Λ₀` on a measurable family-fraction set. -/
 theorem genealogyMeasure_apply (ν : Measure SuccessfulFamilyMark) {s : Set ℝ}
     (hs : MeasurableSet s) :
@@ -72,6 +82,13 @@ theorem genealogyMeasure_apply (ν : Measure SuccessfulFamilyMark) {s : Set ℝ}
         ENNReal.ofReal (familyFraction mark ^ 2) ∂ν := by
   rw [genealogyMeasure, Measure.map_apply (by fun_prop) hs,
     withDensity_apply _ (measurable_familyFraction hs)]
+
+/-- The weighted fraction marginal is finite under the marked measure's second-moment bound. -/
+theorem genealogyMeasure_finite_of_secondMoment
+    {ν : Measure SuccessfulFamilyMark} (hν : HasFiniteGenealogicalIntensity ν) :
+    genealogyMeasure ν Set.univ < ∞ := by
+  rw [genealogyMeasure_apply ν MeasurableSet.univ]
+  simpa [HasFiniteGenealogicalIntensity] using hν
 
 /-- Exponential weight applied to a marked breakout by a canonical front-speed tilt. -/
 noncomputable def speedTiltWeight (theta : ℝ) (mark : SuccessfulFamilyMark) : ℝ :=
@@ -185,15 +202,35 @@ def HasBetaTiltInvariant (gamma : ℝ) (conditionalLaplace : ℝ → ℝ → ℝ
     conditionalLaplace x theta =
       conditionalLaplace 0 theta * (1 - x) ^ (theta / gamma)
 
-/-- The invariant gives the normalized Beta density factor and shows exactly which information
-normalization discards: only the transform at the reference fraction, independent of `x`. -/
-theorem betaTiltInvariant_factorization
-    {gamma : ℝ} {conditionalLaplace : ℝ → ℝ → ℝ}
-    (h : HasBetaTiltInvariant gamma conditionalLaplace)
-    (x theta : ℝ) (hx : x < 1) :
-    conditionalLaplace x theta =
-      conditionalLaplace 0 theta * (1 - x) ^ (theta / gamma) :=
-  h x theta hx
+/-- Centering a conditional displacement transform by the logarithmic response leaves the same
+Laplace transform at every family fraction. -/
+def HasFractionIndependentCenteredTransform
+    (gamma : ℝ) (conditionalLaplace : ℝ → ℝ → ℝ) : Prop :=
+  ∀ x y theta, x < 1 → y < 1 →
+    conditionalLaplace x theta / (1 - x) ^ (theta / gamma) =
+      conditionalLaplace y theta / (1 - y) ^ (theta / gamma)
+
+/-- **Necessary and sufficient Beta criterion at transform level.**  The normalized speed tilt
+has the Beta power factor exactly when subtracting the logarithmic response leaves an
+`x`-independent conditional Laplace transform.  Under uniqueness of conditional Laplace
+transforms this is equivalent to a single additive-noise law independent of `x`. -/
+theorem hasBetaTiltInvariant_iff_centeredTransformIndependent
+    (gamma : ℝ) (conditionalLaplace : ℝ → ℝ → ℝ) :
+    HasBetaTiltInvariant gamma conditionalLaplace ↔
+      HasFractionIndependentCenteredTransform gamma conditionalLaplace := by
+  constructor
+  · intro h x y theta hx hy
+    rw [h x theta hx, h y theta hy]
+    have hxpow : (1 - x) ^ (theta / gamma) ≠ 0 :=
+      ne_of_gt (Real.rpow_pos_of_pos (by linarith) _)
+    have hypow : (1 - y) ^ (theta / gamma) ≠ 0 :=
+      ne_of_gt (Real.rpow_pos_of_pos (by linarith) _)
+    simp [hxpow, hypow]
+  · intro h x theta hx
+    have hcentered := h x 0 theta hx (by norm_num)
+    have hxpow : (1 - x) ^ (theta / gamma) ≠ 0 :=
+      ne_of_gt (Real.rpow_pos_of_pos (by linarith) _)
+    simpa [hxpow] using (div_eq_iff hxpow).mp hcentered
 
 /-! ## A displacement law with the same unconditioned genealogy and a different tilt -/
 

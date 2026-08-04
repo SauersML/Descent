@@ -12,6 +12,7 @@ import Calibrator.FrequencySpectrumStability
 import Calibrator.HorizonCurve
 import Calibrator.LandscapeSuperposition
 import Calibrator.MarkedBreakoutUniversality
+import Calibrator.XiFromMarkedBreakouts
 import Calibrator.MultipleMergerBlindness
 import Calibrator.PencilEnvironment
 import Calibrator.FunctionalDescent
@@ -19,6 +20,9 @@ import Calibrator.SpectralUniversalityFailure
 import Calibrator.SpectrumIdentifiability
 
 namespace Calibrator
+
+open MarkedBreakout
+open XiFromMarks
 
 /-!
 # Unified biology: state, geometry, value, and observation
@@ -208,6 +212,39 @@ theorem speedConditionedGenealogy_pairBlind_tripleRecovers (β : ℝ) :
   ⟨speedTiltBetaMergerRate_two_two β,
     speedBiasParameterFromTripleRate_recovers β⟩
 
+/-- **The biology core consumes the marked successful-family measure itself.**  At zero tilt its
+weighted pushforward is exactly the unconditioned genealogy measure, and for every merger size
+the Bernoulli family-participation rate is the corresponding `Λ`-rate.  This is the formal
+replacement for treating a coalescent measure alone as the universal branching-front object. -/
+theorem markedSuccessfulFamilyMeasure_determinesGenealogy
+    (ν : MeasureTheory.Measure SuccessfulFamilyMark)
+    (b k : ℕ) (hk : 2 ≤ k) :
+    speedTiltedGenealogyMeasure 0 ν = genealogyMeasure ν ∧
+      markedEventMergerRate ν b k = markedLambdaMergerRate ν b k :=
+  ⟨speedTiltedGenealogyMeasure_zero ν,
+    markedEventMergerRate_eq_lambda ν b k hk⟩
+
+/-- The marked second-moment condition is exactly the finite-rate condition consumed by the
+biology core: it makes the weighted genealogy projection a finite measure. -/
+theorem markedSuccessfulFamilyMeasure_finiteGenealogy_of_finiteIntensity
+    {ν : MeasureTheory.Measure SuccessfulFamilyMark}
+    (hν : HasFiniteGenealogicalIntensity ν) :
+    genealogyMeasure ν Set.univ < ⊤ :=
+  genealogyMeasure_finite_of_secondMoment hν
+
+/-- **The speed-conditioned genealogy retains the response mark.**  This measurable-set formula
+is the biology-facing version of `Λθ(dx) = x² ∫ exp(-θr) ν(dx,dr)`: it exposes the full marked
+intensity rather than silently replacing it by its unconditioned fraction marginal. -/
+theorem speedConditionedGenealogy_markedMeasure_formula
+    (theta : ℝ) (ν : MeasureTheory.Measure SuccessfulFamilyMark)
+    {s : Set ℝ} (hs : MeasurableSet s) :
+    speedTiltedGenealogyMeasure theta ν s =
+      ∫⁻ mark in familyFraction ⁻¹' s,
+        ENNReal.ofReal
+          (familyFraction mark ^ 2 *
+            Real.exp (-(theta * frontDisplacement mark))) ∂ν :=
+  speedTiltedGenealogyMeasure_apply theta ν hs
+
 /-- **But the speed-conditioned chart is not universal.**  The `Beta` interpolation is an
 invariant of the front-displacement law, not a consequence of the unconditioned genealogy.  A
 marked breakout measure whose displacement is linear in the family fraction has exactly the
@@ -224,8 +261,8 @@ theorem speedConditionedGenealogy_chart_not_universal :
 
 /-- **And what the chart does rest on, exactly.**  The logarithmic displacement law is what
 makes the tilt factor a power of the surviving fraction, and additive displacement noise
-independent of the family fraction is absorbed by normalization.  These two identities are
-the necessary and sufficient content of the `Beta` interpolation. -/
+independent of the family fraction is absorbed by normalization.  These two identities are the
+forward calculation; the following theorem supplies the exact transform-level converse. -/
 theorem speedConditionedGenealogy_chart_invariant
     (gamma theta x noise : ℝ) (hgamma : gamma ≠ 0) (hx : x < 1) :
     Real.exp (-(theta * MarkedBreakout.logDisplacement gamma x))
@@ -234,6 +271,115 @@ theorem speedConditionedGenealogy_chart_invariant
         = (1 - x) ^ (theta / gamma) * Real.exp (-(theta * noise)) :=
   ⟨MarkedBreakout.logDisplacement_laplace_factors gamma theta x hgamma hx,
     MarkedBreakout.displacementNoise_factors gamma theta x noise hgamma hx⟩
+
+/-! ## Sweep multiplicity: what allele-frequency data cannot decide -/
+
+/-- **A hard sweep and a soft sweep with the same frequency trajectory leave different
+genealogies.**
+
+A beneficial allele reaching frequency `x` from a single origin, and the same allele reaching
+`x` from two independent origins carrying `x/2` each, have identical allele-frequency
+trajectories: same times, same increments, same endpoint.  No frequency statistic separates
+them, at any sample size or sequencing depth, because there is nothing to separate.
+
+Their genealogies differ twice over.  The soft sweep coalesces a sampled pair at half the rate,
+so it leaves twice the diversity for the same frequency change -- which is why a diversity
+level read against a frequency trajectory does not measure selection strength unless
+multiplicity is already known.  And four sampled lineages can fall two-and-two into distinct
+origin classes under the soft sweep, an event the hard sweep cannot produce at all.
+
+The second fact is the usable one: it is a difference in the SHAPE of the genealogy, not its
+rate, so no rescaling of time or effective size reproduces it. -/
+theorem sweepTrajectory_does_not_determine_genealogy (finalFrequency : ℝ)
+    (hpolymorphic : finalFrequency ≠ 0) :
+    XiFromMarks.paintboxWeight ![finalFrequency]
+        ≠ XiFromMarks.paintboxWeight ![finalFrequency / 2, finalFrequency / 2] ∧
+      XiFromMarks.disjointPairMergeProbability ![finalFrequency] = 0 ∧
+      0 < XiFromMarks.disjointPairMergeProbability
+        ![finalFrequency / 2, finalFrequency / 2] :=
+  XiFromMarks.front_does_not_determine_genealogy finalFrequency hpolymorphic
+
+/-- **The sample-size ladder for reading a selected genealogy.**
+
+Two lineages see nothing: every normalized merger law has pairwise rate one, so heterozygosity
+and mean pairwise coalescence time are blind to the regime.  Three lineages see the merger rate
+and recover the tilt parameter exactly.  Four lineages are the first that can see how many
+origins a sweep had, because two-and-two assignment into distinct origin classes is the
+event that distinguishes multiplicity.
+
+Read as a design constraint: a study powered on pairwise diversity cannot detect a selection
+regime however large it is, and a study using three-lineage statistics can measure the rate but
+still cannot tell one origin from several. -/
+theorem selectedGenealogy_sampleSize_ladder (β finalFrequency : ℝ)
+    (hpolymorphic : finalFrequency ≠ 0) :
+    speedTiltBetaMergerRate β 2 2 = 1 ∧
+      speedBiasParameterFromTripleRate (speedTiltBetaMergerRate β 3 3) = β ∧
+      XiFromMarks.disjointPairMergeProbability ![finalFrequency] = 0 ∧
+      0 < XiFromMarks.disjointPairMergeProbability
+        ![finalFrequency / 2, finalFrequency / 2] :=
+  ⟨speedTiltBetaMergerRate_two_two β,
+    speedBiasParameterFromTripleRate_recovers β,
+    XiFromMarks.disjointPairMerge_single_zero finalFrequency,
+    (XiFromMarks.front_does_not_determine_genealogy finalFrequency hpolymorphic).2.2⟩
+
+/-- **The sweep-origin count a frequency trajectory would have to supply, and cannot.**
+
+The pioneer change of variables turns a reproductive-weight tail into the population-fraction
+intensity and the frequency response into the logarithmic displacement law, so the whole
+reduction rests on those two maps and nothing else.  Recording it here is what makes the
+previous theorem a statement about a mechanism rather than about two arbitrary partitions. -/
+theorem sweepResponse_is_logarithmic (gamma reproductiveWeight : ℝ)
+    (hweight : 0 < reproductiveWeight) :
+    XiFromMarks.pioneerWeightDisplacement gamma reproductiveWeight
+      = MarkedBreakout.logDisplacement gamma
+        (XiFromMarks.pioneerWeightFraction reproductiveWeight) :=
+  XiFromMarks.pioneerDisplacement_eq_logDisplacement gamma reproductiveWeight hweight
+
+/-- **The biology core consumes the complete mass-partition mark.**  Collision integrability
+simultaneously makes every fixed-sample event rate finite and makes zero speed tilt recover the
+unconditioned `Ξ` measure.  Thus the successful-event object is not merely an allele-frequency
+measure with an informal multiplicity annotation: the mass partition is part of its type. -/
+theorem markedMassPartitionMeasure_determinesXi
+    (n : ℕ) (ν : MeasureTheory.Measure MarkedMassPartition)
+    (hν : HasFiniteCollisionIntensity ν) :
+    speedTiltedXiMeasure 0 ν = xiMeasure ν ∧
+      samplePartitionChangeRateBound n ν < ⊤ :=
+  ⟨speedTiltedXiMeasure_zero ν,
+    samplePartitionChangeRateBound_lt_top_of_finiteCollision n hν⟩
+
+/-- **The two-colour response is an exact algebraic interface.**  Rank-one relaxation converts
+the pioneer amplitude into its descendant fraction, while the associated logarithmic
+translation restores the pre-breakout amplitude.  Applying this interface to hard selection
+still requires the unavailable uniform two-colour concentration estimate. -/
+theorem twoColourPioneerResponse_exact
+    (conversion gamma reproductiveWeight : ℝ)
+    (hconversion : conversion ≠ 0) (hgamma : gamma ≠ 0)
+    (hweight : -1 < reproductiveWeight) :
+    conversion * reproductiveWeight /
+        (conversion * 1 + conversion * reproductiveWeight) =
+          pioneerWeightFraction reproductiveWeight ∧
+      Real.exp (-(gamma * pioneerWeightDisplacement gamma reproductiveWeight)) *
+          (1 + reproductiveWeight) = 1 := by
+  refine ⟨spectralResponse_pioneerFraction conversion reproductiveWeight hconversion ?_,
+    spectralResponse_shift_restoresAmplitude gamma reproductiveWeight hgamma hweight⟩
+  linarith
+
+
+/-- **Exact criterion for the Beta curve.**  At conditional-Laplace-transform level the Beta
+power profile is equivalent to an `x`-independent transform after subtracting the logarithmic
+front response.  When the transforms determine the laws, this is the claimed common-noise
+representation and is both necessary and sufficient. -/
+theorem speedConditionedGenealogy_beta_iff_logResponse
+    (gamma : ℝ) (conditionalLaplace : ℝ → ℝ → ℝ) :
+    HasBetaTiltInvariant gamma conditionalLaplace ↔
+      HasFractionIndependentCenteredTransform gamma conditionalLaplace :=
+  hasBetaTiltInvariant_iff_centeredTransformIndependent gamma conditionalLaplace
+
+/-- **The `log³ N` clock is a front-response statement.**  At susceptibility exponent three the
+genealogical clock is the cube of the front width; the coalescent rate law contributes no cube. -/
+theorem pioneerSusceptibility_setsGenealogicalClock (width : ℝ) :
+    genealogicalTimescale width 3 = width ^ 3 :=
+  genealogicalTimescale_three width
 
 section StationarityRepair
 
@@ -1016,6 +1162,42 @@ structure UnifiedBiologyObstructions : Prop where
   speedConditionedGenealogyNeedsThreeLineages :
     ∀ β : ℝ, speedTiltBetaMergerRate β 2 2 = 1 ∧
       speedBiasParameterFromTripleRate (speedTiltBetaMergerRate β 3 3) = β
+  /-- The universal branching-front object is a marked successful-family measure: its weighted
+  fraction projection gives every unconditioned merger rate, while zero tilt recovers that
+  projection exactly. -/
+  markedSuccessfulFamilyMeasureDeterminesGenealogy :
+    ∀ (ν : MeasureTheory.Measure SuccessfulFamilyMark) (b k : ℕ),
+      2 ≤ k →
+        speedTiltedGenealogyMeasure 0 ν = genealogyMeasure ν ∧
+          markedEventMergerRate ν b k = markedLambdaMergerRate ν b k
+  /-- General successful events are complete mass partitions.  Their collision-weighted marked
+  measure is the `Ξ` genealogy law, and collision integrability controls every fixed sample. -/
+  markedMassPartitionMeasureDeterminesXi :
+    ∀ (n : ℕ) (ν : MeasureTheory.Measure MarkedMassPartition),
+      HasFiniteCollisionIntensity ν →
+        speedTiltedXiMeasure 0 ν = xiMeasure ν ∧
+          samplePartitionChangeRateBound n ν < ⊤
+  /-- A complete front trajectory cannot identify whether a sweep has one origin or two: the
+  collision rate changes and only the two-origin mechanism admits a simultaneous pair-pair
+  merger. -/
+  frontTrajectoryDoesNotDetermineXi :
+    ∀ x : ℝ, x ≠ 0 →
+      paintboxWeight ![x] ≠ paintboxWeight ![x / 2, x / 2] ∧
+        disjointPairMergeProbability ![x] = 0 ∧
+          0 < disjointPairMergeProbability ![x / 2, x / 2]
+  /-- Rank-one two-colour response gives the pioneer fraction and logarithmic amplitude repair
+  exactly; the remaining hard-selection obstruction is the uniform probabilistic estimate. -/
+  twoColourPioneerResponseIsExact :
+    ∀ conversion gamma w : ℝ, conversion ≠ 0 → gamma ≠ 0 → -1 < w →
+      conversion * w / (conversion * 1 + conversion * w) = pioneerWeightFraction w ∧
+        Real.exp (-(gamma * pioneerWeightDisplacement gamma w)) * (1 + w) = 1
+  /-- Equal unconditioned Bolthausen--Sznitman genealogy does not determine the conditioned
+  family: the logarithmic and linear response marks already separate at three lineages. -/
+  speedConditionedGenealogyRetainsResponseMark :
+    MarkedBreakout.linearDisplacementTripleRate 1 ≠ speedTiltBetaMergerRate 1 3 3
+  /-- The cubic genealogical clock belongs to pioneer susceptibility, not coalescent theory. -/
+  pioneerSusceptibilitySetsClock :
+    ∀ width : ℝ, genealogicalTimescale width 3 = width ^ 3
   /-- A cross-state criterion is not a function of the target context: it fails to descend along
   the label the target-only annotation descends along. -/
   crossStateDoesNotDescend :
@@ -1110,6 +1292,18 @@ theorem unifiedBiology_obstructions : UnifiedBiologyObstructions := by
         kingmanSpectrum_identifiabilityBoundary
       speedConditionedGenealogyNeedsThreeLineages :=
         speedConditionedGenealogy_pairBlind_tripleRecovers
+      markedSuccessfulFamilyMeasureDeterminesGenealogy :=
+        markedSuccessfulFamilyMeasure_determinesGenealogy
+      markedMassPartitionMeasureDeterminesXi :=
+        markedMassPartitionMeasure_determinesXi
+      frontTrajectoryDoesNotDetermineXi :=
+        sweepTrajectory_does_not_determine_genealogy
+      twoColourPioneerResponseIsExact :=
+        twoColourPioneerResponse_exact
+      speedConditionedGenealogyRetainsResponseMark :=
+        speedConditionedGenealogy_chart_not_universal
+      pioneerSusceptibilitySetsClock :=
+        pioneerSusceptibility_setsGenealogicalClock
       crossStateDoesNotDescend := not_descends_contextMatchQuality_along_targetState
       marginalDescentDoesNotCompose := admissible_interaction_join_obstruction
       crudeReportingLosesDescent := admissible_confounding_meet_obstruction

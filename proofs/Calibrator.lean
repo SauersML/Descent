@@ -85,6 +85,7 @@ import Calibrator.FoldedSpectrum
 import Calibrator.SpectralDegradation
 import Calibrator.SpectralUniversalityFailure
 import Calibrator.SpectrumIdentifiability
+import Calibrator.XiFromMarkedBreakouts
 import Calibrator.EnsembleChannel
 import Calibrator.Permeability
 import Calibrator.ErgodicCovariancePencil
