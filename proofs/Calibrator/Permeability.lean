@@ -325,6 +325,14 @@ noncomputable def diagonalCovarianceMomentPermeability {ι : Type*} [Fintype ι]
   ∑ i, covarianceMomentPermeability
     (covarianceDerivative i) (secondMoment i) (fourthMoment i)
 
+/-- Reference evaluation: a design with no covariance sensitivity is impermeable. -/
+theorem diagonalCovarianceMomentPermeability_at_reference_point {ι : Type*} [Fintype ι]
+    (secondMoment fourthMoment : ι → ℝ) :
+    diagonalCovarianceMomentPermeability 0 secondMoment fourthMoment = 0 := by
+  unfold diagonalCovarianceMomentPermeability covarianceMomentPermeability
+  simp
+
+
 /-- A common linear response attenuation multiplies the information of the whole
 independent non-Gaussian panel by `η²`. -/
 theorem diagonalCovarianceMomentPermeability_derivative_scale
@@ -840,6 +848,14 @@ noncomputable def twoChannelMomentInnovationInformation
       firstNoise sharedNoise firstResponse secondResponse ^ 2 /
     twoChannelConditionalMomentNoise firstNoise secondNoise sharedNoise
 
+/-- Reference evaluation: with no response in either channel there is no innovation to read. -/
+theorem twoChannelMomentInnovationInformation_at_reference_point
+    (firstNoise secondNoise sharedNoise : ℝ) :
+    twoChannelMomentInnovationInformation firstNoise secondNoise sharedNoise 0 0 = 0 := by
+  unfold twoChannelMomentInnovationInformation twoChannelConditionalMomentResponse
+  simp
+
+
 /-- With a vanishing denominator Mathlib returns `0`, which is a value this quantity can also
 take legitimately, so the branch is named rather than left to be inferred from the result. -/
 theorem twoChannelMomentInnovationInformation_at_zero_denominator_is_junk
@@ -1053,6 +1069,14 @@ theorem multivariateGaussianPermeability_diagonal {d : ℕ}
 noncomputable def totalMultivariateGaussianInformation {d : ℕ}
     (m : ℝ) (whitenedCovarianceDerivative : Matrix (Fin d) (Fin d) ℝ) : ℝ :=
   m * multivariateGaussianPermeability whitenedCovarianceDerivative
+
+/-- Reference evaluation: no samples, no information. -/
+theorem totalMultivariateGaussianInformation_at_reference_point {d : ℕ}
+    (whitenedCovarianceDerivative : Matrix (Fin d) (Fin d) ℝ) :
+    totalMultivariateGaussianInformation 0 whitenedCovarianceDerivative = 0 := by
+  unfold totalMultivariateGaussianInformation
+  ring
+
 
 /-- The inverse-square cohort compensation law remains exact for correlated channels:
 attenuation by `η` is offset by multiplying effective ensemble size by `1/η²`. -/

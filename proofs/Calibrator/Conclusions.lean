@@ -477,6 +477,14 @@ noncomputable def infRisk {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
     (ℓ : ℝ → Bool → ℝ) (p : TrueCondProb Z) (F : Set (ProbPredictor Z)) : ℝ :=
   oracleRisk (populationRisk μ ℓ p) F
 
+/-- Reference evaluation: against the zero measure a one-element class has zero inf risk. -/
+theorem infRisk_at_zero_measure {Z : Type u} [MeasurableSpace Z]
+    (ℓ : ℝ → Bool → ℝ) (p : TrueCondProb Z) (q : ProbPredictor Z) :
+    infRisk 0 ℓ p {q} = 0 := by
+  unfold infRisk oracleRisk populationRisk
+  simp
+
+
 /-- Reference evaluation: over a one-element predictor class the inf risk is that predictor's. -/
 theorem infRisk_at_reference_point {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
     (ℓ : ℝ → Bool → ℝ) (p : TrueCondProb Z) (q : ProbPredictor Z) :
@@ -1211,6 +1219,14 @@ noncomputable def logBayesRisk {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
     (η : ProbPredictor Z) (F : Set (ProbPredictor Z)) : ℝ :=
   BayesRisk (logRisk μ η) F
 
+/-- Reference evaluation against the zero measure. -/
+theorem logBayesRisk_at_zero_measure {Z : Type u} [MeasurableSpace Z]
+    (η q : ProbPredictor Z) :
+    logBayesRisk 0 η {q} = 0 := by
+  unfold logBayesRisk BayesRisk oracleRisk logRisk
+  simp
+
+
 /-- Reference evaluation over a one-element class. -/
 theorem logBayesRisk_at_reference_point {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
     (η q : ProbPredictor Z) :
@@ -1223,6 +1239,14 @@ theorem logBayesRisk_at_reference_point {Z : Type u} [MeasurableSpace Z] (μ : M
 noncomputable def brierBayesRisk {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
     (η : ProbPredictor Z) (F : Set (ProbPredictor Z)) : ℝ :=
   BayesRisk (brierRisk μ η) F
+
+/-- Reference evaluation against the zero measure. -/
+theorem brierBayesRisk_at_zero_measure {Z : Type u} [MeasurableSpace Z]
+    (η q : ProbPredictor Z) :
+    brierBayesRisk 0 η {q} = 0 := by
+  unfold brierBayesRisk BayesRisk oracleRisk brierRisk
+  simp
+
 
 /-- Reference evaluation over a one-element class. -/
 theorem brierBayesRisk_at_reference_point {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)

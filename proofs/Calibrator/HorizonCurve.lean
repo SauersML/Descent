@@ -109,8 +109,21 @@ noncomputable def uniformTwo : Fin 2 → ℝ := fun _ ↦ 1 / 2
 /-- The kernel that never moves. -/
 def stayKernel (i j : Fin 2) : ℝ := if i = j then 1 else 0
 
+/-- Reference evaluations: the stay kernel is the identity matrix on two states. -/
+theorem stayKernel_at_reference_point :
+    stayKernel 0 0 = 1 ∧ stayKernel 0 1 = 0 := by
+  constructor <;> simp [stayKernel]
+
+
 /-- The kernel that always moves. -/
 def swapKernel (i j : Fin 2) : ℝ := if i = j then 0 else 1
+
+/-- Reference evaluations: the swap kernel is the exchange matrix, so the two kernels are
+complementary rather than proportional. -/
+theorem swapKernel_at_reference_point :
+    swapKernel 0 0 = 0 ∧ swapKernel 0 1 = 1 := by
+  constructor <;> simp [swapKernel]
+
 
 /-- Efficiency at `y` of the design chosen optimally at `x`: full at the state it was built
 for, none at the other. This is the two-endpoint integrand the naive average cannot see.
@@ -118,6 +131,12 @@ for, none at the other. This is the two-endpoint integrand the naive average can
 It is `stayKernel` under the reading this file uses it for -- one function, two names for
 what it means here -- and it calls that definition rather than restating its body. -/
 def agreement (i j : Fin 2) : ℝ := stayKernel i j
+
+/-- Reference evaluations: agreement is one on a match and zero otherwise. -/
+theorem agreement_at_reference_point :
+    agreement 0 0 = 1 ∧ agreement 0 1 = 0 := by
+  constructor <;> simp [agreement, stayKernel]
+
 
 /-- Regret: choose the design optimally at `x`, evaluate it at `y`. -/
 noncomputable def regretCurve (π : Fin 2 → ℝ) (P ρ : Fin 2 → Fin 2 → ℝ) : ℝ :=

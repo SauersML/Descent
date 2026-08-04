@@ -125,6 +125,11 @@ critical point in Ben Arous-Bogachev-Molchanov (2005). It is not a new constant.
 noncomputable def condensationConstant : ℝ :=
   2 - Real.eulerMascheroniConstant - Real.log 2
 
+/-- Reference evaluation in closed form. -/
+theorem condensationConstant_at_reference_point :
+    condensationConstant = 2 - Real.eulerMascheroniConstant - Real.log 2 := rfl
+
+
 /-- Rigorous two-sided bounds on the condensation constant, from mathlib's
 `1/2 < gamma < 2/3` and `0.6931471803 < log 2 < 0.6931471808`.
 
@@ -186,6 +191,11 @@ theorem log_two_lt_condensationConstant : Real.log 2 < condensationConstant := b
 `log chi-square-three`, i.e. `trigamma(3/2)`. It is the second observable of the
 Mellin 2-jet and sets the width of the condensation window. -/
 noncomputable def gaussianJetVariance : ℝ := Real.pi ^ 2 / 2 - 4
+
+/-- Reference evaluation in closed form. -/
+theorem gaussianJetVariance_at_reference_point :
+    gaussianJetVariance = Real.pi ^ 2 / 2 - 4 := rfl
+
 
 /-- `v_G > 0`, from `pi > 3`. -/
 theorem gaussianJetVariance_pos : 0 < gaussianJetVariance := by
@@ -283,6 +293,14 @@ theorem two_pow_le_gaussian_panel_requirement (m : ℝ) (hm : 0 ≤ m) :
 /-- The Gaussian critical degree is `1.37035... * log N`. We record the reciprocal
 constant as a strictly positive multiplier rather than a decimal. -/
 noncomputable def gaussianCriticalMultiplier : ℝ := 1 / condensationConstant
+
+/-- Reference evaluation, stated through the reciprocal so the value is a closed form rather
+than another definition. -/
+theorem gaussianCriticalMultiplier_at_reference_point :
+    1 / gaussianCriticalMultiplier = 2 - Real.eulerMascheroniConstant - Real.log 2 := by
+  unfold gaussianCriticalMultiplier condensationConstant
+  rw [one_div_one_div]
+
 
 theorem gaussianCriticalMultiplier_pos : 0 < gaussianCriticalMultiplier := by
   unfold gaussianCriticalMultiplier

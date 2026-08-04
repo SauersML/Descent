@@ -427,6 +427,11 @@ loci, no LD or structure, and not every statistic that could be called fourth-cu
 was constructed. -/
 noncomputable def gaussianKurtosisMaf : ℝ := (3 - Real.sqrt 3) / 6
 
+/-- Reference evaluation in closed surd form. -/
+theorem gaussianKurtosisMaf_at_reference_point :
+    gaussianKurtosisMaf = (3 - Real.sqrt 3) / 6 := rfl
+
+
 /-- **The Gaussian kurtosis frequency is below a quarter.** A one-sided bound on a constant built
 from a surd does not exclude the sign-flipped constant, which here is `(3 + √3)/6 > 3/4`. This
 bound does. -/
