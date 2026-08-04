@@ -24,6 +24,12 @@ The formal results include:
 * the alternating-binomial identity producing an order-`p` collision;
 * the first-order-versus-order-`p` scaling relation that makes exponent `1 / p` sharp.
 
+The `K`-epoch restriction is not a convenience. `SpectrumIdentifiability` shows that without a
+finite-dimensional sieve there is no exponent to prove: the reciprocal Kingman rate sum
+converges, so on any interval there are nonzero smooth histories the spectrum cannot see at any
+sample size, and the minimax risk is bounded away from zero rather than converging slowly. The
+exponent below describes the sieve, and the sieve is what makes it meaningful.
+
 The analytic Chebyshev-system upper bound and the calendar/coalescent-time bi-Lipschitz theorem
 require a developed theory of bounded piecewise-constant histories and are not asserted here.
 The algebra below is unconditional and is the load-bearing sharpness mechanism those analytic
