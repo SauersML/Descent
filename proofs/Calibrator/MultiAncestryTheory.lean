@@ -185,10 +185,6 @@ section InformationTheoreticLimits
     The mutual information is -(m/2)·log(1-ρ²).
 
     **Domain.** This formula is the mutual information only on `ρ ^ 2 < 1`, and
-    every theorem below that reads it as an information carries that hypothesis.
-    Outside the domain the body returns junk, not an error, because Mathlib
-    defines `Real.log` to be `0` at `0` and to satisfy `log x = log |x|`:
-
     * at `ρ = ±1` — perfect effect portability, the deployment-relevant
       endpoint, where the information must diverge — the body returns `0`, the
       same value it returns at `ρ = 0`. `perfect_and_zero_correlation_collide`
@@ -272,9 +268,7 @@ theorem effectMutualInformation_unbounded_near_perfect
     rw [harg, Real.log_exp]
     have hval : -(m : ℝ) / 2 * -c = |B| + 1 := by
       rw [hc]
-      first
-        | (field_simp; ring)
-        | field_simp
+      field_simp
     rw [hval]
     have hle : B ≤ |B| := le_abs_self B
     linarith
@@ -488,26 +482,42 @@ affect portability noise and stability.
 
 section VariantCountAndEstimationNoise
 
-/-- **Fewer variants → noisier portability estimates.**
-    With fewer variants, each SNP's contribution is larger,
-    making the score more sensitive to individual LD changes. -/
-theorem div_natCast_lt_div_natCast_of_lt
-    (m₁ m₂ : ℕ) (σ_sq : ℝ)
-    (hm : m₁ < m₂) (hσ : 0 < σ_sq)
+/-- Per-variant contribution to the sampling variance of a portability estimate. -/
+noncomputable def portabilityNoiseVariance (variantCount : ℕ) (varianceScale : ℝ) : ℝ :=
+  varianceScale / (variantCount : ℝ)
+
+/-- **More variants strictly reduce portability noise.**  At fixed positive per-variant
+variance scale, the `1 / m` law is strictly decreasing in the number of variants. -/
+theorem portabilityNoiseVariance_strictAnti
+    (m₁ m₂ : ℕ) (varianceScale : ℝ)
+    (hm : m₁ < m₂) (h_variance : 0 < varianceScale)
     (hm₁ : 0 < m₁) :
-    σ_sq / (m₁ : ℝ) > σ_sq / (m₂ : ℝ) := by
-  apply div_lt_div_of_pos_left hσ
+    portabilityNoiseVariance m₂ varianceScale <
+      portabilityNoiseVariance m₁ varianceScale := by
+  unfold portabilityNoiseVariance
+  apply div_lt_div_of_pos_left h_variance
   · exact Nat.cast_pos.mpr hm₁
   · exact Nat.cast_lt.mpr hm
 
-/-- **More variants → portability estimates converge to population-level truth.**
-    By the law of large numbers, the sample portability ratio converges
-    to the true ratio as the number of SNPs increases. -/
-theorem more_variants_more_stable
-    (m : ℕ) (var_per_snp : ℝ) (hv : 0 < var_per_snp) (hm : 0 < m) :
-    -- Variance of portability ratio estimate scales as 1/m
-    var_per_snp / (m : ℝ) > 0 := by
-  exact div_pos hv (Nat.cast_pos.mpr hm)
+/-- Portability noise is positive exactly in the biologically meaningful positive-variance,
+nonempty-panel regime. -/
+theorem portabilityNoiseVariance_pos
+    (m : ℕ) (varianceScale : ℝ)
+    (h_variance : 0 < varianceScale) (hm : 0 < m) :
+    0 < portabilityNoiseVariance m varianceScale := by
+  exact div_pos h_variance (Nat.cast_pos.mpr hm)
+
+/-- **Doubling the variant count exactly halves portability noise.**  This is the actionable
+finite-panel consequence of the `1 / m` law; it makes no positivity assumption on the variance
+scale because the identity is algebraic. -/
+theorem portabilityNoiseVariance_two_mul
+    (m : ℕ) (varianceScale : ℝ) (hm : 0 < m) :
+    portabilityNoiseVariance (2 * m) varianceScale =
+      portabilityNoiseVariance m varianceScale / 2 := by
+  unfold portabilityNoiseVariance
+  have hm' : (m : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr (Nat.ne_of_gt hm)
+  norm_num [Nat.cast_mul]
+  field_simp [hm']
 
 /-- **Shrinkage regularization dampens portability noise.**
     Bayesian shrinkage pulls small effects toward zero,
