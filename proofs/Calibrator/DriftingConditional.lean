@@ -1515,35 +1515,6 @@ theorem charFun_selfSimilar_of_invariance (ν : Measure ℝ) [IsFiniteMeasure ν
     liability_selfSimilar_of_invariance ν L p hrep hα hinv,
     charFun_map_affine ν α β t]
 
-open MeasureTheory ProbabilityTheory in
-/-- **The irreducible analytic classification.**
-
-Let `ν` be a nonzero finite liability measure.  Suppose that, after adding Gaussian noise of
-every positive scale, its characteristic function is unchanged up to an orientation-preserving
-affine change of liability coordinates.  Then the cdf of `ν` is a positive multiple of an
-affine probit cdf.
-
-This is deliberately the only admitted statement in the link-classification chain.  It has no
-external theorem parameter and no arbitrary response curve in its hypotheses: the input is one
-finite measure and the explicit characteristic-function equation
-
-`exp (-(s t)^2 / 2) · φ(t) = φ(t / a) · exp (-i b t / a)`.
-
-Thus the admission is localized to the genuine analytic core: iteration of that equation forces
-the affine multiplier into `(0, 1)`, then forces `log |φ|` to be quadratic and the phase to be
-linear.  All reductions from biological link invariance to this equation, and all reconstruction
-from its cdf conclusion, are proved in this file. -/
-theorem liability_cdf_eq_affineProbit_of_charFun_selfSimilar
-    (ν : Measure ℝ) [IsFiniteMeasure ν]
-    (hmass : 0 < (ν Set.univ).toReal)
-    (hself : ∀ s : ℝ, 0 < s → ∃ a b : ℝ, 0 < a ∧ ∀ t : ℝ,
-      Complex.exp (-(((s * t) ^ 2 : ℝ) : ℂ) / 2) * charFun ν t
-        = charFun ν (t / a) *
-          Complex.exp (((-(b * t / a) : ℝ) : ℂ) * Complex.I)) :
-    ∃ q α β : ℝ, 0 < q ∧ 0 < α ∧
-      ∀ u : ℝ, (ν (Set.Iic u)).toReal = q * Phi (α * u + β) := by
-  sorry
-
 /-! ### Step one: the affine-probit parameters are identifiable
 
 `link_rigidity` asserts an affine-probit representation exists. Before that is worth proving it
@@ -2160,6 +2131,67 @@ theorem cdf_gaussianReal_eq_Phi (m : ℝ) (v : NNReal) (hv : v ≠ 0) (x : ℝ) 
   have hcdf := cdf_gaussianReal_zero_mean v hv (x - m)
   rw [ProbabilityTheory.cdf_eq_real] at hcdf
   simpa [MeasureTheory.Measure.real] using hcdf
+
+open MeasureTheory ProbabilityTheory in
+/-- **The irreducible analytic classification.**
+
+Let `ν` be a nonzero finite liability measure.  Suppose that, after adding Gaussian noise of
+every positive scale, its characteristic function is unchanged up to an orientation-preserving
+affine change of liability coordinates.  Then the cdf of `ν` is a positive multiple of an
+affine probit cdf.
+
+This is deliberately the only admitted statement in the link-classification chain.  It has no
+external theorem parameter and no arbitrary response curve in its hypotheses: the input is one
+finite measure and the explicit characteristic-function equation
+
+`exp (-(s t)^2 / 2) · φ(t) = φ(t / a) · exp (-i b t / a)`.
+
+That analytic core is now proved rather than admitted.  `selfSimilar_alpha_lt_one` forces the
+affine multiplier below one, and `charFun_selfSimilar_closed_form` evaluates the characteristic
+function outright by iterating the equation: the Gaussian factors and the phases accumulate as
+geometric series, and the limit is a Gaussian characteristic function with the variance and mean
+exhibited.  No classification theorem is invoked. -/
+theorem liability_cdf_eq_affineProbit_of_charFun_selfSimilar
+    (ν : Measure ℝ) [IsFiniteMeasure ν]
+    (hmass : 0 < (ν Set.univ).toReal)
+    (hself : ∀ s : ℝ, 0 < s → ∃ a b : ℝ, 0 < a ∧ ∀ t : ℝ,
+      Complex.exp (-(((s * t) ^ 2 : ℝ) : ℂ) / 2) * charFun ν t
+        = charFun ν (t / a) *
+          Complex.exp (((-(b * t / a) : ℝ) : ℂ) * Complex.I)) :
+    ∃ q α β : ℝ, 0 < q ∧ 0 < α ∧
+      ∀ u : ℝ, (ν (Set.Iic u)).toReal = q * Phi (α * u + β) := by
+  obtain ⟨a, b, ha, heq⟩ := hself 1 one_pos
+  have hmassR : 0 < ν.real Set.univ := hmass
+  have ha1 : a < 1 := selfSimilar_alpha_lt_one ν hmassR one_ne_zero heq
+  have hV : 0 < a ^ 2 / (1 - a ^ 2) := div_pos (by positivity) (by nlinarith)
+  set V : ℝ := a ^ 2 / (1 - a ^ 2) with hVdef
+  set w : NNReal := ⟨V, hV.le⟩ with hwdef
+  have hwcoe : (w : ℝ) = V := rfl
+  have hwne : w ≠ 0 := fun h ↦ absurd (congrArg NNReal.toReal h) (ne_of_gt hV)
+  set m : ℝ := b * (1 / (1 - a)) with hmdef
+  set M : ℝ := ν.real Set.univ with hMdef
+  have hsqrt : 0 < Real.sqrt V := Real.sqrt_pos.mpr hV
+  haveI : IsFiniteMeasure ((ENNReal.ofReal M) • gaussianReal m w) := by
+    constructor
+    rw [Measure.smul_apply, smul_eq_mul]
+    exact ENNReal.mul_lt_top ENNReal.ofReal_lt_top (measure_lt_top _ _)
+  have hchar : charFun ν = charFun ((ENNReal.ofReal M) • gaussianReal m w) := by
+    funext u
+    rw [charFun_smul_measure, ENNReal.toReal_ofReal hmassR.le, charFun_gaussianReal,
+      charFun_selfSimilar_closed_form ν ha ha1 heq u, mul_assoc, ← Complex.exp_add]
+    congr 2
+    rw [hwcoe, hmdef, hVdef]
+    push_cast
+    ring
+  have hmeas : ν = (ENNReal.ofReal M) • gaussianReal m w := Measure.ext_of_charFun hchar
+  refine ⟨M, 1 / Real.sqrt V, -(m / Real.sqrt V), hmassR, by positivity, fun u ↦ ?_⟩
+  rw [hmeas, Measure.smul_apply, smul_eq_mul, ENNReal.toReal_mul,
+    ENNReal.toReal_ofReal hmassR.le, cdf_gaussianReal_eq_Phi m w hwne u]
+  congr 2
+  rw [hwcoe]
+  field_simp
+  ring
+
 
 open MeasureTheory ProbabilityTheory in
 /-- **Necessity: no other bounded link shape survives.** A strictly increasing bounded link whose
