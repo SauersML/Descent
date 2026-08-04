@@ -650,41 +650,6 @@ theorem genomicPressureProfiles_eq_of_eqOn_denseTilts
   lipschitzPressureProfiles_eq_of_eqOn_dense
     K left right hleft hright parameters hdense hagrees
 
-/-- **Convergence on dense rational genomic tilts extends to every tilt.**  A
-uniformly Lipschitz sequence and Lipschitz limit need only be checked on the
-enumerated dense family; the complete pressure profile then converges
-pointwise. -/
-theorem genomicPressureProfiles_tendsto_of_tendstoOn_denseTilts
-    {Parameter : Type*} [PseudoMetricSpace Parameter]
-    (K : NNReal) (profiles : ℕ → Parameter → ℝ) (limit : Parameter → ℝ)
-    (hprofiles : ∀ index, LipschitzWith K (profiles index))
-    (hlimit : LipschitzWith K limit)
-    (parameters : Set Parameter) (hdense : Dense parameters)
-    (hconverges : ∀ parameter ∈ parameters,
-      Filter.Tendsto (fun index ↦ profiles index parameter)
-        Filter.atTop (nhds (limit parameter))) :
-    ∀ parameter,
-      Filter.Tendsto (fun index ↦ profiles index parameter)
-        Filter.atTop (nhds (limit parameter)) :=
-  lipschitzPressureProfiles_tendsto_of_tendstoOn_dense
-    K profiles limit hprofiles hlimit parameters hdense hconverges
-
-/-- **On a compact genomic tilt domain, dense convergence is uniform.**
-Uniform Lipschitz control and convergence on the dense rational family imply
-`TendstoUniformly` over every tilt, using a finite compactness net. -/
-theorem genomicPressureProfiles_tendstoUniformly_of_tendstoOn_denseTilts
-    {Parameter : Type*} [PseudoMetricSpace Parameter] [CompactSpace Parameter]
-    (K : NNReal) (profiles : ℕ → Parameter → ℝ) (limit : Parameter → ℝ)
-    (hprofiles : ∀ index, LipschitzWith K (profiles index))
-    (hlimit : LipschitzWith K limit)
-    (parameters : Set Parameter) (hdense : Dense parameters)
-    (hconverges : ∀ parameter ∈ parameters,
-      Filter.Tendsto (fun index ↦ profiles index parameter)
-        Filter.atTop (nhds (limit parameter))) :
-    TendstoUniformly profiles limit Filter.atTop :=
-  lipschitzPressureProfiles_tendstoUniformly_of_tendstoOn_dense
-    K profiles limit hprofiles hlimit parameters hdense hconverges
-
 /-- **Functional genomic right-profile compactness.**  On a compact tilt
 domain, the uniformly bounded pressure functions sharing one Lipschitz constant
 form a compact family in the uniform metric. -/
@@ -2141,11 +2106,11 @@ theorem unifiedBiology_obstructions : UnifiedBiologyObstructions := by
             K left right hleft hright parameters hdense hagrees
       genomicDenseTiltConvergenceExtendsGlobally :=
         fun _Parameter _ K profiles limit hprofiles hlimit parameters hdense hconverges ↦
-          genomicPressureProfiles_tendsto_of_tendstoOn_denseTilts
+          lipschitzPressureProfiles_tendsto_of_tendstoOn_dense
             K profiles limit hprofiles hlimit parameters hdense hconverges
       genomicDenseTiltConvergenceIsUniformOnCompactDomains :=
         fun _Parameter _ _ K profiles limit hprofiles hlimit parameters hdense hconverges ↦
-          genomicPressureProfiles_tendstoUniformly_of_tendstoOn_denseTilts
+          lipschitzPressureProfiles_tendstoUniformly_of_tendstoOn_dense
             K profiles limit hprofiles hlimit parameters hdense hconverges
       genomicBoundedLipschitzPressureProfilesAreCompact :=
         fun _Parameter _ _ K bound ↦

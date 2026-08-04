@@ -182,6 +182,19 @@ theorem ogpOverlapProfile_eq_populationOverlapProfile (q x : ℝ) :
 theorem epochSampleSize_eq_epochLineageSampleSize (K : ℕ) :
     epochSampleSize K = epochLineageSampleSize K := rfl
 
+/-- **The overlap and the squared norm are one inner product, at their own dimensions.**
+
+`configurationOverlap` pairs two two-coordinate configurations and `transplantSqNorm` pairs a
+three-coordinate displacement with itself.  Written out they are the same construction, and
+the corpus's same-quantity screen groups them for it -- correctly, since neither file states
+what the other computes.  No equation between them typechecks: they live at `Fin 2` and
+`Fin 3`.  What can be stated is what each one is, together, and that is this. -/
+theorem configurationOverlap_and_transplantSqNorm_are_dotProduct
+    (configuration : TwoCoordinateConfiguration) (displacement : Fin 3 → ℝ) :
+    configurationOverlap configuration configuration = dotProduct configuration configuration ∧
+      transplantSqNorm displacement = dotProduct displacement displacement :=
+  ⟨rfl, rfl⟩
+
 /-- The two-state kernel that never moves is the one-hot weight on `Fin 2`: one on the
 diagonal, zero off it, whichever way the equality is written. -/
 theorem stayKernel_eq_oneHotWeight (i j : Fin 2) :
