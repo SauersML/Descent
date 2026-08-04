@@ -276,6 +276,29 @@ linear response `r(x)=x`.  This is
 noncomputable def linearDisplacementTripleRate (theta : ℝ) : ℝ :=
   (1 - (1 + theta) * Real.exp (-theta)) / (theta * (1 - Real.exp (-theta)))
 
+/-- Under logarithmic response, the normalized three-lineage rate depends only on the
+dimensionless speed-bias ratio `theta / gamma`. -/
+@[simp] theorem logDisplacementTripleRate (gamma theta : ℝ) :
+    speedTiltBetaMergerRate (theta / gamma) 3 3 =
+      1 / (theta / gamma + 2) := by
+  simp
+
+/-- **The first non-pairwise genealogy coordinate recovers the speed-bias ratio exactly.**
+Pairwise rates are normalized to one and see no regime; taking the reciprocal of the
+three-lineage rate and subtracting two returns `theta / gamma`. -/
+theorem tiltRatio_eq_tripleRate_inv_sub_two (gamma theta : ℝ) :
+    theta / gamma = (speedTiltBetaMergerRate (theta / gamma) 3 3)⁻¹ - 2 := by
+  rw [logDisplacementTripleRate]
+  simp
+
+/-- If the front response scale is known and nonzero, the three-lineage genealogy coordinate
+recovers the canonical speed-bias parameter itself. -/
+theorem speedBias_eq_gamma_mul_tripleRate_transform
+    (gamma theta : ℝ) (hgamma : gamma ≠ 0) :
+    theta = gamma * ((speedTiltBetaMergerRate (theta / gamma) 3 3)⁻¹ - 2) := by
+  rw [← tiltRatio_eq_tripleRate_inv_sub_two]
+  field_simp
+
 /-- The logarithmic law's unit-tilt three-lineage coordinate. -/
 theorem logDisplacementTripleRate_at_unit_tilt :
     speedTiltBetaMergerRate 1 3 3 = 1 / 3 := by
