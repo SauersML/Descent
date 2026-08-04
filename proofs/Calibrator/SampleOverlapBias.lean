@@ -94,7 +94,7 @@ theorem no_overlap_unbiased (r2_true h2 : ℝ) (n_gwas : ℕ) :
 
 /-- More overlap → more inflation (when h² > R²_true). -/
 theorem more_overlap_more_inflation (r2_true h2 f₁ f₂ : ℝ) (n_gwas : ℕ)
-    (h_h2 : r2_true < h2) (h_n : 0 < n_gwas)
+    (h_h2 : r2_true < h2)
     (h_f : f₁ < f₂) :
     partialOverlapR2 r2_true h2 f₁ n_gwas <
       partialOverlapR2 r2_true h2 f₂ n_gwas := by
@@ -124,14 +124,13 @@ theorem apparent_portability_loss_includes_overlap
     (r2_same_true h2 r2_cross : ℝ) (f : ℝ) (n_gwas : ℕ)
     (h_h2 : r2_same_true < h2)
     (h_f_pos : 0 < f)
-    (h_n : 0 < n_gwas)
     (h_real_gap : r2_cross < r2_same_true) :
     r2_cross < partialOverlapR2 r2_same_true h2 f n_gwas ∧
     partialOverlapR2 r2_same_true h2 f n_gwas - r2_cross >
       r2_same_true - r2_cross := by
   have h_inflation : r2_same_true < partialOverlapR2 r2_same_true h2 f n_gwas := by
     have h0 := no_overlap_unbiased r2_same_true h2 n_gwas
-    have hlt := more_overlap_more_inflation r2_same_true h2 0 f n_gwas h_h2 h_n h_f_pos
+    have hlt := more_overlap_more_inflation r2_same_true h2 0 f n_gwas h_h2 h_f_pos
     rw [h0] at hlt
     exact hlt
   constructor
@@ -151,8 +150,7 @@ theorem div_add_lt_div
     (r2_cross r2_same_true overlap_bias : ℝ)
     (h_cross_pos : 0 < r2_cross)
     (h_same_pos : 0 < r2_same_true)
-    (h_bias_pos : 0 < overlap_bias)
-    (h_cross_le : r2_cross < r2_same_true) :
+    (h_bias_pos : 0 < overlap_bias) :
     -- apparent portability < true portability
     r2_cross / (r2_same_true + overlap_bias) < r2_cross / r2_same_true := by
   apply div_lt_div_of_pos_left h_cross_pos h_same_pos
@@ -237,8 +235,6 @@ theorem kinship_inflates (r2_true K h2_family : ℝ)
 theorem grm_threshold_tradeoff
     (r2_true h2_family K_strict K_lenient : ℝ)
     (h_strict_lt : K_strict < K_lenient)
-    (h_strict_pos : 0 < K_strict)
-    (h_lenient_pos : 0 < K_lenient)
     (h_h2_pos : 0 < h2_family) :
     -- Stricter threshold gives smaller kinship inflation
     kinshipInflation r2_true K_strict h2_family <
@@ -253,7 +249,6 @@ theorem grm_threshold_tradeoff
     so the bias is bounded by ε × h²_family. -/
 theorem abs_mul_lt_of_abs_lt_of_le_one
     (K_cross h2_family ε : ℝ)
-    (h_ε_pos : 0 < ε)
     (h_K_small : |K_cross| < ε)
     (h_h2_pos : 0 < h2_family) (h_h2_le : h2_family ≤ 1) :
     |K_cross * h2_family| < ε := by

@@ -460,7 +460,7 @@ driven to zero by polygenicity alone, and `abs_smul_weighted_inner_le` holds for
 coordinate law, including the ones that fail universality. So the diagnostic reports the
 same vanishing value whether or not the score is asymptotically Gaussian, and therefore
 cannot certify the score-distribution assumption it is usually invoked to certify. -/
-theorem pgs_contraction_bound_tendsto_zero {k : ℕ} (hk : 1 ≤ k) (κ c d : ℝ) (hd : 0 < d) :
+theorem pgs_contraction_bound_tendsto_zero {k : ℕ} (hk : 1 ≤ k) (κ c d : ℝ) :
     Filter.Tendsto (fun m : ℕ ↦ |κ| * Real.sqrt (c / (m * d)) ^ k)
       Filter.atTop (nhds 0) := by
   have hk0 : k ≠ 0 := by omega
