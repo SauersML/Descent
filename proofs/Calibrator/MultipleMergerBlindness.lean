@@ -157,6 +157,28 @@ theorem speedTiltFullMergerRate_mem_Ioc
     speedTiltFullMergerRate β extra ∈ Set.Ioc 0 1 :=
   ⟨speedTiltFullMergerRate_pos hβ extra, speedTiltFullMergerRate_le_one hβ extra⟩
 
+/-- The algebraic chart extends continuously to the star boundary `β = -1`: every full merger
+coordinate equals one there. -/
+@[simp] theorem speedTiltFullMergerRate_neg_one (extra : ℕ) :
+    speedTiltFullMergerRate (-1) extra = 1 := by
+  induction extra with
+  | zero => simp
+  | succ extra ih =>
+      rw [speedTiltFullMergerRate_succ, ih, one_mul]
+      have hne : (extra : ℝ) + 1 ≠ 0 := by positivity
+      rw [show (-1 : ℝ) + (extra : ℝ) + 2 = (extra : ℝ) + 1 by ring]
+      exact div_self hne
+
+/-- Uniform Kingman-side envelope: every full merger of at least three lineages is bounded by
+the three-lineage coordinate `1 / (β + 2)`. -/
+theorem speedTiltFullMergerRate_succ_le_threeLineage
+    {β : ℝ} (hβ : -1 < β) (extra : ℕ) :
+    speedTiltFullMergerRate β (extra + 1) ≤ 1 / (β + 2) := by
+  induction extra with
+  | zero => simp
+  | succ extra ih =>
+      exact (speedTiltFullMergerRate_strictAnti_extra hβ (extra + 1)).le.trans ih
+
 /-- Multiplicative penalty contributed by `extra` lineages outside a specified merging
 `k`-tuple.  This is the finite Gamma-ratio identity
 
@@ -226,6 +248,48 @@ theorem speedTiltNonMergerFactor_le_one
   | succ extra ih =>
       exact (speedTiltNonMergerFactor_strictAnti_extra hβ hk extra).le.trans ih
 
+/-- At the star boundary, the presence of any outside lineage kills a full simultaneous merger:
+the first outside-lineage factor is exactly zero. -/
+@[simp] theorem speedTiltNonMergerFactor_neg_one_succ (k extra : ℕ) :
+    speedTiltNonMergerFactor (-1) k (extra + 1) = 0 := by
+  induction extra with
+  | zero => simp [speedTiltNonMergerFactor_succ]
+  | succ extra ih =>
+      rw [speedTiltNonMergerFactor_succ, ih, zero_mul]
+
+/-- For a specified binary merger, the outside-lineage product telescopes exactly.  This is the
+finite-`β` approach to the Kingman rate one. -/
+theorem speedTiltNonMergerFactor_two_eq
+    {β : ℝ} (hβ : -1 < β) (extra : ℕ) :
+    speedTiltNonMergerFactor β 2 extra =
+      (β + 1) / (β + (extra : ℝ) + 1) := by
+  induction extra with
+  | zero =>
+      rw [speedTiltNonMergerFactor_zero]
+      have hne : β + 1 ≠ 0 := by linarith
+      norm_num
+      exact (div_self hne).symm
+  | succ extra ih =>
+      rw [speedTiltNonMergerFactor_succ, ih]
+      have hmiddle : β + (extra : ℝ) + 1 ≠ 0 := by
+        have hextra : 0 ≤ (extra : ℝ) := Nat.cast_nonneg extra
+        linarith
+      calc
+        (β + 1) / (β + (extra : ℝ) + 1) *
+            ((β + (extra : ℝ) + 1) / (β + (2 : ℝ) + (extra : ℝ))) =
+            (β + 1) * ((β + (extra : ℝ) + 1)⁻¹ *
+              (β + (extra : ℝ) + 1)) *
+                (β + (2 : ℝ) + (extra : ℝ))⁻¹ := by
+          simp only [div_eq_mul_inv]
+          ring
+        _ = (β + 1) * (β + (2 : ℝ) + (extra : ℝ))⁻¹ := by
+          rw [inv_mul_cancel₀ hmiddle, mul_one]
+        _ = (β + 1) / (β + ((extra + 1 : ℕ) : ℝ) + 1) := by
+          rw [div_eq_mul_inv]
+          congr 2
+          push_cast
+          ring
+
 /-- All `b`-lineage, specified-`k`-tuple rates under the normalized
 `Beta(1, β + 1)` law.  This is the exact finite-product form of
 
@@ -280,6 +344,56 @@ theorem speedTiltBetaMergerRate_add_outside_strictAnti
   exact mul_lt_mul_of_pos_left
     (speedTiltNonMergerFactor_strictAnti_extra hβ hk extra)
     (speedTiltFullMergerRate_pos hβ (k - 2))
+
+/-- At the star boundary, every full merger has rate one. -/
+@[simp] theorem speedTiltBetaMergerRate_neg_one_self (k : ℕ) :
+    speedTiltBetaMergerRate (-1) k k = 1 := by
+  rw [speedTiltBetaMergerRate_self, speedTiltFullMergerRate_neg_one]
+
+/-- At the star boundary, a specified merger has rate zero as soon as one outside lineage must
+avoid the common parent. -/
+@[simp] theorem speedTiltBetaMergerRate_neg_one_add_outside_succ (k extra : ℕ) :
+    speedTiltBetaMergerRate (-1) (k + (extra + 1)) k = 0 := by
+  simp [speedTiltBetaMergerRate]
+
+/-- Uniform Kingman-side envelope for the complete chart: every merger of three or more lineages
+is at most the normalized triple-merger coordinate. -/
+theorem speedTiltBetaMergerRate_three_or_more_le_triple
+    {β : ℝ} (hβ : -1 < β) (b extra : ℕ) :
+    speedTiltBetaMergerRate β b (extra + 3) ≤ 1 / (β + 2) := by
+  unfold speedTiltBetaMergerRate
+  have hk : 2 ≤ extra + 3 := by omega
+  calc
+    speedTiltFullMergerRate β (extra + 3 - 2) *
+        speedTiltNonMergerFactor β (extra + 3) (b - (extra + 3)) ≤
+        speedTiltFullMergerRate β (extra + 3 - 2) :=
+      mul_le_of_le_one_right
+        (speedTiltFullMergerRate_pos hβ (extra + 3 - 2)).le
+        (speedTiltNonMergerFactor_le_one hβ hk (b - (extra + 3)))
+    _ = speedTiltFullMergerRate β (extra + 1) := rfl
+    _ ≤ 1 / (β + 2) := speedTiltFullMergerRate_succ_le_threeLineage hβ extra
+
+/-- Exact finite-`β` specified binary-merger rate in the presence of `extra` outside lineages. -/
+theorem speedTiltBetaMergerRate_two_with_outside_eq
+    {β : ℝ} (hβ : -1 < β) (extra : ℕ) :
+    speedTiltBetaMergerRate β (extra + 2) 2 =
+      (β + 1) / (β + (extra : ℝ) + 1) := by
+  unfold speedTiltBetaMergerRate
+  rw [speedTiltFullMergerRate_zero]
+  simp only [one_mul]
+  simpa using speedTiltNonMergerFactor_two_eq hβ extra
+
+/-- Exact Kingman-side error of the specified binary-merger coordinate. -/
+theorem one_sub_speedTiltBetaMergerRate_two_with_outside
+    {β : ℝ} (hβ : -1 < β) (extra : ℕ) :
+    1 - speedTiltBetaMergerRate β (extra + 2) 2 =
+      (extra : ℝ) / (β + (extra : ℝ) + 1) := by
+  rw [speedTiltBetaMergerRate_two_with_outside_eq hβ]
+  have hden : β + (extra : ℝ) + 1 ≠ 0 := by
+    have hextra : 0 ≤ (extra : ℝ) := Nat.cast_nonneg extra
+    linarith
+  field_simp
+  ring
 
 /-! ### Raw regular-variation scale versus pair-rate normalization -/
 
