@@ -3633,6 +3633,9 @@ WIRING_ARC = {
     "CirculationDefect",
     "TransplantationStability",
     "LumpedRateBlindness",
+    "MarkedBreakoutUniversality",
+    "XiFromMarkedBreakouts",
+    "TrafficInvariantSeparation",
     "Condensation",
     "CondensationUnification",
     "CumulantBlindness",
@@ -3958,6 +3961,19 @@ CLONE_BLOCK_BUDGET = 0           # a run of source lines repeated verbatim
 CLONE_WINDOW = 8
 CLONE_MIN_CHARS = 160
 
+# A SHORTER run counts when it happens MORE often.  Eight lines twice and five
+# lines four times are the same defect with the copying spread differently, and
+# the first threshold alone reports one and hides the other.  Five lines repeated
+# three times is the second bar.
+CLONE_SHORT_WINDOW = 5
+CLONE_SHORT_MIN_CHARS = 100
+CLONE_SHORT_MIN_OCCURRENCES = 3
+
+# Field assignments inside a structure instance: `fieldName := value`.  Whether a
+# repeated block of these is shareable depends on the two instances' TYPES, which
+# is what `dup_same_result_type` asks.
+CLONE_FIELD_LINE = re.compile(r"^[A-Za-z_][\w'À-ɏͰ-Ͽ]*\s*:=")
+
 # Lines that repeat across every module by construction and say nothing about
 # duplication of MATHEMATICS.  Leaving them in the stream lets a file's import
 # block and namespace scaffolding pair with any other file's.
@@ -3969,7 +3985,21 @@ DUP_IDENT = re.compile(r"[^\W\d][\w'!?₀-₉]*", re.UNICODE)
 # A proof shorter than this is idiom rather than an argument: `rfl`, `by simp`,
 # `by norm_num [foo]`, `⟨h, h'⟩`.  Two theorems both proved by `by simp` is not a
 # missing lemma, and reporting it is how a screen teaches people to skim.
-DUP_PROOF_MIN_TOKENS = 15
+#
+# The floor was 15 tokens, which is a token count standing in for "is this an
+# argument or a reflex".  Ten tokens plus a tactic that is not one of the closers
+# below asks that question directly: `unfold f; rw [h]; linarith` is an argument
+# at twelve tokens and was invisible, while `simp [a, b, c, d, e, f, g]` is a
+# reflex at fifteen and was reported.
+DUP_PROOF_MIN_TOKENS = 10
+
+# Tactics that finish a goal by search rather than by an argument someone chose.
+# A proof made only of these is idiom however long its lemma list runs.
+DUP_CLOSING_TACTICS = {
+    "simp", "simpa", "norm_num", "rfl", "decide", "ring", "ring_nf", "omega",
+    "positivity", "linarith", "nlinarith", "trivial", "aesop", "field_simp",
+    "bound", "gcongr", "fin_cases", "constructor", "exact", "assumption",
+}
 
 
 def dup_alpha(text: str, bound: set) -> str:
@@ -4011,15 +4041,85 @@ def dup_statement_key(d: Decl) -> str:
     return dup_alpha(" ".join(context) + " " + d.header, bound)
 
 
-def dup_substantive(key: str) -> bool:
+def dup_substantive(key: str, corpus_names: frozenset) -> bool:
     """Whether a normalised statement says enough to be worth pairing on.
 
     `∀ x, x = x` and `0 ≤ n` are true of everything and coincide across unrelated
     modules; the same screen in `identifications` requires a constant or a named
     function for exactly this reason.
+
+    The test used to be "thirty characters long, and containing some identifier of
+    three letters or more".  Both halves were wrong in the same direction: length
+    is not aboutness, so `fstFromTau V1 0 = 0` -- nineteen characters naming a
+    corpus definition -- was dropped, while any statement mentioning `Finset` or
+    `Real` reached the bar without saying anything about this corpus.  What makes
+    a statement THIS corpus's is that it names something this corpus defines.
+
+    Asked by tokenising the statement and looking each token up, not by searching
+    the statement for each of five thousand names in turn: the second is the same
+    question and it ran twenty million regex searches to answer it, which cost
+    this guard the seconds-not-minutes property its header promises.
     """
-    skeleton = re.sub(r"\bV[0-9]+\b", "", key)
-    return len(key) >= 30 and bool(re.search(r"[A-Za-z_][A-Za-z_0-9]{2,}", skeleton))
+    return any(w in corpus_names for w in DUP_IDENT.findall(key))
+
+
+@functools.lru_cache(maxsize=1)
+def dup_corpus_names() -> frozenset:
+    """Every name the corpus itself defines, for asking whether text is about it.
+
+    Structure and class FIELDS count.  They are named by this corpus and carry its
+    meaning as much as its theorems do -- a repeated block of field declarations is
+    the corpus repeating itself -- and a set built from declaration names alone
+    would have made the planted structure clone in the calibration invisible.
+    """
+    names = {d.name.split(".")[-1] for d in dup_lean_decls()
+             if d.name and len(d.name.split(".")[-1]) >= 3}
+    # `FIELD_RE` is anchored with `^` and carries no `re.M`, so it matches a LINE
+    # and not a file; running it over whole sources finds only a first line that
+    # happens to be a field, which is none of them.
+    for f in lean_sources(PROOFS):
+        for line in mask(read_source(f)).split("\n"):
+            m = FIELD_RE.match(line)
+            if m and len(m.group(1)) >= 3:
+                names.add(m.group(1))
+    return frozenset(names)
+
+
+def dup_decl_index() -> dict:
+    """file -> ascending `(start_line, Decl)`, for asking which declaration owns a line."""
+    index: dict[str, list] = defaultdict(list)
+    for d in dup_lean_decls():
+        index[d.file].append((d.line, d))
+    for rel in index:
+        index[rel].sort(key=lambda p: p[0])
+    return index
+
+
+def dup_decl_at(index: dict, rel: str, line: int):
+    """The declaration containing `line`, or `None` above the file's first one."""
+    rows = index.get(rel) or index.get(os.path.join("proofs", rel), [])
+    found = None
+    for start, d in rows:
+        if start <= line:
+            found = d
+        else:
+            break
+    return found
+
+
+def dup_same_result_type(a, b) -> bool:
+    """Whether two declarations state their result at the same type.
+
+    Two structure instances at DIFFERENT types cannot share a field block: the
+    fields have different types there, so no definition returns both.  The copy is
+    forced by Lean rather than chosen by the author, and reporting it asks for
+    something that cannot be written.  At the SAME type it can be written -- that
+    is the case this corpus factored into `singleLocusGenerationalWitness` -- so
+    the report stands.
+    """
+    if a is None or b is None:
+        return True
+    return norm(a.conclusion) == norm(b.conclusion)
 
 
 def dup_lean_decls() -> list:
@@ -4067,24 +4167,103 @@ def dup_clone_lines() -> list:
     return stream
 
 
+# A line split so that odd positions are identifiers and even positions are the
+# text between them.  Splitting once per line and renaming by list walk is what
+# keeps the clone scan in seconds: doing it with `re.sub` per window ran the
+# substitution machinery about 1.6 million times over the corpus.
+DUP_SPLIT = re.compile(r"([^\W\d][\w'!?₀-₉]*)", re.UNICODE)
+
+
+def dup_alpha_parts(parts: list, corpus_names: frozenset, seen: dict) -> str:
+    """One pre-split line, with local names renamed through the shared `seen` map."""
+    out = list(parts)
+    for k in range(1, len(out), 2):
+        w = out[k]
+        if w in corpus_names:
+            continue
+        if k + 1 < len(out) and out[k + 1].startswith("."):
+            continue
+        renamed = seen.get(w)
+        if renamed is None:
+            renamed = "L%d" % (len(seen) + 1)
+            seen[w] = renamed
+        out[k] = renamed
+    return "".join(out)
+
+
+def dup_local_alpha(window: tuple, corpus_names: frozenset) -> tuple:  # noqa: D401
+    """A window with its LOCAL names canonicalised by order of first appearance.
+
+    Two proofs that agree on every corpus name, every Mathlib lemma and every
+    operator, and differ only in what they called their own hypotheses, are the
+    same argument written twice -- and comparing raw text misses exactly that, the
+    way a copy-paste-then-rename does.  Only names the corpus does not define are
+    renamed, so a window whose agreement is nothing but variable shape (`intro a;
+    exact a`) cannot collide with an unrelated one: it has no corpus name to
+    agree on, and `dup_clone_named_enough` requires some.
+    """
+    seen: dict[str, str] = {}
+    return tuple(dup_alpha_parts(DUP_SPLIT.split(line), corpus_names, seen)
+                 for line in window)
+
+
+# How many mentions of a corpus-defined name a window must carry to be worth
+# pairing on.  Counted by OCCURRENCE and not by distinct name: a block that puts
+# one corpus function through five steps is about this corpus, and requiring
+# three different names would have hidden it while admitting nothing extra.  What
+# the bar keeps out is two windows agreeing on keywords and punctuation alone --
+# `have`, `exact`, `≤`, `0` -- which is what canonicalising local names would
+# otherwise make identical everywhere.
+CLONE_MIN_MENTIONS = 3
+
+
 def dup_clones() -> list:
-    """Maximal runs of CLONE_WINDOW or more identical lines occurring more than once."""
+    """Repeated runs of source lines: verbatim, or alike up to local names.
+
+    Two bars, because one number cannot express "enough copying".  A long run
+    repeated twice and a shorter run repeated three times are the same defect with
+    the copying spread differently.
+    """
+    corpus_names = dup_corpus_names()
+    index = dup_decl_index()
     stream = dup_clone_lines()
     by_file: dict[str, list] = defaultdict(list)
     for rel, line, text in stream:
         by_file[rel].append((line, text))
 
     # Windows are indexed WITHIN a file, so a window never straddles two files.
+    #
+    # The two cheap tests -- enough text, enough corpus names -- run off prefix
+    # sums, and the expensive one, canonicalising local names, runs only on the
+    # windows that survive them.  Computed per window instead, this scan took
+    # eighty times as long as the whole rest of the file, which would have cost
+    # the guard the property its header promises: that it runs in seconds and so
+    # can run on a broken tree.
     positions: list[tuple[str, int]] = []
     keys: list[tuple] = []
     for rel in sorted(by_file):
         rows = by_file[rel]
-        for i in range(len(rows) - CLONE_WINDOW + 1):
-            window = tuple(t for _, t in rows[i : i + CLONE_WINDOW])
-            if sum(len(t) for t in window) < CLONE_MIN_CHARS:
-                continue
-            positions.append((rel, i))
-            keys.append(window)
+        texts = [t for _, t in rows]
+        split = [DUP_SPLIT.split(t) for t in texts]
+        char_prefix = [0]
+        mention_prefix = [0]
+        for t, parts in zip(texts, split):
+            char_prefix.append(char_prefix[-1] + len(t))
+            mention_prefix.append(mention_prefix[-1] + sum(
+                1 for w in parts[1::2] if w in corpus_names))
+        for width, min_chars, min_occ in (
+                (CLONE_WINDOW, CLONE_MIN_CHARS, 2),
+                (CLONE_SHORT_WINDOW, CLONE_SHORT_MIN_CHARS, CLONE_SHORT_MIN_OCCURRENCES)):
+            for i in range(len(rows) - width + 1):
+                if char_prefix[i + width] - char_prefix[i] < min_chars:
+                    continue
+                if mention_prefix[i + width] - mention_prefix[i] < CLONE_MIN_MENTIONS:
+                    continue
+                seen: dict = {}
+                positions.append((rel, i))
+                keys.append((width, min_occ) + tuple(
+                    dup_alpha_parts(split[j], corpus_names, seen)
+                    for j in range(i, i + width)))
 
     groups: dict[tuple, list] = defaultdict(list)
     for pos, key in zip(positions, keys):
@@ -4093,8 +4272,23 @@ def dup_clones() -> list:
 
     findings = []
     for key, occ in groups.items():
-        if len(occ) < 2:
+        if len(occ) < key[1]:
             continue
+        # A clone whose sites are TIED -- one declaration citing the other by name --
+        # is the relation the corpus asks for, exactly as it is for a duplicated
+        # statement or proof.  A specialisation that repeats its parent's hypotheses
+        # and then applies the parent is not two copies of a claim; it is a claim and
+        # its instance, and a divergence between them is already a build error.
+        owners = [dup_decl_at(index, rel, by_file[rel][i][0]) for rel, i in occ]
+        named = [d for d in owners if d is not None and d.name]
+        if len(named) >= 2 and len(dup_untied(named)) < 2:
+            continue
+        # A repeated block of structure FIELDS is shareable only if the two
+        # instances have the same type; at different types the fields have
+        # different types and no definition returns both.
+        if all(CLONE_FIELD_LINE.match(t) for t in key[2:]):
+            if any(not dup_same_result_type(owners[0], o) for o in owners[1:]):
+                continue
         # Drop a window whose left-neighbour window repeats the same way: it is
         # the tail of a longer clone that is already being reported.  Without
         # this a 30-line clone is reported 23 times.
@@ -4104,11 +4298,19 @@ def dup_clones() -> list:
             if len(prev_keys) == 1 and len(groups[next(iter(prev_keys))]) == len(occ):
                 continue
         # Extend right while every occurrence still agrees, to report the run's
-        # true length rather than the window's.
-        length = CLONE_WINDOW
+        # true length rather than the window's.  Agreement is judged line by line
+        # up to local names, which is coarser than the window's own keying: a run
+        # continuing in renamed form is followed, and the reported length can
+        # overshoot by a line where two locals happen to occupy the same position.
+        # The length is descriptive -- what gates is the window.
+        length = key[0]
         while True:
-            nxt = {by_file[rel][i + length][1] if i + length < len(by_file[rel]) else None
-                   for rel, i in occ}
+            nxt = set()
+            for rel, i in occ:
+                if i + length >= len(by_file[rel]):
+                    nxt.add(None)
+                    break
+                nxt.add(dup_local_alpha((by_file[rel][i + length][1],), corpus_names))
             if len(nxt) != 1 or None in nxt:
                 break
             length += 1
@@ -4140,11 +4342,13 @@ def run_duplication() -> int:
     theorems = [d for d in decls
                 if d.kind in ("theorem", "lemma") and d.name and d.body]
 
+    corpus_names = dup_corpus_names()
+
     # 1. One proposition, two names.
     by_statement: dict[str, list] = defaultdict(list)
     for d in theorems:
         key = dup_statement_key(d)
-        if dup_substantive(key):
+        if dup_substantive(key, corpus_names):
             by_statement[key].append(d)
 
     dup_statements = []
@@ -4160,8 +4364,17 @@ def run_duplication() -> int:
     for d in theorems:
         bound = {b.name for b in d.binders if b.name}
         proof = dup_alpha(d.body, bound)
-        if len(proof.split()) >= DUP_PROOF_MIN_TOKENS:
-            by_proof[proof].append(d)
+        tokens = proof.split()
+        if len(tokens) < DUP_PROOF_MIN_TOKENS:
+            continue
+        # A proof made only of closers is a reflex, however long its lemma lists
+        # run; a proof that names a step someone chose is an argument, and two
+        # theorems sharing one are sharing that choice.
+        if not any(re.sub(r"[^\w']", "", t) not in DUP_CLOSING_TACTICS and
+                   re.match(r"^[a-z]", re.sub(r"[^\w']", "", t) or "_")
+                   for t in tokens):
+            continue
+        by_proof[proof].append(d)
 
     dup_proofs = []
     for proof, members in sorted(by_proof.items()):

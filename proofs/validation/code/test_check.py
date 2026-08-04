@@ -459,6 +459,82 @@ structure PanelB where
   calibrationSlopeEstimate : ℝ
 """),
      "verbatim repeated source blocks"),
+    # A copy that was renamed on the way. Comparing raw text misses exactly the
+    # copy-paste-then-rename, which is the commonest way a block gets duplicated.
+    ("duplication", "a block repeated up to its local names",
+     clean_plus("Calibrator/Sub.lean", CLEAN_SUB + """
+noncomputable def panelScoreFirst (widthA depthA : ℝ) : ℝ :=
+  let scaledWidth := cleanRate widthA * 2
+  let scaledDepth := cleanRate depthA * 3
+  let combined := scaledWidth + scaledDepth
+  let penalised := combined - cleanRate widthA
+  let widened := penalised * cleanRate depthA
+  let settled := widened + combined
+  let finished := settled * 2
+  finished + combined
+
+noncomputable def panelScoreSecond (spanB reachB : ℝ) : ℝ :=
+  let scaledSpan := cleanRate spanB * 2
+  let scaledReach := cleanRate reachB * 3
+  let merged := scaledSpan + scaledReach
+  let charged := merged - cleanRate spanB
+  let broadened := charged * cleanRate reachB
+  let rested := broadened + merged
+  let closed := rested * 2
+  closed + merged
+"""),
+     "verbatim repeated source blocks"),
+    # Shorter, but three times. Eight-lines-twice and five-lines-three-times are
+    # the same defect with the copying spread differently.
+    ("duplication", "a five-line block repeated three times",
+     clean_plus("Calibrator/Sub.lean", CLEAN_SUB + """
+structure ShortPanelA where
+  ancestryFractionEstimate : ℝ
+  recombinationWindowRadius : ℕ
+  perGenerationMutationRate : ℝ
+  residualVarianceEstimate : ℝ
+  calibrationSlopeEstimate : ℝ
+
+structure ShortPanelB where
+  ancestryFractionEstimate : ℝ
+  recombinationWindowRadius : ℕ
+  perGenerationMutationRate : ℝ
+  residualVarianceEstimate : ℝ
+  calibrationSlopeEstimate : ℝ
+
+structure ShortPanelC where
+  ancestryFractionEstimate : ℝ
+  recombinationWindowRadius : ℕ
+  perGenerationMutationRate : ℝ
+  residualVarianceEstimate : ℝ
+  calibrationSlopeEstimate : ℝ
+"""),
+     "verbatim repeated source blocks"),
+    # An argument, not a reflex, at twelve tokens: below the old fifteen-token
+    # floor and invisible because of it.
+    ("duplication", "a short but chosen proof script under two statements",
+     clean_plus("Calibrator/Sub.lean", CLEAN_SUB + """
+theorem chosen_step_first (x : ℝ) (hx : 0 < x) : 0 < cleanRate x + x := by
+  unfold cleanRate
+  have hdouble : 0 < x + x := by linarith
+  linarith
+
+theorem chosen_step_second (y : ℝ) (hy : 0 < y) : 0 < cleanRate y + y * 1 := by
+  unfold cleanRate
+  have hdouble : 0 < y + y := by linarith
+  linarith
+"""),
+     "identical proof scripts under different statements"),
+    # Short, and about this corpus: under the old length floor it was dropped
+    # for being nineteen characters long.
+    ("duplication", "a short statement naming a corpus definition, proved twice",
+     clean_plus("Calibrator/Sub.lean", CLEAN_SUB + """
+theorem clean_rate_at_one_first : cleanRate 1 = 1 := rfl
+
+theorem clean_rate_at_one_second : cleanRate 1 = 1 := by
+  unfold cleanRate
+"""),
+     "same proposition under different names"),
 ]
 
 # Duplication traps: mathematics that LOOKS repeated to a careless screen and is
@@ -488,6 +564,119 @@ theorem panel_weight_nonneg' (v : ℝ) (hv : 0 ≤ v) :
 theorem nat_self (n : ℕ) : n = n := rfl
 
 theorem int_self (k : ℤ) : k = k := rfl
+""")),
+    # A specialisation repeats its parent's hypotheses and then applies the parent.
+    # That is a claim and its instance, tied by a citation the compiler checks --
+    # the same tie the statement and proof screens already credit.
+    ("duplication", "a specialisation that repeats its parent's hypotheses and cites it",
+     clean_plus("Calibrator/Sub.lean", CLEAN_SUB + """
+theorem general_panel_bound
+    (sampleSizePerAncestry : ℕ)
+    (alleleFrequencySpectrum : ℝ)
+    (effectSizeStandardError : ℝ)
+    (ancestryFractionEstimate : ℝ)
+    (recombinationWindowRadius : ℕ)
+    (perGenerationMutationRate : ℝ)
+    (h_spectrum : 0 ≤ alleleFrequencySpectrum)
+    (h_error : 0 ≤ effectSizeStandardError) :
+    0 ≤ alleleFrequencySpectrum + effectSizeStandardError := by
+  linarith
+
+theorem general_panel_bound_at_two
+    (alleleFrequencySpectrum : ℝ)
+    (effectSizeStandardError : ℝ)
+    (ancestryFractionEstimate : ℝ)
+    (recombinationWindowRadius : ℕ)
+    (perGenerationMutationRate : ℝ)
+    (h_spectrum : 0 ≤ alleleFrequencySpectrum)
+    (h_error : 0 ≤ effectSizeStandardError) :
+    0 ≤ alleleFrequencySpectrum + effectSizeStandardError :=
+  general_panel_bound 2 alleleFrequencySpectrum effectSizeStandardError
+    ancestryFractionEstimate recombinationWindowRadius perGenerationMutationRate
+    h_spectrum h_error
+""")),
+    # Two structure instances at DIFFERENT types share a field block. The fields
+    # have different types there, so no definition returns both: the copy is
+    # forced by Lean rather than chosen, and asking for it to be shared asks for
+    # something that cannot be written.
+    ("duplication", "a field block shared by instances of two different types",
+     clean_plus("Calibrator/Sub.lean", CLEAN_SUB + """
+structure NarrowPanel where
+  ancestryFractionEstimate : ℝ
+  recombinationWindowRadius : ℕ
+  perGenerationMutationRate : ℝ
+  residualVarianceEstimate : ℝ
+  calibrationSlopeEstimate : ℝ
+
+structure WidePanel where
+  ancestryFractionEstimate : ℝ
+  recombinationWindowRadius : ℕ
+  perGenerationMutationRate : ℝ
+  residualVarianceEstimate : ℝ
+  calibrationSlopeEstimate : ℝ
+  extraBandwidthEstimate : ℝ
+
+noncomputable def narrowWitness : NarrowPanel where
+  ancestryFractionEstimate := 1 / 2
+  recombinationWindowRadius := 3
+  perGenerationMutationRate := 1 / 4
+  residualVarianceEstimate := 1 / 8
+  calibrationSlopeEstimate := 1
+
+noncomputable def wideWitness : WidePanel where
+  ancestryFractionEstimate := 1 / 2
+  recombinationWindowRadius := 3
+  perGenerationMutationRate := 1 / 4
+  residualVarianceEstimate := 1 / 8
+  calibrationSlopeEstimate := 1
+  extraBandwidthEstimate := 2
+""")),
+    # Alike in nothing but the shape of their local names. Renaming locals before
+    # comparing is what catches a renamed copy; it must not make every pair of
+    # `intro`-and-`exact` proofs into a clone of every other.
+    ("duplication", "two proofs alike only in the shape of their local names",
+     clean_plus("Calibrator/Sub.lean", CLEAN_SUB + """
+theorem shape_only_first (a b : ℝ) (ha : 0 ≤ a) (hb : 0 ≤ b) : 0 ≤ a + b := by
+  have h1 : 0 ≤ a := ha
+  have h2 : 0 ≤ b := hb
+  have h3 : 0 ≤ a + b := add_nonneg h1 h2
+  exact h3
+
+theorem shape_only_second (p q : ℤ) (hp : 0 ≤ p) (hq : 0 ≤ q) : 0 ≤ p * 1 + q := by
+  have k1 : 0 ≤ p := hp
+  have k2 : 0 ≤ q := hq
+  have k3 : 0 ≤ p + q := add_nonneg k1 k2
+  omega
+""")),
+    # Five lines, but only twice: below the short bar, which exists for runs that
+    # repeat often rather than runs that repeat once.
+    ("duplication", "a five-line block repeated only twice",
+     clean_plus("Calibrator/Sub.lean", CLEAN_SUB + """
+structure PairPanelA where
+  ancestryFractionEstimate : ℝ
+  recombinationWindowRadius : ℕ
+  perGenerationMutationRate : ℝ
+  residualVarianceEstimate : ℝ
+  calibrationSlopeEstimate : ℝ
+
+structure PairPanelB where
+  ancestryFractionEstimate : ℝ
+  recombinationWindowRadius : ℕ
+  perGenerationMutationRate : ℝ
+  residualVarianceEstimate : ℝ
+  calibrationSlopeEstimate : ℝ
+""")),
+    # Long enough to clear the token floor and made entirely of closers: a reflex,
+    # not a shared argument.
+    ("duplication", "two long proofs made only of closing tactics",
+     clean_plus("Calibrator/Sub.lean", CLEAN_SUB + """
+theorem closers_only_first (m : CleanModel) : m.rate * 1 = m.rate := by
+  simp [CleanModel.rate, mul_one, add_zero, sub_zero, one_mul]
+  norm_num
+
+theorem closers_only_second (m : CleanModel) : m.rate + 0 = m.rate := by
+  simp [CleanModel.rate, mul_one, add_zero, sub_zero, one_mul]
+  norm_num
 """)),
 ]
 
