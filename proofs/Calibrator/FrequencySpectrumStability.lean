@@ -95,11 +95,34 @@ theorem epochSpectrumCoordinateCount_pos (K : ℕ) (hK : 2 ≤ K) :
   unfold epochSpectrumCoordinateCount
   omega
 
+/-- The coordinate count vanishes exactly for the trivial zero- and one-epoch indices. -/
+theorem epochSpectrumCoordinateCount_eq_zero_iff (K : ℕ) :
+    epochSpectrumCoordinateCount K = 0 ↔ K ≤ 1 := by
+  unfold epochSpectrumCoordinateCount
+  omega
+
 /-- The inverse exponent is positive on the fixed-epoch model domain. -/
 theorem fixedEpochInverseExponent_pos (K : ℕ) (hK : 2 ≤ K) :
     0 < fixedEpochInverseExponent K := by
   unfold fixedEpochInverseExponent
   exact inv_pos.mpr (by exact_mod_cast epochSpectrumCoordinateCount_pos K hK)
+
+/-- The deterministic inverse exponent is zero exactly outside the nontrivial epoch domain. -/
+theorem fixedEpochInverseExponent_eq_zero_iff (K : ℕ) :
+    fixedEpochInverseExponent K = 0 ↔ K ≤ 1 := by
+  simp only [fixedEpochInverseExponent, inv_eq_zero, Nat.cast_eq_zero]
+  exact epochSpectrumCoordinateCount_eq_zero_iff K
+
+/-- Exact positivity domain of the deterministic inverse exponent. -/
+theorem fixedEpochInverseExponent_pos_iff (K : ℕ) :
+    0 < fixedEpochInverseExponent K ↔ 2 ≤ K := by
+  constructor
+  · intro hpos
+    by_contra hK
+    have hsmall : K ≤ 1 := by omega
+    rw [(fixedEpochInverseExponent_eq_zero_iff K).2 hsmall] at hpos
+    exact lt_irrefl 0 hpos
+  · exact fixedEpochInverseExponent_pos K
 
 /-- Two-epoch inference is Lipschitz. -/
 @[simp] theorem fixedEpochInverseExponent_two :
@@ -261,6 +284,24 @@ theorem fixedEpochSampleRateExponent_pos (K : ℕ) (hK : 2 ≤ K) :
     0 < fixedEpochSampleRateExponent K := by
   rw [fixedEpochSampleRateExponent_eq_half_inverse K hK]
   exact div_pos (fixedEpochInverseExponent_pos K hK) (by norm_num)
+
+/-- The root-sample exponent has the same exact zero boundary as its deterministic parent. -/
+theorem fixedEpochSampleRateExponent_eq_zero_iff (K : ℕ) :
+    fixedEpochSampleRateExponent K = 0 ↔ K ≤ 1 := by
+  simp only [fixedEpochSampleRateExponent, inv_eq_zero, Nat.cast_eq_zero, mul_eq_zero,
+    OfNat.ofNat_ne_zero, false_or]
+  exact epochSpectrumCoordinateCount_eq_zero_iff K
+
+/-- Exact positivity domain of the root-sample exponent. -/
+theorem fixedEpochSampleRateExponent_pos_iff (K : ℕ) :
+    0 < fixedEpochSampleRateExponent K ↔ 2 ≤ K := by
+  constructor
+  · intro hpos
+    by_contra hK
+    have hsmall : K ≤ 1 := by omega
+    rw [(fixedEpochSampleRateExponent_eq_zero_iff K).2 hsmall] at hpos
+    exact lt_irrefl 0 hpos
+  · exact fixedEpochSampleRateExponent_pos K
 
 /-- **The epoch coordinate count is positive, and strictly increasing, as a real.**
 
