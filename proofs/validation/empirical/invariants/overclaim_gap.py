@@ -61,6 +61,38 @@ IFF = re.compile(
     r"if and only if|exactly when|precisely when|necessary and sufficient",
     re.I)
 
+# Entries read and judged benign, with the reason. The phrase is in the
+# docstring but is not a claim about THIS theorem's statement: it describes a
+# companion result, a hypothesis, or when the lemma has content at all. Kept as
+# a list rather than a lexical rule because no rule separated these from the
+# real ones -- "zero exactly when the merged ancestries carried the same risk"
+# and "has content exactly when the caller supplies a nontrivial transfer" are
+# the same shape and only one is a claim.
+ACKNOWLEDGED = {
+    "sameTransfer_refl": "describes when the lemma has content, not what it proves",
+    "rademacher_point_killed": "describes the arithmetic core, not an equivalence",
+    "treatNetBenefit_eq": "describes the threshold rule, a companion fact",
+    "no_regretFree_action_of_crossing": "names the dichotomy completed by the previous theorem",
+    "sixthMoment_eq_floorOne_plus_dispersion": "describes what the panel effect is",
+    "hudsonCalibrated_stratification_imitable_if_within_budget": "states the membership criterion it proves",
+    "conflict_nonneg": "describes the Cauchy-Schwarz gap, not an iff",
+    "portability_gap_decomposition": "points forward to a later section",
+    "mul_sq_sub_lt_of_lt_of_ne": "describes what both downstream comparisons reduce to",
+    "mul_le_self_of_le_one": "describes the modelling reading",
+    "belowThresholdMass_eq_zero": "explicitly a package with aboveThresholdMass_eq_zero",
+    "belowThresholdMass_pos_inside": "explicitly a package with the two vanishing results",
+    "two_term_weighted_sum_lt_of_larger_weight_gain": "describes when the claim has content",
+    "not_isNull_of_demographicSpike_gt_budget": "explicitly a package with the previous theorem",
+    "maf_spectrum_identifiable": "describes when the separation hypothesis fails, via a cited theorem",
+    "rsquared_eq_process_moments": "describes the guard's behaviour, not the theorem",
+    "excess_le_two_mul_perturbation": "compares to the sharp form below",
+    "driftLDTrajectory_closedForm": "describes the retention factor, a companion fact",
+    "centeredSquare_third_moment_factored": "names the kurtosis phase boundary the factorization exposes",
+    "amEquilibriumVariance_at_full_heritability": "describes why a disagreement was invisible",
+    "sign_erasure": "converse adjacent",
+    "constantConditional_of_driftDefect_zero": "is itself the converse",
+}
+
 
 def scan() -> list[tuple[str, str, str]]:
     out: list[tuple[str, str, str]] = []
@@ -82,9 +114,10 @@ def scan() -> list[tuple[str, str, str]]:
                 other != name and other.startswith(stem)
                 and ("_of_" in other or other.endswith("_converse"))
                 for other in names)
-            note = hit.group(0).lower() + (
-                "  (converse may be adjacent)" if converse else "")
-            out.append((name, f.relative_to(CORPUS).as_posix(), note))
+            if converse or name in ACKNOWLEDGED:
+                continue
+            out.append((name, f.relative_to(CORPUS).as_posix(),
+                        hit.group(0).lower()))
     return out
 
 
