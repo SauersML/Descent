@@ -186,7 +186,12 @@ theorem independentSampleMultiplier_add_epochs (K extra factor : ℕ) (hK : 2 �
 /-- Independent-data multiplier needed for the canonical linear Laplace core to support all
 `2K - 3` coordinates of a `K`-epoch model when the per-coordinate conditioning exponent is
 `kappa`. This prices the linear core only; boundary collisions still impose the separate
-Hölder law formalized above. -/
+Hölder law formalized above.
+
+Empirical status: UNTESTED. The exponential is the conditioning law read off the Laplace
+core, and the theorems below fix how it scales with the epoch count. What no measurement
+here supports is the value of `kappa` for any real inference problem; it is a parameter of
+the statement, not a number this corpus has pinned. -/
 noncomputable def canonicalGenomeMultiplierForEpochCoordinates
     (kappa : ℝ) (K : ℕ) : ℝ :=
   Real.exp (kappa * epochSpectrumCoordinateCount K)
