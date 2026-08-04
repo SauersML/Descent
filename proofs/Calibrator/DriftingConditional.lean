@@ -361,11 +361,36 @@ in `reconstruct_eq_of_pushed_marked`, the two sides are the same number.
 conditional's own values, so it cannot leave their range: an error in the observed conditional is
 never amplified by transporting it forward. That is the forward direction of the asymmetry the
 analysis turns on, and the backward direction — where the same structure inverts and amplifies —
-is not proved here. -/
+The backward direction is `pushForward_not_injective`, and it is worse than
+amplification: under complete mixing the operator collapses distinct conditionals onto the same
+image, so inverting it is not an ill-conditioned problem but an underdetermined one. No amount of
+data about the pushed-forward conditional recovers which conditional produced it. -/
 
 /-- One step of the coupling applied to a nonnegative density on a finite state space. -/
 noncomputable def pushForward {n : ℕ} (M : Fin n → Fin n → ℝ) (f : Fin n → ℝ) (i : Fin n) : ℝ :=
   ∑ j, M i j * f j
+
+/-- **The backward direction is not merely amplifying, it is undetermined.**
+
+`reconstruct_between` says transporting a conditional forward cannot leave the range of its own
+values, so forward error never grows. The reverse fails for a stronger reason than instability:
+a completely mixing step sends two different conditionals to the SAME image, so there is no
+backward map to be ill-conditioned. Recovering the earlier conditional from the later one is not
+a hard inverse problem; it is not an inverse problem.
+
+The witness is the uniform two-state coupling with the two point conditionals. -/
+theorem pushForward_not_injective :
+    ∃ (M : Fin 2 → Fin 2 → ℝ) (f g : Fin 2 → ℝ),
+      (∀ i j, 0 ≤ M i j) ∧ (∀ i, ∑ j, M i j = 1) ∧ f ≠ g ∧
+      pushForward M f = pushForward M g := by
+  refine ⟨fun _ _ ↦ (1 : ℝ) / 2, ![1, 0], ![0, 1], fun i j ↦ by norm_num,
+    fun i ↦ by simp, ?_, ?_⟩
+  · intro h
+    have h0 := congrFun h 0
+    norm_num at h0
+  · funext i
+    unfold pushForward
+    simp [Fin.sum_univ_two]
 
 /-- Transport a conditional through one step: push the marked subpopulation forward and divide
 by the pushed-forward marginal. -/
@@ -2294,9 +2319,10 @@ obey `ȧ = -λ a - a³/2`. That planar system looks nonlinear and is not: the su
 `A = a⁻²` linearises it to `Ȧ = 2λA + 1`, which is why the realization is integrable in closed
 form rather than merely finite-dimensional.
 
-What is proved here is exactly that substitution. The invariance of the family itself needs the
-Gaussian identity `E[Φ(α + βZ)] = Φ(α/√(1+β²))` and the OU semigroup, neither of which is set up
-in this file, and neither is asserted. -/
+What is proved here is exactly that substitution. The invariance of the family itself is also
+proved, and this paragraph used to say it was not: `gaussianAverage_probit` IS the Gaussian
+identity `E[Φ(α + βZ)] = Φ(α/√(1+β²))`, and `probit_invariant_under_ou` is the OU step. Both are
+above, in this file. -/
 
 /-- **The inverse-square substitution linearises the probit realization flow.**
 
