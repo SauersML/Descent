@@ -543,6 +543,28 @@ theorem split_identified_of_matched_genetics {n : ℕ} (G : CohortGradients n) (
   · exact absurd h hgne
   · linarith [sub_eq_zero.mp h]
 
+/-- **The dual study design: matched nonzero environment with different genetic positions.**
+Holding environment fixed while ancestry varies also supplies a non-collinear cohort pair and
+therefore identifies the two attribution coefficients. -/
+theorem split_identified_of_matched_environments
+    {n : ℕ} (G : CohortGradients n) (i j : Fin n)
+    (hmatch : G.environmentalGradient i = G.environmentalGradient j)
+    (hene : G.environmentalGradient i ≠ 0)
+    (hgen : G.geneticGradient i ≠ G.geneticGradient j)
+    (gamma eta gamma' eta' : ℝ)
+    (hagree : ∀ k : Fin n, cohortShift G gamma eta k = cohortShift G gamma' eta' k) :
+    gamma = gamma' ∧ eta = eta' := by
+  refine split_identified_of_noncollinear G i j ?_ gamma eta gamma' eta' hagree
+  rw [← hmatch]
+  intro hcontra
+  apply hgen
+  have : (G.geneticGradient i - G.geneticGradient j) *
+      G.environmentalGradient i = 0 := by
+    linarith [hcontra]
+  rcases mul_eq_zero.mp this with h | h
+  · exact sub_eq_zero.mp h
+  · exact absurd h hene
+
 /-- **Exact study-design boundary.**  The full cohort-shift vector identifies the genetic and
 environmental coefficients exactly if and only if the panel contains two non-collinear cohort
 gradients.  Thus sample size within cohorts cannot substitute for rank in the cohort design. -/
