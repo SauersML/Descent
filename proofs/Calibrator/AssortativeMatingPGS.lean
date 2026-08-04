@@ -242,8 +242,8 @@ theorem AssortativeMatingModel.variance_exceeds_random (m : AssortativeMatingMod
 /-- Standalone version: AM equilibrium variance exceeds random mating variance. -/
 theorem am_variance_exceeds_random
     (V_A r h2 : ℝ)
-    (h_VA : 0 < V_A) (h_r : 0 < r) (h_r_le : r < 1)
-    (h_h2 : 0 < h2) (h_h2_le : h2 < 1)
+    (h_VA : 0 < V_A) (h_r : 0 < r)
+    (h_h2 : 0 < h2)
     (h_product : r * h2 < 1) :
     V_A < amEquilibriumVariance V_A r h2 := by
   unfold amEquilibriumVariance
@@ -259,7 +259,7 @@ theorem AssortativeMatingModel.variance_finite (m : AssortativeMatingModel) :
 /-- Standalone version. -/
 theorem am_variance_finite
     (V_A r h2 : ℝ)
-    (h_VA : 0 < V_A) (h_product : r * h2 < 1) (h_product_nn : 0 ≤ r * h2) :
+    (h_VA : 0 < V_A) (h_product : r * h2 < 1) :
     0 < amEquilibriumVariance V_A r h2 := by
   unfold amEquilibriumVariance
   exact div_pos h_VA (by linarith)
@@ -509,49 +509,103 @@ theorem DifferentialAMModel.differential_am_misleading (d : DifferentialAMModel)
 
 /-- **AM-corrected portability.**
     Correcting for differential AM:
-    port_corrected = port_measured * (1 - r_source*h2) / (1 - r_target*h2). -/
+    port_corrected = port_measured * (1 - r_target*h2) / (1 - r_source*h2).
+
+    The correction factor is the *reciprocal* of the artifact.  Writing the
+    inflation as `R2_obs = R2_rm / (1 - r*h2)` in each population,
+
+      port_measured = R2_t_obs / R2_s_obs
+                    = (R2_rm_t / R2_rm_s) * (1 - r_s*h2) / (1 - r_t*h2)
+
+    so recovering `R2_rm_t / R2_rm_s` requires multiplying by
+    `(1 - r_t*h2) / (1 - r_s*h2)`.  The source denominator is the divisor:
+    it is the source inflation that has to be undone.
+
+    This factor was inverted until an exact-rational check caught it.  With
+    `r_s = 1/2`, `r_t = 0`, `h2 = 1/2` and identical architectures (true
+    portability `1`), `apparentPortability` is `3/4`; the inverted factor
+    returned `(3/4) * (3/4) = 9/16`, moving *away* from `1` instead of
+    recovering it, while the form above returns `(3/4) * (4/3) = 1`. -/
 noncomputable def amCorrectedPortability
     (port_measured r_source r_target h2 : ℝ) : ℝ :=
-  port_measured * (1 - r_source * h2) / (1 - r_target * h2)
+  port_measured * (1 - r_target * h2) / (1 - r_source * h2)
 
-/-- **amCorrectedPortability where its denominator vanishes, named.** The guard `1 - r_target * h2`
-is zero at `r_target = 1`, `h2 = 1`. At `r_target * h2 = 1` the target correction diverges, so a
+/-- **amCorrectedPortability where its denominator vanishes, named.** The guard `1 - r_source * h2`
+is zero at `r_source = 1`, `h2 = 1`. At `r_source * h2 = 1` the source correction diverges, so a
 portability estimate corrected for assortative mating collapses to zero exactly where the
 correction matters most. Lean returns `0` there rather than the value the modelled quantity
-takes, and no type error marks the point. Consumers must require `1 - r_target * h2 ≠ 0`. -/
-theorem amCorrectedPortability_at_rtarget1h21_is_junk (port_measured : ℝ) (r_source : ℝ) :
-    amCorrectedPortability port_measured r_source 1 1 = 0 := by
+takes, and no type error marks the point. Consumers must require `1 - r_source * h2 ≠ 0`. -/
+theorem amCorrectedPortability_at_rsource1h21_is_junk (port_measured : ℝ) (r_target : ℝ) :
+    amCorrectedPortability port_measured 1 r_target 1 = 0 := by
   unfold amCorrectedPortability
   norm_num
 
-/-- **AM correction reduces measured portability when source has more AM.**
-    The source AM inflates source R², so the correction factor
-    (1-r_s*h2)/(1-r_t*h2) < 1 when r_s > r_t. -/
+/-- **AM correction raises measured portability when source has more AM.**
+    The source AM inflates source R² more than the target's, which deflates
+    the measured ratio; undoing it multiplies by
+    (1-r_t*h2)/(1-r_s*h2) > 1 when r_s > r_t.
+
+    `h_stability_s : r_s * h2 < 1` is load-bearing and is the *source*
+    condition, not the target one.  It is what makes the divisor positive.
+    Dropping it in favour of `r_t * h2 < 1` makes the statement false:
+    at `port_m = 1`, `h2 = 1`, `r_t = 0`, `r_s = 2` the target condition
+    holds, the divisor is `1 - 2 = -1`, and the corrected value is `-1`,
+    which is below `port_m` rather than above it.
+
+    The target condition is *derivable* here (`r_t * h2 < r_s * h2 < 1`), so
+    it is not restated.
+
+    Which of the two is load-bearing depends on the direction of the
+    correction: before `amCorrectedPortability` was inverted the divisor was
+    `1 - r_t * h2` and the target condition was the necessary one.  An
+    unused-premise scan that dropped the source condition was correct against
+    that earlier statement and became wrong when the divisor moved.  Such a
+    scan is only valid against the statement it was computed on. -/
 theorem am_correction_increases_portability
     (port_m r_s r_t h2 : ℝ)
-    (h_port : 0 < port_m) (h_rs : 0 < r_s) (h_rt : 0 ≤ r_t)
-    (h_h2 : 0 < h2) (h_h2_le : h2 < 1) (h_rs_le : r_s < 1)
+    (h_port : 0 < port_m)
+    (h_h2 : 0 < h2)
     (h_more_am : r_t < r_s)
-    (h_product_s : r_s * h2 < 1) (h_product_t : r_t * h2 < 1) :
-    amCorrectedPortability port_m r_s r_t h2 < port_m := by
+    (h_stability_s : r_s * h2 < 1) :
+    port_m < amCorrectedPortability port_m r_s r_t h2 := by
   unfold amCorrectedPortability
-  have h_denom : 0 < 1 - r_t * h2 := by nlinarith [mul_nonneg h_rt (le_of_lt h_h2)]
-  rw [div_lt_iff₀ h_denom]
-  have : (1 - r_s * h2) < (1 - r_t * h2) := by
+  have h_denom : 0 < 1 - r_s * h2 := by linarith
+  rw [lt_div_iff₀ h_denom]
+  have h_gap : (1 - r_s * h2) < (1 - r_t * h2) := by
     nlinarith [mul_pos (by linarith : 0 < r_s - r_t) h_h2]
-  nlinarith [mul_pos h_port h_denom]
+  nlinarith [mul_lt_mul_of_pos_left h_gap h_port]
 
 /-- **AM correction recovers true portability.**
     If the only source of portability loss is differential AM,
     then the corrected portability equals 1 (perfect portability).
-    We show: if port_measured = (1-r_t*h2)/(1-r_s*h2) (the AM artifact),
-    then amCorrectedPortability = 1. -/
+    We show: if port_measured = (1-r_s*h2)/(1-r_t*h2) -- which is exactly
+    `DifferentialAMModel.apparentPortability`, the AM artifact proved `< 1`
+    by `differential_am_misleading` -- then amCorrectedPortability = 1.
+
+    The input was previously written `(1-r_t*h2)/(1-r_s*h2)`, the reciprocal
+    of this file's own `apparentPortability`, and so did not describe the
+    artifact the section is about. -/
 theorem am_correction_recovers_true
     (r_s r_t h2 : ℝ) (h_denom_s : 1 - r_s * h2 ≠ 0) (h_denom_t : 1 - r_t * h2 ≠ 0) :
-    amCorrectedPortability ((1 - r_t * h2) / (1 - r_s * h2)) r_s r_t h2 = 1 := by
+    amCorrectedPortability ((1 - r_s * h2) / (1 - r_t * h2)) r_s r_t h2 = 1 := by
   unfold amCorrectedPortability
   have h_denom_s' : 1 - h2 * r_s ≠ 0 := by simpa [mul_comm] using h_denom_s
-  field_simp [h_denom_s, h_denom_t, h_denom_s']
+  have h_denom_t' : 1 - h2 * r_t ≠ 0 := by simpa [mul_comm] using h_denom_t
+  field_simp [h_denom_s, h_denom_t, h_denom_s', h_denom_t']
+
+/-- **The correction inverts the artifact exactly.**  Feeding
+`DifferentialAMModel.apparentPortability` -- the file's own model of the
+measured ratio under identical architectures -- through the correction
+returns `1`.  This ties the two definitions together, so a future edit that
+inverts one without the other stops being provable. -/
+theorem amCorrectedPortability_apparentPortability (d : DifferentialAMModel) :
+    amCorrectedPortability d.apparentPortability d.r_s d.r_t d.h2 = 1 := by
+  have hs : 1 - d.r_s * d.h2 ≠ 0 := ne_of_gt d.denom_s_pos
+  have ht : 1 - d.r_t * d.h2 ≠ 0 := ne_of_gt d.denom_t_pos
+  have hs' : 1 - d.h2 * d.r_s ≠ 0 := by simpa [mul_comm] using hs
+  have ht' : 1 - d.h2 * d.r_t ≠ 0 := by simpa [mul_comm] using ht
+  simp only [amCorrectedPortability, DifferentialAMModel.apparentPortability]
+  field_simp [hs, ht, hs', ht']
 
 end DifferentialAM
 
@@ -630,11 +684,21 @@ theorem CrossPopAMLD.source_ld_exceeds_target (c : CrossPopAMLD)
 
     Specifically, the AM-LD ratio is:
     (r_t*h2/(1-r_t*h2)) / (r_s*h2/(1-r_s*h2)) = r_t(1-r_s*h2) / (r_s(1-r_t*h2)) < 1
-    when r_t < r_s. -/
+    when r_t < r_s.
+
+    **What the cleared form shows, and it is less than the docstring above.**
+    Expanding both sides, `r_t·(1 - r_s·h2) < r_s·(1 - r_t·h2)` is
+    `r_t - r_s·r_t·h2 < r_s - r_s·r_t·h2`: the assortment term is the *same* on
+    both sides and cancels, leaving `r_t < r_s`. The conclusion is therefore
+    `h_more` written in a heavier notation, and `h2` does not enter at all. A
+    scan of the kernel-accepted proof term confirmed it: the positivity and
+    stability premises `h_rs`, `h_rt`, `h_h2`, `h_stab_s`, `h_stab_t` occur
+    nowhere in the proof and have been removed. Read this as the cancellation
+    identity it is, not as evidence that assortative mating degrades transfer;
+    the substantive claim is upstream, in the *division* by
+    `r_s·h2/(1 - r_s·h2)`, which this statement never performs. -/
 theorem am_ld_breaks_cross_population
     (r_s r_t h2 : ℝ)
-    (h_rs : 0 < r_s) (h_rt : 0 < r_t) (h_h2 : 0 < h2)
-    (h_stab_s : r_s * h2 < 1) (h_stab_t : r_t * h2 < 1)
     (h_more : r_t < r_s) :
     r_t * (1 - r_s * h2) < r_s * (1 - r_t * h2) := by
   nlinarith
@@ -671,7 +735,23 @@ section PopulationStructure
     increases with geographic distance d_ij:
     Fst(d) ≈ d / (4Nσ² + d) where σ² is dispersal variance.
 
-    Empirical status: UNTESTED. -/
+    **Convention, and it is not the one the corpus's other stepping-stone body uses.**
+    `N` here is a population *density* — individuals per unit of the same length in
+    which `d` and `σ_sq` are measured — not a deme size. This is Rousset's continuous
+    isolation-by-distance law `F / (1 - F) = d / (4·N·σ²)`, rearranged; the migration
+    rate is absent because dispersal enters through `σ_sq` and abundance through the
+    density, not through a per-generation `m`. Read `N` as a deme size instead and the
+    body is a stepping-stone `F_ST` with the migration rate dropped, which is a
+    different and wrong formula: contrast
+    `Calibrator.DemographicHistory.demoSteppingStoneFst = d / (d + 4·Ne·m·σ_sq)`, whose
+    `Ne` *is* a deme size and which therefore must and does carry `m`. Dimensional
+    analysis is what separates the two readings — under the deme-size reading `4·N·σ_sq`
+    carries a spurious factor of generations and cannot be added to `d` — and nothing in
+    the body itself does, which is why the convention is stated here.
+
+    Empirical status: UNTESTED. The dimensional check above is a consistency argument,
+    not a measurement: it rules out the deme-size reading and says nothing about whether
+    the density reading holds in any simulated or real population. -/
 noncomputable def ibdFst (d N sigma_sq : ℝ) : ℝ :=
   d / (4 * N * sigma_sq + d)
 
