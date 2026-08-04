@@ -72,6 +72,10 @@ can capture the nonlinear portability decay.
 
 section SplineCalibration
 
+/-- Fourth-order approximation scale for a cubic spline with knot spacing `h`. -/
+noncomputable def cubicSplineApproximationScale (h : ℝ) : ℝ :=
+  h ^ 4
+
 /-- **Fourth powers are strictly monotone on the positives:**
     `0 < h₂ < h₁` gives `h₂⁴ < h₁⁴`.
 
@@ -80,14 +84,19 @@ section SplineCalibration
     The `O(h⁴)` rate is the content of that reading and is stipulated in prose:
     there is no spline, no knot, no function being approximated and no error
     below, only two positive reals and an exponent. -/
-theorem pow_four_lt_pow_four_of_lt
+theorem cubicSplineApproximationScale_strictMono
     (h₁ h₂ : ℝ) (h_finer : h₂ < h₁) (h_pos : 0 < h₂) :
-    h₂ ^ 4 < h₁ ^ 4 := by
+    cubicSplineApproximationScale h₂ < cubicSplineApproximationScale h₁ := by
+  unfold cubicSplineApproximationScale
   apply pow_lt_pow_left₀ h_finer (le_of_lt h_pos)
   norm_num
 
-/-- **A rearrangement: `var₂ - var₁ > bias₁² - bias₂²` gives
-    `bias₁² + var₁ < bias₂² + var₂`.**
+/-- Bias--variance mean squared error of a spline calibration fit. -/
+noncomputable def splineCalibrationMSE (bias variance : ℝ) : ℝ :=
+  bias ^ 2 + variance
+
+/-- **Exact spline bias--variance comparison.** One calibration fit has lower MSE exactly when
+its variance disadvantage is smaller than its squared-bias advantage.
 
     The genetics reading is the bias-variance tradeoff for spline knot count:
     more knots lower the bias and raise the variance, and the sum is what
@@ -97,10 +106,16 @@ theorem pow_four_lt_pow_four_of_lt
 
     The hypothesis is the whole of what the proof uses, so the gap between this and the
     bias-variance tradeoff is visible in the statement rather than described beside it. -/
-theorem sum_lt_sum_of_gap_dominates
-    (bias₁ bias₂ var₁ var₂ : ℝ)
-    (h_var_dominates : var₂ - var₁ > bias₁ ^ 2 - bias₂ ^ 2) :
-    bias₁ ^ 2 + var₁ < bias₂ ^ 2 + var₂ := by linarith
+theorem splineCalibrationMSE_lt_iff
+    (bias₁ bias₂ var₁ var₂ : ℝ) :
+    splineCalibrationMSE bias₁ var₁ < splineCalibrationMSE bias₂ var₂ ↔
+      bias₁ ^ 2 - bias₂ ^ 2 < var₂ - var₁ := by
+  unfold splineCalibrationMSE
+  constructor <;> intro h <;> linarith
+
+/-- Fraction of total variance carried by a signal component. -/
+noncomputable def explainedVarianceFraction (varSignal varNoise : ℝ) : ℝ :=
+  varSignal / (varSignal + varNoise)
 
 /-- **A nonnegative part of a positive total is at most the whole of it:**
     `var_signal / var_total ≤ 1` when `var_total = var_signal + var_noise` with
@@ -111,13 +126,14 @@ theorem sum_lt_sum_of_gap_dominates
     variance, no spline and no `R²` occurs below, and the two are not the same
     inequality. A measured `R²` for a fitted model is likewise not an instance
     of this statement, which has no numerals in it. -/
-theorem part_div_total_le_one
-    (var_signal var_noise var_total : ℝ)
-    (h_total : var_total = var_signal + var_noise)
-    (h_total_pos : 0 < var_total)
+theorem explainedVarianceFraction_le_one
+    (var_signal var_noise : ℝ)
+    (h_total_pos : 0 < var_signal + var_noise)
     (h_noise_nn : 0 ≤ var_noise) :
-    var_signal / var_total ≤ 1 := by
-  rw [div_le_one h_total_pos, h_total]; linarith
+    explainedVarianceFraction var_signal var_noise ≤ 1 := by
+  unfold explainedVarianceFraction
+  rw [div_le_one h_total_pos]
+  linarith
 
 end SplineCalibration
 
