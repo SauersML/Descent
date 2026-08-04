@@ -712,26 +712,39 @@ theorem adaptation_shift_recoverable
   rw [this]
   ring_nf
 
-/-- **QST-FST comparison detects polygenic adaptation.**
+/- **QST-FST comparison detects polygenic adaptation.**
     Q_ST = Var(between-pop trait means) / Var(total).
     Under neutrality, Q_ST ≈ F_ST.
     Q_ST >> F_ST indicates directional selection.
     Q_ST << F_ST indicates stabilizing selection. -/
+/-- **The directional QST/FST diagnostic is exact.** For positive `F_ST`, the ratio exceeds
+one if and only if `Q_ST` exceeds `F_ST`; no positivity assumption on `Q_ST` is needed. -/
+theorem one_lt_qst_div_fst_iff (qst fst : ℝ) (h_fst : 0 < fst) :
+    1 < qst / fst ↔ fst < qst := by
+  rw [lt_div_iff₀ h_fst]
+  simp
+
+/-- **The stabilizing QST/FST diagnostic is exact.** For positive `F_ST`, the ratio is below
+one if and only if `Q_ST` is below `F_ST`. -/
+theorem qst_div_fst_lt_one_iff (qst fst : ℝ) (h_fst : 0 < fst) :
+    qst / fst < 1 ↔ qst < fst := by
+  exact div_lt_one h_fst
+
 theorem qst_fst_comparison_directional
     (qst fst : ℝ)
     (h_fst : 0 < fst)
     (h_directional : fst < qst) :
     -- Q_ST / F_ST > 1 indicates directional selection
-    1 < qst / fst := by
-  rw [lt_div_iff₀ h_fst]; linarith
+    1 < qst / fst :=
+  (one_lt_qst_div_fst_iff qst fst h_fst).2 h_directional
 
 theorem qst_fst_comparison_stabilizing
     (qst fst : ℝ)
     (h_fst : 0 < fst)
     (h_stabilizing : qst < fst) :
     -- Q_ST / F_ST < 1 indicates stabilizing selection
-    qst / fst < 1 := by
-  rw [div_lt_one h_fst]; exact h_stabilizing
+    qst / fst < 1 :=
+  (qst_div_fst_lt_one_iff qst fst h_fst).2 h_stabilizing
 
 end PolygenicAdaptation
 
