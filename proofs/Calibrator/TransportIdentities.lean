@@ -732,8 +732,27 @@ theorem normalized_transport_as_weighted_average
 def baselineWeight (aT : L → ℝ) (l : L) : ℝ :=
   aT l / (∑ m, aT m)
 
+/-- **baselineWeight at a baseline of total mass zero, named.** Normalising by a total that
+vanishes leaves every weight undefined. Lean returns `0`, so an unnormalisable baseline is
+reported as a valid weighting that happens to put no mass anywhere -- and a downstream sum over
+these weights gives zero rather than one, without ever failing. Consumers must exclude it by
+hypothesis. -/
+theorem baselineWeight_zero_total_is_junk {L : Type*} [Fintype L] (l : L) :
+    baselineWeight (fun _ ↦ (0 : ℝ)) l = 0 := by
+  unfold baselineWeight
+  simp
+
 def transportFactor (aQ aT : L → ℝ) (l : L) : ℝ :=
   aQ l / aT l
+
+/-- **transportFactor at a target with no mass, named.** The importance weight divides by the
+target density, which is zero exactly where the target puts no mass. Lean returns `0`: the source
+is reported as contributing nothing there, when in fact the ratio is unbounded and the region is
+precisely where importance weighting fails. Consumers must exclude it by hypothesis. -/
+theorem transportFactor_zero_target_is_junk {L : Type*} (aQ : L → ℝ) (l : L) :
+    transportFactor aQ (fun _ ↦ 0) l = 0 := by
+  unfold transportFactor
+  simp
 
 theorem normalized_transport_from_factors
     (aQ aT : L → ℝ)

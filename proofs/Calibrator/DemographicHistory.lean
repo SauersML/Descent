@@ -780,6 +780,16 @@ section VariableNeFst
 noncomputable def cumulativeDrift {T : ℕ} (Ne : Fin T → ℝ) : ℝ :=
   ∑ i, 1 / (2 * Ne i)
 
+/-- **cumulativeDrift at every epoch at zero effective size, named.** Each term divides by `2 *
+Ne i`, so an epoch of zero effective size contributes junk-zero rather than diverging. A history
+of nothing but total bottlenecks accumulates NO drift at all -- and because the terms are summed,
+one such epoch is silently dropped from an otherwise sound history rather than making the total
+infinite. Consumers must exclude it by hypothesis. -/
+theorem cumulativeDrift_zero_sizes_is_junk {T : ℕ} :
+    cumulativeDrift (fun _ : Fin T ↦ (0 : ℝ)) = 0 := by
+  unfold cumulativeDrift
+  simp
+
 /-- **Within-population heterozygosity loss under variable Nₑ**:
     `1 - exp(-Σ 1/(2·Nₑ(t)))`.
 

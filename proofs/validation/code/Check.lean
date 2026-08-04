@@ -520,7 +520,18 @@ def exempt : List (Name × String) :=
     (`Calibrator.ldPruningDetectionDeficit, "divides by Real.pi * (1 + decay ^ 2) ≥ π"),
     (`Calibrator.ldBandDetectionShare, "divides by Real.pi * (1 + decay ^ 2) ≥ π"),
     (`Calibrator.posteriorPrecision, "1 / prior_var + data_precision; prior_var is a model field"),
-    (`Calibrator.standardNormalPdf, "Real.sqrt (2 * Real.pi) ≠ 0") ]
+    (`Calibrator.standardNormalPdf, "Real.sqrt (2 * Real.pi) ≠ 0"),
+    (`Calibrator.characteristicAmplitude, "Real.sqrt of a sum of squares"),
+    (`Calibrator.outerAtom, "Real.sqrt (1 + w) under the module's own w ≥ 0 convention"),
+    (`Calibrator.conditionalGainFunctional, "branches on the amplitude being zero already"),
+    (`Calibrator.equalVarianceGaussianAUCFromSignalVariance, "branches on vNoise = 0 already"),
+    (`Calibrator.equalVarianceGaussianAUCFromExplainedR2, "branches on 1 ≤ r2 already"),
+    (`Calibrator.fiberConditional, "branches on the fiber being hit already"),
+    (`Calibrator.samplePCOverlapSq, "branches on the BBP threshold already"),
+    (`Calibrator.hasInteraction, "a Prop: the quotient sits under a binder"),
+    (`Calibrator.exitLevels, "a Set: the quotient sits under a binder"),
+    (`Calibrator.hetRecurrence, "proof by induction, not a value"),
+    (`Calibrator.hetMutationDriftRecurrence, "proof by induction, not a value") ]
 
 /-- Is this a numeric literal, or a ratio or negation of them?
 
