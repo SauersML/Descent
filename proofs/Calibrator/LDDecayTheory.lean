@@ -1466,4 +1466,54 @@ theorem ld_recurrence_ratio_eq_decay_factor (r D₀ : ℝ) (t : ℕ) (hD₀ : D�
 
 end LDDecayDerivation
 
+
+/-! ## Second-order statistics cannot separate two marker layouts
+
+`sum_ldScore_isoBlock_eq` elsewhere in the corpus shows the LD score is a spectral
+quantity and therefore blind to a difference that changes achievable accuracy.
+This is the same blindness in its most elementary form, with a finite witness.
+
+The pairwise-distance spectrum of a marker layout -- for each shift `d`, how many
+marker pairs sit `d` apart -- is exactly what a second-order summary of that
+layout sees. Two layouts with the same spectrum are indistinguishable from
+second-order information alone, however much of it is collected.
+
+Such pairs exist and are small. The two six-marker layouts below span the same
+interval, have the same number of markers, and agree at every shift. They are not
+translates of one another and not reflections: reflecting the first about its
+right endpoint gives `{0, 5, 7, 13, 16, 17}`, which is neither.
+
+The consequence for the corpus is the one already recorded spectrally: an LD
+summary built from pairwise correlations alone cannot in principle recover the
+layout, and no amount of data repairs that. Recovering it needs a statistic that
+is not a function of the pairwise spectrum.
+-/
+
+/-- A six-marker layout on a seventeen-unit interval. -/
+def markerLayoutA : Finset ℕ := {0, 1, 4, 10, 12, 17}
+
+/-- A different six-marker layout on the same interval. -/
+def markerLayoutB : Finset ℕ := {0, 1, 8, 11, 13, 17}
+
+/-- How many marker pairs sit exactly `d` apart: the layout's pairwise-distance
+spectrum, and what a second-order summary sees. -/
+def pairSpacingCount (layout : Finset ℕ) (d : ℕ) : ℕ :=
+  (layout.filter (fun a ↦ a + d ∈ layout)).card
+
+/-- **The two layouts are different.** -/
+theorem markerLayout_ne : markerLayoutA ≠ markerLayoutB := by decide
+
+/-- **And their pairwise-distance spectra agree at every shift.** Beyond the span
+both counts are zero, so this covers every shift there is. -/
+theorem pairSpacingCount_eq (d : ℕ) (hd : d ≤ 17) :
+    pairSpacingCount markerLayoutA d = pairSpacingCount markerLayoutB d := by
+  interval_cases d <;> decide
+
+/-- **Nor is one a translate of the other**, so the ambiguity is not the trivial
+one a shift of origin would explain. -/
+theorem markerLayout_not_translate (t : ℕ) (ht : t ≤ 17) :
+    markerLayoutA.image (· + t) ≠ markerLayoutB := by
+  interval_cases t <;> decide
+
+
 end Calibrator
