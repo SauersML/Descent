@@ -1,0 +1,318 @@
+[
+ {
+  "name": "cumulativeDrift [stated reading: 1 - exp(-cumulativeDrift)]",
+  "file": "DemographicHistory.lean",
+  "source": "1 - exp(-sum_i 1/(2*Ne_i))",
+  "note": "",
+  "regime": "heterozygosity loss, the form the file's own note states",
+  "span": 0.9561129490977491,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "bottleneck",
+   "lean": 0.16194090900033853,
+   "truth": 0.16315724004849996,
+   "sem": 0.0024473586007274996,
+   "sems_off": 0.4969974762994964,
+   "rel_err": 0.0074549621444924465
+  },
+  "cells": [
+   {
+    "design": "N=500 x20",
+    "lean": 0.019801326693244747,
+    "truth": 0.019829741018000058,
+    "sem": 0.00029744611527000083,
+    "sems_off": 0.09552763776900505,
+    "rel_err": 0.0014329145665350756
+   },
+   {
+    "design": "N=200 x50",
+    "lean": 0.11750309741540454,
+    "truth": 0.11768562170624997,
+    "sem": 0.0017652843255937494,
+    "sems_off": 0.10339653969568269,
+    "rel_err": 0.0015509480954352401
+   },
+   {
+    "design": "N=50 x60 (deep)",
+    "lean": 0.4511883639059735,
+    "truth": 0.45290789200000003,
+    "sem": 0.006793618380000001,
+    "sems_off": 0.25310931492541894,
+    "rel_err": 0.003796639723881284
+   },
+   {
+    "design": "bottleneck",
+    "lean": 0.16194090900033853,
+    "truth": 0.16315724004849996,
+    "sem": 0.0024473586007274996,
+    "sems_off": 0.4969974762994964,
+    "rel_err": 0.0074549621444924465
+   }
+  ]
+ },
+ {
+  "name": "cumulativeDrift [exact product form]",
+  "file": "DemographicHistory.lean",
+  "source": "1 - prod_i (1 - 1/(2*Ne_i))",
+  "note": "",
+  "regime": "same runs, the exact Wright-Fisher law",
+  "span": 0.9562516820936559,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "N=500 x20",
+   "lean": 0.01981113517046529,
+   "truth": 0.019829741018000058,
+   "sem": 0.00029744611527000083,
+   "sems_off": 0.06255199372121693,
+   "rel_err": 0.0009382799058182538
+  },
+  "cells": [
+   {
+    "design": "N=500 x20",
+    "lean": 0.01981113517046529,
+    "truth": 0.019829741018000058,
+    "sem": 0.00029744611527000083,
+    "sems_off": 0.06255199372121693,
+    "rel_err": 0.0009382799058182538
+   },
+   {
+    "design": "N=200 x50",
+    "lean": 0.11764120699699321,
+    "truth": 0.11768562170624997,
+    "sem": 0.0017652843255937494,
+    "sems_off": 0.025160088158500057,
+    "rel_err": 0.00037740132237750086
+   },
+   {
+    "design": "N=50 x60 (deep)",
+    "lean": 0.4528433576092388,
+    "truth": 0.45290789200000003,
+    "sem": 0.006793618380000001,
+    "sems_off": 0.009499266392596762,
+    "rel_err": 0.00014248899588895143
+   },
+   {
+    "design": "bottleneck",
+    "lean": 0.1631192435026736,
+    "truth": 0.16315724004849996,
+    "sem": 0.0024473586007274996,
+    "sems_off": 0.015525532635500931,
+    "rel_err": 0.000232882989532514
+   }
+  ]
+ },
+ {
+  "name": "cumulativeDrift [raw sum, read as the loss itself]",
+  "file": "DemographicHistory.lean",
+  "source": "sum_i 1/(2*Ne_i)",
+  "note": "",
+  "regime": "the reading battery 1 used; shown for contrast only",
+  "span": 0.9666666666666667,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "N=50 x60 (deep)",
+   "lean": 0.6,
+   "truth": 0.45290789200000003,
+   "sem": 0.006793618380000001,
+   "sems_off": 21.65151172356548,
+   "rel_err": 0.32477267585348224
+  },
+  "cells": [
+   {
+    "design": "N=500 x20",
+    "lean": 0.02,
+    "truth": 0.019829741018000058,
+    "sem": 0.00029744611527000083,
+    "sems_off": 0.572402775693989,
+    "rel_err": 0.008586041635409835
+   },
+   {
+    "design": "N=200 x50",
+    "lean": 0.125,
+    "truth": 0.11768562170624997,
+    "sem": 0.0017652843255937494,
+    "sems_off": 4.143456205724741,
+    "rel_err": 0.06215184308587111
+   },
+   {
+    "design": "N=50 x60 (deep)",
+    "lean": 0.6,
+    "truth": 0.45290789200000003,
+    "sem": 0.006793618380000001,
+    "sems_off": 21.65151172356548,
+    "rel_err": 0.32477267585348224
+   },
+   {
+    "design": "bottleneck",
+    "lean": 0.17666666666666667,
+    "truth": 0.16315724004849996,
+    "sem": 0.0024473586007274996,
+    "sems_off": 5.520002918309929,
+    "rel_err": 0.08280004377464895
+   }
+  ]
+ },
+ {
+  "name": "Var_Delta_Mu [stated ONE-BRANCH regime]",
+  "file": "PortabilityDrift.lean",
+  "source": "2 * fst * V_A, fst = one-branch drift index",
+  "note": "",
+  "regime": "one deme drifts, the other held at ancestral frequencies",
+  "span": 0.9075321568781791,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "t=60 (F_branch=0.139)",
+   "lean": 59.92256929680921,
+   "truth": 58.3738532036891,
+   "sem": 1.3054422291991195,
+   "sems_off": 1.18635360376708,
+   "rel_err": 0.026530989614751532
+  },
+  "cells": [
+   {
+    "design": "t=20 (F_branch=0.049)",
+    "lean": 20.98207046663629,
+    "truth": 20.47171090475639,
+    "sem": 0.45781860289010634,
+    "sems_off": 1.114763704790754,
+    "rel_err": 0.024929990671240146
+   },
+   {
+    "design": "t=60 (F_branch=0.139)",
+    "lean": 59.92256929680921,
+    "truth": 58.3738532036891,
+    "sem": 1.3054422291991195,
+    "sems_off": 1.18635360376708,
+    "rel_err": 0.026530989614751532
+   },
+   {
+    "design": "t=150 (F_branch=0.313)",
+    "lean": 134.50892963496744,
+    "truth": 133.13871878863432,
+    "sem": 2.9774444603078796,
+    "sems_off": 0.46019694560194674,
+    "rel_err": 0.010291603064833564
+   },
+   {
+    "design": "t=300 (F_branch=0.528)",
+    "lean": 226.91207838592777,
+    "truth": 228.41844508308662,
+    "sem": 5.10823027390312,
+    "sems_off": 0.29489013149124577,
+    "rel_err": 0.006594768196635417
+   }
+  ]
+ },
+ {
+  "name": "fstMigrationMutationEquilibrium (deme-count)",
+  "file": "PopulationGeneticsFoundations.lean",
+  "source": "1 / (1 + 4*Ne*m + 4*Ne*mu)",
+  "verdict": "REGIME-LIMITED",
+  "rows": [
+   [
+    2,
+    0.0931433343809771,
+    0.2,
+    0.058823529411764705,
+    0.013111807250147474
+   ],
+   [
+    4,
+    0.1646902558503213,
+    0.2,
+    0.12328767123287672,
+    0.026997068341872484
+   ],
+   [
+    8,
+    0.15502474288333432,
+    0.2,
+    0.16065573770491803,
+    0.019873478195503804
+   ],
+   [
+    20,
+    0.14347458768538604,
+    0.2,
+    0.184089750127486,
+    0.01971028491012089
+   ]
+  ],
+  "note": "matches as n grows; the missing factor is (n/(n-1))^2",
+  "worst": {
+   "sems_off": NaN,
+   "rel_err": NaN
+  }
+ },
+ {
+  "name": "steppingStoneFstQuadratic (slope, tight)",
+  "file": "DemographicHistory.lean",
+  "source": "d / (d + 4*Ne*sigma_sq^2*m^2)",
+  "verdict": "FALSIFIED",
+  "slope": 0.9586569878893142,
+  "se_slope": 0.010279388099907378,
+  "rows": [
+   [
+    0.005,
+    0.21051060632990465,
+    0.0038289610502099673,
+    11.251063413396414
+   ],
+   [
+    0.01,
+    0.12633915374188537,
+    0.0030143938353543575,
+    20.745607843227198
+   ],
+   [
+    0.02,
+    0.06688534006177474,
+    0.0020219051319114497,
+    41.85287803320168
+   ],
+   [
+    0.04,
+    0.03552404357687236,
+    0.001207468096170895,
+    81.44984573639938
+   ],
+   [
+    0.08,
+    0.018697776811788528,
+    0.0007839813678792236,
+    157.4468825464088
+   ]
+  ],
+  "worst": {
+   "sems_off": 101.30398832981787,
+   "rel_err": NaN
+  }
+ },
+ {
+  "name": "freqCorrFromFst (degenerate ancestral case)",
+  "file": "PortabilityDrift.lean",
+  "source": "1 - fst",
+  "verdict": "FALSIFIED",
+  "rows": [
+   [
+    "all p0 = 0.5",
+    0.07491349693977979,
+    0.9250865030602202,
+    0.0004081739768222979,
+    0.0008276628386705733
+   ],
+   [
+    "uniform(0.05,0.95)",
+    0.07497324927621295,
+    0.925026750723787,
+    0.7209321704717232,
+    0.00031277042874842124
+   ]
+  ],
+  "note": "at identical F_ST the correlation is 0.00 or 0.73 depending only on the ancestral spread",
+  "worst": {
+   "sems_off": NaN,
+   "rel_err": NaN
+  }
+ }
+]

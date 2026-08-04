@@ -1,0 +1,502 @@
+[
+ {
+  "name": "Var_Delta_Mu",
+  "file": "PortabilityDrift.lean",
+  "source": "2 * fst * V_A",
+  "note": "",
+  "regime": "variance of the mean-PGS difference across replicate deme pairs, neutral drift, F_ST measured on the same run",
+  "span": 0.9165207182013917,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "t=60 (Fst=0.075)",
+   "lean": 22.281999860325566,
+   "truth": 87.4055356526326,
+   "sem": 3.192663300380718,
+   "sems_off": 20.397871515152,
+   "rel_err": 0.7450733561215301
+  },
+  "cells": [
+   {
+    "design": "t=20 (Fst=0.025)",
+    "lean": 8.111818316814716,
+    "truth": 31.675100334027984,
+    "sem": 1.1569968608650965,
+    "sems_off": 20.365899696214214,
+    "rel_err": 0.7439055210158139
+   },
+   {
+    "design": "t=60 (Fst=0.075)",
+    "lean": 22.281999860325566,
+    "truth": 87.4055356526326,
+    "sem": 3.192663300380718,
+    "sems_off": 20.397871515152,
+    "rel_err": 0.7450733561215301
+   },
+   {
+    "design": "t=150 (Fst=0.186)",
+    "lean": 54.34269285741833,
+    "truth": 182.92650853798526,
+    "sem": 6.681759297226105,
+    "sems_off": 19.24400595123919,
+    "rel_err": 0.7029260915121338
+   },
+   {
+    "design": "t=300 (Fst=0.359)",
+    "lean": 97.17163518948671,
+    "truth": 298.09076663078156,
+    "sem": 10.888365864911725,
+    "sems_off": 18.452643301486248,
+    "rel_err": 0.6740199762381619
+   }
+  ]
+ },
+ {
+  "name": "freqCorrFromFst",
+  "file": "PortabilityDrift.lean",
+  "source": "1 - fst",
+  "note": "",
+  "regime": "Pearson correlation of allele frequencies across loci between two drifted demes",
+  "span": 0.3426277057791558,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "t=20 (Fst=0.025)",
+   "lean": 0.9749990677262407,
+   "truth": 0.8847141652706407,
+   "sem": 0.00038410189866385744,
+   "sems_off": 235.05455914085908,
+   "rel_err": 0.10204979868043722
+  },
+  "cells": [
+   {
+    "design": "t=20 (Fst=0.025)",
+    "lean": 0.9749990677262407,
+    "truth": 0.8847141652706407,
+    "sem": 0.00038410189866385744,
+    "sems_off": 235.05455914085908,
+    "rel_err": 0.10204979868043722
+   },
+   {
+    "design": "t=60 (Fst=0.075)",
+    "lean": 0.9250043855407265,
+    "truth": 0.7373073409681891,
+    "sem": 0.0008067697430871085,
+    "sems_off": 232.65255815657358,
+    "rel_err": 0.2545709694495441
+   },
+   {
+    "design": "t=150 (Fst=0.186)",
+    "lean": 0.814005532233213,
+    "truth": 0.5321513688955135,
+    "sem": 0.0012671617279991873,
+    "sems_off": 222.42951085868046,
+    "rel_err": 0.5296503585487174
+   },
+   {
+    "design": "t=300 (Fst=0.359)",
+    "lean": 0.6409373740143831,
+    "truth": 0.3990876681678692,
+    "sem": 0.001486213001142421,
+    "sems_off": 162.72883204534548,
+    "rel_err": 0.6060064620808681
+   }
+  ]
+ },
+ {
+  "name": "pgsVarianceFromHet",
+  "file": "PortabilityDrift.lean",
+  "source": "beta_sq_sum * het",
+  "note": "",
+  "regime": "PGS variance over individuals, HWE, linkage equilibrium",
+  "span": 0.629112574595642,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "p=0.1 (het=0.18)",
+   "lean": 49.770008370072624,
+   "truth": 49.52702035259174,
+   "sem": 0.35020891943281773,
+   "sems_off": 0.6938373182339707,
+   "rel_err": 0.004906170727635292
+  },
+  "cells": [
+   {
+    "design": "p=0.1 (het=0.18)",
+    "lean": 49.770008370072624,
+    "truth": 49.52702035259174,
+    "sem": 0.35020891943281773,
+    "sems_off": 0.6938373182339707,
+    "rel_err": 0.004906170727635292
+   },
+   {
+    "design": "p=0.3 (het=0.42)",
+    "lean": 112.94563224166332,
+    "truth": 113.33862952709286,
+    "sem": 0.8014251350899723,
+    "sems_off": 0.4903730469913753,
+    "rel_err": 0.00346746106838711
+   },
+   {
+    "design": "p=0.5 (het=0.50)",
+    "lean": 134.19168448704113,
+    "truth": 134.30490580523238,
+    "sem": 0.9496790964150033,
+    "sems_off": 0.11922060685410046,
+    "rel_err": 0.0008430169956370982
+   }
+  ]
+ },
+ {
+  "name": "wrightFisherDriftRetention",
+  "file": "PortabilityDrift.lean",
+  "source": "(1 - 1/(2*N))^t",
+  "note": "",
+  "regime": "H_t / H_0 under neutral WF drift",
+  "span": 0.5528823494362773,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "N=100 t=200",
+   "lean": 0.36695782172616703,
+   "truth": 0.36737941958333337,
+   "sem": 0.002939035356666667,
+   "sems_off": 0.14344769831026893,
+   "rel_err": 0.0011475815864821514
+  },
+  "cells": [
+   {
+    "design": "N=100 t=50",
+    "lean": 0.7783125570686419,
+    "truth": 0.7787027145833333,
+    "sem": 0.006229621716666666,
+    "sems_off": 0.06262940711914806,
+    "rel_err": 0.0005010352569531845
+   },
+   {
+    "design": "N=100 t=200",
+    "lean": 0.36695782172616703,
+    "truth": 0.36737941958333337,
+    "sem": 0.002939035356666667,
+    "sems_off": 0.14344769831026893,
+    "rel_err": 0.0011475815864821514
+   },
+   {
+    "design": "N=500 t=200",
+    "lean": 0.8186488294786356,
+    "truth": 0.8190531059333334,
+    "sem": 0.006552424847466667,
+    "sems_off": 0.06169875490507367,
+    "rel_err": 0.0004935900392405894
+   },
+   {
+    "design": "N=50 t=100",
+    "lean": 0.3660323412732292,
+    "truth": 0.36599892833333336,
+    "sem": 0.002927991426666667,
+    "sems_off": 0.011411556602089094,
+    "rel_err": 9.129245281671275e-05
+   }
+  ]
+ },
+ {
+  "name": "pairwiseFstFromBranchTaus",
+  "file": "PortabilityDrift.lean",
+  "source": "fstFromTau(tauS + tauT) = (tauS+tauT)/(1+tauS+tauT)",
+  "note": "",
+  "regime": "clean split with UNEQUAL daughter sizes, Hudson F_ST",
+  "span": 0.15909090909090898,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "NeA=300 NeB=3000 t=800",
+   "lean": 0.5945945945945945,
+   "truth": 0.3770438503798691,
+   "sem": 0.02487464826206451,
+   "sems_off": 8.745882230081811,
+   "rel_err": 0.5769905648787125
+  },
+  "cells": [
+   {
+    "design": "NeA=1000 NeB=1000 t=1000",
+    "lean": 0.5,
+    "truth": 0.36958808091609846,
+    "sem": 0.02778264268916437,
+    "sems_off": 4.6940069936098645,
+    "rel_err": 0.35285748057851146
+   },
+   {
+    "design": "NeA=500 NeB=2000 t=1000",
+    "lean": 0.5555555555555556,
+    "truth": 0.3625429411099656,
+    "sem": 0.023534224038984235,
+    "sems_off": 8.201358758456038,
+    "rel_err": 0.532385526124603
+   },
+   {
+    "design": "NeA=300 NeB=3000 t=800",
+    "lean": 0.5945945945945945,
+    "truth": 0.3770438503798691,
+    "sem": 0.02487464826206451,
+    "sems_off": 8.745882230081811,
+    "rel_err": 0.5769905648787125
+   }
+  ]
+ },
+ {
+  "name": "hetMutationFloor",
+  "file": "PortabilityDrift.lean",
+  "source": "4*Ne*mu / (1 + 4*Ne*mu)",
+  "note": "",
+  "regime": "infinite-alleles equilibrium heterozygosity, coalescent",
+  "span": 0.9294871794871795,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "theta=4*Ne*mu=0.0",
+   "lean": 0.038461538461538464,
+   "truth": 0.18990901162416238,
+   "sem": 0.013029796452813531,
+   "sems_off": 11.623164929020957,
+   "rel_err": 0.7974738632326969
+  },
+  "cells": [
+   {
+    "design": "theta=4*Ne*mu=0.0",
+    "lean": 0.038461538461538464,
+    "truth": 0.18990901162416238,
+    "sem": 0.013029796452813531,
+    "sems_off": 11.623164929020957,
+    "rel_err": 0.7974738632326969
+   },
+   {
+    "design": "theta=4*Ne*mu=0.1",
+    "lean": 0.10714285714285714,
+    "truth": 0.21653223277547187,
+    "sem": 0.01360336244755429,
+    "sems_off": 8.041348310342311,
+    "rel_err": 0.5051874920905819
+   },
+   {
+    "design": "theta=4*Ne*mu=0.4",
+    "lean": 0.28571428571428575,
+    "truth": 0.31870558813620037,
+    "sem": 0.0175394884971123,
+    "sems_off": 1.8809728931004057,
+    "rel_err": 0.10351654834434727
+   },
+   {
+    "design": "theta=4*Ne*mu=1.2",
+    "lean": 0.5454545454545454,
+    "truth": 0.5496130977642107,
+    "sem": 0.023332326490949386,
+    "sems_off": 0.1782313611665958,
+    "rel_err": 0.007566326797127003
+   }
+  ]
+ },
+ {
+  "name": "liabilityCaseMean / liabilityControlMean [K=0.01]",
+  "file": "PortabilityDrift.lean",
+  "source": "phi(T)/K  and  -caseMean*K/(1-K),  T = Phi^-1(1-K)",
+  "note": "",
+  "regime": "standard normal liability, threshold ascertainment",
+  "span": 1.0101010101010102,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "K=0.01 controlMean",
+   "lean": -0.026921355761068768,
+   "truth": -0.027957288833399017,
+   "sem": 0.00048634941111465324,
+   "sems_off": 2.130018148795569,
+   "rel_err": 0.0370541320549179
+  },
+  "cells": [
+   {
+    "design": "K=0.01 caseMean",
+    "lean": 2.665214220345808,
+    "truth": 2.6646470652969905,
+    "sem": 0.001562271899065936,
+    "sems_off": 0.36303222835707555,
+    "rel_err": 0.00021284434107761817
+   },
+   {
+    "design": "K=0.01 controlMean",
+    "lean": -0.026921355761068768,
+    "truth": -0.027957288833399017,
+    "sem": 0.00048634941111465324,
+    "sems_off": 2.130018148795569,
+    "rel_err": 0.0370541320549179
+   }
+  ]
+ },
+ {
+  "name": "liabilityCaseMean / liabilityControlMean [K=0.05]",
+  "file": "PortabilityDrift.lean",
+  "source": "phi(T)/K  and  -caseMean*K/(1-K),  T = Phi^-1(1-K)",
+  "note": "",
+  "regime": "standard normal liability, threshold ascertainment",
+  "span": 1.0526315789473684,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "K=0.05 caseMean",
+   "lean": 2.0627128075074275,
+   "truth": 2.064466596388639,
+   "sem": 0.0008355146740203303,
+   "sems_off": 2.099052159996756,
+   "rel_err": 0.0008495118711434974
+  },
+  "cells": [
+   {
+    "design": "K=0.05 caseMean",
+    "lean": 2.0627128075074275,
+    "truth": 2.064466596388639,
+    "sem": 0.0008355146740203303,
+    "sems_off": 2.099052159996756,
+    "rel_err": 0.0008495118711434974
+   },
+   {
+    "design": "K=0.05 controlMean",
+    "lean": -0.10856383197407514,
+    "truth": -0.10774504211988396,
+    "sem": 0.0004614100821133436,
+    "sems_off": 1.7745382815238178,
+    "rel_err": 0.007599327431513173
+   }
+  ]
+ },
+ {
+  "name": "liabilityCaseMean / liabilityControlMean [K=0.20]",
+  "file": "PortabilityDrift.lean",
+  "source": "phi(T)/K  and  -caseMean*K/(1-K),  T = Phi^-1(1-K)",
+  "note": "",
+  "regime": "standard normal liability, threshold ascertainment",
+  "span": 1.25,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "K=0.20 controlMean",
+   "lean": -0.3499524005097604,
+   "truth": -0.3491807520464139,
+   "sem": 0.00042661783977823503,
+   "sems_off": 1.8087580766608475,
+   "rel_err": 0.0022098825860937393
+  },
+  "cells": [
+   {
+    "design": "K=0.20 caseMean",
+    "lean": 1.3998096020390416,
+    "truth": 1.3993676439142027,
+    "sem": 0.0005227911066452126,
+    "sems_off": 0.8453818728382996,
+    "rel_err": 0.00031582702855893253
+   },
+   {
+    "design": "K=0.20 controlMean",
+    "lean": -0.3499524005097604,
+    "truth": -0.3491807520464139,
+    "sem": 0.00042661783977823503,
+    "sems_off": 1.8087580766608475,
+    "rel_err": 0.0022098825860937393
+   }
+  ]
+ },
+ {
+  "name": "liabilityCaseVariance [K=0.05 r2=0.3]",
+  "file": "PortabilityDrift.lean",
+  "source": "1 - r2 * caseMean * (caseMean - T)",
+  "note": "",
+  "regime": "two candidate readings of the variance; at most one can be the quantity the name denotes",
+  "span": 0.0,
+  "verdict": "NO POWER",
+  "worst": {
+   "design": "K=0.05 r2=0.3 | var(liability|case)",
+   "lean": 0.7414229549598017,
+   "truth": 0.13822209143812175,
+   "sem": 0.0004367157634743198,
+   "sems_off": 1381.2207251757468,
+   "rel_err": 4.363997514765694
+  },
+  "cells": [
+   {
+    "design": "K=0.05 r2=0.3 | var(liability|case)",
+    "lean": 0.7414229549598017,
+    "truth": 0.13822209143812175,
+    "sem": 0.0004367157634743198,
+    "sems_off": 1381.2207251757468,
+    "rel_err": 4.363997514765694
+   },
+   {
+    "design": "K=0.05 r2=0.3 | var(PGS|case)/r2",
+    "lean": 0.7414229549598017,
+    "truth": 0.7413706239447941,
+    "sem": 0.0023423769289327083,
+    "sems_off": 0.022340988062673442,
+    "rel_err": 7.058684727635516e-05
+   }
+  ]
+ },
+ {
+  "name": "liabilityCaseVariance [K=0.20 r2=0.3]",
+  "file": "PortabilityDrift.lean",
+  "source": "1 - r2 * caseMean * (caseMean - T)",
+  "note": "",
+  "regime": "two candidate readings of the variance; at most one can be the quantity the name denotes",
+  "span": 0.0,
+  "verdict": "NO POWER",
+  "worst": {
+   "design": "K=0.20 r2=0.3 | var(liability|case)",
+   "lean": 0.7655927686223826,
+   "truth": 0.21847411573892095,
+   "sem": 0.0003455147933591121,
+   "sems_off": 1583.4883582388666,
+   "rel_err": 2.5042721927629845
+  },
+  "cells": [
+   {
+    "design": "K=0.20 r2=0.3 | var(liability|case)",
+    "lean": 0.7655927686223826,
+    "truth": 0.21847411573892095,
+    "sem": 0.0003455147933591121,
+    "sems_off": 1583.4883582388666,
+    "rel_err": 2.5042721927629845
+   },
+   {
+    "design": "K=0.20 r2=0.3 | var(PGS|case)/r2",
+    "lean": 0.7655927686223826,
+    "truth": 0.7641921475395618,
+    "sem": 0.001208562813268544,
+    "sems_off": 1.1589145946273436,
+    "rel_err": 0.0018328127125230467
+   }
+  ]
+ },
+ {
+  "name": "liabilityCaseVariance [K=0.05 r2=0.6]",
+  "file": "PortabilityDrift.lean",
+  "source": "1 - r2 * caseMean * (caseMean - T)",
+  "note": "",
+  "regime": "two candidate readings of the variance; at most one can be the quantity the name denotes",
+  "span": 0.0,
+  "verdict": "NO POWER",
+  "worst": {
+   "design": "K=0.05 r2=0.6 | var(liability|case)",
+   "lean": 0.4828459099196034,
+   "truth": 0.13744821323106776,
+   "sem": 0.00043373843573094853,
+   "sems_off": 796.3271599540435,
+   "rel_err": 2.512929695985779
+  },
+  "cells": [
+   {
+    "design": "K=0.05 r2=0.6 | var(liability|case)",
+    "lean": 0.4828459099196034,
+    "truth": 0.13744821323106776,
+    "sem": 0.00043373843573094853,
+    "sems_off": 796.3271599540435,
+    "rel_err": 2.512929695985779
+   },
+   {
+    "design": "K=0.05 r2=0.6 | var(PGS|case)/r2",
+    "lean": 0.4828459099196034,
+    "truth": 0.4825165891257998,
+    "sem": 0.001522653410050672,
+    "sems_off": 0.2162808631497045,
+    "rel_err": 0.0006825066769211971
+   }
+  ]
+ }
+]

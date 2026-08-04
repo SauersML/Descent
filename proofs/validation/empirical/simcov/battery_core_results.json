@@ -1,0 +1,590 @@
+[
+ {
+  "name": "coalFst",
+  "file": "PopulationGeneticsFoundations.lean",
+  "source": "t / (t + 2 * Ne)",
+  "note": "",
+  "regime": "clean split, no migration, Hudson estimator",
+  "span": 0.8636363636363635,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "t=200 Ne=1000",
+   "lean": 0.09090909090909091,
+   "truth": 0.06794286527888754,
+   "sem": 0.01223545081071803,
+   "sems_off": 1.8770232487131064,
+   "rel_err": 0.3380226243908476
+  },
+  "cells": [
+   {
+    "design": "t=200 Ne=1000",
+    "lean": 0.09090909090909091,
+    "truth": 0.06794286527888754,
+    "sem": 0.01223545081071803,
+    "sems_off": 1.8770232487131064,
+    "rel_err": 0.3380226243908476
+   },
+   {
+    "design": "t=500 Ne=1000",
+    "lean": 0.2,
+    "truth": 0.1672846863436772,
+    "sem": 0.017756920514746165,
+    "sems_off": 1.8423979331976226,
+    "rel_err": 0.19556669753447115
+   },
+   {
+    "design": "t=1000 Ne=1000",
+    "lean": 0.3333333333333333,
+    "truth": 0.3100736199573153,
+    "sem": 0.035747747637429654,
+    "sems_off": 0.6506623469520061,
+    "rel_err": 0.07501351898049224
+   },
+   {
+    "design": "t=2000 Ne=1000",
+    "lean": 0.5,
+    "truth": 0.4636551599211534,
+    "sem": 0.034236928745011795,
+    "sems_off": 1.061568353561559,
+    "rel_err": 0.07838765362824213
+   },
+   {
+    "design": "t=4000 Ne=1000",
+    "lean": 0.6666666666666666,
+    "truth": 0.6705666234373403,
+    "sem": 0.02840757363088872,
+    "sems_off": 0.1372858105147386,
+    "rel_err": 0.005815912445332283
+   }
+  ]
+ },
+ {
+  "name": "neiGst (per-site vs ratio-of-averages)",
+  "file": "Conventions.lean",
+  "source": "1 - (p1(1-p1)+p2(1-p2)) / (ploidy * pbar * (1-pbar))",
+  "note": "tests whether the per-site formula composes to the ratio-of-averages F_ST it is used as",
+  "regime": "",
+  "span": 0.9551589040859703,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "neiGst, p wide",
+   "lean": 0.15017681434060948,
+   "truth": 0.15688388386244714,
+   "sem": 0.0015688388386244714,
+   "sems_off": 4.275180698431905,
+   "rel_err": 0.042751806984319046
+  },
+  "cells": [
+   {
+    "design": "neiGst, p near 1/2",
+    "lean": 0.006734092935910718,
+    "truth": 0.00672803509703825,
+    "sem": 6.72803509703825e-05,
+    "sems_off": 0.09003875254953746,
+    "rel_err": 0.0009003875254953745
+   },
+   {
+    "design": "neiGst, p wide",
+    "lean": 0.15017681434060948,
+    "truth": 0.15688388386244714,
+    "sem": 0.0015688388386244714,
+    "sems_off": 4.275180698431905,
+    "rel_err": 0.042751806984319046
+   },
+   {
+    "design": "neiGst, p rare",
+    "lean": 0.016968542142778247,
+    "truth": 0.016312311941737847,
+    "sem": 0.00016312311941737848,
+    "sems_off": 4.022913510875934,
+    "rel_err": 0.04022913510875934
+   }
+  ]
+ },
+ {
+  "name": "fstMigrationMutationEquilibrium [20 demes]",
+  "file": "PopulationGeneticsFoundations.lean",
+  "source": "1 / (1 + 4*Ne*m + 4*Ne*mu)",
+  "note": "",
+  "regime": "symmetric island model, 20 demes",
+  "span": 0.89230494675401,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "20 demes m=3e-03 (4Nm=12.0)",
+   "lean": 0.07692284023741465,
+   "truth": 0.0494892777748732,
+   "sem": 0.011629621019265936,
+   "sems_off": 2.3589386461600332,
+   "rel_err": 0.5543334575892735
+  },
+  "cells": [
+   {
+    "design": "20 demes m=1e-04 (4Nm=0.4)",
+    "lean": 0.7142653067055227,
+    "truth": 0.7071122814501287,
+    "sem": 0.05911039700786605,
+    "sems_off": 0.12101128764948207,
+    "rel_err": 0.010115826641738867
+   },
+   {
+    "design": "20 demes m=3e-04 (4Nm=1.2)",
+    "lean": 0.45453719023290484,
+    "truth": 0.35271877815331487,
+    "sem": 0.04539043542805597,
+    "sems_off": 2.2431688773061578,
+    "rel_err": 0.28866739846590467
+   },
+   {
+    "design": "20 demes m=1e-03 (4Nm=4.0)",
+    "lean": 0.1999984000127999,
+    "truth": 0.1956796609331945,
+    "sem": 0.037999850442129,
+    "sems_off": 0.11365147571258255,
+    "rel_err": 0.022070454634934296
+   },
+   {
+    "design": "20 demes m=3e-03 (4Nm=12.0)",
+    "lean": 0.07692284023741465,
+    "truth": 0.0494892777748732,
+    "sem": 0.011629621019265936,
+    "sems_off": 2.3589386461600332,
+    "rel_err": 0.5543334575892735
+   }
+  ]
+ },
+ {
+  "name": "fstMigrationMutationEquilibrium [2 demes]",
+  "file": "PopulationGeneticsFoundations.lean",
+  "source": "1 / (1 + 4*Ne*m + 4*Ne*mu)",
+  "note": "",
+  "regime": "symmetric island model, 2 demes",
+  "span": 0.89230494675401,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "2 demes m=3e-04 (4Nm=1.2)",
+   "lean": 0.45453719023290484,
+   "truth": 0.24132165715592746,
+   "sem": 0.029004114500646314,
+   "sems_off": 7.3512167755449385,
+   "rel_err": 0.8835325249702326
+  },
+  "cells": [
+   {
+    "design": "2 demes m=1e-04 (4Nm=0.4)",
+    "lean": 0.7142653067055227,
+    "truth": 0.4916036819904342,
+    "sem": 0.030444653560488207,
+    "sems_off": 7.313652765754051,
+    "rel_err": 0.4529291233409052
+   },
+   {
+    "design": "2 demes m=3e-04 (4Nm=1.2)",
+    "lean": 0.45453719023290484,
+    "truth": 0.24132165715592746,
+    "sem": 0.029004114500646314,
+    "sems_off": 7.3512167755449385,
+    "rel_err": 0.8835325249702326
+   },
+   {
+    "design": "2 demes m=1e-03 (4Nm=4.0)",
+    "lean": 0.1999984000127999,
+    "truth": 0.11018301497495253,
+    "sem": 0.02192530539932909,
+    "sems_off": 4.096425723702608,
+    "rel_err": 0.8151472807153147
+   },
+   {
+    "design": "2 demes m=3e-03 (4Nm=12.0)",
+    "lean": 0.07692284023741465,
+    "truth": 0.04388890152023508,
+    "sem": 0.010579618224254754,
+    "sems_off": 3.122413117086419,
+    "rel_err": 0.7526718047830201
+   }
+  ]
+ },
+ {
+  "name": "alleleFreqAfterMigration",
+  "file": "PopulationGeneticsFoundations.lean",
+  "source": "p_c + (p0 - p_c) * (1 - m)^t",
+  "note": "",
+  "regime": "deterministic continent-island recursion",
+  "span": 0.8837043866611889,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "m=0.01 t=40",
+   "lean": 0.6351774068557442,
+   "truth": 0.6351774068557441,
+   "sem": 1e-12,
+   "sems_off": 0.00011102230246251565,
+   "rel_err": 1.7478943876813626e-16
+  },
+  "cells": [
+   {
+    "design": "m=0.01 t=5",
+    "lean": 0.86079203992,
+    "truth": 0.86079203992,
+    "sem": 1e-12,
+    "sems_off": 0.0,
+    "rel_err": 0.0
+   },
+   {
+    "design": "m=0.01 t=40",
+    "lean": 0.6351774068557442,
+    "truth": 0.6351774068557441,
+    "sem": 1e-12,
+    "sems_off": 0.00011102230246251565,
+    "rel_err": 1.7478943876813626e-16
+   },
+   {
+    "design": "m=0.05 t=5",
+    "lean": 0.7190247499999999,
+    "truth": 0.7190247499999999,
+    "sem": 1e-12,
+    "sems_off": 0.0,
+    "rel_err": 0.0
+   },
+   {
+    "design": "m=0.05 t=40",
+    "lean": 0.20280972525208252,
+    "truth": 0.2028097252520826,
+    "sem": 1e-12,
+    "sems_off": 8.326672684688674e-05,
+    "rel_err": 4.1056574946487533e-16
+   },
+   {
+    "design": "m=0.20 t=5",
+    "lean": 0.36214400000000013,
+    "truth": 0.3621440000000001,
+    "sem": 1e-12,
+    "sems_off": 5.551115123125783e-05,
+    "rel_err": 1.5328474648553563e-16
+   },
+   {
+    "design": "m=0.20 t=40",
+    "lean": 0.10010633823966279,
+    "truth": 0.10010633823966283,
+    "sem": 1e-12,
+    "sems_off": 4.163336342344337e-05,
+    "rel_err": 4.158913826592045e-16
+   }
+  ]
+ },
+ {
+  "name": "cumulativeDrift",
+  "file": "DemographicHistory.lean",
+  "source": "sum_i 1 / (2 * Ne_i)",
+  "note": "",
+  "regime": "read as the realised inbreeding 1 - H_t/H_0",
+  "span": 0.9666666666666667,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "N=50 x60 (deep)",
+   "lean": 0.6,
+   "truth": 0.4538265399999999,
+   "sem": 0.004538265399999999,
+   "sems_off": 32.209103504612166,
+   "rel_err": 0.32209103504612163
+  },
+  "cells": [
+   {
+    "design": "N=500 x20",
+    "lean": 0.02,
+    "truth": 0.01989884273333342,
+    "sem": 0.00019898842733333423,
+    "sems_off": 0.5083575362758447,
+    "rel_err": 0.0050835753627584464
+   },
+   {
+    "design": "N=200 x50",
+    "lean": 0.125,
+    "truth": 0.117885066875,
+    "sem": 0.00117885066875,
+    "sems_off": 6.0354829611661955,
+    "rel_err": 0.060354829611661956
+   },
+   {
+    "design": "N=50 x60 (deep)",
+    "lean": 0.6,
+    "truth": 0.4538265399999999,
+    "sem": 0.004538265399999999,
+    "sems_off": 32.209103504612166,
+    "rel_err": 0.32209103504612163
+   },
+   {
+    "design": "bottleneck",
+    "lean": 0.17666666666666667,
+    "truth": 0.16316091900000007,
+    "sem": 0.0016316091900000008,
+    "sems_off": 8.277562880524465,
+    "rel_err": 0.08277562880524465
+   }
+  ]
+ },
+ {
+  "name": "hweGenotypeVariance",
+  "file": "Conventions.lean",
+  "source": "ploidy * p * (1 - p)",
+  "note": "",
+  "regime": "dosage 0/1/2 under Hardy-Weinberg",
+  "span": 0.81,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "p=0.05",
+   "lean": 0.095,
+   "truth": 0.09542093369375002,
+   "sem": 0.0004771046684687501,
+   "sems_off": 0.8822669773930013,
+   "rel_err": 0.004411334886965007
+  },
+  "cells": [
+   {
+    "design": "p=0.05",
+    "lean": 0.095,
+    "truth": 0.09542093369375002,
+    "sem": 0.0004771046684687501,
+    "sems_off": 0.8822669773930013,
+    "rel_err": 0.004411334886965007
+   },
+   {
+    "design": "p=0.25",
+    "lean": 0.375,
+    "truth": 0.37540499969375,
+    "sem": 0.00187702499846875,
+    "sems_off": 0.21576680868950163,
+    "rel_err": 0.001078834043447508
+   },
+   {
+    "design": "p=0.50",
+    "lean": 0.5,
+    "truth": 0.49971248734375,
+    "sem": 0.0024985624367187503,
+    "sems_off": 0.11507123137077414,
+    "rel_err": 0.0005753561568538708
+   }
+  ]
+ },
+ {
+  "name": "admixtureLD",
+  "file": "LDDecayTheory.lean",
+  "source": "alpha * (1 - alpha) * dp1 * dp2",
+  "note": "",
+  "regime": "one-pulse admixture, generation 0, gametic D",
+  "span": 0.3600000000000001,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "alpha=0.5",
+   "lean": 0.09000000000000001,
+   "truth": 0.089741532775,
+   "sem": 0.0008974153277499999,
+   "sems_off": 0.28801293783118914,
+   "rel_err": 0.0028801293783118913
+  },
+  "cells": [
+   {
+    "design": "alpha=0.2",
+    "lean": 0.05760000000000001,
+    "truth": 0.05748818074999998,
+    "sem": 0.0005748818074999998,
+    "sems_off": 0.19450824246170587,
+    "rel_err": 0.0019450824246170586
+   },
+   {
+    "design": "alpha=0.5",
+    "lean": 0.09000000000000001,
+    "truth": 0.089741532775,
+    "sem": 0.0008974153277499999,
+    "sems_off": 0.28801293783118914,
+    "rel_err": 0.0028801293783118913
+   },
+   {
+    "design": "alpha=0.8",
+    "lean": 0.0576,
+    "truth": 0.05770268459999994,
+    "sem": 0.0005770268459999995,
+    "sems_off": 0.17795463194089306,
+    "rel_err": 0.0017795463194089306
+   }
+  ]
+ },
+ {
+  "name": "admixedAlleleFreq",
+  "file": "DemographicHistory.lean",
+  "source": "alpha * p_A + (1 - alpha) * p_B",
+  "note": "",
+  "regime": "",
+  "span": 0.5294117647058824,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "alpha=0.2",
+   "lean": 0.32000000000000006,
+   "truth": 0.3191025,
+   "sem": 0.0007370144070738202,
+   "sems_off": 1.2177509576283716,
+   "rel_err": 0.0028125758964597613
+  },
+  "cells": [
+   {
+    "design": "alpha=0.2",
+    "lean": 0.32000000000000006,
+    "truth": 0.3191025,
+    "sem": 0.0007370144070738202,
+    "sems_off": 1.2177509576283716,
+    "rel_err": 0.0028125758964597613
+   },
+   {
+    "design": "alpha=0.5",
+    "lean": 0.5,
+    "truth": 0.500115,
+    "sem": 0.0007905693941315334,
+    "sems_off": 0.1454647762152588,
+    "rel_err": 0.0002299471121641547
+   },
+   {
+    "design": "alpha=0.8",
+    "lean": 0.6800000000000002,
+    "truth": 0.67923,
+    "sem": 0.0007380321928954047,
+    "sems_off": 1.043314922319771,
+    "rel_err": 0.0011336366179352493
+   }
+  ]
+ },
+ {
+  "name": "driftLDRetention",
+  "file": "LDDecayTheory.lean",
+  "source": "(1 - c)^2 * (1 - 1/(2*Ne))",
+  "note": "",
+  "regime": "per-generation retention of E[D^2] under WF drift",
+  "span": 0.09750000000000006,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "Ne=100 c=0.05",
+   "lean": 0.8979874999999999,
+   "truth": 0.9780995768244882,
+   "sem": 0.0031011275809585213,
+   "sems_off": 25.833208964504003,
+   "rel_err": 0.08190584959108282
+  },
+  "cells": [
+   {
+    "design": "Ne=100 c=0.00",
+    "lean": 0.995,
+    "truth": 1.0439313955082536,
+    "sem": 0.0043623078089323,
+    "sems_off": 11.21685989421959,
+    "rel_err": 0.04687223290610076
+   },
+   {
+    "design": "Ne=100 c=0.02",
+    "lean": 0.955598,
+    "truth": 1.014683542019593,
+    "sem": 0.0030670733904139907,
+    "sems_off": 19.26446957684887,
+    "rel_err": 0.058230511851991906
+   },
+   {
+    "design": "Ne=100 c=0.05",
+    "lean": 0.8979874999999999,
+    "truth": 0.9780995768244882,
+    "sem": 0.0031011275809585213,
+    "sems_off": 25.833208964504003,
+    "rel_err": 0.08190584959108282
+   },
+   {
+    "design": "Ne=500 c=0.02",
+    "lean": 0.9594396,
+    "truth": 0.9750384426446917,
+    "sem": 0.0010283798096335,
+    "sems_off": 15.168367269142523,
+    "rel_err": 0.015998182186931564
+   }
+  ]
+ },
+ {
+  "name": "steppingStoneFstQuadratic",
+  "file": "DemographicHistory.lean",
+  "source": "d / (d + 4*Ne*sigma_sq^2*m^2)",
+  "note": "",
+  "regime": "1D stepping stone, 12 demes, distance 3",
+  "span": 0.004148962655601726,
+  "verdict": "NO POWER",
+  "worst": {
+   "design": "m=0.050 d=3",
+   "lean": 0.9958506224066389,
+   "truth": 0.03247667159903961,
+   "sem": 0.009195337914425072,
+   "sems_off": 104.76765071312045,
+   "rel_err": 29.66356782805563
+  },
+  "cells": [
+   {
+    "design": "m=0.005 d=3",
+    "lean": 0.9999995833335069,
+    "truth": 0.19001123177274062,
+    "sem": 0.03694490428631517,
+    "sems_off": 21.924223846502038,
+    "rel_err": 4.262844590837334
+   },
+   {
+    "design": "m=0.020 d=3",
+    "lean": 0.9998933447098977,
+    "truth": 0.05820507710310619,
+    "sem": 0.013094965909429306,
+    "sems_off": 71.9122351382915,
+    "rel_err": 16.178799418797386
+   },
+   {
+    "design": "m=0.050 d=3",
+    "lean": 0.9958506224066389,
+    "truth": 0.03247667159903961,
+    "sem": 0.009195337914425072,
+    "sems_off": 104.76765071312045,
+    "rel_err": 29.66356782805563
+   }
+  ]
+ },
+ {
+  "name": "demoSteppingStoneFst [already VALIDATED, re-checked]",
+  "file": "DemographicHistory.lean",
+  "source": "d / (d + 4*Ne*m*sigma_sq)",
+  "note": "",
+  "regime": "same design, the sibling form",
+  "span": 0.61875,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "m=0.020 d=3",
+   "lean": 0.7894736842105263,
+   "truth": 0.05820507710310619,
+   "sem": 0.013094965909429306,
+   "sems_off": 55.84349070972799,
+   "rel_err": 12.56365670321215
+  },
+  "cells": [
+   {
+    "design": "m=0.005 d=3",
+    "lean": 0.9836065573770493,
+    "truth": 0.19001123177274062,
+    "sem": 0.03694490428631517,
+    "sems_off": 21.480508366028324,
+    "rel_err": 4.176570606907457
+   },
+   {
+    "design": "m=0.020 d=3",
+    "lean": 0.7894736842105263,
+    "truth": 0.05820507710310619,
+    "sem": 0.013094965909429306,
+    "sems_off": 55.84349070972799,
+    "rel_err": 12.56365670321215
+   },
+   {
+    "design": "m=0.050 d=3",
+    "lean": 0.375,
+    "truth": 0.03247667159903961,
+    "sem": 0.009195337914425072,
+    "sems_off": 37.24967277859699,
+    "rel_err": 10.5467497602522
+   }
+  ]
+ }
+]

@@ -1,0 +1,170 @@
+[
+ {
+  "name": "driftLDStep (one-step map on sigma_d^2)",
+  "file": "LDDecayTheory.lean",
+  "source": "(1-c)^2 * (1/(2*Ne) + (1 - 1/(2*Ne)) * Q)",
+  "note": "",
+  "regime": "WF two-locus, sigma_d^2 = E[D^2]/E[p(1-p)q(1-q)]",
+  "span": 0.7657264268081586,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "Ne=100 c=0.00",
+   "lean": 0.4119685202328021,
+   "truth": 0.4124333222807171,
+   "sem": 0.004450827092030017,
+   "sems_off": 0.10443048860453395,
+   "rel_err": 0.0011269750110022162
+  },
+  "cells": [
+   {
+    "design": "Ne=100 c=0.00",
+    "lean": 0.4119685202328021,
+    "truth": 0.4124333222807171,
+    "sem": 0.004450827092030017,
+    "sems_off": 0.10443048860453395,
+    "rel_err": 0.0011269750110022162
+   },
+   {
+    "design": "Ne=100 c=0.05",
+    "lean": 0.1242619910969711,
+    "truth": 0.12517200867639794,
+    "sem": 0.009699599218018787,
+    "sems_off": 0.0938201217361965,
+    "rel_err": 0.007270136423067797
+   },
+   {
+    "design": "Ne=500 c=0.01",
+    "lean": 0.2776564138907286,
+    "truth": 0.2777860035689534,
+    "sem": 0.006208217277244453,
+    "sems_off": 0.020873895425630812,
+    "rel_err": 0.00046650902694824863
+   },
+   {
+    "design": "Ne=500 c=0.05",
+    "lean": 0.09651333727749396,
+    "truth": 0.0966499251896365,
+    "sem": 0.011151420233077374,
+    "sems_off": 0.012248476811714815,
+    "rel_err": 0.0014132231543328869
+   }
+  ]
+ },
+ {
+  "name": "steppingStoneFstQuadratic (form discrimination)",
+  "file": "DemographicHistory.lean",
+  "source": "d / (d + 4*Ne*sigma_sq^2*m^2)",
+  "verdict": "FALSIFIED",
+  "slope": 0.8129097996210973,
+  "K_by_d": [
+   24.92571764500039,
+   23.482838664071235,
+   16.92806160614547,
+   24.31646726230156
+  ],
+  "K_spread": 0.3568268073773063,
+  "rows": [
+   [
+    0.005,
+    0.18229219926001486,
+    0.0320469963679503,
+    13.457094775190633
+   ],
+   [
+    0.01,
+    0.15054148563425013,
+    0.02265719863878694,
+    16.92806160614547
+   ],
+   [
+    0.02,
+    0.10679485861086979,
+    0.02965129767296512,
+    25.091239962507466
+   ],
+   [
+    0.04,
+    0.03740124773772114,
+    0.009314603455247455,
+    77.2112277386495
+   ]
+  ],
+  "note": "convention-free: exponent of m cannot be changed by any sigma_sq convention",
+  "worst": {
+   "sems_off": NaN,
+   "rel_err": NaN
+  }
+ },
+ {
+  "name": "neiGst (per-site identity)",
+  "file": "Conventions.lean",
+  "source": "1 - (p1(1-p1)+p2(1-p2)) / (ploidy*pbar*(1-pbar))",
+  "verdict": "MATCH",
+  "max_abs_err": 1.1102230246251565e-16,
+  "aggregation_gap_pct": 8.623211714167875,
+  "note": "per-site identity holds; the ratio-of-averages vs mean-of-ratios gap is a declared-convention question",
+  "worst": {
+   "sems_off": 0.0,
+   "rel_err": 1.1102230246251565e-16
+  }
+ },
+ {
+  "name": "coalFst [tight]",
+  "file": "PopulationGeneticsFoundations.lean",
+  "source": "t / (t + 2 * Ne)",
+  "note": "",
+  "regime": "clean split, Hudson ratio-of-averages, 40 reps x 20Mb",
+  "span": 0.8636363636363635,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "t=1000 Ne=1000",
+   "lean": 0.3333333333333333,
+   "truth": 0.2997491732601334,
+   "sem": 0.020565802141435042,
+   "sems_off": 1.6330099765734924,
+   "rel_err": 0.11204087640319978
+  },
+  "cells": [
+   {
+    "design": "t=200 Ne=1000",
+    "lean": 0.09090909090909091,
+    "truth": 0.08190615042989184,
+    "sem": 0.008317431061692944,
+    "sems_off": 1.0824184068880753,
+    "rel_err": 0.1099177587024457
+   },
+   {
+    "design": "t=500 Ne=1000",
+    "lean": 0.2,
+    "truth": 0.20053503380174392,
+    "sem": 0.020582005931920104,
+    "sems_off": 0.025995221433404672,
+    "rel_err": 0.0026680315733402724
+   },
+   {
+    "design": "t=1000 Ne=1000",
+    "lean": 0.3333333333333333,
+    "truth": 0.2997491732601334,
+    "sem": 0.020565802141435042,
+    "sems_off": 1.6330099765734924,
+    "rel_err": 0.11204087640319978
+   },
+   {
+    "design": "t=2000 Ne=1000",
+    "lean": 0.5,
+    "truth": 0.4968902217431769,
+    "sem": 0.02472795288299314,
+    "sems_off": 0.12575963208672652,
+    "rel_err": 0.006258481492981459
+   },
+   {
+    "design": "t=4000 Ne=1000",
+    "lean": 0.6666666666666666,
+    "truth": 0.6581915452747079,
+    "sem": 0.01884255245199808,
+    "sems_off": 0.44978627038716346,
+    "rel_err": 0.012876375354261768
+   }
+  ]
+ }
+]
