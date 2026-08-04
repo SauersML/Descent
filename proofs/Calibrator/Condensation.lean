@@ -323,6 +323,13 @@ and interpolates `0 -> 1`.
 the limit law at the condensation window is `N(0, windowVariance w v)`. -/
 noncomputable def windowVariance (w v : ℝ) : ℝ := Phi (w / Real.sqrt v)
 
+/-- **A window at the centre carries half the mass.** Monotonicity in the window width is shared
+by every increasing function of `w / sqrt v`; the value at zero is not, and it is what identifies
+the standard normal cdf rather than some other sigmoid. -/
+theorem windowVariance_zero_window (v : ℝ) : windowVariance 0 v = Phi 0 := by
+  unfold windowVariance
+  norm_num
+
 /-- Monotonicity of `Phi`, a corollary of `strictMono_Phi` in `Probability`. -/
 theorem monotone_Phi : Monotone Phi := strictMono_Phi.monotone
 
