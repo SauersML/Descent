@@ -622,37 +622,33 @@ theorem popgenDrivenProxyGenerationalModel_generation_one_scales :
       popgenDrivenProxyScale := by
   rcases nondegenerateGenerationalPopGen_coordinates_at_one with
     ⟨h_theta, h_bigM, h_tau, h_fst, h_mut, h_mig⟩
-  refine ⟨?_, ?_, ?_, ?_⟩
-  · generational_witness_simp popgenDrivenProxyGenerationalModel, popgenDrivenTagScale,
-      nondegenerateGenerationalPopGen, h_theta, h_bigM, h_tau, h_fst, h_mut, h_mig
-    ring_nf
-  · generational_witness_simp popgenDrivenProxyGenerationalModel, popgenDrivenTagScale,
-      nondegenerateGenerationalPopGen, h_theta, h_bigM, h_tau, h_fst, h_mut, h_mig
-    ring_nf
-  · calc
-      proxyTaggingTargetAt popgenDrivenProxyGenerationalModel 1 0 0
+  -- Both tags carry the same proxy scale at generation one, and the calculation that shows
+  -- it does not depend on which: it was written out once per tag, `calc` step for `calc`
+  -- step. Proved for an arbitrary tag, the last two goals are two instances of it.
+  have proxy_scale_at :
+      ∀ i : Fin 2, proxyTaggingTargetAt popgenDrivenProxyGenerationalModel 1 i 0 =
+        popgenDrivenProxyScale := by
+    intro i
+    calc
+      proxyTaggingTargetAt popgenDrivenProxyGenerationalModel 1 i 0
           = (7 / 6 : ℝ) * (Real.exp (-(1 : ℝ)) * Real.exp (-(1 / 14 : ℝ))) := by
-              generational_witness_simp nondegenerateGenerationalPopGen,
-                popgenDrivenProxyGenerationalModel, h_fst, h_mut, h_mig
-              ring_nf
+              fin_cases i <;>
+                generational_witness_simp nondegenerateGenerationalPopGen,
+                  popgenDrivenProxyGenerationalModel, h_fst, h_mut, h_mig <;>
+                ring_nf
       _ = (7 / 6 : ℝ) * Real.exp (-(15 / 14 : ℝ)) := by
             congr 1
             rw [← Real.exp_add]
             congr 1
             norm_num
       _ = popgenDrivenProxyScale := by rfl
-  · calc
-      proxyTaggingTargetAt popgenDrivenProxyGenerationalModel 1 1 0
-          = (7 / 6 : ℝ) * (Real.exp (-(1 : ℝ)) * Real.exp (-(1 / 14 : ℝ))) := by
-              generational_witness_simp nondegenerateGenerationalPopGen,
-                popgenDrivenProxyGenerationalModel, h_fst, h_mut, h_mig
-              ring_nf
-      _ = (7 / 6 : ℝ) * Real.exp (-(15 / 14 : ℝ)) := by
-            congr 1
-            rw [← Real.exp_add]
-            congr 1
-            norm_num
-      _ = popgenDrivenProxyScale := by rfl
+  refine ⟨?_, ?_, proxy_scale_at 0, proxy_scale_at 1⟩
+  · generational_witness_simp popgenDrivenProxyGenerationalModel, popgenDrivenTagScale,
+      nondegenerateGenerationalPopGen, h_theta, h_bigM, h_tau, h_fst, h_mut, h_mig
+    ring_nf
+  · generational_witness_simp popgenDrivenProxyGenerationalModel, popgenDrivenTagScale,
+      nondegenerateGenerationalPopGen, h_theta, h_bigM, h_tau, h_fst, h_mut, h_mig
+    ring_nf
 
 /-- In the nondegenerate proxy witness, generation-1 transport degrades target
 `R²` even though target allele frequencies and target effects are held fixed.
@@ -918,41 +914,36 @@ theorem target_r2_changes_along_generation_indexed_af_path :
       GenerationalPopGenParameters.bigM,
       ldCorrelationDecay,
       Matrix.mulVec, dotProduct, Matrix.cons_val', Matrix.cons_val_fin_one]
-  · have h_cov :
-        predictiveCovarianceFromSourceWeights
-            (timeVaryingAFGenerationalModel.toMetricModelAt 1) Pop.target =
-          Real.exp (-(1 / 2 : ℝ)) := by
-      calc
-        predictiveCovarianceFromSourceWeights
-            (timeVaryingAFGenerationalModel.toMetricModelAt 1) Pop.target =
-          Real.exp (-(1 / 4 : ℝ)) *
-            Real.exp (-(1 / 4 : ℝ)) := by
-              generational_witness_simp baselineGenerationalPopGen, timeVaryingAFGenerationalModel
-        _ = Real.exp (-(1 / 2 : ℝ)) := by
-              rw [← Real.exp_add]
-              congr 1
-              ring_nf
-    have h_var :
-        scoreVarianceFromSourceWeights
-            (timeVaryingAFGenerationalModel.toMetricModelAt 1) Pop.target =
-          Real.exp (-(1 / 2 : ℝ)) := by
-      calc
-        scoreVarianceFromSourceWeights
-            (timeVaryingAFGenerationalModel.toMetricModelAt 1) Pop.target =
-          Real.exp (-(1 / 4 : ℝ)) *
-            Real.exp (-(1 / 4 : ℝ)) := by
-              generational_witness_simp baselineGenerationalPopGen, timeVaryingAFGenerationalModel
-        _ = Real.exp (-(1 / 2 : ℝ)) := by
-              rw [← Real.exp_add]
-              congr 1
-              ring_nf
-    have h_ret :
+  -- Both moments land on the same product of two quarter-retentions, and the step from
+  -- that product to `exp(-1/2)` is one fact. It was carried inside both `calc` chains,
+  -- and then a third time below; stated first, both moments are three lines.
+  · have h_ret :
         Real.exp (-(1 / 4 : ℝ)) *
             Real.exp (-(1 / 4 : ℝ)) =
           Real.exp (-(1 / 2 : ℝ)) := by
       rw [← Real.exp_add]
       congr 1
       norm_num
+    have h_cov :
+        predictiveCovarianceFromSourceWeights
+            (timeVaryingAFGenerationalModel.toMetricModelAt 1) Pop.target =
+          Real.exp (-(1 / 2 : ℝ)) := by
+      have h_product :
+          predictiveCovarianceFromSourceWeights
+              (timeVaryingAFGenerationalModel.toMetricModelAt 1) Pop.target =
+            Real.exp (-(1 / 4 : ℝ)) * Real.exp (-(1 / 4 : ℝ)) := by
+        generational_witness_simp baselineGenerationalPopGen, timeVaryingAFGenerationalModel
+      rw [h_product, h_ret]
+    have h_var :
+        scoreVarianceFromSourceWeights
+            (timeVaryingAFGenerationalModel.toMetricModelAt 1) Pop.target =
+          Real.exp (-(1 / 2 : ℝ)) := by
+      have h_product :
+          scoreVarianceFromSourceWeights
+              (timeVaryingAFGenerationalModel.toMetricModelAt 1) Pop.target =
+            Real.exp (-(1 / 4 : ℝ)) * Real.exp (-(1 / 4 : ℝ)) := by
+        generational_witness_simp baselineGenerationalPopGen, timeVaryingAFGenerationalModel
+      rw [h_product, h_ret]
     have h_ret_norm :
         Real.exp (-((4 : ℝ)⁻¹)) * Real.exp (-((4 : ℝ)⁻¹)) =
           Real.exp (-(1 / 2 : ℝ)) := by
