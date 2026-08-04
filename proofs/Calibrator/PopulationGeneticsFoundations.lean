@@ -121,6 +121,16 @@ noncomputable def neiGstFromFrequencies (p₁ p₂ : ℝ) : ℝ :=
   let p_bar := (p₁ + p₂) / 2
   (p₁ - p₂) ^ 2 / (4 * p_bar * (1 - p_bar))
 
+/-- **neiGstFromFrequencies at two monomorphic populations, named.** With both populations fixed
+for the reference allele the mean frequency is zero, so the heterozygosity normaliser `4 p̄ (1 -
+p̄)` vanishes and there is no polymorphism to partition. Numerator and denominator vanish
+together and Lean returns `0`: no differentiation, which is what two identical polymorphic
+populations also give. Consumers must exclude it by hypothesis. -/
+theorem neiGstFromFrequencies_monomorphic_is_junk :
+    neiGstFromFrequencies 0 0 = 0 := by
+  unfold neiGstFromFrequencies
+  norm_num
+
 /-- Nei's `G_ST` is nonneg. -/
 theorem neiGstFromFrequencies_nonneg (p₁ p₂ : ℝ)
     (h₁ : 0 < p₁) (h₁' : p₁ < 1)
@@ -315,6 +325,16 @@ relates the two.
 noncomputable def continentIslandStepSelectionFirst (s m p : ℝ) : ℝ :=
   (1 - m) * (p * (1 + s) / (1 + s * p))
 
+/-- **continentIslandStepSelectionFirst at complete lethality at fixation, named.** At `s = -1`
+the genotype is lethal and at `p = 1` it is fixed, so the mean fitness `1 + s p` vanishes and the
+frequency after selection is undefined -- the population has no survivors to compute a frequency
+over. Lean returns `0`, an ordinary post-selection frequency, and the extinction is not
+distinguishable from loss of the allele. Consumers must exclude it by hypothesis. -/
+theorem continentIslandStepSelectionFirst_lethal_fixed_is_junk (m : ℝ) :
+    continentIslandStepSelectionFirst (-1) m 1 = 0 := by
+  unfold continentIslandStepSelectionFirst
+  norm_num
+
 /-- **Selection before migration, pinned.** This definition carries no result of its own, and
 what distinguishes it from `continentIslandStepMigrationFirst` is only the order in which the two
 forces act. Selecting first on a frequency of one half with `s = 1` raises it to two thirds, and
@@ -336,6 +356,16 @@ theorem continentIslandStepSelectionFirst_reference :
     orderings are separated at every cell where the allele survives. -/
 noncomputable def continentIslandStepMigrationFirst (s m p : ℝ) : ℝ :=
   ((1 - m) * p) * (1 + s) / (1 + s * ((1 - m) * p))
+
+/-- **continentIslandStepMigrationFirst at complete lethality at fixation, named.** The
+migration-first ordering reaches the same vanishing mean fitness and returns the same value, so
+the two orderings -- which `continentIslandStepSelectionFirst_reference` and its partner separate
+at admissible parameters -- become indistinguishable exactly where the model breaks. Consumers
+must exclude it by hypothesis. -/
+theorem continentIslandStepMigrationFirst_lethal_fixed_is_junk :
+    continentIslandStepMigrationFirst (-1) 0 1 = 0 := by
+  unfold continentIslandStepMigrationFirst
+  norm_num
 
 /-- **Migration before selection, pinned.** At the same parameters where selecting first gives
 one third, migrating first gives two fifths: selection acting on the post-migration frequency is
@@ -369,6 +399,16 @@ lost outright and the equilibrium is the boundary value `0`, which
 noncomputable def selectionMigrationEquilibrium (s m : ℝ) : ℝ :=
   max 0 ((s - m - m * s) / s)
 
+/-- **selectionMigrationEquilibrium at zero selection, named.** Without selection there is no
+selection-migration balance and this formula does not describe the equilibrium at all. The
+divisor is zero, the ratio is junk-zero, and `max 0` returns `0`: the locally adapted allele
+reported as absent, which is also what complete swamping by migration gives. The clamp protects
+the lower end and lets the degeneracy through it. Consumers must exclude it by hypothesis. -/
+theorem selectionMigrationEquilibrium_no_selection_is_junk (m : ℝ) :
+    selectionMigrationEquilibrium 0 m = 0 := by
+  unfold selectionMigrationEquilibrium
+  simp
+
 /-- The equilibrium under the migration-first convention.
 
 Derived, not stipulated, in the same way as its companion:
@@ -388,6 +428,15 @@ under either ordering.
     `0.12000` where the allele survives. -/
 noncomputable def selectionMigrationEquilibriumMigrationFirst (s m : ℝ) : ℝ :=
   max 0 ((s - m - m * s) / (s * (1 - m)))
+
+/-- **selectionMigrationEquilibriumMigrationFirst at zero selection, named.** The migration-first
+ordering fails at the same point and to the same value, so the two orderings agree exactly where
+neither is defined. An agreement check between them passes on the degenerate case. Consumers must
+exclude it by hypothesis. -/
+theorem selectionMigrationEquilibriumMigrationFirst_no_selection_is_junk (m : ℝ) :
+    selectionMigrationEquilibriumMigrationFirst 0 m = 0 := by
+  unfold selectionMigrationEquilibriumMigrationFirst
+  simp
 
 /-- **The migration-first equilibrium is a fixed point of the migration-first
 map.**  Neither ordering is more correct, but each must be pinned by its own
