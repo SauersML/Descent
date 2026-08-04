@@ -801,6 +801,17 @@ noncomputable def CrossPopulationMechanisticCalibrationModel.identityCalibration
 
 namespace CrossPopulationMechanisticCalibrationModel
 
+/-- Shared definitional reduction for the three mechanistic calibration-profile projections
+below.  Keeping this list in one tactic prevents source and target laws from silently drifting
+to different model layers. -/
+macro "unfold_mechanistic_calibration_profile" : tactic =>
+  `(tactic| simp only
+    [CrossPopulationMechanisticCalibrationModel.calibrationProfile,
+      CrossPopulationMechanisticCalibrationModel.toShiftModel,
+      CrossPopulationCalibrationShiftModel.calibrationProfile,
+      CrossPopulationCalibrationShiftModel.calibrationMoments,
+      CrossPopulationMechanisticCalibrationModel.calibrationSlope])
+
 /-- Exact mechanistic source calibration-profile law. The source predicted mean
 is the deployed intercept plus the source-weighted source tag mean, and the
 source slope is the literal source `Cov/Var` ratio from the SNP-level score
@@ -818,11 +829,8 @@ theorem sourceCalibrationProfile_exact_mechanistic_portability_law
             scoreVarianceFromSourceWeights m.metric Pop.source
       , link := link } := by
   cases link <;>
-    simp [CrossPopulationMechanisticCalibrationModel.calibrationProfile,
-      CrossPopulationMechanisticCalibrationModel.toShiftModel,
-      CrossPopulationCalibrationShiftModel.calibrationProfile,
-      CrossPopulationCalibrationShiftModel.calibrationMoments,
-      CrossPopulationMechanisticCalibrationModel.calibrationSlope,
+    unfold_mechanistic_calibration_profile <;>
+    simp [
       CrossPopulationMechanisticCalibrationModel.observedMean,
       CrossPopulationMechanisticCalibrationModel.predictedMean,
       CrossPopulationMechanisticCalibrationModel.deploymentIntercept,
@@ -848,11 +856,8 @@ theorem targetCalibrationProfile_exact_mechanistic_portability_law
             scoreVarianceFromSourceWeights m.metric Pop.target
       , link := link } := by
   cases link <;>
-    simp [CrossPopulationMechanisticCalibrationModel.calibrationProfile,
-      CrossPopulationMechanisticCalibrationModel.toShiftModel,
-      CrossPopulationCalibrationShiftModel.calibrationProfile,
-      CrossPopulationCalibrationShiftModel.calibrationMoments,
-      CrossPopulationMechanisticCalibrationModel.calibrationSlope,
+    unfold_mechanistic_calibration_profile <;>
+    simp [
       CrossPopulationMechanisticCalibrationModel.predictedMean,
       CrossPopulationMechanisticCalibrationModel.scoreMean,
       CrossPopulationMechanisticCalibrationModel.deploymentIntercept,
@@ -890,11 +895,8 @@ theorem CrossPopulationMechanisticCalibrationModel.target_profile_slope_eq_direc
         sourceWeightedTagScore m.metric (proxyTaggingProjection m.metric Pop.target) +
         sourceWeightedTagScore m.metric (m.metric.contextCross Pop.target)) /
           scoreVarianceFromSourceWeights m.metric Pop.target := by
-  simp [CrossPopulationMechanisticCalibrationModel.calibrationProfile,
-    CrossPopulationMechanisticCalibrationModel.toShiftModel,
-    CrossPopulationCalibrationShiftModel.calibrationProfile,
-    CrossPopulationCalibrationShiftModel.calibrationMoments,
-    CrossPopulationMechanisticCalibrationModel.calibrationSlope,
+  unfold_mechanistic_calibration_profile
+  simp [
     CalibrationMoments.toProfile, calibrationProfile,
     targetCalibrationSlopeFromSourceWeights_exact_direct_proxy_context_law]
 
@@ -3082,7 +3084,10 @@ theorem screeningQalyGain_neg_iff
   constructor <;> intro h <;> linarith
 
 /-- **Break-even prevalence for a screening operating point.**  This is the prevalence at which
-weighted true-positive benefit exactly balances weighted false-positive harm. -/
+weighted true-positive benefit exactly balances weighted false-positive harm.
+
+Empirical status: UNTESTED. The threshold is derived from the declared linear QALY model; its
+clinical adequacy is not established by data in this corpus. -/
 noncomputable def screeningBreakEvenPrevalence
     (sens spec benefit harm : ℝ) : ℝ :=
   (1 - spec) * harm / (sens * benefit + (1 - spec) * harm)

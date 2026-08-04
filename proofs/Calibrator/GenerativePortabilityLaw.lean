@@ -3,7 +3,6 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Calibrator.ReversibleMarkovSpectrum
 import Calibrator.ObservationalCeiling
-import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
 
 namespace Calibrator
 

@@ -1155,7 +1155,7 @@ section ExpansionLD
     Denotes: a per-generation rate. Other definitions share this formula under names from a
     different concept family; the formula does not fix which is meant. -/
 noncomputable def driftRatePerGen (Ne : ℝ) : ℝ :=
-  1 / (2 * Ne)
+  alleleFreqDivergenceRate Ne 0 0
 
 /-- **The per-generation drift rate, pinned.** This definition carries no result of its own. A
 population of one loses half its heterozygosity per generation, which fixes the two in the

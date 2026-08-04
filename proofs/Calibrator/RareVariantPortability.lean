@@ -38,9 +38,12 @@ This has direct implications for PGS portability.
 section RareVariantSpecificity
 
 /-- Coalescent approximation to the probability that a rare allele is shared across a recently
-diverged population pair. -/
+diverged population pair.
+
+Empirical status: UNTESTED. This is a first-order approximation and is not a probability outside
+the parameter range where its value lies in `[0,1]`. -/
 noncomputable def rareVariantSharingApproximation (Ne p : ℝ) : ℝ :=
-  2 * Ne * p
+  pgsDriftVariance_one_pop p Ne
 
 /-- **Exact ultra-rare threshold in the sharing approximation.**  At positive effective
 population size, the approximate cross-population sharing probability is below one if and only
@@ -53,7 +56,9 @@ theorem rareVariantSharingApproximation_lt_one_iff
   rw [lt_div_iff₀ h2Ne_pos]
   constructor <;> intro h <;> nlinarith [mul_comm p (2 * Ne)]
 
-/-- Fraction of two-component heritability attributable to rare variants. -/
+/-- Fraction of two-component heritability attributable to rare variants.
+
+Empirical status: UNTESTED. The quotient is a declared two-component accounting model. -/
 noncomputable def rareHeritabilityShare
     (rareCount rareVariance commonCount commonVariance : ℝ) : ℝ :=
   rareCount * rareVariance /
@@ -80,7 +85,10 @@ theorem rareHeritabilityShare_mem_Ioo
     linarith [mul_pos h_nc h_vc]
 
 /-- Additive genetic-variance contribution of a variant with effect `β` and allele frequency
-`p` under Hardy--Weinberg genotype variance `2p(1-p)`. -/
+`p` under Hardy--Weinberg genotype variance `2p(1-p)`.
+
+Empirical status: DERIVED under Hardy--Weinberg equilibrium; that equilibrium assumption is not
+empirically checked here. -/
 noncomputable def variantGeneticVarianceContribution (β p : ℝ) : ℝ :=
   β ^ 2 * (2 * p * (1 - p))
 
@@ -157,7 +165,7 @@ theorem independentGeneSharingProbability_gt_single
 
 /-- Variance proxy for a homogeneous `k`-variant gene burden with common effect `β`. -/
 noncomputable def homogeneousGeneBurdenVariance (β : ℝ) (variantCount : ℕ) : ℝ :=
-  variantCount * β ^ 2
+  ncp variantCount β
 
 /-- **A nontrivial homogeneous gene burden has more variance than one variant.**
 

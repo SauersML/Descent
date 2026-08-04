@@ -113,6 +113,14 @@ theorem effectVarianceRecurrence_eq_self_iff
   rw [eq_div_iff hs]
   constructor <;> intro h <;> nlinarith
 
+/-- The declared mutation-selection equilibrium is a fixed point of the one-generation
+variance recurrence whenever selection is nonzero. -/
+theorem equilibriumEffectVariance_isFixedPoint
+    (v_mut s : ℝ) (hs : s ≠ 0) :
+    effectVarianceRecurrence (equilibriumEffectVariance v_mut s) v_mut s =
+      equilibriumEffectVariance v_mut s :=
+  (effectVarianceRecurrence_eq_self_iff _ _ _ hs).2 rfl
+
 /-- Stronger stabilizing selection → smaller effect sizes. -/
 theorem equilibriumEffectVariance_lt_of_selection_lt
     (v_mutation s₁ s₂ : ℝ)
@@ -153,7 +161,9 @@ theorem effectCorrelationStabilizing_lt_of_Ns_lt
   exact div_lt_div_of_pos_left one_pos (by linarith) (by linarith)
 
 /-- Per-locus contribution obtained by spreading a positive architecture-scale variance
-equally over `locusCount` causal loci. -/
+equally over `locusCount` causal loci.
+
+Empirical status: UNTESTED. Equal allocation is the model assumption encoded by the quotient. -/
 noncomputable def polygenicAveragingVariance (architectureVariance : ℝ)
     (locusCount : ℕ) : ℝ :=
   architectureVariance / locusCount
@@ -173,7 +183,9 @@ theorem polygenicAveragingVariance_lt_of_locusCount_lt
       polygenicAveragingVariance architectureVariance m₁ :=
   div_lt_div_of_pos_left h_var (Nat.cast_pos.mpr h_m₁) (Nat.cast_lt.mpr h_more)
 
-/-- Equal per-locus heritability when total heritability is spread over a specified count. -/
+/-- Equal per-locus heritability when total heritability is spread over a specified count.
+
+Empirical status: UNTESTED. Equal allocation across loci is assumed, not inferred. -/
 noncomputable def equalPerLocusHeritability (locusCount : ℕ) (totalHeritability : ℝ) : ℝ :=
   totalHeritability / locusCount
 
@@ -885,9 +897,15 @@ parameters for different trait classes.
 
 section ArchitecturePredictions
 
-/-- Characteristic generation timescale `1/(2s)` for selection-driven portability decay. -/
+/-- Characteristic generation timescale `1/(2s)` for selection-driven portability decay.
+
+Empirical status: UNTESTED. The chart is a modelling convention, not an estimated timescale.
+
+Denotes: a characteristic timescale indexed by selection strength. Its numerical formula
+matches a drift-rate chart, but the biological dimension is declared here rather than inferred
+from that coincidence. -/
 noncomputable def selectionPortabilityTimescale (selectionCoefficient : ℝ) : ℝ :=
-  1 / (2 * selectionCoefficient)
+  alleleFreqDivergenceRate selectionCoefficient 0 0
 
 /-- The selection-decay timescale is pinned at `s = 1/2`. -/
 theorem selectionPortabilityTimescale_at_reference_point :

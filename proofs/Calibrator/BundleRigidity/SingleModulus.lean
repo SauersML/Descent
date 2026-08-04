@@ -3,11 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Mathlib.Tactic
 import Mathlib.Algebra.BigOperators.Ring.Finset
-import Mathlib.Data.Fintype.Basic
-import Mathlib.Data.Fin.VecNotation
 import Mathlib.Data.Real.Sqrt
-import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
-import Mathlib.Topology.ContinuousMap.Algebra
 
 /-!
 # Single-atom modulus families, and a correction to the classification

@@ -295,10 +295,8 @@ theorem latticeBracket_zero_spacing_is_junk (δ : ℝ) :
   simp
 
 /-- The denominator is strictly positive for `h > 0`. -/
-theorem one_sub_exp_neg_pos {h : ℝ} (hh : 0 < h) : 0 < 1 - Real.exp (-h) := by
-  have hlt : Real.exp (-h) < Real.exp 0 := Real.exp_lt_exp.mpr (by linarith)
-  rw [Real.exp_zero] at hlt
-  linarith
+theorem one_sub_exp_neg_pos {h : ℝ} (hh : 0 < h) : 0 < 1 - Real.exp (-h) :=
+  sub_pos.mpr (Real.exp_lt_one_iff.mpr (by linarith))
 
 /-- **The lattice inflation factor is strictly greater than one.**
 

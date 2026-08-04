@@ -5,7 +5,6 @@ import Calibrator.CramerStratum
 import Calibrator.JetBarrier
 import Calibrator.LocalToGlobalCoherence
 import Calibrator.HiddenConeAmbiguity
-import Mathlib.Tactic.LinearCombination
 
 namespace Calibrator
 

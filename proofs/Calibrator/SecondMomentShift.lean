@@ -2,7 +2,6 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Calibrator.TransportIdentities
-import Mathlib.Tactic.Abel
 import Mathlib.Tactic.Ring
 
 namespace Calibrator

@@ -2,8 +2,6 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Mathlib.Tactic
-import Mathlib.Data.Fintype.Basic
-import Mathlib.Data.Fin.VecNotation
 
 /-!
 # A linear structural causal model, with intervention and a derived mediation identity

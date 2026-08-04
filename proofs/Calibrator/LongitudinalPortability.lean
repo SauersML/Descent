@@ -379,7 +379,10 @@ noncomputable def ageDependentMetricProfile
   temporalMetricProfile π
     (ageDependentSignalVariance sourceSignalPeak age age_peak width)
 
-/-- Observed cohort-specific effect after an environmental modifier acts on a genetic effect. -/
+/-- Observed cohort-specific effect after an environmental modifier acts on a genetic effect.
+
+Empirical status: UNTESTED. Multiplication is the declared interaction model, not a conclusion
+drawn from cohort data in this corpus. -/
 noncomputable def cohortObservedEffect (geneticEffect environmentModifier : ℝ) : ℝ :=
   geneticEffect * environmentModifier
 

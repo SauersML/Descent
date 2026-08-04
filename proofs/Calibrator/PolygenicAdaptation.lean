@@ -158,7 +158,7 @@ section PGSOverdispersion
 
     Power: the prediction spans 60.79 to 372.76 across the design. -/
 noncomputable def pgsDriftVariance_one_pop (V_A fst : ℝ) : ℝ :=
-  2 * fst * V_A
+  Var_Delta_Mu V_A fst
 
 /-- **pgsDriftVariance_one_pop pinned at a reference point.** No theorem in the corpus evaluated
 this definition, so every body agreeing with it in sign and monotonicity was indistinguishable

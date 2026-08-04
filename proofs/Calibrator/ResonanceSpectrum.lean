@@ -1,7 +1,6 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
 -- `phase_of_abs_neg` uses `Real.log`, which lives here and is not reachable from the
 -- trigonometric import. Without it `Real.log` resolves as an Unknown constant -- the
 -- same missing-Mathlib-import shape as `Finset.sum_nonneg` in `SpectralDegradation`.

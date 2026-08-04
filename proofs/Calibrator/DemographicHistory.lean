@@ -1088,7 +1088,7 @@ trajectory of that process and its closed form is proved, not asserted.
     Denotes: a per-generation rate. Other definitions share this formula under names from a
     different concept family; the formula does not fix which is meant. -/
 noncomputable def driftLDCreationRate (Ne : ℝ) : ℝ :=
-  1 / (2 * Ne)
+  driftRatePerGen Ne
 
 /-- **driftLDCreationRate at zero Ne, named.** An empty population creates linkage disequilibrium
 instantly and the rate diverges. Lean returns `0`, reporting a population in which drift generates
