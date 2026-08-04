@@ -356,6 +356,16 @@ theorem benchmarkRatioSquared_target_more_drifted :
   unfold benchmarkRatioSquared
   norm_num
 
+/-- **The benchmark ratio at a fully differentiated source, named.** A source population with
+`Fst = 1` is fixed, so the benchmark it provides is degenerate and the ratio diverges. The divisor
+is zero and Lean returns `0`, reporting that the target retains none of the source benchmark --
+a plausible-looking number that a consumer cannot distinguish from a genuine total loss.
+Consumers must require `fstS ≠ 1`. -/
+theorem benchmarkRatioSquared_fixed_source_is_junk (fstT : ℝ) :
+    benchmarkRatioSquared 1 fstT = 0 := by
+  unfold benchmarkRatioSquared
+  simp
+
 /-- What a **symmetric** design observes: the two branch lengths are equal, so only the
 diagonal of the candidate function is ever evaluated.
 

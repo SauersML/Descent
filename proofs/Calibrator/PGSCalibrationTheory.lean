@@ -70,6 +70,15 @@ structure CalibrationMoments where
 noncomputable def calibrationInTheLarge (mean_observed mean_predicted : ℝ) : ℝ :=
   mean_observed - mean_predicted
 
+/-- **Calibration-in-the-large's sign convention, pinned.** This definition carries no result of
+its own, and its entire content is which way the subtraction runs. It is negative when the model
+predicts a higher mean than is observed, so a negative value reports over-prediction; the
+reversed body reports over-prediction as under-prediction. -/
+theorem calibrationInTheLarge_negative_when_overpredicting :
+    calibrationInTheLarge 1 3 = -2 := by
+  unfold calibrationInTheLarge
+  norm_num
+
 /-- **Calibration slope.**
     Regress observed on predicted: Y = a + b × predicted.
     b = 1 means well-calibrated spread.
@@ -238,6 +247,27 @@ theorem calibrationSlopeDeviation_eq_one_sub_of_lt_one
     in each group. H-L ~ χ² under good calibration. -/
 noncomputable def hosmerLemeshowContrib (observed expected n_group : ℝ) : ℝ :=
   n_group * (observed - expected)^2 / (expected * (1 - expected))
+
+/-- **The Hosmer-Lemeshow denominator really is the binomial variance, pinned.** This definition
+carries no result of its own. A group of one whose expected risk is one half and whose observed
+rate is one contributes exactly one: the squared deviation is a quarter and the binomial variance
+`p (1 - p)` is a quarter, so the contribution is the deviation measured in variance units. A body
+dividing by `expected` alone contributes one half here. -/
+theorem hosmerLemeshowContrib_unit_variance :
+    hosmerLemeshowContrib 1 (1 / 2) 1 = 1 := by
+  unfold hosmerLemeshowContrib
+  norm_num
+
+/-- **The Hosmer-Lemeshow contribution at a certain forecast, named.** A group whose expected
+risk is one has binomial variance zero, so any observed deviation from certainty is infinitely
+surprising. The divisor is zero and Lean returns `0`: the group contributes nothing to the
+goodness-of-fit statistic no matter how badly the forecast missed. This is the worst direction
+for the error to run, since it silently removes exactly the groups where the model failed most.
+Consumers must require `0 < expected < 1`. -/
+theorem hosmerLemeshowContrib_certain_forecast_is_junk :
+    hosmerLemeshowContrib 0 1 1 = 0 := by
+  unfold hosmerLemeshowContrib
+  norm_num
 
 /-- H-L contribution is nonneg. -/
 theorem hl_contrib_nonneg (obs exp n : ℝ)
@@ -1512,6 +1542,14 @@ section RecalibrationMethods
 noncomputable def interceptRecalibrated (pgs new_intercept : ℝ) : ℝ :=
   new_intercept + pgs
 
+/-- **Intercept recalibration is a shift, pinned.** This definition carries no result of its own.
+The new intercept is added to the score without touching its scale, which is what distinguishes
+intercept recalibration from a slope refit. -/
+theorem interceptRecalibrated_shifts_without_scaling :
+    interceptRecalibrated 1 2 = 3 := by
+  unfold interceptRecalibrated
+  norm_num
+
 /-- Intercept recalibration shifts CITL by exactly the fitted intercept. -/
 theorem intercept_recalibration_shifts_citl
     (mean_obs mean_pgs new_intercept : ℝ) :
@@ -1538,6 +1576,15 @@ theorem intercept_recal_corrects_citl
     but requires labeled target data. -/
 noncomputable def logisticRecalibrated (pgs a b : ℝ) : ℝ :=
   a + b * pgs
+
+/-- **Which coefficient multiplies the score, pinned.** This definition carries no result of its
+own. The slope multiplies the score and the intercept does not: at score two, intercept one and
+slope three the recalibrated value is seven, where the body with the roles exchanged gives
+five. -/
+theorem logisticRecalibrated_slope_multiplies_score :
+    logisticRecalibrated 2 1 3 = 7 := by
+  unfold logisticRecalibrated
+  norm_num
 
 /-- Exact CITL formula after logistic recalibration. -/
 theorem logistic_recalibration_shifts_citl
@@ -1566,6 +1613,24 @@ theorem logistic_recalibration_corrects_citl
 noncomputable def recalibratedCalibrationSlope
     (slope fittedSlope : ℝ) : ℝ :=
   slope / fittedSlope
+
+/-- **The recalibrated slope's orientation, pinned.** This definition carries no result of its
+own. Dividing by a fitted slope below one inflates the calibration slope rather than deflating
+it, which is the direction that makes refitting correct an under-dispersed score. -/
+theorem recalibratedCalibrationSlope_inflates_when_fit_shallow :
+    recalibratedCalibrationSlope 3 2 = 3 / 2 := by
+  unfold recalibratedCalibrationSlope
+  norm_num
+
+/-- **The recalibrated slope at a null fit, named.** A fitted slope of zero means the score
+carried no signal in the recalibration sample, so the correction factor diverges and no
+recalibration is possible. The divisor is zero and Lean returns `0`, reporting a recalibrated
+slope of zero -- which reads downstream as a well-behaved, if useless, score rather than as a
+failed fit. Consumers must require `fittedSlope ≠ 0`. -/
+theorem recalibratedCalibrationSlope_null_fit_is_junk (slope : ℝ) :
+    recalibratedCalibrationSlope slope 0 = 0 := by
+  unfold recalibratedCalibrationSlope
+  norm_num
 
 /-- Exact affine representation of the target linear predictor in terms of the
     logistic-recalibrated predictor. -/
@@ -1646,6 +1711,18 @@ theorem logistic_recalibration_preserves_auc
 noncomputable def recalibrationTraceMSELowerBound
     (nEvents nParams infoPerEvent : ℝ) : ℝ :=
   nParams / (nEvents * infoPerEvent)
+
+/-- **The recalibration error floor at zero events, named.** With no events the recalibration
+parameters are unidentifiable and the mean squared error is bounded below by nothing useful --
+the bound diverges. The divisor is zero and Lean returns `0`: a floor of zero, which reads as
+PERFECT recalibration being attainable from an empty sample. A lower bound that collapses to zero
+exactly where estimation is impossible is the most dangerous direction for this quantity to fail,
+since it certifies rather than warns. Consumers must require `nEvents ≠ 0` and
+`infoPerEvent ≠ 0`. -/
+theorem recalibrationTraceMSELowerBound_no_events_is_junk (nParams infoPerEvent : ℝ) :
+    recalibrationTraceMSELowerBound 0 nParams infoPerEvent = 0 := by
+  unfold recalibrationTraceMSELowerBound
+  simp
 
 /-- **Total information times the bound is the parameter count.** That is what makes it an
 events-per-parameter rule rather than a bare ratio. -/

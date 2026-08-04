@@ -585,6 +585,16 @@ noncomputable def adaptationDifficultyIndex
     (nParams infoPerSample : ℝ) : ℝ :=
   nParams / infoPerSample
 
+/-- **Adaptation difficulty at zero information per sample, named.** A sample carrying no
+information about the target distribution makes adaptation impossible, so the number of samples
+required diverges. The divisor is zero and Lean returns `0`, reporting the EASIEST possible
+adaptation problem where the truth is that no amount of data suffices. Consumers must require
+`infoPerSample ≠ 0`. -/
+theorem adaptationDifficultyIndex_no_information_is_junk (nParams : ℝ) :
+    adaptationDifficultyIndex nParams 0 = 0 := by
+  unfold adaptationDifficultyIndex
+  simp
+
 /-- **The index times the information per sample is the parameter count.** That is what makes it
 a sample requirement rather than a bare ratio. -/
 theorem adaptationDifficultyIndex_mul_info (nParams infoPerSample : ℝ)
@@ -946,6 +956,17 @@ section PrecisionRecall
 noncomputable def metricPPV (sensitivity specificity prevalence : ℝ) : ℝ :=
   sensitivity * prevalence /
     (sensitivity * prevalence + (1 - specificity) * (1 - prevalence))
+
+/-- **Positive predictive value at zero prevalence, named.** With no cases in the population
+there are no positive calls to be right about and the PPV is undefined; numerator and denominator
+both vanish and Lean returns `0`. So a PERFECT test -- unit sensitivity, unit specificity --
+reports that every positive call it makes is wrong. The failure is worst exactly where screening
+programmes operate, at low prevalence, and it is indistinguishable from a test that genuinely
+never calls a true positive. Consumers must require `0 < prevalence`. -/
+theorem metricPPV_zero_prevalence_is_junk :
+    metricPPV 1 1 0 = 0 := by
+  unfold metricPPV
+  norm_num
 
 /-- **A perfectly specific test has predictive value one wherever it fires.**
 
