@@ -318,7 +318,7 @@ theorem prevalenceLogit_half : prevalenceLogit (1 / 2) = 0 := by
 /-- **The logit is odd about even odds**: swapping a disease for its complement flips the sign.
 This is the property that makes it a log-odds rather than any other increasing reparameterisation
 of prevalence. -/
-theorem prevalenceLogit_reflect (pi : ℝ) (h0 : pi ≠ 0) (h1 : pi ≠ 1) :
+theorem prevalenceLogit_reflect (pi : ℝ) :
     prevalenceLogit (1 - pi) = -prevalenceLogit pi := by
   unfold prevalenceLogit
   rw [sub_sub_cancel, ← Real.log_inv, inv_div]
@@ -855,12 +855,11 @@ theorem targetCalibrationProfile_exact_mechanistic_portability_law
       CrossPopulationMechanisticCalibrationModel.toShiftModel,
       CrossPopulationCalibrationShiftModel.calibrationProfile,
       CrossPopulationCalibrationShiftModel.calibrationMoments,
-      CrossPopulationCalibrationShiftModel.calibrationMoments,
       CrossPopulationMechanisticCalibrationModel.calibrationSlope,
       CrossPopulationMechanisticCalibrationModel.predictedMean,
       CrossPopulationMechanisticCalibrationModel.scoreMean,
       CrossPopulationMechanisticCalibrationModel.deploymentIntercept,
-      CalibrationMoments.toProfile, CalibrationMoments.shifted,
+      CalibrationMoments.toProfile,
       Calibrator.calibrationProfile, calibrationSlopeFromSourceWeights,
       calibrationInTheLarge, sub_eq_add_neg, add_assoc] <;> ring
 
@@ -899,7 +898,7 @@ theorem CrossPopulationMechanisticCalibrationModel.target_profile_slope_eq_direc
     CrossPopulationCalibrationShiftModel.calibrationProfile,
     CrossPopulationCalibrationShiftModel.calibrationMoments,
     CrossPopulationMechanisticCalibrationModel.calibrationSlope,
-    CalibrationMoments.toProfile, CalibrationMoments.shifted, calibrationProfile,
+    CalibrationMoments.toProfile, calibrationProfile,
     targetCalibrationSlopeFromSourceWeights_exact_direct_proxy_context_law]
 
 /-- **The AUC-and-CITL projection**, as one proposition about a source profile, a target
@@ -1318,7 +1317,6 @@ theorem targetCalibrationProfileAtGeneration_exact_mechanistic_popgen_portabilit
     CrossPopulationMechanisticCalibrationModel.observedMean,
     CrossPopulationMechanisticCalibrationModel.observedMeanShift,
     CrossPopulationMechanisticCalibrationModel.deploymentIntercept,
-    CrossPopulationMechanisticCalibrationModel.scoreMean,
     calibrationSlopeFromSourceWeights]
 
 /-- Exact generation-indexed target CITL law on the explicit population-genetic
