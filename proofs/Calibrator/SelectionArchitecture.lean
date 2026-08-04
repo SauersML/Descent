@@ -157,6 +157,18 @@ section DiversifyingSelection
 noncomputable def fluctuatingEffectCorrelation (t τ : ℝ) : ℝ :=
   Real.exp (-t / τ)
 
+/-- **Effects are perfectly correlated at zero divergence.**
+
+The decay theorem below is satisfied by every decreasing function of `t`, so it fixes the
+direction and leaves both the scale and the starting value free. At zero divergence time two
+populations have not diverged and the correlation must be exactly one; a body carrying a leading
+factor, or an offset, would still decay and would fail here. It is also the normalisation that
+makes `τ` a time constant rather than an arbitrary rate parameter. -/
+theorem fluctuatingEffectCorrelation_at_zero (τ : ℝ) :
+    fluctuatingEffectCorrelation 0 τ = 1 := by
+  unfold fluctuatingEffectCorrelation
+  norm_num
+
 /-- Effect correlation decays with divergence time. -/
 theorem fluctuating_correlation_decays
     (t₁ t₂ τ : ℝ)
