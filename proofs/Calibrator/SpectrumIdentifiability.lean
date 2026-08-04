@@ -446,13 +446,16 @@ when the Laplace core's smallest singular value decays like `exp (-κ r / 2)`. -
 noncomputable def stableSieveDimension (kappa L : ℝ) : ℝ :=
   Real.log L / kappa
 
-/-- **The actionable form of severe ill-posedness: one more resolvable epoch dimension costs a
-fixed multiplicative factor `exp κ` of genome.**  With the Cauchy exponent `κ = 2.4103951…`
-that factor is `11.1383…`, and the stable dimension grows like `0.4148697… log L`. -/
-theorem stableSieveDimension_of_scaled (kappa L : ℝ) (hk : kappa ≠ 0) (hL : 0 < L) :
-    stableSieveDimension kappa (Real.exp kappa * L) = stableSieveDimension kappa L + 1 := by
+/-- **The actionable form of severe ill-posedness.** Buying `added` further stable coordinates
+costs the exact genome multiplier `exp (κ * added)`. With the Cauchy exponent
+`κ = 2.4103951…`, every single additional coordinate costs `11.1383…` times as much independent
+data, and the stable dimension grows like `0.4148697… log L`. -/
+theorem stableSieveDimension_of_scaled
+    (kappa L added : ℝ) (hk : kappa ≠ 0) (hL : 0 < L) :
+    stableSieveDimension kappa (Real.exp (kappa * added) * L) =
+      stableSieveDimension kappa L + added := by
   unfold stableSieveDimension
-  rw [Real.log_mul (Real.exp_ne_zero kappa) (ne_of_gt hL), Real.log_exp]
+  rw [Real.log_mul (Real.exp_ne_zero (kappa * added)) (ne_of_gt hL), Real.log_exp]
   field_simp
   ring
 
