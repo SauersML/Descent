@@ -168,25 +168,45 @@ theorem freq_diff_increases_with_fst (fst₁ fst₂ p0 : ℝ)
   -- follows from fst₁ < fst₂ and 2 * p0 * (1-p0) > 0
   nlinarith
 
-/-- **Frequency-dependent effect on PGS variance.**
+/- **Frequency-dependent effect on PGS variance.**
     PGS variance = Σ β²_j × 2p_j(1-p_j).
     When allele frequencies change, PGS variance changes even
     with identical effect sizes. -/
+/-- **Exact ambiguity of weighted heterozygosity.** With a nonzero effect weight, two allele
+frequencies have the same variance contribution exactly when they are equal or complementary.
+The second branch is the minor/major-allele symmetry `p ↔ 1 - p`. -/
+theorem weighted_heterozygosity_eq_iff
+    (beta_sq p_source p_target : ℝ) (h_beta : beta_sq ≠ 0) :
+    beta_sq * (2 * p_source * (1 - p_source)) =
+        beta_sq * (2 * p_target * (1 - p_target)) ↔
+      p_source = p_target ∨ p_source + p_target = 1 := by
+  constructor
+  · intro h
+    have h_het : 2 * p_source * (1 - p_source) =
+        2 * p_target * (1 - p_target) :=
+      mul_left_cancel₀ h_beta h
+    have h_factor : (p_source - p_target) * (1 - p_source - p_target) = 0 := by
+      nlinarith
+    rcases mul_eq_zero.mp h_factor with h_same | h_complement
+    · exact Or.inl (by linarith)
+    · exact Or.inr (by linarith)
+  · rintro (rfl | h_complement)
+    · rfl
+    · rw [show p_target = 1 - p_source by linarith]
+      ring
+
 theorem freq_change_alters_pgs_variance
     (beta_sq p_source p_target : ℝ)
-    (h_beta : 0 < beta_sq) (_h_ps : 0 < p_source) (_h_ps_lt : p_source < 1)
-    (_h_pt : 0 < p_target) (_h_pt_lt : p_target < 1)
+    (h_beta : beta_sq ≠ 0)
     (h_diff : p_source ≠ p_target)
     (h_not_complement : p_source + p_target ≠ 1) :
     beta_sq * (2 * p_source * (1 - p_source)) ≠
       beta_sq * (2 * p_target * (1 - p_target)) := by
   intro h
-  have := mul_left_cancel₀ (ne_of_gt h_beta) h
-  have : p_source * (1 - p_source) = p_target * (1 - p_target) := by linarith
-  have h_factor : (p_source - p_target) * (1 - p_source - p_target) = 0 := by nlinarith
-  rcases mul_eq_zero.mp h_factor with h1 | h2
-  · exact h_diff (by linarith)
-  · exact h_not_complement (by linarith)
+  rcases (weighted_heterozygosity_eq_iff beta_sq p_source p_target h_beta).1 h with
+    h_same | h_complement
+  · exact h_diff h_same
+  · exact h_not_complement h_complement
 
 /-- **Lower-frequency alleles have larger proportional drift.**
     Variants with lower MAF have larger proportional frequency
