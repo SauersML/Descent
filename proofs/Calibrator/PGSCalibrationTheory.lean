@@ -1614,8 +1614,9 @@ theorem intercept_recalibration_shifts_citl
   unfold calibrationInTheLarge interceptRecalibrated
   ring
 
-/-- Intercept recalibration corrects CITL when the intercept is the fitted one. The fitted intercept is written out rather than
-    assumed of a free variable, so nothing is received from the caller. -/
+/-- Intercept recalibration corrects CITL when the intercept is the fitted one.
+    The fitted intercept is written out rather than assumed of a free variable,
+    so nothing is received from the caller. -/
 theorem intercept_recal_corrects_citl
     (mean_obs mean_pgs : ℝ) :
     calibrationInTheLarge mean_obs

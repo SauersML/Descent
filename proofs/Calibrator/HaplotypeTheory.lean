@@ -478,7 +478,8 @@ theorem mul_sq_sub_lt_of_lt_of_ne
   mul_lt_mul_of_pos_right h_coeff (sq_pos_of_ne_zero (sub_ne_zero.mpr h_gap))
 
 /-- **Compound heterozygosity is invisible to a dosage score — but only when
-phasing is good enough.** The comparison is now quantitative: a correctly specified phase-aware predictor beats the dosage predictor whenever its
+phasing is good enough.** The comparison is now quantitative: a correctly
+specified phase-aware predictor beats the dosage predictor whenever its
 switch-error rate is below `freq_cis (1 − freq_cis)`, which is at most `1/4` and
 falls to zero as the configuration becomes monomorphic.
 
