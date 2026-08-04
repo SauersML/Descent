@@ -307,20 +307,30 @@ theorem effectMutualInformation_unbounded_near_perfect
     have hle : B ≤ |B| := le_abs_self B
     linarith
 
-/-- **Mutual information increases with effect correlation.** -/
-theorem more_correlated_more_informative
+/-- Gaussian effect information is invariant under reversal of the source-target correlation
+direction. -/
+theorem effectMutualInformation_neg (m : ℕ) (ρ : ℝ) :
+    effectMutualInformation m (-ρ) = effectMutualInformation m ρ := by
+  unfold effectMutualInformation
+  congr 2
+  ring
+
+/-- **Mutual information increases with absolute effect correlation.**  This is the invariant
+statement: stronger anti-correlation is just as informative as stronger positive correlation. -/
+theorem more_absolute_correlation_more_informative
     (m : ℕ) (ρ₁ ρ₂ : ℝ)
     (hm : 0 < m)
-    (hρ₁_nn : 0 ≤ ρ₁) (hρ₂_nn : 0 ≤ ρ₂)
-    (hρ₁_lt : ρ₁ < 1) (hρ₂_lt : ρ₂ < 1)
-    (h_more_corr : ρ₁ < ρ₂) :
+    (hρ₂ : ρ₂ ^ 2 < 1)
+    (h_more_corr : |ρ₁| < |ρ₂|) :
     effectMutualInformation m ρ₁ < effectMutualInformation m ρ₂ := by
   unfold effectMutualInformation
   have hm_pos : (0 : ℝ) < m := Nat.cast_pos.mpr hm
   have h_neg_m : -(m : ℝ) / 2 < 0 := by linarith
-  have h1 : 1 - ρ₂ ^ 2 < 1 - ρ₁ ^ 2 := by nlinarith [sq_nonneg ρ₁, sq_nonneg ρ₂]
-  have h_pos₁ : 0 < 1 - ρ₁ ^ 2 := by nlinarith [sq_nonneg ρ₁]
-  have h_pos₂ : 0 < 1 - ρ₂ ^ 2 := by nlinarith [sq_nonneg ρ₂]
+  have h_sq : ρ₁ ^ 2 < ρ₂ ^ 2 := by
+    simpa only [sq_abs] using
+      (sq_lt_sq₀ (abs_nonneg ρ₁) (abs_nonneg ρ₂)).2 h_more_corr
+  have h1 : 1 - ρ₂ ^ 2 < 1 - ρ₁ ^ 2 := by linarith
+  have h_pos₂ : 0 < 1 - ρ₂ ^ 2 := by linarith
   have h_log : Real.log (1 - ρ₂ ^ 2) < Real.log (1 - ρ₁ ^ 2) :=
     Real.log_lt_log h_pos₂ h1
   nlinarith
