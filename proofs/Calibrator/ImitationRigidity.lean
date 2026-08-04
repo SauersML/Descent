@@ -423,6 +423,7 @@ a negative score variance: positive semidefiniteness, in the form the genetics
 uses it. -/
 def VarianceNonneg (A : Matrix ι ι ℝ) : Prop := ∀ x : ι → ℝ, 0 ≤ quadForm A x
 
+omit [DecidableEq ι] in
 theorem gramForm_symm {A : Matrix ι ι ℝ} (hA : A.IsSymm) (x y : ι → ℝ) :
     gramForm A x y = gramForm A y x := by
   unfold gramForm
@@ -431,6 +432,7 @@ theorem gramForm_symm {A : Matrix ι ι ℝ} (hA : A.IsSymm) (x y : ι → ℝ) 
   have hsym : A j i = A i j := hA.apply i j
   rw [hsym]; ring
 
+omit [DecidableEq ι] in
 theorem gramForm_sub_left (A : Matrix ι ι ℝ) (x y z : ι → ℝ) :
     gramForm A (x - y) z = gramForm A x z - gramForm A y z := by
   unfold gramForm
@@ -439,6 +441,7 @@ theorem gramForm_sub_left (A : Matrix ι ι ℝ) (x y z : ι → ℝ) :
   rw [← Finset.sum_sub_distrib]
   exact Finset.sum_congr rfl (fun j _ ↦ by simp [sub_mul])
 
+omit [DecidableEq ι] in
 theorem gramForm_smul_left (A : Matrix ι ι ℝ) (c : ℝ) (x y : ι → ℝ) :
     gramForm A (c • x) y = c * gramForm A x y := by
   unfold gramForm
@@ -447,6 +450,7 @@ theorem gramForm_smul_left (A : Matrix ι ι ℝ) (c : ℝ) (x y : ι → ℝ) :
   rw [Finset.mul_sum]
   exact Finset.sum_congr rfl (fun j _ ↦ by simp [Pi.smul_apply, smul_eq_mul]; ring)
 
+omit [DecidableEq ι] in
 theorem gramForm_sub_matrix (A B : Matrix ι ι ℝ) (x y : ι → ℝ) :
     gramForm (A - B) x y = gramForm A x y - gramForm B x y := by
   unfold gramForm
@@ -455,10 +459,12 @@ theorem gramForm_sub_matrix (A B : Matrix ι ι ℝ) (x y : ι → ℝ) :
   rw [← Finset.sum_sub_distrib]
   exact Finset.sum_congr rfl (fun j _ ↦ by simp [Matrix.sub_apply, mul_sub, sub_mul])
 
+omit [DecidableEq ι] in
 theorem quadForm_sub_matrix (A B : Matrix ι ι ℝ) (x : ι → ℝ) :
     quadForm (A - B) x = quadForm A x - quadForm B x :=
   gramForm_sub_matrix A B x x
 
+omit [DecidableEq ι] in
 /-- Expansion of a score variance along a line: the only analytic input the
 Cauchy–Schwarz step needs. -/
 theorem quadForm_sub_smul {A : Matrix ι ι ℝ} (hA : A.IsSymm) (x y : ι → ℝ) (s : ℝ) :
@@ -474,6 +480,7 @@ theorem quadForm_sub_smul {A : Matrix ι ι ℝ} (hA : A.IsSymm) (x y : ι → �
   rw [gramForm_sub_left, gramForm_smul_left, h1, h2]
   ring
 
+omit [DecidableEq ι] in
 /-- **Cauchy–Schwarz in the metric of a genotype covariance.** The covariance
 between two polygenic scores is at most the geometric mean of their variances.
 No invertibility is assumed, so a singular genotype second-moment matrix — the
@@ -502,6 +509,7 @@ theorem gramForm_sq_le {A : Matrix ι ι ℝ} (hA : A.IsSymm) (hpos : VarianceNo
     field_simp at h
     nlinarith [h, hposy]
 
+omit [DecidableEq ι] in
 /-- The score variance contributed by a rank-one covariance bump is the squared
 projection of the weights on the signal direction. -/
 theorem quadForm_rankOneCovarianceBump (scale : ℝ) (loading x : ι → ℝ) :
@@ -521,6 +529,7 @@ theorem quadForm_rankOneCovarianceBump (scale : ℝ) (loading x : ι → ℝ) :
   rw [hswap]
   ring
 
+omit [DecidableEq ι] in
 /-- A vector that the covariance maps onto the signal direction — the solution
 of `A w = v`, written without ever forming an inverse — reproduces the signal
 functional. -/
@@ -538,6 +547,7 @@ theorem gramForm_witness {A : Matrix ι ι ℝ} (hA : A.IsSymm)
   rw [hexpand, hwitness]
   rfl
 
+omit [DecidableEq ι] in
 /-- **The secular criterion for imitation.** A background covariance `A`
 (read: the headroom `C₀ I - K` left by the class ceiling) absorbs a rank-one
 polygenic bump of size `scale²` in the direction `v` exactly when
@@ -559,7 +569,8 @@ theorem varianceNonneg_sub_rankOne_iff
     have hw := hclass witness
     rw [quadForm_sub_matrix, quadForm_rankOneCovarianceBump, ← hself] at hw
     rcases eq_or_lt_of_le (hpos witness) with hzero | hpq
-    · rw [← hzero]; simpa using zero_le_one
+    · rw [← hzero]
+      simp
     · nlinarith [hw, hpq]
   · intro hthreshold x
     rw [quadForm_sub_matrix, quadForm_rankOneCovarianceBump, hproj x]
@@ -1070,11 +1081,13 @@ variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 evaluation geometry. -/
 def lossGeometryRisk (B M : Matrix ι ι ℝ) : ℝ := Matrix.trace (B * M)
 
+omit [DecidableEq ι] in
 theorem lossGeometryRisk_add (B₁ B₂ M : Matrix ι ι ℝ) :
     lossGeometryRisk (B₁ + B₂) M = lossGeometryRisk B₁ M + lossGeometryRisk B₂ M := by
   unfold lossGeometryRisk
   rw [Matrix.add_mul, Matrix.trace_add]
 
+omit [DecidableEq ι] in
 theorem lossGeometryRisk_smul (c : ℝ) (B M : Matrix ι ι ℝ) :
     lossGeometryRisk (c • B) M = c * lossGeometryRisk B M := by
   unfold lossGeometryRisk
@@ -1162,6 +1175,7 @@ private theorem ridge_root_iff_aux (A u : ℝ) (hu : u ≠ 0) :
     · have hinv : 1 - A = 1 / u := by rw [← h, one_div_one_div]
       linarith
 
+omit [DecidableEq ι] in
 /-- **The ridge balance root is a fixed point of a process.**
 
 The deterministic equivalent is not a stipulated closed form — there is no
@@ -1177,6 +1191,7 @@ theorem ridgeBalance_root_isFixedPoint (aspect : ℝ) (eig : ι → ℝ) (ridge 
   unfold ridgeBalance ridgeSelfConsistentStep
   exact ridge_root_iff_aux _ u hu
 
+omit [DecidableEq ι] in
 /-- **The no-shrinkage boundary is attained exactly.**  With `aspect = 0` — an
 infinitely long training sample, no variants-per-individual pressure — the
 resolvent functional vanishes and the fixed point is exactly `u = 1`, i.e.
@@ -1188,6 +1203,7 @@ it. -/
   unfold ridgeSelfConsistentStep
   norm_num
 
+omit [DecidableEq ι] in
 /-- At `aspect = 0` the balance equation has `u = 1` as its root, matching the
 boundary value of the map. -/
 theorem ridgeBalance_of_zero_aspect (eig : ι → ℝ) (ridge : ℝ) :
@@ -1195,6 +1211,7 @@ theorem ridgeBalance_of_zero_aspect (eig : ι → ℝ) (ridge : ℝ) :
   unfold ridgeBalance
   norm_num
 
+omit [DecidableEq ι] in
 theorem ridgeBalance_strictMonoOn (aspect : ℝ) (eig : ι → ℝ) (ridge : ℝ)
     (haspect : 0 ≤ aspect) (heig : ∀ i, 0 ≤ eig i) (hridge : 0 < ridge) :
     StrictMonoOn (ridgeBalance aspect eig ridge) (Set.Ici (1 : ℝ)) := by
@@ -1231,6 +1248,7 @@ theorem ridgeBalance_strictMonoOn (aspect : ℝ) (eig : ι → ℝ) (ridge : ℝ
       mul_le_mul_of_nonneg_left hdiv haspect
     linarith
 
+omit [DecidableEq ι] in
 /-- **Uniqueness of the ridge fixed point.** The scalar that every ridge-PGS
 risk formula depends on is well defined: there is at most one, and it is a
 functional of the training genotype spectrum and aspect ratio alone. -/
@@ -1540,6 +1558,7 @@ answers.
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
+omit [DecidableEq ι] in
 /-- The imitation bump acts on any weight vector through one scalar: the
 projection of the weights on the signal direction. -/
 theorem mulVec_add_rankOneCovarianceBump
@@ -1559,6 +1578,7 @@ theorem mulVec_add_rankOneCovarianceBump
   rw [← Finset.mul_sum]
   ring
 
+omit [DecidableEq ι] in
 /-- **The imitation is invisible to the normal equations of a score orthogonal
 to the signal.** The second-moment matrix of `Calibrator.SecondMomentShift`
 moves by a rank-one term, so a deployed polygenic score uncorrelated with the
@@ -1572,6 +1592,7 @@ theorem secondMoment_imitation_shift
         (scale ^ 2 * dot loading weights) • loading :=
   mulVec_add_rankOneCovarianceBump (secondMomentMatrix E X) scale loading weights
 
+omit [DecidableEq ι] in
 theorem secondMoment_imitation_invisible_to_orthogonal_score
     {Ω : Type*} (E : ExpFunctional Ω) (X : Ω → ι → ℝ)
     (scale : ℝ) (loading weights : ι → ℝ)
@@ -1581,6 +1602,7 @@ theorem secondMoment_imitation_invisible_to_orthogonal_score
   rw [secondMoment_imitation_shift, horth]
   simp
 
+omit [DecidableEq ι] in
 /-- **Whitening cannot destroy the imitation, only rotate it.** Conjugating the
 bump by any right-side transform — the operation `rightWhiten` performs on data
 rows — returns a bump of the same size in the transformed direction. Every
@@ -1619,6 +1641,7 @@ theorem rankOneCovarianceBump_conjugate
   rw [hexpand, hright, ← Finset.mul_sum, ← Finset.mul_sum, hswap]
   ring
 
+omit [DecidableEq ι] in
 /-- **Whitening maps the imitation model to an imitation model.** Applying the
 right-side transform of `Calibrator.WhiteningEquivalence` to a signal-carrying
 genotype matrix returns the same construction at the same strength, with the
