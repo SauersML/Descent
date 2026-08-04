@@ -274,7 +274,7 @@ def families(out: str) -> set[str]:
 
 
 # ======================================================================================
-# Calibration for the other six guards
+# Calibration for the other seven guards
 # ======================================================================================
 #
 # WHY THIS EXISTS.  Until now only the laundering guard had a control.  The other
@@ -405,6 +405,90 @@ structure Carrier where
     ("closure", "module outside the root import closure",
      clean_plus("Calibrator/Orphan.lean", CLEAN_SUB),
      "MODULE_ABSENT"),
+    # The three duplication shapes, one case each.  They are planted separately
+    # because they have three different fixes, and a screen that reports the
+    # wrong one of the three sends the reader to the wrong repair.
+    ("duplication", "one proposition proved twice under two names",
+     clean_plus("Calibrator/Sub.lean", CLEAN_SUB + """
+theorem retention_le_initial (ne t : ℝ) (h : 0 < ne) :
+    (1 - 1 / (2 * ne)) ^ t * cleanRate ne ≤ cleanRate ne := by
+  sorry
+
+theorem heterozygosity_bounded (n s : ℝ) (hn : 0 < n) :
+    (1 - 1 / (2 * n)) ^ s * cleanRate n ≤ cleanRate n := by
+  sorry
+"""),
+     "same proposition under different names"),
+    ("duplication", "one proof script under two different statements",
+     clean_plus("Calibrator/Sub.lean", CLEAN_SUB + """
+theorem alpha_bound (x : ℝ) (hx : 0 < x) : cleanRate x ≤ cleanRate x + x := by
+  have h1 : 0 ≤ x := le_of_lt hx
+  have h2 : cleanRate x = x := rfl
+  simp [cleanRate, h1, h2]
+  linarith [hx, h1]
+
+theorem beta_bound (y : ℝ) (hy : 0 < y) : cleanRate y ≤ cleanRate y * 2 + y := by
+  have h1 : 0 ≤ y := le_of_lt hy
+  have h2 : cleanRate y = y := rfl
+  simp [cleanRate, h1, h2]
+  linarith [hy, h1]
+"""),
+     "identical proof scripts under different statements"),
+    ("duplication", "a copy-pasted block of source lines",
+     clean_plus("Calibrator/Sub.lean", CLEAN_SUB + """
+structure PanelA where
+  sampleSizePerAncestry : ℕ
+  alleleFrequencySpectrum : ℝ
+  effectSizeStandardError : ℝ
+  ancestryFractionEstimate : ℝ
+  recombinationWindowRadius : ℕ
+  perGenerationMutationRate : ℝ
+  observedGenerationCount : ℕ
+  residualVarianceEstimate : ℝ
+  calibrationSlopeEstimate : ℝ
+
+structure PanelB where
+  sampleSizePerAncestry : ℕ
+  alleleFrequencySpectrum : ℝ
+  effectSizeStandardError : ℝ
+  ancestryFractionEstimate : ℝ
+  recombinationWindowRadius : ℕ
+  perGenerationMutationRate : ℝ
+  observedGenerationCount : ℕ
+  residualVarianceEstimate : ℝ
+  calibrationSlopeEstimate : ℝ
+"""),
+     "verbatim repeated source blocks"),
+]
+
+# Duplication traps: mathematics that LOOKS repeated to a careless screen and is
+# not.  Each is a false positive the guard would produce under an obvious
+# simplification of its rules, and a duplication screen that fires on these is
+# useless -- Lean proofs repeat short tactics everywhere, and a screen readers
+# learn to skim past has been deleted in effect.
+NEGATIVE_CASES = [
+    ("duplication", "two short idiomatic proofs of different statements",
+     clean_plus("Calibrator/Sub.lean", CLEAN_SUB + """
+theorem model_rate_refl (m : CleanModel) : m.rate = m.rate := rfl
+
+theorem model_rate_le (m : CleanModel) : m.rate ≤ m.rate := le_refl m.rate
+""")),
+    ("duplication", "an alias whose proof cites the theorem it restates",
+     clean_plus("Calibrator/Sub.lean", CLEAN_SUB + """
+theorem panel_weight_nonneg (w : ℝ) (hw : 0 ≤ w) :
+    0 ≤ w * w + w * w * w := by
+  sorry
+
+theorem panel_weight_nonneg' (v : ℝ) (hv : 0 ≤ v) :
+    0 ≤ v * v + v * v * v :=
+  panel_weight_nonneg v hv
+""")),
+    ("duplication", "trivially true statements that coincide by accident",
+     clean_plus("Calibrator/Sub.lean", CLEAN_SUB + """
+theorem nat_self (n : ℕ) : n = n := rfl
+
+theorem int_self (k : ℤ) : k = k := rfl
+""")),
 ]
 
 
@@ -415,7 +499,7 @@ def calibrate_others() -> list:
     # NEGATIVE, run once per guard: the clean fixture must satisfy all of them.
     # If this fails the positives below prove nothing, because a guard that
     # reports everything reports the planted defect too.
-    for guard in ("style", "regimes", "closure", "wiring"):
+    for guard in ("style", "regimes", "closure", "wiring", "duplication"):
         code, out = run_guard(guard, CLEAN)
         if code != 0:
             failures.append(
@@ -430,6 +514,15 @@ def calibrate_others() -> list:
         elif expected not in out:
             failures.append(
                 f"MISREPORTED     {guard}: {label} reported, but not as {expected!r}")
+
+    # NEGATIVE, per planted trap: repetition that is idiom, an explicit tie, or
+    # an accident of triviality must not be reported.
+    for guard, label, files in NEGATIVE_CASES:
+        code, out = run_guard(guard, files)
+        if code != 0:
+            failures.append(
+                f"FALSE POSITIVE  {guard}: {label}\n"
+                + "\n".join("      " + l for l in out.strip().split("\n")[:12]))
 
     # The wiring guard's --json keys are a machine-readable contract. This is the
     # exact defect that shipped undetected, so it is asserted by name.
@@ -451,8 +544,8 @@ def calibrate_others() -> list:
     # dropped from the default set and nothing says so.
     r = subprocess.run([sys.executable, str(CHECK), "--list"],
                        capture_output=True, text=True)
-    for guard in ("style", "identifications", "laundering", "regimes",
-                  "closure", "wiring", "field-proofs"):
+    for guard in ("style", "identifications", "duplication", "laundering",
+                  "regimes", "closure", "wiring", "field-proofs"):
         if guard not in r.stdout:
             failures.append(f"DISPATCH        --list does not name the {guard!r} guard")
 
@@ -479,7 +572,7 @@ def main() -> int:
     for bad in sorted(families(run(NEGATIVE, "--severity", "conditional"))):
         failures.append(f"FALSE POSITIVE  {bad} reported on clean mathematics")
 
-    # The other six guards, both directions, against fixture corpora.
+    # The other seven guards, both directions, against fixture corpora.
     failures.extend(calibrate_others())
 
     for f in failures:
@@ -491,9 +584,11 @@ def main() -> int:
     print("guard calibration PASSED")
     print(f"  laundering: {len(POSITIVE_EXPECTED)} planted patterns, each in the right family")
     print("  laundering: 0 findings at FATAL or CONDITIONAL severity on clean mathematics")
-    print(f"  style/regimes/closure/wiring: {len(CASES)} planted defects reported, "
-          f"clean fixture corpus accepted by all four")
-    print("  wiring --json keys asserted by name; --list names all seven guards")
+    print(f"  style/regimes/closure/wiring/duplication: {len(CASES)} planted defects "
+          f"reported, clean fixture corpus accepted by all five")
+    print(f"  duplication: {len(NEGATIVE_CASES)} traps -- idiom, an explicit tie and a "
+          f"trivial coincidence -- each accepted")
+    print("  wiring --json keys asserted by name; --list names all eight guards")
     return 0
 
 

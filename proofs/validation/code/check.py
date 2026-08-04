@@ -35,6 +35,11 @@ THE GUARDS, and what each one catches:
   identifications structural guards over the corpus: admissions (`sorry` is
                   reported, `admit` is forbidden), convention drift, equilibria
                   with no dynamic, duplicate bodies, and the budget ratchets.
+  duplication     the same mathematics written twice: two theorems stating one
+                  proposition under two names, one proof script serving two
+                  different statements, and verbatim repeated blocks of source.
+                  It complements the duplicate-BODY screen in `identifications`,
+                  which sees `def` bodies and nothing else.
   laundering      a valid proof of a weaker, conditional, vacuous or circular
                   statement advertised under the intended theorem's name.
   regimes         external theorem packaging in production structures: a
@@ -3778,6 +3783,311 @@ def run_field_proofs() -> int:
 
 
 # ======================================================================================
+# GUARD: duplication -- one piece of mathematics, or one piece of text, written twice
+#
+# The `identifications` guard already screens DEFINITION BODIES: two `def`s whose
+# bodies are alpha-equivalent and which nothing ties together.  That screen sees
+# `def`s and nothing else, and the corpus is mostly not `def`s.  Three duplication
+# shapes were therefore invisible to every guard here:
+#
+#   statements   two THEOREMS whose statements are the same proposition under two
+#                names.  This is the definition case's exact analogue and it is
+#                worse, because a theorem's content is entirely its statement:
+#                the second name adds no mathematics, it adds a second thing that
+#                must be kept in step by hand, and a reader who finds one has no
+#                way to know the other exists.
+#   proofs       two theorems with DIFFERENT statements and a character-identical
+#                proof script.  A repeated script is a lemma that has not been
+#                named: the argument is being re-run rather than applied, so a
+#                repair to the argument reaches one site and not the other.
+#   clones       any run of repeated source lines, anywhere -- inside a structure,
+#                inside a `variable` block, inside a proof, across files.  This is
+#                the catch-all: it needs no parse and so it catches the copy-paste
+#                the two structural screens above cannot name.
+#
+# WHY THREE AND NOT ONE.  They fail differently.  A duplicate statement is a
+# naming defect and the fix is deletion; a duplicate proof is a missing
+# abstraction and the fix is a lemma; a clone is neither -- it is text, and the
+# fix is whatever the text turns out to be.  Collapsing them into one number
+# would report the count that matters least.
+#
+# WHAT IS NOT REPORTED, and why.  A tie is credit here exactly as it is in the
+# duplicate-body screen: if one member's PROOF cites another member by name, the
+# two are related by a compile-checked arc and a divergence between them is a
+# build error rather than a silent drift.  That is the outcome these screens
+# exist to produce, so producing it is not a finding.
+
+DUPLICATE_STATEMENT_BUDGET = 0   # one proposition proved twice under two names
+DUPLICATE_PROOF_BUDGET = 0       # one proof script serving two different statements
+CLONE_BLOCK_BUDGET = 0           # a run of source lines repeated verbatim
+
+# A clone is CLONE_WINDOW or more repeated lines carrying at least CLONE_MIN_CHARS
+# of text.  Both thresholds exist to keep the screen off Lean's unavoidable
+# repetition: `  intro h`, `  simp`, `  ring` recur everywhere and three of them
+# in a row is idiom, not copy-paste.  Eight lines that agree to the character are
+# not idiom.
+CLONE_WINDOW = 8
+CLONE_MIN_CHARS = 160
+
+# Lines that repeat across every module by construction and say nothing about
+# duplication of MATHEMATICS.  Leaving them in the stream lets a file's import
+# block and namespace scaffolding pair with any other file's.
+CLONE_BOILERPLATE = re.compile(
+    r"^(?:import|open|namespace|end|section|set_option|universe|attribute)\b")
+
+DUP_IDENT = re.compile(r"[^\W\d][\w'!?₀-₉]*", re.UNICODE)
+
+# A proof shorter than this is idiom rather than an argument: `rfl`, `by simp`,
+# `by norm_num [foo]`, `⟨h, h'⟩`.  Two theorems both proved by `by simp` is not a
+# missing lemma, and reporting it is how a screen teaches people to skim.
+DUP_PROOF_MIN_TOKENS = 15
+
+
+def dup_alpha(text: str, bound: set) -> str:
+    """`text` with the declaration's own binder names renamed by order of first use.
+
+    Order of USE, not of declaration, so `(m Ne : ℕ)` and `(Ne m : ℕ)` over the
+    same formula normalise together -- the same rule the duplicate-body screen in
+    `identifications` uses, and for the same reason.
+    """
+    seen: dict[str, str] = {}
+
+    def rename(m):
+        w = m.group(0)
+        if w in bound:
+            seen.setdefault(w, "V%d" % (len(seen) + 1))
+            return seen[w]
+        return w
+
+    return norm(DUP_IDENT.sub(rename, text))
+
+
+def dup_statement_key(d: Decl) -> str:
+    """The proposition a theorem states, independent of its binder names.
+
+    Section `variable` binders are included only when the header actually
+    mentions them.  `parse_file` attaches EVERY `variable` declared earlier in the
+    file, used or not, so keying on all of them would make two identical theorems
+    in one file look different the moment an unrelated `variable` line was added
+    between them -- and make two identical theorems in different files look
+    different always.
+    """
+    used = set(DUP_IDENT.findall(d.header))
+    context = sorted(
+        f"({b.name} : {norm(b.type)})"
+        for b in d.binders
+        if b.inherited and b.name and b.name in used
+    )
+    bound = {b.name for b in d.binders if b.name}
+    return dup_alpha(" ".join(context) + " " + d.header, bound)
+
+
+def dup_substantive(key: str) -> bool:
+    """Whether a normalised statement says enough to be worth pairing on.
+
+    `∀ x, x = x` and `0 ≤ n` are true of everything and coincide across unrelated
+    modules; the same screen in `identifications` requires a constant or a named
+    function for exactly this reason.
+    """
+    skeleton = re.sub(r"\bV[0-9]+\b", "", key)
+    return len(key) >= 30 and bool(re.search(r"[A-Za-z_][A-Za-z_0-9]{2,}", skeleton))
+
+
+def dup_lean_decls() -> list:
+    """Every parsed declaration in the corpus, from the one file walk."""
+    decls = []
+    for f in lean_sources(PROOFS):
+        d, _ = parse_file(f)
+        decls.extend(d)
+    return decls
+
+
+def dup_cites(a: Decl, b: Decl) -> bool:
+    """Whether either declaration's proof names the other: a compile-checked tie."""
+    if not a.name or not b.name:
+        return False
+    return (re.search(r"\b" + re.escape(b.name) + r"\b", a.body) is not None or
+            re.search(r"\b" + re.escape(a.name) + r"\b", b.body) is not None)
+
+
+def dup_untied(members: list) -> list:
+    """Members left once everything tied to an earlier member is dropped."""
+    kept: list = []
+    for d in members:
+        if any(dup_cites(d, k) for k in kept):
+            continue
+        kept.append(d)
+    return kept
+
+
+def dup_clone_lines() -> list:
+    """The corpus as a list of (file, line, text), comments and boilerplate removed.
+
+    Read from the MASKED source: a licence header repeated in every file is a
+    licence header, not a clone, and comparing raw text would report the corpus's
+    own conventions as its worst duplication.
+    """
+    stream = []
+    for f in lean_sources(PROOFS):
+        rel = os.path.relpath(f, CORPUS_BASE)
+        for i, raw in enumerate(mask(read_source(f)).split("\n"), start=1):
+            text = " ".join(raw.split())
+            if not text or CLONE_BOILERPLATE.match(text):
+                continue
+            stream.append((rel, i, text))
+    return stream
+
+
+def dup_clones() -> list:
+    """Maximal runs of CLONE_WINDOW or more identical lines occurring more than once."""
+    stream = dup_clone_lines()
+    by_file: dict[str, list] = defaultdict(list)
+    for rel, line, text in stream:
+        by_file[rel].append((line, text))
+
+    # Windows are indexed WITHIN a file, so a window never straddles two files.
+    positions: list[tuple[str, int]] = []
+    keys: list[tuple] = []
+    for rel in sorted(by_file):
+        rows = by_file[rel]
+        for i in range(len(rows) - CLONE_WINDOW + 1):
+            window = tuple(t for _, t in rows[i : i + CLONE_WINDOW])
+            if sum(len(t) for t in window) < CLONE_MIN_CHARS:
+                continue
+            positions.append((rel, i))
+            keys.append(window)
+
+    groups: dict[tuple, list] = defaultdict(list)
+    for pos, key in zip(positions, keys):
+        groups[key].append(pos)
+    key_at = {pos: key for pos, key in zip(positions, keys)}
+
+    findings = []
+    for key, occ in groups.items():
+        if len(occ) < 2:
+            continue
+        # Drop a window whose left-neighbour window repeats the same way: it is
+        # the tail of a longer clone that is already being reported.  Without
+        # this a 30-line clone is reported 23 times.
+        prev = [(rel, i - 1) for rel, i in occ]
+        if all(p in key_at for p in prev):
+            prev_keys = {key_at[p] for p in prev}
+            if len(prev_keys) == 1 and len(groups[next(iter(prev_keys))]) == len(occ):
+                continue
+        # Extend right while every occurrence still agrees, to report the run's
+        # true length rather than the window's.
+        length = CLONE_WINDOW
+        while True:
+            nxt = {by_file[rel][i + length][1] if i + length < len(by_file[rel]) else None
+                   for rel, i in occ}
+            if len(nxt) != 1 or None in nxt:
+                break
+            length += 1
+        findings.append((length, sorted(occ)))
+
+    # A region that repeats with PERIOD shorter than itself -- five copies of the
+    # same nine-line block, one after another -- produces a family of shifted
+    # windows, each a genuine repeat and all of them the same defect.  Reporting
+    # all of them buried the corpus's real clones under one file's arithmetic
+    # blocks.  Longest first, and a finding is dropped when every one of its
+    # occurrences already sits inside a longer finding's.
+    findings.sort(key=lambda x: (-x[0], x[1]))
+    covered: dict[str, list] = defaultdict(list)
+    kept = []
+    for length, occ in findings:
+        if all(any(a <= i and i + length <= b for a, b in covered[rel])
+               for rel, i in occ):
+            continue
+        kept.append((length, sorted(
+            f"{rel}:{by_file[rel][i][0]}-{by_file[rel][i + length - 1][0]}"
+            for rel, i in occ)))
+        for rel, i in occ:
+            covered[rel].append((i, i + length))
+    return kept
+
+
+def run_duplication() -> int:
+    decls = dup_lean_decls()
+    theorems = [d for d in decls
+                if d.kind in ("theorem", "lemma") and d.name and d.body]
+
+    # 1. One proposition, two names.
+    by_statement: dict[str, list] = defaultdict(list)
+    for d in theorems:
+        key = dup_statement_key(d)
+        if dup_substantive(key):
+            by_statement[key].append(d)
+
+    dup_statements = []
+    for key, members in sorted(by_statement.items()):
+        kept = dup_untied(sorted(members, key=lambda d: (d.file, d.line)))
+        if len(kept) > 1:
+            dup_statements.append((key, kept))
+
+    # 2. One proof script, two statements.  Statements that are ALSO equal are
+    #    reported above and are not counted twice here: the finding there is the
+    #    stronger one and the fix there subsumes this one.
+    by_proof: dict[str, list] = defaultdict(list)
+    for d in theorems:
+        bound = {b.name for b in d.binders if b.name}
+        proof = dup_alpha(d.body, bound)
+        if len(proof.split()) >= DUP_PROOF_MIN_TOKENS:
+            by_proof[proof].append(d)
+
+    dup_proofs = []
+    for proof, members in sorted(by_proof.items()):
+        kept = dup_untied(sorted(members, key=lambda d: (d.file, d.line)))
+        if len(kept) < 2:
+            continue
+        if len({dup_statement_key(d) for d in kept}) == 1:
+            continue
+        dup_proofs.append((proof, kept))
+
+    # 3. Repeated text, whatever it is made of.
+    clones = dup_clones()
+
+    failures = []
+    if len(dup_statements) > DUPLICATE_STATEMENT_BUDGET:
+        failures.append(
+            f"theorems stating the same proposition under different names: "
+            f"{len(dup_statements)}, budget {DUPLICATE_STATEMENT_BUDGET}; delete all "
+            f"but one, or -- if both names are wanted -- prove one FROM the other so "
+            f"the corpus records that they are the same claim")
+        for key, members in dup_statements:
+            failures.append(f"    {_clip(key, 92)}")
+            for d in members:
+                failures.append(f"        {d.file}:{d.line}  {d.name}")
+    if len(dup_proofs) > DUPLICATE_PROOF_BUDGET:
+        failures.append(
+            f"identical proof scripts under different statements: {len(dup_proofs)}, "
+            f"budget {DUPLICATE_PROOF_BUDGET}; the repeated script is an unnamed lemma "
+            f"-- name it and apply it")
+        for proof, members in dup_proofs:
+            failures.append(f"    {_clip(proof, 92)}")
+            for d in members:
+                failures.append(f"        {d.file}:{d.line}  {d.name}")
+    if len(clones) > CLONE_BLOCK_BUDGET:
+        failures.append(
+            f"verbatim repeated source blocks of {CLONE_WINDOW}+ lines: {len(clones)}, "
+            f"budget {CLONE_BLOCK_BUDGET}; factor the repeated text, or say in the "
+            f"corpus what makes the two copies different")
+        for length, sites in clones:
+            failures.append(f"    {length} lines: " + "  ==  ".join(sites))
+
+    if failures:
+        print("DUPLICATION FAILURES\n")
+        for line in failures:
+            print("  " + line)
+        return 1
+    print(f"duplication guard passes: duplicate statements "
+          f"{len(dup_statements)}/{DUPLICATE_STATEMENT_BUDGET}, duplicate proofs "
+          f"{len(dup_proofs)}/{DUPLICATE_PROOF_BUDGET}, repeated {CLONE_WINDOW}+-line "
+          f"blocks {len(clones)}/{CLONE_BLOCK_BUDGET} "
+          f"(over {len(theorems)} theorems)")
+    return 0
+
+
+# ======================================================================================
 # DISPATCHER
 # ======================================================================================
 
@@ -3794,6 +4104,7 @@ def run_field_proofs() -> int:
 GUARDS = {
     "style":           dict(fn=run_style,           gated=True,  takes_argv=False),
     "identifications": dict(fn=run_identifications, gated=True,  takes_argv=False),
+    "duplication":     dict(fn=run_duplication,     gated=True,  takes_argv=False),
     "laundering":      dict(fn=run_laundering,      gated=True,  takes_argv=True),
     "regimes":         dict(fn=run_regimes,         gated=True,  takes_argv=False),
     "closure":         dict(fn=run_closure,         gated=True,  takes_argv=False),
@@ -3823,14 +4134,14 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.only:
         if args.only not in GUARDS:
-            print(f"unknown guard {args.only!r}; --list shows the seven",
+            print(f"unknown guard {args.only!r}; --list shows them all",
                   file=sys.stderr)
             return 2
         selected = [args.only]
     else:
         if rest:
             # Guard-specific flags are meaningless without --only: there is no
-            # sensible way to route `--strict` when six guards are running and
+            # sensible way to route `--strict` when every guard is running and
             # only one understands it.  Silently ignoring them would be worse.
             print(f"unrecognised arguments {rest} -- pass them after --only NAME",
                   file=sys.stderr)
