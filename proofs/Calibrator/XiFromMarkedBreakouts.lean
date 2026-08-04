@@ -207,6 +207,27 @@ theorem xi_surjectivity_density (eta : FamilyMassPartition)
 
 /-! ## The paintbox weight, and what it does and does not remember -/
 
+/-- Total population fraction reached by all successful families in one breakout.  A front
+trajectory sees this scalar but not how it is partitioned among independent origins. -/
+noncomputable def totalFamilyFraction {k : ℕ} (η : Fin k → ℝ) : ℝ :=
+  ∑ i, η i
+
+/-- A single successful family carries its whole final fraction. -/
+@[simp] theorem totalFamilyFraction_single (x : ℝ) :
+    totalFamilyFraction ![x] = x := by
+  simp [totalFamilyFraction]
+
+/-- Splitting a successful fraction equally between two origins leaves the total fraction
+unchanged. -/
+@[simp] theorem totalFamilyFraction_split (x : ℝ) :
+    totalFamilyFraction ![x / 2, x / 2] = x := by
+  simp [totalFamilyFraction, Fin.sum_univ_two]
+
+/-- The hard- and soft-sweep witnesses lie in exactly the same total-frequency fiber. -/
+theorem totalFamilyFraction_single_eq_split (x : ℝ) :
+    totalFamilyFraction ![x] = totalFamilyFraction ![x / 2, x / 2] := by
+  simp
+
 /-- Probability that a specified pair of ancestral blocks lands in the same family at a breakout
 with mass partition `η`.  This is `σ(η) = ∑ᵢ ηᵢ²`, and it is the only thing the genealogy sees
 about the partition at the pairwise level. -/
@@ -331,6 +352,21 @@ theorem disjointPairMergeProbability_pos_iff_hasTwoPositiveFamilies {k : ℕ}
       at hpos
     exact lt_irrefl 0 hpos
   · exact disjointPairMergeProbability_pos_of_hasTwoPositiveFamilies η
+
+/-- **Multiplicity is not a function of total sweep frequency.**  A positive fraction reached
+from one origin and the same fraction split across two origins have exactly the same front
+observable, but lie on opposite sides of the Λ/Ξ boundary.  This is the explicit witness-fiber
+statement missing from a merely genealogical comparison. -/
+theorem totalFamilyFraction_does_not_determine_multiplicity (x : ℝ) (hx : 0 < x) :
+    totalFamilyFraction ![x] = totalFamilyFraction ![x / 2, x / 2] ∧
+      ¬HasTwoPositiveFamilies ![x] ∧
+      HasTwoPositiveFamilies ![x / 2, x / 2] := by
+  refine ⟨totalFamilyFraction_single_eq_split x, ?_, ?_⟩
+  · rintro ⟨i, j, hij, hi, hj⟩
+    fin_cases i
+    fin_cases j
+    exact hij rfl
+  · exact ⟨0, 1, by decide, by simpa using half_pos hx, by simpa using half_pos hx⟩
 
 /-- A single-family breakout can never produce a simultaneous disjoint merger. -/
 @[simp] theorem disjointPairMerge_single_zero (x : ℝ) :
