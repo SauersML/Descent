@@ -237,6 +237,40 @@ theorem effectMutualInformation_nonneg (m : ℕ) (ρ : ℝ) (hρ : ρ ^ 2 < 1) :
   have hm : (0 : ℝ) ≤ m := Nat.cast_nonneg m
   nlinarith [h_log, hm]
 
+/-- **Positive Gaussian effect information exactly means nonzero correlation.**  On the valid
+domain and for a nonempty effect vector, the sign of the information detects any nonzero effect
+correlation, regardless of its direction. -/
+theorem effectMutualInformation_pos_iff
+    (m : ℕ) (hm : 0 < m) (ρ : ℝ) (hρ : ρ ^ 2 < 1) :
+    0 < effectMutualInformation m ρ ↔ ρ ≠ 0 := by
+  constructor
+  · intro h_info h_zero
+    subst ρ
+    rw [no_info_when_uncorrelated] at h_info
+    exact (lt_irrefl 0) h_info
+  · intro h_nonzero
+    unfold effectMutualInformation
+    have hm_pos : (0 : ℝ) < m := Nat.cast_pos.mpr hm
+    have h_coeff : -(m : ℝ) / 2 < 0 := by linarith
+    have h_arg_pos : 0 < 1 - ρ ^ 2 := by linarith
+    have h_sq_pos : 0 < ρ ^ 2 := sq_pos_of_ne_zero h_nonzero
+    have h_log : Real.log (1 - ρ ^ 2) < 0 :=
+      Real.log_neg h_arg_pos (by linarith)
+    exact mul_pos_of_neg_of_neg h_coeff h_log
+
+/-- On its valid domain, zero Gaussian effect information characterizes zero source-target effect
+correlation exactly. -/
+theorem effectMutualInformation_eq_zero_iff
+    (m : ℕ) (hm : 0 < m) (ρ : ℝ) (hρ : ρ ^ 2 < 1) :
+    effectMutualInformation m ρ = 0 ↔ ρ = 0 := by
+  constructor
+  · intro h_info
+    by_contra h_nonzero
+    have h_pos := (effectMutualInformation_pos_iff m hm ρ hρ).2 h_nonzero
+    linarith
+  · rintro rfl
+    exact no_info_when_uncorrelated m
+
 /-- **The information does diverge at the edge of its domain.** For every bound
 `B` there is an admissible correlation — one strictly inside `ρ ^ 2 < 1` — whose
 mutual information exceeds `B`. This is the statement the junk value at `ρ = ±1`
