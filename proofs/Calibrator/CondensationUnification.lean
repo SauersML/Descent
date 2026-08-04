@@ -431,6 +431,17 @@ loci, no LD or structure, and not every statistic that could be called fourth-cu
 was constructed. -/
 noncomputable def gaussianKurtosisMaf : ℝ := (3 - Real.sqrt 3) / 6
 
+/-- **The Gaussian kurtosis frequency is below a quarter.** A one-sided bound on a constant built
+from a surd does not exclude the sign-flipped constant, which here is `(3 + √3)/6 > 3/4`. This
+bound does. -/
+theorem gaussianKurtosisMaf_lt_quarter : gaussianKurtosisMaf < 1 / 4 := by
+  have h3 : (3 / 2 : ℝ) < Real.sqrt 3 := by
+    have h : Real.sqrt ((3 / 2 : ℝ) ^ 2) < Real.sqrt 3 :=
+      Real.sqrt_lt_sqrt (by norm_num) (by norm_num)
+    rwa [Real.sqrt_sq (by norm_num : (0:ℝ) ≤ 3 / 2)] at h
+  unfold gaussianKurtosisMaf
+  linarith
+
 theorem sqrt_three_sq : Real.sqrt 3 ^ 2 = 3 := Real.sq_sqrt (by norm_num)
 
 theorem sqrt_three_lt_two : Real.sqrt 3 < 2 := by

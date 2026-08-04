@@ -238,6 +238,15 @@ noncomputable def GWASObservationModel.witness : GWASObservationModel where
 noncomputable def GWASObservationModel.standardError (m : GWASObservationModel) : ℝ :=
   m.sigma / Real.sqrt m.n
 
+/-- **The root-n law, stated as an identity rather than a rate.** Positivity does not pin the
+exponent; multiplying the standard error by the root of the sample size returns the residual
+scale, and no other power of `n` satisfies that. -/
+theorem GWASObservationModel.standardError_mul_sqrt_n (m : GWASObservationModel)
+    (h : Real.sqrt m.n ≠ 0) :
+    m.standardError * Real.sqrt m.n = m.sigma := by
+  unfold GWASObservationModel.standardError
+  field_simp
+
 /-- Standard error is strictly positive. -/
 theorem GWASObservationModel.se_pos (m : GWASObservationModel) :
     0 < m.standardError := by

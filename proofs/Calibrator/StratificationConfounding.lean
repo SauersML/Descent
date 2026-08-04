@@ -260,6 +260,15 @@ theorem ColliderModel.inducedCov_neg (m : ColliderModel) :
 noncomputable def ColliderModel.β_selected (m : ColliderModel) : ℝ :=
   m.β_G * (m.σ2_G / (m.σ2_G + m.σ2_E))
 
+/-- **The attenuation factor is the genetic share of the total variance.** Attenuation alone is
+shared by every multiplier below one; this says which multiplier, and it is the quantity that
+decides how much of the association survives collider selection. -/
+theorem ColliderModel.β_selected_mul_total (m : ColliderModel)
+    (h : m.σ2_G + m.σ2_E ≠ 0) :
+    m.β_selected * (m.σ2_G + m.σ2_E) = m.β_G * m.σ2_G := by
+  unfold ColliderModel.β_selected
+  field_simp
+
 theorem collider_attenuates_association (m : ColliderModel) :
     m.β_selected < m.β_G := by
   unfold ColliderModel.β_selected

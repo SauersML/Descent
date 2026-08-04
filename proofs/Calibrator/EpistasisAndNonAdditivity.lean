@@ -126,6 +126,15 @@ noncomputable def pairwiseModel
     (beta1 beta2 beta12 g1 g2 : ℝ) : ℝ :=
   beta1 * g1 + beta2 * g2 + beta12 * g1 * g2
 
+/-- **The interaction coefficient is exactly the departure from additivity.** This is what makes
+`beta12` estimable: subtract the additive prediction and what remains is the product term, with
+no part of it absorbable into the marginal effects. -/
+theorem pairwiseModel_sub_additive (beta1 beta2 beta12 g1 g2 : ℝ) :
+    pairwiseModel beta1 beta2 beta12 g1 g2 - (beta1 * g1 + beta2 * g2)
+      = beta12 * g1 * g2 := by
+  unfold pairwiseModel
+  ring
+
 /-- **Additive PGS misses interaction signal.**
     PGS_additive = β₁g₁ + β₂g₂ misses β₁₂g₁g₂. -/
 theorem additive_misses_epistasis

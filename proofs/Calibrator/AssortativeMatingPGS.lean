@@ -96,6 +96,13 @@ and positivity and the upper bound are theorems rather than assumptions. -/
 noncomputable def AssortativeMatingModel.h2 (m : AssortativeMatingModel) : ℝ :=
   m.V_A / m.V_P
 
+/-- **Heritability recovers the additive variance from the phenotypic variance.** -/
+theorem AssortativeMatingModel.h2_mul_V_P (m : AssortativeMatingModel)
+    (h : m.V_P ≠ 0) :
+    m.h2 * m.V_P = m.V_A := by
+  unfold AssortativeMatingModel.h2
+  field_simp
+
 theorem AssortativeMatingModel.V_P_pos (m : AssortativeMatingModel) : 0 < m.V_P :=
   lt_trans m.V_A_pos m.V_A_lt_V_P
 
