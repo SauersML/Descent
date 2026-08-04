@@ -52,6 +52,20 @@ section QSTFSTTest
 noncomputable def qst (V_between V_within : ℝ) : ℝ :=
   V_between / (V_between + 2 * V_within)
 
+/-- **No within-population variance makes the statistic one.**
+
+The cross-check below identifies `Q_ST` with the coalescent `F_ST` as one map applied to two
+different pairs, which constrains the two together and neither alone. This endpoint fixes the
+factor of two: at zero within-population variance the ratio is one for every coefficient on
+`V_within`, but the map only reaches one *there*, and a body with the factor elsewhere -- inside
+the numerator, or on `V_between` -- fails. It is also the reading that makes `Q_ST` a proportion:
+all of the additive variation is between populations exactly when none is within. -/
+theorem qst_no_within (V_between : ℝ) (h : V_between ≠ 0) :
+    qst V_between 0 = 1 := by
+  unfold qst
+  norm_num
+  exact div_self h
+
 /-- **Cross-check: `Q_ST` and the coalescent `F_ST` are one map applied to two
 different pairs of quantities.** `PopulationGeneticsFoundations.coalFst` sends
 `(t, Nₑ)` to `t / (t + 2 Nₑ)`; `qst` sends `(V_b, V_w)` to
