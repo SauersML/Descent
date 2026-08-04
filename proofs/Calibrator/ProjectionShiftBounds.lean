@@ -279,7 +279,7 @@ definition, so every body agreeing with it in sign and monotonicity was indistin
 it. At all arguments equal to `1 / 2` it is `1 / 2`, which fixes the coefficients a one-sided
 bound or an invariance leaves free. -/
 theorem reconstructionWeight_at_reference_point :
-    reconstructionWeight 1 / 2 = 1 / 2 := by
+    reconstructionWeight (1 / 2) = 1 / 2 := by
   unfold reconstructionWeight
   norm_num
 

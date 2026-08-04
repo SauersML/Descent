@@ -190,7 +190,7 @@ definition, so every body agreeing with it in sign and monotonicity was indistin
 it. At all arguments equal to `1 / 2` it is `1 / 4`, which fixes the coefficients a one-sided
 bound or an invariance leaves free. -/
 theorem approxLOOPGS_at_reference_point :
-    approxLOOPGS 1 / 2 1 / 2 1 / 2 = 1 / 4 := by
+    approxLOOPGS (1 / 2) (1 / 2) (1 / 2) = 1 / 4 := by
   unfold approxLOOPGS
   norm_num
 
@@ -238,7 +238,7 @@ definition, so every body agreeing with it in sign and monotonicity was indistin
 it. At all arguments equal to `1 / 2` it is `3 / 4`, which fixes the coefficients a one-sided
 bound or an invariance leaves free. -/
 theorem kinshipInflation_at_reference_point :
-    kinshipInflation 1 / 2 1 / 2 1 / 2 = 3 / 4 := by
+    kinshipInflation (1 / 2) (1 / 2) (1 / 2) = 3 / 4 := by
   unfold kinshipInflation
   norm_num
 

@@ -87,7 +87,7 @@ definition, so every body agreeing with it in sign and monotonicity was indistin
 it. At all arguments equal to `1 / 2` it is `1 / 2`, which fixes the coefficients a one-sided
 bound or an invariance leaves free. -/
 theorem fisherAverageEffect_at_reference_point :
-    fisherAverageEffect 1 / 2 1 / 2 1 / 2 = 1 / 2 := by
+    fisherAverageEffect (1 / 2) (1 / 2) (1 / 2) = 1 / 2 := by
   unfold fisherAverageEffect
   norm_num
 
@@ -175,7 +175,7 @@ definition, so every body agreeing with it in sign and monotonicity was indistin
 it. At all arguments equal to `1 / 2` it is `1 / 16`, which fixes the coefficients a one-sided
 bound or an invariance leaves free. -/
 theorem epistaticVariance_at_reference_point :
-    epistaticVariance 1 / 2 1 / 2 1 / 2 = 1 / 16 := by
+    epistaticVariance (1 / 2) (1 / 2) (1 / 2) = 1 / 16 := by
   unfold epistaticVariance
   norm_num
 

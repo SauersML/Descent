@@ -57,7 +57,7 @@ every body agreeing with it in sign and monotonicity was indistinguishable from 
 arguments equal to `1 / 2` it is `1 / 3`, which fixes the
 coefficients a one-sided bound or an invariance leaves free. -/
 theorem qst_at_reference_point :
-    qst 1 / 2 1 / 2 = 1 / 3 := by
+    qst (1 / 2) (1 / 2) = 1 / 3 := by
   unfold qst
   norm_num
 
@@ -139,7 +139,7 @@ this definition, so every body agreeing with it in sign and monotonicity was ind
 from it. At all arguments equal to `1 / 2` it is `1 / 4`, which fixes the coefficients a
 one-sided bound or an invariance leaves free. -/
 theorem pgsDriftVariance_one_pop_at_reference_point :
-    pgsDriftVariance_one_pop 1 / 2 1 / 2 = 1 / 4 := by
+    pgsDriftVariance_one_pop (1 / 2) (1 / 2) = 1 / 4 := by
   unfold pgsDriftVariance_one_pop
   norm_num
 

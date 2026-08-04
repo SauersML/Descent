@@ -50,7 +50,7 @@ this definition, so every body agreeing with it in sign and monotonicity was ind
 from it. At all arguments equal to `1 / 2` it is `1 / 4`, which fixes the coefficients a
 one-sided bound or an invariance leaves free. -/
 theorem neutralPortabilityRatioLD_at_reference_point :
-    neutralPortabilityRatioLD 1 / 2 1 / 2 = 1 / 4 := by
+    neutralPortabilityRatioLD (1 / 2) (1 / 2) = 1 / 4 := by
   unfold neutralPortabilityRatioLD
   norm_num
 
@@ -234,7 +234,7 @@ definition, so every body agreeing with it in sign and monotonicity was indistin
 it. At all arguments equal to `1 / 2` it is `1 / 2`, which fixes the coefficients a one-sided
 bound or an invariance leaves free. -/
 theorem fstFromDriftFactor_at_reference_point :
-    fstFromDriftFactor 1 / 2 = 1 / 2 := by
+    fstFromDriftFactor (1 / 2) = 1 / 2 := by
   unfold fstFromDriftFactor
   norm_num
 

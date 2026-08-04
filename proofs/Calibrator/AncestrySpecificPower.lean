@@ -106,7 +106,7 @@ definition, so every body agreeing with it in sign and monotonicity was indistin
 it. At all arguments equal to `1 / 2` it is `1 / 2`, which fixes the coefficients a one-sided
 bound or an invariance leaves free. -/
 theorem genotypeVarianceHWE_at_reference_point :
-    genotypeVarianceHWE 1 / 2 = 1 / 2 := by
+    genotypeVarianceHWE (1 / 2) = 1 / 2 := by
   unfold genotypeVarianceHWE
   norm_num
 
@@ -392,7 +392,7 @@ definition, so every body agreeing with it in sign and monotonicity was indistin
 it. At all arguments equal to `1 / 2` it is `1 / 2`, which fixes the coefficients a one-sided
 bound or an invariance leaves free. -/
 theorem hweHeterozygosity_at_reference_point :
-    hweHeterozygosity 1 / 2 = 1 / 2 := by
+    hweHeterozygosity (1 / 2) = 1 / 2 := by
   unfold hweHeterozygosity
   norm_num
 

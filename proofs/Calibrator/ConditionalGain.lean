@@ -541,7 +541,7 @@ definition, so every body agreeing with it in sign and monotonicity was indistin
 it. At all arguments equal to `1 / 2` it is `1 / 2`, which fixes the coefficients a one-sided
 bound or an invariance leaves free. -/
 theorem gainLinear_at_reference_point :
-    gainLinear 1 / 2 = 1 / 2 := by
+    gainLinear (1 / 2) = 1 / 2 := by
   unfold gainLinear
   norm_num
 

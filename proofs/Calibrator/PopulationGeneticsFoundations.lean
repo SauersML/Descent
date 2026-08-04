@@ -1115,7 +1115,7 @@ definition, so every body agreeing with it in sign and monotonicity was indistin
 it. At all arguments equal to `1 / 2` it is `1`, which fixes the coefficients a one-sided bound
 or an invariance leaves free. -/
 theorem islandDemeCorrection_at_reference_point :
-    islandDemeCorrection 1 / 2 = 1 := by
+    islandDemeCorrection (1 / 2) = 1 := by
   unfold islandDemeCorrection
   norm_num
 

@@ -1744,7 +1744,7 @@ definition, so every body agreeing with it in sign and monotonicity was indistin
 it. At all arguments equal to `1 / 2` it is `1`, which fixes the coefficients a one-sided bound
 or an invariance leaves free. -/
 theorem varianceProfile_at_reference_point :
-    varianceProfile 1 / 2 = 1 := by
+    varianceProfile (1 / 2) = 1 := by
   unfold varianceProfile
   norm_num
 
@@ -1758,7 +1758,7 @@ definition, so every body agreeing with it in sign and monotonicity was indistin
 it. At all arguments equal to `1 / 2` it is `2`, which fixes the coefficients a one-sided bound
 or an invariance leaves free. -/
 theorem fourthMomentProfile_at_reference_point :
-    fourthMomentProfile 1 / 2 = 2 := by
+    fourthMomentProfile (1 / 2) = 2 := by
   unfold fourthMomentProfile
   norm_num
 

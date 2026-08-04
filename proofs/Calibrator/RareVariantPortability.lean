@@ -292,7 +292,7 @@ this definition, so every body agreeing with it in sign and monotonicity was ind
 from it. At all arguments equal to `1 / 2` it is `5 / 8`, which fixes the coefficients a
 one-sided bound or an invariance leaves free. -/
 theorem mutationSelectionStepRare_at_reference_point :
-    mutationSelectionStepRare 1 / 2 1 / 2 1 / 2 1 / 2 = 5 / 8 := by
+    mutationSelectionStepRare (1 / 2) (1 / 2) (1 / 2) (1 / 2) = 5 / 8 := by
   unfold mutationSelectionStepRare
   norm_num
 
@@ -415,7 +415,7 @@ evaluated this definition, so every body agreeing with it in sign and monotonici
 indistinguishable from it. At all arguments equal to `1 / 2` it is `5 / 8`, which fixes the
 coefficients a one-sided bound or an invariance leaves free. -/
 theorem mutationSelectionStepRecessive_at_reference_point :
-    mutationSelectionStepRecessive 1 / 2 1 / 2 1 / 2 = 5 / 8 := by
+    mutationSelectionStepRecessive (1 / 2) (1 / 2) (1 / 2) = 5 / 8 := by
   unfold mutationSelectionStepRecessive
   norm_num
 

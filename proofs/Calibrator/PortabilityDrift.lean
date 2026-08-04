@@ -516,7 +516,7 @@ this definition, so every body agreeing with it in sign and monotonicity was ind
 from it. At all arguments equal to `1 / 2` it is `2`, which fixes the coefficients a one-sided
 bound or an invariance leaves free. -/
 theorem twoDemeIMEquilibriumETss_at_reference_point :
-    twoDemeIMEquilibriumETss 1 / 2 = 2 := by
+    twoDemeIMEquilibriumETss (1 / 2) = 2 := by
   unfold twoDemeIMEquilibriumETss
   norm_num
 
@@ -942,7 +942,7 @@ definition, so every body agreeing with it in sign and monotonicity was indistin
 it. At all arguments equal to `1 / 2` it is `1 / 4`, which fixes the coefficients a one-sided
 bound or an invariance leaves free. -/
 theorem targetHetFromFst_at_reference_point :
-    targetHetFromFst 1 / 2 1 / 2 = 1 / 4 := by
+    targetHetFromFst (1 / 2) (1 / 2) = 1 / 4 := by
   unfold targetHetFromFst
   norm_num
 
@@ -1532,7 +1532,7 @@ definition, so every body agreeing with it in sign and monotonicity was indistin
 it. At all arguments equal to `1 / 2` it is `1 / 8`, which fixes the coefficients a one-sided
 bound or an invariance leaves free. -/
 theorem realWorldPGSVariance_at_reference_point :
-    realWorldPGSVariance 1 / 2 1 / 2 1 / 2 = 1 / 8 := by
+    realWorldPGSVariance (1 / 2) (1 / 2) (1 / 2) = 1 / 8 := by
   unfold realWorldPGSVariance
   norm_num
 
@@ -4912,7 +4912,7 @@ evaluated this definition, so every body agreeing with it in sign and monotonici
 indistinguishable from it. At all arguments equal to `1 / 2` it is `1 / 2`, which fixes the
 coefficients a one-sided bound or an invariance leaves free. -/
 theorem covarianceRetentionFactorFromFst_at_reference_point :
-    covarianceRetentionFactorFromFst 1 / 2 = 1 / 2 := by
+    covarianceRetentionFactorFromFst (1 / 2) = 1 / 2 := by
   unfold covarianceRetentionFactorFromFst
   norm_num
 
@@ -4952,7 +4952,7 @@ this definition, so every body agreeing with it in sign and monotonicity was ind
 from it. At all arguments equal to `1 / 2` it is `2 / 3`, which
 fixes the coefficients a one-sided bound or an invariance leaves free. -/
 theorem alleleFreqCorrelation_at_reference_point :
-    alleleFreqCorrelation 1 / 2 1 / 2 1 / 2 = 2 / 3 := by
+    alleleFreqCorrelation (1 / 2) (1 / 2) (1 / 2) = 2 / 3 := by
   unfold alleleFreqCorrelation
   norm_num
 
@@ -4983,7 +4983,7 @@ this definition, so every body agreeing with it in sign and monotonicity was ind
 from it. At all arguments equal to `1 / 2` it is `1 / 2`, which fixes the coefficients a
 one-sided bound or an invariance leaves free. -/
 theorem ldOverlapFromSharedLD_at_reference_point :
-    ldOverlapFromSharedLD 1 / 2 = 1 / 2 := by
+    ldOverlapFromSharedLD (1 / 2) = 1 / 2 := by
   unfold ldOverlapFromSharedLD
   norm_num
 

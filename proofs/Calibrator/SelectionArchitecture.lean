@@ -255,7 +255,7 @@ definition, so every body agreeing with it in sign and monotonicity was indistin
 it. At all arguments equal to `1 / 2` it is `1 / 16`, which fixes the coefficients a one-sided
 bound or an invariance leaves free. -/
 theorem optimumOUVariance_at_reference_point :
-    optimumOUVariance 1 / 2 1 / 2 = 1 / 16 := by
+    optimumOUVariance (1 / 2) (1 / 2) = 1 / 16 := by
   unfold optimumOUVariance
   norm_num
 

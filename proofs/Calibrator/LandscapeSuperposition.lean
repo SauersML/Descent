@@ -322,7 +322,7 @@ this definition, so every body agreeing with it in sign and monotonicity was ind
 from it. At all arguments equal to `1 / 2` it is `37 / 128`, which fixes the coefficients a
 one-sided bound or an invariance leaves free. -/
 theorem mixedSphericalCovariance_at_reference_point :
-    mixedSphericalCovariance 1 / 2 1 / 2 1 / 2 = 37 / 128 := by
+    mixedSphericalCovariance (1 / 2) (1 / 2) (1 / 2) = 37 / 128 := by
   unfold mixedSphericalCovariance
   norm_num
 

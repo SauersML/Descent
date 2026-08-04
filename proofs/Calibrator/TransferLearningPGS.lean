@@ -1250,7 +1250,7 @@ this definition, so every body agreeing with it in sign and monotonicity was ind
 from it. At all arguments equal to `1 / 2` it is `1 / 2`, which fixes the coefficients a
 one-sided bound or an invariance leaves free. -/
 theorem deployedTransferTargetR2_at_reference_point :
-    deployedTransferTargetR2 1 / 2 1 / 2 1 / 2 = 1 / 2 := by
+    deployedTransferTargetR2 (1 / 2) (1 / 2) (1 / 2) = 1 / 2 := by
   unfold deployedTransferTargetR2
   norm_num
 

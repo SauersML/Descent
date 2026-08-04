@@ -3080,7 +3080,7 @@ definition, so every body agreeing with it in sign and monotonicity was indistin
 it. At all arguments equal to `1 / 2` it is `1`, which fixes the coefficients a one-sided bound
 or an invariance leaves free. -/
 theorem ldBreakageRate_at_reference_point :
-    ldBreakageRate 1 / 2 = 1 := by
+    ldBreakageRate (1 / 2) = 1 := by
   unfold ldBreakageRate
   norm_num
 

@@ -86,7 +86,7 @@ definition, so every body agreeing with it in sign and monotonicity was indistin
 it. At all arguments equal to `1 / 2` it is `1 / 8`, which fixes the coefficients a one-sided
 bound or an invariance leaves free. -/
 theorem driftVariance_at_reference_point :
-    driftVariance 1 / 2 1 / 2 = 1 / 8 := by
+    driftVariance (1 / 2) (1 / 2) = 1 / 8 := by
   unfold driftVariance
   norm_num
 
@@ -126,7 +126,7 @@ definition, so every body agreeing with it in sign and monotonicity was indistin
 it. At all arguments equal to `1 / 2` it is `1 / 4`, which fixes the coefficients a one-sided
 bound or an invariance leaves free. -/
 theorem expectedFreqDiffSq_at_reference_point :
-    expectedFreqDiffSq 1 / 2 1 / 2 = 1 / 4 := by
+    expectedFreqDiffSq (1 / 2) (1 / 2) = 1 / 4 := by
   unfold expectedFreqDiffSq
   norm_num
 
@@ -247,7 +247,7 @@ definition, so every body agreeing with it in sign and monotonicity was indistin
 it. At all arguments equal to `1 / 2` it is `1 / 4`, which fixes the coefficients a one-sided
 bound or an invariance leaves free. -/
 theorem gwasHeritability_at_reference_point :
-    gwasHeritability 1 / 2 1 / 2 = 1 / 4 := by
+    gwasHeritability (1 / 2) (1 / 2) = 1 / 4 := by
   unfold gwasHeritability
   norm_num
 
@@ -479,7 +479,7 @@ evaluated this definition, so every body agreeing with it in sign and monotonici
 indistinguishable from it. At all arguments equal to `1 / 2` it is `1 / 16`, which fixes the
 coefficients a one-sided bound or an invariance leaves free. -/
 theorem portabilityFromArchitecture_at_reference_point :
-    portabilityFromArchitecture 1 / 2 1 / 2 1 / 2 = 1 / 16 := by
+    portabilityFromArchitecture (1 / 2) (1 / 2) (1 / 2) = 1 / 16 := by
   unfold portabilityFromArchitecture
   norm_num
 

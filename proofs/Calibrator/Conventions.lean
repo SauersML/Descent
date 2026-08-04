@@ -1049,7 +1049,7 @@ definition, so every body agreeing with it in sign and monotonicity was indistin
 it. At all arguments equal to `1 / 2` it is `1 / 4`, which fixes the coefficients a one-sided
 bound or an invariance leaves free. -/
 theorem retainedFraction_at_reference_point :
-    retainedFraction 1 / 2 1 / 2 = 1 / 4 := by
+    retainedFraction (1 / 2) (1 / 2) = 1 / 4 := by
   unfold retainedFraction
   norm_num
 

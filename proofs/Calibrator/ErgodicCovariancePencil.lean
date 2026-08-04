@@ -271,7 +271,7 @@ this definition, so every body agreeing with it in sign and monotonicity was ind
 from it. At all arguments equal to `1 / 2` it is `1 / 2`, which fixes the coefficients a
 one-sided bound or an invariance leaves free. -/
 theorem firstModeConditionalMean_at_reference_point :
-    firstModeConditionalMean 1 / 2 1 / 2 1 / 2 = 1 / 2 := by
+    firstModeConditionalMean (1 / 2) (1 / 2) (1 / 2) = 1 / 2 := by
   unfold firstModeConditionalMean
   norm_num
 

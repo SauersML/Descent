@@ -198,7 +198,7 @@ definition, so every body agreeing with it in sign and monotonicity was indistin
 it. At all arguments equal to `1 / 2` it is `1 / 2`, which fixes the coefficients a one-sided
 bound or an invariance leaves free. -/
 theorem lossOfRetention_at_reference_point :
-    lossOfRetention 1 / 2 = 1 / 2 := by
+    lossOfRetention (1 / 2) = 1 / 2 := by
   unfold lossOfRetention
   norm_num
 
@@ -232,7 +232,7 @@ this definition, so every body agreeing with it in sign and monotonicity was ind
 from it. At all arguments equal to `1 / 2` it is `1 / 4`, which fixes the coefficients a
 one-sided bound or an invariance leaves free. -/
 theorem targetPgsVarOfRetention_at_reference_point :
-    targetPgsVarOfRetention 1 / 2 1 / 2 = 1 / 4 := by
+    targetPgsVarOfRetention (1 / 2) (1 / 2) = 1 / 4 := by
   unfold targetPgsVarOfRetention
   norm_num
 

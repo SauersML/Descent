@@ -430,7 +430,7 @@ evaluated this definition, so every body agreeing with it in sign and monotonici
 indistinguishable from it. At all arguments equal to `1 / 2` it is `1`, which fixes the
 coefficients a one-sided bound or an invariance leaves free. -/
 theorem netReclassificationImprovement_at_reference_point :
-    netReclassificationImprovement 1 / 2 1 / 2 = 1 := by
+    netReclassificationImprovement (1 / 2) (1 / 2) = 1 := by
   unfold netReclassificationImprovement
   norm_num
 
@@ -725,7 +725,7 @@ every body agreeing with it in sign and monotonicity was indistinguishable from 
 arguments equal to `1 / 2` it is `1 / 2`, which fixes the coefficients a one-sided bound or an
 invariance leaves free. -/
 theorem ppv_at_reference_point :
-    ppv 1 / 2 1 / 2 1 / 2 = 1 / 2 := by
+    ppv (1 / 2) (1 / 2) (1 / 2) = 1 / 2 := by
   unfold ppv
   norm_num
 
@@ -857,7 +857,7 @@ evaluated this definition, so every body agreeing with it in sign and monotonici
 indistinguishable from it. At all arguments equal to `1 / 2` it is `1 / 2`, which fixes the
 coefficients a one-sided bound or an invariance leaves free. -/
 theorem proportionCorrectlyClassified_at_reference_point :
-    proportionCorrectlyClassified 1 / 2 1 / 2 1 / 2 = 1 / 2 := by
+    proportionCorrectlyClassified (1 / 2) (1 / 2) (1 / 2) = 1 / 2 := by
   unfold proportionCorrectlyClassified
   norm_num
 

@@ -83,7 +83,7 @@ evaluated this definition, so every body agreeing with it in sign and monotonici
 indistinguishable from it. At all arguments equal to `1 / 2` it is `1 / 4`, which fixes the
 coefficients a one-sided bound or an invariance leaves free. -/
 theorem ancestryGradientSusceptibility_at_reference_point :
-    ancestryGradientSusceptibility 1 / 2 1 / 2 = 1 / 4 := by
+    ancestryGradientSusceptibility (1 / 2) (1 / 2) = 1 / 4 := by
   unfold ancestryGradientSusceptibility
   norm_num
 

@@ -307,7 +307,7 @@ definition, so every body agreeing with it in sign and monotonicity was indistin
 it. At all arguments equal to `1 / 2` it is `1 / 4`, which fixes the coefficients a one-sided
 bound or an invariance leaves free. -/
 theorem ascertainment_loss_at_reference_point :
-    ascertainment_loss 1 / 2 1 / 2 = 1 / 4 := by
+    ascertainment_loss (1 / 2) (1 / 2) = 1 / 4 := by
   unfold ascertainment_loss
   norm_num
 

@@ -552,7 +552,7 @@ evaluated this definition, so every body agreeing with it in sign and monotonici
 indistinguishable from it. At all arguments equal to `1 / 2` it is `1`, which fixes the
 coefficients a one-sided bound or an invariance leaves free. -/
 theorem posteriorPredictiveVariance_at_reference_point :
-    posteriorPredictiveVariance 1 / 2 1 / 2 = 1 := by
+    posteriorPredictiveVariance (1 / 2) (1 / 2) = 1 := by
   unfold posteriorPredictiveVariance
   norm_num
 
@@ -726,7 +726,7 @@ this definition, so every body agreeing with it in sign and monotonicity was ind
 from it. At all arguments equal to `1 / 2` it is `5 / 8`, which fixes the coefficients a
 one-sided bound or an invariance leaves free. -/
 theorem multiAncestryEffectiveN_at_reference_point :
-    multiAncestryEffectiveN 1 / 2 1 / 2 1 / 2 = 5 / 8 := by
+    multiAncestryEffectiveN (1 / 2) (1 / 2) (1 / 2) = 5 / 8 := by
   unfold multiAncestryEffectiveN
   norm_num
 
