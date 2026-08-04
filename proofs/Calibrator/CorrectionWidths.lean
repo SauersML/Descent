@@ -375,8 +375,9 @@ The same witness works for the whole dictionary; choosing a different deep vecto
 operator would not be enough for an adaptive span obstruction. -/
 theorem finite_postprocessors_simultaneously_small
     (A : H →L[ℝ] Y) (hdeep : HasUnitApproxKernel A)
-    {k : ℕ} (T : Fin k → Y →L[ℝ] H) (ε : ℝ) (hε : 0 < ε) :
-    ∃ β : H, ‖β‖ = 1 ∧ ∀ j : Fin k, ‖(T j) (A β)‖ < ε := by
+    {κ : Type*} [Fintype κ] (T : κ → Y →L[ℝ] H) (ε : ℝ) (hε : 0 < ε) :
+    ∃ β : H, ‖β‖ = 1 ∧ ∀ j : κ, ‖(T j) (A β)‖ < ε := by
+  classical
   let budget : ℝ := ∑ j, ‖T j‖ + 1
   have hbudget : 0 < budget := by
     dsimp [budget]
@@ -404,10 +405,11 @@ its ℓ¹ coefficient budget. Free coefficients can amplify a deep signal only b
 explicit coefficient cost. -/
 theorem finite_postprocessors_adaptive_span_small
     (A : H →L[ℝ] Y) (hdeep : HasUnitApproxKernel A)
-    {k : ℕ} (T : Fin k → Y →L[ℝ] H) (ε : ℝ) (hε : 0 < ε) :
-    ∃ β : H, ‖β‖ = 1 ∧ ∀ coefficients : Fin k → ℝ,
+    {κ : Type*} [Fintype κ] (T : κ → Y →L[ℝ] H) (ε : ℝ) (hε : 0 < ε) :
+    ∃ β : H, ‖β‖ = 1 ∧ ∀ coefficients : κ → ℝ,
       ‖∑ j, coefficients j • (T j) (A β)‖ ≤
         ε * ∑ j, |coefficients j| := by
+  classical
   obtain ⟨β, hunit, hsmall⟩ :=
     finite_postprocessors_simultaneously_small A hdeep T ε hε
   refine ⟨β, hunit, ?_⟩
@@ -431,10 +433,11 @@ combination with ℓ¹ coefficient budget at most `Λ` leaves residual at least 
 common unit approximate-kernel target. -/
 theorem finite_postprocessors_budgeted_adaptive_residual
     (A : H →L[ℝ] Y) (hdeep : HasUnitApproxKernel A)
-    {k : ℕ} (T : Fin k → Y →L[ℝ] H) (ε Λ : ℝ) (hε : 0 < ε) :
-    ∃ β : H, ‖β‖ = 1 ∧ ∀ coefficients : Fin k → ℝ,
+    {κ : Type*} [Fintype κ] (T : κ → Y →L[ℝ] H) (ε Λ : ℝ) (hε : 0 < ε) :
+    ∃ β : H, ‖β‖ = 1 ∧ ∀ coefficients : κ → ℝ,
       (∑ j, |coefficients j|) ≤ Λ →
         1 - Λ * ε ≤ ‖β - ∑ j, coefficients j • (T j) (A β)‖ := by
+  classical
   obtain ⟨β, hunit, hspan⟩ :=
     finite_postprocessors_adaptive_span_small A hdeep T ε hε
   refine ⟨β, hunit, ?_⟩
@@ -455,11 +458,12 @@ one for every adaptive coefficient choice in that budget. The witness may depend
 and tolerance, but not on the coefficients selected after seeing the target. -/
 theorem finite_postprocessors_budgeted_adaptive_arbitrarily_close_to_one
     (A : H →L[ℝ] Y) (hdeep : HasUnitApproxKernel A)
-    {k : ℕ} (T : Fin k → Y →L[ℝ] H) (Λ η : ℝ)
+    {κ : Type*} [Fintype κ] (T : κ → Y →L[ℝ] H) (Λ η : ℝ)
     (hΛ : 0 ≤ Λ) (hη : 0 < η) :
-    ∃ β : H, ‖β‖ = 1 ∧ ∀ coefficients : Fin k → ℝ,
+    ∃ β : H, ‖β‖ = 1 ∧ ∀ coefficients : κ → ℝ,
       (∑ j, |coefficients j|) ≤ Λ →
         1 - η ≤ ‖β - ∑ j, coefficients j • (T j) (A β)‖ := by
+  classical
   have hden : 0 < Λ + 1 := by linarith
   obtain ⟨β, hunit, hresidual⟩ :=
     finite_postprocessors_budgeted_adaptive_residual
