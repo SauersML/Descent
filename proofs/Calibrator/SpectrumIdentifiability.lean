@@ -168,6 +168,27 @@ theorem not_summable_one_div_linearRate :
   -- `not_summable_reciprocal_of_rate_le_natSucc` rather than repeating its plumbing.
   not_summable_reciprocal_of_rate_le_natSucc _ (fun _ ↦ by positivity) (fun _ ↦ le_rfl)
 
+/-- **Quadratic-growth Müntz boundary.** Any positive rate ladder growing at least as fast as
+`(n + 1)²` has a summable reciprocal spectrum. Combined with
+`not_summable_reciprocal_of_rate_le_natSucc`, this makes the Kingman-versus-
+Bolthausen--Sznitman contrast a reusable growth criterion rather than two isolated examples. -/
+theorem summable_one_div_of_natSucc_sq_le_rate
+    (rate : ℕ → ℝ) (hquadratic : ∀ n : ℕ, ((n : ℝ) + 1) ^ 2 ≤ rate n) :
+    Summable fun n ↦ 1 / rate n := by
+  have hsquareBase : Summable fun n : ℕ ↦ 1 / (n : ℝ) ^ 2 :=
+    (Real.summable_one_div_nat_pow (p := 2)).2 (by omega)
+  have hsquare : Summable fun n : ℕ ↦ 1 / (((n : ℝ) + 1) ^ 2) := by
+    have hshift := (summable_nat_add_iff
+      (f := fun n : ℕ ↦ 1 / (n : ℝ) ^ 2) 1).2 hsquareBase
+    simpa only [Nat.cast_add, Nat.cast_one] using hshift
+  refine Summable.of_nonneg_of_le ?_ ?_ hsquare
+  · intro n
+    have hsquarePos : 0 < ((n : ℝ) + 1) ^ 2 := by positivity
+    have hrate : 0 < rate n := hsquarePos.trans_le (hquadratic n)
+    exact one_div_nonneg.mpr hrate.le
+  · intro n
+    exact one_div_le_one_div_of_le (by positivity) (hquadratic n)
+
 /-! ## Fixed sample size: a linear count, and analyticity does not help -/
 
 /-- **At a fixed sample size the spectrum imposes only `n` linear conditions.**  Any family with
