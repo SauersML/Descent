@@ -414,6 +414,29 @@ theorem finite_postprocessors_adaptive_span_small
       rw [← Finset.sum_mul]
       ring
 
+/-- **Budgeted adaptive residual barrier.** For a fixed finite dictionary, every adaptive
+combination with ℓ¹ coefficient budget at most `Λ` leaves residual at least `1 - Λε` on one
+common unit approximate-kernel target. -/
+theorem finite_postprocessors_budgeted_adaptive_residual
+    (A : H →L[ℝ] Y) (hdeep : HasUnitApproxKernel A)
+    {k : ℕ} (T : Fin k → Y →L[ℝ] H) (ε Λ : ℝ) (hε : 0 < ε) :
+    ∃ β : H, ‖β‖ = 1 ∧ ∀ coefficients : Fin k → ℝ,
+      (∑ j, |coefficients j|) ≤ Λ →
+        1 - Λ * ε ≤ ‖β - ∑ j, coefficients j • (T j) (A β)‖ := by
+  obtain ⟨β, hunit, hspan⟩ :=
+    finite_postprocessors_adaptive_span_small A hdeep T ε hε
+  refine ⟨β, hunit, ?_⟩
+  intro coefficients hcoefficients
+  have hcorrection : ‖∑ j, coefficients j • (T j) (A β)‖ ≤ ε * Λ :=
+    (hspan coefficients).trans
+      (mul_le_mul_of_nonneg_left hcoefficients hε.le)
+  calc
+    1 - Λ * ε = 1 - ε * Λ := by ring
+    _ ≤ ‖β‖ - ‖∑ j, coefficients j • (T j) (A β)‖ := by
+      rw [hunit]
+      linarith
+    _ ≤ ‖β - ∑ j, coefficients j • (T j) (A β)‖ := norm_sub_norm_le _ _
+
 /-- **Approximate-kernel correction barrier.**  Any bounded post-processing correction leaves at
 least `‖β‖ - ‖T‖ ‖Aβ‖` residual on target `β`.  This is the quantitative lower bound from which the
 uniform modulus and the infinite-dimensional 0--1 obstruction start. -/
