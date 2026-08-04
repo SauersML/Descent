@@ -64,12 +64,80 @@ THM_RE = re.compile(
 
 # `/-` opens a doc comment, so a division must not be followed by `-`.
 DIV_RE = re.compile(r"/(?!-)")
-GUARDS = (
-    ("division", DIV_RE),
-    ("inverse", re.compile(r"⁻¹")),
-    ("log", re.compile(r"Real\.log")),
-    ("sqrt", re.compile(r"Real\.sqrt")),
-)
+LOG_RE = re.compile(r"Real\.log")
+SQRT_RE = re.compile(r"Real\.sqrt")
+INV_RE = re.compile(r"⁻¹")
+
+LETTER = re.compile(r"[A-Za-zͰ-Ͽ]")
+
+
+def _argument_after(body: str, pos: int) -> str:
+    """The operand starting at `pos`: a parenthesised group, or one token."""
+    while pos < len(body) and body[pos] in " \t\n":
+        pos += 1
+    if pos >= len(body):
+        return ""
+    if body[pos] == "(":
+        depth, start = 0, pos
+        while pos < len(body):
+            if body[pos] == "(":
+                depth += 1
+            elif body[pos] == ")":
+                depth -= 1
+                if depth == 0:
+                    return body[start:pos + 1]
+            pos += 1
+        return body[start:]
+    end = pos
+    while end < len(body) and body[end] not in " \t\n)+*-/^,":
+        end += 1
+    return body[pos:end]
+
+
+def _argument_before(body: str, pos: int) -> str:
+    """The operand ending at `pos`, for the postfix inverse."""
+    end = pos
+    while end > 0 and body[end - 1] in " \t\n":
+        end -= 1
+    if end > 0 and body[end - 1] == ")":
+        depth, i = 0, end - 1
+        while i >= 0:
+            if body[i] == ")":
+                depth += 1
+            elif body[i] == "(":
+                depth -= 1
+                if depth == 0:
+                    return body[i:end]
+            i -= 1
+        return body[:end]
+    start = end
+    while start > 0 and body[start - 1] not in " \t\n(+*-/^,":
+        start -= 1
+    return body[start:end]
+
+
+def guards(body: str) -> list[str]:
+    """Which junk-capable operations this body performs on a NON-CONSTANT operand.
+
+    A denominator, logarithm or square-root argument built only from numerals
+    cannot reach the junk point, so `p / 2` and `(1 : ℝ) / 3` are not reported.
+    This is what keeps the count meaningful: without it every weight vector
+    defined as `fun _ => 1 / 2` lands on the list.
+    """
+    kinds = []
+    if any(LETTER.search(_argument_after(body, m.end()))
+           for m in DIV_RE.finditer(body)):
+        kinds.append("division")
+    if any(LETTER.search(_argument_before(body, m.start()))
+           for m in INV_RE.finditer(body)):
+        kinds.append("inverse")
+    if any(LETTER.search(_argument_after(body, m.end()))
+           for m in LOG_RE.finditer(body)):
+        kinds.append("log")
+    if any(LETTER.search(_argument_after(body, m.end()))
+           for m in SQRT_RE.finditer(body)):
+        kinds.append("sqrt")
+    return kinds
 
 
 def scan() -> tuple[int, int, list[tuple[str, str, str]]]:
@@ -83,7 +151,7 @@ def scan() -> tuple[int, int, list[tuple[str, str, str]]]:
             name, body = m.group(1), m.group(3)
             if len(body) > 1200:
                 continue
-            kinds = [k for k, rx in GUARDS if rx.search(body)]
+            kinds = guards(body)
             if not kinds:
                 continue
             total += 1
