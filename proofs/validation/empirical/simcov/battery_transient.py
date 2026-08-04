@@ -28,25 +28,29 @@ import numpy as np
 from battery_core import RESULTS, record
 
 
-def two_deme_fst_curve(Ne, m, mu, gens, n_loci=4000, reps=250, seed=1):
-    """G_ST between two demes, generation by generation, from an identical start."""
+def island_fst_curve(Ne, m, mu, gens, n_demes=24, n_loci=2500, seed=1):
+    """G_ST across `n_demes` demes, generation by generation, from an identical
+    start.
+
+    MANY demes, not two. Battery 21's first attempt used two, whose equilibrium
+    carries the `islandDemeCorrection` factor this branch measured and installed;
+    the design ignored it, the positive control missed by 1455 sems, and the run
+    was correctly voided. At twenty-four demes the correction is 1.043 and the
+    equilibrium is the validated `1/(1 + theta + bigM)`.
+    """
     rng = np.random.default_rng(seed)
     two_n = int(2 * Ne)
-    p1 = np.full((reps, n_loci), 0.5)
-    p2 = np.full((reps, n_loci), 0.5)
+    p = np.full((n_demes, n_loci), 0.5)
     out = []
     for _ in range(gens + 1):
-        pbar = (p1 + p2) / 2
-        hs = (2 * p1 * (1 - p1) + 2 * p2 * (1 - p2)) / 2
+        pbar = p.mean(axis=0)
+        hs = (2 * p * (1 - p)).mean(axis=0)
         ht = 2 * pbar * (1 - pbar)
         denom = ht.mean()
         out.append(float((denom - hs.mean()) / denom) if denom > 0 else float("nan"))
-        n1 = (1 - m) * p1 + m * p2
-        n2 = (1 - m) * p2 + m * p1
-        p1 = rng.binomial(two_n, np.clip(n1, 0, 1)) / two_n
-        p2 = rng.binomial(two_n, np.clip(n2, 0, 1)) / two_n
-        p1 = p1 * (1 - mu) + (1 - p1) * mu
-        p2 = p2 * (1 - mu) + (1 - p2) * mu
+        p = (1 - m) * p + m * pbar[None, :]
+        p = rng.binomial(two_n, np.clip(p, 0, 1)) / two_n
+        p = p * (1 - mu) + (1 - p) * mu
     return np.array(out)
 
 
@@ -54,7 +58,7 @@ def main():
     for Ne, m, mu in ((200, 0.002, 5e-4), (200, 0.005, 2.5e-4)):
         theta, bigM = 4 * Ne * mu, 4 * Ne * m
         gens = 900
-        curve = two_deme_fst_curve(Ne, m, mu, gens, seed=17001)
+        curve = island_fst_curve(Ne, m, mu, gens, seed=17101)
         lam = (1 - 1 / (2 * Ne)) * (1 - theta / (2 * Ne))
         level = 1 / (1 + theta + bigM)
 
@@ -76,9 +80,9 @@ def main():
         record("fstTransientAt [theta=%.1f M=%.1f]" % (theta, bigM),
                "PortabilityDrift.lean",
                "(1/(1 + theta + bigM)) * (1 - hetDecayFactor^t)", cells,
-               regime="two-deme forward Wright-Fisher with symmetric migration "
-                      "and two-way mutation, started identical; the level is "
-                      "controlled against the separately validated equilibrium",
+               regime="24-deme forward Wright-Fisher island model with two-way "
+                      "mutation, started identical; the level is controlled "
+                      "against the separately validated equilibrium",
                control=ctrl)
 
     json.dump(RESULTS, open("battery_transient_results.json", "w"), indent=1,
