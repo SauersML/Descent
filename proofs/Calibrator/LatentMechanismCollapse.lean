@@ -40,14 +40,25 @@ ingredients: exactness of the head mixture against a positivity floor, positivit
 head and tail densities, the tail coefficient identity, and the perturbative margin.
 Those are real lemmas and they are the parts of the argument that arithmetic can carry.
 
-The construction itself — that every uniformly smooth strictly positive family over
-compact manifolds admits a factorization with `r = 1` — needs kernels, mixing measures
-and compact manifolds as formal objects, and none of that is set up here. It is an OPEN
-GAP, and it is not carried as a `sorry` for a specific reason: a `sorry` needs a
-statement, and the statement needs the definitions this file does not have. Writing
-`sorry` against an abstract predicate standing in for the notion would be worse than the
-gap, because the resulting theorem would be false or vacuous depending on how the
-predicate were instantiated.
+The construction's FINITE-DIMENSIONAL core is proved:
+`exists_positive_momentCurve_mixture` reaches an affinely full-dimensional set of targets
+from one smooth curve using strictly positive mixing weights, with the step size explicit.
+That is the convex statement, not merely the affine one, and it is what the smooth-category
+guard clause would have had to block.
+
+What remains open is narrower than this paragraph used to claim. It is the same
+construction with smooth strictly positive mixing DENSITIES over a compact manifold rather
+than finitely many positive weights, and that genuinely needs kernels and measures as
+formal objects. It is not carried as a `sorry` for a specific reason: a `sorry` needs a
+statement, and the statement needs definitions this file does not have. Writing `sorry`
+against an abstract predicate standing in for the notion would be worse than the gap,
+because the resulting theorem would be false or vacuous depending on how the predicate
+were instantiated.
+
+The earlier wording said the construction needed manifolds. The file's own note on
+`exists_momentCurve_combination` said what was actually missing -- that the coefficients
+were not constrained nonnegative -- and going from affine span to convex hull is linear
+algebra with an explicit step, not geometry.
 
 What Lean carries for the identifiability consequence is the finite case:
 `mechanismCount_not_identified` shows one observed family reproduced exactly by three
@@ -395,6 +406,83 @@ theorem exists_momentCurve_combination {n : ℕ} (u : Fin n → ℝ) (hu : Funct
     rw [Matrix.vecMul_vecMul, Matrix.nonsing_inv_mul _ hdet, Matrix.vecMul_one]
   have hcoord := congrFun hsolve j
   simpa [Matrix.vecMul, dotProduct, Matrix.vandermonde] using hcoord
+
+/-! ### The mixture version: strictly positive weights, not merely affine ones
+
+`exists_momentCurve_combination` solves the linear system and its coefficients may be negative,
+so it settles the AFFINE span and not the convex hull. A mechanism mixture needs weights that are
+strictly positive and sum to one, and the gap between the two is the whole reason the
+smooth-category guard clause looked like it might work.
+
+It does not work, and the missing step is finite-dimensional rather than a matter of kernels over
+manifolds. Move from the uniform mixture a short way toward the target: the affine solution
+supplies the direction, and every weight stays positive as long as the step is small enough,
+because the uniform mixture is in the interior of the positive orthant. The bound is explicit --
+one over `1 + n (1 + ∑ |aᵢ|)` -- so nothing here is a compactness argument.
+
+The normalisation comes free. The zeroth moment coordinate is `uᵢ ^ 0 = 1`, so the `j = 0`
+equation reads `∑ cᵢ = target 0`, and a target that is a moment vector of a probability measure
+has `target 0 = 1`.
+
+What this settles: a one-dimensional smooth latent reaches an affinely full-dimensional set of
+observed families with strictly positive mixing weights. What it does not settle: the same with
+smooth strictly positive mixing DENSITIES over a compact manifold, which is a statement about
+kernels and remains open. The obstruction the guard hoped for is gone either way.
+-/
+
+/-- **Strictly positive mixtures of one smooth curve reach every direction.**
+
+From the uniform mixture, a strictly positive mixture of the same `n` moment-curve points moves a
+definite distance toward any target moment vector. The step `t` and the weights are exhibited. -/
+theorem exists_positive_momentCurve_mixture {n : ℕ} (hn : 0 < n)
+    (u : Fin n → ℝ) (hu : Function.Injective u) (target : Fin n → ℝ) :
+    ∃ (t : ℝ) (c : Fin n → ℝ), 0 < t ∧ (∀ i, 0 < c i) ∧
+      ∀ j : Fin n, ∑ i, c i * u i ^ (j : ℕ)
+        = (1 - t) * (∑ i, (1 / (n : ℝ)) * u i ^ (j : ℕ)) + t * target j := by
+  classical
+  obtain ⟨a, ha⟩ := exists_momentCurve_combination u hu target
+  have hnR : (0 : ℝ) < (n : ℝ) := by exact_mod_cast hn
+  set B : ℝ := ∑ i, |a i| with hBdef
+  have hB0 : 0 ≤ B := Finset.sum_nonneg fun i _ ↦ abs_nonneg _
+  set t : ℝ := 1 / (1 + (n : ℝ) * (1 + B)) with htdef
+  have hden : (0 : ℝ) < 1 + (n : ℝ) * (1 + B) := by positivity
+  have ht0 : 0 < t := by positivity
+  have hexp : (n : ℝ) * (1 + B) = (n : ℝ) + (n : ℝ) * B := by ring
+  have hlt : (1 : ℝ) + (n : ℝ) * B < 1 + (n : ℝ) * (1 + B) := by
+    rw [hexp]; linarith
+  have hne : (1 : ℝ) + (n : ℝ) * (1 + B) ≠ 0 := ne_of_gt hden
+  have hone : t * (1 + (n : ℝ) * (1 + B)) = 1 := by
+    rw [htdef, one_div, inv_mul_cancel₀ hne]
+  have htle : t * (1 + (n : ℝ) * B) < 1 := by
+    calc t * (1 + (n : ℝ) * B) < t * (1 + (n : ℝ) * (1 + B)) :=
+          mul_lt_mul_of_pos_left hlt ht0
+      _ = 1 := hone
+  refine ⟨t, fun i ↦ (1 - t) * (1 / (n : ℝ)) + t * a i, ht0, fun i ↦ ?_, fun j ↦ ?_⟩
+  · have hai : |a i| ≤ B :=
+      Finset.single_le_sum (fun k _ ↦ abs_nonneg (a k)) (Finset.mem_univ i)
+    have hlow : -B ≤ a i := neg_le_of_abs_le hai
+    have hkey : 0 < 1 - t * (1 + (n : ℝ) * B) := by linarith
+    have heq : (1 - t) * (1 / (n : ℝ)) + t * (-B)
+        = (1 - t * (1 + (n : ℝ) * B)) / (n : ℝ) := by
+      field_simp
+      ring
+    have hpos : 0 < (1 - t) * (1 / (n : ℝ)) + t * (-B) := by
+      rw [heq]; exact div_pos hkey hnR
+    have hmono : t * (-B) ≤ t * a i := by nlinarith
+    linarith
+  · have h1 : ∑ i, (1 - t) * ((1 / (n : ℝ)) * u i ^ (j : ℕ))
+        = (1 - t) * (∑ i, (1 / (n : ℝ)) * u i ^ (j : ℕ)) := (Finset.mul_sum _ _ _).symm
+    have h2 : ∑ i, t * (a i * u i ^ (j : ℕ))
+        = t * (∑ i, a i * u i ^ (j : ℕ)) := (Finset.mul_sum _ _ _).symm
+    calc ∑ i, ((1 - t) * (1 / (n : ℝ)) + t * a i) * u i ^ (j : ℕ)
+        = ∑ i, ((1 - t) * ((1 / (n : ℝ)) * u i ^ (j : ℕ))
+            + t * (a i * u i ^ (j : ℕ))) :=
+          Finset.sum_congr rfl fun i _ ↦ by ring
+      _ = (1 - t) * (∑ i, (1 / (n : ℝ)) * u i ^ (j : ℕ))
+            + t * (∑ i, a i * u i ^ (j : ℕ)) := by
+          rw [Finset.sum_add_distrib, h1, h2]
+      _ = (1 - t) * (∑ i, (1 / (n : ℝ)) * u i ^ (j : ℕ)) + t * target j := by
+          rw [ha j]
 
 /-- **Two mechanisms reach every achievable observation.**
 
