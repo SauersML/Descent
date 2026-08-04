@@ -192,7 +192,22 @@ section PolygenicityAndPortability
     M_eff = effective number of causal variants
     = (Σ β²_j)² / Σ β⁴_j (inverse kurtosis measure).
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_bulk6.py`,
+    `test_effective_polygenicity`). Its operational meaning is the inverse
+    probability that two draws from the effect-mass distribution land on the
+    same locus, and that is a sampling experiment independent of the algebra --
+    the same oracle that settled `HaplotypeTheory.effectiveHaplotypeNumber`:
+
+      effect vector       this def   inverse match rate      sems
+      400 equal          400.00000   407.83034±4.11298       1.90
+      gaussian, m=400    147.46342   146.35396±0.88224       1.26
+      one dominant         1.12856   1.12850±0.00020         0.32
+      mixture             11.25069   11.26237±0.01804        0.65
+
+    Power: the prediction spans 1.129 to 400.0, a factor of 350, and the
+    one-dominant cell is what separates a participation ratio from a locus
+    count. -/
 noncomputable def effectivePolygenicity (sum_beta_sq sum_beta_fourth : ℝ) : ℝ :=
   sum_beta_sq^2 / sum_beta_fourth
 

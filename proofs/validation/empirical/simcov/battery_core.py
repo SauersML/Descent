@@ -25,33 +25,29 @@ import simlib
 RESULTS = []
 
 
-def record(name, lean_file, source, cells, note="", regime=""):
-    """`cells` is a list of dicts: design, lean value, truth mean, truth sem."""
+def record(name, lean_file, source, cells, note="", regime="",
+           control=None, sem_source="replicates", selected_from=1,
+           oracle_independent=True):
+    """Classify through `verdict.classify`, so the gates actually gate.
+
+    The gates were written after twelve batteries and calibrated against the
+    incidents that produced them, and then for two more batteries nothing called
+    them: the batteries still went through the original inline rule, so a
+    self-test in `causalPortabilityFromLocalFst` -- where the oracle WAS the
+    formula -- was reported as NO POWER rather than as the SELF-TEST it is. A
+    guard nothing calls is a guard that does not exist.
+    """
+    import verdict
+    v, gate_note, worst = verdict.classify(
+        cells, control=control, sem_source=sem_source,
+        selected_from=selected_from, oracle_independent=oracle_independent)
+    full_note = "; ".join(x for x in (note, gate_note) if x)
     preds = [c["lean"] for c in cells]
     span = (max(preds) - min(preds)) / max(abs(max(preds)), 1e-12)
-    worst = None
-    for c in cells:
-        sem = c["sem"] if c["sem"] and c["sem"] > 0 else float("nan")
-        z = abs(c["lean"] - c["truth"]) / sem if sem == sem and sem > 0 else float("inf")
-        rel = abs(c["lean"] - c["truth"]) / max(abs(c["truth"]), 1e-12)
-        c["sems_off"], c["rel_err"] = z, rel
-        if worst is None or z > worst["sems_off"]:
-            worst = c
-    if span < 0.05:
-        verdict = "NO POWER"
-    elif worst["sems_off"] > 3 and worst["rel_err"] > 0.02:
-        verdict = "FALSIFIED"
-    else:
-        verdict = "MATCH"
-    RESULTS.append(dict(name=name, file=lean_file, source=source, note=note,
-                        regime=regime, span=span, verdict=verdict,
+    RESULTS.append(dict(name=name, file=lean_file, source=source,
+                        note=full_note, regime=regime, span=span, verdict=v,
                         worst=worst, cells=cells))
-    print("\n%-38s %s   (span %.0f%%)" % (name, verdict, 100 * span))
-    print("  lean: %s" % source)
-    print("  %-34s %10s %10s %8s %8s" % ("design", "lean", "sim", "sem", "sems"))
-    for c in cells:
-        print("  %-34s %10.5f %10.5f %8.5f %8.2f"
-              % (c["design"], c["lean"], c["truth"], c["sem"], c["sems_off"]))
+    verdict.report(name, source, cells, v, full_note, worst, regime=regime)
 
 
 # ---------------------------------------------------------------------------
