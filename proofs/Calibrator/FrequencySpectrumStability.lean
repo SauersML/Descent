@@ -67,6 +67,12 @@ theorem epochSpectrumCoordinateCount_pos (K : ℕ) (hK : 2 ≤ K) :
   unfold epochSpectrumCoordinateCount
   omega
 
+/-- The inverse exponent is positive on the fixed-epoch model domain. -/
+theorem fixedEpochInverseExponent_pos (K : ℕ) (hK : 2 ≤ K) :
+    0 < fixedEpochInverseExponent K := by
+  unfold fixedEpochInverseExponent
+  exact inv_pos.mpr (by exact_mod_cast epochSpectrumCoordinateCount_pos K hK)
+
 /-- Two-epoch inference is Lipschitz. -/
 @[simp] theorem fixedEpochInverseExponent_two :
     fixedEpochInverseExponent 2 = 1 := by
@@ -90,6 +96,18 @@ def spectrumPrecisionMultiplier (K factor : ℕ) : ℕ :=
 def independentSampleMultiplier (K factor : ℕ) : ℕ :=
   factor ^ (2 * epochSpectrumCoordinateCount K)
 
+/-- Precision budgets compose multiplicatively. -/
+theorem spectrumPrecisionMultiplier_mul (K left right : ℕ) :
+    spectrumPrecisionMultiplier K (left * right) =
+      spectrumPrecisionMultiplier K left * spectrumPrecisionMultiplier K right := by
+  simp [spectrumPrecisionMultiplier, mul_pow]
+
+/-- Under root-sample spectrum error, the independent-data multiplier is exactly the square
+of the deterministic precision multiplier. -/
+theorem independentSampleMultiplier_eq_precision_sq (K factor : ℕ) :
+    independentSampleMultiplier K factor = spectrumPrecisionMultiplier K factor ^ 2 := by
+  simp [independentSampleMultiplier, spectrumPrecisionMultiplier, pow_mul, Nat.mul_comm]
+
 /-- The actionable spectrum-precision table for halving history error. -/
 theorem spectrumPrecisionMultiplier_halving_table :
     spectrumPrecisionMultiplier 2 2 = 2 ∧
@@ -110,6 +128,20 @@ theorem independentSampleMultiplier_halving_table :
 /-- Statistical exponent inherited from root-sample estimation of the spectrum. -/
 noncomputable def fixedEpochSampleRateExponent (K : ℕ) : ℝ :=
   (2 * epochSpectrumCoordinateCount K : ℝ)⁻¹
+
+/-- Root-sample estimation halves the deterministic inverse exponent exactly. -/
+theorem fixedEpochSampleRateExponent_eq_half_inverse (K : ℕ) (hK : 2 ≤ K) :
+    fixedEpochSampleRateExponent K = fixedEpochInverseExponent K / 2 := by
+  have hp : (epochSpectrumCoordinateCount K : ℝ) ≠ 0 := by
+    exact_mod_cast (epochSpectrumCoordinateCount_pos K hK).ne'
+  unfold fixedEpochSampleRateExponent fixedEpochInverseExponent
+  field_simp
+
+/-- The statistical rate exponent is positive on the model domain. -/
+theorem fixedEpochSampleRateExponent_pos (K : ℕ) (hK : 2 ≤ K) :
+    0 < fixedEpochSampleRateExponent K := by
+  rw [fixedEpochSampleRateExponent_eq_half_inverse K hK]
+  exact div_pos (fixedEpochInverseExponent_pos K hK) (by norm_num)
 
 /-- A five-epoch history has the slow `sampleSize⁻¹ᐟ¹⁴` rate. -/
 @[simp] theorem fixedEpochSampleRateExponent_five :
@@ -179,6 +211,16 @@ theorem epochSpectrumCoordinateCount_succ (K : ℕ) (hK : 2 ≤ K) :
     epochSpectrumCoordinateCount (K + 1) = epochSpectrumCoordinateCount K + 2 := by
   unfold epochSpectrumCoordinateCount
   omega
+
+/-- Every additional epoch strictly worsens the deterministic inverse exponent. -/
+theorem fixedEpochInverseExponent_succ_lt (K : ℕ) (hK : 2 ≤ K) :
+    fixedEpochInverseExponent (K + 1) < fixedEpochInverseExponent K := by
+  unfold fixedEpochInverseExponent
+  rw [epochSpectrumCoordinateCount_succ K hK]
+  push_cast
+  have hp : (0 : ℝ) < epochSpectrumCoordinateCount K := by
+    exact_mod_cast epochSpectrumCoordinateCount_pos K hK
+  exact (inv_lt_inv₀ (by linarith) hp).2 (by linarith)
 
 /-! ## Intrinsic nullspace boundary for unrestricted history classes -/
 
