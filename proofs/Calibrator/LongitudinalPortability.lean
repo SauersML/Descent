@@ -126,7 +126,7 @@ separate claim, and it is UNTESTED. -/
 /-- Drift decay rate is positive for positive Ne. -/
 theorem drift_decay_rate_pos (Ne : ℝ) (h : 0 < Ne) :
     0 < driftRatePerGen Ne := by
-  unfold driftRatePerGen
+  unfold driftRatePerGen alleleFreqDivergenceRate
   positivity
 
 /-! **Larger populations drift slower** is `larger_pop_slower_drift_rate` in

@@ -2,6 +2,8 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Calibrator.OpenQuestions
+import Calibrator.AncestrySpecificPower
+import Calibrator.PolygenicAdaptation
 
 namespace Calibrator
 
@@ -51,7 +53,7 @@ if allele frequency is below `1 / (2 Ne)`. -/
 theorem rareVariantSharingApproximation_lt_one_iff
     (Ne p : ℝ) (h_Ne : 0 < Ne) :
     rareVariantSharingApproximation Ne p < 1 ↔ p < 1 / (2 * Ne) := by
-  unfold rareVariantSharingApproximation
+  unfold rareVariantSharingApproximation pgsDriftVariance_one_pop Var_Delta_Mu
   have h2Ne_pos : (0 : ℝ) < 2 * Ne := by positivity
   rw [lt_div_iff₀ h2Ne_pos]
   constructor <;> intro h <;> nlinarith [mul_comm p (2 * Ne)]
@@ -182,7 +184,7 @@ theorem homogeneousGeneBurdenVariance_gt_single
     (h_k : 2 ≤ k) :
     -- Gene burden variance = k · β² > β² = single variant variance
     β ^ 2 < homogeneousGeneBurdenVariance β k := by
-  unfold homogeneousGeneBurdenVariance
+  unfold homogeneousGeneBurdenVariance ncp
   have h_β2 : 0 < β ^ 2 := sq_pos_of_ne_zero h_β
   have h_k_real : (1 : ℝ) < ↑k := by
     exact_mod_cast (by omega : 1 < k)

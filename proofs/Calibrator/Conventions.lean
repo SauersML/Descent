@@ -609,11 +609,13 @@ reciprocal of the coalescent time scale in each. -/
 
 theorem driftLDCreationRate_eq_inv_timeScale (Ne : ℝ) :
     driftLDCreationRate Ne = 1 / coalescentTimeScale Ne := by
-  unfold driftLDCreationRate; rw [coalescentTimeScale_eq]
+  unfold driftLDCreationRate driftRatePerGen alleleFreqDivergenceRate
+  rw [coalescentTimeScale_eq]
 
 theorem driftRatePerGen_eq_inv_timeScale (Ne : ℝ) :
     driftRatePerGen Ne = 1 / coalescentTimeScale Ne := by
-  unfold driftRatePerGen; rw [coalescentTimeScale_eq]
+  unfold driftRatePerGen alleleFreqDivergenceRate
+  rw [coalescentTimeScale_eq]
 
 /-- **Cross-check: the `2 Nₑ` inside `coalFst` is the coalescent time scale.**
 `coalFst t Ne = t / (t + 2 Nₑ)` is `t / (t + E[T_within])`, and `E[T_within]`
@@ -735,7 +737,8 @@ the same convention: `ploidy · F_ST · V_A`.  The two definitions are alpha-equ
 this pair of theorems is what says so rather than leaving it to the reader. -/
 theorem pgsDriftVariance_one_pop_eq_ploidy_form (V_A fst : ℝ) :
     pgsDriftVariance_one_pop V_A fst = ploidy * fst * V_A := by
-  unfold pgsDriftVariance_one_pop ploidy; ring
+  unfold pgsDriftVariance_one_pop Var_Delta_Mu ploidy
+  ring
 
 /-- The two drift-variance definitions are the same quantity. -/
 theorem pgsDriftVariance_one_pop_eq_Var_Delta_Mu (V_A fst : ℝ) :

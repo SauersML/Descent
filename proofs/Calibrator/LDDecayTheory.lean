@@ -1162,7 +1162,7 @@ population of one loses half its heterozygosity per generation, which fixes the 
 denominator: the relevant count is gametes, not individuals. -/
 theorem driftRatePerGen_unit_population :
     driftRatePerGen 1 = 1 / 2 := by
-  unfold driftRatePerGen
+  unfold driftRatePerGen alleleFreqDivergenceRate
   norm_num
 
 /-- **The drift rate at zero effective size, named.** An effective size of zero makes drift
@@ -1172,7 +1172,7 @@ propagates: every retention and decay quantity built on this rate inherits it. C
 require `Ne ≠ 0`. -/
 theorem driftRatePerGen_zero_population_is_junk :
     driftRatePerGen 0 = 0 := by
-  unfold driftRatePerGen
+  unfold driftRatePerGen alleleFreqDivergenceRate
   norm_num
 
 /-- Larger population has a slower per-generation drift rate. This is drift only: without
@@ -1181,7 +1181,7 @@ a recombination argument it is not an LD decay rate, which is the reading falsif
 theorem larger_pop_slower_drift_rate (Ne₁ Ne₂ : ℝ)
     (hNe₁ : 0 < Ne₁) (h_larger : Ne₁ < Ne₂) :
     driftRatePerGen Ne₂ < driftRatePerGen Ne₁ := by
-  unfold driftRatePerGen
+  unfold driftRatePerGen alleleFreqDivergenceRate
   exact div_lt_div_of_pos_left one_pos (by linarith) (by linarith)
 
 /-- **LD half-life at recombination rate `r` and effective size `Nₑ`.**

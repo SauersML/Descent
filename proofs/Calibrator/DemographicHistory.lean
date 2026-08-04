@@ -1095,7 +1095,7 @@ instantly and the rate diverges. Lean returns `0`, reporting a population in whi
 no disequilibrium at all. Consumers must require `Ne ≠ 0`. -/
 theorem driftLDCreationRate_zero_ne_is_junk :
     driftLDCreationRate 0 = 0 := by
-  unfold driftLDCreationRate
+  unfold driftLDCreationRate driftRatePerGen alleleFreqDivergenceRate
   simp
 
 /-- **Cross-check: this is the same per-generation drift rate that

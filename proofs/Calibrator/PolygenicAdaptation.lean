@@ -167,14 +167,15 @@ one-sided bound or an invariance leaves free. It was `1 / 4` while the body was 
 its ploidy factor, and this line is what pins the correction to a number. -/
 theorem pgsDriftVariance_one_pop_at_reference_point :
     pgsDriftVariance_one_pop (1 / 2) (1 / 2) = 1 / 2 := by
-  unfold pgsDriftVariance_one_pop
+  unfold pgsDriftVariance_one_pop Var_Delta_Mu
   norm_num
 
 /-- Single-population PGS drift variance is nonneg. -/
 theorem pgsDriftVariance_one_pop_nonneg (V_A fst : ℝ)
     (h_VA : 0 ≤ V_A) (h_fst : 0 ≤ fst) :
     0 ≤ pgsDriftVariance_one_pop V_A fst := by
-  unfold pgsDriftVariance_one_pop; positivity
+  unfold pgsDriftVariance_one_pop Var_Delta_Mu
+  positivity
 
 /-- **The same drift variance, as a sum over loci.**
 
@@ -230,7 +231,7 @@ in prose. -/
 theorem pgsDriftVarianceFromLoci_eq_closedForm {n : ℕ} (fst : ℝ) (β : Fin n → ℝ) :
     2 * pgsDriftVarianceFromLoci fst β =
       pgsDriftVariance_one_pop (∑ i : Fin n, β i ^ 2) fst := by
-  unfold pgsDriftVarianceFromLoci pgsDriftVariance_one_pop
+  unfold pgsDriftVarianceFromLoci pgsDriftVariance_one_pop Var_Delta_Mu
   rw [Finset.mul_sum, Finset.mul_sum]
   exact Finset.sum_congr rfl (fun i _ ↦ by ring)
 
@@ -300,7 +301,8 @@ theorem expectedPGSDiffVariance_complete_differentiation (V_A : ℝ) :
       = expectedPGSDiffVariance V_A fst -/
 theorem pgsDiffVariance_eq_expected (V_A fst : ℝ) :
     pgsDiffVariance_two_pop V_A fst = expectedPGSDiffVariance V_A fst := by
-  unfold pgsDiffVariance_two_pop pgsDriftVariance_one_pop expectedPGSDiffVariance
+  unfold pgsDiffVariance_two_pop pgsDriftVariance_one_pop Var_Delta_Mu
+    expectedPGSDiffVariance
   ring
 
 /-- **And the two-population difference variance is the sum of two independent
@@ -312,6 +314,7 @@ theorem pgsDiffVariance_two_pop_eq_lociSum {n : ℕ} (fst : ℝ) (β : Fin n →
     pgsDiffVariance_two_pop (∑ i : Fin n, β i ^ 2) fst =
       2 * (pgsDriftVarianceFromLoci fst β + pgsDriftVarianceFromLoci fst β) := by
   unfold pgsDiffVariance_two_pop pgsDriftVarianceFromLoci pgsDriftVariance_one_pop
+    Var_Delta_Mu
   rw [Finset.mul_sum, Finset.mul_sum]
   rw [← Finset.sum_add_distrib, Finset.mul_sum]
   exact Finset.sum_congr rfl (fun i _ ↦ by ring)
