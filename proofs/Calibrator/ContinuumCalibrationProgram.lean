@@ -899,7 +899,7 @@ theorem isStratumCalibrated_gaugeAligned :
   intro x s
   cases s <;>
     norm_num [gaugePosterior, gaugeAlignedConditional, gaugeStratify, gaugeAlignedPredictor,
-      Fintype.sum_prod_type]
+      binarySecondAnnotation, Fintype.sum_prod_type]
 
 /-- The one-half recalibration is stratum-calibrated for the relabelled field. -/
 theorem isStratumCalibrated_gaugeCrossed :
@@ -908,21 +908,21 @@ theorem isStratumCalibrated_gaugeCrossed :
   intro x s
   cases s <;>
     norm_num [gaugePosterior, gaugeCrossedConditional, gaugeStratify, gaugeCrossedPredictor,
-      Fintype.sum_prod_type]
+      balancedBinaryWeight, Fintype.sum_prod_type]
 
 /-- Stratifying the aligned field removes its entire drift defect. -/
 theorem stratifiedCalibrationEnergy_gaugeAligned_eq_zero :
     stratifiedCalibrationEnergy (fun _ : Unit ↦ (1 : ℝ)) gaugePosterior
       gaugeAlignedConditional gaugeStratify gaugeAlignedPredictor = 0 := by
   norm_num [stratifiedCalibrationEnergy, gaugePosterior, gaugeAlignedConditional, gaugeStratify,
-    gaugeAlignedPredictor, Fintype.sum_prod_type]
+    gaugeAlignedPredictor, binarySecondAnnotation, Fintype.sum_prod_type]
 
 /-- Stratifying the relabelled field removes none of it. -/
 theorem stratifiedCalibrationEnergy_gaugeCrossed_eq_quarter :
     stratifiedCalibrationEnergy (fun _ : Unit ↦ (1 : ℝ)) gaugePosterior
       gaugeCrossedConditional gaugeStratify gaugeCrossedPredictor = 1 / 4 := by
   norm_num [stratifiedCalibrationEnergy, gaugePosterior, gaugeCrossedConditional, gaugeStratify,
-    gaugeCrossedPredictor, Fintype.sum_prod_type]
+    gaugeCrossedPredictor, balancedBinaryWeight, Fintype.sum_prod_type]
 
 /-- **The gauge obstruction.**  Two conditional fields with the same posterior, the same posterior
 mean, and the same pooled drift defect leave *different* residuals under the same stratification:
@@ -977,15 +977,15 @@ noncomputable def balancedPosterior (x : Unit) (t : Bool) : ℝ := gaugeCrossedP
 
 /-- The balanced posterior is normalized. -/
 theorem balancedPosterior_sum_eq_one (x : Unit) : ∑ t, balancedPosterior x t = 1 := by
-  norm_num [balancedPosterior]
+  norm_num [balancedPosterior, gaugeCrossedPredictor, balancedBinaryWeight]
 
 /-- Both candidate fields have the same posterior mean, namely the centre. -/
 theorem posteriorMean_swappedConditional (centre radius : ℝ) :
     posteriorMean balancedPosterior (swappedConditional centre radius) () = centre ∧
       posteriorMean balancedPosterior (swappedConditionalMirror centre radius) () = centre := by
   constructor <;>
-    · norm_num [posteriorMean, balancedPosterior, swappedConditional,
-        swappedConditionalMirror] <;> ring
+    · norm_num [posteriorMean, balancedPosterior, gaugeCrossedPredictor, balancedBinaryWeight,
+        swappedConditional, swappedConditionalMirror] <;> ring
 
 /-- **The two candidate fields are indistinguishable by any calibration measurement.**  For every
 predictor whatsoever, they have identical index-wise calibration energy -- so no calibration
@@ -1235,6 +1235,38 @@ theorem no_regretFree_action_of_crossing (q lower upper cutoff : ℝ)
   · exact hboth.2
   · exact hboth.1
 
+/-- **The estimation obstruction and the decision obstruction are one event.**  A drift that
+straddles a clinical threshold has, at the same time, a strictly positive pooled calibration
+defect in the sense of `ContinuumCalibration` and a strictly positive net-benefit regret for
+every available action.  The probability-estimation obstruction and the decision-theoretic one
+are not two findings about a drifting conditional; they are one crossing, counted in two
+currencies. -/
+theorem crossing_forces_defect_and_regret (q lower upper cutoff : ℝ)
+    (hq₀ : 0 < q) (hq₁ : q < 1) (hcutoff : cutoff < 1)
+    (hlower : lower < cutoff) (hupper : cutoff < upper) :
+    0 < (∑ t, twoIndexPosterior (fun _ : Unit ↦ q) () t *
+        posteriorDrift (twoIndexPosterior (fun _ : Unit ↦ q))
+          (twoIndexConditional (fun _ : Unit ↦ upper) (fun _ : Unit ↦ lower)) t () ^ 2) ∧
+      ∀ action : Bool,
+        0 < driftDecisionRegret (twoIndexPosterior (fun _ : Unit ↦ q) ())
+          (fun t ↦ twoIndexConditional (fun _ : Unit ↦ upper) (fun _ : Unit ↦ lower) t ())
+          cutoff action := by
+  have hmarginPos : 0 < min (cutoff - lower) (upper - cutoff) :=
+    lt_min (by linarith) (by linarith)
+  have hlow : (fun _ : Unit ↦ lower) () ≤ cutoff - min (cutoff - lower) (upper - cutoff) := by
+    have hmin := min_le_left (cutoff - lower) (upper - cutoff)
+    simp only
+    linarith
+  have hup : cutoff + min (cutoff - lower) (upper - cutoff) ≤ (fun _ : Unit ↦ upper) () := by
+    have hmin := min_le_right (cutoff - lower) (upper - cutoff)
+    simp only
+    linarith
+  exact ⟨twoIndex_posteriorDriftEnergy_pos_of_thresholdMargin (fun _ ↦ q) (fun _ ↦ upper)
+      (fun _ ↦ lower) () cutoff (min (cutoff - lower) (upper - cutoff)) hq₀ hq₁ hmarginPos
+      hlow hup,
+    fun action ↦
+      no_regretFree_action_of_crossing q lower upper cutoff hq₀ hq₁ hcutoff hlower hupper action⟩
+
 end DecisionSurvival
 
 /-! ## Aggregate calibration is calibration-in-the-large
@@ -1327,7 +1359,8 @@ theorem card_sq_le_sum_mul_sum_inv (n : Stratum → ℝ) (hpos : ∀ s, 0 < n s)
       _ = (∑ s, 1 / n s) - (∑ s : Stratum, 2 * lam) + (∑ s, lam ^ 2 * n s) := by
             rw [Finset.sum_add_distrib, Finset.sum_sub_distrib]
       _ = (∑ s, 1 / n s) - 2 * lam * (Fintype.card Stratum : ℝ) + lam ^ 2 * (∑ s, n s) := by
-            rw [Finset.sum_const, ← Finset.mul_sum, Finset.card_univ]
+            rw [Finset.sum_const, Finset.card_univ, nsmul_eq_mul, ← Finset.mul_sum]
+            ring
   have hlamval : lam * (∑ s, n s) = (Fintype.card Stratum : ℝ) := by
     rw [hlam]
     field_simp
@@ -1348,7 +1381,6 @@ theorem effectiveStratumCount_ge_card (n : Stratum → ℝ) (hpos : ∀ s, 0 < n
         (((∑ s, n s) * ∑ s, 1 / n s) - (Fintype.card Stratum : ℝ) ^ 2) /
           (Fintype.card Stratum : ℝ) := by
     field_simp
-    ring
   have hnonneg :
       0 ≤ ((∑ s, n s) * ∑ s, 1 / n s) / (Fintype.card Stratum : ℝ) -
         (Fintype.card Stratum : ℝ) := by
