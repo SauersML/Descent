@@ -188,4 +188,126 @@ theorem FrequencyResolvedCohort.informationMatchedWeight_optimal
   rw [hmatched_info]
   exact hbound
 
+/-!
+### The combined information index
+
+`map/correctability.rs` reports one whole-design summary,
+`combined_information_index = 4 · effectiveSubgroupSize · √(ΣM_cF_c² / n)`, that had no
+definition anywhere in this corpus: a shipped number with no stated meaning.  Differential
+testing over a 1010-design sweep confirmed the body byte-for-byte and, more usefully, found
+what it *is*: for a single marker class it is exactly the spike-to-threshold ratio, so the
+familiar `> 1` reading is the BBP detectability test in disguise.
+-/
+
+/-- Whole-design detectability index reported by the shipped calculator. -/
+noncomputable def FrequencyResolvedCohort.combinedInformationIndex {classes : ℕ}
+    (cohort : FrequencyResolvedCohort classes) : ℝ :=
+  4 * effectiveSubgroupSize cohort.sampleSize cohort.subgroupSize *
+    Real.sqrt (cohort.totalInformation / cohort.sampleSize)
+
+/-- **The index is the spike measured in threshold units.**  Multiplying it back by the BBP
+threshold returns the rank-one spike exactly, so `combinedInformationIndex > 1` is
+`demographicSpike > bbpProxyThreshold` — the same detectability test the per-class report
+runs — whenever the design has one marker class. -/
+theorem combinedInformationIndex_mul_threshold_eq_spike
+    (n M F m : ℝ) (hn : 0 < n) (hM : 0 < M) (hF : 0 ≤ F) :
+    4 * effectiveSubgroupSize n m * Real.sqrt ((M * F ^ 2) / n) * bbpProxyThreshold n M =
+      demographicSpike n F m := by
+  have hinfo : (0 : ℝ) ≤ M * F ^ 2 / n :=
+    div_nonneg (mul_nonneg (le_of_lt hM) (sq_nonneg F)) (le_of_lt hn)
+  have hn' : n ≠ 0 := ne_of_gt hn
+  have hM' : M ≠ 0 := ne_of_gt hM
+  have hproduct : M * F ^ 2 / n * (n / M) = F ^ 2 := by
+    field_simp
+  have hsqrt : Real.sqrt (M * F ^ 2 / n) * bbpProxyThreshold n M = F := by
+    unfold bbpProxyThreshold
+    rw [← Real.sqrt_mul hinfo, hproduct, Real.sqrt_sq hF]
+  unfold demographicSpike
+  calc
+    4 * effectiveSubgroupSize n m * Real.sqrt (M * F ^ 2 / n) * bbpProxyThreshold n M
+        = 4 * effectiveSubgroupSize n m *
+            (Real.sqrt (M * F ^ 2 / n) * bbpProxyThreshold n M) := by ring
+    _ = 4 * effectiveSubgroupSize n m * F := by rw [hsqrt]
+    _ = 4 * F * effectiveSubgroupSize n m := by ring
+
+/-- The one-class specialization, stated on the structure the calculator's input maps onto. -/
+theorem FrequencyResolvedCohort.combinedInformationIndex_mul_threshold_eq_spike
+    (cohort : FrequencyResolvedCohort 1) :
+    cohort.combinedInformationIndex *
+        bbpProxyThreshold cohort.sampleSize (cohort.effectiveMarkers 0) =
+      demographicSpike cohort.sampleSize (cohort.differentiation 0) cohort.subgroupSize := by
+  have htotal : cohort.totalInformation =
+      cohort.effectiveMarkers 0 * cohort.differentiation 0 ^ 2 := by
+    unfold FrequencyResolvedCohort.totalInformation FrequencyResolvedCohort.classInformation
+    simp
+  unfold FrequencyResolvedCohort.combinedInformationIndex
+  rw [htotal]
+  exact _root_.Calibrator.combinedInformationIndex_mul_threshold_eq_spike cohort.sampleSize
+    (cohort.effectiveMarkers 0) (cohort.differentiation 0) cohort.subgroupSize
+    cohort.sampleSize_pos (cohort.effectiveMarkers_pos 0) (cohort.differentiation_nonneg 0)
+
+/-!
+### Admissibility gap against the shipped validator
+
+`map/correctability.rs::validate` rejects designs this structure accepts.  It requires
+`subgroup_size < sample_size` and `differentiation ≤ 1` (the Hudson `F_ST` scale); the fields
+above require only positivity and nonnegativity.  Every theorem stated over
+`FrequencyResolvedCohort` therefore also quantifies over designs the shipped calculator
+refuses to score, and the next result shows those designs are not harmless — the effective
+subgroup size, which the whole spike scale is built on, goes nonpositive there.
+-/
+
+/-- The extra admissibility conditions the shipped validator enforces. -/
+def FrequencyResolvedCohort.CalculatorAdmissible {classes : ℕ}
+    (cohort : FrequencyResolvedCohort classes) : Prop :=
+  cohort.subgroupSize < cohort.sampleSize ∧ ∀ i, cohort.differentiation i ≤ 1
+
+/-- **A cohort the shipped validator accepts.**  `FrequencyResolvedCohort.witness` above is
+*not* admissible — it has `subgroupSize = sampleSize = 1`, which `validate` rejects — so
+without this second witness `CalculatorAdmissible` would be a property only ever assumed.
+This one splits a two-person panel and carries the maximal legal differentiation. -/
+noncomputable def FrequencyResolvedCohort.admissibleWitness (classes : ℕ) :
+    FrequencyResolvedCohort classes where
+  sampleSize := 2
+  subgroupSize := 1
+  effectiveMarkers := fun _ ↦ 1
+  differentiation := fun _ ↦ 1
+  sampleSize_pos := by norm_num
+  subgroupSize_pos := by norm_num
+  effectiveMarkers_pos := fun _ ↦ by norm_num
+  differentiation_nonneg := fun _ ↦ by norm_num
+
+/-- On admissible designs the effective subgroup size is positive, which is what makes the
+spike, the margin, and every downstream overlap a statement about a real contrast. -/
+theorem FrequencyResolvedCohort.effectiveSubgroupSize_pos_of_admissible {classes : ℕ}
+    (cohort : FrequencyResolvedCohort classes) (hadmissible : cohort.CalculatorAdmissible) :
+    0 < effectiveSubgroupSize cohort.sampleSize cohort.subgroupSize := by
+  unfold effectiveSubgroupSize
+  exact div_pos (mul_pos cohort.subgroupSize_pos (sub_pos.mpr hadmissible.1))
+    cohort.sampleSize_pos
+
+/-- The admissible witness is admissible, so the property is established and not merely
+assumed. -/
+theorem FrequencyResolvedCohort.admissibleWitness_calculatorAdmissible (classes : ℕ) :
+    (FrequencyResolvedCohort.admissibleWitness classes).CalculatorAdmissible := by
+  constructor
+  · show (1 : ℝ) < 2
+    norm_num
+  · intro i
+    show (1 : ℝ) ≤ 1
+    norm_num
+
+/-- **The gap is not vacuous.**  A cohort satisfying every field of the structure but violating
+the shipped validator's `subgroup_size < sample_size` has nonpositive effective subgroup size,
+hence a nonpositive spike for every nonnegative differentiation: the margin is then negative for
+purely arithmetic reasons and reports "uncorrectable" for a design the calculator would have
+refused to accept at all. -/
+theorem FrequencyResolvedCohort.effectiveSubgroupSize_nonpos_of_inadmissible {classes : ℕ}
+    (cohort : FrequencyResolvedCohort classes)
+    (hsubgroup : cohort.sampleSize ≤ cohort.subgroupSize) :
+    effectiveSubgroupSize cohort.sampleSize cohort.subgroupSize ≤ 0 := by
+  unfold effectiveSubgroupSize
+  apply div_nonpos_of_nonpos_of_nonneg _ (le_of_lt cohort.sampleSize_pos)
+  exact mul_nonpos_of_nonneg_of_nonpos (le_of_lt cohort.subgroupSize_pos) (by linarith)
+
 end Calibrator

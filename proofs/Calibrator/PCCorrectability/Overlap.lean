@@ -63,7 +63,14 @@ theorem samplePCOverlapSq_pos_and_lt_one
     linarith
 
 /-- Fraction of the target ancestry axis left after projection onto the modeled
-sample PC. -/
+sample PC.
+
+**This models an analyst who residualizes on the relevant sample PC.**  It does not model
+the analyst's choice of *how many* PCs to fit.  The shipped calculator
+(`map/correctability.rs`, `removed_axis_fraction`) removes the axis only when the class's
+`theoretical_pc_rank` is within the requested `fitted_pcs`, and otherwise removes nothing.
+Use `fittedResidualAxisFraction` below for the shipped quantity; this definition is the
+`pcRank ≤ fittedPCs` special case of it. -/
 noncomputable def samplePCResidualAxisFraction (n M spike : ℝ) : ℝ :=
   1 - samplePCOverlapSq n M spike
 
@@ -139,5 +146,90 @@ theorem samplePCResidualAxisFraction_strictAntiOn_superthreshold
         (spike₁ + 1) * (spike₂ * (spike₂ + n / M)) := by
     nlinarith
   simpa only [mul_assoc] using mul_lt_mul_of_pos_left hcore hratio
+
+/-!
+### The fitted-PC-count gate
+
+Detectability is not the only gate the shipped calculator applies.  A marker class whose
+ancestry axis is the `r`-th population PC is only residualized away if the analyst actually
+fitted at least `r` PCs.  Detecting an axis at rank 30 and then fitting 10 PCs removes none
+of it.
+
+The definitions above model only the spectral gate, and differential testing against
+`map/correctability.rs` found the gap: on the shipped calculator's own unit-test fixture
+(`n = 1000`, `M = 4000`, `F = 0.01`, `m = 500`, `theoretical_pc_rank = 3`, `fitted_pcs = 2`)
+the calculator reports `residual_axis_fraction = 1` — nothing removed — while
+`samplePCResidualAxisFraction` gives `0.0268`.  Over a 1010-design sweep the two disagree on
+160 of 1971 marker-class instances, always in the optimistic direction.  The definitions
+below close the gap.
+-/
+
+/-- Fraction of the target ancestry axis actually removed by a requested PC set, as computed
+by the shipped calculator.  `pcRank` is the one-based population-PC index carrying the axis,
+`fittedPCs` the number of PCs the analyst requested. -/
+noncomputable def removedAxisFraction (n M spike : ℝ) (pcRank fittedPCs : ℕ) : ℝ :=
+  if pcRank ≤ fittedPCs then samplePCOverlapSq n M spike else 0
+
+/-- Fraction of the target ancestry axis left after a requested PC set is projected out. -/
+noncomputable def fittedResidualAxisFraction (n M spike : ℝ) (pcRank fittedPCs : ℕ) : ℝ :=
+  1 - removedAxisFraction n M spike pcRank fittedPCs
+
+/-- **The shipped conjunction is the same function.**  `map/correctability.rs` gates removal
+on `detectable_by_sample_pca && theoretical_pc_rank <= fitted_pcs`, whereas
+`removedAxisFraction` gates on the rank alone.  The two agree because `samplePCOverlapSq` is
+already zero below the edge, so the detectability conjunct is redundant.  Stating this is what
+makes the single-gate definition a faithful model rather than a simplification. -/
+theorem removedAxisFraction_eq_detectability_gated
+    (n M spike : ℝ) (pcRank fittedPCs : ℕ) :
+    removedAxisFraction n M spike pcRank fittedPCs =
+      (if bbpProxyThreshold n M < spike ∧ pcRank ≤ fittedPCs then
+        samplePCOverlapSq n M spike else 0) := by
+  unfold removedAxisFraction
+  by_cases hrank : pcRank ≤ fittedPCs
+  · by_cases hdetect : bbpProxyThreshold n M < spike
+    · simp [hrank, hdetect]
+    · simp [hrank, hdetect, samplePCOverlapSq]
+  · simp [hrank]
+
+/-- Within the fitted PC budget, the shipped residual fraction is exactly the
+Johnstone--Paul one. -/
+theorem fittedResidualAxisFraction_eq_samplePC
+    (n M spike : ℝ) (pcRank fittedPCs : ℕ) (hrank : pcRank ≤ fittedPCs) :
+    fittedResidualAxisFraction n M spike pcRank fittedPCs =
+      samplePCResidualAxisFraction n M spike := by
+  unfold fittedResidualAxisFraction removedAxisFraction samplePCResidualAxisFraction
+  simp [hrank]
+
+/-- **An axis outside the fitted PC budget is untouched, however detectable it is.**  This is
+the content the spectral model alone does not carry: no amount of separation rescues an axis
+the analyst did not fit a PC for.  It is also the exact sense in which
+`samplePCResidualAxisFraction` is optimistic about the shipped calculator. -/
+theorem fittedResidualAxisFraction_eq_one_of_rank_exceeds_budget
+    (n M spike : ℝ) (pcRank fittedPCs : ℕ) (hrank : ¬ pcRank ≤ fittedPCs) :
+    fittedResidualAxisFraction n M spike pcRank fittedPCs = 1 := by
+  unfold fittedResidualAxisFraction removedAxisFraction
+  simp [hrank]
+
+/-- The modeled squared overlap is never negative, on either side of the edge. -/
+theorem samplePCOverlapSq_nonneg (n M spike : ℝ) (hn : 0 < n) (hM : 0 < M) :
+    0 ≤ samplePCOverlapSq n M spike := by
+  by_cases hdetect : bbpProxyThreshold n M < spike
+  · exact le_of_lt (samplePCOverlapSq_pos_and_lt_one n M spike hn hM hdetect).1
+  · rw [samplePCOverlapSq_eq_zero_of_subthreshold n M spike (not_lt.mp hdetect)]
+
+/-- The shipped residual fraction is never below the spectral one: modelling the PC budget can
+only make the reported residual confounding larger.  The corpus's end-to-end risk chain
+(`modeledPCResidualSusceptibility`) is therefore a lower bound on the shipped calculator's
+residual susceptibility, not an equal. -/
+theorem samplePCResidualAxisFraction_le_fitted
+    (n M spike : ℝ) (pcRank fittedPCs : ℕ) (hn : 0 < n) (hM : 0 < M) :
+    samplePCResidualAxisFraction n M spike ≤
+      fittedResidualAxisFraction n M spike pcRank fittedPCs := by
+  have hoverlap := samplePCOverlapSq_nonneg n M spike hn hM
+  unfold fittedResidualAxisFraction removedAxisFraction samplePCResidualAxisFraction
+  by_cases hrank : pcRank ≤ fittedPCs
+  · simp [hrank]
+  · simp only [hrank, if_false, sub_zero]
+    linarith
 
 end Calibrator
