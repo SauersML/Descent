@@ -78,7 +78,17 @@ theorem additive_pgs_ceiling
     α(p) = a + d(1-2p) where a is the additive effect and
     d is the dominance deviation.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_bulk5.py`,
+    `test_fisher_average_effect`). Fitting the slope IS what "average effect"
+    means, so the oracle is a least-squares regression of genotypic value on
+    dosage under Hardy-Weinberg, four million individuals per cell, worst 2.05
+    sems over a prediction spanning 0.36000 to 1.30000.
+
+    The design puts `p` on both sides of one half and uses a negative `d` in one
+    cell, because the `(1 - 2p)` term vanishes at `p = 1/2` -- a design pinned
+    there could not see it at all, which is the blindness
+    `BlindnessRegistry` instance 8 records for this very quantity. -/
 noncomputable def fisherAverageEffect (a d p : ℝ) : ℝ :=
   a + d * (1 - 2 * p)
 
@@ -165,7 +175,13 @@ theorem additive_misses_epistasis
     V_I ∝ Σ β₁₂² × 2p₁(1-p₁) × 2p₂(1-p₂).
     When frequencies change, V_I changes → additive PGS is miscalibrated.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_bulk5.py`,
+    `test_epistatic_variance`). Measured as the variance of the two-locus
+    interaction term AFTER both main effects are removed by least squares, four
+    million individuals, worst 2.56 sems over a prediction spanning 0.12250 to
+    0.23040. Removing the main effects first is what makes this the epistatic
+    component rather than the total two-locus variance. -/
 noncomputable def epistaticVariance
     (beta12 p1 p2 : ℝ) : ℝ :=
   beta12 ^ 2 * (2 * p1 * (1 - p1)) * (2 * p2 * (1 - p2))
@@ -237,7 +253,18 @@ section DominanceEffects
     V_D = Σ (2pq d)² where d is the dominance deviation.
     V_D depends on heterozygosity, which differs across populations.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_bulk5.py`,
+    `test_dominance_variance`). Measured as the variance of the residual left by
+    the additive fit at each locus, summed over independent loci -- the quantity
+    the decomposition names, obtained by fitting rather than by rearranging:
+
+      loci   this def   simulated            sems
+      1       0.04410   0.04409±0.00003      0.31
+      2       0.08096   0.08100±0.00006      0.57
+      3       0.10331   0.10332±0.00007      0.12
+
+    Power: the prediction spans 0.04410 to 0.10331 across the design. -/
 noncomputable def dominanceVariance
     {m : ℕ} (p : Fin m → ℝ) (d : Fin m → ℝ) : ℝ :=
   ∑ i, (2 * p i * (1 - p i) * d i) ^ 2

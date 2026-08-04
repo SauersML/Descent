@@ -567,7 +567,11 @@ section CausalInference
     Attenuation = √R² in the training GWAS.
     In a new population, attenuation changes.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_bulk5.py`,
+    `test_attenuation`). Against the realised correlation between score and
+    outcome at a given r-squared, two million individuals, worst 0.74 sems over
+    a prediction spanning 0.31623 to 0.94868. -/
 noncomputable def pgsAttenuationFactor (r2_gwas : ℝ) : ℝ :=
   Real.sqrt r2_gwas
 
@@ -629,7 +633,17 @@ noncomputable def AttenuationModel.witness : AttenuationModel where
 
 /-- Reliability ratio in a population
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_bulk5.py`,
+    `test_attenuation`). Measured as the ratio of the slope fitted on a NOISY
+    predictor to the slope fitted on the clean one, two million individuals:
+
+      r2    sigma2   this def   measured             sems
+      0.5   0.5       0.50000   0.49997±0.00106      0.03
+      0.2   0.8       0.20000   0.20016±0.00042      0.39
+      0.8   0.2       0.80000   0.80028±0.00170      0.16
+
+    Power: the prediction spans 0.20000 to 0.80000. -/
 noncomputable def reliabilityRatio (r2 σ2_noise : ℝ) : ℝ :=
   r2 / (r2 + σ2_noise)
 
