@@ -578,6 +578,13 @@ noncomputable def AttenuationModel.witness : AttenuationModel where
 noncomputable def reliabilityRatio (r2 σ2_noise : ℝ) : ℝ :=
   r2 / (r2 + σ2_noise)
 
+/-- **The reliability ratio recovers the true variance from the total.** This is what fixes the
+ratio; monotonicity in the noise is shared by every rescaling of it. -/
+theorem reliabilityRatio_mul_total (r2 σ2_noise : ℝ) (h : r2 + σ2_noise ≠ 0) :
+    reliabilityRatio r2 σ2_noise * (r2 + σ2_noise) = r2 := by
+  unfold reliabilityRatio
+  field_simp
+
 /-- Observed (attenuated) coefficient -/
 noncomputable def AttenuationModel.β_obs (m : AttenuationModel) (r2 : ℝ) : ℝ :=
   m.β_true * reliabilityRatio r2 m.σ2_noise

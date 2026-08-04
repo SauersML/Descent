@@ -412,6 +412,13 @@ mismatch in observable tag space. It includes an explicit recombination/array sp
 noncomputable def taggingMismatchScale (recombRate arraySparsity : ℝ) : ℝ :=
   recombRate * arraySparsity
 
+/-- **A fully dense array leaves only the recombination rate.** Sparsity one is the reference
+point, and it fixes the proportionality constant that a rescaled body would change. -/
+theorem taggingMismatchScale_dense (recombRate : ℝ) :
+    taggingMismatchScale recombRate 1 = recombRate := by
+  unfold taggingMismatchScale
+  ring
+
 /-- Demography-to-LD lower bound template used in portability theorems.
 
 **Vacuous in the generic split, and this is measured, not suspected.** The bound is
@@ -904,6 +911,14 @@ unless the noise slope is zero. -/
 
 noncomputable def optimalSlopeLinearNoise (sigma_g_sq base_error slope_error c : ℝ) : ℝ :=
   sigma_g_sq / (sigma_g_sq + base_error + slope_error * c)
+
+/-- **The slope recovers the signal from the total variance.** -/
+theorem optimalSlopeLinearNoise_mul_total (sigma_g_sq base_error slope_error c : ℝ)
+    (h : sigma_g_sq + base_error + slope_error * c ≠ 0) :
+    optimalSlopeLinearNoise sigma_g_sq base_error slope_error c
+      * (sigma_g_sq + base_error + slope_error * c) = sigma_g_sq := by
+  unfold optimalSlopeLinearNoise
+  field_simp
 
 theorem linear_noise_implies_nonlinear_slope
     (sigma_g_sq base_error slope_error : ℝ)

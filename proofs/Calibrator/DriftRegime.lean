@@ -306,6 +306,13 @@ is every power of it.
     prediction. See `proofs/validation/empirical/drift_diff/`. -/
 noncomputable def benchmarkRatio (fstS fstT : ℝ) : ℝ := (1 - fstT) / (1 - fstS)
 
+/-- **The ratio recovers the target retention from the source's.** The squared rival below is
+separated by this identity, not merely by being a different formula. -/
+theorem benchmarkRatio_mul_source (fstS fstT : ℝ) (h : 1 - fstS ≠ 0) :
+    benchmarkRatio fstS fstT * (1 - fstS) = 1 - fstT := by
+  unfold benchmarkRatio
+  field_simp
+
 /-- A deliberately wrong rival: the same ratio squared. Any design that cannot separate
 these two has no power to check the functional form.
 

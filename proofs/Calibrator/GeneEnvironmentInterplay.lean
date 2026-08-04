@@ -259,6 +259,14 @@ section NormOfReaction
 noncomputable def linearNormOfReaction (a b E : ℝ) : ℝ :=
   a + b * E
 
+/-- **The intercept cancels in an environmental contrast.** Only the slope is identified from a
+difference of environments, which is why a genotype's baseline needs a reference environment and
+cannot be read off a reaction-norm comparison. -/
+theorem linearNormOfReaction_sub (a b E₁ E₂ : ℝ) :
+    linearNormOfReaction a b E₁ - linearNormOfReaction a b E₂ = b * (E₁ - E₂) := by
+  unfold linearNormOfReaction
+  ring
+
 /-- **Different genotypes have different slopes.**
     If b(G₁) ≠ b(G₂), then the genotype ranking can reverse
     across environments (crossover GxE). Given two genotypes

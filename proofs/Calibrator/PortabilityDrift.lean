@@ -914,6 +914,14 @@ For one branch with drift index `fst`, this is `2 * fst * V_A`.
 noncomputable def Var_Delta_Mu (V_A fst : ℝ) : ℝ :=
   2 * fst * V_A
 
+/-- **The two populations contribute one drift variance each.** The factor of two is the whole
+content of the definition, and it is what a body carrying a single population's variance would
+get wrong. -/
+theorem Var_Delta_Mu_eq_add_self (V_A fst : ℝ) :
+    Var_Delta_Mu V_A fst = fst * V_A + fst * V_A := by
+  unfold Var_Delta_Mu
+  ring
+
 /-- Drift-driven expected absolute PGS-mean shift under a Normal approximation.
 
     Empirical status: UNTESTED. -/
@@ -3292,6 +3300,13 @@ though the eventual formula was present in the same file. -/
 /-- Standard normal density, `φ(x) = exp(-x²/2)/√(2π)`. -/
 noncomputable def standardNormalPdf (x : ℝ) : ℝ :=
   Real.exp (-x ^ 2 / 2) / Real.sqrt (2 * Real.pi)
+
+/-- **The mode height.** The density at the mean is the normalising constant, which pins the
+constant a body with the wrong normalisation would miss. -/
+theorem standardNormalPdf_zero :
+    standardNormalPdf 0 = 1 / Real.sqrt (2 * Real.pi) := by
+  unfold standardNormalPdf
+  norm_num
 
 /-- The liability threshold `T = Φ⁻¹(1 - K)` for prevalence `K`.
 

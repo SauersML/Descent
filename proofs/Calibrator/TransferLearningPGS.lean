@@ -643,6 +643,12 @@ section ImportanceWeighting
 noncomputable def importanceWeightESS (sum_w sum_w_sq : ℝ) : ℝ :=
   sum_w ^ 2 / sum_w_sq
 
+/-- **The effective size recovers the squared total weight.** -/
+theorem importanceWeightESS_mul_sumSq (sum_w sum_w_sq : ℝ) (h : sum_w_sq ≠ 0) :
+    importanceWeightESS sum_w sum_w_sq * sum_w_sq = sum_w ^ 2 := by
+  unfold importanceWeightESS
+  field_simp
+
 /-- **IW ESS ≤ n, from an actual weight vector, with Cauchy-Schwarz proved.**
 
     `iw_ess_le_n` used to state this for free scalars `sum_w` and `sum_w_sq` and take

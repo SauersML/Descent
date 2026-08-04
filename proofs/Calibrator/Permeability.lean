@@ -1280,6 +1280,13 @@ theorem firstTwoLags_injective_of_amplitude_ne_zero
 nonzero nearby parameter. -/
 noncomputable def quadraticChannel (θ : ℝ) : ℝ := θ ^ 2
 
+/-- **The channel's failure of additivity is exactly the cross term.** First-order blindness at
+zero is shared by every even channel; this identity is not, and it is what a quartic body breaks. -/
+theorem quadraticChannel_add (a b : ℝ) :
+    quadraticChannel (a + b) = quadraticChannel a + 2 * a * b + quadraticChannel b := by
+  unfold quadraticChannel
+  ring
+
 /-- The quadratic channel is first-order blind at zero. -/
 theorem quadraticChannel_deriv_zero : deriv quadraticChannel 0 = 0 := by
   unfold quadraticChannel
