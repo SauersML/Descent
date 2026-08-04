@@ -311,14 +311,19 @@ theorem optimumOUVariance_at_reference_point :
   unfold optimumOUVariance
   norm_num
 
-/-- **The stationary variance of the optimum is linear in the autocorrelation time and quadratic
-in the driving amplitude.** Halving the amplitude quarters the variance while halving the
-correlation time only halves it: the two parameters enter at different orders, which is the
-content a mutant that multiplied them symmetrically would lose. -/
-theorem optimumOUVariance_scaling (sigmaTheta tau c : ℝ) :
-    optimumOUVariance (c * sigmaTheta) tau = c ^ 2 * optimumOUVariance sigmaTheta tau ∧
-      optimumOUVariance sigmaTheta (c * tau) = c * optimumOUVariance sigmaTheta tau := by
-  constructor <;> unfold optimumOUVariance <;> ring
+/-- **The stationary optimum variance is quadratic in the driving amplitude.**
+Halving the amplitude quarters the variance. -/
+theorem optimumOUVariance_amplitude_scaling (sigmaTheta tau c : ℝ) :
+    optimumOUVariance (c * sigmaTheta) tau = c ^ 2 * optimumOUVariance sigmaTheta tau := by
+  unfold optimumOUVariance
+  ring
+
+/-- **The stationary optimum variance is linear in autocorrelation time.**
+Halving the correlation time halves the variance. -/
+theorem optimumOUVariance_time_scaling (sigmaTheta tau c : ℝ) :
+    optimumOUVariance sigmaTheta (c * tau) = c * optimumOUVariance sigmaTheta tau := by
+  unfold optimumOUVariance
+  ring
 
 /-- Selected-architecture variance under fluctuating selection: the baseline
     mutation-selection variance plus the variance induced by a moving optimum. -/
@@ -404,6 +409,16 @@ data imply unbounded selection. Consumers must require `rho ≠ 1`. -/
 theorem stabilizingNsFromObservedCorrelation_perfect_is_junk :
     stabilizingNsFromObservedCorrelation 1 = 0 := by
   unfold stabilizingNsFromObservedCorrelation; norm_num
+
+/-- Below perfect correlation, the recovered stabilizing-selection scale lies in the
+positive-correlation regime `Ns > 1/2` exactly when the observation itself is positive. -/
+theorem stabilizingNsFromObservedCorrelation_gt_half_iff
+    (rho : ℝ) (h_rho_lt : rho < 1) :
+    1 / 2 < stabilizingNsFromObservedCorrelation rho ↔ 0 < rho := by
+  unfold stabilizingNsFromObservedCorrelation
+  have h_denom : 0 < 2 * (1 - rho) := by linarith
+  rw [div_lt_div_iff₀ (by norm_num : (0 : ℝ) < 2) h_denom]
+  constructor <;> intro h <;> nlinarith
 
 /-- The inverse map for the stabilizing effect-correlation formula is exact on
     the biologically relevant region `ρ < 1`. -/
