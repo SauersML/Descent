@@ -261,9 +261,11 @@ whatever regularity the family has — the polynomial-times-exponential construc
 instance where the family is real analytic.
 
 Stated for an arbitrary linear observation map, because the count is the entire argument. -/
-theorem exists_invisible_perturbation {n : ℕ}
-    (obs : (Fin (n + 1) → ℝ) →ₗ[ℝ] (Fin n → ℝ)) :
-    ∃ v : Fin (n + 1) → ℝ, v ≠ 0 ∧ obs v = 0 := by
+theorem exists_invisible_perturbation_of_lt
+    {inputCount outputCount : ℕ} (hcount : outputCount < inputCount)
+    {𝕜 : Type*} [DivisionRing 𝕜]
+    (obs : (Fin inputCount → 𝕜) →ₗ[𝕜] (Fin outputCount → 𝕜)) :
+    ∃ v : Fin inputCount → 𝕜, v ≠ 0 ∧ obs v = 0 := by
   by_contra hcon
   push_neg at hcon
   have hinj : Function.Injective obs := by
@@ -274,6 +276,14 @@ theorem exists_invisible_perturbation {n : ℕ}
   have hle := LinearMap.finrank_le_finrank_of_injective hinj
   simp only [Module.finrank_fin_fun] at hle
   omega
+
+/-- The SFS-sized specialization: `n` linear observations cannot identify an
+`(n + 1)`-dimensional family. -/
+theorem exists_invisible_perturbation {n : ℕ}
+    {𝕜 : Type*} [DivisionRing 𝕜]
+    (obs : (Fin (n + 1) → 𝕜) →ₗ[𝕜] (Fin n → 𝕜)) :
+    ∃ v : Fin (n + 1) → 𝕜, v ≠ 0 ∧ obs v = 0 := by
+  exact exists_invisible_perturbation_of_lt (Nat.lt_succ_self n) obs
 
 /-! ## The constant minimax floor -/
 
