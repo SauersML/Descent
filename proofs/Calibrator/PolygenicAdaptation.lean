@@ -180,6 +180,18 @@ theorem pgsDiffVariance_two_pop_eq_sum (V_A fst : ℝ) :
 noncomputable def expectedPGSDiffVariance (V_A fst : ℝ) : ℝ :=
   V_A * 2 * fst
 
+/-- **At complete differentiation the difference variance is twice the additive variance.**
+
+The agreement with `pgsDiffVariance_two_pop` recorded below is a cross-identity: both sides are
+built from `pgsDriftVariance_one_pop`, so a common wrong factor cancels and the identity survives
+it. Evaluating at `F_ST = 1` does not. Two populations that share no ancestry contribute one
+additive variance each, so the difference carries exactly two, and that is the only reading under
+which the factor is a count of populations rather than a fitted constant. -/
+theorem expectedPGSDiffVariance_complete_differentiation (V_A : ℝ) :
+    expectedPGSDiffVariance V_A 1 = 2 * V_A := by
+  unfold expectedPGSDiffVariance
+  ring
+
 /-- **The two-population PGS difference variance equals expectedPGSDiffVariance.**
 
     This connects the step-by-step derivation to the original definition:
