@@ -19,6 +19,7 @@ import Mathlib.LinearAlgebra.Matrix.PosDef
 import Mathlib.LinearAlgebra.Vandermonde
 import Mathlib.Topology.Sequences
 import Mathlib.Topology.ContinuousMap.Bounded.ArzelaAscoli
+import Mathlib.Topology.MetricSpace.PiNat
 import Mathlib.Topology.MetricSpace.UniformConvergence
 import Mathlib.Topology.Order.LeftRight
 import Mathlib.Tactic
@@ -5034,184 +5035,35 @@ function type it receives the weighted product metric rather than an unrelated
 function-space metric instance. -/
 def ExponentialProfilePoint (bound : ℝ) := BoundedExponentialProfile bound
 
-/-- One coordinate of the explicit exponential-profile distance, capped at
-one exactly as in the right-convergence definition. -/
-noncomputable def cappedProfileDifference (left right : ℝ) : ℝ :=
-  min 1 |left - right|
+/-- Mathlib's metric on a countable product of metric spaces, transported to
+the dedicated profile carrier:
+
+    dist x y = ∑' j, min (2⁻ʲ) (dist (x j) (y j)).
+
+`PiCountable.metricSpace` fixes `toUniformSpace := Pi.uniformSpace _`, so this
+distance carries the product uniformity *by construction* rather than by a
+separate argument.  That is what makes distance convergence and simultaneous
+coordinate convergence the same statement below, and it is why this file no
+longer carries its own capped-coordinate metric: the whole construction, and
+the Tannery/coercivity argument that it induces the product topology, is
+`Mathlib.Topology.MetricSpace.PiNat`.
+
+The earlier bespoke formula was `∑' j, 2⁻ʲ · min 1 |x j - y j|`.  Mathlib's
+caps the weight rather than the discrepancy; both are separating, both have
+total mass two, and both metrize the product topology, so every downstream
+statement is unchanged. -/
+noncomputable instance exponentialProfilePointMetricSpace (bound : ℝ) :
+    MetricSpace (ExponentialProfilePoint bound) :=
+  PiCountable.metricSpace
 
 /-- The explicit weighted distance on the countable exponential/LD profile.
-Lean indices start at zero, so the weights are `2⁻ʲ`; their sum is two.  This
-is the same convention as equation (8.2) up to its harmless index origin.
 
 Convention: the index is the enumeration position of a prior/replica/tilt
 coordinate, not a biological locus. -/
 noncomputable def exponentialProfileDistance
     {bound : ℝ} (left right : BoundedExponentialProfile bound) : ℝ :=
-  ∑' coordinate : ℕ,
-    (1 / 2 : ℝ) ^ coordinate *
-      cappedProfileDifference (left coordinate) (right coordinate)
-
-theorem cappedProfileDifference_nonneg (left right : ℝ) :
-    0 ≤ cappedProfileDifference left right := by
-  unfold cappedProfileDifference
-  exact le_min zero_le_one (abs_nonneg _)
-
-theorem cappedProfileDifference_le_one (left right : ℝ) :
-    cappedProfileDifference left right ≤ 1 := by
-  exact min_le_left _ _
-
-theorem cappedProfileDifference_eq_zero_iff (left right : ℝ) :
-    cappedProfileDifference left right = 0 ↔ left = right := by
-  constructor
-  · intro hzero
-    have habs : |left - right| = 0 := by
-      by_contra hne
-      have hpositive : 0 < |left - right| := lt_of_le_of_ne (abs_nonneg _) (Ne.symm hne)
-      have : 0 < cappedProfileDifference left right := by
-        unfold cappedProfileDifference
-        exact lt_min zero_lt_one hpositive
-      linarith
-    exact sub_eq_zero.mp (abs_eq_zero.mp habs)
-  · rintro rfl
-    simp [cappedProfileDifference]
-
-theorem cappedProfileDifference_comm (left right : ℝ) :
-    cappedProfileDifference left right = cappedProfileDifference right left := by
-  simp [cappedProfileDifference, abs_sub_comm]
-
-/-- Capping an absolute difference at one preserves the triangle inequality. -/
-theorem cappedProfileDifference_triangle (left middle right : ℝ) :
-    cappedProfileDifference left right ≤
-      cappedProfileDifference left middle + cappedProfileDifference middle right := by
-  have habs : |left - right| ≤ |left - middle| + |middle - right| := by
-    calc
-      |left - right| = |(left - middle) + (middle - right)| := by congr 1; ring
-      _ ≤ |left - middle| + |middle - right| := abs_add_le _ _
-  by_cases hleft : 1 ≤ |left - middle|
-  · have hone : cappedProfileDifference left middle = 1 := by
-      simp [cappedProfileDifference, min_eq_left hleft]
-    rw [hone]
-    have hnonneg := cappedProfileDifference_nonneg middle right
-    exact (cappedProfileDifference_le_one left right).trans (by linarith)
-  by_cases hright : 1 ≤ |middle - right|
-  · have hone : cappedProfileDifference middle right = 1 := by
-      simp [cappedProfileDifference, min_eq_left hright]
-    rw [hone]
-    have hnonneg := cappedProfileDifference_nonneg left middle
-    exact (cappedProfileDifference_le_one left right).trans (by linarith)
-  · have hleftEq : cappedProfileDifference left middle = |left - middle| := by
-      unfold cappedProfileDifference
-      rw [min_eq_right (le_of_not_ge hleft)]
-    have hrightEq : cappedProfileDifference middle right = |middle - right| := by
-      unfold cappedProfileDifference
-      rw [min_eq_right (le_of_not_ge hright)]
-    rw [hleftEq, hrightEq]
-    exact (min_le_right (1 : ℝ) |left - right|).trans habs
-
-/-- The coordinate series defining the profile distance is summable. -/
-theorem exponentialProfileDistance_summable
-    {bound : ℝ} (left right : BoundedExponentialProfile bound) :
-    Summable (fun coordinate : ℕ ↦
-      (1 / 2 : ℝ) ^ coordinate *
-        cappedProfileDifference (left coordinate) (right coordinate)) := by
-  refine Summable.of_nonneg_of_le (fun coordinate ↦ ?_) (fun coordinate ↦ ?_)
-    summable_geometric_two
-  · exact mul_nonneg (by positivity) (cappedProfileDifference_nonneg _ _)
-  · exact mul_le_of_le_one_right (by positivity) (cappedProfileDifference_le_one _ _)
-
-theorem exponentialProfileDistance_nonneg
-    {bound : ℝ} (left right : BoundedExponentialProfile bound) :
-    0 ≤ exponentialProfileDistance left right := by
-  unfold exponentialProfileDistance
-  exact tsum_nonneg fun _ ↦ mul_nonneg (by positivity) (cappedProfileDifference_nonneg _ _)
-
-@[simp] theorem exponentialProfileDistance_self
-    {bound : ℝ} (profile : BoundedExponentialProfile bound) :
-    exponentialProfileDistance profile profile = 0 := by
-  simp [exponentialProfileDistance, cappedProfileDifference]
-
-theorem exponentialProfileDistance_comm
-    {bound : ℝ} (left right : BoundedExponentialProfile bound) :
-    exponentialProfileDistance left right = exponentialProfileDistance right left := by
-  apply tsum_congr
-  intro coordinate
-  rw [cappedProfileDifference_comm]
-
-theorem exponentialProfileDistance_triangle
-    {bound : ℝ} (left middle right : BoundedExponentialProfile bound) :
-    exponentialProfileDistance left right ≤
-      exponentialProfileDistance left middle + exponentialProfileDistance middle right := by
-  let leftTerm := fun coordinate : ℕ ↦
-    (1 / 2 : ℝ) ^ coordinate *
-      cappedProfileDifference (left coordinate) (middle coordinate)
-  let rightTerm := fun coordinate : ℕ ↦
-    (1 / 2 : ℝ) ^ coordinate *
-      cappedProfileDifference (middle coordinate) (right coordinate)
-  have hpointwise : ∀ coordinate : ℕ,
-      (1 / 2 : ℝ) ^ coordinate *
-          cappedProfileDifference (left coordinate) (right coordinate) ≤
-        leftTerm coordinate + rightTerm coordinate := by
-    intro coordinate
-    dsimp [leftTerm, rightTerm]
-    calc
-      (1 / 2 : ℝ) ^ coordinate *
-          cappedProfileDifference (left coordinate) (right coordinate) ≤
-        (1 / 2 : ℝ) ^ coordinate *
-          (cappedProfileDifference (left coordinate) (middle coordinate) +
-            cappedProfileDifference (middle coordinate) (right coordinate)) :=
-        mul_le_mul_of_nonneg_left
-          (cappedProfileDifference_triangle _ _ _)
-          (pow_nonneg (by norm_num : (0 : ℝ) ≤ 1 / 2) coordinate)
-      _ = (1 / 2 : ℝ) ^ coordinate *
-          cappedProfileDifference (left coordinate) (middle coordinate) +
-        (1 / 2 : ℝ) ^ coordinate *
-          cappedProfileDifference (middle coordinate) (right coordinate) := by ring
-  calc
-    exponentialProfileDistance left right ≤
-        ∑' coordinate : ℕ, (leftTerm coordinate + rightTerm coordinate) :=
-      (exponentialProfileDistance_summable left right).tsum_le_tsum hpointwise
-        ((exponentialProfileDistance_summable left middle).add
-          (exponentialProfileDistance_summable middle right))
-    _ = exponentialProfileDistance left middle + exponentialProfileDistance middle right :=
-      (exponentialProfileDistance_summable left middle).tsum_add
-        (exponentialProfileDistance_summable middle right)
-
-theorem exponentialProfileDistance_eq_zero_iff
-    {bound : ℝ} (left right : BoundedExponentialProfile bound) :
-    exponentialProfileDistance left right = 0 ↔ left = right := by
-  constructor
-  · intro hzero
-    funext coordinate
-    apply Subtype.ext
-    apply (cappedProfileDifference_eq_zero_iff _ _).mp
-    have htermNonneg : 0 ≤ (1 / 2 : ℝ) ^ coordinate *
-        cappedProfileDifference (left coordinate) (right coordinate) :=
-      mul_nonneg (by positivity) (cappedProfileDifference_nonneg _ _)
-    have htermLe : (1 / 2 : ℝ) ^ coordinate *
-          cappedProfileDifference (left coordinate) (right coordinate) ≤
-        exponentialProfileDistance left right := by
-      exact (exponentialProfileDistance_summable left right).le_tsum coordinate
-        (fun index _ ↦ mul_nonneg (by positivity) (cappedProfileDifference_nonneg _ _))
-    have htermZero : (1 / 2 : ℝ) ^ coordinate *
-        cappedProfileDifference (left coordinate) (right coordinate) = 0 := by
-      rw [hzero] at htermLe
-      linarith
-    exact (mul_eq_zero.mp htermZero).resolve_left (by positivity)
-  · rintro rfl
-    exact exponentialProfileDistance_self left
-
-/-- The explicit weighted formula bundled as an actual metric space.  A
-dedicated type prevents this instance from competing with the pre-existing
-function-space metric on raw bounded profiles. -/
-noncomputable instance exponentialProfilePointMetricSpace (bound : ℝ) :
-    MetricSpace (ExponentialProfilePoint bound) where
-  dist left right := exponentialProfileDistance left right
-  dist_self := exponentialProfileDistance_self
-  dist_comm := exponentialProfileDistance_comm
-  dist_triangle := exponentialProfileDistance_triangle
-  eq_of_dist_eq_zero := by
-    intro left right hzero
-    exact (exponentialProfileDistance_eq_zero_iff left right).mp hzero
+  dist (show ExponentialProfilePoint bound from left)
+    (show ExponentialProfilePoint bound from right)
 
 /-- Distance in the bundled right-profile metric is exactly the weighted
 capped-coordinate formula, not merely topologically equivalent to it. -/
@@ -5219,21 +5071,68 @@ capped-coordinate formula, not merely topologically equivalent to it. -/
     {bound : ℝ} (left right : ExponentialProfilePoint bound) :
     dist left right = exponentialProfileDistance left right := rfl
 
+/-- The explicit series form of the profile distance.  `Encodable.encode` on
+`ℕ` is the identity, so the weight at coordinate `j` is exactly `2⁻ʲ`. -/
+theorem exponentialProfileDistance_eq_tsum
+    {bound : ℝ} (left right : BoundedExponentialProfile bound) :
+    exponentialProfileDistance left right =
+      ∑' coordinate : ℕ,
+        min ((1 / 2 : ℝ) ^ coordinate)
+          (dist (left coordinate) (right coordinate)) :=
+  PiCountable.dist_eq_tsum (F := fun _ : ℕ ↦ Set.Icc (-bound) bound) left right
+
+theorem exponentialProfileDistance_summable
+    {bound : ℝ} (left right : BoundedExponentialProfile bound) :
+    Summable (fun coordinate : ℕ ↦
+      min ((1 / 2 : ℝ) ^ coordinate)
+        (dist (left coordinate) (right coordinate))) :=
+  PiCountable.dist_summable (F := fun _ : ℕ ↦ Set.Icc (-bound) bound) left right
+
+theorem exponentialProfileDistance_nonneg
+    {bound : ℝ} (left right : BoundedExponentialProfile bound) :
+    0 ≤ exponentialProfileDistance left right :=
+  dist_nonneg
+
+@[simp] theorem exponentialProfileDistance_self
+    {bound : ℝ} (profile : BoundedExponentialProfile bound) :
+    exponentialProfileDistance profile profile = 0 :=
+  dist_self (show ExponentialProfilePoint bound from profile)
+
+theorem exponentialProfileDistance_comm
+    {bound : ℝ} (left right : BoundedExponentialProfile bound) :
+    exponentialProfileDistance left right = exponentialProfileDistance right left :=
+  dist_comm (show ExponentialProfilePoint bound from left)
+    (show ExponentialProfilePoint bound from right)
+
+theorem exponentialProfileDistance_triangle
+    {bound : ℝ} (left middle right : BoundedExponentialProfile bound) :
+    exponentialProfileDistance left right ≤
+      exponentialProfileDistance left middle + exponentialProfileDistance middle right :=
+  dist_triangle (show ExponentialProfilePoint bound from left)
+    (show ExponentialProfilePoint bound from middle)
+    (show ExponentialProfilePoint bound from right)
+
+theorem exponentialProfileDistance_eq_zero_iff
+    {bound : ℝ} (left right : BoundedExponentialProfile bound) :
+    exponentialProfileDistance left right = 0 ↔ left = right :=
+  dist_eq_zero (x := show ExponentialProfilePoint bound from left)
+    (y := show ExponentialProfilePoint bound from right)
+
 /-- The explicit right-profile metric has uniform diameter at most two.  The
 constant is exact for the zero-based weights `2⁻ʲ`: their total mass is two,
-and every capped coordinate discrepancy is at most one. -/
+and every coordinate term is capped by its weight. -/
 theorem exponentialProfileDistance_le_two
     {bound : ℝ} (left right : BoundedExponentialProfile bound) :
     exponentialProfileDistance left right ≤ 2 := by
+  rw [exponentialProfileDistance_eq_tsum]
   calc
-    exponentialProfileDistance left right ≤ ∑' coordinate : ℕ, (1 / 2 : ℝ) ^ coordinate :=
+    ∑' coordinate : ℕ,
+        min ((1 / 2 : ℝ) ^ coordinate)
+          (dist (left coordinate) (right coordinate)) ≤
+        ∑' coordinate : ℕ, (1 / 2 : ℝ) ^ coordinate :=
       (exponentialProfileDistance_summable left right).tsum_le_tsum
-        (fun coordinate ↦ mul_le_of_le_one_right (by positivity)
-          (cappedProfileDifference_le_one _ _))
-        summable_geometric_two
-    _ = 2 := by
-      rw [tsum_geometric_of_norm_lt_one (by norm_num : ‖(1 / 2 : ℝ)‖ < 1)]
-      norm_num
+        (fun _ ↦ min_le_left _ _) summable_geometric_two
+    _ = 2 := tsum_geometric_two
 
 /-- Agreement on the first `prefixLength` pressure coordinates controls the
 entire nonperturbative profile with the exact remaining geometric tail.  This
@@ -5245,33 +5144,29 @@ theorem exponentialProfileDistance_le_geometricTail_of_prefix_eq
     (hprefix : ∀ coordinate < prefixLength, left coordinate = right coordinate) :
     exponentialProfileDistance left right ≤
       2 * (1 / 2 : ℝ) ^ prefixLength := by
-  let term := fun coordinate : ℕ ↦
-    (1 / 2 : ℝ) ^ coordinate *
-      cappedProfileDifference (left coordinate) (right coordinate)
-  have hsummable : Summable term := exponentialProfileDistance_summable left right
-  have hprefixSum : ∑ coordinate ∈ Finset.range prefixLength, term coordinate = 0 := by
-    apply Finset.sum_eq_zero
-    intro coordinate hcoordinate
-    have heq := hprefix coordinate (Finset.mem_range.mp hcoordinate)
-    simp [term, heq, cappedProfileDifference]
+  have hsummable := exponentialProfileDistance_summable left right
+  have hprefixSum :
+      ∑ coordinate ∈ Finset.range prefixLength,
+        min ((1 / 2 : ℝ) ^ coordinate)
+          (dist (left coordinate) (right coordinate)) = 0 := by
+    refine Finset.sum_eq_zero fun coordinate hcoordinate ↦ ?_
+    rw [hprefix coordinate (Finset.mem_range.mp hcoordinate), dist_self]
+    exact min_eq_right (by positivity)
   have hsplit := hsummable.sum_add_tsum_nat_add prefixLength
   rw [hprefixSum, zero_add] at hsplit
-  change (∑' coordinate : ℕ, term coordinate) ≤
-    2 * (1 / 2 : ℝ) ^ prefixLength
-  rw [← hsplit]
+  rw [exponentialProfileDistance_eq_tsum, ← hsplit]
   calc
-    (∑' coordinate : ℕ, term (coordinate + prefixLength)) ≤
-        ∑' coordinate : ℕ, (1 / 2 : ℝ) ^ (coordinate + prefixLength) := by
-      apply ((summable_nat_add_iff prefixLength).mpr hsummable).tsum_le_tsum
-      · intro coordinate
-        exact mul_le_of_le_one_right (by positivity)
-          (cappedProfileDifference_le_one _ _)
-      · exact (summable_nat_add_iff prefixLength).mpr summable_geometric_two
+    ∑' coordinate : ℕ,
+        min ((1 / 2 : ℝ) ^ (coordinate + prefixLength))
+          (dist (left (coordinate + prefixLength))
+            (right (coordinate + prefixLength))) ≤
+        ∑' coordinate : ℕ, (1 / 2 : ℝ) ^ (coordinate + prefixLength) :=
+      ((summable_nat_add_iff prefixLength).mpr hsummable).tsum_le_tsum
+        (fun _ ↦ min_le_left _ _)
+        ((summable_nat_add_iff prefixLength).mpr summable_geometric_two)
     _ = 2 * (1 / 2 : ℝ) ^ prefixLength := by
       simp_rw [pow_add]
-      rw [tsum_mul_right,
-        tsum_geometric_of_norm_lt_one (by norm_num : ‖(1 / 2 : ℝ)‖ < 1)]
-      norm_num
+      rw [tsum_mul_right, tsum_geometric_two]
 
 /-- Every coordinate discrepancy is controlled by the complete weighted
 profile distance.  This is the coercive half of the metric construction: no
@@ -5280,11 +5175,11 @@ geometric weight in the global distance. -/
 theorem exponentialProfileDistance_coordinateTerm_le
     {bound : ℝ} (left right : BoundedExponentialProfile bound)
     (coordinate : ℕ) :
-    (1 / 2 : ℝ) ^ coordinate *
-        cappedProfileDifference (left coordinate) (right coordinate) ≤
-      exponentialProfileDistance left right := by
-  exact (exponentialProfileDistance_summable left right).le_tsum coordinate
-    (fun index _ ↦ mul_nonneg (by positivity) (cappedProfileDifference_nonneg _ _))
+    min ((1 / 2 : ℝ) ^ coordinate)
+        (dist (left coordinate) (right coordinate)) ≤
+      exponentialProfileDistance left right :=
+  PiCountable.min_dist_le_dist_pi (F := fun _ : ℕ ↦ Set.Icc (-bound) bound)
+    left right coordinate
 
 /-- **Compactness of the countable exponential profile.**  Every sequence of
 bounded profiles has one strictly increasing subsequence converging in the
@@ -5302,15 +5197,13 @@ every individual pressure coordinate along the same subsequence. -/
 theorem boundedExponentialProfile_coordinatewise
     {bound : ℝ} {profiles : ℕ → BoundedExponentialProfile bound}
     {limit : BoundedExponentialProfile bound} {subsequence : ℕ → ℕ}
-    (hprofiles : Filter.Tendsto (profiles ∘ subsequence) Filter.atTop (nhds limit))
-    (coordinate : ℕ) :
-    Filter.Tendsto (fun n ↦ profiles (subsequence n) coordinate)
-      Filter.atTop (nhds (limit coordinate)) := by
-  exact (continuous_apply coordinate).continuousAt.tendsto.comp hprofiles
+    (hprofiles :
+      Filter.Tendsto (profiles ∘ subsequence) Filter.atTop (nhds limit)) :
+    ∀ coordinate : ℕ,
+      Filter.Tendsto (fun n ↦ profiles (subsequence n) coordinate)
+        Filter.atTop (nhds (limit coordinate)) :=
+  fun coordinate ↦ (tendsto_pi_nhds.mp hprofiles) coordinate
 
-/-- **Diagonal compactness in the form used by right convergence.**  There is
-one common subsequence along which every enumerated pressure coordinate has a
-limit; the subsequence is not allowed to depend on the coordinate. -/
 theorem boundedExponentialProfile_common_coordinatewise_subsequence
     (bound : ℝ) (profiles : ℕ → BoundedExponentialProfile bound) :
     ∃ limit : BoundedExponentialProfile bound, ∃ subsequence : ℕ → ℕ,
@@ -5323,117 +5216,18 @@ theorem boundedExponentialProfile_common_coordinatewise_subsequence
   exact ⟨limit, subsequence, hmono,
     boundedExponentialProfile_coordinatewise hprofiles⟩
 
-/-- The capped coordinate discrepancy is continuous in its first argument. -/
-theorem continuous_cappedProfileDifference_left (right : ℝ) :
-    Continuous (fun left : ℝ ↦ cappedProfileDifference left right) := by
-  unfold cappedProfileDifference
-  exact continuous_const.min ((continuous_id.sub continuous_const).abs)
-
-/-- Coordinatewise convergence implies convergence in the explicit weighted
-profile distance.  Tannery's theorem justifies exchanging the profile limit
-with the infinite weighted sum; the geometric weights dominate every capped
-coordinate term uniformly. -/
-theorem exponentialProfileDistance_tendsto_zero_of_coordinatewise
-    {bound : ℝ} {profiles : ℕ → BoundedExponentialProfile bound}
-    {limit : BoundedExponentialProfile bound}
-    (hcoordinate : ∀ coordinate : ℕ,
-      Filter.Tendsto (fun n ↦ profiles n coordinate)
-        Filter.atTop (nhds (limit coordinate))) :
-    Filter.Tendsto (fun n ↦ exponentialProfileDistance (profiles n) limit)
-      Filter.atTop (nhds 0) := by
-  have hterm : ∀ coordinate : ℕ,
-      Filter.Tendsto
-        (fun n ↦ (1 / 2 : ℝ) ^ coordinate *
-          cappedProfileDifference (profiles n coordinate) (limit coordinate))
-        Filter.atTop (nhds 0) := by
-    intro coordinate
-    have hvalue : Filter.Tendsto
-        (fun n ↦ (profiles n coordinate : ℝ)) Filter.atTop
-        (nhds (limit coordinate : ℝ)) :=
-      continuous_subtype_val.continuousAt.tendsto.comp (hcoordinate coordinate)
-    have hcapped : Filter.Tendsto
-        (fun n ↦ cappedProfileDifference (profiles n coordinate) (limit coordinate))
-        Filter.atTop (nhds 0) := by
-      convert (continuous_cappedProfileDifference_left (limit coordinate)).continuousAt.tendsto.comp
-        hvalue using 1
-      simp [cappedProfileDifference]
-    simpa using (tendsto_const_nhds.mul hcapped)
-  have hbound : ∀ᶠ n in Filter.atTop, ∀ coordinate : ℕ,
-      ‖(1 / 2 : ℝ) ^ coordinate *
-        cappedProfileDifference (profiles n coordinate) (limit coordinate)‖ ≤
-          (1 / 2 : ℝ) ^ coordinate := by
-    exact Filter.Eventually.of_forall fun n coordinate ↦ by
-      rw [Real.norm_eq_abs, abs_of_nonneg]
-      · exact mul_le_of_le_one_right (by positivity)
-          (cappedProfileDifference_le_one _ _)
-      · exact mul_nonneg (by positivity) (cappedProfileDifference_nonneg _ _)
-  have htendsto := tendsto_tsum_of_dominated_convergence
-    (f := fun n coordinate ↦ (1 / 2 : ℝ) ^ coordinate *
-      cappedProfileDifference (profiles n coordinate) (limit coordinate))
-    (g := fun _coordinate : ℕ ↦ (0 : ℝ))
-    (bound := fun coordinate : ℕ ↦ (1 / 2 : ℝ) ^ coordinate)
-    summable_geometric_two hterm hbound
-  simpa [exponentialProfileDistance] using htendsto
-
-/-- Convergence in the explicit weighted profile distance forces convergence
-of every enumerated pressure coordinate.  Together with
-`exponentialProfileDistance_tendsto_zero_of_coordinatewise`, this proves that
-the concrete right-profile distance carries exactly the intended sequential
-product topology, rather than merely being a separating formula on it. -/
-theorem exponentialProfileDistance_coordinatewise_of_tendsto_zero
-    {bound : ℝ} {profiles : ℕ → BoundedExponentialProfile bound}
-    {limit : BoundedExponentialProfile bound}
-    (hdistance :
-      Filter.Tendsto (fun n ↦ exponentialProfileDistance (profiles n) limit)
-        Filter.atTop (nhds 0)) :
-    ∀ coordinate : ℕ,
-      Filter.Tendsto (fun n ↦ profiles n coordinate)
-        Filter.atTop (nhds (limit coordinate)) := by
-  intro coordinate
-  rw [Metric.tendsto_nhds]
-  intro epsilon hepsilon
-  let weight : ℝ := (1 / 2 : ℝ) ^ coordinate
-  have hweight : 0 < weight := by
-    dsimp [weight]
-    positivity
-  have hcutoff : 0 < min epsilon 1 := lt_min hepsilon zero_lt_one
-  have hthreshold : 0 < weight * min epsilon 1 := mul_pos hweight hcutoff
-  have heventually := (Metric.tendsto_nhds.mp hdistance
-    (weight * min epsilon 1) hthreshold)
-  filter_upwards [heventually] with n hn
-  have hdistanceNonneg :
-      0 ≤ exponentialProfileDistance (profiles n) limit :=
-    exponentialProfileDistance_nonneg _ _
-  rw [Real.dist_eq, sub_zero, abs_of_nonneg hdistanceNonneg] at hn
-  have hterm := exponentialProfileDistance_coordinateTerm_le
-    (profiles n) limit coordinate
-  change weight * cappedProfileDifference (profiles n coordinate) (limit coordinate) ≤
-    exponentialProfileDistance (profiles n) limit at hterm
-  have hcapped :
-      cappedProfileDifference (profiles n coordinate) (limit coordinate) <
-        min epsilon 1 := by
-    exact (mul_lt_mul_iff_right₀ hweight).mp (hterm.trans_lt hn)
-  have hcappedOne :
-      cappedProfileDifference (profiles n coordinate) (limit coordinate) < 1 :=
-    hcapped.trans_le (min_le_right _ _)
-  have habsLe :
-      |(profiles n coordinate : ℝ) - (limit coordinate : ℝ)| ≤ 1 := by
-    by_contra hnot
-    have hone : 1 ≤
-        |(profiles n coordinate : ℝ) - (limit coordinate : ℝ)| :=
-      le_of_not_ge hnot
-    have : cappedProfileDifference (profiles n coordinate) (limit coordinate) = 1 := by
-      exact min_eq_left hone
-    linarith
-  have hcappedEq :
-      cappedProfileDifference (profiles n coordinate) (limit coordinate) =
-        |(profiles n coordinate : ℝ) - (limit coordinate : ℝ)| := by
-    exact min_eq_right habsLe
-  have habs :
-      |(profiles n coordinate : ℝ) - (limit coordinate : ℝ)| < epsilon := by
-    rw [← hcappedEq]
-    exact hcapped.trans_le (min_le_left _ _)
-  simpa [Real.dist_eq] using habs
+/-- Standard convergence in the bundled right-profile metric is equivalent to
+simultaneous convergence of every enumerated pressure coordinate.  This is
+immediate from `PiCountable.metricSpace` carrying the product uniformity; the
+former hand-rolled Tannery argument and its coercive converse are gone. -/
+theorem exponentialProfilePoint_tendsto_iff_coordinatewise
+    {bound : ℝ} {profiles : ℕ → ExponentialProfilePoint bound}
+    {limit : ExponentialProfilePoint bound} :
+    Filter.Tendsto profiles Filter.atTop (nhds limit) ↔
+      ∀ coordinate : ℕ,
+        Filter.Tendsto (fun n ↦ profiles n coordinate)
+          Filter.atTop (nhds (limit coordinate)) :=
+  tendsto_pi_nhds
 
 /-- **Exact sequential characterization of the right-profile metric.**
 Weighted-distance convergence is equivalent to simultaneous convergence of
@@ -5445,24 +5239,32 @@ theorem exponentialProfileDistance_tendsto_zero_iff_coordinatewise
         Filter.atTop (nhds 0) ↔
       ∀ coordinate : ℕ,
         Filter.Tendsto (fun n ↦ profiles n coordinate)
-          Filter.atTop (nhds (limit coordinate)) := by
-  constructor
-  · exact exponentialProfileDistance_coordinatewise_of_tendsto_zero
-  · exact exponentialProfileDistance_tendsto_zero_of_coordinatewise
+          Filter.atTop (nhds (limit coordinate)) :=
+  (tendsto_iff_dist_tendsto_zero
+      (f := fun n ↦ show ExponentialProfilePoint bound from profiles n)
+      (a := show ExponentialProfilePoint bound from limit)).symm.trans
+    exponentialProfilePoint_tendsto_iff_coordinatewise
 
-/-- Standard convergence in the bundled right-profile metric is equivalent to
-simultaneous convergence of every enumerated pressure coordinate. -/
-theorem exponentialProfilePoint_tendsto_iff_coordinatewise
-    {bound : ℝ} {profiles : ℕ → ExponentialProfilePoint bound}
-    {limit : ExponentialProfilePoint bound} :
-    Filter.Tendsto profiles Filter.atTop (nhds limit) ↔
-      ∀ coordinate : ℕ,
-        Filter.Tendsto (fun n ↦ profiles n coordinate)
-          Filter.atTop (nhds (limit coordinate)) := by
-  rw [tendsto_iff_dist_tendsto_zero]
-  simpa only [exponentialProfilePoint_dist_eq] using
-    (exponentialProfileDistance_tendsto_zero_iff_coordinatewise
-      (profiles := profiles) (limit := limit))
+theorem exponentialProfileDistance_tendsto_zero_of_coordinatewise
+    {bound : ℝ} {profiles : ℕ → BoundedExponentialProfile bound}
+    {limit : BoundedExponentialProfile bound}
+    (hcoordinate : ∀ coordinate : ℕ,
+      Filter.Tendsto (fun n ↦ profiles n coordinate)
+        Filter.atTop (nhds (limit coordinate))) :
+    Filter.Tendsto (fun n ↦ exponentialProfileDistance (profiles n) limit)
+      Filter.atTop (nhds 0) :=
+  exponentialProfileDistance_tendsto_zero_iff_coordinatewise.mpr hcoordinate
+
+theorem exponentialProfileDistance_coordinatewise_of_tendsto_zero
+    {bound : ℝ} {profiles : ℕ → BoundedExponentialProfile bound}
+    {limit : BoundedExponentialProfile bound}
+    (hdistance :
+      Filter.Tendsto (fun n ↦ exponentialProfileDistance (profiles n) limit)
+        Filter.atTop (nhds 0)) :
+    ∀ coordinate : ℕ,
+      Filter.Tendsto (fun n ↦ profiles n coordinate)
+        Filter.atTop (nhds (limit coordinate)) :=
+  exponentialProfileDistance_tendsto_zero_iff_coordinatewise.mp hdistance
 
 /-- **Sequential compactness in the explicit distance.**  Every bounded
 profile sequence has one common subsequence whose weighted exponential-profile
@@ -5479,24 +5281,18 @@ theorem boundedExponentialProfile_compact_subsequence_in_distance
   exact ⟨limit, subsequence, hmono,
     exponentialProfileDistance_tendsto_zero_of_coordinatewise hcoordinate⟩
 
-/-- Every sequence in the bundled explicit metric has a conventionally
-convergent subsequence.  This upgrades the earlier scalar-distance statement to
-the standard topology generated by the installed `MetricSpace`. -/
-theorem exponentialProfilePoint_isSeqCompact_univ (bound : ℝ) :
-    IsSeqCompact (Set.univ : Set (ExponentialProfilePoint bound)) := by
-  intro profiles _hprofiles
-  obtain ⟨limit, subsequence, hmono, hdistance⟩ :=
-    boundedExponentialProfile_compact_subsequence_in_distance bound profiles
-  refine ⟨limit, Set.mem_univ limit, subsequence, hmono, ?_⟩
-  rw [tendsto_iff_dist_tendsto_zero]
-  simpa only [exponentialProfilePoint_dist_eq] using hdistance
-
 /-- The bounded explicit right-profile metric space is compact in Mathlib's
 ordinary topological sense, not only sequentially compact in a bespoke
 statement. -/
-noncomputable instance exponentialProfilePointCompactSpace (bound : ℝ) :
-    CompactSpace (ExponentialProfilePoint bound) where
-  isCompact_univ := (exponentialProfilePoint_isSeqCompact_univ bound).isCompact
+instance exponentialProfilePointCompactSpace (bound : ℝ) :
+    CompactSpace (ExponentialProfilePoint bound) :=
+  Pi.compactSpace
+
+/-- Every sequence in the bundled explicit metric has a conventionally
+convergent subsequence. -/
+theorem exponentialProfilePoint_isSeqCompact_univ (bound : ℝ) :
+    IsSeqCompact (Set.univ : Set (ExponentialProfilePoint bound)) :=
+  isCompact_univ.isSeqCompact
 
 end ExponentialProfileCompactness
 
