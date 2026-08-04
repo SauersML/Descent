@@ -140,15 +140,21 @@ def guards(body: str) -> list[str]:
     return kinds
 
 
-def scan() -> tuple[int, int, list[tuple[str, str, str]]]:
+# A hypothesis binder in the definition's own signature that rules the junk
+# point out before the body runs.
+GUARDED_SIG = re.compile(r"0\s*<|≠\s*0|0\s*≠|_pos\b|positive")
+
+
+def scan() -> tuple[int, int, int, list[tuple[str, str, str]]]:
     total = 0
     named = 0
+    guarded = 0
     gap: list[tuple[str, str, str]] = []
     for f in sorted(CORPUS.rglob("*.lean")):
         txt = f.read_text(encoding="utf-8")
         junk_thms = {t for t in THM_RE.findall(txt) if "junk" in t.lower()}
         for m in DEF_RE.finditer(txt):
-            name, body = m.group(1), m.group(3)
+            name, sig, body = m.group(1), m.group(2), m.group(3)
             if len(body) > 1200:
                 continue
             kinds = guards(body)
@@ -157,25 +163,28 @@ def scan() -> tuple[int, int, list[tuple[str, str, str]]]:
             total += 1
             if any(name in t for t in junk_thms):
                 named += 1
+            elif GUARDED_SIG.search(sig):
+                guarded += 1
             else:
                 gap.append((name, f.relative_to(CORPUS).as_posix(),
                             ",".join(kinds)))
-    return total, named, gap
+    return total, named, guarded, gap
 
 
 def main(argv: list[str]) -> int:
     if not CORPUS.is_dir():
         print(f"corpus not found at {CORPUS}", file=sys.stderr)
         return 2
-    total, named, gap = scan()
+    total, named, guarded, gap = scan()
+
+    print(f"{total} definitions can hit a junk value; {named} name the branch; "
+          f"{guarded} rule it out in their own signature; {len(gap)} do neither")
 
     want = None
     if "--file" in argv:
         want = argv[argv.index("--file") + 1]
         gap = [g for g in gap if want in g[1]]
-
-    print(f"{total} definitions can hit a junk value; "
-          f"{named} name the branch; {len(gap)} do not")
+        print(f"{len(gap)} of those are in {want}")
     if want is None:
         print()
         by_file = collections.Counter(f for _, f, _ in gap)
@@ -189,6 +198,10 @@ def main(argv: list[str]) -> int:
     print("A necessary condition, not a defect list: totality.py decides, by")
     print("testing whether the junk point is attainable and disagrees with the")
     print("limit. What these share is that nothing in the corpus says either way.")
+    print()
+    print("The commonest false positive is a definition taking a STRUCTURE that")
+    print("carries the domain fact as a field -- OUHorizon carries rate_pos, so")
+    print("ouVariance cannot divide by zero. That is not detected here.")
     return 0
 
 
