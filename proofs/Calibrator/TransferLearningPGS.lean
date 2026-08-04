@@ -2870,6 +2870,20 @@ theorem fineTunedTargetR2_eq_deployedTransferTargetR2_exactAdaptationGain
     source_r2 transported_r2
     (exactAdaptationGain sigmaObsTarget crossTarget noiseVar wBefore wAfter wStar)
 
+/-- The fine-tuned target `R²` of the isotropic design: the transported baseline penalised
+by the portability loss and credited with the exact adaptation gain at `Σ = 1`.
+
+The two theorems below evaluate this same score against two different right-hand sides, and
+each wrote the score out in full -- four lines of it, on top of the seven binder lines they
+share.  Named once, the pair reads as two readings of one quantity, which is what it is. -/
+noncomputable def isotropicFineTunedTargetR2 {p : ℕ}
+    (source_r2 transported_r2 : ℝ) (crossTarget : Fin p → ℝ) (noiseVar : ℝ)
+    (wBefore wAfter wStar : Fin p → ℝ) : ℝ :=
+  fineTunedTargetR2 source_r2
+    (transportPenalty source_r2 transported_r2)
+    (exactAdaptationGain (1 : Matrix (Fin p) (Fin p) ℝ)
+      crossTarget noiseVar wBefore wAfter wStar)
+
 /-- In the isotropic target design, the scalar fine-tuning model is exactly the
     transported baseline plus the drop in squared effect mismatch
     from target adaptation. -/
@@ -2880,12 +2894,11 @@ theorem fineTunedTargetR2_eq_transportedBaseline_plus_gap_drop_isotropic
     (noiseVar : ℝ)
     (wBefore wAfter wStar : Fin p → ℝ)
     (h_opt : (1 : Matrix (Fin p) (Fin p) ℝ).mulVec wStar = crossTarget) :
-    fineTunedTargetR2 source_r2
-        (transportPenalty source_r2 transported_r2)
-        (exactAdaptationGain (1 : Matrix (Fin p) (Fin p) ℝ)
-          crossTarget noiseVar wBefore wAfter wStar) =
+    isotropicFineTunedTargetR2 source_r2 transported_r2 crossTarget noiseVar
+        wBefore wAfter wStar =
       transported_r2 +
         (coefficientGapSq wBefore wStar - coefficientGapSq wAfter wStar) := by
+  unfold isotropicFineTunedTargetR2
   rw [fineTunedTargetR2_eq_transportedBaseline_plus_exact_excessRisk_reduction]
   rw [exactAdaptationGain_eq_coefficientGapDrop_isotropic crossTarget noiseVar
     wBefore wAfter wStar h_opt]
@@ -2900,10 +2913,8 @@ theorem fineTunedTargetR2_eq_deployedTransferTargetR2_gapDrop_isotropic
     (noiseVar : ℝ)
     (wBefore wAfter wStar : Fin p → ℝ)
     (h_opt : (1 : Matrix (Fin p) (Fin p) ℝ).mulVec wStar = crossTarget) :
-    fineTunedTargetR2 source_r2
-        (transportPenalty source_r2 transported_r2)
-        (exactAdaptationGain (1 : Matrix (Fin p) (Fin p) ℝ)
-          crossTarget noiseVar wBefore wAfter wStar) =
+    isotropicFineTunedTargetR2 source_r2 transported_r2 crossTarget noiseVar
+        wBefore wAfter wStar =
       deployedTransferTargetR2 transported_r2
         (coefficientGapSq wBefore wStar - coefficientGapSq wAfter wStar) 0 := by
   rw [fineTunedTargetR2_eq_transportedBaseline_plus_gap_drop_isotropic
