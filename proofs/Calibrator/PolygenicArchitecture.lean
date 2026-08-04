@@ -348,6 +348,14 @@ noncomputable def lostEffectMass {q : ℕ}
     (model : SNPArchitecturePortabilityModel q) : ℝ :=
   model.sourceEffectMass - model.targetRetainedEffectMass
 
+/-- Reference evaluation: nothing is lost when the target retains the whole source mass. -/
+theorem lostEffectMass_at_reference_point {q : ℕ} (model : SNPArchitecturePortabilityModel q)
+    (hfull : model.targetRetainedEffectMass = model.sourceEffectMass) :
+    lostEffectMass model = 0 := by
+  unfold lostEffectMass
+  rw [hfull, sub_self]
+
+
 /-- Relative portability loss: lost causal signal mass as a fraction of the
 source causal signal mass. -/
 noncomputable def relativePortabilityLoss {q : ℕ}
@@ -1137,6 +1145,12 @@ collapsing it into a single trait-wide `r_g² × (1 - FST)` product. -/
 noncomputable def predictedPortability {q : ℕ}
     (model : SNPArchitecturePortabilityModel q) : ℝ :=
   model.portabilityScore
+
+/-- Reference evaluation: the predicted portability is the model's recorded score. -/
+theorem predictedPortability_at_reference_point {q : ℕ}
+    (model : SNPArchitecturePortabilityModel q) :
+    predictedPortability model = model.portabilityScore := rfl
+
 
 /-- Predicted portability is at most the full source causal signal mass. -/
 theorem predicted_le_source {q : ℕ}

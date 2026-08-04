@@ -2283,6 +2283,16 @@ noncomputable def qalyContributionAtTime {T : ℕ}
   model.discount t * path.followupWeight t *
     (path.eventProb t * path.treatmentBenefit t - path.treatmentHarm t)
 
+/-- Reference evaluation: a fully discounted-away epoch contributes nothing. -/
+theorem qalyContributionAtTime_at_zero_discount {T : ℕ}
+    (model : LongitudinalTreatmentModel T) (path : ClinicalPathway T) (t : Fin T)
+    (hzero : model.discount t = 0) :
+    qalyContributionAtTime model path t = 0 := by
+  unfold qalyContributionAtTime
+  rw [hzero]
+  ring
+
+
 /-- **Net treatment margin of a clinical pathway.**
     Positive margin means treatment is beneficial in expectation after exact
     aggregation over discounted follow-up, treatment heterogeneity, and
@@ -2539,6 +2549,14 @@ noncomputable def pathwayNetBenefitError {T : ℕ}
       (predictedPath.treatmentBenefit t - truePath.treatmentBenefit t) -
     (predictedPath.treatmentHarm t - truePath.treatmentHarm t)
 
+/-- Reference evaluation: a predicted pathway that matches the truth has no net-benefit error. -/
+theorem pathwayNetBenefitError_at_reference_point {T : ℕ}
+    (truePath : ClinicalPathway T) (t : Fin T) :
+    pathwayNetBenefitError truePath truePath t = 0 := by
+  unfold pathwayNetBenefitError
+  ring
+
+
 /-- **The per-time treatment-margin error**: the follow-up weight error against the true net
 benefit, plus the deployed weight against the net-benefit error, discounted. -/
 noncomputable def treatmentMarginErrorTerm {T : ℕ} (model : LongitudinalTreatmentModel T)
@@ -2547,6 +2565,15 @@ noncomputable def treatmentMarginErrorTerm {T : ℕ} (model : LongitudinalTreatm
     ((predictedPath.followupWeight t - truePath.followupWeight t) *
         (truePath.eventProb t * truePath.treatmentBenefit t - truePath.treatmentHarm t) +
       predictedPath.followupWeight t * pathwayNetBenefitError truePath predictedPath t)
+
+/-- Reference evaluation: matching pathways leave no margin error term. -/
+theorem treatmentMarginErrorTerm_at_reference_point {T : ℕ}
+    (model : LongitudinalTreatmentModel T) (truePath : ClinicalPathway T) (t : Fin T) :
+    treatmentMarginErrorTerm model truePath truePath t = 0 := by
+  unfold treatmentMarginErrorTerm
+  rw [pathwayNetBenefitError_at_reference_point]
+  ring
+
 
 /-- **Exact componentwise decomposition of longitudinal treatment-margin error.**
     This separates the effect of miscalibrating censoring/follow-up weights,
@@ -2887,6 +2914,15 @@ noncomputable def screeningUtilityFromRates
   sens * prevalence * model.benefit -
     (1 - spec) * (1 - prevalence) * model.harm
 
+/-- Reference evaluation: a perfectly specific test on a zero-prevalence population has no
+utility, whatever its sensitivity -- there is nobody to benefit and nobody to harm. -/
+theorem screeningUtilityFromRates_at_reference_point (model : ScreeningDecisionModel)
+    (sens : ℝ) :
+    screeningUtilityFromRates model sens 1 0 = 0 := by
+  unfold screeningUtilityFromRates
+  ring
+
+
 /-- The count-based and rate-based screening utilities agree when true- and
     false-positive counts are instantiated from sensitivity, specificity,
     prevalence, and sample size. -/
@@ -3171,6 +3207,15 @@ noncomputable def thresholdQalyGainUnderDecision
       model.benefit * trueRisk - model.harm
     else
       0
+
+/-- Reference evaluation: below the treatment threshold no decision is taken and the gain is
+zero, whatever the true risk. -/
+theorem thresholdQalyGainUnderDecision_at_no_treatment (model : ThresholdTreatmentModel)
+    (trueRisk decisionRisk : ℝ) (hbelow : decisionRisk ≤ model.threshold) :
+    thresholdQalyGainUnderDecision model trueRisk decisionRisk = 0 := by
+  unfold thresholdQalyGainUnderDecision
+  rw [dif_neg (by linarith)]
+
 
 /-- **Per-individual one-step QALY loss from using predicted instead of true
     risk.** This is the threshold-rule specialization of `qalyLoss`.
