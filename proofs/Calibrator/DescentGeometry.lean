@@ -86,6 +86,10 @@ noncomputable def pointLaw [DecidableEq Genome] (g : Genome) : Genome → ℝ :=
 /-- The total-variation gap between two finite laws, in the `ℓ¹` normalisation. -/
 noncomputable def totalVariationGap (μ ν : Genome → ℝ) : ℝ := ∑ g, |μ g - ν g|
 
+/-- The finite total-variation gap is nonnegative, including for signed masses. -/
+theorem totalVariationGap_nonneg (μ ν : Genome → ℝ) : 0 ≤ totalVariationGap μ ν := by
+  exact Finset.sum_nonneg fun g _ ↦ abs_nonneg (μ g - ν g)
+
 /-- `b` **descends along** the label map `π` over the family `P` when one label function
 reproduces the value of `b` on every member's fiber conditional, at every label that member
 charges.  This is the property a group-level report claims. -/

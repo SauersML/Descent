@@ -286,6 +286,37 @@ theorem not_descends_contextMatchQuality_along_targetState :
   rw [← hpersist] at hswitch
   norm_num at hswitch
 
+/-- **Uniform quantitative portability bound for the two-dynamics family.**  Across persistence
+and switching, the largest observable change in source-adapted quality on a target-state fiber is
+bounded by the total-variation diameter of that fiber's conditional laws.  The maximum is taken
+over the whole finite family, so this is a population-uniform consequence rather than a
+pointwise restatement of continuity. -/
+theorem contextMatch_sectionOscillation_le_totalVariationDiameter (y : BinaryBiologicalState) :
+    finiteSectionOscillation
+        (fun persists y ↦
+          labelMass (fun g : TransportPair ↦ g.2) (binaryTransportFamily persists) y ≠ 0)
+        (fun persists y ↦
+          fiberConditional (fun g : TransportPair ↦ g.2) (binaryTransportFamily persists) y)
+        (conditionalSectionMean (fun g : TransportPair ↦ contextMatchQuality g.1 g.2))
+        (fun a b : ℝ ↦ |a - b|) y ≤
+      finiteSectionDiameter
+        (fun persists y ↦
+          labelMass (fun g : TransportPair ↦ g.2) (binaryTransportFamily persists) y ≠ 0)
+        (fun persists y ↦
+          fiberConditional (fun g : TransportPair ↦ g.2) (binaryTransportFamily persists) y)
+        totalVariationGap y := by
+  apply finiteSectionOscillation_le_modulus_diameter
+      (omega := fun t ↦ t) (x := y)
+  · exact totalVariationGap_nonneg
+  · exact monotone_id
+  · norm_num
+  · intro μ ν
+    have hquality : ∀ g : TransportPair, |contextMatchQuality g.1 g.2| ≤ 1 := by
+      rintro ⟨x, z⟩
+      fin_cases x <;> fin_cases z <;> norm_num [contextMatchQuality]
+    simpa using abs_sectionMean_sub_le
+      (fun g : TransportPair ↦ contextMatchQuality g.1 g.2) μ ν 1 hquality
+
 /-! ## The adaptation time and the transport time are one time -/
 
 /-- **A single-rate integrated autocorrelation time is the inverse-dissipation frontier

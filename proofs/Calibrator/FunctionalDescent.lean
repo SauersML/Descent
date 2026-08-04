@@ -147,16 +147,91 @@ theorem descends_of_sharedSection (mass : Population → Context → ℝ)
   intro P x hP
   rw [hshared P x hP]
 
-/-- A modulus of continuity turns conditional-section distance into an explicit portability
-bound.  This is the pointwise form of `Osc ≤ ω(diameter)`, before taking any supremum. -/
-theorem section_modulus_bound
-    (conditionalSection : Population → Context → Conditional) (b : Conditional → Value)
-    (rho : Conditional → Conditional → ℝ) (d : Value → Value → ℝ)
-    (omega : ℝ → ℝ)
-    (hmod : ∀ μ ν, d (b μ) (b ν) ≤ omega (rho μ ν)) (P Q : Population) (x : Context) :
-    d (b (conditionalSection P x)) (b (conditionalSection Q x)) ≤
-      omega (rho (conditionalSection P x) (conditionalSection Q x)) :=
-  hmod _ _
+/-! ### Quantitative descent on a finite population family -/
+
+/-- The diameter of the observable conditional section over `x`.  Unsupported population pairs
+contribute zero, so the definition is total; nonnegativity of `rho` makes this convention neutral.
+The `Nonempty Population` assumption is exact for using a finite maximum rather than a supremum. -/
+noncomputable def finiteSectionDiameter [Fintype Population] [Nonempty Population]
+    (supported : Population → Context → Prop)
+    (conditionalSection : Population → Context → Conditional)
+    (rho : Conditional → Conditional → ℝ) (x : Context) : ℝ := by
+  classical
+  exact (Finset.univ : Finset Population).sup'
+    ⟨Classical.choice (inferInstance : Nonempty Population), Finset.mem_univ _⟩ fun P ↦
+      (Finset.univ : Finset Population).sup'
+        ⟨Classical.choice (inferInstance : Nonempty Population), Finset.mem_univ _⟩ fun Q ↦
+          if supported P x ∧ supported Q x then
+            rho (conditionalSection P x) (conditionalSection Q x)
+          else 0
+
+/-- The largest observable disagreement in the value of `b` over the section above `x`. -/
+noncomputable def finiteSectionOscillation [Fintype Population] [Nonempty Population]
+    (supported : Population → Context → Prop)
+    (conditionalSection : Population → Context → Conditional)
+    (b : Conditional → Value) (d : Value → Value → ℝ) (x : Context) : ℝ := by
+  classical
+  exact (Finset.univ : Finset Population).sup'
+    ⟨Classical.choice (inferInstance : Nonempty Population), Finset.mem_univ _⟩ fun P ↦
+      (Finset.univ : Finset Population).sup'
+        ⟨Classical.choice (inferInstance : Nonempty Population), Finset.mem_univ _⟩ fun Q ↦
+          if supported P x ∧ supported Q x then
+            d (b (conditionalSection P x)) (b (conditionalSection Q x))
+          else 0
+
+/-- Every observable pairwise distance is bounded by the finite section diameter. -/
+theorem sectionPairDistance_le_finiteSectionDiameter [Fintype Population] [Nonempty Population]
+    (supported : Population → Context → Prop)
+    (conditionalSection : Population → Context → Conditional)
+    (rho : Conditional → Conditional → ℝ) (x : Context) (P Q : Population)
+    (hP : supported P x) (hQ : supported Q x) :
+    rho (conditionalSection P x) (conditionalSection Q x) ≤
+      finiteSectionDiameter supported conditionalSection rho x := by
+  unfold finiteSectionDiameter
+  refine Finset.le_sup'_of_le _ (Finset.mem_univ P) ?_
+  refine Finset.le_sup'_of_le _ (Finset.mem_univ Q) ?_
+  simp [hP, hQ]
+
+/-- A nonnegative conditional distance gives a nonnegative section diameter. -/
+theorem finiteSectionDiameter_nonneg [Fintype Population] [Nonempty Population]
+    (supported : Population → Context → Prop)
+    (conditionalSection : Population → Context → Conditional)
+    (rho : Conditional → Conditional → ℝ) (x : Context)
+    (hrho : ∀ μ ν, 0 ≤ rho μ ν) :
+    0 ≤ finiteSectionDiameter supported conditionalSection rho x := by
+  let P : Population := Classical.choice (inferInstance : Nonempty Population)
+  unfold finiteSectionDiameter
+  refine le_trans ?_ (Finset.le_sup'_of_le _ (Finset.mem_univ P)
+    (Finset.le_sup'_of_le _ (Finset.mem_univ P) (le_refl _)))
+  by_cases hP : supported P x
+  · simp [hP, hrho]
+  · simp [hP]
+
+/-- **Uniform quantitative descent.**  A monotone modulus bounds the entire observable
+oscillation by its value at the section diameter.  Unlike the former pointwise wrapper, this
+theorem performs the finite maximization and derives a population-uniform statement. -/
+theorem finiteSectionOscillation_le_modulus_diameter
+    [Fintype Population] [Nonempty Population]
+    (supported : Population → Context → Prop)
+    (conditionalSection : Population → Context → Conditional)
+    (b : Conditional → Value) (rho : Conditional → Conditional → ℝ)
+    (d : Value → Value → ℝ) (omega : ℝ → ℝ) (x : Context)
+    (hrho : ∀ μ ν, 0 ≤ rho μ ν) (homega : Monotone omega)
+    (homega0 : 0 ≤ omega 0)
+    (hmod : ∀ μ ν, d (b μ) (b ν) ≤ omega (rho μ ν)) :
+    finiteSectionOscillation supported conditionalSection b d x ≤
+      omega (finiteSectionDiameter supported conditionalSection rho x) := by
+  unfold finiteSectionOscillation
+  refine Finset.sup'_le _ _ fun P _ ↦ ?_
+  refine Finset.sup'_le _ _ fun Q _ ↦ ?_
+  by_cases hsupported : supported P x ∧ supported Q x
+  · rw [if_pos hsupported]
+    exact (hmod _ _).trans (homega
+      (sectionPairDistance_le_finiteSectionDiameter supported conditionalSection rho x P Q
+        hsupported.1 hsupported.2))
+  · rw [if_neg hsupported]
+    exact homega0.trans (homega
+      (finiteSectionDiameter_nonneg supported conditionalSection rho x hrho))
 
 end Descent
 
