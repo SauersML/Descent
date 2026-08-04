@@ -6,9 +6,11 @@ import Mathlib.Algebra.BigOperators.Fin
 import Mathlib.Data.Fintype.Basic
 import Mathlib.Data.Matrix.Basic
 import Mathlib.Data.Real.Basic
+import Mathlib.Data.Real.Sqrt
 import Mathlib.Data.Set.Lattice
 import Mathlib.LinearAlgebra.Matrix.Notation
 import Mathlib.Tactic.FinCases
+import Mathlib.Tactic.FieldSimp
 import Mathlib.Tactic.Linarith
 import Mathlib.Tactic.NormNum
 import Mathlib.Tactic.Ring
@@ -477,6 +479,191 @@ theorem dilutedTails_certificate_pos (q : ℝ) (hq0 : 0 ≤ q) (hq1 : q ≤ 1) :
   · norm_num
   · exact hq0
   · exact hq1
+
+/-! ## Exact population transition for a two-environment covariance mixture -/
+
+/-- The positive root of `r² + r - 1 = 0`.  It is the correlation threshold at which the
+two-block population overlap profile changes from monotone to gapped. -/
+noncomputable def goldenCorrelationThreshold : ℝ :=
+  (Real.sqrt 5 - 1) / 2
+
+/-- The threshold lies strictly inside the correlation interval. -/
+theorem goldenCorrelationThreshold_mem_Ioo :
+    goldenCorrelationThreshold ∈ Set.Ioo (0 : ℝ) 1 := by
+  have hsqrt : (Real.sqrt 5) ^ 2 = 5 := Real.sq_sqrt (by norm_num)
+  have hsqrtNonneg : 0 ≤ Real.sqrt 5 := Real.sqrt_nonneg 5
+  unfold goldenCorrelationThreshold
+  constructor <;> nlinarith
+
+/-- Golden-ratio identity used by every threshold calculation below. -/
+theorem goldenCorrelationThreshold_sq_add_self :
+    goldenCorrelationThreshold ^ 2 + goldenCorrelationThreshold = 1 := by
+  have hsqrt : (Real.sqrt 5) ^ 2 = 5 := Real.sq_sqrt (by norm_num)
+  unfold goldenCorrelationThreshold
+  nlinarith
+
+/-- Population overlap profile for the rank-two correlated sparse-design witness.  Here `x`
+is the missed-support fraction and `q` is the squared active correlation. -/
+noncomputable def populationOverlapProfile (q x : ℝ) : ℝ :=
+  x * (1 - q * x) / (1 - q * x * (1 - x))
+
+/-- The far, disjoint candidate has normalized loss `1 - q`. -/
+@[simp] theorem populationOverlapProfile_one (q : ℝ) :
+    populationOverlapProfile q 1 = 1 - q := by
+  simp [populationOverlapProfile]
+
+/-- The planted support has zero excess population loss. -/
+@[simp] theorem populationOverlapProfile_zero (q : ℝ) :
+    populationOverlapProfile q 0 = 0 := by
+  simp [populationOverlapProfile]
+
+/-- Endpoint derivative numerator of the overlap profile.  Its sign detects whether the
+profile turns down before reaching the disjoint-support endpoint. -/
+noncomputable def populationGapCertificate (correlation : ℝ) : ℝ :=
+  1 - 3 * correlation ^ 2 + correlation ^ 4
+
+/-- The golden threshold is exactly the zero of the population gap certificate. -/
+theorem populationGapCertificate_goldenCorrelationThreshold :
+    populationGapCertificate goldenCorrelationThreshold = 0 := by
+  have hgold : goldenCorrelationThreshold ^ 2 = 1 - goldenCorrelationThreshold := by
+    linarith [goldenCorrelationThreshold_sq_add_self]
+  unfold populationGapCertificate
+  calc
+    1 - 3 * goldenCorrelationThreshold ^ 2 + goldenCorrelationThreshold ^ 4 =
+        1 - 3 * goldenCorrelationThreshold ^ 2 +
+          (goldenCorrelationThreshold ^ 2) ^ 2 := by ring
+    _ = 0 := by nlinarith [hgold]
+
+/-- On squared correlations in `[0,1]`, the certificate is nonnegative below the golden
+threshold. -/
+theorem populationGapCertificate_nonneg_of_abs_le_golden
+    (correlation : ℝ) (hcorrelation : |correlation| ≤ goldenCorrelationThreshold) :
+    0 ≤ populationGapCertificate correlation := by
+  have hthreshold := goldenCorrelationThreshold_mem_Ioo
+  have hsq : correlation ^ 2 ≤ goldenCorrelationThreshold ^ 2 := by
+    rw [sq_le_sq, abs_of_pos hthreshold.1]
+    exact hcorrelation
+  have hq0 : 0 ≤ correlation ^ 2 := sq_nonneg correlation
+  have hq1 : correlation ^ 2 ≤ 1 := by
+    exact (sq_le_one_iff_abs_le_one correlation).mpr (hcorrelation.trans hthreshold.2.le)
+  have hroot : populationGapCertificate goldenCorrelationThreshold = 0 :=
+    populationGapCertificate_goldenCorrelationThreshold
+  have hfactor :
+      populationGapCertificate correlation -
+          populationGapCertificate goldenCorrelationThreshold =
+        (correlation ^ 2 - goldenCorrelationThreshold ^ 2) *
+          (correlation ^ 2 + goldenCorrelationThreshold ^ 2 - 3) := by
+    unfold populationGapCertificate
+    ring
+  have hsecond : correlation ^ 2 + goldenCorrelationThreshold ^ 2 - 3 ≤ 0 := by
+    have hthresholdSq : goldenCorrelationThreshold ^ 2 ≤ 1 := by
+      exact (sq_le_one_iff_abs_le_one goldenCorrelationThreshold).mpr (by
+        rw [abs_of_pos hthreshold.1]
+        exact hthreshold.2.le)
+    nlinarith
+  have hproduct : 0 ≤
+      (correlation ^ 2 - goldenCorrelationThreshold ^ 2) *
+        (correlation ^ 2 + goldenCorrelationThreshold ^ 2 - 3) :=
+    mul_nonneg_of_nonpos_of_nonpos (sub_nonpos.mpr hsq) hsecond
+  rw [hroot, sub_zero] at hfactor
+  linarith
+
+/-- On the admissible correlation interval, crossing the golden threshold makes the endpoint
+certificate strictly negative and hence forces an interior turn of the population profile. -/
+theorem populationGapCertificate_neg_of_golden_lt_abs
+    (correlation : ℝ) (hcorrelation : |correlation| ≤ 1)
+    (hgolden : goldenCorrelationThreshold < |correlation|) :
+    populationGapCertificate correlation < 0 := by
+  have hthreshold := goldenCorrelationThreshold_mem_Ioo
+  have hsq : goldenCorrelationThreshold ^ 2 < correlation ^ 2 := by
+    rw [sq_lt_sq, abs_of_pos hthreshold.1]
+    exact hgolden
+  have hq1 : correlation ^ 2 ≤ 1 := by
+    exact (sq_le_one_iff_abs_le_one correlation).mpr hcorrelation
+  have hroot : populationGapCertificate goldenCorrelationThreshold = 0 :=
+    populationGapCertificate_goldenCorrelationThreshold
+  have hfactor :
+      populationGapCertificate correlation -
+          populationGapCertificate goldenCorrelationThreshold =
+        (correlation ^ 2 - goldenCorrelationThreshold ^ 2) *
+          (correlation ^ 2 + goldenCorrelationThreshold ^ 2 - 3) := by
+    unfold populationGapCertificate
+    ring
+  have hsecond : correlation ^ 2 + goldenCorrelationThreshold ^ 2 - 3 < 0 := by
+    have hthresholdSq : goldenCorrelationThreshold ^ 2 < 1 := by
+      exact (sq_lt_one_iff_abs_lt_one goldenCorrelationThreshold).mpr (by
+        rw [abs_of_pos hthreshold.1]
+        exact hthreshold.2)
+    nlinarith
+  have hproduct :
+      (correlation ^ 2 - goldenCorrelationThreshold ^ 2) *
+          (correlation ^ 2 + goldenCorrelationThreshold ^ 2 - 3) < 0 :=
+    mul_neg_of_pos_of_neg (sub_pos.mpr hsq) hsecond
+  rw [hroot, sub_zero] at hfactor
+  linarith
+
+/-- Effective active correlation when the `+rho` environment has mass `mix` and the `-rho`
+environment has mass `1 - mix`. -/
+noncomputable def mixedEnvironmentCorrelation (rho mix : ℝ) : ℝ :=
+  rho * (2 * mix - 1)
+
+/-- Exact cancellation at a balanced mixture. -/
+@[simp] theorem mixedEnvironmentCorrelation_half (rho : ℝ) :
+    mixedEnvironmentCorrelation rho (1 / 2) = 0 := by
+  unfold mixedEnvironmentCorrelation
+  ring
+
+/-- If the effective correlation lies below the golden threshold, the mixture is on the
+non-gapped side of the exact population certificate. -/
+theorem mixedEnvironmentGapCertificate_nonneg
+    (rho mix : ℝ)
+    (hmix : |mixedEnvironmentCorrelation rho mix| ≤ goldenCorrelationThreshold) :
+    0 ≤ populationGapCertificate (mixedEnvironmentCorrelation rho mix) :=
+  populationGapCertificate_nonneg_of_abs_le_golden _ hmix
+
+/-- Critical minority-environment fraction for a positive pure-environment correlation. -/
+noncomputable def criticalMinorityProportion (rho : ℝ) : ℝ :=
+  (1 - goldenCorrelationThreshold / rho) / 2
+
+/-- At the critical minority fraction, the effective correlation is exactly the golden
+threshold. -/
+theorem mixedEnvironmentCorrelation_at_criticalMinority
+    (rho : ℝ) (hrho : rho ≠ 0) :
+    mixedEnvironmentCorrelation rho (1 - criticalMinorityProportion rho) =
+      goldenCorrelationThreshold := by
+  unfold mixedEnvironmentCorrelation criticalMinorityProportion
+  field_simp [hrho]
+  ring
+
+/-- Consequently the exact gap certificate vanishes at the computed mixing proportion. -/
+theorem mixedEnvironmentGapCertificate_at_criticalMinority
+    (rho : ℝ) (hrho : rho ≠ 0) :
+    populationGapCertificate
+        (mixedEnvironmentCorrelation rho (1 - criticalMinorityProportion rho)) = 0 := by
+  rw [mixedEnvironmentCorrelation_at_criticalMinority rho hrho]
+  exact populationGapCertificate_goldenCorrelationThreshold
+
+/-- Any minority fraction between the critical value and one half closes the population
+certificate, provided each pure environment is itself inside the correlation interval. -/
+theorem mixedEnvironmentGapCertificate_nonneg_of_minority_ge_critical
+    (rho minority : ℝ)
+    (hrhoGolden : goldenCorrelationThreshold < rho)
+    (hminority : criticalMinorityProportion rho ≤ minority)
+    (hminorityHalf : minority ≤ 1 / 2) :
+    0 ≤ populationGapCertificate
+      (mixedEnvironmentCorrelation rho (1 - minority)) := by
+  have hrho : 0 < rho := lt_trans goldenCorrelationThreshold_mem_Ioo.1 hrhoGolden
+  have heffectiveNonneg : 0 ≤ mixedEnvironmentCorrelation rho (1 - minority) := by
+    unfold mixedEnvironmentCorrelation
+    exact mul_nonneg hrho.le (by linarith)
+  have heffectiveLe :
+      mixedEnvironmentCorrelation rho (1 - minority) ≤ goldenCorrelationThreshold := by
+    have hcritical := mixedEnvironmentCorrelation_at_criticalMinority rho hrho.ne'
+    unfold mixedEnvironmentCorrelation at hcritical ⊢
+    nlinarith
+  apply populationGapCertificate_nonneg_of_abs_le_golden
+  rw [abs_of_nonneg heffectiveNonneg]
+  exact heffectiveLe
 
 /-! ## Anisotropy separates Euclidean overlap from covariance energy -/
 

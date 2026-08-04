@@ -92,6 +92,41 @@ theorem pooledCohort_forbiddenOverlap_of_levelResolved_cover
 
 end CohortLandscapeSuperposition
 
+/-! ## Population overlap geometry under ancestry-environment mixing -/
+
+/-- The active sparse-LD correlation after pooling two environments with correlations `rho`
+and `-rho`.  This is the biological name for the exact landscape parameter. -/
+noncomputable def ancestryMixtureCorrelation (rho positiveEnvironmentMass : ℝ) : ℝ :=
+  mixedEnvironmentCorrelation rho positiveEnvironmentMass
+
+/-- A balanced ancestry-environment mixture cancels the active correlation exactly. -/
+@[simp] theorem ancestryMixtureCorrelation_balanced (rho : ℝ) :
+    ancestryMixtureCorrelation rho (1 / 2) = 0 := by
+  exact mixedEnvironmentCorrelation_half rho
+
+/-- **Two individually gapped LD environments can pool to an ungapped population profile.**
+
+At active correlation `4/5`, both signs lie beyond the golden threshold and have a negative
+population gap certificate.  Equal environment mass cancels the active correlation, leaving
+certificate one.  This is a population-landscape statement only: it does not infer a
+polynomial-time algorithm from absence of the gap. -/
+theorem ancestryMixture_pure_gapped_balanced_ungapped :
+    populationGapCertificate (4 / 5) < 0 ∧
+      populationGapCertificate (-(4 / 5)) < 0 ∧
+      populationGapCertificate (ancestryMixtureCorrelation (4 / 5) (1 / 2)) = 1 := by
+  have hthreshold : goldenCorrelationThreshold < (4 / 5 : ℝ) := by
+    have hgold := goldenCorrelationThreshold_sq_add_self
+    have hpositive := goldenCorrelationThreshold_mem_Ioo.1
+    nlinarith
+  have habsPositive : |(4 / 5 : ℝ)| = 4 / 5 := by norm_num
+  have habsNegative : |(-(4 / 5) : ℝ)| = 4 / 5 := by norm_num
+  have hpositive := populationGapCertificate_neg_of_golden_lt_abs
+    (4 / 5) (by norm_num) (by rw [habsPositive]; exact hthreshold)
+  have hnegative := populationGapCertificate_neg_of_golden_lt_abs
+    (-(4 / 5)) (by norm_num) (by rw [habsNegative]; exact hthreshold)
+  refine ⟨hpositive, hnegative, ?_⟩
+  simp [ancestryMixtureCorrelation, mixedEnvironmentCorrelation, populationGapCertificate]
+
 section StationarityRepair
 
 variable {State : Type*} [Fintype State]
@@ -795,7 +830,7 @@ theorem geometry_and_effect_recovery_gates
 
 /-! ## The unified obstruction bundle -/
 
-/-- Nineteen logically distinct failures and boundaries that a biological transport theory must
+/-- Twenty logically distinct failures and boundaries that a biological transport theory must
 not collapse into one scalar "portability" parameter.  The final six fields make continuum
 calibration and finite correction part of the core theorem rather than adjacent examples. -/
 structure UnifiedBiologyObstructions : Prop where
@@ -846,6 +881,12 @@ structure UnifiedBiologyObstructions : Prop where
       lowSNRFourthCoefficient c 1 (-2) m1 m2 m3 m4 rotatedUniformFourthInvariant -
           lowSNRFourthCoefficient c 1 (-2) m1 m2 m3 m4 localizedUniformFourthInvariant =
         49 / 96
+  /-- Both signs of a strong sparse-LD direction have a population gap, while a balanced
+  environment mixture cancels it. -/
+  environmentMixtureClosesPopulationGap :
+    populationGapCertificate (4 / 5) < 0 ∧
+      populationGapCertificate (-(4 / 5)) < 0 ∧
+      populationGapCertificate (ancestryMixtureCorrelation (4 / 5) (1 / 2)) = 1
   /-- A cross-state criterion is not a function of the target context: it fails to descend along
   the label the target-only annotation descends along. -/
   crossStateDoesNotDescend :
@@ -930,6 +971,8 @@ theorem unifiedBiology_obstructions : UnifiedBiologyObstructions := by
           midpoint_blockEntryFourthMean_ne⟩
       symmetricLDChangesLowSNRCoefficient :=
         rademacher_fullLowSNRFourthCoefficient_rotated_sub_localized
+      environmentMixtureClosesPopulationGap :=
+        ancestryMixture_pure_gapped_balanced_ungapped
       crossStateDoesNotDescend := not_descends_contextMatchQuality_along_targetState
       marginalDescentDoesNotCompose := admissible_interaction_join_obstruction
       crudeReportingLosesDescent := admissible_confounding_meet_obstruction
