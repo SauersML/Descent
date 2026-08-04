@@ -264,13 +264,42 @@ theorem effectiveSampleSizeFromSE_fixed_is_junk (se : ℝ) :
   unfold effectiveSampleSizeFromSE
   simp
 
-/-- The effective sample size is positive at any polymorphic frequency. -/
-theorem effective_n_pos (se p : ℝ) (h_se : 0 < se) (hp0 : 0 < p) (hp1 : p < 1) :
-    0 < effectiveSampleSizeFromSE se p := by
-  have hc : 0 < 2 * p * (1 - p) := by nlinarith
-  have hse2 : 0 < se ^ 2 := by positivity
+/-- The SE-derived effective sample size vanishes exactly on its three singular
+boundaries: zero standard error, absent allele, or fixed alternate allele. -/
+theorem effectiveSampleSizeFromSE_eq_zero_iff (se p : ℝ) :
+    effectiveSampleSizeFromSE se p = 0 ↔ se = 0 ∨ p = 0 ∨ p = 1 := by
   unfold effectiveSampleSizeFromSE
-  exact div_pos one_pos (by positivity)
+  constructor
+  · intro h
+    have h_denom : se ^ 2 * (2 * p * (1 - p)) = 0 := by
+      by_contra h_ne
+      exact (div_ne_zero one_ne_zero h_ne) h
+    rcases mul_eq_zero.mp h_denom with h_se | h_frequency
+    · exact Or.inl (sq_eq_zero_iff.mp h_se)
+    · rcases mul_eq_zero.mp h_frequency with h | h
+      · have h_p : p = 0 := by nlinarith
+        exact Or.inr (Or.inl h_p)
+      · exact Or.inr (Or.inr (by linarith))
+  · rintro (rfl | rfl | rfl) <;> norm_num
+
+/-- The effective sample-size formula is positive exactly when the standard error is
+nonzero and the marker is polymorphic. The sign of `se` is immaterial because it is squared. -/
+theorem effectiveSampleSizeFromSE_pos_iff (se p : ℝ) :
+    0 < effectiveSampleSizeFromSE se p ↔ se ≠ 0 ∧ 0 < p ∧ p < 1 := by
+  unfold effectiveSampleSizeFromSE
+  constructor
+  · intro h
+    have h_denom : 0 < se ^ 2 * (2 * p * (1 - p)) := one_div_pos.mp h
+    rcases mul_pos_iff.mp h_denom with ⟨h_se_sq, h_frequency⟩ | ⟨h_se_sq, _⟩
+    · refine ⟨?_, ?_⟩
+      · intro h_zero
+        rw [h_zero] at h_se_sq
+        norm_num at h_se_sq
+      · constructor <;> nlinarith
+    · nlinarith [sq_nonneg se]
+  · rintro ⟨h_se, hp0, hp1⟩
+    apply one_div_pos.mpr
+    exact mul_pos (sq_pos_of_ne_zero h_se) (by nlinarith)
 
 /-- **Meta-analysis model definition.**
     Contains properties of the model, specifically:
