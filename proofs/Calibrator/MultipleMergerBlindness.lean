@@ -506,6 +506,18 @@ theorem speedTiltBetaMergerRate_three_three_injective_on
   field_simp [hne₁, hne₂] at hrate
   linarith
 
+/-- **Pairwise blindness, three-lineage identification.** Distinct admissible speed tilts
+agree exactly at the normalized pair rate and disagree at the first multiple-merger
+coordinate. Thus three lineages are both necessary and sufficient inside this family. -/
+theorem speedTilt_pairwise_blind_triple_separates
+    {β₁ β₂ : ℝ} (hβ₁ : -1 < β₁) (hβ₂ : -1 < β₂) (hne : β₁ ≠ β₂) :
+    speedTiltBetaMergerRate β₁ 2 2 = speedTiltBetaMergerRate β₂ 2 2 ∧
+      speedTiltBetaMergerRate β₁ 3 3 ≠ speedTiltBetaMergerRate β₂ 3 3 := by
+  constructor
+  · simp
+  · intro hrate
+    exact hne (speedTiltBetaMergerRate_three_three_injective_on hβ₁ hβ₂ hrate)
+
 /-- Parameter readout from the normalized three-lineage rate. -/
 noncomputable def speedBiasParameterFromTripleRate (rate : ℝ) : ℝ :=
   rate⁻¹ - 2
@@ -540,6 +552,27 @@ theorem frontSpeedBias_tripleMergerRate (θ γ : ℝ) :
     speedTiltBetaMergerRate (frontSpeedBiasParameter θ γ) 3 3 =
       1 / (θ / γ + 2) := by
   simp [frontSpeedBiasParameter]
+
+/-- **Speed identification at a fixed front scale.** On the admissible microcanonical-tilt
+domain `-γ < θ`, the normalized three-lineage merger rate identifies the front-speed tilt
+exactly whenever the displacement scale is positive. -/
+theorem frontSpeedBias_tripleMergerRate_injective
+    {θ₁ θ₂ γ : ℝ} (hγ : 0 < γ) (hθ₁ : -γ < θ₁) (hθ₂ : -γ < θ₂)
+    (hrate :
+      speedTiltBetaMergerRate (frontSpeedBiasParameter θ₁ γ) 3 3 =
+        speedTiltBetaMergerRate (frontSpeedBiasParameter θ₂ γ) 3 3) :
+    θ₁ = θ₂ := by
+  have hβ₁ : -1 < frontSpeedBiasParameter θ₁ γ := by
+    unfold frontSpeedBiasParameter
+    apply (lt_div_iff₀ hγ).2
+    simpa using hθ₁
+  have hβ₂ : -1 < frontSpeedBiasParameter θ₂ γ := by
+    unfold frontSpeedBiasParameter
+    apply (lt_div_iff₀ hγ).2
+    simpa using hθ₂
+  have hparameter := speedTiltBetaMergerRate_three_three_injective_on hβ₁ hβ₂ hrate
+  unfold frontSpeedBiasParameter at hparameter
+  exact (div_left_inj' hγ.ne').mp hparameter
 
 /-- A nonnegative speed penalty at positive displacement scale moves the genealogy from the
 Bolthausen--Sznitman coordinate `1/2` toward Kingman, never toward the star coalescent. -/
