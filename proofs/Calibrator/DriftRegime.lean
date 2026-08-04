@@ -193,8 +193,23 @@ carried into a regime where it is false without anything failing.
     carries no evidence independent of it. -/
 noncomputable def lossOfRetention (r : ℝ) : ℝ := 1 - r
 
+/-- **Loss and retention partition one.** The cluster below is built from three quantities that
+all move with the retention factor, and the monotonicity relations among them hold for every
+decreasing function of `r`. This identity says which one: the loss is the exact complement, so a
+population retaining nine tenths of its variation has lost one tenth and not some multiple of it. -/
+theorem lossOfRetention_add_retention (r : ℝ) : lossOfRetention r + r = 1 := by
+  unfold lossOfRetention
+  ring
+
 /-- Cluster member: target heterozygosity. -/
 noncomputable def targetHetOfRetention (H₀ r : ℝ) : ℝ := H₀ * r
+
+/-- **Full retention returns the ancestral heterozygosity unchanged.** The cluster's shared
+monotonicity in `r` is satisfied by every increasing map fixing zero; the value at `r = 1` fixes
+the scale, and it is the reference point at which a spurious factor becomes visible. -/
+theorem targetHetOfRetention_full (H₀ : ℝ) : targetHetOfRetention H₀ 1 = H₀ := by
+  unfold targetHetOfRetention
+  ring
 
 /-- Cluster member: target PGS variance.
 
