@@ -363,7 +363,14 @@ theorem explainedR2FromTransportMoments_scale_invariant
 
 /-- Source tagged moments for the explicit LD witness.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: NOT AN EMPIRICAL CLAIM. This is a witness -- a
+    literal configuration exhibited so that a theorem can be stated about it --
+    not a statement about any population. There is no measurement that could
+    agree or disagree with `![1, 1]`; what carries empirical content is the
+    theorem the witness appears in, and that theorem's own status is where it
+    belongs. An UNTESTED marker here reads as an unpaid debt and is not one,
+    which is worse than no marker: it inflates the count of things owed a
+    measurement with items that can never receive one. -/
 def ldWitnessSourceMoments : SourceTaggedMoments 2 2 where
   sigmaTagSource := 1
   directCausalSource := 1
@@ -371,18 +378,39 @@ def ldWitnessSourceMoments : SourceTaggedMoments 2 2 where
 
 /-- Source causal effects for the explicit LD witness.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: NOT AN EMPIRICAL CLAIM. This is a witness -- a
+    literal configuration exhibited so that a theorem can be stated about it --
+    not a statement about any population. There is no measurement that could
+    agree or disagree with `![1, 1]`; what carries empirical content is the
+    theorem the witness appears in, and that theorem's own status is where it
+    belongs. An UNTESTED marker here reads as an unpaid debt and is not one,
+    which is worse than no marker: it inflates the count of things owed a
+    measurement with items that can never receive one. -/
 def ldWitnessBeta : CausalVec 2 := ![1, 1]
 
 /-- Source-learned weights for the explicit LD witness.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: NOT AN EMPIRICAL CLAIM. This is a witness -- a
+    literal configuration exhibited so that a theorem can be stated about it --
+    not a statement about any population. There is no measurement that could
+    agree or disagree with `![1, 1]`; what carries empirical content is the
+    theorem the witness appears in, and that theorem's own status is where it
+    belongs. An UNTESTED marker here reads as an unpaid debt and is not one,
+    which is worse than no marker: it inflates the count of things owed a
+    measurement with items that can never receive one. -/
 noncomputable def ldWitnessSourceWeights : TagVec 2 :=
   sourceBestLinearWeightsFromLD ldWitnessSourceMoments ldWitnessBeta
 
 /-- Target cross-covariance witness shared across the two target LD states.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: NOT AN EMPIRICAL CLAIM. This is a witness -- a
+    literal configuration exhibited so that a theorem can be stated about it --
+    not a statement about any population. There is no measurement that could
+    agree or disagree with `![1, 1]`; what carries empirical content is the
+    theorem the witness appears in, and that theorem's own status is where it
+    belongs. An UNTESTED marker here reads as an unpaid debt and is not one,
+    which is worse than no marker: it inflates the count of things owed a
+    measurement with items that can never receive one. -/
 def ldWitnessTargetCross : TagVec 2 := ![1, 1]
 
 /-- **The witness scores the two SNPs with the causal effects themselves.**
@@ -395,13 +423,27 @@ theorem ldWitnessTargetCross_eq_ldWitnessBeta :
 
 /-- Target LD witness with independent scored SNPs.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: NOT AN EMPIRICAL CLAIM. This is a witness -- a
+    literal configuration exhibited so that a theorem can be stated about it --
+    not a statement about any population. There is no measurement that could
+    agree or disagree with `![1, 1]`; what carries empirical content is the
+    theorem the witness appears in, and that theorem's own status is where it
+    belongs. An UNTESTED marker here reads as an unpaid debt and is not one,
+    which is worse than no marker: it inflates the count of things owed a
+    measurement with items that can never receive one. -/
 def ldWitnessSigmaTargetIndependent : Matrix (Fin 2) (Fin 2) ℝ :=
   !![1, 0; 0, 1]
 
 /-- Target LD witness with perfect correlation between the scored SNPs.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: NOT AN EMPIRICAL CLAIM. This is a witness -- a
+    literal configuration exhibited so that a theorem can be stated about it --
+    not a statement about any population. There is no measurement that could
+    agree or disagree with `![1, 1]`; what carries empirical content is the
+    theorem the witness appears in, and that theorem's own status is where it
+    belongs. An UNTESTED marker here reads as an unpaid debt and is not one,
+    which is worse than no marker: it inflates the count of things owed a
+    measurement with items that can never receive one. -/
 def ldWitnessSigmaTargetCorrelated : Matrix (Fin 2) (Fin 2) ℝ :=
   !![1, 1; 1, 1]
 

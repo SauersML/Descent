@@ -232,7 +232,14 @@ noncomputable def baselineMetricModel : CrossPopulationMetricModel 1 1 := {
 
 /-- Target-LD-shift witness: only the target LD among scored SNPs changes.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: NOT AN EMPIRICAL CLAIM. This is a witness -- a
+    literal configuration exhibited so that a theorem can be stated about it --
+    not a statement about any population. There is no measurement that could
+    agree or disagree with `![1, 1]`; what carries empirical content is the
+    theorem the witness appears in, and that theorem's own status is where it
+    belongs. An UNTESTED marker here reads as an unpaid debt and is not one,
+    which is worse than no marker: it inflates the count of things owed a
+    measurement with items that can never receive one. -/
 noncomputable def targetLDShiftMetricModel : CrossPopulationMetricModel 1 1 :=
   { baselineMetricModel with
       sigmaTag := Pop.withTarget baselineMetricModel.sigmaTag !![2] }
@@ -252,7 +259,14 @@ noncomputable def targetTaggingShiftMetricModel : CrossPopulationMetricModel 1 1
 
 /-- Target effect-shift witness: only the target causal effect size changes.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: NOT AN EMPIRICAL CLAIM. This is a witness -- a
+    literal configuration exhibited so that a theorem can be stated about it --
+    not a statement about any population. There is no measurement that could
+    agree or disagree with `![1, 1]`; what carries empirical content is the
+    theorem the witness appears in, and that theorem's own status is where it
+    belongs. An UNTESTED marker here reads as an unpaid debt and is not one,
+    which is worse than no marker: it inflates the count of things owed a
+    measurement with items that can never receive one. -/
 noncomputable def targetEffectShiftMetricModel : CrossPopulationMetricModel 1 1 :=
   { baselineMetricModel with
       beta := Pop.withTarget baselineMetricModel.beta ![1 / 2] }
@@ -265,7 +279,14 @@ noncomputable def targetContextShiftMetricModel : CrossPopulationMetricModel 1 1
 
 /-- Irreducible target mismatch witness.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: NOT AN EMPIRICAL CLAIM. This is a witness -- a
+    literal configuration exhibited so that a theorem can be stated about it --
+    not a statement about any population. There is no measurement that could
+    agree or disagree with `![1, 1]`; what carries empirical content is the
+    theorem the witness appears in, and that theorem's own status is where it
+    belongs. An UNTESTED marker here reads as an unpaid debt and is not one,
+    which is worse than no marker: it inflates the count of things owed a
+    measurement with items that can never receive one. -/
 noncomputable def targetPrevalenceShiftMetricModel : CrossPopulationMetricModel 1 1 :=
   { baselineMetricModel with
       targetPrevalence := 1 / 4
