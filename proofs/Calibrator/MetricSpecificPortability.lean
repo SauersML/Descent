@@ -1994,6 +1994,9 @@ quantiles, or full histogram -- can detect alignment.
 Empirical status: NOT AN EMPIRICAL CLAIM -- this is a finite counterexample. -/
 noncomputable def ancestryPosition : Fin 3 → ℝ := ![0, 1, 3]
 
+/-- The third ancestry occupies position three in the finite counterexample. -/
+@[simp] theorem ancestryPosition_two : ancestryPosition 2 = 3 := rfl
+
 /-- Distance between two ancestries on the line.
 
 Empirical status: NOT AN EMPIRICAL CLAIM -- this is the metric of a finite counterexample. -/

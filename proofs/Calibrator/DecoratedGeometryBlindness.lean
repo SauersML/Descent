@@ -451,7 +451,7 @@ theorem witnessAlignedField_eq_ancestryScore : witnessAlignedField = ancestrySco
 /-- Equivalently, the aligned decoration is the canonical three-ancestry conditional itself. -/
 theorem witnessAlignedField_eq_threeAncestryConditional :
     witnessAlignedField = threeAncestryConditional := by
-  rw [witnessAlignedField_eq_ancestryScore, ancestryScore_eq_threeAncestryConditional]
+  simpa only [ancestryScore] using witnessAlignedField_eq_ancestryScore
 
 /-- The transposed assignment: the same three risks, the top two exchanged.
 
