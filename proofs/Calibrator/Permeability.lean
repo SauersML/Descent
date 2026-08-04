@@ -544,6 +544,20 @@ noncomputable def twoChannelMomentNoisePrecision
   twoChannelMomentPrecision
     (secondNoise / det) (firstNoise / det) (-sharedNoise / det)
 
+/-- A singular two-channel noise determinant sends every entry to Mathlib's junk `0`, so the
+precision matrix reads as a channel with no information rather than an undefined one. -/
+theorem twoChannelMomentNoisePrecision_at_zero_determinant_is_junk
+    (firstNoise secondNoise sharedNoise : ℝ)
+    (hzero : twoChannelMomentNoiseDet firstNoise secondNoise sharedNoise = 0) :
+    twoChannelMomentNoisePrecision firstNoise secondNoise sharedNoise
+      = twoChannelMomentPrecision 0 0 0 := by
+  show twoChannelMomentPrecision
+      (secondNoise / twoChannelMomentNoiseDet firstNoise secondNoise sharedNoise)
+      (firstNoise / twoChannelMomentNoiseDet firstNoise secondNoise sharedNoise)
+      (-sharedNoise / twoChannelMomentNoiseDet firstNoise secondNoise sharedNoise) = _
+  rw [hzero, div_zero, div_zero, div_zero]
+
+
 /-- Response of the second channel not predicted by the first channel through their
 noise covariance. -/
 noncomputable def twoChannelConditionalMomentResponse

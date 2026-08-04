@@ -825,6 +825,15 @@ theorem certifiedRisk_nonneg (K : ℕ) (h : ℝ) :
 noncomputable def deficit (K : ℕ) (h : ℝ) : ℝ :=
   C.ungradedRisk h / C.certifiedRisk K h
 
+/-- A grade whose certified value is zero divides by zero and Mathlib returns `0`, so the
+deficit reads as no shortfall exactly where the certificate carries no value at all. -/
+theorem deficit_at_zero_certified_value_is_junk (K : ℕ) (h : ℝ)
+    (hzero : C.certifiedRisk K h = 0) :
+    C.deficit K h = 0 := by
+  unfold deficit
+  rw [hzero, div_zero]
+
+
 /-- Matching `K` moments costs no modulus at this scale. -/
 def GradeInsensitive (K : ℕ) (h : ℝ) : Prop :=
   C.modulus.Δ K h = C.modulus.Δ 0 h

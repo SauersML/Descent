@@ -325,6 +325,13 @@ noncomputable def valueMass : ℝ := ∑ i ∈ s, w i
 /-- **Integrated autocorrelation time** of the value signal, `Σ wᵢ/λᵢ`. -/
 noncomputable def autocorrTime : ℝ := ∑ i ∈ s, w i / lam i
 
+/-- A mode with zero relaxation rate contributes Mathlib's junk `0` to the sum rather than the
+infinite autocorrelation time it stands for, so a non-relaxing mode is silently dropped. -/
+theorem autocorrTime_at_zero_rate_is_junk (i : ι) (hzero : lam i = 0) :
+    w i / lam i = 0 := by
+  rw [hzero, div_zero]
+
+
 /-- **The sharp floor is at least the spectral gap**, with equality only at a single rate.
 
     `V/T` is the weighted harmonic mean of the relaxation rates, so it dominates the smallest

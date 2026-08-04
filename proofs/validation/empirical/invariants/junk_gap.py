@@ -207,6 +207,9 @@ UNREACHABLE_BY_HAND = {
     "hardCallObservables": "built from hardCallLatticeSpan, whose divisor is proved nonzero",
     "meffPerturbed": "the divisor is (n : ℝ) + 1 for n : ℕ, always at least one",
     "exitLevels": "the set-builder carries 0 < spikeLoad, which is the divisor",
+    "momentSeparationNode": "the divisor is (D : ℕ) + 1, at least one",
+    "cwRate": "cwRate_one records the endpoint, where the vanishing factor kills log 0",
+    "cwPinskerGapDerivative": "the endpoints are excluded by |m| < 1 in every consumer",
 }
 
 
