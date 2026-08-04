@@ -204,6 +204,7 @@ theorem isCellBalanced_cellMean (weight value : Carrier → ℝ) (cell : Carrier
     ring
   · unfold cellMean
     field_simp
+    ring
 
 /-- **Cellwise balance implies balance overall.**  Summing the per-cell conditions: a
 representative calibrated inside every cell is calibrated in aggregate.  The two demands are
@@ -591,22 +592,6 @@ theorem stratifiedCalibrationEnergy_stratumMean_le (covariateWeight : Covariate 
     stratify (stratumMean posterior conditional stratify) other
     (isStratumCalibrated_stratumMean posterior conditional stratify hposterior) hweight hposterior
 
-/-- **The split is available for every family.**  The pooled drift defect equals the stratum
-mean's irreducible residual plus the resolution it buys -- stated for the recalibration that
-always exists, so this is a decomposition of the defect rather than a conditional identity. -/
-theorem calibrationDriftDefectSq_eq_stratumMean_split (covariateWeight : Covariate → ℝ)
-    (posterior : Covariate → Index → ℝ) (conditional : Index → Covariate → ℝ)
-    (stratify : Index → Stratum)
-    (hposterior : ∀ x t, 0 ≤ posterior x t) (hnormalized : ∀ x, ∑ t, posterior x t = 1) :
-    calibrationDriftDefectSq covariateWeight posterior conditional =
-      stratifiedCalibrationEnergy covariateWeight posterior conditional stratify
-          (stratumMean posterior conditional stratify) +
-        stratumResolutionEnergy covariateWeight posterior conditional stratify
-          (stratumMean posterior conditional stratify) :=
-  calibrationDriftDefectSq_eq_stratified_add_resolution covariateWeight posterior conditional
-    stratify (stratumMean posterior conditional stratify)
-    (isStratumCalibrated_stratumMean posterior conditional stratify hposterior) hnormalized
-
 /-- **Residual and resolution are complementary.**  The drift defect of the pooled theory splits,
 exactly, into the within-stratum residual a stratified recalibration cannot remove and the
 resolution it buys.  Neither can move without the other moving by the same amount: this is the
@@ -678,6 +663,22 @@ theorem stratifiedCalibrationEnergy_perturbed_eq
     ring
   rw [stratifiedCalibrationEnergy_eq_add_stratumGapEnergy covariateWeight posterior conditional
     stratify predictor (fun s x ↦ predictor s x + step * direction s x) hcalibrated, hgap]
+
+/-- **The split is available for every family.**  The pooled drift defect equals the stratum
+mean's irreducible residual plus the resolution it buys -- stated for the recalibration that
+always exists, so this is a decomposition of the defect rather than a conditional identity. -/
+theorem calibrationDriftDefectSq_eq_stratumMean_split (covariateWeight : Covariate → ℝ)
+    (posterior : Covariate → Index → ℝ) (conditional : Index → Covariate → ℝ)
+    (stratify : Index → Stratum)
+    (hposterior : ∀ x t, 0 ≤ posterior x t) (hnormalized : ∀ x, ∑ t, posterior x t = 1) :
+    calibrationDriftDefectSq covariateWeight posterior conditional =
+      stratifiedCalibrationEnergy covariateWeight posterior conditional stratify
+          (stratumMean posterior conditional stratify) +
+        stratumResolutionEnergy covariateWeight posterior conditional stratify
+          (stratumMean posterior conditional stratify) :=
+  calibrationDriftDefectSq_eq_stratified_add_resolution covariateWeight posterior conditional
+    stratify (stratumMean posterior conditional stratify)
+    (isStratumCalibrated_stratumMean posterior conditional stratify hposterior) hnormalized
 
 /-- **What refining a stratification removes is exactly the drift it resolves.**  If a coarse
 stratification factors through a finer one, then the coarse optimum's energy is the fine
@@ -1141,15 +1142,18 @@ theorem unqueried_error_ge_radius (centre radius v : ℝ) (hradius : 0 ≤ radiu
     have hhalf := half_gap_le_max_abs_sub A B v
     rw [hgap] at hhalf
     linarith
+  have hgap : (0 : ℝ) ≤ 2 * radius := by linarith
   cases t
   · refine hkey _ _ ?_
-    norm_num [swappedConditional, swappedConditionalMirror]
-    rw [show centre - radius - (centre + radius) = -(2 * radius) by ring, abs_neg,
-      abs_of_nonneg (by linarith : (0:ℝ) ≤ 2 * radius)]
+    have hdiff : swappedConditional centre radius false () -
+        swappedConditionalMirror centre radius false () = -(2 * radius) := by
+      norm_num [swappedConditional, swappedConditionalMirror] <;> ring
+    rw [hdiff, abs_neg, abs_of_nonneg hgap]
   · refine hkey _ _ ?_
-    norm_num [swappedConditional, swappedConditionalMirror]
-    rw [show centre + radius - (centre - radius) = 2 * radius by ring,
-      abs_of_nonneg (by linarith : (0:ℝ) ≤ 2 * radius)]
+    have hdiff : swappedConditional centre radius true () -
+        swappedConditionalMirror centre radius true () = 2 * radius := by
+      norm_num [swappedConditional, swappedConditionalMirror] <;> ring
+    rw [hdiff, abs_of_nonneg hgap]
 
 /-- **And the pooled mean attains it.**  Reporting the posterior mean at an unqueried population
 is wrong by exactly the drift radius against both candidates, which with the previous theorem
@@ -1306,6 +1310,74 @@ theorem driftDecisionRegret_pos_of_crossing (q lower upper cutoff : ℝ)
         max_eq_left (le_of_lt hupperPos), max_eq_right (le_of_lt hlowerNeg)]
     rw [hvalue]
     exact mul_pos hq₀ hupperPos
+
+/-- The per-population regret of treating: zero above the threshold, the shortfall below it. -/
+theorem decisionRegret_true_eq (cutoff risk : ℝ) (hcutoff : cutoff < 1) :
+    decisionRegret cutoff risk true = max 0 ((cutoff - risk) / (1 - cutoff)) := by
+  have hne : cutoff ≠ 1 := ne_of_lt hcutoff
+  have hpos : (0 : ℝ) < 1 - cutoff := by linarith
+  have hunfold : decisionRegret cutoff risk true =
+      max (treatNetBenefit cutoff risk) 0 - treatNetBenefit cutoff risk := by
+    unfold decisionRegret
+    norm_num
+  rw [hunfold, treatNetBenefit_eq cutoff risk hne]
+  rcases le_total risk cutoff with hside | hside
+  · have hneg : (risk - cutoff) / (1 - cutoff) ≤ 0 :=
+      div_nonpos_of_nonpos_of_nonneg (by linarith) (le_of_lt hpos)
+    have hnonneg : 0 ≤ (cutoff - risk) / (1 - cutoff) :=
+      div_nonneg (by linarith) (le_of_lt hpos)
+    rw [max_eq_right hneg, max_eq_right hnonneg]
+    ring
+  · have hnonneg : 0 ≤ (risk - cutoff) / (1 - cutoff) :=
+      div_nonneg (by linarith) (le_of_lt hpos)
+    have hneg : (cutoff - risk) / (1 - cutoff) ≤ 0 :=
+      div_nonpos_of_nonpos_of_nonneg (by linarith) (le_of_lt hpos)
+    rw [max_eq_left hnonneg, max_eq_left hneg]
+    ring
+
+/-- The per-population regret of not treating: zero below the threshold, the excess above it. -/
+theorem decisionRegret_false_eq (cutoff risk : ℝ) (hcutoff : cutoff < 1) :
+    decisionRegret cutoff risk false = max 0 ((risk - cutoff) / (1 - cutoff)) := by
+  have hne : cutoff ≠ 1 := ne_of_lt hcutoff
+  have hunfold : decisionRegret cutoff risk false = max (treatNetBenefit cutoff risk) 0 := by
+    unfold decisionRegret
+    norm_num
+  rw [hunfold, treatNetBenefit_eq cutoff risk hne, max_comm]
+
+/-- Regret is never negative: no action beats the better of the two available ones. -/
+theorem decisionRegret_nonneg (cutoff risk : ℝ) (hcutoff : cutoff < 1) (treat : Bool) :
+    0 ≤ decisionRegret cutoff risk treat := by
+  cases treat
+  · rw [decisionRegret_false_eq cutoff risk hcutoff]
+    exact le_max_left _ _
+  · rw [decisionRegret_true_eq cutoff risk hcutoff]
+    exact le_max_left _ _
+
+/-- **Any family straddling the threshold pays, whatever is done.**  For an arbitrary finite
+family of populations -- no two-population reduction, no balanced posterior, no bound on the
+number of ancestries -- if one positively weighted population sits strictly below the clinical
+cutoff and another sits strictly above it, then every ancestry-blind action carries strictly
+positive expected net-benefit regret.  What decides the price is the drift range against the
+threshold, never the number of groups. -/
+theorem driftDecisionRegret_pos_of_straddling {Index : Type*} [Fintype Index]
+    (posterior : Index → ℝ) (conditional : Index → ℝ) (cutoff : ℝ) (hcutoff : cutoff < 1)
+    (hposterior : ∀ t, 0 ≤ posterior t)
+    (low high : Index) (hlowWeight : 0 < posterior low) (hhighWeight : 0 < posterior high)
+    (hlow : conditional low < cutoff) (hhigh : cutoff < conditional high) (treat : Bool) :
+    0 < driftDecisionRegret posterior conditional cutoff treat := by
+  have hpos : (0 : ℝ) < 1 - cutoff := by linarith
+  unfold driftDecisionRegret
+  refine Finset.sum_pos' (fun t _ ↦ mul_nonneg (hposterior t)
+    (decisionRegret_nonneg cutoff (conditional t) hcutoff treat)) ?_
+  cases treat
+  · refine ⟨high, Finset.mem_univ high, ?_⟩
+    rw [decisionRegret_false_eq cutoff (conditional high) hcutoff,
+      max_eq_right (div_nonneg (by linarith) (le_of_lt hpos))]
+    exact mul_pos hhighWeight (div_pos (by linarith) hpos)
+  · refine ⟨low, Finset.mem_univ low, ?_⟩
+    rw [decisionRegret_true_eq cutoff (conditional low) hcutoff,
+      max_eq_right (div_nonneg (by linarith) (le_of_lt hpos))]
+    exact mul_pos hlowWeight (div_pos (by linarith) hpos)
 
 /-- **A drift that stays below the threshold costs nothing either.**  If every population's risk
 is at or below the cutoff, treating nobody is regret-free across the whole family. -/
