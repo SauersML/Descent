@@ -40,6 +40,16 @@ The last section records the intrinsic operator boundary: a linear observation i
 model class exactly when the class difference set meets its kernel only at zero.  The separate
 `SpectrumIdentifiability` module proves the finite-dimensional null-direction theorem and the
 stronger all-sample Müntz obstruction, avoiding two copies of the same rank argument here.
+
+## Main results
+
+- `epochLineageSampleSize_add_epochs`: two additional lineages per added epoch.
+- `spectrumPrecisionMultiplier_add_epochs`: exact `factor ^ (2 * extra)` precision cost.
+- `independentSampleMultiplier_add_epochs`: exact `factor ^ (4 * extra)` data cost.
+- `fixedEpochSampleRateExponent_strictAnti`: global worsening of statistical rates.
+- `collisionSpectrumDiscrepancy_eq_distance_pow`: the sharp finite-difference collision.
+- `identifiableUnderLinearObservation_iff_differenceSet_inter_kernel_subset`: intrinsic
+  nullspace criterion without a nonemptiness assumption.
 -/
 
 open scoped BigOperators
