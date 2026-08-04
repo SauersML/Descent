@@ -160,6 +160,62 @@ theorem speedTiltFullMergerRate_strictAnti_extra
       mul_lt_mul_of_pos_left hfactor hrate
     _ = speedTiltFullMergerRate β extra := mul_one _
 
+/-- Every full-merger coordinate involving at least three lineages is strictly decreasing in
+the speed-bias parameter throughout the biological domain. -/
+theorem speedTiltFullMergerRate_strictAnti_beta
+    {β₁ β₂ : ℝ} (hβ₁ : -1 < β₁) (hβ : β₁ < β₂) (extra : ℕ) :
+    speedTiltFullMergerRate β₂ (extra + 1) <
+      speedTiltFullMergerRate β₁ (extra + 1) := by
+  have hβ₂ : -1 < β₂ := hβ₁.trans hβ
+  induction extra with
+  | zero =>
+      simp only [Nat.zero_add, speedTiltFullMergerRate_one]
+      exact one_div_lt_one_div_of_lt (by linarith) (by linarith)
+  | succ extra ih =>
+      change speedTiltFullMergerRate β₂ ((extra + 1) + 1) <
+        speedTiltFullMergerRate β₁ ((extra + 1) + 1)
+      rw [speedTiltFullMergerRate_succ β₂ (extra + 1),
+        speedTiltFullMergerRate_succ β₁ (extra + 1)]
+      have hfactor₂ :
+          0 < (((extra + 1 : ℕ) : ℝ) + 1) /
+            (β₂ + ((extra + 1 : ℕ) : ℝ) + 2) := by
+        apply div_pos
+        · positivity
+        · have hextra : 0 ≤ (((extra + 1 : ℕ) : ℝ)) := by positivity
+          linarith
+      have hfactor :
+          (((extra + 1 : ℕ) : ℝ) + 1) /
+              (β₂ + ((extra + 1 : ℕ) : ℝ) + 2) <
+            (((extra + 1 : ℕ) : ℝ) + 1) /
+              (β₁ + ((extra + 1 : ℕ) : ℝ) + 2) := by
+        exact div_lt_div_of_pos_left (by positivity) (by linarith) (by linarith)
+      calc
+        speedTiltFullMergerRate β₂ (extra + 1) *
+            ((((extra + 1 : ℕ) : ℝ) + 1) /
+              (β₂ + ((extra + 1 : ℕ) : ℝ) + 2)) <
+            speedTiltFullMergerRate β₁ (extra + 1) *
+              ((((extra + 1 : ℕ) : ℝ) + 1) /
+                (β₂ + ((extra + 1 : ℕ) : ℝ) + 2)) :=
+          mul_lt_mul_of_pos_right ih hfactor₂
+        _ < speedTiltFullMergerRate β₁ (extra + 1) *
+              ((((extra + 1 : ℕ) : ℝ) + 1) /
+                (β₁ + ((extra + 1 : ℕ) : ℝ) + 2)) :=
+          mul_lt_mul_of_pos_left hfactor
+            (speedTiltFullMergerRate_pos hβ₁ (extra + 1))
+
+/-- Any one full-merger coordinate of order at least three identifies the speed-bias parameter
+on the entire admissible domain. The triple rate is the smallest such coordinate, not the only
+one. -/
+theorem speedTiltFullMergerRate_injective_on
+    {β₁ β₂ : ℝ} (hβ₁ : -1 < β₁) (hβ₂ : -1 < β₂) (extra : ℕ)
+    (hrate : speedTiltFullMergerRate β₁ (extra + 1) =
+      speedTiltFullMergerRate β₂ (extra + 1)) :
+    β₁ = β₂ := by
+  rcases lt_trichotomy β₁ β₂ with hlt | heq | hgt
+  · exact False.elim ((speedTiltFullMergerRate_strictAnti_beta hβ₁ hlt extra).ne hrate.symm)
+  · exact heq
+  · exact False.elim ((speedTiltFullMergerRate_strictAnti_beta hβ₂ hgt extra).ne hrate)
+
 /-- Every normalized full-merger coordinate is at most the pair-merger normalization. -/
 theorem speedTiltFullMergerRate_le_one
     {β : ℝ} (hβ : -1 < β) (extra : ℕ) :
