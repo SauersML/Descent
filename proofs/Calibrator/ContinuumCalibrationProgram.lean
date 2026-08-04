@@ -151,6 +151,60 @@ theorem isCellBalanced_identity {Carrier : Type*} [Fintype Carrier] [DecidableEq
   intro c
   simp [IsCellBalanced]
 
+/-- The weighted mean inside a cell.  At a cell of zero mass the division returns Lean's `0`;
+that branch is named and used below rather than excluded, which is what makes the existence
+theorem unconditional.
+
+Empirical status: NOT AN EMPIRICAL CLAIM -- this is an exact finite ratio. -/
+noncomputable def cellMean (weight value : Carrier → ℝ) (cell : Carrier → Cell) (c : Cell) : ℝ :=
+  (∑ a, if cell a = c then weight a * value a else 0) /
+    (∑ a, if cell a = c then weight a else 0)
+
+/-- **The empty-cell branch, named.**  A cell carrying no weight has no mean to report and the
+convention returns zero -- not a value any carrier holds.  Consumers reading `cellMean` as "the
+typical value in this cell" must check the cell is inhabited; the balance theorem below does not
+need to, because a cell of zero mass constrains nothing. -/
+theorem cellMean_of_mass_zero (weight value : Carrier → ℝ) (cell : Carrier → Cell) (c : Cell)
+    (hmass : (∑ a, if cell a = c then weight a else 0) = 0) :
+    cellMean weight value cell c = 0 := by
+  unfold cellMean
+  rw [hmass, div_zero]
+
+/-- **The optimum always exists.**  For nonnegative weights the cellwise mean is cell-balanced --
+with no positivity, nonemptiness, or normalization hypothesis.  Every result about a balanced
+representative is therefore a result about a construction that is always available, rather than a
+conditional statement waiting for a witness. -/
+theorem isCellBalanced_cellMean (weight value : Carrier → ℝ) (cell : Carrier → Cell)
+    (hweight : ∀ a, 0 ≤ weight a) :
+    IsCellBalanced weight value cell (cellMean weight value cell) := by
+  intro c
+  have hsplit : ∀ r : ℝ,
+      (∑ a, if cell a = c then weight a * (value a - r) else 0) =
+        (∑ a, if cell a = c then weight a * value a else 0) -
+          r * ∑ a, if cell a = c then weight a else 0 := by
+    intro r
+    rw [Finset.mul_sum, ← Finset.sum_sub_distrib]
+    refine Finset.sum_congr rfl (fun a _ ↦ ?_)
+    by_cases hcell : cell a = c <;> simp [hcell] <;> ring
+  rw [hsplit]
+  by_cases hmass : (∑ a, if cell a = c then weight a else 0) = 0
+  · have hterm : ∀ a : Carrier, (if cell a = c then weight a else 0) = 0 := by
+      refine fun a ↦ (Finset.sum_eq_zero_iff_of_nonneg ?_).mp hmass a (Finset.mem_univ a)
+      intro b _
+      by_cases hcell : cell b = c <;> simp [hcell, hweight b]
+    have hnum : (∑ a, if cell a = c then weight a * value a else 0) = 0 := by
+      refine Finset.sum_eq_zero (fun a _ ↦ ?_)
+      by_cases hcell : cell a = c
+      · have := hterm a
+        rw [if_pos hcell] at this ⊢
+        rw [this]
+        ring
+      · rw [if_neg hcell]
+    rw [hnum, hmass]
+    ring
+  · unfold cellMean
+    field_simp
+
 /-- **Cellwise balance implies balance overall.**  Summing the per-cell conditions: a
 representative calibrated inside every cell is calibrated in aggregate.  The two demands are
 nested, never opposed -- the finite form of the statement that index-wise calibration implies
@@ -269,6 +323,20 @@ theorem cellBalanced_representative_energy_le_of_refine
   linarith
 
 end CellGeometry
+
+/-- **Half the gap is unavoidable.**  If two candidate values cannot be told apart, then every
+number a predictor might report is wrong by at least half the distance between them, against one
+of the two.  This is the general form of every indistinguishability bound below: the two-point
+drift radius, and the worst-population error of a straddling family. -/
+theorem half_gap_le_max_abs_sub (first second report : ℝ) :
+    |first - second| / 2 ≤ max |first - report| |second - report| := by
+  have htriangle : |first - second| ≤ |first - report| + |report - second| :=
+    abs_sub_le first report second
+  have hcomm : |report - second| = |second - report| := abs_sub_comm report second
+  have hleft : |first - report| ≤ max |first - report| |second - report| := le_max_left _ _
+  have hright : |second - report| ≤ max |first - report| |second - report| := le_max_right _ _
+  rw [hcomm] at htriangle
+  linarith
 
 section StratifiedResolution
 
@@ -489,6 +557,55 @@ theorem calibrationInTheLarge_eq_zero_of_isStratumCalibrated
         ∑ t, posterior x t * predictor (stratify t) x := by linarith
   rw [hmeans]
   ring
+
+/-- The posterior-weighted mean conditional risk inside a stratum, at a covariate: the
+ancestry-specific recalibration a stratified model actually fits.
+
+Empirical status: NOT AN EMPIRICAL CLAIM -- this is `cellMean` evaluated fibrewise. -/
+noncomputable def stratumMean (posterior : Covariate → Index → ℝ)
+    (conditional : Index → Covariate → ℝ) (stratify : Index → Stratum) (s : Stratum)
+    (x : Covariate) : ℝ :=
+  cellMean (posterior x) (fun t ↦ conditional t x) stratify s
+
+/-- **The stratified optimum always exists.**  For a nonnegative posterior the stratum mean is
+stratum-calibrated, with no positivity or normalization hypothesis: strata of zero posterior mass
+constrain nothing and are absorbed by the convention.  Every optimality, complementarity and
+refinement result above is therefore about a recalibration that can always be written down. -/
+theorem isStratumCalibrated_stratumMean (posterior : Covariate → Index → ℝ)
+    (conditional : Index → Covariate → ℝ) (stratify : Index → Stratum)
+    (hposterior : ∀ x t, 0 ≤ posterior x t) :
+    IsStratumCalibrated posterior conditional stratify
+      (stratumMean posterior conditional stratify) :=
+  fun x ↦ isCellBalanced_cellMean (posterior x) (fun t ↦ conditional t x) stratify (hposterior x)
+
+/-- **The stratum mean is optimal, unconditionally.**  No ancestry-specific recalibration of the
+same stratification has lower index-wise calibration energy. -/
+theorem stratifiedCalibrationEnergy_stratumMean_le (covariateWeight : Covariate → ℝ)
+    (posterior : Covariate → Index → ℝ) (conditional : Index → Covariate → ℝ)
+    (stratify : Index → Stratum) (other : Stratum → Covariate → ℝ)
+    (hweight : ∀ x, 0 ≤ covariateWeight x) (hposterior : ∀ x t, 0 ≤ posterior x t) :
+    stratifiedCalibrationEnergy covariateWeight posterior conditional stratify
+        (stratumMean posterior conditional stratify) ≤
+      stratifiedCalibrationEnergy covariateWeight posterior conditional stratify other :=
+  stratifiedCalibrationEnergy_le_of_isStratumCalibrated covariateWeight posterior conditional
+    stratify (stratumMean posterior conditional stratify) other
+    (isStratumCalibrated_stratumMean posterior conditional stratify hposterior) hweight hposterior
+
+/-- **The split is available for every family.**  The pooled drift defect equals the stratum
+mean's irreducible residual plus the resolution it buys -- stated for the recalibration that
+always exists, so this is a decomposition of the defect rather than a conditional identity. -/
+theorem calibrationDriftDefectSq_eq_stratumMean_split (covariateWeight : Covariate → ℝ)
+    (posterior : Covariate → Index → ℝ) (conditional : Index → Covariate → ℝ)
+    (stratify : Index → Stratum)
+    (hposterior : ∀ x t, 0 ≤ posterior x t) (hnormalized : ∀ x, ∑ t, posterior x t = 1) :
+    calibrationDriftDefectSq covariateWeight posterior conditional =
+      stratifiedCalibrationEnergy covariateWeight posterior conditional stratify
+          (stratumMean posterior conditional stratify) +
+        stratumResolutionEnergy covariateWeight posterior conditional stratify
+          (stratumMean posterior conditional stratify) :=
+  calibrationDriftDefectSq_eq_stratified_add_resolution covariateWeight posterior conditional
+    stratify (stratumMean posterior conditional stratify)
+    (isStratumCalibrated_stratumMean posterior conditional stratify hposterior) hnormalized
 
 /-- **Residual and resolution are complementary.**  The drift defect of the pooled theory splits,
 exactly, into the within-stratum residual a stratified recalibration cannot remove and the
@@ -1016,28 +1133,23 @@ theorem indexWiseCalibrationEnergy_swappedConditional_eq (centre radius : ℝ)
 for every value a predictor might report there, one of the two indistinguishable fields is wrong
 by at least the drift radius.  Since the fields agree on every observable, this is a bound no
 design and no sample size improves. -/
-theorem unqueried_error_ge_radius (centre radius v : ℝ) (t : Bool) :
+theorem unqueried_error_ge_radius (centre radius v : ℝ) (hradius : 0 ≤ radius) (t : Bool) :
     radius ≤ max |swappedConditional centre radius t () - v|
       |swappedConditionalMirror centre radius t () - v| := by
-  have hkey : ∀ A B : ℝ, A - B = 2 * radius ∨ B - A = 2 * radius →
-      radius ≤ max |A| |B| := by
+  have hkey : ∀ A B : ℝ, |A - B| = 2 * radius → radius ≤ max |A - v| |B - v| := by
     intro A B hgap
-    have hleft : |A| ≤ max |A| |B| := le_max_left _ _
-    have hright : |B| ≤ max |A| |B| := le_max_right _ _
-    rcases hgap with hgap | hgap
-    · have h1 : A ≤ |A| := le_abs_self A
-      have h2 : -B ≤ |B| := by
-        rcases abs_cases B with ⟨habs, _⟩ | ⟨habs, _⟩ <;> linarith
-      linarith
-    · have h1 : B ≤ |B| := le_abs_self B
-      have h2 : -A ≤ |A| := by
-        rcases abs_cases A with ⟨habs, _⟩ | ⟨habs, _⟩ <;> linarith
-      linarith
+    have hhalf := half_gap_le_max_abs_sub A B v
+    rw [hgap] at hhalf
+    linarith
   cases t
-  · refine hkey _ _ (Or.inr ?_)
-    norm_num [swappedConditional, swappedConditionalMirror] <;> ring
-  · refine hkey _ _ (Or.inl ?_)
-    norm_num [swappedConditional, swappedConditionalMirror] <;> ring
+  · refine hkey _ _ ?_
+    norm_num [swappedConditional, swappedConditionalMirror]
+    rw [show centre - radius - (centre + radius) = -(2 * radius) by ring, abs_neg,
+      abs_of_nonneg (by linarith : (0:ℝ) ≤ 2 * radius)]
+  · refine hkey _ _ ?_
+    norm_num [swappedConditional, swappedConditionalMirror]
+    rw [show centre + radius - (centre - radius) = 2 * radius by ring,
+      abs_of_nonneg (by linarith : (0:ℝ) ≤ 2 * radius)]
 
 /-- **And the pooled mean attains it.**  Reporting the posterior mean at an unqueried population
 is wrong by exactly the drift radius against both candidates, which with the previous theorem

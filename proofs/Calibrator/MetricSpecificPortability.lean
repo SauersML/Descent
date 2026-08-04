@@ -611,10 +611,7 @@ noncomputable def fisherTraceMSELowerBound
     (nEff nParams infoPerSample : ℝ) : ℝ :=
   adaptationDifficultyIndex nParams infoPerSample / nEff
 
-/-- **fisherTraceMSELowerBound at zero nEff, named.** With zero effective sample size the trace-MSE
-bound diverges: nothing is estimable. Lean returns `0`, a floor of zero, which certifies perfect
-estimation from no effective data. A lower bound that vanishes where estimation is impossible
-certifies rather than warns. Consumers must require `nEff ≠ 0`. -/
+/-- **fisherTraceMSELowerBound at zero nEff, named.** With zero effective sample size the trace-MSE bound diverges: nothing is estimable. Lean returns `0`, a floor of zero, which certifies perfect estimation from no effective data. A lower bound that vanishes where estimation is impossible certifies rather than warns. Consumers must require `nEff ≠ 0`. -/
 theorem fisherTraceMSELowerBound_zero_neff_is_junk (nParams infoPerSample : ℝ) :
     fisherTraceMSELowerBound 0 nParams infoPerSample = 0 := by
   unfold fisherTraceMSELowerBound
@@ -629,11 +626,8 @@ noncomputable def requiredEffectiveSampleSizeForTraceMSE
     (nParams infoPerSample targetTraceMSE : ℝ) : ℝ :=
   adaptationDifficultyIndex nParams infoPerSample / targetTraceMSE
 
-/-- **requiredEffectiveSampleSizeForTraceMSE at zero targetTraceMSE, named.** A target trace-MSE
-of zero demands infinite data. Lean returns `0`, reporting that exact recovery is free. Consumers
-must require `targetTraceMSE ≠ 0`. -/
-theorem requiredEffectiveSampleSizeForTraceMSE_zero_targettracemse_is_junk
-    (nParams infoPerSample : ℝ) :
+/-- **requiredEffectiveSampleSizeForTraceMSE at zero targetTraceMSE, named.** A target trace-MSE of zero demands infinite data. Lean returns `0`, reporting that exact recovery is free. Consumers must require `targetTraceMSE ≠ 0`. -/
+theorem requiredEffectiveSampleSizeForTraceMSE_zero_targettracemse_is_junk (nParams infoPerSample : ℝ) :
     requiredEffectiveSampleSizeForTraceMSE nParams infoPerSample 0 = 0 := by
   unfold requiredEffectiveSampleSizeForTraceMSE
   simp
@@ -1476,7 +1470,7 @@ rather than a matter of opinion.
 /-- Two ancestries at equal weight in the deployment population.
 
 Empirical status: NOT AN EMPIRICAL CLAIM -- these rational weights define a proof witness. -/
-noncomputable def ancestryPairWeights : Fin 2 → ℝ := uniformTwoWeights
+noncomputable def ancestryPairWeights : Fin 2 → ℝ := ![1 / 2, 1 / 2]
 
 /-- Their risks at one fine covariate value: a large pointwise disagreement.
 
@@ -1486,7 +1480,7 @@ noncomputable def fineRiskByAncestry : Fin 2 → ℝ := ![4 / 5, 1 / 5]
 /-- Their BIN-AVERAGED risks, which agree: the bin averages the disagreement away.
 
 Empirical status: NOT AN EMPIRICAL CLAIM -- these values define a proof witness. -/
-noncomputable def binnedRiskByAncestry : Fin 2 → ℝ := ancestryPairWeights
+noncomputable def binnedRiskByAncestry : Fin 2 → ℝ := ![1 / 2, 1 / 2]
 
 /-- The equal ancestry-pair weights reuse the earlier uniform two-ancestry quantity. -/
 theorem ancestryPairWeights_eq_uniformTwoWeights : ancestryPairWeights = uniformTwoWeights := by
@@ -1527,6 +1521,7 @@ theorem refining_reveals_drift :
       < driftDefect ancestryPairWeights fineRiskByAncestry := by
   rw [binnedRisk_driftDefect_zero]
   exact fineRisk_driftDefect_pos
+
 
 /-! #### Resolution does not order the defect
 
@@ -1602,7 +1597,6 @@ theorem vResolvedConditional_resolution_zero :
   norm_num [Fin.sum_univ_two, bitSign, Matrix.cons_val_zero, Matrix.cons_val_one,
     Matrix.head_cons]
 
-
 /-! #### Drift invisible to genotype is irreducible by any amount of genotyping
 
 The defect splits into a part measurable with respect to the genotype-distribution structure and a
@@ -1632,7 +1626,7 @@ that portion is, and the empirical claim is that it may be the smaller one.
 inferred ancestry coordinate, assigns them the common value.
 
 Empirical status: NOT AN EMPIRICAL CLAIM -- these values define a nonidentifiability witness. -/
-noncomputable def genotypeVisibleRisk : Fin 2 → ℝ := twoBitIndexWeights
+noncomputable def genotypeVisibleRisk : Fin 2 → ℝ := ![1 / 2, 1 / 2]
 
 /-- Their true conditional risks, which differ.
 
@@ -1778,15 +1772,6 @@ rule can be called optimal.
 Empirical status: NOT AN EMPIRICAL CLAIM -- this is the algebraic objective being optimized. -/
 noncomputable def twoCellL2EstimationPenalty (p n₁ n₂ : ℝ) : ℝ :=
   p / n₁ + (1 - p) / n₂
-
-/-- **twoCellL2EstimationPenalty where its denominator vanishes, named.** The guard `n₁` is zero at
-`n₁ = 0`. Lean returns `(1 - p) / n₂` there rather than the value the modelled quantity takes,
-and no type error marks the point. Consumers must require `n₁ ≠ 0`. -/
-theorem twoCellL2EstimationPenalty_at_n0_is_junk (p : ℝ) (n₂ : ℝ) :
-    twoCellL2EstimationPenalty p 0 n₂ = (1 - p) / n₂ := by
-  unfold twoCellL2EstimationPenalty
-  norm_num
-  try ring
 
 /-- The two-cell worst-ancestry estimation error when both cells have equal observation noise.
 
@@ -1967,27 +1952,57 @@ theorem constantConditional_driftDefect_zero {m : ℕ} (π : Fin m → ℝ) (c :
   rw [hpool]
   simp
 
-/-- **And the converse**, which the "exactly when" above asserts and the theorem before it does
-not supply. If every ancestry carries positive weight and the defect vanishes, then every
-ancestry's conditional equals the pooled one -- so the defect is zero precisely on the
-non-drifting conditionals, and a zero defect is evidence about the biology rather than an
-artefact of the weighting.
+/-! #### The score's own distribution cannot see how it aligns with ancestry
 
-The positivity hypothesis is needed and is not decoration: an ancestry of weight zero contributes
-nothing to the defect and its conditional is unconstrained. -/
-theorem constantConditional_of_driftDefect_zero {m : ℕ} (π η : Fin m → ℝ)
-    (hpos : ∀ i, 0 < π i) (h : driftDefect π η = 0) (i : Fin m) :
-    η i = pooledConditional π η := by
-  unfold driftDefect at h
-  have hnn : ∀ j ∈ (Finset.univ : Finset (Fin m)),
-      0 ≤ π j * (η j - pooledConditional π η) ^ 2 :=
-    fun j _ ↦ mul_nonneg (hpos j).le (sq_nonneg _)
-  have hzero := (Finset.sum_eq_zero_iff_of_nonneg hnn).mp h i (Finset.mem_univ i)
-  have hsq : (η i - pooledConditional π η) ^ 2 = 0 :=
-    (mul_eq_zero.mp hzero).resolve_left (hpos i).ne'
-  have hx : η i - pooledConditional π η = 0 := by
-    exact sq_eq_zero_iff.mp hsq
-  linarith
+`pooledConditional_does_not_identify_drift` says the pooled conditional cannot see drift across
+ancestries. This is the same failure one layer up, in the metric: the DISTRIBUTION of a score's
+values across a population does not determine how those values are arranged relative to ancestry
+distance.
+
+Three ancestries at metric positions `0, 1, 3`, equally weighted, and a score taking the values
+`0, 1, 2`. Permuting which ancestry receives which value leaves the score's distribution exactly
+unchanged, and the ancestry geometry exactly unchanged, while the alignment energy moves from
+`10/3` to `2`. So no functional of the score's marginal distribution -- not its mean, variance,
+quantiles, or full histogram -- can detect alignment.
+-/
+
+/-- Three ancestries at positions `0`, `1`, `3` on the line. -/
+noncomputable def threeAncestryDistance : Fin 3 → Fin 3 → ℝ :=
+  ![![0, 1, 3], ![1, 0, 2], ![3, 2, 0]]
+
+/-- A score assigning values `0, 1, 2` to the three ancestries. -/
+noncomputable def ancestryScore : Fin 3 → ℝ := ![0, 1, 2]
+
+/-- The same three values, permuted between the ancestries. -/
+noncomputable def ancestryScoreSwapped : Fin 3 → ℝ := ![0, 2, 1]
+
+/-- Dirichlet-type energy coupling ancestry distance to score differences. -/
+noncomputable def ancestryAlignmentEnergy (m : Fin 3 → ℝ) : ℝ :=
+  (1 / 9) * ∑ i, ∑ j, threeAncestryDistance i j * (m i - m j) ^ 2
+
+/-- **The two scores have the same marginal**, being the same values permuted. -/
+theorem ancestryScoreSwapped_is_permutation :
+    ancestryScoreSwapped = ancestryScore ∘ ![0, 2, 1] := by
+  funext i
+  fin_cases i <;>
+    simp [ancestryScore, ancestryScoreSwapped, Matrix.cons_val_zero, Matrix.cons_val_one,
+      Matrix.head_cons]
+
+/-- **The aligned arrangement's energy.** -/
+theorem ancestryAlignmentEnergy_score : ancestryAlignmentEnergy ancestryScore = 10 / 3 := by
+  unfold ancestryAlignmentEnergy threeAncestryDistance ancestryScore
+  norm_num [Fin.sum_univ_three, Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons,
+    Matrix.cons_val_two, Matrix.tail_cons]
+
+/-- **The permuted arrangement's energy**, against the same metric and the same score values.
+
+With `ancestryScoreSwapped_is_permutation` this is the separation: identical ancestry geometry,
+identical score distribution, different alignment. -/
+theorem ancestryAlignmentEnergy_swapped : ancestryAlignmentEnergy ancestryScoreSwapped = 2 := by
+  unfold ancestryAlignmentEnergy threeAncestryDistance ancestryScoreSwapped
+  norm_num [Fin.sum_univ_three, Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons,
+    Matrix.cons_val_two, Matrix.tail_cons]
+
 
 /-! #### A rare ancestry is not proportionately harmless
 
@@ -2035,68 +2050,27 @@ theorem rareAncestry_defect_exceeds_share_squared (ε : ℝ) (h0 : 0 < ε) (h1 :
   rw [rareAncestry_driftDefect_eq]
   nlinarith
 
-/-! #### The score's own distribution cannot see how it aligns with ancestry
+/-- **And the converse**, which the "exactly when" above asserts and the theorem before it does
+not supply. If every ancestry carries positive weight and the defect vanishes, then every
+ancestry's conditional equals the pooled one -- so the defect is zero precisely on the
+non-drifting conditionals, and a zero defect is evidence about the biology rather than an
+artefact of the weighting.
 
-`pooledConditional_does_not_identify_drift` says the pooled conditional cannot see drift across
-ancestries. This is the same failure one layer up, in the metric: the DISTRIBUTION of a score's
-values across a population -- its margin -- does not determine how those values are arranged
-relative to ancestry distance.
-
-Three ancestries at metric positions `0, 1, 3`, equally weighted, and a score taking the values
-`0, 1, 2`. Permuting which ancestry receives which value leaves the score's distribution exactly
-unchanged, and leaves the ancestry geometry exactly unchanged, while the alignment energy moves
-from `10/3` to `2`.
-
-So no functional of the score's marginal distribution -- not its mean, variance, quantiles, or
-full histogram -- can detect alignment. Reporting the distribution of polygenic scores in a
-cohort, however finely, is compatible with both arrangements. Detecting alignment requires a
-statistic that couples distances to values, which is what the energy below does.
--/
-
-/-- Three ancestries at positions `0`, `1`, `3` on the line.
-
-Empirical status: NOT AN EMPIRICAL CLAIM -- this reuses the decorated-geometry witness. -/
-noncomputable def threeAncestryDistance : Fin 3 → Fin 3 → ℝ := witnessDivergence
-
-/-- A score assigning values `0`, `1`, `2` to the three ancestries.
-
-Empirical status: NOT AN EMPIRICAL CLAIM -- this reuses the aligned decoration witness. -/
-noncomputable def ancestryScore : Fin 3 → ℝ := witnessAlignedField
-
-/-- The same three values, permuted between the ancestries.
-
-Empirical status: NOT AN EMPIRICAL CLAIM -- this reuses the swapped decoration witness. -/
-noncomputable def ancestryScoreSwapped : Fin 3 → ℝ := witnessSwappedField
-
-/-- Dirichlet-type energy coupling ancestry distance to score differences.
-
-Empirical status: NOT AN EMPIRICAL CLAIM -- this is the canonical decorated alignment energy. -/
-noncomputable def ancestryAlignmentEnergy : (Fin 3 → ℝ) → ℝ :=
-  alignmentEnergy witnessWeight witnessDivergence
-
-/-- The ancestry-specific name is definitionally the decorated-geometry alignment functional. -/
-theorem ancestryAlignmentEnergy_eq_alignmentEnergy :
-    ancestryAlignmentEnergy = alignmentEnergy witnessWeight witnessDivergence := rfl
-
-/-- **The two scores have the same marginal**, being the same values permuted. -/
-theorem ancestryScoreSwapped_is_permutation :
-    ancestryScoreSwapped = ancestryScore ∘ ![0, 2, 1] := by
-  funext i
-  fin_cases i <;>
-    simp [ancestryScore, ancestryScoreSwapped, Matrix.cons_val_zero, Matrix.cons_val_one,
-      Matrix.head_cons]
-
-/-- **The aligned arrangement's energy.** -/
-theorem ancestryAlignmentEnergy_score : ancestryAlignmentEnergy ancestryScore = 10 / 3 := by
-  exact alignmentEnergy_witnessAligned_eq
-
-/-- **The permuted arrangement's energy**, against the same metric and the same score values.
-
-With `ancestryScoreSwapped_is_permutation` this is the separation: identical ancestry geometry,
-identical score distribution, different alignment. -/
-theorem ancestryAlignmentEnergy_swapped : ancestryAlignmentEnergy ancestryScoreSwapped = 2 := by
-  exact alignmentEnergy_witnessSwapped_eq
-
+The positivity hypothesis is needed and is not decoration: an ancestry of weight zero contributes
+nothing to the defect and its conditional is unconstrained. -/
+theorem constantConditional_of_driftDefect_zero {m : ℕ} (π η : Fin m → ℝ)
+    (hpos : ∀ i, 0 < π i) (h : driftDefect π η = 0) (i : Fin m) :
+    η i = pooledConditional π η := by
+  unfold driftDefect at h
+  have hnn : ∀ j ∈ (Finset.univ : Finset (Fin m)),
+      0 ≤ π j * (η j - pooledConditional π η) ^ 2 :=
+    fun j _ ↦ mul_nonneg (hpos j).le (sq_nonneg _)
+  have hzero := (Finset.sum_eq_zero_iff_of_nonneg hnn).mp h i (Finset.mem_univ i)
+  have hsq : (η i - pooledConditional π η) ^ 2 = 0 :=
+    (mul_eq_zero.mp hzero).resolve_left (hpos i).ne'
+  have hx : η i - pooledConditional π η = 0 := by
+    exact sq_eq_zero_iff.mp hsq
+  linarith
 
 /-- **The gap is bounded by the two sensitivities it compares.** Symmetry and the vanishing
 criterion are shared by every positive multiple of this distance; the triangle bound is not,
