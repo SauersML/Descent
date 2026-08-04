@@ -506,6 +506,39 @@ theorem finiteEnvironmentCovariancePool_mulVec_ne_zero_of_exists
       ⟨environment, hweight environment, hdetect⟩
 
 omit [DecidableEq ι] in
+/-- **Strict active-diversity gain.** The pooled nullspace is strictly smaller than an active
+reference environment's nullspace exactly when some active environment detects a direction the
+reference misses. Inactive cohorts cannot witness strict shrinkage. -/
+theorem finiteEnvironmentCovariancePool_kernel_ssubset_active
+    {κ : Type*} [Fintype κ]
+    (weight : κ → ℝ) (covariance : κ → Matrix ι ι ℝ)
+    (reference : κ)
+    (hweight : ∀ environment, 0 ≤ weight environment)
+    (hreferenceActive : 0 < weight reference)
+    (hpsd : PositiveSemidefiniteFamily covariance)
+    (hseparates : ∃ shift : ι → ℝ,
+      (covariance reference).mulVec shift = 0 ∧
+        ∃ environment, 0 < weight environment ∧
+          (covariance environment).mulVec shift ≠ 0) :
+    {shift : ι → ℝ |
+      (finiteEnvironmentCovariancePool weight covariance).mulVec shift = 0} ⊂
+        {shift : ι → ℝ | (covariance reference).mulVec shift = 0} := by
+  apply Set.ssubset_iff_subset_ne.mpr
+  constructor
+  · intro shift hpool
+    exact (finiteEnvironmentCovariancePool_mulVec_eq_zero_iff_active
+      weight covariance hweight hpsd shift).mp hpool reference hreferenceActive
+  · obtain ⟨shift, hreference, hdetected⟩ := hseparates
+    intro hequal
+    have hpool : (finiteEnvironmentCovariancePool weight covariance).mulVec shift = 0 := by
+      change shift ∈ {shift : ι → ℝ |
+        (finiteEnvironmentCovariancePool weight covariance).mulVec shift = 0}
+      rw [hequal]
+      exact hreference
+    exact finiteEnvironmentCovariancePool_mulVec_ne_zero_of_exists_active
+      weight covariance hweight hpsd shift hdetected hpool
+
+omit [DecidableEq ι] in
 /-- **Strict diversity gain.** The pooled nullspace is strictly smaller than a reference
 environment's nullspace whenever another environment detects at least one direction that the
 reference environment misses. This is the exact algebraic condition under which adding an
@@ -522,20 +555,11 @@ theorem finiteEnvironmentCovariancePool_kernel_ssubset
     {shift : ι → ℝ |
       (finiteEnvironmentCovariancePool weight covariance).mulVec shift = 0} ⊂
         {shift : ι → ℝ | (covariance reference).mulVec shift = 0} := by
-  apply Set.ssubset_iff_subset_ne.mpr
-  constructor
-  · intro shift hpool
-    exact (finiteEnvironmentCovariancePool_mulVec_eq_zero_iff
-      weight covariance hweight hpsd shift).mp hpool reference
-  · obtain ⟨shift, hreference, hdetected⟩ := hseparates
-    intro hequal
-    have hpool : (finiteEnvironmentCovariancePool weight covariance).mulVec shift = 0 := by
-      change shift ∈ {shift : ι → ℝ |
-        (finiteEnvironmentCovariancePool weight covariance).mulVec shift = 0}
-      rw [hequal]
-      exact hreference
-    exact finiteEnvironmentCovariancePool_mulVec_ne_zero_of_exists
-      weight covariance hweight hpsd shift hdetected hpool
+  apply finiteEnvironmentCovariancePool_kernel_ssubset_active
+    weight covariance reference (fun environment ↦ (hweight environment).le)
+      (hweight reference) hpsd
+  obtain ⟨shift, hreference, environment, hdetect⟩ := hseparates
+  exact ⟨shift, hreference, environment, hweight environment, hdetect⟩
 
 /-! ## Singular portability boundary -/
 
