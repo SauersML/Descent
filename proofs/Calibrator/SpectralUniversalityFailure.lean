@@ -444,15 +444,29 @@ theorem localizedUniformFourthInvariant_eq :
         (x ^ 4 + 2 * x ^ 3 + 3 * x ^ 2 + 2 * x + 1 / 2) x := by
     intro x _
     have h5 : HasDerivAt (fun a : ℝ ↦ a ^ 5 / 5) (x ^ 4) x := by
-      simpa using (hasDerivAt_pow 5 x).div_const 5
+      have h := (hasDerivAt_pow 5 x).div_const 5
+      convert h using 1
+      push_cast
+      ring
     have h4 : HasDerivAt (fun a : ℝ ↦ a ^ 4 / 2) (2 * x ^ 3) x := by
-      simpa using (hasDerivAt_pow 4 x).div_const 2
+      have h := (hasDerivAt_pow 4 x).div_const 2
+      convert h using 1
+      push_cast
+      ring
     have h3 : HasDerivAt (fun a : ℝ ↦ a ^ 3) (3 * x ^ 2) x := by
-      simpa using hasDerivAt_pow 3 x
+      have h := hasDerivAt_pow 3 x
+      convert h using 1
+      push_cast
+      ring
     have h2 : HasDerivAt (fun a : ℝ ↦ a ^ 2) (2 * x) x := by
-      simpa using hasDerivAt_pow 2 x
+      have h := hasDerivAt_pow 2 x
+      convert h using 1
+      push_cast
+      ring
     have h1 : HasDerivAt (fun a : ℝ ↦ a / 2) (1 / 2 : ℝ) x := by
-      simpa using (hasDerivAt_id x).div_const 2
+      have h := (hasDerivAt_id x).div_const 2
+      convert h using 1
+      norm_num
     exact (((h5.add h4).add h3).add h2).add h1
   rw [intervalIntegral.integral_eq_sub_of_hasDerivAt hderiv
     (Continuous.intervalIntegrable (by fun_prop) 1 2)]
@@ -478,12 +492,19 @@ theorem rotatedUniformFourthInvariant_eq :
     have h4 : HasDerivAt (fun a : ℝ ↦ a ^ 4 / 2) (2 * x ^ 3) x := by
       simpa using (hasDerivAt_pow 4 x).div_const 2
     have h3 : HasDerivAt (fun a : ℝ ↦ a ^ 3 / 2) (3 / 2 * x ^ 2) x := by
-      simpa using (hasDerivAt_pow 3 x).div_const 2
+      have h := (hasDerivAt_pow 3 x).div_const 2
+      convert h using 1
+      push_cast
+      ring
     have h2 : HasDerivAt (fun a : ℝ ↦ a ^ 2 / 4) (1 / 2 * x) x := by
-      have := (hasDerivAt_pow 2 x).div_const 4
-      simpa using this
+      have h := (hasDerivAt_pow 2 x).div_const 4
+      convert h using 1
+      push_cast
+      ring
     have h1 : HasDerivAt (fun a : ℝ ↦ a / 8) (1 / 8 : ℝ) x := by
-      simpa using (hasDerivAt_id x).div_const 8
+      have h := (hasDerivAt_id x).div_const 8
+      convert h using 1
+      norm_num
     exact (((h5.add h4).add h3).add h2).add h1
   rw [intervalIntegral.integral_eq_sub_of_hasDerivAt hderiv
     (Continuous.intervalIntegrable (by fun_prop) 1 2)]
