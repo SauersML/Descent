@@ -355,6 +355,37 @@ theorem factoredCorrection_apply_norm_le
     ‖(T.comp A) β‖ ≤ ‖T‖ * ‖A β‖ := by
   exact T.le_opNorm (A β)
 
+/-- **Simultaneous finite-dictionary blindness.** If `A` has unit approximate-kernel vectors,
+then for every fixed finite family of bounded post-processors and every positive tolerance there
+is one unit target on which all corrected observations are smaller than that tolerance.
+
+The same witness works for the whole dictionary; choosing a different deep vector for each
+operator would not be enough for an adaptive span obstruction. -/
+theorem finite_postprocessors_simultaneously_small
+    (A : H →L[ℝ] Y) (hdeep : HasUnitApproxKernel A)
+    {k : ℕ} (T : Fin k → Y →L[ℝ] H) (ε : ℝ) (hε : 0 < ε) :
+    ∃ β : H, ‖β‖ = 1 ∧ ∀ j : Fin k, ‖(T j) (A β)‖ < ε := by
+  let budget : ℝ := ∑ j, ‖T j‖ + 1
+  have hbudget : 0 < budget := by
+    dsimp [budget]
+    have hsum : 0 ≤ ∑ j, ‖T j‖ := Finset.sum_nonneg fun j _ ↦ norm_nonneg (T j)
+    linarith
+  obtain ⟨β, hunit, hdepth⟩ := hdeep (ε / budget) (div_pos hε hbudget)
+  refine ⟨β, hunit, ?_⟩
+  intro j
+  have hjSum : ‖T j‖ ≤ ∑ i, ‖T i‖ :=
+    Finset.single_le_sum (fun i _ ↦ norm_nonneg (T i)) (Finset.mem_univ j)
+  have hjBudget : ‖T j‖ < budget := by
+    dsimp [budget]
+    linarith
+  have hscaledPos : 0 < ε / budget := div_pos hε hbudget
+  calc
+    ‖(T j) (A β)‖ ≤ ‖T j‖ * ‖A β‖ := (T j).le_opNorm (A β)
+    _ ≤ ‖T j‖ * (ε / budget) :=
+      mul_le_mul_of_nonneg_left hdepth (norm_nonneg (T j))
+    _ < budget * (ε / budget) := mul_lt_mul_of_pos_right hjBudget hscaledPos
+    _ = ε := by field_simp
+
 /-- **Approximate-kernel correction barrier.**  Any bounded post-processing correction leaves at
 least `‖β‖ - ‖T‖ ‖Aβ‖` residual on target `β`.  This is the quantitative lower bound from which the
 uniform modulus and the infinite-dimensional 0--1 obstruction start. -/
