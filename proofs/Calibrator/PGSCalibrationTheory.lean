@@ -1656,6 +1656,58 @@ theorem recalibrationTraceMSELowerBound_mul_information
   unfold recalibrationTraceMSELowerBound
   exact div_mul_cancel₀ _ h
 
+/-! ### Post-hoc recalibration cannot reorder, and refitting can
+
+`logistic_recalibration_corrects_citl_and_slope` shows an affine map in the logit fixes
+calibration-in-the-large and the calibration slope, and `logistic_recalibration_preserves_auc`
+shows it leaves discrimination untouched. The second is usually read as reassurance. It is also a
+limitation, and this section makes the limitation exact.
+
+A post-hoc recalibration is a monotone map applied to a fitted score, and monotone maps preserve
+order. So if the true conditional risk ranks two individuals in the opposite order to the fitted
+score, NO recalibration recovers it -- not Platt, not isotonic, not any procedure whose only
+input is the score. Refitting the index does recover it, and the witness below exhibits both
+halves on two individuals.
+
+This is what separates recalibration from joint estimation. Fitting a link and an index together
+can move the ranking; fitting the index under a fixed link and repairing the output afterwards
+cannot. The gap is not a matter of sample size, and no amount of calibration data closes it.
+
+Empirical status: DERIVED. The witness is exhibited, not measured; the claim is about what
+post-hoc maps can express.
+-/
+
+/-- Fitted scores of two individuals. -/
+noncomputable def reorderScore : Fin 2 -> Real := ![0, 1]
+
+/-- A target conditional risk that ranks the same two individuals the other way. -/
+noncomputable def reorderTarget : Fin 2 -> Real := ![4 / 5, 1 / 5]
+
+/-- **No monotone recalibration of the fitted score attains the target.**
+
+The proof is one application of monotonicity: the score puts individual `0` below individual `1`,
+so any monotone map puts their recalibrated risks in that order too, while the target does not. -/
+theorem posthoc_recalibration_cannot_reorder :
+    ¬ ∃ g : Real -> Real, Monotone g ∧ ∀ i, g (reorderScore i) = reorderTarget i := by
+  rintro ⟨g, hmono, hg⟩
+  have hle : g (reorderScore 0) ≤ g (reorderScore 1) := by
+    apply hmono
+    norm_num [reorderScore]
+  rw [hg 0, hg 1] at hle
+  norm_num [reorderTarget] at hle
+
+/-- **Refitting the index does attain it.** Flipping the sign of the linear predictor reverses the
+ranking, after which an affine recalibration lands exactly on the target. The pair with the
+theorem above is the content: the target is not unreachable, it is unreachable *post hoc*. -/
+theorem refit_attains_reordered_target :
+    ∃ g : Real -> Real, Monotone g ∧ ∀ i, g (-(reorderScore i)) = reorderTarget i := by
+  refine ⟨fun t => 4 / 5 + 3 / 5 * t, ?_, ?_⟩
+  · intro u v huv
+    simp only
+    linarith
+  · intro i
+    fin_cases i <;> norm_num [reorderScore, reorderTarget]
+
 /-- **Exact event threshold for a target recalibration precision goal.**
     Solving `d / (n_events * I_event) ≤ τ` for `n_events` gives the exact event
     requirement `d / (I_event * τ)`. Specializing to logistic recalibration
