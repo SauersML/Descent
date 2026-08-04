@@ -97,9 +97,7 @@ theorem ncp_increases_with_n (n₁ n₂ : ℕ) (beta p : ℝ)
 
 /-- **Power of the Wald test at significance threshold `z_α`.**
 
-    `Φ(√ncp - z_α)`.  Numerical comparison against exact non-central
-    chi-squared power agrees to five decimals across `α ∈ {0.05, 5·10⁻⁸}` and
-    `ncp ∈ {1, …, 20}`.
+    `Φ(√ncp - z_α)`.
 
     The threshold argument is essential: a power formula without one, such as
     `1 - exp(-ncp/2)`, returns a single number for a nominal test and a genome-wide scan
@@ -122,12 +120,29 @@ theorem ncp_increases_with_n (n₁ n₂ : ℕ) (beta p : ℝ)
     two-sided column is what a chi-squared test at `α = 0.05` (critical value
     `3.8415`) has.
 
-    Empirical status: VALIDATED at `α = 5·10⁻⁸` (matches exact non-central
-    chi-squared power to five decimals). **The `α = 0.05` cell is UNTESTED
-    pending re-measurement**: the five-decimal agreement claim cannot cover both
-    columns, since they do not share a convention, and the corrected values
-    quoted above are analytic normal-CDF evaluations, not a fresh run against
-    `ncx2`. Re-running that comparison at the two-sided threshold is owed.
+    Empirical status: **VALIDATED under the two-sided reading, and the
+    five-decimal claim is CORRECTED at one cell.** Recomputed against
+    `scipy.stats.ncx2` at one degree of freedom, critical value `z_α²`:
+
+      α        ncp   this def (two-sided)   exact ncx2      one-sided
+      0.05       1        0.16854            0.17008         0.25951
+      0.05       5        0.60877            0.60878         0.72281
+      0.05      10        0.88538            0.88538         0.93542
+      0.05      20        0.99400            0.99400         0.99765
+      5e-8       1        0.00000            0.00000         0.00001
+      5e-8       5        0.00065            0.00065         0.00100
+      5e-8      10        0.01104            0.01104         0.01522
+      5e-8      20        0.16375            0.16375         0.19639
+
+    Two things fall out. The `one-sided` column reproduces the old `α = 0.05`
+    row (`0.2595`, `0.7228`, `0.9354`, `0.9977`) exactly and reproduces none of
+    the `α = 5·10⁻⁸` row, which settles which convention each was computed
+    under. And **the five-decimal agreement does NOT hold at `ncp = 1`,
+    `α = 0.05`**: `0.16854` against `0.17008`. That gap is not noise, it is the
+    lower tail `Φ(-√ncp - z_α) = Φ(-2.95996) = 0.00154` that the one-sided
+    approximation drops, and `0.16854 + 0.00154 = 0.17008` to five decimals. The
+    approximation is exact to five places wherever `√ncp + z_α` is large enough
+    to kill that term, which is everywhere else on this grid.
 
     Power: across `ncp = 1, 5, 10, 20` this formula predicts `0.1685`, `0.6088`,
     `0.8854` and `0.9940` at `α = 0.05`, and `0.0000`, `0.0007`, `0.0110` and
@@ -181,7 +196,7 @@ theorem powerAtThreshold_antitone_in_threshold (ncp z₁ z₂ : ℝ) (h : z₁ �
     such as `p_rare = 0.6, p_common = 0.3` read on the major allele, which the
     folded statement could not reach. -/
 theorem rare_variant_lower_power (n : ℕ) (beta p_rare p_common : ℝ)
-    (h_beta : beta ≠ 0) (h_rare : 0 < p_rare)
+    (h_beta : beta ≠ 0)
     (h_rare_lt : p_rare < p_common)
     (h_active : p_rare + p_common < 1) (hn : 0 < n) :
     noncentralityParam n beta p_rare < noncentralityParam n beta p_common := by
@@ -457,7 +472,7 @@ theorem heritabilityFractionFromN_at_n0c0_is_junk :
 
 /-- The attained fraction of heritability is increasing in `n`. -/
 theorem r2_scaling_increasing (n₁ n₂ C : ℝ)
-    (h_C : 0 < C) (h_n₁ : 0 ≤ n₁) (h_n₂ : 0 ≤ n₂) (h_n : n₁ < n₂) :
+    (h_C : 0 < C) (h_n₁ : 0 ≤ n₁) (h_n : n₁ < n₂) :
     heritabilityFractionFromN n₁ C < heritabilityFractionFromN n₂ C := by
   unfold heritabilityFractionFromN
   rw [div_lt_div_iff₀ (by linarith) (by linarith)]
@@ -476,7 +491,7 @@ theorem r2_scaling_bounded (n C : ℝ)
     Discretely: for n₁ < n₂, the marginal gain δC/((n+δ+C)(n+C)) is
     larger at n₁ than at n₂. Proved algebraically from the definition. -/
 theorem diminishing_returns (n₁ n₂ delta C : ℝ)
-    (h_C : 0 < C) (h_n₁ : 0 ≤ n₁) (h_n₂ : 0 ≤ n₂)
+    (h_C : 0 < C) (h_n₁ : 0 ≤ n₁)
     (h_delta : 0 < delta) (h_n : n₁ < n₂) :
     heritabilityFractionFromN (n₂ + delta) C - heritabilityFractionFromN n₂ C <
       heritabilityFractionFromN (n₁ + delta) C - heritabilityFractionFromN n₁ C := by
@@ -573,7 +588,7 @@ theorem r2_target_lt_r2_source_of_rg_sq_bound
     genetic architecture is shared. -/
 theorem high_rg_implies_good_portability
     (rg lb r2_source : ℝ)
-    (h_rg : lb < rg) (h_lb_nn : 0 ≤ lb) (h_rg_le : rg ≤ 1)
+    (h_rg : lb < rg) (h_lb_nn : 0 ≤ lb)
     (h_r2 : 0 < r2_source) :
     lb^2 * r2_source < rg^2 * r2_source := by
   have : lb ^ 2 < rg ^ 2 := by nlinarith [sq_nonneg (rg - lb)]
@@ -584,7 +599,7 @@ theorem high_rg_implies_good_portability
     cross-population PGS for the affected traits. -/
 theorem low_rg_limits_portability
     (rg ub r2_source : ℝ)
-    (h_rg : rg < ub) (h_rg_nn : 0 ≤ rg) (h_ub_nn : 0 ≤ ub)
+    (h_rg : rg < ub) (h_rg_nn : 0 ≤ rg)
     (h_r2 : 0 < r2_source) :
     rg^2 * r2_source < ub^2 * r2_source := by
   have : rg ^ 2 < ub ^ 2 := by nlinarith [sq_nonneg (rg - ub)]

@@ -14,8 +14,30 @@ This file formalizes how LD structure differences across populations
 affect PGS portability. LD patterns are shaped by population history
 (bottlenecks, admixture, selection) and directly determine PGS accuracy.
 
+**Notation warning: `r` in this file is the RECOMBINATION FRACTION, not the LD
+correlation coefficient.** `ldRetentionPerGen (r Ne)`, `ldAfterGenerations`,
+`ldHalfLife` and `ldRetainedFraction` all take `r` as a per-generation
+recombination fraction, while `tagR2` and `ohtaKimuraSigmaDSq` are about the
+squared correlation that the population-genetics literature also writes `r`.
+The two live twenty lines apart and the letter is the same. `driftLDStep`,
+`driftLDRetention` and `driftLDEquilibrium` spell the recombination rate `c`
+instead, so both spellings are in this one file. Read the signature, not the
+letter: nothing here computes an LD correlation from an argument named `r`,
+and nothing takes a correlation as an argument named `r`.
+
+**Attribution warning: the name "Ohta-Kimura" is used loosely below.** The
+section heading `## Ohta-Kimura LD Decay Model` and `ldRetentionPerGen` are the
+classical per-generation decay of `E[D]`, `D_t = D_0·(1-c)^t·(1-1/(2Nₑ))^t`,
+which is the elementary two-locus recursion, not Ohta and Kimura's result. Ohta
+and Kimura (1971) give the equilibrium `σ_d²` truncation, and exactly one
+definition in this file is theirs: `ohtaKimuraSigmaDSq`, whose own docstring
+says so and insists on the name being read literally. Do not cite this file's
+`E[D]` decay to them, and see `Calibrator.OpenQuestions.ldTaggingDecay` for the
+third thing the name has been attached to and should not be.
+
 Key results:
-1. LD decay with recombination distance follows the Ohta-Kimura model
+1. LD decay with recombination distance follows the classical two-locus
+   recursion; the equilibrium `σ_d²` is the Ohta-Kimura one
 2. LD differences create PGS prediction error via tagging mismatch
 3. Admixture creates long-range LD maximized at equal mixing
 4. Population bottlenecks amplify LD as a function of severity and duration
@@ -239,7 +261,32 @@ section AdmixtureLD
     D_admix = α(1-α)(p₁_A - p₁_B)(p₂_A - p₂_B)
     where α is admixture proportion and A,B are ancestral populations.
 
-    Empirical status: UNTESTED. -/
+    Regime: generation zero of a single admixture pulse, two UNLINKED loci.
+    The disequilibrium here is ancestry mixing alone -- no linkage, no drift, no
+    recombination has happened yet.
+
+    Empirical status: **VALIDATED** (`simcov/battery_bulk30.py`). Ancestry is
+    assigned per individual and alleles are drawn INDEPENDENTLY at each locus
+    from that ancestry's frequencies; `D` is then measured as
+    `E[l₁l₂] - E[l₁]E[l₂]` over 6×10⁶ individuals. The body is a derived
+    consequence of that construction and is never used to build it. Predicted
+    0.09000, 0.05760, -0.05120 and 0.02730 against measured 0.09007 ± 0.00013,
+    0.05758 ± 0.00011, -0.05120 ± 0.00013 and 0.02740 ± 0.00014 -- worst cell
+    0.73 sems at 0.37% relative, over a prediction spanning 157% and changing
+    SIGN.
+
+    Power: three wrong forms ride on the same cells and every one is falsified.
+    Dropping one frequency contrast misses by 1424 sems (350%); reading the
+    mixing weight as linear in `α` rather than as the variance `α(1-α)` misses
+    by 1627 sems (400%); squaring that weight misses by 512 sems (75%). An
+    oracle pinned to the body could reject none of them, so both the product
+    structure and the `α(1-α)` weight are chosen by the data.
+
+    `α` is swept across 1/2, which is the only place `α` and `α(1-α)` can
+    separate, and one cell carries opposite-sign contrasts so a body that lost a
+    sign would show it -- the measured `-0.05120` is that cell. Control: with no
+    ancestry contrast at the second locus, `D` must vanish whatever `α` is, and
+    it does. -/
 noncomputable def admixtureLD (α Δp₁ Δp₂ : ℝ) : ℝ :=
   α * (1 - α) * Δp₁ * Δp₂
 
@@ -817,7 +864,11 @@ section LDMismatchQuantification
     The Frobenius norm of the difference between source and target
     LD matrices captures the total LD mismatch.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: NOT AN EMPIRICAL CLAIM. This is a NORM -- the squared Frobenius norm
+    of a difference of two given matrices -- and a norm of given data is computed, not
+    predicted. The empirical claims in this neighbourhood are the ones that say how big the
+    mismatch IS between two real ancestries, or what accuracy it costs, and those are made
+    by the definitions that consume this, not by the choice of norm. -/
 noncomputable def ldMismatchFrobenius
     {p : ℕ} (Sig_S Sig_T : Matrix (Fin p) (Fin p) ℝ) : ℝ :=
   frobeniusNormSq (Sig_S - Sig_T)
