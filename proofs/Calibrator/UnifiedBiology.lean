@@ -18,11 +18,13 @@ import Calibrator.PencilEnvironment
 import Calibrator.FunctionalDescent
 import Calibrator.SpectralUniversalityFailure
 import Calibrator.SpectrumIdentifiability
+import Calibrator.TrafficInvariantSeparation
 
 namespace Calibrator
 
 open MarkedBreakout
 open XiFromMarks
+open TrafficInvariantSeparation
 
 /-!
 # Unified biology: state, geometry, value, and observation
@@ -103,7 +105,12 @@ end CohortLandscapeSuperposition
 /-! ## Population overlap geometry under ancestry-environment mixing -/
 
 /-- The active sparse-LD correlation after pooling two environments with correlations `rho`
-and `-rho`.  This is the biological name for the exact landscape parameter. -/
+and `-rho`.  This is the biological name for the landscape parameter itself.
+
+    Empirical status: UNTESTED. The pooling formula is arithmetic on the two
+    environment correlations; what is untested is the modelling step before it, that an
+    ancestry-environment mixture is described by two correlations of equal size and
+    opposite sign. No dataset here bears on that. -/
 noncomputable def ancestryMixtureCorrelation (rho positiveEnvironmentMass : ℝ) : ℝ :=
   mixedEnvironmentCorrelation rho positiveEnvironmentMass
 
@@ -364,6 +371,283 @@ theorem twoColourPioneerResponse_exact
     spectralResponse_shift_restoresAmplitude gamma reproductiveWeight hgamma hweight⟩
   linarith
 
+/-! ## Traffic depth, mesoscopic LD structure, and iterative genomic procedures -/
+
+/-- **The complete genomic procedure-risk signature is the canonical coarsest
+sufficient design invariant.**  It reconstructs every model/loss risk directly,
+while equality under any other sufficient invariant forces equality of the
+complete signature.  Uniformity is encoded by the single reconstruction map
+shared across all designs. -/
+theorem genomicAlgorithmicRiskSignature_isCoarsestSufficientInvariant
+    {Algorithm Design Model Loss : Type*}
+    (risk : Algorithm → Design → Model → Loss → ℝ) :
+    RiskSignaturesFactorThrough risk (algorithmicRiskSignature risk) ∧
+      ∀ (Invariant : Type*) (invariant : Design → Invariant),
+        RiskSignaturesFactorThrough risk invariant →
+          ∀ left right, invariant left = invariant right →
+            algorithmicRiskSignature risk left =
+              algorithmicRiskSignature risk right :=
+  algorithmicRiskSignature_isCoarsestSufficientInvariant risk
+
+/-- **A rare LD subspace is invisible to every fixed traffic coordinate but survives a
+logarithmic number of power iterations.**  The exceptional fraction is `4⁻ᵏ`; each fixed graph
+sum loses it, while `k` iterations amplify its squared output by `4ᵏ`. -/
+theorem rareLDSubspace_fixedTrafficInvisible_logRuntimeVisible :
+    (∀ edges : ℕ,
+      Filter.Tendsto (fun iteration ↦ diagonalTrafficCorrection 1 edges iteration)
+        Filter.atTop (nhds 0)) ∧
+      ∀ iteration : ℕ, mesoscopicGFOMEnergy iteration iteration = 1 :=
+  fixedTraffic_invisible_logRuntime_visible
+
+/-- **A positive LD rank-one perturbation is invisible to every fixed genomic
+traffic graph after the finite spike expansion, yet has strictly positive
+variational pressure above the exact Curie--Weiss threshold.**  The contracted
+graph condition is the finite combinatorial input; no finite-volume LDP is
+smuggled into the statement. -/
+theorem positiveLDSpike_fixedTrafficInvisible_variationalPressureVisible
+    {Term : Type*} [Fintype Term]
+    (coefficient : Term → ℝ) (hasOddDegree : Term → Bool)
+    (vertices edges : Term → ℕ)
+    (hconnected : ∀ term, vertices term ≤ edges term)
+    (tlam : ℝ) (hcritical : 1 < tlam) :
+    Filter.Tendsto
+        (fun population : ℕ ↦
+          finiteRankOneTrafficCorrection coefficient hasOddDegree vertices edges
+            (population + 1))
+        Filter.atTop (nhds 0) ∧
+      0 < cwVariationalPressureGap tlam :=
+  finiteRankOneTraffic_invisible_variationalPressure_visible
+    coefficient hasOddDegree vertices edges hconnected tlam hcritical
+
+/-- **Unified genomic counterexample to C2 and C3.**  A single positive LD
+rank-one spike is invisible to every fixed traffic graph, preserves the exact
+lower genotype ground state through an orthogonal genotype, changes the upper
+energy through an aligned genotype, and has positive variational pressure once
+`temperature * spikeStrength > 1`. -/
+theorem positiveLDSpike_refutesTrafficAndGroundStateDichotomies
+    {Term Genotype : Type*} [Fintype Term]
+    (coefficient : Term → ℝ) (hasOddDegree : Term → Bool)
+    (vertices edges : Term → ℕ)
+    (hconnected : ∀ term, vertices term ≤ edges term)
+    (alignment : Genotype → ℝ) (orthogonal aligned : Genotype)
+    (baseline spikeStrength population temperature : ℝ)
+    (hspike : 0 < spikeStrength) (hpopulation : population ≠ 0)
+    (horthogonal : alignment orthogonal = 0)
+    (haligned : alignment aligned = population)
+    (hcritical : 1 < temperature * spikeStrength) :
+    Filter.Tendsto
+        (fun size : ℕ ↦
+          finiteRankOneTrafficCorrection coefficient hasOddDegree vertices edges
+            (size + 1))
+        Filter.atTop (nhds 0) ∧
+      (∀ genotype, baseline ≤
+        rankOneEnergyDensity baseline spikeStrength population (alignment genotype)) ∧
+      rankOneEnergyDensity baseline spikeStrength population (alignment orthogonal) =
+        baseline ∧
+      baseline <
+        rankOneEnergyDensity baseline spikeStrength population (alignment aligned) ∧
+      0 < cwVariationalPressureGap (temperature * spikeStrength) :=
+  rankOneTraffic_groundState_pressure_counterexample
+    coefficient hasOddDegree vertices edges hconnected alignment orthogonal aligned
+    baseline spikeStrength population temperature hspike hpopulation horthogonal haligned
+    hcritical
+
+/-- **A positive LD spike can preserve the lower genetic ground state while changing an
+exponential pressure.**  One genotype direction is orthogonal to the spike and attains the
+baseline, every direction has no lower energy, and the fully aligned Curie–Weiss state has
+strictly positive pressure objective once `2 log 2 < tλ`. -/
+theorem positiveLDSpike_groundStateDoesNotFixPressure
+    (baseline spikeStrength population tlam : ℝ) (hspike : 0 ≤ spikeStrength)
+    (hlarge : 2 * Real.log 2 < tlam) :
+    ((∀ state : Bool, baseline ≤
+        rankOneEnergyDensity baseline spikeStrength population
+          (if state = true then population else 0)) ∧
+      rankOneEnergyDensity baseline spikeStrength population
+        (if false = true then population else 0) = baseline) ∧
+      0 < cwObjective tlam 1 := by
+  refine ⟨rankOne_groundState_certificate
+    (fun state : Bool ↦ if state = true then population else 0) false
+    baseline spikeStrength population hspike ?_, curieWeiss_supercritical_witness tlam hlarge⟩
+  simp
+
+/-- **The positive LD-spike pressure has its exact Curie–Weiss critical point.**  The pressure
+objective is nonpositive for every admissible overlap when `tλ ≤ 1`, and an explicit interior
+overlap has positive objective as soon as `tλ > 1`. -/
+theorem ldOverlapPressure_exactCriticalPoint (tlam : ℝ) :
+    (tlam ≤ 1 → ∀ m : ℝ, |m| ≤ 1 → cwObjective tlam m ≤ 0) ∧
+      (1 < tlam → ∃ m : ℝ, |m| < 1 ∧ 0 < cwObjective tlam m) :=
+  curieWeiss_critical_dichotomy tlam
+
+/-- **The supremal LD pressure, not merely its pointwise objective, has exact
+critical point `tλ = 1`.**  The pressure gap is zero precisely on the
+subcritical side and strictly positive above it. -/
+theorem ldVariationalPressureGap_exactCriticalPoint (tlam : ℝ) :
+    cwVariationalPressureGap tlam = 0 ↔ tlam ≤ 1 :=
+  cwVariationalPressureGap_eq_zero_iff tlam
+
+/-- **The matched-Bayes random-design question reduces to its scalar channel with an explicit
+two-error ledger.**  A scalar mutual-information gap `Δ` loses at most `2ε` when each random
+design is within `ε` of its scalar counterpart. -/
+theorem matchedBayes_randomDesignGap_from_scalarGap
+    (scalarLeft scalarRight randomLeft randomRight epsilon delta : ℝ)
+    (hleft : |randomLeft - scalarLeft| ≤ epsilon)
+    (hright : |randomRight - scalarRight| ≤ epsilon)
+    (hgap : scalarRight - scalarLeft = delta) :
+    delta - 2 * epsilon ≤ randomRight - randomLeft :=
+  randomDesign_gap_of_scalarGap scalarLeft scalarRight randomLeft randomRight epsilon delta
+    hleft hright hgap
+
+/-- **A positive genomic scalar-channel information gap survives at all
+sufficiently advanced points of any regime whose random-design comparison
+error vanishes.**  Taking the regime to be increasing aspect ratio gives the
+large-`δ` reduction claimed in the matched-Bayes programme. -/
+theorem matchedBayes_randomDesignEventuallySeparates_fromScalarGap
+    {Index : Type*} (regime : Filter Index)
+    (scalarLeft scalarRight delta : ℝ)
+    (randomLeft randomRight comparisonError : Index → ℝ)
+    (hleft : ∀ index,
+      |randomLeft index - scalarLeft| ≤ comparisonError index)
+    (hright : ∀ index,
+      |randomRight index - scalarRight| ≤ comparisonError index)
+    (hgap : scalarRight - scalarLeft = delta) (hpositive : 0 < delta)
+    (herrorVanishing :
+      Filter.Tendsto comparisonError regime (nhds 0)) :
+    ∀ᶠ index in regime, randomLeft index < randomRight index :=
+  randomDesign_eventually_separates_of_scalarGap regime
+    scalarLeft scalarRight delta randomLeft randomRight comparisonError
+    hleft hright hgap hpositive herrorVanishing
+
+/-- **A genomic covariance perturbation occupying a vanishing rank fraction
+cannot create an order-one matched information-density separation under the
+matrix I-MMSE/nuclear estimate.**  Thus the extensive-rank requirement for a
+negative matched-Bayes witness is an asymptotic theorem, not only a finite
+inequality. -/
+theorem matchedBayes_sublinearRankPerturbation_isAsymptoticallyInvisible
+    (densityGap rankFraction : ℕ → ℝ) (constant : ℝ)
+    (hrankVanishing : Filter.Tendsto rankFraction Filter.atTop (nhds 0))
+    (hnuclear : ∀ index,
+      |densityGap index| ≤ constant * rankFraction index) :
+    Filter.Tendsto densityGap Filter.atTop (nhds 0) :=
+  matchedDensity_lowRank_tendsto_zero_of_nuclearEstimate
+    densityGap rankFraction constant hrankVanishing hnuclear
+
+/-- A degree-limited genomic risk functional cannot distinguish designs with the same truncated
+traffic profile, so the complete Bayes gap transfers to every procedure in the class. -/
+theorem degreeLimitedGenomicRisk_fullGapHardness
+    {Algorithm : Type*} {D : ℕ} (risk : Algorithm → TruncatedTrafficRisk D)
+    (left right : Fin (D + 1) → ℝ) (htraffic : left = right)
+    (bayesLeft bayesRight : ℝ)
+    (hoptimalRight : ∀ algorithm, bayesRight ≤ (risk algorithm).evaluate right)
+    (algorithm : Algorithm) :
+    bayesRight - bayesLeft ≤ (risk algorithm).evaluate left - bayesLeft :=
+  truncatedTraffic_hardness risk left right htraffic bayesLeft bayesRight hoptimalRight algorithm
+
+/-- **Every finite LD-traffic depth is strictly weaker than the next.**  For
+each `D`, two genuine probability laws on uniformly conditioned diagonal LD
+values in `[1,2]` agree on every connected diagonal traffic coordinate with at
+most `D` edges and differ at `D+1` edges. -/
+theorem genomicLDTrafficHierarchy_strictAtEveryDegree (D : ℕ) :
+    ∃ left right : Fin (D + 2) → ℝ,
+      IsMomentMatchedProbabilityPair D left right ∧
+        SeparatesAtNextDiagonalTraffic D left right :=
+  exists_probabilityWeights_matchingMoments_through_degree D
+
+/-- **At every finite LD-traffic depth there is one probability pair blind to
+the entire graph-polynomial risk class.**  This is stronger than pairwise
+moment matching: the same pair equalizes every truncated risk functional while
+its next traffic coordinate remains different. -/
+theorem genomicLDTrafficBlindPair_existsAtEveryDegree (D : ℕ) :
+    ∃ left right : Fin (D + 2) → ℝ,
+      IsBlindPairForEveryTruncatedTrafficRisk D left right :=
+  exists_probabilityPair_blindToEveryTruncatedTrafficRisk D
+
+/-- **Finite permutation-equivariant genomic polynomials factor through LD
+traffic graphs.**  Endpoint equality patterns encode the rooted or unrooted
+graph, and label-permutation invariance forces coefficients to be constant on
+those graph classes. -/
+theorem permutationInvariantGenomicPolynomial_factorsThroughLDGraphs
+    {Slot Locus Graph : Type*} [Fintype Slot] [DecidableEq Slot]
+    [Fintype Locus] [Fintype Graph] [DecidableEq Graph]
+    (shape : (Slot → Locus) → Graph)
+    (coefficient value : (Slot → Locus) → ℝ)
+    (hshape : ∀ left right, shape left = shape right →
+      SameEqualityPattern left right)
+    (hinvariant : ∀ (permutation : Equiv.Perm Locus) monomial,
+      coefficient (permutation ∘ monomial) = coefficient monomial) :
+    (∑ monomial, coefficient monomial * value monomial) =
+      ∑ graph, graphShapeCoefficient shape coefficient graph *
+        ∑ monomial, if shape monomial = graph then value monomial else 0 :=
+  invariantPolynomial_graphSum_factorization shape coefficient value hshape hinvariant
+
+/-- **The nonperturbative genomic LD profile has a genuine compact state space.**
+Uniformly bounded countable pressure coordinates admit one common subsequence
+on which every prior/replica/tilt coordinate converges.  This is the exact
+diagonal compactness statement needed before any model-specific identification
+of the limiting right-convergence profile. -/
+theorem genomicExponentialProfile_hasCommonCoordinatewiseSubsequence
+    (bound : ℝ) (profiles : ℕ → BoundedExponentialProfile bound) :
+    ∃ limit : BoundedExponentialProfile bound, ∃ subsequence : ℕ → ℕ,
+      StrictMono subsequence ∧
+        ∀ coordinate : ℕ,
+          Filter.Tendsto (fun n ↦ profiles (subsequence n) coordinate)
+            Filter.atTop (nhds (limit coordinate)) :=
+  boundedExponentialProfile_common_coordinatewise_subsequence bound profiles
+
+/-- **The explicit exponential-profile formula is a genuine separating
+distance.**  It is nonnegative, symmetric, triangular, and vanishes exactly on
+identical genomic LD pressure profiles. -/
+theorem genomicExponentialProfileDistance_metricLaws
+    {bound : ℝ} (left middle right : BoundedExponentialProfile bound) :
+    0 ≤ exponentialProfileDistance left right ∧
+      exponentialProfileDistance left right = exponentialProfileDistance right left ∧
+      exponentialProfileDistance left right ≤
+        exponentialProfileDistance left middle + exponentialProfileDistance middle right ∧
+      (exponentialProfileDistance left right = 0 ↔ left = right) :=
+  ⟨exponentialProfileDistance_nonneg left right,
+    exponentialProfileDistance_comm left right,
+    exponentialProfileDistance_triangle left middle right,
+    exponentialProfileDistance_eq_zero_iff left right⟩
+
+/-- **The explicit genomic right-profile distance induces exactly coordinatewise
+pressure convergence.**  Thus convergence in the metric is neither weaker nor
+stronger than simultaneous convergence of every enumerated prior/replica/tilt
+coordinate. -/
+theorem genomicExponentialProfileDistance_converges_iff_coordinatewise
+    {bound : ℝ} {profiles : ℕ → BoundedExponentialProfile bound}
+    {limit : BoundedExponentialProfile bound} :
+    Filter.Tendsto (fun n ↦ exponentialProfileDistance (profiles n) limit)
+        Filter.atTop (nhds 0) ↔
+      ∀ coordinate : ℕ,
+        Filter.Tendsto (fun n ↦ profiles n coordinate)
+          Filter.atTop (nhds (limit coordinate)) :=
+  exponentialProfileDistance_tendsto_zero_iff_coordinatewise
+
+/-- **Finite genomic pressure data approximate the full right profile with an
+explicit modulus.**  The profile space has diameter at most two, and agreement
+on coordinates `0,…,K-1` leaves distance at most the geometric tail `2·2⁻ᴷ`. -/
+theorem genomicExponentialProfileDistance_finitePrefixControl
+    {bound : ℝ} (left right : BoundedExponentialProfile bound)
+    (prefixLength : ℕ)
+    (hprefix : ∀ coordinate < prefixLength, left coordinate = right coordinate) :
+    exponentialProfileDistance left right ≤ 2 ∧
+      exponentialProfileDistance left right ≤
+        2 * (1 / 2 : ℝ) ^ prefixLength :=
+  ⟨exponentialProfileDistance_le_two left right,
+    exponentialProfileDistance_le_geometricTail_of_prefix_eq
+      left right prefixLength hprefix⟩
+
+/-- **Bounded genomic exponential profiles are sequentially compact in the
+explicit weighted distance.**  The same subsequence works simultaneously for
+every enumerated prior/replica/tilt coordinate. -/
+theorem genomicExponentialProfile_compactInExplicitDistance
+    (bound : ℝ) (profiles : ℕ → BoundedExponentialProfile bound) :
+    ∃ limit : BoundedExponentialProfile bound, ∃ subsequence : ℕ → ℕ,
+      StrictMono subsequence ∧
+        Filter.Tendsto
+          (fun n ↦ exponentialProfileDistance (profiles (subsequence n)) limit)
+          Filter.atTop (nhds 0) :=
+  boundedExponentialProfile_compact_subsequence_in_distance bound profiles
+
 
 /-- **Exact criterion for the Beta curve.**  At conditional-Laplace-transform level the Beta
 power profile is equivalent to an `x`-independent transform after subtracting the logarithmic
@@ -455,7 +739,12 @@ noncomputable def switchingTransition
 noncomputable def targetAnnotation (y : BinaryBiologicalState) : ℝ :=
   if y = 1 then 1 else 0
 
-/-- Quality of a source-adapted readout: one exactly when source and target contexts match. -/
+/-- Quality of a source-adapted readout: one exactly when source and target contexts match.
+
+The same function as `persistentTransition`, read as a readout quality rather than as a
+transition.  `Calibrator.contextMatchQuality_eq_persistentTransition` says so; the body is
+written out here rather than delegating, because the witness proofs below evaluate this
+definition by `simp` and a delegation stops them one unfolding short. -/
 noncomputable def contextMatchQuality
     (x y : BinaryBiologicalState) : ℝ := if x = y then 1 else 0
 
@@ -1191,6 +1480,189 @@ structure UnifiedBiologyObstructions : Prop where
     ∀ conversion gamma w : ℝ, conversion ≠ 0 → gamma ≠ 0 → -1 < w →
       conversion * w / (conversion * 1 + conversion * w) = pioneerWeightFraction w ∧
         Real.exp (-(gamma * pioneerWeightDisplacement gamma w)) * (1 + w) = 1
+  /-- The complete uniform procedure-risk signature is sufficient and is
+  coarser than every other sufficient genomic design invariant. -/
+  genomicAlgorithmicRiskSignatureIsCoarsest :
+    ∀ (Algorithm Design Model Loss : Type)
+      (risk : Algorithm → Design → Model → Loss → ℝ),
+      RiskSignaturesFactorThrough risk (algorithmicRiskSignature risk) ∧
+        ∀ (Invariant : Type) (invariant : Design → Invariant),
+          RiskSignaturesFactorThrough risk invariant →
+            ∀ left right, invariant left = invariant right →
+              algorithmicRiskSignature risk left =
+                algorithmicRiskSignature risk right
+  /-- A mesoscopic LD block vanishes from every fixed traffic coordinate but has unit normalized
+  energy after a logarithmic number of power iterations. -/
+  rareLDSubspaceEvadesFixedTrafficAtLogRuntime :
+    (∀ edges : ℕ,
+      Filter.Tendsto (fun iteration ↦ diagonalTrafficCorrection 1 edges iteration)
+        Filter.atTop (nhds 0)) ∧
+      ∀ iteration : ℕ, mesoscopicGFOMEnergy iteration iteration = 1
+  /-- Every finite contracted rank-one LD traffic expansion vanishes, while
+  the associated variational pressure is positive above `tλ = 1`. -/
+  positiveLDSpikeFixedTrafficInvisibleVariationalPressureVisible :
+    ∀ (Term : Type) [Fintype Term]
+      (coefficient : Term → ℝ) (hasOddDegree : Term → Bool)
+      (vertices edges : Term → ℕ),
+      (∀ term, vertices term ≤ edges term) →
+      ∀ tlam : ℝ, 1 < tlam →
+        Filter.Tendsto
+            (fun population : ℕ ↦
+              finiteRankOneTrafficCorrection coefficient hasOddDegree vertices edges
+                (population + 1))
+            Filter.atTop (nhds 0) ∧
+          0 < cwVariationalPressureGap tlam
+  /-- One positive LD spike simultaneously defeats fixed traffic sufficiency
+  and the lower-ground-state characterization. -/
+  positiveLDSpikeRefutesTrafficAndGroundStateDichotomies :
+    ∀ (Term Genotype : Type) [Fintype Term]
+      (coefficient : Term → ℝ) (hasOddDegree : Term → Bool)
+      (vertices edges : Term → ℕ),
+      (∀ term, vertices term ≤ edges term) →
+      ∀ (alignment : Genotype → ℝ) (orthogonal aligned : Genotype)
+        (baseline spikeStrength population temperature : ℝ),
+        0 < spikeStrength → population ≠ 0 →
+        alignment orthogonal = 0 → alignment aligned = population →
+        1 < temperature * spikeStrength →
+          Filter.Tendsto
+              (fun size : ℕ ↦
+                finiteRankOneTrafficCorrection coefficient hasOddDegree vertices edges
+                  (size + 1))
+              Filter.atTop (nhds 0) ∧
+            (∀ genotype, baseline ≤
+              rankOneEnergyDensity baseline spikeStrength population (alignment genotype)) ∧
+            rankOneEnergyDensity baseline spikeStrength population (alignment orthogonal) =
+              baseline ∧
+            baseline <
+              rankOneEnergyDensity baseline spikeStrength population (alignment aligned) ∧
+            0 < cwVariationalPressureGap (temperature * spikeStrength)
+  /-- Positive-cone order and the lower genetic ground state do not determine exponential
+  pressure: an orthogonal state preserves the minimum while an aligned state separates. -/
+  positiveLDSpikeGroundStateDoesNotFixPressure :
+    ∀ baseline spikeStrength population tlam : ℝ, 0 ≤ spikeStrength →
+      2 * Real.log 2 < tlam →
+        ((∀ state : Bool, baseline ≤
+            rankOneEnergyDensity baseline spikeStrength population
+              (if state = true then population else 0)) ∧
+          rankOneEnergyDensity baseline spikeStrength population
+            (if false = true then population else 0) = baseline) ∧
+          0 < cwObjective tlam 1
+  /-- The positive-temperature LD-spike pressure separates at exactly `tλ = 1`. -/
+  ldOverlapPressureHasExactCriticalPoint :
+    ∀ tlam : ℝ,
+      (tlam ≤ 1 → ∀ m : ℝ, |m| ≤ 1 → cwObjective tlam m ≤ 0) ∧
+        (1 < tlam → ∃ m : ℝ, |m| < 1 ∧ 0 < cwObjective tlam m)
+  /-- The actual supremal variational pressure gap vanishes exactly at and
+  below the Curie--Weiss threshold. -/
+  ldVariationalPressureGapHasExactCriticalPoint :
+    ∀ tlam : ℝ, cwVariationalPressureGap tlam = 0 ↔ tlam ≤ 1
+  /-- Scalar matched-channel separation transfers to random design with exactly two comparison
+  errors and no hidden constant. -/
+  matchedBayesRandomDesignReduction :
+    ∀ scalarLeft scalarRight randomLeft randomRight epsilon delta : ℝ,
+      |randomLeft - scalarLeft| ≤ epsilon →
+      |randomRight - scalarRight| ≤ epsilon →
+      scalarRight - scalarLeft = delta →
+        delta - 2 * epsilon ≤ randomRight - randomLeft
+  /-- Every positive scalar matched-channel gap eventually transfers along a
+  regime whose random-design comparison error vanishes. -/
+  matchedBayesRandomDesignEventuallySeparates :
+    ∀ (Index : Type) (regime : Filter Index)
+      (scalarLeft scalarRight delta : ℝ)
+      (randomLeft randomRight comparisonError : Index → ℝ),
+      (∀ index, |randomLeft index - scalarLeft| ≤ comparisonError index) →
+      (∀ index, |randomRight index - scalarRight| ≤ comparisonError index) →
+      scalarRight - scalarLeft = delta → 0 < delta →
+      Filter.Tendsto comparisonError regime (nhds 0) →
+        ∀ᶠ index in regime, randomLeft index < randomRight index
+  /-- Under the nuclear estimate, a vanishing-rank-fraction genomic covariance
+  perturbation has vanishing matched information-density effect. -/
+  matchedBayesSublinearRankPerturbationsAreInvisible :
+    ∀ (densityGap rankFraction : ℕ → ℝ) (constant : ℝ),
+      Filter.Tendsto rankFraction Filter.atTop (nhds 0) →
+      (∀ index, |densityGap index| ≤ constant * rankFraction index) →
+        Filter.Tendsto densityGap Filter.atTop (nhds 0)
+  /-- Every degree-limited genomic risk that factors through a common truncated traffic profile
+  inherits the complete Bayes-risk gap on one shared design. -/
+  degreeLimitedGenomicRiskHasFullGapHardness :
+    ∀ (Algorithm : Type) (D : ℕ) (risk : Algorithm → TruncatedTrafficRisk D)
+      (left right : Fin (D + 1) → ℝ), left = right →
+      ∀ bayesLeft bayesRight : ℝ,
+        (∀ algorithm, bayesRight ≤ (risk algorithm).evaluate right) →
+          ∀ algorithm,
+            bayesRight - bayesLeft ≤ (risk algorithm).evaluate left - bayesLeft
+  /-- The diagonal genomic traffic hierarchy is strictly increasing at every
+  finite edge depth, witnessed by probability laws on `[1,2]`. -/
+  genomicLDTrafficHierarchyIsStrictAtEveryDegree :
+    ∀ D : ℕ,
+      ∃ left right : Fin (D + 2) → ℝ,
+        IsMomentMatchedProbabilityPair D left right ∧
+          SeparatesAtNextDiagonalTraffic D left right
+  /-- A single probability pair defeats every truncated graph-polynomial risk
+  at each finite depth while differing at the next LD traffic coordinate. -/
+  genomicLDTrafficHasCommonBlindPairAtEveryDegree :
+    ∀ D : ℕ,
+      ∃ left right : Fin (D + 2) → ℝ,
+        IsBlindPairForEveryTruncatedTrafficRisk D left right
+  /-- Permutation invariance itself, rather than an assumed orbit-constancy
+  premise, yields exact finite graph-sum factorization. -/
+  permutationInvariantGenomicPolynomialFactorsThroughLDGraphs :
+    ∀ (Slot Locus Graph : Type) [Fintype Slot] [DecidableEq Slot]
+      [Fintype Locus] [Fintype Graph] [DecidableEq Graph]
+      (shape : (Slot → Locus) → Graph)
+      (coefficient value : (Slot → Locus) → ℝ),
+      (∀ left right, shape left = shape right → SameEqualityPattern left right) →
+      (∀ (permutation : Equiv.Perm Locus) monomial,
+        coefficient (permutation ∘ monomial) = coefficient monomial) →
+        (∑ monomial, coefficient monomial * value monomial) =
+          ∑ graph, graphShapeCoefficient shape coefficient graph *
+            ∑ monomial, if shape monomial = graph then value monomial else 0
+  /-- Every uniformly bounded countable exponential/LD profile has one common
+  coordinatewise-convergent subsequence. -/
+  genomicExponentialProfileIsSequentiallyCompact :
+    ∀ (bound : ℝ) (profiles : ℕ → BoundedExponentialProfile bound),
+      ∃ limit : BoundedExponentialProfile bound, ∃ subsequence : ℕ → ℕ,
+        StrictMono subsequence ∧
+          ∀ coordinate : ℕ,
+            Filter.Tendsto (fun n ↦ profiles (subsequence n) coordinate)
+              Filter.atTop (nhds (limit coordinate))
+  /-- The explicit weighted exponential-profile formula satisfies the metric
+  laws on bounded genomic pressure profiles. -/
+  genomicExponentialProfileDistanceSatisfiesMetricLaws :
+    ∀ (bound : ℝ) (left middle right : BoundedExponentialProfile bound),
+      0 ≤ exponentialProfileDistance left right ∧
+        exponentialProfileDistance left right = exponentialProfileDistance right left ∧
+        exponentialProfileDistance left right ≤
+          exponentialProfileDistance left middle + exponentialProfileDistance middle right ∧
+        (exponentialProfileDistance left right = 0 ↔ left = right)
+  /-- Convergence in the explicit genomic right-profile distance is equivalent
+  to convergence of every enumerated pressure coordinate. -/
+  genomicExponentialProfileDistanceCharacterizesConvergence :
+    ∀ (bound : ℝ) (profiles : ℕ → BoundedExponentialProfile bound)
+      (limit : BoundedExponentialProfile bound),
+      Filter.Tendsto (fun n ↦ exponentialProfileDistance (profiles n) limit)
+          Filter.atTop (nhds 0) ↔
+        ∀ coordinate : ℕ,
+          Filter.Tendsto (fun n ↦ profiles n coordinate)
+            Filter.atTop (nhds (limit coordinate))
+  /-- A finite prefix of genomic pressure coordinates controls the complete
+  right-profile distance by the exact remaining geometric tail. -/
+  genomicExponentialProfileHasFiniteCoordinateApproximation :
+    ∀ (bound : ℝ) (left right : BoundedExponentialProfile bound)
+      (prefixLength : ℕ),
+      (∀ coordinate < prefixLength, left coordinate = right coordinate) →
+        exponentialProfileDistance left right ≤ 2 ∧
+          exponentialProfileDistance left right ≤
+            2 * (1 / 2 : ℝ) ^ prefixLength
+  /-- Every bounded sequence has a subsequence converging in the explicit
+  weighted exponential-profile distance. -/
+  genomicExponentialProfileIsCompactInExplicitDistance :
+    ∀ (bound : ℝ) (profiles : ℕ → BoundedExponentialProfile bound),
+      ∃ limit : BoundedExponentialProfile bound, ∃ subsequence : ℕ → ℕ,
+        StrictMono subsequence ∧
+          Filter.Tendsto
+            (fun n ↦ exponentialProfileDistance (profiles (subsequence n)) limit)
+            Filter.atTop (nhds 0)
   /-- Equal unconditioned Bolthausen--Sznitman genealogy does not determine the conditioned
   family: the logarithmic and linear response marks already separate at three lineages. -/
   speedConditionedGenealogyRetainsResponseMark :
@@ -1300,6 +1772,65 @@ theorem unifiedBiology_obstructions : UnifiedBiologyObstructions := by
         sweepTrajectory_does_not_determine_genealogy
       twoColourPioneerResponseIsExact :=
         twoColourPioneerResponse_exact
+      genomicAlgorithmicRiskSignatureIsCoarsest :=
+        fun _Algorithm _Design _Model _Loss risk ↦
+          genomicAlgorithmicRiskSignature_isCoarsestSufficientInvariant risk
+      rareLDSubspaceEvadesFixedTrafficAtLogRuntime :=
+        rareLDSubspace_fixedTrafficInvisible_logRuntimeVisible
+      positiveLDSpikeFixedTrafficInvisibleVariationalPressureVisible :=
+        fun _Term _ coefficient hasOddDegree vertices edges hconnected tlam hcritical ↦
+          positiveLDSpike_fixedTrafficInvisible_variationalPressureVisible
+            coefficient hasOddDegree vertices edges hconnected tlam hcritical
+      positiveLDSpikeRefutesTrafficAndGroundStateDichotomies :=
+        fun _Term _Genotype _ coefficient hasOddDegree vertices edges hconnected alignment
+          orthogonal aligned baseline spikeStrength population temperature hspike hpopulation
+          horthogonal haligned hcritical ↦
+            positiveLDSpike_refutesTrafficAndGroundStateDichotomies
+              coefficient hasOddDegree vertices edges hconnected alignment orthogonal aligned
+              baseline spikeStrength population temperature hspike hpopulation horthogonal
+              haligned hcritical
+      positiveLDSpikeGroundStateDoesNotFixPressure :=
+        positiveLDSpike_groundStateDoesNotFixPressure
+      ldOverlapPressureHasExactCriticalPoint :=
+        ldOverlapPressure_exactCriticalPoint
+      ldVariationalPressureGapHasExactCriticalPoint :=
+        ldVariationalPressureGap_exactCriticalPoint
+      matchedBayesRandomDesignReduction :=
+        matchedBayes_randomDesignGap_from_scalarGap
+      matchedBayesRandomDesignEventuallySeparates :=
+        fun _Index regime scalarLeft scalarRight delta randomLeft randomRight
+          comparisonError hleft hright hgap hpositive herrorVanishing ↦
+            matchedBayes_randomDesignEventuallySeparates_fromScalarGap
+              regime scalarLeft scalarRight delta randomLeft randomRight
+              comparisonError hleft hright hgap hpositive herrorVanishing
+      matchedBayesSublinearRankPerturbationsAreInvisible :=
+        matchedBayes_sublinearRankPerturbation_isAsymptoticallyInvisible
+      degreeLimitedGenomicRiskHasFullGapHardness :=
+        fun _Algorithm _D risk left right htraffic bayesLeft bayesRight hoptimal algorithm ↦
+          degreeLimitedGenomicRisk_fullGapHardness risk left right htraffic bayesLeft bayesRight
+            hoptimal algorithm
+      genomicLDTrafficHierarchyIsStrictAtEveryDegree :=
+        genomicLDTrafficHierarchy_strictAtEveryDegree
+      genomicLDTrafficHasCommonBlindPairAtEveryDegree :=
+        genomicLDTrafficBlindPair_existsAtEveryDegree
+      permutationInvariantGenomicPolynomialFactorsThroughLDGraphs :=
+        fun _Slot _Locus _Graph _ _ _ _ _ shape coefficient value hshape hinvariant ↦
+          permutationInvariantGenomicPolynomial_factorsThroughLDGraphs
+            shape coefficient value hshape hinvariant
+      genomicExponentialProfileIsSequentiallyCompact :=
+        genomicExponentialProfile_hasCommonCoordinatewiseSubsequence
+      genomicExponentialProfileDistanceSatisfiesMetricLaws :=
+        fun _bound left middle right ↦
+          genomicExponentialProfileDistance_metricLaws left middle right
+      genomicExponentialProfileDistanceCharacterizesConvergence :=
+        fun _bound _profiles _limit ↦
+          genomicExponentialProfileDistance_converges_iff_coordinatewise
+      genomicExponentialProfileHasFiniteCoordinateApproximation :=
+        fun _bound left right prefixLength hprefix ↦
+          genomicExponentialProfileDistance_finitePrefixControl
+            left right prefixLength hprefix
+      genomicExponentialProfileIsCompactInExplicitDistance :=
+        genomicExponentialProfile_compactInExplicitDistance
       speedConditionedGenealogyRetainsResponseMark :=
         speedConditionedGenealogy_chart_not_universal
       pioneerSusceptibilitySetsClock :=
