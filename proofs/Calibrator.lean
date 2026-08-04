@@ -63,6 +63,7 @@ import Calibrator.DeclaredInteractionClass
 import Calibrator.CountingInvariantBlindness
 import Calibrator.CountingInvariantInstances
 import Calibrator.PolygenicArchitecture
+import Calibrator.PolygenicContinuumCalibration
 import Calibrator.SampleOverlapBias
 import Calibrator.HaplotypeTheory
 import Calibrator.AncestrySpecificArchitecture
