@@ -189,7 +189,30 @@ theorem closedPopulation_het_eq_neutralDriftFactor (Ne H₀ : ℝ) (hH : 0 < H�
     loci, and `Ne` -- has not been done, and until it is, the results here are
     conditional on the assumption rather than evidence for it.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: UNTESTED, and NOT MEASURABLE in this form. The
+    paragraph above is the reason: `s_correction` has no operational definition,
+    so a simulation cannot set it without inventing one, and whatever the
+    simulation then measures is a property of the invention rather than of this
+    definition.
+
+    That is not a conjecture about the difficulty. It was attempted
+    (`proofs/validation/empirical/simcov/battery_bulk7.py`,
+    `test_selected_drift_factor`) with a per-generation restoring term standing
+    in for `s_correction`, and the result carries the signature of a design
+    testing itself: the `s_correction = 0` cell agreed at 0.02 sems, while the
+    two cells where the invented term actually bit disagreed at 9.5 and 8.1.
+    The verdict gates returned LEAD rather than FALSIFIED, correctly, because no
+    positive control had been declared.
+
+    A measurement becomes possible exactly when the derivation the paragraph
+    above says is missing is supplied -- fixing the dependence of `s_correction`
+    on selection strength, locus count and `Ne`. Until then this definition is
+    counted among the unmeasured, which it is, and no simulation should be built
+    against it. A corpus-wide scan
+    (`proofs/validation/empirical/simcov/unmeasurable_scan.py`) finds this is
+    the ONLY definition still marked UNTESTED whose docstring admits its own
+    parameter is unpinned, so the category is one definition rather than the
+    class it first appeared to be. -/
 noncomputable def selectedDriftFactor (Ne : ℝ) (t : ℕ) (s_correction : ℝ) : ℝ :=
   (1 - 1 / (2 * Ne) + s_correction) ^ t
 
