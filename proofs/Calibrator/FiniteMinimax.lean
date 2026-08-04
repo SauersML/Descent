@@ -18,10 +18,21 @@ risk profiles form a convex subset of `ℝ^Θ` disjoint from the open convex hal
 the minimax level, so `geometric_hahn_banach_open` yields a functional whose coordinate
 weights are nonnegative, and normalising them produces a least-favourable prior.
 
-The exact two-point lower bound is also proved here. If two parameters induce the same
-observation law and their losses obey a pointwise separation inequality, every randomized
-rule—and hence the minimax value—pays at least half that separation. This is the common
-decision-theoretic endpoint of the corpus's exact biological nonidentifiability witnesses.
+Two-point lower bounds are proved in exact and quantitative forms. Exact observational
+equivalence costs half the pointwise loss separation, and a binary experiment shows the constant
+is sharp. Approximate equivalence incurs the explicit penalty `maxLoss × observationL1Distance`.
+Arbitrary stochastic garbling contracts that distance, preserves exact equivalence, and can only
+increase minimax risk. These are the common decision-theoretic endpoints of the corpus's
+biological nonidentifiability witnesses.
+
+## Main results
+
+- `half_separation_le_minimaxRisk_of_observation_eq`: exact two-point minimax floor.
+- `indistinguishableBinaryProblem_minimaxRisk`: sharpness of the factor one-half.
+- `half_separation_sub_l1_le_minimaxRisk`: quantitative finite Le Cam floor.
+- `observationL1Distance_garble_le`: ℓ¹ data processing under stochastic channels.
+- `minimaxRisk_le_garbleObservations`: full minimax monotonicity under garbling.
+- `finite_minimax_duality`: equality of primal minimax and least-favourable-prior values.
 -/
 
 namespace Calibrator.FiniteMinimax
@@ -170,8 +181,9 @@ theorem observationL1Distance_garble_le
     ring
   unfold observationL1Distance
   calc
-    ∑ summary, |((E.garbleObservations summaryCount channel).observation θ₁).probability summary -
-        ((E.garbleObservations summaryCount channel).observation θ₂).probability summary| =
+    ∑ summary,
+        |((E.garbleObservations summaryCount channel).observation θ₁).probability summary -
+          ((E.garbleObservations summaryCount channel).observation θ₂).probability summary| =
       ∑ summary, |∑ observation,
         ((E.observation θ₁).probability observation -
           (E.observation θ₂).probability observation) *
