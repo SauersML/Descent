@@ -322,7 +322,11 @@ from first principles, starting with haplotype frequency dynamics.
     Under linkage equilibrium within each source population,
     freq(AB)_admix = α × p_A × q_A + (1−α) × p_B × q_B.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_bulk2.py`,
+    `test_admixture_ld`). Two million individuals of a one-pulse admixed
+    population, joint haplotype frequency counted directly: worst 0.76 sems over
+    a prediction spanning 0.18200 to 0.30000. -/
 noncomputable def haplotypeFreqAdmixed (alpha p_A q_A p_B q_B : ℝ) : ℝ :=
   alpha * p_A * q_A + (1 - alpha) * p_B * q_B
 
@@ -350,7 +354,10 @@ per-locus copy; two copies differing only in bound-variable names is what that i
     This is the general two-locus definition before any
     recombination has acted.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_bulk2.py`,
+    `test_admixture_ld`). Gametic `D` measured directly from haplotype counts in
+    the admixed generation: worst 0.19 sems over 0.06000 to 0.07560. -/
 noncomputable def admixtureLDTwoLocus (alpha p_A q_A p_B q_B : ℝ) : ℝ :=
   haplotypeFreqAdmixed alpha p_A q_A p_B q_B
     - admixedAlleleFreq alpha p_A p_B * admixedAlleleFreq alpha q_A q_B
@@ -380,7 +387,12 @@ theorem admixture_ld_two_locus_eq (alpha p_A q_A p_B q_B : ℝ) :
     After g generations of random mating, recombination reduces LD
     by (1−r) each generation: D(g) = (1−r)^g × D(0).
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_bulk2.py`,
+    `test_admixture_ld`). Decay across generations of random mating at
+    recombination `r`: worst 0.19 sems over four cells spanning 0.01966 to
+    0.04526, with `r` and `g` both varied so the exponent is tested and not only
+    the coefficient. -/
 noncomputable def admixtureLDAtGen (alpha p_A q_A p_B q_B r : ℝ) (g : ℕ) : ℝ :=
   (1 - r) ^ g * admixtureLDTwoLocus alpha p_A q_A p_B q_B
 

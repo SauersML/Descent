@@ -283,7 +283,22 @@ and is valid only while `h * s` dominates `mu` — see
 `mutationSelectionBalance_at_zero_dominance`, which shows the map degenerates at
 `h = 0` and hands the recessive case to `mutationSelectionStepRecessive`.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED as a linearisation**, with the gap
+    stated (`proofs/validation/empirical/simcov/battery_bulk2.py`,
+    `test_selection_step_against_wf`). Against one generation of EXACT viability
+    selection -- genotype fitnesses `1`, `1 - h s`, `1 - s`, renormalised by mean
+    fitness -- then two-way mutation, from `p = 0.2`:
+
+      h     s      mu        this def   exact selection   relative
+      0.5   0.02   1e-04      0.19808   0.19845            -0.19%
+      0.5   0.10   1e-04      0.19008   0.19190            -0.95%
+      0.2   0.05   1e-03      0.19880   0.19803            +0.39%
+
+    The step drops the mean-fitness denominator and the `p²` term, so it is a
+    linearisation valid at small `s` and small `p`; at `s = 0.1`, `p = 0.2` it is
+    already about one percent per generation, which compounds over a run. Both
+    sides are deterministic, so this is exact arithmetic and the gap is the
+    approximation rather than sampling noise. -/
 noncomputable def mutationSelectionStepRare (mu s h p : ℝ) : ℝ :=
   p * (1 - h * s) + mu * (1 - p)
 
@@ -304,7 +319,14 @@ The fixed point of `mutationSelectionStepRare`. It is `mu / (h * s + mu)`, not
 admissible parameter, including the weak-constraint regime `s < mu` where
 `mu / s` is not a frequency at all.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_bulk2.py`,
+    `test_mutation_selection`). It is the fixed point of
+    `mutationSelectionStepRare`, and iterating that recursion to convergence from
+    `p = 0.5` -- three hundred times the equilibrium -- reproduces it to every
+    digit carried, at `mu` from 1e-05 to 1e-04 and `h*s` from 0.005 to 0.05.
+
+    Power: the prediction spans 0.00100 to 0.00200 across the design. -/
 noncomputable def mutationSelectionBalance (mu s h : ℝ) : ℝ :=
   mu / (h * s + mu)
 
@@ -425,7 +447,15 @@ nonnegative root of `s p² + mu p − mu = 0`, the fixed point of
 qualitatively different scaling from the dominant `mu/(h s)` — and it is bounded
 by `1` for every positive `s`.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_bulk2.py`,
+    `test_mutation_selection`). Fixed point of
+    `mutationSelectionStepRecessive`, iterated to convergence from `p = 0.5`:
+    0.03113, 0.04373 and 0.06825 predicted against the same three limits at
+    `(mu, s)` of (1e-05, 0.01), (1e-04, 0.05) and (1e-03, 0.20). The quadratic
+    root is the part that can be wrong, and it is not.
+
+    Power: the prediction spans 0.03113 to 0.06825 across the design. -/
 noncomputable def mutationSelectionBalanceRecessive (mu s : ℝ) : ℝ :=
   (Real.sqrt (mu * (mu + 4 * s)) - mu) / (2 * s)
 
