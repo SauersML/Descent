@@ -791,7 +791,7 @@ def run_identifications() -> int:
                              ident_strip_comments(open(f).read()), re.M):
             primitives.add(m.group(1).split(".")[-1])
 
-    unrelated = 0
+    unrelated = []
     for norm, members in groups.items():
         if len({m for m, _ in members}) < 2:
             continue
@@ -803,10 +803,12 @@ def run_identifications() -> int:
                  any(re.search(r"\b" + re.escape(pr) + r"\b", st) for pr in primitives))
                 for st in all_stmts)
             if not tied:
-                unrelated += 1
-    if unrelated > UNRELATED_BUDGET:
+                unrelated.extend(f"{m}:{n}" for m, n in members)
+    unrelated = sorted(set(unrelated))
+    if len(unrelated) > UNRELATED_BUDGET:
         bad.append(f"same-quantity definitions never related to a sibling by any theorem: "
-                   f"{unrelated}, budget {UNRELATED_BUDGET}")
+                   f"{len(unrelated)}, budget {UNRELATED_BUDGET}")
+        bad.extend("    " + item for item in unrelated)
 
     # 3d. Missing-argument screen. Six of the eleven falsified definitions failed
     #     the same way: the signature omits an argument the named quantity is
@@ -2015,7 +2017,7 @@ def run_identifications() -> int:
         return 1
     print(f"structural guards pass: convention sites {sites}/{CONVENTION_SITE_BUDGET}, "
           f"undeclared {len(undeclared)}/{UNDECLARED_BUDGET}, conventions {len(undeclared_conv)}/{CONVENTION_DECL_BUDGET}, "
-          f"unrelated {unrelated}/{UNRELATED_BUDGET}, "
+          f"unrelated {len(unrelated)}/{UNRELATED_BUDGET}, "
           f"stipulated equilibria {len(stipulated)}/{EQUILIBRIUM_BUDGET}, "
           f"duplicate bodies {len(duplicates)}/{DUPLICATE_BODY_BUDGET}, "
           f"isolated modules {len(isolated)}/{ISOLATED_MODULE_BUDGET}, "

@@ -2007,12 +2007,12 @@ theorem ancestryScoreSwapped_is_permutation :
     ancestryScoreSwapped = ancestryScore ∘ ![0, 2, 1] := by
   funext i
   fin_cases i <;>
-    simp [ancestryScore, ancestryScoreSwapped, Matrix.cons_val_zero, Matrix.cons_val_one,
-      Matrix.head_cons]
+    simp [ancestryScore, ancestryScoreSwapped, threeAncestryConditional,
+      Matrix.cons_val_zero, Matrix.cons_val_one]
 
 /-- **The aligned arrangement's energy.** -/
 theorem ancestryAlignmentEnergy_score : ancestryAlignmentEnergy ancestryScore = 10 / 3 := by
-  unfold ancestryAlignmentEnergy threeAncestryDistance ancestryScore
+  unfold ancestryAlignmentEnergy threeAncestryDistance ancestryScore threeAncestryConditional
   norm_num [Fin.sum_univ_three, Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons,
     Matrix.cons_val_two, Matrix.tail_cons]
 
