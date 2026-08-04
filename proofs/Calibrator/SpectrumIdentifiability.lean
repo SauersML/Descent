@@ -78,6 +78,7 @@ respectively, linear conditioning, nonlinear collision geometry, and failure of 
 namespace SpectrumIdentifiability
 
 open scoped BigOperators
+open Filter
 
 /-! ## The Kingman rate ladder and its reciprocal sum -/
 
@@ -131,19 +132,28 @@ theorem muntzPartialSum_lt_two (n : ℕ) :
   have : 0 < 2 / ((n : ℝ) + 1) := by positivity
   linarith
 
+/-- **Exact Kingman Müntz mass.**  The reciprocal rate ladder does not merely converge: its
+total mass is exactly two. -/
+theorem hasSum_one_div_coalescentRate :
+    HasSum (fun k : ℕ ↦ 1 / coalescentRate (k + 2)) 2 := by
+  rw [hasSum_iff_tendsto_nat_of_nonneg
+    (fun k ↦ one_div_nonneg.mpr (coalescentRate_add_two_pos k).le)]
+  have hzero : Tendsto (fun n : ℕ ↦ 2 / ((n : ℝ) + 1)) atTop (nhds 0) := by
+    simpa [div_eq_mul_inv] using
+      tendsto_one_div_add_atTop_nhds_zero_nat.const_mul 2
+  simpa only [muntzPartialSum, sub_zero] using tendsto_const_nhds.sub hzero
+
 /-- **The Müntz criterion fails for Kingman rates.**  The reciprocal rate sum converges, so the
 exponential family the spectrum tests is not dense, and a nonzero function orthogonal to all of
 it exists on any interval bounded away from zero. -/
 theorem summable_one_div_coalescentRate :
-    Summable fun k : ℕ ↦ 1 / coalescentRate (k + 2) := by
-  refine summable_of_sum_range_le (c := 2) (fun k ↦ ?_) (fun n ↦ ?_)
-  · exact one_div_nonneg.mpr (coalescentRate_add_two_pos k).le
-  · exact (muntzPartialSum_lt_two n).le
+    Summable fun k : ℕ ↦ 1 / coalescentRate (k + 2) :=
+  hasSum_one_div_coalescentRate.summable
 
-theorem tsum_one_div_coalescentRate_le_two :
-    ∑' k : ℕ, 1 / coalescentRate (k + 2) ≤ 2 := by
-  refine Real.tsum_le_of_sum_range_le (fun k ↦ ?_) (fun n ↦ (muntzPartialSum_lt_two n).le)
-  exact one_div_nonneg.mpr (coalescentRate_add_two_pos k).le
+/-- Exact value of the Kingman reciprocal-rate series. -/
+theorem tsum_one_div_coalescentRate :
+    ∑' k : ℕ, 1 / coalescentRate (k + 2) = 2 :=
+  hasSum_one_div_coalescentRate.tsum_eq
 
 /-- The contrast that makes the criterion a criterion rather than an accident of this proof: a
 ladder growing linearly has a divergent reciprocal sum, and no such nullspace. -/
@@ -205,15 +215,50 @@ theorem twoPoint_risk_lower_bound {ι Θ : Type*} [Fintype ι]
   have h2 := le_max_right (∑ i, p i * d hi (est i)) (∑ i, p i * d (est i) lo)
   linarith
 
-/-- The squared-loss reading of the same floor. -/
+/-- **The genuine squared-loss floor.**  This bounds expected squared loss, not merely the
+square of expected metric loss. -/
 theorem twoPoint_risk_lower_bound_sq {ι Θ : Type*} [Fintype ι]
     (d : Θ → Θ → ℝ) (htri : ∀ a b c, d a c ≤ d a b + d b c) (hd : ∀ a b, 0 ≤ d a b)
     (p : ι → ℝ) (hp : ∀ i, 0 ≤ p i) (hsum : ∑ i, p i = 1)
     (hi lo : Θ) (est : ι → Θ) :
     (d hi lo / 2) ^ 2
-      ≤ max (∑ i, p i * d hi (est i)) (∑ i, p i * d (est i) lo) ^ 2 := by
-  have hnn : 0 ≤ d hi lo / 2 := by have := hd hi lo; linarith
-  exact pow_le_pow_left₀ hnn (twoPoint_risk_lower_bound d htri p hp hsum hi lo est) 2
+      ≤ max (∑ i, p i * d hi (est i) ^ 2) (∑ i, p i * d (est i) lo ^ 2) := by
+  have hpoint (i : ι) :
+      d hi lo ^ 2 ≤ 2 * (d hi (est i) ^ 2 + d (est i) lo ^ 2) := by
+    have hgap : 0 ≤
+        (d hi (est i) + d (est i) lo - d hi lo) *
+          (d hi (est i) + d (est i) lo + d hi lo) := by
+      apply mul_nonneg
+      · linarith [htri hi (est i) lo]
+      · exact add_nonneg (add_nonneg (hd hi (est i)) (hd (est i) lo)) (hd hi lo)
+    nlinarith [sq_nonneg (d hi (est i) - d (est i) lo)]
+  have hbound :
+      ∑ i, p i * d hi lo ^ 2 ≤
+        ∑ i, p i * (2 * (d hi (est i) ^ 2 + d (est i) lo ^ 2)) := by
+    exact Finset.sum_le_sum fun i _ ↦ mul_le_mul_of_nonneg_left (hpoint i) (hp i)
+  have htotal : d hi lo ^ 2 ≤
+      2 * ((∑ i, p i * d hi (est i) ^ 2) + ∑ i, p i * d (est i) lo ^ 2) := by
+    calc
+      d hi lo ^ 2 = (∑ i, p i) * d hi lo ^ 2 := by rw [hsum, one_mul]
+      _ = ∑ i, p i * d hi lo ^ 2 := by rw [Finset.sum_mul]
+      _ ≤ ∑ i, p i * (2 * (d hi (est i) ^ 2 + d (est i) lo ^ 2)) := hbound
+      _ = ∑ i, (2 * (p i * d hi (est i) ^ 2) +
+          2 * (p i * d (est i) lo ^ 2)) := by
+        apply Finset.sum_congr rfl
+        intro i _
+        ring
+      _ = (∑ i, 2 * (p i * d hi (est i) ^ 2)) +
+          ∑ i, 2 * (p i * d (est i) lo ^ 2) := Finset.sum_add_distrib
+      _ = 2 * (∑ i, p i * d hi (est i) ^ 2) +
+          2 * (∑ i, p i * d (est i) lo ^ 2) := by
+        rw [Finset.mul_sum, Finset.mul_sum]
+      _ = 2 * ((∑ i, p i * d hi (est i) ^ 2) +
+          ∑ i, p i * d (est i) lo ^ 2) := by ring
+  have hleft := le_max_left (∑ i, p i * d hi (est i) ^ 2)
+    (∑ i, p i * d (est i) lo ^ 2)
+  have hright := le_max_right (∑ i, p i * d hi (est i) ^ 2)
+    (∑ i, p i * d (est i) lo ^ 2)
+  nlinarith
 
 /-! ## What does survive: geometric attenuation of ancient perturbations -/
 
