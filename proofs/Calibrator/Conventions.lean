@@ -17,7 +17,7 @@ import Calibrator.SerialFounderChain
 import Calibrator.BundleRigidity.TwoAtom
 import Calibrator.LongitudinalPortability
 import Calibrator.ImputationPortability
-import Calibrator.SimulationValidation
+import Calibrator.MechanisticPortabilityWitnesses
 import Calibrator.LDDecayTheory
 import Calibrator.MetricSpecificPortability
 import Calibrator.PhenomeWidePortability
@@ -33,7 +33,7 @@ import Calibrator.CovarianceStructure
 import Calibrator.HaplotypeTheory
 import Calibrator.LongitudinalPortability
 import Calibrator.ImputationPortability
-import Calibrator.SimulationValidation
+import Calibrator.MechanisticPortabilityWitnesses
 import Calibrator.PortabilityDrift
 import Calibrator.StratificationConfounding
 import Calibrator.PolygenicArchitecture
@@ -784,7 +784,9 @@ theorem noncentralityParam_uses_hwe (n : ℕ) (beta p : ℝ) :
 
 theorem gwasNCP_uses_hwe (n : ℕ) (β p : ℝ) :
     gwasNCP n β p = n * β ^ 2 * hweGenotypeVariance p := by
-  unfold gwasNCP hweGenotypeVariance ploidy; ring_nf
+  unfold gwasNCP ncp effectiveFisherInformation fisherInformation genotypeVarianceHWE
+    hweGenotypeVariance ploidy
+  ring
 
 theorem effectiveFisherInformation_uses_hwe (n : ℕ) (p r2_ld : ℝ) :
     effectiveFisherInformation n p r2_ld = n * hweGenotypeVariance p * r2_ld := by

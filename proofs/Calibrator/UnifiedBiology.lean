@@ -220,6 +220,28 @@ theorem speedConditionedGenealogy_pairBlind_tripleRecovers (β : ℝ) :
   ⟨speedTiltBetaMergerRate_two_two β,
     speedBiasParameterFromTripleRate_recovers β⟩
 
+/-- **Why the regular-variation genealogy has no simultaneous disjoint mergers.**  At tail
+scale `d`, a two-family pair-pair collision is smaller than a one-family pair collision by the
+explicit factor `d (β + 1) / ((β + 2) (β + 3))`.  The factor is one order smaller in the
+rare-family scale, not merely bounded by an unspecified error. -/
+theorem speedConditionedGenealogy_twoFamilyToPairRatio
+    {β d : ℝ} (hβ : -1 < β) (hd : d ≠ 0) :
+    speedTiltTwoFamilyCollisionScale β d / speedTiltPairCollisionScale β d =
+      d * (β + 1) / ((β + 2) * (β + 3)) :=
+  speedTiltTwoFamilyCollisionScale_div_pair hβ hd
+
+/-- Along every vanishing regular-variation tail scale, simultaneous two-family collisions
+disappear on the pair-collision clock.  This is the biology-facing separation between the
+single-event `Λ` limit here and the mass-partition `Ξ` limit needed for genuinely simultaneous
+families. -/
+theorem speedConditionedGenealogy_simultaneousMergersVanish
+    {ι : Type*} {l : Filter ι} (β : ℝ) {tailScale : ι → ℝ}
+    (hscale : Filter.Tendsto tailScale l (nhds 0)) :
+    Filter.Tendsto
+      (fun index ↦ tailScale index * (β + 1) / ((β + 2) * (β + 3)))
+      l (nhds 0) :=
+  tendsto_speedTiltTwoFamilyToPairRatio_comp β hscale
+
 /-- **The biology core consumes the marked successful-family measure itself.**  At zero tilt its
 weighted pushforward is exactly the unconditioned genealogy measure, and for every merger size
 the Bernoulli family-participation rate is the corresponding `Λ`-rate.  This is the formal

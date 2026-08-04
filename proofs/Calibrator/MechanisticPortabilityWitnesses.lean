@@ -41,10 +41,34 @@ macro "generational_witness_simp" ms:Lean.Parser.Tactic.simpLemma,* : tactic =>
       Matrix.cons_val', Matrix.cons_val_fin_one])
 
 /-!
-# Simulation Theory and Mechanistic Validation of Portability Models
+# Mechanistic Witness Models for Portability
 
-This file records only simulation-validation objects that remain honest under
-the explicit SNP/LD-aware portability surface in `PortabilityDrift`.
+**This file was called `SimulationValidation`, and the name was wrong in a way
+worth stating.** Nothing here validates anything against a simulation. There is
+no simulated data in this file, no measured constant, no axiom and no `sorry`;
+every numeral in every witness below is a round design value (`0`, `1`, `1/2`,
+`1/4`, `1/8`) chosen to make a contrast visible, and no declaration references
+the empirical batteries in `proofs/validation/empirical/simcov/`.
+
+"Simulation" here meant a worked model INSIDE Lean -- an instance of the
+mechanistic transport surface with explicit LD, tagging, effect and context
+state -- and the project uses the same word for the Wright-Fisher and coalescent
+batteries that test the corpus's definitions against measured population
+genetics. Two unrelated things under one word, with one of them named after the
+other, reads as though the proofs were being fitted to make the batteries pass.
+They are not, and the file is renamed so that the question does not have to be
+asked again.
+
+What these objects are for is the opposite of fitting. Each witness is a pair of
+models differing in exactly one biological coordinate, and each theorem states
+that some metric does or does not move between them -- LD shift changes
+portability without changing source `R²`, a prevalence shift changes Brier
+without changing `R²`, and so on. Their function is to make the definitions
+CONTRADICTABLE: a body that silently ignored the coordinate it claims to depend
+on would satisfy every inequality in the corpus and fail here.
+
+The objects that follow remain honest under the explicit SNP/LD-aware
+portability surface in `PortabilityDrift`.
 
 No source-`R²` attenuation law is assumed. Target metrics are evaluated
 directly from explicit source/target biological state:
@@ -547,6 +571,12 @@ noncomputable def nondegenerateGenerationalPopGen : GenerationalPopGenParameters
   V_A_pos := by norm_num
 }
 
+/-- The chosen mutation scale makes the differentiation transient's retention
+factor vanish exactly at generation one. -/
+theorem nondegenerateGenerationalPopGen_fstDecay_eq_zero :
+    fstTransientDecayFromScaled 1 2 (1 / 2) = 0 := by
+  norm_num [fstTransientDecayFromScaled, hetDecayFromScaled]
+
 /-- Exact generation-1 popgen coordinates for the nondegenerate witness. -/
 theorem nondegenerateGenerationalPopGen_coordinates_at_one :
     nondegenerateGenerationalPopGen.theta = 2 ∧
@@ -562,7 +592,8 @@ theorem nondegenerateGenerationalPopGen_coordinates_at_one :
   · simp [nondegenerateGenerationalPopGen, GenerationalPopGenParameters.fstTransientAt,
       fstTransientDecayFromScaled, hetDecayFromScaled,
       GenerationalPopGenParameters.hetDecayFactor,
-      GenerationalPopGenParameters.theta, GenerationalPopGenParameters.bigM]
+      GenerationalPopGenParameters.theta, GenerationalPopGenParameters.bigM,
+      nondegenerateGenerationalPopGen_fstDecay_eq_zero]
     norm_num
   · simp [nondegenerateGenerationalPopGen,
       GenerationalPopGenParameters.mutationSharedRetentionAt,
@@ -679,7 +710,8 @@ theorem popgenDrivenProxyGenerationalModel_generation_one_scales :
           = (7 / 6 : ℝ) * (Real.exp (-(1 : ℝ)) * Real.exp (-(1 / 14 : ℝ))) := by
               fin_cases i <;>
                 generational_witness_simp nondegenerateGenerationalPopGen,
-                  popgenDrivenProxyGenerationalModel, h_fst, h_mut, h_mig <;>
+                  popgenDrivenProxyGenerationalModel, h_fst, h_mut, h_mig,
+                  nondegenerateGenerationalPopGen_fstDecay_eq_zero <;>
                 ring_nf
       _ = (7 / 6 : ℝ) * Real.exp (-(15 / 14 : ℝ)) := by
             congr 1

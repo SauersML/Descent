@@ -1611,7 +1611,8 @@ theorem fstIslandEquilibriumFiniteDemes_eq_limit_of_unit_correction
 /-- **`fstMigrationMutationEquilibriumManyDemes` at the denominator, named.**
 Migration and mutation enter the divisor additively, so an inadmissible negative migration rate
 can cancel the leading one even with mutation absent. The equilibrium is reported as zero -- no
-differentiation -- where the formula has no value at all. Consumers must exclude it by hypothesis. -/
+differentiation -- where the formula has no value at all. Consumers must exclude it by
+hypothesis. -/
 theorem fstMigrationMutationEquilibriumManyDemes_cancelling_terms_is_junk :
     fstMigrationMutationEquilibriumManyDemes 1 (-(1/4)) 0 = 0 := by
   unfold fstMigrationMutationEquilibriumManyDemes
@@ -2377,7 +2378,30 @@ theorem hetMutationRecurrence_closed_form (lam Hstar H₀ : ℝ) (t : ℕ) :
 /-- **Transient Fst from heterozygosity ratio.**
     Fst(t) = 1 - H(t)/H₀.
 
-    Empirical status: UNTESTED. -/
+    Regime: closed Wright-Fisher drift, no mutation, no migration, no
+    selection. With a mutation floor the ratio does not run to one; see
+    `PortabilityDrift.hetMutationFloor`.
+
+    Empirical status: **VALIDATED** (`simcov/battery_bulk21.py`, `group_ab`).
+    Two isolated Wright-Fisher demes started at a common frequency, 20000
+    replicate pairs, with `H` measured directly as the mean `2p(1-p)` and
+    compared against the classical decay `H_t/H₀ = (1 - 1/(2Nₑ))ᵗ` -- a
+    prediction derived independently of this body, so what is on trial is
+    whether the heterozygosity ratio is the drift `F` and not merely whether
+    two transcriptions of one formula agree. Over `Nₑ` = 50, 100, 200 and `t` =
+    40, 60, 120, 200 the measured ratio gives 0.18125, 0.18109, 0.25736,
+    0.45429 and 0.63124 against the classical 0.18168, 0.18168, 0.25946,
+    0.45284 and 0.63304, worst cell 0.98 sems at 0.28% relative, over a
+    prediction spanning 71%. `Nₑ` and `t` are moved separately, so the two
+    cells that reach `F ≈ 0.18` by different routes both have to hold.
+
+    Caution, recorded because this battery walked into it: `driftVariance` and
+    `expectedFreqDiffSq` compared against the SAME simulated trajectories are
+    NOT independent measurements of anything. Given only the martingale
+    property `E[p_t] = p₀`, `p₀(1-p₀)(1 - H_t/H₀)` reduces identically to
+    `Var(p_t)`, so those comparisons return the drift model's own algebra and
+    scored MATCH at 0.00 sems in three cells. The heterozygosity decay above is
+    the only one of the four that a simulation can refute. -/
 noncomputable def fstFromHetRatio (H H₀ : ℝ) : ℝ :=
   1 - H / H₀
 

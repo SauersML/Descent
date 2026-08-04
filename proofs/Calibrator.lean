@@ -31,7 +31,7 @@ import Calibrator.ClinicalUtilityFairness
 import Calibrator.VarianceComponents
 import Calibrator.ScoreDistribution
 import Calibrator.ValidationStatistics
-import Calibrator.SimulationValidation
+import Calibrator.MechanisticPortabilityWitnesses
 import Calibrator.SelectionValidation
 import Calibrator.GeneticArchitectureDiscovery
 import Calibrator.BayesianPGSTheory
