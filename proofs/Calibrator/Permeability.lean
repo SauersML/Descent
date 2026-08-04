@@ -484,6 +484,16 @@ noncomputable def twoChannelConditionalMomentResponse
     (firstNoise sharedNoise firstResponse secondResponse : ℝ) : ℝ :=
   secondResponse - (sharedNoise / firstNoise) * firstResponse
 
+/-- **With no shared noise the second channel is read unadjusted.** The regression coefficient
+that removes the first channel is exactly the shared-to-own noise ratio, and at zero shared noise
+it vanishes; a body carrying any other numerator would still be a difference of responses. -/
+theorem twoChannelConditionalMomentResponse_no_shared_noise
+    (firstNoise firstResponse secondResponse : ℝ) :
+    twoChannelConditionalMomentResponse firstNoise 0 firstResponse secondResponse
+      = secondResponse := by
+  unfold twoChannelConditionalMomentResponse
+  simp
+
 /-- Residual square-noise variance of the second channel after projecting out the first. -/
 noncomputable def twoChannelConditionalMomentNoise
     (firstNoise secondNoise sharedNoise : ℝ) : ℝ :=

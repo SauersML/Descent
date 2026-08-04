@@ -509,6 +509,14 @@ theorem gainLog_at_exp_one : gainLog (Real.exp 1) = 1 := by
     `gainPower` invited exactly that misreading. -/
 noncomputable def gainPolynomialRow (β n : ℝ) : ℝ := n ^ β * Real.log n
 
+/-- **The polynomial row is the product of a power and the logarithmic row.** The separation
+results order the four rows by growth and do not say how this one is built; the factorisation
+does, and it is what ties the row to `gainLog` rather than to some other slowly varying factor. -/
+theorem gainPolynomialRow_eq_mul (β n : ℝ) :
+    gainPolynomialRow β n = n ^ β * gainLog n := by
+  unfold gainPolynomialRow gainLog
+  ring
+
 /-- Row four: linear gain, the fully fresh case. -/
 noncomputable def gainLinear (n : ℝ) : ℝ := n
 
