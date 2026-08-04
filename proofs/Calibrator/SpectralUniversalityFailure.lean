@@ -479,9 +479,11 @@ theorem rotatedUniformFourthInvariant_eq :
         (x ^ 4 + 2 * x ^ 3 + 3 / 2 * x ^ 2 + 1 / 2 * x + 1 / 8) x := by
     intro x _
     have h5 : HasDerivAt (fun a : ℝ ↦ a ^ 5 / 5) (x ^ 4) x := by
-      simpa using (hasDerivAt_pow 5 x).div_const 5
+      have h := (hasDerivAt_pow 5 x).div_const 5
+      convert h using 1 <;> push_cast <;> ring
     have h4 : HasDerivAt (fun a : ℝ ↦ a ^ 4 / 2) (2 * x ^ 3) x := by
-      simpa using (hasDerivAt_pow 4 x).div_const 2
+      have h := (hasDerivAt_pow 4 x).div_const 2
+      convert h using 1 <;> push_cast <;> ring
     have h3 : HasDerivAt (fun a : ℝ ↦ a ^ 3 / 2) (3 / 2 * x ^ 2) x := by
       have h := (hasDerivAt_pow 3 x).div_const 2
       convert h using 1 <;> push_cast <;> ring
