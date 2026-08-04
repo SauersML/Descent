@@ -21,34 +21,43 @@ are counted, and the unbiased `sum c(c-1)/(n(n-1))` is used for both.
 It shares NO code with the forward engine and NO derivation with the formula, so
 whichever it agrees with is the one that is right.
 
-RESULT: INCONCLUSIVE, and the reason is a flaw in THIS oracle rather than in
-either candidate.
+RESULT after sampling ALL demes: the two simulators AGREE, and the remaining
+comparison against the corpus formula is confounded by a convention.
 
-    m       corpus    this oracle    forward engine
-    0.002   0.3004    -19.5%         -4.8%
-    0.005   0.1889    -20.2%         -5.5%
-    0.010   0.1167    -23.0%         -5.5%
+  m       corpus (linear corr)   this oracle    forward engine
+  0.002   0.3004                 -5.5%          -4.8%
+  0.005   0.1889                 -7.3%          -5.5%
+  0.010   0.1167                 -7.1%          -5.5%
 
-The two simulators disagree with each other by fifteen points, so neither
-adjudicates anything. A tie-breaker that disagrees with both candidates is not a
-tie-breaker.
+That settles the first question. A forward Wright-Fisher engine and a structured
+coalescent, sharing no code and no derivation, land within about two points of
+each other. The forward engine's generation cycle is therefore not the fault;
+both simulators say the same thing.
 
-The likely cause is in the sampling above: `sampled_demes = 4` out of
-`n_demes = 12`, so `H_T` here is the pooled heterozygosity of a THIRD of the
-population, not of the whole of it. A subset pools less variation than the full
-set, so `H_T` is too small, and `F_ST = 1 - H_S/H_T` is biased low -- which is
-the direction and roughly the size of the extra fifteen points. The forward
-engine computes `H_T` over every deme, which is what `1/(1 + theta + bigM)` is
-written about.
+What it does NOT settle is whether the corpus formula is right, because the
+deme-count correction applied to `bigM` moves the prediction by as much as the
+effect being measured. At twelve demes:
 
-The fix is to sample all demes, and it is NOT applied here: the run costs ten
-minutes and this is the fifth consecutive design in this thread whose first
-version was wrong, so the next attempt should start from a derivation of what
-`H_T` means under partial sampling rather than from another guess. Until then
-the corpus formula is neither confirmed nor contradicted, and `fstEquilibrium`
-keeps the status battery 7 gave it -- validated against a mutation-free
-coalescent at 0.21 to 1.13 sems, which tests its `bigM` term and not its
-composition with `theta`.
+  correction        prediction (m=0.002)   oracle sits
+  n/(n-1)           0.3004                 -5.5%
+  (n/(n-1))^2       0.2905                 -2.3%
+
+and at m = 0.010 the squared correction brings the gap to -0.7 percent. So the
+answer depends on which correction is right IN THE PRESENCE OF MUTATION, and
+this branch validated the LINEAR one mutation-free
+(`islandDemeCorrection`, battery `battery_max.py`). Those are different regimes
+and the mutation-free validation does not transfer.
+
+Separating them needs many demes, where `n/(n-1)` is near one and the choice
+cannot carry the answer. That run was attempted at fifty demes and abandoned:
+the structured coalescent with fifty demes at these migration rates did not
+finish in forty minutes, which is a cost worth knowing before the next attempt.
+
+So `fstEquilibrium` keeps its battery-7 status -- validated against a
+mutation-free coalescent, which tests its `bigM` term and not its composition
+with `theta`. The composition remains open, and the specific experiment that
+would close it is: many demes, all sampled, infinite alleles, with a simulator
+fast enough to reach fifty demes.
 """
 import math
 
@@ -61,10 +70,19 @@ def unbiased_hom(counts, n):
     return float((counts * (counts - 1)).sum()) / (n * (n - 1))
 
 
-def island_fst_with_mutation(Ne, m, mu, n_demes=12, n_dip=25, seq_len=400,
-                             reps=14, seed=1, sampled_demes=4):
-    """Equilibrium F_ST under the structured coalescent with infinite alleles."""
+def island_fst_with_mutation(Ne, m, mu, n_demes=12, n_dip=10, seq_len=400,
+                             reps=14, seed=1, sampled_demes=None):
+    """Equilibrium F_ST under the structured coalescent with infinite alleles.
+
+    ALL demes are sampled by default. `H_T` in `1/(1 + theta + bigM)` is the
+    heterozygosity of the whole population, and pooling a subset of demes pools
+    less variation, so a partial sample makes `H_T` too small and `F_ST` too
+    low. The first version of this oracle sampled four demes of twelve and came
+    out fifteen points below the forward engine for exactly that reason.
+    """
     import msprime
+    if sampled_demes is None:
+        sampled_demes = n_demes
     dem = msprime.Demography.island_model([Ne] * n_demes,
                                           migration_rate=m / (n_demes - 1.0))
     vals = []
