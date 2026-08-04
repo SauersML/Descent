@@ -163,6 +163,21 @@ theorem neiGstFromFrequencies_nonneg (p₁ p₂ : ℝ)
   apply div_nonneg (sq_nonneg _)
   nlinarith
 
+/-- At strictly polymorphic subgroup frequencies, Nei's `G_ST` is strictly below one.  Complete
+differentiation therefore requires a boundary fixation configuration rather than two interior
+allele frequencies. -/
+theorem neiGstFromFrequencies_lt_one (p₁ p₂ : ℝ)
+    (h₁ : 0 < p₁) (h₁' : p₁ < 1)
+    (h₂ : 0 < p₂) (h₂' : p₂ < 1) :
+    neiGstFromFrequencies p₁ p₂ < 1 := by
+  unfold neiGstFromFrequencies
+  have h_den : 0 < 4 * ((p₁ + p₂) / 2) * (1 - (p₁ + p₂) / 2) := by
+    nlinarith
+  rw [div_lt_one h_den]
+  have h_within₁ : 0 < p₁ * (1 - p₁) := mul_pos h₁ (sub_pos.mpr h₁')
+  have h_within₂ : 0 < p₂ * (1 - p₂) := mul_pos h₂ (sub_pos.mpr h₂')
+  nlinarith
+
 /-- **`G_ST` is zero when the subgroups are identical.** -/
 theorem neiGstFromFrequencies_zero_same (p : ℝ) :
     neiGstFromFrequencies p p = 0 := by
