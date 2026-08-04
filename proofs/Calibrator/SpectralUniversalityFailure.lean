@@ -13,24 +13,25 @@ import Mathlib.Tactic.Ring
 namespace Calibrator
 
 /-!
-# Failure of spectral sufficiency for skewed product priors
+# Failure of spectral sufficiency for non-Gaussian product priors
 
 This file formalizes the algebraic certificate behind the negative answer to Question S.
 There are two rigid bases: the eigenbasis of a covariance matrix and the coordinate basis in
 which a non-Gaussian prior factorizes.  A spectrum forgets their relative orientation.
 
-The main result is dimension-general.  If independent centered coordinates have common third
-moment `kappa` and are mixed by a matrix `L`, the squared Frobenius norm of the resulting third
-moment tensor is
+The main result is dimension- and order-general.  If independent centered coordinates have common
+order-`q` cumulant `kappa` and are mixed by a matrix `L`, the squared Frobenius norm of the
+resulting order-`q` cumulant tensor is
 
-`kappa ^ 2 * sum i, sum j, ((L.transpose * L) i j) ^ 3`.
+`kappa ^ 2 * sum i, sum j, ((L.transpose * L) i j) ^ q`.
 
-Thus the first orientation-sensitive contraction is the entrywise cube sum of the Gram matrix.
-The second part gives an exact two-dimensional witness: a diagonal block and its forty-five
-degree rotation have the same characteristic polynomial at every parameter value, but different
-entrywise-cube invariants.  At the midpoint parameter their difference is exactly `11 / 8`, and
-the corresponding low-SNR third coefficient differs by `11 / 24` for the sparse centered prior
-with variance and third moment both equal to `2`.
+Thus each nonzero scalar cumulant exposes the corresponding parallel-edge traffic observable.
+At order two this is the spectral two-cycle.  From order three onward it can depend on covariance
+orientation.  The second part gives exact two-dimensional witnesses: a diagonal block and its
+forty-five-degree rotation have the same characteristic polynomial at every parameter value, but
+different entrywise-cube and entrywise-fourth-power invariants.  The cubic low-SNR separation is
+`11 / 24` for a skewed sparse prior, while the quartic separation is `49 / 96` for a symmetric
+Rademacher prior.
 
 No free-entropy limit theorem is assumed as a parameter here.  The declarations below prove the
 finite-dimensional invariant and the coefficient separation on which such a theorem must act.
@@ -40,11 +41,12 @@ adaptive-interpolation step.
 ## Biological interpretation
 
 Take `L` to be a square root of a linkage-disequilibrium covariance matrix.  The input coordinates
-are locus effects in the reference-allele basis.  For a skewed sparse architecture, `kappa` is
-nonzero, so two populations can have identical LD eigenvalues and nevertheless have different
-third-order denoising information.  The spectrum measures LD strength; the entrywise cube sum
-also measures how LD eigenvectors are oriented relative to loci.  This is the basis information
-that a spectral portability summary discards.
+are locus effects in the reference-allele basis.  A skewed sparse architecture can expose the
+cubic invariant, while a symmetric non-Gaussian architecture can expose the quartic invariant.
+More generally, every nonzero higher cumulant detects the matching LD traffic observable.  The
+spectrum measures LD strength; these entrywise power sums also measure how LD eigenvectors are
+oriented relative to loci.  This is the basis information that a spectral portability summary
+discards.
 -/
 
 open scoped BigOperators Matrix
@@ -117,6 +119,79 @@ private theorem sum_sq_expand {I : Type*} [Fintype I] (f : I → ℝ) :
     (∑ i, f i) ^ 2 = ∑ i, ∑ j, f i * f j := by
   simpa only [pow_two] using Fintype.sum_mul_sum f f
 
+/-! ### The cumulant contraction in arbitrary order -/
+
+/-- Order-`q` cumulant tensor obtained by mixing independent coordinates with common scalar
+cumulant `kappa`.  Indexing tensor legs by `Fin q` makes the construction uniform in `q`. -/
+noncomputable def pushedCumulantTensor
+    (order : ℕ) (mixing : Matrix Row Locus ℝ) (kappa : ℝ)
+    (indices : Fin order → Row) : ℝ :=
+  kappa * ∑ locus, ∏ leg, mixing (indices leg) locus
+
+/-- Squared Frobenius norm of an arbitrary-order tensor. -/
+noncomputable def cumulantTensorEnergy
+    (order : ℕ) (tensor : (Fin order → Row) → ℝ) : ℝ :=
+  ∑ indices, tensor indices ^ 2
+
+/-- The two-vertex, `order`-parallel-edge traffic observable. -/
+noncomputable def entryPowerSum
+    (covariance : Matrix Locus Locus ℝ) (order : ℕ) : ℝ :=
+  ∑ left, ∑ right, covariance left right ^ order
+
+/-- **All-order cumulant orientation identity.**  For every tensor order, the squared energy
+of the pushed-forward diagonal cumulant tensor is the corresponding parallel-edge traffic
+observable of the Gram covariance, multiplied by the squared scalar cumulant. -/
+theorem cumulantTensorEnergy_pushedCumulantTensor
+    (order : ℕ) (mixing : Matrix Row Locus ℝ) (kappa : ℝ) :
+    cumulantTensorEnergy order (pushedCumulantTensor order mixing kappa) =
+      kappa ^ 2 * entryPowerSum (mixing.transpose * mixing) order := by
+  classical
+  unfold cumulantTensorEnergy pushedCumulantTensor entryPowerSum
+  simp only [Matrix.mul_apply, Matrix.transpose_apply]
+  calc
+    (∑ indices : Fin order → Row,
+        (kappa * ∑ locus, ∏ leg, mixing (indices leg) locus) ^ 2) =
+        kappa ^ 2 * ∑ indices : Fin order → Row,
+          ∑ left, ∑ right,
+            (∏ leg, mixing (indices leg) left) *
+              ∏ leg, mixing (indices leg) right := by
+      simp_rw [mul_pow, sum_sq_expand]
+      rw [Finset.mul_sum]
+    _ = kappa ^ 2 * ∑ left, ∑ right,
+        ∑ indices : Fin order → Row,
+          (∏ leg, mixing (indices leg) left) *
+            ∏ leg, mixing (indices leg) right := by
+      rw [sum_pair_out]
+    _ = kappa ^ 2 * ∑ left, ∑ right,
+        (∑ row, mixing row left * mixing row right) ^ order := by
+      congr 1
+      apply Finset.sum_congr rfl
+      intro left _
+      apply Finset.sum_congr rfl
+      intro right _
+      calc
+        (∑ indices : Fin order → Row,
+            (∏ leg, mixing (indices leg) left) *
+              ∏ leg, mixing (indices leg) right) =
+            ∑ indices : Fin order → Row,
+              ∏ leg, mixing (indices leg) left * mixing (indices leg) right := by
+          apply Finset.sum_congr rfl
+          intro indices _
+          rw [Finset.prod_mul_distrib]
+        _ = ∏ _leg : Fin order, ∑ row, mixing row left * mixing row right := by
+          rw [Fintype.prod_sum]
+        _ = (∑ row, mixing row left * mixing row right) ^ order := by simp
+    _ = kappa ^ 2 *
+        ∑ left, ∑ right, (∑ x, mixing x left * mixing x right) ^ order := rfl
+
+/-- If the scalar cumulant vanishes, its pushed-forward tensor has zero energy at every order and
+for every covariance orientation. -/
+theorem cumulantTensorEnergy_pushedCumulantTensor_zero
+    (order : ℕ) (mixing : Matrix Row Locus ℝ) :
+    cumulantTensorEnergy order (pushedCumulantTensor order mixing 0) = 0 := by
+  rw [cumulantTensorEnergy_pushedCumulantTensor]
+  simp
+
 /-- Expansion of the cube of a finite sum. -/
 private theorem sum_cube_expand {I : Type*} [Fintype I] (f : I → ℝ) :
     (∑ i, f i) ^ 3 = ∑ i, ∑ j, ∑ k, f i * f j * f k := by
@@ -165,6 +240,11 @@ entries of a covariance matrix. -/
 noncomputable def entryCubeSum (covariance : Matrix Locus Locus ℝ) : ℝ :=
   ∑ i, ∑ j, covariance i j ^ 3
 
+/-- The cubic observable is the order-three specialization of the all-order traffic sum. -/
+theorem entryPowerSum_three (covariance : Matrix Locus Locus ℝ) :
+    entryPowerSum covariance 3 = entryCubeSum covariance :=
+  rfl
+
 /-- The Gram covariance induced by a mixing matrix. -/
 noncomputable def gramCovariance (mixing : Matrix Row Locus ℝ) : Matrix Locus Locus ℝ :=
   mixing.transpose * mixing
@@ -211,6 +291,11 @@ noncomputable def fourthTensorEnergy (tensor : Row → Row → Row → Row → �
 product priors: the sum of the fourth powers of all covariance entries. -/
 noncomputable def entryFourthSum (covariance : Matrix Locus Locus ℝ) : ℝ :=
   ∑ i, ∑ j, covariance i j ^ 4
+
+/-- The quartic observable is the order-four specialization of the all-order traffic sum. -/
+theorem entryPowerSum_four (covariance : Matrix Locus Locus ℝ) :
+    entryPowerSum covariance 4 = entryFourthSum covariance :=
+  rfl
 
 /-- **General fourth-cumulant orientation identity.**  The energy of the pushed-forward fourth
 cumulant tensor is the entrywise-fourth-power sum of the Gram covariance, multiplied by
@@ -445,19 +530,23 @@ theorem localizedUniformFourthInvariant_eq :
     intro x _
     have h5 : HasDerivAt (fun a : ℝ ↦ a ^ 5 / 5) (x ^ 4) x := by
       have h := (hasDerivAt_pow 5 x).div_const 5
-      convert h using 1 <;> push_cast <;> ring
+      convert h using 1
+      norm_num
     have h4 : HasDerivAt (fun a : ℝ ↦ a ^ 4 / 2) (2 * x ^ 3) x := by
       have h := (hasDerivAt_pow 4 x).div_const 2
-      convert h using 1 <;> push_cast <;> ring
+      convert h using 1
+      norm_num
+      ring
     have h3 : HasDerivAt (fun a : ℝ ↦ a ^ 3) (3 * x ^ 2) x := by
       have h := hasDerivAt_pow 3 x
-      convert h using 1 <;> push_cast <;> ring
+      simpa using h
     have h2 : HasDerivAt (fun a : ℝ ↦ a ^ 2) (2 * x) x := by
       have h := hasDerivAt_pow 2 x
-      convert h using 1 <;> push_cast <;> ring
+      convert h using 1
+      norm_num
     have h1 : HasDerivAt (fun a : ℝ ↦ a / 2) (1 / 2 : ℝ) x := by
       have h := (hasDerivAt_id x).div_const 2
-      convert h using 1 <;> norm_num
+      simpa using h
     exact (((h5.add h4).add h3).add h2).add h1
   rw [intervalIntegral.integral_eq_sub_of_hasDerivAt hderiv
     (Continuous.intervalIntegrable (by fun_prop) 1 2)]
@@ -480,19 +569,26 @@ theorem rotatedUniformFourthInvariant_eq :
     intro x _
     have h5 : HasDerivAt (fun a : ℝ ↦ a ^ 5 / 5) (x ^ 4) x := by
       have h := (hasDerivAt_pow 5 x).div_const 5
-      convert h using 1 <;> push_cast <;> ring
+      convert h using 1
+      norm_num
     have h4 : HasDerivAt (fun a : ℝ ↦ a ^ 4 / 2) (2 * x ^ 3) x := by
       have h := (hasDerivAt_pow 4 x).div_const 2
-      convert h using 1 <;> push_cast <;> ring
+      convert h using 1
+      norm_num
+      ring
     have h3 : HasDerivAt (fun a : ℝ ↦ a ^ 3 / 2) (3 / 2 * x ^ 2) x := by
       have h := (hasDerivAt_pow 3 x).div_const 2
-      convert h using 1 <;> push_cast <;> ring
+      convert h using 1
+      norm_num
+      ring
     have h2 : HasDerivAt (fun a : ℝ ↦ a ^ 2 / 4) (1 / 2 * x) x := by
       have h := (hasDerivAt_pow 2 x).div_const 4
-      convert h using 1 <;> push_cast <;> ring
+      convert h using 1
+      norm_num
+      ring
     have h1 : HasDerivAt (fun a : ℝ ↦ a / 8) (1 / 8 : ℝ) x := by
       have h := (hasDerivAt_id x).div_const 8
-      convert h using 1 <;> norm_num
+      simpa using h
     exact (((h5.add h4).add h3).add h2).add h1
   rw [intervalIntegral.integral_eq_sub_of_hasDerivAt hderiv
     (Continuous.intervalIntegrable (by fun_prop) 1 2)]
@@ -562,6 +658,12 @@ theorem rademacher_fullLowSNRFourthCoefficient_rotated_sub_localized
 noncomputable def entrySquareSum {Locus : Type*} [Fintype Locus]
     (covariance : Matrix Locus Locus ℝ) : ℝ :=
   ∑ i, ∑ j, covariance i j ^ 2
+
+/-- The quadratic observable is the order-two specialization of the all-order traffic sum. -/
+theorem entryPowerSum_two {Locus : Type*} [Fintype Locus]
+    (covariance : Matrix Locus Locus ℝ) :
+    entryPowerSum covariance 2 = entrySquareSum covariance :=
+  rfl
 
 /-- For a symmetric covariance, the two-parallel-edge traffic observable is exactly the
 spectral two-cycle `Tr(Σ²)`.  This is the low-order coincidence that fails from order three on. -/
@@ -654,6 +756,23 @@ theorem exists_isospectral_blocks_with_distinct_entryCubeMean :
   norm_num at hzero
 
 /-! ## Biology-facing names -/
+
+/-- The order-`q` orientation-sensitive LD traffic invariant in the locus coordinate basis. -/
+noncomputable def ldOrientationInvariant {Locus : Type*} [Fintype Locus]
+    (order : ℕ) (ld : Matrix Locus Locus ℝ) : ℝ :=
+  entryPowerSum ld order
+
+/-- **All-order architecture/LD contraction.**  An independent effect architecture with scalar
+order-`q` cumulant detects LD orientation through the `q`-parallel-edge traffic invariant.
+This contains both the skewed third-moment and symmetric fourth-cumulant mechanisms. -/
+theorem independentArchitecture_cumulantEnergy_eq_ldOrientationInvariant
+    {Row Locus : Type*} [Fintype Row] [Fintype Locus]
+    (order : ℕ) (ldSquareRoot : Matrix Row Locus ℝ) (effectCumulant : ℝ) :
+    cumulantTensorEnergy order
+        (pushedCumulantTensor order ldSquareRoot effectCumulant) =
+      effectCumulant ^ 2 *
+        ldOrientationInvariant order (gramCovariance ldSquareRoot) := by
+  exact cumulantTensorEnergy_pushedCumulantTensor order ldSquareRoot effectCumulant
 
 /-- The orientation-sensitive third-order LD invariant in the locus coordinate basis. -/
 noncomputable def ldOrientationThirdInvariant {Locus : Type*} [Fintype Locus]
