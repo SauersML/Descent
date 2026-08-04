@@ -186,9 +186,8 @@ theorem one_div_transferTimeInflation_eq_one_sub_fstFromTau (s a : ℝ) :
   have hpos : (0 : ℝ) < 1 + (a / s) ^ 2 := by positivity
   have hne : (1 : ℝ) + (a / s) ^ 2 ≠ 0 := ne_of_gt hpos
   unfold transferTimeInflation fstFromTau
-  first
-  | (field_simp; ring)
-  | field_simp
+  field_simp
+  ring
 
 /-- **Branchwise-to-pairwise `F_ST` map under independent drift from a common
 ancestor.**
@@ -3189,7 +3188,7 @@ theorem alleleFreqMismatchPenalty_le_one (pSource pTarget : ℝ) :
     alleleFreqMismatchPenalty pSource pTarget ≤ 1 := by
   unfold alleleFreqMismatchPenalty
   rw [Real.exp_le_one_iff]
-  simpa using abs_nonneg (pTarget - pSource)
+  exact neg_nonpos.mpr (abs_nonneg (pTarget - pSource))
 
 @[simp] theorem alleleFreqMismatchPenalty_self (p : ℝ) :
     alleleFreqMismatchPenalty p p = 1 := by
@@ -6498,7 +6497,7 @@ theorem steppingStoneFst_lt_one (fst_neighbor α : ℝ) (d : ℕ)
 characteristic scale is `(1 - fst_neighbor)/fst_neighbor` and the form reproduces its own
 anchor; `α` rescales that length, so it is the unit of distance rather than a per-step
 increment as it was under the linear body. -/
-theorem steppingStoneFst_at_one (fst_neighbor : ℝ) (hfst : 0 < fst_neighbor) :
+theorem steppingStoneFst_at_one (fst_neighbor : ℝ) :
     steppingStoneFst fst_neighbor 1 1 = fst_neighbor := by
   unfold steppingStoneFst
   have hden : fst_neighbor * ((1 : ℕ) : ℝ) + 1 * (1 - fst_neighbor) = 1 := by
