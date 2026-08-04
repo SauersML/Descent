@@ -68,6 +68,7 @@ noncomputable def calibrationDriftDefectSq (covariateWeight : Covariate → ℝ)
   ∑ x, covariateWeight x *
     ∑ t, posterior x t * posteriorDrift posterior conditional t x ^ 2
 
+omit [Fintype Covariate] in
 /-- A posterior-weighted conditional residual has zero index mean. -/
 theorem posteriorDrift_weighted_sum_eq_zero
     (posterior : Covariate → Index → ℝ) (conditional : Index → Covariate → ℝ)
@@ -94,6 +95,7 @@ theorem posteriorDrift_weighted_sum_eq_zero
             rw [posteriorMean]
     _ = 0 := by rw [hposterior]; ring
 
+omit [Fintype Covariate] in
 /-- **Pointwise posterior bias--variance identity.**  At a fixed covariate, index-wise squared
 error is conditional drift variance plus squared pooled error. -/
 theorem posterior_bias_variance_decomposition
@@ -160,6 +162,7 @@ noncomputable def posteriorPairwiseDriftEnergy
   (1 / 2) * ∑ s, posterior x s *
     ∑ t, posterior x t * (conditional s x - conditional t x) ^ 2
 
+omit [Fintype Covariate] in
 /-- **Pairwise representation of posterior variance.**  For an arbitrary finite family of
 ancestries or environments, the local drift defect is exactly half the expected squared
 conditional-risk difference between two independent posterior draws.  No ordering, reference
@@ -197,6 +200,7 @@ theorem posteriorPairwiseDriftEnergy_eq_posteriorDriftEnergy
   rw [← Finset.sum_mul, hposterior, one_mul, hrecenter]
   ring
 
+omit [Fintype Covariate] in
 /-- Pairwise drift energy is nonnegative whenever the posterior weights are nonnegative.  No
 normalization is needed for this order property. -/
 theorem posteriorPairwiseDriftEnergy_nonneg
@@ -213,6 +217,7 @@ theorem posteriorPairwiseDriftEnergy_nonneg
     intro t _
     exact mul_nonneg (hnonnegative t) (sq_nonneg _)
 
+omit [Fintype Covariate] in
 /-- **Support-aware zero-defect law.**  For a nonnegative normalized posterior, pairwise drift
 energy vanishes exactly when conditional risks agree on the posterior support.  This is the sealed
 boundary form of the result: zero-mass populations are deliberately invisible, but no positively
@@ -274,6 +279,7 @@ theorem posteriorPairwiseDriftEnergy_eq_zero_iff_on_support
     rw [hsum]
     ring
 
+omit [Fintype Covariate] in
 /-- **Interior zero-defect law.**  When every population or environment has positive posterior
 mass, zero pairwise energy is equivalent to complete conditional invariance.  This is the strict
 support corollary of `posteriorPairwiseDriftEnergy_eq_zero_iff_on_support`. -/
@@ -445,18 +451,21 @@ noncomputable def twoIndexConditional (upper lower : Covariate → ℝ)
     (t : Bool) (x : Covariate) : ℝ :=
   if t then upper x else lower x
 
+omit [Fintype Covariate] in
 /-- The two-index posterior is normalized for every covariate, algebraically and without a
 positivity assumption. -/
 theorem twoIndexPosterior_sum_eq_one (q : Covariate → ℝ) (x : Covariate) :
     ∑ t, twoIndexPosterior q x t = 1 := by
   norm_num [twoIndexPosterior]
 
+omit [Fintype Covariate] in
 /-- The pooled conditional in a two-environment field. -/
 theorem posteriorMean_twoIndex_eq (q upper lower : Covariate → ℝ) (x : Covariate) :
     posteriorMean (twoIndexPosterior q) (twoIndexConditional upper lower) x =
       q x * upper x + (1 - q x) * lower x := by
   norm_num [posteriorMean, twoIndexPosterior, twoIndexConditional]
 
+omit [Fintype Covariate] in
 /-- **Exact two-index drift law, pointwise.**  Conditional drift energy is posterior
 heterogeneity `q(1-q)` times squared section width.  Thus a large difference between two
 biological environments matters only to the extent that both environments remain posteriorly
@@ -471,6 +480,7 @@ theorem twoIndex_posteriorDriftEnergy_eq
   norm_num [twoIndexPosterior, twoIndexConditional]
   ring
 
+omit [Fintype Covariate] in
 /-- **The only interior zero is no conditional drift.**  When both environments remain
 posteriorly possible at a covariate, their local calibration defect vanishes exactly when their
 conditional risks agree.  At `q = 0` or `q = 1` the index is instead determined by the covariate,
@@ -521,6 +531,7 @@ theorem no_common_thresholdDecision_of_crossing {cutoff lower upper : ℝ}
     exact thresholdDecision_ne_of_crossing hlower hupper (h.symm.trans heq)
   · exact Or.inl h
 
+omit [Fintype Covariate] in
 /-- **A threshold crossing with margin forces a positive drift price.**  If both environments
 remain posteriorly possible and their risks lie at least `margin` below and above the cutoff,
 then the local calibration defect is at least `q(1-q)(2 margin)²`.  This turns a clinical
@@ -542,6 +553,7 @@ theorem twoIndex_posteriorDriftEnergy_ge_thresholdMargin
     nlinarith
   exact mul_le_mul_of_nonneg_left hsquare hcoefficient
 
+omit [Fintype Covariate] in
 /-- With positive posterior overlap and positive clinical margin, the threshold-crossing drift
 price is strictly positive. -/
 theorem twoIndex_posteriorDriftEnergy_pos_of_thresholdMargin
