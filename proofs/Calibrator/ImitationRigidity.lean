@@ -1160,6 +1160,16 @@ VALIDATED quantity recorded on `ridgeBalance`. -/
 def ridgeSelfConsistentStep (aspect : ℝ) (eig : ι → ℝ) (ridge u : ℝ) : ℝ :=
   1 / (1 - aspect * ((∑ i, eig i / (eig i + ridge * u)) / (Fintype.card ι : ℝ)))
 
+/-- At the self-consistency singularity the step divides by zero and Mathlib returns `0`, the
+value of a step that moves nowhere rather than one that is undefined. -/
+theorem ridgeSelfConsistentStep_at_singularity_is_junk
+    (aspect : ℝ) (eig : ι → ℝ) (ridge u : ℝ)
+    (hzero : 1 - aspect * ((∑ i, eig i / (eig i + ridge * u)) / (Fintype.card ι : ℝ)) = 0) :
+    ridgeSelfConsistentStep aspect eig ridge u = 0 := by
+  unfold ridgeSelfConsistentStep
+  rw [hzero, div_zero]
+
+
 /-- The scalar content of the ridge balance equation, with the spectral
 functional abstracted to a single real `A`. -/
 private theorem ridge_root_iff_aux (A u : ℝ) (hu : u ≠ 0) :

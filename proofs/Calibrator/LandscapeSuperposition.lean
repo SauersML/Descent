@@ -762,6 +762,14 @@ theorem mixedEnvironmentGapCertificate_nonneg
 noncomputable def criticalMinorityProportion (rho : ℝ) : ℝ :=
   (1 - goldenCorrelationThreshold / rho) / 2
 
+/-- At zero correlation the threshold ratio divides by zero and Mathlib returns `0`, so the
+critical minority share reads as one half.  The true reading is that no mixture closes the gap
+when there is no correlation to cancel. -/
+theorem criticalMinorityProportion_at_zero_correlation_is_junk :
+    criticalMinorityProportion 0 = 1 / 2 := by
+  norm_num [criticalMinorityProportion]
+
+
 /-- At the critical minority fraction, the effective correlation is exactly the golden
 threshold. -/
 theorem mixedEnvironmentCorrelation_at_criticalMinority

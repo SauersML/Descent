@@ -767,6 +767,14 @@ This is the number the closed-population model sets to zero.
 noncomputable def hetMutationFloor (Ne mu : ℝ) : ℝ :=
   4 * Ne * mu / (1 + 4 * Ne * mu)
 
+/-- At the excluded parameter the equilibrium heterozygosity divides by zero and Mathlib
+returns `0`, reporting a monomorphic equilibrium rather than an undefined one. -/
+theorem hetEquilibriumWithMutation_at_zero_denominator_is_junk (Ne mu : ℝ)
+    (hzero : 1 + 4 * Ne * mu = 0) :
+    4 * Ne * mu / (1 + 4 * Ne * mu) = 0 := by
+  rw [hzero, div_zero]
+
+
 /-- **The floor is the rest point of the recurrence.**  Solving
 `(1 - 1/(2 Nₑ)) H + 2 mu (1 - H) = H` gives `H (1/(2 Nₑ) + 2 mu) = 2 mu`, i.e.
 `H = 4 Nₑ mu / (1 + 4 Nₑ mu)`. -/
@@ -1657,7 +1665,8 @@ noncomputable def CrossPopulationMetricModel.witness (p q : ℕ) :
   targetPrevalence_lt_one := by norm_num
 
 /-- Source ERM weights in closed form (normal equations) under invertible source covariance. 
-    Empirical status: **VALIDATED** (`proofs/validation/empirical/simcov/battery_transport.py`). One end-to-end
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_transport.py`). One end-to-end
     transport simulation: 12 tags, 8 causal variants, 400000 individuals per
     population, genotypes drawn from a multivariate normal with a specified joint
     covariance so the ground-truth second moments are SET rather than estimated.
@@ -1785,7 +1794,8 @@ theorem source_target_erm_differ_dense_witness_proved :
 
 /-- **Predictor/outcome cross-covariance in a population**, from explicit biological and
 observational drivers. 
-    Empirical status: **VALIDATED** (`proofs/validation/empirical/simcov/battery_transport.py`). One end-to-end
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_transport.py`). One end-to-end
     transport simulation: 12 tags, 8 causal variants, 400000 individuals per
     population, genotypes drawn from a multivariate normal with a specified joint
     covariance so the ground-truth second moments are SET rather than estimated.
@@ -1956,7 +1966,8 @@ theorem crossCovariance_target_eq_standing_plus_novelMutationEffect_plus_context
 
 /-- Exact score variance in the source population under the learned source
 weights. 
-    Empirical status: **VALIDATED** (`proofs/validation/empirical/simcov/battery_transport.py`). One end-to-end
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_transport.py`). One end-to-end
     transport simulation: 12 tags, 8 causal variants, 400000 individuals per
     population, genotypes drawn from a multivariate normal with a specified joint
     covariance so the ground-truth second moments are SET rather than estimated.
@@ -1977,7 +1988,8 @@ noncomputable def scoreVarianceFromSourceWeights {p q : ℕ}
 At the target this is where effect changes, tag-causal alignment and context shifts enter;
 at the source it is the ordinary in-sample covariance. One definition, because it is one
 quantity. 
-    Empirical status: **VALIDATED** (`proofs/validation/empirical/simcov/battery_transport.py`). One end-to-end
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_transport.py`). One end-to-end
     transport simulation: 12 tags, 8 causal variants, 400000 individuals per
     population, genotypes drawn from a multivariate normal with a specified joint
     covariance so the ground-truth second moments are SET rather than estimated.
@@ -2002,7 +2014,8 @@ noncomputable def calibrationSlopeFromSourceWeights {p q : ℕ}
 
 /-- With a vanishing denominator Mathlib returns `0`, which is a value this quantity can also
 take legitimately, so the branch is named rather than left to be inferred from the result. -/
-theorem calibrationSlopeFromSourceWeights_at_zero_denominator_is_junk {p q : ℕ} (m : CrossPopulationMetricModel p q) (P : Pop)
+theorem calibrationSlopeFromSourceWeights_at_zero_denominator_is_junk {p q : ℕ}
+    (m : CrossPopulationMetricModel p q) (P : Pop)
     (hzero : scoreVarianceFromSourceWeights m P = 0) :
     calibrationSlopeFromSourceWeights m P = 0 := by
   unfold calibrationSlopeFromSourceWeights
@@ -2314,7 +2327,8 @@ theorem effectiveTargetOutcomeVariance_eq_targetOutcomeVariance_add_losses {p q 
     irreducibleTargetResidualBurden, add_assoc]
 
 /-- Exact source `R²` under the full source-side driver state. 
-    Empirical status: **VALIDATED** (`proofs/validation/empirical/simcov/battery_transport.py`). One end-to-end
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_transport.py`). One end-to-end
     transport simulation: 12 tags, 8 causal variants, 400000 individuals per
     population, genotypes drawn from a multivariate normal with a specified joint
     covariance so the ground-truth second moments are SET rather than estimated.
@@ -2332,7 +2346,8 @@ noncomputable def explainedSignalVarianceFromSourceWeights {p q : ℕ}
 
 /-- With a vanishing denominator Mathlib returns `0`, which is a value this quantity can also
 take legitimately, so the branch is named rather than left to be inferred from the result. -/
-theorem explainedSignalVarianceFromSourceWeights_at_zero_denominator_is_junk {p q : ℕ} (m : CrossPopulationMetricModel p q) (P : Pop)
+theorem explainedSignalVarianceFromSourceWeights_at_zero_denominator_is_junk {p q : ℕ}
+    (m : CrossPopulationMetricModel p q) (P : Pop)
     (hzero : scoreVarianceFromSourceWeights m P = 0) :
     explainedSignalVarianceFromSourceWeights m P = 0 := by
   unfold explainedSignalVarianceFromSourceWeights
@@ -2341,7 +2356,8 @@ theorem explainedSignalVarianceFromSourceWeights_at_zero_denominator_is_junk {p 
 
 /-- **Exact `R²` in a population** under the full driver state, against the outcome
 variance that population is actually scored against. 
-    Empirical status: **VALIDATED** (`proofs/validation/empirical/simcov/battery_transport.py`). One end-to-end
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_transport.py`). One end-to-end
     transport simulation: 12 tags, 8 causal variants, 400000 individuals per
     population, genotypes drawn from a multivariate normal with a specified joint
     covariance so the ground-truth second moments are SET rather than estimated.
@@ -2362,7 +2378,8 @@ noncomputable def r2FromSourceWeights {p q : ℕ}
 
 /-- With a vanishing denominator Mathlib returns `0`, which is a value this quantity can also
 take legitimately, so the branch is named rather than left to be inferred from the result. -/
-theorem r2FromSourceWeights_at_zero_denominator_is_junk {p q : ℕ} (m : CrossPopulationMetricModel p q) (P : Pop)
+theorem r2FromSourceWeights_at_zero_denominator_is_junk {p q : ℕ}
+    (m : CrossPopulationMetricModel p q) (P : Pop)
     (hzero : effectiveOutcomeVariance m P = 0) :
     r2FromSourceWeights m P = 0 := by
   unfold r2FromSourceWeights

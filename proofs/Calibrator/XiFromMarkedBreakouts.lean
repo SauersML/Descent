@@ -313,6 +313,13 @@ theorem pioneerWeightFraction_at_zero_denominator_is_junk (w : ℝ)
 noncomputable def pioneerWeightDisplacement (gamma w : ℝ) : ℝ :=
   (1 / gamma) * Real.log (1 + w)
 
+/-- A zero rate constant sends `1 / gamma` to Mathlib's junk `0`, so a pioneer of any weight is
+reported as displacing the front by nothing. -/
+theorem pioneerWeightDisplacement_at_zero_rate_is_junk (w : ℝ) :
+    pioneerWeightDisplacement 0 w = 0 := by
+  simp [pioneerWeightDisplacement]
+
+
 @[simp] theorem pioneerWeightFraction_zero : pioneerWeightFraction 0 = 0 := by
   simp [pioneerWeightFraction]
 
@@ -330,7 +337,9 @@ theorem pioneerWeightDisplacement_one : pioneerWeightDisplacement 1 1 = Real.log
 
 /-- **The response map is exactly the logarithmic displacement law.**  Converting reproductive
 weight to population fraction turns `γ⁻¹ log (1 + w)` into `-γ⁻¹ log (1 - x)`, which is the
-invariant `MarkedBreakoutUniversality` shows is necessary and sufficient for the Beta family.
+displacement law whose forward half `MarkedBreakoutUniversality` proves produces the Beta
+family.  The converse -- that no other law does -- needs uniqueness of Laplace transforms and
+is not formalised.
 So the reduction needs no further hypothesis about the response beyond this one map. -/
 theorem pioneerDisplacement_eq_logDisplacement (gamma w : ℝ) (hw : 0 < w) :
     pioneerWeightDisplacement gamma w

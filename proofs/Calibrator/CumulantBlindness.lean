@@ -362,6 +362,15 @@ for every locus. -/
 noncomputable def locusInfluence (β h : Fin m → ℝ) (j : Fin m) : ℝ :=
   locusVarianceShare β h j / scoreVariance β h
 
+/-- A score with no variance divides by zero and Mathlib returns `0`: the locus is reported as
+having no influence, which is also what a genuinely uninfluential locus reports. -/
+theorem locusInfluence_at_zero_score_variance_is_junk {m : ℕ} (β h : Fin m → ℝ) (j : Fin m)
+    (hzero : scoreVariance β h = 0) :
+    locusInfluence β h j = 0 := by
+  unfold locusInfluence
+  rw [hzero, div_zero]
+
+
 theorem locusVarianceShare_nonneg (β h : Fin m → ℝ) (hh : ∀ j, 0 ≤ h j) (j : Fin m) :
     0 ≤ locusVarianceShare β h j :=
   mul_nonneg (sq_nonneg _) (hh j)

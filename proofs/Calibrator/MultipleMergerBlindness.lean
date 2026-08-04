@@ -403,6 +403,12 @@ regular-variation theorem.  The asymptotic clock is
 noncomputable def speedTiltCollisionScaleCoefficient (β : ℝ) : ℝ :=
   1 / (β + 1)
 
+/-- At the excluded parameter the coefficient divides by zero and Mathlib returns `0`. -/
+theorem speedTiltCollisionScaleCoefficient_at_minus_one_is_junk :
+    speedTiltCollisionScaleCoefficient (-1) = 0 := by
+  norm_num [speedTiltCollisionScaleCoefficient]
+
+
 /-- The collision-clock coefficient is positive exactly on the speed-tilt probability domain. -/
 theorem speedTiltCollisionScaleCoefficient_pos
     {β : ℝ} (hβ : -1 < β) :
@@ -483,6 +489,13 @@ theorem speedTiltBetaMergerRate_three_three_injective_on
 noncomputable def speedBiasParameterFromTripleRate (rate : ℝ) : ℝ :=
   rate⁻¹ - 2
 
+/-- A zero observed triple rate inverts to Mathlib's junk `0`, so the readout reports the
+parameter `-2` -- the excluded endpoint of the biological domain, not a measurement. -/
+theorem speedBiasParameterFromTripleRate_at_zero_rate_is_junk :
+    speedBiasParameterFromTripleRate 0 = -2 := by
+  norm_num [speedBiasParameterFromTripleRate]
+
+
 /-- **Exact speed-bias recovery.**  Throughout the admissible domain, the first non-pairwise
 genealogical coordinate recovers the tilt parameter without approximation. -/
 theorem speedBiasParameterFromTripleRate_recovers
@@ -493,6 +506,13 @@ theorem speedBiasParameterFromTripleRate_recovers
 /-- Speed tilt after a front-displacement scale `γ`: the genealogy sees `θ / γ`. -/
 noncomputable def frontSpeedBiasParameter (θ γ : ℝ) : ℝ :=
   θ / γ
+
+/-- A zero displacement scale divides by zero and Mathlib returns `0`: the genealogy is
+reported as untilted whatever the front tilt actually is. -/
+theorem frontSpeedBiasParameter_at_zero_scale_is_junk (θ : ℝ) :
+    frontSpeedBiasParameter θ 0 = 0 := by
+  simp [frontSpeedBiasParameter]
+
 
 /-- Observable three-lineage rate for a front tilt `θ` and displacement scale `γ`. -/
 theorem frontSpeedBias_tripleMergerRate (θ γ : ℝ) :

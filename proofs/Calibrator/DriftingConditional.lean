@@ -398,6 +398,15 @@ noncomputable def reconstruct {n : ℕ} (M : Fin n → Fin n → ℝ) (p κ : Fi
     (i : Fin n) : ℝ :=
   pushForward M (fun j ↦ κ j * p j) i / pushForward M p i
 
+/-- Where the pushed-forward law puts no mass the reconstruction divides by zero and Mathlib
+returns `0`, reporting a conditional of zero rather than an undefined one. -/
+theorem reconstruct_at_zero_mass_is_junk {n : ℕ} (M : Fin n → Fin n → ℝ) (p κ : Fin n → ℝ)
+    (i : Fin n) (hzero : pushForward M p i = 0) :
+    reconstruct M p κ i = 0 := by
+  unfold reconstruct
+  rw [hzero, div_zero]
+
+
 /-- **Exactness.** If the marked subpopulation is `κ p`, the transported conditional is the ratio
 of the two pushed-forward densities. Both are pushed by the same coupling, which is the whole
 reason this is an identity and not an estimate. -/

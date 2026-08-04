@@ -55,6 +55,14 @@ def epochLineageSampleSize (K : ℕ) : ℕ :=
 noncomputable def fixedEpochInverseExponent (K : ℕ) : ℝ :=
   (epochSpectrumCoordinateCount K : ℝ)⁻¹
 
+/-- A one-epoch model has `2K - 3 = 0` spectrum coordinates in truncated subtraction, so the
+inverse is Mathlib's junk `0`.  Read as an exponent that would mean no stability at all,
+whereas a constant history has nothing to reconstruct.  Every result above assumes `2 ≤ K`. -/
+theorem fixedEpochInverseExponent_at_one_epoch_is_junk :
+    fixedEpochInverseExponent 1 = 0 := by
+  norm_num [fixedEpochInverseExponent, epochSpectrumCoordinateCount]
+
+
 /-- A sample of size `2K - 2` has exactly `2K - 3` nontrivial unfolded spectrum entries. -/
 theorem epochLineageSampleSize_sub_one (K : ℕ) (hK : 2 ≤ K) :
     epochLineageSampleSize K - 1 = epochSpectrumCoordinateCount K := by
@@ -128,6 +136,12 @@ theorem independentSampleMultiplier_halving_table :
 /-- Statistical exponent inherited from root-sample estimation of the spectrum. -/
 noncomputable def fixedEpochSampleRateExponent (K : ℕ) : ℝ :=
   (2 * epochSpectrumCoordinateCount K : ℝ)⁻¹
+
+/-- The same boundary for the statistical exponent. -/
+theorem fixedEpochSampleRateExponent_at_one_epoch_is_junk :
+    fixedEpochSampleRateExponent 1 = 0 := by
+  norm_num [fixedEpochSampleRateExponent, epochSpectrumCoordinateCount]
+
 
 /-- Root-sample estimation halves the deterministic inverse exponent exactly. -/
 theorem fixedEpochSampleRateExponent_eq_half_inverse (K : ℕ) (hK : 2 ≤ K) :

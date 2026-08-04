@@ -24,6 +24,14 @@ noncomputable def gaussianProfileLogLik
   -((observed - mean) ^ 2) / (2 * variance) -
     Real.log (2 * Real.pi * variance) / 2
 
+/-- At zero variance both halves hit Mathlib junk: the quadratic term divides by zero and the
+normalising `Real.log 0` is `0`, so the profile reports a log-likelihood of exactly zero -- the
+value of a perfect fit -- where the true reading is a degenerate model. -/
+theorem gaussianProfileLogLik_at_zero_variance_is_junk (observed mean : ℝ) :
+    gaussianProfileLogLik observed mean 0 = 0 := by
+  simp [gaussianProfileLogLik]
+
+
 @[simp] theorem gaussianProfileLogLik_exactFit
     (observed variance : ℝ) :
     gaussianProfileLogLik observed observed variance =
