@@ -371,6 +371,15 @@ noncomputable def CrossPopulationCalibrationShiftModel.predictedMeanShift
     (m : CrossPopulationCalibrationShiftModel) : ℝ :=
   m.scoreMeanShift + m.deploymentInterceptShift
 
+/-- **Removing the recalibration intercept leaves the score movement.** The predicted mean shift
+has exactly two sources, and separating them is what makes recalibration identifiable from a
+genuine change in the score distribution. -/
+theorem CrossPopulationCalibrationShiftModel.predictedMeanShift_sub_intercept
+    (m : CrossPopulationCalibrationShiftModel) :
+    m.predictedMeanShift - m.deploymentInterceptShift = m.scoreMeanShift := by
+  unfold CrossPopulationCalibrationShiftModel.predictedMeanShift
+  ring
+
 /-- **Observed mean in a population.** The source is the reference; the shift budget
 applies at the target, recorded by `Pop.pair` rather than by a second definition. -/
 noncomputable def CrossPopulationCalibrationShiftModel.observedMean
@@ -1637,6 +1646,15 @@ theorem logistic_recalibration_preserves_auc
 noncomputable def recalibrationTraceMSELowerBound
     (nEvents nParams infoPerEvent : ℝ) : ℝ :=
   nParams / (nEvents * infoPerEvent)
+
+/-- **Total information times the bound is the parameter count.** That is what makes it an
+events-per-parameter rule rather than a bare ratio. -/
+theorem recalibrationTraceMSELowerBound_mul_information
+    (nEvents nParams infoPerEvent : ℝ) (h : nEvents * infoPerEvent ≠ 0) :
+    recalibrationTraceMSELowerBound nEvents nParams infoPerEvent * (nEvents * infoPerEvent)
+      = nParams := by
+  unfold recalibrationTraceMSELowerBound
+  exact div_mul_cancel₀ _ h
 
 /-- **Exact event threshold for a target recalibration precision goal.**
     Solving `d / (n_events * I_event) ≤ τ` for `n_events` gives the exact event

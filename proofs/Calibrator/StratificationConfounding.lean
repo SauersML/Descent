@@ -384,6 +384,13 @@ noncomputable def RGEInflationModel.witness : RGEInflationModel where
 noncomputable def RGEInflationModel.r2_obs (m : RGEInflationModel) : ℝ :=
   m.r2_direct + m.β_indirect ^ 2 * m.σ2
 
+/-- **The inflation is exactly the indirect path's contribution.** Strict inequality against the
+direct term is shared by every body that adds something positive; this says what is added. -/
+theorem RGEInflationModel.r2_obs_sub_direct (m : RGEInflationModel) :
+    m.r2_obs - m.r2_direct = m.β_indirect ^ 2 * m.σ2 := by
+  unfold RGEInflationModel.r2_obs
+  ring
+
 /-- **rGE inflation of apparent heritability.**
     The indirect effect contributes β_indirect² · σ² > 0 to observed R²,
     derived from the model rather than assumed. -/
@@ -488,6 +495,14 @@ noncomputable def SurvivorshipAttenuationModel.witness : SurvivorshipAttenuation
 /-- R² among survivors -/
 noncomputable def SurvivorshipAttenuationModel.r2_surv (m : SurvivorshipAttenuationModel) : ℝ :=
   m.r2_full * (m.var_surv / m.var_birth)
+
+/-- **Attenuation is the ratio of surviving to birth variance.** The strict decrease is shared by
+every body that multiplies by something below one; this fixes the factor. -/
+theorem SurvivorshipAttenuationModel.r2_surv_mul_birth (m : SurvivorshipAttenuationModel)
+    (h : m.var_birth ≠ 0) :
+    m.r2_surv * m.var_birth = m.r2_full * m.var_surv := by
+  unfold SurvivorshipAttenuationModel.r2_surv
+  field_simp
 
 /-- **Survivorship bias attenuates PGS-outcome association in older cohorts.**
     Derived from the attenuation model: Var_surv < Var_birth implies

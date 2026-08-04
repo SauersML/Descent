@@ -237,6 +237,15 @@ structure OneLocusArchitecture where
 noncomputable def OneLocusArchitecture.averageEffect (m : OneLocusArchitecture) : ℝ :=
   m.a + m.d * (1 - 2 * m.p)
 
+/-- **At equal allele frequencies the dominance deviation drops out of the average effect.**
+This is why dominance is invisible to an additive scan run in a population at `p = 1/2`, and it is
+the reference point that fixes the `1 - 2p` factor rather than any multiple of it. -/
+theorem OneLocusArchitecture.averageEffect_at_half (m : OneLocusArchitecture) (h : m.p = 1 / 2) :
+    m.averageEffect = m.a := by
+  unfold OneLocusArchitecture.averageEffect
+  rw [h]
+  ring
+
 /-! ### Wiring to the genotype core
 
 The claim that the average effect is "what a dosage regression recovers" was carried by

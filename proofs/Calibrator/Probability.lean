@@ -285,6 +285,13 @@ noncomputable def HardyWeinbergModel.witness : HardyWeinbergModel where
 def HardyWeinbergModel.refFreq (h : HardyWeinbergModel) : ℝ :=
   1 - h.altFreq
 
+/-- **The two allele frequencies sum to one.** Nonnegativity is shared by every body bounded
+below by zero; this is the identity that makes it the complementary frequency. -/
+theorem HardyWeinbergModel.refFreq_add_altFreq (h : HardyWeinbergModel) :
+    h.refFreq + h.altFreq = 1 := by
+  unfold HardyWeinbergModel.refFreq
+  ring
+
 theorem HardyWeinbergModel.refFreq_nonneg (h : HardyWeinbergModel) :
     0 ≤ h.refFreq := by
   unfold HardyWeinbergModel.refFreq

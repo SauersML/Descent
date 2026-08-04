@@ -1927,6 +1927,14 @@ within-generation ordering does not matter.  This is the first-order
 noncomputable def fstDriftFlowStep (p : EvolutionaryParameters) (F : ℝ) : ℝ :=
   F + (1 - F) / (2 * p.Ne) - 2 * (p.mig + p.mu) * F
 
+/-- **At fixation drift contributes nothing and only flow pulls back.** With `F = 1` the
+`(1 - F)` drift term vanishes identically, so the step is one minus twice the total flow rate --
+the reference point that separates the drift term from the flow term. -/
+theorem fstDriftFlowStep_at_one (p : EvolutionaryParameters) :
+    fstDriftFlowStep p 1 = 1 - 2 * (p.mig + p.mu) := by
+  unfold fstDriftFlowStep
+  ring
+
 /-- **Full equilibrium Fst** under drift + mutation + migration:
     Fst = 1/(1 + θ + M). Both mutation and migration counteract drift.
 
