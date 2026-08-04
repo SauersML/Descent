@@ -603,6 +603,16 @@ theorem residualDiscreteness_le_exp (correlationLength : ℝ) (n : ℕ)
 noncomputable def excursionShapeFactor (blockThirdMoment blockSecondMoment : ℝ) : ℝ :=
   blockThirdMoment / blockSecondMoment ^ (3 / 2 : ℝ)
 
+/-- **excursionShapeFactor at its junk point, named.** A vanishing second moment leaves the
+standardised third moment undefined. The power of zero is zero, the divisor is zero, and the
+shape factor is `0`: a perfectly symmetric excursion, which is what a genuinely unskewed block
+also gives. Consumers must exclude the argument that makes the guard vanish. -/
+theorem excursionShapeFactor_no_second_moment_is_junk (blockThirdMoment : ℝ) :
+    excursionShapeFactor blockThirdMoment 0 = 0 := by
+  unfold excursionShapeFactor
+  rw [Real.zero_rpow (by norm_num)]
+  simp
+
 /-- **Unit second moment makes the shape factor the third moment itself.**
 
 The docstring above tabulates the factor at several weight distributions, and the block bound

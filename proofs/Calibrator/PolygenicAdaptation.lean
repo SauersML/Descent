@@ -329,6 +329,16 @@ strength and `N` the effective population size.
 noncomputable def effectCorrelationStabilizingDriftSelection (d s N : ℝ) : ℝ :=
   1 - d / (1 + s * N)
 
+/-- **effectCorrelationStabilizingDriftSelection at its junk point, named.** When `1 + s * N`
+vanishes the drift-to-selection ratio diverges and the effect correlation is undefined. The
+divisor is zero, the ratio is junk-zero, and the correlation is `1`: PERFECTLY preserved effects,
+the strongest portability claim available, at the parameter combination where the model breaks
+down. Consumers must exclude the argument that makes the guard vanish. -/
+theorem effectCorrelationStabilizingDriftSelection_balanced_is_junk (d : ℝ) :
+    effectCorrelationStabilizingDriftSelection d 1 (-1) = 1 := by
+  unfold effectCorrelationStabilizingDriftSelection
+  norm_num
+
 /-- **The decorrelation is the divergence divided by the selection-drift balance.** Membership in
 `[-1, 1]` is shared by every rescaling of the second term; this fixes the scale. -/
 theorem effectCorrelationStabilizingDriftSelection_gap (d s N : ℝ) (h : 1 + s * N ≠ 0) :

@@ -705,6 +705,15 @@ two-sided geometric series; the identities below are proved, not fitted. -/
 def ldKernelSymbol (decay angle : ℝ) : ℝ :=
   (1 - decay ^ 2) / (1 - 2 * decay * Real.cos angle + decay ^ 2)
 
+/-- **ldKernelSymbol at its junk point, named.** At unit decay and zero angle the Poisson kernel
+is on its singularity, where it diverges. Numerator and denominator vanish together and Lean
+returns `0`: no spectral mass at the frequency carrying all of it. Consumers must exclude the
+argument that makes the guard vanish. -/
+theorem ldKernelSymbol_unit_decay_is_junk :
+    ldKernelSymbol 1 0 = 0 := by
+  unfold ldKernelSymbol
+  norm_num
+
 /-- **Hard edge of the LD spectrum**: the smallest limiting eigenvalue of the
 stationary LD matrix, attained at the highest frequency. It is the conditioning
 bottleneck of any whitening or LD-pruning step.
@@ -712,6 +721,15 @@ bottleneck of any whitening or LD-pruning step.
 Empirical status: DERIVED. `ldKernelSymbol_ge_hardEdge` proves it is a lower
 bound and `ldKernelSymbol_pi` proves it is attained. -/
 def ldHardEdge (decay : ℝ) : ℝ := (1 - decay) / (1 + decay)
+
+/-- **ldHardEdge at its junk point, named.** At `decay = -1` the edge sharpness diverges. The
+divisor `1 + decay` is zero and Lean returns `0`: a perfectly soft edge, the opposite limit, at
+the one decay value where the edge is hardest. Consumers must exclude the argument that makes the
+guard vanish. -/
+theorem ldHardEdge_negative_unit_decay_is_junk :
+    ldHardEdge (-1) = 0 := by
+  unfold ldHardEdge
+  norm_num
 
 /-- **Whitening gain**: the per-variant limit of `tr K⁻¹` for the stationary LD
 kernel, equal to the harmonic mean of the symbol. Every whitened detection

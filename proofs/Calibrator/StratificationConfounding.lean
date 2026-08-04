@@ -571,6 +571,16 @@ section CausalInference
 noncomputable def pgsAttenuationFactor (r2_gwas : ℝ) : ℝ :=
   Real.sqrt r2_gwas
 
+/-- **pgsAttenuationFactor at its junk point, named.** A negative `R²` estimate is not a real
+number's square, but negative estimates are routine output from cross-validated fits. `Real.sqrt`
+is junk-zero there, so an attenuation factor of zero is returned: the score is reported as
+carrying no signal rather than as having produced an inadmissible estimate. Consumers must
+exclude the argument that makes the guard vanish. -/
+theorem pgsAttenuationFactor_negative_r2_is_junk :
+    pgsAttenuationFactor (-1) = 0 := by
+  unfold pgsAttenuationFactor
+  exact Real.sqrt_eq_zero_of_nonpos (by norm_num)
+
 /-- **Attenuation factor decreases with lower GWAS R².**
     In target populations where the GWAS is less predictive,
     the PGS is a noisier proxy for genetic liability. -/

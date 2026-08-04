@@ -3662,6 +3662,16 @@ theorem targetAUC_lt_source_of_neutralAF_benchmark
 noncomputable def equalVarianceGaussianAUCFromSNR (snr : ℝ) : ℝ :=
   Phi (Real.sqrt (snr / 2))
 
+/-- **equalVarianceGaussianAUCFromSNR at its junk point, named.** A negative signal-to-noise
+ratio is inadmissible. `Real.sqrt` is junk-zero, so the AUC collapses to `Phi 0` -- chance
+discrimination -- and a sign error upstream is reported as an uninformative but well-formed
+classifier rather than as a domain violation. Consumers must exclude the argument that makes the
+guard vanish. -/
+theorem equalVarianceGaussianAUCFromSNR_negative_snr_is_junk :
+    equalVarianceGaussianAUCFromSNR (-1) = Phi 0 := by
+  unfold equalVarianceGaussianAUCFromSNR
+  rw [show (-1 : ℝ) / 2 = -(1 / 2) by ring, Real.sqrt_eq_zero_of_nonpos (by norm_num)]
+
 /-- The signal-to-noise and signal/residual-variance parameterizations are exactly the
 same closed-form chart.  This is algebra only: it does not assert that either chart is the
 AUC of a biological process without a separately proved distributional model. -/
@@ -5181,6 +5191,15 @@ difference from `ibdFlowStep`, which linearises `(1 - rate)² (1 - 1/(2 Nₑ))` 
     Empirical status: UNTESTED. -/
 noncomputable def ibdRecurrenceStep (Ne rate x : ℝ) : ℝ :=
   (1 - rate) ^ 2 * (1 / (2 * Ne) + (1 - 1 / (2 * Ne)) * x)
+
+/-- **ibdRecurrenceStep at its junk point, named.** At `Ne = 0` the identity-by-descent input
+term is junk-zero and the retained term keeps full weight, so an empty population is reported as
+generating no new identity by descent. Iterating the recurrence compounds the error. Consumers
+must exclude the argument that makes the guard vanish. -/
+theorem ibdRecurrenceStep_empty_population_is_junk (rate x : ℝ) :
+    ibdRecurrenceStep 0 rate x = (1 - rate) ^ 2 * x := by
+  unfold ibdRecurrenceStep
+  simp
 
 /-- **The rest point of the identity-by-descent recurrence.**
 

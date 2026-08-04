@@ -175,6 +175,16 @@ theorem ldsrExpectedBetaSq_at_n0_is_junk (h2 : ℝ) (M : ℝ) (ell_j : ℝ) :
 noncomputable def ldsrExpectedChi2 (N h2 M ell_j a : ℝ) : ℝ :=
   N * h2 / M * ell_j + N * a + 1
 
+/-- **ldsrExpectedChi2 at its junk point, named.** With no markers the per-marker heritability is
+undefined. The divisor is zero, the genetic term vanishes, and the expected chi-squared reduces
+to confounding plus one -- so an LD-score regression run against an empty reference reports the
+intercept as the whole signal and attributes everything to confounding. Consumers must exclude
+the argument that makes the guard vanish. -/
+theorem ldsrExpectedChi2_no_markers_is_junk (N h2 ell_j a : ℝ) :
+    ldsrExpectedChi2 N h2 0 ell_j a = N * a + 1 := by
+  unfold ldsrExpectedChi2
+  simp
+
 /-- **The intercept is one under the null.**
 
 At zero heritability and no confounding the expected chi-squared is exactly one, whatever the

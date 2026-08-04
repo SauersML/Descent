@@ -135,6 +135,15 @@ SNP-count inflation (`Λ`) on standardized PGS bias. -/
 noncomputable def ascertainmentAmplification (Φ Λ : ℝ) : ℝ :=
   (1 + Φ + Λ) / Real.sqrt (1 + Λ)
 
+/-- **ascertainmentAmplification at its junk point, named.** At `Λ = -1` the normalising square
+root vanishes and the amplification diverges. `Real.sqrt 0` is zero, the divisor is zero, and
+Lean returns `0`: no amplification at all where it is unbounded. Consumers must exclude the
+argument that makes the guard vanish. -/
+theorem ascertainmentAmplification_unit_negative_lambda_is_junk (Φ : ℝ) :
+    ascertainmentAmplification Φ (-1) = 0 := by
+  unfold ascertainmentAmplification
+  simp
+
 /-- Coefficient multiplying the magnitude of environmental confounding in the
 standardized PGS bias formula.  `expectedSNPCount` corresponds to `L Sbar`,
 `Hres` to residual susceptibility `H'`, and `effectSD` to `σβ`.

@@ -2750,6 +2750,16 @@ chart is a derived algebraic identity.
 noncomputable def calibratedBrierFromVariances (π vSignal vResidual : ℝ) : ℝ :=
   π * (1 - π) * (1 - vSignal / (vSignal + vResidual))
 
+/-- **calibratedBrierFromVariances at its junk point, named.** With neither signal nor residual
+variance the explained fraction is undefined. The divisor is zero, the fraction is junk-zero, and
+the Brier score is the uninformative baseline `π (1 - π)` -- the value for a predictor that only
+knows the prevalence, returned for one that has no variance to know anything with. Consumers must
+exclude the argument that makes the guard vanish. -/
+theorem calibratedBrierFromVariances_no_variance_is_junk (π : ℝ) :
+    calibratedBrierFromVariances π 0 0 = π * (1 - π) := by
+  unfold calibratedBrierFromVariances
+  simp
+
 /-- **A residual-free signal drives the calibrated risk to zero.** With no residual variance the
 explained fraction is one and the Brier risk vanishes, which is the endpoint that pins the
 `1 - r²` factor: a body missing it would leave the prevalence variance behind. -/

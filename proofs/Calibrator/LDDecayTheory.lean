@@ -60,6 +60,15 @@ section OhtaKimuraDecay
 noncomputable def ldRetentionPerGen (r Ne : ℝ) : ℝ :=
   (1 - r) * (1 - 1 / (2 * Ne))
 
+/-- **ldRetentionPerGen at its junk point, named.** The drift factor is junk-one at `Ne = 0`, so
+retention reduces to recombination alone and an empty population is reported as contributing
+nothing to the decay of linkage disequilibrium. Consumers must exclude the argument that makes
+the guard vanish. -/
+theorem ldRetentionPerGen_empty_population_is_junk (r : ℝ) :
+    ldRetentionPerGen r 0 = 1 - r := by
+  unfold ldRetentionPerGen
+  simp
+
 /-- **Recombination and drift both erode linkage disequilibrium, pinned.** This definition
 carries no result of its own. The two erosion factors multiply rather than add: at a
 recombination fraction of one half in a population of one, a quarter of the disequilibrium
