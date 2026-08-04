@@ -3539,14 +3539,8 @@ def wiring_strip_comments(text: str) -> str:
 
 
 def wiring_load(root: str) -> dict[str, str]:
-    out = {}
-    for dirpath, _, filenames in os.walk(root):
-        for fn in filenames:
-            if fn.endswith(".lean"):
-                p = os.path.join(dirpath, fn)
-                with open(p, encoding="utf-8") as fh:
-                    out[p] = fh.read()
-    return out
+    """Load exactly the canonical corpus sources used by every other guard."""
+    return {str(path): read_source(path) for path in lean_sources(Path(root))}
 
 
 def wiring_stem(path: str) -> str:
