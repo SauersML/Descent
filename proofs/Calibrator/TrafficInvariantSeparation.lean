@@ -5,6 +5,8 @@ import Mathlib.Analysis.SpecialFunctions.Log.Basic
 import Mathlib.Analysis.SpecialFunctions.Log.Deriv
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
 import Mathlib.Analysis.Complex.ExponentialBounds
+import Mathlib.Analysis.MeanInequalities
+import Mathlib.Analysis.MeanInequalitiesPow
 import Mathlib.Analysis.Normed.Group.Tannery
 import Mathlib.Data.Nat.Choose.Sum
 import Mathlib.Logic.Equiv.Fintype
@@ -66,12 +68,14 @@ keeps the matched-Bayes hinge outside the proved statements.
   SUPREMAL variational pressure itself: below it the gap vanishes identically,
   and above it an explicit interior magnetisation makes the supremum positive.
 
-* `finiteCWPartition_aligned_lower_bound` and
+* `finiteLogSum_ge_weightedLogRatio`,
+  `finiteCWPressureGap_ge_cwObjective`, and
   `finiteRankOneTraffic_invisible_finitePressure_visible` -- the genuine
-  binomially grouped finite Rademacher partition function is normalized at zero
-  coupling, and one aligned state proves strictly positive pressure for every
-  nonzero finite population when `2 log 2 < tλ`.  Thus positive-cone traffic
-  sufficiency is refuted at the actual partition-function level without an LDP.
+  binomially grouped finite Rademacher partition function dominates every
+  interior Curie--Weiss objective by an exact biased-binomial Gibbs inequality.
+  Hence pressure is uniformly positive for every `tλ > 1` while fixed traffic
+  vanishes.  This refutes positive-cone traffic sufficiency at the actual
+  partition-function level without Stirling asymptotics, an LDP, or Varadhan.
 
 * `fixedTraffic_invisible_logRuntime_visible` -- every fixed diagonal traffic
   coordinate loses a block of mass `4⁻ᵏ`, while `k` power iterations amplify its
@@ -144,9 +148,9 @@ a probe returning one number on two objects certifies neither.
 Matched Bayes traffic sufficiency at arbitrary signal-to-noise remains open, and
 nothing here asserts the sharper LDP/Varadhan identification of the finite
 pressure limit with the variational pressure at the exact threshold `tλ = 1`.
-That identification is no longer needed for the C2 counterexample because the
-aligned-state theorem gives genuine positive finite pressure on the explicit
-subregime `2 log 2 < tλ`. The rank-one construction cannot decide matched Bayes: a
+That identification is no longer needed for the C2 counterexample: the finite
+Gibbs lower bound proves genuine pressure separation throughout `tλ > 1`.
+The rank-one construction cannot decide matched Bayes: a
 perturbation of rank `o(p)` moves the exponential pressure by order one and the
 matched mutual-information density by `o(1)`, so a negative witness there needs
 EXTENSIVE rank. That contrast -- one perturbation, four procedure classes, two
@@ -1009,14 +1013,13 @@ theorem cwVariationalPressureGap_eq_zero_iff (tlam : ℝ) :
 
 /-! ### A genuine finite-volume pressure counterexample
 
-The variational theorem above identifies the sharp candidate threshold but, by
-itself, does not identify a finite-volume partition function with that
-variational value.  The following direct construction needs no LDP.  A single
-fully aligned Rademacher state already contributes enough mass to make the
-normalized pressure positive once `2 log 2 < tlam`.  This is weaker than the
-sharp variational threshold `1 < tlam`, but it is sufficient to turn the
-positive-semidefinite-cone counterexample into an actual partition-function
-statement rather than a statement about a surrogate objective.
+The variational theorem above identifies the sharp threshold but, by itself,
+does not identify a finite-volume partition function with that variational
+value.  The development below avoids that identification: a biased-binomial
+trial law and the finite Gibbs variational inequality show directly that every
+interior objective lower-bounds the genuine finite partition function.  The
+aligned-state estimate is retained as a simpler explicit certificate, while
+the trial-law argument reaches the complete supercritical regime `tlam > 1`.
 -/
 
 /-- Magnetisation of the type with `upSpins` positive spins in a population of
@@ -1024,6 +1027,203 @@ size `population`. -/
 noncomputable def finiteCWMagnetization
     (population upSpins : ℕ) : ℝ :=
   2 * (upSpins : ℝ) - population
+
+/-- Magnetisation density of one finite Rademacher type. -/
+noncomputable def finiteCWEmpiricalMagnetization
+    (population upSpins : ℕ) : ℝ :=
+  finiteCWMagnetization population upSpins / population
+
+/-- Positive-spin probability in the biased Rademacher trial law associated
+with magnetisation `m`. -/
+noncomputable def cwPositiveTrialWeight (m : ℝ) : ℝ :=
+  (1 + m) / 2
+
+/-- Negative-spin probability in the same trial law. -/
+noncomputable def cwNegativeTrialWeight (m : ℝ) : ℝ :=
+  (1 - m) / 2
+
+/-- For a nonempty population, rescaling the empirical magnetisation recovers
+the unnormalized magnetisation exactly. -/
+theorem finiteCWEmpiricalMagnetization_scale
+    (population upSpins : ℕ) (hpopulation : 0 < population) :
+    (population : ℝ) * finiteCWEmpiricalMagnetization population upSpins =
+      finiteCWMagnetization population upSpins := by
+  unfold finiteCWEmpiricalMagnetization
+  rw [← mul_div_assoc]
+  exact mul_div_cancel_left₀ _ (by exact_mod_cast hpopulation.ne')
+
+/-- For an interior type, the empirical magnetisation lies strictly inside
+`(-1,1)`. -/
+theorem finiteCWEmpiricalMagnetization_abs_lt_one
+    (population upSpins : ℕ)
+    (hpositive : 0 < upSpins) (hinterior : upSpins < population) :
+    |finiteCWEmpiricalMagnetization population upSpins| < 1 := by
+  have hpopulation : (0 : ℝ) < population := by
+    exact_mod_cast hpositive.trans_le hinterior.le
+  have hupPositive : (0 : ℝ) < upSpins := by exact_mod_cast hpositive
+  have hupInterior : (upSpins : ℝ) < population := by exact_mod_cast hinterior
+  rw [abs_lt]
+  constructor
+  · unfold finiteCWEmpiricalMagnetization finiteCWMagnetization
+    apply (lt_div_iff₀ hpopulation).mpr
+    linarith
+  · unfold finiteCWEmpiricalMagnetization finiteCWMagnetization
+    apply (div_lt_iff₀ hpopulation).mpr
+    linarith
+
+/-- The positive-spin parameter induced by the empirical magnetisation is the
+observed positive-spin fraction. -/
+theorem cwPositiveTrialWeight_empirical
+    (population upSpins : ℕ) (hpopulation : 0 < population) :
+    cwPositiveTrialWeight
+        (finiteCWEmpiricalMagnetization population upSpins) =
+      (upSpins : ℝ) / population := by
+  unfold cwPositiveTrialWeight finiteCWEmpiricalMagnetization finiteCWMagnetization
+  have hpopulationReal : (population : ℝ) ≠ 0 := by
+    exact_mod_cast hpopulation.ne'
+  field_simp
+  ring
+
+/-- The complementary trial parameter is the observed negative-spin fraction. -/
+theorem cwNegativeTrialWeight_empirical
+    (population upSpins : ℕ) (hpopulation : 0 < population)
+    (hle : upSpins ≤ population) :
+    cwNegativeTrialWeight
+        (finiteCWEmpiricalMagnetization population upSpins) =
+      (population - upSpins : ℕ) / (population : ℝ) := by
+  unfold cwNegativeTrialWeight finiteCWEmpiricalMagnetization finiteCWMagnetization
+  have hpopulationReal : (population : ℝ) ≠ 0 := by
+    exact_mod_cast hpopulation.ne'
+  rw [Nat.cast_sub hle]
+  field_simp
+  ring
+
+/-- Binomial type weight under a trial product law with positive-spin weight
+`q` and negative-spin weight `r`. -/
+noncomputable def biasedBinomialTypeWeight
+    (population : ℕ) (q r : ℝ) (upSpins : ℕ) : ℝ :=
+  (Nat.choose population upSpins : ℝ) *
+    q ^ upSpins * r ^ (population - upSpins)
+
+/-- If the two trial weights add to one, the binomial type weights form a
+probability law exactly. -/
+theorem biasedBinomialTypeWeight_sum
+    (population : ℕ) (q r : ℝ) (hqr : q + r = 1) :
+    (∑ upSpins ∈ Finset.range (population + 1),
+      biasedBinomialTypeWeight population q r upSpins) = 1 := by
+  calc
+    (∑ upSpins ∈ Finset.range (population + 1),
+        biasedBinomialTypeWeight population q r upSpins) =
+        (q + r) ^ population := by
+      rw [add_pow]
+      apply Finset.sum_congr rfl
+      intro upSpins _hupSpins
+      simp only [biasedBinomialTypeWeight]
+      ring
+    _ = 1 := by rw [hqr, one_pow]
+
+/-- The exact first moment of the biased binomial type law.  This is proved
+from Pascal splitting rather than imported as a probabilistic fact. -/
+theorem biasedBinomialTypeWeight_firstMoment
+    (population : ℕ) (q r : ℝ) (hqr : q + r = 1) :
+    (∑ upSpins ∈ Finset.range (population + 1),
+      biasedBinomialTypeWeight population q r upSpins * upSpins) =
+        population * q := by
+  induction population with
+  | zero => simp [biasedBinomialTypeWeight]
+  | succ population ih =>
+      have hsplit := Finset.sum_choose_succ_mul (R := ℝ)
+        (fun upSpins downSpins ↦
+          q ^ upSpins * r ^ downSpins * (upSpins : ℝ)) population
+      have hsplit' :
+          (∑ upSpins ∈ Finset.range (population + 2),
+              biasedBinomialTypeWeight (population + 1) q r upSpins * upSpins) =
+            (∑ upSpins ∈ Finset.range (population + 1),
+              (Nat.choose population upSpins : ℝ) *
+                (q ^ upSpins * r ^ (population + 1 - upSpins) * upSpins)) +
+            ∑ upSpins ∈ Finset.range (population + 1),
+              (Nat.choose population upSpins : ℝ) *
+                (q ^ (upSpins + 1) * r ^ (population - upSpins) * (upSpins + 1)) := by
+        simpa only [biasedBinomialTypeWeight, Nat.cast_add, Nat.cast_one,
+          Nat.succ_eq_add_one, mul_assoc] using hsplit
+      rw [hsplit']
+      have hfirst :
+          (∑ upSpins ∈ Finset.range (population + 1),
+            (Nat.choose population upSpins : ℝ) *
+              (q ^ upSpins * r ^ (population + 1 - upSpins) * upSpins)) =
+            r * ∑ upSpins ∈ Finset.range (population + 1),
+              biasedBinomialTypeWeight population q r upSpins * upSpins := by
+        rw [Finset.mul_sum]
+        apply Finset.sum_congr rfl
+        intro upSpins hupSpins
+        have hle : upSpins ≤ population :=
+          Nat.le_of_lt_succ (Finset.mem_range.mp hupSpins)
+        rw [Nat.succ_sub hle, pow_succ]
+        simp only [biasedBinomialTypeWeight]
+        ring
+      have hsecond :
+          (∑ upSpins ∈ Finset.range (population + 1),
+            (Nat.choose population upSpins : ℝ) *
+              (q ^ (upSpins + 1) * r ^ (population - upSpins) * (upSpins + 1))) =
+            q * (∑ upSpins ∈ Finset.range (population + 1),
+              biasedBinomialTypeWeight population q r upSpins * upSpins) +
+            q * (∑ upSpins ∈ Finset.range (population + 1),
+              biasedBinomialTypeWeight population q r upSpins) := by
+        rw [Finset.mul_sum, Finset.mul_sum, ← Finset.sum_add_distrib]
+        apply Finset.sum_congr rfl
+        intro upSpins _hupSpins
+        simp only [biasedBinomialTypeWeight, pow_succ]
+        ring
+      rw [hfirst, hsecond, ih,
+        biasedBinomialTypeWeight_sum population q r hqr]
+      push_cast
+      have hr : r = 1 - q := by linarith
+      rw [hr]
+      ring
+
+/-- **Finite Gibbs variational inequality.**  For any strictly positive trial
+probability weights and strictly positive masses, the log of the total mass is
+at least the trial expectation of the log likelihood ratio.  This is the exact
+finite change-of-measure inequality needed below; no asymptotic principle is
+used. -/
+theorem finiteLogSum_ge_weightedLogRatio
+    {Index : Type*} (indices : Finset Index)
+    (weight mass : Index → ℝ)
+    (hindices : indices.Nonempty)
+    (hweight : ∀ index ∈ indices, 0 < weight index)
+    (hmass : ∀ index ∈ indices, 0 < mass index)
+    (hweightSum : ∑ index ∈ indices, weight index = 1) :
+    (∑ index ∈ indices,
+        weight index * Real.log (mass index / weight index)) ≤
+      Real.log (∑ index ∈ indices, mass index) := by
+  have hjensen :
+      Real.exp (∑ index ∈ indices,
+        weight index * Real.log (mass index / weight index)) ≤
+        ∑ index ∈ indices,
+          weight index * Real.exp (Real.log (mass index / weight index)) := by
+    simpa only [smul_eq_mul] using
+      (convexOn_exp.map_sum_le
+        (t := indices) (w := weight)
+        (p := fun index ↦ Real.log (mass index / weight index))
+        (fun index hindex ↦ (hweight index hindex).le)
+        hweightSum
+        (fun index _hindex ↦ Set.mem_univ
+          (Real.log (mass index / weight index))))
+  have harithmetic :
+      (∑ index ∈ indices,
+        weight index *
+          Real.exp (Real.log (mass index / weight index))) =
+        ∑ index ∈ indices, mass index := by
+    apply Finset.sum_congr rfl
+    intro index hindex
+    rw [Real.exp_log (div_pos (hmass index hindex) (hweight index hindex))]
+    rw [← mul_div_assoc]
+    exact mul_div_cancel_left₀ (mass index) (hweight index hindex).ne'
+  rw [harithmetic] at hjensen
+  have hmassSum : 0 < ∑ index ∈ indices, mass index :=
+    Finset.sum_pos (fun index hindex ↦ hmass index hindex) hindices
+  have hlogged := Real.log_le_log (Real.exp_pos _) hjensen
+  simpa using hlogged
 
 /-- The exact Curie--Weiss/Rademacher partition function after dividing by the
 `2^population` configurations.  Grouping configurations by their number of
@@ -1041,6 +1241,432 @@ noncomputable def finiteCWPartition
 noncomputable def finiteCWPressureGap
     (population : ℕ) (tlam : ℝ) : ℝ :=
   Real.log (finiteCWPartition population tlam) / population
+
+@[simp] theorem cwTrialWeights_sum (m : ℝ) :
+    cwPositiveTrialWeight m + cwNegativeTrialWeight m = 1 := by
+  simp [cwPositiveTrialWeight, cwNegativeTrialWeight]
+  ring
+
+theorem cwPositiveTrialWeight_pos {m : ℝ} (hm : |m| < 1) :
+    0 < cwPositiveTrialWeight m := by
+  rw [abs_lt] at hm
+  unfold cwPositiveTrialWeight
+  linarith
+
+theorem cwNegativeTrialWeight_pos {m : ℝ} (hm : |m| < 1) :
+    0 < cwNegativeTrialWeight m := by
+  rw [abs_lt] at hm
+  unfold cwNegativeTrialWeight
+  linarith
+
+/-- Contribution of one magnetisation type to the normalized finite
+Curie--Weiss partition function. -/
+noncomputable def finiteCWTypeMass
+    (population : ℕ) (tlam : ℝ) (upSpins : ℕ) : ℝ :=
+  ((2 : ℝ) ^ population)⁻¹ *
+    (Nat.choose population upSpins : ℝ) *
+      Real.exp
+        (tlam / (2 * (population : ℝ)) *
+          finiteCWMagnetization population upSpins ^ 2)
+
+/-- The partition function is exactly the sum of its positive type masses. -/
+theorem finiteCWTypeMass_sum (population : ℕ) (tlam : ℝ) :
+    (∑ upSpins ∈ Finset.range (population + 1),
+      finiteCWTypeMass population tlam upSpins) =
+        finiteCWPartition population tlam := by
+  rw [finiteCWPartition, Finset.mul_sum]
+  apply Finset.sum_congr rfl
+  intro upSpins _hupSpins
+  simp only [finiteCWTypeMass]
+  ring
+
+/-- Every admissible magnetisation type has strictly positive trial weight. -/
+theorem biasedBinomialTypeWeight_pos
+    (population upSpins : ℕ) (m : ℝ)
+    (hm : |m| < 1) (hupSpins : upSpins ∈ Finset.range (population + 1)) :
+    0 < biasedBinomialTypeWeight population
+      (cwPositiveTrialWeight m) (cwNegativeTrialWeight m) upSpins := by
+  have hle : upSpins ≤ population :=
+    Nat.le_of_lt_succ (Finset.mem_range.mp hupSpins)
+  exact mul_pos
+    (mul_pos
+      (by exact_mod_cast Nat.choose_pos hle)
+      (pow_pos (cwPositiveTrialWeight_pos hm) _))
+    (pow_pos (cwNegativeTrialWeight_pos hm) _)
+
+/-- Every admissible type also has strictly positive partition mass. -/
+theorem finiteCWTypeMass_pos
+    (population upSpins : ℕ) (tlam : ℝ)
+    (hupSpins : upSpins ∈ Finset.range (population + 1)) :
+    0 < finiteCWTypeMass population tlam upSpins := by
+  have hle : upSpins ≤ population :=
+    Nat.le_of_lt_succ (Finset.mem_range.mp hupSpins)
+  unfold finiteCWTypeMass
+  exact mul_pos
+    (mul_pos (by positivity) (by exact_mod_cast Nat.choose_pos hle))
+    (Real.exp_pos _)
+
+/-- **The tilted binomial weights, summed and first-moment, in one specialisation.**
+
+Both spin means below open by instantiating the general binomial identities at the
+Curie--Weiss trial weights, and each carried its own copy of that step. -/
+theorem cwBinomialTypeWeight_sum_and_firstMoment (population : ℕ) (m : ℝ) :
+    (∑ upSpins ∈ Finset.range (population + 1),
+        biasedBinomialTypeWeight population (cwPositiveTrialWeight m)
+          (cwNegativeTrialWeight m) upSpins) = 1 ∧
+      (∑ upSpins ∈ Finset.range (population + 1),
+        biasedBinomialTypeWeight population (cwPositiveTrialWeight m)
+          (cwNegativeTrialWeight m) upSpins * upSpins) =
+        population * cwPositiveTrialWeight m :=
+  ⟨biasedBinomialTypeWeight_sum population _ _ (cwTrialWeights_sum m),
+    biasedBinomialTypeWeight_firstMoment population _ _ (cwTrialWeights_sum m)⟩
+
+/-- Under the biased binomial trial law, expected magnetisation is exactly
+`population * m`. -/
+theorem biasedBinomialTypeWeight_magnetizationMean
+    (population : ℕ) (m : ℝ) :
+    (∑ upSpins ∈ Finset.range (population + 1),
+      biasedBinomialTypeWeight population
+          (cwPositiveTrialWeight m) (cwNegativeTrialWeight m) upSpins *
+        finiteCWMagnetization population upSpins) =
+      population * m := by
+  let q := cwPositiveTrialWeight m
+  let r := cwNegativeTrialWeight m
+  obtain ⟨hsum, hfirst⟩ := cwBinomialTypeWeight_sum_and_firstMoment population m
+  calc
+    (∑ upSpins ∈ Finset.range (population + 1),
+      biasedBinomialTypeWeight population q r upSpins *
+        finiteCWMagnetization population upSpins) =
+        2 * (∑ upSpins ∈ Finset.range (population + 1),
+          biasedBinomialTypeWeight population q r upSpins * upSpins) -
+        population * (∑ upSpins ∈ Finset.range (population + 1),
+          biasedBinomialTypeWeight population q r upSpins) := by
+      rw [Finset.mul_sum, Finset.mul_sum, ← Finset.sum_sub_distrib]
+      apply Finset.sum_congr rfl
+      intro upSpins _hupSpins
+      simp only [finiteCWMagnetization]
+      ring
+    _ = 2 * (population * q) - population := by rw [hfirst, hsum]; ring
+    _ = population * m := by
+      dsimp [q, cwPositiveTrialWeight]
+      ring
+
+/-- The expected number of negative spins is the complementary binomial
+mean. -/
+theorem biasedBinomialTypeWeight_downSpinMean
+    (population : ℕ) (m : ℝ) :
+    (∑ upSpins ∈ Finset.range (population + 1),
+      biasedBinomialTypeWeight population
+          (cwPositiveTrialWeight m) (cwNegativeTrialWeight m) upSpins *
+        (population - upSpins)) =
+      population * cwNegativeTrialWeight m := by
+  let q := cwPositiveTrialWeight m
+  let r := cwNegativeTrialWeight m
+  obtain ⟨hsum, hfirst⟩ := cwBinomialTypeWeight_sum_and_firstMoment population m
+  calc
+    (∑ upSpins ∈ Finset.range (population + 1),
+      biasedBinomialTypeWeight population q r upSpins *
+        (population - upSpins)) =
+        population * (∑ upSpins ∈ Finset.range (population + 1),
+          biasedBinomialTypeWeight population q r upSpins) -
+        ∑ upSpins ∈ Finset.range (population + 1),
+          biasedBinomialTypeWeight population q r upSpins * upSpins := by
+      rw [Finset.mul_sum, ← Finset.sum_sub_distrib]
+      apply Finset.sum_congr rfl
+      intro upSpins _hupSpins
+      ring
+    _ = population - population * q := by rw [hsum, hfirst]; ring
+    _ = population * r := by
+      have hr : r = 1 - q := by
+        dsimp [q, r]
+        rw [← cwTrialWeights_sum m]
+        ring
+      rw [hr]
+      ring
+
+/-- Jensen's inequality for the square gives the exact lower bound on the
+trial second moment needed by the Curie--Weiss energy. -/
+theorem biasedBinomialTypeWeight_magnetizationSecondMoment
+    (population : ℕ) (m : ℝ) (hm : |m| < 1) :
+    ((population : ℝ) * m) ^ 2 ≤
+      ∑ upSpins ∈ Finset.range (population + 1),
+        biasedBinomialTypeWeight population
+            (cwPositiveTrialWeight m) (cwNegativeTrialWeight m) upSpins *
+          finiteCWMagnetization population upSpins ^ 2 := by
+  let weight := fun upSpins ↦ biasedBinomialTypeWeight population
+    (cwPositiveTrialWeight m) (cwNegativeTrialWeight m) upSpins
+  have hweightNonnegative : ∀ upSpins ∈ Finset.range (population + 1),
+      0 ≤ weight upSpins := fun upSpins hupSpins ↦
+    (biasedBinomialTypeWeight_pos population upSpins m hm hupSpins).le
+  have hweightSum :
+      (∑ upSpins ∈ Finset.range (population + 1), weight upSpins) = 1 :=
+    biasedBinomialTypeWeight_sum population
+      (cwPositiveTrialWeight m) (cwNegativeTrialWeight m) (cwTrialWeights_sum m)
+  have hjensen := Real.pow_arith_mean_le_arith_mean_pow_of_even
+    (Finset.range (population + 1)) weight
+    (finiteCWMagnetization population) hweightNonnegative hweightSum (by decide : Even 2)
+  rw [show (∑ upSpins ∈ Finset.range (population + 1),
+      weight upSpins * finiteCWMagnetization population upSpins) =
+        population * m by
+      exact biasedBinomialTypeWeight_magnetizationMean population m] at hjensen
+  exact hjensen
+
+/-- The entropy cost of the biased Bernoulli trial law is exactly the
+Curie--Weiss rate function used in the variational objective. -/
+theorem cwTrialEntropy_eq_rate {m : ℝ} (hm : |m| < 1) :
+    Real.log 2 +
+        cwPositiveTrialWeight m * Real.log (cwPositiveTrialWeight m) +
+        cwNegativeTrialWeight m * Real.log (cwNegativeTrialWeight m) =
+      cwRate m := by
+  have hplus : 0 < 1 + m := by
+    rw [abs_lt] at hm
+    linarith
+  have hminus : 0 < 1 - m := by
+    rw [abs_lt] at hm
+    linarith
+  have htwo : (2 : ℝ) ≠ 0 := by norm_num
+  rw [show Real.log (cwPositiveTrialWeight m) =
+      Real.log (1 + m) - Real.log 2 by
+        rw [cwPositiveTrialWeight, Real.log_div hplus.ne' htwo],
+    show Real.log (cwNegativeTrialWeight m) =
+      Real.log (1 - m) - Real.log 2 by
+        rw [cwNegativeTrialWeight, Real.log_div hminus.ne' htwo]]
+  unfold cwRate cwPositiveTrialWeight cwNegativeTrialWeight
+  ring
+
+/-- Exact pointwise log likelihood ratio between one Curie--Weiss type mass
+and the corresponding biased-binomial trial mass.  The binomial coefficient
+cancels, leaving energy minus the product-law entropy cost. -/
+theorem finiteCWTypeMass_logRatio
+    (population upSpins : ℕ) (tlam m : ℝ)
+    (hm : |m| < 1) (hupSpins : upSpins ∈ Finset.range (population + 1)) :
+    Real.log
+        (finiteCWTypeMass population tlam upSpins /
+          biasedBinomialTypeWeight population
+            (cwPositiveTrialWeight m) (cwNegativeTrialWeight m) upSpins) =
+      tlam / (2 * (population : ℝ)) *
+          finiteCWMagnetization population upSpins ^ 2 -
+        population * Real.log 2 -
+        upSpins * Real.log (cwPositiveTrialWeight m) -
+        (population - upSpins) * Real.log (cwNegativeTrialWeight m) := by
+  have hle : upSpins ≤ population :=
+    Nat.le_of_lt_succ (Finset.mem_range.mp hupSpins)
+  have hchooseNat : 0 < Nat.choose population upSpins := Nat.choose_pos hle
+  have hchoose : (Nat.choose population upSpins : ℝ) ≠ 0 := by
+    exact_mod_cast hchooseNat.ne'
+  have hq : cwPositiveTrialWeight m ≠ 0 := (cwPositiveTrialWeight_pos hm).ne'
+  have hr : cwNegativeTrialWeight m ≠ 0 := (cwNegativeTrialWeight_pos hm).ne'
+  have hpowTwo : (2 : ℝ) ^ population ≠ 0 := pow_ne_zero _ (by norm_num)
+  rw [Real.log_div
+      (finiteCWTypeMass_pos population upSpins tlam hupSpins).ne'
+      (biasedBinomialTypeWeight_pos population upSpins m hm hupSpins).ne']
+  unfold finiteCWTypeMass biasedBinomialTypeWeight
+  rw [Real.log_mul (mul_ne_zero (inv_ne_zero hpowTwo) hchoose)
+        (Real.exp_ne_zero _),
+    Real.log_mul (inv_ne_zero hpowTwo) hchoose,
+    Real.log_inv, Real.log_pow, Real.log_exp,
+    Real.log_mul (mul_ne_zero hchoose (pow_ne_zero _ hq))
+      (pow_ne_zero _ hr),
+    Real.log_mul hchoose (pow_ne_zero _ hq),
+    Real.log_pow, Real.log_pow]
+  rw [Nat.cast_sub hle]
+  ring
+
+/-- **Finite-volume Curie--Weiss variational lower bound.**  Every interior
+magnetisation supplies its variational objective as a lower bound for the
+genuine normalized finite Rademacher pressure.  The proof is an exact biased
+binomial change of measure plus Jensen; it uses neither Stirling asymptotics
+nor an LDP. -/
+theorem finiteCWPressureGap_ge_cwObjective
+    (population : ℕ) (tlam m : ℝ)
+    (hpopulation : 0 < population) (htlam : 0 ≤ tlam) (hm : |m| < 1) :
+    cwObjective tlam m ≤ finiteCWPressureGap population tlam := by
+  let indices := Finset.range (population + 1)
+  let q := cwPositiveTrialWeight m
+  let r := cwNegativeTrialWeight m
+  let weight := fun upSpins ↦ biasedBinomialTypeWeight population q r upSpins
+  let mass := finiteCWTypeMass population tlam
+  let magnetization := finiteCWMagnetization population
+  let energyScale := tlam / (2 * (population : ℝ))
+  have hindices : indices.Nonempty := ⟨0, by simp [indices]⟩
+  have hweightPositive : ∀ upSpins ∈ indices, 0 < weight upSpins := by
+    intro upSpins hupSpins
+    exact biasedBinomialTypeWeight_pos population upSpins m hm hupSpins
+  have hmassPositive : ∀ upSpins ∈ indices, 0 < mass upSpins := by
+    intro upSpins hupSpins
+    exact finiteCWTypeMass_pos population upSpins tlam hupSpins
+  have hweightSum : (∑ upSpins ∈ indices, weight upSpins) = 1 :=
+    biasedBinomialTypeWeight_sum population q r (cwTrialWeights_sum m)
+  have hfirstMoment :
+      (∑ upSpins ∈ indices, weight upSpins * upSpins) = population * q :=
+    biasedBinomialTypeWeight_firstMoment population q r (cwTrialWeights_sum m)
+  have hdownMoment :
+      (∑ upSpins ∈ indices, weight upSpins * (population - upSpins)) =
+        population * r :=
+    biasedBinomialTypeWeight_downSpinMean population m
+  have hsecondMoment :
+      ((population : ℝ) * m) ^ 2 ≤
+        ∑ upSpins ∈ indices, weight upSpins * magnetization upSpins ^ 2 :=
+    biasedBinomialTypeWeight_magnetizationSecondMoment population m hm
+  have hvariational :
+      (∑ upSpins ∈ indices,
+          weight upSpins * Real.log (mass upSpins / weight upSpins)) ≤
+        Real.log (finiteCWPartition population tlam) := by
+    have h := finiteLogSum_ge_weightedLogRatio indices weight mass hindices
+      hweightPositive hmassPositive hweightSum
+    rw [show (∑ upSpins ∈ indices, mass upSpins) =
+        finiteCWPartition population tlam by
+      exact finiteCWTypeMass_sum population tlam] at h
+    exact h
+  have henergy :
+      (∑ upSpins ∈ indices,
+        weight upSpins * (energyScale * magnetization upSpins ^ 2)) =
+        energyScale *
+          ∑ upSpins ∈ indices, weight upSpins * magnetization upSpins ^ 2 := by
+    rw [Finset.mul_sum]
+    apply Finset.sum_congr rfl
+    intro upSpins _hupSpins
+    ring
+  have hbaselineEntropy :
+      (∑ upSpins ∈ indices,
+        weight upSpins * (population * Real.log 2)) =
+        population * Real.log 2 := by
+    rw [← Finset.sum_mul, hweightSum]
+    ring
+  have hpositiveEntropy :
+      (∑ upSpins ∈ indices,
+        weight upSpins * (upSpins * Real.log q)) =
+        (population * q) * Real.log q := by
+    calc
+      (∑ upSpins ∈ indices,
+        weight upSpins * (upSpins * Real.log q)) =
+          (∑ upSpins ∈ indices, weight upSpins * upSpins) * Real.log q := by
+        rw [Finset.sum_mul]
+        apply Finset.sum_congr rfl
+        intro upSpins _hupSpins
+        ring
+      _ = _ := by rw [hfirstMoment]
+  have hnegativeEntropy :
+      (∑ upSpins ∈ indices,
+        weight upSpins * ((population - upSpins) * Real.log r)) =
+        (population * r) * Real.log r := by
+    calc
+      (∑ upSpins ∈ indices,
+        weight upSpins * ((population - upSpins) * Real.log r)) =
+          (∑ upSpins ∈ indices,
+            weight upSpins * (population - upSpins)) * Real.log r := by
+        rw [Finset.sum_mul]
+        apply Finset.sum_congr rfl
+        intro upSpins _hupSpins
+        ring
+      _ = _ := by rw [hdownMoment]
+  have hweightedIdentity :
+      (∑ upSpins ∈ indices,
+          weight upSpins * Real.log (mass upSpins / weight upSpins)) =
+        energyScale *
+            ∑ upSpins ∈ indices, weight upSpins * magnetization upSpins ^ 2 -
+          population * Real.log 2 -
+          (population * q) * Real.log q -
+          (population * r) * Real.log r := by
+    calc
+      (∑ upSpins ∈ indices,
+          weight upSpins * Real.log (mass upSpins / weight upSpins)) =
+          ∑ upSpins ∈ indices,
+            weight upSpins *
+              (energyScale * magnetization upSpins ^ 2 -
+                population * Real.log 2 -
+                upSpins * Real.log q -
+                (population - upSpins) * Real.log r) := by
+        apply Finset.sum_congr rfl
+        intro upSpins hupSpins
+        rw [finiteCWTypeMass_logRatio population upSpins tlam m hm hupSpins]
+      _ =
+          (∑ upSpins ∈ indices,
+            weight upSpins * (energyScale * magnetization upSpins ^ 2)) -
+          (∑ upSpins ∈ indices,
+            weight upSpins * (population * Real.log 2)) -
+          (∑ upSpins ∈ indices,
+            weight upSpins * (upSpins * Real.log q)) -
+          ∑ upSpins ∈ indices,
+            weight upSpins * ((population - upSpins) * Real.log r) := by
+        repeat' rw [← Finset.sum_sub_distrib]
+        apply Finset.sum_congr rfl
+        intro upSpins _hupSpins
+        ring
+      _ = _ := by
+        rw [henergy, hbaselineEntropy, hpositiveEntropy, hnegativeEntropy]
+  have hpopulationReal : (0 : ℝ) < population := by exact_mod_cast hpopulation
+  have henergyScaleNonnegative : 0 ≤ energyScale := by
+    dsimp [energyScale]
+    positivity
+  have htrialLower :
+      (population : ℝ) * cwObjective tlam m ≤
+        ∑ upSpins ∈ indices,
+          weight upSpins * Real.log (mass upSpins / weight upSpins) := by
+    rw [hweightedIdentity]
+    have henergyLower :=
+      mul_le_mul_of_nonneg_left hsecondMoment henergyScaleNonnegative
+    calc
+      (population : ℝ) * cwObjective tlam m =
+          energyScale * (((population : ℝ) * m) ^ 2) -
+            population * Real.log 2 -
+            (population * q) * Real.log q -
+            (population * r) * Real.log r := by
+        unfold cwObjective
+        dsimp [q, r]
+        rw [← cwTrialEntropy_eq_rate hm]
+        dsimp [energyScale]
+        field_simp [hpopulationReal.ne']
+        ring
+      _ ≤ energyScale *
+            ∑ upSpins ∈ indices,
+              weight upSpins * magnetization upSpins ^ 2 -
+            population * Real.log 2 -
+            (population * q) * Real.log q -
+            (population * r) * Real.log r := by linarith
+  rw [finiteCWPressureGap]
+  apply (le_div_iff₀ hpopulationReal).mpr
+  exact (by simpa [mul_comm] using htrialLower.trans hvariational)
+
+/-- The genuine finite pressure is strictly positive at every nonzero
+population throughout the complete supercritical regime `1 < tlam`. -/
+theorem finiteCWPressureGap_pos_of_supercritical
+    (population : ℕ) (tlam : ℝ)
+    (hpopulation : 0 < population) (hcritical : 1 < tlam) :
+    0 < finiteCWPressureGap population tlam := by
+  obtain ⟨m, hm, hobjective⟩ := curieWeiss_supercritical tlam hcritical
+  exact hobjective.trans_le
+    (finiteCWPressureGap_ge_cwObjective population tlam m hpopulation
+      (le_trans (by norm_num) hcritical.le) hm)
+
+/-- One interior variational witness gives a positive population-uniform lower
+bound on the genuine finite pressure at every supercritical coupling. -/
+theorem finiteCWPressureGap_supercritical_uniformWitness
+    (tlam : ℝ) (hcritical : 1 < tlam) :
+    ∃ m : ℝ, |m| < 1 ∧ 0 < cwObjective tlam m ∧
+      ∀ population : ℕ, 0 < population →
+        cwObjective tlam m ≤ finiteCWPressureGap population tlam := by
+  obtain ⟨m, hm, hobjective⟩ := curieWeiss_supercritical tlam hcritical
+  exact ⟨m, hm, hobjective, fun population hpopulation ↦
+    finiteCWPressureGap_ge_cwObjective population tlam m hpopulation
+      (le_trans (by norm_num) hcritical.le) hm⟩
+
+/-- Hence the actual finite pressure gap cannot converge to zero anywhere in
+the full supercritical regime. -/
+theorem finiteCWPressureGap_not_tendsto_zero_of_supercritical
+    (tlam : ℝ) (hcritical : 1 < tlam) :
+    ¬ Filter.Tendsto
+      (fun population : ℕ ↦ finiteCWPressureGap (population + 1) tlam)
+      Filter.atTop (nhds 0) := by
+  obtain ⟨m, hm, hobjective, hlower⟩ :=
+    finiteCWPressureGap_supercritical_uniformWitness tlam hcritical
+  intro hzero
+  have hbelow : ∀ᶠ population in Filter.atTop,
+      finiteCWPressureGap (population + 1) tlam < cwObjective tlam m :=
+    hzero.eventually_lt_const hobjective
+  obtain ⟨population, hpopulation⟩ := Filter.eventually_atTop.mp hbelow
+  have hlt := hpopulation population le_rfl
+  exact (not_lt_of_ge (hlower (population + 1) (Nat.succ_pos population))) hlt
 
 /-- At zero coupling the binomially grouped partition function is normalized
 to one.  This also verifies that the `2^population` denominator is the genuine
@@ -1205,19 +1831,20 @@ theorem finiteRankOneRademacherPressure_sub_baseline
       finiteCWPressureGap population (temperature * spikeStrength) := by
   simp [finiteRankOneRademacherPressure]
 
-/-- Above the aligned-state threshold, the genuine spiked finite pressure is
-strictly larger than the unspiked pressure for every nonempty population. -/
+/-- Throughout the exact supercritical regime, the genuine spiked finite
+pressure is strictly larger than the unspiked pressure for every nonempty
+population. -/
 theorem finiteRankOneRademacherPressure_gt_baseline
     (baseline : ℝ) (population : ℕ)
     (temperature spikeStrength : ℝ) (hpopulation : 0 < population)
-    (hlarge : 2 * Real.log 2 < temperature * spikeStrength) :
+    (hcritical : 1 < temperature * spikeStrength) :
     finiteBaselineRademacherPressure baseline temperature <
       finiteRankOneRademacherPressure
         baseline population temperature spikeStrength := by
   rw [finiteRankOneRademacherPressure]
   exact lt_add_of_pos_right _
-    (finiteCWPressureGap_pos_of_aligned
-      population (temperature * spikeStrength) hpopulation hlarge)
+    (finiteCWPressureGap_pos_of_supercritical
+      population (temperature * spikeStrength) hpopulation hcritical)
 
 /-- **Positive-cone traffic counterexample at the exact variational level.**
 Every fixed graph has finitely many nonempty spike-edge terms; once identity
@@ -1244,9 +1871,10 @@ theorem finiteRankOneTraffic_invisible_variationalPressure_visible
       coefficient hasOddDegree vertices edges hconnected,
     cwVariationalPressureGap_pos_of_supercritical tlam hcritical⟩
 
-/-- **The three finite-volume properties one rank-one spike has at once**, as one
-proposition: every fixed traffic correction vanishes, the finite pressure gap is bounded
-below at every population, and it does not vanish.
+/-- **The finite-volume properties one rank-one spike has at once**, as one
+proposition: every fixed traffic correction vanishes and one positive interior
+variational witness uniformly lower-bounds the finite pressure at every
+population, so that pressure cannot vanish asymptotically.
 
 Named for the same reason as `RankOneSpikeRefutesBothDichotomies`: the theorem that proves
 it, the genomic restatement that cites that theorem, and the obstruction registry each
@@ -1264,30 +1892,33 @@ def RankOneSpikeInvisibleWithFinitePressure {Term : Type*} [Fintype Term]
         finiteRankOneTrafficCorrection coefficient hasOddDegree vertices edges
           (population + 1))
       Filter.atTop (nhds 0) ∧
-    (∀ population : ℕ,
-      tlam / 2 - Real.log 2 ≤ finiteCWPressureGap (population + 1) tlam) ∧
-    ¬ Filter.Tendsto
-      (fun population : ℕ ↦ finiteCWPressureGap (population + 1) tlam)
-      Filter.atTop (nhds 0)
+    ∃ m : ℝ, |m| < 1 ∧ 0 < cwObjective tlam m ∧
+      (∀ population : ℕ,
+        cwObjective tlam m ≤ finiteCWPressureGap (population + 1) tlam) ∧
+      ¬ Filter.Tendsto
+        (fun population : ℕ ↦ finiteCWPressureGap (population + 1) tlam)
+        Filter.atTop (nhds 0)
 
 /-- **Positive-cone traffic counterexample for the genuine finite partition
-function.**  Every fixed traffic correction vanishes, while for one and the
-same coupling above `2 log 2` the normalized Rademacher pressure is positive
-at every nonzero finite population.  This theorem does not identify the sharp
-finite-volume limit and therefore requires no LDP or Varadhan premise. -/
+function throughout the full supercritical regime.**  Every fixed traffic
+correction vanishes, while for every coupling above `1` one interior trial law
+supplies a positive population-uniform lower bound on normalized Rademacher
+pressure.  This does not identify the full finite-volume limit or prove its
+subcritical convergence and requires no LDP or Varadhan premise. -/
 theorem finiteRankOneTraffic_invisible_finitePressure_visible
     {Term : Type*} [Fintype Term]
     (coefficient : Term → ℝ) (hasOddDegree : Term → Bool)
     (vertices edges : Term → ℕ)
     (hconnected : ∀ term, hasOddDegree term = false → vertices term ≤ edges term)
-    (tlam : ℝ) (hlarge : 2 * Real.log 2 < tlam) :
-    RankOneSpikeInvisibleWithFinitePressure coefficient hasOddDegree vertices edges tlam :=
-  ⟨finiteRankOneTrafficCorrection_tendsto_zero
+    (tlam : ℝ) (hcritical : 1 < tlam) :
+    RankOneSpikeInvisibleWithFinitePressure coefficient hasOddDegree vertices edges tlam := by
+  obtain ⟨m, hm, hobjective, hlower⟩ :=
+    finiteCWPressureGap_supercritical_uniformWitness tlam hcritical
+  exact ⟨finiteRankOneTrafficCorrection_tendsto_zero
       coefficient hasOddDegree vertices edges hconnected,
-    ⟨fun population ↦
-      finiteCWPressureGap_ge_aligned
-        (population + 1) tlam (Nat.succ_pos population),
-      finiteCWPressureGap_not_tendsto_zero_of_aligned tlam hlarge⟩⟩
+    ⟨m, hm, hobjective,
+      ⟨fun population ↦ hlower (population + 1) (Nat.succ_pos population),
+        finiteCWPressureGap_not_tendsto_zero_of_supercritical tlam hcritical⟩⟩⟩
 
 /-- **The four properties one positive rank-one spike has at once**, as one proposition.
 
