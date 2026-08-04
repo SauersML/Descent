@@ -53,8 +53,14 @@ import sys
 HERE = pathlib.Path(__file__).resolve()
 CORPUS = HERE.parents[3] / "Calibrator"
 
+# The docstring body must not itself contain `-/`.  Without that the non-greedy
+# match starts at an EARLIER `/--` -- a definition's docstring, say -- and ends at
+# the theorem's own `-/`, swallowing everything between and attributing the
+# definition's prose to the theorem.  Six entries were that artefact:
+# hweLatticeCondition, IsCompleteCatalogue, lagSensitivityMatrix,
+# contextMatchQuality, algorithmicRiskSignature and AlgorithmicallyEquivalent.
 PAIR = re.compile(
-    r"/--((?:.|\n)*?)-/\s*\n(?:@\[[^\]]*\]\s*)?(?:theorem|lemma)\s+"
+    r"/--((?:(?!-/)(?:.|\n))*?)-/\s*\n(?:@\[[^\]]*\]\s*)?(?:theorem|lemma)\s+"
     r"([A-Za-z0-9_']+)((?:.|\n)*?):=", re.M)
 
 IFF = re.compile(
@@ -91,16 +97,11 @@ ACKNOWLEDGED = {
     "amEquilibriumVariance_at_full_heritability": "describes why a disagreement was invisible",
     "sign_erasure": "converse adjacent",
     "constantConditional_of_driftDefect_zero": "is itself the converse",
-    "equalityPatternPermutation_apply": "the phrase is in a definition docstring above, not this theorem",
     "gaussianKurtosisMaf_lt_quarter": "describes when the fourth-cumulant channel closes, not this bound",
     "rigidity_of_boundedBelowAbove": "the converse is inequivalent_of_unbounded_coding, named in the docstring",
-    "isCompleteCatalogue_kernel": "the phrase defines IsCompleteCatalogue above, not this theorem",
-    "lagObservationDerivative_injective_of_det_ne_zero": "the phrase is in the lagSensitivityMatrix docstring above",
     "qst_no_within": "describes where the map reaches one, which is what this endpoint fixes",
-    "latticeCriticalMaf_lt_quarter": "the phrase defines hweLatticeCondition above, not this bound",
     "realWorldPGSVariance_at_reference_point": "describes when two readings of the variance agree, a companion fact",
     "harmonicMigrationMean_eq_iff_symmetric": "explicitly a package with the inequality above, as the docstring says",
-    "persistentTransition_contextMatchQuality_agreement_eq_stayKernel": "the phrase defines contextMatchQuality above",
 }
 
 
