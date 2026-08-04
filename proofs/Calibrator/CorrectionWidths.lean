@@ -386,6 +386,34 @@ theorem finite_postprocessors_simultaneously_small
     _ < budget * (ε / budget) := mul_lt_mul_of_pos_right hjBudget hscaledPos
     _ = ε := by field_simp
 
+/-- **Adaptive-span budget law.** The simultaneous witness controls the entire moving span:
+every coefficient vector produces a corrected observation of norm at most the tolerance times
+its ℓ¹ coefficient budget. Free coefficients can amplify a deep signal only by paying this
+explicit coefficient cost. -/
+theorem finite_postprocessors_adaptive_span_small
+    (A : H →L[ℝ] Y) (hdeep : HasUnitApproxKernel A)
+    {k : ℕ} (T : Fin k → Y →L[ℝ] H) (ε : ℝ) (hε : 0 < ε) :
+    ∃ β : H, ‖β‖ = 1 ∧ ∀ coefficients : Fin k → ℝ,
+      ‖∑ j, coefficients j • (T j) (A β)‖ ≤
+        ε * ∑ j, |coefficients j| := by
+  obtain ⟨β, hunit, hsmall⟩ :=
+    finite_postprocessors_simultaneously_small A hdeep T ε hε
+  refine ⟨β, hunit, ?_⟩
+  intro coefficients
+  calc
+    ‖∑ j, coefficients j • (T j) (A β)‖ ≤
+        ∑ j, ‖coefficients j • (T j) (A β)‖ := norm_sum_le _ _
+    _ = ∑ j, |coefficients j| * ‖(T j) (A β)‖ := by
+      apply Finset.sum_congr rfl
+      intro j _
+      simp [norm_smul, Real.norm_eq_abs]
+    _ ≤ ∑ j, |coefficients j| * ε :=
+      Finset.sum_le_sum fun j _ ↦
+        mul_le_mul_of_nonneg_left (hsmall j).le (abs_nonneg (coefficients j))
+    _ = ε * ∑ j, |coefficients j| := by
+      rw [← Finset.sum_mul]
+      ring
+
 /-- **Approximate-kernel correction barrier.**  Any bounded post-processing correction leaves at
 least `‖β‖ - ‖T‖ ‖Aβ‖` residual on target `β`.  This is the quantitative lower bound from which the
 uniform modulus and the infinite-dimensional 0--1 obstruction start. -/
