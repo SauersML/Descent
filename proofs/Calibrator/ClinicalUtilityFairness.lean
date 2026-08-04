@@ -99,7 +99,7 @@ noncomputable def LiabilityThresholdModel.witness : LiabilityThresholdModel wher
     The residual variance σ²_resid = h²(1 − R²) + (1 − h²) is strictly positive
     for R² ∈ [0, 1] and h² ∈ (0, 1), since (1 − h²) > 0. -/
 theorem residualVariance_pos (m : LiabilityThresholdModel)
-    (R2 : ℝ) (hR2 : 0 ≤ R2) (hR2' : R2 ≤ 1) :
+    (R2 : ℝ) (hR2' : R2 ≤ 1) :
     0 < m.h_sq * (1 - R2) + (1 - m.h_sq) := by
   have h1 : 0 ≤ m.h_sq * (1 - R2) :=
     mul_nonneg (le_of_lt m.h_sq_pos) (by linarith)
@@ -110,9 +110,9 @@ theorem residualVariance_pos (m : LiabilityThresholdModel)
     This is what makes the residual-positivity side condition of every
     monotonicity theorem below a derived fact rather than a hypothesis. -/
 theorem sigmaResid_pos (m : LiabilityThresholdModel)
-    (R2 : ℝ) (hR2 : 0 ≤ R2) (hR2' : R2 ≤ 1) :
+    (R2 : ℝ) (hR2' : R2 ≤ 1) :
     0 < Real.sqrt (m.h_sq * (1 - R2) + (1 - m.h_sq)) :=
-  Real.sqrt_pos_of_pos (residualVariance_pos m R2 hR2 hR2')
+  Real.sqrt_pos_of_pos (residualVariance_pos m R2 hR2')
 
 /-- **What both z-score denominators do across a rise in `R²`**: each is positive, and the
 one at the larger `R²` is the smaller, because explaining more liability leaves less
@@ -127,7 +127,7 @@ theorem sigmaResid_pos_pos_le (m : LiabilityThresholdModel)
       0 < Real.sqrt (m.h_sq * (1 - R2₁) + (1 - m.h_sq)) ∧
       Real.sqrt (m.h_sq * (1 - R2₂) + (1 - m.h_sq)) ≤
         Real.sqrt (m.h_sq * (1 - R2₁) + (1 - m.h_sq)) := by
-  refine ⟨sigmaResid_pos m R2₂ (le_of_lt (lt_of_le_of_lt hR2₁ hR2)) hR2₂, ?_, ?_⟩
+  refine ⟨sigmaResid_pos m R2₂ hR2₂, ?_, ?_⟩
   · apply Real.sqrt_pos_of_pos
     have : 0 < 1 - m.h_sq := by linarith [m.h_sq_lt_one]
     nlinarith [m.h_sq_pos]
@@ -197,7 +197,7 @@ theorem liabilitySensitivity_zScore_monotone_in_R_of_num_nonneg
     (m : LiabilityThresholdModel) (T' : ℝ)
     (R₁ R₂ : ℝ) (hR₁ : 0 ≤ R₁) (hR₂ : R₂ ≤ 1)
     (hR : R₁ < R₂)
-    (hR2₁ : 0 ≤ R₁ ^ 2) (hR2₂ : R₂ ^ 2 ≤ 1)
+    (hR2₂ : R₂ ^ 2 ≤ 1)
     -- The z-score numerator is nonneg at the lower R value.
     -- This is the clinically relevant regime: the PGS classification
     -- threshold T' is at or below the expected PGS among cases at R₁.
@@ -214,7 +214,7 @@ theorem liabilitySensitivity_zScore_monotone_in_R_of_num_nonneg
   simp only
   -- σ_resid at R₂ is positive: derived, not assumed.
   have h_σ_pos : 0 < Real.sqrt (m.h_sq * (1 - R₂ ^ 2) + (1 - m.h_sq)) :=
-    sigmaResid_pos m (R₂ ^ 2) (sq_nonneg R₂) hR2₂
+    sigmaResid_pos m (R₂ ^ 2) hR2₂
   -- Establish σ₁ > 0
   have h_rv₁_pos : 0 < m.h_sq * (1 - R₁ ^ 2) + (1 - m.h_sq) := by
     have : R₁ ^ 2 ≤ R₂ ^ 2 := by nlinarith
@@ -626,9 +626,8 @@ theorem treat_all_net_benefit (π t : ℝ) :
 theorem pgs_useful_when_exceeds_treat_all
     (sens spec π n t : ℝ)
     (hn : 0 < n) (ht : 0 < t) (ht1 : t < 1)
-    (h_π : 0 < π) (h_π1 : π < 1)
+    (h_π : 0 < π)
     (h_sens : 0 < sens) (h_sens1 : sens ≤ 1)
-    (h_spec : 0 < spec) (h_spec1 : spec ≤ 1)
     -- Positive Youden's index: classifier is better than random
     (h_youden : 1 < sens + spec)
     -- Treatment threshold exceeds prevalence (selective-treatment regime)
@@ -841,8 +840,7 @@ theorem portability_violates_equalized_odds
 theorem fairness_accuracy_tradeoff
     (sens_B_unconstrained sens_B_fair fp_B n t : ℝ)
     (h_sens_drop : sens_B_fair < sens_B_unconstrained)
-    (hn : 0 < n) (ht : 0 < t) (ht1 : t < 1)
-    (h_fp : 0 ≤ fp_B) :
+    (hn : 0 < n) :
     decisionCurveNetBenefit sens_B_fair fp_B n t <
       decisionCurveNetBenefit sens_B_unconstrained fp_B n t := by
   repeat rw [decisionCurveNetBenefit_eq_formula]
@@ -881,8 +879,7 @@ theorem proportionCorrectlyClassified_at_reference_point :
 
 /-- PCC is bounded by max(prevalence, 1-prevalence) from below. -/
 theorem pcc_lower_bound (sens spec π : ℝ)
-    (h_sens : 0 ≤ sens) (h_sens1 : sens ≤ 1)
-    (h_spec : 0 ≤ spec) (h_spec1 : spec ≤ 1)
+    (h_sens : 0 ≤ sens) (h_spec : 0 ≤ spec)
     (h_π : 0 < π) (h_π1 : π < 1) :
     0 ≤ proportionCorrectlyClassified sens spec π := by
   unfold proportionCorrectlyClassified
@@ -895,8 +892,7 @@ theorem pcc_lower_bound (sens spec π : ℝ)
 theorem better_r2_better_stratification
     (sens₁ sens₂ spec₁ spec₂ π : ℝ)
     (h_sens : sens₁ < sens₂) (h_spec : spec₁ < spec₂)
-    (h_π : 0 < π) (h_π1 : π < 1)
-    (h_sens₁ : 0 ≤ sens₁) (h_spec₁ : 0 ≤ spec₁) :
+    (h_π : 0 < π) (h_π1 : π < 1) :
     proportionCorrectlyClassified sens₁ spec₁ π <
       proportionCorrectlyClassified sens₂ spec₂ π := by
   unfold proportionCorrectlyClassified
@@ -911,12 +907,11 @@ theorem better_r2_better_stratification
 theorem portability_gap_creates_stratification_disparity
     (sens_s spec_s sens_t spec_t π : ℝ)
     (h_sens : sens_t < sens_s) (h_spec : spec_t < spec_s)
-    (h_π : 0 < π) (h_π1 : π < 1)
-    (h_sens_t : 0 ≤ sens_t) (h_spec_t : 0 ≤ spec_t) :
+    (h_π : 0 < π) (h_π1 : π < 1) :
     proportionCorrectlyClassified sens_t spec_t π <
       proportionCorrectlyClassified sens_s spec_s π :=
   better_r2_better_stratification sens_t sens_s spec_t spec_s π
-    h_sens h_spec h_π h_π1 h_sens_t h_spec_t
+    h_sens h_spec h_π h_π1
 
 end RiskStratification
 
@@ -946,9 +941,7 @@ section CostEffectiveness
 theorem qaly_gain_positive_condition
     (sens spec π benefit harm : ℝ)
     (h_π : 0 < π) (h_π1 : π < 1)
-    (h_sens : 0 < sens) (h_sens1 : sens ≤ 1)
-    (h_spec : 0 < spec) (h_spec1 : spec < 1)
-    (h_benefit : 0 < benefit) (h_harm : 0 < harm)
+    (h_sens : 0 < sens) (h_harm : 0 < harm)
     -- True positive probability exceeds false positive probability
     -- (equivalent to positive predictive value > 50%, or LR+ × prevalence odds > 1)
     (h_tp_dominates : (1 - spec) * (1 - π) < sens * π)
@@ -979,9 +972,7 @@ theorem lower_portability_lower_cost_effectiveness
     (sens_s spec_s sens_t spec_t π benefit harm : ℝ)
     (h_sens : sens_t < sens_s) (h_spec : spec_t < spec_s)
     (h_π : 0 < π) (h_π1 : π < 1)
-    (h_benefit : 0 < benefit) (h_harm : 0 < harm)
-    (h_sens_t : 0 ≤ sens_t) (h_spec_t : 0 ≤ spec_t)
-    (h_spec_s1 : spec_s ≤ 1) :
+    (h_benefit : 0 < benefit) (h_harm : 0 < harm) :
     screeningQalyGain sens_t spec_t π benefit harm <
       screeningQalyGain sens_s spec_s π benefit harm := by
   repeat rw [screeningQalyGain_eq_formula]
@@ -1004,8 +995,7 @@ theorem lower_portability_lower_cost_effectiveness
     existence. -/
 theorem screeningQalyGain_neg_at_zero_sensitivity
     (π benefit harm : ℝ)
-    (h_π : 0 < π) (h_π1 : π < 1)
-    (h_benefit : 0 < benefit) (h_harm : 0 < harm) :
+    (h_π1 : π < 1) (h_harm : 0 < harm) :
     -- At zero sensitivity, QALY gain is negative
     screeningQalyGain 0 0 π benefit harm < 0 := by
   rw [screeningQalyGain_eq_formula]
@@ -1093,7 +1083,6 @@ theorem populationAttributableFraction_zero_risk_ratio_is_junk (p_high : ℝ) :
 theorem paf_lower_in_target
     (p_high_s p_high_t rr : ℝ)
     (h_rr : 1 < rr)
-    (h_p_s : 0 < p_high_s) (h_p_t : 0 < p_high_t)
     (h_lower : p_high_t < p_high_s) :
     populationAttributableFraction p_high_t rr <
       populationAttributableFraction p_high_s rr := by
@@ -1109,11 +1098,10 @@ theorem paf_lower_in_target
 theorem equity_gap_in_public_health
     (p_high_s p_high_t rr : ℝ)
     (h_rr : 1 < rr)
-    (h_p_s : 0 < p_high_s) (h_p_t : 0 < p_high_t)
     (h_lower : p_high_t < p_high_s) :
     0 < populationAttributableFraction p_high_s rr -
         populationAttributableFraction p_high_t rr := by
-  have h_paf := paf_lower_in_target p_high_s p_high_t rr h_rr h_p_s h_p_t h_lower
+  have h_paf := paf_lower_in_target p_high_s p_high_t rr h_rr h_lower
   linarith
 
 end PopulationImpact
@@ -1203,10 +1191,6 @@ theorem marginal_value_highest_for_underserved
     to a concrete clinical consequence via the qalyGain definition. -/
 theorem minimum_sample_for_clinical_pgs
     (sens spec π benefit harm : ℝ)
-    (h_π : 0 < π) (h_π1 : π < 1)
-    (h_benefit : 0 < benefit) (h_harm : 0 < harm)
-    (h_sens : 0 ≤ sens) (h_sens1 : sens ≤ 1)
-    (h_spec : 0 ≤ spec) (h_spec1 : spec ≤ 1)
     -- The key clinical condition: discrimination is too poor, so
     -- false positive harm exceeds true positive benefit
     (h_poor_disc : sens * π * benefit < (1 - spec) * (1 - π) * harm) :
