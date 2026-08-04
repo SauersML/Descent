@@ -167,6 +167,19 @@ noncomputable def ldsrExpectedBetaSq (h2 M ell_j N : ℝ) : ℝ :=
 noncomputable def ldsrExpectedChi2 (N h2 M ell_j a : ℝ) : ℝ :=
   N * h2 / M * ell_j + N * a + 1
 
+/-- **The intercept is one under the null.**
+
+At zero heritability and no confounding the expected chi-squared is exactly one, whatever the
+sample size, the SNP count or the LD score. That is the whole basis of reading the LD-score
+intercept as a confounding diagnostic: the additive `1` is the null expectation of a
+one-degree-of-freedom statistic and not a fitted offset. The relation to `ldsrExpectedBetaSq`
+proved below multiplies through by `N` and carries the `+ 1` along without constraining it, so a
+body with any other constant satisfies that identity and fails here. -/
+theorem ldsrExpectedChi2_null (N M ell_j : ℝ) :
+    ldsrExpectedChi2 N 0 M ell_j 0 = 1 := by
+  unfold ldsrExpectedChi2
+  ring
+
 /-- **From per-SNP β² to chi-squared: multiply by N.**
     χ²_j = N × β̂_j², so E[χ²_j] = N × E[β̂_j²]. -/
 theorem ldsr_chi2_from_beta_sq (h2 M ell_j N : ℝ) (h_N : N ≠ 0) :
