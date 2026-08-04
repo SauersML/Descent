@@ -1,14 +1,10 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Calibrator.Condensation
-import Mathlib.Analysis.Complex.ExponentialBounds
 import Calibrator.CramerStratum
-import Calibrator.CumulantBlindness
 import Calibrator.JetBarrier
 import Calibrator.LocalToGlobalCoherence
 import Calibrator.HiddenConeAmbiguity
-import Mathlib.Analysis.SpecialFunctions.Log.Basic
 import Mathlib.Tactic.LinearCombination
 
 namespace Calibrator

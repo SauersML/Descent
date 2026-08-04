@@ -1,7 +1,6 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Calibrator.Probability
 import Calibrator.TransportIdentities
 -- Step 4b below needs `FiniteSpectralModel.degradation_eq_zero_iff`, which supplies a
 -- positivity certificate for excess target risk that does not read an F_ST difference.

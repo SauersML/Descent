@@ -1612,31 +1612,23 @@ theorem card_sq_le_sum_mul_sum_inv (n : Stratum → ℝ) (hpos : ∀ s, 0 < n s)
       rw [← Finset.card_univ, hempty, Finset.card_empty]
     rw [hcard]
     simp [hempty]
-  have htotal : 0 < ∑ s, n s := Finset.sum_pos (fun s _ ↦ hpos s) hne
-  set lam : ℝ := (Fintype.card Stratum : ℝ) / (∑ s, n s) with hlam
-  have hexpand : ∀ s : Stratum,
-      n s * (1 / n s - lam) ^ 2 = 1 / n s - 2 * lam + lam ^ 2 * n s := by
+  -- Cauchy-Schwarz at `f s = sqrt (n s)`, `g s = 1 / sqrt (n s)`: the cross term is
+  -- identically one, so the left side is the cardinality.  Mathlib proves the
+  -- inequality (`Finset.sum_mul_sq_le_sq_mul_sq`); the discriminant argument this
+  -- replaced was a second proof of it in disguise.
+  have hkey := Finset.sum_mul_sq_le_sq_mul_sq (Finset.univ : Finset Stratum)
+    (fun s ↦ Real.sqrt (n s)) (fun s ↦ 1 / Real.sqrt (n s))
+  have hsqrt : ∀ s : Stratum, Real.sqrt (n s) ≠ 0 :=
+    fun s ↦ ne_of_gt (Real.sqrt_pos.mpr (hpos s))
+  -- stated in `⁻¹` form, which is what `simp` normalises `1 / _` to
+  have hcross : ∀ s : Stratum, Real.sqrt (n s) * (Real.sqrt (n s))⁻¹ = 1 :=
+    fun s ↦ mul_inv_cancel₀ (hsqrt s)
+  have hf : ∀ s : Stratum, Real.sqrt (n s) ^ 2 = n s :=
+    fun s ↦ Real.sq_sqrt (hpos s).le
+  have hg : ∀ s : Stratum, ((Real.sqrt (n s))⁻¹) ^ 2 = (n s)⁻¹ := by
     intro s
-    have hns : n s ≠ 0 := ne_of_gt (hpos s)
-    field_simp
-    ring
-  have hnonneg : 0 ≤ ∑ s, n s * (1 / n s - lam) ^ 2 :=
-    Finset.sum_nonneg fun s _ ↦ mul_nonneg (le_of_lt (hpos s)) (sq_nonneg _)
-  have hsum : (∑ s, n s * (1 / n s - lam) ^ 2) =
-      (∑ s, 1 / n s) - 2 * lam * (Fintype.card Stratum : ℝ) + lam ^ 2 * (∑ s, n s) := by
-    calc
-      (∑ s, n s * (1 / n s - lam) ^ 2) =
-          ∑ s, (1 / n s - 2 * lam + lam ^ 2 * n s) :=
-            Finset.sum_congr rfl (fun s _ ↦ hexpand s)
-      _ = (∑ s, 1 / n s) - (∑ s : Stratum, 2 * lam) + (∑ s, lam ^ 2 * n s) := by
-            rw [Finset.sum_add_distrib, Finset.sum_sub_distrib]
-      _ = (∑ s, 1 / n s) - 2 * lam * (Fintype.card Stratum : ℝ) + lam ^ 2 * (∑ s, n s) := by
-            simp only [Finset.sum_const, Finset.card_univ, Finset.mul_sum]
-            ring
-  have hlamval : lam * (∑ s, n s) = (Fintype.card Stratum : ℝ) := by
-    rw [hlam]
-    field_simp
-  nlinarith [hnonneg, hsum, hlamval, htotal]
+    rw [inv_pow, Real.sq_sqrt (hpos s).le]
+  simpa [one_div, hcross, hf, hg, Finset.card_univ] using hkey
 
 /-- **Unequal sampling inflates the effective stratum count.**  Whatever the allocation, one pays
 for at least as many strata as one has declared. -/

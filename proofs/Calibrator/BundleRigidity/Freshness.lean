@@ -1,18 +1,6 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Mathlib.Tactic
-import Mathlib.Algebra.BigOperators.Fin
-import Mathlib.Algebra.BigOperators.Ring.Finset
-import Mathlib.Data.Fintype.Basic
-import Mathlib.Data.Fin.VecNotation
-import Mathlib.Data.Real.Sqrt
-import Mathlib.Analysis.SpecialFunctions.Exp
-import Mathlib.Analysis.SpecialFunctions.Log.Basic
-import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
-import Mathlib.Analysis.SpecificLimits.Basic
-import Mathlib.Topology.ContinuousMap.Algebra
-import Mathlib.GroupTheory.Perm.Basic
 import Calibrator.BundleRigidity.Realizability
 
 /-!
@@ -164,10 +152,8 @@ compare. This is the step that turns the telescope into a decay rate. -/
 theorem prod_one_sub_le_exp_neg_sum (a : ℕ → ℝ)
     (ha1 : ∀ k, a k ≤ 1) (n : ℕ) :
     ∏ k ∈ range n, (1 - a k) ≤ Real.exp (-(∑ k ∈ range n, a k)) := by
-  have hterm : ∀ k ∈ range n, (1 - a k) ≤ Real.exp (-(a k)) := by
-    intro k _
-    have := Real.add_one_le_exp (-(a k))
-    linarith
+  have hterm : ∀ k ∈ range n, (1 - a k) ≤ Real.exp (-(a k)) :=
+    fun k _ ↦ Real.one_sub_le_exp_neg (a k)
   have hnonneg : ∀ k ∈ range n, (0 : ℝ) ≤ 1 - a k := by
     intro k _
     linarith [ha1 k]

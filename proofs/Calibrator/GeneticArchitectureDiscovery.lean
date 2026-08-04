@@ -1,11 +1,8 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Calibrator.Probability
 import Calibrator.BayesianPGSTheory
-import Calibrator.PortabilityDrift
 import Mathlib.LinearAlgebra.Matrix.DotProduct
-import Calibrator.OpenQuestions
 import Calibrator.MechanisticPortabilityWitnesses
 import Calibrator.AncestrySpecificPower
 import Calibrator.HaplotypeTheory

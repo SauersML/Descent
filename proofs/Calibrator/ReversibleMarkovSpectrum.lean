@@ -2,7 +2,6 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Mathlib.Data.Real.Basic
-import Mathlib.Tactic.FieldSimp
 import Mathlib.Tactic.Linarith
 import Mathlib.Tactic.NormNum
 import Mathlib.Tactic.Ring

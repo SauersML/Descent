@@ -10,7 +10,6 @@ import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
 -- list answerable to the proofs below.
 import Mathlib.Analysis.SpecialFunctions.Log.Basic
 import Mathlib.Algebra.BigOperators.Group.Finset.Basic
-import Mathlib.Tactic.Ring
 import Mathlib.Tactic.Linarith
 
 namespace Calibrator

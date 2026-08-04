@@ -7,11 +7,7 @@ import Mathlib.Algebra.BigOperators.Fin
 -- `Algebra.BigOperators.Fin`; without this import they resolve as unknown constants and
 -- `degradation_nonneg` / `degradation_eq_zero_iff` fail to elaborate.
 import Mathlib.Algebra.Order.BigOperators.Group.Finset
-import Mathlib.Tactic.FieldSimp
 import Mathlib.Tactic.FinCases
-import Mathlib.Tactic.Linarith
-import Mathlib.Tactic.Ring
-import Calibrator.ReversibleMarkovSpectrum
 import Calibrator.GenerativePortabilityLaw
 import Calibrator.TransportedMinimax
 

@@ -2,10 +2,6 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Calibrator.PCCorrectability.Geometry
-import Mathlib.Tactic.FieldSimp
-import Mathlib.Tactic.Linarith
-import Mathlib.Tactic.NormNum
-import Mathlib.Tactic.Ring
 
 namespace Calibrator
 

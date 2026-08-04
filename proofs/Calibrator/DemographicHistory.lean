@@ -1,10 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Calibrator.Probability
-import Calibrator.PortabilityDrift
 import Calibrator.PopulationGeneticsFoundations
-import Calibrator.OpenQuestions
 import Calibrator.LDDecayTheory
 
 namespace Calibrator

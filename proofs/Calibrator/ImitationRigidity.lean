@@ -1,7 +1,6 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Calibrator.TransportIdentities
 import Calibrator.LDDecayTheory
 import Calibrator.WhiteningEquivalence
 import Mathlib.LinearAlgebra.Matrix.Trace

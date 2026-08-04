@@ -3,7 +3,6 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Calibrator.DriftRegime
 import Calibrator.EpistaticChaos
-import Calibrator.ObservationalCeiling
 import Calibrator.XiFromMarkedBreakouts
 
 namespace Calibrator

@@ -2,14 +2,9 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Mathlib.Analysis.Convex.SpecificFunctions.Basic
-import Calibrator.Probability
-import Calibrator.PortabilityDrift
-import Calibrator.PGSCalibrationTheory
 import Calibrator.ClinicalUtilityFairness
-import Calibrator.OpenQuestions
 import Calibrator.ProjectionShiftBounds
 import Calibrator.ImitationRigidity
-import Calibrator.SpectralDegradation
 -- `FoldedSpectrum` supplies the Gaussian level-set collapse used in
 -- "What the metric split is, and is not" below. That section is the reason this
 -- import exists: `levelSet_metrics_agree_of_coords_eq` is not provable here.

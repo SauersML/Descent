@@ -131,28 +131,19 @@ noncomputable def stdGaussianMeasure : MeasureTheory.Measure Real :=
 def poly_n (n : Nat) (x : Real) : Real := x ^ n
 
 /-- For any natural number n, x^n is integrable with respect to the standard Gaussian measure.
-    This follows from the finiteness of Gaussian moments. -/
+
+Mathlib already carries the finiteness of Gaussian moments as `memLp_id_gaussianReal`,
+so nothing here re-derives it from the Gaussian density: the only step left is that
+`|x| ^ n` dominates `x ^ n`, which is `abs_pow`. -/
 theorem integrable_poly_n (n : Nat) : MeasureTheory.Integrable (poly_n n) stdGaussianMeasure := by
-  have h_gauss_integral : ∀ n : ℕ, MeasureTheory.IntegrableOn (fun x : ℝ ↦ x^n * Real.exp (-x^2 /
-      2)) (Set.univ : Set ℝ) := by
-    intro n
-    have := @integrable_rpow_mul_exp_neg_mul_sq
-    simpa [ div_eq_inv_mul ] using @this ( 1 / 2 ) ( by norm_num ) n ( by linarith )
-  unfold poly_n
-  unfold stdGaussianMeasure
-  simp_all +decide [ProbabilityTheory.gaussianReal]
-  refine' MeasureTheory.Integrable.mono' _ _ _
-  refine' fun x ↦ |x ^ n|
-  · refine' MeasureTheory.Integrable.abs _
-    rw [ MeasureTheory.integrable_withDensity_iff ]
-    · convert h_gauss_integral n |> fun h ↦ h.div_const ( Real.sqrt ( 2 * Real.pi )
-        ) using 2 ; norm_num [ ProbabilityTheory.gaussianPDF ] ; ring_nf
-      norm_num [ ProbabilityTheory.gaussianPDFReal ] ; ring_nf
-      rw [ ENNReal.toReal_ofReal ( Real.exp_nonneg _ ) ]
-    · fun_prop
-    · simp [ProbabilityTheory.gaussianPDF]
-  · exact Continuous.aestronglyMeasurable ( by continuity )
-  · exact Filter.Eventually.of_forall fun x ↦ Real.norm_eq_abs _ ▸ le_rfl
+  unfold poly_n stdGaussianMeasure
+  have hmem : MeasureTheory.MemLp (id : ℝ → ℝ) (n : ENNReal)
+      (ProbabilityTheory.gaussianReal 0 1) := by
+    simpa using ProbabilityTheory.memLp_id_gaussianReal (μ := 0) (v := 1) (n : NNReal)
+  refine (hmem.integrable_norm_pow' (p := n)).mono'
+    ((measurable_id.pow_const n).aestronglyMeasurable) ?_
+  filter_upwards with x
+  simp [Real.norm_eq_abs]
 
 /-- x^2 is integrable with respect to the standard Gaussian measure. -/
 theorem integrable_sq_gaussian : MeasureTheory.Integrable (fun x ↦ x ^ 2) stdGaussianMeasure := by

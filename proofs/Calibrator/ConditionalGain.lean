@@ -5,7 +5,6 @@ import Calibrator.BundleRigidity
 import Calibrator.BundleRigidity.CoverageInvariance
 import Calibrator.BundleRigidity.EntropySplit
 import Calibrator.BundleRigidity.Freshness
-import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
 
 namespace Calibrator
 

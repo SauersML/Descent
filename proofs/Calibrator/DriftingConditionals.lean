@@ -1,8 +1,6 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Calibrator.HorizonCurve
-import Calibrator.ReversibleMarkovSpectrum
 import Calibrator.DriftingConditional
 import Calibrator.UnifiedBiology
 

@@ -1,11 +1,8 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Calibrator.Condensation
 import Calibrator.CumulantBlindness
-import Calibrator.ObservationalCeiling
 import Mathlib.Analysis.SpecialFunctions.Exp
-import Mathlib.Tactic.Linarith
 
 namespace Calibrator
 

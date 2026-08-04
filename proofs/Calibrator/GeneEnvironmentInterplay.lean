@@ -1,8 +1,6 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Calibrator.Probability
-import Calibrator.PortabilityDrift
 import Calibrator.OpenQuestions
 -- For `LevelSetCoordinates`, `IsLevelSetFunctional` and
 -- `levelSet_metrics_agree_of_coords_eq`: the section on genetic/environmental

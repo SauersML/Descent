@@ -1,12 +1,8 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Calibrator.Probability
-import Calibrator.PortabilityDrift
-import Calibrator.OpenQuestions
 import Calibrator.HaplotypeTheory
 import Calibrator.CertificateGrading
-import Calibrator.TransportedMinimax
 import Mathlib.Analysis.SpecialFunctions.Pow.Asymptotics
 
 namespace Calibrator

@@ -4,9 +4,6 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Calibrator.PCCorrectability.Diagnostic
 import Calibrator.PCCorrectability.Overlap
 import Calibrator.ProjectionShiftBounds
-import Mathlib.Tactic.Linarith
-import Mathlib.Tactic.Positivity
-import Mathlib.Tactic.Ring
 
 namespace Calibrator
 

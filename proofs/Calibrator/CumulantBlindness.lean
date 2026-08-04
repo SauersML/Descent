@@ -2,12 +2,9 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Calibrator.Condensation
-import Calibrator.ObservationalCeiling
 import Calibrator.VarianceComponents
 import Mathlib.Data.Real.Sqrt
 import Mathlib.Algebra.Order.BigOperators.Ring.Finset
-import Mathlib.Tactic.Linarith
-import Mathlib.Tactic.Ring
 
 namespace Calibrator
 

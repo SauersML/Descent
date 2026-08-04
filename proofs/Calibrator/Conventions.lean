@@ -1,15 +1,9 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Calibrator.PopulationGeneticsFoundations
-import Calibrator.DriftRegime
-import Calibrator.ImitationRigidity
-import Calibrator.DemographicHistory
 import Calibrator.AncestrySpecificArchitecture
-import Calibrator.PCCorrectability.Threshold
 import Calibrator.AssortativeMatingPGS
 import Calibrator.CovarianceStructure
-import Calibrator.AncestrySpecificPower
 import Calibrator.GeneticArchitectureDiscovery
 import Calibrator.StatisticalGeneticsMethodology
 import Calibrator.BlindnessRegistry
@@ -17,26 +11,15 @@ import Calibrator.SerialFounderChain
 import Calibrator.BundleRigidity.TwoAtom
 import Calibrator.LongitudinalPortability
 import Calibrator.ImputationPortability
-import Calibrator.MechanisticPortabilityWitnesses
-import Calibrator.LDDecayTheory
 import Calibrator.MetricSpecificPortability
-import Calibrator.PhenomeWidePortability
 import Calibrator.ScoreDistribution
 import Calibrator.EpistasisAndNonAdditivity
 import Calibrator.VarianceComponents
 import Calibrator.PowerAnalysis
-import Calibrator.SelectionArchitecture
 import Calibrator.PolygenicAdaptation
 import Calibrator.AncestryCalibration
 import Calibrator.PortabilityBounds
-import Calibrator.CovarianceStructure
-import Calibrator.HaplotypeTheory
-import Calibrator.LongitudinalPortability
-import Calibrator.ImputationPortability
-import Calibrator.MechanisticPortabilityWitnesses
-import Calibrator.PortabilityDrift
 import Calibrator.StratificationConfounding
-import Calibrator.PolygenicArchitecture
 import Calibrator.TransferLearningPGS
 
 namespace Calibrator

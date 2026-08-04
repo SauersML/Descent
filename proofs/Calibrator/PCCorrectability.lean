@@ -1,13 +1,10 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Calibrator.PCCorrectability.Diagnostic
 import Calibrator.PCCorrectability.Design
 import Calibrator.PCCorrectability.Frequency
-import Calibrator.PCCorrectability.Geometry
 import Calibrator.PCCorrectability.ImitationCapacity
 import Calibrator.PCCorrectability.Nonidentifiability
-import Calibrator.PCCorrectability.Overlap
 import Calibrator.PCCorrectability.Unified
 
 /-!
