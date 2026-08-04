@@ -331,6 +331,15 @@ and interpolates `0 -> 1`.
 the limit law at the condensation window is `N(0, windowVariance w v)`. -/
 noncomputable def windowVariance (w v : ℝ) : ℝ := Phi (w / Real.sqrt v)
 
+/-- **windowVariance at its junk point, named.** With no spread the standardised coordinate divides
+by zero and is junk-zero, so the window probability collapses to `Phi 0` for EVERY half-width.
+The dependence on the half-width -- the whole content of the quantity -- disappears silently.
+Consumers must exclude the argument that makes the guard vanish. -/
+theorem windowVariance_zero_spread_is_junk (w : ℝ) :
+    windowVariance w 0 = Phi 0 := by
+  unfold windowVariance
+  simp
+
 /-- **A window at the centre carries half the mass.** Monotonicity in the window width is shared
 by every increasing function of `w / sqrt v`; the value at zero is not, and it is what identifies
 the standard normal cdf rather than some other sigmoid. -/

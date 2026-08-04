@@ -146,6 +146,16 @@ theorem mOne_zero_frequency_is_junk :
     mixture; `p` is a mixture weight, not an allele frequency. -/
 noncomputable def mTwo (p : ℝ) : ℝ := |1 - 2 * p| / (1 - p)
 
+/-- **mTwo at its junk point, named.** At `p = 1` the second atom carries no mass and its modulus
+diverges. The divisor `1 - p` is zero and Lean returns `0`, the modulus of a perfectly balanced
+atom, so the degenerate atom is reported as the best-conditioned one -- the inversion
+`mOne_zero_frequency_is_junk` records at the other endpoint. Consumers must exclude the argument
+that makes the guard vanish. -/
+theorem mTwo_unit_frequency_is_junk :
+    mTwo 1 = 0 := by
+  unfold mTwo
+  norm_num
+
 /-- **On `(0, 1/2]` the first modulus curve is `1/p - 2`**, the absolute value being
 resolvable there. This is the form the chain identity uses. -/
 theorem mOne_eq_of_le_half {p : ℝ} (hp : 0 < p) (hhalf : p ≤ 1 / 2) :

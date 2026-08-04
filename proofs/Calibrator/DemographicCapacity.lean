@@ -53,6 +53,17 @@ stipulating it.
 noncomputable def contrastSpikeLevel (p₁ p₂ : ℝ) : ℝ :=
   (p₁ - p₂) ^ 2 / (meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂))
 
+/-- **contrastSpikeLevel at its junk point, named.** The divisor is `p̄ (1 - p̄)` inside
+`meanAlleleFreq`, which vanishes when both populations are fixed. Numerator and denominator
+vanish together and Lean returns `0`: no contrast spike, which a locus with identical
+intermediate frequencies also gives. The guard is not visible in this definition's own body, so
+reading this line does not reveal that a branch exists. Consumers must exclude the argument that
+makes the guard vanish. -/
+theorem contrastSpikeLevel_monomorphic_is_junk :
+    contrastSpikeLevel 0 0 = 0 := by
+  unfold contrastSpikeLevel meanAlleleFreq
+  norm_num
+
 /-- **No contrast, no spike.** Two populations at the same allele frequency produce a level of
 exactly zero, whatever the frequency is. The proportionality to Nei's `G_ST` fixes the scale;
 this fixes the origin, and a body with an additive offset would satisfy the first and not this. -/

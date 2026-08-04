@@ -571,6 +571,15 @@ section OptimalDesign
 noncomputable def proportionalAllocation (pop_size total_n total_pop : ℝ) : ℝ :=
   total_n * (pop_size / total_pop)
 
+/-- **proportionalAllocation at its junk point, named.** With no total population there are no
+proportions to allocate by. Lean returns `0`: every ancestry receives nothing, so a recruitment
+design against a missing denominator reports a complete, self-consistent, empty allocation
+rather than failing. Consumers must exclude the argument that makes the guard vanish. -/
+theorem proportionalAllocation_empty_reference_is_junk (pop_size total_n : ℝ) :
+    proportionalAllocation pop_size total_n 0 = 0 := by
+  unfold proportionalAllocation
+  simp
+
 /-- Proportional allocation sums to total. -/
 theorem proportional_sums_to_total
     (n_total pop_A pop_B : ℝ)

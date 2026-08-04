@@ -162,6 +162,15 @@ theorem apparentMixingTime_at_equal_parts :
 /-- The factor by which a mixing-time diagnostic understates the transfer-relevant time. -/
 noncomputable def transferTimeInflation (s a : ℝ) : ℝ := 1 + (a / s) ^ 2
 
+/-- **transferTimeInflation at its junk point, named.** A flow with no symmetric part has no
+reversible timescale to inflate against. Lean returns `1`: no inflation at all, the value for a
+perfectly reversible flow, so the maximally irreversible case and the reversible case are
+reported identically. Consumers must exclude the argument that makes the guard vanish. -/
+theorem transferTimeInflation_zero_symmetric_is_junk (a : ℝ) :
+    transferTimeInflation 0 a = 1 := by
+  unfold transferTimeInflation
+  simp
+
 /-- The bias is the inflation factor: quadratic in the circulation-to-dissipation ratio, and
 twice the measured mixing time at equal strengths. -/
 theorem frontierTime_eq_inflation_mul_apparent (s a : ℝ) (hs : 0 < s) :

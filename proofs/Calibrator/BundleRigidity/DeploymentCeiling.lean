@@ -216,6 +216,15 @@ there is no biconditional here, only the forward implication and a named gap. -/
 available guarantee `σ_min ≥ (η/C)^k` and the usual `1/σ_min²` scaling. -/
 noncomputable def sampleCost (η C : ℝ) (k : ℕ) : ℝ := (C / η) ^ (2 * k)
 
+/-- **sampleCost at its junk point, named.** Demanding zero error demands unboundedly many samples.
+The ratio `C / η` is junk-zero and the cost is `0`: exact recovery is free. This is the
+ceiling-side twin of `fixedGradeBenchmarkSampleSize_zero_target_is_junk`, failing in the same
+certifying direction. Consumers must exclude the argument that makes the guard vanish. -/
+theorem sampleCost_zero_precision_is_junk (C : ℝ) :
+    sampleCost 0 C 1 = 0 := by
+  unfold sampleCost
+  norm_num
+
 /-- **The sample cost is unbounded in the coupling order.**
 
 For `0 < η < C` there is, for every bound `B`, a coupling order whose sample cost exceeds

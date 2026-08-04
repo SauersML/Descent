@@ -225,6 +225,15 @@ bound in `n` — so the blindness is not a small-`n` artifact that averages away
     index entering as a multiplier and not as an exponent. Supplied as a value. -/
 noncomputable def ghostGain (α n : ℝ) : ℝ := α * Real.log n
 
+/-- **ghostGain at its junk point, named.** `Real.log 0` is junk-zero, so the gain is `0` for every
+coefficient: no ghost signal, which is what a genuinely absent ghost also gives. The logarithm's
+junk branch is the quiet one -- unlike a division it produces no specially-shaped value and the
+result stays in range. Consumers must exclude the argument that makes the guard vanish. -/
+theorem ghostGain_zero_size_is_junk (α : ℝ) :
+    ghostGain α 0 = 0 := by
+  unfold ghostGain
+  simp
+
 /-- The gain the effective-unit count would predict: a power of `n`. Supplied as a value. -/
 noncomputable def countPredictedGain (α n : ℝ) : ℝ := n ^ α
 

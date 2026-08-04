@@ -1036,6 +1036,16 @@ noncomputable def populationAttributableFraction
     (p_high rr : ℝ) : ℝ :=
   p_high * (1 - 1 / rr)
 
+/-- **populationAttributableFraction at its junk point, named.** A risk ratio of zero means the
+exposure is perfectly protective, where the attributable fraction is negative without bound. The
+formula returns `p_high` -- the exposed fraction itself, the value for an infinitely harmful
+exposure. Sign inverted and magnitude maximal, for a quantity used to rank interventions.
+Consumers must exclude the argument that makes the guard vanish. -/
+theorem populationAttributableFraction_zero_risk_ratio_is_junk (p_high : ℝ) :
+    populationAttributableFraction p_high 0 = p_high := by
+  unfold populationAttributableFraction
+  simp
+
 /-- **PAF is lower in target populations.**
     When PGS is less accurate, the high-risk group is less enriched
     for true cases → lower PAF → less population-level benefit. -/
