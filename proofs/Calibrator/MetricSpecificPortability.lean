@@ -377,7 +377,7 @@ theorem neutralAF_benchmark_liability_auc_sensitive_to_drift
     0 < presentDayEqualVarianceGaussianAUC V_A V_E fstS -
       presentDayEqualVarianceGaussianAUC V_A V_E fstT := by
   have h_drop :=
-    targetLiabilityAUC_lt_source_of_neutralAF_benchmark
+    targetAUC_lt_source_of_neutralAF_benchmark
       V_A V_E fstS fstT hVA hVE h_fst h_fst_bounds
   linarith
 
@@ -1625,6 +1625,50 @@ excluded by some cohort at every split of the target is excluded by the pooled
 fit; that pooling DISSOLVES a barrier does not follow, and needs configurations
 built at the intermediate overlaps.
 -/
+
+
+/-- **The pooled calibration target decomposes into per-ancestry loss budgets.**
+
+`indexwiseLoss` is a nonnegatively weighted sum of per-ancestry squared errors, so
+it is a superposition landscape in the sense of `LandscapeSuperposition`, and that
+file's decomposition specialises here. A prediction meets a pooled calibration
+target exactly when there is a way of dividing the loss budget across ancestries
+that the prediction meets ancestry by ancestry -- and the division witnessing it
+is the prediction's own per-ancestry error.
+
+Nonnegativity of the mixture weights is what makes the reverse direction true. -/
+theorem pooledTarget_iff_exists_budget {m : ℕ} (π η : Fin m → ℝ) (ε v : ℝ)
+    (hπ : ∀ i, 0 ≤ π i) :
+    indexwiseLoss π η v ≤ ε ↔
+      ∃ budget : Fin m → ℝ, (∑ i, π i * budget i) ≤ ε ∧ ∀ i, (η i - v) ^ 2 ≤ budget i := by
+  constructor
+  · intro h
+    exact ⟨fun i ↦ (η i - v) ^ 2, h, fun i ↦ le_rfl⟩
+  · rintro ⟨budget, hsum, hle⟩
+    refine le_trans ?_ hsum
+    exact Finset.sum_le_sum fun i _ ↦ mul_le_mul_of_nonneg_left (hle i) (hπ i)
+
+/-- **A score no budget split can rescue is rejected by the pooled fit.**
+
+The usable half of the decomposition, in the direction the corpus cares about. If
+for every division of the loss budget across ancestries some ancestry is over its
+share, then the pooled objective rejects the prediction too. Pooling cohorts
+cannot rescue a score that fails ancestry-wise under every allocation.
+
+The converse does not follow and is not stated: that pooling ADMITS a prediction
+no single allocation admits would need a prediction constructed at the
+intermediate errors, which no inclusion of this shape supplies. It is the same
+asymmetry `driftDefect_le_indexwiseLoss` has -- a floor that transfers upward and
+not down. -/
+theorem pooledTarget_reject_of_every_budget_rejected {m : ℕ} (π η : Fin m → ℝ) (ε v : ℝ)
+    (hπ : ∀ i, 0 ≤ π i)
+    (hreject : ∀ budget : Fin m → ℝ, (∑ i, π i * budget i) ≤ ε →
+      ∃ i, budget i < (η i - v) ^ 2) :
+    ¬ (indexwiseLoss π η v ≤ ε) := by
+  intro h
+  obtain ⟨budget, hsum, hle⟩ := (pooledTarget_iff_exists_budget π η ε v hπ).mp h
+  obtain ⟨i, hi⟩ := hreject budget hsum
+  exact absurd (hle i) (not_le.mpr hi)
 
 /-! #### Drift invisible to genotype is irreducible by any amount of genotyping
 
