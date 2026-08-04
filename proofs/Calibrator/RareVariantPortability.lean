@@ -129,6 +129,12 @@ and can improve portability.
 
 section BurdenTests
 
+/-- Probability that at least one of `variantCount` independently shared variants survives in a
+gene-level burden, given per-variant sharing probability `singleShare`. -/
+noncomputable def independentGeneSharingProbability
+    (singleShare : ℝ) (variantCount : ℕ) : ℝ :=
+  1 - (1 - singleShare) ^ variantCount
+
 /-- **At least one of `k` shares beats one share**, for `k ≥ 2`:
     `s < 1 - (1-s)^k` whenever `0 < s < 1`.
 
@@ -140,17 +146,22 @@ section BurdenTests
     the sharing events are independent — the assumption that makes
     `1 - (1-s)^k` the right probability — is exactly what a portability claim
     would have to establish, and it is assumed away by writing the expression. -/
-theorem gene_level_share_gt_single_share
+theorem independentGeneSharingProbability_gt_single
     (s : ℝ) (k : ℕ)
     (h_s_pos : 0 < s) (h_s_lt : s < 1)
     (h_k : 2 ≤ k) :
-    s < 1 - (1 - s) ^ k := by
+    s < independentGeneSharingProbability s k := by
+  unfold independentGeneSharingProbability
   have h_base : (1 - s) ^ k ≤ (1 - s) ^ 2 := by
     apply pow_le_pow_of_le_one (by linarith) (by linarith) h_k
   have h_expand : (1 - s) ^ 2 = 1 - 2 * s + s ^ 2 := by ring
   nlinarith [sq_nonneg s]
 
-/-- **`β² < k·β²` for `k ≥ 2` and `β ≠ 0`.**
+/-- Variance proxy for a homogeneous `k`-variant gene burden with common effect `β`. -/
+noncomputable def homogeneousGeneBurdenVariance (β : ℝ) (variantCount : ℕ) : ℝ :=
+  variantCount * β ^ 2
+
+/-- **A nontrivial homogeneous gene burden has more variance than one variant.**
 
     Read as genetics: if `k` variants in a gene carry the same effect `β` and
     contribute additively, gene-level burden variance `k·β²` exceeds
@@ -159,32 +170,42 @@ theorem gene_level_share_gt_single_share
     cross-population correlation, which is what a portability claim would need.
     What is proved is that multiplying a positive number by something larger
     than one increases it. -/
-theorem sq_lt_cast_mul_sq_of_two_le
+theorem homogeneousGeneBurdenVariance_gt_single
     (β : ℝ) (k : ℕ)
     (h_β : β ≠ 0)
     (h_k : 2 ≤ k) :
     -- Gene burden variance = k · β² > β² = single variant variance
-    β ^ 2 < ↑k * β ^ 2 := by
+    β ^ 2 < homogeneousGeneBurdenVariance β k := by
+  unfold homogeneousGeneBurdenVariance
   have h_β2 : 0 < β ^ 2 := sq_pos_of_ne_zero h_β
   have h_k_real : (1 : ℝ) < ↑k := by
     exact_mod_cast (by omega : 1 < k)
   linarith [mul_lt_mul_of_pos_right h_k_real h_β2]
 
 
-/-- **Two opposite nonzero effects: the sum vanishes and the sum of squares does
-    not.** `(β₁+β₂)² < β₁² + β₂²` when `β₁ + β₂ = 0` and `β₁ ≠ 0`.
+/-- Squared signal of an additive burden statistic. -/
+noncomputable def burdenSquaredSignal (β₁ β₂ : ℝ) : ℝ :=
+  (β₁ + β₂) ^ 2
+
+/-- Variance-component signal that retains effects regardless of sign. -/
+noncomputable def varianceComponentSignal (β₁ β₂ : ℝ) : ℝ :=
+  β₁ ^ 2 + β₂ ^ 2
+
+/-- **Two opposite nonzero effects: the burden signal vanishes and the variance-component signal
+    does not.** `(β₁+β₂)² < β₁² + β₂²` when `β₁ + β₂ = 0` and `β₁ ≠ 0`.
 
     This is the two-variant shape of the reason a variance statistic sees signal
     a burden statistic cancels away. It is not a theorem about SKAT: no kernel,
     no test statistic, no null distribution and no power comparison appears
     below, and nothing here says the variance statistic *detects* anything. Two
     reals summing to zero, one of them nonzero. -/
-theorem sq_sum_lt_sum_sq_of_opposite
+theorem burdenSquaredSignal_lt_varianceComponentSignal_of_opposite
     (β₁ β₂ : ℝ)
     (h_opposite : β₁ + β₂ = 0)
     (h_nonzero : β₁ ≠ 0) :
     -- Burden signal (sum) is zero but SKAT signal (sum of squares) is positive
-    (β₁ + β₂) ^ 2 < β₁ ^ 2 + β₂ ^ 2 := by
+    burdenSquaredSignal β₁ β₂ < varianceComponentSignal β₁ β₂ := by
+  unfold burdenSquaredSignal varianceComponentSignal
   rw [h_opposite]
   simp
   have : β₂ = -β₁ := by linarith
