@@ -4078,6 +4078,34 @@ theorem sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explicit_source_varia
         (residualVarianceFromSourceWeights m Pop.source) := by
   rfl
 
+/-- **The AUC chart holds at either population**, given that the population's effective
+outcome variance is positive.
+
+The source and target readings of this were two theorems with the same eleven-line proof:
+derive the signal-below-outcome inequality from `R² < 1`, conclude the residual is nonzero,
+rewrite both AUC forms into their formulas, and clear denominators.  Only the positivity
+fact differs between them, and it is a hypothesis here. -/
+theorem equalVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart_of_pos {p q : ℕ}
+    (m : CrossPopulationMetricModel p q) (P : Pop)
+    (h_eff_pos : 0 < effectiveOutcomeVariance m P)
+    (h_r2 : r2FromSourceWeights m P < 1) :
+    equalVarianceGaussianAUCFromSourceWeights m P =
+      equalVarianceGaussianAUCFromExplainedR2 (r2FromSourceWeights m P) := by
+  have h_signal_lt :
+      explainedSignalVarianceFromSourceWeights m P < effectiveOutcomeVariance m P :=
+    (div_lt_one h_eff_pos).mp (by simpa [r2FromSourceWeights] using h_r2)
+  have h_residual_ne :
+      residualVarianceFromSourceWeights m P ≠ 0 := by
+    rw [residualVarianceFromSourceWeights]
+    exact ne_of_gt (sub_pos.mpr h_signal_lt)
+  rw [equalVarianceGaussianAUCFromExplainedR2_eq_formula_of_lt_one _ h_r2]
+  rw [equalVarianceGaussianAUCFromSourceWeights,
+    equalVarianceGaussianAUCFromSignalVariance_eq_formula_of_ne_noise _ _ h_residual_ne]
+  unfold residualVarianceFromSourceWeights r2FromSourceWeights
+  congr 1
+  congr 1
+  field_simp [ne_of_gt h_eff_pos]
+
 /-- The direct mechanistic source AUC agrees with the `R²` chart induced by the
 same source explained-signal and total-variance decomposition.
 
@@ -4087,25 +4115,9 @@ theorem sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart_of_
     (m : CrossPopulationMetricModel p q)
     (h_r2 : r2FromSourceWeights m Pop.source < 1) :
     equalVarianceGaussianAUCFromSourceWeights m Pop.source =
-      equalVarianceGaussianAUCFromExplainedR2 (r2FromSourceWeights m Pop.source) := by
-  have h_source_ne : (m.outcomeVariance Pop.source) ≠ 0 :=
-    ne_of_gt (m.outcomeVariance_pos Pop.source)
-  have h_signal_lt :
-      explainedSignalVarianceFromSourceWeights m Pop.source <
-        effectiveOutcomeVariance m Pop.source := by
-    exact (div_lt_one (by simpa using m.outcomeVariance_pos Pop.source)).mp
-      (by simpa [r2FromSourceWeights] using h_r2)
-  have h_residual_ne :
-      residualVarianceFromSourceWeights m Pop.source ≠ 0 := by
-    rw [residualVarianceFromSourceWeights]
-    exact ne_of_gt (sub_pos.mpr h_signal_lt)
-  rw [equalVarianceGaussianAUCFromExplainedR2_eq_formula_of_lt_one _ h_r2]
-  rw [equalVarianceGaussianAUCFromSourceWeights,
-    equalVarianceGaussianAUCFromSignalVariance_eq_formula_of_ne_noise _ _ h_residual_ne]
-  unfold residualVarianceFromSourceWeights r2FromSourceWeights
-  congr 1
-  congr 1
-  field_simp [h_source_ne]
+      equalVarianceGaussianAUCFromExplainedR2 (r2FromSourceWeights m Pop.source) :=
+  equalVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart_of_pos m Pop.source
+    (by simpa using m.outcomeVariance_pos Pop.source) h_r2
 
 /-- The mechanistic target AUC is exactly the explicit liability-threshold map
 applied to target explained signal and target residual variance. -/
@@ -4156,25 +4168,9 @@ theorem targetEqualVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart_of_
     (m : CrossPopulationMetricModel p q)
     (h_r2 : r2FromSourceWeights m Pop.target < 1) :
     equalVarianceGaussianAUCFromSourceWeights m Pop.target =
-      equalVarianceGaussianAUCFromExplainedR2 (r2FromSourceWeights m Pop.target) := by
-  have h_eff_ne : effectiveOutcomeVariance m Pop.target ≠ 0 :=
-    ne_of_gt (effectiveTargetOutcomeVariance_pos m)
-  have h_signal_lt :
-      explainedSignalVarianceFromSourceWeights m Pop.target <
-        effectiveOutcomeVariance m Pop.target := by
-    exact (div_lt_one (effectiveTargetOutcomeVariance_pos m)).mp
-      (by simpa [r2FromSourceWeights] using h_r2)
-  have h_residual_ne :
-      residualVarianceFromSourceWeights m Pop.target ≠ 0 := by
-    rw [residualVarianceFromSourceWeights]
-    exact ne_of_gt (sub_pos.mpr h_signal_lt)
-  rw [equalVarianceGaussianAUCFromExplainedR2_eq_formula_of_lt_one _ h_r2]
-  rw [equalVarianceGaussianAUCFromSourceWeights,
-    equalVarianceGaussianAUCFromSignalVariance_eq_formula_of_ne_noise _ _ h_residual_ne]
-  unfold residualVarianceFromSourceWeights r2FromSourceWeights
-  congr 1
-  congr 1
-  field_simp [h_eff_ne]
+      equalVarianceGaussianAUCFromExplainedR2 (r2FromSourceWeights m Pop.target) :=
+  equalVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart_of_pos m Pop.target
+    (effectiveTargetOutcomeVariance_pos m) h_r2
 
 /-- Canonical mechanistic deployed source metric profile evaluated at an
 arbitrary observed prevalence coordinate `π`. This is the source-side analogue
