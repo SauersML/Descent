@@ -551,6 +551,21 @@ theorem gainPolynomialRow_eq_mul (β n : ℝ) :
   unfold gainPolynomialRow gainLog
   ring
 
+/-- **The polynomial row retains its exponent.**  At every problem size above one, the gain is
+strictly increasing in `β`; hence the apparent third row is itself a continuum of genuinely
+distinct growth laws rather than a single coarse class. -/
+theorem gainPolynomialRow_strictMono_exponent (n : ℝ) (hn : 1 < n) :
+    StrictMono fun β : ℝ ↦ gainPolynomialRow β n := by
+  intro β₁ β₂ hβ
+  unfold gainPolynomialRow
+  exact mul_lt_mul_of_pos_right
+    (Real.rpow_lt_rpow_of_exponent_lt hn hβ) (Real.log_pos hn)
+
+/-- A single evaluation above unit size identifies the exponent within the polynomial family. -/
+theorem gainPolynomialRow_injective_exponent (n : ℝ) (hn : 1 < n) :
+    Function.Injective fun β : ℝ ↦ gainPolynomialRow β n :=
+  (gainPolynomialRow_strictMono_exponent n hn).injective
+
 /-- Row four: linear gain, the fully fresh case. -/
 noncomputable def gainLinear (n : ℝ) : ℝ := n
 
