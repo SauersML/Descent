@@ -39,28 +39,27 @@ This has direct implications for PGS portability.
 
 section RareVariantSpecificity
 
+/-- Coalescent approximation to the probability that a rare allele is shared across a recently
+diverged population pair. -/
+noncomputable def rareVariantSharingApproximation (Ne p : ℝ) : ℝ :=
+  2 * Ne * p
 
-/-- **Ultra-rare variants are almost never shared.**
-    Under the coalescent, a variant at frequency p in one population
-    has sharing probability ≈ 2·Ne·p in a diverged population (for
-    recent divergence relative to 2·Ne generations).
-
-    For ultra-rare variants where p < 1/(2·Ne), the sharing probability
-    2·Ne·p is bounded below 1.  This is the defining feature of
-    ultra-rare variants: they arose recently enough that they almost
-    certainly have not spread to the sister population.
-
-    Proof: multiply both sides of p < 1/(2·Ne) by the positive
-    quantity 2·Ne. -/
-theorem ultra_rare_not_shared
-    (Ne p : ℝ)
-    (h_Ne : 0 < Ne)
-    (h_ultra_rare : p < 1 / (2 * Ne)) :
-    -- sharing_prob = 2 * Ne * p (coalescent approximation) is < 1
-    2 * Ne * p < 1 := by
+/-- **Exact ultra-rare threshold in the sharing approximation.**  At positive effective
+population size, the approximate cross-population sharing probability is below one if and only
+if allele frequency is below `1 / (2 Ne)`. -/
+theorem rareVariantSharingApproximation_lt_one_iff
+    (Ne p : ℝ) (h_Ne : 0 < Ne) :
+    rareVariantSharingApproximation Ne p < 1 ↔ p < 1 / (2 * Ne) := by
+  unfold rareVariantSharingApproximation
   have h2Ne_pos : (0 : ℝ) < 2 * Ne := by positivity
-  rw [lt_div_iff₀ h2Ne_pos] at h_ultra_rare
-  linarith [mul_comm p (2 * Ne)]
+  rw [lt_div_iff₀ h2Ne_pos]
+  constructor <;> intro h <;> nlinarith [mul_comm p (2 * Ne)]
+
+/-- Fraction of two-component heritability attributable to rare variants. -/
+noncomputable def rareHeritabilityShare
+    (rareCount rareVariance commonCount commonVariance : ℝ) : ℝ :=
+  rareCount * rareVariance /
+    (rareCount * rareVariance + commonCount * commonVariance)
 
 /-- **One positive summand's share of a sum of two is strictly between `0` and
     `1`.**
@@ -71,30 +70,37 @@ theorem ultra_rare_not_shared
     contribution *substantial* rather than merely positive appears nowhere: no
     `α`, no frequency and no effect size occurs below, and "substantial" is not
     a formal claim about a quantity bounded only by `0` and `1`. -/
-theorem div_add_mem_Ioo_of_pos
+theorem rareHeritabilityShare_mem_Ioo
     (n_rare v_rare n_common v_common : ℝ)
     (h_nr : 0 < n_rare) (h_vr : 0 < v_rare)
     (h_nc : 0 < n_common) (h_vc : 0 < v_common) :
-    -- h²_rare is a strictly positive component of h²_total
-    let h2_rare := n_rare * v_rare
-    let h2_total := n_rare * v_rare + n_common * v_common
-    0 < h2_rare / h2_total ∧ h2_rare / h2_total < 1 := by
+    rareHeritabilityShare n_rare v_rare n_common v_common ∈ Set.Ioo 0 1 := by
+  unfold rareHeritabilityShare
   constructor
   · apply div_pos (by positivity) (by positivity)
   · rw [div_lt_one (by positivity : 0 < n_rare * v_rare + n_common * v_common)]
     linarith [mul_pos h_nc h_vc]
 
-/-- **A product with a zero factor is zero:** `maf_B = 0` gives
-    `β²·(2·maf_B·(1 - maf_B)) = 0`.
+/-- Additive genetic-variance contribution of a variant with effect `β` and allele frequency
+`p` under Hardy--Weinberg genotype variance `2p(1-p)`. -/
+noncomputable def variantGeneticVarianceContribution (β p : ℝ) : ℝ :=
+  β ^ 2 * (2 * p * (1 - p))
 
-    The reading is that a variant absent from a population contributes nothing
-    to a score there. That the contribution IS `β²·2p(1-p)` is the modelling
-    step and is stipulated by writing it; no population, no score and no
-    variant appears below. -/
-theorem mul_genotype_variance_eq_zero_of_freq_zero
-    (β maf_B : ℝ) (h_absent : maf_B = 0) :
-    β ^ 2 * (2 * maf_B * (1 - maf_B)) = 0 := by
-  rw [h_absent]; ring
+/-- **Exact zero fiber of a nonzero-effect variant contribution.**  A variant with nonzero effect
+contributes zero additive variance exactly when the allele is absent or fixed. -/
+theorem variantGeneticVarianceContribution_eq_zero_iff
+    (β p : ℝ) (h_effect : β ≠ 0) :
+    variantGeneticVarianceContribution β p = 0 ↔ p = 0 ∨ p = 1 := by
+  unfold variantGeneticVarianceContribution
+  rw [mul_eq_zero]
+  simp [h_effect, mul_eq_zero]
+  constructor
+  · rintro (hp | hp)
+    · exact Or.inl hp
+    · exact Or.inr (by linarith)
+  · rintro (hp | hp)
+    · exact Or.inl hp
+    · exact Or.inr (by linarith)
 
 
 /-- **A ratio above two means the numerator is above twice the denominator**,
