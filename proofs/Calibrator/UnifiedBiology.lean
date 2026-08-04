@@ -6,6 +6,7 @@ import Calibrator.DirichletTransfer
 import Calibrator.ErgodicCovariancePencil
 import Calibrator.HorizonCurve
 import Calibrator.PencilEnvironment
+import Calibrator.FunctionalDescent
 
 namespace Calibrator
 
@@ -249,5 +250,25 @@ theorem unifiedBiology_obstructions : UnifiedBiologyObstructions := by
         (by norm_num) }
   rw [crossStatePerformance_persistent_eq_one, crossStatePerformance_switching_eq_zero]
   norm_num
+
+/-! ## Conditional descent is the portability gate before prediction
+
+The same score bin or ancestry summary can support different conditional phenotype laws in
+different cohorts.  `FunctionalDescent` separates two biologically distinct failures:
+interaction can disappear in either margin and reappear after refinement, while confounding can
+be controlled by either informative variable and reappear after marginalization.  Thus the
+choice of retained covariate is part of the portability theorem, not preprocessing notation. -/
+
+/-- **The conditional-descent boundary is present in the biological core.**  A balanced pure
+interaction is invisible in either ancestry/environment margin but visible jointly, and a
+cohort-varying confounder prevalence changes marginal risk. -/
+theorem conditionalDescent_biological_boundary :
+    (∀ theta : ℝ, ∀ u : BinaryDescentCovariate,
+      (interactionRisk theta u 0 + interactionRisk theta u 1) / 2 = 1 / 2) ∧
+    interactionRisk 0 0 0 ≠ interactionRisk (1 / 4) 0 0 ∧
+    confoundedMarginalRisk 0 ≠ confoundedMarginalRisk 1 := by
+  refine ⟨interactionRisk_average_second, ?_, ?_⟩
+  · exact interactionRisk_joint_separates (by norm_num)
+  · exact confoundedMarginalRisk_separates (by norm_num)
 
 end Calibrator
