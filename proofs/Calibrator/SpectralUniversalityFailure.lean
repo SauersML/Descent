@@ -52,21 +52,35 @@ section ThirdMomentContraction
 
 variable {Row Locus : Type*} [Fintype Row] [Fintype Locus]
 
-/-- A five-index finite Fubini permutation used by the tensor contraction proof. -/
+/-- Move one finite-sum index through a pair of indices. -/
+private theorem sum_pair_out
+    {A I J : Type*} [Fintype A] [Fintype I] [Fintype J] (f : A → I → J → ℝ) :
+    (∑ a, ∑ i, ∑ j, f a i j) = ∑ i, ∑ j, ∑ a, f a i j := by
+  rw [Finset.sum_comm]
+  apply Finset.sum_congr rfl
+  intro i hi
+  rw [Finset.sum_comm]
+
+/-- A five-index finite Fubini permutation used by the third-order contraction proof. -/
 private theorem sum_five_rotate
-    {A B C D E : Type*} [Fintype A] [Fintype B] [Fintype C] [Fintype D] [Fintype E]
-    (f : A → B → C → D → E → ℝ) :
-    (∑ a, ∑ b, ∑ c, ∑ d, ∑ e, f a b c d e) =
-      ∑ d, ∑ e, ∑ a, ∑ b, ∑ c, f a b c d e := by
-  classical
+    {A B C I J : Type*} [Fintype A] [Fintype B] [Fintype C] [Fintype I] [Fintype J]
+    (f : A → B → C → I → J → ℝ) :
+    (∑ a, ∑ b, ∑ c, ∑ i, ∑ j, f a b c i j) =
+      ∑ i, ∑ j, ∑ a, ∑ b, ∑ c, f a b c i j := by
   calc
-    (∑ a, ∑ b, ∑ c, ∑ d, ∑ e, f a b c d e) =
-        ∑ a, ∑ b, ∑ d, ∑ c, ∑ e, f a b c d e := by
+    (∑ a, ∑ b, ∑ c, ∑ i, ∑ j, f a b c i j) =
+        ∑ a, ∑ b, ∑ i, ∑ j, ∑ c, f a b c i j := by
       apply Finset.sum_congr rfl
       intro a ha
       apply Finset.sum_congr rfl
       intro b hb
-      rw [Finset.sum_comm]
+      exact sum_pair_out (fun c i j ↦ f a b c i j)
+    _ = ∑ a, ∑ i, ∑ j, ∑ b, ∑ c, f a b c i j := by
+      apply Finset.sum_congr rfl
+      intro a ha
+      exact sum_pair_out (fun b i j ↦ ∑ c, f a b c i j)
+    _ = ∑ i, ∑ j, ∑ a, ∑ b, ∑ c, f a b c i j := by
+      exact sum_pair_out (fun a i j ↦ ∑ b, ∑ c, f a b c i j)
 
 /-- A six-index finite Fubini permutation used by the fourth-order contraction proof. -/
 private theorem sum_six_rotate
@@ -74,7 +88,6 @@ private theorem sum_six_rotate
     [Fintype I] [Fintype J] (f : A → B → C → D → I → J → ℝ) :
     (∑ a, ∑ b, ∑ c, ∑ d, ∑ i, ∑ j, f a b c d i j) =
       ∑ i, ∑ j, ∑ a, ∑ b, ∑ c, ∑ d, f a b c d i j := by
-  classical
   calc
     (∑ a, ∑ b, ∑ c, ∑ d, ∑ i, ∑ j, f a b c d i j) =
         ∑ a, ∑ b, ∑ c, ∑ i, ∑ j, ∑ d, f a b c d i j := by
@@ -84,55 +97,19 @@ private theorem sum_six_rotate
       intro b hb
       apply Finset.sum_congr rfl
       intro c hc
-      rw [Finset.sum_comm]
-      apply Finset.sum_congr rfl
-      intro i hi
-      rw [Finset.sum_comm]
+      exact sum_pair_out (fun d i j ↦ f a b c d i j)
     _ = ∑ a, ∑ b, ∑ i, ∑ j, ∑ c, ∑ d, f a b c d i j := by
       apply Finset.sum_congr rfl
       intro a ha
       apply Finset.sum_congr rfl
       intro b hb
-      rw [Finset.sum_comm]
-      apply Finset.sum_congr rfl
-      intro i hi
-      rw [Finset.sum_comm]
+      exact sum_pair_out (fun c i j ↦ ∑ d, f a b c d i j)
     _ = ∑ a, ∑ i, ∑ j, ∑ b, ∑ c, ∑ d, f a b c d i j := by
       apply Finset.sum_congr rfl
       intro a ha
-      rw [Finset.sum_comm]
-      apply Finset.sum_congr rfl
-      intro i hi
-      rw [Finset.sum_comm]
+      exact sum_pair_out (fun b i j ↦ ∑ c, ∑ d, f a b c d i j)
     _ = ∑ i, ∑ j, ∑ a, ∑ b, ∑ c, ∑ d, f a b c d i j := by
-      rw [Finset.sum_comm]
-      apply Finset.sum_congr rfl
-      intro i hi
-      rw [Finset.sum_comm]
-    _ = ∑ a, ∑ d, ∑ b, ∑ c, ∑ e, f a b c d e := by
-      apply Finset.sum_congr rfl
-      intro a ha
-      rw [Finset.sum_comm]
-    _ = ∑ d, ∑ a, ∑ b, ∑ c, ∑ e, f a b c d e := by
-      rw [Finset.sum_comm]
-    _ = ∑ d, ∑ a, ∑ b, ∑ e, ∑ c, f a b c d e := by
-      apply Finset.sum_congr rfl
-      intro d hd
-      apply Finset.sum_congr rfl
-      intro a ha
-      apply Finset.sum_congr rfl
-      intro b hb
-      rw [Finset.sum_comm]
-    _ = ∑ d, ∑ a, ∑ e, ∑ b, ∑ c, f a b c d e := by
-      apply Finset.sum_congr rfl
-      intro d hd
-      apply Finset.sum_congr rfl
-      intro a ha
-      rw [Finset.sum_comm]
-    _ = ∑ d, ∑ e, ∑ a, ∑ b, ∑ c, f a b c d e := by
-      apply Finset.sum_congr rfl
-      intro d hd
-      rw [Finset.sum_comm]
+      exact sum_pair_out (fun a i j ↦ ∑ b, ∑ c, ∑ d, f a b c d i j)
 
 /-- Expansion of the square of a finite sum. -/
 private theorem sum_sq_expand {I : Type*} [Fintype I] (f : I → ℝ) :
@@ -406,10 +383,12 @@ theorem no_isospectral_formula_for_blockEntryFourthMean :
             Matrix.det (covariance - spectralParameter • 1)) := by
   rintro ⟨spectralFormula, hspectral⟩
   have hsame :
-      (fun spectralParameter ↦
-          Matrix.det (localizedCovarianceBlock (3 / 2) - spectralParameter • 1)) =
-        fun spectralParameter ↦
-          Matrix.det (rotatedCovarianceBlock (3 / 2) - spectralParameter • 1) := by
+      (fun spectralParameter : ℝ ↦
+          Matrix.det (localizedCovarianceBlock (3 / 2) -
+            spectralParameter • (1 : Matrix (Fin 2) (Fin 2) ℝ))) =
+        fun spectralParameter : ℝ ↦
+          Matrix.det (rotatedCovarianceBlock (3 / 2) -
+            spectralParameter • (1 : Matrix (Fin 2) (Fin 2) ℝ)) := by
     funext spectralParameter
     exact localizedCovarianceBlock_isospectral_rotatedCovarianceBlock
       (3 / 2) spectralParameter
