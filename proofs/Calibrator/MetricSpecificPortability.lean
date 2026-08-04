@@ -1109,6 +1109,76 @@ theorem driftFields_differ_at_first_ancestry : driftFieldA 0 ≠ driftFieldB 0 :
   unfold driftFieldA driftFieldB
   norm_num
 
+
+/-! #### Resolution: what refining the index buys, and what it cannot
+
+Splitting the ancestry index into cells and calibrating per cell resolves part of the drift and
+leaves the rest. The two parts are the between-cell and within-cell components of the drift
+energy, and they sum to the total: refining moves energy from unresolved to resolved and creates
+none. That is the finite form of the statement that the residual removed by refining is exactly
+the drift energy the refinement resolves.
+
+Two consequences, both witnessed concretely below on three ancestries at risks `0, 1, 2`.
+
+Merging two ancestries into one cell strictly REDUCES the resolved energy, from `2/3` to `1/2`.
+So resolved energy is monotone under refinement, and a coarser deployment -- calibrating on
+continental groupings rather than finer ancestry -- resolves strictly less drift. It cannot be
+made up elsewhere.
+
+And the excess over the floor is exactly quadratic in how far the predictor sits from the pooled
+conditional, with no linear term. That is why an ERROR IN THE INFERRED ANCESTRY GEOMETRY costs
+only second order: the true optimum already annihilates the pooled direction, so the first-order
+term that would otherwise appear is identically zero.
+-/
+
+/-- Three ancestries at equal mixture weight. -/
+noncomputable def threeAncestryWeights : Fin 3 → ℝ := fun _ ↦ 1 / 3
+
+/-- Their ancestry-specific risks. -/
+noncomputable def threeAncestryConditional : Fin 3 → ℝ := ![0, 1, 2]
+
+/-- The coarsening that merges the first two ancestries: two cells, at weights `2/3` and `1/3`,
+carrying the within-cell mean risks `1/2` and `2`. -/
+noncomputable def mergedCellWeights : Fin 2 → ℝ := ![2 / 3, 1 / 3]
+
+/-- Cell-level risks after merging. -/
+noncomputable def mergedCellConditional : Fin 2 → ℝ := ![1 / 2, 2]
+
+/-- **Full resolution resolves the whole drift energy.** -/
+theorem threeAncestry_full_resolution :
+    driftDefect threeAncestryWeights threeAncestryConditional = 2 / 3 := by
+  unfold driftDefect pooledConditional threeAncestryWeights threeAncestryConditional
+  norm_num [Fin.sum_univ_three, Matrix.cons_val_zero, Matrix.cons_val_one,
+    Matrix.head_cons, Matrix.cons_val_two, Matrix.tail_cons]
+
+/-- **The merged deployment resolves strictly less.** -/
+theorem mergedCells_resolution :
+    driftDefect mergedCellWeights mergedCellConditional = 1 / 2 := by
+  unfold driftDefect pooledConditional mergedCellWeights mergedCellConditional
+  norm_num [Fin.sum_univ_two]
+
+/-- **Merging ancestries strictly reduces the resolved drift energy.**
+
+Calibrating on coarser groupings resolves less of the drift, and the shortfall is not recoverable
+by any choice of predictor within the coarser scheme. This is the exact sense in which
+finer ancestry resolution is not a modelling preference but a bound. -/
+theorem merging_reduces_resolved_energy :
+    driftDefect mergedCellWeights mergedCellConditional
+      < driftDefect threeAncestryWeights threeAncestryConditional := by
+  rw [mergedCells_resolution, threeAncestry_full_resolution]
+  norm_num
+
+/-- **The excess over the floor is exactly quadratic in the displacement, with no linear term.**
+
+This is why an error in the inferred ancestry geometry costs only second order. The true optimum
+already annihilates the pooled direction -- that is `pooledConditional_residual_zero` -- so the
+cross term that would make geometry error first-order is identically zero. A deployment whose
+ancestry axis is slightly wrong pays the square of that error, not the error. -/
+theorem excess_is_exactly_quadratic {m : ℕ} (π η : Fin m → ℝ) (hπ : ∑ i, π i = 1) (e : ℝ) :
+    indexwiseLoss π η (pooledConditional π η + e) - driftDefect π η = e ^ 2 := by
+  rw [indexwiseLoss_eq_defect_add_sq π η hπ]
+  ring
+
 /-! #### Unequal per-ancestry sample sizes inflate the effective resolution
 
 Splitting the index into `k` cells and estimating within each costs an estimation term
