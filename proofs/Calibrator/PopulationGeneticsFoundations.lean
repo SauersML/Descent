@@ -141,7 +141,7 @@ theorem neiGstFromFrequencies_nonneg (p₁ p₂ : ℝ)
   nlinarith
 
 /-- **`G_ST` is zero when the subgroups are identical.** -/
-theorem neiGstFromFrequencies_zero_same (p : ℝ) (hp : 0 < p) (hp1 : p < 1) :
+theorem neiGstFromFrequencies_zero_same (p : ℝ) :
     neiGstFromFrequencies p p = 0 := by
   unfold neiGstFromFrequencies
   simp [sub_self, zero_pow (by norm_num : 2 ≠ 0)]
@@ -199,7 +199,7 @@ theorem expected_het_in_unit (θ : ℝ) (h_θ : 0 ≤ θ) :
 /-- **Heterozygosity increases with effective population size.**
     Larger Ne → more mutations retained → higher diversity. -/
 theorem het_increases_with_ne
-    (θ₁ θ₂ : ℝ) (h₁ : 0 < θ₁) (h₂ : 0 < θ₂) (h_more : θ₁ < θ₂) :
+    (θ₁ θ₂ : ℝ) (h₁ : 0 < θ₁) (h_more : θ₁ < θ₂) :
     expectedHeterozygosity θ₁ < expectedHeterozygosity θ₂ := by
   unfold expectedHeterozygosity
   rw [div_lt_div_iff₀ (by linarith) (by linarith)]
@@ -272,7 +272,7 @@ theorem coal_fst_nonneg (t Ne : ℝ) (h_t : 0 ≤ t) (h_Ne : 0 < Ne) :
 /-- Coalescent Fst increases with separation time. -/
 theorem coal_fst_increases_with_time
     (Ne : ℝ) (t₁ t₂ : ℝ) (h_Ne : 0 < Ne)
-    (h_t₁ : 0 ≤ t₁) (h_t₂ : 0 ≤ t₂) (h_more : t₁ < t₂) :
+    (h_t₁ : 0 ≤ t₁) (h_more : t₁ < t₂) :
     coalFst t₁ Ne < coalFst t₂ Ne := by
   unfold coalFst
   rw [div_lt_div_iff₀ (by linarith) (by linarith)]
@@ -280,7 +280,7 @@ theorem coal_fst_increases_with_time
 
 /-- Coalescent Fst approaches 1 as t → ∞ (relative to Ne). -/
 theorem coal_fst_approaches_one
-    (Ne t : ℝ) (h_Ne : 0 < Ne) (h_t : 0 < t)
+    (Ne t : ℝ) (h_Ne : 0 < Ne)
     (h_large : 100 * Ne < t) :
     49 / 50 < coalFst t Ne := by
   unfold coalFst
@@ -309,7 +309,7 @@ section EffectivePopulationSize
 theorem ne_affects_pgs_variance
     (V_A t Ne₁ Ne₂ : ℝ)
     (h_VA : 0 < V_A) (h_t : 0 < t)
-    (h_Ne₁ : 0 < Ne₁) (h_Ne₂ : 0 < Ne₂)
+    (h_Ne₁ : 0 < Ne₁)
     (h_smaller : Ne₁ < Ne₂) :
     V_A * t / (2 * Ne₂) < V_A * t / (2 * Ne₁) := by
   exact div_lt_div_of_pos_left (mul_pos h_VA h_t) (by positivity) (by nlinarith)
@@ -566,7 +566,7 @@ theorem selectionMigrationEquilibrium_orderings (s m : ℝ)
       (1 - m) * ((s - m - m * s) / (s * (1 - m))) := by
     field_simp
   unfold selectionMigrationEquilibrium selectionMigrationEquilibriumMigrationFirst
-  rcases le_or_lt ((s - m - m * s) / (s * (1 - m))) 0 with h | h
+  rcases le_or_gt ((s - m - m * s) / (s * (1 - m))) 0 with h | h
   · have h0 : (s - m - m * s) / s ≤ 0 := by rw [hkey]; nlinarith
     rw [max_eq_left h0, max_eq_left h, mul_zero]
   · have h0 : 0 ≤ (s - m - m * s) / s := by rw [hkey]; nlinarith
@@ -596,7 +596,7 @@ theorem abs_mixture_sub_lt_of_weight_lt
     (h_gw : fst_gw = (1 - f_sel) * fst_neutral + f_sel * fst_selected)
     (h_small : f_sel < 1 / 100)
     (h_pos : 0 < f_sel)
-    (h_neutral_nn : 0 ≤ fst_neutral) (h_sel_nn : 0 ≤ fst_selected)
+    (h_neutral_nn : 0 ≤ fst_neutral)
     (h_sel_higher : fst_neutral < fst_selected) :
     |fst_gw - fst_neutral| < (1 / 100) * fst_selected := by
   rw [h_gw]
@@ -789,7 +789,7 @@ theorem scaledIdentityStep_fixedPoint (scaledRate : ℝ) (h : 0 ≤ scaledRate) 
   have hd : (0 : ℝ) < 1 + scaledRate := by linarith
   have hd' : (1 : ℝ) + scaledRate ≠ 0 := ne_of_gt hd
   unfold scaledIdentityStep
-  rw [mul_one_div, sub_eq_iff_eq_add, div_add_div_same, div_self hd']
+  rw [mul_one_div, sub_eq_iff_eq_add, ← add_div, div_self hd']
 
 /-- **The mutation-drift equilibrium is the rest point of the scaled identity
 balance** driven by mutation alone. -/
@@ -831,7 +831,7 @@ theorem fstMutationDriftEquilibrium_strictAnti (a b : ℝ)
 
 /-- Equilibrium Fst decreases when Ne increases (with μ fixed). -/
 theorem fstEquilibrium_decreases_with_Ne (μ Ne₁ Ne₂ : ℝ)
-    (hμ : 0 < μ) (hNe₁ : 0 < Ne₁) (hNe₂ : 0 < Ne₂)
+    (hμ : 0 < μ) (hNe₁ : 0 < Ne₁)
     (h_more : Ne₁ < Ne₂) :
     fstMutationDriftEquilibrium (scaledMutationRate Ne₂ μ) <
       fstMutationDriftEquilibrium (scaledMutationRate Ne₁ μ) := by
@@ -843,7 +843,7 @@ theorem fstEquilibrium_decreases_with_Ne (μ Ne₁ Ne₂ : ℝ)
 
 /-- Equilibrium Fst decreases when μ increases (with Ne fixed). -/
 theorem fstEquilibrium_decreases_with_mu (Ne μ₁ μ₂ : ℝ)
-    (hNe : 0 < Ne) (hμ₁ : 0 < μ₁) (hμ₂ : 0 < μ₂)
+    (hNe : 0 < Ne) (hμ₁ : 0 < μ₁)
     (h_more : μ₁ < μ₂) :
     fstMutationDriftEquilibrium (scaledMutationRate Ne μ₂) <
       fstMutationDriftEquilibrium (scaledMutationRate Ne μ₁) := by
@@ -924,7 +924,7 @@ theorem fstEquilibrium_eq_one_minus_het (θ : ℝ) (hθ : 0 ≤ θ) :
     Mutation introduces new variants on timescale ~1/μ generations.
     When θ > 2, mutation acts faster than drift, so 1/μ < 2Ne. -/
 theorem mutation_timescale_exceeds_drift (Ne μ : ℝ)
-    (hNe : 0 < Ne) (hμ : 0 < μ)
+    (hμ : 0 < μ)
     (hθ_large : 2 < scaledMutationRate Ne μ) :
     1 / μ < 2 * Ne := by
   unfold scaledMutationRate at hθ_large
@@ -978,7 +978,7 @@ theorem fstMutationDriftTransient_nonneg (θ t Ne : ℝ)
 
 /-- Transient Fst is bounded above by the equilibrium Fst. -/
 theorem fstMutationDriftTransient_le_equilibrium (θ t Ne : ℝ)
-    (hθ : 0 ≤ θ) (ht : 0 ≤ t) (hNe : 0 < Ne) :
+    (hθ : 0 ≤ θ) :
     fstMutationDriftTransient θ t Ne ≤ fstMutationDriftEquilibrium θ := by
   unfold fstMutationDriftTransient
   have hfeq_pos : 0 < fstMutationDriftEquilibrium θ :=
@@ -993,7 +993,7 @@ theorem fstMutationDriftTransient_le_equilibrium (θ t Ne : ℝ)
 
 /-- Transient Fst increases with time toward equilibrium. -/
 theorem fstMutationDriftTransient_increases_with_time (θ Ne t₁ t₂ : ℝ)
-    (hθ : 0 < θ) (hNe : 0 < Ne) (ht₁ : 0 ≤ t₁) (ht₂ : 0 ≤ t₂)
+    (hθ : 0 < θ) (hNe : 0 < Ne)
     (h_more : t₁ < t₂) :
     fstMutationDriftTransient θ t₁ Ne < fstMutationDriftTransient θ t₂ Ne := by
   unfold fstMutationDriftTransient
@@ -1023,7 +1023,7 @@ theorem fstMutationDriftTransient_increases_with_time (θ Ne t₁ t₂ : ℝ)
 theorem fstMutationDriftTransient_at_zero (θ Ne : ℝ) :
     fstMutationDriftTransient θ 0 Ne = 0 := by
   unfold fstMutationDriftTransient
-  simp [mul_zero, zero_div, neg_zero, Real.exp_zero, sub_self]
+  simp [mul_zero, zero_div, Real.exp_zero, sub_self]
 
 /-- **Mutation introduces new population-specific variants over time.**
     The expected number of new mutations per generation per locus is 2Neμ = θ/2.
@@ -1054,14 +1054,14 @@ theorem expectedNewMutations_nonneg (θ t : ℝ) (hθ : 0 ≤ θ) (ht : 0 ≤ t)
 
 /-- More mutations accumulate with larger θ (fixed t). -/
 theorem expectedNewMutations_increases_with_theta (t θ₁ θ₂ : ℝ)
-    (ht : 0 < t) (hθ₁ : 0 ≤ θ₁) (h_more : θ₁ < θ₂) :
+    (ht : 0 < t) (h_more : θ₁ < θ₂) :
     expectedNewMutations θ₁ t < expectedNewMutations θ₂ t := by
   unfold expectedNewMutations
   nlinarith
 
 /-- More mutations accumulate over longer time (fixed θ). -/
 theorem expectedNewMutations_increases_with_time (θ t₁ t₂ : ℝ)
-    (hθ : 0 < θ) (ht₁ : 0 ≤ t₁) (h_more : t₁ < t₂) :
+    (hθ : 0 < θ) (h_more : t₁ < t₂) :
     expectedNewMutations θ t₁ < expectedNewMutations θ t₂ := by
   unfold expectedNewMutations
   nlinarith
@@ -1301,7 +1301,7 @@ theorem islandModelFst_strictAnti_Ne (m a b : ℝ) (hm : 0 < m)
 /-- **When 4Nm > 1, Fst < 1/2** (one-migrant-per-generation rule).
     This is Wright's classical threshold: even one migrant per generation
     (Nm = 0.25, so 4Nm = 1) is enough to prevent substantial differentiation. -/
-theorem islandModelFst_lt_half_of_one_migrant (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 < m)
+theorem islandModelFst_lt_half_of_one_migrant (Ne m : ℝ)
     (h_threshold : 1 < 4 * Ne * m) :
     fstMigrationDriftEquilibrium Ne m < 1 / 2 := by
   unfold fstMigrationDriftEquilibrium
@@ -1310,7 +1310,7 @@ theorem islandModelFst_lt_half_of_one_migrant (Ne m : ℝ) (hNe : 0 < Ne) (hm : 
 
 /-- **When 4Nm ≫ 1, Fst ≈ 0.** Specifically, 4Nm > k implies Fst < 1/(1+k). -/
 theorem islandModelFst_small_of_large_migration (Ne m k : ℝ)
-    (hNe : 0 < Ne) (hm : 0 < m) (hk : 0 < k)
+    (hk : 0 < k)
     (h_large : k < 4 * Ne * m) :
     fstMigrationDriftEquilibrium Ne m < 1 / (1 + k) := by
   unfold fstMigrationDriftEquilibrium
@@ -1604,7 +1604,7 @@ theorem steppingStoneCharacteristicLength_strictMono_dispersal
   unfold steppingStoneCharacteristicLength
   apply Real.sqrt_lt_sqrt (by positivity)
   apply div_lt_div_of_pos_right _ (by positivity)
-  exact (mul_lt_mul_left hm).mpr h
+  exact (mul_lt_mul_iff_right₀ hm).mpr h
 
 /-- **The decay scale shrinks as mutation gets faster.**
     This is the axis on which the `√(2·Nₑ·m)` body was falsified: it is
@@ -1627,7 +1627,7 @@ theorem steppingStoneCharacteristicLength_strictMono_migration
   unfold steppingStoneCharacteristicLength
   apply Real.sqrt_lt_sqrt (by positivity)
   apply div_lt_div_of_pos_right _ (by positivity)
-  exact (mul_lt_mul_right hσ).mpr h
+  exact (mul_lt_mul_iff_left₀ hσ).mpr h
 
 /-! ### `continuousSteppingStoneFst` has been deleted
 
@@ -1756,7 +1756,7 @@ theorem ldCorrelationFromMigration_le_one (M : ℝ) (hM : 0 ≤ M) :
 
 /-- **LD correlation increases with migration rate.** -/
 theorem ldCorrelationFromMigration_increases (M₁ M₂ : ℝ)
-    (hM₁ : 0 < M₁) (hM₂ : 0 < M₂) (h_more : M₁ < M₂) :
+    (hM₁ : 0 < M₁) (h_more : M₁ < M₂) :
     ldCorrelationMigrationAnsatz M₁ < ldCorrelationMigrationAnsatz M₂ := by
   unfold ldCorrelationMigrationAnsatz
   have h1M₁ : 0 < 1 + M₁ := by linarith
@@ -1766,7 +1766,7 @@ theorem ldCorrelationFromMigration_increases (M₁ M₂ : ℝ)
     nlinarith
   have h_sq :
       (M₁ / (1 + M₁)) ^ 2 < (M₂ / (1 + M₂)) ^ 2 := by
-    nlinarith [h_ratio, div_pos hM₁ h1M₁, div_pos hM₂ h1M₂]
+    nlinarith [h_ratio, div_pos hM₁ h1M₁, div_pos (lt_trans hM₁ h_more) h1M₂]
   simpa [div_pow] using h_sq
 
 end MigrationDriftFoundations
@@ -1919,7 +1919,7 @@ theorem heterozygosityLossDerived_faster_small_Ne (Ne₁ Ne₂ : ℝ) (t : ℕ) 
     rw [sub_lt_sub_iff_left]
     exact div_lt_div_of_pos_left one_pos (by linarith) (by linarith)
   linarith [pow_lt_pow_left₀ h_base_lt (le_of_lt h_base₁_pos)
-    (Nat.not_eq_zero_of_lt (by omega : 0 < t))]
+    (Nat.ne_zero_of_lt (by omega : 0 < t))]
 
 /-- **Consistency check: heterozygosityLossDerived agrees with the earlier
     heterozygosityLossFromDrift.**
