@@ -6,10 +6,13 @@ import Mathlib.Analysis.SpecialFunctions.Log.Deriv
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
 import Mathlib.Analysis.Complex.ExponentialBounds
 import Mathlib.Analysis.Normed.Group.Tannery
+import Mathlib.Data.Nat.Choose.Sum
 import Mathlib.Logic.Equiv.Fintype
 import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
 import Mathlib.LinearAlgebra.Vandermonde
 import Mathlib.Topology.Sequences
+import Mathlib.Topology.ContinuousMap.Bounded.ArzelaAscoli
+import Mathlib.Topology.MetricSpace.UniformConvergence
 import Mathlib.Tactic
 import Calibrator.ObservationalCeiling
 
@@ -63,6 +66,13 @@ keeps the matched-Bayes hinge outside the proved statements.
   SUPREMAL variational pressure itself: below it the gap vanishes identically,
   and above it an explicit interior magnetisation makes the supremum positive.
 
+* `finiteCWPartition_aligned_lower_bound` and
+  `finiteRankOneTraffic_invisible_finitePressure_visible` -- the genuine
+  binomially grouped finite Rademacher partition function is normalized at zero
+  coupling, and one aligned state proves strictly positive pressure for every
+  nonzero finite population when `2 log 2 < tλ`.  Thus positive-cone traffic
+  sufficiency is refuted at the actual partition-function level without an LDP.
+
 * `fixedTraffic_invisible_logRuntime_visible` -- every fixed diagonal traffic
   coordinate loses a block of mass `4⁻ᵏ`, while `k` power iterations amplify its
   normalized squared output back to one.
@@ -88,6 +98,24 @@ keeps the matched-Bayes hinge outside the proved statements.
   `boundedExponentialProfile_compact_subsequence_in_distance` -- the explicit
   weighted LD/right-profile formula is separating and triangular, and every
   bounded profile sequence has a subsequence converging in that distance.
+  `exponentialProfilePointMetricSpace` and
+  `exponentialProfilePointCompactSpace` bundle the formula as the standard
+  metric and compact topology on a dedicated carrier.
+
+* `lipschitzPressureProfiles_dist_le_of_net` and
+  `lipschitzPressureProfiles_eq_of_eqOn_dense` -- a finite rational tilt net
+  controls the whole pressure profile by `2Kρ + ε`, and dense rational
+  coordinates uniquely determine every uniformly Lipschitz extension.
+  `lipschitzPressureProfiles_tendsto_of_tendstoOn_dense` transfers convergence
+  on that dense family to every tilt, and
+  `lipschitzPressureProfiles_tendstoUniformly_of_tendstoOn_dense` upgrades it
+  to uniform convergence on compact tilt domains.
+
+* `isCompact_boundedLipschitzPressureFamily` and
+  `boundedLipschitzPressureFamily_tendsto_subseq` -- the full functional
+  right-profile family is compact by Arzelà--Ascoli, so every uniformly bounded
+  equi-Lipschitz pressure sequence has a uniformly convergent subsequence whose
+  limit remains in the same family.
 
 * `randomDesign_gap_of_scalarGap` and
   `randomDesign_eventually_separates_of_scalarGap` -- the matched random-design
@@ -114,8 +142,11 @@ a probe returning one number on two objects certifies neither.
 ## What is NOT settled
 
 Matched Bayes traffic sufficiency at arbitrary signal-to-noise remains open, and
-nothing here asserts the missing LDP/Varadhan identification of the finite
-pressure with the variational pressure. The rank-one construction cannot decide matched Bayes: a
+nothing here asserts the sharper LDP/Varadhan identification of the finite
+pressure limit with the variational pressure at the exact threshold `tλ = 1`.
+That identification is no longer needed for the C2 counterexample because the
+aligned-state theorem gives genuine positive finite pressure on the explicit
+subregime `2 log 2 < tλ`. The rank-one construction cannot decide matched Bayes: a
 perturbation of rank `o(p)` moves the exponential pressure by order one and the
 matched mutual-information density by `o(1)`, so a negative witness there needs
 EXTENSIVE rank. That contrast -- one perturbation, four procedure classes, two
@@ -421,6 +452,15 @@ vanish exactly, while all-even graphs use the factorized rank-one graph sum. -/
 noncomputable def balancedRankOneTrafficCoordinate
     (hasOddDegree : Bool) (p vertices edges : ℕ) : ℝ :=
   if hasOddDegree then 0 else balancedRankOneGraphSum p vertices edges
+
+/-- Reference evaluations: an odd-degree term contributes nothing, and an even-degree term
+contributes the balanced graph sum.  Both branches, since pinning one leaves the other free. -/
+theorem balancedRankOneTrafficCoordinate_at_reference_point (p vertices edges : ℕ) :
+    balancedRankOneTrafficCoordinate true p vertices edges = 0 ∧
+      balancedRankOneTrafficCoordinate false p vertices edges
+        = balancedRankOneGraphSum p vertices edges := by
+  constructor <;> simp [balancedRankOneTrafficCoordinate]
+
 
 /-- Every fixed connected graph coordinate of the balanced positive rank-one
 spike vanishes.  Odd-degree coordinates vanish identically; the edge bound is
@@ -967,6 +1007,218 @@ theorem cwVariationalPressureGap_eq_zero_iff (tlam : ℝ) :
     linarith
   · exact cwVariationalPressureGap_eq_zero_of_subcritical tlam
 
+/-! ### A genuine finite-volume pressure counterexample
+
+The variational theorem above identifies the sharp candidate threshold but, by
+itself, does not identify a finite-volume partition function with that
+variational value.  The following direct construction needs no LDP.  A single
+fully aligned Rademacher state already contributes enough mass to make the
+normalized pressure positive once `2 log 2 < tlam`.  This is weaker than the
+sharp variational threshold `1 < tlam`, but it is sufficient to turn the
+positive-semidefinite-cone counterexample into an actual partition-function
+statement rather than a statement about a surrogate objective.
+-/
+
+/-- Magnetisation of the type with `upSpins` positive spins in a population of
+size `population`. -/
+noncomputable def finiteCWMagnetization
+    (population upSpins : ℕ) : ℝ :=
+  2 * (upSpins : ℝ) - population
+
+/-- The exact Curie--Weiss/Rademacher partition function after dividing by the
+`2^population` configurations.  Grouping configurations by their number of
+positive spins produces the binomial coefficient in the sum. -/
+noncomputable def finiteCWPartition
+    (population : ℕ) (tlam : ℝ) : ℝ :=
+  ((2 : ℝ) ^ population)⁻¹ *
+    ∑ upSpins ∈ Finset.range (population + 1),
+      (Nat.choose population upSpins : ℝ) *
+        Real.exp
+          (tlam / (2 * (population : ℝ)) *
+            finiteCWMagnetization population upSpins ^ 2)
+
+/-- Normalized finite-volume pressure difference from the unspiked baseline. -/
+noncomputable def finiteCWPressureGap
+    (population : ℕ) (tlam : ℝ) : ℝ :=
+  Real.log (finiteCWPartition population tlam) / population
+
+/-- At zero coupling the binomially grouped partition function is normalized
+to one.  This also verifies that the `2^population` denominator is the genuine
+uniform Rademacher normalization. -/
+@[simp] theorem finiteCWPartition_zero (population : ℕ) :
+    finiteCWPartition population 0 = 1 := by
+  have hsum :
+      (∑ upSpins ∈ Finset.range (population + 1),
+        (Nat.choose population upSpins : ℝ)) = (2 : ℝ) ^ population := by
+    exact_mod_cast Nat.sum_range_choose population
+  simp [finiteCWPartition, hsum]
+
+/-- Consequently the finite-volume pressure gap vanishes at zero coupling. -/
+@[simp] theorem finiteCWPressureGap_zero (population : ℕ) :
+    finiteCWPressureGap population 0 = 0 := by
+  simp [finiteCWPressureGap]
+
+/-- The fully aligned type has magnetisation exactly the population size. -/
+@[simp] theorem finiteCWMagnetization_aligned (population : ℕ) :
+    finiteCWMagnetization population population = population := by
+  simp [finiteCWMagnetization]
+  ring
+
+/-- One fully aligned Rademacher state supplies an explicit lower bound on the
+whole finite partition function. -/
+theorem finiteCWPartition_aligned_lower_bound
+    (population : ℕ) (tlam : ℝ) (hpopulation : 0 < population) :
+    ((2 : ℝ) ^ population)⁻¹ *
+        Real.exp (tlam * population / 2) ≤
+      finiteCWPartition population tlam := by
+  have htermNonnegative : ∀ upSpins ∈ Finset.range (population + 1),
+      0 ≤ (Nat.choose population upSpins : ℝ) *
+        Real.exp
+          (tlam / (2 * (population : ℝ)) *
+            finiteCWMagnetization population upSpins ^ 2) := by
+    intro upSpins _hupSpins
+    positivity
+  have halignedMem : population ∈ Finset.range (population + 1) := by
+    simp
+  have halignedTerm :
+      (Nat.choose population population : ℝ) *
+          Real.exp
+            (tlam / (2 * (population : ℝ)) *
+              finiteCWMagnetization population population ^ 2) ≤
+        ∑ upSpins ∈ Finset.range (population + 1),
+          (Nat.choose population upSpins : ℝ) *
+            Real.exp
+              (tlam / (2 * (population : ℝ)) *
+                finiteCWMagnetization population upSpins ^ 2) :=
+    Finset.single_le_sum htermNonnegative halignedMem
+  have hpopulationReal : (population : ℝ) ≠ 0 := by
+    exact_mod_cast hpopulation.ne'
+  have hnormalizedTerm :
+      (Nat.choose population population : ℝ) *
+          Real.exp
+            (tlam / (2 * (population : ℝ)) *
+              finiteCWMagnetization population population ^ 2) =
+        Real.exp (tlam * population / 2) := by
+    simp [finiteCWMagnetization]
+    field_simp
+    ring
+  rw [finiteCWPartition, ← hnormalizedTerm]
+  exact mul_le_mul_of_nonneg_left halignedTerm (by positivity)
+
+/-- The finite Rademacher partition function is strictly positive at every
+population size and coupling, so its logarithm never uses the nonpositive junk
+branch of `Real.log`. -/
+theorem finiteCWPartition_pos (population : ℕ) (tlam : ℝ) :
+    0 < finiteCWPartition population tlam := by
+  by_cases hzero : population = 0
+  · subst population
+    simp [finiteCWPartition]
+  · have hpopulation : 0 < population := Nat.pos_of_ne_zero hzero
+    exact (show
+        0 < ((2 : ℝ) ^ population)⁻¹ *
+          Real.exp (tlam * population / 2) by positivity).trans_le
+      (finiteCWPartition_aligned_lower_bound population tlam hpopulation)
+
+/-- The aligned-state contribution gives a finite-volume lower bound with no
+large-deviation or Varadhan premise. -/
+theorem finiteCWPressureGap_ge_aligned
+    (population : ℕ) (tlam : ℝ) (hpopulation : 0 < population) :
+    tlam / 2 - Real.log 2 ≤ finiteCWPressureGap population tlam := by
+  have hbasePositive :
+      0 < ((2 : ℝ) ^ population)⁻¹ * Real.exp (tlam * population / 2) := by
+    positivity
+  have hpartitionBound :=
+    finiteCWPartition_aligned_lower_bound population tlam hpopulation
+  have hlogBound :
+      Real.log (((2 : ℝ) ^ population)⁻¹ *
+          Real.exp (tlam * population / 2)) ≤
+        Real.log (finiteCWPartition population tlam) :=
+    Real.log_le_log hbasePositive hpartitionBound
+  have hpopulationReal : (0 : ℝ) < population := by
+    exact_mod_cast hpopulation
+  rw [finiteCWPressureGap]
+  apply (le_div_iff₀ hpopulationReal).mpr
+  calc
+    (tlam / 2 - Real.log 2) * population =
+        tlam * population / 2 - population * Real.log 2 := by ring
+    _ = Real.log (((2 : ℝ) ^ population)⁻¹ *
+        Real.exp (tlam * population / 2)) := by
+      rw [Real.log_mul (by positivity) (Real.exp_ne_zero _),
+        Real.log_inv, Real.log_pow, Real.log_exp]
+      ring
+    _ ≤ Real.log (finiteCWPartition population tlam) := hlogBound
+
+/-- **Actual positive finite-volume pressure separation.**  Above the explicit
+aligned-state threshold, every positive population size already has strictly
+positive normalized Rademacher pressure.  No limiting interchange, LDP, or
+analyticity assumption occurs in the statement. -/
+theorem finiteCWPressureGap_pos_of_aligned
+    (population : ℕ) (tlam : ℝ) (hpopulation : 0 < population)
+    (hlarge : 2 * Real.log 2 < tlam) :
+    0 < finiteCWPressureGap population tlam := by
+  have hthreshold : 0 < tlam / 2 - Real.log 2 := by linarith
+  exact hthreshold.trans_le
+    (finiteCWPressureGap_ge_aligned population tlam hpopulation)
+
+/-- The aligned-state lower bound is uniform in population, so above its
+threshold the genuine finite pressure gap cannot disappear in the
+thermodynamic limit. -/
+theorem finiteCWPressureGap_not_tendsto_zero_of_aligned
+    (tlam : ℝ) (hlarge : 2 * Real.log 2 < tlam) :
+    ¬ Filter.Tendsto
+      (fun population : ℕ ↦ finiteCWPressureGap (population + 1) tlam)
+      Filter.atTop (nhds 0) := by
+  intro hzero
+  have hthreshold : 0 < tlam / 2 - Real.log 2 := by linarith
+  have hbelow : ∀ᶠ population in Filter.atTop,
+      finiteCWPressureGap (population + 1) tlam <
+        tlam / 2 - Real.log 2 :=
+    hzero.eventually_lt_const hthreshold
+  obtain ⟨population, hpopulation⟩ := Filter.eventually_atTop.mp hbelow
+  have hlt := hpopulation population le_rfl
+  have hle := finiteCWPressureGap_ge_aligned
+    (population + 1) tlam (Nat.succ_pos population)
+  exact (not_lt_of_ge hle) hlt
+
+/-- The unspiked `aI` contribution to the normalized one-replica quadratic
+Rademacher pressure. -/
+noncomputable def finiteBaselineRademacherPressure
+    (baseline temperature : ℝ) : ℝ :=
+  temperature * baseline / 2
+
+/-- The normalized pressure of `aI + λ uuᵀ` for the balanced-sign rank-one
+direction.  The Curie--Weiss coupling is exactly `temperature * spikeStrength`;
+the baseline and spike contributions therefore separate additively. -/
+noncomputable def finiteRankOneRademacherPressure
+    (baseline : ℝ) (population : ℕ)
+    (temperature spikeStrength : ℝ) : ℝ :=
+  finiteBaselineRademacherPressure baseline temperature +
+    finiteCWPressureGap population (temperature * spikeStrength)
+
+/-- The difference between the spiked and unspiked finite pressures is exactly
+the normalized Curie--Weiss pressure gap, not merely bounded by it. -/
+theorem finiteRankOneRademacherPressure_sub_baseline
+    (baseline : ℝ) (population : ℕ)
+    (temperature spikeStrength : ℝ) :
+    finiteRankOneRademacherPressure baseline population temperature spikeStrength -
+        finiteBaselineRademacherPressure baseline temperature =
+      finiteCWPressureGap population (temperature * spikeStrength) := by
+  simp [finiteRankOneRademacherPressure]
+
+/-- Above the aligned-state threshold, the genuine spiked finite pressure is
+strictly larger than the unspiked pressure for every nonempty population. -/
+theorem finiteRankOneRademacherPressure_gt_baseline
+    (baseline : ℝ) (population : ℕ)
+    (temperature spikeStrength : ℝ) (hpopulation : 0 < population)
+    (hlarge : 2 * Real.log 2 < temperature * spikeStrength) :
+    finiteBaselineRademacherPressure baseline temperature <
+      finiteRankOneRademacherPressure
+        baseline population temperature spikeStrength := by
+  rw [finiteRankOneRademacherPressure]
+  exact lt_add_of_pos_right _
+    (finiteCWPressureGap_pos_of_aligned
+      population (temperature * spikeStrength) hpopulation hlarge)
+
 /-- **Positive-cone traffic counterexample at the exact variational level.**
 Every fixed graph has finitely many nonempty spike-edge terms; once identity
 edges are contracted, their complete correction vanishes by the connected
@@ -991,6 +1243,51 @@ theorem finiteRankOneTraffic_invisible_variationalPressure_visible
   ⟨finiteRankOneTrafficCorrection_tendsto_zero
       coefficient hasOddDegree vertices edges hconnected,
     cwVariationalPressureGap_pos_of_supercritical tlam hcritical⟩
+
+/-- **The three finite-volume properties one rank-one spike has at once**, as one
+proposition: every fixed traffic correction vanishes, the finite pressure gap is bounded
+below at every population, and it does not vanish.
+
+Named for the same reason as `RankOneSpikeRefutesBothDichotomies`: the theorem that proves
+it, the genomic restatement that cites that theorem, and the obstruction registry each
+carried the conjunction in full, so a change to one copy would have been a silent divergence
+rather than a build error.
+
+Empirical status: UNTESTED, and not the kind of thing a dataset tests: this names three
+claims, each proved below at finite volume on an explicit spike.  What a measurement could
+bear on is whether a real LD spike is rank-one, which nothing here asserts. -/
+def RankOneSpikeInvisibleWithFinitePressure {Term : Type*} [Fintype Term]
+    (coefficient : Term → ℝ) (hasOddDegree : Term → Bool)
+    (vertices edges : Term → ℕ) (tlam : ℝ) : Prop :=
+  Filter.Tendsto
+      (fun population : ℕ ↦
+        finiteRankOneTrafficCorrection coefficient hasOddDegree vertices edges
+          (population + 1))
+      Filter.atTop (nhds 0) ∧
+    (∀ population : ℕ,
+      tlam / 2 - Real.log 2 ≤ finiteCWPressureGap (population + 1) tlam) ∧
+    ¬ Filter.Tendsto
+      (fun population : ℕ ↦ finiteCWPressureGap (population + 1) tlam)
+      Filter.atTop (nhds 0)
+
+/-- **Positive-cone traffic counterexample for the genuine finite partition
+function.**  Every fixed traffic correction vanishes, while for one and the
+same coupling above `2 log 2` the normalized Rademacher pressure is positive
+at every nonzero finite population.  This theorem does not identify the sharp
+finite-volume limit and therefore requires no LDP or Varadhan premise. -/
+theorem finiteRankOneTraffic_invisible_finitePressure_visible
+    {Term : Type*} [Fintype Term]
+    (coefficient : Term → ℝ) (hasOddDegree : Term → Bool)
+    (vertices edges : Term → ℕ)
+    (hconnected : ∀ term, hasOddDegree term = false → vertices term ≤ edges term)
+    (tlam : ℝ) (hlarge : 2 * Real.log 2 < tlam) :
+    RankOneSpikeInvisibleWithFinitePressure coefficient hasOddDegree vertices edges tlam :=
+  ⟨finiteRankOneTrafficCorrection_tendsto_zero
+      coefficient hasOddDegree vertices edges hconnected,
+    ⟨fun population ↦
+      finiteCWPressureGap_ge_aligned
+        (population + 1) tlam (Nat.succ_pos population),
+      finiteCWPressureGap_not_tendsto_zero_of_aligned tlam hlarge⟩⟩
 
 /-- **The four properties one positive rank-one spike has at once**, as one proposition.
 
@@ -1664,11 +1961,258 @@ state space behind the diagonal-subsequence argument; unlike a prose appeal to
 coordinate converges.
 -/
 
+/-- **Quantitative dense-parameter control for pressure profiles.**  If a set
+of enumerated parameters is a `radius`-net, two uniformly `K`-Lipschitz
+profiles that differ there by at most `coordinateError` differ everywhere by
+at most `2 K radius + coordinateError`.  This is the finite-resolution theorem
+behind extending rational tilt coordinates to all tilts. -/
+theorem lipschitzPressureProfiles_dist_le_of_net
+    {Parameter : Type*} [PseudoMetricSpace Parameter]
+    (K : NNReal) (left right : Parameter → ℝ)
+    (hleft : LipschitzWith K left) (hright : LipschitzWith K right)
+    (net : Set Parameter) (radius coordinateError : ℝ)
+    (hnet : ∀ parameter, ∃ representative ∈ net,
+      dist parameter representative ≤ radius)
+    (hagrees : ∀ representative ∈ net,
+      dist (left representative) (right representative) ≤ coordinateError) :
+    ∀ parameter,
+      dist (left parameter) (right parameter) ≤
+        2 * (K : ℝ) * radius + coordinateError := by
+  intro parameter
+  obtain ⟨representative, hrepresentative, hdistance⟩ := hnet parameter
+  have hleftBound :
+      dist (left parameter) (left representative) ≤ (K : ℝ) * radius :=
+    hleft.dist_le_mul_of_le hdistance
+  have hrightBound :
+      dist (right representative) (right parameter) ≤ (K : ℝ) * radius := by
+    apply hright.dist_le_mul_of_le
+    simpa [dist_comm] using hdistance
+  have hmiddle := hagrees representative hrepresentative
+  calc
+    dist (left parameter) (right parameter) ≤
+        dist (left parameter) (left representative) +
+          dist (left representative) (right parameter) :=
+      dist_triangle _ _ _
+    _ ≤ dist (left parameter) (left representative) +
+        (dist (left representative) (right representative) +
+          dist (right representative) (right parameter)) := by
+      gcongr
+      exact dist_triangle _ _ _
+    _ ≤ 2 * (K : ℝ) * radius + coordinateError := by
+      linarith
+
+/-- **Dense rational pressure coordinates determine the full Lipschitz
+profile uniquely.**  This is the zero-resolution limit of the preceding net
+bound and is the exact uniqueness statement used by the countable
+right-convergence compactification. -/
+theorem lipschitzPressureProfiles_eq_of_eqOn_dense
+    {Parameter : Type*} [PseudoMetricSpace Parameter]
+    (K : NNReal) (left right : Parameter → ℝ)
+    (hleft : LipschitzWith K left) (hright : LipschitzWith K right)
+    (parameters : Set Parameter) (hdense : Dense parameters)
+    (hagrees : Set.EqOn left right parameters) :
+    left = right :=
+  Continuous.ext_on hdense hleft.continuous hright.continuous hagrees
+
+/-- **Dense rational convergence extends to every tilt.**  A sequence of
+uniformly `K`-Lipschitz pressure profiles that converges pointwise on a dense
+parameter family to a `K`-Lipschitz limit converges pointwise everywhere.  The
+proof uses one nearby dense parameter and a three-term metric bound, so no
+unproved Arzelà--Ascoli step is hidden. -/
+theorem lipschitzPressureProfiles_tendsto_of_tendstoOn_dense
+    {Parameter : Type*} [PseudoMetricSpace Parameter]
+    (K : NNReal) (profiles : ℕ → Parameter → ℝ) (limit : Parameter → ℝ)
+    (hprofiles : ∀ index, LipschitzWith K (profiles index))
+    (hlimit : LipschitzWith K limit)
+    (parameters : Set Parameter) (hdense : Dense parameters)
+    (hconverges : ∀ parameter ∈ parameters,
+      Filter.Tendsto (fun index ↦ profiles index parameter)
+        Filter.atTop (nhds (limit parameter))) :
+    ∀ parameter,
+      Filter.Tendsto (fun index ↦ profiles index parameter)
+        Filter.atTop (nhds (limit parameter)) := by
+  intro parameter
+  rw [Metric.tendsto_nhds]
+  intro epsilon hepsilon
+  have hscale : 0 < 3 * ((K : ℝ) + 1) := by positivity
+  obtain ⟨representative, hrepresentative, hdistance⟩ :=
+    hdense.exists_dist_lt parameter (div_pos hepsilon hscale)
+  have hlocal : (K : ℝ) * dist parameter representative < epsilon / 3 := by
+    calc
+      (K : ℝ) * dist parameter representative ≤
+          ((K : ℝ) + 1) * dist parameter representative := by
+        exact mul_le_mul_of_nonneg_right (by linarith) dist_nonneg
+      _ < ((K : ℝ) + 1) * (epsilon / (3 * ((K : ℝ) + 1))) :=
+        mul_lt_mul_of_pos_left hdistance (by positivity)
+      _ = epsilon / 3 := by
+        field_simp
+  have hmiddle := (Metric.tendsto_nhds.mp
+    (hconverges representative hrepresentative)) (epsilon / 3) (by positivity)
+  filter_upwards [hmiddle] with index hmiddleIndex
+  have hleftLocal :
+      dist (profiles index parameter) (profiles index representative) < epsilon / 3 :=
+    (hprofiles index).dist_le_mul parameter representative |>.trans_lt hlocal
+  have hrightLocal :
+      dist (limit representative) (limit parameter) < epsilon / 3 := by
+    have := hlimit.dist_le_mul representative parameter
+    rw [dist_comm representative parameter] at this
+    exact this.trans_lt hlocal
+  calc
+    dist (profiles index parameter) (limit parameter) ≤
+        dist (profiles index parameter) (profiles index representative) +
+          dist (profiles index representative) (limit parameter) :=
+      dist_triangle _ _ _
+    _ ≤ dist (profiles index parameter) (profiles index representative) +
+        (dist (profiles index representative) (limit representative) +
+          dist (limit representative) (limit parameter)) := by
+      gcongr
+      exact dist_triangle _ _ _
+    _ < epsilon := by linarith
+
+/-- **Compact tilt domains upgrade dense convergence to uniform convergence.**
+Uniform `K`-Lipschitz control supplies equicontinuity; compactness supplies a
+finite radius net; convergence at its finitely many points supplies one common
+index.  The resulting conclusion is `TendstoUniformly`, not merely pointwise
+convergence at each tilt. -/
+theorem lipschitzPressureProfiles_tendstoUniformly_of_tendstoOn_dense
+    {Parameter : Type*} [PseudoMetricSpace Parameter] [CompactSpace Parameter]
+    (K : NNReal) (profiles : ℕ → Parameter → ℝ) (limit : Parameter → ℝ)
+    (hprofiles : ∀ index, LipschitzWith K (profiles index))
+    (hlimit : LipschitzWith K limit)
+    (parameters : Set Parameter) (hdense : Dense parameters)
+    (hconverges : ∀ parameter ∈ parameters,
+      Filter.Tendsto (fun index ↦ profiles index parameter)
+        Filter.atTop (nhds (limit parameter))) :
+    TendstoUniformly profiles limit Filter.atTop := by
+  have hpointwise := lipschitzPressureProfiles_tendsto_of_tendstoOn_dense
+    K profiles limit hprofiles hlimit parameters hdense hconverges
+  rw [Metric.tendstoUniformly_iff]
+  intro epsilon hepsilon
+  let radius : ℝ := epsilon / (6 * ((K : ℝ) + 1))
+  have hradius : 0 < radius := by
+    dsimp [radius]
+    positivity
+  have htotallyBounded : TotallyBounded (Set.univ : Set Parameter) :=
+    CompactSpace.isCompact_univ.totallyBounded
+  obtain ⟨net, _hnetUniv, hnetFinite, hcover⟩ :=
+    Metric.finite_approx_of_totallyBounded htotallyBounded radius hradius
+  have heventually : ∀ᶠ index in Filter.atTop,
+      ∀ representative ∈ hnetFinite.toFinset,
+        dist (profiles index representative) (limit representative) < epsilon / 3 := by
+    rw [Finset.eventually_all]
+    intro representative _hrepresentative
+    exact (Metric.tendsto_nhds.mp (hpointwise representative))
+      (epsilon / 3) (by positivity)
+  filter_upwards [heventually] with index hindex
+  intro parameter
+  have hnetApprox : ∀ candidate, ∃ representative ∈ net,
+      dist candidate representative ≤ radius := by
+    intro candidate
+    have hcandidate := hcover (Set.mem_univ candidate)
+    simp only [Set.mem_iUnion, Metric.mem_ball] at hcandidate
+    obtain ⟨nearby, hnearby, hnearbyDistance⟩ := hcandidate
+    exact ⟨nearby, hnearby, hnearbyDistance.le⟩
+  have hagrees : ∀ candidate ∈ net,
+      dist (profiles index candidate) (limit candidate) ≤ epsilon / 3 := by
+    intro candidate hcandidate
+    exact (hindex candidate (hnetFinite.mem_toFinset.mpr hcandidate)).le
+  have hbound := lipschitzPressureProfiles_dist_le_of_net
+    K (profiles index) limit (hprofiles index) hlimit net radius (epsilon / 3)
+      hnetApprox hagrees parameter
+  have hradiusNonneg : 0 ≤ radius := hradius.le
+  have hspatial : 2 * (K : ℝ) * radius ≤ epsilon / 3 := by
+    calc
+      2 * (K : ℝ) * radius ≤ 2 * ((K : ℝ) + 1) * radius := by
+        gcongr
+        linarith
+      _ = epsilon / 3 := by
+        dsimp [radius]
+        field_simp
+        norm_num
+  rw [dist_comm]
+  exact hbound.trans_lt (by linarith)
+
+/-- Bounded continuous pressure functions with one common Lipschitz constant
+and one common range interval.  This is the functional, rather than merely
+coordinatewise, right-profile family used by Arzelà--Ascoli. -/
+def boundedLipschitzPressureFamily
+    {Parameter : Type*} [PseudoMetricSpace Parameter]
+    (K : NNReal) (bound : ℝ) :
+    Set (BoundedContinuousFunction Parameter ℝ) :=
+  {profile | LipschitzWith K profile ∧
+    ∀ parameter, profile parameter ∈ Set.Icc (-bound) bound}
+
+/-- The bounded common-Lipschitz pressure family is closed in the uniform
+metric on bounded continuous functions. -/
+theorem isClosed_boundedLipschitzPressureFamily
+    {Parameter : Type*} [PseudoMetricSpace Parameter]
+    (K : NNReal) (bound : ℝ) :
+    IsClosed (boundedLipschitzPressureFamily (Parameter := Parameter) K bound) := by
+  rw [show boundedLipschitzPressureFamily (Parameter := Parameter) K bound =
+      {profile | ∀ x y,
+        dist (profile x) (profile y) ≤ (K : ℝ) * dist x y} ∩
+      {profile | ∀ x, profile x ∈ Set.Icc (-bound) bound} by
+    ext profile
+    simp only [boundedLipschitzPressureFamily, Set.mem_setOf_eq, Set.mem_inter_iff]
+    rw [lipschitzWith_iff_dist_le_mul]]
+  apply IsClosed.inter
+  · simp only [Set.setOf_forall]
+    exact isClosed_iInter fun x ↦ isClosed_iInter fun y ↦
+      isClosed_le
+        (BoundedContinuousFunction.continuous_eval_const.dist
+          BoundedContinuousFunction.continuous_eval_const)
+        continuous_const
+  · simp only [Set.setOf_forall]
+    exact isClosed_iInter fun x ↦
+      isClosed_Icc.preimage BoundedContinuousFunction.continuous_eval_const
+
+/-- **Functional right-profile compactness (Arzelà--Ascoli).**  On a compact
+tilt domain, uniformly bounded pressure functions sharing one Lipschitz
+constant form a compact set in the uniform metric. -/
+theorem isCompact_boundedLipschitzPressureFamily
+    {Parameter : Type*} [PseudoMetricSpace Parameter] [CompactSpace Parameter]
+    (K : NNReal) (bound : ℝ) :
+    IsCompact (boundedLipschitzPressureFamily (Parameter := Parameter) K bound) := by
+  let family := boundedLipschitzPressureFamily (Parameter := Parameter) K bound
+  have hclosed : IsClosed family := isClosed_boundedLipschitzPressureFamily K bound
+  have hrange : ∀ (profile : BoundedContinuousFunction Parameter ℝ)
+      (parameter : Parameter),
+      profile ∈ family → profile parameter ∈ Set.Icc (-bound) bound := by
+    intro profile parameter hprofile
+    exact hprofile.2 parameter
+  have hequicontinuous : Equicontinuous ((↑) : family → Parameter → ℝ) := by
+    exact (LipschitzWith.uniformEquicontinuous
+      ((↑) : family → Parameter → ℝ) K
+      (fun profile ↦ profile.property.1)).equicontinuous
+  have hclosure := BoundedContinuousFunction.arzela_ascoli
+    (Set.Icc (-bound) bound) isCompact_Icc family hrange hequicontinuous
+  simpa [hclosed.closure_eq] using hclosure
+
+/-- Every bounded equi-Lipschitz pressure sequence on a compact tilt domain
+has a uniformly convergent subsequence whose limit remains in the same family. -/
+theorem boundedLipschitzPressureFamily_tendsto_subseq
+    {Parameter : Type*} [PseudoMetricSpace Parameter] [CompactSpace Parameter]
+    (K : NNReal) (bound : ℝ)
+    (profiles : ℕ → BoundedContinuousFunction Parameter ℝ)
+    (hprofiles : ∀ index,
+      profiles index ∈ boundedLipschitzPressureFamily K bound) :
+    ∃ limit ∈ boundedLipschitzPressureFamily (Parameter := Parameter) K bound,
+      ∃ subsequence : ℕ → ℕ,
+        StrictMono subsequence ∧
+          Filter.Tendsto (profiles ∘ subsequence) Filter.atTop (nhds limit) :=
+  (isCompact_boundedLipschitzPressureFamily K bound).tendsto_subseq hprofiles
+
 /-- A bounded countable exponential/LD profile.  Coordinate `j` packages one
 choice of prior, replica number, and rational tilt from the fixed countable
 dense family. -/
 abbrev BoundedExponentialProfile (bound : ℝ) :=
   ℕ → Set.Icc (-bound) bound
+
+/-- A dedicated carrier for the explicit exponential/right-profile metric.
+It is definitionally the same bounded coordinate family, but unlike the raw
+function type it receives the weighted product metric rather than an unrelated
+function-space metric instance. -/
+def ExponentialProfilePoint (bound : ℝ) := BoundedExponentialProfile bound
 
 /-- One coordinate of the explicit exponential-profile distance, capped at
 one exactly as in the right-convergence definition. -/
@@ -1835,6 +2379,25 @@ theorem exponentialProfileDistance_eq_zero_iff
     exact (mul_eq_zero.mp htermZero).resolve_left (by positivity)
   · rintro rfl
     exact exponentialProfileDistance_self left
+
+/-- The explicit weighted formula bundled as an actual metric space.  A
+dedicated type prevents this instance from competing with the pre-existing
+function-space metric on raw bounded profiles. -/
+noncomputable instance exponentialProfilePointMetricSpace (bound : ℝ) :
+    MetricSpace (ExponentialProfilePoint bound) where
+  dist left right := exponentialProfileDistance left right
+  dist_self := exponentialProfileDistance_self
+  dist_comm := exponentialProfileDistance_comm
+  dist_triangle := exponentialProfileDistance_triangle
+  eq_of_dist_eq_zero := by
+    intro left right hzero
+    exact (exponentialProfileDistance_eq_zero_iff left right).mp hzero
+
+/-- Distance in the bundled right-profile metric is exactly the weighted
+capped-coordinate formula, not merely topologically equivalent to it. -/
+@[simp] theorem exponentialProfilePoint_dist_eq
+    {bound : ℝ} (left right : ExponentialProfilePoint bound) :
+    dist left right = exponentialProfileDistance left right := rfl
 
 /-- The explicit right-profile metric has uniform diameter at most two.  The
 constant is exact for the zero-based weights `2⁻ʲ`: their total mass is two,
@@ -2067,6 +2630,20 @@ theorem exponentialProfileDistance_tendsto_zero_iff_coordinatewise
   · exact exponentialProfileDistance_coordinatewise_of_tendsto_zero
   · exact exponentialProfileDistance_tendsto_zero_of_coordinatewise
 
+/-- Standard convergence in the bundled right-profile metric is equivalent to
+simultaneous convergence of every enumerated pressure coordinate. -/
+theorem exponentialProfilePoint_tendsto_iff_coordinatewise
+    {bound : ℝ} {profiles : ℕ → ExponentialProfilePoint bound}
+    {limit : ExponentialProfilePoint bound} :
+    Filter.Tendsto profiles Filter.atTop (nhds limit) ↔
+      ∀ coordinate : ℕ,
+        Filter.Tendsto (fun n ↦ profiles n coordinate)
+          Filter.atTop (nhds (limit coordinate)) := by
+  rw [tendsto_iff_dist_tendsto_zero]
+  simpa only [exponentialProfilePoint_dist_eq] using
+    (exponentialProfileDistance_tendsto_zero_iff_coordinatewise
+      (profiles := profiles) (limit := limit))
+
 /-- **Sequential compactness in the explicit distance.**  Every bounded
 profile sequence has one common subsequence whose weighted exponential-profile
 distance to a limiting profile tends to zero. -/
@@ -2081,6 +2658,25 @@ theorem boundedExponentialProfile_compact_subsequence_in_distance
     boundedExponentialProfile_common_coordinatewise_subsequence bound profiles
   exact ⟨limit, subsequence, hmono,
     exponentialProfileDistance_tendsto_zero_of_coordinatewise hcoordinate⟩
+
+/-- Every sequence in the bundled explicit metric has a conventionally
+convergent subsequence.  This upgrades the earlier scalar-distance statement to
+the standard topology generated by the installed `MetricSpace`. -/
+theorem exponentialProfilePoint_isSeqCompact_univ (bound : ℝ) :
+    IsSeqCompact (Set.univ : Set (ExponentialProfilePoint bound)) := by
+  intro profiles _hprofiles
+  obtain ⟨limit, subsequence, hmono, hdistance⟩ :=
+    boundedExponentialProfile_compact_subsequence_in_distance bound profiles
+  refine ⟨limit, Set.mem_univ limit, subsequence, hmono, ?_⟩
+  rw [tendsto_iff_dist_tendsto_zero]
+  simpa only [exponentialProfilePoint_dist_eq] using hdistance
+
+/-- The bounded explicit right-profile metric space is compact in Mathlib's
+ordinary topological sense, not only sequentially compact in a bespoke
+statement. -/
+noncomputable instance exponentialProfilePointCompactSpace (bound : ℝ) :
+    CompactSpace (ExponentialProfilePoint bound) where
+  isCompact_univ := (exponentialProfilePoint_isSeqCompact_univ bound).isCompact
 
 end ExponentialProfileCompactness
 

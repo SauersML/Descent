@@ -442,6 +442,33 @@ theorem positiveLDSpike_fixedTrafficInvisible_variationalPressureVisible
   finiteRankOneTraffic_invisible_variationalPressure_visible
     coefficient hasOddDegree vertices edges hconnected tlam hcritical
 
+/-- **Actual finite-volume genomic pressure counterexample.**  Every fixed LD
+traffic correction vanishes, but above `2 log 2` the exact binomially grouped
+Rademacher pressure is positive at every nonzero population.  Unlike the sharp
+variational theorem, this conclusion uses no LDP or limiting identification. -/
+theorem positiveLDSpike_fixedTrafficInvisible_finitePressureVisible
+    {Term : Type*} [Fintype Term]
+    (coefficient : Term → ℝ) (hasOddDegree : Term → Bool)
+    (vertices edges : Term → ℕ)
+    (hconnected : ∀ term, hasOddDegree term = false → vertices term ≤ edges term)
+    (tlam : ℝ) (hlarge : 2 * Real.log 2 < tlam) :
+    RankOneSpikeInvisibleWithFinitePressure coefficient hasOddDegree vertices edges tlam :=
+  finiteRankOneTraffic_invisible_finitePressure_visible
+    coefficient hasOddDegree vertices edges hconnected tlam hlarge
+
+/-- The same finite-volume statement in direct pressure language: the
+rank-one LD-spiked genomic pressure is strictly larger than the unspiked
+baseline at every nonempty population above the aligned-state threshold. -/
+theorem positiveLDSpike_finitePressureExceedsBaseline
+    (baseline : ℝ) (population : ℕ)
+    (temperature spikeStrength : ℝ) (hpopulation : 0 < population)
+    (hlarge : 2 * Real.log 2 < temperature * spikeStrength) :
+    finiteBaselineRademacherPressure baseline temperature <
+      finiteRankOneRademacherPressure
+        baseline population temperature spikeStrength :=
+  finiteRankOneRademacherPressure_gt_baseline
+    baseline population temperature spikeStrength hpopulation hlarge
+
 /-- **Unified genomic counterexample to C2 and C3.**  A single positive LD
 rank-one spike is invisible to every fixed traffic graph, preserves the exact
 lower genotype ground state through an orthogonal genotype, changes the upper
@@ -641,6 +668,46 @@ theorem genomicPressureProfiles_tendsto_of_tendstoOn_denseTilts
         Filter.atTop (nhds (limit parameter)) :=
   lipschitzPressureProfiles_tendsto_of_tendstoOn_dense
     K profiles limit hprofiles hlimit parameters hdense hconverges
+
+/-- **On a compact genomic tilt domain, dense convergence is uniform.**
+Uniform Lipschitz control and convergence on the dense rational family imply
+`TendstoUniformly` over every tilt, using a finite compactness net. -/
+theorem genomicPressureProfiles_tendstoUniformly_of_tendstoOn_denseTilts
+    {Parameter : Type*} [PseudoMetricSpace Parameter] [CompactSpace Parameter]
+    (K : NNReal) (profiles : ℕ → Parameter → ℝ) (limit : Parameter → ℝ)
+    (hprofiles : ∀ index, LipschitzWith K (profiles index))
+    (hlimit : LipschitzWith K limit)
+    (parameters : Set Parameter) (hdense : Dense parameters)
+    (hconverges : ∀ parameter ∈ parameters,
+      Filter.Tendsto (fun index ↦ profiles index parameter)
+        Filter.atTop (nhds (limit parameter))) :
+    TendstoUniformly profiles limit Filter.atTop :=
+  lipschitzPressureProfiles_tendstoUniformly_of_tendstoOn_dense
+    K profiles limit hprofiles hlimit parameters hdense hconverges
+
+/-- **Functional genomic right-profile compactness.**  On a compact tilt
+domain, the uniformly bounded pressure functions sharing one Lipschitz constant
+form a compact family in the uniform metric. -/
+theorem genomicBoundedLipschitzPressureFamily_isCompact
+    {Parameter : Type*} [PseudoMetricSpace Parameter] [CompactSpace Parameter]
+    (K : NNReal) (bound : ℝ) :
+    IsCompact (boundedLipschitzPressureFamily
+      (Parameter := Parameter) K bound) :=
+  isCompact_boundedLipschitzPressureFamily K bound
+
+/-- Every sequence in the bounded equi-Lipschitz genomic pressure family has
+a uniformly convergent subsequence and its limit stays in the same family. -/
+theorem genomicBoundedLipschitzPressureFamily_hasUniformlyConvergentSubsequence
+    {Parameter : Type*} [PseudoMetricSpace Parameter] [CompactSpace Parameter]
+    (K : NNReal) (bound : ℝ)
+    (profiles : ℕ → BoundedContinuousFunction Parameter ℝ)
+    (hprofiles : ∀ index,
+      profiles index ∈ boundedLipschitzPressureFamily K bound) :
+    ∃ limit ∈ boundedLipschitzPressureFamily (Parameter := Parameter) K bound,
+      ∃ subsequence : ℕ → ℕ,
+        StrictMono subsequence ∧
+          Filter.Tendsto (profiles ∘ subsequence) Filter.atTop (nhds limit) :=
+  boundedLipschitzPressureFamily_tendsto_subseq K bound profiles hprofiles
 
 /-- **The nonperturbative genomic LD profile has a genuine compact state space.**
 Uniformly bounded countable pressure coordinates admit one common subsequence
@@ -1659,6 +1726,26 @@ structure UnifiedBiologyObstructions : Prop where
                 (population + 1))
             Filter.atTop (nhds 0) ∧
           0 < cwVariationalPressureGap tlam
+  /-- Every fixed genomic traffic coordinate misses the positive LD spike, but
+  its genuine finite Rademacher pressure is positive above the explicit
+  aligned-state threshold, with no LDP premise. -/
+  positiveLDSpikeFixedTrafficInvisibleFinitePressureVisible :
+    ∀ (Term : Type) [Fintype Term]
+      (coefficient : Term → ℝ) (hasOddDegree : Term → Bool)
+      (vertices edges : Term → ℕ),
+      (∀ term, hasOddDegree term = false → vertices term ≤ edges term) →
+      ∀ tlam : ℝ, 2 * Real.log 2 < tlam →
+        RankOneSpikeInvisibleWithFinitePressure
+          coefficient hasOddDegree vertices edges tlam
+  /-- At every nonempty population, the genuine rank-one-spiked genomic
+  pressure strictly exceeds the unspiked baseline above `2 log 2`. -/
+  positiveLDSpikeFinitePressureExceedsBaseline :
+    ∀ (baseline : ℝ) (population : ℕ)
+      (temperature spikeStrength : ℝ),
+      0 < population → 2 * Real.log 2 < temperature * spikeStrength →
+        finiteBaselineRademacherPressure baseline temperature <
+          finiteRankOneRademacherPressure
+            baseline population temperature spikeStrength
   /-- One positive LD spike simultaneously defeats fixed traffic sufficiency
   and the lower-ground-state characterization. -/
   positiveLDSpikeRefutesTrafficAndGroundStateDichotomies :
@@ -1790,6 +1877,36 @@ structure UnifiedBiologyObstructions : Prop where
           ∀ parameter,
             Filter.Tendsto (fun index ↦ profiles index parameter)
               Filter.atTop (nhds (limit parameter))
+  /-- On compact tilt domains, the same dense-family hypotheses yield uniform
+  convergence of the complete genomic pressure profile. -/
+  genomicDenseTiltConvergenceIsUniformOnCompactDomains :
+    ∀ (Parameter : Type) [PseudoMetricSpace Parameter] [CompactSpace Parameter]
+      (K : NNReal) (profiles : ℕ → Parameter → ℝ) (limit : Parameter → ℝ),
+      (∀ index, LipschitzWith K (profiles index)) →
+      LipschitzWith K limit →
+      ∀ parameters : Set Parameter, Dense parameters →
+        (∀ parameter ∈ parameters,
+          Filter.Tendsto (fun index ↦ profiles index parameter)
+            Filter.atTop (nhds (limit parameter))) →
+          TendstoUniformly profiles limit Filter.atTop
+  /-- Uniformly bounded, common-Lipschitz genomic pressure functions form a
+  compact family on every compact tilt domain. -/
+  genomicBoundedLipschitzPressureProfilesAreCompact :
+    ∀ (Parameter : Type) [PseudoMetricSpace Parameter] [CompactSpace Parameter]
+      (K : NNReal) (bound : ℝ),
+      IsCompact (boundedLipschitzPressureFamily
+        (Parameter := Parameter) K bound)
+  /-- Every bounded equi-Lipschitz genomic pressure sequence has a uniformly
+  convergent subsequence whose limit remains bounded and equi-Lipschitz. -/
+  genomicBoundedLipschitzPressureProfilesHaveCompactSubsequences :
+    ∀ (Parameter : Type) [PseudoMetricSpace Parameter] [CompactSpace Parameter]
+      (K : NNReal) (bound : ℝ)
+      (profiles : ℕ → BoundedContinuousFunction Parameter ℝ),
+      (∀ index, profiles index ∈ boundedLipschitzPressureFamily K bound) →
+        ∃ limit ∈ boundedLipschitzPressureFamily (Parameter := Parameter) K bound,
+          ∃ subsequence : ℕ → ℕ,
+            StrictMono subsequence ∧
+              Filter.Tendsto (profiles ∘ subsequence) Filter.atTop (nhds limit)
   /-- Every uniformly bounded countable exponential/LD profile has one common
   coordinatewise-convergent subsequence. -/
   genomicExponentialProfileIsSequentiallyCompact :
@@ -1972,6 +2089,12 @@ theorem unifiedBiology_obstructions : UnifiedBiologyObstructions := by
         fun _Term _ coefficient hasOddDegree vertices edges hconnected tlam hcritical ↦
           positiveLDSpike_fixedTrafficInvisible_variationalPressureVisible
             coefficient hasOddDegree vertices edges hconnected tlam hcritical
+      positiveLDSpikeFixedTrafficInvisibleFinitePressureVisible :=
+        fun _Term _ coefficient hasOddDegree vertices edges hconnected tlam hlarge ↦
+          positiveLDSpike_fixedTrafficInvisible_finitePressureVisible
+            coefficient hasOddDegree vertices edges hconnected tlam hlarge
+      positiveLDSpikeFinitePressureExceedsBaseline :=
+        positiveLDSpike_finitePressureExceedsBaseline
       positiveLDSpikeRefutesTrafficAndGroundStateDichotomies :=
         fun _Term _Genotype _ coefficient hasOddDegree vertices edges hconnected alignment
           orthogonal aligned baseline spikeStrength population temperature hspike hpopulation
@@ -2020,6 +2143,17 @@ theorem unifiedBiology_obstructions : UnifiedBiologyObstructions := by
         fun _Parameter _ K profiles limit hprofiles hlimit parameters hdense hconverges ↦
           genomicPressureProfiles_tendsto_of_tendstoOn_denseTilts
             K profiles limit hprofiles hlimit parameters hdense hconverges
+      genomicDenseTiltConvergenceIsUniformOnCompactDomains :=
+        fun _Parameter _ _ K profiles limit hprofiles hlimit parameters hdense hconverges ↦
+          genomicPressureProfiles_tendstoUniformly_of_tendstoOn_denseTilts
+            K profiles limit hprofiles hlimit parameters hdense hconverges
+      genomicBoundedLipschitzPressureProfilesAreCompact :=
+        fun _Parameter _ _ K bound ↦
+          genomicBoundedLipschitzPressureFamily_isCompact K bound
+      genomicBoundedLipschitzPressureProfilesHaveCompactSubsequences :=
+        fun _Parameter _ _ K bound profiles hprofiles ↦
+          genomicBoundedLipschitzPressureFamily_hasUniformlyConvergentSubsequence
+            K bound profiles hprofiles
       genomicExponentialProfileIsSequentiallyCompact :=
         genomicExponentialProfile_hasCommonCoordinatewiseSubsequence
       genomicExponentialProfileDistanceSatisfiesMetricLaws :=

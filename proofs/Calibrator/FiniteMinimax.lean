@@ -607,17 +607,6 @@ structure SeparatedLossCaps (θ₁ θ₂ : Fin (parameterCount + 1))
   capped₂ : ∀ action : Fin (actionCount + 1),
     0 ≤ E.loss θ₂ action ∧ E.loss θ₂ action ≤ maxLoss₂
 
-/-- **The caps are inhabited.**  A zero-separation pair with any nonnegative caps satisfies
-them whenever the loss is a nonnegative function bounded by those caps; the constant-zero
-loss is the concrete case, and it keeps the floors below from being empty. -/
-theorem separatedLossCaps_of_loss_eq_zero
-    (θ₁ θ₂ : Fin (parameterCount + 1)) (maxLoss₁ maxLoss₂ : ℝ)
-    (hzero : ∀ θ action, E.loss θ action = 0)
-    (h₁ : 0 ≤ maxLoss₁) (h₂ : 0 ≤ maxLoss₂) :
-    E.SeparatedLossCaps θ₁ θ₂ 0 maxLoss₁ maxLoss₂ :=
-  ⟨fun action ↦ by simp [hzero], fun action ↦ by simp [hzero, h₁],
-    fun action ↦ by simp [hzero, h₂]⟩
-
 /-- **Symmetric quantitative Le Cam floor.** If the loss is bounded at both parameters, the
 optimal orientation charges the smaller of the two loss caps against observation ℓ¹ distance.
 The bound is clipped at zero and contains the one-sided theorem as the case where only the
@@ -764,6 +753,15 @@ or any other pair of biological mechanisms that induce the same data law. -/
 noncomputable def indistinguishableBinaryProblem (separation : ℝ) : Problem 1 1 0 where
   observation := fun _ ↦ PMF.pure 0
   loss := fun θ action ↦ if θ = action then 0 else separation
+
+/-- **The loss caps are inhabited.**  A theorem conditioned on a bundle nothing satisfies is
+true and empty.  At zero separation the binary problem's loss is identically zero, which is
+separated at zero and capped at zero -- a witness that takes no hypotheses, so it builds the
+bundle rather than moving it to a caller. -/
+theorem separatedLossCaps_indistinguishableBinaryProblem (θ₁ θ₂ : Fin 2) :
+    SeparatedLossCaps (indistinguishableBinaryProblem 0) θ₁ θ₂ 0 0 0 := by
+  refine ⟨fun action ↦ ?_, fun action ↦ ?_, fun action ↦ ?_⟩ <;>
+    simp [indistinguishableBinaryProblem]
 
 /-- The uniform distribution on the two binary actions. -/
 noncomputable def fairBinaryAction : FinitePrior 1 :=
