@@ -53,6 +53,15 @@ theorem scaledMutationRate_div_mu (Ne μ : ℝ) (h : μ ≠ 0) :
 noncomputable def scaledMigrationRate (Ne m : ℝ) : ℝ :=
   4 * Ne * m
 
+/-- **The scaling factor is four times the effective size**, the same convention as the scaled
+mutation rate. Dividing by the migration rate exhibits it, which is the whole content of the
+convention and is what a body carrying any other multiple would fail while remaining positive and
+increasing in both arguments. -/
+theorem scaledMigrationRate_div_m (Ne m : ℝ) (h : m ≠ 0) :
+    scaledMigrationRate Ne m / m = 4 * Ne := by
+  unfold scaledMigrationRate
+  field_simp
+
 /-- **Identity fraction at a scaled rate**, `1 / (1 + θ)`.
 
 Not stipulated: `PopulationGeneticsFoundations.fstMutationDriftEquilibrium_isFixedPoint`

@@ -378,6 +378,14 @@ section DiscoveryBias
     this corpus already had to repair. -/
 def hweHeterozygosity (p : ℝ) : ℝ := 2 * p * (1 - p)
 
+/-- **Heterozygosity peaks at one half, where it equals one half.** The coincidence with the
+genotype variance recorded below is an identity between two bodies and does not fix either of
+them; the value at the interior maximum does, and it is the only point at which a mistaken factor
+of two is visible. -/
+theorem hweHeterozygosity_at_half : hweHeterozygosity (1 / 2) = 1 / 2 := by
+  unfold hweHeterozygosity
+  norm_num
+
 /-- **The heterozygote frequency and the genotype variance coincide under
 Hardy-Weinberg.** They are different quantities — one is a probability, one is
 a second moment — and this is the only thing that licenses writing either
