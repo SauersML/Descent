@@ -284,18 +284,13 @@ theorem selectionModelLRT_lt_iff_missedSelectedVariance_lt_of_matchedEffectCorre
         selectionModelLRT validation null₂ altSummary ↔
       missedSelectedVariance validation null₁ <
         missedSelectedVariance validation null₂ := by
-  constructor
-  · intro hLRT
-    have hNull : selectionSummaryLogLik validation null₂ <
-        selectionSummaryLogLik validation null₁ := by
-      unfold selectionModelLRT likelihoodRatioStat at hLRT
-      linarith
-    exact
-      (selectionSummaryLogLik_lt_iff_missedSelectedVariance_gt_of_matchedEffectCorrelation
-        validation null₁ null₂ hCorr₁ hCorr₂).mp hNull
-  · exact
-      selectionModelLRT_strictMono_missedSelectedVariance_of_matchedEffectCorrelation
-        validation null₁ null₂ altSummary hCorr₁ hCorr₂
+  change likelihoodRatioStat (selectionSummaryLogLik validation null₁)
+      (selectionSummaryLogLik validation altSummary) <
+        likelihoodRatioStat (selectionSummaryLogLik validation null₂)
+          (selectionSummaryLogLik validation altSummary) ↔ _
+  rw [likelihoodRatioStat_lt_iff_of_fixed_alt]
+  exact selectionSummaryLogLik_lt_iff_missedSelectedVariance_gt_of_matchedEffectCorrelation
+    validation null₁ null₂ hCorr₁ hCorr₂
 
 end SelectionValidation
 

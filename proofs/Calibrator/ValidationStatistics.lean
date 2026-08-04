@@ -66,6 +66,25 @@ theorem gaussianProfileLogLik_strictAnti_sqResidual
   unfold gaussianProfileLogLik
   simpa only [neg_div] using hConst
 
+/-- **Exact Gaussian fit ordering.** At positive variance, profile likelihood ranks candidate
+means in precisely the reverse order of their squared residuals.  This is an iff, so no other
+feature of the two means can change their ranking. -/
+theorem gaussianProfileLogLik_lt_iff_sqResidual_gt
+    (observed variance mean₁ mean₂ : ℝ) (hVariance : 0 < variance) :
+    gaussianProfileLogLik observed mean₂ variance <
+        gaussianProfileLogLik observed mean₁ variance ↔
+      (observed - mean₁) ^ 2 < (observed - mean₂) ^ 2 := by
+  constructor
+  · intro hlikelihood
+    have hDen : 0 < 2 * variance := by positivity
+    unfold gaussianProfileLogLik at hlikelihood
+    simp only [neg_div] at hlikelihood
+    have hdiv : (observed - mean₁) ^ 2 / (2 * variance) <
+        (observed - mean₂) ^ 2 / (2 * variance) := by
+      linarith
+    exact (div_lt_div_iff_of_pos_right hDen).mp hdiv
+  · exact gaussianProfileLogLik_strictAnti_sqResidual observed variance mean₁ mean₂ hVariance
+
 /-- Likelihood-ratio statistic comparing a null and alternative fit.
 
     Empirical status: UNTESTED. -/
@@ -88,12 +107,35 @@ theorem likelihoodRatioStat_nonneg
   unfold likelihoodRatioStat
   nlinarith
 
+/-- A likelihood-ratio statistic is nonnegative exactly when the alternative fits at least as
+well as the null. -/
+theorem likelihoodRatioStat_nonneg_iff (logLNull logLAlt : ℝ) :
+    0 ≤ likelihoodRatioStat logLNull logLAlt ↔ logLNull ≤ logLAlt := by
+  unfold likelihoodRatioStat
+  constructor <;> intro h <;> nlinarith
+
 theorem likelihoodRatioStat_pos
     (logLNull logLAlt : ℝ)
     (hFit : logLNull < logLAlt) :
     0 < likelihoodRatioStat logLNull logLAlt := by
   unfold likelihoodRatioStat
   nlinarith
+
+/-- A likelihood-ratio statistic is positive exactly when the alternative fits strictly better
+than the null. -/
+theorem likelihoodRatioStat_pos_iff (logLNull logLAlt : ℝ) :
+    0 < likelihoodRatioStat logLNull logLAlt ↔ logLNull < logLAlt := by
+  unfold likelihoodRatioStat
+  constructor <;> intro h <;> nlinarith
+
+/-- **Exact fixed-alternative ordering.** With one alternative held fixed, likelihood-ratio
+statistics rank nulls in precisely the reverse order of their log-likelihoods. -/
+theorem likelihoodRatioStat_lt_iff_of_fixed_alt
+    (logLNull₁ logLNull₂ logLAlt : ℝ) :
+    likelihoodRatioStat logLNull₁ logLAlt < likelihoodRatioStat logLNull₂ logLAlt ↔
+      logLNull₂ < logLNull₁ := by
+  unfold likelihoodRatioStat
+  constructor <;> intro h <;> nlinarith
 
 end GoodnessOfFit
 
