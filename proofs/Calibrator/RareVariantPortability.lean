@@ -428,7 +428,22 @@ theorem mutationSelectionBalance_at_zero_dominance (mu s : ℝ) (h_mu : mu ≠ 0
 only on homozygotes, so the load is `s * p` per copy rather than `h * s`, and
 mutation replenishes as before.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED as a linearisation**, with the gap
+    stated (`proofs/validation/empirical/simcov/battery_bulk8.py`,
+    `test_mutation_selection_recessive`). Against one generation of EXACT
+    recessive viability selection -- mean fitness `1 - s q^2`, renormalised --
+    followed by two-way mutation. Both sides are deterministic, so this is exact
+    arithmetic and the gap is the approximation:
+
+      s      mu      p       this def   exact       relative
+      0.05   1e-04   0.20     0.19808   0.19846      -0.19%
+      0.20   1e-03   0.15     0.14635   0.14687      -0.35%
+      0.01   1e-05   0.30     0.29911   0.29937      -0.09%
+
+    The step omits the mean-fitness denominator, so it is a linearisation valid
+    at small `s`; at `s = 0.2` it is already a third of a percent per
+    generation, which compounds. This is the same qualifier
+    `mutationSelectionStepRare` carries, and for the same reason. -/
 noncomputable def mutationSelectionStepRecessive (mu s p : ℝ) : ℝ :=
   p - s * p ^ 2 + mu * (1 - p)
 

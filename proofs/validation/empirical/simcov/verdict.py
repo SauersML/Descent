@@ -133,6 +133,20 @@ def classify(cells, control=None, sem_source="replicates", selected_from=1,
         return "LEAD (weak error bar)", "; ".join(notes), worst
 
     # --- FP gate: positive control ------------------------------------------
+    # A control whose predicted and measured values are the SAME NUMBER is not
+    # a control. Battery 23 declared three of them -- `lean=1.0, truth=1.0`,
+    # asserted rather than measured -- and one "passed at 0.00 sems" while the
+    # battery it was gating was wrong by exactly a factor of two. A control has
+    # to be capable of failing, which means both sides must come from somewhere
+    # independent.
+    if control is not None:
+        cl, ct = control.get("lean"), control.get("truth")
+        if cl is not None and ct is not None and abs(cl - ct) < 1e-12:
+            notes.append("control '%s' is DEGENERATE: predicted and measured "
+                         "are the same number, so it cannot fail and gates "
+                         "nothing" % control.get("design", "?"))
+            control = None
+
     if disagrees:
         if control is None:
             return "LEAD (no control)", ("a disagreement without a positive "

@@ -410,7 +410,20 @@ section OptimalAllocation
 
     Concave in `n`, so the returns diminish.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED as a shape**
+    (`proofs/validation/empirical/simcov/battery_bulk8.py`,
+    `test_heritability_learning_curve`). Out-of-sample R-squared as a fraction
+    of heritability, 500 loci at `h2 = 0.5`, scored on a held-out 40000:
+
+      n        predicted   measured   sems
+      5000       0.89372    0.90049   0.25
+      12000      0.95279    1.00844   1.84
+      30000      0.98057    0.98437   0.13
+
+    `C` is fitted at the SMALLEST sample size and then used to predict the other
+    three. That is what makes this a test of the shape `n/(n + C)` rather than
+    of a constant fitted to the curve it is being checked against -- a fit to
+    all four points would agree with almost any monotone saturating form. -/
 noncomputable def heritabilityFractionFromN (n C : ℝ) : ℝ := n / (n + C)
 
 /-- **heritabilityFractionFromN where its denominator vanishes, named.** The guard `n + C` is zero
