@@ -542,7 +542,8 @@ def exempt : List (Name × String) :=
     (`Calibrator.liabilitySpecificity, "Real.sqrt of h_sq and R2, both model-bounded in [0,1]"),
     (`Calibrator.Expected_Abs_Shift, "Real.sqrt of a variance, nonnegative by construction"),
     (`Calibrator.serialFounderWithinTime, "Real.exp arguments, and 2 * N with N a census size"),
-    (`Calibrator.sigmaThetaFromObservedSelectedVariance, "Real.sqrt of an observed variance excess") ]
+    (`Calibrator.sigmaThetaFromObservedSelectedVariance,
+      "Real.sqrt of an observed variance excess") ]
 
 /-- Is this a numeric literal, or a ratio or negation of them?
 
