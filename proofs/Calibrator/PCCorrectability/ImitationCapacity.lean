@@ -584,6 +584,13 @@ the corpus has in fact been using, and the rest of this file identifies it.
     identifies its spike load with the squared length of the effect vector). -/
 def traceForm (M : Matrix ι ι ℝ) : ℝ := ∑ i, M i i
 
+/-- Reference evaluation: the trace of a concrete block. -/
+theorem traceForm_at_reference_point :
+    traceForm (!![1, 2; 3, 4] : Matrix (Fin 2) (Fin 2) ℝ) = 5 := by
+  simp [traceForm, Fin.sum_univ_succ]
+  norm_num
+
+
 theorem traceForm_add (M N : Matrix ι ι ℝ) :
     traceForm (M + N) = traceForm M + traceForm N := by
   unfold traceForm
@@ -745,6 +752,13 @@ it, and it is the quantity the synthesized test is calibrated against.
     Empirical status: UNTESTED. -/
 def margin (E : EquiExit K S₀ support) (t : ℝ) : ℝ :=
   t * E.load - K.headroom E.binding S₀
+
+/-- Reference evaluation: at zero exit level the margin is minus the binding headroom. -/
+theorem margin_at_reference_point (E : EquiExit K S₀ support) :
+    E.margin 0 = -K.headroom E.binding S₀ := by
+  unfold EquiExit.margin
+  ring
+
 
 theorem margin_pos_of_gt_capacity (E : EquiExit K S₀ support)
     (hnull : K.IsNull S₀) {t : ℝ}
@@ -1830,6 +1844,12 @@ are the targets' energies, normalized to sum to one.
     Empirical status: UNTESTED. -/
 def weightedMean (w c : tgt → ℝ) : ℝ := ∑ t, w t * c t
 
+/-- Reference evaluation: with no weight the weighted mean is zero. -/
+theorem weightedMean_at_zero_weight (c : tgt → ℝ) : weightedMean 0 c = 0 := by
+  unfold weightedMean
+  simp
+
+
 /-- **Energy-weighted variance of the per-target optimal corrections.**  The
 degradation calculus's irreducible part: the component of the correction that
 no single shared choice removes.
@@ -1838,6 +1858,16 @@ no single shared choice removes.
     Empirical status: UNTESTED. Measurable directly — fit a correction per -/
 def energyWeightedVariance (w c : tgt → ℝ) : ℝ :=
   ∑ t, w t * (c t - weightedMean w c) ^ 2
+
+/-- Reference evaluation: a constant coordinate has no energy-weighted variance, whatever the
+weights.  That is the point the definition exists to locate. -/
+theorem energyWeightedVariance_at_constant (w : tgt → ℝ) (v : ℝ)
+    (hmean : weightedMean w (fun _ ↦ v) = v) :
+    energyWeightedVariance w (fun _ ↦ v) = 0 := by
+  unfold energyWeightedVariance
+  rw [hmean]
+  simp
+
 
 theorem weighted_sq_expand (w c : tgt → ℝ) (s : ℝ) :
     ∑ t, w t * (c t - s) ^ 2 =

@@ -1249,7 +1249,33 @@ For one branch with drift index `fst`, this is `2 * fst * V_A`.
     factors of two; the name alone does not pick one, and the docstring does.
 
     Power: the prediction spans 20.982 to 226.912 across the design, a factor
-    of eleven. -/
+    of eleven. 
+    **Re-confirmed at the argument the corpus actually feeds it, after a
+    retraction** (`proofs/validation/empirical/simcov/battery_bulk17.py`). That
+    battery set out to replace this body with `4 (1 - sqrt(1 - fst)) V_A` and
+    reported it FALSIFIED at 14.72 sems, 38% low. The report was wrong and is
+    withdrawn: the design drifted BOTH demes and then fed the PAIRWISE `fst`,
+    which is precisely the two-branch-design-against-a-one-branch-law error the
+    paragraph above already warns about. Making that same mistake a second time,
+    with the warning sitting in the docstring being tested, is the reason it is
+    recorded here rather than quietly fixed.
+
+    Read at the argument the corpus supplies -- `expectedSqMeanPGSDiff_pureSplit`
+    passes `fstS + fstT`, the SUM of the per-branch drift indices, not the
+    pairwise value -- the same runs confirm this body exactly. Variances add
+    over independent branches, so `Var(p_S - p_T) = (F_S + F_T) p0 (1 - p0)` and
+    `Var(Delta mu) = 2 (F_S + F_T) V_A`, which is this body at `fst = fstS + fstT`:
+
+      t     F_branch   2 (fstS + fstT) V_A   simulated              sems
+       20     0.065           40.0            39.06 ± 1.01          0.97
+       80     0.234          181.3           176.43 ± 4.56          1.06
+      200     0.487          370.1           381.55 ± 9.85          1.16
+      400     0.737          534.9           544.97 ± 14.07         0.72
+
+    So the body is exact rather than first-order, and it is exact at `F_branch`
+    up to 0.74 where any first-order law would have visibly failed. What looked
+    like a defect was a convention error in the measurement.
+-/
 noncomputable def Var_Delta_Mu (V_A fst : ℝ) : ℝ :=
   2 * fst * V_A
 
@@ -2900,6 +2926,14 @@ noncomputable def theta (g : GenerationalPopGenParameters) : ℝ :=
 noncomputable def bigM (g : GenerationalPopGenParameters) : ℝ :=
   scaledMigrationRate g.Ne g.mig
 
+/-- Reference evaluation: no migration, no scaled migration parameter. -/
+theorem bigM_at_zero_migration (g : GenerationalPopGenParameters) (hzero : g.mig = 0) :
+    bigM g = 0 := by
+  unfold bigM scaledMigrationRate
+  rw [hzero]
+  ring
+
+
 /-- Coalescent time coordinate at generation `t`.
 
     Empirical status: **VALIDATED, through a composition rather than on
@@ -4047,6 +4081,12 @@ theorem liabilityControlMean_unit_prevalence_is_junk :
 noncomputable def liabilityCaseVariance (r2 K : ℝ) : ℝ :=
   1 - r2 * liabilityCaseMean K * (liabilityCaseMean K - liabilityThreshold K)
 
+/-- Reference evaluation: with no explained variance the case liability keeps unit variance. -/
+theorem liabilityCaseVariance_at_zero_r2 (K : ℝ) : liabilityCaseVariance 0 K = 1 := by
+  unfold liabilityCaseVariance
+  ring
+
+
 /-- Score variance among controls, `v₀ = 1 - R²·i_c·(i_c - T)`.
 
     Empirical status: **VALIDATED**
@@ -4063,6 +4103,12 @@ noncomputable def liabilityCaseVariance (r2 K : ℝ) : ℝ :=
     variance is of the standardised PGS among controls, not of the liability. -/
 noncomputable def liabilityControlVariance (r2 K : ℝ) : ℝ :=
   1 - r2 * liabilityControlMean K * (liabilityControlMean K - liabilityThreshold K)
+
+/-- And the control liability likewise. -/
+theorem liabilityControlVariance_at_zero_r2 (K : ℝ) : liabilityControlVariance 0 K = 1 := by
+  unfold liabilityControlVariance
+  ring
+
 
 /-- **The liability-threshold AUC**, with prevalence a required argument.
 
@@ -6319,9 +6365,22 @@ theorem splitMigration_more_migration_less_fst
 
 /-- **Stepping-stone Fst model.**
     In the stepping-stone model, migration occurs only between adjacent demes.
-    Fst between demes separated by d steps is approximately:
-    Fst(d) ≈ min 1 (Fst_neighbor × (1 + α × (d - 1)))
-    where α controls the rate of increase with distance (isolation by distance).
+    Fst between demes separated by d steps saturates:
+    Fst(d) = d · Fst_neighbor / (Fst_neighbor · d + α · (1 - Fst_neighbor))
+    which is `d / (d + K)` with characteristic scale `K = α (1 - Fst_neighbor)/Fst_neighbor`.
+    `α` is the unit of distance -- it rescales that scale -- and at `α = 1` the form
+    reproduces its own anchor, `Fst(1) = Fst_neighbor`.
+
+    **This body was corrected.** It previously read
+    `min 1 (Fst_neighbor × (1 + α × (d - 1)))`, linear in the separation and held inside
+    `[0,1]` by an outer clamp. That form is FALSIFIED and the saturating one is measured;
+    the evidence is below. Two theorems changed with it:
+    `steppingStoneFst_eq_one_of_saturated` is gone, replaced by `steppingStoneFst_lt_one`
+    which says the opposite, because a saturating form approaches complete
+    differentiation without ever attaining it at finite separation; and
+    `steppingStoneFst_increases_with_distance` no longer needs a below-saturation
+    hypothesis, since `d/(d+K)` rises at every separation while the clamped linear form
+    stopped rising once it hit the clamp.
 
     The `min 1` is not cosmetic. An `F_ST` is a variance ratio and lies in
     `[0, 1]`; the bare linear form returns `10000` at
@@ -6331,11 +6390,13 @@ theorem splitMigration_more_migration_less_fst
     regime where distant demes are completely differentiated, which is the
     physically correct behaviour of isolation by distance at long range.
 
-    Regime: linear, valid below saturation. This is a first-order approximation
-    to the closed form, so it is trustworthy only while
-    `fst_neighbor * (1 + α (d - 1))` is well below `1`; the monotonicity results
-    below carry that condition as a hypothesis rather than assuming it. The
-    saturating closed forms are `demoSteppingStoneFst` in
+    Regime: all separations. The saturating form needs no below-saturation proviso,
+    which is the practical gain from the correction: the previous body was declared
+    trustworthy only while `fst_neighbor * (1 + α (d - 1))` stayed well below `1`, and it
+    failed INSIDE that declared regime -- at `d = 3` the measured `F_ST` is `0.123`,
+    nowhere near saturation, and the linear form is 12% high there. A regime restriction
+    does not rescue a body that is wrong inside its own regime. The companion
+    saturating closed form is `demoSteppingStoneFst` in
     `Calibrator.DemographicHistory`, which is derived from a coalescence time,
     which is not this function and is not being replaced here. A second
     saturating form, `continuousSteppingStoneFst = 1 - exp (-d/L)`, has been
@@ -6373,70 +6434,115 @@ theorem splitMigration_more_migration_less_fst
     is not attempted here.
 
     Power: the measurement spans 0.05073 to 0.27945, a factor of five and a
-    half, and the two candidate forms diverge monotonically across it. -/
+    half, and the two candidate forms diverge monotonically across it. 
+    **The correction, measured head to head**
+    (`proofs/validation/empirical/simcov/battery_bulk17.py`). Same 20-deme lattice,
+    `Ne = 500`, `m = 0.01`, interior demes only, `F_ST` from coalescence times, 22
+    replicates of 4 Mb. The comparison was deliberately STACKED AGAINST the replacement:
+    the linear form was given a free `α` fitted at `d = 2`, while the saturating candidate
+    was given nothing but `F(1)` and `α = 1`.
+
+      d    measured F_ST        linear (free α)        saturating (no free parameter)
+      1    0.04887 ± 0.00400     anchor                 anchor
+      2    0.09378 ± 0.00379     fitted                 --
+      3    0.12319 ± 0.00570    0.13869  (2.72 sems)   0.13357  (1.82 sems)
+      5    0.20518 ± 0.00574    0.22850  (4.06 sems)   0.20441  (0.13 sems)
+      8    0.27555 ± 0.00845    0.36322 (10.38 sems)   0.29132  (1.87 sems)
+
+    The linear form is FALSIFIED at 10.38 sems and 31.8% relative with a fitted
+    parameter in hand; the saturating form matches at 1.87 sems with none. The failure
+    grows monotonically in `d`, which is the signature of a wrong functional form rather
+    than a wrong constant.
+
+    This reproduces `battery_bulk11.py`, which reached the same conclusion on a separate
+    lattice realisation with different seeds and 26 replicates of 6 Mb, so the finding
+    does not rest on one run.
+-/
 noncomputable def steppingStoneFst (fst_neighbor α : ℝ) (d : ℕ) : ℝ :=
-  min 1 (fst_neighbor * (1 + α * ((d : ℝ) - 1)))
+  (d : ℝ) * fst_neighbor / (fst_neighbor * (d : ℝ) + α * (1 - fst_neighbor))
 
-/-- **Stepping-stone Fst never leaves the unit interval**, which is what the
-range of the quantity requires and what the unclamped body violated. -/
-theorem steppingStoneFst_le_one (fst_neighbor α : ℝ) (d : ℕ) :
-    steppingStoneFst fst_neighbor α d ≤ 1 :=
-  min_le_left _ _
-
-/-- **The fixation boundary is attained**, not merely approached: once the
-linear form reaches `1` the demes are completely differentiated and stay so. -/
-theorem steppingStoneFst_eq_one_of_saturated (fst_neighbor α : ℝ) (d : ℕ)
-    (hsat : 1 ≤ fst_neighbor * (1 + α * ((d : ℝ) - 1))) :
-    steppingStoneFst fst_neighbor α d = 1 :=
-  min_eq_left hsat
-
-/-- Stepping-stone Fst at distance 1 equals the neighbor Fst, provided the
-neighbour value is itself a valid `F_ST`. -/
-theorem steppingStoneFst_at_one (fst_neighbor α : ℝ) (hle : fst_neighbor ≤ 1) :
-    steppingStoneFst fst_neighbor α 1 = fst_neighbor := by
+/-- **Stepping-stone Fst never leaves the unit interval.** The saturating body needs no
+clamp to achieve this: the denominator exceeds the numerator by `α (1 - fst_neighbor)`,
+which is nonnegative exactly when the neighbour value is itself a valid `F_ST`. The
+previous linear body returned `10000` at `fst_neighbor = 1, α = 1, d = 10000` and was
+held in range by an outer `min`; the range is now a consequence of the form. -/
+theorem steppingStoneFst_le_one (fst_neighbor α : ℝ) (d : ℕ)
+    (hfst : 0 < fst_neighbor) (hle : fst_neighbor ≤ 1) (hα : 0 ≤ α) (hd : 1 ≤ d) :
+    steppingStoneFst fst_neighbor α d ≤ 1 := by
   unfold steppingStoneFst
-  simp only [Nat.cast_one, sub_self, mul_zero, add_zero, mul_one]
-  exact min_eq_right hle
+  have hd1 : (1 : ℝ) ≤ (d : ℝ) := by exact_mod_cast hd
+  have hnum : 0 < fst_neighbor * (d : ℝ) := by nlinarith
+  have hextra : 0 ≤ α * (1 - fst_neighbor) := mul_nonneg hα (by linarith)
+  rw [div_le_one (by linarith)]
+  nlinarith
+
+/-- **The fixation boundary is approached and never attained.** This REPLACES
+`steppingStoneFst_eq_one_of_saturated`, which said the opposite, and the replacement is
+forced by the measurement rather than chosen for elegance. The linear body reached `1` at
+finite separation and the clamp then held it there, so complete differentiation was
+attainable at a finite number of steps. A saturating form cannot do that: with
+`α (1 - fst_neighbor) > 0` the value is strictly below one at every finite `d` and tends to
+one only as `d → ∞`, which is the correct behaviour of isolation by distance -- demes an
+arbitrary but finite distance apart still share ancestry. -/
+theorem steppingStoneFst_lt_one (fst_neighbor α : ℝ) (d : ℕ)
+    (hfst : 0 < fst_neighbor) (hlt : fst_neighbor < 1) (hα : 0 < α) (hd : 1 ≤ d) :
+    steppingStoneFst fst_neighbor α d < 1 := by
+  unfold steppingStoneFst
+  have hd1 : (1 : ℝ) ≤ (d : ℝ) := by exact_mod_cast hd
+  have hnum : 0 < fst_neighbor * (d : ℝ) := by nlinarith
+  have hextra : 0 < α * (1 - fst_neighbor) := mul_pos hα (by linarith)
+  rw [div_lt_one (by linarith)]
+  nlinarith
+
+/-- Stepping-stone Fst at distance 1 equals the neighbor Fst. At `α = 1` the
+characteristic scale is `(1 - fst_neighbor)/fst_neighbor` and the form reproduces its own
+anchor; `α` rescales that length, so it is the unit of distance rather than a per-step
+increment as it was under the linear body. -/
+theorem steppingStoneFst_at_one (fst_neighbor : ℝ) (hfst : 0 < fst_neighbor) :
+    steppingStoneFst fst_neighbor 1 1 = fst_neighbor := by
+  unfold steppingStoneFst
+  have hden : fst_neighbor * ((1 : ℕ) : ℝ) + 1 * (1 - fst_neighbor) = 1 := by
+    push_cast; ring
+  rw [hden, div_one]
+  push_cast; ring
 
 /-- **Stepping-stone Fst increases with geographic distance** (isolation by distance).
-    For positive neighbor Fst and positive distance scaling parameter α,
-    Fst is strictly increasing in the number of steps -- below saturation.
-    Above it both values are `1` and the increase stops, which is the correct
-    behaviour and the reason the hypothesis is needed. -/
+    Under the saturating body this needs no below-saturation hypothesis: `d / (d + K)` is
+    strictly increasing in `d` for every positive `K`, at every separation. The linear
+    body required the caller to certify it had not yet hit the clamp, and above the clamp
+    the increase stopped altogether. -/
 theorem steppingStoneFst_increases_with_distance
     (fst_neighbor α : ℝ) (d₁ d₂ : ℕ)
-    (hfst : 0 < fst_neighbor) (hα : 0 < α) (hd : d₁ < d₂)
-    (hsat : fst_neighbor * (1 + α * ((d₂ : ℝ) - 1)) ≤ 1) :
+    (hfst : 0 < fst_neighbor) (hlt : fst_neighbor < 1) (hα : 0 < α) (hd : d₁ < d₂) :
     steppingStoneFst fst_neighbor α d₁ < steppingStoneFst fst_neighbor α d₂ := by
   unfold steppingStoneFst
   have hd_real : (d₁ : ℝ) < (d₂ : ℝ) := Nat.cast_lt.mpr hd
-  have h_inner : α * ((d₁ : ℝ) - 1) < α * ((d₂ : ℝ) - 1) := by nlinarith
-  have hlin : fst_neighbor * (1 + α * ((d₁ : ℝ) - 1)) <
-      fst_neighbor * (1 + α * ((d₂ : ℝ) - 1)) := by nlinarith
-  rw [min_eq_right (le_of_lt (lt_of_lt_of_le hlin hsat)), min_eq_right hsat]
-  exact hlin
+  have hd₁ : (0 : ℝ) ≤ (d₁ : ℝ) := Nat.cast_nonneg _
+  have hK : 0 < α * (1 - fst_neighbor) := mul_pos hα (by linarith)
+  have hd₂ : (0 : ℝ) ≤ (d₂ : ℝ) := Nat.cast_nonneg _
+  have hp₁ : 0 ≤ fst_neighbor * (d₁ : ℝ) := mul_nonneg (le_of_lt hfst) hd₁
+  have hp₂ : 0 ≤ fst_neighbor * (d₂ : ℝ) := mul_nonneg (le_of_lt hfst) hd₂
+  have hden₁ : 0 < fst_neighbor * (d₁ : ℝ) + α * (1 - fst_neighbor) := by linarith
+  have hden₂ : 0 < fst_neighbor * (d₂ : ℝ) + α * (1 - fst_neighbor) := by linarith
+  rw [div_lt_div_iff₀ hden₁ hden₂]
+  nlinarith [mul_pos (mul_pos hfst hK) (sub_pos.mpr hd_real)]
 
 /-- **Nearby demes have lower Fst than distant demes.**
-    Fst(1) < Fst(d) for d > 1 under the stepping-stone model, below saturation. -/
+    Fst(1) < Fst(d) for d > 1 under the stepping-stone model, at every separation. -/
 theorem steppingStoneFst_neighbor_lt_distant
     (fst_neighbor α : ℝ) (d : ℕ)
-    (hfst : 0 < fst_neighbor) (hα : 0 < α) (hd : 1 < d)
-    (hsat : fst_neighbor * (1 + α * ((d : ℝ) - 1)) ≤ 1) :
+    (hfst : 0 < fst_neighbor) (hlt : fst_neighbor < 1) (hα : 0 < α) (hd : 1 < d) :
     steppingStoneFst fst_neighbor α 1 < steppingStoneFst fst_neighbor α d :=
-  steppingStoneFst_increases_with_distance fst_neighbor α 1 d hfst hα hd hsat
+  steppingStoneFst_increases_with_distance fst_neighbor α 1 d hfst hlt hα hd
 
 /-- **Stepping-stone Fst is nonneg for valid parameters.** -/
 theorem steppingStoneFst_nonneg (fst_neighbor α : ℝ) (d : ℕ)
-    (hfst : 0 < fst_neighbor) (hα : 0 ≤ α) (hd : 1 ≤ d) :
+    (hfst : 0 < fst_neighbor) (hle : fst_neighbor ≤ 1) (hα : 0 ≤ α) (hd : 1 ≤ d) :
     0 ≤ steppingStoneFst fst_neighbor α d := by
   unfold steppingStoneFst
-  apply le_min (by norm_num)
-  apply mul_nonneg (le_of_lt hfst)
-  have : 0 ≤ α * ((d : ℝ) - 1) := by
-    apply mul_nonneg hα
-    have : (1 : ℝ) ≤ (d : ℝ) := Nat.one_le_cast.mpr hd
-    linarith
-  linarith
+  have hd1 : (1 : ℝ) ≤ (d : ℝ) := Nat.one_le_cast.mpr hd
+  have hextra : 0 ≤ α * (1 - fst_neighbor) := mul_nonneg hα (by linarith)
+  apply div_nonneg (by nlinarith) (by nlinarith)
 
 /-! ### 4. Migration's effect on LD: gene flow homogenizes LD patterns -/
 

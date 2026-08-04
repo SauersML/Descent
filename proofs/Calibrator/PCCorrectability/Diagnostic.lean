@@ -29,6 +29,7 @@ noncomputable def pgsTestAxisBias {d : ℕ} (scale : ℝ)
     (expectedPhenotype residualTargetAxis : Fin d → ℝ) : ℝ :=
   scale * ∑ i, expectedPhenotype i * residualTargetAxis i
 
+
 /-- Controlling the single test-specific ancestry axis is necessary and
 sufficient for unbiasedness uniformly over all possible ancestry-correlated
 expected phenotypes. -/
@@ -179,6 +180,14 @@ magnitude once the study design and residual target-axis geometry are fixed.
 noncomputable def standardizedResidualPGSBias
     (expectedSNPCount Hres effectSD Φ Λ confounding : ℝ) : ℝ :=
   pgsStratificationRiskCoefficient expectedSNPCount Hres effectSD Φ Λ * confounding
+
+/-- Reference evaluation: no confounding, no standardized residual bias. -/
+theorem standardizedResidualPGSBias_at_no_confounding
+    (expectedSNPCount Hres effectSD Φ Λ : ℝ) :
+    standardizedResidualPGSBias expectedSNPCount Hres effectSD Φ Λ 0 = 0 := by
+  unfold standardizedResidualPGSBias
+  ring
+
 
 /-- Environmental confounding magnitude required to reach a specified
 standardized signal under the residual-susceptibility model. -/

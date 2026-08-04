@@ -25,6 +25,13 @@ variable {Ω ι : Type*} [Fintype ι] [DecidableEq ι]
 def chiSquareBudget (P : ExpFunctional Ω) (densityRatio : Ω → ℝ) : ℝ :=
   P (fun ω ↦ (densityRatio ω - 1) ^ 2)
 
+/-- Reference evaluation: a density ratio identically one is no shift, and spends no budget. -/
+theorem chiSquareBudget_at_no_shift (P : ExpFunctional Ω) (hzero : P (fun _ ↦ 0) = 0) :
+    chiSquareBudget P (fun _ ↦ 1) = 0 := by
+  unfold chiSquareBudget
+  simpa using hzero
+
+
 /-- Residual curvature seen along a coefficient direction. -/
 def directionalResidualCurvature (P : ExpFunctional Ω)
     (X : Ω → ι → ℝ) (residual : Ω → ℝ) (direction : ι → ℝ) : ℝ :=

@@ -341,6 +341,14 @@ noncomputable def targetRetainedEffectMass {q : ℕ}
     (model : SNPArchitecturePortabilityModel q) : ℝ :=
   ∑ j, model.targetRetainedSquaredEffect j
 
+/-- Reference evaluation: a model retaining no squared effect has no retained mass. -/
+theorem targetRetainedEffectMass_at_zero {q : ℕ} (model : SNPArchitecturePortabilityModel q)
+    (hzero : ∀ j, model.targetRetainedSquaredEffect j = 0) :
+    targetRetainedEffectMass model = 0 := by
+  unfold targetRetainedEffectMass
+  simp [hzero]
+
+
 /-- Total signal mass lost across SNPs when transporting to the target.
 
     Empirical status: UNTESTED. -/
@@ -666,6 +674,14 @@ noncomputable def architectureRadius {q n : ℕ}
     (P : MeanAbsoluteEffectCertificateProblem q n) : ℝ :=
   ∑ i, ∑ j, |P.architecture i j|
 
+/-- Reference evaluation: a zero architecture has zero radius. -/
+theorem architectureRadius_at_zero {q n : ℕ} (P : MeanAbsoluteEffectCertificateProblem q n)
+    (hzero : ∀ i j, P.architecture i j = 0) :
+    architectureRadius P = 0 := by
+  unfold architectureRadius
+  simp [hzero]
+
+
 theorem architectureRadius_nonneg {q n : ℕ}
     (P : MeanAbsoluteEffectCertificateProblem q n) :
     0 ≤ P.architectureRadius := by
@@ -705,6 +721,14 @@ noncomputable def architectureMoment {q n : ℕ}
     (P : MeanAbsoluteEffectCertificateProblem q n) (r : ℕ)
     (i : Fin (n + 1)) : ℝ :=
   ∑ j, (P.architecture i j) ^ (r + 1)
+
+/-- Reference evaluation: every moment of a zero architecture vanishes. -/
+theorem architectureMoment_at_zero {q n : ℕ} (P : MeanAbsoluteEffectCertificateProblem q n)
+    (r : ℕ) (i : Fin (n + 1)) (hzero : ∀ i' j, P.architecture i' j = 0) :
+    architectureMoment P r i = 0 := by
+  unfold architectureMoment
+  simp [hzero]
+
 
 noncomputable def mixtureExperiment {q n : ℕ}
     (P : MeanAbsoluteEffectCertificateProblem q n) :
