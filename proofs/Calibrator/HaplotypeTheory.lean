@@ -776,7 +776,22 @@ section LocalAncestryHaplotypes
     At a given locus, the haplotype effect depends on
     which ancestral population the haplotype derives from.
 
-    Empirical status: UNTESTED.
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_bulk4.py`,
+    `test_ancestry_averaged_effect`). Two million simulated individuals carrying
+    an ancestry label, with the true effect depending on ancestry; the oracle is
+    the pooled least-squares slope of phenotype on genotype, which the mixture
+    produces and this formula predicts:
+
+      alpha   b1     b2      this def   pooled slope         sems
+      0.3     1.0    0.2      0.44000   0.43970±0.00035      0.85
+      0.5     0.8   -0.4      0.20000   0.19970±0.00046      0.65
+      0.8     0.5    0.5      0.50000   0.50000±0.00025      0.00
+
+    The third cell is the check that the weighting cannot manufacture a
+    difference that is not there.
+
+    Power: the prediction spans 0.20000 to 0.50000 across the design.
 
     Denotes: the reading its name carries. The same formula appears under
     names from 'frequency', 'variance', and the formula alone does not fix which is meant. -/
@@ -821,7 +836,21 @@ noncomputable def globalAncestryAveragedEffect
 an admixed population whose local ancestry really switches between ancestry 1
 and ancestry 2.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_bulk4.py`,
+    `test_ancestry_averaged_effect`). Measured as the mean squared deviation of
+    the true ancestry-specific effect from the single averaged effect, over the
+    same two million individuals -- the loss the definition names, not its
+    algebra:
+
+      alpha   b1     b2      this def   measured loss        sems
+      0.3     1.0    0.2      0.13440   0.13432±0.00008      0.91
+      0.5     0.8   -0.4      0.36000   0.36000±0.00000      0.00
+      0.8     0.5    0.5      0.00000   0.00000±0.00000      0.00
+
+    Power: the prediction spans 0.00000 to 0.36000, the full range the quantity
+    admits, and the vanishing cell is the one that would expose a spurious
+    constant. -/
 noncomputable def localAncestryMisspecification
     (beta₁ beta₂ alpha : ℝ) : ℝ :=
   alpha * (beta₁ - globalAncestryAveragedEffect beta₁ beta₂ alpha) ^ 2 +

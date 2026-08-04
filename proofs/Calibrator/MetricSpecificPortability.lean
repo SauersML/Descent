@@ -3232,7 +3232,15 @@ parameter because it is the value the frontier saturates to as the band decay ap
 and `ldTightLinkage_le_ldBlockDetectionShare` shows it bounds the detection share at every
 decay.
 
-Empirical status: UNTESTED. -/
+Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_bulk4.py`,
+    `test_tight_linkage_share`). It claims the `rho -> 1` limit of
+    `ldBandDetectionShare`, and the limit is taken ON THE INTEGRAL rather than
+    on the closed form: quadrature of the reciprocal symbol at `rho = 0.999999`
+    agrees to 0.00 sems at every `kappa` in {0.1, 0.3, 0.6, 0.9}, predictions
+    0.00164, 0.04248, 0.29727 and 0.80164.
+
+    Power: the prediction spans 0.00164 to 0.80164, a factor of 490. -/
 noncomputable def ldTightLinkageDetectionShare (panel : LDPanelRetention) : ℝ :=
   ldPanelRetentionFraction panel -
     Real.sin (Real.pi * ldPanelRetentionFraction panel) / Real.pi
