@@ -185,6 +185,29 @@ theorem nearOptimalSet_superposition_oneHot
 
 end SimplexBoundary
 
+/-! ## Band migration is compatible with disjoint endpoints -/
+
+/-- A unit-width forbidden band whose center moves linearly across the overlap line. -/
+def migratingForbiddenBand (mix : ℝ) : Set ℝ :=
+  Set.Ioo (2 * mix) (2 * mix + 1)
+
+/-- The endpoint bands are disjoint. -/
+theorem migratingForbiddenBand_endpoints_disjoint :
+    Disjoint (migratingForbiddenBand 0) (migratingForbiddenBand 1) := by
+  rw [Set.disjoint_left]
+  intro q hleft hright
+  rcases hleft with ⟨hleftLower, hleftUpper⟩
+  rcases hright with ⟨hrightLower, hrightUpper⟩
+  norm_num at hleftLower hleftUpper hrightLower hrightUpper
+  linarith
+
+/-- Nevertheless every point of the interpolation path has a nonempty forbidden band.  Thus
+endpoint disjointness and continuity alone cannot imply gap dissolution: a band may migrate. -/
+theorem migratingForbiddenBand_nonempty (mix : ℝ) :
+    (migratingForbiddenBand mix).Nonempty := by
+  refine ⟨2 * mix + 1 / 2, ?_⟩
+  constructor <;> norm_num
+
 /-! ## Spherical covariance calibration arithmetic -/
 
 /-- Even mixed spherical covariance with a shared quadratic component and two tail terms. -/
