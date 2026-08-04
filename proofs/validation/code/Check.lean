@@ -923,7 +923,11 @@ run_cmd do
   -- JUNK
   ---------------------------------------------------------------------------
   let named := Junk.namedBranches env
-  let exemptNames := Junk.exempt.map Prod.fst
+  -- Match on the LAST name component. The list was written as `Calibrator.foo`,
+  -- but several of these definitions sit in nested namespaces -- `chain` is
+  -- `Calibrator.BundleRigidity.chain` -- so full-name matching silently failed
+  -- for them and they stayed on the open list despite being exempt.
+  let exemptNames := Junk.exempt.map (fun p ↦ p.fst.getString!)
   let mut junkScanned := 0
   let mut junkNamed := 0
   let mut junkGuarded := 0
@@ -935,7 +939,7 @@ run_cmd do
         if Junk.usesJunkOp v then
           junkScanned := junkScanned + 1
           let base := n.getString!
-          if exemptNames.contains n then
+          if exemptNames.contains base then
             junkExempt := junkExempt + 1
           else if named.any (fun t ↦ (t.splitOn base).length > 1) then
             junkNamed := junkNamed + 1
