@@ -190,7 +190,30 @@ section LOOCorrections
     PGS_LOO_i ≈ PGS_full_i - leverage_i × residual_i
     where leverage_i = X_i'(X'X)⁻¹X_i.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED as an approximation**, and the exact
+    form named (`proofs/validation/empirical/simcov/battery_bulk10.py`,
+    `test_approx_loo`). The oracle is the ACTUAL leave-one-out prediction,
+    obtained by refitting the regression without each individual in turn:
+
+      n     p     as written   true LOO    relative
+      300    8      3.91975     3.91126      0.22%
+      500   20      5.21670     5.24536      0.55%
+      200    5     -6.79229    -6.81396      0.32%
+
+    The exact leave-one-out identity for least squares is
+    `pgs_full - leverage * residual / (1 - leverage)`, and on the same runs it
+    reproduces the refits to 2e-14 -- machine precision, since it is an identity
+    rather than an approximation. This definition drops the `1 / (1 - leverage)`,
+    so its error is the leverage itself to first order, and it grows with the
+    parameter-to-sample ratio: 0.22 percent at `p/n = 0.027` and 0.55 percent at
+    0.04.
+
+    The name says `approx`, which is honest. What the docstring adds is that the
+    exact form costs one division and is available, so the approximation buys
+    nothing here.
+
+    Power: the prediction spans -6.79 to 5.22 across the design, and the error
+    tracks `p/n` rather than being constant. -/
 noncomputable def approxLOOPGS (pgs_full leverage residual : ℝ) : ℝ :=
   pgs_full - leverage * residual
 
