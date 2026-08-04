@@ -19,8 +19,19 @@ correct quantity is angular.
 
 The normed section proves the elementary half of the Douglas principle directly and turns it into
 a quantitative obstruction: every bounded correction is nearly blind on every approximate-kernel
-vector.  This is the finite, theorem-kernel-safe core behind the infinite-dimensional 0--1 law;
+vector. One approximate-kernel witness simultaneously suppresses any fixed finite dictionary;
+the whole adaptive span is controlled by its ℓ¹ coefficient budget, yielding residual
+`1 - Λε`. This is the finite, theorem-kernel-safe core behind the infinite-dimensional 0--1 law;
 the analytic extraction of weakly-null depth cascades is intentionally not smuggled in here.
+
+## Main results
+
+- `uniformCorrectionFamily_eq_factorsThrough`: every positive uniform order is the same cone.
+- `adaptiveCorrectionSet_smul`: adaptive correction is invariant under nonzero target scaling.
+- `not_hasPositiveLowerBound_iff_hasUnitApproxKernel`: exact stability/depth dichotomy.
+- `finite_postprocessors_simultaneously_small`: one deep target blinds a finite dictionary.
+- `finite_postprocessors_adaptive_span_small`: ℓ¹ control of every adaptive combination.
+- `finite_postprocessors_budgeted_adaptive_residual`: the residual lower bound `1 - Λε`.
 -/
 
 namespace Calibrator
@@ -438,8 +449,8 @@ theorem finite_postprocessors_budgeted_adaptive_residual
     _ ≤ ‖β - ∑ j, coefficients j • (T j) (A β)‖ := norm_sub_norm_le _ _
 
 /-- **Approximate-kernel correction barrier.**  Any bounded post-processing correction leaves at
-least `‖β‖ - ‖T‖ ‖Aβ‖` residual on target `β`.  This is the quantitative lower bound from which the
-uniform modulus and the infinite-dimensional 0--1 obstruction start. -/
+least `‖β‖ - ‖T‖ ‖Aβ‖` residual on target `β`.  This is the quantitative lower bound from which
+the uniform modulus and the infinite-dimensional 0--1 obstruction start. -/
 theorem correctionResidual_norm_ge
     (A : H →L[ℝ] Y) (T : Y →L[ℝ] H) (β : H) :
     ‖β‖ - ‖T‖ * ‖A β‖ ≤ ‖β - (T.comp A) β‖ := by
