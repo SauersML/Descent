@@ -477,6 +477,15 @@ theorem dampedAdjustment_zero_time (lam g : ℝ) :
 /-- Premium of the **damped** design over the environment-blind one: `e^{-2λτ}·V`. -/
 noncomputable def dampedPremium (lam τ V : ℝ) : ℝ := Real.exp (-(2 * lam * τ)) * V
 
+/-- **The damped premium is the square of the single-rate decay times the variance.** The rate is
+twice the relaxation rate, not the relaxation rate, and that factor of two is what distinguishes
+a premium on a squared quantity from one on a linear quantity. -/
+theorem dampedPremium_eq_sq (lam τ V : ℝ) :
+    dampedPremium lam τ V = Real.exp (-(lam * τ)) ^ 2 * V := by
+  unfold dampedPremium
+  rw [← Real.exp_nat_mul]
+  ring_nf
+
 /-- Cost of deploying the stale oracle rather than the damped one: `(1 - e^{-λτ})²·V`. -/
 noncomputable def myopiaPrice (lam τ V : ℝ) : ℝ :=
   (1 - Real.exp (-(lam * τ))) ^ 2 * V

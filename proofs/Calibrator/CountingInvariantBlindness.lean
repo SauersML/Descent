@@ -228,6 +228,14 @@ noncomputable def ghostGain (α n : ℝ) : ℝ := α * Real.log n
 /-- The gain the effective-unit count would predict: a power of `n`. Supplied as a value. -/
 noncomputable def countPredictedGain (α n : ℝ) : ℝ := n ^ α
 
+/-- **The counting gain is multiplicative in the tail index.** Splitting the exponent splits the
+gain into a product, which is the property that makes it a power law rather than merely a growing
+function, and which no statement about its growth relative to the logarithm carries. -/
+theorem countPredictedGain_add_exponent (α β n : ℝ) (hn : 0 < n) :
+    countPredictedGain (α + β) n = countPredictedGain α n * countPredictedGain β n := by
+  unfold countPredictedGain
+  exact Real.rpow_add hn α β
+
 /-- **The ghost gain is the logarithm of the counting gain.** That identity is the blindness: a
 diagnostic reading the log of the count sees the tail index as a slope and cannot tell a power
 law from any other, because the log has already flattened it. Separation at large `n` is shared
