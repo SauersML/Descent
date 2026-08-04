@@ -73,6 +73,14 @@ not find it.
 noncomputable def fstMutationDriftEquilibrium (θ : ℝ) : ℝ :=
   1 / (1 + θ)
 
+/-- **The mutation-drift equilibrium `Fst`, pinned.** This definition carries no theorem of its
+own. At `θ = 1` mutation and drift contribute equally and the equilibrium differentiation is one
+half, which fixes the `1 + θ` denominator against `1 / (1 + 2 * θ)` and `1 / (1 + θ) ^ 2`. -/
+theorem fstMutationDriftEquilibrium_at_unit_theta :
+    fstMutationDriftEquilibrium 1 = 1 / 2 := by
+  unfold fstMutationDriftEquilibrium
+  norm_num
+
 /-- **Per-generation heterozygosity decay** at effective size `Nₑ` and scaled mutation
 rate `θ`: drift removes a fraction `1 / (2 Nₑ)` and mutation is replenishing against it.
 Two accessors on two structures used to write this product out separately.
@@ -287,6 +295,13 @@ theorem frobeniusNormSq_pos_of_exists_ne_zero {t : ℕ}
 /-- Source/target `R²` represented from MSE and total phenotype variance. -/
 noncomputable def r2FromMSE (mse varY : ℝ) : ℝ :=
   1 - mse / varY
+
+/-- **`R²` from mean squared error, pinned.** This definition carries no theorem of its own. A
+predictor whose error variance is half the outcome variance explains half of it. -/
+theorem r2FromMSE_half_variance :
+    r2FromMSE 1 2 = 1 / 2 := by
+  unfold r2FromMSE
+  norm_num
 
 /-- Explained-variance fraction from score/outcome covariance, score variance,
 and total outcome variance. This is the exact moment-level coordinate used for

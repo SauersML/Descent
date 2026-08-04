@@ -37,12 +37,28 @@ section PortabilityDrift
 noncomputable def integratedCoalescentHazard (hazard : ℝ → ℝ) (t : ℝ) : ℝ :=
   ∫ s in (0)..t, hazard s
 
+/-- **The integrated hazard under a constant rate, pinned.** This definition carries no theorem
+of its own. A constant coalescence rate `c` accumulates hazard `c * t` by time `t`; the reference
+value that separates the integral from a body that averages rather than accumulates. -/
+theorem integratedCoalescentHazard_const (c t : ℝ) :
+    integratedCoalescentHazard (fun _ => c) t = c * t := by
+  unfold integratedCoalescentHazard
+  simp [mul_comm]
+
 /-- Probability that a pair has not yet coalesced by time `t`, from the
 integrated hazard: `S(t) = exp(-Λ(t))`.
 
     Empirical status: UNTESTED. -/
 noncomputable def coalescenceSurvivalFromHazard (hazard : ℝ → ℝ) (t : ℝ) : ℝ :=
   Real.exp (-(integratedCoalescentHazard hazard t))
+
+/-- **Survival under a constant hazard is exponential, pinned.** This definition carries no
+result of its own. A constant coalescence rate `c` leaves `exp (-c * t)` of pairs uncoalesced by
+time `t` -- the exponential waiting law that the hazard formulation is supposed to reproduce. -/
+theorem coalescenceSurvivalFromHazard_const (c t : ℝ) :
+    coalescenceSurvivalFromHazard (fun _ => c) t = Real.exp (-(c * t)) := by
+  unfold coalescenceSurvivalFromHazard
+  rw [integratedCoalescentHazard_const]
 
 /-- Probability that a pair has coalesced by time `t`, the complement of the
 survival function.
@@ -57,6 +73,14 @@ coalescent timescale.
     Empirical status: UNTESTED. -/
 noncomputable def coalescentTau (t Ne : ℝ) : ℝ :=
   t / (2 * Ne)
+
+/-- **The coalescent time unit, pinned.** `coalescentTau` carries no theorem of its own. Two `Ne`
+generations is one unit of coalescent time -- that is what the scaling means, and it is what
+separates this body from `t / Ne` and from `t / (4 * Ne)`. -/
+theorem coalescentTau_two_Ne_generations (Ne : ℝ) (hNe : Ne ≠ 0) :
+    coalescentTau (2 * Ne) Ne = 1 := by
+  unfold coalescentTau
+  field_simp
 
 /-- **`F_ST` after a clean split, in coalescent units.**
 
@@ -284,6 +308,15 @@ theorem fstFromTau_lt_coalescenceCdf (tau : ℝ) (htau : 0 < tau) :
 
 
 
+/-- **The `Fst` saturation curve's midpoint, pinned.** `fstFromTau_lt_coalescenceCdf` bounds this
+above by the coalescence CDF and is satisfied by any body below that curve, including
+`tau / (1 + 2 * tau)`. One coalescent time unit of separation gives `Fst = 1/2`: the map reaches
+its half-saturation exactly where the separation reaches the drift timescale. -/
+theorem fstFromTau_at_one_time_unit :
+    fstFromTau 1 = 1 / 2 := by
+  unfold fstFromTau
+  norm_num
+
 /-- A split with ongoing migration.
 
 **Do not add a deme-count field here.** The many-deme regime that
@@ -328,6 +361,14 @@ structure DemographicCoalescenceScalars where
   ETss : ℝ
   ETst : ℝ
 
+/-- **Hudson's estimator, pinned.** This definition carries no theorem of its own. When a pair
+drawn between populations takes twice as long to coalesce as a pair drawn within one, half the
+coalescent history is population-specific and `Fst` is one half. -/
+theorem hudsonFstFromCoalescenceTimes_double_between :
+    hudsonFstFromCoalescenceTimes 1 2 = 1 / 2 := by
+  unfold hudsonFstFromCoalescenceTimes
+  norm_num
+
 noncomputable def DemographicCoalescenceScalars.delta
     (d : DemographicCoalescenceScalars) : ℝ :=
   hudsonFstFromCoalescenceTimes d.ETss d.ETst
@@ -364,6 +405,15 @@ total rate `M`, after which both lineages are in one deme.
     Empirical status: UNTESTED. -/
 noncomputable def twoDemeIMFirstStepDiff (M ETss _ETst : ℝ) : ℝ :=
   1 / M + ETss
+
+/-- **The between-deme first step, pinned.** This definition carries no theorem of its own; the
+equilibrium theorems below are fixed-point statements, and the equilibrium of a rescaled body is
+a fixed point of the rescaled recurrence for the same reason. At `M = 1` a lineage waits one
+scaled generation to migrate before it can begin coalescing within a deme. -/
+theorem twoDemeIMFirstStepDiff_unit_migration (ETss ETst : ℝ) :
+    twoDemeIMFirstStepDiff 1 ETss ETst = 1 + ETss := by
+  unfold twoDemeIMFirstStepDiff
+  norm_num
 
 /-- **Expected within-deme coalescence time at migration-drift balance.**
 

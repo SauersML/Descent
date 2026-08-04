@@ -347,6 +347,15 @@ theorem benchmarkRatioSquared_eq_sq (fstS fstT : ℝ) :
   unfold benchmarkRatioSquared benchmarkRatio
   ring
 
+/-- **The benchmark ratio's orientation, pinned.** `benchmarkRatioSquared_eq_sq` is a
+restatement: it is true of every body by construction and in particular of the ratio taken the
+other way up. A target more differentiated than the source shrinks the benchmark; the inverted
+body returns four here instead of a quarter. -/
+theorem benchmarkRatioSquared_target_more_drifted :
+    benchmarkRatioSquared 0 (1 / 2) = 1 / 4 := by
+  unfold benchmarkRatioSquared
+  norm_num
+
 /-- What a **symmetric** design observes: the two branch lengths are equal, so only the
 diagonal of the candidate function is ever evaluated.
 

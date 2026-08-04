@@ -124,6 +124,15 @@ theorem apparentMixingTime_lt_frontierTime (s a : ℝ) (hs : 0 < s) (ha : a ≠ 
   have hpos := circulationDefect_pos s a hs ha
   linarith
 
+/-- **The apparent mixing time's scale, pinned.** The comparison with the frontier time is
+one-sided and holds for any body smaller than it, including `s / (s + a) ^ 2` and half of the
+intended value. At equal symmetric and antisymmetric parts the apparent mixing time is exactly
+half the symmetric part; the squared-sum body returns a quarter. -/
+theorem apparentMixingTime_at_equal_parts :
+    apparentMixingTime 1 1 = 1 / 2 := by
+  unfold apparentMixingTime
+  norm_num
+
 /-- The factor by which a mixing-time diagnostic understates the transfer-relevant time. -/
 noncomputable def transferTimeInflation (s a : ℝ) : ℝ := 1 + (a / s) ^ 2
 

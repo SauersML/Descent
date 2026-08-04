@@ -49,6 +49,15 @@ noncomputable def centeredSquareVarianceFromMoments
     (secondMoment fourthMoment : ℝ) : ℝ :=
   fourthMoment - secondMoment ^ 2
 
+/-- **The variance of a squared standard Gaussian, pinned.** This definition carries no theorem
+of its own. A standard Gaussian has second moment one and fourth moment three, so its square has
+variance two -- the reference value that separates this body from `fourthMoment - secondMoment`
+and from `fourthMoment ^ 2 - secondMoment ^ 2`. -/
+theorem centeredSquareVarianceFromMoments_standard_gaussian :
+    centeredSquareVarianceFromMoments 1 3 = 2 := by
+  unfold centeredSquareVarianceFromMoments
+  norm_num
+
 /-- A centered Gaussian variable of variance `Σ` has square variance `2Σ²`.  This is the
 moment identity that fixes the constant in Gaussian covariance information. -/
 theorem centeredSquareVariance_gaussian (covariance : ℝ) :
@@ -469,6 +478,14 @@ theorem twoChannelMomentPermeabilityWithPrecision
 noncomputable def twoChannelMomentNoiseDet
     (firstNoise secondNoise sharedNoise : ℝ) : ℝ :=
   firstNoise * secondNoise - sharedNoise ^ 2
+
+/-- **The two-channel noise determinant, pinned.** This definition carries no result of its own.
+The shared-noise term enters squared and subtracted, so a reference evaluation is what separates
+it from `firstNoise * secondNoise - sharedNoise` and from a body that adds the shared term. -/
+theorem twoChannelMomentNoiseDet_reference :
+    twoChannelMomentNoiseDet 2 3 1 = 5 := by
+  unfold twoChannelMomentNoiseDet
+  norm_num
 
 /-- Explicit inverse of the symmetric two-channel noise covariance
 `[[v₁,c],[c,v₂]]`, expressed through its determinant. -/

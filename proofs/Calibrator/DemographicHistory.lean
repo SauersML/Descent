@@ -424,6 +424,15 @@ theorem admixedFstExact_at_one (α fst_AB : ℝ) :
   unfold admixedFstExact admixedFst
   ring
 
+/-- **The heterozygosity correction enters as a divisor, pinned.** `admixedFstExact_at_one`
+identifies the exact form with `admixedFst` when the heterozygosity ratio is one, which
+constrains the two definitions jointly and says nothing about how the ratio enters away from
+one. Doubling the admixed heterozygosity halves the differentiation. -/
+theorem admixedFstExact_double_heterozygosity (fst_AB : ℝ) :
+    admixedFstExact 0 fst_AB 2 = fst_AB / 2 := by
+  unfold admixedFstExact
+  ring
+
 /-- **The sign of the bias is forced, not observed.** The measured
     heterozygosity ratio is below one at every admixture proportion tested, and
     whenever it is, `admixedFst` understates the true admixed `F_ST`. This is
@@ -534,6 +543,25 @@ theorem admixed_freq_diff (α p_A p_B : ℝ) :
 theorem admixedFst_from_freq_variance (α : ℝ) (var_parent pbar_term : ℝ) :
     (1 - α) ^ 2 * var_parent / pbar_term =
       admixedFst α (var_parent / pbar_term) := by
+  unfold admixedFst
+  ring
+
+/-- **No admixture, no reduction.** `admixedFst_le_exact` bounds this above and
+`admixedFst_from_freq_variance` ties it to the frequency variance, and a body carrying `α ^ 2`
+in place of `(1 - α) ^ 2` satisfies both. At `α = 0` the recipient population has received no
+ancestry from the donor and its differentiation from the donor is unchanged; the swapped body
+returns zero here. -/
+theorem admixedFst_no_admixture (fst_AB : ℝ) :
+    admixedFst 0 fst_AB = fst_AB := by
+  unfold admixedFst
+  ring
+
+/-- **The exponent on the admixture fraction, pinned.** `admixedFst_no_admixture` fixes the
+orientation and leaves the exponent free: `(1 - α) * fst` agrees with it at `α = 0`. Half
+ancestry from the donor quarters the differentiation, not halves it -- the square is what makes
+admixture cost differentiation faster than it costs ancestry. -/
+theorem admixedFst_at_half_admixture (fst_AB : ℝ) :
+    admixedFst (1 / 2) fst_AB = fst_AB / 4 := by
   unfold admixedFst
   ring
 

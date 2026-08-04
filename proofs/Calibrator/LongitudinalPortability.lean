@@ -312,6 +312,19 @@ noncomputable def ageDependentR2 (sourceSignalPeak age age_peak width : ℝ) : �
   unfold ageDependentSignalShape
   simp [sub_self, Real.exp_zero]
 
+/-- **The width really is a standard deviation.** `ageDependentSignalShape_at_peak` normalises
+the shape at its maximum and constrains nothing about how fast it falls away: every body of the
+form `exp (-(age - peak) ^ 2 / (c * width ^ 2))` agrees there. One width away from the peak the
+signal has fallen by exactly `exp (-1/2)`, which is what fixes `c = 2` and makes `width` the
+standard deviation of the age window rather than an arbitrary scale. -/
+theorem ageDependentSignalShape_one_width_out (age_peak width : ℝ) (hw : width ≠ 0) :
+    ageDependentSignalShape (age_peak + width) age_peak width = Real.exp (-(1 / 2)) := by
+  unfold ageDependentSignalShape
+  have h : age_peak + width - age_peak = width := by ring
+  rw [h]
+  congr 1
+  field_simp
+
 /-- Age-dependent R² peaks at the optimal age. -/
 theorem age_r2_peaks_at_optimal (sourceSignalPeak age_peak width : ℝ) :
     ageDependentR2 sourceSignalPeak age_peak age_peak width =
@@ -321,6 +334,16 @@ theorem age_r2_peaks_at_optimal (sourceSignalPeak age_peak width : ℝ) :
   rw [ageDependentSignalShape_at_peak]
   simp
   exact temporalR2_eq_signal_coordinate sourceSignalPeak
+
+/-- **The age-resolved `R²` at the peak, in closed form.** `age_r2_peaks_at_optimal` reduces the
+composite to `r2FromSignalVariance`, which constrains the two definitions jointly and leaves a
+shared wrong factor free. This carries the reduction through to a closed form in the peak signal
+alone: against unit noise the peak `R²` is `v / (v + 1)`. -/
+theorem ageDependentR2_at_peak (sourceSignalPeak age_peak width : ℝ) :
+    ageDependentR2 sourceSignalPeak age_peak age_peak width
+      = sourceSignalPeak / (sourceSignalPeak + 1) := by
+  rw [age_r2_peaks_at_optimal]
+  rfl
 
 /-- **Education PGS and cohort effects.**
     Education PGS trained on older cohorts (where education access
