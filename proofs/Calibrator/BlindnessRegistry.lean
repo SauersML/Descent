@@ -487,7 +487,11 @@ some rate `λ > 0` that carries the whole of the reproductive regime, and the me
 `1 / λ`. Evaluating the survival function at `x` MEANS of that law gives `exp (-x)` for
 every `λ`: the rate cancels. -/
 
-/-- Survival function of the pairwise coalescence time at rate `lam`. -/
+/-- Survival function of the pairwise coalescence time at rate `lam`.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM in itself -- it is the exponential
+    survival function, fixed by that description. What carries empirical content
+    is instance 9 above, whose measurement is recorded there. -/
 noncomputable def pairwiseCoalescentSurvival (lam t : ℝ) : ℝ := Real.exp (-(lam * t))
 
 /-- **The normalised pairwise law does not depend on the rate.**
