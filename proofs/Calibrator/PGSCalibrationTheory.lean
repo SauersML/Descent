@@ -1238,6 +1238,25 @@ noncomputable def targetIdentityCalibrationProfileAtGeneration
     (t : ℕ) : CalibrationProfile :=
   targetCalibrationProfileAtGeneration m t CalibrationLink.identity
 
+/-- **The closed form the generation-indexed target calibration profile takes**: the
+observed mean carried by the prevalence, environmental and genetic shifts, less the
+deployment intercept and the transported score mean, with the target slope.
+
+The record was written out in the law below and again in the theorem that bundles that law
+with its metric counterpart -- nine lines of it, twice, where a shift added to one copy and
+not the other typechecks. -/
+noncomputable def targetCalibrationProfileAtGenerationClosedForm
+    {p q : ℕ} (m : CrossPopulationGenerationalCalibrationModel p q)
+    (t : ℕ) (link : CalibrationLink) : CalibrationProfile :=
+  { citl :=
+      (m.baseObservedMean +
+          (m.prevalenceShiftAt t + m.environmentalObservedShiftAt t +
+            m.geneticObservedShiftAt t)) -
+        (m.baseDeploymentIntercept + m.deploymentInterceptShiftAt t +
+          sourceWeightedTagScore (m.metric.toMetricModelAt t) (m.targetTagMeanAt t))
+  , slope := calibrationSlopeFromSourceWeights (m.metric.toMetricModelAt t) Pop.target
+  , link := link }
+
 open CrossPopulationMechanisticCalibrationModel in
 /-- Exact generation-indexed target calibration-profile law on the explicit
 population-genetic state slice. -/
@@ -1245,14 +1264,8 @@ theorem targetCalibrationProfileAtGeneration_exact_mechanistic_popgen_portabilit
     {p q : ℕ} (m : CrossPopulationGenerationalCalibrationModel p q)
     (t : ℕ) (link : CalibrationLink) :
     targetCalibrationProfileAtGeneration m t link =
-      { citl :=
-          (m.baseObservedMean +
-              (m.prevalenceShiftAt t + m.environmentalObservedShiftAt t +
-                m.geneticObservedShiftAt t)) -
-            (m.baseDeploymentIntercept + m.deploymentInterceptShiftAt t +
-              sourceWeightedTagScore (m.metric.toMetricModelAt t) (m.targetTagMeanAt t))
-      , slope := calibrationSlopeFromSourceWeights (m.metric.toMetricModelAt t) Pop.target
-      , link := link } := by
+      targetCalibrationProfileAtGenerationClosedForm m t link := by
+  unfold targetCalibrationProfileAtGenerationClosedForm
   unfold targetCalibrationProfileAtGeneration
   rw [targetCalibrationProfile_exact_mechanistic_portability_law]
   simp [
@@ -1310,14 +1323,7 @@ theorem targetMetricAndCalibrationProfilesAtGeneration_exact_mechanistic_popgen_
               (predictiveCovarianceFromSourceWeights (m.metric.toMetricModelAt t) Pop.target) ^ 2 /
                 scoreVarianceFromSourceWeights (m.metric.toMetricModelAt t) Pop.target) } ∧
     targetCalibrationProfileAtGeneration m t link =
-      { citl :=
-          (m.baseObservedMean +
-              (m.prevalenceShiftAt t + m.environmentalObservedShiftAt t +
-                m.geneticObservedShiftAt t)) -
-            (m.baseDeploymentIntercept + m.deploymentInterceptShiftAt t +
-              sourceWeightedTagScore (m.metric.toMetricModelAt t) (m.targetTagMeanAt t))
-      , slope := calibrationSlopeFromSourceWeights (m.metric.toMetricModelAt t) Pop.target
-      , link := link } := by
+      targetCalibrationProfileAtGenerationClosedForm m t link := by
   constructor
   · exact targetMetricProfileAtGeneration_exact_mechanistic_popgen_portability_law m.metric t
   · exact targetCalibrationProfileAtGeneration_exact_mechanistic_popgen_portability_law m t link
