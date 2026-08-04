@@ -233,6 +233,18 @@ noncomputable def averagePhaseInteraction
     (freq_cis interaction_cis interaction_trans : ℝ) : ℝ :=
   freq_cis * interaction_cis + (1 - freq_cis) * interaction_trans
 
+/-- **A population entirely in cis carries the cis interaction.**
+
+The weights sum to one by construction, so the average is an interpolation and the two endpoints
+are what identify which. At `freq_cis = 1` the trans term drops out entirely; a body that
+weighted the two configurations by anything other than their frequencies would still be an affine
+combination and would fail here. This is also the reference the transport-bias definitions below
+are differences of, so fixing it fixes what those differences measure. -/
+theorem averagePhaseInteraction_all_cis (interaction_cis interaction_trans : ℝ) :
+    averagePhaseInteraction 1 interaction_cis interaction_trans = interaction_cis := by
+  unfold averagePhaseInteraction
+  ring
+
 /-- Structural error from using a dosage-only predictor that cannot distinguish
 cis from trans configurations. The best dosage-only predictor within a fixed
 dosage class uses the population-average interaction, leaving this residual
