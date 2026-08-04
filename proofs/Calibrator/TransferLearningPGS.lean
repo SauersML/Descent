@@ -2851,6 +2851,21 @@ theorem exactAdaptationGain_eq_coefficientGapDrop_isotropic
   rw [isotropic_targetLinearExcessRisk_eq_coefficientGapSq crossTarget noiseVar
       wAfter wStar h_opt]
 
+/-- The fine-tuned target `R²` credited with the EXACT adaptation gain: the transported
+baseline, penalised by the portability loss, and credited with the literal drop in target
+excess risk rather than a scalar parameter.
+
+Every theorem about this score wrote it out in full -- four lines of it, on top of the
+binder block they share -- so the score and its readings could drift apart in a proof that
+still typechecks.  The isotropic score below is this one at `Σ = 1`. -/
+noncomputable def fineTunedTargetR2OfExactGain {p : ℕ}
+    (source_r2 transported_r2 : ℝ) (sigmaObsTarget : Matrix (Fin p) (Fin p) ℝ)
+    (crossTarget : Fin p → ℝ) (noiseVar : ℝ)
+    (wBefore wAfter wStar : Fin p → ℝ) : ℝ :=
+  fineTunedTargetR2 source_r2
+    (transportPenalty source_r2 transported_r2)
+    (exactAdaptationGain sigmaObsTarget crossTarget noiseVar wBefore wAfter wStar)
+
 /-- The scalar fine-tuning `adaptation_gain` parameter is exactly the gain in
     target `R²` obtained by reducing literal target excess risk, once the
     baseline portability loss is instantiated by an explicit transported
@@ -2862,11 +2877,11 @@ theorem fineTunedTargetR2_eq_transportedBaseline_plus_exact_excessRisk_reduction
     (crossTarget : Fin p → ℝ)
     (noiseVar : ℝ)
     (wBefore wAfter wStar : Fin p → ℝ) :
-    fineTunedTargetR2 source_r2
-        (transportPenalty source_r2 transported_r2)
-        (exactAdaptationGain sigmaObsTarget crossTarget noiseVar wBefore wAfter wStar) =
+    fineTunedTargetR2OfExactGain source_r2 transported_r2 sigmaObsTarget
+        crossTarget noiseVar wBefore wAfter wStar =
       transported_r2 +
         exactAdaptationGain sigmaObsTarget crossTarget noiseVar wBefore wAfter wStar := by
+  unfold fineTunedTargetR2OfExactGain
   rw [fineTunedTargetR2_eq_transportedR2_plus_adaptation]
 
 /-- The exact excess-risk fine-tuning theorem is an instance of the canonical
@@ -2879,11 +2894,11 @@ theorem fineTunedTargetR2_eq_deployedTransferTargetR2_exactAdaptationGain
     (crossTarget : Fin p → ℝ)
     (noiseVar : ℝ)
     (wBefore wAfter wStar : Fin p → ℝ) :
-    fineTunedTargetR2 source_r2
-        (transportPenalty source_r2 transported_r2)
-        (exactAdaptationGain sigmaObsTarget crossTarget noiseVar wBefore wAfter wStar) =
+    fineTunedTargetR2OfExactGain source_r2 transported_r2 sigmaObsTarget
+        crossTarget noiseVar wBefore wAfter wStar =
       deployedTransferTargetR2 transported_r2
         (exactAdaptationGain sigmaObsTarget crossTarget noiseVar wBefore wAfter wStar) 0 := by
+  unfold fineTunedTargetR2OfExactGain
   simpa using fineTunedTargetR2_eq_deployedTransferTargetR2
     source_r2 transported_r2
     (exactAdaptationGain sigmaObsTarget crossTarget noiseVar wBefore wAfter wStar)
@@ -2897,10 +2912,8 @@ share.  Named once, the pair reads as two readings of one quantity, which is wha
 noncomputable def isotropicFineTunedTargetR2 {p : ℕ}
     (source_r2 transported_r2 : ℝ) (crossTarget : Fin p → ℝ) (noiseVar : ℝ)
     (wBefore wAfter wStar : Fin p → ℝ) : ℝ :=
-  fineTunedTargetR2 source_r2
-    (transportPenalty source_r2 transported_r2)
-    (exactAdaptationGain (1 : Matrix (Fin p) (Fin p) ℝ)
-      crossTarget noiseVar wBefore wAfter wStar)
+  fineTunedTargetR2OfExactGain source_r2 transported_r2
+    (1 : Matrix (Fin p) (Fin p) ℝ) crossTarget noiseVar wBefore wAfter wStar
 
 /-- In the isotropic target design, the scalar fine-tuning model is exactly the
     transported baseline plus the drop in squared effect mismatch

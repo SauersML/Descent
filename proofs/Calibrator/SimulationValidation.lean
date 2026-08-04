@@ -623,25 +623,11 @@ theorem popgenDrivenProxyGenerationalModel_generation_one_scales :
   rcases nondegenerateGenerationalPopGen_coordinates_at_one with
     ⟨h_theta, h_bigM, h_tau, h_fst, h_mut, h_mig⟩
   refine ⟨?_, ?_, ?_, ?_⟩
-  · simp [popgenDrivenProxyGenerationalModel, popgenDrivenTagScale,
-      sigmaTagTargetAt, jointTagLDKernelAt, tagAlleleFreqRetentionAt,
-      tagAlleleFreqTargetAt, alleleFreqMismatchPenalty, nondegenerateGenerationalPopGen,
-      GenerationalPopGenParameters.theta, GenerationalPopGenParameters.bigM,
-      GenerationalPopGenParameters.tauAt, GenerationalPopGenParameters.hetDecayFactor,
-      GenerationalPopGenParameters.fstTransientAt,
-      GenerationalPopGenParameters.mutationSharedRetentionAt,
-      GenerationalPopGenParameters.migrationSharedBoostAt,
-      ldCorrelationDecay, h_theta, h_bigM, h_tau, h_fst, h_mut, h_mig]
+  · generational_witness_simp popgenDrivenProxyGenerationalModel, popgenDrivenTagScale,
+      nondegenerateGenerationalPopGen, h_theta, h_bigM, h_tau, h_fst, h_mut, h_mig
     ring_nf
-  · simp [popgenDrivenProxyGenerationalModel, popgenDrivenTagScale,
-      sigmaTagTargetAt, jointTagLDKernelAt, tagAlleleFreqRetentionAt,
-      tagAlleleFreqTargetAt, alleleFreqMismatchPenalty, nondegenerateGenerationalPopGen,
-      GenerationalPopGenParameters.theta, GenerationalPopGenParameters.bigM,
-      GenerationalPopGenParameters.tauAt, GenerationalPopGenParameters.hetDecayFactor,
-      GenerationalPopGenParameters.fstTransientAt,
-      GenerationalPopGenParameters.mutationSharedRetentionAt,
-      GenerationalPopGenParameters.migrationSharedBoostAt,
-      ldCorrelationDecay, h_theta, h_bigM, h_tau, h_fst, h_mut, h_mig]
+  · generational_witness_simp popgenDrivenProxyGenerationalModel, popgenDrivenTagScale,
+      nondegenerateGenerationalPopGen, h_theta, h_bigM, h_tau, h_fst, h_mut, h_mig
     ring_nf
   · calc
       proxyTaggingTargetAt popgenDrivenProxyGenerationalModel 1 0 0
@@ -1013,58 +999,14 @@ theorem target_effect_heterogeneity_changes_generation_path_without_ld_or_af_cha
     fin_cases i
     fin_cases j
     generational_witness_simp baselineGenerationalPopGen, timeVaryingEffectGenerationalModel
-  · simp [targetSourceEffectProjectionAt, sigmaTagCausalTargetAt,
-      directCausalTargetAt, proxyTaggingTargetAt, baselineGenerationalPopGen,
-      timeVaryingEffectGenerationalModel, tagAlleleFreqRetentionAt,
-      causalAlleleFreqRetentionAt, alleleFreqMismatchPenalty,
-      GenerationalPopGenParameters.theta,
-      GenerationalPopGenParameters.bigM,
-      GenerationalPopGenParameters.tauAt,
-      GenerationalPopGenParameters.hetDecayFactor,
-      GenerationalPopGenParameters.fstTransientAt,
-      GenerationalPopGenParameters.mutationSharedRetentionAt,
-      GenerationalPopGenParameters.migrationSharedBoostAt,
-      ldCorrelationDecay, Matrix.mulVec, dotProduct, Matrix.cons_val',
-      Matrix.cons_val_fin_one]
-  · simp [targetSourceEffectProjectionAt, sigmaTagCausalTargetAt,
-      directCausalTargetAt, proxyTaggingTargetAt, baselineGenerationalPopGen,
-      timeVaryingEffectGenerationalModel, tagAlleleFreqRetentionAt,
-      causalAlleleFreqRetentionAt, alleleFreqMismatchPenalty,
-      GenerationalPopGenParameters.theta,
-      GenerationalPopGenParameters.bigM,
-      GenerationalPopGenParameters.tauAt,
-      GenerationalPopGenParameters.hetDecayFactor,
-      GenerationalPopGenParameters.fstTransientAt,
-      GenerationalPopGenParameters.mutationSharedRetentionAt,
-      GenerationalPopGenParameters.migrationSharedBoostAt,
-      ldCorrelationDecay, Matrix.mulVec, dotProduct, Matrix.cons_val',
-      Matrix.cons_val_fin_one]
-  · simp [targetEffectHeterogeneityProjectionAt, sigmaTagCausalTargetAt,
-      directCausalTargetAt, proxyTaggingTargetAt, baselineGenerationalPopGen,
-      timeVaryingEffectGenerationalModel, tagAlleleFreqRetentionAt,
-      causalAlleleFreqRetentionAt, alleleFreqMismatchPenalty,
-      GenerationalPopGenParameters.theta,
-      GenerationalPopGenParameters.bigM,
-      GenerationalPopGenParameters.tauAt,
-      GenerationalPopGenParameters.hetDecayFactor,
-      GenerationalPopGenParameters.fstTransientAt,
-      GenerationalPopGenParameters.mutationSharedRetentionAt,
-      GenerationalPopGenParameters.migrationSharedBoostAt,
-      ldCorrelationDecay, Matrix.mulVec, dotProduct, Matrix.cons_val',
-      Matrix.cons_val_fin_one]
-  · simp [targetEffectHeterogeneityProjectionAt, sigmaTagCausalTargetAt,
-      directCausalTargetAt, proxyTaggingTargetAt, baselineGenerationalPopGen,
-      timeVaryingEffectGenerationalModel, tagAlleleFreqRetentionAt,
-      causalAlleleFreqRetentionAt, alleleFreqMismatchPenalty,
-      GenerationalPopGenParameters.theta,
-      GenerationalPopGenParameters.bigM,
-      GenerationalPopGenParameters.tauAt,
-      GenerationalPopGenParameters.hetDecayFactor,
-      GenerationalPopGenParameters.fstTransientAt,
-      GenerationalPopGenParameters.mutationSharedRetentionAt,
-      GenerationalPopGenParameters.migrationSharedBoostAt,
-      ldCorrelationDecay, Matrix.mulVec, dotProduct, Matrix.cons_val',
-      Matrix.cons_val_fin_one]
+  · generational_witness_simp baselineGenerationalPopGen,
+      timeVaryingEffectGenerationalModel
+  · generational_witness_simp baselineGenerationalPopGen,
+      timeVaryingEffectGenerationalModel
+  · generational_witness_simp baselineGenerationalPopGen,
+      timeVaryingEffectGenerationalModel
+  · generational_witness_simp baselineGenerationalPopGen,
+      timeVaryingEffectGenerationalModel
   · simp [betaTargetAt, baselineGenerationalPopGen, timeVaryingEffectGenerationalModel]
   · simp [betaTargetAt, baselineGenerationalPopGen, timeVaryingEffectGenerationalModel]
     norm_num
