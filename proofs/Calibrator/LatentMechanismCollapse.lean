@@ -266,14 +266,14 @@ and that is what `head_piece_pos` and the `Tail` section below actually do. -/
 /-- The head piece is a genuine kernel: bounded below by `δ₀` times the reference
 whenever the truncated remainder is small relative to the margin. -/
 theorem head_piece_pos (ε δ₀ g gTail : ℝ)
-    (hδ : 0 < δ₀) (hε : 0 < ε) (hε1 : ε < 1)
+    (hδ : 0 < δ₀) (hε : 0 < ε)
     (hmargin : 2 * δ₀ ≤ 1 + g)
     (htail : |gTail| ≤ ε ^ 2 * δ₀)
     (hεsmall : ε + ε ^ 2 * δ₀ ≤ δ₀) :
     δ₀ * (1 - ε) ≤ 1 - ε + g - gTail := by
   have h1 : -(ε ^ 2 * δ₀) ≤ gTail := (abs_le.mp htail).1
   have h2 : gTail ≤ ε ^ 2 * δ₀ := (abs_le.mp htail).2
-  nlinarith [hmargin, hεsmall, hδ, hε, hε1]
+  nlinarith [hmargin, hεsmall, hδ, hε]
 
 /-!
 ## 3b. Why the smooth category does not prevent the collapse
