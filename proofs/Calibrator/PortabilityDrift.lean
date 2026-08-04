@@ -5282,20 +5282,26 @@ This is data, not a packaged claim that an approximation is adequate.  Any biolo
 use of the infinite-island approximation must compare this explicit quantity with its
 own scientifically justified tolerance. -/
 noncomputable def finiteIslandCorrection (demes : ℝ) : ℝ :=
-  (demes / (demes - 1)) ^ 2
+  demes / (demes - 1)
 
 /-- **The finite-island correction's junk branch, named.** At a single deme the correction
 diverges and Lean returns `0`. Consumers must require `demes ≠ 1`. -/
 theorem finiteIslandCorrection_one_deme_is_junk : finiteIslandCorrection 1 = 0 := by
   unfold finiteIslandCorrection; norm_num
 
-/-- With two demes the finite-island correction is exactly four. -/
-@[simp] theorem finiteIslandCorrection_two : finiteIslandCorrection 2 = 4 := by
+/-- With two demes the finite-island correction is exactly two.
+
+    It was stated as four while the body carried a square. Measurement put the
+    exponent at one, not two: at `4 Ne m = 4.0` and two demes the simulated
+    `F_ST` is `0.09743 ± 0.00432`, against `0.11111` for this correction and
+    `0.05882` for the square, which is 8.9 sems low. See
+    `PopulationGeneticsFoundations.islandDemeCorrection`. -/
+@[simp] theorem finiteIslandCorrection_two : finiteIslandCorrection 2 = 2 := by
   norm_num [finiteIslandCorrection]
 
-/-- Consequently its excess over the infinite-island value is exactly three. -/
+/-- Consequently its excess over the infinite-island value is exactly one. -/
 @[simp] theorem finiteIslandCorrection_two_excess :
-    finiteIslandCorrection 2 - 1 = 3 := by
+    finiteIslandCorrection 2 - 1 = 1 := by
   rw [finiteIslandCorrection_two]
   norm_num
 
