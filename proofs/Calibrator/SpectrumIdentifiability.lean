@@ -309,6 +309,54 @@ theorem cauchyConditioningProfile_eq_integral_closedForm
   unfold cauchyConditioningProfile
   ring
 
+/-- **Derivative cancellation.**  Every algebraic derivative term cancels; only the
+inverse-trigonometric and logarithmic terms remain. -/
+theorem hasDerivAt_cauchyConditioningProfile
+    (θ : ℝ) (hθ0 : 0 < θ) (hθ1 : θ < 1) :
+    HasDerivAt cauchyConditioningProfile
+      (2 * (2 * Real.arctan (1 / θ) - Real.log ((1 + θ) / (1 - θ)))) θ := by
+  have hθ : θ ≠ 0 := ne_of_gt hθ0
+  have hm : 1 - θ ≠ 0 := by linarith
+  have hp : 1 + θ ≠ 0 := by linarith
+  have hAinner : HasDerivAt (fun x : ℝ ↦ 1 + x ^ 2) (2 * θ) θ := by
+    convert (hasDerivAt_const θ (1 : ℝ)).add ((hasDerivAt_id θ).pow 2) using 1
+    all_goals simp [id_eq]
+  have hA := (Real.hasDerivAt_log (by positivity : 1 + θ ^ 2 ≠ 0)).comp θ hAinner
+  have hminus : HasDerivAt (fun x : ℝ ↦ 1 - x) (-1) θ := by
+    convert (hasDerivAt_const θ (1 : ℝ)).sub (hasDerivAt_id θ) using 1
+    all_goals simp
+  have hplus : HasDerivAt (fun x : ℝ ↦ 1 + x) 1 θ := by
+    convert (hasDerivAt_const θ (1 : ℝ)).add (hasDerivAt_id θ) using 1
+    all_goals simp
+  have hlogminus := (Real.hasDerivAt_log hm).comp θ hminus
+  have hlogplus := (Real.hasDerivAt_log hp).comp θ hplus
+  have hB := ((hasDerivAt_id θ).sub_const 1).mul hlogminus
+  have hC := hplus.mul hlogplus
+  have hinv := (hasDerivAt_id θ).inv hθ
+  have hinv' : HasDerivAt (fun x : ℝ ↦ 1 / x) (-1 / θ ^ 2) θ := by
+    convert hinv using 1
+    funext x
+    simp [one_div, Pi.inv_apply]
+  have hatan := (Real.hasDerivAt_arctan (1 / θ)).comp θ hinv'
+  have hD := ((hasDerivAt_id θ).mul hatan).const_mul 2
+  have htotal := ((hA.add hB).sub hC).add hD |>.const_mul 2
+  convert htotal using 1
+  · funext x
+    simp [cauchyConditioningProfile, Function.comp_apply, id_eq]
+    ring
+  · simp only [Function.comp_apply, id_eq]
+    rw [Real.log_div hp hm]
+    field_simp
+    ring
+
+/-- Vanishing of the certified derivative is exactly the two-line transcendental equation. -/
+theorem cauchyConditioningProfile_derivative_zero_iff_stationary
+    (θ : ℝ) :
+    2 * (2 * Real.arctan (1 / θ) - Real.log ((1 + θ) / (1 - θ))) = 0 ↔
+      CauchyConditioningStationary θ := by
+  unfold CauchyConditioningStationary
+  constructor <;> intro h <;> linarith
+
 /-- **Stationary-point cancellation.**  At a solution of
 `arctan (1 / θ) = artanh θ`, the middle terms cancel and the conditioning exponent is one
 logarithmic ratio. -/
