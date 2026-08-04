@@ -950,14 +950,15 @@ section MomentBodyEntropy
     comparison reduces to a comparison of exponents. -/
 noncomputable def logCoveringAtExponent (t e : ℝ) : ℝ := t ^ e
 
-/-- **logCoveringAtExponent pinned at a reference point.** No theorem in the corpus evaluated
-this definition, so every body agreeing with it in sign and monotonicity was indistinguishable
-from it. At all arguments equal to `1 / 2` it is `6369051672525773 / 9007199254740992`, which
-fixes the coefficients a one-sided bound or an invariance leaves free. -/
-theorem logCoveringAtExponent_at_reference_point :
-    logCoveringAtExponent 1 / 2 1 / 2 = 6369051672525773 / 9007199254740992 := by
+/-- **logCoveringAtExponent pinned at unit exponent.** No theorem in the corpus
+evaluated this definition. A reference point with a fractional exponent is not
+available to `norm_num` -- `(1/2) ^ (1/2)` is irrational -- so the pin is at
+exponent one, where `Real.rpow_one` gives the base back and fixes that the second
+argument is an exponent rather than a factor. -/
+theorem logCoveringAtExponent_at_unit_exponent (t : ℝ) (ht : 0 < t) :
+    logCoveringAtExponent t 1 = t := by
   unfold logCoveringAtExponent
-  norm_num
+  exact Real.rpow_one t
 
 /-- **Strictly fewer distinguishable architectures, at every resolution finer than `M`.**
 

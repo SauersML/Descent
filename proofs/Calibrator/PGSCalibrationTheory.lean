@@ -2596,91 +2596,13 @@ theorem abs_treatmentMargin_error_le_componentwise_calibration_bound
               (predictedPath.treatmentHarm t - truePath.treatmentHarm t)| ≤
               εEvent t * benefitBound t +
                 eventBound t * εBenefit t + εHarm t := by
-          have h_split2 :
-              |(predictedPath.eventProb t - truePath.eventProb t) *
-                  truePath.treatmentBenefit t +
-                predictedPath.eventProb t *
-                  (predictedPath.treatmentBenefit t -
-                    truePath.treatmentBenefit t)| ≤
-                |(predictedPath.eventProb t - truePath.eventProb t) *
-                    truePath.treatmentBenefit t| +
-                  |predictedPath.eventProb t *
-                    (predictedPath.treatmentBenefit t -
-                      truePath.treatmentBenefit t)| :=
-            abs_add_le _ _
-          calc
-            |(predictedPath.eventProb t - truePath.eventProb t) *
-                truePath.treatmentBenefit t +
-              predictedPath.eventProb t *
-                (predictedPath.treatmentBenefit t -
-                  truePath.treatmentBenefit t) -
-              (predictedPath.treatmentHarm t - truePath.treatmentHarm t)| ≤
-                |(predictedPath.eventProb t - truePath.eventProb t) *
-                    truePath.treatmentBenefit t| +
-                  |predictedPath.eventProb t *
-                      (predictedPath.treatmentBenefit t -
-                        truePath.treatmentBenefit t)| +
-                  |truePath.treatmentHarm t - predictedPath.treatmentHarm t| := by
-                    calc
-                      |(predictedPath.eventProb t - truePath.eventProb t) *
-                          truePath.treatmentBenefit t +
-                        predictedPath.eventProb t *
-                          (predictedPath.treatmentBenefit t -
-                            truePath.treatmentBenefit t) -
-                        (predictedPath.treatmentHarm t - truePath.treatmentHarm t)| =
-                          |((predictedPath.eventProb t - truePath.eventProb t) *
-                              truePath.treatmentBenefit t +
-                            predictedPath.eventProb t *
-                              (predictedPath.treatmentBenefit t -
-                                truePath.treatmentBenefit t)) +
-                            (-(predictedPath.treatmentHarm t -
-                              truePath.treatmentHarm t))| := by ring_nf
-                      _ ≤
-                          |(predictedPath.eventProb t - truePath.eventProb t) *
-                              truePath.treatmentBenefit t +
-                            predictedPath.eventProb t *
-                              (predictedPath.treatmentBenefit t -
-                                truePath.treatmentBenefit t)| +
-                          |truePath.treatmentHarm t -
-                              predictedPath.treatmentHarm t| := by
-                            simpa [abs_neg, sub_eq_add_neg, add_comm, add_left_comm,
-                              add_assoc] using
-                              (abs_add_le
-                                ((predictedPath.eventProb t - truePath.eventProb t) *
-                                  truePath.treatmentBenefit t +
-                                  predictedPath.eventProb t *
-                                    (predictedPath.treatmentBenefit t -
-                                      truePath.treatmentBenefit t))
-                                (-(predictedPath.treatmentHarm t -
-                                  truePath.treatmentHarm t)))
-                      _ ≤
-                          (|(predictedPath.eventProb t - truePath.eventProb t) *
-                              truePath.treatmentBenefit t| +
-                            |predictedPath.eventProb t *
-                                (predictedPath.treatmentBenefit t -
-                                  truePath.treatmentBenefit t)|) +
-                          |truePath.treatmentHarm t - predictedPath.treatmentHarm t| := by
-                            linarith
-            _ = |predictedPath.eventProb t - truePath.eventProb t| *
-                  |truePath.treatmentBenefit t| +
-                |predictedPath.eventProb t| *
-                  |predictedPath.treatmentBenefit t -
-                    truePath.treatmentBenefit t| +
-                |predictedPath.treatmentHarm t - truePath.treatmentHarm t| := by
-                  rw [abs_mul, abs_mul]
-                  have hharm :
-                      |truePath.treatmentHarm t - predictedPath.treatmentHarm t| =
-                        |predictedPath.treatmentHarm t - truePath.treatmentHarm t| :=
-                    abs_sub_comm _ _
-                  simp [hharm]
-            _ ≤ εEvent t * benefitBound t +
-                eventBound t * εBenefit t + εHarm t := by
-                  have h_term2a' :
-                      |truePath.eventProb t - predictedPath.eventProb t| *
-                          |truePath.treatmentBenefit t| ≤
-                        εEvent t * benefitBound t := by
-                    simpa [abs_sub_comm] using h_term2a
-                  linarith [h_term2a', h_term2b, h_harm_err t]
+          have hsplit := abs_two_products_sub_le
+            (predictedPath.eventProb t - truePath.eventProb t)
+            (truePath.treatmentBenefit t)
+            (predictedPath.eventProb t)
+            (predictedPath.treatmentBenefit t - truePath.treatmentBenefit t)
+            (predictedPath.treatmentHarm t - truePath.treatmentHarm t)
+          linarith [hsplit, h_term2a, h_term2b, h_harm_err t]
         have h_term2 :
             |predictedPath.followupWeight t| *
                 |(predictedPath.eventProb t - truePath.eventProb t) *

@@ -1369,45 +1369,11 @@ theorem drift_degrades_signalToNoise
     mul_lt_mul_of_pos_right hnum hInv
   simpa [div_eq_mul_inv, mul_comm, mul_left_comm, mul_assoc] using hscaled
 
-/-- Drift monotonically degrades present-day `R²` when `V_A, V_E > 0` and `fst < 1`. -/
-theorem drift_degrades_R2
-    (V_A V_E fstS fstT : ℝ)
-    (hVA : 0 < V_A) (hVE : 0 < V_E)
-    (hfst : fstS < fstT)
-    (hfstT_le_one : fstT ≤ 1) :
-    presentDayR2 V_A V_E fstT < presentDayR2 V_A V_E fstS := by
-  unfold presentDayR2 r2FromSignalVariance presentDayPGSVariance pgsVarianceFromHet
-  have h_mono : ∀ (x y : ℝ), 0 ≤ x → x < y → x / (x + V_E) < y / (y + V_E) := by
-    intro x y hx hxy
-    have hxE : 0 < x + V_E := by linarith
-    have hyE : 0 < y + V_E := by linarith [hx, hxy]
-    have hxyE : x + V_E < y + V_E := by linarith
-    have hInv : 1 / (y + V_E) < 1 / (x + V_E) := by
-      rw [one_div_lt_one_div hyE hxE]
-      exact hxyE
-    have hsub : 1 - V_E / (x + V_E) < 1 - V_E / (y + V_E) := by
-      have hmul := mul_lt_mul_of_pos_left hInv hVE
-      have hfrac : V_E / (y + V_E) < V_E / (x + V_E) := by
-        simpa [div_eq_mul_inv, mul_comm, mul_left_comm, mul_assoc] using hmul
-      nlinarith [hfrac]
-    have hxne : x + V_E ≠ 0 := by linarith
-    have hyne : y + V_E ≠ 0 := by linarith
-    have hxrepr : x / (x + V_E) = 1 - V_E / (x + V_E) := by
-      field_simp [hxne]
-      ring
-    have hyrepr : y / (y + V_E) = 1 - V_E / (y + V_E) := by
-      field_simp [hyne]
-      ring
-    simpa [hxrepr, hyrepr] using hsub
-  have hT_nonneg : 0 ≤ V_A * (1 - fstT) := by
-    have : 0 ≤ 1 - fstT := by linarith
-    exact mul_nonneg (le_of_lt hVA) this
-  have h_lt : V_A * (1 - fstT) < V_A * (1 - fstS) := by
-    nlinarith [mul_lt_mul_of_pos_right hfst hVA]
-  exact h_mono (V_A * (1 - fstT)) (V_A * (1 - fstS)) hT_nonneg h_lt
+/-- The analytic core of monotonicity for explained-variance ratios.
 
-/-- For fixed `V_E > 0`, `v ↦ v / (v + V_E)` is strictly increasing on nonnegative variances. -/
-theorem expectedR2_strictMono_nonneg
+This private lemma is shared by the biological drift theorem and the public monotonicity
+API below, so the denominator argument has a single proof. -/
+private theorem r2FromSignalVariance_strictMono_nonneg
     (V_E x y : ℝ)
     (hVE : 0 < V_E) (hx : 0 ≤ x) (hxy : x < y) :
     r2FromSignalVariance x V_E < r2FromSignalVariance y V_E := by
@@ -1432,6 +1398,29 @@ theorem expectedR2_strictMono_nonneg
     field_simp [hyne]
     ring
   simpa [hxrepr, hyrepr] using hsub
+
+/-- Drift monotonically degrades present-day `R²` when `V_A, V_E > 0` and `fst < 1`. -/
+theorem drift_degrades_R2
+    (V_A V_E fstS fstT : ℝ)
+    (hVA : 0 < V_A) (hVE : 0 < V_E)
+    (hfst : fstS < fstT)
+    (hfstT_le_one : fstT ≤ 1) :
+    presentDayR2 V_A V_E fstT < presentDayR2 V_A V_E fstS := by
+  unfold presentDayR2 presentDayPGSVariance pgsVarianceFromHet
+  have hT_nonneg : 0 ≤ V_A * (1 - fstT) := by
+    have : 0 ≤ 1 - fstT := by linarith
+    exact mul_nonneg (le_of_lt hVA) this
+  have h_lt : V_A * (1 - fstT) < V_A * (1 - fstS) := by
+    nlinarith [mul_lt_mul_of_pos_right hfst hVA]
+  exact r2FromSignalVariance_strictMono_nonneg V_E
+    (V_A * (1 - fstT)) (V_A * (1 - fstS)) hVE hT_nonneg h_lt
+
+/-- For fixed `V_E > 0`, `v ↦ v / (v + V_E)` is strictly increasing on nonnegative variances. -/
+theorem expectedR2_strictMono_nonneg
+    (V_E x y : ℝ)
+    (hVE : 0 < V_E) (hx : 0 ≤ x) (hxy : x < y) :
+    r2FromSignalVariance x V_E < r2FromSignalVariance y V_E := by
+  exact r2FromSignalVariance_strictMono_nonneg V_E x y hVE hx hxy
 
 /-- Drift strictly degrades the exact **equal-variance Gaussian** AUC whenever
 signal variance is positive and target drift exceeds source drift.
@@ -1708,29 +1697,23 @@ def witnessCross : Pop → Fin 2 → ℝ :=
 noncomputable def witnessW_opt : Pop → Fin 2 → ℝ :=
   Pop.pair ![0.8, 0.0] ![76 / 99, 32 / 99]
 
+/-- Each population's declared witness weight solves its own normal equations. -/
+private theorem witnessSigmaObs_mulVec_witnessW_opt (P : Pop) :
+    (witnessSigmaObs P).mulVec (witnessW_opt P) = witnessCross P := by
+  cases P <;>
+    ext i <;>
+      fin_cases i <;>
+        norm_num [witnessW_opt, witnessSigmaObs, witnessCross, Matrix.mulVec,
+          Matrix.cons_val', Matrix.cons_val_fin_one, dotProduct, Pop.pair]
+
 /-- A concrete proof that ERM mismatch occurs under LD shift, without relying on
     the abstract `hConflict` hypothesis, using dense 2x2 witnesses. -/
 theorem source_target_erm_differ_dense_witness_proved :
     (witnessSigmaObs Pop.source).mulVec (witnessW_opt Pop.source) = (witnessCross Pop.source) ∧
     (witnessSigmaObs Pop.target).mulVec (witnessW_opt Pop.target) = (witnessCross Pop.target) ∧
     (witnessW_opt Pop.source) ≠ (witnessW_opt Pop.target) := by
-  refine ⟨?_, ?_, ?_⟩
-  · ext i
-    fin_cases i
-    · simp [witnessW_opt, witnessSigmaObs, witnessCross, Matrix.mulVec, Matrix.cons_val',
-      Matrix.cons_val_fin_one, dotProduct, Pop.pair]
-      norm_num
-    · simp [witnessW_opt, witnessSigmaObs, witnessCross, Matrix.mulVec, Matrix.cons_val',
-      Matrix.cons_val_fin_one, dotProduct, Pop.pair]
-      norm_num
-  · ext i
-    fin_cases i
-    · simp [witnessW_opt, witnessSigmaObs, witnessCross, Matrix.mulVec, Matrix.cons_val',
-      Matrix.cons_val_fin_one, dotProduct, Pop.pair]
-      norm_num
-    · simp [witnessW_opt, witnessSigmaObs, witnessCross, Matrix.mulVec, Matrix.cons_val',
-      Matrix.cons_val_fin_one, dotProduct, Pop.pair]
-      norm_num
+  refine ⟨witnessSigmaObs_mulVec_witnessW_opt Pop.source,
+    witnessSigmaObs_mulVec_witnessW_opt Pop.target, ?_⟩
   · intro heq
     have h : (witnessW_opt Pop.source) 0 = (witnessW_opt Pop.target) 0 := congrFun heq 0
     revert h
