@@ -774,7 +774,7 @@ noncomputable def worstIndexError (upper lower report : ℝ) : ℝ :=
   max |upper - report| |lower - report|
 
 /-- **Every report pays at least half the width.** -/
-theorem worstIndexError_ge_half_width (upper lower report : ℝ) (hwidth : lower ≤ upper) :
+theorem worstIndexError_ge_half_width (upper lower report : ℝ) :
     (upper - lower) / 2 ≤ worstIndexError upper lower report := by
   have hleft : |upper - report| ≤ worstIndexError upper lower report := le_max_left _ _
   have hright : |lower - report| ≤ worstIndexError upper lower report := le_max_right _ _
@@ -891,6 +891,16 @@ noncomputable def gaugeAlignedPredictor (s : Bool) (_x : Unit) : ℝ :=
 Empirical status: NOT AN EMPIRICAL CLAIM -- this is a fixed finite recalibration. -/
 noncomputable def gaugeCrossedPredictor (_s : Bool) (x : Unit) : ℝ :=
   balancedBinaryWeight x
+
+/-- The aligned predictor is exactly the indicator of the persistent stratum. -/
+@[simp] theorem gaugeAlignedPredictor_apply (s : Bool) (x : Unit) :
+    gaugeAlignedPredictor s x = if s then 1 else 0 := by
+  cases s <;> norm_num [gaugeAlignedPredictor, binarySecondAnnotation]
+
+/-- The crossed predictor is the pooled one-half report in every stratum. -/
+@[simp] theorem gaugeCrossedPredictor_apply (s : Bool) (x : Unit) :
+    gaugeCrossedPredictor s x = 1 / 2 := by
+  norm_num [gaugeCrossedPredictor, balancedBinaryWeight]
 
 /-- The aligned recalibration is stratum-calibrated for the aligned field. -/
 theorem isStratumCalibrated_gaugeAligned :
@@ -1359,7 +1369,7 @@ theorem card_sq_le_sum_mul_sum_inv (n : Stratum → ℝ) (hpos : ∀ s, 0 < n s)
       _ = (∑ s, 1 / n s) - (∑ s : Stratum, 2 * lam) + (∑ s, lam ^ 2 * n s) := by
             rw [Finset.sum_add_distrib, Finset.sum_sub_distrib]
       _ = (∑ s, 1 / n s) - 2 * lam * (Fintype.card Stratum : ℝ) + lam ^ 2 * (∑ s, n s) := by
-            rw [Finset.sum_const, Finset.card_univ, nsmul_eq_mul, ← Finset.mul_sum]
+            simp only [Finset.sum_const, Finset.card_univ, Finset.mul_sum]
             ring
   have hlamval : lam * (∑ s, n s) = (Fintype.card Stratum : ℝ) := by
     rw [hlam]
@@ -1380,7 +1390,7 @@ theorem effectiveStratumCount_ge_card (n : Stratum → ℝ) (hpos : ∀ s, 0 < n
           (Fintype.card Stratum : ℝ) =
         (((∑ s, n s) * ∑ s, 1 / n s) - (Fintype.card Stratum : ℝ) ^ 2) /
           (Fintype.card Stratum : ℝ) := by
-    field_simp
+    field_simp [hne]
   have hnonneg :
       0 ≤ ((∑ s, n s) * ∑ s, 1 / n s) / (Fintype.card Stratum : ℝ) -
         (Fintype.card Stratum : ℝ) := by
