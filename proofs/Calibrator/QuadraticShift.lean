@@ -410,16 +410,24 @@ theorem positiveSemidefiniteFamily_one {κ : Type*} :
     · intro h
       simp [h]
 
+section ActiveEnvironmentPool
+
+/-! The four laws below are stated for one nonnegatively weighted panel of
+positive-semidefinite environment covariances at one shift.  That signature was written out
+four times; here it is section context, and each theorem states only its own conclusion. -/
+
+variable {κ : Type*} [Fintype κ]
+  (weight : κ → ℝ) (covariance : κ → Matrix ι ι ℝ)
+  (hweight : ∀ environment, 0 ≤ weight environment)
+  (hpsd : PositiveSemidefiniteFamily covariance)
+  (shift : ι → ℝ)
+
 omit [DecidableEq ι] in
+include hweight hpsd in
 /-- **Active-environment energy law.** A nonnegatively weighted covariance panel assigns
 strictly positive energy to a shift exactly when at least one active environment does. This is
 the risk-valued counterpart of the active-kernel intersection theorem below. -/
-theorem finiteEnvironmentCovariancePool_energy_pos_iff_exists_active
-    {κ : Type*} [Fintype κ]
-    (weight : κ → ℝ) (covariance : κ → Matrix ι ι ℝ)
-    (hweight : ∀ environment, 0 ≤ weight environment)
-    (hpsd : PositiveSemidefiniteFamily covariance)
-    (shift : ι → ℝ) :
+theorem finiteEnvironmentCovariancePool_energy_pos_iff_exists_active :
     0 < dot shift ((finiteEnvironmentCovariancePool weight covariance).mulVec shift) ↔
       ∃ environment, 0 < weight environment ∧
         0 < dot shift ((covariance environment).mulVec shift) := by
@@ -452,29 +460,21 @@ theorem finiteEnvironmentCovariancePool_energy_pos_iff_exists_active
       ⟨environment, Finset.mem_univ environment, mul_pos hweightPos henergyPos⟩
 
 omit [DecidableEq ι] in
+include hweight hpsd in
 /-- A nonnegatively weighted pool of positive-semidefinite covariance energies remains
 nonnegative. -/
-theorem finiteEnvironmentCovariancePool_energy_nonneg
-    {κ : Type*} [Fintype κ]
-    (weight : κ → ℝ) (covariance : κ → Matrix ι ι ℝ)
-    (hweight : ∀ environment, 0 ≤ weight environment)
-    (hpsd : PositiveSemidefiniteFamily covariance)
-    (shift : ι → ℝ) :
+theorem finiteEnvironmentCovariancePool_energy_nonneg :
     0 ≤ dot shift ((finiteEnvironmentCovariancePool weight covariance).mulVec shift) := by
   rw [finiteEnvironmentCovariancePool_energy]
   exact Finset.sum_nonneg fun environment _ ↦
     mul_nonneg (hweight environment) (hpsd.energy_nonneg environment shift)
 
 omit [DecidableEq ι] in
+include hweight hpsd in
 /-- **Exact active-environment zero-risk law.** Pooled prediction risk vanishes precisely when
 every positively weighted environment assigns zero risk to the same shift. Zero-weight cohorts
 are absent from the statistical experiment and impose no condition. -/
-theorem finiteEnvironmentCovariancePool_energy_eq_zero_iff_active
-    {κ : Type*} [Fintype κ]
-    (weight : κ → ℝ) (covariance : κ → Matrix ι ι ℝ)
-    (hweight : ∀ environment, 0 ≤ weight environment)
-    (hpsd : PositiveSemidefiniteFamily covariance)
-    (shift : ι → ℝ) :
+theorem finiteEnvironmentCovariancePool_energy_eq_zero_iff_active :
     dot shift ((finiteEnvironmentCovariancePool weight covariance).mulVec shift) = 0 ↔
       ∀ environment, 0 < weight environment →
         dot shift ((covariance environment).mulVec shift) = 0 := by
@@ -499,15 +499,11 @@ theorem finiteEnvironmentCovariancePool_energy_eq_zero_iff_active
     · rw [hzero environment hweightPositive, mul_zero]
 
 omit [DecidableEq ι] in
+include hweight hpsd in
 /-- **Active-environment kernel law.** With merely nonnegative sampling weights, the pooled
 kernel is the intersection of the kernels of exactly those environments assigned positive
 weight. Zero-weight environments contribute neither information nor constraints. -/
-theorem finiteEnvironmentCovariancePool_mulVec_eq_zero_iff_active
-    {κ : Type*} [Fintype κ]
-    (weight : κ → ℝ) (covariance : κ → Matrix ι ι ℝ)
-    (hweight : ∀ environment, 0 ≤ weight environment)
-    (hpsd : PositiveSemidefiniteFamily covariance)
-    (shift : ι → ℝ) :
+theorem finiteEnvironmentCovariancePool_mulVec_eq_zero_iff_active :
     (finiteEnvironmentCovariancePool weight covariance).mulVec shift = 0 ↔
       ∀ environment, 0 < weight environment →
         (covariance environment).mulVec shift = 0 := by
@@ -532,6 +528,8 @@ theorem finiteEnvironmentCovariancePool_mulVec_eq_zero_iff_active
       simp
     · rw [hkernel environment hweightPos]
       simp
+
+end ActiveEnvironmentPool
 
 omit [DecidableEq ι] in
 /-- **Finite-panel kernel-intersection law.** For any finite collection of PSD covariance

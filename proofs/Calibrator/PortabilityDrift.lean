@@ -568,7 +568,24 @@ form extends to the boundary: at `M = 0` it takes the value `1`, complete
 differentiation under total isolation, which
 `twoDemeIMEquilibriumDelta_of_no_migration` records.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_bulk12.py`,
+    `test_two_deme_im_delta`). Read through coalescence times this is
+    `1 - E[T_within]/E[T_between]` for two demes, which needs no estimator
+    convention. 30 replicates of 4 Mb, recombining, `Ne = 1000`:
+
+      M       this def   measured             sems
+       1.0     0.33333   0.33444±0.01124      0.10
+       4.0     0.11111   0.11029±0.00513      0.16
+      10.0     0.04762   0.04233±0.00260      2.03
+
+    The `2` in the denominator is the deme-count factor that this branch
+    measured and installed as `PopulationGeneticsFoundations.islandDemeCorrection`,
+    whose value at two demes is exactly 2. So this is a SECOND and independent
+    confirmation of that correction, on a different design and a different
+    estimator from the one that established it.
+
+    Power: the prediction spans 0.04762 to 0.33333, a factor of seven. -/
 noncomputable def twoDemeIMEquilibriumDelta (M : ℝ) : ℝ :=
   1 / (2 * M + 1)
 
@@ -1798,6 +1815,14 @@ noncomputable def targetLinearRisk {p : ℕ}
     (noiseVar : ℝ)
     (w : Fin p → ℝ) : ℝ :=
   noiseVar + dotProduct w (sigmaObsTarget.mulVec w) - 2 * dotProduct w crossTarget
+
+/-- Reference evaluation: the zero predictor carries exactly the noise variance. -/
+theorem targetLinearRisk_at_reference_point {p : ℕ}
+    (sigmaObsTarget : Matrix (Fin p) (Fin p) ℝ) (crossTarget : Fin p → ℝ) (noiseVar : ℝ) :
+    targetLinearRisk sigmaObsTarget crossTarget noiseVar 0 = noiseVar := by
+  unfold targetLinearRisk
+  simp
+
 
 /-- Dense covariance witness in each population, for non-degenerate ERM-transport tests.
 
@@ -3188,6 +3213,21 @@ abbrev novelUntaggablePhenotypeVarianceAt : ℕ → ℝ :=
 
 /-- Target prevalence, per generation. -/
 abbrev targetPrevalenceAt : ℕ → ℝ := m.outcome.targetPrevalenceAt
+
+/-! The accessors, as `simp` lemmas: a proof that evaluates a model literal has to get from
+the old field name to the nested one, and `abbrev` alone does not carry `simp` across. -/
+
+@[simp] theorem sourceOutcomeVariance_eq :
+    m.sourceOutcomeVariance = m.outcome.sourceOutcomeVariance := rfl
+
+@[simp] theorem targetOutcomeVarianceAt_eq :
+    m.targetOutcomeVarianceAt = m.outcome.targetOutcomeVarianceAt := rfl
+
+@[simp] theorem novelUntaggablePhenotypeVarianceAt_eq :
+    m.novelUntaggablePhenotypeVarianceAt = m.outcome.novelUntaggablePhenotypeVarianceAt := rfl
+
+@[simp] theorem targetPrevalenceAt_eq :
+    m.targetPrevalenceAt = m.outcome.targetPrevalenceAt := rfl
 
 theorem sourceOutcomeVariance_pos : 0 < m.sourceOutcomeVariance :=
   m.outcome.sourceOutcomeVariance_pos
@@ -4868,6 +4908,13 @@ theorem brierRegretRatio_eq_sq_error_ratio (η qSource qTarget : ℝ) :
 noncomputable def logLossRegretPoint (η q : ℝ) : ℝ :=
   bernoulliLogLoss η q - bernoulliLogLoss η η
 
+/-- Reference evaluation: the pointwise regret vanishes exactly on a matching forecast. -/
+theorem logLossRegretPoint_at_reference_point (η : ℝ) :
+    logLossRegretPoint η η = 0 := by
+  unfold logLossRegretPoint
+  ring
+
+
 /-- Pointwise log-loss regret ratio between target and source predictors. -/
 noncomputable def logLossRegretRatio (η qSource qTarget : ℝ) : ℝ :=
   logLossRegretPoint η qTarget / logLossRegretPoint η qSource
@@ -4936,7 +4983,25 @@ theorem targetBrier_strict_gt_source_of_neutralAF_benchmark
 
 /-- Squared mean PGS difference under the pure split model.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_bulk12.py`,
+    `test_pure_split_pgs_diff`). Realised variance of the mean-score difference
+    between two independently drifted demes, `Ne = 200`, 500 loci, 3000
+    replicate deme pairs:
+
+      generations   this def   measured             sems
+        30           46.54641   45.89697±1.18525     0.55
+       100          153.50564  148.78561±3.84227     1.23
+       250          368.98445  353.94478±9.14034     1.65
+
+    `Var_Delta_Mu` is separately validated for ONE branch, so what this adds is
+    the composition over two: feeding it `fstS + fstT` rather than a single
+    branch index reproduces the two-branch variance. That composition is where
+    the drift-variance family went wrong once already -- the missing ploidy
+    factor cancelled inside a cross-identity and survived it -- so checking it
+    against a measurement rather than against a sibling formula is the point.
+
+    Power: the prediction spans 46.5 to 369.0, a factor of eight. -/
 noncomputable def expectedSqMeanPGSDiff_pureSplit (V_A fstS fstT : ℝ) : ℝ :=
   Var_Delta_Mu V_A (fstS + fstT)
 

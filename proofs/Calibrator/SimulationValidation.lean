@@ -608,15 +608,7 @@ noncomputable def popgenDrivenProxyGenerationalModel :
   causalAlleleFreqMutationShiftAt := fun _ ↦ ![0]
   contextCrossSource := ![0, 0]
   contextCrossTargetAt := fun _ ↦ ![0, 0]
-  sourceOutcomeVariance := 4
-  targetOutcomeVarianceAt := fun _ ↦ 4
-  novelUntaggablePhenotypeVarianceAt := fun _ ↦ 0
-  targetPrevalenceAt := fun _ ↦ 1 / 2
-  sourceOutcomeVariance_pos := by norm_num
-  targetOutcomeVariance_pos := by intro t; norm_num
-  novelUntaggablePhenotypeVariance_nonneg := by intro t; norm_num
-  targetPrevalence_pos := by intro t; norm_num
-  targetPrevalence_lt_one := by intro t; norm_num
+  outcome := GenerationalOutcomeScale.balanced 4 (by norm_num)
 }
 
 /-! The closing five fields above -- the untaggable-phenotype variance, the prevalence, and
@@ -891,15 +883,7 @@ noncomputable def singleLocusGenerationalWitness
   causalAlleleFreqMutationShiftAt := causalAlleleFreqMutationShiftAt
   contextCrossSource := ![0]
   contextCrossTargetAt := fun _ ↦ ![0]
-  sourceOutcomeVariance := 2
-  targetOutcomeVarianceAt := fun _ ↦ 2
-  novelUntaggablePhenotypeVarianceAt := fun _ ↦ 0
-  targetPrevalenceAt := fun _ ↦ 1 / 2
-  sourceOutcomeVariance_pos := by norm_num
-  targetOutcomeVariance_pos := by intro t; norm_num
-  novelUntaggablePhenotypeVariance_nonneg := by intro t; norm_num
-  targetPrevalence_pos := by intro t; norm_num
-  targetPrevalence_lt_one := by intro t; norm_num
+  outcome := GenerationalOutcomeScale.balanced 2 (by norm_num)
 }
 
 /-- Single-locus generational witness where the target allele frequency drifts
