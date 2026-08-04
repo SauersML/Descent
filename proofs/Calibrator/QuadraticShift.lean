@@ -26,9 +26,10 @@ reference-to-pool portability constant.
 ## Main results
 
 - `singular_quadratic_excess_risk_identity`: exact excess risk without invertibility.
+- `finiteEnvironmentCovariancePool_energy_pos_iff_exists_active`: positive pooled risk.
 - `finiteEnvironmentCovariancePool_mulVec_eq_zero_iff_active`: active-kernel intersection.
-- `finiteEnvironmentCovariancePool_kernel_ssubset`: exact strict-diversity criterion.
-- `no_uniformQuadraticPortabilityBound_to_finiteEnvironmentPool`: diversity/shift bridge.
+- `finiteEnvironmentCovariancePool_kernel_ssubset_active`: exact strict-diversity criterion.
+- `no_uniformQuadraticPortabilityBound_to_activeEnvironmentPool`: diversity/shift bridge.
 - `best_scalar_correction_attains_floor`: exact post-hoc scalar-correction optimum.
 -/
 
@@ -408,6 +409,47 @@ theorem positiveSemidefiniteFamily_one {κ : Type*} :
       exact mul_self_eq_zero.mp hi
     · intro h
       simp [h]
+
+omit [DecidableEq ι] in
+/-- **Active-environment energy law.** A nonnegatively weighted covariance panel assigns
+strictly positive energy to a shift exactly when at least one active environment does. This is
+the risk-valued counterpart of the active-kernel intersection theorem below. -/
+theorem finiteEnvironmentCovariancePool_energy_pos_iff_exists_active
+    {κ : Type*} [Fintype κ]
+    (weight : κ → ℝ) (covariance : κ → Matrix ι ι ℝ)
+    (hweight : ∀ environment, 0 ≤ weight environment)
+    (hpsd : PositiveSemidefiniteFamily covariance)
+    (shift : ι → ℝ) :
+    0 < dot shift ((finiteEnvironmentCovariancePool weight covariance).mulVec shift) ↔
+      ∃ environment, 0 < weight environment ∧
+        0 < dot shift ((covariance environment).mulVec shift) := by
+  rw [finiteEnvironmentCovariancePool_energy]
+  constructor
+  · intro hsum
+    by_contra hnone
+    have htermZero : ∀ environment,
+        weight environment * dot shift ((covariance environment).mulVec shift) = 0 := by
+      intro environment
+      rcases (hweight environment).eq_or_lt with hweightZero | hweightPos
+      · rw [← hweightZero]
+        simp
+      · have henergyNotPos :
+            ¬ 0 < dot shift ((covariance environment).mulVec shift) := by
+          intro henergyPos
+          exact hnone ⟨environment, hweightPos, henergyPos⟩
+        have henergyZero : dot shift ((covariance environment).mulVec shift) = 0 :=
+          le_antisymm (not_lt.mp henergyNotPos) (hpsd.energy_nonneg environment shift)
+        rw [henergyZero, mul_zero]
+    have hzero :
+        ∑ environment, weight environment *
+          dot shift ((covariance environment).mulVec shift) = 0 := by
+      exact Finset.sum_eq_zero fun environment _ ↦ htermZero environment
+    linarith
+  · rintro ⟨environment, hweightPos, henergyPos⟩
+    exact Finset.sum_pos'
+      (fun environment _ ↦
+        mul_nonneg (hweight environment) (hpsd.energy_nonneg environment shift))
+      ⟨environment, Finset.mem_univ environment, mul_pos hweightPos henergyPos⟩
 
 omit [DecidableEq ι] in
 /-- **Active-environment kernel law.** With merely nonnegative sampling weights, the pooled
