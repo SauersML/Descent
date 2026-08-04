@@ -3137,6 +3137,64 @@ factor. The theorems below are therefore coordinate facts, not a general
 ranking theorem for real-world portability across distinct metrics. -/
 
 
+/-! ### Reference evaluations
+
+Each definition below is fixed at a point where its value is a closed number.  A one-sided
+bound or an invariance leaves a family of bodies satisfying it; an exact evaluation does not,
+which is why these are the theorems the gap scanners look for. -/
+
+/-- No elapsed generations, no recombination: survival is certain. -/
+@[simp] theorem discreteRecombinationSurvival_at_zero_time (recombRate : ℝ) :
+    discreteRecombinationSurvival recombRate 0 = 1 := by
+  simp [discreteRecombinationSurvival]
+
+/-- A zero recombination rate never breaks the haplotype, however long the branch. -/
+@[simp] theorem discreteRecombinationSurvival_at_zero_rate (tmrca : ℕ) :
+    discreteRecombinationSurvival 0 tmrca = 1 := by
+  simp [discreteRecombinationSurvival]
+
+/-- Certain recombination destroys the haplotype in one generation. -/
+theorem discreteRecombinationSurvival_at_certain_rate (tmrca : ℕ) :
+    discreteRecombinationSurvival 1 (tmrca + 1) = 0 := by
+  simp [discreteRecombinationSurvival]
+
+/-- Reference value: a one-per-cent rate over two generations retains `0.9801`. -/
+theorem discreteRecombinationSurvival_at_one_percent :
+    discreteRecombinationSurvival (1 / 100) 2 = 9801 / 10000 := by
+  norm_num [discreteRecombinationSurvival]
+
+/-- The zero matrix has no Frobenius energy. -/
+@[simp] theorem frobeniusNormSq_zero {t : ℕ} :
+    frobeniusNormSq (0 : Matrix (Fin t) (Fin t) ℝ) = 0 := by
+  simp [frobeniusNormSq]
+
+/-- Reference value on a concrete block. -/
+theorem frobeniusNormSq_at_two_by_two :
+    frobeniusNormSq !![1, 2; 3, 4] = 30 := by
+  norm_num [frobeniusNormSq, Fin.sum_univ_succ]
+
+/-- Reference values for the scaled evolutionary quantities at the structure witness, whose
+parameters are unit population size, mutation and migration, quarter recombination and unit
+divergence time. -/
+theorem fstDriftMigration_at_witness :
+    fstDriftMigration EvolutionaryParameters.witness = 1 / 5 := by
+  norm_num [fstDriftMigration, EvolutionaryParameters.bigM,
+    EvolutionaryParameters.witness, scaledMigrationRate]
+
+theorem migrationLDBoost_at_witness :
+    migrationLDBoost EvolutionaryParameters.witness = 7 / 5 := by
+  norm_num [migrationLDBoost, EvolutionaryParameters.bigM, EvolutionaryParameters.tau,
+    EvolutionaryParameters.witness, scaledMigrationRate]
+
+theorem mutationLDErosion_at_witness :
+    mutationLDErosion EvolutionaryParameters.witness = Real.exp (-2) := by
+  norm_num [mutationLDErosion, EvolutionaryParameters.theta, EvolutionaryParameters.tau,
+    EvolutionaryParameters.witness, scaledMutationRate]
+
+theorem sharedLDRetention_at_witness :
+    sharedLDRetention EvolutionaryParameters.witness = Real.exp (-(1 / 2)) := by
+  norm_num [sharedLDRetention, EvolutionaryParameters.witness]
+
 end EndToEndMetrics
 
 end AllClaims
