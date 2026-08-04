@@ -105,10 +105,32 @@ theorem ncp_increases_with_n (n₁ n₂ : ℕ) (beta p : ℝ)
     `1 - exp(-ncp/2)`, returns a single number for a nominal test and a genome-wide scan
     alike — at `α = 5·10⁻⁸` with `ncp = 10` that gives `0.993` against a true `0.011`.
 
-    Empirical status: VALIDATED (matches exact non-central chi-squared power to five decimals).
+    **Convention on `z_α`, and a correction to the table below.** For the
+    two-sided Wald test — equivalently the one-degree-of-freedom chi-squared
+    test a GWAS actually runs — `z_α` must be the TWO-SIDED critical value
+    `Φ⁻¹(1 - α/2)`, so that `z_α²` is the chi-squared critical value. The
+    tabulated `α = 5·10⁻⁸` column obeys that: it was computed at
+    `z = 5.4513 = Φ⁻¹(1 - 2.5·10⁻⁸)`, and the one-sided `5.3267` reproduces
+    none of its entries (`0.0152` and `0.1963` against the tabulated `0.0110`
+    and `0.1638` at `ncp = 10, 20`).
 
-    Power: across `ncp = 1, 5, 10, 20` this formula predicts `0.2595`, `0.7228`,
-    `0.9354` and `0.9977` at `α = 0.05`, and `0.0000`, `0.0007`, `0.0110` and
+    The `α = 0.05` column did NOT: `0.2595`, `0.7228`, `0.9354`, `0.9977` are
+    the ONE-SIDED values at `z = 1.6449`. At the two-sided `z = 1.9600` the same
+    grid gives `0.1685`, `0.6088`, `0.8854` and `0.9940`. So the two columns were
+    computed under different conventions, and the discrepancy is not cosmetic —
+    at `ncp = 1` the one-sided reading overstates power by 54%. The corrected
+    two-sided column is what a chi-squared test at `α = 0.05` (critical value
+    `3.8415`) has.
+
+    Empirical status: VALIDATED at `α = 5·10⁻⁸` (matches exact non-central
+    chi-squared power to five decimals). **The `α = 0.05` cell is UNTESTED
+    pending re-measurement**: the five-decimal agreement claim cannot cover both
+    columns, since they do not share a convention, and the corrected values
+    quoted above are analytic normal-CDF evaluations, not a fresh run against
+    `ncx2`. Re-running that comparison at the two-sided threshold is owed.
+
+    Power: across `ncp = 1, 5, 10, 20` this formula predicts `0.1685`, `0.6088`,
+    `0.8854` and `0.9940` at `α = 0.05`, and `0.0000`, `0.0007`, `0.0110` and
     `0.1638` at `α = 5·10⁻⁸`. The prediction therefore covers essentially the
     whole `[0, 1]` range of power, and the two thresholds separate by an order
     of magnitude at every `ncp` — which is exactly what a threshold-free form

@@ -39,19 +39,50 @@ most fundamental driver of PGS portability issues.
 section AlleleFrequencyDivergence
 
 /-!
-### Derivation of expectedFreqDiffSq = 2·Fst·p₀(1-p₀)
+### Derivation of expectedFreqDiffSq = 2·F·p₀(1-p₀)
+
+**Which `F` this section's `fst` argument is, stated -- it is NOT the pairwise
+`F_ST` the rest of the corpus is written for.**
+
+Every `fst` argument in this section is the PER-BRANCH drift coefficient: the
+single-population Wright `F` measured against the ANCESTOR, i.e. the fraction of
+ancestral heterozygosity a lineage has lost since the split. Three distinct
+quantities share the letter across this development and they are not
+interchangeable:
+
+* **Per-branch drift `F`** (this section). `1 - (1 - 1/(2·Nₑ))^t`, which is
+  `PopulationGeneticsFoundations.heterozygosityLossFromDrift`, approaching
+  `1 - e^(-τ)` in coalescent time.
+* **Pairwise Hudson `F_ST`** (`PortabilityDrift.fstFromTau`), `τ/(1 + τ)`.
+  These two are NOT equal, and the corpus proves it: `fstFromTau_lt_coalescenceCdf`
+  says `τ/(1+τ) < 1 - e^(-τ)` at every positive `τ`. At `τ = 1` they are `0.500`
+  against `0.632`, a 26% gap -- so the substitution is a real error and not a
+  rounding one. They agree only to first order in small divergence.
+* **Nei's `G_ST`** (`Conventions.neiGst`), which is `(p₁-p₂)²/(4·p̄·(1-p̄))` and
+  is HALF the per-branch `F` this section wants, since this section's identity
+  reads `E[(p₁-p₂)²] = 2·F·p₀(1-p₀)` while Nei's reads
+  `E[(p₁-p₂)²] = 4·G_ST·p̄·(1-p̄)`. Feeding `neiGst` to `expectedFreqDiffSq`
+  halves the answer.
+
+The sentence this note replaces -- "this **is** the definition of Fst" -- was
+the defect: it named a WITHIN-population heterozygosity loss as a
+BETWEEN-population variance ratio, which is exactly the conflation
+`Calibrator.DriftRegime` exists to prohibit and which `Conventions`'
+`fstFromDrift_uses_coalescentTimeScale` docstring already names as the corpus's
+recurring `F_ST` bug. Nothing outside this file consumes these three
+definitions, so no downstream value is wrong today; the trap was live for the
+next consumer.
 
 Under the Wright-Fisher model, genetic drift causes allele frequencies
 to fluctuate randomly across generations. For a single population
 diverging from an ancestor with allele frequency p₀:
 
-  Var(p_t - p₀) = p₀(1-p₀) × Fst(t)
+  Var(p_t - p₀) = p₀(1-p₀) × F(t)
 
-This **is** the definition of Fst: the proportion of total allelic
-variance (p₀(1-p₀)) that lies between populations.
+with `F(t)` the per-branch drift coefficient just defined.
 
 **Single-population drift variance:**
-  driftVariance(p₀, Fst) = p₀·(1-p₀)·Fst
+  driftVariance(p₀, F) = p₀·(1-p₀)·F
 
 **Two-population divergence:**
 Consider two populations (pop₁, pop₂) that diverged independently
@@ -61,8 +92,8 @@ because drift is driven by independent sampling in each lineage.
 
   E[(p₁ - p₂)²] = Var(p₁ - p₂)          (since E[p₁ - p₂] = 0)
                  = Var(p₁) + Var(p₂)      (independence of drift)
-                 = p₀(1-p₀)·Fst + p₀(1-p₀)·Fst
-                 = 2·p₀(1-p₀)·Fst
+                 = p₀(1-p₀)·F + p₀(1-p₀)·F
+                 = 2·p₀(1-p₀)·F
 
 The factor of 2 arises because **both** lineages drift independently,
 so the variance of their difference is the sum of their individual
@@ -70,11 +101,28 @@ drift variances.
 -/
 
 /-- **Drift variance for a single population.**
-    Var(p_t - p₀) = p₀(1-p₀) × Fst, which is the definition
-    of Fst as the proportion of ancestral heterozygosity that
-    has become between-population variance.
+    `Var(p_t - p₀) = p₀(1-p₀) × F`, with `F` the PER-BRANCH drift coefficient --
+    the fraction of ancestral heterozygosity this one lineage has lost since the
+    split, Wright's `F` against the ancestor.
 
-    Empirical status: UNTESTED. -/
+    Convention: `fst` is that per-branch `F`, not the pairwise Hudson `F_ST` of
+    `PortabilityDrift.fstFromTau` and not Nei's `G_ST`. The section note above
+    gives the three conversions and the size of each mistake; the short version
+    is that Hudson agrees only to first order (`0.500` against `0.632` at
+    `τ = 1`) and Nei's `G_ST` is exactly half of what this argument wants.
+
+    Empirical status: **the simulation MATCH is an algebraic identity and carries no
+    information.** `battery_bulk21` scored this MATCH against a Wright-Fisher simulation;
+    the verdict is vacuous. The simulator estimates `F_ST` on the same run as
+    `Var(p) / (p₀(1-p₀))`, and substituting that defining relation into this body gives
+    `p₀(1-p₀) · Var(p) / (p₀(1-p₀)) = Var(p)` — the estimator itself, residual exactly `0`
+    under computer algebra, using no Wright-Fisher property beyond the martingale
+    `E[p_t] = p₀`. On the same cells a competing body that is genuinely a different
+    function of the same inputs is separable (a planted `p₀(1-p₀)·fst²` leaves the nonzero
+    residual `Var(p)·(-Var(p) - p₀² + p₀)/(p₀(p₀-1))`), so the design had power it never
+    spent: it was pointed at a definition. The docstring's own first sentence says as much.
+    UNTESTED as a claim about the world; what is actually open is the convention question
+    the paragraph above states, and an identity cannot settle it. -/
 noncomputable def driftVariance (p0 fst : ℝ) : ℝ :=
   p0 * (1 - p0) * fst
 
@@ -114,7 +162,13 @@ theorem driftVariance_eq_zero_iff (p0 fst : ℝ) :
     ancestor, Var(p₁ - p₂) = Var(p₁) + Var(p₂) = 2·driftVariance.
     The factor of 2 comes from independence of drift.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **the simulation MATCH is an algebraic identity and carries no
+    information**, for the reason given at `driftVariance`, of which this is twice the body.
+    Substituting the simulator's own `F_ST := Var(p)/(p₀(1-p₀))` collapses this onto
+    `2·Var(p)`, which is what the simulator computes for `Var(p₁ - p₂)` once the two
+    lineages are drawn independently — residual exactly `0`. The factor of `2` the docstring
+    argues for is therefore assumed by the estimator, not tested by it. UNTESTED as a claim
+    about the world. -/
 noncomputable def twoPopDriftVariance (p0 fst : ℝ) : ℝ :=
   2 * driftVariance p0 fst
 
@@ -144,10 +198,24 @@ theorem twoPopDriftVariance_eq_zero_iff (p0 fst : ℝ) :
     norm_num
 
 /-- **Expected allele frequency difference from drift.**
-    E[(p₁ - p₂)²] = 2 × FST × p₀(1-p₀)
-    where p₀ is the ancestral frequency.
+    `E[(p₁ - p₂)²] = 2 × F × p₀(1-p₀)`, `p₀` the ancestral frequency and `F` the
+    per-branch drift coefficient of `driftVariance`.
 
-    Empirical status: UNTESTED. -/
+    Convention: the `2` is the count of independently drifting branches, and it
+    is the constant that goes wrong when the argument is read as a pairwise
+    differentiation instead. Against Nei's `G_ST` the same expectation is
+    `4·G_ST·p̄·(1-p̄)`, so `fst := neiGst p₁ p₂` halves this body. See the
+    section note.
+
+    Empirical status: **the simulation MATCH is an algebraic identity and carries no
+    information.** `battery_bulk21` scored this MATCH; this body is `twoPopDriftVariance`
+    with its arguments in the other order, so it collapses onto the simulator's `2·Var(p)`
+    for the same reason and with the same exactly-`0` residual. Note what that means for the
+    convention paragraph above: the factor-of-2 question and the Nei/Hudson question are
+    precisely what the simulation could NOT answer, because the estimator it compared
+    against carried the corpus's own convention in its definition of `fst`. UNTESTED as a
+    claim about the world; the convention is open and a simulation pinned to the convention
+    cannot close it. -/
 noncomputable def expectedFreqDiffSq (fst p0 : ℝ) : ℝ :=
   2 * fst * p0 * (1 - p0)
 
@@ -292,7 +360,22 @@ causal variant.
     Regime: one causal variant, one tag, both standardized; the apparent effect
     is the tag's MARGINAL regression coefficient.
 
-    Empirical status: UNTESTED.
+    Empirical status: **VALIDATED** (`simcov/battery_bulk22.py`, `group_b`).
+    One causal variant and one tag at correlation `r`, both standardized, over
+    2×10⁶ individuals; the observable is the tag's REALISED marginal OLS slope.
+    `r` is swept from 0.3 to 0.9, over which `r` and `r²` separate threefold.
+
+      β_c    r     this body   realised slope   sems
+      0.3   0.9     0.270000      0.269586       0.61
+      0.3   0.5     0.150000      0.150119       0.17
+      0.5   0.7     0.350000      0.350293       0.44
+      0.2   0.3     0.060000      0.060220       0.31
+
+    The identity gate is carried: the squared form `β_c · r²` is run on the SAME
+    cells and misses by 39 to 159 sems — at `r = 0.3` it predicts 0.018 against
+    a measured 0.0602 — and the positive control, the causal variant's own
+    slope, which must be `β_c`, passes at 0.02 sems. A match with no rejected
+    competitor would have measured nothing.
 
     CORRECTED. This body previously took squared LD. Regressing the phenotype
     on the tag recovers
@@ -364,7 +447,18 @@ theorem taggedEffect_eq_iff
     actually produce. The definition never claimed to know what a finite draw
     would realise.
 
-    Power: the prediction spans 0.18777 to 0.51355 across the design. -/
+    Power: the prediction spans 0.18777 to 0.51355 across the design.
+
+    **The exponent is chosen by the data** (`simcov/battery_bulk29.py`,
+    `group_b`), which the run above did not establish. An independent design --
+    200 causal variants each with one tag, the phenotype built from the CAUSAL
+    variants and the score fitted on the TAGS, 300000 individuals -- reproduces
+    this body at worst 3.51 sems (1.2% relative) with `r` swept 0.3 to 0.9.
+    Carried on the same cells, the UNSQUARED form `h²_true · r` is FALSIFIED at
+    up to 652 sems (225% relative). So the square is not a convention: a tag
+    recovers heritability, which is quadratic in the effect, through `r²`, while
+    it recovers the EFFECT itself through `r` -- see `taggedEffect`, where the
+    corpus had the exponents the other way round. -/
 noncomputable def gwasHeritability (h2_true avg_r2_tag : ℝ) : ℝ :=
   h2_true * avg_r2_tag
 
