@@ -762,7 +762,7 @@ theorem geometry_and_effect_recovery_gates
 
 /-! ## The unified obstruction bundle -/
 
-/-- Eighteen logically distinct failures and boundaries that a biological transport theory must
+/-- Nineteen logically distinct failures and boundaries that a biological transport theory must
 not collapse into one scalar "portability" parameter.  The final six fields make continuum
 calibration and finite correction part of the core theorem rather than adjacent examples. -/
 structure UnifiedBiologyObstructions : Prop where
@@ -806,6 +806,11 @@ structure UnifiedBiologyObstructions : Prop where
         (rotatedCovarianceBlock (3 / 2)) ∧
       blockEntryFourthMean (localizedCovarianceBlock (3 / 2)) ≠
         blockEntryFourthMean (rotatedCovarianceBlock (3 / 2))
+  /-- For a coding-symmetric Rademacher architecture, the missing LD orientation changes the
+  fourth-order low-SNR information coefficient by exactly `49 / 96`. -/
+  symmetricLDChangesLowSNRCoefficient :
+    lowSNRFourthOrientationCoefficient (-2) rotatedUniformFourthInvariant -
+        lowSNRFourthOrientationCoefficient (-2) localizedUniformFourthInvariant = 49 / 96
   /-- A cross-state criterion is not a function of the target context: it fails to descend along
   the label the target-only annotation descends along. -/
   crossStateDoesNotDescend :
@@ -888,6 +893,8 @@ theorem unifiedBiology_obstructions : UnifiedBiologyObstructions := by
       symmetricSparseLDLosesOrientation :=
         ⟨localizedCovarianceBlock_isospectral_rotatedCovarianceBlock (3 / 2),
           midpoint_blockEntryFourthMean_ne⟩
+      symmetricLDChangesLowSNRCoefficient :=
+        rademacher_lowSNRFourthCoefficient_rotated_sub_localized
       crossStateDoesNotDescend := not_descends_contextMatchQuality_along_targetState
       marginalDescentDoesNotCompose := admissible_interaction_join_obstruction
       crudeReportingLosesDescent := admissible_confounding_meet_obstruction

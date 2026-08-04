@@ -451,8 +451,8 @@ theorem localizedUniformFourthInvariant_eq :
   rw [intervalIntegral.integral_add
     (Continuous.intervalIntegrable (by fun_prop) 1 2)
     (Continuous.intervalIntegrable (by fun_prop) 1 2)]
-  simp only [intervalIntegral.integral_const_mul, intervalIntegral.integral_const, integral_pow,
-    integral_id]
+  simp only [intervalIntegral.integral_const_mul, intervalIntegral.integral_const, integral_pow]
+  rw [intervalIntegral.integral_const_mul, integral_id]
   norm_num
 
 /-- The rotated block family has fourth-order traffic invariant `723 / 40`. -/
@@ -478,8 +478,8 @@ theorem rotatedUniformFourthInvariant_eq :
   rw [intervalIntegral.integral_add
     (Continuous.intervalIntegrable (by fun_prop) 1 2)
     (Continuous.intervalIntegrable (by fun_prop) 1 2)]
-  simp only [intervalIntegral.integral_const_mul, intervalIntegral.integral_const, integral_pow,
-    integral_id]
+  simp only [intervalIntegral.integral_const_mul, intervalIntegral.integral_const, integral_pow]
+  rw [intervalIntegral.integral_const_mul, integral_id]
   norm_num
 
 /-- Exact continuum separation of the fourth-order traffic invariant. -/
