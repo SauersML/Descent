@@ -146,6 +146,48 @@ theorem neiGstFromFrequencies_zero_same (p : ℝ) :
   unfold neiGstFromFrequencies
   simp [sub_self, zero_pow (by norm_num : 2 ≠ 0)]
 
+/-- **Exact identifiability from Nei's two-population `G_ST`.**  At polymorphic loci, `G_ST`
+vanishes if and only if the two subgroup allele frequencies agree.  The polymorphism assumptions
+exclude the `0 / 0` endpoint where Lean's totalized division would otherwise manufacture the same
+numerical answer. -/
+theorem neiGstFromFrequencies_eq_zero_iff
+    (p₁ p₂ : ℝ)
+    (h₁ : 0 < p₁) (h₁' : p₁ < 1)
+    (h₂ : 0 < p₂) (h₂' : p₂ < 1) :
+    neiGstFromFrequencies p₁ p₂ = 0 ↔ p₁ = p₂ := by
+  have h_den : 0 < 4 * ((p₁ + p₂) / 2) * (1 - (p₁ + p₂) / 2) := by
+    nlinarith
+  constructor
+  · intro h_zero
+    unfold neiGstFromFrequencies at h_zero
+    rw [div_eq_zero_iff] at h_zero
+    rcases h_zero with h_num | h_den_zero
+    · nlinarith [sq_nonneg (p₁ - p₂)]
+    · exact False.elim (h_den.ne' h_den_zero)
+  · intro h_same
+    subst p₂
+    exact neiGstFromFrequencies_zero_same p₁
+
+/-- At polymorphic loci, Nei's `G_ST` is strictly positive exactly when the subgroup allele
+frequencies differ. -/
+theorem neiGstFromFrequencies_pos_iff
+    (p₁ p₂ : ℝ)
+    (h₁ : 0 < p₁) (h₁' : p₁ < 1)
+    (h₂ : 0 < p₂) (h₂' : p₂ < 1) :
+    0 < neiGstFromFrequencies p₁ p₂ ↔ p₁ ≠ p₂ := by
+  have h_nonneg := neiGstFromFrequencies_nonneg p₁ p₂ h₁ h₁' h₂ h₂'
+  constructor
+  · intro h_pos h_same
+    have h_zero :=
+      (neiGstFromFrequencies_eq_zero_iff p₁ p₂ h₁ h₁' h₂ h₂').2 h_same
+    linarith
+  · intro h_different
+    have h_nonzero : neiGstFromFrequencies p₁ p₂ ≠ 0 := by
+      intro h_zero
+      exact h_different
+        ((neiGstFromFrequencies_eq_zero_iff p₁ p₂ h₁ h₁' h₂ h₂').1 h_zero)
+    exact lt_of_le_of_ne h_nonneg (Ne.symm h_nonzero)
+
 /-- **`G_ST` is symmetric.** -/
 theorem neiGstFromFrequencies_symmetric (p₁ p₂ : ℝ) :
     neiGstFromFrequencies p₁ p₂ = neiGstFromFrequencies p₂ p₁ := by
@@ -1179,7 +1221,41 @@ carried implicitly.
 
     Power: at fixed `4 Ne m` the two candidates predict 0.11111 against 0.05882
     at two demes and converge to 0.19598 against 0.19202 at forty, so the design
-    separates them where they differ and not where they do not. -/
+    separates them where they differ and not where they do not. 
+    **Validated across five deme counts, and the squared form excluded**
+    (`proofs/validation/empirical/simcov/battery_bulk18b.py`). Island model with
+    the TOTAL emigration rate held fixed at `4 Ne m = 2.0` while the deme count
+    runs 2, 3, 5, 10, 25, `F_ST` from coalescence times so no estimator
+    convention enters:
+
+      demes   measured             no correction   d/(d-1)      (d/(d-1))^2
+        2     0.18634 ± 0.00832     0.33333        0.20000      0.11111
+        3     0.22334 ± 0.00972     0.33333        0.25000      0.18182
+        5     0.28418 ± 0.01266     0.33333        0.27778      0.24242
+       10     0.31609 ± 0.00907     0.33333        0.30303      0.28826
+       25     0.32598 ± 0.01121     0.33333        0.32468      0.31544
+
+      worst cell:                  17.66 sems      2.74 sems    9.04 sems
+
+    The linear correction is the one the data supports. The SQUARED correction
+    was carried through the same cells because it is the form originally
+    proposed for this defect, and it is excluded at 9.04 sems -- it overshoots
+    at every deme count and worst where the correction matters most. Recording
+    that is the point of having carried it: the power on this factor is settled
+    by the sweep rather than by whichever form was proposed first.
+
+    Holding the TOTAL rate fixed is what makes the sweep mean anything, and an
+    earlier run of it did not. `msprime`'s `island_model(migration_rate = m)`
+    sets the rate between each ORDERED PAIR, so a deme's total emigration is
+    `m (n - 1)` and climbs with the deme count; a sweep at fixed pairwise rate
+    moves the very quantity the formulas take, and the measured `F_ST` then
+    falls for a reason no candidate is being asked about. That run is superseded
+    by this one.
+
+    The no-correction row is `fstDriftMigrationManyDemes` and the table is also
+    its evidence: 17.66 sems adrift at two demes and 0.65 sems at twenty-five,
+    which is what a many-deme limit should look like.
+-/
 noncomputable def islandDemeCorrection (d : ℝ) : ℝ := d / (d - 1)
 
 /-- **islandDemeCorrection pinned at a reference point.** No theorem in the corpus evaluated this
