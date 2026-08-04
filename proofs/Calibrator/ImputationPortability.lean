@@ -128,6 +128,16 @@ theorem mul_le_self_of_le_one
 noncomputable def ldExtentImputationQuality (c ld_extent : ℝ) : ℝ :=
   max 0 (1 - c / ld_extent)
 
+/-- **ldExtentImputationQuality at its junk point, named.** A panel with no linkage-disequilibrium
+extent imputes nothing. The divisor is zero, the penalty term is junk-zero, and the quality
+clamps to `1`: PERFECT imputation from a panel that carries no information. The `max 0` guard
+protects the lower end and lets the upper end fail unremarked. Consumers must guard the argument
+that makes the divisor vanish. -/
+theorem ldExtentImputationQuality_zero_extent_is_junk (c : ℝ) :
+    ldExtentImputationQuality c 0 = 1 := by
+  unfold ldExtentImputationQuality
+  simp
+
 /-- The clamped quality measure is an `r²`: it lies in `[0, 1]` for every
 positive tagging constant and LD extent, with no side condition. -/
 theorem ldExtentImputationQuality_mem_unit (c ld_extent : ℝ)

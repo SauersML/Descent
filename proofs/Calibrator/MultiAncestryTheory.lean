@@ -212,6 +212,17 @@ section InformationTheoreticLimits
 noncomputable def effectMutualInformation (m : ℕ) (ρ : ℝ) : ℝ :=
   -(m : ℝ) / 2 * Real.log (1 - ρ ^ 2)
 
+/-- **effectMutualInformation at its junk point, named.** At perfect correlation the mutual
+information between two effect vectors diverges -- each determines the other exactly. `Real.log
+(1 - 1)` is junk-zero and the information is reported as `0`: complete independence. This is the
+maximal inversion available in an information measure, and it sits at the parameter value a
+portability analysis most wants to test. Consumers must guard the argument that makes the
+divisor vanish. -/
+theorem effectMutualInformation_perfect_correlation_is_junk (m : ℕ) :
+    effectMutualInformation m 1 = 0 := by
+  unfold effectMutualInformation
+  simp
+
 /-- **Mutual information is zero when effects are uncorrelated.** -/
 theorem no_info_when_uncorrelated (m : ℕ) :
     effectMutualInformation m 0 = 0 := by

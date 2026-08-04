@@ -131,6 +131,15 @@ used in the portability theorem below.
 noncomputable def neutralDriftFactor (Ne : ℝ) (t : ℕ) : ℝ :=
   (1 - 1 / (2 * Ne)) ^ t
 
+/-- **neutralDriftFactor at its junk point, named.** An empty population loses all heterozygosity
+immediately. The per-generation factor is junk-one and the retention is `1` at every generation
+count, so the error does not attenuate with `t` -- it is the multiplicative identity and
+persists exactly. Consumers must guard the argument that makes the divisor vanish. -/
+theorem neutralDriftFactor_empty_population_is_junk (t : ℕ) :
+    neutralDriftFactor 0 t = 1 := by
+  unfold neutralDriftFactor
+  simp
+
 /-- **This factor is the closed-population regime's retention.**
 
 The tie is to the regime *object*, not to another copy of the formula. That

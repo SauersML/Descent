@@ -1784,6 +1784,15 @@ Empirical status: NOT AN EMPIRICAL CLAIM -- this is the algebraic objective bein
 noncomputable def twoCellWorstEstimationPenalty (n₁ n₂ : ℝ) : ℝ :=
   max (1 / n₁) (1 / n₂)
 
+/-- **twoCellWorstEstimationPenalty at its junk point, named.** Two empty cells give an unbounded
+worst-case estimation penalty. Both reciprocals are junk-zero and the maximum is `0`: the best
+possible worst case, certified for a design with no data in either cell. Consumers must guard
+the argument that makes the divisor vanish. -/
+theorem twoCellWorstEstimationPenalty_empty_cells_is_junk :
+    twoCellWorstEstimationPenalty 0 0 = 0 := by
+  unfold twoCellWorstEstimationPenalty
+  simp
+
 /-- **The exact `L²(π)` recruitment bound.**  Its right side is the total sample size times
 the weighted estimation penalty.  Equality holds precisely on the square-root allocation ray. -/
 theorem twoCell_l2_allocation_lower_bound (p n₁ n₂ : ℝ)

@@ -77,6 +77,15 @@ PGS bias and spectral detectability. -/
 noncomputable def markerDangerIndex (confounding n markers : ℝ) : ℝ :=
   confounding * Real.sqrt (markers / n)
 
+/-- **markerDangerIndex at its junk point, named.** With no samples the confounding danger per
+marker is unbounded. The ratio `markers / n` is junk-zero, its square root is zero, and the
+index reports NO danger from a study with no data. Consumers must guard the argument that makes
+the divisor vanish. -/
+theorem markerDangerIndex_zero_samples_is_junk (confounding markers : ℝ) :
+    markerDangerIndex confounding 0 markers = 0 := by
+  unfold markerDangerIndex
+  simp
+
 /-- At fixed sample size and positive confounding, increasing the number of
 effectively independent markers strictly increases the danger index. -/
 theorem more_markers_increase_uncorrectable_bias_danger

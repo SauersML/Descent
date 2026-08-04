@@ -1253,6 +1253,15 @@ re-derived here. -/
 def alleleLossProbability (initial time : ℝ) : ℝ :=
   Real.exp (-(initial / (2 * time)))
 
+/-- **alleleLossProbability at its junk point, named.** At zero elapsed time no allele has been lost
+and the loss probability is zero. The divisor `2 * time` is zero, the exponent is junk-zero, and
+`exp 0 = 1`: CERTAIN loss, reported at the instant before any drift has acted. Consumers must
+guard the argument that makes the divisor vanish. -/
+theorem alleleLossProbability_zero_time_is_junk (initial : ℝ) :
+    alleleLossProbability initial 0 = 1 := by
+  unfold alleleLossProbability
+  simp
+
 /-- **A vanishing starting frequency leaves loss certain.** At `initial = 0` the exponent is zero
 and the probability is one: an allele that was never there is lost with certainty at every
 horizon. That reference point fixes the normalisation, which no statement about the decay rate

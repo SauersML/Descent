@@ -255,6 +255,16 @@ noncomputable def ageDependentSignalShape
     (age age_peak width : ℝ) : ℝ :=
   Real.exp (-(age - age_peak)^2 / (2 * width^2))
 
+/-- **ageDependentSignalShape at its junk point, named.** A window of zero width admits signal at
+the peak age only. The divisor `2 * width ^ 2` is zero, the exponent is junk-zero, and `exp 0 =
+1`: FULL signal at every age, for a window that should admit almost none. The failure is uniform
+in `age`, so no age-stratified check can see it. Consumers must guard the argument that makes
+the divisor vanish. -/
+theorem ageDependentSignalShape_zero_width_is_junk (age age_peak : ℝ) :
+    ageDependentSignalShape age age_peak 0 = 1 := by
+  unfold ageDependentSignalShape
+  simp
+
 /-- Explicit age-indexed signal variance built from a peak signal level and a
     Gaussian age-kernel shape. This remains an explicit signal profile, not a
     source-`R²` transport law. -/

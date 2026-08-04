@@ -42,6 +42,15 @@ open scoped BigOperators
 noncomputable def scalarPermeability (covariance covarianceDerivative : ℝ) : ℝ :=
   (1 / 2 : ℝ) * (covarianceDerivative / covariance) ^ 2
 
+/-- **scalarPermeability at its junk point, named.** A vanishing covariance makes the relative
+sensitivity, and with it the Fisher-type permeability, unbounded. The ratio is junk-zero and the
+permeability reports `0`: a perfectly impermeable channel where the truth is a perfectly
+transparent one. Consumers must guard the argument that makes the divisor vanish. -/
+theorem scalarPermeability_zero_covariance_is_junk (covarianceDerivative : ℝ) :
+    scalarPermeability 0 covarianceDerivative = 0 := by
+  unfold scalarPermeability
+  simp
+
 /-! ## The named Gaussian covariance experiment -/
 
 /-- Variance of a centered square from its second and fourth raw moments. -/

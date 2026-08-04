@@ -85,6 +85,15 @@ alongside it was conservative, so the two partially masked each other. -/
 noncomputable def bbpProxyThreshold (n M : ℝ) : ℝ :=
   Real.sqrt (n / M)
 
+/-- **bbpProxyThreshold at its junk point, named.** A zero ambient dimension leaves the BBP
+threshold undefined. The ratio is junk-zero and the threshold is `0`: every spike is above it,
+so the detection criterion admits everything. Consumers must guard the argument that makes the
+divisor vanish. -/
+theorem bbpProxyThreshold_zero_dimension_is_junk (n : ℝ) :
+    bbpProxyThreshold n 0 = 0 := by
+  unfold bbpProxyThreshold
+  simp
+
 /-- **The threshold depends only on the aspect ratio.** Growing the sample and the panel together
 leaves it unchanged: what matters is `n/M`, not either count alone, which is the whole content of
 a proportional-regime threshold. Squaring recovers that ratio exactly. -/

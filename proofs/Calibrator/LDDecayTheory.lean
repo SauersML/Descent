@@ -331,6 +331,15 @@ because it had no other place to go.
 noncomputable def driftLDStep (Ne c Q : ℝ) : ℝ :=
   (1 - c) ^ 2 * (1 / (2 * Ne) + (1 - 1 / (2 * Ne)) * Q)
 
+/-- **driftLDStep at its junk point, named.** The same junk-one drift factor as `driftLDRetention`,
+in the recurrence: at `Ne = 0` the drift-generated term vanishes and the retained term keeps its
+full weight, so iterating the step reports disequilibrium decaying by recombination alone in a
+population that has none. Consumers must guard the argument that makes the divisor vanish. -/
+theorem driftLDStep_zero_population_is_junk (c Q : ℝ) :
+    driftLDStep 0 c Q = (1 - c) ^ 2 * Q := by
+  unfold driftLDStep
+  simp
+
 /-- **Cross-check: the Sved drift-recombination step and the island-model
 `F_ST` step are one recurrence.** `PortabilityDrift.islandFstMultiplicativeStep`
 applies it with the migration rate in the place of the recombination rate and
@@ -369,6 +378,15 @@ theorem driftLDStep_eq_ibdRecurrenceStep (Ne c Q : ℝ) :
     Empirical status: UNTESTED. -/
 noncomputable def driftLDRetention (Ne c : ℝ) : ℝ :=
   (1 - c) ^ 2 * (1 - 1 / (2 * Ne))
+
+/-- **driftLDRetention at its junk point, named.** An empty population destroys linkage
+disequilibrium in one generation. The drift factor `1 - 1 / (2 * Ne)` is junk-one at `Ne = 0`,
+so retention reduces to the recombination factor alone and the population contributes nothing to
+decay. Consumers must guard the argument that makes the divisor vanish. -/
+theorem driftLDRetention_zero_population_is_junk (c : ℝ) :
+    driftLDRetention 0 c = (1 - c) ^ 2 := by
+  unfold driftLDRetention
+  simp
 
 /-- **Drift--recombination equilibrium of the two-locus identity measure.**
 
