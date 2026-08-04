@@ -31,6 +31,14 @@ strict monotonicity, and exact parameter recovery on its biological domain `β >
 The file deliberately does not assert that a particular selected-front model converges to a
 given `Λ`-coalescent.  Such convergence requires model-specific front and genealogy theorems;
 the results below say exactly what becomes identifiable once a normalized `Λ` law is given.
+
+## Main results
+
+- `lambdaCoalescent_pairwise_rate_blind`: universal pair-rate blindness.
+- `speedTilt_pairwise_blind_triple_separates`: three lineages are minimal for speed tilts.
+- `speedBiasParameterFromTripleRate_recovers`: exact inverse of the triple-rate chart.
+- `frontSpeedBias_tripleMergerRate_injective`: front-speed identification at fixed scale.
+- `not_summable_one_div_bolthausenSznitmanTotalMergerRate`: the linear-rate contrast.
 -/
 
 open MeasureTheory
@@ -534,6 +542,24 @@ genealogical coordinate recovers the tilt parameter without approximation. -/
 theorem speedBiasParameterFromTripleRate_recovers
     (β : ℝ) :
     speedBiasParameterFromTripleRate (speedTiltBetaMergerRate β 3 3) = β := by
+  simp [speedBiasParameterFromTripleRate]
+
+/-- The inverse chart maps every genuine triple-merger probability back into the admissible
+speed-tilt domain. -/
+theorem speedBiasParameterFromTripleRate_mem_domain
+    {rate : ℝ} (hrate : rate ∈ Set.Ioo 0 1) :
+    -1 < speedBiasParameterFromTripleRate rate := by
+  have hinv : 1 < rate⁻¹ := by
+    simpa [one_div] using one_div_lt_one_div_of_lt hrate.1 hrate.2
+  unfold speedBiasParameterFromTripleRate
+  linarith
+
+/-- **Surjectivity of the triple-rate chart.** Every candidate rate is recovered after
+conversion to its speed-bias parameter. On `(0,1)` the preceding theorem additionally certifies
+that this parameter belongs to the biological domain; at zero Mathlib's total inverse passes
+through the excluded junk parameter `-2`. -/
+theorem speedTiltBetaMergerRate_speedBiasParameterFromTripleRate (rate : ℝ) :
+    speedTiltBetaMergerRate (speedBiasParameterFromTripleRate rate) 3 3 = rate := by
   simp [speedBiasParameterFromTripleRate]
 
 /-- Speed tilt after a front-displacement scale `γ`: the genealogy sees `θ / γ`. -/
