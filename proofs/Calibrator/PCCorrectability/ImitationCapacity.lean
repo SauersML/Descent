@@ -2338,18 +2338,21 @@ theorem thirdCumulant_frobenius_eq_gram_cubeSum {d n : ℕ} (L : Fin d → Fin n
       = ∑ a, ∑ b, ∑ i, ∑ j, ∑ c,
         (L a i * L b i * L c i) * (L a j * L b j * L c j) := by
     refine Finset.sum_congr rfl fun a _ ↦ Finset.sum_congr rfl fun b _ ↦ ?_
-    exact sum_reorder_pair_out _
+    exact sum_reorder_pair_out
+      (fun c i j ↦ (L a i * L b i * L c i) * (L a j * L b j * L c j))
   have hb : (∑ a, ∑ b, ∑ i, ∑ j, ∑ c,
         (L a i * L b i * L c i) * (L a j * L b j * L c j))
       = ∑ a, ∑ i, ∑ j, ∑ b, ∑ c,
         (L a i * L b i * L c i) * (L a j * L b j * L c j) := by
     refine Finset.sum_congr rfl fun a _ ↦ ?_
-    exact sum_reorder_pair_out _
+    exact sum_reorder_pair_out
+      (fun b i j ↦ ∑ c, (L a i * L b i * L c i) * (L a j * L b j * L c j))
   have ha : (∑ a, ∑ i, ∑ j, ∑ b, ∑ c,
         (L a i * L b i * L c i) * (L a j * L b j * L c j))
       = ∑ i, ∑ j, ∑ a, ∑ b, ∑ c,
         (L a i * L b i * L c i) * (L a j * L b j * L c j) :=
-    sum_reorder_pair_out _
+    sum_reorder_pair_out
+      (fun a i j ↦ ∑ b, ∑ c, (L a i * L b i * L c i) * (L a j * L b j * L c j))
   rw [hc, hb, ha]
   refine Finset.sum_congr rfl fun i _ ↦ Finset.sum_congr rfl fun j _ ↦
     Finset.sum_congr rfl fun a _ ↦ Finset.sum_congr rfl fun b _ ↦
