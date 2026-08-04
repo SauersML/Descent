@@ -69,6 +69,23 @@ theorem FactorsThrough.smul (A : H →ₗ[𝕜] Y) (C : H →ₗ[𝕜] H)
   rcases hC with ⟨T, rfl⟩
   exact ⟨c • T, by ext; simp⟩
 
+/-- The corrections factoring through a fixed observation form a linear subspace of all
+endomorphisms. -/
+def factorsThroughSubmodule (A : H →ₗ[𝕜] Y) : Submodule 𝕜 (H →ₗ[𝕜] H) where
+  carrier := {C | FactorsThrough A C}
+  zero_mem' := FactorsThrough.zero A
+  add_mem' := by
+    intro C D hC hD
+    exact FactorsThrough.add A C D hC hD
+  smul_mem' := by
+    intro c C hC
+    exact FactorsThrough.smul A C hC c
+
+/-- Membership in the factor-through submodule is exactly factorization through `A`. -/
+@[simp] theorem mem_factorsThroughSubmodule
+    (A : H →ₗ[𝕜] Y) (C : H →ₗ[𝕜] H) :
+    C ∈ factorsThroughSubmodule A ↔ FactorsThrough A C := Iff.rfl
+
 /-- Post-composing a factored correction by an arbitrary endomorphism preserves admissibility. -/
 theorem FactorsThrough.postcomp (A : H →ₗ[𝕜] Y) (C R : H →ₗ[𝕜] H)
     (hC : FactorsThrough A C) :
@@ -111,7 +128,8 @@ theorem uniformCorrectionFamily_zero (A : H →ₗ[𝕜] Y) :
 /-- Every finite uniform dictionary produces one correction factoring through `A`. -/
 theorem uniformCorrectionFamily_subset_factorsThrough
     (A : H →ₗ[𝕜] Y) (k : ℕ) :
-    UniformCorrectionFamily A k ⊆ {C | FactorsThrough A C} := by
+    UniformCorrectionFamily A k ⊆
+      (factorsThroughSubmodule A : Set (H →ₗ[𝕜] H)) := by
   intro C hC
   rcases hC with ⟨T, a, rfl⟩
   exact ⟨combinedPostprocessor T a, rfl⟩
@@ -119,9 +137,10 @@ theorem uniformCorrectionFamily_subset_factorsThrough
 /-- Every single factored correction is represented by any nonempty uniform dictionary. -/
 theorem factorsThrough_subset_uniformCorrectionFamily
     (A : H →ₗ[𝕜] Y) (k : ℕ) (hk : 0 < k) :
-    {C | FactorsThrough A C} ⊆ UniformCorrectionFamily A k := by
+    (factorsThroughSubmodule A : Set (H →ₗ[𝕜] H)) ⊆ UniformCorrectionFamily A k := by
   classical
   intro C hC
+  change FactorsThrough A C at hC
   rcases hC with ⟨S, rfl⟩
   let j₀ : Fin k := ⟨0, hk⟩
   refine ⟨fun j ↦ if j = j₀ then S else 0,
@@ -133,7 +152,8 @@ theorem factorsThrough_subset_uniformCorrectionFamily
 all corrections factoring through the observation operator. -/
 theorem uniformCorrectionFamily_eq_factorsThrough
     (A : H →ₗ[𝕜] Y) (k : ℕ) (hk : 0 < k) :
-    UniformCorrectionFamily A k = {C | FactorsThrough A C} := by
+    UniformCorrectionFamily A k =
+      (factorsThroughSubmodule A : Set (H →ₗ[𝕜] H)) := by
   apply Set.Subset.antisymm
   · exact uniformCorrectionFamily_subset_factorsThrough A k
   · exact factorsThrough_subset_uniformCorrectionFamily A k hk
@@ -143,7 +163,8 @@ full factor-through cone. -/
 theorem uniformCorrectionFamily_order_dichotomy
     (A : H →ₗ[𝕜] Y) (k : ℕ) :
     UniformCorrectionFamily A k =
-      if k = 0 then {0} else {C | FactorsThrough A C} := by
+      if k = 0 then {0} else
+        (factorsThroughSubmodule A : Set (H →ₗ[𝕜] H)) := by
   by_cases hk : k = 0
   · subst k
     simp [uniformCorrectionFamily_zero]
@@ -255,7 +276,8 @@ noncomputable def uniformCorrectionWidth
 /-- The correction diameter: optimize over every single correction factoring through `A`. -/
 noncomputable def correctionDiameter
     (A : H →ₗ[ℝ] Y) (B : Set H) : ℝ :=
-  sInf (worstCorrectionResidual B '' {C | FactorsThrough A C})
+  sInf (worstCorrectionResidual B ''
+    (factorsThroughSubmodule A : Set (H →ₗ[ℝ] H)))
 
 /-- **Numerical uniform-collapse theorem.**  On every target class, all positive dictionary orders
 have exactly the correction diameter.  This is an equality of the optimization domains, so it does
