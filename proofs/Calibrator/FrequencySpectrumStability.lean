@@ -244,6 +244,28 @@ theorem canonicalGenomeMultiplierForEpochCoordinates_add_epochs
     kappa * epochSpectrumCoordinateCount K + kappa * (2 * extra) by push_cast; ring,
     Real.exp_add]
 
+/-- **Exact one-epoch price at the Cauchy root.**  A new epoch contributes two spectrum
+coordinates.  Since independent-data cost squares inverse singular-value cost, its exact
+multiplier is the fourth power of the stationary per-direction base
+`(1 + θ²) / (1 - θ²)`. -/
+theorem canonicalGenomeMultiplierForEpochCoordinates_succ_at_stationary
+    (θ : ℝ) (K : ℕ) (hK : 2 ≤ K) (hθ0 : 0 < θ) (hθ1 : θ < 1)
+    (hstationary : SpectrumIdentifiability.CauchyConditioningStationary θ) :
+    canonicalGenomeMultiplierForEpochCoordinates
+        (SpectrumIdentifiability.cauchyConditioningProfile θ) (K + 1) =
+      canonicalGenomeMultiplierForEpochCoordinates
+          (SpectrumIdentifiability.cauchyConditioningProfile θ) K *
+        ((1 + θ ^ 2) / (1 - θ ^ 2)) ^ 4 := by
+  rw [canonicalGenomeMultiplierForEpochCoordinates_add_epochs _ K 1 hK]
+  have hbase :=
+    SpectrumIdentifiability.exp_half_cauchyConditioningProfile_at_stationary
+      θ hθ0 hθ1 hstationary
+  rw [show SpectrumIdentifiability.cauchyConditioningProfile θ * (2 * (1 : ℕ)) =
+    (4 : ℕ) * (SpectrumIdentifiability.cauchyConditioningProfile θ / 2) by
+      norm_num
+      ring]
+  rw [Real.exp_nat_mul, hbase]
+
 /-- The actionable spectrum-precision table for halving history error. -/
 theorem spectrumPrecisionMultiplier_halving_table :
     spectrumPrecisionMultiplier 2 2 = 2 ∧
