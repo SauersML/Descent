@@ -153,8 +153,22 @@ def main():
 
     measured = sum(v for k, v in by_status.items()
                    if k in {"VALIDATED", "FALSIFIED", "MEASURED", "TESTED"})
-    print("\nMEASURED-against-ground-truth: %d / %d  (%.1f%%)"
+    # A definition that declares itself NOT AN EMPIRICAL CLAIM is not owed a
+    # measurement, so counting it in the denominator understates what has been
+    # established. The screen that builds `emp` reads names and bodies, not
+    # status, so the exclusion has to happen here -- and both numbers are
+    # printed, because a denominator that moved is a denominator a reader must
+    # be able to audit.
+    nonclaim = [r for r in emp
+                if "NOT AN EMPIRICAL CLAIM" in (r.get("doc") or "")]
+    claimable = len(emp) - len(nonclaim)
+    print("\ndeclared NOT AN EMPIRICAL CLAIM (witnesses): %d" % len(nonclaim))
+    for r in nonclaim:
+        print("    %s  (%s)" % (r["short"], r["file"].split("/")[-1]))
+    print("\nMEASURED / all screened:        %d / %d  (%.1f%%)"
           % (measured, len(emp), 100.0 * measured / max(len(emp), 1)))
+    print("MEASURED / measurable claims:   %d / %d  (%.1f%%)"
+          % (measured, claimable, 100.0 * measured / max(claimable, 1)))
     print("wrote inventory.json")
 
 
