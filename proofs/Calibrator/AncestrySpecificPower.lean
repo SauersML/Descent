@@ -127,17 +127,38 @@ theorem genotypeVarianceHWE_at_reference_point :
   unfold genotypeVarianceHWE
   norm_num
 
-/-- Genotype variance is nonnegative when 0 ≤ p ≤ 1. -/
-theorem genotypeVariance_nonneg (p : ℝ) (h_p : 0 ≤ p) (h_p_le : p ≤ 1) :
-    0 ≤ genotypeVarianceHWE p := by
+/-- Genotype variance is nonnegative exactly on the biological frequency interval. -/
+theorem genotypeVariance_nonneg_iff (p : ℝ) :
+    0 ≤ genotypeVarianceHWE p ↔ 0 ≤ p ∧ p ≤ 1 := by
   unfold genotypeVarianceHWE
-  nlinarith
+  constructor
+  · intro h
+    constructor <;> nlinarith
+  · rintro ⟨h_p, h_p_le⟩
+    nlinarith
 
-/-- Genotype variance is strictly positive when 0 < p < 1. -/
-theorem genotypeVariance_pos (p : ℝ) (h_p : 0 < p) (h_p_lt : p < 1) :
-    0 < genotypeVarianceHWE p := by
+/-- Genotype variance is positive exactly at polymorphic loci. -/
+theorem genotypeVariance_pos_iff (p : ℝ) :
+    0 < genotypeVarianceHWE p ↔ 0 < p ∧ p < 1 := by
   unfold genotypeVarianceHWE
-  nlinarith
+  constructor
+  · intro h
+    constructor <;> nlinarith
+  · rintro ⟨h_p, h_p_lt⟩
+    nlinarith
+
+/-- Genotype variance vanishes exactly for an absent or fixed alternate allele. -/
+theorem genotypeVariance_eq_zero_iff (p : ℝ) :
+    genotypeVarianceHWE p = 0 ↔ p = 0 ∨ p = 1 := by
+  unfold genotypeVarianceHWE
+  constructor
+  · intro h
+    rcases mul_eq_zero.mp h with h | h
+    · left
+      nlinarith
+    · right
+      linarith
+  · rintro (rfl | rfl) <;> norm_num
 
 /-- Genotype variance is maximized at p = 1/2 where it equals 1/2. -/
 theorem genotypeVariance_max (p : ℝ) :
@@ -163,7 +184,7 @@ noncomputable def effectiveFisherInformation (n : ℕ) (p r2_ld : ℝ) : ℝ :=
 the theorem states a number: an inequality or an invariance leaves a family of bodies
 satisfying it, and a value does not. -/
 theorem effectiveFisherInformation_at_reference_point :
-    effectiveFisherInformation 1 1 1 = 0 := by
+    effectiveFisherInformation 1 (1 / 2) 1 = 1 / 2 := by
   norm_num [effectiveFisherInformation, fisherInformation, genotypeVarianceHWE]
 
 
@@ -173,6 +194,14 @@ theorem effectiveFisherInfo_eq (n : ℕ) (p r2_ld : ℝ) :
     effectiveFisherInformation n p r2_ld = n * (2 * p * (1 - p)) * r2_ld := by
   unfold effectiveFisherInformation fisherInformation genotypeVarianceHWE
   ring
+
+/-- Effective information vanishes exactly when the study is empty, the locus is
+monomorphic, or the tag carries no squared correlation with the causal variant. -/
+theorem effectiveFisherInformation_eq_zero_iff (n : ℕ) (p r2_ld : ℝ) :
+    effectiveFisherInformation n p r2_ld = 0 ↔
+      n = 0 ∨ p = 0 ∨ p = 1 ∨ r2_ld = 0 := by
+  simp [effectiveFisherInformation, fisherInformation, genotypeVariance_eq_zero_iff,
+    mul_eq_zero, or_assoc]
 
 /-- **Bridge between conventional LD `r²` and permeability attenuation.**
 If `η` is the correlation-scale response retained by a tag, conventional regression
@@ -202,7 +231,7 @@ theorem information_loss_from_tagging (n : ℕ) (p r2_ld : ℝ)
     unfold fisherInformation
     apply mul_nonneg
     · exact Nat.cast_nonneg n
-    · exact genotypeVariance_nonneg p h_p h_p_le
+    · exact (genotypeVariance_nonneg_iff p).2 ⟨h_p, h_p_le⟩
   nlinarith
 
 /-!
