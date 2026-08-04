@@ -25,8 +25,8 @@ first moment of the merger-fraction law is already visible.
 This is an exact information boundary, not an asymptotic approximation.  The Dirac witnesses
 show that two normalized merger laws can agree on every two-lineage rate while their
 three-lineage rates are separated by an arbitrary change in merger fraction.  The final
-section records the commonly used one-parameter rate chart `1 / (θ + 2)` and proves that the
-three-lineage statistic identifies its parameter on the biological domain `θ > -2`.
+section develops the complete normalized `Beta(1, β + 1)` rate chart and proves positivity,
+strict monotonicity, and exact parameter recovery on its biological domain `β > -1`.
 
 The file deliberately does not assert that a particular selected-front model converges to a
 given `Λ`-coalescent.  Such convergence requires model-specific front and genealogy theorems;
@@ -77,41 +77,6 @@ theorem pairwise_blind_three_lineage_separates_dirac :
       lambdaCoalescentMergerRate (Measure.dirac 1) 3 3 = 1 := by
   simp
 
-/-! ## A one-parameter merger-rate chart -/
-
-/-- Normalized pairwise rate in the `θ` rate chart. -/
-noncomputable def betaFamilyPairMergerRate (_θ : ℝ) : ℝ :=
-  1
-
-/-- Three-lineage simultaneous-merger rate in the `θ` rate chart. -/
-noncomputable def betaFamilyTripleMergerRate (θ : ℝ) : ℝ :=
-  1 / (θ + 2)
-
-/-- Pairwise summaries erase the parameter completely. -/
-theorem betaFamilyPairMergerRate_blind (θ₁ θ₂ : ℝ) :
-    betaFamilyPairMergerRate θ₁ = betaFamilyPairMergerRate θ₂ :=
-  rfl
-
-/-- Three-lineage rates identify the parameter throughout the biological domain. -/
-theorem betaFamilyTripleMergerRate_injective_on
-    {θ₁ θ₂ : ℝ} (hθ₁ : -2 < θ₁) (hθ₂ : -2 < θ₂)
-    (hrate : betaFamilyTripleMergerRate θ₁ = betaFamilyTripleMergerRate θ₂) :
-    θ₁ = θ₂ := by
-  have hne₁ : θ₁ + 2 ≠ 0 := by linarith
-  have hne₂ : θ₂ + 2 ≠ 0 := by linarith
-  unfold betaFamilyTripleMergerRate at hrate
-  field_simp [hne₁, hne₂] at hrate
-  linarith
-
-/-- Increasing `θ` strictly decreases the visible three-lineage rate. -/
-theorem betaFamilyTripleMergerRate_strictAnti
-    {θ₁ θ₂ : ℝ} (hθ₁ : -2 < θ₁) (hθ : θ₁ < θ₂) :
-    betaFamilyTripleMergerRate θ₂ < betaFamilyTripleMergerRate θ₁ := by
-  unfold betaFamilyTripleMergerRate
-  have hpos₁ : 0 < θ₁ + 2 := by linarith
-  have hpos₂ : 0 < θ₂ + 2 := by linarith
-  exact one_div_lt_one_div_of_lt hpos₁ (by linarith)
-
 /-! ## Complete normalized speed-tilt rate chart -/
 
 /-- Full-merger moment for `extra + 2` lineages under the normalized
@@ -142,6 +107,56 @@ theorem speedTiltFullMergerRate_succ (β : ℝ) (extra : ℕ) :
         (((extra : ℝ) + 1) / (β + (extra : ℝ) + 2)) := by
   simp only [speedTiltFullMergerRate, Finset.prod_range_succ]
 
+/-- Every normalized full-merger coordinate is positive on the probability-law domain
+`Beta(1, β + 1)`, namely `β > -1`. -/
+theorem speedTiltFullMergerRate_pos
+    {β : ℝ} (hβ : -1 < β) (extra : ℕ) :
+    0 < speedTiltFullMergerRate β extra := by
+  unfold speedTiltFullMergerRate
+  apply Finset.prod_pos
+  intro j _
+  apply div_pos
+  · positivity
+  · have hj0 : 0 ≤ (j : ℝ) := Nat.cast_nonneg j
+    linarith
+
+/-- Each additional lineage makes a full simultaneous merger strictly less likely on the
+biological domain. -/
+theorem speedTiltFullMergerRate_strictAnti_extra
+    {β : ℝ} (hβ : -1 < β) (extra : ℕ) :
+    speedTiltFullMergerRate β (extra + 1) < speedTiltFullMergerRate β extra := by
+  rw [speedTiltFullMergerRate_succ]
+  have hrate : 0 < speedTiltFullMergerRate β extra :=
+    speedTiltFullMergerRate_pos hβ extra
+  have hden : 0 < β + (extra : ℝ) + 2 := by
+    have hextra : 0 ≤ (extra : ℝ) := Nat.cast_nonneg extra
+    linarith
+  have hfactor : ((extra : ℝ) + 1) / (β + (extra : ℝ) + 2) < 1 := by
+    apply (div_lt_one hden).2
+    linarith
+  calc
+    speedTiltFullMergerRate β extra *
+        (((extra : ℝ) + 1) / (β + (extra : ℝ) + 2)) <
+        speedTiltFullMergerRate β extra * 1 :=
+      mul_lt_mul_of_pos_left hfactor hrate
+    _ = speedTiltFullMergerRate β extra := mul_one _
+
+/-- Every normalized full-merger coordinate is at most the pair-merger normalization. -/
+theorem speedTiltFullMergerRate_le_one
+    {β : ℝ} (hβ : -1 < β) (extra : ℕ) :
+    speedTiltFullMergerRate β extra ≤ 1 := by
+  induction extra with
+  | zero => simp
+  | succ extra ih =>
+      exact (speedTiltFullMergerRate_strictAnti_extra hβ extra).le.trans ih
+
+/-- Full-merger coordinates belong to `(0, 1]`; the upper endpoint occurs only at the
+normalized pair rate. -/
+theorem speedTiltFullMergerRate_mem_Ioc
+    {β : ℝ} (hβ : -1 < β) (extra : ℕ) :
+    speedTiltFullMergerRate β extra ∈ Set.Ioc 0 1 :=
+  ⟨speedTiltFullMergerRate_pos hβ extra, speedTiltFullMergerRate_le_one hβ extra⟩
+
 /-- All `b`-lineage, specified-`k`-tuple rates obtained by expanding
 `(1-x)^(b-k)` against the full-merger moments. -/
 noncomputable def speedTiltBetaMergerRate (β : ℝ) (b k : ℕ) : ℝ :=
@@ -158,6 +173,37 @@ noncomputable def speedTiltBetaMergerRate (β : ℝ) (b k : ℕ) : ℝ :=
 @[simp] theorem speedTiltBetaMergerRate_three_three (β : ℝ) :
     speedTiltBetaMergerRate β 3 3 = 1 / (β + 2) := by
   simp [speedTiltBetaMergerRate]
+
+/-- The first visible coordinate is a genuine probability on the biological domain. -/
+theorem speedTiltBetaMergerRate_three_three_mem_Ioo
+    {β : ℝ} (hβ : -1 < β) :
+    speedTiltBetaMergerRate β 3 3 ∈ Set.Ioo 0 1 := by
+  rw [speedTiltBetaMergerRate_three_three]
+  constructor
+  · exact one_div_pos.mpr (by linarith)
+  · have hden : 1 < β + 2 := by linarith
+    calc
+      1 / (β + 2) < 1 / 1 := one_div_lt_one_div_of_lt (by norm_num) hden
+      _ = 1 := by norm_num
+
+/-- Increasing the speed-bias parameter strictly suppresses the first visible multiple-merger
+coordinate. -/
+theorem speedTiltBetaMergerRate_three_three_strictAnti
+    {β₁ β₂ : ℝ} (hβ₁ : -1 < β₁) (hβ : β₁ < β₂) :
+    speedTiltBetaMergerRate β₂ 3 3 < speedTiltBetaMergerRate β₁ 3 3 := by
+  rw [speedTiltBetaMergerRate_three_three, speedTiltBetaMergerRate_three_three]
+  exact one_div_lt_one_div_of_lt (by linarith) (by linarith)
+
+/-- Three lineages identify the speed-bias parameter on the entire probability-law domain. -/
+theorem speedTiltBetaMergerRate_three_three_injective_on
+    {β₁ β₂ : ℝ} (hβ₁ : -1 < β₁) (hβ₂ : -1 < β₂)
+    (hrate : speedTiltBetaMergerRate β₁ 3 3 = speedTiltBetaMergerRate β₂ 3 3) :
+    β₁ = β₂ := by
+  rw [speedTiltBetaMergerRate_three_three, speedTiltBetaMergerRate_three_three] at hrate
+  have hne₁ : β₁ + 2 ≠ 0 := by linarith
+  have hne₂ : β₂ + 2 ≠ 0 := by linarith
+  field_simp [hne₁, hne₂] at hrate
+  linarith
 
 /-- Parameter readout from the normalized three-lineage rate. -/
 noncomputable def speedBiasParameterFromTripleRate (rate : ℝ) : ℝ :=
@@ -179,6 +225,23 @@ theorem frontSpeedBias_tripleMergerRate (θ γ : ℝ) :
     speedTiltBetaMergerRate (frontSpeedBiasParameter θ γ) 3 3 =
       1 / (θ / γ + 2) := by
   simp [frontSpeedBiasParameter]
+
+/-- A nonnegative speed penalty at positive displacement scale moves the genealogy from the
+Bolthausen--Sznitman coordinate `1/2` toward Kingman, never toward the star coalescent. -/
+theorem frontSpeedBias_tripleMergerRate_le_half
+    {θ γ : ℝ} (hθ : 0 ≤ θ) (hγ : 0 < γ) :
+    speedTiltBetaMergerRate (frontSpeedBiasParameter θ γ) 3 3 ≤ 1 / 2 := by
+  rw [frontSpeedBias_tripleMergerRate]
+  have hratio : 0 ≤ θ / γ := div_nonneg hθ hγ.le
+  exact one_div_le_one_div_of_le (by norm_num) (by linarith)
+
+/-- A strictly positive speed penalty strictly suppresses the three-lineage merger rate. -/
+theorem frontSpeedBias_tripleMergerRate_lt_half
+    {θ γ : ℝ} (hθ : 0 < θ) (hγ : 0 < γ) :
+    speedTiltBetaMergerRate (frontSpeedBiasParameter θ γ) 3 3 < 1 / 2 := by
+  rw [frontSpeedBias_tripleMergerRate]
+  have hratio : 0 < θ / γ := div_pos hθ hγ
+  exact one_div_lt_one_div_of_lt (by norm_num) (by linarith)
 
 /-- No speed tilt gives the Bolthausen--Sznitman three-lineage coordinate `1/2`. -/
 @[simp] theorem speedTiltBetaMergerRate_three_three_zero :
