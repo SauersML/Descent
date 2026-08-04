@@ -380,6 +380,14 @@ theorem source_higher_effective_information
     Power: the prediction spans 4.20000 to 8.40000. -/
 noncomputable def ncp (n_eff β : ℝ) : ℝ := n_eff * β ^ 2
 
+/-- Reference evaluation.  The value is computed through the definitions this body calls, but
+the theorem states a number: an inequality or an invariance leaves a family of bodies
+satisfying it, and a value does not. -/
+theorem ncp_at_reference_point :
+    ncp 1 1 = 1 := by
+  norm_num [ncp]
+
+
 /-- NCP is monotone in effective sample size. -/
 theorem ncp_mono_neff (n1 n2 β : ℝ) (h_n : n1 < n2) (h_β : β ≠ 0) :
     ncp n1 β < ncp n2 β := by

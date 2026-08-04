@@ -237,6 +237,14 @@ theorem ghostGain_zero_size_is_junk (α : ℝ) :
 /-- The gain the effective-unit count would predict: a power of `n`. Supplied as a value. -/
 noncomputable def countPredictedGain (α n : ℝ) : ℝ := n ^ α
 
+/-- Reference evaluation.  The value is computed through the definitions this body calls, but
+the theorem states a number: an inequality or an invariance leaves a family of bodies
+satisfying it, and a value does not. -/
+theorem countPredictedGain_at_reference_point :
+    countPredictedGain 1 1 = 1 := by
+  norm_num [countPredictedGain]
+
+
 /-- **The counting gain is multiplicative in the tail index.** Splitting the exponent splits the
 gain into a product, which is the property that makes it a power law rather than merely a growing
 function, and which no statement about its growth relative to the logarithm carries. -/

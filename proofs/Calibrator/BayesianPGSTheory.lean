@@ -231,6 +231,14 @@ theorem shrinkage_increases_with_h (n : ℝ) (h₁ h₂ : ℝ)
 noncomputable def jamesSteinMSE (lam σ_sq β_sq : ℝ) : ℝ :=
   lam ^ 2 * σ_sq + (1 - lam) ^ 2 * β_sq
 
+/-- Reference evaluation.  The value is computed through the definitions this body calls, but
+the theorem states a number: an inequality or an invariance leaves a family of bodies
+satisfying it, and a value does not. -/
+theorem jamesSteinMSE_at_reference_point :
+    jamesSteinMSE 1 1 1 = 1 := by
+  norm_num [jamesSteinMSE]
+
+
 /-- **OLS MSE is the no-shrinkage case.** MSE(1) = σ² (full weight on data). -/
 theorem mse_ols_is_no_shrinkage (σ_sq β_sq : ℝ) :
     jamesSteinMSE 1 σ_sq β_sq = σ_sq := by
@@ -454,6 +462,14 @@ section PriorSpecification
 noncomputable def spikeAndSlabPriorVariance (π σ_slab : ℝ) : ℝ :=
   π * σ_slab ^ 2
 
+/-- Reference evaluation.  The value is computed through the definitions this body calls, but
+the theorem states a number: an inequality or an invariance leaves a family of bodies
+satisfying it, and a value does not. -/
+theorem spikeAndSlabPriorVariance_at_reference_point :
+    spikeAndSlabPriorVariance 1 1 = 1 := by
+  norm_num [spikeAndSlabPriorVariance]
+
+
 /-- Spike-and-slab variance is nonneg. -/
 theorem spike_slab_variance_nonneg (π σ_slab : ℝ)
     (h_π : 0 ≤ π) :
@@ -471,6 +487,14 @@ theorem spike_slab_variance_nonneg (π σ_slab : ℝ)
                                = π·(1-π)·σ²_β -/
 noncomputable def misspecExcessRisk (π σ_β_sq : ℝ) : ℝ :=
   π * (1 - π) * σ_β_sq
+
+/-- Reference evaluation.  The value is computed through the definitions this body calls, but
+the theorem states a number: an inequality or an invariance leaves a family of bodies
+satisfying it, and a value does not. -/
+theorem misspecExcessRisk_at_reference_point :
+    misspecExcessRisk 1 1 = 0 := by
+  norm_num [misspecExcessRisk]
+
 
 /-- **Excess risk is nonneg for valid parameters.** -/
 theorem misspec_excess_risk_nonneg (π σ_β_sq : ℝ)

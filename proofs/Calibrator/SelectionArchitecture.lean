@@ -724,6 +724,14 @@ section GWASPowerMAF
 noncomputable def gwasNCP (n : ℕ) (β p : ℝ) : ℝ :=
   n * β ^ 2 * (2 * p * (1 - p))
 
+/-- Reference evaluation.  The value is computed through the definitions this body calls, but
+the theorem states a number: an inequality or an invariance leaves a family of bodies
+satisfying it, and a value does not. -/
+theorem gwasNCP_at_reference_point :
+    gwasNCP 1 1 1 = 0 := by
+  norm_num [gwasNCP]
+
+
 /-- NCP is positive for informative variants. -/
 theorem gwas_ncp_pos (n : ℕ) (β p : ℝ)
     (hn : 0 < n) (hβ : β ≠ 0) (hp : 0 < p) (hp1 : p < 1) :

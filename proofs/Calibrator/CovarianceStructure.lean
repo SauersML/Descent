@@ -421,6 +421,14 @@ theorem admixture_ld_two_locus_eq (alpha p_A q_A p_B q_B : ℝ) :
 noncomputable def admixtureLDAtGen (alpha p_A q_A p_B q_B r : ℝ) (g : ℕ) : ℝ :=
   (1 - r) ^ g * admixtureLDTwoLocus alpha p_A q_A p_B q_B
 
+/-- Reference evaluation.  The value is computed through the definitions this body calls, but
+the theorem states a number: an inequality or an invariance leaves a family of bodies
+satisfying it, and a value does not. -/
+theorem admixtureLDAtGen_at_reference_point :
+    admixtureLDAtGen 1 1 1 1 1 1 1 = 0 := by
+  norm_num [admixtureLDAtGen, admixedAlleleFreq, admixtureLDTwoLocus, haplotypeFreqAdmixed]
+
+
 /-- **Full admixture LD formula at generation g.**
     Combining the algebraic identity with recombination decay:
     D(g) = α(1−α)(p_A − p_B)(q_A − q_B)(1−r)^g. -/

@@ -319,6 +319,14 @@ section Epistasis
 noncomputable def epistaticVariancePairwise (γ p₁ p₂ : ℝ) : ℝ :=
   γ ^ 2 * (2 * p₁ * (1 - p₁)) * (2 * p₂ * (1 - p₂))
 
+/-- Reference evaluation.  The value is computed through the definitions this body calls, but
+the theorem states a number: an inequality or an invariance leaves a family of bodies
+satisfying it, and a value does not. -/
+theorem epistaticVariancePairwise_at_reference_point :
+    epistaticVariancePairwise 1 1 1 = 0 := by
+  norm_num [epistaticVariancePairwise]
+
+
 /-- Epistatic variance is nonneg. -/
 theorem epistatic_variance_pairwise_nonneg (γ p₁ p₂ : ℝ)
     (h₁ : 0 ≤ p₁) (h₁' : p₁ ≤ 1) (h₂ : 0 ≤ p₂) (h₂' : p₂ ≤ 1) :

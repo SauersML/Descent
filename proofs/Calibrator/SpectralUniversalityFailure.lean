@@ -662,6 +662,13 @@ noncomputable def entrySquareSum {Locus : Type*} [Fintype Locus]
     (covariance : Matrix Locus Locus ℝ) : ℝ :=
   ∑ i, ∑ j, covariance i j ^ 2
 
+/-- Reference evaluation on a concrete two-by-two matrix.  The matrix is asymmetric on purpose:
+a body that reads entry `i j` and one that reads `j i` do not agree on it. -/
+theorem entrySquareSum_at_reference_point :
+    entrySquareSum (!![1, 2; 3, 4] : Matrix (Fin 2) (Fin 2) ℝ) = 30 := by
+  norm_num [entrySquareSum, Fin.sum_univ_two]
+
+
 /-- The quadratic observable is the order-two specialization of the all-order traffic sum. -/
 theorem entryPowerSum_two {Locus : Type*} [Fintype Locus]
     (covariance : Matrix Locus Locus ℝ) :

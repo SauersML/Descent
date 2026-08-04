@@ -615,6 +615,14 @@ non-stationary environments, and continuum spectral measures. -/
     correct damping factor: `α(2ρ - α)V`. Measured across 32 cells at `|z| < 1.3`. -/
 noncomputable def shrinkagePremium (α ρ V : ℝ) : ℝ := α * (2 * ρ - α) * V
 
+/-- Reference evaluation.  The value is computed through the definitions this body calls, but
+the theorem states a number: an inequality or an invariance leaves a family of bodies
+satisfying it, and a value does not. -/
+theorem shrinkagePremium_at_reference_point :
+    shrinkagePremium 1 1 1 = 1 := by
+  norm_num [shrinkagePremium]
+
+
 /-- **The safe region is `0 < α < 2ρ`.** Damping helps for any shrinkage strictly between zero
     and twice the correct factor — a wide target, which is why the rule tolerates a
     mis-estimated rate. -/

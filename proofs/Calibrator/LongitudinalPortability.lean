@@ -440,6 +440,14 @@ prevalence `π_obs` and mean predicted risk `π_pred`. -/
 noncomputable def temporalCalibrationInTheLarge (π_obs π_pred : ℝ) : ℝ :=
   calibrationInTheLarge π_obs π_pred
 
+/-- Reference evaluation.  The value is computed through the definitions this body calls, but
+the theorem states a number: an inequality or an invariance leaves a family of bodies
+satisfying it, and a value does not. -/
+theorem temporalCalibrationInTheLarge_at_reference_point :
+    temporalCalibrationInTheLarge 1 1 = 0 := by
+  norm_num [temporalCalibrationInTheLarge, calibrationInTheLarge]
+
+
 /-- Exact temporal calibration drift from a prevalence shift with fixed mean
 prediction. The temporal CITL shift equals the prevalence shift exactly. -/
 theorem temporal_calibration_changes_with_prevalence

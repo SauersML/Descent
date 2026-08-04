@@ -606,6 +606,14 @@ This is `admixedFst α fst_AB`.
 noncomputable def admixedAlleleFreq (α p_A p_B : ℝ) : ℝ :=
   α * p_A + (1 - α) * p_B
 
+/-- Reference evaluation.  The value is computed through the definitions this body calls, but
+the theorem states a number: an inequality or an invariance leaves a family of bodies
+satisfying it, and a value does not. -/
+theorem admixedAlleleFreq_at_reference_point :
+    admixedAlleleFreq 1 1 1 = 1 := by
+  norm_num [admixedAlleleFreq]
+
+
 /-- **Key algebraic identity**: the difference between admixed and source A
     allele frequencies is (1-α) times the parental difference.
     This is the core of the (1-α)² derivation. -/

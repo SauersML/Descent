@@ -62,6 +62,14 @@ lag covariances. -/
 noncomputable def gaussianPairSquareChannel3 (γ₀ γ₁ γ₂ : ℝ) : ℝ :=
   3 * γ₀ ^ 2 + 4 * γ₁ ^ 2 + 2 * γ₂ ^ 2
 
+/-- Reference evaluation.  The value is computed through the definitions this body calls, but
+the theorem states a number: an inequality or an invariance leaves a family of bodies
+satisfying it, and a value does not. -/
+theorem gaussianPairSquareChannel3_at_reference_point :
+    gaussianPairSquareChannel3 1 1 1 = 9 := by
+  norm_num [gaussianPairSquareChannel3]
+
+
 /-- **The channel is nonnegative: it is a positive combination of squares.** A body that lost a
 square, or carried a negative weight, would fail here on the coordinate it broke. -/
 theorem gaussianPairSquareChannel3_nonneg (γ₀ γ₁ γ₂ : ℝ) :
