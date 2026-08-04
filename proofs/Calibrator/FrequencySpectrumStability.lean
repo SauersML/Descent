@@ -619,6 +619,21 @@ theorem targetIdentifiableUnderLinearObservation_id_iff
       IdentifiableUnderLinearObservation observation modelClass := by
   rfl
 
+/-- The global functional criterion in `SpectrumIdentifiability` is exactly the unrestricted
+model-class specialization of the class-relative criterion. -/
+theorem targetIdentifiableUnderLinearObservation_univ_iff
+    {R V W Z : Type*} [Ring R]
+    [AddCommGroup V] [Module R V] [AddCommGroup W] [Module R W]
+    [AddCommGroup Z] [Module R Z]
+    (observation : V →ₗ[R] W) (target : V →ₗ[R] Z) :
+    TargetIdentifiableUnderLinearObservation observation target Set.univ ↔
+      SpectrumIdentifiability.LinearTargetDeterminedByObservation observation target := by
+  constructor
+  · intro hdetermined left right hequal
+    exact hdetermined left (Set.mem_univ left) right (Set.mem_univ right) hequal
+  · intro hdetermined left _ right _ hequal
+    exact hdetermined left right hequal
+
 /-- **Intrinsic identifiability criterion.**  The data identify a class exactly when no
 nonzero difference of two admissible histories belongs to the observation kernel. -/
 theorem identifiableUnderLinearObservation_iff_difference_kernel
