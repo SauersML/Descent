@@ -1,0 +1,765 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Calibrator.FunctionalDescent
+import Mathlib.Tactic
+
+namespace Calibrator
+
+open scoped BigOperators
+
+/-!
+# The section map: descent for conditionals that are actually constructed
+
+`Calibrator.FunctionalDescent` states descent for an abstract section map
+`conditionalSection : Population → Context → Conditional`.  Nothing there builds a conditional
+from a law, so its interaction and confounding witnesses are arithmetic identities that a reader
+must accept as standing for descent statements.  This module supplies the missing construction —
+`fiberConditional`, elementary division by a fiber mass — and then proves the descent statements
+themselves.
+
+The organizing object is the **section** over a label value `x`: the set of fiber conditionals
+`{fiberConditional π (P i) x}` that the family of populations can realize there.  Descent says
+exactly that the functional is constant on each section, and every result below is the geometry
+of that set against the functional.
+
+## What is proved
+
+* `functionalDescends_iff_descendsAlong` — the abstract formulation is instantiated: for
+  nonnegative laws, `FunctionalDescends` over `fiberConditional` is `DescendsAlong`.
+* `descendsAlong_iff_pairwiseConsistent` — descent is decided by pairs of populations, for an
+  arbitrary (not necessarily countable) family.  At finite resolution there is no further gluing
+  condition, which is exactly what fails for undominated families over a continuum.
+* `kernelSufficient_iff_identity_descends` — every functional descends iff the family shares one
+  fiber conditional, iff the identity functional descends.  One test settles the whole class.
+* `descendsAlong_sectionMean_of_labelFunction` and `labelFunction_of_descends_pointLaws` — the
+  affine pole: label-measurable kernels always descend, and against the family of all point laws
+  nothing else does.
+* `abs_sectionMean_sub_le` with `exists_kernel_attaining_totalVariationGap` — the size of the
+  obstruction is the total-variation width of the section, attained, not a slack bound.
+* `sectionMean_gap_unbounded_at_small_totalVariationGap` — and for kernels with no bound the
+  width in total variation controls nothing at all: two laws at total-variation distance `2ε`
+  can differ by any prescribed amount.  A bounded kernel is not a technical convenience in the
+  bound above; without it the bound is false.
+* `interaction_join_obstruction`, `confounding_meet_obstruction` — the two order-theoretic
+  failures, now stated as descent of a functional of a joint law rather than as arithmetic.  The
+  conditional risks driving them are `interactionRisk` and `confoundedConditionalRisk` from
+  `Calibrator.FunctionalDescent`, so these are those witnesses, promoted.
+* `kernelSufficient_componentPosterior` — the posterior component vector of a mixture is
+  kernel-sufficient for the family of all mixing weights, so *every* functional descends along
+  it.  This is `componentMixtureDensity_factorization` turned into a statement about
+  conditionals.
+* `componentAffine_localization_residual_eq_neg_one` — the ansatz that is *not* rescued by it.
+  In an exact three-genome, two-component model the descended value at a genome is `-1` and the
+  posterior-weighted average of the component values is `0`.
+
+## Epistemic boundary
+
+Everything is finite and exact.  Finiteness is what makes every family dominated, and domination
+is exactly the hypothesis under which pairwise consistency is equivalent to descent; no statement
+here covers undominated gluing over a continuum, and none should be read as evidence about it.
+`fiberConditional` is canonical only where the fiber mass is nonzero, and every statement carries
+that hypothesis.  No claim is made about measurable disintegration in a general Borel setting.
+-/
+
+section Sections
+
+variable {Genome Label Value Population : Type*} [Fintype Genome]
+variable [DecidableEq Label]
+
+/-- The mass a finite law `p` puts on the fiber of the label map `π` over `x`. -/
+noncomputable def labelMass (π : Genome → Label) (p : Genome → ℝ) (x : Label) : ℝ :=
+  ∑ g, if π g = x then p g else 0
+
+/-- The conditional law of `p` on the fiber over `x`.  It is canonical exactly where the fiber
+mass is nonzero; the division convention returns zero elsewhere and carries no information. -/
+noncomputable def fiberConditional (π : Genome → Label) (p : Genome → ℝ) (x : Label)
+    (g : Genome) : ℝ :=
+  if π g = x then p g / labelMass π p x else 0
+
+/-- The law concentrated on a single genome. -/
+noncomputable def pointLaw [DecidableEq Genome] (g : Genome) : Genome → ℝ :=
+  fun g' ↦ if g' = g then 1 else 0
+
+/-- The total-variation gap between two finite laws, in the `ℓ¹` normalisation. -/
+noncomputable def totalVariationGap (μ ν : Genome → ℝ) : ℝ := ∑ g, |μ g - ν g|
+
+/-- `b` **descends along** the label map `π` over the family `P` when one label function
+reproduces the value of `b` on every member's fiber conditional, at every label that member
+charges.  This is the property a group-level report claims. -/
+def DescendsAlong (π : Genome → Label) (P : Population → Genome → ℝ)
+    (b : (Genome → ℝ) → Value) : Prop :=
+  ∃ value : Label → Value,
+    ∀ i x, labelMass π (P i) x ≠ 0 → b (fiberConditional π (P i) x) = value x
+
+/-- Two populations agree wherever both charge the label: the local layer of descent. -/
+def PairwiseConsistent (π : Genome → Label) (P : Population → Genome → ℝ)
+    (b : (Genome → ℝ) → Value) : Prop :=
+  ∀ i j x, labelMass π (P i) x ≠ 0 → labelMass π (P j) x ≠ 0 →
+    b (fiberConditional π (P i) x) = b (fiberConditional π (P j) x)
+
+/-- The family shares one conditional law on each charged fiber: sufficiency of the label, stated
+without reference to any functional. -/
+def KernelSufficient (π : Genome → Label) (P : Population → Genome → ℝ) : Prop :=
+  ∀ i j x, labelMass π (P i) x ≠ 0 → labelMass π (P j) x ≠ 0 →
+    fiberConditional π (P i) x = fiberConditional π (P j) x
+
+/-- A law with nonnegative values puts nonnegative mass on every fiber. -/
+theorem labelMass_nonneg (π : Genome → Label) (p : Genome → ℝ) (hp : ∀ g, 0 ≤ p g) (x : Label) :
+    0 ≤ labelMass π p x := by
+  rw [labelMass]
+  refine Finset.sum_nonneg fun g _ ↦ ?_
+  by_cases hg : π g = x
+  · rw [if_pos hg]
+    exact hp g
+  · rw [if_neg hg]
+
+/-- **The abstract section map has a construction.**  For nonnegative laws, descent in the sense
+of `FunctionalDescent` — carried by the marginal mass and an abstract section — is descent of the
+functional along the label over the family of conditional laws. -/
+theorem functionalDescends_iff_descendsAlong (π : Genome → Label) (P : Population → Genome → ℝ)
+    (hP : ∀ i g, 0 ≤ P i g) (b : (Genome → ℝ) → Value) :
+    FunctionalDescends (fun i x ↦ labelMass π (P i) x)
+        (fun i x ↦ fiberConditional π (P i) x) b ↔ DescendsAlong π P b := by
+  have hpos : ∀ i x, 0 < labelMass π (P i) x ↔ labelMass π (P i) x ≠ 0 := by
+    intro i x
+    exact ⟨fun h ↦ ne_of_gt h, fun h ↦ lt_of_le_of_ne (labelMass_nonneg π (P i) (hP i) x)
+      (Ne.symm h)⟩
+  constructor
+  · rintro ⟨value, hvalue⟩
+    exact ⟨value, fun i x hx ↦ hvalue i x ((hpos i x).mpr hx)⟩
+  · rintro ⟨value, hvalue⟩
+    exact ⟨value, fun i x hx ↦ hvalue i x ((hpos i x).mp hx)⟩
+
+/-- A conditional law is a law: its own fiber carries all of its mass. -/
+theorem labelMass_fiberConditional (π : Genome → Label) (p : Genome → ℝ) (x : Label)
+    (h : labelMass π p x ≠ 0) : labelMass π (fiberConditional π p x) x = 1 := by
+  have hterm : ∀ g, (if π g = x then fiberConditional π p x g else 0)
+      = (if π g = x then p g else 0) / labelMass π p x := by
+    intro g
+    by_cases hg : π g = x
+    · rw [if_pos hg, if_pos hg, fiberConditional, if_pos hg]
+    · rw [if_neg hg, if_neg hg, zero_div]
+  calc labelMass π (fiberConditional π p x) x
+      = (∑ g, if π g = x then p g else 0) / labelMass π p x := by
+        rw [Finset.sum_div]
+        exact Finset.sum_congr rfl fun g _ ↦ hterm g
+    _ = 1 := div_self h
+
+/-- **Descent is a pairwise condition.**  A label report exists exactly when any two populations
+agree at every label both of them charge.  The family is indexed by an arbitrary type: at finite
+resolution nothing beyond pairwise agreement is required, because counting measure dominates
+every member.  This is the finite form of the dominated theorem, and it is precisely what an
+undominated family over a continuum can violate. -/
+theorem descendsAlong_iff_pairwiseConsistent (π : Genome → Label)
+    (P : Population → Genome → ℝ) (b : (Genome → ℝ) → Value) (defaultValue : Value) :
+    DescendsAlong π P b ↔ PairwiseConsistent π P b := by
+  constructor
+  · rintro ⟨value, hvalue⟩ i j x hi hj
+    rw [hvalue i x hi, hvalue j x hj]
+  · intro hpair
+    classical
+    refine ⟨fun x ↦ if h : ∃ i, labelMass π (P i) x ≠ 0 then
+      b (fiberConditional π (P (Classical.choose h)) x) else defaultValue, ?_⟩
+    intro i x hi
+    have hex : ∃ i, labelMass π (P i) x ≠ 0 := ⟨i, hi⟩
+    show b (fiberConditional π (P i) x) =
+      if h : ∃ i, labelMass π (P i) x ≠ 0 then
+        b (fiberConditional π (P (Classical.choose h)) x) else defaultValue
+    rw [dif_pos hex]
+    exact hpair i (Classical.choose hex) x hi (Classical.choose_spec hex)
+
+/-- **The sufficiency pole.**  If the family shares one conditional on every charged fiber then
+every functional descends: no property of the functional is involved. -/
+theorem descendsAlong_of_kernelSufficient (π : Genome → Label)
+    (P : Population → Genome → ℝ) (hK : KernelSufficient π P) (b : (Genome → ℝ) → Value)
+    (defaultValue : Value) :
+    DescendsAlong π P b := by
+  rw [descendsAlong_iff_pairwiseConsistent π P b defaultValue]
+  intro i j x hi hj
+  rw [hK i j x hi hj]
+
+/-- The converse half of the pole: descent of the identity functional *is* kernel sufficiency, so
+a single functional decides the whole class. -/
+theorem kernelSufficient_iff_identity_descends (π : Genome → Label)
+    (P : Population → Genome → ℝ) :
+    KernelSufficient π P ↔ DescendsAlong π P (fun μ ↦ μ) := by
+  constructor
+  · intro hK
+    exact descendsAlong_of_kernelSufficient π P hK _ (fun _ ↦ 0)
+  · rintro ⟨value, hvalue⟩ i j x hi hj
+    exact (hvalue i x hi).trans (hvalue j x hj).symm
+
+/-- The fiber mass of a law tilted by a label-measurable factor factors. -/
+theorem labelMass_labelFactor (π : Genome → Label) (m : Label → ℝ) (base : Genome → ℝ)
+    (x : Label) : labelMass π (fun g ↦ m (π g) * base g) x = m x * labelMass π base x := by
+  rw [labelMass, labelMass, Finset.mul_sum]
+  refine Finset.sum_congr rfl fun g _ ↦ ?_
+  by_cases hg : π g = x
+  · rw [if_pos hg, if_pos hg, hg]
+  · rw [if_neg hg, if_neg hg, mul_zero]
+
+/-- A label-measurable tilt cancels in the conditional: the tilted law and the base law have the
+same fiber conditional wherever the tilted law charges the fiber. -/
+theorem fiberConditional_labelFactor (π : Genome → Label) (m : Label → ℝ) (base : Genome → ℝ)
+    (x : Label) (h : labelMass π (fun g ↦ m (π g) * base g) x ≠ 0) :
+    fiberConditional π (fun g ↦ m (π g) * base g) x = fiberConditional π base x := by
+  rw [labelMass_labelFactor] at h
+  have hm : m x ≠ 0 := fun hm ↦ h (by rw [hm, zero_mul])
+  funext g
+  rw [fiberConditional, fiberConditional, labelMass_labelFactor]
+  by_cases hg : π g = x
+  · rw [if_pos hg, if_pos hg, hg, mul_div_mul_left _ _ hm]
+  · rw [if_neg hg, if_neg hg]
+
+/-- **A family that differs only by a label-measurable tilt of one base law is kernel
+sufficient.**  This is the mechanism behind both positive results below: the stratum in the
+confounded family, and the posterior component vector of a mixture. -/
+theorem kernelSufficient_of_labelTilt (π : Genome → Label) (base : Genome → ℝ)
+    (tilt : Population → Label → ℝ) (P : Population → Genome → ℝ)
+    (hP : ∀ i, P i = fun g ↦ tilt i (π g) * base g) : KernelSufficient π P := by
+  intro i j x hi hj
+  rw [hP i] at hi ⊢
+  rw [hP j] at hj ⊢
+  rw [fiberConditional_labelFactor π (tilt i) base x hi,
+    fiberConditional_labelFactor π (tilt j) base x hj]
+
+/-- A label that separates a genome from every other genome conditions to the point law there. -/
+theorem fiberConditional_of_separating [DecidableEq Genome] (π : Genome → Label)
+    (p : Genome → ℝ) (g : Genome)
+    (hsep : ∀ g', π g' = π g → g' = g) (hp : p g ≠ 0) :
+    fiberConditional π p (π g) = pointLaw g := by
+  have hmass : labelMass π p (π g) = p g := by
+    rw [labelMass, Finset.sum_eq_single g]
+    · rw [if_pos rfl]
+    · intro g' _ hne
+      by_cases hg : π g' = π g
+      · exact absurd (hsep g' hg) hne
+      · rw [if_neg hg]
+    · intro h
+      exact absurd (Finset.mem_univ g) h
+  funext g'
+  rw [fiberConditional, hmass, pointLaw]
+  by_cases hg : π g' = π g
+  · rw [if_pos hg, if_pos (hsep g' hg), hsep g' hg, div_self hp]
+  · rw [if_neg hg, if_neg]
+    intro hgg
+    exact hg (by rw [hgg])
+
+end Sections
+
+/-! ## The affine pole and the exact size of the obstruction -/
+
+section AffinePole
+
+variable {Genome Label Population : Type*} [Fintype Genome]
+variable [DecidableEq Label]
+
+/-- The value of an affine functional on a fiber conditional is the fiber-restricted mean. -/
+theorem conditionalSectionMean_fiberConditional (π : Genome → Label) (p : Genome → ℝ) (x : Label)
+    (f : Genome → ℝ) : conditionalSectionMean f (fiberConditional π p x)
+      = (∑ g, if π g = x then p g * f g else 0) / labelMass π p x := by
+  rw [conditionalSectionMean, Finset.sum_div]
+  refine Finset.sum_congr rfl fun g _ ↦ ?_
+  by_cases hg : π g = x
+  · rw [fiberConditional, if_pos hg, if_pos hg, div_mul_eq_mul_div]
+  · rw [fiberConditional, if_neg hg, if_neg hg, zero_mul, zero_div]
+
+/-- A kernel that is already a function of the label returns that function's value at the label,
+under every law charging it. -/
+theorem conditionalSectionMean_fiberConditional_of_labelFunction (π : Genome → Label)
+    (p : Genome → ℝ) (x : Label) (u : Label → ℝ) (h : labelMass π p x ≠ 0) :
+    conditionalSectionMean (fun g ↦ u (π g)) (fiberConditional π p x) = u x := by
+  rw [conditionalSectionMean_fiberConditional]
+  have hnum : (∑ g, if π g = x then p g * u (π g) else 0) = labelMass π p x * u x := by
+    rw [labelMass, Finset.sum_mul]
+    refine Finset.sum_congr rfl fun g _ ↦ ?_
+    by_cases hg : π g = x
+    · rw [if_pos hg, if_pos hg, hg]
+    · rw [if_neg hg, if_neg hg, zero_mul]
+  rw [hnum, mul_comm, mul_div_assoc, div_self h, mul_one]
+
+/-- **The affine pole, easy direction.**  A label-measurable kernel descends along that label over
+every family at once. -/
+theorem descendsAlong_sectionMean_of_labelFunction (π : Genome → Label)
+    (P : Population → Genome → ℝ) (u : Label → ℝ) :
+    DescendsAlong π P (conditionalSectionMean (fun g ↦ u (π g))) :=
+  ⟨u, fun i x hi ↦ conditionalSectionMean_fiberConditional_of_labelFunction π (P i) x u hi⟩
+
+/-- The fiber mass of a point law at its own label is one. -/
+theorem labelMass_pointLaw [DecidableEq Genome] (π : Genome → Label) (g : Genome) :
+    labelMass π (pointLaw g) (π g) = 1 := by
+  rw [labelMass, Finset.sum_eq_single g]
+  · rw [if_pos rfl, pointLaw, if_pos rfl]
+  · intro g' _ hne
+    by_cases hg : π g' = π g
+    · rw [if_pos hg, pointLaw, if_neg hne]
+    · rw [if_neg hg]
+  · intro h
+    exact absurd (Finset.mem_univ g) h
+
+/-- The mean of a kernel under a point law is the kernel's value there. -/
+theorem conditionalSectionMean_pointLaw [DecidableEq Genome] (f : Genome → ℝ) (g : Genome) :
+    conditionalSectionMean f (pointLaw g) = f g := by
+  rw [conditionalSectionMean, Finset.sum_eq_single g]
+  · rw [pointLaw, if_pos rfl, one_mul]
+  · intro g' _ hne
+    rw [pointLaw, if_neg hne, zero_mul]
+  · intro h
+    exact absurd (Finset.mem_univ g) h
+
+/-- A point law conditioned on its own label is itself. -/
+theorem fiberConditional_pointLaw [DecidableEq Genome] (π : Genome → Label) (g : Genome) :
+    fiberConditional π (pointLaw g) (π g) = pointLaw g := by
+  funext g'
+  rw [fiberConditional, labelMass_pointLaw, div_one]
+  by_cases hg : π g' = π g
+  · rw [if_pos hg]
+  · rw [if_neg hg, pointLaw, if_neg]
+    intro hgg
+    exact hg (by rw [hgg])
+
+/-- **The affine pole, hard direction.**  Against the maximal family of point laws — one member
+concentrated on each genome — only label-measurable kernels descend.  The correction space that
+descent otherwise permits collapses to zero at this pole. -/
+theorem labelFunction_of_descends_pointLaws [DecidableEq Genome] (π : Genome → Label)
+    (f : Genome → ℝ)
+    (h : DescendsAlong π (pointLaw : Genome → Genome → ℝ) (conditionalSectionMean f)) :
+    ∃ u : Label → ℝ, ∀ g, f g = u (π g) := by
+  obtain ⟨value, hvalue⟩ := h
+  refine ⟨value, fun g ↦ ?_⟩
+  have hg := hvalue g (π g) (by rw [labelMass_pointLaw]; norm_num)
+  rw [fiberConditional_pointLaw, conditionalSectionMean_pointLaw] at hg
+  exact hg
+
+/-- **The obstruction is a width.**  For kernels bounded by `C` the gap between two populations'
+values is at most `C` times the total-variation distance between their conditionals. -/
+theorem abs_sectionMean_sub_le (f μ ν : Genome → ℝ) (C : ℝ) (hf : ∀ g, |f g| ≤ C) :
+    |conditionalSectionMean f μ - conditionalSectionMean f ν| ≤ C * totalVariationGap μ ν := by
+  rw [conditionalSectionMean_sub_eq_width, totalVariationGap, Finset.mul_sum]
+  refine le_trans (Finset.abs_sum_le_sum_abs _ _) (Finset.sum_le_sum fun g _ ↦ ?_)
+  rw [abs_mul, mul_comm C]
+  exact mul_le_mul_of_nonneg_left (hf g) (abs_nonneg _)
+
+/-- **The width is attained.**  Some kernel of sup-norm one separates two laws by exactly their
+total-variation gap, so the bound above is the support-function width of the section in the
+worst direction, not a slack inequality. -/
+theorem exists_kernel_attaining_totalVariationGap (μ ν : Genome → ℝ) :
+    ∃ f : Genome → ℝ, (∀ g, |f g| ≤ 1) ∧
+      conditionalSectionMean f μ - conditionalSectionMean f ν = totalVariationGap μ ν := by
+  refine ⟨fun g ↦ if 0 ≤ μ g - ν g then 1 else -1, fun g ↦ ?_, ?_⟩
+  · show |if 0 ≤ μ g - ν g then (1 : ℝ) else -1| ≤ 1
+    by_cases hg : 0 ≤ μ g - ν g
+    · rw [if_pos hg, abs_one]
+    · rw [if_neg hg, abs_neg, abs_one]
+  · rw [conditionalSectionMean_sub_eq_width, totalVariationGap]
+    refine Finset.sum_congr rfl fun g _ ↦ ?_
+    show (μ g - ν g) * (if 0 ≤ μ g - ν g then (1 : ℝ) else -1) = |μ g - ν g|
+    by_cases hg : 0 ≤ μ g - ν g
+    · rw [if_pos hg, mul_one, abs_of_nonneg hg]
+    · rw [if_neg hg, mul_neg_one, abs_of_neg (lt_of_not_ge hg)]
+
+end AffinePole
+
+/-! ## Total variation controls nothing without a bound on the kernel -/
+
+/-- **The kernel bound in `abs_sectionMean_sub_le` is not removable.**  For any prescribed gap `M`
+and any total-variation budget, two laws that far apart in total variation differ by exactly `M`
+under an unbounded kernel: moving a mass `ε` onto a genome whose kernel value is `M / ε`.
+
+This is the reason a distributional-similarity check between two cohorts is the wrong diagnostic
+for a functional built from unbounded kernels, such as a variance or a covariance operator.  Small
+total variation does not bound the disagreement; only moment closeness does. -/
+theorem sectionMean_gap_unbounded_at_small_totalVariationGap (eps M : ℝ) (heps : 0 < eps) :
+    ∃ μ ν f : Fin 2 → ℝ, totalVariationGap μ ν = 2 * eps ∧
+      conditionalSectionMean f μ - conditionalSectionMean f ν = M := by
+  have hne : eps ≠ 0 := ne_of_gt heps
+  refine ⟨fun g ↦ if g = 0 then 1 - eps else eps, fun g ↦ if g = 0 then 1 else 0,
+    fun g ↦ if g = 0 then 0 else M / eps, ?_, ?_⟩
+  · simp only [totalVariationGap, Fin.sum_univ_two]
+    show |1 - eps - 1| + |eps - 0| = 2 * eps
+    rw [show 1 - eps - 1 = -eps by ring, abs_neg, abs_of_pos heps, sub_zero, abs_of_pos heps]
+    ring
+  · simp only [conditionalSectionMean, Fin.sum_univ_two]
+    show (1 - eps) * 0 + eps * (M / eps) - (1 * 0 + 0 * (M / eps)) = M
+    field_simp
+    ring
+
+/-! ## Effect modification: each margin descends, their join does not -/
+
+section Interaction
+
+/-- A genome carrying two loci and a binary trait: `(u, v, y)`. -/
+abbrev TwoLociTrait := Fin 2 × Fin 2 × Fin 2
+
+/-- The joint law whose conditional trait risk is `interactionRisk`: the two loci are independent
+and uniform, and the trait risk carries the interaction and no main effect. -/
+noncomputable def interactionTraitLaw (theta : ℝ) (g : TwoLociTrait) : ℝ :=
+  (1 / 4) * (if g.2.2 = 1 then interactionRisk theta g.1 g.2.1
+    else 1 - interactionRisk theta g.1 g.2.1)
+
+/-- The trait indicator, whose mean is the trait frequency. -/
+noncomputable def traitIndicator (g : TwoLociTrait) : ℝ := if g.2.2 = 1 then 1 else 0
+
+/-- The interaction masses are normalized for every algebraic parameter value.  Nonnegativity,
+and hence the probability-law interpretation, is recorded separately because it genuinely
+requires the biological risk bound `|theta| ≤ 1 / 2`. -/
+theorem interactionTraitLaw_sum_eq_one (theta : ℝ) : ∑ g, interactionTraitLaw theta g = 1 := by
+  simp [interactionTraitLaw, Fintype.sum_prod_type, Fin.sum_univ_two]
+  ring
+
+/-- In the admissible risk range the normalized interaction masses are nonnegative. -/
+theorem interactionTraitLaw_nonneg {theta : ℝ} (htheta : |theta| ≤ 1 / 2)
+    (g : TwoLociTrait) : 0 ≤ interactionTraitLaw theta g := by
+  rcases abs_le.mp htheta with ⟨hlo, hhi⟩
+  rcases g with ⟨u, v, y⟩
+  fin_cases u <;> fin_cases v <;> fin_cases y <;>
+    simp [interactionTraitLaw, interactionRisk] <;> linarith
+
+/-- Thus every parameter in the admissible interaction interval defines an actual finite
+probability law, not merely a normalized signed mass. -/
+theorem interactionTraitLaw_isProbability {theta : ℝ} (htheta : |theta| ≤ 1 / 2) :
+    (∀ g, 0 ≤ interactionTraitLaw theta g) ∧ ∑ g, interactionTraitLaw theta g = 1 :=
+  ⟨interactionTraitLaw_nonneg htheta, interactionTraitLaw_sum_eq_one theta⟩
+
+/-- The first locus carries half the mass at each of its values, whatever the interaction. -/
+theorem labelMass_interactionTraitLaw_locusOne (theta : ℝ) (x : Fin 2) :
+    labelMass (fun g : TwoLociTrait ↦ g.1) (interactionTraitLaw theta) x = 1 / 2 := by
+  fin_cases x <;>
+    simp [labelMass, interactionTraitLaw, Fintype.sum_prod_type, Fin.sum_univ_two] <;> ring
+
+/-- Conditional on the first locus, the trait frequency is the average of the interaction risk
+over the second locus — which `interactionRisk_average_second` computes to be one half,
+independently of the population parameter. -/
+theorem trait_value_locusOne (theta : ℝ) (x : Fin 2) :
+    conditionalSectionMean traitIndicator
+      (fiberConditional (fun g : TwoLociTrait ↦ g.1) (interactionTraitLaw theta) x) = 1 / 2 := by
+  rw [conditionalSectionMean_fiberConditional, labelMass_interactionTraitLaw_locusOne]
+  have hx : (∑ g : TwoLociTrait, if g.1 = x then interactionTraitLaw theta g * traitIndicator g
+      else 0) = (interactionRisk theta x 0 + interactionRisk theta x 1) / 4 := by
+    fin_cases x <;>
+      simp [interactionTraitLaw, traitIndicator, Fintype.sum_prod_type, Fin.sum_univ_two] <;> ring
+  rw [hx]
+  have haverage := interactionRisk_average_second theta x
+  field_simp at haverage ⊢
+  linarith
+
+/-- The trait frequency descends along the first locus. -/
+theorem descends_trait_along_locusOne :
+    DescendsAlong (fun g : TwoLociTrait ↦ g.1) interactionTraitLaw
+      (conditionalSectionMean traitIndicator) :=
+  ⟨fun _ ↦ 1 / 2, fun theta x _ ↦ trait_value_locusOne theta x⟩
+
+/-- The second locus carries half the mass at each of its values. -/
+theorem labelMass_interactionTraitLaw_locusTwo (theta : ℝ) (x : Fin 2) :
+    labelMass (fun g : TwoLociTrait ↦ g.2.1) (interactionTraitLaw theta) x = 1 / 2 := by
+  fin_cases x <;>
+    simp [labelMass, interactionTraitLaw, Fintype.sum_prod_type, Fin.sum_univ_two] <;> ring
+
+/-- The same erasure holds along the second locus, by `interactionRisk_average_first`. -/
+theorem trait_value_locusTwo (theta : ℝ) (x : Fin 2) :
+    conditionalSectionMean traitIndicator
+      (fiberConditional (fun g : TwoLociTrait ↦ g.2.1) (interactionTraitLaw theta) x)
+      = 1 / 2 := by
+  rw [conditionalSectionMean_fiberConditional, labelMass_interactionTraitLaw_locusTwo]
+  have hx : (∑ g : TwoLociTrait, if g.2.1 = x then interactionTraitLaw theta g * traitIndicator g
+      else 0) = (interactionRisk theta 0 x + interactionRisk theta 1 x) / 4 := by
+    fin_cases x <;>
+      simp [interactionTraitLaw, traitIndicator, Fintype.sum_prod_type, Fin.sum_univ_two] <;> ring
+  rw [hx]
+  have haverage := interactionRisk_average_first theta x
+  field_simp at haverage ⊢
+  linarith
+
+/-- The trait frequency descends along the second locus. -/
+theorem descends_trait_along_locusTwo :
+    DescendsAlong (fun g : TwoLociTrait ↦ g.2.1) interactionTraitLaw
+      (conditionalSectionMean traitIndicator) :=
+  ⟨fun _ ↦ 1 / 2, fun theta x _ ↦ trait_value_locusTwo theta x⟩
+
+/-- The pair of loci carries a quarter of the mass at each of its four values. -/
+theorem labelMass_interactionTraitLaw_locusPair (theta : ℝ) :
+    labelMass (fun g : TwoLociTrait ↦ (g.1, g.2.1)) (interactionTraitLaw theta) (0, 0)
+      = 1 / 4 := by
+  simp [labelMass, interactionTraitLaw, Fintype.sum_prod_type, Fin.sum_univ_two]
+  ring
+
+/-- Conditional on both loci, the trait frequency is the interaction risk itself, which exposes
+the population parameter. -/
+theorem trait_value_locusPair (theta : ℝ) :
+    conditionalSectionMean traitIndicator
+      (fiberConditional (fun g : TwoLociTrait ↦ (g.1, g.2.1)) (interactionTraitLaw theta) (0, 0))
+      = interactionRisk theta 0 0 := by
+  rw [conditionalSectionMean_fiberConditional, labelMass_interactionTraitLaw_locusPair]
+  have hnum : (∑ g : TwoLociTrait, if (g.1, g.2.1) = ((0 : Fin 2), (0 : Fin 2)) then
+      interactionTraitLaw theta g * traitIndicator g else 0) = interactionRisk theta 0 0 / 4 := by
+    simp [interactionTraitLaw, traitIndicator, Fintype.sum_prod_type, Fin.sum_univ_two]
+    ring
+  rw [hnum]
+  field_simp
+
+/-- **The join of two descent labels need not be a descent label.**  The trait frequency descends
+along each locus separately and along neither refinement that records both: reporting it by locus
+is honest at each margin and dishonest jointly.  Effect modification is an order-theoretic
+failure, and descent is therefore not inherited by refinements of a descent label — checking
+stability along each coordinate separately proves nothing about the pair. -/
+theorem interaction_join_obstruction :
+    DescendsAlong (fun g : TwoLociTrait ↦ g.1) interactionTraitLaw
+        (conditionalSectionMean traitIndicator) ∧
+      DescendsAlong (fun g : TwoLociTrait ↦ g.2.1) interactionTraitLaw
+        (conditionalSectionMean traitIndicator) ∧
+      ¬ DescendsAlong (fun g : TwoLociTrait ↦ (g.1, g.2.1)) interactionTraitLaw
+        (conditionalSectionMean traitIndicator) := by
+  refine ⟨descends_trait_along_locusOne, descends_trait_along_locusTwo, ?_⟩
+  rintro ⟨value, hvalue⟩
+  have h0 := hvalue 0 (0, 0) (by rw [labelMass_interactionTraitLaw_locusPair]; norm_num)
+  have h1 := hvalue (1 / 4) (0, 0) (by rw [labelMass_interactionTraitLaw_locusPair]; norm_num)
+  rw [trait_value_locusPair] at h0 h1
+  exact interactionRisk_joint_separates (theta := 0) (eta := 1 / 4) (by norm_num)
+    (h0.trans h1.symm)
+
+end Interaction
+
+/-! ## Confounding: two informative labels descend, their meet does not -/
+
+section Confounding
+
+/-- A genome carrying an exposure coordinate and a stratum coordinate: `(u, v)`. -/
+abbrev ExposureStratum := Fin 2 × Fin 2
+
+/-- The within-stratum exposure law, whose exposure probability is
+`confoundedConditionalRisk`.  It is the same in every population. -/
+noncomputable def exposureGivenStratum (g : ExposureStratum) : ℝ :=
+  if g.1 = 1 then confoundedConditionalRisk g.2 else 1 - confoundedConditionalRisk g.2
+
+/-- The stratum frequency, the only thing that varies across the family. -/
+noncomputable def stratumFrequency (beta : ℝ) (s : Fin 2) : ℝ := if s = 1 then beta else 1 - beta
+
+/-- The confounded family: one within-stratum law, and a stratum composition that drifts. -/
+noncomputable def confoundedExposureLaw (beta : ℝ) (g : ExposureStratum) : ℝ :=
+  stratumFrequency beta g.2 * exposureGivenStratum g
+
+/-- The confounded masses are normalized for every algebraic parameter value.  Their
+probability-law interpretation additionally requires `beta ∈ [0,1]`, proved next. -/
+theorem confoundedExposureLaw_sum_eq_one (beta : ℝ) : ∑ g, confoundedExposureLaw beta g = 1 := by
+  simp [confoundedExposureLaw, stratumFrequency, exposureGivenStratum, confoundedConditionalRisk,
+    Fintype.sum_prod_type, Fin.sum_univ_two]
+  ring
+
+/-- A prevalence in `[0,1]` makes every confounded-family mass nonnegative. -/
+theorem confoundedExposureLaw_nonneg {beta : ℝ} (hbeta0 : 0 ≤ beta) (hbeta1 : beta ≤ 1)
+    (g : ExposureStratum) : 0 ≤ confoundedExposureLaw beta g := by
+  rcases g with ⟨u, v⟩
+  fin_cases u <;> fin_cases v <;>
+    simp [confoundedExposureLaw, stratumFrequency, exposureGivenStratum,
+      confoundedConditionalRisk] <;> linarith
+
+/-- Hence the biologically meaningful prevalence interval gives actual probability laws. -/
+theorem confoundedExposureLaw_isProbability {beta : ℝ} (hbeta0 : 0 ≤ beta) (hbeta1 : beta ≤ 1) :
+    (∀ g, 0 ≤ confoundedExposureLaw beta g) ∧ ∑ g, confoundedExposureLaw beta g = 1 :=
+  ⟨confoundedExposureLaw_nonneg hbeta0 hbeta1, confoundedExposureLaw_sum_eq_one beta⟩
+
+/-- **The stratum label is kernel-sufficient for the confounded family**, because its members
+differ only by a stratum-measurable tilt of one within-stratum law.  Every functional of the
+genome descends along the stratum: this is what standardization computes. -/
+theorem kernelSufficient_confounded_stratum :
+    KernelSufficient (fun g : ExposureStratum ↦ g.2) confoundedExposureLaw :=
+  kernelSufficient_of_labelTilt _ exposureGivenStratum stratumFrequency confoundedExposureLaw
+    fun _ ↦ rfl
+
+/-- The exposure indicator, whose mean is the exposure frequency. -/
+noncomputable def exposureIndicator (g : ExposureStratum) : ℝ := if g.1 = 1 then 1 else 0
+
+/-- The exposure frequency descends along the exposure label itself: the kernel is already a
+function of that label. -/
+theorem descends_exposure_along_exposure :
+    DescendsAlong (fun g : ExposureStratum ↦ g.1) confoundedExposureLaw
+      (conditionalSectionMean exposureIndicator) :=
+  descendsAlong_sectionMean_of_labelFunction _ confoundedExposureLaw fun x ↦ if x = 1 then 1 else 0
+
+/-- The exposure frequency descends along the stratum label, by kernel sufficiency. -/
+theorem descends_exposure_along_stratum :
+    DescendsAlong (fun g : ExposureStratum ↦ g.2) confoundedExposureLaw
+      (conditionalSectionMean exposureIndicator) :=
+  descendsAlong_of_kernelSufficient _ confoundedExposureLaw kernelSufficient_confounded_stratum _ 0
+
+/-- The trivial label: the meet of the exposure label and the stratum label.  Descent along it
+says the crude exposure frequency is the same in every population. -/
+def trivialLabel : ExposureStratum → Unit := fun _ ↦ ()
+
+/-- Under the trivial label the whole space is one fiber of mass one. -/
+theorem labelMass_trivialLabel (beta : ℝ) :
+    labelMass trivialLabel (confoundedExposureLaw beta) () = 1 := by
+  rw [labelMass, ← confoundedExposureLaw_sum_eq_one beta]
+  exact Finset.sum_congr rfl fun g _ ↦ if_pos rfl
+
+/-- Under the trivial label, conditioning does nothing: the fiber conditional is the law. -/
+theorem fiberConditional_trivialLabel (beta : ℝ) :
+    fiberConditional trivialLabel (confoundedExposureLaw beta) () = confoundedExposureLaw beta := by
+  funext g
+  rw [fiberConditional, labelMass_trivialLabel, div_one, if_pos rfl]
+
+/-- The crude exposure frequency is exactly the confounded marginal risk: it moves with the
+stratum composition even though the within-stratum law never changes. -/
+theorem crude_exposure_frequency (beta : ℝ) :
+    conditionalSectionMean exposureIndicator (confoundedExposureLaw beta)
+      = confoundedMarginalRisk beta := by
+  simp [conditionalSectionMean, confoundedExposureLaw, stratumFrequency, exposureGivenStratum,
+    exposureIndicator, confoundedConditionalRisk, confoundedMarginalRisk, Fintype.sum_prod_type,
+    Fin.sum_univ_two]
+
+/-- **The meet of two descent labels need not be a descent label.**  The exposure frequency
+descends along the exposure label and along the stratum label, and not along the label they have
+in common — so there is no coarsest honest reporting label, and two minimal ones can be
+incomparable.  This is confounding: standardization is invariant across the family and
+marginalization is not. -/
+theorem confounding_meet_obstruction :
+    DescendsAlong (fun g : ExposureStratum ↦ g.1) confoundedExposureLaw
+        (conditionalSectionMean exposureIndicator) ∧
+      DescendsAlong (fun g : ExposureStratum ↦ g.2) confoundedExposureLaw
+        (conditionalSectionMean exposureIndicator) ∧
+      ¬ DescendsAlong trivialLabel confoundedExposureLaw
+        (conditionalSectionMean exposureIndicator) := by
+  refine ⟨descends_exposure_along_exposure, descends_exposure_along_stratum, ?_⟩
+  rintro ⟨value, hvalue⟩
+  have h0 := hvalue 0 () (by rw [labelMass_trivialLabel]; norm_num)
+  have h1 := hvalue 1 () (by rw [labelMass_trivialLabel]; norm_num)
+  rw [fiberConditional_trivialLabel, crude_exposure_frequency] at h0 h1
+  exact confoundedMarginalRisk_separates (beta := 0) (gamma := 1) (by norm_num)
+    (h0.trans h1.symm)
+
+end Confounding
+
+/-! ## The posterior component vector is a sufficiency pole -/
+
+section ComponentDescent
+
+variable {Genome Component Population : Type*} [Fintype Genome]
+variable [Fintype Component]
+
+omit [Fintype Genome] in
+/-- The factorization of `componentMixtureDensity_factorization` extended to genomes the
+reference mixture does not charge, where nonnegativity forces both sides to vanish.  The
+extension is what lets the factorization be read as a statement about conditional laws rather
+than about a ratio on a support. -/
+theorem componentMixtureDensity_eq_posteriorTilt_mul (q : Component → Genome → ℝ)
+    (w0 w : Component → ℝ) (hq : ∀ k g, 0 ≤ q k g) (hw0 : ∀ k, 0 < w0 k) (g : Genome) :
+    componentMixtureDensity q w g
+      = posteriorTilt q w0 w g * componentMixtureDensity q w0 g := by
+  by_cases hZ : componentMixtureDensity q w0 g = 0
+  · have hzero : ∀ k, q k g = 0 := by
+      intro k
+      have hsum : ∑ k, w0 k * q k g = 0 := hZ
+      have hnn : ∀ k ∈ Finset.univ, 0 ≤ w0 k * q k g := fun k _ ↦
+        mul_nonneg (le_of_lt (hw0 k)) (hq k g)
+      have hk := (Finset.sum_eq_zero_iff_of_nonneg hnn).mp hsum k (Finset.mem_univ k)
+      rcases mul_eq_zero.mp hk with h | h
+      · exact absurd h (ne_of_gt (hw0 k))
+      · exact h
+    rw [hZ, mul_zero, componentMixtureDensity]
+    exact Finset.sum_eq_zero fun k _ ↦ by rw [hzero k, mul_zero]
+  · rw [componentMixtureDensity_factorization q w0 w g (fun k ↦ ne_of_gt (hw0 k)) hZ, mul_comm]
+
+/-- **The posterior component vector is kernel-sufficient for the family of all mixing
+weights.**  Changing the weights tilts the law by a factor that reads the genome only through its
+posterior component coordinates, so the conditional law on a posterior fiber is the same in every
+population.  Reporting against posterior ancestry is therefore exempt from the join and meet
+obstructions above. -/
+theorem kernelSufficient_componentPosterior [DecidableEq (Component → ℝ)]
+    (q : Component → Genome → ℝ) (w0 : Component → ℝ) (hq : ∀ k g, 0 ≤ q k g)
+    (hw0 : ∀ k, 0 < w0 k) (w : Population → Component → ℝ) :
+    KernelSufficient (componentPosterior q w0) (fun i ↦ componentMixtureDensity q (w i)) := by
+  refine kernelSufficient_of_labelTilt _ (componentMixtureDensity q w0)
+    (fun i a ↦ ∑ k, a k * (w i k / w0 k)) _ (fun i ↦ funext fun g ↦ ?_)
+  simpa [posteriorTilt] using componentMixtureDensity_eq_posteriorTilt_mul q w0 (w i) hq hw0 g
+
+/-- **Every functional of the genome descends along posterior ancestry** — not merely a mean, and
+with no continuity, linearity or moment hypothesis on the functional.  This is the sufficiency
+pole realized by a biologically available label. -/
+theorem descendsAlong_componentPosterior [DecidableEq (Component → ℝ)]
+    (q : Component → Genome → ℝ) (w0 : Component → ℝ) (hq : ∀ k g, 0 ≤ q k g)
+    (hw0 : ∀ k, 0 < w0 k) (w : Population → Component → ℝ) (b : (Genome → ℝ) → ℝ) :
+    DescendsAlong (componentPosterior q w0) (fun i ↦ componentMixtureDensity q (w i)) b :=
+  descendsAlong_of_kernelSufficient _ _ (kernelSufficient_componentPosterior q w0 hq hw0 w) b 0
+
+end ComponentDescent
+
+/-! ## Descent along ancestry does not make the ancestry-weighted ansatz exact -/
+
+section ComponentResidual
+
+/-- Two components over three genomes, with overlapping support. -/
+noncomputable def exampleComponent (k : Fin 2) (g : Fin 3) : ℝ :=
+  if k = 0 then (if g = 0 then 1 / 2 else 1 / 4) else (if g = 2 then 1 / 2 else 1 / 4)
+
+/-- Reference mixing weights, taken away from the symmetric point so that nothing below turns on
+a symmetry of the reference. -/
+noncomputable def exampleReference (k : Fin 2) : ℝ := if k = 0 then 1 / 3 else 2 / 3
+
+/-- A trait value carried by each genome. -/
+noncomputable def exampleTrait (g : Fin 3) : ℝ := if g = 0 then -1 else if g = 2 then 1 else 0
+
+/-- Both components are probability laws over the three genomes. -/
+theorem exampleComponent_sum_eq_one (k : Fin 2) : ∑ g, exampleComponent k g = 1 := by
+  fin_cases k <;> norm_num +decide [exampleComponent, Fin.sum_univ_three]
+
+/-- The reference mixture charges the first genome. -/
+theorem componentMixtureDensity_example_zero :
+    componentMixtureDensity exampleComponent exampleReference 0 = 1 / 3 := by
+  norm_num +decide [componentMixtureDensity, exampleComponent, exampleReference,
+    Fin.sum_univ_two]
+
+/-- The posterior component vector separates the first genome from the other two, so its
+posterior fiber is that genome alone and the descended value is the trait value there. -/
+theorem componentPosterior_example_separating (g : Fin 3)
+    (h : componentPosterior exampleComponent exampleReference g
+      = componentPosterior exampleComponent exampleReference 0) : g = 0 := by
+  fin_cases g
+  · rfl
+  · exfalso
+    have hzero := congrFun h 0
+    norm_num +decide [componentPosterior, componentMixtureDensity, exampleComponent,
+      exampleReference, Fin.sum_univ_two] at hzero
+  · exfalso
+    have hzero := congrFun h 0
+    norm_num +decide [componentPosterior, componentMixtureDensity, exampleComponent,
+      exampleReference, Fin.sum_univ_two] at hzero
+
+/-- At the first genome's posterior the two component trait means cancel, so the
+posterior-weighted ansatz reports zero there. -/
+theorem componentWeighted_example_zero :
+    ∑ k, componentPosterior exampleComponent exampleReference 0 k *
+      conditionalSectionMean exampleTrait (exampleComponent k) = 0 := by
+  norm_num +decide [componentPosterior, componentMixtureDensity, conditionalSectionMean,
+    exampleComponent, exampleReference, exampleTrait, Fin.sum_univ_two, Fin.sum_univ_three]
+
+/-- The error the posterior-weighted ansatz makes at the first genome of this model: its
+descended trait mean minus the posterior-weighted average of the component trait means. -/
+noncomputable def exampleComponentResidual : ℝ :=
+  componentRepresentationResidual
+    (conditionalSectionMean exampleTrait
+      (fiberConditional (componentPosterior exampleComponent exampleReference)
+        (componentMixtureDensity exampleComponent exampleReference)
+        (componentPosterior exampleComponent exampleReference 0)))
+    (componentPosterior exampleComponent exampleReference 0)
+    (fun k ↦ conditionalSectionMean exampleTrait (exampleComponent k))
+
+/-- **Descent along ancestry does not make the ancestry-weighted ansatz exact.**  In this model
+the trait mean on the posterior fiber of the first genome is `-1`, while the posterior-weighted
+average of the two component trait means at the same posterior is `0`: a
+`componentRepresentationResidual` of `-1`, a full unit of trait, entirely localization and no
+Jensen term, since the functional is affine.
+
+Two shape intuitions both fail here.  The residual does not vanish at a balanced posterior — the
+posterior at this genome is exactly balanced and the residual is maximal — and it is not a
+small-overlap correction that a nonlinearity budget could absorb. -/
+theorem exampleComponentResidual_eq_neg_one : exampleComponentResidual = -1 := by
+  rw [exampleComponentResidual, componentRepresentationResidual, componentWeighted_example_zero,
+    fiberConditional_of_separating _ _ (0 : Fin 3) componentPosterior_example_separating
+      (by rw [componentMixtureDensity_example_zero]; norm_num),
+    conditionalSectionMean_pointLaw]
+  norm_num [exampleTrait]
+
+end ComponentResidual
+
+end Calibrator

@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Calibrator.DeclaredInteractionClass
+import Calibrator.DescentGeometry
 import Calibrator.DirichletTransfer
 import Calibrator.ErgodicCovariancePencil
 import Calibrator.HorizonCurve
@@ -33,10 +34,15 @@ readout at the target or by taking an autocorrelation.  The first section proves
 and gives a two-state witness where every target-only average agrees while cross-state
 performance changes from perfect to zero.
 
-The final theorem packages four independent obstructions that a unified biological model
+The final theorem packages eight independent obstructions that a unified biological model
 must keep visible: stationarity blindness, loss of joint dependence under marginal summaries,
-rank-two value/allocation conflict even in a common eigenbasis, and failure of freeness for
-operators sharing a local genomic geometry.
+rank-two value/allocation conflict even in a common eigenbasis, failure of freeness for
+operators sharing a local genomic geometry, and four failures of *descent* — of a criterion to
+be a function of the label it is reported against.  The descent layer comes from
+`Calibrator.DescentGeometry`: a cross-state criterion is not a function of the target context,
+reportability along each margin does not compose to the pair, dropping a stratum destroys
+reportability both finer labels have, and — although every functional descends along posterior
+ancestry — the ancestry-weighted average of component values is not the descended report.
 
 ## Epistemic boundary
 
@@ -174,6 +180,100 @@ theorem crossStatePerformance_switching_eq_zero :
   norm_num [crossStatePerformance, binaryStateWeight, switchingTransition,
     contextMatchQuality, Fin.sum_univ_two]
 
+/-! ## The stationarity repair is a descent failure
+
+The repair above says a target-only average cannot see the dynamics.  `Calibrator.DescentGeometry`
+says what kind of statement that is: the target context is a *label*, the two dynamics are two
+*populations* on source-target pairs, and a criterion is reportable by target context exactly
+when it descends along that label.  The target-only annotation descends; the source-adapted
+quality does not.  So the quantity a cross-state criterion measures is a function of the pair
+(target context, population), not of the target context — which is why no relabelling of the
+target average recovers it. -/
+
+/-- A source-target pair of biological contexts. -/
+abbrev TransportPair := BinaryBiologicalState × BinaryBiologicalState
+
+/-- The joint law of source and target contexts under a transition. -/
+noncomputable def jointTransportLaw
+    (transition : BinaryBiologicalState → BinaryBiologicalState → ℝ) (g : TransportPair) : ℝ :=
+  binaryStateWeight g.1 * transition g.1 g.2
+
+/-- The two-population family: the context persists, or the context switches. -/
+noncomputable def binaryTransportFamily (persists : Bool) : TransportPair → ℝ :=
+  jointTransportLaw (if persists then persistentTransition else switchingTransition)
+
+/-- Target-only performance is the mean of a target-measurable kernel under the joint law. -/
+theorem targetOnlyTransportPerformance_eq_conditionalSectionMean
+    (transition : BinaryBiologicalState → BinaryBiologicalState → ℝ)
+    (score : BinaryBiologicalState → ℝ) :
+    targetOnlyTransportPerformance binaryStateWeight transition score =
+      conditionalSectionMean (fun g : TransportPair ↦ score g.2)
+        (jointTransportLaw transition) := by
+  rw [targetOnlyTransportPerformance, conditionalSectionMean, Fintype.sum_prod_type]
+  refine Finset.sum_congr rfl fun x _ ↦ ?_
+  rw [Finset.mul_sum]
+  refine Finset.sum_congr rfl fun y _ ↦ ?_
+  rw [jointTransportLaw]
+  ring
+
+/-- Cross-state performance is the mean of a kernel that reads both coordinates. -/
+theorem crossStatePerformance_eq_conditionalSectionMean
+    (transition : BinaryBiologicalState → BinaryBiologicalState → ℝ)
+    (quality : BinaryBiologicalState → BinaryBiologicalState → ℝ) :
+    crossStatePerformance binaryStateWeight transition quality =
+      conditionalSectionMean (fun g : TransportPair ↦ quality g.1 g.2)
+        (jointTransportLaw transition) := by
+  rw [crossStatePerformance, conditionalSectionMean, Fintype.sum_prod_type]
+  refine Finset.sum_congr rfl fun x _ ↦ ?_
+  rw [Finset.mul_sum]
+  refine Finset.sum_congr rfl fun y _ ↦ ?_
+  rw [jointTransportLaw]
+  ring
+
+/-- Both dynamics put half the mass on each target context. -/
+theorem labelMass_binaryTransportFamily (persists : Bool) (y : BinaryBiologicalState) :
+    labelMass (fun g : TransportPair ↦ g.2) (binaryTransportFamily persists) y = 1 / 2 := by
+  cases persists <;> fin_cases y <;>
+    norm_num [labelMass, binaryTransportFamily, jointTransportLaw, binaryStateWeight,
+      persistentTransition, switchingTransition, Fintype.sum_prod_type, Fin.sum_univ_two]
+
+/-- A target-only annotation descends along the target context: it is reportable there. -/
+theorem descends_targetAnnotation_along_targetState :
+    DescendsAlong (fun g : TransportPair ↦ g.2) binaryTransportFamily
+      (conditionalSectionMean (fun g : TransportPair ↦ targetAnnotation g.2)) :=
+  descendsAlong_sectionMean_of_labelFunction _ binaryTransportFamily targetAnnotation
+
+/-- Under persistence, the source-adapted readout is perfect on every target fiber. -/
+theorem contextMatchQuality_value_persistent :
+    conditionalSectionMean (fun g : TransportPair ↦ contextMatchQuality g.1 g.2)
+      (fiberConditional (fun g : TransportPair ↦ g.2) (binaryTransportFamily true) 0) = 1 := by
+  rw [conditionalSectionMean_fiberConditional, labelMass_binaryTransportFamily]
+  norm_num [binaryTransportFamily, jointTransportLaw, binaryStateWeight, persistentTransition,
+    contextMatchQuality, Fintype.sum_prod_type, Fin.sum_univ_two]
+
+/-- Under complete switching, the same readout is worthless on the same fiber. -/
+theorem contextMatchQuality_value_switching :
+    conditionalSectionMean (fun g : TransportPair ↦ contextMatchQuality g.1 g.2)
+      (fiberConditional (fun g : TransportPair ↦ g.2) (binaryTransportFamily false) 0) = 0 := by
+  rw [conditionalSectionMean_fiberConditional, labelMass_binaryTransportFamily]
+  norm_num [binaryTransportFamily, jointTransportLaw, binaryStateWeight, switchingTransition,
+    contextMatchQuality, Fintype.sum_prod_type, Fin.sum_univ_two]
+
+/-- **The cross-state criterion does not descend along the target context.**  No function of the
+target context reproduces it across the two dynamics, so a temporal criterion is a function of
+the pair (context, population).  The target-only annotation of the previous theorem does descend:
+descent, not sensitivity, is what separates the two quantities. -/
+theorem not_descends_contextMatchQuality_along_targetState :
+    ¬ DescendsAlong (fun g : TransportPair ↦ g.2) binaryTransportFamily
+      (conditionalSectionMean (fun g : TransportPair ↦ contextMatchQuality g.1 g.2)) := by
+  rintro ⟨value, hvalue⟩
+  have hpersist := hvalue true 0 (by rw [labelMass_binaryTransportFamily]; norm_num)
+  have hswitch := hvalue false 0 (by rw [labelMass_binaryTransportFamily]; norm_num)
+  rw [contextMatchQuality_value_persistent] at hpersist
+  rw [contextMatchQuality_value_switching] at hswitch
+  rw [← hpersist] at hswitch
+  norm_num at hswitch
+
 /-! ## The adaptation time and the transport time are one time -/
 
 /-- **A single-rate integrated autocorrelation time is the inverse-dissipation frontier
@@ -215,7 +315,7 @@ theorem geometry_and_effect_recovery_gates
 
 /-! ## The unified obstruction bundle -/
 
-/-- Four logically distinct failures that a biological transport theory must not collapse
+/-- Eight logically distinct failures that a biological transport theory must not collapse
 into one scalar "portability" parameter. -/
 structure UnifiedBiologyObstructions : Prop where
   /-- Stationary target averaging cannot distinguish persistence from switching. -/
@@ -236,6 +336,25 @@ structure UnifiedBiologyObstructions : Prop where
   /-- Shared local genomic geometry leaves a positive mixed fourth path moment. -/
   sharedGeometryNotFree :
     0 < 2 * (1 : ℝ) * 1 + 4 * (0 : ℝ) ^ 2 * 0 ^ 2
+  /-- A cross-state criterion is not a function of the target context: it fails to descend along
+  the label the target-only annotation descends along. -/
+  crossStateDoesNotDescend :
+    ¬ DescendsAlong (fun g : TransportPair ↦ g.2) binaryTransportFamily
+      (conditionalSectionMean (fun g : TransportPair ↦ contextMatchQuality g.1 g.2))
+  /-- Reportability along each margin separately does not give reportability along the pair, so a
+  stability check run one covariate at a time certifies nothing jointly. -/
+  marginalDescentDoesNotCompose :
+    ¬ DescendsAlong (fun g : TwoLociTrait ↦ (g.1, g.2.1)) interactionTraitLaw
+      (conditionalSectionMean traitIndicator)
+  /-- Dropping a stratum destroys reportability that both finer labels have: there is no coarsest
+  honest reporting label. -/
+  crudeReportingLosesDescent :
+    ¬ DescendsAlong trivialLabel confoundedExposureLaw
+      (conditionalSectionMean exposureIndicator)
+  /-- Every functional descends along posterior ancestry, and the ancestry-weighted average of
+  component values is still off by a full unit of trait: descent and the affine-in-ancestry
+  ansatz are different claims. -/
+  ancestryWeightedAnsatzFails : exampleComponentResidual = -1
 
 /-- **Unified finite obstruction theorem.**  Dynamics, dependence, value allocation, and
 local operator geometry each carry information invisible to a tempting scalar reduction.
@@ -247,7 +366,11 @@ theorem unifiedBiology_obstructions : UnifiedBiologyObstructions := by
       marginalsLoseDependence := coordinateMarginalsDoNotDetermineJointLaw
       commutingAllocationConflict := commutingConflict_myopic_ne_transport
       sharedGeometryNotFree := tridiagonalABAB_pathExpression_pos 0 0 1 1 (by norm_num)
-        (by norm_num) }
+        (by norm_num)
+      crossStateDoesNotDescend := not_descends_contextMatchQuality_along_targetState
+      marginalDescentDoesNotCompose := interaction_join_obstruction.2.2
+      crudeReportingLosesDescent := confounding_meet_obstruction.2.2
+      ancestryWeightedAnsatzFails := exampleComponentResidual_eq_neg_one }
   rw [crossStatePerformance_persistent_eq_one, crossStatePerformance_switching_eq_zero]
   norm_num
 
