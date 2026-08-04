@@ -192,6 +192,58 @@ theorem selectionSummaryLogLik_strictAnti_missedSelectedVariance_of_matchedEffec
         validation.observedEffectCorrelation validation.effectCorrelationNoise)
   exact hTotal
 
+/-- Equal selected-variance miss gives equal validation likelihood when both summaries match the
+observed effect correlation. -/
+theorem selectionSummaryLogLik_eq_of_missedSelectedVariance_eq_of_matchedEffectCorrelation
+    (validation : SelectionValidationModel)
+    (summary₁ summary₂ : SelectionModelSummary)
+    (hCorr₁ :
+      summary₁.predictedEffectCorrelation = validation.observedEffectCorrelation)
+    (hCorr₂ :
+      summary₂.predictedEffectCorrelation = validation.observedEffectCorrelation)
+    (hMiss :
+      missedSelectedVariance validation summary₁ =
+        missedSelectedVariance validation summary₂) :
+    selectionSummaryLogLik validation summary₁ =
+      selectionSummaryLogLik validation summary₂ := by
+  rw [selectionSummaryLogLik_eq_of_matchedEffectCorrelation validation summary₁ hCorr₁,
+    selectionSummaryLogLik_eq_of_matchedEffectCorrelation validation summary₂ hCorr₂,
+    gaussianProfileLogLik_eq_missedSelectedVariance,
+    gaussianProfileLogLik_eq_missedSelectedVariance, hMiss]
+
+/-- **Exact validation ordering.** Among summaries that match the observed effect correlation,
+the Gaussian validation likelihood ranks them in precisely the reverse order of their absolute
+selected-variance misses.  The earlier strict-antitonicity theorem is the forward half; this iff
+also proves that no other feature of such a summary can alter the ranking. -/
+theorem selectionSummaryLogLik_lt_iff_missedSelectedVariance_gt_of_matchedEffectCorrelation
+    (validation : SelectionValidationModel)
+    (summary₁ summary₂ : SelectionModelSummary)
+    (hCorr₁ :
+      summary₁.predictedEffectCorrelation = validation.observedEffectCorrelation)
+    (hCorr₂ :
+      summary₂.predictedEffectCorrelation = validation.observedEffectCorrelation) :
+    selectionSummaryLogLik validation summary₂ <
+        selectionSummaryLogLik validation summary₁ ↔
+      missedSelectedVariance validation summary₁ <
+        missedSelectedVariance validation summary₂ := by
+  constructor
+  · intro hlikelihood
+    by_contra hmiss
+    have hle : missedSelectedVariance validation summary₂ ≤
+        missedSelectedVariance validation summary₁ := le_of_not_gt hmiss
+    rcases hle.eq_or_lt with hequal | hstrict
+    · have hlikelihoodEq :=
+        selectionSummaryLogLik_eq_of_missedSelectedVariance_eq_of_matchedEffectCorrelation
+          validation summary₂ summary₁ hCorr₂ hCorr₁ hequal
+      exact (ne_of_lt hlikelihood) hlikelihoodEq
+    · have hopposite :=
+        selectionSummaryLogLik_strictAnti_missedSelectedVariance_of_matchedEffectCorrelation
+          validation summary₂ summary₁ hCorr₂ hCorr₁ hstrict
+      exact lt_asymm hlikelihood hopposite
+  · exact
+      selectionSummaryLogLik_strictAnti_missedSelectedVariance_of_matchedEffectCorrelation
+        validation summary₁ summary₂ hCorr₁ hCorr₂
+
 /-- With a fixed alternative summary, the likelihood-ratio statistic strictly
 increases as the null summary misses the observed selected variance by more,
 provided both null summaries fit the observed effect correlation equally well. -/
@@ -216,6 +268,34 @@ theorem selectionModelLRT_strictMono_missedSelectedVariance_of_matchedEffectCorr
       validation null₁ null₂ hCorr₁ hCorr₂ hMiss
   unfold selectionModelLRT likelihoodRatioStat
   linarith
+
+/-- **Exact LRT ordering at matched effect correlation.** With the alternative fixed, the
+likelihood-ratio statistic ranks two null summaries exactly by their selected-variance miss.
+This turns the validation prescription into an iff: a larger statistic means, and only means,
+a worse selected-variance fit within the matched-correlation fiber. -/
+theorem selectionModelLRT_lt_iff_missedSelectedVariance_lt_of_matchedEffectCorrelation
+    (validation : SelectionValidationModel)
+    (null₁ null₂ altSummary : SelectionModelSummary)
+    (hCorr₁ :
+      null₁.predictedEffectCorrelation = validation.observedEffectCorrelation)
+    (hCorr₂ :
+      null₂.predictedEffectCorrelation = validation.observedEffectCorrelation) :
+    selectionModelLRT validation null₁ altSummary <
+        selectionModelLRT validation null₂ altSummary ↔
+      missedSelectedVariance validation null₁ <
+        missedSelectedVariance validation null₂ := by
+  constructor
+  · intro hLRT
+    have hNull : selectionSummaryLogLik validation null₂ <
+        selectionSummaryLogLik validation null₁ := by
+      unfold selectionModelLRT likelihoodRatioStat at hLRT
+      linarith
+    exact
+      (selectionSummaryLogLik_lt_iff_missedSelectedVariance_gt_of_matchedEffectCorrelation
+        validation null₁ null₂ hCorr₁ hCorr₂).mp hNull
+  · exact
+      selectionModelLRT_strictMono_missedSelectedVariance_of_matchedEffectCorrelation
+        validation null₁ null₂ altSummary hCorr₁ hCorr₂
 
 end SelectionValidation
 
