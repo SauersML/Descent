@@ -896,6 +896,14 @@ parameter and nothing fitted. -/
 noncomputable def nextFloorFourthMoment (m2 m4 m6 m8 : ℝ) : ℝ :=
   (m8 - 4 * m6 + 6 * m4 - 4 * m2 + 1) / (m4 - 1) ^ 2
 
+/-- **The Gaussian tower reproduces itself.** Feeding the standard normal moments `1, 3, 15, 105`
+returns `(105 - 60 + 18 - 4 + 1)/4 = 15`, so the squared floor of a Gaussian has the same fourth
+moment as the Gaussian's sixth. That is the fixed point the tower is built on, and it fixes every
+coefficient in the numerator at once. -/
+theorem nextFloorFourthMoment_gaussian : nextFloorFourthMoment 1 3 15 105 = 15 := by
+  unfold nextFloorFourthMoment
+  norm_num
+
 /-- **Floor one of the Gaussian tower has `σ₁² = 2`.** From `E[X⁴] = 3`. -/
 theorem gaussianFloorOneScaleSq : squaringScaleSq 3 = 2 := by
   unfold squaringScaleSq

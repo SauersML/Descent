@@ -2751,6 +2751,15 @@ noncomputable def IrreducibleTargetPenalty.total
     penalty.sourceSpecificOverfit +
     penalty.novelUntaggablePhenotype
 
+/-- **Removing three components leaves the fourth.** The budget is additive across its four
+named sources, which is what makes attributing a share to any one of them meaningful; a body
+that weighted them would satisfy the nonnegativity results and not this. -/
+theorem IrreducibleTargetPenalty.total_sub_three (penalty : IrreducibleTargetPenalty) :
+    penalty.total - penalty.brokenTagging - penalty.ancestrySpecificLD
+      - penalty.sourceSpecificOverfit = penalty.novelUntaggablePhenotype := by
+  unfold IrreducibleTargetPenalty.total
+  ring
+
 theorem IrreducibleTargetPenalty.total_nonneg
     (penalty : IrreducibleTargetPenalty) :
     0 ≤ penalty.total := by

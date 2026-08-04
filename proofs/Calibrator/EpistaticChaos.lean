@@ -2110,6 +2110,13 @@ content and no free parameter.
 Empirical status: UNTESTED. Algebra on one fixed integer matrix; no modelling -/
 def circulantSpectrumA (c : ℝ) : ℝ := 8 * c ^ 2 + 2 * c - 4
 
+/-- **The eigenvalue at the uniform mode.** At `cos θ = 1` the circulant acts on the all-ones
+vector and returns the row sum, which is six for these offsets. That value fixes the constant
+term, which no statement about the polynomial's shape or its roots does. -/
+theorem circulantSpectrumA_at_one : circulantSpectrumA 1 = 6 := by
+  unfold circulantSpectrumA
+  norm_num
+
 /-- Eigenvalue of the circulant with offsets `(0,2,1,0,0,0,1,2)` as a polynomial
 in `c = cos θ`, from `λ = 4 cos θ + 2 cos 2θ`.
 integer matrix, no free parameter.
