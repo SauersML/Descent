@@ -1778,6 +1778,15 @@ Empirical status: NOT AN EMPIRICAL CLAIM -- this is the algebraic objective bein
 noncomputable def twoCellL2EstimationPenalty (p n₁ n₂ : ℝ) : ℝ :=
   p / n₁ + (1 - p) / n₂
 
+/-- **twoCellL2EstimationPenalty at its junk point, named.** An empty first cell makes its
+estimation penalty unbounded. The divisor is zero, that term vanishes, and the penalty reduces
+to the second cell alone -- so a design that samples one ancestry not at all is charged only for
+the ancestry it did sample. Consumers must exclude the argument that makes the guard vanish. -/
+theorem twoCellL2EstimationPenalty_empty_first_cell_is_junk (p n₂ : ℝ) :
+    twoCellL2EstimationPenalty p 0 n₂ = (1 - p) / n₂ := by
+  unfold twoCellL2EstimationPenalty
+  simp
+
 /-- The two-cell worst-ancestry estimation error when both cells have equal observation noise.
 
 Empirical status: NOT AN EMPIRICAL CLAIM -- this is the algebraic objective being optimized. -/

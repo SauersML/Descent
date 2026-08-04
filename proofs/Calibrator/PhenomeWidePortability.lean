@@ -184,6 +184,15 @@ theorem closedPopulation_het_eq_neutralDriftFactor (Ne H₀ : ℝ) (hH : 0 < H�
 noncomputable def selectedDriftFactor (Ne : ℝ) (t : ℕ) (s_correction : ℝ) : ℝ :=
   (1 - 1 / (2 * Ne) + s_correction) ^ t
 
+/-- **selectedDriftFactor at its junk point, named.** The drift term `1 / (2 * Ne)` is junk-zero at
+`Ne = 0`, so the factor reduces to selection alone and an empty population is reported as one in
+which drift does nothing. As with `neutralDriftFactor` the error compounds with the generation
+count rather than attenuating. Consumers must exclude the argument that makes the guard vanish. -/
+theorem selectedDriftFactor_empty_population_is_junk (t : ℕ) (s_correction : ℝ) :
+    selectedDriftFactor 0 t s_correction = (1 + s_correction) ^ t := by
+  unfold selectedDriftFactor
+  simp
+
 /-- **Fst from a drift factor.**
     In the island/drift model, Fst = 1 - driftFactor, where driftFactor
     is the fraction of ancestral heterozygosity retained.

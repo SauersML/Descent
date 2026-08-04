@@ -114,10 +114,30 @@ def InLinkageEquilibrium {k n : ℕ} (family : BundleFamily k) (panel : Panel n)
 /-- The genotype standard deviation `√(2q(1-q))` at frequency `q`. -/
 noncomputable def diploidStdev (q : ℝ) : ℝ := Real.sqrt (2 * q * (1 - q))
 
+/-- **diploidStdev at its junk point, named.** Outside `[0, 1]` the variance `2 q (1 - q)` is
+negative and `Real.sqrt` is junk-zero, so an inadmissible allele frequency reports a standard
+deviation of zero -- the value for a monomorphic locus. A caller passing an out-of-range
+frequency gets a plausible number instead of an error. Consumers must exclude the argument that
+makes the guard vanish. -/
+theorem diploidStdev_out_of_range_frequency_is_junk :
+    diploidStdev 2 = 0 := by
+  unfold diploidStdev
+  rw [show (2 : ℝ) * 2 * (1 - 2) = -4 by norm_num]
+  exact Real.sqrt_eq_zero_of_nonpos (by norm_num)
+
 /-- The standardized dosage of genotype `j ∈ {0,1,2}` at frequency `q`:
 `(j - 2q)/√(2q(1-q))`. -/
 noncomputable def diploidAtomValue (j : Fin 3) (q : ℝ) : ℝ :=
   ((j : ℝ) - 2 * q) / diploidStdev q
+
+/-- **diploidAtomValue at its junk point, named.** At a monomorphic locus the standardising
+denominator is zero, so every genotype's standardised dosage is junk-zero -- all three genotypes
+collapse to the same value, and the atom structure the quantity exists to expose disappears.
+Consumers must exclude the argument that makes the guard vanish. -/
+theorem diploidAtomValue_monomorphic_is_junk (j : Fin 3) :
+    diploidAtomValue j 0 = 0 := by
+  unfold diploidAtomValue diploidStdev
+  simp
 
 /-- The Hardy-Weinberg mass of genotype `j` at frequency `q`. The three masses are locked
 to one parameter; this is what makes the family a bundle. -/

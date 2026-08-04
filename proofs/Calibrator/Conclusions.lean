@@ -521,6 +521,16 @@ theorem BayesRisk_mono {α : Type u} (R : α → ℝ) (F G : Set α)
 noncomputable def bernoulliLogLoss (p q : ℝ) : ℝ :=
   -(p * Real.log q + (1 - p) * Real.log (1 - q))
 
+/-- **bernoulliLogLoss at its junk point, named.** A forecast of probability zero for an outcome
+that occurs is infinitely costly -- that is the whole point of a log score. `Real.log 0` is
+junk-zero and the loss is `0`: a PERFECT score, awarded to the most confidently wrong forecast
+expressible. Nothing in the corpus's scoring chain distinguishes it from a correct certain
+forecast. Consumers must exclude the argument that makes the guard vanish. -/
+theorem bernoulliLogLoss_certain_and_wrong_is_junk :
+    bernoulliLogLoss 1 0 = 0 := by
+  unfold bernoulliLogLoss
+  simp
+
 /-- **The log loss is in nats, pinned.** `bernoulliLogLoss_certain_correct` fixes the loss where
 the forecast is certain and right, which is zero for every body of the form `c * loss` and so
 fixes no unit. A certain outcome forecast at one half costs `log 2` -- one bit, measured in nats

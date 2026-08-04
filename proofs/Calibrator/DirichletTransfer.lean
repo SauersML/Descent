@@ -154,6 +154,15 @@ noncomputable def localizedTransferVariance (v : ℝ) (_k : ℕ) : ℝ := v
 /-- Limit variance for a **delocalized** weight, which averages over `k` sites. -/
 noncomputable def delocalizedTransferVariance (v : ℝ) (k : ℕ) : ℝ := v / k
 
+/-- **delocalizedTransferVariance at its junk point, named.** Spreading variance over no blocks
+leaves it undefined. Lean returns `0`: perfectly delocalised, the value for variance spread over
+unboundedly many blocks, which is the opposite regime. Consumers must exclude the argument that
+makes the guard vanish. -/
+theorem delocalizedTransferVariance_zero_blocks_is_junk (v : ℝ) :
+    delocalizedTransferVariance v 0 = 0 := by
+  unfold delocalizedTransferVariance
+  simp
+
 /-- **Local typing does not reduce a localized scheme's transfer variance.** -/
 theorem localizedTransferVariance_const (v : ℝ) (k₁ k₂ : ℕ) :
     localizedTransferVariance v k₁ = localizedTransferVariance v k₂ := rfl

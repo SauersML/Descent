@@ -709,6 +709,15 @@ section FounderEffects
 noncomputable def founderHeterozygosityLoss (k : ℕ) (t : ℕ) : ℝ :=
   1 - (1 - 1 / (2 * (k : ℝ))) ^ t
 
+/-- **founderHeterozygosityLoss at its junk point, named.** A founding population of zero loses all
+heterozygosity at once. The per-generation retention is junk-one, so the loss is `0` at every
+generation count: no founder effect whatsoever, reported for the most extreme founder event
+possible. Consumers must exclude the argument that makes the guard vanish. -/
+theorem founderHeterozygosityLoss_zero_founders_is_junk (t : ℕ) :
+    founderHeterozygosityLoss 0 t = 0 := by
+  unfold founderHeterozygosityLoss
+  simp
+
 /-- Smaller founding population → larger heterozygosity loss (more drift). -/
 theorem smaller_founder_larger_heterozygosity_loss
     (k₁ k₂ : ℕ) (t : ℕ)

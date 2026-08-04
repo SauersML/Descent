@@ -495,6 +495,14 @@ noncomputable def gainBounded : ℝ → ℝ := fun _ ↦ 1
 /-- Row two: logarithmic gain. The heavy-tail ghost and the equicorrelated copula live here. -/
 noncomputable def gainLog (n : ℝ) : ℝ := Real.log n
 
+/-- **gainLog at its junk point, named.** `Real.log 0` is junk-zero, so a size-zero problem is
+reported at the same gain as a size-one problem, where the logarithm genuinely vanishes.
+Consumers must exclude the argument that makes the guard vanish. -/
+theorem gainLog_zero_size_is_junk :
+    gainLog 0 = 0 := by
+  unfold gainLog
+  simp
+
 /-- **The logarithmic row is on the natural scale.** Separation from the other rows is a
 statement about growth and is shared by every positive multiple of this one; evaluating at `e`
 fixes the multiple at one. -/
@@ -508,6 +516,14 @@ theorem gainLog_at_exp_one : gainLog (Real.exp 1) = 1 := by
     rate and takes no significance threshold, because none enters it. The earlier name
     `gainPower` invited exactly that misreading. -/
 noncomputable def gainPolynomialRow (β n : ℝ) : ℝ := n ^ β * Real.log n
+
+/-- **gainPolynomialRow at its junk point, named.** The logarithmic factor is junk-zero at size
+zero, so the whole row vanishes at every exponent -- and vanishing is also what a genuinely flat
+row gives. Consumers must exclude the argument that makes the guard vanish. -/
+theorem gainPolynomialRow_zero_size_is_junk (β : ℝ) :
+    gainPolynomialRow β 0 = 0 := by
+  unfold gainPolynomialRow
+  simp
 
 /-- **The polynomial row is the product of a power and the logarithmic row.** The separation
 results order the four rows by growth and do not say how this one is built; the factorisation

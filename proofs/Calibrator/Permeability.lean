@@ -520,6 +520,16 @@ noncomputable def twoChannelConditionalMomentResponse
     (firstNoise sharedNoise firstResponse secondResponse : ℝ) : ℝ :=
   secondResponse - (sharedNoise / firstNoise) * firstResponse
 
+/-- **twoChannelConditionalMomentResponse at its junk point, named.** A noiseless first channel
+determines its own moment exactly, so conditioning on it should remove the whole shared
+component. The divisor is zero, the regression coefficient is junk-zero, and the second response
+is returned UNCHANGED -- the value for two independent channels. Consumers must exclude the
+argument that makes the guard vanish. -/
+theorem twoChannelConditionalMomentResponse_noiseless_first_is_junk (sharedNoise firstResponse secondResponse : ℝ) :
+    twoChannelConditionalMomentResponse 0 sharedNoise firstResponse secondResponse = secondResponse := by
+  unfold twoChannelConditionalMomentResponse
+  simp
+
 /-- **With no shared noise the second channel is read unadjusted.** The regression coefficient
 that removes the first channel is exactly the shared-to-own noise ratio, and at zero shared noise
 it vanishes; a body carrying any other numerator would still be a difference of responses. -/
