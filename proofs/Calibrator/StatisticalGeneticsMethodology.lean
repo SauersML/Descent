@@ -491,6 +491,16 @@ with different properties for portability prediction.
 
 section GeneticCorrelationMethods
 
+/-- Two-region genome-wide genetic correlation formed with positive region weights. -/
+noncomputable def twoRegionGeneticCorrelation
+    (rhoFirst rhoSecond firstWeight secondWeight : ℝ) : ℝ :=
+  (firstWeight * rhoFirst + secondWeight * rhoSecond) / (firstWeight + secondWeight)
+
+/-- The regional average is pinned at equal weights between correlations zero and one-half. -/
+theorem twoRegionGeneticCorrelation_at_reference_point :
+    twoRegionGeneticCorrelation (1 / 2) 0 1 1 = 1 / 4 := by
+  norm_num [twoRegionGeneticCorrelation]
+
 /-- **Genetic correlation varies across the genome.**
     ρ_g estimated from different genomic regions can vary,
     reflecting locus-specific selection pressures.
@@ -503,13 +513,24 @@ section GeneticCorrelationMethods
     No such theorem exists in this corpus, and the disjoint licence it would appeal to is
     not proved here. What is formalized below is the variance *parameter* of a hypothesised
     Gaussian limit. -/
-theorem lt_weightedAverage_of_lt
+theorem secondCorrelation_lt_twoRegionGeneticCorrelation
     (rho_chr1 rho_chr6 : ℝ) (w₁ w₆ : ℝ)
     (h_chr6_lower : rho_chr6 < rho_chr1) -- HLA region has lower correlation
     (h_w1 : 0 < w₁) (h_w6 : 0 < w₆) :
-    -- Genome-wide weighted average is between the two regional estimates
-    rho_chr6 < (w₁ * rho_chr1 + w₆ * rho_chr6) / (w₁ + w₆) := by
+    rho_chr6 < twoRegionGeneticCorrelation rho_chr1 rho_chr6 w₁ w₆ := by
+  unfold twoRegionGeneticCorrelation
   rw [lt_div_iff₀ (by linarith : (0:ℝ) < w₁ + w₆)]
+  nlinarith
+
+/-- With positive weights and distinct regional correlations, the genome-wide average
+is also strictly below the larger regional correlation. -/
+theorem twoRegionGeneticCorrelation_lt_firstCorrelation
+    (rho_chr1 rho_chr6 : ℝ) (w₁ w₆ : ℝ)
+    (h_chr6_lower : rho_chr6 < rho_chr1)
+    (h_w1 : 0 < w₁) (h_w6 : 0 < w₆) :
+    twoRegionGeneticCorrelation rho_chr1 rho_chr6 w₁ w₆ < rho_chr1 := by
+  unfold twoRegionGeneticCorrelation
+  rw [div_lt_iff₀ (by linarith : (0 : ℝ) < w₁ + w₆)]
   nlinarith
 
 
