@@ -36,7 +36,7 @@ import admissible                        # noqa: E402
 import lean_parse                        # noqa: E402
 from translate import Untranslatable, pyname, translate_def   # noqa: E402
 
-PROOFS = HERE.parent.parent
+PROOFS = lean_parse.find_proofs_root(HERE)
 _ALL_STRUCTS = {}
 
 
@@ -471,7 +471,7 @@ def main():
         exec(compile(mod, "lean_defs.py", "exec"), ns)
     except Exception as e:                                        # noqa: BLE001
         print(f"GENERATED MODULE FAILED TO IMPORT: {e!r}", file=sys.stderr)
-        return
+        return 1
 
     by_struct = {s["short"]: s for s in blob["structures"]}
     global _ALL_STRUCTS
@@ -575,6 +575,20 @@ def main():
     for k, v in bad.most_common(15):
         print(f"  {v:4d}  {k}")
 
+    # An EMPTY table is the one outcome this script must never report as
+    # success.  It looks identical to a clean run -- no parse failures, no
+    # translator errors, every tally zero -- and every downstream consumer then
+    # validates an empty corpus and agrees with itself.  That is exactly what
+    # happened while `PROOFS` pointed one directory too high: `rglob` on a
+    # missing path yields nothing, so this printed "definitions parsed : 0" and
+    # exited 0, and the extraction tier was dead without a single red signal.
+    if not D:
+        print("\nNO DEFINITIONS EXTRACTED -- the corpus was not found or the "
+              "parser is broken. Refusing to report success on an empty table.",
+              file=sys.stderr)
+        return 1
+    return 0
+
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

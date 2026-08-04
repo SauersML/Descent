@@ -47,8 +47,9 @@ HERE = pathlib.Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 
 import api                                                # noqa: E402
+import lean_parse                                         # noqa: E402
 
-PROOFS = HERE.parent.parent
+PROOFS = lean_parse.find_proofs_root(HERE)
 
 # Tactic positions that require a bare constant name.
 UNFOLD_RE = re.compile(r"\bunfold\s+([^\n;]+)")

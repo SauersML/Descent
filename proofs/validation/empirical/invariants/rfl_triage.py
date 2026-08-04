@@ -272,7 +272,9 @@ import re
 import sys
 
 HERE = pathlib.Path(__file__).resolve().parent
-CALIB = HERE.parent.parent / "Calibrator"
+# parents[3] from the FILE, matching extract_defs.py/theorems.py/structures.py
+# beside it. `HERE.parent.parent` is validation/, one level short of the corpus.
+CALIB = pathlib.Path(__file__).resolve().parents[3] / "Calibrator"
 
 # The population-genetics slice. Split by MODULE, not by list position: a
 # tautology audit needs the surrounding file open, and two agents in one file

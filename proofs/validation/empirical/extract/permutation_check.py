@@ -49,7 +49,7 @@ sys.path.insert(0, str(HERE))
 import lean_parse                                          # noqa: E402
 from translate import Untranslatable, pyname, translate_def  # noqa: E402
 
-REPO = HERE.parent.parent.parent
+REPO = lean_parse.find_proofs_root(HERE).parent
 PROBE_POINTS = 24
 
 

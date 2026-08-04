@@ -33,8 +33,9 @@ HERE = pathlib.Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 
 import api                                                # noqa: E402
+import lean_parse                                         # noqa: E402
 
-PROOFS = HERE.parent.parent
+PROOFS = lean_parse.find_proofs_root(HERE)
 SCRIPTS = PROOFS / "validation" / "popgen_defs"
 
 # The pattern currently in use, reproduced exactly so the delta is honest.

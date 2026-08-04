@@ -63,7 +63,10 @@ import sys
 
 HERE = pathlib.Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-CALIB = HERE.parent.parent / "Calibrator"
+
+import lean_parse                                          # noqa: E402
+
+CALIB = lean_parse.find_proofs_root(HERE) / "Calibrator"
 
 REL = re.compile(r"[∀∃≤≥≠∧∨¬∈↔]|(?<![:<>=!])=(?!=)|<|>")
 THEOREM_NAME = re.compile(r"^(theorem\d*|characterization|axiom|assum|premise|"

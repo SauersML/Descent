@@ -19,8 +19,11 @@ import subprocess
 import sys
 
 HERE = pathlib.Path(__file__).resolve().parent
-PROOFS = HERE.parent.parent
 sys.path.insert(0, str(HERE))
+
+import lean_parse                                          # noqa: E402
+
+PROOFS = lean_parse.find_proofs_root(HERE)
 
 QUICK = "--quick" in sys.argv
 failures = []

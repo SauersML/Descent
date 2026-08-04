@@ -274,7 +274,13 @@ def parse_file(path: pathlib.Path, root: pathlib.Path):
         fq = f"{ns}.{name}" if ns else name
 
         est = ""
-        mest = re.search(r"Empirical status:\s*([A-Z][A-Z_\- ]*)", doc)
+        # Leading `**` must be skipped: docstrings write the verdict in markdown
+        # bold (`Empirical status: **MEASURED ...**`), and requiring [A-Z] right
+        # after the colon silently yielded "" for every one of them -- reading a
+        # measured definition as unmarked. `check.py`'s own empirical-claim
+        # screen already parses bold statuses, so this regex was the odd one out
+        # and the two instruments disagreed about which defs carry a verdict.
+        mest = re.search(r"Empirical status:\s*\*{0,2}\s*([A-Z][A-Z_\- ]*)", doc)
         if mest:
             est = mest.group(1).strip().rstrip(".")
 
@@ -440,11 +446,45 @@ def mine_from_docstring(d: Decl):
 _SOURCE_DIGEST = (None, 0)
 
 
+class CorpusNotFound(Exception):
+    """The Lean corpus is not where a caller said it was.
+
+    Raised rather than returning an empty parse, because those two outcomes are
+    indistinguishable downstream and the difference is the whole verdict.
+    """
+
+
+def find_proofs_root(start: pathlib.Path) -> pathlib.Path:
+    """Walk up from `start` to the directory that actually holds `Calibrator/`.
+
+    Every module under validation/ used to hardcode its own depth
+    (`HERE.parent.parent`).  When this directory moved from
+    `proofs/validation/extract` to `proofs/validation/empirical/extract` those
+    constants all became one level short, so `root` pointed at
+    `proofs/validation/Calibrator`, which does not exist.  `rglob` on a missing
+    directory yields nothing, so the whole extraction tier parsed zero
+    definitions and reported success.  Searching for the corpus instead of
+    counting `..`s cannot go stale when a file is moved again.
+    """
+    start = start.resolve()
+    for cand in (start, *start.parents):
+        if (cand / "Calibrator").is_dir():
+            return cand
+    raise CorpusNotFound(
+        f"no ancestor of {start} contains a Calibrator/ directory; the Lean "
+        f"corpus could not be located")
+
+
 def build(root: pathlib.Path):
     global _SOURCE_DIGEST
+    root = pathlib.Path(root)
+    if not root.is_dir():
+        raise CorpusNotFound(f"corpus root {root} does not exist")
     _SOURCE_DIGEST = source_digest(root)
     all_decls, failures = [], []
     files = sorted(root.rglob("*.lean"))
+    if not files:
+        raise CorpusNotFound(f"corpus root {root} contains no .lean files")
     extra = root.parent / (root.name + ".lean")
     if extra.exists():
         files.append(extra)

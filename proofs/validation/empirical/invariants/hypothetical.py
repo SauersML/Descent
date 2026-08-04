@@ -49,7 +49,11 @@ import re
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-CALIBRATOR = os.path.normpath(os.path.join(HERE, "..", "..", "Calibrator"))
+# Three levels up, not two: this file sits at proofs/validation/empirical/
+# invariants/, so `../..` is validation/ and yields a path that does not exist.
+# Its siblings here use `parents[3]`, which is the same distance counted from
+# the file rather than from the directory.
+CALIBRATOR = os.path.normpath(os.path.join(HERE, "..", "..", "..", "Calibrator"))
 
 # A declaration header: the token, the name, then everything up to the `:` that
 # opens the statement.  Lean lets binders span lines, so the header is taken up

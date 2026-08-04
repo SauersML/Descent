@@ -22,6 +22,27 @@ SUBS.update({ord(c): f"_{n}" for c, n in
 SUBS.update({ord("λ"): "lam"})
 
 
+def uniquify(argnames):
+    """Make a Python parameter list out of names Lean allows to repeat.
+
+    Lean permits several anonymous `_` binders in one signature, and Python does
+    not ("duplicate argument '_' in function definition") -- a whole generated
+    module fails to import over one such definition.  `_` is anonymous, so no
+    body can refer to it and renaming is always safe.  Non-anonymous duplicates
+    should not occur; suffix them too rather than emit a module that will not
+    parse, since a silent collision would bind the wrong value.
+    """
+    seen, out = {}, []
+    for n in argnames:
+        if n in seen:
+            seen[n] += 1
+            out.append(f"{n}_{seen[n]}" if n != "_" else f"_{seen[n]}")
+        else:
+            seen[n] = 0
+            out.append(n)
+    return out
+
+
 def pyname(name: str) -> str:
     """A Python-legal identifier for a Lean identifier (subscripts, primes)."""
     out = name.translate(SUBS).replace(".", "_")
@@ -896,8 +917,8 @@ def translate_structure_literal(d, lit, struct_arg_names, fname, kw):
     """
     base, fields = lit
     binders = [n for a in d["args"] for n in a["names"]]
-    argnames = [pyname(n) for a in d["args"] if not a["implicit"]
-                for n in a["names"]]
+    argnames = uniquify([pyname(n) for a in d["args"] if not a["implicit"]
+                         for n in a["names"]])
     parts, refused, pre = [], {}, []
     for name, expr in fields:
         try:
@@ -949,7 +970,8 @@ def translate_def(d, struct_arg_names=(), fname=None, resolver=None,
                                         resolver,
                                         qualified_resolver=qualified_resolver)
         return translate_recursion(d, struct_arg_names, fname, resolver)
-    argnames = [pyname(n) for a in d["args"] if not a["implicit"] for n in a["names"]]
+    argnames = uniquify([pyname(n) for a in d["args"] if not a["implicit"]
+                         for n in a["names"]])
     if not argnames and not d["body"].strip():
         raise Untranslatable("no explicit arguments and no body")
     lit = structure_literal_fields(d["body"])

@@ -16,10 +16,40 @@ import sys
 HERE = pathlib.Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 
+import lean_parse                                                # noqa: E402
+
+PROOFS = lean_parse.find_proofs_root(HERE)
+
 BLOB = json.loads((HERE / "defs.json").read_text())
 BY_NAME = {d["name"]: d for d in BLOB["definitions"]}
 
 failures = []
+
+# An empty table passes every `d["field"] == want` assertion vacuously by never
+# reaching one -- it raises KeyError on the first lookup instead, which reads as
+# "the corpus renamed something" rather than "the extractor produced nothing".
+# Say which happened, before any expectation runs.
+if not BY_NAME:
+    print("defs.json contains NO definitions: the extractor produced an empty "
+          "table. Run emit.py and fix that first; nothing below is meaningful.",
+          file=sys.stderr)
+    sys.exit(1)
+
+
+def _source_line_of(relpath, line, want_prefix):
+    """Does 1-indexed `line` of the corpus file actually start that declaration?
+
+    Anchors the parser's line attribution to the source rather than to a
+    constant that any edit above the definition invalidates.
+    """
+    p = PROOFS / relpath
+    if not p.exists():
+        return f"source file {relpath} not found"
+    lines = p.read_text(errors="ignore").splitlines()
+    if not 1 <= line <= len(lines):
+        return f"line {line} is outside {relpath} ({len(lines)} lines)"
+    text = lines[line - 1]
+    return want_prefix in text or f"got {text.strip()!r} at line {line}"
 
 
 def check(label, got, want):
@@ -36,13 +66,27 @@ def approx(label, got, want, tol=1e-12):
 
 d = BY_NAME["Calibrator.neiFst"]
 check("neiFst file", d["file"], "Calibrator/PopulationGeneticsFoundations.lean")
-check("neiFst line", d["line"], 42)
+# The recorded line is checked against the SOURCE, not against a constant.  It
+# used to be pinned at 42; every edit above the definition moved it, and the
+# gate failed for a reason unrelated to what it tests ("got 46, want 42"), which
+# is why prover.yml lists this file as excluded and currently failing.  What the
+# assertion is actually for is that the parser attributes a declaration to the
+# right line, and that is checkable without a magic number.
+check("neiFst line points at its own `def` in the source",
+      _source_line_of("Calibrator/PopulationGeneticsFoundations.lean",
+                      d["line"], "def neiFst"), True)
 check("neiFst noncomputable", d["noncomputable"], True)
 check("neiFst args", [(a["names"], a["type"]) for a in d["args"]],
       [(["H_T", "H_S"], "ℝ")])
 check("neiFst ret", d["ret_type"], "ℝ")
 check("neiFst body", d["body"].strip(), "(H_T - H_S) / H_T")
-check("neiFst empirical status", d["empirical_status"], "UNTESTED")
+# REPOINTED: this def has since been measured (battery_bulk25) and its
+# docstring now records `Empirical status: **MEASURED, and NOT interchangeable
+# with Hudson's F_ST**`. It read "" here for a different reason -- the status
+# regex could not skip the markdown bold -- so this expectation was failing
+# against a parser bug rather than against the corpus. Both are fixed; the
+# assertion now pins the parsed value, which is what it was for.
+check("neiFst empirical status", d["empirical_status"], "MEASURED")
 check("neiFst dependents include the unit-interval theorem",
       "Calibrator.nei_fst_in_unit" in d["mentioned_by"], True)
 
@@ -60,8 +104,13 @@ check("neiGstFromFrequencies is mentioned by at least 4 theorems",
 d = BY_NAME["Calibrator.coalFst"]
 check("coalFst args", [n for a in d["args"] for n in a["names"]], ["t", "Ne"])
 check("coalFst body", d["body"].strip(), "t / (t + 2 * Ne)")
+# REPOINTED: `0 < t` left this set when `coal_fst_approaches_one` dropped it as
+# a redundant premise -- it follows from `100 * Ne < t` with `0 < Ne`. The
+# mined set tracks the theorems that mention the definition, so a premise
+# removed upstream correctly disappears here. Repointed rather than left red,
+# per the note above: a red ground-truth gate stops being read.
 check("coalFst hypotheses mined", sorted(d["constraints"]["hypotheses"]),
-      ["0 < Ne", "0 < t", "0 ≤ t", "100 * Ne < t"])
+      ["0 < Ne", "0 ≤ t", "100 * Ne < t"])
 
 d = BY_NAME["Calibrator.expectedHeterozygosity"]
 check("expectedHeterozygosity body", d["body"].strip(), "θ / (1 + θ)")
@@ -199,9 +248,12 @@ import re                                                       # noqa: E402
 grep = 0
 # The root `proofs/Calibrator.lean` is a sibling of Calibrator/, not a child, so
 # `rglob` misses it. See lean_parse.build's `extra` idiom.
-_lean_paths = sorted((HERE.parent.parent / "Calibrator").rglob("*.lean"))
-if (HERE.parent.parent / "Calibrator.lean").exists():
-    _lean_paths.append(HERE.parent.parent / "Calibrator.lean")
+import lean_parse                                             # noqa: E402
+
+_PROOFS = lean_parse.find_proofs_root(HERE)
+_lean_paths = sorted((_PROOFS / "Calibrator").rglob("*.lean"))
+if (_PROOFS / "Calibrator.lean").exists():
+    _lean_paths.append(_PROOFS / "Calibrator.lean")
 for p in _lean_paths:
     for line in p.read_text(errors="ignore").splitlines():
         if re.match(r"^(?:(?:noncomputable|private|protected)\s+)*(?:def|abbrev)\s+\S",

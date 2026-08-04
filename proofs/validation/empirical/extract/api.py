@@ -368,7 +368,7 @@ def stamp() -> dict:
     for n in names:
         h.update(body_checksum(n).encode())
     import lean_parse
-    live, nfiles = lean_parse.source_digest(HERE.parent.parent / "Calibrator")
+    live, nfiles = lean_parse.source_digest(lean_parse.find_proofs_root(HERE) / "Calibrator")
     return {"arg_convention": ARG_CONVENTION,
             "source_digest_of_table": _blob().get("source_digest"),
             "source_digest_on_disk": live,
@@ -432,7 +432,7 @@ def staleness():
     try:
         import lean_parse
         stored = _blob().get("source_digest")
-        live, n = lean_parse.source_digest(HERE.parent.parent / "Calibrator")
+        live, n = lean_parse.source_digest(lean_parse.find_proofs_root(HERE) / "Calibrator")
         if stored is None:
             out.append("table predates source-digest recording; regenerate to "
                        "make freshness checkable at all")
