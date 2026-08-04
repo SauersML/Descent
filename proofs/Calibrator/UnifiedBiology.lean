@@ -11,6 +11,7 @@ import Calibrator.EnsembleChannel
 import Calibrator.HorizonCurve
 import Calibrator.PencilEnvironment
 import Calibrator.FunctionalDescent
+import Calibrator.SpectralUniversalityFailure
 
 namespace Calibrator
 
@@ -761,7 +762,7 @@ theorem geometry_and_effect_recovery_gates
 
 /-! ## The unified obstruction bundle -/
 
-/-- Fifteen logically distinct failures and boundaries that a biological transport theory must
+/-- Seventeen logically distinct failures and boundaries that a biological transport theory must
 not collapse into one scalar "portability" parameter.  The final six fields make continuum
 calibration and finite correction part of the core theorem rather than adjacent examples. -/
 structure UnifiedBiologyObstructions : Prop where
@@ -783,6 +784,21 @@ structure UnifiedBiologyObstructions : Prop where
   /-- Shared local genomic geometry leaves a positive mixed fourth path moment. -/
   sharedGeometryNotFree :
     0 < 2 * (1 : ℝ) * 1 + 4 * (0 : ℝ) ^ 2 * 0 ^ 2
+  /-- Equal LD eigenvalues do not determine the third-order orientation invariant in the locus
+  basis where the effect-size prior factorizes. -/
+  isospectralLDLosesOrientation :
+    Isospectral2 (localizedCovarianceBlock (3 / 2))
+        (rotatedCovarianceBlock (3 / 2)) ∧
+      blockEntryCubeMean (localizedCovarianceBlock (3 / 2)) ≠
+        blockEntryCubeMean (rotatedCovarianceBlock (3 / 2))
+  /-- Under the centered sparse architecture, that missing LD orientation changes the cubic
+  low-SNR information coefficient by exactly `11 / 24`. -/
+  skewedLDChangesLowSNRCoefficient :
+    ∀ aspect m1 m2 m3 : ℝ,
+      lowSNRThirdCoefficient aspect 2 2 m1 m2 m3
+          (blockEntryCubeMean (rotatedCovarianceBlock (3 / 2))) -
+        lowSNRThirdCoefficient aspect 2 2 m1 m2 m3
+          (blockEntryCubeMean (localizedCovarianceBlock (3 / 2))) = 11 / 24
   /-- A cross-state criterion is not a function of the target context: it fails to descend along
   the label the target-only annotation descends along. -/
   crossStateDoesNotDescend :
@@ -851,6 +867,17 @@ theorem unifiedBiology_obstructions : UnifiedBiologyObstructions := by
       commutingAllocationConflict := commutingConflict_myopic_ne_transport
       sharedGeometryNotFree := tridiagonalABAB_pathExpression_pos 0 0 1 1 (by norm_num)
         (by norm_num)
+      isospectralLDLosesOrientation :=
+        ⟨localizedCovarianceBlock_isospectral_rotatedCovarianceBlock (3 / 2), by
+          intro heq
+          have hzero :
+              blockEntryCubeMean (localizedCovarianceBlock (3 / 2)) -
+                  blockEntryCubeMean (rotatedCovarianceBlock (3 / 2)) = 0 := by
+            rw [heq, sub_self]
+          rw [midpoint_blockEntryCubeMean_separation] at hzero
+          norm_num at hzero⟩
+      skewedLDChangesLowSNRCoefficient :=
+        sparsePrior_lowSNRThirdCoefficient_rotated_sub_localized
       crossStateDoesNotDescend := not_descends_contextMatchQuality_along_targetState
       marginalDescentDoesNotCompose := admissible_interaction_join_obstruction
       crudeReportingLosesDescent := admissible_confounding_meet_obstruction

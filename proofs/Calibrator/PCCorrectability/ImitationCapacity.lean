@@ -2264,21 +2264,97 @@ theorem multiBlock_cubeSum_gap {m : ℕ} (a : Fin m → ℝ) :
 
 
 
-/-! ### The mechanism lives in `SpectralUniversalityFailure`
+/-! ### The mechanism: a cumulant contraction is an entrywise power sum
 
-The identity that says WHY the separating quantity is an entrywise cube sum --
-that the squared Frobenius norm of the third-cumulant tensor of `Θ = L B`
-collapses to `∑ᵢⱼ (LᵀL)ᵢⱼ³` -- belongs with the rest of the spectral-universality
-development in `proofs/Calibrator/SpectralUniversalityFailure.lean`, where it is
-stated in the general form: cumulant scalar carried, Mathlib's `Matrix` API, and
-arbitrary index types rather than `Fin`.
+The block families exhibit designs a spectral formula cannot separate. This is the
+identity that says WHY the separating quantity is an entrywise cube sum, and it
+holds in every dimension with no reference to the counterexample.
 
-A version was drafted here and removed rather than left standing beside it. Two
-statements of one lemma in two modules is the duplication this corpus already
-paid for once, and the general form is the one to build on. What stays here is
-only the block construction, which needs no contraction identity: it exhibits the
-designs, and the mechanism explains them.
+Write a section as `Θ = L B` with `B` centred and independent. The third-cumulant
+tensor of `Θ` is `κ₃` times the threefold contraction of `L` against itself, and
+its squared Frobenius norm is what enters the low signal-to-noise expansion of the
+mutual information at third order. The identity below evaluates that norm: it
+collapses to the entrywise cube sum of the Gram matrix `S = LᵀL`, the design
+covariance.
+
+That is the obstruction in one line. The covariance enters the expansion elsewhere
+through `Tr Cᵏ`, which is spectral. It enters here through `∑ᵢⱼ Sᵢⱼ³`, which is
+not, and the identity shows the entrywise form is FORCED by the contraction rather
+than chosen.
+
+The proof is a reordering of a fivefold sum: expanding the square pairs the two
+index copies, expanding the cube pairs the three tensor copies, and the two orders
+differ. `simp` does not find the reordering and chaining swaps at depth is where a
+first attempt died. `sum_reorder_pair_out` below does it in one move, peeling an
+index past two others, and three applications of it carry the whole rearrangement.
 -/
+
+/-- Move an outer index inside two others. The engine of the reordering: one
+application peels a single index past a pair, and the contraction identity needs
+three. -/
+private theorem sum_reorder_pair_out {X I J : Type*}
+    [Fintype X] [Fintype I] [Fintype J] (f : X → I → J → ℝ) :
+    (∑ x, ∑ i, ∑ j, f x i j) = ∑ i, ∑ j, ∑ x, f x i j := by
+  rw [Finset.sum_comm]
+  refine Finset.sum_congr rfl fun i _ ↦ ?_
+  rw [Finset.sum_comm]
+
+/-- The Gram matrix `S = LᵀL`: the covariance of `Θ = L B` for `B` with unit
+independent coordinates. -/
+noncomputable def gramMatrix {d n : ℕ} (L : Fin d → Fin n → ℝ) (i j : Fin n) : ℝ :=
+  ∑ a, L a i * L a j
+
+/-- The third-cumulant tensor of `Θ = L B`, up to the scalar `κ₃`. -/
+noncomputable def thirdCumulantTensor {d n : ℕ} (L : Fin d → Fin n → ℝ)
+    (a b c : Fin d) : ℝ :=
+  ∑ i, L a i * L b i * L c i
+
+/-- **The contraction identity.** The squared Frobenius norm of the third-cumulant
+tensor is the entrywise cube sum of the Gram matrix. Dimension-free, and the step
+at which a spectral quantity would have to appear and does not. -/
+theorem thirdCumulant_frobenius_eq_gram_cubeSum {d n : ℕ} (L : Fin d → Fin n → ℝ) :
+    (∑ a, ∑ b, ∑ c, (thirdCumulantTensor L a b c) ^ 2)
+      = ∑ i, ∑ j, (gramMatrix L i j) ^ 3 := by
+  unfold thirdCumulantTensor gramMatrix
+  have lhs : (∑ a, ∑ b, ∑ c, (∑ i, L a i * L b i * L c i) ^ 2)
+      = ∑ a, ∑ b, ∑ c, ∑ i, ∑ j,
+          (L a i * L b i * L c i) * (L a j * L b j * L c j) := by
+    refine Finset.sum_congr rfl fun a _ ↦ Finset.sum_congr rfl fun b _ ↦
+      Finset.sum_congr rfl fun c _ ↦ ?_
+    rw [sq, Finset.sum_mul_sum]
+  have rhs : (∑ i, ∑ j, (∑ a, L a i * L a j) ^ 3)
+      = ∑ i, ∑ j, ∑ a, ∑ b, ∑ c,
+          (L a i * L a j) * (L b i * L b j) * (L c i * L c j) := by
+    refine Finset.sum_congr rfl fun i _ ↦ Finset.sum_congr rfl fun j _ ↦ ?_
+    rw [pow_succ, pow_succ, pow_one, Finset.sum_mul_sum]
+    refine Finset.sum_congr rfl fun a _ ↦ ?_
+    rw [Finset.sum_mul_sum]
+    refine Finset.sum_congr rfl fun b _ ↦ ?_
+    rw [Finset.sum_mul]
+  rw [lhs, rhs]
+  -- peel `c`, then `b`, then `a`, past the `(i, j)` pair
+  have hc : (∑ a, ∑ b, ∑ c, ∑ i, ∑ j,
+        (L a i * L b i * L c i) * (L a j * L b j * L c j))
+      = ∑ a, ∑ b, ∑ i, ∑ j, ∑ c,
+        (L a i * L b i * L c i) * (L a j * L b j * L c j) := by
+    refine Finset.sum_congr rfl fun a _ ↦ Finset.sum_congr rfl fun b _ ↦ ?_
+    exact sum_reorder_pair_out _
+  have hb : (∑ a, ∑ b, ∑ i, ∑ j, ∑ c,
+        (L a i * L b i * L c i) * (L a j * L b j * L c j))
+      = ∑ a, ∑ i, ∑ j, ∑ b, ∑ c,
+        (L a i * L b i * L c i) * (L a j * L b j * L c j) := by
+    refine Finset.sum_congr rfl fun a _ ↦ ?_
+    exact sum_reorder_pair_out _
+  have ha : (∑ a, ∑ i, ∑ j, ∑ b, ∑ c,
+        (L a i * L b i * L c i) * (L a j * L b j * L c j))
+      = ∑ i, ∑ j, ∑ a, ∑ b, ∑ c,
+        (L a i * L b i * L c i) * (L a j * L b j * L c j) :=
+    sum_reorder_pair_out _
+  rw [hc, hb, ha]
+  refine Finset.sum_congr rfl fun i _ ↦ Finset.sum_congr rfl fun j _ ↦
+    Finset.sum_congr rfl fun a _ ↦ Finset.sum_congr rfl fun b _ ↦
+    Finset.sum_congr rfl fun c _ ↦ ?_
+  ring
 
 end CapacityInvariant
 

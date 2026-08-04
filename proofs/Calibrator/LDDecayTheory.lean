@@ -331,12 +331,31 @@ because it had no other place to go.
     misnaming is what produced the factor-of-four error already recorded in this
     corpus.
 
-    Empirical status: UNTESTED as written here.  The formula it replaces
-    (`bottleneckLDAmplification`, deleted above) was falsified by up to 3.3-fold
-    through omitting `c`; the classical small-`c`, large-`Nₑ` limit of the
-    fixed point of this map is the Sved expression `1/(1 + 4 Nₑ c)` that the
-    falsification report cites as truth, but that limit is documented here, not
-    proved, and the map itself has not been simulated. -/
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_core2.py`,
+    `test_drift_ld_step`). The map itself is now simulated. Explicit
+    Wright-Fisher forward simulation on two biallelic loci, 6000 replicates,
+    haplotype counts resampled multinomially each generation so drift is the
+    sampling rather than an added variance term. `Q` is read as the normalised
+    `sigma_d^2 = E[D^2] / E[p(1-p)q(1-q)]`, and the test is the ONE-STEP map:
+    predict `Q_{t+1}` from the measured `Q_t` at each of 19 generations past the
+    transient, then compare against the measured `Q_{t+1}`.
+
+      Ne     c      predicted   simulated             sems
+      100    0.00     0.41197   0.41243+/-0.00445     0.10
+      100    0.05     0.12426   0.12517+/-0.00970     0.09
+      500    0.01     0.27766   0.27779+/-0.00621     0.02
+      500    0.05     0.09651   0.09665+/-0.01115     0.01
+
+    `Q` must be the NORMALISED `sigma_d^2`, and reading it as the raw `E[D^2]`
+    inverts the answer: drift destroys `E[D]` but GENERATES variance in `D`, so
+    raw `E[D^2]` GROWS -- measured ratio 1.044 per generation at `c = 0`, where
+    any retention factor is below one. A first measurement compared this map's
+    coefficient `driftLDRetention` against that raw ratio and reported a 26-sem
+    falsification that was entirely the wrong quantity.
+
+    Power: the prediction spans 0.09651 to 0.41197 across the design, a factor
+    of four and a quarter. -/
 noncomputable def driftLDStep (Ne c Q : ℝ) : ℝ :=
   (1 - c) ^ 2 * (1 / (2 * Ne) + (1 - 1 / (2 * Ne)) * Q)
 
