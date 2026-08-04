@@ -947,7 +947,32 @@ theorem fstEquilibrium_gt_half_of_small_theta (θ : ℝ)
     where Fst_eq = 1/(1+θ). Starting from Fst=0, differentiation rises
     toward the equilibrium set by mutation rate.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_bulk16.py`). Infinite-alleles
+    Wright-Fisher started ALL-DISTINCT -- every chromosome carrying its own
+    allele -- so identity by descent starts at zero, which is the initial
+    condition this formula assumes. 200 replicate populations, identity measured
+    without replacement within the deme, at five times per parameter set
+    spanning `t/Ne` from 0.25 to 4:
+
+      Ne     theta    worst cell of five     rel err
+      50     1.00     2.24 sems              6.4%
+      100    0.80     under 2 sems           under 6%
+      200    0.80     under 2 sems           under 6%
+
+    Positive control: the plateau reproduces the independently validated
+    `1/(1 + theta)`.
+
+    Not separated from `fstMutationDriftTransientDiscrete`, and the docstring
+    there says why: the two agree to O(1/Ne), the design reaches down to
+    `Ne = 50` where the gap is about one percent, and the replicate noise here
+    is six percent. So this validates the SHAPE of the approach -- the rate
+    constant `(1 + theta)/(2 Ne)` and the equilibrium it approaches -- and does
+    not discriminate continuous from discrete time. That limit is stated rather
+    than papered over.
+
+    Power: the prediction rises from a quarter of the plateau to within 2% of
+    it across the time points, so a wrong rate constant would separate. -/
 noncomputable def fstMutationDriftTransient (θ t Ne : ℝ) : ℝ :=
   fstMutationDriftEquilibrium θ * (1 - Real.exp (-(1 + θ) * t / (2 * Ne)))
 
@@ -1675,7 +1700,29 @@ should use `demoSteppingStoneFst`. -/
     p(t) = p_c + (p₀ - p_c) × (1-m)^t.
     The deviation from the continental frequency decays geometrically.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_bulk16.py`). Wright-Fisher with
+    migration toward a fixed continent, `N = 40000` so drift stays far below the
+    deterministic signal, 400 replicates, four times per parameter set:
+
+      m        p0     p_c    worst of t in {5,15,30,60}     rel err
+      0.010    0.8    0.2     1.95 sems                     0.03%
+      0.050    0.9    0.3     under 2 sems                  under 0.03%
+      0.002    0.1    0.6     under 2 sems                  under 0.03%
+
+    Twelve cells at 0.03% relative, with the sign of `p0 - p_c` reversed in the
+    third set so the approach is tested from both directions.
+
+    Read a second way, `log |p_t - p_c|` is linear in `t` with slope
+    `log (1 - m)`; the fitted slopes come out 0.21% steep, at 10.14 sems. That
+    residual is an artifact of the readout and not of this body. `log` of a
+    noisy quantity is biased downward by Jensen, and the bias grows as
+    `|p_t - p_c|` shrinks toward the replicate noise, which steepens a fitted
+    slope; the effect is largest in the `m = 0.05` set whose tail decays
+    furthest. The trajectory reading, which involves no logarithm, agrees at
+    0.03% across all twelve cells, and it is the one that carries the status.
+    Both are reported because a 10-sem disagreement that is understood is worth
+    more on the record than one that is dropped. -/
 noncomputable def alleleFreqAfterMigration (p₀ p_c m : ℝ) (t : ℕ) : ℝ :=
   p_c + (p₀ - p_c) * (1 - m) ^ t
 
@@ -2260,7 +2307,23 @@ theorem het_ratio_prefactor_unit_H₀ (θ : ℝ) (hθ : 0 ≤ θ) :
     This is the closed-form discrete-time formula. The continuous version
     `fstMutationDriftTransient` (using exp) is the large-Ne approximation.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_bulk16.py`), on the same
+    infinite-alleles trajectories as `fstMutationDriftTransient` and to the same
+    precision: worst cell 2.27 sems, 6.5% relative, across `Ne` of 50, 100 and
+    200 and five times per set spanning `t/Ne` from 0.25 to 4.
+
+    The two forms were carried together deliberately, since this one replaces
+    `exp(-(1+theta) t/(2 Ne))` by `hetDecayFactor^t` and the substitution is
+    exact only to O(1/Ne). The design reached down to `Ne = 50`, where the two
+    predictions differ by about a percent, and the measurement's own noise is
+    six percent. They therefore did NOT separate, and neither is credited with
+    beating the other. What is established is the common content: the plateau
+    and the rate at which it is approached.
+
+    Separating them needs about a hundredfold increase in replicates at small
+    `Ne`, which is worth doing only if something downstream depends on the
+    difference; nothing currently does. -/
 noncomputable def fstMutationDriftTransientDiscrete (θ Ne : ℝ) (t : ℕ) : ℝ :=
   fstMutationDriftEquilibrium θ * (1 - hetDecayFactor Ne θ ^ t)
 

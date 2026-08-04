@@ -2326,7 +2326,41 @@ theorem sharedLDRetention_decreasing_in_time
     that is not shared. The fraction of LD that remains "ancestral" (shared)
     decays exponentially with the scaled mutation rate.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED** (`proofs/validation/empirical/simcov/battery_bulk16.py` and
+    `battery_bulk16b.py`). The composition asserts
+    `exp(-theta * tau) = exp(-4 Ne mu * t/(2 Ne)) = exp(-2 mu t)`: the chance
+    that NEITHER lineage of a sampled pair has mutated in `t` generations. `Ne`
+    cancels, and that cancellation is the content worth testing, because a
+    scaled parameter composed with a scaled time is exactly where this branch
+    has already found factor errors. Measured as the fraction of 400000
+    replicate lineage pairs carrying no mutation:
+
+      Ne     mu        t      theta*tau   predicted  measured             sems
+      250    1.0e-3    125     0.25        0.77880   0.77779 ± 0.00066    1.54
+      500    1.0e-3    250     0.50        0.60653   0.60722 ± 0.00077    0.90
+      2000   2.5e-4    1000    0.50        0.60653   0.60617 ± 0.00077    0.47
+      500    2.0e-3    500     2.00        0.13534   0.13525 ± 0.00054    0.17
+      1000   5.0e-4    2000    2.00        0.13534   0.13598 ± 0.00054    1.18
+      250    4.0e-3    250     2.00        0.13534   0.13448 ± 0.00054    1.59
+
+    `theta * tau` runs over a factor of eight while `Ne` independently runs over
+    a factor of eight, so the functional form and the cancellation are under
+    test at once. The three rows at `theta*tau = 2.00` carry `Ne` of 250, 500
+    and 1000 and agree to 0.6%: `Ne` really does drop out.
+
+    The competing one-lineage reading `exp(-mu t)` is carried through the same
+    measurement and misses by up to 433 sems and 174% relative, so the factor of
+    two in "two lineages" is chosen by the data rather than argued.
+
+    An earlier version of this design held `theta * tau = 1` in every cell so
+    that the cancellation would be visible, and the verdict gate called NO POWER
+    on it -- correctly, since a prediction that never moves cannot reject a
+    wrong functional form no matter what else the design shows. The numbers
+    above are from the redone design.
+
+    This is the same arithmetic as `PortabilityDrift.mutationSharedRetentionAt`
+    stated on the DGP parameter record, so it SHARES that measurement rather
+    than having an independent one, and the status is recorded as shared. -/
 noncomputable def mutationLDErosion (p : EvolutionaryParameters) : ℝ :=
   Real.exp (-p.theta * p.tau)
 
