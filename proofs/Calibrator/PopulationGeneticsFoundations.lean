@@ -160,6 +160,15 @@ section CoalescentTheory
 noncomputable def expectedHeterozygosity (θ : ℝ) : ℝ :=
   θ / (1 + θ)
 
+/-- **expectedHeterozygosity at `θ = -1`, named.** A negative scaled mutation rate is
+inadmissible. The divisor vanishes at `θ = -1` and the expected heterozygosity is `0` -- a
+monomorphic locus, which is a perfectly ordinary answer and therefore invisible. Consumers must
+exclude it by hypothesis. -/
+theorem expectedHeterozygosity_negative_unit_theta_is_junk :
+    expectedHeterozygosity (-1) = 0 := by
+  unfold expectedHeterozygosity
+  norm_num
+
 /-- **At unit scaled mutation rate the population is half heterozygous.** The membership in
 `[0,1)` recorded below holds for every increasing map into that interval; the value at `θ = 1`
 fixes which one, and it is the calibration point that distinguishes `θ/(1+θ)` from any other
@@ -1205,6 +1214,15 @@ theorem islandModelFst_eq_mutationForm (Ne m : ℝ) :
 noncomputable def fstMigrationMutationEquilibrium (Ne m μ : ℝ) : ℝ :=
   1 / (1 + 4 * Ne * m + 4 * Ne * μ)
 
+/-- **fstMigrationMutationEquilibrium at the denominator, named.** Migration and mutation enter
+the divisor additively, so an inadmissible negative migration rate can cancel the leading one
+even with mutation absent. The equilibrium is reported as zero -- no differentiation -- where the
+formula has no value at all. Consumers must exclude it by hypothesis. -/
+theorem fstMigrationMutationEquilibrium_cancelling_terms_is_junk :
+    fstMigrationMutationEquilibrium 1 (-(1/4)) 0 = 0 := by
+  unfold fstMigrationMutationEquilibrium
+  norm_num
+
 /-- **The migration term's coefficient, pinned.** `fstMigrationMutationEquilibrium_isFixedPoint`
 is invariant under exactly the rescaling it should exclude. At `4 Ne m = 1` with no mutation the
 equilibrium `Fst` is one half, which fixes the factor four on the migration term. -/
@@ -1493,6 +1511,15 @@ theorem asymmetric_fst_difference_sign (Ne m₁₂ m₂₁ : ℝ)
     supported: it is a functional form nobody has compared to a simulation. -/
 noncomputable def ldCorrelationMigrationAnsatz (M : ℝ) : ℝ :=
   M ^ 2 / (1 + M) ^ 2
+
+/-- **ldCorrelationMigrationAnsatz at `M = -1`, named.** The squared divisor `(1 + M) ^ 2`
+vanishes at `M = -1`, and the ansatz returns zero correlation where it diverges. Squaring the
+divisor makes the branch quadratically flat around the singularity, so sampling near it gives no
+warning. Consumers must exclude it by hypothesis. -/
+theorem ldCorrelationMigrationAnsatz_negative_unit_migration_is_junk :
+    ldCorrelationMigrationAnsatz (-1) = 0 := by
+  unfold ldCorrelationMigrationAnsatz
+  norm_num
 
 /-- LD correlation from migration is nonneg. -/
 theorem ldCorrelationFromMigration_nonneg (M : ℝ) :

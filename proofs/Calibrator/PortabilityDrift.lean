@@ -125,6 +125,15 @@ never equal.
 noncomputable def fstFromTau (tau : ℝ) : ℝ :=
   tau / (1 + tau)
 
+/-- **fstFromTau at `tau = -1`, named.** A coalescent time of minus one is outside the admissible
+range, which is exactly why it must be excluded by hypothesis rather than left to the totality
+convention: the saturation curve's divisor vanishes there and Lean returns `0`, an ordinary `Fst`
+value that no downstream range check will reject. Consumers must exclude it by hypothesis. -/
+theorem fstFromTau_negative_unit_tau_is_junk :
+    fstFromTau (-1) = 0 := by
+  unfold fstFromTau
+  norm_num
+
 /-- `F_ST` after `t` generations of drift at effective size `Nₑ`, obtained by
 rescaling to coalescent time and applying `fstFromTau`.
 
@@ -419,6 +428,15 @@ fixed ordering has a different fixed point, differing at O(1/Nₑ).
 noncomputable def twoDemeIMFirstStepSame (M _ETss ETst : ℝ) : ℝ :=
   1 / (1 + M) + (M / (1 + M)) * ETst
 
+/-- **twoDemeIMFirstStepSame at `M = -1`, named.** Both terms divide by `1 + M`, so both are
+junk-zero at `M = -1` and the whole first step collapses to zero regardless of the between-deme
+time it is supposed to depend on. Two junk branches in one expression, and the dependence on
+`ETst` disappears with them. Consumers must exclude it by hypothesis. -/
+theorem twoDemeIMFirstStepSame_negative_unit_migration_is_junk (ETss ETst : ℝ) :
+    twoDemeIMFirstStepSame (-1) ETss ETst = 0 := by
+  unfold twoDemeIMFirstStepSame
+  norm_num
+
 /-- **First-step analysis of the structured coalescent, different-deme state.**
 Lineages in different demes cannot coalesce; the only event is a migration, at
 total rate `M`, after which both lineages are in one deme.
@@ -482,6 +500,14 @@ differentiation under total isolation, which
     Empirical status: UNTESTED. -/
 noncomputable def twoDemeIMEquilibriumDelta (M : ℝ) : ℝ :=
   1 / (2 * M + 1)
+
+/-- **twoDemeIMEquilibriumDelta at `M = -1/2`, named.** At `2 M + 1 = 0` the equilibrium gap
+diverges. Lean returns `0`: no gap between within- and between-deme coalescence, which is
+panmixia -- the opposite of a diverging gap. Consumers must exclude it by hypothesis. -/
+theorem twoDemeIMEquilibriumDelta_negative_half_migration_is_junk :
+    twoDemeIMEquilibriumDelta (-(1/2)) = 0 := by
+  unfold twoDemeIMEquilibriumDelta
+  norm_num
 
 /-- **The within-deme coalescence time is a fixed point of first-step
 analysis.**  Solving `ETss = 1/(1+M) + (M/(1+M)) ETst` jointly with
@@ -5146,6 +5172,14 @@ theorem finiteIslandCorrection_one_deme_is_junk : finiteIslandCorrection 1 = 0 :
 noncomputable def fstMigrationDriftEquilibrium (Ne m : ℝ) : ℝ :=
   1 / (1 + 4 * Ne * m)
 
+/-- **fstMigrationDriftEquilibrium at `4 * Ne * m = -1`, named.** A negative migration rate is
+inadmissible, and at `4 Ne m = -1` the divisor vanishes. Lean returns `0`: no differentiation at
+all, the value for free gene flow. Consumers must exclude it by hypothesis. -/
+theorem fstMigrationDriftEquilibrium_balancing_negative_migration_is_junk :
+    fstMigrationDriftEquilibrium 1 (-(1/4)) = 0 := by
+  unfold fstMigrationDriftEquilibrium
+  norm_num
+
 /-- **No migration leaves complete differentiation.** At `m = 0` the island model fixes
 populations entirely, so the equilibrium is one; that is the reference point which fixes the
 constant term, and it is what a body with the wrong intercept would miss. -/
@@ -5653,6 +5687,14 @@ theorem sharedLD_from_equilibrium_eq (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 ≤ m) 
 noncomputable def sharedLDFromMigration (M : ℝ) : ℝ :=
   M / (1 + M)
 
+/-- **sharedLDFromMigration at `M = -1`, named.** A negative scaled migration rate is
+inadmissible; the divisor vanishes there and the shared disequilibrium is reported as zero, which
+is what complete isolation also gives. Consumers must exclude it by hypothesis. -/
+theorem sharedLDFromMigration_negative_unit_migration_is_junk :
+    sharedLDFromMigration (-1) = 0 := by
+  unfold sharedLDFromMigration
+  norm_num
+
 /-- **The migration shared-LD map and the coalescent `F_ST` map are one function.**
 
 `fstFromTau` sends coalescent time `tau` to `tau / (1 + tau)`; `sharedLDFromMigration`
@@ -5843,6 +5885,14 @@ That theorem *does* prove the migration claim, because it derives the `F_ST` ord
     Empirical status: UNTESTED. -/
 noncomputable def asymmetricFst (Ne m_into : ℝ) : ℝ :=
   1 / (1 + 4 * Ne * m_into)
+
+/-- **asymmetricFst at `4 * Ne * m_into = -1`, named.** The directional twin of
+`fstMigrationDriftEquilibrium_balancing_negative_migration_is_junk`, with the same divisor and
+the same collapse to no differentiation. Consumers must exclude it by hypothesis. -/
+theorem asymmetricFst_balancing_negative_migration_is_junk :
+    asymmetricFst 1 (-(1/4)) = 0 := by
+  unfold asymmetricFst
+  norm_num
 
 /-- **Asymmetric Fst is just the island model Fst with directional migration.** -/
 theorem asymmetricFst_eq_migrationDriftEq (Ne m_into : ℝ) :
@@ -6186,6 +6236,14 @@ theorem fstMigDriftNext_no_migration_fixedpoint_one (Ne : ℝ) (hNe : Ne ≠ 0) 
     Empirical status: UNTESTED. -/
 noncomputable def fstMigDriftEquil (Ne m : ℝ) : ℝ :=
   1 / (4 * Ne * m + 1)
+
+/-- **fstMigDriftEquil at `4 * Ne * m + 1 = 0`, named.** A third spelling of the same
+equilibrium, failing at the same point. Three definitions of one quantity share a junk branch, so
+agreement between them is not evidence about the value. Consumers must exclude it by hypothesis. -/
+theorem fstMigDriftEquil_balancing_negative_migration_is_junk :
+    fstMigDriftEquil 1 (-(1/4)) = 0 := by
+  unfold fstMigDriftEquil
+  norm_num
 
 /-- The derived equilibrium matches `fstMigrationDriftEquilibrium`. -/
 theorem fstMigDriftEquil_eq_fstMigrationDriftEquilibrium (Ne m : ℝ) :

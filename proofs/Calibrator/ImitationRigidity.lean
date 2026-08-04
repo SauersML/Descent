@@ -323,6 +323,16 @@ section DeadSensors
 def scalarRowResolvent (latent quadraticForm : ℝ) : ℝ :=
   1 / (1 + latent ^ 2 * quadraticForm)
 
+/-- **scalarRowResolvent at `1 + latent ^ 2 * quadraticForm = 0`, named.** The quadratic form may
+be negative, so the divisor can vanish even though it looks like the strictly positive `1 + exp`
+shape. The resolvent is reported as zero where it has a pole -- and this is the entry that
+defeats every syntactic rule for recognising a nonvanishing denominator. Consumers must exclude
+it by hypothesis. -/
+theorem scalarRowResolvent_cancelling_quadratic_form_is_junk :
+    scalarRowResolvent 1 (-1) = 0 := by
+  unfold scalarRowResolvent
+  norm_num
+
 /-- **The resolvent inverts its own denominator.** The dead-sensor value at zero latent loading is
 one for every body of the form `1 / (1 + c · latent² · q)`, whatever `c` is; multiplying the
 denominator back fixes it. -/

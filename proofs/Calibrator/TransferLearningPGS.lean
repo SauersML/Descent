@@ -1092,6 +1092,17 @@ theorem gaussianSourceResidualRisk_half_nat :
 noncomputable def pinskerAncestryDivergenceCap (I_phi_A : ℝ) : ℝ :=
   Real.sqrt (2 * I_phi_A)
 
+/-- **pinskerAncestryDivergenceCap at a negative mutual information, named.** Mutual information
+cannot be negative, but a plug-in estimate of it can be. `Real.sqrt` is junk-zero on the negative
+radicand, so the cap is reported as zero: the tightest possible bound, certifying that no
+ancestry information leaks, produced by an estimate that was invalid. Consumers must exclude it
+by hypothesis. -/
+theorem pinskerAncestryDivergenceCap_negative_information_is_junk :
+    pinskerAncestryDivergenceCap (-1) = 0 := by
+  unfold pinskerAncestryDivergenceCap
+  rw [show (2 : ℝ) * (-1) = -2 by ring]
+  exact Real.sqrt_eq_zero_of_nonpos (by norm_num)
+
 /-- **The Pinsker cap's constant, pinned.** `pinskerAncestryDivergenceCap_mono` fixes the
 direction and holds for `sqrt (c * I)` at every positive `c`. Half a nat of ancestry information
 caps the total-variation divergence at one, which is what fixes `c = 2` -- and, incidentally,
