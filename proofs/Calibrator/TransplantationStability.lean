@@ -74,10 +74,25 @@ not an assumption: a symmetric operator on a finite-dimensional real space has o
 noncomputable def spectralEnergy {n : ℕ} (μ c : Fin (n + 1) → ℝ) : ℝ :=
   ∑ i, μ i * c i ^ 2
 
+/-- Reference evaluation at dimension two with distinct weights and coordinates. -/
+theorem spectralEnergy_at_reference_point :
+    spectralEnergy (![1, 3] : Fin 2 → ℝ) (![2, 5] : Fin 2 → ℝ) = 79 := by
+  simp [spectralEnergy, Fin.sum_univ_succ]
+  norm_num
+
+
 /-- Squared misalignment of a unit state with the ground direction: the mass it puts on the
 excited directions. -/
 noncomputable def misalignmentSq {n : ℕ} (c : Fin (n + 1) → ℝ) : ℝ :=
   ∑ i ∈ Finset.univ.erase 0, c i ^ 2
+
+/-- Reference evaluation: the leading coordinate is excluded, so only the tail contributes. -/
+theorem misalignmentSq_at_reference_point :
+    misalignmentSq (![2, 5] : Fin 2 → ℝ) = 25 := by
+  unfold misalignmentSq
+  rw [show (Finset.univ.erase (0 : Fin 2)) = {1} from by decide]
+  norm_num
+
 
 /-- **The gap lower bound, proved.** If every excited eigenvalue sits at least `γ` above the
 ground energy `μ 0`, then a unit state pays at least `γ` times its squared misalignment.
@@ -515,6 +530,13 @@ noncomputable def trueDesignValue (δ : ℝ) (i : Fin 2) : ℝ := if i = 0 then 
 at each design and ranks them the other way. -/
 noncomputable def approxDesignValue (δ : ℝ) (i : Fin 2) : ℝ := if i = 0 then 1 - δ else 1
 
+/-- Reference evaluations: the design is perturbed in its first coordinate only. -/
+theorem approxDesignValue_at_reference_point :
+    approxDesignValue (1 / 4) 0 = 3 / 4 ∧ approxDesignValue (1 / 4) 1 = 1 := by
+  constructor <;> simp [approxDesignValue]
+  norm_num
+
+
 /-- The approximate model never undervalues a design by more than `δ`. -/
 theorem approxDesignValue_lower (δ : ℝ) (hδ : 0 ≤ δ) (i : Fin 2) :
     trueDesignValue δ i - δ ≤ approxDesignValue δ i := by
@@ -573,6 +595,13 @@ noncomputable def transplantModuleProjection (v : Fin 3 → ℝ) : Fin 3 → ℝ
 
 /-- Squared Euclidean norm in three coordinates. -/
 noncomputable def transplantSqNorm (v : Fin 3 → ℝ) : ℝ := dotProduct v v
+
+/-- Reference evaluation on a concrete three-vector. -/
+theorem transplantSqNorm_at_reference_point :
+    transplantSqNorm (![1, 2, 3] : Fin 3 → ℝ) = 14 := by
+  simp [transplantSqNorm, dotProduct, Fin.sum_univ_succ]
+  norm_num
+
 
 /-- The target: one unit inside the module, one unit orthogonal to it. -/
 noncomputable def transplantTarget : Fin 3 → ℝ := ![0, 1, 1]

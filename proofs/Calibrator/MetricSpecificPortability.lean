@@ -2027,6 +2027,12 @@ noncomputable def skewedAncestryRisks : Fin 3 → ℝ := ![0, 0, 1]
 noncomputable def absoluteLoss {m : ℕ} (π η : Fin m → ℝ) (v : ℝ) : ℝ :=
   ∑ i, π i * |η i - v|
 
+/-- Reference evaluation at two atoms with distinct masses and locations. -/
+theorem absoluteLoss_at_reference_point :
+    absoluteLoss (![1, 3] : Fin 2 → ℝ) (![2, 5] : Fin 2 → ℝ) 4 = 5 := by
+  norm_num [absoluteLoss, Fin.sum_univ_two]
+
+
 /-- **The pooled mean is `3/10`.** -/
 theorem skewedAncestry_pooled_mean :
     pooledConditional skewedAncestryWeights skewedAncestryRisks = 3 / 10 := by
@@ -2440,6 +2446,13 @@ noncomputable def ppvPortabilityGap
     (sensitivity specificity prevalenceSource prevalenceTarget : ℝ) : ℝ :=
   |metricPPV sensitivity specificity prevalenceTarget -
     metricPPV sensitivity specificity prevalenceSource|
+
+/-- Reference evaluation: equal prevalences leave no gap, whatever the operating point. -/
+theorem ppvPortabilityGap_at_reference_point (sensitivity specificity prevalence : ℝ) :
+    ppvPortabilityGap sensitivity specificity prevalence prevalence = 0 := by
+  unfold ppvPortabilityGap
+  simp
+
 
 /-- **The gap is bounded by the two predictive values it compares.** Strict positivity under a
 prevalence shift is shared by every positive multiple of this distance; the triangle bound is

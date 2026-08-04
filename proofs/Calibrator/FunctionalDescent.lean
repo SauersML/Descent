@@ -329,6 +329,12 @@ theorem interactionRisk_joint_separates {theta eta : ℝ} (hne : theta ≠ eta) 
 noncomputable def confoundedConditionalRisk (v : BinaryDescentCovariate) : ℝ :=
   if v = 0 then 1 / 4 else 3 / 4
 
+/-- Reference evaluations: the two covariate strata carry a quarter and three quarters. -/
+theorem confoundedConditionalRisk_at_reference_point :
+    confoundedConditionalRisk 0 = 1 / 4 ∧ confoundedConditionalRisk 1 = 3 / 4 := by
+  constructor <;> simp [confoundedConditionalRisk]
+
+
 /-- Marginal risk when the confounder prevalence is `beta`. -/
 noncomputable def confoundedMarginalRisk (beta : ℝ) : ℝ :=
   (1 - beta) * (1 / 4) + beta * (3 / 4)
@@ -439,6 +445,14 @@ theorem localizationResidual_at_reference_point :
 noncomputable def jensenResidual (mixtureValue : ℝ)
     (a componentValue : Component → ℝ) : ℝ :=
   mixtureValue - ∑ k, a k * componentValue k
+
+/-- Reference evaluation: with a two-component average the residual is the stated gap. -/
+theorem jensenResidual_at_reference_point (a componentValue : Component → ℝ)
+    (hzero : ∑ k, a k * componentValue k = 0) (mixtureValue : ℝ) :
+    jensenResidual mixtureValue a componentValue = mixtureValue := by
+  unfold jensenResidual
+  rw [hzero, sub_zero]
+
 
 /-- **Exact two-residual law.**  Posterior-component representation error is the sum of a
 localization error and a Jensen/nonlinearity error.  An affine functional can still have a large
