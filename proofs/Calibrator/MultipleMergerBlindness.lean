@@ -406,6 +406,19 @@ theorem speedTiltBetaMergerRate_self (β : ℝ) (k : ℕ) :
     speedTiltBetaMergerRate β k k = speedTiltFullMergerRate β (k - 2) := by
   simp [speedTiltBetaMergerRate]
 
+/-- Every full-merger coordinate in the general rate API with at least three active lineages
+identifies the speed-bias parameter. -/
+theorem speedTiltBetaMergerRate_self_injective_on
+    {β₁ β₂ : ℝ} (hβ₁ : -1 < β₁) (hβ₂ : -1 < β₂) (extra : ℕ)
+    (hrate :
+      speedTiltBetaMergerRate β₁ (extra + 3) (extra + 3) =
+        speedTiltBetaMergerRate β₂ (extra + 3) (extra + 3)) :
+    β₁ = β₂ := by
+  rw [speedTiltBetaMergerRate_self, speedTiltBetaMergerRate_self] at hrate
+  have hsimplify : extra + 3 - 2 = extra + 1 := by omega
+  rw [hsimplify] at hrate
+  exact speedTiltFullMergerRate_injective_on hβ₁ hβ₂ extra hrate
+
 /-- The general merger-rate API inherits the exact Bolthausen--Sznitman full-merger law. -/
 @[simp] theorem speedTiltBetaMergerRate_zero_beta_self (extra : ℕ) :
     speedTiltBetaMergerRate 0 (extra + 2) (extra + 2) =
@@ -587,11 +600,7 @@ theorem speedTiltBetaMergerRate_three_three_injective_on
     {β₁ β₂ : ℝ} (hβ₁ : -1 < β₁) (hβ₂ : -1 < β₂)
     (hrate : speedTiltBetaMergerRate β₁ 3 3 = speedTiltBetaMergerRate β₂ 3 3) :
     β₁ = β₂ := by
-  rw [speedTiltBetaMergerRate_three_three, speedTiltBetaMergerRate_three_three] at hrate
-  have hne₁ : β₁ + 2 ≠ 0 := by linarith
-  have hne₂ : β₂ + 2 ≠ 0 := by linarith
-  field_simp [hne₁, hne₂] at hrate
-  linarith
+  exact speedTiltBetaMergerRate_self_injective_on hβ₁ hβ₂ 0 hrate
 
 /-- **Pairwise blindness, three-lineage identification.** Distinct admissible speed tilts
 agree exactly at the normalized pair rate and disagree at the first multiple-merger
