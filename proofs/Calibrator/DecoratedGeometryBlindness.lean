@@ -411,7 +411,7 @@ theorem witnessDivergence_eq_threeAncestryDistance :
     witnessDivergence = threeAncestryDistance := by
   funext s t
   fin_cases s <;> fin_cases t <;>
-    norm_num [witnessDivergence, threeAncestryDistance]
+    norm_num [witnessDivergence, threeAncestryDistance, ancestryPosition]
 
 /-- The tabulated divergence is the gap between the positions, as claimed. -/
 theorem witnessDivergence_eq_position_gap (s t : Fin 3) :
