@@ -72,8 +72,7 @@ theorem mul_sub_mul_pos_of_lt
 theorem disparity_increases_with_distance
     (R2_source fst₁ fst₂ : ℝ)
     (h_R2 : 0 < R2_source)
-    (h_fst₁_pos : 0 < fst₁) (h_fst₁_lt : fst₁ < 1)
-    (h_fst₂_pos : 0 < fst₂) (h_fst₂_lt : fst₂ < 1)
+    (h_fst₁_lt : fst₁ < 1) (h_fst₂_lt : fst₂ < 1)
     (h_fst : fst₁ < fst₂) :
     -- R² loss at fst₁ < R² loss at fst₂
     R2_source * (1 - (1 - fst₁) ^ 2) < R2_source * (1 - (1 - fst₂) ^ 2) := by
@@ -88,7 +87,6 @@ theorem disparity_increases_with_distance
     to d₀ + α × R²_eur. -/
 theorem deployment_amplifies_disparity
     (d₀ α r2_eur : ℝ)
-    (h_nn : 0 ≤ d₀)
     (h_α : 0 < α) (h_r2 : 0 < r2_eur) :
     d₀ < d₀ + α * r2_eur := by
   linarith [mul_pos h_α h_r2]
@@ -133,7 +131,6 @@ theorem chouldechova_impossibility
     (h_K₁ : 0 < K₁) (h_K₁' : K₁ < 1)
     (h_K₂ : 0 < K₂) (h_K₂' : K₂ < 1)
     (h_fpr : 0 < fpr) (h_fnr_lt : fnr < 1)
-    (h_fnr_nn : 0 ≤ fnr)
     -- PPV = K × (1-FNR) / (K × (1-FNR) + (1-K) × FPR)
     (h_ppv₁_def : ppv₁ = K₁ * (1 - fnr) / (K₁ * (1 - fnr) + (1 - K₁) * fpr))
     (h_ppv₂_def : ppv₂ = K₂ * (1 - fnr) / (K₂ * (1 - fnr) + (1 - K₂) * fpr)) :
@@ -159,7 +156,7 @@ theorem chouldechova_impossibility
 theorem equal_fpr_requires_different_thresholds
     (mu₁ mu₂ sigma₁ sigma₂ threshold₁ threshold₂ : ℝ)
     (h_mu_diff : mu₁ ≠ mu₂)
-    (h_sigma₁ : 0 < sigma₁) (h_sigma₂ : 0 < sigma₂)
+    (h_sigma₂ : 0 < sigma₂)
     -- Equal FPR ↔ equal z-scores
     (h_equal_z : (threshold₁ - mu₁) / sigma₁ = (threshold₂ - mu₂) / sigma₂)
     (h_sigma_eq : sigma₁ = sigma₂) :
@@ -344,19 +341,29 @@ with diverse populations.
 
 section ClinicalImplementation
 
-/-- **Minimum R² for clinical utility.**
+/- **Minimum R² for clinical utility.**
     Below a threshold R², PGS does not improve clinical decisions.
     The net clinical value = α × R² - cost. When R² is small
     (R² < cost / α), the net value is negative. -/
+/-- **The clinical-utility threshold is exact.** For a positive benefit slope, net utility is
+negative if and only if predictive accuracy lies below the cost-to-benefit ratio. -/
+theorem net_utility_neg_iff_r2_lt_threshold (r2 α cost : ℝ) (h_α : 0 < α) :
+    α * r2 - cost < 0 ↔ r2 < cost / α := by
+  constructor
+  · intro h
+    rw [lt_div_iff₀ h_α]
+    nlinarith [mul_comm α r2]
+  · intro h
+    have h_mul : r2 * α < cost := (lt_div_iff₀ h_α).mp h
+    nlinarith [mul_comm α r2]
+
 theorem r2_threshold_for_utility
     (r2 α cost : ℝ)
-    (h_α : 0 < α) (h_cost : 0 < cost)
-    (h_r2_nn : 0 ≤ r2)
+    (h_α : 0 < α)
     (h_below : r2 < cost / α) :
     -- PGS net value is negative in this population
-    α * r2 - cost < 0 := by
-  have : r2 * α < cost := by rwa [lt_div_iff₀ h_α] at h_below
-  linarith [mul_comm α r2]
+    α * r2 - cost < 0 :=
+  (net_utility_neg_iff_r2_lt_threshold r2 α cost h_α).2 h_below
 
 /-- **Relative precision of R² estimate is worse for smaller R².**
     To estimate R² with SE < δ, need approximately n > 4R²(1-R²)²/δ².
@@ -371,9 +378,8 @@ theorem r2_threshold_for_utility
 theorem validation_n_depends_on_r2
     (r2_source r2_target delta : ℝ)
     (h_r2_target_smaller : r2_target < r2_source)
-    (h_r2_source : 0 < r2_source) (h_r2_target : 0 < r2_target)
     (h_delta : 0 < delta)
-    (h_r2_source_lt : r2_source < 1) (h_r2_target_lt : r2_target < 1) :
+    (h_r2_source_lt : r2_source < 1) :
     -- n/R² = 4(1-R²)²/δ² is larger for the target (smaller R²)
     4 * (1 - r2_source) ^ 2 / delta ^ 2 <
       4 * (1 - r2_target) ^ 2 / delta ^ 2 := by
