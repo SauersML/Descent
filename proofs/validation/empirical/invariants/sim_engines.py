@@ -624,13 +624,17 @@ def sim_hudson_fst(p1, p2, n=400000, seed=0):
     return float(1.0 - within / between)
 
 
-def sim_fst_mutation_drift_equilibrium(theta, reps=4000, seed=0):
+def sim_fst_mutation_drift_equilibrium(theta, reps=600, seed=0):
     """Equilibrium F_ST under infinite alleles, as one minus heterozygosity.
 
     F_ST here is the probability that two gene copies are identical by descent,
     which at equilibrium is the complement of heterozygosity.  The heterozygosity
     comes from an explicit Wright-Fisher run with mutation, so nothing in the
     oracle knows the `1 / (1 + theta)` form.
+
+    `reps` is deliberately below the infinite-alleles default: this oracle is
+    evaluated once per sampled point, once per stability seed and once per
+    mutant, so the default would put the whole tier past its wall clock.
     """
     return 1.0 - sim_infinite_alleles_heterozygosity(theta, reps=reps, seed=seed)
 

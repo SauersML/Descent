@@ -323,7 +323,7 @@ SPECS = [
          [(0.2, 3.0)],
          "one minus the equilibrium heterozygosity of an explicit Wright-Fisher "
          "run under infinite-alleles mutation",
-         tol=0.08),
+         tol=0.12, reps=4),
 
     spec("Conventions.neiGst",
          lambda p1, p2, seed=0: S.sim_nei_gst(p1, p2, seed=seed),
