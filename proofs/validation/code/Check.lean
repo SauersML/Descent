@@ -616,6 +616,35 @@ partial def hasGuardBinder : Expr → Bool
   | .mdata _ b => hasGuardBinder b
   | _ => false
 
+/-- Does this structure carry a domain fact as a field?
+
+Checks each field's PROJECTION TYPE for an order or disequality constant, rather
+than the field's name. Name-based matching catches `Ne_pos` and `mu_nonneg` and
+misses `h_k : 0 < k` and `h_variances : ∀ i, 0 < variances i`, which are just as
+binding. A definition taking such a structure cannot reach its junk point however
+it is called: `EvolutionaryParameters` carries `Ne_pos`, so `fstDriftMigration`
+never divides by zero.
+
+The Python scan `junk_gap.py` has had this check since early on; this one did
+not, and the difference was the largest remaining gap between the two totals. -/
+def structureCarriesDomainFact (env : Environment) (S : Name) : Bool :=
+  (getStructureFields env S).any fun f ↦
+    match env.find? (S ++ f) with
+    | some ci =>
+        (Inflation.constsOf ci.type).fold (init := false) fun acc n ↦
+          acc || n == ``LT.lt || n == ``LE.le || n == ``Ne
+    | none => false
+
+/-- Does any argument of this definition have a structure type carrying a domain
+fact? -/
+partial def argumentStructureGuards (env : Environment) : Expr → Bool
+  | .forallE _ t b _ =>
+      (match t.getAppFn.constName? with
+        | some S => isStructure env S && structureCarriesDomainFact env S
+        | none => false) || argumentStructureGuards env b
+  | .mdata _ b => argumentStructureGuards env b
+  | _ => false
+
 /-- Every theorem name in the corpus that names a junk branch. -/
 def namedBranches (env : Environment) : Array String := Id.run do
   let mut out : Array String := #[]
