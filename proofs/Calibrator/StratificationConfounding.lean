@@ -246,6 +246,16 @@ instance : Nonempty ColliderModel := ⟨ColliderModel.witness⟩
 noncomputable def ColliderModel.inducedCov (m : ColliderModel) : ℝ :=
   -(m.σ2_G * m.σ2_E / (m.σ2_G + m.σ2_E))
 
+/-- **The induced covariance is minus the harmonic-mean half of the two variances.** Negativity
+alone is shared by every negative multiple; multiplying the total variance back exhibits the
+product, and it is the product that makes the induced association vanish when either source of
+variation is absent. -/
+theorem ColliderModel.inducedCov_mul_total (m : ColliderModel)
+    (h : m.σ2_G + m.σ2_E ≠ 0) :
+    m.inducedCov * (m.σ2_G + m.σ2_E) = -(m.σ2_G * m.σ2_E) := by
+  unfold ColliderModel.inducedCov
+  field_simp
+
 theorem ColliderModel.inducedCov_neg (m : ColliderModel) :
     m.inducedCov < 0 := by
   unfold ColliderModel.inducedCov
@@ -451,6 +461,17 @@ noncomputable def SurvivorshipModel.witness : SurvivorshipModel where
 /-- Frequency of risk allele among survivors -/
 noncomputable def SurvivorshipModel.pSurv (m : SurvivorshipModel) : ℝ :=
   m.p₀ * m.s / (m.p₀ * m.s + (1 - m.p₀))
+
+/-- **Neutral survival leaves the frequency untouched.** At `s = 1` carriers and non-carriers
+survive alike and the post-selection frequency is the starting one; that is the fixed point which
+fixes the form, and a body with any other numerator would still be a frequency in `[0,1]`. -/
+theorem SurvivorshipModel.pSurv_neutral (m : SurvivorshipModel) (hs : m.s = 1)
+    (h : m.p₀ * 1 + (1 - m.p₀) ≠ 0) :
+    m.pSurv = m.p₀ := by
+  unfold SurvivorshipModel.pSurv
+  rw [hs]
+  field_simp
+  ring
 
 /-- **Age-dependent genotype frequency shift.**
     The risk allele frequency among survivors is lower than at birth,
