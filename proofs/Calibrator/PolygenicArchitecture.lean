@@ -3,7 +3,6 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Calibrator.HaplotypeTheory
 import Calibrator.CertificateGrading
-import Mathlib.Analysis.SpecialFunctions.Pow.Asymptotics
 
 namespace Calibrator
 

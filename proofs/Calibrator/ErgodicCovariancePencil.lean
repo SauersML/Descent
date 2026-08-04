@@ -3,7 +3,6 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Mathlib.MeasureTheory.Measure.Map
 import Mathlib.LinearAlgebra.Matrix.NonsingularInverse
-import Mathlib.Data.NNReal.Basic
 import Calibrator.PencilEnvironment
 
 /-!

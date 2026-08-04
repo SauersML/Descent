@@ -775,7 +775,9 @@ theorem noncentralityParam_uses_hwe (n : ℕ) (beta p : ℝ) :
 
 theorem gwasNCP_uses_hwe (n : ℕ) (β p : ℝ) :
     gwasNCP n β p = n * β ^ 2 * hweGenotypeVariance p := by
-  simp only [gwasNCP, hweGenotypeVariance, ploidy]
+  unfold gwasNCP ncp effectiveFisherInformation fisherInformation genotypeVarianceHWE
+    hweGenotypeVariance ploidy
+  ring_nf
 
 theorem effectiveFisherInformation_uses_hwe (n : ℕ) (p r2_ld : ℝ) :
     effectiveFisherInformation n p r2_ld = n * hweGenotypeVariance p * r2_ld := by

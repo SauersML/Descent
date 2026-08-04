@@ -5,7 +5,6 @@ import Calibrator.Probability
 import Mathlib.NumberTheory.Harmonic.EulerMascheroni
 import Mathlib.Analysis.Complex.ExponentialBounds
 import Mathlib.Analysis.Real.Pi.Bounds
-import Mathlib.Analysis.SpecialFunctions.Integrals.Basic
 import Mathlib.Tactic.Linarith
 import Mathlib.Tactic.Ring
 

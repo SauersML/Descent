@@ -9,7 +9,6 @@ import Calibrator.ImitationRigidity
 -- "What the metric split is, and is not" below. That section is the reason this
 -- import exists: `levelSet_metrics_agree_of_coords_eq` is not provable here.
 import Calibrator.FoldedSpectrum
-import Mathlib.Analysis.SpecialFunctions.Trigonometric.Inverse
 
 namespace Calibrator
 

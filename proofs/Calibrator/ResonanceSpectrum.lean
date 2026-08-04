@@ -9,7 +9,6 @@ import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
 -- why the `Calibrator` root lists this module: being compiled is what makes the import
 -- list answerable to the proofs below.
 import Mathlib.Analysis.SpecialFunctions.Log.Basic
-import Mathlib.Algebra.BigOperators.Group.Finset.Basic
 import Mathlib.Tactic.Linarith
 
 namespace Calibrator

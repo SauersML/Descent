@@ -3,7 +3,6 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Calibrator.PCCorrectability.Threshold
 import Mathlib.Algebra.Order.BigOperators.Ring.Finset
-import Mathlib.Tactic.FieldSimp
 import Mathlib.Tactic.Ring
 
 namespace Calibrator
