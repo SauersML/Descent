@@ -145,6 +145,20 @@ theorem FactorsThrough.apply_eq_of_observation_eq
   rcases hC with ⟨T, rfl⟩
   simp only [LinearMap.comp_apply, hobs]
 
+/-- **Observable-fiber criterion.** A linear correction factors through the observation exactly
+when it is constant on every fiber of the observation operator. -/
+theorem factorsThrough_iff_apply_eq_of_observation_eq
+    (A : H →ₗ[𝕜] Y) (C : H →ₗ[𝕜] H) :
+    FactorsThrough A C ↔ ∀ β γ : H, A β = A γ → C β = C γ := by
+  constructor
+  · intro hC β γ hobs
+    exact hC.apply_eq_of_observation_eq A C β γ hobs
+  · intro hfiber
+    rw [factorsThrough_iff_ker_le]
+    intro β hβ
+    rw [LinearMap.mem_ker] at hβ ⊢
+    simpa using hfiber β 0 (by simpa using hβ)
+
 /-- The single post-processor represented by a finite uniform dictionary and fixed coefficients. -/
 noncomputable def combinedPostprocessor {k : ℕ}
     (T : Fin k → Y →ₗ[𝕜] H) (a : Fin k → 𝕜) : Y →ₗ[𝕜] H :=
