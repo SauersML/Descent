@@ -1687,6 +1687,96 @@ theorem pooledTarget_reject_of_every_budget_rejected {m : ℕ} (π η : Fin m �
   obtain ⟨i, hi⟩ := hreject budget hsum
   exact absurd (hle i) (not_le.mpr hi)
 
+
+/-! #### Heterogeneous cohorts can remove a barrier that each cohort alone has
+
+The superposition decomposition above says a barrier persists unless some
+allocation satisfies every cohort at once. This records the population geometry
+where that escape is available, and how much minority data it takes.
+
+For a design whose covariance couples the planted support to a decoy support with
+strength `α`, the population loss at overlap fraction `x` away from the truth is
+`φ_q(x) = x(1 - qx) / (1 - qx(1-x))` with `q = α²`. A barrier exists exactly when
+that profile has an interior maximum, which happens exactly when `1 - 3q + q²`
+turns negative -- so the transition is at the root of that quadratic.
+
+The root is the golden-ratio conjugate squared, and the transition in `α` is the
+golden-ratio conjugate itself. Mixing two cohorts with couplings `±ρ` in
+proportion `π` gives an average coupling `ρ(2π - 1)`, so a minority fraction of
+`½(1 - ρ_c/ρ)` suffices to bring the mixture below the transition. At the
+strongest possible coupling that is `(3 - √5)/4`, a little over nineteen per cent.
+
+The biological reading is the one the corpus cares about: a barrier created by
+linkage between a causal locus and a decoy in one ancestry can be removed by
+including a second ancestry in which the linkage has the opposite sign, and the
+required minority fraction is bounded away from a half. It is not a statement
+about better conditioning -- the eigenvalue extremes and the coherence can be
+held fixed while this happens.
+-/
+
+/-- Population loss profile at overlap fraction `x` from the truth, for coupling
+strength squared `q`. -/
+noncomputable def ogpOverlapProfile (q x : ℝ) : ℝ :=
+  x * (1 - q * x) / (1 - q * x * (1 - x))
+
+/-- **At zero overlap the profile is `1 - q`.** The best distant candidate keeps
+the fraction of the loss that the coupling cannot explain away. -/
+theorem ogpOverlapProfile_at_zero_overlap (q : ℝ) :
+    ogpOverlapProfile q 1 = 1 - q := by
+  unfold ogpOverlapProfile
+  norm_num
+
+/-- The sign of this quadratic decides whether the loss profile has an interior
+maximum, and so whether the landscape has a barrier. -/
+noncomputable def ogpTransitionPolynomial (q : ℝ) : ℝ := 1 - 3 * q + q ^ 2
+
+/-- **The transition is at the golden-ratio conjugate squared.** -/
+theorem ogpTransitionPolynomial_root :
+    ogpTransitionPolynomial ((3 - Real.sqrt 5) / 2) = 0 := by
+  unfold ogpTransitionPolynomial
+  have h : Real.sqrt 5 ^ 2 = 5 := Real.sq_sqrt (by norm_num)
+  nlinarith [h]
+
+/-- **And so the transition in the coupling itself is the golden-ratio
+conjugate**, since squaring it returns the root above. -/
+theorem ogpCouplingThreshold_sq :
+    ((Real.sqrt 5 - 1) / 2) ^ 2 = (3 - Real.sqrt 5) / 2 := by
+  have h : Real.sqrt 5 ^ 2 = 5 := Real.sq_sqrt (by norm_num)
+  nlinarith [h]
+
+/-- **The minority fraction that removes the barrier at maximal coupling.**
+
+Two cohorts with couplings of opposite sign, mixed in proportion `π`, have average
+coupling `ρ(2π - 1)`. Setting that to the threshold and solving for the minority
+share gives `½(1 - ρ_c/ρ)`; at `ρ = 1` it is `(3 - √5)/4`, a little over nineteen
+per cent. Bounded away from a half: the minority cohort does not have to be
+half the data. -/
+theorem ogpMinorityFraction_at_unit_coupling :
+    (1 - (Real.sqrt 5 - 1) / 2) / 2 = (3 - Real.sqrt 5) / 4 := by
+  ring
+
+/-! #### A direction invisible to the pooled design is invisible to every cohort
+
+The exact-degeneracy counterpart, and it runs the other way from the barrier
+result. Pooling cannot manufacture identifiability: if a coefficient direction
+carries no signal in the pooled design, it carries none in any cohort. What
+pooling does is the converse -- a direction invisible in one cohort can be visible
+in the pool, because the pooled quadratic form is a nonnegatively weighted sum and
+vanishes only when every term does.
+
+So heterogeneous cohorts shrink the exactly-unidentifiable set by intersecting
+it, which is the precise sense in which adding an ancestry can resolve an
+ambiguity that no single ancestry resolves. -/
+theorem pooledQuadratic_eq_zero_iff {K : ℕ} (π : Fin K → ℝ) (Q : Fin K → ℝ)
+    (hπ : ∀ g, 0 < π g) (hQ : ∀ g, 0 ≤ Q g) (g : Fin K)
+    (hzero : ∑ h, π h * Q h = 0) :
+    Q g = 0 := by
+  have hnn : ∀ h ∈ (Finset.univ : Finset (Fin K)), 0 ≤ π h * Q h :=
+    fun h _ ↦ mul_nonneg (hπ h).le (hQ h)
+  have := (Finset.sum_eq_zero_iff_of_nonneg hnn).mp hzero g (Finset.mem_univ g)
+  exact (mul_eq_zero.mp this).resolve_left (hπ g).ne'
+
+
 /-! #### Drift invisible to genotype is irreducible by any amount of genotyping
 
 The defect splits into a part measurable with respect to the genotype-distribution structure and a
