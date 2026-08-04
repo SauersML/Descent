@@ -517,6 +517,51 @@ theorem calibrationDriftDefectSq_eq_stratified_add_resolution
   rw [hsplit]
   rfl
 
+/-- **With no strata to separate the populations, the whole drift is irreducible.**  Under the
+trivial stratification the best recalibration is the pooled posterior mean and its index-wise
+energy is exactly the drift defect of `ContinuumCalibration`.  This is the baseline every
+ancestry-specific recalibration is measured against, and the finite form of the statement that
+drift invisible to the available labels cannot be removed by any amount of recalibration. -/
+theorem stratifiedCalibrationEnergy_trivial_eq_calibrationDriftDefectSq
+    (covariateWeight : Covariate → ℝ) (posterior : Covariate → Index → ℝ)
+    (conditional : Index → Covariate → ℝ)
+    (hposterior : ∀ x, ∑ t, posterior x t = 1) :
+    stratifiedCalibrationEnergy covariateWeight posterior conditional
+        (fun _ ↦ (default : Unit)) (fun _ x ↦ posteriorMean posterior conditional x) =
+      calibrationDriftDefectSq covariateWeight posterior conditional := by
+  rw [stratifiedCalibrationEnergy_const_eq_indexWiseCalibrationEnergy]
+  exact indexWiseCalibrationEnergy_posteriorMean_eq_driftDefectSq covariateWeight posterior
+    conditional hposterior
+
+/-- **A first-order error in the recalibration costs only second order in the energy.**  Moving a
+stratum-calibrated recalibration by `step` along any stratum-level direction raises the index-wise
+calibration energy by exactly `step ^ 2` times that direction's energy: the first-order term is
+annihilated by the calibration condition itself.  So a slightly mis-estimated stratification or a
+slightly mis-estimated per-stratum offset is second-order harmless, which is why the strata may be
+learned from the same data without spoiling the first-order behaviour of the calibration. -/
+theorem stratifiedCalibrationEnergy_perturbed_eq
+    (covariateWeight : Covariate → ℝ) (posterior : Covariate → Index → ℝ)
+    (conditional : Index → Covariate → ℝ) (stratify : Index → Stratum)
+    (predictor direction : Stratum → Covariate → ℝ) (step : ℝ)
+    (hcalibrated : IsStratumCalibrated posterior conditional stratify predictor) :
+    stratifiedCalibrationEnergy covariateWeight posterior conditional stratify
+        (fun s x ↦ predictor s x + step * direction s x) =
+      stratifiedCalibrationEnergy covariateWeight posterior conditional stratify predictor +
+        step ^ 2 *
+          ∑ x, covariateWeight x * ∑ t, posterior x t * direction (stratify t) x ^ 2 := by
+  have hgap :
+      stratumGapEnergy covariateWeight posterior stratify predictor
+          (fun s x ↦ predictor s x + step * direction s x) =
+        step ^ 2 *
+          ∑ x, covariateWeight x * ∑ t, posterior x t * direction (stratify t) x ^ 2 := by
+    unfold stratumGapEnergy
+    simp only [Finset.mul_sum]
+    refine Finset.sum_congr rfl (fun x _ ↦ ?_)
+    refine Finset.sum_congr rfl (fun t _ ↦ ?_)
+    ring
+  rw [stratifiedCalibrationEnergy_eq_add_stratumGapEnergy covariateWeight posterior conditional
+    stratify predictor (fun s x ↦ predictor s x + step * direction s x) hcalibrated, hgap]
+
 /-- **What refining a stratification removes is exactly the drift it resolves.**  If a coarse
 stratification factors through a finer one, then the coarse optimum's energy is the fine
 optimum's energy plus the energy of the gap between them.  Refining ancestry labels, adding a
