@@ -274,6 +274,41 @@ theorem twoIndex_calibrationDriftDefectSq_eq
   intro x _
   ring
 
+/-- **Sharp one-quarter bound.**  For nonnegative covariate weights, posterior uncertainty can
+charge at most one quarter of the squared conditional separation.  The constant is independent of
+the number or scale of covariates and cannot be improved, as the balanced theorem below shows. -/
+theorem twoIndex_calibrationDriftDefectSq_le_quarter_widthEnergy
+    (covariateWeight q upper lower : Covariate → ℝ)
+    (hweight : ∀ x, 0 ≤ covariateWeight x) :
+    calibrationDriftDefectSq covariateWeight (twoIndexPosterior q)
+      (twoIndexConditional upper lower) ≤
+        ∑ x, covariateWeight x * (1 / 4) * (upper x - lower x) ^ 2 := by
+  rw [twoIndex_calibrationDriftDefectSq_eq]
+  apply Finset.sum_le_sum
+  intro x _
+  have hposterior : q x * (1 - q x) ≤ 1 / 4 := by
+    nlinarith [sq_nonneg (q x - 1 / 2)]
+  calc
+    covariateWeight x * q x * (1 - q x) * (upper x - lower x) ^ 2 =
+        (covariateWeight x * (q x * (1 - q x))) * (upper x - lower x) ^ 2 := by
+          ring
+    _ ≤ (covariateWeight x * (1 / 4)) * (upper x - lower x) ^ 2 :=
+      mul_le_mul_of_nonneg_right
+        (mul_le_mul_of_nonneg_left hposterior (hweight x)) (sq_nonneg _)
+    _ = covariateWeight x * (1 / 4) * (upper x - lower x) ^ 2 := by ring
+
+/-- **Balanced posteriors attain the one-quarter bound.**  Therefore `1/4` in the preceding
+theorem is the exact permeability constant for two equally plausible biological environments. -/
+theorem twoIndex_balanced_calibrationDriftDefectSq_eq_quarter_widthEnergy
+    (covariateWeight upper lower : Covariate → ℝ) :
+    calibrationDriftDefectSq covariateWeight
+      (twoIndexPosterior (fun _ ↦ 1 / 2)) (twoIndexConditional upper lower) =
+        ∑ x, covariateWeight x * (1 / 4) * (upper x - lower x) ^ 2 := by
+  rw [twoIndex_calibrationDriftDefectSq_eq]
+  apply Finset.sum_congr rfl
+  intro x _
+  ring
+
 /-- A weighted calibration moment after aggregating out the population index. -/
 noncomputable def aggregateCalibrationMoment (covariateWeight : Covariate → ℝ)
     (posterior : Covariate → Index → ℝ) (conditional : Index → Covariate → ℝ)

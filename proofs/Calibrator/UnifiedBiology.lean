@@ -297,6 +297,30 @@ theorem not_descends_contextMatchQuality_along_targetState :
   rw [← hpersist] at hswitch
   norm_num at hswitch
 
+/-- The largest change in source-adapted context-match quality across supported biological
+dynamics at one target state.
+
+Empirical status: NOT AN EMPIRICAL CLAIM -- this is an exact finite section oscillation. -/
+noncomputable def contextMatchSectionOscillation (y : BinaryBiologicalState) : ℝ :=
+  finiteSectionOscillation
+    (fun persists y ↦
+      labelMass (fun g : TransportPair ↦ g.2) (binaryTransportFamily persists) y ≠ 0)
+    (fun persists y ↦
+      fiberConditional (fun g : TransportPair ↦ g.2) (binaryTransportFamily persists) y)
+    (conditionalSectionMean (fun g : TransportPair ↦ contextMatchQuality g.1 g.2))
+    (fun a b : ℝ ↦ |a - b|) y
+
+/-- The total-variation diameter of supported dynamics on one biological target-state fiber.
+
+Empirical status: NOT AN EMPIRICAL CLAIM -- this is an exact finite section diameter. -/
+noncomputable def contextMatchTotalVariationDiameter (y : BinaryBiologicalState) : ℝ :=
+  finiteSectionDiameter
+    (fun persists y ↦
+      labelMass (fun g : TransportPair ↦ g.2) (binaryTransportFamily persists) y ≠ 0)
+    (fun persists y ↦
+      fiberConditional (fun g : TransportPair ↦ g.2) (binaryTransportFamily persists) y)
+    totalVariationGap y
+
 /-- **Sharp range-sensitive portability bound for the two-dynamics family.**  Across persistence
 and switching, the largest observable change in source-adapted quality on a target-state fiber is
 bounded by half the `ℓ¹` total-variation diameter.  The factor `1/2` uses both facts that the fiber
@@ -304,19 +328,8 @@ conditionals are probability laws and that quality lies in `[0,1]`; the cruder s
 loses this factor.  The maximum is over the whole finite family, not a pointwise restatement. -/
 theorem contextMatch_sectionOscillation_le_half_totalVariationDiameter
     (y : BinaryBiologicalState) :
-    finiteSectionOscillation
-        (fun persists y ↦
-          labelMass (fun g : TransportPair ↦ g.2) (binaryTransportFamily persists) y ≠ 0)
-        (fun persists y ↦
-          fiberConditional (fun g : TransportPair ↦ g.2) (binaryTransportFamily persists) y)
-        (conditionalSectionMean (fun g : TransportPair ↦ contextMatchQuality g.1 g.2))
-        (fun a b : ℝ ↦ |a - b|) y ≤
-      finiteSectionDiameter
-        (fun persists y ↦
-          labelMass (fun g : TransportPair ↦ g.2) (binaryTransportFamily persists) y ≠ 0)
-        (fun persists y ↦
-          fiberConditional (fun g : TransportPair ↦ g.2) (binaryTransportFamily persists) y)
-        totalVariationGap y / 2 := by
+    contextMatchSectionOscillation y ≤ contextMatchTotalVariationDiameter y / 2 := by
+  unfold contextMatchSectionOscillation contextMatchTotalVariationDiameter
   apply finiteSectionOscillation_le_modulus_diameter
       (omega := fun t ↦ t / 2) (x := y)
   · exact totalVariationGap_nonneg
@@ -342,12 +355,8 @@ theorem contextMatch_sectionOscillation_le_half_totalVariationDiameter
 /-- The two biological conditionals are opposite point masses on every target fiber, so their
 `ℓ¹` total-variation diameter is exactly two. -/
 theorem contextMatch_totalVariationDiameter_eq_two (y : BinaryBiologicalState) :
-    finiteSectionDiameter
-        (fun persists y ↦
-          labelMass (fun g : TransportPair ↦ g.2) (binaryTransportFamily persists) y ≠ 0)
-        (fun persists y ↦
-          fiberConditional (fun g : TransportPair ↦ g.2) (binaryTransportFamily persists) y)
-        totalVariationGap y = 2 := by
+    contextMatchTotalVariationDiameter y = 2 := by
+  unfold contextMatchTotalVariationDiameter
   apply le_antisymm
   · apply finiteSectionDiameter_le_of_pairwise
       (supported := fun persists y ↦
@@ -396,13 +405,8 @@ readout changes from one under persistence to zero under switching, so the secti
 exactly one.  Together with `contextMatch_totalVariationDiameter_eq_two`, this proves equality in
 the sharp range-sensitive bound above rather than merely exhibiting non-descent. -/
 theorem contextMatch_sectionOscillation_eq_one (y : BinaryBiologicalState) :
-    finiteSectionOscillation
-        (fun persists y ↦
-          labelMass (fun g : TransportPair ↦ g.2) (binaryTransportFamily persists) y ≠ 0)
-        (fun persists y ↦
-          fiberConditional (fun g : TransportPair ↦ g.2) (binaryTransportFamily persists) y)
-        (conditionalSectionMean (fun g : TransportPair ↦ contextMatchQuality g.1 g.2))
-        (fun a b : ℝ ↦ |a - b|) y = 1 := by
+    contextMatchSectionOscillation y = 1 := by
+  unfold contextMatchSectionOscillation
   apply le_antisymm
   · calc
       finiteSectionOscillation
@@ -419,7 +423,10 @@ theorem contextMatch_sectionOscillation_eq_one (y : BinaryBiologicalState) :
               fiberConditional (fun g : TransportPair ↦ g.2) (binaryTransportFamily persists) y)
             totalVariationGap y / 2 :=
         contextMatch_sectionOscillation_le_half_totalVariationDiameter y
-      _ = 1 := by rw [contextMatch_totalVariationDiameter_eq_two]; norm_num
+      _ = 1 := by
+        change contextMatchTotalVariationDiameter y / 2 = 1
+        rw [contextMatch_totalVariationDiameter_eq_two]
+        norm_num
   · have hpersist :
         labelMass (fun g : TransportPair ↦ g.2) (binaryTransportFamily true) y ≠ 0 := by
       rw [labelMass_binaryTransportFamily]
@@ -490,6 +497,30 @@ theorem binaryContextMatch_calibrationDriftDefectSq_eq_quarter :
     cases persists <;> norm_num [twoIndexConditional]
   rw [hposterior, hconditional, twoIndex_calibrationDriftDefectSq_eq]
   norm_num [binaryStateWeight, Fin.sum_univ_two]
+
+/-- **The calibration price is one quarter of squared section oscillation.**  This identifies the
+`L²` posterior-field obstruction with the sharp functional-descent geometry in the same biological
+model, rather than merely evaluating the two theories on unrelated witnesses. -/
+theorem binaryContextMatch_calibrationDriftDefectSq_eq_quarter_oscillationSq
+    (y : BinaryBiologicalState) :
+    calibrationDriftDefectSq binaryStateWeight binaryDynamicsPosterior
+      binaryConditionalContextMatch =
+        (1 / 4) * contextMatchSectionOscillation y ^ 2 := by
+  rw [binaryContextMatch_calibrationDriftDefectSq_eq_quarter,
+    contextMatch_sectionOscillation_eq_one]
+  norm_num
+
+/-- **Equivalent total-variation price.**  Since the two biological fibers are maximally
+separated in total variation, the same obstruction is one sixteenth of the squared fiber
+diameter. -/
+theorem binaryContextMatch_calibrationDriftDefectSq_eq_sixteenth_tvDiameterSq
+    (y : BinaryBiologicalState) :
+    calibrationDriftDefectSq binaryStateWeight binaryDynamicsPosterior
+      binaryConditionalContextMatch =
+        (1 / 16) * contextMatchTotalVariationDiameter y ^ 2 := by
+  rw [binaryContextMatch_calibrationDriftDefectSq_eq_quarter,
+    contextMatch_totalVariationDiameter_eq_two]
+  norm_num
 
 /-- The pooled predictor is perfectly aggregate-calibrated in the persistence/switching model. -/
 theorem binaryContextMatch_aggregateCalibrationEnergy_eq_zero :
