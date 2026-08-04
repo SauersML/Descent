@@ -196,7 +196,7 @@ theorem ldDecayPerGeneration_eq_zero_iff (r : ℝ) (t : ℕ) :
     have h_base : 1 - r = 0 := (pow_eq_zero_iff h_t).1 h
     exact ⟨by linarith, Nat.pos_of_ne_zero h_t⟩
   · rintro ⟨rfl, h_t⟩
-    exact (zero_pow (Nat.ne_of_gt h_t) : (0 : ℝ) ^ t = 0)
+    norm_num [Nat.ne_of_gt h_t]
 
 /-- On the biological recombination interval, LD retention equals one exactly with no
 recombination or at elapsed time zero. -/
