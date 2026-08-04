@@ -16,6 +16,11 @@ noncomputable section
 All statements are finite-dimensional and allow a singular second-moment
 matrix.  A pseudoinverse is not logically required: the exact excess-risk
 identity follows from any solution of the normal equations `B v = b`.
+
+The final section isolates the exact portability obstruction created by
+singularity. A uniform source-to-target quadratic bound forces every
+source-null direction to have zero target risk; a single source-null direction
+with positive target risk rules out every finite portability constant.
 -/
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -240,6 +245,63 @@ theorem best_scalar_correction_attains_floor
   · intro c
     rw [quadraticCoefficientDistance_eq_floor_add_sq B u v c hsymmetric hu.ne']
     exact le_add_of_nonneg_right (mul_nonneg (le_of_lt hu) (sq_nonneg _))
+
+/-! ## Singular portability boundary -/
+
+/-- A uniform coefficient-space portability bound: target excess risk is at most `constant`
+times source excess risk in every coefficient direction.  No nonsingularity is assumed. -/
+def UniformQuadraticPortabilityBound
+    (source target : Matrix ι ι ℝ) (constant : ℝ) : Prop :=
+  ∀ shift : ι → ℝ,
+    dot shift (target.mulVec shift) ≤
+      constant * dot shift (source.mulVec shift)
+
+omit [DecidableEq ι] in
+/-- **A uniform portability bound cannot create target risk on a source-null direction.**
+Positive semidefiniteness of the target closes the inequality to an equality. -/
+theorem target_energy_eq_zero_of_uniformPortability_of_source_kernel
+    (source target : Matrix ι ι ℝ) (constant : ℝ)
+    (hbound : UniformQuadraticPortabilityBound source target constant)
+    (htarget : ∀ shift : ι → ℝ, 0 ≤ dot shift (target.mulVec shift))
+    (shift : ι → ℝ) (hsourceKernel : source.mulVec shift = 0) :
+    dot shift (target.mulVec shift) = 0 := by
+  apply le_antisymm
+  · have h := hbound shift
+    rw [hsourceKernel] at h
+    simpa [dot] using h
+  · exact htarget shift
+
+omit [DecidableEq ι] in
+/-- If zero target quadratic energy characterizes the target kernel, every uniform portability
+bound forces the source kernel into the target kernel.  This is the coefficient-space form of
+`ker source ⊆ ker target`. -/
+theorem target_kernel_of_uniformPortability_of_source_kernel
+    (source target : Matrix ι ι ℝ) (constant : ℝ)
+    (hbound : UniformQuadraticPortabilityBound source target constant)
+    (htargetNonneg : ∀ shift : ι → ℝ, 0 ≤ dot shift (target.mulVec shift))
+    (htargetZero : ∀ shift : ι → ℝ,
+      dot shift (target.mulVec shift) = 0 ↔ target.mulVec shift = 0)
+    (shift : ι → ℝ) (hsourceKernel : source.mulVec shift = 0) :
+    target.mulVec shift = 0 := by
+  apply (htargetZero shift).mp
+  exact target_energy_eq_zero_of_uniformPortability_of_source_kernel
+    source target constant hbound htargetNonneg shift hsourceKernel
+
+omit [DecidableEq ι] in
+/-- **Catastrophic shift certificate.**  If a direction is invisible in training but has
+strictly positive deployment risk, then no finite uniform source-to-target portability constant
+exists.  This is the sharp algebraic obstruction behind nonportable singular fits. -/
+theorem no_uniformQuadraticPortabilityBound_of_source_kernel_target_pos
+    (source target : Matrix ι ι ℝ) (shift : ι → ℝ)
+    (hsourceKernel : source.mulVec shift = 0)
+    (htargetPos : 0 < dot shift (target.mulVec shift)) :
+    ¬ ∃ constant : ℝ, UniformQuadraticPortabilityBound source target constant := by
+  rintro ⟨constant, hbound⟩
+  have h := hbound shift
+  rw [hsourceKernel] at h
+  simp [dot] at h
+  unfold dot at htargetPos
+  exact (not_lt_of_ge h) htargetPos
 
 end
 
