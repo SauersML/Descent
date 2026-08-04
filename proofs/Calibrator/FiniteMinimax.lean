@@ -172,6 +172,58 @@ theorem observationL1Distance_comm
   intro observation _
   exact abs_sub_comm _ _
 
+/-- Observation ℓ¹ distance satisfies the triangle inequality. -/
+theorem observationL1Distance_triangle
+    (θ₁ θ₂ θ₃ : Fin (parameterCount + 1)) :
+    E.observationL1Distance θ₁ θ₃ ≤
+      E.observationL1Distance θ₁ θ₂ + E.observationL1Distance θ₂ θ₃ := by
+  unfold observationL1Distance
+  calc
+    ∑ observation, |(E.observation θ₁).probability observation -
+        (E.observation θ₃).probability observation| ≤
+      ∑ observation, (|(E.observation θ₁).probability observation -
+        (E.observation θ₂).probability observation| +
+          |(E.observation θ₂).probability observation -
+            (E.observation θ₃).probability observation|) := by
+      exact Finset.sum_le_sum fun observation _ ↦
+        abs_sub_le ((E.observation θ₁).probability observation)
+          ((E.observation θ₂).probability observation)
+          ((E.observation θ₃).probability observation)
+    _ = (∑ observation, |(E.observation θ₁).probability observation -
+        (E.observation θ₂).probability observation|) +
+      ∑ observation, |(E.observation θ₂).probability observation -
+        (E.observation θ₃).probability observation| := Finset.sum_add_distrib
+
+/-- Zero observation ℓ¹ distance is equivalent to exact equality of the two data laws. -/
+theorem observationL1Distance_eq_zero_iff
+    (θ₁ θ₂ : Fin (parameterCount + 1)) :
+    E.observationL1Distance θ₁ θ₂ = 0 ↔
+      E.observation θ₁ = E.observation θ₂ := by
+  constructor
+  · intro hzero
+    unfold observationL1Distance at hzero
+    have htermNonneg : ∀ observation ∈
+        (Finset.univ : Finset (Fin (observationCount + 1))),
+        0 ≤ |(E.observation θ₁).probability observation -
+          (E.observation θ₂).probability observation| :=
+      fun observation _ ↦ abs_nonneg _
+    have hall := (Finset.sum_eq_zero_iff_of_nonneg htermNonneg).mp hzero
+    apply PMF.ext
+    intro observation
+    have habs := hall observation (Finset.mem_univ observation)
+    have hreal : (E.observation θ₁).probability observation =
+        (E.observation θ₂).probability observation :=
+      sub_eq_zero.mp (abs_eq_zero.mp habs)
+    change ((E.observation θ₁) observation).toReal =
+      ((E.observation θ₂) observation).toReal at hreal
+    exact (ENNReal.toReal_eq_toReal
+      ((E.observation θ₁).apply_ne_top observation)
+      ((E.observation θ₂).apply_ne_top observation)).1 hreal
+  · intro hobs
+    unfold observationL1Distance
+    rw [hobs]
+    simp
+
 /-- Any two probability laws have ℓ¹ distance at most two. -/
 theorem observationL1Distance_le_two
     (θ₁ θ₂ : Fin (parameterCount + 1)) :
