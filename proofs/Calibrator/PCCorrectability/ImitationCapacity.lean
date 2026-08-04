@@ -2100,6 +2100,50 @@ theorem no_spectral_formula_for_entrywiseFourthSum :
   exact entrywiseFourthSum_not_spectral this
 
 
+
+/-! ### The statistic, as a reference panel would compute it
+
+The invariant above is written as a double sum over matrix entries. A reference
+panel computes per-variant sums, so the usable form is a score attached to each
+variant, summed over variants -- exactly how the LD score is computed and used.
+
+`ldScore` is the standard one, `∑ᵢ rᵢⱼ²`, the quantity LD score regression
+regresses chi-squared statistics against. `ldFourthScore` is `∑ᵢ rᵢⱼ⁴`, and
+summing it over variants recovers `entrywiseFourthSum`. So the non-spectral
+invariant is not an abstract functional: it is a per-variant score of the same
+shape as the one already computed on every reference panel, differing only in the
+exponent.
+-/
+
+/-- The LD score of a variant: the sum of squared correlations with every variant,
+itself included. This is the statistic LD score regression is built on. -/
+noncomputable def ldScore (r : Fin 2 → Fin 2 → ℝ) (j : Fin 2) : ℝ :=
+  ∑ i, (r i j) ^ 2
+
+/-- The fourth-power LD score of a variant. Same shape as `ldScore`, one exponent
+up, and it is the per-variant form of the non-spectral invariant. -/
+noncomputable def ldFourthScore (r : Fin 2 → Fin 2 → ℝ) (j : Fin 2) : ℝ :=
+  ∑ i, (r i j) ^ 4
+
+/-- **The invariant is the summed fourth-power LD score.** This is what makes it
+computable: a panel that already produces LD scores produces this by changing an
+exponent. -/
+theorem entrywiseFourthSum_eq_sum_ldFourthScore (M : Fin 2 → Fin 2 → ℝ) :
+    entrywiseFourthSum M = ∑ j, ldFourthScore M j := by
+  unfold entrywiseFourthSum ldFourthScore
+  rw [Finset.sum_comm]
+
+/-- **The ordinary LD score cannot see the difference.** Both blocks have the same
+summed LD score at every `a`, because that sum is the trace of `Σ²` and hence
+spectral. So the standard statistic is blind to exactly the structure the
+fourth-power one detects, and the two differ by `3 (a + ½)²`. -/
+theorem sum_ldScore_isoBlock_eq (a : ℝ) :
+    ∑ j, ldScore (isoBlockD a) j = ∑ j, ldScore (isoBlockR a) j := by
+  unfold ldScore isoBlockD isoBlockR
+  simp [Fin.sum_univ_two]
+  ring
+
+
 end CapacityInvariant
 
 end
