@@ -2,6 +2,8 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Mathlib.Analysis.Normed.Operator.Basic
+import Mathlib.LinearAlgebra.Basis.VectorSpace
+import Mathlib.LinearAlgebra.Isomorphisms
 
 /-!
 # Correction widths: the exact algebraic core
@@ -26,6 +28,7 @@ the analytic extraction of weakly-null depth cascades is intentionally not smugg
 
 ## Main results
 
+- `factorsThrough_iff_ker_le`: exact algebraic factorization criterion over a field.
 - `uniformCorrectionWidth_order_dichotomy`: exact numerical formula at every uniform order.
 - `adaptiveCorrectionSet_smul`: adaptive correction is invariant under nonzero target scaling.
 - `not_hasPositiveLowerBound_iff_hasUnitApproxKernel`: exact stability/depth dichotomy.
@@ -108,6 +111,30 @@ theorem FactorsThrough.ker_le
   rw [LinearMap.mem_ker]
   rcases hC with ⟨T, rfl⟩
   simp [LinearMap.mem_ker.mp hβ]
+
+/-- **Algebraic factorization criterion.** Over a field, a correction factors through the
+observation operator exactly when it annihilates every observationally invisible direction. -/
+theorem factorsThrough_iff_ker_le
+    (A : H →ₗ[𝕜] Y) (C : H →ₗ[𝕜] H) :
+    FactorsThrough A C ↔ LinearMap.ker A ≤ LinearMap.ker C := by
+  constructor
+  · exact fun hC ↦ hC.ker_le A C
+  · intro hker
+    let f : LinearMap.range A →ₗ[𝕜] H :=
+      ((LinearMap.ker A).liftQ C hker).comp A.quotKerEquivRange.symm.toLinearMap
+    rcases f.exists_extend with ⟨T, hT⟩
+    refine ⟨T, ?_⟩
+    ext β
+    have hAβ : A β ∈ LinearMap.range A := ⟨β, rfl⟩
+    have hTβ := DFunLike.congr_fun hT ⟨A β, hAβ⟩
+    simpa [f] using hTβ.symm
+
+/-- Membership in the factor-through submodule is intrinsically characterized by kernel
+inclusion. -/
+theorem mem_factorsThroughSubmodule_iff_ker_le
+    (A : H →ₗ[𝕜] Y) (C : H →ₗ[𝕜] H) :
+    C ∈ factorsThroughSubmodule A ↔ LinearMap.ker A ≤ LinearMap.ker C := by
+  exact factorsThrough_iff_ker_le A C
 
 /-- **Observable-quotient law.**  Every admissible correction is constant on each fiber of the
 observation map.  No coefficient choice can distinguish targets that produced the same data. -/
