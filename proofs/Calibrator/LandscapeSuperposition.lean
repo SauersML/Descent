@@ -599,6 +599,115 @@ theorem populationGapCertificate_neg_of_golden_lt_abs
   rw [hroot, sub_zero] at hfactor
   linarith
 
+/-! ### Arbitrary finite environment mixtures -/
+
+/-- Effective active correlation of a finite collection of environments. -/
+noncomputable def pooledEnvironmentCorrelations
+    {Environment : Type*} (active : Finset Environment)
+    (mass correlation : Environment → ℝ) : ℝ :=
+  ∑ environment ∈ active, mass environment * correlation environment
+
+/-- A normalized nonnegative environment mixture remains inside the component correlation
+interval.  This is the general convex-hull law behind every two-environment calculation. -/
+theorem pooledEnvironmentCorrelations_mem_Icc
+    {Environment : Type*} (active : Finset Environment)
+    (mass correlation : Environment → ℝ) (lower upper : ℝ)
+    (hmass : ∀ environment ∈ active, 0 ≤ mass environment)
+    (hsum : ∑ environment ∈ active, mass environment = 1)
+    (hcorrelation : ∀ environment ∈ active,
+      correlation environment ∈ Set.Icc lower upper) :
+    pooledEnvironmentCorrelations active mass correlation ∈ Set.Icc lower upper := by
+  constructor
+  · calc
+      lower = ∑ environment ∈ active, mass environment * lower := by
+        rw [← Finset.sum_mul, hsum, one_mul]
+      _ ≤ ∑ environment ∈ active, mass environment * correlation environment := by
+        exact Finset.sum_le_sum fun environment hactive ↦
+          mul_le_mul_of_nonneg_left (hcorrelation environment hactive).1
+            (hmass environment hactive)
+      _ = pooledEnvironmentCorrelations active mass correlation := rfl
+  · calc
+      pooledEnvironmentCorrelations active mass correlation =
+          ∑ environment ∈ active, mass environment * correlation environment := rfl
+      _ ≤ ∑ environment ∈ active, mass environment * upper := by
+        exact Finset.sum_le_sum fun environment hactive ↦
+          mul_le_mul_of_nonneg_left (hcorrelation environment hactive).2
+            (hmass environment hactive)
+      _ = upper := by rw [← Finset.sum_mul, hsum, one_mul]
+
+/-- A strictly better component with positive mass makes the pooled correlation strictly
+larger than a common lower bound. -/
+theorem pooledEnvironmentCorrelations_gt
+    {Environment : Type*} (active : Finset Environment)
+    (mass correlation : Environment → ℝ) (lower : ℝ)
+    (hmass : ∀ environment ∈ active, 0 ≤ mass environment)
+    (hsum : ∑ environment ∈ active, mass environment = 1)
+    (hlower : ∀ environment ∈ active, lower ≤ correlation environment)
+    (witness : Environment) (hwitness : witness ∈ active)
+    (hwitnessMass : 0 < mass witness)
+    (hwitnessCorrelation : lower < correlation witness) :
+    lower < pooledEnvironmentCorrelations active mass correlation := by
+  have hstrict :
+      ∑ environment ∈ active, mass environment * lower <
+        ∑ environment ∈ active, mass environment * correlation environment := by
+    apply Finset.sum_lt_sum
+    · intro environment hactive
+      exact mul_le_mul_of_nonneg_left (hlower environment hactive)
+        (hmass environment hactive)
+    · exact ⟨witness, hwitness,
+        mul_lt_mul_of_pos_left hwitnessCorrelation hwitnessMass⟩
+  calc
+    lower = ∑ environment ∈ active, mass environment * lower := by
+      rw [← Finset.sum_mul, hsum, one_mul]
+    _ < ∑ environment ∈ active, mass environment * correlation environment := hstrict
+    _ = pooledEnvironmentCorrelations active mass correlation := rfl
+
+/-- **Same-sign, magnitude-varying environments cannot close this population gap.**  If every
+positively weighted pure environment lies on the positive gapped side of the golden threshold,
+then so does their pooled correlation. -/
+theorem pooledEnvironmentCorrelations_golden_lt
+    {Environment : Type*} (active : Finset Environment)
+    (mass correlation : Environment → ℝ)
+    (hmass : ∀ environment ∈ active, 0 ≤ mass environment)
+    (hsum : ∑ environment ∈ active, mass environment = 1)
+    (hgolden : ∀ environment ∈ active,
+      goldenCorrelationThreshold < correlation environment)
+    (witness : Environment) (hwitness : witness ∈ active)
+    (hwitnessMass : 0 < mass witness) :
+    goldenCorrelationThreshold < pooledEnvironmentCorrelations active mass correlation :=
+  pooledEnvironmentCorrelations_gt active mass correlation goldenCorrelationThreshold
+    hmass hsum (fun environment hactive ↦ (hgolden environment hactive).le)
+    witness hwitness hwitnessMass (hgolden witness hwitness)
+
+/-- Therefore a normalized same-sign mixture of individually gapped admissible correlations
+retains a negative population gap certificate.  Magnitude heterogeneity alone cannot close the
+gap in this rank-two witness family. -/
+theorem pooledEnvironmentGapCertificate_neg_of_same_sign
+    {Environment : Type*} (active : Finset Environment)
+    (mass correlation : Environment → ℝ)
+    (hmass : ∀ environment ∈ active, 0 ≤ mass environment)
+    (hsum : ∑ environment ∈ active, mass environment = 1)
+    (hgolden : ∀ environment ∈ active,
+      goldenCorrelationThreshold < correlation environment)
+    (hupper : ∀ environment ∈ active, correlation environment ≤ 1)
+    (witness : Environment) (hwitness : witness ∈ active)
+    (hwitnessMass : 0 < mass witness) :
+    populationGapCertificate (pooledEnvironmentCorrelations active mass correlation) < 0 := by
+  have hpooledGolden : goldenCorrelationThreshold <
+      pooledEnvironmentCorrelations active mass correlation :=
+    pooledEnvironmentCorrelations_golden_lt active mass correlation hmass hsum hgolden
+      witness hwitness hwitnessMass
+  have hpooledBounds := pooledEnvironmentCorrelations_mem_Icc active mass correlation
+    goldenCorrelationThreshold 1 hmass hsum
+      (fun environment hactive ↦ ⟨(hgolden environment hactive).le, hupper environment hactive⟩)
+  have hpooledPos : 0 < pooledEnvironmentCorrelations active mass correlation :=
+    goldenCorrelationThreshold_mem_Ioo.1.trans hpooledGolden
+  apply populationGapCertificate_neg_of_golden_lt_abs
+  · rw [abs_of_pos hpooledPos]
+    exact hpooledBounds.2
+  · rw [abs_of_pos hpooledPos]
+    exact hpooledGolden
+
 /-- Effective active correlation obtained by pooling arbitrary left and right environments. -/
 noncomputable def pooledEnvironmentCorrelation
     (left right leftMass : ℝ) : ℝ :=
