@@ -716,7 +716,26 @@ theorem driftLDEquilibrium_strictAnti (Ne₁ Ne₂ c : ℝ)
     `Q₀`, iterating `driftLDStep`.  This is the process; the closed form below
     is a theorem about it, not a second definition.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED as a trajectory**
+    (`proofs/validation/empirical/simcov/battery_traj.py`,
+    `test_drift_ld_trajectory`). `driftLDStep` was already validated as a
+    one-step map, which is a weak test of the iterate: a one-step comparison
+    re-anchors on the truth every generation and so cannot see an error that
+    compounds. This runs the recurrence forward from `Q_0` for the whole
+    trajectory with no re-anchoring, against Wright-Fisher two-locus simulation
+    with 8000 replicates:
+
+      Ne     c      gens    this def   simulated            sems
+      100    0.00     15     0.40636   0.41185±0.00824      0.67
+      100    0.05     15     0.10710   0.11249±0.00225      2.40
+      500    0.01     25     0.23166   0.23107±0.00462      0.13
+
+    That the iterate survives 15 to 25 generations unanchored is the part the
+    one-step test could not establish: `mutationSelectionStepRare` is the
+    counterexample, where a per-generation gap of about one percent passed a
+    one-step test and compounds.
+
+    Power: the prediction spans 0.10710 to 0.40636, a factor of four. -/
 noncomputable def driftLDTrajectory (Ne c Q₀ : ℝ) : ℕ → ℝ
   | 0 => Q₀
   | t + 1 => driftLDStep Ne c (driftLDTrajectory Ne c Q₀ t)
