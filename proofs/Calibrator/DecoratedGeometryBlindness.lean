@@ -43,6 +43,10 @@ A fourth, in the same spirit, about resources rather than geometry.
   `ε = 1/Λ`.  The always-true half is recorded, and a two-mode witness shows the reciprocal
   dictionary failing at maximum strength: budgeted error `0` against modulus `1`.
 
+Each is stated in the generality it holds in: an arbitrary finite family of populations, an
+arbitrary nonnegative weight, an arbitrary divergence.  The explicit witnesses are there to show
+the general theorems are not vacuous and that their converses fail, not to stand in for them.
+
 None of this is asymptotic.  Every statement below is an identity or an inequality between finite
 sums, and the witnesses are explicit.
 -/
@@ -245,6 +249,132 @@ theorem marginEnergy_perm_invariant (weight : Pop → ℝ) (field : Pop → ℝ)
           rw [hweight s, hweight t]
     _ = ∑ s, ∑ t, weight s * weight t * (field s - field t) ^ 2 :=
         hkey (fun s t ↦ weight s * weight t * (field s - field t) ^ 2)
+
+/-- Reindexing a double sum by a permutation changes nothing. -/
+theorem sum_double_comp_perm (relabel : Equiv.Perm Pop) (F : Pop → Pop → ℝ) :
+    (∑ s, ∑ t, F (relabel s) (relabel t)) = ∑ s, ∑ t, F s t := by
+  calc
+    (∑ s, ∑ t, F (relabel s) (relabel t)) = ∑ s, ∑ t, F (relabel s) t :=
+      Finset.sum_congr rfl (fun s _ ↦ Equiv.sum_comp relabel (F (relabel s)))
+    _ = ∑ s, ∑ t, F s t := Equiv.sum_comp relabel (fun s ↦ ∑ t, F s t)
+
+/-- **Alignment energy is invariant under exactly the symmetries of the decorated geometry.**  A
+relabelling that preserves both the sampling weights and the divergences leaves the alignment
+energy unchanged.  Together with the witness below -- a weight-preserving relabelling that does
+not preserve divergences, and does change the energy -- this locates the alignment functional
+precisely: it sees every relabelling except the ones that are isomorphisms of the geometry, while
+the margin sees none of them. -/
+theorem alignmentEnergy_perm_invariant (weight : Pop → ℝ) (divergence : Pop → Pop → ℝ)
+    (field : Pop → ℝ) (relabel : Equiv.Perm Pop)
+    (hweight : ∀ p, weight (relabel p) = weight p)
+    (hdivergence : ∀ a b, divergence (relabel a) (relabel b) = divergence a b) :
+    alignmentEnergy weight divergence (fun p ↦ field (relabel p)) =
+      alignmentEnergy weight divergence field := by
+  unfold alignmentEnergy
+  calc
+    (∑ s, ∑ t, weight s * weight t * divergence s t *
+        (field (relabel s) - field (relabel t)) ^ 2) =
+        ∑ s, ∑ t, weight (relabel s) * weight (relabel t) *
+          divergence (relabel s) (relabel t) *
+            (field (relabel s) - field (relabel t)) ^ 2 := by
+          refine Finset.sum_congr rfl (fun s _ ↦ Finset.sum_congr rfl (fun t _ ↦ ?_))
+          rw [hweight s, hweight t, hdivergence s t]
+    _ = ∑ s, ∑ t, weight s * weight t * divergence s t * (field s - field t) ^ 2 :=
+        sum_double_comp_perm relabel
+          (fun a b ↦ weight a * weight b * divergence a b * (field a - field b) ^ 2)
+
+/-- Transposing two equally weighted populations preserves the weights. -/
+theorem weight_swap_invariant [DecidableEq Pop] (weight : Pop → ℝ) (s t : Pop)
+    (hweight : weight s = weight t) (p : Pop) :
+    weight (Equiv.swap s t p) = weight p := by
+  rcases eq_or_ne p s with hp | hp
+  · rw [hp, Equiv.swap_apply_left, hweight]
+  rcases eq_or_ne p t with hq | hq
+  · rw [hq, Equiv.swap_apply_right, hweight]
+  · rw [Equiv.swap_apply_of_ne_of_ne hp hq]
+
+/-- **Profile twins are invisible to alignment as well.**  Transposing two equally weighted
+populations that are equidistant from everything leaves the alignment energy unchanged too -- so
+the identifiability obstruction of the first section is not repaired by looking at how the
+decoration sits on the geometry.  Nothing computed from divergences and weights can see it; only
+the decoration itself can. -/
+theorem alignmentEnergy_swap_twin_invariant [DecidableEq Pop] (weight : Pop → ℝ)
+    (divergence : Pop → Pop → ℝ) (field : Pop → ℝ) (s t : Pop)
+    (htwin : IsProfileTwin divergence s t)
+    (hsymm : ∀ a b, divergence a b = divergence b a) (hweight : weight s = weight t) :
+    alignmentEnergy weight divergence (fun p ↦ field (Equiv.swap s t p)) =
+      alignmentEnergy weight divergence field :=
+  alignmentEnergy_perm_invariant weight divergence field (Equiv.swap s t)
+    (weight_swap_invariant weight s t hweight)
+    (fun a b ↦ divergence_swap_twin_invariant divergence s t htwin hsymm a b)
+
+/-- **A separated population is charged in proportion to its frequency, not its square.**  If one
+population's risk differs from every other's by at least `gap`, its contribution to the margin
+energy is at least `w(1 - w)gap²` where `w` is its sampling weight.  The two-population witness
+below is the case of two populations; the content is that no number of other populations dilutes
+the first-order dependence on `w`. -/
+theorem marginEnergy_ge_separated_population [DecidableEq Pop] (weight field : Pop → ℝ) (p : Pop)
+    (gap : ℝ) (hweight : ∀ q, 0 ≤ weight q) (htotal : ∑ q, weight q = 1)
+    (hgap : 0 ≤ gap) (hsep : ∀ q, q ≠ p → gap ≤ |field p - field q|) :
+    weight p * (1 - weight p) * gap ^ 2 ≤ marginEnergy weight field := by
+  have hsq : ∀ q, q ≠ p → gap ^ 2 ≤ (field p - field q) ^ 2 := by
+    intro q hq
+    calc
+      gap ^ 2 ≤ |field p - field q| ^ 2 := by
+        have := hsep q hq
+        nlinarith [abs_nonneg (field p - field q)]
+      _ = (field p - field q) ^ 2 := sq_abs _
+  have hrest : (∑ q ∈ Finset.univ.erase p, weight q) = 1 - weight p := by
+    rw [Finset.sum_erase_eq_sub (Finset.mem_univ p), htotal]
+  -- the row at `p`
+  have hrow : weight p * (1 - weight p) * gap ^ 2 ≤
+      weight p * ∑ t, weight t * (field p - field t) ^ 2 := by
+    have hinner : (1 - weight p) * gap ^ 2 ≤ ∑ t, weight t * (field p - field t) ^ 2 := by
+      calc
+        (1 - weight p) * gap ^ 2 = ∑ t ∈ Finset.univ.erase p, weight t * gap ^ 2 := by
+          rw [← Finset.sum_mul, hrest]
+        _ ≤ ∑ t ∈ Finset.univ.erase p, weight t * (field p - field t) ^ 2 := by
+          refine Finset.sum_le_sum (fun t ht ↦ ?_)
+          exact mul_le_mul_of_nonneg_left (hsq t (Finset.ne_of_mem_erase ht)) (hweight t)
+        _ ≤ ∑ t, weight t * (field p - field t) ^ 2 := by
+          refine Finset.sum_le_sum_of_subset_of_nonneg (Finset.erase_subset _ _) ?_
+          exact fun t _ _ ↦ mul_nonneg (hweight t) (sq_nonneg _)
+    simpa only [mul_assoc] using mul_le_mul_of_nonneg_left hinner (hweight p)
+  -- every other row sees `p` itself
+  have hother : ∀ s ∈ Finset.univ.erase p,
+      weight s * (weight p * gap ^ 2) ≤ weight s * ∑ t, weight t * (field s - field t) ^ 2 := by
+    intro s hs
+    refine mul_le_mul_of_nonneg_left ?_ (hweight s)
+    have hterm_nonneg : ∀ t ∈ (Finset.univ : Finset Pop),
+        0 ≤ weight t * (field s - field t) ^ 2 :=
+      fun t _ ↦ mul_nonneg (hweight t) (sq_nonneg _)
+    have hsingle : weight p * (field s - field p) ^ 2 ≤
+        ∑ t, weight t * (field s - field t) ^ 2 := by
+      exact Finset.single_le_sum hterm_nonneg (Finset.mem_univ p)
+    have hgapsq : gap ^ 2 ≤ (field s - field p) ^ 2 := by
+      have hne : s ≠ p := Finset.ne_of_mem_erase hs
+      have hswap : (field p - field s) ^ 2 = (field s - field p) ^ 2 := by ring
+      rw [← hswap]
+      exact hsq s hne
+    calc
+      weight p * gap ^ 2 ≤ weight p * (field s - field p) ^ 2 :=
+        mul_le_mul_of_nonneg_left hgapsq (hweight p)
+      _ ≤ ∑ t, weight t * (field s - field t) ^ 2 := hsingle
+  have hsplit : (∑ s, weight s * ∑ t, weight t * (field s - field t) ^ 2) =
+      weight p * (∑ t, weight t * (field p - field t) ^ 2) +
+        ∑ s ∈ Finset.univ.erase p, weight s * ∑ t, weight t * (field s - field t) ^ 2 :=
+    (Finset.add_sum_erase Finset.univ
+      (fun s ↦ weight s * ∑ t, weight t * (field s - field t) ^ 2) (Finset.mem_univ p)).symm
+  have htail : (1 - weight p) * (weight p * gap ^ 2) ≤
+      ∑ s ∈ Finset.univ.erase p, weight s * ∑ t, weight t * (field s - field t) ^ 2 := by
+    calc
+      (1 - weight p) * (weight p * gap ^ 2) =
+          ∑ s ∈ Finset.univ.erase p, weight s * (weight p * gap ^ 2) := by
+        rw [← Finset.sum_mul, hrest]
+      _ ≤ ∑ s ∈ Finset.univ.erase p, weight s * ∑ t, weight t * (field s - field t) ^ 2 :=
+        Finset.sum_le_sum hother
+  rw [marginEnergy_eq, hsplit]
+  linarith
 
 end MarginVersusAlignment
 
@@ -532,6 +662,39 @@ theorem clippedModeError_ne_modulus_at_reciprocal :
   · unfold clippedModeError
     norm_num
   · norm_num
+
+/-- Worst-mode residual error of a bounded-coefficient recalibration over a finite spectrum.
+
+Empirical status: NOT AN EMPIRICAL CLAIM -- this is an exact finite maximum. -/
+noncomputable def spectrumBudgetedError {Mode : Type*} [Fintype Mode] [Nonempty Mode]
+    (rootSource rootGain : Mode → ℝ) (budget : ℝ) : ℝ :=
+  Finset.univ.sup' Finset.univ_nonempty
+    (fun i ↦ clippedModeError (rootSource i) (rootGain i) budget)
+
+/-- **The zero-budget spectrum value, pinned.**  With no correction allowed the worst mode keeps
+its whole source. -/
+theorem spectrumBudgetedError_zero_budget {Mode : Type*} [Fintype Mode] [Nonempty Mode]
+    (rootSource rootGain : Mode → ℝ) :
+    spectrumBudgetedError rootSource rootGain 0 =
+      Finset.univ.sup' Finset.univ_nonempty rootSource := by
+  unfold spectrumBudgetedError
+  simp
+
+/-- **The Legendre bound for a whole spectrum.**  Whatever the budget, the worst-mode error is at
+least the source of any mode hiding below the noise level, less the budget spent reaching it.  So
+the conjugate trade is not an artefact of looking at one mode: it is the general lower bound, and
+it is the only half of the reciprocal dictionary that survives. -/
+theorem spectrumBudgetedError_ge_conjugate {Mode : Type*} [Fintype Mode] [Nonempty Mode]
+    (rootSource rootGain : Mode → ℝ) (budget noise : ℝ) (mode : Mode)
+    (hsource : 0 ≤ rootSource mode) (hbudget : 0 ≤ budget)
+    (hgain : rootGain mode ≤ noise) (hclip : budget * noise ≤ 1) :
+    rootSource mode * (1 - budget * noise) ≤
+      spectrumBudgetedError rootSource rootGain budget :=
+  le_trans
+    (clippedModeError_ge_conjugate (rootSource mode) (rootGain mode) budget noise hsource hbudget
+      hgain hclip)
+    (Finset.le_sup' (fun i ↦ clippedModeError (rootSource i) (rootGain i) budget)
+      (Finset.mem_univ mode))
 
 end BudgetConjugacy
 
