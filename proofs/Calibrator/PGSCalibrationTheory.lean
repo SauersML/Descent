@@ -1881,6 +1881,14 @@ noncomputable def nri
     (up_events down_events up_nonevents down_nonevents n_events n_nonevents : ℝ) : ℝ :=
   (up_events - down_events) / n_events + (down_nonevents - up_nonevents) / n_nonevents
 
+/-- **Reclassifying nobody scores zero, whatever the denominators are.** The index is a sum of
+two net rates and each vanishes when its own movements cancel; a body carrying an additive term
+in the counts would report improvement for a model that moved no one. -/
+theorem nri_no_movement (up_events up_nonevents n_events n_nonevents : ℝ) :
+    nri up_events up_events up_nonevents up_nonevents n_events n_nonevents = 0 := by
+  unfold nri
+  ring
+
 /-- **Downward reclassification at a clinical decision threshold.**
     A downward intercept correction of size `δ > 0` moves an individual from
     high risk to low risk exactly when the baseline score lies in the threshold
