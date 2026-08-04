@@ -1346,6 +1346,26 @@ theorem targetMetricAndCalibrationProfilesAtGeneration_exact_mechanistic_popgen_
   · exact targetMetricProfileAtGeneration_exact_mechanistic_popgen_portability_law m.metric t
   · exact targetCalibrationProfileAtGeneration_exact_mechanistic_popgen_portability_law m t link
 
+section CrossAncestryProjection
+
+/-! The two projection theorems in this section take the same model, the same calibration
+shift model, and the same three assumptions about them -- an `R²` in the unit interval at
+each population, a drop between them, and a perfectly calibrated source.  Each restated
+that block, eight lines of it, and the restatements are what the duplication guard was
+seeing.  The block is a `variable` line here, and `include` makes it a premise of each
+theorem exactly as writing it out did; what differs between the two theorems stays written
+where it differs. -/
+
+variable {p q : ℕ}
+  (metric : CrossPopulationMetricModel p q)
+  (cal : CrossPopulationCalibrationShiftModel)
+  (h_source_r2_unit : r2FromSourceWeights metric Pop.source ∈ Set.Ico 0 1)
+  (h_target_r2_unit : r2FromSourceWeights metric Pop.target ∈ Set.Ico 0 1)
+  (h_r2_drop :
+    r2FromSourceWeights metric Pop.target < r2FromSourceWeights metric Pop.source)
+  (h_src_cal : ((cal.identityCalibrationProfile Pop.source)).citl = 0)
+
+include h_source_r2_unit h_target_r2_unit h_r2_drop h_src_cal in
 /-- **An assumed R² drop transports to an AUC drop, and an assumed nonzero shift budget
 transports to worsened CITL.**
 
@@ -1361,14 +1381,6 @@ on purpose. It asserts that cross-ancestry AUC drops, and this theorem does not 
 any shift is worse. The qualifier `from_explicit_shift_budget` covers the calibration half
 alone, so the name must state the R² input too. -/
 theorem auc_drop_and_citl_worsening_of_r2_drop_and_shift_budget
-    {p q : ℕ}
-    (metric : CrossPopulationMetricModel p q)
-    (cal : CrossPopulationCalibrationShiftModel)
-    (h_source_r2_unit : r2FromSourceWeights metric Pop.source ∈ Set.Ico 0 1)
-    (h_target_r2_unit : r2FromSourceWeights metric Pop.target ∈ Set.Ico 0 1)
-    (h_r2_drop :
-      r2FromSourceWeights metric Pop.target < r2FromSourceWeights metric Pop.source)
-    (h_src_cal : ((cal.identityCalibrationProfile Pop.source)).citl = 0)
     (h_shift_nonzero :
       cal.observedMeanShift - cal.predictedMeanShift ≠ 0) :
     AucDropsAndCitlWorsens cal
@@ -1386,6 +1398,7 @@ theorem auc_drop_and_citl_worsening_of_r2_drop_and_shift_budget
     source_calibrated_target_citl_facts cal h_src_cal h_shift_nonzero
   exact ⟨h_auc, h_citl_eq, h_abs_eq, h_abs_worse⟩
 
+include h_source_r2_unit h_target_r2_unit h_r2_drop h_src_cal in
 /-- **Prevalence-only cross-ancestry CITL worsening is just a special case.**
 When every non-prevalence calibration shift vanishes, the full explicit shift
 budget reduces to prevalence shift alone. This theorem is deliberately scoped
@@ -1394,14 +1407,6 @@ as a benchmark special case rather than a general SNP-level deployment law.
 As above, the AUC drop is `h_r2_drop` transported through the monotone chart, not a
 consequence of ancestry distance; the name now says so. -/
 theorem auc_drop_and_baseRate_only_citl_worsening_of_r2_drop
-    {p q : ℕ}
-    (metric : CrossPopulationMetricModel p q)
-    (cal : CrossPopulationCalibrationShiftModel)
-    (h_source_r2_unit : r2FromSourceWeights metric Pop.source ∈ Set.Ico 0 1)
-    (h_target_r2_unit : r2FromSourceWeights metric Pop.target ∈ Set.Ico 0 1)
-    (h_r2_drop :
-      r2FromSourceWeights metric Pop.target < r2FromSourceWeights metric Pop.source)
-    (h_src_cal : ((cal.identityCalibrationProfile Pop.source)).citl = 0)
     (h_env : cal.environmentalObservedShift = 0)
     (h_genetic : cal.geneticObservedShift = 0)
     (h_score : cal.scoreMeanShift = 0)
@@ -1432,6 +1437,8 @@ theorem auc_drop_and_baseRate_only_citl_worsening_of_r2_drop
       cal h_src_cal h_env h_genetic h_score h_intercept]
   · rw [source_calibrated_target_abs_citl_eq_abs_prevalence_shift_of_no_other_shifts
       cal h_src_cal h_env h_genetic h_score h_intercept]
+
+end CrossAncestryProjection
 
 /-- **Neutral-benchmark cross-ancestry AUC drops while observable calibrated
 Brier worsens.**
