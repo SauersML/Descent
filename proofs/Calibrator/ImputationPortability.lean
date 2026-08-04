@@ -163,6 +163,15 @@ theorem panelAdjustedImputationQuality_eq_ld_iff
   · rintro rfl
     ring
 
+/-- With a nonzero LD ceiling, panel-adjusted imputation quality vanishes exactly when panel
+match vanishes. -/
+theorem panelAdjustedImputationQuality_eq_zero_iff
+    (r2_LD panelMatch : ℝ) (h_ld : r2_LD ≠ 0) :
+    panelAdjustedImputationQuality r2_LD panelMatch = 0 ↔ panelMatch = 0 := by
+  unfold panelAdjustedImputationQuality
+  rw [mul_eq_zero]
+  simp [h_ld]
+
 /-- **Imputation quality as a function of LD extent alone.**
 
     The name carries the restriction because the signature cannot carry the alternative.
@@ -201,6 +210,45 @@ theorem ldExtentImputationQuality_mem_unit (c ld_extent : ℝ)
   apply max_le
   · norm_num
   · linarith
+
+/-- **Exact LD cutoff for non-imputability.**  At positive LD extent, the clamped LD-only quality
+is zero exactly when the available LD extent does not exceed the tagging constant. -/
+theorem ldExtentImputationQuality_eq_zero_iff
+    (c ld_extent : ℝ) (h_ld : 0 < ld_extent) :
+    ldExtentImputationQuality c ld_extent = 0 ↔ ld_extent ≤ c := by
+  constructor
+  · intro h_zero
+    have h_penalty : 1 - c / ld_extent ≤ 0 := by
+      calc
+        1 - c / ld_extent ≤ max 0 (1 - c / ld_extent) := le_max_right _ _
+        _ = 0 := h_zero
+    have h_ratio : 1 ≤ c / ld_extent := by linarith
+    have := (le_div_iff₀ h_ld).1 h_ratio
+    simpa using this
+  · intro h_cutoff
+    have h_ratio : 1 ≤ c / ld_extent := by
+      apply (le_div_iff₀ h_ld).2
+      simpa using h_cutoff
+    unfold ldExtentImputationQuality
+    rw [max_eq_left (by linarith)]
+
+/-- At positive LD extent, LD-only imputation quality is strictly positive exactly above the
+tagging cutoff. -/
+theorem ldExtentImputationQuality_pos_iff
+    (c ld_extent : ℝ) (h_ld : 0 < ld_extent) :
+    0 < ldExtentImputationQuality c ld_extent ↔ c < ld_extent := by
+  constructor
+  · intro h_quality
+    by_contra h_not_above
+    have h_zero :=
+      (ldExtentImputationQuality_eq_zero_iff c ld_extent h_ld).2 (le_of_not_gt h_not_above)
+    linarith
+  · intro h_above
+    have h_ratio : c / ld_extent < 1 := (div_lt_one h_ld).2 h_above
+    calc
+      0 < 1 - c / ld_extent := by linarith
+      _ ≤ ldExtentImputationQuality c ld_extent := by
+        exact le_max_right _ _
 
 /-- **LD-dependent imputation creates systematic bias.**
     In populations with shorter LD (e.g., AFR), tagging is worse,
