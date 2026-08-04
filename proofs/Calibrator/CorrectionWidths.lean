@@ -32,6 +32,7 @@ the analytic extraction of weakly-null depth cascades is intentionally not smugg
 - `finite_postprocessors_simultaneously_small`: one deep target blinds a finite dictionary.
 - `finite_postprocessors_adaptive_span_small`: ℓ¹ control of every adaptive combination.
 - `finite_postprocessors_budgeted_adaptive_residual`: the residual lower bound `1 - Λε`.
+- `finite_postprocessors_budgeted_adaptive_arbitrarily_close_to_one`: uniform budget barrier.
 -/
 
 namespace Calibrator
@@ -447,6 +448,29 @@ theorem finite_postprocessors_budgeted_adaptive_residual
       rw [hunit]
       linarith
     _ ≤ ‖β - ∑ j, coefficients j • (T j) (A β)‖ := norm_sub_norm_le _ _
+
+/-- **Finite-order adaptive obstruction at every fixed budget.** For any finite dictionary and
+nonnegative ℓ¹ coefficient budget, one common unit target leaves residual arbitrarily close to
+one for every adaptive coefficient choice in that budget. The witness may depend on the budget
+and tolerance, but not on the coefficients selected after seeing the target. -/
+theorem finite_postprocessors_budgeted_adaptive_arbitrarily_close_to_one
+    (A : H →L[ℝ] Y) (hdeep : HasUnitApproxKernel A)
+    {k : ℕ} (T : Fin k → Y →L[ℝ] H) (Λ η : ℝ)
+    (hΛ : 0 ≤ Λ) (hη : 0 < η) :
+    ∃ β : H, ‖β‖ = 1 ∧ ∀ coefficients : Fin k → ℝ,
+      (∑ j, |coefficients j|) ≤ Λ →
+        1 - η ≤ ‖β - ∑ j, coefficients j • (T j) (A β)‖ := by
+  have hden : 0 < Λ + 1 := by linarith
+  obtain ⟨β, hunit, hresidual⟩ :=
+    finite_postprocessors_budgeted_adaptive_residual
+      A hdeep T (η / (Λ + 1)) Λ (div_pos hη hden)
+  refine ⟨β, hunit, ?_⟩
+  intro coefficients hcoefficients
+  have hbudgetFraction : Λ * (η / (Λ + 1)) ≤ η := by
+    rw [← mul_div_assoc]
+    exact (div_le_iff₀ hden).2 (by nlinarith)
+  exact (by linarith : 1 - η ≤ 1 - Λ * (η / (Λ + 1))).trans
+    (hresidual coefficients hcoefficients)
 
 /-- **Approximate-kernel correction barrier.**  Any bounded post-processing correction leaves at
 least `‖β‖ - ‖T‖ ‖Aβ‖` residual on target `β`.  This is the quantitative lower bound from which
