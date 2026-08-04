@@ -1967,6 +1967,55 @@ theorem entrywiseCubeSum_not_spectral :
   norm_num
 
 
+
+/-- **The gap in closed form.** The two blocks are separated at every `a`, not at
+one lucky point: the difference is `(3a+1)/2`, a nonvanishing affine function of
+the eigenvalue offset.
+
+Integrating it over the block family `a ∈ [1,2]`, with the one-half per-coordinate
+normalisation, gives `11/8` -- the constant that multiplies `κ₃²/12` in the
+third-order term of the mutual-information density. -/
+theorem entrywiseCubeSum_gap (a : ℝ) :
+    entrywiseCubeSum (isoBlockD a) - entrywiseCubeSum (isoBlockR a) = (3 * a + 1) / 2 := by
+  rw [entrywiseCubeSum_isoBlockD, entrywiseCubeSum_isoBlockR]
+  ring
+
+/-- **And the separation is uniform over the admissible spectrum.** Every
+eigenvalue of these blocks lies in `[1,3]`, so `a ≥ 1` throughout, and the gap is
+bounded below by two. The failure is not a boundary artefact and not a
+conditioning artefact: the condition number never exceeds three. -/
+theorem entrywiseCubeSum_gap_pos (a : ℝ) (ha : 1 ≤ a) :
+    2 ≤ entrywiseCubeSum (isoBlockD a) - entrywiseCubeSum (isoBlockR a) := by
+  rw [entrywiseCubeSum_gap]
+  linarith
+
+/-- **No function of the spectrum computes the cube sum.** This is the general
+statement, quantified over every putative spectral formula rather than exhibiting
+one pair.
+
+For a real symmetric two-by-two block the characteristic polynomial determines
+the eigenvalue multiset and conversely, so "a function of the spectrum" is
+exactly "a function of `blockCharPoly`". No such function reproduces
+`entrywiseCubeSum`, because `isoBlockD 1` and `isoBlockR 1` share a characteristic
+polynomial and differ in cube sum.
+
+Consequently every portability quantity in this corpus that reads a design only
+through `normalizedMoment`, `inverseTraceCertificate`, or any other eigenvalue
+summary is blind to a difference that changes achievable accuracy whenever the
+effect prior has a nonzero third cumulant -- which the standard sparse polygenic
+prior does by construction. -/
+theorem no_spectral_formula_for_entrywiseCubeSum :
+    ¬ ∃ f : (ℝ → ℝ) → ℝ,
+      ∀ M : Fin 2 → Fin 2 → ℝ, entrywiseCubeSum M = f (blockCharPoly M) := by
+  rintro ⟨f, hf⟩
+  have hpoly : blockCharPoly (isoBlockD 1) = blockCharPoly (isoBlockR 1) := by
+    funext x
+    exact isoBlock_charPoly_eq 1 x
+  have : entrywiseCubeSum (isoBlockD 1) = entrywiseCubeSum (isoBlockR 1) := by
+    rw [hf (isoBlockD 1), hf (isoBlockR 1), hpoly]
+  exact entrywiseCubeSum_not_spectral this
+
+
 end CapacityInvariant
 
 end
