@@ -652,6 +652,17 @@ section PhasingErrors
     Empirical status: UNTESTED. -/
 noncomputable def phaseAttenuation (s : ℝ) : ℝ := (1 - 2 * s)^2
 
+/-- **Random phasing destroys the signal entirely.**
+
+At a switch error rate of one half the phase carries no information and the attenuation is exactly
+zero. Membership in `[0,1]`, recorded below, holds for every squared affine map of `s` into that
+interval and leaves the zero unlocated; this fixes it at the point where phase becomes a coin
+flip, which is the only rate at which the attenuation *should* vanish. A body vanishing anywhere
+else would still be bounded and still be decreasing on the relevant range. -/
+theorem phaseAttenuation_random_phase : phaseAttenuation (1 / 2) = 0 := by
+  unfold phaseAttenuation
+  norm_num
+
 /-- Phase attenuation is in [0,1] for small error rate. -/
 theorem phase_attenuation_bounded (s : ℝ)
     (h_s : 0 ≤ s) (h_s_le : s ≤ 1 / 2) :
