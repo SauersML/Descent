@@ -4953,6 +4953,14 @@ theorem finiteIslandCorrection_one_deme_is_junk : finiteIslandCorrection 1 = 0 :
 noncomputable def fstMigrationDriftEquilibrium (Ne m : ℝ) : ℝ :=
   1 / (1 + 4 * Ne * m)
 
+/-- **No migration leaves complete differentiation.** At `m = 0` the island model fixes
+populations entirely, so the equilibrium is one; that is the reference point which fixes the
+constant term, and it is what a body with the wrong intercept would miss. -/
+theorem fstMigrationDriftEquilibrium_no_migration (Ne : ℝ) :
+    fstMigrationDriftEquilibrium Ne 0 = 1 := by
+  unfold fstMigrationDriftEquilibrium
+  norm_num
+
 /-- **The island-model F_ST is the rest point of the identity balance** driven
 by migration.  It is not a stipulated closed form: substitute any other
 constant and this fails. -/
@@ -5261,6 +5269,15 @@ theorem lt_one_of_le_migrationEquilibrium (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 < 
     Empirical status: UNTESTED. -/
 noncomputable def SplitMigrationModel.fstMigDriftEq (s : SplitMigrationModel) : ℝ :=
   fstMigrationDriftEquilibrium s.Ne s.mig
+
+/-- **The equilibrium inverts one plus four Ne m.** The many-deme limit identity below relates
+this to another quantity without fixing the coefficient on the scaled migration rate; multiplying
+the denominator back does, and any other coefficient would satisfy the limit identity equally. -/
+theorem SplitMigrationModel.fstMigDriftEq_mul_denom (s : SplitMigrationModel)
+    (h : 1 + 4 * s.Ne * s.mig ≠ 0) :
+    s.fstMigDriftEq * (1 + 4 * s.Ne * s.mig) = 1 := by
+  unfold SplitMigrationModel.fstMigDriftEq fstMigrationDriftEquilibrium
+  field_simp
 
 /-- SplitMigrationModel equilibrium Fst equals the limit Fst for many demes. -/
 theorem SplitMigrationModel.fstMigDriftEq_eq_limit (s : SplitMigrationModel) :
