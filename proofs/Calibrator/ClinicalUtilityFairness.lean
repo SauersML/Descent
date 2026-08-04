@@ -989,8 +989,8 @@ theorem screeningQalyGain_neg_at_zero_sensitivity
     (h_π1 : π < 1) (h_harm : 0 < harm) :
     -- At zero sensitivity, QALY gain is negative
     screeningQalyGain 0 0 π benefit harm < 0 := by
-  rw [screeningQalyGain_eq_formula]
-  nlinarith
+  apply (screeningQalyGain_neg_iff 0 0 π benefit harm).2
+  simpa using mul_pos (sub_pos.mpr h_π1) h_harm
 
 end CostEffectiveness
 
@@ -1186,8 +1186,7 @@ theorem minimum_sample_for_clinical_pgs
     -- false positive harm exceeds true positive benefit
     (h_poor_disc : sens * π * benefit < (1 - spec) * (1 - π) * harm) :
     screeningQalyGain sens spec π benefit harm < 0 := by
-  rw [screeningQalyGain_eq_formula]
-  linarith
+  exact (screeningQalyGain_neg_iff sens spec π benefit harm).2 h_poor_disc
 
 end Recommendations
 

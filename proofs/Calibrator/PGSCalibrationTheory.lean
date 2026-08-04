@@ -3084,6 +3084,50 @@ theorem screeningQalyGain_neg_iff
   rw [screeningQalyGain_eq_formula]
   constructor <;> intro h <;> linarith
 
+/-- **Break-even prevalence for a screening operating point.**  This is the prevalence at which
+weighted true-positive benefit exactly balances weighted false-positive harm. -/
+noncomputable def screeningBreakEvenPrevalence
+    (sens spec benefit harm : ℝ) : ℝ :=
+  (1 - spec) * harm / (sens * benefit + (1 - spec) * harm)
+
+/-- **Exact prevalence threshold for positive screening utility.**  Whenever the combined
+benefit/harm scale is positive, screening has positive QALY gain exactly above the break-even
+prevalence.  Sensitivity and specificity enter jointly: neither prevalence nor discrimination
+alone determines utility. -/
+theorem screeningQalyGain_pos_iff_prevalence_gt
+    (sens spec prevalence benefit harm : ℝ)
+    (h_scale : 0 < sens * benefit + (1 - spec) * harm) :
+    0 < screeningQalyGain sens spec prevalence benefit harm ↔
+      screeningBreakEvenPrevalence sens spec benefit harm < prevalence := by
+  rw [screeningQalyGain_pos_iff]
+  unfold screeningBreakEvenPrevalence
+  rw [div_lt_iff₀ h_scale]
+  constructor <;> intro h <;> nlinarith
+
+/-- At positive combined utility scale, screening is QALY-neutral exactly at its break-even
+prevalence. -/
+theorem screeningQalyGain_eq_zero_iff_prevalence_eq
+    (sens spec prevalence benefit harm : ℝ)
+    (h_scale : 0 < sens * benefit + (1 - spec) * harm) :
+    screeningQalyGain sens spec prevalence benefit harm = 0 ↔
+      prevalence = screeningBreakEvenPrevalence sens spec benefit harm := by
+  rw [screeningQalyGain_eq_zero_iff]
+  unfold screeningBreakEvenPrevalence
+  rw [eq_div_iff h_scale.ne']
+  constructor <;> intro h <;> nlinarith
+
+/-- At positive combined utility scale, screening has negative QALY gain exactly below its
+break-even prevalence. -/
+theorem screeningQalyGain_neg_iff_prevalence_lt
+    (sens spec prevalence benefit harm : ℝ)
+    (h_scale : 0 < sens * benefit + (1 - spec) * harm) :
+    screeningQalyGain sens spec prevalence benefit harm < 0 ↔
+      prevalence < screeningBreakEvenPrevalence sens spec benefit harm := by
+  rw [screeningQalyGain_neg_iff]
+  unfold screeningBreakEvenPrevalence
+  rw [lt_div_iff₀ h_scale]
+  constructor <;> intro h <;> nlinarith
+
 /-- Canonical decision-curve screening model: benefit is normalized to `1` and
     false-positive harm is the usual decision-curve odds weight `t / (1-t)`. -/
 noncomputable def decisionCurveScreeningModel
