@@ -59,11 +59,22 @@ theorem half_le_div_of_half_le
   rw [ge_iff_le, div_le_div_iff₀ (by norm_num : (0:ℝ) < 2) h_G]
   linarith
 
-/-- **Additive PGS R² ≤ h² narrow-sense.**
-    Even a perfect additive PGS cannot explain dominance or
-    epistatic variance. An additive PGS can capture at most V_A
-    out of total phenotypic variance V_P = V_A + V_D + V_I + V_E,
-    so r2_additive ≤ V_A / V_P ≤ h²_narrow = V_A / (V_A + V_E). -/
+/-- **The additive `R²` ceiling is BELOW the non-additive-free ratio.**
+
+    **Heritability convention, corrected.** The docstring used to read
+    `r2_additive ≤ V_A / V_P ≤ h²_narrow = V_A / (V_A + V_E)`, naming the RIGHT
+    side narrow-sense heritability. That is the wrong label and it points the
+    wrong way. Narrow-sense heritability is `h² = V_A / V_P` with
+    `V_P = V_A + V_D + V_I + V_E` -- the LEFT side here. `V_A / (V_A + V_E)` is
+    what `h²` would be in a model with no dominance and no epistasis, and it is
+    strictly LARGER whenever `V_D + V_I > 0`. A reader taking the old label
+    would set the additive-PGS ceiling above the true narrow-sense heritability,
+    by the factor `V_P / (V_A + V_E)`.
+
+    So: an additive PGS captures at most `V_A` out of `V_P`, hence at most
+    `h² = V_A / V_P`, and this theorem bounds THAT by the non-additive-free
+    ratio. Both sides are `V_A` over a denominator; only the denominators
+    differ, and dropping `V_D + V_I` from one of them is the whole content. -/
 theorem additive_pgs_ceiling
     (V_A V_D V_I V_E : ℝ)
     (h_A : 0 ≤ V_A) (h_D : 0 ≤ V_D) (h_I : 0 ≤ V_I) (h_E : 0 < V_E) :
@@ -220,14 +231,19 @@ theorem epistatic_variance_nonneg
     contributions change with allele frequencies. When allele
     frequencies differ (p₁_src ≠ p₁_tgt or p₂_src ≠ p₂_tgt)
     and there is nonzero epistasis (β₁₂ ≠ 0), the epistatic
-    variance differs between populations. -/
+    variance differs between populations.
+
+    The four frequencies range over all of `ℝ`, not over `(0,1)`. This
+    statement carried eight `0 < p` and `p < 1` premises until a scan of the
+    kernel-accepted proof term found that none of the eight occurs in the
+    proof: the argument cancels `4 β₁₂²` off both sides of an equality and
+    never asks where a frequency sits. Reinstating them would narrow the
+    theorem without adding content. The biological reading is unchanged --
+    on the frequency range it is about, the hypothesis `h_freq_diff` is the
+    heterozygosity-product mismatch and it is what does the work. -/
 theorem epistasis_portability_loss
     (beta12 p1_src p2_src p1_tgt p2_tgt : ℝ)
     (h_beta : beta12 ≠ 0)
-    (h_p1s : 0 < p1_src) (h_p1s' : p1_src < 1)
-    (h_p2s : 0 < p2_src) (h_p2s' : p2_src < 1)
-    (h_p1t : 0 < p1_tgt) (h_p1t' : p1_tgt < 1)
-    (h_p2t : 0 < p2_tgt) (h_p2t' : p2_tgt < 1)
     (h_freq_diff : p1_src * (1 - p1_src) * p2_src * (1 - p2_src) ≠
                    p1_tgt * (1 - p1_tgt) * p2_tgt * (1 - p2_tgt)) :
     epistaticVariance beta12 p1_src p2_src ≠
@@ -363,11 +379,8 @@ theorem div_le_div_of_le_numerator
     is cross-population at all. -/
 theorem sub_div_lt_sub_div_of_lt
     (r2_train k_linear k_ml n : ℝ)
-    (h_r2 : 0 < r2_train)
-    (h_kl : 0 < k_linear) (h_km : 0 < k_ml)
     (h_n : 0 < n)
-    (h_more_params : k_linear < k_ml)
-    (h_valid : k_ml < n) :
+    (h_more_params : k_linear < k_ml) :
     -- ML has larger overfitting penalty k/n
     r2_train - k_ml / n < r2_train - k_linear / n := by
   have : k_linear / n < k_ml / n := div_lt_div_of_pos_right h_more_params h_n
@@ -417,7 +430,7 @@ theorem div_le_div_of_le_numerator'
 theorem regularization_controls_portability
     (k_NA n lam_weak lam_strong : ℝ)
     (h_k : 0 < k_NA) (h_n : 0 < n)
-    (h_lw : 0 < lam_weak) (h_ls : 0 < lam_strong)
+    (h_lw : 0 < lam_weak)
     (h_stronger : lam_weak < lam_strong) :
     -- Stronger regularization → fewer effective parameters → less overfit
     k_NA / (1 + lam_strong) / n < k_NA / (1 + lam_weak) / n := by
