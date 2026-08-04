@@ -613,6 +613,43 @@ theorem stableSieveDimension_of_scaled
   field_simp
   ring
 
+/-- **Exact lower design threshold.** For positive conditioning exponent and genome length,
+resolving at least `r` stable coordinates is equivalent to having at least `exp (κ r)` units of
+independent data. -/
+theorem le_stableSieveDimension_iff
+    (kappa L r : ℝ) (hk : 0 < kappa) (hL : 0 < L) :
+    r ≤ stableSieveDimension kappa L ↔ Real.exp (kappa * r) ≤ L := by
+  unfold stableSieveDimension
+  constructor
+  · intro h
+    have hlog : kappa * r ≤ Real.log L := by
+      simpa [mul_comm] using (le_div_iff₀ hk).mp h
+    calc
+      Real.exp (kappa * r) ≤ Real.exp (Real.log L) := Real.exp_le_exp.mpr hlog
+      _ = L := Real.exp_log hL
+  · intro h
+    apply (le_div_iff₀ hk).2
+    apply Real.exp_le_exp.mp
+    simpa [Real.exp_log hL, mul_comm] using h
+
+/-- **Exact upper design threshold.** Under the same domain conditions, capping the stable
+dimension by `r` is equivalent to capping independent data by `exp (κ r)`. -/
+theorem stableSieveDimension_le_iff
+    (kappa L r : ℝ) (hk : 0 < kappa) (hL : 0 < L) :
+    stableSieveDimension kappa L ≤ r ↔ L ≤ Real.exp (kappa * r) := by
+  unfold stableSieveDimension
+  constructor
+  · intro h
+    have hlog : Real.log L ≤ kappa * r := by
+      simpa [mul_comm] using (div_le_iff₀ hk).mp h
+    calc
+      L = Real.exp (Real.log L) := (Real.exp_log hL).symm
+      _ ≤ Real.exp (kappa * r) := Real.exp_le_exp.mpr hlog
+  · intro h
+    apply (div_le_iff₀ hk).2
+    apply Real.exp_le_exp.mp
+    simpa [Real.exp_log hL, mul_comm] using h
+
 /-! ## Reference evaluations and junk-value boundaries -/
 
 /-- At zero cumulative coalescent time nothing is attenuated: every rung contributes one. -/
