@@ -353,7 +353,8 @@ noncomputable def causalPortabilityFromLocalFst {m : ℕ}
 retained and the total effect mass are empty sums. Lean returns `0`: no portability at all, which
 is what a score whose every effect fails to transfer also gives. A missing panel and a completely
 non-portable one are reported identically. Consumers must exclude it by hypothesis. -/
-theorem causalPortabilityFromLocalFst_empty_panel_is_junk (sourceSquaredEffect fstCausal : Fin 0 → ℝ) :
+theorem causalPortabilityFromLocalFst_empty_panel_is_junk
+    (sourceSquaredEffect fstCausal : Fin 0 → ℝ) :
     causalPortabilityFromLocalFst sourceSquaredEffect fstCausal = 0 := by
   unfold causalPortabilityFromLocalFst
   simp
