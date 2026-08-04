@@ -54,10 +54,10 @@ noncomputable def qst (V_between V_within : ℝ) : ℝ :=
 
 /-- **qst pinned at a reference point.** No theorem in the corpus evaluated this definition, so
 every body agreeing with it in sign and monotonicity was indistinguishable from it. At all
-arguments equal to `1 / 2` it is `6004799503160661 / 18014398509481984`, which fixes the
+arguments equal to `1 / 2` it is `1 / 3`, which fixes the
 coefficients a one-sided bound or an invariance leaves free. -/
 theorem qst_at_reference_point :
-    qst 1 / 2 1 / 2 = 6004799503160661 / 18014398509481984 := by
+    qst 1 / 2 1 / 2 = 1 / 3 := by
   unfold qst
   norm_num
 

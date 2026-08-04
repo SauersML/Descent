@@ -753,10 +753,10 @@ def ldWhiteningGain (decay : ℝ) : ℝ := (1 + decay ^ 2) / (1 - decay ^ 2)
 
 /-- **ldWhiteningGain pinned at a reference point.** No theorem in the corpus evaluated this
 definition, so every body agreeing with it in sign and monotonicity was indistinguishable from
-it. At all arguments equal to `1 / 2` it is `7505999378950827 / 4503599627370496`, which fixes
+it. At all arguments equal to `1 / 2` it is `5 / 3`, which fixes
 the coefficients a one-sided bound or an invariance leaves free. -/
 theorem ldWhiteningGain_at_reference_point :
-    ldWhiteningGain 1 / 2 = 7505999378950827 / 4503599627370496 := by
+    ldWhiteningGain 1 / 2 = 5 / 3 := by
   unfold ldWhiteningGain
   norm_num
 

@@ -4966,10 +4966,10 @@ noncomputable def alleleFreqCorrelation (fst varAncestral meanHetAncestral : ℝ
 
 /-- **alleleFreqCorrelation pinned at a reference point.** No theorem in the corpus evaluated
 this definition, so every body agreeing with it in sign and monotonicity was indistinguishable
-from it. At all arguments equal to `1 / 2` it is `6004799503160661 / 9007199254740992`, which
+from it. At all arguments equal to `1 / 2` it is `2 / 3`, which
 fixes the coefficients a one-sided bound or an invariance leaves free. -/
 theorem alleleFreqCorrelation_at_reference_point :
-    alleleFreqCorrelation 1 / 2 1 / 2 1 / 2 = 6004799503160661 / 9007199254740992 := by
+    alleleFreqCorrelation 1 / 2 1 / 2 1 / 2 = 2 / 3 := by
   unfold alleleFreqCorrelation
   norm_num
 

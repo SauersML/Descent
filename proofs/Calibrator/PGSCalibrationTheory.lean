@@ -2455,6 +2455,23 @@ theorem treatmentMargin_error_eq_componentwise_sum
   intro t _
   ring
 
+/-- **Two products and a subtraction, bounded factor by factor.**
+
+The per-time treatment-margin error is `xy + zw - v`, and bounding it took an eight-line
+`calc` -- rewrite as `(xy + zw) + (-v)`, apply the triangle inequality twice, then
+`abs_mul` -- written out wherever the shape occurred.  Nothing in that argument is about
+pathways, so none of it needs the pathway names it was written in. -/
+theorem abs_two_products_sub_le (x y z w v : ℝ) :
+    |x * y + z * w - v| ≤ |x| * |y| + |z| * |w| + |v| := by
+  calc |x * y + z * w - v|
+      ≤ |x * y + z * w| + |v| := by
+        simpa [sub_eq_add_neg, abs_neg] using abs_add_le (x * y + z * w) (-v)
+    _ ≤ |x * y| + |z * w| + |v| := by
+        have := abs_add_le (x * y) (z * w)
+        linarith
+    _ = |x| * |y| + |z| * |w| + |v| := by
+        rw [abs_mul, abs_mul]
+
 /-- **Componentwise calibration error bound for longitudinal treatment margin.**
     If the deployed pathway approximates the true censoring/eligibility weights,
     event probabilities, treatment-benefit heterogeneity, and treatment harm
