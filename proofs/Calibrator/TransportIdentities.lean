@@ -267,7 +267,7 @@ theorem covariance_smul_right (E : ExpFunctional Ω) (X Y : Ω → ℝ) (c : ℝ
     have h :
         (fun ω ↦ X ω * (c • Y) ω) = c • (fun ω ↦ X ω * Y ω) := by
       funext ω
-      simp [smul_eq_mul, mul_assoc, mul_left_comm]
+      simp [smul_eq_mul, mul_left_comm]
     rw [h, E.smul_eval]
   have hy : E (c • Y) = c * E Y := by
     rw [E.smul_eval]
@@ -281,7 +281,7 @@ theorem covariance_finset_sum_right
       = Finset.sum s (fun i ↦ covariance E X (Y i)) := by
   induction s using Finset.induction with
   | empty =>
-      simp [covariance_eq_expect_mul_sub_means, ExpFunctional.eval_zero]
+      simp [covariance_eq_expect_mul_sub_means]
   | @insert a s ha hs =>
       simp [Finset.sum_insert, ha, covariance_add_right, hs]
 
@@ -294,10 +294,12 @@ variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 def dot (x y : ι → ℝ) : ℝ := ∑ i, x i * y i
 
+omit [DecidableEq ι] in
 theorem dot_add_left (x y z : ι → ℝ) :
     dot (fun i ↦ x i + y i) z = dot x z + dot y z := by
   simp [dot, add_mul, Finset.sum_add_distrib]
 
+omit [DecidableEq ι] in
 theorem dot_sub_left (x y z : ι → ℝ) :
     dot (fun i ↦ x i - y i) z = dot x z - dot y z := by
   simp [dot, sub_eq_add_neg, add_mul, Finset.sum_add_distrib]
@@ -425,6 +427,7 @@ def optimalWeightsFromMoments
     (E : ExpFunctional Ω) (X : Ω → J → ℝ) (Y : Ω → ℝ) : J → ℝ :=
   sigmaInv.mulVec (crossCovVector E X Y)
 
+omit [DecidableEq J] in
 theorem matrix_mulVec_add (A : Matrix J J ℝ) (x y : J → ℝ) :
     A.mulVec (fun i ↦ x i + y i) = A.mulVec x + A.mulVec y := by
   ext j
@@ -446,8 +449,9 @@ theorem covariance_with_causal_signal
         apply Finset.sum_congr rfl
         intro i hi
         rw [covariance_smul_right]]
-  simp [dot, mul_comm]
+  simp [mul_comm]
 
+omit [Fintype J] [DecidableEq J] in
 theorem crossCovVector_decomposition
     (E : ExpFunctional Ω) (X : Ω → J → ℝ) (C : Ω → L → ℝ)
     (β : L → ℝ) (h : Ω → ℝ) :
@@ -459,6 +463,7 @@ theorem crossCovVector_decomposition
   rw [covariance_with_causal_signal]
   simp [Matrix.mulVec, dotProduct, dot]
 
+omit [DecidableEq J] in
 theorem optimalWeightsFromMoments_decomposition
     (sigmaInv : Matrix J J ℝ)
     (E : ExpFunctional Ω) (X : Ω → J → ℝ) (C : Ω → L → ℝ)
@@ -480,7 +485,7 @@ theorem secondMoment_quadratic_form
       (fun ω ↦ (dot u (X ω)) ^ 2)
         = ∑ i, ∑ j, (u i * u j) • (fun ω ↦ X ω i * X ω j) := by
     funext ω
-    simp [dot, pow_two, Finset.sum_mul_sum, smul_eq_mul, mul_assoc, mul_left_comm, mul_comm]
+    simp [dot, pow_two, Finset.sum_mul_sum, smul_eq_mul, mul_left_comm, mul_comm]
   rw [h_expand, ExpFunctional.eval_sum]
   rw [show (∑ i, E (∑ j, (u i * u j) • fun ω ↦ X ω i * X ω j))
         = ∑ i, ∑ j, E ((u i * u j) • fun ω ↦ X ω i * X ω j) by
@@ -511,6 +516,7 @@ theorem secondMoment_quadratic_form
           intro x hx
           ring
 
+omit [Fintype J] [DecidableEq J] in
 theorem secondMoment_eq_covariance_of_centered
     (E : ExpFunctional Ω) (X : Ω → J → ℝ)
     (hcentered : ∀ i, E (fun ω ↦ X ω i) = 0) :
@@ -551,7 +557,7 @@ theorem expected_coordinate_dot_eq_covariance_mulVec
       (fun ω ↦ X ω i * dot w (X ω))
         = ∑ j, (w j) • (fun ω ↦ X ω i * X ω j) := by
     funext ω
-    simp [dot, Finset.mul_sum, smul_eq_mul, mul_assoc, mul_left_comm, mul_comm]
+    simp [dot, Finset.mul_sum, smul_eq_mul, mul_left_comm, mul_comm]
   rw [h_expand, ExpFunctional.eval_sum]
   rw [show (∑ j, E ((w j) • fun ω ↦ X ω i * X ω j))
         = ∑ j, w j * E (fun ω ↦ X ω i * X ω j) by
@@ -652,7 +658,7 @@ theorem scalar_summary_factorization_of_kernel_inclusion
     ext θ
     have hAθ : A θ = 0 := by
       apply hker θ
-      simpa [hf]
+      simp [hf]
     simp [hf, hAθ]
   · have hnonzero : ∃ v : V, f v ≠ 0 := by
       by_contra hnone
@@ -709,6 +715,7 @@ def transportedCovariance (w : J → ℝ) (K : J → L → ℝ) (β : L → ℝ)
 def locusTerm (w : J → ℝ) (K : J → L → ℝ) (β : L → ℝ) (l : L) : ℝ :=
   (∑ j, w j * K j l) * β l
 
+omit [DecidableEq J] [DecidableEq L] in
 theorem transported_covariance_decomposes
     (w : J → ℝ) (K : J → L → ℝ) (β : L → ℝ) :
     transportedCovariance w K β = ∑ l, locusTerm w K β l := by
@@ -719,6 +726,7 @@ theorem transported_covariance_decomposes
   simpa [mul_assoc, mul_left_comm, mul_comm] using
     (Finset.sum_mul (s := Finset.univ) (f := fun j ↦ w j * K j l) (a := β l)).symm
 
+omit [DecidableEq L] in
 theorem normalized_transport_as_weighted_average
     (aT τ : L → ℝ) :
     (∑ l, aT l * τ l) / (∑ l, aT l)
@@ -754,6 +762,7 @@ theorem transportFactor_zero_target_is_junk {L : Type*} (aQ : L → ℝ) (l : L)
   unfold transportFactor
   simp
 
+omit [DecidableEq L] in
 theorem normalized_transport_from_factors
     (aQ aT : L → ℝ)
     (hbase : ∀ l, aT l ≠ 0) :
@@ -766,6 +775,7 @@ theorem normalized_transport_from_factors
   intro l hl
   field_simp [hbase l]
 
+omit [DecidableEq L] in
 theorem normalized_transport_constant_factor
     (aT τ : L → ℝ) (φ : ℝ)
     (hden : ∑ m, aT m ≠ 0)
@@ -1016,7 +1026,7 @@ theorem prevalence_mul_recall (c : ConfusionMatrix) :
   by_cases h : c.tp + c.fn = 0
   · have htp : c.tp = 0 := by
       linarith [c.tp_nonneg, c.fn_nonneg, h]
-    simp [h, htp]
+    simp [htp]
   · field_simp [h]
 
 theorem one_sub_prevalence_mul_fpr (c : ConfusionMatrix) :
@@ -1026,7 +1036,7 @@ theorem one_sub_prevalence_mul_fpr (c : ConfusionMatrix) :
   by_cases h : c.fp + c.tn = 0
   · have hfp : c.fp = 0 := by
       linarith [c.fp_nonneg, c.tn_nonneg, h]
-    simp [h, hfp]
+    simp [hfp]
   · field_simp [h]
 
 theorem precision_eq_prevalence_recall_fpr (c : ConfusionMatrix) :
