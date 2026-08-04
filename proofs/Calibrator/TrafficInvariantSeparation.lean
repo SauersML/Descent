@@ -3740,24 +3740,6 @@ theorem finiteOutlierCoordinate_card (population : ℕ) :
     Fintype.card (FiniteOutlierCoordinate population) = population + 1 := by
   simp [FiniteOutlierCoordinate]
 
-/-- A fixed numerator divided by the growing spectral dimension `p+1`
-vanishes.  Both moment and arbitrary-observable outlier corrections factor
-through this single limit theorem. -/
-theorem constant_div_natSucc_tendsto_zero (constant : ℝ) :
-    Filter.Tendsto
-      (fun population : ℕ ↦ constant / (((population + 1 : ℕ) : ℝ)))
-      Filter.atTop (nhds 0) := by
-  have hdenominator : Filter.Tendsto
-      (fun population : ℕ ↦ ((population + 1 : ℕ) : ℝ))
-      Filter.atTop Filter.atTop := by
-    convert (tendsto_natCast_atTop_atTop (R := ℝ)).comp
-      (Filter.tendsto_add_atTop_nat 1) using 1
-  have hinverse : Filter.Tendsto
-      (fun population : ℕ ↦ (((population + 1 : ℕ) : ℝ))⁻¹)
-      Filter.atTop (nhds 0) :=
-    hdenominator.inv_tendsto_atTop
-  simpa [div_eq_mul_inv] using hinverse.const_mul constant
-
 /-- The exact normalized-moment correction caused by the single outlier. -/
 theorem normalizedDiagonalSpectralMoment_outlier_sub_bulk
     (baseline spikeStrength : ℝ) (population edges : ℕ) :
@@ -3783,9 +3765,10 @@ theorem normalizedDiagonalSpectralMoment_outlier_sub_bulk_tendsto_zero
           normalizedDiagonalSpectralMoment population edges
             (finiteBulkDiagonal baseline population))
       Filter.atTop (nhds 0) := by
-  simpa only [normalizedDiagonalSpectralMoment_outlier_sub_bulk] using
-    constant_div_natSucc_tendsto_zero
-      ((baseline + spikeStrength) ^ edges - baseline ^ edges)
+  simpa only [normalizedDiagonalSpectralMoment_outlier_sub_bulk, Function.comp_def] using
+    (tendsto_const_div_atTop_nhds_zero_nat
+        ((baseline + spikeStrength) ^ edges - baseline ^ edges)).comp
+      (Filter.tendsto_add_atTop_nat 1)
 
 /-- The exact empirical-average correction for any fixed spectral test
 function. -/
@@ -3814,9 +3797,10 @@ theorem normalizedDiagonalSpectralObservable_outlier_sub_bulk_tendsto_zero
           normalizedDiagonalSpectralObservable population observable
             (finiteBulkDiagonal baseline population))
       Filter.atTop (nhds 0) := by
-  simpa only [normalizedDiagonalSpectralObservable_outlier_sub_bulk] using
-    constant_div_natSucc_tendsto_zero
-      (observable (baseline + spikeStrength) - observable baseline)
+  simpa only [normalizedDiagonalSpectralObservable_outlier_sub_bulk, Function.comp_def] using
+    (tendsto_const_div_atTop_nhds_zero_nat
+        (observable (baseline + spikeStrength) - observable baseline)).comp
+      (Filter.tendsto_add_atTop_nat 1)
 
 /-- A value is the maximum of a finite diagonal spectrum when it upper-bounds
 every coordinate and is attained. -/

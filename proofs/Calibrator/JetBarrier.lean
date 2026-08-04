@@ -304,13 +304,6 @@ theorem one_sub_exp_neg_pos {h : ℝ} (hh : 0 < h) : 0 < 1 - Real.exp (-h) := by
   rw [Real.exp_zero] at hlt
   linarith
 
-/-- The strict inequality `1 - h < exp (-h)` for `h > 0`, from strict convexity of
-`exp`. This is the entire analytic content of the inflation factor. -/
-theorem one_sub_lt_exp_neg {h : ℝ} (hh : 0 < h) : 1 - h < Real.exp (-h) := by
-  have hne : (-h : ℝ) ≠ 0 := by linarith
-  have := Real.add_one_lt_exp hne
-  linarith
-
 /-- **The lattice inflation factor is strictly greater than one.**
 
 This is the quantitative heart of Theorem 1b: a lattice law with span `h > 0`, matched
@@ -321,7 +314,7 @@ from the Gaussian. -/
 theorem one_lt_latticeInflation {h : ℝ} (hh : 0 < h) : 1 < latticeInflation h := by
   have hden : 0 < 1 - Real.exp (-h) := one_sub_exp_neg_pos hh
   have hlt : 1 - Real.exp (-h) < h := by
-    have := one_sub_lt_exp_neg hh
+    have := Real.one_sub_lt_exp_neg hh.ne'
     linarith
   unfold latticeInflation
   rw [lt_div_iff₀ hden]

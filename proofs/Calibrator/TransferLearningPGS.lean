@@ -1944,42 +1944,26 @@ theorem metaLearnedTransferGapSq_eq_sourcePopulationMeanEffectGapSq
 /-- Dot product distributes over addition in the left argument. -/
 theorem dotProduct_add_left {p : ℕ}
     (u v w : Fin p → ℝ) :
-    dotProduct (fun i ↦ u i + v i) w = dotProduct u w + dotProduct v w := by
-  simp [dotProduct, add_mul, Finset.sum_add_distrib]
+    dotProduct (fun i ↦ u i + v i) w = dotProduct u w + dotProduct v w :=
+  add_dotProduct u v w
 
 /-- Dot product distributes over addition in the right argument. -/
 theorem dotProduct_add_right {p : ℕ}
     (u v w : Fin p → ℝ) :
-    dotProduct u (fun i ↦ v i + w i) = dotProduct u v + dotProduct u w := by
-  simp [dotProduct, mul_add, Finset.sum_add_distrib]
-
-/-- Dot product is symmetric over `ℝ`. -/
-theorem dotProduct_comm {p : ℕ}
-    (u v : Fin p → ℝ) :
-    dotProduct u v = dotProduct v u := by
-  simp [dotProduct, mul_comm]
+    dotProduct u (fun i ↦ v i + w i) = dotProduct u v + dotProduct u w :=
+  dotProduct_add u v w
 
 /-- Pulling a scalar out of the left dot-product argument. -/
 theorem dotProduct_smul_left {p : ℕ}
     (c : ℝ) (u v : Fin p → ℝ) :
-    dotProduct (fun i ↦ c * u i) v = c * dotProduct u v := by
-  unfold dotProduct
-  rw [show (∑ i, (c * u i) * v i) = ∑ i, c * (u i * v i) by
-        apply Finset.sum_congr rfl
-        intro i hi
-        ring]
-  rw [← Finset.mul_sum]
+    dotProduct (fun i ↦ c * u i) v = c * dotProduct u v :=
+  smul_dotProduct c u v
 
 /-- Pulling a scalar out of the right dot-product argument. -/
 theorem dotProduct_smul_right {p : ℕ}
     (u v : Fin p → ℝ) (c : ℝ) :
-    dotProduct u (fun i ↦ c * v i) = c * dotProduct u v := by
-  unfold dotProduct
-  rw [show (∑ i, u i * (c * v i)) = ∑ i, c * (u i * v i) by
-        apply Finset.sum_congr rfl
-        intro i hi
-        ring]
-  rw [← Finset.mul_sum]
+    dotProduct u (fun i ↦ c * v i) = c * dotProduct u v :=
+  dotProduct_smul c u v
 
 /-- Dot product of a finite sum of vectors with a fixed vector. -/
 theorem dotProduct_sum_left {α : Type*} [DecidableEq α] {p : ℕ}
