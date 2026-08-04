@@ -266,6 +266,31 @@ theorem taggedDriftR2RatioCorrected_ge_retention (V_A V_E fst shared_ld : ℝ)
   rw [le_div_iff₀ hden]
   nlinarith [mul_nonneg hk0.le (mul_nonneg hfst0 hVA.le)]
 
+/-- The corrected target-to-source accuracy ratio cannot exceed the fraction of tagging that
+survives. Drift can only attenuate the tagging channel; it cannot amplify it. -/
+theorem taggedDriftR2RatioCorrected_le_sharedLD (V_A V_E fst shared_ld : ℝ)
+    (hVA : 0 < V_A) (hVE : 0 < V_E)
+    (hfst0 : 0 ≤ fst) (hfst1 : fst < 1) (hs0 : 0 ≤ shared_ld) :
+    taggedDriftR2RatioCorrected V_A V_E fst shared_ld ≤ shared_ld := by
+  have h1f : 0 < 1 - fst := by linarith
+  have hden : 0 < (1 - fst) * V_A + V_E := add_pos (mul_pos h1f hVA) hVE
+  unfold taggedDriftR2RatioCorrected
+  rw [div_le_iff₀ hden]
+  nlinarith [mul_nonneg hs0 (mul_nonneg hfst0 hVE.le)]
+
+/-- **Exact tagging sandwich.** In the corrected drift-plus-tagging model, portability lies
+between bare joint retention `(1-F_ST)·shared_ld` and `shared_ld`. This isolates the full range
+that allele-frequency drift can move an otherwise fixed tagging channel. -/
+theorem taggedDriftR2RatioCorrected_sandwich (V_A V_E fst shared_ld : ℝ)
+    (hVA : 0 < V_A) (hVE : 0 < V_E)
+    (hfst0 : 0 ≤ fst) (hfst1 : fst < 1) (hs0 : 0 < shared_ld) :
+    (1 - fst) * shared_ld ≤ taggedDriftR2RatioCorrected V_A V_E fst shared_ld ∧
+      taggedDriftR2RatioCorrected V_A V_E fst shared_ld ≤ shared_ld :=
+  ⟨taggedDriftR2RatioCorrected_ge_retention V_A V_E fst shared_ld
+      hVA hVE hfst0 hfst1 hs0,
+    taggedDriftR2RatioCorrected_le_sharedLD V_A V_E fst shared_ld
+      hVA hVE hfst0 hfst1 hs0.le⟩
+
 /-- **A measured accuracy ratio caps how much tagging can have survived.**
 
 If the observed target-to-source `R²` ratio is `observed`, then preserved
@@ -289,6 +314,22 @@ theorem le_div_one_sub_of_ratio_eq
   rw [h_match] at hge
   rw [le_div_iff₀ h1f]
   linarith [hge]
+
+/-- **Observed portability identifies an interval for preserved tagging.** If the corrected model
+matches the observed accuracy ratio, then tagging survival is at least the observation and at most
+`observed/(1-F_ST)`. The interval collapses as drift vanishes. -/
+theorem sharedLD_mem_observed_interval_of_ratio_eq
+    (V_A V_E fst shared_ld observed : ℝ)
+    (hVA : 0 < V_A) (hVE : 0 < V_E)
+    (hfst0 : 0 ≤ fst) (hfst1 : fst < 1) (hs0 : 0 < shared_ld)
+    (h_match : taggedDriftR2RatioCorrected V_A V_E fst shared_ld = observed) :
+    observed ≤ shared_ld ∧ shared_ld ≤ observed / (1 - fst) := by
+  constructor
+  · rw [← h_match]
+    exact taggedDriftR2RatioCorrected_le_sharedLD V_A V_E fst shared_ld
+      hVA hVE hfst0 hfst1 hs0.le
+  · exact le_div_one_sub_of_ratio_eq V_A V_E fst shared_ld observed
+      hVA hVE hfst0 hfst1 hs0 h_match
 
 end AttributionToTagging
 
