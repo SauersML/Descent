@@ -2134,6 +2134,33 @@ theorem selfSimilar_alpha_lt_one (ν : Measure ℝ) [IsFiniteMeasure ν]
   rw [charFun_zero] at hz0
   exact absurd (Complex.ofReal_eq_zero.mp hz0) (ne_of_gt hmass)
 
+open MeasureTheory ProbabilityTheory Complex in
+/-- Scaling a measure scales its characteristic function. -/
+theorem charFun_smul_measure (μ : Measure ℝ) (c : ENNReal) (t : ℝ) :
+    charFun (c • μ) t = ((c.toReal : ℝ) : ℂ) * charFun μ t := by
+  simp only [charFun_apply_real]
+  rw [MeasureTheory.integral_smul_measure, Complex.real_smul]
+
+open MeasureTheory ProbabilityTheory Complex in
+/-- **The cdf of a Gaussian is the standard one at the standardised argument.**
+
+`cdf_gaussianReal_zero_mean` does the centred case, which is pure change of variable. The mean is
+a translation, and translating the half-line is the whole of the general case. -/
+theorem cdf_gaussianReal_eq_Phi (m : ℝ) (v : NNReal) (hv : v ≠ 0) (x : ℝ) :
+    ((gaussianReal m v) (Set.Iic x)).toReal = Phi ((x - m) / Real.sqrt (v : ℝ)) := by
+  have hmap : (gaussianReal 0 v).map (fun y ↦ y + m) = gaussianReal m v := by
+    have h := gaussianReal_map_add_const (μ := (0 : ℝ)) (v := v) m
+    rwa [zero_add] at h
+  have hpre : (fun y : ℝ ↦ y + m) ⁻¹' Set.Iic x = Set.Iic (x - m) := by
+    ext y
+    simp [Set.mem_Iic, le_sub_iff_add_le]
+  have hshift : (gaussianReal m v) (Set.Iic x) = (gaussianReal 0 v) (Set.Iic (x - m)) := by
+    rw [← hmap, Measure.map_apply (by fun_prop) measurableSet_Iic, hpre]
+  rw [hshift]
+  have hcdf := cdf_gaussianReal_zero_mean v hv (x - m)
+  rw [ProbabilityTheory.cdf_eq_real] at hcdf
+  simpa [MeasureTheory.Measure.real] using hcdf
+
 open MeasureTheory ProbabilityTheory in
 /-- **Necessity: no other bounded link shape survives.** A strictly increasing bounded link whose
 two-parameter family is closed under Gaussian averaging is a positive vertical affine transform
