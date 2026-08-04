@@ -212,7 +212,9 @@ above it, the variance is carried by values too large ever to be witnessed among
 samples and the observed sum is empty. -/
 noncomputable def criticalDegree (N c : ℝ) : ℝ := Real.log N / c
 
-/-- **criticalDegree at zero c, named.** A zero coupling constant admits no condensation and the critical degree diverges. Lean returns `0`, reporting that condensation begins at the empty graph. Consumers must require `c ≠ 0`. -/
+/-- **criticalDegree at zero c, named.** A zero coupling constant admits no condensation and the
+critical degree diverges. Lean returns `0`, reporting that condensation begins at the empty graph.
+Consumers must require `c ≠ 0`. -/
 theorem criticalDegree_zero_c_is_junk (N : ℝ) :
     criticalDegree N 0 = 0 := by
   unfold criticalDegree

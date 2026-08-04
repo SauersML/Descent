@@ -45,6 +45,17 @@ section HeritabilityDefinitions
 noncomputable def narrowSenseH2 (V_A V_D V_I V_E : ℝ) : ℝ :=
   V_A / (V_A + V_D + V_I + V_E)
 
+/-- **narrowSenseH2 where its denominator vanishes, named.** The guard `V_A + V_D + V_I + V_E` is
+zero at `V_A = 0`, `V_D = 0`, `V_I = 0`, `V_E = 0`. A phenotype with no variance of any kind has
+no heritability to report; the value returned reads as a trait with no genetic basis. Lean
+returns `0` there rather than the value the modelled quantity takes, and no type error marks the
+point. Consumers must require `V_A + V_D + V_I + V_E ≠ 0`. -/
+theorem narrowSenseH2_at_va0vd0vi0ve0_is_junk :
+    narrowSenseH2 0 0 0 0 = 0 := by
+  unfold narrowSenseH2
+  norm_num
+  try ring
+
 /-- Narrow-sense h² is in [0, 1] for nonneg components. -/
 theorem narrow_h2_in_unit (V_A V_D V_I V_E : ℝ)
     (hA : 0 ≤ V_A) (hD : 0 ≤ V_D) (hI : 0 ≤ V_I) (hE : 0 ≤ V_E)
@@ -62,7 +73,9 @@ theorem narrow_h2_in_unit (V_A V_D V_I V_E : ℝ)
 noncomputable def snpH2 (V_A_tagged V_P : ℝ) : ℝ :=
   V_A_tagged / V_P
 
-/-- **snpH2 at zero V_P, named.** A trait with no phenotypic variance has no heritability to estimate. Lean returns `0`, reporting a trait with no genetic basis rather than a trait with no variance at all. Consumers must require `V_P ≠ 0`. -/
+/-- **snpH2 at zero V_P, named.** A trait with no phenotypic variance has no heritability to
+estimate. Lean returns `0`, reporting a trait with no genetic basis rather than a trait with no
+variance at all. Consumers must require `V_P ≠ 0`. -/
 theorem snpH2_zero_vp_is_junk (V_A_tagged : ℝ) :
     snpH2 V_A_tagged 0 = 0 := by
   unfold snpH2
@@ -464,7 +477,10 @@ noncomputable def liabilityScaleH2
     (h2_observed prevalence z_height : ℝ) : ℝ :=
   h2_observed * prevalence * (1 - prevalence) / z_height ^ 2
 
-/-- **liabilityScaleH2 at zero z_height, named.** A zero threshold height makes the observed-to-liability conversion undefined. Lean returns `0`, reporting no heritability on the liability scale for any observed-scale estimate whatsoever. Consumers must require `z_height ≠ 0`. -/
+/-- **liabilityScaleH2 at zero z_height, named.** A zero threshold height makes the
+observed-to-liability conversion undefined. Lean returns `0`, reporting no heritability on the
+liability scale for any observed-scale estimate whatsoever. Consumers must require
+`z_height ≠ 0`. -/
 theorem liabilityScaleH2_zero_zheight_is_junk (h2_observed prevalence : ℝ) :
     liabilityScaleH2 h2_observed prevalence 0 = 0 := by
   unfold liabilityScaleH2

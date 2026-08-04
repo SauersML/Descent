@@ -607,6 +607,14 @@ noncomputable def haplotypeEffectVarianceOLS
     (σ2 n freq : ℝ) : ℝ :=
   σ2 / (n * freq * (1 - freq))
 
+/-- **haplotypeEffectVarianceOLS at zero n, named.** The same failure at zero sample size, and
+again in the direction that certifies rather than warns: no data yields zero estimation variance.
+Consumers must require `n ≠ 0`. -/
+theorem haplotypeEffectVarianceOLS_zero_n_is_junk (σ2 : ℝ) (freq : ℝ) :
+    haplotypeEffectVarianceOLS σ2 0 freq = 0 := by
+  unfold haplotypeEffectVarianceOLS
+  simp
+
 /-- **But haplotype PGS can overfit in training population.**
 
     Rare haplotypes have fewer observed carriers, so their effect estimates are noisier, and
@@ -833,6 +841,18 @@ theorem la_deconvolution_improves_pgs
     (`proofs/validation/empirical/popgen_diff2/`). -/
 noncomputable def expectedTractLength (g admixtureFraction : ℝ) : ℝ :=
   1 / (g * (1 - admixtureFraction))
+
+/-- **The expected tract length at unit admixture fraction, named.** An admixture fraction of one
+means every lineage comes from the same source, so ancestry never switches and tracts are
+unbounded. The divisor `g * (1 - admixtureFraction)` is zero and Lean returns `0`: tracts of zero
+length, the shortest possible, for the population with no ancestry breakpoints at all. Tract
+length is what dates an admixture event, so this branch dates an unadmixed population as
+infinitely old rather than reporting that the question does not apply. Consumers must require
+`admixtureFraction ≠ 1`. -/
+theorem expectedTractLength_unit_admixture_is_junk (g : ℝ) :
+    expectedTractLength g 1 = 0 := by
+  unfold expectedTractLength
+  simp
 
 /-- Tracts get shorter with more generations, at fixed admixture fraction. -/
 theorem tract_length_shortens_with_time (g₁ g₂ admixtureFraction : ℝ)

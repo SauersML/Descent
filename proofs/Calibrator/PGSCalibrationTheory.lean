@@ -286,6 +286,26 @@ end CalibrationDefinitions
 noncomputable def prevalenceLogit (pi : ℝ) : ℝ :=
   Real.log (pi / (1 - pi))
 
+/-- **The prevalence logit at zero prevalence, named.** A disease that never occurs has log-odds
+of minus infinity. The ratio `pi / (1 - pi)` is zero, `Real.log 0` is junk-zero, and the logit
+comes back as `0` -- which is the logit of prevalence ONE HALF. A never-occurring outcome and a
+coin flip are assigned the same log-odds, and every calibration-in-the-large shift computed as a
+difference of logits inherits it. Consumers must require `0 < pi`. -/
+theorem prevalenceLogit_zero_prevalence_is_junk :
+    prevalenceLogit 0 = 0 := by
+  unfold prevalenceLogit
+  simp
+
+/-- **The prevalence logit at unit prevalence, named.** The other end fails to the same value by
+a different route: `1 - pi` is zero, the ratio is junk-zero, and `Real.log 0` is junk-zero again.
+So a universal outcome and a never-occurring one are BOTH reported at the log-odds of a coin
+flip, and are indistinguishable from each other as well as from the middle. Consumers must
+require `pi < 1`. -/
+theorem prevalenceLogit_unit_prevalence_is_junk :
+    prevalenceLogit 1 = 0 := by
+  unfold prevalenceLogit
+  simp
+
 /-- The logit is zero exactly at even odds. -/
 theorem prevalenceLogit_half : prevalenceLogit (1 / 2) = 0 := by
   unfold prevalenceLogit; norm_num
@@ -1794,6 +1814,15 @@ noncomputable def requiredEventsForRecalibration
     (nParams infoPerEvent targetTraceMSE : ℝ) : ℝ :=
   nParams / (infoPerEvent * targetTraceMSE)
 
+/-- **requiredEventsForRecalibration at zero infoPerEvent, named.** With no information per event,
+no number of events recalibrates the model. Lean returns `0`, reporting that recalibration needs no
+events at all. Consumers must require `infoPerEvent ≠ 0`. -/
+theorem requiredEventsForRecalibration_zero_infoperevent_is_junk
+    (nParams targetTraceMSE : ℝ) :
+    requiredEventsForRecalibration nParams 0 targetTraceMSE = 0 := by
+  unfold requiredEventsForRecalibration
+  simp
+
 /-- **Sample size needed for recalibration.**
     Under the orthogonal Fisher trace-MSE model, achieving target calibration
     precision `τ` is equivalent to having at least
@@ -1859,6 +1888,16 @@ theorem required_events_decrease_with_event_information
 noncomputable def requiredTargetCohortSizeForRecalibration
     (nParams prevalence infoPerEvent targetTraceMSE : ℝ) : ℝ :=
   requiredEventsForRecalibration nParams infoPerEvent targetTraceMSE / prevalence
+
+/-- **requiredTargetCohortSizeForRecalibration at zero prevalence, named.** At zero prevalence no
+cohort of any size yields events, so the required size diverges. Lean returns `0`: recalibration
+is free in a population where the outcome never occurs. Consumers must require `prevalence ≠ 0`.
+-/
+theorem requiredTargetCohortSizeForRecalibration_zero_prevalence_is_junk
+    (nParams infoPerEvent targetTraceMSE : ℝ) :
+    requiredTargetCohortSizeForRecalibration nParams 0 infoPerEvent targetTraceMSE = 0 := by
+  unfold requiredTargetCohortSizeForRecalibration
+  simp
 
 /-- **Exact labeled-cohort threshold for target recalibration.**
     If a fraction `π` of target individuals are events, then `n = n_events / π`

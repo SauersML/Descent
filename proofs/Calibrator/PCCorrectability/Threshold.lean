@@ -27,7 +27,10 @@ size `n`.
     transposed body cannot ride along. -/
 noncomputable def effectiveSubgroupSize (n m : ℝ) : ℝ := m * (n - m) / n
 
-/-- **effectiveSubgroupSize at zero n, named.** An empty cohort has no effective subgroup size and the quantity is undefined. Lean returns `0`, which is also what a genuinely balanced split of an empty design would give, so the degenerate case is not distinguishable. Consumers must require `n ≠ 0`. -/
+/-- **effectiveSubgroupSize at zero n, named.** An empty cohort has no effective subgroup size and
+the quantity is undefined. Lean returns `0`, which is also what a genuinely balanced split of an
+empty design would give, so the degenerate case is not distinguishable. Consumers must require
+`n ≠ 0`. -/
 theorem effectiveSubgroupSize_zero_n_is_junk (m : ℝ) :
     effectiveSubgroupSize 0 m = 0 := by
   unfold effectiveSubgroupSize

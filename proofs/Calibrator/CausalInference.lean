@@ -190,6 +190,15 @@ theorem indirect_eq_total_sub_direct_of_sum
 noncomputable def effectShare (indirect_effect total_effect : ℝ) : ℝ :=
   indirect_effect / total_effect
 
+/-- **effectShare at zero total_effect, named.** A total effect of zero leaves no denominator for
+the indirect share -- mediation is undefined when nothing is mediated. Lean returns `0`, reporting
+a purely direct effect, which is the same value a genuinely unmediated pathway produces.
+Consumers must require `total_effect ≠ 0`. -/
+theorem effectShare_zero_totaleffect_is_junk (indirect_effect : ℝ) :
+    effectShare indirect_effect 0 = 0 := by
+  unfold effectShare
+  simp
+
 /-- **The share and the proportional reduction are one ratio, read from the two ends.**
 
 `DGP.r2FromMSE mse varY` is `1 - mse / varY`, and `effectShare mse varY` is that same
@@ -446,6 +455,14 @@ theorem r2_increments_strictAnti_in_signal
 noncomputable def costEffectiveness (improvement cost : ℝ) : ℝ :=
   improvement / cost
 
+/-- **costEffectiveness at zero cost, named.** A free intervention has unbounded
+cost-effectiveness. Lean returns `0`, the WORST possible ratio, for the intervention that should
+rank first. Consumers must require `cost ≠ 0`. -/
+theorem costEffectiveness_zero_cost_is_junk (improvement : ℝ) :
+    costEffectiveness improvement 0 = 0 := by
+  unfold costEffectiveness
+  simp
+
 /-- **Cost-effectiveness does not depend on the currency.** Measuring improvement and cost in
 units `t` times smaller leaves the ratio unchanged, which is what makes it a rate rather than a
 margin. -/
@@ -494,6 +511,19 @@ section SensitivityAnalysis
     explain away the observed portability difference. -/
 noncomputable def eValue (rr : ℝ) : ℝ :=
   rr + Real.sqrt (rr * (rr - 1))
+
+/-- **The E-value below unit risk ratio, named.** The formula is derived for `rr ≥ 1`; below one
+the radicand `rr * (rr - 1)` is negative, `Real.sqrt` is junk-zero, and the E-value collapses to
+the risk ratio itself. An E-value is by construction at least one -- it is the minimum confounding
+strength that would explain the association away -- so this branch returns a value that cannot
+occur, and returns it as an ordinary number rather than as a domain error. Consumers must require
+`1 ≤ rr`. -/
+theorem eValue_below_unit_risk_ratio_is_junk :
+    eValue (1 / 2) = 1 / 2 := by
+  unfold eValue
+  have h : (1 : ℝ) / 2 * ((1 : ℝ) / 2 - 1) ≤ 0 := by norm_num
+  rw [Real.sqrt_eq_zero_of_nonpos h]
+  norm_num
 
 /-- E-value ≥ 1 for RR ≥ 1. -/
 theorem e_value_ge_one (rr : ℝ) (h_rr : 1 ≤ rr) :

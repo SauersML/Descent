@@ -230,6 +230,16 @@ Measured in `proofs/validation/empirical/drift_diff/`. Use `taggedDriftR2RatioCo
 noncomputable def taggedDriftR2RatioCorrected (V_A V_E fst shared_ld : ℝ) : ℝ :=
   (1 - fst) * shared_ld * (V_A + V_E) / ((1 - fst) * V_A + V_E)
 
+/-- **taggedDriftR2RatioCorrected where its denominator vanishes, named.** The guard `(1 - fst) *
+V_A + V_E` is zero at `V_A = 0`, `V_E = 0`, `fst = 0`. Lean returns `0` there rather than the
+value the modelled quantity takes, and no type error marks the point. Consumers must require `(1
+- fst) * V_A + V_E ≠ 0`. -/
+theorem taggedDriftR2RatioCorrected_at_va0ve0fst0_is_junk (shared_ld : ℝ) :
+    taggedDriftR2RatioCorrected 0 0 0 shared_ld = 0 := by
+  unfold taggedDriftR2RatioCorrected
+  norm_num
+  try ring
+
 /-- The accuracy ratio is at least the product of the two retention channels.
 Same computation as the neutral case, with `1 - F_ST` replaced by
 `(1 - F_ST) * shared_ld`. The drift channel divides a phenotypic variance

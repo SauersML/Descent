@@ -267,7 +267,7 @@ its own; `threeCycleCrossFeatureArrow_swap` is an antisymmetry, which fixes the 
 the normalisation, since twice this body is equally antisymmetric. On constant features the
 forward cross moment is one, so the three terms are averaged rather than summed. -/
 theorem threeCycleForwardCrossMoment_const :
-    threeCycleForwardCrossMoment (fun _ => 1) (fun _ => 1) = 1 := by
+    threeCycleForwardCrossMoment (fun _ ↦ 1) (fun _ ↦ 1) = 1 := by
   unfold threeCycleForwardCrossMoment
   norm_num
 

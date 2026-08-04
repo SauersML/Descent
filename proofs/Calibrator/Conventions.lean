@@ -269,6 +269,17 @@ saying it meant.
 noncomputable def hudsonFst (p₁ p₂ : ℝ) : ℝ :=
   (p₁ - p₂) ^ 2 / (p₁ * (1 - p₂) + p₂ * (1 - p₁))
 
+/-- **hudsonFst where its denominator vanishes, named.** The guard `p₁ * (1 - p₂) + p₂ * (1 - p₁)`
+is zero at `p₁ = 0`, `p₂ = 0`. Two populations both fixed for the reference allele have no
+polymorphism to partition. Lean returns `0` there rather than the value the modelled quantity
+takes, and no type error marks the point. Consumers must require `p₁ * (1 - p₂) + p₂ * (1 - p₁)
+≠ 0`. -/
+theorem hudsonFst_at_p0p0_is_junk :
+    hudsonFst 0 0 = 0 := by
+  unfold hudsonFst
+  norm_num
+  try ring
+
 /-- **Hudson's `F_ST` does not care which population is called first.** Both the squared
 frequency difference and the denominator `p₁ + p₂ - 2p₁p₂` are symmetric, so the statistic is
 too. A body that broke this would be measuring a directed quantity under a symmetric name. -/
@@ -995,6 +1006,15 @@ theorem discreteRecombinationSurvival_eq_geometricDecay (r : ℝ) (t : ℕ) :
 from coalescence times, `R²` from a mean squared error, and residual efficacy
 are one map. -/
 noncomputable def oneMinusRatio (a b : ℝ) : ℝ := 1 - a / b
+
+/-- **The complementary ratio at a zero denominator, named.** With `b = 0` the ratio is undefined
+and so is its complement. Lean returns `1`, the value that means "`a` is entirely accounted for" --
+the strongest possible claim, produced by the case where nothing is known at all. Consumers must
+require `b ≠ 0`. -/
+theorem oneMinusRatio_zero_denominator_is_junk (a : ℝ) :
+    oneMinusRatio a 0 = 1 := by
+  unfold oneMinusRatio
+  simp
 
 theorem fstFromHetRatio_eq_oneMinusRatio (H H₀ : ℝ) :
     fstFromHetRatio H H₀ = oneMinusRatio H H₀ := by

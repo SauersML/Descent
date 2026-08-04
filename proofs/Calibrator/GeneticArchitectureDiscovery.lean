@@ -349,6 +349,15 @@ noncomputable def olsEffectEstimationVariance
     (σ2 varX n : ℝ) : ℝ :=
   σ2 / (n * varX)
 
+/-- **olsEffectEstimationVariance at zero varX, named.** With no variance in the regressor the
+effect is unidentified and its sampling variance is infinite. Lean returns `0` -- a perfectly
+precise estimate of a quantity that cannot be estimated at all, which downstream reads as an
+infinitely confident effect. Consumers must require `varX ≠ 0`. -/
+theorem olsEffectEstimationVariance_zero_varx_is_junk (σ2 : ℝ) (n : ℝ) :
+    olsEffectEstimationVariance σ2 0 n = 0 := by
+  unfold olsEffectEstimationVariance
+  simp
+
 /-- **Cross-check: the corrected haplotype estimation variance is the one-locus OLS
 variance at the binary-indicator genotype variance.** `HaplotypeTheory` divides by
 `n × f × (1-f)`; this divides by `n × varX` with `varX` a genotype variance, and for a
@@ -391,6 +400,15 @@ spread over `k` causal loci. -/
 noncomputable def perCausalLocusSignal
     (h2 k : ℝ) : ℝ :=
   h2 / k
+
+/-- **perCausalLocusSignal at zero k, named.** With no causal loci the heritability has nowhere to
+sit and the per-locus signal diverges. Lean returns `0`, an infinitely polygenic architecture,
+which is the opposite architecture to the one the argument describes. Consumers must require
+`k ≠ 0`. -/
+theorem perCausalLocusSignal_zero_k_is_junk (h2 : ℝ) :
+    perCausalLocusSignal h2 0 = 0 := by
+  unfold perCausalLocusSignal
+  simp
 
 /-- **The loci partition the heritability.** -/
 theorem perCausalLocusSignal_mul_count (h2 k : ℝ) (hk : k ≠ 0) :
@@ -501,6 +519,17 @@ section MultiTraitAnalysis
 noncomputable def geneticCorrelation
     (cov_g vg₁ vg₂ : ℝ) : ℝ :=
   cov_g / Real.sqrt (vg₁ * vg₂)
+
+/-- **The genetic correlation against a trait with no genetic variance, named.** With `vg₁ = 0`
+there is no genetic component to correlate with and the quantity is undefined. The square root is
+zero, the divisor is zero, and Lean returns `0` -- reporting two traits with no shared genetic
+basis, which is exactly the substantive conclusion someone runs this to test. The same junk value
+arises from a NEGATIVE variance estimate, which REML returns routinely, so the branch is reachable
+from real output. Consumers must require `0 < vg₁ * vg₂`. -/
+theorem geneticCorrelation_no_genetic_variance_is_junk (cov_g vg₂ : ℝ) :
+    geneticCorrelation cov_g 0 vg₂ = 0 := by
+  unfold geneticCorrelation
+  simp
 
 /-- Effective discovery-sample size for trait A after borrowing information
 from a genetically correlated trait B.

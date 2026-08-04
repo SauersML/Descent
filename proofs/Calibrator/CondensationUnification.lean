@@ -896,6 +896,15 @@ parameter and nothing fitted. -/
 noncomputable def nextFloorFourthMoment (m2 m4 m6 m8 : ℝ) : ℝ :=
   (m8 - 4 * m6 + 6 * m4 - 4 * m2 + 1) / (m4 - 1) ^ 2
 
+/-- **nextFloorFourthMoment at unit m4, named.** A fourth moment of one is the Gaussian floor
+itself, where the recurrence has nothing left to descend and the next floor is undefined. The
+divisor `(m4 - 1) ^ 2` is zero and Lean returns `0`, a floor BELOW the Gaussian one, which the
+moment hierarchy forbids. Consumers must require `m4 ≠ 1`. -/
+theorem nextFloorFourthMoment_unit_m4_is_junk (m2 : ℝ) (m6 : ℝ) (m8 : ℝ) :
+    nextFloorFourthMoment m2 1 m6 m8 = 0 := by
+  unfold nextFloorFourthMoment
+  simp
+
 /-- **The Gaussian tower reproduces itself.** Feeding the standard normal moments `1, 3, 15, 105`
 returns `(105 - 60 + 18 - 4 + 1)/4 = 15`, so the squared floor of a Gaussian has the same fourth
 moment as the Gaussian's sixth. That is the fixed point the tower is built on, and it fixes every
@@ -1019,7 +1028,9 @@ centering constant is forced by `E[X²] = 1` and the scale by `Var(X²)`, so the
 parameter. -/
 noncomputable def squaringStep (scale x : ℝ) : ℝ := (x ^ 2 - 1) / scale
 
-/-- **squaringStep at zero scale, named.** A zero scale leaves the squaring step undefined. Lean returns `0`, a fixed point of the recurrence, so an iteration through this branch stalls silently rather than failing. Consumers must require `scale ≠ 0`. -/
+/-- **squaringStep at zero scale, named.** A zero scale leaves the squaring step undefined. Lean
+returns `0`, a fixed point of the recurrence, so an iteration through this branch stalls silently
+rather than failing. Consumers must require `scale ≠ 0`. -/
 theorem squaringStep_zero_scale_is_junk (x : ℝ) :
     squaringStep 0 x = 0 := by
   unfold squaringStep

@@ -52,6 +52,17 @@ section QSTFSTTest
 noncomputable def qst (V_between V_within : ℝ) : ℝ :=
   V_between / (V_between + 2 * V_within)
 
+/-- **qst where its denominator vanishes, named.** The guard `V_between + 2 * V_within` is zero at
+`V_between = 0`, `V_within = 0`. With neither between- nor within-population variance there is
+no differentiation to quantify. Lean returns `0` there rather than the value the modelled
+quantity takes, and no type error marks the point. Consumers must require `V_between + 2 *
+V_within ≠ 0`. -/
+theorem qst_at_vbetween0vwithin0_is_junk :
+    qst 0 0 = 0 := by
+  unfold qst
+  norm_num
+  try ring
+
 /-- **No within-population variance makes the statistic one.**
 
 The cross-check below identifies `Q_ST` with the coalescent `F_ST` as one map applied to two

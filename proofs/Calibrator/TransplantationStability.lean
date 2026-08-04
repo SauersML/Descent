@@ -535,4 +535,82 @@ theorem crossing_loss_linear (δ : ℝ) (hδ : 0 < δ) :
   refine ⟨?_, ?_, ?_⟩ <;>
     simp [trueDesignValue, approxDesignValue] <;> linarith
 
+
+/-! ## The perturbation bound in `Def` is false, and here is why
+
+A tempting bound for transplanting a design across a perturbed module is
+
+    excess  ≤  C * Def ^ 2 / σ_min ^ 2 * ε ^ 2  +  O(ε ^ 3),
+
+with `Def` the calibration defect of the target against the aggregate class and `σ_min` the
+smallest singular value of the module. It says that a target which is already exactly calibrated
+-- `Def = 0` -- pays only a cubic price for an `O(ε)` error in the module.
+
+It is false, and the witness is three dimensions of linear algebra. Take the module and the
+aggregate class both equal to the span of `e₀` and `e₁`, and the target `e₁ + e₂`. The optimum is
+`e₁`, the residual `e₂` is orthogonal to the module, so `Def = 0` and `σ_min = 1`. Perturb the
+module to the span of `e₀` and `e₁ + ε e₂`, which still contains the aggregate class and moves the
+projector by `O(ε)`. The estimated optimum is `(1 + ε) e₁`, and the excess it actually incurs is
+`ε ^ 2`.
+
+So the left-hand side is quadratic while the claimed right-hand side is cubic. The three theorems
+below are the whole refutation: the defect vanishes, the excess is exactly `ε ^ 2`, and `ε ^ 2`
+dominates every cubic on `(0, 1)`.
+
+What survives is that the constant cannot be `Def`. The excess is driven by the component of the
+residual lying OUTSIDE the true module -- here `e₂`, which `Def` cannot see precisely because the
+optimum is calibrated against everything the module does see. Any repaired bound has to measure
+that component instead.
+-/
+
+/-- Orthogonal projection onto the span of the first two coordinates. -/
+noncomputable def transplantModuleProjection (v : Fin 3 → ℝ) : Fin 3 → ℝ := ![v 0, v 1, 0]
+
+/-- Squared Euclidean norm in three coordinates. -/
+noncomputable def transplantSqNorm (v : Fin 3 → ℝ) : ℝ := dotProduct v v
+
+/-- The target: one unit inside the module, one unit orthogonal to it. -/
+noncomputable def transplantTarget : Fin 3 → ℝ := ![0, 1, 1]
+
+/-- The optimum against the true module. -/
+noncomputable def transplantOptimum : Fin 3 → ℝ := ![0, 1, 0]
+
+/-- The optimum against the module perturbed by `ε`. -/
+noncomputable def transplantEstimate (ε : ℝ) : Fin 3 → ℝ := ![0, 1 + ε, 0]
+
+/-- The calibration defect of the target against the true module. -/
+noncomputable def transplantDefect : ℝ :=
+  transplantSqNorm (transplantModuleProjection
+    (fun i ↦ transplantTarget i - transplantOptimum i))
+
+/-- The excess actually incurred by deploying the perturbed optimum. -/
+noncomputable def transplantExcess (ε : ℝ) : ℝ :=
+  transplantSqNorm (transplantModuleProjection
+    (fun i ↦ transplantTarget i - transplantEstimate ε i))
+
+/-- **The target is exactly calibrated.** Its residual against the true module is `e₂`, which the
+module projection annihilates, so the defect any `Def`-based bound would multiply by is zero. -/
+theorem transplantDefect_zero : transplantDefect = 0 := by
+  unfold transplantDefect transplantSqNorm transplantModuleProjection
+    transplantTarget transplantOptimum
+  norm_num [Fin.sum_univ_three, Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons]
+
+/-- **The excess is quadratic in the perturbation**, not cubic. -/
+theorem transplantExcess_eq_sq (ε : ℝ) : transplantExcess ε = ε ^ 2 := by
+  unfold transplantExcess transplantSqNorm transplantModuleProjection
+    transplantTarget transplantEstimate
+  norm_num [Fin.sum_univ_three, Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons]
+  ring
+
+/-- **So no cubic bound holds.** With `transplantDefect_zero` the claimed bound is `O(ε ^ 3)`, and
+on `(0, 1)` the true excess exceeds every cubic. The failure is not a lost constant: it is the
+wrong power of `ε`. -/
+theorem transplantExcess_exceeds_cubic (ε : ℝ) (h0 : 0 < ε) (h1 : ε < 1) :
+    ε ^ 3 < transplantExcess ε := by
+  rw [transplantExcess_eq_sq]
+  calc
+    ε ^ 3 = ε ^ 2 * ε := by ring
+    _ < ε ^ 2 * 1 := mul_lt_mul_of_pos_left h1 (sq_pos_of_pos h0)
+    _ = ε ^ 2 := mul_one _
+
 end Calibrator

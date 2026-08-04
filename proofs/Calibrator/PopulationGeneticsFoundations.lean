@@ -195,6 +195,16 @@ theorem het_increases_with_ne
 noncomputable def coalFst (t Ne : ℝ) : ℝ :=
   t / (t + 2 * Ne)
 
+/-- **coalFst where its denominator vanishes, named.** The guard `t + 2 * Ne` is zero at `t = 0`,
+`Ne = 0`. At zero separation and zero effective size the coalescent chart is degenerate at both
+ends at once. Lean returns `0` there rather than the value the modelled quantity takes, and no
+type error marks the point. Consumers must require `t + 2 * Ne ≠ 0`. -/
+theorem coalFst_at_t0ne0_is_junk :
+    coalFst 0 0 = 0 := by
+  unfold coalFst
+  norm_num
+  try ring
+
 /-- **One quantity, one definition.**  `coalFst` and `fstFromTau` are the same
 function in generation and coalescent units.  Three formulas for this quantity
 existed across three files and two were wrong; this theorem is the relation
@@ -1843,6 +1853,15 @@ theorem hetMutationRecurrence_closed_form (lam Hstar H₀ : ℝ) (t : ℕ) :
     Empirical status: UNTESTED. -/
 noncomputable def fstFromHetRatio (H H₀ : ℝ) : ℝ :=
   1 - H / H₀
+
+/-- **fstFromHetRatio where its denominator vanishes, named.** The guard `H₀` is zero at `H₀ = 0`.
+Lean returns `1` there rather than the value the modelled quantity takes, and no type error
+marks the point. Consumers must require `H₀ ≠ 0`. -/
+theorem fstFromHetRatio_at_h0_is_junk (H : ℝ) :
+    fstFromHetRatio H 0 = 1 := by
+  unfold fstFromHetRatio
+  norm_num
+  try ring
 
 /-- **The proportional-reduction form, written three times in this corpus, related here so
 that a change to any one of them fails to compile.**

@@ -542,6 +542,17 @@ theorem bernoulliLogLoss_certain_correct : bernoulliLogLoss 1 1 = 0 := by
 noncomputable def bernoulliKLReal (p q : ℝ) : ℝ :=
   p * Real.log (p / q) + (1 - p) * Real.log ((1 - p) / (1 - q))
 
+/-- **The Bernoulli KL divergence against a certain forecast, named.** A forecast of zero
+probability for an outcome that can occur has infinite KL divergence -- that is the whole content
+of the divergence as a penalty. The ratio `p / 0` is junk-zero, `Real.log 0` is junk-zero, and
+the first term vanishes, leaving `(1 - p) * log (1 - p)`, which is FINITE AND NEGATIVE for
+`p` in `(0, 1)`. So the certificate that is supposed to bound log-loss regret from above returns
+a negative number exactly where the regret is unbounded. Consumers must require `0 < q`. -/
+theorem bernoulliKLReal_certain_forecast_is_junk (p : ℝ) :
+    bernoulliKLReal p 0 = (1 - p) * Real.log (1 - p) := by
+  unfold bernoulliKLReal
+  simp
+
 /-- **A forecast that matches the truth has zero divergence.** Both logarithms are of one, so the
 divergence vanishes identically on the diagonal. Nonnegativity is shared by every positive
 multiple and by bodies with an additive floor; vanishing exactly at agreement is not, and it is

@@ -215,6 +215,15 @@ theorem mse_ols_is_no_shrinkage (σ_sq β_sq : ℝ) :
 noncomputable def optimalShrinkage (σ_sq β_sq : ℝ) : ℝ :=
   β_sq / (σ_sq + β_sq)
 
+/-- **optimalShrinkage where its denominator vanishes, named.** The guard `σ_sq + β_sq` is zero at
+`σ_sq = 0`, `β_sq = 0`. Lean returns `0` there rather than the value the modelled quantity
+takes, and no type error marks the point. Consumers must require `σ_sq + β_sq ≠ 0`. -/
+theorem optimalShrinkage_at_sq0sq0_is_junk :
+    optimalShrinkage 0 0 = 0 := by
+  unfold optimalShrinkage
+  norm_num
+  try ring
+
 /-- **Optimal shrinkage is in (0,1) for positive parameters.** -/
 theorem optimal_shrinkage_in_unit (σ_sq β_sq : ℝ)
     (h_σ : 0 < σ_sq) (h_β : 0 < β_sq) :
@@ -271,6 +280,15 @@ section LDReferenceMismatch
     This is the key quantity affected by LD mismatch. -/
 noncomputable def snpShrinkage (σ τ : ℝ) : ℝ :=
   σ / (σ + τ)
+
+/-- **snpShrinkage where its denominator vanishes, named.** The guard `σ + τ` is zero at `σ = 0`, `τ
+= 0`. Lean returns `0` there rather than the value the modelled quantity takes, and no type
+error marks the point. Consumers must require `σ + τ ≠ 0`. -/
+theorem snpShrinkage_at_00_is_junk :
+    snpShrinkage 0 0 = 0 := by
+  unfold snpShrinkage
+  norm_num
+  try ring
 
 /-- **LD mismatch bias bound from mean value theorem.**
     For the shrinkage function f(σ) = σ/(σ+τ), we have

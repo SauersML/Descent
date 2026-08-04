@@ -47,6 +47,14 @@ section StabilizingSelection
 noncomputable def equilibriumEffectVariance (v_mutation s : ℝ) : ℝ :=
   v_mutation / s
 
+/-- **equilibriumEffectVariance at zero s, named.** Without selection there is no equilibrium:
+mutational input accumulates without bound. Lean returns `0`, reporting no standing variance where
+the truth is unbounded standing variance. Consumers must require `s ≠ 0`. -/
+theorem equilibriumEffectVariance_zero_s_is_junk (v_mutation : ℝ) :
+    equilibriumEffectVariance v_mutation 0 = 0 := by
+  unfold equilibriumEffectVariance
+  simp
+
 /-- **Selection removes exactly the standing variance it is charged with.**
 
 Multiplying the equilibrium by the selection strength returns the per-generation mutational input,
@@ -106,6 +114,17 @@ theorem stronger_stabilizing_smaller_effects
     Empirical status: UNTESTED. -/
 noncomputable def effectCorrelationStabilizing (Ns : ℝ) : ℝ :=
   1 - 1 / (2 * Ns)
+
+/-- **The stabilizing effect correlation at zero selection, named.** With `Ns = 0` the effect
+sizes are governed by drift alone and the cross-population correlation decays to zero. Lean
+returns `1`: PERFECTLY preserved effects, the strongest portability claim the corpus can make,
+produced exactly where portability is weakest. Its inverse map
+`stabilizingNsFromObservedCorrelation` is junk at the same value from the other side. Consumers
+must require `Ns ≠ 0`. -/
+theorem effectCorrelationStabilizing_zero_selection_is_junk :
+    effectCorrelationStabilizing 0 = 1 := by
+  unfold effectCorrelationStabilizing
+  simp
 
 /-- Effect correlation increases with stronger selection (relative to drift). -/
 theorem effect_correlation_increases_with_Ns

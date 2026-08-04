@@ -394,6 +394,17 @@ section OptimalAllocation
     Empirical status: UNTESTED. -/
 noncomputable def heritabilityFractionFromN (n C : ℝ) : ℝ := n / (n + C)
 
+/-- **heritabilityFractionFromN where its denominator vanishes, named.** The guard `n + C` is zero
+at `n = 0`, `C = 0`. At zero sample size and zero constant the recovered heritability fraction
+is undefined; the value returned certifies that none of the heritability has been captured. Lean
+returns `0` there rather than the value the modelled quantity takes, and no type error marks the
+point. Consumers must require `n + C ≠ 0`. -/
+theorem heritabilityFractionFromN_at_n0c0_is_junk :
+    heritabilityFractionFromN 0 0 = 0 := by
+  unfold heritabilityFractionFromN
+  norm_num
+  try ring
+
 /-- The attained fraction of heritability is increasing in `n`. -/
 theorem r2_scaling_increasing (n₁ n₂ C : ℝ)
     (h_C : 0 < C) (h_n₁ : 0 ≤ n₁) (h_n₂ : 0 ≤ n₂) (h_n : n₁ < n₂) :
@@ -603,6 +614,19 @@ theorem fixedGradeRiskBenchmark_zero_grade_is_junk (n c : ℝ) :
   unfold fixedGradeRiskBenchmark
   rw [div_zero, neg_zero, Real.rpow_zero]
 
+/-- **The polynomial benchmark at zero samples, named.**
+`fixedGradeRiskBenchmark_zero_grade_is_junk` names the degenerate GRADE; this is the degenerate
+SAMPLE SIZE, which is the one a consumer can
+reach by accident. `Real.rpow` sends `0` to `0` at any nonzero exponent, so a benchmark evaluated
+before any data has been collected reports risk `0` -- perfect accuracy, attained by an estimator
+that has seen nothing. The quantity diverges there. Of the two junk branches in this definition
+this is the dangerous direction, because a risk of zero reads as success and a risk of one reads
+as failure. Consumers must require `n ≠ 0`. -/
+theorem fixedGradeRiskBenchmark_zero_samples_is_junk (K c : ℝ) (h : c / K ≠ 0) :
+    fixedGradeRiskBenchmark 0 K c = 0 := by
+  unfold fixedGradeRiskBenchmark
+  exact Real.zero_rpow (neg_ne_zero.mpr h)
+
 /-- **Sample size that inverts the logarithmic risk benchmark at `ε`.**
 
     `exp (1/ε)`. This is a benchmark inversion, not an asserted sample-size
@@ -626,6 +650,17 @@ theorem logarithmicBenchmarkSampleSize_inverts (epsilon : ℝ) :
   unfold logarithmicRiskBenchmark logarithmicBenchmarkSampleSize
   rw [Real.log_exp, one_div_one_div]
 
+/-- **The logarithmic inverse benchmark at zero target risk, named.** The same demand for perfect
+accuracy, failing through a different totality convention: `1 / 0` is junk-zero and `exp 0 = 1`,
+so the formula reports that ONE sample suffices for perfect accuracy. The polynomial form returns
+zero here and this returns one, so the two benchmarks disagree at the same degenerate point while
+`fixedGradeBenchmark_lt_logarithmicBenchmark` compares them elsewhere -- and neither branch is
+visible in the comparison. Consumers must require `epsilon ≠ 0`. -/
+theorem logarithmicBenchmarkSampleSize_zero_target_is_junk :
+    logarithmicBenchmarkSampleSize 0 = 1 := by
+  unfold logarithmicBenchmarkSampleSize
+  norm_num
+
 /-- `fixedGradeBenchmarkSampleSize` inverts the polynomial benchmark. -/
 theorem fixedGradeBenchmarkSampleSize_inverts (epsilon K c : ℝ)
     (h_eps : 0 < epsilon) (hK : K ≠ 0) (hc : c ≠ 0) :
@@ -634,6 +669,17 @@ theorem fixedGradeBenchmarkSampleSize_inverts (epsilon K c : ℝ)
   have hexp : (-(K / c)) * (-(c / K)) = 1 := by
     rw [neg_mul_neg, div_mul_div_comm, mul_comm c K, div_self (mul_ne_zero hK hc)]
   rw [← Real.rpow_mul (le_of_lt h_eps), hexp, Real.rpow_one]
+
+/-- **The inverse benchmark at zero target risk, named.** Demanding perfect accuracy requires
+unboundedly many samples, which is the whole content of a sample-size law. `Real.rpow` sends `0`
+to `0` at any nonzero exponent, so this returns `0`: perfect accuracy is free, attainable with no
+data at all. A sample-size formula that collapses to zero exactly where the requirement diverges
+certifies rather than warns, and nothing downstream distinguishes it from a genuinely cheap
+design. Consumers must require `epsilon ≠ 0`. -/
+theorem fixedGradeBenchmarkSampleSize_zero_target_is_junk (K c : ℝ) (h : K / c ≠ 0) :
+    fixedGradeBenchmarkSampleSize 0 K c = 0 := by
+  unfold fixedGradeBenchmarkSampleSize
+  exact Real.zero_rpow (neg_ne_zero.mpr h)
 
 /-- **The deployment sample cost lands exactly on the polynomial benchmark, at grade `2k`.**
 

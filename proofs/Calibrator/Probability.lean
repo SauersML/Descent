@@ -466,6 +466,16 @@ We write the denominator as `σ² * sqrt(σ²)` to stay inside the existing real
 noncomputable def berryEsseenErrorBound (berryEsseenConstant variance thirdMomentSum : ℝ) : ℝ :=
   berryEsseenConstant * thirdMomentSum / (variance * Real.sqrt variance)
 
+/-- **berryEsseenErrorBound at zero variance, named.** With zero variance the standardised sum is
+not defined and the Berry-Esseen bound does not apply. Lean returns `0`: a normal approximation
+certified as exact where the central limit theorem has no content. An error bound that vanishes
+where the approximation is meaningless certifies rather than warns. Consumers must require
+`variance ≠ 0`. -/
+theorem berryEsseenErrorBound_zero_variance_is_junk (berryEsseenConstant : ℝ) (thirdMomentSum : ℝ) :
+    berryEsseenErrorBound berryEsseenConstant 0 thirdMomentSum = 0 := by
+  unfold berryEsseenErrorBound
+  simp
+
 theorem berryEsseenErrorBound_nonneg
     (berryEsseenConstant variance thirdMomentSum : ℝ)
     (hC : 0 ≤ berryEsseenConstant)

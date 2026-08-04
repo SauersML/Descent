@@ -718,6 +718,16 @@ noncomputable def snrPortabilityRatio
     (v_sig_s v_noise_s v_sig_t v_noise_t : ℝ) : ℝ :=
   (v_sig_t / v_noise_t) / (v_sig_s / v_noise_s)
 
+/-- **snrPortabilityRatio where its denominator vanishes, named.** The guard `v_sig_s / v_noise_s`
+is zero at `v_sig_s = 0`, `v_noise_s = 1`. Lean returns `0` there rather than the value the
+modelled quantity takes, and no type error marks the point. Consumers must require `v_sig_s /
+v_noise_s ≠ 0`. -/
+theorem snrPortabilityRatio_at_vsigs0vnoises1_is_junk (v_sig_t : ℝ) (v_noise_t : ℝ) :
+    snrPortabilityRatio 0 1 v_sig_t v_noise_t = 0 := by
+  unfold snrPortabilityRatio
+  norm_num
+  try ring
+
 /-- **SNR portability depends only on signal ratio when noise is constant.** -/
 theorem snr_portability_signal_only
     (v_sig_s v_sig_t v_noise : ℝ)
@@ -820,6 +830,17 @@ section DiseasePortability
     Empirical status: UNTESTED. -/
 noncomputable def f1Score (precision sensitivity : ℝ) : ℝ :=
   2 * precision * sensitivity / (precision + sensitivity)
+
+/-- **f1Score where its denominator vanishes, named.** The guard `precision + sensitivity` is zero
+at `precision = 0`, `sensitivity = 0`. A classifier with neither precision nor sensitivity has
+no F1 score; the value returned is indistinguishable from a classifier that fires and is always
+wrong. Lean returns `0` there rather than the value the modelled quantity takes, and no type
+error marks the point. Consumers must require `precision + sensitivity ≠ 0`. -/
+theorem f1Score_at_precision0sensitivity0_is_junk :
+    f1Score 0 0 = 0 := by
+  unfold f1Score
+  norm_num
+  try ring
 
 /-- **F1 score is symmetric in precision and recall.** -/
 theorem f1_symmetric (p r : ℝ) : f1Score p r = f1Score r p := by

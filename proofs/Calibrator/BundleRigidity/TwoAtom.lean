@@ -131,6 +131,15 @@ open scoped BigOperators
     mixture; `p` is a mixture weight, not an allele frequency. -/
 noncomputable def mOne (p : ℝ) : ℝ := |1 - 2 * p| / p
 
+/-- **The first atom modulus at zero frequency, named.** An atom with no mass has no modulus and
+the quantity diverges. Lean returns `0`, the value of a perfectly balanced atom at `p = 1 / 2`,
+so the degenerate atom is reported as the best-conditioned one. Consumers must require
+`p ≠ 0`. -/
+theorem mOne_zero_frequency_is_junk :
+    mOne 0 = 0 := by
+  unfold mOne
+  simp
+
 /-- The second modulus curve of the two-atom family: `|1 - 2p| / (1 - p)`.
 
     Empirical status: NOT AN EMPIRICAL CLAIM -- a modulus curve of a two-point

@@ -257,6 +257,16 @@ noncomputable def replicatesForEqualPermeability
     (sourceReplicates sourcePermeability targetPermeability : ℝ) : ℝ :=
   sourceReplicates * sourcePermeability / targetPermeability
 
+/-- **replicatesForEqualPermeability at zero targetPermeability, named.** A target channel with
+zero permeability cannot be matched at any number of replicates. Lean returns `0`, reporting that
+no replication is needed to match an unmatchable channel. Consumers must require
+`targetPermeability ≠ 0`. -/
+theorem replicatesForEqualPermeability_zero_targetpermeability_is_junk
+    (sourceReplicates sourcePermeability : ℝ) :
+    replicatesForEqualPermeability sourceReplicates sourcePermeability 0 = 0 := by
+  unfold replicatesForEqualPermeability
+  simp
+
 /-- **General cohort-allocation law.** Multiplying target permeability by the prescribed
 replicate count recovers exactly the source total information. -/
 theorem replicatesForEqualPermeability_spec
@@ -516,6 +526,16 @@ noncomputable def twoChannelConditionalMomentNoise
     (firstNoise secondNoise sharedNoise : ℝ) : ℝ :=
   secondNoise - sharedNoise ^ 2 / firstNoise
 
+/-- **Conditional noise on a noiseless first channel, named.** A first channel with zero noise is
+deterministic, so conditioning on it removes everything the two channels share and the shared
+term is not merely undefined but maximally informative. Lean returns the second channel's noise
+unchanged -- conditioning removed NOTHING -- which is the value for two independent channels.
+Consumers must require `firstNoise ≠ 0`. -/
+theorem twoChannelConditionalMomentNoise_noiseless_first_is_junk (secondNoise sharedNoise : ℝ) :
+    twoChannelConditionalMomentNoise 0 secondNoise sharedNoise = secondNoise := by
+  unfold twoChannelConditionalMomentNoise
+  simp
+
 /-- **Closed two-channel GMM information.**  Inverting the named noise covariance gives
 the standard numerator divided by its determinant. -/
 theorem twoChannelMomentNoisePermeability_closed
@@ -646,6 +666,13 @@ theorem twoChannelMomentInformation_eq_first_iff
 /-- Information delivered per unit acquisition cost. -/
 noncomputable def informationPerUnitCost (information cost : ℝ) : ℝ :=
   information / cost
+
+/-- **informationPerUnitCost at zero cost, named.** Free information has unbounded value per unit
+cost. Lean returns `0`, ranking the free measurement last. Consumers must require `cost ≠ 0`. -/
+theorem informationPerUnitCost_zero_cost_is_junk (information : ℝ) :
+    informationPerUnitCost information 0 = 0 := by
+  unfold informationPerUnitCost
+  simp
 
 /-- **The rate does not depend on the units.** Measuring both information and cost in units `t`
 times smaller leaves the rate unchanged, which is what makes it a rate rather than a difference. -/
@@ -1000,6 +1027,17 @@ noncomputable def covarianceTangentEstimatorVarianceFromMoments
     (m covarianceDerivative secondMoment fourthMoment : ℝ) : ℝ :=
   centeredSquareVarianceFromMoments secondMoment fourthMoment /
     (m * covarianceDerivative ^ 2)
+
+/-- **covarianceTangentEstimatorVarianceFromMoments at zero m, named.** At zero replicates the
+estimator has no sampling distribution and its variance is undefined. Lean returns `0`, the
+variance of a perfect estimator, for an estimator built from nothing. Consumers must require
+`m ≠ 0`. -/
+theorem covarianceTangentEstimatorVarianceFromMoments_zero_m_is_junk
+    (covarianceDerivative secondMoment fourthMoment : ℝ) :
+    covarianceTangentEstimatorVarianceFromMoments 0 covarianceDerivative secondMoment
+      fourthMoment = 0 := by
+  unfold covarianceTangentEstimatorVarianceFromMoments
+  simp
 
 /-- **Exact non-Gaussian information--variance reciprocity.** For the named
 covariance-moment experiment, total moment permeability times the known-mean tangent

@@ -252,6 +252,16 @@ tridiagonal precision of the source Markov covariance. -/
 noncomputable def localPencilTraceContribution (source target : ℝ) : ℝ :=
   (1 + source ^ 2 - 2 * source * target) / (1 - source ^ 2)
 
+/-- **localPencilTraceContribution where its denominator vanishes, named.** The guard `1 - source ^
+2` is zero at `source = 1`. At unit source coherence the pencil is degenerate and the trace
+contribution diverges. Lean returns `0` there rather than the value the modelled quantity takes,
+and no type error marks the point. Consumers must require `1 - source ^ 2 ≠ 0`. -/
+theorem localPencilTraceContribution_at_source1_is_junk (target : ℝ) :
+    localPencilTraceContribution 1 target = 0 := by
+  unfold localPencilTraceContribution
+  norm_num
+  try ring
+
 /-- Conditional mean of a first semigroup eigenfunction: `r = exp(-λ τ)` in the Jacobi
 anchor, `mean` is the invariant mean, and `source` is the time-zero coordinate. -/
 def firstModeConditionalMean (mean r source : ℝ) : ℝ :=

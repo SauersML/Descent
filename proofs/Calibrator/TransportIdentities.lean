@@ -767,7 +767,10 @@ end TraitTransport
 
 def explainableFraction (between total : ℝ) : ℝ := between / total
 
-/-- **explainableFraction at zero total, named.** With no total variance nothing is explainable and the fraction is undefined. Lean returns `0`, reporting that none of the variance is between-group, which is what a genuinely homogeneous population also gives. Consumers must require `total ≠ 0`. -/
+/-- **explainableFraction at zero total, named.** With no total variance nothing is explainable
+and the fraction is undefined. Lean returns `0`, reporting that none of the variance is
+between-group, which is what a genuinely homogeneous population also gives. Consumers must
+require `total ≠ 0`. -/
 theorem explainableFraction_zero_total_is_junk (between : ℝ) :
     explainableFraction between 0 = 0 := by
   unfold explainableFraction

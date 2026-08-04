@@ -41,7 +41,7 @@ noncomputable def integratedCoalescentHazard (hazard : ℝ → ℝ) (t : ℝ) : 
 of its own. A constant coalescence rate `c` accumulates hazard `c * t` by time `t`; the reference
 value that separates the integral from a body that averages rather than accumulates. -/
 theorem integratedCoalescentHazard_const (c t : ℝ) :
-    integratedCoalescentHazard (fun _ => c) t = c * t := by
+    integratedCoalescentHazard (fun _ ↦ c) t = c * t := by
   unfold integratedCoalescentHazard
   simp [mul_comm]
 
@@ -56,7 +56,7 @@ noncomputable def coalescenceSurvivalFromHazard (hazard : ℝ → ℝ) (t : ℝ)
 result of its own. A constant coalescence rate `c` leaves `exp (-c * t)` of pairs uncoalesced by
 time `t` -- the exponential waiting law that the hazard formulation is supposed to reproduce. -/
 theorem coalescenceSurvivalFromHazard_const (c t : ℝ) :
-    coalescenceSurvivalFromHazard (fun _ => c) t = Real.exp (-(c * t)) := by
+    coalescenceSurvivalFromHazard (fun _ ↦ c) t = Real.exp (-(c * t)) := by
   unfold coalescenceSurvivalFromHazard
   rw [integratedCoalescentHazard_const]
 
@@ -1153,6 +1153,14 @@ theorem expected_abs_mean_shift_of_wrightFisher
 /-- Present-day signal-to-noise ratio for prediction under drift. -/
 noncomputable def presentDaySignalToNoise (V_A V_E fst : ℝ) : ℝ :=
   presentDayPGSVariance V_A fst / V_E
+
+/-- **presentDaySignalToNoise at zero V_E, named.** A trait with no environmental variance has
+unbounded signal-to-noise. Lean returns `0`, the least predictable case, for the most predictable
+trait. Consumers must require `V_E ≠ 0`. -/
+theorem presentDaySignalToNoise_zero_ve_is_junk (V_A fst : ℝ) :
+    presentDaySignalToNoise V_A 0 fst = 0 := by
+  unfold presentDaySignalToNoise
+  simp
 
 /-- **Present-day coefficient of determination under drift.**
 
@@ -4577,6 +4585,15 @@ point differs from this one at O(rate², rate/Nₑ).
 noncomputable def ibdFlowStep (Ne rate F : ℝ) : ℝ :=
   F + (1 - F) / (2 * Ne) - 2 * rate * F
 
+/-- **ibdFlowStep where its denominator vanishes, named.** The guard `2 * Ne` is zero at `Ne = 0`.
+Lean returns `F - 2 * rate * F` there rather than the value the modelled quantity takes, and no
+type error marks the point. Consumers must require `2 * Ne ≠ 0`. -/
+theorem ibdFlowStep_at_ne0_is_junk (rate : ℝ) (F : ℝ) :
+    ibdFlowStep 0 rate F = F - 2 * rate * F := by
+  unfold ibdFlowStep
+  norm_num
+  try ring
+
 /-- **`1/(1 + 4 Nₑ · rate)` is the fixed point of the identity balance.**
 Setting `(1 - F)/(2 Nₑ) = 2 · rate · F` gives `1 - F = 4 Nₑ · rate · F`, hence
 `F = 1/(1 + 4 Nₑ · rate)`.  This single lemma is what pins every `1/(1 + θ)`
@@ -5150,6 +5167,16 @@ it is the island-model equilibrium `F_ST`, with `rate = c` it is Sved's `E[r²]`
     Empirical status: UNTESTED. -/
 noncomputable def ibdRecurrenceFixedPoint (Ne rate : ℝ) : ℝ :=
   (1 - rate) ^ 2 / ((1 - rate) ^ 2 + 2 * Ne * rate * (2 - rate))
+
+/-- **ibdRecurrenceFixedPoint where its denominator vanishes, named.** The guard `(1 - rate) ^ 2 + 2
+* Ne * rate * (2 - rate)` is zero at `Ne = 0`, `rate = 1`. Lean returns `0` there rather than
+the value the modelled quantity takes, and no type error marks the point. Consumers must require
+`(1 - rate) ^ 2 + 2 * Ne * rate * (2 - rate) ≠ 0`. -/
+theorem ibdRecurrenceFixedPoint_at_ne0rate1_is_junk :
+    ibdRecurrenceFixedPoint 0 1 = 0 := by
+  unfold ibdRecurrenceFixedPoint
+  norm_num
+  try ring
 
 /-- **The rest point is a fixed point of the recurrence.**  Stated once here so
 that the island-model and Sved readings cannot acquire different answers. -/
@@ -6002,6 +6029,15 @@ theorem admixtureLDDecay_at_zero (r : ℝ) :
 noncomputable def admixtureLDBoost (r : ℝ) (t_since : ℕ) (equilibrium_ld : ℝ) : ℝ :=
   admixtureLDDecay r t_since / equilibrium_ld
 
+/-- **admixtureLDBoost at zero equilibrium_ld, named.** A zero equilibrium linkage disequilibrium
+gives no baseline for the boost to be measured against. Lean returns `0`, reporting no excess
+disequilibrium from admixture, in exactly the situation where any disequilibrium at all is
+entirely due to admixture. Consumers must require `equilibrium_ld ≠ 0`. -/
+theorem admixtureLDBoost_zero_equilibriumld_is_junk (r : ℝ) (t_since : ℕ) :
+    admixtureLDBoost r t_since 0 = 0 := by
+  unfold admixtureLDBoost
+  simp
+
 /-- Admixture LD boost exceeds 1 when admixture LD is above equilibrium. -/
 theorem admixtureLDBoost_gt_one_of_above_equilibrium (r : ℝ) (t_since : ℕ) (equilibrium_ld : ℝ)
     (heq_pos : 0 < equilibrium_ld)
@@ -6060,6 +6096,16 @@ section MigrationDriftRecurrence
     Empirical status: UNTESTED. -/
 noncomputable def fstMigDriftNext (Ne m Fst : ℝ) : ℝ :=
   (1 - 2 * m - 1 / (2 * Ne)) * Fst + 1 / (2 * Ne)
+
+/-- **The migration-drift step at zero effective size, named.** Both `1 / (2 * Ne)` terms are
+junk-zero at `Ne = 0`, so the step reduces to `(1 - 2 * m) * Fst`: migration still erodes
+differentiation and drift contributes nothing. An empty population is reported as one in which
+drift generates no differentiation at all, and iterating the step compounds the error.
+Consumers must require `Ne ≠ 0`. -/
+theorem fstMigDriftNext_zero_population_is_junk (m Fst : ℝ) :
+    fstMigDriftNext 0 m Fst = (1 - 2 * m) * Fst := by
+  unfold fstMigDriftNext
+  simp
 
 /-- The recurrence can be written as Fst_{t+1} = a * Fst_t + b where
     a = 1 - 2m - 1/(2Ne) and b = 1/(2Ne). -/

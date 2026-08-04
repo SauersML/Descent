@@ -1267,7 +1267,10 @@ absorption channel. -/
 def absorptionInformation (initial time : ℝ) : ℝ :=
   alleleLossProbability initial time / (4 * time ^ 2)
 
-/-- **absorptionInformation at zero time, named.** At zero elapsed time no absorption has occurred and the information rate is undefined. The divisor is `4 * time ^ 2`, so the branch is quadratically flat around it and sampling near zero gives no warning before the value jumps. Consumers must require `time ≠ 0`. -/
+/-- **absorptionInformation at zero time, named.** At zero elapsed time no absorption has occurred
+and the information rate is undefined. The divisor is `4 * time ^ 2`, so the branch is
+quadratically flat around it and sampling near zero gives no warning before the value jumps.
+Consumers must require `time ≠ 0`. -/
 theorem absorptionInformation_zero_time_is_junk (initial : ℝ) :
     absorptionInformation initial 0 = 0 := by
   unfold absorptionInformation
@@ -1337,7 +1340,9 @@ whose information scale is of order `1 / (x t)`. -/
 def absorptionChannelWeight (initial time : ℝ) : ℝ :=
   initial * alleleLossProbability initial time / (4 * time)
 
-/-- **absorptionChannelWeight at zero time, named.** The same `4 * time ^ 2` divisor as `absorptionInformation`, and the same silence: at zero elapsed time the channel weight is undefined and Lean returns `0`, an inert channel. Consumers must require `time ≠ 0`. -/
+/-- **absorptionChannelWeight at zero time, named.** The same `4 * time ^ 2` divisor as
+`absorptionInformation`, and the same silence: at zero elapsed time the channel weight is
+undefined and Lean returns `0`, an inert channel. Consumers must require `time ≠ 0`. -/
 theorem absorptionChannelWeight_zero_time_is_junk (initial : ℝ) :
     absorptionChannelWeight initial 0 = 0 := by
   unfold absorptionChannelWeight

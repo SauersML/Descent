@@ -183,6 +183,17 @@ noncomputable def AssortativeMatingModel.equilibriumVariance (m : AssortativeMat
 noncomputable def amEquilibriumVariance (V_A r h2 : ℝ) : ℝ :=
   V_A / (1 - r * h2)
 
+/-- **amEquilibriumVariance where its denominator vanishes, named.** The guard `1 - r * h2` is zero
+at `r = 1`, `h2 = 1`. Complete assortative mating on a fully heritable trait is the singularity
+of this formula: the equilibrium additive variance diverges, because each generation's mating
+correlation feeds back undamped. Lean returns `0` there rather than the value the modelled
+quantity takes, and no type error marks the point. Consumers must require `1 - r * h2 ≠ 0`. -/
+theorem amEquilibriumVariance_at_r1h21_is_junk (V_A : ℝ) :
+    amEquilibriumVariance V_A 1 1 = 0 := by
+  unfold amEquilibriumVariance
+  norm_num
+  try ring
+
 /-- **The AM equilibrium variance is the fixed point of the variance
 recursion.**  Solving `½ V (1 + r h²) + ½ V₀ = V` gives `V (1 - r h²) = V₀`,
 i.e. `V = V₀ / (1 - r h²)`; no other constant can be substituted here and
@@ -272,6 +283,17 @@ theorem AssortativeMatingModel.variance_inflation_factor (m : AssortativeMatingM
     Empirical status: UNTESTED. -/
 noncomputable def amInducedLD (beta_i beta_j r h2 : ℝ) : ℝ :=
   beta_i * beta_j * r * h2 / (1 - r * h2)
+
+/-- **amInducedLD where its denominator vanishes, named.** The guard `1 - r * h2` is zero at `r =
+1`, `h2 = 1`. The same singularity as `amEquilibriumVariance`: at `r * h2 = 1` the induced
+disequilibrium diverges rather than vanishing. Lean returns `0` there rather than the value the
+modelled quantity takes, and no type error marks the point. Consumers must require `1 - r * h2 ≠
+0`. -/
+theorem amInducedLD_at_r1h21_is_junk (beta_i : ℝ) (beta_j : ℝ) :
+    amInducedLD beta_i beta_j 1 1 = 0 := by
+  unfold amInducedLD
+  norm_num
+  try ring
 
 /-- AM-induced LD has the same sign as the product of effects. -/
 theorem am_ld_sign
@@ -480,6 +502,17 @@ noncomputable def amCorrectedPortability
     (port_measured r_source r_target h2 : ℝ) : ℝ :=
   port_measured * (1 - r_source * h2) / (1 - r_target * h2)
 
+/-- **amCorrectedPortability where its denominator vanishes, named.** The guard `1 - r_target * h2`
+is zero at `r_target = 1`, `h2 = 1`. At `r_target * h2 = 1` the target correction diverges, so a
+portability estimate corrected for assortative mating collapses to zero exactly where the
+correction matters most. Lean returns `0` there rather than the value the modelled quantity
+takes, and no type error marks the point. Consumers must require `1 - r_target * h2 ≠ 0`. -/
+theorem amCorrectedPortability_at_rtarget1h21_is_junk (port_measured : ℝ) (r_source : ℝ) :
+    amCorrectedPortability port_measured r_source 1 1 = 0 := by
+  unfold amCorrectedPortability
+  norm_num
+  try ring
+
 /-- **AM correction reduces measured portability when source has more AM.**
     The source AM inflates source R², so the correction factor
     (1-r_s*h2)/(1-r_t*h2) < 1 when r_s > r_t. -/
@@ -630,6 +663,16 @@ section PopulationStructure
     Empirical status: UNTESTED. -/
 noncomputable def ibdFst (d N sigma_sq : ℝ) : ℝ :=
   d / (4 * N * sigma_sq + d)
+
+/-- **ibdFst where its denominator vanishes, named.** The guard `4 * N * sigma_sq + d` is zero at `d
+= 0`, `N = 0`, `sigma_sq = 0`. Lean returns `0` there rather than the value the modelled
+quantity takes, and no type error marks the point. Consumers must require `4 * N * sigma_sq + d
+≠ 0`. -/
+theorem ibdFst_at_d0n0sigmasq0_is_junk :
+    ibdFst 0 0 0 = 0 := by
+  unfold ibdFst
+  norm_num
+  try ring
 
 /-- IBD Fst increases with distance. -/
 theorem ibd_fst_increases_with_distance

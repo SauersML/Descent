@@ -47,6 +47,17 @@ downstream of this one.
 noncomputable def markovPoissonKernel (lam x : ℝ) : ℝ :=
   (1 - lam ^ 2) / (1 + lam ^ 2 - 2 * lam * x)
 
+/-- **markovPoissonKernel where its denominator vanishes, named.** The guard `1 + lam ^ 2 - 2 * lam
+* x` is zero at `lam = 1`, `x = 1`. At unit persistence and unit argument the Poisson kernel is
+on its singularity, where it diverges. Lean returns `0` there rather than the value the modelled
+quantity takes, and no type error marks the point. Consumers must require `1 + lam ^ 2 - 2 * lam
+* x ≠ 0`. -/
+theorem markovPoissonKernel_at_lam1x1_is_junk :
+    markovPoissonKernel 1 1 = 0 := by
+  unfold markovPoissonKernel
+  norm_num
+  try ring
+
 /-- Reversing the transition eigenvalue reflects the frequency coordinate. -/
 theorem markovPoissonKernel_neg (lam x : ℝ) :
     markovPoissonKernel (-lam) x = markovPoissonKernel lam (-x) := by

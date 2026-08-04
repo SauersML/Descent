@@ -464,6 +464,15 @@ is the fourth moment of the standardized dosage — the first thing any moment-b
 learns about a frequency spectrum. -/
 noncomputable def invHeterozygosity (q : ℝ) : ℝ := 1 / (2 * q * (1 - q))
 
+/-- **The inverse heterozygosity at a monomorphic locus, named.** A locus fixed for either allele
+has zero heterozygosity, so its inverse diverges -- that is the whole point of the quantity as a
+weight. Lean returns `0`, the SMALLEST possible weight, so a monomorphic locus enters a weighted
+sum as negligible rather than as inadmissible. Consumers must require `q ≠ 0` and `q ≠ 1`. -/
+theorem invHeterozygosity_monomorphic_is_junk :
+    invHeterozygosity 0 = 0 := by
+  unfold invHeterozygosity
+  simp
+
 /-- **Level one, what is determined**: the fourth moment of the standardized dosage at a
 locus is exactly its inverse heterozygosity. Averaged over a panel in linkage
 equilibrium, low-order moment data delivers `E_q[1/(2q(1-q))]` and that is a genuine,
@@ -1776,6 +1785,14 @@ must be measured or proved for the assay being designed. -/
 /-- Cohorts required for a target aggregate risk: `m ≥ d/(2 c₋ η² R)`. -/
 noncomputable def requiredCohorts (d cMinus eta R : ℝ) : ℝ :=
   d / (2 * cMinus * eta ^ 2 * R)
+
+/-- **requiredCohorts at zero cMinus, named.** A zero lower spectral constant means no number of
+cohorts suffices to resolve the spectrum. Lean returns `0`: no cohorts required at all, the exact
+inversion of an impossible design. Consumers must require `cMinus ≠ 0`. -/
+theorem requiredCohorts_zero_cminus_is_junk (d : ℝ) (eta : ℝ) (R : ℝ) :
+    requiredCohorts d 0 eta R = 0 := by
+  unfold requiredCohorts
+  simp
 
 /-- **Strict inverse-square monotonicity.** In the conditional cost formula, smaller positive
 `η` requires strictly more cohorts.  A separate limit theorem would be needed to formalize

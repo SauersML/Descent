@@ -112,6 +112,15 @@ itself a clinical decision or misclassification theorem.
 noncomputable def thresholdStandardizedCoordinate (threshold μ σ : ℝ) : ℝ :=
   (threshold - μ) / σ
 
+/-- **thresholdStandardizedCoordinate at zero σ, named.** A distribution with no spread has no
+standardised coordinate: every threshold is either impossible or certain. Lean returns `0`,
+placing the threshold exactly at the mean, the least informative position, for a degenerate score.
+Consumers must require `σ ≠ 0`. -/
+theorem thresholdStandardizedCoordinate_zero_sigma_is_junk (threshold : ℝ) (μ : ℝ) :
+    thresholdStandardizedCoordinate threshold μ 0 = 0 := by
+  unfold thresholdStandardizedCoordinate
+  simp
+
 /-- **The standardized coordinate is translation equivariant and vanishes at the mean.** Shifting
 the threshold and the mean together leaves it unchanged, which is what makes it a position
 relative to the distribution rather than an absolute score. -/
@@ -493,7 +502,10 @@ section BlockCount
 noncomputable def effectiveBlockCount (markers correlationLength : ℝ) : ℝ :=
   markers / correlationLength
 
-/-- **effectiveBlockCount at zero correlationLength, named.** A correlation length of zero means every marker is independent, so the block count should be the marker count. Lean returns `0`: no blocks at all, and any per-block correction built on it silently divides by nothing. Consumers must require `correlationLength ≠ 0`. -/
+/-- **effectiveBlockCount at zero correlationLength, named.** A correlation length of zero means
+every marker is independent, so the block count should be the marker count. Lean returns `0`: no
+blocks at all, and any per-block correction built on it silently divides by nothing. Consumers
+must require `correlationLength ≠ 0`. -/
 theorem effectiveBlockCount_zero_correlationlength_is_junk (markers : ℝ) :
     effectiveBlockCount markers 0 = 0 := by
   unfold effectiveBlockCount
@@ -648,6 +660,15 @@ noncomputable def externallyStandardized
     (pgs μ_source σ_source : ℝ) : ℝ :=
   (pgs - μ_source) / σ_source
 
+/-- **externallyStandardized at zero σ_source, named.** Standardising against a source cohort
+with no spread is undefined. Lean returns `0`, the population mean, so every individual is
+reported at exactly average risk regardless of their score. Consumers must require
+`σ_source ≠ 0`. -/
+theorem externallyStandardized_zero_sigmasource_is_junk (pgs : ℝ) (μ_source : ℝ) :
+    externallyStandardized pgs μ_source 0 = 0 := by
+  unfold externallyStandardized
+  simp
+
 /-- **The source scale recovers the raw deviation.** -/
 theorem externallyStandardized_mul_sd (pgs μ_source σ_source : ℝ) (h : σ_source ≠ 0) :
     externallyStandardized pgs μ_source σ_source * σ_source = pgs - μ_source := by
@@ -660,6 +681,15 @@ theorem externallyStandardized_mul_sd (pgs μ_source σ_source : ℝ) (h : σ_so
 noncomputable def internallyStandardized
     (pgs μ_target σ_target : ℝ) : ℝ :=
   (pgs - μ_target) / σ_target
+
+/-- **internallyStandardized at zero σ_target, named.** The same collapse against the target
+cohort: with zero target spread every individual is reported at average risk, and the whole
+ranking the score exists to provide is silently discarded. Consumers must require
+`σ_target ≠ 0`. -/
+theorem internallyStandardized_zero_sigmatarget_is_junk (pgs : ℝ) (μ_target : ℝ) :
+    internallyStandardized pgs μ_target 0 = 0 := by
+  unfold internallyStandardized
+  simp
 
 /-- **The target scale recovers the raw deviation.** The pair with the theorem above is the
 content: the two standardisations differ only in which population supplies the moments. -/

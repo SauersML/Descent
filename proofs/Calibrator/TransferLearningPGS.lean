@@ -78,12 +78,30 @@ noncomputable def sharedLDHeritability {m : ℕ}
     (β : Fin m → ℝ) (ld : Fin m → Fin m → ℝ) (var_y : ℝ) : ℝ :=
   sharedLDGeneticVariance β ld / var_y
 
+/-- **sharedLDHeritability at zero var_y, named.** A trait with no phenotypic variance has no
+heritability. Lean returns `0`, reporting a trait with no genetic basis rather than a trait with no
+variance at all -- and the two have opposite implications for whether a score can ever work.
+Consumers must require `var_y ≠ 0`. -/
+theorem sharedLDHeritability_zero_vary_is_junk {m : ℕ} (β : Fin m → ℝ)
+    (ld : Fin m → Fin m → ℝ) :
+    sharedLDHeritability β ld 0 = 0 := by
+  unfold sharedLDHeritability
+  simp
+
 /-- R² of a PGS: the squared correlation between PGS and phenotype.
     R² = Cov(PGS, Y)² / (Var(PGS) × Var(Y)).
 
     Empirical status: UNTESTED. -/
 noncomputable def pgsR2 (cov_pgs_y : ℝ) (var_pgs var_y : ℝ) : ℝ :=
   cov_pgs_y ^ 2 / (var_pgs * var_y)
+
+/-- **pgsR2 at zero var_pgs, named.** A score with no variance has no `R²`. Lean returns `0`,
+which reads as a score that varies and fails, rather than a score that is constant. Consumers
+must require `var_pgs ≠ 0`. -/
+theorem pgsR2_zero_varpgs_is_junk (cov_pgs_y : ℝ) (var_y : ℝ) :
+    pgsR2 cov_pgs_y 0 var_y = 0 := by
+  unfold pgsR2
+  simp
 
 /-- **`R²` is invariant under rescaling the score.** Multiplying the polygenic score by `c`
 multiplies its covariance with the outcome by `c` and its variance by `c²`, and the ratio is
@@ -152,6 +170,14 @@ noncomputable def additiveGeneticVariance {m : ℕ} (β : Fin m → ℝ) : ℝ :
     Empirical status: UNTESTED. -/
 noncomputable def additiveHeritability {m : ℕ} (β : Fin m → ℝ) (var_y : ℝ) : ℝ :=
   additiveGeneticVariance β / var_y
+
+/-- **additiveHeritability at zero var_y, named.** The same zero-phenotypic-variance branch as
+`sharedLDHeritability`, reached through a different genetic-variance definition, and reported
+identically. Consumers must require `var_y ≠ 0`. -/
+theorem additiveHeritability_zero_vary_is_junk {m : ℕ} (β : Fin m → ℝ) :
+    additiveHeritability β 0 = 0 := by
+  unfold additiveHeritability
+  simp
 
 /-- Source-population `R²` of the score that uses source effect sizes as weights in the
     standardized diagonal-LD model.
@@ -651,7 +677,10 @@ section ImportanceWeighting
 noncomputable def importanceWeightESS (sum_w sum_w_sq : ℝ) : ℝ :=
   sum_w ^ 2 / sum_w_sq
 
-/-- **importanceWeightESS at zero sum_w_sq, named.** With zero total squared weight there are no samples and the effective sample size is undefined. Lean returns `0`, which is the correct-looking answer for the wrong reason and hides the empty-sample case inside the degenerate-weights case. Consumers must require `sum_w_sq ≠ 0`. -/
+/-- **importanceWeightESS at zero sum_w_sq, named.** With zero total squared weight there are no
+samples and the effective sample size is undefined. Lean returns `0`, which is the correct-looking
+answer for the wrong reason and hides the empty-sample case inside the degenerate-weights case.
+Consumers must require `sum_w_sq ≠ 0`. -/
 theorem importanceWeightESS_zero_sumwsq_is_junk (sum_w : ℝ) :
     importanceWeightESS sum_w 0 = 0 := by
   unfold importanceWeightESS
@@ -1562,6 +1591,16 @@ noncomputable def sourceShrinkageMSE (gapSq noiseVar nTarget lam : ℝ) : ℝ :=
     quadratic objective, not assumed. -/
 noncomputable def optimalSourceShrinkageWeight (gapSq noiseVar nTarget : ℝ) : ℝ :=
   (noiseVar / nTarget) / (gapSq + noiseVar / nTarget)
+
+/-- **optimalSourceShrinkageWeight where its denominator vanishes, named.** The guard `gapSq +
+noiseVar / nTarget` is zero at `gapSq = 0`, `noiseVar = 0`, `nTarget = 1`. Lean returns `0`
+there rather than the value the modelled quantity takes, and no type error marks the point.
+Consumers must require `gapSq + noiseVar / nTarget ≠ 0`. -/
+theorem optimalSourceShrinkageWeight_at_gapsq0noisevar0ntarget1_is_junk :
+    optimalSourceShrinkageWeight 0 0 1 = 0 := by
+  unfold optimalSourceShrinkageWeight
+  norm_num
+  try ring
 
 /-- **With no transfer gap the optimal weight is one: keep the source entirely.** The quadratic
 decomposition below holds around whatever the optimum is and does not say where it sits; this
@@ -2584,6 +2623,16 @@ theorem optimalFineTuningMSE_strictMono_in_gapSq
 noncomputable def requiredTargetSamplesForOptimalFineTuningMSE
     (gapSq noiseVar tau : ℝ) : ℝ :=
   noiseVar * (gapSq - tau) / (tau * gapSq)
+
+/-- **requiredTargetSamplesForOptimalFineTuningMSE at zero gapSq, named.** A zero squared gap means
+source and target coincide and no target samples are needed -- but the formula reaches that answer
+through a division by zero rather than through the model, so it returns `0` for the wrong reason
+and returns it just as readily when `tau` is zero and the requirement diverges. Consumers must
+require `gapSq ≠ 0`. -/
+theorem requiredTargetSamplesForOptimalFineTuningMSE_zero_gapsq_is_junk (noiseVar : ℝ) (tau : ℝ) :
+    requiredTargetSamplesForOptimalFineTuningMSE 0 noiseVar tau = 0 := by
+  unfold requiredTargetSamplesForOptimalFineTuningMSE
+  simp
 
 /-- The required target sample size is positive whenever the desired MSE target
     lies strictly below the transfer gap. -/

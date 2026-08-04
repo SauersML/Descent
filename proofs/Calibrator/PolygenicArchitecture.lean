@@ -52,7 +52,9 @@ section EffectSizeDistribution
     Empirical status: UNTESTED. -/
 noncomputable def expectedSquaredEffect (h2 M : ℝ) : ℝ := h2 / M
 
-/-- **expectedSquaredEffect at zero M, named.** With no causal variants the heritability has nowhere to sit and the per-variant squared effect diverges. Lean returns `0`, the infinitely polygenic limit. Consumers must require `M ≠ 0`. -/
+/-- **expectedSquaredEffect at zero M, named.** With no causal variants the heritability has
+nowhere to sit and the per-variant squared effect diverges. Lean returns `0`, the infinitely
+polygenic limit. Consumers must require `M ≠ 0`. -/
 theorem expectedSquaredEffect_zero_m_is_junk (h2 : ℝ) :
     expectedSquaredEffect h2 0 = 0 := by
   unfold expectedSquaredEffect
@@ -971,6 +973,16 @@ section HeritabilityPartitioning
     Empirical status: UNTESTED. -/
 noncomputable def heritabilityEnrichment (h2_cat M_cat h2_total M_total : ℝ) : ℝ :=
   (h2_cat / M_cat) / (h2_total / M_total)
+
+/-- **heritabilityEnrichment where its denominator vanishes, named.** The guard `h2_total / M_total`
+is zero at `h2_total = 0`, `M_total = 1`. Lean returns `0` there rather than the value the
+modelled quantity takes, and no type error marks the point. Consumers must require `h2_total /
+M_total ≠ 0`. -/
+theorem heritabilityEnrichment_at_h2total0mtotal1_is_junk (h2_cat : ℝ) (M_cat : ℝ) :
+    heritabilityEnrichment h2_cat M_cat 0 1 = 0 := by
+  unfold heritabilityEnrichment
+  norm_num
+  try ring
 
 /-- Enrichment > 1 means more heritability per variant. -/
 theorem enrichment_interpretation (h2_c M_c h2_t M_t : ℝ)

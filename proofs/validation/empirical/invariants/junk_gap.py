@@ -182,6 +182,22 @@ def structures_carrying_domain_facts() -> set[str]:
 # point out before the body runs.
 GUARDED_SIG = re.compile(r"0\s*<|≠\s*0|0\s*≠|_pos\b|positive")
 
+# Definitions checked by hand whose guard cannot vanish anywhere in the type,
+# so there is no branch to name. Kept as an explicit list with reasons rather
+# than as a pattern, because every attempt to generalise these into a rule also
+# swallowed entries whose guard genuinely can vanish -- `scalarRowResolvent`
+# divides by `1 + latent ^ 2 * quadraticForm`, which looks like `sigmoid`'s
+# denominator and is not, because `quadraticForm` may be negative.
+UNREACHABLE_BY_HAND = {
+    "sigmoid": "1 + Real.exp (-x) ≥ 1",
+    "gaussianPosteriorShrinkage": "n * h + 1 = 0 needs n * h = -1, outside the domain",
+    "chain": "2 * k + 1 ≠ 0 for k : ℕ",
+    "gaussianCriticalMultiplier": "condensationConstant is proved positive",
+    "squaringFixedPoint": "scale ^ 2 + 4 ≥ 4",
+    "characteristicAmplitude": "a sum of squares is nonnegative",
+    "fstMutationDriftEquilibrium": "1 + θ = 0 needs θ = -1, outside the domain",
+}
+
 
 def _toplevel_div(s: str):
     """Split on the last top-level `/`, or None if the body is not a quotient."""
@@ -256,6 +272,8 @@ def scan() -> tuple[collections.Counter, list[tuple[str, str, str]]]:
             elif any(t in struct_guard for t in
                      re.findall(r":\s*([A-Za-z][A-Za-z0-9_'.]*)", " ".join(sig.split()))):
                 tally["ruled out by a structure field"] += 1
+            elif name in UNREACHABLE_BY_HAND:
+                tally["guard cannot vanish (checked by hand)"] += 1
             elif re.search(r"\bif\b", body):
                 tally["degenerate case already branched"] += 1
             else:
@@ -273,6 +291,7 @@ def main(argv: list[str]) -> int:
     tally, gap = scan()
     for key in ("can hit a junk value", "branch named",
                 "ruled out by its own hypothesis", "ruled out by a structure field",
+                "guard cannot vanish (checked by hand)",
                 "degenerate case already branched", "OPEN"):
         print(f"  {tally[key]:5d}  {key}")
 

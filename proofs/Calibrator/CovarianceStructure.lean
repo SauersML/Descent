@@ -143,6 +143,15 @@ tags a number of causal effects proportional to its LD score.
 noncomputable def ldsrExpectedBetaSq (h2 M ell_j N : ℝ) : ℝ :=
   h2 / M * ell_j + 1 / N
 
+/-- **ldsrExpectedBetaSq where its denominator vanishes, named.** The guard `N` is zero at `N = 0`.
+Lean returns `h2 / M * ell_j` there rather than the value the modelled quantity takes, and no
+type error marks the point. Consumers must require `N ≠ 0`. -/
+theorem ldsrExpectedBetaSq_at_n0_is_junk (h2 : ℝ) (M : ℝ) (ell_j : ℝ) :
+    ldsrExpectedBetaSq h2 M ell_j 0 = h2 / M * ell_j := by
+  unfold ldsrExpectedBetaSq
+  norm_num
+  try ring
+
 /-- **LD score regression expectation.**
     `χ²_j = (N h²/M) ℓ_j + N a + 1`, with intercept above one indicating
     confounding and slope proportional to `h²/M`.

@@ -30,6 +30,15 @@ statistical experiments and is not asserted here.
 noncomputable def transportedRidgeParameter (τ a r : ℝ) : ℝ :=
   τ ^ 2 * a / (a + r)
 
+/-- **transportedRidgeParameter where its denominator vanishes, named.** The guard `a + r` is zero
+at `a = 0`, `r = 0`. Lean returns `0` there rather than the value the modelled quantity takes,
+and no type error marks the point. Consumers must require `a + r ≠ 0`. -/
+theorem transportedRidgeParameter_at_a0r0_is_junk (τ : ℝ) :
+    transportedRidgeParameter τ 0 0 = 0 := by
+  unfold transportedRidgeParameter
+  norm_num
+  try ring
+
 /-- Robust drift strictly decreases the interior effective ridge parameter. -/
 theorem transportedRidgeParameter_lt_source (τ a r : ℝ)
     (hτ : τ ≠ 0) (ha : 0 < a) (hr : 0 < r) :
@@ -51,6 +60,16 @@ theorem transportedRidgeParameter_pos (τ a r : ℝ)
 /-- Scalar form of the robust stationarity solution before imposing the bias fixed point. -/
 noncomputable def robustRidgeCandidate (S τ a r : ℝ) : ℝ :=
   (a + r) * S ^ 2 / ((a + r) * S ^ 2 + τ ^ 2 * a)
+
+/-- **robustRidgeCandidate where its denominator vanishes, named.** The guard `(a + r) * S ^ 2 + τ ^
+2 * a` is zero at `S = 0`, `τ = 0`, `a = 0`, `r = 0`. Lean returns `0` there rather than the
+value the modelled quantity takes, and no type error marks the point. Consumers must require `(a
++ r) * S ^ 2 + τ ^ 2 * a ≠ 0`. -/
+theorem robustRidgeCandidate_at_s00a0r0_is_junk :
+    robustRidgeCandidate 0 0 0 0 = 0 := by
+  unfold robustRidgeCandidate
+  norm_num
+  try ring
 
 /-- The candidate is the usual ridge filter with the corrected effective parameter. -/
 theorem robustRidgeCandidate_eq (S τ a r : ℝ) (ha : 0 < a) (hr : 0 ≤ r)
@@ -205,11 +224,45 @@ section LongMemoryGeometry
     here is unsupported as well as contradicted. -/
 noncomputable def longMemoryMetric (ε δ : ℝ) : ℝ := ε ^ 2 / δ ^ 3
 
+/-- **longMemoryMetric where its denominator vanishes, named.** The guard `δ ^ 3` is zero at `δ =
+0`. Lean returns `0` there rather than the value the modelled quantity takes, and no type error
+marks the point. Consumers must require `δ ^ 3 ≠ 0`. -/
+theorem longMemoryMetric_at_0_is_junk (ε : ℝ) :
+    longMemoryMetric ε 0 = 0 := by
+  unfold longMemoryMetric
+  norm_num
+  try ring
+
+/-- **longMemoryMetric at zero δ, named.** A zero bandwidth gives an infinite metric. Lean
+returns `0`, the finest possible resolution, for a bandwidth that resolves nothing. Consumers
+must require `δ ≠ 0`. -/
+theorem longMemoryMetric_zero_δ_is_junk (ε : ℝ) :
+    longMemoryMetric ε 0 = 0 := by
+  unfold longMemoryMetric
+  simp
+
 /-- The parameter variance as originally posited: `3δ³/(nε²)`.
 
     **Retained as a named object, not endorsed.** The measured scaling is `δ^{+1}` with no
     `ε` dependence. -/
 noncomputable def longMemoryVariance (ε δ n : ℝ) : ℝ := 3 * δ ^ 3 / (n * ε ^ 2)
+
+/-- **longMemoryVariance where its denominator vanishes, named.** The guard `n * ε ^ 2` is zero at
+`ε = 0`, `n = 0`. Lean returns `0` there rather than the value the modelled quantity takes, and
+no type error marks the point. Consumers must require `n * ε ^ 2 ≠ 0`. -/
+theorem longMemoryVariance_at_0n0_is_junk (δ : ℝ) :
+    longMemoryVariance 0 δ 0 = 0 := by
+  unfold longMemoryVariance
+  norm_num
+  try ring
+
+/-- **longMemoryVariance at zero ε, named.** A zero signal scale makes the variance infinite:
+nothing can be estimated. Lean returns `0`, a perfectly estimated quantity. Consumers must
+require `ε ≠ 0`. -/
+theorem longMemoryVariance_zero_ε_is_junk (δ : ℝ) (n : ℝ) :
+    longMemoryVariance 0 δ n = 0 := by
+  unfold longMemoryVariance
+  simp
 
 /-- **The actual mechanism: an efficient estimator's transported loss is `p/(2n)`.**
 

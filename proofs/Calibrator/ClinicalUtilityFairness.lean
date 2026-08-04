@@ -721,6 +721,17 @@ section Fairness
 noncomputable def ppv (prev tpr fpr : ℝ) : ℝ :=
   prev * tpr / (prev * tpr + (1 - prev) * fpr)
 
+/-- **ppv where its denominator vanishes, named.** The guard `prev * tpr + (1 - prev) * fpr` is zero
+at `prev = 0`, `tpr = 0`, `fpr = 0`. With no cases and a test that never fires, the positive
+predictive value is undefined; the value returned reads as a test whose every positive call is
+wrong. Lean returns `0` there rather than the value the modelled quantity takes, and no type
+error marks the point. Consumers must require `prev * tpr + (1 - prev) * fpr ≠ 0`. -/
+theorem ppv_at_prev0tpr0fpr0_is_junk :
+    ppv 0 0 0 = 0 := by
+  unfold ppv
+  norm_num
+  try ring
+
 /-- **Predictive value recovers the true positives from everything predicted positive.** -/
 theorem ppv_mul_predictedPositive (prev tpr fpr : ℝ)
     (h : prev * tpr + (1 - prev) * fpr ≠ 0) :

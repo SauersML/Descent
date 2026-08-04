@@ -130,6 +130,14 @@ theorem dirichlet_ordering_survives_remainder
         Empirical status: UNTESTED. -/
 noncomputable def driftHorizon (D₁ D₂ C : ℝ) : ℝ := (D₂ - D₁) / (2 * C)
 
+/-- **driftHorizon at zero C, named.** A zero coupling constant means the two divergences never
+reconcile and the horizon is infinite. Lean returns `0`, placing the horizon at the present
+moment. Consumers must require `C ≠ 0`. -/
+theorem driftHorizon_zero_c_is_junk (D₁ : ℝ) (D₂ : ℝ) :
+    driftHorizon D₁ D₂ 0 = 0 := by
+  unfold driftHorizon
+  simp
+
 /-- A wider Dirichlet gap buys a proportionally longer horizon. -/
 theorem driftHorizon_strictMono (D₁ D₂ D₂' C : ℝ) (hC : 0 < C) (h : D₂ < D₂') :
     driftHorizon D₁ D₂ C < driftHorizon D₁ D₂' C := by
@@ -183,6 +191,15 @@ theorem localizedTransferVariance_eq_delocalized_one (v : ℝ) (k : ℕ) :
 
 /-- The Gaussian finite-`n` inverse-Wishart inflation, `n/(n - m - 1)`. -/
 noncomputable def sampleInverseInflation (n m : ℝ) : ℝ := n / (n - m - 1)
+
+/-- **sampleInverseInflation where its denominator vanishes, named.** The guard `n - m - 1` is zero
+at `n = 1`, `m = 0`. Lean returns `0` there rather than the value the modelled quantity takes,
+and no type error marks the point. Consumers must require `n - m - 1 ≠ 0`. -/
+theorem sampleInverseInflation_at_n1m0_is_junk :
+    sampleInverseInflation 1 0 = 0 := by
+  unfold sampleInverseInflation
+  norm_num
+  try ring
 
 /-- The inflation exceeds one whenever the panel is not degenerate, so ignoring it
     understates the inverse. -/

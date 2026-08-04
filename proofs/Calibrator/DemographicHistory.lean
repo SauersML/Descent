@@ -101,12 +101,32 @@ section SteppingStone
 noncomputable def demoSteppingStoneFst (d Ne m σ_sq : ℝ) : ℝ :=
   d / (d + 4 * Ne * m * σ_sq)
 
+/-- **demoSteppingStoneFst where its denominator vanishes, named.** The guard `d + 4 * Ne * m *
+σ_sq` is zero at `d = 0`, `Ne = 0`, `m = 0`, `σ_sq = 0`. Lean returns `0` there rather than the
+value the modelled quantity takes, and no type error marks the point. Consumers must require `d
++ 4 * Ne * m * σ_sq ≠ 0`. -/
+theorem demoSteppingStoneFst_at_d0ne0m0sq0_is_junk :
+    demoSteppingStoneFst 0 0 0 0 = 0 := by
+  unfold demoSteppingStoneFst
+  norm_num
+  try ring
+
 /-- **The functional form the previous derivation produced**, retained so that the
 indistinguishability recorded in the note above can be stated rather than asserted.
 
     Empirical status: UNTESTED. -/
 noncomputable def steppingStoneFstQuadratic (d Ne m σ_sq : ℝ) : ℝ :=
   d / (d + 4 * Ne * σ_sq ^ 2 * m ^ 2)
+
+/-- **steppingStoneFstQuadratic where its denominator vanishes, named.** The guard `d + 4 * Ne *
+σ_sq ^ 2 * m ^ 2` is zero at `d = 0`, `Ne = 0`, `m = 0`, `σ_sq = 0`. Lean returns `0` there
+rather than the value the modelled quantity takes, and no type error marks the point. Consumers
+must require `d + 4 * Ne * σ_sq ^ 2 * m ^ 2 ≠ 0`. -/
+theorem steppingStoneFstQuadratic_at_d0ne0m0sq0_is_junk :
+    steppingStoneFstQuadratic 0 0 0 0 = 0 := by
+  unfold steppingStoneFstQuadratic
+  norm_num
+  try ring
 
 /-- **A freely fitted dispersal variance cannot tell the two forms apart.**
 
@@ -226,6 +246,14 @@ being 2m (or 2·m·σ²), not from any separate diploid doubling.
 noncomputable def steppingStoneDiffusionTimescale (d σ_sq m : ℝ) : ℝ :=
   d / (2 * σ_sq * m)
 
+/-- **steppingStoneDiffusionTimescale at zero σ_sq, named.** With no dispersal variance a lineage
+never moves between demes and the diffusion timescale is infinite. Lean returns `0`: instantaneous
+mixing across the lattice, the opposite regime. Consumers must require `σ_sq ≠ 0`. -/
+theorem steppingStoneDiffusionTimescale_zero_sigmasq_is_junk (d : ℝ) (m : ℝ) :
+    steppingStoneDiffusionTimescale d 0 m = 0 := by
+  unfold steppingStoneDiffusionTimescale
+  simp
+
 /-- **Expected meeting time on a lattice of `D` demes**, `d·(D-d)/(2·σ²·m)`:
     the quantity `steppingStoneDiffusionTimescale` is a per-deme rescaling of.
     Stated so that the corpus contains the lattice-level time under a name,
@@ -240,6 +268,14 @@ noncomputable def steppingStoneDiffusionTimescale (d σ_sq m : ℝ) : ℝ :=
 noncomputable def steppingStoneMeetingTimeOnLattice
     (d demeCount σ_sq m : ℝ) : ℝ :=
   d * (demeCount - d) / (2 * σ_sq * m)
+
+/-- **steppingStoneMeetingTimeOnLattice at zero σ_sq, named.** The same zero-dispersal branch as
+the diffusion timescale, with the same reversal: lineages that can never move are reported as
+meeting immediately. Consumers must require `σ_sq ≠ 0`. -/
+theorem steppingStoneMeetingTimeOnLattice_zero_sigmasq_is_junk (d : ℝ) (demeCount : ℝ) (m : ℝ) :
+    steppingStoneMeetingTimeOnLattice d demeCount 0 m = 0 := by
+  unfold steppingStoneMeetingTimeOnLattice
+  simp
 
 /-- **The guard against the argument swap.**
 
@@ -415,6 +451,15 @@ noncomputable def admixedFst (α fst_AB : ℝ) : ℝ :=
     Empirical status: UNTESTED. -/
 noncomputable def admixedFstExact (α fst_AB hetRatio : ℝ) : ℝ :=
   (1 - α) ^ 2 * fst_AB / hetRatio
+
+/-- **admixedFstExact at zero hetRatio, named.** A heterozygosity ratio of zero means the admixed
+population carries no heterozygosity to normalise against, and the corrected `Fst` is undefined.
+Lean returns `0`, reporting no differentiation, which is what a freely interbreeding pair of
+populations also gives. Consumers must require `hetRatio ≠ 0`. -/
+theorem admixedFstExact_zero_hetratio_is_junk (α : ℝ) (fst_AB : ℝ) :
+    admixedFstExact α fst_AB 0 = 0 := by
+  unfold admixedFstExact
+  simp
 
 /-- **The regime, made checkable.** `admixedFst` is exactly the `hetRatio = 1`
     case. A future edit that changes either body without preserving this stops
@@ -882,7 +927,9 @@ trajectory of that process and its closed form is proved, not asserted.
 noncomputable def driftLDCreationRate (Ne : ℝ) : ℝ :=
   1 / (2 * Ne)
 
-/-- **driftLDCreationRate at zero Ne, named.** An empty population creates linkage disequilibrium instantly and the rate diverges. Lean returns `0`, reporting a population in which drift generates no disequilibrium at all. Consumers must require `Ne ≠ 0`. -/
+/-- **driftLDCreationRate at zero Ne, named.** An empty population creates linkage disequilibrium
+instantly and the rate diverges. Lean returns `0`, reporting a population in which drift generates
+no disequilibrium at all. Consumers must require `Ne ≠ 0`. -/
 theorem driftLDCreationRate_zero_ne_is_junk :
     driftLDCreationRate 0 = 0 := by
   unfold driftLDCreationRate

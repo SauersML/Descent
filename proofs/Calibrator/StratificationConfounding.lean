@@ -623,6 +623,17 @@ noncomputable def AttenuationModel.witness : AttenuationModel where
 noncomputable def reliabilityRatio (r2 σ2_noise : ℝ) : ℝ :=
   r2 / (r2 + σ2_noise)
 
+/-- **reliabilityRatio where its denominator vanishes, named.** The guard `r2 + σ2_noise` is zero at
+`r2 = 0`, `σ2_noise = 0`. With no signal and no noise the reliability ratio is undefined, and
+the value returned reads as a completely unreliable measurement. Lean returns `0` there rather
+than the value the modelled quantity takes, and no type error marks the point. Consumers must
+require `r2 + σ2_noise ≠ 0`. -/
+theorem reliabilityRatio_at_r202noise0_is_junk :
+    reliabilityRatio 0 0 = 0 := by
+  unfold reliabilityRatio
+  norm_num
+  try ring
+
 /-- **The reliability ratio recovers the true variance from the total.** This is what fixes the
 ratio; monotonicity in the noise is shared by every rescaling of it. -/
 theorem reliabilityRatio_mul_total (r2 σ2_noise : ℝ) (h : r2 + σ2_noise ≠ 0) :

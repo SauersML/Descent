@@ -332,6 +332,16 @@ noncomputable def explainedR2FromTransportMoments
     (scoreOutcomeCov scoreVariance outcomeVariance : ℝ) : ℝ :=
   scoreOutcomeCov ^ 2 / (scoreVariance * outcomeVariance)
 
+/-- **explainedR2FromTransportMoments at zero scoreVariance, named.** A score with no variance
+explains nothing, and the ratio is undefined rather than zero -- there is no denominator to
+normalise the covariance against. Lean returns `0`, which is indistinguishable from a score that
+varies and predicts nothing. Consumers must require `scoreVariance ≠ 0`. -/
+theorem explainedR2FromTransportMoments_zero_scorevariance_is_junk
+    (scoreOutcomeCov outcomeVariance : ℝ) :
+    explainedR2FromTransportMoments scoreOutcomeCov 0 outcomeVariance = 0 := by
+  unfold explainedR2FromTransportMoments
+  simp
+
 /-- **A score that is the outcome explains all of it.** When the covariance and both variances
 coincide the explained fraction is exactly one, which fixes the normalisation; every positive
 multiple of this ratio is a squared covariance over a variance product and would miss it. -/
@@ -982,6 +992,16 @@ unless the noise slope is zero. -/
 
 noncomputable def optimalSlopeLinearNoise (sigma_g_sq base_error slope_error c : ℝ) : ℝ :=
   sigma_g_sq / (sigma_g_sq + base_error + slope_error * c)
+
+/-- **optimalSlopeLinearNoise where its denominator vanishes, named.** The guard `sigma_g_sq +
+base_error + slope_error * c` is zero at `sigma_g_sq = 0`, `base_error = 0`, `slope_error = 0`,
+`c = 0`. Lean returns `0` there rather than the value the modelled quantity takes, and no type
+error marks the point. Consumers must require `sigma_g_sq + base_error + slope_error * c ≠ 0`. -/
+theorem optimalSlopeLinearNoise_at_sigmagsq0baseerror0slopeer_is_junk :
+    optimalSlopeLinearNoise 0 0 0 0 = 0 := by
+  unfold optimalSlopeLinearNoise
+  norm_num
+  try ring
 
 /-- **The slope recovers the signal from the total variance.** -/
 theorem optimalSlopeLinearNoise_mul_total (sigma_g_sq base_error slope_error c : ℝ)
@@ -2595,6 +2615,16 @@ namespace TransportedMetrics
     Empirical status: UNTESTED. -/
 noncomputable def r2FromSignalVariance (vSignal vNoise : ℝ) : ℝ :=
   vSignal / (vSignal + vNoise)
+
+/-- **r2FromSignalVariance where its denominator vanishes, named.** The guard `vSignal + vNoise` is
+zero at `vSignal = 0`, `vNoise = 0`. With neither signal nor noise there is no variance to
+explain. Lean returns `0` there rather than the value the modelled quantity takes, and no type
+error marks the point. Consumers must require `vSignal + vNoise ≠ 0`. -/
+theorem r2FromSignalVariance_at_vsignal0vnoise0_is_junk :
+    r2FromSignalVariance 0 0 = 0 := by
+  unfold r2FromSignalVariance
+  norm_num
+  try ring
 
 /-- **The explained-variance ratio really is the `R²` of a data-generating process** —
 under a regime that is now written down rather than assumed.

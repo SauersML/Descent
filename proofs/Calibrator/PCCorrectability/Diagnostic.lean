@@ -111,6 +111,16 @@ noncomputable def pcTargetAxisEfficacy
     (uncorrectedSusceptibility residualSusceptibility : ℝ) : ℝ :=
   1 - residualSusceptibility / uncorrectedSusceptibility
 
+/-- **Principal-component correction efficacy against a null susceptibility, named.** If the
+uncorrected susceptibility is zero there was nothing to correct and the efficacy is undefined.
+Lean returns `1`: PERFECT correction, the best possible score, awarded for correcting a
+susceptibility that was not there. A diagnostic that scores its own inapplicability as success is
+the wrong way round. Consumers must require `uncorrectedSusceptibility ≠ 0`. -/
+theorem pcTargetAxisEfficacy_null_susceptibility_is_junk (residualSusceptibility : ℝ) :
+    pcTargetAxisEfficacy 0 residualSusceptibility = 1 := by
+  unfold pcTargetAxisEfficacy
+  simp
+
 /-- Rearranging the efficacy definition recovers the residual susceptibility
 exactly. -/
 theorem residual_susceptibility_eq_one_sub_efficacy_mul

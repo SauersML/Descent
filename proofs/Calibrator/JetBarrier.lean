@@ -262,11 +262,30 @@ At a threshold placed exactly on the lattice (`delta = 0`), the exceedance inten
 a lattice law exceeds the nonlattice/Gaussian intensity by this factor. -/
 noncomputable def latticeInflation (h : ℝ) : ℝ := h / (1 - Real.exp (-h))
 
+/-- **The lattice inflation factor at zero spacing, named, and a removable singularity missed.**
+As `h` tends to zero the ratio `h / (1 - exp (-h))` tends to `1`: the inflation factor is
+continuous there and the continuum limit is the identity. Lean returns `0` instead, because the
+divisor is junk-zero -- so the one point where the answer is known exactly is the one point the
+definition gets wrong, and it gets it wrong by the whole factor. Consumers must require
+`h ≠ 0`. -/
+theorem latticeInflation_zero_spacing_is_junk :
+    latticeInflation 0 = 0 := by
+  unfold latticeInflation
+  simp
+
 /-- The general bracket `rho(delta) = h * exp (-delta) / (1 - exp (-h))`, where
 `delta ∈ [0, h)` is the distance from the threshold up to the next lattice point.
 `latticeInflation h = latticeBracket h 0`. -/
 noncomputable def latticeBracket (h δ : ℝ) : ℝ :=
   h * Real.exp (-δ) / (1 - Real.exp (-h))
+
+/-- **The lattice bracket at zero spacing, named.** The same divisor as `latticeInflation`, and
+the same removable singularity: the true limit is `exp (-δ)`, and Lean returns `0` for every
+`δ`. Consumers must require `h ≠ 0`. -/
+theorem latticeBracket_zero_spacing_is_junk (δ : ℝ) :
+    latticeBracket 0 δ = 0 := by
+  unfold latticeBracket
+  simp
 
 @[simp] theorem latticeBracket_zero (h : ℝ) : latticeBracket h 0 = latticeInflation h := by
   unfold latticeBracket latticeInflation

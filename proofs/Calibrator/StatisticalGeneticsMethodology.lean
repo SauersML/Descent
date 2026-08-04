@@ -93,7 +93,10 @@ theorem incremental_r2_nonneg
 noncomputable def portabilityRatio (dr2_target dr2_source : ℝ) : ℝ :=
   dr2_target / dr2_source
 
-/-- **portabilityRatio at zero dr2_source, named.** A source cohort with no explained variance gives no baseline to be portable from. Lean returns `0`, complete failure to transfer, which is indistinguishable from a real transfer failure against a working source. Consumers must require `dr2_source ≠ 0`. -/
+/-- **portabilityRatio at zero dr2_source, named.** A source cohort with no explained variance
+gives no baseline to be portable from. Lean returns `0`, complete failure to transfer, which is
+indistinguishable from a real transfer failure against a working source. Consumers must require
+`dr2_source ≠ 0`. -/
 theorem portabilityRatio_zero_dr2source_is_junk (dr2_target : ℝ) :
     portabilityRatio dr2_target 0 = 0 := by
   unfold portabilityRatio
@@ -210,6 +213,27 @@ correct inverse-variance meta-analysis **weight**, and where a weight is wanted
     (`proofs/validation/empirical/ldsc_diff/`). -/
 noncomputable def effectiveSampleSizeFromSE (se p : ℝ) : ℝ :=
   1 / (se ^ 2 * (2 * p * (1 - p)))
+
+/-- **The effective sample size at a monomorphic marker, named.** With `p = 0` the dosage has no
+variance, and the standard error of an effect estimated at a monomorphic marker carries no
+information about sample size at all -- at fixed `se` the formula diverges. The divisor
+`2 * p * (1 - p)` is zero and Lean returns `0`: the SMALLEST effective sample size, so a marker
+that should be excluded from a meta-analysis instead enters it carrying weight zero, silently,
+and the total effective N is understated rather than flagged. Consumers must require `p ≠ 0`. -/
+theorem effectiveSampleSizeFromSE_monomorphic_is_junk (se : ℝ) :
+    effectiveSampleSizeFromSE se 0 = 0 := by
+  unfold effectiveSampleSizeFromSE
+  simp
+
+/-- **The effective sample size at a fixed marker, named.** The mirror branch at `p = 1`, by the
+same `2 * p * (1 - p)` divisor and with the same consequence. Both ends of the frequency range
+report zero effective sample size, so a marker fixed for the alternate allele and one fixed for
+the reference are indistinguishable from each other and from a genuinely uninformative
+polymorphic marker. Consumers must require `p ≠ 1`. -/
+theorem effectiveSampleSizeFromSE_fixed_is_junk (se : ℝ) :
+    effectiveSampleSizeFromSE se 1 = 0 := by
+  unfold effectiveSampleSizeFromSE
+  simp
 
 /-- The effective sample size is positive at any polymorphic frequency. -/
 theorem effective_n_pos (se p : ℝ) (h_se : 0 < se) (hp0 : 0 < p) (hp1 : p < 1) :

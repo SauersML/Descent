@@ -84,7 +84,9 @@ theorem driftGeneratorForm_independent_of_circulation (s a a' x y : ℝ) :
 /-- The time constant that sets the transfer frontier: the inverse dissipation. -/
 noncomputable def frontierTime (s : ℝ) : ℝ := 1 / s
 
-/-- **frontierTime at zero s, named.** A zero rate never reaches the frontier, so the time diverges. Lean returns `0`: arrival is instantaneous, the opposite end of the scale. Consumers must require `s ≠ 0`. -/
+/-- **frontierTime at zero s, named.** A zero rate never reaches the frontier, so the time
+diverges. Lean returns `0`: arrival is instantaneous, the opposite end of the scale. Consumers
+must require `s ≠ 0`. -/
 theorem frontierTime_zero_s_is_junk :
     frontierTime 0 = 0 := by
   unfold frontierTime
@@ -94,8 +96,26 @@ theorem frontierTime_zero_s_is_junk :
 symmetric part of the resolvent of `S + A`. -/
 noncomputable def apparentMixingTime (s a : ℝ) : ℝ := s / (s ^ 2 + a ^ 2)
 
+/-- **apparentMixingTime where its denominator vanishes, named.** The guard `s ^ 2 + a ^ 2` is zero
+at `s = 0`, `a = 0`. Lean returns `0` there rather than the value the modelled quantity takes,
+and no type error marks the point. Consumers must require `s ^ 2 + a ^ 2 ≠ 0`. -/
+theorem apparentMixingTime_at_s0a0_is_junk :
+    apparentMixingTime 0 0 = 0 := by
+  unfold apparentMixingTime
+  norm_num
+  try ring
+
 /-- The exact gap between the two. -/
 noncomputable def circulationDefect (s a : ℝ) : ℝ := a ^ 2 / (s * (s ^ 2 + a ^ 2))
+
+/-- **circulationDefect at zero s, named.** A zero symmetric part leaves no circulation to be
+defective about, and the defect diverges. Lean returns `0`, reporting a perfectly circulating
+flow -- the best case -- for a flow with no symmetric component at all. Consumers must require
+`s ≠ 0`. -/
+theorem circulationDefect_zero_s_is_junk (a : ℝ) :
+    circulationDefect 0 a = 0 := by
+  unfold circulationDefect
+  simp
 
 /-- The gap between the two times, in cleared form. -/
 theorem circulationDefect_eq_sub (s a : ℝ) (hs : 0 < s) :
