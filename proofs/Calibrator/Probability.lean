@@ -943,5 +943,20 @@ theorem eq_of_ae_eq_of_continuous {α : Type*} [TopologicalSpace α]
     (h_ae : f =ᵐ[μ] g) : f = g :=
   Measure.eq_of_ae_eq h_ae hf hg
 
+/-- **Heterozygosity rises with allele frequency below one half.**
+
+`2 p (1 - p)` is the genotype variance at Hardy-Weinberg, and this is the only fact about
+its shape the corpus uses.  It was proved three times: once about rare against common
+variants in `RareVariantPortability`, once about neutral against balanced sites in
+`SelectionArchitecture`, and once through the named `genotypeVarianceHWE` in
+`GeneticArchitectureDiscovery` -- three modules, one `nlinarith` on the same two squares,
+and no theorem relating any two of them.
+
+It belongs here, above all three, because it is a fact about a real number in `[0, 1/2]`
+and not about rarity, selection or discovery. -/
+theorem two_mul_one_sub_strictMono_le_half (p q : ℝ)
+    (h_lt : p < q) (h_q_half : q ≤ 1 / 2) :
+    2 * p * (1 - p) < 2 * q * (1 - q) := by
+  nlinarith [sq_nonneg (q - 1 / 2), sq_nonneg (p - 1 / 2)]
 
 end Calibrator

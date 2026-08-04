@@ -106,13 +106,12 @@ theorem genotypeVarianceHWE_strictMono_left_half
     (h_order : maf₂ < maf₁)
     (h_maf₁_half : maf₁ ≤ 1 / 2) :
     genotypeVarianceHWE maf₂ < genotypeVarianceHWE maf₁ := by
+  -- The shape fact -- `2 p (1 - p)` rises with `p` below the turning point -- is
+  -- `two_mul_one_sub_strictMono_le_half` in `Calibrator.Probability`, where it is about a
+  -- real number rather than about a minor allele.  This theorem is that fact read through
+  -- the name the genotype variance carries here.
   unfold genotypeVarianceHWE
-  have h_maf₂_half : maf₂ < 1 / 2 := lt_of_lt_of_le h_order h_maf₁_half
-  have h_maf₂_nonneg : 0 ≤ maf₂ := le_of_lt h_maf₂_pos
-  -- 2p(1-p) is a genotype variance, so the gap factors as (maf₁ - maf₂)(1 - maf₁ - maf₂),
-  -- and both factors are positive below the 1/2 turning point.
-  nlinarith [mul_pos (sub_pos.mpr h_order)
-    (show (0:ℝ) < 1 - maf₁ - maf₂ by linarith)]
+  exact two_mul_one_sub_strictMono_le_half maf₂ maf₁ h_order h_maf₁_half
 
 /-- **Different LD and MAF can produce population-specific GWAS hits.**
     This theorem now proves the biologically relevant part explicitly:

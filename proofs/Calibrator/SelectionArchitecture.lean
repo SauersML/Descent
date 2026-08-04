@@ -433,6 +433,18 @@ noncomputable def sigmaThetaFromObservedSelectedVariance
     (2 * (v_selected - stabilizingSelectedArchitectureVariance v_mutation s) /
       tauFromObservedEffectCorrelation t rho)
 
+/-- A nonpositive radicand sends `Real.sqrt` to Mathlib's junk `0`, so an observed variance
+below the mutation-selection floor reports zero effect-size scale rather than an inconsistent
+model.  Zero scale is a value the architecture can also take, so it cannot be read as a flag. -/
+theorem sigmaThetaFromObservedSelectedVariance_at_nonpositive_radicand_is_junk
+    (v_selected v_mutation s t rho : ℝ)
+    (hnonpos : 2 * (v_selected - stabilizingSelectedArchitectureVariance v_mutation s) /
+      tauFromObservedEffectCorrelation t rho ≤ 0) :
+    sigmaThetaFromObservedSelectedVariance v_selected v_mutation s t rho = 0 := by
+  unfold sigmaThetaFromObservedSelectedVariance
+  exact Real.sqrt_eq_zero_of_nonpos hnonpos
+
+
 /-- The recovered optimum-diffusion scale is positive whenever the observed
     selected-architecture variance strictly exceeds the stabilizing baseline. -/
 theorem sigmaThetaFromObservedSelectedVariance_pos
@@ -534,8 +546,9 @@ theorem two_mul_one_sub_lt_of_lt_of_lt_half
     (h_neutral_pos : 0 < p_neutral)
     (h_balanced : hi < p_balanced) (h_balanced_lt : p_balanced < 1/2)
     (h_lo_le_hi : lo ≤ hi) (h_lo_pos : 0 < lo) :
-    2 * p_neutral * (1 - p_neutral) < 2 * p_balanced * (1 - p_balanced) := by
-  nlinarith [sq_nonneg (p_balanced - 1/2), sq_nonneg (p_neutral - 1/2)]
+    2 * p_neutral * (1 - p_neutral) < 2 * p_balanced * (1 - p_balanced) :=
+  two_mul_one_sub_strictMono_le_half p_neutral p_balanced
+    (by linarith) (le_of_lt h_balanced_lt)
 
 end DiversifyingSelection
 

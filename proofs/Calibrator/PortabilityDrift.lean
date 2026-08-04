@@ -1683,6 +1683,17 @@ noncomputable def sourceERMWeights {p : ℕ}
     (crossSource : Fin p → ℝ) : Fin p → ℝ :=
   sigmaObsSource⁻¹.mulVec crossSource
 
+/-- A singular source covariance has Mathlib inverse `0`, so the fitted weights are the zero
+predictor.  That is a legitimate weight vector, not a flag, which is why the branch is named:
+a rank-deficient design reports "predict nothing" rather than "not identified". -/
+theorem sourceERMWeights_at_singular_covariance_is_junk {p : ℕ}
+    (sigmaObsSource : Matrix (Fin p) (Fin p) ℝ) (crossSource : Fin p → ℝ)
+    (hsingular : ¬ IsUnit sigmaObsSource.det) :
+    sourceERMWeights sigmaObsSource crossSource = 0 := by
+  unfold sourceERMWeights
+  rw [Matrix.nonsing_inv_apply_not_isUnit _ hsingular, Matrix.zero_mulVec]
+
+
 /-- **Aggregate tag-to-causal alignment in a population**: directly observed causal
 variants plus ancestry-specific proxy tagging, each including whatever arose after
 divergence.
@@ -5338,6 +5349,18 @@ noncomputable def presentDayR2MutationDrift (V_A V_E fst_drift shared_ld : ℝ) 
   let v := presentDayPGSVarianceMutationDrift V_A fst_drift shared_ld
   v / (v + V_E)
 
+/-- Where the present-day score variance and the environmental variance cancel, the ratio
+divides by zero and Mathlib returns `0`: no predictive accuracy, reported for a model that has
+no total variance at all. -/
+theorem presentDayR2MutationDrift_at_zero_total_variance_is_junk
+    (V_A V_E fst_drift shared_ld : ℝ)
+    (hzero : presentDayPGSVarianceMutationDrift V_A fst_drift shared_ld + V_E = 0) :
+    presentDayR2MutationDrift V_A V_E fst_drift shared_ld = 0 := by
+  show presentDayPGSVarianceMutationDrift V_A fst_drift shared_ld /
+    (presentDayPGSVarianceMutationDrift V_A fst_drift shared_ld + V_E) = 0
+  rw [hzero, div_zero]
+
+
 
 /-- **Mutation-drift R² is below drift-only R².**
     When shared LD is imperfect, R² under mutation-drift is strictly below
@@ -5860,21 +5883,32 @@ theorem fstMigrationDriftEquilibrium_in_unit (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0
   ⟨fstMigrationDriftEquilibrium_pos Ne m hNe (le_of_lt hm),
    fstMigrationDriftEquilibrium_lt_one Ne m hNe hm⟩
 
+/-- **The equilibrium decreases when the migration-drift product rises.**
+
+Both monotonicities are this one fact: the equilibrium is `1 / (1 + 4 Ne m)`, so it falls
+whenever `Ne * m` rises, and whether that happened by moving `m` or by moving `Ne` is the
+caller's business.  Stated separately, each carried the same three-line proof. -/
+theorem fstMigrationDriftEquilibrium_strictAnti_product (Ne₁ m₁ Ne₂ m₂ : ℝ)
+    (h_pos : 0 < Ne₁ * m₁) (h_more : Ne₁ * m₁ < Ne₂ * m₂) :
+    fstMigrationDriftEquilibrium Ne₂ m₂ < fstMigrationDriftEquilibrium Ne₁ m₁ := by
+  unfold fstMigrationDriftEquilibrium
+  apply div_lt_div_of_pos_left one_pos (by nlinarith) (by nlinarith)
+
 /-- **Equilibrium Fst decreases with migration rate** (Ne fixed).
     More migration → more gene flow → less differentiation. -/
 theorem fstMigrationDriftEquilibrium_decreases_with_m (Ne m₁ m₂ : ℝ)
     (hNe : 0 < Ne) (hm₁ : 0 < m₁) (h_more : m₁ < m₂) :
-    fstMigrationDriftEquilibrium Ne m₂ < fstMigrationDriftEquilibrium Ne m₁ := by
-  unfold fstMigrationDriftEquilibrium
-  apply div_lt_div_of_pos_left one_pos (by nlinarith) (by nlinarith)
+    fstMigrationDriftEquilibrium Ne m₂ < fstMigrationDriftEquilibrium Ne m₁ :=
+  fstMigrationDriftEquilibrium_strictAnti_product Ne m₁ Ne m₂
+    (by positivity) (by nlinarith)
 
 /-- **Equilibrium Fst decreases with effective population size** (m fixed).
     Larger Ne → slower drift relative to migration → less differentiation. -/
 theorem fstMigrationDriftEquilibrium_decreases_with_Ne (Ne₁ Ne₂ m : ℝ)
     (hNe₁ : 0 < Ne₁) (hm : 0 < m) (h_more : Ne₁ < Ne₂) :
-    fstMigrationDriftEquilibrium Ne₂ m < fstMigrationDriftEquilibrium Ne₁ m := by
-  unfold fstMigrationDriftEquilibrium
-  apply div_lt_div_of_pos_left one_pos (by nlinarith) (by nlinarith)
+    fstMigrationDriftEquilibrium Ne₂ m < fstMigrationDriftEquilibrium Ne₁ m :=
+  fstMigrationDriftEquilibrium_strictAnti_product Ne₁ m Ne₂ m
+    (by positivity) (by nlinarith)
 
 /-! ### 2. Migration counteracts drift -/
 
@@ -6655,96 +6689,38 @@ theorem fstMigDriftNext_no_migration_fixedpoint_one (Ne : ℝ) (hNe : Ne ≠ 0) 
   ring_nf
 
 /-! ### 2. The exact equilibrium fixed point -/
+/-! ### The migration-drift equilibrium, under one name
 
-/-- **Equilibrium Fst from the migration-drift recurrence.**
-    Solving Fst* = (1 - 2m - 1/(2Ne)) * Fst* + 1/(2Ne) for Fst*:
-      Fst* - (1 - 2m - 1/(2Ne)) * Fst* = 1/(2Ne)
-      Fst* * (2m + 1/(2Ne)) = 1/(2Ne)
-      Fst* = (1/(2Ne)) / (2m + 1/(2Ne))
-            = 1 / (4*Ne*m + 1)
-    This is the closed-form solution of the linearized recurrence.
+`fstMigDriftEquil Ne m = 1 / (4 * Ne * m + 1)` stood here as a third spelling of
+`fstMigrationDriftEquilibrium Ne m = 1 / (1 + 4 * Ne * m)`, with its own junk-point
+theorem, its own positivity, its own two bounds and its own two monotonicities -- eight
+declarations, each the twin of one above, and a ninth proving the two spellings equal.
 
-    Empirical status: UNTESTED. -/
-noncomputable def fstMigDriftEquil (Ne m : ℝ) : ℝ :=
-  1 / (4 * Ne * m + 1)
+The prose here said so: "Three definitions of one quantity share a junk branch, so
+agreement between them is not evidence about the value." The remedy for that is one
+definition, not a theorem tying the copies, because a tie makes the copies consistent and
+leaves the reader to find out which of the three names a given theorem happens to use.
 
-/-- **fstMigDriftEquil at `4 * Ne * m + 1 = 0`, named.** A third spelling of the same
-equilibrium, failing at the same point. Three definitions of one quantity share a junk branch, so
-agreement between them is not evidence about the value. Consumers must exclude it by hypothesis. -/
-theorem fstMigDriftEquil_balancing_negative_migration_is_junk :
-    fstMigDriftEquil 1 (-(1/4)) = 0 := by
-  unfold fstMigDriftEquil
-  norm_num
-
-/-- The derived equilibrium matches `fstMigrationDriftEquilibrium`. -/
-theorem fstMigDriftEquil_eq_fstMigrationDriftEquilibrium (Ne m : ℝ) :
-    fstMigDriftEquil Ne m = fstMigrationDriftEquilibrium Ne m := by
-  unfold fstMigDriftEquil fstMigrationDriftEquilibrium
-  ring
+What was genuinely this spelling's own -- the drift-over-migration-plus-drift ratio form,
+which is the reading that makes the balance explicit -- is stated below on the surviving
+name. -/
 
 /-- **Intermediate form of the fixed-point equation.**
     The equilibrium can also be written as
       Fst* = (1/(2Ne)) / (2m + 1/(2Ne))
     which makes the balance between drift (numerator) and
     migration + drift (denominator) explicit. -/
-theorem fstMigDriftEquil_ratio_form (Ne m : ℝ)
+theorem fstMigrationDriftEquilibrium_ratio_form (Ne m : ℝ)
     (hNe : 0 < Ne) (hm : 0 ≤ m) :
-    fstMigDriftEquil Ne m =
+    fstMigrationDriftEquilibrium Ne m =
       (1 / (2 * Ne)) / (2 * m + 1 / (2 * Ne)) := by
-  unfold fstMigDriftEquil
+  unfold fstMigrationDriftEquilibrium
   have hNe2 : (0 : ℝ) < 2 * Ne := by positivity
   have hden : 2 * m + 1 / (2 * Ne) ≠ 0 := by
     have : 0 < 2 * m + 1 / (2 * Ne) := by positivity
     linarith
   field_simp [hden]
   ring
-
-/-! ### 3. Equilibrium Fst is positive and bounded -/
-
-/-- Equilibrium Fst from the recurrence is positive. -/
-theorem fstMigDriftEquil_pos (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 ≤ m) :
-    0 < fstMigDriftEquil Ne m := by
-  unfold fstMigDriftEquil
-  positivity
-
-/-- Equilibrium Fst from the recurrence is at most 1. -/
-theorem fstMigDriftEquil_le_one (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 ≤ m) :
-    fstMigDriftEquil Ne m ≤ 1 := by
-  unfold fstMigDriftEquil
-  rw [div_le_one (by nlinarith)]
-  nlinarith
-
-/-- Equilibrium Fst from the recurrence is strictly less than 1 when m > 0. -/
-theorem fstMigDriftEquil_lt_one (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 < m) :
-    fstMigDriftEquil Ne m < 1 := by
-  unfold fstMigDriftEquil
-  rw [div_lt_one (by nlinarith)]
-  nlinarith
-
-/-! ### 4. Equilibrium Fst is decreasing in m (derived from the formula) -/
-
-/-- **Equilibrium Fst decreases with migration rate.**
-    From Fst* = 1/(4Nm + 1), increasing m increases the denominator,
-    hence decreases Fst*. This is derived, not assumed. -/
-theorem fstMigDriftEquil_decreasing_in_m (Ne m₁ m₂ : ℝ)
-    (hNe : 0 < Ne) (hm₁ : 0 < m₁)
-    (h_more : m₁ < m₂) :
-    fstMigDriftEquil Ne m₂ < fstMigDriftEquil Ne m₁ := by
-  unfold fstMigDriftEquil
-  apply div_lt_div_of_pos_left one_pos (by nlinarith) (by nlinarith)
-
-/-! ### 5. Equilibrium Fst is decreasing in Ne (derived from the formula) -/
-
-/-- **Equilibrium Fst decreases with effective population size.**
-    From Fst* = 1/(4Nm + 1), increasing Ne increases the denominator 4Nm + 1,
-    hence decreases Fst*. Larger populations have slower drift relative to
-    migration, so less differentiation. -/
-theorem fstMigDriftEquil_decreasing_in_Ne (Ne₁ Ne₂ m : ℝ)
-    (hNe₁ : 0 < Ne₁) (hm : 0 < m)
-    (h_more : Ne₁ < Ne₂) :
-    fstMigDriftEquil Ne₂ m < fstMigDriftEquil Ne₁ m := by
-  unfold fstMigDriftEquil
-  apply div_lt_div_of_pos_left one_pos (by nlinarith) (by nlinarith)
 
 /-! ### 6. The full (non-linearized) recurrence and its fixed point -/
 
@@ -6756,14 +6732,14 @@ theorem fstMigDriftEquil_decreasing_in_Ne (Ne₁ Ne₂ m : ℝ)
     This is still only the recurrence's coarse allele-frequency benchmark,
     not a mechanistic portability law. -/
 noncomputable def neutralAFBenchmarkFromRecurrence (Ne m : ℝ) : ℝ :=
-  1 - fstMigDriftEquil Ne m
+  1 - fstMigrationDriftEquilibrium Ne m
 
 /-- The recurrence-derived neutral allele-frequency benchmark equals
 `4Nm / (4Nm + 1)`. -/
 theorem neutralAFBenchmarkFromRecurrence_eq (Ne m : ℝ)
     (hNe : 0 < Ne) (hm : 0 ≤ m) :
     neutralAFBenchmarkFromRecurrence Ne m = 4 * Ne * m / (4 * Ne * m + 1) := by
-  unfold neutralAFBenchmarkFromRecurrence fstMigDriftEquil
+  unfold neutralAFBenchmarkFromRecurrence fstMigrationDriftEquilibrium
   have hden : 4 * Ne * m + 1 ≠ 0 := by nlinarith
   field_simp [hden]
   ring_nf
@@ -6802,15 +6778,13 @@ theorem neutralAFBenchmarkFromRecurrence_lt_one (Ne m : ℝ) (hNe : 0 < Ne) (hm 
 /-- **The recurrence-derived benchmark connects back to the file's coarse `R²`
 benchmark.**
     Using the recurrence-derived `F_ST`, the benchmark target `R²` is the
-    present-day `R²` at `fstMigDriftEquil`. More migration yields higher
+    present-day `R²` at `fstMigrationDriftEquilibrium`. More migration yields higher
     benchmark `R²`. -/
 theorem recurrence_derived_R2_increases_with_m (V_A V_E Ne m₁ m₂ : ℝ)
     (hVA : 0 < V_A) (hVE : 0 < V_E) (hNe : 0 < Ne)
     (hm₁ : 0 < m₁) (h_more : m₁ < m₂) :
-    presentDayR2 V_A V_E (fstMigDriftEquil Ne m₁) <
-      presentDayR2 V_A V_E (fstMigDriftEquil Ne m₂) := by
-  rw [fstMigDriftEquil_eq_fstMigrationDriftEquilibrium,
-      fstMigDriftEquil_eq_fstMigrationDriftEquilibrium]
+    presentDayR2 V_A V_E (fstMigrationDriftEquilibrium Ne m₁) <
+      presentDayR2 V_A V_E (fstMigrationDriftEquilibrium Ne m₂) := by
   exact drift_degrades_R2 V_A V_E
     (fstMigrationDriftEquilibrium Ne m₂) (fstMigrationDriftEquilibrium Ne m₁)
     hVA hVE

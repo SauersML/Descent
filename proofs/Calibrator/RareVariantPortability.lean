@@ -589,8 +589,8 @@ theorem two_mul_mul_one_sub_lt_of_lt
     (h_common_lt : maf_common ≤ 1/2)
     (h_rare_maf : maf_rare < maf_common) :
     -- Heterozygosity is smaller for rarer variants (when both ≤ 1/2)
-    2 * maf_rare * (1 - maf_rare) < 2 * maf_common * (1 - maf_common) := by
-  nlinarith [sq_nonneg (maf_common - 1/2), sq_nonneg (maf_rare - 1/2)]
+    2 * maf_rare * (1 - maf_rare) < 2 * maf_common * (1 - maf_common) :=
+  two_mul_one_sub_strictMono_le_half maf_rare maf_common h_rare_maf h_common_lt
 
 /-- **The α model: E[β²] ∝ [p(1-p)]^(1+α).**
     α = 0: neutral (no relationship between MAF and effect)
