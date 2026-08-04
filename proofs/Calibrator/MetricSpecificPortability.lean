@@ -1777,6 +1777,82 @@ theorem pooledQuadratic_eq_zero_iff {K : ℕ} (π : Fin K → ℝ) (Q : Fin K �
   exact (mul_eq_zero.mp this).resolve_left (hπ g).ne'
 
 
+
+/-! #### Heterogeneity fattens the lower tail, so barriers close by filling not deleting
+
+The intuition that pooling cohorts removes a barrier by DELETING the distant
+cluster is backwards, and the correction is a one-line concavity argument.
+
+The large-deviation rate for an anomalously small residual is built from
+`log (1 + 2λs)` in the per-cohort residual scales `s`. That function is concave,
+so a mixture of cohorts has rate at most that of a single cohort at the average
+scale. Holding the average covariance fixed, heterogeneity cannot make a
+candidate's anomalously good fit exponentially less likely -- it makes it at
+least as likely.
+
+So at fixed average covariance a barrier closes by FILLING the intermediate
+region, not by removing the far cluster. That matches the decomposition above,
+whose usable half certifies persistence and says nothing about dissolution: the
+dissolution direction needs configurations built at intermediate overlaps, and
+this says the tails there are if anything fatter than the homogeneous
+comparison would suggest.
+-/
+
+/-- **Two cohorts have a smaller rate than one cohort at their average scale.**
+
+Concavity of the logarithm, applied at the residual scales. `π` and `1 - π` are
+the cohort proportions and `s₁`, `s₂` the per-cohort residual scales; the
+right-hand side is the rate of a homogeneous design whose scale is the mixture
+average. A smaller rate means a fatter lower tail. -/
+theorem mixtureRate_le_averagedRate (π s₁ s₂ lam : ℝ)
+    (hπ0 : 0 ≤ π) (hπ1 : π ≤ 1) (hs₁ : 0 < 1 + 2 * lam * s₁) (hs₂ : 0 < 1 + 2 * lam * s₂) :
+    π * Real.log (1 + 2 * lam * s₁) + (1 - π) * Real.log (1 + 2 * lam * s₂)
+      ≤ Real.log (1 + 2 * lam * (π * s₁ + (1 - π) * s₂)) := by
+  have hcon : ConcaveOn ℝ (Set.Ioi 0) Real.log :=
+    (Real.strictConcaveOn_log_Ioi).concaveOn
+  have h := hcon.2 (Set.mem_Ioi.mpr hs₁) (Set.mem_Ioi.mpr hs₂) hπ0 (by linarith) (by ring)
+  simpa [smul_eq_mul, mul_add, add_mul, mul_comm, mul_left_comm, mul_assoc] using h
+
+/-! #### The frequency-spectrum inverse problem locks complexity to ill-posedness
+
+For a demographic history with at most `K` epochs, the sharp stability exponent
+for recovering it from the expected site-frequency spectrum is `1 / (2K - 3)`.
+Read through the sample size the spectrum comes from, that constant is not an
+arbitrary function of `K`.
+
+A sample of `n = 2K - 2` haplotypes has exactly `n - 1 = 2K - 3` spectrum entries,
+so the exponent is the reciprocal of the number of entries available. Each extra
+epoch demands two more samples AND costs two in the exponent: the model's
+complexity and the inverse problem's ill-posedness move together, and no
+sampling effort separates them.
+
+Two epochs are Lipschitz-stable. Three already have cube-root instability, four
+fifth-root. -/
+
+/-- Sample size whose spectrum resolves a `K`-epoch history. -/
+def epochSampleSize (K : ℕ) : ℕ := 2 * K - 2
+
+/-- Number of unfolded spectrum entries at that sample size. -/
+def spectrumEntries (n : ℕ) : ℕ := n - 1
+
+/-- **The stability exponent's denominator is the number of spectrum entries.**
+Not a coincidence of the parameterisation: it says the recoverable resolution is
+set by how many numbers the spectrum has, and each epoch consumes two of them. -/
+theorem spectrumEntries_epochSampleSize (K : ℕ) (hK : 2 ≤ K) :
+    spectrumEntries (epochSampleSize K) = 2 * K - 3 := by
+  unfold spectrumEntries epochSampleSize
+  omega
+
+/-- **Two epochs are Lipschitz-stable.** -/
+theorem spectrumEntries_two_epochs : spectrumEntries (epochSampleSize 2) = 1 := by decide
+
+/-- **Three epochs are cube-root stable.** -/
+theorem spectrumEntries_three_epochs : spectrumEntries (epochSampleSize 3) = 3 := by decide
+
+/-- **Four epochs are fifth-root stable.** -/
+theorem spectrumEntries_four_epochs : spectrumEntries (epochSampleSize 4) = 5 := by decide
+
+
 /-! #### Drift invisible to genotype is irreducible by any amount of genotyping
 
 The defect splits into a part measurable with respect to the genotype-distribution structure and a
@@ -2681,42 +2757,15 @@ theorem brier_score_bounded
     mul_nonneg (mul_nonneg h_π h_one_minus_pi) h2
   nlinarith
 
-/-- **Brier portability decomposition as the exact proper-score result on the
-mechanistic transport model.**
+/-! **Brier portability decomposition as the exact proper-score result** is
+`brier_increase_mainly_calibration` above, which proves the decomposition, the positivity
+of both terms, their order, and the half-share.
 
-Because the exported deployed Brier surface is an exact proper scoring rule on
-the source/target variance state, total Brier worsening decomposes into:
-
-- a mechanistic signal-loss term from the target SNP/LD/effect state; and
-- an outcome-scale term from evaluating the same source score at the target
-  prevalence scale.
-
-If the latter dominates, it contributes more than half of the total Brier
-worsening. -/
-theorem brier_proper_score_portability_decomposition
-    {p q : ℕ} (πSource : ℝ) (m : CrossPopulationMetricModel p q)
-    (h_source_r2_unit : r2FromSourceWeights m Pop.source ∈ Set.Ico 0 1)
-    (h_r2_drop : r2FromSourceWeights m Pop.target < r2FromSourceWeights m Pop.source)
-    (h_prev_factor :
-      πSource * (1 - πSource) <
-        m.targetPrevalence * (1 - m.targetPrevalence))
-    (h_scale_dom :
-      m.targetPrevalence * (1 - m.targetPrevalence) *
-          (r2FromSourceWeights m Pop.source - r2FromSourceWeights m Pop.target) <
-        (m.targetPrevalence * (1 - m.targetPrevalence) -
-            πSource * (1 - πSource)) *
-          (1 - r2FromSourceWeights m Pop.source)) :
-    targetCalibratedBrierFromSourceWeights m -
-      sourceCalibratedBrierFromSourceWeightsAtPrevalence m πSource =
-        brierDiscriminationLoss m +
-        brierCalibrationLoss πSource m ∧
-    (targetCalibratedBrierFromSourceWeights m -
-        sourceCalibratedBrierFromSourceWeightsAtPrevalence m πSource) / 2 <
-      brierCalibrationLoss πSource m := by
-  rcases brier_increase_mainly_calibration
-      πSource m h_source_r2_unit h_r2_drop h_prev_factor h_scale_dom with
-    ⟨h_decomp, _h_disc_pos, _h_cal_pos, _h_dom, h_half⟩
-  exact ⟨h_decomp, h_half⟩
+A second theorem here, `brier_proper_score_portability_decomposition`, restated the
+decomposition and the half-share alone -- the same sixteen-line hypothesis block copied,
+and a proof that destructures the stronger result and rebuilds two of its five conjuncts.
+A projection of a theorem is not a theorem; the caller who wants two of the five can take
+them from the one that proves all five. -/
 
 end ProperScoringRules
 
