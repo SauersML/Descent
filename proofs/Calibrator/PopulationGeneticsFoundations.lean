@@ -48,6 +48,24 @@ section FstDefinitions
 noncomputable def neiFst (H_T H_S : ℝ) : ℝ :=
   (H_T - H_S) / H_T
 
+/-- **Nei's `Fst` is a proportion of total heterozygosity, pinned.** This definition carries no
+result of its own. Subpopulations holding half the total heterozygosity give `Fst = 1/2`: the
+deficit is measured against the total, not against the subpopulation value, and it runs total
+minus subpopulation so that structure raises it. -/
+theorem neiFst_half_heterozygosity_retained :
+    neiFst 2 1 = 1 / 2 := by
+  unfold neiFst
+  norm_num
+
+/-- **Nei's `Fst` at zero total heterozygosity, named.** Two monomorphic populations have no
+heterozygosity to partition and `Fst` is undefined, but the divisor is zero and Lean returns `0`
+-- reporting perfect genetic identity where the data say nothing at all. The two cases are not
+distinguishable downstream. Consumers must require `H_T ≠ 0`. -/
+theorem neiFst_monomorphic_is_junk :
+    neiFst 0 0 = 0 := by
+  unfold neiFst
+  norm_num
+
 /-- Nei's Fst is in [0, 1] when H_T > 0 and H_S ≤ H_T. -/
 theorem nei_fst_in_unit (H_T H_S : ℝ)
     (h_HT : 0 < H_T) (h_HS : 0 ≤ H_S) (h_le : H_S ≤ H_T) :
@@ -279,6 +297,15 @@ relates the two.
 noncomputable def continentIslandStepSelectionFirst (s m p : ℝ) : ℝ :=
   (1 - m) * (p * (1 + s) / (1 + s * p))
 
+/-- **Selection before migration, pinned.** This definition carries no result of its own, and
+what distinguishes it from `continentIslandStepMigrationFirst` is only the order in which the two
+forces act. Selecting first on a frequency of one half with `s = 1` raises it to two thirds, and
+the subsequent half-migration cuts that to one third. -/
+theorem continentIslandStepSelectionFirst_reference :
+    continentIslandStepSelectionFirst 1 (1 / 2) (1 / 2) = 1 / 3 := by
+  unfold continentIslandStepSelectionFirst
+  norm_num
+
 /-- The same generation with the migration step first.
 
     Empirical status: VALIDATED (iteration gives 0.47368 at s = 0.1, m = 0.05,
@@ -291,6 +318,15 @@ noncomputable def continentIslandStepSelectionFirst (s m p : ℝ) : ℝ :=
     orderings are separated at every cell where the allele survives. -/
 noncomputable def continentIslandStepMigrationFirst (s m p : ℝ) : ℝ :=
   ((1 - m) * p) * (1 + s) / (1 + s * ((1 - m) * p))
+
+/-- **Migration before selection, pinned.** At the same parameters where selecting first gives
+one third, migrating first gives two fifths: selection acting on the post-migration frequency is
+less efficient at removing the immigrant allele, so the order of the two forces within a
+generation is not a bookkeeping choice. -/
+theorem continentIslandStepMigrationFirst_reference :
+    continentIslandStepMigrationFirst 1 (1 / 2) (1 / 2) = 2 / 5 := by
+  unfold continentIslandStepMigrationFirst
+  norm_num
 
 /-- **Selection-migration equilibrium frequency** under the selection-first
 convention.
@@ -498,6 +534,15 @@ section WrightFStatistics
 noncomputable def wrightFIT (f_IS f_ST : ℝ) : ℝ :=
   1 - (1 - f_IS) * (1 - f_ST)
 
+/-- **Wright's `F_IT` compounds the two levels, pinned.** The identity with
+`pairwiseFstFromBranches` constrains the two definitions jointly and leaves a shared wrong factor
+free. Two independent halves compound to three quarters, not to one -- the inbreeding
+coefficients multiply as retained heterozygosities rather than adding. -/
+theorem wrightFIT_compounds_two_halves :
+    wrightFIT (1 / 2) (1 / 2) = 3 / 4 := by
+  unfold wrightFIT
+  norm_num
+
 /-- Wright's decomposition identity. -/
 theorem wright_decomposition (f_IS f_ST : ℝ) :
     wrightFIT f_IS f_ST = f_IS + f_ST - f_IS * f_ST := by
@@ -558,6 +603,14 @@ theorem wrightFIT_eq_pairwiseFstFromBranches (a b : ℝ) :
 noncomputable def heterozygosityLossFromDrift (t : ℕ) (Ne : ℝ) : ℝ :=
   1 - (1 - 1 / (2 * Ne)) ^ t
 
+/-- **One generation of drift in a population of one, pinned.** This definition carries no result
+of its own. At `Ne = 1` a single generation loses half the heterozygosity, which fixes the
+per-generation rate at `1 / (2 Ne)` against `1 / Ne` and against `1 / (4 Ne)`. -/
+theorem heterozygosityLossFromDrift_one_generation :
+    heterozygosityLossFromDrift 1 1 = 1 / 2 := by
+  unfold heterozygosityLossFromDrift
+  norm_num
+
 /-- Fst from drift is nonneg. -/
 theorem fst_drift_nonneg (t : ℕ) (Ne : ℝ) (h_Ne : 2 ≤ Ne) :
     0 ≤ heterozygosityLossFromDrift t Ne := by
@@ -616,6 +669,15 @@ parameterised by `θ` and `M` rather than by `Nₑ` and a rate.
     Empirical status: UNTESTED. -/
 noncomputable def scaledIdentityStep (scaledRate F : ℝ) : ℝ :=
   1 - scaledRate * F
+
+/-- **The identity-by-descent step's coefficient, pinned.** `scaledIdentityStep_fixedPoint` is a
+fixed-point statement, and the equilibrium of a rescaled body is a fixed point of the rescaled
+recurrence for the same reason -- the coefficient appears on both sides and cancels. A unit
+scaled rate acting on an identity of one half returns one half. -/
+theorem scaledIdentityStep_unit_rate :
+    scaledIdentityStep 1 (1 / 2) = 1 / 2 := by
+  unfold scaledIdentityStep
+  norm_num
 
 /-- **`1/(1 + scaledRate)` is the fixed point of the scaled identity balance.**
 Setting `F = 1 - scaledRate * F` gives `F (1 + scaledRate) = 1`. Every
@@ -1124,6 +1186,23 @@ theorem islandModelFst_eq_mutationForm (Ne m : ℝ) :
     Empirical status: UNTESTED. -/
 noncomputable def fstMigrationMutationEquilibrium (Ne m μ : ℝ) : ℝ :=
   1 / (1 + 4 * Ne * m + 4 * Ne * μ)
+
+/-- **The migration term's coefficient, pinned.** `fstMigrationMutationEquilibrium_isFixedPoint`
+is invariant under exactly the rescaling it should exclude. At `4 Ne m = 1` with no mutation the
+equilibrium `Fst` is one half, which fixes the factor four on the migration term. -/
+theorem fstMigrationMutationEquilibrium_migration_only :
+    fstMigrationMutationEquilibrium 1 (1 / 4) 0 = 1 / 2 := by
+  unfold fstMigrationMutationEquilibrium
+  norm_num
+
+/-- **The mutation term enters with the same coefficient, pinned.** Mutation and migration are
+interchangeable at this order: `4 Ne mu = 1` with no migration gives the same equilibrium as
+`4 Ne m = 1` with no mutation. Fixing the migration coefficient alone would leave the mutation
+coefficient free. -/
+theorem fstMigrationMutationEquilibrium_mutation_only :
+    fstMigrationMutationEquilibrium 1 0 (1 / 4) = 1 / 2 := by
+  unfold fstMigrationMutationEquilibrium
+  norm_num
 
 /-- **The combined equilibrium is the rest point of the scaled identity balance
 at the summed scaled rate.**  This is where the additivity of `θ` and `M` comes

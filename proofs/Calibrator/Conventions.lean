@@ -169,6 +169,14 @@ let a proof about one be applied to the other without anything failing. The theo
 records the coincidence, which is what a shared convention deserves — as against the
 island-model `F_ST`, where four names really did denote one quantity and are now one. -/
 
+/-- **The mean allele frequency is unweighted, pinned.** The identity with the symmetric
+migration map constrains the two definitions jointly. Taken alone: a fixed and an absent allele
+average to one half, which fixes the two-population mean as the arithmetic midpoint. -/
+theorem meanAlleleFreq_fixed_and_absent :
+    meanAlleleFreq 0 1 = 1 / 2 := by
+  unfold meanAlleleFreq
+  norm_num
+
 theorem effectiveSymmetricMigration_eq_meanAlleleFreq_map (m₁₂ m₂₁ : ℝ) :
     effectiveSymmetricMigration m₁₂ m₂₁ = meanAlleleFreq m₁₂ m₂₁ := by
   unfold effectiveSymmetricMigration meanAlleleFreq; ring
@@ -367,6 +375,15 @@ theorem neiGst_ne_hudsonFst_at_mean_half :
 
 /-- Between-subgroup allele-frequency variance for an equal-weight split. -/
 noncomputable def betweenSubgroupVariance (p₁ p₂ : ℝ) : ℝ := (p₁ - p₂) ^ 2 / 4
+
+/-- **The between-subgroup variance's normalisation, pinned.** The identity with the fair
+two-point variance constrains the two definitions jointly and leaves a shared wrong factor free.
+Two subgroups at the extremes of the frequency range have between-group variance one quarter --
+the variance of a fair coin -- not one. -/
+theorem betweenSubgroupVariance_extremes :
+    betweenSubgroupVariance 1 0 = 1 / 4 := by
+  unfold betweenSubgroupVariance
+  norm_num
 
 /-- **Cross-check: the fair two-point variance in `ImitationRigidity` is the
 between-subgroup variance.** Both are `(a - b)² / 4`: the variance of a
