@@ -1842,6 +1842,98 @@ theorem rightLim_mem_Icc_of_bounded (L : ℝ → ℝ) (hmono : Monotone L)
   · exact le_trans (ciInf_le hbb u) (hmono.le_rightLim le_rfl)
   · exact le_trans (hmono.rightLim_le (lt_add_one u)) (le_ciSup hba (u + 1))
 
+/-! ### Step six: the self-similar law contracts, so its scale factor is below one
+
+`charFun_selfSimilar_of_invariance` leaves one equation on one function. Solving it is an
+iteration: substituting the equation into itself replaces `α` by `αⁿ`, and with `0 < α < 1` the
+point `αⁿ u` runs to zero, where a characteristic function is its total mass. The limit then
+evaluates the characteristic function in closed form and it is Gaussian.
+
+That argument needs `α < 1`, which the invariance does not state. It is forced. Taking moduli in
+the functional equation gives `‖ψ(u)‖ = ‖ψ(α u)‖ · exp(-(sαu)²/2)`, and iterating that bound with
+`α ≥ 1` drives `‖ψ(u)‖` below `M · exp(-n (su)²/2)` for every `n`. So `ψ` would vanish off the
+origin while equalling the total mass at it, and a characteristic function of a finite measure is
+continuous. Mathlib does not carry that continuity, so it is proved here by dominated convergence
+against the constant bound one. -/
+
+open MeasureTheory ProbabilityTheory Complex in
+/-- **A characteristic function is continuous.** The integrand is bounded by one and continuous
+in the argument, and the measure is finite, so dominated convergence applies directly. -/
+theorem continuous_charFun_real (ν : Measure ℝ) [IsFiniteMeasure ν] :
+    Continuous (fun t : ℝ ↦ charFun ν t) := by
+  simp only [charFun_apply_real]
+  refine MeasureTheory.continuous_of_dominated (bound := fun _ : ℝ ↦ (1 : ℝ))
+    (fun t ↦ by fun_prop) (fun t ↦ ?_) (integrable_const 1) ?_
+  · filter_upwards with x
+    rw [show ((t : ℂ) * (x : ℂ) * Complex.I) = (((t * x : ℝ)) : ℂ) * Complex.I by push_cast; ring,
+      Complex.norm_exp_ofReal_mul_I]
+  · filter_upwards with x
+    fun_prop
+
+open MeasureTheory ProbabilityTheory Complex in
+/-- The modulus form of the functional equation, at the substitution that makes it an iteration. -/
+theorem norm_charFun_selfSimilar (ν : Measure ℝ) [IsFiniteMeasure ν]
+    {s α β : ℝ} (hα : 0 < α)
+    (heq : ∀ t : ℝ, Complex.exp (-(((s * t) ^ 2 : ℝ) : ℂ) / 2) * charFun ν t
+      = charFun ν (t / α) * Complex.exp (((-(β * t / α) : ℝ) : ℂ) * Complex.I)) (u : ℝ) :
+    Real.exp (-((s * (α * u)) ^ 2) / 2) * ‖charFun ν (α * u)‖ = ‖charFun ν u‖ := by
+  have hcancel : α * u / α = u := by field_simp
+  have h := heq (α * u)
+  rw [hcancel] at h
+  have hnorm := congrArg (fun z : ℂ ↦ ‖z‖) h
+  simp only [norm_mul] at hnorm
+  rw [Complex.norm_exp_ofReal_mul_I] at hnorm
+  have hcoe : (-(((s * (α * u)) ^ 2 : ℝ) : ℂ) / 2)
+      = (((-((s * (α * u)) ^ 2) / 2 : ℝ)) : ℂ) := by push_cast; ring
+  rw [show ‖Complex.exp (-(((s * (α * u)) ^ 2 : ℝ) : ℂ) / 2)‖
+      = Real.exp (-((s * (α * u)) ^ 2) / 2) by
+    rw [hcoe, Complex.norm_exp, Complex.ofReal_re]] at hnorm
+  simpa using hnorm
+
+open MeasureTheory ProbabilityTheory Complex in
+/-- **With a scale factor at least one, the characteristic function is squeezed to nothing.**
+Each substitution of the equation into itself contributes another factor `exp(-(su)²/2)`, and
+`α ≥ 1` keeps every contribution at least that large. -/
+theorem norm_charFun_le_geometric (ν : Measure ℝ) [IsFiniteMeasure ν]
+    {s α β : ℝ} (hα1 : 1 ≤ α)
+    (heq : ∀ t : ℝ, Complex.exp (-(((s * t) ^ 2 : ℝ) : ℂ) / 2) * charFun ν t
+      = charFun ν (t / α) * Complex.exp (((-(β * t / α) : ℝ) : ℂ) * Complex.I))
+    (u : ℝ) (n : ℕ) :
+    ‖charFun ν u‖ ≤ ν.real Set.univ * Real.exp (-(n : ℝ) * (s * u) ^ 2 / 2) := by
+  have hα : 0 < α := lt_of_lt_of_le zero_lt_one hα1
+  induction n generalizing u with
+  | zero => simpa using norm_charFun_le (μ := ν) u
+  | succ n ih =>
+    have hrel := norm_charFun_selfSimilar ν hα heq u
+    have hIH := ih (α * u)
+    have hmass : (0 : ℝ) ≤ ν.real Set.univ := by positivity
+    have hα2 : (1 : ℝ) ≤ α ^ 2 := by nlinarith
+    have hsq : (s * u) ^ 2 ≤ (s * (α * u)) ^ 2 := by
+      have hexp : (s * (α * u)) ^ 2 = α ^ 2 * (s * u) ^ 2 := by ring
+      rw [hexp]
+      nlinarith [sq_nonneg (s * u)]
+    have hfac : Real.exp (-((s * (α * u)) ^ 2) / 2) ≤ Real.exp (-((s * u) ^ 2) / 2) :=
+      Real.exp_le_exp.mpr (by linarith)
+    have hmono : Real.exp (-(n : ℝ) * (s * (α * u)) ^ 2 / 2)
+        ≤ Real.exp (-(n : ℝ) * (s * u) ^ 2 / 2) := by
+      refine Real.exp_le_exp.mpr ?_
+      have hn : (0 : ℝ) ≤ (n : ℝ) := Nat.cast_nonneg n
+      nlinarith
+    have hbound : ‖charFun ν (α * u)‖ ≤ ν.real Set.univ * Real.exp (-(n : ℝ) * (s * u) ^ 2 / 2) :=
+      hIH.trans (mul_le_mul_of_nonneg_left hmono hmass)
+    calc ‖charFun ν u‖
+        = Real.exp (-((s * (α * u)) ^ 2) / 2) * ‖charFun ν (α * u)‖ := hrel.symm
+      _ ≤ Real.exp (-((s * u) ^ 2) / 2)
+            * (ν.real Set.univ * Real.exp (-(n : ℝ) * (s * u) ^ 2 / 2)) :=
+          mul_le_mul hfac hbound (norm_nonneg _) (Real.exp_pos _).le
+      _ = ν.real Set.univ
+            * (Real.exp (-((s * u) ^ 2) / 2) * Real.exp (-(n : ℝ) * (s * u) ^ 2 / 2)) := by ring
+      _ = ν.real Set.univ * Real.exp (-((n + 1 : ℕ) : ℝ) * (s * u) ^ 2 / 2) := by
+          rw [← Real.exp_add]
+          congr 1
+          push_cast
+          ring
+
 open MeasureTheory ProbabilityTheory in
 /-- **Necessity: no other bounded link shape survives.** A strictly increasing bounded link whose
 two-parameter family is closed under Gaussian averaging is a positive vertical affine transform
