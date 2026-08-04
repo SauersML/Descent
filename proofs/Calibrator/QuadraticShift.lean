@@ -246,6 +246,79 @@ theorem best_scalar_correction_attains_floor
     rw [quadraticCoefficientDistance_eq_floor_add_sq B u v c hsymmetric hu.ne']
     exact le_add_of_nonneg_right (mul_nonneg (le_of_lt hu) (sq_nonneg _))
 
+/-! ## Pooled-environment nullspace geometry -/
+
+/-- Weighted covariance of two labeled environments. -/
+def weightedCovariancePool (weightLeft weightRight : ℝ)
+    (left right : Matrix ι ι ℝ) : Matrix ι ι ℝ :=
+  fun i j ↦ weightLeft * left i j + weightRight * right i j
+
+omit [DecidableEq ι] in
+/-- Matrix-vector action of a two-environment covariance pool. -/
+theorem weightedCovariancePool_mulVec
+    (weightLeft weightRight : ℝ) (left right : Matrix ι ι ℝ)
+    (shift : ι → ℝ) :
+    (weightedCovariancePool weightLeft weightRight left right).mulVec shift =
+      fun i ↦ weightLeft * left.mulVec shift i + weightRight * right.mulVec shift i := by
+  ext i
+  simp only [weightedCovariancePool, Matrix.mulVec, dotProduct, add_mul]
+  rw [Finset.sum_add_distrib, Finset.mul_sum, Finset.mul_sum]
+  apply congrArg₂ (fun x y : ℝ ↦ x + y) <;>
+    apply Finset.sum_congr rfl <;>
+    intro j _ <;>
+    ring
+
+omit [DecidableEq ι] in
+/-- Quadratic energy of a pooled covariance is the weighted sum of environmental energies. -/
+theorem weightedCovariancePool_energy
+    (weightLeft weightRight : ℝ) (left right : Matrix ι ι ℝ)
+    (shift : ι → ℝ) :
+    dot shift ((weightedCovariancePool weightLeft weightRight left right).mulVec shift) =
+      weightLeft * dot shift (left.mulVec shift) +
+        weightRight * dot shift (right.mulVec shift) := by
+  rw [weightedCovariancePool_mulVec]
+  simp only [dot, mul_add]
+  rw [Finset.sum_add_distrib, Finset.mul_sum, Finset.mul_sum]
+  apply congrArg₂ (fun x y : ℝ ↦ x + y) <;>
+    apply Finset.sum_congr rfl <;>
+    intro i _ <;>
+    ring
+
+omit [DecidableEq ι] in
+/-- **Exact multi-environment kernel-intersection law.** With positive environment weights,
+positive-semidefinite covariance energies cannot cancel. Hence a coefficient direction is
+invisible to the pooled design exactly when it is invisible in both environments.
+
+The `energy = 0 ↔ kernel` hypotheses are the finite-dimensional PSD fact stated explicitly,
+so the theorem is reusable for any covariance representation satisfying it. -/
+theorem weightedCovariancePool_mulVec_eq_zero_iff
+    (weightLeft weightRight : ℝ) (left right : Matrix ι ι ℝ)
+    (hweightLeft : 0 < weightLeft) (hweightRight : 0 < weightRight)
+    (hleftNonneg : ∀ shift : ι → ℝ, 0 ≤ dot shift (left.mulVec shift))
+    (hrightNonneg : ∀ shift : ι → ℝ, 0 ≤ dot shift (right.mulVec shift))
+    (hleftZero : ∀ shift : ι → ℝ,
+      dot shift (left.mulVec shift) = 0 ↔ left.mulVec shift = 0)
+    (hrightZero : ∀ shift : ι → ℝ,
+      dot shift (right.mulVec shift) = 0 ↔ right.mulVec shift = 0)
+    (shift : ι → ℝ) :
+    (weightedCovariancePool weightLeft weightRight left right).mulVec shift = 0 ↔
+      left.mulVec shift = 0 ∧ right.mulVec shift = 0 := by
+  constructor
+  · intro hpool
+    have henergy : weightLeft * dot shift (left.mulVec shift) +
+        weightRight * dot shift (right.mulVec shift) = 0 := by
+      rw [← weightedCovariancePool_energy weightLeft weightRight left right shift, hpool]
+      simp [dot]
+    have hleftEnergy : dot shift (left.mulVec shift) = 0 := by
+      nlinarith [hleftNonneg shift, hrightNonneg shift]
+    have hrightEnergy : dot shift (right.mulVec shift) = 0 := by
+      nlinarith [hleftNonneg shift, hrightNonneg shift]
+    exact ⟨(hleftZero shift).mp hleftEnergy, (hrightZero shift).mp hrightEnergy⟩
+  · rintro ⟨hleft, hright⟩
+    rw [weightedCovariancePool_mulVec, hleft, hright]
+    ext i
+    simp
+
 /-! ## Singular portability boundary -/
 
 /-- A uniform coefficient-space portability bound: target excess risk is at most `constant`
