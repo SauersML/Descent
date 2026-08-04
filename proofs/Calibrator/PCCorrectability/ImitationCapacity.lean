@@ -1875,6 +1875,98 @@ theorem imitationCapacity_mul_load_eq_headroom
   rw [E.imitationCapacity_eq hnull, div_mul_eq_mul_div, mul_div_assoc,
     div_self (ne_of_gt E.load_pos), mul_one]
 
+
+/-! ## The linkage-disequilibrium spectrum does not determine portability
+
+`normalizedMoment` and `inverseTraceCertificate` above summarise a design by its
+eigenvalues. Every quantity in this corpus that reads a design through those two
+is therefore a function of the spectrum alone, and the question is whether that
+is enough.
+
+It is not, and the obstruction is visible in two dimensions. Take a block that is
+diagonal in the variant basis and the same block rotated by forty-five degrees:
+
+    D a = ⟪a, 0; 0, a+1⟫        R a = ⟪a+½, ½; ½, a+½⟫
+
+`R a` is `U (D a) Uᵀ` for the rotation `U`, so the two are EXACTLY isospectral --
+same trace, same determinant, hence the same characteristic polynomial at every
+`a`, not merely the same limiting spectral law. No eigenvalue summary can
+separate them.
+
+But the entrywise cube sum `∑ᵢⱼ Σᵢⱼ³` differs: `9` against `7` at `a = 1`. That
+quantity is not a spectral invariant, and it is the first non-spectral coordinate
+of the low signal-to-noise expansion of the mutual information, entering at third
+order multiplied by the SQUARE OF THE PRIOR'S THIRD CUMULANT.
+
+The biology is in that last factor. For a symmetric effect prior the third
+cumulant vanishes and the spectrum suffices. Polygenic effect priors are not
+symmetric: the standard modelling assumption is a sparse prior with a point mass
+at zero and mass on one side, whose third cumulant is nonzero by construction. So
+for exactly the priors this corpus uses, two linkage-disequilibrium structures
+with identical eigenvalues -- identical `normalizedMoment` at every order,
+identical `inverseTraceCertificate` -- support different achievable accuracy.
+
+What follows is the finite core: isospectrality proved through the characteristic
+polynomial, and the cube sums separated.
+-/
+
+/-- A block diagonal in the variant basis. -/
+noncomputable def isoBlockD (a : ℝ) : Fin 2 → Fin 2 → ℝ :=
+  fun i j ↦ if i = j then (if i = 0 then a else a + 1) else 0
+
+/-- The same block rotated by forty-five degrees. -/
+noncomputable def isoBlockR (a : ℝ) : Fin 2 → Fin 2 → ℝ :=
+  fun i j ↦ if i = j then a + 1 / 2 else 1 / 2
+
+/-- Trace of a two-by-two block. -/
+noncomputable def blockTrace (M : Fin 2 → Fin 2 → ℝ) : ℝ := M 0 0 + M 1 1
+
+/-- Determinant of a two-by-two block. -/
+noncomputable def blockDet (M : Fin 2 → Fin 2 → ℝ) : ℝ := M 0 0 * M 1 1 - M 0 1 * M 1 0
+
+/-- Characteristic polynomial of a two-by-two block. For this size the trace and
+determinant determine it, and it determines the eigenvalue multiset. -/
+noncomputable def blockCharPoly (M : Fin 2 → Fin 2 → ℝ) (x : ℝ) : ℝ :=
+  x ^ 2 - blockTrace M * x + blockDet M
+
+/-- The entrywise cube sum, the first non-spectral coordinate. -/
+noncomputable def entrywiseCubeSum (M : Fin 2 → Fin 2 → ℝ) : ℝ :=
+  ∑ i, ∑ j, (M i j) ^ 3
+
+/-- **The rotated block is isospectral to the diagonal one**, at every `a` and
+exactly -- not merely in the limit. -/
+theorem isoBlock_charPoly_eq (a x : ℝ) :
+    blockCharPoly (isoBlockD a) x = blockCharPoly (isoBlockR a) x := by
+  unfold blockCharPoly blockTrace blockDet isoBlockD isoBlockR
+  norm_num
+  ring
+
+/-- **The diagonal block's entrywise cube sum.** -/
+theorem entrywiseCubeSum_isoBlockD (a : ℝ) :
+    entrywiseCubeSum (isoBlockD a) = a ^ 3 + (a + 1) ^ 3 := by
+  unfold entrywiseCubeSum isoBlockD
+  simp [Fin.sum_univ_two]
+
+/-- **The rotated block's entrywise cube sum**, which the rotation has changed. -/
+theorem entrywiseCubeSum_isoBlockR (a : ℝ) :
+    entrywiseCubeSum (isoBlockR a) = 2 * (a + 1 / 2) ^ 3 + 2 * (1 / 2) ^ 3 := by
+  unfold entrywiseCubeSum isoBlockR
+  simp [Fin.sum_univ_two]
+  ring
+
+/-- **So the cube sum is not a spectral invariant.** Two blocks with the same
+characteristic polynomial at every `a` are separated by it at `a = 1`: nine
+against seven.
+
+With `isoBlock_charPoly_eq` this is the refutation. Any portability quantity
+computed from the eigenvalues of a design assigns these two the same value, and
+they are not interchangeable whenever the effect prior is skewed. -/
+theorem entrywiseCubeSum_not_spectral :
+    entrywiseCubeSum (isoBlockD 1) ≠ entrywiseCubeSum (isoBlockR 1) := by
+  rw [entrywiseCubeSum_isoBlockD, entrywiseCubeSum_isoBlockR]
+  norm_num
+
+
 end CapacityInvariant
 
 end
