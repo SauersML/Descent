@@ -619,10 +619,48 @@ theorem no_uniformQuadraticPortabilityBound_of_source_kernel_target_pos
   exact (not_lt_of_ge h) htargetPos
 
 omit [DecidableEq ι] in
-/-- **Diversity gain forces reference-to-pool nonportability.** If one direction is invisible
-in a reference environment but detected by any positively weighted environment, pooled target
-risk is strictly positive along that direction. Therefore no finite constant can bound pooled
-deployment risk by reference-environment risk uniformly over coefficients. -/
+/-- **Active diversity gain forces reference-to-pool nonportability.** If one direction is
+invisible in a reference environment but detected by an active environment, pooled target risk
+is strictly positive along that direction. Inactive environments are irrelevant. -/
+theorem no_uniformQuadraticPortabilityBound_to_activeEnvironmentPool
+    {κ : Type*} [Fintype κ]
+    (weight : κ → ℝ) (covariance : κ → Matrix ι ι ℝ)
+    (reference : κ)
+    (hweight : ∀ environment, 0 ≤ weight environment)
+    (hpsd : PositiveSemidefiniteFamily covariance)
+    (shift : ι → ℝ)
+    (hreference : (covariance reference).mulVec shift = 0)
+    (hdetected : ∃ environment, 0 < weight environment ∧
+      (covariance environment).mulVec shift ≠ 0) :
+    ¬ ∃ constant : ℝ, UniformQuadraticPortabilityBound
+      (covariance reference) (finiteEnvironmentCovariancePool weight covariance) constant := by
+  classical
+  obtain ⟨detector, hdetectorWeight, hdetector⟩ := hdetected
+  have hdetectorEnergyNe :
+      dot shift ((covariance detector).mulVec shift) ≠ 0 := by
+    intro henergy
+    exact hdetector ((hpsd.energy_eq_zero_iff detector shift).mp henergy)
+  have hdetectorEnergyPos : 0 < dot shift ((covariance detector).mulVec shift) :=
+    lt_of_le_of_ne (hpsd.energy_nonneg detector shift) (Ne.symm hdetectorEnergyNe)
+  have htermNonneg : ∀ environment ∈ (Finset.univ : Finset κ),
+      0 ≤ weight environment * dot shift ((covariance environment).mulVec shift) := by
+    intro environment _
+    exact mul_nonneg (hweight environment) (hpsd.energy_nonneg environment shift)
+  have hdetectorLe : weight detector * dot shift ((covariance detector).mulVec shift) ≤
+      ∑ environment, weight environment *
+        dot shift ((covariance environment).mulVec shift) :=
+    Finset.single_le_sum htermNonneg (Finset.mem_univ detector)
+  have hpoolEnergyPos : 0 < dot shift
+      ((finiteEnvironmentCovariancePool weight covariance).mulVec shift) := by
+    rw [finiteEnvironmentCovariancePool_energy]
+    exact (mul_pos hdetectorWeight hdetectorEnergyPos).trans_le hdetectorLe
+  exact no_uniformQuadraticPortabilityBound_of_source_kernel_target_pos
+    (covariance reference) (finiteEnvironmentCovariancePool weight covariance)
+      shift hreference hpoolEnergyPos
+
+omit [DecidableEq ι] in
+/-- **Diversity gain forces reference-to-pool nonportability.** The all-positive panel result is
+the direct specialization of the active-environment theorem. -/
 theorem no_uniformQuadraticPortabilityBound_to_finiteEnvironmentPool
     {κ : Type*} [Fintype κ]
     (weight : κ → ℝ) (covariance : κ → Matrix ι ι ℝ)
@@ -634,29 +672,10 @@ theorem no_uniformQuadraticPortabilityBound_to_finiteEnvironmentPool
     (hdetected : ∃ environment, (covariance environment).mulVec shift ≠ 0) :
     ¬ ∃ constant : ℝ, UniformQuadraticPortabilityBound
       (covariance reference) (finiteEnvironmentCovariancePool weight covariance) constant := by
-  classical
-  obtain ⟨detector, hdetector⟩ := hdetected
-  have hdetectorEnergyNe :
-      dot shift ((covariance detector).mulVec shift) ≠ 0 := by
-    intro henergy
-    exact hdetector ((hpsd.energy_eq_zero_iff detector shift).mp henergy)
-  have hdetectorEnergyPos : 0 < dot shift ((covariance detector).mulVec shift) :=
-    lt_of_le_of_ne (hpsd.energy_nonneg detector shift) (Ne.symm hdetectorEnergyNe)
-  have htermNonneg : ∀ environment ∈ (Finset.univ : Finset κ),
-      0 ≤ weight environment * dot shift ((covariance environment).mulVec shift) := by
-    intro environment _
-    exact mul_nonneg (hweight environment).le (hpsd.energy_nonneg environment shift)
-  have hdetectorLe : weight detector * dot shift ((covariance detector).mulVec shift) ≤
-      ∑ environment, weight environment *
-        dot shift ((covariance environment).mulVec shift) :=
-    Finset.single_le_sum htermNonneg (Finset.mem_univ detector)
-  have hpoolEnergyPos : 0 < dot shift
-      ((finiteEnvironmentCovariancePool weight covariance).mulVec shift) := by
-    rw [finiteEnvironmentCovariancePool_energy]
-    exact (mul_pos (hweight detector) hdetectorEnergyPos).trans_le hdetectorLe
-  exact no_uniformQuadraticPortabilityBound_of_source_kernel_target_pos
-    (covariance reference) (finiteEnvironmentCovariancePool weight covariance)
-      shift hreference hpoolEnergyPos
+  obtain ⟨environment, hdetect⟩ := hdetected
+  exact no_uniformQuadraticPortabilityBound_to_activeEnvironmentPool
+    weight covariance reference (fun environment ↦ (hweight environment).le) hpsd shift
+      hreference ⟨environment, hweight environment, hdetect⟩
 
 end
 
