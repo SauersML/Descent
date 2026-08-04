@@ -22,13 +22,31 @@ CALIBRATION STATE -- one arm is ready and one is not.
       mutation-and-drift core is therefore sound, which is the part biallelic
       mutation got wrong.
 
-  ISLAND F_ST: NOT ready. Against `1/(1 + theta + bigM)` the plateau sits about
-      7 percent low and the cause is not identified. The obvious candidate --
-      Nei's `G_ST` being downward biased at small deme counts -- was tested and
-      REJECTED: at 12, 24 and 40 demes the gap runs -7.7, -5.2 and -8.2 percent,
-      which does not close with deme count and whose non-monotonicity is
-      consistent with noise at six replicates rather than with a deme-count
-      effect.
+  ISLAND F_ST: NOT ready, and the fault is in the MIGRATION step. Two candidate
+      explanations were tested and both rejected, which is what makes the third
+      diagnosis usable rather than a guess.
+
+      Rejected: small-deme-count `G_ST` bias. At 12, 24 and 40 demes the gap runs
+      -7.7, -5.2 and -8.2 percent, which does not close with deme count.
+
+      Rejected: the mutation term. Setting `mu` to 2e-5 so that `theta` is
+      0.006 -- negligible -- reduces the prediction to the DRIFT-MIGRATION
+      equilibrium the coalescent oracle validated independently, and the gap
+      does not shrink. It GROWS, to -37.9, -34.6 and -40.4 percent at
+      `m` = 0.002, 0.005 and 0.01. So the 7 percent seen with mutation present
+      was mutation partially masking a much larger migration error.
+
+      The diagnosis: inverting `F_ST = 1/(1 + 4 Ne m c)` for the `m` the engine
+      behaves as if it had gives ratios of 2.11, 1.70 and 1.79 against the `m`
+      actually set. The engine migrates roughly 1.8 times too fast, near enough
+      to two to suspect a doubled application, and the parent-choice step is
+      where to look: a gene draws from the pool with probability `m` AND that
+      same draw serves as reproduction, so migration and drift are not the two
+      separate events the island model composes.
+
+      This is a sharper handover than "7 percent somewhere". It is not fixed
+      here because guessing at a simulator's semantics is what voided batteries
+      21 and 22, and the fix wants a derivation rather than another attempt.
 
 So this engine must NOT yet be used as the positive control for the transient
 family. A control that is itself 7 percent off would void every battery it
