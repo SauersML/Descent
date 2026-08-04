@@ -452,6 +452,82 @@ def isReflProof (e : Expr) : Bool :=
 
 end Rfl
 
+
+/-! ## JUNK — definitions that can return a totality artifact and never say so
+
+Mathlib totalises partial operations: `x / 0 = 0`, `Real.log 0 = 0`,
+`Real.sqrt x = 0` for `x < 0`, `x⁻¹` at `0`.  A definition built from these
+returns a number at every point of its type, and at some of those points the
+number is the convention showing through rather than the modelled quantity.
+Nothing errors, nothing is flagged, and the value is usually in range.
+
+The corpus convention is to NAME such a branch: a theorem stating what the
+definition returns there, with a docstring saying what the quantity actually
+does at that point and what consumers must require.  See
+`stabilizingNsFromObservedCorrelation_perfect_is_junk`.
+
+WHY THIS SCAN IS HERE AND NOT IN PYTHON.  `junk_gap.py` reads source text and is
+blind to aliasing.  Twice during this corpus's development a deduplication pass
+rewrote `bitSign := ![-1, 1]` to `bitSign := driftFieldB`, and the text scan
+stopped seeing a vector literal it had been matching on.  This scan reads the
+elaborated environment, so an alias, an abbreviation and a literal are the same
+expression to it.
+
+WHAT IT CANNOT DO.  It cannot decide REACHABILITY -- whether the junk point lies
+inside the definition's admissible box.  That is the three-part test in
+`proofs/validation/empirical/invariants/totality.py`, and it is undecidable in
+general.  So this scan enforces the weaker, checkable contract: every definition
+that CAN reach a junk value either names the branch or appears in `exempt` with
+a reason.  A definition whose guard provably cannot vanish is not a defect, and
+saying so in `exempt` is the whole cost of clearing it.
+-/
+
+namespace Junk
+
+/-- The totalised partial operations. -/
+def junkOps : List Name := [``HDiv.hDiv, ``Inv.inv, ``Real.log, ``Real.sqrt]
+
+/-- Definitions checked by hand whose guard cannot vanish anywhere in the type,
+so there is no branch to name.  A list with reasons rather than a pattern:
+every attempt to generalise these into a rule also swallowed definitions whose
+guard genuinely can vanish.  `scalarRowResolvent` divides by
+`1 + latent ^ 2 * quadraticForm`, which looks exactly like `sigmoid`'s
+denominator and is not, because `quadraticForm` may be negative. -/
+def exempt : List (Name × String) :=
+  [ (`Calibrator.sigmoid, "1 + Real.exp (-x) ≥ 1"),
+    (`Calibrator.standardNormalPdf, "Real.sqrt (2 * Real.pi) ≠ 0"),
+    (`Calibrator.squaringFixedPoint, "scale ^ 2 + 4 ≥ 4"),
+    (`Calibrator.characteristicAmplitude, "a sum of squares is nonnegative"),
+    (`Calibrator.gaussianCriticalMultiplier, "condensationConstant is proved positive"),
+    (`Calibrator.chain, "2 * k + 1 ≠ 0 for k : ℕ"),
+    (`Calibrator.uniformOccupancyDistinctHaplotypes, "(2 : ℝ) ^ k ≠ 0") ]
+
+/-- Does this value apply a totalised partial operation? -/
+def usesJunkOp (e : Expr) : Bool :=
+  (constsOf e).fold (init := false) fun acc n ↦ acc || junkOps.contains n
+
+/-- Does the type carry a hypothesis that rules the junk point out before the
+body runs -- a positivity, a nonzero, or an order bound? -/
+partial def hasGuardBinder : Expr → Bool
+  | .forallE _ t b _ =>
+      (match t.getAppFn.constName? with
+        | some ``LT.lt | some ``LE.le | some ``Ne => true
+        | _ => false) || hasGuardBinder b
+  | .mdata _ b => hasGuardBinder b
+  | _ => false
+
+/-- Every theorem name in the corpus that names a junk branch. -/
+def namedBranches (env : Environment) : Array String := Id.run do
+  let mut out : Array String := #[]
+  for (n, ci) in env.constants.toList do
+    if isOurs n && ci.isTheorem then
+      let s := n.toString
+      if (s.splitOn "_is_junk").length > 1 then
+        out := out.push s
+  return out
+
+end Junk
+
 end Check
 
 /-! ## Driver
@@ -712,6 +788,40 @@ run_cmd do
           ("propFields", toJson (fs.map (fun f ↦ f.toString))) ]
   IO.println s!"    {none_} of {carriers.size} carriers are never constructed"
   logInfo m!"TOTAL_RFL_THEOREMS\t{rflCount}"
+
+
+  ---------------------------------------------------------------------------
+  -- JUNK
+  ---------------------------------------------------------------------------
+  let named := Junk.namedBranches env
+  let exemptNames := Junk.exempt.map Prod.fst
+  let mut junkScanned := 0
+  let mut junkNamed := 0
+  let mut junkGuarded := 0
+  let mut junkExempt := 0
+  let mut junkOpen : Array (Name × String) := #[]
+  for (n, ci) in env.constants.toList do
+    if isOurs n && userWritten env n && !ci.isTheorem then
+      if let some v := ci.value? then
+        if Junk.usesJunkOp v then
+          junkScanned := junkScanned + 1
+          let base := n.getString!
+          if exemptNames.contains n then
+            junkExempt := junkExempt + 1
+          else if named.any (fun t ↦ (t.splitOn base).length > 1) then
+            junkNamed := junkNamed + 1
+          else if Junk.hasGuardBinder ci.type then
+            junkGuarded := junkGuarded + 1
+          else
+            let loc ← liftCoreM <| whereIs env n
+            junkOpen := junkOpen.push (n, loc)
+  IO.println s!"JUNK: {junkScanned} definitions can return a totality artifact"
+  IO.println s!"  {junkNamed} name the branch, {junkGuarded} rule it out by hypothesis, {junkExempt} exempt"
+  for (n, loc) in junkOpen do
+    IO.println s!"  OPEN  {n}   [{loc}]"
+  logInfo m!"JUNK_SCANNED\t{junkScanned}"
+  logInfo m!"JUNK_NAMED\t{junkNamed}"
+  logInfo m!"JUNK_OPEN\t{junkOpen.size}"
 
   ---------------------------------------------------------------------------
   -- Stored results
