@@ -331,6 +331,23 @@ theorem sharedLD_mem_observed_interval_of_ratio_eq
   · exact le_div_one_sub_of_ratio_eq V_A V_E fst shared_ld observed
       hVA hVE hfst0 hfst1 hs0 h_match
 
+/-- **Continental tagging attribution, exactly.**  At `F_ST = 0.12 = 3/25` and observed
+target-to-source accuracy ratio `0.30 = 3/10`, the corrected drift-plus-tagging model forces
+tagging survival below `15/44 ≈ 0.341`.  Equivalently, at least `29/44 ≈ 0.659` of the tagging
+structure is lost.  The oft-quoted “roughly two thirds” is therefore a proved consequence of
+the model inputs, not a rounded calculation left in prose. -/
+theorem continental_portability_forces_two_thirds_tagging_loss
+    (V_A V_E shared_ld : ℝ)
+    (hVA : 0 < V_A) (hVE : 0 < V_E) (hs0 : 0 < shared_ld)
+    (h_match : taggedDriftR2RatioCorrected V_A V_E (3 / 25) shared_ld = 3 / 10) :
+    shared_ld ≤ 15 / 44 ∧ 29 / 44 ≤ 1 - shared_ld := by
+  have hupper := le_div_one_sub_of_ratio_eq
+    V_A V_E (3 / 25) shared_ld (3 / 10) hVA hVE (by norm_num) (by norm_num) hs0 h_match
+  norm_num at hupper ⊢
+  constructor
+  · exact hupper
+  · linarith
+
 end AttributionToTagging
 
 /-! ## A demographic parameter this file could never have fitted
