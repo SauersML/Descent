@@ -51,49 +51,49 @@ variable {𝕜 H Y : Type*} [Field 𝕜]
   [AddCommGroup H] [Module 𝕜 H] [AddCommGroup Y] [Module 𝕜 Y]
 
 /-- A correction is admissible when it factors through the observation operator. -/
-def FactorsThrough (A : H →ₗ[𝕜] Y) (C : H →ₗ[𝕜] H) : Prop :=
+def FactorsThroughObservation (A : H →ₗ[𝕜] Y) (C : H →ₗ[𝕜] H) : Prop :=
   ∃ T : Y →ₗ[𝕜] H, C = T.comp A
 
 /-- The zero correction factors through every observation. -/
-theorem FactorsThrough.zero (A : H →ₗ[𝕜] Y) : FactorsThrough A 0 := by
+theorem FactorsThroughObservation.zero (A : H →ₗ[𝕜] Y) : FactorsThroughObservation A 0 := by
   exact ⟨0, by ext; simp⟩
 
 /-- Factored corrections are closed under addition. -/
-theorem FactorsThrough.add (A : H →ₗ[𝕜] Y) (C D : H →ₗ[𝕜] H)
-    (hC : FactorsThrough A C) (hD : FactorsThrough A D) :
-    FactorsThrough A (C + D) := by
+theorem FactorsThroughObservation.add (A : H →ₗ[𝕜] Y) (C D : H →ₗ[𝕜] H)
+    (hC : FactorsThroughObservation A C) (hD : FactorsThroughObservation A D) :
+    FactorsThroughObservation A (C + D) := by
   rcases hC with ⟨T, rfl⟩
   rcases hD with ⟨S, rfl⟩
   exact ⟨T + S, by ext; simp⟩
 
 /-- Factored corrections are closed under scalar multiplication. -/
-theorem FactorsThrough.smul (A : H →ₗ[𝕜] Y) (C : H →ₗ[𝕜] H)
-    (hC : FactorsThrough A C) (c : 𝕜) :
-    FactorsThrough A (c • C) := by
+theorem FactorsThroughObservation.smul (A : H →ₗ[𝕜] Y) (C : H →ₗ[𝕜] H)
+    (hC : FactorsThroughObservation A C) (c : 𝕜) :
+    FactorsThroughObservation A (c • C) := by
   rcases hC with ⟨T, rfl⟩
   exact ⟨c • T, by ext; simp⟩
 
 /-- The corrections factoring through a fixed observation form a linear subspace of all
 endomorphisms. -/
 def factorsThroughSubmodule (A : H →ₗ[𝕜] Y) : Submodule 𝕜 (H →ₗ[𝕜] H) where
-  carrier := {C | FactorsThrough A C}
-  zero_mem' := FactorsThrough.zero A
+  carrier := {C | FactorsThroughObservation A C}
+  zero_mem' := FactorsThroughObservation.zero A
   add_mem' := by
     intro C D hC hD
-    exact FactorsThrough.add A C D hC hD
+    exact FactorsThroughObservation.add A C D hC hD
   smul_mem' := by
     intro c C hC
-    exact FactorsThrough.smul A C hC c
+    exact FactorsThroughObservation.smul A C hC c
 
 /-- Membership in the factor-through submodule is exactly factorization through `A`. -/
 @[simp] theorem mem_factorsThroughSubmodule
     (A : H →ₗ[𝕜] Y) (C : H →ₗ[𝕜] H) :
-    C ∈ factorsThroughSubmodule A ↔ FactorsThrough A C := Iff.rfl
+    C ∈ factorsThroughSubmodule A ↔ FactorsThroughObservation A C := Iff.rfl
 
 /-- Post-composing a factored correction by an arbitrary endomorphism preserves admissibility. -/
-theorem FactorsThrough.postcomp (A : H →ₗ[𝕜] Y) (C R : H →ₗ[𝕜] H)
-    (hC : FactorsThrough A C) :
-    FactorsThrough A (R.comp C) := by
+theorem FactorsThroughObservation.postcomp (A : H →ₗ[𝕜] Y) (C R : H →ₗ[𝕜] H)
+    (hC : FactorsThroughObservation A C) :
+    FactorsThroughObservation A (R.comp C) := by
   rcases hC with ⟨T, rfl⟩
   exact ⟨R.comp T, by ext; simp⟩
 
@@ -102,11 +102,11 @@ theorem factorsThroughSubmodule_postcomp_mem
     (A : H →ₗ[𝕜] Y) (C R : H →ₗ[𝕜] H)
     (hC : C ∈ factorsThroughSubmodule A) :
     R.comp C ∈ factorsThroughSubmodule A := by
-  exact FactorsThrough.postcomp A C R hC
+  exact FactorsThroughObservation.postcomp A C R hC
 
 /-- Every factored correction annihilates at least the kernel of the observation operator. -/
-theorem FactorsThrough.ker_le
-    (A : H →ₗ[𝕜] Y) (C : H →ₗ[𝕜] H) (hC : FactorsThrough A C) :
+theorem FactorsThroughObservation.ker_le
+    (A : H →ₗ[𝕜] Y) (C : H →ₗ[𝕜] H) (hC : FactorsThroughObservation A C) :
     LinearMap.ker A ≤ LinearMap.ker C := by
   intro β hβ
   rw [LinearMap.mem_ker]
@@ -117,7 +117,7 @@ theorem FactorsThrough.ker_le
 observation operator exactly when it annihilates every observationally invisible direction. -/
 theorem factorsThrough_iff_ker_le
     (A : H →ₗ[𝕜] Y) (C : H →ₗ[𝕜] H) :
-    FactorsThrough A C ↔ LinearMap.ker A ≤ LinearMap.ker C := by
+    FactorsThroughObservation A C ↔ LinearMap.ker A ≤ LinearMap.ker C := by
   constructor
   · exact fun hC ↦ hC.ker_le A C
   · intro hker
@@ -172,8 +172,8 @@ theorem factorsThroughSubmodule_mono_of_observation_factorization
 
 /-- **Observable-quotient law.**  Every admissible correction is constant on each fiber of the
 observation map.  No coefficient choice can distinguish targets that produced the same data. -/
-theorem FactorsThrough.apply_eq_of_observation_eq
-    (A : H →ₗ[𝕜] Y) (C : H →ₗ[𝕜] H) (hC : FactorsThrough A C)
+theorem FactorsThroughObservation.apply_eq_of_observation_eq
+    (A : H →ₗ[𝕜] Y) (C : H →ₗ[𝕜] H) (hC : FactorsThroughObservation A C)
     (β γ : H) (hobs : A β = A γ) :
     C β = C γ := by
   rcases hC with ⟨T, rfl⟩
@@ -183,7 +183,7 @@ theorem FactorsThrough.apply_eq_of_observation_eq
 when it is constant on every fiber of the observation operator. -/
 theorem factorsThrough_iff_apply_eq_of_observation_eq
     (A : H →ₗ[𝕜] Y) (C : H →ₗ[𝕜] H) :
-    FactorsThrough A C ↔ ∀ β γ : H, A β = A γ → C β = C γ := by
+    FactorsThroughObservation A C ↔ ∀ β γ : H, A β = A γ → C β = C γ := by
   constructor
   · intro hC β γ hobs
     exact hC.apply_eq_of_observation_eq A C β γ hobs
@@ -231,7 +231,7 @@ theorem factorsThrough_subset_uniformCorrectionFamily
     (factorsThroughSubmodule A : Set (H →ₗ[𝕜] H)) ⊆ UniformCorrectionFamily A k := by
   classical
   intro C hC
-  change FactorsThrough A C at hC
+  change FactorsThroughObservation A C at hC
   rcases hC with ⟨S, rfl⟩
   let j₀ : Fin k := ⟨0, hk⟩
   refine ⟨fun j ↦ if j = j₀ then S else 0,
@@ -341,9 +341,9 @@ theorem NonzeroCorrectionEigencone.smul_mem
 
 /-- Factored corrections annihilate every true kernel direction. -/
 theorem factorsThrough_apply_eq_zero_of_mem_ker
-    (A : H →ₗ[𝕜] Y) (C : H →ₗ[𝕜] H) (hC : FactorsThrough A C)
+    (A : H →ₗ[𝕜] Y) (C : H →ₗ[𝕜] H) (hC : FactorsThroughObservation A C)
     (β : H) (hβ : β ∈ LinearMap.ker A) : C β = 0 := by
-  exact LinearMap.mem_ker.mp (FactorsThrough.ker_le A C hC hβ)
+  exact LinearMap.mem_ker.mp (FactorsThroughObservation.ker_le A C hC hβ)
 
 end AlgebraicCore
 
@@ -422,8 +422,8 @@ theorem conjugateLinearOperator_comp (U : H ≃ₗ[𝕜] H')
 /-- Conjugation preserves and reflects the factor-through relation. -/
 theorem factorsThrough_conjugate_iff (U : H ≃ₗ[𝕜] H')
     (A C : H →ₗ[𝕜] H) :
-    FactorsThrough (conjugateLinearOperator U A) (conjugateLinearOperator U C) ↔
-      FactorsThrough A C := by
+    FactorsThroughObservation (conjugateLinearOperator U A) (conjugateLinearOperator U C) ↔
+      FactorsThroughObservation A C := by
   constructor
   · rintro ⟨T', hT'⟩
     refine ⟨conjugateLinearOperator U.symm T', ?_⟩

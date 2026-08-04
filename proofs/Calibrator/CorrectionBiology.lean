@@ -114,7 +114,7 @@ theorem dynamicsPooledProjector_mem_uniformCorrectionFamily
 sum, even if their persistence/switching contrasts differ. -/
 theorem factoredDynamicsCorrection_eq_of_pooledSum_eq
     (C : (Bool → ℝ) →ₗ[ℝ] (Bool → ℝ))
-    (hC : FactorsThrough dynamicsPoolingObservation C)
+    (hC : FactorsThroughObservation dynamicsPoolingObservation C)
     (β γ : Bool → ℝ) (hpool : β false + β true = γ false + γ true) :
     C β = C γ := by
   apply hC.apply_eq_of_observation_eq dynamicsPoolingObservation C β γ
@@ -124,7 +124,7 @@ theorem factoredDynamicsCorrection_eq_of_pooledSum_eq
 persistence/switching contrast leaves every factored correction unchanged. -/
 theorem factoredDynamicsCorrection_add_contrast
     (C : (Bool → ℝ) →ₗ[ℝ] (Bool → ℝ))
-    (hC : FactorsThrough dynamicsPoolingObservation C)
+    (hC : FactorsThroughObservation dynamicsPoolingObservation C)
     (β : Bool → ℝ) (c : ℝ) :
     C (β + c • dynamicsContrast) = C β := by
   apply hC.apply_eq_of_observation_eq dynamicsPoolingObservation C
@@ -143,7 +143,7 @@ field shared by persistence and switching. Thus the normal form is forced by the
 model and exactness on common biology; it is not merely a convenient choice of representative. -/
 theorem dynamicsPooledProjector_eq_of_factorsThrough_of_fixes_common
     (C : (Bool → ℝ) →ₗ[ℝ] (Bool → ℝ))
-    (hC : FactorsThrough dynamicsPoolingObservation C)
+    (hC : FactorsThroughObservation dynamicsPoolingObservation C)
     (hcommon : ∀ c : ℝ, C (fun _ : Bool ↦ c) = fun _ : Bool ↦ c) :
     C = dynamicsPooledProjector := by
   apply LinearMap.ext
