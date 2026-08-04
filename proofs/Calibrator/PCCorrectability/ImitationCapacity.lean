@@ -70,14 +70,23 @@ how much: more constraints, smaller capacity, lower threshold.
 constraint with positive spike load rigidifies.  That is a design instruction
 for study construction, not a structural accident of symmetric designs.
 
-*The `m_eff` prohibition.*  Effective-marker counts of the Cheverud–Nyholt and
-Li–Ji type are participation-ratio functionals of the LD spectrum, hence
-continuous in the weak topology.  `certificate_not_momentContinuous` proves
-that no such functional can determine a detection threshold: two spectra agree
-on every normalized moment to within `1/(n+1)` while their inverse-trace
-certificates differ by `n/(n+1)`.  The corpus's own `ldWhiteningGain` is the
-right functional for exactly the reason those are wrong — it is edge-sensitive
-and *not* weakly continuous.  Those two facts are the same fact.
+*The `m_eff` prohibition, and its exact reach.*  The Cheverud–Nyholt count
+`1 + (k-1)(1 - Var(λ)/k)` is a second-moment functional of the LD spectrum,
+hence continuous in the weak topology, and `certificate_not_momentContinuous`
+prohibits it: two spectra agree on every normalized moment to within `1/(n+1)`
+while their inverse-trace certificates differ by `n/(n+1)`.  The corpus's own
+`ldWhiteningGain` is the right functional for exactly the reason that one is
+wrong — it is edge-sensitive and *not* weakly continuous.  Those two facts are
+the same fact.
+
+**The prohibition does not reach Li–Ji, and this docstring used to claim it
+did.**  Li and Ji's count is `Σᵢ f(|λᵢ|)` with `f(x) = I(x ≥ 1) + (x - ⌊x⌋)`.
+That integrand is discontinuous at every positive integer, so the functional is
+not weakly continuous and is not a participation ratio; the moment argument
+below says nothing about it.  Whether Li–Ji can determine a detection threshold
+is open here.  Sweeping it into the prohibition was a statement stronger than
+the theorem — the defect is the one this corpus keeps finding, a name promising
+the general case over a proof of the special one.
 
 References:
 - Berisa and Pickrell (2016), Bioinformatics 32:283--285 (LD blocks).

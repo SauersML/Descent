@@ -193,7 +193,23 @@ theorem effectGeneticCorrelation_empty_panel_is_junk (β_source β_target : Fin 
 
 /-- Standardized diagonal LD operator: independent variants with unit variance.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is the DEFINITION of the
+    regime, not a statement within it. The identity matrix is what "diagonal LD"
+    means, and no measurement of any population could agree or disagree with it:
+    a population whose LD matrix is not the identity is not a counterexample to
+    this body, it is simply outside the regime this body names.
+
+    What carries empirical content is every result stated over it, and those are
+    measured at their own definitions: `sourceSelfR2DiagonalLD`,
+    `transportedTargetR2DiagonalLD` and `targetOracleR2DiagonalLD` are all
+    VALIDATED against simulated individuals drawn with independent standardized
+    genotypes -- which is this operator made real -- and the two wrong forms of
+    the `pgsR2` shape are rejected there at 1364 and 212 sems.
+
+    An UNTESTED marker here would read as an unpaid debt and is not one. It
+    inflates the count of things owed a measurement with an item that can never
+    receive one, which is the same reasoning `DGP.ldWitnessBeta` and the
+    `MechanisticPortabilityWitnesses` fixtures already carry. -/
 def standardizedDiagonalLD {m : ℕ} : Fin m → Fin m → ℝ :=
   fun i j ↦ if i = j then 1 else 0
 
@@ -675,7 +691,8 @@ Key results:
 
 Reference: Ben-David, Blitzer, Crammer, Kulesza, Pereira and Vaughan (2010),
 "A theory of learning from different domains", Machine Learning 79:151-175 -- the
-source of the eps_S(h) + d_H(S,T) + lambda* bound formalized below. The mapping of
+source of the eps_S(h) + (1/2) d_{H delta H}(S,T) + lambda* bound formalized
+below -- see `benDavidUpperBound` for why the one-half is not optional. The mapping of
 that bound onto ancestry domains, and the relation between H-divergence and Fst,
 are derived here, not imported from it.
 -/
@@ -694,7 +711,27 @@ The PGS portability problem maps to domain adaptation:
 
 section DomainAdaptation
 
-/-- Ben-David upper-bound functional `ε_S(h) + d_H(S,T) + λ*`. -/
+/-- Ben-David upper-bound functional `ε_S(h) + divergence + λ*`.
+
+    **Convention on the divergence argument, stated because the published bound
+    carries a factor this body does not.** Ben-David, Blitzer, Crammer, Kulesza,
+    Pereira and Vaughan (2010), Theorem 2, is
+
+      `ε_T(h) ≤ ε_S(h) + ½·d_{HΔH}(D_S, D_T) + λ`,
+
+    and the `½` is there because their `d_H(D, D') = 2·sup_{h∈H} |Pr_D[I(h)] -
+    Pr_{D'}[I(h)]|` carries a factor two in its own definition. So `divergence`
+    here must be supplied as the HALF-divergence `½·d_{HΔH}`, equivalently the
+    bare supremum `sup_h |Pr_{D_S}[I(h)] - Pr_{D_T}[I(h)]|`. Feeding a raw
+    `d_{HΔH}` doubles the middle term and the bound is loose by that factor.
+
+    This is a naming convention and not a claim: nothing in the corpus computes
+    `d_{HΔH}` from an ancestry pair, and `divergence_increases_with_fst` was
+    deleted (note below) precisely because the map from `F_ST` to this argument
+    is not derived anywhere. The convention still has to be written down --
+    an argument named `divergence` against a cited theorem whose divergence is
+    twice it is exactly the unstated-convention defect this corpus has already
+    paid for over `F_ST`. -/
 def benDavidUpperBound (err_source divergence lambda_star : ℝ) : ℝ :=
   err_source + divergence + lambda_star
 

@@ -2036,7 +2036,34 @@ theorem totalEffect_target_eq_betaSource_plus_targetEffectHeterogeneity {p q : �
 tagging surface. This isolates what would transport if target effects were
 identical to source effects.
 
-    Empirical status: UNTESTED. -/
+    Regime: standardized variants; the LD operator is the tag-by-causal
+    cross-covariance and the vector it acts on is an effect vector on the causal
+    coordinates.
+
+    Empirical status: **VALIDATED** (`simcov/battery_bulk32.py`). What is on
+    trial is the PROJECTION ITSELF -- that applying the LD cross-covariance to a
+    causal effect vector yields the MARGINAL effects an association scan
+    actually estimates. That is a fact about genotypes, not about algebra: the
+    oracle regresses simulated phenotypes on simulated genotypes, one univariate
+    regression per variant, and never forms the LD matrix from the effects.
+
+    40 variants with AR(1) LD (`Σᵢⱼ = ρ^|i-j|`, `ρ` swept 0.4 to 0.9), four
+    causal among them, 400000 individuals. Agreement is read at the
+    WORST-FITTING coordinate of the 40 rather than on an average that would hide
+    a local miss, with the error bar inflated by `√(2 log 40)` for that
+    selection: worst cell 1.16 sems.
+
+    Power: two competing forms ride on the same cells. Dropping the projection
+    entirely -- taking the marginal effect to BE the causal effect -- misses by
+    up to 61 sems; applying the projection TWICE, which is what an `r` versus
+    `r²` confusion looks like at the vector level, is FALSIFIED at 539 sems.
+    Control: the realised genetic variance reproduces `βᵀΣβ` on the same run,
+    passing at 0.29 sems.
+
+    The measurement is of the shared shape `Σ.mulVec ·`, so it establishes the
+    projection for every body of this family; what differs between them is
+    WHICH effect vector is projected, and those vectors carry their own
+    statuses. -/
 noncomputable def targetSourceEffectProjection {p q : ℕ}
     (m : CrossPopulationMetricModel p q) : Fin p → ℝ :=
   (sigmaTagCausalSourceAt m Pop.target).mulVec (m.beta Pop.source)
@@ -2044,7 +2071,34 @@ noncomputable def targetSourceEffectProjection {p q : ℕ}
 /-- Incremental target-side projection induced purely by effect-size
 heterogeneity relative to the source effect vector.
 
-    Empirical status: UNTESTED. -/
+    Regime: standardized variants; the LD operator is the tag-by-causal
+    cross-covariance and the vector it acts on is an effect vector on the causal
+    coordinates.
+
+    Empirical status: **VALIDATED** (`simcov/battery_bulk32.py`). What is on
+    trial is the PROJECTION ITSELF -- that applying the LD cross-covariance to a
+    causal effect vector yields the MARGINAL effects an association scan
+    actually estimates. That is a fact about genotypes, not about algebra: the
+    oracle regresses simulated phenotypes on simulated genotypes, one univariate
+    regression per variant, and never forms the LD matrix from the effects.
+
+    40 variants with AR(1) LD (`Σᵢⱼ = ρ^|i-j|`, `ρ` swept 0.4 to 0.9), four
+    causal among them, 400000 individuals. Agreement is read at the
+    WORST-FITTING coordinate of the 40 rather than on an average that would hide
+    a local miss, with the error bar inflated by `√(2 log 40)` for that
+    selection: worst cell 1.16 sems.
+
+    Power: two competing forms ride on the same cells. Dropping the projection
+    entirely -- taking the marginal effect to BE the causal effect -- misses by
+    up to 61 sems; applying the projection TWICE, which is what an `r` versus
+    `r²` confusion looks like at the vector level, is FALSIFIED at 539 sems.
+    Control: the realised genetic variance reproduces `βᵀΣβ` on the same run,
+    passing at 0.29 sems.
+
+    The measurement is of the shared shape `Σ.mulVec ·`, so it establishes the
+    projection for every body of this family; what differs between them is
+    WHICH effect vector is projected, and those vectors carry their own
+    statuses. -/
 noncomputable def targetEffectHeterogeneityProjection {p q : ℕ}
     (m : CrossPopulationMetricModel p q) : Fin p → ℝ :=
   (sigmaTagCausalSourceAt m Pop.target).mulVec (targetEffectHeterogeneity m)
@@ -2052,7 +2106,34 @@ noncomputable def targetEffectHeterogeneityProjection {p q : ℕ}
 /-- Projection induced purely by target-only novel causal effects through the
 target tagging surface.
 
-    Empirical status: UNTESTED. -/
+    Regime: standardized variants; the LD operator is the tag-by-causal
+    cross-covariance and the vector it acts on is an effect vector on the causal
+    coordinates.
+
+    Empirical status: **VALIDATED** (`simcov/battery_bulk32.py`). What is on
+    trial is the PROJECTION ITSELF -- that applying the LD cross-covariance to a
+    causal effect vector yields the MARGINAL effects an association scan
+    actually estimates. That is a fact about genotypes, not about algebra: the
+    oracle regresses simulated phenotypes on simulated genotypes, one univariate
+    regression per variant, and never forms the LD matrix from the effects.
+
+    40 variants with AR(1) LD (`Σᵢⱼ = ρ^|i-j|`, `ρ` swept 0.4 to 0.9), four
+    causal among them, 400000 individuals. Agreement is read at the
+    WORST-FITTING coordinate of the 40 rather than on an average that would hide
+    a local miss, with the error bar inflated by `√(2 log 40)` for that
+    selection: worst cell 1.16 sems.
+
+    Power: two competing forms ride on the same cells. Dropping the projection
+    entirely -- taking the marginal effect to BE the causal effect -- misses by
+    up to 61 sems; applying the projection TWICE, which is what an `r` versus
+    `r²` confusion looks like at the vector level, is FALSIFIED at 539 sems.
+    Control: the realised genetic variance reproduces `βᵀΣβ` on the same run,
+    passing at 0.29 sems.
+
+    The measurement is of the shared shape `Σ.mulVec ·`, so it establishes the
+    projection for every body of this family; what differs between them is
+    WHICH effect vector is projected, and those vectors carry their own
+    statuses. -/
 noncomputable def targetNovelMutationEffectProjection {p q : ℕ}
     (m : CrossPopulationMetricModel p q) : Fin p → ℝ :=
   (sigmaTagCausalSourceAt m Pop.target).mulVec (m.novelCausalEffect Pop.target)
@@ -2897,7 +2978,36 @@ theorem targetR2FromSourceWeights_exact_effect_heterogeneity_law {p q : ℕ}
 /-- Ohta-Kimura-style closed-form LD-correlation decay law across populations:
 correlation decays exponentially with recombination distance and divergence.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: UNTESTED, with a LEAD AGAINST THE EXPONENTIAL SHAPE
+    (`simcov/battery_bulk31.py`). Recorded as a lead and not a falsification,
+    because the run carried no valid positive control -- the harness's own rule
+    is that a disagreement without one has not shown the design can reproduce a
+    known result.
+
+    The lead: coalescent theory gives Sved's `r² ≈ 1/(1 + 4·Nₑ·c)`, which is
+    HYPERBOLIC in distance, not exponential, and the two differ in shape rather
+    than scale. Measured `r²` between common SNP pairs binned over an
+    eightyfold distance range (`Nₑ = 1000`, 5 Mb at `1e-8`, 8 replicates), with
+    BOTH laws fitted to the same curve with one free rate and one free
+    amplitude each so neither is handicapped:
+
+      distance    measured r²        exponential fit   hyperbolic fit
+        10 kb     0.5900 ± 0.0162    0.2387            0.4682
+        75 kb     0.1721 ± 0.0104    0.1977            0.2133
+       300 kb     0.0781 ± 0.0031    0.1028            0.0739
+      1200 kb     0.0295 ± 0.0015    0.0075            0.0205
+
+    The exponential misses at BOTH ends -- 21.7 sems at the short end and 14.2
+    sems at the long end, where it decays far too fast -- while the hyperbolic
+    stays within a few sems across most of the range. That two-sided failure is
+    the signature of a wrong shape rather than a wrong constant, so no choice of
+    `lambda` repairs it.
+
+    What would settle it: a control this design lacks. The obvious candidate,
+    that the hyperbolic fit recovers the simulated `Nₑ`, does not work as one --
+    it returned `Nₑ_eff = 563` against a true 1000, a known bias of `r²`
+    estimated from 60 sampled chromosomes. A design with an independently known
+    anchor is needed before either shape earns a verdict. -/
 noncomputable def ldCorrelationDecay (distance fstGap lambda : ℝ) : ℝ :=
   Real.exp (-(lambda * fstGap * distance))
 
@@ -3691,7 +3801,34 @@ noncomputable def sigmaTagCausalTargetAt {p q : ℕ}
 target tagging surface. This isolates what would transport if target causal
 effects were identical to source effects.
 
-    Empirical status: UNTESTED. -/
+    Regime: standardized variants; the LD operator is the tag-by-causal
+    cross-covariance and the vector it acts on is an effect vector on the causal
+    coordinates.
+
+    Empirical status: **VALIDATED** (`simcov/battery_bulk32.py`). What is on
+    trial is the PROJECTION ITSELF -- that applying the LD cross-covariance to a
+    causal effect vector yields the MARGINAL effects an association scan
+    actually estimates. That is a fact about genotypes, not about algebra: the
+    oracle regresses simulated phenotypes on simulated genotypes, one univariate
+    regression per variant, and never forms the LD matrix from the effects.
+
+    40 variants with AR(1) LD (`Σᵢⱼ = ρ^|i-j|`, `ρ` swept 0.4 to 0.9), four
+    causal among them, 400000 individuals. Agreement is read at the
+    WORST-FITTING coordinate of the 40 rather than on an average that would hide
+    a local miss, with the error bar inflated by `√(2 log 40)` for that
+    selection: worst cell 1.16 sems.
+
+    Power: two competing forms ride on the same cells. Dropping the projection
+    entirely -- taking the marginal effect to BE the causal effect -- misses by
+    up to 61 sems; applying the projection TWICE, which is what an `r` versus
+    `r²` confusion looks like at the vector level, is FALSIFIED at 539 sems.
+    Control: the realised genetic variance reproduces `βᵀΣβ` on the same run,
+    passing at 0.29 sems.
+
+    The measurement is of the shared shape `Σ.mulVec ·`, so it establishes the
+    projection for every body of this family; what differs between them is
+    WHICH effect vector is projected, and those vectors carry their own
+    statuses. -/
 noncomputable def targetSourceEffectProjectionAt {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) : Fin p → ℝ :=
   (sigmaTagCausalTargetAt m t).mulVec m.betaSource
@@ -3699,7 +3836,34 @@ noncomputable def targetSourceEffectProjectionAt {p q : ℕ}
 /-- Incremental generation-indexed projection induced purely by per-locus
 target-effect heterogeneity, including target-only novel causal effects.
 
-    Empirical status: UNTESTED. -/
+    Regime: standardized variants; the LD operator is the tag-by-causal
+    cross-covariance and the vector it acts on is an effect vector on the causal
+    coordinates.
+
+    Empirical status: **VALIDATED** (`simcov/battery_bulk32.py`). What is on
+    trial is the PROJECTION ITSELF -- that applying the LD cross-covariance to a
+    causal effect vector yields the MARGINAL effects an association scan
+    actually estimates. That is a fact about genotypes, not about algebra: the
+    oracle regresses simulated phenotypes on simulated genotypes, one univariate
+    regression per variant, and never forms the LD matrix from the effects.
+
+    40 variants with AR(1) LD (`Σᵢⱼ = ρ^|i-j|`, `ρ` swept 0.4 to 0.9), four
+    causal among them, 400000 individuals. Agreement is read at the
+    WORST-FITTING coordinate of the 40 rather than on an average that would hide
+    a local miss, with the error bar inflated by `√(2 log 40)` for that
+    selection: worst cell 1.16 sems.
+
+    Power: two competing forms ride on the same cells. Dropping the projection
+    entirely -- taking the marginal effect to BE the causal effect -- misses by
+    up to 61 sems; applying the projection TWICE, which is what an `r` versus
+    `r²` confusion looks like at the vector level, is FALSIFIED at 539 sems.
+    Control: the realised genetic variance reproduces `βᵀΣβ` on the same run,
+    passing at 0.29 sems.
+
+    The measurement is of the shared shape `Σ.mulVec ·`, so it establishes the
+    projection for every body of this family; what differs between them is
+    WHICH effect vector is projected, and those vectors carry their own
+    statuses. -/
 noncomputable def targetEffectHeterogeneityProjectionAt {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) : Fin p → ℝ :=
   (sigmaTagCausalTargetAt m t).mulVec
@@ -5365,13 +5529,33 @@ The closed form takes that value exactly, rather than approaching it. -/
   unfold ibdFlowStep
   simp
 
-/-- **Equilibrium Fst under mutation-drift balance: Fst = 1/(1 + θ).**
-    This is the Wright (1931) island model result.
+/-- **Equilibrium identity probability under mutation-drift balance,
+`F = 1/(1 + θ)` with `θ = 4·Nₑ·μ`.**
+
+    **Attribution, corrected.** This is *not* the Wright (1931) island-model
+    result, which this file also carries at `fstMigrationDriftEquilibrium` and
+    which is `1/(1 + 4·Nₑ·m)` in the MIGRATION rate. The mutation-drift form is
+    Malécot's `(4Nu + 1)⁻¹`, standardly cited to Kimura and Crow (1964),
+    *The Number of Alleles That Can Be Maintained in a Finite Population*,
+    Genetics 49:725--738. The two laws share the algebraic shape `1/(1 + 4·Nₑ·rate)`
+    -- that shared shape is the whole content of `ibdFlowStep_fixedPoint`, which
+    proves it once for an abstract `rate` -- and they are different results about
+    different forces. A docstring that names the wrong one invites a reader to
+    substitute `m` for `μ` on the authority of a citation that does not cover it.
+
+    Convention: despite the `Fst` in the name (inherited from
+    `DGP.fstMutationDriftEquilibrium`, whose docstring says the same thing), the
+    quantity is the probability that two gene copies drawn at random from ONE
+    population are identical by descent -- the complement of the equilibrium
+    heterozygosity `θ/(1+θ)` at `PortabilityDrift.hetMutationFloor`. It is not a
+    between-population differentiation measure.
 
     Not stipulated: `MutationDriftModelAssumptions.fstEquilibrium_isFixedPoint`
     derives it as the rest point of `ibdFlowStep` with `rate = μ`.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: UNTESTED here; the identical body at
+    `DGP.fstMutationDriftEquilibrium` is VALIDATED against `msprime`'s
+    `InfiniteAlleles` model at worst 2.40 sems. -/
 noncomputable def MutationDriftModelAssumptions.fstEquilibrium
     (m : MutationDriftModelAssumptions) : ℝ :=
   fstMutationDriftEquilibrium m.theta
@@ -5673,7 +5857,24 @@ theorem alleleFreqCorrelation_eq_retentionFactor_iff
 /-- LD overlap is directly the shared LD fraction (identity mapping, made
     explicit for clarity in the derivation chain).
 
-    Empirical status: UNTESTED. -/
+    Empirical status: NOT AN EMPIRICAL CLAIM -- the body is the identity
+    function on its argument, as the name and the parenthetical both say. There
+    is no measurement that could agree or disagree with `fun x ↦ x`: any
+    observation whatever is consistent with it, because it asserts nothing about
+    the world.
+
+    What this declaration DOES carry is a naming claim -- that "LD overlap" and
+    "shared LD fraction" denote the same quantity -- and that is a claim about
+    the two definitions' intended readings, not about a population. It is
+    settled by the derivation chain this body was made explicit for, not by a
+    simulation.
+
+    An UNTESTED marker here would read as an unpaid debt and is not one; it
+    inflates the count of things owed a measurement with an item that can never
+    receive one. The bodies downstream of it are where the empirical content
+    lives: `covarianceDivergenceMutationDrift` and
+    `presentDayPGSVarianceMutationDrift` both consume this fraction and both
+    make claims a simulation can reach. -/
 noncomputable def ldOverlapFromSharedLD (shared_ld : ℝ) : ℝ := shared_ld
 
 /-- **ldOverlapFromSharedLD pinned at a reference point.** No theorem in the corpus evaluated
@@ -6679,7 +6880,45 @@ already-derived `fstMigrationDriftEquilibrium`. -/
     Defined as `1 - fstMigrationDriftEquilibrium Ne m`, i.e., the complement
     of the between-population divergence under migration-drift balance.
 
-    Empirical status: UNTESTED. -/
+    Regime: two-deme island model at migration-drift balance. "Shared LD" is
+    read as the correlation, across SNP pairs, between the signed LD `r`
+    measured separately in each deme -- a property of PAIRS of sites, where
+    `F_ST` is a property of single sites. They are different observables, which
+    is what makes the identity refutable rather than algebraic.
+
+    Empirical status: **FALSIFIED** outside the weak-differentiation limit
+    (`simcov/battery_bulk34.py`). Measured at `Nₑ = 1000` over 5 Mb with
+    recombination, `4·Nₑ·m` swept a hundredfold:
+
+      4Nₑm    F_ST              shared LD          1 - F_ST
+      0.4     0.5606 ± 0.0192   0.9060 ± 0.0132    0.4394
+      2.0     0.2079 ± 0.0151   0.9341 ± 0.0054    0.7921
+      8.0     0.0710 ± 0.0065   0.9674 ± 0.0021    0.9290
+      40      0.0136 ± 0.0014   0.9890 ± 0.0005    0.9864
+
+    Worst cell 35 sems, 52% relative. The law is accurate where `F_ST` is small
+    -- at `4·Nₑ·m = 40` it predicts 0.9864 against 0.9890 measured -- and fails
+    badly once `F_ST` exceeds roughly 0.2, where it predicts 0.44 against 0.91
+    measured, low by a factor of two. LD structure is set largely by shared
+    ancestral recombination history, and that persists long after allele
+    frequencies have drifted apart; `1 - F_ST` has no term for it.
+
+    No nearby variant rescues the shape: `(1 - F)²` is falsified at 56 sems and
+    `1 - 2F` at 78 sems on the same cells. That all three fail while the
+    pipeline reproduces its control is what makes this a statement about the
+    law rather than about the measurement.
+
+    Control: one panmictic population whose samples are split into two arbitrary
+    halves, run through the SAME estimators, filters and pair selection --
+    `F_ST = 0.0015`, indistinguishable from zero. That run also quantifies the
+    only known bias in the shared-LD estimator: correlating two noisy per-deme
+    estimates of `r` attenuates the correlation to 0.9945 rather than 1, a
+    0.55% one-sided effect identical across cells and two orders of magnitude
+    too small to produce the gap above.
+
+    Consequence: `signalRetentionMigrationDrift` and
+    `retainedSignalVarianceMigrationDrift` consume this fraction, so their
+    values inherit the error wherever `F_ST` is not small. -/
 noncomputable def sharedLD_from_equilibrium (Ne m : ℝ) : ℝ :=
   1 - fstMigrationDriftEquilibrium Ne m
 
@@ -6719,7 +6958,24 @@ theorem sharedLD_from_equilibrium_eq (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 ≤ m) 
     measured, so a battery comparing the two reproduces `M/(1+M) = 1 - 1/(1+M)`
     to machine precision and the harness returns SELF-TEST. The empirical content
     is entirely in the equilibrium it complements -- including that equilibrium's
-    recorded deme-count blindness, which this inherits. -/
+    recorded deme-count blindness, which this inherits.
+
+    THE NAME IS A SECOND CLAIM, AND IT IS **FALSIFIED**
+    (`simcov/battery_bulk34.py`). That `M/(1+M) = 1 - 1/(1+M)` is algebra. That
+    the resulting number is the fraction of LD SHARED between demes is not, and
+    a simulation reaches it: shared LD read as the cross-deme correlation of
+    signed `r` over SNP pairs -- a property of PAIRS of sites, where `F_ST` is a
+    property of single sites -- runs 0.9060, 0.9341, 0.9674 and 0.9890 as
+    `4·Nₑ·m` goes 0.4, 2, 8, 40, against this body's 0.4394, 0.7921, 0.9290 and
+    0.9864. Worst cell 35 sems, low by a factor of two at `F_ST = 0.56`. The
+    agreement at `4·Nₑ·m = 40` is the weak-differentiation limit, not the
+    general case. See `sharedLD_from_equilibrium` for the full table, the
+    rejected variants and the control.
+
+    So the SELF-TEST verdict is right about what `battery_bulk9.py` compared,
+    and wrong as a summary of this body's empirical content: the identity is
+    unfalsifiable, the interpretation is not, and the interpretation is what
+    downstream consumers use. -/
 noncomputable def sharedLDFromMigration (M : ℝ) : ℝ :=
   M / (1 + M)
 

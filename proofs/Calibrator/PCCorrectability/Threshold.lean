@@ -75,15 +75,34 @@ noncomputable def demographicSpike (n F m : ℝ) : ℝ :=
 
 /-- Reference evaluation.  The value is computed through the definitions this body calls, but
 the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not. -/
+satisfying it, and a value does not.
+
+The evaluation point is `n = 4, F = 1, m = 1`, deliberately **off** the balanced-and-unit
+point `n = m = 1`.  The previous statement was `demographicSpike 1 1 1 = 0`, and at `m = n`
+the effective subgroup size is zero, so *every* constant in front of `F * effectiveSubgroupSize`
+satisfies it: the reference point pinned nothing.  Differential testing against the shipped
+calculator caught this — a body with the constant `2` in place of `4` passes the old reference
+point and every other reference point in this arc, while disagreeing with
+`map/correctability.rs` on 7275 of 30624 compared outputs.  Here
+`effectiveSubgroupSize 4 1 = 3/4` is nonzero, so the value `3` pins the constant. -/
 theorem demographicSpike_at_reference_point :
-    demographicSpike 1 1 1 = 0 := by
+    demographicSpike 4 1 1 = 3 := by
   norm_num [demographicSpike, effectiveSubgroupSize]
 
 
 
-/-- BBP-style proxy threshold for `n` samples and `M` effectively independent
-markers.
+/-- BBP-style proxy threshold for `n` individuals and `M` effectively
+independent markers.
+
+**Which count is the dimension, stated.** The threshold is `√(n/M)`, not
+`√(M/n)`, and the difference is not a typo to be normalized away. The
+Baik--Ben Arous--Péché transition puts a spike above the bulk edge exactly when
+it exceeds `√γ` with `γ = dimension/observations`. This corpus's PCA is the
+Patterson--Price--Reich one, run on the `n × n` cross-individual matrix built
+from `M` markers: the INDIVIDUALS are the dimension and the MARKERS are the
+observations, so `γ = n/M`. Reading it the other way -- `M` as dimension --
+inverts the aspect ratio and, in the usual `M ≫ n` genotype panel, turns an
+easy detection problem into an impossible one.
 
 `M` is the effectively independent marker count, not a raw variant count.
 Simulation measures the cost of confusing the two: supplying a raw count in
@@ -94,10 +113,11 @@ alongside it was conservative, so the two partially masked each other. -/
 noncomputable def bbpProxyThreshold (n M : ℝ) : ℝ :=
   Real.sqrt (n / M)
 
-/-- **bbpProxyThreshold at its junk point, named.** A zero ambient dimension leaves the BBP
-threshold undefined. The ratio is junk-zero and the threshold is `0`: every spike is above it,
-so the detection criterion admits everything. Consumers must guard the argument that makes the
-divisor vanish. -/
+/-- **bbpProxyThreshold at its junk point, named.** With no markers there are no observations
+and the BBP aspect ratio is undefined -- and the true threshold DIVERGES as `M → 0`, since
+`n/M → ∞`. The ratio is junk-zero and the threshold is `0` instead: every spike is above it, so
+the detection criterion admits everything at exactly the parameter where it should admit
+nothing. Consumers must guard the argument that makes the divisor vanish. -/
 theorem bbpProxyThreshold_zero_dimension_is_junk (n : ℝ) :
     bbpProxyThreshold n 0 = 0 := by
   unfold bbpProxyThreshold
@@ -123,10 +143,18 @@ noncomputable def pcCorrectabilityMargin (n M F m : ℝ) : ℝ :=
 
 /-- Reference evaluation.  The value is computed through the definitions this body calls, but
 the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not. -/
+satisfying it, and a value does not.
+
+As with `demographicSpike_at_reference_point`, the old point `n = M = F = m = 1` was
+degenerate: the spike term vanishes there, so the stated value `-1` was the threshold alone
+and constrained nothing about the spike half of the difference.  At `n = 4, M = 1, F = 1, m = 1`
+the spike is `3` and the threshold is `√4 = 2`, so both halves are live. -/
 theorem pcCorrectabilityMargin_at_reference_point :
-    pcCorrectabilityMargin 1 1 1 1 = -1 := by
-  norm_num [pcCorrectabilityMargin, bbpProxyThreshold, demographicSpike, effectiveSubgroupSize]
+    pcCorrectabilityMargin 4 1 1 1 = 1 := by
+  have hsqrt : Real.sqrt 4 = 2 := by
+    rw [show (4 : ℝ) = 2 ^ 2 by norm_num, Real.sqrt_sq (by norm_num : (0 : ℝ) ≤ 2)]
+  unfold pcCorrectabilityMargin bbpProxyThreshold demographicSpike effectiveSubgroupSize
+  norm_num [hsqrt]
 
 
 

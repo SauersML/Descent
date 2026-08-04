@@ -585,9 +585,31 @@ theorem faster_decay_lower_correlation
   nlinarith
 
 /-- **LD tagging efficiency decays exponentially with genetic distance.**
-    ρ²_LD(d) = exp(-λ_LD · d). This is the Ohta-Kimura result.
+    ρ²_LD(d) = exp(-λ_LD · d).
 
-    Empirical status: UNTESTED. -/
+    **Attribution, corrected: this is NOT the Ohta-Kimura result**, which the
+    docstring previously claimed. Ohta and Kimura (1971) give
+    `σ_d² ≈ (10 + ρ)/((2 + ρ)(11 + ρ))` with `ρ = 4·Nₑ·c`, formalized at
+    `LDDecayTheory.ohtaKimuraSigmaDSq`; that is HYPERBOLIC in the scaled
+    recombination rate, not exponential in it, and so is Sved's
+    `r² ≈ 1/(1 + 4·Nₑ·c)`. No published neutral two-locus theory in this
+    corpus's reference set predicts an exponential in genetic distance. The
+    exponential here is a phenomenological one-parameter chart, and it is only
+    that.
+
+    Regime: `d` is genetic distance, `λ_LD` a fitted rate with no derivation.
+    Nothing identifies `λ_LD` with `Nₑ` or with a recombination rate, so this
+    body cannot be inverted for a demographic parameter.
+
+    Empirical status: UNTESTED here, with a **LEAD AGAINST THE EXPONENTIAL
+    SHAPE** carried by the sibling body `PortabilityDrift.ldCorrelationDecay`,
+    which is the same exponential chart. Read that docstring before using this
+    one: with both shapes fitted to the same simulated `r²` curve at one free
+    rate and one free amplitude each, the exponential misses at BOTH ends --
+    21.7 sems at 10 kb and 14.2 sems at 1200 kb -- while the hyperbolic stays
+    within a few sems across the range. A two-sided failure is the signature of
+    a wrong shape, so no choice of `λ_LD` repairs it. That run carried no valid
+    positive control, which is why it is a lead and not a falsification. -/
 noncomputable def ldTaggingDecay (lam_LD d : ℝ) : ℝ :=
   Real.exp (-lam_LD * d)
 
