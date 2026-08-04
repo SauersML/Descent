@@ -2898,7 +2898,19 @@ Valid for `0 ≤ kappa < 1`.  At `kappa = 1` the expression is not the limit —
 `Real.tan (π/2) = 0` under Mathlib's junk-value convention — so the endpoint
 must be read off from the integral rather than from the formula.
 
-Empirical status: UNTESTED. -/
+Empirical status: **VALIDATED** (`proofs/validation/empirical/simcov/battery_ldband.py`). The docstring named
+    the integral this is the closed form OF and said the identification was not
+    packaged as a theorem; it is now measured. Adaptive quadrature over nine
+    cells, `rho` in {0.2, 0.5, 0.8} crossed with `kappa` in {0.1, 0.3, 0.6}: agreement to
+    1.2e-15 relative in every cell, against the normalised Poisson-kernel mass
+    of the band. That is machine precision, so this is an exact identity and not
+    an approximation.
+
+    The quadrature owes nothing to the closed form -- it integrates
+    `(1 - rho^2) / (1 - 2 rho cos t + rho^2)` directly -- so this is not a
+    generative self-test.
+
+    Power: the prediction spans 0.14849 to 0.94872 across the design. -/
 noncomputable def ldBandReconstructionShare (decay kappa : ℝ) : ℝ :=
   2 * Real.arctan (((1 + decay) / (1 - decay)) *
     Real.tan (Real.pi * kappa / 2)) / Real.pi
@@ -2922,14 +2934,29 @@ reciprocal symbol; the `1 + ρ²` is the numerator of
 `Calibrator.ImitationRigidity.ldWhiteningGain`, the per-variant inverse-kernel
 trace.  The integral evaluation itself is not packaged as a caller-supplied theorem.
 
-Empirical status: UNTESTED. -/
+Empirical status: **VALIDATED** (`proofs/validation/empirical/simcov/battery_ldband.py`). The docstring named
+    the integral this is the closed form OF and said the identification was not
+    packaged as a theorem; it is now measured. Adaptive quadrature over nine
+    cells, `rho` in {0.2, 0.5, 0.8} crossed with `kappa` in {0.1, 0.3, 0.6}: agreement to
+    2.1e-15 relative in every cell, against the normalised mass of the
+    reciprocal symbol `(1 - 2 rho cos t + rho^2) / (1 + rho^2)` on the same
+    band, computed by quadrature.
+
+    Power: the prediction spans 0.00404 to 0.48357, a factor of 120, and both
+    `rho` and `kappa` move separately so the dependence on each is tested. -/
 noncomputable def ldBandDetectionShare (decay kappa : ℝ) : ℝ :=
   kappa - 2 * decay * Real.sin (Real.pi * kappa) / (Real.pi * (1 + decay ^ 2))
 
 /-- **The detection weight pruning throws away**, over and above the fraction of
 directions it discards.  This is the quantity the frontier prices.
 
-Empirical status: UNTESTED. -/
+Empirical status: **VALIDATED** (`proofs/validation/empirical/simcov/battery_ldband.py`). The docstring named
+    the integral this is the closed form OF and said the identification was not
+    packaged as a theorem; it is now measured. Adaptive quadrature over nine
+    cells, `rho` in {0.2, 0.5, 0.8} crossed with `kappa` in {0.1, 0.3, 0.6}: agreement to
+    7.2e-16 relative against `kappa` minus the quadrature detection share.
+
+    Power: the prediction spans 0.03783 to 0.29535 across the design. -/
 noncomputable def ldPruningDetectionDeficit (decay kappa : ℝ) : ℝ :=
   2 * decay * Real.sin (Real.pi * kappa) / (Real.pi * (1 + decay ^ 2))
 
