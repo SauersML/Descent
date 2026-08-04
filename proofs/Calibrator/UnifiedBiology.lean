@@ -498,6 +498,31 @@ theorem binaryContextMatch_calibrationDriftDefectSq_eq_quarter :
   rw [hposterior, hconditional, twoIndex_calibrationDriftDefectSq_eq]
   norm_num [binaryStateWeight, Fin.sum_univ_two]
 
+/-- **The biological defect is pairwise disagreement.**  The quarter-unit portability loss is
+exactly half the expected squared quality difference between two independent posterior draws of
+the biological dynamics, averaged over target contexts.  Thus the binary persistence/switching
+calculation is a concrete face of the arbitrary finite-population pairwise drift law rather than
+an isolated two-state formula. -/
+theorem binaryContextMatch_pairwiseCalibrationDriftEnergy_eq_quarter :
+    pairwiseCalibrationDriftEnergy binaryStateWeight binaryDynamicsPosterior
+      binaryConditionalContextMatch = 1 / 4 := by
+  rw [← calibrationDriftDefectSq_eq_pairwiseCalibrationDriftEnergy
+    binaryStateWeight binaryDynamicsPosterior binaryConditionalContextMatch
+    binaryDynamicsPosterior_sum_eq_one]
+  exact binaryContextMatch_calibrationDriftDefectSq_eq_quarter
+
+/-- At each target context, the same pairwise disagreement price is already `1/4`; averaging over
+contexts does not create the obstruction, it only preserves a pointwise ancestry/dynamics defect. -/
+theorem binaryContextMatch_posteriorPairwiseDriftEnergy_eq_quarter
+    (y : BinaryBiologicalState) :
+    posteriorPairwiseDriftEnergy binaryDynamicsPosterior
+      binaryConditionalContextMatch y = 1 / 4 := by
+  rw [posteriorPairwiseDriftEnergy_eq_posteriorDriftEnergy
+    binaryDynamicsPosterior binaryConditionalContextMatch y
+    (binaryDynamicsPosterior_sum_eq_one y)]
+  norm_num [posteriorDrift, posteriorMean_binaryConditionalContextMatch_eq_half,
+    binaryDynamicsPosterior]
+
 /-- **The calibration price is one quarter of squared section oscillation.**  This identifies the
 `L²` posterior-field obstruction with the sharp functional-descent geometry in the same biological
 model, rather than merely evaluating the two theories on unrelated witnesses. -/

@@ -148,6 +148,117 @@ theorem posterior_bias_variance_decomposition
           (posteriorMean posterior conditional x - predictor x) ^ 2 := by
             simp [m, posteriorDrift]
 
+/-! ## Arbitrary finite families: drift is average pairwise disagreement -/
+
+/-- Half the posterior-weighted squared disagreement between two independent draws of the
+population index at a fixed covariate.
+
+Empirical status: NOT AN EMPIRICAL CLAIM -- this is an exact finite quadratic form. -/
+noncomputable def posteriorPairwiseDriftEnergy
+    (posterior : Covariate → Index → ℝ) (conditional : Index → Covariate → ℝ)
+    (x : Covariate) : ℝ :=
+  (1 / 2) * ∑ s, posterior x s *
+    ∑ t, posterior x t * (conditional s x - conditional t x) ^ 2
+
+/-- **Pairwise representation of posterior variance.**  For an arbitrary finite family of
+ancestries or environments, the local drift defect is exactly half the expected squared
+conditional-risk difference between two independent posterior draws.  No ordering, reference
+ancestry, or two-group reduction is required. -/
+theorem posteriorPairwiseDriftEnergy_eq_posteriorDriftEnergy
+    (posterior : Covariate → Index → ℝ) (conditional : Index → Covariate → ℝ)
+    (x : Covariate) (hposterior : ∑ t, posterior x t = 1) :
+    posteriorPairwiseDriftEnergy posterior conditional x =
+      ∑ t, posterior x t * posteriorDrift posterior conditional t x ^ 2 := by
+  let variance :=
+    ∑ t, posterior x t * posteriorDrift posterior conditional t x ^ 2
+  have hrow (s : Index) :
+      (∑ t, posterior x t * (conditional s x - conditional t x) ^ 2) =
+        variance + (posteriorMean posterior conditional x - conditional s x) ^ 2 := by
+    calc
+      (∑ t, posterior x t * (conditional s x - conditional t x) ^ 2) =
+          ∑ t, posterior x t * (conditional t x - conditional s x) ^ 2 := by
+            apply Finset.sum_congr rfl
+            intro t _
+            ring
+      _ = variance +
+          (posteriorMean posterior conditional x - conditional s x) ^ 2 := by
+            simpa [variance] using
+              posterior_bias_variance_decomposition posterior conditional
+                (fun _ ↦ conditional s x) x hposterior
+  have hrecenter :
+      (∑ s, posterior x s *
+        (posteriorMean posterior conditional x - conditional s x) ^ 2) = variance := by
+    apply Finset.sum_congr rfl
+    intro s _
+    simp only [posteriorDrift]
+    ring
+  unfold posteriorPairwiseDriftEnergy
+  simp_rw [hrow, mul_add, Finset.sum_add_distrib]
+  rw [← Finset.sum_mul, hposterior, one_mul, hrecenter]
+  ring
+
+/-- **Zero pairwise defect characterizes conditional invariance.**  When every population or
+environment has positive posterior mass, the pairwise drift energy at a covariate vanishes exactly
+when all of their conditional risks agree there.  Positivity is essential: a zero-mass population
+is deliberately invisible to the deployed posterior. -/
+theorem posteriorPairwiseDriftEnergy_eq_zero_iff
+    (posterior : Covariate → Index → ℝ) (conditional : Index → Covariate → ℝ)
+    (x : Covariate) (hposterior : ∑ t, posterior x t = 1)
+    (hpositive : ∀ t, 0 < posterior x t) :
+    posteriorPairwiseDriftEnergy posterior conditional x = 0 ↔
+      ∀ s t, conditional s x = conditional t x := by
+  constructor
+  · intro henergy
+    have hsum :
+        (∑ t, posterior x t * posteriorDrift posterior conditional t x ^ 2) = 0 := by
+      rw [← posteriorPairwiseDriftEnergy_eq_posteriorDriftEnergy
+        posterior conditional x hposterior]
+      exact henergy
+    have hterm (t : Index) :
+        posterior x t * posteriorDrift posterior conditional t x ^ 2 = 0 := by
+      exact (Finset.sum_eq_zero_iff_of_nonneg
+        (fun u _ ↦ mul_nonneg (le_of_lt (hpositive u)) (sq_nonneg _))).mp hsum
+          t (Finset.mem_univ t)
+    have hdrift (t : Index) : posteriorDrift posterior conditional t x = 0 := by
+      have hsquare : posteriorDrift posterior conditional t x ^ 2 = 0 :=
+        (mul_eq_zero.mp (hterm t)).resolve_left (ne_of_gt (hpositive t))
+      nlinarith [sq_nonneg (posteriorDrift posterior conditional t x)]
+    intro s t
+    have hs := hdrift s
+    have ht := hdrift t
+    simp only [posteriorDrift] at hs ht
+    linarith
+  · intro hinvariant
+    have hzero (s t : Index) : (conditional s x - conditional t x) ^ 2 = 0 := by
+      rw [hinvariant s t]
+      ring
+    simp [posteriorPairwiseDriftEnergy, hzero]
+
+/-- The global pairwise drift energy, averaged over covariates.  This form exposes the defect as
+an ensemble of ancestry-to-ancestry disagreements rather than deviations from a privileged pooled
+mean.
+
+Empirical status: NOT AN EMPIRICAL CLAIM -- this is an exact finite weighted sum. -/
+noncomputable def pairwiseCalibrationDriftEnergy
+    (covariateWeight : Covariate → ℝ) (posterior : Covariate → Index → ℝ)
+    (conditional : Index → Covariate → ℝ) : ℝ :=
+  ∑ x, covariateWeight x * posteriorPairwiseDriftEnergy posterior conditional x
+
+/-- **General finite-family drift law.**  The calibration defect equals the posterior-weighted
+average of all pairwise conditional disagreements.  The two-index `q(1-q)Δ²` law below is its
+rank-one face. -/
+theorem calibrationDriftDefectSq_eq_pairwiseCalibrationDriftEnergy
+    (covariateWeight : Covariate → ℝ) (posterior : Covariate → Index → ℝ)
+    (conditional : Index → Covariate → ℝ)
+    (hposterior : ∀ x, ∑ t, posterior x t = 1) :
+    calibrationDriftDefectSq covariateWeight posterior conditional =
+      pairwiseCalibrationDriftEnergy covariateWeight posterior conditional := by
+  unfold calibrationDriftDefectSq pairwiseCalibrationDriftEnergy
+  apply Finset.sum_congr rfl
+  intro x _
+  rw [posteriorPairwiseDriftEnergy_eq_posteriorDriftEnergy posterior conditional x
+    (hposterior x)]
+
 /-- **Global Pythagoras for varying conditionals.**  The complete index-wise violation is the
 sum of the aggregate violation and the drift defect. -/
 theorem indexWiseCalibrationEnergy_eq_driftDefect_add_aggregate
