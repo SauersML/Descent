@@ -4397,6 +4397,14 @@ noncomputable def MutationDriftModelAssumptions.witness : MutationDriftModelAssu
 noncomputable def MutationDriftModelAssumptions.theta (m : MutationDriftModelAssumptions) : ℝ :=
   scaledMutationRate m.Ne m.μ
 
+/-- **The scaled mutation parameter is linear in the mutation rate with slope four Ne.**
+`theta_pos` below fixes the sign and leaves the slope free. -/
+theorem MutationDriftModelAssumptions.theta_div_mu (m : MutationDriftModelAssumptions)
+    (h : m.μ ≠ 0) :
+    m.theta / m.μ = 4 * m.Ne := by
+  unfold MutationDriftModelAssumptions.theta scaledMutationRate
+  field_simp
+
 /-- θ is positive for any valid mutation-drift model. -/
 theorem MutationDriftModelAssumptions.theta_pos (m : MutationDriftModelAssumptions) :
     0 < m.theta := by
@@ -4462,6 +4470,15 @@ The closed form takes that value exactly, rather than approaching it. -/
 noncomputable def MutationDriftModelAssumptions.fstEquilibrium
     (m : MutationDriftModelAssumptions) : ℝ :=
   fstMutationDriftEquilibrium m.theta
+
+/-- **The equilibrium inverts one plus the scaled mutation parameter.** `fstEquilibrium_pos`
+fixes the sign; this fixes the value, and a body carrying any other coefficient on `theta` would
+be positive too. -/
+theorem MutationDriftModelAssumptions.fstEquilibrium_mul_denom
+    (m : MutationDriftModelAssumptions) (h : 1 + m.theta ≠ 0) :
+    m.fstEquilibrium * (1 + m.theta) = 1 := by
+  unfold MutationDriftModelAssumptions.fstEquilibrium fstMutationDriftEquilibrium
+  field_simp
 
 /-- **The mutation-drift equilibrium is the fixed point of the identity
 balance** driven by mutation alone. -/

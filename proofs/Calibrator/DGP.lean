@@ -39,6 +39,14 @@ cluster" for the two failure shapes and the rule they share, recorded next to
 noncomputable def scaledMutationRate (Ne μ : ℝ) : ℝ :=
   4 * Ne * μ
 
+/-- **The scaling factor is four times the effective size.** Positivity is shared by every
+positive multiple of this product; dividing by the mutation rate exhibits the factor, which is
+the whole content of the scaling convention. -/
+theorem scaledMutationRate_div_mu (Ne μ : ℝ) (h : μ ≠ 0) :
+    scaledMutationRate Ne μ / μ = 4 * Ne := by
+  unfold scaledMutationRate
+  field_simp
+
 /-- **Scaled migration rate** `M = 4 Nₑ m`, the same scaling applied to gene flow.
 
     Empirical status: UNTESTED. -/
