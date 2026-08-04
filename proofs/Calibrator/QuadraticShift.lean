@@ -473,6 +473,23 @@ theorem finiteEnvironmentCovariancePool_mulVec_eq_zero_iff
     exact hkernel environment
 
 omit [DecidableEq ι] in
+/-- A direction detected by at least one active environment cannot remain in the pooled
+nullspace; inactive environments are irrelevant. -/
+theorem finiteEnvironmentCovariancePool_mulVec_ne_zero_of_exists_active
+    {κ : Type*} [Fintype κ]
+    (weight : κ → ℝ) (covariance : κ → Matrix ι ι ℝ)
+    (hweight : ∀ environment, 0 ≤ weight environment)
+    (hpsd : PositiveSemidefiniteFamily covariance)
+    (shift : ι → ℝ)
+    (hdetected : ∃ environment, 0 < weight environment ∧
+      (covariance environment).mulVec shift ≠ 0) :
+    (finiteEnvironmentCovariancePool weight covariance).mulVec shift ≠ 0 := by
+  intro hpool
+  obtain ⟨environment, hactive, hdetect⟩ := hdetected
+  exact hdetect ((finiteEnvironmentCovariancePool_mulVec_eq_zero_iff_active
+    weight covariance hweight hpsd shift).mp hpool environment hactive)
+
+omit [DecidableEq ι] in
 /-- A direction detected by at least one positively weighted environment cannot remain in the
 pooled nullspace. -/
 theorem finiteEnvironmentCovariancePool_mulVec_ne_zero_of_exists
@@ -483,10 +500,10 @@ theorem finiteEnvironmentCovariancePool_mulVec_ne_zero_of_exists
     (shift : ι → ℝ)
     (hdetected : ∃ environment, (covariance environment).mulVec shift ≠ 0) :
     (finiteEnvironmentCovariancePool weight covariance).mulVec shift ≠ 0 := by
-  intro hpool
   obtain ⟨environment, hdetect⟩ := hdetected
-  exact hdetect ((finiteEnvironmentCovariancePool_mulVec_eq_zero_iff
-    weight covariance hweight hpsd shift).mp hpool environment)
+  exact finiteEnvironmentCovariancePool_mulVec_ne_zero_of_exists_active
+    weight covariance (fun environment ↦ (hweight environment).le) hpsd shift
+      ⟨environment, hweight environment, hdetect⟩
 
 omit [DecidableEq ι] in
 /-- **Strict diversity gain.** The pooled nullspace is strictly smaller than a reference
