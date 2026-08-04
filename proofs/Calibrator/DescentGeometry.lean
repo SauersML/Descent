@@ -49,7 +49,7 @@ of that set against the functional.
   kernel-sufficient for the family of all mixing weights, so *every* functional descends along
   it.  This is `componentMixtureDensity_factorization` turned into a statement about
   conditionals.
-* `componentAffine_localization_residual_eq_neg_one` — the ansatz that is *not* rescued by it.
+* `exampleComponentResidual_eq_neg_one` — the ansatz that is *not* rescued by it.
   In an exact three-genome, two-component model the descended value at a genome is `-1` and the
   posterior-weighted average of the component values is `0`.
 
