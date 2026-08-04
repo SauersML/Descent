@@ -11,6 +11,7 @@ import Calibrator.EnsembleChannel
 import Calibrator.FrequencySpectrumStability
 import Calibrator.HorizonCurve
 import Calibrator.LandscapeSuperposition
+import Calibrator.MarkedBreakoutUniversality
 import Calibrator.MultipleMergerBlindness
 import Calibrator.PencilEnvironment
 import Calibrator.FunctionalDescent
@@ -206,6 +207,33 @@ theorem speedConditionedGenealogy_pairBlind_tripleRecovers (β : ℝ) :
       speedBiasParameterFromTripleRate (speedTiltBetaMergerRate β 3 3) = β :=
   ⟨speedTiltBetaMergerRate_two_two β,
     speedBiasParameterFromTripleRate_recovers β⟩
+
+/-- **But the speed-conditioned chart is not universal.**  The `Beta` interpolation is an
+invariant of the front-displacement law, not a consequence of the unconditioned genealogy.  A
+marked breakout measure whose displacement is linear in the family fraction has exactly the
+same unconditioned Bolthausen--Sznitman limit and a different conditioned three-lineage rate,
+so no deterministic time change relates the two charts.
+
+The biological reading is a constraint on inference: fitting the `Beta` chart to
+three-lineage data identifies the tilt parameter only if the displacement law is the
+logarithmic one.  The chart is a model assumption about front response, not a fact about
+multiple-merger genealogies. -/
+theorem speedConditionedGenealogy_chart_not_universal :
+    MarkedBreakout.linearDisplacementTripleRate 1 ≠ speedTiltBetaMergerRate 1 3 3 :=
+  MarkedBreakout.tripleRate_separates_at_unit_tilt
+
+/-- **And what the chart does rest on, exactly.**  The logarithmic displacement law is what
+makes the tilt factor a power of the surviving fraction, and additive displacement noise
+independent of the family fraction is absorbed by normalization.  These two identities are
+the necessary and sufficient content of the `Beta` interpolation. -/
+theorem speedConditionedGenealogy_chart_invariant
+    (gamma theta x noise : ℝ) (hgamma : gamma ≠ 0) (hx : x < 1) :
+    Real.exp (-(theta * MarkedBreakout.logDisplacement gamma x))
+        = (1 - x) ^ (theta / gamma) ∧
+      Real.exp (-(theta * (MarkedBreakout.logDisplacement gamma x + noise)))
+        = (1 - x) ^ (theta / gamma) * Real.exp (-(theta * noise)) :=
+  ⟨MarkedBreakout.logDisplacement_laplace_factors gamma theta x hgamma hx,
+    MarkedBreakout.displacementNoise_factors gamma theta x noise hgamma hx⟩
 
 section StationarityRepair
 
