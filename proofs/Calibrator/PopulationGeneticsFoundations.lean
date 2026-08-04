@@ -1314,6 +1314,48 @@ theorem islandModelFst_eq_mutationForm (Ne m : ℝ) :
 noncomputable def fstMigrationMutationEquilibrium (Ne m μ : ℝ) : ℝ :=
   1 / (1 + 4 * Ne * m + 4 * Ne * μ)
 
+/-- **The island-model equilibrium with the deme count carried explicitly.**
+
+    `1 / (1 + 4 Ne m n/(n-1) + 4 Ne mu)`. The homogenising force a deme feels is
+    not the emigration rate but the rate at which it receives lineages from the
+    other `n - 1` demes, and at small `n` those differ by a factor that no value
+    of `m` absorbs: at two demes the correction is 2, at forty it is 1.026.
+
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_correct.py`,
+    `correct_island_deme_count`). msprime symmetric island model at equilibrium,
+    `Ne = 1000`, TOTAL emigration rate `m = 1e-3` held fixed so `4 Ne m = 4.0` is
+    identical in every row, `mu = 1e-8`, Hudson `F_ST`, 40 replicates of 20 Mb:
+
+      demes   limit form   this def   simulated          sems (this def)
+        2         0.20000    0.11111  0.11698±0.01017     0.6
+        3         0.20000    0.14286  0.13273±0.01669     0.6
+        4         0.20000    0.15789  0.12658±0.01764     1.7
+        6         0.20000    0.17241  0.17579±0.02036     0.2
+       10         0.20000    0.18367  0.14297±0.01752     2.3
+       20         0.20000    0.19194  0.18580±0.01879     0.3
+       40         0.20000    0.19608  0.17114±0.01809     1.4
+
+    Worst cell 2.3 sems against the limit form's 8.2 at two demes. The squared
+    correction `(n/(n-1))^2` was also tried and is excluded: it gives 0.05882 at
+    two demes, 5.7 sems low, where this form sits at 0.6.
+
+    Power: at fixed `4 Ne m` the prediction spans 0.11111 to 0.19608 across the
+    deme counts while the limit form is constant at 0.20000, so the design
+    separates them by construction. -/
+noncomputable def fstIslandEquilibriumFiniteDemes (Ne m μ nDemes : ℝ) : ℝ :=
+  1 / (1 + 4 * Ne * m * (nDemes / (nDemes - 1)) + 4 * Ne * μ)
+
+/-- **The many-deme limit is the deme-blind formula.** At `nDemes / (nDemes - 1) = 1`
+the finite-deme equilibrium is exactly `fstMigrationMutationEquilibrium`, which is
+the precise sense in which the older definition is a limit rather than a law. -/
+theorem fstIslandEquilibriumFiniteDemes_eq_limit_of_unit_correction
+    (Ne m μ nDemes : ℝ) (h : nDemes / (nDemes - 1) = 1) :
+    fstIslandEquilibriumFiniteDemes Ne m μ nDemes
+      = fstMigrationMutationEquilibrium Ne m μ := by
+  unfold fstIslandEquilibriumFiniteDemes fstMigrationMutationEquilibrium
+  rw [h]; ring_nf
+
 /-- **fstMigrationMutationEquilibrium at the denominator, named.** Migration and mutation enter
 the divisor additively, so an inadmissible negative migration rate can cancel the leading one
 even with mutation absent. The equilibrium is reported as zero -- no differentiation -- where the

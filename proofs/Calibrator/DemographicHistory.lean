@@ -140,6 +140,16 @@ indistinguishability recorded in the note above can be stated rather than assert
     residual 4 sems from exactly 1 is a finite-lattice effect and is not the
     difference between the two candidates.
 
+    This is the evidence `demoSteppingStoneFst_indistinguishable_from_quadratic`
+    demands and no earlier measurement supplied. That theorem proves the two
+    forms are indistinguishable while `σ²` is free, and states the consequence
+    as a requirement: evidence for the FUNCTIONAL FORM needs `σ²` held at an
+    independently determined dispersal scale while `m` varies. On a
+    nearest-neighbour lattice the dispersal scale is fixed by the geometry and
+    cannot move with `m`, so the design above satisfies exactly that condition
+    and the tie is broken. The definition is kept, because stating the
+    indistinguishability requires naming the rejected form.
+
     Power: `K` spans 11.251 to 157.447, a factor of fourteen, across the design;
     the two candidate exponents predict a factor of 16 and a factor of 256 over
     that same range of `m`. -/
