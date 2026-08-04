@@ -2289,6 +2289,28 @@ first attempt died. `sum_reorder_pair_out` below does it in one move, peeling an
 index past two others, and three applications of it carry the whole rearrangement.
 -/
 
+/-- Expand a squared sum into a double sum. -/
+private theorem sum_sq_expand {A : Type*} [Fintype A] (f : A → ℝ) :
+    (∑ a, f a) ^ 2 = ∑ a, ∑ b, f a * f b := by
+  rw [sq, Finset.sum_mul_sum]
+
+/-- Expand a cubed sum into a triple sum.
+
+`pow_succ` is not the route: it leaves `(x * x) * x`, so `Finset.sum_mul_sum`
+rewrites the inner factor and the shape no longer matches. Peeling one factor at
+a time with `Finset.sum_mul` and `Finset.mul_sum` does match. -/
+private theorem sum_cube_expand {A : Type*} [Fintype A] (f : A → ℝ) :
+    (∑ a, f a) ^ 3 = ∑ a, ∑ b, ∑ c, f a * f b * f c := by
+  calc (∑ a, f a) ^ 3 = ((∑ a, f a) * (∑ b, f b)) * (∑ c, f c) := by ring
+    _ = (∑ a, ∑ b, f a * f b) * (∑ c, f c) := by rw [Finset.sum_mul_sum]
+    _ = ∑ a, (∑ b, f a * f b) * (∑ c, f c) := by rw [Finset.sum_mul]
+    _ = ∑ a, ∑ b, (f a * f b) * (∑ c, f c) := by
+        refine Finset.sum_congr rfl fun a _ ↦ ?_
+        rw [Finset.sum_mul]
+    _ = ∑ a, ∑ b, ∑ c, f a * f b * f c := by
+        refine Finset.sum_congr rfl fun a _ ↦ Finset.sum_congr rfl fun b _ ↦ ?_
+        rw [Finset.mul_sum]
+
 /-- Move an outer index inside two others. The engine of the reordering: one
 application peels a single index past a pair, and the contraction identity needs
 three. -/
@@ -2321,16 +2343,12 @@ theorem thirdCumulant_frobenius_eq_gram_cubeSum {d n : ℕ} (L : Fin d → Fin n
           (L a i * L b i * L c i) * (L a j * L b j * L c j) := by
     refine Finset.sum_congr rfl fun a _ ↦ Finset.sum_congr rfl fun b _ ↦
       Finset.sum_congr rfl fun c _ ↦ ?_
-    rw [sq, Finset.sum_mul_sum]
+    exact sum_sq_expand (fun i ↦ L a i * L b i * L c i)
   have rhs : (∑ i, ∑ j, (∑ a, L a i * L a j) ^ 3)
       = ∑ i, ∑ j, ∑ a, ∑ b, ∑ c,
           (L a i * L a j) * (L b i * L b j) * (L c i * L c j) := by
     refine Finset.sum_congr rfl fun i _ ↦ Finset.sum_congr rfl fun j _ ↦ ?_
-    rw [pow_succ, pow_succ, pow_one, Finset.sum_mul_sum]
-    refine Finset.sum_congr rfl fun a _ ↦ ?_
-    rw [Finset.sum_mul_sum]
-    refine Finset.sum_congr rfl fun b _ ↦ ?_
-    rw [Finset.sum_mul]
+    exact sum_cube_expand (fun a ↦ L a i * L a j)
   rw [lhs, rhs]
   -- peel `c`, then `b`, then `a`, past the `(i, j)` pair
   have hc : (∑ a, ∑ b, ∑ c, ∑ i, ∑ j,
