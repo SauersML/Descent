@@ -1563,27 +1563,22 @@ noncomputable def vResolvedConditional (v : Fin 2) : Fin 2 → ℝ :=
 /-- **Resolving `U` exposes no drift.** -/
 theorem uResolvedConditional_driftDefect_zero (u : Fin 2) :
     driftDefect twoBitIndexWeights (uResolvedConditional u) = 0 := by
-  unfold driftDefect pooledConditional twoBitIndexWeights uResolvedConditional
-  fin_cases u <;>
-    norm_num [Fin.sum_univ_two, bitSign, Matrix.cons_val_zero, Matrix.cons_val_one,
-      Matrix.head_cons]
+  unfold driftDefect pooledConditional uResolvedConditional
+  norm_num [Fin.sum_univ_two, bitSign, driftFieldB, twoBitIndexWeights, binnedRiskByAncestry, Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons]
 
 /-- **Resolving `V` exposes drift**, at every value of the bit. -/
 theorem vResolvedConditional_driftDefect_pos (v : Fin 2) :
     0 < driftDefect twoBitIndexWeights (vResolvedConditional v) := by
-  unfold driftDefect pooledConditional twoBitIndexWeights vResolvedConditional
-  fin_cases v <;>
-    norm_num [Fin.sum_univ_two, bitSign, Matrix.cons_val_zero, Matrix.cons_val_one,
-      Matrix.head_cons]
+  unfold driftDefect pooledConditional vResolvedConditional
+  fin_cases v <;> norm_num [Fin.sum_univ_two, bitSign, driftFieldB, twoBitIndexWeights, binnedRiskByAncestry, Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons]
 
 /-- **Resolving `U` has positive resolution**: the index-averaged conditional still varies across
 the bit, which is what resolution measures. -/
 theorem uResolvedConditional_resolution_pos :
     0 < driftDefect twoBitIndexWeights
       (fun u ↦ pooledConditional twoBitIndexWeights (uResolvedConditional u)) := by
-  unfold driftDefect pooledConditional twoBitIndexWeights uResolvedConditional
-  norm_num [Fin.sum_univ_two, bitSign, Matrix.cons_val_zero, Matrix.cons_val_one,
-    Matrix.head_cons]
+  unfold driftDefect pooledConditional uResolvedConditional
+  norm_num [Fin.sum_univ_two, bitSign, driftFieldB, twoBitIndexWeights, binnedRiskByAncestry, Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons]
 
 /-- **Resolving `V` has zero resolution.** The index average of the drifting part is constant, so
 a predictor that sees only `V` predicts the same value everywhere.
@@ -1593,9 +1588,8 @@ defect, `V` has zero resolution and positive defect. More resolution, less defec
 theorem vResolvedConditional_resolution_zero :
     driftDefect twoBitIndexWeights
       (fun v ↦ pooledConditional twoBitIndexWeights (vResolvedConditional v)) = 0 := by
-  unfold driftDefect pooledConditional twoBitIndexWeights vResolvedConditional
-  norm_num [Fin.sum_univ_two, bitSign, Matrix.cons_val_zero, Matrix.cons_val_one,
-    Matrix.head_cons]
+  unfold driftDefect pooledConditional vResolvedConditional
+  norm_num [Fin.sum_univ_two, bitSign, driftFieldB, twoBitIndexWeights, binnedRiskByAncestry, Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons]
 
 /-! #### Drift invisible to genotype is irreducible by any amount of genotyping
 
