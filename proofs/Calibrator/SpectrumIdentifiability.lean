@@ -190,26 +190,29 @@ theorem not_summable_one_div_linearRate :
   -- `not_summable_reciprocal_of_rate_le_natSucc` rather than repeating its plumbing.
   not_summable_reciprocal_of_rate_le_natSucc _ (fun _ ↦ by positivity) (fun _ ↦ le_rfl)
 
-/-- **Quadratic-growth Müntz boundary.** Any positive rate ladder growing at least as fast as
-`(n + 1)²` has a summable reciprocal spectrum. Combined with
+/-- **Superlinear polynomial Müntz boundary.** Any positive rate ladder growing at least as
+fast as `(n + 1) ^ power` for `power > 1` has a summable reciprocal spectrum. Combined with
 `not_summable_reciprocal_of_rate_le_natSucc`, this makes the Kingman-versus-
 Bolthausen--Sznitman contrast a reusable growth criterion rather than two isolated examples. -/
-theorem summable_one_div_of_natSucc_sq_le_rate
-    (rate : ℕ → ℝ) (hquadratic : ∀ n : ℕ, ((n : ℝ) + 1) ^ 2 ≤ rate n) :
+theorem summable_one_div_of_natSucc_rpow_le_rate
+    (rate : ℕ → ℝ) (power : ℝ) (hpower : 1 < power)
+    (hgrowth : ∀ n : ℕ, ((n : ℝ) + 1) ^ power ≤ rate n) :
     Summable fun n ↦ 1 / rate n := by
-  have hsquareBase : Summable fun n : ℕ ↦ 1 / (n : ℝ) ^ 2 :=
-    (Real.summable_one_div_nat_pow (p := 2)).2 (by omega)
-  have hsquare : Summable fun n : ℕ ↦ 1 / (((n : ℝ) + 1) ^ 2) := by
+  have hpowerBase : Summable fun n : ℕ ↦ 1 / (n : ℝ) ^ power :=
+    Real.summable_one_div_nat_rpow.mpr hpower
+  have hpowerShift : Summable fun n : ℕ ↦ 1 / (((n : ℝ) + 1) ^ power) := by
     have hshift := (summable_nat_add_iff
-      (f := fun n : ℕ ↦ 1 / (n : ℝ) ^ 2) 1).2 hsquareBase
+      (f := fun n : ℕ ↦ 1 / (n : ℝ) ^ power) 1).2 hpowerBase
     simpa only [Nat.cast_add, Nat.cast_one] using hshift
-  refine Summable.of_nonneg_of_le ?_ ?_ hsquare
+  refine Summable.of_nonneg_of_le ?_ ?_ hpowerShift
   · intro n
-    have hsquarePos : 0 < ((n : ℝ) + 1) ^ 2 := by positivity
-    have hrate : 0 < rate n := hsquarePos.trans_le (hquadratic n)
+    have hgrowthPos : 0 < ((n : ℝ) + 1) ^ power :=
+      Real.rpow_pos_of_pos (by positivity) power
+    have hrate : 0 < rate n := hgrowthPos.trans_le (hgrowth n)
     exact one_div_nonneg.mpr hrate.le
   · intro n
-    exact one_div_le_one_div_of_le (by positivity) (hquadratic n)
+    exact one_div_le_one_div_of_le
+      (Real.rpow_pos_of_pos (by positivity) power) (hgrowth n)
 
 /-! ## Fixed sample size: a linear count, and analyticity does not help -/
 
