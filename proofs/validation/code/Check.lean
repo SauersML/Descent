@@ -504,7 +504,7 @@ def exempt : List (Name × String) :=
 
 /-- Does this value apply a totalised partial operation? -/
 def usesJunkOp (e : Expr) : Bool :=
-  (constsOf e).fold (init := false) fun acc n ↦ acc || junkOps.contains n
+  (Inflation.constsOf e).fold (init := false) fun acc n ↦ acc || junkOps.contains n
 
 /-- Does the type carry a hypothesis that rules the junk point out before the
 body runs -- a positivity, a nonzero, or an order bound? -/
