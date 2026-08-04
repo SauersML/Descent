@@ -29,6 +29,7 @@ the analytic extraction of weakly-null depth cascades is intentionally not smugg
 - `uniformCorrectionFamily_eq_factorsThrough`: every positive uniform order is the same cone.
 - `adaptiveCorrectionSet_smul`: adaptive correction is invariant under nonzero target scaling.
 - `not_hasPositiveLowerBound_iff_hasUnitApproxKernel`: exact stability/depth dichotomy.
+- `HasUnitApproxKernel.postcomp`: bounded observation processing preserves deep targets.
 - `finite_postprocessors_simultaneously_small`: one deep target blinds a finite dictionary.
 - `finite_postprocessors_adaptive_span_small`: ℓ¹ control of every adaptive combination.
 - `finite_postprocessors_budgeted_adaptive_residual`: the residual lower bound `1 - Λε`.
@@ -352,6 +353,34 @@ theorem not_hasPositiveLowerBound_iff_hasUnitApproxKernel (A : H →L[ℝ] Y) :
     obtain ⟨β, hunit, hdepth⟩ := hdeep (c / 2) (half_pos hc)
     have hlower : c ≤ ‖A β‖ := by simpa [hunit] using hbound β
     linarith
+
+/-- **Approximate-kernel data processing.** Bounded downstream processing cannot repair an
+observation operator that has arbitrarily deep unit targets. This covers compression, feature
+maps, and bounded re-encodings before any correction dictionary is applied. -/
+theorem HasUnitApproxKernel.postcomp
+    {Z : Type*} [NormedAddCommGroup Z] [NormedSpace ℝ Z]
+    {A : H →L[ℝ] Y} (hdeep : HasUnitApproxKernel A) (B : Y →L[ℝ] Z) :
+    HasUnitApproxKernel (B.comp A) := by
+  intro ε hε
+  have hden : 0 < ‖B‖ + 1 := by positivity
+  obtain ⟨β, hunit, hdepth⟩ := hdeep (ε / (‖B‖ + 1)) (div_pos hε hden)
+  refine ⟨β, hunit, ?_⟩
+  have hscaled : ‖B‖ * ‖A β‖ ≤ ‖B‖ * (ε / (‖B‖ + 1)) :=
+    mul_le_mul_of_nonneg_left hdepth (norm_nonneg B)
+  calc
+    ‖(B.comp A) β‖ ≤ ‖B‖ * ‖A β‖ := B.le_opNorm (A β)
+    _ ≤ ‖B‖ * (ε / (‖B‖ + 1)) := hscaled
+    _ ≤ ε := by
+      rw [← mul_div_assoc]
+      exact (div_le_iff₀ hden).2 (by nlinarith [norm_nonneg B])
+
+/-- No bounded downstream observation map can restore a positive lower stability bound after
+approximate-kernel depth has appeared. -/
+theorem not_hasPositiveLowerBound_postcomp
+    {Z : Type*} [NormedAddCommGroup Z] [NormedSpace ℝ Z]
+    {A : H →L[ℝ] Y} (hdeep : HasUnitApproxKernel A) (B : Y →L[ℝ] Z) :
+    ¬ HasPositiveLowerBound (B.comp A) := by
+  exact (not_hasPositiveLowerBound_iff_hasUnitApproxKernel (B.comp A)).2 (hdeep.postcomp B)
 
 /-- The zero observation on the real line is the simplest concrete approximate-kernel model. -/
 theorem hasUnitApproxKernel_zero_real :
