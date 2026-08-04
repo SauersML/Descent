@@ -522,6 +522,13 @@ profile turns down before reaching the disjoint-support endpoint. -/
 noncomputable def populationGapCertificate (correlation : ℝ) : ℝ :=
   1 - 3 * correlation ^ 2 + correlation ^ 4
 
+/-- Difference factorization for the population gap certificate. -/
+theorem populationGapCertificate_sub_eq_mul (left right : ℝ) :
+    populationGapCertificate left - populationGapCertificate right =
+      (left ^ 2 - right ^ 2) * (left ^ 2 + right ^ 2 - 3) := by
+  unfold populationGapCertificate
+  ring
+
 /-- The golden threshold is exactly the zero of the population gap certificate. -/
 theorem populationGapCertificate_goldenCorrelationThreshold :
     populationGapCertificate goldenCorrelationThreshold = 0 := by
@@ -548,13 +555,8 @@ theorem populationGapCertificate_nonneg_of_abs_le_golden
     exact (sq_le_one_iff_abs_le_one correlation).mpr (hcorrelation.trans hthreshold.2.le)
   have hroot : populationGapCertificate goldenCorrelationThreshold = 0 :=
     populationGapCertificate_goldenCorrelationThreshold
-  have hfactor :
-      populationGapCertificate correlation -
-          populationGapCertificate goldenCorrelationThreshold =
-        (correlation ^ 2 - goldenCorrelationThreshold ^ 2) *
-          (correlation ^ 2 + goldenCorrelationThreshold ^ 2 - 3) := by
-    unfold populationGapCertificate
-    ring
+  have hfactor := populationGapCertificate_sub_eq_mul
+    correlation goldenCorrelationThreshold
   have hsecond : correlation ^ 2 + goldenCorrelationThreshold ^ 2 - 3 ≤ 0 := by
     have hthresholdSq : goldenCorrelationThreshold ^ 2 ≤ 1 := by
       exact (sq_le_one_iff_abs_le_one goldenCorrelationThreshold).mpr (by
@@ -582,13 +584,8 @@ theorem populationGapCertificate_neg_of_golden_lt_abs
     exact (sq_le_one_iff_abs_le_one correlation).mpr hcorrelation
   have hroot : populationGapCertificate goldenCorrelationThreshold = 0 :=
     populationGapCertificate_goldenCorrelationThreshold
-  have hfactor :
-      populationGapCertificate correlation -
-          populationGapCertificate goldenCorrelationThreshold =
-        (correlation ^ 2 - goldenCorrelationThreshold ^ 2) *
-          (correlation ^ 2 + goldenCorrelationThreshold ^ 2 - 3) := by
-    unfold populationGapCertificate
-    ring
+  have hfactor := populationGapCertificate_sub_eq_mul
+    correlation goldenCorrelationThreshold
   have hsecond : correlation ^ 2 + goldenCorrelationThreshold ^ 2 - 3 < 0 := by
     have hthresholdSq : goldenCorrelationThreshold ^ 2 < 1 := by
       exact (sq_lt_one_iff_abs_lt_one goldenCorrelationThreshold).mpr (by

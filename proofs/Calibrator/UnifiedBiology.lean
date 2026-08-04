@@ -8,6 +8,7 @@ import Calibrator.DescentGeometry
 import Calibrator.DirichletTransfer
 import Calibrator.ErgodicCovariancePencil
 import Calibrator.EnsembleChannel
+import Calibrator.FrequencySpectrumStability
 import Calibrator.HorizonCurve
 import Calibrator.LandscapeSuperposition
 import Calibrator.PencilEnvironment
@@ -126,6 +127,29 @@ theorem ancestryMixture_pure_gapped_balanced_ungapped :
     (-(4 / 5)) (by norm_num) (by rw [habsNegative]; exact hthreshold)
   refine ⟨hpositive, hnegative, ?_⟩
   simp [ancestryMixtureCorrelation, mixedEnvironmentCorrelation, populationGapCertificate]
+
+/-! ## Demographic resolution budget from the frequency spectrum -/
+
+/-- **Exact fixed-epoch design budget.**  The first conjunct is the spectrum-precision
+multiplier needed to halve reconstruction error; the second is the independent-genomic-data
+multiplier under root-sample spectrum error.  These are algebraic consequences of the sharp
+`1 / (2K - 3)` inverse exponent. -/
+theorem fixedEpochDemography_halving_budget :
+    (spectrumPrecisionMultiplier 2 2 = 2 ∧
+      spectrumPrecisionMultiplier 3 2 = 8 ∧
+      spectrumPrecisionMultiplier 4 2 = 32 ∧
+      spectrumPrecisionMultiplier 5 2 = 128) ∧
+    (independentSampleMultiplier 2 2 = 4 ∧
+      independentSampleMultiplier 3 2 = 64 ∧
+      independentSampleMultiplier 4 2 = 1024 ∧
+      independentSampleMultiplier 5 2 = 16384) :=
+  ⟨spectrumPrecisionMultiplier_halving_table,
+    independentSampleMultiplier_halving_table⟩
+
+/-- A five-epoch demographic sieve inherits the slow `sampleSize⁻¹ᐟ¹⁴` stability rate. -/
+theorem fiveEpochDemography_sampleRateExponent :
+    fixedEpochSampleRateExponent 5 = 1 / 14 :=
+  fixedEpochSampleRateExponent_five
 
 section StationarityRepair
 
@@ -830,7 +854,7 @@ theorem geometry_and_effect_recovery_gates
 
 /-! ## The unified obstruction bundle -/
 
-/-- Twenty logically distinct failures and boundaries that a biological transport theory must
+/-- Twenty-one logically distinct failures and boundaries that a biological transport theory must
 not collapse into one scalar "portability" parameter.  The final six fields make continuum
 calibration and finite correction part of the core theorem rather than adjacent examples. -/
 structure UnifiedBiologyObstructions : Prop where
@@ -887,6 +911,10 @@ structure UnifiedBiologyObstructions : Prop where
     populationGapCertificate (4 / 5) < 0 ∧
       populationGapCertificate (-(4 / 5)) < 0 ∧
       populationGapCertificate (ancestryMixtureCorrelation (4 / 5) (1 / 2)) = 1
+  /-- Five demographic epochs already reduce root-sample spectrum estimation to a
+  `sampleSize⁻¹ᐟ¹⁴` history-reconstruction exponent. -/
+  fiveEpochDemographyIsSeverelyIllConditioned :
+    fixedEpochSampleRateExponent 5 = 1 / 14
   /-- A cross-state criterion is not a function of the target context: it fails to descend along
   the label the target-only annotation descends along. -/
   crossStateDoesNotDescend :
@@ -973,6 +1001,8 @@ theorem unifiedBiology_obstructions : UnifiedBiologyObstructions := by
         rademacher_fullLowSNRFourthCoefficient_rotated_sub_localized
       environmentMixtureClosesPopulationGap :=
         ancestryMixture_pure_gapped_balanced_ungapped
+      fiveEpochDemographyIsSeverelyIllConditioned :=
+        fiveEpochDemography_sampleRateExponent
       crossStateDoesNotDescend := not_descends_contextMatchQuality_along_targetState
       marginalDescentDoesNotCompose := admissible_interaction_join_obstruction
       crudeReportingLosesDescent := admissible_confounding_meet_obstruction
