@@ -336,7 +336,7 @@ theorem contextMatch_sectionOscillation_le_half_totalVariationDiameter
         (binaryTransportFamily persists) y hpersist)
       (sum_fiberConditional (fun g : TransportPair ↦ g.2)
         (binaryTransportFamily switches) y hswitch)
-    simpa [div_eq_mul_inv] using hbound
+    simpa [div_eq_mul_inv, mul_comm] using hbound
 
 /-- The two biological conditionals are opposite point masses on every target fiber, so their
 `ℓ¹` total-variation diameter is exactly two. -/
