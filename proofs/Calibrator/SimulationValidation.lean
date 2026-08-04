@@ -803,29 +803,40 @@ theorem popgenDrivenProxyGenerationalModel_target_r2_strictly_decreases_at_one :
     nlinarith
   rw [popgenDrivenProxyGenerationalModel_target_r2_at_zero]
   exact h_r2_lt_half
+/-- **The single-locus generational scaffold.**
 
-/-- Single-locus generational witness where the target allele frequency drifts
-away from the source after generation `0`, lowering tagging quality and target
-`R²` even though the learned source score is unchanged. -/
-noncomputable def timeVaryingAFGenerationalModel :
+The two single-locus witnesses below differ in five fields -- the effect heterogeneity, which
+locus is scored directly rather than tagged, and the two allele-frequency mutation shifts --
+and agreed in the other twenty, which they each wrote out.  A witness for one driver could
+therefore differ from its neighbour in a field neither is about, and the closing block
+(context, variances, prevalence and its four positivity proofs) was a third copy of what the
+two-tag witness above already says.
+
+Taken as a function of the five, the twenty are stated once and every witness theorem still
+evaluates them: a function application unfolds by `simp`, which a structure update does not
+-- that was tried first, and it left six goals open that the literals close. -/
+noncomputable def singleLocusGenerationalWitness
+    (targetEffectHeterogeneityAt : ℕ → Fin 1 → ℝ)
+    (directCausalSource proxyTaggingSource : Matrix (Fin 1) (Fin 1) ℝ)
+    (tagAlleleFreqMutationShiftAt causalAlleleFreqMutationShiftAt : ℕ → Fin 1 → ℝ) :
     CrossPopulationGenerationalModel 1 1 := {
   popGen := baselineGenerationalPopGen
   betaSource := ![1]
-  targetEffectHeterogeneityAt := fun _ ↦ ![0]
+  targetEffectHeterogeneityAt := targetEffectHeterogeneityAt
   novelCausalEffectTargetAt := fun _ ↦ ![0]
   sigmaTagSource := !![1]
-  directCausalSource := !![0]
+  directCausalSource := directCausalSource
   novelDirectCausalTemplate := !![0]
-  proxyTaggingSource := !![1]
+  proxyTaggingSource := proxyTaggingSource
   novelProxyTaggingTemplate := !![0]
   tagDistance := !![1]
   tagCausalDistance := !![1]
   tagAlleleFreqSource := ![1 / 2]
   tagAlleleFreqStandingTargetAt := fun _ ↦ ![1 / 2]
-  tagAlleleFreqMutationShiftAt := fun t ↦ ![if t = 0 then (0 : ℝ) else 1 / 4]
+  tagAlleleFreqMutationShiftAt := tagAlleleFreqMutationShiftAt
   causalAlleleFreqSource := ![1 / 2]
   causalAlleleFreqStandingTargetAt := fun _ ↦ ![1 / 2]
-  causalAlleleFreqMutationShiftAt := fun t ↦ ![if t = 0 then (0 : ℝ) else 1 / 4]
+  causalAlleleFreqMutationShiftAt := causalAlleleFreqMutationShiftAt
   contextCrossSource := ![0]
   contextCrossTargetAt := fun _ ↦ ![0]
   sourceOutcomeVariance := 2
@@ -838,65 +849,25 @@ noncomputable def timeVaryingAFGenerationalModel :
   targetPrevalence_pos := by intro t; norm_num
   targetPrevalence_lt_one := by intro t; norm_num
 }
+
+/-- Single-locus generational witness where the target allele frequency drifts
+away from the source after generation `0`, lowering tagging quality and target
+`R²` even though the learned source score is unchanged. -/
+noncomputable def timeVaryingAFGenerationalModel :
+    CrossPopulationGenerationalModel 1 1 :=
+  singleLocusGenerationalWitness (fun _ ↦ ![0]) !![0] !![1]
+    (fun t ↦ ![if t = 0 then (0 : ℝ) else 1 / 4])
+    (fun t ↦ ![if t = 0 then (0 : ℝ) else 1 / 4])
 
 /-- Single-locus generational witness where LD, tagging, and allele frequencies
 stay fixed, but the target effect vector changes over time. This isolates
 population/time-varying effect heterogeneity as the sole portability driver.
 
     Empirical status: UNTESTED. -/
--- **Why the witness literals repeat each other, and why that stands.**
---
--- Five fields separate this witness from `timeVaryingAFGenerationalModel`: the effect
--- heterogeneity that drives it, which locus is scored directly rather than tagged, and the
--- two mutation shifts it turns off.  The other twenty are the same in both, and the closing
--- fields -- the context cross-covariances, the outcome variances, the prevalence and its
--- four positivity proofs -- are the same again in the two-tag proxy witness above.
---
--- Both ways of sharing them were tried and neither survives:
---
---   * `{ timeVaryingAFGenerationalModel with ... }` states the shared twenty once, and the
---     witness theorems below evaluate those fields by `simp`; a structure update does not
---     reduce far enough for them, and six goals are left open that the literal closes.
---   * a constructor function taking the differing fields cannot reach the two-tag witness
---     at all: that model is at a different dimension, so the closing fields it shares have
---     different types and no one function returns both.
---
--- So the repetition is what Lean's structure syntax costs here, not an oversight, and the
--- duplication guard's report of it is correct in letter and unfixable in fact.  What
--- protects these witnesses from drifting apart in a field neither is about is the theorems
--- immediately below each of them, which pin every field either witness is used for.
 noncomputable def timeVaryingEffectGenerationalModel :
-    CrossPopulationGenerationalModel 1 1 := {
-  popGen := baselineGenerationalPopGen
-  betaSource := ![1]
-  targetEffectHeterogeneityAt := fun t ↦
-    ![if t = 0 then (0 : ℝ) else -(1 / 2)]
-  novelCausalEffectTargetAt := fun _ ↦ ![0]
-  sigmaTagSource := !![1]
-  directCausalSource := !![1]
-  novelDirectCausalTemplate := !![0]
-  proxyTaggingSource := !![0]
-  novelProxyTaggingTemplate := !![0]
-  tagDistance := !![1]
-  tagCausalDistance := !![1]
-  tagAlleleFreqSource := ![1 / 2]
-  tagAlleleFreqStandingTargetAt := fun _ ↦ ![1 / 2]
-  tagAlleleFreqMutationShiftAt := fun _ ↦ ![0]
-  causalAlleleFreqSource := ![1 / 2]
-  causalAlleleFreqStandingTargetAt := fun _ ↦ ![1 / 2]
-  causalAlleleFreqMutationShiftAt := fun _ ↦ ![0]
-  contextCrossSource := ![0]
-  contextCrossTargetAt := fun _ ↦ ![0]
-  sourceOutcomeVariance := 2
-  targetOutcomeVarianceAt := fun _ ↦ 2
-  novelUntaggablePhenotypeVarianceAt := fun _ ↦ 0
-  targetPrevalenceAt := fun _ ↦ 1 / 2
-  sourceOutcomeVariance_pos := by norm_num
-  targetOutcomeVariance_pos := by intro t; norm_num
-  novelUntaggablePhenotypeVariance_nonneg := by intro t; norm_num
-  targetPrevalence_pos := by intro t; norm_num
-  targetPrevalence_lt_one := by intro t; norm_num
-}
+    CrossPopulationGenerationalModel 1 1 :=
+  singleLocusGenerationalWitness (fun t ↦ ![if t = 0 then (0 : ℝ) else -(1 / 2)]) !![1] !![0]
+    (fun _ ↦ ![0]) (fun _ ↦ ![0])
 
 /-- The generation-indexed target `R²` path reflects explicit allele-frequency
 drift in the target population. At generation `0` the target matches the
@@ -908,7 +879,8 @@ theorem target_r2_changes_along_generation_indexed_af_path :
       Real.exp (-(1 / 2 : ℝ)) /
         (2 + 2 * (1 - Real.exp (-(1 / 2 : ℝ))) ^ 2) := by
   constructor
-  · simp [baselineGenerationalPopGen, r2FromSourceWeights, timeVaryingAFGenerationalModel,
+  · simp [singleLocusGenerationalWitness, baselineGenerationalPopGen, r2FromSourceWeights,
+    timeVaryingAFGenerationalModel,
       CrossPopulationGenerationalModel.toMetricModelAt,
       sigmaTagTargetAt, directCausalTargetAt, proxyTaggingTargetAt, sigmaTagCausalTargetAt,
       tagAlleleFreqRetentionAt, causalAlleleFreqRetentionAt, alleleFreqMismatchPenalty,
@@ -947,7 +919,8 @@ theorem target_r2_changes_along_generation_indexed_af_path :
           predictiveCovarianceFromSourceWeights
               (timeVaryingAFGenerationalModel.toMetricModelAt 1) Pop.target =
             Real.exp (-(1 / 4 : ℝ)) * Real.exp (-(1 / 4 : ℝ)) := by
-        generational_witness_simp baselineGenerationalPopGen, timeVaryingAFGenerationalModel
+        generational_witness_simp singleLocusGenerationalWitness, baselineGenerationalPopGen,
+      timeVaryingAFGenerationalModel
       rw [h_product, h_ret]
     have h_var :
         scoreVarianceFromSourceWeights
@@ -957,7 +930,8 @@ theorem target_r2_changes_along_generation_indexed_af_path :
           scoreVarianceFromSourceWeights
               (timeVaryingAFGenerationalModel.toMetricModelAt 1) Pop.target =
             Real.exp (-(1 / 4 : ℝ)) * Real.exp (-(1 / 4 : ℝ)) := by
-        generational_witness_simp baselineGenerationalPopGen, timeVaryingAFGenerationalModel
+        generational_witness_simp singleLocusGenerationalWitness, baselineGenerationalPopGen,
+      timeVaryingAFGenerationalModel
       rw [h_product, h_ret]
     have h_ret_norm :
         Real.exp (-((4 : ℝ)⁻¹)) * Real.exp (-((4 : ℝ)⁻¹)) =
@@ -967,7 +941,8 @@ theorem target_r2_changes_along_generation_indexed_af_path :
         effectiveOutcomeVariance
             (timeVaryingAFGenerationalModel.toMetricModelAt 1) Pop.target =
           2 + 2 * (1 - Real.exp (-(1 / 2 : ℝ))) ^ 2 := by
-      generational_witness_simp baselineGenerationalPopGen, timeVaryingAFGenerationalModel
+      generational_witness_simp singleLocusGenerationalWitness, baselineGenerationalPopGen,
+      timeVaryingAFGenerationalModel
       rw [h_ret_norm]
       ring
     have h_exp_ne : Real.exp (-(1 / 2 : ℝ)) ≠ 0 := by
@@ -1006,29 +981,33 @@ theorem target_effect_heterogeneity_changes_generation_path_without_ld_or_af_cha
   · ext i j
     fin_cases i
     fin_cases j
-    generational_witness_simp baselineGenerationalPopGen, timeVaryingAFGenerationalModel,
+    generational_witness_simp singleLocusGenerationalWitness, baselineGenerationalPopGen,
+      timeVaryingAFGenerationalModel,
       timeVaryingEffectGenerationalModel
   · ext i j
     fin_cases i
     fin_cases j
-    generational_witness_simp baselineGenerationalPopGen, timeVaryingAFGenerationalModel,
+    generational_witness_simp singleLocusGenerationalWitness, baselineGenerationalPopGen,
+      timeVaryingAFGenerationalModel,
       timeVaryingEffectGenerationalModel
-  · generational_witness_simp baselineGenerationalPopGen,
+  · generational_witness_simp singleLocusGenerationalWitness, baselineGenerationalPopGen,
       timeVaryingEffectGenerationalModel
-  · generational_witness_simp baselineGenerationalPopGen,
+  · generational_witness_simp singleLocusGenerationalWitness, baselineGenerationalPopGen,
       timeVaryingEffectGenerationalModel
-  · generational_witness_simp baselineGenerationalPopGen,
+  · generational_witness_simp singleLocusGenerationalWitness, baselineGenerationalPopGen,
       timeVaryingEffectGenerationalModel
-  · generational_witness_simp baselineGenerationalPopGen,
+  · generational_witness_simp singleLocusGenerationalWitness, baselineGenerationalPopGen,
       timeVaryingEffectGenerationalModel
-  · simp [betaTargetAt, baselineGenerationalPopGen, timeVaryingAFGenerationalModel,
+  · simp [betaTargetAt, singleLocusGenerationalWitness, baselineGenerationalPopGen,
+    timeVaryingAFGenerationalModel,
     timeVaryingEffectGenerationalModel]
-  · simp [betaTargetAt, baselineGenerationalPopGen, timeVaryingAFGenerationalModel,
+  · simp [betaTargetAt, singleLocusGenerationalWitness, baselineGenerationalPopGen,
+    timeVaryingAFGenerationalModel,
     timeVaryingEffectGenerationalModel]
     norm_num
-  · generational_witness_simp baselineGenerationalPopGen,
+  · generational_witness_simp singleLocusGenerationalWitness, baselineGenerationalPopGen,
       timeVaryingEffectGenerationalModel
-  · generational_witness_simp baselineGenerationalPopGen,
+  · generational_witness_simp singleLocusGenerationalWitness, baselineGenerationalPopGen,
       timeVaryingEffectGenerationalModel
     norm_num
 
