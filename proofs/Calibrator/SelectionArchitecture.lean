@@ -137,7 +137,7 @@ theorem effectCorrelationStabilizing_zero_selection_is_junk :
 /-- Effect correlation increases with stronger selection (relative to drift). -/
 theorem effect_correlation_increases_with_Ns
     (Ns₁ Ns₂ : ℝ)
-    (h₁ : 1 < Ns₁) (h₂ : 1 < Ns₂) (h_more : Ns₁ < Ns₂) :
+    (h₁ : 1 < Ns₁) (h_more : Ns₁ < Ns₂) :
     effectCorrelationStabilizing Ns₁ < effectCorrelationStabilizing Ns₂ := by
   unfold effectCorrelationStabilizing
   rw [sub_lt_sub_iff_left]
@@ -249,7 +249,7 @@ theorem fluctuating_correlation_decays
 /-- Shorter autocorrelation time → faster decay. -/
 theorem shorter_autocorrelation_faster_decay
     (t τ₁ τ₂ : ℝ)
-    (h_τ₁ : 0 < τ₁) (h_τ₂ : 0 < τ₂)
+    (h_τ₂ : 0 < τ₂)
     (h_shorter : τ₂ < τ₁)
     (h_t : 0 < t) :
     fluctuatingEffectCorrelation t τ₂ < fluctuatingEffectCorrelation t τ₁ := by
@@ -262,11 +262,11 @@ theorem shorter_autocorrelation_faster_decay
     correlation.** -/
 theorem short_autocorrelation_lower_correlation
     (τ_short τ_long t : ℝ)
-    (h_short : 0 < τ_short) (h_long : 0 < τ_long)
+    (h_short : 0 < τ_short)
     (h_shorter : τ_short < τ_long)
     (h_t : 0 < t) :
     fluctuatingEffectCorrelation t τ_short < fluctuatingEffectCorrelation t τ_long :=
-  shorter_autocorrelation_faster_decay t τ_long τ_short h_long h_short h_shorter h_t
+  shorter_autocorrelation_faster_decay t τ_long τ_short h_short h_shorter h_t
 
 /-- Selected-architecture variance under stabilizing selection. -/
 noncomputable def stabilizingSelectedArchitectureVariance (v_mutation s : ℝ) : ℝ :=
@@ -353,7 +353,7 @@ theorem fluctuatingSelectedArchitectureVariance_gt_stabilizing
     matching `exp(-t/τ)` to `1 - 1/(2Ns)`. -/
 theorem fluctuatingCorrelation_lt_stabilizing_of_tau_lt_threshold
     (t tau Ns : ℝ)
-    (h_t : 0 < t) (h_tau : 0 < tau) (hNs : 1 < Ns)
+    (h_tau : 0 < tau) (hNs : 1 < Ns)
     (h_tau_lt : tau < t / (-Real.log (effectCorrelationStabilizing Ns))) :
     fluctuatingEffectCorrelation t tau < effectCorrelationStabilizing Ns := by
   have h_rho_pos : 0 < effectCorrelationStabilizing Ns :=
@@ -599,9 +599,8 @@ theorem observedSummary_identifies_fluctuating_not_stabilizing
 theorem two_mul_one_sub_lt_of_lt_of_lt_half
     (p_neutral p_balanced lo hi : ℝ)
     (h_neutral_low : p_neutral < lo)
-    (h_neutral_pos : 0 < p_neutral)
     (h_balanced : hi < p_balanced) (h_balanced_lt : p_balanced < 1/2)
-    (h_lo_le_hi : lo ≤ hi) (h_lo_pos : 0 < lo) :
+    (h_lo_le_hi : lo ≤ hi) :
     2 * p_neutral * (1 - p_neutral) < 2 * p_balanced * (1 - p_balanced) :=
   two_mul_one_sub_strictMono_le_half p_neutral p_balanced
     (by linarith) (le_of_lt h_balanced_lt)
@@ -706,7 +705,7 @@ theorem adaptation_shift_recoverable
     (∑ j, scores j) / ↑n + μ_shift := by
     rw [show (∑ j : Fin n, (scores j + μ_shift)) =
       (∑ j, scores j) + n * μ_shift by
-      simp [Finset.sum_add_distrib, Finset.mul_sum]]
+      simp [Finset.sum_add_distrib]]
     have hn : (n : ℝ) ≠ 0 := by
       exact_mod_cast hzero
     field_simp [hn]
@@ -720,7 +719,7 @@ theorem adaptation_shift_recoverable
     Q_ST << F_ST indicates stabilizing selection. -/
 theorem qst_fst_comparison_directional
     (qst fst : ℝ)
-    (h_qst : 0 < qst) (h_fst : 0 < fst)
+    (h_fst : 0 < fst)
     (h_directional : fst < qst) :
     -- Q_ST / F_ST > 1 indicates directional selection
     1 < qst / fst := by
@@ -788,8 +787,6 @@ theorem gwas_ncp_pos (n : ℕ) (β p : ℝ)
 theorem ncp_ratio_from_maf
     (n : ℕ) (β p₁ p₂ : ℝ)
     (hn : 0 < n) (hβ : 0 < β)
-    (hp₁ : 0 < p₁) (hp₁1 : p₁ < 1)
-    (hp₂ : 0 < p₂) (hp₂1 : p₂ < 1)
     (h_maf : p₁ < p₂) (h_half : p₂ ≤ 1/2) :
     gwasNCP n β p₁ < gwasNCP n β p₂ := by
   unfold gwasNCP
@@ -815,7 +812,7 @@ section ArchitecturePredictions
     where s is the selection coefficient.
     Smaller `s` gives slower change; larger `s` gives faster change. -/
 theorem one_div_two_mul_strictAnti_of_pos
-    (s₁ s₂ : ℝ) (h₁ : 0 < s₁) (h₂ : 0 < s₂)
+    (s₁ s₂ : ℝ) (h₁ : 0 < s₁)
     (h_stronger : s₁ < s₂) :
     1 / (2 * s₂) < 1 / (2 * s₁) := by
   apply div_lt_div_of_pos_left one_pos (by linarith) (by linarith)
@@ -853,7 +850,7 @@ section Pleiotropy
     the shared loci, both traits suffer. -/
 theorem both_mul_one_sub_lt_self_of_pos
     (r2_t1_source r2_t1_target r2_t2_source r2_t2_target ρ_shared : ℝ)
-    (h_shared : 0 < ρ_shared) (h_shared_le : ρ_shared ≤ 1)
+    (h_shared : 0 < ρ_shared)
     -- Both traits drop proportionally to the shared component
     (d₁ d₂ : ℝ) (h_d₁ : 0 < d₁) (h_d₂ : 0 < d₂)
     (h_t1_drop : r2_t1_target = r2_t1_source * (1 - ρ_shared * d₁))
@@ -875,7 +872,7 @@ theorem both_mul_one_sub_lt_self_of_pos
     (2) portability of each trait individually -/
 theorem cross_trait_portability_bound
     (rg port₁ port₂ : ℝ)
-    (h_rg : 0 ≤ rg) (h_rg_le : rg ≤ 1)
+    (h_rg_le : rg ≤ 1)
     (h_p₁ : 0 ≤ port₁) (h_p₁_le : port₁ ≤ 1)
     (h_p₂ : 0 ≤ port₂) (h_p₂_le : port₂ ≤ 1) :
     rg * port₁ * port₂ ≤ 1 := by
