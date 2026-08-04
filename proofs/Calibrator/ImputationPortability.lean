@@ -80,7 +80,7 @@ theorem imputationErrorVariance_at_reference_point :
 /-- Imputation error variance is nonneg. -/
 theorem imputation_error_nonneg (beta_sq het r2_imp : ℝ)
     (h_bsq : 0 ≤ beta_sq) (h_het : 0 ≤ het)
-    (h_r2 : 0 ≤ r2_imp) (h_r2_le : r2_imp ≤ 1) :
+    (h_r2_le : r2_imp ≤ 1) :
     0 ≤ imputationErrorVariance beta_sq het r2_imp := by
   unfold imputationErrorVariance
   exact mul_nonneg (mul_nonneg h_bsq h_het) (by linarith)
@@ -95,6 +95,32 @@ theorem imputed_pgs_variance_decomposition (beta_sq het r2_imp : ℝ) :
   unfold attenuatedVariance imputationErrorVariance
   ring
 
+/-- **Perfect imputation is exactly the no-attenuation boundary.**  For a variant with nonzero
+true variance contribution, attenuated and true PGS variance agree if and only if imputation
+quality is one. -/
+theorem attenuatedVariance_eq_true_iff
+    (beta_sq het r2_imp : ℝ) (h_true : beta_sq * het ≠ 0) :
+    attenuatedVariance beta_sq het r2_imp = beta_sq * het ↔ r2_imp = 1 := by
+  unfold attenuatedVariance
+  constructor
+  · intro h_equal
+    apply mul_left_cancel₀ h_true
+    calc
+      (beta_sq * het) * r2_imp = beta_sq * het := h_equal
+      _ = (beta_sq * het) * 1 := (mul_one _).symm
+  · rintro rfl
+    ring
+
+/-- For a variant with nonzero true variance contribution, imputation error vanishes exactly at
+unit imputation quality. -/
+theorem imputationErrorVariance_eq_zero_iff
+    (beta_sq het r2_imp : ℝ) (h_true : beta_sq * het ≠ 0) :
+    imputationErrorVariance beta_sq het r2_imp = 0 ↔ r2_imp = 1 := by
+  unfold imputationErrorVariance
+  rw [mul_eq_zero]
+  simp only [h_true, false_or]
+  constructor <;> intro h <;> linarith
+
 end ImputationQuality
 
 
@@ -107,23 +133,35 @@ PGS quality across populations.
 
 section ReferencePanel
 
-/-- **Scaling a nonnegative number by at most one does not increase it:**
-    `r2_LD * panel_match ≤ r2_LD` for `0 ≤ r2_LD` and `panel_match ≤ 1`.
+/-- Imputation quality after multiplying the local LD ceiling by reference-panel match. -/
+noncomputable def panelAdjustedImputationQuality (r2_LD panelMatch : ℝ) : ℝ :=
+  r2_LD * panelMatch
 
-    The reading is that a same-population reference panel imputes best, under
-    the model `imputation r² = r²_LD × panel_match` with `panel_match ∈ (0,1]`
-    and `= 1` exactly when the panel matches. That model is the whole claim and
-    it is stipulated, not derived: no panel, no LD, no imputation and no
-    population appears below, and nothing here says a matched panel *attains*
-    the bound — `panel_match = 1` is not among the hypotheses, so the statement
-    is a bound, not an optimality result. -/
-theorem mul_le_self_of_le_one
+/-- Panel mismatch cannot exceed the local LD imputation ceiling when LD signal is nonnegative
+and panel match is at most one. -/
+theorem panelAdjustedImputationQuality_le_ld
     (r2_LD panel_match : ℝ)
     (h_r2 : 0 ≤ r2_LD) (h_pm_le : panel_match ≤ 1) :
-    r2_LD * panel_match ≤ r2_LD := by
+    panelAdjustedImputationQuality r2_LD panel_match ≤ r2_LD := by
+  unfold panelAdjustedImputationQuality
   calc r2_LD * panel_match ≤ r2_LD * 1 :=
         mul_le_mul_of_nonneg_left h_pm_le h_r2
     _ = r2_LD := mul_one _
+
+/-- With a nonzero LD ceiling, the panel-adjusted quality attains that ceiling exactly for a
+perfectly matched reference panel. -/
+theorem panelAdjustedImputationQuality_eq_ld_iff
+    (r2_LD panelMatch : ℝ) (h_ld : r2_LD ≠ 0) :
+    panelAdjustedImputationQuality r2_LD panelMatch = r2_LD ↔ panelMatch = 1 := by
+  unfold panelAdjustedImputationQuality
+  constructor
+  · intro h_equal
+    apply mul_left_cancel₀ h_ld
+    calc
+      r2_LD * panelMatch = r2_LD := h_equal
+      _ = r2_LD * 1 := (mul_one _).symm
+  · rintro rfl
+    ring
 
 /-- **Imputation quality as a function of LD extent alone.**
 
@@ -175,7 +213,7 @@ theorem ldExtentImputationQuality_mem_unit (c ld_extent : ℝ)
     the comparison is an equality rather than a strict inequality. -/
 theorem shorter_ld_worse_imputation
     (c ld_extent_long ld_extent_short : ℝ)
-    (h_c : 0 < c) (h_long : c < ld_extent_long) (h_short : c < ld_extent_short)
+    (h_c : 0 < c) (h_short : c < ld_extent_short)
     (h_shorter : ld_extent_short < ld_extent_long) :
     ldExtentImputationQuality c ld_extent_short < ldExtentImputationQuality c ld_extent_long := by
   have h_short_pos : 0 < ld_extent_short := by linarith
@@ -190,16 +228,6 @@ theorem shorter_ld_worse_imputation
   rw [max_eq_right (by linarith : (0 : ℝ) ≤ 1 - c / ld_extent_short),
     max_eq_right (by linarith : (0 : ℝ) ≤ 1 - c / ld_extent_long)]
   linarith
-
-/-- **Imputation quality filtering threshold.**
-    Variants with r²_imp < threshold (e.g., 0.3) are excluded.
-    Different thresholds in different populations create
-    non-overlapping variant sets → PGS incomparability. -/
-theorem le_trans_of_le_of_le
-    (n_eur_pass n_afr_pass n_shared : ℕ)
-    (h_eur_more : n_afr_pass ≤ n_eur_pass)
-    (h_shared_le : n_shared ≤ n_afr_pass) :
-    n_shared ≤ n_eur_pass := le_trans h_shared_le h_eur_more
 
 end ReferencePanel
 
@@ -220,11 +248,11 @@ section RareVariantImputation
     Missing from panel → imputation r² = 0.
     Model: imputation r² = r²_LD × I(variant_in_panel). If the variant
     is absent from the panel, the indicator is 0 and r²_imp = 0. -/
-theorem mul_eq_zero_of_right_eq_zero
+theorem panelAdjustedImputationQuality_eq_zero_of_panel_absent
     (r2_LD : ℝ) (variant_in_panel : ℝ)
     (h_missing : variant_in_panel = 0) :
-    r2_LD * variant_in_panel = 0 := by
-  rw [h_missing, mul_zero]
+    panelAdjustedImputationQuality r2_LD variant_in_panel = 0 := by
+  simp [panelAdjustedImputationQuality, h_missing]
 
 /-- **At unit imputation quality the attenuation factor is one.**
 
@@ -233,10 +261,10 @@ theorem mul_eq_zero_of_right_eq_zero
     derived, and that it therefore removes imputation-related portability artifacts is a reading
     of the arithmetic rather than a consequence of it: no sequencing platform, no variant and no
     portability quantity appears below. -/
-theorem wgs_perfect_imputation
-    (r2_imp_wgs : ℝ) (h_perfect : r2_imp_wgs = 1) :
-    attenuatedVariance 1 1 r2_imp_wgs = 1 := by
-  unfold attenuatedVariance; rw [h_perfect]; ring
+theorem wgs_preserves_true_variance
+    (beta_sq het r2_imp_wgs : ℝ) (h_perfect : r2_imp_wgs = 1) :
+    attenuatedVariance beta_sq het r2_imp_wgs = beta_sq * het := by
+  simp [attenuatedVariance, h_perfect]
 
 /-- **Cost-benefit of WGS vs arrays.**
     WGS costs more per sample → smaller sample sizes.
@@ -247,7 +275,7 @@ theorem wgs_perfect_imputation
     despite r²_imp < 1, because the sample size advantage compensates. -/
 theorem wgs_vs_array_tradeoff
     (h2 r2_imp n_wgs n_array C : ℝ)
-    (h_h2 : 0 < h2) (h_imp : 0 < r2_imp) (h_imp_le : r2_imp ≤ 1)
+    (h_h2 : 0 < h2)
     (h_nw : 0 < n_wgs) (h_na : 0 < n_array) (h_C : 0 < C)
     (h_sample_advantage : r2_imp * n_array * (n_wgs + C) > n_wgs * (n_array + C)) :
     h2 * n_wgs / (n_wgs + C) < h2 * r2_imp * n_array / (n_array + C) := by
@@ -363,8 +391,7 @@ theorem ascertainment_loss_eq_neutralPortabilityRatioLD (coverage v_causal : ℝ
     arrays have higher coverage (cover_multi > cover_std). -/
 theorem multi_ethnic_arrays_reduce_bias
     (V_causal cover_std cover_multi : ℝ)
-    (h_V : 0 < V_causal) (h_cs : 0 ≤ cover_std) (h_cm : 0 ≤ cover_multi)
-    (h_cs_le : cover_std ≤ 1) (h_cm_le : cover_multi ≤ 1)
+    (h_V : 0 < V_causal)
     (h_better : cover_std < cover_multi) :
     ascertainment_loss cover_multi V_causal <
       ascertainment_loss cover_std V_causal := by
