@@ -224,6 +224,35 @@ theorem summable_one_div_of_scaled_natSucc_rpow_le_rate
     exact one_div_le_one_div_of_le
       (mul_pos hscale (Real.rpow_pos_of_pos (by positivity) power)) (hgrowth n)
 
+/-- **Exact polynomial Müntz phase boundary.** For a pure polynomial rate ladder, reciprocal
+summability is equivalent to exponent strictly greater than one. The criterion is invariant
+under every nonzero rescaling of the biological clock. -/
+theorem summable_one_div_scaled_natSucc_rpow_iff
+    (scale power : ℝ) (hscale : scale ≠ 0) :
+    (Summable fun n : ℕ ↦ 1 / (scale * ((n : ℝ) + 1) ^ power)) ↔ 1 < power := by
+  have hrewrite :
+      (fun n : ℕ ↦ 1 / (scale * ((n : ℝ) + 1) ^ power)) =
+        fun n : ℕ ↦ (1 / scale) * (1 / (((n : ℝ) + 1) ^ power)) := by
+    funext n
+    have hbase : ((n : ℝ) + 1) ^ power ≠ 0 :=
+      (Real.rpow_pos_of_pos (by positivity) power).ne'
+    field_simp
+  rw [hrewrite, summable_mul_left_iff (one_div_ne_zero hscale)]
+  have hshift :
+      (Summable fun n : ℕ ↦ 1 / (((n : ℝ) + 1) ^ power)) ↔
+        Summable fun n : ℕ ↦ 1 / (n : ℝ) ^ power := by
+    simpa only [Nat.cast_add, Nat.cast_one] using
+      (summable_nat_add_iff
+        (f := fun n : ℕ ↦ 1 / (n : ℝ) ^ power) 1)
+  exact hshift.trans Real.summable_one_div_nat_rpow
+
+/-- The complementary exact boundary: a polynomial rate ladder has divergent reciprocal mass
+exactly at exponents at most one. -/
+theorem not_summable_one_div_scaled_natSucc_rpow_iff
+    (scale power : ℝ) (hscale : scale ≠ 0) :
+    (¬ Summable fun n : ℕ ↦ 1 / (scale * ((n : ℝ) + 1) ^ power)) ↔ power ≤ 1 := by
+  rw [not_congr (summable_one_div_scaled_natSucc_rpow_iff scale power hscale), not_lt]
+
 /-! ## Fixed sample size: a linear count, and analyticity does not help -/
 
 /-- **At a fixed sample size the spectrum imposes only `n` linear conditions.**  Any family with
