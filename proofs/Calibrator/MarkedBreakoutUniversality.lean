@@ -37,6 +37,7 @@ genealogy limit to an axiom.  It formalizes exactly what that convergence would 
 namespace MarkedBreakout
 
 open MeasureTheory
+open Filter
 open scoped BigOperators ENNReal
 
 /-! ## The marked measure and its genealogy projection -/
@@ -298,6 +299,28 @@ theorem speedBias_eq_gamma_mul_tripleRate_transform
     theta = gamma * ((speedTiltBetaMergerRate (theta / gamma) 3 3)⁻¹ - 2) := by
   rw [← tiltRatio_eq_tripleRate_inv_sub_two]
   field_simp
+
+/-- **Kingman endpoint for logarithmic front response.** At every positive response scale,
+increasing canonical speed bias suppresses every specified merger of three or more lineages. -/
+theorem tendsto_logDisplacement_mergerRate_three_or_more_atTop
+    (gamma : ℝ) (hgamma : 0 < gamma) (b extra : ℕ) :
+    Tendsto
+      (fun theta : ℝ ↦ speedTiltBetaMergerRate (theta / gamma) b (extra + 3))
+      atTop (nhds 0) := by
+  have hratio : Tendsto (fun theta : ℝ ↦ theta / gamma) atTop atTop :=
+    (tendsto_div_const_atTop_of_pos hgamma).2 tendsto_id
+  exact (tendsto_speedTiltBetaMergerRate_three_or_more_atTop b extra).comp hratio
+
+/-- At the same endpoint, every specified binary-merger rate converges to the Kingman
+normalization one. -/
+theorem tendsto_logDisplacement_binaryMergerRate_atTop
+    (gamma : ℝ) (hgamma : 0 < gamma) (extra : ℕ) :
+    Tendsto
+      (fun theta : ℝ ↦ speedTiltBetaMergerRate (theta / gamma) (extra + 2) 2)
+      atTop (nhds 1) := by
+  have hratio : Tendsto (fun theta : ℝ ↦ theta / gamma) atTop atTop :=
+    (tendsto_div_const_atTop_of_pos hgamma).2 tendsto_id
+  exact (tendsto_speedTiltBetaMergerRate_two_with_outside_atTop extra).comp hratio
 
 /-- The logarithmic law's unit-tilt three-lineage coordinate. -/
 theorem logDisplacementTripleRate_at_unit_tilt :
