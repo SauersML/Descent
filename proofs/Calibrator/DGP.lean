@@ -1454,9 +1454,23 @@ variable {Ω : Type*} [MeasurableSpace Ω]
 noncomputable def measureMean (μ : Measure Ω) (Z : Ω → ℝ) : ℝ :=
   ∫ ω, Z ω ∂μ
 
+/-- Reference evaluation: under a point mass the mean is the observable's value there. -/
+theorem measureMean_at_reference_point [MeasurableSingletonClass Ω] (a : Ω) (Z : Ω → ℝ) :
+    measureMean (Measure.dirac a) Z = Z a := by
+  unfold measureMean
+  simp
+
+
 /-- Exact variance under a concrete probability measure. -/
 noncomputable def measureVariance (μ : Measure Ω) (Z : Ω → ℝ) : ℝ :=
   ∫ ω, (Z ω - measureMean μ Z) ^ 2 ∂μ
+
+/-- Reference evaluation: a point mass has no spread. -/
+theorem measureVariance_at_reference_point [MeasurableSingletonClass Ω] (a : Ω) (Z : Ω → ℝ) :
+    measureVariance (Measure.dirac a) Z = 0 := by
+  unfold measureVariance
+  simp [measureMean]
+
 
 /-- Exact covariance under a concrete probability measure. -/
 noncomputable def measureCovariance (μ : Measure Ω) (X Y : Ω → ℝ) : ℝ :=
@@ -1469,6 +1483,13 @@ noncomputable def measureExpMSE (μ : Measure Ω) (Y S : Ω → ℝ) : ℝ :=
 /-- Exact bias of a predictor under a concrete probability measure. -/
 noncomputable def measureBias (μ : Measure Ω) (Y S : Ω → ℝ) : ℝ :=
   measureMean μ S - measureMean μ Y
+
+/-- Reference evaluation: under a point mass the bias is the pointwise difference. -/
+theorem measureBias_at_reference_point [MeasurableSingletonClass Ω] (a : Ω) (Y S : Ω → ℝ) :
+    measureBias (Measure.dirac a) Y S = S a - Y a := by
+  unfold measureBias
+  simp [measureMean]
+
 
 end ExactMeasureMetricIdentities
 

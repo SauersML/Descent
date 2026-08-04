@@ -592,6 +592,56 @@ theorem permutationInvariantGenomicPolynomial_factorsThroughLDGraphs
         ∑ monomial, if shape monomial = graph then value monomial else 0 :=
   invariantPolynomial_graphSum_factorization shape coefficient value hshape hinvariant
 
+/-- **A finite tilt net quantitatively controls the full genomic pressure
+profile.**  Uniform `K`-Lipschitz control converts radius-`ρ` coordinate error
+into the global bound `2Kρ + ε`. -/
+theorem genomicPressureProfiles_dist_le_of_tiltNet
+    {Parameter : Type*} [PseudoMetricSpace Parameter]
+    (K : NNReal) (left right : Parameter → ℝ)
+    (hleft : LipschitzWith K left) (hright : LipschitzWith K right)
+    (net : Set Parameter) (radius coordinateError : ℝ)
+    (hnet : ∀ parameter, ∃ representative ∈ net,
+      dist parameter representative ≤ radius)
+    (hagrees : ∀ representative ∈ net,
+      dist (left representative) (right representative) ≤ coordinateError) :
+    ∀ parameter,
+      dist (left parameter) (right parameter) ≤
+        2 * (K : ℝ) * radius + coordinateError :=
+  lipschitzPressureProfiles_dist_le_of_net
+    K left right hleft hright net radius coordinateError hnet hagrees
+
+/-- **Dense rational genomic tilt coordinates determine the complete pressure
+profile.**  Two uniformly Lipschitz profiles agreeing on the dense enumerated
+family agree at every tilt. -/
+theorem genomicPressureProfiles_eq_of_eqOn_denseTilts
+    {Parameter : Type*} [PseudoMetricSpace Parameter]
+    (K : NNReal) (left right : Parameter → ℝ)
+    (hleft : LipschitzWith K left) (hright : LipschitzWith K right)
+    (parameters : Set Parameter) (hdense : Dense parameters)
+    (hagrees : Set.EqOn left right parameters) :
+    left = right :=
+  lipschitzPressureProfiles_eq_of_eqOn_dense
+    K left right hleft hright parameters hdense hagrees
+
+/-- **Convergence on dense rational genomic tilts extends to every tilt.**  A
+uniformly Lipschitz sequence and Lipschitz limit need only be checked on the
+enumerated dense family; the complete pressure profile then converges
+pointwise. -/
+theorem genomicPressureProfiles_tendsto_of_tendstoOn_denseTilts
+    {Parameter : Type*} [PseudoMetricSpace Parameter]
+    (K : NNReal) (profiles : ℕ → Parameter → ℝ) (limit : Parameter → ℝ)
+    (hprofiles : ∀ index, LipschitzWith K (profiles index))
+    (hlimit : LipschitzWith K limit)
+    (parameters : Set Parameter) (hdense : Dense parameters)
+    (hconverges : ∀ parameter ∈ parameters,
+      Filter.Tendsto (fun index ↦ profiles index parameter)
+        Filter.atTop (nhds (limit parameter))) :
+    ∀ parameter,
+      Filter.Tendsto (fun index ↦ profiles index parameter)
+        Filter.atTop (nhds (limit parameter)) :=
+  lipschitzPressureProfiles_tendsto_of_tendstoOn_dense
+    K profiles limit hprofiles hlimit parameters hdense hconverges
+
 /-- **The nonperturbative genomic LD profile has a genuine compact state space.**
 Uniformly bounded countable pressure coordinates admit one common subsequence
 on which every prior/replica/tilt coordinate converges.  This is the exact
@@ -620,6 +670,24 @@ theorem genomicExponentialProfileDistance_metricLaws
     exponentialProfileDistance_comm left right,
     exponentialProfileDistance_triangle left middle right,
     exponentialProfileDistance_eq_zero_iff left right⟩
+
+/-- **The genomic right-profile formula is an actual compact metric space.**
+The installed metric is exactly the weighted capped-coordinate distance, and
+its complete carrier is compact in the ordinary topological sense. -/
+theorem genomicExponentialProfilePoint_isCompactMetricSpace (bound : ℝ) :
+    IsCompact (Set.univ : Set (ExponentialProfilePoint bound)) :=
+  isCompact_univ
+
+/-- Standard convergence in the bundled genomic right-profile metric is
+exactly simultaneous convergence of every prior/replica/tilt coordinate. -/
+theorem genomicExponentialProfilePoint_converges_iff_coordinatewise
+    {bound : ℝ} {profiles : ℕ → ExponentialProfilePoint bound}
+    {limit : ExponentialProfilePoint bound} :
+    Filter.Tendsto profiles Filter.atTop (nhds limit) ↔
+      ∀ coordinate : ℕ,
+        Filter.Tendsto (fun n ↦ profiles n coordinate)
+          Filter.atTop (nhds (limit coordinate)) :=
+  exponentialProfilePoint_tendsto_iff_coordinatewise
 
 /-- **The explicit genomic right-profile distance induces exactly coordinatewise
 pressure convergence.**  Thus convergence in the metric is neither weaker nor
@@ -686,6 +754,12 @@ variable {State : Type*} [Fintype State]
 noncomputable def onePointPerformance (weight : State → ℝ) (score : State → ℝ) : ℝ :=
   ∑ y, weight y * score y
 
+/-- Reference evaluation on a two-state law with distinct weights and scores. -/
+theorem onePointPerformance_at_reference_point :
+    onePointPerformance (![1, 3] : Fin 2 → ℝ) (![2, 5] : Fin 2 → ℝ) = 17 := by
+  norm_num [onePointPerformance, Fin.sum_univ_two]
+
+
 /-- Mean performance obtained by transporting to `y` and then evaluating a score that sees
 only `y`.  Under stationarity this is exactly `onePointPerformance`; it contains no temporal
 information. -/
@@ -735,6 +809,11 @@ abbrev BinaryBiologicalState := Fin 2
 /-- Uniform invariant law on two biological contexts. -/
 noncomputable def binaryStateWeight (_ : BinaryBiologicalState) : ℝ := 1 / 2
 
+/-- Reference evaluation: the two states are equally weighted. -/
+@[simp] theorem binaryStateWeight_at_reference_point (x : BinaryBiologicalState) :
+    binaryStateWeight x = 1 / 2 := rfl
+
+
 /-- The biological context law is the canonical balanced calibration weight. -/
 @[simp] theorem binaryStateWeight_eq_balancedBinaryWeight (x : BinaryBiologicalState) :
     binaryStateWeight x = balancedBinaryWeight x := by
@@ -744,13 +823,31 @@ noncomputable def binaryStateWeight (_ : BinaryBiologicalState) : ℝ := 1 / 2
 noncomputable def persistentTransition
     (x y : BinaryBiologicalState) : ℝ := if x = y then 1 else 0
 
+/-- Reference evaluations: the persistent kernel is the identity matrix on two states. -/
+theorem persistentTransition_at_reference_point :
+    persistentTransition 0 0 = 1 ∧ persistentTransition 0 1 = 0 := by
+  constructor <;> norm_num [persistentTransition]
+
+
 /-- A transition that swaps the two contexts. -/
 noncomputable def switchingTransition
     (x y : BinaryBiologicalState) : ℝ := if x = y then 0 else 1
 
+/-- Reference evaluations: the switching kernel is the exchange matrix. -/
+theorem switchingTransition_at_reference_point :
+    switchingTransition 0 0 = 0 ∧ switchingTransition 0 1 = 1 := by
+  constructor <;> norm_num [switchingTransition]
+
+
 /-- A target-only annotation distinguishing state `1`. -/
 noncomputable def targetAnnotation (y : BinaryBiologicalState) : ℝ :=
   if y = 1 then 1 else 0
+
+/-- Reference evaluations: the annotation is the indicator of the distinguished state. -/
+theorem targetAnnotation_at_reference_point :
+    targetAnnotation 1 = 1 ∧ targetAnnotation 0 = 0 := by
+  constructor <;> norm_num [targetAnnotation]
+
 
 /-- Quality of a source-adapted readout: one exactly when source and target contexts match.
 
@@ -760,6 +857,12 @@ written out here rather than delegating, because the witness proofs below evalua
 definition by `simp` and a delegation stops them one unfolding short. -/
 noncomputable def contextMatchQuality
     (x y : BinaryBiologicalState) : ℝ := if x = y then 1 else 0
+
+/-- Reference evaluations: quality one on a match, zero on a mismatch. -/
+theorem contextMatchQuality_at_reference_point :
+    contextMatchQuality 0 0 = 1 ∧ contextMatchQuality 0 1 = 0 := by
+  constructor <;> norm_num [contextMatchQuality]
+
 
 /-- **The two-context biological witness runs on the horizon-curve kernels.**
 
@@ -830,6 +933,12 @@ abbrev TransportPair := BinaryBiologicalState × BinaryBiologicalState
 noncomputable def jointTransportLaw
     (transition : BinaryBiologicalState → BinaryBiologicalState → ℝ) (g : TransportPair) : ℝ :=
   binaryStateWeight g.1 * transition g.1 g.2
+
+/-- Reference evaluation: half the mass of the persistent kernel sits on each diagonal pair. -/
+theorem jointTransportLaw_at_reference_point :
+    jointTransportLaw persistentTransition (0, 0) = 1 / 2 := by
+  norm_num [jointTransportLaw, persistentTransition, binaryStateWeight]
+
 
 /-- The two-population family: the context persists, or the context switches. -/
 noncomputable def binaryTransportFamily (persists : Bool) : TransportPair → ℝ :=
@@ -1265,6 +1374,13 @@ noncomputable def dynamicsBroadcast : ℝ →ₗ[ℝ] (Bool → ℝ) where
 noncomputable def dynamicsCommonMode (persists : Bool) : ℝ :=
   binaryFirstAnnotation persists + binarySecondAnnotation persists
 
+/-- Reference evaluations: the common mode is one in both Boolean states, which is exactly why
+it carries no contrast. -/
+theorem dynamicsCommonMode_at_reference_point :
+    dynamicsCommonMode true = 1 ∧ dynamicsCommonMode false = 1 := by
+  constructor <;> norm_num [dynamicsCommonMode, binaryFirstAnnotation, binarySecondAnnotation]
+
+
 /-- Pooling followed by broadcasting recovers the common mode exactly. -/
 theorem dynamicsBroadcast_pooling_commonMode :
     dynamicsBroadcast (dynamicsPoolingObservation dynamicsCommonMode) =
@@ -1638,6 +1754,42 @@ structure UnifiedBiologyObstructions : Prop where
         (∑ monomial, coefficient monomial * value monomial) =
           ∑ graph, graphShapeCoefficient shape coefficient graph *
             ∑ monomial, if shape monomial = graph then value monomial else 0
+  /-- A finite tilt net controls the complete Lipschitz genomic pressure
+  profile with explicit error `2Kρ + ε`. -/
+  genomicPressureProfilesHaveQuantitativeTiltNetControl :
+    ∀ (Parameter : Type) [PseudoMetricSpace Parameter]
+      (K : NNReal) (left right : Parameter → ℝ),
+      LipschitzWith K left → LipschitzWith K right →
+      ∀ (net : Set Parameter) (radius coordinateError : ℝ),
+        (∀ parameter, ∃ representative ∈ net,
+          dist parameter representative ≤ radius) →
+        (∀ representative ∈ net,
+          dist (left representative) (right representative) ≤ coordinateError) →
+          ∀ parameter,
+            dist (left parameter) (right parameter) ≤
+              2 * (K : ℝ) * radius + coordinateError
+  /-- Agreement on a dense rational tilt family determines the full uniformly
+  Lipschitz genomic pressure profile. -/
+  genomicDenseTiltCoordinatesDeterminePressureProfile :
+    ∀ (Parameter : Type) [PseudoMetricSpace Parameter]
+      (K : NNReal) (left right : Parameter → ℝ),
+      LipschitzWith K left → LipschitzWith K right →
+      ∀ parameters : Set Parameter, Dense parameters →
+        Set.EqOn left right parameters → left = right
+  /-- Pointwise convergence on a dense rational tilt family extends to every
+  tilt for a uniformly Lipschitz genomic pressure sequence and limit. -/
+  genomicDenseTiltConvergenceExtendsGlobally :
+    ∀ (Parameter : Type) [PseudoMetricSpace Parameter]
+      (K : NNReal) (profiles : ℕ → Parameter → ℝ) (limit : Parameter → ℝ),
+      (∀ index, LipschitzWith K (profiles index)) →
+      LipschitzWith K limit →
+      ∀ parameters : Set Parameter, Dense parameters →
+        (∀ parameter ∈ parameters,
+          Filter.Tendsto (fun index ↦ profiles index parameter)
+            Filter.atTop (nhds (limit parameter))) →
+          ∀ parameter,
+            Filter.Tendsto (fun index ↦ profiles index parameter)
+              Filter.atTop (nhds (limit parameter))
   /-- Every uniformly bounded countable exponential/LD profile has one common
   coordinatewise-convergent subsequence. -/
   genomicExponentialProfileIsSequentiallyCompact :
@@ -1654,8 +1806,22 @@ structure UnifiedBiologyObstructions : Prop where
       0 ≤ exponentialProfileDistance left right ∧
         exponentialProfileDistance left right = exponentialProfileDistance right left ∧
         exponentialProfileDistance left right ≤
-          exponentialProfileDistance left middle + exponentialProfileDistance middle right ∧
+        exponentialProfileDistance left middle + exponentialProfileDistance middle right ∧
         (exponentialProfileDistance left right = 0 ↔ left = right)
+  /-- The explicit genomic right-profile carrier has the installed weighted
+  metric and is compact in its standard topology. -/
+  genomicExponentialProfilePointIsCompactMetricSpace :
+    ∀ bound : ℝ,
+      IsCompact (Set.univ : Set (ExponentialProfilePoint bound))
+  /-- Metric convergence of bundled genomic profiles is coordinatewise
+  convergence of every enumerated pressure. -/
+  genomicExponentialProfilePointConvergenceIsCoordinatewise :
+    ∀ (bound : ℝ) (profiles : ℕ → ExponentialProfilePoint bound)
+      (limit : ExponentialProfilePoint bound),
+      Filter.Tendsto profiles Filter.atTop (nhds limit) ↔
+        ∀ coordinate : ℕ,
+          Filter.Tendsto (fun n ↦ profiles n coordinate)
+            Filter.atTop (nhds (limit coordinate))
   /-- Convergence in the explicit genomic right-profile distance is equivalent
   to convergence of every enumerated pressure coordinate. -/
   genomicExponentialProfileDistanceCharacterizesConvergence :
@@ -1842,11 +2008,28 @@ theorem unifiedBiology_obstructions : UnifiedBiologyObstructions := by
         fun _Slot _Locus _Graph _ _ _ _ _ shape coefficient value hshape hinvariant ↦
           permutationInvariantGenomicPolynomial_factorsThroughLDGraphs
             shape coefficient value hshape hinvariant
+      genomicPressureProfilesHaveQuantitativeTiltNetControl :=
+        fun _Parameter _ K left right hleft hright net radius coordinateError hnet hagrees ↦
+          genomicPressureProfiles_dist_le_of_tiltNet
+            K left right hleft hright net radius coordinateError hnet hagrees
+      genomicDenseTiltCoordinatesDeterminePressureProfile :=
+        fun _Parameter _ K left right hleft hright parameters hdense hagrees ↦
+          genomicPressureProfiles_eq_of_eqOn_denseTilts
+            K left right hleft hright parameters hdense hagrees
+      genomicDenseTiltConvergenceExtendsGlobally :=
+        fun _Parameter _ K profiles limit hprofiles hlimit parameters hdense hconverges ↦
+          genomicPressureProfiles_tendsto_of_tendstoOn_denseTilts
+            K profiles limit hprofiles hlimit parameters hdense hconverges
       genomicExponentialProfileIsSequentiallyCompact :=
         genomicExponentialProfile_hasCommonCoordinatewiseSubsequence
       genomicExponentialProfileDistanceSatisfiesMetricLaws :=
         fun _bound left middle right ↦
           genomicExponentialProfileDistance_metricLaws left middle right
+      genomicExponentialProfilePointIsCompactMetricSpace :=
+        genomicExponentialProfilePoint_isCompactMetricSpace
+      genomicExponentialProfilePointConvergenceIsCoordinatewise :=
+        fun _bound _profiles _limit ↦
+          genomicExponentialProfilePoint_converges_iff_coordinatewise
       genomicExponentialProfileDistanceCharacterizesConvergence :=
         fun _bound _profiles _limit ↦
           genomicExponentialProfileDistance_converges_iff_coordinatewise

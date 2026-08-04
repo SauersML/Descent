@@ -452,14 +452,38 @@ noncomputable def populationRisk {Z : Type u} [MeasurableSpace Z] (μ : Measure 
     (ℓ : ℝ → Bool → ℝ) (p : TrueCondProb Z) (q : ProbPredictor Z) : ℝ :=
   ∫ z, (p z).1 * ℓ (q z).1 true + (1 - (p z).1) * ℓ (q z).1 false ∂μ
 
+/-- Reference evaluation: against the zero measure every predictor has zero risk, which is the
+degenerate end of the experiment rather than a good predictor. -/
+theorem populationRisk_at_reference_point {Z : Type u} [MeasurableSpace Z]
+    (ℓ : ℝ → Bool → ℝ) (p : TrueCondProb Z) (q : ProbPredictor Z) :
+    populationRisk 0 ℓ p q = 0 := by
+  unfold populationRisk
+  simp
+
+
 /-- Population-level oracle risk over a model class `F`. -/
 noncomputable def oracleRisk {α : Type u} (R : α → ℝ) (F : Set α) : ℝ :=
   sInf (R '' F)
+
+/-- Reference evaluation: over a one-element class the oracle risk is that element's risk. -/
+theorem oracleRisk_at_reference_point {α : Type u} (R : α → ℝ) (a : α) :
+    oracleRisk R {a} = R a := by
+  unfold oracleRisk
+  simp
+
 
 /-- Oracle infimum risk for a predictor class `F`. -/
 noncomputable def infRisk {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
     (ℓ : ℝ → Bool → ℝ) (p : TrueCondProb Z) (F : Set (ProbPredictor Z)) : ℝ :=
   oracleRisk (populationRisk μ ℓ p) F
+
+/-- Reference evaluation: over a one-element predictor class the inf risk is that predictor's. -/
+theorem infRisk_at_reference_point {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
+    (ℓ : ℝ → Bool → ℝ) (p : TrueCondProb Z) (q : ProbPredictor Z) :
+    infRisk μ ℓ p {q} = populationRisk μ ℓ p q := by
+  unfold infRisk
+  simp [oracleRisk]
+
 
 /-- If your class contains the baseline class, its oracle risk is no worse. -/
 theorem oracleRisk_mono {α : Type u} (R : α → ℝ) (Fyours Fbaseline : Set α)
@@ -712,10 +736,25 @@ noncomputable def logLossRegret {Z : Type u} [MeasurableSpace Z] (μ : Measure Z
     (p q : Z → ℝ) : ℝ :=
   ∫ z, bernoulliLogLoss (p z) (q z) - bernoulliLogLoss (p z) (p z) ∂μ
 
+/-- Reference evaluation: a predictor that matches the truth has zero regret. -/
+theorem logLossRegret_at_reference_point {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
+    (p : Z → ℝ) :
+    logLossRegret μ p p = 0 := by
+  unfold logLossRegret
+  simp
+
+
 /-- Population Bernoulli KL certificate. -/
 noncomputable def logLossKLCertificate {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
     (p q : Z → ℝ) : ℝ :=
   ∫ z, bernoulliKLReal (p z) (q z) ∂μ
+
+/-- Reference evaluation: against the zero measure the certificate is zero. -/
+theorem logLossKLCertificate_at_reference_point {Z : Type u} [MeasurableSpace Z] (p q : Z → ℝ) :
+    logLossKLCertificate 0 p q = 0 := by
+  unfold logLossKLCertificate
+  simp
+
 
 /-- Regret identity for log-loss at population level. -/
 theorem logLoss_regret_eq_integral_kl {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
@@ -812,10 +851,26 @@ noncomputable def brierRegret {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
     (p q : Z → ℝ) : ℝ :=
   ∫ z, expectedBrierScore (q z) (p z) - expectedBrierScore (p z) (p z) ∂μ
 
+/-- Reference evaluation: a predictor that matches the truth has zero regret. -/
+theorem brierRegret_at_reference_point {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
+    (p : Z → ℝ) :
+    brierRegret μ p p = 0 := by
+  unfold brierRegret
+  simp
+
+
 /-- Population L² certificate for Brier regret. -/
 noncomputable def brierL2Certificate {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
     (p q : Z → ℝ) : ℝ :=
   ∫ z, (q z - p z) ^ 2 ∂μ
+
+/-- Reference evaluation: the certificate vanishes exactly on a matching predictor. -/
+theorem brierL2Certificate_at_reference_point {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
+    (p : Z → ℝ) :
+    brierL2Certificate μ p p = 0 := by
+  unfold brierL2Certificate
+  simp
+
 
 theorem brier_regret_eq_l2_certificate {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
     (p q : Z → ℝ) :
@@ -1156,10 +1211,26 @@ noncomputable def logBayesRisk {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
     (η : ProbPredictor Z) (F : Set (ProbPredictor Z)) : ℝ :=
   BayesRisk (logRisk μ η) F
 
+/-- Reference evaluation over a one-element class. -/
+theorem logBayesRisk_at_reference_point {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
+    (η q : ProbPredictor Z) :
+    logBayesRisk μ η {q} = logRisk μ η q := by
+  unfold logBayesRisk BayesRisk oracleRisk
+  simp
+
+
 /-- Brier Bayes risk over a predictor class. -/
 noncomputable def brierBayesRisk {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
     (η : ProbPredictor Z) (F : Set (ProbPredictor Z)) : ℝ :=
   BayesRisk (brierRisk μ η) F
+
+/-- Reference evaluation over a one-element class. -/
+theorem brierBayesRisk_at_reference_point {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
+    (η q : ProbPredictor Z) :
+    brierBayesRisk μ η {q} = brierRisk μ η q := by
+  unfold brierBayesRisk BayesRisk oracleRisk
+  simp
+
 
 /-- The side conditions are demanded of the members of `F`, the class the infimum is taken
 over, rather than of every term of `ProbPredictor Z`. In the previous form `h_q_open` was
