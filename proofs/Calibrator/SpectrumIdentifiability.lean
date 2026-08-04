@@ -107,9 +107,11 @@ open Filter
     convention rather than requiring it to be got right -- the same move that
     settled the stepping-stone exponent.
 
-    Power: the prediction spans 3 to 28, a factor of nine. This is the defining rate of the Kingman coalescent, a
-    modelling choice rather than a measurement. Whether a given population's genealogy
-    follows it is what the identifiability results below leave open. -/
+    Power: the prediction spans 3 to 28, a factor of nine.
+
+    What is validated is the RATE LADDER, against genealogies simulated under the
+    Kingman model. Whether a given real population's genealogy is Kingman at all is a
+    different question, and it is the one the identifiability results below leave open. -/
 noncomputable def coalescentRate (m : ℕ) : ℝ :=
   (m : ℝ) * ((m : ℝ) - 1) / 2
 
@@ -190,13 +192,13 @@ theorem not_summable_one_div_linearRate :
   -- `not_summable_reciprocal_of_rate_le_natSucc` rather than repeating its plumbing.
   not_summable_reciprocal_of_rate_le_natSucc _ (fun _ ↦ by positivity) (fun _ ↦ le_rfl)
 
-/-- **Superlinear polynomial Müntz boundary.** Any positive rate ladder growing at least as
-fast as `(n + 1) ^ power` for `power > 1` has a summable reciprocal spectrum. Combined with
-`not_summable_reciprocal_of_rate_le_natSucc`, this makes the Kingman-versus-
-Bolthausen--Sznitman contrast a reusable growth criterion rather than two isolated examples. -/
-theorem summable_one_div_of_natSucc_rpow_le_rate
-    (rate : ℕ → ℝ) (power : ℝ) (hpower : 1 < power)
-    (hgrowth : ∀ n : ℕ, ((n : ℝ) + 1) ^ power ≤ rate n) :
+/-- **Scale-invariant superlinear polynomial Müntz boundary.** Any rate ladder bounded below
+by `scale * (n + 1) ^ power`, with positive `scale` and `power > 1`, has a summable reciprocal
+spectrum. Combined with `not_summable_reciprocal_of_rate_le_natSucc`, this turns the
+Kingman-versus-Bolthausen--Sznitman contrast into a reusable growth criterion. -/
+theorem summable_one_div_of_scaled_natSucc_rpow_le_rate
+    (rate : ℕ → ℝ) (scale power : ℝ) (hscale : 0 < scale) (hpower : 1 < power)
+    (hgrowth : ∀ n : ℕ, scale * ((n : ℝ) + 1) ^ power ≤ rate n) :
     Summable fun n ↦ 1 / rate n := by
   have hpowerBase : Summable fun n : ℕ ↦ 1 / (n : ℝ) ^ power :=
     Real.summable_one_div_nat_rpow.mpr hpower
@@ -204,15 +206,22 @@ theorem summable_one_div_of_natSucc_rpow_le_rate
     have hshift := (summable_nat_add_iff
       (f := fun n : ℕ ↦ 1 / (n : ℝ) ^ power) 1).2 hpowerBase
     simpa only [Nat.cast_add, Nat.cast_one] using hshift
-  refine Summable.of_nonneg_of_le ?_ ?_ hpowerShift
-  · intro n
-    have hgrowthPos : 0 < ((n : ℝ) + 1) ^ power :=
+  have hscaled :
+      Summable fun n : ℕ ↦ 1 / (scale * ((n : ℝ) + 1) ^ power) := by
+    refine (hpowerShift.mul_left (1 / scale)).congr ?_
+    intro n
+    have hbase : 0 < ((n : ℝ) + 1) ^ power :=
       Real.rpow_pos_of_pos (by positivity) power
+    field_simp [hscale.ne', hbase.ne']
+  refine Summable.of_nonneg_of_le ?_ ?_ hscaled
+  · intro n
+    have hgrowthPos : 0 < scale * ((n : ℝ) + 1) ^ power :=
+      mul_pos hscale (Real.rpow_pos_of_pos (by positivity) power)
     have hrate : 0 < rate n := hgrowthPos.trans_le (hgrowth n)
     exact one_div_nonneg.mpr hrate.le
   · intro n
     exact one_div_le_one_div_of_le
-      (Real.rpow_pos_of_pos (by positivity) power) (hgrowth n)
+      (mul_pos hscale (Real.rpow_pos_of_pos (by positivity) power)) (hgrowth n)
 
 /-! ## Fixed sample size: a linear count, and analyticity does not help -/
 
