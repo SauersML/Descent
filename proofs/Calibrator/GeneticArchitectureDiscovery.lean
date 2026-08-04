@@ -559,6 +559,14 @@ noncomputable def multiTraitEffectiveSampleSize
     (n₁ n₂ rg : ℝ) : ℝ :=
   n₁ + rg ^ 2 * n₂
 
+/-- Reference evaluation.  The value is computed through the definitions this body calls, but
+the theorem states a number: an inequality or an invariance leaves a family of bodies
+satisfying it, and a value does not. -/
+theorem multiTraitEffectiveSampleSize_at_reference_point :
+    multiTraitEffectiveSampleSize 1 1 1 = 2 := by
+  norm_num [multiTraitEffectiveSampleSize]
+
+
 /-- **Cross-check: borrowing across traits and borrowing across ancestries are
 the same arithmetic.** `BayesianPGSTheory.multiAncestryEffectiveN` adds
 `rg² · n_other` to the target sample size for a genetically correlated

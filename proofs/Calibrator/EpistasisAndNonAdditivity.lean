@@ -145,6 +145,14 @@ noncomputable def pairwiseModel
     (beta1 beta2 beta12 g1 g2 : ℝ) : ℝ :=
   beta1 * g1 + beta2 * g2 + beta12 * g1 * g2
 
+/-- Reference evaluation.  The value is computed through the definitions this body calls, but
+the theorem states a number: an inequality or an invariance leaves a family of bodies
+satisfying it, and a value does not. -/
+theorem pairwiseModel_at_reference_point :
+    pairwiseModel 1 1 1 1 1 = 3 := by
+  norm_num [pairwiseModel]
+
+
 /-- **The interaction coefficient is exactly the departure from additivity.** This is what makes
 `beta12` estimable: subtract the additive prediction and what remains is the product term, with
 no part of it absorbable into the marginal effects. -/

@@ -151,6 +151,14 @@ theorem driftHorizon_strictMono (D₁ D₂ D₂' C : ℝ) (hC : 0 < C) (h : D₂
     the infinite-volume field, so it does not see the local marker count at all. -/
 noncomputable def localizedTransferVariance (v : ℝ) (_k : ℕ) : ℝ := v
 
+/-- Reference evaluation.  The value is computed through the definitions this body calls, but
+the theorem states a number: an inequality or an invariance leaves a family of bodies
+satisfying it, and a value does not. -/
+theorem localizedTransferVariance_at_reference_point :
+    localizedTransferVariance 1 1 = 1 := by
+  norm_num [localizedTransferVariance]
+
+
 /-- Limit variance for a **delocalized** weight, which averages over `k` sites. -/
 noncomputable def delocalizedTransferVariance (v : ℝ) (k : ℕ) : ℝ := v / k
 

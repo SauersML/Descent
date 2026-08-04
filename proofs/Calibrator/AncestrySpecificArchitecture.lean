@@ -108,6 +108,14 @@ theorem drift_variance_nonneg (p0 fst : ℝ)
 noncomputable def twoPopDriftVariance (p0 fst : ℝ) : ℝ :=
   2 * driftVariance p0 fst
 
+/-- Reference evaluation.  The value is computed through the definitions this body calls, but
+the theorem states a number: an inequality or an invariance leaves a family of bodies
+satisfying it, and a value does not. -/
+theorem twoPopDriftVariance_at_reference_point :
+    twoPopDriftVariance 1 1 = 0 := by
+  norm_num [twoPopDriftVariance, driftVariance]
+
+
 /-- Two-population drift variance equals the sum of individual drift variances. -/
 theorem twoPopDriftVariance_eq_sum (p0 fst : ℝ) :
     twoPopDriftVariance p0 fst = driftVariance p0 fst + driftVariance p0 fst := by
@@ -389,6 +397,14 @@ recursion `islandFstMultiplicativeStep` has a different fixed point.
     Empirical status: UNTESTED. -/
 noncomputable def geneFlowFstStep (m Ne F : ℝ) : ℝ :=
   ibdFlowStep Ne m F
+
+/-- Reference evaluation.  The value is computed through the definitions this body calls, but
+the theorem states a number: an inequality or an invariance leaves a family of bodies
+satisfying it, and a value does not. -/
+theorem geneFlowFstStep_at_reference_point :
+    geneFlowFstStep 1 1 1 = -1 := by
+  norm_num [geneFlowFstStep, ibdFlowStep]
+
 
 /-- One quantity, one map. -/
 theorem geneFlowFstStep_eq_ibdFlowStep (m Ne F : ℝ) :

@@ -52,6 +52,14 @@ section IncrementalR2
 noncomputable def incrementalR2 (r2_full r2_covariates : ℝ) : ℝ :=
   r2_full - r2_covariates
 
+/-- Reference evaluation.  The value is computed through the definitions this body calls, but
+the theorem states a number: an inequality or an invariance leaves a family of bodies
+satisfying it, and a value does not. -/
+theorem incrementalR2_at_reference_point :
+    incrementalR2 1 1 = 0 := by
+  norm_num [incrementalR2]
+
+
 /-- **Increments telescope.** The gain from covariates to full equals the gain through any
 intermediate model plus the gain from there. A body that failed this would not be an increment. -/
 theorem incrementalR2_telescope (a b c : ℝ) :

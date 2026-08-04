@@ -1290,6 +1290,15 @@ first.
 def stratificationCertificateMargin (headroom n M F m : ℝ) : ℝ :=
   demographicSpike n F m - (headroom + bbpProxyThreshold n M)
 
+/-- Reference evaluation.  The value is computed through the definitions this body calls, but
+the theorem states a number: an inequality or an invariance leaves a family of bodies
+satisfying it, and a value does not. -/
+theorem stratificationCertificateMargin_at_reference_point :
+    stratificationCertificateMargin 1 1 1 1 1 = -2 := by
+  norm_num [stratificationCertificateMargin, bbpProxyThreshold, demographicSpike,
+    effectiveSubgroupSize]
+
+
 /-- **The existing margin is this one at zero headroom.**  This is the precise
 sense in which `pcCorrectabilityMargin` is a special case: it assumes the
 background class has no room left. -/

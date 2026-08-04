@@ -593,11 +593,29 @@ theorem faster_decay_lower_correlation
 noncomputable def ldTaggingDecay (lam_LD d : ℝ) : ℝ :=
   Real.exp (-lam_LD * d)
 
+/-- Reference evaluation.  The value is computed through the definitions this body calls, but
+the theorem states a number: an inequality or an invariance leaves a family of bodies
+satisfying it, and a value does not. -/
+theorem ldTaggingDecay_at_reference_point :
+    ldTaggingDecay 0 0 = 1 := by
+  norm_num [ldTaggingDecay]
+
+
+
 /-- **Combined LD + effect turnover portability.**
     Total portability = R²_source · ρ²_LD(d) · ρ²_effect(d). -/
 noncomputable def combinedPortability
     (r2_src lam_LD lam_eff d : ℝ) : ℝ :=
   r2_src * ldTaggingDecay lam_LD d * (Real.exp (-lam_eff * d)) ^ 2
+
+/-- Reference evaluation.  The value is computed through the definitions this body calls, but
+the theorem states a number: an inequality or an invariance leaves a family of bodies
+satisfying it, and a value does not. -/
+theorem combinedPortability_at_reference_point :
+    combinedPortability 0 0 0 0 = 0 := by
+  norm_num [combinedPortability, ldTaggingDecay]
+
+
 
 /-- **At distance 0, combined portability equals source R².** -/
 theorem combined_portability_at_zero (r2_src lam_LD lam_eff : ℝ) :

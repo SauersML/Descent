@@ -291,6 +291,14 @@ noncomputable def fluctuatingSelectedArchitectureVariance
     (v_mutation s sigmaTheta tau : ℝ) : ℝ :=
   equilibriumEffectVariance v_mutation s + optimumOUVariance sigmaTheta tau
 
+/-- Reference evaluation.  The value is computed through the definitions this body calls, but
+the theorem states a number: an inequality or an invariance leaves a family of bodies
+satisfying it, and a value does not. -/
+theorem fluctuatingSelectedArchitectureVariance_at_reference_point :
+    fluctuatingSelectedArchitectureVariance 1 1 1 1 = 3 / 2 := by
+  norm_num [fluctuatingSelectedArchitectureVariance, equilibriumEffectVariance, optimumOUVariance]
+
+
 theorem effectCorrelationStabilizing_pos
     (Ns : ℝ) (hNs : 1 < Ns) :
     0 < effectCorrelationStabilizing Ns := by

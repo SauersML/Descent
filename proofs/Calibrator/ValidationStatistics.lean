@@ -73,6 +73,14 @@ noncomputable def likelihoodRatioStat
     (logLNull logLAlt : ℝ) : ℝ :=
   -2 * (logLNull - logLAlt)
 
+/-- Reference evaluation.  The value is computed through the definitions this body calls, but
+the theorem states a number: an inequality or an invariance leaves a family of bodies
+satisfying it, and a value does not. -/
+theorem likelihoodRatioStat_at_reference_point :
+    likelihoodRatioStat 1 1 = 0 := by
+  norm_num [likelihoodRatioStat]
+
+
 theorem likelihoodRatioStat_nonneg
     (logLNull logLAlt : ℝ)
     (hFit : logLNull ≤ logLAlt) :

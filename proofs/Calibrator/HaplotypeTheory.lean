@@ -67,6 +67,14 @@ haplotypes, each equally frequent, and `n` chromosomes are drawn independently.
 noncomputable def uniformOccupancyDistinctHaplotypes (k n : ℕ) : ℝ :=
   (2 : ℝ) ^ k * (1 - (1 - 1 / ((2 : ℝ) ^ k)) ^ n)
 
+/-- Reference evaluation.  The value is computed through the definitions this body calls, but
+the theorem states a number: an inequality or an invariance leaves a family of bodies
+satisfying it, and a value does not. -/
+theorem uniformOccupancyDistinctHaplotypes_at_reference_point :
+    uniformOccupancyDistinctHaplotypes 1 1 = 1 := by
+  norm_num [uniformOccupancyDistinctHaplotypes]
+
+
 /-- **A sample cannot show more distinct haplotypes than the window admits.** With `k` sites
 there are `2^k` possible haplotypes, and the occupancy expectation stays below that ceiling
 however many chromosomes are drawn. -/
@@ -312,6 +320,14 @@ noncomputable def haplotypePhasePredictionError
     (1 - freq_cis) *
       ((1 - switch_err) * (interaction_trans - pred_trans) ^ 2 +
         switch_err * (interaction_trans - pred_cis) ^ 2)
+
+/-- Reference evaluation.  The value is computed through the definitions this body calls, but
+the theorem states a number: an inequality or an invariance leaves a family of bodies
+satisfying it, and a value does not. -/
+theorem haplotypePhasePredictionError_at_reference_point :
+    haplotypePhasePredictionError 1 1 1 1 1 1 = 0 := by
+  norm_num [haplotypePhasePredictionError]
+
 
 /-- Transport bias from carrying a source-trained dosage approximation into a
 target population whose cis/trans configuration frequency differs. -/

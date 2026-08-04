@@ -1035,6 +1035,14 @@ equation of `squaringStep`; no free parameter. -/
 noncomputable def squaringFixedPoint (scale : ℝ) : ℝ :=
   (scale + Real.sqrt (scale ^ 2 + 4)) / 2
 
+/-- Reference evaluation.  The value is computed through the definitions this body calls, but
+the theorem states a number: an inequality or an invariance leaves a family of bodies
+satisfying it, and a value does not. -/
+theorem squaringFixedPoint_at_reference_point :
+    squaringFixedPoint 0 = 1 := by
+  norm_num [squaringFixedPoint]
+
+
 /-- The defining identity in cleared form: `x*² - 1 = σ x*`. -/
 theorem squaringFixedPoint_root (scale : ℝ) :
     squaringFixedPoint scale ^ 2 - 1 = scale * squaringFixedPoint scale := by

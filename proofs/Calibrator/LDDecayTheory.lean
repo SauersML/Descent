@@ -119,6 +119,14 @@ theorem ld_retention_nonneg (r Ne : ℝ)
 noncomputable def ldAfterGenerations (D₀ r Ne : ℝ) (t : ℕ) : ℝ :=
   D₀ * (ldRetentionPerGen r Ne) ^ t
 
+/-- Reference evaluation.  The value is computed through the definitions this body calls, but
+the theorem states a number: an inequality or an invariance leaves a family of bodies
+satisfying it, and a value does not. -/
+theorem ldAfterGenerations_at_reference_point :
+    ldAfterGenerations 1 1 1 1 = 0 := by
+  norm_num [ldAfterGenerations, ldRetentionPerGen]
+
+
 /-- LD decays monotonically with time. -/
 theorem ld_decays_with_time (D₀ r Ne : ℝ) (t₁ t₂ : ℕ)
     (hD₀ : 0 < D₀) (hr : 0 < r) (hr1 : r < 1) (hNe : 1 < Ne)
