@@ -1346,6 +1346,16 @@ noncomputable def fstMigrationMutationEquilibrium (Ne m μ : ℝ) : ℝ :=
 noncomputable def fstIslandEquilibriumFiniteDemes (Ne m μ nDemes : ℝ) : ℝ :=
   1 / (1 + 4 * Ne * m * (nDemes / (nDemes - 1)) + 4 * Ne * μ)
 
+/-- **fstIslandEquilibriumFiniteDemes at a single deme, named.** The finite-deme correction is
+`nDemes / (nDemes - 1)`, whose divisor vanishes at one deme. The migration term is junk-zero
+there, so the equilibrium reduces to the mutation-only form -- a single population reported as
+differentiated from itself at the mutation-drift level, where in fact there is nothing to
+differentiate from. Consumers must exclude it by hypothesis. -/
+theorem fstIslandEquilibriumFiniteDemes_single_deme_is_junk (Ne m μ : ℝ) :
+    fstIslandEquilibriumFiniteDemes Ne m μ 1 = 1 / (1 + 4 * Ne * μ) := by
+  unfold fstIslandEquilibriumFiniteDemes
+  norm_num
+
 /-- **The finite-deme equilibrium is the fixed point of the same identity balance**,
 at the deme-corrected scaled rate. The correction multiplies the migration term and
 nothing else, so the balance that produced the limit form produces this one at

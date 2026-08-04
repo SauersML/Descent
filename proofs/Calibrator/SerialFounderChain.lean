@@ -127,6 +127,16 @@ This is the part a closed form gets right. The approach to it is not, and
 noncomputable def serialFounderCeilingFst (N Nanc tAnc τ : ℝ) : ℝ :=
   τ / (serialFounderWithinTime N Nanc tAnc + τ)
 
+/-- **serialFounderCeilingFst at zero between-population coalescent time, named.** With the
+between-population time set to zero the ratio has a vanishing numerator, and the
+within-population time can vanish with it. Lean returns `0`: no ceiling on differentiation along
+a serial founder chain, which is the value for populations that never separated. Consumers must
+exclude it by hypothesis. -/
+theorem serialFounderCeilingFst_no_coalescent_time_is_junk (N Nanc tAnc : ℝ) :
+    serialFounderCeilingFst N Nanc tAnc 0 = 0 := by
+  unfold serialFounderCeilingFst
+  norm_num
+
 /-- The ceiling `F_ST` is a genuine variance ratio: nonnegative, and below one whenever the
 within-deme time is positive. -/
 theorem serialFounderCeilingFst_lt_one (N Nanc tAnc τ : ℝ)

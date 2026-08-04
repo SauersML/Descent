@@ -72,31 +72,23 @@ survives mixing, whereas cohort-specific higher-order structure is diluted.
 
 section CohortLandscapeSuperposition
 
-variable {Cohort Genotype Overlap : Type*} [Fintype Cohort]
+variable {Cohort Genotype Overlap : Type*}
 
 /-- A level-resolved forbidden overlap in at least one cohort remains forbidden for the pooled
 cohort objective.  In biological language, pooling cannot create a pair of high-fitness
 genotypes unless every cohort admits that overlap at the component levels realized by the
 pair. -/
 theorem pooledCohort_forbiddenOverlap_of_levelResolved_cover
-    (weight : Cohort → ℝ) (fitness : Cohort → Genotype → ℝ)
+    (active : Finset Cohort) (weight : Cohort → ℝ) (fitness : Cohort → Genotype → ℝ)
     (overlap : Genotype → Genotype → Overlap) (target : ℝ)
-    (hweight : ∀ cohort, 0 ≤ weight cohort) (q : Overlap)
+    (hweight : ∀ cohort ∈ active, 0 ≤ weight cohort) (q : Overlap)
     (hcover : ∀ leftLevel rightLevel,
-      AdmissibleLevels weight target leftLevel →
-        AdmissibleLevels weight target rightLevel →
-          ∃ cohort,
+      AdmissibleLevels active weight target leftLevel →
+        AdmissibleLevels active weight target rightLevel →
+          ∃ cohort ∈ active,
             q ∉ ComponentAchievableOverlaps fitness overlap leftLevel rightLevel cohort) :
-    q ∉ SuperposedAchievableOverlaps weight fitness overlap target :=
-  forbiddenOverlap_of_levelResolved_cover weight fitness overlap target hweight q hcover
-
-/-- With equal independent cohort weights, the shared quadratic genetic component retains its
-coefficient, while the cohort-specific quartic and sextic tails are halved. -/
-theorem sharedGeneticStructure_survives_equalCohortMixing (q : ℝ) :
-    (1 / 2 : ℝ) * mixedSphericalCovariance (1 / 10) 0 q +
-        (1 / 2 : ℝ) * mixedSphericalCovariance 0 (1 / 14) q =
-      mixedSphericalCovariance (1 / 20) (1 / 28) q :=
-  halfWeight_quartic_sextic_covariance q
+    q ∉ SuperposedAchievableOverlaps active weight fitness overlap target :=
+  forbiddenOverlap_of_levelResolved_cover active weight fitness overlap target hweight q hcover
 
 end CohortLandscapeSuperposition
 

@@ -155,6 +155,15 @@ noncomputable def effectGeneticCorrelation {m : ℕ} (β_source β_target : Fin 
   (∑ i : Fin m, β_source i * β_target i) /
     Real.sqrt ((∑ i : Fin m, β_source i ^ 2) * (∑ i : Fin m, β_target i ^ 2))
 
+/-- **effectGeneticCorrelation at an empty variant panel, named.** Both effect sums are empty, so
+the numerator and the radicand vanish together and the square root divides by zero. Lean returns
+`0`: no genetic correlation between two traits measured on no variants, which is what two
+genuinely unrelated traits also give. Consumers must exclude it by hypothesis. -/
+theorem effectGeneticCorrelation_empty_panel_is_junk (β_source β_target : Fin 0 → ℝ) :
+    effectGeneticCorrelation β_source β_target = 0 := by
+  unfold effectGeneticCorrelation
+  norm_num
+
 /-- Standardized diagonal LD operator: independent variants with unit variance.
 
     Empirical status: UNTESTED. -/
