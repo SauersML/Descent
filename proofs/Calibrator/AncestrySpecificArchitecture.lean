@@ -289,18 +289,30 @@ in different ancestries due to population-specific LD.
 
 section LDTagging
 
+/-- Apparent effect recovered through a tag with squared LD to the causal variant. -/
+noncomputable def taggedEffect (causalEffect tagR2 : ℝ) : ℝ :=
+  causalEffect * tagR2
+
+/-- The tagged-effect scale is pinned at an interior reference point. -/
+theorem taggedEffect_at_reference_point : taggedEffect (1 / 2) (1 / 2) = 1 / 4 := by
+  norm_num [taggedEffect]
+
 /-- **Tag SNP may differ across populations.**
     If tag_source is the best proxy for causal variant C in the source,
     and tag_target is the best proxy in the target,
-    these may be different SNPs entirely. -/
-theorem different_tags_different_weights
-    (beta_causal r2_tag_source r2_tag_target : ℝ)
-    (h_beta : 0 < beta_causal)
-    (h_diff : r2_tag_source ≠ r2_tag_target) :
-    -- The apparent effect at the tag differs
-    beta_causal * r2_tag_source ≠ beta_causal * r2_tag_target := by
-  intro h
-  exact h_diff (mul_left_cancel₀ (ne_of_gt h_beta) h)
+    these may be different SNPs entirely. Their apparent effects agree exactly
+    when the causal effect is null or the two tags have the same squared LD. -/
+theorem taggedEffect_eq_iff
+    (causalEffect sourceTagR2 targetTagR2 : ℝ) :
+    taggedEffect causalEffect sourceTagR2 = taggedEffect causalEffect targetTagR2 ↔
+      causalEffect = 0 ∨ sourceTagR2 = targetTagR2 := by
+  unfold taggedEffect
+  constructor
+  · intro h
+    by_cases h_effect : causalEffect = 0
+    · exact Or.inl h_effect
+    · exact Or.inr (mul_left_cancel₀ h_effect h)
+  · rintro (rfl | rfl) <;> ring
 
 /-- **LD tagging efficiency.**
     The proportion of heritability captured by GWAS depends on
@@ -565,11 +577,10 @@ recursion `islandFstMultiplicativeStep` has a different fixed point.
 noncomputable def geneFlowFstStep (m Ne F : ℝ) : ℝ :=
   ibdFlowStep Ne m F
 
-/-- Reference evaluation.  The value is computed through the definitions this body calls, but
-the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not. -/
+/-- At migration rate `1/4` and effective size `1`, `F = 1/2` is the exact
+migration-drift equilibrium and remains fixed after one step. -/
 theorem geneFlowFstStep_at_reference_point :
-    geneFlowFstStep 1 1 1 = -1 := by
+    geneFlowFstStep (1 / 4) 1 (1 / 2) = 1 / 2 := by
   norm_num [geneFlowFstStep, ibdFlowStep]
 
 
@@ -585,9 +596,9 @@ theorem equilibriumFst_isFixedPoint (m Ne : ℝ) (hNe : 0 < Ne) (hm : 0 ≤ m) :
     geneFlowFstStep m Ne (fstMigrationDriftEquilibrium Ne m) = fstMigrationDriftEquilibrium Ne m :=
   ibdFlowStep_fixedPoint Ne m hNe hm
 
-/-- Equilibrium FST decreases with migration rate. -/
-theorem fst_decreases_with_migration (m₁ m₂ Ne : ℝ)
-    (h_Ne : 0 < Ne) (h_m₁ : 0 < m₁) (h_m₂ : 0 < m₂)
+/-- Equilibrium FST strictly decreases as a nonnegative migration rate increases. -/
+theorem fstMigrationDriftEquilibrium_lt_of_migration_lt (m₁ m₂ Ne : ℝ)
+    (h_Ne : 0 < Ne) (h_m₁ : 0 ≤ m₁)
     (h_m : m₁ < m₂) :
     fstMigrationDriftEquilibrium Ne m₂ < fstMigrationDriftEquilibrium Ne m₁ := by
   unfold fstMigrationDriftEquilibrium
