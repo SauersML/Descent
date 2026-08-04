@@ -153,7 +153,31 @@ indistinguishability recorded in the note above can be stated rather than assert
 
     Power: `K` spans 11.251 to 157.447, a factor of fourteen, across the design;
     the two candidate exponents predict a factor of 16 and a factor of 256 over
-    that same range of `m`. -/
+    that same range of `m`. 
+    **Independently reconfirmed** (`proofs/validation/empirical/simcov/battery_bulk17.py`).
+    A separate 20-deme lattice realisation, `Ne = 500`, separation `d = 4`, four
+    migration rates spanning a factor of eight, `K = d(1 - F)/F` read off at each
+    and the exponent taken as the log-log slope of `K` against `m`:
+
+      m        F_ST                K = d(1-F)/F
+      0.004    0.30906 ± 0.01070    8.943
+      0.008    0.20305 ± 0.00687   15.700
+      0.016    0.11095 ± 0.00556   32.051
+      0.032    0.05641 ± 0.00220   66.913
+
+      fitted exponent  0.974 ± 0.042
+
+    The linear form predicts 1 and this body predicts 2: the measurement sits
+    0.62 sems from linear and 24.4 sems from quadratic. Same conclusion as the
+    run recorded above, on different seeds and a different separation.
+
+    An error in the first pass of that battery is worth recording, since it
+    inverted a verdict. The comparison cells were signed backwards -- `K` GROWS
+    with `m`, so the linear form predicts a slope of `+1`, not `-1` -- and the
+    harness duly reported both candidates as failing by tens of sems. The
+    measured number 0.974 was correct throughout; only the two predictions it
+    was compared against carried the wrong sign.
+-/
 noncomputable def steppingStoneFstQuadratic (d Ne m σ_sq : ℝ) : ℝ :=
   d / (d + 4 * Ne * σ_sq ^ 2 * m ^ 2)
 
@@ -856,7 +880,25 @@ section VariableNeFst
     rows, which is what fixes the exponent reading as the intended one.
 
     Power: the prediction spans 0.01980 to 0.45119 across the schedules, a
-    factor of twenty-three. -/
+    factor of twenty-three. 
+    **A retraction** (`proofs/validation/empirical/simcov/battery_bulk17.py`).
+    That battery reported this body FALSIFIED at 78 sems against the realised
+    `F = 1 - H/H_ancestral`, and proposed replacing it with
+    `1 - prod (1 - 1/(2 Ne_i))`. The report is withdrawn. It tested the bare sum
+    AS the heterozygosity loss, which is a reading this docstring already
+    disowns: the sum is consumed as an EXPONENT, by
+    `heterozygosityLossVariableNe = 1 - exp(-cumulativeDrift)`, and the table
+    above already records that the bare sum read as the loss errs by up to 21.7
+    sems. Re-deriving a known and documented failure of a disowned reading is
+    not a new finding.
+
+    What the new run does add is confirmation on deeper schedules than the
+    original: over four schedules reaching `F = 0.55`, including twelve
+    consecutive epochs at `Ne = 20`, the exact product `1 - prod (1 - 1/(2 Ne_i))`
+    tracks the simulation to 1.77 sems and 3.8% relative. That strengthens the
+    note above -- the product is the exact law and the exponential is a very good
+    approximation to it -- without changing what this definition says.
+-/
 noncomputable def cumulativeDrift {T : ℕ} (Ne : Fin T → ℝ) : ℝ :=
   ∑ i, 1 / (2 * Ne i)
 
