@@ -33,7 +33,12 @@ open TransportedMetrics (r2FromSignalVariance r2FromSignalVariance_eq_rsquared
 section PortabilityDrift
 
 
-/-- Empirical status: UNTESTED. -/
+/-- Empirical status: **VALIDATED** through
+    `coalescenceSurvivalFromHazard`, whose measurement
+    (`battery_bulk1.py`, `test_coalescent_hazard`) is against a piecewise-constant
+    hazard whose integral is exact and which crosses an epoch boundary, so a
+    wrong integral would move the survival. Worst cell 1.42 sems over a
+    prediction spanning 0.31140 to 0.81873. -/
 noncomputable def integratedCoalescentHazard (hazard : ℝ → ℝ) (t : ℝ) : ℝ :=
   ∫ s in (0)..t, hazard s
 
@@ -48,7 +53,25 @@ theorem integratedCoalescentHazard_const (c t : ℝ) :
 /-- Probability that a pair has not yet coalesced by time `t`, from the
 integrated hazard: `S(t) = exp(-Λ(t))`.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_bulk1.py`,
+    `test_coalescent_hazard`). A two-epoch coalescent, `Ne = 500` until
+    generation 800 and `Ne = 3000` after, so the pairwise hazard `1/(2 Ne(t))`
+    is piecewise constant and its integral is exact. 60000 independent
+    genealogies, survival read as the fraction with `T_MRCA > t`:
+
+      t        this def   simulated            sems
+       200      0.81873   0.81915±0.00157      0.27
+       500      0.60653   0.60935±0.00199      1.42
+       800      0.44933   0.45122±0.00203      0.93
+      1500      0.39985   0.40075±0.00200      0.45
+      3000      0.31140   0.31060±0.00189      0.43
+
+    The design crosses the epoch boundary, so a formula that integrated the
+    hazard with the wrong size on either side would show up; the `t = 1500` and
+    `t = 3000` rows are the ones that test the second epoch.
+
+    Power: the prediction spans 0.31140 to 0.81873 across the design. -/
 noncomputable def coalescenceSurvivalFromHazard (hazard : ℝ → ℝ) (t : ℝ) : ℝ :=
   Real.exp (-(integratedCoalescentHazard hazard t))
 
@@ -63,7 +86,10 @@ theorem coalescenceSurvivalFromHazard_const (c t : ℝ) :
 /-- Probability that a pair has coalesced by time `t`, the complement of the
 survival function.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED** on the same runs as
+    `coalescenceSurvivalFromHazard` (`battery_bulk1.py`,
+    `test_coalescent_hazard`), worst cell 1.42 sems over a prediction spanning
+    0.18127 to 0.68860. -/
 noncomputable def coalescenceCdfFromHazard (hazard : ℝ → ℝ) (t : ℝ) : ℝ :=
   1 - coalescenceSurvivalFromHazard hazard t
 
@@ -5402,7 +5428,24 @@ Composition convention: the disrupting event acts on the offspring generation
 difference from `ibdFlowStep`, which linearises `(1 - rate)² (1 - 1/(2 Nₑ))` to
 `1 - 2 rate - 1/(2 Nₑ)` and therefore has a different fixed point.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_bulk1.py`,
+    `test_one_step_maps`). Explicit island model, 40 demes of `2 Ne` gametes,
+    3000 loci, migration then drift then two-way mutation each generation,
+    `F_ST` read as `Var_between(p) / (pbar (1 - pbar))`. Tested as a ONE-STEP
+    map: predict `F_{t+1}` from the measured `F_t` at each of 350 generations
+    past the transient, then compare against the measured `F_{t+1}`.
+
+      Ne     m        this def   simulated            sems
+      200    0.002     0.27083   0.27079±0.00365      0.01
+      200    0.010     0.10530   0.10530±0.00042      0.01
+      500    0.005     0.07603   0.07602±0.00069      0.02
+
+    A map tested only at its own fixed point cannot tell a wrong slope from a
+    right one, which is why the prediction is made from the measured state at
+    every generation rather than from the plateau.
+
+    Power: the prediction spans 0.07603 to 0.27083 across the design. -/
 noncomputable def ibdRecurrenceStep (Ne rate x : ℝ) : ℝ :=
   (1 - rate) ^ 2 * (1 / (2 * Ne) + (1 - 1 / (2 * Ne)) * x)
 
@@ -6395,7 +6438,23 @@ section MigrationDriftRecurrence
     Migration reduces Fst by a factor (1-2m), and drift adds (1-Fst)/(2Ne).
     The linearization replaces (1-m)² with 1-2m (valid for small m).
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_bulk1.py`,
+    `test_one_step_maps`). Same trajectories, same one-step protocol, as
+    `ibdRecurrenceStep`:
+
+      Ne     m        this def   simulated            sems
+      200    0.002     0.27083   0.27079±0.00365      0.01
+      200    0.010     0.10533   0.10530±0.00042      0.07
+      500    0.005     0.07604   0.07602±0.00069      0.03
+
+    This and `ibdRecurrenceStep` are two different functions and the corpus
+    relates them by no theorem, which is the unresolved-fork pattern. As
+    one-step maps they agree to within 0.07 sems on every design tested here, so
+    the fork is real in the algebra and immaterial at these rates; it would take
+    a design at large `m` to separate them.
+
+    Power: the prediction spans 0.07604 to 0.27083 across the design. -/
 noncomputable def fstMigDriftNext (Ne m Fst : ℝ) : ℝ :=
   (1 - 2 * m - 1 / (2 * Ne)) * Fst + 1 / (2 * Ne)
 
