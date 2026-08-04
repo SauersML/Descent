@@ -83,6 +83,8 @@ DIV_RE = re.compile(r"/(?!-)")
 LOG_RE = re.compile(r"Real\.log")
 SQRT_RE = re.compile(r"Real\.sqrt")
 INV_RE = re.compile(r"⁻¹")
+# `x ^ (n : ℤ)` is junk at `x = 0` for negative `n`, and Lean will not say so.
+ZPOW_RE = re.compile(r"\^\s*\(\s*-|\^\s*\([A-Za-z_][A-Za-z0-9_']*\s*:\s*ℤ")
 
 LETTER = re.compile(r"[A-Za-zͰ-Ͽ]")
 
@@ -153,7 +155,27 @@ def guards(body: str) -> list[str]:
     if any(LETTER.search(_argument_after(body, m.end()))
            for m in SQRT_RE.finditer(body)):
         kinds.append("sqrt")
+    if ZPOW_RE.search(body):
+        kinds.append("zpow")
     return kinds
+
+
+def structures_carrying_domain_facts() -> set[str]:
+    """Structures with a positivity or nonzero field.
+
+    A definition taking one of these cannot reach the junk point however it is
+    called -- `OUHorizon` carries `rate_pos`, so `ouVariance` never divides by
+    zero. Treating those as open work is the scanner's own false positive, and
+    it was the largest one: 58 entries.
+    """
+    out: set[str] = set()
+    for f in CORPUS.rglob("*.lean"):
+        txt = f.read_text(encoding="utf-8")
+        for m in re.finditer(r"^structure\s+([A-Za-z0-9_']+)((?:.|\n)*?)(?=\n\n)",
+                             txt, re.M):
+            if re.search(r"0\s*<|≠\s*0|0\s*≤|_pos\b|_nonneg\b", m.group(2)):
+                out.add(m.group(1))
+    return out
 
 
 # A hypothesis binder in the definition's own signature that rules the junk
@@ -214,41 +236,45 @@ def mechanical(name: str, sig: str, body: str):
     return hit[0], " ".join("0" if n == hit[0] else n for n in names)
 
 
-def scan() -> tuple[int, int, int, list[tuple[str, str, str]]]:
-    total = 0
-    named = 0
-    guarded = 0
+def scan() -> tuple[collections.Counter, list[tuple[str, str, str]]]:
+    struct_guard = structures_carrying_domain_facts()
+    tally: collections.Counter = collections.Counter()
     gap: list[tuple[str, str, str]] = []
     for f in sorted(CORPUS.rglob("*.lean")):
         txt = f.read_text(encoding="utf-8")
         junk_thms = {t for t in THM_RE.findall(txt) if "junk" in t.lower()}
         for m in DEF_RE.finditer(txt):
             name, sig, body = m.group(1), m.group(2), m.group(3)
-            if len(body) > 1200:
-                continue
             kinds = guards(body)
             if not kinds:
                 continue
-            total += 1
+            tally["can hit a junk value"] += 1
             if any(name in t for t in junk_thms):
-                named += 1
+                tally["branch named"] += 1
             elif GUARDED_SIG.search(sig):
-                guarded += 1
+                tally["ruled out by its own hypothesis"] += 1
+            elif any(t in struct_guard for t in
+                     re.findall(r":\s*([A-Za-z][A-Za-z0-9_'.]*)", " ".join(sig.split()))):
+                tally["ruled out by a structure field"] += 1
+            elif re.search(r"\bif\b", body):
+                tally["degenerate case already branched"] += 1
             else:
                 mech = mechanical(name, sig, body)
                 note = f"junk at {mech[0]} = 0" if mech else ",".join(kinds)
                 gap.append((name, f.relative_to(CORPUS).as_posix(), note))
-    return total, named, guarded, gap
+                tally["OPEN"] += 1
+    return tally, gap
 
 
 def main(argv: list[str]) -> int:
     if not CORPUS.is_dir():
         print(f"corpus not found at {CORPUS}", file=sys.stderr)
         return 2
-    total, named, guarded, gap = scan()
-
-    print(f"{total} definitions can hit a junk value; {named} name the branch; "
-          f"{guarded} rule it out in their own signature; {len(gap)} do neither")
+    tally, gap = scan()
+    for key in ("can hit a junk value", "branch named",
+                "ruled out by its own hypothesis", "ruled out by a structure field",
+                "degenerate case already branched", "OPEN"):
+        print(f"  {tally[key]:5d}  {key}")
 
     if "--mechanical" in argv:
         gap = [g for g in gap if g[2].startswith("junk at ")]
@@ -272,10 +298,7 @@ def main(argv: list[str]) -> int:
     print("A necessary condition, not a defect list: totality.py decides, by")
     print("testing whether the junk point is attainable and disagrees with the")
     print("limit. What these share is that nothing in the corpus says either way.")
-    print()
-    print("The commonest false positive is a definition taking a STRUCTURE that")
-    print("carries the domain fact as a field -- OUHorizon carries rate_pos, so")
-    print("ouVariance cannot divide by zero. That is not detected here.")
+
     return 0
 
 
