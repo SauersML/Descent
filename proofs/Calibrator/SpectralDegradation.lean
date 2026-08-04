@@ -1,9 +1,6 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
--- `Finset.sum_nonneg` and `Finset.single_le_sum` live here, not in
--- `Algebra.BigOperators.Fin`; without this import they resolve as unknown constants and
--- `degradation_nonneg` / `degradation_eq_zero_iff` fail to elaborate.
 import Calibrator.GenerativePortabilityLaw
 import Calibrator.TransportedMinimax
 

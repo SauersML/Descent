@@ -1,14 +1,13 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
--- `phase_of_abs_neg` uses `Real.log`, which lives here and is not reachable from the
--- trigonometric import. Without it `Real.log` resolves as an Unknown constant -- the
--- same missing-Mathlib-import shape as `Finset.sum_nonneg` in `SpectralDegradation`.
--- A missing import here is invisible to any build that does not reach this file, which is
--- why the `Calibrator` root lists this module: being compiled is what makes the import
--- list answerable to the proofs below.
 import Mathlib.Analysis.SpecialFunctions.Log.Basic
 import Mathlib.Tactic.Linarith
+
+-- `phase_of_abs_neg` uses `Real.log`, which is why `Log.Basic` is imported above: without
+-- it `Real.log` resolves as an unknown constant. A missing import here is invisible to any
+-- build that does not reach this file, which is why the `Calibrator` root lists this
+-- module: being compiled is what makes the import list answerable to the proofs below.
 
 namespace Calibrator
 
