@@ -3,6 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Calibrator.PGSCalibrationTheory
 import Calibrator.Condensation
+import Calibrator.JetBarrier
 
 namespace Calibrator
 
@@ -765,6 +766,57 @@ theorem not_subcritical_of_panel_lt_two_pow {N m : ℝ} (hm : 0 ≤ m) (hN : 0 <
   absurd (two_pow_le_panel_of_subcritical hm hN hsub) (not_le.2 hpanel)
 
 end CondensationCost
+
+/-!
+### Where the residual discreteness of a hard-called score is worst
+
+`residualDiscreteness` above measures how much lattice structure survives in a score built
+from discrete genotypes. It says the discreteness shrinks; it does not say what it costs
+where it does not shrink. `Calibrator.JetBarrier` supplies the missing factor.
+
+A hard-called genotype has three-point support, so `log x ^ 2` is finitely supported and
+the score inherits a lattice of spacing `h`. At a threshold sitting a distance `δ` above
+the nearest lattice point below it, the lattice bracket `latticeBracket h δ` is the factor
+by which the lattice law's exceedance intensity departs from the continuum value. Two facts
+about that factor decide how a percentile cut on a hard-called score should be read: it is
+maximal exactly at alignment (`δ = 0`) and it strictly exceeds one there.
+
+Scope, taken from the source module: identifying `latticeBracket` with a ratio of *actual*
+exceedance intensities needs two local limit theorems that this corpus does not prove, and
+JetBarrier says so. What is proved, and all that is used here, is the arithmetic of the
+factor itself -- which is enough to say where the worst case is, and that it is not at
+`1`.
+-/
+
+section LatticeThreshold
+
+/-- **Alignment is the worst case for a lattice threshold.**
+
+Moving the threshold off the lattice can only reduce the bracket, so the aligned value
+`latticeInflation h` bounds every off-lattice value. Immediate from
+`latticeBracket_antitone` at `δ₁ = 0` together with `latticeBracket_zero`, but worth its own
+name: it is what says a percentile cut placed *on* a hard-call value is the adversarial
+choice rather than a neutral one. -/
+theorem latticeBracket_le_latticeInflation {h : ℝ} (hh : 0 < h) {δ : ℝ} (hδ : 0 ≤ δ) :
+    latticeBracket h δ ≤ latticeInflation h := by
+  have hmono := latticeBracket_antitone hh hδ
+  rwa [latticeBracket_zero] at hmono
+
+/-- **A hard-called score's threshold factor is bounded by a value strictly above one.**
+
+For every positive lattice spacing and every threshold offset, the bracket is at most
+`latticeInflation h`, and that bound is strictly greater than `1`. So the discreteness a
+hard call leaves behind cannot be treated as a neutral rounding: at the worst placement it
+is a strict departure from the continuum, of a size fixed by the spacing alone.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- arithmetic about `latticeBracket`. The
+    identification of that factor with an exceedance-intensity ratio is not proved in
+    this corpus; see the note above. -/
+theorem hardCall_threshold_factor_bounded {h : ℝ} (hh : 0 < h) {δ : ℝ} (hδ : 0 ≤ δ) :
+    latticeBracket h δ ≤ latticeInflation h ∧ 1 < latticeInflation h :=
+  ⟨latticeBracket_le_latticeInflation hh hδ, one_lt_latticeInflation hh⟩
+
+end LatticeThreshold
 
 end GaussianApproximation
 

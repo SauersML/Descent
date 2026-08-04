@@ -2,6 +2,11 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Calibrator.OpenQuestions
+-- For `summary_statistic_coherence_not_locally_certifiable`,
+-- `no_bounded_locality_hierarchy`, `nonbipartite_twin_tv_gap` and
+-- `expanderAgreementFloor`: the window-audit section below is what the twin
+-- construction says about neighbourhood-consistency QC.
+import Calibrator.LocalToGlobalCoherence
 
 namespace Calibrator
 
@@ -631,6 +636,90 @@ theorem disjointWindow_limit_variances_eq_segment :
     exact ⟨1, share, h_nn, h_le, h_eq⟩
 
 end DisjointWindowDesigns
+
+/-!
+## What a window audit of summary statistics can and cannot certify
+
+The section above is about what a disjoint-window design *achieves*. This one is about what
+a window-based **check** on reported summary statistics can *certify*, and the answer is
+sharply less than the practice assumes.
+
+Neighbourhood-consistency QC -- verifying that per-block marginal laws implied by reported
+statistics agree wherever adjacent blocks overlap, at some window radius -- is the standard
+diagnostic for whether a summary-statistic set could have come from one coherent
+population. `Calibrator.LocalToGlobalCoherence` supplies a twin pair that defeats it: two
+systems agreeing on every bounded-radius datum, one globally realizable and one at strictly
+positive distance from every global law. Enlarging the radius does not help, and neither
+does consulting every radius at once and combining the verdicts arbitrarily.
+
+The gap is not marginal. The non-realizable twin sits at average marginal total-variation
+distance at least `expanderAgreementFloor = 1/2 - sqrt 5 / 6`, which
+`expanderAgreementFloor_gt` brackets above `0.127` -- a constant, not something that decays
+with the window size.
+
+Scope: the twin construction rests on Ramanujan-graph inputs that are classical and are
+flagged as such in the source module. What is transported here is the packaging, not a new
+expander result, and the theorem below is stated over an abstract audit so that it commits
+to no particular QC procedure.
+-/
+
+section WindowAuditCeiling
+
+/-- **A summary-statistic set can pass every window audit and still be far from coherent.**
+
+Both halves of the twin construction at the summary-statistic reading, stated together
+because either alone understates the result. The first conjunct is the impossibility: at no
+radius `r` is there a certificate, computed from the audit output, that decides whether one
+population generated the statistics. The second is the size of what is being missed: the
+average marginal total-variation distance from every global law is strictly positive.
+
+An audit that returns *identical output on a realizable and a non-realizable set* is not a
+weak diagnostic; it is not a diagnostic. Escaping this requires data outside the window --
+the joint content the marginals omit -- not a larger window or a longer hierarchy of
+checks.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- a transport of the twin construction
+    into summary-statistic vocabulary, carrying no assertion about any released
+    statistics. -/
+theorem window_audit_cannot_certify_coherence
+    {SummaryStatSet AuditOutput ι : Type*}
+    (audit : ℕ → SummaryStatSet → AuditOutput)
+    (onePopulationRealizable : SummaryStatSet → Prop)
+    (coherentSet incoherentSet : SummaryStatSet)
+    (hidenticalAudits : ∀ r : ℕ, audit r coherentSet = audit r incoherentSet)
+    (hcoherent : onePopulationRealizable coherentSet)
+    (hincoherent : ¬ onePopulationRealizable incoherentSet)
+    (E : Finset ι) (hE : E.Nonempty) (agree tv : ι → ℝ) (β : ℝ)
+    (hβ : β < expanderAgreementFloor)
+    (htv : ∀ e ∈ E, agree e - β ≤ tv e)
+    (hagree : expanderAgreementFloor * E.card ≤ ∑ e ∈ E, agree e) :
+    (∀ r : ℕ, ¬ ∃ certify : AuditOutput → Prop,
+        ∀ S : SummaryStatSet, onePopulationRealizable S ↔ certify (audit r S))
+      ∧ 0 < (∑ e ∈ E, tv e) / E.card :=
+  ⟨summary_statistic_coherence_not_locally_certifiable audit onePopulationRealizable
+      coherentSet incoherentSet hidenticalAudits hcoherent hincoherent,
+    nonbipartite_twin_tv_gap E hE agree tv β hβ htv hagree⟩
+
+/-- **No hierarchy of window audits certifies coherence either.** The same twin pair is
+identical on the whole radius family, so folding every radius into one verdict by any rule
+whatsoever still fails to decide realizability. Recorded separately because "run the check
+at every window size and combine" is the natural response to the theorem above, and it is
+the response that does not work. -/
+theorem window_audit_hierarchy_cannot_certify_coherence
+    {SummaryStatSet AuditOutput Verdict : Type*}
+    (audit : ℕ → SummaryStatSet → AuditOutput)
+    (onePopulationRealizable : SummaryStatSet → Prop)
+    (combine : (ℕ → AuditOutput) → Verdict) (accept : Verdict → Prop)
+    (coherentSet incoherentSet : SummaryStatSet)
+    (hidenticalAudits : ∀ r : ℕ, audit r coherentSet = audit r incoherentSet)
+    (hcoherent : onePopulationRealizable coherentSet)
+    (hincoherent : ¬ onePopulationRealizable incoherentSet) :
+    ¬ ∀ S : SummaryStatSet,
+        onePopulationRealizable S ↔ accept (combine (fun r ↦ audit r S)) :=
+  no_bounded_locality_hierarchy audit onePopulationRealizable combine accept
+    coherentSet incoherentSet hidenticalAudits hcoherent hincoherent
+
+end WindowAuditCeiling
 
 /-!
 ## Source `R²` Is Not a Sufficient Biological State Variable

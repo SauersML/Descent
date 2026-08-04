@@ -7,6 +7,10 @@ import Calibrator.OpenQuestions
 -- identifiability below upgrades a calibration-level non-identifiability into a
 -- statement about every threshold metric at once, which is not provable here.
 import Calibrator.FoldedSpectrum
+-- For `twoMechanismMixture`, `mechanismCount_not_identified` and
+-- `mechanismCount_not_identified_of_range`: the mechanism-count section below is the
+-- gene-environment reading of the latent-mechanism collapse.
+import Calibrator.LatentMechanismCollapse
 
 namespace Calibrator
 
@@ -645,5 +649,80 @@ theorem no_threshold_metric_separates_collinear_split {n : ℕ}
   exact shift_blind_to_split_of_collinear G c hcol gamma eta t i
 
 end CounterfactualFramework
+
+
+/-!
+## How many mechanisms mediate GxE is not a question about the data
+
+`NormOfReaction` above shows that a genotype's environmental sensitivity is identified only
+as a slope, and `linearNormOfReaction_sub` shows the intercept cancels. Those are statements
+about *which parameters* a reaction-norm comparison recovers. The statements below are about
+a different quantity a GxE study routinely reports: **how many pathways** mediate the
+interaction.
+
+`Calibrator.LatentMechanismCollapse` proves the finite shadow of the collapse theorem --
+the same observed family is reproduced with zero residual by a two-mechanism model and by
+a three-mechanism model, with every weight a genuine mixing weight in both. Transported
+here, that says a study reporting `k` mediating pathways is reporting a modelling choice.
+No estimator can prefer one count, because the counts are not distinguishable by the
+observations at all.
+
+Scope, from the source module and not weakened: the general collapse theorem -- smooth
+strictly positive mixing densities over a compact manifold, driving the minimal count to
+`1` -- is an open gap there and is not used here. What is used is the finite, fully proved
+instance and its universal form over an observation window.
+-/
+
+section MechanismCount
+
+/-- **The number of GxE mechanisms is not identified from the reaction norms.**
+
+Given any family of contexts whose observed reaction-norm values lie in the window
+`[2/10, 9/10]`, a *two*-mechanism model reproduces every one of them exactly, with genuine
+mixing weights. So no observed family of reaction norms inside that window is evidence for
+any particular mechanism count, and a reported count carries no information the data
+supplied.
+
+Stated at `linearNormOfReaction` rather than at an abstract observable because that is the
+quantity this file defines and a GxE study measures.
+
+    Empirical status: DERIVED. The witnesses are the exact weights produced by
+    `exists_twoMechanismMixture_eq`; nothing is approximated. -/
+theorem normOfReaction_mechanismCount_not_identified {ι : Type*} (a b E : ι → ℝ)
+    (hrange : ∀ i, 2 / 10 ≤ linearNormOfReaction (a i) (b i) (E i) ∧
+      linearNormOfReaction (a i) (b i) (E i) ≤ 9 / 10) :
+    ∃ w : ι → ℝ, (∀ i, 0 ≤ w i ∧ w i ≤ 1) ∧
+      ∀ i, twoMechanismMixture (w i) = linearNormOfReaction (a i) (b i) (E i) :=
+  mechanismCount_not_identified_of_range _ hrange
+
+/-- **A three-context GxE design with two mechanism counts and zero residual.**
+
+The concrete witness behind the theorem above, in reaction-norm coordinates: three
+environments whose reaction norms read `0.35`, `0.50` and `0.70` are fit exactly by a
+three-pathway model using all three pathways with strictly positive weight, and exactly by
+a two-pathway model. Both fits are displayed, so the non-identifiability is exhibited
+rather than asserted.
+
+The reaction-norm parameters are recovered from the observed values by
+`linearNormOfReaction`, which is why the hypothesis is an equation on measured values and
+not on latent quantities.
+
+    Empirical status: DERIVED. Exact arithmetic on displayed witnesses. -/
+theorem gxe_threeContext_mechanismCount_not_identified
+    (a b E : Fin 3 → ℝ)
+    (h₀ : linearNormOfReaction (a 0) (b 0) (E 0) = 35 / 100)
+    (h₁ : linearNormOfReaction (a 1) (b 1) (E 1) = 50 / 100)
+    (h₂ : linearNormOfReaction (a 2) (b 2) (E 2) = 70 / 100) :
+    (threeMechanismMixture (7 / 10) (3 / 20) = linearNormOfReaction (a 0) (b 0) (E 0) ∧
+        threeMechanismMixture (2 / 5) (3 / 10) = linearNormOfReaction (a 1) (b 1) (E 1) ∧
+        threeMechanismMixture (1 / 5) (3 / 20) = linearNormOfReaction (a 2) (b 2) (E 2)) ∧
+      (twoMechanismMixture (11 / 14) = linearNormOfReaction (a 0) (b 0) (E 0) ∧
+        twoMechanismMixture (4 / 7) = linearNormOfReaction (a 1) (b 1) (E 1) ∧
+        twoMechanismMixture (2 / 7) = linearNormOfReaction (a 2) (b 2) (E 2)) := by
+  obtain ⟨⟨t₀, t₁, t₂⟩, ⟨s₀, s₁, s₂⟩⟩ := mechanismCount_not_identified
+  exact ⟨⟨by rw [h₀]; exact t₀, by rw [h₁]; exact t₁, by rw [h₂]; exact t₂⟩,
+    ⟨by rw [h₀]; exact s₀, by rw [h₁]; exact s₁, by rw [h₂]; exact s₂⟩⟩
+
+end MechanismCount
 
 end Calibrator
