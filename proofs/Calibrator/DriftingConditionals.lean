@@ -68,6 +68,11 @@ theorem transportMass_total (P : ι → ι → ℝ) (mass : ι → ℝ)
 noncomputable def markedMass (population response : ι → ℝ) (x : ι) : ℝ :=
   population x * response x
 
+/-- Reference evaluation: the marked mass is the pointwise product. -/
+theorem markedMass_at_reference_point (population response : ι → ℝ) (x : ι) :
+    markedMass population response x = population x * response x := rfl
+
+
 /-- Response curve after both population mass and frozen marked mass pass
 through the same kernel. Positivity of every transported population cell is an
 input because a real-valued conditional probability is undefined on an empty
@@ -356,8 +361,21 @@ theorem transportedResponse_dist_le
 /-- A response concentrated in ancestry state zero. -/
 def stateZeroResponse (i : Fin 2) : ℝ := if i = 0 then 1 else 0
 
+/-- Reference evaluations: the indicator of the first state. -/
+theorem stateZeroResponse_at_reference_point :
+    stateZeroResponse 0 = 1 ∧ stateZeroResponse 1 = 0 := by
+  constructor <;> simp [stateZeroResponse]
+
+
 /-- A response concentrated in ancestry state one. -/
 def stateOneResponse (i : Fin 2) : ℝ := if i = 1 then 1 else 0
+
+/-- Reference evaluations: the indicator of the second state, so the two responses are
+supported on disjoint states. -/
+theorem stateOneResponse_at_reference_point :
+    stateOneResponse 0 = 0 ∧ stateOneResponse 1 = 1 := by
+  constructor <;> simp [stateOneResponse]
+
 
 /-- The ancestry-state-one response IS `UnifiedBiology.targetAnnotation`.
 
@@ -427,6 +445,13 @@ theorem uniformTwo_stationary_symmetricTwoStateKernel (switch : ℝ) :
 
 /-- The centered ancestry contrast. -/
 def twoStateContrast (i : Fin 2) : ℝ := if i = 0 then 1 else -1
+
+/-- Reference evaluations: the contrast is the sign, not an indicator -- it sums to zero over
+the two states where an indicator would not. -/
+theorem twoStateContrast_at_reference_point :
+    twoStateContrast 0 = 1 ∧ twoStateContrast 1 = -1 := by
+  constructor <;> simp [twoStateContrast]
+
 
 /-- Symmetric ancestry switching damps the centered ancestry contrast by the
 same persistence eigenvalue used by the reversible Markov spectral kernel. -/

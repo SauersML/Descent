@@ -442,6 +442,11 @@ definition prevents equal-posterior constructions in downstream biological modul
 into independent copies of the same quantity. -/
 noncomputable def balancedBinaryWeight {Carrier : Type*} (_ : Carrier) : ℝ := 1 / 2
 
+/-- Reference evaluation: the balanced weight is a half at every carrier point. -/
+@[simp] theorem balancedBinaryWeight_at_reference_point {Carrier : Type*} (c : Carrier) :
+    balancedBinaryWeight c = 1 / 2 := rfl
+
+
 /-- Posterior on two environments, with `q x` assigned to `true`. -/
 noncomputable def twoIndexPosterior (q : Covariate → ℝ) (x : Covariate) (t : Bool) : ℝ :=
   if t then q x else 1 - q x

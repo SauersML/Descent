@@ -213,6 +213,13 @@ noncomputable def binaryTransitionArrowStatistic (xs : List Bool) : ℝ :=
   | [x₀, x₁] => twoUnitArrow binaryFirstAnnotation binarySecondAnnotation x₀ x₁
   | _ => 0
 
+/-- Reference evaluations: the statistic reads a two-element list and is zero on every other
+length, which is the whole content of the pattern match. -/
+theorem binaryTransitionArrowStatistic_at_reference_point :
+    binaryTransitionArrowStatistic [] = 0 ∧ binaryTransitionArrowStatistic [true] = 0 := by
+  constructor <;> simp [binaryTransitionArrowStatistic]
+
+
 /-- Mean of a statistic in the two-orientation experiment.  The forward orientation has
 weight `(1 + θ)/2` and the reverse orientation `(1 - θ)/2`; `|θ| ≤ 1` is needed only when
 interpreting those algebraic weights as probabilities. -/
@@ -261,8 +268,21 @@ three-state cycle is the smallest explicit positive control.
 /-- First annotation on a three-state cycle: present only in state `0`. -/
 noncomputable def threeCycleFeatureA (i : Fin 3) : ℝ := if i.val = 0 then 1 else 0
 
+/-- Reference evaluations: the feature is the indicator of the first cycle position. -/
+theorem threeCycleFeatureA_at_reference_point :
+    threeCycleFeatureA 0 = 1 ∧ threeCycleFeatureA 1 = 0 ∧ threeCycleFeatureA 2 = 0 := by
+  refine ⟨?_, ?_, ?_⟩ <;> simp [threeCycleFeatureA]
+
+
 /-- Second annotation on a three-state cycle: present only in state `1`. -/
 noncomputable def threeCycleFeatureB (i : Fin 3) : ℝ := if i.val = 1 then 1 else 0
+
+/-- Reference evaluations: the second feature is the indicator of the second position, so the
+two features are supported on disjoint positions. -/
+theorem threeCycleFeatureB_at_reference_point :
+    threeCycleFeatureB 0 = 0 ∧ threeCycleFeatureB 1 = 1 ∧ threeCycleFeatureB 2 = 0 := by
+  refine ⟨?_, ?_, ?_⟩ <;> simp [threeCycleFeatureB]
+
 
 /-- Uniform lag-one cross moment along the deterministic cycle `0 → 1 → 2 → 0`.
 Choosing the initial phase uniformly makes this a stationary finite process. -/
@@ -395,6 +415,16 @@ noncomputable def weightedBandPredictorLoss
     {ι Band : Type*} [Fintype ι] [Fintype Band]
     (weight : ι → Band → ℝ) (target predictor : ι → Band → ℝ) : ℝ :=
   ∑ i, ∑ b, weight i b * (target i b - predictor i b) ^ 2
+
+/-- Reference evaluation with one band and two members: unit weights and a predictor that
+misses by one and by two. -/
+theorem weightedBandPredictorLoss_at_reference_point :
+    weightedBandPredictorLoss (fun (_ : Fin 2) (_ : Fin 1) ↦ (1 : ℝ))
+        (fun (i : Fin 2) (_ : Fin 1) ↦ (![1, 3] : Fin 2 → ℝ) i)
+        (fun (i : Fin 2) (_ : Fin 1) ↦ (![2, 5] : Fin 2 → ℝ) i) = 5 := by
+  simp [weightedBandPredictorLoss, Fin.sum_univ_succ]
+  norm_num
+
 
 /-- **Exact spectral compound-deployment identity.** If the prediction residual is
 orthogonal to displacement from the source in the evaluation-weighted inner product,

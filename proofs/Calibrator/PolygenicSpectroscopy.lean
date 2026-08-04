@@ -881,6 +881,11 @@ def hweLatticeCondition (q : ℝ) : Prop := (1 - 2 * q) ^ 2 = 4 * q * (1 - q)
 /-- The critical allele frequency `q* = (2 - sqrt 2) / 4 = 0.146447...`. -/
 noncomputable def latticeCriticalMaf : ℝ := (2 - Real.sqrt 2) / 4
 
+/-- Reference evaluation: the lattice-critical minor allele frequency in closed form. -/
+theorem latticeCriticalMaf_at_reference_point :
+    latticeCriticalMaf = (2 - Real.sqrt 2) / 4 := rfl
+
+
 /-- **The critical frequency is below a quarter.** Positivity alone is shared by the sign-flipped
 constant, which sits above one half; this bound is not. -/
 theorem latticeCriticalMaf_lt_quarter : latticeCriticalMaf < 1 / 4 := by
@@ -981,6 +986,18 @@ greater than one and the separation of `hardCall_arithmeticProgression_at_critic
 is quantitative. -/
 noncomputable def hardCallLatticeSpan : ℝ :=
   Real.log ((1 - latticeCriticalMaf) / latticeCriticalMaf)
+
+/-- Reference evaluation: the span is the log-odds of the lattice-critical frequency. -/
+theorem hardCallLatticeSpan_at_reference_point :
+    hardCallLatticeSpan = Real.log ((2 + Real.sqrt 2) / (2 - Real.sqrt 2)) := by
+  unfold hardCallLatticeSpan latticeCriticalMaf
+  congr 1
+  have h : Real.sqrt 2 < 2 := by
+    nlinarith [Real.sq_sqrt (by norm_num : (0:ℝ) ≤ 2), Real.sqrt_nonneg 2]
+  have hne : (2 : ℝ) - Real.sqrt 2 ≠ 0 := by linarith
+  field_simp
+  ring
+
 
 theorem hardCallLatticeSpan_pos : 0 < hardCallLatticeSpan := by
   have h0 : 0 < latticeCriticalMaf := latticeCriticalMaf_pos
