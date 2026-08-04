@@ -230,11 +230,32 @@ noncomputable def pairwiseFstFromBranches (fstS fstT : ℝ) : ℝ :=
     not `t` from each side. Summing both branch taus double-counts the split
     time, which is exactly the observed `+50` percent.
 
-    Power: the prediction spans 0.3333 to 0.6667 across the design while the
-    measurement spans 0.19923 to 0.49974, so a correct functional form could
-    have matched and this one could not. -/
+    **The body has been corrected to the MEAN of the branch taus**, which is the
+    composition with the split time counted once. On a symmetric split it
+    reduces to `fstFromTau tau`, hence to `coalFst`, which is what makes the two
+    definitions agree instead of differing by fifty percent. Re-measured on the
+    same engine (`battery_correct.py`, `correct_pairwise_tau`, 30 replicates of
+    20 Mb, recombining):
+
+      NeA    NeB    t      old (sum)   this (mean)   simulated          sems
+      1000   1000    500      0.33333       0.20000  0.19682±0.00277   1.2
+      1000   1000   1000      0.50000       0.33333  0.32924±0.00326   1.3
+      1000   1000   2000      0.66667       0.50000  0.49999±0.00302   0.0
+       600    600   1200      0.66667       0.50000  0.49410±0.00385   1.5
+       500   2000   1000      0.55556       0.38462  0.36592±0.00330   5.7
+
+    Empirical status: **VALIDATED for equal branch lengths** (worst 1.5 sems
+    over four designs spanning 0.19682 to 0.49999), and **still wrong for
+    unequal ones** -- the last row misses by 5.7 sems. That residual is a
+    signature limitation and not a repairable constant: with unequal daughter
+    sizes the between-deme coalescence also depends on the ANCESTRAL size, and
+    two branch taus cannot carry it. Use `hudsonFstFromCoalescenceTimes` there.
+
+    Power: the prediction spans 0.20000 to 0.50000 across the symmetric designs,
+    a factor of two and a half, and the superseded sum form is excluded at 40 to
+    59 sems on every one of them. -/
 noncomputable def pairwiseFstFromBranchTaus (tauS tauT : ℝ) : ℝ :=
-  fstFromTau (tauS + tauT)
+  fstFromTau ((tauS + tauT) / 2)
 
 @[simp] theorem pairwise_fst_decomposition (fstS fstT : ℝ) :
     pairwiseFstFromBranches fstS fstT = fstS + fstT - fstS * fstT := by
@@ -271,42 +292,36 @@ theorem pairwiseFstFromBranchTaus_lt_pairwiseFstFromBranches (a b : ℝ)
       pairwiseFstFromBranches (fstFromTau a) (fstFromTau b) := by
   rw [pairwiseFstFromBranches_eq_fstFromTau_add_mul a b ha.le hb.le]
   unfold pairwiseFstFromBranchTaus fstFromTau
-  have h1 : (0 : ℝ) < 1 + (a + b) := by linarith
+  have h1 : (0 : ℝ) < 1 + (a + b) / 2 := by linarith
   have h2 : (0 : ℝ) < 1 + (a + b + a * b) := by nlinarith
   rw [div_lt_div_iff₀ h1 h2]
   nlinarith [mul_pos ha hb]
 
-/-- **The gap between the two compositions is second order in the branch
-lengths.**  It is bounded by `eps ^ 2` when both branches are below `eps`, which
-is the precise sense in which the multiplicative map is accurate at small
-`F_ST` and the reason the `T = 200` row above agrees to `0.6%`. -/
-theorem pairwiseFst_composition_gap_le (a b eps : ℝ)
-    (ha : 0 ≤ a) (hb : 0 ≤ b) (hae : a ≤ eps) (hbe : b ≤ eps) :
-    pairwiseFstFromBranches (fstFromTau a) (fstFromTau b) -
-        pairwiseFstFromBranchTaus a b ≤ eps ^ 2 := by
-  have hab : 0 ≤ a * b := mul_nonneg ha hb
-  have h1 : (0 : ℝ) < 1 + (a + b) := by linarith
-  have h2 : (0 : ℝ) < 1 + (a + b + a * b) := by linarith
-  have h1' : (1 : ℝ) + (a + b) ≠ 0 := ne_of_gt h1
-  have h2' : (1 : ℝ) + (a + b + a * b) ≠ 0 := ne_of_gt h2
-  rw [pairwiseFstFromBranches_eq_fstFromTau_add_mul a b ha hb]
+/-- **The gap between the two compositions is FIRST order in the branch length.**
+
+    This theorem previously claimed the gap was bounded by `eps ^ 2`, and that
+    claim was an artifact of the superseded body. It was true of
+    `fstFromTau (tauS + tauT)`, whose extra `tauS * tauT` really is second
+    order -- and it was the licence under which the two compositions could be
+    treated as interchangeable at small `F_ST`. With the split time counted once
+    rather than twice, they differ at first order and no longer may be.
+
+    At equal branches the gap is exactly `a / (1 + a) ^ 2`, which is `a` to
+    leading order. So the multiplicative composition in `F_ST` and the additive
+    composition in coalescent time are two different quantities, and the
+    simulation in the docstring above says the coalescent one is the measured
+    `F_ST`: `0.49999 ± 0.00302` against this definition's `0.50000` where
+    `pairwiseFstFromBranches` gives `0.75`. -/
+theorem pairwiseFst_composition_gap_eq (a : ℝ) (ha : 0 ≤ a) :
+    pairwiseFstFromBranches (fstFromTau a) (fstFromTau a) -
+        pairwiseFstFromBranchTaus a a = a / (1 + a) ^ 2 := by
+  have h1 : (1 : ℝ) + a ≠ 0 := by positivity
+  rw [pairwiseFstFromBranches_eq_fstFromTau_add_mul a a ha ha]
   unfold pairwiseFstFromBranchTaus fstFromTau
-  have key : (a + b + a * b) / (1 + (a + b + a * b)) - (a + b) / (1 + (a + b)) =
-      a * b / ((1 + (a + b)) * (1 + (a + b + a * b))) := by
-    field_simp
-    ring
-  rw [key]
-  have hden : (0 : ℝ) < (1 + (a + b)) * (1 + (a + b + a * b)) := mul_pos h1 h2
-  have hsum : (0 : ℝ) ≤ a + b := by linarith
-  have hsum' : (0 : ℝ) ≤ a + b + a * b := by linarith
-  have hone : (1 : ℝ) ≤ (1 + (a + b)) * (1 + (a + b + a * b)) := by
-    nlinarith [mul_nonneg hsum hsum']
-  have hstep : a * b / ((1 + (a + b)) * (1 + (a + b + a * b))) ≤ a * b := by
-    rw [div_le_iff₀ hden]
-    nlinarith [mul_le_mul_of_nonneg_left hone hab]
-  have heps : (0 : ℝ) ≤ eps := le_trans ha hae
-  have hfinal : a * b ≤ eps ^ 2 := by nlinarith [mul_le_mul hae hbe hb heps]
-  linarith
+  have h2 : (1 : ℝ) + (a + a + a * a) ≠ 0 := by nlinarith
+  have h3 : (1 : ℝ) + (a + a) / 2 ≠ 0 := by linarith
+  field_simp
+  ring
 
 @[simp] theorem coalescenceCdfFromHazard_eq (hazard : ℝ → ℝ) (t : ℝ) :
     coalescenceCdfFromHazard hazard t =
