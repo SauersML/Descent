@@ -91,6 +91,7 @@ ACKNOWLEDGED = {
     "amEquilibriumVariance_at_full_heritability": "describes why a disagreement was invisible",
     "sign_erasure": "converse adjacent",
     "constantConditional_of_driftDefect_zero": "is itself the converse",
+    "equalityPatternPermutation_apply": "the phrase is in a definition docstring above, not this theorem",
     "gaussianKurtosisMaf_lt_quarter": "describes when the fourth-cumulant channel closes, not this bound",
     "rigidity_of_boundedBelowAbove": "the converse is inequivalent_of_unbounded_coding, named in the docstring",
     "isCompleteCatalogue_kernel": "the phrase defines IsCompleteCatalogue above, not this theorem",
@@ -116,6 +117,12 @@ def scan() -> list[tuple[str, str, str]]:
                 continue
             hit = IFF.search(doc)
             if not hit:
+                continue
+            # A junk-branch naming states a VALUE at a point.  Its docstring says which
+            # point -- "reports no risk exactly when the effect units are degenerate" --
+            # and there is no equivalence in it to claim.  The naming convention is the
+            # rule, so this needs no per-theorem entry.
+            if name.endswith("_is_junk"):
                 continue
             # A converse stated nearby, by the corpus's own naming habit.
             stem = name.split("_")[0]

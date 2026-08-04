@@ -210,6 +210,8 @@ UNREACHABLE_BY_HAND = {
     "momentSeparationNode": "the divisor is (D : ℕ) + 1, at least one",
     "cwRate": "cwRate_one records the endpoint, where the vanishing factor kills log 0",
     "cwPinskerGapDerivative": "the endpoints are excluded by |m| < 1 in every consumer",
+    "momentUniformWeight": "the divisor is (D : ℕ) + 2, at least two",
+    "momentPerturbationScale": "the divisor is (D + 2) times 1 + a sum of absolute values, at least two",
 }
 
 
