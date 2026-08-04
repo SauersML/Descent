@@ -143,15 +143,21 @@ theorem dynamics_contrast_coordinate_eq
 /-- The exact normal form bundled as the biological correction theorem consumed by downstream
 applications. -/
 structure BiologicalCorrectionNormalForm : Prop where
+  /-- Pooling followed by broadcasting is idempotent. -/
   projector_idempotent :
     dynamicsPooledProjector.comp dynamicsPooledProjector = dynamicsPooledProjector
+  /-- The fixed points are exactly the fields that agree across both dynamics. -/
   fixed_exactly_on_common_fields :
-    ∀ β, dynamicsPooledProjector β = β ↔ β false = β true
+    ∀ β : Bool → ℝ, dynamicsPooledProjector β = β ↔ β false = β true
+  /-- The correction residual is exactly the persistence/switching contrast. -/
   residual_exactly_contrast :
-    ∀ β, β - dynamicsPooledProjector β = dynamicsContrastCoefficient β • dynamicsContrast
+    ∀ β : Bool → ℝ,
+      β - dynamicsPooledProjector β = dynamicsContrastCoefficient β • dynamicsContrast
+  /-- Every positive dictionary order represents the pooled projector. -/
   represented_at_every_positive_order :
-    ∀ k, 0 < k → dynamicsPooledProjector ∈
+    ∀ k : ℕ, 0 < k → dynamicsPooledProjector ∈
       UniformCorrectionFamily dynamicsPoolingObservation k
+  /-- Every represented correction is blind to translations along the contrast. -/
   all_uniform_corrections_contrast_blind :
     ∀ (k : ℕ) (C : (Bool → ℝ) →ₗ[ℝ] (Bool → ℝ)),
       C ∈ UniformCorrectionFamily dynamicsPoolingObservation k →

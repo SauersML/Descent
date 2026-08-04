@@ -50,7 +50,7 @@ structure PolygenicContinuumCalibrationLaw
     (ancestryRisk : Ancestry → Genotype → ℝ) : Prop where
   /-- Ancestry-wise squared calibration error is pooled error plus an irreducible drift floor. -/
   ancestry_pythagoras :
-    ∀ score,
+    ∀ score : Genotype → ℝ,
       indexWiseCalibrationEnergy genotypeWeight ancestryPosterior ancestryRisk score =
         polygenicCalibrationFloor genotypeWeight ancestryPosterior ancestryRisk +
           aggregateCalibrationEnergy genotypeWeight ancestryPosterior ancestryRisk score
@@ -66,7 +66,7 @@ structure PolygenicContinuumCalibrationLaw
   /-- Zero floor means risk invariance only on represented ancestry/genotype support. -/
   floor_eq_zero_iff_support_invariant :
     polygenicCalibrationFloor genotypeWeight ancestryPosterior ancestryRisk = 0 ↔
-      ∀ x, 0 < genotypeWeight x → ∀ s t,
+      ∀ x : Genotype, 0 < genotypeWeight x → ∀ s t : Ancestry,
         0 < ancestryPosterior x s → 0 < ancestryPosterior x t →
           ancestryRisk s x = ancestryRisk t x
 
@@ -76,9 +76,9 @@ theorem polygenicContinuumCalibrationLaw
     (genotypeWeight : Genotype → ℝ)
     (ancestryPosterior : Genotype → Ancestry → ℝ)
     (ancestryRisk : Ancestry → Genotype → ℝ)
-    (hweight : ∀ x, 0 ≤ genotypeWeight x)
-    (hposterior : ∀ x, ∑ t, ancestryPosterior x t = 1)
-    (hnonnegative : ∀ x t, 0 ≤ ancestryPosterior x t) :
+    (hweight : ∀ x : Genotype, 0 ≤ genotypeWeight x)
+    (hposterior : ∀ x : Genotype, ∑ t, ancestryPosterior x t = 1)
+    (hnonnegative : ∀ (x : Genotype) (t : Ancestry), 0 ≤ ancestryPosterior x t) :
     PolygenicContinuumCalibrationLaw genotypeWeight ancestryPosterior ancestryRisk := by
   refine
     { ancestry_pythagoras := ?_
@@ -107,8 +107,8 @@ theorem pairwiseAncestryDisagreement_le_indexWiseCalibration
     (ancestryPosterior : Genotype → Ancestry → ℝ)
     (ancestryRisk : Ancestry → Genotype → ℝ)
     (score : Genotype → ℝ)
-    (hweight : ∀ x, 0 ≤ genotypeWeight x)
-    (hposterior : ∀ x, ∑ t, ancestryPosterior x t = 1) :
+    (hweight : ∀ x : Genotype, 0 ≤ genotypeWeight x)
+    (hposterior : ∀ x : Genotype, ∑ t, ancestryPosterior x t = 1) :
     pairwiseCalibrationDriftEnergy genotypeWeight ancestryPosterior ancestryRisk ≤
       indexWiseCalibrationEnergy genotypeWeight ancestryPosterior ancestryRisk score := by
   rw [← calibrationDriftDefectSq_eq_pairwiseCalibrationDriftEnergy
@@ -135,13 +135,16 @@ by the ancestry-specific risks creates both positive calibration defect and posi
 regret for either ancestry-blind action. -/
 structure BinaryPolygenicDeploymentBoundary
     (q lower upper cutoff : ℝ) : Prop where
+  /-- The pooled mean is strictly worse than the minimax midpoint for the worst ancestry. -/
   pooled_mean_is_worst_ancestry_suboptimal :
     (upper - lower) / 2 <
       worstIndexError upper lower (q * upper + (1 - q) * lower)
+  /-- Crossing the clinical cutoff creates a positive ancestry calibration floor. -/
   crossing_creates_positive_calibration_floor :
     0 < ∑ t, twoIndexPosterior (fun _ : Unit ↦ q) () t *
       posteriorDrift (twoIndexPosterior (fun _ : Unit ↦ q))
         (twoIndexConditional (fun _ : Unit ↦ upper) (fun _ : Unit ↦ lower)) t () ^ 2
+  /-- Neither ancestry-blind binary action is simultaneously regret-free. -/
   no_ancestry_blind_action_is_regret_free :
     ∀ action : Bool,
       0 < driftDecisionRegret (twoIndexPosterior (fun _ : Unit ↦ q) ())
