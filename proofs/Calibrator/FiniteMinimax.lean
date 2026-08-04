@@ -83,6 +83,29 @@ theorem garbleObservations_observation_eq
   change (E.observation θ₁).bind channel = (E.observation θ₂).bind channel
   rw [hobs]
 
+/-- Probability mass under a finite bind is the finite kernel mixture. -/
+theorem finitePrior_probability_bind
+    {sourceCount targetCount : ℕ}
+    (prior : FinitePrior sourceCount)
+    (kernel : Fin (sourceCount + 1) → FinitePrior targetCount)
+    (target : Fin (targetCount + 1)) :
+    FinitePrior.probability (prior.bind kernel) target =
+      ∑ source, FinitePrior.probability prior source *
+        FinitePrior.probability (kernel source) target := by
+  unfold FinitePrior.probability
+  rw [PMF.bind_apply, tsum_fintype,
+    ENNReal.toReal_sum (fun source _ ↦ ENNReal.mul_ne_top (prior.apply_ne_top source)
+      ((kernel source).apply_ne_top target))]
+  exact Finset.sum_congr rfl fun source _ ↦ ENNReal.toReal_mul
+
+/-- Simulate a rule for garbled data from the original observation by sampling the channel and
+then applying the garbled-data rule. -/
+noncomputable def liftGarbledRule
+    {summaryCount : ℕ}
+    (channel : Fin (observationCount + 1) → FinitePrior summaryCount)
+    (δ : Rule actionCount summaryCount) : Rule actionCount observationCount :=
+  fun observation ↦ (channel observation).bind δ
+
 /-- Push every observation through a deterministic summary map.  Deterministic SFS binning,
 ancestry-score compression, and feature extraction are pure-channel special cases of
 `garbleObservations`. -/
@@ -108,6 +131,56 @@ noncomputable def risk
     (θ : Fin (parameterCount + 1)) : ℝ :=
   ∑ x, (E.observation θ).probability x *
     ∑ a, (δ x).probability a * E.loss θ a
+
+/-- Simulating a garbled-data rule from the original observation preserves its risk exactly. -/
+theorem risk_liftGarbledRule_eq
+    {summaryCount : ℕ}
+    (channel : Fin (observationCount + 1) → FinitePrior summaryCount)
+    (δ : Rule actionCount summaryCount) (θ : Fin (parameterCount + 1)) :
+    E.risk (liftGarbledRule channel δ) θ =
+      (E.garbleObservations summaryCount channel).risk δ θ := by
+  unfold risk liftGarbledRule garbleObservations
+  simp_rw [finitePrior_probability_bind]
+  calc
+    ∑ observation, (E.observation θ).probability observation *
+        ∑ action, (∑ summary, (channel observation).probability summary *
+          (δ summary).probability action) * E.loss θ action =
+      ∑ observation, (E.observation θ).probability observation *
+        ∑ summary, (channel observation).probability summary *
+          ∑ action, (δ summary).probability action * E.loss θ action := by
+      apply Finset.sum_congr rfl
+      intro observation _
+      congr 1
+      simp_rw [Finset.sum_mul]
+      rw [Finset.sum_comm]
+      apply Finset.sum_congr rfl
+      intro summary _
+      rw [Finset.mul_sum]
+      apply Finset.sum_congr rfl
+      intro action _
+      ring
+    _ = ∑ observation, ∑ summary,
+        ((E.observation θ).probability observation *
+          (channel observation).probability summary) *
+            ∑ action, (δ summary).probability action * E.loss θ action := by
+      apply Finset.sum_congr rfl
+      intro observation _
+      rw [Finset.mul_sum]
+      apply Finset.sum_congr rfl
+      intro summary _
+      ring
+    _ = ∑ summary, ∑ observation,
+        ((E.observation θ).probability observation *
+          (channel observation).probability summary) *
+            ∑ action, (δ summary).probability action * E.loss θ action :=
+      Finset.sum_comm
+    _ = ∑ summary, (∑ observation,
+        (E.observation θ).probability observation *
+          (channel observation).probability summary) *
+            ∑ action, (δ summary).probability action * E.loss θ action := by
+      apply Finset.sum_congr rfl
+      intro summary _
+      rw [Finset.sum_mul]
 
 /-- **Exact observational-equivalence lower bound for one rule.**  If two parameters emit the
 same observation law and every action incurs combined loss at least `separation`, then the sum
@@ -167,6 +240,23 @@ theorem separation_le_risk_add_of_observation_eq
 /-- Worst-case risk of a randomized rule. -/
 noncomputable def worstRisk (δ : Rule actionCount observationCount) : ℝ :=
   sSup (Set.range (E.risk δ))
+
+/-- The original and garbled experiments assign the same worst-case risk to a garbled rule and
+its simulation. -/
+theorem worstRisk_liftGarbledRule_eq
+    {summaryCount : ℕ}
+    (channel : Fin (observationCount + 1) → FinitePrior summaryCount)
+    (δ : Rule actionCount summaryCount) :
+    E.worstRisk (liftGarbledRule channel δ) =
+      (E.garbleObservations summaryCount channel).worstRisk δ := by
+  unfold worstRisk
+  congr 1
+  ext value
+  constructor
+  · rintro ⟨θ, rfl⟩
+    exact ⟨θ, (E.risk_liftGarbledRule_eq channel δ θ).symm⟩
+  · rintro ⟨θ, rfl⟩
+    exact ⟨θ, E.risk_liftGarbledRule_eq channel δ θ⟩
 
 /-- Primal minimax value. -/
 noncomputable def minimaxRisk : ℝ :=
@@ -404,6 +494,28 @@ theorem exists_risk_lower_bound :
           mul_le_mul_of_nonneg_left (hinner x)
             (FinitePrior.probability_nonneg (E.observation θ) x)
     _ = E.risk δ θ := rfl
+
+/-- **Full minimax data-processing inequality.** Passing observations through any
+parameter-independent stochastic channel cannot lower the minimax risk. Every decision rule
+available after garbling was already simulable from the original data with exactly the same
+risk profile. -/
+theorem minimaxRisk_le_garbleObservations
+    (summaryCount : ℕ)
+    (channel : Fin (observationCount + 1) → FinitePrior summaryCount) :
+    E.minimaxRisk ≤ (E.garbleObservations summaryCount channel).minimaxRisk := by
+  obtain ⟨lower, hlower⟩ := E.exists_risk_lower_bound
+  have hbdd : BddBelow (Set.range E.worstRisk) := by
+    refine ⟨lower, ?_⟩
+    rintro value ⟨δ, rfl⟩
+    exact le_trans (hlower δ 0)
+      (le_csSup (Set.finite_range _).bddAbove ⟨0, rfl⟩)
+  apply le_csInf (Set.range_nonempty (E.garbleObservations summaryCount channel).worstRisk)
+  rintro value ⟨δ, rfl⟩
+  calc
+    E.minimaxRisk ≤ E.worstRisk (liftGarbledRule channel δ) :=
+      csInf_le hbdd ⟨liftGarbledRule channel δ, rfl⟩
+    _ = (E.garbleObservations summaryCount channel).worstRisk δ :=
+      E.worstRisk_liftGarbledRule_eq channel δ
 
 /-- **Sharp binary minimax theorem.** Exact observational equivalence costs precisely half
 the pointwise separation, not merely at least half: the fair randomized rule attains the
