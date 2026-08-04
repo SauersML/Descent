@@ -115,7 +115,7 @@ theorem part_div_total_le_one
     (var_signal var_noise var_total : ℝ)
     (h_total : var_total = var_signal + var_noise)
     (h_total_pos : 0 < var_total)
-    (h_signal_nn : 0 ≤ var_signal) (h_noise_nn : 0 ≤ var_noise) :
+    (h_noise_nn : 0 ≤ var_noise) :
     var_signal / var_total ≤ 1 := by
   rw [div_le_one h_total_pos, h_total]; linarith
 
@@ -132,6 +132,15 @@ of transfer learning for PGS.
 
 section TransferLearning
 
+/-- Mean squared error of a source-transferred estimator with fixed transfer bias. -/
+noncomputable def transferredEstimatorMSE (σ_sq bias_sq nTarget : ℝ) : ℝ :=
+  σ_sq / nTarget + bias_sq
+
+/-- Mean squared error of a target-only estimator that must learn an additional variance
+component from target data. -/
+noncomputable def targetOnlyEstimatorMSE (σ_sq σ_extra_sq nTarget : ℝ) : ℝ :=
+  (σ_sq + σ_extra_sq) / nTarget
+
 /-- **More target data reduces MSE monotonically.** -/
 theorem more_target_data_reduces_mse
     (σ_sq gap : ℝ) (n₁ n₂ : ℕ)
@@ -143,7 +152,7 @@ theorem more_target_data_reduces_mse
   · exact Nat.cast_pos.mpr h_n₁
   · exact Nat.cast_lt.mpr h_more
 
-/-- **Transfer is beneficial when source provides information.**
+/-- **Exact transfer-learning crossover.**
     The transferred estimator beats the target-only estimator when
     n_T is small relative to the information from source.
 
@@ -155,47 +164,26 @@ theorem more_target_data_reduces_mse
     Derived: MSE_transfer < MSE_target ↔ bias² < σ²_extra/n_T.
     When n_T is small, σ²_extra/n_T is large, so transfer wins.
     As n_T → ∞, σ²_extra/n_T → 0, so target-only wins (bias² > 0). -/
-theorem transfer_beats_target_only
+theorem transferredEstimatorMSE_lt_targetOnly_iff
     (σ_sq bias_sq σ_extra_sq : ℝ) (n_T : ℝ)
-    (h_σ : 0 < σ_sq) (h_bias : 0 < bias_sq)
-    (h_extra : 0 < σ_extra_sq) (h_n : 0 < n_T)
-    (h_small_n : n_T < σ_extra_sq / bias_sq) :
-    let mse_transfer := σ_sq / n_T + bias_sq
-    let mse_target := (σ_sq + σ_extra_sq) / n_T
-    mse_transfer < mse_target := by
-  simp only
-  -- From h_small_n: n_T < σ_extra_sq / bias_sq
-  -- Multiply both sides by bias_sq > 0: n_T * bias_sq < σ_extra_sq
-  -- Divide by n_T > 0: bias_sq < σ_extra_sq / n_T
-  -- Then σ_sq/n_T + bias_sq < σ_sq/n_T + σ_extra_sq/n_T = (σ_sq + σ_extra_sq)/n_T
-  have h_prod : bias_sq * n_T < σ_extra_sq := by
-    rw [mul_comm]
-    exact (lt_div_iff₀ h_bias).mp h_small_n
-  have h_key : bias_sq < σ_extra_sq / n_T := by
-    exact (lt_div_iff₀ h_n).2 h_prod
-  rw [add_div]; linarith
-
-/-- **The transfer/target comparison interval is nonempty.**
-    Transfer learning is expected to help below some critical sample size `n_crit` and
-    to stop helping above it.
-
-    WHAT IS PROVED IS WEAKER THAN THAT, and the name says so: given `n_lo < n_hi`, some
-    real number lies strictly between them. The monotonicity and sign-change premises are
-    carried because they are what makes the interval the interesting one to look in, but
-    they are NOT used to locate a crossover: no continuity of `mse_transfer - mse_target`
-    is assumed, so an intermediate-value argument is unavailable and the returned point is
-    the midpoint, not a crossing. Naming this `critical_sample_size_exists` claimed the
-    argument this file does not make. -/
-theorem exists_sample_size_strictly_between
-    (mse_transfer mse_target : ℝ → ℝ) (n_lo n_hi : ℝ)
-    (h_transfer_decreasing : ∀ n₁ n₂ : ℝ, 0 < n₁ → n₁ < n₂ → mse_transfer n₂ < mse_transfer n₁)
-    (h_target_decreasing : ∀ n₁ n₂ : ℝ, 0 < n₁ → n₁ < n₂ → mse_target n₂ < mse_target n₁)
-    (h_lo_pos : 0 < n_lo) (h_range : n_lo < n_hi)
-    (h_small_n : mse_transfer n_lo < mse_target n_lo)
-    (h_large_n : mse_target n_hi < mse_transfer n_hi) :
-    -- There exists a crossover point
-    ∃ n_crit : ℝ, n_lo < n_crit ∧ n_crit < n_hi := by
-  exact ⟨(n_lo + n_hi) / 2, by linarith, by linarith⟩
+    (h_bias : 0 < bias_sq) (h_n : 0 < n_T) :
+    transferredEstimatorMSE σ_sq bias_sq n_T <
+        targetOnlyEstimatorMSE σ_sq σ_extra_sq n_T ↔
+      n_T < σ_extra_sq / bias_sq := by
+  unfold transferredEstimatorMSE targetOnlyEstimatorMSE
+  rw [add_div]
+  constructor
+  · intro h_mse
+    have h_key : bias_sq < σ_extra_sq / n_T := by linarith
+    have h_prod : bias_sq * n_T < σ_extra_sq := (lt_div_iff₀ h_n).1 h_key
+    apply (lt_div_iff₀ h_bias).2
+    simpa [mul_comm] using h_prod
+  · intro h_sample
+    have h_prod : n_T * bias_sq < σ_extra_sq := (lt_div_iff₀ h_bias).1 h_sample
+    have h_key : bias_sq < σ_extra_sq / n_T := by
+      apply (lt_div_iff₀ h_n).2
+      simpa [mul_comm] using h_prod
+    linarith
 
 /-- **Multi-ancestry meta-analysis is optimal.**
     Combining GWAS data from multiple ancestries via inverse-variance
@@ -285,8 +273,6 @@ theorem threshold_shift_changes_prevalence
 theorem r2_depends_on_prevalence_but_auc_doesnt
     (h2 π₁ π₂ : ℝ)
     (h_h2 : 0 < h2)
-    (h_π₁ : 0 < π₁) (h_π₁_lt : π₁ < 1)
-    (h_π₂ : 0 < π₂) (h_π₂_lt : π₂ < 1)
     (h_diff_prev : π₁ ≠ π₂)
     (h_not_complement : π₁ + π₂ ≠ 1) :
     h2 * (π₁ * (1 - π₁)) ≠ h2 * (π₂ * (1 - π₂)) := by
