@@ -438,6 +438,8 @@ DUPLICATE_BODY_BUDGET = 0           # one body under two names, tied by nothing
 REGIME_DECL_BUDGET = 0              # drift regimes baked into a body instead of a hypothesis
 UNDERDELIVERY_BUDGET = 0            # docstring attributes an identity the signature does not prove
 INHERITED_VALIDATION_BUDGET = None  # VALIDATED inherited from a sibling identity; pin on first run
+UNRESOLVED_CANDIDATE_BUDGET = 0     # self-declared alternative never discriminated from its sibling
+UNRESOLVED_FORK_BUDGET = None       # two defs of one observable related only by an inequality
 VACUOUS_VALIDATION_BUDGET = None    # VALIDATED with no recorded power; pin on first run
 LAUNDERED_PROP_BUDGET = 0           # named propositions only ever assumed, never established
 UNWITNESSED_BUNDLE_BUDGET = 0       # assumption bundles no concrete construction satisfies
@@ -836,24 +838,151 @@ def run_identifications() -> int:
         (r"ldamplif|amplifld|bottlenecklD",
                               [r"\br\b", r"recomb", r"\bc\b"],
          "LD amplification depends on the recombination rate"),
+        # Measured in proofs/validation/empirical/simcov. Both entries below
+        # cost a falsified definition each, and both were invisible to every
+        # other screen because the BODY is unobjectionable -- what is wrong is
+        # that no value of the arguments can make it right.
+        (r"freqcorr|frequencycorrel|allelefreqcorr",
+                              [r"var", r"spread", r"ancestral", r"\bsd\b"],
+         "the allele-frequency correlation is Var(p0)/(Var(p0)+F*E[p0(1-p0)]); "
+         "at FIXED F_ST the measured correlation runs 0.0004 to 0.7209 as the "
+         "ancestral spread changes, so no function of F_ST alone can be it"),
+        # NOT a bare `island`: `continentIsland...` names a two-population model
+        # in which a deme count is not a parameter at all, and flagging it would
+        # be inventing a finding. The pattern wants the symmetric island model.
+        (r"(?<!continent)island|migrationmutationequil|migrationdriftequil",
+                              [r"ndeme", r"demes", r"\bn\b", r"\bd\b", r"islands"],
+         "island-model F_ST depends on the deme count: at fixed 4*Ne*m the "
+         "simulated F_ST runs 0.117 at two demes to 0.186 at twenty"),
     ]
+    # A definition MAY omit an argument it depends on, but only by declaring the
+    # regime in which the omission is exact. `fstMigrationMutationEquilibrium`
+    # is the many-deme limit and is right there; what made it a defect was that
+    # nothing said so, so a reader at two demes got a number 8.2 sems wrong with
+    # no warning attached. A declared regime is a claim someone can check; a
+    # silent one is the failure this screen exists to stop.
+    REGIME_DECLARED = re.compile(r"\bRegime:|\blimit\b|\bmany-deme\b|"
+                                 r"\bapproximation\b|\basymptotic\b", re.I)
     missing = []
     for f in ident_lean_files():
+        raw_lines = open(f).read().split("\n")
         body_all = ident_strip_comments(open(f).read())
         for m in re.finditer(r"^(?:noncomputable )?def ([A-Za-z_0-9'.]+)([^:]*):", body_all, re.M):
             name, args = m.group(1).split(".")[-1], m.group(2)
             if name in PREVALENCE_FREE or re.search(r"gaussian|interval|approximation", name, re.I):
                 continue   # name declares the model it is exact for, or is a wrapper
+            doc = ident_preceding_docstring(raw_lines, body_all[:m.start()].count("\n"))
             for pat, needed, why in REQUIRED_ARGS:
                 if not re.search(pat, name, re.I):
                     continue
-                if not any(re.search(a, args, re.I) for a in needed):
-                    missing.append(f"{os.path.relpath(f, IDENT_ROOT)}: `{name}` takes no "
-                                   f"{needed[0]}-like argument; {why}")
+                if any(re.search(a, args, re.I) for a in needed):
+                    continue
+                if REGIME_DECLARED.search(doc):
+                    continue   # omission is exact in a regime the docstring names
+                missing.append(f"{os.path.relpath(f, IDENT_ROOT)}: `{name}` takes no "
+                               f"{needed[0]}-like argument and declares no regime; {why}")
     if len(missing) > MISSING_ARG_BUDGET:
         bad.append(f"definitions omitting an argument the named quantity depends on: "
                    f"{len(missing)}, budget {MISSING_ARG_BUDGET}")
         bad.extend("    " + x for x in missing)
+
+    # 3d-ter. UNRESOLVED CANDIDATE. A definition whose own docstring calls it a
+    #     candidate, an alternative, or a form retained for comparison, and which
+    #     has never been discriminated from the sibling it is an alternative TO.
+    #     Retaining both is defensible exactly until a measurement can separate
+    #     them, and not one line past it: `steppingStoneFstQuadratic` sat here
+    #     with its rival through a log-log slope of 0.959 against its predicted
+    #     2, and `pairwiseFstFromBranchTaus` through a fifty percent error.
+    #
+    #     Lean cannot raise this. Both members of a fork typecheck, both admit
+    #     junk-value and monotonicity theorems, and a `def` is a stipulation --
+    #     there is nothing in it for the kernel to disagree with. A green build
+    #     is evidence about the ALGEBRA and no evidence at all about which of two
+    #     rival formulas is the observable. That is the whole gap the Empirical
+    #     status markers cover, and this screen makes one corner of it fail loud.
+    CANDIDATE_PHRASE = re.compile(
+        r"offered as a candidate|is a candidate|as a candidate for|"
+        r"retained so that|the alternative form|competing form|rival form|"
+        r"the form the previous", re.I)
+    unresolved = []
+    for f in ident_lean_files():
+        raw = open(f).read()
+        for m in re.finditer(r"/--((?:(?!-/).)*)-/\s*\n(?:noncomputable )?def ([A-Za-z_0-9'.]+)",
+                             raw, re.S):
+            doc, name = m.group(1), m.group(2).split(".")[-1]
+            if not CANDIDATE_PHRASE.search(doc):
+                continue
+            if re.search(r"Empirical status:\s*[*_ ]*(VALIDATED|FALSIFIED|MEASURED|TESTED)", doc):
+                continue
+            unresolved.append(f"{os.path.relpath(f, IDENT_ROOT)}: `{name}` declares itself an "
+                              f"alternative but carries no discriminating measurement")
+    if len(unresolved) > UNRESOLVED_CANDIDATE_BUDGET:
+        bad.append(f"self-declared alternatives never discriminated from their sibling: "
+                   f"{len(unresolved)}, budget {UNRESOLVED_CANDIDATE_BUDGET}; measure the "
+                   f"two apart or drop one")
+        bad.extend("    " + x for x in unresolved)
+
+    # 3d-quater. UNRESOLVED FORK. Two definitions of ONE observable, related to
+    #     each other by an inequality or a difference but never by an equality,
+    #     with neither carrying a measurement. The corpus can then compute two
+    #     different numbers for one quantity and prove theorems about both, and
+    #     the theorem relating them certifies only that they DIFFER.
+    #
+    #     `pairwiseFstFromBranchTaus` against `coalFst` is the worked example:
+    #     0.50 against 0.33 on one simulated split, with
+    #     `pairwiseFstFromBranchTaus_lt_pairwiseFstFromBranches` stating only
+    #     that one lies below the other. Guard 3c screens same-BODY duplicates;
+    #     a fork has different bodies by construction and walks straight through.
+    #
+    #     Advisory until the count is measured once and pinned, the same
+    #     treatment INHERITED_VALIDATION_BUDGET gets: this is retroactive over a
+    #     large existing surface, and failing the build on all of it at once
+    #     would be noise rather than signal.
+    OBSERVABLE_GROUPS = [
+        ("F_ST", re.compile(r"fst|gst", re.I)),
+        ("heterozygosity", re.compile(r"^het|heterozyg", re.I)),
+        ("AUC", re.compile(r"auc", re.I)),
+        ("portability", re.compile(r"portab", re.I)),
+    ]
+    def_status, all_defs = {}, []
+    for f in ident_lean_files():
+        raw_lines = open(f).read().split("\n")
+        src = ident_strip_comments(open(f).read())
+        for i, line in enumerate(src.split("\n")):
+            dm = re.match(r"^(?:noncomputable )?def ([A-Za-z_0-9'.]+)", line)
+            if not dm:
+                continue
+            nm = dm.group(1).split(".")[-1]
+            all_defs.append(nm)
+            doc = ident_preceding_docstring(raw_lines, i)
+            def_status[nm] = bool(re.search(
+                r"Empirical status:\s*[*_ ]*(VALIDATED|FALSIFIED|MEASURED|TESTED)", doc))
+    forks = set()
+    for _label, pat in OBSERVABLE_GROUPS:
+        members = [n for n in all_defs if pat.search(n)]
+        if len(members) < 2:
+            continue
+        for f in ident_lean_files():
+            src = ident_strip_comments(open(f).read())
+            for tm in re.finditer(r"^theorem\s+[A-Za-z_0-9'.]+(.*?):=", src, re.S | re.M):
+                stmt = tm.group(1)
+                present = [n for n in members if re.search(r"\b" + re.escape(n) + r"\b", stmt)]
+                if len(present) < 2:
+                    continue
+                concl = stmt.split(":", 1)[-1]
+                if re.search(r"(?<![<>≤≥≠!])=(?!=)", concl):
+                    continue          # the theorem asserts agreement: not a fork
+                if not re.search(r"[<>≤≥≠]", concl):
+                    continue
+                if sum(1 for n in present if not def_status.get(n)) >= 2:
+                    forks.add(tuple(sorted(present)))
+    if UNRESOLVED_FORK_BUDGET is None:
+        for x in sorted(forks)[:10]:
+            print(f"  advisory (unresolved fork): {' vs '.join(x)}")
+    elif len(forks) > UNRESOLVED_FORK_BUDGET:
+        bad.append(f"definitions of one observable related only by an inequality, neither "
+                   f"measured: {len(forks)}, budget {UNRESOLVED_FORK_BUDGET}")
+        bad.extend("    " + " vs ".join(x) for x in sorted(forks))
 
     # 3d-bis. Overclaiming. Two of the falsified definitions carried the word
     #     "exact" in a docstring while being 26 percent wrong. A definition may

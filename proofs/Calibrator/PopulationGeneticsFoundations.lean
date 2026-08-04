@@ -1346,6 +1346,27 @@ noncomputable def fstMigrationMutationEquilibrium (Ne m μ : ℝ) : ℝ :=
 noncomputable def fstIslandEquilibriumFiniteDemes (Ne m μ nDemes : ℝ) : ℝ :=
   1 / (1 + 4 * Ne * m * (nDemes / (nDemes - 1)) + 4 * Ne * μ)
 
+/-- **The finite-deme equilibrium is the fixed point of the same identity balance**,
+at the deme-corrected scaled rate. The correction multiplies the migration term and
+nothing else, so the balance that produced the limit form produces this one at
+`4 Nₑ m n/(n-1) + 4 Nₑ μ`. Without this the definition would be an equilibrium
+stipulated as a closed form, which is the defect `EQUILIBRIUM_BUDGET` names. -/
+theorem fstIslandEquilibriumFiniteDemes_isFixedPoint (Ne m μ nDemes : ℝ)
+    (hNe : 0 < Ne) (hm : 0 ≤ m) (hμ : 0 ≤ μ)
+    (hcorr : 0 ≤ nDemes / (nDemes - 1)) :
+    scaledIdentityStep (4 * Ne * m * (nDemes / (nDemes - 1)) + 4 * Ne * μ)
+        (fstIslandEquilibriumFiniteDemes Ne m μ nDemes) =
+      fstIslandEquilibriumFiniteDemes Ne m μ nDemes := by
+  have h4 : (0 : ℝ) ≤ 4 * Ne := by linarith
+  have h : (0 : ℝ) ≤ 4 * Ne * m * (nDemes / (nDemes - 1)) + 4 * Ne * μ :=
+    add_nonneg (mul_nonneg (mul_nonneg h4 hm) hcorr) (mul_nonneg h4 hμ)
+  have hbody : fstIslandEquilibriumFiniteDemes Ne m μ nDemes =
+      1 / (1 + (4 * Ne * m * (nDemes / (nDemes - 1)) + 4 * Ne * μ)) := by
+    unfold fstIslandEquilibriumFiniteDemes
+    rw [add_assoc]
+  rw [hbody]
+  exact scaledIdentityStep_fixedPoint _ h
+
 /-- **The many-deme limit is the deme-blind formula.** At `nDemes / (nDemes - 1) = 1`
 the finite-deme equilibrium is exactly `fstMigrationMutationEquilibrium`, which is
 the precise sense in which the older definition is a limit rather than a law. -/
