@@ -22,38 +22,40 @@ CALIBRATION STATE -- one arm is ready and one is not.
       mutation-and-drift core is therefore sound, which is the part biallelic
       mutation got wrong.
 
-  ISLAND F_ST: NOT ready, and the fault is in the MIGRATION step. Two candidate
-      explanations were tested and both rejected, which is what makes the third
-      diagnosis usable rather than a guess.
+  ISLAND F_ST: nearly ready, with a stated 4 percent systematic. Against
+      `1/(1 + theta + bigM)` at `theta` near 1, where heterozygosity is about
+      one half and the estimator is in a usable regime, the plateau sits 4.1,
+      4.2 and 3.3 percent low at `m` = 0.002, 0.005 and 0.010. A consistent
+      small offset across a factor of five in migration.
 
-      Rejected: small-deme-count `G_ST` bias. At 12, 24 and 40 demes the gap runs
-      -7.7, -5.2 and -8.2 percent, which does not close with deme count.
+      TWO EARLIER DIAGNOSES OF THIS ARM WERE WRONG AND ARE RETRACTED.
 
-      Rejected: the mutation term. Setting `mu` to 2e-5 so that `theta` is
-      0.006 -- negligible -- reduces the prediction to the DRIFT-MIGRATION
-      equilibrium the coalescent oracle validated independently, and the gap
-      does not shrink. It GROWS, to -37.9, -34.6 and -40.4 percent at
-      `m` = 0.002, 0.005 and 0.01. So the 7 percent seen with mutation present
-      was mutation partially masking a much larger migration error.
+      The first said "about 7 percent, cause unidentified". The second, reached
+      by setting `mu` to 2e-5 so that the prediction would reduce to the
+      drift-migration equilibrium, reported 38 percent and concluded the engine
+      migrated 1.8 times too fast. Both were artefacts of the regime, not
+      properties of the engine.
 
-      The diagnosis: inverting `F_ST = 1/(1 + 4 Ne m c)` for the `m` the engine
-      behaves as if it had gives ratios of 2.11, 1.70 and 1.79 against the `m`
-      actually set. The engine migrates roughly 1.8 times too fast, near enough
-      to two to suspect a doubled application, and the parent-choice step is
-      where to look: a gene draws from the pool with probability `m` AND that
-      same draw serves as reproduction, so migration and drift are not the two
-      separate events the island model composes.
+      At `mu` = 2e-5 the equilibrium heterozygosity is `theta/(1 + theta)` with
+      `theta` = 0.006, so `H` is about six parts in a thousand. The within-deme
+      homozygosity estimator `sum (c/n)^2` carries a bias of order `1/(2 Ne)` =
+      0.0033, which is more than HALF of `H_T` itself. Every `F_ST` computed
+      there is dominated by that bias. The test built to be decisive was run
+      where its own estimator does not work, and the sharper-sounding diagnosis
+      it produced was worth less than the vaguer one it replaced.
 
-      This is a sharper handover than "7 percent somewhere". It is not fixed
-      here because guessing at a simulator's semantics is what voided batteries
-      21 and 22, and the fix wants a derivation rather than another attempt.
+      That is the fourth design error in this thread and the most instructive:
+      a limit taken to simplify a comparison can destroy the statistic being
+      compared. Check that the estimator survives the limit before trusting
+      what it says there.
 
-So this engine must NOT yet be used as the positive control for the transient
-family. A control that is itself 7 percent off would void every battery it
-gates, correctly, and quoting it as though it were calibrated would be the
-mistake this whole harness exists to prevent. What is needed next is either the
-cause of the island gap or a bias-corrected estimator; the single-population arm
-can be used in the meantime for anything that does not involve migration.
+USING IT. The single-population arm is calibrated at 0.9 percent and is ready.
+The island arm carries a known 4 percent systematic, so it may serve as a
+positive control only where 4 percent is comfortably inside the tolerance, and
+never at a three-sem gate with tight error bars -- there it would void batteries
+for its own offset. Closing that last 4 percent, most likely with unbiased
+homozygosity estimators `sum c(c-1) / (n(n-1))`, is what remains before the
+transient family can be measured against it.
 """
 import math
 
