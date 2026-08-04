@@ -1,6 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Calibrator.SpectrumIdentifiability
 import Mathlib.Data.Nat.Choose.Sum
 import Mathlib.Data.Real.Basic
 import Mathlib.Tactic
@@ -46,6 +47,7 @@ stronger all-sample Müntz obstruction, avoiding two copies of the same rank arg
 - `epochLineageSampleSize_add_epochs`: two additional lineages per added epoch.
 - `spectrumPrecisionMultiplier_add_epochs`: exact `factor ^ (2 * extra)` precision cost.
 - `independentSampleMultiplier_add_epochs`: exact `factor ^ (4 * extra)` data cost.
+- `canonicalGenomeMultiplierForEpochCoordinates_add_epochs`: exponential linear-core cost.
 - `fixedEpochSampleRateExponent_strictAnti`: global worsening of statistical rates.
 - `collisionSpectrumDiscrepancy_eq_distance_pow`: the sharp finite-difference collision.
 - `identifiableUnderLinearObservation_iff_differenceSet_inter_kernel_subset`: intrinsic
@@ -178,6 +180,41 @@ theorem independentSampleMultiplier_add_epochs (K extra factor : ℕ) (hK : 2 �
   rw [epochSpectrumCoordinateCount_add_epochs K extra hK, Nat.mul_add, pow_add]
   congr 2
   omega
+
+/-! ### Coupling epoch complexity to canonical Laplace conditioning -/
+
+/-- Independent-data multiplier needed for the canonical linear Laplace core to support all
+`2K - 3` coordinates of a `K`-epoch model when the per-coordinate conditioning exponent is
+`kappa`. This prices the linear core only; boundary collisions still impose the separate
+Hölder law formalized above. -/
+noncomputable def canonicalGenomeMultiplierForEpochCoordinates
+    (kappa : ℝ) (K : ℕ) : ℝ :=
+  Real.exp (kappa * epochSpectrumCoordinateCount K)
+
+/-- The canonical multiplier buys exactly the coordinate count it was designed for. -/
+theorem stableSieveDimension_canonicalGenomeMultiplierForEpochCoordinates
+    (kappa : ℝ) (K : ℕ) (hkappa : kappa ≠ 0) :
+    SpectrumIdentifiability.stableSieveDimension kappa
+        (canonicalGenomeMultiplierForEpochCoordinates kappa K) =
+      epochSpectrumCoordinateCount K := by
+  have hscaled := SpectrumIdentifiability.stableSieveDimension_of_scaled
+    kappa 1 (epochSpectrumCoordinateCount K) hkappa (by norm_num)
+  simpa [canonicalGenomeMultiplierForEpochCoordinates] using hscaled
+
+/-- **Exact per-epoch price in the canonical Laplace core.** Adding `extra` epochs adds
+`2 * extra` stable spectral coordinates and therefore multiplies the independent-data budget
+by `exp (kappa * (2 * extra))`. In particular, one epoch costs `exp (2 * kappa)`. -/
+theorem canonicalGenomeMultiplierForEpochCoordinates_add_epochs
+    (kappa : ℝ) (K extra : ℕ) (hK : 2 ≤ K) :
+    canonicalGenomeMultiplierForEpochCoordinates kappa (K + extra) =
+      canonicalGenomeMultiplierForEpochCoordinates kappa K *
+        Real.exp (kappa * (2 * extra)) := by
+  rw [canonicalGenomeMultiplierForEpochCoordinates,
+    canonicalGenomeMultiplierForEpochCoordinates,
+    epochSpectrumCoordinateCount_add_epochs K extra hK]
+  rw [show kappa * ((epochSpectrumCoordinateCount K + 2 * extra : ℕ) : ℝ) =
+    kappa * epochSpectrumCoordinateCount K + kappa * (2 * extra) by push_cast; ring,
+    Real.exp_add]
 
 /-- The actionable spectrum-precision table for halving history error. -/
 theorem spectrumPrecisionMultiplier_halving_table :
