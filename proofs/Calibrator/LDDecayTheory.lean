@@ -1126,7 +1126,7 @@ theorem driftRatePerGen_zero_population_is_junk :
 a recombination argument it is not an LD decay rate, which is the reading falsified at
 `driftRatePerGen`. The monotonicity proved here is a fact about `1/(2Ne)`. -/
 theorem larger_pop_slower_drift_rate (Ne₁ Ne₂ : ℝ)
-    (hNe₁ : 0 < Ne₁) (hNe₂ : 0 < Ne₂) (h_larger : Ne₁ < Ne₂) :
+    (hNe₁ : 0 < Ne₁) (h_larger : Ne₁ < Ne₂) :
     driftRatePerGen Ne₂ < driftRatePerGen Ne₁ := by
   unfold driftRatePerGen
   exact div_lt_div_of_pos_left one_pos (by linarith) (by linarith)
@@ -1306,7 +1306,7 @@ theorem ldAfterGenerations_eq_retainedFraction (D₀ r Ne : ℝ) (t : ℕ) :
 /-- Larger current Ne means more LD retained after any fixed time, at a fixed
     recombination rate. -/
 theorem larger_ne_more_ld_retained (r Ne₁ Ne₂ : ℝ) (t : ℕ)
-    (hr0 : 0 ≤ r) (hr1 : r < 1) (hNe₁ : 2 < Ne₁) (hNe₂ : 2 < Ne₂)
+    (hr1 : r < 1) (hNe₁ : 2 < Ne₁)
     (h : Ne₁ < Ne₂) (ht : 0 < t) :
     ldRetainedFraction r Ne₁ t < ldRetainedFraction r Ne₂ t := by
   unfold ldRetainedFraction ldRetentionPerGen
@@ -1344,12 +1344,12 @@ theorem ld_retained_decreasing (r Ne : ℝ) (t₁ t₂ : ℕ)
     The one with larger Ne retains more excess LD. -/
 theorem different_ne_different_ld_persistence
     (D₀ r Ne₁ Ne₂ : ℝ) (t : ℕ)
-    (hD₀ : 0 < D₀) (hr0 : 0 ≤ r) (hr1 : r < 1)
-    (hNe₁ : 2 < Ne₁) (hNe₂ : 2 < Ne₂)
+    (hD₀ : 0 < D₀) (hr1 : r < 1)
+    (hNe₁ : 2 < Ne₁)
     (h_larger : Ne₁ < Ne₂) (ht : 0 < t) :
     D₀ * ldRetainedFraction r Ne₁ t < D₀ * ldRetainedFraction r Ne₂ t := by
   apply mul_lt_mul_of_pos_left _ hD₀
-  exact larger_ne_more_ld_retained r Ne₁ Ne₂ t hr0 hr1 hNe₁ hNe₂ h_larger ht
+  exact larger_ne_more_ld_retained r Ne₁ Ne₂ t hr1 hNe₁ h_larger ht
 
 end LDHalfLifeTrajectory
 
@@ -1404,7 +1404,7 @@ theorem ld_decay_closed_form (r D₀ : ℝ) (t : ℕ) :
   | zero =>
     simp
   | succ n ih =>
-    simp [ih, pow_succ, mul_assoc, mul_left_comm, mul_comm]
+    simp [ih, pow_succ, mul_left_comm, mul_comm]
 
 /-- **LD magnitude decreases each generation** when 0 < r < 1 and D(t) > 0.
 
