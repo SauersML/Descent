@@ -194,6 +194,32 @@ the Beta family: logarithmic in the surviving fraction, with rate constant `γ`.
 noncomputable def logDisplacement (gamma x : ℝ) : ℝ :=
   -(1 / gamma) * Real.log (1 - x)
 
+/-- Larger successful families cause strictly larger logarithmic front displacements whenever
+the front scale is positive.  This is the order-theoretic mechanism behind speed conditioning:
+the canonical tilt does not merely change a normalization, it penalizes the large-family tail. -/
+theorem logDisplacement_strictMono
+    {gamma x y : ℝ} (hgamma : 0 < gamma) (hxy : x < y) (hy : y < 1) :
+    logDisplacement gamma x < logDisplacement gamma y := by
+  have hypos : 0 < 1 - y := by linarith
+  have hxpos : 0 < 1 - x := by linarith
+  have hlog : Real.log (1 - y) < Real.log (1 - x) :=
+    Real.strictMonoOn_log hypos hxpos (by linarith)
+  unfold logDisplacement
+  have hcoefficient : -(1 / gamma) < 0 := neg_lt_zero.mpr (one_div_pos.mpr hgamma)
+  exact mul_lt_mul_of_neg_left hlog hcoefficient
+
+/-- A positive canonical speed penalty strictly suppresses larger successful-family fractions
+under the logarithmic response law. -/
+theorem logDisplacement_speedTilt_strictAnti
+    {gamma theta x y : ℝ} (hgamma : 0 < gamma) (htheta : 0 < theta)
+    (hxy : x < y) (hy : y < 1) :
+    Real.exp (-(theta * logDisplacement gamma y)) <
+      Real.exp (-(theta * logDisplacement gamma x)) := by
+  apply Real.exp_lt_exp.mpr
+  have hdisplacement : logDisplacement gamma x < logDisplacement gamma y :=
+    logDisplacement_strictMono hgamma hxy hy
+  nlinarith
+
 /-- **The tilt factorizes exactly.**  Under the logarithmic displacement law the exponential
 tilt `exp(-θ r(x))` is the power `(1-x)^(θ/γ)`. -/
 theorem logDisplacement_laplace_factors (gamma theta x : ℝ) (hg : gamma ≠ 0) (hx : x < 1) :
