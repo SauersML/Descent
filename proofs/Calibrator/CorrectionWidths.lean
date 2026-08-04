@@ -438,6 +438,19 @@ theorem hasPositiveLowerBound_postcomp_iff
     HasPositiveLowerBound (B.comp A) ↔ HasPositiveLowerBound A := by
   exact ⟨HasPositiveLowerBound.of_postcomp, fun hA ↦ hA.comp hB⟩
 
+/-- **Approximate-kernel invariance under stable processing.** A downstream map bounded below
+preserves and reflects the existence of arbitrarily deep unit targets. -/
+theorem hasUnitApproxKernel_postcomp_iff
+    {Z : Type*} [NormedAddCommGroup Z] [NormedSpace ℝ Z]
+    (A : H →L[ℝ] Y) (B : Y →L[ℝ] Z) (hB : HasPositiveLowerBound B) :
+    HasUnitApproxKernel (B.comp A) ↔ HasUnitApproxKernel A := by
+  calc
+    HasUnitApproxKernel (B.comp A) ↔ ¬ HasPositiveLowerBound (B.comp A) :=
+      (not_hasPositiveLowerBound_iff_hasUnitApproxKernel (B.comp A)).symm
+    _ ↔ ¬ HasPositiveLowerBound A :=
+      not_congr (hasPositiveLowerBound_postcomp_iff A B hB)
+    _ ↔ HasUnitApproxKernel A := not_hasPositiveLowerBound_iff_hasUnitApproxKernel A
+
 /-- The zero observation on the real line is the simplest concrete approximate-kernel model. -/
 theorem hasUnitApproxKernel_zero_real :
     HasUnitApproxKernel (0 : ℝ →L[ℝ] ℝ) := by
