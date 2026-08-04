@@ -30,6 +30,7 @@ the analytic extraction of weakly-null depth cascades is intentionally not smugg
 - `adaptiveCorrectionSet_smul`: adaptive correction is invariant under nonzero target scaling.
 - `not_hasPositiveLowerBound_iff_hasUnitApproxKernel`: exact stability/depth dichotomy.
 - `HasUnitApproxKernel.postcomp`: bounded observation processing preserves deep targets.
+- `hasPositiveLowerBound_postcomp_iff`: exact stability invariance under stable processing.
 - `finite_postprocessors_simultaneously_small`: one deep target blinds a finite dictionary.
 - `finite_postprocessors_adaptive_span_small`: ℓ¹ control of every adaptive combination.
 - `finite_postprocessors_budgeted_adaptive_residual`: the residual lower bound `1 - Λε`.
@@ -375,6 +376,21 @@ theorem not_hasPositiveLowerBound_iff_hasUnitApproxKernel (A : H →L[ℝ] Y) :
     have hlower : c ≤ ‖A β‖ := by simpa [hunit] using hbound β
     linarith
 
+/-- Positive lower stability bounds multiply under composition. -/
+theorem HasPositiveLowerBound.comp
+    {Z : Type*} [NormedAddCommGroup Z] [NormedSpace ℝ Z]
+    {A : H →L[ℝ] Y} (hA : HasPositiveLowerBound A)
+    {B : Y →L[ℝ] Z} (hB : HasPositiveLowerBound B) :
+    HasPositiveLowerBound (B.comp A) := by
+  obtain ⟨cA, hcA, hboundA⟩ := hA
+  obtain ⟨cB, hcB, hboundB⟩ := hB
+  refine ⟨cB * cA, mul_pos hcB hcA, ?_⟩
+  intro β
+  calc
+    (cB * cA) * ‖β‖ = cB * (cA * ‖β‖) := by ring
+    _ ≤ cB * ‖A β‖ := mul_le_mul_of_nonneg_left (hboundA β) hcB.le
+    _ ≤ ‖B (A β)‖ := hboundB (A β)
+
 /-- **Approximate-kernel data processing.** Bounded downstream processing cannot repair an
 observation operator that has arbitrarily deep unit targets. This covers compression, feature
 maps, and bounded re-encodings before any correction dictionary is applied. -/
@@ -402,6 +418,25 @@ theorem not_hasPositiveLowerBound_postcomp
     {A : H →L[ℝ] Y} (hdeep : HasUnitApproxKernel A) (B : Y →L[ℝ] Z) :
     ¬ HasPositiveLowerBound (B.comp A) := by
   exact (not_hasPositiveLowerBound_iff_hasUnitApproxKernel (B.comp A)).2 (hdeep.postcomp B)
+
+/-- A bounded downstream map cannot manufacture a positive lower bound absent from its source. -/
+theorem HasPositiveLowerBound.of_postcomp
+    {Z : Type*} [NormedAddCommGroup Z] [NormedSpace ℝ Z]
+    {A : H →L[ℝ] Y} {B : Y →L[ℝ] Z}
+    (hcomp : HasPositiveLowerBound (B.comp A)) :
+    HasPositiveLowerBound A := by
+  by_contra hA
+  have hdeep := (not_hasPositiveLowerBound_iff_hasUnitApproxKernel A).1 hA
+  exact not_hasPositiveLowerBound_postcomp hdeep B hcomp
+
+/-- **Stability invariance under stable observation processing.** If the downstream map is
+itself bounded below, postcomposition preserves and reflects the source's positive lower
+stability bound exactly. -/
+theorem hasPositiveLowerBound_postcomp_iff
+    {Z : Type*} [NormedAddCommGroup Z] [NormedSpace ℝ Z]
+    (A : H →L[ℝ] Y) (B : Y →L[ℝ] Z) (hB : HasPositiveLowerBound B) :
+    HasPositiveLowerBound (B.comp A) ↔ HasPositiveLowerBound A := by
+  exact ⟨HasPositiveLowerBound.of_postcomp, fun hA ↦ hA.comp hB⟩
 
 /-- The zero observation on the real line is the simplest concrete approximate-kernel model. -/
 theorem hasUnitApproxKernel_zero_real :
