@@ -32,14 +32,27 @@ recalibration (a + b × PGS) for population T?
 
 section LinearRecalibration
 
+/-- Target-population slope obtained by transporting a source slope through effect correlation
+`rho` and score-variance ratio `alpha`. -/
+noncomputable def ancestryRecalibratedSlope (bSource rho alpha : ℝ) : ℝ :=
+  rho * (bSource * alpha) / alpha ^ 2
 
 /-- **Recalibration slope under drift model.**
     If effects change by factor ρ and variance changes by factor α,
     optimal slope = ρ × b_source / α. -/
-theorem mul_div_sq_eq_div
+theorem ancestryRecalibratedSlope_eq
     (b_source ρ α : ℝ) (h_α : α ≠ 0) :
-    ρ * (b_source * α) / (α ^ 2) = ρ * b_source / α := by
+    ancestryRecalibratedSlope b_source ρ α = ρ * b_source / α := by
+  unfold ancestryRecalibratedSlope
   field_simp
+
+/-- Source `R²` retained after linear recalibration at squared effect correlation `rhoSq`. -/
+noncomputable def ancestryRecalibratedR2 (r2Source rhoSq : ℝ) : ℝ :=
+  r2Source * rhoSq
+
+/-- Source `R²` lost to non-recoverable effect turnover. -/
+noncomputable def effectTurnoverR2Loss (r2Source rhoSq : ℝ) : ℝ :=
+  r2Source * (1 - rhoSq)
 
 /-- **Recalibration recovers R² up to effect turnover limit.**
     After optimal linear recalibration, the residual R² loss is
@@ -50,12 +63,11 @@ theorem mul_div_sq_eq_div
     The turnover loss = r2_source × (1 - ρ²) is the non-recoverable part.
     These two components sum to r2_source by algebraic decomposition:
       r2_source × ρ² + r2_source × (1 - ρ²) = r2_source × (ρ² + 1 - ρ²) = r2_source. -/
-theorem mul_add_mul_one_sub_eq_self
+theorem ancestryRecalibratedR2_add_effectTurnoverR2Loss
     (r2_source ρ_sq : ℝ) :
-    let r2_recalibrated := r2_source * ρ_sq
-    let r2_loss_turnover := r2_source * (1 - ρ_sq)
-    r2_recalibrated + r2_loss_turnover = r2_source := by
-  simp only
+    ancestryRecalibratedR2 r2_source ρ_sq +
+      effectTurnoverR2Loss r2_source ρ_sq = r2_source := by
+  unfold ancestryRecalibratedR2 effectTurnoverR2Loss
   ring
 
 
