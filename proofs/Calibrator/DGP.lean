@@ -444,6 +444,15 @@ noncomputable def demographicCovarianceGapLowerBound
     (fstSource fstTarget recombRate arraySparsity kappa : ℝ) : ℝ :=
   kappa * taggingMismatchScale recombRate arraySparsity * (fstTarget - fstSource)
 
+/-- **Equal differentiation gives a vacuous bound.** The file already records that this bound is
+identically zero when the two populations share an `F_ST`, as a warning; stating it fixes the
+origin, which no proportionality claim about `kappa` or the mismatch scale can. -/
+theorem demographicCovarianceGapLowerBound_equal_fst
+    (fst recombRate arraySparsity kappa : ℝ) :
+    demographicCovarianceGapLowerBound fst fst recombRate arraySparsity kappa = 0 := by
+  unfold demographicCovarianceGapLowerBound
+  ring
+
 /-- The two linked loci need two distinct indices, so the block size must be at least two.
 That is carried as an ordinary explicit argument `ht : 2 ≤ t` rather than a `Fact` instance:
 the bound is a premise of every statement below, and instance syntax would hide it from
