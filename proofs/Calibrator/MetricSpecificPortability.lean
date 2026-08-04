@@ -1563,8 +1563,10 @@ noncomputable def vResolvedConditional (v : Fin 2) : Fin 2 → ℝ :=
 /-- **Resolving `U` exposes no drift.** -/
 theorem uResolvedConditional_driftDefect_zero (u : Fin 2) :
     driftDefect twoBitIndexWeights (uResolvedConditional u) = 0 := by
-  unfold driftDefect pooledConditional uResolvedConditional
-  norm_num [Fin.sum_univ_two, bitSign, driftFieldB, twoBitIndexWeights, binnedRiskByAncestry, Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons]
+  unfold driftDefect pooledConditional uResolvedConditional twoBitIndexWeights
+    binnedRiskByAncestry
+  simp only [Fin.sum_univ_two, Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons]
+  ring
 
 /-- **Resolving `V` exposes drift**, at every value of the bit. -/
 theorem vResolvedConditional_driftDefect_pos (v : Fin 2) :
