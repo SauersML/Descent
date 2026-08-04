@@ -528,6 +528,46 @@ def TargetIdentifiableUnderLinearObservation
   ∀ left ∈ modelClass, ∀ right ∈ modelClass,
     observation left = observation right → target left = target right
 
+/-- Restricting the biological model class preserves identifiability of every target. -/
+theorem TargetIdentifiableUnderLinearObservation.mono
+    {R V W Z : Type*} [Ring R]
+    [AddCommGroup V] [Module R V] [AddCommGroup W] [Module R W]
+    [AddCommGroup Z] [Module R Z]
+    {observation : V →ₗ[R] W} {target : V →ₗ[R] Z} {large small : Set V}
+    (hidentifiable : TargetIdentifiableUnderLinearObservation observation target large)
+    (hsubset : small ⊆ large) :
+    TargetIdentifiableUnderLinearObservation observation target small := by
+  intro left hleft right hright hequal
+  exact hidentifiable left (hsubset hleft) right (hsubset hright) hequal
+
+/-- Processing an observation cannot make a previously unidentified target identifiable: if
+the processed observation suffices, then the original observation suffices. -/
+theorem TargetIdentifiableUnderLinearObservation.of_processedObservation
+    {R V W Y Z : Type*} [Ring R]
+    [AddCommGroup V] [Module R V] [AddCommGroup W] [Module R W]
+    [AddCommGroup Y] [Module R Y] [AddCommGroup Z] [Module R Z]
+    (observation : V →ₗ[R] W) (processing : W →ₗ[R] Y) (target : V →ₗ[R] Z)
+    (modelClass : Set V)
+    (hidentifiable :
+      TargetIdentifiableUnderLinearObservation (processing.comp observation) target modelClass) :
+    TargetIdentifiableUnderLinearObservation observation target modelClass := by
+  intro left hleft right hright hequal
+  apply hidentifiable left hleft right hright
+  simp only [LinearMap.comp_apply, hequal]
+
+/-- Every linear summary of an identifiable target remains identifiable on the same model
+class. -/
+theorem TargetIdentifiableUnderLinearObservation.postcomp
+    {R V W Y Z : Type*} [Ring R]
+    [AddCommGroup V] [Module R V] [AddCommGroup W] [Module R W]
+    [AddCommGroup Y] [Module R Y] [AddCommGroup Z] [Module R Z]
+    {observation : V →ₗ[R] W} {target : V →ₗ[R] Y} {modelClass : Set V}
+    (hidentifiable : TargetIdentifiableUnderLinearObservation observation target modelClass)
+    (processing : Y →ₗ[R] Z) :
+    TargetIdentifiableUnderLinearObservation observation (processing.comp target) modelClass := by
+  intro left hleft right hright hequal
+  simp only [LinearMap.comp_apply, hidentifiable left hleft right hright hequal]
+
 /-- **Class-relative functional-identifiability criterion.** A target is recoverable on a model
 class exactly when every admissible difference invisible to the observation is also invisible
 to the target. -/
