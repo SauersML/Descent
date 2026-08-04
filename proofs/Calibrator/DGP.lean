@@ -3073,9 +3073,6 @@ theorem PGSEvolutionaryModel.coordinateSummary_explicit
       PGSEvolutionaryModel.toEvo,
       sharedLDRetention, mutationLDErosion, migrationLDBoost, fstEquilibrium]
 
-/-- Monotonicity of `Phi`, a corollary of `strictMono_Phi` in `Probability`. -/
-theorem Phi_monotone : Monotone Phi := strictMono_Phi.monotone
-
 /-! ### Step 3: Metric evaluation from explicit target signal and additive losses
 
 The rigorous interface now stops at the component summaries above. This file

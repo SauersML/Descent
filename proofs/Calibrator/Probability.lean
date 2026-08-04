@@ -408,6 +408,19 @@ theorem HardyWeinbergModel.genotypeVariance_eq
   simp only [HardyWeinbergModel.genotypeProb, altAlleleCount, HardyWeinbergModel.refFreq]
   ring_nf
 
+/-- **A polymorphic locus has positive genotype variance.**
+
+Ten proofs across `CondensationUnification` and `EpistaticChaos` opened by deriving this
+from `genotypeVariance_eq` in the same four lines.  It is one fact about the model and it is
+named here, beside the identity it comes from. -/
+theorem HardyWeinbergModel.genotypeVariance_pos
+    (h : HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
+    0 < h.genotypeVariance := by
+  rw [h.genotypeVariance_eq]
+  unfold HardyWeinbergModel.refFreq
+  have hcomp : (0 : ℝ) < 1 - h.altFreq := by linarith
+  nlinarith [hq0, hcomp]
+
 /-- Absolute third centered moment at one Hardy-Weinberg locus. This is the term that
 enters the Berry-Esseen numerator for weighted sums of bounded genotype variables.
 
@@ -598,8 +611,9 @@ theorem strictMono_Phi : StrictMono Phi := by
     measureReal_def, measureReal_def]
   exact ENNReal.toReal_lt_toReal (measure_ne_top _ _) (measure_ne_top _ _) |>.mpr hlt
 
-/- The `Monotone Phi` corollary is stated where it is used: `Calibrator.monotone_Phi` in
-`Condensation` and `Calibrator.Phi_monotone` in `DGP`, both `strictMono_Phi.monotone`. -/
+/-- Monotonicity of `Phi`, the weak corollary of `strictMono_Phi`.  It lives here, beside the
+strict form it follows from, rather than being restated in each file that uses it. -/
+theorem Phi_monotone : Monotone Phi := strictMono_Phi.monotone
 
 /-- Heteroscedastic Gaussian noise assumption:
 for each ancestry coordinate `x`, the environmental noise follows `N(0, σ²(x))`. -/

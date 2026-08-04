@@ -595,11 +595,7 @@ theorem standardizedGenotype_symmetric_iff
     (∃ coding : SymmetricCoding DiploidGenotype,
         (∀ g, coding.weight g = h.genotypeProb g) ∧
         (∀ g, coding.value g = h.standardizedGenotype g)) ↔ h.altFreq = 1 / 2 := by
-  have hvar : 0 < h.genotypeVariance := by
-    rw [h.genotypeVariance_eq]
-    unfold HardyWeinbergModel.refFreq
-    have hcomp : (0 : ℝ) < 1 - h.altFreq := by linarith
-    nlinarith [hq0, hcomp]
+  have hvar : 0 < h.genotypeVariance := h.genotypeVariance_pos hq0 hq1
   have hs : 0 < Real.sqrt h.genotypeVariance := Real.sqrt_pos.mpr hvar
   have hsne : Real.sqrt h.genotypeVariance ≠ 0 := ne_of_gt hs
   constructor
@@ -778,11 +774,7 @@ Theorem D, unlike everything in §`SignErasure`, is not restricted to `q = 1/2`.
 theorem standardizedGenotype_second_moment_one (h : HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
     ∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 2 = 1 := by
-  have hvar : 0 < h.genotypeVariance := by
-    rw [h.genotypeVariance_eq]
-    unfold HardyWeinbergModel.refFreq
-    have hcomp : (0 : ℝ) < 1 - h.altFreq := by linarith
-    nlinarith [hq0, hcomp]
+  have hvar : 0 < h.genotypeVariance := h.genotypeVariance_pos hq0 hq1
   have hsq : Real.sqrt h.genotypeVariance ^ 2 = h.genotypeVariance :=
     Real.sq_sqrt hvar.le
   have hfactor : ∀ g : DiploidGenotype,
@@ -817,11 +809,7 @@ theorem standardizedGenotype_fourth_moment (h : HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
     ∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4 =
       1 / h.genotypeVariance := by
-  have hvar : 0 < h.genotypeVariance := by
-    rw [h.genotypeVariance_eq]
-    unfold HardyWeinbergModel.refFreq
-    have hcomp : (0 : ℝ) < 1 - h.altFreq := by linarith
-    nlinarith [hq0, hcomp]
+  have hvar : 0 < h.genotypeVariance := h.genotypeVariance_pos hq0 hq1
   have hsq : Real.sqrt h.genotypeVariance ^ 2 = h.genotypeVariance :=
     Real.sq_sqrt hvar.le
   have hquart : Real.sqrt h.genotypeVariance ^ 4 = h.genotypeVariance ^ 2 := by
@@ -857,11 +845,7 @@ theorem standardizedSquare_second_cumulant (h : HardyWeinbergModel)
     h.genotypeVariance *
         ((∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4) - 1) =
       1 - h.genotypeVariance := by
-  have hvar : 0 < h.genotypeVariance := by
-    rw [h.genotypeVariance_eq]
-    unfold HardyWeinbergModel.refFreq
-    have hcomp : (0 : ℝ) < 1 - h.altFreq := by linarith
-    nlinarith [hq0, hcomp]
+  have hvar : 0 < h.genotypeVariance := h.genotypeVariance_pos hq0 hq1
   rw [standardizedGenotype_fourth_moment h hq0 hq1, mul_sub, mul_one_div,
     div_self (ne_of_gt hvar), mul_one]
 
@@ -1000,11 +984,7 @@ theorem standardizedGenotype_sixth_moment (h : HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
     ∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 6 =
       (1 / h.genotypeVariance) ^ 2 + 10 * (1 / h.genotypeVariance) - 20 := by
-  have hvar : 0 < h.genotypeVariance := by
-    rw [h.genotypeVariance_eq]
-    unfold HardyWeinbergModel.refFreq
-    have hcomp : (0 : ℝ) < 1 - h.altFreq := by linarith
-    nlinarith [hq0, hcomp]
+  have hvar : 0 < h.genotypeVariance := h.genotypeVariance_pos hq0 hq1
   have hne : h.genotypeVariance ≠ 0 := ne_of_gt hvar
   have hsq : Real.sqrt h.genotypeVariance ^ 2 = h.genotypeVariance :=
     Real.sq_sqrt hvar.le
@@ -1123,11 +1103,7 @@ theorem centeredSquare_third_moment_zero_iff_balanced (h : HardyWeinbergModel)
     (∑ g : DiploidGenotype, h.genotypeProb g * h.centeredSquare g ^ 3) = 0 ↔
       1 / h.genotypeVariance = 2 := by
   rw [centeredSquare_third_moment_factored h hq0 hq1]
-  have hvar : 0 < h.genotypeVariance := by
-    rw [h.genotypeVariance_eq]
-    unfold HardyWeinbergModel.refFreq
-    have hcomp : (0 : ℝ) < 1 - h.altFreq := by linarith
-    nlinarith [hq0, hcomp]
+  have hvar : 0 < h.genotypeVariance := h.genotypeVariance_pos hq0 hq1
   have hinvpos : 0 < 1 / h.genotypeVariance := by positivity
   constructor
   · intro hzero
@@ -1152,11 +1128,7 @@ theorem standardizedGenotype_even_moment_mul (h : HardyWeinbergModel)
     (∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ (2 * m)) *
         h.genotypeVariance ^ m =
       ∑ g : DiploidGenotype, h.genotypeProb g * h.centeredAltAlleleCount g ^ (2 * m) := by
-  have hvar : 0 < h.genotypeVariance := by
-    rw [h.genotypeVariance_eq]
-    unfold HardyWeinbergModel.refFreq
-    have hcomp : (0 : ℝ) < 1 - h.altFreq := by linarith
-    nlinarith [hq0, hcomp]
+  have hvar : 0 < h.genotypeVariance := h.genotypeVariance_pos hq0 hq1
   have hpow : Real.sqrt h.genotypeVariance ^ (2 * m) = h.genotypeVariance ^ m := by
     rw [pow_mul, Real.sq_sqrt hvar.le]
   have hterm : ∀ g : DiploidGenotype,

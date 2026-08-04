@@ -350,6 +350,12 @@ theorem pioneerFraction_inverse (x width : ℝ) (p : ℕ) (hw : 0 < width ^ p)
   field_simp
   ring
 
+/-- **The side condition of the pioneer substitution.**  Every identity in `w = x / (1 - x)`
+clears its denominators against this one nonvanishing, so it is named here rather than
+re-derived at each use -- including in `XiFromMarkedBreakouts`, which imports this file. -/
+theorem pioneer_one_sub_ne_zero {x : ℝ} (hx1 : x ≠ 1) : (1 : ℝ) - x ≠ 0 :=
+  sub_ne_zero.mpr (Ne.symm hx1)
+
 /-- **The pioneer substitution produces the inverse-square intensity exactly.**
 
 The overshoot intensity `A exp(-γδ)dδ` becomes
@@ -360,7 +366,7 @@ theorem pioneerIntensity_eq_inverseSquare
     (hg : gamma ≠ 0) (hw : width ^ p ≠ 0) (hx0 : x ≠ 0) (hx1 : x ≠ 1) :
     (A * (B / (width ^ p * (x / (1 - x))))) * (1 / (gamma * (x * (1 - x)))) =
       (A * B / (gamma * width ^ p)) * (1 / x ^ 2) := by
-  have h1 : (1 : ℝ) - x ≠ 0 := sub_ne_zero.mpr (Ne.symm hx1)
+  have h1 := pioneer_one_sub_ne_zero hx1
   field_simp
 
 /-- Genealogical timescale produced by the pioneer substitution. -/

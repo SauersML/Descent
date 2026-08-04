@@ -1,6 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Calibrator.MultipleMergerBlindness
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Arctan
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.ArctanDeriv
 import Mathlib.Analysis.SpecialFunctions.Log.Basic
@@ -158,11 +159,10 @@ theorem tsum_one_div_coalescentRate :
 /-- The contrast that makes the criterion a criterion rather than an accident of this proof: a
 ladder growing linearly has a divergent reciprocal sum, and no such nullspace. -/
 theorem not_summable_one_div_linearRate :
-    ¬ Summable fun k : ℕ ↦ 1 / ((k : ℝ) + 1) := by
-  intro h
-  refine Real.not_summable_one_div_natCast ?_
-  refine (summable_nat_add_iff 1).mp ?_
-  simpa using h
+    ¬ Summable fun k : ℕ ↦ 1 / ((k : ℝ) + 1) :=
+  -- The linear ladder is the extreme case of the merger-rate criterion, so this reads off
+  -- `not_summable_reciprocal_of_rate_le_natSucc` rather than repeating its plumbing.
+  not_summable_reciprocal_of_rate_le_natSucc _ (fun _ ↦ by positivity) (fun _ ↦ le_rfl)
 
 /-! ## Fixed sample size: a linear count, and analyticity does not help -/
 

@@ -53,15 +53,6 @@ theorem dynamicsPooledProjector_fixed_iff (β : Bool → ℝ) :
 noncomputable def dynamicsContrastCoefficient (β : Bool → ℝ) : ℝ :=
   (β true - β false) / 2
 
-/-- **Exact biological correction normal form.**  Every two-dynamics field is the sum of its
-pooled, recoverable component and one scalar multiple of the correction-blind contrast. -/
-theorem dynamics_common_contrast_decomposition (β : Bool → ℝ) :
-    β = dynamicsPooledProjector β + dynamicsContrastCoefficient β • dynamicsContrast := by
-  funext persists
-  cases persists <;>
-    simp [dynamicsPooledProjector_apply, dynamicsContrastCoefficient, dynamicsContrast] <;>
-    ring
-
 /-- The residual of canonical pooled correction is exactly the contrast component. -/
 theorem dynamicsPooledProjector_residual (β : Bool → ℝ) :
     β - dynamicsPooledProjector β = dynamicsContrastCoefficient β • dynamicsContrast := by
@@ -69,6 +60,15 @@ theorem dynamicsPooledProjector_residual (β : Bool → ℝ) :
   cases persists <;>
     simp [dynamicsPooledProjector_apply, dynamicsContrastCoefficient, dynamicsContrast] <;>
     ring
+
+/-- **Exact biological correction normal form.**  Every two-dynamics field is the sum of its
+pooled, recoverable component and one scalar multiple of the correction-blind contrast.
+
+This is the residual identity above rearranged, not a second computation: "what pooled
+correction misses is the contrast" and "field = pooled + contrast" are one fact. -/
+theorem dynamics_common_contrast_decomposition (β : Bool → ℝ) :
+    β = dynamicsPooledProjector β + dynamicsContrastCoefficient β • dynamicsContrast :=
+  sub_eq_iff_eq_add'.mp (dynamicsPooledProjector_residual β)
 
 /-- The canonical pooled projector is representable by every positive uniform dictionary order. -/
 theorem dynamicsPooledProjector_mem_uniformCorrectionFamily

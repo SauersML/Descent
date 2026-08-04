@@ -159,15 +159,6 @@ noncomputable def cellMean (weight value : Carrier → ℝ) (cell : Carrier → 
   (∑ a, if cell a = c then weight a * value a else 0) /
     (∑ a, if cell a = c then weight a else 0)
 
-/-- With a vanishing denominator Mathlib returns `0`, which is a value this quantity can also
-take legitimately, so the branch is named rather than left to be inferred from the result. -/
-theorem cellMean_at_zero_denominator_is_junk (weight value : Carrier → ℝ) (cell : Carrier → Cell) (c : Cell)
-    (hzero : (∑ a, if cell a = c then weight a else 0) = 0) :
-    cellMean weight value cell c = 0 := by
-  unfold cellMean
-  rw [hzero, div_zero]
-
-
 /-- **The empty-cell branch, named.**  A cell carrying no weight has no mean to report and the
 convention returns zero -- not a value any carrier holds.  Consumers reading `cellMean` as "the
 typical value in this cell" must check the cell is inhabited; the balance theorem below does not

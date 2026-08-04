@@ -829,29 +829,32 @@ theorem fstMutationDriftEquilibrium_strictAnti (a b : ℝ)
   have hden_lt : 1 + a < 1 + b := by linarith
   simpa using div_lt_div_of_pos_left one_pos hden hden_lt
 
+/-- **Equilibrium Fst decreases when the compound parameter `Ne * μ` increases.**
+
+The scaled mutation rate sees `Ne` and `μ` only through their product, so raising either one
+is the same move.  Both single-parameter statements below are this fact; stated separately,
+each carried its own copy of the unfolding. -/
+theorem fstEquilibrium_decreases_with_product (Ne₁ μ₁ Ne₂ μ₂ : ℝ)
+    (h_nonneg : 0 ≤ Ne₁ * μ₁) (h_more : Ne₁ * μ₁ < Ne₂ * μ₂) :
+    fstMutationDriftEquilibrium (scaledMutationRate Ne₂ μ₂) <
+      fstMutationDriftEquilibrium (scaledMutationRate Ne₁ μ₁) := by
+  apply fstMutationDriftEquilibrium_strictAnti <;> unfold scaledMutationRate <;> nlinarith
+
 /-- Equilibrium Fst decreases when Ne increases (with μ fixed). -/
 theorem fstEquilibrium_decreases_with_Ne (μ Ne₁ Ne₂ : ℝ)
     (hμ : 0 < μ) (hNe₁ : 0 < Ne₁)
     (h_more : Ne₁ < Ne₂) :
     fstMutationDriftEquilibrium (scaledMutationRate Ne₂ μ) <
-      fstMutationDriftEquilibrium (scaledMutationRate Ne₁ μ) := by
-  apply fstMutationDriftEquilibrium_strictAnti
-  · unfold scaledMutationRate
-    nlinarith
-  unfold scaledMutationRate
-  nlinarith
+      fstMutationDriftEquilibrium (scaledMutationRate Ne₁ μ) :=
+  fstEquilibrium_decreases_with_product Ne₁ μ Ne₂ μ (by nlinarith) (by nlinarith)
 
 /-- Equilibrium Fst decreases when μ increases (with Ne fixed). -/
 theorem fstEquilibrium_decreases_with_mu (Ne μ₁ μ₂ : ℝ)
     (hNe : 0 < Ne) (hμ₁ : 0 < μ₁)
     (h_more : μ₁ < μ₂) :
     fstMutationDriftEquilibrium (scaledMutationRate Ne μ₂) <
-      fstMutationDriftEquilibrium (scaledMutationRate Ne μ₁) := by
-  apply fstMutationDriftEquilibrium_strictAnti
-  · unfold scaledMutationRate
-    nlinarith
-  unfold scaledMutationRate
-  nlinarith
+      fstMutationDriftEquilibrium (scaledMutationRate Ne μ₁) :=
+  fstEquilibrium_decreases_with_product Ne μ₁ Ne μ₂ (by nlinarith) (by nlinarith)
 
 /-- **Complementarity of heterozygosity and Fst under mutation-drift balance.**
 

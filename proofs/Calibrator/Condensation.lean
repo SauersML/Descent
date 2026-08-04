@@ -347,9 +347,6 @@ theorem windowVariance_zero_window (v : ℝ) : windowVariance 0 v = Phi 0 := by
   unfold windowVariance
   norm_num
 
-/-- Monotonicity of `Phi`, a corollary of `strictMono_Phi` in `Probability`. -/
-theorem monotone_Phi : Monotone Phi := strictMono_Phi.monotone
-
 theorem Phi_nonneg (x : ℝ) : 0 ≤ Phi x := by
   unfold Phi
   exact ProbabilityTheory.cdf_nonneg _ _
@@ -373,7 +370,7 @@ theorem windowVariance_mono {v : ℝ} (hv : 0 < v) :
   intro a b hab
   have hs : 0 < Real.sqrt v := Real.sqrt_pos.mpr hv
   have : a / Real.sqrt v ≤ b / Real.sqrt v := by gcongr
-  exact monotone_Phi this
+  exact Phi_monotone this
 
 /-!
 ## 5. What the condensation theorems say about a polygenic score

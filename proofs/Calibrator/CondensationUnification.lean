@@ -304,11 +304,7 @@ coordinate of the tower is an object this development already had. -/
 theorem standardizedGenotype_sq_eq_standardizedSquare (h : HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) (g : DiploidGenotype) :
     h.standardizedGenotype g ^ 2 = h.standardizedSquare g := by
-  have hvar : 0 < h.genotypeVariance := by
-    rw [h.genotypeVariance_eq]
-    unfold HardyWeinbergModel.refFreq
-    have hcomp : (0 : ℝ) < 1 - h.altFreq := by linarith
-    nlinarith [hq0, hcomp]
+  have hvar : 0 < h.genotypeVariance := h.genotypeVariance_pos hq0 hq1
   have hsq : Real.sqrt h.genotypeVariance ^ 2 = h.genotypeVariance :=
     Real.sq_sqrt hvar.le
   unfold HardyWeinbergModel.standardizedGenotype HardyWeinbergModel.standardizedSquare
@@ -1177,11 +1173,7 @@ rigidity phase boundary. -/
 theorem standardizedGenotype_fourth_moment_ge_two (h : HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
     2 ≤ ∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4 := by
-  have hvar : 0 < h.genotypeVariance := by
-    rw [h.genotypeVariance_eq]
-    unfold HardyWeinbergModel.refFreq
-    have hcomp : (0 : ℝ) < 1 - h.altFreq := by linarith
-    nlinarith [hq0, hcomp]
+  have hvar : 0 < h.genotypeVariance := h.genotypeVariance_pos hq0 hq1
   rw [standardizedGenotype_fourth_moment h hq0 hq1, le_div_iff₀ hvar]
   have hle := hweGenotypeVariance_le_half h
   linarith [hle]
@@ -1193,11 +1185,7 @@ theorem standardizedGenotype_fourth_moment_eq_two_iff (h : HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
     (∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4) = 2 ↔
       h.altFreq = 1 / 2 := by
-  have hvar : 0 < h.genotypeVariance := by
-    rw [h.genotypeVariance_eq]
-    unfold HardyWeinbergModel.refFreq
-    have hcomp : (0 : ℝ) < 1 - h.altFreq := by linarith
-    nlinarith [hq0, hcomp]
+  have hvar : 0 < h.genotypeVariance := h.genotypeVariance_pos hq0 hq1
   have hveq : h.genotypeVariance = 2 * h.altFreq * (1 - h.altFreq) := by
     rw [h.genotypeVariance_eq]
     unfold HardyWeinbergModel.refFreq

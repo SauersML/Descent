@@ -376,23 +376,32 @@ theorem localizedCovarianceBlock_isospectral_rotatedCovarianceBlock (a : ℝ) :
   rw [localizedCovarianceBlock_characteristicDeterminant,
     rotatedCovarianceBlock_characteristicDeterminant]
 
+/-- **A spectral root of either block is `a` or `a + 1`.**
+
+Both bounds below are read off this: the root is one of two values, and where each lands
+follows from where `a` lands.  Stated separately, each carried its own case split on the
+same factorisation. -/
+theorem block_spectralParameter_eq_or
+    (a spectralParameter : ℝ)
+    (hroot : (a - spectralParameter) * (a + 1 - spectralParameter) = 0) :
+    spectralParameter = a ∨ spectralParameter = a + 1 := by
+  rcases mul_eq_zero.mp hroot with hroot | hroot
+  · exact Or.inl (by linarith)
+  · exact Or.inr (by linarith)
+
 /-- Every spectral root of either block is at least one when `1 ≤ a`. -/
 theorem block_spectralParameter_ge_one
     (a spectralParameter : ℝ) (ha : 1 ≤ a)
     (hroot : (a - spectralParameter) * (a + 1 - spectralParameter) = 0) :
     1 ≤ spectralParameter := by
-  rcases mul_eq_zero.mp hroot with hroot | hroot
-  · linarith
-  · linarith
+  rcases block_spectralParameter_eq_or a spectralParameter hroot with h | h <;> linarith
 
 /-- Every spectral root of either block is at most three when `a ≤ 2`. -/
 theorem block_spectralParameter_le_three
     (a spectralParameter : ℝ) (ha : a ≤ 2)
     (hroot : (a - spectralParameter) * (a + 1 - spectralParameter) = 0) :
     spectralParameter ≤ 3 := by
-  rcases mul_eq_zero.mp hroot with hroot | hroot
-  · linarith
-  · linarith
+  rcases block_spectralParameter_eq_or a spectralParameter hroot with h | h <;> linarith
 
 /-- Per-coordinate normalization of the entrywise cube invariant for a two-dimensional block. -/
 noncomputable def blockEntryCubeMean (covariance : Matrix (Fin 2) (Fin 2) ℝ) : ℝ :=
@@ -513,6 +522,32 @@ offsets `a ∈ [1, 2]`. -/
 noncomputable def rotatedUniformFourthInvariant : ℝ :=
   ∫ a in (1 : ℝ)..2, blockEntryFourthMean (rotatedCovarianceBlock a)
 
+/-- **The integral of a quartic over `[1, 2]`, once.**
+
+Both traffic invariants below are this integral at different coefficients.  Written out at
+each one, the antiderivative and its five derivative steps appeared twice verbatim, which
+made a shared computation look like two independent ones. -/
+theorem integral_quartic_one_two (c₄ c₃ c₂ c₁ c₀ : ℝ) :
+    (∫ a in (1 : ℝ)..2, (c₄ * a ^ 4 + c₃ * a ^ 3 + c₂ * a ^ 2 + c₁ * a ^ 1 + c₀ * a ^ 0)) =
+      31 / 5 * c₄ + 15 / 4 * c₃ + 7 / 3 * c₂ + 3 / 2 * c₁ + c₀ := by
+  have hderiv : ∀ x ∈ Set.uIcc (1 : ℝ) 2,
+      HasDerivAt (fun a : ℝ ↦ c₄ / 5 * a ^ 5 + c₃ / 4 * a ^ 4 + c₂ / 3 * a ^ 3 +
+          c₁ / 2 * a ^ 2 + c₀ * a ^ 1)
+        (c₄ * x ^ 4 + c₃ * x ^ 3 + c₂ * x ^ 2 + c₁ * x ^ 1 + c₀ * x ^ 0) x := by
+    intro x _
+    have h := ((((hasDerivAt_pow 5 x).const_mul (c₄ / 5)).add
+        ((hasDerivAt_pow 4 x).const_mul (c₃ / 4))).add
+        ((hasDerivAt_pow 3 x).const_mul (c₂ / 3))).add
+        ((hasDerivAt_pow 2 x).const_mul (c₁ / 2)) |>.add
+        ((hasDerivAt_pow 1 x).const_mul c₀)
+    convert h using 1
+    push_cast
+    ring
+  rw [intervalIntegral.integral_eq_sub_of_hasDerivAt hderiv
+    (Continuous.intervalIntegrable (by fun_prop) 1 2)]
+  norm_num
+  all_goals ring
+
 /-- The localized block family has fourth-order traffic invariant `121 / 5`. -/
 theorem localizedUniformFourthInvariant_eq :
     localizedUniformFourthInvariant = 121 / 5 := by
@@ -520,36 +555,10 @@ theorem localizedUniformFourthInvariant_eq :
   simp_rw [blockEntryFourthMean_localizedCovarianceBlock]
   have hintegrand :
       (fun a : ℝ ↦ (a ^ 4 + (a + 1) ^ 4) / 2) =
-        fun a : ℝ ↦ a ^ 4 + 2 * a ^ 3 + 3 * a ^ 2 + 2 * a + 1 / 2 := by
+        fun a : ℝ ↦ 1 * a ^ 4 + 2 * a ^ 3 + 3 * a ^ 2 + 2 * a ^ 1 + (1 / 2) * a ^ 0 := by
     funext a
     ring
-  rw [hintegrand]
-  have hderiv : ∀ x ∈ Set.uIcc (1 : ℝ) 2,
-      HasDerivAt (fun a : ℝ ↦ a ^ 5 / 5 + a ^ 4 / 2 + a ^ 3 + a ^ 2 + a / 2)
-        (x ^ 4 + 2 * x ^ 3 + 3 * x ^ 2 + 2 * x + 1 / 2) x := by
-    intro x _
-    have h5 : HasDerivAt (fun a : ℝ ↦ a ^ 5 / 5) (x ^ 4) x := by
-      have h := (hasDerivAt_pow 5 x).div_const 5
-      convert h using 1
-      norm_num
-    have h4 : HasDerivAt (fun a : ℝ ↦ a ^ 4 / 2) (2 * x ^ 3) x := by
-      have h := (hasDerivAt_pow 4 x).div_const 2
-      convert h using 1
-      norm_num
-      ring
-    have h3 : HasDerivAt (fun a : ℝ ↦ a ^ 3) (3 * x ^ 2) x := by
-      have h := hasDerivAt_pow 3 x
-      simpa using h
-    have h2 : HasDerivAt (fun a : ℝ ↦ a ^ 2) (2 * x) x := by
-      have h := hasDerivAt_pow 2 x
-      convert h using 1
-      norm_num
-    have h1 : HasDerivAt (fun a : ℝ ↦ a / 2) (1 / 2 : ℝ) x := by
-      have h := (hasDerivAt_id x).div_const 2
-      simpa using h
-    exact (((h5.add h4).add h3).add h2).add h1
-  rw [intervalIntegral.integral_eq_sub_of_hasDerivAt hderiv
-    (Continuous.intervalIntegrable (by fun_prop) 1 2)]
+  rw [hintegrand, integral_quartic_one_two]
   norm_num
 
 /-- The rotated block family has fourth-order traffic invariant `723 / 40`. -/
@@ -559,39 +568,11 @@ theorem rotatedUniformFourthInvariant_eq :
   simp_rw [blockEntryFourthMean_rotatedCovarianceBlock]
   have hintegrand :
       (fun a : ℝ ↦ (a + 1 / 2) ^ 4 + 1 / 16) =
-        fun a : ℝ ↦ a ^ 4 + 2 * a ^ 3 + 3 / 2 * a ^ 2 + 1 / 2 * a + 1 / 8 := by
+        fun a : ℝ ↦ 1 * a ^ 4 + 2 * a ^ 3 + (3 / 2) * a ^ 2 + (1 / 2) * a ^ 1
+          + (1 / 8) * a ^ 0 := by
     funext a
     ring
-  rw [hintegrand]
-  have hderiv : ∀ x ∈ Set.uIcc (1 : ℝ) 2,
-      HasDerivAt (fun a : ℝ ↦ a ^ 5 / 5 + a ^ 4 / 2 + a ^ 3 / 2 + a ^ 2 / 4 + a / 8)
-        (x ^ 4 + 2 * x ^ 3 + 3 / 2 * x ^ 2 + 1 / 2 * x + 1 / 8) x := by
-    intro x _
-    have h5 : HasDerivAt (fun a : ℝ ↦ a ^ 5 / 5) (x ^ 4) x := by
-      have h := (hasDerivAt_pow 5 x).div_const 5
-      convert h using 1
-      norm_num
-    have h4 : HasDerivAt (fun a : ℝ ↦ a ^ 4 / 2) (2 * x ^ 3) x := by
-      have h := (hasDerivAt_pow 4 x).div_const 2
-      convert h using 1
-      norm_num
-      ring
-    have h3 : HasDerivAt (fun a : ℝ ↦ a ^ 3 / 2) (3 / 2 * x ^ 2) x := by
-      have h := (hasDerivAt_pow 3 x).div_const 2
-      convert h using 1
-      norm_num
-      ring
-    have h2 : HasDerivAt (fun a : ℝ ↦ a ^ 2 / 4) (1 / 2 * x) x := by
-      have h := (hasDerivAt_pow 2 x).div_const 4
-      convert h using 1
-      norm_num
-      ring
-    have h1 : HasDerivAt (fun a : ℝ ↦ a / 8) (1 / 8 : ℝ) x := by
-      have h := (hasDerivAt_id x).div_const 8
-      simpa using h
-    exact (((h5.add h4).add h3).add h2).add h1
-  rw [intervalIntegral.integral_eq_sub_of_hasDerivAt hderiv
-    (Continuous.intervalIntegrable (by fun_prop) 1 2)]
+  rw [hintegrand, integral_quartic_one_two]
   norm_num
 
 /-- Exact continuum separation of the fourth-order traffic invariant. -/

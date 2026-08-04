@@ -55,6 +55,24 @@ theorem right_whitening_removes_coloring
   ext row col
   exact congrFun (hremove (noise row)) col
 
+/-- **A row-wise inverse lifts to the matrices it acts on.**
+
+Both directions below are this one fact.  `rightWhiten` and `rightColor` are both
+`rightTransform` -- two names for one operation, kept because the whitening story reads
+better with both -- so "recoloring undoes whitening" and "whitening undoes recoloring" are
+the same lemma with its two matrices exchanged, and each was carrying its own copy of the
+three-line lift. -/
+theorem rightTransform_leftInverse
+    (outer inner : Matrix cols cols ℝ)
+    (h : Function.LeftInverse
+      (fun x ↦ outer.transpose.mulVec x)
+      (fun x ↦ inner.transpose.mulVec x)) :
+    Function.LeftInverse (rightTransform outer : Matrix rows cols ℝ → Matrix rows cols ℝ)
+      (rightTransform inner) := by
+  intro data
+  ext row col
+  exact congrFun (h (data row)) col
+
 /-- Recoloring is a left inverse of whitening whenever the corresponding row
 maps are inverse in that direction. -/
 theorem rightColor_leftInverse_rightWhiten
@@ -63,10 +81,8 @@ theorem rightColor_leftInverse_rightWhiten
       (fun x ↦ color.transpose.mulVec x)
       (fun x ↦ inverseColor.transpose.mulVec x)) :
     Function.LeftInverse (rightColor color : Matrix rows cols ℝ → Matrix rows cols ℝ)
-      (rightWhiten inverseColor) := by
-  intro data
-  ext row col
-  exact congrFun (hleft (data row)) col
+      (rightWhiten inverseColor) :=
+  rightTransform_leftInverse color inverseColor hleft
 
 /-- Recoloring is a right inverse of whitening whenever the corresponding row
 maps are inverse in the other direction. -/
@@ -76,10 +92,10 @@ theorem rightColor_rightInverse_rightWhiten
       (fun x ↦ color.transpose.mulVec x)
       (fun x ↦ inverseColor.transpose.mulVec x)) :
     Function.RightInverse (rightColor color : Matrix rows cols ℝ → Matrix rows cols ℝ)
-      (rightWhiten inverseColor) := by
-  intro data
-  ext row col
-  exact congrFun (hright (data row)) col
+      (rightWhiten inverseColor) :=
+  -- `RightInverse f g` is `LeftInverse g f`, so this is the lift above with the two
+  -- matrices exchanged rather than a second lift.
+  rightTransform_leftInverse inverseColor color hright
 
 /-- An invertible right-whitening map is a distribution-independent bijection
 of data spaces, with recoloring as its explicit inverse. -/

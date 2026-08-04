@@ -59,8 +59,7 @@ theorem clinical_benefit_increases_with_r2
 theorem mul_sub_mul_pos_of_lt
     (α r2_eur r2_afr : ℝ)
     (h_α : 0 < α)
-    (h_r2_gap : r2_afr < r2_eur)
-    (h_nn : 0 ≤ r2_afr) :
+    (h_r2_gap : r2_afr < r2_eur) :
     0 < α * r2_eur - α * r2_afr := by
   have : r2_eur - r2_afr > 0 := by linarith
   nlinarith
@@ -101,9 +100,12 @@ theorem deployment_amplifies_disparity
 theorem qaly_gap_proportional_to_r2_gap
     (γ r2₁ r2₂ : ℝ)
     (h_γ : 0 < γ) (h_gap : r2₂ < r2₁) :
-    0 < γ * r2₁ - γ * r2₂ := by
-  have : r2₁ - r2₂ > 0 := by linarith
-  nlinarith
+    0 < γ * r2₁ - γ * r2₂ :=
+  -- Benefit-per-unit-R² and QALYs-per-unit-R² are the same arithmetic: a positive
+  -- constant times a positive gap. `mul_sub_mul_pos_of_lt` above is that fact, and
+  -- carried an unused nonnegativity hypothesis that stopped this from being written
+  -- as an instance of it.
+  mul_sub_mul_pos_of_lt γ r2₁ r2₂ h_γ h_gap
 
 end HealthDisparity
 
@@ -399,14 +401,7 @@ theorem validation_n_depends_on_r2
     metric formulas, not assumed through an abstract link. -/
 theorem do_no_harm_principle
     (m : LiabilityThresholdModel) (T' μ_control r2_source r2_target π benefit harm : ℝ)
-    (h_r2_loss : r2_target < r2_source)
-    (h_r2_target : 0 ≤ r2_target)
-    (h_r2_source : r2_source ≤ 1)
-    (hμ_control_neg : μ_control < 0)
-    (h_sens_num_nonneg :
-      0 ≤ Real.sqrt r2_target * Real.sqrt m.h_sq * m.case_mean - T')
-    (h_spec_num_nonneg :
-      0 ≤ T' - Real.sqrt r2_target * Real.sqrt m.h_sq * μ_control)
+    (hregime : ThresholdRegime m T' μ_control r2_target r2_source)
     (h_π : 0 < π) (h_π1 : π < 1)
     (h_benefit : 0 < benefit) (h_harm : 0 < harm) :
     -- Net value in target is strictly less than in source
@@ -414,15 +409,11 @@ theorem do_no_harm_principle
         (1 - specFromR2 m r2_target T' μ_control) * (1 - π) * harm <
       sensFromR2 m r2_source T' * π * benefit -
         (1 - specFromR2 m r2_source T' μ_control) * (1 - π) * harm := by
-  have h_sens :
-      sensFromR2 m r2_target T' < sensFromR2 m r2_source T' := by
-    exact sensFromR2_strictMono_of_threshold_le m T' r2_target r2_source
-      h_r2_target h_r2_source h_r2_loss h_sens_num_nonneg
-  have h_spec :
-      specFromR2 m r2_target T' μ_control <
-        specFromR2 m r2_source T' μ_control := by
-    exact specFromR2_strictMono_of_threshold_le m T' μ_control r2_target r2_source
-      hμ_control_neg h_r2_target h_r2_source h_r2_loss h_spec_num_nonneg
+  obtain ⟨h_r2_loss, h_r2_target, h_r2_source, hμ_control_neg, h_sens_num_nonneg,
+    h_spec_num_nonneg⟩ := hregime
+  obtain ⟨h_sens, h_spec⟩ :=
+    sens_and_spec_strictMono_of_threshold_le m T' μ_control r2_target r2_source
+      hμ_control_neg h_r2_target h_r2_source h_r2_loss h_sens_num_nonneg h_spec_num_nonneg
   have h1 :
       sensFromR2 m r2_target T' * π * benefit <
         sensFromR2 m r2_source T' * π * benefit := by
@@ -452,14 +443,7 @@ theorem do_no_harm_principle
     metrics, not from an abstract link. -/
 theorem phased_deployment_reduces_risk
     (m : LiabilityThresholdModel) (T' μ_control r2_validated r2_unvalidated π : ℝ)
-    (h_r2_gap : r2_unvalidated < r2_validated)
-    (h_r2_unvalidated : 0 ≤ r2_unvalidated)
-    (h_r2_validated : r2_validated ≤ 1)
-    (hμ_control_neg : μ_control < 0)
-    (h_sens_num_nonneg :
-      0 ≤ Real.sqrt r2_unvalidated * Real.sqrt m.h_sq * m.case_mean - T')
-    (h_spec_num_nonneg :
-      0 ≤ T' - Real.sqrt r2_unvalidated * Real.sqrt m.h_sq * μ_control)
+    (hregime : ThresholdRegime m T' μ_control r2_unvalidated r2_validated)
     (h_π : 0 < π) (h_π1 : π < 1)
     -- The validated population has strictly better risk stratification
     -- (proportion correctly classified) than the unvalidated population,
@@ -469,15 +453,12 @@ theorem phased_deployment_reduces_risk
         specFromR2 m r2_unvalidated T' μ_control * (1 - π) <
       sensFromR2 m r2_validated T' * π +
         specFromR2 m r2_validated T' μ_control * (1 - π) := by
-  have h_sens :
-      sensFromR2 m r2_unvalidated T' < sensFromR2 m r2_validated T' := by
-    exact sensFromR2_strictMono_of_threshold_le m T' r2_unvalidated r2_validated
-      h_r2_unvalidated h_r2_validated h_r2_gap h_sens_num_nonneg
-  have h_spec :
-      specFromR2 m r2_unvalidated T' μ_control <
-        specFromR2 m r2_validated T' μ_control := by
-    exact specFromR2_strictMono_of_threshold_le m T' μ_control r2_unvalidated r2_validated
-      hμ_control_neg h_r2_unvalidated h_r2_validated h_r2_gap h_spec_num_nonneg
+  obtain ⟨h_r2_gap, h_r2_unvalidated, h_r2_validated, hμ_control_neg, h_sens_num_nonneg,
+    h_spec_num_nonneg⟩ := hregime
+  obtain ⟨h_sens, h_spec⟩ :=
+    sens_and_spec_strictMono_of_threshold_le m T' μ_control r2_unvalidated r2_validated
+      hμ_control_neg h_r2_unvalidated h_r2_validated h_r2_gap h_sens_num_nonneg
+      h_spec_num_nonneg
   have h1 :
       sensFromR2 m r2_unvalidated T' * π <
         sensFromR2 m r2_validated T' * π :=

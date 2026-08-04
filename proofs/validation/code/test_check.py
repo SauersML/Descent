@@ -538,6 +538,27 @@ theorem chosen_step_second (y : ℝ) (hy : 0 < y) : 0 < cleanRate y + y * 1 := b
   linarith
 """),
      "identical proof scripts under different statements"),
+    # Citing a corpus lemma exempts a one-step application, not a whole argument
+    # built around one: the rest of the script is still shared and still unnamed.
+    ("duplication", "a long shared argument that happens to cite a corpus lemma",
+     clean_plus("Calibrator/Sub.lean", CLEAN_SUB + """
+theorem cited_helper (x : ℝ) : 0 ≤ x * x := mul_self_nonneg x
+
+theorem long_shared_first (x : ℝ) (hx : 0 < x) : 0 < cleanRate x + x * x + x := by
+  have hsquare := cited_helper x
+  have hrate : cleanRate x = x := rfl
+  have hsum : 0 < x + x := by linarith
+  rw [hrate]
+  nlinarith [hx, hsquare, hsum]
+
+theorem long_shared_second (y : ℝ) (hy : 0 < y) : 0 < cleanRate y + y * y + y * 1 := by
+  have hsquare := cited_helper y
+  have hrate : cleanRate y = y := rfl
+  have hsum : 0 < y + y := by linarith
+  rw [hrate]
+  nlinarith [hy, hsquare, hsum]
+"""),
+     "identical proof scripts under different statements"),
     # Short, and about this corpus: under the old length floor it was dropped
     # for being nineteen characters long.
     ("duplication", "a short statement naming a corpus definition, proved twice",
@@ -571,6 +592,48 @@ theorem panel_weight_nonneg (w : ℝ) (hw : 0 ≤ w) :
 theorem panel_weight_nonneg' (v : ℝ) (hv : 0 ≤ v) :
     0 ≤ v * v + v * v * v :=
   panel_weight_nonneg v hv
+""")),
+    # The screen's own remedy, carried out: one lemma, two applications. If the two
+    # call sites were reported, every successful factoring would leave a fresh
+    # finding behind and the guard would push the corpus back toward copying.
+    ("duplication", "two bounds that each apply one already-named corpus lemma",
+     clean_plus("Calibrator/Sub.lean", CLEAN_SUB + """
+theorem root_is_low_or_high (a x : ℝ) (hroot : (a - x) * (a + 1 - x) = 0) :
+    x = a ∨ x = a + 1 := by
+  sorry
+
+theorem root_ge_one (a x : ℝ) (ha : 1 ≤ a) (hroot : (a - x) * (a + 1 - x) = 0) :
+    1 ≤ x := by
+  rcases root_is_low_or_high a x hroot with h | h <;> linarith
+
+theorem root_le_three (a x : ℝ) (ha : a ≤ 2) (hroot : (a - x) * (a + 1 - x) = 0) :
+    x ≤ 3 := by
+  rcases root_is_low_or_high a x hroot with h | h <;> linarith
+""")),
+    # A run of one-line `have`s matches itself at every shift. Reporting those shifts
+    # claims an eight-line block was copied when the repeat is a single line.
+    ("duplication", "a run of one-line steps that matches itself at every shift",
+     clean_plus("Calibrator/Sub.lean", CLEAN_SUB + """
+theorem periodic_step_run (weightBound eventBound benefitBound harmBound netBound spanBound leadBound lagBound driftBound shiftBound slopeBound offsetBound scaleBound widthBound depthBound reachBound tiltBound span2Bound : ℝ → ℝ) (t : ℝ) : True := by
+  have hweight : 0 ≤ |weightBound t| := abs_nonneg (weightBound t)
+  have hevent : 0 ≤ |eventBound t| := abs_nonneg (eventBound t)
+  have hbenefit : 0 ≤ |benefitBound t| := abs_nonneg (benefitBound t)
+  have hharm : 0 ≤ |harmBound t| := abs_nonneg (harmBound t)
+  have hnet : 0 ≤ |netBound t| := abs_nonneg (netBound t)
+  have hspan : 0 ≤ |spanBound t| := abs_nonneg (spanBound t)
+  have hlead : 0 ≤ |leadBound t| := abs_nonneg (leadBound t)
+  have hlag : 0 ≤ |lagBound t| := abs_nonneg (lagBound t)
+  have hdrift : 0 ≤ |driftBound t| := abs_nonneg (driftBound t)
+  have hshift : 0 ≤ |shiftBound t| := abs_nonneg (shiftBound t)
+  have hslope : 0 ≤ |slopeBound t| := abs_nonneg (slopeBound t)
+  have hoffset : 0 ≤ |offsetBound t| := abs_nonneg (offsetBound t)
+  have hscale : 0 ≤ |scaleBound t| := abs_nonneg (scaleBound t)
+  have hwidth : 0 ≤ |widthBound t| := abs_nonneg (widthBound t)
+  have hdepth : 0 ≤ |depthBound t| := abs_nonneg (depthBound t)
+  have hreach : 0 ≤ |reachBound t| := abs_nonneg (reachBound t)
+  have htilt : 0 ≤ |tiltBound t| := abs_nonneg (tiltBound t)
+  have hspan2 : 0 ≤ |span2Bound t| := abs_nonneg (span2Bound t)
+  trivial
 """)),
     ("duplication", "trivially true statements that coincide by accident",
      clean_plus("Calibrator/Sub.lean", CLEAN_SUB + """

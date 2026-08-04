@@ -4030,6 +4030,13 @@ DUP_IDENT = re.compile(r"[^\W\d][\w'!?₀-₉]*", re.UNICODE)
 # reflex at fifteen and was reported.
 DUP_PROOF_MIN_TOKENS = 10
 
+# A proof this short that invokes one of the corpus's own theorems is an
+# APPLICATION of an already-named lemma, not an unnamed argument two theorems are
+# secretly sharing.  The screen's remedy is "name the repeated script and apply
+# it"; a script that has already done that must not be reported again, or every
+# successful factoring leaves its two call sites behind as a fresh finding.
+DUP_APPLICATION_MAX_TOKENS = 14
+
 # Tactics that finish a goal by search rather than by an argument someone chose.
 # A proof made only of these is idiom however long its lemma list runs.
 DUP_CLOSING_TACTICS = {
@@ -4122,6 +4129,19 @@ def dup_corpus_names() -> frozenset:
     return frozenset(names)
 
 
+def dup_corpus_theorems() -> frozenset:
+    """Names of the corpus's own theorems -- the things a proof can APPLY.
+
+    Separate from `dup_corpus_names` because the two questions differ: a
+    definition's name in a proof (`unfold shrinkage`) says what the proof is
+    about, while a theorem's name says which already-named step it is invoking.
+    Only the second answers "is the shared content already a lemma?".
+    """
+    return frozenset(d.name.split(".")[-1] for d in dup_lean_decls()
+                     if d.name and d.kind in ("theorem", "lemma")
+                     and len(d.name.split(".")[-1]) >= 3)
+
+
 def dup_decl_index() -> dict:
     """file -> ascending `(start_line, Decl)`, for asking which declaration owns a line."""
     index: dict[str, list] = defaultdict(list)
@@ -4210,6 +4230,10 @@ def dup_clone_lines() -> list:
 # substitution machinery about 1.6 million times over the corpus.
 DUP_SPLIT = re.compile(r"([^\W\d][\w'!?₀-₉]*)", re.UNICODE)
 
+# The placeholder that `dup_alpha_parts` writes for a local name, matched so that the
+# periodicity test can ask whether two lines have the same SHAPE.
+DUP_LOCAL_MASK = re.compile(r"\bL\d+\b")
+
 
 def dup_alpha_parts(parts: list, corpus_names: frozenset, seen: dict) -> str:
     """One pre-split line, with local names renamed through the shared `seen` map."""
@@ -4252,6 +4276,38 @@ def dup_local_alpha(window: tuple, corpus_names: frozenset) -> tuple:  # noqa: D
 # `have`, `exact`, `≤`, `0` -- which is what canonicalising local names would
 # otherwise make identical everywhere.
 CLONE_MIN_MENTIONS = 3
+
+
+def dup_periodic(lines: tuple) -> bool:
+    """Whether `lines` is at least two repeats of a shorter pattern of its own.
+
+    Such a window is not a block: it is a shorter repeat seen through a window too
+    wide for it.  Eight consecutive `have hx : 0 ≤ b t := le_trans (abs_nonneg _)
+    (hb t)` lines match the next eight exactly, and calling that "eight lines
+    copied" misreads a one-line idiom repeated eight times -- which is below the
+    bar this screen sets, deliberately.
+    """
+    # Compared with the local names MASKED, not merely canonicalised: canonicalising
+    # numbers each new local in order, so the second copy of a repeated line reads
+    # `L13 L14` where the first reads `L9 L10` and the repetition is invisible.
+    masked = [DUP_LOCAL_MASK.sub("L", line) for line in lines]
+    width = len(masked)
+    for period in range(1, width // 2 + 1):
+        if all(masked[i] == masked[i - period] for i in range(period, width)):
+            return True
+    return False
+
+
+def dup_disjoint(occ: list, width: int) -> list:
+    """`occ` with windows that overlap an already-kept window in the same file dropped."""
+    kept: list = []
+    last: dict[str, int] = {}
+    for rel, i in occ:
+        if rel in last and i < last[rel] + width:
+            continue
+        kept.append((rel, i))
+        last[rel] = i
+    return kept
 
 
 def dup_clones() -> list:
@@ -4309,6 +4365,16 @@ def dup_clones() -> list:
 
     findings = []
     for key, occ in groups.items():
+        # Two windows that OVERLAP are not two copies of anything: they are one
+        # region that repeats with a period shorter than the window.  A run of six
+        # `have h : 0 ≤ x := le_trans (abs_nonneg _) (hx t)` lines matches itself at
+        # every shift, and reporting those shifts says "eight lines copied" about a
+        # region whose actual repeat is one line -- below the bar this screen sets.
+        # Keeping the leftmost of each overlapping run leaves genuine copies, which
+        # are disjoint, untouched.
+        if dup_periodic(key[2:]):
+            continue
+        occ = dup_disjoint(sorted(occ), key[0])
         if len(occ) < key[1]:
             continue
         # A clone whose sites are TIED -- one declaration citing the other by name --
@@ -4380,6 +4446,7 @@ def run_duplication() -> int:
                 if d.kind in ("theorem", "lemma") and d.name and d.body]
 
     corpus_names = dup_corpus_names()
+    corpus_theorems = dup_corpus_theorems()
 
     # 1. One proposition, two names.
     by_statement: dict[str, list] = defaultdict(list)
@@ -4410,6 +4477,11 @@ def run_duplication() -> int:
         if not any(re.sub(r"[^\w']", "", t) not in DUP_CLOSING_TACTICS and
                    re.match(r"^[a-z]", re.sub(r"[^\w']", "", t) or "_")
                    for t in tokens):
+            continue
+        # Already factored: a short script naming a corpus theorem is that
+        # theorem being applied, and the shared step is the lemma it names.
+        if len(tokens) <= DUP_APPLICATION_MAX_TOKENS and any(
+                re.sub(r"[^\w']", "", t) in corpus_theorems for t in tokens):
             continue
         by_proof[proof].append(d)
 

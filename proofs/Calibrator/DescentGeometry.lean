@@ -519,11 +519,21 @@ theorem admissibleInteractionTraitLaw_isProbability (theta : AdmissibleInteracti
       ∑ g, admissibleInteractionTraitLaw theta g = 1 := by
   simpa [admissibleInteractionTraitLaw] using interactionTraitLaw_isProbability theta.2
 
+/-- **Each locus carries half the mass at each of its values.**
+
+One fact about the interaction law -- both margins are uniform -- and the two loci read it
+off.  Stated separately, each locus carried its own copy of the same case split. -/
+theorem labelMass_interactionTraitLaw_margins (theta : ℝ) (x : Fin 2) :
+    labelMass (fun g : TwoLociTrait ↦ g.1) (interactionTraitLaw theta) x = 1 / 2 ∧
+      labelMass (fun g : TwoLociTrait ↦ g.2.1) (interactionTraitLaw theta) x = 1 / 2 := by
+  constructor <;>
+    (fin_cases x <;>
+      simp [labelMass, interactionTraitLaw, Fintype.sum_prod_type, Fin.sum_univ_two] <;> ring)
+
 /-- The first locus carries half the mass at each of its values, whatever the interaction. -/
 theorem labelMass_interactionTraitLaw_locusOne (theta : ℝ) (x : Fin 2) :
-    labelMass (fun g : TwoLociTrait ↦ g.1) (interactionTraitLaw theta) x = 1 / 2 := by
-  fin_cases x <;>
-    simp [labelMass, interactionTraitLaw, Fintype.sum_prod_type, Fin.sum_univ_two] <;> ring
+    labelMass (fun g : TwoLociTrait ↦ g.1) (interactionTraitLaw theta) x = 1 / 2 :=
+  (labelMass_interactionTraitLaw_margins theta x).1
 
 /-- Conditional on the first locus, the trait frequency is the average of the interaction risk
 over the second locus — which `interactionRisk_average_second` computes to be one half,
@@ -543,9 +553,8 @@ theorem trait_value_locusOne (theta : ℝ) (x : Fin 2) :
 
 /-- The second locus carries half the mass at each of its values. -/
 theorem labelMass_interactionTraitLaw_locusTwo (theta : ℝ) (x : Fin 2) :
-    labelMass (fun g : TwoLociTrait ↦ g.2.1) (interactionTraitLaw theta) x = 1 / 2 := by
-  fin_cases x <;>
-    simp [labelMass, interactionTraitLaw, Fintype.sum_prod_type, Fin.sum_univ_two] <;> ring
+    labelMass (fun g : TwoLociTrait ↦ g.2.1) (interactionTraitLaw theta) x = 1 / 2 :=
+  (labelMass_interactionTraitLaw_margins theta x).2
 
 /-- The same erasure holds along the second locus, by `interactionRisk_average_first`. -/
 theorem trait_value_locusTwo (theta : ℝ) (x : Fin 2) :

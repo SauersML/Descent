@@ -360,7 +360,7 @@ hypotheses of the reduction are a uniform `w⁻¹` pioneer tail and a uniform re
 third condition: the `x⁻²dx` shape is not an extra assumption but the image of the first. -/
 theorem pioneerIntensity_jacobian (x : ℝ) (hx0 : x ≠ 0) (hx1 : x ≠ 1) :
     1 / (x / (1 - x)) ^ 2 * (1 / (1 - x) ^ 2) = 1 / x ^ 2 := by
-  have h1 : (1 : ℝ) - x ≠ 0 := sub_ne_zero.mpr (Ne.symm hx1)
+  have h1 := MarkedBreakout.pioneer_one_sub_ne_zero hx1
   field_simp
 
 /-! ## Rank-one two-colour response algebra -/

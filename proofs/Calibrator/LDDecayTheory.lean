@@ -1020,6 +1020,30 @@ theorem more_severe_bottleneck_more_ld (N₁ N₂ N_r c : ℝ) (t_b t_r : ℕ)
     mul_lt_mul_of_pos_right h_gap_lt h_amp₂_pos
   exact mul_lt_mul_of_pos_right (lt_of_le_of_lt h_step₁ h_step₂) h_dec_pos
 
+/-- **The bottleneck excess factor is positive.**
+
+Both the positivity of bottleneck excess LD and its decay after recovery open by proving
+this one product positive, from the same hypotheses and by the same three steps -- the
+equilibrium gap, the retention bound, and their product.  `DemographicHistory` proved it a
+second time.  It is one fact and it is named here. -/
+theorem bottleneckExcessFactor_pos (N_b N_r c : ℝ) (t_b : ℕ)
+    (hNb : 1 ≤ N_b) (h_bottle : N_b < N_r)
+    (hc : 0 < c) (hc1 : c < 1) (ht_b : 0 < t_b) :
+    0 < (driftLDEquilibrium N_b c - driftLDEquilibrium N_r c) *
+      (1 - driftLDRetention N_b c ^ t_b) := by
+  have hc0 : (0 : ℝ) ≤ c := le_of_lt hc
+  have hc1' : c ≤ 1 := le_of_lt hc1
+  have h_gap_pos : 0 < driftLDEquilibrium N_b c - driftLDEquilibrium N_r c := by
+    have := driftLDEquilibrium_strictAnti N_b N_r c hNb h_bottle hc hc1
+    linarith
+  have hLb := driftLDRetention_mem_unit N_b c hNb hc0 hc1'
+  have hLb_lt : driftLDRetention N_b c < 1 :=
+    driftLDRetention_lt_one N_b c hNb hc hc1'
+  have h_amp_pos : 0 < 1 - driftLDRetention N_b c ^ t_b := by
+    have := pow_lt_one₀ hLb.1 hLb_lt (by omega : t_b ≠ 0)
+    linarith
+  exact mul_pos h_gap_pos h_amp_pos
+
 /-- After recovery, excess LD decays with time. -/
 theorem excess_ld_decays_after_recovery (N_b N_r c : ℝ) (t_b : ℕ) (t₁ t₂ : ℕ)
     (hNb : 1 ≤ N_b) (h_bottle : N_b < N_r)
@@ -1032,18 +1056,7 @@ theorem excess_ld_decays_after_recovery (N_b N_r c : ℝ) (t_b : ℕ) (t₁ t₂
   have hc1' : c ≤ 1 := le_of_lt hc1
   rw [excessLDAfterBottleneck_closedForm N_b N_r c t_b t₂ hNb hNr hc0 hc1',
     excessLDAfterBottleneck_closedForm N_b N_r c t_b t₁ hNb hNr hc0 hc1']
-  have h_gap_pos : 0 < driftLDEquilibrium N_b c - driftLDEquilibrium N_r c := by
-    have := driftLDEquilibrium_strictAnti N_b N_r c hNb h_bottle hc hc1
-    linarith
-  have hLb := driftLDRetention_mem_unit N_b c hNb hc0 hc1'
-  have hLb_lt : driftLDRetention N_b c < 1 :=
-    driftLDRetention_lt_one N_b c hNb hc hc1'
-  have h_amp_pos : 0 < 1 - driftLDRetention N_b c ^ t_b := by
-    have := pow_lt_one₀ hLb.1 hLb_lt (by omega : t_b ≠ 0)
-    linarith
-  have h_head_pos :
-      0 < (driftLDEquilibrium N_b c - driftLDEquilibrium N_r c) *
-        (1 - driftLDRetention N_b c ^ t_b) := mul_pos h_gap_pos h_amp_pos
+  have h_head_pos := bottleneckExcessFactor_pos N_b N_r c t_b hNb h_bottle hc hc1 ht_b
   apply mul_lt_mul_of_pos_left _ h_head_pos
   have h_Lr_pos : 0 < driftLDRetention N_r c :=
     driftLDRetention_pos N_r c hNr hc1

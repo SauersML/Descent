@@ -153,25 +153,17 @@ theorem portability_concave_in_fst_reduction
   have hx_lt : xHigh < xLow := by
     unfold xHigh xLow
     nlinarith [mul_lt_mul_of_pos_right hfst hVA]
-  have h_high_reduce :
-      presentDayR2 V_A V_E (fst₂ - Δ) = r2FromSignalVariance (xHigh + δ) V_E := by
+  -- Reducing a shifted Fst to a shifted signal variance is one rewrite, stated once for an
+  -- arbitrary Fst rather than copied out at the high and the low value.
+  have h_reduce : ∀ f : ℝ,
+      presentDayR2 V_A V_E (f - Δ) = r2FromSignalVariance ((1 - f) * V_A + δ) V_E := by
+    intro f
     rw [presentDayR2_eq_expectedR2]
-    unfold xHigh δ
+    unfold δ
     congr 1
     ring
-  have h_high :
-      presentDayR2 V_A V_E fst₂ = r2FromSignalVariance xHigh V_E := by
-    rw [presentDayR2_eq_expectedR2]
-  have h_low_reduce :
-      presentDayR2 V_A V_E (fst₁ - Δ) = r2FromSignalVariance (xLow + δ) V_E := by
-    rw [presentDayR2_eq_expectedR2]
-    unfold xLow δ
-    congr 1
-    ring
-  have h_low :
-      presentDayR2 V_A V_E fst₁ = r2FromSignalVariance xLow V_E := by
-    rw [presentDayR2_eq_expectedR2]
-  rw [h_high_reduce, h_high, h_low_reduce, h_low]
+  rw [h_reduce fst₂, presentDayR2_eq_expectedR2 V_A V_E fst₂,
+    h_reduce fst₁, presentDayR2_eq_expectedR2 V_A V_E fst₁]
   exact expectedR2_gain_strictAnti_base xHigh xLow δ V_E hVE hxHigh hx_lt hδ
 
 end GWASDiversity

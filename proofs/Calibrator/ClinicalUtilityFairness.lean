@@ -477,6 +477,46 @@ theorem specFromR2_strictMono_of_threshold_le
   exact liabilitySpecificity_monotone_in_R2_of_threshold_le Phi m T' μ_control strictMono_Phi
     hμ_control_neg R2₁ R2₂ hR2₁ hR2₂ hR2 h_num_nonneg
 
+/-- **The clinically relevant threshold regime, named once.**
+
+Every portability-loss statement below is conditioned on the same six facts: an `R²` gap
+inside `[0, 1]`, a control mean below the threshold, and the two numerator sign conditions
+that put the operating point in the regime where the exact metrics are monotone.  Written
+out at each theorem, that block was nine identical lines repeated across this file and
+`EquityAndImplementation`.  It is one regime, so it is one structure. -/
+structure ThresholdRegime (m : LiabilityThresholdModel) (T' μ_control r2_lo r2_hi : ℝ) :
+    Prop where
+  /-- The lower `R²` really is lower. -/
+  r2_gap : r2_lo < r2_hi
+  /-- `R²` is a squared correlation, so it is nonnegative. -/
+  r2_lo_nonneg : 0 ≤ r2_lo
+  /-- ... and at most one. -/
+  r2_hi_le_one : r2_hi ≤ 1
+  /-- Controls sit below the liability threshold. -/
+  control_neg : μ_control < 0
+  /-- The sensitivity numerator is in the regime where the metric increases with `R²`. -/
+  sens_num_nonneg : 0 ≤ Real.sqrt r2_lo * Real.sqrt m.h_sq * m.case_mean - T'
+  /-- The specificity numerator is in the same regime. -/
+  spec_num_nonneg : 0 ≤ T' - Real.sqrt r2_lo * Real.sqrt m.h_sq * μ_control
+
+/-- **Both exact operating-point metrics improve together with `R²`.**
+
+Every utility comparison below -- NRI, net benefit, decision-curve -- opens by deriving these
+two strict inequalities from the same five hypotheses, and each opened by rederiving them.
+The pair is one fact about the liability-threshold model, so it is named once here. -/
+theorem sens_and_spec_strictMono_of_threshold_le
+    (m : LiabilityThresholdModel) (T' μ_control R2₁ R2₂ : ℝ)
+    (hμ_control_neg : μ_control < 0)
+    (hR2₁ : 0 ≤ R2₁) (hR2₂ : R2₂ ≤ 1)
+    (hR2 : R2₁ < R2₂)
+    (h_sens_num_nonneg : 0 ≤ Real.sqrt R2₁ * Real.sqrt m.h_sq * m.case_mean - T')
+    (h_spec_num_nonneg : 0 ≤ T' - Real.sqrt R2₁ * Real.sqrt m.h_sq * μ_control) :
+    sensFromR2 m R2₁ T' < sensFromR2 m R2₂ T' ∧
+      specFromR2 m R2₁ T' μ_control < specFromR2 m R2₂ T' μ_control :=
+  ⟨sensFromR2_strictMono_of_threshold_le m T' R2₁ R2₂ hR2₁ hR2₂ hR2 h_sens_num_nonneg,
+    specFromR2_strictMono_of_threshold_le m T' μ_control R2₁ R2₂ hμ_control_neg hR2₁ hR2₂ hR2
+      h_spec_num_nonneg⟩
+
 /-- **NRI is positive when PGS adds value.**
     If a higher-`R²` model is evaluated at the same classification threshold in
     the same liability-threshold population, then both the exact sensitivity
@@ -493,15 +533,8 @@ theorem nri_positive_when_pgs_adds_value
       (sensFromR2 m r2_new T' - sensFromR2 m r2_old T')
       (specFromR2 m r2_new T' μ_control - specFromR2 m r2_old T' μ_control) := by
   unfold netReclassificationImprovement
-  have h1 :
-      sensFromR2 m r2_old T' < sensFromR2 m r2_new T' := by
-    exact sensFromR2_strictMono_of_threshold_le m T' r2_old r2_new
-      h_r2_old h_r2_new h_r2_improves h_sens_num_nonneg
-  have h2 :
-      specFromR2 m r2_old T' μ_control <
-        specFromR2 m r2_new T' μ_control := by
-    exact specFromR2_strictMono_of_threshold_le m T' μ_control r2_old r2_new
-      hμ_control_neg h_r2_old h_r2_new h_r2_improves h_spec_num_nonneg
+  obtain ⟨h1, h2⟩ := sens_and_spec_strictMono_of_threshold_le m T' μ_control r2_old r2_new
+    hμ_control_neg h_r2_old h_r2_new h_r2_improves h_sens_num_nonneg h_spec_num_nonneg
   linarith
 
 /-- **NRI decreases with portability loss.**
@@ -510,14 +543,7 @@ theorem nri_positive_when_pgs_adds_value
     threshold, so exact NRI is strictly lower in the target. -/
 theorem nri_decreases_with_portability_loss
     (m : LiabilityThresholdModel) (T' μ_control r2_base r2_source r2_target : ℝ)
-    (h_r2_loss : r2_target < r2_source)
-    (h_r2_target : 0 ≤ r2_target)
-    (h_r2_source : r2_source ≤ 1)
-    (hμ_control_neg : μ_control < 0)
-    (h_sens_num_nonneg :
-      0 ≤ Real.sqrt r2_target * Real.sqrt m.h_sq * m.case_mean - T')
-    (h_spec_num_nonneg :
-      0 ≤ T' - Real.sqrt r2_target * Real.sqrt m.h_sq * μ_control) :
+    (hregime : ThresholdRegime m T' μ_control r2_target r2_source) :
     netReclassificationImprovement
       (sensFromR2 m r2_target T' - sensFromR2 m r2_base T')
       (specFromR2 m r2_target T' μ_control - specFromR2 m r2_base T' μ_control) <
@@ -526,6 +552,8 @@ theorem nri_decreases_with_portability_loss
       (specFromR2 m r2_source T' μ_control - specFromR2 m r2_base T' μ_control) := by
   -- Both sides subtract the SAME baseline, so this is the previous theorem's positivity
   -- read across a common `r2_base`.  It had its own copy of that theorem's proof.
+  obtain ⟨h_r2_loss, h_r2_target, h_r2_source, hμ_control_neg, h_sens_num_nonneg,
+    h_spec_num_nonneg⟩ := hregime
   have h := nri_positive_when_pgs_adds_value m T' μ_control r2_target r2_source
     h_r2_loss h_r2_target h_r2_source hμ_control_neg h_sens_num_nonneg h_spec_num_nonneg
   unfold netReclassificationImprovement at h ⊢
@@ -542,14 +570,7 @@ theorem nri_decreases_with_portability_loss
     guarantees improvement in the source guarantees degradation in the target. -/
 theorem nri_can_be_negative
     (m : LiabilityThresholdModel) (T' μ_control r2_old r2_target : ℝ)
-    (h_r2_below : r2_target < r2_old)
-    (h_r2_target : 0 ≤ r2_target)
-    (h_r2_old : r2_old ≤ 1)
-    (hμ_control_neg : μ_control < 0)
-    (h_sens_num_nonneg :
-      0 ≤ Real.sqrt r2_target * Real.sqrt m.h_sq * m.case_mean - T')
-    (h_spec_num_nonneg :
-      0 ≤ T' - Real.sqrt r2_target * Real.sqrt m.h_sq * μ_control) :
+    (hregime : ThresholdRegime m T' μ_control r2_target r2_old) :
     netReclassificationImprovement
       (sensFromR2 m r2_target T' - sensFromR2 m r2_old T')
       (specFromR2 m r2_target T' μ_control - specFromR2 m r2_old T' μ_control) < 0 := by
@@ -557,7 +578,7 @@ theorem nri_can_be_negative
   -- above with the baseline taken at `r2_old` -- a third copy of one proof, now an
   -- instance of it.
   have h := nri_decreases_with_portability_loss m T' μ_control r2_old r2_old r2_target
-    h_r2_below h_r2_target h_r2_old hμ_control_neg h_sens_num_nonneg h_spec_num_nonneg
+    hregime
   unfold netReclassificationImprovement at h ⊢
   linarith
 
@@ -665,27 +686,16 @@ theorem portability_narrows_useful_range
     (m : LiabilityThresholdModel) (T' μ_control r2_source r2_target π t : ℝ)
     (h_π : 0 < π) (h_π1 : π < 1)
     (ht : 0 < t) (ht1 : t < 1)
-    (h_r2 : r2_target < r2_source)
-    (h_r2_target : 0 ≤ r2_target)
-    (h_r2_source : r2_source ≤ 1)
-    (hμ_control_neg : μ_control < 0)
-    (h_sens_num_nonneg :
-      0 ≤ Real.sqrt r2_target * Real.sqrt m.h_sq * m.case_mean - T')
-    (h_spec_num_nonneg :
-      0 ≤ T' - Real.sqrt r2_target * Real.sqrt m.h_sq * μ_control) :
+    (hregime : ThresholdRegime m T' μ_control r2_target r2_source) :
     decisionCurveNetBenefit (sensFromR2 m r2_target T' * π)
         ((1 - specFromR2 m r2_target T' μ_control) * (1 - π)) 1 t <
       decisionCurveNetBenefit (sensFromR2 m r2_source T' * π)
         ((1 - specFromR2 m r2_source T' μ_control) * (1 - π)) 1 t := by
-  have h_sens :
-      sensFromR2 m r2_target T' < sensFromR2 m r2_source T' := by
-    exact sensFromR2_strictMono_of_threshold_le m T' r2_target r2_source
-      h_r2_target h_r2_source h_r2 h_sens_num_nonneg
-  have h_spec :
-      specFromR2 m r2_target T' μ_control <
-        specFromR2 m r2_source T' μ_control := by
-    exact specFromR2_strictMono_of_threshold_le m T' μ_control r2_target r2_source
-      hμ_control_neg h_r2_target h_r2_source h_r2 h_spec_num_nonneg
+  obtain ⟨h_r2, h_r2_target, h_r2_source, hμ_control_neg, h_sens_num_nonneg,
+    h_spec_num_nonneg⟩ := hregime
+  obtain ⟨h_sens, h_spec⟩ :=
+    sens_and_spec_strictMono_of_threshold_le m T' μ_control r2_target r2_source
+      hμ_control_neg h_r2_target h_r2_source h_r2 h_sens_num_nonneg h_spec_num_nonneg
   repeat rw [decisionCurveNetBenefit_eq_formula]
   have htt : 0 < t / (1 - t) := div_pos ht (by linarith)
   have h1 : sensFromR2 m r2_target T' * π < sensFromR2 m r2_source T' * π :=

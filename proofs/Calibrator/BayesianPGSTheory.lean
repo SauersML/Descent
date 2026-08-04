@@ -193,24 +193,34 @@ theorem gaussian_shrinkage_in_unit (n h : ℝ)
   · rw [div_lt_one (by positivity)]
     linarith
 
+/-- **Shrinkage increases with the compound parameter `n * h`.**
+
+The posterior sees the sample size and the per-SNP heritability only through their product,
+so raising either one is the same move.  The two single-parameter statements below are this
+fact; stated separately, each carried its own copy of the same division argument. -/
+theorem shrinkage_strictMono_product (n₁ h₁ n₂ h₂ : ℝ)
+    (h_pos : 0 < n₁ * h₁) (h_more : n₁ * h₁ < n₂ * h₂) :
+    gaussianPosteriorShrinkage n₁ h₁ < gaussianPosteriorShrinkage n₂ h₂ := by
+  unfold gaussianPosteriorShrinkage
+  have hd₁ : 0 < n₁ * h₁ + 1 := by linarith
+  have hd₂ : 0 < n₂ * h₂ + 1 := by linarith
+  rw [div_lt_div_iff₀ hd₁ hd₂]
+  nlinarith
+
 /-- **Shrinkage increases with sample size.** More data → less shrinkage. -/
 theorem shrinkage_increases_with_n (h : ℝ) (n₁ n₂ : ℝ)
     (h_h : 0 < h) (h_n₁ : 0 < n₁) (h_n₂ : 0 < n₂)
     (h_more : n₁ < n₂) :
-    gaussianPosteriorShrinkage n₁ h < gaussianPosteriorShrinkage n₂ h := by
-  unfold gaussianPosteriorShrinkage
-  rw [div_lt_div_iff₀ (by positivity) (by positivity)]
-  nlinarith
+    gaussianPosteriorShrinkage n₁ h < gaussianPosteriorShrinkage n₂ h :=
+  shrinkage_strictMono_product n₁ h n₂ h (by positivity) (by nlinarith)
 
 /-- **Shrinkage increases with per-SNP heritability.**
     SNPs with larger effects are shrunk less. -/
 theorem shrinkage_increases_with_h (n : ℝ) (h₁ h₂ : ℝ)
     (h_n : 0 < n) (h_h₁ : 0 < h₁) (h_h₂ : 0 < h₂)
     (h_more : h₁ < h₂) :
-    gaussianPosteriorShrinkage n h₁ < gaussianPosteriorShrinkage n h₂ := by
-  unfold gaussianPosteriorShrinkage
-  rw [div_lt_div_iff₀ (by positivity) (by positivity)]
-  nlinarith
+    gaussianPosteriorShrinkage n h₁ < gaussianPosteriorShrinkage n h₂ :=
+  shrinkage_strictMono_product n h₁ n h₂ (by positivity) (by nlinarith)
 
 /-- **James-Stein shrinkage MSE.**
     For estimating β with observation β̂_OLS ~ N(β, σ²), consider the
@@ -376,6 +386,17 @@ theorem cross_population_bias_gt_base_bias_of_positive_fst
     base_bias < base_bias + c * fst := by
   linarith [mul_pos h_c_pos h_fst_pos]
 
+/-- **The bias model is strictly monotone in its middle factor.**
+
+Both statements below posit a bias of the form `c · x · fst` and vary `x`: the attenuation
+factor of a mixed reference panel in one, the count of correlated SNPs in the other.  The
+inequality is the same one, and naming it says so. -/
+theorem scaled_bias_strictMono (c fst x y : ℝ)
+    (h_c : 0 < c) (h_fst : 0 < fst) (h_lt : x < y) :
+    c * x * fst < c * y * fst := by
+  have h_cf : 0 < c * fst := mul_pos h_c h_fst
+  nlinarith
+
 /-- **Multi-ancestry LD reference reduces cross-population bias.**
     A reference panel combining multiple ancestries has intermediate LD
     that partially matches each population.  If single-ancestry bias
@@ -395,22 +416,23 @@ theorem multi_ancestry_reference_reduces_bias
     (h_c : 0 < c) (h_fst : 0 < fst)
     (_h_α_pos : 0 < α) (h_α_lt : α < 1) :
     c * α * fst < c * fst := by
-  have h_cf : 0 < c * fst := mul_pos h_c h_fst
-  nlinarith
+  simpa using scaled_bias_strictMono c fst α 1 h_c h_fst h_α_lt
 
 /-- **LD mismatch is worse for long-range LD regions.**
     Regions with long-range LD (e.g., MHC) are more affected by
     LD reference mismatch because the LD structure is more population-specific.
     Model: bias in a region = c · n_correlated_snps · fst.  Long-range LD
-    regions have more correlated SNPs, so the bias is larger. -/
+    regions have more correlated SNPs, so the bias is larger.
+
+    `_h_short_pos` is deliberately unused and marked as such: a nonnegative SNP count is part
+    of the modelled range, but the inequality follows from the comparison alone. -/
 theorem long_range_ld_worse_mismatch
     (c fst n_short n_long : ℝ)
     (h_c : 0 < c) (h_fst : 0 < fst)
-    (h_short_pos : 0 < n_short)
+    (_h_short_pos : 0 < n_short)
     (h_more_snps : n_short < n_long) :
-    c * n_short * fst < c * n_long * fst := by
-  have h_cf : 0 < c * fst := mul_pos h_c h_fst
-  nlinarith
+    c * n_short * fst < c * n_long * fst :=
+  scaled_bias_strictMono c fst n_short n_long h_c h_fst h_more_snps
 
 end LDReferenceMismatch
 

@@ -49,13 +49,14 @@ The theorems below are stated about `fstMigrationDriftEquilibrium` from
 `Calibrator.PopulationGeneticsFoundations`, which this file imports. Do not restate
 `1/(1 + 4 Nₑ m)` here; the regime caveats above belong to that one definition. -/
 
-/-- More migration → lower equilibrium F_ST. -/
+/-- More migration → lower equilibrium F_ST.  The demographic reading of
+`fstMigrationDriftEquilibrium_decreases_with_m`, which `Calibrator.PortabilityDrift` proves:
+this file names the consequence it uses rather than reproving it. -/
 theorem more_migration_lower_fst (Ne m₁ m₂ : ℝ)
     (hNe : 0 < Ne) (hm₁ : 0 < m₁)
     (h_more : m₁ < m₂) :
-    fstMigrationDriftEquilibrium Ne m₂ < fstMigrationDriftEquilibrium Ne m₁ := by
-  unfold fstMigrationDriftEquilibrium
-  apply div_lt_div_of_pos_left one_pos (by positivity) (by nlinarith)
+    fstMigrationDriftEquilibrium Ne m₂ < fstMigrationDriftEquilibrium Ne m₁ :=
+  fstMigrationDriftEquilibrium_decreases_with_m Ne m₁ m₂ hNe hm₁ h_more
 
 /-! The island-model `F_ST` has one definition, `fstMigrationDriftEquilibrium`. A second
 spelling in this module would need its own theorem tying it to that one, which is a
@@ -678,6 +679,15 @@ section ArchaicIntrogression
 noncomputable def introgressionVariants (N₀ introgressionRate t : ℝ) : ℝ :=
   N₀ * (1 - Real.exp (-introgressionRate * t))
 
+/-- Reference evaluation.  The value is computed through the definitions this body calls, but
+the theorem states a number: an inequality or an invariance leaves a family of bodies
+satisfying it, and a value does not. -/
+theorem introgressionVariants_at_reference_point :
+    introgressionVariants 0 0 0 = 0 := by
+  norm_num [introgressionVariants]
+
+
+
 /-- **Differential introgression creates population-specific variants.**
     When one population has a higher archaic introgression fraction than
     another, the resulting population-specific variants contribute to
@@ -1101,19 +1111,8 @@ theorem bottleneck_excess_ld_pos (Ne_b Ne_stable c : ℝ) (t_b : ℕ)
     (hc : 0 < c) (hc1 : c < 1)
     (ht : 0 < t_b) :
     0 < bottleneckExcessLD Ne_b Ne_stable c t_b := by
-  have hc0 : (0 : ℝ) ≤ c := le_of_lt hc
-  have hc1' : c ≤ 1 := le_of_lt hc1
-  rw [bottleneckExcessLD_eq_closedForm Ne_b Ne_stable c t_b hNb hc0 hc1']
-  have h_gap : 0 < driftLDEquilibrium Ne_b c - driftLDEquilibrium Ne_stable c := by
-    have := driftLDEquilibrium_strictAnti Ne_b Ne_stable c hNb h_bottle hc hc1
-    linarith
-  have hLb := driftLDRetention_mem_unit Ne_b c hNb hc0 hc1'
-  have hLb_lt : driftLDRetention Ne_b c < 1 :=
-    driftLDRetention_lt_one Ne_b c hNb hc hc1'
-  have h_amp : 0 < 1 - driftLDRetention Ne_b c ^ t_b := by
-    have := pow_lt_one₀ hLb.1 hLb_lt (by omega : t_b ≠ 0)
-    linarith
-  exact mul_pos h_gap h_amp
+  rw [bottleneckExcessLD_eq_closedForm Ne_b Ne_stable c t_b hNb (le_of_lt hc) (le_of_lt hc1)]
+  exact bottleneckExcessFactor_pos Ne_b Ne_stable c t_b hNb h_bottle hc hc1 ht
 
 /-- **A bottleneck adds mismatch on top of whatever `F_ST` already contributes.**
 
