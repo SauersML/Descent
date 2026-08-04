@@ -22,32 +22,37 @@ CALIBRATION STATE -- one arm is ready and one is not.
       mutation-and-drift core is therefore sound, which is the part biallelic
       mutation got wrong.
 
-  ISLAND F_ST: nearly ready, with a stated 4 percent systematic. Against
-      `1/(1 + theta + bigM)` at `theta` near 1, where heterozygosity is about
-      one half and the estimator is in a usable regime, the plateau sits 4.1,
-      4.2 and 3.3 percent low at `m` = 0.002, 0.005 and 0.010. A consistent
-      small offset across a factor of five in migration.
+  ISLAND F_ST: a consistent 5 percent offset against the corpus formula, cause
+      NOT identified, and THREE hypotheses tested and rejected. The offset is
+      -4.8, -5.5 and -5.5 percent at `m` = 0.002, 0.005 and 0.010 with `theta`
+      near 1, so it is flat across a factor of five in migration.
 
-      TWO EARLIER DIAGNOSES OF THIS ARM WERE WRONG AND ARE RETRACTED.
+      Rejected 1 -- small-deme-count `G_ST` bias. The gap does not close with
+      deme count: -7.7, -5.2, -8.2 percent at 12, 24 and 40 demes.
 
-      The first said "about 7 percent, cause unidentified". The second, reached
-      by setting `mu` to 2e-5 so that the prediction would reduce to the
-      drift-migration equilibrium, reported 38 percent and concluded the engine
-      migrated 1.8 times too fast. Both were artefacts of the regime, not
-      properties of the engine.
+      Rejected 2 -- the mutation term. A test at `mu` = 2e-5 appeared to show a
+      38 percent gap and was itself invalid: at `theta` = 0.006 the equilibrium
+      heterozygosity is six parts in a thousand and the homozygosity bias
+      `1/(2 Ne)` is more than half of `H_T`. The statistic does not survive that
+      limit. Measured where `H` is about one half, the gap is the 5 percent
+      above.
 
-      At `mu` = 2e-5 the equilibrium heterozygosity is `theta/(1 + theta)` with
-      `theta` = 0.006, so `H` is about six parts in a thousand. The within-deme
-      homozygosity estimator `sum (c/n)^2` carries a bias of order `1/(2 Ne)` =
-      0.0033, which is more than HALF of `H_T` itself. Every `F_ST` computed
-      there is dominated by that bias. The test built to be decisive was run
-      where its own estimator does not work, and the sharper-sounding diagnosis
-      it produced was worth less than the vaguer one it replaced.
+      Rejected 3 -- plug-in homozygosity bias. `sum (c/n)^2` overestimates
+      homozygosity by about `1/n` and enters `H_S` and `H_T` at different sample
+      sizes, so it does not cancel in the ratio. Replacing it with the unbiased
+      `sum c(c-1)/(n(n-1))` -- which is used below, being correct regardless --
+      moved the gap from -4.1/-4.2/-3.3 to -4.8/-5.5/-5.5. It did not close it
+      and slightly widened it, so this is not the cause either.
 
-      That is the fourth design error in this thread and the most instructive:
-      a limit taken to simplify a comparison can destroy the statistic being
-      compared. Check that the estimator survives the limit before trusting
-      what it says there.
+      WHAT REMAINS. The offset is flat in `m`, which argues against anything
+      scaling with migration, and it survives an unbiased estimator, which
+      argues against sampling. The two live possibilities are a residual in this
+      engine's generation cycle -- migration and reproduction are one draw here,
+      not the two composed events of the island model -- and the corpus formula
+      itself, which composes `theta` and `bigM` ADDITIVELY in
+      `1/(1 + theta + bigM)`. Distinguishing those needs an island oracle
+      independent of both, which this branch does not have: the coalescent one
+      is mutation-free and so cannot test the composition.
 
 USING IT. The single-population arm is calibrated at 0.9 percent and is ready.
 The island arm carries a known 4 percent systematic, so it may serve as a
@@ -109,6 +114,21 @@ def run(Ne, m, mu, gens, n_demes=12, reps=24, seed=1, record_every=1):
     return np.array(out_t), np.array(out_f)
 
 
+def _unbiased_hom(counts, n):
+    """Unbiased estimator of `sum p_i^2`: `sum c(c-1) / (n(n-1))`.
+
+    The plug-in `sum (c/n)^2` overestimates homozygosity by about `1/n`, and
+    that bias is NOT harmless here because it enters `H_S` and `H_T` at
+    different sample sizes -- `2 Ne` within a deme against `n_demes * 2 Ne`
+    pooled -- so it does not cancel in the ratio. With `H` near one half and
+    `2 Ne` = 300 the within-deme bias is a third of a percent of `H`, and the
+    island arm sat 4 percent low with it in place.
+    """
+    if n < 2:
+        return float("nan")
+    return float((counts * (counts - 1)).sum()) / (n * (n - 1))
+
+
 def _fst(state):
     """1 - H_S/H_T with identity read off allele labels, averaged over reps."""
     reps, n_demes, two_n = state.shape
@@ -116,15 +136,13 @@ def _fst(state):
     for r in range(reps):
         s = state[r]
         k = int(s.max()) + 1
-        # within-deme homozygosity
         hom_s = 0.0
         for d in range(n_demes):
-            c = np.bincount(s[d], minlength=k).astype(float) / two_n
-            hom_s += float((c ** 2).sum())
+            c = np.bincount(s[d], minlength=k).astype(float)
+            hom_s += _unbiased_hom(c, two_n)
         hom_s /= n_demes
-        # total homozygosity on the pooled sample
-        c = np.bincount(s.ravel(), minlength=k).astype(float) / (n_demes * two_n)
-        hom_t = float((c ** 2).sum())
+        c = np.bincount(s.ravel(), minlength=k).astype(float)
+        hom_t = _unbiased_hom(c, n_demes * two_n)
         hs, ht = 1 - hom_s, 1 - hom_t
         vals.append((ht - hs) / ht if ht > 0 else float("nan"))
     return float(np.nanmean(vals))
