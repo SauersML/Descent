@@ -229,6 +229,18 @@ theorem stableSieveDimension_canonicalGenomeMultiplierForEpochCoordinates
     kappa 1 (epochSpectrumCoordinateCount K) hkappa (by norm_num)
   simpa [canonicalGenomeMultiplierForEpochCoordinates] using hscaled
 
+/-- **Exact fixed-epoch feasibility criterion.** At positive conditioning exponent and genome
+length, a `K`-epoch model's full `2K - 3` coordinate set fits inside the stable Laplace sieve if
+and only if its canonical exponential data budget is available. -/
+theorem epochCoordinates_le_stableSieveDimension_iff
+    (kappa L : ℝ) (K : ℕ) (hkappa : 0 < kappa) (hL : 0 < L) :
+    (epochSpectrumCoordinateCount K : ℝ) ≤
+        SpectrumIdentifiability.stableSieveDimension kappa L ↔
+      canonicalGenomeMultiplierForEpochCoordinates kappa K ≤ L := by
+  simpa [canonicalGenomeMultiplierForEpochCoordinates] using
+    SpectrumIdentifiability.le_stableSieveDimension_iff
+      kappa L (epochSpectrumCoordinateCount K) hkappa hL
+
 /-- **Exact per-epoch price in the canonical Laplace core.** Adding `extra` epochs adds
 `2 * extra` stable spectral coordinates and therefore multiplies the independent-data budget
 by `exp (kappa * (2 * extra))`. In particular, one epoch costs `exp (2 * kappa)`. -/
