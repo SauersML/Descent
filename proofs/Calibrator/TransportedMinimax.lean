@@ -120,6 +120,15 @@ Empirical status: DERIVED. The witness is exact rational arithmetic. -/
 /-- The manuscript's inflated candidate, named so it can be refuted rather than paraphrased. -/
 noncomputable def inflatedRidgeParameter (τ a r : ℝ) : ℝ := τ ^ 2 * (1 + r / a)
 
+/-- **inflatedRidgeParameter at its junk point, named.** The inflation factor `1 + r / a` diverges
+as the scale vanishes. The divisor is zero, the ratio is junk-zero, and the ridge parameter is
+returned UNINFLATED -- exactly the regularisation the inflation exists to prevent. Consumers
+must exclude the argument that makes the guard vanish. -/
+theorem inflatedRidgeParameter_zero_scale_is_junk (τ r : ℝ) :
+    inflatedRidgeParameter τ 0 r = τ ^ 2 := by
+  unfold inflatedRidgeParameter
+  simp
+
 /-- **The derived ridge is the bias-weight factor applied as a divisor.**
 
     `τ²a/(a+r) = τ²/(1 + r/a)`. The factor `1 + r/a` is the same one the manuscript
@@ -349,6 +358,16 @@ theorem momentBodyEntropyExponent_zero_is_junk : momentBodyEntropyExponent 0 = 0
 
 /-- Entropy exponent of the enclosing hyperrectangle: `ε^(-2/(2α-1))`. -/
 noncomputable def hyperrectangleEntropyExponent (α : ℝ) : ℝ := 2 / (2 * α - 1)
+
+/-- **hyperrectangleEntropyExponent at its junk point, named.** At `α = 1 / 2` the hyperrectangle
+entropy exponent diverges: this is the critical smoothness where the minimax rate changes
+character. The divisor `2 * α - 1` is zero and the exponent is `0`, reporting no entropy growth
+at the one value where it is unbounded. Consumers must exclude the argument that makes the guard
+vanish. -/
+theorem hyperrectangleEntropyExponent_critical_smoothness_is_junk :
+    hyperrectangleEntropyExponent (1 / 2) = 0 := by
+  unfold hyperrectangleEntropyExponent
+  norm_num
 
 /-- **Positivity buys an exponent, at every admissible `α`.**
 

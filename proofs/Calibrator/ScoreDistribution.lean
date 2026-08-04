@@ -537,6 +537,15 @@ theorem effectiveBlockCount_mul_correlationLength (markers correlationLength : �
 noncomputable def residualDiscreteness (correlationLength : ℝ) (n : ℕ) : ℝ :=
   (1 - 1 / correlationLength) ^ (n - 1)
 
+/-- **residualDiscreteness at its junk point, named.** A correlation length of zero means every
+residual is independent and discreteness vanishes. The reciprocal is junk-zero, the base is one,
+and the power is `1` at every `n`: maximal discreteness, retained exactly however many markers
+are taken. Consumers must exclude the argument that makes the guard vanish. -/
+theorem residualDiscreteness_zero_correlation_length_is_junk (n : ℕ) :
+    residualDiscreteness 0 n = 1 := by
+  unfold residualDiscreteness
+  simp
+
 /-- At a single marker there is no averaging and the ghost is undiminished. -/
 theorem residualDiscreteness_one (correlationLength : ℝ) :
     residualDiscreteness correlationLength 1 = 1 := by

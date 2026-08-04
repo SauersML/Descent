@@ -3,6 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Calibrator.ContinuumCalibrationProgram
 import Calibrator.PGSCalibrationTheory
+import Calibrator.UnifiedBiology
 
 namespace Calibrator
 
@@ -21,6 +22,24 @@ section GeneralAncestryLaw
 variable {Genotype Ancestry : Type*}
   [Fintype Genotype] [Fintype Ancestry]
 
+/-- The irreducible ancestry-wise calibration floor, expressed in polygenic-score language.
+
+Empirical status: NOT AN EMPIRICAL CLAIM -- this names an exact calibration functional. -/
+noncomputable def polygenicCalibrationFloor
+    (genotypeWeight : Genotype → ℝ)
+    (ancestryPosterior : Genotype → Ancestry → ℝ)
+    (ancestryRisk : Ancestry → Genotype → ℝ) : ℝ :=
+  calibrationDriftDefectSq genotypeWeight ancestryPosterior ancestryRisk
+
+/-- The polygenic calibration floor is exactly the continuum drift defect. -/
+theorem polygenicCalibrationFloor_eq_driftDefectSq
+    (genotypeWeight : Genotype → ℝ)
+    (ancestryPosterior : Genotype → Ancestry → ℝ)
+    (ancestryRisk : Ancestry → Genotype → ℝ) :
+    polygenicCalibrationFloor genotypeWeight ancestryPosterior ancestryRisk =
+      calibrationDriftDefectSq genotypeWeight ancestryPosterior ancestryRisk := by
+  rfl
+
 /-- The four exact laws needed to interpret continuum calibration as a polygenic-score
 portability theorem. -/
 structure PolygenicContinuumCalibrationLaw
@@ -31,20 +50,20 @@ structure PolygenicContinuumCalibrationLaw
   ancestryPythagoras :
     ∀ score,
       indexWiseCalibrationEnergy genotypeWeight ancestryPosterior ancestryRisk score =
-        calibrationDriftDefectSq genotypeWeight ancestryPosterior ancestryRisk +
+        polygenicCalibrationFloor genotypeWeight ancestryPosterior ancestryRisk +
           aggregateCalibrationEnergy genotypeWeight ancestryPosterior ancestryRisk score
   /-- The posterior-mean score is pooled-calibrated and attains the ancestry-wise floor. -/
   pooledScoreAttainsFloor :
     indexWiseCalibrationEnergy genotypeWeight ancestryPosterior ancestryRisk
         (posteriorMean ancestryPosterior ancestryRisk) =
-      calibrationDriftDefectSq genotypeWeight ancestryPosterior ancestryRisk
+      polygenicCalibrationFloor genotypeWeight ancestryPosterior ancestryRisk
   /-- The floor is the weighted average of all pairwise ancestry-risk disagreements. -/
   floorIsPairwiseDisagreement :
-    calibrationDriftDefectSq genotypeWeight ancestryPosterior ancestryRisk =
+    polygenicCalibrationFloor genotypeWeight ancestryPosterior ancestryRisk =
       pairwiseCalibrationDriftEnergy genotypeWeight ancestryPosterior ancestryRisk
   /-- Zero floor means risk invariance only on represented ancestry/genotype support. -/
   floorZeroIffSupportInvariant :
-    calibrationDriftDefectSq genotypeWeight ancestryPosterior ancestryRisk = 0 ↔
+    polygenicCalibrationFloor genotypeWeight ancestryPosterior ancestryRisk = 0 ↔
       ∀ x, 0 < genotypeWeight x → ∀ s t,
         0 < ancestryPosterior x s → 0 < ancestryPosterior x t →
           ancestryRisk s x = ancestryRisk t x
@@ -65,13 +84,17 @@ theorem polygenicContinuumCalibrationLaw
       floorIsPairwiseDisagreement := ?_
       floorZeroIffSupportInvariant := ?_ }
   · intro score
+    rw [polygenicCalibrationFloor_eq_driftDefectSq]
     exact indexWiseCalibrationEnergy_eq_driftDefect_add_aggregate
       genotypeWeight ancestryPosterior ancestryRisk score hposterior
-  · exact indexWiseCalibrationEnergy_posteriorMean_eq_driftDefectSq
+  · rw [polygenicCalibrationFloor_eq_driftDefectSq]
+    exact indexWiseCalibrationEnergy_posteriorMean_eq_driftDefectSq
       genotypeWeight ancestryPosterior ancestryRisk hposterior
-  · exact calibrationDriftDefectSq_eq_pairwiseCalibrationDriftEnergy
+  · rw [polygenicCalibrationFloor_eq_driftDefectSq]
+    exact calibrationDriftDefectSq_eq_pairwiseCalibrationDriftEnergy
       genotypeWeight ancestryPosterior ancestryRisk hposterior
-  · exact calibrationDriftDefectSq_eq_zero_iff_on_support
+  · rw [polygenicCalibrationFloor_eq_driftDefectSq]
+    exact calibrationDriftDefectSq_eq_zero_iff_on_support
       genotypeWeight ancestryPosterior ancestryRisk hweight hposterior hnonnegative
 
 /-- Any ancestry-aware predictor pays at least the pairwise-disagreement floor.  This combines
@@ -94,6 +117,15 @@ theorem pairwiseAncestryDisagreement_le_indexWiseCalibration
 end GeneralAncestryLaw
 
 section BinaryDeploymentBoundary
+
+/-- The aligned calibration witness and the persistence-only biological posterior expose the
+same binary direction, despite reversing their argument roles. -/
+theorem gaugeAlignedPredictor_eq_persistentOnlyDynamicsPosterior
+    (persists : Bool) (x : Unit) :
+    gaugeAlignedPredictor persists x =
+      persistentOnlyDynamicsPosterior (0 : BinaryBiologicalState) persists := by
+  cases persists <;>
+    norm_num [gaugeAlignedPredictor, persistentOnlyDynamicsPosterior, binarySecondAnnotation]
 
 /-- A binary-ancestry PGS deployment has two simultaneous boundaries: unequal representation
 separates pooled calibration from worst-ancestry performance, while a clinical threshold crossed

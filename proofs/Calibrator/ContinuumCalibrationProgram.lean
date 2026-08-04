@@ -592,6 +592,85 @@ theorem stratifiedCalibrationEnergy_stratumMean_le (covariateWeight : Covariate 
     stratify (stratumMean posterior conditional stratify) other
     (isStratumCalibrated_stratumMean posterior conditional stratify hposterior) hweight hposterior
 
+/-- **The gauge law in general.**  Relabelling the populations changes nothing, provided the
+relabelling preserves the posterior and maps each population to one in the same stratum.  So the
+stratified residual is a function of the family up to exactly those relabellings -- and no
+further: the witness below permutes populations *across* strata, preserves the posterior and the
+law of the conditional field, and changes the residual.  What a prescribed stratification
+recovers is therefore not a functional of the drift's law. -/
+theorem stratifiedCalibrationEnergy_relabel_invariant
+    (covariateWeight : Covariate → ℝ) (posterior : Covariate → Index → ℝ)
+    (conditional : Index → Covariate → ℝ) (stratify : Index → Stratum)
+    (predictor : Stratum → Covariate → ℝ) (relabel : Equiv.Perm Index)
+    (hposterior : ∀ x t, posterior x (relabel t) = posterior x t)
+    (hstratify : ∀ t, stratify (relabel t) = stratify t) :
+    stratifiedCalibrationEnergy covariateWeight posterior
+        (fun t x ↦ conditional (relabel t) x) stratify predictor =
+      stratifiedCalibrationEnergy covariateWeight posterior conditional stratify predictor := by
+  unfold stratifiedCalibrationEnergy
+  refine Finset.sum_congr rfl (fun x _ ↦ ?_)
+  congr 1
+  calc
+    (∑ t, posterior x t * (conditional (relabel t) x - predictor (stratify t) x) ^ 2) =
+        ∑ t, posterior x (relabel t) *
+          (conditional (relabel t) x - predictor (stratify (relabel t)) x) ^ 2 := by
+          refine Finset.sum_congr rfl (fun t _ ↦ ?_)
+          rw [hposterior x t, hstratify t]
+    _ = ∑ t, posterior x t * (conditional t x - predictor (stratify t) x) ^ 2 :=
+        Equiv.sum_comp relabel
+          (fun u ↦ posterior x u * (conditional u x - predictor (stratify u) x) ^ 2)
+
+/-- **Any two populations put a floor under the defect.**  For an arbitrary finite family, the
+pooled drift defect at a covariate is at least the product of any two populations' posterior
+weights times the square of their risk gap.  This is the usable numeric form of the obstruction:
+two ancestries that are both plausible at a covariate and disagree about risk there force a
+calibration defect no recalibration can remove, and the bound needs neither a two-group reduction
+nor a balanced posterior. -/
+theorem posteriorPairwiseDriftEnergy_ge_pair
+    (posterior : Covariate → Index → ℝ) (conditional : Index → Covariate → ℝ) (x : Covariate)
+    (s t : Index) (hst : s ≠ t) (hnonneg : ∀ u, 0 ≤ posterior x u) :
+    posterior x s * posterior x t * (conditional s x - conditional t x) ^ 2 ≤
+      posteriorPairwiseDriftEnergy posterior conditional x := by
+  classical
+  have hrownonneg : ∀ r : Index,
+      0 ≤ posterior x r * ∑ u, posterior x u * (conditional r x - conditional u x) ^ 2 :=
+    fun r ↦ mul_nonneg (hnonneg r)
+      (Finset.sum_nonneg fun u _ ↦ mul_nonneg (hnonneg u) (sq_nonneg _))
+  have hrow : ∀ a b : Index,
+      posterior x a * (posterior x b * (conditional a x - conditional b x) ^ 2) ≤
+        posterior x a * ∑ u, posterior x u * (conditional a x - conditional u x) ^ 2 := by
+    intro a b
+    refine mul_le_mul_of_nonneg_left ?_ (hnonneg a)
+    exact Finset.single_le_sum
+      (f := fun u ↦ posterior x u * (conditional a x - conditional u x) ^ 2)
+      (fun u _ ↦ mul_nonneg (hnonneg u) (sq_nonneg _)) (Finset.mem_univ b)
+  have hpair :
+      (posterior x s * ∑ u, posterior x u * (conditional s x - conditional u x) ^ 2) +
+          (posterior x t * ∑ u, posterior x u * (conditional t x - conditional u x) ^ 2) ≤
+        ∑ r, posterior x r * ∑ u, posterior x u * (conditional r x - conditional u x) ^ 2 := by
+    have hsum : (∑ r ∈ ({s, t} : Finset Index),
+        posterior x r * ∑ u, posterior x u * (conditional r x - conditional u x) ^ 2) =
+          (posterior x s * ∑ u, posterior x u * (conditional s x - conditional u x) ^ 2) +
+            (posterior x t * ∑ u, posterior x u * (conditional t x - conditional u x) ^ 2) :=
+      Finset.sum_pair hst
+    calc
+      (posterior x s * ∑ u, posterior x u * (conditional s x - conditional u x) ^ 2) +
+            (posterior x t * ∑ u, posterior x u * (conditional t x - conditional u x) ^ 2) =
+          ∑ r ∈ ({s, t} : Finset Index),
+            posterior x r * ∑ u, posterior x u * (conditional r x - conditional u x) ^ 2 :=
+        hsum.symm
+      _ ≤ ∑ r, posterior x r *
+            ∑ u, posterior x u * (conditional r x - conditional u x) ^ 2 :=
+        Finset.sum_le_sum_of_subset_of_nonneg (Finset.subset_univ _)
+          (fun r _ _ ↦ hrownonneg r)
+  have hfirst := hrow s t
+  have hsecond := hrow t s
+  have hswap : (conditional t x - conditional s x) ^ 2 =
+      (conditional s x - conditional t x) ^ 2 := by ring
+  rw [hswap] at hsecond
+  unfold posteriorPairwiseDriftEnergy
+  nlinarith [hfirst, hsecond, hpair]
+
 /-- **Residual and resolution are complementary.**  The drift defect of the pooled theory splits,
 exactly, into the within-stratum residual a stratified recalibration cannot remove and the
 resolution it buys.  Neither can move without the other moving by the same amount: this is the

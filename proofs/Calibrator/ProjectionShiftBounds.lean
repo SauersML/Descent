@@ -257,6 +257,15 @@ weights each direction by the inverse background variance.  This is the same
 Empirical status: UNTESTED. -/
 def detectionWeight (s : ℝ) : ℝ := s⁻¹
 
+/-- **detectionWeight at its junk point, named.** A signal of zero scale should carry unbounded
+inverse-variance weight. The inverse of zero is junk-zero, so it carries NO weight and drops
+silently out of any weighted combination it enters. Consumers must exclude the argument that
+makes the guard vanish. -/
+theorem detectionWeight_zero_scale_is_junk :
+    detectionWeight 0 = 0 := by
+  unfold detectionWeight
+  simp
+
 /-- **Reconstruction weight of an eigendirection** with background variance `s`:
 the direction's own variance, i.e. its share of the total signal energy.  A
 rank-`k` truncation maximising `∑ σᵢ` over retained directions is what

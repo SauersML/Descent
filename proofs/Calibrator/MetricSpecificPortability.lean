@@ -1980,17 +1980,25 @@ unchanged, and the ancestry geometry exactly unchanged, while the alignment ener
 quantiles, or full histogram -- can detect alignment.
 -/
 
-/-- Three ancestries at positions `0`, `1`, `3` on the line. -/
+/-- Three ancestries at positions `0`, `1`, `3` on the line.
+
+Empirical status: NOT AN EMPIRICAL CLAIM -- this is a finite counterexample. -/
 noncomputable def threeAncestryDistance : Fin 3 → Fin 3 → ℝ :=
   ![![0, 1, 3], ![1, 0, 2], ![3, 2, 0]]
 
-/-- A score assigning values `0, 1, 2` to the three ancestries. -/
-noncomputable def ancestryScore : Fin 3 → ℝ := ![0, 1, 2]
+/-- A score assigning values `0, 1, 2` to the three ancestries.
 
-/-- The same three values, permuted between the ancestries. -/
+Empirical status: NOT AN EMPIRICAL CLAIM -- this reuses the finite drift witness. -/
+noncomputable def ancestryScore : Fin 3 → ℝ := threeAncestryConditional
+
+/-- The same three values, permuted between the ancestries.
+
+Empirical status: NOT AN EMPIRICAL CLAIM -- this is a finite counterexample. -/
 noncomputable def ancestryScoreSwapped : Fin 3 → ℝ := ![0, 2, 1]
 
-/-- Dirichlet-type energy coupling ancestry distance to score differences. -/
+/-- Dirichlet-type energy coupling ancestry distance to score differences.
+
+Empirical status: NOT AN EMPIRICAL CLAIM -- this defines the counterexample's energy. -/
 noncomputable def ancestryAlignmentEnergy (m : Fin 3 → ℝ) : ℝ :=
   (1 / 9) * ∑ i, ∑ j, threeAncestryDistance i j * (m i - m j) ^ 2
 

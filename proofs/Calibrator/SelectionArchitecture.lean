@@ -188,6 +188,16 @@ section DiversifyingSelection
 noncomputable def fluctuatingEffectCorrelation (t τ : ℝ) : ℝ :=
   Real.exp (-t / τ)
 
+/-- **fluctuatingEffectCorrelation at its junk point, named.** A zero autocorrelation time means
+effects decorrelate instantly, so the correlation should be zero at any positive separation. The
+divisor is zero, the exponent is junk-zero, and `exp 0 = 1`: PERFECTLY preserved effects. This
+is the forward map's version of the inversion `tauFromObservedEffectCorrelation_perfect_is_junk`
+records on the way back. Consumers must exclude the argument that makes the guard vanish. -/
+theorem fluctuatingEffectCorrelation_zero_autocorrelation_is_junk (t : ℝ) :
+    fluctuatingEffectCorrelation t 0 = 1 := by
+  unfold fluctuatingEffectCorrelation
+  simp
+
 /-- **Effects are perfectly correlated at zero divergence.**
 
 The decay theorem below is satisfied by every decreasing function of `t`, so it fixes the

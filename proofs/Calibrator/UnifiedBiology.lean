@@ -115,6 +115,11 @@ abbrev BinaryBiologicalState := Fin 2
 /-- Uniform invariant law on two biological contexts. -/
 noncomputable def binaryStateWeight (_ : BinaryBiologicalState) : ℝ := 1 / 2
 
+/-- The biological context law is the canonical balanced calibration weight. -/
+@[simp] theorem binaryStateWeight_eq_balancedBinaryWeight (x : BinaryBiologicalState) :
+    binaryStateWeight x = balancedBinaryWeight x := by
+  rfl
+
 /-- A transition that preserves the context. -/
 noncomputable def persistentTransition
     (x y : BinaryBiologicalState) : ℝ := if x = y then 1 else 0
@@ -454,6 +459,12 @@ theorem contextMatch_sectionOscillation_eq_one (y : BinaryBiologicalState) :
 the posterior on the two biological dynamics is uniform. -/
 noncomputable def binaryDynamicsPosterior
     (_ : BinaryBiologicalState) (_ : Bool) : ℝ := 1 / 2
+
+/-- The uninformative dynamics posterior is the canonical balanced calibration weight. -/
+@[simp] theorem binaryDynamicsPosterior_eq_balancedBinaryWeight
+    (y : BinaryBiologicalState) (persists : Bool) :
+    binaryDynamicsPosterior y persists = balancedBinaryWeight persists := by
+  rfl
 
 /-- Conditional source-adapted quality for one dynamics and one target context, constructed from
 the same fiber conditional used by the descent theorem above. -/

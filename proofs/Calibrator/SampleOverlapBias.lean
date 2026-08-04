@@ -47,6 +47,15 @@ section OverlapInflation
 noncomputable def overlapInflation (r2_true r2_observed : ℝ) : ℝ :=
   r2_observed / r2_true - 1
 
+/-- **overlapInflation at its junk point, named.** With no true explained variance the inflation
+ratio is undefined. The divisor is zero, the ratio is junk-zero, and the result is `-1`: a
+hundred per cent DEFLATION, reported for an observed overlap that is entirely spurious.
+Consumers must exclude the argument that makes the guard vanish. -/
+theorem overlapInflation_zero_true_r2_is_junk (r2_observed : ℝ) :
+    overlapInflation 0 r2_observed = -1 := by
+  unfold overlapInflation
+  simp
+
 /-- Inflation is positive when observed exceeds true. -/
 theorem overlap_inflation_positive (r2_true r2_observed : ℝ)
     (h_true : 0 < r2_true) (h_inflated : r2_true < r2_observed) :

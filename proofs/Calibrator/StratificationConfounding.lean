@@ -881,6 +881,15 @@ section PowerAnalysis
 noncomputable def r2EstimatorVariance (r2 : ℝ) (n : ℕ) : ℝ :=
   4 * r2 * (1 - r2) ^ 2 / n
 
+/-- **r2EstimatorVariance at its junk point, named.** The sampling variance of an `R²` estimate from
+no samples is unbounded. The divisor is zero and the variance is `0`: a perfectly precise
+estimate from an empty study, which downstream reads as an arbitrarily tight confidence
+interval. Consumers must exclude the argument that makes the guard vanish. -/
+theorem r2EstimatorVariance_zero_samples_is_junk (r2 : ℝ) :
+    r2EstimatorVariance r2 0 = 0 := by
+  unfold r2EstimatorVariance
+  simp
+
 /-- R² estimator variance is positive for non-degenerate R². -/
 theorem r2_estimator_variance_pos (r2 : ℝ) (n : ℕ)
     (h_r2 : 0 < r2) (h_r2_lt : r2 < 1) (h_n : 0 < n) :

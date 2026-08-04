@@ -1585,6 +1585,16 @@ theorem scratch_beats_fine_tuning_iff_target_sample_exceeds_critical
 noncomputable def sourceShrinkageMSE (gapSq noiseVar nTarget lam : ℝ) : ℝ :=
   gapSq * lam^2 + (noiseVar / nTarget) * (1 - lam)^2
 
+/-- **sourceShrinkageMSE at its junk point, named.** With no target samples the estimation term
+`noiseVar / nTarget` is unbounded and no shrinkage weight is safe. The divisor is zero, that
+term vanishes, and the mean squared error reduces to the bias term alone -- so the optimiser is
+free to take `lam` toward one and is told it costs nothing. Consumers must exclude the argument
+that makes the guard vanish. -/
+theorem sourceShrinkageMSE_zero_target_samples_is_junk (gapSq noiseVar lam : ℝ) :
+    sourceShrinkageMSE gapSq noiseVar 0 lam = gapSq * lam ^ 2 := by
+  unfold sourceShrinkageMSE
+  simp
+
 /-- **Exact optimizer of the source-shrinkage MSE.**
     In the explicit bias-variance model above, the unique minimizer is
     `(noiseVar / nTarget) / (gapSq + noiseVar / nTarget)`. This is derived from the
