@@ -600,12 +600,19 @@ partial def usesJunkOp (e : Expr) : Bool :=
       | _ => false)
 
 /-- Does the type carry a hypothesis that rules the junk point out before the
-body runs -- a positivity, a nonzero, or an order bound? -/
+body runs -- a positivity, a nonzero, or an order bound?
+
+Recurses into the BINDER TYPE as well as the body. Several definitions here take
+their guard universally quantified -- `reverseBridge` and `transportedResponse`
+both take `∀ y, 0 < transportMass P population y` -- and a version that looked
+only at the head of each binder type saw a `forallE` there and missed them. Those
+definitions cannot reach their junk point at all, and were being reported as open
+work. -/
 partial def hasGuardBinder : Expr → Bool
   | .forallE _ t b _ =>
       (match t.getAppFn.constName? with
         | some ``LT.lt | some ``LE.le | some ``Ne => true
-        | _ => false) || hasGuardBinder b
+        | _ => false) || hasGuardBinder t || hasGuardBinder b
   | .mdata _ b => hasGuardBinder b
   | _ => false
 
