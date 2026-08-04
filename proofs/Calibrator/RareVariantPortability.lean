@@ -103,22 +103,19 @@ theorem variantGeneticVarianceContribution_eq_zero_iff
     · exact Or.inr (by linarith)
 
 
-/-- **A ratio above two means the numerator is above twice the denominator**,
-    for a positive denominator.
+/-- Ratio of rare-variant counts between two populations. -/
+noncomputable def rareVariantCountRatio (sourceCount targetCount : ℝ) : ℝ :=
+  sourceCount / targetCount
 
-    Cross-multiplication. The demographic reading — larger long-term `Nₑ` and no
-    out-of-Africa bottleneck, hence more rare variants — is the reason someone
-    might assert the hypothesis `2 < ratio`, and is not derived here. Nothing
-    below names a population, and the factor claimed in prose was three while
-    the hypothesis says two. -/
-theorem two_mul_lt_of_two_lt_div
-    (n_rare_afr n_rare_eur ratio : ℝ)
-    (h_ratio : ratio = n_rare_afr / n_rare_eur)
-    (h_more : 2 < ratio)
-    (h_eur_pos : 0 < n_rare_eur) :
-    2 * n_rare_eur < n_rare_afr := by
-  have : 2 < n_rare_afr / n_rare_eur := by linarith
-  rwa [lt_div_iff₀ h_eur_pos] at this
+/-- **Exact fold-difference criterion for rare-variant counts.**  With positive target count,
+the cross-population count ratio exceeds a factor exactly when the source count exceeds that
+factor times the target count. -/
+theorem rareVariantCountRatio_gt_iff
+    (sourceCount targetCount factor : ℝ) (h_target : 0 < targetCount) :
+    factor < rareVariantCountRatio sourceCount targetCount ↔
+      factor * targetCount < sourceCount := by
+  unfold rareVariantCountRatio
+  exact lt_div_iff₀ h_target
 
 end RareVariantSpecificity
 
