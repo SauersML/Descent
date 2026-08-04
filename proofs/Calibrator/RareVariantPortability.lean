@@ -644,7 +644,7 @@ theorem expectedEffectMultiplier_symm (p α : ℝ) :
   unfold expectedEffectMultiplier
   rw [show (1 - p) * (1 - (1 - p)) = p * (1 - p) by ring]
 
-theorem expectedEffectMultiplier_neutral_exponent (p : ℝ) (hp : 0 < p * (1 - p)) :
+theorem expectedEffectMultiplier_neutral_exponent (p : ℝ) :
     expectedEffectMultiplier p (-1) = 1 := by
   unfold expectedEffectMultiplier
   rw [show (1 : ℝ) + -1 = 0 by ring, Real.rpow_zero]
