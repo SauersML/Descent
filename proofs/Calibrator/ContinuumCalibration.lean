@@ -197,16 +197,33 @@ theorem posteriorPairwiseDriftEnergy_eq_posteriorDriftEnergy
   rw [← Finset.sum_mul, hposterior, one_mul, hrecenter]
   ring
 
-/-- **Zero pairwise defect characterizes conditional invariance.**  When every population or
-environment has positive posterior mass, the pairwise drift energy at a covariate vanishes exactly
-when all of their conditional risks agree there.  Positivity is essential: a zero-mass population
-is deliberately invisible to the deployed posterior. -/
-theorem posteriorPairwiseDriftEnergy_eq_zero_iff
+/-- Pairwise drift energy is nonnegative whenever the posterior weights are nonnegative.  No
+normalization is needed for this order property. -/
+theorem posteriorPairwiseDriftEnergy_nonneg
+    (posterior : Covariate → Index → ℝ) (conditional : Index → Covariate → ℝ)
+    (x : Covariate) (hnonnegative : ∀ t, 0 ≤ posterior x t) :
+    0 ≤ posteriorPairwiseDriftEnergy posterior conditional x := by
+  unfold posteriorPairwiseDriftEnergy
+  apply mul_nonneg
+  · norm_num
+  · apply Finset.sum_nonneg
+    intro s _
+    apply mul_nonneg (hnonnegative s)
+    apply Finset.sum_nonneg
+    intro t _
+    exact mul_nonneg (hnonnegative t) (sq_nonneg _)
+
+/-- **Support-aware zero-defect law.**  For a nonnegative normalized posterior, pairwise drift
+energy vanishes exactly when conditional risks agree on the posterior support.  This is the sealed
+boundary form of the result: zero-mass populations are deliberately invisible, but no positively
+represented population can disagree without paying positive defect. -/
+theorem posteriorPairwiseDriftEnergy_eq_zero_iff_on_support
     (posterior : Covariate → Index → ℝ) (conditional : Index → Covariate → ℝ)
     (x : Covariate) (hposterior : ∑ t, posterior x t = 1)
-    (hpositive : ∀ t, 0 < posterior x t) :
+    (hnonnegative : ∀ t, 0 ≤ posterior x t) :
     posteriorPairwiseDriftEnergy posterior conditional x = 0 ↔
-      ∀ s t, conditional s x = conditional t x := by
+      ∀ s t, 0 < posterior x s → 0 < posterior x t →
+        conditional s x = conditional t x := by
   constructor
   · intro henergy
     have hsum :
@@ -217,22 +234,62 @@ theorem posteriorPairwiseDriftEnergy_eq_zero_iff
     have hterm (t : Index) :
         posterior x t * posteriorDrift posterior conditional t x ^ 2 = 0 := by
       exact (Finset.sum_eq_zero_iff_of_nonneg
-        (fun u _ ↦ mul_nonneg (le_of_lt (hpositive u)) (sq_nonneg _))).mp hsum
+        (fun u _ ↦ mul_nonneg (hnonnegative u) (sq_nonneg _))).mp hsum
           t (Finset.mem_univ t)
-    have hdrift (t : Index) : posteriorDrift posterior conditional t x = 0 := by
+    have hdrift (t : Index) (ht : 0 < posterior x t) :
+        posteriorDrift posterior conditional t x = 0 := by
       have hsquare : posteriorDrift posterior conditional t x ^ 2 = 0 :=
-        (mul_eq_zero.mp (hterm t)).resolve_left (ne_of_gt (hpositive t))
+        (mul_eq_zero.mp (hterm t)).resolve_left (ne_of_gt ht)
       nlinarith [sq_nonneg (posteriorDrift posterior conditional t x)]
-    intro s t
-    have hs := hdrift s
-    have ht := hdrift t
+    intro s t hspos htpos
+    have hs := hdrift s hspos
+    have ht := hdrift t htpos
     simp only [posteriorDrift] at hs ht
     linarith
   · intro hinvariant
-    have hzero (s t : Index) : (conditional s x - conditional t x) ^ 2 = 0 := by
-      rw [hinvariant s t]
-      ring
-    simp [posteriorPairwiseDriftEnergy, hzero]
+    have houter (s : Index) :
+        posterior x s *
+          (∑ t, posterior x t * (conditional s x - conditional t x) ^ 2) = 0 := by
+      by_cases hs : posterior x s = 0
+      · simp [hs]
+      · have hspos : 0 < posterior x s :=
+          lt_of_le_of_ne (hnonnegative s) (Ne.symm hs)
+        have hinner :
+            (∑ t, posterior x t * (conditional s x - conditional t x) ^ 2) = 0 := by
+          apply Finset.sum_eq_zero
+          intro t _
+          by_cases ht : posterior x t = 0
+          · simp [ht]
+          · have htpos : 0 < posterior x t :=
+              lt_of_le_of_ne (hnonnegative t) (Ne.symm ht)
+            rw [hinvariant s t hspos htpos]
+            ring
+        rw [hinner]
+        ring
+    have hsum :
+        (∑ s, posterior x s *
+          ∑ t, posterior x t * (conditional s x - conditional t x) ^ 2) = 0 := by
+      exact Finset.sum_eq_zero (fun s _ ↦ houter s)
+    unfold posteriorPairwiseDriftEnergy
+    rw [hsum]
+    ring
+
+/-- **Interior zero-defect law.**  When every population or environment has positive posterior
+mass, zero pairwise energy is equivalent to complete conditional invariance.  This is the strict
+support corollary of `posteriorPairwiseDriftEnergy_eq_zero_iff_on_support`. -/
+theorem posteriorPairwiseDriftEnergy_eq_zero_iff
+    (posterior : Covariate → Index → ℝ) (conditional : Index → Covariate → ℝ)
+    (x : Covariate) (hposterior : ∑ t, posterior x t = 1)
+    (hpositive : ∀ t, 0 < posterior x t) :
+    posteriorPairwiseDriftEnergy posterior conditional x = 0 ↔
+      ∀ s t, conditional s x = conditional t x := by
+  rw [posteriorPairwiseDriftEnergy_eq_zero_iff_on_support posterior conditional x
+    hposterior (fun t ↦ le_of_lt (hpositive t))]
+  constructor
+  · intro h s t
+    exact h s t (hpositive s) (hpositive t)
+  · intro h s t _ _
+    exact h s t
 
 /-- The global pairwise drift energy, averaged over covariates.  This form exposes the defect as
 an ensemble of ancestry-to-ancestry disagreements rather than deviations from a privileged pooled
@@ -258,6 +315,66 @@ theorem calibrationDriftDefectSq_eq_pairwiseCalibrationDriftEnergy
   intro x _
   rw [posteriorPairwiseDriftEnergy_eq_posteriorDriftEnergy posterior conditional x
     (hposterior x)]
+
+/-- **Global support-aware zero-defect law.**  With nonnegative covariate and posterior weights,
+the global pairwise defect vanishes exactly when conditional risks agree among every pair of
+populations represented at each positively weighted covariate.  This identifies both sealing
+boundaries explicitly: zero covariate mass seals a context, and zero posterior mass seals a
+population within that context. -/
+theorem pairwiseCalibrationDriftEnergy_eq_zero_iff_on_support
+    (covariateWeight : Covariate → ℝ) (posterior : Covariate → Index → ℝ)
+    (conditional : Index → Covariate → ℝ)
+    (hweight : ∀ x, 0 ≤ covariateWeight x)
+    (hposterior : ∀ x, ∑ t, posterior x t = 1)
+    (hnonnegative : ∀ x t, 0 ≤ posterior x t) :
+    pairwiseCalibrationDriftEnergy covariateWeight posterior conditional = 0 ↔
+      ∀ x, 0 < covariateWeight x → ∀ s t,
+        0 < posterior x s → 0 < posterior x t → conditional s x = conditional t x := by
+  have hlocal_nonneg (x : Covariate) :
+      0 ≤ posteriorPairwiseDriftEnergy posterior conditional x :=
+    posteriorPairwiseDriftEnergy_nonneg posterior conditional x (hnonnegative x)
+  constructor
+  · intro hglobal x hx s t hs ht
+    have hterm :
+        covariateWeight x * posteriorPairwiseDriftEnergy posterior conditional x = 0 := by
+      unfold pairwiseCalibrationDriftEnergy at hglobal
+      exact (Finset.sum_eq_zero_iff_of_nonneg
+        (fun y _ ↦ mul_nonneg (hweight y) (hlocal_nonneg y))).mp hglobal
+          x (Finset.mem_univ x)
+    have hlocal : posteriorPairwiseDriftEnergy posterior conditional x = 0 :=
+      (mul_eq_zero.mp hterm).resolve_left (ne_of_gt hx)
+    exact (posteriorPairwiseDriftEnergy_eq_zero_iff_on_support
+      posterior conditional x (hposterior x) (hnonnegative x)).mp hlocal s t hs ht
+  · intro hinvariant
+    unfold pairwiseCalibrationDriftEnergy
+    apply Finset.sum_eq_zero
+    intro x _
+    by_cases hx : covariateWeight x = 0
+    · simp [hx]
+    · have hxpos : 0 < covariateWeight x :=
+        lt_of_le_of_ne (hweight x) (Ne.symm hx)
+      have hlocal : posteriorPairwiseDriftEnergy posterior conditional x = 0 :=
+        (posteriorPairwiseDriftEnergy_eq_zero_iff_on_support
+          posterior conditional x (hposterior x) (hnonnegative x)).mpr
+            (hinvariant x hxpos)
+      rw [hlocal]
+      ring
+
+/-- The calibration defect itself has the same exact support characterization, by the general
+pairwise drift identity. -/
+theorem calibrationDriftDefectSq_eq_zero_iff_on_support
+    (covariateWeight : Covariate → ℝ) (posterior : Covariate → Index → ℝ)
+    (conditional : Index → Covariate → ℝ)
+    (hweight : ∀ x, 0 ≤ covariateWeight x)
+    (hposterior : ∀ x, ∑ t, posterior x t = 1)
+    (hnonnegative : ∀ x t, 0 ≤ posterior x t) :
+    calibrationDriftDefectSq covariateWeight posterior conditional = 0 ↔
+      ∀ x, 0 < covariateWeight x → ∀ s t,
+        0 < posterior x s → 0 < posterior x t → conditional s x = conditional t x := by
+  rw [calibrationDriftDefectSq_eq_pairwiseCalibrationDriftEnergy
+    covariateWeight posterior conditional hposterior]
+  exact pairwiseCalibrationDriftEnergy_eq_zero_iff_on_support
+    covariateWeight posterior conditional hweight hposterior hnonnegative
 
 /-- **Global Pythagoras for varying conditionals.**  The complete index-wise violation is the
 sum of the aggregate violation and the drift defect. -/

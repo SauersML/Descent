@@ -3,9 +3,11 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Calibrator.DeclaredInteractionClass
 import Calibrator.ContinuumCalibration
+import Calibrator.CorrectionWidths
 import Calibrator.DescentGeometry
 import Calibrator.DirichletTransfer
 import Calibrator.ErgodicCovariancePencil
+import Calibrator.EnsembleChannel
 import Calibrator.HorizonCurve
 import Calibrator.PencilEnvironment
 import Calibrator.FunctionalDescent
@@ -522,6 +524,99 @@ theorem binaryContextMatch_posteriorPairwiseDriftEnergy_eq_quarter
     (binaryDynamicsPosterior_sum_eq_one y)]
   norm_num [posteriorDrift, posteriorMean_binaryConditionalContextMatch_eq_half,
     binaryDynamicsPosterior]
+
+/-- A sealed support boundary: the deployed population contains only persistent dynamics and
+assigns zero posterior mass to switching dynamics.  The conditional field is unchanged; only its
+represented support changes. -/
+noncomputable def persistentOnlyDynamicsPosterior
+    (_ : BinaryBiologicalState) (persists : Bool) : ℝ := binarySecondAnnotation persists
+
+/-- The support-sealed biological posterior remains normalized. -/
+theorem persistentOnlyDynamicsPosterior_sum_eq_one (y : BinaryBiologicalState) :
+    ∑ persists, persistentOnlyDynamicsPosterior y persists = 1 := by
+  norm_num [persistentOnlyDynamicsPosterior, binarySecondAnnotation]
+
+/-- Its posterior masses are nonnegative. -/
+theorem persistentOnlyDynamicsPosterior_nonnegative
+    (y : BinaryBiologicalState) (persists : Bool) :
+    0 ≤ persistentOnlyDynamicsPosterior y persists := by
+  cases persists <;> norm_num [persistentOnlyDynamicsPosterior, binarySecondAnnotation]
+
+/-- **Biological sealing law at zero support.**  Persistence and switching still have conditional
+qualities one and zero, but after switching receives zero posterior mass the calibration defect is
+exactly zero.  This is not conditional invariance; it is categorical blindness created by the
+support wall, and it is certified by the general support-aware theorem. -/
+theorem persistentOnly_contextMatch_calibrationDriftDefectSq_eq_zero :
+    calibrationDriftDefectSq binaryStateWeight persistentOnlyDynamicsPosterior
+      binaryConditionalContextMatch = 0 := by
+  apply (calibrationDriftDefectSq_eq_zero_iff_on_support
+    binaryStateWeight persistentOnlyDynamicsPosterior binaryConditionalContextMatch
+    (fun y ↦ by norm_num [binaryStateWeight])
+    persistentOnlyDynamicsPosterior_sum_eq_one
+    persistentOnlyDynamicsPosterior_nonnegative).mpr
+  intro y _ s t hs ht
+  cases s
+  · norm_num [persistentOnlyDynamicsPosterior, binarySecondAnnotation] at hs
+  · cases t
+    · norm_num [persistentOnlyDynamicsPosterior, binarySecondAnnotation] at ht
+    · rfl
+
+/-! ## Finite correction cannot recover a pooled biological contrast -/
+
+/-- Pool the two biological dynamics into one unlabeled observation.  The sum is intentionally
+unnormalized: its kernel, not its scale, is the information boundary. -/
+noncomputable def dynamicsPoolingObservation : (Bool → ℝ) →ₗ[ℝ] ℝ where
+  toFun β := β false + β true
+  map_add' β γ := by simp; ring
+  map_smul' c β := by simp; ring
+
+/-- The persistence-versus-switching contrast erased by pooling. -/
+noncomputable def dynamicsContrast : Bool → ℝ := fun persists ↦ if persists then 1 else -1
+
+/-- Pooling annihilates the biological dynamics contrast exactly. -/
+theorem dynamicsContrast_mem_pooling_kernel :
+    dynamicsContrast ∈ LinearMap.ker dynamicsPoolingObservation := by
+  rw [LinearMap.mem_ker]
+  norm_num [dynamicsPoolingObservation, dynamicsContrast]
+
+/-- **Uniform finite-order correction barrier in biology.**  Every correction assembled from any
+nonempty finite dictionary of post-processors acts through the pooled observation, hence erases the
+persistence/switching contrast.  Increasing the dictionary order cannot restore information that
+pooling removed. -/
+theorem every_uniform_pooled_correction_erases_dynamicsContrast
+    (k : ℕ) (C : (Bool → ℝ) →ₗ[ℝ] (Bool → ℝ))
+    (hC : C ∈ UniformCorrectionFamily dynamicsPoolingObservation k) :
+    C dynamicsContrast = 0 := by
+  apply factorsThrough_apply_eq_zero_of_mem_ker dynamicsPoolingObservation C
+  · exact uniformCorrectionFamily_subset_factorsThrough dynamicsPoolingObservation k hC
+  · exact dynamicsContrast_mem_pooling_kernel
+
+/-- Adaptive coefficients do not rescue the contrast either: every vector they can synthesize from
+the pooled contrast is zero. -/
+theorem adaptive_pooled_correctionSet_dynamicsContrast_eq_zero
+    (k : ℕ) (T : Fin k → ℝ →ₗ[ℝ] (Bool → ℝ)) :
+    adaptiveCorrectionSet dynamicsPoolingObservation T dynamicsContrast = {0} :=
+  adaptiveCorrectionSet_of_mem_ker dynamicsPoolingObservation T dynamicsContrast
+    dynamicsContrast_mem_pooling_kernel
+
+/-- The pooled correction residual is the entire contrast, not merely a positive lower bound. -/
+theorem uniform_pooled_correction_residual_eq_dynamicsContrast
+    (k : ℕ) (C : (Bool → ℝ) →ₗ[ℝ] (Bool → ℝ))
+    (hC : C ∈ UniformCorrectionFamily dynamicsPoolingObservation k) :
+    dynamicsContrast - C dynamicsContrast = dynamicsContrast := by
+  rw [every_uniform_pooled_correction_erases_dynamicsContrast k C hC]
+  exact sub_zero _
+
+/-- The correction-theory contrast is exactly twice the calibration drift field of the biological
+context-match example.  This equality wires the two obstruction theories to the same biological
+direction rather than merely placing their theorems in one file. -/
+theorem dynamicsContrast_eq_two_mul_contextMatchDrift
+    (persists : Bool) (y : BinaryBiologicalState) :
+    dynamicsContrast persists =
+      2 * posteriorDrift binaryDynamicsPosterior binaryConditionalContextMatch persists y := by
+  cases persists <;>
+    norm_num [dynamicsContrast, posteriorDrift,
+      posteriorMean_binaryConditionalContextMatch_eq_half]
 
 /-- **The calibration price is one quarter of squared section oscillation.**  This identifies the
 `L²` posterior-field obstruction with the sharp functional-descent geometry in the same biological
