@@ -197,6 +197,7 @@ theorem projection_shift_genuine_artifact_decomposition
   rw [residualScoreMoment_outcome_change]
   abel
 
+omit [DecidableEq ι] in
 /-- Pointwise conditional excess risk when the target conditional mean has a
 nonlinear residual `η = m - vᵀx`. -/
 theorem nonlinear_conditional_excess_risk_identity

@@ -88,6 +88,7 @@ theorem dot_smul_right (c : ℝ) (x y : ι → ℝ) :
     dot x (c • y) = c * dot x y := by
   simp [dot, Finset.mul_sum, mul_left_comm]
 
+omit [DecidableEq ι] in
 /-- The usual excess-risk identity remains exact for singular `B`.  The only
 needed fact is range compatibility, expressed directly as `B v = b`. -/
 theorem singular_quadratic_excess_risk_identity
@@ -106,6 +107,7 @@ theorem singular_quadratic_excess_risk_identity
     matrix_mulVec_sub, dot_sub_left, dot_sub_right, dot_sub_right, hcross]
   ring
 
+omit [DecidableEq ι] in
 /-- Positive semidefiniteness turns the singular identity into global
 optimality; uniqueness is deliberately not asserted. -/
 theorem normal_solution_minimizes_singular_quadratic_risk
@@ -121,6 +123,7 @@ theorem normal_solution_minimizes_singular_quadratic_risk
     outcomeSecondMoment B b w v hsymmetric hnormal
   linarith [hpsd (fun i ↦ w i - v i)]
 
+omit [DecidableEq ι] in
 /-- Moving a normal-equation solution by a kernel vector produces another
 solution with exactly the same risk. -/
 theorem singular_minimizer_kernel_invariance
@@ -158,6 +161,7 @@ def bestScalarCorrection (B : Matrix ι ι ℝ)
     (u v : ι → ℝ) : ℝ :=
   dot u (B.mulVec v) / dot u (B.mulVec u)
 
+omit [DecidableEq ι] in
 /-- **bestScalarCorrection at a null correction direction, named.** With the correction direction
 identically zero its energy `⟪u, B u⟫` vanishes, so the optimal scalar is undefined -- there is
 no direction to scale. Lean returns `0`, which reads as the correct answer being no correction at
@@ -173,6 +177,7 @@ def scalarCorrectionFloor (B : Matrix ι ι ℝ)
   dot v (B.mulVec v) -
     dot u (B.mulVec v) ^ 2 / dot u (B.mulVec u)
 
+omit [DecidableEq ι] in
 /-- A correction direction with no energy sends the subtracted quotient to junk `0`, so the
 floor collapses to the whole target energy: no correction is credited, because the term that
 would credit it is undefined. -/
@@ -183,6 +188,7 @@ theorem scalarCorrectionFloor_at_zero_energy_is_junk
   rw [hzero, div_zero, sub_zero]
 
 
+omit [DecidableEq ι] in
 /-- Completed-square identity for post-hoc scalar correction.  It gives both
 the exact optimum and the exact geometric floor. -/
 theorem quadraticCoefficientDistance_eq_floor_add_sq
@@ -215,6 +221,7 @@ theorem quadraticCoefficientDistance_eq_floor_add_sq
   field_simp [hu]
   ring
 
+omit [DecidableEq ι] in
 /-- With positive variance along the deployed direction, the floor is attained
 by the reported scalar and no scalar correction can do better. -/
 theorem best_scalar_correction_attains_floor
