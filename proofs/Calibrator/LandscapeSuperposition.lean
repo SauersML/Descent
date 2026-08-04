@@ -599,6 +599,28 @@ theorem populationGapCertificate_neg_of_golden_lt_abs
   rw [hroot, sub_zero] at hfactor
   linarith
 
+/-- Effective active correlation obtained by pooling arbitrary left and right environments. -/
+noncomputable def pooledEnvironmentCorrelation
+    (left right leftMass : ℝ) : ℝ :=
+  leftMass * left + (1 - leftMass) * right
+
+/-- Opposite-sign, equal-magnitude environments reduce to the cancellation parameter used
+below. -/
+theorem pooledEnvironmentCorrelation_opposite
+    (rho mix : ℝ) :
+    pooledEnvironmentCorrelation rho (-rho) mix = rho * (2 * mix - 1) := by
+  unfold pooledEnvironmentCorrelation
+  ring
+
+/-- **Same-sign caveat.**  Pooling two equal active correlations does not change the landscape
+parameter at all.  Thus the explicit gap-closing example is a sign-cancellation mechanism,
+not a theorem that arbitrary ancestry heterogeneity helps. -/
+@[simp] theorem pooledEnvironmentCorrelation_same
+    (rho mix : ℝ) :
+    pooledEnvironmentCorrelation rho rho mix = rho := by
+  unfold pooledEnvironmentCorrelation
+  ring
+
 /-- Effective active correlation when the `+rho` environment has mass `mix` and the `-rho`
 environment has mass `1 - mix`. -/
 noncomputable def mixedEnvironmentCorrelation (rho mix : ℝ) : ℝ :=

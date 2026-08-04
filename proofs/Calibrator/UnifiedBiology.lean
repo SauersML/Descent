@@ -130,6 +130,14 @@ theorem ancestryMixture_pure_gapped_balanced_ungapped :
   refine ⟨hpositive, hnegative, ?_⟩
   simp [ancestryMixtureCorrelation, mixedEnvironmentCorrelation, populationGapCertificate]
 
+/-- **Scope of the explicit diversity mechanism.**  If the two ancestry environments carry
+the same active LD correlation, pooling leaves that correlation unchanged at every mixture
+weight.  The proven gap-closing construction therefore uses opposite-sign LD, not diversity
+alone. -/
+theorem sameSignAncestryPooling_preservesActiveCorrelation (rho mix : ℝ) :
+    pooledEnvironmentCorrelation rho rho mix = rho :=
+  pooledEnvironmentCorrelation_same rho mix
+
 /-! ## Demographic resolution budget from the frequency spectrum -/
 
 /-- **Exact fixed-epoch design budget.**  The first conjunct is the spectrum-precision
@@ -902,7 +910,7 @@ theorem geometry_and_effect_recovery_gates
 
 /-! ## The unified obstruction bundle -/
 
-/-- Twenty-three logically distinct failures and boundaries that a biological transport theory must
+/-- Twenty-four logically distinct failures and boundaries that a biological transport theory must
 not collapse into one scalar "portability" parameter.  The final six fields make continuum
 calibration and finite correction part of the core theorem rather than adjacent examples. -/
 structure UnifiedBiologyObstructions : Prop where
@@ -959,6 +967,10 @@ structure UnifiedBiologyObstructions : Prop where
     populationGapCertificate (4 / 5) < 0 ∧
       populationGapCertificate (-(4 / 5)) < 0 ∧
       populationGapCertificate (ancestryMixtureCorrelation (4 / 5) (1 / 2)) = 1
+  /-- Equal-sign active LD cannot be diluted by mixing; the explicit closure theorem is a
+  sign-cancellation result. -/
+  sameSignEnvironmentPoolingDoesNotMoveGapParameter :
+    ∀ rho mix : ℝ, pooledEnvironmentCorrelation rho rho mix = rho
   /-- Five demographic epochs already reduce root-sample spectrum estimation to a
   `sampleSize⁻¹ᐟ¹⁴` history-reconstruction exponent. -/
   fiveEpochDemographyIsSeverelyIllConditioned :
@@ -1062,6 +1074,8 @@ theorem unifiedBiology_obstructions : UnifiedBiologyObstructions := by
         rademacher_fullLowSNRFourthCoefficient_rotated_sub_localized
       environmentMixtureClosesPopulationGap :=
         ancestryMixture_pure_gapped_balanced_ungapped
+      sameSignEnvironmentPoolingDoesNotMoveGapParameter :=
+        sameSignAncestryPooling_preservesActiveCorrelation
       fiveEpochDemographyIsSeverelyIllConditioned :=
         fiveEpochDemography_sampleRateExponent
       kingmanSpectrumHasIdentifiabilityBoundary :=
