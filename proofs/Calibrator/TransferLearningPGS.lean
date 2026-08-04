@@ -595,6 +595,14 @@ that relation is not a small assumption: it is what would let a measured `F_ST` 
 converted into a term of the Ben-David bound at all. Multiplying an inequality by a
 positive constant is the only result such a theorem holds. -/
 
+/-- **The Ben-David bound is a sum, pinned.** The comparison with the information-certified
+bound below is one-sided and holds for any body dominated by it. The three terms enter additively
+and with equal weight: source error, domain divergence and the joint-optimal residual. -/
+theorem benDavidUpperBound_reference :
+    benDavidUpperBound 1 2 3 = 6 := by
+  unfold benDavidUpperBound
+  norm_num
+
 /-- **Larger `λ*` worsens the Ben-David upper bound.**
     `λ*` is the irreducible source-target approximation gap appearing in the
     domain-adaptation certificate. For fixed source error and divergence, a
@@ -804,10 +812,28 @@ def pcaSignalLossPenalty
     (signalBaseline signalRetained lossWeight : ℝ) : ℝ :=
   lossWeight * (signalBaseline - signalRetained)
 
+/-- **The signal-loss penalty's orientation and scale, pinned.** This definition carries no
+result of its own. Two units of weight on two units of lost signal is a penalty of four: the
+weight multiplies the loss rather than the retained signal, and the difference runs baseline
+minus retained so that losing signal costs rather than pays. -/
+theorem pcaSignalLossPenalty_reference :
+    pcaSignalLossPenalty 3 1 2 = 4 := by
+  unfold pcaSignalLossPenalty
+  norm_num
+
 /-- Reduction in ancestry-induced target bias achieved by removing ancestry PCs. -/
 def pcaBiasReduction
     (ancestryBiasWith ancestryBiasWithout : ℝ) : ℝ :=
   ancestryBiasWith - ancestryBiasWithout
+
+/-- **The bias-reduction sign convention, pinned.** This definition carries no result of its own,
+and the whole content of the definition is which way the subtraction runs. A reduction is
+positive when correcting for principal components leaves LESS ancestry bias than not correcting;
+the reversed body reports successful correction as damage. -/
+theorem pcaBiasReduction_positive_when_correction_helps :
+    pcaBiasReduction 3 1 = 2 := by
+  unfold pcaBiasReduction
+  norm_num
 
 /-- Linearized target error after PCA adjustment: ancestry bias plus a
     weighted trait-signal loss penalty. -/
@@ -997,6 +1023,15 @@ theorem local_pc_removal_minimum_beats_adjacent_choices
 def infoBottleneckObjective (I_phi_Y I_phi_A lam : ℝ) : ℝ :=
   I_phi_Y - lam * I_phi_A
 
+/-- **The information-bottleneck trade-off, pinned.** This definition carries no result of its
+own. The ancestry term is subtracted and weighted, so a Lagrange multiplier of two on equal
+outcome and ancestry information gives an objective of minus one: past `lam = 1` the objective
+prefers discarding predictive information to buying ancestry invariance. -/
+theorem infoBottleneckObjective_reference :
+    infoBottleneckObjective 1 1 2 = -1 := by
+  unfold infoBottleneckObjective
+  norm_num
+
 /-- Closed-form normalized Gaussian source residual risk from mutual information.
     For a jointly Gaussian source trait `Y` and representation `φ(X)` with
     `Var(Y)=1`, the residual variance fraction is under this model `exp(-2 I(φ(X);Y))`.
@@ -1005,6 +1040,15 @@ def infoBottleneckObjective (I_phi_Y I_phi_A lam : ℝ) : ℝ :=
 noncomputable def gaussianSourceResidualRisk (I_phi_Y : ℝ) : ℝ :=
   Real.exp (-2 * I_phi_Y)
 
+/-- **The Gaussian residual risk's rate, pinned.** `gaussianSourceResidualRisk_strictAnti` says
+the risk decreases in the retained information, which is true of EVERY decreasing function and
+so fixes no exponent. Half a nat of information about the outcome cuts the residual risk by
+exactly one e-fold, which is what fixes the factor two in the exponent. -/
+theorem gaussianSourceResidualRisk_half_nat :
+    gaussianSourceResidualRisk (1 / 2) = Real.exp (-1) := by
+  unfold gaussianSourceResidualRisk
+  norm_num
+
 /-- Pinsker-certified ancestry-divergence cap from mutual information.
     This is the standard `√(2 I)` envelope obtained by combining binary-domain
     total-variation control with Pinsker's inequality.
@@ -1012,6 +1056,15 @@ noncomputable def gaussianSourceResidualRisk (I_phi_Y : ℝ) : ℝ :=
     Empirical status: UNTESTED. -/
 noncomputable def pinskerAncestryDivergenceCap (I_phi_A : ℝ) : ℝ :=
   Real.sqrt (2 * I_phi_A)
+
+/-- **The Pinsker cap's constant, pinned.** `pinskerAncestryDivergenceCap_mono` fixes the
+direction and holds for `sqrt (c * I)` at every positive `c`. Half a nat of ancestry information
+caps the total-variation divergence at one, which is what fixes `c = 2` -- and, incidentally,
+marks where the cap stops saying anything, since total variation never exceeds one. -/
+theorem pinskerAncestryDivergenceCap_half_nat :
+    pinskerAncestryDivergenceCap (1 / 2) = 1 := by
+  unfold pinskerAncestryDivergenceCap
+  norm_num
 
 /-- Information-certified Ben-David upper envelope built from:
     - exact Gaussian source residual risk,
@@ -1144,11 +1197,28 @@ def oracleTransportAdaptationGain
     (transported_r2 oracle_target_r2 : ℝ) : ℝ :=
   oracle_target_r2 - transported_r2
 
+/-- **The adaptation gain's orientation, pinned.** This definition carries no result of its own,
+and its entire content is the direction of the subtraction. The gain is what refitting in the
+target would buy over transporting the source score, so it is positive when the oracle beats the
+transported score. -/
+theorem oracleTransportAdaptationGain_positive_when_oracle_wins :
+    oracleTransportAdaptationGain 1 3 = 2 := by
+  unfold oracleTransportAdaptationGain
+  norm_num
+
 /-- Portability penalty as the literal gap between a source baseline and an
     explicitly supplied transported target baseline. -/
 noncomputable def transportPenalty
     (source_r2 transported_r2 : ℝ) : ℝ :=
   source_r2 - transported_r2
+
+/-- **The transport penalty's orientation, pinned.** This definition carries no result of its
+own. The penalty is what transporting COSTS relative to performance in the source population, so
+it is positive when the score does worse after transport. -/
+theorem transportPenalty_positive_when_transport_costs :
+    transportPenalty 3 1 = 2 := by
+  unfold transportPenalty
+  norm_num
 
 /-- The additive fine-tuning model is exactly the transported target baseline
     plus any additional target-specific adaptation gain once the portability

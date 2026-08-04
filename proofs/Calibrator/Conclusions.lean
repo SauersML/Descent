@@ -521,6 +521,15 @@ theorem BayesRisk_mono {α : Type u} (R : α → ℝ) (F G : Set α)
 noncomputable def bernoulliLogLoss (p q : ℝ) : ℝ :=
   -(p * Real.log q + (1 - p) * Real.log (1 - q))
 
+/-- **The log loss is in nats, pinned.** `bernoulliLogLoss_certain_correct` fixes the loss where
+the forecast is certain and right, which is zero for every body of the form `c * loss` and so
+fixes no unit. A certain outcome forecast at one half costs `log 2` -- one bit, measured in nats
+-- which fixes `c = 1` and with it the base of the logarithm. -/
+theorem bernoulliLogLoss_half_forecast :
+    bernoulliLogLoss 1 (1 / 2) = Real.log 2 := by
+  unfold bernoulliLogLoss
+  simp [one_div, Real.log_inv]
+
 /-- **A confident correct prediction costs nothing.** At `p = 1` and `q = 1` both terms vanish --
 the second because its coefficient does -- so the loss is exactly zero. That endpoint fixes the
 normalisation: a body carrying an additive constant, or the wrong sign on either term, is still a

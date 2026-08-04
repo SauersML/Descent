@@ -40,6 +40,15 @@ open scoped BigOperators
 noncomputable def fejerChannel3 (γ₀ γ₁ γ₂ : ℝ) : ℝ :=
   γ₀ + (4 / 3 : ℝ) * γ₁ + (2 / 3 : ℝ) * γ₂
 
+/-- **The Fejer weights, pinned.** This definition carries no result of its own. On a flat
+autocovariance the three-lag Fejer channel returns three -- the sum of the weights `1, 4/3, 2/3`
+-- which fixes the triangular taper against a flat `1, 1, 1` window and against the Bartlett
+weights. -/
+theorem fejerChannel3_flat :
+    fejerChannel3 1 1 1 = 3 := by
+  unfold fejerChannel3
+  norm_num
+
 /-- Direct covariance counting: three diagonal terms, four ordered lag-one terms, and two
 ordered lag-two terms. -/
 theorem three_mul_sampleMeanVariance3 (γ₀ γ₁ γ₂ : ℝ) :
@@ -161,8 +170,24 @@ theorem twoUnitArrow_distinguishes_orientation {α : Type*} (f g : α → ℝ)
 /-- Indicator of the first state in the binary transition model. -/
 noncomputable def binaryFirstAnnotation (x : Bool) : ℝ := if x then 0 else 1
 
+/-- **The first annotation's orientation, pinned.** This definition carries no result of its own,
+and its entire content is which Boolean it sends to one. The first annotation is the indicator of
+`false`, the second the indicator of `true`; without this the two are interchangeable and every
+arrow built from them flips sign. -/
+theorem binaryFirstAnnotation_true :
+    binaryFirstAnnotation true = 0 := by
+  unfold binaryFirstAnnotation
+  norm_num
+
 /-- Indicator of the second state in the binary transition model. -/
 noncomputable def binarySecondAnnotation (x : Bool) : ℝ := if x then 1 else 0
+
+/-- **The second annotation's orientation, pinned.** Together with `binaryFirstAnnotation_true`
+this fixes the pair against the exchange that flips the sign of every arrow built from them. -/
+theorem binarySecondAnnotation_true :
+    binarySecondAnnotation true = 1 := by
+  unfold binarySecondAnnotation
+  norm_num
 
 /-- The forward binary transition has arrow `+1`. -/
 theorem binaryTransitionArrow_forward :
@@ -236,6 +261,15 @@ Choosing the initial phase uniformly makes this a stationary finite process. -/
 noncomputable def threeCycleForwardCrossMoment
     (f g : Fin 3 → ℝ) : ℝ :=
   (f 0 * g 1 + f 1 * g 2 + f 2 * g 0) / 3
+
+/-- **The three-cycle cross moment is an average, pinned.** This definition carries no result of
+its own; `threeCycleCrossFeatureArrow_swap` is an antisymmetry, which fixes the structure and not
+the normalisation, since twice this body is equally antisymmetric. On constant features the
+forward cross moment is one, so the three terms are averaged rather than summed. -/
+theorem threeCycleForwardCrossMoment_const :
+    threeCycleForwardCrossMoment (fun _ => 1) (fun _ => 1) = 1 := by
+  unfold threeCycleForwardCrossMoment
+  norm_num
 
 /-- Reversal-odd off-diagonal component of the lag-one cross-moment matrix. -/
 noncomputable def threeCycleCrossFeatureArrow (f g : Fin 3 → ℝ) : ℝ :=
