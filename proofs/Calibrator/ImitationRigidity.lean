@@ -1089,6 +1089,14 @@ variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 evaluation geometry. -/
 def lossGeometryRisk (B M : Matrix ι ι ℝ) : ℝ := Matrix.trace (B * M)
 
+/-- Reference evaluation on a concrete pair of two-by-two blocks. -/
+theorem lossGeometryRisk_at_reference_point :
+    lossGeometryRisk (!![1, 2; 3, 4] : Matrix (Fin 2) (Fin 2) ℝ)
+      (!![1, 0; 0, 1] : Matrix (Fin 2) (Fin 2) ℝ) = 5 := by
+  simp [lossGeometryRisk, Matrix.trace, Matrix.diag, Matrix.mul_apply, Fin.sum_univ_succ]
+  norm_num
+
+
 omit [DecidableEq ι] in
 theorem lossGeometryRisk_add (B₁ B₂ M : Matrix ι ι ℝ) :
     lossGeometryRisk (B₁ + B₂) M = lossGeometryRisk B₁ M + lossGeometryRisk B₂ M := by
