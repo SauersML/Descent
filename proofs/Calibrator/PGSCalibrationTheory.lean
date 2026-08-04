@@ -875,6 +875,24 @@ theorem CrossPopulationMechanisticCalibrationModel.target_profile_slope_eq_direc
     CalibrationMoments.toProfile, CalibrationMoments.shifted, calibrationProfile,
     targetCalibrationSlopeFromSourceWeights_exact_direct_proxy_context_law]
 
+/-- **The AUC-and-CITL projection**, as one proposition about a source profile, a target
+profile and a shift budget: discrimination falls, the target's calibration-in-the-large is
+the budget, its size is the budget's size, and it is strictly worse than the source's.
+
+The two theorems below conclude exactly this, at two different source profiles, and each
+wrote the four conjuncts and their `let`-bound profiles out in full.  Named, the difference
+between them is visible in one argument -- which prevalence the source profile is read at
+-- instead of being buried in nine lines that agree. -/
+def AucDropsAndCitlWorsens (cal : CrossPopulationCalibrationShiftModel)
+    (sourceMetrics targetMetrics : TransportedMetrics.Profile) : Prop :=
+  targetMetrics.auc < sourceMetrics.auc ∧
+    ((cal.identityCalibrationProfile Pop.target)).citl =
+      cal.observedMeanShift - cal.predictedMeanShift ∧
+    |((cal.identityCalibrationProfile Pop.target)).citl| =
+      |cal.observedMeanShift - cal.predictedMeanShift| ∧
+    |((cal.identityCalibrationProfile Pop.source)).citl| <
+      |((cal.identityCalibrationProfile Pop.target)).citl|
+
 /-- **What a perfectly calibrated source and a nonzero shift budget give at the target**:
 the target CITL is the budget, its size is the budget's size, and it is strictly worse than
 the source's, which is zero.
@@ -950,17 +968,13 @@ theorem source_to_target_exact_metric_profile_from_shift_budget
     (h_src_cal : ((cal.identityCalibrationProfile Pop.source)).citl = 0)
     (h_shift_nonzero :
       cal.observedMeanShift - cal.predictedMeanShift ≠ 0) :
-    let sourceProfile := (cal.identityCalibrationProfile Pop.source)
-    let targetProfile := (cal.identityCalibrationProfile Pop.target)
-    let sourceMetrics :=
-      sourceMetricProfileFromSourceWeightsAtPrevalence metric (cal.observedMean Pop.target)
-    let targetMetrics := targetMetricProfileFromSourceWeights metric
-    targetMetrics.auc < sourceMetrics.auc ∧
-    targetProfile.citl = cal.observedMeanShift - cal.predictedMeanShift ∧
-    |targetProfile.citl| = |cal.observedMeanShift - cal.predictedMeanShift| ∧
-    |sourceProfile.citl| < |targetProfile.citl| ∧
-    sourceMetrics.brier < targetMetrics.brier := by
-  dsimp
+    AucDropsAndCitlWorsens cal
+        (sourceMetricProfileFromSourceWeightsAtPrevalence metric (cal.observedMean Pop.target))
+        (targetMetricProfileFromSourceWeights metric) ∧
+      (sourceMetricProfileFromSourceWeightsAtPrevalence metric
+          (cal.observedMean Pop.target)).brier <
+        (targetMetricProfileFromSourceWeights metric).brier := by
+  unfold AucDropsAndCitlWorsens
   have h_auc :
       (targetMetricProfileFromSourceWeights metric).auc <
         (sourceMetricProfileFromSourceWeightsAtPrevalence
@@ -987,7 +1001,7 @@ theorem source_to_target_exact_metric_profile_from_shift_budget
     simpa [brierFromR2, sourceBrierFromR2, TransportedMetrics.calibratedBrier] using
       brierFromR2_strictAnti metric.targetPrevalence
         metric.targetPrevalence_pos metric.targetPrevalence_lt_one h_r2_drop
-  exact ⟨h_auc, h_citl_eq, h_abs_eq, h_abs_worse, h_brier⟩
+  exact ⟨⟨h_auc, h_citl_eq, h_abs_eq, h_abs_worse⟩, h_brier⟩
 
 /-- **Exact cross-ancestry metric portability law from the mechanistic
 SNP-level transport model and mechanistic calibration state.**
@@ -1058,8 +1072,9 @@ theorem source_to_target_exact_metric_profile
     source_to_target_exact_metric_profile_from_shift_budget cal.metric cal.toShiftModel
       h_target_mean_eq_prevalence_shift h_source_r2_unit h_target_r2_unit h_r2_drop
       h_src_cal_shift h_shift_nonzero_shift
+  unfold AucDropsAndCitlWorsens at h_main
   dsimp at h_main ⊢
-  rcases h_main with ⟨h_auc, h_citl, h_abs, h_worse, h_brier⟩
+  rcases h_main with ⟨⟨h_auc, h_citl, h_abs, h_worse⟩, h_brier⟩
   refine ⟨h_auc, ?_, ?_, ?_, ?_⟩
   · simpa [CrossPopulationMechanisticCalibrationModel.identityCalibrationProfile,
       CrossPopulationMechanisticCalibrationModel.calibrationProfile,
@@ -1332,15 +1347,10 @@ theorem auc_drop_and_citl_worsening_of_r2_drop_and_shift_budget
     (h_src_cal : ((cal.identityCalibrationProfile Pop.source)).citl = 0)
     (h_shift_nonzero :
       cal.observedMeanShift - cal.predictedMeanShift ≠ 0) :
-    let sourceProfile := (cal.identityCalibrationProfile Pop.source)
-    let targetProfile := (cal.identityCalibrationProfile Pop.target)
-    let sourceMetrics := sourceMetricProfileFromSourceWeightsAtTargetPrevalence metric
-    let targetMetrics := targetMetricProfileFromSourceWeights metric
-    targetMetrics.auc < sourceMetrics.auc ∧
-    targetProfile.citl = cal.observedMeanShift - cal.predictedMeanShift ∧
-    |targetProfile.citl| = |cal.observedMeanShift - cal.predictedMeanShift| ∧
-    |sourceProfile.citl| < |targetProfile.citl| := by
-  dsimp
+    AucDropsAndCitlWorsens cal
+      (sourceMetricProfileFromSourceWeightsAtTargetPrevalence metric)
+      (targetMetricProfileFromSourceWeights metric) := by
+  unfold AucDropsAndCitlWorsens
   have h_auc :
       (targetMetricProfileFromSourceWeights metric).auc <
         (sourceMetricProfileFromSourceWeightsAtTargetPrevalence metric).auc := by
@@ -1394,6 +1404,7 @@ theorem auc_drop_and_baseRate_only_citl_worsening_of_r2_drop
     auc_drop_and_citl_worsening_of_r2_drop_and_shift_budget
       metric cal h_source_r2_unit h_target_r2_unit h_r2_drop
       h_src_cal h_shift_nonzero
+  unfold AucDropsAndCitlWorsens at h_main
   dsimp at h_main ⊢
   rcases h_main with ⟨h_auc, h_citl, h_abs, h_worse⟩
   refine ⟨h_auc, ?_, ?_, h_worse⟩
