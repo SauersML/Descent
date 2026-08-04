@@ -1367,7 +1367,10 @@ theorem link_average_as_convolution (ν : Measure ℝ) [IsFiniteMeasure ν]
 open MeasureTheory ProbabilityTheory in
 /-- The liability distribution `ν` blurred by an independent Gaussian of scale `s`: the law
 of `Y - s Z` for `Y ∼ ν` and `Z` standard normal.  Since the standard normal is symmetric
-this is `ν` convolved with `N(0, s²)`. -/
+this is `ν` convolved with `N(0, s²)`.
+
+Empirical status: NOT AN EMPIRICAL CLAIM -- this is the pushforward measure that defines
+Gaussian liability blurring in the formal model. -/
 noncomputable def convolvedLiability (ν : Measure ℝ) (s : ℝ) : Measure ℝ :=
   ((gaussianReal 0 1).prod ν).map fun q ↦ q.2 - s * q.1
 

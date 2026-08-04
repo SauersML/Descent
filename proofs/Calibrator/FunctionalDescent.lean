@@ -61,15 +61,16 @@ consistency constructs a single witness by choosing any population present at ea
 
 The proof does not store a theorem inside model data and does not choose a conditional off its
 support: the arbitrary default is used only at contexts with zero mass in every population. -/
-theorem descends_of_overlapConsistent [Nonempty Value]
+theorem descends_of_overlapConsistent
     (mass : Population → Context → ℝ)
     (conditionalSection : Population → Context → Conditional) (b : Conditional → Value)
+    (defaultValue : Value)
     (h : OverlapConsistent mass conditionalSection b) :
     FunctionalDescends mass conditionalSection b := by
   classical
   let witness : Context → Value := fun x ↦
     if hx : ∃ P, 0 < mass P x then b (conditionalSection (Classical.choose hx) x)
-    else Classical.choice inferInstance
+    else defaultValue
   refine ⟨witness, ?_⟩
   intro P x hP
   have hx : ∃ Q, 0 < mass Q x := ⟨P, hP⟩
@@ -77,13 +78,14 @@ theorem descends_of_overlapConsistent [Nonempty Value]
   exact h P (Classical.choose hx) x hP (Classical.choose_spec hx)
 
 /-- On finite-valued biological models the dominated characterization is an equivalence. -/
-theorem functionalDescends_iff_overlapConsistent [Nonempty Value]
+theorem functionalDescends_iff_overlapConsistent
     (mass : Population → Context → ℝ)
-    (conditionalSection : Population → Context → Conditional) (b : Conditional → Value) :
+    (conditionalSection : Population → Context → Conditional) (b : Conditional → Value)
+    (defaultValue : Value) :
     FunctionalDescends mass conditionalSection b ↔
       OverlapConsistent mass conditionalSection b :=
   ⟨overlapConsistent_of_descends mass conditionalSection b,
-    descends_of_overlapConsistent mass conditionalSection b⟩
+    descends_of_overlapConsistent mass conditionalSection b defaultValue⟩
 
 /-- **Kernel sufficiency is the all-functionals pole.**  If every population uses one shared
 conditional section on its support, every functional descends, with no regularity assumption on
