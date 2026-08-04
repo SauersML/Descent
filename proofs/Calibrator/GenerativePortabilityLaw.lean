@@ -113,6 +113,14 @@ def independentHistory (amplitude : ℝ) : SpectralHistory where
   memory := 0
   phase := 0
 
+/-- **An independent history reports back the amplitude it was given.** The projection is a
+faithful readout on the family it is meant to summarise; a body that rescaled or offset the
+amplitude would still be a projection and would fail here. -/
+theorem historyMarginalAmplitude_independentHistory (amplitude : ℝ) :
+    historyMarginalAmplitude (independentHistory amplitude) = amplitude := by
+  unfold historyMarginalAmplitude independentHistory
+  rfl
+
 /-- A persistent two-state driving mode with the same marginal signal amplitude. -/
 noncomputable def persistentHalfHistory (amplitude : ℝ) : SpectralHistory where
   amplitude := amplitude

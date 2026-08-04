@@ -1253,6 +1253,15 @@ re-derived here. -/
 def alleleLossProbability (initial time : ℝ) : ℝ :=
   Real.exp (-(initial / (2 * time)))
 
+/-- **A vanishing starting frequency leaves loss certain.** At `initial = 0` the exponent is zero
+and the probability is one: an allele that was never there is lost with certainty at every
+horizon. That reference point fixes the normalisation, which no statement about the decay rate
+does, and it is the endpoint a body with the wrong sign in the exponent would invert. -/
+theorem alleleLossProbability_at_zero (time : ℝ) :
+    alleleLossProbability 0 time = 1 := by
+  unfold alleleLossProbability
+  norm_num
+
 /-- **Fisher information carried by the loss/no-loss status alone**: the
 absorption channel. -/
 def absorptionInformation (initial time : ℝ) : ℝ :=
@@ -1321,6 +1330,15 @@ theorem sqrt_alleleLoss_derivative_sq {initial time : ℝ} (htime : 0 < time) :
 whose information scale is of order `1 / (x t)`. -/
 def absorptionChannelWeight (initial time : ℝ) : ℝ :=
   initial * alleleLossProbability initial time / (4 * time)
+
+/-- **The channel is dark at a vanishing starting frequency.** Nothing has been lost because
+nothing was there, so the absorption channel carries no information however long the horizon.
+The crossover result names where the channel is brightest; this names where it is off, and a body
+missing the leading factor would report information at zero frequency. -/
+theorem absorptionChannelWeight_at_zero (time : ℝ) :
+    absorptionChannelWeight 0 time = 0 := by
+  unfold absorptionChannelWeight
+  norm_num
 
 /-- **The information crossover time.** The absorption channel is dark at short
 times (nothing has been lost yet) and dark again at long times (everything has),

@@ -2110,19 +2110,21 @@ content and no free parameter.
 Empirical status: UNTESTED. Algebra on one fixed integer matrix; no modelling -/
 def circulantSpectrumA (c : ℝ) : ℝ := 8 * c ^ 2 + 2 * c - 4
 
-/-- **The eigenvalue at the uniform mode.** At `cos θ = 1` the circulant acts on the all-ones
-vector and returns the row sum, which is six for these offsets. That value fixes the constant
-term, which no statement about the polynomial's shape or its roots does. -/
-theorem circulantSpectrumA_at_one : circulantSpectrumA 1 = 6 := by
-  unfold circulantSpectrumA
-  norm_num
-
 /-- Eigenvalue of the circulant with offsets `(0,2,1,0,0,0,1,2)` as a polynomial
 in `c = cos θ`, from `λ = 4 cos θ + 2 cos 2θ`.
 integer matrix, no free parameter.
 
 Empirical status: UNTESTED. As for `circulantSpectrumA`: algebra on one fixed -/
 def circulantSpectrumB (c : ℝ) : ℝ := 4 * c ^ 2 + 4 * c - 2
+
+/-- **The uniform mode cannot tell the two circulants apart.** Both act on the all-ones vector by
+their row sum, and both row sums are six, so the two epistatic architectures agree exactly at
+`cos θ = 1` and differ only away from it. A diagnostic that reads only the uniform mode is blind
+to the difference between them, which is what makes the rest of the spectrum the discriminating
+part. -/
+theorem circulantSpectra_agree_at_one : circulantSpectrumB 1 = circulantSpectrumA 1 := by
+  unfold circulantSpectrumB circulantSpectrumA
+  norm_num
 
 /-- The reduction to a quadratic in `cos θ` for the first circulant. -/
 theorem circulantSpectrumA_eq_cos (θ : ℝ) :
