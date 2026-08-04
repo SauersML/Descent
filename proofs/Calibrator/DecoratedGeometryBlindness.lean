@@ -389,15 +389,6 @@ populations costs more Dirichlet energy than putting them on adjacent ones.
 
 section ThreePopulationWitness
 
-/-- Positions of three populations on a one-dimensional divergence axis.
-
-Empirical status: NOT AN EMPIRICAL CLAIM -- this is a fixed finite configuration. -/
-noncomputable def witnessPosition : Fin 3 → ℝ := ![0, 1, 3]
-
-/-- The third population's position, pinned: the table reduces at indices zero and one under the
-ambient simp set and not at index two, so the last entry is stated. -/
-@[simp] theorem witnessPosition_two : witnessPosition 2 = 3 := rfl
-
 /-- Divergence between the three populations: the gap between their positions, tabulated.
 
 Empirical status: NOT AN EMPIRICAL CLAIM -- this is a fixed finite divergence. -/
@@ -424,9 +415,9 @@ theorem witnessDivergence_eq_threeAncestryDistance :
 
 /-- The tabulated divergence is the gap between the positions, as claimed. -/
 theorem witnessDivergence_eq_position_gap (s t : Fin 3) :
-    witnessDivergence s t = |witnessPosition s - witnessPosition t| := by
+    witnessDivergence s t = |ancestryPosition s - ancestryPosition t| := by
   fin_cases s <;> fin_cases t <;>
-    norm_num [witnessDivergence, witnessPosition]
+    norm_num [witnessDivergence, ancestryPosition]
 
 /-- The witness divergence is symmetric. -/
 theorem witnessDivergence_symm (s t : Fin 3) :

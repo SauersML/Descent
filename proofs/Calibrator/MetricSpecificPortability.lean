@@ -1994,7 +1994,9 @@ quantiles, or full histogram -- can detect alignment.
 Empirical status: NOT AN EMPIRICAL CLAIM -- this is a finite counterexample. -/
 noncomputable def ancestryPosition : Fin 3 → ℝ := ![0, 1, 3]
 
-/-- Distance between two ancestries on the line. -/
+/-- Distance between two ancestries on the line.
+
+Empirical status: NOT AN EMPIRICAL CLAIM -- this is the metric of a finite counterexample. -/
 noncomputable def threeAncestryDistance : Fin 3 → Fin 3 → ℝ :=
   fun i j ↦ |ancestryPosition i - ancestryPosition j|
 
