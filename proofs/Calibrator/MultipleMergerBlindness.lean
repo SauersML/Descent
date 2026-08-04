@@ -90,6 +90,13 @@ subtraction. -/
 noncomputable def speedTiltFullMergerRate (β : ℝ) (extra : ℕ) : ℝ :=
   ∏ j ∈ Finset.range extra, ((j : ℝ) + 1) / (β + (j : ℝ) + 2)
 
+/-- At the excluded parameter the first factor divides by zero, so Mathlib returns `0` for the
+whole product: every merger of three or more lineages is reported as impossible. -/
+theorem speedTiltFullMergerRate_at_minus_two_is_junk (extra : ℕ) :
+    speedTiltFullMergerRate (-2) (extra + 1) = 0 := by
+  simp [speedTiltFullMergerRate, Finset.prod_range_succ']
+
+
 /-- Pair merger is normalized to one. -/
 @[simp] theorem speedTiltFullMergerRate_zero (β : ℝ) :
     speedTiltFullMergerRate β 0 = 1 := by

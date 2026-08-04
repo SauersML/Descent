@@ -282,7 +282,12 @@ end CalibrationDefinitions
 
 /-- Logistic-scale prevalence log-odds.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_bulk6.py`,
+    `test_prevalence_logit`). The oracle is the fitted intercept of an
+    intercept-only logistic model on four million simulated binary outcomes,
+    which is what a calibration-in-the-large is read off in practice; worst 2.66
+    sems over a prediction spanning -3.89182 to -0.61904. -/
 noncomputable def prevalenceLogit (pi : ℝ) : ℝ :=
   Real.log (pi / (1 - pi))
 
@@ -323,7 +328,20 @@ theorem prevalenceLogit_reflect (pi : ℝ) (h0 : pi ≠ 0) (h1 : pi ≠ 1) :
     in the target, the intercept shift on the logistic linear-predictor
     scale is `logit(π_target) - logit(π_source)`.
 
-    Empirical status: UNTESTED. Definitional within the logistic model declared
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_bulk6.py`,
+    `test_prevalence_logit`). Difference of fitted intercepts between two
+    simulated populations:
+
+      shift            this def   fitted               sems
+      0.02 -> 0.10      1.69460   1.69828±0.00394      0.93
+      0.10 -> 0.35      1.57819   1.57618±0.00197      1.02
+      0.35 -> 0.02     -3.27278  -3.27761±0.00373      1.29
+
+    The design includes a SIGN REVERSAL, so a formula that had the two
+    prevalences the wrong way round would show rather than cancel.
+
+    Power: the prediction spans -3.27278 to 1.69460. Definitional within the logistic model declared
     above: it fixes the shift rather than predicting an observable. -/
 noncomputable def prevalenceCITLShift (pi_source pi_target : ℝ) : ℝ :=
   prevalenceLogit pi_target - prevalenceLogit pi_source
@@ -2032,6 +2050,22 @@ noncomputable def nri
     (up_events down_events up_nonevents down_nonevents n_events n_nonevents : ℝ) : ℝ :=
   (up_events - down_events) / n_events + (down_nonevents - up_nonevents) / n_nonevents
 
+/-- With no events the first reclassification term divides by zero and Mathlib returns `0`, so
+the index reports the non-event half alone rather than being undefined. -/
+theorem nri_at_zero_events_is_junk
+    (up_events down_events up_nonevents down_nonevents n_nonevents : ℝ) :
+    nri up_events down_events up_nonevents down_nonevents 0 n_nonevents
+      = (down_nonevents - up_nonevents) / n_nonevents := by
+  simp [nri]
+
+/-- And symmetrically with no non-events. -/
+theorem nri_at_zero_nonevents_is_junk
+    (up_events down_events up_nonevents down_nonevents n_events : ℝ) :
+    nri up_events down_events up_nonevents down_nonevents n_events 0
+      = (up_events - down_events) / n_events := by
+  simp [nri]
+
+
 /-- **Reclassifying nobody scores zero, whatever the denominators are.** The index is a sum of
 two net rates and each vanishes when its own movements cancel; a body carrying an additive term
 in the counts would report improvement for a model that moved no one. -/
@@ -2917,6 +2951,16 @@ noncomputable def qalyScreeningDecisionModel
   benefit := benefit
   harm := harm
 
+/-- With neither benefit nor harm the threshold divides by zero and Mathlib returns `0`: a
+model that screens everyone, which is the opposite of what a decision with no stakes should
+recommend. -/
+theorem qalyScreeningDecisionModel_at_zero_stakes_is_junk (benefit harm : ℝ)
+    (hzero : benefit + harm = 0) :
+    (qalyScreeningDecisionModel benefit harm).threshold = 0 := by
+  unfold qalyScreeningDecisionModel
+  simp [hzero]
+
+
 /-- The canonical cost-effectiveness screening model satisfies the exact
     threshold/utility bridge equation. -/
 theorem qalyScreeningDecisionModel_harm_eq_threshold_scale
@@ -2963,6 +3007,13 @@ noncomputable def decisionCurveScreeningModel
   threshold := t
   benefit := 1
   harm := t / (1 - t)
+
+/-- At a unit threshold the odds ratio divides by zero and Mathlib returns `0` harm, so the
+model reports screening as costless exactly where it should be prohibitive. -/
+theorem decisionCurveScreeningModel_at_unit_threshold_is_junk :
+    (decisionCurveScreeningModel 1).harm = 0 := by
+  simp [decisionCurveScreeningModel]
+
 
 /-- The decision-curve screening model satisfies the exact threshold/utility
     bridge equation whenever `t ≠ 1`. -/

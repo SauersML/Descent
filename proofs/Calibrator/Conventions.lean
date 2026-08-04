@@ -251,6 +251,16 @@ noncomputable def neiGst (p₁ p₂ : ℝ) : ℝ :=
   1 - (p₁ * (1 - p₁) + p₂ * (1 - p₂)) /
     (ploidy * meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂))
 
+/-- Where the mean-frequency heterozygosity vanishes the ratio divides by zero and Mathlib
+returns `0`, so the statistic reports complete differentiation for a pair of populations that
+are both monomorphic and identical. -/
+theorem neiGst_at_zero_mean_heterozygosity_is_junk (p₁ p₂ : ℝ)
+    (hzero : ploidy * meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) = 0) :
+    neiGst p₁ p₂ = 1 := by
+  unfold neiGst
+  rw [hzero, div_zero, sub_zero]
+
+
 /-- **Hudson's `F_ST` for two subgroups, parametric limit** (Bhatia, Patterson,
 Sankararaman & Price 2013, eq. 10, at infinite sample size):
 
@@ -808,11 +818,11 @@ theorem asymmetricFst_eq_scaled (Ne m_into : ℝ) :
   unfold asymmetricFst fstMutationDriftEquilibrium
   rw [scaledMigrationRate_eq_ploidy_form]; unfold ploidy; ring_nf
 
-theorem fstMigDriftEquil_eq_scaled (Ne m : ℝ) :
-    fstMigDriftEquil Ne m
-      = fstMutationDriftEquilibrium (scaledMigrationRate Ne m) := by
-  unfold fstMigDriftEquil fstMutationDriftEquilibrium
-  rw [scaledMigrationRate_eq_ploidy_form]; unfold ploidy; ring_nf
+/-! The bridge from the migration-drift equilibrium to the scaled mutation-drift form is
+`fstMigrationDriftEquilibrium_eq_scaled` above.  A second copy of it stood here, for the
+second spelling of that equilibrium -- which is what the note above predicted: "A second
+spelling of `1 / (1 + 4 Nₑ m)` would need its own bridge theorem, which is a reason not to
+add one."  The spelling is gone from `PortabilityDrift` and its bridge with it. -/
 
 theorem fstMigrationMutationEquilibrium_eq_scaled (Ne m μ : ℝ) :
     fstMigrationMutationEquilibrium Ne m μ

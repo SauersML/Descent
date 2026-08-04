@@ -730,6 +730,16 @@ noncomputable def lowSNRThirdCoefficient
       (m3 + 3 * m1 * m2 / aspect + m1 ^ 3 / aspect ^ 2) -
     thirdMoment ^ 2 / 12 * h3
 
+/-- At zero aspect both aspect-scaled moment terms are Mathlib junk `0`, so the coefficient
+drops the cross-moment structure entirely and reports only the diagonal third moment against
+the orientation term. -/
+theorem lowSNRThirdCoefficient_at_zero_aspect_is_junk
+    (variance thirdMoment m1 m2 m3 h3 : ℝ) :
+    lowSNRThirdCoefficient 0 variance thirdMoment m1 m2 m3 h3
+      = variance ^ 3 / 6 * m3 - thirdMoment ^ 2 / 12 * h3 := by
+  simp [lowSNRThirdCoefficient]
+
+
 /-- At fixed spectrum, changing orientation changes the cubic coefficient by exactly the squared
 third moment times the change in the entrywise-cube invariant. -/
 theorem lowSNRThirdCoefficient_sub_of_spectral_match

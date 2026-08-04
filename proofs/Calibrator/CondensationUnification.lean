@@ -1787,6 +1787,17 @@ noncomputable def jProfile (tilt order : ℕ) (s : ℝ) : ℝ :=
   Real.log (1 + s) ^ order * (1 + s) ^ tilt -
     Real.log (1 - s) ^ order * (1 - s) ^ tilt
 
+/-- At full tilt `Real.log (1 - s)` is Mathlib's junk `0`, so for any positive order the second
+half of the profile vanishes and only the growing branch is reported.  The true profile
+diverges there; every result above keeps `s` strictly inside the unit interval. -/
+theorem jProfile_at_unit_argument_is_junk (tilt order : ℕ) :
+    jProfile tilt (order + 1) 1 = Real.log 2 ^ (order + 1) * 2 ^ tilt := by
+  unfold jProfile
+  have hlog : Real.log (1 - (1 : ℝ)) = 0 := by norm_num
+  rw [hlog, zero_pow (Nat.succ_ne_zero order)]
+  norm_num
+
+
 /-- `J₁⁰` is the variance profile: tilt one, order zero. -/
 theorem jProfile_one_zero (s : ℝ) : jProfile 1 0 s = varianceProfile s := by
   unfold jProfile varianceProfile
