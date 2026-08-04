@@ -81,8 +81,6 @@ theorem thirdTensorEnergy_pushedThirdMomentTensor
   classical
   unfold thirdTensorEnergy pushedThirdMomentTensor entryCubeSum gramCovariance
   simp only [Matrix.mul_apply, Matrix.transpose_apply]
-  simp_rw [pow_two, pow_succ, pow_zero, mul_one]
-  simp_rw [Finset.mul_sum, Finset.sum_mul]
   ring
 
 end ThirdMomentContraction
@@ -108,7 +106,7 @@ def Isospectral2 (left right : Matrix (Fin 2) (Fin 2) ℝ) : Prop :=
 theorem localizedCovarianceBlock_isospectral_rotatedCovarianceBlock (a : ℝ) :
     Isospectral2 (localizedCovarianceBlock a) (rotatedCovarianceBlock a) := by
   intro spectralParameter
-  simp [Isospectral2, localizedCovarianceBlock, rotatedCovarianceBlock, Matrix.det_fin_two]
+  simp [localizedCovarianceBlock, rotatedCovarianceBlock, Matrix.det_fin_two]
   ring
 
 /-- Per-coordinate normalization of the entrywise cube invariant for a two-dimensional block. -/
@@ -172,8 +170,8 @@ theorem sparsePrior_lowSNRThirdCoefficient_rotated_sub_localized
       lowSNRThirdCoefficient aspect 2 2 m1 m2 m3
         (blockEntryCubeMean (localizedCovarianceBlock (3 / 2))) = 11 / 24 := by
   rw [lowSNRThirdCoefficient_sub_of_spectral_match]
-  have hsep := midpoint_blockEntryCubeMean_separation
-  norm_num at hsep ⊢
+  rw [midpoint_blockEntryCubeMean_separation]
+  norm_num
 
 /-- There is no spectrum-only representation of the entrywise-cube invariant, already among
 positive two-dimensional covariance blocks with eigenvalues in `[1, 3]`. -/

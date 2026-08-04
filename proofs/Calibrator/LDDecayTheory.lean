@@ -428,6 +428,16 @@ theorem driftLDRetention_zero_population_is_junk (c : ℝ) :
 noncomputable def driftLDEquilibrium (Ne c : ℝ) : ℝ :=
   (1 - c) ^ 2 * (1 / (2 * Ne)) / (1 - driftLDRetention Ne c)
 
+/-- **driftLDEquilibrium at an empty population with no recombination, named.** Two junk branches
+compound. At `Ne = 0` the drift input `1 / (2 Ne)` is junk-zero, and `driftLDRetention` is
+junk-one there, so the denominator `1 - retention` is zero as well. Numerator and denominator
+vanish together and the equilibrium is `0`: no linkage disequilibrium maintained, in the
+population that maintains the most. Consumers must exclude it by hypothesis. -/
+theorem driftLDEquilibrium_empty_population_is_junk :
+    driftLDEquilibrium 0 0 = 0 := by
+  unfold driftLDEquilibrium driftLDRetention
+  norm_num
+
 /-- **The Ohta-Kimura (1971) approximation to `σ_d²`**, in terms of the scaled
 recombination rate `ρ = 4·Nₑ·c`:
 
@@ -461,6 +471,16 @@ not justified.
 noncomputable def ohtaKimuraSigmaDSq (Ne c : ℝ) : ℝ :=
   let ρ := 4 * Ne * c
   (10 + ρ) / ((2 + ρ) * (11 + ρ))
+
+/-- **ohtaKimuraSigmaDSq at a scaled recombination rate of minus two, named.** The Ohta-Kimura
+denominator `(2 + ρ)(11 + ρ)` vanishes at `ρ = -2`, reachable from an inadmissible negative
+recombination rate. Lean returns `0`: no expected squared linkage disequilibrium at all, the
+value for free recombination, produced at a pole of the formula. Consumers must exclude it by
+hypothesis. -/
+theorem ohtaKimuraSigmaDSq_cancelling_scaled_recombination_is_junk :
+    ohtaKimuraSigmaDSq 1 (-(1/2)) = 0 := by
+  unfold ohtaKimuraSigmaDSq
+  norm_num
 
 /-- `σ_d²` under this approximation is strictly positive whenever `ρ ≥ 0`,
 which is what a ratio of nonnegative expectations requires and is the cheapest

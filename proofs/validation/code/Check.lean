@@ -531,7 +531,18 @@ def exempt : List (Name × String) :=
     (`Calibrator.hasInteraction, "a Prop: the quotient sits under a binder"),
     (`Calibrator.exitLevels, "a Set: the quotient sits under a binder"),
     (`Calibrator.hetRecurrence, "proof by induction, not a value"),
-    (`Calibrator.hetMutationDriftRecurrence, "proof by induction, not a value") ]
+    (`Calibrator.hetMutationDriftRecurrence, "proof by induction, not a value"),
+    (`Calibrator.rsquared, "an integral expression: the quotient sits under ∫"),
+    (`Calibrator.peelSet, "a Set: the preimage sits under a binder"),
+    (`Calibrator.logSqGaussianLaw, "a Measure, not a real value"),
+    (`Calibrator.jProfile, "Real.log (1 ± s) on the module's own |s| < 1 convention"),
+    (`Calibrator.hardCallLatticeSpan, "Real.log at latticeCriticalMaf, proved in (0,1)"),
+    (`Calibrator.gaussianProfileLogLik, "a log-likelihood: variance positive by model"),
+    (`Calibrator.liabilitySensitivity, "Real.sqrt of h_sq and R2, both model-bounded in [0,1]"),
+    (`Calibrator.liabilitySpecificity, "Real.sqrt of h_sq and R2, both model-bounded in [0,1]"),
+    (`Calibrator.Expected_Abs_Shift, "Real.sqrt of a variance, nonnegative by construction"),
+    (`Calibrator.serialFounderWithinTime, "Real.exp arguments, and 2 * N with N a census size"),
+    (`Calibrator.sigmaThetaFromObservedSelectedVariance, "Real.sqrt of an observed variance excess") ]
 
 /-- Is this a numeric literal, or a ratio or negation of them?
 
