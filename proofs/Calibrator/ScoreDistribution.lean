@@ -555,6 +555,18 @@ theorem residualDiscreteness_le_exp (correlationLength : ℝ) (n : ℕ)
 noncomputable def excursionShapeFactor (blockThirdMoment blockSecondMoment : ℝ) : ℝ :=
   blockThirdMoment / blockSecondMoment ^ (3 / 2 : ℝ)
 
+/-- **Unit second moment makes the shape factor the third moment itself.**
+
+The docstring above tabulates the factor at several weight distributions, and the block bound
+below is stated as `√ℓ · κ` for whatever `κ` is. Neither fixes the normalising power. At unit
+second moment the denominator is one, so the factor equals the third moment exactly, and a body
+carrying any other exponent -- `^1`, `^2`, the reciprocal -- agrees there and nowhere else. This
+is the point at which the three-halves power is the only thing being asserted. -/
+theorem excursionShapeFactor_unit_second_moment (blockThirdMoment : ℝ) :
+    excursionShapeFactor blockThirdMoment 1 = blockThirdMoment := by
+  unfold excursionShapeFactor
+  norm_num
+
 /-- **The block bound is `√ℓ · κ` times the marker bound.**
 
     `κ` appears explicitly. Setting `κ = 1` recovers the equal-weight block-constant case and
