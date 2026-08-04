@@ -108,16 +108,52 @@ theorem joinTime_pushforward_not_lt
 chain, whose total age is `tAnc`, or survives into the ancestral population and waits a
 further `2·N_anc`.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **FALSIFIED as written, and the body corrected**
+    (`proofs/validation/empirical/simcov/battery_bulk12.py`,
+    `test_serial_founder_within_time`). Mean pairwise TMRCA in a two-epoch
+    history, 60000 independent genealogies per cell, `N = 400`, `Nanc = 4000`:
+
+      tAnc    as written   corrected   measured           sems(written)  sems(corr)
+       200      6563.13     6407.37    6455.53±31.99          3.36          1.51
+       800      3743.04     3448.73    3481.02±25.99         10.08          1.24
+      3000      1039.88      969.33     982.79± 8.88          6.43          1.52
+
+    The error is a double-counted `tAnc`. Decomposing on whether the pair
+    coalesces before the size change,
+
+      E[T] = ∫₀^tAnc t f(t) dt + P(not yet) · (tAnc + 2 Nanc),
+
+    and the second term is right: a pair still uncoalesced at `tAnc` waits a
+    further `2 Nanc` on average, so `tAnc + 2 Nanc` from the present. What was
+    wrong is the FIRST term. The truncated integral is
+    `2N - e^(-a) (2N + tAnc)`, not `2N (1 - e^(-a))`, and the missing
+    `-e^(-a) tAnc` is exactly what cancels the `tAnc` carried by the second
+    term. The two forms differ by `tAnc · e^(-tAnc/(2N))`, which is 294 of the
+    3743 at `tAnc = 800`.
+
+    After cancellation the expectation is simply `2N` weighted by the
+    probability of coalescing in the recent epoch and `2 Nanc` by its
+    complement, which is the body now.
+
+    Power: the measurement spans 982.79 to 6455.53, a factor of six and a half,
+    and `tAnc` crosses the epoch boundary in both directions -- most pairs
+    coalesce after it at `tAnc = 200` and before it at `tAnc = 3000`. The
+    corrected form holds across that whole range at 1.5 sems; the superseded one
+    fails hardest in the middle, where `e^(-a) tAnc` is largest. -/
 noncomputable def serialFounderWithinTime (N Nanc tAnc : ℝ) : ℝ :=
   2 * N * (1 - Real.exp (-tAnc / (2 * N)))
-    + Real.exp (-tAnc / (2 * N)) * (tAnc + 2 * Nanc)
+    + Real.exp (-tAnc / (2 * N)) * (2 * Nanc)
 
 /-- A zero effective size sends `-tAnc / (2 * N)` to Mathlib's junk `0`, hence the exponential
 to one, and the body reports the ancestral term alone.  The true limit is the opposite: with no
-population there is no within-chain coalescent time to accumulate. -/
+population there is no within-chain coalescent time to accumulate.
+
+The junk value is now `2 * Nanc` rather than `tAnc + 2 * Nanc`, because the body no longer
+double-counts `tAnc`; the correction is recorded on the definition above. The branch is still
+junk and still has to be excluded by hypothesis -- what changed is only which wrong number it
+returns. -/
 theorem serialFounderWithinTime_at_zero_size_is_junk (Nanc tAnc : ℝ) :
-    serialFounderWithinTime 0 Nanc tAnc = tAnc + 2 * Nanc := by
+    serialFounderWithinTime 0 Nanc tAnc = 2 * Nanc := by
   unfold serialFounderWithinTime
   simp
 
