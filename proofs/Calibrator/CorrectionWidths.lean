@@ -26,7 +26,7 @@ the analytic extraction of weakly-null depth cascades is intentionally not smugg
 
 ## Main results
 
-- `uniformCorrectionFamily_eq_factorsThrough`: every positive uniform order is the same cone.
+- `uniformCorrectionWidth_order_dichotomy`: exact numerical formula at every uniform order.
 - `adaptiveCorrectionSet_smul`: adaptive correction is invariant under nonzero target scaling.
 - `not_hasPositiveLowerBound_iff_hasUnitApproxKernel`: exact stability/depth dichotomy.
 - `HasUnitApproxKernel.postcomp`: bounded observation processing preserves deep targets.
@@ -264,6 +264,27 @@ theorem uniformCorrectionWidth_eq_correctionDiameter
     uniformCorrectionWidth A k B = correctionDiameter A B := by
   unfold uniformCorrectionWidth correctionDiameter
   rw [uniformCorrectionFamily_eq_factorsThrough A k hk]
+
+/-- At order zero, the numerical width is exactly the worst residual of the zero correction. -/
+theorem uniformCorrectionWidth_zero
+    (A : H →ₗ[ℝ] Y) (B : Set H) :
+    uniformCorrectionWidth A 0 B = worstCorrectionResidual B 0 := by
+  unfold uniformCorrectionWidth
+  rw [uniformCorrectionFamily_zero]
+  simp
+
+/-- **Complete numerical order dichotomy.** Uniform order zero does nothing; every positive
+order optimizes over the same full factor-through cone and therefore equals the correction
+diameter. There is no intermediate dependence on dictionary size. -/
+theorem uniformCorrectionWidth_order_dichotomy
+    (A : H →ₗ[ℝ] Y) (k : ℕ) (B : Set H) :
+    uniformCorrectionWidth A k B =
+      if k = 0 then worstCorrectionResidual B 0 else correctionDiameter A B := by
+  by_cases hk : k = 0
+  · subst k
+    simp [uniformCorrectionWidth_zero]
+  · rw [if_neg hk]
+    exact uniformCorrectionWidth_eq_correctionDiameter A k B (Nat.pos_of_ne_zero hk)
 
 end UniformWidths
 
