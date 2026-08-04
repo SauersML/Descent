@@ -95,7 +95,15 @@ def evaluated(defs: dict) -> set[str]:
     """
     seen: set[str] = set()
     for head in theorem_heads():
-        for line in head.split("\n"):
+        # A statement that WRAPS puts its definition on one line and its `=` on the
+        # next, so the per-line scan below misses it entirely.  When the whole head
+        # contains exactly one `=` there are no hypothesis equalities to confuse the
+        # leftmost-name rule, so the joined head can be scanned directly.
+        joined = " ".join(head.split())
+        lines = head.split("\n")
+        if joined.count("=") - joined.count(":=") - joined.count("==") == 1:
+            lines = lines + [joined]
+        for line in lines:
             for pos, ch in enumerate(line):
                 if ch != "=":
                     continue
