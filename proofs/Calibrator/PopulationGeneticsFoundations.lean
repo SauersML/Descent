@@ -218,9 +218,9 @@ theorem het_increases_with_ne
     a ratio of averages, 25 replicates of 20 Mb, 50 diploids per deme:
 
       t        this def    simulated             sems
-       500       0.20000   0.19923+/-0.00227     0.34
-      1000       0.33333   0.33415+/-0.00319     0.25
-      2000       0.50000   0.49974+/-0.00330     0.08
+       500       0.20000   0.19923±0.00227     0.34
+      1000       0.33333   0.33415±0.00319     0.25
+      2000       0.50000   0.49974±0.00330     0.08
 
     Recombination is not optional in this design. At `recombination_rate = 0`
     every site in a replicate sits on ONE genealogy, so a 20 Mb sequence carries
@@ -1293,10 +1293,10 @@ theorem islandModelFst_eq_mutationForm (Ne m : ℝ) :
     of 4 Mb, 40 diploids from each of two sampled demes:
 
       demes    this def    simulated F_ST
-        2        0.2000    0.09314+/-0.01311     8.2 sems, +115 percent
-        4        0.2000    0.16469+/-0.02700     1.3 sems
-        8        0.2000    0.15502+/-0.01987     2.3 sems
-       20        0.2000    0.14347+/-0.01971     2.9 sems
+        2        0.2000    0.09314±0.01311     8.2 sems, +115 percent
+        4        0.2000    0.16469±0.02700     1.3 sems
+        8        0.2000    0.15502±0.01987     2.3 sems
+       20        0.2000    0.14347±0.01971     2.9 sems
 
     The scaled rate `4*Ne*m` is identical in every row, so a formula in
     `(Ne, m, mu)` alone must return one number for all four; the measurement

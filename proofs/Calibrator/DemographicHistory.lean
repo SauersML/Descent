@@ -126,13 +126,13 @@ indistinguishability recorded in the note above can be stated rather than assert
     30 replicates of 10 Mb, and read the log-log slope of `K` against `m`:
 
       m         F_ST                K
-      0.005     0.21051+/-0.00383    11.251
-      0.010     0.12634+/-0.00301    20.746
-      0.020     0.06689+/-0.00202    41.853
-      0.040     0.03552+/-0.00121    81.450
-      0.080     0.01870+/-0.00078   157.447
+      0.005     0.21051±0.00383    11.251
+      0.010     0.12634±0.00301    20.746
+      0.020     0.06689±0.00202    41.853
+      0.040     0.03552±0.00121    81.450
+      0.080     0.01870±0.00078   157.447
 
-      slope = 0.959 +/- 0.010
+      slope = 0.959 ± 0.010
 
     This form has `K` proportional to `m^2` and so predicts slope 2; the linear
     sibling `demoSteppingStoneFst` has `K` proportional to `m` and predicts
@@ -817,10 +817,10 @@ section VariableNeFst
     replicates of 2000 loci, realised loss taken as `1 - H_T/H_0`:
 
       schedule              1 - exp(-Σ)   simulated             sems
-      Ne=500, 20 gens          0.01980    0.01983+/-0.00030      0.10
-      Ne=200, 50 gens          0.11750    0.11769+/-0.00177      0.10
-      Ne=50, 60 gens           0.45119    0.45291+/-0.00679      0.25
-      1000/30/1000 bottleneck  0.16194    0.16316+/-0.00245      0.50
+      Ne=500, 20 gens          0.01980    0.01983±0.00030      0.10
+      Ne=200, 50 gens          0.11750    0.11769±0.00177      0.10
+      Ne=50, 60 gens           0.45119    0.45291±0.00679      0.25
+      1000/30/1000 bottleneck  0.16194    0.16316±0.00245      0.50
 
     The same runs give the exact Wright-Fisher product `1 - Π(1 - 1/(2 Ne_i))`
     at 0.01 to 0.06 sems, so the exponential form carries a real second-order

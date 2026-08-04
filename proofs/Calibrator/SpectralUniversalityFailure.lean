@@ -5,6 +5,7 @@ import Mathlib.Data.Matrix.Basic
 import Mathlib.Data.Real.Basic
 import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
 import Mathlib.Tactic.FinCases
+import Mathlib.Tactic.Linarith
 import Mathlib.Tactic.NormNum
 import Mathlib.Tactic.Ring
 
@@ -173,12 +174,44 @@ def Isospectral2 (left right : Matrix (Fin 2) (Fin 2) ℝ) : Prop :=
     Matrix.det (left - spectralParameter • 1) =
       Matrix.det (right - spectralParameter • 1)
 
+/-- Characteristic determinant of the localized block. -/
+theorem localizedCovarianceBlock_characteristicDeterminant (a spectralParameter : ℝ) :
+    Matrix.det (localizedCovarianceBlock a - spectralParameter • 1) =
+      (a - spectralParameter) * (a + 1 - spectralParameter) := by
+  simp [localizedCovarianceBlock, Matrix.det_fin_two]
+
+/-- Characteristic determinant of the rotated block.  Its factorization is identical to the
+localized block's factorization, which is exact isospectrality rather than moment matching. -/
+theorem rotatedCovarianceBlock_characteristicDeterminant (a spectralParameter : ℝ) :
+    Matrix.det (rotatedCovarianceBlock a - spectralParameter • 1) =
+      (a - spectralParameter) * (a + 1 - spectralParameter) := by
+  simp [rotatedCovarianceBlock, Matrix.det_fin_two]
+  ring
+
 /-- The localized and rotated blocks are exactly isospectral for every value of `a`. -/
 theorem localizedCovarianceBlock_isospectral_rotatedCovarianceBlock (a : ℝ) :
     Isospectral2 (localizedCovarianceBlock a) (rotatedCovarianceBlock a) := by
   intro spectralParameter
-  simp [localizedCovarianceBlock, rotatedCovarianceBlock, Matrix.det_fin_two]
-  ring
+  rw [localizedCovarianceBlock_characteristicDeterminant,
+    rotatedCovarianceBlock_characteristicDeterminant]
+
+/-- Every spectral root of either block is at least one when `1 ≤ a`. -/
+theorem block_spectralParameter_ge_one
+    (a spectralParameter : ℝ) (ha : 1 ≤ a)
+    (hroot : (a - spectralParameter) * (a + 1 - spectralParameter) = 0) :
+    1 ≤ spectralParameter := by
+  rcases mul_eq_zero.mp hroot with hroot | hroot
+  · linarith
+  · linarith
+
+/-- Every spectral root of either block is at most three when `a ≤ 2`. -/
+theorem block_spectralParameter_le_three
+    (a spectralParameter : ℝ) (ha : a ≤ 2)
+    (hroot : (a - spectralParameter) * (a + 1 - spectralParameter) = 0) :
+    spectralParameter ≤ 3 := by
+  rcases mul_eq_zero.mp hroot with hroot | hroot
+  · linarith
+  · linarith
 
 /-- Per-coordinate normalization of the entrywise cube invariant for a two-dimensional block. -/
 noncomputable def blockEntryCubeMean (covariance : Matrix (Fin 2) (Fin 2) ℝ) : ℝ :=
@@ -212,6 +245,30 @@ theorem midpoint_blockEntryCubeMean_separation :
   norm_num
 
 /-! ## The low-SNR coefficient and the Question S certificate -/
+
+/-- Three equiprobable atoms realizing the centered form of the sparse prior
+`(2 / 3) delta_(-1) + (1 / 3) delta_2`.  Repeating `-1` twice avoids introducing a
+measure-theoretic wrapper around an elementary finite law. -/
+noncomputable def centeredSparsePriorAtom : Fin 3 → ℝ := ![-1, -1, 2]
+
+/-- The centered sparse prior has mean zero. -/
+theorem centeredSparsePriorAtom_mean :
+    (∑ i, centeredSparsePriorAtom i) / 3 = 0 := by
+  norm_num [centeredSparsePriorAtom, Fin.sum_univ_three, Matrix.cons_val_zero,
+    Matrix.cons_val_one, Matrix.cons_val_two, Matrix.head_cons]
+
+/-- The centered sparse prior has variance two. -/
+theorem centeredSparsePriorAtom_secondMoment :
+    (∑ i, centeredSparsePriorAtom i ^ 2) / 3 = 2 := by
+  norm_num [centeredSparsePriorAtom, Fin.sum_univ_three, Matrix.cons_val_zero,
+    Matrix.cons_val_one, Matrix.cons_val_two, Matrix.head_cons]
+
+/-- The centered sparse prior has third moment two, so it detects covariance orientation at the
+first non-spectral low-SNR order. -/
+theorem centeredSparsePriorAtom_thirdMoment :
+    (∑ i, centeredSparsePriorAtom i ^ 3) / 3 = 2 := by
+  norm_num [centeredSparsePriorAtom, Fin.sum_univ_three, Matrix.cons_val_zero,
+    Matrix.cons_val_one, Matrix.cons_val_two, Matrix.head_cons]
 
 /-- The cubic low-SNR coefficient after the spectral terms and the orientation term are
 separated.  `m1`, `m2`, and `m3` are spectral moments; `h3` is the entrywise-cube invariant. -/

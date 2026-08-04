@@ -342,10 +342,10 @@ because it had no other place to go.
     transient, then compare against the measured `Q_{t+1}`.
 
       Ne     c      predicted   simulated             sems
-      100    0.00     0.41197   0.41243+/-0.00445     0.10
-      100    0.05     0.12426   0.12517+/-0.00970     0.09
-      500    0.01     0.27766   0.27779+/-0.00621     0.02
-      500    0.05     0.09651   0.09665+/-0.01115     0.01
+      100    0.00     0.41197   0.41243±0.00445     0.10
+      100    0.05     0.12426   0.12517±0.00970     0.09
+      500    0.01     0.27766   0.27779±0.00621     0.02
+      500    0.05     0.09651   0.09665±0.01115     0.01
 
     `Q` must be the NORMALISED `sigma_d^2`, and reading it as the raw `E[D^2]`
     inverts the answer: drift destroys `E[D]` but GENERATES variance in `D`, so

@@ -1081,10 +1081,10 @@ For one branch with drift index `fst`, this is `2 * fst * V_A`.
     generation and the variance taken across replicates:
 
       generations   F_branch   2 * fst * V_A   simulated              sems
-        20            0.049          20.982    20.472+/-0.458         1.11
-        60            0.139          59.923    58.374+/-1.305         1.19
-       150            0.313         134.509   133.139+/-2.977         0.46
-       300            0.528         226.912   228.418+/-5.108         0.29
+        20            0.049          20.982    20.472±0.458         1.11
+        60            0.139          59.923    58.374±1.305         1.19
+       150            0.313         134.509   133.139±2.977         0.46
+       300            0.528         226.912   228.418±5.108         0.29
 
     The qualifier "one branch" is load-bearing and was nearly missed. A first
     measurement drifted BOTH demes, which doubles the divergence, and reported
@@ -4875,8 +4875,8 @@ noncomputable def covarianceRetention (freq_corr ld_overlap : ℝ) : ℝ :=
     correlation taken within each replicate so its scatter is measured:
 
       ancestral p0            1 - Fst    measured corr    sems off
-      all p0 = 0.5             0.9251    0.0004+/-0.0008      1117
-      uniform(0.05, 0.95)      0.9250    0.7209+/-0.0003       653
+      all p0 = 0.5             0.9251    0.0004±0.0008      1117
+      uniform(0.05, 0.95)      0.9250    0.7209±0.0003       653
 
     At identical `F_ST` the correlation is either zero or 0.72, so it is not a
     function of `F_ST` and no repair of the constant can make it one. The
