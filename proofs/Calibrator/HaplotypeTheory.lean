@@ -368,6 +368,15 @@ noncomputable def haplotypeTransportBias
   |averagePhaseInteraction freq_cis_target pred_cis pred_trans -
     averagePhaseInteraction freq_cis_target interaction_cis interaction_trans|
 
+/-- Reference evaluation: a predictor that matches the interaction transports without bias. -/
+theorem haplotypeTransportBias_at_reference_point
+    (freq_cis_target interaction_cis interaction_trans : ℝ) :
+    haplotypeTransportBias freq_cis_target interaction_cis interaction_trans
+      interaction_cis interaction_trans = 0 := by
+  unfold haplotypeTransportBias
+  simp
+
+
 -- **Predicting the true interaction leaves no transport bias** is
 -- `haplotypeTransportBias_eq_zero_of_portable_effects` below, stated once. It was also
 -- stated here, as `haplotypeTransportBias_self`, with the same statement and a different
@@ -465,11 +474,10 @@ than a definitional `0`. -/
 theorem haplotypeTransportBias_eq_zero_of_portable_effects
     (freq_cis_target interaction_cis interaction_trans : ℝ) :
     haplotypeTransportBias freq_cis_target interaction_cis interaction_trans
-      interaction_cis interaction_trans = 0 := by
-  rw [haplotypeTransportBias_eq]
-  have h : freq_cis_target * (interaction_cis - interaction_cis) +
-      (1 - freq_cis_target) * (interaction_trans - interaction_trans) = 0 := by ring
-  rw [h, abs_zero]
+      interaction_cis interaction_trans = 0 :=
+  -- The same claim as the reference evaluation above, which is why it cites it rather than
+  -- proving it a second way: two proofs of one statement are one statement twice.
+  haplotypeTransportBias_at_reference_point freq_cis_target interaction_cis interaction_trans
 
 /-- And it is strictly positive as soon as the fitted effects miss the target's
 on average. -/

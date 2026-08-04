@@ -655,10 +655,28 @@ noncomputable def borrowedTraitBProjection {p q : ℕ}
     (m : CrossTraitBorrowingModel p q) : ℝ :=
   dotProduct m.sourceWeights (borrowedTraitBCrossCov m)
 
+/-- Reference evaluation: a model with no source weights projects nothing. -/
+theorem borrowedTraitBProjection_at_reference_point {p q : ℕ}
+    (m : CrossTraitBorrowingModel p q) (hzero : m.sourceWeights = 0) :
+    borrowedTraitBProjection m = 0 := by
+  unfold borrowedTraitBProjection
+  rw [hzero]
+  simp
+
+
 /-- Total trait-B projection captured by the source-trained score. -/
 noncomputable def totalTraitBProjection {p q : ℕ}
     (m : CrossTraitBorrowingModel p q) : ℝ :=
   dotProduct m.sourceWeights (totalTraitBCrossCov m)
+
+/-- The same at zero source weights for the total projection. -/
+theorem totalTraitBProjection_at_reference_point {p q : ℕ}
+    (m : CrossTraitBorrowingModel p q) (hzero : m.sourceWeights = 0) :
+    totalTraitBProjection m = 0 := by
+  unfold totalTraitBProjection
+  rw [hzero]
+  simp
+
 
 theorem traitBSpecificCrossCov_nonneg {p q : ℕ}
     (m : CrossTraitBorrowingModel p q)

@@ -885,6 +885,15 @@ theorem cumulativeDrift_zero_sizes_is_junk {T : ℕ} :
 noncomputable def heterozygosityLossVariableNe {T : ℕ} (Ne : Fin T → ℝ) : ℝ :=
   1 - Real.exp (-(cumulativeDrift Ne))
 
+/-- Reference evaluation: with no cumulative drift no heterozygosity is lost. -/
+theorem heterozygosityLossVariableNe_at_reference_point {T : ℕ} (Ne : Fin T → ℝ)
+    (hzero : cumulativeDrift Ne = 0) :
+    heterozygosityLossVariableNe Ne = 0 := by
+  unfold heterozygosityLossVariableNe
+  rw [hzero]
+  simp
+
+
 /-- Heterozygosity loss under variable Nₑ is nonneg when all Nₑ are positive. -/
 theorem heterozygosityLossVariableNe_nonneg {T : ℕ}
     (Ne : Fin T → ℝ) (hNe : ∀ i, 0 < Ne i) :

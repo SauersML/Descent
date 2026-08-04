@@ -798,6 +798,14 @@ noncomputable def ldMismatchFrobenius
     {p : ℕ} (Sig_S Sig_T : Matrix (Fin p) (Fin p) ℝ) : ℝ :=
   frobeniusNormSq (Sig_S - Sig_T)
 
+/-- Reference evaluation: matching panels have no Frobenius mismatch. -/
+theorem ldMismatchFrobenius_at_reference_point {p : ℕ}
+    (Sig : Matrix (Fin p) (Fin p) ℝ) :
+    ldMismatchFrobenius Sig Sig = 0 := by
+  unfold ldMismatchFrobenius
+  simp [frobeniusNormSq]
+
+
 /-- LD mismatch is nonneg. -/
 theorem ld_mismatch_nonneg {p : ℕ}
     (Sig_S Sig_T : Matrix (Fin p) (Fin p) ℝ) :

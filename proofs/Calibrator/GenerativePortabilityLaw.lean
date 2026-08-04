@@ -39,6 +39,15 @@ noncomputable def historySelfEnergy (h : SpectralHistory) : ℝ :=
 noncomputable def historySpectralDistanceSq (h h' : SpectralHistory) : ℝ :=
   historySelfEnergy h + historySelfEnergy h' - 2 * historyKernel h h'
 
+/-- Reference evaluation: a history has zero spectral distance from itself. -/
+theorem historySpectralDistanceSq_at_reference_point (h : SpectralHistory)
+    (hself : historyKernel h h = historySelfEnergy h) :
+    historySpectralDistanceSq h h = 0 := by
+  unfold historySpectralDistanceSq
+  rw [hself]
+  ring
+
+
 /-- Leading quadratic degradation between two one-mode histories. -/
 noncomputable def historyDegradation (h h' : SpectralHistory) : ℝ :=
   h.amplitude ^ 2 * historySelfEnergy h -

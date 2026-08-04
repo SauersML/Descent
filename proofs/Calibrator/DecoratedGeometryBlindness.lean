@@ -433,6 +433,10 @@ theorem witnessDivergence_self (s : Fin 3) : witnessDivergence s s = 0 := by
 Empirical status: NOT AN EMPIRICAL CLAIM -- this is a fixed finite weight. -/
 noncomputable def witnessWeight (_p : Fin 3) : ℝ := 1 / 3
 
+/-- Reference evaluation: the witness is uniform on three points. -/
+@[simp] theorem witnessWeight_at_reference_point (p : Fin 3) : witnessWeight p = 1 / 3 := rfl
+
+
 /-- The aligned assignment: risk increases with position.
 
 Empirical status: NOT AN EMPIRICAL CLAIM -- this is a fixed finite decoration. -/

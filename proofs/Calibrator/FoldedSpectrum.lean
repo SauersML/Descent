@@ -801,6 +801,14 @@ noncomputable def totalDiploidCovarianceMomentInformation
     (m q covarianceDerivative : ℝ) : ℝ :=
   m * diploidCovarianceMomentPermeability q covarianceDerivative
 
+/-- Reference evaluation: no samples, no information. -/
+theorem totalDiploidCovarianceMomentInformation_at_reference_point
+    (q covarianceDerivative : ℝ) :
+    totalDiploidCovarianceMomentInformation 0 q covarianceDerivative = 0 := by
+  unfold totalDiploidCovarianceMomentInformation
+  ring
+
+
 /-- **Exact rare/tagged cohort multiplier.** For a nonzero covariance response, matching
 the information of `m` balanced, perfectly observed standardized genotypes with a
 one-percent-MAF, half-response channel requires exactly `(19604/99)·m` observations. -/

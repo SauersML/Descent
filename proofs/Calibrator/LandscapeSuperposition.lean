@@ -620,6 +620,14 @@ noncomputable def pooledEnvironmentCorrelations
     (mass correlation : Environment → ℝ) : ℝ :=
   ∑ environment ∈ active, mass environment * correlation environment
 
+/-- Reference evaluation: with no active environments there is nothing to pool. -/
+theorem pooledEnvironmentCorrelations_at_reference_point {Environment : Type*}
+    (mass correlation : Environment → ℝ) :
+    pooledEnvironmentCorrelations (∅ : Finset Environment) mass correlation = 0 := by
+  unfold pooledEnvironmentCorrelations
+  simp
+
+
 /-- A normalized nonnegative environment mixture remains inside the component correlation
 interval.  This is the general convex-hull law behind every two-environment calculation. -/
 theorem pooledEnvironmentCorrelations_mem_Icc
@@ -902,6 +910,14 @@ noncomputable def covarianceDisplacementEnergy
     (sigma : Matrix (Fin 2) (Fin 2) ℝ)
     (candidate truth : TwoCoordinateConfiguration) : ℝ :=
   dotProduct (candidate - truth) (sigma.mulVec (candidate - truth))
+
+/-- Reference evaluation: a candidate at the truth carries no displacement energy. -/
+theorem covarianceDisplacementEnergy_at_reference_point
+    (sigma : Matrix (Fin 2) (Fin 2) ℝ) (truth : TwoCoordinateConfiguration) :
+    covarianceDisplacementEnergy sigma truth truth = 0 := by
+  unfold covarianceDisplacementEnergy
+  simp
+
 
 /-- General symmetric two-coordinate covariance. -/
 noncomputable def symmetricTwoCoordinateCovariance
