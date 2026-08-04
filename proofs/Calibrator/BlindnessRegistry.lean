@@ -1,14 +1,15 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Calibrator.ObservationalCeiling
 import Calibrator.DriftRegime
 import Calibrator.EpistaticChaos
+import Calibrator.ObservationalCeiling
+import Calibrator.XiFromMarkedBreakouts
 
 namespace Calibrator
 
 /-!
-# The registry: seven instances of one law, and what a guard suite can buy
+# The registry: ten instances of one law, and what a guard suite can buy
 
 `Calibrator.ObservationalCeiling` states the law: a probe that reports the same data on
 two objects certifies neither, so no criterion built from that probe decides any
@@ -28,6 +29,7 @@ and then proves the thing the collection is for.
 | 7 | a symmetric validation design | the ratio vs. its square | **methodological** | `DriftRegime` |
 | 8 | Fisher's average effect | additive vs. dominant locus at `p = 1/2` | **genotypic** | this file |
 | 9 | any statistic of normalised pairwise coalescence times | Kingman vs. Beta vs. Dirac coalescents | **methodological** | this file |
+| 10 | total selected-allele frequency | one-origin vs. two-origin sweep | **genealogical** | `XiFromMarkedBreakouts` |
 
 Instances 1-5 are theorems about the mathematics. Instances 6 and 7 are theorems about
 the **development's own quality process**, and that is the point of assembling them in
@@ -35,6 +37,14 @@ one place: a cross-check is a probe, a validation design is a probe, and neither
 exempt from the law they are used to establish. A guard that cannot separate two
 candidate definitions certifies neither of them, exactly as a cumulant that cannot
 separate two laws certifies neither.
+
+Instance 10 is the sweep analogue of instance 8.  A hard sweep and a soft sweep can reach
+exactly the same selected-allele frequency, so every statistic of that frequency trajectory is
+blind to the number of origins.  The hidden distinction is nevertheless observable in the
+ancestry: four lineages can split two-and-two across distinct successful families only in the
+soft sweep.  The exact boundary is `HasTwoPositiveFamilies`, and
+`disjointPairMergeProbability_pos_iff_hasTwoPositiveFamilies` proves that the four-lineage
+event vanishes precisely on its complement.
 
 Instance 9 is the one that indicts this development's own measuring apparatus. With two
 lineages a `Λ`-coalescent has a single exponential clock, so the pairwise coalescence time
@@ -513,5 +523,23 @@ theorem normalised_pairwise_blind_to_rate (lam₁ lam₂ x : ℝ)
       = pairwiseCoalescentSurvival lam₂ (x / lam₂) := by
   rw [pairwiseCoalescentSurvival_normalised lam₁ x h₁,
     pairwiseCoalescentSurvival_normalised lam₂ x h₂]
+
+/-! ### Instance 10: total sweep frequency versus origin multiplicity -/
+
+/-- **The total selected-allele frequency is blind to sweep multiplicity.**
+
+For every positive final frequency, the single-origin and equally split two-origin sweeps lie in
+the same fiber of the total-frequency probe.  The first has no two-positive-family structure;
+the second does.  This packages the specialist Xi result in the registry's standard witness-pair
+form and identifies the extra data required to escape the ceiling: ancestry from four lineages,
+not more precision in the frequency trajectory. -/
+theorem totalSweepFrequency_blind_to_originMultiplicity (finalFrequency : ℝ)
+    (hfrequency : 0 < finalFrequency) :
+    XiFromMarks.totalFamilyFraction ![finalFrequency] =
+        XiFromMarks.totalFamilyFraction ![finalFrequency / 2, finalFrequency / 2] ∧
+      ¬XiFromMarks.HasTwoPositiveFamilies ![finalFrequency] ∧
+      XiFromMarks.HasTwoPositiveFamilies ![finalFrequency / 2, finalFrequency / 2] :=
+  XiFromMarks.totalFamilyFraction_does_not_determine_multiplicity
+    finalFrequency hfrequency
 
 end Calibrator
