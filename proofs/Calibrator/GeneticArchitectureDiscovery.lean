@@ -213,6 +213,13 @@ noncomputable def taggedScoreEstimationRisk {m : ℕ}
     (targetTagVariance estimatorMSE : Fin m → ℝ) : ℝ :=
   ∑ i, targetTagVariance i * estimatorMSE i
 
+/-- Reference evaluation on a two-locus index with distinct entries.  Not the empty index:
+`∑ over Fin 0 = 0` holds for every sum body, so it fixes nothing. -/
+theorem taggedScoreEstimationRisk_at_reference_point :
+    taggedScoreEstimationRisk ![1, 3] ![1, 3] = 10 := by
+  norm_num [taggedScoreEstimationRisk, Fin.sum_univ_two]
+
+
 /-- C+T-to-dense-model gap measured as target causal signal mass missed by the
 current discovered set. When discovery at larger sample size recovers more
 causal loci, this gap shrinks. -/

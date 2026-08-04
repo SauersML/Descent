@@ -242,6 +242,13 @@ noncomputable def dominanceVariance
     {m : ℕ} (p : Fin m → ℝ) (d : Fin m → ℝ) : ℝ :=
   ∑ i, (2 * p i * (1 - p i) * d i) ^ 2
 
+/-- Reference evaluation on a two-locus index with distinct entries.  Not the empty index:
+`∑ over Fin 0 = 0` holds for every sum body, so it fixes nothing. -/
+theorem dominanceVariance_at_reference_point :
+    dominanceVariance ![1, 3] ![1, 3] = 1296 := by
+  norm_num [dominanceVariance, Fin.sum_univ_two]
+
+
 /-- Dominance variance is nonneg. -/
 theorem dominance_variance_nonneg
     {m : ℕ} (p : Fin m → ℝ) (d : Fin m → ℝ) :
