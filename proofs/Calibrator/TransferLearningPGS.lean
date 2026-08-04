@@ -1475,6 +1475,15 @@ noncomputable def sourceShrinkageMSE (gapSq noiseVar nTarget lam : ℝ) : ℝ :=
 noncomputable def optimalSourceShrinkageWeight (gapSq noiseVar nTarget : ℝ) : ℝ :=
   (noiseVar / nTarget) / (gapSq + noiseVar / nTarget)
 
+/-- **With no transfer gap the optimal weight is one: keep the source entirely.** The quadratic
+decomposition below holds around whatever the optimum is and does not say where it sits; this
+does, and it is the endpoint that distinguishes a shrinkage rule from its complement. -/
+theorem optimalSourceShrinkageWeight_no_gap (noiseVar nTarget : ℝ)
+    (h : noiseVar / nTarget ≠ 0) :
+    optimalSourceShrinkageWeight 0 noiseVar nTarget = 1 := by
+  unfold optimalSourceShrinkageWeight
+  rw [zero_add, div_self h]
+
 /-- Exact quadratic decomposition around the optimal source weight. -/
 theorem sourceShrinkageMSE_eq_optimal_plus_square
     (gapSq noiseVar nTarget lam : ℝ)
