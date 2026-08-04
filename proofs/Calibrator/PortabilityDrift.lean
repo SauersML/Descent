@@ -6196,7 +6196,16 @@ section MigrationDriftPortability
 
 /-! ### 1. Fst under migration-drift balance: Fst = 1/(1 + 4Nm) -/
 
-/-- The standard finite-island correction factor for `demes` demes.
+/-- The finite-island correction factor `d/(d-1)` for `demes` demes.
+
+Convention: this is the correction as it enters the HUDSON coalescence-time
+`F_ST`, where it appears LINEARLY: `1/(1 + 4·Nₑ·m·d/(d-1))`. The widely quoted
+Crow--Aoki (1984) finite-island formula carries `(d/(d-1))²`, but that is the
+correction for Nei's `G_ST`, a different statistic. Do not read this factor as
+the square's base and then square it; `PopulationGeneticsFoundations`'
+`islandDemeCorrection` carries the measurement that excludes the square under
+this corpus's convention, at 9.04 sems, and `islandFstFiniteDemes` carries the
+attribution for both forms.
 
 This is data, not a packaged claim that an approximation is adequate.  Any biological
 use of the infinite-island approximation must compare this explicit quantity with its
@@ -7056,7 +7065,42 @@ name/quantity mismatch, so the two are separated rather than bounded.
 
     Denotes: a dimensionless fraction in `[0, 1)`, never a variance.
 
-    Empirical status: UNTESTED. -/
+    Regime: two-deme island model at migration-drift balance; "signal
+    retention" read as the fraction of a score's covariance with the genetic
+    value that survives transfer from the deme its weights came from.
+
+    Empirical status: **FALSIFIED as a product**
+    (`simcov/battery_bulk35.py`). Measured at `Nₑ = 1000` over 5 Mb with
+    recombination, 80 causal sites segregating in both demes, weights taken as
+    the deme-0 LD projection `Σ_A·β` (itself VALIDATED at
+    `targetSourceEffectProjection`):
+
+      4Nₑm    retention          this body   1-F     M/(1+M)
+      0.4     0.507 ± 0.076      0.131       0.460   0.286
+      2.0     0.523 ± 0.076      0.543       0.814   0.667
+      8.0     0.781 ± 0.099      0.834       0.939   0.889
+      40      0.993 ± 0.117      0.963       0.987   0.976
+
+    The product misses by 4.97 sems (74% relative), low at weak migration where
+    it multiplies two factors that are each already below one. The single
+    factor `1 - F` is ALSO falsified, at 3.81 sems. `M/(1+M)` alone survives at
+    worst 2.93 sems.
+
+    NOT ASSERTED: that `M/(1+M)` is the right law. Its worst cell is off by 44%
+    relative and escapes rejection only by sitting just under the three-sem
+    gate, on error bars of 0.08 to 0.12. What this run establishes is that the
+    PRODUCT is wrong; which single factor replaces it needs tighter bars. The
+    direction is consistent with `sharedLD_from_equilibrium`, where measured
+    shared LD stayed near 1 rather than falling to `M/(1+M)` -- if the LD term
+    does not decay as written, multiplying by it twice over is exactly the error
+    this table shows.
+
+    Calibration, not a control: the estimator attenuates because `w = Σ_A·β`
+    reuses the same finite-sample `Σ_A` the denominator contracts against, so
+    the denominator carries squared estimation noise the numerator does not. The
+    attenuation is measured on one panmictic population split arbitrarily in
+    half -- same sample size, same site count, same pipeline -- and divided out
+    of every cell. The CONTROL is that the same split gives `F_ST = 0`. -/
 noncomputable def signalRetentionMigrationDrift (Ne m : ℝ) : ℝ :=
   (1 - fstMigrationDriftEquilibrium Ne m) *
     sharedLDFromMigration (scaledMigrationRate Ne m)
@@ -7067,7 +7111,13 @@ noncomputable def signalRetentionMigrationDrift (Ne m : ℝ) : ℝ :=
 
     Denotes: a variance, in the units of `V_A`.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **FALSIFIED**, inherited. This body is
+    `signalRetentionMigrationDrift Ne m * V_A`, and that fraction is falsified
+    as a product at 4.97 sems by `simcov/battery_bulk35.py` -- see there for the
+    table, the surviving single-factor candidate, and the calibration. Scaling a
+    wrong fraction by `V_A` leaves it wrong; the `V_A` factor itself is not what
+    the measurement addresses, and `retainedSignalVarianceMigrationDrift_eq_retention_mul_VA`
+    remains true as algebra. -/
 noncomputable def retainedSignalVarianceMigrationDrift (V_A Ne m : ℝ) : ℝ :=
   signalRetentionMigrationDrift Ne m * V_A
 

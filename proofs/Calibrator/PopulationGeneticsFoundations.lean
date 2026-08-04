@@ -1237,12 +1237,20 @@ section MigrationDriftFoundations
 **REGIME, stated once for everything in this section.** `1/(1 + 4·Nₑ·m)` is the
 INFINITE-ISLAND LIMIT. It is the `d → ∞` case of the finite-island result
 
-  `F_ST = 1 / (1 + 4·Nₑ·m·(d/(d-1))²)`
+  `F_ST = 1 / (1 + 4·Nₑ·m·d/(d-1))`
 
-for `d` demes, and it is not the finite-`d` answer. The correction factor
-`(d/(d-1))²` is `4` at `d = 2` and `2.25` at `d = 3`, so with two demes the
-limit understates the migration pressure by a factor of four in the scaled rate
-and overstates `F_ST` correspondingly. Nothing about the expression `1/(1+4Nm)`
+for `d` demes, and it is not the finite-`d` answer. **This header used to quote
+the SQUARED correction `(d/(d-1))²` here while `islandFstFiniteDemes` -- twenty
+lines below, in this same section -- states the linear one, and the measurement
+recorded on `islandDemeCorrection` excludes the square at 9.04 sems.** The two
+were a straight contradiction inside one section. The linear form is the one
+this corpus's `F_ST` convention has: see the attribution note on
+`islandFstFiniteDemes` for which published statistic each form belongs to.
+
+The correction factor `d/(d-1)` is `2` at `d = 2` and `1.5` at `d = 3`, so with
+two demes the limit understates the migration pressure by a factor of two in
+the scaled rate and overstates `F_ST` correspondingly. Nothing about the
+expression `1/(1+4Nm)`
 announces this, which is why every theorem below is a theorem about the limit
 and not about a two-deme system. `islandFstFiniteDemes` states the finite form,
 `islandFstFiniteDemes_lt_islandLimit` proves the limit is an overstatement at
@@ -1367,11 +1375,38 @@ theorem islandDemeCorrection_eq_finiteIslandCorrection (d : ℝ) :
   unfold islandDemeCorrection finiteIslandCorrection
   ring
 
-/-- **Finite-island `F_ST` for `d` demes** (Wright; Nei):
-`F_ST = 1/(1 + 4·Nₑ·m·d/(d-1))`.
+/-- **Finite-island `F_ST` for `d` demes**, `F_ST = 1/(1 + 4·Nₑ·m·d/(d-1))`.
+
+    **Attribution, corrected -- this is not Nei's.** The docstring used to cite
+    "(Wright; Nei)". The form with the deme factor SQUARED,
+    `1/(1 + 4·Nₑ·m·(d/(d-1))²)`, is Crow and Aoki (1984) for Nei's `G_ST` and is
+    what Whitlock and McCauley (1999), Heredity 82:117--125, quote; naming Nei on
+    the LINEAR form credits him with the form this corpus measured against his.
+
+    The linear form is the ratio-of-coalescence-times statistic, Slatkin (1991),
+    *Inbreeding coefficients and coalescence times*, Genetics Research
+    58:167--175, which finds `F_ST` in the finite island model by that route. The
+    derivation is short enough to check here: in the symmetric island model
+    `E[T_within] = 2·Nₑ·d` and `E[T_between] = 2·Nₑ·d + (d-1)/(2·m)`, so
+    `1 - E[T_within]/E[T_between] = 1/(1 + 4·Nₑ·m·d/(d-1))`, which is this body.
+
+    **So the two forms are two STATISTICS, not two guesses at one number**, and
+    the FALSIFIED verdict on the square recorded at `islandDemeCorrection` should
+    be read that way: the measurement read `F_ST` as `1 - E[T_w]/E[T_b]` off the
+    genealogies, which is exactly the quantity the linear form computes, so the
+    square was on trial under a convention that is not its own. It is not
+    evidence that Crow and Aoki are wrong about `G_ST`. What the corpus is
+    entitled to say is that under ITS `F_ST` convention -- the Hudson
+    ratio-of-averages one every `F_ST` here is written for -- the correction is
+    linear. (At `d = 2` the two happen to coincide once the corpus's own
+    two-population `Hudson = 2G/(1 + G)` bridge is applied: `G = 1/(1 + 4M)`
+    maps to `1/(1 + 2M)`, which is the linear form there. That coincidence does
+    NOT extend to `d > 2`, where the two-subpopulation bridge does not apply,
+    and no `d > 2` conversion is claimed here.)
 
     Regime: `d` demes of equal size `Nₑ`, symmetric migration at rate `m`,
-    mutation negligible relative to migration. This is the finite-`d`
+    mutation negligible relative to migration, and `F_ST` in the Hudson
+    coalescence-time convention. This is the finite-`d`
     statement; `fstMigrationDriftEquilibrium` is its `d → ∞` limit.
 
     Empirical status: matches `validation/differential/refs.island_fst_finite_demes`,
