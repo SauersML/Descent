@@ -600,6 +600,31 @@ theorem frontSpeedBias_tripleMergerRate_injective
   unfold frontSpeedBiasParameter at hparameter
   exact (div_left_inj' hγ.ne').mp hparameter
 
+/-- Front-speed tilt reconstructed from an observed normalized triple-merger rate and a known
+positive displacement scale. -/
+noncomputable def frontSpeedTiltFromTripleRate (rate γ : ℝ) : ℝ :=
+  γ * speedBiasParameterFromTripleRate rate
+
+/-- **Exact dimensional speed recovery.** Once the displacement scale is known, the first
+non-pairwise genealogical coordinate recovers the original front-speed tilt exactly. -/
+theorem frontSpeedTiltFromTripleRate_recovers
+    (θ γ : ℝ) (hγ : γ ≠ 0) :
+    frontSpeedTiltFromTripleRate
+        (speedTiltBetaMergerRate (frontSpeedBiasParameter θ γ) 3 3) γ = θ := by
+  unfold frontSpeedTiltFromTripleRate
+  rw [speedBiasParameterFromTripleRate_recovers]
+  unfold frontSpeedBiasParameter
+  field_simp
+
+/-- A valid triple-merger probability reconstructs an admissible dimensional speed tilt at
+every positive front-displacement scale. -/
+theorem frontSpeedTiltFromTripleRate_mem_domain
+    {rate γ : ℝ} (hrate : rate ∈ Set.Ioo 0 1) (hγ : 0 < γ) :
+    -γ < frontSpeedTiltFromTripleRate rate γ := by
+  unfold frontSpeedTiltFromTripleRate
+  have hβ := speedBiasParameterFromTripleRate_mem_domain hrate
+  nlinarith
+
 /-- A nonnegative speed penalty at positive displacement scale moves the genealogy from the
 Bolthausen--Sznitman coordinate `1/2` toward Kingman, never toward the star coalescent. -/
 theorem frontSpeedBias_tripleMergerRate_le_half
