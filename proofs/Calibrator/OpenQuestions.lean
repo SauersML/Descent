@@ -47,37 +47,14 @@ theorem scalar_summary_insufficient_for_accuracy
     ∀ θ : V, ∃ θ' : V, distance θ' = distance θ ∧ accuracy θ' ≠ accuracy θ :=
   scalar_summary_insufficient_of_not_scalar_factorization distance accuracy hnot
 
-theorem explainable_fraction_bound_of_conditional_noise_floor_exact
-    {Ω : Type*} {mΩ : MeasurableSpace Ω}
-    {μ : Measure[mΩ] Ω} [IsProbabilityMeasure μ]
-    {m : MeasurableSpace Ω}
-    (hm : m ≤ mΩ)
-    {L noiseFloor : Ω → ℝ}
-    (hL : MemLp L 2 μ)
-    (hVar_pos : 0 < Var[L; μ])
-    (hNoise_int : Integrable noiseFloor μ)
-    (hNoise_nonneg : 0 ≤ μ[noiseFloor])
-    (hNoise_le : noiseFloor ≤ᵐ[μ] conditionalVariance μ m L) :
-    explainableFraction (Var[conditionalMean μ m L; μ]) (Var[L; μ])
-      ≤ Var[conditionalMean μ m L; μ] / (Var[conditionalMean μ m L; μ] + μ[noiseFloor]) :=
-  explainable_fraction_bound_of_conditional_noise_floor hm hL hVar_pos
-    hNoise_int hNoise_nonneg hNoise_le
+/-! The conditional-noise-floor and Gaussian-floor bounds on the explainable fraction answer
+this question, and they are `explainable_fraction_bound_of_conditional_noise_floor` and
+`explainable_fraction_bound_of_conditional_gaussian_floor` in `Calibrator.TransportIdentities`.
 
-theorem explainable_fraction_bound_of_conditional_gaussian_floor_exact
-    {Ω : Type*} {mΩ : MeasurableSpace Ω}
-    {μ : Measure[mΩ] Ω} [IsProbabilityMeasure μ]
-    {m : MeasurableSpace Ω}
-    (hm : m ≤ mΩ)
-    {L sigma4 : Ω → ℝ}
-    (hL : MemLp L 2 μ)
-    (hVar_pos : 0 < Var[L; μ])
-    (hsigma4_int : Integrable sigma4 μ)
-    (hsigma4_nonneg : 0 ≤ μ[sigma4])
-    (hGaussianFloor : (fun ω ↦ (2 : ℝ) * sigma4 ω) ≤ᵐ[μ] conditionalVariance μ m L) :
-    explainableFraction (Var[conditionalMean μ m L; μ]) (Var[L; μ])
-      ≤ Var[conditionalMean μ m L; μ] / (Var[conditionalMean μ m L; μ] + 2 * μ[sigma4]) :=
-  explainable_fraction_bound_of_conditional_gaussian_floor hm hL hVar_pos
-    hsigma4_int hsigma4_nonneg hGaussianFloor
+They were also restated here, suffixed `_exact`, each copying its original's eight-line
+measure-theoretic binder block and citing the original as its proof.  Both live in the
+`Calibrator` namespace already, so the copies renamed nothing and reached no reader the
+originals did not; what they added was a second block of hypotheses to keep in step. -/
 
 /-- **The between-group fraction of an assumed variance decomposition is at most one.**
 

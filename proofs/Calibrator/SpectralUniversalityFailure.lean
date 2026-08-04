@@ -439,8 +439,21 @@ theorem localizedUniformFourthInvariant_eq :
     funext a
     ring
   rw [hintegrand]
-  norm_num [intervalIntegral.integral_add, intervalIntegral.integral_const_mul,
-    intervalIntegral.integral_mul_const, intervalIntegral.integral_pow]
+  rw [intervalIntegral.integral_add
+    (Continuous.intervalIntegrable (by fun_prop) 1 2)
+    (Continuous.intervalIntegrable (by fun_prop) 1 2)]
+  rw [intervalIntegral.integral_add
+    (Continuous.intervalIntegrable (by fun_prop) 1 2)
+    (Continuous.intervalIntegrable (by fun_prop) 1 2)]
+  rw [intervalIntegral.integral_add
+    (Continuous.intervalIntegrable (by fun_prop) 1 2)
+    (Continuous.intervalIntegrable (by fun_prop) 1 2)]
+  rw [intervalIntegral.integral_add
+    (Continuous.intervalIntegrable (by fun_prop) 1 2)
+    (Continuous.intervalIntegrable (by fun_prop) 1 2)]
+  simp only [intervalIntegral.integral_const_mul, intervalIntegral.integral_const, integral_pow,
+    integral_id]
+  norm_num
 
 /-- The rotated block family has fourth-order traffic invariant `723 / 40`. -/
 theorem rotatedUniformFourthInvariant_eq :
@@ -453,8 +466,21 @@ theorem rotatedUniformFourthInvariant_eq :
     funext a
     ring
   rw [hintegrand]
-  norm_num [intervalIntegral.integral_add, intervalIntegral.integral_const_mul,
-    intervalIntegral.integral_mul_const, intervalIntegral.integral_pow]
+  rw [intervalIntegral.integral_add
+    (Continuous.intervalIntegrable (by fun_prop) 1 2)
+    (Continuous.intervalIntegrable (by fun_prop) 1 2)]
+  rw [intervalIntegral.integral_add
+    (Continuous.intervalIntegrable (by fun_prop) 1 2)
+    (Continuous.intervalIntegrable (by fun_prop) 1 2)]
+  rw [intervalIntegral.integral_add
+    (Continuous.intervalIntegrable (by fun_prop) 1 2)
+    (Continuous.intervalIntegrable (by fun_prop) 1 2)]
+  rw [intervalIntegral.integral_add
+    (Continuous.intervalIntegrable (by fun_prop) 1 2)
+    (Continuous.intervalIntegrable (by fun_prop) 1 2)]
+  simp only [intervalIntegral.integral_const_mul, intervalIntegral.integral_const, integral_pow,
+    integral_id]
+  norm_num
 
 /-- Exact continuum separation of the fourth-order traffic invariant. -/
 theorem localizedUniformFourthInvariant_sub_rotated :
@@ -471,10 +497,13 @@ noncomputable def lowSNRFourthOrientationCoefficient
 mutual-information coefficient exceeds the localized design's by exactly `49 / 96`. -/
 theorem rademacher_lowSNRFourthCoefficient_rotated_sub_localized :
     lowSNRFourthOrientationCoefficient (-2) rotatedUniformFourthInvariant -
-        lowSNRFourthOrientationCoefficient (-2) localizedUniformFourthInvariant = 49 / 96 := by
+      lowSNRFourthOrientationCoefficient (-2) localizedUniformFourthInvariant = 49 / 96 := by
   unfold lowSNRFourthOrientationCoefficient
-  rw [localizedUniformFourthInvariant_sub_rotated]
-  ring
+  calc
+    -((-2 : ℝ) ^ 2 / 48 * rotatedUniformFourthInvariant) -
+          -((-2 : ℝ) ^ 2 / 48 * localizedUniformFourthInvariant) =
+        (localizedUniformFourthInvariant - rotatedUniformFourthInvariant) / 12 := by ring
+    _ = 49 / 96 := by rw [localizedUniformFourthInvariant_sub_rotated]; norm_num
 
 /-! ## The order-two coincidence -/
 
@@ -491,8 +520,8 @@ theorem entrySquareSum_eq_trace_sq_of_symmetric
     (hsymmetric : ∀ i j, covariance j i = covariance i j) :
     entrySquareSum covariance = Matrix.trace (covariance * covariance) := by
   classical
-  unfold entrySquareSum Matrix.trace
-  simp only [Matrix.mul_apply]
+  change (∑ i, ∑ j, covariance i j ^ 2) =
+    ∑ i, ∑ j, covariance i j * covariance j i
   apply Finset.sum_congr rfl
   intro i hi
   apply Finset.sum_congr rfl

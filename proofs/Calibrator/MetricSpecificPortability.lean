@@ -3389,21 +3389,10 @@ haplotype, imputation, or short-window mismatch.  A single pair of populations c
 order when the deployment task changes bands.
 -/
 
-/-- Existence of one scalar population-shift score whose monotone task-specific charts
-recover both low-band and high-band degradation for the two-band witness. -/
-def HasTaskIndependentSpectralPortabilityScalar (a : ℝ) : Prop :=
-  let low₁ := FiniteSpectralModel.bandDegradation
-    twoBandBaseline (twoBandLowShift a) {0}
-  let low₂ := FiniteSpectralModel.bandDegradation
-    twoBandBaseline (twoBandHighShift a) {0}
-  let high₁ := FiniteSpectralModel.bandDegradation
-    twoBandBaseline (twoBandLowShift a) {1}
-  let high₂ := FiniteSpectralModel.bandDegradation
-    twoBandBaseline (twoBandHighShift a) {1}
-  ∃ (d₁ d₂ : ℝ) (Φlow Φhigh : ℝ → ℝ),
-    Monotone Φlow ∧ Monotone Φhigh ∧
-    Φlow d₁ = low₁ ∧ Φlow d₂ = low₂ ∧
-    Φhigh d₁ = high₁ ∧ Φhigh d₂ = high₂
+-- `HasTaskIndependentSpectralPortabilityScalar` is defined in `Calibrator.SpectralDegradation`,
+-- beside the two-band witness it quantifies over.  It was written out again here, `let`
+-- bindings and all, which is how the biological consumer and the spectral witness came to
+-- carry two copies of one predicate.
 
 /-- **Metric-specific portability has no universal scalar degradation order.**  At every
 nonzero shift the low-band and high-band tasks rank the same two population shifts in

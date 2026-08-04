@@ -311,22 +311,33 @@ theorem twoBand_reversal_values (a : ℝ) :
   simp [FiniteSpectralModel.bandDegradation, FiniteSpectralModel.optimalReadout,
     twoBandBaseline, twoBandLowShift, twoBandHighShift]
 
+/-- Existence of one scalar population-shift score whose monotone task-specific charts
+recover both low-band and high-band degradation for the two-band witness.
+
+The predicate lives here, beside the witness it is about, because the theorem below and its
+biological consumer in `Calibrator.MetricSpecificPortability` both need it and it was
+written out in full in both places -- eight lines of `let`-bound band degradations and the
+existential over the two charts, copied. -/
+def HasTaskIndependentSpectralPortabilityScalar (a : ℝ) : Prop :=
+  let low₁ := FiniteSpectralModel.bandDegradation
+    twoBandBaseline (twoBandLowShift a) {0}
+  let low₂ := FiniteSpectralModel.bandDegradation
+    twoBandBaseline (twoBandHighShift a) {0}
+  let high₁ := FiniteSpectralModel.bandDegradation
+    twoBandBaseline (twoBandLowShift a) {1}
+  let high₂ := FiniteSpectralModel.bandDegradation
+    twoBandBaseline (twoBandHighShift a) {1}
+  ∃ (d₁ d₂ : ℝ) (Φlow Φhigh : ℝ → ℝ),
+    Monotone Φlow ∧ Monotone Φhigh ∧
+    Φlow d₁ = low₁ ∧ Φlow d₂ = low₂ ∧
+    Φhigh d₁ = high₁ ∧ Φhigh d₂ = high₂
+
 /-- **No task-independent scalar ranks the two genomic-band shifts.**  For any nonzero
 shift, pair 1 is strictly worse on the low-frequency task and pair 2 is strictly worse on
 the high-frequency task. -/
 theorem twoBand_no_common_monotone_scalar (a : ℝ) (ha : a ≠ 0) :
-    let low₁ := FiniteSpectralModel.bandDegradation
-      twoBandBaseline (twoBandLowShift a) {0}
-    let low₂ := FiniteSpectralModel.bandDegradation
-      twoBandBaseline (twoBandHighShift a) {0}
-    let high₁ := FiniteSpectralModel.bandDegradation
-      twoBandBaseline (twoBandLowShift a) {1}
-    let high₂ := FiniteSpectralModel.bandDegradation
-      twoBandBaseline (twoBandHighShift a) {1}
-    ¬ ∃ (d₁ d₂ : ℝ) (Φlow Φhigh : ℝ → ℝ),
-      Monotone Φlow ∧ Monotone Φhigh ∧
-      Φlow d₁ = low₁ ∧ Φlow d₂ = low₂ ∧
-      Φhigh d₁ = high₁ ∧ Φhigh d₂ = high₂ := by
+    ¬ HasTaskIndependentSpectralPortabilityScalar a := by
+  unfold HasTaskIndependentSpectralPortabilityScalar
   dsimp
   apply no_common_monotone_scalar_of_reversal
   · rw [(twoBand_reversal_values a).1, (twoBand_reversal_values a).2.1]
