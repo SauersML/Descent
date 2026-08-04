@@ -114,6 +114,25 @@ theorem sigmaResid_pos (m : LiabilityThresholdModel)
     0 < Real.sqrt (m.h_sq * (1 - R2) + (1 - m.h_sq)) :=
   Real.sqrt_pos_of_pos (residualVariance_pos m R2 hR2 hR2')
 
+/-- **What both z-score denominators do across a rise in `R²`**: each is positive, and the
+one at the larger `R²` is the smaller, because explaining more liability leaves less
+residual to scale by.
+
+The sensitivity and specificity monotonicity theorems below each established these three
+facts inline, in the same order and by the same tactics.  They differ only in their
+numerators; the denominator is the same object in both, and it is now proved about once. -/
+theorem sigmaResid_pos_pos_le (m : LiabilityThresholdModel)
+    (R2₁ R2₂ : ℝ) (hR2₁ : 0 ≤ R2₁) (hR2₂ : R2₂ ≤ 1) (hR2 : R2₁ < R2₂) :
+    0 < Real.sqrt (m.h_sq * (1 - R2₂) + (1 - m.h_sq)) ∧
+      0 < Real.sqrt (m.h_sq * (1 - R2₁) + (1 - m.h_sq)) ∧
+      Real.sqrt (m.h_sq * (1 - R2₂) + (1 - m.h_sq)) ≤
+        Real.sqrt (m.h_sq * (1 - R2₁) + (1 - m.h_sq)) := by
+  refine ⟨sigmaResid_pos m R2₂ (le_of_lt (lt_of_le_of_lt hR2₁ hR2)) hR2₂, ?_, ?_⟩
+  · apply Real.sqrt_pos_of_pos
+    have : 0 < 1 - m.h_sq := by linarith [m.h_sq_lt_one]
+    nlinarith [m.h_sq_pos]
+  · exact Real.sqrt_le_sqrt (by nlinarith [m.h_sq_pos])
+
 /-- **Liability sensitivity.**
     Under the liability threshold model, the sensitivity of a PGS-based
     classifier at classification threshold `T'` is:
@@ -262,17 +281,7 @@ theorem liabilitySensitivity_monotone_in_R2_of_threshold_le
   -- with the same structure as
   -- liabilitySensitivity_zScore_monotone_in_R_of_num_nonneg.
   -- σ₂ > 0: derived from the model, not assumed.
-  have h_σ_pos : 0 < Real.sqrt (m.h_sq * (1 - R2₂) + (1 - m.h_sq)) :=
-    sigmaResid_pos m R2₂ (le_of_lt (lt_of_le_of_lt hR2₁ hR2)) hR2₂
-  -- σ₁ > 0
-  have h_σ₁_pos : 0 < Real.sqrt (m.h_sq * (1 - R2₁) + (1 - m.h_sq)) := by
-    apply Real.sqrt_pos_of_pos
-    have : 0 < 1 - m.h_sq := by linarith [m.h_sq_lt_one]
-    nlinarith [m.h_sq_pos]
-  -- σ₂ ≤ σ₁
-  have h_σ_le : Real.sqrt (m.h_sq * (1 - R2₂) + (1 - m.h_sq)) ≤
-      Real.sqrt (m.h_sq * (1 - R2₁) + (1 - m.h_sq)) :=
-    Real.sqrt_le_sqrt (by nlinarith [m.h_sq_pos])
+  obtain ⟨h_σ_pos, h_σ₁_pos, h_σ_le⟩ := sigmaResid_pos_pos_le m R2₁ R2₂ hR2₁ hR2₂ hR2
   -- √R2₁ < √R2₂
   have h_sqrt_lt : Real.sqrt R2₁ < Real.sqrt R2₂ :=
     Real.sqrt_lt_sqrt hR2₁ hR2
@@ -320,17 +329,7 @@ theorem liabilitySpecificity_monotone_in_R2_of_threshold_le
   -- so -h·μ_control > 0 and the numerator grows with R).
   -- The denominator σ_resid decreases with R². Same cross-multiply argument.
   -- σ₂ > 0: derived from the model, not assumed.
-  have h_σ_pos : 0 < Real.sqrt (m.h_sq * (1 - R2₂) + (1 - m.h_sq)) :=
-    sigmaResid_pos m R2₂ (le_of_lt (lt_of_le_of_lt hR2₁ hR2)) hR2₂
-  -- σ₁ > 0
-  have h_σ₁_pos : 0 < Real.sqrt (m.h_sq * (1 - R2₁) + (1 - m.h_sq)) := by
-    apply Real.sqrt_pos_of_pos
-    have : 0 < 1 - m.h_sq := by linarith [m.h_sq_lt_one]
-    nlinarith [m.h_sq_pos]
-  -- σ₂ ≤ σ₁
-  have h_σ_le : Real.sqrt (m.h_sq * (1 - R2₂) + (1 - m.h_sq)) ≤
-      Real.sqrt (m.h_sq * (1 - R2₁) + (1 - m.h_sq)) :=
-    Real.sqrt_le_sqrt (by nlinarith [m.h_sq_pos])
+  obtain ⟨h_σ_pos, h_σ₁_pos, h_σ_le⟩ := sigmaResid_pos_pos_le m R2₁ R2₂ hR2₁ hR2₂ hR2
   -- √R2₁ < √R2₂
   have h_sqrt_lt : Real.sqrt R2₁ < Real.sqrt R2₂ :=
     Real.sqrt_lt_sqrt hR2₁ hR2
