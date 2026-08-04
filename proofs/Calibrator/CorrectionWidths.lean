@@ -36,6 +36,41 @@ variable {𝕜 H Y : Type*} [Field 𝕜]
 def FactorsThrough (A : H →ₗ[𝕜] Y) (C : H →ₗ[𝕜] H) : Prop :=
   ∃ T : Y →ₗ[𝕜] H, C = T.comp A
 
+/-- The zero correction factors through every observation. -/
+theorem FactorsThrough.zero (A : H →ₗ[𝕜] Y) : FactorsThrough A 0 := by
+  exact ⟨0, by ext; simp⟩
+
+/-- Factored corrections are closed under addition. -/
+theorem FactorsThrough.add (A : H →ₗ[𝕜] Y) (C D : H →ₗ[𝕜] H)
+    (hC : FactorsThrough A C) (hD : FactorsThrough A D) :
+    FactorsThrough A (C + D) := by
+  rcases hC with ⟨T, rfl⟩
+  rcases hD with ⟨S, rfl⟩
+  exact ⟨T + S, by ext; simp⟩
+
+/-- Factored corrections are closed under scalar multiplication. -/
+theorem FactorsThrough.smul (A : H →ₗ[𝕜] Y) (C : H →ₗ[𝕜] H)
+    (hC : FactorsThrough A C) (c : 𝕜) :
+    FactorsThrough A (c • C) := by
+  rcases hC with ⟨T, rfl⟩
+  exact ⟨c • T, by ext; simp⟩
+
+/-- Post-composing a factored correction by an arbitrary endomorphism preserves admissibility. -/
+theorem FactorsThrough.postcomp (A : H →ₗ[𝕜] Y) (C R : H →ₗ[𝕜] H)
+    (hC : FactorsThrough A C) :
+    FactorsThrough A (R.comp C) := by
+  rcases hC with ⟨T, rfl⟩
+  exact ⟨R.comp T, by ext; simp⟩
+
+/-- **Observable-quotient law.**  Every admissible correction is constant on each fiber of the
+observation map.  No coefficient choice can distinguish targets that produced the same data. -/
+theorem FactorsThrough.apply_eq_of_observation_eq
+    (A : H →ₗ[𝕜] Y) (C : H →ₗ[𝕜] H) (hC : FactorsThrough A C)
+    (β γ : H) (hobs : A β = A γ) :
+    C β = C γ := by
+  rcases hC with ⟨T, rfl⟩
+  simp only [LinearMap.comp_apply, hobs]
+
 /-- The single post-processor represented by a finite uniform dictionary and fixed coefficients. -/
 noncomputable def combinedPostprocessor {k : ℕ}
     (T : Fin k → Y →ₗ[𝕜] H) (a : Fin k → 𝕜) : Y →ₗ[𝕜] H :=
@@ -45,6 +80,19 @@ noncomputable def combinedPostprocessor {k : ℕ}
 def UniformCorrectionFamily (A : H →ₗ[𝕜] Y) (k : ℕ) : Set (H →ₗ[𝕜] H) :=
   {C | ∃ (T : Fin k → Y →ₗ[𝕜] H) (a : Fin k → 𝕜),
     C = (combinedPostprocessor T a).comp A}
+
+/-- At order zero the only representable uniform correction is the zero map. -/
+theorem uniformCorrectionFamily_zero (A : H →ₗ[𝕜] Y) :
+    UniformCorrectionFamily A 0 = {0} := by
+  ext C
+  constructor
+  · rintro ⟨T, a, rfl⟩
+    simp [combinedPostprocessor]
+  · intro hC
+    rw [Set.mem_singleton_iff] at hC
+    subst C
+    refine ⟨fun j ↦ Fin.elim0 j, fun j ↦ Fin.elim0 j, ?_⟩
+    simp [combinedPostprocessor]
 
 /-- Every finite uniform dictionary produces one correction factoring through `A`. -/
 theorem uniformCorrectionFamily_subset_factorsThrough
@@ -76,11 +124,35 @@ theorem uniformCorrectionFamily_eq_factorsThrough
   · exact uniformCorrectionFamily_subset_factorsThrough A k
   · exact factorsThrough_subset_uniformCorrectionFamily A k hk
 
+/-- The exact order dichotomy: order zero contains only zero, while every positive order is the
+full factor-through cone. -/
+theorem uniformCorrectionFamily_order_dichotomy
+    (A : H →ₗ[𝕜] Y) (k : ℕ) :
+    UniformCorrectionFamily A k =
+      if k = 0 then {0} else {C | FactorsThrough A C} := by
+  by_cases hk : k = 0
+  · subst k
+    simp [uniformCorrectionFamily_zero]
+  · simp only [hk, ↓reduceIte]
+    exact uniformCorrectionFamily_eq_factorsThrough A k (Nat.pos_of_ne_zero hk)
+
 /-- The set of target vectors achievable by target-dependent coefficients from a fixed
 dictionary. -/
 def adaptiveCorrectionSet {k : ℕ} (A : H →ₗ[𝕜] Y)
     (T : Fin k → Y →ₗ[𝕜] H) (β : H) : Set H :=
   {z | ∃ a : Fin k → 𝕜, z = ∑ j, a j • T j (A β)}
+
+/-- With no adaptive dictionary entries, the only achievable vector is zero. -/
+theorem adaptiveCorrectionSet_zero_order (A : H →ₗ[𝕜] Y) (β : H) :
+    adaptiveCorrectionSet A (fun j : Fin 0 ↦ Fin.elim0 j) β = {0} := by
+  ext z
+  constructor
+  · rintro ⟨a, rfl⟩
+    simp
+  · intro hz
+    rw [Set.mem_singleton_iff] at hz
+    subst z
+    exact ⟨fun j ↦ Fin.elim0 j, by simp⟩
 
 /-- **Adaptive scale invariance.**  Rescaling a nonzero target does not change its achievable
 adaptive correction set; coefficients absorb the scale.  Consequently adaptive error on a ball
