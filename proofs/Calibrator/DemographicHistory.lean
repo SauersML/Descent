@@ -109,7 +109,6 @@ theorem demoSteppingStoneFst_at_d0ne0m0sq0_is_junk :
     demoSteppingStoneFst 0 0 0 0 = 0 := by
   unfold demoSteppingStoneFst
   norm_num
-  try ring
 
 /-- **The functional form the previous derivation produced**, retained so that the
 indistinguishability recorded in the note above can be stated rather than asserted.
@@ -126,7 +125,6 @@ theorem steppingStoneFstQuadratic_at_d0ne0m0sq0_is_junk :
     steppingStoneFstQuadratic 0 0 0 0 = 0 := by
   unfold steppingStoneFstQuadratic
   norm_num
-  try ring
 
 /-- **A freely fitted dispersal variance cannot tell the two forms apart.**
 

@@ -260,7 +260,6 @@ theorem localPencilTraceContribution_at_source1_is_junk (target : ℝ) :
     localPencilTraceContribution 1 target = 0 := by
   unfold localPencilTraceContribution
   norm_num
-  try ring
 
 /-- Conditional mean of a first semigroup eigenfunction: `r = exp(-λ τ)` in the Jacobi
 anchor, `mean` is the invariant mean, and `source` is the time-zero coordinate. -/

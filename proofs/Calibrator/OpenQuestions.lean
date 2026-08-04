@@ -726,7 +726,6 @@ theorem snrPortabilityRatio_at_vsigs0vnoises1_is_junk (v_sig_t : ℝ) (v_noise_t
     snrPortabilityRatio 0 1 v_sig_t v_noise_t = 0 := by
   unfold snrPortabilityRatio
   norm_num
-  try ring
 
 /-- **SNR portability depends only on signal ratio when noise is constant.** -/
 theorem snr_portability_signal_only
@@ -840,7 +839,6 @@ theorem f1Score_at_precision0sensitivity0_is_junk :
     f1Score 0 0 = 0 := by
   unfold f1Score
   norm_num
-  try ring
 
 /-- **F1 score is symmetric in precision and recall.** -/
 theorem f1_symmetric (p r : ℝ) : f1Score p r = f1Score r p := by

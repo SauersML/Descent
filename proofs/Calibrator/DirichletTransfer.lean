@@ -208,7 +208,6 @@ theorem sampleInverseInflation_at_n1m0_is_junk :
     sampleInverseInflation 1 0 = 0 := by
   unfold sampleInverseInflation
   norm_num
-  try ring
 
 /-- The inflation exceeds one whenever the panel is not degenerate, so ignoring it
     understates the inverse. -/

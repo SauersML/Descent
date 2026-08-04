@@ -192,7 +192,6 @@ theorem amEquilibriumVariance_at_r1h21_is_junk (V_A : ℝ) :
     amEquilibriumVariance V_A 1 1 = 0 := by
   unfold amEquilibriumVariance
   norm_num
-  try ring
 
 /-- **The AM equilibrium variance is the fixed point of the variance
 recursion.**  Solving `½ V (1 + r h²) + ½ V₀ = V` gives `V (1 - r h²) = V₀`,
@@ -293,7 +292,6 @@ theorem amInducedLD_at_r1h21_is_junk (beta_i : ℝ) (beta_j : ℝ) :
     amInducedLD beta_i beta_j 1 1 = 0 := by
   unfold amInducedLD
   norm_num
-  try ring
 
 /-- AM-induced LD has the same sign as the product of effects. -/
 theorem am_ld_sign
@@ -511,7 +509,6 @@ theorem amCorrectedPortability_at_rtarget1h21_is_junk (port_measured : ℝ) (r_s
     amCorrectedPortability port_measured r_source 1 1 = 0 := by
   unfold amCorrectedPortability
   norm_num
-  try ring
 
 /-- **AM correction reduces measured portability when source has more AM.**
     The source AM inflates source R², so the correction factor
@@ -672,7 +669,6 @@ theorem ibdFst_at_d0n0sigmasq0_is_junk :
     ibdFst 0 0 0 = 0 := by
   unfold ibdFst
   norm_num
-  try ring
 
 /-- IBD Fst increases with distance. -/
 theorem ibd_fst_increases_with_distance

@@ -203,7 +203,6 @@ theorem coalFst_at_t0ne0_is_junk :
     coalFst 0 0 = 0 := by
   unfold coalFst
   norm_num
-  try ring
 
 /-- **One quantity, one definition.**  `coalFst` and `fstFromTau` are the same
 function in generation and coalescent units.  Three formulas for this quantity
@@ -1861,7 +1860,6 @@ theorem fstFromHetRatio_at_h0_is_junk (H : ℝ) :
     fstFromHetRatio H 0 = 1 := by
   unfold fstFromHetRatio
   norm_num
-  try ring
 
 /-- **The proportional-reduction form, written three times in this corpus, related here so
 that a change to any one of them fails to compile.**

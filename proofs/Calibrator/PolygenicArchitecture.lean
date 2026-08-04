@@ -982,7 +982,6 @@ theorem heritabilityEnrichment_at_h2total0mtotal1_is_junk (h2_cat : ℝ) (M_cat 
     heritabilityEnrichment h2_cat M_cat 0 1 = 0 := by
   unfold heritabilityEnrichment
   norm_num
-  try ring
 
 /-- Enrichment > 1 means more heritability per variant. -/
 theorem enrichment_interpretation (h2_c M_c h2_t M_t : ℝ)

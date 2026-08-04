@@ -37,7 +37,6 @@ theorem transportedRidgeParameter_at_a0r0_is_junk (τ : ℝ) :
     transportedRidgeParameter τ 0 0 = 0 := by
   unfold transportedRidgeParameter
   norm_num
-  try ring
 
 /-- Robust drift strictly decreases the interior effective ridge parameter. -/
 theorem transportedRidgeParameter_lt_source (τ a r : ℝ)
@@ -69,7 +68,6 @@ theorem robustRidgeCandidate_at_s00a0r0_is_junk :
     robustRidgeCandidate 0 0 0 0 = 0 := by
   unfold robustRidgeCandidate
   norm_num
-  try ring
 
 /-- The candidate is the usual ridge filter with the corrected effective parameter. -/
 theorem robustRidgeCandidate_eq (S τ a r : ℝ) (ha : 0 < a) (hr : 0 ≤ r)
@@ -240,7 +238,6 @@ theorem longMemoryMetric_at_0_is_junk (ε : ℝ) :
     longMemoryMetric ε 0 = 0 := by
   unfold longMemoryMetric
   norm_num
-  try ring
 
 /-- **longMemoryMetric at zero δ, named.** A zero bandwidth gives an infinite metric. Lean
 returns `0`, the finest possible resolution, for a bandwidth that resolves nothing. Consumers
@@ -263,7 +260,6 @@ theorem longMemoryVariance_at_0n0_is_junk (δ : ℝ) :
     longMemoryVariance 0 δ 0 = 0 := by
   unfold longMemoryVariance
   norm_num
-  try ring
 
 /-- **longMemoryVariance at zero ε, named.** A zero signal scale makes the variance infinite:
 nothing can be estimated. Lean returns `0`, a perfectly estimated quantity. Consumers must

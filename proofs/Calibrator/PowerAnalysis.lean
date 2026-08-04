@@ -403,7 +403,6 @@ theorem heritabilityFractionFromN_at_n0c0_is_junk :
     heritabilityFractionFromN 0 0 = 0 := by
   unfold heritabilityFractionFromN
   norm_num
-  try ring
 
 /-- The attained fraction of heritability is increasing in `n`. -/
 theorem r2_scaling_increasing (n₁ n₂ C : ℝ)

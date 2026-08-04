@@ -632,7 +632,6 @@ theorem reliabilityRatio_at_r202noise0_is_junk :
     reliabilityRatio 0 0 = 0 := by
   unfold reliabilityRatio
   norm_num
-  try ring
 
 /-- **The reliability ratio recovers the true variance from the total.** This is what fixes the
 ratio; monotonicity in the noise is shared by every rescaling of it. -/

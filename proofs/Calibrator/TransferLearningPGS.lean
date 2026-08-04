@@ -1610,7 +1610,6 @@ theorem optimalSourceShrinkageWeight_at_gapsq0noisevar0ntarget1_is_junk :
     optimalSourceShrinkageWeight 0 0 1 = 0 := by
   unfold optimalSourceShrinkageWeight
   norm_num
-  try ring
 
 /-- **With no transfer gap the optimal weight is one: keep the source entirely.** The quadratic
 decomposition below holds around whatever the optimum is and does not say where it sits; this

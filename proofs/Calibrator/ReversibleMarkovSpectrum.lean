@@ -56,7 +56,6 @@ theorem markovPoissonKernel_at_lam1x1_is_junk :
     markovPoissonKernel 1 1 = 0 := by
   unfold markovPoissonKernel
   norm_num
-  try ring
 
 /-- Reversing the transition eigenvalue reflects the frequency coordinate. -/
 theorem markovPoissonKernel_neg (lam x : ℝ) :

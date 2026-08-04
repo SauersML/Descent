@@ -290,7 +290,6 @@ theorem wienerWeight_at_noise0s0_is_junk :
     wienerWeight 0 0 = 0 := by
   unfold wienerWeight
   norm_num
-  try ring
 
 /-- **Detection weights are strictly decreasing in the background variance.** -/
 theorem detectionWeight_strictAnti {s₁ s₂ : ℝ} (h₁ : 0 < s₁) (h : s₁ < s₂) :

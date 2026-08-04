@@ -730,7 +730,6 @@ theorem ppv_at_prev0tpr0fpr0_is_junk :
     ppv 0 0 0 = 0 := by
   unfold ppv
   norm_num
-  try ring
 
 /-- **Predictive value recovers the true positives from everything predicted positive.** -/
 theorem ppv_mul_predictedPositive (prev tpr fpr : ℝ)

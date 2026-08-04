@@ -103,7 +103,6 @@ theorem apparentMixingTime_at_s0a0_is_junk :
     apparentMixingTime 0 0 = 0 := by
   unfold apparentMixingTime
   norm_num
-  try ring
 
 /-- The exact gap between the two. -/
 noncomputable def circulationDefect (s a : ℝ) : ℝ := a ^ 2 / (s * (s ^ 2 + a ^ 2))

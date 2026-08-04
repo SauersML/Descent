@@ -222,7 +222,6 @@ theorem optimalShrinkage_at_sq0sq0_is_junk :
     optimalShrinkage 0 0 = 0 := by
   unfold optimalShrinkage
   norm_num
-  try ring
 
 /-- **Optimal shrinkage is in (0,1) for positive parameters.** -/
 theorem optimal_shrinkage_in_unit (σ_sq β_sq : ℝ)
@@ -288,7 +287,6 @@ theorem snpShrinkage_at_00_is_junk :
     snpShrinkage 0 0 = 0 := by
   unfold snpShrinkage
   norm_num
-  try ring
 
 /-- **LD mismatch bias bound from mean value theorem.**
     For the shrinkage function f(σ) = σ/(σ+τ), we have

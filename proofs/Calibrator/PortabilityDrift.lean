@@ -4592,7 +4592,6 @@ theorem ibdFlowStep_at_ne0_is_junk (rate : ℝ) (F : ℝ) :
     ibdFlowStep 0 rate F = F - 2 * rate * F := by
   unfold ibdFlowStep
   norm_num
-  try ring
 
 /-- **`1/(1 + 4 Nₑ · rate)` is the fixed point of the identity balance.**
 Setting `(1 - F)/(2 Nₑ) = 2 · rate · F` gives `1 - F = 4 Nₑ · rate · F`, hence
@@ -5176,7 +5175,6 @@ theorem ibdRecurrenceFixedPoint_at_ne0rate1_is_junk :
     ibdRecurrenceFixedPoint 0 1 = 0 := by
   unfold ibdRecurrenceFixedPoint
   norm_num
-  try ring
 
 /-- **The rest point is a fixed point of the recurrence.**  Stated once here so
 that the island-model and Sved readings cannot acquire different answers. -/

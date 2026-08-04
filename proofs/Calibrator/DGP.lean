@@ -1001,7 +1001,6 @@ theorem optimalSlopeLinearNoise_at_sigmagsq0baseerror0slopeer_is_junk :
     optimalSlopeLinearNoise 0 0 0 0 = 0 := by
   unfold optimalSlopeLinearNoise
   norm_num
-  try ring
 
 /-- **The slope recovers the signal from the total variance.** -/
 theorem optimalSlopeLinearNoise_mul_total (sigma_g_sq base_error slope_error c : ℝ)
@@ -2624,7 +2623,6 @@ theorem r2FromSignalVariance_at_vsignal0vnoise0_is_junk :
     r2FromSignalVariance 0 0 = 0 := by
   unfold r2FromSignalVariance
   norm_num
-  try ring
 
 /-- **The explained-variance ratio really is the `R²` of a data-generating process** —
 under a regime that is now written down rather than assumed.

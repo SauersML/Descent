@@ -61,7 +61,6 @@ theorem qst_at_vbetween0vwithin0_is_junk :
     qst 0 0 = 0 := by
   unfold qst
   norm_num
-  try ring
 
 /-- **No within-population variance makes the statistic one.**
 

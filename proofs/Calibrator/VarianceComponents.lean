@@ -54,7 +54,6 @@ theorem narrowSenseH2_at_va0vd0vi0ve0_is_junk :
     narrowSenseH2 0 0 0 0 = 0 := by
   unfold narrowSenseH2
   norm_num
-  try ring
 
 /-- Narrow-sense h² is in [0, 1] for nonneg components. -/
 theorem narrow_h2_in_unit (V_A V_D V_I V_E : ℝ)

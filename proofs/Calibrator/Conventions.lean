@@ -278,7 +278,6 @@ theorem hudsonFst_at_p0p0_is_junk :
     hudsonFst 0 0 = 0 := by
   unfold hudsonFst
   norm_num
-  try ring
 
 /-- **Hudson's `F_ST` does not care which population is called first.** Both the squared
 frequency difference and the denominator `p₁ + p₂ - 2p₁p₂` are symmetric, so the statistic is

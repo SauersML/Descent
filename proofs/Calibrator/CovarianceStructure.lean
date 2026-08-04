@@ -150,7 +150,6 @@ theorem ldsrExpectedBetaSq_at_n0_is_junk (h2 : ℝ) (M : ℝ) (ell_j : ℝ) :
     ldsrExpectedBetaSq h2 M ell_j 0 = h2 / M * ell_j := by
   unfold ldsrExpectedBetaSq
   norm_num
-  try ring
 
 /-- **LD score regression expectation.**
     `χ²_j = (N h²/M) ℓ_j + N a + 1`, with intercept above one indicating

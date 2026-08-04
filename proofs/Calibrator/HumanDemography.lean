@@ -238,7 +238,6 @@ theorem taggedDriftR2RatioCorrected_at_va0ve0fst0_is_junk (shared_ld : ℝ) :
     taggedDriftR2RatioCorrected 0 0 0 shared_ld = 0 := by
   unfold taggedDriftR2RatioCorrected
   norm_num
-  try ring
 
 /-- The accuracy ratio is at least the product of the two retention channels.
 Same computation as the neutral case, with `1 - F_ST` replaced by
