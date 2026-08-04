@@ -2,9 +2,13 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Mathlib.Algebra.Order.BigOperators.Group.Finset
+import Mathlib.Algebra.BigOperators.Fin
 import Mathlib.Data.Fintype.Basic
+import Mathlib.Data.Matrix.Basic
 import Mathlib.Data.Real.Basic
 import Mathlib.Data.Set.Lattice
+import Mathlib.LinearAlgebra.Matrix.Notation
+import Mathlib.Tactic.FinCases
 import Mathlib.Tactic.Linarith
 import Mathlib.Tactic.NormNum
 import Mathlib.Tactic.Ring
@@ -34,7 +38,7 @@ No external spin-glass criterion is accepted as a theorem parameter; only the po
 that such a criterion would consume is formalized here.
 -/
 
-open scoped BigOperators
+open scoped BigOperators Matrix
 
 section LevelResolvedCalculus
 
@@ -230,5 +234,70 @@ theorem dilutedTails_certificate_pos (q : ℝ) (hq0 : 0 ≤ q) (hq1 : q ≤ 1) :
       _ ≤ q ^ 2 := by simpa using hq4le
   unfold sphericalGaplessnessCertificate
   nlinarith
+
+/-! ## Anisotropy separates Euclidean overlap from covariance energy -/
+
+abbrev TwoCoordinateConfiguration := Fin 2 → ℝ
+
+/-- Euclidean overlap, the coordinate used by the classical isotropic band calculation. -/
+noncomputable def configurationOverlap
+    (left right : TwoCoordinateConfiguration) : ℝ :=
+  dotProduct left right
+
+/-- Energy scale of the displacement from a planted configuration under covariance `sigma`. -/
+noncomputable def covarianceDisplacementEnergy
+    (sigma : Matrix (Fin 2) (Fin 2) ℝ)
+    (candidate truth : TwoCoordinateConfiguration) : ℝ :=
+  dotProduct (candidate - truth) (sigma.mulVec (candidate - truth))
+
+/-- A positive anisotropic covariance with eigen-directions rotated relative to coordinates. -/
+noncomputable def overlapEnergyWitnessCovariance : Matrix (Fin 2) (Fin 2) ℝ :=
+  !![2, 1; 1, 2]
+
+/-- The covariance energy is a sum of three squares. -/
+theorem overlapEnergyWitnessCovariance_energy_eq (vector : TwoCoordinateConfiguration) :
+    dotProduct vector (overlapEnergyWitnessCovariance.mulVec vector) =
+      vector 0 ^ 2 + vector 1 ^ 2 + (vector 0 + vector 1) ^ 2 := by
+  simp [overlapEnergyWitnessCovariance, dotProduct, Matrix.mulVec, Fin.sum_univ_two]
+  ring
+
+/-- The witness covariance is strictly positive on every nonzero configuration. -/
+theorem overlapEnergyWitnessCovariance_pos
+    (vector : TwoCoordinateConfiguration) (hvector : vector ≠ 0) :
+    0 < dotProduct vector (overlapEnergyWitnessCovariance.mulVec vector) := by
+  rw [overlapEnergyWitnessCovariance_energy_eq]
+  have hcoordinate : vector 0 ≠ 0 ∨ vector 1 ≠ 0 := by
+    by_contra hzero
+    push_neg at hzero
+    apply hvector
+    funext i
+    fin_cases i
+    · exact hzero.1
+    · exact hzero.2
+  rcases hcoordinate with hfirst | hsecond
+  · nlinarith [sq_pos_of_ne_zero hfirst, sq_nonneg (vector 1),
+      sq_nonneg (vector 0 + vector 1)]
+  · nlinarith [sq_nonneg (vector 0), sq_pos_of_ne_zero hsecond,
+      sq_nonneg (vector 0 + vector 1)]
+
+noncomputable def overlapEnergyTruth : TwoCoordinateConfiguration := ![1, 0]
+noncomputable def overlapEnergyPositive : TwoCoordinateConfiguration := ![0, 1]
+noncomputable def overlapEnergyNegative : TwoCoordinateConfiguration := ![0, -1]
+
+/-- The two candidates have the same Euclidean norm and the same overlap with the planted
+configuration, but different covariance energies.  Thus an anisotropic first-moment theory
+cannot project to overlap alone; its state space must retain both `(ρ, r)`. -/
+theorem equal_overlap_different_covariance_energy :
+    configurationOverlap overlapEnergyPositive overlapEnergyTruth = 0 ∧
+      configurationOverlap overlapEnergyNegative overlapEnergyTruth = 0 ∧
+      configurationOverlap overlapEnergyPositive overlapEnergyPositive = 1 ∧
+      configurationOverlap overlapEnergyNegative overlapEnergyNegative = 1 ∧
+      covarianceDisplacementEnergy overlapEnergyWitnessCovariance
+          overlapEnergyPositive overlapEnergyTruth = 2 ∧
+      covarianceDisplacementEnergy overlapEnergyWitnessCovariance
+          overlapEnergyNegative overlapEnergyTruth = 6 := by
+  norm_num [configurationOverlap, covarianceDisplacementEnergy,
+    overlapEnergyWitnessCovariance, overlapEnergyTruth, overlapEnergyPositive,
+    overlapEnergyNegative, dotProduct, Matrix.mulVec, Fin.sum_univ_two]
 
 end Calibrator
