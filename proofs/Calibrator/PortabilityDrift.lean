@@ -689,7 +689,21 @@ recursion multiplies `(1 - mu)²` against the drift factor and differs at
     Regime: none. This is the general recurrence; the closed population is the
     special case `mu = 0`, recorded by `hetTrajectory_of_no_mutation`.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED**, with a stated bias
+    (`proofs/validation/empirical/simcov/battery_max.py`,
+    `test_het_recurrences`). One Wright-Fisher generation with two-way allele
+    mutation `p' = p(1-mu) + (1-p)mu`, 4000 loci, 400 replicates, predicted from
+    the measured `H` of the preceding generation:
+
+      Ne      mu      this def   simulated            sems    relative
+      100    1e-3      0.36462   0.36391±0.00010      6.82      +0.20%
+      500    1e-3      0.39493   0.39414±0.00008     10.09      +0.20%
+      100    5e-3      0.40047   0.39650±0.00008     47.66      +1.00%
+
+    High in every cell and growing with `mu`: the recursion drops the
+    `mu/(2 Ne)` and `mu^2` cross terms, so it is a linearisation and not an
+    identity. One percent at `mu = 5e-3` is small for a per-generation step and
+    compounds over a run. -/
 noncomputable def hetStepWithMutation (Ne mu H : ℝ) : ℝ :=
   (1 - 1 / (2 * Ne)) * H + 2 * mu * (1 - H)
 
@@ -3565,7 +3579,18 @@ noncomputable def liabilityCaseVariance (r2 K : ℝ) : ℝ :=
 
 /-- Score variance among controls, `v₀ = 1 - R²·i_c·(i_c - T)`.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_max.py`,
+    `test_liability_control_variance`). Four million explicit normal
+    liabilities, the variance read on the STANDARDISED score among controls:
+
+      K       r2     this def   simulated            sems
+      0.05    0.3     0.94289   0.94167±0.00068      1.79
+      0.20    0.3     0.87490   0.87428±0.00069      0.90
+      0.05    0.6     0.88579   0.88614±0.00064      0.56
+
+    The reading is pinned the same way `liabilityCaseVariance`'s was: the
+    variance is of the standardised PGS among controls, not of the liability. -/
 noncomputable def liabilityControlVariance (r2 K : ℝ) : ℝ :=
   1 - r2 * liabilityControlMean K * (liabilityControlMean K - liabilityThreshold K)
 
@@ -4674,7 +4699,18 @@ within-generation ordering does not matter.  The unlinearised discrete-generatio
 recursion multiplies them instead -- see `islandFstMultiplicativeStep` -- and its fixed
 point differs from this one at O(rate², rate/Nₑ).
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_max.py`, `test_ibd_flow_step`).
+    Wright-Fisher forward simulation, 4000 loci, 300 replicate populations, one
+    generation of drift plus gene flow from a fixed source pool, `F` read as
+    `1 - H/H_ancestral`:
+
+      Ne     rate     this def   simulated            sems
+      200    0.000     0.07459   0.07452±0.00030      0.22
+      200    0.002     0.07018   0.07015±0.00028      0.09
+      500    0.005     0.02596   0.02592±0.00010      0.43
+
+    Power: the prediction spans 0.02596 to 0.07459 across the design. -/
 noncomputable def ibdFlowStep (Ne rate F : ℝ) : ℝ :=
   F + (1 - F) / (2 * Ne) - 2 * rate * F
 

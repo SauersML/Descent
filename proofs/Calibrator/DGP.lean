@@ -527,7 +527,17 @@ private def twoLocusIdx1 {t : ℕ} (ht : 2 ≤ t) : Fin t :=
 
 /-- Survival of two linked loci to the MRCA under discrete recombination.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_transfer.py`,
+    `test_ld_decay_defs`). 400000 replicate meiosis chains, an exact Bernoulli
+    count with no model slack:
+
+      r       t     this def   simulated            sems
+      0.01    20     0.81791   0.81793±0.00061      0.05
+      0.01   100     0.36603   0.36627±0.00076      0.31
+      0.05    40     0.12851   0.12859±0.00053      0.14
+
+    Power: the prediction spans 0.12851 to 0.81791, a factor of six. -/
 noncomputable def discreteRecombinationSurvival (recombRate : ℝ) (tmrca : ℕ) : ℝ :=
   (1 - recombRate) ^ tmrca
 
@@ -2161,7 +2171,24 @@ theorem fst_ordering (p : EvolutionaryParameters) (h_theta : 0 < p.theta) :
     The fraction of LD shared between populations decays as exp(-2rt)
     (factor of 2 because both lineages must avoid recombination).
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **FALSIFIED** as an exact law, VALIDATED as a
+    small-`r` approximation
+    (`proofs/validation/empirical/simcov/battery_transfer.py`,
+    `test_ld_decay_defs`). The exact survival of two independent lineages over
+    `t_div` meioses is `(1 - r)^(2 t_div)`, which is
+    `discreteRecombinationSurvival` squared; this definition is its continuous
+    limit and the gap is second order in `r`:
+
+      r       t     this def   simulated            sems     relative
+      0.01    20     0.67032   0.66902±0.00100      1.30       +0.2%
+      0.01   100     0.13534   0.13415±0.00056      2.12       +0.9%
+      0.05    40     0.01832   0.01653±0.00014     13.09      +10.8%
+
+    High in every cell, and the error grows with `r` exactly as `exp(-2rt)`
+    against `(1-r)^(2t)` requires. At `r = 0.05` it is eleven percent, which is
+    not a rounding difference. Use the exact form where `r` is not small.
+
+    Power: the prediction spans 0.01832 to 0.67032 across the design. -/
 noncomputable def sharedLDRetention (p : EvolutionaryParameters) : ℝ :=
   Real.exp (-2 * p.recomb * p.t_div)
 
