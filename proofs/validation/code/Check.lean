@@ -939,7 +939,8 @@ run_cmd do
             junkExempt := junkExempt + 1
           else if named.any (fun t ↦ (t.splitOn base).length > 1) then
             junkNamed := junkNamed + 1
-          else if Junk.hasGuardBinder ci.type then
+          else if Junk.hasGuardBinder ci.type
+              || Junk.argumentStructureGuards env ci.type then
             junkGuarded := junkGuarded + 1
           else
             let loc ← liftCoreM <| whereIs env n
