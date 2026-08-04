@@ -85,7 +85,29 @@ open Filter
 
 /-- Kingman pair-coalescence rate for `m` lineages, `m (m - 1) / 2`.
 
-    Empirical status: UNTESTED. This is the defining rate of the Kingman coalescent, a
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_bulk9.py`,
+    `test_coalescent_rate_by_ratio`). Measured as a RATIO of waiting times,
+    which no time-unit convention can enter:
+
+      ratio        this def   measured             sems
+      T(2)/T(3)     3.00000   2.96490±0.02614      1.34
+      T(2)/T(4)     6.00000   5.92983±0.04946      1.42
+      T(2)/T(6)    15.00000  14.87823±0.11851      1.03
+      T(2)/T(8)    28.00000  27.78241±0.21343      1.02
+
+    30000 independent genealogies per lineage count, first-coalescence time
+    only. The absolute value of `T(2)` against `Ne` generations is the positive
+    control and it passes.
+
+    The ratio form is deliberate. A first attempt compared the absolute rate and
+    reported a clean factor of two, which was `ploidy = 1` with
+    `population_size = Ne` making msprime measure time in units of `Ne` rather
+    than `2 Ne`. A ratio of two quantities measured the same way removes the
+    convention rather than requiring it to be got right -- the same move that
+    settled the stepping-stone exponent.
+
+    Power: the prediction spans 3 to 28, a factor of nine. This is the defining rate of the Kingman coalescent, a
     modelling choice rather than a measurement. Whether a given population's genealogy
     follows it is what the identifiability results below leave open. -/
 noncomputable def coalescentRate (m : ℕ) : ℝ :=

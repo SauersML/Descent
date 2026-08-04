@@ -192,7 +192,25 @@ section DiversifyingSelection
     turnover, while τ → ∞ recovers stabilizing selection with a fixed
     optimum.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_bulk9.py`,
+    `test_ou_effect_correlation`). Lag-`t` autocorrelation of a stationary
+    Ornstein-Uhlenbeck process across 20000 independent replicates, with `tau`
+    and `t` varied separately:
+
+      tau    t     this def   measured             sems
+       5     10     0.13534   0.13220±0.00695      0.45
+       5     40     0.00034   0.00607±0.00707      0.81
+      20     10     0.60653   0.60511±0.00448      0.32
+      20     40     0.13534   0.13904±0.00693      0.53
+      60     10     0.84648   0.85097±0.00195      2.30
+      60     40     0.51342   0.51808±0.00517      0.90
+
+    The autocorrelation is produced by the process, not by the formula.
+
+    Power: the prediction spans 0.00034 to 0.84648, and the two cells that share
+    a predicted 0.13534 at different `(tau, t)` check that only the ratio
+    matters. -/
 noncomputable def fluctuatingEffectCorrelation (t τ : ℝ) : ℝ :=
   Real.exp (-t / τ)
 
@@ -387,7 +405,28 @@ theorem effectCorrelationStabilizing_eq_observedCorrelation_of_recoveredNs
 /-- Recover the fluctuating-selection autocorrelation time `τ` from an observed
     cross-population effect correlation measured at divergence time `t`.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED where `rho` is measurable, and
+    ILL-CONDITIONED as `rho` approaches zero
+    (`proofs/validation/empirical/simcov/battery_bulk9.py`,
+    `test_ou_effect_correlation`). Recovering `tau` from the measured
+    autocorrelation of an Ornstein-Uhlenbeck process built with a known `tau`:
+
+      tau    t     recovered   built with   sems
+       5     10      4.94210     5.00000     0.39
+      20     10     19.90689    20.00000     0.16
+      20     40     20.27384    20.00000     0.46
+      60     10     61.96429    60.00000     1.09
+      60     40     60.82545    60.00000     0.46
+       5     40      7.83521     5.00000    18.90
+
+    The last row is the regime, not a defect. At `tau = 5` and `t = 40` the true
+    correlation is `exp(-8) = 0.00034`, and the measurement returns
+    `0.00607 ± 0.00707` -- consistent with zero. Taking a logarithm of a
+    quantity indistinguishable from zero amplifies its error without bound, so
+    `-t / log(rho)` inherits that: a 0.006 measurement gives 7.8 where the truth
+    is 5. The inverse is usable only while `rho` is separated from zero by more
+    than its own error bar, which the first five rows satisfy and the sixth does
+    not. -/
 noncomputable def tauFromObservedEffectCorrelation (t rho : ℝ) : ℝ :=
   -t / Real.log rho
 
