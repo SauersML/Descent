@@ -184,6 +184,15 @@ noncomputable def effectiveHaplotypeNumber {α : Type*} [Fintype α]
     (freq : α → ℝ) : ℝ :=
   1 / haplotypeHomozygosity freq
 
+/-- **effectiveHaplotypeNumber over an empty index, named.** With no haplotypes the homozygosity
+is an empty sum, so its reciprocal divides by zero. Lean returns `0`: fewer than one effective
+haplotype, a value the quantity cannot take, since an effective number is at least one whenever
+any haplotype exists. Consumers must require a nonempty index. -/
+theorem effectiveHaplotypeNumber_empty_panel_is_junk (freq : Fin 0 → ℝ) :
+    effectiveHaplotypeNumber freq = 0 := by
+  unfold effectiveHaplotypeNumber haplotypeHomozygosity
+  simp
+
 /-- Lower homozygosity implies a larger effective number of haplotypes. This is
 the biologically relevant diversity statement: populations with more even
 haplotype frequency spectra carry more effective haplotypic states. -/

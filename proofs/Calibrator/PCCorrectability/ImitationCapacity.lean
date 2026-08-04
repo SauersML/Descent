@@ -1452,6 +1452,15 @@ weakly continuous one.
 def normalizedMoment (m : ℕ) (lam : ℕ → ℝ) (p : ℕ) : ℝ :=
   (∑ i ∈ Finset.range m, lam i ^ p) / (m : ℝ)
 
+/-- **normalizedMoment over an empty index, named.** A spectrum with no eigenvalues has no
+normalised moment. `Finset.range 0` is empty and the divisor is zero, so every moment of every
+order is reported as `0` -- including the zeroth, which is one for any nonempty spectrum.
+Consumers must require a nonempty index. -/
+theorem normalizedMoment_empty_spectrum_is_junk (lam : ℕ → ℝ) (p : ℕ) :
+    normalizedMoment 0 lam p = 0 := by
+  unfold normalizedMoment
+  simp
+
 /-- **The inverse-trace certificate**: `tr K⁻¹ / m` in eigenvalue coordinates.
 This is the quantity `ldWhiteningGain` computes in closed form for an AR(1)
 kernel, and the one the linear program identifies as the detection threshold's
@@ -1461,6 +1470,15 @@ denominator.
     by the definition of `ldPrecisionTrace` as the trace of the inverse. -/
 def inverseTraceCertificate (m : ℕ) (lam : ℕ → ℝ) : ℝ :=
   (∑ i ∈ Finset.range m, (lam i)⁻¹) / (m : ℝ)
+
+/-- **inverseTraceCertificate over an empty index, named.** The certificate averages inverse
+eigenvalues, and over an empty spectrum both the sum and the count vanish. Lean returns `0`: the
+strongest possible certificate -- an inverse trace of zero means no small eigenvalue anywhere --
+issued for a matrix with no eigenvalues at all. Consumers must require a nonempty index. -/
+theorem inverseTraceCertificate_empty_spectrum_is_junk (lam : ℕ → ℝ) :
+    inverseTraceCertificate 0 lam = 0 := by
+  unfold inverseTraceCertificate
+  simp
 
 /-! ### The certificate and the AR(1) whitening gain are one quantity
 

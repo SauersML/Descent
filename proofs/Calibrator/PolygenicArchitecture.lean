@@ -523,6 +523,15 @@ section NonsmoothSummaries
 noncomputable def meanAbsoluteEffect {q : ℕ} (beta : Fin q → ℝ) : ℝ :=
   (∑ j, |beta j|) / q
 
+/-- **meanAbsoluteEffect over an empty index, named.** An architecture with no variants has no
+mean absolute effect. The empty sum and the zero cast vanish together and Lean returns `0`, which
+is also what an architecture of exactly-null effects gives -- so a missing panel and a null
+architecture are indistinguishable. Consumers must require a nonempty index. -/
+theorem meanAbsoluteEffect_empty_architecture_is_junk (beta : Fin 0 → ℝ) :
+    meanAbsoluteEffect beta = 0 := by
+  unfold meanAbsoluteEffect
+  simp
+
 theorem meanAbsoluteEffect_nonneg {q : ℕ} (beta : Fin q → ℝ) :
     0 ≤ meanAbsoluteEffect beta := by
   unfold meanAbsoluteEffect

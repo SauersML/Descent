@@ -3193,6 +3193,16 @@ Empirical status: UNTESTED. -/
 noncomputable def sharedCorrectionConsensus (curvature optimum : ι → ℝ) : ℝ :=
   (∑ i, curvature i * optimum i) / ∑ i, curvature i
 
+/-- **sharedCorrectionConsensus over an empty index, named.** The consensus is a
+curvature-weighted mean of the per-task optima, and with no tasks both sums vanish. Lean returns
+`0`, which is a perfectly ordinary correction value -- so a consensus over an empty set of tasks
+is reported as a definite recommendation rather than as absent. Consumers must require a nonempty
+index. -/
+theorem sharedCorrectionConsensus_no_curvature_is_junk (curvature optimum : Fin 0 → ℝ) :
+    sharedCorrectionConsensus curvature optimum = 0 := by
+  unfold sharedCorrectionConsensus
+  simp
+
 /-- **The spread law's right-hand side**: the curvature-weighted variance of the
 per-target optimal corrections.
 

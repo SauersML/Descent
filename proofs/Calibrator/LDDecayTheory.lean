@@ -764,6 +764,17 @@ section HarmonicMeanNe
 noncomputable def harmonicMeanNe {T : ℕ} (Ne : Fin T → ℝ) : ℝ :=
   (T : ℝ) / ∑ i, (1 / Ne i)
 
+/-- **harmonicMeanNe over an empty index, named.** A demographic history with no epochs has no
+harmonic mean effective size. Numerator and denominator both vanish -- the cast of zero and the
+empty sum -- and Lean returns `0`: an effective population size of zero, which elsewhere in this
+corpus is itself a junk point that makes drift instantaneous. An empty history therefore enters
+every downstream drift calculation as the most extreme bottleneck expressible. Consumers must
+require a nonempty index. -/
+theorem harmonicMeanNe_empty_history_is_junk (Ne : Fin 0 → ℝ) :
+    harmonicMeanNe Ne = 0 := by
+  unfold harmonicMeanNe
+  simp
+
 /-- The reciprocal of the harmonic mean equals the average of reciprocals. -/
 theorem harmonic_mean_reciprocal (T : ℕ) (hT : 0 < T)
     (Ne : Fin T → ℝ) (hNe : ∀ i, 0 < Ne i) :
