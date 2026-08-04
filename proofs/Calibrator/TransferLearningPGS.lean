@@ -1113,6 +1113,18 @@ section FineTuning
 def fineTunedTargetR2 (r2_source divergence_penalty adaptation_gain : ℝ) : ℝ :=
   r2_source - divergence_penalty + adaptation_gain
 
+/-- **Divergence and adaptation enter with opposite signs and equal weight.**
+
+The three-term budget is additive, so a divergence penalty is cancelled exactly by an equal
+adaptation gain and the fine-tuned accuracy returns to the source's. That symmetry is the content
+of the model -- it says the two effects are commensurable and trade one for one -- and a body
+weighting them differently would still be monotone in each argument, which is all the surrounding
+comparisons require. -/
+theorem fineTunedTargetR2_cancels (r2_source d : ℝ) :
+    fineTunedTargetR2 r2_source d d = r2_source := by
+  unfold fineTunedTargetR2
+  ring
+
 /-- Target-trained `R²` in a simple additive estimation-penalty model. -/
 def scratchTargetR2 (oracle_target_r2 estimation_penalty : ℝ) : ℝ :=
   oracle_target_r2 - estimation_penalty

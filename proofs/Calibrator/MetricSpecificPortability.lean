@@ -947,6 +947,23 @@ noncomputable def metricPPV (sensitivity specificity prevalence : ℝ) : ℝ :=
   sensitivity * prevalence /
     (sensitivity * prevalence + (1 - specificity) * (1 - prevalence))
 
+/-- **A perfectly specific test has predictive value one wherever it fires.**
+
+At `specificity = 1` the false-positive term vanishes identically and the predictive value is one
+at every prevalence, however small. That is the endpoint which fixes the form: the dependence on
+prevalence is carried entirely by the false-positive term, so a body that let prevalence enter the
+numerator would still be increasing in sensitivity and in prevalence, and would fail here.
+
+It is also the reason the PPV portability gap is driven by specificity rather than sensitivity.
+Two populations differing only in prevalence have equal predictive value when specificity is one,
+and the gap opens only as specificity falls away from it. -/
+theorem metricPPV_perfect_specificity (sensitivity prevalence : ℝ)
+    (h : sensitivity * prevalence ≠ 0) :
+    metricPPV sensitivity 1 prevalence = 1 := by
+  unfold metricPPV
+  norm_num
+  exact div_self h
+
 /-- Absolute portability gap for sensitivity between source and target use cases. -/
 def sensitivityPortabilityGap (sensSource sensTarget : ℝ) : ℝ :=
   |sensTarget - sensSource|
@@ -1577,12 +1594,13 @@ theorem median_beats_mean_under_absolute_loss :
 /-! #### Unequal per-ancestry sample sizes inflate the effective resolution
 
 Splitting the index into `k` cells and estimating within each costs an estimation term
-proportional to the EFFECTIVE cell count `N * ∑ πᵢ / nᵢ`, not to `k`. The two agree exactly when
-the allocation is proportional to the mixture weight, and any departure costs a harmonic factor.
+proportional to the EFFECTIVE cell count `N * ∑ πᵢ / nᵢ`, not to `k`.  For equal cell
+weights this is minimized by equal allocation and any departure costs a harmonic factor.  For
+unequal weights the square-root law proved below replaces proportional allocation.
 
-The two-cell case carries the whole content and is stated exactly: the penalty is at least four,
-which is what proportional allocation achieves, and it grows without bound as the split becomes
-lopsided. Biologically this is the cost of a cohort that is ninety percent one ancestry.
+The equal-weight two-cell case is stated first: the penalty is at least four, attained by equal
+allocation, and grows without bound as the split becomes lopsided.  The subsequent theorems then
+separate posterior-weighted and worst-ancestry recruitment objectives.
 -/
 
 /-- **The harmonic penalty for unequal allocation.** -/
