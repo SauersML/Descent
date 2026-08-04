@@ -581,6 +581,17 @@ noncomputable def popgenDrivenProxyGenerationalModel :
   targetPrevalence_lt_one := by intro t; norm_num
 }
 
+/-! The closing five fields above -- the untaggable-phenotype variance, the prevalence, and
+its three positivity proofs -- read the same as the ones in `singleLocusGenerationalWitness`
+below, and the duplication guard reports that.
+
+It stands.  Those fields are dimension-generic in TEXT and not in TYPE: this witness carries
+two tags and the scaffold carries one, so `contextCrossSource` is `Fin 2 → ℝ` here and
+`Fin 1 → ℝ` there, and no function returns both.  Sharing them would take a parent structure
+holding the dimension-free fields, which is a change to `CrossPopulationGenerationalModel`
+in another module and to every witness in the corpus -- a larger claim than the repetition
+is worth, and one that should be made for its own reasons rather than to satisfy a count. -/
+
 /-- The source weights in the nondegenerate two-tag proxy witness are the
 source proxy covariances themselves, because the source scored-SNP covariance
 is the identity. -/
