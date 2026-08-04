@@ -203,6 +203,10 @@ UNREACHABLE_BY_HAND = {
     "ldBandDetectionShare": "the divisor is Real.pi * (1 + decay ^ 2), at least pi",
     "ldPruningDetectionDeficit": "the divisor is Real.pi * (1 + decay ^ 2), at least pi",
     "bolthausenSznitmanTotalMergerRate": "the divisors are (j : ℕ) + 1 and + 2, both positive",
+    "hardCallLatticeSpan": "latticeCriticalMaf is proved strictly between 0 and 1",
+    "hardCallObservables": "built from hardCallLatticeSpan, whose divisor is proved nonzero",
+    "meffPerturbed": "the divisor is (n : ℝ) + 1 for n : ℕ, always at least one",
+    "exitLevels": "the set-builder carries 0 < spikeLoad, which is the divisor",
 }
 
 

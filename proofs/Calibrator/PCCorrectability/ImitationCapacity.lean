@@ -1198,6 +1198,14 @@ load is not `effectiveSubgroupSize`.
 def subgroupContrast (n m : ℕ) : ℕ → ℝ :=
   twoBlock m (((n : ℝ) - (m : ℝ)) / (n : ℝ)) (-((m : ℝ) / (n : ℝ)))
 
+/-- With no individuals the contrast divides by zero and Mathlib returns `0` in both blocks, so
+an empty panel reports a contrast that is identically zero rather than undefined. -/
+theorem subgroupContrast_at_empty_panel_is_junk (m : ℕ) :
+    subgroupContrast 0 m = twoBlock m 0 0 := by
+  unfold subgroupContrast
+  norm_num
+
+
 /-- The subgroup contrast as a vector on the panel's individuals.
 
     Empirical status: DERIVED. -/

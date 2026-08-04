@@ -163,6 +163,15 @@ noncomputable def pgsStratificationRiskCoefficient
   Real.sqrt expectedSNPCount * Real.sqrt Hres / effectSD *
     ascertainmentAmplification Φ Λ
 
+/-- A zero effect scale divides by zero and Mathlib returns `0`, so the study is reported as
+carrying no stratification risk exactly when its effect units are degenerate. -/
+theorem pgsStratificationRiskCoefficient_at_zero_effect_scale_is_junk
+    (expectedSNPCount Hres Φ Λ : ℝ) :
+    pgsStratificationRiskCoefficient expectedSNPCount Hres 0 Φ Λ = 0 := by
+  unfold pgsStratificationRiskCoefficient
+  simp
+
+
 /-- Standardized residual stratification bias is linear in the confounding
 magnitude once the study design and residual target-axis geometry are fixed.
 

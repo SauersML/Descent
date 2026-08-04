@@ -168,6 +168,13 @@ def LatticeDatum.Describes : LatticeDatum → MeasureTheory.Measure ℝ → Prop
 noncomputable def logSqGaussianLaw : MeasureTheory.Measure ℝ :=
   stdGaussianMeasure.map (fun x ↦ Real.log (x ^ 2))
 
+/-- The pushforward map sends `0` to Mathlib's junk `Real.log 0 = 0`.  The law is unaffected:
+the standard Gaussian gives `{0}` measure zero, so the junk point carries no mass and no
+statement about `logSqGaussianLaw` depends on the value there. -/
+theorem logSqGaussianLaw_at_zero_is_junk : Real.log ((0 : ℝ) ^ 2) = 0 := by
+  norm_num
+
+
 /-- **`log g²` is nonlattice.**
 
     Every arithmetic progression is countable. Its preimage under `x ↦ log (x²)` is

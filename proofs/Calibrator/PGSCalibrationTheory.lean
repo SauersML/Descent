@@ -2187,6 +2187,19 @@ noncomputable def reclassifiedBandEventPrevalence
     (π * thresholdBandRate μevent threshold δ +
       (1 - π) * thresholdBandRate μnonevent threshold δ)
 
+/-- An empty reclassification band divides by zero and Mathlib returns `0`, so the posterior
+event prevalence in the band reads as certainly-no-event rather than undefined. -/
+theorem reclassifiedBandEventPrevalence_at_empty_band_is_junk
+    (π : ℝ) (μevent μnonevent : Measure ℝ)
+    [IsProbabilityMeasure μevent] [IsProbabilityMeasure μnonevent]
+    (threshold δ : ℝ)
+    (hzero : π * thresholdBandRate μevent threshold δ +
+      (1 - π) * thresholdBandRate μnonevent threshold δ = 0) :
+    reclassifiedBandEventPrevalence π μevent μnonevent threshold δ = 0 := by
+  unfold reclassifiedBandEventPrevalence
+  rw [hzero, div_zero]
+
+
 /-- **Positive NRI means the reclassified band is lower risk than the cohort.**
     For a downward intercept recalibration, positive NRI is equivalent to the
     patients moved from high risk to low risk having event prevalence below the
