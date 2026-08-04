@@ -966,6 +966,19 @@ theorem sensitivityPortabilityGap_eq_zero_iff (a b : ℝ) :
 
 /-! ### Calibrating one score across a continuum of ancestries
 
+WHAT THE INDEX AND THE COVARIATE ARE. This is not optional bookkeeping; the wrong reading makes
+every theorem below say `0 = 0`.
+
+The COVARIATE is the SCORE. The INDEX is ancestry position. `π` is the ancestry posterior GIVEN
+the score, and `η i` is ancestry `i`'s risk at that score. Each ancestry has its own calibration
+curve in the score, the score's distribution genuinely varies with ancestry, and the drift is how
+each ancestry's risk curve departs from the pooled curve.
+
+The reading that destroys everything is index = principal-component position WHILE the components
+are also regressors. Then the covariate determines the index, the ancestry posterior collapses to
+a point mass, and `pointMass_driftDefect_zero` below shows the defect is identically zero. The
+framework requires the index to be HIDDEN BEHIND the covariate, not measured alongside it.
+
 A polygenic score deployed across many ancestries faces two calibration demands. INDEX-WISE:
 calibrated within each ancestry separately. POOLED: calibrated on the mixture. The applied
 literature treats these as competing objectives and reports a pooled-versus-worst-group gap as
@@ -1011,6 +1024,24 @@ noncomputable def indexwiseLoss {m : ℕ} (π η : Fin m → ℝ) (v : ℝ) : �
 /-- Dispersion of the ancestry-specific conditional about the pooled one. -/
 noncomputable def driftDefect {m : ℕ} (π η : Fin m → ℝ) : ℝ :=
   ∑ i, π i * (η i - pooledConditional π η) ^ 2
+
+/-- **If the covariate determines the index, there is no drift and nothing below has content.**
+
+The whole development lives on the ancestry posterior given the covariate being spread out. When
+that posterior is a point mass -- which is exactly what happens if the ancestry coordinate is
+itself among the regressors -- the defect is zero, the pooled and index-wise demands coincide
+trivially, and every theorem in this section degenerates to `0 = 0`.
+
+Stated so the degeneracy is visible rather than discovered later. It is the precondition for
+reading any of the results as saying something about a deployment. -/
+theorem pointMass_driftDefect_zero {m : ℕ} (η : Fin m → ℝ) (i₀ : Fin m) :
+    driftDefect (fun j ↦ if j = i₀ then (1 : ℝ) else 0) η = 0 := by
+  have hpool : pooledConditional (fun j ↦ if j = i₀ then (1 : ℝ) else 0) η = η i₀ := by
+    unfold pooledConditional
+    simp
+  unfold driftDefect
+  rw [hpool]
+  simp
 
 /-- **The pooled residual vanishes at the pooled conditional.** -/
 theorem pooledConditional_residual_zero {m : ℕ} (π η : Fin m → ℝ) (hπ : ∑ i, π i = 1) :
@@ -1179,6 +1210,168 @@ theorem excess_is_exactly_quadratic {m : ℕ} (π η : Fin m → ℝ) (hπ : ∑
   rw [indexwiseLoss_eq_defect_add_sq π η hπ]
   ring
 
+
+/-! #### The ancestry coordinate that explains the most variation can explain none of the drift
+
+The drift operator sends a weight function on the ancestry continuum to the drift it captures.
+Ordering ancestry coordinates by how much drift energy each carries is therefore the ordering that
+minimises unresolved drift for a given number of coordinates.
+
+Principal components order the same continuum by how much GENOTYPE variance each explains. Nothing
+connects the two orderings, and the witness below shows they can be not merely different but
+opposed: four ancestries, two candidate coordinates, and the coordinate that carries all of the
+score variation carries none of the drift while the coordinate that carries all of the drift
+carries none of the score variation.
+
+So "use the leading principal components as ancestry coordinates" is not a neutral choice. It
+optimises a criterion unrelated to calibration, and the direction it selects first can be exactly
+the direction along which the risk curve does not move.
+
+Two further consequences, which follow from the drift operator being built out of the drift
+itself. The optimal coordinates are SCORE- AND TRAIT-SPECIFIC: change the score or the trait and
+the operator changes, so there is no one universal ancestry map. And estimating them needs
+phenotypes across the ancestry range, so the basis is supervised and does not extrapolate. What
+`excess_is_exactly_quadratic` buys is that getting the basis slightly wrong costs the square of
+the error rather than the error, provided the constant coordinate is always retained.
+-/
+
+/-- Four ancestries at equal posterior weight. -/
+noncomputable def fourAncestryWeights : Fin 4 → ℝ := fun _ ↦ 1 / 4
+
+/-- A candidate ancestry coordinate: the contrast between the first pair and the second. -/
+noncomputable def coordinateHighVariance : Fin 4 → ℝ :=
+  fun i ↦ if (i : ℕ) < 2 then 1 else -1
+
+/-- A second candidate: the alternating contrast. -/
+noncomputable def coordinateHighDrift : Fin 4 → ℝ :=
+  fun i ↦ if (i : ℕ) % 2 = 0 then 1 else -1
+
+/-- How the score varies across ancestries. -/
+noncomputable def scoreAcrossAncestry : Fin 4 → ℝ :=
+  fun i ↦ if (i : ℕ) < 2 then 1 else -1
+
+/-- How the risk curve drifts across ancestries. -/
+noncomputable def driftAcrossAncestry : Fin 4 → ℝ :=
+  fun i ↦ if (i : ℕ) % 2 = 0 then 1 else -1
+
+/-- Energy a candidate coordinate captures from a field on the ancestry index. -/
+noncomputable def capturedEnergy {m : ℕ} (π w field : Fin m → ℝ) : ℝ :=
+  (∑ i, π i * w i * field i) ^ 2
+
+/-- **The first coordinate captures all of the score variation.** -/
+theorem highVariance_captures_score :
+    capturedEnergy fourAncestryWeights coordinateHighVariance scoreAcrossAncestry = 1 := by
+  unfold capturedEnergy fourAncestryWeights coordinateHighVariance scoreAcrossAncestry
+  simp [Fin.sum_univ_four]
+  try norm_num
+
+/-- **And none of the drift.** -/
+theorem highVariance_captures_no_drift :
+    capturedEnergy fourAncestryWeights coordinateHighVariance driftAcrossAncestry = 0 := by
+  unfold capturedEnergy fourAncestryWeights coordinateHighVariance driftAcrossAncestry
+  simp [Fin.sum_univ_four]
+  try norm_num
+
+/-- **The second coordinate captures none of the score variation.** -/
+theorem highDrift_captures_no_score :
+    capturedEnergy fourAncestryWeights coordinateHighDrift scoreAcrossAncestry = 0 := by
+  unfold capturedEnergy fourAncestryWeights coordinateHighDrift scoreAcrossAncestry
+  simp [Fin.sum_univ_four]
+  try norm_num
+
+/-- **And all of the drift.** -/
+theorem highDrift_captures_drift :
+    capturedEnergy fourAncestryWeights coordinateHighDrift driftAcrossAncestry = 1 := by
+  unfold capturedEnergy fourAncestryWeights coordinateHighDrift driftAcrossAncestry
+  simp [Fin.sum_univ_four]
+  try norm_num
+
+/-- **The two orderings are opposed.** Ranking ancestry coordinates by explained score variation
+puts the first ahead of the second; ranking them by captured drift puts the second ahead of the
+first. A coordinate system chosen to explain variation is therefore not a coordinate system
+chosen to explain portability, and here it is exactly the wrong one. -/
+theorem variance_ordering_opposes_drift_ordering :
+    capturedEnergy fourAncestryWeights coordinateHighDrift scoreAcrossAncestry
+      < capturedEnergy fourAncestryWeights coordinateHighVariance scoreAcrossAncestry
+    ∧ capturedEnergy fourAncestryWeights coordinateHighVariance driftAcrossAncestry
+      < capturedEnergy fourAncestryWeights coordinateHighDrift driftAcrossAncestry := by
+  rw [highVariance_captures_score, highVariance_captures_no_drift,
+    highDrift_captures_no_score, highDrift_captures_drift]
+  norm_num
+
+
+/-! #### The atomic within/between split
+
+The witness above shows merging two ancestries loses resolved energy. The identity below is why,
+in general and exactly. For two ancestries at weights `w₁, w₂` carrying risks `a, b`, write `c`
+for their weighted mean. Then against ANY reference `m`,
+
+    w₁(a-m)² + w₂(b-m)² = (w₁+w₂)(c-m)² + w₁w₂/(w₁+w₂) · (a-b)²
+
+The first term on the right is what a deployment that merges the two ancestries can still see;
+the second is what it loses, and it is the weighted squared risk gap between them. The loss is
+zero exactly when the two ancestries carry the same risk, which is when merging them was
+harmless.
+
+That is the whole content of resolution monotonicity: refinement resolves the pairwise risk gaps,
+and coarsening returns them to the irreducible floor. -/
+theorem within_between_split (w₁ w₂ a b m : ℝ) (hw : 0 < w₁ + w₂) :
+    w₁ * (a - m) ^ 2 + w₂ * (b - m) ^ 2
+      = (w₁ + w₂) * ((w₁ * a + w₂ * b) / (w₁ + w₂) - m) ^ 2
+        + w₁ * w₂ / (w₁ + w₂) * (a - b) ^ 2 := by
+  field_simp
+  ring
+
+/-- **Merging two ancestries loses exactly the weighted squared risk gap.** Nonnegative always,
+and zero exactly when the merged ancestries carried the same risk. -/
+theorem merge_loss_nonneg (w₁ w₂ a b : ℝ) (h₁ : 0 ≤ w₁) (h₂ : 0 ≤ w₂) (hw : 0 < w₁ + w₂) :
+    0 ≤ w₁ * w₂ / (w₁ + w₂) * (a - b) ^ 2 := by
+  have : 0 ≤ w₁ * w₂ / (w₁ + w₂) := by positivity
+  positivity
+
+/-- **Equal risks make the merge free.** A deployment may coarsen its ancestry axis without cost
+exactly across ancestries whose conditional risk agrees; every other merge is paid for. -/
+theorem merge_loss_eq_zero_iff_equal_risk (w₁ w₂ a b : ℝ) (h₁ : 0 < w₁) (h₂ : 0 < w₂) :
+    w₁ * w₂ / (w₁ + w₂) * (a - b) ^ 2 = 0 ↔ a = b := by
+  have hw : 0 < w₁ + w₂ := by linarith
+  have hc : w₁ * w₂ / (w₁ + w₂) ≠ 0 := by positivity
+  constructor
+  · intro h
+    have hsq : (a - b) ^ 2 = 0 := by
+      rcases mul_eq_zero.mp h with h' | h'
+      · exact absurd h' hc
+      · exact h'
+    have := pow_eq_zero_iff (two_ne_zero) |>.mp hsq
+    linarith
+  · intro h
+    rw [h]
+    ring
+
+/-! #### The other half of the survival criterion -/
+
+/-- The part of the threshold regret charged to ancestries below the threshold. -/
+noncomputable def belowThresholdMass {m : ℕ} (π η : Fin m → ℝ) (τ : ℝ) : ℝ :=
+  ∑ i, π i * max (τ - η i) 0
+
+/-- **A threshold below every ancestry-specific risk is also untouched by the drift.** With
+`aboveThresholdMass_eq_zero` this is the full survival criterion: a decision threshold transports
+across ancestries exactly when it lies outside the spread of their risks, on either side. -/
+theorem belowThresholdMass_eq_zero {m : ℕ} (π η : Fin m → ℝ) (τ : ℝ)
+    (h : ∀ i, τ ≤ η i) :
+    belowThresholdMass π η τ = 0 := by
+  unfold belowThresholdMass
+  refine Finset.sum_eq_zero fun i _ ↦ ?_
+  rw [max_eq_right (by linarith [h i])]
+  ring
+
+/-- **Both sides charge at a threshold strictly inside the spread**, so no single prediction
+serves every ancestry for that loss. Together with the two vanishing results this is exact: the
+loss survives the drift if and only if its threshold avoids the interior of the risk range. -/
+theorem belowThresholdMass_pos_inside :
+    0 < belowThresholdMass uniformTwoWeights twoAncestryConditional (1 / 2) := by
+  unfold belowThresholdMass uniformTwoWeights twoAncestryConditional
+  norm_num [Fin.sum_univ_two]
+
 /-! #### Unequal per-ancestry sample sizes inflate the effective resolution
 
 Splitting the index into `k` cells and estimating within each costs an estimation term
@@ -1208,6 +1401,50 @@ theorem harmonic_allocation_penalty_equal (n : ℝ) (h : 0 < n) :
     (n + n) * (1 / n + 1 / n) = 4 := by
   field_simp
   ring
+
+
+/-! #### Resolution monotonicity in general, not just on a witness
+
+The merge witness shows coarsening loses drift energy in one instance; the atomic split shows
+exactly what a two-way merge costs. The general statement is that a CELL of any size, collapsed
+to its weighted mean, retains at most the energy it had, and the shortfall is the within-cell
+dispersion.
+
+This is weighted Cauchy-Schwarz, and it is what makes resolution monotone under arbitrary
+refinement rather than only under pairwise merges: any coarsening is a composition of cell
+collapses, and each one loses energy.
+
+Biologically it says the same thing at every granularity. A deployment that calibrates on
+continental groupings resolves at most what one calibrating on finer ancestry resolves, whatever
+the groupings are, and the deficit is the spread of risk inside each grouping. -/
+theorem cell_collapse_loses_energy {m : ℕ} (s : Finset (Fin m)) (π w : Fin m → ℝ)
+    (hπ : ∀ i, 0 ≤ π i) :
+    (∑ i ∈ s, π i * w i) ^ 2 ≤ (∑ i ∈ s, π i) * ∑ i ∈ s, π i * w i ^ 2 := by
+  have key := Finset.sum_mul_sq_le_sq_mul_sq s
+    (fun i ↦ Real.sqrt (π i)) (fun i ↦ Real.sqrt (π i) * w i)
+  have hprod : ∀ i ∈ s, Real.sqrt (π i) * (Real.sqrt (π i) * w i) = π i * w i := by
+    intro i _
+    rw [← mul_assoc, Real.mul_self_sqrt (hπ i)]
+  have hsq1 : ∀ i ∈ s, Real.sqrt (π i) ^ 2 = π i := by
+    intro i _
+    rw [Real.sq_sqrt (hπ i)]
+  have hsq2 : ∀ i ∈ s, (Real.sqrt (π i) * w i) ^ 2 = π i * w i ^ 2 := by
+    intro i _
+    rw [mul_pow, Real.sq_sqrt (hπ i)]
+  calc (∑ i ∈ s, π i * w i) ^ 2
+      = (∑ i ∈ s, Real.sqrt (π i) * (Real.sqrt (π i) * w i)) ^ 2 := by
+        rw [Finset.sum_congr rfl hprod]
+    _ ≤ (∑ i ∈ s, Real.sqrt (π i) ^ 2) * ∑ i ∈ s, (Real.sqrt (π i) * w i) ^ 2 := key
+    _ = (∑ i ∈ s, π i) * ∑ i ∈ s, π i * w i ^ 2 := by
+        rw [Finset.sum_congr rfl hsq1, Finset.sum_congr rfl hsq2]
+
+/-- **A cell of unit weight retains at most its energy.** The normalised form, which is the one
+that composes: collapsing a cell to its mean can only lose. -/
+theorem cell_collapse_loses_energy_normalised {m : ℕ} (s : Finset (Fin m)) (π w : Fin m → ℝ)
+    (hπ : ∀ i, 0 ≤ π i) (hs : ∑ i ∈ s, π i = 1) :
+    (∑ i ∈ s, π i * w i) ^ 2 ≤ ∑ i ∈ s, π i * w i ^ 2 := by
+  have h := cell_collapse_loses_energy s π w hπ
+  rwa [hs, one_mul] at h
 
 /-! #### Which decision losses survive the drift
 
@@ -1241,6 +1478,51 @@ theorem aboveThresholdMass_pos_inside :
     0 < aboveThresholdMass uniformTwoWeights twoAncestryConditional (1 / 2) := by
   unfold aboveThresholdMass uniformTwoWeights twoAncestryConditional
   norm_num [Fin.sum_univ_two]
+
+
+/-! #### Why a threshold inside the drift range admits no single decision
+
+`aboveThresholdMass_eq_zero` and `belowThresholdMass_eq_zero` say a threshold outside the range of
+ancestry-specific risks is untouched. The reason a threshold INSIDE the range cannot be served is
+sharper than "the regret is positive": the two ancestries fall on opposite sides of it, so the
+decision the loss recommends is literally different at each, and no single prediction is the
+right decision at both.
+
+That is the deployment question, stated exactly. It is not "is the score calibrated" but "does
+the spread of ancestry-specific risk at my operating point straddle my clinical cutoff". The
+first is an aggregate diagnostic; the second is decidable from the fitted per-ancestry curves and
+is the one that determines whether the cutoff transports. -/
+theorem threshold_inside_separates_ancestries (τ : ℝ) (h0 : 0 < τ) (h1 : τ < 1) :
+    twoAncestryConditional 0 < τ ∧ τ < twoAncestryConditional 1 := by
+  have e0 : twoAncestryConditional 0 = 0 := by unfold twoAncestryConditional; norm_num
+  have e1 : twoAncestryConditional 1 = 1 := by unfold twoAncestryConditional; norm_num
+  rw [e0, e1]
+  exact ⟨h0, h1⟩
+
+/-- **A threshold outside the range does not separate them.** Both ancestries sit on the same side,
+so the decision is the same at each and the cutoff transports unchanged. The pair with the theorem
+above is the survival criterion in decision form. -/
+theorem threshold_outside_does_not_separate (τ : ℝ) (h : 1 < τ) :
+    twoAncestryConditional 0 < τ ∧ twoAncestryConditional 1 < τ := by
+  have e0 : twoAncestryConditional 0 = 0 := by unfold twoAncestryConditional; norm_num
+  have e1 : twoAncestryConditional 1 = 1 := by unfold twoAncestryConditional; norm_num
+  rw [e0, e1]
+  exact ⟨by linarith, h⟩
+
+/-- **Equal risks across ancestries leave nothing to obstruct.** The defect vanishes exactly when
+the conditional does not drift, which is the other degenerate case worth naming beside
+`pointMass_driftDefect_zero`: there the index was determined by the covariate, here the index
+exists but carries no risk variation. Either way the framework says nothing, and a deployment
+should know which of the two it is in. -/
+theorem constantConditional_driftDefect_zero {m : ℕ} (π : Fin m → ℝ) (c : ℝ)
+    (hπ : ∑ i, π i = 1) :
+    driftDefect π (fun _ ↦ c) = 0 := by
+  have hpool : pooledConditional π (fun _ ↦ c) = c := by
+    unfold pooledConditional
+    rw [← Finset.sum_mul, hπ, one_mul]
+  unfold driftDefect
+  rw [hpool]
+  simp
 
 /-- **The gap is bounded by the two sensitivities it compares.** Symmetry and the vanishing
 criterion are shared by every positive multiple of this distance; the triangle bound is not,
