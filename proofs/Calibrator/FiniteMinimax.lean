@@ -64,6 +64,27 @@ layer use exactly the same prior-predictive observation law. -/
     (E.toMixtureExperiment target moment).mixture π =
       π.bind E.observation := rfl
 
+/-- Push every observation through a deterministic summary map while retaining the parameter,
+action, and loss spaces.  This models SFS binning, ancestry-score compression, and any other
+deterministic biological preprocessing. -/
+noncomputable def summarizeObservations (summaryCount : ℕ)
+    (summary : Fin (observationCount + 1) → Fin (summaryCount + 1)) :
+    Problem parameterCount actionCount summaryCount where
+  observation := fun θ ↦ E.observation θ |>.bind fun observation ↦ PMF.pure (summary observation)
+  loss := E.loss
+
+/-- Deterministic preprocessing preserves exact observational equivalence. -/
+theorem summarizeObservations_observation_eq
+    (summaryCount : ℕ)
+    (summary : Fin (observationCount + 1) → Fin (summaryCount + 1))
+    (θ₁ θ₂ : Fin (parameterCount + 1))
+    (hobs : E.observation θ₁ = E.observation θ₂) :
+    (E.summarizeObservations summaryCount summary).observation θ₁ =
+      (E.summarizeObservations summaryCount summary).observation θ₂ := by
+  change (E.observation θ₁).bind (fun observation ↦ PMF.pure (summary observation)) =
+    (E.observation θ₂).bind (fun observation ↦ PMF.pure (summary observation))
+  rw [hobs]
+
 /-- Frequentist risk at one parameter value. -/
 noncomputable def risk
     (δ : Rule actionCount observationCount)
@@ -160,6 +181,22 @@ theorem half_separation_le_minimaxRisk_of_observation_eq
   apply le_csInf (Set.range_nonempty E.worstRisk)
   rintro worstValue ⟨δ, rfl⟩
   exact E.half_separation_le_worstRisk_of_observation_eq θ₁ θ₂ separation hobs hloss δ
+
+/-- **Data processing cannot repair exact nonidentifiability.** If two biological parameters
+are observationally equivalent before deterministic summarization, then every summary-based
+decision problem retains the same half-separation minimax floor. -/
+theorem half_separation_le_summarized_minimaxRisk_of_observation_eq
+    (summaryCount : ℕ)
+    (summary : Fin (observationCount + 1) → Fin (summaryCount + 1))
+    (θ₁ θ₂ : Fin (parameterCount + 1)) (separation : ℝ)
+    (hobs : E.observation θ₁ = E.observation θ₂)
+    (hloss : ∀ action : Fin (actionCount + 1),
+      separation ≤ E.loss θ₁ action + E.loss θ₂ action) :
+    separation / 2 ≤ (E.summarizeObservations summaryCount summary).minimaxRisk := by
+  refine half_separation_le_minimaxRisk_of_observation_eq
+    (E := E.summarizeObservations summaryCount summary) θ₁ θ₂ separation ?_ ?_
+  · exact E.summarizeObservations_observation_eq summaryCount summary θ₁ θ₂ hobs
+  · exact hloss
 
 /-! ## Sharpness of the observational-equivalence floor -/
 
