@@ -26,6 +26,7 @@ directly from explicit source/target biological state:
 - target prevalence for deployed calibration metrics
 -/
 
+
 section MechanisticValidation
 
 /-- Exact target/source portability ratio from the explicit mechanistic state. -/
@@ -254,6 +255,34 @@ noncomputable def novelUntaggablePhenotypeMetricModel : CrossPopulationMetricMod
       novelUntaggablePhenotypeVarianceTarget := 1 / 2
       novelUntaggablePhenotypeVarianceTarget_nonneg := by norm_num }
 
+/-- **Evaluate a witness model's metrics from its explicit state.**
+
+Every witness theorem below reduces the same way: unfold the model, the residual
+decomposition, the source-weight chain and the Brier chart, then finish with `norm_num`.
+That list was written out once per theorem -- nine copies of twenty lines, differing only
+in which model names led the list, so a lemma added to one chain silently left the others
+evaluating a different one.  The list is the tactic; the witnesses just invoke it. -/
+macro "metric_witness_simp" : tactic =>
+  `(tactic| simp [baselineMetricModel, baselineProxyTagMetricModel,
+      targetTaggingShiftMetricModel, targetLDShiftMetricModel, targetEffectShiftMetricModel,
+      targetContextShiftMetricModel, targetPrevalenceShiftMetricModel,
+      novelTargetOnlyTaggingMetricModel, novelUntaggablePhenotypeMetricModel,
+      mechanisticPortabilityRatio,
+      brokenTaggingResidual, ancestrySpecificLDResidual, sourceSpecificOverfitResidual,
+      novelUntaggablePhenotypeResidual, irreducibleTargetResidualBurden,
+      r2FromSourceWeights,
+      explainedSignalVarianceFromSourceWeights,
+      predictiveCovarianceFromSourceWeights,
+      scoreVarianceFromSourceWeights,
+      sigmaTagCausal,
+      taggingProjection, directCausalProjection, proxyTaggingProjection,
+      sourceWeightsFromExplicitDrivers, sourceERMWeights,
+      crossCovariance,
+      effectiveOutcomeVariance,
+      targetCalibratedBrierFromSourceWeights,
+      TransportedMetrics.calibratedBrier, TransportedMetrics.r2FromSignalVariance,
+      Matrix.mulVec, dotProduct, Matrix.cons_val', Matrix.cons_val_fin_one])
+
 /-- The baseline witness has exact source and target metrics that can be read
 off from the explicit state. -/
 theorem baseline_mechanistic_metrics :
@@ -265,23 +294,7 @@ theorem baseline_mechanistic_metrics :
     r2FromSourceWeights baselineMetricModel Pop.target = 1 / 2 ∧
     mechanisticPortabilityRatio baselineMetricModel = 1 ∧
     targetCalibratedBrierFromSourceWeights baselineMetricModel = 1 / 8 := by
-  simp [baselineMetricModel, mechanisticPortabilityRatio,
-    brokenTaggingResidual, ancestrySpecificLDResidual, sourceSpecificOverfitResidual,
-    novelUntaggablePhenotypeResidual,
-    irreducibleTargetResidualBurden,
-    r2FromSourceWeights,
-    explainedSignalVarianceFromSourceWeights,
-    predictiveCovarianceFromSourceWeights,
-    scoreVarianceFromSourceWeights,
-    sigmaTagCausal,
-    taggingProjection,
-    directCausalProjection, proxyTaggingProjection,
-    sourceWeightsFromExplicitDrivers, sourceERMWeights,
-    crossCovariance,
-    effectiveOutcomeVariance,
-    targetCalibratedBrierFromSourceWeights,
-    TransportedMetrics.calibratedBrier, TransportedMetrics.r2FromSignalVariance,
-    Matrix.mulVec, dotProduct, Matrix.cons_val', Matrix.cons_val_fin_one]
+  metric_witness_simp
   norm_num
 
 /-- A score built on the directly causal SNP and a score built on a perfect
@@ -298,20 +311,7 @@ theorem direct_causal_vs_proxy_tag_same_source_r2_different_portability :
       r2FromSourceWeights baselineProxyTagMetricModel Pop.source ∧
     r2FromSourceWeights targetTaggingShiftMetricModel Pop.target <
       r2FromSourceWeights baselineMetricModel Pop.target := by
-  simp [baselineMetricModel, baselineProxyTagMetricModel, targetTaggingShiftMetricModel,
-    directCausalProjection, proxyTaggingProjection,
-    r2FromSourceWeights,
-    explainedSignalVarianceFromSourceWeights,
-    predictiveCovarianceFromSourceWeights,
-    scoreVarianceFromSourceWeights,
-    sourceWeightsFromExplicitDrivers, sourceERMWeights,
-    crossCovariance,
-    sigmaTagCausal,
-    taggingProjection,
-    effectiveOutcomeVariance, brokenTaggingResidual,
-    ancestrySpecificLDResidual, sourceSpecificOverfitResidual,
-    irreducibleTargetResidualBurden,
-    Matrix.mulVec, dotProduct, Matrix.cons_val', Matrix.cons_val_fin_one]
+  metric_witness_simp
   norm_num
 
 /-- Target LD among scored SNPs changes target `R²` and portability even when
@@ -323,20 +323,7 @@ theorem target_ld_shift_changes_portability_without_changing_source_r2 :
     r2FromSourceWeights targetLDShiftMetricModel Pop.target = 1 / 6 ∧
     r2FromSourceWeights baselineMetricModel Pop.target = 1 / 2 ∧
     mechanisticPortabilityRatio targetLDShiftMetricModel = 1 / 3 := by
-  simp [baselineMetricModel, targetLDShiftMetricModel, mechanisticPortabilityRatio,
-    ancestrySpecificLDResidual, brokenTaggingResidual, sourceSpecificOverfitResidual,
-    irreducibleTargetResidualBurden,
-    r2FromSourceWeights,
-    explainedSignalVarianceFromSourceWeights,
-    predictiveCovarianceFromSourceWeights,
-    scoreVarianceFromSourceWeights,
-    sigmaTagCausal,
-    taggingProjection,
-    directCausalProjection, proxyTaggingProjection,
-    sourceWeightsFromExplicitDrivers, sourceERMWeights,
-    crossCovariance,
-    effectiveOutcomeVariance,
-    Matrix.mulVec, dotProduct, Matrix.cons_val', Matrix.cons_val_fin_one]
+  metric_witness_simp
   norm_num
 
 /-- Target proxy-tagging alignment changes target `R²` directly, even with the
@@ -347,21 +334,7 @@ theorem target_tagging_shift_changes_target_r2 :
       r2FromSourceWeights baselineProxyTagMetricModel Pop.source ∧
     r2FromSourceWeights targetTaggingShiftMetricModel Pop.target = 1 / 9 ∧
     mechanisticPortabilityRatio targetTaggingShiftMetricModel = 2 / 9 := by
-  simp [baselineMetricModel, baselineProxyTagMetricModel, targetTaggingShiftMetricModel,
-    mechanisticPortabilityRatio,
-    brokenTaggingResidual, ancestrySpecificLDResidual, sourceSpecificOverfitResidual,
-    irreducibleTargetResidualBurden,
-    r2FromSourceWeights,
-    explainedSignalVarianceFromSourceWeights,
-    predictiveCovarianceFromSourceWeights,
-    scoreVarianceFromSourceWeights,
-    sigmaTagCausal,
-    taggingProjection,
-    directCausalProjection, proxyTaggingProjection,
-    sourceWeightsFromExplicitDrivers, sourceERMWeights,
-    crossCovariance,
-    effectiveOutcomeVariance,
-    Matrix.mulVec, dotProduct, Matrix.cons_val', Matrix.cons_val_fin_one]
+  metric_witness_simp
   norm_num
 
 /-- Target effect-size shifts change target `R²` directly, even with unchanged
@@ -372,20 +345,7 @@ theorem target_effect_shift_changes_target_r2 :
     irreducibleTargetResidualBurden targetEffectShiftMetricModel = 0 ∧
     r2FromSourceWeights targetEffectShiftMetricModel Pop.target = 1 / 8 ∧
     mechanisticPortabilityRatio targetEffectShiftMetricModel = 1 / 4 := by
-  simp [baselineMetricModel, targetEffectShiftMetricModel, mechanisticPortabilityRatio,
-    brokenTaggingResidual, ancestrySpecificLDResidual, sourceSpecificOverfitResidual,
-    irreducibleTargetResidualBurden,
-    r2FromSourceWeights,
-    explainedSignalVarianceFromSourceWeights,
-    predictiveCovarianceFromSourceWeights,
-    scoreVarianceFromSourceWeights,
-    sigmaTagCausal,
-    taggingProjection,
-    directCausalProjection, proxyTaggingProjection,
-    sourceWeightsFromExplicitDrivers, sourceERMWeights,
-    crossCovariance,
-    effectiveOutcomeVariance,
-    Matrix.mulVec, dotProduct, Matrix.cons_val', Matrix.cons_val_fin_one]
+  metric_witness_simp
   norm_num
 
 /-- Source-only context structure that does not transport creates an additive
@@ -396,20 +356,7 @@ theorem target_context_shift_creates_additive_overfit_loss_and_changes_target_r2
       r2FromSourceWeights baselineMetricModel Pop.source ∧
     r2FromSourceWeights targetContextShiftMetricModel Pop.target = 1 / 9 ∧
     mechanisticPortabilityRatio targetContextShiftMetricModel = 2 / 9 := by
-  simp [baselineMetricModel, targetContextShiftMetricModel, mechanisticPortabilityRatio,
-    brokenTaggingResidual, ancestrySpecificLDResidual, sourceSpecificOverfitResidual,
-    irreducibleTargetResidualBurden,
-    r2FromSourceWeights,
-    explainedSignalVarianceFromSourceWeights,
-    predictiveCovarianceFromSourceWeights,
-    scoreVarianceFromSourceWeights,
-    sigmaTagCausal,
-    taggingProjection,
-    directCausalProjection, proxyTaggingProjection,
-    sourceWeightsFromExplicitDrivers, sourceERMWeights,
-    crossCovariance,
-    effectiveOutcomeVariance,
-    Matrix.mulVec, dotProduct, Matrix.cons_val', Matrix.cons_val_fin_one]
+  metric_witness_simp
   norm_num
 
 /-- Target prevalence changes the calibrated Brier score even when the score
@@ -419,21 +366,7 @@ theorem target_prevalence_shift_changes_brier_without_changing_target_r2 :
       r2FromSourceWeights baselineMetricModel Pop.target ∧
     targetCalibratedBrierFromSourceWeights targetPrevalenceShiftMetricModel = 3 / 32 ∧
     targetCalibratedBrierFromSourceWeights baselineMetricModel = 1 / 8 := by
-  simp [baselineMetricModel, targetPrevalenceShiftMetricModel,
-    brokenTaggingResidual, ancestrySpecificLDResidual, sourceSpecificOverfitResidual,
-    irreducibleTargetResidualBurden,
-    r2FromSourceWeights,
-    explainedSignalVarianceFromSourceWeights,
-    predictiveCovarianceFromSourceWeights,
-    scoreVarianceFromSourceWeights,
-    sigmaTagCausal,
-    taggingProjection, directCausalProjection, proxyTaggingProjection,
-    sourceWeightsFromExplicitDrivers, sourceERMWeights,
-    crossCovariance,
-    effectiveOutcomeVariance,
-    targetCalibratedBrierFromSourceWeights,
-    TransportedMetrics.calibratedBrier, TransportedMetrics.r2FromSignalVariance,
-    Matrix.mulVec, dotProduct, Matrix.cons_val', Matrix.cons_val_fin_one]
+  metric_witness_simp
   norm_num
 
 /-- New target-only tagging created after divergence can change target `R²`
@@ -444,20 +377,7 @@ theorem novel_target_only_tagging_changes_target_r2 :
       r2FromSourceWeights baselineProxyTagMetricModel Pop.source ∧
     r2FromSourceWeights novelTargetOnlyTaggingMetricModel Pop.target = 1 / 9 ∧
     r2FromSourceWeights baselineProxyTagMetricModel Pop.target = 1 / 2 := by
-  simp [baselineMetricModel, baselineProxyTagMetricModel, novelTargetOnlyTaggingMetricModel,
-    r2FromSourceWeights,
-    explainedSignalVarianceFromSourceWeights,
-    predictiveCovarianceFromSourceWeights,
-    scoreVarianceFromSourceWeights,
-    sigmaTagCausal,
-    taggingProjection,
-    directCausalProjection, proxyTaggingProjection,
-    sourceWeightsFromExplicitDrivers, sourceERMWeights,
-    crossCovariance,
-    brokenTaggingResidual, ancestrySpecificLDResidual, sourceSpecificOverfitResidual,
-    novelUntaggablePhenotypeResidual, irreducibleTargetResidualBurden,
-    effectiveOutcomeVariance, Matrix.mulVec, dotProduct,
-    Matrix.cons_val', Matrix.cons_val_fin_one]
+  metric_witness_simp
   norm_num
 
 /-- Novel target-only causal variance that is not tagged by the transported
@@ -468,20 +388,7 @@ theorem novel_untaggable_phenotype_variance_lowers_target_r2 :
     novelUntaggablePhenotypeResidual novelUntaggablePhenotypeMetricModel = 1 / 2 ∧
     r2FromSourceWeights novelUntaggablePhenotypeMetricModel Pop.target = 2 / 5 ∧
     r2FromSourceWeights baselineMetricModel Pop.target = 1 / 2 := by
-  simp [baselineMetricModel, novelUntaggablePhenotypeMetricModel,
-    r2FromSourceWeights,
-    explainedSignalVarianceFromSourceWeights,
-    predictiveCovarianceFromSourceWeights,
-    scoreVarianceFromSourceWeights,
-    sigmaTagCausal,
-    taggingProjection,
-    directCausalProjection, proxyTaggingProjection,
-    sourceWeightsFromExplicitDrivers, sourceERMWeights,
-    crossCovariance,
-    brokenTaggingResidual, ancestrySpecificLDResidual, sourceSpecificOverfitResidual,
-    novelUntaggablePhenotypeResidual, irreducibleTargetResidualBurden,
-    effectiveOutcomeVariance, Matrix.mulVec, dotProduct,
-    Matrix.cons_val', Matrix.cons_val_fin_one]
+  metric_witness_simp
   norm_num
 
 /-- The liability-threshold AUC coordinate in the mechanistic metric profile is
@@ -663,12 +570,14 @@ state exactly, so the target deployed `R²` equals the source-side value `1/2`. 
 theorem popgenDrivenProxyGenerationalModel_target_r2_at_zero :
     r2FromSourceWeights
       (popgenDrivenProxyGenerationalModel.toMetricModelAt 0) Pop.target = 1 / 2 := by
+  -- The generational witness needs the transport kernels as well as the metric chain, so
+  -- it does not go through `metric_witness_simp`.
   simp [r2FromSourceWeights, popgenDrivenProxyGenerationalModel,
     CrossPopulationGenerationalModel.toMetricModelAt,
     sigmaTagTargetAt, directCausalTargetAt, proxyTaggingTargetAt, sigmaTagCausalTargetAt,
     novelDirectCausalTargetAt, novelProxyTaggingTargetAt,
     tagAlleleFreqRetentionAt, causalAlleleFreqRetentionAt, alleleFreqMismatchPenalty,
-    r2FromSourceWeights, explainedSignalVarianceFromSourceWeights,
+    explainedSignalVarianceFromSourceWeights,
     predictiveCovarianceFromSourceWeights, scoreVarianceFromSourceWeights,
     sigmaTagCausal,
     sourceWeightsFromExplicitDrivers, sourceERMWeights, crossCovariance,

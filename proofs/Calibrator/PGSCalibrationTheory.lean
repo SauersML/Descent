@@ -875,6 +875,35 @@ theorem CrossPopulationMechanisticCalibrationModel.target_profile_slope_eq_direc
     CalibrationMoments.toProfile, CalibrationMoments.shifted, calibrationProfile,
     targetCalibrationSlopeFromSourceWeights_exact_direct_proxy_context_law]
 
+/-- **What a perfectly calibrated source and a nonzero shift budget give at the target**:
+the target CITL is the budget, its size is the budget's size, and it is strictly worse than
+the source's, which is zero.
+
+Both projection theorems below need exactly these three facts and each derived them inline,
+in the same order, from the same two lemmas -- seventeen lines, twice. -/
+theorem source_calibrated_target_citl_facts
+    (cal : CrossPopulationCalibrationShiftModel)
+    (h_src_cal : ((cal.identityCalibrationProfile Pop.source)).citl = 0)
+    (h_shift_nonzero : cal.observedMeanShift - cal.predictedMeanShift ≠ 0) :
+    ((cal.identityCalibrationProfile Pop.target)).citl =
+        cal.observedMeanShift - cal.predictedMeanShift ∧
+      |((cal.identityCalibrationProfile Pop.target)).citl| =
+        |cal.observedMeanShift - cal.predictedMeanShift| ∧
+      |((cal.identityCalibrationProfile Pop.source)).citl| <
+        |((cal.identityCalibrationProfile Pop.target)).citl| := by
+  have h_citl_eq :
+      ((cal.identityCalibrationProfile Pop.target)).citl =
+        cal.observedMeanShift - cal.predictedMeanShift :=
+    source_calibrated_target_citl_eq_shift_budget cal h_src_cal
+  refine ⟨h_citl_eq, source_calibrated_target_abs_citl_eq_abs_shift_budget cal h_src_cal, ?_⟩
+  have h_tgt_ne_zero : ((cal.identityCalibrationProfile Pop.target)).citl ≠ 0 := by
+    rw [h_citl_eq]
+    exact h_shift_nonzero
+  have h_tgt_abs_pos :
+      0 < |((cal.identityCalibrationProfile Pop.target)).citl| :=
+    abs_pos.mpr h_tgt_ne_zero
+  simpa [h_src_cal] using h_tgt_abs_pos
+
 /-- **Exact cross-ancestry metric profile from the mechanistic SNP-level
 transport model plus an explicit calibration-shift budget.**
 
@@ -944,24 +973,8 @@ theorem source_to_target_exact_metric_profile_from_shift_budget
         metric h_source_r2_unit.2]
     exact equalVarianceGaussianAUCFromExplainedR2_strictMonoOn_unitInterval
       h_target_r2_unit h_source_r2_unit h_r2_drop
-  have h_citl_eq :
-      ((cal.identityCalibrationProfile Pop.target)).citl =
-        cal.observedMeanShift - cal.predictedMeanShift :=
-    source_calibrated_target_citl_eq_shift_budget cal h_src_cal
-  have h_abs_eq :
-      |((cal.identityCalibrationProfile Pop.target)).citl| =
-        |cal.observedMeanShift - cal.predictedMeanShift| :=
-    source_calibrated_target_abs_citl_eq_abs_shift_budget cal h_src_cal
-  have h_tgt_ne_zero : ((cal.identityCalibrationProfile Pop.target)).citl ≠ 0 := by
-    rw [h_citl_eq]
-    exact h_shift_nonzero
-  have h_abs_worse :
-      |((cal.identityCalibrationProfile Pop.source)).citl| <
-        |((cal.identityCalibrationProfile Pop.target)).citl| := by
-    have h_tgt_abs_pos :
-        0 < |((cal.identityCalibrationProfile Pop.target)).citl| :=
-      abs_pos.mpr h_tgt_ne_zero
-    simpa [h_src_cal] using h_tgt_abs_pos
+  obtain ⟨h_citl_eq, h_abs_eq, h_abs_worse⟩ :=
+    source_calibrated_target_citl_facts cal h_src_cal h_shift_nonzero
   have h_brier :
       (sourceMetricProfileFromSourceWeightsAtPrevalence
         metric (cal.observedMean Pop.target)).brier <
@@ -1339,24 +1352,8 @@ theorem auc_drop_and_citl_worsening_of_r2_drop_and_shift_budget
         metric h_source_r2_unit.2]
     exact equalVarianceGaussianAUCFromExplainedR2_strictMonoOn_unitInterval
       h_target_r2_unit h_source_r2_unit h_r2_drop
-  have h_citl_eq :
-      ((cal.identityCalibrationProfile Pop.target)).citl =
-        cal.observedMeanShift - cal.predictedMeanShift :=
-    source_calibrated_target_citl_eq_shift_budget cal h_src_cal
-  have h_abs_eq :
-      |((cal.identityCalibrationProfile Pop.target)).citl| =
-        |cal.observedMeanShift - cal.predictedMeanShift| :=
-    source_calibrated_target_abs_citl_eq_abs_shift_budget cal h_src_cal
-  have h_tgt_ne_zero : ((cal.identityCalibrationProfile Pop.target)).citl ≠ 0 := by
-    rw [h_citl_eq]
-    exact h_shift_nonzero
-  have h_abs_worse :
-      |((cal.identityCalibrationProfile Pop.source)).citl| <
-        |((cal.identityCalibrationProfile Pop.target)).citl| := by
-    have h_tgt_abs_pos :
-        0 < |((cal.identityCalibrationProfile Pop.target)).citl| :=
-      abs_pos.mpr h_tgt_ne_zero
-    simpa [h_src_cal] using h_tgt_abs_pos
+  obtain ⟨h_citl_eq, h_abs_eq, h_abs_worse⟩ :=
+    source_calibrated_target_citl_facts cal h_src_cal h_shift_nonzero
   exact ⟨h_auc, h_citl_eq, h_abs_eq, h_abs_worse⟩
 
 /-- **Prevalence-only cross-ancestry CITL worsening is just a special case.**
