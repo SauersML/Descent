@@ -188,6 +188,22 @@ coordinate equals one there. -/
       rw [show (-1 : ℝ) + (extra : ℝ) + 2 = (extra : ℝ) + 1 by ring]
       exact div_self hne
 
+/-- **Exact Bolthausen--Sznitman full-merger chart.** At zero speed tilt, the normalized rate
+for all `extra + 2` lineages to merge simultaneously is `1 / (extra + 1)`. Equivalently,
+`λ k k = 1 / (k - 1)` throughout the untilted endpoint. -/
+theorem speedTiltFullMergerRate_zero_beta (extra : ℕ) :
+    speedTiltFullMergerRate 0 extra = 1 / ((extra : ℝ) + 1) := by
+  induction extra with
+  | zero => norm_num
+  | succ extra ih =>
+      rw [speedTiltFullMergerRate_succ, ih]
+      have hleft : (extra : ℝ) + 1 ≠ 0 := by positivity
+      have hright : (extra : ℝ) + 2 ≠ 0 := by positivity
+      rw [show (0 : ℝ) + (extra : ℝ) + 2 = (extra : ℝ) + 2 by ring]
+      push_cast
+      field_simp
+      ring
+
 /-- Uniform Kingman-side envelope: every full merger of at least three lineages is bounded by
 the three-lineage coordinate `1 / (β + 2)`. -/
 theorem speedTiltFullMergerRate_succ_le_threeLineage
