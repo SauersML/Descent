@@ -979,6 +979,17 @@ noncomputable def ppvPortabilityGap
   |metricPPV sensitivity specificity prevalenceTarget -
     metricPPV sensitivity specificity prevalenceSource|
 
+/-- **The gap is bounded by the two predictive values it compares.** Strict positivity under a
+prevalence shift is shared by every positive multiple of this distance; the triangle bound is
+not, so it is what fixes the multiple at one. -/
+theorem ppvPortabilityGap_le_add_abs
+    (sensitivity specificity prevalenceSource prevalenceTarget : ℝ) :
+    ppvPortabilityGap sensitivity specificity prevalenceSource prevalenceTarget
+      ≤ |metricPPV sensitivity specificity prevalenceTarget|
+        + |metricPPV sensitivity specificity prevalenceSource| := by
+  unfold ppvPortabilityGap
+  exact abs_sub _ _
+
 /-- **PPV is strictly increasing in prevalence.**
     At fixed sensitivity and specificity, higher prevalence yields higher PPV.
     This is the concrete base-rate sensitivity of PPV. -/

@@ -323,6 +323,15 @@ section DeadSensors
 def scalarRowResolvent (latent quadraticForm : ℝ) : ℝ :=
   1 / (1 + latent ^ 2 * quadraticForm)
 
+/-- **The resolvent inverts its own denominator.** The dead-sensor value at zero latent loading is
+one for every body of the form `1 / (1 + c · latent² · q)`, whatever `c` is; multiplying the
+denominator back fixes it. -/
+theorem scalarRowResolvent_mul_denom (latent quadraticForm : ℝ)
+    (h : 1 + latent ^ 2 * quadraticForm ≠ 0) :
+    scalarRowResolvent latent quadraticForm * (1 + latent ^ 2 * quadraticForm) = 1 := by
+  unfold scalarRowResolvent
+  field_simp
+
 @[simp] theorem scalarRowResolvent_dead (quadraticForm : ℝ) :
     scalarRowResolvent 0 quadraticForm = 1 := by
   simp [scalarRowResolvent]
