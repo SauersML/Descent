@@ -98,7 +98,12 @@ theorem ploidy_at_reference_point :
 /-- Genotype variance at a locus in Hardy-Weinberg proportions, for dosage
 coded `0, 1, …, ploidy`.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_core.py`,
+    `test_hwe_variance`). Realised dosage variance over 400000 Hardy-Weinberg
+    genotypes per cell: worst 0.88 sems over a prediction spanning 0.09500 to
+    0.50000. This body also appears as `AncestrySpecificPower.genotypeVarianceHWE`
+    and `hweHeterozygosity`; all three are measured against the same oracle. -/
 noncomputable def hweGenotypeVariance (p : ℝ) : ℝ := ploidy * p * (1 - p)
 
 /-- **The genotype variance peaks at even allele frequency and is exactly one half there.** With
@@ -985,6 +990,14 @@ constant. -/
 
 /-- Convex combination, `α x + (1 - α) y`. -/
 noncomputable def convexMix (α x y : ℝ) : ℝ := α * x + (1 - α) * y
+
+/-- Reference evaluation.  The value is computed through the definitions this body calls, but
+the theorem states a number: an inequality or an invariance leaves a family of bodies
+satisfying it, and a value does not. -/
+theorem convexMix_at_reference_point :
+    convexMix 1 1 1 = 1 := by
+  norm_num [convexMix]
+
 
 theorem spikeAndSlabVariance_eq_convexMix (pi sl sm : ℝ) :
     spikeAndSlabVariance pi sl sm = convexMix pi sl sm := by

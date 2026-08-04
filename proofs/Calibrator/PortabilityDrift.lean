@@ -957,9 +957,26 @@ PGS variance = Σᵢ βᵢ² × 2pᵢ(1-pᵢ), i.e. the sum of squared effect si
 weighted by per-locus heterozygosity. Here `β_sq_sum` is Σᵢ βᵢ² and `het` is
 the average heterozygosity 2p(1-p) (or its sum, depending on normalisation).
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_pgs.py`,
+    `test_pgs_variance_from_het`). Realised PGS variance over 40000 individuals
+    at 300 unlinked loci: worst 0.69 sems over a prediction spanning 49.77 to
+    134.19, a factor of two and a half.
+
+    Regime: linkage equilibrium. The formula sums per-locus contributions and
+    drops the LD cross terms, the same qualifier `ScoreDistribution.pgsVariance`
+    carries, where the omission was measured at 72 percent on a recombining
+    panel. -/
 noncomputable def pgsVarianceFromHet (β_sq_sum het : ℝ) : ℝ :=
   β_sq_sum * het
+
+/-- Reference evaluation.  The value is computed through the definitions this body calls, but
+the theorem states a number: an inequality or an invariance leaves a family of bodies
+satisfying it, and a value does not. -/
+theorem pgsVarianceFromHet_at_reference_point :
+    pgsVarianceFromHet 1 1 = 1 := by
+  norm_num [pgsVarianceFromHet]
+
 
 /-- **Score variance is bilinear in effect scale and heterozygosity.** Rescaling every effect by
 `c` scales the summed squares by `c` as given, and the variance follows; the same holds in the
@@ -1078,7 +1095,21 @@ theorem presentDayPGSVariance_eq_one_sub_fst_mul (V_A fst : ℝ) :
     two regimes disagree at every positive time. Do not read this factor as a
     between-population `F_ST`.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_pgs.py`,
+    `test_wf_drift_retention`). Realised `H_t / H_0` under neutral Wright-Fisher
+    drift, 400 replicates of 600 loci:
+
+      N     t      this def   simulated            sems
+      100    50     0.77831   0.77870±0.00623      0.06
+      100   200     0.36696   0.36738±0.00294      0.14
+      500   200     0.81865   0.81905±0.00655      0.06
+       50   100     0.36603   0.36600±0.00293      0.01
+
+    The last two rows share a retention while differing in both `N` and `t`, so
+    the design tests the exponent and not only the base.
+
+    Power: the prediction spans 0.36603 to 0.81865. -/
 noncomputable def wrightFisherDriftRetention (N t : ℕ) : ℝ :=
   (1 - 1 / (2 * (N : ℝ))) ^ t
 

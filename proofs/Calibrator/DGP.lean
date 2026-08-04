@@ -95,7 +95,22 @@ theorem fstMutationDriftEquilibrium_at_unit_theta :
 rate `θ`: drift removes a fraction `1 / (2 Nₑ)` and mutation is replenishing against it.
 Two accessors on two structures used to write this product out separately.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED as a linearisation**, with the
+    gap stated (`proofs/validation/empirical/simcov/battery_max.py`,
+    `test_het_recurrences`). Against one Wright-Fisher generation with two-way
+    allele mutation, predicted from the measured heterozygosity of the preceding
+    generation:
+
+      Ne     theta    this def   simulated            relative
+      100    0.4       0.36263   0.36391±0.00010       -0.35%
+      500    2.0       0.39294   0.39414±0.00008       -0.30%
+      100    2.0       0.39049   0.39650±0.00008       -1.52%
+
+    Low in every cell and growing with `theta`: the product `(1 - 1/(2Ne))
+    (1 - theta/(2Ne))` drops the input term that `hetStepWithMutation` carries,
+    so it is a pure-decay reading and understates the retained heterozygosity
+    wherever mutation replenishes it. One and a half percent per generation at
+    `theta = 2` compounds over a run. -/
 noncomputable def hetDecayFromScaled (Ne θ : ℝ) : ℝ :=
   (1 - 1 / (2 * Ne)) * (1 - θ / (2 * Ne))
 

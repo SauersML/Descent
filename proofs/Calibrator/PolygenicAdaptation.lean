@@ -225,7 +225,13 @@ theorem pgsDriftVarianceFromLoci_eq_closedForm {n : ℕ} (fst : ℝ) (β : Fin n
     from their common ancestor, analogous to the factor of 2 in
     expectedFreqDiffSq for allele frequency differences.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED** after the ploidy correction
+    (`proofs/validation/empirical/simcov/battery_bulk3.py`,
+    `test_drift_variance_family`). Variance of the mean-score difference between
+    two independently drifted populations, 4000 replicates. Before the
+    correction to `pgsDriftVariance_one_pop` this definition inherited that
+    body's missing ploidy factor and read 50.5 percent low at 22.6 sems; it is
+    `2 * pgsDriftVariance_one_pop` and so was corrected with it. -/
 noncomputable def pgsDiffVariance_two_pop (V_A fst : ℝ) : ℝ :=
   2 * pgsDriftVariance_one_pop V_A fst
 
