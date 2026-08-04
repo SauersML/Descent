@@ -3056,6 +3056,34 @@ theorem screeningQalyGain_eq_formula
   unfold screeningQalyGain screeningUtilityFromRates qalyScreeningDecisionModel
   ring
 
+/-- **Exact QALY break-even boundary.** Screening has positive QALY gain exactly when weighted
+true-positive benefit exceeds weighted false-positive harm.  This iff is assumption-free: domain
+restrictions such as rates in `[0,1]` are needed for interpretation, not for the algebraic
+decision boundary. -/
+theorem screeningQalyGain_pos_iff
+    (sens spec prevalence benefit harm : ℝ) :
+    0 < screeningQalyGain sens spec prevalence benefit harm ↔
+      (1 - spec) * (1 - prevalence) * harm < sens * prevalence * benefit := by
+  rw [screeningQalyGain_eq_formula]
+  constructor <;> intro h <;> linarith
+
+/-- Screening is exactly QALY-neutral precisely on the weighted benefit/harm equality surface. -/
+theorem screeningQalyGain_eq_zero_iff
+    (sens spec prevalence benefit harm : ℝ) :
+    screeningQalyGain sens spec prevalence benefit harm = 0 ↔
+      sens * prevalence * benefit = (1 - spec) * (1 - prevalence) * harm := by
+  rw [screeningQalyGain_eq_formula]
+  exact sub_eq_zero
+
+/-- Screening has negative QALY gain exactly when weighted false-positive harm exceeds weighted
+true-positive benefit. -/
+theorem screeningQalyGain_neg_iff
+    (sens spec prevalence benefit harm : ℝ) :
+    screeningQalyGain sens spec prevalence benefit harm < 0 ↔
+      sens * prevalence * benefit < (1 - spec) * (1 - prevalence) * harm := by
+  rw [screeningQalyGain_eq_formula]
+  constructor <;> intro h <;> linarith
+
 /-- Canonical decision-curve screening model: benefit is normalized to `1` and
     false-positive harm is the usual decision-curve odds weight `t / (1-t)`. -/
 noncomputable def decisionCurveScreeningModel

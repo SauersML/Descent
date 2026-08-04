@@ -940,7 +940,7 @@ section CostEffectiveness
     criterion (PPV > 50%), not a restatement of the conclusion. -/
 theorem qaly_gain_positive_condition
     (sens spec π benefit harm : ℝ)
-    (h_π : 0 < π) (h_π1 : π < 1)
+    (h_π : 0 < π)
     (h_sens : 0 < sens) (h_harm : 0 < harm)
     -- True positive probability exceeds false positive probability
     -- (equivalent to positive predictive value > 50%, or LR+ × prevalence odds > 1)
@@ -948,21 +948,12 @@ theorem qaly_gain_positive_condition
     -- Treatment benefit exceeds harm
     (h_bh : harm ≤ benefit) :
     0 < screeningQalyGain sens spec π benefit harm := by
-  rw [screeningQalyGain_eq_formula]
-  have h_prob_gap : 0 < sens * π - (1 - spec) * (1 - π) := by
-    nlinarith
-  have h_lower_pos : 0 < harm * (sens * π - (1 - spec) * (1 - π)) := by
-    exact mul_pos h_harm h_prob_gap
-  have h_weight_nonneg : 0 ≤ sens * π := by
-    positivity
-  have h_lower_le :
-      harm * (sens * π - (1 - spec) * (1 - π)) ≤
-        screeningQalyGain sens spec π benefit harm := by
-    rw [screeningQalyGain_eq_formula]
-    have h_gain_term_nonneg : 0 ≤ sens * π * (benefit - harm) := by
-      nlinarith
-    nlinarith
-  exact lt_of_lt_of_le h_lower_pos h_lower_le
+  apply (screeningQalyGain_pos_iff sens spec π benefit harm).2
+  calc
+    (1 - spec) * (1 - π) * harm < sens * π * harm :=
+      mul_lt_mul_of_pos_right h_tp_dominates h_harm
+    _ ≤ sens * π * benefit :=
+      mul_le_mul_of_nonneg_left h_bh (mul_nonneg h_sens.le h_π.le)
 
 /-- **Lower portability → lower cost-effectiveness.**
     If the target population has lower sensitivity and higher false positive rate
