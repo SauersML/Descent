@@ -112,6 +112,79 @@ theorem betaFamilyTripleMergerRate_strictAnti
   have hpos₂ : 0 < θ₂ + 2 := by linarith
   exact one_div_lt_one_div_of_lt hpos₁ (by linarith)
 
+/-! ## Complete normalized speed-tilt rate chart -/
+
+/-- Full-merger moment for `extra + 2` lineages under the normalized
+`Beta(1, β + 1)` merger law.  The product form is the integer identity
+
+`(β + 1) B(extra + 1, β + 1)
+  = ∏ j < extra, (j + 1) / (β + j + 2)`.
+
+Using `extra` rather than a merger size makes the total definition free of truncated
+subtraction. -/
+noncomputable def speedTiltFullMergerRate (β : ℝ) (extra : ℕ) : ℝ :=
+  ∏ j ∈ Finset.range extra, ((j : ℝ) + 1) / (β + (j : ℝ) + 2)
+
+/-- Pair merger is normalized to one. -/
+@[simp] theorem speedTiltFullMergerRate_zero (β : ℝ) :
+    speedTiltFullMergerRate β 0 = 1 := by
+  simp [speedTiltFullMergerRate]
+
+/-- Three-lineage merger is the first nontrivial coordinate of the speed tilt. -/
+@[simp] theorem speedTiltFullMergerRate_one (β : ℝ) :
+    speedTiltFullMergerRate β 1 = 1 / (β + 2) := by
+  simp [speedTiltFullMergerRate]
+
+/-- Exact recurrence for every higher simultaneous full-merger rate. -/
+theorem speedTiltFullMergerRate_succ (β : ℝ) (extra : ℕ) :
+    speedTiltFullMergerRate β (extra + 1) =
+      speedTiltFullMergerRate β extra *
+        (((extra : ℝ) + 1) / (β + (extra : ℝ) + 2)) := by
+  simp only [speedTiltFullMergerRate, Finset.prod_range_succ]
+
+/-- All `b`-lineage, specified-`k`-tuple rates obtained by expanding
+`(1-x)^(b-k)` against the full-merger moments. -/
+noncomputable def speedTiltBetaMergerRate (β : ℝ) (b k : ℕ) : ℝ :=
+  ∑ j ∈ Finset.range (b - k + 1),
+    (-1 : ℝ) ^ j * ((b - k).choose j : ℝ) *
+      speedTiltFullMergerRate β (k - 2 + j)
+
+/-- The complete rate chart retains the universal pairwise normalization. -/
+@[simp] theorem speedTiltBetaMergerRate_two_two (β : ℝ) :
+    speedTiltBetaMergerRate β 2 2 = 1 := by
+  simp [speedTiltBetaMergerRate]
+
+/-- The complete rate chart exposes `β` at three lineages. -/
+@[simp] theorem speedTiltBetaMergerRate_three_three (β : ℝ) :
+    speedTiltBetaMergerRate β 3 3 = 1 / (β + 2) := by
+  simp [speedTiltBetaMergerRate]
+
+/-- Parameter readout from the normalized three-lineage rate. -/
+noncomputable def speedBiasParameterFromTripleRate (rate : ℝ) : ℝ :=
+  rate⁻¹ - 2
+
+/-- **Exact speed-bias recovery.**  Throughout the admissible domain, the first non-pairwise
+genealogical coordinate recovers the tilt parameter without approximation. -/
+theorem speedBiasParameterFromTripleRate_recovers
+    (β : ℝ) :
+    speedBiasParameterFromTripleRate (speedTiltBetaMergerRate β 3 3) = β := by
+  simp [speedBiasParameterFromTripleRate]
+
+/-- Speed tilt after a front-displacement scale `γ`: the genealogy sees `θ / γ`. -/
+noncomputable def frontSpeedBiasParameter (θ γ : ℝ) : ℝ :=
+  θ / γ
+
+/-- Observable three-lineage rate for a front tilt `θ` and displacement scale `γ`. -/
+theorem frontSpeedBias_tripleMergerRate (θ γ : ℝ) :
+    speedTiltBetaMergerRate (frontSpeedBiasParameter θ γ) 3 3 =
+      1 / (θ / γ + 2) := by
+  simp [frontSpeedBiasParameter]
+
+/-- No speed tilt gives the Bolthausen--Sznitman three-lineage coordinate `1/2`. -/
+@[simp] theorem speedTiltBetaMergerRate_three_three_zero :
+    speedTiltBetaMergerRate 0 3 3 = 1 / 2 := by
+  norm_num
+
 /-! ## Bolthausen--Sznitman total-rate ladder -/
 
 /-- Telescoping collision-rate sum with `n + 1` active blocks.  For the uniform merger law,

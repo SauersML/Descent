@@ -165,6 +165,16 @@ theorem pairwiseGenealogy_blind_threeLineage_visible :
       lambdaCoalescentMergerRate (MeasureTheory.Measure.dirac 1) 3 3 = 1 :=
   pairwise_blind_three_lineage_separates_dirac
 
+/-- **Speed-conditioned genealogy is identified at three lineages, not two.**  In the
+normalized `Beta(1, β + 1)` chart the pair rate is identically one, while the inverse of the
+three-lineage rate recovers `β` exactly.  This is the finite observable consequence of the
+regular-variation speed-tilt theorem. -/
+theorem speedConditionedGenealogy_pairBlind_tripleRecovers (β : ℝ) :
+    speedTiltBetaMergerRate β 2 2 = 1 ∧
+      speedBiasParameterFromTripleRate (speedTiltBetaMergerRate β 3 3) = β :=
+  ⟨speedTiltBetaMergerRate_two_two β,
+    speedBiasParameterFromTripleRate_recovers β⟩
+
 section StationarityRepair
 
 variable {State : Type*} [Fintype State]
@@ -868,7 +878,7 @@ theorem geometry_and_effect_recovery_gates
 
 /-! ## The unified obstruction bundle -/
 
-/-- Twenty-one logically distinct failures and boundaries that a biological transport theory must
+/-- Twenty-two logically distinct failures and boundaries that a biological transport theory must
 not collapse into one scalar "portability" parameter.  The final six fields make continuum
 calibration and finite correction part of the core theorem rather than adjacent examples. -/
 structure UnifiedBiologyObstructions : Prop where
@@ -929,6 +939,11 @@ structure UnifiedBiologyObstructions : Prop where
   `sampleSize⁻¹ᐟ¹⁴` history-reconstruction exponent. -/
   fiveEpochDemographyIsSeverelyIllConditioned :
     fixedEpochSampleRateExponent 5 = 1 / 14
+  /-- Normalized pairwise genealogy is speed-blind, while the three-lineage merger rate exactly
+  recovers the speed-bias parameter. -/
+  speedConditionedGenealogyNeedsThreeLineages :
+    ∀ β : ℝ, speedTiltBetaMergerRate β 2 2 = 1 ∧
+      speedBiasParameterFromTripleRate (speedTiltBetaMergerRate β 3 3) = β
   /-- A cross-state criterion is not a function of the target context: it fails to descend along
   the label the target-only annotation descends along. -/
   crossStateDoesNotDescend :
@@ -1017,6 +1032,8 @@ theorem unifiedBiology_obstructions : UnifiedBiologyObstructions := by
         ancestryMixture_pure_gapped_balanced_ungapped
       fiveEpochDemographyIsSeverelyIllConditioned :=
         fiveEpochDemography_sampleRateExponent
+      speedConditionedGenealogyNeedsThreeLineages :=
+        speedConditionedGenealogy_pairBlind_tripleRecovers
       crossStateDoesNotDescend := not_descends_contextMatchQuality_along_targetState
       marginalDescentDoesNotCompose := admissible_interaction_join_obstruction
       crudeReportingLosesDescent := admissible_confounding_meet_obstruction
