@@ -458,7 +458,7 @@ theorem admixture_ld_specializes_to_magnitude (alpha p_A p_B r : ℝ) (g : ℕ)
 /-- Admixture LD is nonneg. -/
 theorem admixture_ld_nonneg (alpha p_A p_B r : ℝ) (g : ℕ)
     (h_alpha : 0 ≤ alpha) (h_alpha_le : alpha ≤ 1)
-    (h_r : 0 ≤ r) (h_r_le : r ≤ 1) :
+    (h_r_le : r ≤ 1) :
     0 ≤ admixtureLDMagnitude alpha p_A p_B r g := by
   unfold admixtureLDMagnitude
   apply mul_nonneg
@@ -467,9 +467,7 @@ theorem admixture_ld_nonneg (alpha p_A p_B r : ℝ) (g : ℕ)
 
 /-- Admixture LD is maximized at α = 0.5. -/
 theorem admixture_ld_max_at_half (alpha p_A p_B r : ℝ) (g : ℕ)
-    (h_alpha : 0 ≤ alpha) (h_alpha_le : alpha ≤ 1)
-    (h_r : 0 ≤ r) (h_r_le : r ≤ 1)
-    (h_diff : p_A ≠ p_B) :
+    (h_r_le : r ≤ 1) :
     admixtureLDMagnitude alpha p_A p_B r g ≤
       admixtureLDMagnitude (1/2) p_A p_B r g := by
   unfold admixtureLDMagnitude
@@ -512,7 +510,7 @@ theorem admixture_ld_confounds_pgs
     (alpha p_A p_B r β γ : ℝ) (g : ℕ)
     (h_alpha : 0 < alpha) (h_alpha_lt : alpha < 1)
     (h_diff : p_A ≠ p_B)
-    (h_r : 0 ≤ r) (h_r_lt : r < 1)
+    (h_r_lt : r < 1)
     (h_γ : γ ≠ 0) :
     -- The observed effect carries the confounding bias γ × D
     β + γ * admixtureLDMagnitude alpha p_A p_B r g ≠ β := by
