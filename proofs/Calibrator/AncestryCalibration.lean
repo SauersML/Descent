@@ -290,7 +290,11 @@ theorem threshold_shift_changes_prevalence
     (h_mean_shift : liability_mean₁ < liability_mean₂) :
     threshold - liability_mean₂ < threshold - liability_mean₁ := by linarith
 
-/-- **Different prevalence → different R² even with same AUC.**
+/-- Prevalence-dependent `R²` factor in the simplified liability-threshold chart. -/
+noncomputable def prevalenceScaledR2 (h2 prevalence : ℝ) : ℝ :=
+  h2 * (prevalence * (1 - prevalence))
+
+/-- **Exact prevalence ambiguity of the simplified liability `R²` chart.**
     This is a key insight from Wang et al.: R² and AUC can disagree
     about portability because R² depends on prevalence.
     Under the liability threshold model, R² ≈ h² × f(K) where K is
@@ -298,18 +302,25 @@ theorem threshold_shift_changes_prevalence
     even with identical genetic effects.
     We model this: R² scales with K(1-K), so different prevalences yield
     different R² values given the same underlying discrimination. -/
-theorem r2_depends_on_prevalence_but_auc_doesnt
+theorem prevalenceScaledR2_eq_iff
     (h2 π₁ π₂ : ℝ)
-    (h_h2 : 0 < h2)
-    (h_diff_prev : π₁ ≠ π₂)
-    (h_not_complement : π₁ + π₂ ≠ 1) :
-    h2 * (π₁ * (1 - π₁)) ≠ h2 * (π₂ * (1 - π₂)) := by
-  intro heq
-  have := mul_left_cancel₀ (ne_of_gt h_h2) heq
-  have h_factor : (π₁ - π₂) * (1 - π₁ - π₂) = 0 := by nlinarith
-  rcases mul_eq_zero.mp h_factor with h1 | h2
-  · exact h_diff_prev (by linarith)
-  · exact h_not_complement (by linarith)
+    (h_h2 : h2 ≠ 0) :
+    prevalenceScaledR2 h2 π₁ = prevalenceScaledR2 h2 π₂ ↔
+      π₁ = π₂ ∨ π₁ + π₂ = 1 := by
+  unfold prevalenceScaledR2
+  constructor
+  · intro h_equal
+    have h_core := mul_left_cancel₀ h_h2 h_equal
+    have h_factor : (π₁ - π₂) * (1 - π₁ - π₂) = 0 := by nlinarith
+    rcases mul_eq_zero.mp h_factor with h_same | h_complement
+    · exact Or.inl (by linarith)
+    · exact Or.inr (by linarith)
+  · rintro (h_same | h_complement)
+    · subst π₂
+      rfl
+    · have hπ₂ : π₂ = 1 - π₁ := by linarith
+      rw [hπ₂]
+      ring
 
 end PhenotypeHeterogeneity
 
