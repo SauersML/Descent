@@ -457,7 +457,12 @@ def sim_am_equilibrium_variance(V_A, r, h2, gens=40, n=60000, seed=0):
         shuffled = a_s[rng.permutation(n)]
         take = rng.random(n) < r
         mate = np.where(take, np.roll(a_s, 1), shuffled)
-        off = 0.5 * (partner + mate) + rng.normal(0.0, np.sqrt(va / 2.0), n)
+        # Segregation variance is the BASE additive variance halved, not the
+        # current one.  Mendelian sampling is unaffected by assortment, and
+        # drawing it from `va` makes the recursion self-reinforcing: it diverged
+        # to 1817 against a closed form of 1.25, which the checker reported as
+        # "unstable across seeds" rather than as a broken oracle.
+        off = 0.5 * (partner + mate) + rng.normal(0.0, np.sqrt(V_A / 2.0), n)
         va = float(np.var(off))
     return va
 
@@ -600,3 +605,32 @@ def sim_nei_gst(p1, p2, n=200000, seed=0):
     if total <= 0:
         return None
     return float(1.0 - within / total)
+
+def sim_hudson_fst(p1, p2, n=400000, seed=0):
+    """Hudson's F_ST from sampled haplotypes.
+
+    One minus the ratio of the mean within-population pairwise difference to the
+    mean between-population pairwise difference.  Every quantity is measured from
+    draws; the closed form is never used, which is what makes this a test of the
+    formula rather than a restatement of it.
+    """
+    rng = np.random.default_rng(seed)
+    a1 = rng.binomial(1, p1, size=n)
+    a2 = rng.binomial(1, p1, size=n)
+    b1 = rng.binomial(1, p2, size=n)
+    b2 = rng.binomial(1, p2, size=n)
+    within = 0.5 * (float(np.mean(np.abs(a1 - a2))) + float(np.mean(np.abs(b1 - b2))))
+    between = float(np.mean(np.abs(a1 - b1)))
+    return float(1.0 - within / between)
+
+
+def sim_fst_mutation_drift_equilibrium(theta, reps=4000, seed=0):
+    """Equilibrium F_ST under infinite alleles, as one minus heterozygosity.
+
+    F_ST here is the probability that two gene copies are identical by descent,
+    which at equilibrium is the complement of heterozygosity.  The heterozygosity
+    comes from an explicit Wright-Fisher run with mutation, so nothing in the
+    oracle knows the `1 / (1 + theta)` form.
+    """
+    return 1.0 - sim_infinite_alleles_heterozygosity(theta, reps=reps, seed=seed)
+

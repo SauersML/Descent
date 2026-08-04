@@ -311,6 +311,20 @@ SPECS = [
          [(0.05, 0.95)],
          "variance of a diploid dosage drawn Binomial(2, p)"),
 
+    spec("Conventions.hudsonFst",
+         lambda p1, p2, seed=0: S.sim_hudson_fst(p1, p2, seed=seed),
+         [(0.05, 0.95), (0.05, 0.95)],
+         "one minus the ratio of within- to between-population mean pairwise "
+         "difference, measured from sampled haplotypes",
+         tol=0.08),
+
+    spec("DGP.fstMutationDriftEquilibrium",
+         lambda theta, seed=0: S.sim_fst_mutation_drift_equilibrium(theta, seed=seed),
+         [(0.2, 3.0)],
+         "one minus the equilibrium heterozygosity of an explicit Wright-Fisher "
+         "run under infinite-alleles mutation",
+         tol=0.08),
+
     spec("Conventions.neiGst",
          lambda p1, p2, seed=0: S.sim_nei_gst(p1, p2, seed=seed),
          [(0.1, 0.9), (0.1, 0.9)],
@@ -461,8 +475,18 @@ def main(argv):
             stab.append(w2 <= 1.0)
         stable = all(stab)
 
+        # Agreeing on ZERO independent point-sets is not an unstable verdict, it
+        # is a stable disagreement, and calling it unstable withdraws it from the
+        # report instead of surfacing it.  That is how a broken oracle hid:
+        # sim_am_equilibrium_variance diverged to 1817 against a closed form of
+        # 1.25 and was filed as "unstable across seeds -- withdrawn, not counted".
+        # A spec that never agrees is telling you something; it must be said out
+        # loud, and whether the fault is the formula or the oracle is then a
+        # question a human can answer.
+        never_agrees = sum(stab) == 0
         results[k] = dict(
             verdict=("agrees" if agrees else "disagrees") if stable
+                    else "disagrees-on-every-seed" if never_agrees
                     else "unstable",
             seed_stability=dict(seeds_tried=len(stab),
                                 seeds_agreeing=sum(stab)),
@@ -477,6 +501,10 @@ def main(argv):
                                 mutants_survived=survived),
             uncovered_reason=(
                 None if (agrees and killed and stable) else
+                ("the oracle and the definition disagree on EVERY independent "
+                 "point-set, which is a stable disagreement and not an unstable "
+                 "verdict; either the body or the oracle is wrong and this must "
+                 "not be withdrawn silently") if never_agrees else
                 ("the verdict depends on the random draw: agrees on only "
                  f"{sum(stab)} of {len(stab)} independent point-sets, so it "
                  "is not a verdict and is not counted") if not stable else
@@ -492,12 +520,19 @@ def main(argv):
     ok = [k for k, v in results.items() if v.get("covered")]
     dis = [k for k, v in results.items() if v.get("verdict") == "disagrees"]
     uns = [k for k, v in results.items() if v.get("verdict") == "unstable"]
+    never = [k for k, v in results.items()
+             if v.get("verdict") == "disagrees-on-every-seed"]
     vac = [k for k, v in results.items()
            if v.get("verdict") == "agrees" and not v.get("covered")]
     print(f"{len(SPECS)} specs -> {out}")
     print(f"  {len(ok)} covered (oracle agrees AND a mutant is rejected)")
     print(f"  {len(dis)} DISAGREE with the simulation")
     print(f"  {len(vac)} agree but no mutant was rejected -- not counted")
+    print(f"  {len(never)} DISAGREE ON EVERY SEED -- a stable disagreement, not instability")
+    for k in never:
+        v = results[k]
+        print(f"      {k}: worst point {v['worst_excess_over_allowed']:.2f}x "
+              "over the allowed tolerance")
     print(f"  {len(uns)} UNSTABLE across seeds -- withdrawn, not counted")
     for k in uns:
         st = results[k]["seed_stability"]
