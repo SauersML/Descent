@@ -1946,7 +1946,47 @@ theorem heterozygosityLossDerived_eq_fstFromDrift (Ne : ℝ) (t : ℕ) :
     Drift reduces heterozygosity by factor (1 - 1/(2N)), while mutation
     creates new heterozygosity at rate 2μ from homozygous sites.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_bulk15.py`). Infinite-alleles
+    Wright-Fisher, 220 replicate populations started MONOMORPHIC so the whole
+    trajectory sits far from the plateau, where a recurrence's slope is what is
+    actually under test. The map is iterated FIFTEEN generations from a measured
+    `H_t` and compared against the measured `H_{t+15}`, because a map can be
+    right for one step and wrong compounded:
+
+      Ne    theta   from H0    predicted  simulated            sems
+      100   0.80    0.0859      0.13136   0.12337 ± 0.00790     1.01
+      100   0.80    0.1644      0.19990   0.20650 ± 0.01163     0.57
+      100   0.80    0.2830      0.30349   0.30751 ± 0.01443     0.28
+       50   1.00    0.0971      0.20241   0.20537 ± 0.01088     0.27
+       50   1.00    0.3159      0.36406   0.36316 ± 0.01440     0.06
+      200   0.80    0.0991      0.12168   0.12164 ± 0.00789     0.01
+      200   0.80    0.2666      0.27820   0.27850 ± 0.01329     0.02
+
+    The ORACLE is the finding here. An earlier run of this same design against a
+    BIALLELIC Wright-Fisher missed by 632 sems, and the arithmetic says why:
+    under biallelic two-way mutation `p - 1/2` contracts by `1 - 2 mu` and
+    `H = 1/2 - 2 (p - 1/2)^2`, so the exact input term there is `2 mu (1 - 2 H)`,
+    not the `2 mu (1 - H)` this body carries. The two differ by `2 mu H`, which
+    is O(mu) per step. This body's term is the INFINITE-ALLELES one, which is
+    what the docstring above declares -- a new mutation is always a novel allele,
+    so a homozygote becomes heterozygous with probability `2 mu` -- and on the
+    matching oracle it is correct.
+
+    Both candidates were carried through so the data chose rather than the
+    argument: the biallelic term reaches 2.84 sems and 11.2% relative on the same
+    trajectories where this body reaches 1.01 sems and 6.5%. That is a
+    preference, not an exclusion, and it is stated as one.
+
+    The reason this needed iterating to see: an O(mu) error per step hides under
+    the noise of a single generation. `hetStepWithMutation` was re-measured on
+    the infinite-alleles oracle in the same battery and holds at 0.71 sems, so
+    its status survives -- but it survives by re-measurement, not by inheritance.
+
+    The engine runs about 1% hot against the known plateau (`H = 0.4489` and
+    `0.5044` measured against `theta/(1+theta) = 0.4444` and `0.5000`), which is
+    the same systematic `ia_engine.selftest` reports, so it is disclosed rather
+    than absorbed: it is a tenth of the gap being resolved here. -/
 noncomputable def hetMutationDriftRecurrence (Ne mu : ℝ) (H₀ : ℝ) : ℕ → ℝ
   | 0 => H₀
   | t + 1 => (1 - 1 / (2 * Ne)) * hetMutationDriftRecurrence Ne mu H₀ t +
@@ -2106,7 +2146,25 @@ noncomputable def hetDecayFactor (Ne θ : ℝ) : ℝ :=
     and λ, since the affine recurrence H(t+1) = λ H(t) + c has
     fixed point H* = c/(1-λ), i.e. c = (1-λ) H*.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_bulk15.py`). Measured against the
+    same infinite-alleles trajectories as `hetMutationDriftRecurrence`, with
+    `lam = 1 - 1/(2 Ne) - 2 mu` and `Hstar = theta/(1 + theta)`, iterated fifteen
+    generations from a measured start: worst cell 1.01 sems, 6.5% relative,
+    across `theta` of 0.80 and 1.00 and `Ne` of 50, 100 and 200.
+
+    Deliberately NOT compared against the sibling recurrence. The two are the
+    same map in different coordinates -- expanding
+    `(1 - 1/(2Ne)) H + 2 mu (1 - H)` gives slope `1 - 1/(2Ne) - 2 mu` and
+    intercept `2 mu`, and `2 mu / (1/(2Ne) + 2 mu) = theta/(1 + theta)` -- so
+    agreement between them is an algebraic identity carrying no empirical weight.
+    The battery reports that identity separately and labels it a SELF-TEST. What
+    is measured here is the trajectory.
+
+    The engine runs about 1% hot against the known plateau (`H = 0.4489` and
+    `0.5044` measured against `theta/(1+theta) = 0.4444` and `0.5000`), which is
+    the same systematic `ia_engine.selftest` reports, so it is disclosed rather
+    than absorbed: it is a tenth of the gap being resolved here. -/
 noncomputable def hetMutationRecurrence (lam Hstar H₀ : ℝ) : ℕ → ℝ
   | 0 => H₀
   | t + 1 => lam * hetMutationRecurrence lam Hstar H₀ t + (1 - lam) * Hstar

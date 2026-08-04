@@ -1415,11 +1415,19 @@ theorem steppingStoneCharacteristicLength_uses_ploidy (m σ_sq μ : ℝ) :
 /-- **All three twos in the serial-founder within-deme time are coalescent time scales.**
 A pair either coalesces inside the chain, on the scale `coalescentTimeScale N`, or survives
 into the ancestral population and waits a further `coalescentTimeScale Nanc`. Three literal
-twos in one body is exactly the shape in which one of them gets changed alone. -/
+twos in one body is exactly the shape in which one of them gets changed alone.
+
+There is no `tAnc` term, and that absence is the whole content of the correction this
+body carries. Conditional on surviving to `tAnc` the pair waits `tAnc + 2 Nanc`, so the
+survival branch does look like it should contribute one; but the coalesce-early branch is
+a PARTIAL expectation, `∫₀^tAnc t (1/2N) e^{-t/2N} dt = 2N (1 - e^{-a}) - tAnc e^{-a}`,
+whose `- tAnc e^{-a}` cancels it exactly. Writing `2N (1 - e^{-a})` for the early branch
+and `e^{-a} (tAnc + 2 Nanc)` for the late one counts `tAnc e^{-a}` once too often, which
+is what this body used to do. -/
 theorem serialFounderWithinTime_uses_coalescentTimeScale (N Nanc tAnc : ℝ) :
     serialFounderWithinTime N Nanc tAnc
       = coalescentTimeScale N * (1 - Real.exp (-tAnc / coalescentTimeScale N))
-          + Real.exp (-tAnc / coalescentTimeScale N) * (tAnc + coalescentTimeScale Nanc) := by
+          + Real.exp (-tAnc / coalescentTimeScale N) * coalescentTimeScale Nanc := by
   unfold serialFounderWithinTime coalescentTimeScale ploidy; ring
 
 /-- **Nei's `G_ST` between a frequency and its fold is the squared contrast.** At

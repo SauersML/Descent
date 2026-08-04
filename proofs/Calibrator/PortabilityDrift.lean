@@ -746,7 +746,23 @@ recursion multiplies `(1 - mu)²` against the drift factor and differs at
     High in every cell and growing with `mu`: the recursion drops the
     `mu/(2 Ne)` and `mu^2` cross terms, so it is a linearisation and not an
     identity. One percent at `mu = 5e-3` is small for a per-generation step and
-    compounds over a run. -/
+    compounds over a run. 
+    **Re-measured on the correct oracle**
+    (`proofs/validation/empirical/simcov/battery_bulk15.py`). The status above was
+    earned against a BIALLELIC Wright-Fisher, whose exact input term is
+    `2 mu (1 - 2 H)` rather than the `2 mu (1 - H)` this body carries: under
+    biallelic two-way mutation `p - 1/2` contracts by `1 - 2 mu` and
+    `H = 1/2 - 2 (p - 1/2)^2`. The `2 mu (1 - H)` form is the infinite-alleles
+    one. The discrepancy is `2 mu H`, O(mu) per step, so it hides under the noise
+    of a SINGLE generation, which is exactly what a one-step design measures --
+    the error was found only by iterating the same map fifteen times, where it
+    reached 632 sems.
+
+    Re-run on infinite-alleles trajectories, this body holds at worst 0.71 sems
+    over nine cells spanning `theta` 0.80 to 1.00 and `Ne` 50 to 200. The status
+    stands, but it now stands on an oracle that matches the model the body
+    describes, rather than on one that agreed with it to first order in `mu`.
+-/
 noncomputable def hetStepWithMutation (Ne mu H : ℝ) : ℝ :=
   (1 - 1 / (2 * Ne)) * H + 2 * mu * (1 - H)
 
