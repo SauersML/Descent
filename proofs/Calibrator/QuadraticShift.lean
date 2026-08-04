@@ -452,6 +452,53 @@ theorem finiteEnvironmentCovariancePool_energy_pos_iff_exists_active
       ⟨environment, Finset.mem_univ environment, mul_pos hweightPos henergyPos⟩
 
 omit [DecidableEq ι] in
+/-- A nonnegatively weighted pool of positive-semidefinite covariance energies remains
+nonnegative. -/
+theorem finiteEnvironmentCovariancePool_energy_nonneg
+    {κ : Type*} [Fintype κ]
+    (weight : κ → ℝ) (covariance : κ → Matrix ι ι ℝ)
+    (hweight : ∀ environment, 0 ≤ weight environment)
+    (hpsd : PositiveSemidefiniteFamily covariance)
+    (shift : ι → ℝ) :
+    0 ≤ dot shift ((finiteEnvironmentCovariancePool weight covariance).mulVec shift) := by
+  rw [finiteEnvironmentCovariancePool_energy]
+  exact Finset.sum_nonneg fun environment _ ↦
+    mul_nonneg (hweight environment) (hpsd.energy_nonneg environment shift)
+
+omit [DecidableEq ι] in
+/-- **Exact active-environment zero-risk law.** Pooled prediction risk vanishes precisely when
+every positively weighted environment assigns zero risk to the same shift. Zero-weight cohorts
+are absent from the statistical experiment and impose no condition. -/
+theorem finiteEnvironmentCovariancePool_energy_eq_zero_iff_active
+    {κ : Type*} [Fintype κ]
+    (weight : κ → ℝ) (covariance : κ → Matrix ι ι ℝ)
+    (hweight : ∀ environment, 0 ≤ weight environment)
+    (hpsd : PositiveSemidefiniteFamily covariance)
+    (shift : ι → ℝ) :
+    dot shift ((finiteEnvironmentCovariancePool weight covariance).mulVec shift) = 0 ↔
+      ∀ environment, 0 < weight environment →
+        dot shift ((covariance environment).mulVec shift) = 0 := by
+  constructor
+  · intro hpool environment hactive
+    apply le_antisymm
+    · apply not_lt.mp
+      intro hpositive
+      have hpoolPositive :=
+        (finiteEnvironmentCovariancePool_energy_pos_iff_exists_active
+          weight covariance hweight hpsd shift).2
+          ⟨environment, hactive, hpositive⟩
+      linarith
+    · exact hpsd.energy_nonneg environment shift
+  · intro hzero
+    rw [finiteEnvironmentCovariancePool_energy]
+    apply Finset.sum_eq_zero
+    intro environment _
+    rcases (hweight environment).eq_or_lt with hweightZero | hweightPositive
+    · rw [← hweightZero]
+      simp
+    · rw [hzero environment hweightPositive, mul_zero]
+
+omit [DecidableEq ι] in
 /-- **Active-environment kernel law.** With merely nonnegative sampling weights, the pooled
 kernel is the intersection of the kernels of exactly those environments assigned positive
 weight. Zero-weight environments contribute neither information nor constraints. -/
