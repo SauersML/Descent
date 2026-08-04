@@ -324,6 +324,14 @@ these two has no power to check the functional form.
     (`proofs/validation/empirical/drift_diff/`). -/
 noncomputable def benchmarkRatioSquared (fstS fstT : ℝ) : ℝ := ((1 - fstT) / (1 - fstS)) ^ 2
 
+/-- **The rival is exactly the square of the benchmark.** Stating the relation ties the two
+together, so a design demonstrated to separate them is separating a function from its square and
+not merely two unrelated formulas. -/
+theorem benchmarkRatioSquared_eq_sq (fstS fstT : ℝ) :
+    benchmarkRatioSquared fstS fstT = benchmarkRatio fstS fstT ^ 2 := by
+  unfold benchmarkRatioSquared benchmarkRatio
+  ring
+
 /-- What a **symmetric** design observes: the two branch lengths are equal, so only the
 diagonal of the candidate function is ever evaluated.
 

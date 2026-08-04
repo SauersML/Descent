@@ -495,6 +495,13 @@ noncomputable def gainBounded : ℝ → ℝ := fun _ ↦ 1
 /-- Row two: logarithmic gain. The heavy-tail ghost and the equicorrelated copula live here. -/
 noncomputable def gainLog (n : ℝ) : ℝ := Real.log n
 
+/-- **The logarithmic row is on the natural scale.** Separation from the other rows is a
+statement about growth and is shared by every positive multiple of this one; evaluating at `e`
+fixes the multiple at one. -/
+theorem gainLog_at_exp_one : gainLog (Real.exp 1) = 1 := by
+  unfold gainLog
+  exact Real.log_exp 1
+
 /-- Row three: `n^β log n`, the long-range copula row.
 
     Named for the **power law in `n`**, not for statistical power: this is a conditional-gain

@@ -426,6 +426,14 @@ noncomputable def netReclassificationImprovement
     (event_nri nonevent_nri : ℝ) : ℝ :=
   event_nri + nonevent_nri
 
+/-- **The two components are recoverable from each other and the total.** This is why a single
+NRI cannot be read: a positive total is consistent with a gain among events and a loss among
+non-events, and the identity is what forces the two to be reported separately. -/
+theorem netReclassificationImprovement_sub_event (event_nri nonevent_nri : ℝ) :
+    netReclassificationImprovement event_nri nonevent_nri - event_nri = nonevent_nri := by
+  unfold netReclassificationImprovement
+  ring
+
 /-- Exact operating-point sensitivity under the liability-threshold model. -/
 noncomputable def sensFromR2
     (m : LiabilityThresholdModel) (r2 T' : ℝ) : ℝ :=

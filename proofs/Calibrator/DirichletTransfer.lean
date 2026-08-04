@@ -391,6 +391,14 @@ section StalenessCrossover
     relaxation rate: `(2e^{-λτ} - 1)·V`. -/
 noncomputable def stalePremium (lam τ V : ℝ) : ℝ := (2 * Real.exp (-(lam * τ)) - 1) * V
 
+/-- **At zero elapsed time the stale design carries the whole premium.** The crossover result
+below says the premium changes sign at `log 2 / lam`; that fixes where it vanishes and not what
+it starts from, and a body with the wrong leading factor would agree about the crossover. -/
+theorem stalePremium_zero_time (lam V : ℝ) :
+    stalePremium lam 0 V = V := by
+  unfold stalePremium
+  norm_num
+
 /-- The crossover horizon: `log 2 / λ` for a positive relaxation rate.
 
 The positivity argument is part of the definition's interface so that `λ = 0`

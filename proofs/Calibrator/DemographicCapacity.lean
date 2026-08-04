@@ -53,6 +53,14 @@ stipulating it.
 noncomputable def contrastSpikeLevel (p₁ p₂ : ℝ) : ℝ :=
   (p₁ - p₂) ^ 2 / (meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂))
 
+/-- **No contrast, no spike.** Two populations at the same allele frequency produce a level of
+exactly zero, whatever the frequency is. The proportionality to Nei's `G_ST` fixes the scale;
+this fixes the origin, and a body with an additive offset would satisfy the first and not this. -/
+theorem contrastSpikeLevel_self (p : ℝ) :
+    contrastSpikeLevel p p = 0 := by
+  unfold contrastSpikeLevel
+  norm_num
+
 /-- **The level is four times Nei's `G_ST`, derived rather than stipulated.** -/
 theorem contrastSpikeLevel_eq_four_neiGst (p₁ p₂ : ℝ)
     (h : meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) ≠ 0) :
