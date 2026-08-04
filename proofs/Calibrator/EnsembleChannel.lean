@@ -297,10 +297,23 @@ noncomputable def ensembleSquaredLoss {ι : Type*} [Fintype ι]
     (target : ι → ℝ) (deployment : ℝ) : ℝ :=
   ∑ i, (target i - deployment) ^ 2
 
+/-- Reference evaluation against a single deployment value. -/
+theorem ensembleSquaredLoss_at_reference_point :
+    ensembleSquaredLoss (![1, 3] : Fin 2 → ℝ) 2 = 2 := by
+  norm_num [ensembleSquaredLoss, Fin.sum_univ_two]
+
+
 /-- Squared loss of a target-specific predictor across a finite ensemble. -/
 noncomputable def ensemblePredictorSquaredLoss {ι : Type*} [Fintype ι]
     (target predictor : ι → ℝ) : ℝ :=
   ∑ i, (target i - predictor i) ^ 2
+
+/-- Reference evaluation at two ensemble members with distinct residuals.  Not the empty index:
+`∑ over an empty type = 0` holds for every sum body, so it fixes nothing. -/
+theorem ensemblePredictorSquaredLoss_at_reference_point :
+    ensemblePredictorSquaredLoss (![1, 3] : Fin 2 → ℝ) (![2, 7] : Fin 2 → ℝ) = 17 := by
+  norm_num [ensemblePredictorSquaredLoss, Fin.sum_univ_two]
+
 
 /-- **Conditional-predictor Pythagorean identity.** If the prediction residual is
 orthogonal to the displacement from the source deployment, then source deployment loss is
