@@ -432,6 +432,17 @@ corpus, not a claim against an experiment. -/
 noncomputable def berryEsseenBound (C ρ σ_sq m : ℝ) : ℝ :=
   berryEsseenErrorBound C σ_sq ρ / Real.sqrt m
 
+/-- **The root-`m` law, as an identity rather than a rate.**
+
+Multiplying the bound by the root of the block count returns the per-block error factor, and no
+other power of `m` satisfies that. The closed form recorded below expands the numerator and leaves
+the exponent alone, so it is compatible with `m`, `m²`, or `m^(1/3)` in the denominator; this is
+what says the decay is root-`m` and not merely decreasing. -/
+theorem berryEsseenBound_mul_sqrt (C ρ σ_sq m : ℝ) (h : Real.sqrt m ≠ 0) :
+    berryEsseenBound C ρ σ_sq m * Real.sqrt m = berryEsseenErrorBound C σ_sq ρ := by
+  unfold berryEsseenBound
+  field_simp
+
 /-- The closed form, as a theorem rather than a second definition. -/
 theorem berryEsseenBound_eq (C ρ σ_sq m : ℝ) :
     berryEsseenBound C ρ σ_sq m = C * ρ / (σ_sq * Real.sqrt σ_sq * Real.sqrt m) := by
