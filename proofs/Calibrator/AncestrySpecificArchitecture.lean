@@ -90,14 +90,27 @@ theorem driftVariance_at_reference_point :
   unfold driftVariance
   norm_num
 
-/-- Drift variance is nonneg. -/
-theorem drift_variance_nonneg (p0 fst : ℝ)
+/-- Drift variance is nonnegative on the biological parameter domain. -/
+theorem driftVariance_nonneg (p0 fst : ℝ)
     (h_p0 : 0 ≤ p0) (h_p0_le : p0 ≤ 1) (h_fst : 0 ≤ fst) :
     0 ≤ driftVariance p0 fst := by
   unfold driftVariance
   apply mul_nonneg
   · exact mul_nonneg h_p0 (sub_nonneg.mpr h_p0_le)
   · exact h_fst
+
+/-- Drift variance vanishes exactly at a monomorphic ancestor or at zero differentiation. -/
+theorem driftVariance_eq_zero_iff (p0 fst : ℝ) :
+    driftVariance p0 fst = 0 ↔ p0 = 0 ∨ p0 = 1 ∨ fst = 0 := by
+  unfold driftVariance
+  constructor
+  · intro h
+    rcases mul_eq_zero.mp h with h | h
+    · rcases mul_eq_zero.mp h with h | h
+      · exact Or.inl h
+      · exact Or.inr (Or.inl (by linarith))
+    · exact Or.inr (Or.inr h)
+  · rintro (rfl | rfl | rfl) <;> norm_num
 
 /-- **Two-population drift variance from independent lineages.**
     For two populations diverging independently from the same
@@ -112,7 +125,7 @@ noncomputable def twoPopDriftVariance (p0 fst : ℝ) : ℝ :=
 the theorem states a number: an inequality or an invariance leaves a family of bodies
 satisfying it, and a value does not. -/
 theorem twoPopDriftVariance_at_reference_point :
-    twoPopDriftVariance 1 1 = 0 := by
+    twoPopDriftVariance (1 / 2) (1 / 2) = 1 / 4 := by
   norm_num [twoPopDriftVariance, driftVariance]
 
 
@@ -120,6 +133,18 @@ theorem twoPopDriftVariance_at_reference_point :
 theorem twoPopDriftVariance_eq_sum (p0 fst : ℝ) :
     twoPopDriftVariance p0 fst = driftVariance p0 fst + driftVariance p0 fst := by
   unfold twoPopDriftVariance; ring
+
+/-- Independent two-lineage drift has the same null fiber as one-lineage drift. -/
+theorem twoPopDriftVariance_eq_zero_iff (p0 fst : ℝ) :
+    twoPopDriftVariance p0 fst = 0 ↔ p0 = 0 ∨ p0 = 1 ∨ fst = 0 := by
+  rw [twoPopDriftVariance_eq_sum]
+  constructor
+  · intro h
+    have h_zero : driftVariance p0 fst = 0 := by linarith
+    exact (driftVariance_eq_zero_iff p0 fst).1 h_zero
+  · intro h
+    rw [(driftVariance_eq_zero_iff p0 fst).2 h]
+    norm_num
 
 /-- **Expected allele frequency difference from drift.**
     E[(p₁ - p₂)²] = 2 × FST × p₀(1-p₀)
@@ -145,13 +170,29 @@ theorem twoPopDriftVariance_eq_expectedFreqDiffSq (p0 fst : ℝ) :
     twoPopDriftVariance p0 fst = expectedFreqDiffSq fst p0 := by
   unfold twoPopDriftVariance driftVariance expectedFreqDiffSq; ring
 
-/-- Expected frequency difference is nonneg. -/
-theorem expected_freq_diff_nonneg (fst p0 : ℝ)
+/-- Expected frequency difference is nonnegative on the biological parameter domain. -/
+theorem expectedFreqDiffSq_nonneg (fst p0 : ℝ)
     (h_fst : 0 ≤ fst) (h_p0 : 0 ≤ p0) (h_p0_le : p0 ≤ 1) :
     0 ≤ expectedFreqDiffSq fst p0 := by
   unfold expectedFreqDiffSq
   nlinarith [mul_nonneg h_fst h_p0,
     mul_nonneg (mul_nonneg h_fst h_p0) (by linarith : 0 ≤ 1 - p0)]
+
+/-- Expected squared frequency divergence vanishes exactly at zero differentiation or
+when the ancestral allele is absent or fixed. -/
+theorem expectedFreqDiffSq_eq_zero_iff (fst p0 : ℝ) :
+    expectedFreqDiffSq fst p0 = 0 ↔ fst = 0 ∨ p0 = 0 ∨ p0 = 1 := by
+  rw [← twoPopDriftVariance_eq_expectedFreqDiffSq]
+  constructor
+  · intro h
+    rcases (twoPopDriftVariance_eq_zero_iff p0 fst).1 h with h | h | h
+    · exact Or.inr (Or.inl h)
+    · exact Or.inr (Or.inr h)
+    · exact Or.inl h
+  · rintro (h | h | h)
+    · exact (twoPopDriftVariance_eq_zero_iff p0 fst).2 (Or.inr (Or.inr h))
+    · exact (twoPopDriftVariance_eq_zero_iff p0 fst).2 (Or.inl h)
+    · exact (twoPopDriftVariance_eq_zero_iff p0 fst).2 (Or.inr (Or.inl h))
 
 /-- **Expected frequency difference increases with FST.**
     Derived from drift variance formula: E[(p₁-p₂)²] = 2·Fst·p₀(1-p₀).
