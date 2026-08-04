@@ -848,6 +848,12 @@ stay fixed, but the target effect vector changes over time. This isolates
 population/time-varying effect heterogeneity as the sole portability driver.
 
     Empirical status: UNTESTED. -/
+-- Five fields separate this witness from `timeVaryingAFGenerationalModel`: the effect
+-- heterogeneity that drives it, which locus is scored directly rather than tagged, and the
+-- two mutation shifts it turns off.  Written as `{ timeVaryingAFGenerationalModel with ... }`
+-- the shared twenty are stated once -- but the witness theorems below evaluate these fields
+-- by `simp`, and a structure update does not reduce far enough for them: six goals are left
+-- open that the literal closes.  The copy stays, and this note is why.
 noncomputable def timeVaryingEffectGenerationalModel :
     CrossPopulationGenerationalModel 1 1 := {
   popGen := baselineGenerationalPopGen
@@ -994,12 +1000,12 @@ theorem target_effect_heterogeneity_changes_generation_path_without_ld_or_af_cha
   · ext i j
     fin_cases i
     fin_cases j
-    generational_witness_simp baselineGenerationalPopGen, timeVaryingEffectGenerationalModel
+    generational_witness_simp baselineGenerationalPopGen, timeVaryingAFGenerationalModel,
+      timeVaryingEffectGenerationalModel
   · ext i j
     fin_cases i
     fin_cases j
-    generational_witness_simp baselineGenerationalPopGen, timeVaryingEffectGenerationalModel
-  · generational_witness_simp baselineGenerationalPopGen,
+    generational_witness_simp baselineGenerationalPopGen, timeVaryingAFGenerationalModel,
       timeVaryingEffectGenerationalModel
   · generational_witness_simp baselineGenerationalPopGen,
       timeVaryingEffectGenerationalModel
@@ -1007,51 +1013,17 @@ theorem target_effect_heterogeneity_changes_generation_path_without_ld_or_af_cha
       timeVaryingEffectGenerationalModel
   · generational_witness_simp baselineGenerationalPopGen,
       timeVaryingEffectGenerationalModel
-  · simp [betaTargetAt, baselineGenerationalPopGen, timeVaryingEffectGenerationalModel]
-  · simp [betaTargetAt, baselineGenerationalPopGen, timeVaryingEffectGenerationalModel]
+  · generational_witness_simp baselineGenerationalPopGen,
+      timeVaryingEffectGenerationalModel
+  · simp [betaTargetAt, baselineGenerationalPopGen, timeVaryingAFGenerationalModel,
+    timeVaryingEffectGenerationalModel]
+  · simp [betaTargetAt, baselineGenerationalPopGen, timeVaryingAFGenerationalModel,
+    timeVaryingEffectGenerationalModel]
     norm_num
-  · simp [baselineGenerationalPopGen, timeVaryingEffectGenerationalModel,
-      betaTargetAt, r2FromSourceWeights,
-      CrossPopulationGenerationalModel.toMetricModelAt,
-      r2FromSourceWeights, explainedSignalVarianceFromSourceWeights,
-      predictiveCovarianceFromSourceWeights, scoreVarianceFromSourceWeights,
-      sigmaTagTargetAt, directCausalTargetAt, proxyTaggingTargetAt, sigmaTagCausalTargetAt,
-      sigmaTagCausal,
-      sourceWeightsFromExplicitDrivers, sourceERMWeights,
-      crossCovariance,
-      effectiveOutcomeVariance, irreducibleTargetResidualBurden,
-      brokenTaggingResidual, ancestrySpecificLDResidual, sourceSpecificOverfitResidual,
-      tagAlleleFreqRetentionAt, causalAlleleFreqRetentionAt, alleleFreqMismatchPenalty,
-      GenerationalPopGenParameters.theta,
-      GenerationalPopGenParameters.bigM,
-      GenerationalPopGenParameters.tauAt,
-      GenerationalPopGenParameters.hetDecayFactor,
-      GenerationalPopGenParameters.fstTransientAt,
-      GenerationalPopGenParameters.mutationSharedRetentionAt,
-      GenerationalPopGenParameters.migrationSharedBoostAt,
-      ldCorrelationDecay,
-      Matrix.mulVec, dotProduct, Matrix.cons_val', Matrix.cons_val_fin_one]
-  · simp [baselineGenerationalPopGen, timeVaryingEffectGenerationalModel,
-      betaTargetAt, r2FromSourceWeights,
-      CrossPopulationGenerationalModel.toMetricModelAt,
-      r2FromSourceWeights, explainedSignalVarianceFromSourceWeights,
-      predictiveCovarianceFromSourceWeights, scoreVarianceFromSourceWeights,
-      sigmaTagTargetAt, directCausalTargetAt, proxyTaggingTargetAt, sigmaTagCausalTargetAt,
-      sigmaTagCausal,
-      sourceWeightsFromExplicitDrivers, sourceERMWeights,
-      crossCovariance,
-      effectiveOutcomeVariance, irreducibleTargetResidualBurden,
-      brokenTaggingResidual, ancestrySpecificLDResidual, sourceSpecificOverfitResidual,
-      tagAlleleFreqRetentionAt, causalAlleleFreqRetentionAt, alleleFreqMismatchPenalty,
-      GenerationalPopGenParameters.theta,
-      GenerationalPopGenParameters.bigM,
-      GenerationalPopGenParameters.tauAt,
-      GenerationalPopGenParameters.hetDecayFactor,
-      GenerationalPopGenParameters.fstTransientAt,
-      GenerationalPopGenParameters.mutationSharedRetentionAt,
-      GenerationalPopGenParameters.migrationSharedBoostAt,
-      ldCorrelationDecay,
-      Matrix.mulVec, dotProduct, Matrix.cons_val', Matrix.cons_val_fin_one]
+  · generational_witness_simp baselineGenerationalPopGen,
+      timeVaryingEffectGenerationalModel
+  · generational_witness_simp baselineGenerationalPopGen,
+      timeVaryingEffectGenerationalModel
     norm_num
 
 /-- The generation-indexed deployed profile always reads its `R²` coordinate
