@@ -1,6 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Mathlib.Analysis.SpecialFunctions.Sigmoid
 import Calibrator.Probability
 
 namespace Calibrator
@@ -269,127 +270,54 @@ theorem brier_lt_at_prob_mean_when_mean_is_true (pred : PosteriorPrediction)
 
 /-! ### Jensen's Inequality and the Direction of Bias -/
 
-/-- The sigmoid function (logistic function).
-    σ(x) = 1 / (1 + e^(-x)) -/
-noncomputable def sigmoid (x : ℝ) : ℝ := 1 / (1 + Real.exp (-x))
+/-- The sigmoid function (logistic function), `σ(x) = 1 / (1 + e^(-x))`.
 
-/-- Sigmoid is bounded in (0, 1). -/
-theorem sigmoid_pos (x : ℝ) : 0 < sigmoid x := by
-  unfold sigmoid
-  apply div_pos one_pos
-  have h : Real.exp (-x) > 0 := Real.exp_pos (-x)
-  linarith
+This is Mathlib's `Real.sigmoid`, which carries positivity, the upper bound
+one, strict monotonicity, the derivative and differentiability already; only
+the statements below that Mathlib does not have are proved here.  The local
+abbreviation exists because the surrounding calibration statements read in
+terms of `sigmoid`, and it is reducible, so every `Real.sigmoid_*` lemma
+applies to it directly. -/
+noncomputable abbrev sigmoid : ℝ → ℝ := Real.sigmoid
 
-theorem sigmoid_lt_one (x : ℝ) : sigmoid x < 1 := by
-  unfold sigmoid
-  rw [div_lt_one]
-  · have h : Real.exp (-x) > 0 := Real.exp_pos (-x)
-    linarith
-  · have h : Real.exp (-x) > 0 := Real.exp_pos (-x)
-    linarith
-
-/-- Sigmoid at zero equals 1/2. -/
-theorem sigmoid_zero : sigmoid 0 = 1 / 2 := by
-  unfold sigmoid
-  simp only [neg_zero, Real.exp_zero]
-  norm_num
-
-/-- Sigmoid is greater than 1/2 for positive inputs (monotonicity). -/
+/-- Sigmoid is greater than 1/2 for positive inputs (monotonicity).  Mathlib
+has the strict monotonicity and the value at zero; this is the composite. -/
 theorem sigmoid_gt_half {x : ℝ} (hx : x > 0) : sigmoid x > 1 / 2 := by
-  unfold sigmoid
-  have hexp_lt : Real.exp (-x) < 1 := by rw [Real.exp_lt_one_iff]; linarith
-  have hexp_pos : Real.exp (-x) > 0 := Real.exp_pos (-x)
-  have hdenom : 1 + Real.exp (-x) > 0 := by linarith
-  have hdenom_lt : 1 + Real.exp (-x) < 2 := by linarith
-  -- Want: 1 / (1 + exp(-x)) > 1/2
-  -- Equivalent to: 1 + exp(-x) < 2 (since 1/a < 1/b ↔ b < a for positive a, b)
-  have h2pos : (2 : ℝ) > 0 := by norm_num
-  rw [gt_iff_lt, one_div_lt_one_div h2pos hdenom]
-  exact hdenom_lt
+  have h := (Real.sigmoid_lt_iff (a := 0) (b := x)).mpr hx
+  rw [Real.sigmoid_zero] at h
+  linarith
 
 /-- Sigmoid is less than 1/2 for negative inputs (monotonicity). -/
 theorem sigmoid_lt_half {x : ℝ} (hx : x < 0) : sigmoid x < 1 / 2 := by
-  unfold sigmoid
-  have hexp_gt : Real.exp (-x) > 1 := by
-    rw [gt_iff_lt, ← Real.exp_zero]
-    exact Real.exp_strictMono (by linarith : (0 : ℝ) < -x)
-  have hexp_pos : Real.exp (-x) > 0 := Real.exp_pos (-x)
-  have hdenom : 1 + Real.exp (-x) > 0 := by linarith
-  have hdenom_gt : 1 + Real.exp (-x) > 2 := by linarith
-  -- Want: 1 / (1 + exp(-x)) < 1/2
-  -- Equivalent to: 2 < 1 + exp(-x) (since 1/a < 1/b ↔ b < a for positive a, b)
-  have h2pos : (2 : ℝ) > 0 := by norm_num
-  rw [one_div_lt_one_div hdenom h2pos]
-  exact hdenom_gt
-
-/-- Sigmoid is strictly monotone increasing. -/
-theorem sigmoid_monotone : StrictMono sigmoid := by
-  intro x y hxy
-  unfold sigmoid
-  have hx_pos : 1 + Real.exp (-x) > 0 := by have := Real.exp_pos (-x); linarith
-  have hy_pos : 1 + Real.exp (-y) > 0 := by have := Real.exp_pos (-y); linarith
-  rw [one_div_lt_one_div hx_pos hy_pos]
-  have h1 : Real.exp (-y) < Real.exp (-x) := Real.exp_strictMono (by linarith : -y < -x)
+  have h := (Real.sigmoid_lt_iff (a := x) (b := 0)).mpr hx
+  rw [Real.sigmoid_zero] at h
   linarith
 
-lemma differentiable_sigmoid (x : ℝ) : DifferentiableAt ℝ sigmoid x := by
-  unfold sigmoid
-  apply DifferentiableAt.div
-  · exact differentiableAt_const _
-  · apply DifferentiableAt.add
-    · exact differentiableAt_const _
-    · apply DifferentiableAt.exp
-      exact differentiableAt_id.neg
-  · have : Real.exp (-x) > 0 := Real.exp_pos (-x)
-    linarith
-
-lemma deriv_sigmoid (x : ℝ) : deriv sigmoid x = sigmoid x * (1 - sigmoid x) := by
-  have h_diff : DifferentiableAt ℝ (fun x ↦ 1 + Real.exp (-x)) x := by
-    apply DifferentiableAt.add
-    · exact differentiableAt_const _
-    · apply DifferentiableAt.exp
-      exact differentiableAt_id.neg
-  have h_ne : 1 + Real.exp (-x) ≠ 0 := by
-    have : Real.exp (-x) > 0 := Real.exp_pos (-x)
-    linarith
-  unfold sigmoid
-  simp only [one_div]
-  apply HasDerivAt.deriv
-  convert HasDerivAt.inv (c := fun x ↦ 1 + Real.exp (-x)) (by
-      apply HasDerivAt.add
-      · apply hasDerivAt_const
-      · apply HasDerivAt.exp
-        apply HasDerivAt.neg
-        apply hasDerivAt_id
-    ) h_ne using 1
-  field_simp [h_ne]
-  ring
-
+/-- The second derivative.  Mathlib has the first derivative and its
+`HasDerivAt` form; only the second derivative is proved here. -/
 lemma deriv2_sigmoid (x : ℝ) : deriv (deriv sigmoid) x = sigmoid x * (1 - sigmoid x) * (1 - 2 *
     sigmoid x) := by
-  have h_eq : deriv sigmoid = fun x ↦ sigmoid x * (1 - sigmoid x) := by
-    ext y; rw [deriv_sigmoid]
+  have h_eq : deriv sigmoid = fun x ↦ sigmoid x * (1 - sigmoid x) := Real.deriv_sigmoid
   rw [h_eq]
   apply HasDerivAt.deriv
-  have h_has_deriv_sig : HasDerivAt sigmoid (sigmoid x * (1 - sigmoid x)) x := by
-    rw [← deriv_sigmoid]
-    exact DifferentiableAt.hasDerivAt (differentiable_sigmoid x)
+  have h_has_deriv_sig : HasDerivAt sigmoid (sigmoid x * (1 - sigmoid x)) x :=
+    Real.hasDerivAt_sigmoid x
   convert HasDerivAt.mul h_has_deriv_sig (HasDerivAt.sub (hasDerivAt_const x (1:ℝ))
       h_has_deriv_sig) using 1
   simp; ring
 
 lemma sigmoid_strictConcaveOn_Ici : StrictConcaveOn ℝ (Set.Ici 0) sigmoid := by
   apply strictConcaveOn_of_deriv2_neg (convex_Ici 0)
-  · have h_diff : Differentiable ℝ sigmoid := fun x ↦ differentiable_sigmoid x
+  · have h_diff : Differentiable ℝ sigmoid := _root_.differentiable_sigmoid
     exact h_diff.continuous.continuousOn
   · intro x hx
     rw [interior_Ici] at hx
     dsimp only [Nat.iterate, Function.comp]
     rw [deriv2_sigmoid]
     apply mul_neg_of_pos_of_neg
-    · apply mul_pos (sigmoid_pos x)
+    · apply mul_pos (Real.sigmoid_pos x)
       rw [sub_pos]
-      exact sigmoid_lt_one x
+      exact Real.sigmoid_lt_one x
     · have h := sigmoid_gt_half hx
       linarith
 
@@ -413,18 +341,18 @@ lemma sigmoid_strictConcaveOn_Ici : StrictConcaveOn ℝ (Set.Ici 0) sigmoid := b
       filter_upwards [h_support] with ω hω
       exact le_of_lt hω
     have h_ae_meas : AEStronglyMeasurable X P := h_measurable.aestronglyMeasurable
-    have h_diff : Differentiable ℝ sigmoid := fun x ↦ differentiable_sigmoid x
+    have h_diff : Differentiable ℝ sigmoid := _root_.differentiable_sigmoid
     have h_cont : ContinuousOn sigmoid (Set.Ici 0) := h_diff.continuous.continuousOn
     have h_int_sigmoid : Integrable (sigmoid ∘ X) P := by
       have h_cont_sig : Continuous sigmoid :=
-        Differentiable.continuous (fun x ↦ differentiable_sigmoid x)
+        _root_.continuous_sigmoid
       refine Integrable.of_bound (h_cont_sig.comp_aestronglyMeasurable h_ae_meas) (1:ℝ) ?_
       filter_upwards with ω
       rw [Real.norm_eq_abs]
       rw [abs_le]
       constructor
-      · apply le_trans (by norm_num : (-1:ℝ) ≤ 0) (le_of_lt (sigmoid_pos _))
-      · exact le_of_lt (sigmoid_lt_one _)
+      · apply le_trans (by norm_num : (-1:ℝ) ≤ 0) (le_of_lt (Real.sigmoid_pos _))
+      · exact le_of_lt (Real.sigmoid_lt_one _)
     rcases sigmoid_strictConcaveOn_Ici.ae_eq_const_or_lt_map_average h_cont isClosed_Ici
       h_mem h_integrable h_int_sigmoid with h_eq | h_lt
     · exfalso
