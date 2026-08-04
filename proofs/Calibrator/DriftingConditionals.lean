@@ -80,7 +80,9 @@ noncomputable def transportedResponse (P : ι → ι → ℝ)
 
 /-- With a vanishing denominator Mathlib returns `0`, which is a value this quantity can also
 take legitimately, so the branch is named rather than left to be inferred from the result. -/
-theorem transportedResponse_at_zero_denominator_is_junk (P : ι → ι → ℝ) (population response : ι → ℝ) (_hpositive : ∀ y, 0 < transportMass P population y) (y : ι)
+theorem transportedResponse_at_zero_denominator_is_junk (P : ι → ι → ℝ)
+    (population response : ι → ℝ)
+    (_hpositive : ∀ y, 0 < transportMass P population y) (y : ι)
     (hzero : transportMass P population y = 0) :
     transportedResponse P population response _hpositive y = 0 := by
   unfold transportedResponse
@@ -123,6 +125,12 @@ theorem transportedResponse_prevalence_conserved
 /-- Composition of two finite transport kernels. -/
 noncomputable def composeKernel (P Q : ι → ι → ℝ) (x z : ι) : ℝ :=
   ∑ y, P x y * Q y z
+
+/-- Reference evaluation: composing the all-ones kernel with itself on two states doubles. -/
+theorem composeKernel_at_reference_point :
+    composeKernel (fun _ _ : Fin 2 ↦ (1 : ℝ)) (fun _ _ : Fin 2 ↦ (1 : ℝ)) 0 0 = 2 := by
+  norm_num [composeKernel, Fin.sum_univ_two]
+
 
 /-- Transporting mass through a composed kernel is the same as transporting it
 through the two kernels in sequence. -/
@@ -209,7 +217,8 @@ noncomputable def reverseBridge (P : ι → ι → ℝ) (population : ι → ℝ
 
 /-- With a vanishing denominator Mathlib returns `0`, which is a value this quantity can also
 take legitimately, so the branch is named rather than left to be inferred from the result. -/
-theorem reverseBridge_at_zero_denominator_is_junk (P : ι → ι → ℝ) (population : ι → ℝ) (_hpositive : ∀ y, 0 < transportMass P population y) (y x : ι)
+theorem reverseBridge_at_zero_denominator_is_junk (P : ι → ι → ℝ) (population : ι → ℝ)
+    (_hpositive : ∀ y, 0 < transportMass P population y) (y x : ι)
     (hzero : transportMass P population y = 0) :
     reverseBridge P population _hpositive y x = 0 := by
   unfold reverseBridge
@@ -269,30 +278,22 @@ theorem transportedResponse_mem_Icc
     (lower upper : ℝ) (hlower : ∀ x, lower ≤ response x)
     (hupper : ∀ x, response x ≤ upper) (y : ι) :
     transportedResponse P population response hpositive y ∈ Set.Icc lower upper := by
+  -- A transported response is an average through the reverse bridge, and an average of
+  -- values in `[lower, upper]` stays in `[lower, upper]`.  Read off the bridge's own two
+  -- properties, each direction is one comparison; written directly against the quotient,
+  -- the two directions were one summation argument copied and mirrored.
+  have hnonneg := reverseBridge_nonnegative P population hkernel hpopulation hpositive
+  have hmass := reverseBridge_mass_preserving P population hpositive y
+  rw [transportedResponse_eq_reverseBridge_average]
   constructor
-  · unfold transportedResponse
-    rw [le_div_iff₀ (hpositive y)]
-    unfold transportMass markedMass
-    rw [Finset.mul_sum]
-    refine Finset.sum_le_sum fun x _ ↦ ?_
-    have hweight : 0 ≤ population x * P x y :=
-      mul_nonneg (hpopulation x) (hkernel x y)
-    calc
-      lower * (population x * P x y) ≤ response x * (population x * P x y) :=
-        mul_le_mul_of_nonneg_right (hlower x) hweight
-      _ = population x * response x * P x y := by ring
-  · unfold transportedResponse
-    rw [div_le_iff₀ (hpositive y)]
-    unfold transportMass markedMass
-    rw [Finset.mul_sum]
-    refine Finset.sum_le_sum fun x _ ↦ ?_
-    have hweight : 0 ≤ population x * P x y :=
-      mul_nonneg (hpopulation x) (hkernel x y)
-    calc
-      population x * response x * P x y =
-          response x * (population x * P x y) := by ring
-      _ ≤ upper * (population x * P x y) :=
-        mul_le_mul_of_nonneg_right (hupper x) hweight
+  · calc lower = ∑ x, reverseBridge P population hpositive y x * lower := by
+          rw [← Finset.sum_mul, hmass, one_mul]
+      _ ≤ ∑ x, reverseBridge P population hpositive y x * response x :=
+          Finset.sum_le_sum fun x _ ↦ mul_le_mul_of_nonneg_left (hlower x) (hnonneg y x)
+  · calc ∑ x, reverseBridge P population hpositive y x * response x
+        ≤ ∑ x, reverseBridge P population hpositive y x * upper :=
+          Finset.sum_le_sum fun x _ ↦ mul_le_mul_of_nonneg_left (hupper x) (hnonneg y x)
+      _ = upper := by rw [← Finset.sum_mul, hmass, one_mul]
 
 /-- Reconstruction is linear in the marked response when the population and
 transport kernel are fixed. -/

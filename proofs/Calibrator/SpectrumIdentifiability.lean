@@ -83,7 +83,11 @@ open Filter
 
 /-! ## The Kingman rate ladder and its reciprocal sum -/
 
-/-- Kingman pair-coalescence rate for `m` lineages, `m (m - 1) / 2`. -/
+/-- Kingman pair-coalescence rate for `m` lineages, `m (m - 1) / 2`.
+
+    Empirical status: UNTESTED. This is the defining rate of the Kingman coalescent, a
+    modelling choice rather than a measurement. Whether a given population's genealogy
+    follows it is what the identifiability results below leave open. -/
 noncomputable def coalescentRate (m : ℕ) : ℝ :=
   (m : ℝ) * ((m : ℝ) - 1) / 2
 
@@ -299,7 +303,12 @@ theorem spectrumAttenuation_le_geometric (n : ℕ) (τ : ℝ) (hτ : 0 ≤ τ) :
 The literal integrand `log ((θ² + x²) / |θ² - x²|)` integrates to
 `2 [log ((1 + θ²) / (1 - θ²)) + 2θ arctan (1/θ) - θ log ((1 + θ) / (1 - θ))]`, where the two
 divergent logarithms cancel as `θ → 1`.  The regrouping below performs that cancellation
-symbolically, so the profile is finite on all of `[0, 1]`. -/
+symbolically, so the profile is finite on all of `[0, 1]`.
+
+Empirical status: UNTESTED, and not the kind of thing a dataset tests: this is the closed
+form of an integral, checked by the theorems below rather than by measurement. It is named
+here because it carries the conditioning of a Cauchy matrix, which a numerical experiment
+COULD measure. -/
 noncomputable def cauchyConditioningProfile (θ : ℝ) : ℝ :=
   2 * (Real.log (1 + θ ^ 2) + (θ - 1) * Real.log (1 - θ)
     - (1 + θ) * Real.log (1 + θ) + 2 * θ * Real.arctan (1 / θ))

@@ -363,6 +363,42 @@ theorem finiteEnvironmentCovariancePool_energy
   intro i _
   ring
 
+/-- **A positive-semidefinite family of environment covariances, named once.**
+
+Five statements below are conditioned on the same two facts about the family: every
+environment's quadratic form is nonnegative, and it vanishes exactly on that environment's
+kernel.  Written out at each theorem, that block was five identical lines repeated five
+times.  It is one property of the family, so it is one structure. -/
+structure PositiveSemidefiniteFamily {κ : Type*} (covariance : κ → Matrix ι ι ℝ) : Prop where
+  /-- Every environment's quadratic form is nonnegative. -/
+  energy_nonneg : ∀ environment shift,
+    0 ≤ dot shift ((covariance environment).mulVec shift)
+  /-- ... and vanishes exactly on that environment's kernel. -/
+  energy_eq_zero_iff : ∀ environment shift,
+    dot shift ((covariance environment).mulVec shift) = 0 ↔
+      (covariance environment).mulVec shift = 0
+
+/-- **The family is inhabited.**  Theorems conditioned on a bundle nothing satisfies are
+true and empty.  The identity covariance in every environment is such a family: its
+quadratic form is the squared norm, nonnegative and vanishing only at zero. -/
+theorem positiveSemidefiniteFamily_one {κ : Type*} :
+    PositiveSemidefiniteFamily (fun _ : κ ↦ (1 : Matrix ι ι ℝ)) where
+  energy_nonneg := by
+    intro _ shift
+    simp only [Matrix.one_mulVec, dot]
+    exact Finset.sum_nonneg fun i _ ↦ mul_self_nonneg (shift i)
+  energy_eq_zero_iff := by
+    intro _ shift
+    simp only [Matrix.one_mulVec, dot]
+    constructor
+    · intro h
+      funext i
+      have hi := (Finset.sum_eq_zero_iff_of_nonneg
+        (fun j _ ↦ mul_self_nonneg (shift j))).mp h i (Finset.mem_univ i)
+      exact mul_self_eq_zero.mp hi
+    · intro h
+      simp [h]
+
 omit [DecidableEq ι] in
 /-- **Active-environment kernel law.** With merely nonnegative sampling weights, the pooled
 kernel is the intersection of the kernels of exactly those environments assigned positive
@@ -371,11 +407,7 @@ theorem finiteEnvironmentCovariancePool_mulVec_eq_zero_iff_active
     {κ : Type*} [Fintype κ]
     (weight : κ → ℝ) (covariance : κ → Matrix ι ι ℝ)
     (hweight : ∀ environment, 0 ≤ weight environment)
-    (hnonneg : ∀ environment shift,
-      0 ≤ dot shift ((covariance environment).mulVec shift))
-    (hzero : ∀ environment shift,
-      dot shift ((covariance environment).mulVec shift) = 0 ↔
-        (covariance environment).mulVec shift = 0)
+    (hpsd : PositiveSemidefiniteFamily covariance)
     (shift : ι → ℝ) :
     (finiteEnvironmentCovariancePool weight covariance).mulVec shift = 0 ↔
       ∀ environment, 0 < weight environment →
@@ -391,13 +423,13 @@ theorem finiteEnvironmentCovariancePool_mulVec_eq_zero_iff_active
     have htermNonneg : ∀ environment ∈ (Finset.univ : Finset κ),
         0 ≤ weight environment * dot shift ((covariance environment).mulVec shift) := by
       intro environment _
-      exact mul_nonneg (hweight environment) (hnonneg environment shift)
+      exact mul_nonneg (hweight environment) (hpsd.energy_nonneg environment shift)
     have hweightedZero :=
       (Finset.sum_eq_zero_iff_of_nonneg htermNonneg).mp henergySum
         environment (Finset.mem_univ environment)
     have henergyZero : dot shift ((covariance environment).mulVec shift) = 0 :=
       (mul_eq_zero.mp hweightedZero).resolve_left hactive.ne'
-    exact (hzero environment shift).mp henergyZero
+    exact (hpsd.energy_eq_zero_iff environment shift).mp henergyZero
   · intro hkernel
     rw [finiteEnvironmentCovariancePool_mulVec]
     ext i
@@ -418,16 +450,12 @@ theorem finiteEnvironmentCovariancePool_mulVec_eq_zero_iff
     {κ : Type*} [Fintype κ]
     (weight : κ → ℝ) (covariance : κ → Matrix ι ι ℝ)
     (hweight : ∀ environment, 0 < weight environment)
-    (hnonneg : ∀ environment shift,
-      0 ≤ dot shift ((covariance environment).mulVec shift))
-    (hzero : ∀ environment shift,
-      dot shift ((covariance environment).mulVec shift) = 0 ↔
-        (covariance environment).mulVec shift = 0)
+    (hpsd : PositiveSemidefiniteFamily covariance)
     (shift : ι → ℝ) :
     (finiteEnvironmentCovariancePool weight covariance).mulVec shift = 0 ↔
       ∀ environment, (covariance environment).mulVec shift = 0 := by
   rw [finiteEnvironmentCovariancePool_mulVec_eq_zero_iff_active
-    weight covariance (fun environment ↦ (hweight environment).le) hnonneg hzero shift]
+    weight covariance (fun environment ↦ (hweight environment).le) hpsd shift]
   constructor
   · intro hactive environment
     exact hactive environment (hweight environment)
@@ -441,18 +469,14 @@ theorem finiteEnvironmentCovariancePool_mulVec_ne_zero_of_exists
     {κ : Type*} [Fintype κ]
     (weight : κ → ℝ) (covariance : κ → Matrix ι ι ℝ)
     (hweight : ∀ environment, 0 < weight environment)
-    (hnonneg : ∀ environment shift,
-      0 ≤ dot shift ((covariance environment).mulVec shift))
-    (hzero : ∀ environment shift,
-      dot shift ((covariance environment).mulVec shift) = 0 ↔
-        (covariance environment).mulVec shift = 0)
+    (hpsd : PositiveSemidefiniteFamily covariance)
     (shift : ι → ℝ)
     (hdetected : ∃ environment, (covariance environment).mulVec shift ≠ 0) :
     (finiteEnvironmentCovariancePool weight covariance).mulVec shift ≠ 0 := by
   intro hpool
   obtain ⟨environment, hdetect⟩ := hdetected
   exact hdetect ((finiteEnvironmentCovariancePool_mulVec_eq_zero_iff
-    weight covariance hweight hnonneg hzero shift).mp hpool environment)
+    weight covariance hweight hpsd shift).mp hpool environment)
 
 omit [DecidableEq ι] in
 /-- **Strict diversity gain.** The pooled nullspace is strictly smaller than a reference
@@ -464,11 +488,7 @@ theorem finiteEnvironmentCovariancePool_kernel_ssubset
     (weight : κ → ℝ) (covariance : κ → Matrix ι ι ℝ)
     (reference : κ)
     (hweight : ∀ environment, 0 < weight environment)
-    (hnonneg : ∀ environment shift,
-      0 ≤ dot shift ((covariance environment).mulVec shift))
-    (hzero : ∀ environment shift,
-      dot shift ((covariance environment).mulVec shift) = 0 ↔
-        (covariance environment).mulVec shift = 0)
+    (hpsd : PositiveSemidefiniteFamily covariance)
     (hseparates : ∃ shift : ι → ℝ,
       (covariance reference).mulVec shift = 0 ∧
         ∃ environment, (covariance environment).mulVec shift ≠ 0) :
@@ -479,7 +499,7 @@ theorem finiteEnvironmentCovariancePool_kernel_ssubset
   constructor
   · intro shift hpool
     exact (finiteEnvironmentCovariancePool_mulVec_eq_zero_iff
-      weight covariance hweight hnonneg hzero shift).mp hpool reference
+      weight covariance hweight hpsd shift).mp hpool reference
   · obtain ⟨shift, hreference, hdetected⟩ := hseparates
     intro hequal
     have hpool : (finiteEnvironmentCovariancePool weight covariance).mulVec shift = 0 := by
@@ -488,7 +508,7 @@ theorem finiteEnvironmentCovariancePool_kernel_ssubset
       rw [hequal]
       exact hreference
     exact finiteEnvironmentCovariancePool_mulVec_ne_zero_of_exists
-      weight covariance hweight hnonneg hzero shift hdetected hpool
+      weight covariance hweight hpsd shift hdetected hpool
 
 /-! ## Singular portability boundary -/
 
@@ -557,11 +577,7 @@ theorem no_uniformQuadraticPortabilityBound_to_finiteEnvironmentPool
     (weight : κ → ℝ) (covariance : κ → Matrix ι ι ℝ)
     (reference : κ)
     (hweight : ∀ environment, 0 < weight environment)
-    (hnonneg : ∀ environment shift,
-      0 ≤ dot shift ((covariance environment).mulVec shift))
-    (hzero : ∀ environment shift,
-      dot shift ((covariance environment).mulVec shift) = 0 ↔
-        (covariance environment).mulVec shift = 0)
+    (hpsd : PositiveSemidefiniteFamily covariance)
     (shift : ι → ℝ)
     (hreference : (covariance reference).mulVec shift = 0)
     (hdetected : ∃ environment, (covariance environment).mulVec shift ≠ 0) :
@@ -572,13 +588,13 @@ theorem no_uniformQuadraticPortabilityBound_to_finiteEnvironmentPool
   have hdetectorEnergyNe :
       dot shift ((covariance detector).mulVec shift) ≠ 0 := by
     intro henergy
-    exact hdetector ((hzero detector shift).mp henergy)
+    exact hdetector ((hpsd.energy_eq_zero_iff detector shift).mp henergy)
   have hdetectorEnergyPos : 0 < dot shift ((covariance detector).mulVec shift) :=
-    lt_of_le_of_ne (hnonneg detector shift) (Ne.symm hdetectorEnergyNe)
+    lt_of_le_of_ne (hpsd.energy_nonneg detector shift) (Ne.symm hdetectorEnergyNe)
   have htermNonneg : ∀ environment ∈ (Finset.univ : Finset κ),
       0 ≤ weight environment * dot shift ((covariance environment).mulVec shift) := by
     intro environment _
-    exact mul_nonneg (hweight environment).le (hnonneg environment shift)
+    exact mul_nonneg (hweight environment).le (hpsd.energy_nonneg environment shift)
   have hdetectorLe : weight detector * dot shift ((covariance detector).mulVec shift) ≤
       ∑ environment, weight environment *
         dot shift ((covariance environment).mulVec shift) :=

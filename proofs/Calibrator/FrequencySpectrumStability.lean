@@ -210,22 +210,28 @@ theorem fixedEpochSampleRateExponent_pos (K : ℕ) (hK : 2 ≤ K) :
   rw [fixedEpochSampleRateExponent_eq_half_inverse K hK]
   exact div_pos (fixedEpochInverseExponent_pos K hK) (by norm_num)
 
+/-- **The epoch coordinate count is positive, and strictly increasing, as a real.**
+
+Both strict-antitonicity proofs below start from exactly this comparison and each carried
+its own copy of the four steps that produce it: the positivity, the natural-number
+inequality, and the two casts. -/
+theorem epochSpectrumCoordinateCount_lt_real {K L : ℕ} (hK : 2 ≤ K) (hKL : K < L) :
+    (0 : ℝ) < epochSpectrumCoordinateCount K ∧
+      (epochSpectrumCoordinateCount K : ℝ) < epochSpectrumCoordinateCount L := by
+  have hcountK : 0 < epochSpectrumCoordinateCount K :=
+    epochSpectrumCoordinateCount_pos K hK
+  have hcount : epochSpectrumCoordinateCount K < epochSpectrumCoordinateCount L := by
+    unfold epochSpectrumCoordinateCount
+    omega
+  exact ⟨by exact_mod_cast hcountK, by exact_mod_cast hcount⟩
+
 /-- Statistical convergence strictly worsens throughout the fixed-epoch hierarchy: every
 additional epoch lowers the root-sample inverse exponent. -/
 theorem fixedEpochSampleRateExponent_strictAnti
     {K L : ℕ} (hK : 2 ≤ K) (hKL : K < L) :
     fixedEpochSampleRateExponent L < fixedEpochSampleRateExponent K := by
   unfold fixedEpochSampleRateExponent
-  have hcountK : 0 < epochSpectrumCoordinateCount K :=
-    epochSpectrumCoordinateCount_pos K hK
-  have hcount : epochSpectrumCoordinateCount K < epochSpectrumCoordinateCount L := by
-    unfold epochSpectrumCoordinateCount
-    omega
-  have hcountKReal : (0 : ℝ) < epochSpectrumCoordinateCount K := by
-    exact_mod_cast hcountK
-  have hcountReal : (epochSpectrumCoordinateCount K : ℝ) <
-      epochSpectrumCoordinateCount L := by
-    exact_mod_cast hcount
+  obtain ⟨hcountKReal, hcountReal⟩ := epochSpectrumCoordinateCount_lt_real hK hKL
   have hdenK : (0 : ℝ) < 2 * epochSpectrumCoordinateCount K := by
     nlinarith
   have hden : (2 * epochSpectrumCoordinateCount K : ℝ) <
@@ -325,16 +331,7 @@ theorem fixedEpochInverseExponent_strictAnti
     {K L : ℕ} (hK : 2 ≤ K) (hKL : K < L) :
     fixedEpochInverseExponent L < fixedEpochInverseExponent K := by
   unfold fixedEpochInverseExponent
-  have hcountK : 0 < epochSpectrumCoordinateCount K :=
-    epochSpectrumCoordinateCount_pos K hK
-  have hcount : epochSpectrumCoordinateCount K < epochSpectrumCoordinateCount L := by
-    unfold epochSpectrumCoordinateCount
-    omega
-  have hcountKReal : (0 : ℝ) < epochSpectrumCoordinateCount K := by
-    exact_mod_cast hcountK
-  have hcountReal : (epochSpectrumCoordinateCount K : ℝ) <
-      epochSpectrumCoordinateCount L := by
-    exact_mod_cast hcount
+  obtain ⟨hcountKReal, hcountReal⟩ := epochSpectrumCoordinateCount_lt_real hK hKL
   exact (inv_lt_inv₀ (hcountKReal.trans hcountReal) hcountKReal).2 hcountReal
 
 /-! ## Intrinsic nullspace boundary for unrestricted history classes -/

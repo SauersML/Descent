@@ -298,7 +298,11 @@ theorem translatedForbiddenBand_endpoint_displacement
           (start + velocity * leftMix + width) = velocity * (rightMix - leftMix)) := by
   constructor <;> ring
 
-/-- The concrete unit-width band used to refute the endpoint-disjointness heuristic. -/
+/-- The concrete unit-width band used to refute the endpoint-disjointness heuristic.
+
+    Empirical status: UNTESTED, and deliberately so: this is a counterexample, chosen for
+    its arithmetic and not offered as a description of any migrating population. Its job is
+    to show that a heuristic fails, which one instance suffices to do. -/
 def migratingForbiddenBand (mix : ℝ) : Set ℝ :=
   translatedForbiddenBand 0 2 1 mix
 

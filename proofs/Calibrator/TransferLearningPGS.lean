@@ -885,6 +885,15 @@ def pcaNetTargetError
     (ancestryBias signalBaseline signalRetained lossWeight : ℝ) : ℝ :=
   ancestryBias + pcaSignalLossPenalty signalBaseline signalRetained lossWeight
 
+/-- Reference evaluation.  The value is computed through the definitions this body calls, but
+the theorem states a number: an inequality or an invariance leaves a family of bodies
+satisfying it, and a value does not. -/
+theorem pcaNetTargetError_at_reference_point :
+    pcaNetTargetError 1 1 1 1 = 1 := by
+  norm_num [pcaNetTargetError, pcaSignalLossPenalty]
+
+
+
 /-- Exact error difference induced by removing ancestry PCs. -/
 theorem pca_target_error_difference
     (ancestry_bias_with ancestry_bias_without signal_with signal_without lossWeight : ℝ) :
@@ -917,68 +926,11 @@ theorem pca_tradeoff
         pcaNetTargetError ancestry_bias_with signal_with signal_with lossWeight ↔
       pcaSignalLossPenalty signal_with signal_without lossWeight =
         pcaBiasReduction ancestry_bias_with ancestry_bias_without) := by
-  refine ⟨?_, ?_, ?_, ?_⟩
-  · have hdiff := pca_target_error_difference
-      ancestry_bias_with ancestry_bias_without signal_with signal_without lossWeight
-    constructor <;> intro h
-    · have hsub :
-          pcaNetTargetError ancestry_bias_without signal_with signal_without lossWeight -
-              pcaNetTargetError ancestry_bias_with signal_with signal_with lossWeight < 0 := by
-        linarith
-      rw [hdiff] at hsub
-      nlinarith
-    · have hsub :
-          pcaSignalLossPenalty signal_with signal_without lossWeight -
-              pcaBiasReduction ancestry_bias_with ancestry_bias_without < 0 := by
-        nlinarith
-      rw [← hdiff] at hsub
-      linarith
-  · have hdiff := pca_target_error_difference
-      ancestry_bias_with ancestry_bias_without signal_with signal_without lossWeight
-    constructor <;> intro h
-    · have hsub :
-          pcaNetTargetError ancestry_bias_without signal_with signal_without lossWeight -
-              pcaNetTargetError ancestry_bias_with signal_with signal_with lossWeight ≤ 0 := by
-        linarith
-      rw [hdiff] at hsub
-      linarith
-    · have hsub :
-          pcaSignalLossPenalty signal_with signal_without lossWeight -
-              pcaBiasReduction ancestry_bias_with ancestry_bias_without ≤ 0 := by
-        linarith
-      rw [← hdiff] at hsub
-      linarith
-  · have hdiff := pca_target_error_difference
-      ancestry_bias_with ancestry_bias_without signal_with signal_without lossWeight
-    constructor <;> intro h
-    · have hsub :
-          0 <
-            pcaNetTargetError ancestry_bias_without signal_with signal_without lossWeight -
-              pcaNetTargetError ancestry_bias_with signal_with signal_with lossWeight := by
-        linarith
-      rw [hdiff] at hsub
-      linarith
-    · have hsub :
-          0 < pcaSignalLossPenalty signal_with signal_without lossWeight -
-              pcaBiasReduction ancestry_bias_with ancestry_bias_without := by
-        linarith
-      rw [← hdiff] at hsub
-      linarith
-  · have hdiff := pca_target_error_difference
-      ancestry_bias_with ancestry_bias_without signal_with signal_without lossWeight
-    constructor <;> intro h
-    · have hsub :
-          pcaNetTargetError ancestry_bias_without signal_with signal_without lossWeight -
-              pcaNetTargetError ancestry_bias_with signal_with signal_with lossWeight = 0 := by
-        linarith
-      rw [hdiff] at hsub
-      nlinarith
-    · have hsub :
-          pcaSignalLossPenalty signal_with signal_without lossWeight -
-              pcaBiasReduction ancestry_bias_with ancestry_bias_without = 0 := by
-        linarith
-      rw [← hdiff] at hsub
-      linarith
+  -- All four comparisons are the one difference identity read four ways.  Written out,
+  -- each carried its own copy of the same two-step rearrangement.
+  have hdiff := pca_target_error_difference
+    ancestry_bias_with ancestry_bias_without signal_with signal_without lossWeight
+  refine ⟨?_, ?_, ?_, ?_⟩ <;> constructor <;> intro h <;> linarith
 
 /-- When the ancestry-bias reduction and signal loss are both positive,
     the total-error tradeoff is controlled by a single loss-weight threshold. -/
@@ -1129,6 +1081,16 @@ noncomputable def infoCertifiedBenDavidUpperBound
     (I_phi_Y I_phi_A lambda_star : ℝ) : ℝ :=
   gaussianSourceResidualRisk I_phi_Y +
     pinskerAncestryDivergenceCap I_phi_A + lambda_star
+
+/-- Reference evaluation.  The value is computed through the definitions this body calls, but
+the theorem states a number: an inequality or an invariance leaves a family of bodies
+satisfying it, and a value does not. -/
+theorem infoCertifiedBenDavidUpperBound_at_reference_point :
+    infoCertifiedBenDavidUpperBound 0 0 0 = 1 := by
+  norm_num [infoCertifiedBenDavidUpperBound, gaussianSourceResidualRisk,
+    pinskerAncestryDivergenceCap]
+
+
 
 /-- More label information strictly lowers the exact Gaussian source residual term. -/
 theorem gaussianSourceResidualRisk_strictAnti
@@ -2118,6 +2080,46 @@ theorem dotProduct_meanPopulationDeviation_eq_zero {p : ℕ}
   rw [hsum]
   ring
 
+/-- **The meta-learning deviation geometry, named once.**
+
+Five statements below are conditioned on the same three facts about the population-specific
+deviations: each is orthogonal to the shared residual, each has the same squared norm, and
+distinct ones are orthogonal.  Written out at each theorem that block was five identical
+lines repeated five times, and restricting it to a smaller task count was another nine.
+It is one geometry, so it is one structure, with its own restriction lemma. -/
+structure MetaLearningDeviations {p : ℕ} (wShared wTarget : Fin p → ℝ)
+    (deviation : ℕ → Fin p → ℝ) (populationSpecificGap : ℝ) (k : ℕ) : Prop where
+  /-- Every deviation is orthogonal to the shared residual. -/
+  shared_orth : ∀ j < k, dotProduct (fun i ↦ wShared i - wTarget i) (deviation j) = 0
+  /-- Every deviation has the same squared norm. -/
+  norm_eq : ∀ j < k, dotProduct (deviation j) (deviation j) = populationSpecificGap
+  /-- Distinct deviations are orthogonal. -/
+  pairwise : ∀ j < k, ∀ l < k, j ≠ l → dotProduct (deviation j) (deviation l) = 0
+
+/-- **The geometry is inhabited.**  A theorem conditioned on a bundle nothing satisfies is
+true and empty.  One source population with zero deviation from the shared centre satisfies
+all three conditions, so the statements below are statements about something. -/
+theorem metaLearningDeviations_witness {p : ℕ} (wShared wTarget : Fin p → ℝ) :
+    MetaLearningDeviations wShared wTarget (fun _ _ ↦ 0) 0 1 := by
+  refine ⟨?_, ?_, ?_⟩
+  · intro j _
+    simp [dotProduct]
+  · intro j _
+    simp [dotProduct]
+  · intro j hj l hl hne
+    exact absurd (show j = l by omega) hne
+
+/-- The geometry at `k₂` populations restricts to any smaller task count. -/
+theorem MetaLearningDeviations.mono {p : ℕ} {wShared wTarget : Fin p → ℝ}
+    {deviation : ℕ → Fin p → ℝ} {populationSpecificGap : ℝ} {k₁ k₂ : ℕ}
+    (h : MetaLearningDeviations wShared wTarget deviation populationSpecificGap k₂)
+    (hle : k₁ ≤ k₂) :
+    MetaLearningDeviations wShared wTarget deviation populationSpecificGap k₁ :=
+  ⟨fun j hj ↦ h.shared_orth j (lt_of_lt_of_le hj hle),
+    fun j hj ↦ h.norm_eq j (lt_of_lt_of_le hj hle),
+    fun j hj l hl hne ↦
+      h.pairwise j (lt_of_lt_of_le hj hle) l (lt_of_lt_of_le hl hle) hne⟩
+
 /-- Exact transfer-gap formula for the shared-feature meta-learning model.
     The shared center's own residual gap is `coefficientGapSq wShared wTarget`
     — computed, not assumed. If in addition each population-specific deviation
@@ -2131,14 +2133,10 @@ theorem metaLearnedTransferGapSq_eq_irreducible_plus_populationSpecificGap_div_k
     (populationSpecificGap : ℝ)
     (k : ℕ)
     (h_k : 0 < k)
-    (h_shared_orth :
-      ∀ j < k, dotProduct (fun i ↦ wShared i - wTarget i) (deviation j) = 0)
-    (h_norm :
-      ∀ j < k, dotProduct (deviation j) (deviation j) = populationSpecificGap)
-    (h_pair :
-      ∀ j < k, ∀ l < k, j ≠ l → dotProduct (deviation j) (deviation l) = 0) :
+    (hdev : MetaLearningDeviations wShared wTarget deviation populationSpecificGap k) :
     metaLearnedTransferGapSq wShared wTarget deviation k =
       coefficientGapSq wShared wTarget + populationSpecificGap / k := by
+  obtain ⟨h_shared_orth, h_norm, h_pair⟩ := hdev
   obtain ⟨irreducibleGap, h_shared⟩ :
       ∃ g : ℝ, coefficientGapSq wShared wTarget = g := ⟨_, rfl⟩
   rw [h_shared]
@@ -2191,23 +2189,15 @@ theorem sourcePopulationMeanEffectGapSq_eq_irreducible_plus_populationSpecificGa
     (populationSpecificGap : ℝ)
     (k : ℕ)
     (h_k : 0 < k)
-    (h_shared_orth :
-      ∀ j < k, dotProduct (fun i ↦ wShared i - wTarget i)
-        (centeredPopulationEffectDeviation wShared wSource j) = 0)
-    (h_norm :
-      ∀ j < k, dotProduct (centeredPopulationEffectDeviation wShared wSource j)
-        (centeredPopulationEffectDeviation wShared wSource j) = populationSpecificGap)
-    (h_pair :
-      ∀ j < k, ∀ l < k, j ≠ l →
-        dotProduct (centeredPopulationEffectDeviation wShared wSource j)
-          (centeredPopulationEffectDeviation wShared wSource l) = 0) :
+    (hdev : MetaLearningDeviations wShared wTarget
+      (centeredPopulationEffectDeviation wShared wSource) populationSpecificGap k) :
     coefficientGapSq (sourcePopulationMeanWeights wSource k) wTarget =
       coefficientGapSq wShared wTarget + populationSpecificGap / k := by
   rw [← metaLearnedTransferGapSq_eq_sourcePopulationMeanEffectGapSq
     wShared wTarget wSource k h_k]
   exact metaLearnedTransferGapSq_eq_irreducible_plus_populationSpecificGap_div_k
     wShared wTarget (centeredPopulationEffectDeviation wShared wSource)
-    populationSpecificGap k h_k h_shared_orth h_norm h_pair
+    populationSpecificGap k h_k hdev
 
 /-- More source populations strictly reduce the exact residual transfer gap in
     the shared-feature meta-learning model, because the averaged population-
@@ -2220,12 +2210,7 @@ theorem metaLearnedTransferGapSq_strictMono {p : ℕ}
     (h_pop : 0 < populationSpecificGap)
     (h_k₁ : 0 < k₁)
     (h_more : k₁ < k₂)
-    (h_shared_orth :
-      ∀ j < k₂, dotProduct (fun i ↦ wShared i - wTarget i) (deviation j) = 0)
-    (h_norm :
-      ∀ j < k₂, dotProduct (deviation j) (deviation j) = populationSpecificGap)
-    (h_pair :
-      ∀ j < k₂, ∀ l < k₂, j ≠ l → dotProduct (deviation j) (deviation l) = 0) :
+    (hdev : MetaLearningDeviations wShared wTarget deviation populationSpecificGap k₂) :
     metaLearnedTransferGapSq wShared wTarget deviation k₂ <
       metaLearnedTransferGapSq wShared wTarget deviation k₁ := by
   have h_k₂ : 0 < k₂ := lt_trans h_k₁ h_more
@@ -2234,22 +2219,13 @@ theorem metaLearnedTransferGapSq_strictMono {p : ℕ}
         coefficientGapSq wShared wTarget + populationSpecificGap / k₂ :=
     metaLearnedTransferGapSq_eq_irreducible_plus_populationSpecificGap_div_k
       wShared wTarget deviation populationSpecificGap
-      k₂ h_k₂ h_shared_orth h_norm h_pair
+      k₂ h_k₂ hdev
   have h_formula₁ :
       metaLearnedTransferGapSq wShared wTarget deviation k₁ =
         coefficientGapSq wShared wTarget + populationSpecificGap / k₁ :=
     metaLearnedTransferGapSq_eq_irreducible_plus_populationSpecificGap_div_k
       wShared wTarget deviation populationSpecificGap
-      k₁ h_k₁
-      (by
-        intro j hj
-        exact h_shared_orth j (lt_trans hj h_more))
-      (by
-        intro j hj
-        exact h_norm j (lt_trans hj h_more))
-      (by
-        intro j hj l hl hneq
-        exact h_pair j (lt_trans hj h_more) l (lt_trans hl h_more) hneq)
+      k₁ h_k₁ (hdev.mono (le_of_lt h_more))
   rw [h_formula₂, h_formula₁]
   have hk₁ : 0 < (k₁ : ℝ) := Nat.cast_pos.mpr h_k₁
   have hcast : (k₁ : ℝ) < (k₂ : ℝ) := by
@@ -2266,16 +2242,11 @@ theorem metaLearnedTransferGapSq_pos {p : ℕ}
     (k : ℕ)
     (h_pop : 0 < populationSpecificGap)
     (h_k : 0 < k)
-    (h_shared_orth :
-      ∀ j < k, dotProduct (fun i ↦ wShared i - wTarget i) (deviation j) = 0)
-    (h_norm :
-      ∀ j < k, dotProduct (deviation j) (deviation j) = populationSpecificGap)
-    (h_pair :
-      ∀ j < k, ∀ l < k, j ≠ l → dotProduct (deviation j) (deviation l) = 0) :
+    (hdev : MetaLearningDeviations wShared wTarget deviation populationSpecificGap k) :
     0 < metaLearnedTransferGapSq wShared wTarget deviation k := by
   rw [metaLearnedTransferGapSq_eq_irreducible_plus_populationSpecificGap_div_k
     wShared wTarget deviation populationSpecificGap
-    k h_k h_shared_orth h_norm h_pair]
+    k h_k hdev]
   have h_irred : 0 ≤ coefficientGapSq wShared wTarget :=
     coefficientGapSq_nonneg wShared wTarget
   have hk : 0 < (k : ℝ) := Nat.cast_pos.mpr h_k
@@ -3020,12 +2991,7 @@ theorem amortized_per_population_adaptation_cost_falls_with_task_count
     (deviation : ℕ → Fin p → ℝ)
     (populationSpecificGap noiseVar nTarget tau : ℝ)
     (k₁ k₂ : ℕ)
-    (h_shared_orth :
-      ∀ j < k₂, dotProduct (fun i ↦ wShared i - wTarget i) (deviation j) = 0)
-    (h_norm :
-      ∀ j < k₂, dotProduct (deviation j) (deviation j) = populationSpecificGap)
-    (h_pair :
-      ∀ j < k₂, ∀ l < k₂, j ≠ l → dotProduct (deviation j) (deviation l) = 0)
+    (hdev : MetaLearningDeviations wShared wTarget deviation populationSpecificGap k₂)
     (h_pop : 0 < populationSpecificGap)
     (h_noise : 0 < noiseVar)
     (h_n : 0 < nTarget)
@@ -3058,12 +3024,12 @@ theorem amortized_per_population_adaptation_cost_falls_with_task_count
         metaLearnedTransferGapSq wShared wTarget deviation k₁ :=
     metaLearnedTransferGapSq_strictMono
       wShared wTarget deviation populationSpecificGap
-      k₁ k₂ h_pop h_k₁ h_more_tasks h_shared_orth h_norm h_pair
+      k₁ k₂ h_pop h_k₁ h_more_tasks hdev
   have h_gap₂_pos :
       0 < metaLearnedTransferGapSq wShared wTarget deviation k₂ :=
     metaLearnedTransferGapSq_pos
       wShared wTarget deviation populationSpecificGap
-      k₂ h_pop h_k₂ h_shared_orth h_norm h_pair
+      k₂ h_pop h_k₂ hdev
   have h_mse_order :
       optimalFineTuningMSE
           (metaLearnedTransferGapSq wShared wTarget deviation k₂)
@@ -3108,12 +3074,7 @@ theorem metaLearned_deployedTransferTargetR2_strictMono
     (deviation : ℕ → Fin p → ℝ)
     (populationSpecificGap : ℝ)
     (k₁ k₂ : ℕ)
-    (h_shared_orth :
-      ∀ j < k₂, dotProduct (fun i ↦ wShared i - wTarget i) (deviation j) = 0)
-    (h_norm :
-      ∀ j < k₂, dotProduct (deviation j) (deviation j) = populationSpecificGap)
-    (h_pair :
-      ∀ j < k₂, ∀ l < k₂, j ≠ l -> dotProduct (deviation j) (deviation l) = 0)
+    (hdev : MetaLearningDeviations wShared wTarget deviation populationSpecificGap k₂)
     (h_pop : 0 < populationSpecificGap)
     (h_k₁ : 0 < k₁)
     (h_more_tasks : k₁ < k₂) :
@@ -3130,7 +3091,7 @@ theorem metaLearned_deployedTransferTargetR2_strictMono
         metaLearnedTransferGapSq wShared wTarget deviation k₁ :=
     metaLearnedTransferGapSq_strictMono
       wShared wTarget deviation populationSpecificGap
-      k₁ k₂ h_pop h_k₁ h_more_tasks h_shared_orth h_norm h_pair
+      k₁ k₂ h_pop h_k₁ h_more_tasks hdev
   unfold deployedTransferTargetR2 oracleTransportAdaptationGain
   linarith
 
@@ -3176,6 +3137,15 @@ theorem subunit_effect_correlation_prevents_attaining_target_heritability
 noncomputable def privateArchitectureTransferCeiling
     (h2_target f_private M : ℝ) : ℝ :=
   h2_target * (1 - f_private) * sharedLDFromMigration M
+
+/-- Reference evaluation.  The value is computed through the definitions this body calls, but
+the theorem states a number: an inequality or an invariance leaves a family of bodies
+satisfying it, and a value does not. -/
+theorem privateArchitectureTransferCeiling_at_reference_point :
+    privateArchitectureTransferCeiling 1 1 1 = 0 := by
+  norm_num [privateArchitectureTransferCeiling, sharedLDFromMigration]
+
+
 
 /-- **A positive private causal fraction lowers the transferable `R²` ceiling.**
     In the architecture-aware transfer model above, compare a trait with

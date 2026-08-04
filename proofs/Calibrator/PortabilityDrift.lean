@@ -2745,6 +2745,14 @@ correlation decays exponentially with recombination distance and divergence.
 noncomputable def ldCorrelationDecay (distance fstGap lambda : ℝ) : ℝ :=
   Real.exp (-(lambda * fstGap * distance))
 
+/-- Reference evaluation.  The value is computed through the definitions this body calls, but
+the theorem states a number: an inequality or an invariance leaves a family of bodies
+satisfying it, and a value does not. -/
+theorem ldCorrelationDecay_at_reference_point :
+    ldCorrelationDecay 0 0 0 = 1 := by
+  norm_num [ldCorrelationDecay]
+
+
 /-- For positive divergence scale, LD correlation strictly decreases with distance. -/
 theorem ldCorrelationDecay_strictAnti_distance
     (d1 d2 fstGap lambda : ℝ)
@@ -6120,6 +6128,14 @@ already-derived `fstMigrationDriftEquilibrium`. -/
 noncomputable def sharedLD_from_equilibrium (Ne m : ℝ) : ℝ :=
   1 - fstMigrationDriftEquilibrium Ne m
 
+/-- Reference evaluation.  The value is computed through the definitions this body calls, but
+the theorem states a number: an inequality or an invariance leaves a family of bodies
+satisfying it, and a value does not. -/
+theorem sharedLD_from_equilibrium_at_reference_point :
+    sharedLD_from_equilibrium 1 1 = 4 / 5 := by
+  norm_num [sharedLD_from_equilibrium, fstMigrationDriftEquilibrium]
+
+
 /-- The shared LD fraction derived from Fst equilibrium equals M/(1+M).
     This is the formal derivation: starting from Fst = 1/(1+M), we obtain
     shared_LD = 1 - 1/(1+M) = M/(1+M). -/
@@ -6759,14 +6775,15 @@ theorem fstMigrationDriftEquilibrium_ratio_form (Ne m : ℝ)
     This is still only the recurrence's coarse allele-frequency benchmark,
     not a mechanistic portability law. -/
 noncomputable def neutralAFBenchmarkFromRecurrence (Ne m : ℝ) : ℝ :=
-  1 - fstMigrationDriftEquilibrium Ne m
+  sharedLD_from_equilibrium Ne m
 
 /-- The recurrence-derived neutral allele-frequency benchmark equals
 `4Nm / (4Nm + 1)`. -/
 theorem neutralAFBenchmarkFromRecurrence_eq (Ne m : ℝ)
     (hNe : 0 < Ne) (hm : 0 ≤ m) :
     neutralAFBenchmarkFromRecurrence Ne m = 4 * Ne * m / (4 * Ne * m + 1) := by
-  unfold neutralAFBenchmarkFromRecurrence fstMigrationDriftEquilibrium
+  unfold neutralAFBenchmarkFromRecurrence sharedLD_from_equilibrium
+    fstMigrationDriftEquilibrium
   have hden : 4 * Ne * m + 1 ≠ 0 := by nlinarith
   field_simp [hden]
   ring_nf

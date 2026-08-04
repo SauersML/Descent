@@ -279,6 +279,15 @@ noncomputable def totalCovarianceMomentInformation
   m * covarianceMomentPermeability
     covarianceDerivative secondMoment fourthMoment
 
+/-- Reference evaluation.  The value is computed through the definitions this body calls, but
+the theorem states a number: an inequality or an invariance leaves a family of bodies
+satisfying it, and a value does not. -/
+theorem totalCovarianceMomentInformation_at_reference_point :
+    totalCovarianceMomentInformation 2 2 2 2 = -4 := by
+  norm_num [totalCovarianceMomentInformation, centeredSquareVarianceFromMoments,
+    covarianceMomentPermeability]
+
+
 /-- Effective target replicate count required to match a source experiment's total
 information when per-replicate permeability changes.  Counts are real-valued design
 quantities; an implemented study rounds upward. -/
@@ -833,9 +842,11 @@ noncomputable def twoChannelMomentInnovationInformation
 
 /-- With a vanishing denominator Mathlib returns `0`, which is a value this quantity can also
 take legitimately, so the branch is named rather than left to be inferred from the result. -/
-theorem twoChannelMomentInnovationInformation_at_zero_denominator_is_junk (firstNoise secondNoise sharedNoise firstResponse secondResponse : ℝ)
+theorem twoChannelMomentInnovationInformation_at_zero_denominator_is_junk
+    (firstNoise secondNoise sharedNoise firstResponse secondResponse : ℝ)
     (hzero : twoChannelConditionalMomentNoise firstNoise secondNoise sharedNoise = 0) :
-    twoChannelMomentInnovationInformation firstNoise secondNoise sharedNoise firstResponse secondResponse = 0 := by
+    twoChannelMomentInnovationInformation firstNoise secondNoise sharedNoise firstResponse
+      secondResponse = 0 := by
   unfold twoChannelMomentInnovationInformation
   rw [hzero, div_zero]
 
@@ -1061,7 +1072,7 @@ whitening; biologically it can arise from overlapping LD, haplotypes, ancestry t
 longitudinal sampling. -/
 noncomputable def twoChannelWhitenedDerivative
     (first second shared : ℝ) : Matrix (Fin 2) (Fin 2) ℝ :=
-  ![![first, shared], ![shared, second]]
+  twoChannelMomentPrecision first second shared
 
 /-- **Exact two-channel correlated law.** Off-diagonal response contributes `shared²`
 to permeability in addition to the two diagonal terms. It must not be discarded merely
@@ -1072,7 +1083,7 @@ theorem twoChannelWhitenedDerivative_permeability
         (twoChannelWhitenedDerivative first second shared) =
       (1 / 2 : ℝ) * (first ^ 2 + second ^ 2) + shared ^ 2 := by
   simp [multivariateGaussianPermeability, frobeniusNormSq,
-    twoChannelWhitenedDerivative, Fin.sum_univ_two]
+    twoChannelWhitenedDerivative, twoChannelMomentPrecision, Fin.sum_univ_two]
   ring
 
 /-- A genuine shared covariance response strictly increases information relative to the
@@ -1101,6 +1112,14 @@ noncomputable def covarianceTangentEstimatorVarianceFromMoments
     (m covarianceDerivative secondMoment fourthMoment : ℝ) : ℝ :=
   centeredSquareVarianceFromMoments secondMoment fourthMoment /
     (m * covarianceDerivative ^ 2)
+
+/-- Reference evaluation.  The value is computed through the definitions this body calls, but
+the theorem states a number: an inequality or an invariance leaves a family of bodies
+satisfying it, and a value does not. -/
+theorem covarianceTangentEstimatorVarianceFromMoments_at_reference_point :
+    covarianceTangentEstimatorVarianceFromMoments 1 1 1 1 = 0 := by
+  norm_num [covarianceTangentEstimatorVarianceFromMoments, centeredSquareVarianceFromMoments]
+
 
 /-- **covarianceTangentEstimatorVarianceFromMoments at zero m, named.** At zero replicates the
 estimator has no sampling distribution and its variance is undefined. Lean returns `0`, the

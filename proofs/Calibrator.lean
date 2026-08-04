@@ -13,6 +13,7 @@ import Calibrator.DemographicCapacity
 import Calibrator.DriftRegime
 import Calibrator.BlindnessRegistry
 import Calibrator.OpenQuestions
+import Calibrator.TrafficInvariantSeparation
 import Calibrator.TransportIdentities
 import Calibrator.SecondMomentShift
 import Calibrator.QuadraticShift
@@ -129,6 +130,89 @@ import Calibrator.BundleRigidity.Telescope
 import Calibrator.BundleRigidity.TwoAtom
 
 namespace Calibrator
+
+/-- The pioneer share map is the same saturation coordinate already used for coalescent time.
+The arguments have different biological meanings, but the common algebraic map is made explicit
+rather than left as two silently parallel formulas. -/
+theorem pioneerWeightFraction_eq_fstFromTau (w : ℝ) :
+    XiFromMarks.pioneerWeightFraction w = fstFromTau w := rfl
+
+/-- The same saturation coordinate also appears in the migration/LD chart; this identity keeps
+the shared formula explicit without conflating the three scientific arguments. -/
+theorem pioneerWeightFraction_eq_sharedLDFromMigration (w : ℝ) :
+    XiFromMarks.pioneerWeightFraction w = sharedLDFromMigration w := rfl
+
+/-! ### One formula, several readings
+
+Each theorem below records that two definitions in different modules compute the same
+function.  The arguments they serve are different -- that is why both names exist -- but the
+identity is stated rather than left for a reader to notice, so a correction to either side
+that does not reach the other stops the build. -/
+
+/-- The pooled-environment correlation is a convex combination, and so is the average phase
+interaction: mass on the first argument, the rest on the second. -/
+theorem averagePhaseInteraction_eq_pooledEnvironmentCorrelation
+    (freq_cis interaction_cis interaction_trans : ℝ) :
+    averagePhaseInteraction freq_cis interaction_cis interaction_trans =
+      pooledEnvironmentCorrelation interaction_cis interaction_trans freq_cis := by
+  unfold averagePhaseInteraction pooledEnvironmentCorrelation
+  ring
+
+/-- The ancestry-specific effect is the same convex combination at the ancestry weight. -/
+theorem ancestrySpecificEffect_eq_pooledEnvironmentCorrelation
+    (beta_pop1 beta_pop2 alpha : ℝ) :
+    ancestrySpecificEffect beta_pop1 beta_pop2 alpha =
+      pooledEnvironmentCorrelation beta_pop1 beta_pop2 alpha := by
+  unfold ancestrySpecificEffect pooledEnvironmentCorrelation
+  ring
+
+/-- The spike-and-slab variance is the same convex combination at the slab probability. -/
+theorem spikeAndSlabVariance_eq_pooledEnvironmentCorrelation
+    (pi sigma_sq_large sigma_sq_small : ℝ) :
+    spikeAndSlabVariance pi sigma_sq_large sigma_sq_small =
+      pooledEnvironmentCorrelation sigma_sq_large sigma_sq_small pi := by
+  unfold spikeAndSlabVariance pooledEnvironmentCorrelation
+  ring
+
+/-- The overlap-gap profile of the metric chart is the landscape's population overlap
+profile: one formula, read once as a metric and once as a landscape. -/
+theorem ogpOverlapProfile_eq_populationOverlapProfile (q x : ℝ) :
+    ogpOverlapProfile q x = populationOverlapProfile q x := rfl
+
+/-- The epoch sample size of the metric chart is the epoch lineage sample size. -/
+theorem epochSampleSize_eq_epochLineageSampleSize (K : ℕ) :
+    epochSampleSize K = epochLineageSampleSize K := rfl
+
+/-- The two-state kernel that never moves is the one-hot weight on `Fin 2`: one on the
+diagonal, zero off it, whichever way the equality is written. -/
+theorem stayKernel_eq_oneHotWeight (i j : Fin 2) :
+    stayKernel i j = oneHotWeight (R := ℝ) i j := by
+  unfold stayKernel oneHotWeight
+  by_cases h : i = j
+  · simp [h]
+  · simp [h, Ne.symm h]
+
+/-- The context-preserving transition is that same one-hot weight. -/
+theorem persistentTransition_eq_oneHotWeight (x y : BinaryBiologicalState) :
+    persistentTransition x y = oneHotWeight (R := ℝ) x y := by
+  unfold persistentTransition oneHotWeight
+  by_cases h : x = y
+  · simp [h]
+  · simp [h, Ne.symm h]
+
+/-- The readout quality and the context-preserving transition are one Kronecker delta. -/
+theorem contextMatchQuality_eq_persistentTransition (x y : BinaryBiologicalState) :
+    contextMatchQuality x y = persistentTransition x y := rfl
+
+/-- And it is the one-hot weight, which is the third name for that delta. -/
+theorem contextMatchQuality_eq_oneHotWeight (x y : BinaryBiologicalState) :
+    contextMatchQuality x y = oneHotWeight (R := ℝ) x y := by
+  rw [contextMatchQuality_eq_persistentTransition, persistentTransition_eq_oneHotWeight]
+
+/-- The stable sieve dimension and the condensation critical degree are the same logarithmic
+law, at different arguments: `log L / κ` and `log N / c`. -/
+theorem stableSieveDimension_eq_criticalDegree (kappa L : ℝ) :
+    SpectrumIdentifiability.stableSieveDimension kappa L = criticalDegree L kappa := rfl
 
 /-
 THE WARNING WAS ALREADY WRITTEN DOWN. READ THE PROSE NEXT TO WHAT YOU ARE ABOUT
@@ -341,6 +425,16 @@ def sigmaT : Matrix (Fin 2) (Fin 2) ℝ := ![![1, 1], ![1, 1]]
 
 /-- Source cross-covariances. -/
 def crossS : Fin 2 → ℝ := ![1, 0]
+
+/-- The truth configuration of the overlap-energy witness is the cross-population selector. -/
+theorem overlapEnergyTruth_eq_crossS : overlapEnergyTruth = crossS := rfl
+
+/-- The positive configuration is the reordering score. -/
+theorem overlapEnergyPositive_eq_reorderScore : overlapEnergyPositive = reorderScore := rfl
+
+/-- And it is the two-ancestry conditional, which is the third name for `![0, 1]`. -/
+theorem overlapEnergyPositive_eq_twoAncestryConditional :
+    overlapEnergyPositive = twoAncestryConditional := rfl
 
 /-! Target cross-covariances were restated here as `crossT`. The same witness
 vector `![1, 1]` is `DGP.ldWitnessTargetCross`, and the restatement has been

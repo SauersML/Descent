@@ -732,6 +732,20 @@ theorem Var_Delta_Mu_eq_ploidy_form (V_A fst : ℝ) :
     Var_Delta_Mu V_A fst = ploidy * fst * V_A := by
   unfold Var_Delta_Mu ploidy; ring
 
+/-- **The one-population PGS drift variance carries the same ploidy factor.**
+
+`pgsDriftVariance_one_pop` is the single-population form of `Var_Delta_Mu`, and its `2` is
+the same convention: `ploidy · F_ST · V_A`.  The two definitions are alpha-equivalent, and
+this pair of theorems is what says so rather than leaving it to the reader. -/
+theorem pgsDriftVariance_one_pop_eq_ploidy_form (V_A fst : ℝ) :
+    pgsDriftVariance_one_pop V_A fst = ploidy * fst * V_A := by
+  unfold pgsDriftVariance_one_pop ploidy; ring
+
+/-- The two drift-variance definitions are the same quantity. -/
+theorem pgsDriftVariance_one_pop_eq_Var_Delta_Mu (V_A fst : ℝ) :
+    pgsDriftVariance_one_pop V_A fst = Var_Delta_Mu V_A fst := by
+  rw [pgsDriftVariance_one_pop_eq_ploidy_form, Var_Delta_Mu_eq_ploidy_form]
+
 /-! ### Genotype variance inside sums and products
 
 Eight further definitions carry `2 p (1 - p)` as a factor rather than as their

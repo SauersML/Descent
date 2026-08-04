@@ -349,7 +349,8 @@ noncomputable def relativePortabilityLoss {q : ℕ}
 
 /-- With a vanishing denominator Mathlib returns `0`, which is a value this quantity can also
 take legitimately, so the branch is named rather than left to be inferred from the result. -/
-theorem relativePortabilityLoss_at_zero_denominator_is_junk {q : ℕ} (model : SNPArchitecturePortabilityModel q)
+theorem relativePortabilityLoss_at_zero_denominator_is_junk {q : ℕ}
+    (model : SNPArchitecturePortabilityModel q)
     (hzero : model.sourceEffectMass = 0) :
     relativePortabilityLoss model = 0 := by
   unfold relativePortabilityLoss
@@ -364,7 +365,8 @@ noncomputable def portabilityScore {q : ℕ}
 
 /-- With a vanishing denominator Mathlib returns `0`, which is a value this quantity can also
 take legitimately, so the branch is named rather than left to be inferred from the result. -/
-theorem portabilityScore_at_zero_denominator_is_junk {q : ℕ} (model : SNPArchitecturePortabilityModel q)
+theorem portabilityScore_at_zero_denominator_is_junk {q : ℕ}
+    (model : SNPArchitecturePortabilityModel q)
     (hzero : model.sourceEffectMass = 0) :
     portabilityScore model = 0 := by
   unfold portabilityScore
@@ -1148,7 +1150,8 @@ noncomputable def weightedRetentionUpperBound {q : ℕ}
 
 /-- With a vanishing denominator Mathlib returns `0`, which is a value this quantity can also
 take legitimately, so the branch is named rather than left to be inferred from the result. -/
-theorem weightedRetentionUpperBound_at_zero_denominator_is_junk {q : ℕ} (model : SNPArchitecturePortabilityModel q) (retentionUpper : Fin q → ℝ)
+theorem weightedRetentionUpperBound_at_zero_denominator_is_junk {q : ℕ}
+    (model : SNPArchitecturePortabilityModel q) (retentionUpper : Fin q → ℝ)
     (hzero : model.sourceEffectMass = 0) :
     weightedRetentionUpperBound model retentionUpper = 0 := by
   unfold weightedRetentionUpperBound

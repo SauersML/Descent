@@ -499,6 +499,14 @@ structure ThresholdRegime (m : LiabilityThresholdModel) (T' μ_control r2_lo r2_
   /-- The specificity numerator is in the same regime. -/
   spec_num_nonneg : 0 ≤ T' - Real.sqrt r2_lo * Real.sqrt m.h_sq * μ_control
 
+/-- **The regime is inhabited.**  A theorem conditioned on a bundle nothing satisfies is
+true and empty; this witness makes the statements below statements about something.  At
+`R² = 0` the score carries no signal, the sensitivity numerator is the threshold itself, and
+both sign conditions hold at the origin. -/
+theorem thresholdRegime_witness :
+    ThresholdRegime LiabilityThresholdModel.witness 0 (-1) 0 1 :=
+  ⟨by norm_num, le_rfl, le_rfl, by norm_num, by simp, by simp⟩
+
 /-- **Both exact operating-point metrics improve together with `R²`.**
 
 Every utility comparison below -- NRI, net benefit, decision-curve -- opens by deriving these

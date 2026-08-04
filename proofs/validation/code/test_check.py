@@ -412,6 +412,17 @@ elab "cheat" : tactic => do
   pure ()
 """),
      "installs custom syntax"),
+    # The missing-argument screen, in both directions.  A definition that COMPUTES
+    # statistical power without a significance threshold is the defect it exists for.
+    ("identifications", "a power definition with no significance threshold",
+     clean_plus("Calibrator/Sub.lean", CLEAN_SUB + """
+/-- Power of the association test at effect size `beta`.
+
+    Empirical status: UNTESTED. -/
+noncomputable def gwasDetectionPower (beta sampleSize : ℝ) : ℝ :=
+  beta * sampleSize
+"""),
+     "takes no alpha-like argument"),
     # A macro at TERM level rewrites the statement a reader thinks they read.
     ("identifications", "a term-level macro",
      clean_plus("Calibrator/Sub.lean", CLEAN_SUB + """
@@ -635,6 +646,34 @@ theorem periodic_step_run (weightBound eventBound benefitBound harmBound netBoun
   have hspan2 : 0 ≤ |span2Bound t| := abs_nonneg (span2Bound t)
   trivial
 """)),
+    # `power` is two words.  An exponent taken as a natural-number argument is the
+    # algebraic one, and asking a sum of q-th powers for an alpha level is asking the
+    # wrong question.  `auc` is likewise a word, not the letters inside `cauchy`.
+    ("identifications", "an exponent named power, and AUC's letters inside another word",
+     clean_plus("Calibrator/Sub.lean", CLEAN_SUB + """
+/-- Sum of `power`-th entry powers of a matrix.
+
+    Empirical status: UNTESTED. -/
+noncomputable def entryPowerTotal (m : Matrix (Fin 2) (Fin 2) ℝ) (power : ℕ) : ℝ :=
+  ∑ i, ∑ j, m i j ^ power
+
+/-- Conditioning profile of a Cauchy matrix at parameter `theta`.
+
+    Empirical status: UNTESTED. -/
+noncomputable def cauchyProfileScale (theta : ℝ) : ℝ :=
+  theta * theta
+"""),
+     "takes no"),
+    # A `Prop` relating two metrics takes them as arguments; it computes neither.
+    ("identifications", "a Prop relating two given AUC values",
+     clean_plus("Calibrator/Sub.lean", CLEAN_SUB + """
+/-- Discrimination falls from source to target.
+
+    Empirical status: UNTESTED. -/
+def AucFallsAcrossPopulations (sourceAuc targetAuc : ℝ) : Prop :=
+  targetAuc < sourceAuc
+"""),
+     "takes no"),
     ("duplication", "trivially true statements that coincide by accident",
      clean_plus("Calibrator/Sub.lean", CLEAN_SUB + """
 theorem nat_self (n : ℕ) : n = n := rfl

@@ -365,7 +365,8 @@ noncomputable def componentPosterior (q : Component → Genome → ℝ)
 
 /-- With a vanishing denominator Mathlib returns `0`, which is a value this quantity can also
 take legitimately, so the branch is named rather than left to be inferred from the result. -/
-theorem componentPosterior_at_zero_denominator_is_junk (q : Component → Genome → ℝ) (w0 : Component → ℝ) (g : Genome) (k : Component)
+theorem componentPosterior_at_zero_denominator_is_junk
+    (q : Component → Genome → ℝ) (w0 : Component → ℝ) (g : Genome) (k : Component)
     (hzero : componentMixtureDensity q w0 g = 0) :
     componentPosterior q w0 g k = 0 := by
   unfold componentPosterior

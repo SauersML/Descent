@@ -68,7 +68,8 @@ noncomputable def mechanisticPortabilityRatio {p q : ℕ}
 
 /-- With a vanishing denominator Mathlib returns `0`, which is a value this quantity can also
 take legitimately, so the branch is named rather than left to be inferred from the result. -/
-theorem mechanisticPortabilityRatio_at_zero_denominator_is_junk {p q : ℕ} (m : CrossPopulationMetricModel p q)
+theorem mechanisticPortabilityRatio_at_zero_denominator_is_junk {p q : ℕ}
+    (m : CrossPopulationMetricModel p q)
     (hzero : r2FromSourceWeights m Pop.source = 0) :
     mechanisticPortabilityRatio m = 0 := by
   unfold mechanisticPortabilityRatio
@@ -615,12 +616,15 @@ noncomputable def popgenDrivenProxyGenerationalModel :
 its three positivity proofs -- read the same as the ones in `singleLocusGenerationalWitness`
 below, and the duplication guard reports that.
 
-It stands.  Those fields are dimension-generic in TEXT and not in TYPE: this witness carries
-two tags and the scaffold carries one, so `contextCrossSource` is `Fin 2 → ℝ` here and
-`Fin 1 → ℝ` there, and no function returns both.  Sharing them would take a parent structure
-holding the dimension-free fields, which is a change to `CrossPopulationGenerationalModel`
-in another module and to every witness in the corpus -- a larger claim than the repetition
-is worth, and one that should be made for its own reasons rather than to satisfy a count. -/
+It stands, but not for the reason first written here.  These five fields are dimension-free:
+their types are `ℝ` and `ℕ → ℝ`, with no `Fin` in sight.  What blocks sharing them is that a
+field assignment lives inside a structure literal and cannot be lifted out of one: a shared
+constructor would have to be generic in both dimensions and therefore take every OTHER field
+-- some twenty of them, most dimension-indexed -- as an argument, which trades five repeated
+lines for twenty argument names at each call.  That is a worse corpus, so the repetition
+stays and is reported.  A parent structure holding the dimension-free fields would fix it
+properly; it is a change to `CrossPopulationGenerationalModel` in another module and to every
+witness, and it should be made for its own reasons rather than to satisfy a count. -/
 
 /-- The source weights in the nondegenerate two-tag proxy witness are the
 source proxy covariances themselves, because the source scored-SNP covariance

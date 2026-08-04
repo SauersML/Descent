@@ -1748,11 +1748,17 @@ theorem ogpTransitionPolynomial_root :
   nlinarith [h]
 
 /-- **And so the transition in the coupling itself is the golden-ratio
-conjugate**, since squaring it returns the root above. -/
+conjugate**, since squaring it returns the root above.
+
+Stated as a root of `ogpTransitionPolynomial` rather than as the bare arithmetic identity
+`((√5 - 1)/2)² = (3 - √5)/2`: the name claims something about the overlap-gap transition,
+and this is that claim.  The arithmetic is still what proves it. -/
 theorem ogpCouplingThreshold_sq :
-    ((Real.sqrt 5 - 1) / 2) ^ 2 = (3 - Real.sqrt 5) / 2 := by
+    ogpTransitionPolynomial (((Real.sqrt 5 - 1) / 2) ^ 2) = 0 ∧
+      ((Real.sqrt 5 - 1) / 2) ^ 2 = (3 - Real.sqrt 5) / 2 := by
   have h : Real.sqrt 5 ^ 2 = 5 := Real.sq_sqrt (by norm_num)
-  nlinarith [h]
+  have hsq : ((Real.sqrt 5 - 1) / 2) ^ 2 = (3 - Real.sqrt 5) / 2 := by nlinarith [h]
+  exact ⟨by rw [hsq]; exact ogpTransitionPolynomial_root, hsq⟩
 
 /-- **The minority fraction that removes the barrier at maximal coupling.**
 
@@ -2898,7 +2904,8 @@ Valid for `0 ≤ kappa < 1`.  At `kappa = 1` the expression is not the limit —
 `Real.tan (π/2) = 0` under Mathlib's junk-value convention — so the endpoint
 must be read off from the integral rather than from the formula.
 
-Empirical status: **VALIDATED** (`proofs/validation/empirical/simcov/battery_ldband.py`). The docstring named
+Empirical status: **VALIDATED**
+(`proofs/validation/empirical/simcov/battery_ldband.py`). The docstring named
     the integral this is the closed form OF and said the identification was not
     packaged as a theorem; it is now measured. Adaptive quadrature over nine
     cells, `rho` in {0.2, 0.5, 0.8} crossed with `kappa` in {0.1, 0.3, 0.6}: agreement to
@@ -2934,7 +2941,8 @@ reciprocal symbol; the `1 + ρ²` is the numerator of
 `Calibrator.ImitationRigidity.ldWhiteningGain`, the per-variant inverse-kernel
 trace.  The integral evaluation itself is not packaged as a caller-supplied theorem.
 
-Empirical status: **VALIDATED** (`proofs/validation/empirical/simcov/battery_ldband.py`). The docstring named
+Empirical status: **VALIDATED**
+(`proofs/validation/empirical/simcov/battery_ldband.py`). The docstring named
     the integral this is the closed form OF and said the identification was not
     packaged as a theorem; it is now measured. Adaptive quadrature over nine
     cells, `rho` in {0.2, 0.5, 0.8} crossed with `kappa` in {0.1, 0.3, 0.6}: agreement to
@@ -2950,7 +2958,8 @@ noncomputable def ldBandDetectionShare (decay kappa : ℝ) : ℝ :=
 /-- **The detection weight pruning throws away**, over and above the fraction of
 directions it discards.  This is the quantity the frontier prices.
 
-Empirical status: **VALIDATED** (`proofs/validation/empirical/simcov/battery_ldband.py`). The docstring named
+Empirical status: **VALIDATED**
+(`proofs/validation/empirical/simcov/battery_ldband.py`). The docstring named
     the integral this is the closed form OF and said the identification was not
     packaged as a theorem; it is now measured. Adaptive quadrature over nine
     cells, `rho` in {0.2, 0.5, 0.8} crossed with `kappa` in {0.1, 0.3, 0.6}: agreement to

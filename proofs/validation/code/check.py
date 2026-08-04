@@ -572,6 +572,19 @@ def ident_preceding_docstring(lines, i):
         j -= 1
     return "\n".join(lines[max(0, j):end + 1])
 
+def ident_result_kind(args: str) -> str:
+    """`"N::"` when a definition returns `ℕ`, and the empty string otherwise.
+
+    The coarsest split that separates truncated natural subtraction from real
+    subtraction, and deliberately no finer: a result type compared as WRITTEN would
+    separate `Fin 2 → ℝ` from `TwoCoordinateConfiguration` and from `Fin 2 -> Real`,
+    three spellings of one type, and every group it split that way would be a finding
+    silenced rather than a false one removed.
+    """
+    result = args.rsplit(":", 1)[-1].strip() if ":" in args else ""
+    return "N::" if result in ("ℕ", "Nat") else ""
+
+
 def ident_lean_files():
     return (glob.glob(os.path.join(IDENT_ROOT, "Calibrator", "*.lean")) +
             glob.glob(os.path.join(IDENT_ROOT, "Calibrator", "*", "*.lean")) +
@@ -675,6 +688,10 @@ def run_identifications() -> int:
                 bad.append(f"{rel}: {reason}")
 
     # convention drift
+    DOMAIN = re.compile(r"fst|drift|selection|herit|linkage|allele|geno|migrat|coalesc|mutation|"
+                        r"epistat|domin|recomb|ancestr|spike|admix|haplo|polygenic|prevalence|"
+                        r"liability|penetrance|pgs|gwas|singleton|winners|power|ncp|effect", re.I)
+    DOMAIN_CASED = re.compile(r"^ld|(?:^|[a-z0-9])LD(?=[A-Z_]|$)")
     defpat = re.compile(r'^(?:noncomputable )?def ([A-Za-z_0-9\'.]+)(.*?)(?=\n(?:/-|@\[|theorem |noncomputable |def |abbrev |structure |section |end |namespace ))', re.S | re.M)
     # A convention restatement is a 2 or a 4 adjacent to a population-genetic
     # parameter: 2 Ne, 4 Ne mu, 2 p (1 - p). The 2 in a Gaussian density or in
@@ -706,7 +723,16 @@ def run_identifications() -> int:
             body = m.group(2)
             body = body.split(":=", 1)[1] if ":=" in body else ""
             body = re.sub(r'\^\s*[0-9]+', '', body)
-            if mult.search(body) and m.group(1).split(".")[-1] not in tied:
+            short = m.group(1).split(".")[-1]
+            # A ploidy convention is restated inside a POPULATION-GENETIC definition.
+            # Without that condition the screen read `2 * (Real.log (1 + θ ...))` in a
+            # Cauchy conditioning profile as a ploidy factor, because `θ` is in the
+            # neighbouring-symbol list for the sake of `4 Ne mu`. Tying that two to
+            # `ploidy` would have recorded a claim about genetics the definition does
+            # not make.
+            if not (DOMAIN.search(short) or DOMAIN_CASED.search(short)):
+                continue
+            if mult.search(body) and short not in tied:
                 sites += 1
     # 3b. Undeclared empirical definitions. Every definition whose name carries
     #     domain vocabulary, or whose body contains a modelling constant, is a
@@ -746,10 +772,6 @@ def run_identifications() -> int:
     #     segment. Written case-sensitively, and as a separate pattern rather
     #     than an inline `(?-i:...)` scope, which needs Python 3.11 and would
     #     fail on the cluster's 3.6.
-    DOMAIN = re.compile(r"fst|drift|selection|herit|linkage|allele|geno|migrat|coalesc|mutation|"
-                        r"epistat|domin|recomb|ancestr|spike|admix|haplo|polygenic|prevalence|"
-                        r"liability|penetrance|pgs|gwas|singleton|winners|power|ncp|effect", re.I)
-    DOMAIN_CASED = re.compile(r"^ld|(?:^|[a-z0-9])LD(?=[A-Z_]|$)")
     undeclared = []
     for f in ident_lean_files():
         raw = open(f).read().split("\n")
@@ -790,11 +812,31 @@ def run_identifications() -> int:
             if len(body) > 80:
                 continue
             bound = set(re.findall(r"[A-Za-z_][A-Za-z_0-9₀-₉']*", args))
+            # Binders collapse to ONE placeholder, which is coarser than the
+            # alpha-equivalence screen below, and knowingly so.
+            #
+            # It has a false positive it cannot avoid: `dotProduct left right` and
+            # `dotProduct v v` normalise alike, so `configurationOverlap` at `Fin 2`
+            # and `transplantSqNorm` at `Fin 3` are reported as one quantity, and no
+            # equation between them typechecks. Numbering the binders positionally
+            # fixes that pair -- and takes this screen from 2 findings to 65, because
+            # the coarse key was ALSO grouping unrelated arities into hubs where each
+            # member counted as tied through some sibling. Those 63 are latent in the
+            # corpus, not invented by the sharpening; they are a corpus-sized project
+            # and they are recorded here rather than either silently kept hidden or
+            # dumped into a report nobody can act on. Do not pin a budget to them.
             norm = re.sub(r"[A-Za-z_][A-Za-z_0-9₀-₉'.]*",
                           lambda t: "V" if t.group(0) in bound else t.group(0), body)
             if not re.search(r"[0-9]|[A-Za-z_]{3,}", norm.replace("V", "")):
                 continue
-            groups.setdefault(norm, []).append((mod, name.split(".")[-1]))
+            # `n - 1` at `ℕ` and `x - 1` at `ℝ` read alike and are different
+            # operations -- one truncates -- and no equation between them typechecks,
+            # so grouping them asks for a repair nobody can write. Only THAT split is
+            # made: keying on the result type as written would separate `Fin 2 → ℝ`
+            # from `TwoCoordinateConfiguration`, which are the same type under two
+            # spellings, and would silence findings rather than sharpen them.
+            groups.setdefault(ident_result_kind(args) + norm, []).append(
+                (mod, name.split(".")[-1]))
     all_stmts = []
     for f in ident_lean_files():
         for b in re.split(r"\n(?=@\[simp\]\s*\n?theorem |theorem |private theorem )",
@@ -841,7 +883,13 @@ def run_identifications() -> int:
     REQUIRED_ARGS = [
         (r"power",            [r"alpha", r"z_?alpha", r"threshold", r"level"],
          "statistical power depends on the significance threshold"),
-        (r"auc",              [r"prev", r"k\b", r"pi\b", r"baseRate"],
+        # NOT a bare `auc` under `re.I`: those three letters sit inside `cauchy`, and
+        # the pattern spent two findings on `cauchyConditioningProfile` and
+        # `CauchyConditioningStationary` -- a Cauchy matrix's conditioning does not
+        # depend on disease prevalence, and no argument would have repaired it.
+        # Written case-sensitively, as `AUC` standing as its own camelCase segment.
+        (re.compile(r"(?:AUC|Auc|auc)(?![a-z])"),
+                              [r"prev", r"k\b", r"pi\b", r"baseRate"],
          "AUC under a threshold model depends on prevalence"),
         (r"winner|curse",     [r"alpha", r"z_?alpha", r"threshold"],
          "selection bias depends on the selection threshold"),
@@ -878,19 +926,42 @@ def run_identifications() -> int:
     # silent one is the failure this screen exists to stop.
     REGIME_DECLARED = re.compile(r"\bRegime:|\blimit\b|\bmany-deme\b|"
                                  r"\bapproximation\b|\basymptotic\b", re.I)
+    # `power` is two words. Statistical power is a probability and depends on the
+    # significance threshold; an algebraic power is an exponent and depends on
+    # nothing but itself. A definition that TAKES the exponent as a natural-number
+    # argument -- `entryPowerSum (covariance) (order : ℕ)`, `ldPowerScore
+    # (covariance) (power : ℕ) (j)` -- is using the second word, and asking it for
+    # a significance threshold is asking a sum of `q`-th powers to declare an
+    # alpha level.
+    EXPONENT_ARG = re.compile(r"\b(power|order|exponent|degree)\b[^:)]*:\s*ℕ")
     missing = []
+    REQUIRED_ARGS = [(p if hasattr(p, "search") else re.compile(p, re.I), a, w)
+                     for p, a, w in REQUIRED_ARGS]
     for f in ident_lean_files():
         raw_lines = open(f).read().split("\n")
         body_all = ident_strip_comments(open(f).read())
-        for m in re.finditer(r"^(?:noncomputable )?def ([A-Za-z_0-9'.]+)([^:]*):", body_all, re.M):
+        # The signature runs to `:=`, not to the first colon.  Stopping at the first
+        # colon showed this screen only the FIRST binder, so a definition that takes
+        # the argument in its second binder was reported for not taking it at all.
+        for m in re.finditer(r"^(?:noncomputable )?def ([A-Za-z_0-9'.]+)"
+                             r"((?:(?!:=|\bwhere\b)[\s\S])*)(?::=|\bwhere\b)",
+                             body_all, re.M):
             name, args = m.group(1).split(".")[-1], m.group(2)
             if name in PREVALENCE_FREE or re.search(r"gaussian|interval|approximation", name, re.I):
                 continue   # name declares the model it is exact for, or is a wrapper
             doc = ident_preceding_docstring(raw_lines, body_all[:m.start()].count("\n"))
+            # A `Prop` RELATING metrics does not compute one, so it cannot have
+            # omitted an argument the computation depends on: `AucDropsAndCitlWorsens`
+            # takes the two AUCs as arguments, and whatever prevalence they were read
+            # at is already inside them.
+            if re.search(r":\s*Prop\s*$", args.rstrip()):
+                continue
             for pat, needed, why in REQUIRED_ARGS:
-                if not re.search(pat, name, re.I):
+                if not pat.search(name):
                     continue
                 if any(re.search(a, args, re.I) for a in needed):
+                    continue
+                if pat.pattern == r"power" and EXPONENT_ARG.search(args):
                     continue
                 if REGIME_DECLARED.search(doc):
                     continue   # omission is exact in a regime the docstring names
@@ -1258,7 +1329,11 @@ def run_identifications() -> int:
         rel = os.path.relpath(f, IDENT_ROOT)
         for m in list(valuedef.finditer(src)) + list(eqndef.finditer(src)):
             name, args, body = m.group(1).split(".")[-1], m.group(2), m.group(3)
-            norm = alpha_normal(args, body)
+            # `ℕ`-valued and `ℝ`-valued bodies that read alike are not the same
+            # operation -- natural subtraction truncates -- and no equation between
+            # them typechecks. That one split, and no finer one: see
+            # `ident_result_kind`.
+            norm = ident_result_kind(args) + alpha_normal(args, body)
             # Pure operator shape is not a shared quantity: `a + b` coincides
             # everywhere. Require a constant or a named function, as 3c does.
             if not re.search(r"[0-9]|[A-Za-z_]{3,}", re.sub(r"\bV[0-9]+\b", "", norm)):
@@ -2066,10 +2141,24 @@ def run_identifications() -> int:
     for tname, stmt in global_theorems:
         if not DOMAIN_WORD.search(tname):
             continue
-        goal = goal_of(statement_of(full_decl.get(tname, stmt)))
-        if set(re.findall(IDENT, goal)) & corpus_vocab:
+        signature = statement_of(full_decl.get(tname, stmt))
+        goal = goal_of(signature)
+        goal_idents = set(re.findall(IDENT, goal))
+        if goal_idents & corpus_vocab:
             continue
-        domain_named_arithmetic.append(
+        # A hypothesis can earn the name too, but only if it constrains what the
+        # goal talks about. `continental_portability_forces_two_thirds_tagging_loss`
+        # bounds `shared_ld` GIVEN that `taggedDriftR2RatioCorrected` takes a stated
+        # value at it: the corpus quantity is in the hypothesis and the variable it
+        # pins is in the goal, so the claim is about genetics and the name is honest.
+        # An unrelated hypothesis earns nothing -- the shared variable is the test.
+        hyps = signature[:len(signature) - len(goal)] if goal and goal in signature else ""
+        for hyp in re.findall(r"\([^()]*:[^()]*\)", hyps):
+            hyp_idents = set(re.findall(IDENT, hyp))
+            if (hyp_idents & corpus_vocab) and (hyp_idents & goal_idents):
+                break
+        else:
+            domain_named_arithmetic.append(
             "`%s` names genetics but its goal mentions no constant this corpus "
             "defines" % tname)
     if DOMAIN_NAMED_ARITHMETIC_BUDGET is None:

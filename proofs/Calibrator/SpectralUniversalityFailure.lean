@@ -133,7 +133,11 @@ noncomputable def cumulantTensorEnergy
     (order : ℕ) (tensor : (Fin order → Row) → ℝ) : ℝ :=
   ∑ indices, tensor indices ^ 2
 
-/-- The two-vertex, `order`-parallel-edge traffic observable. -/
+/-- The two-vertex, `order`-parallel-edge traffic observable.
+
+Empirical status: UNTESTED. The sum is algebra on a covariance matrix. The empirical
+claim in its neighbourhood -- that this quantity separates LD matrices that the spectrum
+cannot tell apart -- is proved below on explicit witnesses, not measured on data. -/
 noncomputable def entryPowerSum
     (covariance : Matrix Locus Locus ℝ) (order : ℕ) : ℝ :=
   ∑ left, ∑ right, covariance left right ^ order
@@ -325,7 +329,11 @@ theorem fourthTensorEnergy_pushedFourthCumulantTensor
   ring
 
 /-- The power-`power` LD score of one locus.  Power two is the usual LD score; power four is
-the per-locus statistic detecting symmetric non-Gaussian orientation effects. -/
+the per-locus statistic detecting symmetric non-Gaussian orientation effects.
+
+Empirical status: UNTESTED. Power two is the standard LD score and is measured routinely
+elsewhere; the fourth-power statistic named here has not been computed on any panel in this
+development, and nothing below claims it has. -/
 noncomputable def ldPowerScore
     (covariance : Matrix Locus Locus ℝ) (power : ℕ) (j : Locus) : ℝ :=
   ∑ i, covariance i j ^ power
@@ -762,7 +770,10 @@ theorem exists_isospectral_blocks_with_distinct_entryCubeMean :
 
 /-! ## Biology-facing names -/
 
-/-- The order-`q` orientation-sensitive LD traffic invariant in the locus coordinate basis. -/
+/-- The order-`q` orientation-sensitive LD traffic invariant in the locus coordinate basis.
+
+Empirical status: UNTESTED. A renaming of `entryPowerSum` in biological vocabulary, carrying
+that definition's status: algebra, with no panel computation behind it. -/
 noncomputable def ldOrientationInvariant {Locus : Type*} [Fintype Locus]
     (order : ℕ) (ld : Matrix Locus Locus ℝ) : ℝ :=
   entryPowerSum ld order
@@ -779,7 +790,10 @@ theorem independentArchitecture_cumulantEnergy_eq_ldOrientationInvariant
         ldOrientationInvariant order (gramCovariance ldSquareRoot) := by
   exact cumulantTensorEnergy_pushedCumulantTensor order ldSquareRoot effectCumulant
 
-/-- The orientation-sensitive third-order LD invariant in the locus coordinate basis. -/
+/-- The orientation-sensitive third-order LD invariant in the locus coordinate basis.
+
+Empirical status: UNTESTED, as for `ldOrientationInvariant`: algebra on the LD matrix, never
+evaluated on a real one here. -/
 noncomputable def ldOrientationThirdInvariant {Locus : Type*} [Fintype Locus]
     (ld : Matrix Locus Locus ℝ) : ℝ :=
   entryCubeSum ld
@@ -805,7 +819,10 @@ theorem symmetricArchitecture_thirdMomentEnergy_eq_zero
   simp
 
 /-- The orientation-sensitive fourth-order LD invariant in the locus coordinate basis.  It is
-the summed fourth-power LD score and remains visible for symmetric sparse effect priors. -/
+the summed fourth-power LD score and remains visible for symmetric sparse effect priors.
+
+Empirical status: UNTESTED. "Remains visible" is proved on the explicit witness pair below,
+at one dimension and one prior; it is not a measurement on genotype data. -/
 noncomputable def ldOrientationFourthInvariant {Locus : Type*} [Fintype Locus]
     (ld : Matrix Locus Locus ℝ) : ℝ :=
   entryFourthSum ld

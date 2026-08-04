@@ -204,7 +204,7 @@ theorem closedPopulation_het_eq_neutralDriftFactor (Ne H₀ : ℝ) (hH : 0 < H�
     The verdict gates returned LEAD rather than FALSIFIED, correctly, because no
     positive control had been declared.
 
-    A measurement becomes possible exactly when the derivation the paragraph
+    A measurement becomes possible only once the derivation the paragraph
     above says is missing is supplied -- fixing the dependence of `s_correction`
     on selection strength, locus count and `Ne`. Until then this definition is
     counted among the unmeasured, which it is, and no simulation should be built

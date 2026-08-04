@@ -37,7 +37,11 @@ open MeasureTheory
 
 /-- Rate at which a specified `k`-tuple among `b` active lineages merges in a
 `Λ`-coalescent.  Natural-number subtraction makes the definition total; the biological range
-is `2 ≤ k ≤ b`. -/
+is `2 ≤ k ≤ b`.
+
+Empirical status: UNTESTED. The formula is the definition of a `Λ`-coalescent, so it is a
+modelling frame rather than a claim; which `Λ` a real population has -- and whether one
+exists -- is what this file shows the pairwise spectrum cannot answer. -/
 noncomputable def lambdaCoalescentMergerRate
     (Λ : Measure ℝ) (b k : ℕ) : ℝ :=
   ∫ x, x ^ (k - 2) * (1 - x) ^ (b - k) ∂Λ

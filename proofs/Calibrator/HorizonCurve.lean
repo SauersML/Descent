@@ -113,8 +113,11 @@ def stayKernel (i j : Fin 2) : ℝ := if i = j then 1 else 0
 def swapKernel (i j : Fin 2) : ℝ := if i = j then 0 else 1
 
 /-- Efficiency at `y` of the design chosen optimally at `x`: full at the state it was built
-for, none at the other. This is the two-endpoint integrand the naive average cannot see. -/
-def agreement (i j : Fin 2) : ℝ := if i = j then 1 else 0
+for, none at the other. This is the two-endpoint integrand the naive average cannot see.
+
+It is `stayKernel` under the reading this file uses it for -- one function, two names for
+what it means here -- and it calls that definition rather than restating its body. -/
+def agreement (i j : Fin 2) : ℝ := stayKernel i j
 
 /-- Regret: choose the design optimally at `x`, evaluate it at `y`. -/
 noncomputable def regretCurve (π : Fin 2 → ℝ) (P ρ : Fin 2 → Fin 2 → ℝ) : ℝ :=
