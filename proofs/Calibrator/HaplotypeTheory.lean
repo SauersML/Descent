@@ -278,6 +278,17 @@ noncomputable def dosageTransportBias
   |averagePhaseInteraction freq_cis_target interaction_cis interaction_trans -
     averagePhaseInteraction freq_cis_source interaction_cis interaction_trans|
 
+/-- **The bias is bounded by the two phase interactions it compares.** The closed form below
+holds for every positive multiple of this distance; the triangle bound does not, so it is what
+fixes the multiple at one. -/
+theorem dosageTransportBias_le_add_abs
+    (freq_cis_source freq_cis_target interaction_cis interaction_trans : ℝ) :
+    dosageTransportBias freq_cis_source freq_cis_target interaction_cis interaction_trans
+      ≤ |averagePhaseInteraction freq_cis_target interaction_cis interaction_trans|
+        + |averagePhaseInteraction freq_cis_source interaction_cis interaction_trans| := by
+  unfold dosageTransportBias
+  exact abs_sub _ _
+
 /-- **Transport bias of a phase-aware haplotype model.**
 
 The model is fitted in the source population, which fixes the pair
@@ -298,6 +309,16 @@ noncomputable def haplotypeTransportBias
     (freq_cis_target pred_cis pred_trans interaction_cis interaction_trans : ℝ) : ℝ :=
   |averagePhaseInteraction freq_cis_target pred_cis pred_trans -
     averagePhaseInteraction freq_cis_target interaction_cis interaction_trans|
+
+/-- **Predicting the true interaction leaves no transport bias.** The closed form does not say
+where the bias vanishes; this does, and a body carrying an additive floor would satisfy the
+first and not this. -/
+theorem haplotypeTransportBias_self
+    (freq_cis_target interaction_cis interaction_trans : ℝ) :
+    haplotypeTransportBias freq_cis_target interaction_cis interaction_trans
+      interaction_cis interaction_trans = 0 := by
+  unfold haplotypeTransportBias
+  simp
 
 /-- The dosage-only phase-misspecification error has the exact variance form
 `f(1-f)(δ_cis - δ_trans)^2`. -/
