@@ -392,7 +392,7 @@ kernel valued in `[a,b]` pays only `(b-a)/2` against the `ℓ¹` total-variation
 sharp (and is the one needed by binary biological readouts); `abs_sectionMean_sub_le` alone loses
 a factor of two because it forgets normalization. -/
 theorem abs_sectionMean_sub_le_half_range (f μ ν : Genome → ℝ) (a b : ℝ)
-    (hab : a ≤ b) (hf : ∀ g, a ≤ f g ∧ f g ≤ b)
+    (hf : ∀ g, a ≤ f g ∧ f g ≤ b)
     (hμ : ∑ g, μ g = 1) (hν : ∑ g, ν g = 1) :
     |conditionalSectionMean f μ - conditionalSectionMean f ν| ≤
       ((b - a) / 2) * totalVariationGap μ ν := by

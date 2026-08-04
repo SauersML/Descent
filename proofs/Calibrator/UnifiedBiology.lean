@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Calibrator.DeclaredInteractionClass
+import Calibrator.ContinuumCalibration
 import Calibrator.DescentGeometry
 import Calibrator.DirichletTransfer
 import Calibrator.ErgodicCovariancePencil
@@ -331,7 +332,7 @@ theorem contextMatch_sectionOscillation_le_half_totalVariationDiameter
       (fun g : TransportPair ↦ contextMatchQuality g.1 g.2)
       (fiberConditional (fun g : TransportPair ↦ g.2) (binaryTransportFamily persists) y)
       (fiberConditional (fun g : TransportPair ↦ g.2) (binaryTransportFamily switches) y)
-      0 1 (by norm_num) hquality
+      0 1 hquality
       (sum_fiberConditional (fun g : TransportPair ↦ g.2)
         (binaryTransportFamily persists) y hpersist)
       (sum_fiberConditional (fun g : TransportPair ↦ g.2)
@@ -437,6 +438,77 @@ theorem contextMatch_sectionOscillation_eq_one (y : BinaryBiologicalState) :
     rw [contextMatchQuality_value_persistent y, contextMatchQuality_value_switching y] at hlower
     norm_num at hlower ⊢
     exact hlower
+
+/-! ## Continuum-calibration core, instantiated in biology -/
+
+/-- With no information favoring persistence over switching after observing the target context,
+the posterior on the two biological dynamics is uniform. -/
+noncomputable def binaryDynamicsPosterior
+    (_ : BinaryBiologicalState) (_ : Bool) : ℝ := 1 / 2
+
+/-- Conditional source-adapted quality for one dynamics and one target context, constructed from
+the same fiber conditional used by the descent theorem above. -/
+noncomputable def binaryConditionalContextMatch
+    (persists : Bool) (y : BinaryBiologicalState) : ℝ :=
+  conditionalSectionMean (fun g : TransportPair ↦ contextMatchQuality g.1 g.2)
+    (fiberConditional (fun g : TransportPair ↦ g.2) (binaryTransportFamily persists) y)
+
+/-- The constructed conditional-quality field is one for persistence and zero for switching. -/
+@[simp] theorem binaryConditionalContextMatch_eq_indicator
+    (persists : Bool) (y : BinaryBiologicalState) :
+    binaryConditionalContextMatch persists y = if persists then 1 else 0 := by
+  cases persists
+  · simp [binaryConditionalContextMatch, contextMatchQuality_value_switching]
+  · simp [binaryConditionalContextMatch, contextMatchQuality_value_persistent]
+
+/-- The binary dynamics posterior is normalized on every biological target context. -/
+theorem binaryDynamicsPosterior_sum_eq_one (y : BinaryBiologicalState) :
+    ∑ persists, binaryDynamicsPosterior y persists = 1 := by
+  norm_num [binaryDynamicsPosterior]
+
+/-- Pooling persistence and switching makes the source-adapted quality look exactly one-half on
+every target context.  This is the posterior-mean predictor of the calibration core. -/
+theorem posteriorMean_binaryConditionalContextMatch_eq_half (y : BinaryBiologicalState) :
+    posteriorMean binaryDynamicsPosterior binaryConditionalContextMatch y = 1 / 2 := by
+  norm_num [posteriorMean, binaryDynamicsPosterior]
+
+/-- **Biological drift defect.**  Persistence has conditional quality one and switching has
+quality zero, while the pooled posterior mean is one-half.  Averaging across the two target
+contexts leaves an irreducible squared index-wise calibration defect of exactly `1/4`. -/
+theorem binaryContextMatch_calibrationDriftDefectSq_eq_quarter :
+    calibrationDriftDefectSq binaryStateWeight binaryDynamicsPosterior
+      binaryConditionalContextMatch = 1 / 4 := by
+  have hposterior : binaryDynamicsPosterior =
+      twoIndexPosterior (fun _ : BinaryBiologicalState ↦ 1 / 2) := by
+    funext y persists
+    cases persists <;> norm_num [binaryDynamicsPosterior, twoIndexPosterior]
+  have hconditional : binaryConditionalContextMatch =
+      twoIndexConditional (fun _ : BinaryBiologicalState ↦ 1)
+        (fun _ : BinaryBiologicalState ↦ 0) := by
+    funext persists y
+    rw [binaryConditionalContextMatch_eq_indicator]
+    cases persists <;> norm_num [twoIndexConditional]
+  rw [hposterior, hconditional, twoIndex_calibrationDriftDefectSq_eq]
+  norm_num [binaryStateWeight, Fin.sum_univ_two]
+
+/-- The pooled predictor is perfectly aggregate-calibrated in the persistence/switching model. -/
+theorem binaryContextMatch_aggregateCalibrationEnergy_eq_zero :
+    aggregateCalibrationEnergy binaryStateWeight binaryDynamicsPosterior
+      binaryConditionalContextMatch
+      (posteriorMean binaryDynamicsPosterior binaryConditionalContextMatch) = 0 :=
+  aggregateCalibrationEnergy_posteriorMean _ _ _
+
+/-- **No aggregate/index-wise trade-off in the biological model.**  The same pooled predictor
+that has zero aggregate error has index-wise energy exactly `1/4`, the drift defect.  This is the
+finite biological realization of the continuum program's central Pythagorean obstruction. -/
+theorem binaryContextMatch_indexWiseCalibrationEnergy_eq_quarter :
+    indexWiseCalibrationEnergy binaryStateWeight binaryDynamicsPosterior
+      binaryConditionalContextMatch
+      (posteriorMean binaryDynamicsPosterior binaryConditionalContextMatch) = 1 / 4 := by
+  rw [indexWiseCalibrationEnergy_posteriorMean_eq_driftDefectSq
+    binaryStateWeight binaryDynamicsPosterior binaryConditionalContextMatch
+    binaryDynamicsPosterior_sum_eq_one]
+  exact binaryContextMatch_calibrationDriftDefectSq_eq_quarter
 
 /-! ## The adaptation time and the transport time are one time -/
 

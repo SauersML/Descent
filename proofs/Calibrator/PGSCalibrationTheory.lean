@@ -1701,7 +1701,7 @@ ranking, after which an affine recalibration lands exactly on the target. The pa
 theorem above is the content: the target is not unreachable, it is unreachable *post hoc*. -/
 theorem refit_attains_reordered_target :
     ∃ g : Real -> Real, Monotone g ∧ ∀ i, g (-(reorderScore i)) = reorderTarget i := by
-  refine ⟨fun t => 4 / 5 + 3 / 5 * t, ?_, ?_⟩
+  refine ⟨fun t ↦ 4 / 5 + 3 / 5 * t, ?_, ?_⟩
   · intro u v huv
     simp only
     linarith

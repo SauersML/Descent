@@ -1021,7 +1021,9 @@ noncomputable def pooledConditional {m : ℕ} (π η : Fin m → ℝ) : ℝ := �
 noncomputable def indexwiseLoss {m : ℕ} (π η : Fin m → ℝ) (v : ℝ) : ℝ :=
   ∑ i, π i * (η i - v) ^ 2
 
-/-- Dispersion of the ancestry-specific conditional about the pooled one. -/
+/-- Dispersion of the ancestry-specific conditional about the pooled one.
+
+Empirical status: NOT AN EMPIRICAL CLAIM -- this is the weighted variance of supplied risks. -/
 noncomputable def driftDefect {m : ℕ} (π η : Fin m → ℝ) : ℝ :=
   ∑ i, π i * (η i - pooledConditional π η) ^ 2
 
@@ -1087,11 +1089,20 @@ theorem indexwiseLoss_at_pooled {m : ℕ} (π η : Fin m → ℝ) (hπ : ∑ i, 
 
 /-! #### The worst-ancestry norm is where the tension actually is -/
 
-/-- Two ancestries at unequal mixture weight. -/
+/-- Two ancestries at unequal mixture weight.
+
+Empirical status: NOT AN EMPIRICAL CLAIM -- these rational weights define a proof witness. -/
 noncomputable def twoAncestryWeights : Fin 2 → ℝ := ![3 / 4, 1 / 4]
 
-/-- Their ancestry-specific risks at one covariate value. -/
+/-- Their ancestry-specific risks at one covariate value.
+
+Empirical status: NOT AN EMPIRICAL CLAIM -- these values define a proof witness. -/
 noncomputable def twoAncestryConditional : Fin 2 → ℝ := ![0, 1]
+
+/-- The ancestry-risk witness equals the canonical two-person score witness. -/
+theorem twoAncestryConditional_eq_reorderScore : twoAncestryConditional = reorderScore := by
+  funext i
+  fin_cases i <;> norm_num [twoAncestryConditional, reorderScore]
 
 theorem twoAncestryWeights_sum : ∑ i, twoAncestryWeights i = 1 := by
   unfold twoAncestryWeights
@@ -1117,10 +1128,14 @@ theorem pooledOptimum_worse_in_worst_ancestry :
 
 /-! #### Pooled data cannot identify the drift -/
 
-/-- One drift field over two ancestries. -/
+/-- One drift field over two ancestries.
+
+Empirical status: NOT AN EMPIRICAL CLAIM -- this is an algebraic nonidentifiability witness. -/
 noncomputable def driftFieldA : Fin 2 → ℝ := ![1, -1]
 
-/-- Another, with the ancestries exchanged. -/
+/-- Another, with the ancestries exchanged.
+
+Empirical status: NOT AN EMPIRICAL CLAIM -- this is an algebraic nonidentifiability witness. -/
 noncomputable def driftFieldB : Fin 2 → ℝ := ![-1, 1]
 
 /-- Equal mixture weights. -/
@@ -1162,10 +1177,14 @@ only second order: the true optimum already annihilates the pooled direction, so
 term that would otherwise appear is identically zero.
 -/
 
-/-- Three ancestries at equal mixture weight. -/
+/-- Three ancestries at equal mixture weight.
+
+Empirical status: NOT AN EMPIRICAL CLAIM -- these rational weights define a proof witness. -/
 noncomputable def threeAncestryWeights : Fin 3 → ℝ := fun _ ↦ 1 / 3
 
-/-- Their ancestry-specific risks. -/
+/-- Their ancestry-specific risks.
+
+Empirical status: NOT AN EMPIRICAL CLAIM -- these values define a proof witness. -/
 noncomputable def threeAncestryConditional : Fin 3 → ℝ := ![0, 1, 2]
 
 /-- The coarsening that merges the first two ancestries: two cells, at weights `2/3` and `1/3`,
@@ -1235,22 +1254,30 @@ phenotypes across the ancestry range, so the basis is supervised and does not ex
 the error rather than the error, provided the constant coordinate is always retained.
 -/
 
-/-- Four ancestries at equal posterior weight. -/
+/-- Four ancestries at equal posterior weight.
+
+Empirical status: NOT AN EMPIRICAL CLAIM -- these rational weights define a proof witness. -/
 noncomputable def fourAncestryWeights : Fin 4 → ℝ := fun _ ↦ 1 / 4
 
 /-- A candidate ancestry coordinate: the contrast between the first pair and the second. -/
 noncomputable def coordinateHighVariance : Fin 4 → ℝ :=
   fun i ↦ if (i : ℕ) < 2 then 1 else -1
 
-/-- A second candidate: the alternating contrast. -/
+/-- A second candidate: the alternating contrast.
+
+Empirical status: NOT AN EMPIRICAL CLAIM -- this is a finite contrast used in a proof witness. -/
 noncomputable def coordinateHighDrift : Fin 4 → ℝ :=
   fun i ↦ if (i : ℕ) % 2 = 0 then 1 else -1
 
-/-- How the score varies across ancestries. -/
+/-- How the score varies across ancestries.
+
+Empirical status: NOT AN EMPIRICAL CLAIM -- this is a finite score field used in a proof witness. -/
 noncomputable def scoreAcrossAncestry : Fin 4 → ℝ :=
   fun i ↦ if (i : ℕ) < 2 then 1 else -1
 
-/-- How the risk curve drifts across ancestries. -/
+/-- How the risk curve drifts across ancestries.
+
+Empirical status: NOT AN EMPIRICAL CLAIM -- this is a finite drift field used in a proof witness. -/
 noncomputable def driftAcrossAncestry : Fin 4 → ℝ :=
   fun i ↦ if (i : ℕ) % 2 = 0 then 1 else -1
 
@@ -1390,14 +1417,36 @@ that the drift is invisible to that score's level sets -- which is testable, on 
 rather than a matter of opinion.
 -/
 
-/-- Two ancestries at equal weight in the deployment population. -/
+/-- Two ancestries at equal weight in the deployment population.
+
+Empirical status: NOT AN EMPIRICAL CLAIM -- these rational weights define a proof witness. -/
 noncomputable def ancestryPairWeights : Fin 2 → ℝ := ![1 / 2, 1 / 2]
 
-/-- Their risks at one fine covariate value: a large pointwise disagreement. -/
+/-- Their risks at one fine covariate value: a large pointwise disagreement.
+
+Empirical status: NOT AN EMPIRICAL CLAIM -- these values define a proof witness. -/
 noncomputable def fineRiskByAncestry : Fin 2 → ℝ := ![4 / 5, 1 / 5]
 
-/-- Their BIN-AVERAGED risks, which agree: the bin averages the disagreement away. -/
+/-- Their BIN-AVERAGED risks, which agree: the bin averages the disagreement away.
+
+Empirical status: NOT AN EMPIRICAL CLAIM -- these values define a proof witness. -/
 noncomputable def binnedRiskByAncestry : Fin 2 → ℝ := ![1 / 2, 1 / 2]
+
+/-- The equal ancestry-pair weights reuse the earlier uniform two-ancestry quantity. -/
+theorem ancestryPairWeights_eq_uniformTwoWeights : ancestryPairWeights = uniformTwoWeights := by
+  funext i
+  fin_cases i <;> norm_num [ancestryPairWeights, uniformTwoWeights]
+
+/-- The coarsened equal-risk field has the same values as the uniform two-ancestry weights. -/
+theorem binnedRiskByAncestry_eq_uniformTwoWeights :
+    binnedRiskByAncestry = uniformTwoWeights := by
+  funext i
+  fin_cases i <;> norm_num [binnedRiskByAncestry, uniformTwoWeights]
+
+/-- The fine-risk witness equals the earlier reversed target-risk witness. -/
+theorem fineRiskByAncestry_eq_reorderTarget : fineRiskByAncestry = reorderTarget := by
+  funext i
+  fin_cases i <;> norm_num [fineRiskByAncestry, reorderTarget]
 
 /-- **At the bin resolution there is no obstruction at all.** -/
 theorem binnedRisk_driftDefect_zero :
@@ -1437,10 +1486,14 @@ mean it is `21/50` -- strictly worse. The pooled mean is not merely a different 
 suboptimal for the decision.
 -/
 
-/-- A skewed ancestry distribution. -/
+/-- A skewed ancestry distribution.
+
+Empirical status: NOT AN EMPIRICAL CLAIM -- these rational weights define a proof witness. -/
 noncomputable def skewedAncestryWeights : Fin 3 → ℝ := ![2 / 5, 3 / 10, 3 / 10]
 
-/-- Ancestry-conditional risks at the operating point. -/
+/-- Ancestry-conditional risks at the operating point.
+
+Empirical status: NOT AN EMPIRICAL CLAIM -- these values define a proof witness. -/
 noncomputable def skewedAncestryRisks : Fin 3 → ℝ := ![0, 0, 1]
 
 /-- Ancestry-weighted absolute loss, the criterion a threshold decision induces. -/
@@ -1495,6 +1548,79 @@ theorem harmonic_allocation_penalty_equal (n : ℝ) (h : 0 < n) :
     (n + n) * (1 / n + 1 / n) = 4 := by
   field_simp
   ring
+
+/-! #### Recruitment depends on the deployment objective
+
+The preceding equal-weight witness does not justify proportional recruitment for unequal ancestry
+weights.  For the stated `L²(π)` estimation term `∑ πᵢ / nᵢ`, the exact two-cell lower
+bound is attained by square-root (Neyman) allocation, `nᵢ ∝ √πᵢ`.  A worst-ancestry
+objective is different again: with equal per-sample noise it is minimized by equal precision,
+independently of the deployment mixture.  Thus an objective must be fixed before a recruitment
+rule can be called optimal.
+-/
+
+/-- The two-cell contribution to posterior-weighted mean squared estimation error.
+
+Empirical status: NOT AN EMPIRICAL CLAIM -- this is the algebraic objective being optimized. -/
+noncomputable def twoCellL2EstimationPenalty (p n₁ n₂ : ℝ) : ℝ :=
+  p / n₁ + (1 - p) / n₂
+
+/-- The two-cell worst-ancestry estimation error when both cells have equal observation noise.
+
+Empirical status: NOT AN EMPIRICAL CLAIM -- this is the algebraic objective being optimized. -/
+noncomputable def twoCellWorstEstimationPenalty (n₁ n₂ : ℝ) : ℝ :=
+  max (1 / n₁) (1 / n₂)
+
+/-- **The exact `L²(π)` recruitment bound.**  Its right side is the total sample size times
+the weighted estimation penalty.  Equality holds precisely on the square-root allocation ray. -/
+theorem twoCell_l2_allocation_lower_bound (p n₁ n₂ : ℝ)
+    (hp₀ : 0 ≤ p) (hp₁ : p ≤ 1) (hn₁ : 0 < n₁) (hn₂ : 0 < n₂) :
+    (Real.sqrt p + Real.sqrt (1 - p)) ^ 2 ≤
+      (n₁ + n₂) * twoCellL2EstimationPenalty p n₁ n₂ := by
+  have hsqp : Real.sqrt p ^ 2 = p := Real.sq_sqrt hp₀
+  have hsqc : Real.sqrt (1 - p) ^ 2 = 1 - p :=
+    Real.sq_sqrt (sub_nonneg.mpr hp₁)
+  have hscaled :
+      ((n₁ + n₂) * twoCellL2EstimationPenalty p n₁ n₂ -
+          (Real.sqrt p + Real.sqrt (1 - p)) ^ 2) * (n₁ * n₂) =
+        (Real.sqrt p * n₂ - Real.sqrt (1 - p) * n₁) ^ 2 := by
+    unfold twoCellL2EstimationPenalty
+    field_simp [ne_of_gt hn₁, ne_of_gt hn₂]
+    ring_nf
+    rw [hsqp, hsqc]
+    ring
+  nlinarith [sq_nonneg (Real.sqrt p * n₂ - Real.sqrt (1 - p) * n₁),
+    mul_pos hn₁ hn₂]
+
+/-- **Worst-ancestry recruitment has a different lower bound.**  Equal precision minimizes the
+largest cell variance; deployment prevalence does not enter this objective. -/
+theorem twoCell_worst_allocation_lower_bound (n₁ n₂ : ℝ) (hn₁ : 0 < n₁) (hn₂ : 0 < n₂) :
+    2 / (n₁ + n₂) ≤ twoCellWorstEstimationPenalty n₁ n₂ := by
+  rcases le_total n₁ n₂ with h₁₂ | h₂₁
+  · apply le_trans _ (le_max_left _ _)
+    rw [div_le_div_iff₀ (add_pos hn₁ hn₂) hn₁]
+    nlinarith
+  · apply le_trans _ (le_max_right _ _)
+    rw [div_le_div_iff₀ (add_pos hn₁ hn₂) hn₂]
+    nlinarith
+
+/-- Equal recruitment attains the worst-ancestry lower bound exactly. -/
+theorem twoCell_worst_allocation_equal (n : ℝ) (hn : 0 < n) :
+    twoCellWorstEstimationPenalty n n = 2 / (n + n) := by
+  unfold twoCellWorstEstimationPenalty
+  rw [max_self]
+  field_simp
+  norm_num
+
+/-- **Proportional recruitment can be strictly suboptimal even for the `L²(π)` objective.**
+At deployment weight `4/5`, both allocations below use `15n` samples.  The square-root allocation
+`10n:5n` has lower weighted estimation error than the proportional allocation `12n:3n`. -/
+theorem squareRoot_allocation_beats_proportional (n : ℝ) (hn : 0 < n) :
+    twoCellL2EstimationPenalty (4 / 5) (10 * n) (5 * n) <
+      twoCellL2EstimationPenalty (4 / 5) (12 * n) (3 * n) := by
+  unfold twoCellL2EstimationPenalty
+  field_simp [ne_of_gt hn]
+  nlinarith
 
 
 /-! #### Resolution monotonicity in general, not just on a witness

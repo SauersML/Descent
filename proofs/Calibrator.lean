@@ -51,6 +51,7 @@ import Calibrator.PowerAnalysis
 import Calibrator.CovarianceStructure
 import Calibrator.CausalInference
 import Calibrator.CertificateGrading
+import Calibrator.ContinuumCalibration
 import Calibrator.FiniteMinimax
 import Calibrator.FiniteMinimaxBoundary
 import Calibrator.PencilEnvironment
