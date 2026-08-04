@@ -2497,30 +2497,46 @@ theorem abs_two_products_sub_le (x y z w v : ℝ) :
     _ = |x| * |y| + |z| * |w| + |v| := by
         rw [abs_mul, abs_mul]
 
+section ComponentwiseCalibrationBudget
+
+/-! The three theorems below are about one deployed pathway measured against one true
+pathway under one componentwise error budget, and each restated that budget in full:
+seventeen lines of hypotheses, three times.  The budget is a `variable` block now, and
+`include` makes it a premise of each theorem exactly as writing it out did.
+
+It is deliberately NOT a structure.  A bundle of hypotheses with no construction that
+satisfies it is what the `identifications` guard calls an unwitnessed bundle, and this
+corpus has been bitten by that shape; a `variable` block carries the same hypotheses
+without inventing a certificate. -/
+
+variable {T : ℕ} (model : LongitudinalTreatmentModel T)
+  (truePath predictedPath : ClinicalPathway T)
+  (εWeight εEvent εBenefit εHarm
+    weightBound eventBound benefitBound netBound : Fin T → ℝ)
+  (h_weight_err : ∀ t,
+    |predictedPath.followupWeight t - truePath.followupWeight t| ≤ εWeight t)
+  (h_event_err : ∀ t,
+    |predictedPath.eventProb t - truePath.eventProb t| ≤ εEvent t)
+  (h_benefit_err : ∀ t,
+    |predictedPath.treatmentBenefit t - truePath.treatmentBenefit t| ≤ εBenefit t)
+  (h_harm_err : ∀ t,
+    |predictedPath.treatmentHarm t - truePath.treatmentHarm t| ≤ εHarm t)
+  (h_weight_bound : ∀ t, |predictedPath.followupWeight t| ≤ weightBound t)
+  (h_event_bound : ∀ t, |predictedPath.eventProb t| ≤ eventBound t)
+  (h_benefit_bound : ∀ t, |truePath.treatmentBenefit t| ≤ benefitBound t)
+  (h_net_bound : ∀ t,
+    |truePath.eventProb t * truePath.treatmentBenefit t -
+        truePath.treatmentHarm t| ≤ netBound t)
+
+include h_weight_err h_event_err h_benefit_err h_harm_err
+  h_weight_bound h_event_bound h_benefit_bound h_net_bound
+
 /-- **Componentwise calibration error bound for longitudinal treatment margin.**
     If the deployed pathway approximates the true censoring/eligibility weights,
     event probabilities, treatment-benefit heterogeneity, and treatment harm
     with bounded error, then the exact finite-horizon treatment-margin error is
     bounded by the corresponding weighted sum of those componentwise errors. -/
-theorem abs_treatmentMargin_error_le_componentwise_calibration_bound
-    {T : ℕ} (model : LongitudinalTreatmentModel T)
-    (truePath predictedPath : ClinicalPathway T)
-    (εWeight εEvent εBenefit εHarm
-      weightBound eventBound benefitBound netBound : Fin T → ℝ)
-    (h_weight_err : ∀ t,
-      |predictedPath.followupWeight t - truePath.followupWeight t| ≤ εWeight t)
-    (h_event_err : ∀ t,
-      |predictedPath.eventProb t - truePath.eventProb t| ≤ εEvent t)
-    (h_benefit_err : ∀ t,
-      |predictedPath.treatmentBenefit t - truePath.treatmentBenefit t| ≤ εBenefit t)
-    (h_harm_err : ∀ t,
-      |predictedPath.treatmentHarm t - truePath.treatmentHarm t| ≤ εHarm t)
-    (h_weight_bound : ∀ t, |predictedPath.followupWeight t| ≤ weightBound t)
-    (h_event_bound : ∀ t, |predictedPath.eventProb t| ≤ eventBound t)
-    (h_benefit_bound : ∀ t, |truePath.treatmentBenefit t| ≤ benefitBound t)
-    (h_net_bound : ∀ t,
-      |truePath.eventProb t * truePath.treatmentBenefit t -
-          truePath.treatmentHarm t| ≤ netBound t) :
+theorem abs_treatmentMargin_error_le_componentwise_calibration_bound :
     |treatmentMargin model predictedPath - treatmentMargin model truePath| ≤
       Finset.univ.sum (fun t ↦
         model.discount t *
@@ -2626,25 +2642,7 @@ theorem abs_treatmentMargin_error_le_componentwise_calibration_bound
 
 /-- **Exact longitudinal QALY-loss bound from calibration errors in the event
     process, heterogeneous treatment effects, harms, and censoring weights.** -/
-theorem qalyLoss_le_componentwise_calibration_bound
-    {T : ℕ} (model : LongitudinalTreatmentModel T)
-    (truePath predictedPath : ClinicalPathway T)
-    (εWeight εEvent εBenefit εHarm
-      weightBound eventBound benefitBound netBound : Fin T → ℝ)
-    (h_weight_err : ∀ t,
-      |predictedPath.followupWeight t - truePath.followupWeight t| ≤ εWeight t)
-    (h_event_err : ∀ t,
-      |predictedPath.eventProb t - truePath.eventProb t| ≤ εEvent t)
-    (h_benefit_err : ∀ t,
-      |predictedPath.treatmentBenefit t - truePath.treatmentBenefit t| ≤ εBenefit t)
-    (h_harm_err : ∀ t,
-      |predictedPath.treatmentHarm t - truePath.treatmentHarm t| ≤ εHarm t)
-    (h_weight_bound : ∀ t, |predictedPath.followupWeight t| ≤ weightBound t)
-    (h_event_bound : ∀ t, |predictedPath.eventProb t| ≤ eventBound t)
-    (h_benefit_bound : ∀ t, |truePath.treatmentBenefit t| ≤ benefitBound t)
-    (h_net_bound : ∀ t,
-      |truePath.eventProb t * truePath.treatmentBenefit t -
-          truePath.treatmentHarm t| ≤ netBound t) :
+theorem qalyLoss_le_componentwise_calibration_bound :
     qalyLoss model truePath predictedPath ≤
       Finset.univ.sum (fun t ↦
         model.discount t *
@@ -2663,24 +2661,6 @@ theorem qalyLoss_le_componentwise_calibration_bound
     longitudinal treatment margin, the deployed and oracle clinical decisions
     coincide exactly and QALY regret vanishes.** -/
 theorem qalyLoss_eq_zero_of_componentwise_calibration_bound_lt_abs_true_margin
-    {T : ℕ} (model : LongitudinalTreatmentModel T)
-    (truePath predictedPath : ClinicalPathway T)
-    (εWeight εEvent εBenefit εHarm
-      weightBound eventBound benefitBound netBound : Fin T → ℝ)
-    (h_weight_err : ∀ t,
-      |predictedPath.followupWeight t - truePath.followupWeight t| ≤ εWeight t)
-    (h_event_err : ∀ t,
-      |predictedPath.eventProb t - truePath.eventProb t| ≤ εEvent t)
-    (h_benefit_err : ∀ t,
-      |predictedPath.treatmentBenefit t - truePath.treatmentBenefit t| ≤ εBenefit t)
-    (h_harm_err : ∀ t,
-      |predictedPath.treatmentHarm t - truePath.treatmentHarm t| ≤ εHarm t)
-    (h_weight_bound : ∀ t, |predictedPath.followupWeight t| ≤ weightBound t)
-    (h_event_bound : ∀ t, |predictedPath.eventProb t| ≤ eventBound t)
-    (h_benefit_bound : ∀ t, |truePath.treatmentBenefit t| ≤ benefitBound t)
-    (h_net_bound : ∀ t,
-      |truePath.eventProb t * truePath.treatmentBenefit t -
-          truePath.treatmentHarm t| ≤ netBound t)
     (h_small :
       Finset.univ.sum (fun t ↦
         model.discount t *
@@ -2698,6 +2678,8 @@ theorem qalyLoss_eq_zero_of_componentwise_calibration_bound_lt_abs_true_margin
       h_weight_err h_event_err h_benefit_err h_harm_err
       h_weight_bound h_event_bound h_benefit_bound h_net_bound)
     h_small
+
+end ComponentwiseCalibrationBudget
 
 /-- **Expected QALY loss from pathway miscalibration.**
     This is the population expectation of exact oracle regret under the
