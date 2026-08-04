@@ -84,7 +84,7 @@ theorem thirdTensorEnergy_pushedThirdMomentTensor
   simp only [pow_two, pow_three]
   simp_rw [Finset.mul_sum, Finset.sum_mul]
   ring_nf
-  simp_rw [Finset.mul_sum, Finset.sum_mul]
+  simp_rw [Fintype.sum_mul_sum]
   ring_nf
 
 end ThirdMomentContraction

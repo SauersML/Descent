@@ -2205,15 +2205,18 @@ off-block entries are zero and every exponent here is positive, so they drop. -/
 theorem multiEntrywisePow_multiBlockD {m : ℕ} (a : Fin m → ℝ) (k : ℕ) :
     multiEntrywisePow (multiBlockD a) k
       = ∑ i, ∑ x, ∑ y, (isoBlockD (a i) x y) ^ (k + 1) := by
+  classical
   unfold multiEntrywisePow multiBlockD
   rw [Fintype.sum_prod_type]
-  refine Finset.sum_congr rfl fun i _ ↦ ?_
-  refine Finset.sum_congr rfl fun x _ ↦ ?_
+  refine Finset.sum_congr rfl fun i _ ↦ Finset.sum_congr rfl fun x _ ↦ ?_
   rw [Fintype.sum_prod_type]
   rw [Finset.sum_eq_single i]
-  · simp
+  · refine Finset.sum_congr rfl fun y _ ↦ ?_
+    simp
   · intro j _ hj
-    simp [hj]
+    refine Finset.sum_eq_zero fun y _ ↦ ?_
+    rw [if_neg (Ne.symm hj)]
+    exact zero_pow (Nat.succ_ne_zero k)
   · intro h
     exact absurd (Finset.mem_univ i) h
 
@@ -2221,15 +2224,18 @@ theorem multiEntrywisePow_multiBlockD {m : ℕ} (a : Fin m → ℝ) (k : ℕ) :
 theorem multiEntrywisePow_multiBlockR {m : ℕ} (a : Fin m → ℝ) (k : ℕ) :
     multiEntrywisePow (multiBlockR a) k
       = ∑ i, ∑ x, ∑ y, (isoBlockR (a i) x y) ^ (k + 1) := by
+  classical
   unfold multiEntrywisePow multiBlockR
   rw [Fintype.sum_prod_type]
-  refine Finset.sum_congr rfl fun i _ ↦ ?_
-  refine Finset.sum_congr rfl fun x _ ↦ ?_
+  refine Finset.sum_congr rfl fun i _ ↦ Finset.sum_congr rfl fun x _ ↦ ?_
   rw [Fintype.sum_prod_type]
   rw [Finset.sum_eq_single i]
-  · simp
+  · refine Finset.sum_congr rfl fun y _ ↦ ?_
+    simp
   · intro j _ hj
-    simp [hj]
+    refine Finset.sum_eq_zero fun y _ ↦ ?_
+    rw [if_neg (Ne.symm hj)]
+    exact zero_pow (Nat.succ_ne_zero k)
   · intro h
     exact absurd (Finset.mem_univ i) h
 

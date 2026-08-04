@@ -208,10 +208,31 @@ noncomputable def pairwiseFstFromBranches (fstS fstT : ℝ) : ℝ :=
     definition it errs -5.4%, -1.2%, +3.4%, +2.4% where the multiplicative map
     errs +0.6%, +7.0%, +13.0%, +14.7%.
 
-    Empirical status: UNTESTED. The four residuals just quoted are recomputed
-    from the table on `pairwiseFstFromBranches` rather than measured in a run of
-    their own, so they are a consistency check on the algebra and not an
-    independent validation. -/
+    Empirical status: **FALSIFIED**
+    (`proofs/validation/empirical/simcov/battery_fix.py`, `test_fst_composition`).
+    Measured against msprime coalescent simulation of a clean split, recombining
+    at `1e-8` so that each replicate carries many independent genealogies,
+    Hudson's `F_ST` as a ratio of averages, 25 replicates of 20 Mb, 50 diploids
+    per deme:
+
+      Ne     t       this def   `coalFst`   simulated   sems off (this def)
+      1000   500       0.3333      0.2000      0.19923            59.1
+      1000   1000      0.5000      0.3333      0.33415            51.9
+      1000   2000      0.6667      0.5000      0.49974            50.6
+
+    On the SAME runs `coalFst` matches to 0.34, 0.25 and 0.08 sems. Two
+    definitions of one quantity disagree and the simulation says which.
+
+    The premise stated above is where it goes wrong: two demes that split `t`
+    generations ago have `E[T_between] = 1 + tau`, NOT `1 + tauS + tauT`.
+    Coalescence times add along a path, but the path to the common ancestor is
+    traversed ONCE -- reaching the ancestral population takes `t` generations,
+    not `t` from each side. Summing both branch taus double-counts the split
+    time, which is exactly the observed `+50` percent.
+
+    Power: the prediction spans 0.3333 to 0.6667 across the design while the
+    measurement spans 0.19923 to 0.49974, so a correct functional form could
+    have matched and this one could not. -/
 noncomputable def pairwiseFstFromBranchTaus (tauS tauT : ℝ) : ℝ :=
   fstFromTau (tauS + tauT)
 
