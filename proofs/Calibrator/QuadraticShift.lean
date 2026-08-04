@@ -17,10 +17,19 @@ All statements are finite-dimensional and allow a singular second-moment
 matrix.  A pseudoinverse is not logically required: the exact excess-risk
 identity follows from any solution of the normal equations `B v = b`.
 
-The final section isolates the exact portability obstruction created by
-singularity. A uniform source-to-target quadratic bound forces every
-source-null direction to have zero target risk; a single source-null direction
-with positive target risk rules out every finite portability constant.
+The pooled-environment section proves that nonnegative covariance energies cannot cancel.
+With nonnegative sampling weights, the pooled kernel is the intersection over exactly the
+positive-weight environments; a second ancestry gives a strict identifiability gain precisely
+when it detects a reference-null direction. That same direction rules out every finite uniform
+reference-to-pool portability constant.
+
+## Main results
+
+- `singular_quadratic_excess_risk_identity`: exact excess risk without invertibility.
+- `finiteEnvironmentCovariancePool_mulVec_eq_zero_iff_active`: active-kernel intersection.
+- `finiteEnvironmentCovariancePool_kernel_ssubset`: exact strict-diversity criterion.
+- `no_uniformQuadraticPortabilityBound_to_finiteEnvironmentPool`: diversity/shift bridge.
+- `best_scalar_correction_attains_floor`: exact post-hoc scalar-correction optimum.
 -/
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -369,7 +378,8 @@ Five statements below are conditioned on the same two facts about the family: ev
 environment's quadratic form is nonnegative, and it vanishes exactly on that environment's
 kernel.  Written out at each theorem, that block was five identical lines repeated five
 times.  It is one property of the family, so it is one structure. -/
-structure PositiveSemidefiniteFamily {κ : Type*} (covariance : κ → Matrix ι ι ℝ) : Prop where
+structure PositiveSemidefiniteFamily {κ : Type*}
+    (covariance : κ → Matrix ι ι ℝ) : Prop where
   /-- Every environment's quadratic form is nonnegative. -/
   energy_nonneg : ∀ environment shift,
     0 ≤ dot shift ((covariance environment).mulVec shift)
