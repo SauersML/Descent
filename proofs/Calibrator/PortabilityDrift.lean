@@ -2357,15 +2357,11 @@ theorem targetCalibratedBrierFromSourceWeights_exact_loss_budget_law
         m.targetPrevalence
         ((predictiveCovarianceFromSourceWeights m Pop.target) ^ 2 /
           scoreVarianceFromSourceWeights m Pop.target)
-        ((m.outcomeVariance Pop.target) +
-          brokenTaggingResidual m +
-          ancestrySpecificLDResidual m +
-          sourceSpecificOverfitResidual m +
-          novelUntaggablePhenotypeResidual m -
+        ((m.outcomeVariance Pop.target) + irreducibleTargetResidualBurden m -
           (predictiveCovarianceFromSourceWeights m Pop.target) ^ 2 /
             scoreVarianceFromSourceWeights m Pop.target) := by
   rw [targetCalibratedBrierFromSourceWeights_exact_metric_portability_law,
-    effectiveTargetOutcomeVariance_eq_targetOutcomeVariance_add_losses]
+    effectiveOutcomeVariance_target]
 
 /-- The direct mechanistic target calibrated Brier coordinate agrees with the
 `R²` chart induced by the same explicit target explained-signal and
@@ -4094,15 +4090,11 @@ theorem targetEqualVarianceGaussianAUCFromSourceWeights_exact_loss_budget_law
       equalVarianceGaussianAUCFromSignalVariance
         ((predictiveCovarianceFromSourceWeights m Pop.target) ^ 2 /
           scoreVarianceFromSourceWeights m Pop.target)
-        ((m.outcomeVariance Pop.target) +
-          brokenTaggingResidual m +
-          ancestrySpecificLDResidual m +
-          sourceSpecificOverfitResidual m +
-          novelUntaggablePhenotypeResidual m -
+        ((m.outcomeVariance Pop.target) + irreducibleTargetResidualBurden m -
           (predictiveCovarianceFromSourceWeights m Pop.target) ^ 2 /
             scoreVarianceFromSourceWeights m Pop.target) := by
   rw [targetEqualVarianceGaussianAUCFromSourceWeights_exact_metric_portability_law,
-    effectiveTargetOutcomeVariance_eq_targetOutcomeVariance_add_losses]
+    effectiveOutcomeVariance_target]
 
 /-- The direct mechanistic target AUC agrees with the `R²` chart induced by the
 same target explained-signal and total-variance decomposition.

@@ -387,15 +387,6 @@ section DiscoveryBias
     this corpus already had to repair. -/
 def hweHeterozygosity (p : ℝ) : ℝ := 2 * p * (1 - p)
 
-/-- **hweHeterozygosity pinned at a reference point.** No theorem in the corpus evaluated this
-definition, so every body agreeing with it in sign and monotonicity was indistinguishable from
-it. At all arguments equal to `1 / 2` it is `1 / 2`, which fixes the coefficients a one-sided
-bound or an invariance leaves free. -/
-theorem hweHeterozygosity_at_reference_point :
-    hweHeterozygosity (1 / 2) = 1 / 2 := by
-  unfold hweHeterozygosity
-  norm_num
-
 /-- **Heterozygosity peaks at one half, where it equals one half.** The coincidence with the
 genotype variance recorded below is an identity between two bodies and does not fix either of
 them; the value at the interior maximum does, and it is the only point at which a mistaken factor
