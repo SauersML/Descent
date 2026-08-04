@@ -928,6 +928,13 @@ theorem Var_Delta_Mu_eq_add_self (V_A fst : ℝ) :
 noncomputable def Expected_Abs_Shift (V_A fstS fstT : ℝ) : ℝ :=
   Real.sqrt (Var_Delta_Mu V_A (fstS + fstT)) * Real.sqrt (2 / Real.pi)
 
+/-- **No additive variance, no shift.** The half-normal constant multiplies a standard deviation,
+so it cannot manufacture a shift out of nothing; a body with an additive offset would. -/
+theorem Expected_Abs_Shift_zero_variance (fstS fstT : ℝ) :
+    Expected_Abs_Shift 0 fstS fstT = 0 := by
+  unfold Expected_Abs_Shift Var_Delta_Mu
+  simp
+
 /-- **The half-normal relation between the mean absolute shift and its variance.** Squaring
 returns exactly `2/π` times the variance, which is the identity that makes this the mean of a
 folded normal rather than any other summary of the same spread. A body carrying a different
@@ -4297,6 +4304,12 @@ theorem targetBrier_strict_gt_source_of_neutralAF_benchmark
     Empirical status: UNTESTED. -/
 noncomputable def expectedSqMeanPGSDiff_pureSplit (V_A fstS fstT : ℝ) : ℝ :=
   Var_Delta_Mu V_A (fstS + fstT)
+
+/-- **The closed form: twice the summed differentiation times the additive variance.** -/
+theorem expectedSqMeanPGSDiff_pureSplit_closed (V_A fstS fstT : ℝ) :
+    expectedSqMeanPGSDiff_pureSplit V_A fstS fstT = 2 * (fstS + fstT) * V_A := by
+  unfold expectedSqMeanPGSDiff_pureSplit Var_Delta_Mu
+  ring
 
 /-- The expected squared mean PGS difference equals `2(F_S + F_T) V_A`. -/
 @[simp] theorem expectedSqMeanPGSDiff_pureSplit_eq (V_A fstS fstT : ℝ) :

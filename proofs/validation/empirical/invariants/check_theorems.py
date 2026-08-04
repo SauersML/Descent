@@ -69,8 +69,12 @@ def build(st, defs, arity, rename, ambiguous, ns, emitted):
     globals dict at call time.
     """
     varnames = [v for v, _, _ in st["variables"]]
-    if not varnames:
-        raise Untranspilable("no scalar variables to sample")
+    # A theorem about a NULLARY constant -- `0 < expanderAgreementFloor`,
+    # `latticeCriticalMaf < 1/4` -- has nothing to sample and was rejected here
+    # for that reason, which reads as a statement outside the fragment. It is
+    # the opposite: with no free variable there is exactly one point to check,
+    # and a mutant of the constant either survives that check or does not. Every
+    # closed-form constant in the corpus was unreachable because of this line.
     params = [(v, t) for v, t, _ in st["variables"]]
     args = ", ".join(pyname(v) for v in varnames)
 
@@ -111,6 +115,21 @@ def evaluate(prop, ns_globals, seed=None, want=40, tries=8000):
     rng = random.Random(_s.sub("theorems") if seed is None else seed)
     ok = fail = undecided = 0
     first = None
+    if not prop["vars"]:
+        # one point, evaluated once; `want` repetitions of a constant would be
+        # the same answer reported forty times
+        backends.OVERFLOWED[0] = False
+        try:
+            v = prop["concl"]()
+        except Exception:
+            return 0, 0, None
+        if backends.OVERFLOWED[0]:
+            return 0, 0, None
+        if v is True:
+            return 1, 0, None
+        if v is False:
+            return 0, 1, {}
+        return 0, 0, None
     for _ in range(tries):
         if ok + fail >= want:
             break
@@ -186,7 +205,8 @@ def main(argv):
             results[st["name"]] = dict(status="hypothesis-not-modelled")
             continue
         ok, fail, first = evaluate(prop, ns)
-        if ok + fail < 5:
+        # a nullary statement has one admissible point, and one is all it has
+        if ok + fail < (1 if not prop["vars"] else 5):
             results[st["name"]] = dict(status="no-admissible-points",
                                        reason="hypotheses rejected almost every "
                                               "sampled point")

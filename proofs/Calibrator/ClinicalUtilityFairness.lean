@@ -713,6 +713,13 @@ section Fairness
 noncomputable def ppv (prev tpr fpr : ℝ) : ℝ :=
   prev * tpr / (prev * tpr + (1 - prev) * fpr)
 
+/-- **Predictive value recovers the true positives from everything predicted positive.** -/
+theorem ppv_mul_predictedPositive (prev tpr fpr : ℝ)
+    (h : prev * tpr + (1 - prev) * fpr ≠ 0) :
+    ppv prev tpr fpr * (prev * tpr + (1 - prev) * fpr) = prev * tpr := by
+  unfold ppv
+  field_simp
+
 /-- **Impossibility: equalized odds + different base rates → PPV differs.**
     Under equalized odds (same TPR and FPR across groups), if prevalence
     differs, then PPV must differ — so predictive parity is violated.

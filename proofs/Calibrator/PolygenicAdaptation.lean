@@ -293,6 +293,14 @@ strength and `N` the effective population size.
 noncomputable def effectCorrelationStabilizingDriftSelection (d s N : ℝ) : ℝ :=
   1 - d / (1 + s * N)
 
+/-- **The decorrelation is the divergence divided by the selection-drift balance.** Membership in
+`[-1, 1]` is shared by every rescaling of the second term; this fixes the scale. -/
+theorem effectCorrelationStabilizingDriftSelection_gap (d s N : ℝ) (h : 1 + s * N ≠ 0) :
+    (1 - effectCorrelationStabilizingDriftSelection d s N) * (1 + s * N) = d := by
+  unfold effectCorrelationStabilizingDriftSelection
+  field_simp
+  ring
+
 /-- **Effect correlation under fluctuating selection**, clamped to the correlation
 range. Fluctuating selection accelerates decorrelation by the factor
 `(1 + f·N)`; the clamp at `-1` is what keeps the quantity a correlation for every
@@ -301,6 +309,14 @@ parameter value rather than only on the range the ordering theorem wants.
     Empirical status: UNTESTED. -/
 noncomputable def effectCorrelationFluctuating (d f N : ℝ) : ℝ :=
   max (-1) (1 - d * (1 + f * N))
+
+/-- **Away from the clamp the correlation is exactly the linear expression.** The clamp is the
+only nonlinearity, which is what the range theorem alone does not say. -/
+theorem effectCorrelationFluctuating_unclamped (d f N : ℝ)
+    (h : (-1 : ℝ) ≤ 1 - d * (1 + f * N)) :
+    effectCorrelationFluctuating d f N = 1 - d * (1 + f * N) := by
+  unfold effectCorrelationFluctuating
+  exact max_eq_right h
 
 /-- Both selected correlations are in `[-1, 1]` by construction, for any
 decorrelation `0 ≤ d ≤ 1` and nonnegative scaled selection. **Do not supply this

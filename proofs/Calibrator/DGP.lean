@@ -2916,6 +2916,13 @@ noncomputable def alleleFreqDivergenceRate (Ne mu m_rate : ℝ) : ℝ :=
   let bigM := 4 * Ne * m_rate
   1 / (2 * Ne * (1 + theta + bigM))
 
+/-- **With neither mutation nor migration the rate is pure drift.** This is the reference point
+that fixes the `2Ne`, which no scale-free property of the formula can. -/
+theorem alleleFreqDivergenceRate_neutral_isolated (Ne : ℝ) :
+    alleleFreqDivergenceRate Ne 0 0 = 1 / (2 * Ne) := by
+  unfold alleleFreqDivergenceRate
+  norm_num
+
 /-- LD breakage rate from recombination.
 
     Empirical status: UNTESTED. -/
