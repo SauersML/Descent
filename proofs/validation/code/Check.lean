@@ -502,9 +502,60 @@ def exempt : List (Name × String) :=
     (`Calibrator.chain, "2 * k + 1 ≠ 0 for k : ℕ"),
     (`Calibrator.uniformOccupancyDistinctHaplotypes, "(2 : ℝ) ^ k ≠ 0") ]
 
-/-- Does this value apply a totalised partial operation? -/
-def usesJunkOp (e : Expr) : Bool :=
-  (Inflation.constsOf e).fold (init := false) fun acc n ↦ acc || junkOps.contains n
+/-- Is this a numeric literal, or a ratio or negation of them?
+
+A divisor built only from numerals cannot vanish, so `(p₁ + p₂) / 2` has no junk
+branch.  The first version of this scan tested only whether `HDiv.hDiv` occurred
+anywhere in the body, and reported 496 definitions -- including every weight
+vector defined as `![3 / 4, 1 / 4]`.  Counting those as open work is the scan's
+own false positive and makes the total meaningless. -/
+partial def isLiteral (e : Expr) : Bool :=
+  match e.getAppFn.constName? with
+  | some ``OfNat.ofNat => true
+  | some ``Neg.neg => match e.getAppArgs[2]? with
+      | some a => isLiteral a
+      | none => false
+  | some ``HDiv.hDiv =>
+      match e.getAppArgs[4]?, e.getAppArgs[5]? with
+      | some a, some b => isLiteral a && isLiteral b
+      | _, _ => false
+  | _ => e.isRawNatLit
+
+/-- Does this application totalise a partial operation on a NON-CONSTANT
+operand?  The operand position differs per operation: `HDiv.hDiv` and `Inv.inv`
+are heterogeneous-operation classes carrying instance arguments ahead of the
+values, while `Real.log` and `Real.sqrt` take their argument first. -/
+def riskyHere (e : Expr) : Bool :=
+  let args := e.getAppArgs
+  match e.getAppFn.constName? with
+  | some ``HDiv.hDiv => match args[5]? with
+      | some d => !isLiteral d
+      | none => false
+  | some ``Inv.inv => match args[2]? with
+      | some d => !isLiteral d
+      | none => false
+  | some ``Real.log => match args[0]? with
+      | some d => !isLiteral d
+      | none => false
+  | some ``Real.sqrt => match args[0]? with
+      | some d => !isLiteral d
+      | none => false
+  | _ => false
+
+/-- Does this value apply a totalised partial operation to something that can
+vanish?  Walks the definition body only; theorem proof terms are never scanned,
+so the exponential-revisit hazard recorded on `Inflation.constsOf` does not
+arise here. -/
+partial def usesJunkOp (e : Expr) : Bool :=
+  riskyHere e ||
+    (match e with
+      | .app f a => usesJunkOp f || usesJunkOp a
+      | .lam _ t b _ => usesJunkOp t || usesJunkOp b
+      | .forallE _ t b _ => usesJunkOp t || usesJunkOp b
+      | .letE _ t v b _ => usesJunkOp t || usesJunkOp v || usesJunkOp b
+      | .mdata _ b => usesJunkOp b
+      | .proj _ _ b => usesJunkOp b
+      | _ => false)
 
 /-- Does the type carry a hypothesis that rules the junk point out before the
 body runs -- a positivity, a nonzero, or an order bound? -/
