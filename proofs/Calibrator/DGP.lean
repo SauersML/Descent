@@ -286,6 +286,14 @@ noncomputable def explainedR2FromTransportMoments
     (scoreOutcomeCov scoreVariance outcomeVariance : ℝ) : ℝ :=
   scoreOutcomeCov ^ 2 / (scoreVariance * outcomeVariance)
 
+/-- **A score that is the outcome explains all of it.** When the covariance and both variances
+coincide the explained fraction is exactly one, which fixes the normalisation; every positive
+multiple of this ratio is a squared covariance over a variance product and would miss it. -/
+theorem explainedR2FromTransportMoments_perfect (v : ℝ) (h : v ≠ 0) :
+    explainedR2FromTransportMoments v v v = 1 := by
+  unfold explainedR2FromTransportMoments
+  field_simp
+
 /-- **Rescaling the score leaves the explained fraction alone.** Multiplying the score by `c`
 multiplies its covariance with the outcome by `c` and its variance by `c²`. This is the property
 that makes the quantity a squared correlation and lets it be compared across scores reported on

@@ -522,6 +522,14 @@ noncomputable def posteriorPredictiveVariance
     (residual_var estimation_var : ℝ) : ℝ :=
   residual_var + estimation_var
 
+/-- **Removing the estimation variance leaves the residual variance.** The two sources of
+predictive uncertainty are separable, which is what licenses reporting them apart; a body that
+combined them any other way would not admit this decomposition. -/
+theorem posteriorPredictiveVariance_sub_estimation (residual_var estimation_var : ℝ) :
+    posteriorPredictiveVariance residual_var estimation_var - estimation_var = residual_var := by
+  unfold posteriorPredictiveVariance
+  ring
+
 /-- Posterior predictive variance ≥ residual variance. -/
 theorem posterior_predictive_wider_than_residual
     (residual_var estimation_var : ℝ)
