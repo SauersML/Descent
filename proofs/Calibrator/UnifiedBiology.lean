@@ -390,16 +390,35 @@ interaction can disappear in either margin and reappear after refinement, while 
 be controlled by either informative variable and reappear after marginalization.  Thus the
 choice of retained covariate is part of the portability theorem, not preprocessing notation. -/
 
-/-- **The conditional-descent boundary is present in the biological core.**  A balanced pure
-interaction is invisible in either ancestry/environment margin but visible jointly, and a
-cohort-varying confounder prevalence changes marginal risk. -/
+/-- **The conditional-descent boundary is present in the biological core.**  Both finite
+probability-law witnesses retain their complete order-theoretic statements.  Moreover, each
+failure is already pairwise: the exact finite gluing theorem rules out a hidden global-selection
+explanation.  Biologically, two cohorts disagree on a charged conditional section; the failure is
+effect modification or confounding, not an off-support choice of conditional version. -/
 theorem conditionalDescent_biological_boundary :
-    (∀ theta : ℝ, ∀ u : BinaryDescentCovariate,
-      (interactionRisk theta u 0 + interactionRisk theta u 1) / 2 = 1 / 2) ∧
-    interactionRisk 0 0 0 ≠ interactionRisk (1 / 4) 0 0 ∧
-    confoundedMarginalRisk 0 ≠ confoundedMarginalRisk 1 := by
-  refine ⟨interactionRisk_average_second, ?_, ?_⟩
-  · exact interactionRisk_joint_separates (by norm_num)
-  · exact confoundedMarginalRisk_separates (by norm_num)
+    ((DescendsAlong (fun g : TwoLociTrait ↦ g.1) admissibleInteractionTraitLaw
+          (conditionalSectionMean traitIndicator) ∧
+        DescendsAlong (fun g : TwoLociTrait ↦ g.2.1) admissibleInteractionTraitLaw
+          (conditionalSectionMean traitIndicator) ∧
+        ¬ DescendsAlong (fun g : TwoLociTrait ↦ (g.1, g.2.1))
+          admissibleInteractionTraitLaw (conditionalSectionMean traitIndicator)) ∧
+      ¬ PairwiseConsistent (fun g : TwoLociTrait ↦ (g.1, g.2.1))
+        admissibleInteractionTraitLaw (conditionalSectionMean traitIndicator)) ∧
+    ((DescendsAlong (fun g : ExposureStratum ↦ g.1) admissibleConfoundedExposureLaw
+          (conditionalSectionMean exposureIndicator) ∧
+        DescendsAlong (fun g : ExposureStratum ↦ g.2) admissibleConfoundedExposureLaw
+          (conditionalSectionMean exposureIndicator) ∧
+        ¬ DescendsAlong trivialLabel admissibleConfoundedExposureLaw
+          (conditionalSectionMean exposureIndicator)) ∧
+      ¬ PairwiseConsistent trivialLabel admissibleConfoundedExposureLaw
+        (conditionalSectionMean exposureIndicator)) := by
+  refine ⟨⟨admissible_interaction_join_obstruction, ?_⟩,
+    ⟨admissible_confounding_meet_obstruction, ?_⟩⟩
+  · intro hpair
+    exact admissible_interaction_join_obstruction.2.2
+      ((descendsAlong_iff_pairwiseConsistent_of_nonempty _ _ _).mpr hpair)
+  · intro hpair
+    exact admissible_confounding_meet_obstruction.2.2
+      ((descendsAlong_iff_pairwiseConsistent_of_nonempty _ _ _).mpr hpair)
 
 end Calibrator

@@ -64,28 +64,47 @@ support: the arbitrary default is used only at contexts with zero mass in every 
 theorem descends_of_overlapConsistent
     (mass : Population → Context → ℝ)
     (conditionalSection : Population → Context → Conditional) (b : Conditional → Value)
-    (defaultValue : Value)
+    (defaultWitness : Context → Value)
     (h : OverlapConsistent mass conditionalSection b) :
     FunctionalDescends mass conditionalSection b := by
   classical
   let witness : Context → Value := fun x ↦
     if hx : ∃ P, 0 < mass P x then b (conditionalSection (Classical.choose hx) x)
-    else defaultValue
+    else defaultWitness x
   refine ⟨witness, ?_⟩
   intro P x hP
   have hx : ∃ Q, 0 < mass Q x := ⟨P, hP⟩
   rw [show witness x = b (conditionalSection (Classical.choose hx) x) by simp [witness, hx]]
   exact h P (Classical.choose hx) x hP (Classical.choose_spec hx)
 
-/-- On finite-valued biological models the dominated characterization is an equivalence. -/
+/-- **Exact gluing characterization.**  Pairwise consistency is the only compatibility
+condition.  The additional conjunct is not biological: it is the logically necessary ability to
+define a total witness on contexts unsupported by every population.  Stating it as
+`Nonempty (Context → Value)` is sharp, including the edge case where `Context` is empty and
+`Value` is not inhabited. -/
 theorem functionalDescends_iff_overlapConsistent
     (mass : Population → Context → ℝ)
-    (conditionalSection : Population → Context → Conditional) (b : Conditional → Value)
-    (defaultValue : Value) :
+    (conditionalSection : Population → Context → Conditional) (b : Conditional → Value) :
     FunctionalDescends mass conditionalSection b ↔
-      OverlapConsistent mass conditionalSection b :=
-  ⟨overlapConsistent_of_descends mass conditionalSection b,
-    descends_of_overlapConsistent mass conditionalSection b defaultValue⟩
+      OverlapConsistent mass conditionalSection b ∧ Nonempty (Context → Value) := by
+  constructor
+  · intro h
+    exact ⟨overlapConsistent_of_descends mass conditionalSection b h, ⟨h.choose⟩⟩
+  · rintro ⟨h, ⟨defaultWitness⟩⟩
+    exact descends_of_overlapConsistent mass conditionalSection b defaultWitness h
+
+/-- In the ordinary case of an inhabited value space, the witness-space obstruction is
+automatic and descent is exactly pairwise overlap consistency. -/
+theorem functionalDescends_iff_overlapConsistent_of_nonempty [Nonempty Value]
+    (mass : Population → Context → ℝ)
+    (conditionalSection : Population → Context → Conditional) (b : Conditional → Value) :
+    FunctionalDescends mass conditionalSection b ↔
+      OverlapConsistent mass conditionalSection b := by
+  constructor
+  · exact overlapConsistent_of_descends mass conditionalSection b
+  · intro h
+    exact (functionalDescends_iff_overlapConsistent mass conditionalSection b).mpr
+      ⟨h, ⟨fun _ ↦ Classical.choice (inferInstance : Nonempty Value)⟩⟩
 
 /-- **Kernel sufficiency is the all-functionals pole.**  If every population uses one shared
 conditional section on its support, every functional descends, with no regularity assumption on

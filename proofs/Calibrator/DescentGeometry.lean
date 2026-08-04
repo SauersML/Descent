@@ -27,8 +27,9 @@ of that set against the functional.
 
 * `functionalDescends_iff_descendsAlong` — the abstract formulation is instantiated: for
   nonnegative laws, `FunctionalDescends` over `fiberConditional` is `DescendsAlong`.
-* `descendsAlong_iff_pairwiseConsistent` — descent is decided by pairs of populations, for an
-  arbitrary (not necessarily countable) family.  At finite resolution there is no further gluing
+* `descendsAlong_iff_pairwiseConsistent` — descent is decided by pairs of populations plus the
+  exact witness-space inhabitation condition, for an arbitrary (not necessarily countable)
+  family.  For ordinary inhabited value spaces there is no further finite-resolution gluing
   condition, which is exactly what fails for undominated families over a continuum.
 * `kernelSufficient_iff_identity_descends` — every functional descends iff the family shares one
   fiber conditional, iff the identity functional descends.  One test settles the whole class.
@@ -147,36 +148,51 @@ theorem labelMass_fiberConditional (π : Genome → Label) (p : Genome → ℝ) 
         exact Finset.sum_congr rfl fun g _ ↦ hterm g
     _ = 1 := div_self h
 
-/-- **Descent is a pairwise condition.**  A label report exists exactly when any two populations
-agree at every label both of them charge.  The family is indexed by an arbitrary type: at finite
-resolution nothing beyond pairwise agreement is required, because counting measure dominates
-every member.  This is the finite form of the dominated theorem, and it is precisely what an
-undominated family over a continuum can violate. -/
+/-- **Exact finite descent characterization.**  A label report exists exactly when any two
+populations agree at every label both charge and the total witness-function space is inhabited.
+The second conjunct handles the degenerate logical case of an empty value type without imposing
+the stronger assumption that `Value` itself is inhabited when `Label` is empty.  For ordinary
+biological value spaces it is automatic.  The family is indexed by an arbitrary type: at finite
+resolution there is no additional gluing obstruction because counting measure dominates every
+member. -/
 theorem descendsAlong_iff_pairwiseConsistent (π : Genome → Label)
-    (P : Population → Genome → ℝ) (b : (Genome → ℝ) → Value) (defaultValue : Value) :
-    DescendsAlong π P b ↔ PairwiseConsistent π P b := by
+    (P : Population → Genome → ℝ) (b : (Genome → ℝ) → Value) :
+    DescendsAlong π P b ↔ PairwiseConsistent π P b ∧ Nonempty (Label → Value) := by
   constructor
-  · rintro ⟨value, hvalue⟩ i j x hi hj
+  · rintro ⟨value, hvalue⟩
+    refine ⟨?_, ⟨value⟩⟩
+    intro i j x hi hj
     rw [hvalue i x hi, hvalue j x hj]
-  · intro hpair
+  · rintro ⟨hpair, ⟨defaultWitness⟩⟩
     classical
     refine ⟨fun x ↦ if h : ∃ i, labelMass π (P i) x ≠ 0 then
-      b (fiberConditional π (P (Classical.choose h)) x) else defaultValue, ?_⟩
+      b (fiberConditional π (P (Classical.choose h)) x) else defaultWitness x, ?_⟩
     intro i x hi
     have hex : ∃ i, labelMass π (P i) x ≠ 0 := ⟨i, hi⟩
     show b (fiberConditional π (P i) x) =
       if h : ∃ i, labelMass π (P i) x ≠ 0 then
-        b (fiberConditional π (P (Classical.choose h)) x) else defaultValue
+        b (fiberConditional π (P (Classical.choose h)) x) else defaultWitness x
     rw [dif_pos hex]
     exact hpair i (Classical.choose hex) x hi (Classical.choose_spec hex)
+
+/-- For an inhabited codomain, finite descent is precisely pairwise consistency. -/
+theorem descendsAlong_iff_pairwiseConsistent_of_nonempty [Nonempty Value]
+    (π : Genome → Label) (P : Population → Genome → ℝ) (b : (Genome → ℝ) → Value) :
+    DescendsAlong π P b ↔ PairwiseConsistent π P b := by
+  constructor
+  · exact fun h ↦ ((descendsAlong_iff_pairwiseConsistent π P b).mp h).1
+  · intro h
+    exact (descendsAlong_iff_pairwiseConsistent π P b).mpr
+      ⟨h, ⟨fun _ ↦ Classical.choice (inferInstance : Nonempty Value)⟩⟩
 
 /-- **The sufficiency pole.**  If the family shares one conditional on every charged fiber then
 every functional descends: no property of the functional is involved. -/
 theorem descendsAlong_of_kernelSufficient (π : Genome → Label)
     (P : Population → Genome → ℝ) (hK : KernelSufficient π P) (b : (Genome → ℝ) → Value)
-    (defaultValue : Value) :
+    (defaultWitness : Label → Value) :
     DescendsAlong π P b := by
-  rw [descendsAlong_iff_pairwiseConsistent π P b defaultValue]
+  rw [descendsAlong_iff_pairwiseConsistent]
+  refine ⟨?_, ⟨defaultWitness⟩⟩
   intro i j x hi hj
   rw [hK i j x hi hj]
 
@@ -187,7 +203,7 @@ theorem kernelSufficient_iff_identity_descends (π : Genome → Label)
     KernelSufficient π P ↔ DescendsAlong π P (fun μ ↦ μ) := by
   constructor
   · intro hK
-    exact descendsAlong_of_kernelSufficient π P hK _ (fun _ ↦ 0)
+    exact descendsAlong_of_kernelSufficient π P hK _ (fun _ _ ↦ 0)
   · rintro ⟨value, hvalue⟩ i j x hi hj
     exact (hvalue i x hi).trans (hvalue j x hj).symm
 
@@ -656,7 +672,7 @@ theorem admissible_confounding_meet_obstruction :
   · exact descendsAlong_of_kernelSufficient _ admissibleConfoundedExposureLaw
       (fun i j x hi hj ↦ kernelSufficient_confounded_stratum i.1 j.1 x (by
         simpa [admissibleConfoundedExposureLaw] using hi) (by
-        simpa [admissibleConfoundedExposureLaw] using hj)) _ 0
+        simpa [admissibleConfoundedExposureLaw] using hj)) _ (fun _ ↦ 0)
   · rintro ⟨value, hvalue⟩
     let beta0 : AdmissiblePrevalence := ⟨0, by norm_num⟩
     let beta1 : AdmissiblePrevalence := ⟨1, by norm_num⟩
@@ -743,7 +759,8 @@ theorem descendsAlong_componentPosterior [DecidableEq (Component → ℝ)]
     (q : Component → Genome → ℝ) (w0 : Component → ℝ) (hq : ∀ k g, 0 ≤ q k g)
     (hw0 : ∀ k, 0 < w0 k) (w : Population → Component → ℝ) (b : (Genome → ℝ) → ℝ) :
     DescendsAlong (componentPosterior q w0) (fun i ↦ componentMixtureDensity q (w i)) b :=
-  descendsAlong_of_kernelSufficient _ _ (kernelSufficient_componentPosterior q w0 hq hw0 w) b 0
+  descendsAlong_of_kernelSufficient _ _ (kernelSufficient_componentPosterior q w0 hq hw0 w) b
+    (fun _ ↦ 0)
 
 end ComponentDescent
 
