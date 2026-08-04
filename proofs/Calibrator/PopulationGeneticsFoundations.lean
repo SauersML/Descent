@@ -1393,8 +1393,28 @@ theorem islandModelFst_eq_mutationForm (Ne m : ℝ) :
 
     Power: the prediction is constant at 0.2000 by construction across a design
     whose measurement spans 0.09314 to 0.16469, which is what makes the
-    constancy refutable rather than merely unverified. -/
-noncomputable def fstMigrationMutationEquilibrium (Ne m μ : ℝ) : ℝ :=
+    constancy refutable rather than merely unverified. 
+    **The name was corrected, because the name was the falsity.** This body
+    cannot express a deme-count factor -- its signature is `(Ne, m, mu)` and
+    nothing else -- so no edit to the body can fix what the measurement above
+    found. What could be fixed is the CLAIM: called
+    `fstMigrationMutationEquilibrium`, it asserts it is the island-model
+    equilibrium, which is false at small deme count; called
+    `...ManyDemes`, it asserts it is the many-deme limit of one, and the limit
+    it is the limit OF is now a definition in this file --
+    `fstIslandEquilibriumFiniteDemes`, which carries `nDemes` explicitly and
+    whose `islandDemeCorrection = d/(d - 1)` has since been measured and
+    validated at `d = 2`.
+
+    This is the whole content of the repair. A consumer at two or three demes
+    now has to read a name that says the body does not apply to them, rather
+    than a name that says it does. Documenting the restriction in prose while
+    leaving the name unqualified is what let the two-deme error stand, and the
+    same pattern is recorded on `asymmetricFst` in `PortabilityDrift`, whose
+    name commits it to exactly two demes and which therefore cannot be repaired
+    this way at all.
+-/
+noncomputable def fstMigrationMutationEquilibriumManyDemes (Ne m μ : ℝ) : ℝ :=
   1 / (1 + 4 * Ne * m + 4 * Ne * μ)
 
 /-- **The island-model equilibrium with the deme count carried explicitly.**
@@ -1462,55 +1482,55 @@ theorem fstIslandEquilibriumFiniteDemes_isFixedPoint (Ne m μ nDemes : ℝ)
   exact scaledIdentityStep_fixedPoint _ h
 
 /-- **The many-deme limit is the deme-blind formula.** At `nDemes / (nDemes - 1) = 1`
-the finite-deme equilibrium is exactly `fstMigrationMutationEquilibrium`, which is
+the finite-deme equilibrium is exactly `fstMigrationMutationEquilibriumManyDemes`, which is
 the precise sense in which the older definition is a limit rather than a law. -/
 theorem fstIslandEquilibriumFiniteDemes_eq_limit_of_unit_correction
     (Ne m μ nDemes : ℝ) (h : islandDemeCorrection nDemes = 1) :
     fstIslandEquilibriumFiniteDemes Ne m μ nDemes
-      = fstMigrationMutationEquilibrium Ne m μ := by
-  unfold fstIslandEquilibriumFiniteDemes fstMigrationMutationEquilibrium
+      = fstMigrationMutationEquilibriumManyDemes Ne m μ := by
+  unfold fstIslandEquilibriumFiniteDemes fstMigrationMutationEquilibriumManyDemes
   rw [h]; ring_nf
 
-/-- **fstMigrationMutationEquilibrium at the denominator, named.** Migration and mutation enter
+/-- **fstMigrationMutationEquilibriumManyDemes at the denominator, named.** Migration and mutation enter
 the divisor additively, so an inadmissible negative migration rate can cancel the leading one
 even with mutation absent. The equilibrium is reported as zero -- no differentiation -- where the
 formula has no value at all. Consumers must exclude it by hypothesis. -/
-theorem fstMigrationMutationEquilibrium_cancelling_terms_is_junk :
-    fstMigrationMutationEquilibrium 1 (-(1/4)) 0 = 0 := by
-  unfold fstMigrationMutationEquilibrium
+theorem fstMigrationMutationEquilibriumManyDemes_cancelling_terms_is_junk :
+    fstMigrationMutationEquilibriumManyDemes 1 (-(1/4)) 0 = 0 := by
+  unfold fstMigrationMutationEquilibriumManyDemes
   norm_num
 
-/-- **The migration term's coefficient, pinned.** `fstMigrationMutationEquilibrium_isFixedPoint`
+/-- **The migration term's coefficient, pinned.** `fstMigrationMutationEquilibriumManyDemes_isFixedPoint`
 is invariant under exactly the rescaling it should exclude. At `4 Ne m = 1` with no mutation the
 equilibrium `Fst` is one half, which fixes the factor four on the migration term. -/
-theorem fstMigrationMutationEquilibrium_migration_only :
-    fstMigrationMutationEquilibrium 1 (1 / 4) 0 = 1 / 2 := by
-  unfold fstMigrationMutationEquilibrium
+theorem fstMigrationMutationEquilibriumManyDemes_migration_only :
+    fstMigrationMutationEquilibriumManyDemes 1 (1 / 4) 0 = 1 / 2 := by
+  unfold fstMigrationMutationEquilibriumManyDemes
   norm_num
 
 /-- **The mutation term enters with the same coefficient, pinned.** Mutation and migration are
 interchangeable at this order: `4 Ne mu = 1` with no migration gives the same equilibrium as
 `4 Ne m = 1` with no mutation. Fixing the migration coefficient alone would leave the mutation
 coefficient free. -/
-theorem fstMigrationMutationEquilibrium_mutation_only :
-    fstMigrationMutationEquilibrium 1 0 (1 / 4) = 1 / 2 := by
-  unfold fstMigrationMutationEquilibrium
+theorem fstMigrationMutationEquilibriumManyDemes_mutation_only :
+    fstMigrationMutationEquilibriumManyDemes 1 0 (1 / 4) = 1 / 2 := by
+  unfold fstMigrationMutationEquilibriumManyDemes
   norm_num
 
 /-- **The combined equilibrium is the rest point of the scaled identity balance
 at the summed scaled rate.**  This is where the additivity of `θ` and `M` comes
 from: one balance, one rate, and that rate is `4 Nₑ (m + μ)`. -/
-theorem fstMigrationMutationEquilibrium_isFixedPoint (Ne m μ : ℝ)
+theorem fstMigrationMutationEquilibriumManyDemes_isFixedPoint (Ne m μ : ℝ)
     (hNe : 0 < Ne) (hm : 0 ≤ m) (hμ : 0 ≤ μ) :
     scaledIdentityStep (4 * Ne * m + 4 * Ne * μ)
-        (fstMigrationMutationEquilibrium Ne m μ) =
-      fstMigrationMutationEquilibrium Ne m μ := by
+        (fstMigrationMutationEquilibriumManyDemes Ne m μ) =
+      fstMigrationMutationEquilibriumManyDemes Ne m μ := by
   have h4 : (0 : ℝ) ≤ 4 * Ne := by linarith
   have h : (0 : ℝ) ≤ 4 * Ne * m + 4 * Ne * μ :=
     add_nonneg (mul_nonneg h4 hm) (mul_nonneg h4 hμ)
-  have hbody : fstMigrationMutationEquilibrium Ne m μ =
+  have hbody : fstMigrationMutationEquilibriumManyDemes Ne m μ =
       1 / (1 + (4 * Ne * m + 4 * Ne * μ)) := by
-    unfold fstMigrationMutationEquilibrium
+    unfold fstMigrationMutationEquilibriumManyDemes
     rw [add_assoc]
   rw [hbody]
   exact scaledIdentityStep_fixedPoint _ h
@@ -1518,15 +1538,15 @@ theorem fstMigrationMutationEquilibrium_isFixedPoint (Ne m μ : ℝ)
 /-- Combined Fst is below migration-only Fst. -/
 theorem fstMigrationMutation_lt_migrationOnly (Ne m μ : ℝ)
     (hNe : 0 < Ne) (hm : 0 < m) (hμ : 0 < μ) :
-    fstMigrationMutationEquilibrium Ne m μ < fstMigrationDriftEquilibrium Ne m := by
-  unfold fstMigrationMutationEquilibrium fstMigrationDriftEquilibrium
+    fstMigrationMutationEquilibriumManyDemes Ne m μ < fstMigrationDriftEquilibrium Ne m := by
+  unfold fstMigrationMutationEquilibriumManyDemes fstMigrationDriftEquilibrium
   apply div_lt_div_of_pos_left one_pos (by nlinarith) (by nlinarith)
 
 /-- Combined Fst is below mutation-only Fst. -/
 theorem fstMigrationMutation_lt_mutationOnly (Ne m μ : ℝ)
     (hNe : 0 < Ne) (hm : 0 < m) (hμ : 0 < μ) :
-    fstMigrationMutationEquilibrium Ne m μ < fstMutationDriftEquilibrium (4 * Ne * μ) := by
-  unfold fstMigrationMutationEquilibrium fstMutationDriftEquilibrium
+    fstMigrationMutationEquilibriumManyDemes Ne m μ < fstMutationDriftEquilibrium (4 * Ne * μ) := by
+  unfold fstMigrationMutationEquilibriumManyDemes fstMutationDriftEquilibrium
   apply div_lt_div_of_pos_left one_pos (by nlinarith) (by nlinarith)
 
 /-! ### Stepping-Stone Model Foundations -/

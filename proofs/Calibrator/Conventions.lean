@@ -852,10 +852,10 @@ second spelling of that equilibrium -- which is what the note above predicted: "
 spelling of `1 / (1 + 4 Nₑ m)` would need its own bridge theorem, which is a reason not to
 add one."  The spelling is gone from `PortabilityDrift` and its bridge with it. -/
 
-theorem fstMigrationMutationEquilibrium_eq_scaled (Ne m μ : ℝ) :
-    fstMigrationMutationEquilibrium Ne m μ
+theorem fstMigrationMutationEquilibriumManyDemes_eq_scaled (Ne m μ : ℝ) :
+    fstMigrationMutationEquilibriumManyDemes Ne m μ
       = 1 / (1 + scaledMigrationRate Ne m + scaledMutationRate Ne μ) := by
-  unfold fstMigrationMutationEquilibrium
+  unfold fstMigrationMutationEquilibriumManyDemes
   rw [scaledMigrationRate_eq_ploidy_form, scaledMutationRate_eq_ploidy_form]
   unfold ploidy; ring_nf
 

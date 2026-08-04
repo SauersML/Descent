@@ -6798,7 +6798,7 @@ That theorem *does* prove the migration claim, because it derives the `F_ST` ord
     uses m₁₂ (rate of migrants into pop 1 from pop 2).
 
     Empirical status: **FALSIFIED**, and by the same mechanism as
-    `PopulationGeneticsFoundations.fstMigrationMutationEquilibrium`: the
+    `PopulationGeneticsFoundations.fstMigrationMutationEquilibriumManyDemes`: the
     deme-count factor is missing (`proofs/validation/empirical/simcov/battery_bulk13.py`).
     Two demes with asymmetric migration, `Ne = 1000`, `F_ST` read as
     `1 - E[T_within]/E[T_between]` from coalescence times so no estimator
@@ -6817,7 +6817,7 @@ That theorem *does* prove the migration claim, because it derives the `F_ST` ord
     `n = 2`, which two independent designs in this branch have now confirmed.
 
     So this is not an asymmetry problem at all. It is the deme-count blindness
-    already recorded on `fstMigrationMutationEquilibrium`, in a definition whose
+    already recorded on `fstMigrationMutationEquilibriumManyDemes`, in a definition whose
     name commits it to exactly two demes and which therefore cannot plead the
     many-deme limit. Use `fstIslandEquilibriumFiniteDemes` with `nDemes = 2`.
 
