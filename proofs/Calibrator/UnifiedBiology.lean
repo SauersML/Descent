@@ -396,14 +396,8 @@ theorem contextMatch_totalVariationDiameter_eq_two (y : BinaryBiologicalState) :
         (binaryTransportFamily persists) y hpersist
     · exact sum_fiberConditional (fun g : TransportPair ↦ g.2)
         (binaryTransportFamily switches) y hswitch
-  · have hpersist :
-        labelMass (fun g : TransportPair ↦ g.2) (binaryTransportFamily true) y ≠ 0 := by
-      rw [labelMass_binaryTransportFamily]
-      norm_num
-    have hswitch :
-        labelMass (fun g : TransportPair ↦ g.2) (binaryTransportFamily false) y ≠ 0 := by
-      rw [labelMass_binaryTransportFamily]
-      norm_num
+  · have hpersist := labelMass_binaryTransportFamily_ne_zero true y
+    have hswitch := labelMass_binaryTransportFamily_ne_zero false y
     have hlower := sectionPairDistance_le_finiteSectionDiameter
       (fun persists y ↦
         labelMass (fun g : TransportPair ↦ g.2) (binaryTransportFamily persists) y ≠ 0)
@@ -447,14 +441,8 @@ theorem contextMatch_sectionOscillation_eq_one (y : BinaryBiologicalState) :
         change contextMatchTotalVariationDiameter y / 2 = 1
         rw [contextMatch_totalVariationDiameter_eq_two]
         norm_num
-  · have hpersist :
-        labelMass (fun g : TransportPair ↦ g.2) (binaryTransportFamily true) y ≠ 0 := by
-      rw [labelMass_binaryTransportFamily]
-      norm_num
-    have hswitch :
-        labelMass (fun g : TransportPair ↦ g.2) (binaryTransportFamily false) y ≠ 0 := by
-      rw [labelMass_binaryTransportFamily]
-      norm_num
+  · have hpersist := labelMass_binaryTransportFamily_ne_zero true y
+    have hswitch := labelMass_binaryTransportFamily_ne_zero false y
     have hlower := sectionPairValueDistance_le_finiteSectionOscillation
       (fun persists y ↦
         labelMass (fun g : TransportPair ↦ g.2) (binaryTransportFamily persists) y ≠ 0)

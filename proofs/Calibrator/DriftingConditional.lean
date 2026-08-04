@@ -1694,16 +1694,22 @@ argument is dominated convergence and nothing else -- the averaging weight is a 
 measure and the curve is bounded, so the tail limits pass through the integral. -/
 
 open MeasureTheory ProbabilityTheory Filter Topology in
-/-- **Gaussian averaging inherits the floor.** At low liability every displaced value is already
-near the floor, and the displacement has finite weight, so the average goes there too. -/
-theorem tendsto_gaussianAverage_atBot (L : ℝ → ℝ) (hmono : Monotone L)
-    (hlo : ∀ u, 0 < L u) (hhi : ∀ u, L u < 1) (σ : ℝ) :
-    Tendsto (fun x ↦ ∫ z, L (x + σ * z) ∂(gaussianReal 0 1)) atBot (𝓝 (⨅ u, L u)) := by
+/-- **Gaussian averaging inherits whatever limit the liability curve has.**
+
+Every displaced value is near the limit once `x` is far enough along the filter, and the
+displacement has finite weight, so the average goes there too.  The floor and the ceiling
+below are this theorem at `atBot` and at `atTop`; they were written out twice, and the two
+copies differed only in the direction of three names. -/
+theorem tendsto_gaussianAverage_of_tendsto (L : ℝ → ℝ) (hmono : Monotone L)
+    (hlo : ∀ u, 0 < L u) (hhi : ∀ u, L u < 1) (σ : ℝ)
+    {l : Filter ℝ} [l.IsCountablyGenerated] {limit : ℝ}
+    (hL : Tendsto L l (𝓝 limit))
+    (hshift : ∀ z : ℝ, Tendsto (fun x : ℝ ↦ x + σ * z) l l) :
+    Tendsto (fun x ↦ ∫ z, L (x + σ * z) ∂(gaussianReal 0 1)) l (𝓝 limit) := by
   have hmeas : Measurable L := hmono.measurable
-  have hfloor := exists_floor_of_monotone_bddBelow L hmono hlo
   rw [tendsto_iff_seq_tendsto]
   intro x hx
-  have hconst : ∫ _z : ℝ, (⨅ u, L u) ∂(gaussianReal 0 1) = ⨅ u, L u := by
+  have hconst : ∫ _z : ℝ, limit ∂(gaussianReal 0 1) = limit := by
     simp
   rw [← hconst]
   refine MeasureTheory.tendsto_integral_of_dominated_convergence (fun _ ↦ (1 : ℝ))
@@ -1713,38 +1719,25 @@ theorem tendsto_gaussianAverage_atBot (L : ℝ → ℝ) (hmono : Monotone L)
     rw [Real.norm_eq_abs, abs_of_pos (hlo _)]
     exact le_of_lt (hhi _)
   · filter_upwards with z
-    refine hfloor.comp ?_
-    rw [Filter.tendsto_atBot]
-    intro c
-    rw [Filter.tendsto_atBot] at hx
-    filter_upwards [hx (c - σ * z)] with n hn
-    linarith
+    exact hL.comp ((hshift z).comp hx)
+
+open MeasureTheory ProbabilityTheory Filter Topology in
+/-- **Gaussian averaging inherits the floor.** -/
+theorem tendsto_gaussianAverage_atBot (L : ℝ → ℝ) (hmono : Monotone L)
+    (hlo : ∀ u, 0 < L u) (hhi : ∀ u, L u < 1) (σ : ℝ) :
+    Tendsto (fun x ↦ ∫ z, L (x + σ * z) ∂(gaussianReal 0 1)) atBot (𝓝 (⨅ u, L u)) :=
+  tendsto_gaussianAverage_of_tendsto L hmono hlo hhi σ
+    (exists_floor_of_monotone_bddBelow L hmono hlo)
+    (fun z ↦ tendsto_atBot_add_const_right _ (σ * z) tendsto_id)
 
 open MeasureTheory ProbabilityTheory Filter Topology in
 /-- **And the ceiling.** -/
 theorem tendsto_gaussianAverage_atTop (L : ℝ → ℝ) (hmono : Monotone L)
     (hlo : ∀ u, 0 < L u) (hhi : ∀ u, L u < 1) (σ : ℝ) :
-    Tendsto (fun x ↦ ∫ z, L (x + σ * z) ∂(gaussianReal 0 1)) atTop (𝓝 (⨆ u, L u)) := by
-  have hmeas : Measurable L := hmono.measurable
-  have hceil := exists_ceiling_of_monotone_bddAbove L hmono hhi
-  rw [tendsto_iff_seq_tendsto]
-  intro x hx
-  have hconst : ∫ _z : ℝ, (⨆ u, L u) ∂(gaussianReal 0 1) = ⨆ u, L u := by
-    simp
-  rw [← hconst]
-  refine MeasureTheory.tendsto_integral_of_dominated_convergence (fun _ ↦ (1 : ℝ))
-    (fun n ↦ (hmeas.comp (by fun_prop)).aestronglyMeasurable)
-    (integrable_const 1) (fun n ↦ ?_) ?_
-  · filter_upwards with z
-    rw [Real.norm_eq_abs, abs_of_pos (hlo _)]
-    exact le_of_lt (hhi _)
-  · filter_upwards with z
-    refine hceil.comp ?_
-    rw [Filter.tendsto_atTop]
-    intro c
-    rw [Filter.tendsto_atTop] at hx
-    filter_upwards [hx (c - σ * z)] with n hn
-    linarith
+    Tendsto (fun x ↦ ∫ z, L (x + σ * z) ∂(gaussianReal 0 1)) atTop (𝓝 (⨆ u, L u)) :=
+  tendsto_gaussianAverage_of_tendsto L hmono hlo hhi σ
+    (exists_ceiling_of_monotone_bddAbove L hmono hhi)
+    (fun z ↦ tendsto_atTop_add_const_right _ (σ * z) tendsto_id)
 
 open MeasureTheory ProbabilityTheory Filter Topology in
 /-- **The reparametrised slope is positive.**
