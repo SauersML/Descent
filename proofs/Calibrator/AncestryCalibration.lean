@@ -340,7 +340,17 @@ section Epistasis
     the epistatic variance component is:
     V_epistasis = γ² × H₁ × H₂ where Hᵢ = 2pᵢ(1-pᵢ).
 
-    Empirical status: UNTESTED. -/
+    Regime: two UNLINKED loci at Hardy-Weinberg and linkage equilibrium, and
+    the interaction component read on the CENTRED dosages. The centring is not
+    a detail: the product of the uncentred dosages carries both additive terms,
+    and its variance is not this body.
+
+    Empirical status: **VALIDATED**
+    (`validation/empirical/invariants/check_simulation.py`). The registered
+    simulation draws 600000 independent Hardy-Weinberg dosages at the two loci,
+    centres both realised dosage vectors, and compares the interaction variance
+    against the formula extracted from this definition over `γ ∈ [0.2, 2]` and
+    `p₁, p₂ ∈ [0.1, 0.9]`, with relative tolerance `0.05`. -/
 noncomputable def epistaticVariancePairwise (γ p₁ p₂ : ℝ) : ℝ :=
   γ ^ 2 * (2 * p₁ * (1 - p₁)) * (2 * p₂ * (1 - p₂))
 
