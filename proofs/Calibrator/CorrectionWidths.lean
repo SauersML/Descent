@@ -93,6 +93,22 @@ theorem FactorsThrough.postcomp (A : H →ₗ[𝕜] Y) (C R : H →ₗ[𝕜] H)
   rcases hC with ⟨T, rfl⟩
   exact ⟨R.comp T, by ext; simp⟩
 
+/-- The factor-through submodule is closed under arbitrary output-side postcomposition. -/
+theorem factorsThroughSubmodule_postcomp_mem
+    (A : H →ₗ[𝕜] Y) (C R : H →ₗ[𝕜] H)
+    (hC : C ∈ factorsThroughSubmodule A) :
+    R.comp C ∈ factorsThroughSubmodule A := by
+  exact FactorsThrough.postcomp A C R hC
+
+/-- Every factored correction annihilates at least the kernel of the observation operator. -/
+theorem FactorsThrough.ker_le
+    (A : H →ₗ[𝕜] Y) (C : H →ₗ[𝕜] H) (hC : FactorsThrough A C) :
+    LinearMap.ker A ≤ LinearMap.ker C := by
+  intro β hβ
+  rw [LinearMap.mem_ker]
+  rcases hC with ⟨T, rfl⟩
+  simp [LinearMap.mem_ker.mp hβ]
+
 /-- **Observable-quotient law.**  Every admissible correction is constant on each fiber of the
 observation map.  No coefficient choice can distinguish targets that produced the same data. -/
 theorem FactorsThrough.apply_eq_of_observation_eq
@@ -252,8 +268,7 @@ theorem NonzeroCorrectionEigencone.smul_mem
 theorem factorsThrough_apply_eq_zero_of_mem_ker
     (A : H →ₗ[𝕜] Y) (C : H →ₗ[𝕜] H) (hC : FactorsThrough A C)
     (β : H) (hβ : β ∈ LinearMap.ker A) : C β = 0 := by
-  rcases hC with ⟨T, rfl⟩
-  simp [LinearMap.mem_ker.mp hβ]
+  exact LinearMap.mem_ker.mp (FactorsThrough.ker_le A C hC hβ)
 
 end AlgebraicCore
 
