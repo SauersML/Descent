@@ -50,10 +50,11 @@ What survives is stated too.  Ancient perturbations are attenuated at least geom
 cumulative coalescent time (`spectrumAttenuation_le_geometric`), which is the operator reading
 of the bottleneck phenomenon; and after a finite-dimensional restriction the Laplace core is
 exponentially ill-conditioned, so the stable sieve dimension grows like `log L / κ`
-(`stableSieveDimension_of_scaled`).  The numerical value `κ = 2.4103951…`, its maximiser
-`θ⋆ = 0.7340955…`, and the resulting genome-size multiplier `exp κ = 11.1383…` per additional
-stable dimension come from maximising the Cauchy-matrix profile below; only the profile and
-the scaling law are asserted formally, since the maximisation is a numerical claim.
+(`stableSieveDimension_of_scaled`).  The numerical value `κ = 2.4103951…`, its
+maximiser `θ⋆ = 0.7340955…`, and the resulting genome-size multiplier
+`exp κ = 11.1383…` per additional stable dimension come from maximising the Cauchy-matrix
+profile below; only the profile and the scaling law are asserted formally, since the
+maximisation is a numerical claim.
 
 The companion blindness is in `MultipleMergerBlindness`, which reaches the same conclusion
 from the other side of the ladder: after normalisation every Λ-coalescent has the same pairwise
@@ -391,14 +392,41 @@ theorem spectrumAttenuation_le_geometric (n : ℕ) (τ : ℝ) (hτ : 0 ≤ τ) :
   have h := two_mul_add_one_le_coalescentRate k
   nlinarith [mul_nonneg (Nat.cast_nonneg (α := ℝ) k) hτ]
 
+/-- **Closed-form ancient-time envelope.** At every positive cumulative coalescent time, the
+entire finite spectrum is bounded by the corresponding infinite geometric ladder. The bound is
+uniform in sample size. -/
+theorem spectrumAttenuation_le_closedForm (n : ℕ) (τ : ℝ) (hτ : 0 < τ) :
+    spectrumAttenuation n τ ≤
+      Real.exp (-(2 * τ)) / (1 - Real.exp (-(4 * τ))) := by
+  let q : ℝ := Real.exp (-(4 * τ))
+  have hq0 : 0 ≤ q := (Real.exp_pos _).le
+  have hq1 : q < 1 := by
+    change Real.exp (-(4 * τ)) < 1
+    exact Real.exp_lt_one_iff.mpr (by nlinarith)
+  have hsum : ∑ k ∈ Finset.range n, q ^ k ≤ (1 - q)⁻¹ := by
+    calc
+      ∑ k ∈ Finset.range n, q ^ k ≤ ∑' k : ℕ, q ^ k :=
+        (summable_geometric_of_lt_one hq0 hq1).sum_le_tsum
+          (Finset.range n) (fun k _ ↦ pow_nonneg hq0 k)
+      _ = (1 - q)⁻¹ := tsum_geometric_of_lt_one hq0 hq1
+  calc
+    spectrumAttenuation n τ ≤
+        Real.exp (-(2 * τ)) * ∑ k ∈ Finset.range n, q ^ k := by
+      simpa only [q] using spectrumAttenuation_le_geometric n τ hτ.le
+    _ ≤ Real.exp (-(2 * τ)) * (1 - q)⁻¹ :=
+      mul_le_mul_of_nonneg_left hsum (Real.exp_pos _).le
+    _ = Real.exp (-(2 * τ)) / (1 - Real.exp (-(4 * τ))) := by
+      simp only [q, div_eq_mul_inv]
+
 /-! ## After a finite-dimensional restriction: an exponential conditioning law -/
 
 /-- Cauchy-matrix conditioning profile, in the form whose singularities cancel.
 
 The literal integrand `log ((θ² + x²) / |θ² - x²|)` integrates to
-`2 [log ((1 + θ²) / (1 - θ²)) + 2θ arctan (1/θ) - θ log ((1 + θ) / (1 - θ))]`, where the two
-divergent logarithms cancel as `θ → 1`.  The regrouping below performs that cancellation
-symbolically, so the profile is finite on all of `[0, 1]`.
+`2 [log ((1 + θ²) / (1 - θ²)) + 2θ arctan (1/θ) -
+θ log ((1 + θ) / (1 - θ))]`, where the two divergent logarithms cancel as `θ → 1`.
+The regrouping below performs that cancellation symbolically, so the profile is finite on
+all of `[0, 1]`.
 
 Empirical status: UNTESTED, and not the kind of thing a dataset tests: this is the closed
 form of an integral, checked by the theorems below rather than by measurement. It is named
