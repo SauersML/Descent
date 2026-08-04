@@ -3229,22 +3229,6 @@ the old field name to the nested one, and `abbrev` alone does not carry `simp` a
 @[simp] theorem targetPrevalenceAt_eq :
     m.targetPrevalenceAt = m.outcome.targetPrevalenceAt := rfl
 
-theorem sourceOutcomeVariance_pos : 0 < m.sourceOutcomeVariance :=
-  m.outcome.sourceOutcomeVariance_pos
-
-theorem targetOutcomeVariance_pos : ∀ t, 0 < m.targetOutcomeVarianceAt t :=
-  m.outcome.targetOutcomeVariance_pos
-
-theorem novelUntaggablePhenotypeVariance_nonneg :
-    ∀ t, 0 ≤ m.novelUntaggablePhenotypeVarianceAt t :=
-  m.outcome.novelUntaggablePhenotypeVariance_nonneg
-
-theorem targetPrevalence_pos : ∀ t, 0 < m.targetPrevalenceAt t :=
-  m.outcome.targetPrevalence_pos
-
-theorem targetPrevalence_lt_one : ∀ t, m.targetPrevalenceAt t < 1 :=
-  m.outcome.targetPrevalence_lt_one
-
 end CrossPopulationGenerationalModel
 
 /-- **The generational transport model is inhabited**, at every panel size `(p, q)`.
@@ -3547,9 +3531,9 @@ noncomputable def CrossPopulationGenerationalModel.toMetricModelAt {p q : ℕ}
   novelCausalEffect := Pop.pair 0 (m.novelCausalEffectTargetAt t)
   novelUntaggablePhenotypeVarianceTarget := m.novelUntaggablePhenotypeVarianceAt t
   targetPrevalence := m.targetPrevalenceAt t
-  novelUntaggablePhenotypeVarianceTarget_nonneg := m.novelUntaggablePhenotypeVariance_nonneg t
-  targetPrevalence_pos := m.targetPrevalence_pos t
-  targetPrevalence_lt_one := m.targetPrevalence_lt_one t
+  novelUntaggablePhenotypeVarianceTarget_nonneg := m.outcome.novelUntaggablePhenotypeVariance_nonneg t
+  targetPrevalence_pos := m.outcome.targetPrevalence_pos t
+  targetPrevalence_lt_one := m.outcome.targetPrevalence_lt_one t
   novelDirectCausal_source := rfl
   novelProxyTagging_source := rfl
   novelCausalEffect_source := rfl
@@ -3558,8 +3542,8 @@ noncomputable def CrossPopulationGenerationalModel.toMetricModelAt {p q : ℕ}
   outcomeVariance_pos := by
     intro P
     cases P
-    · exact m.sourceOutcomeVariance_pos
-    · exact m.targetOutcomeVariance_pos t
+    · exact m.outcome.sourceOutcomeVariance_pos
+    · exact m.outcome.targetOutcomeVariance_pos t
 
 /-- At each generation, the target tagging projection splits into the part that
 would be obtained under source-stable effects plus a separate projection of the
@@ -6601,7 +6585,39 @@ That theorem *does* prove the migration claim, because it derives the `F_ST` ord
     it receives migrants. The "effective Fst" from population 1's perspective
     uses m₁₂ (rate of migrants into pop 1 from pop 2).
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **FALSIFIED**, and by the same mechanism as
+    `PopulationGeneticsFoundations.fstMigrationMutationEquilibrium`: the
+    deme-count factor is missing (`proofs/validation/empirical/simcov/battery_bulk13.py`).
+    Two demes with asymmetric migration, `Ne = 1000`, `F_ST` read as
+    `1 - E[T_within]/E[T_between]` from coalescence times so no estimator
+    convention enters, 26 replicates of 4 Mb:
+
+      m12       m21      larger-rate reading   smaller-rate   measured
+      1.0e-3    1.0e-3     0.20000 (14.5σ)     0.20000 (14.5σ)  0.11480±0.00589
+      1.5e-3    5.0e-4     0.14286 ( 4.3σ)     0.33333 (34.1σ)  0.11538±0.00640
+      1.8e-3    2.0e-4     0.12195 ( 2.4σ)     0.55556 (85.6σ)  0.10918±0.00521
+
+    NEITHER reading of the single `m_into` argument works, and the SYMMETRIC row
+    says why. There `m12 = m21`, so there is no ambiguity about which rate to
+    use, and the body still misses by 14.5 sems: it returns
+    `1/(1 + 4 Ne m) = 0.200` where the two-deme value is
+    `1/(1 + 2 · 4 Ne m) = 0.111`. The factor of two is `islandDemeCorrection` at
+    `n = 2`, which two independent designs in this branch have now confirmed.
+
+    So this is not an asymmetry problem at all. It is the deme-count blindness
+    already recorded on `fstMigrationMutationEquilibrium`, in a definition whose
+    name commits it to exactly two demes and which therefore cannot plead the
+    many-deme limit. Use `fstIslandEquilibriumFiniteDemes` with `nDemes = 2`.
+
+    The positive control is the symmetric cell against the independently
+    validated two-deme island value, and it passes at 0.77 sems, so the design
+    reproduces a known answer before reporting a new one -- which the forward
+    Wright-Fisher attempt at this same pair in `battery_bulk1.py` did not, and
+    was correctly voided for.
+
+    Power: the measurement spans 0.10918 to 0.11538 while the two candidate
+    readings span 0.12195 to 0.55556, so the design separates them by a factor
+    of five. -/
 noncomputable def asymmetricFst (Ne m_into : ℝ) : ℝ :=
   1 / (1 + 4 * Ne * m_into)
 
@@ -6683,7 +6699,27 @@ theorem asymmetric_migration_portability_direction
     this corpus, and nothing here should be read as settling it.
     nothing about the harmonic mean.
 
-    Empirical status: UNTESTED. A test of this quantity tests the arithmetic mean and says -/
+    Empirical status: **VALIDATED as a constancy claim**
+    (`proofs/validation/empirical/simcov/battery_bulk13.py`). The claim is that
+    an asymmetric pair behaves like a symmetric one at the ARITHMETIC MEAN rate,
+    so the test holds that mean fixed and varies the asymmetry: if anything
+    beyond the mean mattered, the measured `F_ST` would move and the prediction
+    would not.
+
+      m12       m21      mean rate   predicted   measured             sems
+      1.0e-3    1.0e-3    1.0e-3      0.11111    0.11480±0.00589      0.63
+      1.5e-3    5.0e-4    1.0e-3      0.11111    0.11538±0.00640      0.67
+      1.8e-3    2.0e-4    1.0e-3      0.11111    0.10918±0.00521      0.37
+
+    The asymmetry ratio runs from 1 to 9 across those rows and the measurement
+    moves by 0.006, within its own error. The prediction is constant BY
+    CONSTRUCTION here, which is why the verdict machinery reports no span; the
+    power of this design is in the measured values not moving, not in the
+    predicted ones moving.
+
+    Fed to the deme-corrected two-deme form. The uncorrected
+    `1/(1 + 4 Ne m_eff)` would miss every row by 14 sems, which is the separate
+    defect recorded on `asymmetricFst`. A test of this quantity tests the arithmetic mean and says -/
 noncomputable def effectiveSymmetricMigration (m₁₂ m₂₁ : ℝ) : ℝ :=
   (m₁₂ + m₂₁) / 2
 
