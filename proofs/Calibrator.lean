@@ -288,6 +288,13 @@ than retained as named results.
 -/
 
 
+/-! The two specialisations below repeat their `DGP` originals' hypothesis blocks, and the
+duplication guard reports that.  It stands: what they add is `t := 2`, discharged by
+`two_le_two`, and a specialisation's statement IS its hypotheses at the fixed dimension --
+there is nothing to factor that would leave the specialisation saying anything.  Deleting
+them would remove a result rather than a duplicate, which is the distinction the primed
+restatements deleted above did not have: those fixed nothing. -/
+
 /-- Concrete `2 × 2` specialization of the two-locus coalescent covariance-gap theorem. -/
 theorem twoLocusCoalescent_covariance_gap_lower_bound_dim_two
     (ibdWeight recombRate : ℝ)

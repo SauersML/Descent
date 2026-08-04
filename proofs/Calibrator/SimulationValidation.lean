@@ -844,12 +844,27 @@ stay fixed, but the target effect vector changes over time. This isolates
 population/time-varying effect heterogeneity as the sole portability driver.
 
     Empirical status: UNTESTED. -/
+-- **Why the witness literals repeat each other, and why that stands.**
+--
 -- Five fields separate this witness from `timeVaryingAFGenerationalModel`: the effect
 -- heterogeneity that drives it, which locus is scored directly rather than tagged, and the
--- two mutation shifts it turns off.  Written as `{ timeVaryingAFGenerationalModel with ... }`
--- the shared twenty are stated once -- but the witness theorems below evaluate these fields
--- by `simp`, and a structure update does not reduce far enough for them: six goals are left
--- open that the literal closes.  The copy stays, and this note is why.
+-- two mutation shifts it turns off.  The other twenty are the same in both, and the closing
+-- fields -- the context cross-covariances, the outcome variances, the prevalence and its
+-- four positivity proofs -- are the same again in the two-tag proxy witness above.
+--
+-- Both ways of sharing them were tried and neither survives:
+--
+--   * `{ timeVaryingAFGenerationalModel with ... }` states the shared twenty once, and the
+--     witness theorems below evaluate those fields by `simp`; a structure update does not
+--     reduce far enough for them, and six goals are left open that the literal closes.
+--   * a constructor function taking the differing fields cannot reach the two-tag witness
+--     at all: that model is at a different dimension, so the closing fields it shares have
+--     different types and no one function returns both.
+--
+-- So the repetition is what Lean's structure syntax costs here, not an oversight, and the
+-- duplication guard's report of it is correct in letter and unfixable in fact.  What
+-- protects these witnesses from drifting apart in a field neither is about is the theorems
+-- immediately below each of them, which pin every field either witness is used for.
 noncomputable def timeVaryingEffectGenerationalModel :
     CrossPopulationGenerationalModel 1 1 := {
   popGen := baselineGenerationalPopGen
