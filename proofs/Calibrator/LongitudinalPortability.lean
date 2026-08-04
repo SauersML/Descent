@@ -55,26 +55,48 @@ noncomputable def portabilityAtTime (r2_initial lambda_total t : ℝ) : ℝ :=
 the theorem states a number: an inequality or an invariance leaves a family of bodies
 satisfying it, and a value does not. -/
 theorem portabilityAtTime_at_reference_point :
-    portabilityAtTime 0 0 0 = 0 := by
+    portabilityAtTime 1 1 1 = Real.exp (-1) := by
   norm_num [portabilityAtTime]
 
 
 
 /-- Portability at time 0 equals initial R². -/
-theorem portability_at_zero (r2_initial lambda_total : ℝ) :
+theorem portabilityAtTime_zero_time (r2_initial lambda_total : ℝ) :
     portabilityAtTime r2_initial lambda_total 0 = r2_initial := by
   unfold portabilityAtTime
   simp [mul_zero, Real.exp_zero, mul_one]
 
-/-- Portability is nonneg when initial R² is nonneg. -/
-theorem portability_nonneg (r2_initial lambda_total t : ℝ)
-    (h_r2 : 0 ≤ r2_initial) :
-    0 ≤ portabilityAtTime r2_initial lambda_total t := by
+/-- Portability is nonnegative exactly when its initial R² is nonnegative. -/
+theorem portabilityAtTime_nonneg_iff (r2_initial lambda_total t : ℝ) :
+    0 ≤ portabilityAtTime r2_initial lambda_total t ↔ 0 ≤ r2_initial := by
   unfold portabilityAtTime
-  exact mul_nonneg h_r2 (le_of_lt (Real.exp_pos _))
+  have h_exp : 0 < Real.exp (-lambda_total * t) := Real.exp_pos _
+  constructor
+  · intro h
+    nlinarith
+  · intro h
+    exact mul_nonneg h (le_of_lt h_exp)
+
+/-- Exponential decay never creates a zero: longitudinal portability vanishes exactly
+when the initial score has zero R². -/
+theorem portabilityAtTime_eq_zero_iff (r2_initial lambda_total t : ℝ) :
+    portabilityAtTime r2_initial lambda_total t = 0 ↔ r2_initial = 0 := by
+  simp [portabilityAtTime, Real.exp_ne_zero]
+
+/-- Portability remains strictly positive at every finite time exactly when its initial
+R² is positive. -/
+theorem portabilityAtTime_pos_iff (r2_initial lambda_total t : ℝ) :
+    0 < portabilityAtTime r2_initial lambda_total t ↔ 0 < r2_initial := by
+  unfold portabilityAtTime
+  have h_exp : 0 < Real.exp (-lambda_total * t) := Real.exp_pos _
+  constructor
+  · intro h
+    nlinarith
+  · intro h
+    exact mul_pos h h_exp
 
 /-- Portability decreases with divergence time. -/
-theorem portability_decreases_with_time (r2_initial lambda_total t₁ t₂ : ℝ)
+theorem portabilityAtTime_lt_of_time_lt (r2_initial lambda_total t₁ t₂ : ℝ)
     (h_r2 : 0 < r2_initial) (h_lam : 0 < lambda_total)
     (h_t : t₁ < t₂) :
     portabilityAtTime r2_initial lambda_total t₂ <
@@ -160,7 +182,7 @@ theorem ld_decay_in_unit (r : ℝ) (t : ℕ)
 
 /-- LD decays faster with higher recombination rate. -/
 theorem ld_decay_faster_with_higher_r (r₁ r₂ : ℝ) (t : ℕ)
-    (h_r₁ : 0 ≤ r₁) (h_r₂ : r₂ ≤ 1)
+    (h_r₂ : r₂ ≤ 1)
     (h_lt : r₁ < r₂) (h_t : 0 < t) :
     ldDecayPerGeneration r₂ t < ldDecayPerGeneration r₁ t := by
   unfold ldDecayPerGeneration
@@ -196,8 +218,14 @@ theorem secularTrendBias_at_reference_point :
   unfold secularTrendBias
   norm_num
 
+/-- Secular trend bias vanishes exactly when the trend rate or elapsed time vanishes. -/
+theorem secularTrendBias_eq_zero_iff (trend_rate t : ℝ) :
+    secularTrendBias trend_rate t = 0 ↔ trend_rate = 0 ∨ t = 0 := by
+  unfold secularTrendBias
+  exact mul_eq_zero
+
 /-- Secular trend bias grows linearly with time. -/
-theorem secular_trend_grows (trend_rate t₁ t₂ : ℝ)
+theorem secularTrendBias_lt_of_time_lt (trend_rate t₁ t₂ : ℝ)
     (h_rate : 0 < trend_rate) (h_t : t₁ < t₂) :
     secularTrendBias trend_rate t₁ < secularTrendBias trend_rate t₂ := by
   unfold secularTrendBias; nlinarith
@@ -223,7 +251,7 @@ theorem changing_env_variance_changes_h2
     PGS trained on modern cohorts may not apply to historical ones. -/
 theorem heritability_increases_when_env_equalizes
     (V_A V_E_before V_E_after : ℝ)
-    (h_VA : 0 < V_A) (h_VE_b : 0 < V_E_before) (h_VE_a : 0 < V_E_after)
+    (h_VA : 0 < V_A) (h_VE_a : 0 < V_E_after)
     (h_reduced : V_E_after < V_E_before) :
     V_A / (V_A + V_E_before) < V_A / (V_A + V_E_after) := by
   rw [div_lt_div_iff₀ (by linarith) (by linarith)]
@@ -318,19 +346,32 @@ noncomputable def ageDependentMetricProfile
   temporalMetricProfile π
     (ageDependentSignalVariance sourceSignalPeak age age_peak width)
 
+/-- Observed cohort-specific effect after an environmental modifier acts on a genetic effect. -/
+noncomputable def cohortObservedEffect (geneticEffect environmentModifier : ℝ) : ℝ :=
+  geneticEffect * environmentModifier
+
+/-- The cohort-effect scale is pinned at an interior reference point. -/
+theorem cohortObservedEffect_at_reference_point :
+    cohortObservedEffect (1 / 2) (1 / 2) = 1 / 4 := by
+  norm_num [cohortObservedEffect]
+
 /-- **PGS effect sizes are cohort-dependent.**
     A PGS trained on one birth cohort may have different
     effect sizes in another due to changed environments.
     Model: the observed effect β_obs = β_genetic × env_modifier, where
     env_modifier differs between cohorts due to changing environments.
     If env₁ ≠ env₂ and β_genetic ≠ 0, then the observed effects differ. -/
-theorem mul_ne_mul_left_of_ne_of_ne_zero
-    (beta_genetic env₁ env₂ : ℝ)
-    (h_beta : beta_genetic ≠ 0)
-    (h_env_diff : env₁ ≠ env₂) :
-    beta_genetic * env₁ ≠ beta_genetic * env₂ := by
-  intro h
-  exact h_env_diff (mul_left_cancel₀ h_beta h)
+theorem cohortObservedEffect_eq_iff
+    (geneticEffect env₁ env₂ : ℝ) :
+    cohortObservedEffect geneticEffect env₁ = cohortObservedEffect geneticEffect env₂ ↔
+      geneticEffect = 0 ∨ env₁ = env₂ := by
+  unfold cohortObservedEffect
+  constructor
+  · intro h
+    by_cases h_effect : geneticEffect = 0
+    · exact Or.inl h_effect
+    · exact Or.inr (mul_left_cancel₀ h_effect h)
+  · rintro (rfl | rfl) <;> ring
 
 /-- **Age-dependent PGS performance.**
     PGS for age-related traits (e.g., CAD, T2D) have different
@@ -394,7 +435,7 @@ theorem ageDependentR2_at_peak (sourceSignalPeak age_peak width : ℝ) :
     so R²_old < R²_young. -/
 theorem education_cohort_effect
     (V_A V_E_old V_E_young : ℝ)
-    (h_VA : 0 < V_A) (h_VE_old : 0 < V_E_old) (h_VE_young : 0 < V_E_young)
+    (h_VA : 0 < V_A) (h_VE_young : 0 < V_E_young)
     (h_more_barriers : V_E_young < V_E_old) :
     V_A / (V_A + V_E_old) ≠ V_A / (V_A + V_E_young) := by
   intro h
@@ -561,8 +602,7 @@ theorem staleness_increases (lambda t₁ t₂ : ℝ)
 /-- **Ensemble of temporal models.**
     Averaging PGS from multiple time periods can improve robustness
     to temporal drift. Average R² ≥ min individual R². -/
-theorem ensemble_at_least_min (r2_old r2_new : ℝ)
-    (h_old : 0 ≤ r2_old) (h_new : 0 ≤ r2_new) :
+theorem ensemble_at_least_min (r2_old r2_new : ℝ) :
     min r2_old r2_new ≤ (r2_old + r2_new) / 2 := by
   rcases le_total r2_old r2_new with h | h
   · simp [min_eq_left h]; linarith
