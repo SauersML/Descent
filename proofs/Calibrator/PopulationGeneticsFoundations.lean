@@ -210,7 +210,33 @@ theorem het_increases_with_ne
     E[T_between] = t + 2Ne, E[T_within] = 2Ne.
     Fst = 1 - T_within / T_between = t / (t + 2Ne).
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_fix.py`,
+    `test_fst_composition`). msprime coalescent simulation of a clean split with
+    no migration, ancestral and both daughter sizes `Ne = 1000`, recombining at
+    `1e-8` so a replicate carries many independent genealogies, Hudson `F_ST` as
+    a ratio of averages, 25 replicates of 20 Mb, 50 diploids per deme:
+
+      t        this def    simulated             sems
+       500       0.20000   0.19923+/-0.00227     0.34
+      1000       0.33333   0.33415+/-0.00319     0.25
+      2000       0.50000   0.49974+/-0.00330     0.08
+
+    Recombination is not optional in this design. At `recombination_rate = 0`
+    every site in a replicate sits on ONE genealogy, so a 20 Mb sequence carries
+    no more information about `F_ST` than a single site; two runs of this same
+    demography then differed by 2.4 sems and neither error bar was usable.
+
+    On these same runs `pairwiseFstFromBranchTaus` -- the sibling composition
+    that sums both branch taus -- errs by 51 to 59 sems, and is falsified there.
+
+    Regime: symmetric split. This definition takes a single `Ne` and so says
+    nothing about unequal daughter sizes; substituting a harmonic mean for an
+    asymmetric split misses by 4.6 sems and is not a reading this definition
+    offers.
+
+    Power: the prediction spans 0.20000 to 0.50000 across the design, a factor
+    of two and a half. -/
 noncomputable def coalFst (t Ne : ℝ) : ℝ :=
   t / (t + 2 * Ne)
 
@@ -1259,7 +1285,32 @@ theorem islandModelFst_eq_mutationForm (Ne m : ℝ) :
     When both migration (m) and mutation (μ) act, the equilibrium Fst
     is 1/(1 + 4Nm + 4Neμ), which is below either individual equilibrium.
 
-    Empirical status: UNTESTED. -/
+    **The deme count is missing from the signature, and the quantity depends on
+    it.** Measured against msprime's symmetric island model at equilibrium
+    (`proofs/validation/empirical/simcov/battery_verify.py`,
+    `test_island_deme_count`), `Ne = 1000`, total emigration rate `m = 1e-3` so
+    that `4*Ne*m = 4.0` is held FIXED, `mu = 1e-8`, Hudson `F_ST`, 24 replicates
+    of 4 Mb, 40 diploids from each of two sampled demes:
+
+      demes    this def    simulated F_ST
+        2        0.2000    0.09314+/-0.01311     8.2 sems, +115 percent
+        4        0.2000    0.16469+/-0.02700     1.3 sems
+        8        0.2000    0.15502+/-0.01987     2.3 sems
+       20        0.2000    0.14347+/-0.01971     2.9 sems
+
+    The scaled rate `4*Ne*m` is identical in every row, so a formula in
+    `(Ne, m, mu)` alone must return one number for all four; the measurement
+    does not. The two-deme row is decisive on its own.
+
+    Empirical status: **FALSIFIED at small deme count**, and UNTESTED as a
+    many-deme limit -- the design above does not pin the deme-count factor
+    itself, only that one is needed. A definition taking no deme count cannot
+    state the regime it is the limit of; consumers at two or three demes are
+    the ones this silently misinforms.
+
+    Power: the prediction is constant at 0.2000 by construction across a design
+    whose measurement spans 0.09314 to 0.16469, which is what makes the
+    constancy refutable rather than merely unverified. -/
 noncomputable def fstMigrationMutationEquilibrium (Ne m μ : ℝ) : ℝ :=
   1 / (1 + 4 * Ne * m + 4 * Ne * μ)
 

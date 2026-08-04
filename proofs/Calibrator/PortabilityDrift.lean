@@ -1073,7 +1073,29 @@ theorem wrightFisherHeterozygosityLoss_lt_one
 /-- Drift-driven variance of the between-population PGS-mean difference.
 For one branch with drift index `fst`, this is `2 * fst * V_A`.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED** in the stated ONE-BRANCH regime
+    (`proofs/validation/empirical/simcov/battery_verify.py`,
+    `test_var_delta_mu_one_branch`). Wright-Fisher forward simulation, `Ne=200`,
+    600 loci, 4000 replicate populations, one deme drifting while the other is
+    held at the ancestral frequencies, `V_A` measured in the ancestral
+    generation and the variance taken across replicates:
+
+      generations   F_branch   2 * fst * V_A   simulated              sems
+        20            0.049          20.982    20.472+/-0.458         1.11
+        60            0.139          59.923    58.374+/-1.305         1.19
+       150            0.313         134.509   133.139+/-2.977         0.46
+       300            0.528         226.912   228.418+/-5.108         0.29
+
+    The qualifier "one branch" is load-bearing and was nearly missed. A first
+    measurement drifted BOTH demes, which doubles the divergence, and reported
+    a factor-of-four falsification that was entirely an artefact of feeding a
+    two-branch design to a one-branch law. Nei's `G_ST` between two demes is
+    half the per-branch drift index and a quarter of the corpus's own pairwise
+    `F_ST`, so this quantity has three circulating conventions that differ by
+    factors of two; the name alone does not pick one, and the docstring does.
+
+    Power: the prediction spans 20.982 to 226.912 across the design, a factor
+    of eleven. -/
 noncomputable def Var_Delta_Mu (V_A fst : ℝ) : ℝ :=
   2 * fst * V_A
 
@@ -4844,7 +4866,34 @@ noncomputable def covarianceRetention (freq_corr ld_overlap : ℝ) : ℝ :=
 /-- Allele frequency correlation equals `1 - Fst`, where Fst measures the
     fraction of genetic variance due to population divergence.
 
-    Empirical status: UNTESTED.
+    Empirical status: **FALSIFIED** as a function of `F_ST`
+    (`proofs/validation/empirical/simcov/battery_verify.py`,
+    `test_freq_corr_killer`). Two Wright-Fisher designs were run to the SAME
+    differentiation -- `G_ST` 0.0749 and 0.0750, so `1 - Fst` is 0.9251 and
+    0.9250 -- differing only in the ancestral frequencies the two demes started
+    from. `Ne = 200`, 60 generations, 4000 loci, 400 replicate deme pairs, the
+    correlation taken within each replicate so its scatter is measured:
+
+      ancestral p0            1 - Fst    measured corr    sems off
+      all p0 = 0.5             0.9251    0.0004+/-0.0008      1117
+      uniform(0.05, 0.95)      0.9250    0.7209+/-0.0003       653
+
+    At identical `F_ST` the correlation is either zero or 0.72, so it is not a
+    function of `F_ST` and no repair of the constant can make it one. The
+    degenerate row is the clearest statement of the mechanism: when every locus
+    starts at the same ancestral frequency there is no across-locus signal for
+    the two demes to share, and the correlation is exactly zero however little
+    they have diverged.
+
+    What the quantity actually is:
+    `corr(p1, p2) = Var(p0) / (Var(p0) + F * E[p0 (1 - p0)])`,
+    which depends on the ancestral spread as well as on the drift index, and
+    reduces to `1 - F` only when `Var(p0)` and `E[p0 (1 - p0)]` stand in one
+    particular ratio.
+
+    Power: the design holds `F_ST` fixed to four decimal places and moves the
+    measured correlation from 0.0004 to 0.7209, which is the largest span the
+    quantity admits.
 
     Denotes: the reading its name carries. The same formula appears under
     names from 'factor', 'frequency', 'fst', and the formula alone does not fix which is meant. -/

@@ -51,6 +51,64 @@ section ThirdMomentContraction
 
 variable {Row Locus : Type*} [Fintype Row] [Fintype Locus]
 
+/-- A five-index finite Fubini permutation used by the tensor contraction proof. -/
+private theorem sum_five_rotate
+    {A B C D E : Type*} [Fintype A] [Fintype B] [Fintype C] [Fintype D] [Fintype E]
+    (f : A → B → C → D → E → ℝ) :
+    (∑ a, ∑ b, ∑ c, ∑ d, ∑ e, f a b c d e) =
+      ∑ d, ∑ e, ∑ a, ∑ b, ∑ c, f a b c d e := by
+  classical
+  calc
+    (∑ a, ∑ b, ∑ c, ∑ d, ∑ e, f a b c d e) =
+        ∑ a, ∑ b, ∑ d, ∑ c, ∑ e, f a b c d e := by
+      apply Finset.sum_congr rfl
+      intro a ha
+      apply Finset.sum_congr rfl
+      intro b hb
+      rw [Finset.sum_comm]
+    _ = ∑ a, ∑ d, ∑ b, ∑ c, ∑ e, f a b c d e := by
+      apply Finset.sum_congr rfl
+      intro a ha
+      rw [Finset.sum_comm]
+    _ = ∑ d, ∑ a, ∑ b, ∑ c, ∑ e, f a b c d e := by
+      rw [Finset.sum_comm]
+    _ = ∑ d, ∑ a, ∑ b, ∑ e, ∑ c, f a b c d e := by
+      apply Finset.sum_congr rfl
+      intro d hd
+      apply Finset.sum_congr rfl
+      intro a ha
+      apply Finset.sum_congr rfl
+      intro b hb
+      rw [Finset.sum_comm]
+    _ = ∑ d, ∑ a, ∑ e, ∑ b, ∑ c, f a b c d e := by
+      apply Finset.sum_congr rfl
+      intro d hd
+      apply Finset.sum_congr rfl
+      intro a ha
+      rw [Finset.sum_comm]
+    _ = ∑ d, ∑ e, ∑ a, ∑ b, ∑ c, f a b c d e := by
+      apply Finset.sum_congr rfl
+      intro d hd
+      rw [Finset.sum_comm]
+
+/-- Expansion of the square of a finite sum. -/
+private theorem sum_sq_expand {I : Type*} [Fintype I] (f : I → ℝ) :
+    (∑ i, f i) ^ 2 = ∑ i, ∑ j, f i * f j := by
+  simpa only [pow_two] using Fintype.sum_mul_sum f f
+
+/-- Expansion of the cube of a finite sum. -/
+private theorem sum_cube_expand {I : Type*} [Fintype I] (f : I → ℝ) :
+    (∑ i, f i) ^ 3 = ∑ i, ∑ j, ∑ k, f i * f j * f k := by
+  rw [pow_three, Fintype.sum_mul_sum]
+  simp_rw [Finset.mul_sum, Finset.sum_mul]
+  apply Finset.sum_congr rfl
+  intro i hi
+  apply Finset.sum_congr rfl
+  intro j hj
+  apply Finset.sum_congr rfl
+  intro k hk
+  ring
+
 /-- The third moment tensor obtained by applying `mixing` to independent centered coordinates
 whose common scalar third moment is `kappa`. -/
 noncomputable def pushedThirdMomentTensor
@@ -81,11 +139,20 @@ theorem thirdTensorEnergy_pushedThirdMomentTensor
   classical
   unfold thirdTensorEnergy pushedThirdMomentTensor entryCubeSum gramCovariance
   simp only [Matrix.mul_apply, Matrix.transpose_apply]
-  simp only [pow_two, pow_three]
-  simp_rw [Finset.mul_sum, Finset.sum_mul]
-  ring_nf
-  simp_rw [Fintype.sum_mul_sum]
-  ring_nf
+  simp_rw [mul_pow, sum_sq_expand, sum_cube_expand]
+  simp_rw [Finset.mul_sum]
+  rw [sum_five_rotate]
+  apply Finset.sum_congr rfl
+  intro i hi
+  apply Finset.sum_congr rfl
+  intro j hj
+  apply Finset.sum_congr rfl
+  intro a ha
+  apply Finset.sum_congr rfl
+  intro b hb
+  apply Finset.sum_congr rfl
+  intro c hc
+  ring
 
 end ThirdMomentContraction
 
