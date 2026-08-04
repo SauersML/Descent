@@ -323,15 +323,20 @@ theorem contextMatch_sectionOscillation_le_half_totalVariationDiameter
     linarith
   · norm_num
   · intro persists switches hpersist hswitch
-    apply abs_sectionMean_sub_le_half_range
-        (fun g : TransportPair ↦ contextMatchQuality g.1 g.2)
-        _ _ 0 1 (by norm_num)
-    · rintro ⟨x, z⟩
+    have hquality : ∀ g : TransportPair,
+        0 ≤ contextMatchQuality g.1 g.2 ∧ contextMatchQuality g.1 g.2 ≤ 1 := by
+      rintro ⟨x, z⟩
       fin_cases x <;> fin_cases z <;> norm_num [contextMatchQuality]
-    · exact sum_fiberConditional (fun g : TransportPair ↦ g.2)
-        (binaryTransportFamily persists) y hpersist
-    · exact sum_fiberConditional (fun g : TransportPair ↦ g.2)
-        (binaryTransportFamily switches) y hswitch
+    have hbound := abs_sectionMean_sub_le_half_range
+      (fun g : TransportPair ↦ contextMatchQuality g.1 g.2)
+      (fiberConditional (fun g : TransportPair ↦ g.2) (binaryTransportFamily persists) y)
+      (fiberConditional (fun g : TransportPair ↦ g.2) (binaryTransportFamily switches) y)
+      0 1 (by norm_num) hquality
+      (sum_fiberConditional (fun g : TransportPair ↦ g.2)
+        (binaryTransportFamily persists) y hpersist)
+      (sum_fiberConditional (fun g : TransportPair ↦ g.2)
+        (binaryTransportFamily switches) y hswitch)
+    simpa [div_eq_mul_inv] using hbound
 
 /-- The two biological conditionals are opposite point masses on every target fiber, so their
 `ℓ¹` total-variation diameter is exactly two. -/
@@ -343,7 +348,12 @@ theorem contextMatch_totalVariationDiameter_eq_two (y : BinaryBiologicalState) :
           fiberConditional (fun g : TransportPair ↦ g.2) (binaryTransportFamily persists) y)
         totalVariationGap y = 2 := by
   apply le_antisymm
-  · apply finiteSectionDiameter_le_of_pairwise (C := 2) (by norm_num)
+  · apply finiteSectionDiameter_le_of_pairwise
+      (supported := fun persists y ↦
+        labelMass (fun g : TransportPair ↦ g.2) (binaryTransportFamily persists) y ≠ 0)
+      (conditionalSection := fun persists y ↦
+        fiberConditional (fun g : TransportPair ↦ g.2) (binaryTransportFamily persists) y)
+      (rho := totalVariationGap) (x := y) (C := 2) (by norm_num)
     intro persists switches hpersist hswitch
     apply totalVariationGap_le_two_of_probabilityMasses
     · intro g
