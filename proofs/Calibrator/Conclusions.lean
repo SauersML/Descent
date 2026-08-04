@@ -533,6 +533,18 @@ theorem bernoulliLogLoss_certain_correct : bernoulliLogLoss 1 1 = 0 := by
 noncomputable def bernoulliKLReal (p q : ℝ) : ℝ :=
   p * Real.log (p / q) + (1 - p) * Real.log ((1 - p) / (1 - q))
 
+/-- **A forecast that matches the truth has zero divergence.** Both logarithms are of one, so the
+divergence vanishes identically on the diagonal. Nonnegativity is shared by every positive
+multiple and by bodies with an additive floor; vanishing exactly at agreement is not, and it is
+what makes this a divergence rather than a monotone rescaling of one. -/
+theorem bernoulliKLReal_self (p : ℝ) : bernoulliKLReal p p = 0 := by
+  unfold bernoulliKLReal
+  rcases eq_or_ne p 0 with hp | hp
+  · rw [hp]; norm_num
+  · rcases eq_or_ne (1 - p) 0 with hq | hq
+    · rw [hq, div_self hp]; norm_num
+    · rw [div_self hp, div_self hq]; norm_num
+
 /-- Bernoulli KL on `[0,1]` probabilities. -/
 noncomputable def klBernReal (p q : UnitProb) : ℝ :=
   bernoulliKLReal p.1 q.1

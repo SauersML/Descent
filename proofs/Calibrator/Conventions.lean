@@ -92,6 +92,14 @@ coded `0, 1, …, ploidy`.
     Empirical status: UNTESTED. -/
 noncomputable def hweGenotypeVariance (p : ℝ) : ℝ := ploidy * p * (1 - p)
 
+/-- **The genotype variance peaks at even allele frequency and is exactly one half there.** With
+diploid ploidy the value at `p = 1/2` is `2 · (1/2) · (1/2) = 1/2`. The vanishing at the two
+fixed points is shared by every multiple of `p(1-p)`; the value at the interior maximum fixes the
+ploidy factor, which is the only free constant in the formula. -/
+theorem hweGenotypeVariance_at_half : hweGenotypeVariance (1 / 2) = 1 / 2 := by
+  unfold hweGenotypeVariance ploidy
+  norm_num
+
 /-- Coalescent time scale: time measured in units of `ploidy · Nₑ`
 generations.
 

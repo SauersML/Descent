@@ -1472,6 +1472,61 @@ theorem refining_reveals_drift :
   rw [binnedRisk_driftDefect_zero]
   exact fineRisk_driftDefect_pos
 
+
+/-! #### Drift invisible to genotype is irreducible by any amount of genotyping
+
+The defect splits into a part measurable with respect to the genotype-distribution structure and a
+part orthogonal to it. Only the first is attackable by more reference panels, deeper sequencing,
+or better ancestry inference: the second is invisible to every genotype-measurable statistic, so
+no quantity of genotype data touches it.
+
+The witness is two ancestries whose genotype distributions coincide -- so any genotype-based
+method assigns them the same value, and any inferred ancestry coordinate merges them -- carrying
+different conditional risks. At the genotype-visible resolution the defect is zero. The true
+defect is positive. The gap is irreducible.
+
+This is the formal shape of the binding empirical objection to the whole extrapolation programme.
+Harpak and colleagues report that variation in individual-level prediction accuracy is only weakly
+predicted by genetic distance and is explained comparably well by socioeconomic measures. If that
+is so, a large part of the drift field sits in exactly the orthogonal component witnessed here,
+and the fill-distance machinery -- which prices extrapolation in a metric induced by the GENOTYPE
+marginals -- is pricing the wrong thing. More diverse genotyping shrinks the attackable part and
+leaves the rest untouched.
+
+The theory gives the accounting and not the causal decomposition. It says which portion of a
+measured portability gap is in principle reachable by genetic data; it does not say how large
+that portion is, and the empirical claim is that it may be the smaller one.
+-/
+
+/-- Two ancestries indistinguishable by genotype: any genotype-measurable statistic, and hence any
+inferred ancestry coordinate, assigns them the common value. -/
+noncomputable def genotypeVisibleRisk : Fin 2 → ℝ := ![1 / 2, 1 / 2]
+
+/-- Their true conditional risks, which differ. -/
+noncomputable def trueRiskUnderSocialDrift : Fin 2 → ℝ := ![4 / 5, 1 / 5]
+
+/-- **Genotype data sees no obstruction here.** -/
+theorem genotypeVisible_driftDefect_zero :
+    driftDefect ancestryPairWeights genotypeVisibleRisk = 0 := by
+  unfold driftDefect pooledConditional ancestryPairWeights genotypeVisibleRisk
+  norm_num [Fin.sum_univ_two]
+
+/-- **The obstruction is nonetheless there.** -/
+theorem trueRisk_driftDefect_pos :
+    0 < driftDefect ancestryPairWeights trueRiskUnderSocialDrift := by
+  unfold driftDefect pooledConditional ancestryPairWeights trueRiskUnderSocialDrift
+  norm_num [Fin.sum_univ_two]
+
+/-- **So no amount of genotyping closes it.** Every genotype-measurable statistic takes the same
+value on the two ancestries, so every predictor built from genotype data alone assigns them the
+same risk and carries the full gap. Diversifying the reference panel moves the attackable
+component and cannot move this one. -/
+theorem genotype_invisible_drift_irreducible :
+    driftDefect ancestryPairWeights genotypeVisibleRisk
+      < driftDefect ancestryPairWeights trueRiskUnderSocialDrift := by
+  rw [genotypeVisible_driftDefect_zero]
+  exact trueRisk_driftDefect_pos
+
 /-! #### A decision loss wants a median, not the mean that meta-analysis estimates
 
 Under squared loss the single best target is the ancestry-weighted MEAN, which is what a

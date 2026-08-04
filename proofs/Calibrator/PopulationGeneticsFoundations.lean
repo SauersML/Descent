@@ -142,6 +142,14 @@ section CoalescentTheory
 noncomputable def expectedHeterozygosity (θ : ℝ) : ℝ :=
   θ / (1 + θ)
 
+/-- **At unit scaled mutation rate the population is half heterozygous.** The membership in
+`[0,1)` recorded below holds for every increasing map into that interval; the value at `θ = 1`
+fixes which one, and it is the calibration point that distinguishes `θ/(1+θ)` from any other
+saturating form. -/
+theorem expectedHeterozygosity_at_one : expectedHeterozygosity 1 = 1 / 2 := by
+  unfold expectedHeterozygosity
+  norm_num
+
 /-- Expected heterozygosity is in [0, 1). -/
 theorem expected_het_in_unit (θ : ℝ) (h_θ : 0 ≤ θ) :
     0 ≤ expectedHeterozygosity θ ∧ expectedHeterozygosity θ < 1 := by
