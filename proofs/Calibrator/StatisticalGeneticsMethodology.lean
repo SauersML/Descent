@@ -56,7 +56,7 @@ noncomputable def incrementalR2 (r2_full r2_covariates : ℝ) : ℝ :=
 the theorem states a number: an inequality or an invariance leaves a family of bodies
 satisfying it, and a value does not. -/
 theorem incrementalR2_at_reference_point :
-    incrementalR2 1 1 = 0 := by
+    incrementalR2 (3 / 4) (1 / 4) = 1 / 2 := by
   norm_num [incrementalR2]
 
 
@@ -65,6 +65,13 @@ intermediate model plus the gain from there. A body that failed this would not b
 theorem incrementalR2_telescope (a b c : ℝ) :
     incrementalR2 a b + incrementalR2 b c = incrementalR2 a c := by
   unfold incrementalR2; ring
+
+/-- Incremental R² vanishes exactly when the full and covariate-only fits explain the
+same fraction of variance. -/
+theorem incrementalR2_eq_zero_iff (r2_full r2_covariates : ℝ) :
+    incrementalR2 r2_full r2_covariates = 0 ↔ r2_full = r2_covariates := by
+  unfold incrementalR2
+  exact sub_eq_zero
 
 /-- Nesting the models makes the increment nonnegative. -/
 theorem incrementalR2_nonneg (r2_full r2_covariates : ℝ)
@@ -81,7 +88,7 @@ theorem incrementalR2_nonneg (r2_full r2_covariates : ℝ)
     We encode this as: the full model's R² is at least the
     covariate-only model's R², which is a consequence of OLS
     minimizing sum of squared residuals over a nested subspace. -/
-theorem incremental_r2_nonneg
+theorem incrementalR2_nonneg_of_rss_le
     (rss_full rss_cov tss : ℝ)
     (h_tss : 0 < tss)
     -- Nested model property: full model has no more residual than submodel
@@ -111,7 +118,7 @@ theorem portabilityRatio_zero_dr2source_is_junk (dr2_target : ℝ) :
   simp
 
 /-- Portability ratio ≤ 1 when target PGS is weaker. -/
-theorem portability_ratio_le_one
+theorem portabilityRatio_le_one
     (dr2_t dr2_s : ℝ) (h_s : 0 < dr2_s) (h_weaker : dr2_t ≤ dr2_s) :
     portabilityRatio dr2_t dr2_s ≤ 1 := by
   unfold portabilityRatio
@@ -119,15 +126,29 @@ theorem portability_ratio_le_one
 
 /-- **The portability ratio reaches one exactly at full transport.**
 
-    The companion equality to `portability_ratio_le_one`. Without it the bound
+    The companion equality to `portabilityRatio_le_one`. Without it the bound
     is compatible with a ratio that can never reach its own ceiling; with it,
     the ceiling is attained precisely when the target increment equals the
     source increment, and at no other point. -/
-theorem portability_ratio_eq_one_iff
+theorem portabilityRatio_eq_one_iff
     (dr2_t dr2_s : ℝ) (h_s : 0 < dr2_s) :
     portabilityRatio dr2_t dr2_s = 1 ↔ dr2_t = dr2_s := by
   unfold portabilityRatio
   rw [div_eq_iff (ne_of_gt h_s), one_mul]
+
+/-- Against a nonzero source increment, zero portability is exactly zero target
+increment rather than an artifact of division by zero. -/
+theorem portabilityRatio_eq_zero_iff
+    (dr2_t dr2_s : ℝ) (h_s : dr2_s ≠ 0) :
+    portabilityRatio dr2_t dr2_s = 0 ↔ dr2_t = 0 := by
+  unfold portabilityRatio
+  constructor
+  · intro h
+    calc
+      dr2_t = dr2_t / dr2_s * dr2_s := (div_mul_cancel₀ dr2_t h_s).symm
+      _ = 0 := by rw [h]; norm_num
+  · rintro rfl
+    norm_num
 
 end IncrementalR2
 
