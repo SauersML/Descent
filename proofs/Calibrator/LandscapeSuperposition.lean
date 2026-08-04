@@ -781,6 +781,14 @@ theorem criticalMinorityProportion_at_zero_correlation_is_junk :
     criticalMinorityProportion 0 = 1 / 2 := by
   norm_num [criticalMinorityProportion]
 
+/-- **Exact maximal-correlation diversity threshold.**  When the two pure environments have
+unit-magnitude opposite correlations, the minimum minority share that reaches the non-gapped
+population phase is `(3 - √5) / 4`, approximately nineteen percent. -/
+theorem criticalMinorityProportion_one :
+    criticalMinorityProportion 1 = (3 - Real.sqrt 5) / 4 := by
+  unfold criticalMinorityProportion goldenCorrelationThreshold
+  ring
+
 /-- For positive correlation, the critical minority share is the lower endpoint
 `(rho - rho_c) / (2 rho)` of the exact gap-closing interval. -/
 theorem criticalMinorityProportion_eq_ratio
