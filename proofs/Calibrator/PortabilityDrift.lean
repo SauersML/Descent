@@ -82,6 +82,16 @@ theorem coalescentTau_two_Ne_generations (Ne : ℝ) (hNe : Ne ≠ 0) :
   unfold coalescentTau
   field_simp
 
+/-- **Coalescent time at zero effective size, named.** With no population there is no coalescent
+timescale to divide by, and every finite separation is infinitely many drift units. The divisor
+is zero and Lean returns `0`, reporting no divergence at all -- so every `Fst` computed through
+this chart from a zero effective size comes out at zero, indistinguishable from two populations
+that have just split. Consumers must require `Ne ≠ 0`. -/
+theorem coalescentTau_zero_population_is_junk (t : ℝ) :
+    coalescentTau t 0 = 0 := by
+  unfold coalescentTau
+  norm_num
+
 /-- **`F_ST` after a clean split, in coalescent units.**
 
 This is not an independent formula.  It is `coalFst` expressed in units of
@@ -369,6 +379,17 @@ theorem hudsonFstFromCoalescenceTimes_double_between :
   unfold hudsonFstFromCoalescenceTimes
   norm_num
 
+/-- **Hudson's estimator at zero between-population coalescence time, named.** If a pair drawn
+between populations coalesces instantly there is no differentiation at all, so `Fst` should be
+zero or undefined. The divisor is zero, the ratio is junk-zero, and the estimator returns `1` --
+COMPLETE differentiation, the opposite end of the scale. Of the junk branches in this chart this
+is the one that inverts rather than flattens, so it cannot be spotted as an implausible extreme.
+Consumers must require `ETst ≠ 0`. -/
+theorem hudsonFstFromCoalescenceTimes_instant_between_is_junk (ETss : ℝ) :
+    hudsonFstFromCoalescenceTimes ETss 0 = 1 := by
+  unfold hudsonFstFromCoalescenceTimes
+  simp
+
 noncomputable def DemographicCoalescenceScalars.delta
     (d : DemographicCoalescenceScalars) : ℝ :=
   hudsonFstFromCoalescenceTimes d.ETss d.ETst
@@ -414,6 +435,16 @@ theorem twoDemeIMFirstStepDiff_unit_migration (ETss ETst : ℝ) :
     twoDemeIMFirstStepDiff 1 ETss ETst = 1 + ETss := by
   unfold twoDemeIMFirstStepDiff
   norm_num
+
+/-- **The between-deme first step at zero migration, named.** With no migration a lineage can
+never leave its deme, so two lineages in different demes never coalesce and the waiting time is
+infinite. The divisor is zero and Lean returns `0` for the waiting term, leaving the between-deme
+time EQUAL to the within-deme time -- complete panmixia, reported for two demes that never
+exchange a single migrant. Consumers must require `M ≠ 0`. -/
+theorem twoDemeIMFirstStepDiff_no_migration_is_junk (ETss ETst : ℝ) :
+    twoDemeIMFirstStepDiff 0 ETss ETst = ETss := by
+  unfold twoDemeIMFirstStepDiff
+  simp
 
 /-- **Expected within-deme coalescence time at migration-drift balance.**
 
@@ -474,6 +505,22 @@ theorem twoDemeIMEquilibriumETst_isFixedPoint (M : ℝ) (hM : 0 < M) :
   unfold twoDemeIMFirstStepDiff twoDemeIMEquilibriumETss twoDemeIMEquilibriumETst
   rw [eq_div_iff hM', add_mul, one_div_mul_cancel hM']
   ring
+
+/-- **The between-deme equilibrium at zero migration, named, and the reason it is dangerous.**
+With no migration the between-deme coalescence time is infinite. The divisor is zero and Lean
+returns `0`: INSTANT coalescence between demes that never exchange a migrant.
+
+The consequence propagates and then hides. `hudsonFstFromCoalescenceTimes` is `1 - ETss / ETst`,
+and at `ETst = 0` it is junk-`1` -- see
+`hudsonFstFromCoalescenceTimes_instant_between_is_junk`. So the chart reports complete
+differentiation for two isolated demes, which is the RIGHT answer, reached through two junk
+branches and a value that is the exact opposite of the truth at the intermediate step. A
+plausible final number is the worst possible cover for this, since nothing downstream will
+prompt anyone to look. Consumers must require `M ≠ 0`. -/
+theorem twoDemeIMEquilibriumETst_no_migration_is_junk :
+    twoDemeIMEquilibriumETst 0 = 0 := by
+  unfold twoDemeIMEquilibriumETst
+  simp
 
 /-- **The equilibrium F_ST is the Hudson ratio of the coalescent fixed
 point.**  One step of first-step analysis applied to the equilibrium times,
@@ -888,6 +935,16 @@ theorem presentDayPGSVariance_eq_one_sub_fst_mul (V_A fst : ℝ) :
     Empirical status: UNTESTED. -/
 noncomputable def wrightFisherDriftRetention (N t : ℕ) : ℝ :=
   (1 - 1 / (2 * (N : ℝ))) ^ t
+
+/-- **Wright-Fisher retention at zero census size, named.** An empty population loses all
+heterozygosity immediately, so retention is zero for every positive number of generations. The
+divisor is zero, the per-generation loss is junk-zero, and the retention factor is `1` raised to
+the generation count -- PERFECT retention, forever. The error grows with `t` rather than washing
+out, since the junk value is the multiplicative identity. Consumers must require `N ≠ 0`. -/
+theorem wrightFisherDriftRetention_empty_population_is_junk (t : ℕ) :
+    wrightFisherDriftRetention 0 t = 1 := by
+  unfold wrightFisherDriftRetention
+  simp
 
 /-- **Drift retention composes over time.** Retention across `s + t` generations is retention
 across `s` times retention across `t`, and no generations retain everything. That semigroup
@@ -3388,11 +3445,31 @@ noncomputable def liabilityThreshold (K : ℝ) : ℝ := Function.invFun Phi (1 -
 noncomputable def liabilityCaseMean (K : ℝ) : ℝ :=
   standardNormalPdf (liabilityThreshold K) / K
 
+/-- **The liability case mean at zero prevalence, named.** With no cases there is no case
+distribution and the mean liability among cases is undefined; as prevalence falls the true value
+diverges, since the surviving cases sit ever further into the tail. The divisor is zero and Lean
+returns `0` -- the POPULATION mean liability, the value for a trait under no ascertainment at
+all. Rare-disease work is exactly where prevalence approaches this branch. Consumers must require
+`K ≠ 0`. -/
+theorem liabilityCaseMean_zero_prevalence_is_junk :
+    liabilityCaseMean 0 = 0 := by
+  unfold liabilityCaseMean
+  simp
+
 /-- Mean liability among controls, `i_c = -i·K/(1-K)`.
 
     Empirical status: UNTESTED. -/
 noncomputable def liabilityControlMean (K : ℝ) : ℝ :=
   -liabilityCaseMean K * K / (1 - K)
+
+/-- **The liability control mean at unit prevalence, named.** If everyone is a case there are no
+controls and the control mean is undefined. The divisor `1 - K` is zero and Lean returns `0`, the
+population mean, so a universally prevalent trait reports a control group sitting exactly at the
+population average. Consumers must require `K ≠ 1`. -/
+theorem liabilityControlMean_unit_prevalence_is_junk :
+    liabilityControlMean 1 = 0 := by
+  unfold liabilityControlMean
+  simp
 
 /-- Score variance among cases, `v₁ = 1 - R²·i·(i - T)`.
 

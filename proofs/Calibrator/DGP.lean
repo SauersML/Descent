@@ -101,6 +101,17 @@ open scoped InnerProductSpace
 open InnerProductSpace
 open MeasureTheory
 
+/-- **Heterozygosity decay at zero effective size, named, and doubled.** Both factors divide by
+`2 Ne`, so at `Ne = 0` both are junk-zero and both factors collapse to one: the decay multiplier
+is `1`, reporting a population that loses no heterozygosity at all. An empty population in fact
+loses everything in one generation, so this is the maximal reversal, and it is produced by two
+independent junk branches in the same expression -- neither of which is visible in the value.
+Consumers must require `Ne ≠ 0`. -/
+theorem hetDecayFromScaled_zero_population_is_junk (θ : ℝ) :
+    hetDecayFromScaled 0 θ = 1 := by
+  unfold hetDecayFromScaled
+  simp
+
 section AllClaims
 
 variable {p k : ℕ}
@@ -302,6 +313,17 @@ theorem r2FromMSE_half_variance :
     r2FromMSE 1 2 = 1 / 2 := by
   unfold r2FromMSE
   norm_num
+
+/-- **`R²` against a constant outcome, named.** An outcome with no variance cannot be explained
+or failed to be explained: `R²` is undefined. The divisor is zero, the ratio is junk-zero, and
+the result is `1` -- PERFECT prediction, certified for a predictor that has done nothing, against
+a target that never moved. The direction matters: a junk `R²` of zero would look like a failure
+and be investigated, whereas a junk `R²` of one looks like a success. Consumers must require
+`varY ≠ 0`. -/
+theorem r2FromMSE_constant_outcome_is_junk (mse : ℝ) :
+    r2FromMSE mse 0 = 1 := by
+  unfold r2FromMSE
+  simp
 
 /-- Explained-variance fraction from score/outcome covariance, score variance,
 and total outcome variance. This is the exact moment-level coordinate used for
@@ -2981,6 +3003,16 @@ noncomputable def alleleFreqDivergenceRate (Ne mu m_rate : ℝ) : ℝ :=
   let theta := 4 * Ne * mu
   let bigM := 4 * Ne * m_rate
   1 / (2 * Ne * (1 + theta + bigM))
+
+/-- **The allele-frequency divergence rate at zero effective size, named.** Drift is
+instantaneous in an empty population, so the divergence rate diverges. The divisor is zero and
+Lean returns `0`: no divergence at all, indistinguishable from an infinite population. Scaled
+mutation and migration are themselves multiplied by `Ne`, so they vanish too and the denominator
+carries no trace of the degeneracy. Consumers must require `Ne ≠ 0`. -/
+theorem alleleFreqDivergenceRate_zero_population_is_junk (mu m_rate : ℝ) :
+    alleleFreqDivergenceRate 0 mu m_rate = 0 := by
+  unfold alleleFreqDivergenceRate
+  norm_num
 
 /-- **With neither mutation nor migration the rate is pure drift.** This is the reference point
 that fixes the `2Ne`, which no scale-free property of the formula can. -/

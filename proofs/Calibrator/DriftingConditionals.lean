@@ -592,6 +592,16 @@ theorem ouVariance_nonneg (horizon : OUHorizon) : 0 ≤ ouVariance horizon := by
       nlinarith [horizon.rate_pos, horizon.time_nonneg]))
   · exact mul_nonneg (by norm_num) horizon.rate_pos.le
 
+/-- **The Ornstein-Uhlenbeck variance's timescale, pinned.** `ouVariance_nonneg` is a sign, and
+holds for every body of the form `(1 - exp (-c * rate * time)) / (c * rate)`. At relaxation rate
+one half over unit time the accumulated variance is `1 - exp (-1)`, which fixes `c = 2` -- the
+factor that makes the stationary variance `1 / (2 * rate)` rather than `1 / rate`, and with it the
+rate at which a drifting conditional forgets its starting value. -/
+theorem ouVariance_unit_relaxation :
+    ouVariance ⟨1 / 2, 1, by norm_num, by norm_num⟩ = 1 - Real.exp (-1) := by
+  unfold ouVariance
+  norm_num
+
 /-- The denominator shared by both surfaces of the drifting probit index.
 
     Empirical status: UNTESTED. -/
