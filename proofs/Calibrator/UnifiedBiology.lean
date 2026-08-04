@@ -202,6 +202,14 @@ noncomputable def jointTransportLaw
 noncomputable def binaryTransportFamily (persists : Bool) : TransportPair → ℝ :=
   jointTransportLaw (if persists then persistentTransition else switchingTransition)
 
+/-- Both members of the persistence/switching family are genuine nonnegative finite laws. -/
+theorem binaryTransportFamily_nonneg (persists : Bool) (g : TransportPair) :
+    0 ≤ binaryTransportFamily persists g := by
+  rcases g with ⟨x, y⟩
+  cases persists <;> fin_cases x <;> fin_cases y <;>
+    norm_num [binaryTransportFamily, jointTransportLaw, binaryStateWeight,
+      persistentTransition, switchingTransition]
+
 /-- Target-only performance is the mean of a target-measurable kernel under the joint law. -/
 theorem targetOnlyTransportPerformance_eq_conditionalSectionMean
     (transition : BinaryBiologicalState → BinaryBiologicalState → ℝ)
@@ -244,20 +252,22 @@ theorem descends_targetAnnotation_along_targetState :
   descendsAlong_sectionMean_of_labelFunction _ binaryTransportFamily targetAnnotation
 
 /-- Under persistence, the source-adapted readout is perfect on every target fiber. -/
-theorem contextMatchQuality_value_persistent :
+theorem contextMatchQuality_value_persistent (y : BinaryBiologicalState) :
     conditionalSectionMean (fun g : TransportPair ↦ contextMatchQuality g.1 g.2)
-      (fiberConditional (fun g : TransportPair ↦ g.2) (binaryTransportFamily true) 0) = 1 := by
+      (fiberConditional (fun g : TransportPair ↦ g.2) (binaryTransportFamily true) y) = 1 := by
   rw [conditionalSectionMean_fiberConditional, labelMass_binaryTransportFamily]
-  norm_num [binaryTransportFamily, jointTransportLaw, binaryStateWeight, persistentTransition,
-    contextMatchQuality, Fintype.sum_prod_type, Fin.sum_univ_two]
+  fin_cases y <;>
+    norm_num [binaryTransportFamily, jointTransportLaw, binaryStateWeight, persistentTransition,
+      contextMatchQuality, Fintype.sum_prod_type, Fin.sum_univ_two]
 
 /-- Under complete switching, the same readout is worthless on the same fiber. -/
-theorem contextMatchQuality_value_switching :
+theorem contextMatchQuality_value_switching (y : BinaryBiologicalState) :
     conditionalSectionMean (fun g : TransportPair ↦ contextMatchQuality g.1 g.2)
-      (fiberConditional (fun g : TransportPair ↦ g.2) (binaryTransportFamily false) 0) = 0 := by
+      (fiberConditional (fun g : TransportPair ↦ g.2) (binaryTransportFamily false) y) = 0 := by
   rw [conditionalSectionMean_fiberConditional, labelMass_binaryTransportFamily]
-  norm_num [binaryTransportFamily, jointTransportLaw, binaryStateWeight, switchingTransition,
-    contextMatchQuality, Fintype.sum_prod_type, Fin.sum_univ_two]
+  fin_cases y <;>
+    norm_num [binaryTransportFamily, jointTransportLaw, binaryStateWeight, switchingTransition,
+      contextMatchQuality, Fintype.sum_prod_type, Fin.sum_univ_two]
 
 /-- **The cross-state criterion does not descend along the target context.**  No function of the
 target context reproduces it across the two dynamics, so a temporal criterion is a function of
@@ -281,17 +291,18 @@ theorem not_descends_contextMatchQuality_along_targetState :
   change conditionalSectionMean (fun g : TransportPair ↦ contextMatchQuality g.1 g.2)
       (fiberConditional (fun g : TransportPair ↦ g.2) (binaryTransportFamily false) 0) = value 0
     at hswitch
-  rw [contextMatchQuality_value_persistent] at hpersist
-  rw [contextMatchQuality_value_switching] at hswitch
+  rw [contextMatchQuality_value_persistent 0] at hpersist
+  rw [contextMatchQuality_value_switching 0] at hswitch
   rw [← hpersist] at hswitch
   norm_num at hswitch
 
-/-- **Uniform quantitative portability bound for the two-dynamics family.**  Across persistence
+/-- **Sharp range-sensitive portability bound for the two-dynamics family.**  Across persistence
 and switching, the largest observable change in source-adapted quality on a target-state fiber is
-bounded by the total-variation diameter of that fiber's conditional laws.  The maximum is taken
-over the whole finite family, so this is a population-uniform consequence rather than a
-pointwise restatement of continuity. -/
-theorem contextMatch_sectionOscillation_le_totalVariationDiameter (y : BinaryBiologicalState) :
+bounded by half the `ℓ¹` total-variation diameter.  The factor `1/2` uses both facts that the fiber
+conditionals are probability laws and that quality lies in `[0,1]`; the cruder sup-norm argument
+loses this factor.  The maximum is over the whole finite family, not a pointwise restatement. -/
+theorem contextMatch_sectionOscillation_le_half_totalVariationDiameter
+    (y : BinaryBiologicalState) :
     finiteSectionOscillation
         (fun persists y ↦
           labelMass (fun g : TransportPair ↦ g.2) (binaryTransportFamily persists) y ≠ 0)
@@ -304,18 +315,118 @@ theorem contextMatch_sectionOscillation_le_totalVariationDiameter (y : BinaryBio
           labelMass (fun g : TransportPair ↦ g.2) (binaryTransportFamily persists) y ≠ 0)
         (fun persists y ↦
           fiberConditional (fun g : TransportPair ↦ g.2) (binaryTransportFamily persists) y)
-        totalVariationGap y := by
+        totalVariationGap y / 2 := by
   apply finiteSectionOscillation_le_modulus_diameter
-      (omega := fun t ↦ t) (x := y)
+      (omega := fun t ↦ t / 2) (x := y)
   · exact totalVariationGap_nonneg
-  · exact monotone_id
+  · intro s t hst
+    linarith
   · norm_num
-  · intro μ ν
-    have hquality : ∀ g : TransportPair, |contextMatchQuality g.1 g.2| ≤ 1 := by
-      rintro ⟨x, z⟩
+  · intro persists switches hpersist hswitch
+    apply abs_sectionMean_sub_le_half_range
+        (fun g : TransportPair ↦ contextMatchQuality g.1 g.2)
+        _ _ 0 1 (by norm_num)
+    · rintro ⟨x, z⟩
       fin_cases x <;> fin_cases z <;> norm_num [contextMatchQuality]
-    simpa using abs_sectionMean_sub_le
-      (fun g : TransportPair ↦ contextMatchQuality g.1 g.2) μ ν 1 hquality
+    · exact sum_fiberConditional (fun g : TransportPair ↦ g.2)
+        (binaryTransportFamily persists) y hpersist
+    · exact sum_fiberConditional (fun g : TransportPair ↦ g.2)
+        (binaryTransportFamily switches) y hswitch
+
+/-- The two biological conditionals are opposite point masses on every target fiber, so their
+`ℓ¹` total-variation diameter is exactly two. -/
+theorem contextMatch_totalVariationDiameter_eq_two (y : BinaryBiologicalState) :
+    finiteSectionDiameter
+        (fun persists y ↦
+          labelMass (fun g : TransportPair ↦ g.2) (binaryTransportFamily persists) y ≠ 0)
+        (fun persists y ↦
+          fiberConditional (fun g : TransportPair ↦ g.2) (binaryTransportFamily persists) y)
+        totalVariationGap y = 2 := by
+  apply le_antisymm
+  · apply finiteSectionDiameter_le_of_pairwise (C := 2) (by norm_num)
+    intro persists switches hpersist hswitch
+    apply totalVariationGap_le_two_of_probabilityMasses
+    · intro g
+      exact fiberConditional_nonneg (fun g : TransportPair ↦ g.2)
+        (binaryTransportFamily persists) y (binaryTransportFamily_nonneg persists) hpersist g
+    · intro g
+      exact fiberConditional_nonneg (fun g : TransportPair ↦ g.2)
+        (binaryTransportFamily switches) y (binaryTransportFamily_nonneg switches) hswitch g
+    · exact sum_fiberConditional (fun g : TransportPair ↦ g.2)
+        (binaryTransportFamily persists) y hpersist
+    · exact sum_fiberConditional (fun g : TransportPair ↦ g.2)
+        (binaryTransportFamily switches) y hswitch
+  · have hpersist :
+        labelMass (fun g : TransportPair ↦ g.2) (binaryTransportFamily true) y ≠ 0 := by
+      rw [labelMass_binaryTransportFamily]
+      norm_num
+    have hswitch :
+        labelMass (fun g : TransportPair ↦ g.2) (binaryTransportFamily false) y ≠ 0 := by
+      rw [labelMass_binaryTransportFamily]
+      norm_num
+    have hlower := sectionPairDistance_le_finiteSectionDiameter
+      (fun persists y ↦
+        labelMass (fun g : TransportPair ↦ g.2) (binaryTransportFamily persists) y ≠ 0)
+      (fun persists y ↦
+        fiberConditional (fun g : TransportPair ↦ g.2) (binaryTransportFamily persists) y)
+      totalVariationGap y true false hpersist hswitch
+    have hgap :
+        totalVariationGap
+          (fiberConditional (fun g : TransportPair ↦ g.2) (binaryTransportFamily true) y)
+          (fiberConditional (fun g : TransportPair ↦ g.2) (binaryTransportFamily false) y) = 2 := by
+      fin_cases y <;>
+        norm_num [totalVariationGap, fiberConditional, labelMass, binaryTransportFamily,
+          jointTransportLaw, binaryStateWeight, persistentTransition, switchingTransition,
+          Fintype.sum_prod_type, Fin.sum_univ_two]
+    rwa [hgap] at hlower
+
+/-- **The quantitative obstruction is attained.**  On every target state the source-adapted
+readout changes from one under persistence to zero under switching, so the section oscillation is
+exactly one.  Together with `contextMatch_totalVariationDiameter_eq_two`, this proves equality in
+the sharp range-sensitive bound above rather than merely exhibiting non-descent. -/
+theorem contextMatch_sectionOscillation_eq_one (y : BinaryBiologicalState) :
+    finiteSectionOscillation
+        (fun persists y ↦
+          labelMass (fun g : TransportPair ↦ g.2) (binaryTransportFamily persists) y ≠ 0)
+        (fun persists y ↦
+          fiberConditional (fun g : TransportPair ↦ g.2) (binaryTransportFamily persists) y)
+        (conditionalSectionMean (fun g : TransportPair ↦ contextMatchQuality g.1 g.2))
+        (fun a b : ℝ ↦ |a - b|) y = 1 := by
+  apply le_antisymm
+  · calc
+      finiteSectionOscillation
+          (fun persists y ↦
+            labelMass (fun g : TransportPair ↦ g.2) (binaryTransportFamily persists) y ≠ 0)
+          (fun persists y ↦
+            fiberConditional (fun g : TransportPair ↦ g.2) (binaryTransportFamily persists) y)
+          (conditionalSectionMean (fun g : TransportPair ↦ contextMatchQuality g.1 g.2))
+          (fun a b : ℝ ↦ |a - b|) y ≤
+          finiteSectionDiameter
+            (fun persists y ↦
+              labelMass (fun g : TransportPair ↦ g.2) (binaryTransportFamily persists) y ≠ 0)
+            (fun persists y ↦
+              fiberConditional (fun g : TransportPair ↦ g.2) (binaryTransportFamily persists) y)
+            totalVariationGap y / 2 :=
+        contextMatch_sectionOscillation_le_half_totalVariationDiameter y
+      _ = 1 := by rw [contextMatch_totalVariationDiameter_eq_two]; norm_num
+  · have hpersist :
+        labelMass (fun g : TransportPair ↦ g.2) (binaryTransportFamily true) y ≠ 0 := by
+      rw [labelMass_binaryTransportFamily]
+      norm_num
+    have hswitch :
+        labelMass (fun g : TransportPair ↦ g.2) (binaryTransportFamily false) y ≠ 0 := by
+      rw [labelMass_binaryTransportFamily]
+      norm_num
+    have hlower := sectionPairValueDistance_le_finiteSectionOscillation
+      (fun persists y ↦
+        labelMass (fun g : TransportPair ↦ g.2) (binaryTransportFamily persists) y ≠ 0)
+      (fun persists y ↦
+        fiberConditional (fun g : TransportPair ↦ g.2) (binaryTransportFamily persists) y)
+      (conditionalSectionMean (fun g : TransportPair ↦ contextMatchQuality g.1 g.2))
+      (fun a b : ℝ ↦ |a - b|) y true false hpersist hswitch
+    rw [contextMatchQuality_value_persistent y, contextMatchQuality_value_switching y] at hlower
+    norm_num at hlower ⊢
+    exact hlower
 
 /-! ## The adaptation time and the transport time are one time -/
 

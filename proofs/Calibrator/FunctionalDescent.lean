@@ -192,6 +192,20 @@ theorem sectionPairDistance_le_finiteSectionDiameter [Fintype Population] [Nonem
   refine Finset.le_sup'_of_le _ (Finset.mem_univ Q) ?_
   simp [hP, hQ]
 
+/-- Every observable pairwise disagreement contributes to the finite section oscillation. -/
+theorem sectionPairValueDistance_le_finiteSectionOscillation
+    [Fintype Population] [Nonempty Population]
+    (supported : Population → Context → Prop)
+    (conditionalSection : Population → Context → Conditional)
+    (b : Conditional → Value) (d : Value → Value → ℝ) (x : Context) (P Q : Population)
+    (hP : supported P x) (hQ : supported Q x) :
+    d (b (conditionalSection P x)) (b (conditionalSection Q x)) ≤
+      finiteSectionOscillation supported conditionalSection b d x := by
+  unfold finiteSectionOscillation
+  refine Finset.le_sup'_of_le _ (Finset.mem_univ P) ?_
+  refine Finset.le_sup'_of_le _ (Finset.mem_univ Q) ?_
+  simp [hP, hQ]
+
 /-- A nonnegative conditional distance gives a nonnegative section diameter. -/
 theorem finiteSectionDiameter_nonneg [Fintype Population] [Nonempty Population]
     (supported : Population → Context → Prop)
@@ -207,6 +221,25 @@ theorem finiteSectionDiameter_nonneg [Fintype Population] [Nonempty Population]
   · simp [hP, hrho]
   · simp [hP]
 
+/-- A uniform pairwise bound controls the finite section diameter.  The separate bound at zero
+is necessary because unsupported pairs contribute zero by definition. -/
+theorem finiteSectionDiameter_le_of_pairwise [Fintype Population] [Nonempty Population]
+    (supported : Population → Context → Prop)
+    (conditionalSection : Population → Context → Conditional)
+    (rho : Conditional → Conditional → ℝ) (x : Context) (C : ℝ)
+    (hC : 0 ≤ C)
+    (hpair : ∀ P Q, supported P x → supported Q x →
+      rho (conditionalSection P x) (conditionalSection Q x) ≤ C) :
+    finiteSectionDiameter supported conditionalSection rho x ≤ C := by
+  unfold finiteSectionDiameter
+  refine Finset.sup'_le _ _ fun P _ ↦ ?_
+  refine Finset.sup'_le _ _ fun Q _ ↦ ?_
+  by_cases hsupported : supported P x ∧ supported Q x
+  · rw [if_pos hsupported]
+    exact hpair P Q hsupported.1 hsupported.2
+  · rw [if_neg hsupported]
+    exact hC
+
 /-- **Uniform quantitative descent.**  A monotone modulus bounds the entire observable
 oscillation by its value at the section diameter.  Unlike the former pointwise wrapper, this
 theorem performs the finite maximization and derives a population-uniform statement. -/
@@ -218,7 +251,9 @@ theorem finiteSectionOscillation_le_modulus_diameter
     (d : Value → Value → ℝ) (omega : ℝ → ℝ) (x : Context)
     (hrho : ∀ μ ν, 0 ≤ rho μ ν) (homega : Monotone omega)
     (homega0 : 0 ≤ omega 0)
-    (hmod : ∀ μ ν, d (b μ) (b ν) ≤ omega (rho μ ν)) :
+    (hmod : ∀ P Q, supported P x → supported Q x →
+      d (b (conditionalSection P x)) (b (conditionalSection Q x)) ≤
+        omega (rho (conditionalSection P x) (conditionalSection Q x))) :
     finiteSectionOscillation supported conditionalSection b d x ≤
       omega (finiteSectionDiameter supported conditionalSection rho x) := by
   unfold finiteSectionOscillation
@@ -226,7 +261,7 @@ theorem finiteSectionOscillation_le_modulus_diameter
   refine Finset.sup'_le _ _ fun Q _ ↦ ?_
   by_cases hsupported : supported P x ∧ supported Q x
   · rw [if_pos hsupported]
-    exact (hmod _ _).trans (homega
+    exact (hmod P Q hsupported.1 hsupported.2).trans (homega
       (sectionPairDistance_le_finiteSectionDiameter supported conditionalSection rho x P Q
         hsupported.1 hsupported.2))
   · rw [if_neg hsupported]

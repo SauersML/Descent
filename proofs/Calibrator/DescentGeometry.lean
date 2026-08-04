@@ -90,6 +90,21 @@ noncomputable def totalVariationGap (μ ν : Genome → ℝ) : ℝ := ∑ g, |μ
 theorem totalVariationGap_nonneg (μ ν : Genome → ℝ) : 0 ≤ totalVariationGap μ ν := by
   exact Finset.sum_nonneg fun g _ ↦ abs_nonneg (μ g - ν g)
 
+/-- In the `ℓ¹` normalization, two finite probability masses are at total-variation gap at most
+two.  Nonnegativity and unit mass are explicit: the statement is false for arbitrary signed
+masses or unnormalised sections. -/
+theorem totalVariationGap_le_two_of_probabilityMasses (μ ν : Genome → ℝ)
+    (hμ_nonneg : ∀ g, 0 ≤ μ g) (hν_nonneg : ∀ g, 0 ≤ ν g)
+    (hμ_sum : ∑ g, μ g = 1) (hν_sum : ∑ g, ν g = 1) :
+    totalVariationGap μ ν ≤ 2 := by
+  rw [totalVariationGap]
+  calc
+    (∑ g, |μ g - ν g|) ≤ ∑ g, (μ g + ν g) := by
+      refine Finset.sum_le_sum fun g _ ↦ ?_
+      exact abs_le.2 ⟨by linarith [hμ_nonneg g, hν_nonneg g],
+        by linarith [hμ_nonneg g, hν_nonneg g]⟩
+    _ = 2 := by rw [Finset.sum_add_distrib, hμ_sum, hν_sum]; norm_num
+
 /-- `b` **descends along** the label map `π` over the family `P` when one label function
 reproduces the value of `b` on every member's fiber conditional, at every label that member
 charges.  This is the property a group-level report claims. -/
@@ -151,6 +166,29 @@ theorem labelMass_fiberConditional (π : Genome → Label) (p : Genome → ℝ) 
         rw [Finset.sum_div]
         exact Finset.sum_congr rfl fun g _ ↦ hterm g
     _ = 1 := div_self h
+
+/-- A supported fiber conditional has total mass one, not merely fiber mass one. -/
+theorem sum_fiberConditional (π : Genome → Label) (p : Genome → ℝ) (x : Label)
+    (h : labelMass π p x ≠ 0) : ∑ g, fiberConditional π p x g = 1 := by
+  rw [← labelMass_fiberConditional π p x h]
+  unfold labelMass
+  apply Finset.sum_congr rfl
+  intro g _
+  by_cases hg : π g = x
+  · simp [hg]
+  · simp [fiberConditional, hg]
+
+/-- Conditioning a nonnegative finite law on a charged fiber preserves nonnegativity. -/
+theorem fiberConditional_nonneg (π : Genome → Label) (p : Genome → ℝ) (x : Label)
+    (hp : ∀ g, 0 ≤ p g) (h : labelMass π p x ≠ 0) (g : Genome) :
+    0 ≤ fiberConditional π p x g := by
+  have hmass : 0 < labelMass π p x :=
+    lt_of_le_of_ne (labelMass_nonneg π p hp x) (Ne.symm h)
+  unfold fiberConditional
+  by_cases hg : π g = x
+  · rw [if_pos hg]
+    exact div_nonneg (hp g) (le_of_lt hmass)
+  · rw [if_neg hg]
 
 /-- **Exact finite descent characterization.**  A label report exists exactly when any two
 populations agree at every label both charge and the total witness-function space is inhabited.
@@ -347,6 +385,43 @@ theorem abs_sectionMean_sub_le (f μ ν : Genome → ℝ) (C : ℝ) (hf : ∀ g,
   refine le_trans (Finset.abs_sum_le_sum_abs _ _) (Finset.sum_le_sum fun g _ ↦ ?_)
   rw [abs_mul, mul_comm C]
   exact mul_le_mul_of_nonneg_left (hf g) (abs_nonneg _)
+
+/-- **Range-sensitive total-variation bound.**  For probability masses, translating a kernel by
+the midpoint of its range does not change the difference of its expectations.  Consequently a
+kernel valued in `[a,b]` pays only `(b-a)/2` against the `ℓ¹` total-variation gap.  The factor is
+sharp (and is the one needed by binary biological readouts); `abs_sectionMean_sub_le` alone loses
+a factor of two because it forgets normalization. -/
+theorem abs_sectionMean_sub_le_half_range (f μ ν : Genome → ℝ) (a b : ℝ)
+    (hab : a ≤ b) (hf : ∀ g, a ≤ f g ∧ f g ≤ b)
+    (hμ : ∑ g, μ g = 1) (hν : ∑ g, ν g = 1) :
+    |conditionalSectionMean f μ - conditionalSectionMean f ν| ≤
+      ((b - a) / 2) * totalVariationGap μ ν := by
+  let c : ℝ := (a + b) / 2
+  let centered : Genome → ℝ := fun g ↦ f g - c
+  have hcentered : ∀ g, |centered g| ≤ (b - a) / 2 := by
+    intro g
+    apply abs_le.2
+    dsimp [centered, c]
+    constructor <;> linarith [(hf g).1, (hf g).2]
+  have hzero : ∑ g, (μ g - ν g) = 0 := by
+    rw [Finset.sum_sub_distrib, hμ, hν]
+    norm_num
+  have htranslate :
+      conditionalSectionMean centered μ - conditionalSectionMean centered ν =
+        conditionalSectionMean f μ - conditionalSectionMean f ν := by
+    rw [conditionalSectionMean_sub_eq_width, conditionalSectionMean_sub_eq_width]
+    calc
+      (∑ g, (μ g - ν g) * centered g) =
+          ∑ g, ((μ g - ν g) * f g - (μ g - ν g) * c) := by
+            apply Finset.sum_congr rfl
+            intro g _
+            dsimp [centered]
+            ring
+      _ = (∑ g, (μ g - ν g) * f g) - (∑ g, (μ g - ν g)) * c := by
+            rw [Finset.sum_sub_distrib, Finset.sum_mul]
+      _ = ∑ g, (μ g - ν g) * f g := by rw [hzero]; ring
+  rw [← htranslate]
+  exact abs_sectionMean_sub_le centered μ ν ((b - a) / 2) hcentered
 
 /-- **The width is attained.**  Some kernel of sup-norm one separates two laws by exactly their
 total-variation gap, so the bound above is the support-function width of the section in the
