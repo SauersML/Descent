@@ -224,37 +224,51 @@ but the portability implications are complex.
 
 section WGSBasedPGS
 
+/-- Cross-population signal carried by a variant after multiplying its additive genetic-variance
+contribution by its sharing probability. -/
+noncomputable def portableVariantSignal (β frequency sharing : ℝ) : ℝ :=
+  variantGeneticVarianceContribution β frequency * sharing
 
-/-- **`β²·2p(1-p)·s` is monotone in `p` below `1/2` and in `s`:** raising both
-    the frequency and the sharing rate does not decrease the product.
-
-    The reading is that the common-variant part of a score ports better than
-    the rare part. Below there is no score, no component and no population, and
-    the expression `β²·2p(1-p)·s` being the cross-population signal is
-    stipulated rather than derived. Two monotonicity steps in a product of
-    nonnegatives. -/
-theorem mul_genotype_variance_mul_le_of_le
+/-- **Portable variant signal is jointly monotone in frequency below one-half and in sharing.**
+The theorem includes zero effects, equal frequencies, and zero sharing; strict hypotheses are not
+needed for a non-strict portability comparison. -/
+theorem portableVariantSignal_mono_frequency_sharing
     (β p_common p_rare s_common s_rare : ℝ)
-    (h_β : β ≠ 0)
-    (h_pc : 0 < p_common) (h_pc1 : p_common < 1)
-    (h_pr : 0 < p_rare) (h_pr1 : p_rare < 1)
-    (h_sr : 0 < s_rare)
-    (h_freq : p_rare < p_common) (h_half : p_common ≤ 1/2)
+    (h_pr : 0 ≤ p_rare)
+    (h_freq : p_rare ≤ p_common) (h_half : p_common ≤ 1 / 2)
+    (h_sr : 0 ≤ s_rare)
     (h_sharing : s_rare ≤ s_common) :
-    β ^ 2 * (2 * p_rare * (1 - p_rare)) * s_rare ≤
-      β ^ 2 * (2 * p_common * (1 - p_common)) * s_common := by
-  have h_β2 : 0 < β ^ 2 := sq_pos_of_ne_zero h_β
+    portableVariantSignal β p_rare s_rare ≤
+      portableVariantSignal β p_common s_common := by
+  unfold portableVariantSignal variantGeneticVarianceContribution
+  have h_β2 : 0 ≤ β ^ 2 := sq_nonneg β
   have h_het_rare : 0 ≤ 2 * p_rare * (1 - p_rare) := by nlinarith
   have h_het_le : 2 * p_rare * (1 - p_rare) ≤ 2 * p_common * (1 - p_common) := by
     nlinarith [sq_nonneg (p_common - 1/2), sq_nonneg (p_rare - 1/2)]
   calc β ^ 2 * (2 * p_rare * (1 - p_rare)) * s_rare
       ≤ β ^ 2 * (2 * p_common * (1 - p_common)) * s_rare := by
-        apply mul_le_mul_of_nonneg_right _ (le_of_lt h_sr)
-        exact mul_le_mul_of_nonneg_left h_het_le (le_of_lt h_β2)
+        apply mul_le_mul_of_nonneg_right _ h_sr
+        exact mul_le_mul_of_nonneg_left h_het_le h_β2
     _ ≤ β ^ 2 * (2 * p_common * (1 - p_common)) * s_common := by
         apply mul_le_mul_of_nonneg_left h_sharing
-        apply mul_nonneg (le_of_lt h_β2)
+        apply mul_nonneg h_β2
         nlinarith [sq_nonneg (p_common - 1/2)]
+
+/-- For a polymorphic nonzero-effect variant, portable signal vanishes exactly when the variant
+is not shared with the target population. -/
+theorem portableVariantSignal_eq_zero_iff
+    (β frequency sharing : ℝ)
+    (h_effect : β ≠ 0) (h_freq_pos : 0 < frequency) (h_freq_lt : frequency < 1) :
+    portableVariantSignal β frequency sharing = 0 ↔ sharing = 0 := by
+  have h_contribution : variantGeneticVarianceContribution β frequency ≠ 0 := by
+    intro h_zero
+    rcases (variantGeneticVarianceContribution_eq_zero_iff β frequency h_effect).1 h_zero with
+      h_zero_freq | h_fixed
+    · linarith
+    · linarith
+  unfold portableVariantSignal
+  rw [mul_eq_zero]
+  simp [h_contribution]
 
 
 end WGSBasedPGS
