@@ -3065,6 +3065,69 @@ theorem alleleFreqMismatchPenalty_unit_gap (pSource : ℝ) :
   rw [h]
   norm_num
 
+/-- **The outcome scale of a generational transport model**, as one object.
+
+Four numbers and the five side conditions that keep them admissible: outcome variance in
+each population, the untaggable-phenotype variance, and the target prevalence.  None of them
+mentions the panel dimensions, and every witness in the corpus sets them the same way, so as
+fields of the model they were nine lines of boilerplate repeated at each witness -- text the
+duplication guard could see and no constructor could share, because a field assignment
+cannot be lifted out of a structure literal.  As their own structure they are one argument,
+and `balanced` is the setting every witness actually wants. -/
+structure GenerationalOutcomeScale where
+  /-- Outcome variance in the source population. -/
+  sourceOutcomeVariance : ℝ
+  /-- Outcome variance in the target population, per generation. -/
+  targetOutcomeVarianceAt : ℕ → ℝ
+  /-- Variance of the target-only untaggable phenotype, per generation. -/
+  novelUntaggablePhenotypeVarianceAt : ℕ → ℝ
+  /-- Target prevalence, per generation. -/
+  targetPrevalenceAt : ℕ → ℝ
+  /-- Source outcome variance is positive. -/
+  sourceOutcomeVariance_pos : 0 < sourceOutcomeVariance
+  /-- Target outcome variance is positive at every generation. -/
+  targetOutcomeVariance_pos : ∀ t, 0 < targetOutcomeVarianceAt t
+  /-- The untaggable-phenotype variance is a variance. -/
+  novelUntaggablePhenotypeVariance_nonneg : ∀ t, 0 ≤ novelUntaggablePhenotypeVarianceAt t
+  /-- Prevalence is positive at every generation. -/
+  targetPrevalence_pos : ∀ t, 0 < targetPrevalenceAt t
+  /-- ... and below one. -/
+  targetPrevalence_lt_one : ∀ t, targetPrevalenceAt t < 1
+
+/-- **The balanced outcome scale**: variance `v` in both populations, no untaggable
+phenotype, prevalence one half and constant in time.  This is what every generational
+witness in the corpus sets, and it is now set once. -/
+noncomputable def GenerationalOutcomeScale.balanced (v : ℝ) (hv : 0 < v) :
+    GenerationalOutcomeScale where
+  sourceOutcomeVariance := v
+  targetOutcomeVarianceAt := fun _ ↦ v
+  novelUntaggablePhenotypeVarianceAt := fun _ ↦ 0
+  targetPrevalenceAt := fun _ ↦ 1 / 2
+  sourceOutcomeVariance_pos := hv
+  targetOutcomeVariance_pos := fun _ ↦ hv
+  novelUntaggablePhenotypeVariance_nonneg := fun _ ↦ le_rfl
+  targetPrevalence_pos := fun _ ↦ by norm_num
+  targetPrevalence_lt_one := fun _ ↦ by norm_num
+
+/-! The balanced scale's four values, as `simp` lemmas.  Witness proofs evaluate a model by
+unfolding its literal, and without these they stop at the constructor call rather than
+reaching the numbers -- which is the one cost of nesting these fields, paid once here. -/
+
+@[simp] theorem GenerationalOutcomeScale.balanced_sourceOutcomeVariance (v : ℝ) (hv : 0 < v) :
+    (GenerationalOutcomeScale.balanced v hv).sourceOutcomeVariance = v := rfl
+
+@[simp] theorem GenerationalOutcomeScale.balanced_targetOutcomeVarianceAt
+    (v : ℝ) (hv : 0 < v) (t : ℕ) :
+    (GenerationalOutcomeScale.balanced v hv).targetOutcomeVarianceAt t = v := rfl
+
+@[simp] theorem GenerationalOutcomeScale.balanced_novelUntaggablePhenotypeVarianceAt
+    (v : ℝ) (hv : 0 < v) (t : ℕ) :
+    (GenerationalOutcomeScale.balanced v hv).novelUntaggablePhenotypeVarianceAt t = 0 := rfl
+
+@[simp] theorem GenerationalOutcomeScale.balanced_targetPrevalenceAt
+    (v : ℝ) (hv : 0 < v) (t : ℕ) :
+    (GenerationalOutcomeScale.balanced v hv).targetPrevalenceAt t = 1 / 2 := rfl
+
 /-- Generation-indexed cross-population state. Source quantities are fixed at
 training time; target quantities are explicit functions of generation. The
 time-varying target LD and tagging state is derived from:
@@ -3102,15 +3165,47 @@ structure CrossPopulationGenerationalModel (p q : ℕ) where
   causalAlleleFreqMutationShiftAt : ℕ → Fin q → ℝ
   contextCrossSource : Fin p → ℝ
   contextCrossTargetAt : ℕ → Fin p → ℝ
-  sourceOutcomeVariance : ℝ
-  targetOutcomeVarianceAt : ℕ → ℝ
-  novelUntaggablePhenotypeVarianceAt : ℕ → ℝ
-  targetPrevalenceAt : ℕ → ℝ
-  sourceOutcomeVariance_pos : 0 < sourceOutcomeVariance
-  targetOutcomeVariance_pos : ∀ t, 0 < targetOutcomeVarianceAt t
-  novelUntaggablePhenotypeVariance_nonneg : ∀ t, 0 ≤ novelUntaggablePhenotypeVarianceAt t
-  targetPrevalence_pos : ∀ t, 0 < targetPrevalenceAt t
-  targetPrevalence_lt_one : ∀ t, targetPrevalenceAt t < 1
+  /-- The outcome scale.  The accessors below expose its fields under their old names, so
+  every reader of the model is unaffected by the nesting. -/
+  outcome : GenerationalOutcomeScale
+
+namespace CrossPopulationGenerationalModel
+
+variable {p q : ℕ} (m : CrossPopulationGenerationalModel p q)
+
+/-! The outcome scale's fields, under the names they had when they were fields of the model.
+They are `abbrev`s and projections, so nothing that read them before reads differently now. -/
+
+/-- Outcome variance in the source population. -/
+abbrev sourceOutcomeVariance : ℝ := m.outcome.sourceOutcomeVariance
+
+/-- Outcome variance in the target population, per generation. -/
+abbrev targetOutcomeVarianceAt : ℕ → ℝ := m.outcome.targetOutcomeVarianceAt
+
+/-- Variance of the target-only untaggable phenotype, per generation. -/
+abbrev novelUntaggablePhenotypeVarianceAt : ℕ → ℝ :=
+  m.outcome.novelUntaggablePhenotypeVarianceAt
+
+/-- Target prevalence, per generation. -/
+abbrev targetPrevalenceAt : ℕ → ℝ := m.outcome.targetPrevalenceAt
+
+theorem sourceOutcomeVariance_pos : 0 < m.sourceOutcomeVariance :=
+  m.outcome.sourceOutcomeVariance_pos
+
+theorem targetOutcomeVariance_pos : ∀ t, 0 < m.targetOutcomeVarianceAt t :=
+  m.outcome.targetOutcomeVariance_pos
+
+theorem novelUntaggablePhenotypeVariance_nonneg :
+    ∀ t, 0 ≤ m.novelUntaggablePhenotypeVarianceAt t :=
+  m.outcome.novelUntaggablePhenotypeVariance_nonneg
+
+theorem targetPrevalence_pos : ∀ t, 0 < m.targetPrevalenceAt t :=
+  m.outcome.targetPrevalence_pos
+
+theorem targetPrevalence_lt_one : ∀ t, m.targetPrevalenceAt t < 1 :=
+  m.outcome.targetPrevalence_lt_one
+
+end CrossPopulationGenerationalModel
 
 /-- **The generational transport model is inhabited**, at every panel size `(p, q)`.
 
@@ -3142,15 +3237,7 @@ noncomputable def CrossPopulationGenerationalModel.witness (p q : ℕ) :
   causalAlleleFreqMutationShiftAt := fun _ _ ↦ 0
   contextCrossSource := fun _ ↦ 0
   contextCrossTargetAt := fun _ _ ↦ 0
-  sourceOutcomeVariance := 1
-  targetOutcomeVarianceAt := fun _ ↦ 1
-  novelUntaggablePhenotypeVarianceAt := fun _ ↦ 0
-  targetPrevalenceAt := fun _ ↦ 1 / 2
-  sourceOutcomeVariance_pos := by norm_num
-  targetOutcomeVariance_pos := fun _ ↦ by norm_num
-  novelUntaggablePhenotypeVariance_nonneg := fun _ ↦ by norm_num
-  targetPrevalence_pos := fun _ ↦ by norm_num
-  targetPrevalence_lt_one := fun _ ↦ by norm_num
+  outcome := GenerationalOutcomeScale.balanced 1 (by norm_num)
 
 /-- Generation-indexed target effect vector. This is derived from the source
 effect vector plus an explicit locus-resolved heterogeneity path and a
@@ -6101,7 +6188,37 @@ theorem splitMigration_more_migration_less_fst
     `demoSteppingStoneFst`, and the coalescent derivation decides against the
     exponential.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **FALSIFIED** in its distance dependence
+    (`proofs/validation/empirical/simcov/battery_bulk11.py`). The body says
+    `F_ST` grows LINEARLY in the separation `d`, capped at one. Measured on a
+    20-deme 1D stepping stone, `Ne = 500`, `m = 0.01`, interior demes only so no
+    boundary reflection enters, `F_ST` read from coalescence times so no
+    estimator convention enters, 26 replicates of 6 Mb:
+
+      d    measured F_ST      linear (alpha from d=2)   saturating d/(d+K)
+      1    0.05073±0.00285          --                        --
+      2    0.09655±0.00423        fitted                    fitted
+      3    0.13472±0.00457    0.14238   (1.7 sems)       K = 19.27
+      5    0.18782±0.00399    0.23403  (11.6 sems)       K = 21.62
+      8    0.27945±0.00605    0.37151  (15.2 sems)       K = 20.63
+
+    `alpha` is fitted at `d = 2` and used to predict the rest, because a form
+    fitted to every point agrees with anything monotone. The linear form then
+    overshoots by 33 percent at `d = 8`, which is what a function without
+    saturation must do once the separation is large enough.
+
+    The sibling `DemographicHistory.demoSteppingStoneFst`, which saturates,
+    describes the SAME runs far better: its `K = d(1-F)/F` should be constant
+    and comes out 18.71, 19.27, 21.62, 20.63 -- a 15 percent drift rather than
+    33, and no systematic overshoot. That head-to-head on one dataset is the
+    evidence here, not a control cell that could only agree with itself.
+
+    Neither form is exact. The residual drift in `K` says the saturating form is
+    also approximate at these separations, and pinning the true `d`-dependence
+    is not attempted here.
+
+    Power: the measurement spans 0.05073 to 0.27945, a factor of five and a
+    half, and the two candidate forms diverge monotonically across it. -/
 noncomputable def steppingStoneFst (fst_neighbor α : ℝ) (d : ℕ) : ℝ :=
   min 1 (fst_neighbor * (1 + α * ((d : ℝ) - 1)))
 
