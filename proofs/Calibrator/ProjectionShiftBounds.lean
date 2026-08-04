@@ -91,6 +91,7 @@ theorem weighted_residual_moment_directional_bound
 def coefficientEnergy (B : Matrix ι ι ℝ) (x : ι → ℝ) : ℝ :=
   dot x (B.mulVec x)
 
+omit [DecidableEq ι] in
 theorem dot_add_right_shift (x y z : ι → ℝ) :
     dot x (y + z) = dot x y + dot x z := by
   simp [dot, mul_add, Finset.sum_add_distrib]
@@ -165,6 +166,7 @@ theorem projection_shift_eq_genuine_add_artifact
   rw [projection_shift_genuine_artifact_decomposition Q X hOld hNew u v htarget]
   rw [matrix_mulVec_add, hgenuine, hartifact]
 
+omit [DecidableEq ι] in
 /-- Exact energy expansion for the sum of a genuine component and a projection
 artifact. -/
 theorem coefficientEnergy_add
@@ -179,6 +181,7 @@ theorem coefficientEnergy_add
   rw [hsymmetric y x]
   ring
 
+omit [DecidableEq ι] in
 /-- Risk-level genuine/artifact decomposition with sharp norm budgets.  If the
 cross term obeys the corresponding Cauchy--Schwarz budget, total movement is
 bounded by the square of the sum of component budgets. -/
@@ -361,6 +364,7 @@ structure IsRankAllocation (k : ℝ) (M : ι → ℝ) : Prop where
   upper : ∀ i, M i ≤ 1
   trace : ∑ i, M i = k
 
+omit [DecidableEq ι] in
 /-- **The predicate is satisfiable.**  Every theorem below assumes an allocation
 exists; the zero allocation at budget `0` is one.  Without this they are conditional on
 a hypothesis nothing in the corpus discharges. -/
@@ -413,6 +417,7 @@ theorem captureRatio_le_of_le {a b c : ℝ} (h : a ≤ b) (hc : 0 < c) :
   rw [div_eq_mul_inv, div_eq_mul_inv]
   exact mul_le_mul_of_nonneg_right h (le_of_lt (inv_pos.mpr hc))
 
+omit [DecidableEq ι] in
 /-- A profile of nonnegative weights has nonnegative total.
 
 This is what replaces the caller-supplied positivity of the efficiency
@@ -477,6 +482,7 @@ does, and none can capture less than `S` does when the ordering is reversed.
 Nothing here needs a sort, an eigenvector, or a compactness argument.
 -/
 
+omit [DecidableEq ι] in
 /-- Recentring the profile at the threshold, on the whole index set: the allocation's
 capture of `w - t` is its capture of `w` less `t` times its trace.
 
@@ -491,6 +497,7 @@ theorem sum_mul_sub_const (w M : ι → ℝ) (t : ℝ) :
     _ = (∑ i, M i * w i) - ∑ i, t * M i := by rw [Finset.sum_sub_distrib]
     _ = (∑ i, M i * w i) - t * ∑ i, M i := by rw [← Finset.mul_sum]
 
+omit [Fintype ι] [DecidableEq ι] in
 /-- Recentring the profile at the threshold, on the chosen set: `t` leaves `|S|` copies of
 itself behind. -/
 theorem sum_sub_const_on (w : ι → ℝ) (S : Finset ι) (t : ℝ) :
@@ -500,6 +507,7 @@ theorem sum_sub_const_on (w : ι → ℝ) (S : Finset ι) (t : ℝ) :
     _ = (∑ i ∈ S, w i) - t * (S.card : ℝ) := by
         rw [Finset.sum_const, nsmul_eq_mul]; ring
 
+omit [DecidableEq ι] in
 /-- **Threshold optimality.**  `S` is `w`-dominant above the threshold `t`; then
 `S` maximises captured `w`-weight over all relaxed rank-`|S|` allocations. -/
 theorem spectralCapture_le_of_threshold
@@ -529,6 +537,7 @@ theorem spectralCapture_le_of_threshold
   unfold spectralCapture
   linarith
 
+omit [DecidableEq ι] in
 /-- **Threshold pessimality**, the mirror statement.  If `S` sits *below* the
 threshold in the profile `w`, then `S` captures less `w`-weight than any relaxed
 rank-`|S|` allocation.  This is the half that turns "pruning is greedy for
@@ -565,6 +574,7 @@ the very same set is separated *below* the threshold `1/t` in the detection
 profile.  So one hypothesis yields both conclusions, in opposite directions.
 -/
 
+omit [Fintype ι] [DecidableEq ι] in
 /-- A variance-dominant set is inverse-variance-dominated: the reversal of the
 weight order transports the separating threshold `t` to the threshold `t⁻¹`. -/
 theorem detection_threshold_of_variance_threshold
@@ -666,6 +676,7 @@ threshold, which is exactly when the threshold set of a given cardinality is not
 unique.
 -/
 
+omit [DecidableEq ι] in
 theorem spectralCapture_linear
     (w₁ w₂ M : ι → ℝ) (lam mu : ℝ) :
     spectralCapture (fun i ↦ lam * w₁ i + mu * w₂ i) M =
@@ -679,6 +690,7 @@ theorem spectralCapture_linear
     _ = lam * (∑ i, M i * w₁ i) + mu * ∑ i, M i * w₂ i := by
         rw [← Finset.mul_sum, ← Finset.mul_sum]
 
+omit [DecidableEq ι] in
 /-- The relaxed feasible set is convex. -/
 theorem isRankAllocation_convex {k lam : ℝ} {M N : ι → ℝ}
     (hM : IsRankAllocation k M) (hN : IsRankAllocation k N)
@@ -703,6 +715,7 @@ theorem isRankAllocation_convex {k lam : ℝ} {M N : ι → ℝ}
           rw [← Finset.mul_sum, ← Finset.mul_sum]
       _ = k := by rw [hM.trace, hN.trace]; ring
 
+omit [DecidableEq ι] in
 /-- Captured weight is affine along segments of the feasible set; hence so are
 both efficiencies, and hence the achievable region is convex. -/
 theorem spectralCapture_affine (w M N : ι → ℝ) (lam : ℝ) :
@@ -828,6 +841,7 @@ def HasThresholdSetAtEveryRank (score : ι → ℝ) : Prop :=
     ∃ (S : Finset ι) (t : ℝ), S.card = k ∧
       (∀ i ∈ S, t ≤ score i) ∧ (∀ i ∉ S, score i ≤ t)
 
+omit [DecidableEq ι] in
 /-- Constant scores have a threshold set at every rank: every subset of the
 right size works and the cut is at the common value. -/
 theorem hasThresholdSetAtEveryRank_const (c : ℝ) :
@@ -859,9 +873,9 @@ theorem hasThresholdSetAtEveryRank_of_fintype (score : ι → ℝ) :
     by_cases hι : (Finset.univ : Finset ι).Nonempty
     · obtain ⟨i, -, himax⟩ :=
         (Finset.univ : Finset ι).exists_max_image score hι
-      exact ⟨∅, score i, by simpa [hk0], by simp,
+      exact ⟨∅, score i, by simp [hk0], by simp,
         fun j _ ↦ himax j (Finset.mem_univ j)⟩
-    · refine ⟨∅, 0, by simpa [hk0], by simp, ?_⟩
+    · refine ⟨∅, 0, by simp [hk0], by simp, ?_⟩
       intro j _
       exact False.elim (hι ⟨j, Finset.mem_univ j⟩)
   · have hSnonempty : S.Nonempty := Finset.card_pos.mp (by omega)
@@ -944,6 +958,7 @@ optimum.  No abstract covariance is introduced.
 
 section RescalingAndRotation
 
+omit [DecidableEq ι] in
 /-- Rescaling a coefficient vector scales its energy by the square.
 
 Stated with `•` rather than `fun i ↦ c * x i` so that the scalar-multiplication
@@ -954,6 +969,7 @@ theorem coefficientEnergy_smul (B : Matrix ι ι ℝ) (c : ℝ) (x : ι → ℝ)
   rw [matrix_mulVec_smul, dot_smul_left, dot_smul_right]
   ring
 
+omit [DecidableEq ι] in
 /-- The `show`/`ring` in the conversion below is deliberate and should not be
 shortened back to `simp`.
 
@@ -976,6 +992,7 @@ theorem coefficientEnergy_sub (B : Matrix ι ι ℝ) (x y : ι → ℝ)
     coefficientEnergy_smul, matrix_mulVec_smul, dot_smul_right]
   ring
 
+omit [DecidableEq ι] in
 /-- **Excess risk along the recalibration orbit.**  Expanding the energy of
 `a * beta - theta` in the target metric gives a quadratic in the single scalar
 `a`; every statement below is about that quadratic. -/
@@ -1015,6 +1032,7 @@ def irreducibleDegradation (B : Matrix ι ι ℝ) (beta theta : ι → ℝ) : �
   coefficientEnergy B theta -
     dot beta (B.mulVec theta) ^ 2 / coefficientEnergy B beta
 
+omit [DecidableEq ι] in
 /-- **No rescaling reaches below the angle term.**  The recalibration orbit
 `{a * beta}` is bounded below by `irreducibleDegradation`, uniformly in `a`. -/
 theorem irreducibleDegradation_le_rescaled
@@ -1033,6 +1051,7 @@ theorem irreducibleDegradation_le_rescaled
   unfold irreducibleDegradation
   linarith
 
+omit [DecidableEq ι] in
 /-- **And the bound is attained, at the optimal recalibration.**  So
 `irreducibleDegradation` is the value of the recalibration problem, not merely a
 lower bound for it. -/
@@ -1050,6 +1069,7 @@ theorem rescaled_at_optimum_eq_irreducibleDegradation
   linear_combination
     (dot beta (B.mulVec theta) ^ 2 * (coefficientEnergy B beta)⁻¹) * hu
 
+omit [DecidableEq ι] in
 /-- **The degradation splits into a removable part and a class, and the
 removable part is a perfect square.**
 
@@ -1080,6 +1100,7 @@ theorem rescaled_energy_sub_irreducible_eq_sq
     (2 * a * dot beta (B.mulVec theta) -
       dot beta (B.mulVec theta) ^ 2 * (coefficientEnergy B beta)⁻¹) * hu
 
+omit [DecidableEq ι] in
 /-- The removable part is nonnegative, so the split is a decomposition into two
 nonnegative pieces rather than a cancellation. -/
 theorem removable_part_nonneg
@@ -1091,6 +1112,7 @@ theorem removable_part_nonneg
   rw [rescaled_energy_sub_irreducible_eq_sq B beta theta a hsymmetric hbeta]
   exact mul_nonneg (le_of_lt hbeta) (sq_nonneg _)
 
+omit [DecidableEq ι] in
 /-- **Recalibration removes the coboundary and only the coboundary.**  The
 degradation drops to the angle term exactly when the correction applied is the
 one that target wanted; any other scalar leaves a strictly positive remainder on
@@ -1131,6 +1153,7 @@ capture, or no coefficient energy to correct against -- so the returned value is
 quantity the name promises.  Naming the branch is what keeps a consumer from reading `0` as
 "perfectly inefficient" rather than "undefined here". -/
 
+omit [DecidableEq ι] in
 /-- With no total reconstruction weight there is nothing to be efficient about, and the
 quotient reports `0` rather than being undefined. -/
 theorem reconstructionEfficiency_at_zero_total_is_junk (spectrum M : ι → ℝ)
@@ -1139,6 +1162,7 @@ theorem reconstructionEfficiency_at_zero_total_is_junk (spectrum M : ι → ℝ)
   unfold reconstructionEfficiency
   rw [hzero, div_zero]
 
+omit [DecidableEq ι] in
 /-- The same boundary for the detection channel. -/
 theorem detectionEfficiency_at_zero_total_is_junk (spectrum M : ι → ℝ)
     (hzero : spectralTotal (fun i ↦ detectionWeight (spectrum i)) = 0) :
@@ -1146,6 +1170,7 @@ theorem detectionEfficiency_at_zero_total_is_junk (spectrum M : ι → ℝ)
   unfold detectionEfficiency
   rw [hzero, div_zero]
 
+omit [DecidableEq ι] in
 /-- A coefficient direction with no energy in the `B` metric has no optimal shared correction;
 the quotient reports `0`, which is a legitimate correction value and so cannot be recognised
 as degenerate by its value alone. -/
@@ -1155,6 +1180,7 @@ theorem sharedCorrectionOptimum_at_zero_energy_is_junk
   unfold sharedCorrectionOptimum
   rw [hzero, div_zero]
 
+omit [DecidableEq ι] in
 /-- At the same degenerate point the irreducible degradation collapses to the whole target
 energy: no correction is subtracted, because the quotient that would subtract it is junk. -/
 theorem irreducibleDegradation_at_zero_energy_is_junk
