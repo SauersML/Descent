@@ -378,6 +378,16 @@ noncomputable def Panel.fold {n : ℕ} (panel : Panel n) : Panel n :=
   { support := fun i ↦ min (panel.support i) (1 - panel.support i),
     weight := panel.weight }
 
+/-- Folding chooses the same canonical representative from both allele-label orientations. -/
+theorem Panel.reflect_fold {n : ℕ} (panel : Panel n) :
+    panel.reflect.fold = panel.fold := by
+  cases panel with
+  | mk support weight =>
+      simp only [Panel.reflect, Panel.fold]
+      congr 1
+      funext i
+      simp [min_comm]
+
 theorem diploid_massAt_fold (q v : ℝ) :
     diploidFamily.massAt (min q (1 - q)) v = diploidFamily.massAt q v := by
   rcases le_total q (1 - q) with h | h
@@ -410,6 +420,27 @@ theorem fold_support_nonneg {n : ℕ} (panel : Panel n) (i : Fin n)
   unfold Panel.fold
   simp only
   exact le_min h0 (by linarith)
+
+/-- **Folding is a projection on admissible allele-frequency panels.** Once every locus has been
+moved to minor-allele frequency, folding again changes neither its support nor its weights. -/
+theorem Panel.fold_idempotent {n : ℕ} (panel : Panel n)
+    (h0 : ∀ i, 0 ≤ panel.support i) (h1 : ∀ i, panel.support i ≤ 1) :
+    panel.fold.fold = panel.fold := by
+  cases panel with
+  | mk support weight =>
+      simp only [Panel.fold] at h0 h1 ⊢
+      congr 1
+      funext i
+      have hminor0 : 0 ≤ min (support i) (1 - support i) :=
+        le_min (h0 i) (by linarith [h1 i])
+      have hminorHalf : min (support i) (1 - support i) ≤ 1 / 2 := by
+        rcases le_total (support i) (1 - support i) with h | h
+        · rw [min_eq_left h]
+          linarith
+        · rw [min_eq_right h]
+          linarith
+      rw [min_eq_left]
+      linarith
 
 /-! ## 4. Ascertainment ties: the checkable warning
 
