@@ -157,12 +157,172 @@ theorem speedTiltFullMergerRate_mem_Ioc
     speedTiltFullMergerRate β extra ∈ Set.Ioc 0 1 :=
   ⟨speedTiltFullMergerRate_pos hβ extra, speedTiltFullMergerRate_le_one hβ extra⟩
 
-/-- All `b`-lineage, specified-`k`-tuple rates obtained by expanding
-`(1-x)^(b-k)` against the full-merger moments. -/
+/-- Multiplicative penalty contributed by `extra` lineages outside a specified merging
+`k`-tuple.  This is the finite Gamma-ratio identity
+
+`Gamma(β + extra + 1) / Gamma(β + 1) * Gamma(β + k) / Gamma(β + k + extra)`.
+
+The product form stays elementary and makes positivity transparent on `β > -1`, `2 ≤ k`. -/
+noncomputable def speedTiltNonMergerFactor (β : ℝ) (k extra : ℕ) : ℝ :=
+  ∏ j ∈ Finset.range extra,
+    (β + (j : ℝ) + 1) / (β + (k : ℝ) + (j : ℝ))
+
+/-- No outside lineage contributes no survival penalty. -/
+@[simp] theorem speedTiltNonMergerFactor_zero (β : ℝ) (k : ℕ) :
+    speedTiltNonMergerFactor β k 0 = 1 := by
+  simp [speedTiltNonMergerFactor]
+
+/-- Exact recurrence when one more lineage must avoid the specified merging parent. -/
+theorem speedTiltNonMergerFactor_succ (β : ℝ) (k extra : ℕ) :
+    speedTiltNonMergerFactor β k (extra + 1) =
+      speedTiltNonMergerFactor β k extra *
+        ((β + (extra : ℝ) + 1) / (β + (k : ℝ) + (extra : ℝ))) := by
+  simp only [speedTiltNonMergerFactor, Finset.prod_range_succ]
+
+/-- The outside-lineage factor is positive throughout the probability-law domain. -/
+theorem speedTiltNonMergerFactor_pos
+    {β : ℝ} (hβ : -1 < β) {k : ℕ} (hk : 2 ≤ k) (extra : ℕ) :
+    0 < speedTiltNonMergerFactor β k extra := by
+  unfold speedTiltNonMergerFactor
+  apply Finset.prod_pos
+  intro j _
+  apply div_pos
+  · have hj : 0 ≤ (j : ℝ) := Nat.cast_nonneg j
+    linarith
+  · have hkReal : 2 ≤ (k : ℝ) := by exact_mod_cast hk
+    have hj : 0 ≤ (j : ℝ) := Nat.cast_nonneg j
+    linarith
+
+/-- Each additional nonmerging lineage strictly lowers a specified merger rate. -/
+theorem speedTiltNonMergerFactor_strictAnti_extra
+    {β : ℝ} (hβ : -1 < β) {k : ℕ} (hk : 2 ≤ k) (extra : ℕ) :
+    speedTiltNonMergerFactor β k (extra + 1) <
+      speedTiltNonMergerFactor β k extra := by
+  rw [speedTiltNonMergerFactor_succ]
+  have hfactorPos : 0 < speedTiltNonMergerFactor β k extra :=
+    speedTiltNonMergerFactor_pos hβ hk extra
+  have hden : 0 < β + (k : ℝ) + (extra : ℝ) := by
+    have hkReal : 2 ≤ (k : ℝ) := by exact_mod_cast hk
+    have hextra : 0 ≤ (extra : ℝ) := Nat.cast_nonneg extra
+    linarith
+  have hratio :
+      (β + (extra : ℝ) + 1) / (β + (k : ℝ) + (extra : ℝ)) < 1 := by
+    apply (div_lt_one hden).2
+    have hkReal : 2 ≤ (k : ℝ) := by exact_mod_cast hk
+    linarith
+  calc
+    speedTiltNonMergerFactor β k extra *
+        ((β + (extra : ℝ) + 1) / (β + (k : ℝ) + (extra : ℝ))) <
+        speedTiltNonMergerFactor β k extra * 1 :=
+      mul_lt_mul_of_pos_left hratio hfactorPos
+    _ = speedTiltNonMergerFactor β k extra := mul_one _
+
+/-- The outside-lineage factor belongs to `(0, 1]`. -/
+theorem speedTiltNonMergerFactor_le_one
+    {β : ℝ} (hβ : -1 < β) {k : ℕ} (hk : 2 ≤ k) (extra : ℕ) :
+    speedTiltNonMergerFactor β k extra ≤ 1 := by
+  induction extra with
+  | zero => simp
+  | succ extra ih =>
+      exact (speedTiltNonMergerFactor_strictAnti_extra hβ hk extra).le.trans ih
+
+/-- All `b`-lineage, specified-`k`-tuple rates under the normalized
+`Beta(1, β + 1)` law.  This is the exact finite-product form of
+
+`(β + 1) * B(k - 1, β + b - k + 1)`.
+
+The first factor is the full `k`-merger moment; the second is the penalty that each of the
+`b-k` outside lineages avoids the merging parent. -/
 noncomputable def speedTiltBetaMergerRate (β : ℝ) (b k : ℕ) : ℝ :=
-  ∑ j ∈ Finset.range (b - k + 1),
-    (-1 : ℝ) ^ j * ((b - k).choose j : ℝ) *
-      speedTiltFullMergerRate β (k - 2 + j)
+  speedTiltFullMergerRate β (k - 2) * speedTiltNonMergerFactor β k (b - k)
+
+/-- With no outside lineage, the general rate reduces to the full-merger coordinate. -/
+theorem speedTiltBetaMergerRate_self (β : ℝ) (k : ℕ) :
+    speedTiltBetaMergerRate β k k = speedTiltFullMergerRate β (k - 2) := by
+  simp [speedTiltBetaMergerRate]
+
+/-- Every specified merger rate is positive on the biological domain. -/
+theorem speedTiltBetaMergerRate_pos
+    {β : ℝ} (hβ : -1 < β) {b k : ℕ} (hk : 2 ≤ k) :
+    0 < speedTiltBetaMergerRate β b k := by
+  unfold speedTiltBetaMergerRate
+  exact mul_pos (speedTiltFullMergerRate_pos hβ (k - 2))
+    (speedTiltNonMergerFactor_pos hβ hk (b - k))
+
+/-- Every specified merger coordinate belongs to `(0, 1]`. -/
+theorem speedTiltBetaMergerRate_mem_Ioc
+    {β : ℝ} (hβ : -1 < β) {b k : ℕ} (hk : 2 ≤ k) :
+    speedTiltBetaMergerRate β b k ∈ Set.Ioc 0 1 := by
+  refine ⟨speedTiltBetaMergerRate_pos hβ hk, ?_⟩
+  unfold speedTiltBetaMergerRate
+  exact (mul_le_mul
+      (speedTiltFullMergerRate_le_one hβ (k - 2))
+      (speedTiltNonMergerFactor_le_one hβ hk (b - k))
+      (speedTiltNonMergerFactor_pos hβ hk (b - k)).le
+      (by norm_num)).trans (by norm_num)
+
+/-- Exact `Beta(1, β + 1)` recurrence after adding one outside lineage. -/
+theorem speedTiltBetaMergerRate_add_outside_succ
+    (β : ℝ) (k extra : ℕ) :
+    speedTiltBetaMergerRate β (k + (extra + 1)) k =
+      speedTiltBetaMergerRate β (k + extra) k *
+        ((β + (extra : ℝ) + 1) / (β + (k : ℝ) + (extra : ℝ))) := by
+  simp only [speedTiltBetaMergerRate, Nat.add_sub_cancel_left,
+    speedTiltNonMergerFactor_succ]
+  ring
+
+/-- For a fixed specified merger, each additional outside lineage strictly lowers its rate. -/
+theorem speedTiltBetaMergerRate_add_outside_strictAnti
+    {β : ℝ} (hβ : -1 < β) {k : ℕ} (hk : 2 ≤ k) (extra : ℕ) :
+    speedTiltBetaMergerRate β (k + (extra + 1)) k <
+      speedTiltBetaMergerRate β (k + extra) k := by
+  simp only [speedTiltBetaMergerRate, Nat.add_sub_cancel_left]
+  exact mul_lt_mul_of_pos_left
+    (speedTiltNonMergerFactor_strictAnti_extra hβ hk extra)
+    (speedTiltFullMergerRate_pos hβ (k - 2))
+
+/-! ### Raw regular-variation scale versus pair-rate normalization -/
+
+/-- Pair-collision coefficient relative to the tail scale `d_N` in the index-one
+regular-variation theorem.  The asymptotic clock is
+`c_(N,β) ∼ d_N * speedTiltCollisionScaleCoefficient β`. -/
+noncomputable def speedTiltCollisionScaleCoefficient (β : ℝ) : ℝ :=
+  1 / (β + 1)
+
+/-- The collision-clock coefficient is positive exactly on the speed-tilt probability domain. -/
+theorem speedTiltCollisionScaleCoefficient_pos
+    {β : ℝ} (hβ : -1 < β) :
+    0 < speedTiltCollisionScaleCoefficient β := by
+  unfold speedTiltCollisionScaleCoefficient
+  exact one_div_pos.mpr (by linarith)
+
+/-- Increasing the speed penalty shortens the pair-collision coefficient on the raw tail scale. -/
+theorem speedTiltCollisionScaleCoefficient_strictAnti
+    {β₁ β₂ : ℝ} (hβ₁ : -1 < β₁) (hβ : β₁ < β₂) :
+    speedTiltCollisionScaleCoefficient β₂ < speedTiltCollisionScaleCoefficient β₁ := by
+  unfold speedTiltCollisionScaleCoefficient
+  exact one_div_lt_one_div_of_lt (by linarith) (by linarith)
+
+/-- Raw merger coefficient on the `d_N` timescale before pair-rate normalization. -/
+noncomputable def speedTiltRawMergerCoefficient (β : ℝ) (b k : ℕ) : ℝ :=
+  speedTiltCollisionScaleCoefficient β * speedTiltBetaMergerRate β b k
+
+/-- The raw pair coefficient is exactly the regular-variation collision-clock coefficient. -/
+@[simp] theorem speedTiltRawMergerCoefficient_two_two (β : ℝ) :
+    speedTiltRawMergerCoefficient β 2 2 = speedTiltCollisionScaleCoefficient β := by
+  unfold speedTiltRawMergerCoefficient
+  rw [speedTiltBetaMergerRate_self, speedTiltFullMergerRate_zero, mul_one]
+
+/-- **Clock normalization identity.**  Dividing every raw regular-variation coefficient by the
+raw pair coefficient recovers the normalized `Beta(1, β + 1)` rate chart exactly. -/
+theorem speedTiltRawMergerCoefficient_div_pair
+    {β : ℝ} (hβ : -1 < β) (b k : ℕ) :
+    speedTiltRawMergerCoefficient β b k /
+        speedTiltRawMergerCoefficient β 2 2 =
+      speedTiltBetaMergerRate β b k := by
+  rw [speedTiltRawMergerCoefficient_two_two]
+  unfold speedTiltRawMergerCoefficient
+  field_simp [(speedTiltCollisionScaleCoefficient_pos hβ).ne']
 
 /-- The complete rate chart retains the universal pairwise normalization. -/
 @[simp] theorem speedTiltBetaMergerRate_two_two (β : ℝ) :
