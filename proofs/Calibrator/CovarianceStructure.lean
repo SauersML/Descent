@@ -139,7 +139,32 @@ tags a number of causal effects proportional to its LD score.
     E[β̂_j²] = (h²/M) × ℓ_j + 1/N, where the first term is the
     signal from LD-tagged causal effects and the second is sampling noise.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED in its slope**, intercept consistent but
+    not separately powered
+    (`proofs/validation/empirical/simcov/battery_ldsc.py`, `test_ldsc`).
+    Explicit GWAS on a recombining coalescent panel of 120 common variants and
+    3000 diploids: causal effects drawn with per-SNP variance `h2/M`, a
+    phenotype built from them, single-SNP marginal regressions run exactly as a
+    GWAS computes them, `E[beta_hat^2]` averaged over 400 replicate studies at
+    each SNP and then regressed on that SNP's measured LD score.
+
+      h2      slope predicted   slope fitted          sems
+      0.2           0.00167     0.00158±0.00004       2.39
+      0.5           0.00417     0.00411±0.00005       1.00
+
+    The slope is what LDSC reads as heritability and it holds. The intercept is
+    what LDSC reads as confounding, and this design does NOT establish it: both
+    cells share `N`, so the prediction `1/N` is constant across the design at
+    0.00033 while the fitted values are 0.00019±0.00021 and -0.00018±0.00032 --
+    consistent, but a design in which the prediction never moves cannot confirm
+    it. Varying `N` is the missing cell and is owed.
+
+    The LD score is computed with the finite-sample correction
+    `r2 - (1 - r2)/(n - 2)` subtracted, because measured `r2` is upward biased at
+    every off-diagonal pair and an uncorrected LD score biases the slope down.
+
+    Power: the slope prediction spans 0.00167 to 0.00417, a factor of two and a
+    half, across the two heritabilities. -/
 noncomputable def ldsrExpectedBetaSq (h2 M ell_j N : ℝ) : ℝ :=
   h2 / M * ell_j + 1 / N
 

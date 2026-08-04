@@ -92,7 +92,15 @@ noncomputable def fisherInformation (n : ℕ) (v : ℝ) : ℝ := n * v
     `Conventions.genotypeVarianceHWE_eq_hwe` ties it to `hweGenotypeVariance`,
     which derives the factor of two from `ploidy`.
 
-    Empirical status: UNTESTED.
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_ldsc.py`, `test_hwe_fork`).
+    Two million Hardy-Weinberg genotypes per cell against the realised dosage
+    variance: worst 1.72 sems over a prediction spanning 0.09500 to 0.50000.
+
+    This body is `Conventions.hweGenotypeVariance` and `hweHeterozygosity` as
+    well -- one quantity under three names in three files. All three are now
+    measured against the same oracle, so a divergence between them would show
+    up; nothing relates them by theorem, which is the fork the guard reports.
 
     Denotes: a variance — the variance of the dosage `G ∈ {0, 1, 2}`. It is
     *not* the allelic variance `p(1-p)`, and it is numerically but not
@@ -201,6 +209,15 @@ Power is then P(χ²₁(λ) > χ²_α) = Φ(√λ - z_α) approximately.
     SE² = 1 / I_eff = 1 / (n × 2p(1-p) × r²_LD) = 1 / n_eff. -/
 noncomputable def standardErrorSq (n : ℕ) (p r2_ld : ℝ) : ℝ :=
   1 / effectiveFisherInformation n p r2_ld
+
+/-- With a vanishing denominator Mathlib returns `0`, which is a value this quantity can also
+take legitimately, so the branch is named rather than left to be inferred from the result. -/
+theorem standardErrorSq_at_zero_denominator_is_junk (n : ℕ) (p r2_ld : ℝ)
+    (hzero : effectiveFisherInformation n p r2_ld = 0) :
+    standardErrorSq n p r2_ld = 0 := by
+  unfold standardErrorSq
+  rw [hzero, div_zero]
+
 
 /-- **NCP from the Wald test.**
     NCP = (β / SE)² = β² / SE² = β² × I_eff = β² × n_eff.
@@ -390,7 +407,11 @@ section DiscoveryBias
     independently as `StratificationConfounding.heterozygosity`; that definition
     is gone and its references point here.
 
-    Empirical status: UNTESTED.
+    Empirical status: **VALIDATED** on the same runs as
+    `genotypeVarianceHWE` (`battery_ldsc.py`, `test_hwe_fork`), worst 1.72 sems.
+    It is the same body as `genotypeVarianceHWE` in this file and
+    `Conventions.hweGenotypeVariance`: one quantity, three names, no theorem
+    relating them.
 
     Denotes: a frequency — the probability that a random individual is a
     heterozygote. It is a *probability*, not a variance, and it is a different
