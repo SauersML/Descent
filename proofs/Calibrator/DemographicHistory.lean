@@ -51,7 +51,7 @@ The theorems below are stated about `fstMigrationDriftEquilibrium` from
 
 /-- More migration → lower equilibrium F_ST. -/
 theorem more_migration_lower_fst (Ne m₁ m₂ : ℝ)
-    (hNe : 0 < Ne) (hm₁ : 0 < m₁) (hm₂ : 0 < m₂)
+    (hNe : 0 < Ne) (hm₁ : 0 < m₁)
     (h_more : m₁ < m₂) :
     fstMigrationDriftEquilibrium Ne m₂ < fstMigrationDriftEquilibrium Ne m₁ := by
   unfold fstMigrationDriftEquilibrium
@@ -545,8 +545,6 @@ theorem admixed_fst_smaller (α fst_AB : ℝ)
     the weighted average is strictly between the two parent values. -/
 theorem convexCombination_strictly_between
     (r2_AA r2_AB α : ℝ)
-    (h_AA_pos : 0 < r2_AA)
-    (h_AB_nn : 0 ≤ r2_AB)
     (h_gap : r2_AB < r2_AA)
     (hα : 0 < α) (hα1 : α < 1) :
     r2_AB < α * r2_AA + (1 - α) * r2_AB ∧
@@ -758,7 +756,7 @@ theorem founderHeterozygosityLoss_zero_founders_is_junk (t : ℕ) :
 /-- Smaller founding population → larger heterozygosity loss (more drift). -/
 theorem smaller_founder_larger_heterozygosity_loss
     (k₁ k₂ : ℕ) (t : ℕ)
-    (hk₁ : 2 < k₁) (hk₂ : 2 < k₂)
+    (hk₂ : 2 < k₂)
     (h_smaller : k₂ < k₁) (ht : 0 < t) :
     founderHeterozygosityLoss k₁ t < founderHeterozygosityLoss k₂ t := by
   unfold founderHeterozygosityLoss
@@ -870,7 +868,7 @@ noncomputable def heterozygosityLossVariableNe {T : ℕ} (Ne : Fin T → ℝ) : 
   1 - Real.exp (-(cumulativeDrift Ne))
 
 /-- Heterozygosity loss under variable Nₑ is nonneg when all Nₑ are positive. -/
-theorem heterozygosityLossVariableNe_nonneg {T : ℕ} (hT : 0 < T)
+theorem heterozygosityLossVariableNe_nonneg {T : ℕ}
     (Ne : Fin T → ℝ) (hNe : ∀ i, 0 < Ne i) :
     0 ≤ heterozygosityLossVariableNe Ne := by
   unfold heterozygosityLossVariableNe
@@ -892,7 +890,6 @@ theorem heterozygosityLossVariableNe_lt_one {T : ℕ} (Ne : Fin T → ℝ) :
 /-- Larger cumulative drift yields higher heterozygosity loss. -/
 theorem more_drift_higher_heterozygosity_loss {T : ℕ}
     (Ne₁ Ne₂ : Fin T → ℝ)
-    (hNe₁ : ∀ i, 0 < Ne₁ i) (hNe₂ : ∀ i, 0 < Ne₂ i)
     (h_more_drift : cumulativeDrift Ne₁ < cumulativeDrift Ne₂) :
     heterozygosityLossVariableNe Ne₁ < heterozygosityLossVariableNe Ne₂ := by
   unfold heterozygosityLossVariableNe
@@ -905,7 +902,7 @@ theorem more_drift_higher_heterozygosity_loss {T : ℕ}
 /-- Population with uniformly smaller Ne accumulates more drift. -/
 theorem smaller_ne_more_drift {T : ℕ} (hT : 0 < T)
     (Ne₁ Ne₂ : Fin T → ℝ)
-    (hNe₁ : ∀ i, 0 < Ne₁ i) (hNe₂ : ∀ i, 0 < Ne₂ i)
+    (hNe₂ : ∀ i, 0 < Ne₂ i)
     (h_smaller : ∀ i, Ne₂ i < Ne₁ i) :
     cumulativeDrift Ne₁ < cumulativeDrift Ne₂ := by
   unfold cumulativeDrift
@@ -926,7 +923,7 @@ theorem smaller_ne_more_drift {T : ℕ} (hT : 0 < T)
     `1/(2Nₑ)`, which is the definition's business and not this statement's:
     here there are two positive reals and no population. -/
 theorem one_div_two_mul_lt_one_div_two_mul_of_lt (x y : ℝ)
-    (hx : 0 < x) (hy : 0 < y)
+    (hx : 0 < x)
     (hxy : x < y) :
     1 / (2 * y) < 1 / (2 * x) :=
   div_lt_div_of_pos_left one_pos (by linarith) (by linarith)
@@ -1147,8 +1144,7 @@ theorem bottleneck_reduces_portability_ratio
     (hR2 : 0 < R2_source)
     (hNb : 1 ≤ Ne_b) (h_bottle : Ne_b < Ne_stable)
     (hc : 0 < c) (hc1 : c < 1)
-    (ht : 0 < t_b)
-    (hfst : 0 ≤ fst) (hfst1 : fst < 1) :
+    (ht : 0 < t_b) :
     R2_source * ((1 - fst) - bottleneckExcessLD Ne_b Ne_stable c t_b) <
     R2_source * (1 - fst) := by
   apply mul_lt_mul_of_pos_left _ hR2
@@ -1166,7 +1162,6 @@ theorem mul_sq_lt_mul_sq_of_lt_of_nonneg
     (ld_mismatch_exp ld_mismatch_small accuracy_coeff : ℝ)
     (h_coeff_pos : 0 < accuracy_coeff)
     (h_mismatch_exp_nn : 0 ≤ ld_mismatch_exp)
-    (h_mismatch_small_nn : 0 ≤ ld_mismatch_small)
     (h_exp_less : ld_mismatch_exp < ld_mismatch_small) :
     accuracy_coeff * ld_mismatch_exp ^ 2 < accuracy_coeff * ld_mismatch_small ^ 2 := by
   apply mul_lt_mul_of_pos_left _ h_coeff_pos
