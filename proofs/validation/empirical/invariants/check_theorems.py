@@ -69,6 +69,17 @@ def build(st, defs, arity, rename, ambiguous, ns, emitted):
     globals dict at call time.
     """
     varnames = [v for v, _, _ in st["variables"]]
+    # Nullary statements are evaluated below at their single point. A nullary
+    # CONJUNCTION must not be: the transpiler renders `∧` as something whose
+    # truth value does not track three separate equations, and allowing
+    # `positiveThreshold_values` through produced a "checker disagrees with a
+    # proved theorem" -- the tool indicting the corpus for its own defect.
+    # Conjunctions that DO have variables were already being checked and carry
+    # real coverage, so this is deliberately narrow: excluding them all costs
+    # seventeen discriminated definitions and fixes nothing that this does not.
+    if not varnames and ("∧" in st["conclusion"] or "↔" in st["conclusion"]):
+        raise Untranspilable("nullary conjunction: not a single relation")
+
     # A theorem about a NULLARY constant -- `0 < expanderAgreementFloor`,
     # `latticeCriticalMaf < 1/4` -- has nothing to sample and was rejected here
     # for that reason, which reads as a statement outside the fragment. It is
