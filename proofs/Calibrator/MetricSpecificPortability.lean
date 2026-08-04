@@ -1604,96 +1604,27 @@ theorem vResolvedConditional_resolution_zero :
     binnedRiskByAncestry, Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons]
 
 
-/-! #### Superposing landscapes: the near-optimal set decomposes over value allocations
+/-! #### Superposition of landscapes lives in `LandscapeSuperposition`
 
-`indexwiseLoss` above is a weighted sum of per-ancestry objectives, and fitting a
-score to pooled cohorts is the same shape: one landscape per cohort, combined
-with weights. The question this section answers is what the near-optimal set of
-the pooled objective is in terms of the summands'.
+Pooling cohorts is a weighted sum of per-cohort landscapes, which is the shape
+`indexwiseLoss` above already has, so a version of that theory was drafted here.
+It is gone: `proofs/Calibrator/LandscapeSuperposition.lean` has the same material
+and more.
 
-It decomposes exactly. A configuration is near-optimal for the weighted sum iff
-there is an allocation of values to summands, feasible against the threshold,
-at which the configuration is simultaneously near-optimal for every summand --
-and the allocation witnessing it is just the configuration's own value vector.
+That file carries the decomposition of the pooled near-optimal set over feasible
+level allocations, the overlap inclusion it implies, the persistence lemma in both
+set and interval form, the vertex-of-the-simplex counterexample showing the
+decomposition is not uniform in the weights, and the spherical calibration
+arithmetic -- two barriered summands whose equal mixture is barrier-free. On that
+last one it proves the mixture certificate positive across the whole overlap
+range rather than at a single point, which the version here did not.
 
-The consequence that matters is one-directional and that is the point. The
-identity upper-bounds the pooled near-optimal set by a union of intersections, so
-it can certify that a barrier PERSISTS under pooling: if every feasible
-allocation leaves some cohort excluding a region, the pooled objective excludes it
-too. It cannot certify the reverse. Showing that pooling DISSOLVES a barrier
-requires constructing configurations at the intermediate overlaps, which no
-inclusion of this shape supplies.
-
-Two hypotheses are load-bearing and both are easy to lose. The weights must be
-nonnegative, or the reverse inclusion fails outright. And the decomposition is not
-uniform in the weights: at a vertex of the simplex the superposition IS one
-summand, so any statement of the form "the pooled barrier is contained in every
-summand's barrier" is false there. `superposition_at_vertex` records that.
+The connection worth keeping in mind from this module: the identity's usable half
+is one-directional, and it is the same asymmetry `driftDefect` has. A barrier
+excluded by some cohort at every split of the target is excluded by the pooled
+fit; that pooling DISSOLVES a barrier does not follow, and needs configurations
+built at the intermediate overlaps.
 -/
-
-/-- A weighted superposition of landscapes: one objective per cohort, combined. -/
-noncomputable def superposition {Ω : Type*} {K : ℕ}
-    (lam : Fin K → ℝ) (H : Fin K → Ω → ℝ) (σ : Ω) : ℝ :=
-  ∑ k, lam k * H k σ
-
-/-- The near-optimal set of an objective at threshold `η`. -/
-def nearOptimal {Ω : Type*} (f : Ω → ℝ) (η : ℝ) : Set Ω := {σ | η ≤ f σ}
-
-/-- Value allocations feasible against the threshold. -/
-def feasibleAllocation {K : ℕ} (lam : Fin K → ℝ) (η : ℝ) : Set (Fin K → ℝ) :=
-  {v | η ≤ ∑ k, lam k * v k}
-
-/-- **The decomposition.** The pooled near-optimal set is the union, over feasible
-value allocations, of the configurations simultaneously near-optimal for every
-summand at that allocation.
-
-Nonnegative weights are required for the reverse inclusion: with a negative weight
-a summand doing better can make the pooled objective worse. -/
-theorem nearOptimal_superposition {Ω : Type*} {K : ℕ}
-    (lam : Fin K → ℝ) (H : Fin K → Ω → ℝ) (η : ℝ) (hlam : ∀ k, 0 ≤ lam k) :
-    nearOptimal (superposition lam H) η
-      = ⋃ v ∈ feasibleAllocation lam η, ⋂ k, nearOptimal (H k) (v k) := by
-  ext σ
-  constructor
-  · intro hσ
-    refine Set.mem_iUnion₂.mpr ⟨fun k ↦ H k σ, hσ, ?_⟩
-    exact Set.mem_iInter.mpr fun k ↦ le_refl _
-  · intro hσ
-    obtain ⟨v, hv, hmem⟩ := Set.mem_iUnion₂.mp hσ
-    have hk : ∀ k, v k ≤ H k σ := fun k ↦ Set.mem_iInter.mp hmem k
-    refine le_trans hv ?_
-    exact Finset.sum_le_sum fun k _ ↦ mul_le_mul_of_nonneg_left (hk k) (hlam k)
-
-/-- **Barriers persist under pooling.** If every feasible allocation leaves the
-simultaneous near-optimal set inside a region, the pooled near-optimal set is
-inside it too.
-
-This is the usable half, and it is the only half this identity gives. Read for
-cohorts: a configuration excluded by some cohort at every way of splitting the
-target between cohorts is excluded by the pooled fit. -/
-theorem nearOptimal_superposition_subset {Ω : Type*} {K : ℕ}
-    (lam : Fin K → ℝ) (H : Fin K → Ω → ℝ) (η : ℝ) (hlam : ∀ k, 0 ≤ lam k)
-    (S : Set Ω)
-    (hall : ∀ v ∈ feasibleAllocation lam η, (⋂ k, nearOptimal (H k) (v k)) ⊆ S) :
-    nearOptimal (superposition lam H) η ⊆ S := by
-  rw [nearOptimal_superposition lam H η hlam]
-  exact Set.iUnion₂_subset hall
-
-/-- **At a vertex of the simplex the superposition is a single summand.** So no
-statement placing the pooled barrier inside every summand's barrier can hold
-uniformly in the weights: at this weighting the pooled landscape has exactly the
-first summand's barrier, and the others are irrelevant. -/
-theorem superposition_at_vertex {Ω : Type*} {K : ℕ}
-    (H : Fin (K + 1) → Ω → ℝ) (σ : Ω) :
-    superposition (fun k ↦ if k = 0 then 1 else 0) H σ = H 0 σ := by
-  unfold superposition
-  rw [Finset.sum_eq_single 0]
-  · simp
-  · intro k _ hk
-    simp [hk]
-  · intro h
-    exact absurd (Finset.mem_univ 0) h
-
 
 /-! #### Drift invisible to genotype is irreducible by any amount of genotyping
 
