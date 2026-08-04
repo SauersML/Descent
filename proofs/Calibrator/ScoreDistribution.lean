@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Calibrator.PGSCalibrationTheory
+import Calibrator.Condensation
 
 namespace Calibrator
 
@@ -714,6 +715,56 @@ theorem effectiveBlockCount_of_blocks (b ℓ : ℝ) (hℓ : ℓ ≠ 0) :
   field_simp
 
 end BlockCount
+
+/-!
+### What the Gaussian score assumption costs once the score is not additive
+
+Everything above is degree one. `berry_esseen_block_bound_eq` and the block-count
+corrections describe an aggregate of per-variant contributions entering *linearly*, and the
+rate they certify is the classical one in the effective number of independent blocks.
+
+`Calibrator.Condensation` fixes the price of leaving that regime. A score aggregating terms
+of multiplicative degree `m` -- pairwise is `m = 2`, three-way is `m = 3` -- is in the
+regime where a Gaussian score law could hold only while `m` stays below
+`criticalDegree N condensationConstant`, and the theorem below reads off what that costs in
+panel size. Degree, not variant count, is the quantity the panel has to outrun; a purely
+additive score is degree one and the requirement is vacuous there.
+
+Scope: `criticalDegree` is a *defined* quantity, `log N / c`. That the boundary so named is
+where a real transition occurs is the cited BBM result and is not proved in this corpus.
+What is proved, and used here, is what the definition costs in sample size.
+-/
+
+section CondensationCost
+
+/-- **Admitting interaction degree `m` costs a panel of at least `2 ^ m` terms.**
+
+If an aggregate of `N` disjoint degree-`m` terms is subcritical -- the only regime in which
+a Gaussian score assumption is even available -- then `N` exceeds `2 ^ m`. The panel
+requirement is exponential in the interaction degree, so the additive apparatus of this
+section does not extend to epistatic scores by taking `N` large in any practical sense.
+
+Composed from `Condensation.subcritical_iff_exp_lt`, which puts the boundary in panel
+units, and `Condensation.two_pow_le_gaussian_panel_requirement`, which is the statement
+`log 2 < condensationConstant` in exponentiated form.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- arithmetic about the defined
+    `criticalDegree`, carrying no assertion that a transition occurs there. -/
+theorem two_pow_le_panel_of_subcritical {N m : ℝ} (hm : 0 ≤ m) (hN : 0 < N)
+    (hsub : m < criticalDegree N condensationConstant) :
+    (2 : ℝ) ^ m ≤ N :=
+  le_trans (two_pow_le_gaussian_panel_requirement m hm)
+    ((subcritical_iff_exp_lt condensationConstant_pos hN).1 hsub).le
+
+/-- **A panel below `2 ^ m` is supercritical.** The contrapositive, in the direction a
+study is actually read: given the panel and the interaction degree, the Gaussian score
+assumption is unavailable, whatever the per-variant influence. -/
+theorem not_subcritical_of_panel_lt_two_pow {N m : ℝ} (hm : 0 ≤ m) (hN : 0 < N)
+    (hpanel : N < (2 : ℝ) ^ m) :
+    ¬ m < criticalDegree N condensationConstant := fun hsub ↦
+  absurd (two_pow_le_panel_of_subcritical hm hN hsub) (not_le.2 hpanel)
+
+end CondensationCost
 
 end GaussianApproximation
 

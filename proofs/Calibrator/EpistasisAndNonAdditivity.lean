@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Calibrator.OpenQuestions
+import Calibrator.PolygenicSpectroscopy
 
 namespace Calibrator
 
@@ -424,5 +425,90 @@ theorem regularization_controls_portability
   apply div_lt_div_of_pos_left h_k (by linarith) (by linarith)
 
 end NonAdditiveMethods
+
+
+/-!
+## The condensation boundary of the pairwise model
+
+`PairwiseEpistasis` above compares an additive fit against `pairwiseModel` and prices the
+difference in variance and in portability. Every such comparison is calibrated against a
+Gaussian law for the score, and that law is a degree-one statement: the Berry-Esseen
+apparatus of `Calibrator.ScoreDistribution` describes additive aggregates.
+
+`Calibrator.PolygenicSpectroscopy` computes, in closed form, the allele-frequency-dependent
+multiplicative degree at which the Gaussian genotype surrogate stops describing the
+aggregate. The two theorems below are what that computation says about the *pairwise* and
+three-way models specifically -- the models this file is about -- rather than about a
+general chaos.
+
+Scope, taken from the `MEASURED` block on `maxSafeEpistaticOrder` and not weakened here:
+the common-variant column of that table is FALSIFIED, optimistic by up to `2.64x`, and the
+condensation-direction claim is backwards. What is VALIDATED is the rare-variant tail, and
+the rare-variant tail is the only thing used below. Both statements are therefore about
+low-frequency variants, which is also where the pairwise model is most often fitted and
+least often powered.
+-/
+
+section CondensationBoundary
+
+/-- **Pairwise epistasis outruns its own Gaussian null at some frequency, for every panel
+size.**
+
+For any number `N` of disjoint interaction terms there is an allele frequency below
+`1 / 8` at which the largest safe multiplicative degree has already fallen to two. So no
+panel is large enough to make pairwise interaction statistics on sufficiently rare variants
+subcritical: the Gaussian surrogate against which such a statistic is calibrated is
+converging to a different limit than the genotypes are.
+
+This is `PolygenicSpectroscopy.exists_maf_supercritical` at `m = 2`, converted from the
+additive form `log N < m * c(q)` into the safe-order form by `epistatic_order_safe_iff`.
+The conversion is the content: `maxSafeEpistaticOrder` is the quantity a study designer
+reads, and the inequality on drifts is not.
+
+    Empirical status: VALIDATED in the regime used -- the rare-variant tail of the
+    `maxSafeEpistaticOrder` table, whose convexity gap falls to `0.0035` at `q = 1e-4`. -/
+theorem exists_maf_pairwise_beyond_safe_order {N : ℝ} (hN : 1 ≤ N) :
+    ∃ q : ℝ, 0 < q ∧ q ≤ 1 / 8 ∧ maxSafeEpistaticOrder N q ≤ 2 := by
+  obtain ⟨q, hq0, hq8, hsuper⟩ := exists_maf_supercritical (N := N) (m := 2) (by norm_num) hN
+  refine ⟨q, hq0, hq8, ?_⟩
+  by_contra hcon
+  push_neg at hcon
+  have hq1 : q < 1 := by linarith
+  have hsafe := (epistatic_order_safe_iff (N := N) (q := q) (m := 2) hq0 hq1).1 hcon
+  linarith
+
+/-- **Three-way interaction is past the boundary at MAF `10 ^ (-3)` for any realistic
+panel.**
+
+At `q = 1 / 1024` the Hardy-Weinberg Mellin drift exceeds `6`, so the safe order is below
+`log N / 6`. Any panel with `log N ≤ 18` -- that is, up to about `6.6 * 10 ^ 7` disjoint
+interaction terms, comfortably above the `10 ^ 6` a genome-wide pairwise scan produces --
+therefore cannot support degree three.
+
+The comparison that makes this a design statement rather than an inequality: the Gaussian
+condensation constant would put the safe order at `N = 10 ^ 6` near `19`
+(`gaussianCriticalMultiplier_bounds` times `log N = 13.8`). The genotype drift at this
+frequency puts it below `3`. A design calibrated on the Gaussian constant is wrong about
+the admissible interaction order by a factor of six at rare variants, and
+`maxSafeEpistaticOrder_collapse_at_rare_maf` proves the sevenfold version of the same gap.
+
+    Empirical status: VALIDATED in the regime used -- see the note above. -/
+theorem threeway_beyond_safe_order_at_rare_maf {N : ℝ} (hN : Real.log N ≤ 18) :
+    maxSafeEpistaticOrder N (1 / 1024) < 3 := by
+  have hlb := rare_variant_drift_sharp_lower_bound
+    (q := 1 / 1024) (by norm_num) (by norm_num)
+  have harg : (1 : ℝ) / (2 * (1 / 1024)) = 512 := by norm_num
+  rw [harg] at hlb
+  have h512 : Real.log 512 = 9 * Real.log 2 := by
+    rw [show (512 : ℝ) = 2 ^ (9 : ℕ) by norm_num, Real.log_pow]
+    norm_num
+  rw [h512] at hlb
+  have hl2 : (0.6931471803 : ℝ) < Real.log 2 := Real.log_two_gt_d9
+  have hdrift : (6 : ℝ) < hweMellinDrift (1 / 1024) := by linarith
+  unfold maxSafeEpistaticOrder
+  rw [div_lt_iff₀ (by linarith)]
+  linarith
+
+end CondensationBoundary
 
 end Calibrator
