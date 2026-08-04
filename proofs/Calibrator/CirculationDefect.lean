@@ -179,10 +179,10 @@ theorem frontierTime_eq_inflation_mul_apparent (s a : ℝ) (hs : 0 < s) :
   unfold frontierTime transferTimeInflation apparentMixingTime
   field_simp [h1, ne_of_gt h2]
 
-/-- The inflation factor is at least one. The dissipation must be positive: at `s = 0` Lean's
-`a / 0 = 0` makes the factor exactly one for every circulation, so without the hypothesis the
-bound holds for the wrong reason at the one point where it matters most. -/
-theorem transferTimeInflation_ge_one (s a : ℝ) (hs : 0 < s) :
+/-- The inflation factor is at least one for every algebraic input.  At `s = 0` this remains true
+only because Lean's totalized quotient sets `a / 0 = 0`; the separate equality characterization
+therefore retains the biologically necessary guard `0 < s`. -/
+theorem transferTimeInflation_ge_one (s a : ℝ) :
     1 ≤ transferTimeInflation s a := by
   unfold transferTimeInflation
   nlinarith [sq_nonneg (a / s)]
