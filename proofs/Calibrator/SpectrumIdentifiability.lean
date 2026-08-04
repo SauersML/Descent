@@ -50,7 +50,10 @@ What survives is stated too.  Ancient perturbations are attenuated at least geom
 cumulative coalescent time (`spectrumAttenuation_le_geometric`), which is the operator reading
 of the bottleneck phenomenon; and after a finite-dimensional restriction the Laplace core is
 exponentially ill-conditioned, so the stable sieve dimension grows like `log L / κ`
-(`stableSieveDimension_of_scaled`).  The numerical value `κ = 2.4103951…`, its
+(`stableSieveDimension_of_scaled`). A derived linear target is recoverable precisely when it
+annihilates the observation kernel (`linearTargetDeterminedByObservation_iff_ker_le`), which
+is the usable positive boundary behind estimable demographic functionals. The numerical value
+`κ = 2.4103951…`, its
 maximiser `θ⋆ = 0.7340955…`, and the resulting genome-size multiplier
 `exp κ = 11.1383…` per additional stable dimension come from maximising the Cauchy-matrix
 profile below; only the profile and the scaling law are asserted formally, since the
@@ -285,6 +288,55 @@ theorem exists_invisible_perturbation {n : ℕ}
     (obs : (Fin (n + 1) → 𝕜) →ₗ[𝕜] (Fin n → 𝕜)) :
     ∃ v : Fin (n + 1) → 𝕜, v ≠ 0 ∧ obs v = 0 := by
   exact exists_invisible_perturbation_of_lt (Nat.lt_succ_self n) obs
+
+/-! ## Which derived functionals remain identifiable -/
+
+/-- A derived linear target is determined by an observation when it is constant on every
+observation fiber. This is weaker than identifying the full input and is the right notion for
+questions such as whether a particular demographic average is recoverable from the SFS. -/
+def LinearTargetDeterminedByObservation
+    {R V W Z : Type*} [Ring R]
+    [AddCommGroup V] [Module R V] [AddCommGroup W] [Module R W]
+    [AddCommGroup Z] [Module R Z]
+    (observation : V →ₗ[R] W) (target : V →ₗ[R] Z) : Prop :=
+  ∀ left right, observation left = observation right → target left = target right
+
+/-- **Exact functional-identifiability criterion.** A linear target can be read from an
+observation exactly when every direction invisible to the observation is also invisible to
+the target. Thus full-history nonidentifiability does not prevent estimation of a functional
+that annihilates the SFS nullspace. -/
+theorem linearTargetDeterminedByObservation_iff_ker_le
+    {R V W Z : Type*} [Ring R]
+    [AddCommGroup V] [Module R V] [AddCommGroup W] [Module R W]
+    [AddCommGroup Z] [Module R Z]
+    (observation : V →ₗ[R] W) (target : V →ₗ[R] Z) :
+    LinearTargetDeterminedByObservation observation target ↔
+      LinearMap.ker observation ≤ LinearMap.ker target := by
+  constructor
+  · intro hdetermined direction hdirection
+    rw [LinearMap.mem_ker] at hdirection ⊢
+    have htarget := hdetermined direction 0 (by simpa using hdirection)
+    simpa using htarget
+  · intro hkernel left right hequal
+    have hdifference : left - right ∈ LinearMap.ker observation := by
+      rw [LinearMap.mem_ker, map_sub, hequal, sub_self]
+    have htarget := hkernel hdifference
+    rw [LinearMap.mem_ker, map_sub, sub_eq_zero] at htarget
+    exact htarget
+
+/-- Full input identifiability is the special case in which the requested target is the
+identity map. -/
+theorem linearTargetDeterminedByObservation_id_iff
+    {R V W : Type*} [Ring R]
+    [AddCommGroup V] [Module R V] [AddCommGroup W] [Module R W]
+    (observation : V →ₗ[R] W) :
+    LinearTargetDeterminedByObservation observation LinearMap.id ↔
+      Function.Injective observation := by
+  constructor
+  · intro hdetermined left right hequal
+    simpa using hdetermined left right hequal
+  · intro hinjective left right hequal
+    simpa using hinjective hequal
 
 /-! ## The constant minimax floor -/
 
