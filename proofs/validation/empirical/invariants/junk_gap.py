@@ -41,9 +41,25 @@ hypothesis consumers must carry.  A junk branch that is named cannot be reached
 by accident; one that is not is a wrong answer inside the domain, returned
 silently, that no type error will ever reveal.
 
+MECHANICAL ENTRIES
+
+`--mechanical` narrows the list to the entries where the junk theorem writes
+itself: the body is a single top-level quotient, the denominator is a product of
+numerals and exactly one parameter, and the signature carries no positivity
+hypothesis.  Setting that parameter to zero makes the denominator vanish, so the
+value is zero by `simp` and nothing has to be worked out.  What still has to be
+written is the part that matters -- what the modelled quantity does at that
+point, and what consumers must require.
+
+The rule is narrow on purpose, and its limits are the interesting cases: it
+cannot see a body with a sum, an integral, a structure argument or a
+conditional, and it cannot see a denominator that vanishes anywhere other than
+at zero.  Those need reading.
+
     python3 junk_gap.py                  # counts, and the worst files
     python3 junk_gap.py --list           # every entry with its guards
     python3 junk_gap.py --file NAME      # one module
+    python3 junk_gap.py --mechanical     # entries whose junk theorem is one line
 """
 
 from __future__ import annotations
@@ -145,6 +161,59 @@ def guards(body: str) -> list[str]:
 GUARDED_SIG = re.compile(r"0\s*<|≠\s*0|0\s*≠|_pos\b|positive")
 
 
+def _toplevel_div(s: str):
+    """Split on the last top-level `/`, or None if the body is not a quotient."""
+    depth, pos = 0, None
+    for i, c in enumerate(s):
+        if c in "([{":
+            depth += 1
+        elif c in ")]}":
+            depth -= 1
+        elif depth == 0 and c == "/" and (i + 1 >= len(s) or s[i + 1] != "-"):
+            pos = i
+    return None if pos is None else (s[:pos].strip(), s[pos + 1:].strip())
+
+
+def _toplevel_addsub(s: str) -> bool:
+    depth = 0
+    for i, c in enumerate(s):
+        if c in "([{":
+            depth += 1
+        elif c in ")]}":
+            depth -= 1
+        elif (depth == 0 and c in "+-" and 0 < i < len(s) - 1
+              and s[i - 1] == " " and s[i + 1] == " "):
+            return True
+    return False
+
+
+BINDER = re.compile(r"\(([A-Za-z_][A-Za-z0-9_'\s]*?)\s*:\s*ℝ\)")
+
+
+def mechanical(name: str, sig: str, body: str):
+    """`(parameter, call arguments)` if the one-line junk theorem applies."""
+    sig = " ".join(sig.split())
+    b = " ".join(body.split())
+    if len(b) > 110 or any(k in b for k in ("if ", "let ", "fun ", "∑", "∫")):
+        return None
+    if GUARDED_SIG.search(sig):
+        return None
+    if BINDER.sub("", sig).strip() not in ("", ": ℝ"):
+        return None
+    split = _toplevel_div(b)
+    if not split or _toplevel_addsub(b):
+        return None
+    den = split[1]
+    names = [w for g in BINDER.findall(sig) for w in g.split()]
+    hit = [p for p in names if re.search(r"\b" + re.escape(p) + r"\b", den)]
+    if len(hit) != 1:
+        return None
+    skeleton = re.sub(r"\b" + re.escape(hit[0]) + r"\b", "P", den)
+    if not re.fullmatch(r"[\d\s\*\(\)\^\.P]+", skeleton) or "P" not in skeleton:
+        return None
+    return hit[0], " ".join("0" if n == hit[0] else n for n in names)
+
+
 def scan() -> tuple[int, int, int, list[tuple[str, str, str]]]:
     total = 0
     named = 0
@@ -166,8 +235,9 @@ def scan() -> tuple[int, int, int, list[tuple[str, str, str]]]:
             elif GUARDED_SIG.search(sig):
                 guarded += 1
             else:
-                gap.append((name, f.relative_to(CORPUS).as_posix(),
-                            ",".join(kinds)))
+                mech = mechanical(name, sig, body)
+                note = f"junk at {mech[0]} = 0" if mech else ",".join(kinds)
+                gap.append((name, f.relative_to(CORPUS).as_posix(), note))
     return total, named, guarded, gap
 
 
@@ -180,6 +250,10 @@ def main(argv: list[str]) -> int:
     print(f"{total} definitions can hit a junk value; {named} name the branch; "
           f"{guarded} rule it out in their own signature; {len(gap)} do neither")
 
+    if "--mechanical" in argv:
+        gap = [g for g in gap if g[2].startswith("junk at ")]
+        print(f"{len(gap)} of those have a one-line junk theorem")
+
     want = None
     if "--file" in argv:
         want = argv[argv.index("--file") + 1]
@@ -190,7 +264,7 @@ def main(argv: list[str]) -> int:
         by_file = collections.Counter(f for _, f, _ in gap)
         for f, c in by_file.most_common(15):
             print(f"  {c:4d}  {f}")
-    if "--list" in argv or want is not None:
+    if "--list" in argv or want is not None or "--mechanical" in argv:
         print()
         for name, f, kinds in gap:
             print(f"  {name:44s} {kinds:18s} {f}")
