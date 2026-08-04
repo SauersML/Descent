@@ -454,6 +454,22 @@ end SingleModulus
 The construction, and then the rational witness at `v = 3/5`.
 -/
 
+/-- **An atom on the `(1+v)` side has modulus `v`.** -/
+theorem modulus_of_sq_eq_one_add {a v : ℝ} (hv : 0 ≤ v) (ha : a ^ 2 = 1 + v) :
+    |a ^ 2 - 1| = v := by
+  rw [ha, show (1 : ℝ) + v - 1 = v by ring]
+  exact abs_of_nonneg hv
+
+/-- **And an atom on the `(1-v)` side has the same modulus**, through the other sign.
+
+Between them these two discharge every `modulus_eq` field in the witnesses below.  Each
+witness proved them again for each of its atoms, four lines per atom, and the `±` atoms
+proved them a second time through `(-a)^2 = a^2`: the same two facts, eight ways. -/
+theorem modulus_of_sq_eq_one_sub {a v : ℝ} (hv : 0 ≤ v) (ha : a ^ 2 = 1 - v) :
+    |a ^ 2 - 1| = v := by
+  rw [ha, show (1 : ℝ) - v - 1 = -v by ring, abs_neg]
+  exact abs_of_nonneg hv
+
 /-- **A three-atom single-modulus family**, for any `0 < v < 1`.
 
 Atoms `A, -A, -B` with `A = √(1+v)`, `B = √(1-v)`; masses
@@ -511,15 +527,9 @@ noncomputable def threeAtom (v A B r : ℝ) (hv : 0 ≤ v) (hA : A ^ 2 = 1 + v)
   modulus_eq := by
     intro j
     fin_cases j
-    · show |A ^ 2 - 1| = v
-      rw [hA, show (1 : ℝ) + v - 1 = v by ring]
-      exact abs_of_nonneg hv
-    · show |(-A) ^ 2 - 1| = v
-      rw [show (-A) ^ 2 = A ^ 2 by ring, hA, show (1 : ℝ) + v - 1 = v by ring]
-      exact abs_of_nonneg hv
-    · show |(-B) ^ 2 - 1| = v
-      rw [show (-B) ^ 2 = B ^ 2 by ring, hB, show (1 : ℝ) - v - 1 = -v by ring, abs_neg]
-      exact abs_of_nonneg hv
+    · exact modulus_of_sq_eq_one_add hv hA
+    · exact modulus_of_sq_eq_one_add hv (by simpa using hA)
+    · exact modulus_of_sq_eq_one_sub hv (by simpa using hB)
 
 /-- **The rational witness at `v = 3/5`**, which needs no square-root manipulation: with
 `B² = 2/5` and `A = 2B`, the masses are exactly `(3/8, 1/8, 1/2)`.
@@ -653,18 +663,10 @@ noncomputable def fourAtom (v A B c : ℝ) (hv : 0 ≤ v) (hA : A ^ 2 = 1 + v)
   modulus_eq := by
     intro j
     fin_cases j
-    · show |A ^ 2 - 1| = v
-      rw [hA, show (1 : ℝ) + v - 1 = v by ring]
-      exact abs_of_nonneg hv
-    · show |(-A) ^ 2 - 1| = v
-      rw [show (-A) ^ 2 = A ^ 2 by ring, hA, show (1 : ℝ) + v - 1 = v by ring]
-      exact abs_of_nonneg hv
-    · show |B ^ 2 - 1| = v
-      rw [hB, show (1 : ℝ) - v - 1 = -v by ring, abs_neg]
-      exact abs_of_nonneg hv
-    · show |(-B) ^ 2 - 1| = v
-      rw [show (-B) ^ 2 = B ^ 2 by ring, hB, show (1 : ℝ) - v - 1 = -v by ring, abs_neg]
-      exact abs_of_nonneg hv
+    · exact modulus_of_sq_eq_one_add hv hA
+    · exact modulus_of_sq_eq_one_add hv (by simpa using hA)
+    · exact modulus_of_sq_eq_one_sub hv hB
+    · exact modulus_of_sq_eq_one_sub hv (by simpa using hB)
 
 /-!
 ## The three families, with no parameter left free
