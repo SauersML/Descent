@@ -335,15 +335,10 @@ theorem fst_from_selectedDriftFactor_mem_unit (Ne : ℝ) (t : ℕ) (s_correction
     the strict inequality (for t ≥ 1). -/
 theorem selected_drift_factor_gt_neutral (Ne : ℝ) (t : ℕ) (s_correction : ℝ)
     (h_s_pos : 0 < s_correction)
-    -- keeps the per-generation factor at or below 1; without it the factor
-    -- exceeds 1 and the induced F_ST goes negative
-    (h_s_lt : s_correction < 1 / (2 * Ne))
     (h_t_pos : 1 ≤ t)
     -- the neutral per-generation factor is positive
     (h_base_pos : 0 < 1 - 1 / (2 * Ne)) :
     neutralDriftFactor Ne t < selectedDriftFactor Ne t s_correction := by
-  have _hrange :=
-    selectedDriftFactor_mem_unit Ne t s_correction h_s_pos h_s_lt h_base_pos
   unfold neutralDriftFactor selectedDriftFactor
   have h_base_lt : 1 - 1 / (2 * Ne) < 1 - 1 / (2 * Ne) + s_correction := by
     linarith
@@ -361,11 +356,15 @@ theorem stabilizing_selection_reduces_fst (Ne : ℝ) (t : ℕ) (s_correction : �
     (h_s_lt : s_correction < 1 / (2 * Ne))
     (h_t_pos : 1 ≤ t)
     (h_base_pos : 0 < 1 - 1 / (2 * Ne)) :
-    fstFromDriftFactor (selectedDriftFactor Ne t s_correction) <
-      fstFromDriftFactor (neutralDriftFactor Ne t) := by
-  unfold fstFromDriftFactor
-  linarith [selected_drift_factor_gt_neutral Ne t s_correction
-    h_s_pos h_s_lt h_t_pos h_base_pos]
+    0 ≤ fstFromDriftFactor (selectedDriftFactor Ne t s_correction) ∧
+      fstFromDriftFactor (selectedDriftFactor Ne t s_correction) <
+        fstFromDriftFactor (neutralDriftFactor Ne t) := by
+  constructor
+  · exact (fst_from_selectedDriftFactor_mem_unit Ne t s_correction
+      h_s_pos h_s_lt h_base_pos).1
+  · unfold fstFromDriftFactor
+    linarith [selected_drift_factor_gt_neutral Ne t s_correction
+      h_s_pos h_t_pos h_base_pos]
 
 /-- **Corollary: Fst at causal loci is strictly less than Fst at neutral loci.**
     This is the exact condition needed by the portability theorem below.
@@ -379,8 +378,8 @@ theorem fst_causal_lt_fst_neutral_of_stabilizing_selection
     (h_base_pos : 0 < 1 - 1 / (2 * Ne)) :
     fstFromDriftFactor (selectedDriftFactor Ne t s_correction) <
       fstFromDriftFactor (neutralDriftFactor Ne t) := by
-  exact stabilizing_selection_reduces_fst Ne t s_correction
-    h_s_pos h_s_lt h_t_pos h_base_pos
+  exact (stabilizing_selection_reduces_fst Ne t s_correction
+    h_s_pos h_s_lt h_t_pos h_base_pos).2
 
 /-- Effect-size-weighted retained causal portability from a locus-specific
 causal-`F_ST` profile, resolved per locus rather than as a trait-wide scalar.
