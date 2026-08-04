@@ -402,6 +402,42 @@ theorem stableSieveDimension_of_scaled (kappa L : ℝ) (hk : kappa ≠ 0) (hL : 
   field_simp
   ring
 
+/-! ## Reference evaluations and junk-value boundaries -/
+
+/-- At zero cumulative coalescent time nothing is attenuated: every rung contributes one. -/
+@[simp] theorem spectrumAttenuation_at_zero (n : ℕ) :
+    spectrumAttenuation n 0 = n := by
+  simp [spectrumAttenuation]
+
+/-- An empty ladder deposits nothing. -/
+@[simp] theorem spectrumAttenuation_empty (tau : ℝ) : spectrumAttenuation 0 tau = 0 := by
+  simp [spectrumAttenuation]
+
+/-- Reference value: the first rung alone attenuates as `exp (-2 tau)`, since `a 2 = 1`. -/
+theorem spectrumAttenuation_one (tau : ℝ) :
+    spectrumAttenuation 1 tau = Real.exp (-(2 * tau)) := by
+  simp [spectrumAttenuation]
+
+/-- At unit genome length no sieve dimension is resolvable, whatever the exponent. -/
+@[simp] theorem stableSieveDimension_at_one (kappa : ℝ) :
+    stableSieveDimension kappa 1 = 0 := by
+  simp [stableSieveDimension]
+
+/-- Reference value: at genome length `exp kappa` exactly one dimension is resolvable. -/
+theorem stableSieveDimension_at_exp (kappa : ℝ) (hk : kappa ≠ 0) :
+    stableSieveDimension kappa (Real.exp kappa) = 1 := by
+  unfold stableSieveDimension
+  rw [Real.log_exp, div_self hk]
+
+/-- Division by `kappa` at `kappa = 0` is Mathlib's junk `0`, so a vanishing conditioning
+exponent reports that no dimension is stable.  The true reading is the opposite -- a zero
+exponent means no ill-conditioning, hence unbounded stable dimension -- so this is a junk
+value that inverts the meaning, and `stableSieveDimension_of_scaled` excludes it. -/
+theorem stableSieveDimension_at_zero_exponent_is_junk (L : ℝ) :
+    stableSieveDimension 0 L = 0 := by
+  simp [stableSieveDimension]
+
+
 end SpectrumIdentifiability
 
 end Calibrator

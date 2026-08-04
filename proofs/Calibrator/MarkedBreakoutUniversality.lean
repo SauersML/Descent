@@ -50,13 +50,19 @@ def familyFraction (mark : SuccessfulFamilyMark) : ℝ := mark.1
 /-- Displacement of the front caused by a successful family. -/
 def frontDisplacement (mark : SuccessfulFamilyMark) : ℝ := mark.2
 
+@[measurability, fun_prop]
+theorem measurable_familyFraction : Measurable familyFraction := measurable_fst
+
+@[measurability, fun_prop]
+theorem measurable_frontDisplacement : Measurable frontDisplacement := measurable_snd
+
 /-- The unconditioned genealogy measure induced by a marked successful-family intensity.
 
 This is the literal measure-theoretic formula `Λ₀(dx) = x² ν(dx, ℝ)`: weight the marked measure
 by `x²`, then push it forward along the family-fraction coordinate. -/
 noncomputable def genealogyMeasure (ν : Measure SuccessfulFamilyMark) : Measure ℝ :=
   Measure.map familyFraction
-    (ν.withDensity fun mark => ENNReal.ofReal (familyFraction mark ^ 2))
+    (ν.withDensity fun mark ↦ ENNReal.ofReal (familyFraction mark ^ 2))
 
 /-- Evaluation of `Λ₀` on a measurable family-fraction set. -/
 theorem genealogyMeasure_apply (ν : Measure SuccessfulFamilyMark) {s : Set ℝ}
@@ -65,7 +71,7 @@ theorem genealogyMeasure_apply (ν : Measure SuccessfulFamilyMark) {s : Set ℝ}
       ∫⁻ mark in familyFraction ⁻¹' s,
         ENNReal.ofReal (familyFraction mark ^ 2) ∂ν := by
   rw [genealogyMeasure, Measure.map_apply (by fun_prop) hs,
-    Measure.withDensity_apply _ ((by fun_prop : Measurable familyFraction).measurableSet_preimage hs)]
+    withDensity_apply _ (measurable_familyFraction hs)]
 
 /-- Exponential weight applied to a marked breakout by a canonical front-speed tilt. -/
 noncomputable def speedTiltWeight (theta : ℝ) (mark : SuccessfulFamilyMark) : ℝ :=
@@ -76,7 +82,7 @@ noncomputable def speedTiltWeight (theta : ℝ) (mark : SuccessfulFamilyMark) : 
 noncomputable def speedTiltedGenealogyMeasure
     (theta : ℝ) (ν : Measure SuccessfulFamilyMark) : Measure ℝ :=
   Measure.map familyFraction
-    (ν.withDensity fun mark =>
+    (ν.withDensity fun mark ↦
       ENNReal.ofReal (familyFraction mark ^ 2 * speedTiltWeight theta mark))
 
 /-- Evaluation of the speed-tilted genealogy measure on a measurable fraction set. -/
@@ -88,7 +94,7 @@ theorem speedTiltedGenealogyMeasure_apply
         ENNReal.ofReal
           (familyFraction mark ^ 2 * Real.exp (-(theta * frontDisplacement mark))) ∂ν := by
   rw [speedTiltedGenealogyMeasure, Measure.map_apply (by fun_prop) hs,
-    Measure.withDensity_apply _ ((by fun_prop : Measurable familyFraction).measurableSet_preimage hs)]
+    withDensity_apply _ (measurable_familyFraction hs)]
   rfl
 
 /-- Zero speed tilt is exactly the unconditioned genealogy, not merely a proportional measure. -/
@@ -159,7 +165,6 @@ theorem logDisplacement_laplace_factors (gamma theta x : ℝ) (hg : gamma ≠ 0)
   unfold logDisplacement
   congr 1
   field_simp
-  ring
 
 /-- Additive displacement noise independent of the family fraction contributes an `x`-independent
 factor, so pair-rate normalization removes it. -/
@@ -261,7 +266,6 @@ theorem pioneerIntensity_eq_inverseSquare
       (A * B / (gamma * width ^ p)) * (1 / x ^ 2) := by
   have h1 : (1 : ℝ) - x ≠ 0 := sub_ne_zero.mpr (Ne.symm hx1)
   field_simp
-  ring
 
 /-- Genealogical timescale produced by the pioneer substitution. -/
 noncomputable def genealogicalTimescale (width : ℝ) (p : ℕ) : ℝ := width ^ p
@@ -275,6 +279,90 @@ theorem genealogicalTimescale_add (width : ℝ) (p q : ℕ) :
 /-- With susceptibility exponent three, the pioneer clock is the front-width cube. -/
 @[simp] theorem genealogicalTimescale_three (width : ℝ) :
     genealogicalTimescale width 3 = width ^ 3 := rfl
+
+/-! ## Reference evaluations and junk-value boundaries
+
+Every definition in this file is pinned at a reference point, and every point where Mathlib's
+totalisation of a partial operation supplies a junk value is named. -/
+
+/-- A mark's fraction coordinate is its first component. -/
+@[simp] theorem familyFraction_mk (x r : ℝ) : familyFraction (x, r) = x := rfl
+
+/-- A mark's displacement coordinate is its second component. -/
+@[simp] theorem frontDisplacement_mk (x r : ℝ) : frontDisplacement (x, r) = r := rfl
+
+/-- At zero tilt every mark carries unit weight: no conditioning, no reweighting. -/
+@[simp] theorem speedTiltWeight_zero (mark : SuccessfulFamilyMark) :
+    speedTiltWeight 0 mark = 1 := by
+  simp [speedTiltWeight]
+
+/-- A family that reaches unit displacement at unit tilt is downweighted by exactly `e⁻¹`. -/
+theorem speedTiltWeight_at_unit_mark (x : ℝ) :
+    speedTiltWeight 1 (x, 1) = (Real.exp 1)⁻¹ := by
+  simp [speedTiltWeight, Real.exp_neg]
+
+/-- A family that reaches no one displaces the front by nothing. -/
+@[simp] theorem logDisplacement_at_zero_fraction (gamma : ℝ) :
+    logDisplacement gamma 0 = 0 := by
+  simp [logDisplacement]
+
+/-- Reference value: at unit rate constant, a family reaching half the population displaces the
+front by `log 2`. -/
+theorem logDisplacement_at_half : logDisplacement 1 (1 / 2) = Real.log 2 := by
+  unfold logDisplacement
+  rw [show (1 : ℝ) - 1 / 2 = (2 : ℝ)⁻¹ by norm_num, Real.log_inv]
+  ring
+
+/-- `Real.log (1 - x)` at `x = 1` is Mathlib's junk `0`, so `logDisplacement` reports no
+displacement for a family that takes the whole population.  The true displacement diverges
+there; the biological range is `x < 1`, which every theorem above assumes. -/
+theorem logDisplacement_at_full_fraction_is_junk (gamma : ℝ) :
+    logDisplacement gamma 1 = 0 := by
+  simp [logDisplacement]
+
+/-- `1 / gamma` at `gamma = 0` is Mathlib's junk `0`, so a zero rate constant reports no
+displacement.  A zero rate constant has no front, so the case is outside the model rather than
+a value to be trusted; `logDisplacement_laplace_factors` excludes it. -/
+theorem logDisplacement_at_zero_rate_is_junk (x : ℝ) : logDisplacement 0 x = 0 := by
+  simp [logDisplacement]
+
+/-- The linear-displacement triple rate at `theta = 0` divides by zero.  Mathlib returns `0`,
+whereas the limit is `1 / 2` -- the Bolthausen--Sznitman value, since zero tilt is no
+conditioning.  This is a junk value that disagrees with the limit, so the definition must not
+be read at `theta = 0`; `tripleRate_separates_at_unit_tilt` evaluates at `theta = 1`. -/
+theorem linearDisplacementTripleRate_at_zero_is_junk :
+    linearDisplacementTripleRate 0 = 0 := by
+  simp [linearDisplacementTripleRate]
+
+/-- A pioneer with no advantage reaches no one. -/
+@[simp] theorem pioneerFraction_zero_advantage (width : ℝ) (p : ℕ) :
+    pioneerFraction 0 width p = 0 := by
+  simp [pioneerFraction]
+
+/-- Reference value: an advantage equal to the susceptibility scale reaches exactly half. -/
+theorem pioneerFraction_at_unit_ratio (width : ℝ) (p : ℕ) (hw : width ^ p ≠ 0) :
+    pioneerFraction (width ^ p) width p = 1 / 2 := by
+  unfold pioneerFraction
+  rw [div_self hw]
+  norm_num
+
+/-- `advantage / width ^ p` at `width = 0` with positive `p` is Mathlib's junk `0`, so a
+zero-width front reports that no pioneer reaches anyone.  The relaxation map is undefined
+there; every theorem above carries `width ^ p ne 0`. -/
+theorem pioneerFraction_at_zero_width_is_junk (advantage : ℝ) (p : ℕ) (hp : p ≠ 0) :
+    pioneerFraction advantage 0 p = 0 := by
+  unfold pioneerFraction
+  rw [zero_pow hp]
+  simp
+
+/-- The timescale at unit front width is one, whatever the susceptibility exponent. -/
+@[simp] theorem genealogicalTimescale_one (p : ℕ) : genealogicalTimescale 1 p = 1 := by
+  simp [genealogicalTimescale]
+
+/-- Reference value: front width two with the cubic susceptibility exponent gives clock `8`. -/
+theorem genealogicalTimescale_at_two : genealogicalTimescale 2 3 = 8 := by
+  norm_num [genealogicalTimescale]
+
 
 end MarkedBreakout
 

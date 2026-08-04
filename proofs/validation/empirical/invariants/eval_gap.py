@@ -57,7 +57,8 @@ THM_RE = re.compile(r"^\s*(?:@\[[^\]]*\]\s*)?(?:theorem|lemma)\s", re.M)
 # The name pattern used to require four characters, so `ppv` and `qst` could
 # never be recognised as pinned however many theorems evaluated them. Both were
 # carrying a reference evaluation and being reported as open work.
-EVAL_RE = re.compile(r"\b([a-z][A-Za-z0-9_']+)\b[^\n=<>≤≥≠]*=\s*([^\n]+)")
+NAME_RE = re.compile(r"\b([a-z][A-Za-z0-9_']*)\b")
+COMPARISON = "<>≤≥≠"
 
 
 def real_defs() -> dict[str, tuple[pathlib.Path, str]]:
@@ -84,12 +85,36 @@ def theorem_heads() -> list[str]:
 
 
 def evaluated(defs: dict) -> set[str]:
+    """Names appearing on the left of an equation whose right side names no definition.
+
+    Scanning per equals-sign rather than per name matters.  The earlier version
+    matched `name ... = rhs` in one pass, so the regex consumed the whole line
+    starting from the FIRST lowercase token -- which for `@[simp] theorem f_mk ...`
+    is `simp`.  Every `@[simp]`-tagged evaluation was therefore invisible, and the
+    definitions they pinned were reported as open work.
+    """
     seen: set[str] = set()
     for head in theorem_heads():
-        for m in EVAL_RE.finditer(head):
-            name, rhs = m.group(1), m.group(2)
-            if name in defs and not any(d in rhs for d in defs):
-                seen.add(name)
+        for line in head.split("\n"):
+            for pos, ch in enumerate(line):
+                if ch != "=":
+                    continue
+                if pos and line[pos - 1] in COMPARISON + ":!":
+                    continue
+                if pos + 1 < len(line) and line[pos + 1] == "=":
+                    continue
+                lhs, rhs = line[:pos], line[pos + 1:]
+                if any(c in lhs for c in COMPARISON):
+                    continue
+                if any(d in rhs for d in defs):
+                    continue
+                # Only the leftmost definition name counts: it is the head of the
+                # applied expression.  `hweGenotypeVariance gaussianKurtosisMaf = 1/3`
+                # pins the variance, not the argument it is evaluated at.
+                for name in NAME_RE.findall(lhs):
+                    if name in defs:
+                        seen.add(name)
+                        break
     return seen
 
 
