@@ -173,6 +173,16 @@ def scalarCorrectionFloor (B : Matrix ι ι ℝ)
   dot v (B.mulVec v) -
     dot u (B.mulVec v) ^ 2 / dot u (B.mulVec u)
 
+/-- A correction direction with no energy sends the subtracted quotient to junk `0`, so the
+floor collapses to the whole target energy: no correction is credited, because the term that
+would credit it is undefined. -/
+theorem scalarCorrectionFloor_at_zero_energy_is_junk
+    (B : Matrix ι ι ℝ) (u v : ι → ℝ) (hzero : dot u (B.mulVec u) = 0) :
+    scalarCorrectionFloor B u v = dot v (B.mulVec v) := by
+  unfold scalarCorrectionFloor
+  rw [hzero, div_zero, sub_zero]
+
+
 /-- Completed-square identity for post-hoc scalar correction.  It gives both
 the exact optimum and the exact geometric floor. -/
 theorem quadraticCoefficientDistance_eq_floor_add_sq

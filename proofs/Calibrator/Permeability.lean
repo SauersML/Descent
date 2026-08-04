@@ -84,6 +84,16 @@ noncomputable def covarianceScoreInformationFromMoments
   (covarianceDerivative / (2 * covariance ^ 2)) ^ 2 *
     centeredSquareVarianceFromMoments secondMoment fourthMoment
 
+/-- A vanishing covariance sends `covarianceDerivative / (2 * covariance ^ 2)` to Mathlib's
+junk `0`, and the information with it.  Zero information is what a genuinely uninformative
+channel also reports, so the branch has to be named. -/
+theorem covarianceScoreInformationFromMoments_at_zero_covariance_is_junk
+    (covarianceDerivative secondMoment fourthMoment : ℝ) :
+    covarianceScoreInformationFromMoments 0 covarianceDerivative secondMoment fourthMoment = 0 := by
+  unfold covarianceScoreInformationFromMoments
+  simp
+
+
 /-- **Derivation of permeability from the Gaussian experiment.** Substituting
 `E[X²]=Σ` and `E[X⁴]=3Σ²` into the covariance score gives exactly
 `p = (1/2)(Γ/Σ)²`; the factor `1/2` is therefore already inside `p`. -/
@@ -151,6 +161,16 @@ noncomputable def covarianceMomentPermeability
     (covarianceDerivative secondMoment fourthMoment : ℝ) : ℝ :=
   covarianceDerivative ^ 2 /
     centeredSquareVarianceFromMoments secondMoment fourthMoment
+
+/-- With no centered-square variance the quotient is junk `0`, reporting an impermeable channel
+where the model has no noise scale at all. -/
+theorem covarianceMomentPermeability_at_zero_noise_is_junk
+    (covarianceDerivative secondMoment fourthMoment : ℝ)
+    (hzero : centeredSquareVarianceFromMoments secondMoment fourthMoment = 0) :
+    covarianceMomentPermeability covarianceDerivative secondMoment fourthMoment = 0 := by
+  unfold covarianceMomentPermeability
+  rw [hzero, div_zero]
+
 
 /-- Covariance-moment permeability is the generic scalar moment law applied to the
 centered-square channel. -/

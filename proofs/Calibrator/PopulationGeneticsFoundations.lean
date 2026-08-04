@@ -948,6 +948,15 @@ theorem fstEquilibrium_gt_half_of_small_theta (θ : ℝ)
 noncomputable def fstMutationDriftTransient (θ t Ne : ℝ) : ℝ :=
   fstMutationDriftEquilibrium θ * (1 - Real.exp (-(1 + θ) * t / (2 * Ne)))
 
+/-- A zero effective size sends the scaled time to Mathlib's junk `0`, hence the exponential to
+one and the transient to zero: the body reports no divergence at all where the true reading is
+immediate saturation at the equilibrium value. -/
+theorem fstMutationDriftTransient_at_zero_size_is_junk (θ t : ℝ) :
+    fstMutationDriftTransient θ t 0 = 0 := by
+  unfold fstMutationDriftTransient
+  simp
+
+
 /-- Transient mutation-drift Fst is nonneg for nonneg θ, t, and positive Ne. -/
 theorem fstMutationDriftTransient_nonneg (θ t Ne : ℝ)
     (hθ : 0 ≤ θ) (ht : 0 ≤ t) (hNe : 0 < Ne) :

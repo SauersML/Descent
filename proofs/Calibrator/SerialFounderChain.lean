@@ -113,6 +113,15 @@ noncomputable def serialFounderWithinTime (N Nanc tAnc : ℝ) : ℝ :=
   2 * N * (1 - Real.exp (-tAnc / (2 * N)))
     + Real.exp (-tAnc / (2 * N)) * (tAnc + 2 * Nanc)
 
+/-- A zero effective size sends `-tAnc / (2 * N)` to Mathlib's junk `0`, hence the exponential
+to one, and the body reports the ancestral term alone.  The true limit is the opposite: with no
+population there is no within-chain coalescent time to accumulate. -/
+theorem serialFounderWithinTime_at_zero_size_is_junk (Nanc tAnc : ℝ) :
+    serialFounderWithinTime 0 Nanc tAnc = tAnc + 2 * Nanc := by
+  unfold serialFounderWithinTime
+  simp
+
+
 /-- **The validated half.** The saturated far-deme `F_ST` is the ratio of the ceiling waiting
 time to the total, `τ / (T_w + τ)`, with `τ` the founder ceiling and `T_w` the within-deme
 time. Measured: `0.18497` against an exact `0.19248`, a `3.9%` error with no free parameter.

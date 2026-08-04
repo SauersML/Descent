@@ -248,6 +248,15 @@ theorem tridiagonalABAB_pathExpression_pos
 noncomputable def ababFinite (Eα Eβ Eα2 Eβ2 m : ℝ) : ℝ :=
   2 * (1 - 1 / m) * Eα2 * Eβ2 + 4 * (1 - 2 / m) * Eα ^ 2 * Eβ ^ 2
 
+/-- A zero panel size sends both finite-sample corrections `1 / m` and `2 / m` to Mathlib's junk
+`0`, so the body reports the infinite-panel value.  With no markers the correction should be
+maximal, not absent. -/
+theorem ababFinite_at_zero_panel_is_junk (Eα Eβ Eα2 Eβ2 : ℝ) :
+    ababFinite Eα Eβ Eα2 Eβ2 0 = 2 * Eα2 * Eβ2 + 4 * Eα ^ 2 * Eβ ^ 2 := by
+  unfold ababFinite
+  simp
+
+
 /-- **The deterministic case reproduces the raw path count.**
 
     The docstring above claims the finite-`m` expression "reproduces
