@@ -6097,6 +6097,20 @@ theorem harmonicMigrationMean_le_effectiveSymmetricMigration (m₁₂ m₂₁ : 
   rw [div_le_div_iff₀ (by linarith) (by norm_num : (0:ℝ) < 2)]
   nlinarith [sq_nonneg (m₁₂ - m₂₁)]
 
+/-- **And equality forces the two directional rates to agree**, which is what the
+statement above claims and does not prove on its own. Together they are the
+equality case of the arithmetic-harmonic mean inequality: symmetrising two
+migration rates loses nothing exactly when there was nothing asymmetric to
+lose. -/
+theorem harmonicMigrationMean_eq_iff_symmetric (m₁₂ m₂₁ : ℝ)
+    (h₁ : 0 < m₁₂) (h₂ : 0 < m₂₁)
+    (heq : 2 * m₁₂ * m₂₁ / (m₁₂ + m₂₁) = effectiveSymmetricMigration m₁₂ m₂₁) :
+    m₁₂ = m₂₁ := by
+  unfold effectiveSymmetricMigration at heq
+  have hsum : 0 < m₁₂ + m₂₁ := by linarith
+  rw [div_eq_div_iff (by linarith) (by norm_num : (0:ℝ) < 2)] at heq
+  nlinarith [sq_nonneg (m₁₂ - m₂₁)]
+
 /-- **Hence the equilibrium `F_ST` computed from this mean is never above the one the
 harmonic mean would give.** `fstMigrationDriftEquilibrium` is decreasing in the migration
 rate, so substituting the larger mean returns the smaller `F_ST`. Composed with

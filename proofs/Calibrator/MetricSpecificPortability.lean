@@ -1413,6 +1413,23 @@ theorem merge_loss_nonneg (w₁ w₂ a b : ℝ) (h₁ : 0 ≤ w₁) (h₂ : 0 �
   have : 0 ≤ w₁ * w₂ / (w₁ + w₂) := by positivity
   positivity
 
+/-- **And it is zero only when the merged ancestries carried the same risk**, which
+is the second half of the claim above. With both weights positive the coefficient
+is positive, so the loss vanishes exactly on equal risks -- merging costs nothing
+only when there was nothing to merge. -/
+theorem merge_loss_eq_zero_iff (w₁ w₂ a b : ℝ) (h₁ : 0 < w₁) (h₂ : 0 < w₂)
+    (hzero : w₁ * w₂ / (w₁ + w₂) * (a - b) ^ 2 = 0) :
+    a = b := by
+  have hsum : 0 < w₁ + w₂ := by linarith
+  have hcoef : 0 < w₁ * w₂ / (w₁ + w₂) := div_pos (mul_pos h₁ h₂) hsum
+  have hsq : (a - b) ^ 2 = 0 := by
+    rcases mul_eq_zero.mp hzero with h | h
+    · exact absurd h (ne_of_gt hcoef)
+    · exact h
+  have : a - b = 0 := by
+    exact pow_eq_zero_iff (two_ne_zero) |>.mp hsq
+  linarith
+
 /-- **Equal risks make the merge free.** A deployment may coarsen its ancestry axis without cost
 exactly across ancestries whose conditional risk agrees; every other merge is paid for. -/
 theorem merge_loss_eq_zero_iff_equal_risk (w₁ w₂ a b : ℝ) (h₁ : 0 < w₁) (h₂ : 0 < w₂) :
