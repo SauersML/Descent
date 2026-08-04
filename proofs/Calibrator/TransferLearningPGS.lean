@@ -2647,6 +2647,17 @@ theorem optimalFineTuningMSE_eq_closed_form
     (optimalSourceShrinkageWeight gapSq noiseVar nTarget) h_curv]
   ring
 
+/-- Closed form with target sample size cleared from the nested quotient.  This is the form in
+which the exact sample-complexity threshold is transparent. -/
+theorem optimalFineTuningMSE_eq_gap_mul_noise_div
+    (gapSq noiseVar nTarget : ℝ)
+    (h_n : 0 < nTarget)
+    (h_curv : gapSq + noiseVar / nTarget ≠ 0) :
+    optimalFineTuningMSE gapSq noiseVar nTarget =
+      gapSq * noiseVar / (nTarget * gapSq + noiseVar) := by
+  rw [optimalFineTuningMSE_eq_closed_form gapSq noiseVar nTarget h_curv]
+  field_simp [h_n.ne']
+
 /-- For fixed target sample size and noise level, the optimal fine-tuning MSE
     is strictly increasing in the residual source-target mismatch. -/
 theorem optimalFineTuningMSE_strictMono_in_gapSq
@@ -2712,6 +2723,29 @@ theorem requiredTargetSamplesForOptimalFineTuningMSE_pos
   have h_den : 0 < tau * gapSq :=
     mul_pos h_tau h_gap_pos
   exact div_pos h_num h_den
+
+/-- **Exact target-sample requirement for a desired fine-tuning accuracy.**  When the requested
+tolerance lies strictly between zero and the residual transfer gap, optimal fine-tuning reaches
+that tolerance if and only if the target sample size meets the derived threshold.  This turns the
+sample formula into a necessary-and-sufficient design law. -/
+theorem optimalFineTuningMSE_le_iff_requiredTargetSamples_le
+    (gapSq noiseVar nTarget tau : ℝ)
+    (h_noise : 0 < noiseVar)
+    (h_n : 0 < nTarget)
+    (h_tau : 0 < tau)
+    (h_gap : tau < gapSq) :
+    optimalFineTuningMSE gapSq noiseVar nTarget ≤ tau ↔
+      requiredTargetSamplesForOptimalFineTuningMSE gapSq noiseVar tau ≤ nTarget := by
+  have h_gap_pos : 0 < gapSq := lt_trans h_tau h_gap
+  have h_curv : gapSq + noiseVar / nTarget ≠ 0 := by
+    exact ne_of_gt (add_pos h_gap_pos (div_pos h_noise h_n))
+  have h_mse_denom : 0 < nTarget * gapSq + noiseVar := by
+    exact add_pos (mul_pos h_n h_gap_pos) h_noise
+  have h_req_denom : 0 < tau * gapSq := mul_pos h_tau h_gap_pos
+  rw [optimalFineTuningMSE_eq_gap_mul_noise_div gapSq noiseVar nTarget h_n h_curv]
+  unfold requiredTargetSamplesForOptimalFineTuningMSE
+  rw [div_le_iff₀ h_mse_denom, div_le_iff₀ h_req_denom]
+  constructor <;> intro h <;> nlinarith
 
 /-- For a fixed MSE tolerance, reducing the transfer gap strictly lowers the
     target sample size required to hit that tolerance under optimal fine-tuning. -/
