@@ -431,6 +431,11 @@ theorem indexWiseCalibrationEnergy_posteriorMean_eq_driftDefectSq
 
 /-! ## Two-index law: prevalence heterogeneity times squared section width -/
 
+/-- The canonical equal weight used by binary calibration witnesses.  Keeping this as one
+definition prevents equal-posterior constructions in downstream biological modules from drifting
+into independent copies of the same quantity. -/
+noncomputable def balancedBinaryWeight {Carrier : Type*} (_ : Carrier) : ℝ := 1 / 2
+
 /-- Posterior on two environments, with `q x` assigned to `true`. -/
 noncomputable def twoIndexPosterior (q : Covariate → ℝ) (x : Covariate) (t : Bool) : ℝ :=
   if t then q x else 1 - q x
