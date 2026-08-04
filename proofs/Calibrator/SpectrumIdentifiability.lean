@@ -468,6 +468,37 @@ inverse-hyperbolic-tangent API. -/
 def CauchyConditioningStationary (θ : ℝ) : Prop :=
   Real.arctan (1 / θ) = (1 / 2) * Real.log ((1 + θ) / (1 - θ))
 
+/-- **The Cauchy conditioning root is unique in the biological interval.**  The left side of
+the stationary equation decreases with `θ`, while its log-odds right side increases.  Hence
+the numerical root used to define the severe-ill-posedness constant is canonical rather than
+one choice among several stationary points. -/
+theorem cauchyConditioningStationary_unique
+    {θ₁ θ₂ : ℝ} (hθ₁0 : 0 < θ₁) (hθ₁1 : θ₁ < 1)
+    (hθ₂0 : 0 < θ₂) (hθ₂1 : θ₂ < 1)
+    (hθ₁ : CauchyConditioningStationary θ₁)
+    (hθ₂ : CauchyConditioningStationary θ₂) :
+    θ₁ = θ₂ := by
+  have impossible_of_lt {x y : ℝ} (hx0 : 0 < x) (hx1 : x < 1)
+      (hy0 : 0 < y) (hy1 : y < 1) (hxy : x < y)
+      (hx : CauchyConditioningStationary x)
+      (hy : CauchyConditioningStationary y) : False := by
+    have hinv : 1 / y < 1 / x := one_div_lt_one_div_of_lt hx0 hxy
+    have hatan : Real.arctan (1 / y) < Real.arctan (1 / x) :=
+      Real.arctan_strictMono hinv
+    have hratio : (1 + x) / (1 - x) < (1 + y) / (1 - y) := by
+      apply (div_lt_div_iff₀ (by linarith : 0 < 1 - x) (by linarith : 0 < 1 - y)).2
+      nlinarith
+    have hratioX : 0 < (1 + x) / (1 - x) := div_pos (by linarith) (by linarith)
+    have hratioY : 0 < (1 + y) / (1 - y) := div_pos (by linarith) (by linarith)
+    have hlog : Real.log ((1 + x) / (1 - x)) < Real.log ((1 + y) / (1 - y)) :=
+      Real.strictMonoOn_log hratioX hratioY hratio
+    unfold CauchyConditioningStationary at hx hy
+    linarith
+  rcases lt_trichotomy θ₁ θ₂ with hlt | heq | hgt
+  · exact False.elim (impossible_of_lt hθ₁0 hθ₁1 hθ₂0 hθ₂1 hlt hθ₁ hθ₂)
+  · exact heq
+  · exact False.elim (impossible_of_lt hθ₂0 hθ₂1 hθ₁0 hθ₁1 hgt hθ₂ hθ₁)
+
 /-- On the interior of the unit interval, the cancellation-safe profile agrees with the
 closed form obtained by integrating the Cauchy kernel. -/
 theorem cauchyConditioningProfile_eq_integral_closedForm
