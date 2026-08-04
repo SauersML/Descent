@@ -1139,6 +1139,15 @@ def ridgeBalance (aspect : ℝ) (eig : ι → ℝ) (ridge u : ℝ) : ℝ :=
   (1 - 1 / u) -
     aspect * ((∑ i, eig i / (eig i + ridge * u)) / (Fintype.card ι : ℝ))
 
+/-- At a zero self-consistency variable the leading `1 / u` is Mathlib's junk `0`, so the
+balance reports `1` minus the aspect term where the true expression diverges. -/
+theorem ridgeBalance_at_zero_variable_is_junk (aspect : ℝ) (eig : ι → ℝ) (ridge : ℝ) :
+    ridgeBalance aspect eig ridge 0
+      = 1 - aspect * ((∑ i, eig i / (eig i + ridge * 0)) / (Fintype.card ι : ℝ)) := by
+  unfold ridgeBalance
+  norm_num
+
+
 /-- **The self-consistency equation read as a one-step map.**
 
 `ridgeBalance` is the residual of the equation `1 - 1/u = A(u)`, where

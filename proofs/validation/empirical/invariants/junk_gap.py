@@ -197,6 +197,10 @@ UNREACHABLE_BY_HAND = {
     "characteristicAmplitude": "a sum of squares is nonnegative",
     "fstMutationDriftEquilibrium": "1 + θ = 0 needs θ = -1, outside the domain",
     "uniformMetaWeight": "the junk point k = 0 makes the index type Fin 0 empty, so no value is observable",
+    "uniformOccupancyDistinctHaplotypes": "the divisor is (2 : ℝ) ^ k, which is positive",
+    "ldBandDetectionShare": "the divisor is Real.pi * (1 + decay ^ 2), at least pi",
+    "ldPruningDetectionDeficit": "the divisor is Real.pi * (1 + decay ^ 2), at least pi",
+    "bolthausenSznitmanTotalMergerRate": "the divisors are (j : ℕ) + 1 and + 2, both positive",
 }
 
 

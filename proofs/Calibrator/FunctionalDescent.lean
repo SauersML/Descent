@@ -377,6 +377,15 @@ noncomputable def posteriorTilt (q : Component → Genome → ℝ)
     (w0 w : Component → ℝ) (g : Genome) : ℝ :=
   ∑ k, componentPosterior q w0 g k * (w k / w0 k)
 
+/-- A component with zero base weight contributes a junk ratio `w k / 0 = 0`, so the tilt drops
+that component silently rather than reporting an undefined reweighting. -/
+theorem posteriorTilt_at_zero_base_weight_is_junk
+    (q : Component → Genome → ℝ) (w0 w : Component → ℝ) (g : Genome) (k : Component)
+    (hzero : w0 k = 0) :
+    componentPosterior q w0 g k * (w k / w0 k) = 0 := by
+  rw [hzero, div_zero, mul_zero]
+
+
 /-- **Component-map factorization.**  Every mixture density is the reference density times a
 function of the posterior component vector.  This is the exact algebra behind sufficiency of
 ancestry-posterior coordinates; it is not an imported factorization theorem. -/
