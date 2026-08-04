@@ -70,6 +70,13 @@ theorem epochLineageSampleSize_sub_one (K : ℕ) (hK : 2 ≤ K) :
   unfold epochLineageSampleSize epochSpectrumCoordinateCount
   omega
 
+/-- Adding `extra` demographic epochs requires exactly `2 * extra` additional sampled
+lineages in the minimal identifying SFS design. -/
+theorem epochLineageSampleSize_add_epochs (K extra : ℕ) (hK : 1 ≤ K) :
+    epochLineageSampleSize (K + extra) = epochLineageSampleSize K + 2 * extra := by
+  unfold epochLineageSampleSize
+  omega
+
 /-- The collision order is positive for every model with at least two epochs. -/
 theorem epochSpectrumCoordinateCount_pos (K : ℕ) (hK : 2 ≤ K) :
     0 < epochSpectrumCoordinateCount K := by
@@ -202,6 +209,29 @@ theorem fixedEpochSampleRateExponent_pos (K : ℕ) (hK : 2 ≤ K) :
     0 < fixedEpochSampleRateExponent K := by
   rw [fixedEpochSampleRateExponent_eq_half_inverse K hK]
   exact div_pos (fixedEpochInverseExponent_pos K hK) (by norm_num)
+
+/-- Statistical convergence strictly worsens throughout the fixed-epoch hierarchy: every
+additional epoch lowers the root-sample inverse exponent. -/
+theorem fixedEpochSampleRateExponent_strictAnti
+    {K L : ℕ} (hK : 2 ≤ K) (hKL : K < L) :
+    fixedEpochSampleRateExponent L < fixedEpochSampleRateExponent K := by
+  unfold fixedEpochSampleRateExponent
+  have hcountK : 0 < epochSpectrumCoordinateCount K :=
+    epochSpectrumCoordinateCount_pos K hK
+  have hcount : epochSpectrumCoordinateCount K < epochSpectrumCoordinateCount L := by
+    unfold epochSpectrumCoordinateCount
+    omega
+  have hcountKReal : (0 : ℝ) < epochSpectrumCoordinateCount K := by
+    exact_mod_cast hcountK
+  have hcountReal : (epochSpectrumCoordinateCount K : ℝ) <
+      epochSpectrumCoordinateCount L := by
+    exact_mod_cast hcount
+  have hdenK : (0 : ℝ) < 2 * epochSpectrumCoordinateCount K := by
+    nlinarith
+  have hden : (2 * epochSpectrumCoordinateCount K : ℝ) <
+      2 * epochSpectrumCoordinateCount L := by
+    nlinarith
+  exact (inv_lt_inv₀ (hdenK.trans hden) hdenK).2 hden
 
 /-- A five-epoch history has the slow `sampleSize⁻¹ᐟ¹⁴` rate. -/
 @[simp] theorem fixedEpochSampleRateExponent_five :
