@@ -618,6 +618,54 @@ theorem dynamicsContrast_eq_two_mul_contextMatchDrift
     norm_num [dynamicsContrast, posteriorDrift,
       posteriorMean_binaryConditionalContextMatch_eq_half]
 
+/-- Broadcast one pooled scalar equally back to the two biological dynamics.  The factor `1/2`
+undoes the unnormalized sum in `dynamicsPoolingObservation`. -/
+noncomputable def dynamicsBroadcast : ℝ →ₗ[ℝ] (Bool → ℝ) where
+  toFun z := fun _ ↦ z / 2
+  map_add' z w := by funext persists; dsimp; ring
+  map_smul' c z := by funext persists; dsimp; ring
+
+/-- The shared biological mode, invariant between persistence and switching. -/
+noncomputable def dynamicsCommonMode (persists : Bool) : ℝ :=
+  binaryFirstAnnotation persists + binarySecondAnnotation persists
+
+/-- Pooling followed by broadcasting recovers the common mode exactly. -/
+theorem dynamicsBroadcast_pooling_commonMode :
+    dynamicsBroadcast (dynamicsPoolingObservation dynamicsCommonMode) =
+      dynamicsCommonMode := by
+  funext persists
+  cases persists <;>
+    norm_num [dynamicsBroadcast, dynamicsPoolingObservation, dynamicsCommonMode,
+      binaryFirstAnnotation, binarySecondAnnotation]
+
+/-- The common mode is a nonzero eigen-direction of the pooled correction. -/
+theorem dynamicsCommonMode_mem_nonzeroCorrectionEigencone :
+    dynamicsCommonMode ∈
+      NonzeroCorrectionEigencone dynamicsPoolingObservation dynamicsBroadcast := by
+  exact ⟨1, one_ne_zero, by
+    simpa using dynamicsBroadcast_pooling_commonMode⟩
+
+/-- **Thin-class phase change in biology.**  The same one-term adaptive dictionary that cannot
+produce any part of `dynamicsContrast` recovers `dynamicsCommonMode` exactly.  Adaptivity is thus
+not generically weak or strong: it is exact on the observable eigencone and absolutely blind on
+the pooled kernel. -/
+theorem dynamicsCommonMode_mem_adaptive_pooled_correctionSet :
+    dynamicsCommonMode ∈ adaptiveCorrectionSet dynamicsPoolingObservation
+      (fun _ : Fin 1 ↦ dynamicsBroadcast) dynamicsCommonMode :=
+  mem_adaptiveCorrectionSet_singleton_of_mem_nonzeroEigencone
+    dynamicsPoolingObservation dynamicsBroadcast dynamicsCommonMode
+    dynamicsCommonMode_mem_nonzeroCorrectionEigencone
+
+/-- The biological conditional-quality field decomposes into one half common mode plus one half
+contrast.  Pooling retains the former and erases the latter. -/
+theorem binaryConditionalContextMatch_eq_half_common_add_contrast
+    (persists : Bool) (y : BinaryBiologicalState) :
+    binaryConditionalContextMatch persists y =
+      (1 / 2) * dynamicsCommonMode persists + (1 / 2) * dynamicsContrast persists := by
+  cases persists <;>
+    norm_num [binaryConditionalContextMatch_eq_indicator, dynamicsCommonMode, dynamicsContrast,
+      binaryFirstAnnotation, binarySecondAnnotation]
+
 /-- **The calibration price is one quarter of squared section oscillation.**  This identifies the
 `L²` posterior-field obstruction with the sharp functional-descent geometry in the same biological
 model, rather than merely evaluating the two theories on unrelated witnesses. -/
@@ -702,8 +750,9 @@ theorem geometry_and_effect_recovery_gates
 
 /-! ## The unified obstruction bundle -/
 
-/-- Nine logically distinct failures that a biological transport theory must not collapse
-into one scalar "portability" parameter. -/
+/-- Fifteen logically distinct failures and boundaries that a biological transport theory must
+not collapse into one scalar "portability" parameter.  The final six fields make continuum
+calibration and finite correction part of the core theorem rather than adjacent examples. -/
 structure UnifiedBiologyObstructions : Prop where
   /-- Stationary target averaging cannot distinguish persistence from switching. -/
   targetOnlyBlind :
@@ -750,6 +799,35 @@ structure UnifiedBiologyObstructions : Prop where
   component values is still off by a full unit of trait: descent and the affine-in-ancestry
   ansatz are different claims. -/
   ancestryWeightedAnsatzFails : exampleComponentResidual = -1
+  /-- Pooling is aggregate-calibrated but leaves the positive index-wise drift defect. -/
+  conditionalDriftSurvivesPooling :
+    calibrationDriftDefectSq binaryStateWeight binaryDynamicsPosterior
+      binaryConditionalContextMatch = 1 / 4
+  /-- Removing a dynamics from posterior support seals the defect without making the two
+  conditional fields equal. -/
+  zeroSupportSealsConditionalDrift :
+    calibrationDriftDefectSq binaryStateWeight persistentOnlyDynamicsPosterior
+      binaryConditionalContextMatch = 0
+  /-- Every finite uniform correction through the pooled observation erases the biological
+  contrast, independently of dictionary order. -/
+  uniformCorrectionCannotRecoverContrast :
+    ∀ (k : ℕ) (C : (Bool → ℝ) →ₗ[ℝ] (Bool → ℝ)),
+      C ∈ UniformCorrectionFamily dynamicsPoolingObservation k → C dynamicsContrast = 0
+  /-- Target-dependent coefficients cannot recover a direction already annihilated by the
+  observation. -/
+  adaptiveCorrectionCannotRecoverContrast :
+    ∀ (k : ℕ) (T : Fin k → ℝ →ₗ[ℝ] (Bool → ℝ)),
+      adaptiveCorrectionSet dynamicsPoolingObservation T dynamicsContrast = {0}
+  /-- The same one-term adaptive dictionary is exact on the observable common mode, exposing the
+  thin-class phase change rather than a blanket failure of adaptivity. -/
+  observableModeIsAdaptivelyExact :
+    dynamicsCommonMode ∈ adaptiveCorrectionSet dynamicsPoolingObservation
+      (fun _ : Fin 1 ↦ dynamicsBroadcast) dynamicsCommonMode
+  /-- The correction-null contrast and the calibration drift are the same biological direction,
+  with the normalization made explicit. -/
+  correctionContrastIsCalibrationDrift :
+    ∀ persists y, dynamicsContrast persists =
+      2 * posteriorDrift binaryDynamicsPosterior binaryConditionalContextMatch persists y
 
 /-- **Unified finite obstruction theorem.**  Dynamics, dependence, value allocation, and
 local operator geometry each carry information invisible to a tempting scalar reduction.
@@ -765,7 +843,17 @@ theorem unifiedBiology_obstructions : UnifiedBiologyObstructions := by
       crossStateDoesNotDescend := not_descends_contextMatchQuality_along_targetState
       marginalDescentDoesNotCompose := admissible_interaction_join_obstruction
       crudeReportingLosesDescent := admissible_confounding_meet_obstruction
-      ancestryWeightedAnsatzFails := exampleComponentResidual_eq_neg_one }
+      ancestryWeightedAnsatzFails := exampleComponentResidual_eq_neg_one
+      conditionalDriftSurvivesPooling := binaryContextMatch_calibrationDriftDefectSq_eq_quarter
+      zeroSupportSealsConditionalDrift :=
+        persistentOnly_contextMatch_calibrationDriftDefectSq_eq_zero
+      uniformCorrectionCannotRecoverContrast :=
+        every_uniform_pooled_correction_erases_dynamicsContrast
+      adaptiveCorrectionCannotRecoverContrast :=
+        adaptive_pooled_correctionSet_dynamicsContrast_eq_zero
+      observableModeIsAdaptivelyExact :=
+        dynamicsCommonMode_mem_adaptive_pooled_correctionSet
+      correctionContrastIsCalibrationDrift := dynamicsContrast_eq_two_mul_contextMatchDrift }
   rw [crossStatePerformance_persistent_eq_one, crossStatePerformance_switching_eq_zero]
   norm_num
 

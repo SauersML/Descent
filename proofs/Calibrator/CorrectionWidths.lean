@@ -115,6 +115,32 @@ theorem adaptiveCorrectionSet_of_mem_ker {k : ℕ} (A : H →ₗ[𝕜] Y)
     subst z
     exact ⟨0, by simp⟩
 
+/-- Targets lying on a nonzero eigen-direction of one factored correction form the elementary
+thin class on which one adaptive coefficient is exact. -/
+def NonzeroCorrectionEigencone (A : H →ₗ[𝕜] Y) (T : Y →ₗ[𝕜] H) : Set H :=
+  {β | ∃ eigenvalue : 𝕜, eigenvalue ≠ 0 ∧ T (A β) = eigenvalue • β}
+
+/-- **One-direction adaptive exactness.**  A target on a nonzero eigen-direction is recovered
+exactly by a one-term adaptive dictionary: the free coefficient supplies the inverse eigenvalue.
+This is the abstract one-sparse mechanism behind the maximal uniform/adaptive gap on thin
+classes. -/
+theorem mem_adaptiveCorrectionSet_singleton_of_mem_nonzeroEigencone
+    (A : H →ₗ[𝕜] Y) (T : Y →ₗ[𝕜] H) (β : H)
+    (hβ : β ∈ NonzeroCorrectionEigencone A T) :
+    β ∈ adaptiveCorrectionSet A (fun _ : Fin 1 ↦ T) β := by
+  rcases hβ with ⟨eigenvalue, heigenvalue, heigen⟩
+  refine ⟨fun _ ↦ eigenvalue⁻¹, ?_⟩
+  simp [heigen, smul_smul, heigenvalue]
+
+/-- The nonzero eigencone is closed under arbitrary target rescaling. -/
+theorem NonzeroCorrectionEigencone.smul_mem
+    (A : H →ₗ[𝕜] Y) (T : Y →ₗ[𝕜] H) (β : H)
+    (hβ : β ∈ NonzeroCorrectionEigencone A T) (c : 𝕜) :
+    c • β ∈ NonzeroCorrectionEigencone A T := by
+  rcases hβ with ⟨eigenvalue, heigenvalue, heigen⟩
+  refine ⟨eigenvalue, heigenvalue, ?_⟩
+  simp [heigen, smul_smul, mul_comm]
+
 /-- Factored corrections annihilate every true kernel direction. -/
 theorem factorsThrough_apply_eq_zero_of_mem_ker
     (A : H →ₗ[𝕜] Y) (C : H →ₗ[𝕜] H) (hC : FactorsThrough A C)
@@ -226,6 +252,20 @@ theorem correctionResidual_norm_ge
     ‖β‖ - ‖T‖ * ‖A β‖ ≤ ‖β‖ - ‖(T.comp A) β‖ :=
       sub_le_sub_left (factoredCorrection_apply_norm_le A T β) _
     _ ≤ ‖β - (T.comp A) β‖ := norm_sub_norm_le _ _
+
+/-- **Budget--depth exchange.**  A post-processor of norm at most `Λ` cannot remove more than
+`Λ * ε` of a target observed at depth at most `ε`.  This is the proved lower half of the
+budgeted-width/modulus sandwich. -/
+theorem correctionResidual_norm_ge_of_budget_depth
+    (A : H →L[ℝ] Y) (T : Y →L[ℝ] H) (β : H) (Λ ε : ℝ)
+    (hbudget : ‖T‖ ≤ Λ) (hdepth : ‖A β‖ ≤ ε)
+    (hΛ : 0 ≤ Λ) :
+    ‖β‖ - Λ * ε ≤ ‖β - (T.comp A) β‖ := by
+  have hproduct : ‖T‖ * ‖A β‖ ≤ Λ * ε :=
+    mul_le_mul hbudget hdepth (norm_nonneg (A β)) hΛ
+  calc
+    ‖β‖ - Λ * ε ≤ ‖β‖ - ‖T‖ * ‖A β‖ := sub_le_sub_left hproduct _
+    _ ≤ ‖β - (T.comp A) β‖ := correctionResidual_norm_ge A T β
 
 /-- Unit approximate-kernel vectors force residual arbitrarily close to one at the explicit rate
 `1 - ‖T‖ ε`. -/
