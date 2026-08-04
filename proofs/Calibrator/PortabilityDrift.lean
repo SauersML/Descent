@@ -3531,7 +3531,8 @@ noncomputable def CrossPopulationGenerationalModel.toMetricModelAt {p q : ℕ}
   novelCausalEffect := Pop.pair 0 (m.novelCausalEffectTargetAt t)
   novelUntaggablePhenotypeVarianceTarget := m.novelUntaggablePhenotypeVarianceAt t
   targetPrevalence := m.targetPrevalenceAt t
-  novelUntaggablePhenotypeVarianceTarget_nonneg := m.outcome.novelUntaggablePhenotypeVariance_nonneg t
+  novelUntaggablePhenotypeVarianceTarget_nonneg :=
+    m.outcome.novelUntaggablePhenotypeVariance_nonneg t
   targetPrevalence_pos := m.outcome.targetPrevalence_pos t
   targetPrevalence_lt_one := m.outcome.targetPrevalence_lt_one t
   novelDirectCausal_source := rfl
@@ -6009,7 +6010,29 @@ identical.
     the simulated `F_ST` runs 0.117 at two demes to 0.186 at twenty, against
     a deme-blind 0.200. See `fstIslandEquilibriumFiniteDemes`.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED**, including the
+    argument forwarding (`proofs/validation/empirical/simcov/battery_bulk14.py`).
+    Island-model Wright-Fisher, 40 demes, 3000 loci, run 220 generations past
+    the transient and then tested as a one-step map at each of 120 further
+    generations, `F_ST` read as `Var_between(p) / mean(pbar (1 - pbar))`:
+
+      Ne     m        this def   simulated            sems
+      200    0.002     0.32536   0.32563 ± 0.00195     0.14
+      200    0.010     0.10990   0.10967 ± 0.00066     0.35
+      500    0.005     0.08848   0.08860 ± 0.00053     0.23
+
+    (worst of the 120 generations in each row)
+
+    What this adds over the already-validated `ibdRecurrenceStep` it forwards to
+    is the FORWARDING. A wrapper that delegates correctly and one that transposes
+    its arguments are the same source text to a reading eye, so the battery calls
+    this definition at its own declared signature `(Ne m F)` with `Ne` and `m`
+    five orders of magnitude apart. A transposed forwarding would return
+    6.7e+06, 1.8e+06 and 2.3e+07 in the three rows against a measurement near
+    0.1: the check has a margin of seven orders of magnitude, rather than the
+    few percent a same-scale design would have given it.
+
+    Power: the prediction spans 0.088 to 0.325 across the design. -/
 noncomputable def islandFstMultiplicativeStep (Ne m F : ℝ) : ℝ :=
   ibdRecurrenceStep Ne m F
 
@@ -6719,7 +6742,8 @@ theorem asymmetric_migration_portability_direction
 
     Fed to the deme-corrected two-deme form. The uncorrected
     `1/(1 + 4 Ne m_eff)` would miss every row by 14 sems, which is the separate
-    defect recorded on `asymmetricFst`. A test of this quantity tests the arithmetic mean and says -/
+    defect recorded on `asymmetricFst`. A test of this quantity tests the arithmetic
+    mean and says -/
 noncomputable def effectiveSymmetricMigration (m₁₂ m₂₁ : ℝ) : ℝ :=
   (m₁₂ + m₂₁) / 2
 

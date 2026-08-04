@@ -394,7 +394,27 @@ Composition convention: drift and gene flow are added, not composed, which is
 the weak-migration/large-`Nₑ` first-order model.  The unlinearised multiplicative
 recursion `islandFstMultiplicativeStep` has a different fixed point.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED**, including the argument
+    forwarding (`proofs/validation/empirical/simcov/battery_bulk14.py`).
+    Wright-Fisher forward simulation, 4000 loci, 300 replicate populations, one
+    generation of drift plus gene flow from a fixed source pool, `F` read as
+    `1 - H/H_ancestral`:
+
+      Ne     rate     this def   simulated            sems
+      200    0.002     0.07045   0.07050 ± 0.00028     0.15
+      500    0.005     0.02602   0.02599 ± 0.00010     0.23
+      200    0.010     0.05502   0.05497 ± 0.00022     0.22
+
+    The forwarding is the point of the test. This definition's signature is
+    `(m Ne F)` while the `ibdFlowStep` it delegates to is `(Ne rate F)`, so the
+    first two arguments are exchanged in the call and a wrapper that failed to
+    exchange them would be indistinguishable by eye. The battery calls this
+    definition at its OWN order with the rate and `Ne` five orders apart: a
+    transposed forwarding would return 205.61, 72.20 and 25.88 against a
+    measurement near 0.05. The forwarding is correct, and it is now correct for
+    a reason that a reader can check against numbers.
+
+    Power: the prediction spans 0.026 to 0.070 across the design. -/
 noncomputable def geneFlowFstStep (m Ne F : ℝ) : ℝ :=
   ibdFlowStep Ne m F
 

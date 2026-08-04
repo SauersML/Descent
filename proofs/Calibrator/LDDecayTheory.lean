@@ -1398,7 +1398,42 @@ section LDDecayDerivation
     and D₀ is the initial LD. This is the fundamental discrete-time model
     of LD decay under random mating with recombination.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_bulk14.py`). Two-locus
+    Wright-Fisher with recombination, `N = 20000`, 600 replicate populations
+    started in complete coupling phase. Tested as a MAP: at each generation the
+    measured `D_t` is fed in and the prediction compared against the measured
+    `D_{t+1}`, so what is under test is the per-generation factor and not the
+    starting value.
+
+      r        worst of 12 generations                       sems
+      0.005    predicted from measured D_t                   1.68
+      0.020                                                  0.4
+      0.100                                                  0.2
+
+    Read a second way, which no rescaling of `D` can affect: `log D_t` is linear
+    in `t` with slope `log (1 - r)`.
+
+      r        log(1 - r)   measured slope        sems
+      0.005    -0.005013    -0.005038 ± 4e-06     6.3
+      0.020    -0.020203    -0.020219 ± 1e-05     1.6
+      0.100    -0.105361    -0.105338 ± 3e-05     0.55
+
+    The `r = 0.005` slope sits 0.5% steep and that is the design's own disclosed
+    residual, not a defect in this body: drift shrinks `D` by a further
+    `1 - 1/(2N)` per generation because `D` is quadratic in haplotype
+    frequencies and multinomial sampling is unbiased only in the frequencies
+    themselves. `log(1 - 1/(2N)) = -2.5e-05` against `log(1 - r) = -0.005013` is
+    0.50%, which is the discrepancy to two figures. The effect is invisible at
+    `r = 0.1` where it is 0.02% of the signal, exactly as its size predicts.
+
+    So `1 - r` is the recombination contribution and it is correct; a
+    finite-population trajectory decays by `(1 - r)(1 - 1/(2N))`, and this
+    definition names only the first factor, which is what a recurrence called
+    `ldRecurrence` should name.
+
+    Power: the design spans a factor of twenty in `r`, and the fitted decay
+    tracks it across that whole range. -/
 def ldRecurrence (r D₀ : ℝ) : ℕ → ℝ
   | 0 => D₀
   | t + 1 => (1 - r) * ldRecurrence r D₀ t
