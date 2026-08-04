@@ -645,20 +645,6 @@ def main(argv=None):
     return results
 
 
-def legacy_mentions():
-    """Definition names appearing in the pre-existing validation scripts."""
-    names = set()
-    for p in (PROOFS / "validation").rglob("*.py"):
-        if p.is_relative_to(HERE):
-            continue
-        txt = p.read_text(errors="ignore")
-        for m in re.finditer(r"lean_([A-Za-z_][\w']*)", txt):
-            names.add(m.group(1))
-        for m in re.finditer(r"[\"']([a-z][A-Za-z0-9_']{4,})[\"']", txt):
-            names.add(m.group(1))
-    return names
-
-
 def report(results, classes, args):
     total = len(results)
     by_class = collections.defaultdict(lambda: collections.Counter())
@@ -746,17 +732,6 @@ def report(results, classes, args):
     print("\nwhy the rest are uncovered:")
     for k, v in unc.most_common(12):
         print(f"  {v:5d}  {k[:88]}")
-
-    legacy = legacy_mentions()
-    claimed = [n for n in results
-               if n.split(".")[-1] in legacy or n in legacy]
-    unverified = [n for n in claimed if results[n]["status"] != "COVERED"]
-    print(f"\nlegacy scripts name {len(claimed)} definitions; of those, "
-          f"{len(claimed) - len(unverified)} also have a falsifiable check here.")
-    print(f"{len(unverified)} are named by a legacy script but have no "
-          "demonstrated-falsifiable check:")
-    for n in unverified[:10]:
-        print(f"  {n}")
 
     # ---- falsifiability evidence, published per definition
     cov = {n: r for n, r in results.items() if r["status"] == "COVERED"}
