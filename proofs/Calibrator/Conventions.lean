@@ -762,7 +762,7 @@ theorem epistaticVariancePairwise_uses_hwe (γ p₁ p₂ : ℝ) :
 /-- The between-population drift variance of the score, carrying the same
 ploidy factor as `Var_Delta_Mu`. -/
 theorem expectedPGSDiffVariance_eq_ploidy_form (V_A fst : ℝ) :
-    expectedPGSDiffVariance V_A fst = ploidy * fst * V_A := by
+    expectedPGSDiffVariance V_A fst = ploidy * ploidy * fst * V_A := by
   unfold expectedPGSDiffVariance ploidy; ring
 
 /-! ### The remaining singletons

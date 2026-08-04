@@ -351,7 +351,21 @@ theorem expectedLinearEffectEstimate_unbiased (β_true : ℝ) :
 /-- One-locus OLS effect-estimation variance under genotype variance `varX` and
 sample size `n`.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_bulk3.py`,
+    `test_ols_variance`). Against the observed scatter of a single-SNP
+    regression coefficient over 4000 replicate studies:
+
+      n      sigma2   p      this def   simulated            sems
+      2000   1.0      0.3     0.00119   0.00116±0.00003      1.16
+      8000   1.0      0.3     0.00030   0.00030±0.00001      0.70
+      2000   4.0      0.1     0.01111   0.01101±0.00025      0.43
+
+    The oracle is the scatter the regression actually produces, not a formula,
+    so this is not a generative self-test. `n`, `sigma2` and `p` each move
+    separately, so the dependence on each is tested rather than one combination.
+
+    Power: the prediction spans 0.00030 to 0.01111, a factor of thirty-seven. -/
 noncomputable def olsEffectEstimationVariance
     (σ2 varX n : ℝ) : ℝ :=
   σ2 / (n * varX)

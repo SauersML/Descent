@@ -123,23 +123,53 @@ section PGSOverdispersion
     **Derivation from drift theory:**
     - PGS = Σᵢ βᵢ × Gᵢ, so under drift E[ΔPGS] = Σᵢ βᵢ × E[Δpᵢ] = 0
       (drift is unbiased on allele frequencies).
-    - Var(ΔPGS) = Σᵢ βᵢ² × Var(Δpᵢ)     (independent loci)
-                = Σᵢ βᵢ² × 2pᵢ(1-pᵢ) × Fst  (definition of Fst)
-                = Fst × Σᵢ 2pᵢ(1-pᵢ)βᵢ²
-                = Fst × V_A              (definition of additive genetic variance)
+    - Var(ΔPGS) = Σᵢ (ploidy·βᵢ)² × Var(Δpᵢ)     (independent loci)
+                = Σᵢ 4βᵢ² × pᵢ(1-pᵢ) × Fst
+                = 2·Fst × Σᵢ 2pᵢ(1-pᵢ)βᵢ²
+                = 2·Fst × V_A            (definition of additive genetic variance)
 
     This gives the variance of PGS change in one population due to drift.
 
-    Empirical status: UNTESTED. -/
+    **The ploidy factor was missing and the body has been corrected.** The chain
+    above previously read `Var(ΔPGS) = Σᵢ βᵢ² × Var(Δpᵢ)`, dropping the `ploidy`
+    that the score itself carries: a PGS is `Σᵢ βᵢ·Gᵢ` with `Gᵢ` a DOSAGE, so its
+    mean is `Σᵢ βᵢ·2pᵢ` and a frequency change of `Δpᵢ` moves it by `2βᵢΔpᵢ`. The
+    square of that is `4βᵢ²`, not `βᵢ²`, and the two factors of two collapse to
+    one against the `2pᵢ(1-pᵢ)` inside `V_A`.
+
+    Measured (`proofs/validation/empirical/simcov/battery_bulk3.py`,
+    `test_drift_variance_family`): Wright-Fisher, `Ne = 200`, 600 loci, 4000
+    replicate populations, variance of one population's mean score about the
+    ancestral mean.
+
+      generations   F       old (fst·V_A)   this (2·fst·V_A)   simulated
+        30          0.072        30.39           60.79         60.98±1.36
+       100          0.221        91.56          183.12        185.13±4.14
+       250          0.465       186.38          372.76        366.22±8.19
+
+    The superseded body is 50.7 percent low at 22.7 sems in every cell. The
+    corrected value is what `PortabilityDrift.Var_Delta_Mu` already states for
+    this same quantity, and that definition was validated on the same engine at
+    0.29 to 1.19 sems -- so the two agreed only after this correction.
+
+    The docstring below on `expectedPGSDiffVariance` predicted precisely this
+    failure: a common wrong factor built into both sides of a cross-identity
+    cancels and the identity survives. It did, for three definitions at once.
+
+    Empirical status: **VALIDATED** after correction; the superseded body
+    **FALSIFIED** at 22.7 sems.
+
+    Power: the prediction spans 60.79 to 372.76 across the design. -/
 noncomputable def pgsDriftVariance_one_pop (V_A fst : ℝ) : ℝ :=
-  fst * V_A
+  2 * fst * V_A
 
 /-- **pgsDriftVariance_one_pop pinned at a reference point.** No theorem in the corpus evaluated
 this definition, so every body agreeing with it in sign and monotonicity was indistinguishable
-from it. At all arguments equal to `1 / 2` it is `1 / 4`, which fixes the coefficients a
-one-sided bound or an invariance leaves free. -/
+from it. At all arguments equal to `1 / 2` it is `1 / 2`, which fixes the coefficients a
+one-sided bound or an invariance leaves free. It was `1 / 4` while the body was missing
+its ploidy factor, and this line is what pins the correction to a number. -/
 theorem pgsDriftVariance_one_pop_at_reference_point :
-    pgsDriftVariance_one_pop (1 / 2) (1 / 2) = 1 / 4 := by
+    pgsDriftVariance_one_pop (1 / 2) (1 / 2) = 1 / 2 := by
   unfold pgsDriftVariance_one_pop
   norm_num
 
@@ -161,7 +191,13 @@ squared effect:
 
 `pgsDriftVarianceFromLoci_eq_closedForm` is the theorem that the sum and the
 closed form agree, so the closed form can now be contradicted by changing either
-one.
+one. It carries an explicit factor of two, and that factor is the whole content
+of the scale difference: this sum is on the STANDARDIZED scale, where each
+locus already carries its `2p(1-p)` inside `beta`, while
+`pgsDriftVariance_one_pop` is on the DOSAGE scale, where the score is
+`sum beta * G` with `G` counting alleles and the ploidy is still explicit. The
+two are the same quantity written in two units, and writing the identity without
+the factor -- as it stood -- asserted that the units agree.
 
     Empirical status: UNTESTED. -/
 noncomputable def pgsDriftVarianceFromLoci {n : ℕ} (fst : ℝ) (β : Fin n → ℝ) : ℝ :=
@@ -170,18 +206,19 @@ noncomputable def pgsDriftVarianceFromLoci {n : ℕ} (fst : ℝ) (β : Fin n →
 /-- **The locus sum equals the closed form.** This is the step that was carried
 in prose. -/
 theorem pgsDriftVarianceFromLoci_eq_closedForm {n : ℕ} (fst : ℝ) (β : Fin n → ℝ) :
-    pgsDriftVarianceFromLoci fst β =
+    2 * pgsDriftVarianceFromLoci fst β =
       pgsDriftVariance_one_pop (∑ i : Fin n, β i ^ 2) fst := by
   unfold pgsDriftVarianceFromLoci pgsDriftVariance_one_pop
-  rw [Finset.mul_sum]
+  rw [Finset.mul_sum, Finset.mul_sum]
+  exact Finset.sum_congr rfl (fun i _ ↦ by ring)
 
 /-- **PGS difference variance between two independently drifting populations.**
 
     For two populations that diverged from a common ancestor and drifted
     independently:
     - Var(PGS₁ - PGS₂) = Var(PGS₁) + Var(PGS₂)  (independence of drift)
-                        = Fst × V_A + Fst × V_A
-                        = 2 × Fst × V_A
+                        = 2·Fst × V_A + 2·Fst × V_A
+                        = 4 × Fst × V_A
                         = 2 × pgsDriftVariance_one_pop(V_A, Fst)
 
     The factor of 2 arises because both populations drift independently
@@ -201,12 +238,18 @@ theorem pgsDiffVariance_two_pop_eq_sum (V_A fst : ℝ) :
 
 /-- **Expected PGS mean difference under drift.**
     Under pure drift, the PGS mean difference has variance:
-    Var(ΔPGS) = V_A × 2FST.
+    Var(ΔPGS) = V_A × 4FST.
     The expected |ΔPGS| ∝ √(V_A × FST).
 
-    Empirical status: UNTESTED. -/
+    **Corrected with `pgsDriftVariance_one_pop`**, whose missing ploidy factor
+    this definition inherited. Measured on the two-branch design of
+    `battery_bulk3.py`: the superseded `V_A × 2FST` is 50.5 percent low at 22.6
+    sems in every cell.
+
+    Empirical status: **VALIDATED** after correction; the superseded body
+    **FALSIFIED** at 22.6 sems. -/
 noncomputable def expectedPGSDiffVariance (V_A fst : ℝ) : ℝ :=
-  V_A * 2 * fst
+  V_A * 4 * fst
 
 /-- **At complete differentiation the difference variance is twice the additive variance.**
 
@@ -216,7 +259,7 @@ it. Evaluating at `F_ST = 1` does not. Two populations that share no ancestry co
 additive variance each, so the difference carries exactly two, and that is the only reading under
 which the factor is a count of populations rather than a fitted constant. -/
 theorem expectedPGSDiffVariance_complete_differentiation (V_A : ℝ) :
-    expectedPGSDiffVariance V_A 1 = 2 * V_A := by
+    expectedPGSDiffVariance V_A 1 = 4 * V_A := by
   unfold expectedPGSDiffVariance
   ring
 
@@ -239,10 +282,11 @@ for. Chained with `pgsDiffVariance_eq_expected`, this ties
 restatement of itself. -/
 theorem pgsDiffVariance_two_pop_eq_lociSum {n : ℕ} (fst : ℝ) (β : Fin n → ℝ) :
     pgsDiffVariance_two_pop (∑ i : Fin n, β i ^ 2) fst =
-      pgsDriftVarianceFromLoci fst β + pgsDriftVarianceFromLoci fst β := by
-  rw [pgsDriftVarianceFromLoci_eq_closedForm]
-  unfold pgsDiffVariance_two_pop
-  ring
+      2 * (pgsDriftVarianceFromLoci fst β + pgsDriftVarianceFromLoci fst β) := by
+  unfold pgsDiffVariance_two_pop pgsDriftVarianceFromLoci pgsDriftVariance_one_pop
+  rw [Finset.mul_sum, Finset.mul_sum]
+  rw [← Finset.sum_add_distrib, Finset.mul_sum]
+  exact Finset.sum_congr rfl (fun i _ ↦ by ring)
 
 /-- Expected variance is nonneg. -/
 theorem expected_pgs_diff_var_nonneg (V_A fst : ℝ)
