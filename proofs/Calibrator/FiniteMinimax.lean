@@ -29,7 +29,7 @@ biological nonidentifiability witnesses.
 
 - `half_separation_le_minimaxRisk_of_observation_eq`: exact two-point minimax floor.
 - `indistinguishableBinaryProblem_minimaxRisk`: sharpness of the factor one-half.
-- `half_separation_sub_l1_le_minimaxRisk`: quantitative finite Le Cam floor.
+- `half_separation_sub_l1_le_minimaxRisk`: clipped quantitative finite Le Cam floor.
 - `observationL1Distance_garble_le`: ℓ¹ data processing under stochastic channels.
 - `minimaxRisk_le_garbleObservations`: full minimax monotonicity under garbling.
 - `finite_minimax_duality`: equality of primal minimax and least-favourable-prior values.
@@ -555,14 +555,23 @@ theorem half_separation_sub_l1_le_worstRisk
     (hloss₂ : ∀ action : Fin (actionCount + 1),
       0 ≤ E.loss θ₂ action ∧ E.loss θ₂ action ≤ maxLoss)
     (δ : Rule actionCount observationCount) :
-    (separation - maxLoss * E.observationL1Distance θ₁ θ₂) / 2 ≤
+    max 0 ((separation - maxLoss * E.observationL1Distance θ₁ θ₂) / 2) ≤
       E.worstRisk δ := by
   have hrisk := E.separation_sub_l1_le_risk_add θ₁ θ₂ separation maxLoss
     hloss hloss₂ δ
   have hbdd : BddAbove (Set.range (E.risk δ)) := (Set.finite_range _).bddAbove
   have h₁ : E.risk δ θ₁ ≤ E.worstRisk δ := le_csSup hbdd ⟨θ₁, rfl⟩
   have h₂ : E.risk δ θ₂ ≤ E.worstRisk δ := le_csSup hbdd ⟨θ₂, rfl⟩
-  linarith
+  have hrisk₂Nonneg : 0 ≤ E.risk δ θ₂ := by
+    unfold risk
+    apply Finset.sum_nonneg
+    intro observation _
+    apply mul_nonneg (FinitePrior.probability_nonneg (E.observation θ₂) observation)
+    apply Finset.sum_nonneg
+    intro action _
+    exact mul_nonneg (FinitePrior.probability_nonneg (δ observation) action)
+      (hloss₂ action).1
+  exact max_le (hrisk₂Nonneg.trans h₂) (by linarith)
 
 /-- **Finite Le Cam minimax floor.** Approximate observational equivalence leaves a quantitative
 minimax obstruction. The exact half-separation theorem is recovered when the ℓ¹ discrepancy
@@ -573,7 +582,7 @@ theorem half_separation_sub_l1_le_minimaxRisk
       separation ≤ E.loss θ₁ action + E.loss θ₂ action)
     (hloss₂ : ∀ action : Fin (actionCount + 1),
       0 ≤ E.loss θ₂ action ∧ E.loss θ₂ action ≤ maxLoss) :
-    (separation - maxLoss * E.observationL1Distance θ₁ θ₂) / 2 ≤
+    max 0 ((separation - maxLoss * E.observationL1Distance θ₁ θ₂) / 2) ≤
       E.minimaxRisk := by
   apply le_csInf (Set.range_nonempty E.worstRisk)
   rintro value ⟨δ, rfl⟩
@@ -590,14 +599,19 @@ theorem half_separation_sub_l1_le_garbled_minimaxRisk
       separation ≤ E.loss θ₁ action + E.loss θ₂ action)
     (hloss₂ : ∀ action : Fin (actionCount + 1),
       0 ≤ E.loss θ₂ action ∧ E.loss θ₂ action ≤ maxLoss) :
-    (separation - maxLoss * E.observationL1Distance θ₁ θ₂) / 2 ≤
+    max 0 ((separation - maxLoss * E.observationL1Distance θ₁ θ₂) / 2) ≤
       (E.garbleObservations summaryCount channel).minimaxRisk := by
   have hmaxLoss : 0 ≤ maxLoss := (hloss₂ 0).1.trans (hloss₂ 0).2
   have hcontract := E.observationL1Distance_garble_le channel θ₁ θ₂
   have hgarbled := half_separation_sub_l1_le_minimaxRisk
     (E := E.garbleObservations summaryCount channel)
       θ₁ θ₂ separation maxLoss hloss hloss₂
-  linarith [mul_le_mul_of_nonneg_left hcontract hmaxLoss]
+  have hscalar :
+      (separation - maxLoss * E.observationL1Distance θ₁ θ₂) / 2 ≤
+        (separation - maxLoss *
+          (E.garbleObservations summaryCount channel).observationL1Distance θ₁ θ₂) / 2 := by
+    linarith [mul_le_mul_of_nonneg_left hcontract hmaxLoss]
+  exact (max_le_max_left 0 hscalar).trans hgarbled
 
 /-- Every rule pays at least half the separation of two observationally equivalent parameters. -/
 theorem half_separation_le_worstRisk_of_observation_eq
