@@ -2011,6 +2011,76 @@ theorem charFun_selfSimilar_iterate (ν : Measure ℝ) [IsFiniteMeasure ν]
     rw [ih, charFun_selfSimilar_step ν hα heq (α ^ n * u), hpow, ← hA, ← hB]
     ring
 
+/-! ### Step eight: the limit, and the closed form it produces
+
+The iterate identity holds at every `n` with no convergence hypothesis. Letting `n` grow uses
+`α < 1` three times: `αⁿ u` runs to zero, where a characteristic function is its total mass, and
+the two partial sums run to `α²/(1-α²)` and `1/(1-α)`. The result is a closed form for the
+characteristic function of the liability law, and it is a Gaussian one. -/
+
+open MeasureTheory ProbabilityTheory Complex Filter Topology in
+/-- **The characteristic function of a self-similar liability law, in closed form.**
+
+Only a Gaussian is affinely self-similar under adding an independent Gaussian, and this is that
+statement with the Gaussian exhibited rather than asserted to exist: variance `s²α²/(1-α²)` and
+mean `β/(1-α)`, both read off the two geometric series. -/
+theorem charFun_selfSimilar_closed_form (ν : Measure ℝ) [IsFiniteMeasure ν]
+    {s α β : ℝ} (hα : 0 < α) (hα1 : α < 1)
+    (heq : ∀ t : ℝ, Complex.exp (-(((s * t) ^ 2 : ℝ) : ℂ) / 2) * charFun ν t
+      = charFun ν (t / α) * Complex.exp (((-(β * t / α) : ℝ) : ℂ) * Complex.I)) (u : ℝ) :
+    charFun ν u
+      = (ν.real Set.univ : ℂ)
+        * Complex.exp ((-(s ^ 2 * u ^ 2 / 2) * (α ^ 2 / (1 - α ^ 2)) : ℝ))
+        * Complex.exp (((β * u * (1 / (1 - α)) : ℝ) : ℂ) * Complex.I) := by
+  have hα2 : α ^ 2 < 1 := by nlinarith
+  have hcont1 : Continuous (fun x : ℝ ↦ Complex.exp ((x : ℂ))) :=
+    Complex.continuous_exp.comp Complex.continuous_ofReal
+  have hcont2 : Continuous (fun x : ℝ ↦ Complex.exp ((x : ℂ) * Complex.I)) :=
+    Complex.continuous_exp.comp (Complex.continuous_ofReal.mul continuous_const)
+  have hz : Tendsto (fun n : ℕ ↦ α ^ n * u) atTop (𝓝 0) := by
+    have h := (tendsto_pow_atTop_nhds_zero_of_lt_one hα.le hα1).mul_const u
+    simpa using h
+  have hchar : Tendsto (fun n : ℕ ↦ charFun ν (α ^ n * u)) atTop
+      (𝓝 ((ν.real Set.univ : ℂ))) := by
+    have hc := ((continuous_charFun_real ν).tendsto 0).comp hz
+    rwa [charFun_zero] at hc
+  have hs1 : Tendsto (fun n : ℕ ↦ ∑ k ∈ Finset.range n, α ^ (2 * (k + 1))) atTop
+      (𝓝 (α ^ 2 / (1 - α ^ 2))) := by
+    have hg : HasSum (fun k : ℕ ↦ α ^ 2 * (α ^ 2) ^ k) (α ^ 2 * (1 - α ^ 2)⁻¹) :=
+      (hasSum_geometric_of_lt_one (sq_nonneg α) hα2).mul_left _
+    have ht := hg.tendsto_sum_nat
+    have hrw : ∀ n : ℕ, ∑ k ∈ Finset.range n, α ^ 2 * (α ^ 2) ^ k
+        = ∑ k ∈ Finset.range n, α ^ (2 * (k + 1)) := by
+      intro n
+      refine Finset.sum_congr rfl fun k _ ↦ ?_
+      rw [← pow_mul, ← pow_add]
+      ring_nf
+    simp only [hrw] at ht
+    rwa [div_eq_mul_inv]
+  have hs2 : Tendsto (fun n : ℕ ↦ ∑ k ∈ Finset.range n, α ^ k) atTop
+      (𝓝 (1 / (1 - α))) := by
+    have ht := (hasSum_geometric_of_lt_one hα.le hα1).tendsto_sum_nat
+    rwa [one_div]
+  have hlim : Tendsto (fun n : ℕ ↦
+      charFun ν (α ^ n * u)
+        * Complex.exp ((-(s ^ 2 * u ^ 2 / 2)
+            * ∑ k ∈ Finset.range n, α ^ (2 * (k + 1)) : ℝ))
+        * Complex.exp (((β * u * ∑ k ∈ Finset.range n, α ^ k : ℝ) : ℂ) * Complex.I))
+      atTop (𝓝 ((ν.real Set.univ : ℂ)
+        * Complex.exp ((-(s ^ 2 * u ^ 2 / 2) * (α ^ 2 / (1 - α ^ 2)) : ℝ))
+        * Complex.exp (((β * u * (1 / (1 - α)) : ℝ) : ℂ) * Complex.I))) :=
+    (hchar.mul ((hcont1.tendsto _).comp (tendsto_const_nhds.mul hs1))).mul
+      ((hcont2.tendsto _).comp (tendsto_const_nhds.mul hs2))
+  have hconst : (fun n : ℕ ↦
+      charFun ν (α ^ n * u)
+        * Complex.exp ((-(s ^ 2 * u ^ 2 / 2)
+            * ∑ k ∈ Finset.range n, α ^ (2 * (k + 1)) : ℝ))
+        * Complex.exp (((β * u * ∑ k ∈ Finset.range n, α ^ k : ℝ) : ℂ) * Complex.I))
+      = fun _ : ℕ ↦ charFun ν u :=
+    funext fun n ↦ (charFun_selfSimilar_iterate ν hα heq u n).symm
+  rw [hconst] at hlim
+  exact tendsto_nhds_unique tendsto_const_nhds hlim
+
 open MeasureTheory ProbabilityTheory in
 /-- **Necessity: no other bounded link shape survives.** A strictly increasing bounded link whose
 two-parameter family is closed under Gaussian averaging is a positive vertical affine transform
