@@ -77,6 +77,36 @@ theorem dynamicsPooledProjector_mem_uniformCorrectionFamily
   apply factorsThrough_subset_uniformCorrectionFamily dynamicsPoolingObservation k hk
   exact ⟨dynamicsBroadcast, rfl⟩
 
+/-- Every admissible biological correction gives the same output to fields with the same pooled
+sum, even if their persistence/switching contrasts differ. -/
+theorem factoredDynamicsCorrection_eq_of_pooledSum_eq
+    (C : (Bool → ℝ) →ₗ[ℝ] (Bool → ℝ))
+    (hC : FactorsThrough dynamicsPoolingObservation C)
+    (β γ : Bool → ℝ) (hpool : β false + β true = γ false + γ true) :
+    C β = C γ := by
+  apply hC.apply_eq_of_observation_eq dynamicsPoolingObservation C β γ
+  exact hpool
+
+/-- **Contrast-orbit blindness.**  Moving any biological field by any amount along the
+persistence/switching contrast leaves every factored correction unchanged. -/
+theorem factoredDynamicsCorrection_add_contrast
+    (C : (Bool → ℝ) →ₗ[ℝ] (Bool → ℝ))
+    (hC : FactorsThrough dynamicsPoolingObservation C)
+    (β : Bool → ℝ) (c : ℝ) :
+    C (β + c • dynamicsContrast) = C β := by
+  apply hC.apply_eq_of_observation_eq dynamicsPoolingObservation C
+  simp [dynamicsPoolingObservation, dynamicsContrast]
+  ring
+
+/-- Every finite uniform biological correction is constant along the entire contrast orbit. -/
+theorem uniformDynamicsCorrection_add_contrast
+    (k : ℕ) (C : (Bool → ℝ) →ₗ[ℝ] (Bool → ℝ))
+    (hC : C ∈ UniformCorrectionFamily dynamicsPoolingObservation k)
+    (β : Bool → ℝ) (c : ℝ) :
+    C (β + c • dynamicsContrast) = C β := by
+  exact factoredDynamicsCorrection_add_contrast C
+    (uniformCorrectionFamily_subset_factorsThrough dynamicsPoolingObservation k hC) β c
+
 /-- The contrast coefficient of the common mode vanishes. -/
 theorem dynamicsContrastCoefficient_commonMode :
     dynamicsContrastCoefficient dynamicsCommonMode = 0 := by
@@ -113,6 +143,10 @@ structure BiologicalCorrectionNormalForm : Prop where
   representedAtEveryPositiveOrder :
     ∀ k, 0 < k → dynamicsPooledProjector ∈
       UniformCorrectionFamily dynamicsPoolingObservation k
+  allUniformCorrectionsAreContrastBlind :
+    ∀ (k : ℕ) (C : (Bool → ℝ) →ₗ[ℝ] (Bool → ℝ)),
+      C ∈ UniformCorrectionFamily dynamicsPoolingObservation k →
+        ∀ (β : Bool → ℝ) (c : ℝ), C (β + c • dynamicsContrast) = C β
 
 /-- **Biological correction theorem.**  Pooling is exactly a projection onto shared biology; its
 entire complement is the one-dimensional dynamics contrast already identified with calibration
@@ -122,5 +156,6 @@ theorem biologicalCorrectionNormalForm : BiologicalCorrectionNormalForm where
   fixedExactlyOnCommonFields := dynamicsPooledProjector_fixed_iff
   residualExactlyContrast := dynamicsPooledProjector_residual
   representedAtEveryPositiveOrder := dynamicsPooledProjector_mem_uniformCorrectionFamily
+  allUniformCorrectionsAreContrastBlind := uniformDynamicsCorrection_add_contrast
 
 end Calibrator
