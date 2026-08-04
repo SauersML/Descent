@@ -1898,13 +1898,23 @@ quantity is not a spectral invariant, and it is the first non-spectral coordinat
 of the low signal-to-noise expansion of the mutual information, entering at third
 order multiplied by the SQUARE OF THE PRIOR'S THIRD CUMULANT.
 
-The biology is in that last factor. For a symmetric effect prior the third
-cumulant vanishes and the spectrum suffices. Polygenic effect priors are not
-symmetric: the standard modelling assumption is a sparse prior with a point mass
-at zero and mass on one side, whose third cumulant is nonzero by construction. So
-for exactly the priors this corpus uses, two linkage-disequilibrium structures
-with identical eigenvalues -- identical `normalizedMoment` at every order,
-identical `inverseTraceCertificate` -- support different achievable accuracy.
+The biology is in that last factor, and it does NOT go the way one would first
+guess. For a symmetric effect prior the third cumulant vanishes and this
+particular obstruction is inactive -- and in genetics it vanishes by force, not
+by convention. Which allele is called `alternate` is a reference-genome
+bookkeeping choice, so flipping it sends `x` to `-x` and any coding-invariant
+prior must be symmetric. Every deployed polygenic prior is: BayesR's centred
+normal mixture, PRS-CS's continuous shrinkage, LDpred's spike and slab. All have
+`κ₃ = 0`, so the cube-sum obstruction is switched off for standard scores.
+
+Two things follow. The obstruction reappears at the next order, where the
+relevant invariant is the entrywise FOURTH power sum, and `κ₄` does not vanish
+for a sparse prior -- sparsity is exactly what makes it nonzero. That case is
+below, and it is the one that bears on polygenic scores. And the third-order
+obstruction switches back ON under any functional orientation of variants --
+derived allele, predicted-deleterious allele, disruption present -- because
+those break the coding symmetry that forces `κ₃ = 0`. For structural variants
+that orientation is the natural one.
 
 What follows is the finite core: isospectrality proved through the characteristic
 polynomial, and the cube sums separated.
@@ -2014,6 +2024,80 @@ theorem no_spectral_formula_for_entrywiseCubeSum :
   have : entrywiseCubeSum (isoBlockD 1) = entrywiseCubeSum (isoBlockR 1) := by
     rw [hf (isoBlockD 1), hf (isoBlockR 1), hpoly]
   exact entrywiseCubeSum_not_spectral this
+
+
+
+/-! ### The invariant that survives a symmetric prior
+
+With `κ₃ = 0` the cube sum is multiplied by zero and the leading obstruction
+moves to the next order, where the contraction of the fourth-cumulant tensor
+produces the entrywise FOURTH power sum. That is the case that bears on polygenic
+scores, because sparsity is exactly what makes `κ₄` nonzero.
+
+It is also the biologically legible one. With `Σ` a linkage-disequilibrium
+matrix, `Σᵢⱼ` is a correlation `rᵢⱼ`, so the invariant is `∑ᵢⱼ rᵢⱼ⁴` -- a
+fourth-power sibling of the LD score `∑ᵢ rᵢⱼ²` that LD score regression is built
+on, arrived at by derivation rather than by analogy, and computable from any
+reference panel.
+
+The separation is cleaner at fourth order than at third: the gap is `3 (a + ½)²`,
+a perfect square, so it is strictly positive at every eigenvalue offset but one
+rather than on a half-line.
+-/
+
+/-- The entrywise fourth power sum: the non-spectral invariant that survives when
+the prior is symmetric. -/
+noncomputable def entrywiseFourthSum (M : Fin 2 → Fin 2 → ℝ) : ℝ :=
+  ∑ i, ∑ j, (M i j) ^ 4
+
+/-- **The diagonal block's fourth power sum.** -/
+theorem entrywiseFourthSum_isoBlockD (a : ℝ) :
+    entrywiseFourthSum (isoBlockD a) = a ^ 4 + (a + 1) ^ 4 := by
+  unfold entrywiseFourthSum isoBlockD
+  simp [Fin.sum_univ_two]
+
+/-- **The rotated block's fourth power sum.** -/
+theorem entrywiseFourthSum_isoBlockR (a : ℝ) :
+    entrywiseFourthSum (isoBlockR a) = 2 * (a + 1 / 2) ^ 4 + 2 * (1 / 2) ^ 4 := by
+  unfold entrywiseFourthSum isoBlockR
+  simp [Fin.sum_univ_two]
+  ring
+
+/-- **The gap is a perfect square.** Three times `(a + ½)²`, so the two blocks are
+separated at every eigenvalue offset except the single point `a = -½`, which lies
+outside the admissible spectrum. Unlike the third-order gap, which is affine and
+changes sign, this one cannot vanish anywhere the design is positive definite. -/
+theorem entrywiseFourthSum_gap (a : ℝ) :
+    entrywiseFourthSum (isoBlockD a) - entrywiseFourthSum (isoBlockR a)
+      = 3 * (a + 1 / 2) ^ 2 := by
+  rw [entrywiseFourthSum_isoBlockD, entrywiseFourthSum_isoBlockR]
+  ring
+
+/-- **So the fourth power sum is not a spectral invariant either**, and this is
+the one that matters for a symmetric prior. -/
+theorem entrywiseFourthSum_not_spectral :
+    entrywiseFourthSum (isoBlockD 1) ≠ entrywiseFourthSum (isoBlockR 1) := by
+  rw [entrywiseFourthSum_isoBlockD, entrywiseFourthSum_isoBlockR]
+  norm_num
+
+/-- **No function of the spectrum computes it.** The same quantification over
+every putative spectral formula as for the cube sum, now for the invariant that
+survives the symmetry forced on polygenic priors by allele coding.
+
+This is the operative statement for polygenic scores: no summary of a linkage
+matrix through its eigenvalues -- `normalizedMoment` at any order,
+`inverseTraceCertificate`, any spectral statistic whatever -- determines
+achievable accuracy under a sparse symmetric effect prior. -/
+theorem no_spectral_formula_for_entrywiseFourthSum :
+    ¬ ∃ f : (ℝ → ℝ) → ℝ,
+      ∀ M : Fin 2 → Fin 2 → ℝ, entrywiseFourthSum M = f (blockCharPoly M) := by
+  rintro ⟨f, hf⟩
+  have hpoly : blockCharPoly (isoBlockD 1) = blockCharPoly (isoBlockR 1) := by
+    funext x
+    exact isoBlock_charPoly_eq 1 x
+  have : entrywiseFourthSum (isoBlockD 1) = entrywiseFourthSum (isoBlockR 1) := by
+    rw [hf (isoBlockD 1), hf (isoBlockR 1), hpoly]
+  exact entrywiseFourthSum_not_spectral this
 
 
 end CapacityInvariant
