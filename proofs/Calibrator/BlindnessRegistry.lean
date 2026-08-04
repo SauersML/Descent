@@ -27,6 +27,7 @@ and then proves the thing the collection is for.
 | 6 | the cluster's internal cross-checks | two retention values | **methodological** | `DriftRegime` |
 | 7 | a symmetric validation design | the ratio vs. its square | **methodological** | `DriftRegime` |
 | 8 | Fisher's average effect | additive vs. dominant locus at `p = 1/2` | **genotypic** | this file |
+| 9 | any statistic of normalised pairwise coalescence times | Kingman vs. Beta vs. Dirac coalescents | **methodological** | this file |
 
 Instances 1-5 are theorems about the mathematics. Instances 6 and 7 are theorems about
 the **development's own quality process**, and that is the point of assembling them in
@@ -34,6 +35,36 @@ one place: a cross-check is a probe, a validation design is a probe, and neither
 exempt from the law they are used to establish. A guard that cannot separate two
 candidate definitions certifies neither of them, exactly as a cumulant that cannot
 separate two laws certifies neither.
+
+Instance 9 is the one that indicts this development's own measuring apparatus. With two
+lineages a `Λ`-coalescent has a single exponential clock, so the pairwise coalescence time
+is `Exp(λ)` and the reproductive regime enters ONLY through `λ`. Normalising by the mean
+divides that rate straight out, and every model lands on `Exp(1)`. Measured
+(`proofs/validation/empirical/simcov/battery_blind.py`), the raw mean pairwise time spans
+four orders of magnitude across models -- `191.7` for Beta at `α = 1.1`, `977876` for a
+Dirac coalescent -- while after normalisation every one of them agrees with Kingman:
+
+  model              CV      skew    P(T > 2·mean)    sems from Kingman
+  Kingman          1.0025   2.0876      0.1338              --
+  Beta α = 1.9     0.9882   1.9541      0.1344         2.02 / 0.19
+  Beta α = 1.5     0.9886   1.9199      0.1366         1.97 / 0.82
+  Beta α = 1.1     0.9899   1.9663      0.1351         1.78 / 0.40
+  Dirac ψ = 0.3    1.0024   2.0435      0.1323         0.01 / 0.43
+
+The exponential values are `CV = 1`, `skew = 2`, `P = 0.1353`, and all five rows sit on
+them. The site-frequency spectrum at `n = 10` separates the same models cleanly -- the
+singleton fraction runs `0.3544` for Kingman to `0.4017` at `α = 1.1`, total variation up
+to `0.047`, monotone in `α` -- because it reads branch lengths subtending three or more
+leaves, which a pairwise probe never sees.
+
+**Why this belongs in a registry rather than a footnote.** Every `F_ST` in
+`proofs/validation/empirical/simcov` is `1 - E[T_within] / E[T_between]`, a ratio of
+pairwise quantities. So every `VALIDATED` marker that harness issued is valid *within
+Kingman* and carries no information about any other regime, however many replicates were
+run. Heterozygosity, `π`, and pairwise `F_ST` inherit the same ceiling. An instrument that
+cannot report its own blind spot will eventually report someone else's answer as its own,
+which is the rule `scripts/cluster-lean-build.sh` records for build logs and which applies
+here unchanged.
 
 Instance 8 is of a third kind. Its witness pair is two *loci*, and the property the probe
 fails to certify — whether the heterozygote sits at the midpoint of the homozygotes — is a
@@ -431,5 +462,36 @@ theorem dominance_resolution_bound (a d d' p δ : ℝ) (hp : 1 - 2 * p ≠ 0)
   rw [averageEffect_separation] at h
   rw [le_div_iff₀ (abs_pos.mpr hp), mul_comm]
   exact h
+
+/-! ### Instance 9: normalised pairwise coalescence times
+
+The mathematical core, stated on the survival function so it needs no measure theory.
+With two lineages the only possible event is coalescence, so the time is exponential with
+some rate `λ > 0` that carries the whole of the reproductive regime, and the mean is
+`1 / λ`. Evaluating the survival function at `x` MEANS of that law gives `exp (-x)` for
+every `λ`: the rate cancels. -/
+
+/-- Survival function of the pairwise coalescence time at rate `lam`. -/
+noncomputable def pairwiseCoalescentSurvival (lam t : ℝ) : ℝ := Real.exp (-(lam * t))
+
+/-- **The normalised pairwise law does not depend on the rate.**
+
+At `t = x / lam`, which is `x` multiples of the mean `1 / lam`, the survival probability is
+`exp (-x)` whatever `lam` is. So no statistic of normalised pairwise coalescence times can
+separate two `Λ`-coalescents, and the measured table above is what that looks like across
+five models whose raw timescales differ by four orders of magnitude. -/
+theorem pairwiseCoalescentSurvival_normalised (lam x : ℝ) (hlam : lam ≠ 0) :
+    pairwiseCoalescentSurvival lam (x / lam) = Real.exp (-x) := by
+  unfold pairwiseCoalescentSurvival
+  rw [mul_div_cancel₀ x hlam]
+
+/-- **Two regimes, one normalised law.** The blindness in the form the registry states its
+other instances: two different rates, and the probe returns the same number at every `x`. -/
+theorem normalised_pairwise_blind_to_rate (lam₁ lam₂ x : ℝ)
+    (h₁ : lam₁ ≠ 0) (h₂ : lam₂ ≠ 0) :
+    pairwiseCoalescentSurvival lam₁ (x / lam₁)
+      = pairwiseCoalescentSurvival lam₂ (x / lam₂) := by
+  rw [pairwiseCoalescentSurvival_normalised lam₁ x h₁,
+    pairwiseCoalescentSurvival_normalised lam₂ x h₂]
 
 end Calibrator

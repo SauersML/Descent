@@ -1,0 +1,322 @@
+[
+ {
+  "name": "pgsPhenoCov / sharedLDGeneticVariance",
+  "file": "TransferLearningPGS.lean",
+  "source": "sum_ij bw_i * ld_ij * bc_j",
+  "note": "",
+  "regime": "standardised dosages, LD as the correlation matrix, coalescent LD from msprime",
+  "span": 0.0,
+  "verdict": "NO POWER",
+  "worst": {
+   "design": "Cov(PGS, y)",
+   "lean": 0.8690399985252654,
+   "truth": 0.8893826994061518,
+   "sem": 0.03241973509964075,
+   "sems_off": 0.6274789358507692,
+   "rel_err": 0.02287283179048727
+  },
+  "cells": [
+   {
+    "design": "Cov(PGS, y)",
+    "lean": 0.8690399985252654,
+    "truth": 0.8893826994061518,
+    "sem": 0.03241973509964075,
+    "sems_off": 0.6274789358507692,
+    "rel_err": 0.02287283179048727
+   },
+   {
+    "design": "Var(PGS) = sharedLDGeneticVariance",
+    "lean": 0.8690399985252654,
+    "truth": 0.8690399985252655,
+    "sem": 0.019432325118688105,
+    "sems_off": 5.713279382905409e-15,
+    "rel_err": 1.2775281074624545e-16
+   }
+  ]
+ },
+ {
+  "name": "sharedLDHeritability",
+  "file": "TransferLearningPGS.lean",
+  "source": "sharedLDGeneticVariance beta ld / var_y",
+  "note": "",
+  "regime": "fraction of phenotypic variance from the additive score",
+  "span": 0.0,
+  "verdict": "NO POWER",
+  "worst": {
+   "design": "sharedLDHeritability",
+   "lean": 0.22176142558922918,
+   "truth": 0.2217614255892292,
+   "sem": 0.004958736224047779,
+   "sems_off": 5.597308338569429e-15,
+   "rel_err": 1.251596193606765e-16
+  },
+  "cells": [
+   {
+    "design": "sharedLDHeritability",
+    "lean": 0.22176142558922918,
+    "truth": 0.2217614255892292,
+    "sem": 0.004958736224047779,
+    "sems_off": 5.597308338569429e-15,
+    "rel_err": 1.251596193606765e-16
+   }
+  ]
+ },
+ {
+  "name": "pgsR2 / sourceTruthR2SharedLD / transportedTargetR2SharedLD",
+  "file": "TransferLearningPGS.lean",
+  "source": "cov_pgs_y^2 / (var_pgs * var_y)",
+  "note": "",
+  "regime": "squared correlation of the score with the phenotype",
+  "span": 0.5013811085130768,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "transported target R2",
+   "lean": 0.11581173191810029,
+   "truth": 0.12099410848025749,
+   "sem": 0.003826169662591077,
+   "sems_off": 1.3544555048945999,
+   "rel_err": 0.04283164384820276
+  },
+  "cells": [
+   {
+    "design": "source R2",
+    "lean": 0.23226503025735754,
+    "truth": 0.23214891225879328,
+    "sem": 0.007341193190683711,
+    "sems_off": 0.01581731954849202,
+    "rel_err": 0.0005001875625194091
+   },
+   {
+    "design": "transported target R2",
+    "lean": 0.11581173191810029,
+    "truth": 0.12099410848025749,
+    "sem": 0.003826169662591077,
+    "sems_off": 1.3544555048945999,
+    "rel_err": 0.04283164384820276
+   }
+  ]
+ },
+ {
+  "name": "ldEffectGeneticCorrelation vs effectGeneticCorrelation",
+  "file": "TransferLearningPGS.lean",
+  "source": "LD-weighted vs plain cosine between effect vectors",
+  "note": "",
+  "regime": "truth is the correlation of the two genetic values in the same individuals; only one of the two can be it",
+  "span": 0.03851595737969871,
+  "verdict": "NO POWER",
+  "worst": {
+   "design": "effectGeneticCorrelation (LD-free)",
+   "lean": 0.6979178023210815,
+   "truth": 0.6710368299923498,
+   "sem": 0.008691671508132973,
+   "sems_off": 3.092727596018624,
+   "rel_err": 0.04005886283326373
+  },
+  "cells": [
+   {
+    "design": "ldEffectGeneticCorrelation",
+    "lean": 0.6710368299923497,
+    "truth": 0.6710368299923498,
+    "sem": 0.008691671508132973,
+    "sems_off": 1.2773412151923809e-14,
+    "rel_err": 1.6544889564970878e-16
+   },
+   {
+    "design": "effectGeneticCorrelation (LD-free)",
+    "lean": 0.6979178023210815,
+    "truth": 0.6710368299923498,
+    "sem": 0.008691671508132973,
+    "sems_off": 3.092727596018624,
+    "rel_err": 0.04005886283326373
+   }
+  ]
+ },
+ {
+  "name": "fstEquilibrium",
+  "file": "DGP.lean",
+  "source": "1 / (1 + theta + bigM)",
+  "note": "",
+  "regime": "20-deme island model, exact coalescence times; mutation does not alter a coalescence-time F_ST",
+  "span": 0.42592592592592593,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "theta=0.4 M=2.0",
+   "lean": 0.29411764705882354,
+   "truth": 0.30968693002595166,
+   "sem": 0.013732810835116826,
+   "sems_off": 1.133728786776496,
+   "rel_err": 0.05027426558112549
+  },
+  "cells": [
+   {
+    "design": "theta=0.1 M=2.0",
+    "lean": 0.3225806451612903,
+    "truth": 0.30968693002595166,
+    "sem": 0.013732810835116826,
+    "sems_off": 0.9388984738919961,
+    "rel_err": 0.0416346764594107
+   },
+   {
+    "design": "theta=0.1 M=4.0",
+    "lean": 0.19607843137254904,
+    "truth": 0.19353514679830885,
+    "sem": 0.011848837827332911,
+    "sems_off": 0.21464422176268955,
+    "rel_err": 0.013141202599704818
+   },
+   {
+    "design": "theta=0.4 M=2.0",
+    "lean": 0.29411764705882354,
+    "truth": 0.30968693002595166,
+    "sem": 0.013732810835116826,
+    "sems_off": 1.133728786776496,
+    "rel_err": 0.05027426558112549
+   },
+   {
+    "design": "theta=0.4 M=4.0",
+    "lean": 0.18518518518518517,
+    "truth": 0.19353514679830885,
+    "sem": 0.011848837827332911,
+    "sems_off": 0.7047072240166863,
+    "rel_err": 0.04314441976694562
+   }
+  ]
+ },
+ {
+  "name": "fstDriftMigration",
+  "file": "DGP.lean",
+  "source": "1 / (1 + bigM)",
+  "note": "",
+  "regime": "same runs, the mutation-free sibling",
+  "span": 0.3999999999999999,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "theta=0.1 M=2.0",
+   "lean": 0.3333333333333333,
+   "truth": 0.30968693002595166,
+   "sem": 0.013732810835116826,
+   "sems_off": 1.7218909945889818,
+   "rel_err": 0.07635583234139103
+  },
+  "cells": [
+   {
+    "design": "theta=0.1 M=2.0",
+    "lean": 0.3333333333333333,
+    "truth": 0.30968693002595166,
+    "sem": 0.013732810835116826,
+    "sems_off": 1.7218909945889818,
+    "rel_err": 0.07635583234139103
+   },
+   {
+    "design": "theta=0.1 M=4.0",
+    "lean": 0.2,
+    "truth": 0.19353514679830885,
+    "sem": 0.011848837827332911,
+    "sems_off": 0.5456107422432626,
+    "rel_err": 0.03340402665169884
+   },
+   {
+    "design": "theta=0.4 M=2.0",
+    "lean": 0.3333333333333333,
+    "truth": 0.30968693002595166,
+    "sem": 0.013732810835116826,
+    "sems_off": 1.7218909945889818,
+    "rel_err": 0.07635583234139103
+   },
+   {
+    "design": "theta=0.4 M=4.0",
+    "lean": 0.2,
+    "truth": 0.19353514679830885,
+    "sem": 0.011848837827332911,
+    "sems_off": 0.5456107422432626,
+    "rel_err": 0.03340402665169884
+   }
+  ]
+ },
+ {
+  "name": "discreteRecombinationSurvival",
+  "file": "DGP.lean",
+  "source": "(1 - recombRate)^tmrca",
+  "note": "",
+  "regime": "probability no recombination occurs in tmrca meioses",
+  "span": 0.8428767984990642,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "r=0.01 t=100",
+   "lean": 0.3660323412732292,
+   "truth": 0.366265,
+   "sem": 0.0007617659577832945,
+   "sems_off": 0.3054202204674958,
+   "rel_err": 0.0006352196545419489
+  },
+  "cells": [
+   {
+    "design": "r=0.01 t=20",
+    "lean": 0.8179069375972308,
+    "truth": 0.817935,
+    "sem": 0.0006101584543686172,
+    "sems_off": 0.04599199202810489,
+    "rel_err": 3.430884210750517e-05
+   },
+   {
+    "design": "r=0.01 t=100",
+    "lean": 0.3660323412732292,
+    "truth": 0.366265,
+    "sem": 0.0007617659577832945,
+    "sems_off": 0.3054202204674958,
+    "rel_err": 0.0006352196545419489
+   },
+   {
+    "design": "r=0.05 t=40",
+    "lean": 0.12851215656510312,
+    "truth": 0.128585,
+    "sem": 0.0005292704832479325,
+    "sems_off": 0.13762988340077612,
+    "rel_err": 0.0005665002519491805
+   }
+  ]
+ },
+ {
+  "name": "sharedLDRetention",
+  "file": "DGP.lean",
+  "source": "exp(-2 * recomb * t_div)",
+  "note": "",
+  "regime": "two lineages each surviving t_div meioses intact; the continuous approximation to the exact (1-r)^(2t)",
+  "span": 0.9726762775527074,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "r=0.05 t=40",
+   "lean": 0.01831563888873418,
+   "truth": 0.016534102225,
+   "sem": 0.00013611249017687083,
+   "sems_off": 13.088708181146112,
+   "rel_err": 0.10774922275734139
+  },
+  "cells": [
+   {
+    "design": "r=0.01 t=20",
+    "lean": 0.6703200460356393,
+    "truth": 0.669017664225,
+    "sem": 0.00099813991074799,
+    "sems_off": 1.304808871597338,
+    "rel_err": 0.001946707658531036
+   },
+   {
+    "design": "r=0.01 t=100",
+    "lean": 0.1353352832366127,
+    "truth": 0.134150050225,
+    "sem": 0.0005580164170549967,
+    "sems_off": 2.1240110064644875,
+    "rel_err": 0.00883512909331593
+   },
+   {
+    "design": "r=0.05 t=40",
+    "lean": 0.01831563888873418,
+    "truth": 0.016534102225,
+    "sem": 0.00013611249017687083,
+    "sems_off": 13.088708181146112,
+    "rel_err": 0.10774922275734139
+   }
+  ]
+ }
+]
