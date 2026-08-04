@@ -41,10 +41,11 @@ of that set against the functional.
   width in total variation controls nothing at all: two laws at total-variation distance `2ε`
   can differ by any prescribed amount.  A bounded kernel is not a technical convenience in the
   bound above; without it the bound is false.
-* `interaction_join_obstruction`, `confounding_meet_obstruction` — the two order-theoretic
-  failures, now stated as descent of a functional of a joint law rather than as arithmetic.  The
-  conditional risks driving them are `interactionRisk` and `confoundedConditionalRisk` from
-  `Calibrator.FunctionalDescent`, so these are those witnesses, promoted.
+* `admissible_interaction_join_obstruction`, `admissible_confounding_meet_obstruction` — the two
+  order-theoretic failures, stated over genuine probability-law families rather than as
+  arithmetic.  The conditional risks driving them are `interactionRisk` and
+  `confoundedConditionalRisk` from `Calibrator.FunctionalDescent`, so these are those witnesses,
+  promoted without extending their parameters beyond the probability simplex.
 * `kernelSufficient_componentPosterior` — the posterior component vector of a mixture is
   kernel-sufficient for the family of all mixing weights, so *every* functional descends along
   it.  This is `componentMixtureDensity_factorization` turned into a statement about
@@ -459,12 +460,6 @@ theorem trait_value_locusOne (theta : ℝ) (x : Fin 2) :
   field_simp at haverage ⊢
   linarith
 
-/-- The trait frequency descends along the first locus. -/
-theorem descends_trait_along_locusOne :
-    DescendsAlong (fun g : TwoLociTrait ↦ g.1) interactionTraitLaw
-      (conditionalSectionMean traitIndicator) :=
-  ⟨fun _ ↦ 1 / 2, fun theta x _ ↦ trait_value_locusOne theta x⟩
-
 /-- The second locus carries half the mass at each of its values. -/
 theorem labelMass_interactionTraitLaw_locusTwo (theta : ℝ) (x : Fin 2) :
     labelMass (fun g : TwoLociTrait ↦ g.2.1) (interactionTraitLaw theta) x = 1 / 2 := by
@@ -486,12 +481,6 @@ theorem trait_value_locusTwo (theta : ℝ) (x : Fin 2) :
   field_simp at haverage ⊢
   linarith
 
-/-- The trait frequency descends along the second locus. -/
-theorem descends_trait_along_locusTwo :
-    DescendsAlong (fun g : TwoLociTrait ↦ g.2.1) interactionTraitLaw
-      (conditionalSectionMean traitIndicator) :=
-  ⟨fun _ ↦ 1 / 2, fun theta x _ ↦ trait_value_locusTwo theta x⟩
-
 /-- The pair of loci carries a quarter of the mass at each of its four values. -/
 theorem labelMass_interactionTraitLaw_locusPair (theta : ℝ) :
     labelMass (fun g : TwoLociTrait ↦ (g.1, g.2.1)) (interactionTraitLaw theta) (0, 0)
@@ -512,26 +501,6 @@ theorem trait_value_locusPair (theta : ℝ) :
     ring
   rw [hnum]
   field_simp
-
-/-- **The join of two descent labels need not be a descent label.**  The trait frequency descends
-along each locus separately and along neither refinement that records both: reporting it by locus
-is honest at each margin and dishonest jointly.  Effect modification is an order-theoretic
-failure, and descent is therefore not inherited by refinements of a descent label — checking
-stability along each coordinate separately proves nothing about the pair. -/
-theorem interaction_join_obstruction :
-    DescendsAlong (fun g : TwoLociTrait ↦ g.1) interactionTraitLaw
-        (conditionalSectionMean traitIndicator) ∧
-      DescendsAlong (fun g : TwoLociTrait ↦ g.2.1) interactionTraitLaw
-        (conditionalSectionMean traitIndicator) ∧
-      ¬ DescendsAlong (fun g : TwoLociTrait ↦ (g.1, g.2.1)) interactionTraitLaw
-        (conditionalSectionMean traitIndicator) := by
-  refine ⟨descends_trait_along_locusOne, descends_trait_along_locusTwo, ?_⟩
-  rintro ⟨value, hvalue⟩
-  have h0 := hvalue 0 (0, 0) (by rw [labelMass_interactionTraitLaw_locusPair]; norm_num)
-  have h1 := hvalue (1 / 4) (0, 0) (by rw [labelMass_interactionTraitLaw_locusPair]; norm_num)
-  rw [trait_value_locusPair] at h0 h1
-  exact interactionRisk_joint_separates (theta := 0) (eta := 1 / 4) (by norm_num)
-    (h0.trans h1.symm)
 
 /-- **Probability-law form of the interaction obstruction.**  Restricting the population index
 to the admissible risk interval preserves descent along either locus and failure along their
@@ -647,19 +616,6 @@ theorem kernelSufficient_confounded_stratum :
 /-- The exposure indicator, whose mean is the exposure frequency. -/
 noncomputable def exposureIndicator (g : ExposureStratum) : ℝ := if g.1 = 1 then 1 else 0
 
-/-- The exposure frequency descends along the exposure label itself: the kernel is already a
-function of that label. -/
-theorem descends_exposure_along_exposure :
-    DescendsAlong (fun g : ExposureStratum ↦ g.1) confoundedExposureLaw
-      (conditionalSectionMean exposureIndicator) :=
-  descendsAlong_sectionMean_of_labelFunction _ confoundedExposureLaw fun x ↦ if x = 1 then 1 else 0
-
-/-- The exposure frequency descends along the stratum label, by kernel sufficiency. -/
-theorem descends_exposure_along_stratum :
-    DescendsAlong (fun g : ExposureStratum ↦ g.2) confoundedExposureLaw
-      (conditionalSectionMean exposureIndicator) :=
-  descendsAlong_of_kernelSufficient _ confoundedExposureLaw kernelSufficient_confounded_stratum _ 0
-
 /-- The trivial label: the meet of the exposure label and the stratum label.  Descent along it
 says the crude exposure frequency is the same in every population. -/
 def trivialLabel : ExposureStratum → Unit := fun _ ↦ ()
@@ -684,26 +640,6 @@ theorem crude_exposure_frequency (beta : ℝ) :
   simp [conditionalSectionMean, confoundedExposureLaw, stratumFrequency, exposureGivenStratum,
     exposureIndicator, confoundedConditionalRisk, confoundedMarginalRisk, Fintype.sum_prod_type,
     Fin.sum_univ_two]
-
-/-- **The meet of two descent labels need not be a descent label.**  The exposure frequency
-descends along the exposure label and along the stratum label, and not along the label they have
-in common — so there is no coarsest honest reporting label, and two minimal ones can be
-incomparable.  This is confounding: standardization is invariant across the family and
-marginalization is not. -/
-theorem confounding_meet_obstruction :
-    DescendsAlong (fun g : ExposureStratum ↦ g.1) confoundedExposureLaw
-        (conditionalSectionMean exposureIndicator) ∧
-      DescendsAlong (fun g : ExposureStratum ↦ g.2) confoundedExposureLaw
-        (conditionalSectionMean exposureIndicator) ∧
-      ¬ DescendsAlong trivialLabel confoundedExposureLaw
-        (conditionalSectionMean exposureIndicator) := by
-  refine ⟨descends_exposure_along_exposure, descends_exposure_along_stratum, ?_⟩
-  rintro ⟨value, hvalue⟩
-  have h0 := hvalue 0 () (by rw [labelMass_trivialLabel]; norm_num)
-  have h1 := hvalue 1 () (by rw [labelMass_trivialLabel]; norm_num)
-  rw [fiberConditional_trivialLabel, crude_exposure_frequency] at h0 h1
-  exact confoundedMarginalRisk_separates (beta := 0) (gamma := 1) (by norm_num)
-    (h0.trans h1.symm)
 
 /-- **Probability-law form of the confounding obstruction.**  Even when every member is indexed
 by a valid prevalence, exposure and stratum labels each support descent while their common
