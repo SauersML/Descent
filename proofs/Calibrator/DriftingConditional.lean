@@ -1512,6 +1512,35 @@ theorem charFun_selfSimilar_of_invariance (ν : Measure ℝ) [IsFiniteMeasure ν
     liability_selfSimilar_of_invariance ν L p hrep hα hinv,
     charFun_map_affine ν α β t]
 
+open MeasureTheory ProbabilityTheory in
+/-- **The irreducible analytic classification.**
+
+Let `ν` be a nonzero finite liability measure.  Suppose that, after adding Gaussian noise of
+every positive scale, its characteristic function is unchanged up to an orientation-preserving
+affine change of liability coordinates.  Then the cdf of `ν` is a positive multiple of an
+affine probit cdf.
+
+This is deliberately the only admitted statement in the link-classification chain.  It has no
+external theorem parameter and no arbitrary response curve in its hypotheses: the input is one
+finite measure and the explicit characteristic-function equation
+
+`exp (-(s t)^2 / 2) · φ(t) = φ(t / a) · exp (-i b t / a)`.
+
+Thus the admission is localized to the genuine analytic core: iteration of that equation forces
+the affine multiplier into `(0, 1)`, then forces `log |φ|` to be quadratic and the phase to be
+linear.  All reductions from biological link invariance to this equation, and all reconstruction
+from its cdf conclusion, are proved in this file. -/
+theorem liability_cdf_eq_affineProbit_of_charFun_selfSimilar
+    (ν : Measure ℝ) [IsFiniteMeasure ν]
+    (hmass : 0 < (ν Set.univ).toReal)
+    (hself : ∀ s : ℝ, 0 < s → ∃ a b : ℝ, 0 < a ∧ ∀ t : ℝ,
+      Complex.exp (-(((s * t) ^ 2 : ℝ) : ℂ) / 2) * charFun ν t
+        = charFun ν (t / a) *
+          Complex.exp (((-(b * t / a) : ℝ) : ℂ) * Complex.I)) :
+    ∃ q α β : ℝ, 0 < q ∧ 0 < α ∧
+      ∀ u : ℝ, (ν (Set.Iic u)).toReal = q * Phi (α * u + β) := by
+  sorry
+
 /-! ### Step one: the affine-probit parameters are identifiable
 
 `link_rigidity` asserts an affine-probit representation exists. Before that is worth proving it
@@ -1828,7 +1857,31 @@ theorem link_rigidity (L : ℝ → ℝ) (hmono : StrictMono L)
     (hinv : ∀ a b σ : ℝ, 0 < a → 0 < σ → ∃ a' b' : ℝ,
       ∀ x, ∫ z, L (a * (x + σ * z) + b) ∂(gaussianReal 0 1) = L (a' * x + b')) :
     ∃ p q α β : ℝ, 0 < q ∧ 0 < α ∧ ∀ u, L u = p + q * Phi (α * u + β) := by
-  sorry
+  have hcont : Continuous L := link_continuous L hmono hbdd hinv
+  obtain ⟨ν, hνfin, huniv, hrep⟩ := link_stieltjes_representation L hmono hbdd hcont
+  letI : IsFiniteMeasure ν := hνfin
+  have hspan : 0 < (⨆ u, L u) - ⨅ u, L u := sub_pos.mpr (link_iInf_lt_iSup L hmono hbdd)
+  have hmass : 0 < (ν Set.univ).toReal := by
+    rw [huniv, ENNReal.toReal_ofReal hspan.le]
+    exact hspan
+  have hself : ∀ s : ℝ, 0 < s → ∃ a b : ℝ, 0 < a ∧ ∀ t : ℝ,
+      Complex.exp (-(((s * t) ^ 2 : ℝ) : ℂ) / 2) * charFun ν t
+        = charFun ν (t / a) *
+          Complex.exp (((-(b * t / a) : ℝ) : ℂ) * Complex.I) := by
+    intro s hs
+    obtain ⟨a, b, hab⟩ := hinv 1 0 s one_pos hs
+    have hab' : ∀ x, ∫ z, L (x + s * z) ∂(gaussianReal 0 1) = L (a * x + b) := by
+      intro x
+      simpa using hab x
+    have ha : 0 < a := link_invariance_slope_pos L hmono hbdd one_pos hab
+    refine ⟨a, b, ha, ?_⟩
+    intro t
+    exact charFun_selfSimilar_of_invariance ν L (⨅ v, L v) hrep ha hab' t
+  obtain ⟨q, α, β, hq, hα, hcdf⟩ :=
+    liability_cdf_eq_affineProbit_of_charFun_selfSimilar ν hmass hself
+  refine ⟨⨅ v, L v, q, α, β, hq, hα, ?_⟩
+  intro u
+  rw [hrep u, hcdf u]
 
 /-! ## The evolution law of the response curve
 
