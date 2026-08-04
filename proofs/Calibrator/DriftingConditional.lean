@@ -2081,6 +2081,56 @@ theorem charFun_selfSimilar_closed_form (ν : Measure ℝ) [IsFiniteMeasure ν]
   rw [hconst] at hlim
   exact tendsto_nhds_unique tendsto_const_nhds hlim
 
+open MeasureTheory ProbabilityTheory Complex Filter Topology in
+/-- **The scale factor is strictly below one.**
+
+`norm_charFun_le_geometric` says that with `α ≥ 1` the modulus of the characteristic function is
+below `M · exp(-n (su)²/2)` for every `n`, which for `u ≠ 0` forces it to vanish. A
+characteristic function that vanishes off the origin and equals the total mass at it is not
+continuous, and `continuous_charFun_real` says it is. So `α < 1`, and the iteration converges. -/
+theorem selfSimilar_alpha_lt_one (ν : Measure ℝ) [IsFiniteMeasure ν]
+    (hmass : 0 < ν.real Set.univ) {s α β : ℝ} (hs : s ≠ 0)
+    (heq : ∀ t : ℝ, Complex.exp (-(((s * t) ^ 2 : ℝ) : ℂ) / 2) * charFun ν t
+      = charFun ν (t / α) * Complex.exp (((-(β * t / α) : ℝ) : ℂ) * Complex.I)) :
+    α < 1 := by
+  by_contra hcon
+  push_neg at hcon
+  have hzero : ∀ u : ℝ, u ≠ 0 → charFun ν u = 0 := by
+    intro u hu
+    have hc : 0 < (s * u) ^ 2 := by positivity
+    have hbound : ∀ n : ℕ,
+        ‖charFun ν u‖ ≤ ν.real Set.univ * Real.exp (-(n : ℝ) * (s * u) ^ 2 / 2) :=
+      fun n ↦ norm_charFun_le_geometric ν hcon heq u n
+    have hinner : Tendsto (fun n : ℕ ↦ -(n : ℝ) * (s * u) ^ 2 / 2) atTop atBot := by
+      rw [Filter.tendsto_atBot]
+      intro b
+      obtain ⟨N, hN⟩ := exists_nat_gt (-b * 2 / (s * u) ^ 2)
+      filter_upwards [Filter.eventually_ge_atTop N] with n hn
+      have hnr : -b * 2 / (s * u) ^ 2 < (n : ℝ) :=
+        lt_of_lt_of_le hN (by exact_mod_cast hn)
+      rw [div_lt_iff₀ hc] at hnr
+      linarith
+    have hexp : Tendsto (fun n : ℕ ↦ Real.exp (-(n : ℝ) * (s * u) ^ 2 / 2)) atTop (𝓝 0) :=
+      Real.tendsto_exp_atBot.comp hinner
+    have hlim : Tendsto (fun n : ℕ ↦ ν.real Set.univ
+        * Real.exp (-(n : ℝ) * (s * u) ^ 2 / 2)) atTop (𝓝 0) := by
+      simpa using hexp.const_mul (ν.real Set.univ)
+    have hconstseq : Tendsto (fun _ : ℕ ↦ ‖charFun ν u‖) atTop (𝓝 ‖charFun ν u‖) :=
+      tendsto_const_nhds
+    have hle : ‖charFun ν u‖ ≤ 0 :=
+      le_of_tendsto_of_tendsto' hconstseq hlim hbound
+    exact norm_eq_zero.mp (le_antisymm hle (norm_nonneg _))
+  have hseq : Tendsto (fun k : ℕ ↦ 1 / ((k : ℝ) + 1)) atTop (𝓝 0) :=
+    tendsto_one_div_add_atTop_nhds_zero_nat
+  have hlim2 := ((continuous_charFun_real ν).tendsto 0).comp hseq
+  have hallzero : (fun k : ℕ ↦ charFun ν (1 / ((k : ℝ) + 1))) = fun _ : ℕ ↦ (0 : ℂ) :=
+    funext fun k ↦ hzero _ (by positivity)
+  rw [Function.comp_def, hallzero] at hlim2
+  have hzeroseq : Tendsto (fun _ : ℕ ↦ (0 : ℂ)) atTop (𝓝 (0 : ℂ)) := tendsto_const_nhds
+  have hz0 : charFun ν 0 = 0 := (tendsto_nhds_unique hzeroseq hlim2).symm
+  rw [charFun_zero] at hz0
+  exact absurd (Complex.ofReal_eq_zero.mp hz0) (ne_of_gt hmass)
+
 open MeasureTheory ProbabilityTheory in
 /-- **Necessity: no other bounded link shape survives.** A strictly increasing bounded link whose
 two-parameter family is closed under Gaussian averaging is a positive vertical affine transform
