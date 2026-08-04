@@ -87,8 +87,9 @@ the link's density, which would need smoothness the hypotheses do not give, but 
 link as the cdf of a liability measure and classifying the measures that are affinely
 self-similar under Gaussian blurring. The reconstruction operator built from the observed
 marginal likewise needs diffusion generators, Fréchet curve spaces, and time reversal.
-`stationaryDrift_collapses_to_generator` proves the stationary algebraic core: the curve's transport drift collapses back to the generator's own
-drift, which is why the stationary flow is the semigroup itself.
+`stationaryDrift_collapses_to_generator` proves the stationary algebraic core: the curve's
+transport drift collapses back to the generator's own drift, which is why the stationary flow is
+the semigroup itself.
 
 Empirical status: DERIVED. The identification and stability results are proved at the stated
 hypotheses; whether a given cohort series satisfies them — a conservative population model, a
