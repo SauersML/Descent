@@ -816,7 +816,9 @@ run_cmd do
             let loc ← liftCoreM <| whereIs env n
             junkOpen := junkOpen.push (n, loc)
   IO.println s!"JUNK: {junkScanned} definitions can return a totality artifact"
-  IO.println s!"  {junkNamed} name the branch, {junkGuarded} rule it out by hypothesis, {junkExempt} exempt"
+  IO.println <|
+    s!"  {junkNamed} name the branch, {junkGuarded} rule it out by hypothesis, " ++
+      s!"{junkExempt} exempt"
   for (n, loc) in junkOpen do
     IO.println s!"  OPEN  {n}   [{loc}]"
   logInfo m!"JUNK_SCANNED\t{junkScanned}"
