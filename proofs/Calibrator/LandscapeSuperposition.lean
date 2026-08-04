@@ -1,10 +1,10 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Mathlib.Algebra.Order.BigOperators.Group.Finset
 import Mathlib.Data.Fintype.Basic
 import Mathlib.Data.Real.Basic
 import Mathlib.Data.Set.Lattice
-import Mathlib.Algebra.BigOperators.Group.Finset.Basic
 import Mathlib.Tactic.Linarith
 import Mathlib.Tactic.NormNum
 import Mathlib.Tactic.Ring
@@ -67,10 +67,11 @@ theorem nearOptimal_superposition_iff_exists_levels
   · intro hconfig
     refine ⟨fun k ↦ energy k config, hconfig, ?_⟩
     intro k
+    change energy k config ≤ energy k config
     exact le_rfl
   · rintro ⟨level, hadmissible, hlevel⟩
     exact hadmissible.trans <| Finset.sum_le_sum fun k hk ↦
-      mul_le_mul_of_nonneg_left (hlevel k) (hweight k)
+      mul_le_mul_of_nonneg_left (show level k ≤ energy k config from hlevel k) (hweight k)
 
 /-- Overlaps achieved by a common pair of configurations above two component-level vectors. -/
 def ComponentAchievableOverlaps
@@ -182,6 +183,20 @@ end SimplexBoundary
 
 /-! ## Spherical covariance calibration arithmetic -/
 
+/-- Even mixed spherical covariance with a shared quadratic component and two tail terms. -/
+noncomputable def mixedSphericalCovariance (alpha beta q : ℝ) : ℝ :=
+  q ^ 2 + alpha * q ^ 4 + beta * q ^ 6
+
+/-- Independent half-weight superposition adds covariances with squared weights.  The shared
+quadratic component is retained, whereas the two idiosyncratic tails are each diluted by one
+half. -/
+theorem halfWeight_quartic_sextic_covariance (q : ℝ) :
+    (1 / 2 : ℝ) * mixedSphericalCovariance (1 / 10) 0 q +
+        (1 / 2 : ℝ) * mixedSphericalCovariance 0 (1 / 14) q =
+      mixedSphericalCovariance (1 / 20) (1 / 28) q := by
+  unfold mixedSphericalCovariance
+  ring
+
 /-- The polynomial certificate `2 ξ'' ξ'''' - 3 (ξ''')²` for
 `ξ(q) = q² + alpha q⁴ + beta q⁶`. -/
 noncomputable def sphericalGaplessnessCertificate (alpha beta q : ℝ) : ℝ :=
@@ -208,7 +223,7 @@ theorem dilutedTails_certificate_pos (q : ℝ) (hq0 : 0 ≤ q) (hq1 : q ≤ 1) :
   have hq2le : q ^ 2 ≤ 1 := by nlinarith
   have hq4le : q ^ 4 ≤ q ^ 2 := by nlinarith [sq_nonneg (q ^ 2)]
   have hq6le : q ^ 6 ≤ q ^ 2 := by
-    have hq4nonneg : 0 ≤ q ^ 4 := positivity
+    have hq4nonneg : 0 ≤ q ^ 4 := by nlinarith [sq_nonneg (q ^ 2)]
     calc
       q ^ 6 = q ^ 4 * q ^ 2 := by ring
       _ ≤ q ^ 4 * 1 := mul_le_mul_of_nonneg_left hq2le hq4nonneg
