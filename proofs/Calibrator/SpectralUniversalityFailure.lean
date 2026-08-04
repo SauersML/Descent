@@ -67,6 +67,48 @@ private theorem sum_five_rotate
       apply Finset.sum_congr rfl
       intro b hb
       rw [Finset.sum_comm]
+
+/-- A six-index finite Fubini permutation used by the fourth-order contraction proof. -/
+private theorem sum_six_rotate
+    {A B C D I J : Type*} [Fintype A] [Fintype B] [Fintype C] [Fintype D]
+    [Fintype I] [Fintype J] (f : A → B → C → D → I → J → ℝ) :
+    (∑ a, ∑ b, ∑ c, ∑ d, ∑ i, ∑ j, f a b c d i j) =
+      ∑ i, ∑ j, ∑ a, ∑ b, ∑ c, ∑ d, f a b c d i j := by
+  classical
+  calc
+    (∑ a, ∑ b, ∑ c, ∑ d, ∑ i, ∑ j, f a b c d i j) =
+        ∑ a, ∑ b, ∑ c, ∑ i, ∑ j, ∑ d, f a b c d i j := by
+      apply Finset.sum_congr rfl
+      intro a ha
+      apply Finset.sum_congr rfl
+      intro b hb
+      apply Finset.sum_congr rfl
+      intro c hc
+      rw [Finset.sum_comm]
+      apply Finset.sum_congr rfl
+      intro i hi
+      rw [Finset.sum_comm]
+    _ = ∑ a, ∑ b, ∑ i, ∑ j, ∑ c, ∑ d, f a b c d i j := by
+      apply Finset.sum_congr rfl
+      intro a ha
+      apply Finset.sum_congr rfl
+      intro b hb
+      rw [Finset.sum_comm]
+      apply Finset.sum_congr rfl
+      intro i hi
+      rw [Finset.sum_comm]
+    _ = ∑ a, ∑ i, ∑ j, ∑ b, ∑ c, ∑ d, f a b c d i j := by
+      apply Finset.sum_congr rfl
+      intro a ha
+      rw [Finset.sum_comm]
+      apply Finset.sum_congr rfl
+      intro i hi
+      rw [Finset.sum_comm]
+    _ = ∑ i, ∑ j, ∑ a, ∑ b, ∑ c, ∑ d, f a b c d i j := by
+      rw [Finset.sum_comm]
+      apply Finset.sum_congr rfl
+      intro i hi
+      rw [Finset.sum_comm]
     _ = ∑ a, ∑ d, ∑ b, ∑ c, ∑ e, f a b c d e := by
       apply Finset.sum_congr rfl
       intro a ha
@@ -109,6 +151,26 @@ private theorem sum_cube_expand {I : Type*} [Fintype I] (f : I → ℝ) :
   apply Finset.sum_congr rfl
   intro k hk
   ring
+
+/-- Expansion of the fourth power of a finite sum. -/
+private theorem sum_fourth_expand {I : Type*} [Fintype I] (f : I → ℝ) :
+    (∑ i, f i) ^ 4 = ∑ i, ∑ j, ∑ k, ∑ l, f i * f j * f k * f l := by
+  calc
+    (∑ i, f i) ^ 4 =
+        ((∑ i, f i) * (∑ j, f j)) * ((∑ k, f k) * (∑ l, f l)) := by ring
+    _ = (∑ i, ∑ j, f i * f j) * (∑ k, ∑ l, f k * f l) := by
+      rw [Fintype.sum_mul_sum, Fintype.sum_mul_sum]
+    _ = ∑ i, ∑ j, ∑ k, ∑ l, f i * f j * f k * f l := by
+      simp_rw [Finset.sum_mul, Finset.mul_sum]
+      apply Finset.sum_congr rfl
+      intro i hi
+      apply Finset.sum_congr rfl
+      intro j hj
+      apply Finset.sum_congr rfl
+      intro k hk
+      apply Finset.sum_congr rfl
+      intro l hl
+      ring
 
 /-- The third moment tensor obtained by applying `mixing` to independent centered coordinates
 whose common scalar third moment is `kappa`. -/
@@ -154,6 +216,62 @@ theorem thirdTensorEnergy_pushedThirdMomentTensor
   apply Finset.sum_congr rfl
   intro c hc
   ring
+
+/-! ### The symmetric-prior obstruction at fourth order -/
+
+/-- The fourth cumulant tensor obtained by applying `mixing` to independent centered
+coordinates whose common scalar fourth cumulant is `kappa`. -/
+noncomputable def pushedFourthCumulantTensor
+    (mixing : Matrix Row Locus ℝ) (kappa : ℝ) (a b c d : Row) : ℝ :=
+  kappa * ∑ i, mixing a i * mixing b i * mixing c i * mixing d i
+
+/-- Squared Frobenius norm of a four-index tensor. -/
+noncomputable def fourthTensorEnergy (tensor : Row → Row → Row → Row → ℝ) : ℝ :=
+  ∑ a, ∑ b, ∑ c, ∑ d, tensor a b c d ^ 2
+
+/-- The orientation-sensitive invariant that remains available to symmetric non-Gaussian
+product priors: the sum of the fourth powers of all covariance entries. -/
+noncomputable def entryFourthSum (covariance : Matrix Locus Locus ℝ) : ℝ :=
+  ∑ i, ∑ j, covariance i j ^ 4
+
+/-- **General fourth-cumulant orientation identity.**  The energy of the pushed-forward fourth
+cumulant tensor is the entrywise-fourth-power sum of the Gram covariance, multiplied by
+`kappa ^ 2`.  Unlike the third-order obstruction, this survives symmetric sparse priors. -/
+theorem fourthTensorEnergy_pushedFourthCumulantTensor
+    (mixing : Matrix Row Locus ℝ) (kappa : ℝ) :
+    fourthTensorEnergy (pushedFourthCumulantTensor mixing kappa) =
+      kappa ^ 2 * entryFourthSum (gramCovariance mixing) := by
+  classical
+  unfold fourthTensorEnergy pushedFourthCumulantTensor entryFourthSum gramCovariance
+  simp only [Matrix.mul_apply, Matrix.transpose_apply]
+  simp_rw [mul_pow, sum_sq_expand, sum_fourth_expand]
+  simp_rw [Finset.mul_sum]
+  rw [sum_six_rotate]
+  apply Finset.sum_congr rfl
+  intro i hi
+  apply Finset.sum_congr rfl
+  intro j hj
+  apply Finset.sum_congr rfl
+  intro a ha
+  apply Finset.sum_congr rfl
+  intro b hb
+  apply Finset.sum_congr rfl
+  intro c hc
+  apply Finset.sum_congr rfl
+  intro d hd
+  ring
+
+/-- The power-`power` LD score of one locus.  Power two is the usual LD score; power four is
+the per-locus statistic detecting symmetric non-Gaussian orientation effects. -/
+noncomputable def ldPowerScore
+    (covariance : Matrix Locus Locus ℝ) (power : ℕ) (j : Locus) : ℝ :=
+  ∑ i, covariance i j ^ power
+
+/-- The fourth-order orientation invariant is the sum of per-locus fourth-power LD scores. -/
+theorem entryFourthSum_eq_sum_ldPowerScore_four (covariance : Matrix Locus Locus ℝ) :
+    entryFourthSum covariance = ∑ j, ldPowerScore covariance 4 j := by
+  unfold entryFourthSum ldPowerScore
+  rw [Finset.sum_comm]
 
 end ThirdMomentContraction
 
@@ -243,6 +361,68 @@ theorem midpoint_blockEntryCubeMean_separation :
         blockEntryCubeMean (rotatedCovarianceBlock (3 / 2)) = 11 / 8 := by
   rw [blockEntryCubeMean_localized_sub_rotated]
   norm_num
+
+/-- Per-coordinate normalization of the entrywise fourth-power invariant for a block. -/
+noncomputable def blockEntryFourthMean (covariance : Matrix (Fin 2) (Fin 2) ℝ) : ℝ :=
+  entryFourthSum covariance / 2
+
+/-- Closed form of the fourth-order orientation invariant for the localized block. -/
+theorem blockEntryFourthMean_localizedCovarianceBlock (a : ℝ) :
+    blockEntryFourthMean (localizedCovarianceBlock a) =
+      (a ^ 4 + (a + 1) ^ 4) / 2 := by
+  simp [blockEntryFourthMean, entryFourthSum, localizedCovarianceBlock, Fin.sum_univ_two]
+
+/-- Closed form of the fourth-order orientation invariant for the rotated block. -/
+theorem blockEntryFourthMean_rotatedCovarianceBlock (a : ℝ) :
+    blockEntryFourthMean (rotatedCovarianceBlock a) =
+      (a + 1 / 2) ^ 4 + 1 / 16 := by
+  simp [blockEntryFourthMean, entryFourthSum, rotatedCovarianceBlock, Fin.sum_univ_two]
+  ring
+
+/-- The exactly isospectral blocks have distinct fourth-order orientation invariants throughout
+the positive-definite parameter range.  The gap is a positive perfect square. -/
+theorem blockEntryFourthMean_localized_sub_rotated (a : ℝ) :
+    blockEntryFourthMean (localizedCovarianceBlock a) -
+        blockEntryFourthMean (rotatedCovarianceBlock a) =
+      3 / 2 * (a + 1 / 2) ^ 2 := by
+  rw [blockEntryFourthMean_localizedCovarianceBlock,
+    blockEntryFourthMean_rotatedCovarianceBlock]
+  ring
+
+/-- The midpoint construction has fourth-order per-coordinate separation exactly six. -/
+theorem midpoint_blockEntryFourthMean_separation :
+    blockEntryFourthMean (localizedCovarianceBlock (3 / 2)) -
+        blockEntryFourthMean (rotatedCovarianceBlock (3 / 2)) = 6 := by
+  rw [blockEntryFourthMean_localized_sub_rotated]
+  norm_num
+
+/-- There is no characteristic-polynomial formula for the fourth-order invariant, even on the
+same well-conditioned positive covariance blocks used by the third-order witness. -/
+theorem no_isospectral_formula_for_blockEntryFourthMean :
+    ¬ ∃ spectralFormula : ((ℝ → ℝ) → ℝ),
+      ∀ covariance : Matrix (Fin 2) (Fin 2) ℝ,
+        blockEntryFourthMean covariance =
+          spectralFormula (fun spectralParameter ↦
+            Matrix.det (covariance - spectralParameter • 1)) := by
+  rintro ⟨spectralFormula, hspectral⟩
+  have hsame :
+      (fun spectralParameter ↦
+          Matrix.det (localizedCovarianceBlock (3 / 2) - spectralParameter • 1)) =
+        fun spectralParameter ↦
+          Matrix.det (rotatedCovarianceBlock (3 / 2) - spectralParameter • 1) := by
+    funext spectralParameter
+    exact localizedCovarianceBlock_isospectral_rotatedCovarianceBlock
+      (3 / 2) spectralParameter
+  have heq :
+      blockEntryFourthMean (localizedCovarianceBlock (3 / 2)) =
+        blockEntryFourthMean (rotatedCovarianceBlock (3 / 2)) := by
+    rw [hspectral, hspectral, hsame]
+  have hzero :
+      blockEntryFourthMean (localizedCovarianceBlock (3 / 2)) -
+          blockEntryFourthMean (rotatedCovarianceBlock (3 / 2)) = 0 := by
+    rw [heq, sub_self]
+  rw [midpoint_blockEntryFourthMean_separation] at hzero
+  norm_num at hzero
 
 /-! ## The low-SNR coefficient and the Question S certificate -/
 
@@ -343,5 +523,30 @@ theorem symmetricArchitecture_thirdMomentEnergy_eq_zero
     thirdTensorEnergy (pushedThirdMomentTensor ldSquareRoot 0) = 0 := by
   rw [thirdTensorEnergy_pushedThirdMomentTensor]
   simp
+
+/-- The orientation-sensitive fourth-order LD invariant in the locus coordinate basis.  It is
+the summed fourth-power LD score and remains visible for symmetric sparse effect priors. -/
+noncomputable def ldOrientationFourthInvariant {Locus : Type*} [Fintype Locus]
+    (ld : Matrix Locus Locus ℝ) : ℝ :=
+  entryFourthSum ld
+
+/-- A symmetric non-Gaussian effect architecture detects LD orientation through its fourth
+cumulant.  This is an exact finite-locus identity and covers the biologically standard case in
+which reference-allele recoding forces the third moment to vanish. -/
+theorem symmetricNonGaussianArchitecture_fourthCumulantEnergy_eq_ldOrientationInvariant
+    {Row Locus : Type*} [Fintype Row] [Fintype Locus]
+    (ldSquareRoot : Matrix Row Locus ℝ) (effectFourthCumulant : ℝ) :
+    fourthTensorEnergy
+        (pushedFourthCumulantTensor ldSquareRoot effectFourthCumulant) =
+      effectFourthCumulant ^ 2 *
+        ldOrientationFourthInvariant (gramCovariance ldSquareRoot) := by
+  exact fourthTensorEnergy_pushedFourthCumulantTensor ldSquareRoot effectFourthCumulant
+
+/-- The fourth-order LD invariant is directly estimable as a sum of per-variant fourth-power
+LD scores, mirroring the standard squared-correlation LD score with exponent four. -/
+theorem ldOrientationFourthInvariant_eq_sum_ldPowerScore_four
+    {Locus : Type*} [Fintype Locus] (ld : Matrix Locus Locus ℝ) :
+    ldOrientationFourthInvariant ld = ∑ j, ldPowerScore ld 4 j := by
+  exact entryFourthSum_eq_sum_ldPowerScore_four ld
 
 end Calibrator
