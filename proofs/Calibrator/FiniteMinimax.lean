@@ -146,6 +146,60 @@ theorem observationL1Distance_nonneg
     0 ≤ E.observationL1Distance θ₁ θ₂ := by
   exact Finset.sum_nonneg fun _ _ ↦ abs_nonneg _
 
+/-- **ℓ¹ data-processing inequality.** Every parameter-independent stochastic channel
+contracts observation-law distance. -/
+theorem observationL1Distance_garble_le
+    {summaryCount : ℕ}
+    (channel : Fin (observationCount + 1) → FinitePrior summaryCount)
+    (θ₁ θ₂ : Fin (parameterCount + 1)) :
+    (E.garbleObservations summaryCount channel).observationL1Distance θ₁ θ₂ ≤
+      E.observationL1Distance θ₁ θ₂ := by
+  have hpoint : ∀ summary,
+      ((E.garbleObservations summaryCount channel).observation θ₁).probability summary -
+          ((E.garbleObservations summaryCount channel).observation θ₂).probability summary =
+        ∑ observation, ((E.observation θ₁).probability observation -
+          (E.observation θ₂).probability observation) *
+            (channel observation).probability summary := by
+    intro summary
+    change FinitePrior.probability ((E.observation θ₁).bind channel) summary -
+        FinitePrior.probability ((E.observation θ₂).bind channel) summary = _
+    rw [finitePrior_probability_bind, finitePrior_probability_bind,
+      ← Finset.sum_sub_distrib]
+    apply Finset.sum_congr rfl
+    intro observation _
+    ring
+  unfold observationL1Distance
+  calc
+    ∑ summary, |((E.garbleObservations summaryCount channel).observation θ₁).probability summary -
+        ((E.garbleObservations summaryCount channel).observation θ₂).probability summary| =
+      ∑ summary, |∑ observation,
+        ((E.observation θ₁).probability observation -
+          (E.observation θ₂).probability observation) *
+            (channel observation).probability summary| := by
+        exact Finset.sum_congr rfl fun summary _ ↦ congrArg abs (hpoint summary)
+    _ ≤ ∑ summary, ∑ observation,
+        |(E.observation θ₁).probability observation -
+          (E.observation θ₂).probability observation| *
+            (channel observation).probability summary := by
+      refine Finset.sum_le_sum fun summary _ ↦ ?_
+      refine (Finset.abs_sum_le_sum_abs _ _).trans_eq ?_
+      apply Finset.sum_congr rfl
+      intro observation _
+      rw [abs_mul, abs_of_nonneg
+        (FinitePrior.probability_nonneg (channel observation) summary)]
+    _ = ∑ observation,
+        |(E.observation θ₁).probability observation -
+          (E.observation θ₂).probability observation| *
+            ∑ summary, (channel observation).probability summary := by
+      rw [Finset.sum_comm]
+      exact Finset.sum_congr rfl fun observation _ ↦ (Finset.mul_sum _ _ _).symm
+    _ = ∑ observation,
+        |(E.observation θ₁).probability observation -
+          (E.observation θ₂).probability observation| := by
+      apply Finset.sum_congr rfl
+      intro observation _
+      rw [(finitePrior_probability_mem (channel observation)).2, mul_one]
+
 /-- **Approximate observational-equivalence lower bound for one rule.** If every action pays
 combined loss at least `separation`, and the second parameter's loss lies in `[0, maxLoss]`,
 then replacing the first observation law by the second can reduce the two-risk lower bound by
@@ -410,6 +464,25 @@ theorem half_separation_sub_l1_le_minimaxRisk
   rintro value ⟨δ, rfl⟩
   exact E.half_separation_sub_l1_le_worstRisk
     θ₁ θ₂ separation maxLoss hloss hloss₂ δ
+
+/-- Garbling preserves the original quantitative Le Cam floor. Since the channel contracts
+ℓ¹ distance, the post-processed experiment is at least as hard as the original bound reports. -/
+theorem half_separation_sub_l1_le_garbled_minimaxRisk
+    {summaryCount : ℕ}
+    (channel : Fin (observationCount + 1) → FinitePrior summaryCount)
+    (θ₁ θ₂ : Fin (parameterCount + 1)) (separation maxLoss : ℝ)
+    (hloss : ∀ action : Fin (actionCount + 1),
+      separation ≤ E.loss θ₁ action + E.loss θ₂ action)
+    (hloss₂ : ∀ action : Fin (actionCount + 1),
+      0 ≤ E.loss θ₂ action ∧ E.loss θ₂ action ≤ maxLoss) :
+    (separation - maxLoss * E.observationL1Distance θ₁ θ₂) / 2 ≤
+      (E.garbleObservations summaryCount channel).minimaxRisk := by
+  have hmaxLoss : 0 ≤ maxLoss := (hloss₂ 0).1.trans (hloss₂ 0).2
+  have hcontract := E.observationL1Distance_garble_le channel θ₁ θ₂
+  have hgarbled := half_separation_sub_l1_le_minimaxRisk
+    (E := E.garbleObservations summaryCount channel)
+      θ₁ θ₂ separation maxLoss hloss hloss₂
+  linarith [mul_le_mul_of_nonneg_left hcontract hmaxLoss]
 
 /-- Every rule pays at least half the separation of two observationally equivalent parameters. -/
 theorem half_separation_le_worstRisk_of_observation_eq
