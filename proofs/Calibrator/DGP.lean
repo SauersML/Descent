@@ -2931,6 +2931,18 @@ theorem alleleFreqDivergenceRate_neutral_isolated (Ne : ℝ) :
   unfold alleleFreqDivergenceRate
   norm_num
 
+/-- **A second reference point, where the scaled mutation rate is one.**
+
+`alleleFreqDivergenceRate_neutral_isolated` fixes the outer `2 * Ne` and nothing else: at zero
+mutation and zero migration every body of the form `1 / (2 Ne (1 + c1 theta + c2 bigM))` agrees,
+whatever `c1` and `c2` are. Evaluating where `theta = 1` separates them, which is what a
+reference point has to do to be worth stating -- it only pins what varies at that point. -/
+theorem alleleFreqDivergenceRate_unit_theta (Ne : ℝ) (h : Ne ≠ 0) :
+    alleleFreqDivergenceRate Ne (1 / (4 * Ne)) 0 = 1 / (4 * Ne) := by
+  unfold alleleFreqDivergenceRate
+  field_simp
+  ring
+
 /-- LD breakage rate from recombination.
 
     Empirical status: UNTESTED. -/

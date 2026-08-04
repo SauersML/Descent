@@ -72,6 +72,16 @@ steps back one deme at a time and arrives at deme 0 at `T0 + (D-2)·splitStep` �
 noncomputable def serialFounderJoinTime (T0 splitStep : ℝ) (D k : ℕ) : ℝ :=
   if k = 0 then 0 else T0 + splitStep * ((D : ℝ) - 2)
 
+/-- **Two demes leave no room for a serial step.** At `D = 2` the chain has a source and one
+descendant, the step count is zero, and the join time is the base time alone. The constancy
+theorem below says the join time does not depend on `k`; this says what the constant is, which
+constancy alone leaves free. -/
+theorem serialFounderJoinTime_two_demes (T0 splitStep : ℝ) (k : ℕ) (hk : k ≠ 0) :
+    serialFounderJoinTime T0 splitStep 2 k = T0 := by
+  unfold serialFounderJoinTime
+  rw [if_neg hk]
+  norm_num
+
 /-- **The founder ceiling carries no distance information.** Every non-source deme reaches
 the source at the same time, so the founder history alone cannot distinguish a near deme from
 a far one. This is the measured mechanism, and it is why three candidate closed forms that

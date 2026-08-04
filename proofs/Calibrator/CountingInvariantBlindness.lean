@@ -228,6 +228,16 @@ noncomputable def ghostGain (α n : ℝ) : ℝ := α * Real.log n
 /-- The gain the effective-unit count would predict: a power of `n`. Supplied as a value. -/
 noncomputable def countPredictedGain (α n : ℝ) : ℝ := n ^ α
 
+/-- **The ghost gain is the logarithm of the counting gain.** That identity is the blindness: a
+diagnostic reading the log of the count sees the tail index as a slope and cannot tell a power
+law from any other, because the log has already flattened it. Separation at large `n` is shared
+by every pair growing at different rates; this says the two are the same quantity on different
+scales. -/
+theorem ghostGain_eq_log_countPredictedGain (α n : ℝ) (hn : 0 < n) :
+    ghostGain α n = Real.log (countPredictedGain α n) := by
+  unfold ghostGain countPredictedGain
+  rw [Real.log_rpow hn]
+
 /-- **The two gains separate without bound.**
 
     For every tail index `α > 0`, past some `n` the power exceeds the logarithm by any
