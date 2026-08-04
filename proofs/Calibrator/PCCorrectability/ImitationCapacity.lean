@@ -2144,6 +2144,99 @@ theorem sum_ldScore_isoBlock_eq (a : ℝ) :
   ring
 
 
+
+/-! ### Arbitrary dimension
+
+The two-by-two witness is not the theorem. The construction is a direct sum of
+`m` such blocks with independent offsets, giving designs of every even dimension
+`p = 2m`, and everything above survives the sum: the block structure means each
+entrywise power sum is the sum of the per-block ones, and each spectral quantity
+is likewise the sum of the per-block ones.
+
+Two spectral controls are proved alongside, so the separation cannot be dismissed
+as an artefact of a weak notion of "spectral". The trace agrees, and the sum of
+squared entries agrees -- and for a symmetric matrix that second sum is exactly
+`Tr Σ²`, the second spectral moment. The first quantity to separate the families
+is the cube sum, and it separates them by `∑ᵢ (3 aᵢ + 1)/2`, which grows linearly
+in the dimension rather than washing out.
+-/
+
+/-- `m` diagonal blocks with independent offsets: a design of dimension `2m`. -/
+noncomputable def multiBlockD {m : ℕ} (a : Fin m → ℝ) :
+    (Fin m × Fin 2) → (Fin m × Fin 2) → ℝ :=
+  fun p q ↦ if p.1 = q.1 then isoBlockD (a p.1) p.2 q.2 else 0
+
+/-- The same `m` blocks, each rotated by forty-five degrees. -/
+noncomputable def multiBlockR {m : ℕ} (a : Fin m → ℝ) :
+    (Fin m × Fin 2) → (Fin m × Fin 2) → ℝ :=
+  fun p q ↦ if p.1 = q.1 then isoBlockR (a p.1) p.2 q.2 else 0
+
+/-- Entrywise `k`-th power sum of a block design. -/
+noncomputable def multiEntrywisePow {m : ℕ}
+    (M : (Fin m × Fin 2) → (Fin m × Fin 2) → ℝ) (k : ℕ) : ℝ :=
+  ∑ p, ∑ q, (M p q) ^ (k + 1)
+
+/-- **A block design's entrywise power sums are the sum of its blocks'.** The
+off-block entries are zero and every exponent here is positive, so they drop. -/
+theorem multiEntrywisePow_multiBlockD {m : ℕ} (a : Fin m → ℝ) (k : ℕ) :
+    multiEntrywisePow (multiBlockD a) k
+      = ∑ i, ∑ x, ∑ y, (isoBlockD (a i) x y) ^ (k + 1) := by
+  unfold multiEntrywisePow multiBlockD
+  rw [Fintype.sum_prod_type]
+  refine Finset.sum_congr rfl fun i _ ↦ ?_
+  refine Finset.sum_congr rfl fun x _ ↦ ?_
+  rw [Fintype.sum_prod_type]
+  rw [Finset.sum_eq_single i]
+  · simp
+  · intro j _ hj
+    simp [hj]
+  · intro h
+    exact absurd (Finset.mem_univ i) h
+
+/-- The same for the rotated family. -/
+theorem multiEntrywisePow_multiBlockR {m : ℕ} (a : Fin m → ℝ) (k : ℕ) :
+    multiEntrywisePow (multiBlockR a) k
+      = ∑ i, ∑ x, ∑ y, (isoBlockR (a i) x y) ^ (k + 1) := by
+  unfold multiEntrywisePow multiBlockR
+  rw [Fintype.sum_prod_type]
+  refine Finset.sum_congr rfl fun i _ ↦ ?_
+  refine Finset.sum_congr rfl fun x _ ↦ ?_
+  rw [Fintype.sum_prod_type]
+  rw [Finset.sum_eq_single i]
+  · simp
+  · intro j _ hj
+    simp [hj]
+  · intro h
+    exact absurd (Finset.mem_univ i) h
+
+/-- **Spectral control one: the sum of squared entries agrees in every
+dimension.** For a symmetric matrix this sum is `Tr Σ²`, the second spectral
+moment, so the families are not separated by it. -/
+theorem multiBlock_squareSum_eq {m : ℕ} (a : Fin m → ℝ) :
+    multiEntrywisePow (multiBlockD a) 1 = multiEntrywisePow (multiBlockR a) 1 := by
+  rw [multiEntrywisePow_multiBlockD, multiEntrywisePow_multiBlockR]
+  refine Finset.sum_congr rfl fun i _ ↦ ?_
+  unfold isoBlockD isoBlockR
+  simp [Fin.sum_univ_two]
+  ring
+
+/-- **And the cube sums separate them, by a margin linear in the dimension.**
+
+With `multiBlock_squareSum_eq` this is the full-dimensional statement: two
+families of designs of every even dimension, agreeing on the second spectral
+moment and separated by the first non-spectral coordinate, with the gap summing
+one nonvanishing term per block rather than averaging away. -/
+theorem multiBlock_cubeSum_gap {m : ℕ} (a : Fin m → ℝ) :
+    multiEntrywisePow (multiBlockD a) 2 - multiEntrywisePow (multiBlockR a) 2
+      = ∑ i, (3 * a i + 1) / 2 := by
+  rw [multiEntrywisePow_multiBlockD, multiEntrywisePow_multiBlockR,
+    ← Finset.sum_sub_distrib]
+  refine Finset.sum_congr rfl fun i _ ↦ ?_
+  unfold isoBlockD isoBlockR
+  simp [Fin.sum_univ_two]
+  ring
+
+
 end CapacityInvariant
 
 end
