@@ -521,6 +521,14 @@ theorem BayesRisk_mono {α : Type u} (R : α → ℝ) (F G : Set α)
 noncomputable def bernoulliLogLoss (p q : ℝ) : ℝ :=
   -(p * Real.log q + (1 - p) * Real.log (1 - q))
 
+/-- **A confident correct prediction costs nothing.** At `p = 1` and `q = 1` both terms vanish --
+the second because its coefficient does -- so the loss is exactly zero. That endpoint fixes the
+normalisation: a body carrying an additive constant, or the wrong sign on either term, is still a
+sum of weighted logarithms and would fail here. -/
+theorem bernoulliLogLoss_certain_correct : bernoulliLogLoss 1 1 = 0 := by
+  unfold bernoulliLogLoss
+  norm_num
+
 /-- Real-valued Bernoulli KL divergence formula. -/
 noncomputable def bernoulliKLReal (p q : ℝ) : ℝ :=
   p * Real.log (p / q) + (1 - p) * Real.log ((1 - p) / (1 - q))
