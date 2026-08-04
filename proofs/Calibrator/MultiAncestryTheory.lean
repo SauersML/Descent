@@ -217,7 +217,8 @@ information between two effect vectors diverges -- each determines the other exa
 (1 - 1)` is junk-zero and the information is reported as `0`: complete independence. This is the
 maximal inversion available in an information measure, and it sits at the parameter value a
 portability analysis most wants to test. Consumers must guard the argument that makes the
-divisor vanish. -/
+divisor vanish. The mutual information between two identical effect vectors is not zero; it
+is unbounded, and `Real.log 0 = 0` in Mathlib is the whole of why `0` appears here. -/
 theorem effectMutualInformation_perfect_correlation_is_junk (m : ℕ) :
     effectMutualInformation m 1 = 0 := by
   unfold effectMutualInformation
@@ -229,16 +230,6 @@ theorem no_info_when_uncorrelated (m : ℕ) :
   unfold effectMutualInformation
   simp [Real.log_one]
 
-/-- **The junk value at perfect correlation.** At `ρ = 1` the body returns `0`,
-because `Real.log 0 = 0` in Mathlib. The mutual information between two
-identical effect vectors is not zero; it is unbounded. -/
-theorem effectMutualInformation_at_perfect_correlation (m : ℕ) :
-    effectMutualInformation m 1 = 0 := by
-  unfold effectMutualInformation
-  first
-    | norm_num
-    | simp
-
 /-- **Perfect portability and zero portability are indistinguishable to this
 formula.** The two endpoints of the deployment question return the same number.
 Any claim read off `effectMutualInformation` at or beyond `|ρ| = 1` is therefore
@@ -246,7 +237,7 @@ not a claim about information, which is why the domain hypothesis `ρ ^ 2 < 1`
 appears in the theorems below. -/
 theorem perfect_and_zero_correlation_collide (m : ℕ) :
     effectMutualInformation m 1 = effectMutualInformation m 0 := by
-  rw [effectMutualInformation_at_perfect_correlation, no_info_when_uncorrelated]
+  rw [effectMutualInformation_perfect_correlation_is_junk, no_info_when_uncorrelated]
 
 /-- On its domain the quantity is a nonnegative information. -/
 theorem effectMutualInformation_nonneg (m : ℕ) (ρ : ℝ) (hρ : ρ ^ 2 < 1) :
@@ -479,11 +470,12 @@ theorem diversity_reduces_max_gap
     (h_single_bound : fst_worst_single ≤ 1)
     (h_improvement : fst_worst_multi < fst_worst_single) :
     portabilityGap (presentDayR2 V_A V_E fstS) (presentDayR2 V_A V_E fst_worst_multi) <
-      portabilityGap (presentDayR2 V_A V_E fstS) (presentDayR2 V_A V_E fst_worst_single) := by
-  unfold portabilityGap
-  have h1 : presentDayR2 V_A V_E fst_worst_single < presentDayR2 V_A V_E fst_worst_multi :=
-    drift_degrades_R2 V_A V_E fst_worst_multi fst_worst_single hVA hVE h_improvement h_single_bound
-  linarith
+      portabilityGap (presentDayR2 V_A V_E fstS) (presentDayR2 V_A V_E fst_worst_single) :=
+  -- Diversification lowers the worst population's effective `Fst`, and "the gap grows with
+  -- distance" read backwards is exactly that. The two were one theorem with the target pair
+  -- renamed, proved twice.
+  portability_gap_increases_with_distance V_A V_E fstS fst_worst_multi fst_worst_single
+    hVA hVE h_improvement h_single_bound
 
 end EquityImplications
 

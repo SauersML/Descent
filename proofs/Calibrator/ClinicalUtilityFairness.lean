@@ -516,16 +516,11 @@ theorem nri_decreases_with_portability_loss
     netReclassificationImprovement
       (sensFromR2 m r2_source T' - sensFromR2 m r2_base T')
       (specFromR2 m r2_source T' μ_control - specFromR2 m r2_base T' μ_control) := by
-  unfold netReclassificationImprovement
-  have h1 :
-      sensFromR2 m r2_target T' < sensFromR2 m r2_source T' := by
-    exact sensFromR2_strictMono_of_threshold_le m T' r2_target r2_source
-      h_r2_target h_r2_source h_r2_loss h_sens_num_nonneg
-  have h2 :
-      specFromR2 m r2_target T' μ_control <
-        specFromR2 m r2_source T' μ_control := by
-    exact specFromR2_strictMono_of_threshold_le m T' μ_control r2_target r2_source
-      hμ_control_neg h_r2_target h_r2_source h_r2_loss h_spec_num_nonneg
+  -- Both sides subtract the SAME baseline, so this is the previous theorem's positivity
+  -- read across a common `r2_base`.  It had its own copy of that theorem's proof.
+  have h := nri_positive_when_pgs_adds_value m T' μ_control r2_target r2_source
+    h_r2_loss h_r2_target h_r2_source hμ_control_neg h_sens_num_nonneg h_spec_num_nonneg
+  unfold netReclassificationImprovement at h ⊢
   linarith
 
 /-- **NRI can become negative in target populations.**
@@ -550,16 +545,12 @@ theorem nri_can_be_negative
     netReclassificationImprovement
       (sensFromR2 m r2_target T' - sensFromR2 m r2_old T')
       (specFromR2 m r2_target T' μ_control - specFromR2 m r2_old T' μ_control) < 0 := by
-  unfold netReclassificationImprovement
-  have h1 :
-      sensFromR2 m r2_target T' < sensFromR2 m r2_old T' := by
-    exact sensFromR2_strictMono_of_threshold_le m T' r2_target r2_old
-      h_r2_target h_r2_old h_r2_below h_sens_num_nonneg
-  have h2 :
-      specFromR2 m r2_target T' μ_control <
-        specFromR2 m r2_old T' μ_control := by
-    exact specFromR2_strictMono_of_threshold_le m T' μ_control r2_target r2_old
-      hμ_control_neg h_r2_target h_r2_old h_r2_below h_spec_num_nonneg
+  -- The old model compared against itself contributes nothing, so this is the theorem
+  -- above with the baseline taken at `r2_old` -- a third copy of one proof, now an
+  -- instance of it.
+  have h := nri_decreases_with_portability_loss m T' μ_control r2_old r2_old r2_target
+    h_r2_below h_r2_target h_r2_old hμ_control_neg h_sens_num_nonneg h_spec_num_nonneg
+  unfold netReclassificationImprovement at h ⊢
   linarith
 
 end NRI
@@ -1097,11 +1088,11 @@ theorem diversification_is_optimal_equity_intervention
     (h_π : 0 < π)
     (h_improves : sens_t < sens_t') :
     numberNeededToScreen sens_t' π (lt_trans h_sens_t h_improves) h_π <
-      numberNeededToScreen sens_t π h_sens_t h_π := by
-  unfold numberNeededToScreen
-  apply div_lt_div_of_pos_left one_pos
-  · exact mul_pos h_sens_t h_π
-  · exact mul_lt_mul_of_pos_right h_improves h_π
+      numberNeededToScreen sens_t π h_sens_t h_π :=
+  -- Raising the target's sensitivity by diversification and comparing a source's higher
+  -- sensitivity to a target's lower one are the same inequality; this was `nns_higher_in_target`
+  -- restated with the two sensitivities swapped and its proof copied.
+  nns_higher_in_target sens_t' sens_t π h_sens_t h_π h_improves
 
 /-- **Marginal value of diverse samples is highest for underserved populations.**
     If the underserved population has lower current sensitivity (sens_under < sens_served),

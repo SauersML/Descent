@@ -3,6 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Mathlib.Data.Matrix.Basic
 import Mathlib.Data.Real.Basic
+import Mathlib.Analysis.SpecialFunctions.Integrals.Basic
 import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
 import Mathlib.Tactic.FinCases
 import Mathlib.Tactic.Linarith
@@ -414,6 +415,90 @@ theorem no_isospectral_formula_for_blockEntryFourthMean :
     rw [heq, sub_self]
   rw [midpoint_blockEntryFourthMean_separation] at hzero
   norm_num at hzero
+
+/-! ## The continuum block family and the exact Rademacher coefficient -/
+
+/-- Per-coordinate fourth-order invariant of the localized block family, averaged uniformly
+over offsets `a ∈ [1, 2]`. -/
+noncomputable def localizedUniformFourthInvariant : ℝ :=
+  ∫ a in (1 : ℝ)..2, blockEntryFourthMean (localizedCovarianceBlock a)
+
+/-- Per-coordinate fourth-order invariant of the rotated block family, averaged uniformly over
+offsets `a ∈ [1, 2]`. -/
+noncomputable def rotatedUniformFourthInvariant : ℝ :=
+  ∫ a in (1 : ℝ)..2, blockEntryFourthMean (rotatedCovarianceBlock a)
+
+/-- The localized block family has fourth-order traffic invariant `121 / 5`. -/
+theorem localizedUniformFourthInvariant_eq :
+    localizedUniformFourthInvariant = 121 / 5 := by
+  unfold localizedUniformFourthInvariant
+  simp_rw [blockEntryFourthMean_localizedCovarianceBlock]
+  have hintegrand :
+      (fun a : ℝ ↦ (a ^ 4 + (a + 1) ^ 4) / 2) =
+        fun a : ℝ ↦ a ^ 4 + 2 * a ^ 3 + 3 * a ^ 2 + 2 * a + 1 / 2 := by
+    funext a
+    ring
+  rw [hintegrand]
+  norm_num [intervalIntegral.integral_add, intervalIntegral.integral_const_mul,
+    intervalIntegral.integral_mul_const, intervalIntegral.integral_pow]
+
+/-- The rotated block family has fourth-order traffic invariant `723 / 40`. -/
+theorem rotatedUniformFourthInvariant_eq :
+    rotatedUniformFourthInvariant = 723 / 40 := by
+  unfold rotatedUniformFourthInvariant
+  simp_rw [blockEntryFourthMean_rotatedCovarianceBlock]
+  have hintegrand :
+      (fun a : ℝ ↦ (a + 1 / 2) ^ 4 + 1 / 16) =
+        fun a : ℝ ↦ a ^ 4 + 2 * a ^ 3 + 3 / 2 * a ^ 2 + 1 / 2 * a + 1 / 8 := by
+    funext a
+    ring
+  rw [hintegrand]
+  norm_num [intervalIntegral.integral_add, intervalIntegral.integral_const_mul,
+    intervalIntegral.integral_mul_const, intervalIntegral.integral_pow]
+
+/-- Exact continuum separation of the fourth-order traffic invariant. -/
+theorem localizedUniformFourthInvariant_sub_rotated :
+    localizedUniformFourthInvariant - rotatedUniformFourthInvariant = 49 / 8 := by
+  rw [localizedUniformFourthInvariant_eq, rotatedUniformFourthInvariant_eq]
+  norm_num
+
+/-- The orientation-sensitive part of the fourth low-SNR mutual-information coefficient. -/
+noncomputable def lowSNRFourthOrientationCoefficient
+    (fourthCumulant h4 : ℝ) : ℝ :=
+  -(fourthCumulant ^ 2 / 48 * h4)
+
+/-- For a Rademacher prior, whose fourth cumulant is `-2`, the rotated design's fourth-order
+mutual-information coefficient exceeds the localized design's by exactly `49 / 96`. -/
+theorem rademacher_lowSNRFourthCoefficient_rotated_sub_localized :
+    lowSNRFourthOrientationCoefficient (-2) rotatedUniformFourthInvariant -
+        lowSNRFourthOrientationCoefficient (-2) localizedUniformFourthInvariant = 49 / 96 := by
+  unfold lowSNRFourthOrientationCoefficient
+  rw [localizedUniformFourthInvariant_sub_rotated]
+  ring
+
+/-! ## The order-two coincidence -/
+
+/-- Entrywise square sum, the two-parallel-edge traffic observable. -/
+noncomputable def entrySquareSum {Locus : Type*} [Fintype Locus]
+    (covariance : Matrix Locus Locus ℝ) : ℝ :=
+  ∑ i, ∑ j, covariance i j ^ 2
+
+/-- For a symmetric covariance, the two-parallel-edge traffic observable is exactly the
+spectral two-cycle `Tr(Σ²)`.  This is the low-order coincidence that fails from order three on. -/
+theorem entrySquareSum_eq_trace_sq_of_symmetric
+    {Locus : Type*} [Fintype Locus] [DecidableEq Locus]
+    (covariance : Matrix Locus Locus ℝ)
+    (hsymmetric : ∀ i j, covariance j i = covariance i j) :
+    entrySquareSum covariance = Matrix.trace (covariance * covariance) := by
+  classical
+  unfold entrySquareSum Matrix.trace
+  simp only [Matrix.mul_apply]
+  apply Finset.sum_congr rfl
+  intro i hi
+  apply Finset.sum_congr rfl
+  intro j hj
+  rw [hsymmetric]
+  ring
 
 /-! ## The low-SNR coefficient and the Question S certificate -/
 

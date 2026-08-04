@@ -4910,9 +4910,65 @@ noncomputable def covarianceRetention (freq_corr ld_overlap : ℝ) : ℝ :=
     measured correlation from 0.0004 to 0.7209, which is the largest span the
     quantity admits.
 
-    Denotes: the reading its name carries. The same formula appears under
-    names from 'factor', 'frequency', 'fst', and the formula alone does not fix which is meant. -/
-noncomputable def freqCorrFromFst (fst : ℝ) : ℝ := 1 - fst
+    **The name has been changed.** This was `freqCorrFromFst`, and that name is
+    the falsified claim: it asserted that `1 - Fst` IS the allele-frequency
+    correlation, which the measurement above refutes. The body `1 - Fst` is
+    retained because it is what every consumer actually uses it as -- a
+    covariance-retention factor -- and the new name says only that. The
+    correlation itself is `alleleFreqCorrelation` below, which carries the
+    arguments the quantity depends on.
+
+    Empirical status: UNTESTED as a covariance-retention factor. Its former
+    justification was the correlation identity, and that justification is gone;
+    retention needs a measurement of its own and has not had one. -/
+noncomputable def covarianceRetentionFactorFromFst (fst : ℝ) : ℝ := 1 - fst
+
+/-- **The allele-frequency correlation between two drifted demes.**
+
+    `corr(p1, p2) = Var(p0) / (Var(p0) + fst * E[p0 (1 - p0)])`, where the two
+    ancestral moments are taken over the loci scored. Both demes descend from
+    one ancestral population, so their frequencies share exactly the ancestral
+    across-locus spread and differ by independent drift; the correlation is the
+    ratio of the shared part to the total, which is what this states.
+
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_correct.py`,
+    `correct_freq_corr`). Wright-Fisher forward simulation, `Ne = 200`, 4000
+    loci, 400 replicate deme pairs, four ancestral distributions crossed with
+    two drift depths -- eight cells that a formula in `fst` alone must get wrong
+    and this one gets right:
+
+      ancestral p0          gens    1 - fst   this def   measured      sems
+      uniform(0.05,0.95)      60     0.9251     0.7237     0.7240       1.1
+      uniform(0.05,0.95)     200     0.7545     0.4786     0.4780       0.9
+      beta(0.5,0.5)           60     0.9249     0.8721     0.8719       1.0
+      beta(0.5,0.5)          200     0.7547     0.7136     0.7132       1.0
+      beta(2,2)               60     0.9251     0.6437     0.6440       0.8
+      beta(2,2)              200     0.7547     0.3908     0.3906       0.3
+      all p0 = 0.5            60     0.9252     0.0000     0.0006       0.8
+      all p0 = 0.5           200     0.7546     0.0000    -0.0001       0.1
+
+    Power: the prediction spans 0.0000 to 0.8721 across the design, the full
+    range the quantity admits, while `1 - fst` is pinned at 0.925 or 0.755 by
+    the drift depth alone and is wrong in seven of the eight cells. -/
+noncomputable def alleleFreqCorrelation (fst varAncestral meanHetAncestral : ℝ) : ℝ :=
+  varAncestral / (varAncestral + fst * meanHetAncestral)
+
+/-- **Exactly when the retention factor is the frequency correlation.**
+
+    The two agree precisely at `varAncestral = (1 - fst) * meanHetAncestral`,
+    and nowhere else for positive `fst`. This is the assumption the old
+    `freqCorrFromFst` name asserted silently; stating it is what stops it being
+    assumed again. -/
+theorem alleleFreqCorrelation_eq_retentionFactor_iff
+    (fst varAncestral meanHetAncestral : ℝ)
+    (hden : varAncestral + fst * meanHetAncestral ≠ 0) :
+    alleleFreqCorrelation fst varAncestral meanHetAncestral =
+        covarianceRetentionFactorFromFst fst ↔
+      varAncestral * fst = (1 - fst) * fst * meanHetAncestral := by
+  unfold alleleFreqCorrelation covarianceRetentionFactorFromFst
+  rw [div_eq_iff hden]
+  constructor <;> intro h <;> nlinarith [h]
 
 /-- LD overlap is directly the shared LD fraction (identity mapping, made
     explicit for clarity in the derivation chain).
@@ -4922,16 +4978,16 @@ noncomputable def ldOverlapFromSharedLD (shared_ld : ℝ) : ℝ := shared_ld
 
 /-- Covariance retention in terms of Fst and shared_LD. -/
 theorem covarianceRetention_from_fst_ld (fst shared_ld : ℝ) :
-    covarianceRetention (freqCorrFromFst fst) (ldOverlapFromSharedLD shared_ld) =
+    covarianceRetention (covarianceRetentionFactorFromFst fst) (ldOverlapFromSharedLD shared_ld) =
       (1 - fst) * shared_ld := by
-  unfold covarianceRetention freqCorrFromFst ldOverlapFromSharedLD
+  unfold covarianceRetention covarianceRetentionFactorFromFst ldOverlapFromSharedLD
   ring
 
 /-- **Covariance divergence derived from retention.**
     Divergence is `1 - retention`, which yields the multiplicative formula
     `1 - (1 - Fst) × shared_LD`. -/
 noncomputable def covarianceDivergenceFromRetention (fst shared_ld : ℝ) : ℝ :=
-  1 - covarianceRetention (freqCorrFromFst fst) (ldOverlapFromSharedLD shared_ld)
+  1 - covarianceRetention (covarianceRetentionFactorFromFst fst) (ldOverlapFromSharedLD shared_ld)
 
 /-- The derived divergence formula equals `1 - (1 - Fst) × shared_LD`. -/
 theorem covarianceDivergenceFromRetention_eq (fst shared_ld : ℝ) :

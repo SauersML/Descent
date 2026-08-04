@@ -151,12 +151,21 @@ theorem excess_le_two_mul_perturbation {n : ℕ}
   have h2 : e ⬝ᵥ (E *ᵥ e) ≤ δ := le_of_abs_le hE0
   linarith
 
-/-- Scaling a vector scales its quadratic form by the square. -/
-theorem quadForm_smul {m : ℕ} (E : Matrix (Fin m) (Fin m) ℝ) (t : ℝ) (w : Fin m → ℝ) :
-    (fun i ↦ t * w i) ⬝ᵥ (E *ᵥ fun i ↦ t * w i) = t ^ 2 * (w ⬝ᵥ (E *ᵥ w)) := by
+/-- **Scalars come out of both arguments of the form.** The three scaling lemmas in this
+module -- left, right, and both at once for the quadratic form -- had one proof, written out
+three times: expand `dotProduct` and `mulVec`, push the scalar through the sums, and close
+each term by `ring`. Written once, the other two are instances at `t = 1`. -/
+theorem bilinear_smul_smul {m : ℕ} (E : Matrix (Fin m) (Fin m) ℝ) (s t : ℝ)
+    (u w : Fin m → ℝ) :
+    (fun i ↦ s * u i) ⬝ᵥ (E *ᵥ fun i ↦ t * w i) = s * t * (u ⬝ᵥ (E *ᵥ w)) := by
   simp only [dotProduct, Matrix.mulVec, Finset.mul_sum]
   refine Finset.sum_congr rfl fun i _ ↦ ?_
   refine Finset.sum_congr rfl fun j _ ↦ by ring
+
+/-- Scaling a vector scales its quadratic form by the square. -/
+theorem quadForm_smul {m : ℕ} (E : Matrix (Fin m) (Fin m) ℝ) (t : ℝ) (w : Fin m → ℝ) :
+    (fun i ↦ t * w i) ⬝ᵥ (E *ᵥ fun i ↦ t * w i) = t ^ 2 * (w ⬝ᵥ (E *ᵥ w)) := by
+  simpa [pow_two] using bilinear_smul_smul E t t w w
 
 /-- Scaling a vector scales its squared norm by the square. -/
 theorem sumSq_smul {m : ℕ} (t : ℝ) (w : Fin m → ℝ) :
@@ -280,17 +289,13 @@ theorem bilinear_le_of_unit {n : ℕ} {E : Matrix (Fin (n + 1)) (Fin (n + 1)) �
 theorem bilinear_smul_left {m : ℕ} (E : Matrix (Fin m) (Fin m) ℝ) (t : ℝ)
     (u w : Fin m → ℝ) :
     (fun i ↦ t * u i) ⬝ᵥ (E *ᵥ w) = t * (u ⬝ᵥ (E *ᵥ w)) := by
-  simp only [dotProduct, Matrix.mulVec, Finset.mul_sum]
-  refine Finset.sum_congr rfl fun i _ ↦ ?_
-  refine Finset.sum_congr rfl fun j _ ↦ by ring
+  simpa using bilinear_smul_smul E t 1 u w
 
 /-- Scaling the right argument of the bilinear form. -/
 theorem bilinear_smul_right {m : ℕ} (E : Matrix (Fin m) (Fin m) ℝ) (t : ℝ)
     (u w : Fin m → ℝ) :
     u ⬝ᵥ (E *ᵥ fun i ↦ t * w i) = t * (u ⬝ᵥ (E *ᵥ w)) := by
-  simp only [dotProduct, Matrix.mulVec, Finset.mul_sum]
-  refine Finset.sum_congr rfl fun i _ ↦ ?_
-  refine Finset.sum_congr rfl fun j _ ↦ by ring
+  simpa using bilinear_smul_smul E 1 t u w
 
 /-- **Where the `√2` comes from.** If a squared ground weight and a squared misalignment sum
 to one, the sum of the misalignment's square root and the ground weight's absolute value is

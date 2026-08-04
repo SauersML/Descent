@@ -1876,6 +1876,135 @@ theorem imitationCapacity_mul_load_eq_headroom
     div_self (ne_of_gt E.load_pos), mul_one]
 
 
+
+/-! ### Order four: the mechanism at the order that matters, and why order two proves nothing
+
+Two additions, both forced by the fact that genetics has `κ₃ = 0`.
+
+FIRST, the contraction one order up. The fourth-cumulant tensor of `Θ = L B`
+contracts to the entrywise FOURTH power sum of the Gram matrix, exactly as the
+third contracts to the cube sum. This is the operative mechanism for polygenic
+scores, because allele-coding symmetry forces the third cumulant to vanish while
+sparsity is precisely what makes the fourth nonzero.
+
+SECOND, the order-two coincidence, which has to be stated or the evidence reads
+backwards. For a symmetric matrix
+
+    ∑ᵢⱼ Σᵢⱼ²  =  Tr Σ²
+
+identically -- the two-vertex double-edge graph and the two-cycle are the same
+polynomial. So agreement at second order is not evidence that spectral summaries
+suffice; it is the unique low-order coincidence between the parallel-edge and
+cyclic diagrams. `multiBlock_squareSum_eq` above exhibits that agreement, and
+without this theorem a reader could take it for a spectral-sufficiency result.
+The coincidence breaks at three and at four, which is what the gaps show.
+-/
+
+/-- Expand a fourth power of a sum, building on the cube. -/
+private theorem sum_pow_four_expand {A : Type*} [Fintype A] (f : A → ℝ) :
+    (∑ a, f a) ^ 4 = ∑ a, ∑ b, ∑ c, ∑ d, f a * f b * f c * f d := by
+  calc (∑ a, f a) ^ 4 = (∑ a, f a) ^ 3 * (∑ d, f d) := by ring
+    _ = (∑ a, ∑ b, ∑ c, f a * f b * f c) * (∑ d, f d) := by rw [sum_cube_expand]
+    _ = ∑ a, (∑ b, ∑ c, f a * f b * f c) * (∑ d, f d) := by rw [Finset.sum_mul]
+    _ = ∑ a, ∑ b, (∑ c, f a * f b * f c) * (∑ d, f d) := by
+        refine Finset.sum_congr rfl fun a _ ↦ ?_
+        rw [Finset.sum_mul]
+    _ = ∑ a, ∑ b, ∑ c, (f a * f b * f c) * (∑ d, f d) := by
+        refine Finset.sum_congr rfl fun a _ ↦ Finset.sum_congr rfl fun b _ ↦ ?_
+        rw [Finset.sum_mul]
+    _ = ∑ a, ∑ b, ∑ c, ∑ d, f a * f b * f c * f d := by
+        refine Finset.sum_congr rfl fun a _ ↦ Finset.sum_congr rfl fun b _ ↦
+          Finset.sum_congr rfl fun c _ ↦ ?_
+        rw [Finset.mul_sum]
+
+/-- The fourth-cumulant tensor of `Θ = L B`, up to the scalar `κ₄`. -/
+noncomputable def fourthCumulantTensor {d n : ℕ} (L : Fin d → Fin n → ℝ)
+    (a b c e : Fin d) : ℝ :=
+  ∑ i, L a i * L b i * L c i * L e i
+
+/-- **The fourth-order contraction identity.** The squared Frobenius norm of the
+fourth-cumulant tensor is the entrywise fourth power sum of the Gram matrix.
+
+This is the operative one for polygenic scores. Allele coding forces `κ₃ = 0`, so
+the third-order obstruction is switched off; sparsity makes `κ₄` nonzero, so this
+one is not. With `Σ` a linkage matrix the invariant is `∑ᵢⱼ rᵢⱼ⁴`, the
+fourth-power LD score. -/
+theorem fourthCumulant_frobenius_eq_gram_fourthSum {d n : ℕ} (L : Fin d → Fin n → ℝ) :
+    (∑ a, ∑ b, ∑ c, ∑ e, (fourthCumulantTensor L a b c e) ^ 2)
+      = ∑ i, ∑ j, (gramMatrix L i j) ^ 4 := by
+  unfold fourthCumulantTensor gramMatrix
+  have lhs : (∑ a, ∑ b, ∑ c, ∑ e, (∑ i, L a i * L b i * L c i * L e i) ^ 2)
+      = ∑ a, ∑ b, ∑ c, ∑ e, ∑ i, ∑ j,
+          (L a i * L b i * L c i * L e i) * (L a j * L b j * L c j * L e j) := by
+    refine Finset.sum_congr rfl fun a _ ↦ Finset.sum_congr rfl fun b _ ↦
+      Finset.sum_congr rfl fun c _ ↦ Finset.sum_congr rfl fun e _ ↦ ?_
+    exact sum_sq_expand (fun i ↦ L a i * L b i * L c i * L e i)
+  have rhs : (∑ i, ∑ j, (∑ a, L a i * L a j) ^ 4)
+      = ∑ i, ∑ j, ∑ a, ∑ b, ∑ c, ∑ e,
+          (L a i * L a j) * (L b i * L b j) * (L c i * L c j) * (L e i * L e j) := by
+    refine Finset.sum_congr rfl fun i _ ↦ Finset.sum_congr rfl fun j _ ↦ ?_
+    exact sum_pow_four_expand (fun a ↦ L a i * L a j)
+  rw [lhs, rhs]
+  have he : (∑ a, ∑ b, ∑ c, ∑ e, ∑ i, ∑ j,
+        (L a i * L b i * L c i * L e i) * (L a j * L b j * L c j * L e j))
+      = ∑ a, ∑ b, ∑ c, ∑ i, ∑ j, ∑ e,
+        (L a i * L b i * L c i * L e i) * (L a j * L b j * L c j * L e j) := by
+    refine Finset.sum_congr rfl fun a _ ↦ Finset.sum_congr rfl fun b _ ↦
+      Finset.sum_congr rfl fun c _ ↦ ?_
+    exact sum_reorder_pair_out
+      (fun e i j ↦ (L a i * L b i * L c i * L e i) * (L a j * L b j * L c j * L e j))
+  have hc : (∑ a, ∑ b, ∑ c, ∑ i, ∑ j, ∑ e,
+        (L a i * L b i * L c i * L e i) * (L a j * L b j * L c j * L e j))
+      = ∑ a, ∑ b, ∑ i, ∑ j, ∑ c, ∑ e,
+        (L a i * L b i * L c i * L e i) * (L a j * L b j * L c j * L e j) := by
+    refine Finset.sum_congr rfl fun a _ ↦ Finset.sum_congr rfl fun b _ ↦ ?_
+    exact sum_reorder_pair_out
+      (fun c i j ↦ ∑ e, (L a i * L b i * L c i * L e i) * (L a j * L b j * L c j * L e j))
+  have hb : (∑ a, ∑ b, ∑ i, ∑ j, ∑ c, ∑ e,
+        (L a i * L b i * L c i * L e i) * (L a j * L b j * L c j * L e j))
+      = ∑ a, ∑ i, ∑ j, ∑ b, ∑ c, ∑ e,
+        (L a i * L b i * L c i * L e i) * (L a j * L b j * L c j * L e j) := by
+    refine Finset.sum_congr rfl fun a _ ↦ ?_
+    exact sum_reorder_pair_out
+      (fun b i j ↦ ∑ c, ∑ e,
+        (L a i * L b i * L c i * L e i) * (L a j * L b j * L c j * L e j))
+  have ha : (∑ a, ∑ i, ∑ j, ∑ b, ∑ c, ∑ e,
+        (L a i * L b i * L c i * L e i) * (L a j * L b j * L c j * L e j))
+      = ∑ i, ∑ j, ∑ a, ∑ b, ∑ c, ∑ e,
+        (L a i * L b i * L c i * L e i) * (L a j * L b j * L c j * L e j) :=
+    sum_reorder_pair_out
+      (fun a i j ↦ ∑ b, ∑ c, ∑ e,
+        (L a i * L b i * L c i * L e i) * (L a j * L b j * L c j * L e j))
+  rw [he, hc, hb, ha]
+  refine Finset.sum_congr rfl fun i _ ↦ Finset.sum_congr rfl fun j _ ↦
+    Finset.sum_congr rfl fun a _ ↦ Finset.sum_congr rfl fun b _ ↦
+    Finset.sum_congr rfl fun c _ ↦ Finset.sum_congr rfl fun e _ ↦ ?_
+  ring
+
+/-- The two-cycle: `Tr Σ²` written entrywise. -/
+noncomputable def traceOfSquare {n : ℕ} (M : Fin n → Fin n → ℝ) : ℝ :=
+  ∑ i, ∑ j, M i j * M j i
+
+/-- **Order two is a coincidence, not evidence.** For a symmetric matrix the
+double-edge graph and the two-cycle are the same polynomial, so agreement at
+second order says nothing about whether spectral summaries suffice. The
+coincidence breaks at three and at four. -/
+theorem entrywiseSquare_eq_traceOfSquare {n : ℕ} (M : Fin n → Fin n → ℝ)
+    (hsym : ∀ i j, M i j = M j i) :
+    (∑ i, ∑ j, (M i j) ^ 2) = traceOfSquare M := by
+  unfold traceOfSquare
+  refine Finset.sum_congr rfl fun i _ ↦ Finset.sum_congr rfl fun j _ ↦ ?_
+  rw [sq, hsym i j]
+
+/-- **The block gap integrates to the reported constant.** The per-block fourth
+gap is `3 (a + ½)²`, whose antiderivative is `(a + ½)³`; over the block family
+`a ∈ [1,2]` that is `49/4`, and halving for the two coordinates per block gives
+`49/8` -- the separation of the two limiting fourth-power invariants. -/
+theorem fourthGap_antiderivative_difference :
+    (2 + 1 / 2 : ℝ) ^ 3 - (1 + 1 / 2 : ℝ) ^ 3 = 49 / 4 := by
+  norm_num
+
+
 end CapacityInvariant
 
 end

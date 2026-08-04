@@ -380,7 +380,7 @@ theorem standardizedSquare_never_symmetric (h : HardyWeinbergModel)
     have hnum : (0 : ℝ) < 2 * (1 - h.altFreq) := by linarith
     have hval : 0 < 2 * (1 - h.altFreq) / h.altFreq := div_pos hnum hq0
     exact mul_pos (pow_pos hq0 2) (pow_pos hval 3)
-  rw [sum_diploidGenotype] at hzero
+  rw [sum_over_genotypes] at hzero
   linarith [hzero, hnonneg DiploidGenotype.homRef, hnonneg DiploidGenotype.het, hpos]
 
 /-- **The allele frequency at which the hub channel is blind**, `(3 - √3)/6 = 0.211324…`.
@@ -905,14 +905,6 @@ theorem nextFloorFourthMoment_unit_m4_is_junk (m2 : ℝ) (m6 : ℝ) (m8 : ℝ) :
   unfold nextFloorFourthMoment
   simp
 
-/-- **The Gaussian tower reproduces itself.** Feeding the standard normal moments `1, 3, 15, 105`
-returns `(105 - 60 + 18 - 4 + 1)/4 = 15`, so the squared floor of a Gaussian has the same fourth
-moment as the Gaussian's sixth. That is the fixed point the tower is built on, and it fixes every
-coefficient in the numerator at once. -/
-theorem nextFloorFourthMoment_gaussian : nextFloorFourthMoment 1 3 15 105 = 15 := by
-  unfold nextFloorFourthMoment
-  norm_num
-
 /-- **Floor one of the Gaussian tower has `σ₁² = 2`.** From `E[X⁴] = 3`. -/
 theorem gaussianFloorOneScaleSq : squaringScaleSq 3 = 2 := by
   unfold squaringScaleSq
@@ -921,7 +913,11 @@ theorem gaussianFloorOneScaleSq : squaringScaleSq 3 = 2 := by
 /-- **The Gaussian's second floor has fourth moment `15`.** From the standard normal
 moments `E[X²] = 1`, `E[X⁴] = 3`, `E[X⁶] = 15`, `E[X⁸] = 105`:
 `(105 - 60 + 18 - 4 + 1)/4 = 60/4 = 15`. The numerator `60` is the fourth central moment
-of a chi-square with one degree of freedom, which is the independent check. -/
+of a chi-square with one degree of freedom, which is the independent check.
+
+Read the other way, this is the fixed point the tower is built on -- the squared floor of a
+Gaussian has the same fourth moment as the Gaussian's sixth, which fixes every coefficient in
+the numerator at once. That reading was a second theorem with this exact statement. -/
 theorem gaussianFloorTwoFourthMoment : nextFloorFourthMoment 1 3 15 105 = 15 := by
   unfold nextFloorFourthMoment
   norm_num

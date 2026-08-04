@@ -331,15 +331,11 @@ noncomputable def haplotypeTransportBias
   |averagePhaseInteraction freq_cis_target pred_cis pred_trans -
     averagePhaseInteraction freq_cis_target interaction_cis interaction_trans|
 
-/-- **Predicting the true interaction leaves no transport bias.** The closed form does not say
-where the bias vanishes; this does, and a body carrying an additive floor would satisfy the
-first and not this. -/
-theorem haplotypeTransportBias_self
-    (freq_cis_target interaction_cis interaction_trans : ℝ) :
-    haplotypeTransportBias freq_cis_target interaction_cis interaction_trans
-      interaction_cis interaction_trans = 0 := by
-  unfold haplotypeTransportBias
-  simp
+-- **Predicting the true interaction leaves no transport bias** is
+-- `haplotypeTransportBias_eq_zero_of_portable_effects` below, stated once. It was also
+-- stated here, as `haplotypeTransportBias_self`, with the same statement and a different
+-- proof; the closed form does not say where the bias vanishes, and saying it twice does
+-- not say it twice as well.
 
 /-- The dosage-only phase-misspecification error has the exact variance form
 `f(1-f)(δ_cis - δ_trans)^2`. -/
@@ -459,6 +455,17 @@ This hypothesis is checkable and is not always satisfied. At `freq_cis = 0.05`
 the threshold is `0.0475`, comparable to reported switch-error rates in
 underrepresented populations, so the conclusion is not available there; see
 `dosage_beats_haplotype_when_phasing_poor` for the reversal. -/
+/-- Both error comparisons below reduce to this: the two closed forms differ only in a
+leading coefficient, and the shared factor `(δ_cis - δ_trans) ^ 2` is positive exactly when
+the two effects differ.  The comparison is therefore the coefficient comparison, in either
+direction, and the argument is written once here rather than once per direction. -/
+theorem mul_sq_sub_lt_of_lt_of_ne
+    {coeffSmall coeffLarge effectCis effectTrans : ℝ}
+    (h_coeff : coeffSmall < coeffLarge) (h_gap : effectCis ≠ effectTrans) :
+    coeffSmall * (effectCis - effectTrans) ^ 2 <
+      coeffLarge * (effectCis - effectTrans) ^ 2 :=
+  mul_lt_mul_of_pos_right h_coeff (sq_pos_of_ne_zero (sub_ne_zero.mpr h_gap))
+
 theorem compound_het_not_captured_by_dosage
     (freq_cis switch_err interaction_cis interaction_trans : ℝ)
     (h_phase_gap : interaction_cis ≠ interaction_trans)
@@ -467,9 +474,7 @@ theorem compound_het_not_captured_by_dosage
         interaction_cis interaction_trans <
       dosagePhaseMisspecificationError freq_cis interaction_cis interaction_trans := by
   rw [dosagePhaseMisspecificationError_eq, haplotypePhasePredictionError_correctSpec_eq]
-  have h_gap_sq : 0 < (interaction_cis - interaction_trans) ^ 2 :=
-    sq_pos_of_ne_zero (sub_ne_zero.mpr h_phase_gap)
-  exact mul_lt_mul_of_pos_right h_phasing h_gap_sq
+  exact mul_sq_sub_lt_of_lt_of_ne h_phasing h_phase_gap
 
 /-- **The comparison reverses when phasing is poor.** Above the threshold the
 dosage-only predictor has strictly smaller error than the phase-aware one, for
@@ -484,9 +489,7 @@ theorem dosage_beats_haplotype_when_phasing_poor
       haplotypePhasePredictionError freq_cis switch_err interaction_cis interaction_trans
         interaction_cis interaction_trans := by
   rw [dosagePhaseMisspecificationError_eq, haplotypePhasePredictionError_correctSpec_eq]
-  have h_gap_sq : 0 < (interaction_cis - interaction_trans) ^ 2 :=
-    sq_pos_of_ne_zero (sub_ne_zero.mpr h_phase_gap)
-  exact mul_lt_mul_of_pos_right h_phasing h_gap_sq
+  exact mul_sq_sub_lt_of_lt_of_ne h_phasing h_phase_gap
 
 /-- **Phase effects are population-specific.**
     Haplotype frequencies differ → phase configuration frequencies

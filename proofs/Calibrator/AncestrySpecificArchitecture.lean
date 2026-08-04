@@ -410,7 +410,7 @@ where:
   covariance between source PGS weights and target genotypes. The per-locus
   contribution is E[β × G_target] ∝ β × 2p_target, and the correlation between
   source and target allele frequencies is (1 - Fst). (See PortabilityDrift.lean:
-  `freqCorrFromFst`.)
+  `covarianceRetentionFactorFromFst`.)
 
 - **ld_overlap ≈ tagging_ratio**: the fraction of causal-variant LD captured
   by GWAS tag SNPs in the target population. Different LD patterns mean the
@@ -455,8 +455,8 @@ noncomputable def portabilityFromArchitecture
 theorem portabilityFromArchitecture_eq_rg_sq_mul_retention
     (rg fst tagging_ratio : ℝ) :
     portabilityFromArchitecture rg fst tagging_ratio =
-      rg^2 * covarianceRetention (freqCorrFromFst fst) (ldOverlapFromSharedLD tagging_ratio) := by
-  unfold portabilityFromArchitecture covarianceRetention freqCorrFromFst ldOverlapFromSharedLD
+      rg^2 * covarianceRetention (covarianceRetentionFactorFromFst fst) (ldOverlapFromSharedLD tagging_ratio) := by
+  unfold portabilityFromArchitecture covarianceRetention covarianceRetentionFactorFromFst ldOverlapFromSharedLD
   ring
 
 /-- **Portability equals rg² × (1 - divergence), where divergence is derived.**
@@ -468,7 +468,7 @@ theorem portabilityFromArchitecture_from_divergence
     portabilityFromArchitecture rg fst tagging_ratio =
       rg^2 * (1 - covarianceDivergenceFromRetention fst tagging_ratio) := by
   unfold portabilityFromArchitecture covarianceDivergenceFromRetention
-    covarianceRetention freqCorrFromFst ldOverlapFromSharedLD
+    covarianceRetention covarianceRetentionFactorFromFst ldOverlapFromSharedLD
   ring
 
 /-- Portability is bounded by rg². -/

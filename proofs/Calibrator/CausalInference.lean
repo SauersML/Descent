@@ -43,8 +43,10 @@ theorems instantiate that with different names for the noise term:
   — removing a positive fraction of a noise component raises `R²`.
   **Subtracting a positive scalar is not mediation.** No mediator variable appears anywhere
   in the statement.
-* `r2_lt_of_drift_variance_pos`, `r2_lt_of_technical_noise_pos`, `r2_lt_of_sampling_noise_pos`,
-  `r2_lt_of_gxe_noise_pos` — four instances of the same monotonicity.
+* `r2_lt_of_drift_variance_pos`, `r2_lt_of_added_noise_pos` — two instances of the same
+  monotonicity. The second was three theorems (technical, sampling and GxE noise) whose
+  statements and proofs were identical; the noise source was in the name and nowhere in the
+  mathematics, so it is now a caller's choice of instantiation.
   **No counterfactual semantics is involved**: there is no twin network,
   no potential outcome, and nothing is evaluated in a world other than the one described by
   the formula.
@@ -148,17 +150,13 @@ theorem r2_strictMono_under_effect_turnover
     -- drift-only R² (no effect turnover), showing the selection
     -- pathway causes genuine additional loss beyond LD/drift.
     r2FromSignalVariance (ρ ^ 2 * presentDayPGSVariance V_A fst) V_E <
-      r2FromSignalVariance (presentDayPGSVariance V_A fst) V_E := by
-  apply expectedR2_strictMono_nonneg V_E _ _ hVE
-  · exact le_of_lt (mul_pos (sq_pos_of_pos hρ_pos)
-      (by unfold presentDayPGSVariance pgsVarianceFromHet; exact mul_pos hVA (by linarith)))
-  · have h_pdv_pos : 0 < presentDayPGSVariance V_A fst := by
-      unfold presentDayPGSVariance pgsVarianceFromHet; exact mul_pos hVA (by linarith)
-    calc ρ ^ 2 * presentDayPGSVariance V_A fst
-        < 1 * presentDayPGSVariance V_A fst := by
-          apply mul_lt_mul_of_pos_right _ h_pdv_pos
-          nlinarith [sq_abs ρ, sq_nonneg ρ]
-      _ = presentDayPGSVariance V_A fst := one_mul _
+      r2FromSignalVariance (presentDayPGSVariance V_A fst) V_E :=
+  -- This proof was written out a second time here, tactic for tactic, as
+  -- `effect_retention_lowers_target_r2_at_fixed_fst` in `OpenQuestions`.  That one is the
+  -- same claim with the source `Fst` carried along unused, so this is its instance at
+  -- `fstS = 0` and the argument now exists once.
+  effect_retention_lowers_target_r2_at_fixed_fst V_A V_E 0 fst ρ hVA hVE le_rfl hfst_lt
+    hfst_pos hρ_pos hρ_lt
 
 end SumDecompositionArithmetic
 
@@ -310,56 +308,24 @@ theorem r2_lt_of_drift_variance_pos
       exact mul_lt_mul_of_pos_right (by linarith) hVA
     linarith
 
-/-- **`R²` is strictly lower when a technical-noise term is present.**
-    With array genotyping, imputation error adds noise V_tech to
-    the environmental variance, reducing observed R².  WGS removes
-    this (V_tech = 0), so the WGS R² exceeds array R².
-    The remaining gap from source R² is purely genetic drift. -/
-theorem r2_lt_of_technical_noise_pos
-    (vSignal V_E V_tech : ℝ)
-    (h_sig : 0 < vSignal) (h_VE : 0 < V_E) (h_tech : 0 < V_tech) :
-    -- Array R² (with technical noise) < WGS R² (without)
-    r2FromSignalVariance vSignal (V_E + V_tech) < r2FromSignalVariance vSignal V_E := by
-  unfold r2FromSignalVariance
-  have h_denom_wgs : 0 < vSignal + V_E := by linarith
-  have h_denom_arr : 0 < vSignal + (V_E + V_tech) := by linarith
-  rw [div_lt_div_iff₀ h_denom_arr h_denom_wgs]
-  nlinarith
+/-- **`R²` is strictly lower when any positive noise term is added.**
 
-/-- **`R²` is strictly lower when a sampling-noise term is present.**
-    With finite sample, winner's curse inflates effect estimates,
-    adding noise V_wc to the prediction.  With n → ∞, V_wc → 0.
-    We model finite-sample R² as r2FromSignalVariance with signal vSignal
-    and noise V_E + V_wc (winner's curse adds prediction error).
-    Infinite-sample R² uses noise V_E only.
-    The remaining loss (infinite-sample R² vs source R²) is from
-    LD mismatch and true effect size differences. -/
-theorem r2_lt_of_sampling_noise_pos
-    (vSignal V_E V_wc : ℝ)
-    (h_sig : 0 < vSignal) (h_VE : 0 < V_E) (h_wc : 0 < V_wc) :
-    -- Finite-sample R² < infinite-sample R²
-    r2FromSignalVariance vSignal (V_E + V_wc) < r2FromSignalVariance vSignal V_E := by
+    This was written out three times, as `r2_lt_of_technical_noise_pos` (array
+    imputation error, absent under WGS), `r2_lt_of_sampling_noise_pos` (winner's
+    curse at finite `n`), and `r2_lt_of_gxe_noise_pos` (GxE variance in the target).
+    The three statements were character-for-character the same proposition with the
+    added term renamed, and the three proofs were the same proof: nothing in any of
+    them mentions imputation, sampling or GxE, and no statement could tell one from
+    another.  The mechanism lives in what a caller instantiates `vNoiseAdded` with,
+    which is where the mechanism actually is. -/
+theorem r2_lt_of_added_noise_pos
+    (vSignal V_E vNoiseAdded : ℝ)
+    (h_sig : 0 < vSignal) (h_VE : 0 < V_E) (h_added : 0 < vNoiseAdded) :
+    r2FromSignalVariance vSignal (V_E + vNoiseAdded) < r2FromSignalVariance vSignal V_E := by
   unfold r2FromSignalVariance
-  have h_denom_inf : 0 < vSignal + V_E := by linarith
-  have h_denom_fin : 0 < vSignal + (V_E + V_wc) := by linarith
-  rw [div_lt_div_iff₀ h_denom_fin h_denom_inf]
-  nlinarith
-
-/-- **`R²` is strictly lower when a GxE noise term is present.**
-    GxE interaction adds variance V_gxe to the target phenotype,
-    inflating environmental noise from V_E to V_E + V_gxe.
-    If environments were equalized (V_gxe = 0), the target R²
-    would be higher.  The remaining loss is purely from genetic
-    architecture differences (drift, LD, effect turnover). -/
-theorem r2_lt_of_gxe_noise_pos
-    (vSignal V_E V_gxe : ℝ)
-    (h_sig : 0 < vSignal) (h_VE : 0 < V_E) (h_gxe : 0 < V_gxe) :
-    -- R² with GxE < R² without GxE
-    r2FromSignalVariance vSignal (V_E + V_gxe) < r2FromSignalVariance vSignal V_E := by
-  unfold r2FromSignalVariance
-  have h_denom_eq : 0 < vSignal + V_E := by linarith
-  have h_denom_gxe : 0 < vSignal + (V_E + V_gxe) := by linarith
-  rw [div_lt_div_iff₀ h_denom_gxe h_denom_eq]
+  have h_denom_clean : 0 < vSignal + V_E := by linarith
+  have h_denom_noisy : 0 < vSignal + (V_E + vNoiseAdded) := by linarith
+  rw [div_lt_div_iff₀ h_denom_noisy h_denom_clean]
   nlinarith
 
 end NoiseReductionMonotonicity

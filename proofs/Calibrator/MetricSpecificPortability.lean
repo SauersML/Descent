@@ -820,9 +820,10 @@ theorem brier_bounded_by_prevalence
     (h_π : 0 < π) (h_π' : π < 1)
     (h_r2 : 0 < r2) :
     brierFromR2 π r2 < π * (1 - π) := by
-  unfold brierFromR2 TransportedMetrics.calibratedBrier
-  have h_prev : 0 < π * (1 - π) := by nlinarith
-  nlinarith
+  -- The uninformative predictor is `r2 = 0`, where the Brier score IS `π(1-π)`, so this is
+  -- the monotonicity above at that endpoint rather than a second run of the same `nlinarith`.
+  simpa [brierFromR2, TransportedMetrics.calibratedBrier] using
+    brier_increases_with_portability_loss π r2 0 h_π h_π' h_r2
 
 /-- Brier worsening caused by mechanistic signal/discrimination loss alone,
 holding the outcome prevalence scale fixed at the target-population value. -/

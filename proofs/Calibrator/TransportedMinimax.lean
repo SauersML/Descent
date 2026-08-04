@@ -233,19 +233,13 @@ noncomputable def longMemoryMetric (ε δ : ℝ) : ℝ := ε ^ 2 / δ ^ 3
 
 /-- **longMemoryMetric where its denominator vanishes, named.** The guard `δ ^ 3` is zero at `δ =
 0`. Lean returns `0` there rather than the value the modelled quantity takes, and no type error
-marks the point. Consumers must require `δ ^ 3 ≠ 0`. -/
+marks the point. A zero bandwidth gives an infinite metric, and what is reported instead is `0`,
+the finest possible resolution, for a bandwidth that resolves nothing. Consumers must require
+`δ ≠ 0`. -/
 theorem longMemoryMetric_at_0_is_junk (ε : ℝ) :
     longMemoryMetric ε 0 = 0 := by
   unfold longMemoryMetric
   norm_num
-
-/-- **longMemoryMetric at zero δ, named.** A zero bandwidth gives an infinite metric. Lean
-returns `0`, the finest possible resolution, for a bandwidth that resolves nothing. Consumers
-must require `δ ≠ 0`. -/
-theorem longMemoryMetric_zero_δ_is_junk (ε : ℝ) :
-    longMemoryMetric ε 0 = 0 := by
-  unfold longMemoryMetric
-  simp
 
 /-- The parameter variance as originally posited: `3δ³/(nε²)`.
 

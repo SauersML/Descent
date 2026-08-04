@@ -187,35 +187,23 @@ distinguish them were the *same* function
 `approximationInterval` under two names, so nothing in either statement would detect
 swapping AUC for `R²`. -/
 
-/-- Any exact AUC within `scoreApproximationError` of a Gaussian center lies in the
-corresponding interval around that center.  The AUC-side error control is the hypothesis. -/
-theorem HWEPolygenicScoreDGP.mem_aucApproximationInterval_of_abs_sub_le
-    {m : ℕ} [Fintype (Fin m)]
-    (dgp : HWEPolygenicScoreDGP m)
-    (aucExact aucGaussian : ℝ)
-    (h : |aucExact - aucGaussian| ≤ dgp.scoreApproximationError) :
-    aucExact ∈
-      Calibrator.approximationInterval aucGaussian dgp.scoreApproximationError := by
-  simpa [Calibrator.approximationInterval] using
-    (mem_approximationInterval_of_abs_sub_le
-    aucExact aucGaussian dgp.scoreApproximationError
-    (by
-      unfold HWEPolygenicScoreDGP.scoreApproximationError
-      exact dgp.scoreModel.berryEsseenErrorBound_nonneg _ dgp.berryEsseenConstant_nonneg)
-    h)
+/-- Any exact quantity within `scoreApproximationError` of a Gaussian center lies in the
+corresponding interval around that center.  The error control is the hypothesis.
 
-/-- Any exact `R²` within `scoreApproximationError` of a Gaussian center lies in the
-corresponding interval around that center.  The `R²`-side error control is the hypothesis. -/
-theorem HWEPolygenicScoreDGP.mem_r2ApproximationInterval_of_abs_sub_le
+There were two of these, one named for AUC and one for `R²`.  Since `approximationInterval`
+is the same function in both, the two statements were the same proposition with the variables
+renamed -- neither could detect swapping AUC for `R²`, which is the very confusion the
+paragraph above warns about, committed in the names of the theorems warning about it. -/
+theorem HWEPolygenicScoreDGP.mem_scoreApproximationInterval_of_abs_sub_le
     {m : ℕ} [Fintype (Fin m)]
     (dgp : HWEPolygenicScoreDGP m)
-    (r2Exact r2Gaussian : ℝ)
-    (h : |r2Exact - r2Gaussian| ≤ dgp.scoreApproximationError) :
-    r2Exact ∈
-      Calibrator.approximationInterval r2Gaussian dgp.scoreApproximationError := by
+    (exactValue gaussianCenter : ℝ)
+    (h : |exactValue - gaussianCenter| ≤ dgp.scoreApproximationError) :
+    exactValue ∈
+      Calibrator.approximationInterval gaussianCenter dgp.scoreApproximationError := by
   simpa [Calibrator.approximationInterval] using
-    (mem_approximationInterval_of_abs_sub_le
-    r2Exact r2Gaussian dgp.scoreApproximationError
+    (Calibrator.mem_approximationInterval_of_abs_sub_le
+    exactValue gaussianCenter dgp.scoreApproximationError
     (by
       unfold HWEPolygenicScoreDGP.scoreApproximationError
       exact dgp.scoreModel.berryEsseenErrorBound_nonneg _ dgp.berryEsseenConstant_nonneg)

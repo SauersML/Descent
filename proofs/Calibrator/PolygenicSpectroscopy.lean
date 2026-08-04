@@ -168,20 +168,13 @@ open scoped BigOperators
 
 /-!
 ## 0. Summation over the three genotypes
--/
 
-/-- Expand a sum over diploid genotypes into its three terms. -/
-theorem sum_diploidGenotype (f : DiploidGenotype → ℝ) :
-    (∑ g : DiploidGenotype, f g) =
-      f DiploidGenotype.homRef + f DiploidGenotype.het + f DiploidGenotype.homAlt := by
-  have hrewrite :
-      (∑ g : DiploidGenotype, f g) =
-        ∑ i : Fin 3, f (DiploidGenotype.equivFin3.symm i) := by
-    exact Fintype.sum_equiv DiploidGenotype.equivFin3 _ _ (by
-      intro x
-      rw [DiploidGenotype.equivFin3_symm_apply_apply])
-  rw [hrewrite, Fin.sum_univ_three]
-  rfl
+The expansion of a genotype sum into its three terms is `sum_over_genotypes` in
+`Calibrator.Probability`, which this module imports transitively.  A second copy
+of it lived here under a second name, with the same statement and
+the same proof, and nothing in the corpus said the two were one theorem: a repair
+to either reached half the call sites.
+-/
 
 /-!
 ## 1. The standardized genotype and its Mellin drift
@@ -318,7 +311,7 @@ theorem HardyWeinbergModel.mellinDrift_eq (h : HardyWeinbergModel)
   have hC : q ^ 2 * (2 * (1 - q) / q) = 2 * q * (1 - q) := by
     field_simp
   unfold HardyWeinbergModel.mellinDrift hweMellinDrift
-  rw [sum_diploidGenotype, hX0, hX1, hX2, hP0, hP1, hP2, hA, hB, hC]
+  rw [sum_over_genotypes, hX0, hX1, hX2, hP0, hP1, hP2, hA, hB, hC]
   linear_combination (2 * q * (1 - q)) * hL
 
 end ClosedForm
@@ -951,7 +944,7 @@ theorem HardyWeinbergModel.mellinJetVariance_eq (h : HardyWeinbergModel)
     field_simp
   have hdrift : h.mellinDrift = hweMellinDrift q := h.mellinDrift_eq hq0 hq1
   unfold HardyWeinbergModel.mellinJetVariance hweMellinJetVariance
-  rw [sum_diploidGenotype, hX0, hX1, hX2, hP0, hP1, hP2, hA, hB, hC, hdrift]
+  rw [sum_over_genotypes, hX0, hX1, hX2, hP0, hP1, hP2, hA, hB, hC, hdrift]
 
 /-- The lattice span at `q*` is `h = log ((1 - q*) / q*) = log (3 + 2 sqrt 2)`, which
 is strictly positive; hence the inflation factor `h / (1 - exp (-h))` is strictly
@@ -1441,7 +1434,7 @@ theorem HardyWeinbergModel.standardizedFourthMoment_eq (h : HardyWeinbergModel)
   obtain ⟨hX0, hX1, hX2⟩ := standardizedSquare_values h hq0 hq1
   obtain ⟨hP0, hP1, hP2⟩ := genotypeProb_values h
   unfold HardyWeinbergModel.standardizedFourthMoment
-  rw [sum_diploidGenotype, hX0, hX1, hX2, hP0, hP1, hP2]
+  rw [sum_over_genotypes, hX0, hX1, hX2, hP0, hP1, hP2]
   field_simp
   ring
 

@@ -221,13 +221,13 @@ noncomputable def fstFromDriftFactor (driftFactor : ℝ) : ℝ :=
   1 - driftFactor
 
 /-- **Cross-check: `1 - F_ST` read forwards and backwards.**
-`PortabilityDrift.freqCorrFromFst` sends `F_ST` to the retained
+`PortabilityDrift.covarianceRetentionFactorFromFst` sends `F_ST` to the retained
 frequency correlation; `fstFromDriftFactor` sends the retained drift factor
 back to `F_ST`. They are the same involution, and stating it keeps the two
 directions from acquiring different conventions. -/
-theorem fstFromDriftFactor_eq_freqCorrFromFst (driftFactor : ℝ) :
-    fstFromDriftFactor driftFactor = freqCorrFromFst driftFactor := by
-  unfold fstFromDriftFactor freqCorrFromFst; ring
+theorem fstFromDriftFactor_eq_covarianceRetentionFactorFromFst (driftFactor : ℝ) :
+    fstFromDriftFactor driftFactor = covarianceRetentionFactorFromFst driftFactor := by
+  unfold fstFromDriftFactor covarianceRetentionFactorFromFst; ring
 
 /-- **The third spelling of the same involution.**
 
@@ -238,8 +238,8 @@ between-population `F_ST`, and a retained frequency correlation are different qu
 and `DriftRegime` records what substituting one for another cost — but the map they share
 is written down here, so a convention change in any one of them contradicts this. This
 module is where all three are visible at once. -/
-theorem lossOfRetention_eq_fstFromDriftFactor_eq_freqCorrFromFst (r : ℝ) :
-    lossOfRetention r = fstFromDriftFactor r ∧ lossOfRetention r = freqCorrFromFst r :=
+theorem lossOfRetention_eq_fstFromDriftFactor_eq_covarianceRetentionFactorFromFst (r : ℝ) :
+    lossOfRetention r = fstFromDriftFactor r ∧ lossOfRetention r = covarianceRetentionFactorFromFst r :=
   ⟨rfl, rfl⟩
 
 /-- **`F_ST` from an admissible drift factor lies in `[0, 1)`.**
