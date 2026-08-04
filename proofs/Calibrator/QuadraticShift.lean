@@ -319,6 +319,90 @@ theorem weightedCovariancePool_mulVec_eq_zero_iff
     ext i
     simp
 
+/-- Weighted covariance of an arbitrary finite environment panel. -/
+def finiteEnvironmentCovariancePool
+    {κ : Type*} [Fintype κ]
+    (weight : κ → ℝ) (covariance : κ → Matrix ι ι ℝ) : Matrix ι ι ℝ :=
+  fun i j ↦ ∑ environment, weight environment * covariance environment i j
+
+omit [DecidableEq ι] in
+/-- Matrix-vector action of a finite weighted covariance pool. -/
+theorem finiteEnvironmentCovariancePool_mulVec
+    {κ : Type*} [Fintype κ]
+    (weight : κ → ℝ) (covariance : κ → Matrix ι ι ℝ) (shift : ι → ℝ) :
+    (finiteEnvironmentCovariancePool weight covariance).mulVec shift =
+      fun i ↦ ∑ environment, weight environment *
+        (covariance environment).mulVec shift i := by
+  classical
+  ext i
+  simp only [finiteEnvironmentCovariancePool, Matrix.mulVec, dotProduct]
+  simp_rw [Finset.sum_mul, Finset.mul_sum]
+  rw [Finset.sum_comm]
+  apply Finset.sum_congr rfl
+  intro environment _
+  apply Finset.sum_congr rfl
+  intro j _
+  ring
+
+omit [DecidableEq ι] in
+/-- Pooled quadratic energy is the weighted sum of all environment-specific energies. -/
+theorem finiteEnvironmentCovariancePool_energy
+    {κ : Type*} [Fintype κ]
+    (weight : κ → ℝ) (covariance : κ → Matrix ι ι ℝ) (shift : ι → ℝ) :
+    dot shift ((finiteEnvironmentCovariancePool weight covariance).mulVec shift) =
+      ∑ environment, weight environment *
+        dot shift ((covariance environment).mulVec shift) := by
+  classical
+  rw [finiteEnvironmentCovariancePool_mulVec]
+  simp only [dot]
+  simp_rw [Finset.mul_sum]
+  rw [Finset.sum_comm]
+  apply Finset.sum_congr rfl
+  intro environment _
+  apply Finset.sum_congr rfl
+  intro i _
+  ring
+
+omit [DecidableEq ι] in
+/-- **Finite-panel kernel-intersection law.** For any finite collection of PSD covariance
+environments with strictly positive sampling weights, pooling shrinks nonidentifiability to the
+intersection of all environmental kernels. No number of positive-semidefinite environments can
+cancel information supplied by another one. -/
+theorem finiteEnvironmentCovariancePool_mulVec_eq_zero_iff
+    {κ : Type*} [Fintype κ]
+    (weight : κ → ℝ) (covariance : κ → Matrix ι ι ℝ)
+    (hweight : ∀ environment, 0 < weight environment)
+    (hnonneg : ∀ environment shift,
+      0 ≤ dot shift ((covariance environment).mulVec shift))
+    (hzero : ∀ environment shift,
+      dot shift ((covariance environment).mulVec shift) = 0 ↔
+        (covariance environment).mulVec shift = 0)
+    (shift : ι → ℝ) :
+    (finiteEnvironmentCovariancePool weight covariance).mulVec shift = 0 ↔
+      ∀ environment, (covariance environment).mulVec shift = 0 := by
+  classical
+  constructor
+  · intro hpool environment
+    have henergySum :
+        ∑ environment, weight environment *
+          dot shift ((covariance environment).mulVec shift) = 0 := by
+      rw [← finiteEnvironmentCovariancePool_energy weight covariance shift, hpool]
+      simp [dot]
+    have htermNonneg : ∀ environment ∈ (Finset.univ : Finset κ),
+        0 ≤ weight environment * dot shift ((covariance environment).mulVec shift) := by
+      intro environment _
+      exact mul_nonneg (hweight environment).le (hnonneg environment shift)
+    have hweightedZero :=
+      (Finset.sum_eq_zero_iff_of_nonneg htermNonneg).mp henergySum
+        environment (Finset.mem_univ environment)
+    have henergyZero : dot shift ((covariance environment).mulVec shift) = 0 :=
+      (mul_eq_zero.mp hweightedZero).resolve_left (hweight environment).ne'
+    exact (hzero environment shift).mp henergyZero
+  · intro hkernel
+    rw [finiteEnvironmentCovariancePool_mulVec]
+    ext i
+    simp [hkernel]
+
 /-! ## Singular portability boundary -/
 
 /-- A uniform coefficient-space portability bound: target excess risk is at most `constant`
