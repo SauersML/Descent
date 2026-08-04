@@ -320,8 +320,29 @@ theorem gwasHeritability_at_reference_point :
   unfold gwasHeritability
   norm_num
 
-/-- GWAS heritability ≤ true heritability. -/
-theorem gwas_h2_le_true (h2_true avg_r2_tag : ℝ)
+/-- GWAS heritability vanishes exactly when there is no heritable signal or no tagging. -/
+theorem gwasHeritability_eq_zero_iff (h2_true avg_r2_tag : ℝ) :
+    gwasHeritability h2_true avg_r2_tag = 0 ↔ h2_true = 0 ∨ avg_r2_tag = 0 := by
+  unfold gwasHeritability
+  exact mul_eq_zero
+
+/-- Perfect tagging recovers the true heritability; equality also holds vacuously when
+the true heritability itself is zero. -/
+theorem gwasHeritability_eq_true_iff (h2_true avg_r2_tag : ℝ) :
+    gwasHeritability h2_true avg_r2_tag = h2_true ↔
+      h2_true = 0 ∨ avg_r2_tag = 1 := by
+  unfold gwasHeritability
+  constructor
+  · intro h
+    have h_factor : h2_true * (avg_r2_tag - 1) = 0 := by nlinarith
+    rcases mul_eq_zero.mp h_factor with h_zero | h_tag
+    · exact Or.inl h_zero
+    · exact Or.inr (by linarith)
+  · rintro (rfl | rfl) <;> ring
+
+/-- GWAS heritability is at most true heritability under nonnegative signal and
+tagging efficiency at most one. -/
+theorem gwasHeritability_le_true (h2_true avg_r2_tag : ℝ)
     (h_h2 : 0 ≤ h2_true) (h_r2_le : avg_r2_tag ≤ 1) :
     gwasHeritability h2_true avg_r2_tag ≤ h2_true := by
   unfold gwasHeritability
@@ -602,6 +623,28 @@ theorem portabilityFromArchitecture_from_divergence
       rg^2 * (1 - covarianceDivergenceFromRetention fst tagging_ratio) := by
   unfold portabilityFromArchitecture covarianceDivergenceFromRetention
     covarianceRetention covarianceRetentionFactorFromFst ldOverlapFromSharedLD
+  ring
+
+/-- Architecture portability is zero exactly when cross-population effect correlation
+vanishes, differentiation is complete, or the target tags none of the signal. -/
+theorem portabilityFromArchitecture_eq_zero_iff (rg fst tagging_ratio : ℝ) :
+    portabilityFromArchitecture rg fst tagging_ratio = 0 ↔
+      rg = 0 ∨ fst = 1 ∨ tagging_ratio = 0 := by
+  unfold portabilityFromArchitecture
+  constructor
+  · intro h
+    rcases mul_eq_zero.mp h with h | h
+    · rcases mul_eq_zero.mp h with h | h
+      · exact Or.inl (sq_eq_zero_iff.mp h)
+      · exact Or.inr (Or.inl (by linarith))
+    · exact Or.inr (Or.inr h)
+  · rintro (rfl | rfl | rfl) <;> norm_num
+
+/-- With no differentiation and perfect tagging, portability is exactly the squared
+cross-population genetic correlation. -/
+@[simp] theorem portabilityFromArchitecture_perfect_tagging (rg : ℝ) :
+    portabilityFromArchitecture rg 0 1 = rg ^ 2 := by
+  unfold portabilityFromArchitecture
   ring
 
 /-- Portability is bounded by rg². -/
