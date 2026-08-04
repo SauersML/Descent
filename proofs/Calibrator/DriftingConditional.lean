@@ -452,8 +452,13 @@ theorem reconstruct_between {n : ℕ} (M : Fin n → Fin n → ℝ) (p κ : Fin 
     the initial curve equals its value at the limit. Under ergodic mixing that limit is the
     constant curve at the base rate, so every continuous invariant is a function of prevalence
     alone: discrimination, calibration and curve shape are all transient, and the base rate is
-    the only stable summary. -/
-theorem continuousInvariant_eq_at_limit {H : Type*} [TopologicalSpace H] [T2Space H]
+    the only stable summary.
+
+    `H` is not assumed Hausdorff. It was: the statement carried `[T2Space H]`, which a scan of
+    the kernel-accepted proof term found unused. It has to be unused -- the uniqueness of limits
+    this proof invokes is `tendsto_nhds_unique` on `ℝ`, the codomain, whose separation is
+    ambient, and the argument never needs limits in `H` to be unique. -/
+theorem continuousInvariant_eq_at_limit {H : Type*} [TopologicalSpace H]
     (Phi : H → ℝ) (hPhi : Continuous Phi) (flow : ℝ → H) (limit : H)
     (hinv : ∀ t, Phi (flow t) = Phi (flow 0))
     (hconv : Filter.Tendsto flow Filter.atTop (nhds limit)) :
@@ -1881,7 +1886,7 @@ theorem continuous_charFun_real (ν : Measure ℝ) [IsFiniteMeasure ν] :
 
 open MeasureTheory ProbabilityTheory Complex in
 /-- The modulus form of the functional equation, at the substitution that makes it an iteration. -/
-theorem norm_charFun_selfSimilar (ν : Measure ℝ) [IsFiniteMeasure ν]
+theorem norm_charFun_selfSimilar (ν : Measure ℝ)
     {s α β : ℝ} (hα : 0 < α)
     (heq : ∀ t : ℝ, Complex.exp (-(((s * t) ^ 2 : ℝ) : ℂ) / 2) * charFun ν t
       = charFun ν (t / α) * Complex.exp (((-(β * t / α) : ℝ) : ℂ) * Complex.I)) (u : ℝ) :
@@ -1953,7 +1958,7 @@ with variance `s²α²/(1-α²)` and mean `β/(1-α)`. -/
 
 open MeasureTheory ProbabilityTheory Complex in
 /-- **One substitution.** The equation, rearranged into the direction the iteration runs. -/
-theorem charFun_selfSimilar_step (ν : Measure ℝ) [IsFiniteMeasure ν]
+theorem charFun_selfSimilar_step (ν : Measure ℝ)
     {s α β : ℝ} (hα : 0 < α)
     (heq : ∀ t : ℝ, Complex.exp (-(((s * t) ^ 2 : ℝ) : ℂ) / 2) * charFun ν t
       = charFun ν (t / α) * Complex.exp (((-(β * t / α) : ℝ) : ℂ) * Complex.I)) (u : ℝ) :

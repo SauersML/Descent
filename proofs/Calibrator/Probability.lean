@@ -161,13 +161,19 @@ theorem integrable_id_gaussian : MeasureTheory.Integrable (fun x ↦ x) stdGauss
 theorem integrable_pow4_gaussian : MeasureTheory.Integrable (fun x ↦ x ^ 4) stdGaussianMeasure := by
   apply integrable_poly_n 4
 
-/-- If f is integrable on μ and g is integrable on ν, then f(x) * g(y) is integrable on μ.prod ν.
-    This is essential for Fubini-type arguments on product measures. -/
-theorem integrable_prod_mul {X Y : Type*} [MeasurableSpace X] [MeasurableSpace Y]
-    {μ : Measure X} {ν : Measure Y} [SigmaFinite μ] [SigmaFinite ν]
-    (f : X → ℝ) (g : Y → ℝ) (hf : Integrable f μ) (hg : Integrable g ν) :
-    Integrable (fun p : X × Y ↦ f p.1 * g p.2) (μ.prod ν) :=
-  hf.mul_prod hg
+/-! **`integrable_prod_mul` was deleted here.** It read
+
+    theorem integrable_prod_mul ... [SigmaFinite μ] [SigmaFinite ν]
+        (f) (g) (hf : Integrable f μ) (hg : Integrable g ν) :
+        Integrable (fun p : X × Y ↦ f p.1 * g p.2) (μ.prod ν) :=
+      hf.mul_prod hg
+
+and was `MeasureTheory.Integrable.mul_prod` with the arguments moved around. A
+scan of the kernel-accepted proof terms found both `SigmaFinite` instances
+unused, which is the tell: the upstream lemma does not need them, so the two
+instance binders were narrowing the corpus's copy below the general statement
+for no reason -- exactly the failure mode the `mathlib` guard exists to catch.
+Nothing in the corpus referenced it. Use `Integrable.mul_prod` directly. -/
 
 /-!
 =================================================================
@@ -178,7 +184,11 @@ theorem integrable_prod_mul {X Y : Type*} [MeasurableSpace X] [MeasurableSpace Y
 variable {Ω : Type*} [MeasureSpace Ω] {ℙ : Measure Ω} [IsProbabilityMeasure ℙ]
 
 def Phenotype := Ω → ℝ
-/-- Empirical status: UNTESTED. -/
+/-- Empirical status: NOT AN EMPIRICAL CLAIM. `PGS` is a TYPE ABBREVIATION --
+the type of real-valued random variables on the sample space -- not a formula.
+It says a score is a measurable function of the outcome and asserts nothing a
+simulation could contradict; every claim about what a score is worth is made by
+the definitions that inhabit this type. -/
 def PGS := Ω → ℝ
 def PC (k : ℕ) := Ω → (Fin k → ℝ)
 
@@ -252,7 +262,13 @@ theorem sum_over_genotypes (f : DiploidGenotype → ℝ) :
 
 /-- Number of alternative alleles carried by a diploid genotype.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: NOT AN EMPIRICAL CLAIM. This is the corpus's genotype
+    CODING, `0/1/2` for the three diploid genotypes, and a coding cannot
+    disagree with a population: it fixes what the symbol `dosage` denotes
+    everywhere downstream. What is empirical is what the coding buys, and that
+    is tested where it is used -- `BlindnessRegistry.averageEffect` is the
+    least-squares slope of genotypic value on THIS dosage, and a different
+    coding would move that slope. -/
 def altAlleleCount : DiploidGenotype → ℝ
   | .homRef => 0
   | .het => 1
@@ -296,7 +312,22 @@ theorem HardyWeinbergModel.refFreq_le_one (h : HardyWeinbergModel) :
 /-- Hardy-Weinberg genotype probabilities:
 `P(AA) = p^2`, `P(Aa) = 2pq`, `P(aa) = q^2`, where `q` is the alternative-allele frequency.
 
-    Empirical status: UNTESTED. -/
+    Regime: random union of gametes -- random mating, no selection, no
+    inbreeding, one generation. Those are the assumptions the factor of two
+    rests on, not decoration.
+
+    Empirical status: **VALIDATED** (`simcov/battery_bulk28.py`, `group_a`).
+    Gametes are paired at random and genotypes are COUNTED; the body is never
+    evaluated to build the oracle. Over `p` = 0.05, 0.2, 0.5, 0.8, across all
+    three genotypes, the worst cell is 1.20 sems at 0.02% relative on 4×10⁶
+    individuals per cell.
+
+    Power: the heterozygote term without its factor of two -- the classic
+    error, and the one a table of counts settles instantly -- is carried on the
+    same cells and is FALSIFIED at 1000 sems (50% relative). An oracle pinned
+    to the body could not reject it, so the factor of two is chosen by the
+    counts. Control: the realised allele frequency recovers `p` on the same
+    draws. -/
 def HardyWeinbergModel.genotypeProb (h : HardyWeinbergModel) : DiploidGenotype → ℝ
   | .homRef => h.refFreq ^ 2
   | .het => 2 * h.refFreq * h.altFreq
@@ -373,7 +404,12 @@ theorem HardyWeinbergModel.expectedAltAlleleCount_eq
 
 /-- Centered alternative-allele count at one locus.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: NOT AN EMPIRICAL CLAIM. Subtracting a quantity's own
+    expectation is centering, and centering is an operation rather than a
+    prediction: it has no free coefficient a measurement could find wrong. The
+    empirical content sits one level down, in `expectedAltAlleleCount = 2q`,
+    which is the Hardy-Weinberg claim and is proved against `genotypeProb`
+    immediately above. -/
 noncomputable def HardyWeinbergModel.centeredAltAlleleCount
     (h : HardyWeinbergModel) (g : DiploidGenotype) : ℝ :=
   altAlleleCount g - h.expectedAltAlleleCount
@@ -655,7 +691,14 @@ theorem noise_integrated_cdf_zero {k : ℕ} (hN : GaussianNoiseAssumption k)
 
 /-- Latent liability `L = S + E`.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: NOT AN EMPIRICAL CLAIM. This is the DECLARATION of the
+    liability-threshold model's additive decomposition, and the definition of
+    what the symbols `S` and `E` mean in the rest of this file. Whether real
+    liability is additive in a genetic and an environmental part is an empirical
+    question, but it is not a question about this body: any answer leaves
+    `s + e` as the definition of the sum. The testable consequences live in the
+    threshold quantities built on it -- `etaLiabilityThreshold`, the prevalence
+    and the observed-scale `R²` -- where a wrong decomposition would show. -/
 def latentLiability (s e : ℝ) : ℝ := s + e
 
 /-- **Liability is additive, so the genetic part is recoverable given the environment.** This is

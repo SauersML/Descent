@@ -858,25 +858,18 @@ theorem dispersion_escapes_low_moments (q₁ q₂ q₃ : ℝ)
     linear_combination 2 * hcontra - (a + b + 2 * c) * hmean
   linarith [hpos, key]
 
-/-- **Level two: full modulus data on a separating panel pins the whole spectrum.**
+/-! **Level two, and where it now lives.**
 
-This is `spectrum_determined_of_separating` restated for the diploid family with its
-standing hypotheses visible: finitely many loci, linkage equilibrium, no ascertainment
-tie (which `Separating` already excludes, by `not_separating_of_frequencyTie`).
-
-Note what is and is not claimed. **A realized panel is finite** — `n` loci, `n`
-frequencies — and finiteness is in the hypothesis, doing real work: `Separating` asks each
-locus to own a value, which needs a list to pick a minimum from. The continuum
-idealization of the same spectrum has full core for this family (every modulus value is
-covered at least four times on `(0,1)` and twice above), so the peeling criterion does not
-apply there and identifiability of a continuous spectrum from modulus data is **open**. -/
-theorem folded_spectrum_identifiable_on_finite_panel {n : ℕ} (panel : Panel n)
-    (joint : (Fin n → Fin 3) → ℝ)
-    (_hLinkageEquilibrium : InLinkageEquilibrium diploidFamily panel joint)
-    (hsep : Separating diploidFamily panel)
-    (hkernel : ∀ v : ℝ, spectrumModulusLaw diploidFamily panel v = 0) (i : Fin n) :
-    panel.weight i = 0 :=
-  spectrum_determined_of_separating diploidFamily panel hsep hkernel i
+This section used to restate `spectrum_determined_of_separating` for the diploid family
+as `folded_spectrum_identifiable_on_finite_panel`, under an
+`InLinkageEquilibrium diploidFamily panel joint` premise and a `joint` parameter that
+existed only to state it. A scan of the kernel-accepted proof terms found the premise
+occurring nowhere in the proof, and it cannot: `spectrumModulusLaw` and `Separating` are
+functions of the panel's frequencies and weights alone, so the statement never sees a
+joint genotype distribution and holds whether or not the panel is in equilibrium.
+Deleting the dead premise left the statement character-for-character identical to
+`maf_spectrum_identifiable` in §7b, whose own linkage-equilibrium and minor-allele
+premises were dead for the same reason, so the two have been merged there. -/
 
 /-! ## 6. Matched low-order functionals, and what portability loss cannot be blamed on -/
 
@@ -949,8 +942,10 @@ the effect-size architecture is not.**
 
 Two verdicts from the same data, in one statement:
 
-* *(left)* On a finite, linkage-equilibrium, separating panel, modulus data determines the
-  allele-frequency spectrum completely — no per-locus frequency information supplied.
+* *(left)* On a finite separating panel, modulus data determines the allele-frequency
+  spectrum completely — no per-locus frequency information supplied, and no linkage
+  equilibrium required (see `folded_spectrum_identifiable_on_finite_panel` for why the
+  equilibrium premise this statement used to carry was doing nothing).
 * *(right)* On the effect-size side, every **even** summary — heritability `E[β²]`,
   LD-score regression on squared z-scores, stratified heritability, method-of-moments
   polygenicity — is constant on the fibers of the magnitude map, so a redistribution of
@@ -969,8 +964,6 @@ ground than usually assumed, and effect-size asymmetry should not be inferred fr
 moment-based summaries at all — the signs are in the data, and the summaries in use
 discard them (`odd_summary_detects_transfer` says which statistics recover them). -/
 theorem spectrum_recoverable_architecture_not {n : ℕ} (panel : Panel n)
-    (joint : (Fin n → Fin 3) → ℝ)
-    (_hLinkageEquilibrium : InLinkageEquilibrium diploidFamily panel joint)
     (hsep : Separating diploidFamily panel)
     (hkernel : ∀ v : ℝ, spectrumModulusLaw diploidFamily panel v = 0)
     (F : Fiber) (shift : ℝ) {summary : ℝ → ℝ} (heven : IsEvenSummary summary) :
@@ -988,6 +981,13 @@ clause, no cycle hypothesis to check, and no exceptional set.
 
 > **The minor-allele-frequency spectrum of any finite marker panel is identifiable from
 > modulus data.**
+
+**That sentence is the section's thesis, not its theorem.** `maf_spectrum_identifiable`
+below assumes `Separating`, no lemma in this corpus produces a `Separating` panel, and the
+minor-allele premise it used to carry turned out to occur nowhere in its proof. The step
+from "finite, minor-allele coded, distinct frequencies" to `Separating` — peeling — is
+argued in (ii) below and is not formalized. Read the display as a conjecture the file
+supports and does not discharge.
 
 Three things about that statement are worth more than the statement.
 
@@ -1074,20 +1074,31 @@ theorem diploid_modulus_ref_le_one (q : ℝ) (hq0 : 0 < q) (hhalf : q ≤ 1 / 2)
 
 /-- **The finite identifiability theorem, in this file's vocabulary.**
 
-Unconditional in the sense that matters: no genericity clause and no cycle hypothesis,
-because the cycle variety of this family is empty on `(0, 1/2]`. What remains as a
-hypothesis is what a reader can check on their own panel — finiteness, minor-allele
-coding, linkage equilibrium, and separation, the last of which the peeling argument
-supplies for any finite panel with distinct frequencies.
+`spectrum_determined_of_separating` for the diploid family: on a finite separating panel,
+modulus data determines every weight.
+
+**One hypothesis carries this result, and it is `Separating`.** The statement used to
+carry three more — a `joint` parameter, `InLinkageEquilibrium diploidFamily panel joint`,
+and a minor-allele-coding premise `∀ i, 0 < support i ∧ support i ≤ 1/2` — and a scan of
+the kernel-accepted proof terms found that none of the three occurs anywhere in the proof.
+They cannot: `spectrumModulusLaw` and `Separating` are functions of the panel's
+frequencies and weights alone, so the theorem never sees a joint genotype distribution,
+and it never inspects where in `(0,1)` a frequency lies. The premises have been removed.
+
+**What that costs the section heading above, and it is worth stating plainly.** The
+minor-allele restriction is what empties the cycle variety, and that is why the §7b
+narrative is not idle — but the emptiness is established by the `n = 2` enumeration in
+prose, not consumed by this theorem, and **no lemma in this corpus produces a
+`Separating` panel**. `Separating` is only ever assumed. So "every finite MAF panel is
+identifiable, with no exceptional set" is not what is formalized here; what is formalized
+is "every finite *separating* panel is identifiable", and the step from distinct
+minor-allele-coded frequencies to `Separating` — the peeling argument — remains an
+unformalized gap. Do not quote the headline as a theorem.
 
 The separation hypothesis is not window dressing and is not vacuous: by
 `not_separating_of_frequencyTie` it fails exactly when two markers share a frequency, which
-is the ascertainment case of §4. Distinct frequencies, finitely many, minor-allele coded:
-identifiable. -/
+is the ascertainment case of §4. -/
 theorem maf_spectrum_identifiable {n : ℕ} (panel : Panel n)
-    (joint : (Fin n → Fin 3) → ℝ)
-    (_hLinkageEquilibrium : InLinkageEquilibrium diploidFamily panel joint)
-    (_hMinorAllele : ∀ i : Fin n, 0 < panel.support i ∧ panel.support i ≤ 1 / 2)
     (hsep : Separating diploidFamily panel)
     (hkernel : ∀ v : ℝ, spectrumModulusLaw diploidFamily panel v = 0) (i : Fin n) :
     panel.weight i = 0 :=

@@ -357,7 +357,6 @@ theorem stratification_confounds_overdispersion
     the biases are less than the naive statistic). -/
 theorem corrections_reduce_signal
     (stat_naive ld_bias ascertainment_bias : ℝ)
-    (h_naive_pos : 0 < stat_naive)
     (h_ld : 0 < ld_bias) (h_asc : 0 < ascertainment_bias)
     (h_partial : ld_bias + ascertainment_bias < stat_naive) :
     let stat_corrected := stat_naive - ld_bias - ascertainment_bias
@@ -493,7 +492,7 @@ theorem effectCorrelation_mem_range
     `d / (1 + s·N)`, so `ρ_stab = 1 - d/(1 + s·N) > 1 - d = ρ_neutral`. -/
 theorem stabilizing_maintains_architecture
     (d s N : ℝ)
-    (h_d_pos : 0 < d) (h_d_le : d ≤ 1)
+    (h_d_pos : 0 < d)
     (h_s : 0 < s) (h_N : 0 < N) :
     1 - d < effectCorrelationStabilizingDriftSelection d s N := by
   unfold effectCorrelationStabilizingDriftSelection
@@ -528,7 +527,7 @@ theorem fluctuating_selection_worst_portability
     effectCorrelationFluctuating d f N < 1 - d ∧
       1 - d < effectCorrelationStabilizingDriftSelection d s N := by
   have h_fN : 0 < f * N := mul_pos h_f h_N
-  refine ⟨?_, stabilizing_maintains_architecture d s N h_d_pos h_d_le h_s h_N⟩
+  refine ⟨?_, stabilizing_maintains_architecture d s N h_d_pos h_s h_N⟩
   unfold effectCorrelationFluctuating
   apply max_lt
   · linarith
@@ -569,7 +568,7 @@ section DetectingAdaptation
     After correction, the signal was greatly reduced. -/
 theorem stratification_reduces_adaptation_signal
     (signal_raw strat_bias : ℝ)
-    (h_raw_pos : 0 < signal_raw) (h_bias_pos : 0 < strat_bias)
+    (h_bias_pos : 0 < strat_bias)
     (h_partial : strat_bias < signal_raw) :
     -- After removing stratification bias, signal is reduced but not eliminated
     0 < signal_raw - strat_bias ∧ signal_raw - strat_bias < signal_raw := by

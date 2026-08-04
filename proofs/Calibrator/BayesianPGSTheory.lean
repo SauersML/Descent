@@ -207,7 +207,7 @@ theorem shrinkage_strictMono_product (n₁ h₁ n₂ h₂ : ℝ)
 
 /-- **Shrinkage increases with sample size.** More data → less shrinkage. -/
 theorem shrinkage_increases_with_n (h : ℝ) (n₁ n₂ : ℝ)
-    (h_h : 0 < h) (h_n₁ : 0 < n₁) (h_n₂ : 0 < n₂)
+    (h_h : 0 < h) (h_n₁ : 0 < n₁)
     (h_more : n₁ < n₂) :
     gaussianPosteriorShrinkage n₁ h < gaussianPosteriorShrinkage n₂ h :=
   shrinkage_strictMono_product n₁ h n₂ h (by positivity) (by nlinarith)
@@ -215,7 +215,7 @@ theorem shrinkage_increases_with_n (h : ℝ) (n₁ n₂ : ℝ)
 /-- **Shrinkage increases with per-SNP heritability.**
     SNPs with larger effects are shrunk less. -/
 theorem shrinkage_increases_with_h (n : ℝ) (h₁ h₂ : ℝ)
-    (h_n : 0 < n) (h_h₁ : 0 < h₁) (h_h₂ : 0 < h₂)
+    (h_n : 0 < n) (h_h₁ : 0 < h₁)
     (h_more : h₁ < h₂) :
     gaussianPosteriorShrinkage n h₁ < gaussianPosteriorShrinkage n h₂ :=
   shrinkage_strictMono_product n h₁ n h₂ (by positivity) (by nlinarith)
@@ -516,8 +516,6 @@ theorem misspec_excess_risk_nonneg (π σ_β_sq : ℝ)
 theorem prior_misspec_worse_for_sparse
     (σ_β_sq π_sparse π_poly : ℝ)
     (h_σ : 0 < σ_β_sq)
-    (h_sparse_pos : 0 < π_sparse)
-    (h_poly_pos : 0 < π_poly)
     (h_sparse_lt_half : π_sparse < 1/2)
     (h_poly_lt_half : π_poly ≤ 1/2)
     (h_sparser : π_sparse < π_poly) :
@@ -551,8 +549,8 @@ theorem prior_misspec_worse_for_sparse
 theorem portability_prior_interaction
     (σ_β_sq π_sparse π_poly : ℝ)
     (h_σ : 0 < σ_β_sq)
-    (h_sparse_pos : 0 < π_sparse) (h_sparse_lt : π_sparse < 1/2)
-    (h_poly_gt : 1/2 < π_poly) (h_poly_lt : π_poly < 1)
+    (h_sparse_lt : π_sparse < 1/2)
+    (h_poly_gt : 1/2 < π_poly)
     (h_far_enough : 1 - π_sparse < π_poly) :
     misspecExcessRisk π_poly σ_β_sq < misspecExcessRisk π_sparse σ_β_sq := by
   unfold misspecExcessRisk
@@ -677,7 +675,7 @@ section PRSCS
     about sparsity beyond the arithmetic. -/
 theorem global_shrinkage_controls_sparsity
     (M φ₁ φ₂ : ℝ)
-    (hM : 0 < M) (hφ₁ : 0 < φ₁) (hφ₂ : 0 < φ₂)
+    (hM : 0 < M) (hφ₁ : 0 < φ₁)
     (h_more_phi : φ₁ < φ₂) :
     M * (φ₁ / (1 + φ₁)) < M * (φ₂ / (1 + φ₂)) := by
   apply mul_lt_mul_of_pos_left _ hM

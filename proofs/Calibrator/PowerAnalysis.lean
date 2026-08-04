@@ -525,7 +525,7 @@ theorem invest_in_undersampled (n_large n_small delta C : ℝ)
     (h_delta : 0 < delta) (h_gap : n_small < n_large) :
     heritabilityFractionFromN (n_large + delta) C - heritabilityFractionFromN n_large C <
       heritabilityFractionFromN (n_small + delta) C - heritabilityFractionFromN n_small C :=
-  diminishing_returns n_small n_large delta C h_C h_small h_large h_delta h_gap
+  diminishing_returns n_small n_large delta C h_C h_small h_delta h_gap
 
 /-- **Multi-ancestry GWAS sum of R² is maximized by balanced allocation.**
     For two populations with equal weights and a fixed total budget `2n`,
@@ -547,7 +547,7 @@ theorem balanced_allocation_maximizes_total_utility
         heritabilityFractionFromN n C - heritabilityFractionFromN (n - delta) C := by
     simpa [sub_eq_add_neg, add_assoc, add_comm, add_left_comm] using
       (diminishing_returns (n - delta) n delta C h_C
-        h_n_minus_delta_nonneg h_n_nonneg h_delta (by linarith))
+        h_n_minus_delta_nonneg h_delta (by linarith))
   have h_sum :
       heritabilityFractionFromN (n - delta) C + heritabilityFractionFromN (n + delta) C <
         heritabilityFractionFromN n C + heritabilityFractionFromN n C := by

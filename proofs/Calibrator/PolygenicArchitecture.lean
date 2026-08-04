@@ -3,6 +3,14 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Calibrator.HaplotypeTheory
 import Calibrator.CertificateGrading
+-- `momentBodyEntropyExponent`, `hyperrectangleEntropyExponent` and
+-- `momentBody_entropy_exponent_lt` are used in the covering-exponent section
+-- below.  They were previously reached by accident, through
+-- `CertificateGrading → … → SpectralDegradation → TransportedMinimax`, and
+-- `SpectralDegradation` itself referenced nothing from `TransportedMinimax` --
+-- so dropping that unused import removed this file's only path to names it
+-- genuinely uses.  Declared here, where the use is.
+import Calibrator.TransportedMinimax
 
 namespace Calibrator
 
@@ -44,7 +52,19 @@ section EffectSizeDistribution
     Under the infinitesimal model: β² ~ Exponential(1/σ²)
     where σ² = h²/M (heritability divided by number of variants).
 
-    Empirical status: UNTESTED. -/
+    Empirical status: NOT AN EMPIRICAL CLAIM, and the two MATCHes on record for it are
+    worthless. `battery_bulk18.py` and `battery_ldsc.py` both "validated" this body by
+    drawing effects with variance `h2/M` and measuring their mean square, which tests the
+    random number generator: agreement is guaranteed by construction and the residual is
+    sampling noise. That is the GENERATIVE SELF-TEST shape `simcov/verdict.py` now refuses,
+    and neither battery declared it, so the harness scored both MATCH.
+
+    The body is the same map as `SelectionArchitecture.equalPerLocusHeritability` --
+    heritability spread equally over M loci -- so it DEFINES the equal-allocation
+    architecture rather than predicting one. The testable claim in its neighbourhood is that
+    real squared effects are exponentially distributed with this mean, which is a claim
+    about the effect-size DISTRIBUTION and is the one `spikeAndSlabVariance` below says the
+    corpus does not make. -/
 noncomputable def expectedSquaredEffect (h2 M : ℝ) : ℝ := h2 / M
 
 /-- **expectedSquaredEffect at zero M, named.** With no causal variants the heritability has
@@ -251,7 +271,24 @@ theorem effective_polygenicity_ge_one
     at all: `M_eff` cannot exceed the number of variants, which no formulation
     over two free reals can express.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: NOT AN EMPIRICAL CLAIM -- a summary statistic of the
+    effect vector, whose value is fixed by `beta` alone. There is no measurement
+    that could agree or disagree with it, and two attempts to build one
+    (`simcov/battery_bulk28.py` and `battery_bulk29.py`) returned algebra in
+    both directions rather than evidence:
+
+      * against EQUAL-MAGNITUDE effects at `k` loci the participation ratio is
+        exactly `k`, so comparing it to the count of nonzero effects agreed to
+        machine precision and the harness reported SELF-TEST;
+      * against GAUSSIAN effects at `k` loci it is `k/3`, because
+        `E[b⁴] = 3σ⁴`, so the same comparison missed by 281 sems -- a fact about
+        the fourth moment of the normal distribution, not about this body.
+
+    Both outcomes are determined before any simulation runs. What COULD carry
+    empirical content is the modelling claim that the participation ratio is the
+    right summary of an architecture -- that it predicts something about
+    discovery, transfer or power. That is a claim about a downstream use, and it
+    belongs at the definition that makes it. -/
 noncomputable def effectivePolygenicityOfEffects {q : ℕ} (beta : Fin q → ℝ) : ℝ :=
   effectivePolygenicity (∑ j, beta j ^ 2) (∑ j, beta j ^ 4)
 
@@ -337,14 +374,20 @@ namespace SNPArchitecturePortabilityModel
 
 /-- Total causal signal mass in the source architecture.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: NOT AN EMPIRICAL CLAIM. The body sums a FIELD of the structure over
+    its index set. Given the model the sum is fixed, so nothing measurable can disagree
+    with it; what is empirical is what the per-SNP squared effects are, and that is an
+    input. The corresponding claim about a real architecture -- that a sum of squared
+    effects is the additive variance under linkage equilibrium -- is
+    `TransferLearningPGS.additiveGeneticVariance`, which IS measured. -/
 noncomputable def sourceEffectMass {q : ℕ}
     (model : SNPArchitecturePortabilityModel q) : ℝ :=
   ∑ j, model.sourceSquaredEffect j
 
 /-- Total causal signal mass still retained in the target architecture.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: NOT AN EMPIRICAL CLAIM, for the same reason as
+    `sourceEffectMass`: it sums a declared field of the model. -/
 noncomputable def targetRetainedEffectMass {q : ℕ}
     (model : SNPArchitecturePortabilityModel q) : ℝ :=
   ∑ j, model.targetRetainedSquaredEffect j
@@ -359,7 +402,9 @@ theorem targetRetainedEffectMass_at_zero {q : ℕ} (model : SNPArchitecturePorta
 
 /-- Total signal mass lost across SNPs when transporting to the target.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: NOT AN EMPIRICAL CLAIM. A difference of two sums over the same
+    declared fields: the accounting identity "lost = source minus retained" is what the
+    body says, and an identity has no free coefficient for data to correct. -/
 noncomputable def lostEffectMass {q : ℕ}
     (model : SNPArchitecturePortabilityModel q) : ℝ :=
   model.sourceEffectMass - model.targetRetainedEffectMass
@@ -1037,7 +1082,7 @@ evaluated this definition. A reference point with a fractional exponent is not
 available to `norm_num` -- `(1/2) ^ (1/2)` is irrational -- so the pin is at
 exponent one, where `Real.rpow_one` gives the base back and fixes that the second
 argument is an exponent rather than a factor. -/
-theorem logCoveringAtExponent_at_unit_exponent (t : ℝ) (ht : 0 < t) :
+theorem logCoveringAtExponent_at_unit_exponent (t : ℝ) :
     logCoveringAtExponent t 1 = t := by
   unfold logCoveringAtExponent
   exact Real.rpow_one t
@@ -1089,7 +1134,27 @@ section HeritabilityPartitioning
     High enrichment means the category harbors more causal signal
     per variant.
 
-    Empirical status: UNTESTED. -/
+    Regime: a partition of variants into a category and its complement, with
+    heritability read as a sum of squared effects. The PER-VARIANT
+    normalisation is the whole content -- a category holding half the
+    heritability is enriched only relative to how many variants it holds.
+
+    Empirical status: **VALIDATED** (`simcov/battery_bulk28.py`, `group_c`).
+    Effects are drawn so a category of `M_cat` variants carries a set share of
+    the heritability, and the oracle is the REALISED ratio of per-variant
+    heritability inside the category to the genome-wide per-variant
+    heritability, computed from the drawn effects. Over category sizes 100 to
+    1000 out of 4000 and shares 0.25 to 0.5, the body predicts 10.0, 2.5, 2.0
+    and 12.0 against measured 9.34 ± 0.93, 2.45 ± 0.17, 2.00 ± 0.09 and 12.02 ±
+    1.70 -- worst cell 0.70 sems, over a prediction spanning 83%.
+
+    Power: the bare share `h2_cat / h2_total`, which omits the per-variant
+    normalisation, is carried on the same cells and is FALSIFIED at up to 16.76
+    sems (75% relative). The two agree only when a category holds exactly its
+    proportional share of variants, so the design deliberately puts the
+    category far from proportional -- that is the only regime in which the
+    normalisation is visible at all. Control: the realised total heritability
+    recovers the 0.5 it was drawn at, passing at 0.53 sems. -/
 noncomputable def heritabilityEnrichment (h2_cat M_cat h2_total M_total : ℝ) : ℝ :=
   (h2_cat / M_cat) / (h2_total / M_total)
 

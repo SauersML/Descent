@@ -211,11 +211,18 @@ side by side in the same table with the same standard errors. -/
 
 /-- **Frequency change affects additive variance.**
     When MAF changes from p to p' at a single locus,
-    the contribution to V_A changes. -/
+    the contribution to V_A changes.
+
+    The two premises that carry this are `h_freq : p₁ ≠ p₂` and
+    `h_sum : p₁ + p₂ ≠ 1`, and the second is not optional: `2p(1-p)` is
+    symmetric about `1/2`, so a reflected pair `p₂ = 1 - p₁` gives *equal*
+    additive variance at different frequencies. Four `0 < p < 1` premises used
+    to sit alongside them; a scan of the kernel-accepted proof term found that
+    none of the four occurs in the proof — the factorization
+    `(p₁ - p₂)(1 - (p₁ + p₂)) = 0` needs no range at all — and they have been
+    removed rather than left to suggest the range is what makes this work. -/
 theorem frequency_change_affects_va
     (p₁ p₂ α : ℝ)
-    (h₁ : 0 < p₁) (h₁' : p₁ < 1)
-    (h₂ : 0 < p₂) (h₂' : p₂ < 1)
     (h_freq : p₁ ≠ p₂) (h_α : α ≠ 0)
     (h_sum : p₁ + p₂ ≠ 1) :
     2 * p₁ * (1 - p₁) * α ^ 2 ≠ 2 * p₂ * (1 - p₂) * α ^ 2 := by
@@ -233,7 +240,7 @@ theorem frequency_change_affects_va
     If Ve differs, h² differs even with identical genetic architecture. -/
 theorem env_variance_changes_h2
     (V_A Ve₁ Ve₂ : ℝ)
-    (hVA : 0 < V_A) (hVe₁ : 0 < Ve₁) (hVe₂ : 0 < Ve₂)
+    (hVA : 0 < V_A) (hVe₁ : 0 < Ve₁)
     (h_diff : Ve₁ < Ve₂) :
     V_A / (V_A + Ve₂) < V_A / (V_A + Ve₁) := by
   exact div_lt_div_of_pos_left hVA (by linarith) (by linarith)
@@ -310,7 +317,7 @@ theorem mul_le_self_of_fraction_le_one
     R²_PGS_target ≤ h²_SNP × power_fraction × portability_ratio. -/
 theorem mul_mul_le_self_of_le_one_of_le_one
     (h2_snp power_frac port_ratio : ℝ)
-    (h_h2 : 0 < h2_snp) (h_power : 0 < power_frac) (h_port : 0 < port_ratio)
+    (h_h2 : 0 < h2_snp) (h_port : 0 < port_ratio)
     (h_power_le : power_frac ≤ 1) (h_port_le : port_ratio ≤ 1) :
     h2_snp * power_frac * port_ratio ≤ h2_snp := by
   calc h2_snp * power_frac * port_ratio
@@ -329,7 +336,7 @@ theorem three_way_ceiling
     (h2 gwas_power port_ratio target_r2 : ℝ)
     (h_h2_le : h2 ≤ 1) (h_power_le : gwas_power ≤ 1)
     (h_port_le : port_ratio ≤ 1)
-    (h_h2_nn : 0 ≤ h2) (h_power_nn : 0 ≤ gwas_power) (h_port_nn : 0 ≤ port_ratio)
+    (h_h2_nn : 0 ≤ h2) (h_power_nn : 0 ≤ gwas_power)
     (h_bound : target_r2 ≤ h2 * gwas_power * port_ratio) :
     target_r2 ≤ 1 := by
   have : h2 * gwas_power * port_ratio ≤ 1 := by
@@ -412,7 +419,7 @@ theorem greml_underestimates_with_poor_tagging
     alone, which the one-sided form could not support. -/
 theorem stratification_inflates_greml
     (V_A V_strat V_E : ℝ)
-    (h_VA : 0 ≤ V_A) (h_strat_pos : 0 < V_strat) (h_VE : 0 ≤ V_E)
+    (h_strat_pos : 0 < V_strat)
     (h_total : 0 < V_A + V_strat + V_E) :
     let V_P := V_A + V_strat + V_E
     let h2_true := V_A / V_P

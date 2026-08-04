@@ -640,10 +640,16 @@ theorem clippedModeError_beyond_full_correction (rootSource rootGain budget : �
 /-- **The Legendre lower bound, always true.**  A mode hiding below the noise level leaves at
 least its source minus the budget spent reaching it.  This is the half of the budget-to-noise
 dictionary that survives, and it is a conjugate relation: source minus budget times noise, not
-source evaluated at a reciprocal. -/
+source evaluated at a reciprocal.
+
+"Always true" is now literal. The statement carried a fourth premise
+`hclip : budget * noise ≤ 1`, restricting it to budgets that have not yet clipped; a scan of
+the kernel-accepted proof term found `hclip` occurring nowhere, and it cannot be needed --
+past the clip both sides only move further apart, since the left side goes negative while the
+right side floors at zero.  The premise has been removed, and the bound holds at every
+budget. -/
 theorem clippedModeError_ge_conjugate (rootSource rootGain budget noise : ℝ)
-    (hsource : 0 ≤ rootSource) (hbudget : 0 ≤ budget) (hgain : rootGain ≤ noise)
-    (hclip : budget * noise ≤ 1) :
+    (hsource : 0 ≤ rootSource) (hbudget : 0 ≤ budget) (hgain : rootGain ≤ noise) :
     rootSource * (1 - budget * noise) ≤ clippedModeError rootSource rootGain budget := by
   unfold clippedModeError
   have hmono : budget * rootGain ≤ budget * noise := mul_le_mul_of_nonneg_left hgain hbudget
@@ -688,12 +694,12 @@ it is the only half of the reciprocal dictionary that survives. -/
 theorem spectrumBudgetedError_ge_conjugate {Mode : Type*} [Fintype Mode] [Nonempty Mode]
     (rootSource rootGain : Mode → ℝ) (budget noise : ℝ) (mode : Mode)
     (hsource : 0 ≤ rootSource mode) (hbudget : 0 ≤ budget)
-    (hgain : rootGain mode ≤ noise) (hclip : budget * noise ≤ 1) :
+    (hgain : rootGain mode ≤ noise) :
     rootSource mode * (1 - budget * noise) ≤
       spectrumBudgetedError rootSource rootGain budget :=
   le_trans
     (clippedModeError_ge_conjugate (rootSource mode) (rootGain mode) budget noise hsource hbudget
-      hgain hclip)
+      hgain)
     (Finset.le_sup' (fun i ↦ clippedModeError (rootSource i) (rootGain i) budget)
       (Finset.mem_univ mode))
 

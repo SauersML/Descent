@@ -23,11 +23,16 @@ variable {Ω ι : Type*} [Fintype ι] [DecidableEq ι]
 def chiSquareBudget (P : ExpFunctional Ω) (densityRatio : Ω → ℝ) : ℝ :=
   P (fun ω ↦ (densityRatio ω - 1) ^ 2)
 
-/-- Reference evaluation: a density ratio identically one is no shift, and spends no budget. -/
-theorem chiSquareBudget_at_no_shift (P : ExpFunctional Ω) (hzero : P (fun _ ↦ 0) = 0) :
+/-- Reference evaluation: a density ratio identically one is no shift, and spends no budget.
+
+This carried a premise `hzero : P (fun _ ↦ 0) = 0`, which a scan of the kernel-accepted
+proof term found unused -- and it has to be, because `ExpFunctional.eval_zero` is a `simp`
+lemma proving exactly that from homogeneity. A reference evaluation whose value is
+conditional on a supplied equation is not pinning anything, so the premise is gone. -/
+theorem chiSquareBudget_at_no_shift (P : ExpFunctional Ω) :
     chiSquareBudget P (fun _ ↦ 1) = 0 := by
   unfold chiSquareBudget
-  simpa using hzero
+  simp
 
 
 /-- Residual curvature seen along a coefficient direction. -/

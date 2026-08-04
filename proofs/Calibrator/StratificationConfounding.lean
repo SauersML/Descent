@@ -464,8 +464,7 @@ noncomputable def SurvivorshipModel.pSurv (m : SurvivorshipModel) : ℝ :=
 /-- **Neutral survival leaves the frequency untouched.** At `s = 1` carriers and non-carriers
 survive alike and the post-selection frequency is the starting one; that is the fixed point which
 fixes the form, and a body with any other numerator would still be a frequency in `[0,1]`. -/
-theorem SurvivorshipModel.pSurv_neutral (m : SurvivorshipModel) (hs : m.s = 1)
-    (h : m.p₀ * 1 + (1 - m.p₀) ≠ 0) :
+theorem SurvivorshipModel.pSurv_neutral (m : SurvivorshipModel) (hs : m.s = 1) :
     m.pSurv = m.p₀ := by
   unfold SurvivorshipModel.pSurv
   rw [hs]

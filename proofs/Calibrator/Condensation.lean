@@ -233,7 +233,7 @@ theorem criticalDegree_zero_c_is_junk (N : ℝ) :
 Squaring the panel size doubles the critical degree at fixed coupling, and halving the coupling
 doubles it at fixed panel: the two enter at different orders, which is the content a body
 multiplying them symmetrically would lose. -/
-theorem criticalDegree_square (N c : ℝ) (hN : 0 < N) :
+theorem criticalDegree_square (N c : ℝ) :
     criticalDegree (N ^ 2) c = 2 * criticalDegree N c := by
   unfold criticalDegree
   rw [Real.log_pow]
