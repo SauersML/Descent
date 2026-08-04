@@ -363,6 +363,18 @@ theorem epistatic_variance_pairwise_nonneg (γ p₁ p₂ : ℝ)
     · nlinarith
   · nlinarith
 
+/-- **Exact zero fiber of pairwise epistatic variance.**  The component vanishes exactly when
+the interaction effect is zero or at least one locus is monomorphic. -/
+theorem epistaticVariancePairwise_eq_zero_iff (γ p₁ p₂ : ℝ) :
+    epistaticVariancePairwise γ p₁ p₂ = 0 ↔
+      γ = 0 ∨ p₁ = 0 ∨ p₁ = 1 ∨ p₂ = 0 ∨ p₂ = 1 := by
+  unfold epistaticVariancePairwise
+  simp [eq_comm]
+  have hp₁ : 0 = 1 - p₁ ↔ p₁ = 1 := by constructor <;> intro h <;> linarith
+  have hp₂ : 0 = 1 - p₂ ↔ p₂ = 1 := by constructor <;> intro h <;> linarith
+  rw [hp₁, hp₂]
+  tauto
+
 /-- **Epistatic variance changes faster than additive variance under drift.**
     Because epistatic variance depends on the product of two heterozygosities,
     it changes approximately twice as fast as additive variance. -/
