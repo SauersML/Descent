@@ -364,6 +364,52 @@ theorem finiteEnvironmentCovariancePool_energy
   ring
 
 omit [DecidableEq ι] in
+/-- **Active-environment kernel law.** With merely nonnegative sampling weights, the pooled
+kernel is the intersection of the kernels of exactly those environments assigned positive
+weight. Zero-weight environments contribute neither information nor constraints. -/
+theorem finiteEnvironmentCovariancePool_mulVec_eq_zero_iff_active
+    {κ : Type*} [Fintype κ]
+    (weight : κ → ℝ) (covariance : κ → Matrix ι ι ℝ)
+    (hweight : ∀ environment, 0 ≤ weight environment)
+    (hnonneg : ∀ environment shift,
+      0 ≤ dot shift ((covariance environment).mulVec shift))
+    (hzero : ∀ environment shift,
+      dot shift ((covariance environment).mulVec shift) = 0 ↔
+        (covariance environment).mulVec shift = 0)
+    (shift : ι → ℝ) :
+    (finiteEnvironmentCovariancePool weight covariance).mulVec shift = 0 ↔
+      ∀ environment, 0 < weight environment →
+        (covariance environment).mulVec shift = 0 := by
+  classical
+  constructor
+  · intro hpool environment hactive
+    have henergySum :
+        ∑ environment, weight environment *
+          dot shift ((covariance environment).mulVec shift) = 0 := by
+      rw [← finiteEnvironmentCovariancePool_energy weight covariance shift, hpool]
+      simp [dot]
+    have htermNonneg : ∀ environment ∈ (Finset.univ : Finset κ),
+        0 ≤ weight environment * dot shift ((covariance environment).mulVec shift) := by
+      intro environment _
+      exact mul_nonneg (hweight environment) (hnonneg environment shift)
+    have hweightedZero :=
+      (Finset.sum_eq_zero_iff_of_nonneg htermNonneg).mp henergySum
+        environment (Finset.mem_univ environment)
+    have henergyZero : dot shift ((covariance environment).mulVec shift) = 0 :=
+      (mul_eq_zero.mp hweightedZero).resolve_left hactive.ne'
+    exact (hzero environment shift).mp henergyZero
+  · intro hkernel
+    rw [finiteEnvironmentCovariancePool_mulVec]
+    ext i
+    apply Finset.sum_eq_zero
+    intro environment _
+    rcases (hweight environment).eq_or_lt with hweightZero | hweightPos
+    · rw [← hweightZero]
+      simp
+    · rw [hkernel environment hweightPos]
+      simp
+
+omit [DecidableEq ι] in
 /-- **Finite-panel kernel-intersection law.** For any finite collection of PSD covariance
 environments with strictly positive sampling weights, pooling shrinks nonidentifiability to the
 intersection of all environmental kernels. No number of positive-semidefinite environments can
@@ -380,28 +426,13 @@ theorem finiteEnvironmentCovariancePool_mulVec_eq_zero_iff
     (shift : ι → ℝ) :
     (finiteEnvironmentCovariancePool weight covariance).mulVec shift = 0 ↔
       ∀ environment, (covariance environment).mulVec shift = 0 := by
-  classical
+  rw [finiteEnvironmentCovariancePool_mulVec_eq_zero_iff_active
+    weight covariance (fun environment ↦ (hweight environment).le) hnonneg hzero shift]
   constructor
-  · intro hpool environment
-    have henergySum :
-        ∑ environment, weight environment *
-          dot shift ((covariance environment).mulVec shift) = 0 := by
-      rw [← finiteEnvironmentCovariancePool_energy weight covariance shift, hpool]
-      simp [dot]
-    have htermNonneg : ∀ environment ∈ (Finset.univ : Finset κ),
-        0 ≤ weight environment * dot shift ((covariance environment).mulVec shift) := by
-      intro environment _
-      exact mul_nonneg (hweight environment).le (hnonneg environment shift)
-    have hweightedZero :=
-      (Finset.sum_eq_zero_iff_of_nonneg htermNonneg).mp henergySum
-        environment (Finset.mem_univ environment)
-    have henergyZero : dot shift ((covariance environment).mulVec shift) = 0 :=
-      (mul_eq_zero.mp hweightedZero).resolve_left (hweight environment).ne'
-    exact (hzero environment shift).mp henergyZero
-  · intro hkernel
-    rw [finiteEnvironmentCovariancePool_mulVec]
-    ext i
-    simp [hkernel]
+  · intro hactive environment
+    exact hactive environment (hweight environment)
+  · intro hkernel environment _
+    exact hkernel environment
 
 omit [DecidableEq ι] in
 /-- A direction detected by at least one positively weighted environment cannot remain in the
