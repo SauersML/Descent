@@ -387,6 +387,14 @@ section DiscoveryBias
     this corpus already had to repair. -/
 def hweHeterozygosity (p : ℝ) : ℝ := 2 * p * (1 - p)
 
+/-- **hweHeterozygosity pinned at the frequency of maximum heterozygosity.** At
+`p = 1 / 2` it is `1 / 2`, the textbook maximum, which fixes the factor of two
+against `p * (1 - p)`. -/
+theorem hweHeterozygosity_at_reference_point :
+    hweHeterozygosity (1 / 2) = 1 / 2 := by
+  unfold hweHeterozygosity
+  norm_num
+
 /-- **Heterozygosity peaks at one half, where it equals one half.** The coincidence with the
 genotype variance recorded below is an identity between two bodies and does not fix either of
 them; the value at the interior maximum does, and it is the only point at which a mistaken factor

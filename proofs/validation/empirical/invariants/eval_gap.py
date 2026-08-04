@@ -53,7 +53,11 @@ DEF_RE = re.compile(
 THM_RE = re.compile(r"^\s*(?:@\[[^\]]*\]\s*)?(?:theorem|lemma)\s", re.M)
 # `name applied-to-things = rhs`, with no comparison operator in between so that
 # `f x ≤ g y = ...` does not read as an evaluation of `f`.
-EVAL_RE = re.compile(r"\b([a-z][A-Za-z0-9_']{3,})\b[^\n=<>≤≥≠]*=\s*([^\n]+)")
+#
+# The name pattern used to require four characters, so `ppv` and `qst` could
+# never be recognised as pinned however many theorems evaluated them. Both were
+# carrying a reference evaluation and being reported as open work.
+EVAL_RE = re.compile(r"\b([a-z][A-Za-z0-9_']+)\b[^\n=<>≤≥≠]*=\s*([^\n]+)")
 
 
 def real_defs() -> dict[str, tuple[pathlib.Path, str]]:
