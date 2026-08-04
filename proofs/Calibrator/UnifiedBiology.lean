@@ -264,11 +264,23 @@ target context reproduces it across the two dynamics, so a temporal criterion is
 the pair (context, population).  The target-only annotation of the previous theorem does descend:
 descent, not sensitivity, is what separates the two quantities. -/
 theorem not_descends_contextMatchQuality_along_targetState :
-    ¬ DescendsAlong (fun g : TransportPair ↦ g.2) binaryTransportFamily
+  ¬ DescendsAlong (fun g : TransportPair ↦ g.2) binaryTransportFamily
       (conditionalSectionMean (fun g : TransportPair ↦ contextMatchQuality g.1 g.2)) := by
   rintro ⟨value, hvalue⟩
-  have hpersist := hvalue true 0 (by rw [labelMass_binaryTransportFamily]; norm_num)
-  have hswitch := hvalue false 0 (by rw [labelMass_binaryTransportFamily]; norm_num)
+  have hpersist := hvalue true 0 (by
+    change labelMass (fun g : TransportPair ↦ g.2) (binaryTransportFamily true) 0 ≠ 0
+    rw [labelMass_binaryTransportFamily]
+    norm_num)
+  have hswitch := hvalue false 0 (by
+    change labelMass (fun g : TransportPair ↦ g.2) (binaryTransportFamily false) 0 ≠ 0
+    rw [labelMass_binaryTransportFamily]
+    norm_num)
+  change conditionalSectionMean (fun g : TransportPair ↦ contextMatchQuality g.1 g.2)
+      (fiberConditional (fun g : TransportPair ↦ g.2) (binaryTransportFamily true) 0) = value 0
+    at hpersist
+  change conditionalSectionMean (fun g : TransportPair ↦ contextMatchQuality g.1 g.2)
+      (fiberConditional (fun g : TransportPair ↦ g.2) (binaryTransportFamily false) 0) = value 0
+    at hswitch
   rw [contextMatchQuality_value_persistent] at hpersist
   rw [contextMatchQuality_value_switching] at hswitch
   rw [← hpersist] at hswitch

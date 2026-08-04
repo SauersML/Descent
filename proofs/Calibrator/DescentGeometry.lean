@@ -89,16 +89,16 @@ noncomputable def totalVariationGap (μ ν : Genome → ℝ) : ℝ := ∑ g, |μ
 /-- `b` **descends along** the label map `π` over the family `P` when one label function
 reproduces the value of `b` on every member's fiber conditional, at every label that member
 charges.  This is the property a group-level report claims. -/
-def DescendsAlong (π : Genome → Label) (P : Population → Genome → ℝ)
+abbrev DescendsAlong (π : Genome → Label) (P : Population → Genome → ℝ)
     (b : (Genome → ℝ) → Value) : Prop :=
-  ∃ value : Label → Value,
-    ∀ i x, labelMass π (P i) x ≠ 0 → b (fiberConditional π (P i) x) = value x
+  DescendsOn (fun i x ↦ labelMass π (P i) x ≠ 0)
+    (fun i x ↦ fiberConditional π (P i) x) b
 
 /-- Two populations agree wherever both charge the label: the local layer of descent. -/
-def PairwiseConsistent (π : Genome → Label) (P : Population → Genome → ℝ)
+abbrev PairwiseConsistent (π : Genome → Label) (P : Population → Genome → ℝ)
     (b : (Genome → ℝ) → Value) : Prop :=
-  ∀ i j x, labelMass π (P i) x ≠ 0 → labelMass π (P j) x ≠ 0 →
-    b (fiberConditional π (P i) x) = b (fiberConditional π (P j) x)
+  PairwiseCompatibleOn (fun i x ↦ labelMass π (P i) x ≠ 0)
+    (fun i x ↦ fiberConditional π (P i) x) b
 
 /-- The family shares one conditional law on each charged fiber: sufficiency of the label, stated
 without reference to any functional. -/
@@ -157,33 +157,14 @@ resolution there is no additional gluing obstruction because counting measure do
 member. -/
 theorem descendsAlong_iff_pairwiseConsistent (π : Genome → Label)
     (P : Population → Genome → ℝ) (b : (Genome → ℝ) → Value) :
-    DescendsAlong π P b ↔ PairwiseConsistent π P b ∧ Nonempty (Label → Value) := by
-  constructor
-  · rintro ⟨value, hvalue⟩
-    refine ⟨?_, ⟨value⟩⟩
-    intro i j x hi hj
-    rw [hvalue i x hi, hvalue j x hj]
-  · rintro ⟨hpair, ⟨defaultWitness⟩⟩
-    classical
-    refine ⟨fun x ↦ if h : ∃ i, labelMass π (P i) x ≠ 0 then
-      b (fiberConditional π (P (Classical.choose h)) x) else defaultWitness x, ?_⟩
-    intro i x hi
-    have hex : ∃ i, labelMass π (P i) x ≠ 0 := ⟨i, hi⟩
-    show b (fiberConditional π (P i) x) =
-      if h : ∃ i, labelMass π (P i) x ≠ 0 then
-        b (fiberConditional π (P (Classical.choose h)) x) else defaultWitness x
-    rw [dif_pos hex]
-    exact hpair i (Classical.choose hex) x hi (Classical.choose_spec hex)
+    DescendsAlong π P b ↔ PairwiseConsistent π P b ∧ Nonempty (Label → Value) :=
+  descendsOn_iff_pairwiseCompatibleOn _ _ b
 
 /-- For an inhabited codomain, finite descent is precisely pairwise consistency. -/
 theorem descendsAlong_iff_pairwiseConsistent_of_nonempty [Nonempty Value]
     (π : Genome → Label) (P : Population → Genome → ℝ) (b : (Genome → ℝ) → Value) :
-    DescendsAlong π P b ↔ PairwiseConsistent π P b := by
-  constructor
-  · exact fun h ↦ ((descendsAlong_iff_pairwiseConsistent π P b).mp h).1
-  · intro h
-    exact (descendsAlong_iff_pairwiseConsistent π P b).mpr
-      ⟨h, ⟨fun _ ↦ Classical.choice (inferInstance : Nonempty Value)⟩⟩
+    DescendsAlong π P b ↔ PairwiseConsistent π P b :=
+  descendsOn_iff_pairwiseCompatibleOn_of_nonempty _ _ b
 
 /-- **The sufficiency pole.**  If the family shares one conditional on every charged fiber then
 every functional descends: no property of the functional is involved. -/
@@ -194,6 +175,7 @@ theorem descendsAlong_of_kernelSufficient (π : Genome → Label)
   rw [descendsAlong_iff_pairwiseConsistent]
   refine ⟨?_, ⟨defaultWitness⟩⟩
   intro i j x hi hj
+  change b (fiberConditional π (P i) x) = b (fiberConditional π (P j) x)
   rw [hK i j x hi hj]
 
 /-- The converse half of the pole: descent of the identity functional *is* kernel sufficiency, so
@@ -345,7 +327,11 @@ theorem labelFunction_of_descends_pointLaws [DecidableEq Genome] (π : Genome �
     ∃ u : Label → ℝ, ∀ g, f g = u (π g) := by
   obtain ⟨value, hvalue⟩ := h
   refine ⟨value, fun g ↦ ?_⟩
-  have hg := hvalue g (π g) (by rw [labelMass_pointLaw]; norm_num)
+  have hg := hvalue g (π g) (by
+    change labelMass π (pointLaw g) (π g) ≠ 0
+    rw [labelMass_pointLaw]
+    norm_num)
+  change conditionalSectionMean f (fiberConditional π (pointLaw g) (π g)) = value (π g) at hg
   rw [fiberConditional_pointLaw, conditionalSectionMean_pointLaw] at hg
   exact hg
 

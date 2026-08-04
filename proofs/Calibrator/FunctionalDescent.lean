@@ -12,16 +12,17 @@ open scoped BigOperators
 # Functional descent across populations
 
 A functional of a conditional biological law need not be a function of the retained covariate.
-This module formalizes the finite, exact core of that question.  A `section` gives the conditional
-law realized by population `P` above retained context `x`; `mass P x` says whether that version is
-observable.  `FunctionalDescends mass section b` means that one population-independent function of
-`x` evaluates `b` on every realized section.
+This module formalizes the set-level core of that question.  `DescendsOn supported section b`
+allows any observability relation: positive probability, nonzero mass, assay detectability, or
+study eligibility.  A `section` gives the conditional law realized by population `P` above
+retained context `x`; `supported P x` says whether that version is observable.  The familiar
+`FunctionalDescends mass section b` is exactly the positive-mass specialization.
 
 The support condition is essential.  Conditional laws are only canonical where the corresponding
-marginal has positive mass, so comparisons are made only on overlap.  On finite spaces all
-functions are measurable and the global uniformization obstruction disappears; consequently
-pairwise overlap consistency is both necessary and sufficient.  This is the exact finite analogue
-of the dominated theorem, not a claim that undominated standard-Borel gluing is automatic.
+marginal has positive mass, so comparisons are made only on overlap.  Without a measurability
+requirement, pairwise compatibility plus inhabitation of the total witness-function space is
+necessary and sufficient.  On finite measurable spaces this is the exact dominated analogue; it
+is not a claim that undominated standard-Borel gluing is automatic.
 
 For polygenic-score portability, `x` can be an ancestry summary or score bin, `P` a cohort,
 `section P x` the conditional genotype/phenotype law, and `b` risk, calibration, variance, or a
@@ -33,51 +34,87 @@ section Descent
 
 variable {Population Context Conditional Value : Type*}
 
-/-- A conditional functional descends when one context function agrees with it on every
-population/context pair carrying positive marginal mass. -/
-def FunctionalDescends (mass : Population → Context → ℝ)
+/-- A functional descends on an arbitrary observability relation when one total context function
+agrees with it at every supported population/context pair.  Nothing here requires that support
+come from a real-valued mass; positive probability, nonzero finite mass, censoring eligibility,
+and assay detectability are all instances of the same calculus. -/
+def DescendsOn (supported : Population → Context → Prop)
     (conditionalSection : Population → Context → Conditional) (b : Conditional → Value) : Prop :=
-  ∃ witness : Context → Value, ∀ P x, 0 < mass P x → b (conditionalSection P x) = witness x
+  ∃ witness : Context → Value, ∀ P x, supported P x → b (conditionalSection P x) = witness x
 
-/-- The canonical local condition: two versions are compared only where both populations put
-positive marginal mass. -/
-def OverlapConsistent (mass : Population → Context → ℝ)
+/-- The local compatibility condition for an arbitrary observability relation. -/
+def PairwiseCompatibleOn (supported : Population → Context → Prop)
     (conditionalSection : Population → Context → Conditional) (b : Conditional → Value) : Prop :=
-  ∀ P Q x, 0 < mass P x → 0 < mass Q x →
+  ∀ P Q x, supported P x → supported Q x →
     b (conditionalSection P x) = b (conditionalSection Q x)
 
-/-- Descent always implies consistency on overlap.  At a common atom this is exact pointwise
-equality, not equality of arbitrarily selected off-support versions. -/
-theorem overlapConsistent_of_descends (mass : Population → Context → ℝ)
+/-- Descent always implies pairwise compatibility wherever both populations are observable. -/
+theorem pairwiseCompatibleOn_of_descendsOn (supported : Population → Context → Prop)
     (conditionalSection : Population → Context → Conditional) (b : Conditional → Value)
-    (h : FunctionalDescends mass conditionalSection b) :
-    OverlapConsistent mass conditionalSection b := by
+    (h : DescendsOn supported conditionalSection b) :
+    PairwiseCompatibleOn supported conditionalSection b := by
   obtain ⟨witness, hw⟩ := h
   intro P Q x hP hQ
   rw [hw P x hP, hw Q x hQ]
 
-/-- **Finite/dominated gluing theorem.**  With no measurability obstruction, pairwise overlap
-consistency constructs a single witness by choosing any population present at each context.
+/-- **Set-level gluing theorem.**  With no measurability requirement, pairwise compatibility
+constructs a witness by choosing any observable population at each context.
 
 The proof does not store a theorem inside model data and does not choose a conditional off its
-support: the arbitrary default is used only at contexts with zero mass in every population. -/
-theorem descends_of_overlapConsistent
-    (mass : Population → Context → ℝ)
+support: the arbitrary default is used only at contexts unsupported by every population. -/
+theorem descendsOn_of_pairwiseCompatibleOn
+    (supported : Population → Context → Prop)
     (conditionalSection : Population → Context → Conditional) (b : Conditional → Value)
     (defaultWitness : Context → Value)
-    (h : OverlapConsistent mass conditionalSection b) :
-    FunctionalDescends mass conditionalSection b := by
+    (h : PairwiseCompatibleOn supported conditionalSection b) :
+    DescendsOn supported conditionalSection b := by
   classical
   let witness : Context → Value := fun x ↦
-    if hx : ∃ P, 0 < mass P x then b (conditionalSection (Classical.choose hx) x)
+    if hx : ∃ P, supported P x then b (conditionalSection (Classical.choose hx) x)
     else defaultWitness x
   refine ⟨witness, ?_⟩
   intro P x hP
-  have hx : ∃ Q, 0 < mass Q x := ⟨P, hP⟩
+  have hx : ∃ Q, supported Q x := ⟨P, hP⟩
   rw [show witness x = b (conditionalSection (Classical.choose hx) x) by simp [witness, hx]]
   exact h P (Classical.choose hx) x hP (Classical.choose_spec hx)
 
-/-- **Exact gluing characterization.**  Pairwise consistency is the only compatibility
+/-- **Exact gluing characterization.**  Pairwise compatibility is the only local condition.
+The witness-space conjunct is the exact global existence condition, including empty types. -/
+theorem descendsOn_iff_pairwiseCompatibleOn
+    (supported : Population → Context → Prop)
+    (conditionalSection : Population → Context → Conditional) (b : Conditional → Value) :
+    DescendsOn supported conditionalSection b ↔
+      PairwiseCompatibleOn supported conditionalSection b ∧ Nonempty (Context → Value) := by
+  constructor
+  · intro h
+    exact ⟨pairwiseCompatibleOn_of_descendsOn supported conditionalSection b h, ⟨h.choose⟩⟩
+  · rintro ⟨h, ⟨defaultWitness⟩⟩
+    exact descendsOn_of_pairwiseCompatibleOn supported conditionalSection b defaultWitness h
+
+/-- With an inhabited codomain, descent on any support relation is exactly pairwise
+compatibility. -/
+theorem descendsOn_iff_pairwiseCompatibleOn_of_nonempty [Nonempty Value]
+    (supported : Population → Context → Prop)
+    (conditionalSection : Population → Context → Conditional) (b : Conditional → Value) :
+    DescendsOn supported conditionalSection b ↔
+      PairwiseCompatibleOn supported conditionalSection b := by
+  constructor
+  · exact pairwiseCompatibleOn_of_descendsOn supported conditionalSection b
+  · intro h
+    exact (descendsOn_iff_pairwiseCompatibleOn supported conditionalSection b).mpr
+      ⟨h, ⟨fun _ ↦ Classical.choice (inferInstance : Nonempty Value)⟩⟩
+
+/-- Positive marginal mass is the standard probabilistic support relation. -/
+abbrev FunctionalDescends (mass : Population → Context → ℝ)
+    (conditionalSection : Population → Context → Conditional) (b : Conditional → Value) : Prop :=
+  DescendsOn (fun P x ↦ 0 < mass P x) conditionalSection b
+
+/-- Pairwise compatibility on the overlap of positive-mass contexts. -/
+abbrev OverlapConsistent (mass : Population → Context → ℝ)
+    (conditionalSection : Population → Context → Conditional) (b : Conditional → Value) : Prop :=
+  PairwiseCompatibleOn (fun P x ↦ 0 < mass P x) conditionalSection b
+
+/-- **Exact positive-mass characterization.**  Pairwise consistency is the only compatibility
 condition.  The additional conjunct is not biological: it is the logically necessary ability to
 define a total witness on contexts unsupported by every population.  Stating it as
 `Nonempty (Context → Value)` is sharp, including the edge case where `Context` is empty and
@@ -86,12 +123,8 @@ theorem functionalDescends_iff_overlapConsistent
     (mass : Population → Context → ℝ)
     (conditionalSection : Population → Context → Conditional) (b : Conditional → Value) :
     FunctionalDescends mass conditionalSection b ↔
-      OverlapConsistent mass conditionalSection b ∧ Nonempty (Context → Value) := by
-  constructor
-  · intro h
-    exact ⟨overlapConsistent_of_descends mass conditionalSection b h, ⟨h.choose⟩⟩
-  · rintro ⟨h, ⟨defaultWitness⟩⟩
-    exact descends_of_overlapConsistent mass conditionalSection b defaultWitness h
+      OverlapConsistent mass conditionalSection b ∧ Nonempty (Context → Value) :=
+  descendsOn_iff_pairwiseCompatibleOn _ conditionalSection b
 
 /-- In the ordinary case of an inhabited value space, the witness-space obstruction is
 automatic and descent is exactly pairwise overlap consistency. -/
@@ -100,11 +133,7 @@ theorem functionalDescends_iff_overlapConsistent_of_nonempty [Nonempty Value]
     (conditionalSection : Population → Context → Conditional) (b : Conditional → Value) :
     FunctionalDescends mass conditionalSection b ↔
       OverlapConsistent mass conditionalSection b := by
-  constructor
-  · exact overlapConsistent_of_descends mass conditionalSection b
-  · intro h
-    exact (functionalDescends_iff_overlapConsistent mass conditionalSection b).mpr
-      ⟨h, ⟨fun _ ↦ Classical.choice (inferInstance : Nonempty Value)⟩⟩
+  exact descendsOn_iff_pairwiseCompatibleOn_of_nonempty _ conditionalSection b
 
 /-- **Kernel sufficiency is the all-functionals pole.**  If every population uses one shared
 conditional section on its support, every functional descends, with no regularity assumption on
