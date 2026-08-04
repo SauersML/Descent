@@ -947,6 +947,15 @@ noncomputable def hweMellinJetVariance (q : ℝ) : ℝ :=
       2 * q * (1 - q) * (Real.log (2 * (1 - q) / q)) ^ 2 -
     hweMellinDrift q ^ 2
 
+/-- At fixation every logarithm argument collapses to Mathlib's junk `0` and every prefactor
+vanishes with it, so the jet variance reports minus the squared drift.  A monomorphic locus has
+no Mellin jet at all; the biological range is `0 < q < 1`. -/
+theorem hweMellinJetVariance_at_fixation_is_junk :
+    hweMellinJetVariance 1 = -(hweMellinDrift 1 ^ 2) := by
+  unfold hweMellinJetVariance
+  norm_num
+
+
 /-- **The jet variance of a Hardy-Weinberg locus in closed form.** -/
 theorem HardyWeinbergModel.mellinJetVariance_eq (h : HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :

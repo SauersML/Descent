@@ -82,7 +82,9 @@ THM_RE = re.compile(
 DIV_RE = re.compile(r"/(?!-)")
 LOG_RE = re.compile(r"Real\.log")
 SQRT_RE = re.compile(r"Real\.sqrt")
-INV_RE = re.compile(r"⁻¹")
+# `⁻¹'` is Set.preimage, not `Inv.inv`: `(F.curve j) ⁻¹' S` inverts nothing and has no
+# junk value.  Without the negative lookahead `peelSet` was reported as inverse-capable.
+INV_RE = re.compile(r"⁻¹(?!')")
 # `x ^ (n : ℤ)` is junk at `x = 0` for negative `n`, and Lean will not say so.
 ZPOW_RE = re.compile(r"\^\s*\(\s*-|\^\s*\([A-Za-z_][A-Za-z0-9_']*\s*:\s*ℤ")
 
@@ -266,6 +268,11 @@ def scan() -> tuple[collections.Counter, list[tuple[str, str, str]]]:
         junk_thms = {t for t in THM_RE.findall(txt) if "junk" in t.lower()}
         for m in DEF_RE.finditer(txt):
             name, sig, body = m.group(1), m.group(2), m.group(3)
+            # A `Prop`-valued body is a statement, not a value: any quotient inside it sits
+            # under the quantifiers and hypotheses of that statement, which carry their own
+            # guard.  `hasInteraction` divides by `p₂ - p₁` under an explicit `p₁ ≠ p₂`.
+            if re.search(r":\s*Prop\s*$", " ".join(sig.split())):
+                continue
             kinds = guards(body)
             if not kinds:
                 continue

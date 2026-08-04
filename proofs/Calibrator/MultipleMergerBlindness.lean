@@ -196,6 +196,16 @@ noncomputable def speedTiltNonMergerFactor (β : ℝ) (k extra : ℕ) : ℝ :=
   ∏ j ∈ Finset.range extra,
     (β + (j : ℝ) + 1) / (β + (k : ℝ) + (j : ℝ))
 
+/-- Where the first factor's denominator vanishes Mathlib returns `0` for the whole product, so
+every survival penalty is reported as total. -/
+theorem speedTiltNonMergerFactor_at_zero_first_denominator_is_junk
+    (β : ℝ) (k extra : ℕ) (hzero : β + (k : ℝ) = 0) :
+    speedTiltNonMergerFactor β k (extra + 1) = 0 := by
+  unfold speedTiltNonMergerFactor
+  rw [Finset.prod_range_succ']
+  simp [hzero]
+
+
 /-- No outside lineage contributes no survival penalty. -/
 @[simp] theorem speedTiltNonMergerFactor_zero (β : ℝ) (k : ℕ) :
     speedTiltNonMergerFactor β k 0 = 1 := by

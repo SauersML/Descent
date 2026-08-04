@@ -437,6 +437,16 @@ noncomputable def diagonalSquareNoisePrecision {d : ℕ}
   Matrix.diagonal fun i ↦
     1 / centeredSquareVarianceFromMoments (secondMoment i) (fourthMoment i)
 
+/-- A channel with no centered-square variance gets Mathlib's junk precision `0` on the
+diagonal, which reads as infinite noise rather than as an undefined channel. -/
+theorem diagonalSquareNoisePrecision_at_zero_variance_is_junk {d : ℕ}
+    (secondMoment fourthMoment : Fin d → ℝ) (i : Fin d)
+    (hzero : centeredSquareVarianceFromMoments (secondMoment i) (fourthMoment i) = 0) :
+    diagonalSquareNoisePrecision secondMoment fourthMoment i i = 0 := by
+  unfold diagonalSquareNoisePrecision
+  rw [Matrix.diagonal_apply_eq, hzero, div_zero]
+
+
 /-- Positive square-noise variance in every independent channel makes the induced
 diagonal precision positive definite. -/
 theorem diagonalSquareNoisePrecision_posDef {d : ℕ}

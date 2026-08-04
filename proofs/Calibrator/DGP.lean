@@ -270,6 +270,17 @@ noncomputable def sourceBestLinearWeightsFromLD {c t : ℕ}
     (mom : SourceTaggedMoments c t) (betaCausal : CausalVec c) : TagVec t :=
   mom.sigmaTagSource⁻¹.mulVec (mom.sigmaTagCausal.mulVec betaCausal)
 
+/-- A singular source tag covariance has Mathlib inverse `0`, so the best linear weights are the
+zero predictor.  That is a legitimate weight vector, so a rank-deficient tag panel reports
+"predict nothing" rather than "not identified". -/
+theorem sourceBestLinearWeightsFromLD_at_singular_is_junk {c t : ℕ}
+    (mom : SourceTaggedMoments c t) (betaCausal : CausalVec c)
+    (hsingular : ¬ IsUnit mom.sigmaTagSource.det) :
+    sourceBestLinearWeightsFromLD mom betaCausal = 0 := by
+  unfold sourceBestLinearWeightsFromLD
+  rw [Matrix.nonsing_inv_apply_not_isUnit _ hsingular, Matrix.zero_mulVec]
+
+
 /-- Frobenius norm squared for a square covariance matrix:
 `‖A‖_F² = Σᵢ Σⱼ Aᵢⱼ²`. -/
 noncomputable def frobeniusNormSq {t : ℕ}

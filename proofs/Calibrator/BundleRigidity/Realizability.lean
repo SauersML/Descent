@@ -122,6 +122,14 @@ theorem block_mass_one (q : Fin B → ℝ) (hq : ∑ b, q b = 1) :
 noncomputable def outerAtom (w : ℝ) : ℝ := Real.sqrt (1 + w)
 noncomputable def innerAtom (w : ℝ) : ℝ := Real.sqrt (1 - w)
 
+/-- Below the admissible range the radicand is nonpositive and Mathlib's square root is `0`, so
+the outer atom reports zero amplitude rather than an inadmissible weight. -/
+theorem outerAtom_at_inadmissible_weight_is_junk (w : ℝ) (hw : w ≤ -1) :
+    outerAtom w = 0 := by
+  unfold outerAtom
+  exact Real.sqrt_eq_zero_of_nonpos (by linarith)
+
+
 theorem outerAtom_sq {w : ℝ} (hw : 0 ≤ w) : outerAtom w ^ 2 = 1 + w := by
   exact Real.sq_sqrt (by linarith)
 
