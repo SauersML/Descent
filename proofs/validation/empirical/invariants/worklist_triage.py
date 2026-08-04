@@ -33,6 +33,44 @@ and report what `check_theorems` decided about each:
   unstated           nothing mentions it. Only this group needs a theorem
                      written from scratch.
 
+EIGHT WAYS A DEFINITION LOOKS COVERED AND IS NOT
+
+The `checker-blind` group is the interesting one, and across roughly eighty
+repairs it has come in eight shapes.  Each is a theorem that holds, that a reader
+would take as verification, and that a whole family of wrong bodies also
+satisfies.  Listed with what each fixes and what it leaves free:
+
+  restatement (`rfl`)        nothing at all; true of every body by construction
+  one-sided surd bound       a sign; not the sign-flipped constant, which usually
+                             lands on the same side of zero
+  invariance / symmetry      the structure; not the constant.  Twice a ratio is
+                             still unit-invariant, twice a distance still
+                             symmetric with the same vanishing criterion
+  vanishing criterion        where it is zero; not the slope through that zero
+  growth or decay rate       the direction; not the rate.  A decay theorem holds
+                             for EVERY decreasing function, so it constrains no
+                             exponent -- the most common case in this corpus, and
+                             the one where the docstring most often claims a rate
+  monotone cluster           the direction across several related quantities; no
+                             scale for any of them
+  cross-identity             the two definitions JOINTLY and neither alone.  If
+                             both carry the same wrong factor it cancels and the
+                             identity survives untouched
+  fixed-point / recurrence   invariant under exactly the rescaling it should
+                             exclude: the equilibrium of `c * f` is a fixed point
+                             of the recurrence for every `c`, since `c` appears
+                             on both sides
+
+The repair is the same in all eight: EVALUATE AT THE ARGUMENT WHERE THE WRONG
+BODIES DISAGREE.  Usually a fixed point, an interior maximum, an endpoint of the
+parameter range, or a reference value at which one term drops out.  Multiplying a
+denominator back is the same move for ratios.
+
+A corollary worth stating separately: constraints on DERIVED quantities do not
+reach the base.  `dosageTransportBias` and `haplotypeTransportBias` are both
+differences of `averagePhaseInteraction`, and bounding both differences leaves the
+interpolation they are built from unpinned.
+
 Run after check_theorems.py:
 
     python3 worklist_triage.py            # counts
