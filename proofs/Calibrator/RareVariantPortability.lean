@@ -299,6 +299,19 @@ admissible parameter, including the weak-constraint regime `s < mu` where
 noncomputable def mutationSelectionBalance (mu s h : ℝ) : ℝ :=
   mu / (h * s + mu)
 
+/-- **Without selection nothing holds the allele down.**
+
+At `h * s = 0` the balance is one: mutation pushes and nothing pushes back, so the allele fixes.
+The identification with the drift chart's saturation map, recorded below, is a cross-identity
+between two definitions and constrains them jointly; both could carry the same wrong coefficient
+on `h * s` and it would survive. This endpoint does not, and it is what makes the denominator a
+sum of the two opposing rates rather than a fitted normalisation. -/
+theorem mutationSelectionBalance_no_selection (mu : ℝ) (h : mu ≠ 0) :
+    mutationSelectionBalance mu 0 0 = 1 := by
+  unfold mutationSelectionBalance
+  norm_num
+  exact div_self h
+
 /-- **Mutation-selection balance is the drift chart's saturation map, at a
 different argument.**
 

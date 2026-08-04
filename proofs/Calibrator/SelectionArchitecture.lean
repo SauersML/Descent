@@ -47,6 +47,18 @@ section StabilizingSelection
 noncomputable def equilibriumEffectVariance (v_mutation s : ℝ) : ℝ :=
   v_mutation / s
 
+/-- **Selection removes exactly the standing variance it is charged with.**
+
+Multiplying the equilibrium by the selection strength returns the per-generation mutational input,
+which is what balance means: what selection takes each generation equals what mutation supplies.
+The recurrence below is a fixed-point statement and is satisfied by the equilibrium of any body of
+the form `c · v_mutation / s`, whatever `c` is, because the same `c` appears on both sides. This
+identity fixes it at one. -/
+theorem equilibriumEffectVariance_mul_selection (v_mutation s : ℝ) (h : s ≠ 0) :
+    equilibriumEffectVariance v_mutation s * s = v_mutation := by
+  unfold equilibriumEffectVariance
+  field_simp
+
 /-- **Mutation-selection balance recurrence.**
     Each generation, new mutational variance v_mut is added and selection
     of strength s removes a fraction s of the standing variance V.
