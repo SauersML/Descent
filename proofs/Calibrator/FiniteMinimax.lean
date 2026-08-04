@@ -161,6 +161,51 @@ theorem half_separation_le_minimaxRisk_of_observation_eq
   rintro worstValue ⟨δ, rfl⟩
   exact E.half_separation_le_worstRisk_of_observation_eq θ₁ θ₂ separation hobs hloss δ
 
+/-! ## Sharpness of the observational-equivalence floor -/
+
+/-- The canonical two-parameter experiment with no information: both parameters emit the
+same observation, and choosing the wrong parameter as the action costs `separation`.
+
+This is the smallest exact model of an SFS-null demographic pair, an LD-null genetic pair,
+or any other pair of biological mechanisms that induce the same data law. -/
+noncomputable def indistinguishableBinaryProblem (separation : ℝ) : Problem 1 1 0 where
+  observation := fun _ ↦ PMF.pure 0
+  loss := fun θ action ↦ if θ = action then 0 else separation
+
+/-- The uniform distribution on the two binary actions. -/
+noncomputable def fairBinaryAction : FinitePrior 1 :=
+  PMF.ofFintype ![1 / 2, 1 / 2] (by
+    rw [Fin.sum_univ_two]
+    simpa using ENNReal.inv_two_add_inv_two)
+
+/-- With only one possible observation, the fair rule randomizes equally between the two
+actions. -/
+noncomputable def fairBinaryRule : Rule 1 0 := fun _ ↦ fairBinaryAction
+
+/-- The fair rule pays exactly half the separation at either indistinguishable parameter. -/
+theorem indistinguishableBinaryProblem_risk_fair (separation : ℝ) (θ : Fin 2) :
+    (indistinguishableBinaryProblem separation).risk fairBinaryRule θ = separation / 2 := by
+  fin_cases θ <;>
+    rw [risk, Fin.sum_univ_one, Fin.sum_univ_two] <;>
+    norm_num [indistinguishableBinaryProblem, fairBinaryRule, fairBinaryAction,
+      FinitePrior.probability, PMF.ofFintype_apply] <;>
+    ring
+
+/-- The observational-equivalence lower bound is sharp: in the canonical binary experiment,
+the fair randomized rule has worst-case risk exactly `separation / 2`. -/
+theorem indistinguishableBinaryProblem_worstRisk_fair (separation : ℝ) :
+    (indistinguishableBinaryProblem separation).worstRisk fairBinaryRule = separation / 2 := by
+  unfold worstRisk
+  have hrange : Set.range ((indistinguishableBinaryProblem separation).risk fairBinaryRule) =
+      {separation / 2} := by
+    ext value
+    constructor
+    · rintro ⟨θ, rfl⟩
+      exact indistinguishableBinaryProblem_risk_fair separation θ
+    · rintro rfl
+      exact ⟨0, indistinguishableBinaryProblem_risk_fair separation 0⟩
+  rw [hrange, csSup_singleton]
+
 /-- Bayes risk of a rule under a finite prior. -/
 noncomputable def bayesRisk
     (π : FinitePrior parameterCount)
@@ -291,6 +336,30 @@ theorem exists_risk_lower_bound :
           mul_le_mul_of_nonneg_left (hinner x)
             (FinitePrior.probability_nonneg (E.observation θ) x)
     _ = E.risk δ θ := rfl
+
+/-- **Sharp binary minimax theorem.** Exact observational equivalence costs precisely half
+the pointwise separation, not merely at least half: the fair randomized rule attains the
+generic lower bound. This shows that the constant in
+`half_separation_le_minimaxRisk_of_observation_eq` cannot be improved. -/
+theorem indistinguishableBinaryProblem_minimaxRisk (separation : ℝ) :
+    (indistinguishableBinaryProblem separation).minimaxRisk = separation / 2 := by
+  let E := indistinguishableBinaryProblem separation
+  have hlower : separation / 2 ≤ E.minimaxRisk := by
+    apply E.half_separation_le_minimaxRisk_of_observation_eq 0 1 separation rfl
+    intro action
+    fin_cases action <;> simp [E, indistinguishableBinaryProblem]
+  obtain ⟨lower, hlowerRisk⟩ := E.exists_risk_lower_bound
+  have hbdd : BddBelow (Set.range E.worstRisk) := by
+    refine ⟨lower, ?_⟩
+    rintro value ⟨δ, rfl⟩
+    exact le_trans (hlowerRisk δ 0)
+      (le_csSup (Set.finite_range _).bddAbove ⟨0, rfl⟩)
+  have hupper : E.minimaxRisk ≤ separation / 2 := by
+    calc
+      E.minimaxRisk ≤ E.worstRisk fairBinaryRule :=
+        csInf_le hbdd ⟨fairBinaryRule, rfl⟩
+      _ = separation / 2 := indistinguishableBinaryProblem_worstRisk_fair separation
+  exact le_antisymm hupper hlower
 
 /-- Mix two decision rules with weight `t`, as a Bernoulli choice between them.
 
