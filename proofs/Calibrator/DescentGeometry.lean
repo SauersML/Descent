@@ -422,6 +422,21 @@ theorem interactionTraitLaw_isProbability {theta : ℝ} (htheta : |theta| ≤ 1 
     (∀ g, 0 ≤ interactionTraitLaw theta g) ∧ ∑ g, interactionTraitLaw theta g = 1 :=
   ⟨interactionTraitLaw_nonneg htheta, interactionTraitLaw_sum_eq_one theta⟩
 
+/-- The admissible biological interaction parameters: exactly those for which every conditional
+risk, and therefore every joint mass, lies in the probability simplex. -/
+abbrev AdmissibleInteractionParameter := {theta : ℝ // |theta| ≤ 1 / 2}
+
+/-- The interaction family restricted to its probability-law parameter space. -/
+noncomputable def admissibleInteractionTraitLaw
+    (theta : AdmissibleInteractionParameter) (g : TwoLociTrait) : ℝ :=
+  interactionTraitLaw theta.1 g
+
+/-- Every member of the admissible interaction family is an actual probability law. -/
+theorem admissibleInteractionTraitLaw_isProbability (theta : AdmissibleInteractionParameter) :
+    (∀ g, 0 ≤ admissibleInteractionTraitLaw theta g) ∧
+      ∑ g, admissibleInteractionTraitLaw theta g = 1 := by
+  simpa [admissibleInteractionTraitLaw] using interactionTraitLaw_isProbability theta.2
+
 /-- The first locus carries half the mass at each of its values, whatever the interaction. -/
 theorem labelMass_interactionTraitLaw_locusOne (theta : ℝ) (x : Fin 2) :
     labelMass (fun g : TwoLociTrait ↦ g.1) (interactionTraitLaw theta) x = 1 / 2 := by
@@ -518,6 +533,53 @@ theorem interaction_join_obstruction :
   exact interactionRisk_joint_separates (theta := 0) (eta := 1 / 4) (by norm_num)
     (h0.trans h1.symm)
 
+/-- **Probability-law form of the interaction obstruction.**  Restricting the population index
+to the admissible risk interval preserves descent along either locus and failure along their
+join.  Thus the obstruction is realized entirely inside the probability simplex. -/
+theorem admissible_interaction_join_obstruction :
+    DescendsAlong (fun g : TwoLociTrait ↦ g.1) admissibleInteractionTraitLaw
+        (conditionalSectionMean traitIndicator) ∧
+      DescendsAlong (fun g : TwoLociTrait ↦ g.2.1) admissibleInteractionTraitLaw
+        (conditionalSectionMean traitIndicator) ∧
+      ¬ DescendsAlong (fun g : TwoLociTrait ↦ (g.1, g.2.1)) admissibleInteractionTraitLaw
+        (conditionalSectionMean traitIndicator) := by
+  refine ⟨⟨fun _ ↦ 1 / 2, fun theta x _ ↦ ?_⟩,
+    ⟨fun _ ↦ 1 / 2, fun theta x _ ↦ ?_⟩, ?_⟩
+  · simpa [admissibleInteractionTraitLaw] using trait_value_locusOne theta.1 x
+  · simpa [admissibleInteractionTraitLaw] using trait_value_locusTwo theta.1 x
+  · rintro ⟨value, hvalue⟩
+    let theta0 : AdmissibleInteractionParameter := ⟨0, by norm_num⟩
+    let thetaQuarter : AdmissibleInteractionParameter := ⟨1 / 4, by norm_num⟩
+    have hmass0 : labelMass (fun g : TwoLociTrait ↦ (g.1, g.2.1))
+        (admissibleInteractionTraitLaw theta0) (0, 0) ≠ 0 := by
+      simpa [admissibleInteractionTraitLaw, theta0] using
+        (show labelMass (fun g : TwoLociTrait ↦ (g.1, g.2.1))
+          (interactionTraitLaw 0) (0, 0) ≠ 0 by
+            rw [labelMass_interactionTraitLaw_locusPair]
+            norm_num)
+    have hmassQuarter : labelMass (fun g : TwoLociTrait ↦ (g.1, g.2.1))
+        (admissibleInteractionTraitLaw thetaQuarter) (0, 0) ≠ 0 := by
+      simpa [admissibleInteractionTraitLaw, thetaQuarter] using
+        (show labelMass (fun g : TwoLociTrait ↦ (g.1, g.2.1))
+          (interactionTraitLaw (1 / 4)) (0, 0) ≠ 0 by
+            rw [labelMass_interactionTraitLaw_locusPair]
+            norm_num)
+    have h0 := hvalue theta0 (0, 0) hmass0
+    have hQuarter := hvalue thetaQuarter (0, 0) hmassQuarter
+    have hvalue0 : conditionalSectionMean traitIndicator
+        (fiberConditional (fun g : TwoLociTrait ↦ (g.1, g.2.1))
+          (admissibleInteractionTraitLaw theta0) (0, 0)) = interactionRisk 0 0 0 := by
+      simpa [admissibleInteractionTraitLaw, theta0] using trait_value_locusPair 0
+    have hvalueQuarter : conditionalSectionMean traitIndicator
+        (fiberConditional (fun g : TwoLociTrait ↦ (g.1, g.2.1))
+          (admissibleInteractionTraitLaw thetaQuarter) (0, 0)) =
+          interactionRisk (1 / 4) 0 0 := by
+      simpa [admissibleInteractionTraitLaw, thetaQuarter] using trait_value_locusPair (1 / 4)
+    rw [hvalue0] at h0
+    rw [hvalueQuarter] at hQuarter
+    exact interactionRisk_joint_separates (theta := 0) (eta := 1 / 4) (by norm_num)
+      (h0.trans hQuarter.symm)
+
 end Interaction
 
 /-! ## Confounding: two informative labels descend, their meet does not -/
@@ -558,6 +620,21 @@ theorem confoundedExposureLaw_nonneg {beta : ℝ} (hbeta0 : 0 ≤ beta) (hbeta1 
 theorem confoundedExposureLaw_isProbability {beta : ℝ} (hbeta0 : 0 ≤ beta) (hbeta1 : beta ≤ 1) :
     (∀ g, 0 ≤ confoundedExposureLaw beta g) ∧ ∑ g, confoundedExposureLaw beta g = 1 :=
   ⟨confoundedExposureLaw_nonneg hbeta0 hbeta1, confoundedExposureLaw_sum_eq_one beta⟩
+
+/-- Biologically admissible stratum prevalences. -/
+abbrev AdmissiblePrevalence := {beta : ℝ // 0 ≤ beta ∧ beta ≤ 1}
+
+/-- The confounding family restricted to genuine prevalence parameters. -/
+noncomputable def admissibleConfoundedExposureLaw
+    (beta : AdmissiblePrevalence) (g : ExposureStratum) : ℝ :=
+  confoundedExposureLaw beta.1 g
+
+/-- Every admissible prevalence produces an actual probability law. -/
+theorem admissibleConfoundedExposureLaw_isProbability (beta : AdmissiblePrevalence) :
+    (∀ g, 0 ≤ admissibleConfoundedExposureLaw beta g) ∧
+      ∑ g, admissibleConfoundedExposureLaw beta g = 1 := by
+  simpa [admissibleConfoundedExposureLaw] using
+    confoundedExposureLaw_isProbability beta.2.1 beta.2.2
 
 /-- **The stratum label is kernel-sufficient for the confounded family**, because its members
 differ only by a stratum-measurable tilt of one within-stratum law.  Every functional of the
@@ -627,6 +704,56 @@ theorem confounding_meet_obstruction :
   rw [fiberConditional_trivialLabel, crude_exposure_frequency] at h0 h1
   exact confoundedMarginalRisk_separates (beta := 0) (gamma := 1) (by norm_num)
     (h0.trans h1.symm)
+
+/-- **Probability-law form of the confounding obstruction.**  Even when every member is indexed
+by a valid prevalence, exposure and stratum labels each support descent while their common
+coarsening does not. -/
+theorem admissible_confounding_meet_obstruction :
+    DescendsAlong (fun g : ExposureStratum ↦ g.1) admissibleConfoundedExposureLaw
+        (conditionalSectionMean exposureIndicator) ∧
+      DescendsAlong (fun g : ExposureStratum ↦ g.2) admissibleConfoundedExposureLaw
+        (conditionalSectionMean exposureIndicator) ∧
+      ¬ DescendsAlong trivialLabel admissibleConfoundedExposureLaw
+        (conditionalSectionMean exposureIndicator) := by
+  refine ⟨descendsAlong_sectionMean_of_labelFunction _ admissibleConfoundedExposureLaw
+      fun x ↦ if x = 1 then 1 else 0, ?_, ?_⟩
+  · exact descendsAlong_of_kernelSufficient _ admissibleConfoundedExposureLaw
+      (fun i j x hi hj ↦ kernelSufficient_confounded_stratum i.1 j.1 x (by
+        simpa [admissibleConfoundedExposureLaw] using hi) (by
+        simpa [admissibleConfoundedExposureLaw] using hj)) _ 0
+  · rintro ⟨value, hvalue⟩
+    let beta0 : AdmissiblePrevalence := ⟨0, by norm_num⟩
+    let beta1 : AdmissiblePrevalence := ⟨1, by norm_num⟩
+    have hmass0 : labelMass trivialLabel (admissibleConfoundedExposureLaw beta0) () ≠ 0 := by
+      simpa [admissibleConfoundedExposureLaw, beta0] using
+        (show labelMass trivialLabel (confoundedExposureLaw 0) () ≠ 0 by
+          rw [labelMass_trivialLabel]
+          norm_num)
+    have hmass1 : labelMass trivialLabel (admissibleConfoundedExposureLaw beta1) () ≠ 0 := by
+      simpa [admissibleConfoundedExposureLaw, beta1] using
+        (show labelMass trivialLabel (confoundedExposureLaw 1) () ≠ 0 by
+          rw [labelMass_trivialLabel]
+          norm_num)
+    have h0 := hvalue beta0 () hmass0
+    have h1 := hvalue beta1 () hmass1
+    have hvalue0 : conditionalSectionMean exposureIndicator
+        (fiberConditional trivialLabel (admissibleConfoundedExposureLaw beta0) ()) =
+          confoundedMarginalRisk 0 := by
+      change conditionalSectionMean exposureIndicator
+        (fiberConditional trivialLabel (confoundedExposureLaw 0) ()) = confoundedMarginalRisk 0
+      rw [fiberConditional_trivialLabel]
+      exact crude_exposure_frequency 0
+    have hvalue1 : conditionalSectionMean exposureIndicator
+        (fiberConditional trivialLabel (admissibleConfoundedExposureLaw beta1) ()) =
+          confoundedMarginalRisk 1 := by
+      change conditionalSectionMean exposureIndicator
+        (fiberConditional trivialLabel (confoundedExposureLaw 1) ()) = confoundedMarginalRisk 1
+      rw [fiberConditional_trivialLabel]
+      exact crude_exposure_frequency 1
+    rw [hvalue0] at h0
+    rw [hvalue1] at h1
+    exact confoundedMarginalRisk_separates (beta := 0) (gamma := 1) (by norm_num)
+      (h0.trans h1.symm)
 
 end Confounding
 

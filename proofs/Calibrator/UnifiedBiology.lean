@@ -344,12 +344,12 @@ structure UnifiedBiologyObstructions : Prop where
   /-- Reportability along each margin separately does not give reportability along the pair, so a
   stability check run one covariate at a time certifies nothing jointly. -/
   marginalDescentDoesNotCompose :
-    ¬ DescendsAlong (fun g : TwoLociTrait ↦ (g.1, g.2.1)) interactionTraitLaw
+    ¬ DescendsAlong (fun g : TwoLociTrait ↦ (g.1, g.2.1)) admissibleInteractionTraitLaw
       (conditionalSectionMean traitIndicator)
   /-- Dropping a stratum destroys reportability that both finer labels have: there is no coarsest
   honest reporting label. -/
   crudeReportingLosesDescent :
-    ¬ DescendsAlong trivialLabel confoundedExposureLaw
+    ¬ DescendsAlong trivialLabel admissibleConfoundedExposureLaw
       (conditionalSectionMean exposureIndicator)
   /-- Every functional descends along posterior ancestry, and the ancestry-weighted average of
   component values is still off by a full unit of trait: descent and the affine-in-ancestry
@@ -368,8 +368,8 @@ theorem unifiedBiology_obstructions : UnifiedBiologyObstructions := by
       sharedGeometryNotFree := tridiagonalABAB_pathExpression_pos 0 0 1 1 (by norm_num)
         (by norm_num)
       crossStateDoesNotDescend := not_descends_contextMatchQuality_along_targetState
-      marginalDescentDoesNotCompose := interaction_join_obstruction.2.2
-      crudeReportingLosesDescent := confounding_meet_obstruction.2.2
+      marginalDescentDoesNotCompose := admissible_interaction_join_obstruction.2.2
+      crudeReportingLosesDescent := admissible_confounding_meet_obstruction.2.2
       ancestryWeightedAnsatzFails := exampleComponentResidual_eq_neg_one }
   rw [crossStatePerformance_persistent_eq_one, crossStatePerformance_switching_eq_zero]
   norm_num
