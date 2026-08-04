@@ -345,7 +345,10 @@ theorem HardyWeinbergModel.genotypeProb_sum (h : HardyWeinbergModel) :
 
 /-- Expected alternative-allele count under Hardy-Weinberg equilibrium.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_linalg.py`,
+    `test_hwe_moments`). Two million Hardy-Weinberg genotypes per cell, worst
+    1.1 sems over a prediction spanning 0.20000 to 1.00000. -/
 noncomputable def HardyWeinbergModel.expectedAltAlleleCount (h : HardyWeinbergModel) : ℝ :=
   ∑ g : DiploidGenotype, altAlleleCount g * h.genotypeProb g
 
@@ -386,7 +389,10 @@ noncomputable def HardyWeinbergModel.centeredAltAlleleCount
 
 /-- One-locus genotype variance under Hardy-Weinberg equilibrium.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_linalg.py`,
+    `test_hwe_moments`). Two million Hardy-Weinberg genotypes per cell, worst
+    1.0 sems over a prediction spanning 0.18000 to 0.50000. -/
 noncomputable def HardyWeinbergModel.genotypeVariance (h : HardyWeinbergModel) : ℝ :=
   ∑ g : DiploidGenotype,
     h.genotypeProb g * (h.centeredAltAlleleCount g) ^ 2
@@ -405,7 +411,12 @@ theorem HardyWeinbergModel.genotypeVariance_eq
 /-- Absolute third centered moment at one Hardy-Weinberg locus. This is the term that
 enters the Berry-Esseen numerator for weighted sums of bounded genotype variables.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_linalg.py`,
+    `test_hwe_moments`). Two million Hardy-Weinberg genotypes per cell, worst
+    1.0 sems over a prediction spanning 0.15696 to 0.50000. The third ABSOLUTE
+    moment is not the third central moment: the latter vanishes at `p = 1/2`
+    and this does not, which is what the design at `p = 0.5` checks. -/
 noncomputable def HardyWeinbergModel.genotypeThirdAbsMoment
     (h : HardyWeinbergModel) : ℝ :=
   ∑ g : DiploidGenotype,

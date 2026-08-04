@@ -41,14 +41,35 @@ section ScoreMeanVariance
 /-- **PGS mean under HWE.**
     E[PGS] = Σᵢ βᵢ × 2pᵢ.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_linalg.py`,
+    `test_pgs_moments`). Mean score over 6000 simulated diploids, both in
+    linkage equilibrium and on a recombining coalescent panel: worst 0.3 sems,
+    0.89 percent. The mean is insensitive to LD, which is why both panels agree
+    here and `pgsVariance` does not. -/
 noncomputable def pgsMean {m : ℕ} (β : Fin m → ℝ) (p : Fin m → ℝ) : ℝ :=
   ∑ i, β i * (2 * p i)
 
 /-- **PGS variance under HWE and linkage equilibrium.**
     Var(PGS) = Σᵢ βᵢ² × 2pᵢ(1-pᵢ).
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED at linkage equilibrium**, and the
+    LD gap measured (`proofs/validation/empirical/simcov/battery_linalg.py`,
+    `test_pgs_moments`). Score variance over 6000 simulated diploids:
+
+      panel                   this def   simulated              sems    relative
+      linkage equilibrium      as body   agrees                  0.1      0.26%
+      coalescent LD            as body   disagrees              39.3     71.8%
+
+    The formula sums per-locus contributions and drops the LD cross terms
+    `Σᵢ≠ⱼ βᵢβⱼ Cov(gᵢ, gⱼ)`, so on a linked panel it understates the score
+    variance by 72 percent at the LD of a recombining coalescent sample. This is
+    the same qualifier `VarianceComponents.additiveVariance` carries, and it is
+    load-bearing for the same reason: the unconditional reading is wrong
+    wherever the scored variants are in LD, which is the usual case.
+
+    Power: the two panels are the design, and they separate the linkage-
+    equilibrium reading from the unconditional one at 39 sems. -/
 noncomputable def pgsVariance {m : ℕ} (β : Fin m → ℝ) (p : Fin m → ℝ) : ℝ :=
   ∑ i, β i ^ 2 * (2 * p i * (1 - p i))
 
@@ -65,7 +86,14 @@ theorem pgs_variance_nonneg {m : ℕ} (β : Fin m → ℝ) (p : Fin m → ℝ)
 /-- **Mean shift between populations.**
     Δμ = Σᵢ βᵢ × 2(p'ᵢ - pᵢ).
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_linalg.py`,
+    `test_shift_fork`). Difference in mean score between two simulated diploid
+    panels, worst 1.2 sems over a shift spanning 1.78945 to -3.66260.
+
+    On the same runs `SelectionArchitecture.polygenicAdaptationShift` was 50
+    percent low at 15.2 sems, because it lacked the ploidy factor this
+    definition carries; that body has since been corrected. -/
 noncomputable def pgsMeanShift
     {m : ℕ} (β : Fin m → ℝ) (p_source p_target : Fin m → ℝ) : ℝ :=
   ∑ i, β i * (2 * (p_target i - p_source i))
@@ -280,7 +308,7 @@ theorem identity_citl_changes_of_nonzero_pgsMeanShift
   rw [identity_citl_shift_eq_neg_pgsMeanShift]
   exact neg_ne_zero.mpr h_shift
 
-/-- **Mechanistic target calibration slope is below `1` exactly when the
+/-- **Mechanistic target calibration slope is below `1` when the
 transported SNP-level score law says so.**
     This is the honest score-distribution statement: the target identity-link
     profile uses the literal transported `Cov/Var` slope from the mechanistic
@@ -641,7 +669,7 @@ theorem berry_esseen_block_bound_eq (C ρ σ_sq b ℓ κ : ℝ)
 
 /-- **When the marker count is anti-conservative, and when it is not.**
 
-    The marker-count bound understates the true one exactly when `κ√ℓ > 1`. That covers the
+    The marker-count bound understates the true one whenever `κ√ℓ > 1`. That covers the
     renewal-chain case, where `κ ≈ 2.09` makes the understatement *worse* than `√ℓ`. It does
     **not** cover every case: heterogeneous effect sizes give `κ ≈ 0.63`, so at small `ℓ` the
     marker count can be conservative instead. The hypothesis is stated rather than assumed

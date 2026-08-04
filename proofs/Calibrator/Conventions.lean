@@ -821,6 +821,18 @@ theorem fstMigrationMutationEquilibrium_eq_scaled (Ne m μ : ℝ) :
   rw [scaledMigrationRate_eq_ploidy_form, scaledMutationRate_eq_ploidy_form]
   unfold ploidy; ring_nf
 
+/-- **The finite-deme island equilibrium carries the same two scaled rates.** Its
+`4 Nₑ m` is `scaledMigrationRate` and its `4 Nₑ μ` is `scaledMutationRate`, exactly as in
+the deme-blind limit form; the deme correction multiplies the migration rate and does not
+touch either constant. Without this the `4` would be a third inlined ploidy convention. -/
+theorem fstIslandEquilibriumFiniteDemes_eq_scaled (Ne m μ nDemes : ℝ) :
+    fstIslandEquilibriumFiniteDemes Ne m μ nDemes
+      = 1 / (1 + scaledMigrationRate Ne m * islandDemeCorrection nDemes
+              + scaledMutationRate Ne μ) := by
+  unfold fstIslandEquilibriumFiniteDemes
+  rw [scaledMigrationRate_eq_ploidy_form, scaledMutationRate_eq_ploidy_form]
+  unfold ploidy; ring_nf
+
 theorem expectedFreqDiffSq_uses_hwe (fst p0 : ℝ) :
     expectedFreqDiffSq fst p0 = fst * hweGenotypeVariance p0 := by
   unfold expectedFreqDiffSq hweGenotypeVariance ploidy; ring
@@ -1275,6 +1287,15 @@ weight is not this expression, so the constant is forced by the coding and belon
 theorem averageEffect_uses_ploidy (m : OneLocusArchitecture) :
     m.averageEffect = m.a + m.d * (1 - ploidy * m.p) := by
   unfold OneLocusArchitecture.averageEffect ploidy; ring
+
+/-- **The two in the polygenic-adaptation shift is the ploidy.** The mean score is
+`Σᵢ βᵢ · ploidy · pᵢ`, so its shift carries the same factor; the body writes the `2` as a
+literal only because importing `Conventions` into `SelectionArchitecture` closes an import
+cycle. This theorem is what stops that literal from drifting away from `ploidy`. -/
+theorem polygenicAdaptationShift_uses_ploidy {m : ℕ} (β Δp : Fin m → ℝ) :
+    polygenicAdaptationShift β Δp = ∑ i, β i * ploidy * Δp i := by
+  unfold polygenicAdaptationShift ploidy
+  simp
 
 /-- **The four in the quadratic stepping-stone form is twice the ploidy**, the same
 `4 Nₑ` scaling as every other migration-drift denominator in the corpus. Only the powers of

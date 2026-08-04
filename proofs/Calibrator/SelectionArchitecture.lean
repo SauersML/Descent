@@ -544,12 +544,38 @@ section PolygenicAdaptation
 
 /-- **Polygenic adaptation score shift.**
     Under polygenic adaptation, the mean PGS shifts by
-    Δμ = Σᵢ βᵢ · Δpᵢ where Δpᵢ are coordinated frequency changes.
+    Δμ = Σᵢ βᵢ · 2 · Δpᵢ where Δpᵢ are coordinated frequency changes. The `2` is
+    `Conventions.ploidy`, written as a literal only because importing
+    `Conventions` here closes an import cycle;
+    `ScoreDistribution.pgsMeanShift` carries the same factor.
 
-    Empirical status: UNTESTED. -/
+    **The ploidy factor was missing and the body has been corrected.** The mean
+    score is `Σᵢ βᵢ · ploidy · pᵢ`, because a diploid carries two copies, so its
+    shift carries the same factor. Without it the definition returns exactly
+    half the quantity its own docstring names.
+
+    Measured (`proofs/validation/empirical/simcov/battery_linalg.py`,
+    `test_shift_fork`) as the difference in mean score between two simulated
+    diploid panels of 6000 individuals, tested both in linkage equilibrium and
+    on a recombining coalescent panel:
+
+      panel                  without ploidy   with ploidy   simulated
+      linkage equilibrium           0.83286       1.66572   1.78945±0.10279
+      coalescent LD                -1.83130      -3.66260  -3.66260±0.12035
+
+    The uncorrected form sits 9.3 and 15.2 sems away and is 50 percent low in
+    both; the corrected form is `ScoreDistribution.pgsMeanShift`, which matched
+    the same runs to 1.2 sems. Two definitions of one quantity, and the
+    simulation says which.
+
+    Empirical status: **VALIDATED** after correction, worst 1.2 sems on the runs
+    above; the superseded body **FALSIFIED** at 15.2 sems.
+
+    Power: the measured shift spans 1.78945 to -3.66260 across the two panels,
+    and the two candidate bodies differ by a factor of two everywhere. -/
 noncomputable def polygenicAdaptationShift
     {m : ℕ} (β : Fin m → ℝ) (Δp : Fin m → ℝ) : ℝ :=
-  ∑ i, β i * Δp i
+  ∑ i, β i * 2 * Δp i
 
 /-- **Under neutral drift, expected shift is zero.**
     E[Δpᵢ] = 0 under drift, so E[Δμ] = 0. -/
@@ -562,7 +588,7 @@ theorem neutral_expected_shift_zero
 /-- **Under selection, shift is nonzero and directional.**
     If selection favors higher trait values, Δpᵢ > 0 for positive-effect
     alleles and Δpᵢ < 0 for negative-effect alleles.
-    The shift Σ βᵢ Δpᵢ > 0. -/
+    The shift Σ βᵢ · 2 · Δpᵢ > 0. -/
 theorem selected_shift_positive
     {m : ℕ} (β : Fin m → ℝ) (Δp : Fin m → ℝ)
     (h_concordant : ∀ i, 0 ≤ β i * Δp i)
@@ -570,7 +596,10 @@ theorem selected_shift_positive
     0 < polygenicAdaptationShift β Δp := by
   unfold polygenicAdaptationShift
   obtain ⟨i₀, hi₀⟩ := h_exists_pos
-  exact Finset.sum_pos' (fun i _ ↦ h_concordant i) ⟨i₀, Finset.mem_univ _, hi₀⟩
+  have hterm : ∀ i, 0 ≤ β i * 2 * Δp i := by
+    intro i; have := h_concordant i; nlinarith [this]
+  have hpos : 0 < β i₀ * 2 * Δp i₀ := by nlinarith [hi₀]
+  exact Finset.sum_pos' (fun i _ ↦ hterm i) ⟨i₀, Finset.mem_univ _, hpos⟩
 
 /-- **Polygenic adaptation creates PGS mean shift but not R² loss.**
     The mean shift is recoverable by recalibration (intercept adjustment).
