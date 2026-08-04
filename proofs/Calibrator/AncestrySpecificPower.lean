@@ -140,7 +140,7 @@ theorem genotypeVariance_pos (p : ℝ) (h_p : 0 < p) (h_p_lt : p < 1) :
   nlinarith
 
 /-- Genotype variance is maximized at p = 1/2 where it equals 1/2. -/
-theorem genotypeVariance_max (p : ℝ) (h_p : 0 ≤ p) (h_p_le : p ≤ 1) :
+theorem genotypeVariance_max (p : ℝ) :
     genotypeVarianceHWE p ≤ genotypeVarianceHWE (1/2 : ℝ) := by
   unfold genotypeVarianceHWE
   nlinarith [sq_nonneg (p - 1/2)]
@@ -195,7 +195,7 @@ theorem ld_r2_matches_covariance_response_retention
 
 /-- Information loss from imperfect tagging: effective info ≤ full info. -/
 theorem information_loss_from_tagging (n : ℕ) (p r2_ld : ℝ)
-    (h_p : 0 ≤ p) (h_p_le : p ≤ 1) (h_r2 : 0 ≤ r2_ld) (h_r2_le : r2_ld ≤ 1) :
+    (h_p : 0 ≤ p) (h_p_le : p ≤ 1) (h_r2_le : r2_ld ≤ 1) :
     effectiveFisherInformation n p r2_ld ≤ fisherInformation n (genotypeVarianceHWE p) := by
   unfold effectiveFisherInformation
   have h_info_nonneg : 0 ≤ fisherInformation n (genotypeVarianceHWE p) := by
@@ -293,7 +293,6 @@ theorem effective_information_nonneg (n : ℕ) (p r2_ld : ℝ)
     to the GWAS tag SNPs, hence lower effective sample size. -/
 theorem effective_information_mono_r2 (n : ℕ) (p r2_a r2_b : ℝ)
     (h_n : 0 < n) (h_p : 0 < p) (h_p_lt : p < 1)
-    (h_r2_a : 0 ≤ r2_a) (h_r2_b : 0 ≤ r2_b)
     (h_r2 : r2_a < r2_b) :
     effectiveFisherInformation n p r2_a < effectiveFisherInformation n p r2_b := by
   unfold effectiveFisherInformation fisherInformation genotypeVarianceHWE
@@ -328,7 +327,6 @@ theorem effective_information_mono_n (n_a n_b : ℕ) (p r2_ld : ℝ)
 theorem source_higher_effective_information
     (n_source n_target : ℕ) (p_source p_target r2_source r2_target : ℝ)
     (h_n : n_target < n_source) (h_r2 : r2_target < r2_source)
-    (h_p_source : 0 < p_source) (h_p_source_lt : p_source < 1)
     (h_p_target : 0 < p_target) (h_p_target_lt : p_target < 1)
     (h_r2_target : 0 < r2_target)
     -- Same variant, same allele frequency for simplicity
@@ -351,8 +349,7 @@ theorem source_higher_effective_information
     have step1 : effectiveFisherInformation n_target p_target r2_target <
         effectiveFisherInformation n_target p_target r2_source :=
       effective_information_mono_r2 n_target p_target r2_target r2_source
-        h_nt_pos h_p_target h_p_target_lt
-        (le_of_lt h_r2_target) (le_of_lt (by linarith)) h_r2
+        h_nt_pos h_p_target h_p_target_lt h_r2
     have step2 : effectiveFisherInformation n_target p_target r2_source <
         effectiveFisherInformation n_source p_target r2_source :=
       effective_information_mono_n n_target n_source p_target r2_source
@@ -468,8 +465,7 @@ theorem hweHeterozygosity_eq_genotypeVarianceHWE (p : ℝ) :
     Proof: het(q) - het(p) = 2(q - p)(1 - p - q). When p < q < 1/2,
     both factors are positive so het(q) > het(p). -/
 theorem het_strict_mono_on_lower_half (p q : ℝ)
-    (h_p : 0 < p) (h_p_lt : p < 1/2)
-    (h_q : 0 < q) (h_q_lt : q < 1/2)
+    (h_p_lt : p < 1/2) (h_q_lt : q < 1/2)
     (h_pq : p < q) :
     hweHeterozygosity p < hweHeterozygosity q := by
   unfold hweHeterozygosity
@@ -487,14 +483,14 @@ theorem het_strict_mono_on_lower_half (p q : ℝ)
     additive variance contribution `2p(1-p)β²` for any nonzero effect size. -/
 theorem discovered_variants_eur_biased
     (p_eur p_afr β : ℝ)
-    (h_eur : 0 < p_eur) (h_eur_lt : p_eur < 1/2)
-    (h_afr : 0 < p_afr) (h_afr_lt : p_afr < 1/2)
+    (h_eur_lt : p_eur < 1/2)
+    (h_afr_lt : p_afr < 1/2)
     (h_drift_down : p_afr < p_eur)
     (h_β_ne : β ≠ 0) :
     hweHeterozygosity p_afr * β ^ 2 <
       hweHeterozygosity p_eur * β ^ 2 := by
   have h_het_lt :=
-    het_strict_mono_on_lower_half p_afr p_eur h_afr h_afr_lt h_eur h_eur_lt h_drift_down
+    het_strict_mono_on_lower_half p_afr p_eur h_afr_lt h_eur_lt h_drift_down
   have h_β_sq_pos : 0 < β ^ 2 := sq_pos_of_ne_zero h_β_ne
   exact mul_lt_mul_of_pos_right h_het_lt h_β_sq_pos
 
@@ -573,7 +569,7 @@ section PowerPortabilityTradeoff
 theorem mul_lt_self_and_complement_mul_pos
     (N c₁ c₂ α : ℝ)
     (h_N : 0 < N) (h_c₁ : 0 < c₁) (h_c₂ : 0 < c₂)
-    (h_α_pos : 0 < α) (h_α_lt : α < 1) :
+    (h_α_lt : α < 1) :
     -- Multi-ancestry reduces best-pop R² (pop1 gets αN < N)
     α * N * c₁ < N * c₁ ∧
     -- Multi-ancestry creates nonzero worst-pop R² (pop2 gets (1-α)N > 0)
@@ -598,7 +594,7 @@ theorem mul_lt_self_and_complement_mul_pos
     Proof: multiply out to get 2ρ² < 1 + ρ², i.e., ρ² < 1. -/
 theorem mul_lt_mul_avg_of_lt_one
     (R2 ρ_sq : ℝ)
-    (h_R2 : 0 < R2) (h_ρ : 0 < ρ_sq) (h_ρ_lt : ρ_sq < 1) :
+    (h_R2 : 0 < R2) (h_ρ_lt : ρ_sq < 1) :
     -- single-ancestry worst-case < multi-ancestry worst-case
     ρ_sq * R2 < R2 * (1 + ρ_sq) / 2 := by
   -- Equivalent to: 2 * ρ_sq * R2 < R2 * (1 + ρ_sq)
@@ -620,8 +616,13 @@ theorem pareto_no_dominance
     (h_more_power : power₁ < power₂)
     (h_less_port : port₂ < port₁) :
     -- Neither design dominates the other
-    ¬(power₂ ≤ power₁ ∧ port₁ ≤ port₂) := by
-  intro ⟨h1, h2⟩; linarith
+    ¬(power₂ ≤ power₁ ∧ port₂ ≤ port₁) ∧
+      ¬(power₁ ≤ power₂ ∧ port₁ ≤ port₂) := by
+  constructor
+  · intro ⟨h_power, _⟩
+    linarith
+  · intro ⟨_, h_port⟩
+    linarith
 
 end PowerPortabilityTradeoff
 
@@ -689,7 +690,6 @@ theorem afr_needs_more_samples
     (n_source : ℕ) (p r2_source r2_target : ℝ)
     (h_n : 0 < n_source)
     (h_p : 0 < p) (h_p_lt : p < 1)
-    (h_r2_source : 0 < r2_source)
     (h_r2_target : 0 < r2_target)
     (h_shorter_ld : r2_target < r2_source) :
     -- The multiplier needed is r²_source / r²_target > 1
@@ -703,7 +703,7 @@ theorem afr_needs_more_samples
     exact h_shorter_ld
   · -- Direct application of monotonicity in r²
     exact effective_information_mono_r2 n_source p r2_target r2_source
-      h_n h_p h_p_lt (le_of_lt h_r2_target) (le_of_lt h_r2_source) h_shorter_ld
+      h_n h_p h_p_lt h_shorter_ld
 
 /-- **General version: any population with shorter LD needs more samples.**
     The multiplier r²_long / r²_short is determined by the LD structure,
@@ -714,7 +714,6 @@ theorem shorter_ld_needs_more_samples
     (n : ℕ) (p r2_long r2_short : ℝ)
     (h_n : 0 < n)
     (h_p : 0 < p) (h_p_lt : p < 1)
-    (h_r2_long : 0 < r2_long)
     (h_r2_short : 0 < r2_short)
     (h_shorter : r2_short < r2_long) :
     -- Same sample size yields lower effective n with shorter LD
@@ -723,7 +722,7 @@ theorem shorter_ld_needs_more_samples
     1 < r2_long / r2_short := by
   constructor
   · exact effective_information_mono_r2 n p r2_short r2_long
-      h_n h_p h_p_lt (le_of_lt h_r2_short) (le_of_lt h_r2_long) h_shorter
+      h_n h_p h_p_lt h_shorter
   · rw [one_lt_div h_r2_short]
     exact h_shorter
 
