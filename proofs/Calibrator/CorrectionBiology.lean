@@ -70,6 +70,39 @@ theorem dynamics_common_contrast_decomposition (β : Bool → ℝ) :
     β = dynamicsPooledProjector β + dynamicsContrastCoefficient β • dynamicsContrast :=
   sub_eq_iff_eq_add'.mp (dynamicsPooledProjector_residual β)
 
+/-- **Exact pooling fiber.** Two persistence/switching fields have the same pooled observation
+if and only if one is obtained from the other by the uniquely normalized contrast translation.
+The coefficient is not existentially hidden: it is exactly the difference of the two contrast
+coordinates.  Thus pooling loses precisely one biological direction and no other information. -/
+theorem dynamicsPoolingObservation_eq_iff_contrast_translation (β γ : Bool → ℝ) :
+    dynamicsPoolingObservation β = dynamicsPoolingObservation γ ↔
+      γ = β + (dynamicsContrastCoefficient γ - dynamicsContrastCoefficient β) •
+        dynamicsContrast := by
+  constructor
+  · intro hpool
+    funext persists
+    change β false + β true = γ false + γ true at hpool
+    cases persists <;>
+      simp [dynamicsContrastCoefficient, dynamicsContrast] <;>
+      linarith
+  · intro htranslation
+    rw [htranslation]
+    simp [dynamicsPoolingObservation, dynamicsContrast]
+    ring
+
+/-- Equivalent existential description of the same fiber.  The explicit theorem above gives the
+canonical witness; this form is convenient when only orbit membership matters. -/
+theorem dynamicsPoolingObservation_eq_iff_exists_add_contrast (β γ : Bool → ℝ) :
+    dynamicsPoolingObservation β = dynamicsPoolingObservation γ ↔
+      ∃ c : ℝ, γ = β + c • dynamicsContrast := by
+  constructor
+  · intro hpool
+    exact ⟨dynamicsContrastCoefficient γ - dynamicsContrastCoefficient β,
+      (dynamicsPoolingObservation_eq_iff_contrast_translation β γ).mp hpool⟩
+  · rintro ⟨c, rfl⟩
+    simp [dynamicsPoolingObservation, dynamicsContrast]
+    ring
+
 /-- The canonical pooled projector is representable by every positive uniform dictionary order. -/
 theorem dynamicsPooledProjector_mem_uniformCorrectionFamily
     (k : ℕ) (hk : 0 < k) :
@@ -197,6 +230,12 @@ structure BiologicalCorrectionNormalForm : Prop where
   residual_exactly_contrast :
     ∀ β : Bool → ℝ,
       β - dynamicsPooledProjector β = dynamicsContrastCoefficient β • dynamicsContrast
+  /-- Observation fibers are exactly the affine orbits of the dynamics contrast. -/
+  pooling_fiber_exact :
+    ∀ β γ : Bool → ℝ,
+      dynamicsPoolingObservation β = dynamicsPoolingObservation γ ↔
+        γ = β + (dynamicsContrastCoefficient γ - dynamicsContrastCoefficient β) •
+          dynamicsContrast
   /-- Every positive dictionary order represents the pooled projector. -/
   represented_at_every_positive_order :
     ∀ k : ℕ, 0 < k → dynamicsPooledProjector ∈
@@ -214,6 +253,7 @@ theorem biologicalCorrectionNormalForm : BiologicalCorrectionNormalForm where
   projector_idempotent := dynamicsPooledProjector_idempotent
   fixed_exactly_on_common_fields := dynamicsPooledProjector_fixed_iff
   residual_exactly_contrast := dynamicsPooledProjector_residual
+  pooling_fiber_exact := dynamicsPoolingObservation_eq_iff_contrast_translation
   represented_at_every_positive_order := dynamicsPooledProjector_mem_uniformCorrectionFamily
   all_uniform_corrections_contrast_blind := uniformDynamicsCorrection_add_contrast
 
