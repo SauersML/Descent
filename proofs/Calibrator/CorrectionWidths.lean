@@ -29,6 +29,7 @@ the analytic extraction of weakly-null depth cascades is intentionally not smugg
 ## Main results
 
 - `factorsThrough_iff_ker_le`: exact algebraic factorization criterion over a field.
+- `factorsThroughSubmodule_mono_of_ker_le`: information monotonicity of corrections.
 - `uniformCorrectionWidth_order_dichotomy`: exact numerical formula at every uniform order.
 - `adaptiveCorrectionSet_smul`: adaptive correction is invariant under nonzero target scaling.
 - `not_hasPositiveLowerBound_iff_hasUnitApproxKernel`: exact stability/depth dichotomy.
@@ -135,6 +136,39 @@ theorem mem_factorsThroughSubmodule_iff_ker_le
     (A : H →ₗ[𝕜] Y) (C : H →ₗ[𝕜] H) :
     C ∈ factorsThroughSubmodule A ↔ LinearMap.ker A ≤ LinearMap.ker C := by
   exact factorsThrough_iff_ker_le A C
+
+/-- **Information monotonicity.** If `B` distinguishes every direction distinguished by `A`,
+then every correction factoring through `A` also factors through `B`. -/
+theorem factorsThroughSubmodule_mono_of_ker_le
+    {Z : Type*} [AddCommGroup Z] [Module 𝕜 Z]
+    (A : H →ₗ[𝕜] Y) (B : H →ₗ[𝕜] Z)
+    (hker : LinearMap.ker B ≤ LinearMap.ker A) :
+    factorsThroughSubmodule A ≤ factorsThroughSubmodule B := by
+  intro C hC
+  rw [mem_factorsThroughSubmodule_iff_ker_le] at hC ⊢
+  exact hker.trans hC
+
+/-- The algebraic correction space depends only on the observationally invisible subspace, not
+on the representation or codomain of the observation operator. -/
+theorem factorsThroughSubmodule_eq_of_ker_eq
+    {Z : Type*} [AddCommGroup Z] [Module 𝕜 Z]
+    (A : H →ₗ[𝕜] Y) (B : H →ₗ[𝕜] Z)
+    (hker : LinearMap.ker A = LinearMap.ker B) :
+    factorsThroughSubmodule A = factorsThroughSubmodule B := by
+  apply le_antisymm
+  · exact factorsThroughSubmodule_mono_of_ker_le A B hker.ge
+  · exact factorsThroughSubmodule_mono_of_ker_le B A hker.le
+
+/-- Parameter-independent processing cannot create algebraic corrections: if `A` is obtained
+by postprocessing `B`, then the factor-through space for `A` is contained in that for `B`. -/
+theorem factorsThroughSubmodule_mono_of_observation_factorization
+    {Z : Type*} [AddCommGroup Z] [Module 𝕜 Z]
+    (A : H →ₗ[𝕜] Y) (B : H →ₗ[𝕜] Z) (Q : Z →ₗ[𝕜] Y)
+    (hA : A = Q.comp B) :
+    factorsThroughSubmodule A ≤ factorsThroughSubmodule B := by
+  apply factorsThroughSubmodule_mono_of_ker_le A B
+  rw [hA]
+  exact LinearMap.ker_le_ker_comp B Q
 
 /-- **Observable-quotient law.**  Every admissible correction is constant on each fiber of the
 observation map.  No coefficient choice can distinguish targets that produced the same data. -/
