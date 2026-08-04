@@ -132,6 +132,121 @@ noncomputable def risk
   ∑ x, (E.observation θ).probability x *
     ∑ a, (δ x).probability a * E.loss θ a
 
+/-- ℓ¹ distance between two finite observation laws. Twice the usual total-variation
+distance, but free of an extra normalization convention. -/
+noncomputable def observationL1Distance
+    (θ₁ θ₂ : Fin (parameterCount + 1)) : ℝ :=
+  ∑ observation,
+    |(E.observation θ₁).probability observation -
+      (E.observation θ₂).probability observation|
+
+/-- Observation ℓ¹ distance is nonnegative. -/
+theorem observationL1Distance_nonneg
+    (θ₁ θ₂ : Fin (parameterCount + 1)) :
+    0 ≤ E.observationL1Distance θ₁ θ₂ := by
+  exact Finset.sum_nonneg fun _ _ ↦ abs_nonneg _
+
+/-- **Approximate observational-equivalence lower bound for one rule.** If every action pays
+combined loss at least `separation`, and the second parameter's loss lies in `[0, maxLoss]`,
+then replacing the first observation law by the second can reduce the two-risk lower bound by
+at most `maxLoss` times their ℓ¹ distance. -/
+theorem separation_sub_l1_le_risk_add
+    (θ₁ θ₂ : Fin (parameterCount + 1)) (separation maxLoss : ℝ)
+    (hloss : ∀ action : Fin (actionCount + 1),
+      separation ≤ E.loss θ₁ action + E.loss θ₂ action)
+    (hloss₂ : ∀ action : Fin (actionCount + 1),
+      0 ≤ E.loss θ₂ action ∧ E.loss θ₂ action ≤ maxLoss)
+    (δ : Rule actionCount observationCount) :
+    separation - maxLoss * E.observationL1Distance θ₁ θ₂ ≤
+      E.risk δ θ₁ + E.risk δ θ₂ := by
+  let firstLoss : Fin (observationCount + 1) → ℝ := fun observation ↦
+    ∑ action, (δ observation).probability action * E.loss θ₁ action
+  let secondLoss : Fin (observationCount + 1) → ℝ := fun observation ↦
+    ∑ action, (δ observation).probability action * E.loss θ₂ action
+  have hmassAction : ∀ observation,
+      ∑ action, (δ observation).probability action = 1 :=
+    fun observation ↦ (finitePrior_probability_mem (δ observation)).2
+  have hsecondBounds : ∀ observation, 0 ≤ secondLoss observation ∧
+      secondLoss observation ≤ maxLoss := by
+    intro observation
+    constructor
+    · exact Finset.sum_nonneg fun action _ ↦
+        mul_nonneg (FinitePrior.probability_nonneg (δ observation) action) (hloss₂ action).1
+    · calc
+        secondLoss observation ≤
+            ∑ action, (δ observation).probability action * maxLoss :=
+          Finset.sum_le_sum fun action _ ↦
+            mul_le_mul_of_nonneg_left (hloss₂ action).2
+              (FinitePrior.probability_nonneg (δ observation) action)
+        _ = maxLoss := by rw [← Finset.sum_mul, hmassAction observation, one_mul]
+  have hcombined : ∀ observation,
+      separation ≤ firstLoss observation + secondLoss observation := by
+    intro observation
+    calc
+      separation = ∑ action, (δ observation).probability action * separation := by
+        rw [← Finset.sum_mul, hmassAction observation, one_mul]
+      _ ≤ ∑ action, (δ observation).probability action *
+          (E.loss θ₁ action + E.loss θ₂ action) :=
+        Finset.sum_le_sum fun action _ ↦
+          mul_le_mul_of_nonneg_left (hloss action)
+            (FinitePrior.probability_nonneg (δ observation) action)
+      _ = firstLoss observation + secondLoss observation := by
+        unfold firstLoss secondLoss
+        rw [← Finset.sum_add_distrib]
+        apply Finset.sum_congr rfl
+        intro action _
+        ring
+  have hmassFirst : ∑ observation,
+      (E.observation θ₁).probability observation = 1 :=
+    (finitePrior_probability_mem (E.observation θ₁)).2
+  have hgood : separation ≤ ∑ observation,
+      (E.observation θ₁).probability observation *
+        (firstLoss observation + secondLoss observation) := by
+    calc
+      separation = ∑ observation,
+          (E.observation θ₁).probability observation * separation := by
+        rw [← Finset.sum_mul, hmassFirst, one_mul]
+      _ ≤ _ := Finset.sum_le_sum fun observation _ ↦
+        mul_le_mul_of_nonneg_left (hcombined observation)
+          (FinitePrior.probability_nonneg (E.observation θ₁) observation)
+  have hmaxLoss : 0 ≤ maxLoss :=
+    (hsecondBounds 0).1.trans (hsecondBounds 0).2
+  have herrorTerm : ∀ observation,
+      -maxLoss * |(E.observation θ₁).probability observation -
+          (E.observation θ₂).probability observation| ≤
+        ((E.observation θ₂).probability observation -
+          (E.observation θ₁).probability observation) * secondLoss observation := by
+    intro observation
+    rw [abs_sub_comm]
+    by_cases hsign : 0 ≤ (E.observation θ₂).probability observation -
+        (E.observation θ₁).probability observation
+    · rw [abs_of_nonneg hsign]
+      nlinarith [mul_nonneg hsign (hsecondBounds observation).1,
+        mul_nonneg hmaxLoss hsign]
+    · have hnegative : (E.observation θ₂).probability observation -
+          (E.observation θ₁).probability observation ≤ 0 := le_of_not_ge hsign
+      rw [abs_of_nonpos hnegative]
+      nlinarith [mul_nonpos_of_nonpos_of_nonneg hnegative
+        (sub_nonneg.mpr (hsecondBounds observation).2)]
+  have herror : -maxLoss * E.observationL1Distance θ₁ θ₂ ≤
+      ∑ observation, ((E.observation θ₂).probability observation -
+        (E.observation θ₁).probability observation) * secondLoss observation := by
+    unfold observationL1Distance
+    rw [Finset.mul_sum]
+    exact Finset.sum_le_sum fun observation _ ↦ herrorTerm observation
+  have hriskDecomposition : E.risk δ θ₁ + E.risk δ θ₂ =
+      (∑ observation, (E.observation θ₁).probability observation *
+        (firstLoss observation + secondLoss observation)) +
+      ∑ observation, ((E.observation θ₂).probability observation -
+        (E.observation θ₁).probability observation) * secondLoss observation := by
+    unfold risk firstLoss secondLoss
+    rw [← Finset.sum_add_distrib, ← Finset.sum_add_distrib]
+    apply Finset.sum_congr rfl
+    intro observation _
+    ring
+  rw [hriskDecomposition]
+  linarith
+
 /-- Simulating a garbled-data rule from the original observation preserves its risk exactly. -/
 theorem risk_liftGarbledRule_eq
     {summaryCount : ℕ}
@@ -261,6 +376,40 @@ theorem worstRisk_liftGarbledRule_eq
 /-- Primal minimax value. -/
 noncomputable def minimaxRisk : ℝ :=
   sInf (Set.range E.worstRisk)
+
+/-- Every rule pays at least half the loss separation, discounted explicitly by observation
+ℓ¹ discrepancy. -/
+theorem half_separation_sub_l1_le_worstRisk
+    (θ₁ θ₂ : Fin (parameterCount + 1)) (separation maxLoss : ℝ)
+    (hloss : ∀ action : Fin (actionCount + 1),
+      separation ≤ E.loss θ₁ action + E.loss θ₂ action)
+    (hloss₂ : ∀ action : Fin (actionCount + 1),
+      0 ≤ E.loss θ₂ action ∧ E.loss θ₂ action ≤ maxLoss)
+    (δ : Rule actionCount observationCount) :
+    (separation - maxLoss * E.observationL1Distance θ₁ θ₂) / 2 ≤
+      E.worstRisk δ := by
+  have hrisk := E.separation_sub_l1_le_risk_add θ₁ θ₂ separation maxLoss
+    hloss hloss₂ δ
+  have hbdd : BddAbove (Set.range (E.risk δ)) := (Set.finite_range _).bddAbove
+  have h₁ : E.risk δ θ₁ ≤ E.worstRisk δ := le_csSup hbdd ⟨θ₁, rfl⟩
+  have h₂ : E.risk δ θ₂ ≤ E.worstRisk δ := le_csSup hbdd ⟨θ₂, rfl⟩
+  linarith
+
+/-- **Finite Le Cam minimax floor.** Approximate observational equivalence leaves a quantitative
+minimax obstruction. The exact half-separation theorem is recovered when the ℓ¹ discrepancy
+vanishes. -/
+theorem half_separation_sub_l1_le_minimaxRisk
+    (θ₁ θ₂ : Fin (parameterCount + 1)) (separation maxLoss : ℝ)
+    (hloss : ∀ action : Fin (actionCount + 1),
+      separation ≤ E.loss θ₁ action + E.loss θ₂ action)
+    (hloss₂ : ∀ action : Fin (actionCount + 1),
+      0 ≤ E.loss θ₂ action ∧ E.loss θ₂ action ≤ maxLoss) :
+    (separation - maxLoss * E.observationL1Distance θ₁ θ₂) / 2 ≤
+      E.minimaxRisk := by
+  apply le_csInf (Set.range_nonempty E.worstRisk)
+  rintro value ⟨δ, rfl⟩
+  exact E.half_separation_sub_l1_le_worstRisk
+    θ₁ θ₂ separation maxLoss hloss hloss₂ δ
 
 /-- Every rule pays at least half the separation of two observationally equivalent parameters. -/
 theorem half_separation_le_worstRisk_of_observation_eq
