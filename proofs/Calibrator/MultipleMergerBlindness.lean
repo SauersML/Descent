@@ -350,6 +350,13 @@ theorem speedTiltBetaMergerRate_self (β : ℝ) (k : ℕ) :
     speedTiltBetaMergerRate β k k = speedTiltFullMergerRate β (k - 2) := by
   simp [speedTiltBetaMergerRate]
 
+/-- The general merger-rate API inherits the exact Bolthausen--Sznitman full-merger law. -/
+@[simp] theorem speedTiltBetaMergerRate_zero_beta_self (extra : ℕ) :
+    speedTiltBetaMergerRate 0 (extra + 2) (extra + 2) =
+      1 / ((extra : ℝ) + 1) := by
+  rw [speedTiltBetaMergerRate_self]
+  simpa using speedTiltFullMergerRate_zero_beta extra
+
 /-- Every specified merger rate is positive on the biological domain. -/
 theorem speedTiltBetaMergerRate_pos
     {β : ℝ} (hβ : -1 < β) {b k : ℕ} (hk : 2 ≤ k) :
@@ -661,7 +668,7 @@ theorem frontSpeedBias_tripleMergerRate_lt_half
 /-- No speed tilt gives the Bolthausen--Sznitman three-lineage coordinate `1/2`. -/
 @[simp] theorem speedTiltBetaMergerRate_three_three_zero :
     speedTiltBetaMergerRate 0 3 3 = 1 / 2 := by
-  norm_num
+  simp
 
 /-! ## Bolthausen--Sznitman total-rate ladder -/
 
