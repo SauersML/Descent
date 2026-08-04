@@ -95,7 +95,7 @@ theorem ld_retention_lt_one (r Ne : ℝ)
 
 /-- LD retention is nonneg for reasonable parameters. -/
 theorem ld_retention_nonneg (r Ne : ℝ)
-    (hr : 0 ≤ r) (hr1 : r ≤ 1) (hNe : 1 ≤ Ne) :
+    (hr1 : r ≤ 1) (hNe : 1 ≤ Ne) :
     0 ≤ ldRetentionPerGen r Ne := by
   unfold ldRetentionPerGen
   apply mul_nonneg
@@ -135,7 +135,7 @@ theorem ld_decays_with_time (D₀ r Ne : ℝ) (t₁ t₂ : ℕ)
   simp only [ldAfterGenerations, abs_mul, abs_of_pos hD₀]
   apply mul_lt_mul_of_pos_left _ hD₀
   have h_ret_nn : 0 ≤ ldRetentionPerGen r Ne :=
-    ld_retention_nonneg r Ne (le_of_lt hr) (le_of_lt hr1) (le_of_lt hNe)
+    ld_retention_nonneg r Ne (le_of_lt hr1) (le_of_lt hNe)
   have h_ret_lt : ldRetentionPerGen r Ne < 1 :=
     ld_retention_lt_one r Ne hr hr1 hNe
   rw [abs_of_nonneg (pow_nonneg h_ret_nn _), abs_of_nonneg (pow_nonneg h_ret_nn _)]

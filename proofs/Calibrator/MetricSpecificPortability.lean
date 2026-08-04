@@ -1590,7 +1590,7 @@ theorem uResolvedConditional_driftDefect_zero (u : Fin 2) :
     driftDefect twoBitIndexWeights (uResolvedConditional u) = 0 := by
   unfold driftDefect pooledConditional uResolvedConditional twoBitIndexWeights
     binnedRiskByAncestry
-  simp only [Fin.sum_univ_two, Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons]
+  simp only [Fin.sum_univ_two, Matrix.cons_val_zero, Matrix.cons_val_one]
   ring
 
 /-- **Resolving `V` exposes drift**, at every value of the bit. -/
@@ -2397,7 +2397,7 @@ theorem rareAncestry_driftDefect_eq (ε : ℝ) :
     driftDefect (rareAncestryWeights ε) rareAncestryRisks = ε * (1 - ε) := by
   unfold driftDefect pooledConditional rareAncestryWeights rareAncestryRisks
     twoAncestryConditional
-  simp [Fin.sum_univ_two, Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons]
+  simp [Fin.sum_univ_two, Matrix.cons_val_zero, Matrix.cons_val_one]
   ring
 
 /-- **And it exceeds the square of the rare group's share**, for any share below one half.
@@ -3198,7 +3198,7 @@ theorem ldRetentionPerGen_abs_lt_one {recomb Ne : ℝ}
     (hr0 : 0 ≤ recomb) (hr1 : recomb ≤ 1) (hNe : 1 < Ne) :
     |ldRetentionPerGen recomb Ne| < 1 := by
   have hnn : 0 ≤ ldRetentionPerGen recomb Ne :=
-    ld_retention_nonneg recomb Ne hr0 hr1 (le_of_lt hNe)
+    ld_retention_nonneg recomb Ne hr1 (le_of_lt hNe)
   have hlt : ldRetentionPerGen recomb Ne < 1 := by
     have hfac : 0 < 1 - 1 / (2 * Ne) := by
       rw [sub_pos, div_lt_one (by linarith)]
