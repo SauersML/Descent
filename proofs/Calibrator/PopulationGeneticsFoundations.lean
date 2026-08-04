@@ -612,6 +612,15 @@ theorem wrightFIT_eq_pairwiseFstFromBranches (a b : ℝ) :
 noncomputable def heterozygosityLossFromDrift (t : ℕ) (Ne : ℝ) : ℝ :=
   1 - (1 - 1 / (2 * Ne)) ^ t
 
+/-- **heterozygosityLossFromDrift at its junk point, named.** An empty population loses all
+heterozygosity in one generation. The per-generation retention is junk-one, so the loss is `0` at
+every generation count -- no drift at all, reported for the strongest drift possible. Consumers
+must exclude the argument that makes the guard vanish. -/
+theorem heterozygosityLossFromDrift_empty_population_is_junk (t : ℕ) :
+    heterozygosityLossFromDrift t 0 = 0 := by
+  unfold heterozygosityLossFromDrift
+  simp
+
 /-- **One generation of drift in a population of one, pinned.** This definition carries no result
 of its own. At `Ne = 1` a single generation loses half the heterozygosity, which fixes the
 per-generation rate at `1 / (2 Ne)` against `1 / Ne` and against `1 / (4 Ne)`. -/
@@ -1309,6 +1318,15 @@ theorem fstMigrationMutation_lt_mutationOnly (Ne m μ : ℝ)
 noncomputable def steppingStoneCharacteristicLength (m σ_sq μ : ℝ) : ℝ :=
   Real.sqrt (m * σ_sq / (2 * μ))
 
+/-- **steppingStoneCharacteristicLength at its junk point, named.** Without mutation there is no
+scale at which isolation by distance saturates, so the characteristic length is unbounded. The
+divisor is zero, the radicand is junk-zero, and the length is `0`: complete local isolation, the
+opposite limit. Consumers must exclude the argument that makes the guard vanish. -/
+theorem steppingStoneCharacteristicLength_no_mutation_is_junk (m σ_sq : ℝ) :
+    steppingStoneCharacteristicLength m σ_sq 0 = 0 := by
+  unfold steppingStoneCharacteristicLength
+  simp
+
 /-- The characteristic length scale is positive for positive migration,
     dispersal and mutation rates. -/
 theorem steppingStoneCharacteristicLength_pos (m σ_sq μ : ℝ)
@@ -1585,6 +1603,15 @@ theorem hetRecurrence_closed_form (Ne H₀ : ℝ) (t : ℕ) :
     names from 'fst', 'heterozygosity', and the formula alone does not fix which is meant. -/
 noncomputable def heterozygosityLossDerived (Ne : ℝ) (t : ℕ) : ℝ :=
   1 - (1 - 1 / (2 * Ne)) ^ t
+
+/-- **heterozygosityLossDerived at its junk point, named.** The same failure as
+`heterozygosityLossFromDrift_empty_population_is_junk` reached through a second definition of the
+same quantity, so an agreement check between the two derivations passes on the wrong value.
+Consumers must exclude the argument that makes the guard vanish. -/
+theorem heterozygosityLossDerived_empty_population_is_junk (t : ℕ) :
+    heterozygosityLossDerived 0 t = 0 := by
+  unfold heterozygosityLossDerived
+  simp
 
 /-- **Fst matches heterozygosity loss.**
     When H₀ > 0, heterozygosityLossDerived Ne t = 1 - hetRecurrence Ne H₀ t / H₀. -/

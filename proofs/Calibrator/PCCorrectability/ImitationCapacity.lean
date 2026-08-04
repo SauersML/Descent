@@ -1043,6 +1043,14 @@ assigns to a unit isotropic spike on `nSites` variants.
 def traceWindowSpikeLoad (decay : ℝ) (nSites : ℕ) : ℝ :=
   ldPrecisionTrace decay nSites / (nSites : ℝ)
 
+/-- **traceWindowSpikeLoad at its junk point, named.** Averaging a trace over no sites is
+undefined. Lean returns `0`: no spike load, which is what a genuinely flat spectrum also gives.
+Consumers must exclude the argument that makes the guard vanish. -/
+theorem traceWindowSpikeLoad_no_sites_is_junk (decay : ℝ) :
+    traceWindowSpikeLoad decay 0 = 0 := by
+  unfold traceWindowSpikeLoad
+  simp
+
 /-- **The identification.**  The whitening gain already in the corpus *is* the
 large-chromosome certificate value of the trace-window constraint.  This is
 what turns `(1+ρ²)/(1-ρ²)` from a quantity correlated with detectability into
@@ -1062,6 +1070,16 @@ constraint is the trace window and the effect prior is isotropic.
     boundary against `headroom · (1 - ρ²) / (1 + ρ²)`. -/
 def whitenedCapacity (headroom decay : ℝ) : ℝ :=
   headroom / ldWhiteningGain decay
+
+/-- **whitenedCapacity at its junk point, named.** Two junk branches in sequence. At unit decay
+the whitening gain divides by `1 - decay ^ 2` and is junk-zero, so the capacity divides by that
+zero and is junk-zero in turn. A channel at perfect retention -- where the gain in fact diverges
+-- is reported as having no capacity at all, and neither branch is visible in the value.
+Consumers must exclude the argument that makes the guard vanish. -/
+theorem whitenedCapacity_perfect_retention_is_junk (headroom : ℝ) :
+    whitenedCapacity headroom 1 = 0 := by
+  unfold whitenedCapacity ldWhiteningGain
+  norm_num
 
 theorem whitenedCapacity_closedForm (headroom decay : ℝ) :
     whitenedCapacity headroom decay =

@@ -441,6 +441,16 @@ corpus, not a claim against an experiment. -/
 noncomputable def berryEsseenBound (C ρ σ_sq m : ℝ) : ℝ :=
   berryEsseenErrorBound C σ_sq ρ / Real.sqrt m
 
+/-- **berryEsseenBound at its junk point, named.** With no markers there is no sum for the
+central limit theorem to approximate and the Berry-Esseen bound does not apply. The square root
+of zero is zero, the divisor is zero, and the bound is `0`: a normal approximation certified as
+exact where there is nothing to approximate. Consumers must exclude the argument that makes the
+guard vanish. -/
+theorem berryEsseenBound_no_markers_is_junk (C ρ σ_sq : ℝ) :
+    berryEsseenBound C ρ σ_sq 0 = 0 := by
+  unfold berryEsseenBound
+  simp
+
 /-- **The root-`m` law, as an identity rather than a rate.**
 
 Multiplying the bound by the root of the block count returns the per-block error factor, and no

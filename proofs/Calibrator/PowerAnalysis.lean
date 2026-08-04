@@ -110,6 +110,16 @@ theorem ncp_increases_with_n (n₁ n₂ : ℕ) (beta p : ℝ)
 noncomputable def powerAtThreshold (ncp z_alpha : ℝ) : ℝ :=
   Phi (Real.sqrt ncp - z_alpha)
 
+/-- **powerAtThreshold at its junk point, named.** A negative non-centrality parameter is
+inadmissible; `Real.sqrt` is junk-zero there, so the power collapses to the size of the test. A
+caller passing a sign-flipped effect gets the nominal type-one error rate back as if it were
+power. Consumers must exclude the argument that makes the guard vanish. -/
+theorem powerAtThreshold_negative_noncentrality_is_junk (z_alpha : ℝ) :
+    powerAtThreshold (-1) z_alpha = Phi (-z_alpha) := by
+  unfold powerAtThreshold
+  rw [Real.sqrt_eq_zero_of_nonpos (by norm_num)]
+  norm_num
+
 /-- **Power increases with the noncentrality parameter** at a fixed
     threshold. -/
 theorem powerAtThreshold_mono (ncp₁ ncp₂ z_alpha : ℝ) (h : ncp₁ ≤ ncp₂) :

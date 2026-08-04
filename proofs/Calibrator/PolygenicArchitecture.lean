@@ -393,6 +393,15 @@ noncomputable def uniformCatastrophicPortabilityScore
     (M : ℕ) (mismatched : Finset (Fin M)) : ℝ :=
   1 - (mismatched.card : ℝ) / (M : ℝ)
 
+/-- **uniformCatastrophicPortabilityScore at its junk point, named.** An empty variant panel has
+no portability to score. The divisor is zero, the mismatch fraction is junk-zero, and the score
+is `1`: PERFECT portability, awarded to a panel with no variants in it. Consumers must exclude
+the argument that makes the guard vanish. -/
+theorem uniformCatastrophicPortabilityScore_empty_panel_is_junk (mismatched : Finset (Fin 0)) :
+    uniformCatastrophicPortabilityScore 0 mismatched = 1 := by
+  unfold uniformCatastrophicPortabilityScore
+  simp
+
 /-- **More polygenic architectures are more robust to the same number of badly
 mismatched causal SNPs.**
 
