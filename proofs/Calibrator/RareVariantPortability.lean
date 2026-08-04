@@ -443,6 +443,25 @@ theorem mutationSelectionBalance_mem_unit (mu s h : ℝ)
   rw [div_le_one h_load]
   linarith
 
+/-- **Exact loss boundary of dominant mutation--selection balance.**  When total load is nonzero,
+the equilibrium deleterious-allele frequency vanishes exactly when mutation input vanishes. -/
+theorem mutationSelectionBalance_eq_zero_iff
+    (mu s h : ℝ) (h_load : h * s + mu ≠ 0) :
+    mutationSelectionBalance mu s h = 0 ↔ mu = 0 := by
+  unfold mutationSelectionBalance
+  rw [div_eq_zero_iff]
+  simp [h_load]
+
+/-- **Exact fixation boundary of dominant mutation--selection balance.**  When total load is
+nonzero, the equilibrium frequency is one exactly when the effective selective component `h*s`
+vanishes. -/
+theorem mutationSelectionBalance_eq_one_iff
+    (mu s h : ℝ) (h_load : h * s + mu ≠ 0) :
+    mutationSelectionBalance mu s h = 1 ↔ h * s = 0 := by
+  unfold mutationSelectionBalance
+  rw [div_eq_iff h_load]
+  constructor <;> intro h_eq <;> nlinarith
+
 /-- The balance is strictly below the textbook `mu / (h s)`, so the classical
 formula is an upper bound and the correction is second order in `mu`. -/
 theorem mutationSelectionBalance_lt_classical (mu s h : ℝ)
