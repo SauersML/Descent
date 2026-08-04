@@ -1372,6 +1372,100 @@ theorem belowThresholdMass_pos_inside :
   unfold belowThresholdMass uniformTwoWeights twoAncestryConditional
   norm_num [Fin.sum_univ_two]
 
+
+/-! #### The obstruction is drift VISIBLE TO THE SCORE'S BINS, not total effect heterogeneity
+
+The irreducible defect is the variance across ancestry of the BIN-AVERAGED risk, not of the
+pointwise risk. Those come apart, and the distinction decides whether the portability floor is
+estimable and possibly small or a restatement of "effect sizes differ across populations".
+
+Below, two ancestries whose risks at a fine covariate resolution are `4/5` and `1/5` -- a large
+pointwise disagreement -- average to `1/2` in both ancestries once binned. At the bin resolution
+the defect is exactly zero: a score whose level sets average the drift away carries no irreducible
+obstruction, however large the underlying effect heterogeneity. Sharpening the bins reveals it.
+
+That is co-monotonicity in its operative form. Resolution and defect move together, so a claim to
+have built a maximally discriminative score that is also calibrated across ancestry is a claim
+that the drift is invisible to that score's level sets -- which is testable, on the fitted curves,
+rather than a matter of opinion.
+-/
+
+/-- Two ancestries at equal weight in the deployment population. -/
+noncomputable def ancestryPairWeights : Fin 2 → ℝ := ![1 / 2, 1 / 2]
+
+/-- Their risks at one fine covariate value: a large pointwise disagreement. -/
+noncomputable def fineRiskByAncestry : Fin 2 → ℝ := ![4 / 5, 1 / 5]
+
+/-- Their BIN-AVERAGED risks, which agree: the bin averages the disagreement away. -/
+noncomputable def binnedRiskByAncestry : Fin 2 → ℝ := ![1 / 2, 1 / 2]
+
+/-- **At the bin resolution there is no obstruction at all.** -/
+theorem binnedRisk_driftDefect_zero :
+    driftDefect ancestryPairWeights binnedRiskByAncestry = 0 := by
+  unfold driftDefect pooledConditional ancestryPairWeights binnedRiskByAncestry
+  norm_num [Fin.sum_univ_two]
+
+/-- **At the fine resolution there is.** -/
+theorem fineRisk_driftDefect_pos :
+    0 < driftDefect ancestryPairWeights fineRiskByAncestry := by
+  unfold driftDefect pooledConditional ancestryPairWeights fineRiskByAncestry
+  norm_num [Fin.sum_univ_two]
+
+/-- **Sharpening the score reveals drift the coarse bins hid.**
+
+The same two ancestries carry no measurable obstruction when the score bins average their risks
+together, and a strictly positive one when the bins separate them. So the portability floor is a
+property of the score's resolution and not of the biology alone, and a score can be made
+ancestry-calibrated by refusing to resolve -- at the exact cost of the resolution it gave up. -/
+theorem refining_reveals_drift :
+    driftDefect ancestryPairWeights binnedRiskByAncestry
+      < driftDefect ancestryPairWeights fineRiskByAncestry := by
+  rw [binnedRisk_driftDefect_zero]
+  exact fineRisk_driftDefect_pos
+
+/-! #### A decision loss wants a median, not the mean that meta-analysis estimates
+
+Under squared loss the single best target is the ancestry-weighted MEAN, which is what a
+fixed-effects meta-analysis across cohorts estimates. Under a threshold decision loss it is a
+weighted MEDIAN of the ancestry-conditional risks. When the ancestry distribution is skewed --
+and a GWAS-derived `π` is heavily skewed -- these are different numbers, so the quantity the
+literature estimates is not the quantity a deployment decision needs.
+
+The witness below has three ancestries at weights `2/5, 3/10, 3/10` carrying risks `0, 0, 1`. The
+weighted mean is `3/10`; the weighted median is `0`. Absolute loss at `0` is `3/10`, and at the
+mean it is `21/50` -- strictly worse. The pooled mean is not merely a different summary, it is
+suboptimal for the decision.
+-/
+
+/-- A skewed ancestry distribution. -/
+noncomputable def skewedAncestryWeights : Fin 3 → ℝ := ![2 / 5, 3 / 10, 3 / 10]
+
+/-- Ancestry-conditional risks at the operating point. -/
+noncomputable def skewedAncestryRisks : Fin 3 → ℝ := ![0, 0, 1]
+
+/-- Ancestry-weighted absolute loss, the criterion a threshold decision induces. -/
+noncomputable def absoluteLoss {m : ℕ} (π η : Fin m → ℝ) (v : ℝ) : ℝ :=
+  ∑ i, π i * |η i - v|
+
+/-- **The pooled mean is `3/10`.** -/
+theorem skewedAncestry_pooled_mean :
+    pooledConditional skewedAncestryWeights skewedAncestryRisks = 3 / 10 := by
+  unfold pooledConditional skewedAncestryWeights skewedAncestryRisks
+  norm_num [Fin.sum_univ_three, Matrix.cons_val_zero, Matrix.cons_val_one,
+    Matrix.head_cons, Matrix.cons_val_two, Matrix.tail_cons]
+
+/-- **The median beats the mean under absolute loss.**
+
+So the target a decision loss wants is not the one a meta-analysis reports. Estimating the pooled
+effect and deploying it at a threshold optimises the wrong functional, and the gap widens with the
+skew of the ancestry distribution. -/
+theorem median_beats_mean_under_absolute_loss :
+    absoluteLoss skewedAncestryWeights skewedAncestryRisks 0
+      < absoluteLoss skewedAncestryWeights skewedAncestryRisks (3 / 10) := by
+  unfold absoluteLoss skewedAncestryWeights skewedAncestryRisks
+  norm_num [Fin.sum_univ_three, Matrix.cons_val_zero, Matrix.cons_val_one,
+    Matrix.head_cons, Matrix.cons_val_two, Matrix.tail_cons, abs_of_nonneg, abs_of_nonpos]
+
 /-! #### Unequal per-ancestry sample sizes inflate the effective resolution
 
 Splitting the index into `k` cells and estimating within each costs an estimation term
