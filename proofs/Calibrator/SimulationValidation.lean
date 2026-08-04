@@ -83,6 +83,13 @@ noncomputable def sourceSquaredEffectMass {q : ℕ}
     (β : Fin q → ℝ) : ℝ :=
   ∑ i, β i ^ 2
 
+/-- Reference evaluation at dimension two.  Each vector argument gets different entries, so a
+body that swaps two of its arguments does not agree with one that does not. -/
+theorem sourceSquaredEffectMass_at_reference_point :
+    sourceSquaredEffectMass (![1, 3] : Fin 2 → ℝ) = 10 := by
+  norm_num [sourceSquaredEffectMass, Fin.sum_univ_two]
+
+
 /-- Generic `q`-locus direct-causal witness with identical source and target
 states and no proxy, context, or novel-variant channels. Serves as the
 multi-locus baseline sanity check. -/

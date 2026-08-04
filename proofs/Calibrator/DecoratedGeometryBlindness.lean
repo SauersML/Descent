@@ -541,6 +541,13 @@ section RareSubpopulation
 Empirical status: NOT AN EMPIRICAL CLAIM -- this is a fixed finite weight. -/
 noncomputable def rareWeight (rare : ℝ) (p : Bool) : ℝ := if p then rare else 1 - rare
 
+/-- Reference evaluation.  Hypothesis arguments are discharged at the point, and a `Bool`
+argument selects the branch; the theorem still states a number. -/
+theorem rareWeight_at_reference_point :
+    rareWeight 1 true = 1 := by
+  norm_num [rareWeight]
+
+
 /-- The rare population carries risk one, the common population risk zero.
 
 Empirical status: NOT AN EMPIRICAL CLAIM -- this is a fixed finite decoration. -/

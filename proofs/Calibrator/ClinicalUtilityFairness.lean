@@ -1036,6 +1036,13 @@ noncomputable def numberNeededToScreen (sens π : ℝ)
     (_hsens : 0 < sens) (_hπ : 0 < π) : ℝ :=
   1 / (sens * π)
 
+/-- Reference evaluation.  Hypothesis arguments are discharged at the point, and a `Bool`
+argument selects the branch; the theorem still states a number. -/
+theorem numberNeededToScreen_at_reference_point :
+    numberNeededToScreen 1 1 (by norm_num) (by norm_num) = 1 := by
+  norm_num [numberNeededToScreen]
+
+
 /-- NNS is higher in the target population. -/
 theorem nns_higher_in_target
     (sens_s sens_t π : ℝ)

@@ -73,6 +73,13 @@ noncomputable def pgsMean {m : ℕ} (β : Fin m → ℝ) (p : Fin m → ℝ) : �
 noncomputable def pgsVariance {m : ℕ} (β : Fin m → ℝ) (p : Fin m → ℝ) : ℝ :=
   ∑ i, β i ^ 2 * (2 * p i * (1 - p i))
 
+/-- Reference evaluation at dimension two.  Each vector argument gets different entries, so a
+body that swaps two of its arguments does not agree with one that does not. -/
+theorem pgsVariance_at_reference_point :
+    pgsVariance (![1, 3] : Fin 2 → ℝ) (![2, 5] : Fin 2 → ℝ) = -364 := by
+  norm_num [pgsVariance, Fin.sum_univ_two]
+
+
 /-- PGS variance is nonneg. -/
 theorem pgs_variance_nonneg {m : ℕ} (β : Fin m → ℝ) (p : Fin m → ℝ)
     (hp : ∀ i, 0 ≤ p i) (hp1 : ∀ i, p i ≤ 1) :

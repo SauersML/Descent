@@ -172,6 +172,13 @@ noncomputable def additiveVariance
     {m : ℕ} (p : Fin m → ℝ) (α : Fin m → ℝ) : ℝ :=
   ∑ i, 2 * p i * (1 - p i) * (α i) ^ 2
 
+/-- Reference evaluation at dimension two.  Each vector argument gets different entries, so a
+body that swaps two of its arguments does not agree with one that does not. -/
+theorem additiveVariance_at_reference_point :
+    additiveVariance (![1, 3] : Fin 2 → ℝ) (![2, 5] : Fin 2 → ℝ) = -300 := by
+  norm_num [additiveVariance, Fin.sum_univ_two]
+
+
 /-- Additive variance is nonneg. -/
 theorem additive_variance_nonneg
     {m : ℕ} (p : Fin m → ℝ) (α : Fin m → ℝ)

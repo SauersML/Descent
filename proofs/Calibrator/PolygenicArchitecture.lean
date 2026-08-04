@@ -247,6 +247,13 @@ theorem effective_polygenicity_ge_one
 noncomputable def effectivePolygenicityOfEffects {q : ℕ} (beta : Fin q → ℝ) : ℝ :=
   effectivePolygenicity (∑ j, beta j ^ 2) (∑ j, beta j ^ 4)
 
+/-- Reference evaluation at dimension two.  Each vector argument gets different entries, so a
+body that swaps two of its arguments does not agree with one that does not. -/
+theorem effectivePolygenicityOfEffects_at_reference_point :
+    effectivePolygenicityOfEffects (![1, 3] : Fin 2 → ℝ) = 50 / 41 := by
+  norm_num [effectivePolygenicityOfEffects, effectivePolygenicity, Fin.sum_univ_two]
+
+
 /-- `∑ β⁴ ≤ (∑ β²)²`: the lower half of the polygenicity range, as a theorem
 about an effect vector rather than a hypothesis about two reals. It is the
 statement that a sum of nonnegative numbers dominates the sum of their
