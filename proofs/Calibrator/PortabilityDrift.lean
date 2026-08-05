@@ -3378,7 +3378,39 @@ theorem PGSEvolutionaryModel.coordinateSummary_matches_generational_popgen_at_fl
 allele frequencies drift away from the source frequencies, even if the source
 score itself is unchanged.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **FALSIFIED** (`simcov/battery_bulk52.py`). Retention
+    cannot be a function of the GAP alone, which is all this body is.
+
+    The observable is the fraction of a variant's predictive contribution that
+    survives transport: with a fixed effect, the ratio of realised
+    score-phenotype covariance in the target to that in the source, over 3×10⁶
+    individuals per population. Three cells share `|Δp| = 0.2` at different
+    places in the unit interval:
+
+      p_source  p_target   this body   measured retention
+       0.50      0.30       0.9165      0.8418 ± 0.0014
+       0.30      0.10       0.9165      0.4278 ± 0.0007
+       0.70      0.50       0.9165      1.1926 ± 0.0020
+
+    This body predicts the SAME number for all three, because it sees only
+    `|Δp|`. The measurement spans a factor of nearly three across them. Worst
+    cell 560 sems at 91% relative. That is a refutation of the SHAPE, not of a
+    constant: no rescaling of an exponential in `|Δp|` can produce three
+    different values from one gap.
+
+    The third row is the sharper problem. Retention there EXCEEDS ONE -- moving
+    a frequency from 0.7 toward 0.5 raises the variant's genotype variance and
+    so its contribution -- and a quantity called a penalty, bounded above by one
+    for every argument, cannot represent that at all.
+
+    WHAT FITS: the genotype-variance ratio `2·p_t(1-p_t) / (2·p_s(1-p_s))`,
+    carried on the same cells, MATCHES at worst 2.12 sems (0.35% relative). Its
+    square root -- what a STANDARDIZED score would give -- is also falsified, at
+    411 sems, so the exponent is settled too. Control: the counted source allele
+    frequency recovers `pSource`, at 1.13 sems.
+
+    Consequence: `tagAlleleFreqRetentionAt` and `causalAlleleFreqRetentionAt`
+    are this body applied to their own frequencies and inherit the failure. -/
 noncomputable def alleleFreqMismatchPenalty (pSource pTarget : ℝ) : ℝ :=
   Real.exp (-|pTarget - pSource|)
 
@@ -7166,8 +7198,8 @@ name/quantity mismatch, so the two are separated rather than bounded.
     PRODUCT is wrong; which single factor replaces it needs tighter bars. The
     direction is consistent with `sharedLD_from_equilibrium`, where measured
     shared LD stayed near 1 rather than falling to `M/(1+M)` -- if the LD term
-    does not decay as written, multiplying by it twice over is exactly the error
-    this table shows.
+    does not decay as written, multiplying by it twice over is the error this
+    table shows.
 
     Calibration, not a control: the estimator attenuates because `w = Σ_A·β`
     reuses the same finite-sample `Σ_A` the denominator contracts against, so
@@ -7230,6 +7262,59 @@ theorem signalRetentionMigrationDrift_nonneg (Ne m : ℝ)
     0 ≤ signalRetentionMigrationDrift Ne m := by
   rw [signalRetentionMigrationDrift_eq_ratio Ne m hNe hm]
   positivity
+
+/-- **The product form is the SQUARE of the single-factor law.**
+
+`sharedLDFromMigration (4·Nₑ·m) = 4·Nₑ·m / (1 + 4·Nₑ·m)` and
+`1 - fstMigrationDriftEquilibrium Nₑ m` are the same number, so the product this
+definition takes is that number multiplied by itself.  The two candidate laws
+the docstring above weighs against each other are therefore `x` and `x²` for the
+same measurable `x`. -/
+theorem signalRetentionMigrationDrift_eq_one_sub_fst_sq (Ne m : ℝ)
+    (hNe : 0 < Ne) (hm : 0 ≤ m) :
+    signalRetentionMigrationDrift Ne m =
+      (1 - fstMigrationDriftEquilibrium Ne m) ^ 2 := by
+  unfold signalRetentionMigrationDrift fstMigrationDriftEquilibrium
+    sharedLDFromMigration scaledMigrationRate
+  have hden : (1 + 4 * Ne * m) ≠ 0 := by nlinarith
+  field_simp
+  ring
+
+/-- **No calibration constant can reconcile the two laws**, which is what makes
+the comparison between them survive the defect that stalled it.
+
+Both runs recorded above divided measured retention by an estimator ceiling
+obtained from a panmictic control, and that ceiling came out `0.8905` and then
+`1.0430` on six replicates -- a 17% swing applied to every cell, which is why
+neither run's verdict was safe.  An unstable ceiling is a multiplicative
+constant on the measurement.
+
+This theorem says that no such constant maps the single-factor law onto the
+product law: they are `x` and `x²`, so a constant `c` would have to equal `x`,
+and `x` varies with migration.  A calibration error therefore cannot turn one
+into the other, and cannot manufacture agreement with the wrong one either.
+
+The design that follows needs no ceiling at all.  Measure retention and `F_ST`
+on the same data and read the slope of `log retention` against `log (1 - F_ST)`:
+the product form predicts `2`, the single factor predicts `1`, and an unknown
+multiplicative ceiling `c` contributes `log c` to the INTERCEPT and nothing to
+the slope.  That is the discriminating comparison this definition has been
+missing -- exponent 1 against exponent 2 -- and it is the reason the status
+below can stop being a standing debt.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM.  It is algebra about two
+    candidate laws, and it is what makes the measurement of them possible. -/
+theorem no_calibration_constant_reconciles_retention_laws :
+    ¬ ∃ c : ℝ, ∀ Ne m : ℝ, 0 < Ne → 0 < m →
+        c * (1 - fstMigrationDriftEquilibrium Ne m) =
+          signalRetentionMigrationDrift Ne m := by
+  rintro ⟨c, hc⟩
+  have h1 := hc 1 (1 / 4) (by norm_num) (by norm_num)
+  have h2 := hc 1 (3 / 4) (by norm_num) (by norm_num)
+  unfold signalRetentionMigrationDrift fstMigrationDriftEquilibrium
+    sharedLDFromMigration scaledMigrationRate at h1 h2
+  norm_num at h1 h2
+  linarith
 
 /-- Retained signal variance under migration-drift equals M²/((1+M)²) × V_A. -/
 theorem retainedSignalVarianceMigrationDrift_eq (V_A Ne m : ℝ)
