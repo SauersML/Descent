@@ -87,6 +87,21 @@ theorem blocks_top (n : ℕ) [NeZero n] : blocks (Theta n) = 1 := by
     ⟨Quotient.mk _ ⟨0, Nat.pos_of_ne_zero (NeZero.ne n)⟩⟩
   exact Nat.card_eq_one_iff_unique.mpr ⟨hsub, hne⟩
 
+/-- **One block means absorbed.**  A relation on the sample with a single class is `Θ`: the
+whole sample has a common ancestor.  K-C (1.10) names `Θ` as the absorbing state, and this
+is why the block count `1` is the only thing the death process needs to detect it. -/
+theorem blocks_eq_one_iff {n : ℕ} [NeZero n] (ξ : ER n) : blocks ξ = 1 ↔ ξ = Theta n := by
+  constructor
+  · intro h
+    have hsub : Subsingleton (Quotient ξ) := by
+      have := (Nat.card_eq_one_iff_unique.mp h).1
+      exact this
+    refine Setoid.ext fun x y => ⟨fun _ => trivial, fun _ => ?_⟩
+    exact Quotient.exact (Subsingleton.elim (Quotient.mk ξ x) (Quotient.mk ξ y))
+  · intro h
+    rw [h]
+    exact blocks_top n
+
 theorem blocks_pos {n : ℕ} [NeZero n] (ξ : ER n) : 0 < blocks ξ := by
   have hne : Nonempty (Quotient ξ) := ⟨Quotient.mk ξ ⟨0, Nat.pos_of_ne_zero (NeZero.ne n)⟩⟩
   exact Nat.card_pos
