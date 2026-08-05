@@ -5,6 +5,7 @@ import Descent.Program.Conclusions
 import Descent.PopGen.DGP
 import Descent.Spectral.CirculationDefect
 import Descent.Core.Fst
+import Descent.Core.Parameters
 
 namespace Descent
 
@@ -3357,63 +3358,17 @@ theorem ldCorrelationDecay_strictAnti_fst
     mul_lt_mul_of_pos_right hsqrt h_pos
   linarith
 
-/-- Generation-indexed population-genetic parameters that drive explicit
-time-varying portability state. These parameters govern drift, mutation,
-migration, and recombination without compressing transport into source `R²`. -/
-structure GenerationalPopGenParameters where
-  Ne : ℝ
-  μ : ℝ
-  mig : ℝ
-  recomb : ℝ
-  V_A : ℝ
-  Ne_pos : 0 < Ne
-  μ_nonneg : 0 ≤ μ
-  mig_nonneg : 0 ≤ mig
-  recomb_nonneg : 0 ≤ recomb
-  recomb_le_half : recomb ≤ 1 / 2
-  V_A_pos : 0 < V_A
+/-! ### Generation-indexed population-genetic parameters
 
-/-- **The parameter class is inhabited**, at a standard human-scale setting:
-`Nₑ = 1000`, `μ = 10⁻⁵` per generation, `m = 10⁻³`, `r = 10⁻²`, additive variance
-`1`.
+The record itself is `Core.PopGenParameters`. It used to be written out here as
+`Descent.Core.PopGenParameters` -- the same fields and the same positivity proofs as
+`DGP.EvolutionaryParameters`, differing only in spelling `μ` for `mu` and in dropping the
+divergence time. Two records meant a constraint tightened on one reached the other only
+if someone noticed. The accessors below are the generation-indexed laws this module adds
+to the shared record, not a second record.
+-/
 
-    Every value is strictly inside the constraints — no rate is `0` and the
-    recombination fraction is well below the free-recombination boundary `1/2` —
-    so nothing downstream is read at a degenerate point. -/
-noncomputable def GenerationalPopGenParameters.witness : GenerationalPopGenParameters where
-  Ne := 1000
-  μ := 1 / 100000
-  mig := 1 / 1000
-  recomb := 1 / 100
-  V_A := 1
-  Ne_pos := by norm_num
-  μ_nonneg := by norm_num
-  mig_nonneg := by norm_num
-  recomb_nonneg := by norm_num
-  recomb_le_half := by norm_num
-  V_A_pos := by norm_num
-
-namespace GenerationalPopGenParameters
-
-/-- Scaled mutation rate `θ = 4Neμ`.
-
-    Empirical status: UNTESTED. -/
-noncomputable def theta (g : GenerationalPopGenParameters) : ℝ :=
-  scaledMutationRate g.Ne g.μ
-
-/-- Scaled migration rate `M = 4Nem`.
-
-    Empirical status: UNTESTED. -/
-noncomputable def bigM (g : GenerationalPopGenParameters) : ℝ :=
-  scaledMigrationRate g.Ne g.mig
-
-/-- Reference evaluation: no migration, no scaled migration parameter. -/
-theorem bigM_at_zero_migration (g : GenerationalPopGenParameters) (hzero : g.mig = 0) :
-    bigM g = 0 := by
-  unfold bigM scaledMigrationRate
-  rw [hzero]
-  ring
-
+namespace Core.PopGenParameters
 
 /-- Coalescent time coordinate at generation `t`.
 
@@ -3455,12 +3410,12 @@ theorem bigM_at_zero_migration (g : GenerationalPopGenParameters) (hzero : g.mig
     check. Halving or doubling this factor moves `exp(-theta * tau)` from 0.135
     to 0.368 or 0.018 in the bottom rows, which the measurement excludes by
     hundreds of sems. -/
-noncomputable def tauAt (g : GenerationalPopGenParameters) (t : ℕ) : ℝ :=
+noncomputable def tauAt (g : Descent.Core.PopGenParameters) (t : ℕ) : ℝ :=
   (t : ℝ) / (2 * g.Ne)
 
 /-- With a vanishing denominator Mathlib returns `0`, which is a value this quantity can also
 take legitimately, so the branch is named rather than left to be inferred from the result. -/
-theorem tauAt_at_zero_denominator_is_junk (g : GenerationalPopGenParameters) (t : ℕ)
+theorem tauAt_at_zero_denominator_is_junk (g : Descent.Core.PopGenParameters) (t : ℕ)
     (hzero : (2 * g.Ne) = 0) :
     tauAt g t = 0 := by
   unfold tauAt
@@ -3468,7 +3423,7 @@ theorem tauAt_at_zero_denominator_is_junk (g : GenerationalPopGenParameters) (t 
 
 
 /-- Per-generation heterozygosity retention factor under drift + mutation. -/
-noncomputable def hetDecayFactor (g : GenerationalPopGenParameters) : ℝ :=
+noncomputable def hetDecayFactor (g : Descent.Core.PopGenParameters) : ℝ :=
   hetDecayFromScaled g.Ne g.theta
 
 /-- Transient differentiation after `t` generations. This is the same
@@ -3508,7 +3463,7 @@ layer, but now exposed directly to the mechanistic SNP/LD state.
     table are recorded on `DGP.fstTransientDecayFromScaled`. Power: the
     half-life prediction spans 32.62 to 69.31 across the design where the
     superseded base spans 69.31 to 554.52. -/
-noncomputable def fstTransientAt (g : GenerationalPopGenParameters) (t : ℕ) : ℝ :=
+noncomputable def fstTransientAt (g : Descent.Core.PopGenParameters) (t : ℕ) : ℝ :=
   (1 / (1 + g.theta + 2 * g.bigM)) *
     (1 - fstTransientDecayFromScaled g.Ne g.theta g.bigM ^ t)
 
@@ -3547,7 +3502,7 @@ generations.
     wrong functional form no matter what else the design shows. The numbers
     above are from the redone design. -/
 noncomputable def mutationSharedRetentionAt
-    (g : GenerationalPopGenParameters) (t : ℕ) : ℝ :=
+    (g : Descent.Core.PopGenParameters) (t : ℕ) : ℝ :=
   Real.exp (-g.theta * g.tauAt t)
 
 /-- Migration-driven restoration of shared variation after `t` generations.
@@ -3574,41 +3529,43 @@ noncomputable def mutationSharedRetentionAt
     `DGP.migrationLDBoost`, of which this is the generation-t reading.
     -/
 noncomputable def migrationSharedBoostAt
-    (g : GenerationalPopGenParameters) (t : ℕ) : ℝ :=
+    (g : Descent.Core.PopGenParameters) (t : ℕ) : ℝ :=
   1 + g.bigM * g.tauAt t / (1 + g.bigM)
 
-@[simp] theorem tauAt_zero (g : GenerationalPopGenParameters) :
+@[simp] theorem tauAt_zero (g : Descent.Core.PopGenParameters) :
     g.tauAt 0 = 0 := by
   simp [tauAt]
 
-@[simp] theorem fstTransientAt_zero (g : GenerationalPopGenParameters) :
+@[simp] theorem fstTransientAt_zero (g : Descent.Core.PopGenParameters) :
     g.fstTransientAt 0 = 0 := by
   simp [fstTransientAt, fstTransientDecayFromScaled, hetDecayFromScaled]
 
-@[simp] theorem mutationSharedRetentionAt_zero (g : GenerationalPopGenParameters) :
+@[simp] theorem mutationSharedRetentionAt_zero (g : Descent.Core.PopGenParameters) :
     g.mutationSharedRetentionAt 0 = 1 := by
   simp [mutationSharedRetentionAt, tauAt]
 
-@[simp] theorem migrationSharedBoostAt_zero (g : GenerationalPopGenParameters) :
+@[simp] theorem migrationSharedBoostAt_zero (g : Descent.Core.PopGenParameters) :
     g.migrationSharedBoostAt 0 = 1 := by
   simp [migrationSharedBoostAt, tauAt, bigM]
 
-end GenerationalPopGenParameters
+end Core.PopGenParameters
 
 /-- Exact bridge from the coarse DGP evolutionary block to the
 generation-indexed population-genetic parameter block used by the mechanistic
 transport model. This carries only the shared popgen primitives; the
 SNP/LD-aware state still lives in `CrossPopulationGenerationalModel`. -/
 noncomputable def PGSEvolutionaryModel.toGenerationalPopGenParameters
-    (m : PGSEvolutionaryModel) : GenerationalPopGenParameters where
+    (m : PGSEvolutionaryModel) : Descent.Core.PopGenParameters where
   Ne := m.Ne
-  μ := m.mu
+  mu := m.mu
   mig := m.mig
+  t_div := m.t_div
   recomb := m.recomb
   V_A := m.V_A
   Ne_pos := m.Ne_pos
-  μ_nonneg := m.mu_nonneg
+  mu_nonneg := m.mu_nonneg
   mig_nonneg := m.mig_nonneg
+  t_div_nonneg := m.t_div_nonneg
   recomb_nonneg := m.recomb_nonneg
   recomb_le_half := m.recomb_le_half
   V_A_pos := m.V_A_pos
@@ -3617,18 +3574,20 @@ noncomputable def PGSEvolutionaryModel.toGenerationalPopGenParameters
     (m : PGSEvolutionaryModel) :
     (m.toGenerationalPopGenParameters).theta = m.theta := by
   simp [PGSEvolutionaryModel.toGenerationalPopGenParameters,
-    GenerationalPopGenParameters.theta, EvolutionaryParameters.theta]
+    Descent.Core.PopGenParameters.theta, EvolutionaryParameters.theta,
+    scaledMutationRate]
 
 @[simp] theorem PGSEvolutionaryModel.toGenerationalPopGenParameters_bigM
     (m : PGSEvolutionaryModel) :
     (m.toGenerationalPopGenParameters).bigM = m.bigM := by
   simp [PGSEvolutionaryModel.toGenerationalPopGenParameters,
-    GenerationalPopGenParameters.bigM, EvolutionaryParameters.bigM]
+    Descent.Core.PopGenParameters.bigM, EvolutionaryParameters.bigM,
+    scaledMigrationRate]
 
 @[simp] theorem PGSEvolutionaryModel.toGenerationalPopGenParameters_hetDecayFactor
     (m : PGSEvolutionaryModel) :
     (m.toGenerationalPopGenParameters).hetDecayFactor = m.hetDecayFactor := by
-  unfold GenerationalPopGenParameters.hetDecayFactor PGSEvolutionaryModel.hetDecayFactor
+  unfold Descent.Core.PopGenParameters.hetDecayFactor PGSEvolutionaryModel.hetDecayFactor
     hetDecayFromScaled
   rw [PGSEvolutionaryModel.toGenerationalPopGenParameters_theta]
   rfl
@@ -3642,13 +3601,14 @@ theorem constrained them jointly and could not have caught the decay base. -/
     (m : PGSEvolutionaryModel) :
     (m.toGenerationalPopGenParameters).fstTransientAt (Nat.floor m.t_div) =
       m.fstTransient := by
-  unfold GenerationalPopGenParameters.fstTransientAt PGSEvolutionaryModel.fstTransient
+  unfold Descent.Core.PopGenParameters.fstTransientAt PGSEvolutionaryModel.fstTransient
     fstTransientDecayFromScaled hetDecayFromScaled
   simp [PGSEvolutionaryModel.toGenerationalPopGenParameters, fstEquilibrium,
     Descent.Core.fstFromFlow,
-    GenerationalPopGenParameters.theta, GenerationalPopGenParameters.bigM,
+    Descent.Core.PopGenParameters.theta, Descent.Core.PopGenParameters.bigM,
     PGSEvolutionaryModel.toEvo, EvolutionaryParameters.theta,
-    EvolutionaryParameters.bigM, scaledMutationRate, scaledMigrationRate]
+    EvolutionaryParameters.bigM, scaledMutationRate, scaledMigrationRate,
+    Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy]
   exact Or.inl (by ring)
 
 /-- When divergence time is an integer number of generations, the coarse
@@ -3659,10 +3619,10 @@ theorem PGSEvolutionaryModel.toGenerationalPopGenParameters_mutationSharedRetent
     (h_disc : m.t_div = (Nat.floor m.t_div : ℝ)) :
     (m.toGenerationalPopGenParameters).mutationSharedRetentionAt (Nat.floor m.t_div) =
       mutationLDErosion m.toEvo := by
-  unfold GenerationalPopGenParameters.mutationSharedRetentionAt
+  unfold Descent.Core.PopGenParameters.mutationSharedRetentionAt
     PGSEvolutionaryModel.toEvo mutationLDErosion
   rw [PGSEvolutionaryModel.toGenerationalPopGenParameters_theta]
-  simp only [GenerationalPopGenParameters.tauAt,
+  simp only [Descent.Core.PopGenParameters.tauAt,
     PGSEvolutionaryModel.toGenerationalPopGenParameters,
     EvolutionaryParameters.theta, EvolutionaryParameters.tau]
   rw [h_disc, Nat.floor_natCast]
@@ -3675,10 +3635,10 @@ theorem PGSEvolutionaryModel.toGenerationalPopGenParameters_migrationSharedBoost
     (h_disc : m.t_div = (Nat.floor m.t_div : ℝ)) :
     (m.toGenerationalPopGenParameters).migrationSharedBoostAt (Nat.floor m.t_div) =
       migrationLDBoost m.toEvo := by
-  unfold GenerationalPopGenParameters.migrationSharedBoostAt
+  unfold Descent.Core.PopGenParameters.migrationSharedBoostAt
     PGSEvolutionaryModel.toEvo migrationLDBoost
   rw [PGSEvolutionaryModel.toGenerationalPopGenParameters_bigM]
-  simp only [GenerationalPopGenParameters.tauAt,
+  simp only [Descent.Core.PopGenParameters.tauAt,
     PGSEvolutionaryModel.toGenerationalPopGenParameters,
     EvolutionaryParameters.bigM, EvolutionaryParameters.tau]
   rw [h_disc, Nat.floor_natCast]
@@ -3886,7 +3846,7 @@ time-varying target LD and tagging state is derived from:
   mutation-shift components,
 - plus target-only untaggable phenotype variance from novel mutations. -/
 structure CrossPopulationGenerationalModel (p q : ℕ) where
-  popGen : GenerationalPopGenParameters
+  popGen : Descent.Core.PopGenParameters
   betaSource : Fin q → ℝ
   targetEffectHeterogeneityAt : ℕ → Fin q → ℝ
   novelCausalEffectTargetAt : ℕ → Fin q → ℝ
@@ -3957,7 +3917,7 @@ end CrossPopulationGenerationalModel
     variance and prevalence fields are strictly inside their constraints. -/
 noncomputable def CrossPopulationGenerationalModel.witness (p q : ℕ) :
     CrossPopulationGenerationalModel p q where
-  popGen := GenerationalPopGenParameters.witness
+  popGen := Descent.Core.PopGenParameters.witness
   betaSource := fun _ ↦ 0
   targetEffectHeterogeneityAt := fun _ _ ↦ 0
   novelCausalEffectTargetAt := fun _ _ ↦ 0
@@ -4108,10 +4068,10 @@ noncomputable def causalAlleleFreqRetentionAt {p q : ℕ}
 
 /-- Fraction of target-side novel variation accumulated by generation `t`.
 This is the complement of shared ancestral variation retained after mutation. -/
-noncomputable def novelVariantInnovationAt (g : GenerationalPopGenParameters) (t : ℕ) : ℝ :=
+noncomputable def novelVariantInnovationAt (g : Descent.Core.PopGenParameters) (t : ℕ) : ℝ :=
   1 - g.mutationSharedRetentionAt t
 
-@[simp] theorem novelVariantInnovationAt_zero (g : GenerationalPopGenParameters) :
+@[simp] theorem novelVariantInnovationAt_zero (g : Descent.Core.PopGenParameters) :
     novelVariantInnovationAt g 0 = 0 := by
   simp [novelVariantInnovationAt]
 
@@ -6140,12 +6100,14 @@ theorem MutationDriftModelAssumptions.theta_div_mu (m : MutationDriftModelAssump
     (h : m.μ ≠ 0) :
     m.theta / m.μ = 4 * m.Ne := by
   unfold MutationDriftModelAssumptions.theta scaledMutationRate
+    Descent.Core.scaledMutationRate Descent.Core.ploidy
   field_simp
+  ring
 
 /-- θ is positive for any valid mutation-drift model. -/
 theorem MutationDriftModelAssumptions.theta_pos (m : MutationDriftModelAssumptions) :
     0 < m.theta := by
-  unfold MutationDriftModelAssumptions.theta scaledMutationRate
+  unfold MutationDriftModelAssumptions.theta scaledMutationRate Descent.Core.scaledMutationRate Descent.Core.ploidy
   nlinarith [m.Ne_pos, m.mu_pos]
 
 /-- **One generation of the identity-by-descent balance.**
@@ -6275,7 +6237,11 @@ balance** driven by mutation alone. -/
 theorem MutationDriftModelAssumptions.fstEquilibrium_isFixedPoint
     (m : MutationDriftModelAssumptions) :
     ibdFlowStep m.Ne m.μ m.fstEquilibrium = m.fstEquilibrium := by
-  have hθ : m.fstEquilibrium = 1 / (1 + 4 * m.Ne * m.μ) := rfl
+  have hθ : m.fstEquilibrium = 1 / (1 + 4 * m.Ne * m.μ) := by
+    unfold MutationDriftModelAssumptions.fstEquilibrium MutationDriftModelAssumptions.theta
+      fstMutationDriftEquilibrium scaledMutationRate Descent.Core.fstFromFlow
+      Descent.Core.scaledMutationRate Descent.Core.ploidy
+    ring_nf
   rw [hθ]
   exact ibdFlowStep_fixedPoint m.Ne m.μ m.Ne_pos (le_of_lt m.mu_pos)
 
@@ -7376,13 +7342,13 @@ theorem fstIslandMultiplicativeEquilibrium_ne_fstMigrationDriftEquilibrium :
 /-- Scaled migration rate is positive when Ne and m are positive. -/
 theorem scaledMigrationRate_pos (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 < m) :
     0 < scaledMigrationRate Ne m := by
-  unfold scaledMigrationRate
+  unfold scaledMigrationRate Descent.Core.scaledMigrationRate Descent.Core.ploidy
   positivity
 
 /-- Fst under migration-drift equilibrium equals 1/(1 + M). -/
 theorem fstMigrationDriftEquilibrium_eq_from_M (Ne m : ℝ) :
     fstMigrationDriftEquilibrium Ne m = 1 / (1 + scaledMigrationRate Ne m) := by
-  unfold fstMigrationDriftEquilibrium scaledMigrationRate Descent.Core.fstFromFlow
+  unfold fstMigrationDriftEquilibrium scaledMigrationRate Descent.Core.fstFromFlow Descent.Core.scaledMigrationRate Descent.Core.ploidy
   ring
 
 /-- Equilibrium Fst under migration-drift is positive for nonneg migration. -/
@@ -7507,7 +7473,7 @@ theorem SplitMigrationModel.fstMigDriftEq_eq_limit (s : SplitMigrationModel) :
     s.fstMigDriftEq = s.fstEqLimitLowMutationManyDemes := by
   unfold SplitMigrationModel.fstMigDriftEq fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
     SplitMigrationModel.fstEqLimitLowMutationManyDemes
-    scaledMigrationRate
+    scaledMigrationRate Descent.Core.scaledMigrationRate Descent.Core.ploidy
   ring
 
 /-- **Increased migration strictly improves equilibrium Fst in the SplitMigration framework.**
@@ -8041,9 +8007,12 @@ theorem sharedLDFromMigration_increases (M₁ M₂ : ℝ)
     This parallels the mutation-drift complementarity. -/
 theorem fst_plus_sharedLD_eq_one (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 ≤ m) :
     fstMigrationDriftEquilibrium Ne m + sharedLDFromMigration (scaledMigrationRate Ne m) = 1 := by
-  unfold fstMigrationDriftEquilibrium sharedLDFromMigration scaledMigrationRate Descent.Core.fstFromFlow
+  unfold fstMigrationDriftEquilibrium sharedLDFromMigration scaledMigrationRate
+    Descent.Core.fstFromFlow Descent.Core.scaledMigrationRate Descent.Core.ploidy
   have hden : 1 + 4 * Ne * m ≠ 0 := by nlinarith
-  field_simp [hden]
+  have hden' : 1 + Ne * m * 4 ≠ 0 := by intro hc; apply hden; linarith
+  field_simp
+  ring
 
 /-! ### 5. Portability under migration-drift: R² improves with gene flow -/
 
@@ -8223,7 +8192,7 @@ theorem signalRetentionMigrationDrift_eq_ratio (Ne m : ℝ)
     signalRetentionMigrationDrift Ne m =
       (scaledMigrationRate Ne m) ^ 2 / (1 + scaledMigrationRate Ne m) ^ 2 := by
   unfold signalRetentionMigrationDrift fstMigrationDriftEquilibrium sharedLDFromMigration Descent.Core.fstFromFlow
-    scaledMigrationRate
+    scaledMigrationRate Descent.Core.scaledMigrationRate Descent.Core.ploidy
   have hden : (1 + 4 * Ne * m) ≠ 0 := by nlinarith
   field_simp [hden]
   ring
@@ -8258,7 +8227,7 @@ theorem signalRetentionMigrationDrift_eq_one_sub_fst_sq (Ne m : ℝ)
     signalRetentionMigrationDrift Ne m =
       (1 - fstMigrationDriftEquilibrium Ne m) ^ 2 := by
   unfold signalRetentionMigrationDrift fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
-    sharedLDFromMigration scaledMigrationRate
+    sharedLDFromMigration scaledMigrationRate Descent.Core.scaledMigrationRate Descent.Core.ploidy
   have hden : (1 + 4 * Ne * m) ≠ 0 := by nlinarith
   field_simp
   ring
@@ -8295,7 +8264,7 @@ theorem no_calibration_constant_reconciles_retention_laws :
   have h1 := hc 1 (1 / 4) (by norm_num) (by norm_num)
   have h2 := hc 1 (3 / 4) (by norm_num) (by norm_num)
   unfold signalRetentionMigrationDrift fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
-    sharedLDFromMigration scaledMigrationRate at h1 h2
+    sharedLDFromMigration scaledMigrationRate Descent.Core.scaledMigrationRate Descent.Core.ploidy at h1 h2
   norm_num at h1 h2
   linarith
 
@@ -8335,7 +8304,7 @@ theorem signalRetention_increases_with_migration (V_A Ne m₁ m₂ : ℝ)
   have hM₁ : 0 < M₁ := scaledMigrationRate_pos Ne m₁ hNe hm₁
   have hM₂ : 0 < M₂ := scaledMigrationRate_pos Ne m₂ hNe hm₂
   have hM_lt : M₁ < M₂ := by
-    simp [M₁, M₂, scaledMigrationRate]
+    simp [M₁, M₂, scaledMigrationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy]
     nlinarith
   have h1M₁ : 0 < 1 + M₁ := by linarith
   have h1M₂ : 0 < 1 + M₂ := by linarith

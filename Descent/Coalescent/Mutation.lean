@@ -98,9 +98,7 @@ theorem identityByDescent_eq {N : ℕ} (hN : 1 ≤ N) {β : ℝ} (hβ0 : 0 < β)
       (1 / (N : ℝ)) * (1 - 1 / (N : ℝ)) ^ s * (1 - β) ^ (2 * (s + 1))
         = ((1 / (N : ℝ)) * (1 - β) ^ 2) * r ^ s := by
     intro s
-    rw [hr, mul_pow, ← pow_mul]
-    ring_nf
-    rw [show 2 * (s + 1) = 2 * s + 2 from by ring, pow_add]
+    rw [hr, mul_pow, ← pow_mul, show 2 * (s + 1) = 2 * s + 2 from by ring, pow_add]
     ring
   rw [identityByDescent, tsum_congr hterm, tsum_mul_left, tsum_geometric_of_lt_one hr0 hr1]
   have hden : 1 - r = (1 + ((N : ℝ) - 1) * (2 * β - β ^ 2)) / (N : ℝ) := by
@@ -114,7 +112,6 @@ theorem identityByDescent_eq {N : ℕ} (hN : 1 ≤ N) {β : ℝ} (hβ0 : 0 < β)
     have : 0 < 1 + ((N : ℝ) - 1) * (2 * β - β ^ 2) := by nlinarith
     linarith
   field_simp
-  ring
 
 /-- **K-G p.34: the `θ` limit.**  Under the mutation-drift balance `2Nβ → θ` with `β → 0`,
 the identity-by-descent probability tends to `(1+θ)⁻¹`.  This is Kingman's convergence, and
@@ -128,9 +125,14 @@ theorem tendsto_identityByDescent {θ : ℝ} (hθ : 0 ≤ θ) :
     tendsto_one_div_atTop_nhds_zero_nat
   have hnum : Tendsto (fun N : ℕ => (1 - θ / (2 * (N : ℝ))) ^ 2) atTop (nhds 1) := by
     have h : Tendsto (fun N : ℕ => 1 - θ / (2 * (N : ℝ))) atTop (nhds 1) := by
-      have : Tendsto (fun N : ℕ => (θ / 2) * (1 / (N : ℝ))) atTop (nhds 0) := by
-        simpa using hinv.const_mul (θ / 2)
-      simpa [div_div_eq_mul_div, mul_comm, mul_div_assoc] using tendsto_const_nhds.sub this
+      have hz : Tendsto (fun N : ℕ => θ / (2 * (N : ℝ))) atTop (nhds 0) := by
+        have hc : Tendsto (fun N : ℕ => (θ / 2) * (1 / (N : ℝ))) atTop (nhds 0) := by
+          simpa using hinv.const_mul (θ / 2)
+        refine hc.congr fun N => ?_
+        rcases eq_or_ne ((N : ℝ)) 0 with hN | hN
+        · simp [hN]
+        · field_simp
+      simpa using tendsto_const_nhds.sub hz
     simpa using h.pow 2
   have hden : Tendsto (fun N : ℕ =>
       1 + ((N : ℝ) - 1) * (2 * (θ / (2 * (N : ℝ))) - (θ / (2 * (N : ℝ))) ^ 2))
@@ -177,8 +179,8 @@ noncomputable def ewensDenominator (θ : ℝ) (n : ℕ) : ℝ :=
   simp [ewensDenominator]
 
 theorem ewensDenominator_three (θ : ℝ) : ewensDenominator θ 3 = (θ + 1) * (θ + 2) := by
-  simp [ewensDenominator, Finset.prod_range_succ]
-  ring
+  unfold ewensDenominator
+  norm_num [Finset.prod_range_succ]
 
 /-- **K-G (3.8).**  The probability that the allelic relation on a sample of `n` is a given
 equivalence relation with class sizes `lam`.
@@ -228,7 +230,7 @@ theorem ewensProb_three_total {θ : ℝ} (hθ : 0 ≤ θ) :
   have h2 : (θ : ℝ) + 2 ≠ 0 := by linarith
   unfold ewensProb
   rw [ewensDenominator_three]
-  simp only [Multiset.card_cons, Multiset.card_singleton, Multiset.map_cons,
+  simp only [Multiset.card_singleton, Multiset.map_cons,
     Multiset.map_singleton, Multiset.prod_cons, Multiset.prod_singleton]
   norm_num [Nat.factorial]
   field_simp

@@ -23,6 +23,7 @@ import Descent.Portability.StratificationConfounding
 import Descent.Portability.TransferLearningPGS
 import Descent.Portability.RareVariantPortability
 import Descent.Core.Fst
+import Descent.Core.Parameters
 
 namespace Descent
 
@@ -143,14 +144,14 @@ is twice the coalescent time scale times the mutation rate**, rather than an
 independently chosen `4`. -/
 theorem scaledMutationRate_eq_ploidy_form (Ne mu : ℝ) :
     scaledMutationRate Ne mu = 2 * ploidy * Ne * mu := by
-  unfold scaledMutationRate ploidy Descent.Core.ploidy; ring
+  unfold scaledMutationRate ploidy Descent.Core.scaledMutationRate Descent.Core.ploidy; ring
 
 /-- **Cross-check: the scaled migration rate in `PortabilityDrift` uses the
 same convention.** These two were written in different files, each spelling
 out its own `4`. -/
 theorem scaledMigrationRate_eq_ploidy_form (Ne m : ℝ) :
     scaledMigrationRate Ne m = 2 * ploidy * Ne * m := by
-  unfold scaledMigrationRate ploidy Descent.Core.ploidy; ring
+  unfold scaledMigrationRate ploidy Descent.Core.scaledMigrationRate Descent.Core.ploidy; ring
 
 /-- **Cross-check: `heterozygosityLossFromDrift` uses the coalescent time scale**, so the
 `2 Nₑ` inside it is the same `ploidy · Nₑ` and not a separate choice.
@@ -201,7 +202,7 @@ from the diffusion limit, and tying it to `ploidy` would record a claim about
 genetics that this parameter does not make. -/
 theorem mutationSelectionDriftParameter_eq_scaledMutationRate (Ne s h : ℝ) :
     mutationSelectionDriftParameter Ne s h = scaledMutationRate Ne (h * s) := by
-  unfold mutationSelectionDriftParameter scaledMutationRate; ring
+  unfold mutationSelectionDriftParameter scaledMutationRate Descent.Core.scaledMutationRate Descent.Core.ploidy; ring
 
 /-- **The two in the allele-frequency retention ratio is the ploidy, twice, and
 that is why the ratio does not depend on it.**
@@ -965,27 +966,21 @@ theorem coalescentTau_uses_timeScale (t Ne : ℝ) :
 
 /-! ### The scaled rates, written out on three parameter records
 
-`θ = 4 Nₑ μ` and `M = 4 Nₑ m` appear as fields of
-`GenerationalPopGenParameters` in `PortabilityDrift` and of
-`EvolutionaryParameters` in `DGP`, each spelling out its own four. -/
-
-theorem GenerationalPopGenParameters_theta_eq_ploidy_form
-    (g : GenerationalPopGenParameters) :
-    GenerationalPopGenParameters.theta g = 2 * ploidy * g.Ne * g.μ := by
-  unfold GenerationalPopGenParameters.theta ploidy scaledMutationRate Descent.Core.ploidy; ring
-
-theorem GenerationalPopGenParameters_bigM_eq_ploidy_form
-    (g : GenerationalPopGenParameters) :
-    GenerationalPopGenParameters.bigM g = 2 * ploidy * g.Ne * g.mig := by
-  unfold GenerationalPopGenParameters.bigM ploidy scaledMigrationRate Descent.Core.ploidy; ring
+`θ = 4 Nₑ μ` and `M = 4 Nₑ m` used to appear on two parameter records, each spelling out
+its own four: `GenerationalPopGenParameters` in `PortabilityDrift` and
+`EvolutionaryParameters` in `DGP`. There is now one record, `Core.PopGenParameters`, and
+its `theta` and `bigM` are `Core.scaledMutationRate` and `Core.scaledMigrationRate` by
+definition -- so the two theorems that used to hold those spellings together are deleted
+rather than restated. What remains below is the `EvolutionaryParameters` pair, which is
+still a separate record. -/
 
 theorem EvolutionaryParameters_theta_eq_ploidy_form (p : EvolutionaryParameters) :
     EvolutionaryParameters.theta p = 2 * ploidy * p.Ne * p.mu := by
-  unfold EvolutionaryParameters.theta ploidy scaledMutationRate Descent.Core.ploidy; ring
+  unfold EvolutionaryParameters.theta ploidy scaledMutationRate Descent.Core.scaledMutationRate Descent.Core.ploidy; ring
 
 theorem EvolutionaryParameters_bigM_eq_ploidy_form (p : EvolutionaryParameters) :
     EvolutionaryParameters.bigM p = 2 * ploidy * p.Ne * p.mig := by
-  unfold EvolutionaryParameters.bigM ploidy scaledMigrationRate Descent.Core.ploidy; ring
+  unfold EvolutionaryParameters.bigM ploidy scaledMigrationRate Descent.Core.scaledMigrationRate Descent.Core.ploidy; ring
 
 /-- **The between-population variance of the mean breeding value is
 `ploidy · F_ST · V_A`.**
@@ -1182,7 +1177,7 @@ theorem selectedDriftFactor_uses_timeScale (Ne : ℝ) (t : ℕ) (s_correction : 
 theorem SplitMigrationModel_scaledMigration_eq_ploidy_form
     (m : SplitMigrationModel) :
     scaledMigrationRate m.Ne m.mig = 2 * ploidy * m.Ne * m.mig := by
-  unfold scaledMigrationRate ploidy Descent.Core.ploidy; ring
+  unfold scaledMigrationRate ploidy Descent.Core.scaledMigrationRate Descent.Core.ploidy; ring
 
 theorem fstMigDriftNext_uses_timeScale (Ne m Fst : ℝ) :
     fstMigDriftNext Ne m Fst
@@ -1219,10 +1214,10 @@ theorem demoSteppingStoneFst_eq_scaled (d Ne m σ_sq : ℝ) :
 Each carries the convention in its own shape: inside a `let`, in a recursion
 step, or under two nested decay factors. A relation reaches all of them. -/
 
-theorem tauAt_uses_timeScale (g : GenerationalPopGenParameters) (t : ℕ) :
-    GenerationalPopGenParameters.tauAt g t
+theorem tauAt_uses_timeScale (g : Descent.Core.PopGenParameters) (t : ℕ) :
+    Descent.Core.PopGenParameters.tauAt g t
       = (t : ℝ) / coalescentTimeScale g.Ne := by
-  unfold GenerationalPopGenParameters.tauAt; rw [coalescentTimeScale_eq]
+  unfold Descent.Core.PopGenParameters.tauAt; rw [coalescentTimeScale_eq]
 
 /-- The divergence rate is the reciprocal of the coalescent timescale, and the scaled mutation
 and migration rates do not appear. This theorem previously carried them in the denominator; the
@@ -1571,7 +1566,7 @@ theorem islandFstFiniteDemes_eq_scaled (Ne m d : ℝ) :
     islandFstFiniteDemes Ne m d
       = fstMutationDriftEquilibrium (scaledMigrationRate Ne m * islandDemeCorrection d) := by
   unfold islandFstFiniteDemes fstMutationDriftEquilibrium scaledMigrationRate Descent.Core.fstFromFlow
-    islandDemeCorrection Descent.Core.islandDemeCorrection Descent.Core.ratio
+    islandDemeCorrection Descent.Core.islandDemeCorrection Descent.Core.ratio Descent.Core.scaledMigrationRate Descent.Core.ploidy
   ring
 
 /-- **The `2 μ` in the stepping-stone characteristic length counts the two lineages of a

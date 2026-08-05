@@ -857,7 +857,7 @@ section MutationDriftBalance
 /-- Scaled mutation rate is positive when Ne and μ are positive. -/
 theorem scaledMutationRate_pos (Ne μ : ℝ) (hNe : 0 < Ne) (hμ : 0 < μ) :
     0 < scaledMutationRate Ne μ := by
-  unfold scaledMutationRate
+  unfold scaledMutationRate Descent.Core.scaledMutationRate Descent.Core.ploidy
   positivity
 
 /-- **One coalescent time unit of the identity balance, in scaled units.**
@@ -945,7 +945,9 @@ theorem fstEquilibrium_decreases_with_product (Ne₁ μ₁ Ne₂ μ₂ : ℝ)
     (h_nonneg : 0 ≤ Ne₁ * μ₁) (h_more : Ne₁ * μ₁ < Ne₂ * μ₂) :
     fstMutationDriftEquilibrium (scaledMutationRate Ne₂ μ₂) <
       fstMutationDriftEquilibrium (scaledMutationRate Ne₁ μ₁) := by
-  apply fstMutationDriftEquilibrium_strictAnti <;> unfold scaledMutationRate <;> nlinarith
+  apply fstMutationDriftEquilibrium_strictAnti <;>
+    unfold scaledMutationRate Descent.Core.scaledMutationRate Descent.Core.ploidy <;>
+    nlinarith
 
 /-- Equilibrium Fst decreases when Ne increases (with μ fixed). -/
 theorem fstEquilibrium_decreases_with_Ne (μ Ne₁ Ne₂ : ℝ)
@@ -1037,7 +1039,7 @@ theorem mutation_timescale_exceeds_drift (Ne μ : ℝ)
     (hμ : 0 < μ)
     (hθ_large : 2 < scaledMutationRate Ne μ) :
     1 / μ < 2 * Ne := by
-  unfold scaledMutationRate at hθ_large
+  unfold scaledMutationRate Descent.Core.scaledMutationRate Descent.Core.ploidy at hθ_large
   rw [div_lt_iff₀ hμ]
   nlinarith
 

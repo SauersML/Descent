@@ -7,6 +7,7 @@ import Descent.Foundations.TransportIdentities
 -- See the discussion above `excess_target_risk_pos_of_bandwise_readout_mismatch`.
 import Descent.Spectral.SpectralDegradation
 import Descent.Core.Fst
+import Descent.Core.Parameters
 
 namespace Descent
 
@@ -14,7 +15,7 @@ namespace Descent
 
 `θ = 4 Nₑ μ` and `M = 4 Nₑ m` are the same scaling applied to a mutation rate and to a
 migration rate, and `1 / (1 + θ)` is the identity fraction at either. Six accessors across
-five structures — `SplitMigrationModel`, `GenerationalPopGenParameters`,
+five structures — `SplitMigrationModel`, `Descent.Core.PopGenParameters`,
 `MutationDriftModelAssumptions`, `EvolutionaryParameters` and `PGSEvolutionaryModel` —
 used to spell out their own `4 * Ne * _`, and two more wrote out the quotient. That is
 eight independent chances to write a different four.
@@ -49,15 +50,16 @@ cluster" for the two failure shapes and the rule they share, recorded next to
     numeric factor and a wrong `Nₑ`-dependence each break one of those pairs,
     which a sweep holding `4·Nₑ·μ` fixed could not detect at all. -/
 noncomputable def scaledMutationRate (Ne μ : ℝ) : ℝ :=
-  4 * Ne * μ
+  Descent.Core.scaledMutationRate Ne μ
 
 /-- **The scaling factor is four times the effective size.** Positivity is shared by every
 positive multiple of this product; dividing by the mutation rate exhibits the factor, which is
 the whole content of the scaling convention. -/
 theorem scaledMutationRate_div_mu (Ne μ : ℝ) (h : μ ≠ 0) :
     scaledMutationRate Ne μ / μ = 4 * Ne := by
-  unfold scaledMutationRate
+  unfold scaledMutationRate Descent.Core.scaledMutationRate Descent.Core.ploidy
   field_simp
+  ring
 
 /-- **Scaled migration rate** `M = 4 Nₑ m`, the same scaling applied to gene flow.
 
@@ -74,7 +76,7 @@ theorem scaledMutationRate_div_mu (Ne μ : ℝ) (h : μ ≠ 0) :
     four INDEPENDENTLY, so `M = 1` and `M = 4` are each reached twice by
     different routes and the `Nₑ`-dependence is separately on trial. -/
 noncomputable def scaledMigrationRate (Ne m : ℝ) : ℝ :=
-  4 * Ne * m
+  Descent.Core.scaledMigrationRate Ne m
 
 /-- **The scaling factor is four times the effective size**, the same convention as the scaled
 mutation rate. Dividing by the migration rate exhibits it, which is the whole content of the
@@ -82,8 +84,9 @@ convention and is what a body carrying any other multiple would fail while remai
 increasing in both arguments. -/
 theorem scaledMigrationRate_div_m (Ne m : ℝ) (h : m ≠ 0) :
     scaledMigrationRate Ne m / m = 4 * Ne := by
-  unfold scaledMigrationRate
+  unfold scaledMigrationRate Descent.Core.scaledMigrationRate Descent.Core.ploidy
   field_simp
+  ring
 
 /-- **Identity fraction at a scaled rate**, `1 / (1 + θ)`.
 
@@ -2560,16 +2563,18 @@ noncomputable def EvolutionaryParameters.bigM (p : EvolutionaryParameters) : ℝ
 /-- θ ≥ 0. -/
 theorem EvolutionaryParameters.theta_nonneg (p : EvolutionaryParameters) :
     0 ≤ p.theta := by
-  unfold theta scaledMutationRate
-  have h1 : 0 < 4 * p.Ne := by linarith [p.Ne_pos]
-  exact mul_nonneg (le_of_lt h1) p.mu_nonneg
+  unfold theta scaledMutationRate Descent.Core.scaledMutationRate Descent.Core.ploidy
+  have := p.Ne_pos
+  have := p.mu_nonneg
+  positivity
 
 /-- M ≥ 0. -/
 theorem EvolutionaryParameters.bigM_nonneg (p : EvolutionaryParameters) :
     0 ≤ p.bigM := by
-  unfold bigM scaledMigrationRate
-  have h1 : 0 < 4 * p.Ne := by linarith [p.Ne_pos]
-  exact mul_nonneg (le_of_lt h1) p.mig_nonneg
+  unfold bigM scaledMigrationRate Descent.Core.scaledMigrationRate Descent.Core.ploidy
+  have := p.Ne_pos
+  have := p.mig_nonneg
+  positivity
 
 /-- τ ≥ 0. -/
 theorem EvolutionaryParameters.tau_nonneg (p : EvolutionaryParameters) :
@@ -2805,7 +2810,7 @@ theorem fstEquilibrium_isFixedPoint (p : EvolutionaryParameters) :
   have hd' : (1 : ℝ) + p.theta + 2 * p.bigM ≠ 0 := ne_of_gt hd
   have hscaled : 1 + p.theta + 2 * p.bigM = 1 + 4 * p.Ne * (2 * p.mig + p.mu) := by
     unfold EvolutionaryParameters.theta EvolutionaryParameters.bigM scaledMutationRate
-      scaledMigrationRate
+      scaledMigrationRate Descent.Core.scaledMutationRate Descent.Core.scaledMigrationRate Descent.Core.ploidy
     ring
   unfold fstDemeCorrectedFlowStep fstEquilibrium Descent.Core.fstFromFlow
   rw [← add_assoc]
@@ -2821,10 +2826,10 @@ theorem fstEquilibrium_of_no_flow (p : EvolutionaryParameters)
     (hmig : p.mig = 0) (hmu : p.mu = 0) :
     fstEquilibrium p = 1 := by
   have hθ : p.theta = 0 := by
-    unfold EvolutionaryParameters.theta scaledMutationRate
+    unfold EvolutionaryParameters.theta scaledMutationRate Descent.Core.scaledMutationRate Descent.Core.ploidy
     rw [hmu]; ring
   have hM : p.bigM = 0 := by
-    unfold EvolutionaryParameters.bigM scaledMigrationRate
+    unfold EvolutionaryParameters.bigM scaledMigrationRate Descent.Core.scaledMigrationRate Descent.Core.ploidy
     rw [hmig]; ring
   unfold fstEquilibrium Descent.Core.fstFromFlow
   rw [hθ, hM]
@@ -3174,12 +3179,12 @@ theorem fstEquilibrium_decreasing_in_theta
     fstEquilibrium p₂ < fstEquilibrium p₁ := by
   simp only
   unfold fstEquilibrium EvolutionaryParameters.theta EvolutionaryParameters.bigM scaledMutationRate Descent.Core.fstFromFlow
-    scaledMigrationRate
+    scaledMigrationRate Descent.Core.scaledMutationRate Descent.Core.scaledMigrationRate Descent.Core.ploidy
   simp only
   rw [← add_assoc, ← add_assoc]
   rw [div_lt_div_iff₀
-    (by nlinarith : 0 < 1 + 4 * Ne * mu₂ + 2 * (4 * Ne * mig))
-    (by nlinarith : 0 < 1 + 4 * Ne * mu₁ + 2 * (4 * Ne * mig))]
+    (by nlinarith : 0 < 1 + 2 * 2 * Ne * mu₂ + 2 * (2 * 2 * Ne * mig))
+    (by nlinarith : 0 < 1 + 2 * 2 * Ne * mu₁ + 2 * (2 * 2 * Ne * mig))]
   nlinarith
 
 theorem fstEquilibrium_decreasing_in_migration
@@ -3194,12 +3199,12 @@ theorem fstEquilibrium_decreasing_in_migration
     fstEquilibrium p₂ < fstEquilibrium p₁ := by
   simp only
   unfold fstEquilibrium EvolutionaryParameters.theta EvolutionaryParameters.bigM scaledMutationRate Descent.Core.fstFromFlow
-    scaledMigrationRate
+    scaledMigrationRate Descent.Core.scaledMutationRate Descent.Core.scaledMigrationRate Descent.Core.ploidy
   simp only
   rw [← add_assoc, ← add_assoc]
   rw [div_lt_div_iff₀
-    (by nlinarith : 0 < 1 + 4 * Ne * mu + 2 * (4 * Ne * mig₂))
-    (by nlinarith : 0 < 1 + 4 * Ne * mu + 2 * (4 * Ne * mig₁))]
+    (by nlinarith : 0 < 1 + 2 * 2 * Ne * mu + 2 * (2 * 2 * Ne * mig₂))
+    (by nlinarith : 0 < 1 + 2 * 2 * Ne * mu + 2 * (2 * 2 * Ne * mig₁))]
   nlinarith
 
 /-! **Two Fst-to-covariance-gap statements were removed here, and neither mentioned a
@@ -4199,17 +4204,17 @@ divergence time. -/
 theorem fstDriftMigrationManyDemes_at_witness :
     fstDriftMigrationManyDemes EvolutionaryParameters.witness = 1 / 5 := by
   norm_num [fstDriftMigrationManyDemes, EvolutionaryParameters.bigM,
-    EvolutionaryParameters.witness, scaledMigrationRate]
+    EvolutionaryParameters.witness, scaledMigrationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy]
 
 theorem migrationLDBoost_at_witness :
     migrationLDBoost EvolutionaryParameters.witness = 7 / 5 := by
   norm_num [migrationLDBoost, EvolutionaryParameters.bigM, EvolutionaryParameters.tau,
-    EvolutionaryParameters.witness, scaledMigrationRate]
+    EvolutionaryParameters.witness, scaledMigrationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy]
 
 theorem mutationLDErosion_at_witness :
     mutationLDErosion EvolutionaryParameters.witness = Real.exp (-2) := by
   norm_num [mutationLDErosion, EvolutionaryParameters.theta, EvolutionaryParameters.tau,
-    EvolutionaryParameters.witness, scaledMutationRate]
+    EvolutionaryParameters.witness, scaledMutationRate, Descent.Core.scaledMutationRate, Descent.Core.ploidy]
 
 theorem sharedLDRetention_at_witness :
     sharedLDRetention EvolutionaryParameters.witness
