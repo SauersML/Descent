@@ -3807,7 +3807,13 @@ theorem constrained them jointly and could not have caught the decay base. -/
     PopGen.PGSEvolutionaryModel.toEvo, PopGen.EvolutionaryParameters.theta,
     PopGen.EvolutionaryParameters.bigM, PopGen.scaledMutationRate, PopGen.scaledMigrationRate,
     Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy]
-  exact Or.inl (by ring)
+  -- `simp` leaves either the disjunction `a = b ∨ _` or, when it has already
+  -- discharged the second disjunct, the equation itself.  Which one depends on
+  -- the order the now fully-qualified unfoldings fire in, and both are closed by
+  -- the same `ring`.
+  first
+    | exact Or.inl (by ring)
+    | ring
 
 /-- When divergence time is an integer number of generations, the coarse
 mutation-history coordinate agrees exactly with the generational popgen bridge
