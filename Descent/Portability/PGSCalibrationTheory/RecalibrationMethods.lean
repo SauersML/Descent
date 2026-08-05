@@ -2,6 +2,10 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.PGSCalibrationTheory.CalibrationDefinitions
+-- Same three names as `CalibrationVsDiscrimination`, and the same vanished fifteen-module
+-- path to them.  This file reaches `Program.Conclusions` on its own now rather than
+-- through a sibling that happens to be earlier in the chain.
+import Descent.Program.Conclusions
 
 namespace Descent.Portability
 
