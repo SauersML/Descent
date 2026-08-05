@@ -1,5 +1,5 @@
 /-
-Released under AGPL-3.0-or-later as described in the file LICENSE.
+Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.TransportIdentities
 -- Step 4b below needs `FiniteSpectralModel.degradation_eq_zero_iff`, which supplies a

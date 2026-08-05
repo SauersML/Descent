@@ -15,4 +15,4 @@ All contributions are welcome.
 
 ## License
 
-AGPL-3.0-or-later. See [LICENSE](LICENSE).
+Apache-2.0. See [LICENSE](LICENSE).

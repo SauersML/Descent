@@ -1,5 +1,5 @@
 /-
-Released under AGPL-3.0-or-later as described in the file LICENSE.
+Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.DGP
 import Descent.EnsembleChannel
