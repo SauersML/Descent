@@ -301,10 +301,11 @@ jobs:
       #     the differential battery above (sections 20 and 21) with a
       #     two-directional calibration, which is the shape a sympy finding
       #     has to take before it can gate anything.
-      #   * extract/test_parser.py, which pins absolute LINE NUMBERS in the
-      #     Lean sources ("neiFst line: got 46, want 42"). Any edit above a
-      #     definition breaks it, so it fails for reasons unrelated to what it
-      #     is testing. It is currently failing for exactly that reason.
+      # (extract/test_parser.py used to be listed here for pinning absolute
+      # LINE NUMBERS. It no longer does, and it is now a required step above.
+      # Leaving it excluded was expensive: while it sat red, nobody read it, and
+      # it was the only instrument positioned to notice that the extraction tier
+      # had gone silent. A red ground-truth gate must be repointed, not left.)
 
       - name: Executable correctability contract
         run: cargo test --manifest-path proofs/validation/empirical/correctability_calculator/Cargo.toml

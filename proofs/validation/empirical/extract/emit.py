@@ -11,14 +11,24 @@ scripts should import it instead of re-transcribing formulas:
 
 # REGENERATE WITH:  python3 proofs/validation/empirical/extract/emit.py
 #
-# This produces lean_defs.py and defs.json, which are NOT IN GIT.
-# They are generated from proofs/Calibrator/, which changes every few
-# minutes, and a committed snapshot drifts by six figures -- defs.json
-# measured 122994 changed lines against its last committed copy. A cache
-# that far from its source is not a cache, it is a second source of truth
-# that disagrees with the first. Run this in your own worktree
-# immediately before use, so your numbers are pinned to the revision you
-# are standing on.
+# This produces lean_defs.py, defs.json and classes.json.
+#
+# They ARE in git (and also listed in .gitignore, which does not apply to
+# already-tracked files), but they are NOT AUTHORITATIVE: defs.json carries a
+# `_NOT_AUTHORITATIVE` banner as its first key, and `api.require_fresh()`
+# refuses to let a checker report a number from a table that does not describe
+# the corpus on disk right now. They are generated from proofs/Calibrator/,
+# which changes every few minutes, and a committed snapshot drifts by six
+# figures -- defs.json measured 122994 changed lines against its last committed
+# copy. A cache that far from its source is not a cache, it is a second source
+# of truth that disagrees with the first. Run this in your own worktree
+# immediately before use, so your numbers are pinned to the revision you are
+# standing on.
+#
+# (This comment used to claim the files were "NOT IN GIT". They are, so the
+# claim was worse than useless: it told a reader the stale-cache hazard could
+# not arise here, when the guard against it is `require_fresh()` rather than
+# their absence.)
 from __future__ import annotations
 
 import json
