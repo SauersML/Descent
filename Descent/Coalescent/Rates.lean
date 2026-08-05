@@ -193,9 +193,7 @@ theorem tendsto_two_div_shift {c : ℝ} (hc : 2 ≤ c) :
     positivity
   · have hm : (0 : ℝ) ≤ (m : ℝ) := Nat.cast_nonneg m
     have hle : 2 / (c + (m : ℝ) - 1) ≤ 2 / ((m : ℝ) + 1) := by
-      gcongr
-      · linarith
-      · linarith
+      gcongr <;> linarith
     simpa [mul_one_div] using hle
 
 /-- Exact partial sums of the tail ladder. -/
@@ -213,7 +211,6 @@ theorem sum_one_div_deathRate_tail {k : ℕ} (hk : 2 ≤ k) (m : ℕ) :
       have h3 : ((k : ℝ) + (m : ℝ)) ≠ 0 := by linarith
       rw [Finset.sum_range_succ, ih, one_div_deathRate_eq hkm]
       push_cast
-      field_simp
       ring
 
 /-- **K-C p.239: `Σ_{r ≥ k} d_r⁻¹ = 2/(k-1)`.**  The mean time to come down from infinitely
@@ -287,9 +284,16 @@ theorem survivalFactor_partialProd {x : ℕ} (hx : 2 ≤ x) (m : ℕ) :
         unfold deathRate
         push_cast
         ring
-      rw [Finset.prod_range_succ, ih, hd]
+      have hfac : (1 : ℝ) - 1 / (((x : ℝ) + (m : ℝ) + 1) * ((x : ℝ) + (m : ℝ)) / 2)
+          = (((x : ℝ) + (m : ℝ) - 1) * ((x : ℝ) + (m : ℝ) + 2))
+              / (((x : ℝ) + (m : ℝ) + 1) * ((x : ℝ) + (m : ℝ))) := by
+        rw [eq_div_iff (mul_ne_zero h4 h3)]
+        field_simp
+        ring
+      rw [Finset.prod_range_succ, ih, hd, hfac, div_mul_div_comm]
+      rw [div_eq_div_iff (mul_ne_zero (mul_ne_zero h1 h2) (mul_ne_zero h4 h3))
+        (mul_ne_zero h1 (by push_cast; intro hcon; exact h3 (by linarith)))]
       push_cast
-      field_simp
       ring
 
 /-- The truncated products, written so the tail correction is visible as an additive term. -/
