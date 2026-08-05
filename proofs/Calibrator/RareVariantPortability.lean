@@ -667,9 +667,109 @@ by `1` for every positive `s`.
     `(mu, s)` of (1e-05, 0.01), (1e-04, 0.05) and (1e-03, 0.20). The quadratic
     root is the part that can be wrong, and it is not.
 
-    Power: the prediction spans 0.03113 to 0.06825 across the design. -/
+    That reading is now RESTRICTED, and the restriction is severe. Iterating
+    `mutationSelectionStepRecessive` to its own fixed point recovers this body
+    by `mutationSelectionBalanceRecessive_isFixedPoint`; it is an algebraic
+    identity and there is no population in it. Forward, individual-based
+    simulation of a real finite population -- SLiM 4.3, one true biallelic
+    locus with genotype fitnesses `1, 1, 1 - s`, recurrent mutation and drift
+    (`proofs/validation/empirical/crossengine/`) -- measures the time-averaged
+    carrier frequency at `mu = 1e-04`, `s = 0.5` (so this body predicts
+    0.014042) with `Nₑ` swept:
+
+      Nₑ      2 Nₑ √(mu s)   measured             sems    relative
+      16000   226            0.013710 ± 0.000111  -3.0     -2.4%
+      4000     57            0.012633 ± 0.000369  -3.8    -10.0%
+      1000     14            0.009351 ± 0.000319  -14.7   -33.4%
+      200       2.8          0.005162 ± 0.000193  -46.1   -63.2%
+      50        0.7          0.002622 ± 0.000213  -53.6   -81.3%
+
+    The body is approached from below as `Nₑ` grows and is reached only in the
+    large-population limit. Below `2 Nₑ √(mu s) ≈ 50` it overstates the standing
+    frequency of a recessive deleterious allele by a factor rising to five. This
+    is the regime real human recessive alleles occupy, which is what makes the
+    restriction worth stating rather than noting.
+
+    The reason is structural, not a coefficient: heterozygotes are invisible to
+    selection at `h = 0`, so a recessive allele is held down only through the
+    homozygotes it makes, and at low frequency in a finite population it makes
+    almost none. Drift then dominates over a range of `Nₑ` where the
+    corresponding DOMINANT claim -- see `mutationSelectionBalance`, which needs
+    only `4 Nₑ h s ≥ 10` -- is already safe. The two claims do not share a
+    regime, and `mutationSelectionBalance_at_zero_dominance` records that they
+    do not share a formula either.
+
+    Power, and the competitor that earns the match: on the same cells the
+    dominant scaling `mu / s` is rejected at 11 to 122 sems and `√(mu / (2 s))`
+    at 2.0 to 35, and a deliberately planted body 40 percent above this one is
+    rejected at 19 to 80 sems on the two cells that MATCH -- so the agreement at
+    large `Nₑ` is a measurement and not a tautology. The square-root scaling
+    itself survives; only its `Nₑ`-independence does not.
+
+    Measured on ONE engine by necessity. A recessive claim cannot be put to an
+    infinite-sites simulator at all: two distinct mutations at one position make
+    a compound heterozygote that is scored heterozygous at two sites and so
+    escapes selection entirely at `h = 0`, which inflates the measurement and
+    inflates it MORE as `Nₑ` grows. An earlier cross-engine run showed exactly
+    that -- rising past this body to 0.023 at `Nₑ = 4000` -- and it was an
+    artefact of the instrument, not a property of the corpus. fwdpy11 is
+    excluded from this claim for that reason and the harness refuses it by
+    capability rather than by comment. -/
 noncomputable def mutationSelectionBalanceRecessive (mu s : ℝ) : ℝ :=
   (Real.sqrt (mu * (mu + 4 * s)) - mu) / (2 * s)
+
+/-- **The drift parameter the recessive balance omits.**
+
+`2 Nₑ √(mu s)` compares the selective force on a recessive deleterious allele
+sitting at its deterministic frequency `√(mu/s)` -- which acts at rate `s √(mu/s)`
+per copy, only through homozygotes -- with the drift rate `1/(2 Nₑ)`. It is the
+argument `mutationSelectionBalanceRecessive` does not take.
+
+This is data, not a packaged claim that the deterministic approximation is
+adequate. Measurement puts that balance within 10 percent at `2 Nₑ √(mu s) ≥ 57`
+and 63 to 81 percent high below `2 Nₑ √(mu s) ≤ 2.8`.
+
+Note it is a WEAKER condition on `Nₑ` than the dominant case needs to be safe,
+in the sense that it involves `√(mu s)` rather than `h s`: at `mu = 1e-04` and
+`s = 0.5` the dominant claim is safe from `Nₑ = 10` while this one is not safe
+until `Nₑ` is in the thousands.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is the compound parameter
+    itself, named so that a consumer has to confront it. The measurement that
+    fixes where it matters is recorded on `mutationSelectionBalanceRecessive`. -/
+noncomputable def recessiveMutationSelectionDriftParameter (Ne mu s : ℝ) : ℝ :=
+  2 * Ne * Real.sqrt (mu * s)
+
+/-- **The regime in which the recessive deterministic balance was validated.**
+
+Stated as a `Prop` rather than left in prose so that a consumer can be made to
+carry it. The threshold is the conservative end of the measured bracket: the
+claim holds at `2 Nₑ √(mu s) = 57` and fails at `14`.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a hypothesis a consumer
+    discharges, not a prediction about data. -/
+def DeterministicRecessiveBalanceRegime (Ne mu s : ℝ) : Prop :=
+  50 ≤ recessiveMutationSelectionDriftParameter Ne mu s
+
+/-- **The recessive regime is exactly a lower bound on the compound parameter.**
+It constrains `Nₑ`, `mu` and `s` only jointly, which is why the restriction
+cannot be stated as a bound on the effective size alone. -/
+theorem deterministicRecessiveBalanceRegime_iff (Ne mu s : ℝ) :
+    DeterministicRecessiveBalanceRegime Ne mu s ↔ 50 ≤ 2 * Ne * Real.sqrt (mu * s) := by
+  unfold DeterministicRecessiveBalanceRegime recessiveMutationSelectionDriftParameter
+  exact Iff.rfl
+
+/-- **The recessive drift parameter at a reference point.** No theorem evaluated
+it, so every body agreeing with it in sign and monotonicity was indistinguishable
+from it. At `Nₑ = 1000` and `mu * s = 1 / 100` it is `200`, which fixes both the
+factor `2` and the square root: a body without the root would return `20` here
+and a body without the `2` would return `100`. -/
+theorem recessiveMutationSelectionDriftParameter_at_reference_point :
+    recessiveMutationSelectionDriftParameter 1000 (1 / 100) 1 = 200 := by
+  unfold recessiveMutationSelectionDriftParameter
+  rw [show (1 : ℝ) / 100 * 1 = (1 / 10) ^ 2 by norm_num]
+  rw [Real.sqrt_sq (by norm_num)]
+  norm_num
 
 /-- **mutationSelectionBalanceRecessive at zero s, named.** Without selection nothing holds a
 recessive allele down and the balance frequency is not given by this formula at all. The divisor
