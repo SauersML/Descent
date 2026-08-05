@@ -6378,23 +6378,6 @@ def run_shape_chains() -> int:
     The fix is never to delete the import -- that breaks the build, because the
     sibling is the conduit.  It is to import the modules named below it directly,
     after which the sibling is either used or genuinely removable.
-
-    A DIRECTORY-HEAD EDGE IS EXEMPT, and the exemption is deliberate rather than a
-    side effect.  A module whose one import is its own directory head -- today
-    `Program/OpenQuestions` and `Portability/PortabilityBounds`, both importing
-    `Portability/PortabilityDrift` -- looks exactly like the defect above and is
-    not one: the head carries the directory's whole external import surface, so
-    that edge is load-bearing until each module under it has been given its own
-    external import list.  Six such edges were knowingly left in `PortabilityDrift`
-    and `MetricSpecificPortability` during the chain repair, on that reasoning.
-
-    Two independent things keep them out, and both are load-bearing because either
-    one alone would be a rule someone could quietly break.  A head sits one level
-    UP from the modules under it, so it is never a sibling and the second condition
-    rejects it.  And `_shape_graph_without_toc` deletes heads outright, so a module
-    whose only import was its head has zero imports in the graph this reads and
-    fails the first condition too.  If the sibling test is ever loosened, the second
-    protection still holds; do not remove both.
     """
     _raw, code, _graph, decls, _arch = _shape_corpus()
     graph = _shape_graph_without_toc()
@@ -6835,6 +6818,446 @@ def run_shape_routes() -> int:
 
 
 # ======================================================================================
+# LAYERS
+# ======================================================================================
+
+# WHAT THIS CAUGHT.  `Descent/Spectral/SpectralDegradation.lean` imported
+# `Descent.Portability.GenerativePortabilityLaw` and named not one declaration from it.
+# The import was carrying Mathlib: `GenerativePortabilityLaw` reaches `Mathlib.Tactic`,
+# `Mathlib.Data.Real.Basic` and `Mathlib.Data.Fintype.BigOperators` through
+# `Descent.Blindness.ObservationalCeiling`, and the file was living off that closure
+# instead of naming what it uses.  The cost was not an unused import.  `PopGen.DGP`
+# imports `SpectralDegradation` for `degradation_eq_zero_iff` -- the positivity
+# certificate for excess target risk that does not read an F_ST difference -- so the
+# layer that GENERATES the moments reached, one hop later, the layer that CONSUMES
+# them.  Nothing in the mathematics wanted that.  A Mathlib import did.
+#
+# The same shape, fourteen times over, put `Descent.Program.OpenQuestions` -- the
+# programme narrative, the module that says what the corpus has and has not settled --
+# underneath eight `PopGen` files and six `Portability` ones.  Thirteen of the fourteen
+# named nothing from it; `Portability.PortabilityBounds` named one theorem whose whole
+# proof was `div_lt_div_of_pos_right (by nlinarith) h`.
+#
+# WHY THESE RULES AND NOT A VAGUER ONE.  "Imports should go downward" is not checkable
+# and "modules should be cohesive" fires on the whole corpus.  These four are each a
+# yes-or-no question about one edge:
+#
+#   ORDER      the seven ranked directories are `Core < Foundations < Coalescent <
+#              PopGen < Portability < Decision < Program`, and an import from a lower
+#              rank to a higher one is a violation.  That contract is not invented
+#              here; it is the corpus's own, quoted in the `SHAPE_DEPTH_LIMIT` comment
+#              above, and `SHAPE_DEPTH_LIMIT` is 12 BECAUSE of it.  A guard measuring
+#              depth against a layer contract nothing checks is measuring against a
+#              wish.
+#   CORE       a module under `Descent/Core/` may import `Descent.Core.*` and Mathlib
+#              and nothing else.  This is ORDER's strongest case and it is stated
+#              separately because it does not need the ranking to be right: Core is
+#              depth 0-1, the corpus's headline chain reads through it, and an import
+#              out of it is an unstated premise at the bottom of everything.  It is
+#              also the rule that makes moving content DOWN into Core a safe repair,
+#              which is what most of the fixes below are.
+#   NARRATIVE  nothing outside `Descent/Program/` may import `Descent.Program.*`.
+#              ORDER already forbids this for the seven ranked directories; this rule
+#              extends it to the four unranked ones, and it needs no ranking to be
+#              justified.  A narrative module is written AGAINST the corpus and must
+#              stay rewritable without breaking a build.  An import from the technical
+#              side destroys exactly that property.
+#   META       `Descent/Meta/` is the corpus auditing itself, and its head states the
+#              contract in prose: "nothing under it is read by the corpus, and no
+#              module of `Descent/Meta/` may import a proof module.  That direction is
+#              the one thing this group has to keep: a proof module able to import its
+#              own auditor can be written to satisfy it."  That is an argument for a
+#              mechanism, written next to no mechanism.  Here it is: no edge in either
+#              direction between `Descent.Meta.*` and the rest of `Descent`.  It is at
+#              zero and it is the only rule here that has never been nonzero, which is
+#              exactly why it should be written down now rather than after the first
+#              module reaches across.
+#   REACHABLE  a qualified cross-directory name must have its defining module in the
+#              importer's transitive closure.  This is not a layer rule and it is here
+#              because it is the rule that makes the other three SAFE TO ACT ON.  Lean
+#              resolves `Program.f1Score` through any import chain that happens to
+#              reach it, so a file can name a declaration for years without importing
+#              the module that defines it -- and then a repair two layers away deletes
+#              the chain and the file stops compiling.  That happened three times this
+#              week: `MetricSpecificPortability.PrecisionRecall` reached
+#              `Program.f1Score` through `R2Decomposition -> PopGen.LDDecayTheory ->
+#              Program.OpenQuestions`, and the two `PGSCalibrationTheory` files reached
+#              `Program.populationAUC` along a FIFTEEN-module path out through
+#              `Program.OpenQuestions`, into `Portability.PortabilityDrift`, down its
+#              ten-module interior and back out to `Program.Conclusions`.  All three
+#              are fixed and this rule is at zero.
+#
+# EVERY VIOLATION IS A NAMED EXCEPTION OR IT IS NOT A VIOLATION ANYONE HAS THOUGHT
+# ABOUT.  `LAYER_PENDING` below carries one sentence per outstanding edge saying what
+# the edge is made of and what repair retires it.  An edge NOT in that table is
+# reported harder than one in it, because an unlisted edge is one nobody has argued
+# for.  The table is not a budget: every entry in it still counts as a violation and
+# the budget is 0.  What the sentence buys is that the next person does not re-derive
+# the analysis, and that an edge cannot be added silently -- adding one means writing
+# down why.
+#
+# CALIBRATION.  Both counted rules have been run against a second tree -- the corpus at
+# `62bbadb`, the state before this release's import work, reachable with
+# `DESCENT_CORPUS=<checkout> --only layers` -- and they disagree with the run against
+# the corpus today in the way each is supposed to.  ORDER reports 27 cross-layer edges
+# there against 14 here, so it is measuring something that moved.  REACHABLE reports
+# ZERO there against 31 here, which is the control that matters: a rule that has never
+# been silent is indistinguishable from a rule that is always on, and this one was
+# silent on a whole corpus one release ago.  The 31 are not a discovery about old code.
+# They are this release's import repairs, each of which deleted a chain some unrelated
+# file was resolving a name through, and every one of them is a file that will not
+# compile.
+#
+# THE UNRANKED DIRECTORIES.  `Blindness`, `Conditionals`, `Pangenome`, `Spectral` and
+# `Meta` have no rank in the contract, so ORDER cannot speak about their 98 edges and
+# does not pretend to.  They are listed in `LAYER_UNRANKED` with the reason each is
+# unranked, and the guard PRINTS their edge census every run so the exclusion is
+# visible rather than silent.  Ranking them is a decision about what the corpus is,
+# not a decision a guard may make on its own.
+#
+# A DIRECTORY IN NEITHER TABLE IS ITSELF A FINDING, and that rule is the difference
+# between a named exception and an allowlist.  `Descent/Meta/` appeared during the week
+# this guard was written; with only a skip-list of four names it would have been
+# unranked, unexplained and unmentioned, and the guard would have gone on reporting a
+# clean order over a directory nobody had placed.  Adding a top-level directory now
+# means writing one sentence about where it sits.
+
+LAYER_ORDER = ("Core", "Foundations", "Coalescent", "PopGen", "Portability",
+               "Decision", "Program")
+LAYER_RANK = {name: i for i, name in enumerate(LAYER_ORDER)}
+
+# Why each of these is unranked, and what ranking it would have to settle.  A guard
+# that skipped them without saying so would report a clean order over half the tree.
+LAYER_UNRANKED = {
+    "Blindness":
+        "It states what a family of models CANNOT distinguish, so it is written "
+        "against whatever layer's objects are being shown indistinguishable; it has "
+        "edges to Core, Foundations, Coalescent, PopGen, Portability and Spectral, "
+        "and ranking it means first deciding whether an impossibility result sits "
+        "with the objects it is about or below all of them.",
+    "Conditionals":
+        "Conditional-law geometry used by Spectral and Portability and reaching back "
+        "into Blindness; it is the one directory whose heaviest edge (12 to Blindness) "
+        "runs to another unranked directory, so its rank cannot be decided before "
+        "Blindness's is.",
+    "Pangenome":
+        "Three modules and one edge, to Coalescent. It is joined to the corpus by its "
+        "own table of contents and by almost nothing else, which is the finding "
+        "`shape-components` reports; ranking it is premature while it is an island.",
+    "Meta":
+        "Not in the order at all, in either direction: it is the corpus auditing "
+        "itself, written in the corpus's own language and importing only Lean and "
+        "Batteries. Its separation is enforced by the META rule below rather than by "
+        "a rank, because a rank would permit it to import the bottom of the order and "
+        "the point is that it imports none of it.",
+    "Spectral":
+        "Frequency-band and pencil machinery that both PopGen and Portability consume, "
+        "and that consumes Blindness and Conditionals in turn. It is a genuine "
+        "cross-cutting layer and the honest options are to rank it beside Foundations "
+        "or to split it, neither of which a guard decides.",
+}
+
+# One sentence per outstanding cross-layer edge: what the edge is MADE OF, and the
+# repair that retires it.  Keys are `(importer, imported)` module names.  Every entry
+# still counts as a violation; see the section header.
+LAYER_PENDING = {
+    ("Descent.PopGen.DemographicCapacity",
+     "Descent.Portability.PCCorrectability.ImitationCapacity"):
+        "`traceWindowBudgetClass`, `imitable_within_traceWindowBudget`, "
+        "`pcCorrectabilityMargin` and `demographicSpike`. These ARE about correcting a "
+        "score across populations and are correctly placed; the file states a PopGen "
+        "capacity theorem in terms of them, so the consumer moves UP rather than the "
+        "definitions moving down.",
+    ("Descent.PopGen.GeneticArchitectureDiscovery",
+     "Descent.Portability.AncestrySpecificPower"):
+        "Twenty-two uses of `Portability.genotypeVarianceHWE`, which is Hardy-Weinberg "
+        "genotype variance and contains no transport at all. Extract it downward -- "
+        "Core or PopGen -- and this edge and two others go with it.",
+    ("Descent.PopGen.GeneticArchitectureDiscovery",
+     "Descent.Portability.BayesianPGSTheory"):
+        "`jamesSteinMSE` and `optimalShrinkage`: shrinkage-estimator facts about one "
+        "population, in Portability because the Bayesian PGS chapter was written "
+        "there. They belong at or below PopGen.",
+    ("Descent.PopGen.GeneticArchitectureDiscovery",
+     "Descent.Portability.MechanisticPortabilityWitnesses"):
+        "`mechanisticPortabilityRatio` and `sigmaTagCausalSourceAt` ARE about "
+        "transport and are correctly placed. This edge inverts because a PopGen file "
+        "states an architecture theorem in terms of them, so here the consumer moves "
+        "UP rather than the definition moving down.",
+    ("Descent.PopGen.HumanDemography", "Descent.Portability.PortabilityDrift"):
+        "`fstFromGenerations` and `coalescentTau` are demography and coalescent time "
+        "-- single-population quantities with no score being carried anywhere -- "
+        "housed in the drift chapter because that is where the drift chapter was "
+        "written.",
+    ("Descent.PopGen.LDDecayTheory", "Descent.Portability.PortabilityDrift"):
+        "Unfolds `Portability.ibdRecurrenceStep` and `islandFstMultiplicativeStep` "
+        "against its own `driftLDStep`. The identity-by-descent recurrence and the "
+        "island-model F_ST step are statements about one population's allele "
+        "frequencies over generations; nothing in them is about transport.",
+    # The five `PopulationGeneticsFoundations` files below arrived together and for one
+    # reason: the chain that used to carry these names ran out of the directory and back
+    # in, and cutting it left five files naming declarations they could not reach. The
+    # imports are the repair for THAT, and they make a dependency that was always there
+    # visible for the first time.
+    ("Descent.PopGen.PopulationGeneticsFoundations.CoalescentTheory",
+     "Descent.Portability.PortabilityDrift"):
+        "`Portability.coalescentTau`: coalescent time for a pair of demes, which is a "
+        "PopGen quantity housed in the drift chapter.",
+    ("Descent.PopGen.PopulationGeneticsFoundations.FstDerivationFromDrift",
+     "Descent.Portability.PortabilityDrift"):
+        "`Portability.hetMutationFloor`: the mutation-drift heterozygosity floor for "
+        "one closed population. Same extraction.",
+    ("Descent.PopGen.PopulationGeneticsFoundations.MigrationDriftFoundations",
+     "Descent.Portability.PortabilityDrift"):
+        "`Portability.effectiveSymmetricMigration` and "
+        "`fstMigrationDriftEquilibrium`: island-model migration-drift balance, single "
+        "population set, no score carried anywhere.",
+    ("Descent.PopGen.PopulationGeneticsFoundations.TransientFstDerivation",
+     "Descent.Portability.PortabilityDrift"):
+        "`Portability.hudsonFstFromCoalescenceTimes`: Hudson's F_ST from coalescence "
+        "times, which is the definition this directory exists to derive.",
+    ("Descent.PopGen.PopulationGeneticsFoundations.WrightFStatistics",
+     "Descent.Portability.PortabilityDrift"):
+        "`Portability.pairwiseFstFromBranches`: pairwise F_ST off a tree. Same "
+        "extraction as the four above; one move of the drift recurrences down into "
+        "PopGen retires all five edges and `LDDecayTheory`'s as well.",
+    ("Descent.PopGen.PolygenicArchitecture", "Descent.Decision.CertificateGrading"):
+        "Reads `FinitePrior.mean` and the atom-modulus lemmas. The certificate "
+        "machinery is decision-theoretic and correctly placed; the polygenic INSTANCE "
+        "of it is what sits in the wrong layer, so this repair moves a theorem up.",
+    ("Descent.PopGen.PolygenicArchitecture", "Descent.Decision.TransportedMinimax"):
+        "Same file and same repair: the minimax entropy exponents it names are "
+        "Decision's, and the architecture statement consuming them is the thing in "
+        "the wrong place.",
+    ("Descent.PopGen.SelectionArchitecture", "Descent.Portability.AncestrySpecificPower"):
+        "`fisherInformation`, `ncp` and `effectiveFisherInformation` are study-design "
+        "quantities for a single cohort. Same extraction as "
+        "`GeneticArchitectureDiscovery`.",
+    ("Descent.PopGen.StandardizedGenotypeMoments",
+     "Descent.Portability.AncestrySpecificPower"):
+        "`Portability.genotypeVarianceHWE` again, six times. One extraction retires "
+        "this edge, and two more above it.",
+    ("Descent.Portability.MetricSpecificPortability.PrecisionRecall",
+     "Descent.Program.OpenQuestions"):
+        "`Program.f1Score`. This import was WRITTEN rather than found: the file named "
+        "`f1Score` and reached it through `R2Decomposition -> PopGen.LDDecayTheory -> "
+        "Program.OpenQuestions` until that chain was cut. An F1 formula is a "
+        "classifier metric with no programme content; move the definition into "
+        "Portability and the edge goes.",
+    ("Descent.Portability.PGSCalibrationTheory.CalibrationVsDiscrimination",
+     "Descent.Program.Conclusions"):
+        "`BinaryPopulation`, `populationAUC` and `populationAUC_strictMono_invariant`: "
+        "a measure-theoretic AUC apparatus housed in the narrative module. Also "
+        "written rather than found -- the names arrived along a fifteen-module path "
+        "that no longer exists.",
+    ("Descent.Portability.PGSCalibrationTheory.RecalibrationMethods",
+     "Descent.Program.Conclusions"):
+        "The same three names and the same repair; this file reaches them on its own "
+        "now rather than through a sibling that happened to be earlier in a chain.",
+    ("Descent.Portability.PortabilityDrift.Definitions", "Descent.Program.Conclusions"):
+        "This file names NOTHING from `Conclusions`. It is a carrier: "
+        "`PortabilityDrift.PresentDayMoments`, further down the same chain, names "
+        "`brierBernoulliRisk`, `bernoulliKLReal` and `exactBrierRiskOfCalibrated` and "
+        "reaches them only through here. Interim repair is to move the import to the "
+        "file that uses the names; the real one is to move the Bernoulli losses out "
+        "of the narrative module.",
+}
+
+# The self-auditing directory, separated in both directions.  See META in the header.
+LAYER_META = "Meta"
+
+LAYER_QUALIFIED = re.compile(r"\b([A-Z][A-Za-z0-9]*)\.([A-Za-z_][A-Za-z0-9_'!?]*)")
+LAYER_DECL = re.compile(
+    r"(?m)^\s*(?:@\[[^\]]*\]\s*)?(?:private\s+|protected\s+|noncomputable\s+|nonrec\s+)*"
+    r"(?:theorem|lemma|def|abbrev|structure|inductive|class|instance)\s+"
+    r"([A-Za-z_][A-Za-z0-9_'!?]*)")
+
+
+def _layer_of(mod: str):
+    """`Descent.PopGen.DGP` -> `PopGen`; the root and anything else -> `None`."""
+    parts = mod.split(".")
+    return parts[1] if len(parts) > 1 and parts[0] == "Descent" else None
+
+
+def _layer_graph():
+    """`(raw sources, the whole import graph, the tables of contents in it)`.
+
+    THE GRAPH IS NOT PRUNED, and that is the difference between this guard and the
+    shape ones.  `_shape_graph_without_toc` deletes heads at both ends because a head
+    declares nothing and its edges are what `lake build` needs to reach the tree
+    rather than what a proof rests on -- right for depth, wrong here twice over.
+    `Descent.PopGen.LDDecayTheory -> Descent.Portability.PortabilityDrift` is an
+    import of another layer's head and it is exactly as much a cross-layer dependency
+    as an import of a module inside it; deleting the head end hides it.  And Lean
+    resolves names through heads like any other import, so a reachability rule run on
+    a pruned graph reports sixty modules as naming declarations they cannot see when
+    they see them perfectly well.
+
+    What IS skipped is edges whose SOURCE is a table of contents: `Descent/PopGen.lean`
+    importing every module under `Descent/PopGen/` is the `heads` contract being
+    satisfied, and `Descent.lean` importing the eleven heads is the build entry point.
+    Neither is a dependency anything rests on.  `_shape_is_toc` decides what a head is,
+    by the `heads` contract; a second answer to that question here is the failure this
+    file's own header records.
+    """
+    raw, _code, graph, decls, _arch = _shape_corpus()
+    return raw, graph, {m for m in graph if _shape_is_toc(m, graph, decls)}
+
+
+def _layer_reachable(graph, start):
+    seen, stack = {start}, [start]
+    while stack:
+        for dep in graph.get(stack.pop(), ()):
+            if dep not in seen:
+                seen.add(dep)
+                stack.append(dep)
+    return seen
+
+
+def run_layers() -> int:
+    raw, graph, toc = _layer_graph()
+    if not graph:
+        print("layers guard CANNOT RUN: no Lean modules found under "
+              f"{CORPUS / 'Descent'}")
+        return 1
+
+    order, core, narrative, meta, census = [], [], [], [], collections.Counter()
+
+    for mod in sorted(graph):
+        if mod in toc:
+            continue
+        src = _layer_of(mod)
+        for dep in sorted(graph[mod]):
+            dst = _layer_of(dep)
+            if src is None or dst is None or src == dst:
+                continue
+            if src in LAYER_RANK and dst in LAYER_RANK:
+                if LAYER_RANK[dst] > LAYER_RANK[src]:
+                    order.append((mod, dep))
+            else:
+                census[(src, dst)] += 1
+            if src == "Core":
+                core.append((mod, dep))
+            if dst == "Program":
+                narrative.append((mod, dep))
+            if (src == LAYER_META) != (dst == LAYER_META):
+                meta.append((mod, dep))
+
+    # A top-level directory that is neither ranked nor explained.  See the header: this
+    # is what stops `LAYER_UNRANKED` from being an allowlist that grows by accident.
+    unplaced = sorted({d for d in (_layer_of(m) for m in graph)
+                       if d and d not in LAYER_RANK and d not in LAYER_UNRANKED})
+
+    # REACHABLE.  Only qualified names whose head is a top-level directory are
+    # checked: `Program.f1Score` is a claim about a module, `Finset.sum_congr` and
+    # `h.altFreq` are not.  Comments are stripped first, because a docstring is
+    # allowed to name a declaration the file does not import -- that is what a
+    # cross-reference IS.
+    declared_in = {}
+    for mod, text in raw.items():
+        layer = _layer_of(mod)
+        if layer is None:
+            continue
+        for name in LAYER_DECL.findall(text):
+            declared_in.setdefault((layer, name), set()).add(mod)
+
+    unreachable = []
+    for mod in sorted(graph):
+        if mod in toc:
+            continue
+        src = _layer_of(mod)
+        text = raw.get(mod)
+        if src is None or text is None:
+            continue
+        body = re.sub(r"--[^\n]*", "", re.sub(r"/-.*?-/", "", text, flags=re.S))
+        closure = None
+        for layer, name in sorted(set(LAYER_QUALIFIED.findall(body))):
+            if layer == src or (layer not in LAYER_UNRANKED
+                                and layer not in LAYER_RANK):
+                continue
+            homes = declared_in.get((layer, name))
+            if not homes:
+                continue
+            if closure is None:
+                closure = _layer_reachable(graph, mod)
+            if not homes & closure:
+                unreachable.append(
+                    f"{mod} names {layer}.{name}, defined in "
+                    f"{', '.join(sorted(homes))}, which it does not reach")
+
+    stale = sorted(e for e in LAYER_PENDING
+                   if e not in set(order) | set(core) | set(narrative))
+
+    bad = []
+    edges = sorted(set(order) | set(core) | set(narrative) | set(meta))
+    if edges:
+        listed = [e for e in edges if e in LAYER_PENDING]
+        unlisted = [e for e in edges if e not in LAYER_PENDING]
+        bad.append(f"cross-layer import edges: {len(edges)}, budget 0")
+        for mod, dep in edges:
+            rules = ("order " if (mod, dep) in order else "") + \
+                    ("core " if (mod, dep) in core else "") + \
+                    ("narrative " if (mod, dep) in narrative else "") + \
+                    ("meta" if (mod, dep) in meta else "")
+            bad.append(f"    {mod}")
+            bad.append(f"      -> {dep}   [{rules.strip().replace(' ', '+')}]")
+            reason = LAYER_PENDING.get((mod, dep))
+            if reason:
+                bad.append(f"      {reason}")
+            else:
+                bad.append("      NOT IN `LAYER_PENDING`: nobody has written down what "
+                           "this edge is made of. Either name the declarations it "
+                           "carries and the repair that retires it, or delete the "
+                           "import -- an unargued cross-layer edge is the one shape "
+                           "this guard exists to stop appearing.")
+        bad.append(f"    ({len(listed)} argued for in `LAYER_PENDING`, "
+                   f"{len(unlisted)} not)")
+    if unreachable:
+        bad.append(f"qualified names outside the importer's closure: "
+                   f"{len(unreachable)}, budget 0; import the module that DEFINES the "
+                   f"name, because the chain it currently arrives through belongs to "
+                   f"another file and can be cut without warning")
+        bad.extend("    " + x for x in sorted(unreachable))
+    if unplaced:
+        bad.append(f"top-level directories in neither `LAYER_ORDER` nor "
+                   f"`LAYER_UNRANKED`: {len(unplaced)}, budget 0; give it a rank in "
+                   f"the order or a sentence in `LAYER_UNRANKED` saying why it has "
+                   f"none -- an unplaced directory is a piece of the corpus this "
+                   f"guard silently reports as clean")
+        bad.extend("    " + x for x in unplaced)
+    if stale:
+        bad.append(f"`LAYER_PENDING` entries whose edge no longer exists: {len(stale)}, "
+                   f"budget 0; delete the entry -- a repaired edge described as "
+                   f"outstanding is worse than no description")
+        bad.extend(f"    {m} -> {d}" for m, d in stale)
+
+    print(f"unranked-directory edges, not counted: {sum(census.values())} across "
+          f"{len(census)} directory pairs. The contract ranks {len(LAYER_ORDER)} "
+          f"directories and these {len(LAYER_UNRANKED)} have no rank:")
+    for name in sorted(LAYER_UNRANKED):
+        print(f"    {name}: {LAYER_UNRANKED[name]}")
+    for (a, b), n in sorted(census.items(), key=lambda kv: (-kv[1], kv[0])):
+        print(f"    {a} -> {b}: {n}")
+
+    if bad:
+        for line in bad:
+            print(line)
+        print(f"layers guard FAILS. The declared order is "
+              f"{' < '.join(LAYER_ORDER)}, and an edge that runs the other way is a "
+              f"lower layer that cannot be read, moved or rewritten without the "
+              f"higher one -- which is the whole of what a layer buys.")
+        return 1
+
+    print(f"layers guard passes: {sum(len(v) for v in graph.values())} import edge(s) "
+          f"over {len(graph)} modules, none running up the order "
+          f"{' < '.join(LAYER_ORDER)}, none leaving `Descent/Core/`, none reaching "
+          f"`Descent/Program/` from outside it, none crossing the `Descent/Meta/` "
+          f"boundary in either direction, and every qualified cross-directory name "
+          f"inside its importer's closure.")
+    return 0
+
+
+# ======================================================================================
 # DISPATCHER
 # ======================================================================================
 
@@ -6993,6 +7416,27 @@ GUARDS = {
     # nothing has taken its place. Calibrated against a fixture carrying that pair,
     # since a guard that has only ever reported zero has not been shown to fire.
     "shape-routes":    dict(fn=run_shape_routes,     gated=True,  takes_argv=False),
+    # DIAGNOSTIC for the reason the `ledger` entry above records, and the outstanding
+    # findings are two different things that flip it at two different times.
+    #
+    # ORDER/CORE/NARRATIVE/META: 19 cross-layer edges, every one argued for by name in
+    # `LAYER_PENDING`, and every one a real inversion whose repair is content moving
+    # between directories. Flip when that table is empty. It was 27 one release ago;
+    # the ones that went were not fixed by moving anything, they were imports carrying
+    # Mathlib or the programme narrative and naming nothing from what they imported.
+    #
+    # REACHABLE: 17, and this one is URGENT rather than aspirational. Each is a file
+    # naming a declaration it does not reach, which means it does not compile, and
+    # every one arrived this release from an import repair -- the count against
+    # `62bbadb` is zero. The fix is one import line per file, naming the module that
+    # DEFINES the name; `PopulationGeneticsFoundations` has already had five such lines
+    # land and they are the five newest entries in `LAYER_PENDING`.
+    #
+    # WHEN REACHABLE IS BACK AT ZERO IT SHOULD BE SPLIT OUT AND GATED ON ITS OWN rather
+    # than waiting on `LAYER_PENDING`. It is the only rule in this file that has been
+    # demonstrated silent on a whole corpus and nonzero on another, and holding a
+    # calibrated rule hostage to an uncalibrated one is how a gate never lands.
+    "layers":          dict(fn=run_layers,           gated=False, takes_argv=False),
 }
 
 
