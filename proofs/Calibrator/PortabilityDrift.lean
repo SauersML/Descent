@@ -854,7 +854,27 @@ This is the number the closed-population model sets to zero.
 
     The observation the body explains is measured too: at demographic
     equilibrium the retention stays at `1.025 ± 0.020` out to `T = 4000` where
-    the floorless model predicts `0.135`. -/
+    the floorless model predicts `0.135`.
+
+    INDEPENDENTLY CONFIRMED, and with the competitor gate the run above lacks
+    (`simcov/battery_ia02.py`). 200 replicates rather than 40, same regime, and
+    two competing readings carried on the same cells: `θ/(1+2θ)` misses by up to
+    182 sems and `2θ/(1+2θ)` by 18, while the body sits at worst 0.68 sems. The
+    Ewens control tracks `E[K]` from 1.5 to 24.4 alleles across the hundredfold
+    sweep at 0.09 to 1.45 sems. A validation with no rejected competitor is
+    arithmetic; this one is not.
+
+    THE SAME TRAP HAS NOW BITTEN THIS DEFINITION THREE TIMES, in three
+    directions, and it is worth naming so it stops. `msprime.InfiniteAlleles()`
+    requires a DISCRETE genome. Under `discrete_genome=False` each mutation
+    lands at its own real-valued position, so one locus carrying `k` mutations
+    is reported as `k` biallelic SITES instead of one site with `k+1` allelic
+    states -- and a design reading the FIRST variant then sees two alleles
+    however large `θ` is. That produced a 21-sem falsification once, a VOID in
+    `battery_bulk20.py` `group_b` once, and correct numbers only when
+    `sequence_length = 1` is used with msprime's default discrete genome. The
+    Ewens control is what caught it every time, because `∑ᵢ θ/(θ+i-1)` cannot
+    return 2 for every `θ`. Do not drop that control. -/
 noncomputable def hetMutationFloor (Ne mu : ℝ) : ℝ :=
   4 * Ne * mu / (1 + 4 * Ne * mu)
 

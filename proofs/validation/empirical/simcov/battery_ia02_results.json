@@ -1,0 +1,241 @@
+{
+ "_battery_sha": "0e9f40266bea871b",
+ "results": [
+  {
+   "name": "[control] Ewens expected allele count on the same samples",
+   "file": "PortabilityDrift.lean",
+   "source": "sum_i theta/(theta+i-1)",
+   "note": "",
+   "regime": "single-locus infinite-alleles mutation at coalescent equilibrium, Ne = 1000, 100 sampled genes, 200 replicates, sequence_length = 1 on msprime's DEFAULT DISCRETE genome so all mutations fall on one site; the observable is the realised number of distinct allelic states",
+   "span": 0.938527647856863,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "theta=10.0",
+    "lean": 24.441754351848147,
+    "truth": 24.08,
+    "sem": 0.2486506297566768,
+    "sems_off": 1.4548700407561885,
+    "rel_err": 0.01502302125615234
+   },
+   "cells": [
+    {
+     "design": "theta=0.1",
+     "lean": 1.5024921305128602,
+     "truth": 1.475,
+     "sem": 0.04366242131599985,
+     "sems_off": 0.6296519909853421,
+     "rel_err": 0.018638732551091625
+    },
+    {
+     "design": "theta=0.5",
+     "lean": 3.2843421893016345,
+     "truth": 3.275,
+     "sem": 0.10271135825982386,
+     "sems_off": 0.09095575659706569,
+     "rel_err": 0.002852576885995283
+    },
+    {
+     "design": "theta=1.0",
+     "lean": 5.187377517639621,
+     "truth": 5.145,
+     "sem": 0.12767686520880647,
+     "sems_off": 0.33191226594039275,
+     "rel_err": 0.008236640940645492
+    },
+    {
+     "design": "theta=3.0",
+     "lean": 11.121247287921772,
+     "truth": 11.1,
+     "sem": 0.2042266944196273,
+     "sems_off": 0.10403776050017906,
+     "rel_err": 0.0019141700830425622
+    },
+    {
+     "design": "theta=10.0",
+     "lean": 24.441754351848147,
+     "truth": 24.08,
+     "sem": 0.2486506297566768,
+     "sems_off": 1.4548700407561885,
+     "rel_err": 0.01502302125615234
+    }
+   ]
+  },
+  {
+   "name": "hetMutationFloor",
+   "file": "PortabilityDrift.lean",
+   "source": "4 * Ne * mu / (1 + 4 * Ne * mu)",
+   "note": "",
+   "regime": "the same samples as the control above; heterozygosity is 1 - sum p_i^2 over the WHOLE sample with the unbiased n/(n-1) correction, never conditioned on polymorphism. theta = 4*Ne*mu comes from the simulation's own exact Ne and mu, so no nominal-versus-realised substitution occurs. theta is swept a hundredfold, over which the three readings separate by up to a factor of two",
+   "span": 0.8999999999999999,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "theta=4*Ne*mu=1.0",
+    "lean": 0.5,
+    "truth": 0.5097868686868687,
+    "sem": 0.014428107306051142,
+    "sems_off": 0.6783196492282896,
+    "rel_err": 0.01919796151689465
+   },
+   "cells": [
+    {
+     "design": "theta=4*Ne*mu=0.1",
+     "lean": 0.09090909090909091,
+     "truth": 0.09002424242424244,
+     "sem": 0.011289471764869472,
+     "sems_off": 0.07837820079429597,
+     "rel_err": 0.00982900228894562
+    },
+    {
+     "design": "theta=4*Ne*mu=0.5",
+     "lean": 0.3333333333333333,
+     "truth": 0.3441474747474748,
+     "sem": 0.016010292974097257,
+     "sems_off": 0.6754493144902151,
+     "rel_err": 0.031422986387090575
+    },
+    {
+     "design": "theta=4*Ne*mu=1.0",
+     "lean": 0.5,
+     "truth": 0.5097868686868687,
+     "sem": 0.014428107306051142,
+     "sems_off": 0.6783196492282896,
+     "rel_err": 0.01919796151689465
+    },
+    {
+     "design": "theta=4*Ne*mu=3.0",
+     "lean": 0.75,
+     "truth": 0.7459080808080807,
+     "sem": 0.008208411887930357,
+     "sems_off": 0.49850315113159327,
+     "rel_err": 0.0054858223113581584
+    },
+    {
+     "design": "theta=4*Ne*mu=10.0",
+     "lean": 0.9090909090909091,
+     "truth": 0.9092080808080809,
+     "sem": 0.0023852163721020817,
+     "sems_off": 0.04912414594428847,
+     "rel_err": 0.00012887227868422563
+    }
+   ]
+  },
+  {
+   "name": "hetMutationFloor [denominator 1 + 2*theta, competing]",
+   "file": "PortabilityDrift.lean",
+   "source": "theta / (1 + 2*theta)",
+   "note": "positive control 'theta=1.0 [Ewens E(K), independent of every body under test]' passed at 0.33 sems",
+   "regime": "the same samples as the control above; heterozygosity is 1 - sum p_i^2 over the WHOLE sample with the unbiased n/(n-1) correction, never conditioned on polymorphism. theta = 4*Ne*mu comes from the simulation's own exact Ne and mu, so no nominal-versus-realised substitution occurs. theta is swept a hundredfold, over which the three readings separate by up to a factor of two",
+   "span": 0.825,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "theta=4*Ne*mu=10.0",
+    "lean": 0.47619047619047616,
+    "truth": 0.9092080808080809,
+    "sem": 0.0023852163721020817,
+    "sems_off": 181.54227418621483,
+    "rel_err": 0.47625798071740605
+   },
+   "cells": [
+    {
+     "design": "theta=4*Ne*mu=0.1",
+     "lean": 0.08333333333333334,
+     "truth": 0.09002424242424244,
+     "sem": 0.011289471764869472,
+     "sems_off": 0.5926680388829029,
+     "rel_err": 0.07432341456846643
+    },
+    {
+     "design": "theta=4*Ne*mu=0.5",
+     "lean": 0.25,
+     "truth": 0.3441474747474748,
+     "sem": 0.016010292974097257,
+     "sems_off": 5.880434224395156,
+     "rel_err": 0.2735672397903179
+    },
+    {
+     "design": "theta=4*Ne*mu=1.0",
+     "lean": 0.3333333333333333,
+     "truth": 0.5097868686868687,
+     "sem": 0.014428107306051142,
+     "sems_off": 12.229846341628669,
+     "rel_err": 0.34613197434459647
+    },
+    {
+     "design": "theta=4*Ne*mu=3.0",
+     "lean": 0.42857142857142855,
+     "truth": 0.7459080808080807,
+     "sem": 0.008208411887930357,
+     "sems_off": 38.65993283101007,
+     "rel_err": 0.4254366729649382
+    },
+    {
+     "design": "theta=4*Ne*mu=10.0",
+     "lean": 0.47619047619047616,
+     "truth": 0.9092080808080809,
+     "sem": 0.0023852163721020817,
+     "sems_off": 181.54227418621483,
+     "rel_err": 0.47625798071740605
+    }
+   ]
+  },
+  {
+   "name": "hetMutationFloor [2*theta/(1 + 2*theta), competing]",
+   "file": "PortabilityDrift.lean",
+   "source": "2*theta / (1 + 2*theta)",
+   "note": "positive control 'theta=1.0 [Ewens E(K), independent of every body under test]' passed at 0.33 sems",
+   "regime": "the same samples as the control above; heterozygosity is 1 - sum p_i^2 over the WHOLE sample with the unbiased n/(n-1) correction, never conditioned on polymorphism. theta = 4*Ne*mu comes from the simulation's own exact Ne and mu, so no nominal-versus-realised substitution occurs. theta is swept a hundredfold, over which the three readings separate by up to a factor of two",
+   "span": 0.825,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "theta=4*Ne*mu=10.0",
+    "lean": 0.9523809523809523,
+    "truth": 0.9092080808080809,
+    "sem": 0.0023852163721020817,
+    "sems_off": 18.100190858082758,
+    "rel_err": 0.04748403856518793
+   },
+   "cells": [
+    {
+     "design": "theta=4*Ne*mu=0.1",
+     "lean": 0.16666666666666669,
+     "truth": 0.09002424242424244,
+     "sem": 0.011289471764869472,
+     "sems_off": 6.788840597566292,
+     "rel_err": 0.8513531708630672
+    },
+    {
+     "design": "theta=4*Ne*mu=0.5",
+     "lean": 0.5,
+     "truth": 0.3441474747474748,
+     "sem": 0.016010292974097257,
+     "sems_off": 9.73452050531967,
+     "rel_err": 0.45286552041936423
+    },
+    {
+     "design": "theta=4*Ne*mu=1.0",
+     "lean": 0.6666666666666666,
+     "truth": 0.5097868686868687,
+     "sem": 0.014428107306051142,
+     "sems_off": 10.873207043172085,
+     "rel_err": 0.30773605131080706
+    },
+    {
+     "design": "theta=4*Ne*mu=3.0",
+     "lean": 0.8571428571428571,
+     "truth": 0.7459080808080807,
+     "sem": 0.008208411887930357,
+     "sems_off": 13.551315145178808,
+     "rel_err": 0.14912665407012354
+    },
+    {
+     "design": "theta=4*Ne*mu=10.0",
+     "lean": 0.9523809523809523,
+     "truth": 0.9092080808080809,
+     "sem": 0.0023852163721020817,
+     "sems_off": 18.100190858082758,
+     "rel_err": 0.04748403856518793
+    }
+   ]
+  }
+ ]
+}
