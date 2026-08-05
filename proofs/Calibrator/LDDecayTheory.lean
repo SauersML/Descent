@@ -882,8 +882,24 @@ noncomputable def ldMismatchFrobenius
     {p : ℕ} (Sig_S Sig_T : Matrix (Fin p) (Fin p) ℝ) : ℝ :=
   frobeniusNormSq (Sig_S - Sig_T)
 
-/-- Reference evaluation: matching panels have no Frobenius mismatch. -/
-theorem ldMismatchFrobenius_at_reference_point {p : ℕ}
+/-- **Matching panels have no Frobenius mismatch.**
+
+RENAMED off `_at_reference_point`, because it never was one. A reference
+evaluation earns its name by pinning the SCALE of a body: it states a value that
+a rescaled competitor `c · body` would get wrong. This states `0`, and `c · 0 = 0`
+for every `c`, so it rejects no rescaling and no wrong constant — the name was
+claiming evidence the statement cannot carry.
+
+What it does carry is the separation axiom: a mismatch measure that did not
+vanish on the diagonal would not be a distance at all. That is real content, and
+it is why this is renamed rather than moved. Moving the point would destroy a
+true result to satisfy a checker.
+
+NOT YET PINNED: no theorem in this file fixes the scale of `frobeniusNormSq`.
+The sum of squares, the sum of absolute entries and the largest entry all vanish
+on the diagonal and all satisfy every theorem here, so nothing distinguishes
+them. A witness would have to evaluate on a matrix with distinct entries. -/
+theorem ldMismatchFrobenius_self {p : ℕ}
     (Sig : Matrix (Fin p) (Fin p) ℝ) :
     ldMismatchFrobenius Sig Sig = 0 := by
   unfold ldMismatchFrobenius

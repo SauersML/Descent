@@ -2441,8 +2441,25 @@ noncomputable def ppvPortabilityGap
   |metricPPV sensitivity specificity prevalenceTarget -
     metricPPV sensitivity specificity prevalenceSource|
 
-/-- Reference evaluation: equal prevalences leave no gap, whatever the operating point. -/
-theorem ppvPortabilityGap_at_reference_point (sensitivity specificity prevalence : ℝ) :
+/-- **Equal prevalences leave no gap, whatever the operating point.**
+
+RENAMED off `_at_reference_point`. The old name claimed to pin the body's scale,
+and a statement of `0` cannot: `c · 0 = 0` for every `c`, so every rescaling of
+this gap satisfies it. The vanishing is nonetheless real content — it says the
+gap is a function of the DIFFERENCE between the two prevalences and not of their
+level, which is exactly the property that makes it a portability gap rather than
+a second copy of the PPV.
+
+Note the quantifiers are what give it its strength: it holds for every
+`sensitivity` and `specificity`, so it also says the operating point cannot
+manufacture a gap on its own. That is worth keeping and is not what a reference
+evaluation is for.
+
+NOT YET PINNED: no theorem here fixes the scale. `ppvPortabilityGap_le_add_abs`
+below bounds it by the two predictive values, which rules out multiples ABOVE
+one, and this theorem rules out nothing; a fractional multiple `c < 1` satisfies
+both. A witness at two distinct prevalences would fix it. -/
+theorem ppvPortabilityGap_self (sensitivity specificity prevalence : ℝ) :
     ppvPortabilityGap sensitivity specificity prevalence prevalence = 0 := by
   unfold ppvPortabilityGap
   simp

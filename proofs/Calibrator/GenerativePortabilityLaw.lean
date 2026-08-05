@@ -38,12 +38,31 @@ noncomputable def historySelfEnergy (h : SpectralHistory) : ℝ :=
 noncomputable def historySpectralDistanceSq (h h' : SpectralHistory) : ℝ :=
   historySelfEnergy h + historySelfEnergy h' - 2 * historyKernel h h'
 
-/-- Reference evaluation: a history has zero spectral distance from itself. -/
-theorem historySpectralDistanceSq_at_reference_point (h : SpectralHistory)
-    (hself : historyKernel h h = historySelfEnergy h) :
+/-- **A history has zero spectral distance from itself.**
+
+RENAMED off `_at_reference_point`. A reference evaluation pins the SCALE of a
+body by stating a value a rescaled competitor would get wrong; this states `0`,
+and `c · 0 = 0` for every `c`, so it rejects nothing and the old name asserted
+evidence the statement does not carry. Kept and renamed rather than moved,
+because the vanishing IS the content: `historySpectralDistanceSq` is the
+polarization expansion `⟨h,h⟩ + ⟨h',h'⟩ - 2⟨h,h'⟩`, and that it collapses on the
+diagonal is what makes it a squared distance rather than an arbitrary
+combination of kernels.
+
+THE HYPOTHESIS WAS ALSO DROPPED. It read
+`(hself : historyKernel h h = historySelfEnergy h)`, which is true by `rfl` —
+`historySelfEnergy h` is *defined* as `historyKernel h h`. A premise that the
+definitions already discharge adds no strength and makes the statement look
+conditional when it is not; the conclusion holds for every `SpectralHistory`.
+
+NOT YET PINNED: nothing fixes the coefficient `2` on the cross term. Any
+`⟨h,h⟩ + ⟨h',h'⟩ - k⟨h,h'⟩` vanishes on the diagonal exactly when `k = 2`, so
+this theorem does constrain `k` — but only through the diagonal, and no theorem
+here evaluates the distance between two DIFFERENT histories, which is what would
+fix the two self-energy coefficients independently. -/
+theorem historySpectralDistanceSq_self (h : SpectralHistory) :
     historySpectralDistanceSq h h = 0 := by
-  unfold historySpectralDistanceSq
-  rw [hself]
+  unfold historySpectralDistanceSq historySelfEnergy
   ring
 
 
