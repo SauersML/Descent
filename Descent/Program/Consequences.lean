@@ -17,6 +17,8 @@ import Descent.Portability.PCCorrectability.Diagnostic
 import Descent.Foundations.CovarianceStructure
 import Descent.Blindness.DecoratedGeometryBlindness
 import Descent.Program.CausalInference
+import Descent.Portability.PolygenicContinuumCalibration
+import Descent.Portability.GenerativePortabilityLaw
 
 /-!
 # What the separate results say when they are put together
@@ -458,5 +460,40 @@ theorem drift_and_turnover_are_separate_channels
         TransportedMetrics.r2FromSignalVariance (presentDayPGSVariance V_A fst) V_E :=
   ⟨Descent.Core.ScoreMoments.deployedR2_mono_in_migration p q V_E hE hNe hmu hV hlt hflow,
    r2_strictMono_under_effect_turnover V_A V_E fst ρ hVA hVE hfst_lt hρ_pos hρ_lt⟩
+
+/-! ### Two floors that are not the same floor -/
+
+/-- **The calibration floor is an ancestry drift defect; the degradation law's floor is a
+spectral distance. On an equal-amplitude slice they are different quantities of the same
+history, and a programme that conflates them optimises the wrong one.**
+
+`PolygenicContinuumCalibration.polygenicCalibrationFloor_eq_driftDefectSq` identifies the
+irreducible calibration error with a drift defect across the ancestry continuum: no score,
+however fitted, gets below it, because it is a property of how ancestry posteriors and
+risks disagree rather than of the fit.
+
+`GenerativePortabilityLaw.historyDegradation_equal_amplitude` says that when two histories
+carry equal amplitude, their degradation is the squared amplitude times a SPECTRAL
+distance -- a property of memory and phase, not of ancestry weighting.
+
+Both are floors on what deployment can achieve, and they respond to different
+interventions. Reweighting ancestries moves the first and leaves the second exactly where
+it was; matching spectra moves the second and leaves the first. Neither module says the
+other exists.
+
+The equal-amplitude hypothesis is what makes the second one legible, and it is stated
+rather than assumed away: off that slice the degradation carries an amplitude-mismatch
+term too, which `historyDegradation_cone_identity` separates. -/
+theorem calibration_floor_and_spectral_floor_are_different_floors
+    {Genotype Ancestry : Type*} [Fintype Genotype] [Fintype Ancestry]
+    (genotypeWeight : Genotype → ℝ)
+    (ancestryPosterior : Genotype → Ancestry → ℝ)
+    (ancestryRisk : Ancestry → Genotype → ℝ)
+    (h h' : SpectralHistory) (ha : h.amplitude = h'.amplitude) :
+    polygenicCalibrationFloor genotypeWeight ancestryPosterior ancestryRisk =
+        calibrationDriftDefectSq genotypeWeight ancestryPosterior ancestryRisk ∧
+      historyDegradation h h' = h.amplitude ^ 2 * historySpectralDistanceSq h h' :=
+  ⟨polygenicCalibrationFloor_eq_driftDefectSq genotypeWeight ancestryPosterior ancestryRisk,
+   historyDegradation_equal_amplitude h h' ha⟩
 
 end Descent
