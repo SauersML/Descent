@@ -6672,6 +6672,122 @@ def run_shape_spine() -> int:
     return 0
 
 
+def _shape_camel_words(name: str) -> list:
+    """`deployedR2FromIsland` -> `['deployed', 'R2', 'From', 'Island']`."""
+    return re.findall(r"[A-Z]?[a-z0-9'₀-₉]+|[A-Z]+(?![a-z])", name)
+
+
+def run_shape_routes() -> int:
+    """No raw-real entry point may sit beside a record-typed one of the same name.
+
+    WHAT THIS CATCHES.  Until this release the corpus carried both of these:
+
+        deployedR2           (p : PopGenParameters) (V_E : ℝ) : ℝ
+        deployedR2FromIsland (Ne m μ nDemes V_A V_E : ℝ)       : ℝ
+
+    Two routes to one metric.  The record's whole job is that a constraint added to
+    it -- `recomb_le_half`, `Ne_pos` -- reaches every caller; the second route took
+    four of the record's fields as loose reals and reached none of them, so
+    `deployedR2FromIsland` could be called at a negative effective size and nothing
+    said otherwise.  This is the same defect that produced `EvolutionaryParameters`
+    and `GenerationalPopGenParameters`, two records with the same fields in two
+    modules that do not import each other, which is what `PopGenParameters` was
+    introduced to end.  It came back as a function signature, and it is the third
+    time this shape has been fixed by hand.
+
+    THE COUNT IS ZERO, so this is the one of the five shape guards that lands
+    GATED.  `deployedR2FromIsland` was deleted while these guards were being
+    written -- the timing is the argument, not a coincidence: the repair and the
+    guard were two responses to the same audit, and only one of them survives to
+    the next release.  A guard whose count has never been nonzero is
+    indistinguishable from a guard that does nothing, so this one was calibrated
+    against a fixture holding exactly the pair above: it reports the pair, and
+    reports nothing once the raw-real route is removed.  `DESCENT_CORPUS` points
+    it at that fixture, which is the reason `_shape_corpus` patches
+    `architecture.ROOT` rather than letting it compute its own.
+
+    HOW IT IS DETECTED.  A definition taking `SHAPE_RAW_ARITY` or more BARE `ℝ`
+    arguments, whose camel-case name shares a full stem with a definition that
+    takes a parameter record.  "Shares a full stem" means one name's word sequence
+    is a prefix of the other's -- `deployed·R2` is a prefix of
+    `deployed·R2·From·Island` -- rather than any shared characters, which would fire
+    on every name beginning with `fst`.
+
+    THE MATCH IS CORPUS-WIDE, not within a file.  The pair above happens to be two
+    lines apart, but the failure this exists to stop is a second route appearing in
+    a DIFFERENT module, which is how both parallel parameter records got written:
+    two files that do not import each other cannot see that they are describing the
+    same thing.
+
+    A raw-real definition with no record-typed twin is not reported.
+    `deployedR2FromTau (V_A V_E tau : ℝ)` is a kernel in its own coordinates and
+    takes no population history; it is three reals, below the arity, and it has no
+    sibling to be a second route to.
+    """
+    _raw, code, _graph, _decls, _arch = _shape_corpus()
+
+    raw_entry, record_entry = {}, {}
+    for mod, text in code.items():
+        lines, i = text.split("\n"), 0
+        while i < len(lines):
+            m = re.match(r"^\s*(?:noncomputable\s+)?(?:def|abbrev)\s+([\w.'₀-₉]+)",
+                         lines[i])
+            if not m:
+                i += 1
+                continue
+            block, j = [lines[i]], i + 1
+            while j < len(lines) and lines[j].strip() and \
+                    not SHAPE_DECL_STOP.match(lines[j]):
+                block.append(lines[j])
+                j += 1
+            i = j
+            sig = " ".join(" ".join(block).split()).partition(":=")[0]
+            name = m.group(1).split(".")[-1]
+            reals = sum(len(g.split()) for g in re.findall(r"\(([^()]*?):\s*ℝ\s*\)", sig))
+            if reals >= SHAPE_RAW_ARITY:
+                raw_entry.setdefault(name, (mod, reals))
+            if re.search(r"\([^()]*?:\s*[A-Z][\w.']*Parameters\b", sig):
+                record_entry.setdefault(name, mod)
+
+    findings = []
+    for raw_name in sorted(raw_entry):
+        rmod, reals = raw_entry[raw_name]
+        rwords = _shape_camel_words(raw_name)
+        for rec_name in sorted(record_entry):
+            if rec_name == raw_name:
+                continue
+            cwords = _shape_camel_words(rec_name)
+            k = 0
+            while k < min(len(rwords), len(cwords)) and \
+                    rwords[k].lower() == cwords[k].lower():
+                k += 1
+            if k and (k == len(cwords) or k == len(rwords)):
+                findings.append(
+                    f"{raw_name} ({rmod}) takes {reals} bare reals and shares the "
+                    f"stem `{''.join(rwords[:k])}` with {rec_name} "
+                    f"({record_entry[rec_name]}), which takes a parameter record")
+
+    if findings:
+        print(f"metrics reachable by two routes, one of them raw reals: "
+              f"{len(findings)}, budget 0; make the raw-real definition compute the "
+              f"record and call the record-typed one, so the record's field "
+              f"constraints hold on both routes -- or delete it if the "
+              f"record-typed one already covers its callers")
+        for line in findings:
+            print("    " + line)
+        print(f"shape-routes guard FAILS. A parameter record only enforces what it "
+              f"enforces on the callers that go through it; a second entry point "
+              f"taking the same demography as loose reals is the record's "
+              f"constraints made optional, and nothing in the build says which "
+              f"route a caller took.")
+        return 1
+
+    print(f"shape-routes guard passes: {len(raw_entry)} definition(s) take "
+          f"{SHAPE_RAW_ARITY}+ bare reals and none shares a stem with a "
+          f"record-typed definition")
+    return 0
+
+
 # ======================================================================================
 # DISPATCHER
 # ======================================================================================
@@ -6810,6 +6926,11 @@ GUARDS = {
     # long. This is the one of the five that no amount of moving imports around
     # will fix; it needs theorems that do not exist yet.
     "shape-spine":     dict(fn=run_shape_spine,      gated=False, takes_argv=False),
+    # GATED, alone among the five, because its count is already zero:
+    # `deployedR2FromIsland` was deleted while these guards were being written and
+    # nothing has taken its place. Calibrated against a fixture carrying that pair,
+    # since a guard that has only ever reported zero has not been shown to fire.
+    "shape-routes":    dict(fn=run_shape_routes,     gated=True,  takes_argv=False),
 }
 
 
