@@ -7,6 +7,7 @@ import Descent.Portability.PortabilityBounds
 import Descent.Core.Moments
 import Descent.Portability.ImputationPortability
 import Descent.Portability.LongitudinalPortability
+import Descent.Portability.EquityAndImplementation
 
 /-!
 # What the separate results say when they are put together
@@ -127,5 +128,47 @@ theorem zero_at_followup_means_zero_at_baseline
     (h : portabilityAtTime r2_initial lambda_total t = 0) :
     r2_initial = 0 :=
   (portabilityAtTime_eq_zero_iff r2_initial lambda_total t).mp h
+
+/-! ### The demographic chain reaches a clinical benefit gap -/
+
+/-- **A migration rate difference between two histories becomes a clinical benefit gap,
+and the whole chain is named maps.**
+
+`EquityAndImplementation.mul_sub_mul_pos_of_lt` proves that an `R²` gap becomes a benefit
+gap at any positive benefit-per-unit-`R²`. `Core.ScoreMoments.deployedR2_mono_in_migration`
+proves that a lower migration rate produces a lower deployed `R²`. Composing them says
+the thing neither says: two populations whose histories differ only in gene flow end up
+with a benefit gap, and the size of that gap is determined by the demography rather than
+by anything about the score.
+
+That is the corpus's central claim, in the coordinate a health system would act on, and
+until now it could not be stated -- `EquityAndImplementation` takes `R²` values as free
+reals and nothing connected them to a history. -/
+theorem demography_becomes_a_benefit_gap
+    (p q : Descent.Core.PopGenParameters) (V_E α : ℝ)
+    (hα : 0 < α) (hE : 0 < V_E)
+    (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hV : p.V_A = q.V_A)
+    (hlt : p.mig < q.mig) (hflow : 0 < p.mu + p.mig) :
+    0 < α * Descent.Core.ScoreMoments.deployedR2 q V_E
+          - α * Descent.Core.ScoreMoments.deployedR2 p V_E :=
+  mul_sub_mul_pos_of_lt α (Descent.Core.ScoreMoments.deployedR2 q V_E)
+    (Descent.Core.ScoreMoments.deployedR2 p V_E) hα
+    (Descent.Core.ScoreMoments.deployedR2_mono_in_migration p q V_E hE hNe hmu hV hlt hflow)
+
+/-- **And the gap a health system can close is bounded by the heritability, not by
+effort.**
+
+Composing the cap with the benefit law: no demographic intervention, and no amount of
+score improvement under pure drift, takes the benefit above `α` times the trait's
+heritability. A programme promising more than that is promising something the model
+cannot deliver, and the bound comes from the moment tuple rather than from an assumption
+about what is achievable. -/
+theorem benefit_is_capped_by_heritability
+    (p : Descent.Core.PopGenParameters) (V_E α : ℝ)
+    (hα : 0 < α) (hE : 0 ≤ V_E) (hflow : 0 < p.mu + p.mig) :
+    α * Descent.Core.ScoreMoments.deployedR2 p V_E
+      ≤ α * Descent.Core.share p.V_A V_E :=
+  mul_le_mul_of_nonneg_left
+    (Descent.Core.ScoreMoments.deployedR2_le_heritability p V_E hE hflow) (le_of_lt hα)
 
 end Descent
