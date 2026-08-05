@@ -2508,7 +2508,9 @@ theorem Var_Delta_Mu_eq_ploidy_form (V_A fst : ℝ) :
 `pgsVarianceFromHet` -- so this is a real identity and not a restatement of a body. -/
 theorem presentDayPGSVariance_eq_retainedFraction (V_A fst : ℝ) :
     Portability.presentDayPGSVariance V_A fst = Descent.Core.retainedFraction fst V_A := by
-  unfold Portability.presentDayPGSVariance Portability.pgsVarianceFromHet Descent.Core.retainedFraction; ring
+  unfold Portability.presentDayPGSVariance Portability.pgsVarianceFromHet Descent.Core.product
+    Descent.Core.retainedFraction
+  ring
 
 /-- **The realised target PGS variance is a retained fraction, scaled by transport.**
 `PortabilityDrift.realWorldPGSVariance` erodes the additive variance by `1 - F_ST` and then
@@ -2532,7 +2534,8 @@ survived. -/
 theorem amEquilibrium_then_drift (V_A r h2 fst : ℝ) :
     Portability.presentDayPGSVariance (PopGen.amEquilibriumVariance V_A r h2) fst =
       (1 - fst) * (V_A / (1 - r * h2)) := by
-  unfold Portability.presentDayPGSVariance Portability.pgsVarianceFromHet PopGen.amEquilibriumVariance
+  unfold Portability.presentDayPGSVariance Portability.pgsVarianceFromHet Descent.Core.product
+    PopGen.amEquilibriumVariance
   ring
 
 end Descent.Portability
