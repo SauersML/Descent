@@ -2821,7 +2821,7 @@
  },
  "Descent.BundleRigidity.altSum": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '•'",
+  "note": "recursion has no `0` branch",
   "file": "Descent/Blindness/BundleRigidity/Telescope.lean",
   "line": 95,
   "short": "altSum",
@@ -24519,6 +24519,59 @@
    }
   }
  },
+ "Descent.Coalescent.returnProb": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "self-check: structure projection unavailable (AttributeError(\"'float' object has no attribute 'choose'\"))",
+  "file": "Descent/Coalescent/PolyaCriterion.lean",
+  "line": 88,
+  "short": "returnProb",
+  "ret_type": "ℝ",
+  "empirical_status": "DERIVED",
+  "python": "returnProb",
+  "args": [
+   "n"
+  ],
+  "box": {
+   "n": [
+    4.0,
+    20.0
+   ]
+  },
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "AttributeError(\"'float' object has no attribute 'choose'\")"
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Coalescent.not_summable_returnProb",
+   "Descent.Coalescent.returnProb_eq_card_ratio",
+   "Descent.Coalescent.returnProb_gt_one_div",
+   "Descent.Coalescent.returnProb_nonneg"
+  ],
+  "constraints": {
+   "declared_kind": "probability",
+   "declared_lo": 0.0,
+   "declared_hi": 1.0,
+   "hypotheses": [
+    "4 ≤ n"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Coalescent.returnProb_eq_card_ratio": [],
+    "Descent.Coalescent.returnProb_nonneg": [],
+    "Descent.Coalescent.returnProb_gt_one_div": [
+     "4 ≤ n"
+    ],
+    "Descent.Coalescent.not_summable_returnProb": []
+   },
+   "range_lo_thm": [
+    "Descent.Coalescent.returnProb_nonneg",
+    0
+   ],
+   "range_lo": 0
+  }
+ },
  "Descent.Coalescent.jumpStep": {
   "class": "STRUCTURAL",
   "note": "structure literal",
@@ -26063,6 +26116,7 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Coalescent.lineages_meet_of_difference_zero",
    "Descent.Coalescent.meet_iff_difference_walk_zero",
    "Descent.Coalescent.walk_sub",
    "Descent.Coalescent.walk_succ",
@@ -26070,8 +26124,13 @@
    "Descent.Coalescent.walk_zero_step"
   ],
   "constraints": {
-   "hypotheses": [],
+   "hypotheses": [
+    "walk (x₀ - y₀"
+   ],
    "hypotheses_by_theorem": {
+    "Descent.Coalescent.lineages_meet_of_difference_zero": [
+     "walk (x₀ - y₀"
+    ],
     "Descent.Coalescent.walk_zero": [],
     "Descent.Coalescent.walk_succ": [],
     "Descent.Coalescent.walk_sub": [],
@@ -28546,7 +28605,7 @@
    ]
   },
   "selfcheck": {
-   "finite_points": 4,
+   "finite_points": 7,
    "total_points": 8,
    "error": "OverflowError('math range error')"
   },
@@ -38905,17 +38964,26 @@
   }
  },
  "Descent.Pop.pair": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "trailing tokens after expression: op:|",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Core/Population.lean",
   "line": 61,
   "short": "pair",
   "ret_type": "α",
   "empirical_status": "",
-  "python": null,
-  "args": [],
+  "python": "pair",
+  "args": [
+   "s",
+   "t",
+   "p",
+   "_e"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
@@ -38936,7 +39004,7 @@
  },
  "Descent.Pop.withTarget": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition pair",
+  "note": "self-check: arity/type mismatch (TypeError(\"'dict' object is not callable\"))",
   "file": "Descent/Core/Population.lean",
   "line": 72,
   "short": "withTarget",
@@ -38951,7 +39019,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'pair' is not defined\")"
+   "error": "TypeError(\"'dict' object is not callable\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -89726,7 +89794,7 @@
  },
  "Descent.shiftedObservedMean": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition pair",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'float' and 'f)",
   "file": "Descent/Portability/PGSCalibrationTheory.lean",
   "line": 463,
   "short": "shiftedObservedMean",
@@ -89751,7 +89819,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'pair' is not defined\")"
+   "error": "TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -89971,7 +90039,7 @@
  },
  "Descent.CrossPopulationCalibrationShiftModel.observedMean": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition pair",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'float' and 'f)",
   "file": "Descent/Portability/PGSCalibrationTheory.lean",
   "line": 500,
   "short": "observedMean",
@@ -89986,7 +90054,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'pair' is not defined\")"
+   "error": "TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -90020,7 +90088,7 @@
  },
  "Descent.CrossPopulationCalibrationShiftModel.predictedMean": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition pair",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'float' and 'f)",
   "file": "Descent/Portability/PGSCalibrationTheory.lean",
   "line": 505,
   "short": "predictedMean",
@@ -90035,7 +90103,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'pair' is not defined\")"
+   "error": "TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -90345,7 +90413,7 @@
  },
  "Descent.CrossPopulationMechanisticCalibrationModel.deploymentIntercept": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition pair",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'float' and 'f)",
   "file": "Descent/Portability/PGSCalibrationTheory.lean",
   "line": 748,
   "short": "deploymentIntercept",
@@ -90360,7 +90428,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'pair' is not defined\")"
+   "error": "TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -90579,7 +90647,7 @@
  },
  "Descent.CrossPopulationMechanisticCalibrationModel.predictedMean": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition pair",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'float' and 'f)",
   "file": "Descent/Portability/PGSCalibrationTheory.lean",
   "line": 771,
   "short": "predictedMean",
@@ -90594,7 +90662,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'pair' is not defined\")"
+   "error": "TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -90624,7 +90692,7 @@
  },
  "Descent.CrossPopulationMechanisticCalibrationModel.observedMean": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition pair",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'float' and 'f)",
   "file": "Descent/Portability/PGSCalibrationTheory.lean",
   "line": 776,
   "short": "observedMean",
@@ -90639,7 +90707,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'pair' is not defined\")"
+   "error": "TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -91120,8 +91188,8 @@
   }
  },
  "Descent.CrossPopulationGenerationalCalibrationModel.tagMeanAt": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition pair",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/PGSCalibrationTheory.lean",
   "line": 1252,
   "short": "tagMeanAt",
@@ -91140,9 +91208,9 @@
    ]
   },
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "NameError(\"name 'pair' is not defined\")"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -91156,7 +91224,7 @@
  },
  "Descent.CrossPopulationGenerationalCalibrationModel.deploymentInterceptAt": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition pair",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'float' and 'f)",
   "file": "Descent/Portability/PGSCalibrationTheory.lean",
   "line": 1258,
   "short": "deploymentInterceptAt",
@@ -91177,7 +91245,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'pair' is not defined\")"
+   "error": "TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -91330,7 +91398,7 @@
  },
  "Descent.CrossPopulationGenerationalCalibrationModel.predictedMeanAt": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition pair",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'float' and 'f)",
   "file": "Descent/Portability/PGSCalibrationTheory.lean",
   "line": 1279,
   "short": "predictedMeanAt",
@@ -91351,7 +91419,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'pair' is not defined\")"
+   "error": "TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -91371,7 +91439,7 @@
  },
  "Descent.CrossPopulationGenerationalCalibrationModel.observedMeanAt": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition pair",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'float' and 'f)",
   "file": "Descent/Portability/PGSCalibrationTheory.lean",
   "line": 1284,
   "short": "observedMeanAt",
@@ -91392,7 +91460,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'pair' is not defined\")"
+   "error": "TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -98371,7 +98439,7 @@
  },
  "Descent.residualBurden": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition pair",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for -: 'list' and 'li)",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 2884,
   "short": "residualBurden",
@@ -98386,7 +98454,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'pair' is not defined\")"
+   "error": "TypeError(\"unsupported operand type(s) for -: 'list' and 'list'\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -118550,7 +118618,7 @@
  },
  "Descent.binaryTransitionArrowStatistic": {
   "class": "NOT-EXTRACTABLE",
-  "note": "trailing tokens after expression: op:|",
+  "note": "recursion has no `0` branch",
   "file": "Descent/Spectral/EnsembleChannel.lean",
   "line": 209,
   "short": "binaryTransitionArrowStatistic",
@@ -126398,7 +126466,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "Matrix/vector literal (![…])",
   "file": "Descent.lean",
-  "line": 485,
+  "line": 486,
   "short": "sigmaS",
   "ret_type": "Matrix (Fin 2) (Fin 2) ℝ",
   "empirical_status": "",
@@ -126424,7 +126492,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "Matrix/vector literal (![…])",
   "file": "Descent.lean",
-  "line": 488,
+  "line": 489,
   "short": "sigmaT",
   "ret_type": "Matrix (Fin 2) (Fin 2) ℝ",
   "empirical_status": "",
@@ -126450,7 +126518,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "Matrix/vector literal (![…])",
   "file": "Descent.lean",
-  "line": 491,
+  "line": 492,
   "short": "crossS",
   "ret_type": "Fin 2 → ℝ",
   "empirical_status": "",
@@ -126483,7 +126551,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "Matrix/vector literal (![…])",
   "file": "Descent.lean",
-  "line": 508,
+  "line": 509,
   "short": "sigmaT2",
   "ret_type": "Matrix (Fin 2) (Fin 2) ℝ",
   "empirical_status": "",

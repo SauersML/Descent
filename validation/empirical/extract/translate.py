@@ -771,7 +771,21 @@ def translate_enum_match(d, enums, struct_arg_names=(), fname=None,
             raise Untranslatable("enum branch needs `let`, not supported here")
         branches[ctors[ctor]] = ret
     args = [pyname(n) for n in explicit] + [pyname(scrut)]
-    lines = [f"def {fname or pyname(d['short'])}({', '.join(args)}):",
+    fn = fname or pyname(d["short"])
+    # PARTIAL APPLICATION IS NOT AN ERROR IN LEAN, and this dispatch table is a
+    # function like any other.  `Pop.withTarget f t = Pop.pair (f Pop.source) t`
+    # supplies two of `pair`'s three arguments and leaves the scrutinee for the
+    # caller; a fixed-arity Python def raises TypeError on that and takes every
+    # dependent down with it.  Collecting arguments until there are enough is
+    # what the Lean means, not a convenience.
+    lines = [f"def {fn}(*_a):",
+             f"    if len(_a) < {len(args)}:",
+             f"        return lambda *_b: {fn}(*(_a + _b))",
+             # The trailing comma matters: with one argument `s = _a[:1]`
+             # binds a TUPLE, and every branch then computes on a tuple.
+             f"    {', '.join(args)}, = _a[:{len(args)}]"
+             if len(args) == 1 else
+             f"    {', '.join(args)} = _a[:{len(args)}]",
              f"    _t = [{', '.join(branches[i] for i in range(len(ctors)))}]",
              f"    return _t[_rt._ix({pyname(scrut)}, {len(ctors)}, "
              f"{d['short']!r})]"]
@@ -982,6 +996,42 @@ def translate_def(d, struct_arg_names=(), fname=None, resolver=None,
     rather than pick when that is not decisive -- a silently wrong pick produces
     a callable that computes a different function than the Lean says.
     """
+    # A `match` EXPRESSION BODY is the same object as a pipe-equation body, and
+    # the parser only recognised the latter.  `Pop.pair` is written
+    #
+    #     def Pop.pair (s t : α) (p : Pop) : α :=
+    #       match p with
+    #       | Pop.source => s
+    #       | Pop.target => t
+    #
+    # which parsed as an expression, choked on the first `|`, and was reported
+    # `trailing tokens after expression: op:|`.  Twelve declarations then failed
+    # in turn with `calls untranslated definition pair`.  Rewriting the body into
+    # equations hands it to the enum-match compiler that already exists, and the
+    # scrutinee must be the LAST explicit binder for that compiler's dispatch --
+    # which it is here and is checked rather than assumed.
+    if not d.get("equations"):
+        body = (d.get("body") or "").strip()
+        m = re.match(r"match\s+([A-Za-z_][\w'₀-₉]*)\s+with\s+(\|.*)\Z", body, re.S)
+        if m:
+            scrut, rest = m.group(1), m.group(2)
+            explicit = [n for a in d["args"] if not a["implicit"] for n in a["names"]]
+            branches = [b.strip() for b in rest.split("|") if b.strip()]
+            parsed = []
+            for b in branches:
+                if "=>" not in b:
+                    parsed = []
+                    break
+                pat, _, rhs = b.partition("=>")
+                parsed.append({"pattern": pat.strip(), "rhs": rhs.strip()})
+            if parsed and explicit and explicit[-1] == scrut:
+                d = dict(d)
+                d["equations"] = parsed
+                d["args"] = [a for a in d["args"]
+                             if a["implicit"] or scrut not in a["names"]] + \
+                            [a for a in d["args"]
+                             if not a["implicit"] and scrut in a["names"]]
+
     if d.get("equations"):
         pats = [e["pattern"].strip() for e in d.get("equations") or []]
         if enums and _enum_of(pats, enums):

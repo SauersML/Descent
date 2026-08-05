@@ -1,7 +1,7 @@
 {
  "_NOT_AUTHORITATIVE": "The committed copy of this file is STALE BY CONSTRUCTION: the Lean corpus moves every few minutes and this is a cache of it. Do not consume a committed copy -- run validation/extract/emit.py in your own worktree immediately before use, and call api.require_fresh(), which raises if the table does not describe the Lean on disk.",
- "source_digest": "sha256:873900b4300df2f6584b4457cca7a602",
- "source_files": 209,
+ "source_digest": "sha256:5dbb3c55c7b88efa3c7a3a2e541274de",
+ "source_files": 210,
  "collisions": {},
  "theorems": [
   {
@@ -15814,6 +15814,80 @@
     "ancestor",
     "ancestralPartition",
     "ancestralRel"
+   ]
+  },
+  {
+   "name": "Descent.Coalescent.card_balancedPaths",
+   "kind": "theorem",
+   "file": "Descent/Coalescent/PolyaCriterion.lean",
+   "line": 61,
+   "statement": "(n : ℕ) : ((univ : Finset (Fin (2 * n))).powersetCard n).card = (2 * n).choose n",
+   "mentions": []
+  },
+  {
+   "name": "Descent.Coalescent.card_allPaths",
+   "kind": "theorem",
+   "file": "Descent/Coalescent/PolyaCriterion.lean",
+   "line": 66,
+   "statement": "(n : ℕ) : (Finset.univ : Finset (Finset (Fin (2 * n)))).card = 4 ^ n",
+   "mentions": []
+  },
+  {
+   "name": "Descent.Coalescent.displacement_eq_zero_iff",
+   "kind": "theorem",
+   "file": "Descent/Coalescent/PolyaCriterion.lean",
+   "line": 73,
+   "statement": "{n : ℕ} (up : Finset (Fin (2 * n))) : 2 * (up.card : ℤ) - 2 * (n : ℤ) = 0 ↔ up.card = n",
+   "mentions": []
+  },
+  {
+   "name": "Descent.Coalescent.returnProb_eq_card_ratio",
+   "kind": "theorem",
+   "file": "Descent/Coalescent/PolyaCriterion.lean",
+   "line": 91,
+   "statement": "(n : ℕ) : returnProb n = (((univ : Finset (Fin (2 * n))).powersetCard n).card : ℝ) / ((Finset.univ : Finset (Finset (Fin (2 * n)))).card : ℝ)",
+   "mentions": [
+    "returnProb"
+   ]
+  },
+  {
+   "name": "Descent.Coalescent.returnProb_nonneg",
+   "kind": "theorem",
+   "file": "Descent/Coalescent/PolyaCriterion.lean",
+   "line": 100,
+   "statement": "(n : ℕ) : 0 ≤ returnProb n",
+   "mentions": [
+    "returnProb"
+   ]
+  },
+  {
+   "name": "Descent.Coalescent.returnProb_gt_one_div",
+   "kind": "theorem",
+   "file": "Descent/Coalescent/PolyaCriterion.lean",
+   "line": 107,
+   "statement": "{n : ℕ} (hn : 4 ≤ n) : 1 / (n : ℝ) < returnProb n",
+   "mentions": [
+    "returnProb"
+   ]
+  },
+  {
+   "name": "Descent.Coalescent.not_summable_returnProb",
+   "kind": "theorem",
+   "file": "Descent/Coalescent/PolyaCriterion.lean",
+   "line": 124,
+   "statement": ": ¬ Summable returnProb",
+   "mentions": [
+    "returnProb"
+   ]
+  },
+  {
+   "name": "Descent.Coalescent.lineages_meet_of_difference_zero",
+   "kind": "theorem",
+   "file": "Descent/Coalescent/PolyaCriterion.lean",
+   "line": 156,
+   "statement": "(x₀ y₀ : ℤ) (ξ η : ℕ → ℤ) (t : ℕ) (h : walk (x₀ - y₀) (fun s ↦ ξ s - η s) t = 0) : walk x₀ ξ t = walk y₀ η t",
+   "mentions": [
+    "walk"
    ]
   },
   {
@@ -66859,7 +66933,7 @@
    "name": "Descent.pioneerWeightFraction_eq_fstFromTau",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 204,
+   "line": 205,
    "statement": "(w : ℝ) : XiFromMarks.pioneerWeightFraction w = fstFromTau w",
    "mentions": [
     "fstFromTau",
@@ -66870,7 +66944,7 @@
    "name": "Descent.pioneerWeightFraction_eq_sharedLDFromMigration",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 209,
+   "line": 210,
    "statement": "(w : ℝ) : XiFromMarks.pioneerWeightFraction w = sharedLDFromMigration w",
    "mentions": [
     "pioneerWeightFraction",
@@ -66881,7 +66955,7 @@
    "name": "Descent.ogpOverlapProfile_eq_populationOverlapProfile",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 230,
+   "line": 231,
    "statement": "(q x : ℝ) : ogpOverlapProfile q x = populationOverlapProfile q x",
    "mentions": [
     "ogpOverlapProfile",
@@ -66892,7 +66966,7 @@
    "name": "Descent.epochSampleSize_eq_epochLineageSampleSize",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 234,
+   "line": 235,
    "statement": "(K : ℕ) : epochSampleSize K = epochLineageSampleSize K",
    "mentions": [
     "epochLineageSampleSize",
@@ -66903,7 +66977,7 @@
    "name": "Descent.configurationOverlap_and_transplantSqNorm_are_dotProduct",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 244,
+   "line": 245,
    "statement": "(configuration : TwoCoordinateConfiguration) (displacement : Fin 3 → ℝ) : configurationOverlap configuration configuration = dotProduct configuration configuration ∧ transplantSqNorm displacement = dotProduct displacement displacement",
    "mentions": [
     "TwoCoordinateConfiguration",
@@ -66916,7 +66990,7 @@
    "name": "Descent.stayKernel_eq_oneHotWeight",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 252,
+   "line": 253,
    "statement": "(i j : Fin 2) : stayKernel i j = oneHotWeight (R := ℝ) i j",
    "mentions": [
     "oneHotWeight",
@@ -66927,7 +67001,7 @@
    "name": "Descent.persistentTransition_eq_oneHotWeight",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 260,
+   "line": 261,
    "statement": "(x y : BinaryBiologicalState) : persistentTransition x y = oneHotWeight (R := ℝ) x y",
    "mentions": [
     "BinaryBiologicalState",
@@ -66939,7 +67013,7 @@
    "name": "Descent.contextMatchQuality_eq_persistentTransition",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 268,
+   "line": 269,
    "statement": "(x y : BinaryBiologicalState) : contextMatchQuality x y = persistentTransition x y",
    "mentions": [
     "BinaryBiologicalState",
@@ -66951,7 +67025,7 @@
    "name": "Descent.contextMatchQuality_eq_oneHotWeight",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 272,
+   "line": 273,
    "statement": "(x y : BinaryBiologicalState) : contextMatchQuality x y = oneHotWeight (R := ℝ) x y",
    "mentions": [
     "BinaryBiologicalState",
@@ -66963,7 +67037,7 @@
    "name": "Descent.stableSieveDimension_eq_criticalDegree",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 278,
+   "line": 279,
    "statement": "(kappa L : ℝ) : SpectrumIdentifiability.stableSieveDimension kappa L = criticalDegree L kappa",
    "mentions": [
     "criticalDegree",
@@ -66975,7 +67049,7 @@
    "name": "Descent.two_le_two",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 430,
+   "line": 431,
    "statement": ": (2 : ℕ) ≤ 2",
    "mentions": []
   },
@@ -66983,7 +67057,7 @@
    "name": "Descent.twoLocusCoalescent_covariance_gap_lower_bound_dim_two",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 448,
+   "line": 449,
    "statement": "(ibdWeight recombRate : ℝ) (tSource tTarget : ℕ) (h_time : tSource ≤ tTarget) : 2 * (ibdWeight * discreteRecombinationSurvival recombRate tSource * (1 - discreteRecombinationSurvival recombRate (tTarget - tSource))) ^ 2 ≤ frobeniusNormSq (twoLocusCoalescentCovarianceMatrix two_le_two ibdWeight recombRate tSource - twoLocusCoalescentCovarianceMatrix two_le_two ibdWeight recombRate tTarget)",
    "mentions": [
     "discreteRecombinationSurvival",
@@ -66996,7 +67070,7 @@
    "name": "Descent.covariance_mismatch_pos_of_twoLocusCoalescent_dim_two",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 462,
+   "line": 463,
    "statement": "(ibdWeight recombRate : ℝ) (tSource tTarget : ℕ) (h_ibd_pos : 0 < ibdWeight) (h_recomb_pos : 0 < recombRate) (h_recomb_lt_one : recombRate < 1) (h_time : tSource < tTarget) : 0 < frobeniusNormSq (twoLocusCoalescentCovarianceMatrix two_le_two ibdWeight recombRate tSource - twoLocusCoalescentCovarianceMatrix two_le_two ibdWeight recombRate tTarget)",
    "mentions": [
     "frobeniusNormSq",
@@ -67008,7 +67082,7 @@
    "name": "Descent.expectedBrierScore_deriv_proved",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 480,
+   "line": 481,
    "statement": "(p π : ℝ) : deriv (fun x ↦ expectedBrierScore x π) p = 2 * (p - π)",
    "mentions": [
     "expectedBrierScore"
@@ -67018,7 +67092,7 @@
    "name": "Descent.overlapEnergyTruth_eq_crossS",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 494,
+   "line": 495,
    "statement": ": overlapEnergyTruth = crossS",
    "mentions": [
     "crossS",
@@ -67029,7 +67103,7 @@
    "name": "Descent.overlapEnergyPositive_eq_reorderScore",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 497,
+   "line": 498,
    "statement": ": overlapEnergyPositive = reorderScore",
    "mentions": [
     "overlapEnergyPositive",
@@ -67040,7 +67114,7 @@
    "name": "Descent.overlapEnergyPositive_eq_twoAncestryConditional",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 500,
+   "line": 501,
    "statement": ": overlapEnergyPositive = twoAncestryConditional",
    "mentions": [
     "overlapEnergyPositive",
@@ -67051,7 +67125,7 @@
    "name": "Descent.sigmaT_mulVec_crossS_eq_ldWitnessTargetCross",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 521,
+   "line": 522,
    "statement": ": sigmaT.mulVec crossS = ldWitnessTargetCross",
    "mentions": [
     "crossS",
@@ -67062,7 +67136,7 @@
    "name": "Descent.source_erm_solves_source_not_target_normal_equations",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 530,
+   "line": 531,
    "statement": ": let wS : Fin 2 → ℝ",
    "mentions": []
   },
@@ -67070,7 +67144,7 @@
    "name": "Descent.source_target_erm_differ_proved",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 550,
+   "line": 551,
    "statement": ": let wS : Fin 2 → ℝ",
    "mentions": []
   },
@@ -67078,7 +67152,7 @@
    "name": "Descent.target_r2_drop_of_twoLocusCoalescent_dim_two",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 568,
+   "line": 569,
    "statement": "(mseSource mseTarget varY lam : ℝ) (ibdWeight recombRate : ℝ) (tSource tTarget : ℕ) (h_mse_gap_lb : lam * frobeniusNormSq (twoLocusCoalescentCovarianceMatrix two_le_two ibdWeight recombRate tSource - twoLocusCoalescentCovarianceMatrix two_le_two ibdWeight recombRate tTarget) ≤ mseTarget - mseSource) (h_lam_pos : 0 < lam) (h_varY_pos : 0 < varY) (h_ibd_pos : 0 < ibdWeight) (h_recomb_pos : 0 < recombRate) (h_recomb_lt_one : recombRate < 1) (h_time : tSource < tTarget) : r2FromMSE mseTarget varY < r2FromMSE mseSource varY",
    "mentions": [
     "frobeniusNormSq",
@@ -67091,7 +67165,7 @@
    "name": "Descent.ld_decay_implies_nonlinear_calibration_of_exp_tagging",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 637,
+   "line": 638,
    "statement": "{k : ℕ} [Fintype (Fin k)] (mech : LDDecayMechanism k) (lambda : ℝ) (h_lambda_pos : 0 < lambda) (h_tagging : mech.tagging_efficiency = fun d ↦ Real.exp (-lambda * d)) (c0 c1 c2 : Fin k → ℝ) (hd0 : mech.distance c0 = 0) (hd1 : mech.distance c1 = 1) (hd2 : mech.distance c2 = 2) : ∀ (beta0 beta1 : ℝ), (fun c ↦ beta0 + beta1 * mech.distance c) ≠ (fun c ↦ decaySlope mech c)",
    "mentions": [
     "decaySlope"
@@ -67101,7 +67175,7 @@
    "name": "Descent.additive_score_subcritical_at_balanced_locus_proved",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 727,
+   "line": 728,
    "statement": ": 1 < maxSafeEpistaticOrder 1000000 (1 / 2)",
    "mentions": [
     "maxSafeEpistaticOrder"
@@ -67111,7 +67185,7 @@
    "name": "Descent.pairwise_epistasis_supercritical_proved",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 738,
+   "line": 739,
    "statement": ": ∃ q : ℝ, 0 < q ∧ q ≤ 1 / 8 ∧ Real.log 1000000 < 2 * hweMellinDrift q",
    "mentions": [
     "hweMellinDrift"
@@ -67121,7 +67195,7 @@
    "name": "Descent.hardCall_lattice_inflation_proved",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 745,
+   "line": 746,
    "statement": ": 1 < latticeInflation hardCallLatticeSpan",
    "mentions": [
     "hardCallLatticeSpan",
@@ -67132,7 +67206,7 @@
    "name": "Descent.frustration_floor_proved",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 752,
+   "line": 753,
    "statement": ": (0.127 : ℝ) < expanderAgreementFloor",
    "mentions": [
     "expanderAgreementFloor"
@@ -67142,7 +67216,7 @@
    "name": "Descent.chargedTuples_one_slot_iff",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 772,
+   "line": 773,
    "statement": "{T : Type*} [TopologicalSpace T] {d : ℕ} (F : BundleRigidity.ModulusFamily T d) (S : Set T) (v : ℝ) (t : Fin 1 → T) : t ∈ BundleRigidity.chargedTuples (fun j x ↦ F.curve j x) {u | u 0 ∈ S} (fun _ ↦ v) ↔ t 0 ∈ F.coverers S v",
    "mentions": [
     "S",
@@ -67154,7 +67228,7 @@
    "name": "Descent.singleModulus_atom_sq_eq_realizability_atom_sq",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 788,
+   "line": 789,
    "statement": "{d : ℕ} {v : ℝ} (S : BundleRigidity.SingleModulus d v) (hv : 0 ≤ v) (hv1 : v ≤ 1) (j : Fin d) : S.atom j ^ 2 = BundleRigidity.outerAtom v ^ 2 ∨ S.atom j ^ 2 = BundleRigidity.innerAtom v ^ 2",
    "mentions": [
     "S",
@@ -67166,7 +67240,7 @@
    "name": "Descent.sampleCost_eq_fixedGradeBenchmarkSampleSize",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 808,
+   "line": 809,
    "statement": "(η C : ℝ) (k : ℕ) (hη : 0 < η) (hC : 0 < C) : BundleRigidity.sampleCost η C k = fixedGradeBenchmarkSampleSize (η / C) ((2 * k : ℕ) : ℝ) 1",
    "mentions": [
     "fixedGradeBenchmarkSampleSize",
@@ -67177,7 +67251,7 @@
    "name": "Descent.intensity_eq_charFnSq",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 831,
+   "line": 832,
    "statement": "{n : ℕ} (P : PhasePanel n) (s : ℝ) : P.intensity s = charFnSq P.weight P.phase s",
    "mentions": [
     "charFnSq",
@@ -97253,6 +97327,60 @@
    ]
   },
   {
+   "name": "Descent.Coalescent.returnProb",
+   "decl_name": "returnProb",
+   "short": "returnProb",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Descent/Coalescent/PolyaCriterion.lean",
+   "line": 88,
+   "signature": "(n : ℕ) : ℝ",
+   "args": [
+    {
+     "names": [
+      "n"
+     ],
+     "type": "ℕ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ℝ",
+   "body": " ((2 * n).choose n : ℝ) / 4 ^ n",
+   "docstring": "`P(S_{2n} = 0)`, the chance a `±1` walk is back at the origin after `2n` steps.\n\nEmpirical status: DERIVED, not posited -- `returnProb_eq_card_ratio` identifies it as the\nnumber of returning step-sets over the number of step-sets, which is its probability under the\nuniform law on step-sets, i.e. under independent fair steps.",
+   "empirical_status": "DERIVED",
+   "namespace": "Descent.Coalescent",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "declared_kind": "probability",
+    "declared_lo": 0.0,
+    "declared_hi": 1.0,
+    "hypotheses": [
+     "4 ≤ n"
+    ],
+    "hypotheses_by_theorem": {
+     "Descent.Coalescent.returnProb_eq_card_ratio": [],
+     "Descent.Coalescent.returnProb_nonneg": [],
+     "Descent.Coalescent.returnProb_gt_one_div": [
+      "4 ≤ n"
+     ],
+     "Descent.Coalescent.not_summable_returnProb": []
+    },
+    "range_lo_thm": [
+     "Descent.Coalescent.returnProb_nonneg",
+     0
+    ],
+    "range_lo": 0
+   },
+   "mentioned_by": [
+    "Descent.Coalescent.not_summable_returnProb",
+    "Descent.Coalescent.returnProb_eq_card_ratio",
+    "Descent.Coalescent.returnProb_gt_one_div",
+    "Descent.Coalescent.returnProb_nonneg"
+   ]
+  },
+  {
    "name": "Descent.Coalescent.jumpStep",
    "decl_name": "jumpStep",
    "short": "jumpStep",
@@ -99086,8 +99214,13 @@
     }
    ],
    "constraints": {
-    "hypotheses": [],
+    "hypotheses": [
+     "walk (x₀ - y₀"
+    ],
     "hypotheses_by_theorem": {
+     "Descent.Coalescent.lineages_meet_of_difference_zero": [
+      "walk (x₀ - y₀"
+     ],
      "Descent.Coalescent.walk_zero": [],
      "Descent.Coalescent.walk_succ": [],
      "Descent.Coalescent.walk_sub": [],
@@ -99096,6 +99229,7 @@
     }
    },
    "mentioned_by": [
+    "Descent.Coalescent.lineages_meet_of_difference_zero",
     "Descent.Coalescent.meet_iff_difference_walk_zero",
     "Descent.Coalescent.walk_sub",
     "Descent.Coalescent.walk_succ",
@@ -210374,7 +210508,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Descent.lean",
-   "line": 485,
+   "line": 486,
    "signature": ": Matrix (Fin 2) (Fin 2) ℝ",
    "args": [],
    "ret_type": "Matrix (Fin 2) (Fin 2) ℝ",
@@ -210403,7 +210537,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Descent.lean",
-   "line": 488,
+   "line": 489,
    "signature": ": Matrix (Fin 2) (Fin 2) ℝ",
    "args": [],
    "ret_type": "Matrix (Fin 2) (Fin 2) ℝ",
@@ -210432,7 +210566,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Descent.lean",
-   "line": 491,
+   "line": 492,
    "signature": ": Fin 2 → ℝ",
    "args": [],
    "ret_type": "Fin 2 → ℝ",
@@ -210468,7 +210602,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Descent.lean",
-   "line": 508,
+   "line": 509,
    "signature": ": Matrix (Fin 2) (Fin 2) ℝ",
    "args": [],
    "ret_type": "Matrix (Fin 2) (Fin 2) ℝ",

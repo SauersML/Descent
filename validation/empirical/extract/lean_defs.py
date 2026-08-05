@@ -29,7 +29,10 @@ import lean_rt as _rt
 def averageEffect(m):
     return (_rt._proj(m, 'a') + (_rt._proj(m, 'd') * ((1.0 - (2.0 * _rt._proj(m, 'p'))))))
 
-def genotypicValue(m, _e):
+def genotypicValue(*_a):
+    if len(_a) < 2:
+        return lambda *_b: genotypicValue(*(_a + _b))
+    m, _e = _a[:2]
     _t = [(-_rt._proj(m, 'a')), _rt._proj(m, 'd'), _rt._proj(m, 'a')]
     return _t[_rt._ix(_e, 3, 'genotypicValue')]
 
@@ -699,6 +702,9 @@ def transitTime(n, hold):
 def pathState(n, chain, hold, t):
     return chain((blockCountAt(n, hold, t)))
 
+def returnProb(n):
+    return _rt.rdiv((_rt._proj(((2.0 * n)), 'choose')(n)), _rt.lpow(4.0, n))
+
 def deathRate(k):
     return Descent_Core_pairCount(k)
 
@@ -1173,6 +1179,13 @@ def Descent_Core_PopGenParameters_bigM(p):
 def Descent_Core_PopGenParameters_fstEquilibrium(p):
     return fstFromFlow(((Descent_Core_PopGenParameters_theta(p) + (2.0 * Descent_Core_PopGenParameters_bigM(p)))))
 
+def pair(*_a):
+    if len(_a) < 4:
+        return lambda *_b: pair(*(_a + _b))
+    s, t, p, _e = _a[:4]
+    _t = [s, t]
+    return _t[_rt._ix(_e, 2, 'pair')]
+
 def withTarget(f, t):
     return pair((f(0)), t)
 
@@ -1380,14 +1393,20 @@ def klBern(p, q):
 def poly_n(n, x):
     return _rt.lpow(x, n)
 
-def altAlleleCount(_e):
+def altAlleleCount(*_a):
+    if len(_a) < 1:
+        return lambda *_b: altAlleleCount(*(_a + _b))
+    _e, = _a[:1]
     _t = [0.0, 1.0, 2.0]
     return _t[_rt._ix(_e, 3, 'altAlleleCount')]
 
 def refFreq(h):
     return (1.0 - _rt._proj(h, 'altFreq'))
 
-def genotypeProb(h, _e):
+def genotypeProb(*_a):
+    if len(_a) < 2:
+        return lambda *_b: genotypeProb(*(_a + _b))
+    h, _e = _a[:2]
     _t = [_rt.lpow(refFreq(h), 2.0), ((2.0 * refFreq(h)) * _rt._proj(h, 'altFreq')), _rt.lpow(_rt._proj(h, 'altFreq'), 2.0)]
     return _t[_rt._ix(_e, 3, 'genotypeProb')]
 
@@ -4246,7 +4265,10 @@ def hweMellinJetVariance(q):
 def hardCallLatticeSpan():
     return _rt.rlog((_rt.rdiv(((1.0 - latticeCriticalMaf())), latticeCriticalMaf())))
 
-def hardCallLatticeIndex(_e):
+def hardCallLatticeIndex(*_a):
+    if len(_a) < 1:
+        return lambda *_b: hardCallLatticeIndex(*(_a + _b))
+    _e, = _a[:1]
     _t = [(-1.0), 0.0, 1.0]
     return _t[_rt._ix(_e, 3, 'hardCallLatticeIndex')]
 
