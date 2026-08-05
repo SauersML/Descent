@@ -81,6 +81,35 @@ THE GUARDS, and what each one catches:
                   run.  It is excluded from the default set because it shells
                   out to git and reads a remote ref.
 
+THE SHAPE GUARDS are five more, and they are a family rather than five checks
+that happen to be adjacent.  Every one of them measures a property this corpus
+has already been repaired to have and has already lost again, because the tree is
+organised by the order a person would read it in and a reading order is invisible
+to a build.  They read the import graph and the declaration index from
+`architecture.py` rather than deriving either, and the only thing they add is an
+exit code.
+
+  shape-depth     the longest import chain, with the tables of contents removed.
+                  A chain of thirty-eight modules in which each file imports the
+                  one written before it is a manuscript order compiled into the
+                  build graph.
+  shape-chains    a module whose ONE internal import is a sibling in its own
+                  directory that it names nothing from.  The finding prints where
+                  the symbols it does name actually live, which is the import it
+                  wanted.
+  shape-components  a module outside the corpus's single weak component.
+                  `Coalescent` was an island one release ago and `Pangenome` was
+                  one in this release; both were wired in by hand, which is the
+                  argument for the guard rather than against it.
+  shape-spine     cross-module theorem reuse, and the count of theorems joining
+                  `PopGenParameters` to a metric computed from the `Core/Moments`
+                  kernel.  The second is the corpus's headline claim, counted.
+  shape-routes    a definition taking four or more bare reals that shares a name
+                  stem with a record-typed one: two routes to one metric, of
+                  which only one carries the record's constraints.  GATED; the
+                  other four are DIAGNOSTIC while their repairs land, and the
+                  `GUARDS` entry for each names what flips it.
+
 WHY ONE FILE.  These seven were seven scripts in three directories, and the cost
 was not tidiness.  Three of them independently re-derived "which files are the
 corpus" and the three answers disagreed; one walked `Descent/` and
