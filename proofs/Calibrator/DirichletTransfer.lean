@@ -127,7 +127,22 @@ theorem dirichlet_ordering_survives_remainder
 /-- **The drift horizon of a Dirichlet gap**, isolated so it can be computed. Beyond this
     much drift the first-order comparison is uninformative.
 
-        Empirical status: UNTESTED. -/
+        Empirical status: UNTESTED, with a LEAD SUPPORTING THE FACTOR TWO
+    (`simcov/battery_bulk50.py`, `group_b`). A walk closing the gap at expected
+    rate `2·C` per generation, 4000 replicates, with the observable the COUNTED
+    number of generations to cross. The body lands within 2.19% of the count
+    across gaps and rates swept independently, while dropping the factor two --
+    `(D₂ - D₁)/C` -- misses by 2135 sems and 99% relative. So the `2` is not
+    decoration; it is the two-sided contribution the docstring names.
+
+    Recorded as a lead rather than a verdict for two reasons, both about this
+    run and not about the body. The control was DEGENERATE -- it compared a
+    ratio against the number that ratio is by construction -- so the harness
+    correctly refused to license a falsification from it. And the 2.19%
+    residual is consistent with the walk's discreteness: generations are
+    integers and the last step overshoots the target, which biases a counted
+    crossing time upward by roughly one step in fifty. A continuous-time design,
+    or a control with two independent sides, would settle it. -/
 noncomputable def driftHorizon (D₁ D₂ C : ℝ) : ℝ := (D₂ - D₁) / (2 * C)
 
 /-- **driftHorizon at zero C, named.** A zero coupling constant means the two divergences never
@@ -460,14 +475,19 @@ cannot silently acquire crossover zero through real division by zero. -/
 noncomputable def stalenessCrossover (lam : ℝ) (_hlam : 0 < lam) : ℝ :=
   Real.log 2 / lam
 
-/-- With a vanishing denominator Mathlib returns `0`, which is a value this quantity can also
-take legitimately, so the branch is named rather than left to be inferred from the result. -/
-theorem stalenessCrossover_at_zero_denominator_is_junk (lam : ℝ) (_hlam : 0 < lam)
-    (hzero : lam = 0) :
-    stalenessCrossover lam _hlam = 0 := by
-  unfold stalenessCrossover
-  rw [hzero, div_zero]
+/-! **There is no zero-denominator branch to name here, and the theorem that named one
+has been deleted.** It read
 
+    theorem stalenessCrossover_at_zero_denominator_is_junk
+        (lam : ℝ) (_hlam : 0 < lam) (hzero : lam = 0) : stalenessCrossover lam _hlam = 0
+
+and its two hypotheses are `0 < lam` and `lam = 0`, which cannot both hold: the statement
+was vacuous and proved nothing about anything. That is not an accident of how it was
+written, it is what the definition above guarantees -- `stalenessCrossover` takes the
+positivity proof as an argument, so no caller can reach the division by zero, and a
+`_is_junk` theorem for a branch the interface makes unreachable has no branch to describe.
+Found by the vacuity mode of `proofs/validation/mutation`, which derived `False` from the
+hypotheses. -/
 
 /-- At the crossover the stale design is exactly as good as not adapting. -/
 theorem stalePremium_zero_at_crossover (lam V : ℝ) (hlam : 0 < lam) :

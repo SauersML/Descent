@@ -348,7 +348,27 @@ hypotheses of theorems below rather than parts of this definition. Defining the
 haplotype error as the literal `0` instead would make every comparison against
 the dosage predictor a tautology.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED**
+(`simcov/battery_bulk50.py`, `group_a`). 4×10⁶ individuals: true phase drawn at
+rate `freq_cis`, a switch error drawn independently at rate `switch_err` that
+flips which prediction is APPLIED, and the observable the realised mean squared
+error. Worst cell 1.51 sems at 0.14% relative, with `switch_err` swept 0 to 0.25
+and one design giving the two interactions opposite signs, where misreading
+phase costs most.
+
+Power, and the two confusions this shape invites, both rejected on the same
+cells: dropping the switch channel entirely -- computing the error as if phase
+were always read correctly -- misses by 1152 sems (83% relative); applying the
+switch rate to the phase FREQUENCY rather than to the READ misses by 1174 sems
+(85%). The second is the subtler error, because it produces a number of the
+right magnitude that moves in the right direction with `switch_err`, and only
+the two-sign design separates it cleanly.
+
+The switch error acts on the READ, not on the truth: an individual in cis whose
+phase is misread still HAS the cis interaction, and merely receives the trans
+prediction. That is why the body pairs `interaction_cis` with `pred_trans` in
+its switched branch rather than swapping both. Control: with no switch error
+the counted cis fraction recovers `freq_cis`. -/
 noncomputable def haplotypePhasePredictionError
     (freq_cis switch_err pred_cis pred_trans interaction_cis interaction_trans : ℝ) : ℝ :=
   freq_cis *
