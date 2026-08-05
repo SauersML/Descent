@@ -6738,6 +6738,55 @@ def run_shape_spine() -> int:
     return 0
 
 
+def _shape_record_fields(code) -> set:
+    """The `ℝ`-valued field names of `PopGenParameters`, and their loose spellings.
+
+    A raw-real route is one that re-supplies THE RECORD'S FIELDS as bare arguments.
+    Counting bare reals of any name instead was too blunt, and it over-fired the day
+    this guard was gated: `deployedPPVFromTau (L) (V_A V_E tau prevalence : ℝ)` has
+    four bare reals and is not a second route to anything.  It wraps
+    `deployedR2FromTau`, which is the sanctioned kernel in the tau coordinate --
+    `run_shape_routes` already said in prose that such a kernel is legitimate, and
+    then counted its wrappers anyway, because `prevalence` and `tau` are reals and
+    the test was arity.
+
+    `deployedR2FromIsland (Ne m μ nDemes V_A V_E : ℝ)` is the real pattern, and the
+    difference is visible in the binder names.  `Ne`, `m`, `μ`, `nDemes` and `V_A`
+    are fields of the record rebuilt by hand, and the definition goes on to compute
+    `F_ST` itself rather than reading `p.fstEquilibrium`.  `tau` and `prevalence`
+    are not fields of anything; they are a coordinate and a clinical input.
+
+    The field list is read off the `structure` rather than typed here, so the deme
+    count that joined the record is covered without an edit to this guard.  The
+    alias table is the one hand-maintained part, and it has to be: the corpus
+    writes the migration rate `m` and the mutation rate `μ` at call sites while the
+    record spells them `mig` and `mu`, and a route rebuilding the record under
+    those spellings is the same route.
+    """
+    aliases = {
+        "mu": {"mu", "μ"},
+        "mig": {"mig", "m", "m_rate", "m_into"},
+        "t_div": {"t_div", "t"},
+        "recomb": {"recomb", "r"},
+    }
+    fields, in_structure = set(), False
+    for line in code.get("Descent.Core.Parameters", "").split("\n"):
+        if re.match(r"^structure\s+PopGenParameters\b", line):
+            in_structure = True
+            continue
+        if not in_structure:
+            continue
+        m = re.match(r"^\s+([A-Za-z_][\w'₀-₉]*)\s*:\s*ℝ\s*$", line)
+        if m:
+            fields |= aliases.get(m.group(1), {m.group(1)})
+            continue
+        # The proof fields (`Ne_pos : 0 < Ne`) end the ℝ-valued run; the first
+        # line at column zero ends the structure.
+        if line and not line[0].isspace():
+            break
+    return fields
+
+
 def _shape_camel_words(name: str) -> list:
     """`deployedR2FromIsland` -> `['deployed', 'R2', 'From', 'Island']`."""
     return re.findall(r"[A-Z]?[a-z0-9'₀-₉]+|[A-Z]+(?![a-z])", name)
@@ -6792,6 +6841,8 @@ def run_shape_routes() -> int:
     """
     _raw, code, _graph, _decls, _arch = _shape_corpus()
 
+    fields = _shape_record_fields(code)
+
     raw_entry, record_entry = {}, {}
     for mod, text in code.items():
         lines, i = text.split("\n"), 0
@@ -6809,7 +6860,9 @@ def run_shape_routes() -> int:
             i = j
             sig = " ".join(" ".join(block).split()).partition(":=")[0]
             name = m.group(1).split(".")[-1]
-            reals = sum(len(g.split()) for g in re.findall(r"\(([^()]*?):\s*ℝ\s*\)", sig))
+            binders = [b for g in re.findall(r"\(([^()]*?):\s*ℝ\s*\)", sig)
+                       for b in g.split()]
+            reals = sum(1 for b in binders if b in fields)
             if reals >= SHAPE_RAW_ARITY:
                 raw_entry.setdefault(name, (mod, reals))
             if re.search(r"\([^()]*?:\s*[A-Z][\w.']*Parameters\b", sig):
@@ -6829,7 +6882,7 @@ def run_shape_routes() -> int:
                 k += 1
             if k and (k == len(cwords) or k == len(rwords)):
                 findings.append(
-                    f"{raw_name} ({rmod}) takes {reals} bare reals and shares the "
+                    f"{raw_name} ({rmod}) re-supplies {reals} record fields as bare reals and shares the "
                     f"stem `{''.join(rwords[:k])}` with {rec_name} "
                     f"({record_entry[rec_name]}), which takes a parameter record")
 
@@ -6848,9 +6901,9 @@ def run_shape_routes() -> int:
               f"route a caller took.")
         return 1
 
-    print(f"shape-routes guard passes: {len(raw_entry)} definition(s) take "
-          f"{SHAPE_RAW_ARITY}+ bare reals and none shares a stem with a "
-          f"record-typed definition")
+    print(f"shape-routes guard passes: {len(raw_entry)} definition(s) re-supply "
+          f"{SHAPE_RAW_ARITY}+ of the parameter record's fields as bare reals, and "
+          f"none shares a stem with a record-typed definition")
     return 0
 
 
@@ -6899,16 +6952,28 @@ def run_shape_routes() -> int:
 #              justified.  A narrative module is written AGAINST the corpus and must
 #              stay rewritable without breaking a build.  An import from the technical
 #              side destroys exactly that property.
-#   META       `Descent/Meta/` is the corpus auditing itself, and its head states the
-#              contract in prose: "nothing under it is read by the corpus, and no
-#              module of `Descent/Meta/` may import a proof module.  That direction is
-#              the one thing this group has to keep: a proof module able to import its
-#              own auditor can be written to satisfy it."  That is an argument for a
-#              mechanism, written next to no mechanism.  Here it is: no edge in either
-#              direction between `Descent.Meta.*` and the rest of `Descent`.  It is at
-#              zero and it is the only rule here that has never been nonzero, which is
-#              exactly why it should be written down now rather than after the first
-#              module reaches across.
+#   META       no module of `Descent/Meta/` may import a proof module, and no proof
+#              module may import a `Descent/Meta/` AUDITOR.  The head states the first
+#              half in prose: "a proof module able to import its own auditor can be
+#              written to satisfy it."  That is the whole argument, and it is an
+#              argument about auditors.
+#
+#              THE RULE WAS FIRST WRITTEN AS "no edge in either direction", which is
+#              stronger than its own argument and was true only because
+#              `Descent/Meta/` then held nothing but checks.  It stopped being true the
+#              day the directory acquired VOCABULARY: `Descent.Meta.Informal` supplies
+#              the `informal_lemma`, `TODO` and `@[withdrawn]` commands, which a proof
+#              module must import in order to record a gap, and which cannot be
+#              "written to satisfy" because they have no verdict -- they add data to an
+#              environment extension and no constant to the environment.  A file that
+#              declares a gap has not passed a check; there is no check.
+#
+#              So the direction that carries the danger is still absolute, and the
+#              direction that carries none is allowed for the named modules in
+#              `LAYER_META_VOCABULARY` and no others.  Widening a rule to fit a case is
+#              how allowlists start, which is why the set is enumerated here rather
+#              than derived from a path shape, and why the Meta-imports-proof half
+#              admits no exceptions at all.
 #   REACHABLE  a qualified cross-directory name must have its defining module in the
 #              importer's transitive closure.  This is not a layer rule and it is here
 #              because it is the rule that makes the other three SAFE TO ACT ON.  Lean
@@ -7015,11 +7080,14 @@ LAYER_UNRANKED = {
         "own table of contents and by almost nothing else, which is the finding "
         "`shape-components` reports; ranking it is premature while it is an island.",
     "Meta":
-        "Not in the order at all, in either direction: it is the corpus auditing "
-        "itself, written in the corpus's own language and importing only Lean and "
-        "Batteries. Its separation is enforced by the META rule below rather than by "
-        "a rank, because a rank would permit it to import the bottom of the order and "
-        "the point is that it imports none of it.",
+        "Not in the order: it is the corpus's machinery about itself, written in the "
+        "corpus's own language and importing only Lean and Batteries. A rank would "
+        "permit it to import the bottom of the order and the point is that it imports "
+        "none of it, so its separation is enforced by the META rule below instead. "
+        "That rule is asymmetric on purpose. Nothing here may import a proof module, "
+        "ever; a proof module may import the VOCABULARY modules named in "
+        "`LAYER_META_VOCABULARY`, which add commands for writing a gap down and add no "
+        "constant anything could cite, and may import no auditor.",
     "Spectral":
         "Frequency-band and pencil machinery that both PopGen and Portability consume, "
         "and that consumes Blindness and Conditionals in turn. It is a genuine "
@@ -7133,8 +7201,23 @@ LAYER_PENDING = {
         "of the narrative module.",
 }
 
-# The self-auditing directory, separated in both directions.  See META in the header.
+# The self-auditing directory.  See META in the header.
 LAYER_META = "Meta"
+
+# The modules under `Descent/Meta/` a proof module MAY import: the ones that add
+# SYNTAX and read nothing.  `Informal` supplies `TODO`, `informal_definition`,
+# `informal_lemma` and `@[withdrawn]`; `Semiformal` supplies `semiformal_result`.
+# Both import `Lean.Elab.Command` and nothing else, both record into an environment
+# extension, and neither adds a constant to the environment -- so a proof module that
+# imports one gains a way to WRITE DOWN a gap and no way to cite one.
+#
+# Enumerated, not derived.  A path-shaped test ("anything not named `*Lint*`") would
+# admit the next auditor somebody files under a neutral name, and the whole value of
+# this rule is that widening it has to be a deliberate edit somebody argues for.
+LAYER_META_VOCABULARY = {
+    "Descent.Meta.Informal",
+    "Descent.Meta.Semiformal",
+}
 
 LAYER_QUALIFIED = re.compile(r"\b([A-Z][A-Za-z0-9]*)\.([A-Za-z_][A-Za-z0-9_'!?]*)")
 LAYER_DECL = re.compile(
@@ -7211,7 +7294,10 @@ def run_layers() -> int:
             if dst == "Program":
                 narrative.append((mod, dep))
             if (src == LAYER_META) != (dst == LAYER_META):
-                meta.append((mod, dep))
+                # A proof module importing named `Descent/Meta/` VOCABULARY is not a
+                # violation; every other crossing, in either direction, is.  See META.
+                if not (dst == LAYER_META and dep in LAYER_META_VOCABULARY):
+                    meta.append((mod, dep))
 
     # A top-level directory that is neither ranked nor explained.  See the header: this
     # is what stops `LAYER_UNRANKED` from being an allowlist that grows by accident.
@@ -7321,8 +7407,9 @@ def run_layers() -> int:
     print(f"layers guard passes: {sum(len(v) for v in graph.values())} import edge(s) "
           f"over {len(graph)} modules, none running up the order "
           f"{' < '.join(LAYER_ORDER)}, none leaving `Descent/Core/`, none reaching "
-          f"`Descent/Program/` from outside it, none crossing the `Descent/Meta/` "
-          f"boundary in either direction, and every qualified cross-directory name "
+          f"`Descent/Program/` from outside it, none reaching a `Descent/Meta/` "
+          f"auditor or leaving `Descent/Meta/` at all, and every qualified "
+          f"cross-directory name "
           f"inside its importer's closure.")
     return 0
 
