@@ -1982,8 +1982,36 @@ theorem asymmetric_fst_difference_sign (Ne m₁₂ m₂₁ : ℝ)
     constrains it beyond monotonicity and range. Do not rename it to assert a derivation
     unless one is supplied.
 
-    Empirical status: UNTESTED, and untested here means unfalsified rather than
-    supported: it is a functional form nobody has compared to a simulation. -/
+    Empirical status: **FALSIFIED** (`simcov/battery_bulk51.py`, `group_a`).
+    The comparison the paragraph above says nobody had made has now been made,
+    and the ansatz does not survive it.
+
+    Two-deme island model at `Nₑ = 1000` over 5 Mb with recombination; the
+    observable is the cross-deme correlation of signed LD `r` across SNP pairs
+    common in BOTH demes -- the quantity this body names -- with `4·Nₑ·m` swept a
+    hundredfold:
+
+      4Nₑm    measured LD correlation   this ansatz   M/(1+M)
+      0.4     0.8908 ± 0.0196           0.0816        0.2857
+      2.0     0.9414 ± 0.0057           0.4444        0.6667
+      8.0     0.9747 ± 0.0027           0.7901        0.8889
+      40      0.9898 ± 0.0004           0.9518        0.9756
+
+    Worst cell 87 sems at 53% relative. The failure is worst at LOW migration,
+    where the ansatz predicts almost no shared LD and the simulation finds
+    nearly complete sharing. The unsquared `M/(1+M)` is carried alongside and is
+    also FALSIFIED, at 48 sems -- so this is not a matter of one power too many.
+    Both forms decay with migration; the measured correlation does not.
+
+    Why: LD structure between two demes is set largely by the recombination
+    history they SHARED before separating, and that persists long after
+    migration has stopped homogenising allele frequencies. Neither form has a
+    term for it. `PortabilityDrift.sharedLD_from_equilibrium` records the same
+    finding from the other direction.
+
+    Control: one panmictic population split into two arbitrary halves, through
+    the same estimators and filters, gives `F_ST` indistinguishable from zero
+    (0.41 sems). -/
 noncomputable def ldCorrelationMigrationAnsatz (M : ℝ) : ℝ :=
   M ^ 2 / (1 + M) ^ 2
 
