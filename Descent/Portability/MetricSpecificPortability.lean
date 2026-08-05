@@ -1911,9 +1911,12 @@ sampling effort separates them.
 Two epochs are Lipschitz-stable. Three already have cube-root instability, four
 fifth-root. -/
 
-/-- Sample size whose spectrum resolves a `K`-epoch history. -/
-def epochSampleSize (K : ℕ) : ℕ :=
-  Descent.Core.pairedEpochCount K
+/-! **`epochSampleSize` is deleted.** It was `Core.pairedEpochCount K`, and so is
+`PopGen.epochLineageSampleSize` -- one quantity under two names, in two subsystems,
+each with its own small theory proved about it. The theorems below name the kernel
+directly rather than reintroduce a third name for it; the named quantity belongs in
+`FrequencySpectrumStability`, where the frequency spectrum it counts entries of lives,
+and this module only ever needed the count. -/
 
 /-- Number of unfolded spectrum entries at that sample size. -/
 def spectrumEntries (n : ℕ) : ℕ := n - 1
@@ -1921,19 +1924,19 @@ def spectrumEntries (n : ℕ) : ℕ := n - 1
 /-- **The stability exponent's denominator is the number of spectrum entries.**
 Not a coincidence of the parameterisation: it says the recoverable resolution is
 set by how many numbers the spectrum has, and each epoch consumes two of them. -/
-theorem spectrumEntries_epochSampleSize (K : ℕ) (hK : 2 ≤ K) :
-    spectrumEntries (epochSampleSize K) = 2 * K - 3 := by
-  unfold spectrumEntries epochSampleSize Descent.Core.pairedEpochCount
+theorem spectrumEntries_pairedEpochCount (K : ℕ) (hK : 2 ≤ K) :
+    spectrumEntries (Descent.Core.pairedEpochCount K) = 2 * K - 3 := by
+  unfold spectrumEntries Descent.Core.pairedEpochCount
   omega
 
 /-- **Two epochs are Lipschitz-stable.** -/
-theorem spectrumEntries_two_epochs : spectrumEntries (epochSampleSize 2) = 1 := by decide
+theorem spectrumEntries_two_epochs : spectrumEntries (Descent.Core.pairedEpochCount 2) = 1 := by decide
 
 /-- **Three epochs are cube-root stable.** -/
-theorem spectrumEntries_three_epochs : spectrumEntries (epochSampleSize 3) = 3 := by decide
+theorem spectrumEntries_three_epochs : spectrumEntries (Descent.Core.pairedEpochCount 3) = 3 := by decide
 
 /-- **Four epochs are fifth-root stable.** -/
-theorem spectrumEntries_four_epochs : spectrumEntries (epochSampleSize 4) = 5 := by decide
+theorem spectrumEntries_four_epochs : spectrumEntries (Descent.Core.pairedEpochCount 4) = 5 := by decide
 
 
 /-! #### Drift invisible to genotype is irreducible by any amount of genotyping
