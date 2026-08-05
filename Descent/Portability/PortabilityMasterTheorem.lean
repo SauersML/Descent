@@ -39,19 +39,36 @@ covariance, outcome variance, MSE, calibration slope, calibration intercept, and
 as a closed algebraic expression in those inputs.  No approximation, no limit, no
 asymptotic regime, no side condition beyond the finiteness of the two index sets.
 
-The results are of three kinds.
+The results are of five kinds.
 
 1. **Exact metric laws** (`§2`).  Each output metric equals a named closed form in the
    input moments.  These are identities, not bounds.
 2. **The transport decomposition** (`§3`).  The source-to-target movement of each metric
    splits into named channels with *no remainder term*, and the `R²` ratio factors into
-   exactly three factors.
-3. **Completeness** (`§4`).  A three-real statistic is proved to determine every metric
-   in this list (sufficiency), and each of its three coordinates is proved to be
-   separately necessary by realisable witnesses (minimality).  Sufficiency without
+   exactly three factors -- not the four the informal decomposition posits.
+3. **Completeness** (`§4`).  A three-real statistic is proved to determine `R²` and the
+   calibration slope (sufficiency); its achievable set is proved to be exactly the
+   Cauchy-Schwarz cone (range); and each of its three coordinates is proved separately
+   necessary by realisable four-individual witnesses (minimality).  Sufficiency without
    minimality would be satisfied by the whole input tuple, and minimality without
-   sufficiency by any three functionally independent quantities; together they say the
-   statistic is the right one.
+   sufficiency by any three functionally independent quantities; together with the range
+   statement they say the statistic is a coordinate system on the deployments rather
+   than a lossy summary of a larger space.
+4. **Recalibration** (`§5`).  The MSE of an arbitrary affine correction, its exact
+   minimum `Var(Y)·(1 - R²)`, and the invariance of `R²` under the correction.  That
+   pair is the exact division of portability loss into a repairable part -- the affine
+   gauge -- and an unrepairable one, with nothing in between.
+5. **The training leg and the scope boundary** (`§7`, `§8`).  A score fitted to a
+   population is exactly calibrated in it, deploying any weights costs the target oracle
+   plus the target LD quadratic form of the weight error with no cross term, and the
+   weight error is two different matrix inverses applied to two different vectors.  `§8`
+   then fixes the scope from the other side: two deployments identical in every
+   second-moment metric refer twice as many people above a cut-off as each other, so the
+   statistic covers the second-moment metrics and provably nothing beyond them.
+
+`§6` names the junk branches, `§0` supplies the non-degenerate expectation functionals
+the witnesses are built from, and `§1b` points at the covariance algebra in
+`Descent.Foundations.TransportIdentities` that all of `§2` is an instance of.
 
 ## What is deliberately *not* proved here
 
@@ -1299,6 +1316,137 @@ theorem weightError_eq (sigmaInvS sigmaInvT : Matrix J J ℝ) :
 end Deployment
 
 end Training
+
+section StatisticBoundary
+
+/-!
+## §8 Where the statistic stops
+
+`§4` proves the three-real statistic sufficient for `R²` and the calibration slope, and
+each of its coordinates necessary.  A completeness claim is only as good as its stated
+scope, so this section fixes the scope from the other side: the statistic is sufficient
+for the *second-moment* metrics and for nothing beyond them.
+
+`exceedance` is the simplest metric that is not a second-moment functional -- the
+fraction of a population scoring above a cut-off, which is what a screening programme
+actually deploys.  Two populations below have **identical** score variance, predictive
+covariance and outcome variance, hence identical `R²`, calibration slope and
+recalibrated MSE, and they put different fractions of the population above zero.
+
+So the third open question of Wang et al. (2026) -- that portability depends on the
+metric reported -- is not one phenomenon but two.  Within the second-moment metrics it
+is `§4`'s minimality: the metrics are different functions on a three-dimensional
+statistic, so they have different level sets.  Between second-moment and threshold
+metrics it is this section: no amount of second-moment information determines a
+threshold metric at all, and a study reporting `R²` has said nothing about the
+sensitivity of the screen it is validating.
+-/
+
+/-- The fraction of the population whose score exceeds a cut-off.  The threshold metric
+in its simplest form; sensitivity, specificity and precision are all built from
+exceedances of the joint law. -/
+def exceedance (P : DeploymentPopulation (Fin 4) (Fin 1) (Fin 1)) (w : Fin 1 → ℝ)
+    (t : ℝ) : ℝ :=
+  P.E (fun ω ↦ if t < P.score w ω then 1 else 0)
+
+/-- **The one-contrast population.**  A single scored variant which is also the single
+causal variant, with unit effect and no residual: score and phenotype coincide, so the
+statistic is `(Var v, Var v, Var v)` for whatever contrast `v` is supplied and `R²` is
+exactly `1`.  All that is left free is the *shape* of `v`, which is exactly the
+information the statistic discards. -/
+def oneContrastPopulation (v : Fin 4 → ℝ) : DeploymentPopulation (Fin 4) (Fin 1) (Fin 1) where
+  E := uniformExp (Fin 4)
+  X := fun ω _ ↦ v ω
+  C := fun ω _ ↦ v ω
+  β := fun _ ↦ 1
+  h := fun _ ↦ 0
+
+theorem oneContrast_statistic (v : Fin 4 → ℝ) :
+    portabilityStatistic (oneContrastPopulation v) unitWeight
+      = (variance (uniformExp (Fin 4)) v, variance (uniformExp (Fin 4)) v,
+          variance (uniformExp (Fin 4)) v) := by
+  have hscore : (oneContrastPopulation v).score unitWeight = v := by
+    funext ω
+    simp [DeploymentPopulation.score, oneContrastPopulation, linScore, dot, unitWeight]
+  have hpheno : (oneContrastPopulation v).phenotype = v := by
+    funext ω
+    simp [DeploymentPopulation.phenotype, oneContrastPopulation, causalSignal, dot]
+  unfold portabilityStatistic DeploymentPopulation.scoreVariance
+    DeploymentPopulation.predictiveCovariance DeploymentPopulation.outcomeVariance
+  rw [hscore, hpheno, ← variance_eq_covariance_self]
+  rfl
+
+/-- The balanced contrast: half the population above zero. -/
+def balancedContrast : Fin 4 → ℝ := ![-1, -1, 1, 1]
+
+/-- The spread contrast: the same variance, a quarter of the population above zero. -/
+def spreadContrast : Fin 4 → ℝ := ![-Real.sqrt 2, 0, 0, Real.sqrt 2]
+
+theorem variance_balancedContrast : variance (uniformExp (Fin 4)) balancedContrast = 1 := by
+  rw [variance_uniformExp_four]
+  simp [balancedContrast]
+  norm_num
+
+theorem variance_spreadContrast : variance (uniformExp (Fin 4)) spreadContrast = 1 := by
+  rw [variance_uniformExp_four]
+  simp [spreadContrast]
+  norm_num
+
+theorem exceedance_balancedContrast :
+    exceedance (oneContrastPopulation balancedContrast) unitWeight 0 = 1 / 2 := by
+  unfold exceedance
+  have hscore : ∀ ω, (oneContrastPopulation balancedContrast).score unitWeight ω
+      = balancedContrast ω := fun ω ↦ by
+    simp [DeploymentPopulation.score, oneContrastPopulation, linScore, dot, unitWeight]
+  simp only [hscore]
+  show uniformExp (Fin 4) _ = _
+  rw [uniformExp_four]
+  norm_num [balancedContrast, Matrix.cons_val_two, Matrix.cons_val_three,
+    Matrix.tail_cons, Matrix.head_cons]
+
+theorem exceedance_spreadContrast :
+    exceedance (oneContrastPopulation spreadContrast) unitWeight 0 = 1 / 4 := by
+  have hpos : (0 : ℝ) < Real.sqrt 2 := Real.sqrt_pos.mpr (by norm_num)
+  unfold exceedance
+  have hscore : ∀ ω, (oneContrastPopulation spreadContrast).score unitWeight ω
+      = spreadContrast ω := fun ω ↦ by
+    simp [DeploymentPopulation.score, oneContrastPopulation, linScore, dot, unitWeight]
+  simp only [hscore]
+  show uniformExp (Fin 4) _ = _
+  rw [uniformExp_four]
+  norm_num [spreadContrast, Matrix.cons_val_two, Matrix.cons_val_three,
+    Matrix.tail_cons, Matrix.head_cons, hpos, hpos.not_gt]
+
+/-- **The statistic does not determine a threshold metric.**
+
+    Two realisable populations with the same score variance, the same predictive
+    covariance and the same outcome variance -- hence the same `R²`, the same
+    calibration slope, and the same optimally recalibrated MSE -- put `1/2` and `1/4` of
+    their members above the same cut-off.
+
+    This is not a small discrepancy at an unlucky threshold: the two deployments are
+    indistinguishable to every second-moment metric there is, and one screen refers twice
+    as many people as the other. -/
+theorem statistic_does_not_determine_exceedance :
+    portabilityStatistic (oneContrastPopulation balancedContrast) unitWeight
+        = portabilityStatistic (oneContrastPopulation spreadContrast) unitWeight ∧
+      (oneContrastPopulation balancedContrast).r2 unitWeight
+        = (oneContrastPopulation spreadContrast).r2 unitWeight ∧
+      (oneContrastPopulation balancedContrast).calibrationSlope unitWeight
+        = (oneContrastPopulation spreadContrast).calibrationSlope unitWeight ∧
+      exceedance (oneContrastPopulation balancedContrast) unitWeight 0
+        ≠ exceedance (oneContrastPopulation spreadContrast) unitWeight 0 := by
+  have hstat : portabilityStatistic (oneContrastPopulation balancedContrast) unitWeight
+      = portabilityStatistic (oneContrastPopulation spreadContrast) unitWeight := by
+    rw [oneContrast_statistic, oneContrast_statistic, variance_balancedContrast,
+      variance_spreadContrast]
+  refine ⟨hstat, ?_, ?_, ?_⟩
+  · exact (metrics_eq_of_statistic_eq _ _ _ _ hstat).1
+  · exact (metrics_eq_of_statistic_eq _ _ _ _ hstat).2
+  · rw [exceedance_balancedContrast, exceedance_spreadContrast]
+    norm_num
+
+end StatisticBoundary
 
 end
 
