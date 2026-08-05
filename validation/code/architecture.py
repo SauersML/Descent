@@ -585,6 +585,20 @@ def defs_with_no_theorem(code, decls):
     return sorted(n for n in defs if n not in named)
 
 
+def is_layer_head(mod: str) -> bool:
+    """`Descent.X` where `Descent/X/` is a directory: a table of contents.
+
+    A head imports every module under it and names none of them, on purpose, so
+    counting its imports as "naming nothing used" would report eleven modules
+    doing exactly their job -- 302 of them, once the split files landed -- and
+    bury the real signal, which is an import added without the code that was
+    supposed to use it.
+    """
+    parts = mod.split(".")
+    return len(parts) == 2 and parts[0] == "Descent" and \
+        os.path.isdir(os.path.join(LEAN_ROOT, parts[1]))
+
+
 def unused_direct_imports(raw, code, decls):
     """Direct imports whose declarations the importing module never names.
 
@@ -603,6 +617,8 @@ def unused_direct_imports(raw, code, decls):
     """
     out = {}
     for mod in sorted(code):
+        if is_layer_head(mod):
+            continue
         # The root is an import aggregator by construction: it names almost
         # nothing and exists to pull the corpus together for `lake build`.
         # Counting its imports here would bury the signal under 130 entries

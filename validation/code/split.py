@@ -263,7 +263,11 @@ def main() -> int:
     prev = None
     for name, a, b in merged:
         pre, suf = balance(L(a, b))
-        imports = list(header) + ([f"import {stem_mod(args.path)}.{prev}"] if prev else [])
+        # A later part inherits the header transitively through its predecessor.
+        # Repeating it imports dozens of modules the part does not name, which
+        # buries the one thing the unused-import count is for: an import added
+        # without the code that was supposed to use it.
+        imports = ([f"import {stem_mod(args.path)}.{prev}"] if prev else list(header))
         out = (lic + imports + [""] + preamble + [""] + open_lines + [""]
                + [WHY.format(stem=stem, name=name, path=args.path, total=total), ""]
                + pre + L(a, b) + suf + [""] + closers + [""])

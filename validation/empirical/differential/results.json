@@ -7,8 +7,8 @@
  "corpus_stamp": {
   "arg_convention": 2,
   "source_digest_of_table": "sha256:f71e3035745faa7381206552f10348ef",
-  "source_digest_on_disk": "sha256:b723d20f55591b305102db370726a600",
-  "source_files": 223,
+  "source_digest_on_disk": "sha256:09ef4465d5147e3241740e58b43f9ca8",
+  "source_files": 263,
   "table_is_current": false,
   "n_collisions": 0,
   "n_definitions": 2230,
@@ -1452,7 +1452,7 @@
     "fq": "Descent.hetDecayFactor",
     "translator": "leanexpr (extract unavailable)",
     "extract_error": "KeyError: \"'Descent.hetDecayFactor' is ambiguous: ['Descent.PopGen.PGSEvolutionaryModel.hetDecayFactor', 'Descent.PopGen.hetDecayFactor', 'Descent.Portability.Core.PopGenParameters.hetDecayFactor']\"",
-    "source": "PopGen/PopulationGeneticsFoundations.lean:2442",
+    "source": "PopGen/PopulationGeneticsFoundations/TransientFstDerivation.lean:67",
     "leanexpr_sha16": "e91b1afa411cc438"
    },
    "Descent.PopGen.hetMutationDriftRecurrence": {
@@ -1786,7 +1786,7 @@
       3.0
      ]
     },
-    "also_in_leanexpr": true
+    "also_in_leanexpr": false
    },
    "Descent.PopGen.neiGstFromFrequencies": {
     "fq": "Descent.PopGen.neiGstFromFrequencies",
@@ -2096,9 +2096,9 @@
  },
  "cross_validation": {
   "method": "leanexpr.py vs extract/api.py over every evaluated argument tuple",
-  "n_definitions_compared": 55,
+  "n_definitions_compared": 54,
   "n_arg_tuples": 162760,
-  "n_agree_all_points": 55,
+  "n_agree_all_points": 54,
   "agree": {
    "Descent.PopGen.admixedFst": 22,
    "Descent.Portability.admixtureLDDecay": 6,
@@ -2139,7 +2139,6 @@
    "Descent.PopGen.ldRecurrence": 6,
    "Descent.PopGen.ldRetainedFraction": 8,
    "Descent.PopGen.ldRetentionPerGen": 18,
-   "Descent.PopGen.neiFst": 16,
    "Descent.PopGen.neiGstFromFrequencies": 16,
    "Descent.PopGen.nextFloorFourthMoment": 9,
    "Descent.PopGen.ohtaKimuraSigmaDSq": 4,
@@ -2165,12 +2164,13 @@
    "hetRecurrence": "not in extract table",
    "heterozygosityLossVariableNe": "not extractable by leanexpr",
    "ldMismatchFrobenius": "not extractable by leanexpr",
+   "neiFst": "not extractable by leanexpr",
    "scaledMutationRate": "not extractable by leanexpr"
   }
  },
  "contract_totality": {
   "method": "strict-arithmetic leanexpr vs lean_rt-backed extract, same points",
-  "points_checked": 162727,
+  "points_checked": 162711,
   "totality_boundary_points": [],
   "value_mismatches": [],
   "clean": true
@@ -4736,7 +4736,7 @@
   },
   "hetDecayFactor-vs-exact-eigenvalue": {
    "definition": "Descent.hetDecayFactor",
-   "definition_source": "PopGen/PopulationGeneticsFoundations.lean:2442",
+   "definition_source": "PopGen/PopulationGeneticsFoundations/TransientFstDerivation.lean:67",
    "definition_checksum": null,
    "translator": "leanexpr (extract unavailable)",
    "numeric_standin": null,

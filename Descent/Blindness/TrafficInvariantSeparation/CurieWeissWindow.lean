@@ -1,29 +1,6 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Mathlib.Analysis.SpecialFunctions.Log.Basic
-import Mathlib.Analysis.SpecialFunctions.Log.Deriv
-import Mathlib.Analysis.SpecialFunctions.Pow.Real
-import Mathlib.Analysis.Complex.ExponentialBounds
-import Mathlib.Analysis.Calculus.MeanValue
-import Mathlib.Analysis.MeanInequalities
-import Mathlib.Analysis.MeanInequalitiesPow
-import Mathlib.Analysis.Normed.Group.Tannery
-import Mathlib.Data.Nat.Choose.Sum
-import Mathlib.Data.Matrix.Mul
-import Mathlib.Data.Real.StarOrdered
-import Mathlib.Logic.Equiv.Fintype
-import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
-import Mathlib.LinearAlgebra.Matrix.DotProduct
-import Mathlib.LinearAlgebra.Matrix.PosDef
-import Mathlib.LinearAlgebra.Vandermonde
-import Mathlib.Topology.Sequences
-import Mathlib.Topology.ContinuousMap.Bounded.ArzelaAscoli
-import Mathlib.Topology.MetricSpace.PiNat
-import Mathlib.Topology.MetricSpace.UniformConvergence
-import Mathlib.Topology.Order.LeftRight
-import Mathlib.Tactic
-import Descent.Blindness.ObservationalCeiling
 import Descent.Blindness.TrafficInvariantSeparation.RankOneInvisibility
 
 namespace Descent.Blindness

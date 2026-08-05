@@ -1,9 +1,6 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.Program.OpenQuestions
-import Descent.Core.Fst
-import Descent.Core.Heterozygosity
 import Descent.PopGen.PopulationGeneticsFoundations.SelectionMigrationBalance
 
 namespace Descent.PopGen
