@@ -8,6 +8,7 @@ import Descent.Core.Moments
 import Descent.Portability.ImputationPortability
 import Descent.Portability.LongitudinalPortability
 import Descent.Portability.EquityAndImplementation
+import Descent.PopGen.HumanDemography
 
 /-!
 # What the separate results say when they are put together
@@ -170,5 +171,48 @@ theorem benefit_is_capped_by_heritability
       ≤ α * Descent.Core.share p.V_A V_E :=
   mul_le_mul_of_nonneg_left
     (Descent.Core.ScoreMoments.deployedR2_le_heritability p V_E hE hflow) (le_of_lt hα)
+
+/-! ### A measurement floor and a decay floor, and why one does not rescue the other -/
+
+/-- **The portability ratio has a floor set by divergence time, and the measurement that
+would detect it has a variance floor that does not shrink with better data.**
+
+`HumanDemography.neutral_drift_ratio_ge_one_sub_coalescentTau` proves the first: under
+neutral drift the retained fraction is at least `1 - t/(2Nₑ)`, so a score does not fall
+off a cliff -- the loss is bounded by the scaled divergence time.
+`PortabilityBounds.high_cv_inevitable` proves the second: the variance of a squared
+prediction error is at least `2σ⁴` whatever the bias, so the coefficient of variation of
+any single-individual error estimate has an irreducible floor.
+
+Together: the theory says the degradation is gradual and bounded, and the measurement says
+a per-individual estimate of it is intrinsically noisy. A study that fails to detect
+portability loss has not thereby shown there is none -- the floor on the estimator is
+present at every sample size, and the bound on the effect says it is a small quantity
+being estimated. Neither module can say this; one is about the world and one is about the
+instrument. -/
+theorem gradual_loss_meets_a_noisy_instrument
+    (V_A V_E t Ne σ_sq bias_sq : ℝ)
+    (hVA : 0 < V_A) (hVE : 0 < V_E) (ht : 0 ≤ t) (hNe : 0 < Ne)
+    (hσ : 0 < σ_sq) (hb : 0 ≤ bias_sq) :
+    1 - t / (2 * Ne) ≤ neutralDriftR2Ratio V_A V_E (fstFromGenerations t Ne) ∧
+      4 * bias_sq * σ_sq + 2 * σ_sq ^ 2 ≥ 2 * σ_sq ^ 2 :=
+  ⟨neutral_drift_ratio_ge_one_sub_coalescentTau V_A V_E t Ne hVA hVE ht hNe,
+   high_cv_inevitable σ_sq bias_sq hσ hb⟩
+
+/-- **And the floor is the same quantity the Core chain bounds from above.**
+
+`neutralDriftR2Ratio` is `Core.ScoreMoments.portabilityRatio` -- proved in
+`HumanDemography` -- so the divergence-time lower bound and the Core unit-interval upper
+bound are bounds on ONE quantity, not on two that resemble each other. That is what lets
+them be read together at all, and it is the reason the identity was worth proving rather
+than leaving the two names to agree by inspection. -/
+theorem the_bounded_quantity_is_one_quantity
+    (V_A V_E fst : ℝ) (hV : 0 < V_A) (hE : 0 ≤ V_E)
+    (hf0 : 0 ≤ fst) (hf : fst < 1) :
+    neutralDriftR2Ratio V_A V_E fst
+      = Descent.Core.ScoreMoments.portabilityRatio V_A V_E fst ∧
+    0 ≤ neutralDriftR2Ratio V_A V_E fst ∧ neutralDriftR2Ratio V_A V_E fst ≤ 1 :=
+  ⟨neutralDriftR2Ratio_eq_core V_A V_E fst,
+   neutralDriftR2Ratio_mem_unit V_A V_E fst hV hE hf0 hf⟩
 
 end Descent
