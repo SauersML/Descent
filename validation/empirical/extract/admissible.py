@@ -549,17 +549,6 @@ def type_value(ty, rng, structs=None, dim=None, lo=0.05, hi=1.0, _depth=0,
             raise Uninhabitable(f"matrix over {tail!r}, not a scalar")
         return _rt.VecFn(_rt.VecFn(rng.uniform(lo, hi) for _ in range(dim))
                          for _ in range(dim))
-    if head == "List":
-        # `List α` is inhabitable whenever `α` is: a short list of inhabitants.
-        # Refusing it cost seven definitions taking a `List Hap` or a `List ι` --
-        # haplotype panels and index lists, which are data the corpus computes
-        # over rather than anything measure-theoretic. Length `dim` for the same
-        # reason a `Fin n` table has `dim` entries: one size, chosen once.
-        elem = ty.split(None, 1)[1] if len(ty.split(None, 1)) > 1 else ""
-        if not elem:
-            raise Uninhabitable("`List` with no element type")
-        return [type_value(elem, rng, structs, dim, lo, hi, _depth + 1)
-                for _ in range(dim)]
     if head == "Fin":
         return rng.randrange(_index_card(ty, structs, dim) or dim)
     cards = enum_cards(structs)

@@ -106,7 +106,12 @@ def adversarial_vectors():
 
     # SHAPE 4: scalar-only definitions must be untouched by the vector feature.
     close("coalFst(100,1000)", lean_defs.coalFst(100.0, 1000.0), 100 / 2100)
-    close("neiFst(0.4,0.3)", lean_defs.neiFst(0.4, 0.3), 0.25)
+    # REPOINTED off `neiFst`, which returns a `Core.NeiFst` now and so is not
+    # emitted as a callable real. `neiFst H_T H_S` is `1 - H_S/H_T`, which is
+    # `proportionalReduction H_S H_T` -- the kernel it is built on -- so the
+    # same number is checked through the body that still computes it.
+    close("proportionalReduction(0.3,0.4)",
+          lean_defs.proportionalReduction(0.3, 0.4), 0.25)
     assert api.vector_args("Descent.coalFst") is None, \
         "scalar-only definition reported as taking vectors"
     print("  ok  scalar-only signatures unchanged")
@@ -350,8 +355,11 @@ def shape_directed_inhabitants_are_right():
     # -- cardinalities read from the corpus's own inductives
     cards = admissible.enum_cards(structs)
     assert cards.get("Pop") == 2, cards.get("Pop")
-    assert cards.get("DiploidGenotype") == 3, cards.get("DiploidGenotype")
-    print("  ok  enum cardinalities: Pop=2, DiploidGenotype=3 (from the Lean)")
+    # `DiploidGenotype` folded into `Core.Genome` and is `Core.Genotype` now.
+    # Read off the Lean either way -- that is the point of this check -- but
+    # the name it reads had moved.
+    assert cards.get("Genotype") == 3, cards.get("Genotype")
+    print("  ok  enum cardinalities: Pop=2, Genotype=3 (from the Lean)")
 
     # -- shapes, asserted against the Lean types they were built from
     D = admissible.VECTOR_DIM

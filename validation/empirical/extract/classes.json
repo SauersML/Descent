@@ -865,7 +865,7 @@
  },
  "Descent.Blindness.BundleRigidity.weightRatio": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition prodWeight",
+  "note": "no inhabitant for an argument type: \"no inhabitant modelled for the type 'List ι'\")",
   "file": "Descent/Blindness/BundleRigidity/Dichotomy.lean",
   "line": 115,
   "short": "weightRatio",
@@ -881,7 +881,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'prodWeight' is not defined\")"
+   "error": "Uninhabitable(\"no inhabitant modelled for the type 'List ι'\")"
   },
   "numeric_standins": null,
   "vector_args": {
@@ -937,7 +937,7 @@
  },
  "Descent.Blindness.BundleRigidity.defect": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition prodWeight",
+  "note": "no inhabitant for an argument type: \"no inhabitant modelled for the type 'List ι'\")",
   "file": "Descent/Blindness/BundleRigidity/Dichotomy.lean",
   "line": 129,
   "short": "defect",
@@ -954,7 +954,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'prodWeight' is not defined\")"
+   "error": "Uninhabitable(\"no inhabitant modelled for the type 'List ι'\")"
   },
   "numeric_standins": null,
   "vector_args": {
@@ -1076,7 +1076,7 @@
  },
  "Descent.Blindness.BundleRigidity.chi": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition prodWeight",
+  "note": "no inhabitant for an argument type: \"no inhabitant modelled for the type 'List ι'\")",
   "file": "Descent/Blindness/BundleRigidity/Dichotomy.lean",
   "line": 191,
   "short": "chi",
@@ -1092,7 +1092,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'prodWeight' is not defined\")"
+   "error": "Uninhabitable(\"no inhabitant modelled for the type 'List ι'\")"
   },
   "numeric_standins": null,
   "vector_args": {
@@ -29322,7 +29322,7 @@
    ]
   },
   "selfcheck": {
-   "finite_points": 4,
+   "finite_points": 6,
    "total_points": 8,
    "error": "OverflowError('math range error')"
   },
@@ -29393,7 +29393,7 @@
    ]
   },
   "selfcheck": {
-   "finite_points": 5,
+   "finite_points": 1,
    "total_points": 8,
    "error": "OverflowError('math range error')"
   },
@@ -53123,7 +53123,7 @@
  },
  "Descent.Pangenome.piSeq6": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition sumOver",
+  "note": "no inhabitant for an argument type: \"no inhabitant modelled for the type 'List Hap'\")",
   "file": "Descent/Pangenome/GaugeCounterexample.lean",
   "line": 134,
   "short": "piSeq6",
@@ -53137,7 +53137,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'sumOver' is not defined\")"
+   "error": "Uninhabitable(\"no inhabitant modelled for the type 'List Hap'\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -53153,7 +53153,7 @@
  },
  "Descent.Pangenome.piRows6": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition sumOver",
+  "note": "no inhabitant for an argument type: \"no inhabitant modelled for the type 'List Hap'\")",
   "file": "Descent/Pangenome/GaugeCounterexample.lean",
   "line": 140,
   "short": "piRows6",
@@ -53168,7 +53168,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'sumOver' is not defined\")"
+   "error": "Uninhabitable(\"no inhabitant modelled for the type 'List Hap'\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -53184,7 +53184,7 @@
  },
  "Descent.Pangenome.thetaW6": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition S",
+  "note": "no inhabitant for an argument type: \"no inhabitant modelled for the type 'List Hap'\")",
   "file": "Descent/Pangenome/GaugeCounterexample.lean",
   "line": 145,
   "short": "thetaW6",
@@ -53199,7 +53199,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'S' is not defined\")"
+   "error": "Uninhabitable(\"no inhabitant modelled for the type 'List Hap'\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -53215,7 +53215,7 @@
  },
  "Descent.Pangenome.tajimaNum6": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition sumOver",
+  "note": "no inhabitant for an argument type: \"no inhabitant modelled for the type 'List Hap'\")",
   "file": "Descent/Pangenome/GaugeCounterexample.lean",
   "line": 149,
   "short": "tajimaNum6",
@@ -53230,7 +53230,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'sumOver' is not defined\")"
+   "error": "Uninhabitable(\"no inhabitant modelled for the type 'List Hap'\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -53886,7 +53886,7 @@
  },
  "Descent.Pangenome.Gauge.totalWalkDist": {
   "class": "NOT-EXTRACTABLE",
-  "note": "no inhabitant for an argument type: \"no inhabitant modelled for the type 'Nat E'\")",
+  "note": "no inhabitant for an argument type: \"no inhabitant modelled for the type 'List E'\")",
   "file": "Descent/Pangenome/GaugeInvariance.lean",
   "line": 276,
   "short": "totalWalkDist",
@@ -53901,7 +53901,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "Uninhabitable(\"no inhabitant modelled for the type 'Nat E'\")"
+   "error": "Uninhabitable(\"no inhabitant modelled for the type 'List E'\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -77369,7 +77369,7 @@
  },
  "Descent.Portability.thresholdDecision": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition true",
+  "note": "self-check: calls untranslated definition false",
   "file": "Descent/Portability/ContinuumCalibration.lean",
   "line": 525,
   "short": "thresholdDecision",
@@ -77393,7 +77393,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'true' is not defined\")"
+   "error": "NameError(\"name 'false' is not defined\")"
   },
   "numeric_standins": null,
   "vector_args": null,
