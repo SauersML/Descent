@@ -300,11 +300,17 @@ prevalence at all. That asymmetry is the whole content of a precision-recall cur
 axis is a property of the score and the other is a property of the population it is
 deployed in.
 
+Spelled `recallRate` and not `recall`, for two reasons that agree. `recall` is a RESERVED
+COMMAND KEYWORD in Lean 4, so `def recall` does not parse and `o.recall` fails at every
+use site -- this file did carry that name and the whole `Descent.Core` target failed to
+build on it. And `Foundations.ConfusionMatrix.recallRate` already spells the same
+quantity this way, so the keyword forced the name the corpus had already chosen.
+
     Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
     A kernel asserts nothing about a population, so no measurement can bear on it.
     What can be measured is a named quantity claiming this shape computes it, and
     those live in the subsystem modules with their own status lines and ledger rows. -/
-noncomputable def recall (o : OperatingPoint) : ℝ :=
+noncomputable def recallRate (o : OperatingPoint) : ℝ :=
   identifiedWith o.sensitivity
 
 /-- **The `F₁` score**, the harmonic mean of precision and recall.
@@ -314,8 +320,8 @@ noncomputable def recall (o : OperatingPoint) : ℝ :=
     What can be measured is a named quantity claiming this shape computes it, and
     those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def f1 (o : OperatingPoint) (prevalence : ℝ) : ℝ :=
-  ratio (2 * (o.precision prevalence) * (o.recall))
-    (o.precision prevalence + o.recall)
+  ratio (2 * (o.precision prevalence) * (o.recallRate))
+    (o.precision prevalence + o.recallRate)
 
 /-- **The predictive value is the Bayes form**, definitionally. Stated so that a reader
 who knows the textbook expression can see that `share` is it, and so that the existing
@@ -337,7 +343,7 @@ content of the identification. -/
     o.precision prevalence = o.positivePredictiveValue prevalence := rfl
 
 /-- **Recall unfolds to the sensitivity.** -/
-@[simp] theorem recall_eq (o : OperatingPoint) : o.recall = o.sensitivity := rfl
+@[simp] theorem recallRate_eq (o : OperatingPoint) : o.recallRate = o.sensitivity := rfl
 
 /-- **The predictive value lies in the unit interval**, on an admissible point at a
 prevalence in range, away from the degenerate denominator. The bound every consumer
@@ -555,7 +561,7 @@ theorem f1_at_perfect (prevalence : ℝ) (h : prevalence ≠ 0) :
     perfect.f1 prevalence = 1 := by
   have hp : perfect.positivePredictiveValue prevalence = 1 :=
     positivePredictiveValue_of_specificity_one perfect prevalence rfl (by simpa using h)
-  unfold f1 ratio precision recall identifiedWith
+  unfold f1 ratio precision recallRate identifiedWith
   rw [hp, perfect_sensitivity]
   norm_num
 
@@ -565,7 +571,7 @@ for a rule that is merely bad, so the junk point is indistinguishable from a rea
 verdict. Consumers must require `precision + recall ≠ 0`. -/
 theorem f1_treatNone_is_junk (prevalence : ℝ) :
     treatNone.f1 prevalence = 0 := by
-  simp [f1, ratio, precision, recall, identifiedWith, positivePredictiveValue, share]
+  simp [f1, ratio, precision, recallRate, identifiedWith, positivePredictiveValue, share]
 
 /-! ### The decision-analytic half
 
