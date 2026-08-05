@@ -1,215 +1,36 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.Foundations.Probability
-import Descent.PopGen.DGP
-import Descent.Program.Conclusions
-import Descent.Portability.PortabilityDrift
-import Descent.Portability.PortabilityMasterTheorem
-import Descent.PopGen.HumanDemography
-import Descent.PopGen.AdditiveInvariance
-import Descent.Blindness.ImitationRigidity
-import Descent.Program.Conventions
-import Descent.PopGen.DemographicCapacity
-import Descent.PopGen.DriftRegime
-import Descent.Blindness.BlindnessRegistry
-import Descent.Program.OpenQuestions
-import Descent.Blindness.TrafficInvariantSeparation
-import Descent.Foundations.TransportIdentities
-import Descent.Spectral.SecondMomentShift
-import Descent.Spectral.QuadraticShift
-import Descent.Spectral.ProjectionShiftBounds
-import Descent.Spectral.ProjectionSolve
-import Descent.Spectral.WhiteningEquivalence
-import Descent.Portability.PortabilityBounds
-import Descent.Portability.MultiAncestryTheory
-import Descent.Portability.StratificationConfounding
-import Descent.Portability.AncestryCalibration
-import Descent.PopGen.LDDecayTheory
-import Descent.PopGen.SelectionArchitecture
-import Descent.PopGen.DemographicHistory
-import Descent.PopGen.SerialFounderChain
-import Descent.Portability.ClinicalUtilityFairness
-import Descent.PopGen.VarianceComponents
-import Descent.Portability.ScoreDistribution
-import Descent.Decision.ValidationStatistics
-import Descent.Portability.MechanisticPortabilityWitnesses
-import Descent.Decision.SelectionValidation
-import Descent.PopGen.GeneticArchitectureDiscovery
-import Descent.Portability.BayesianPGSTheory
-import Descent.Portability.PhenomeWidePortability
-import Descent.Portability.TransferLearningPGS
-import Descent.Portability.MetricSpecificPortability
-import Descent.PopGen.PopulationGeneticsFoundations
-import Descent.PopGen.GeneEnvironmentInterplay
-import Descent.Portability.RareVariantPortability
-import Descent.Portability.StatisticalGeneticsMethodology
-import Descent.Portability.EquityAndImplementation
-import Descent.PopGen.EpistasisAndNonAdditivity
-import Descent.PopGen.PolygenicAdaptation
-import Descent.PopGen.AssortativeMatingPGS
-import Descent.Portability.ImputationPortability
-import Descent.Portability.LongitudinalPortability
-import Descent.Decision.PowerAnalysis
-import Descent.Foundations.CovarianceStructure
-import Descent.Program.CausalInference
-import Descent.Decision.CertificateGrading
-import Descent.Portability.ContinuumCalibration
-import Descent.Portability.ContinuumCalibrationProgram
-import Descent.Blindness.DecoratedGeometryBlindness
-import Descent.Portability.CorrectionBiology
-import Descent.Portability.CorrectionWidths
-import Descent.Decision.FiniteMinimax
-import Descent.Decision.BlindnessMinimaxFloors
-import Descent.Spectral.PencilEnvironment
-import Descent.Spectral.DirichletTransfer
-import Descent.Conditionals.DeclaredInteractionClass
-import Descent.Blindness.CountingInvariantBlindness
-import Descent.Blindness.CountingInvariantInstances
-import Descent.PopGen.PolygenicArchitecture
-import Descent.Portability.PolygenicContinuumCalibration
-import Descent.Portability.SampleOverlapBias
-import Descent.PopGen.HaplotypeTheory
-import Descent.PopGen.AncestrySpecificArchitecture
-import Descent.Portability.AncestrySpecificPower
-import Descent.Portability.PGSCalibrationTheory
-import Descent.Blindness.ObservationalCeiling
-import Descent.Blindness.Condensation
-import Descent.Blindness.CumulantBlindness
-import Descent.Blindness.JetBarrier
-import Descent.Conditionals.LocalToGlobalCoherence
-import Descent.Blindness.HiddenConeAmbiguity
-import Descent.Conditionals.LatentMechanismCollapse
-import Descent.Spectral.PolygenicSpectroscopy
-import Descent.Blindness.EpistaticChaos
-import Descent.PopGen.StandardizedGenotypeMoments
-import Descent.Blindness.CramerStratum
-import Descent.Spectral.FoldedSpectrum
-import Descent.Spectral.SpectralDegradation
-import Descent.Blindness.SpectralUniversalityFailure
-import Descent.Blindness.SpectrumIdentifiability
-import Descent.Blindness.XiFromMarkedBreakouts
-import Descent.Spectral.EnsembleChannel
-import Descent.Spectral.Permeability
-import Descent.Spectral.ErgodicCovariancePencil
-import Descent.Portability.HorizonCurve
-import Descent.Conditionals.DriftingConditionals
-import Descent.Spectral.CirculationDefect
-import Descent.Blindness.LumpedRateBlindness
-import Descent.Portability.TransplantationStability
-import Descent.Conditionals.DynamicsContrast
-import Descent.Coalescent.Rates
-import Descent.Coalescent.StateSpace
-import Descent.Coalescent.WrightFisher
-import Descent.Coalescent.JumpChain
-import Descent.Coalescent.Mutation
-import Descent.Coalescent.Restriction
-import Descent.Coalescent.Paintbox
-import Descent.Coalescent.IntervalPicture
-import Descent.Coalescent.Generator
-import Descent.Coalescent.Process
-import Descent.Coalescent.Kernel
-import Descent.Coalescent.Split
-import Descent.Coalescent.Extend
-import Descent.Coalescent.Ewens
-import Descent.Coalescent.CutSets
-import Descent.Coalescent.CutCount
-import Descent.Coalescent.Path
-import Descent.Coalescent.Trajectory
-import Descent.Coalescent.Law
-import Descent.Coalescent.HoldingTime
-import Descent.Coalescent.Infinite
-import Descent.Coalescent.Encoding
-import Descent.Coalescent.QuotientRelation
-import Descent.Coalescent.CompetingRates
-import Descent.Coalescent.StepLaw
-import Descent.Coalescent.PaintboxFrequency
-import Descent.Coalescent.Moran
-import Descent.Coalescent.Lumping
-import Descent.Coalescent.NeutralMutation
-import Descent.Coalescent.Program
-import Descent.Coalescent.Lambda
-import Descent.Coalescent.MultiMerge
-import Descent.Coalescent.Xi
-import Descent.Coalescent.Recombination
-import Descent.Coalescent.Structured
-import Descent.Coalescent.SeedBank
-import Descent.Coalescent.Selection
-import Descent.Coalescent.Beta
-import Descent.Coalescent.XiRates
-import Descent.Coalescent.Uniqueness
-import Descent.Coalescent.BranchLength
-import Descent.Coalescent.SegregatingSites
-import Descent.Coalescent.FamilySize
-import Descent.Coalescent.Pedigree
-import Descent.Coalescent.Duality
-import Descent.Coalescent.SiteFrequencySpectrum
-import Descent.Coalescent.VariableSize
-import Descent.Coalescent.AlleleCount
-import Descent.Coalescent.ComingDownFromInfinity
-import Descent.Coalescent.Fixation
-import Descent.Coalescent.TransitVariance
-import Descent.Coalescent.GeneTreeDiscordance
-import Descent.Coalescent.SpectrumMoments
-import Descent.Coalescent.Convergence
-import Descent.Coalescent.FuUrn
-import Descent.Coalescent.ComingDownCriterion
-import Descent.Coalescent.Lookdown
-import Descent.Coalescent.SpatialCoalescent
-import Descent.Coalescent.LookdownClocks
-import Descent.Coalescent.BertrandDescent
-import Descent.Coalescent.HoldingSecondMoment
-import Descent.Coalescent.PairwiseTimes
-import Descent.Coalescent.TajimaVariance
-import Descent.Coalescent.PolyaCriterion
-import Descent.Coalescent.SemigroupLimit
-import Descent.Coalescent.MohleLemma
-import Descent.Coalescent.DescentTime
-import Descent.Coalescent.TrajectoryLaw
-import Descent.Coalescent.EntranceLaw
-import Descent.Coalescent.LaplaceTransform
-import Descent.Coalescent.TransitTransform
-import Descent.Coalescent.ThreeSeries
-import Descent.Coalescent.DecreaseRate
-import Descent.Coalescent.PairChainLimit
-import Descent.Coalescent.ExpRemainder
-import Descent.Coalescent.BlockCountMatrix
-import Descent.Coalescent.BlockMatrixLimit
--- THE BUILD MUST COVER ITS OWN CORPUS. Everything below was outside this root's import
--- closure, so `lake build Descent` never compiled it -- and a module the build never
--- reaches is not clean, it is UNBUILT. That is not a hypothetical: `ResonanceSpectrum`
--- had been failing all day on a missing `Real.log` import while every whole-corpus build
--- reported zero errors, because no target ever named it. It showed up only as a line in
--- `MODULES_ABSENT`, which is a truthful report in a format nobody interrogated.
+-- ELEVEN HEADS, NOT 171 MODULES.  Each `Descent.X` below imports every file under
+-- `Descent/X/`, so the build still covers the whole corpus -- which is what the list this
+-- replaces existed to guarantee.  What changes is who guarantees it.
 --
--- So orphan modules get imported here rather than left to be picked up by whoever
--- remembers to name them. If one of these goes red the ROOT goes red, which is the
--- entire point: that is the signal that was missing. Do not remove an import here to
--- make the root build green -- that restores the blindness rather than fixing the break.
+-- THE BUILD MUST COVER ITS OWN CORPUS.  A module the build never reaches is not clean, it
+-- is UNBUILT, and that is not hypothetical: `ResonanceSpectrum` failed all day on a
+-- missing `Real.log` import while every whole-corpus build reported zero errors, because
+-- no target ever named it.  It showed up only as a line in `MODULES_ABSENT`, a truthful
+-- report in a format nobody interrogated.
 --
--- Check for new orphans with `validation/code/check.py`, which
--- compares the TRANSITIVE closure of this file against every source module on disk.
+-- The old remedy was to name orphans HERE, by hand, with a comment asking future readers
+-- to remember.  A list somebody maintains by hand has the same failure mode as no list,
+-- one lapse later, and the comment even recorded the near-miss: four `BundleRigidity`
+-- modules were reachable only transitively and one, `DeploymentCeiling`, was not reachable
+-- at all.  Distinguishing those needed a transitive-closure check run by a person.
 --
--- A caution about HOW to run that check, learned by getting it wrong here: comparing the
--- files on disk against the imports named IN THIS FILE reports false orphans, because most
--- modules are reached TRANSITIVELY. `BundleRigidity.CoverageInvariance`, `.EntropySplit`,
--- `.Freshness` and `.Realizability` are named nowhere in this file and are all in the
--- closure anyway, via `FoldedSpectrum -> ConditionalGain`. Only a genuine transitive
--- closure distinguishes an orphan from a module someone else already imports;
--- `DeploymentCeiling`, added above, was the only real one.
-import Descent.Spectral.ResonanceSpectrum
-import Descent.Blindness.BundleRigidity.Coverage
-import Descent.Blindness.BundleRigidity.Cycles
-import Descent.Blindness.BundleRigidity.DeploymentCeiling
-import Descent.Blindness.BundleRigidity.Dichotomy
-import Descent.Blindness.BundleRigidity.LinearSCM
-import Descent.Blindness.BundleRigidity.Operator
-import Descent.Blindness.BundleRigidity.SingleModulus
-import Descent.Blindness.BundleRigidity.Telescope
-import Descent.Blindness.BundleRigidity.TwoAtom
-import Descent.Pangenome.GaugeCounterexample
-import Descent.Pangenome.GaugeInvariance
-import Descent.Program.Consequences
+-- A head does not need remembering.  `validation/code/check.py --only heads` reads each
+-- directory off disk and fails if a file in it is missing from its head, so a new module
+-- is either imported or the build names it.  Coverage stopped being a promise.
+import Descent.Blindness
+import Descent.Coalescent
+import Descent.Conditionals
+import Descent.Core
+import Descent.Decision
+import Descent.Foundations
+import Descent.Pangenome
+import Descent.PopGen
+import Descent.Portability
+import Descent.Program
+import Descent.Spectral
 
 namespace Descent
 

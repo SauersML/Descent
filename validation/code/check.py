@@ -5839,7 +5839,74 @@ def run_ledger() -> int:
 # The signature column is not decoration.  `laundering` and `wiring` take their
 # own flags, so `--only laundering --strict` has to reach them; the rest take
 # nothing and are called with no arguments.
+def run_heads() -> int:
+    """Every module under `Descent/X/` must be imported by `Descent/X.lean`.
+
+    The root file used to import 171 modules directly, because a module the build
+    never reaches is not clean, it is UNBUILT -- `ResonanceSpectrum` failed all
+    day on a missing import while every whole-corpus build reported zero errors.
+    The remedy was to name orphans in the root by hand, and a hand-maintained
+    list has the same failure mode as no list, one lapse later.  The root's own
+    comment recorded the near-miss: four `BundleRigidity` modules were reachable
+    only transitively and `DeploymentCeiling` was not reachable at all.
+
+    So the root names eleven heads and this guard reads the directories off disk.
+    A new module is either in its head or the build says which one is not, and
+    nobody has to remember anything.
+
+    A head is also required to contain no declarations.  A table of contents that
+    states a theorem is a module pretending to be a table of contents, and the
+    next reader has no way to know which it is without opening it.
+    """
+    import os as _os
+    import re as _re
+
+    root = _os.path.dirname(_os.path.dirname(
+        _os.path.dirname(_os.path.abspath(__file__))))
+    lean = _os.path.join(root, "Descent")
+    decl = _re.compile(r"(?m)^\s*(?:@\[[^\]]*\]\s*)?(?:private\s+|protected\s+|"
+                       r"noncomputable\s+)*(?:def|abbrev|theorem|lemma|structure|"
+                       r"inductive|instance|class)\s")
+    missing, stray, declaring = [], [], []
+
+    for entry in sorted(_os.listdir(lean)):
+        d = _os.path.join(lean, entry)
+        if not _os.path.isdir(d):
+            continue
+        head = _os.path.join(root, "Descent", entry + ".lean")
+        if not _os.path.exists(head):
+            missing.append(f"Descent/{entry}.lean does not exist")
+            continue
+        text = open(head, encoding="utf-8", errors="ignore").read()
+        imported = set(_re.findall(r"(?m)^import\s+(\S+)$", text))
+        on_disk = set()
+        for dirpath, _sub, files in _os.walk(d):
+            for fn in sorted(files):
+                if fn.endswith(".lean"):
+                    rel = _os.path.relpath(_os.path.join(dirpath, fn), root)
+                    on_disk.add(rel[:-len(".lean")].replace(_os.sep, "."))
+        for m in sorted(on_disk - imported):
+            missing.append(f"Descent/{entry}.lean does not import {m}")
+        for m in sorted(imported - on_disk):
+            stray.append(f"Descent/{entry}.lean imports {m}, which is not under it")
+        body = _re.sub(r"/-.*?-/", " ", text, flags=_re.S)
+        if decl.search(body):
+            declaring.append(f"Descent/{entry}.lean declares something; a head is a "
+                             f"table of contents")
+
+    for line in missing + stray + declaring:
+        print(f"  {line}")
+    total = len(missing) + len(stray) + len(declaring)
+    if total:
+        print(f"heads guard FAILS: {total} problem(s); a head must be exactly its "
+              f"directory, and nothing else")
+        return 1
+    print("heads guard: every directory head imports exactly its own modules")
+    return 0
+
+
 GUARDS = {
+    "heads":           dict(fn=run_heads,           gated=True,  takes_argv=False),
     "style":           dict(fn=run_style,           gated=True,  takes_argv=False),
     "identifications": dict(fn=run_identifications, gated=True,  takes_argv=False),
     "duplication":     dict(fn=run_duplication,     gated=True,  takes_argv=False),
