@@ -6,6 +6,7 @@ import Descent.PopGen.DGP
 import Descent.Spectral.CirculationDefect
 import Descent.Core.Fst
 import Descent.Core.Parameters
+import Descent.Core.Moments
 
 namespace Descent
 
@@ -1629,6 +1630,129 @@ itself is not restated here: this is `r2FromSignalVariance` applied to the drift
 variance, so the two cannot drift apart. -/
 noncomputable def presentDayR2 (V_A V_E fst : ℝ) : ℝ :=
   r2FromSignalVariance (presentDayPGSVariance V_A fst) V_E
+
+/-! ### The drift model produces a moment tuple
+
+`PortabilityMasterTheorem` declares that the interface between the population-genetic
+layer and the deployed-metric layer is a moment tuple. This section is the PopGen side of
+that interface: a drift model with additive variance `V_A`, environmental variance `V_E`
+and differentiation `F_ST` produces a `Core.ScoreMoments`, and the metrics below are that
+tuple read through the Core metric laws rather than through a second set of formulas.
+
+Before this, `presentDayR2` and the master theorem's `r2` were two expressions with the
+same shape in two modules with nothing relating them, and the layer contract was a
+sentence in a docstring. -/
+
+/-- **The drift model's moment tuple.** What this module hands the metric layer. -/
+noncomputable def driftMoments (V_A V_E fst : ℝ) : Descent.Core.ScoreMoments :=
+  Descent.Core.ScoreMoments.momentsUnderDrift V_A V_E fst
+
+/-- **The tuple's score variance IS `presentDayPGSVariance`.** The first of three
+component identities; together they say the tuple is not a fourth model but a repackaging
+of the three quantities this module already computes. -/
+theorem driftMoments_scoreVariance (V_A V_E fst : ℝ) :
+    (driftMoments V_A V_E fst).scoreVariance = presentDayPGSVariance V_A fst := by
+  unfold driftMoments Descent.Core.ScoreMoments.momentsUnderDrift presentDayPGSVariance
+    pgsVarianceFromHet Descent.Core.retainedFraction
+  simp only [Descent.Core.product]
+  ring
+
+/-- **The predictive covariance is the same retained variance.** Under drift with no
+effect turnover the score's covariance with the outcome equals its own variance -- which
+is exactly why the calibration slope does not move, and why a deployment judged only by
+calibration reports no problem. -/
+theorem driftMoments_predictiveCovariance (V_A V_E fst : ℝ) :
+    (driftMoments V_A V_E fst).predictiveCovariance = presentDayPGSVariance V_A fst := by
+  unfold driftMoments Descent.Core.ScoreMoments.momentsUnderDrift presentDayPGSVariance
+    pgsVarianceFromHet Descent.Core.retainedFraction
+  simp only [Descent.Core.product]
+  ring
+
+/-- **The outcome variance carries the SAME erosion.** The target's own additive variance
+is eroded by drift too, so the denominator is `V_A(1-F) + V_E`, not `V_A + V_E`. Using the
+ancestral additive variance here understates the deployed `R²`. -/
+theorem driftMoments_outcomeVariance (V_A V_E fst : ℝ) :
+    (driftMoments V_A V_E fst).outcomeVariance = presentDayPGSVariance V_A fst + V_E := by
+  unfold driftMoments Descent.Core.ScoreMoments.momentsUnderDrift presentDayPGSVariance
+    pgsVarianceFromHet Descent.Core.retainedFraction
+  simp only [Descent.Core.product]
+  ring
+
+/-- **`presentDayR2` IS the Core metric law on this module's tuple.**
+
+The composition the corpus's layer contract asserted and could not state. Both sides are
+`V_A(1-F) / (V_A(1-F) + V_E)`; what the equality buys is the dependency, so a change to
+either the drift model or the metric law reaches the other. -/
+theorem presentDayR2_eq_core (V_A V_E fst : ℝ) :
+    presentDayR2 V_A V_E fst = (driftMoments V_A V_E fst).r2 := by
+  unfold presentDayR2 driftMoments Descent.Core.ScoreMoments.momentsUnderDrift
+    Descent.Core.ScoreMoments.r2 TransportedMetrics.r2FromSignalVariance
+    presentDayPGSVariance pgsVarianceFromHet Descent.Core.share
+    Descent.Core.retainedFraction
+  have e1 : V_A * (1 - fst) = (1 - fst) * V_A := by ring
+  rw [e1]
+  rcases eq_or_ne ((1 - fst) * V_A) 0 with hz | hz
+  · rw [hz]; simp
+  · rw [pow_two, mul_div_mul_left _ _ hz]
+
+/-- **The calibration slope of a drift-attenuated score is one at every `F_ST`.**
+
+Read off the tuple rather than derived again: drift erodes the score variance and the
+predictive covariance by the same factor. A polygenic score that has lost most of its
+`R²` in a target population can be perfectly calibrated there, and a deployment audited
+on calibration alone would find nothing. -/
+theorem driftMoments_calibrationSlope (V_A V_E fst : ℝ) (hV : 0 < V_A) (hf : fst < 1) :
+    (driftMoments V_A V_E fst).calibrationSlope = 1 :=
+  Descent.Core.ScoreMoments.calibrationSlope_momentsUnderDrift V_A V_E fst hV hf
+
+/-- **The deployed `R²` under drift lies in the unit interval**, inherited from the Core
+bound rather than re-proved. -/
+theorem presentDayR2_mem_unit (V_A V_E fst : ℝ) (hV : 0 < V_A) (hE : 0 ≤ V_E)
+    (hf : fst < 1) :
+    0 ≤ presentDayR2 V_A V_E fst ∧ presentDayR2 V_A V_E fst ≤ 1 := by
+  have hr : 0 < (1 - fst) * V_A := by nlinarith
+  rw [presentDayR2_eq_core]
+  refine (driftMoments V_A V_E fst).r2_mem_unit ?_
+  refine { scoreVariance_pos := ?_, outcomeVariance_pos := ?_, cauchy_schwarz := ?_ } <;>
+    unfold driftMoments Descent.Core.ScoreMoments.momentsUnderDrift
+      Descent.Core.retainedFraction <;> simp
+  · linarith
+  · linarith
+  · nlinarith [sq_nonneg ((1 - fst) * V_A), mul_nonneg (le_of_lt hV) hE]
+
+/-- **More differentiation, less deployed `R²`** -- this module's own statement of the
+law, now a consequence of the Core one rather than a parallel derivation. -/
+theorem presentDayR2_anti (V_A V_E f₁ f₂ : ℝ) (hV : 0 < V_A) (hE : 0 < V_E)
+    (h1 : f₁ < f₂) (h2 : f₂ < 1) :
+    presentDayR2 V_A V_E f₂ < presentDayR2 V_A V_E f₁ := by
+  rw [presentDayR2_eq_core, presentDayR2_eq_core]
+  exact Descent.Core.ScoreMoments.r2_momentsUnderDrift_anti V_A V_E f₁ f₂ hV hE h1 h2
+
+/-- **`fst` is a free real here, and this is what pins it.**
+
+Every metric in this section takes `fst` as an argument, which severs it from the
+population genetics meant to produce it. `Core.PopGenParameters.fstEquilibrium` is that
+production, and this theorem is the join: the deployed metric of a demographic history is
+this module's metric at the equilibrium that history reaches.
+
+Where `fst` remains free below, it is because the module means an ARBITRARY
+differentiation -- a measured `F_ST` from data, a differentiation produced by selection
+rather than drift, or a sensitivity sweep -- and not because a derivation was unavailable. -/
+theorem presentDayR2_at_equilibrium (p : Descent.Core.PopGenParameters) (V_E : ℝ) :
+    presentDayR2 p.V_A V_E p.fstEquilibrium
+      = Descent.Core.ScoreMoments.deployedR2 p V_E := by
+  rw [presentDayR2_eq_core]
+  rfl
+
+/-- **And the end-to-end law, in this module's vocabulary**: raise the migration rate in
+the demographic parameters and `presentDayR2` rises. Every step -- equilibrium, moment
+tuple, metric -- is a named map. -/
+theorem presentDayR2_mono_in_migration (p q : Descent.Core.PopGenParameters) (V_E : ℝ)
+    (hE : 0 < V_E) (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hV : p.V_A = q.V_A)
+    (hlt : p.mig < q.mig) (hflow : 0 < p.mu + p.mig) :
+    presentDayR2 p.V_A V_E p.fstEquilibrium < presentDayR2 q.V_A V_E q.fstEquilibrium := by
+  rw [presentDayR2_at_equilibrium, presentDayR2_at_equilibrium]
+  exact Descent.Core.ScoreMoments.deployedR2_mono_in_migration p q V_E hE hNe hmu hV hlt hflow
 
 /-- Exact bridge theorem: the dashboard algebraic `presentDayR2` equals statistical
 `rsquared` when the relevant second-moment identities hold. -/
