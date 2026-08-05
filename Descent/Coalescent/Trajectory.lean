@@ -199,11 +199,11 @@ theorem chainLaw_head_blocks {n : ℕ} :
           rw [PMF.mem_support_map_iff] at hmem
           obtain ⟨z, hz, rfl⟩ := hmem
           rw [List.head?_cons, Option.some_inj] at hx
-          subst hx
-          have hy : blocks y + m = n := ih (by omega) hl' (List.head?_cons)
+          have hy : blocks y + m = n := ih (by omega) hl' List.head?_cons
           have hy2 : 2 ≤ blocks y := by omega
-          have hcov : Covers y x := (mem_support_jumpLaw hy2).mp hz
-          have := hcov.2
+          have hcov : Covers y z := (mem_support_jumpLaw hy2).mp hz
+          have hc2 := hcov.2
+          rw [← hx]
           omega
 
 /-- **The law of `ℛ_k`**, the jump chain's state after `k` jumps: the head of the trajectory.

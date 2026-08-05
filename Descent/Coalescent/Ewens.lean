@@ -40,6 +40,7 @@ factor -- but turning class-size facts into a statement about the product over
 
 namespace Coalescent
 
+open Nat
 open scoped Classical
 
 /-- A sample of one admits exactly one relation, so sums over `𝓔₁` are single terms.  This
@@ -76,9 +77,13 @@ theorem sum_fiber_eq_sum_seatings {n : ℕ} (ξ : ER n) (w : ER (n + 1) → ℝ)
     exact extend_injective ξ h
   · intro ζ hζ
     have hres : restrict (Nat.le_succ n) ζ = ξ := (Finset.mem_filter.mp hζ).2
-    subst hres
-    obtain ⟨o, ho⟩ := exists_extend ζ
-    exact ⟨o, Finset.mem_univ _, ho⟩
+    have key : ∀ (ξ' : ER n), restrict (Nat.le_succ n) ζ = ξ' →
+        ∃ o : Option (Quotient ξ'), ζ = extend ξ' o := by
+      intro ξ' h
+      subst h
+      exact exists_extend ζ
+    obtain ⟨o, ho⟩ := key ξ hres
+    exact ⟨o, Finset.mem_univ _, ho.symm⟩
   · intro o _
     rfl
 
@@ -103,8 +108,7 @@ or start a new one.  This is the `θ + n` of the recursion before the weights ar
 "one seat per class" into "one seat per element". -/
 theorem card_seatings {n : ℕ} (ξ : ER n) :
     Nat.card (Option (Quotient ξ)) = blocks ξ + 1 := by
-  rw [Nat.card_option]
-  rfl
+  simp [blocks]
 
 /-! ### Transferring products from classes to fibres
 
@@ -141,12 +145,13 @@ theorem prod_quotient_ker {m : ℕ} {β : Type*} [DecidableEq β] (f : Fin m →
         | _ y => exact Quotient.sound (show f x = f y from h)
   · intro v hv
     obtain ⟨x, _, hx⟩ := Finset.mem_image.mp hv
-    exact ⟨Quotient.mk _ x, Finset.mem_univ _, hx.symm⟩
+    exact ⟨Quotient.mk _ x, Finset.mem_univ _, hx⟩
   · intro d _
     induction d using Quotient.inductionOn with
     | _ x =>
         show g (classSize (Setoid.ker f) (Quotient.mk _ x)) = _
         rw [classSize_ker]
+        rfl
 
 /-- Fibre cardinalities, as `Finset` cards rather than `Nat.card` of subtypes, which is what
 the transfer above consumes. -/
@@ -176,12 +181,13 @@ theorem image_extendMap_none {n : ℕ} (ξ : ER n) :
     Finset.univ.image (extendMap ξ none) = Finset.univ := by
   classical
   ext v
-  simp only [Finset.mem_image, Finset.mem_univ, iff_true, and_true]
+  simp only [Finset.mem_univ, iff_true]
   match v with
-  | none => exact ⟨Fin.last n, extendMap_last ξ none⟩
+  | none => exact Finset.mem_image.mpr ⟨Fin.last n, Finset.mem_univ _, extendMap_last ξ none⟩
   | some c =>
       obtain ⟨x, hx⟩ := quotient_mk_surjective ξ c
-      exact ⟨Fin.castLE (Nat.le_succ n) x, by rw [extendMap_castLE, hx]⟩
+      exact Finset.mem_image.mpr ⟨Fin.castLE (Nat.le_succ n) x, Finset.mem_univ _, by
+        rw [extendMap_castLE, hx]⟩
 
 theorem image_extendMap_some {n : ℕ} (ξ : ER n) (c : Quotient ξ) :
     Finset.univ.image (extendMap ξ (some c))
@@ -190,10 +196,10 @@ theorem image_extendMap_some {n : ℕ} (ξ : ER n) (c : Quotient ξ) :
   ext v
   simp only [Finset.mem_image, Finset.mem_univ, true_and]
   constructor
-  · rintro ⟨x, rfl⟩
+  · rintro ⟨x, -, rfl⟩
     rcases lt_or_ge (x : ℕ) n with hx | hx
     · exact ⟨Quotient.mk ξ ⟨x, hx⟩, (extendMap_of_lt ξ _ x hx).symm⟩
-    · rw [eq_last_of_not_lt (by omega), extendMap_last]
+    · rw [eq_last_of_not_lt (x := x) (by omega), extendMap_last]
       exact ⟨c, rfl⟩
   · rintro ⟨d, rfl⟩
     obtain ⟨x, hx⟩ := quotient_mk_surjective ξ d
@@ -267,7 +273,7 @@ theorem ewensWeight_extend_some {n : ℕ} (θ : ℝ) (ξ : ER n) (c : Quotient �
         omega⟩
       rw [hm]
       simp only [Nat.add_sub_cancel]
-      rw [show m + 1 + 1 - 1 = m + 1 from by omega, Nat.factorial_succ]
+      rw [Nat.factorial_succ]
       push_cast
       ring
     have herase : ∏ d ∈ Finset.univ.erase c,

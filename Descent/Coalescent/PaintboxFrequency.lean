@@ -48,7 +48,7 @@ noncomputable def colourIndicator (Z : ℕ → Ω → ℕ) (r i : ℕ) : Ω → 
 theorem measurable_colourIndicator [MeasurableSpace Ω] {Z : ℕ → Ω → ℕ} (hZ : ∀ i, Measurable (Z i))
     (r i : ℕ) : Measurable (colourIndicator Z r i) := by
   unfold colourIndicator
-  exact (measurable_const.ite (measurableSet_eq_fun (hZ i) measurable_const) measurable_const)
+  exact measurable_const.ite ((hZ i) (measurableSet_singleton r)) measurable_const
 
 theorem colourIndicator_le_one {Z : ℕ → Ω → ℕ} (r i : ℕ) (ω : Ω) :
     ‖colourIndicator Z r i ω‖ ≤ 1 := by
@@ -67,8 +67,7 @@ parameter and not merely some number. -/
 theorem integral_colourIndicator [MeasureSpace Ω] [IsProbabilityMeasure (ℙ : Measure Ω)]
     {Z : ℕ → Ω → ℕ} (hZ : ∀ i, Measurable (Z i)) (r i : ℕ) :
     ∫ ω, colourIndicator Z r i ω = (ℙ {ω | Z i ω = r}).toReal := by
-  have hmeas : MeasurableSet {ω | Z i ω = r} :=
-    measurableSet_eq_fun (hZ i) measurable_const
+  have hmeas : MeasurableSet {ω | Z i ω = r} := (hZ i) (measurableSet_singleton r)
   have hind : colourIndicator Z r i = Set.indicator {ω | Z i ω = r} (1 : Ω → ℝ) := by
     funext ω
     unfold colourIndicator
@@ -94,12 +93,12 @@ theorem tendsto_colourFrequency [MeasureSpace Ω] [IsProbabilityMeasure (ℙ : M
   have hindep' : Pairwise fun i j => IndepFun (colourIndicator Z r i) (colourIndicator Z r j) := by
     intro i j hij
     exact (hindep hij).comp
-      (measurable_const.ite (measurableSet_eq_fun measurable_id measurable_const) measurable_const)
-      (measurable_const.ite (measurableSet_eq_fun measurable_id measurable_const) measurable_const)
+      (measurable_const.ite (measurable_id (measurableSet_singleton r)) measurable_const)
+      (measurable_const.ite (measurable_id (measurableSet_singleton r)) measurable_const)
   have hident' : ∀ i, IdentDistrib (colourIndicator Z r i) (colourIndicator Z r 0) := by
     intro i
     exact (hident i).comp
-      (measurable_const.ite (measurableSet_eq_fun measurable_id measurable_const) measurable_const)
+      (measurable_const.ite (measurable_id (measurableSet_singleton r)) measurable_const)
   have hlaw := ProbabilityTheory.strong_law_ae (X := colourIndicator Z r)
     (integrable_colourIndicator hZ r 0) hindep' hident'
   filter_upwards [hlaw] with ω hω

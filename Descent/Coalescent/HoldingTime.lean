@@ -4,6 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Coalescent.Law
 import Mathlib.Analysis.SpecialFunctions.Integrals.Basic
 import Mathlib.MeasureTheory.Integral.ExpDecay
+import Mathlib.Analysis.SpecialFunctions.ImproperIntegrals
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
 import Mathlib.Tactic
 
 namespace Descent
@@ -40,7 +42,7 @@ deriving it; that second integral is not done here either.
 
 namespace Coalescent
 
-open MeasureTheory Set
+open MeasureTheory Set Nat
 
 /-- K-C (1.7): the sojourn density in a state with death rate `d`, as a density against
 Lebesgue measure.  Zero on `t ≤ 0` -- a sojourn is positive. -/
@@ -54,9 +56,8 @@ theorem integral_holdDensity {d : ℝ} (hd : 0 < d) :
   have hscale : ∫ t in Ioi (0 : ℝ), Real.exp (-(d * t))
       = d⁻¹ • ∫ x in Ioi (d * (0 : ℝ)), Real.exp (-x) :=
     integral_comp_mul_left_Ioi (fun x => Real.exp (-x)) 0 hd
-  rw [integral_const_mul, hscale]
-  rw [mul_zero, integral_exp_neg_Ioi]
-  rw [smul_eq_mul, mul_one]
+  rw [integral_const_mul, hscale, mul_zero, integral_exp_neg_Ioi, smul_eq_mul]
+  simp
   field_simp
 
 theorem holdDensity_integrable {d : ℝ} (hd : 0 < d) :
@@ -106,11 +107,11 @@ theorem integral_id_mul_exp_neg : ∫ x in Ioi (0 : ℝ), x * Real.exp (-x) = 1 
   have hgamma : Real.Gamma 2 = ∫ x in Ioi (0 : ℝ), Real.exp (-x) * x ^ ((2 : ℝ) - 1) :=
     Real.Gamma_eq_integral (by norm_num)
   have hone : Real.Gamma 2 = 1 := by
-    have h := Real.Gamma_nat_eq_factorial 1
-    norm_num at h
-    exact h
+    have h : Real.Gamma ((1 : ℕ) + 1) = ((Nat.factorial 1 : ℕ) : ℝ) :=
+      Real.Gamma_nat_eq_factorial 1
+    simpa using h
   rw [hone] at hgamma
-  rw [← hgamma]
+  rw [hgamma]
   refine setIntegral_congr_fun measurableSet_Ioi fun x hx => ?_
   rw [show (2 : ℝ) - 1 = 1 by norm_num, Real.rpow_one]
   ring
