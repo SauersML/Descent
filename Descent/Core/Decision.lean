@@ -854,4 +854,736 @@ theorem nriFromOperatingPoints_mem_Icc (old new : OperatingPoint)
 
 end OperatingPoint
 
+/-! ### What a discrimination level does to an operating point
+
+This is the join, and it is the only place in this file where a modelling commitment is
+made. Everything above is arithmetic on two probabilities; everything below is the
+demography-to-metric spine. They meet here.
+
+A sensitivity is not a function of `(Var S, Cov(S,Y), Var Y)`. Under a liability-threshold
+model it is `Φ` of a standardised threshold displaced by `√R²`, and `Core` has no `Φ` --
+the same wall `Core.Moments.aucArgument` meets and answers by writing the argument of the
+normal integral rather than a wrong closed form for it.
+
+The answer here is to name the ONE consequence of the distributional assumption that
+every clinical metric actually uses: a better discriminating score has a better operating
+point. Nothing below needs more than that, so nothing below assumes more than that. -/
+
+/-- **An operating-point law**: how a threshold rule's two coordinates respond to the
+score's discrimination.
+
+The two monotonicity fields are the content. They say that raising `R²` -- by any means,
+demographic or otherwise -- strictly improves both the fraction of cases called and the
+fraction of non-cases cleared, at the fixed threshold the law is about. That is what a
+liability-threshold model with a Gaussian link delivers, and it is what
+`Portability.ClinicalUtilityFairness.sensFromR2` and `specFromR2` prove of the Gaussian
+instance -- but it is strictly weaker than assuming the Gaussian, and every theorem below
+is quantified over ALL laws satisfying it.
+
+The fields are hypotheses of the structure rather than of each theorem for the same
+reason `PopGenParameters` carries its positivity proofs as fields: a constraint added
+once cannot be forgotten at a use site.
+
+Why a `ℝ → OperatingPoint` and not a `ScoreMoments → OperatingPoint`: the corpus's own
+minimality results say the second-moment metrics see the tuple only through the three
+numbers, and every one of them factors through `R²`. A law reading more of the tuple
+would be claiming the operating point depends on something `R²` does not capture, which
+is a modelling claim with no measurement behind it. -/
+structure OperatingPointLaw where
+  /-- The operating point a score with this much explained variance reaches. -/
+  point : ℝ → OperatingPoint
+  /-- More explained variance, more cases called. -/
+  sensitivity_strictMono : ∀ x y : ℝ, 0 ≤ x → x < y → y ≤ 1 →
+    (point x).sensitivity < (point y).sensitivity
+  /-- More explained variance, more non-cases cleared. -/
+  specificity_strictMono : ∀ x y : ℝ, 0 ≤ x → x < y → y ≤ 1 →
+    (point x).specificity < (point y).specificity
+  /-- What the law returns on the unit interval is an operating point a rule could have. -/
+  point_admissible : ∀ x : ℝ, 0 ≤ x → x ≤ 1 → (point x).Admissible
+
+/-- **The chance-calibrated point at a discrimination level**, both coordinates
+`(1 + R²)/2`: a coin flip at no discrimination, perfect at complete discrimination,
+linear between.
+
+This is a WITNESS and not a model. Nothing claims a real score behaves this way; what it
+does is make `OperatingPointLaw` inhabited, so that the theorems quantified over laws are
+statements about something rather than true and empty.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
+noncomputable def chanceCalibratedPoint (x : ℝ) : OperatingPoint where
+  sensitivity := midpoint 1 x
+  specificity := midpoint 1 x
+
+@[simp] theorem chanceCalibratedPoint_sensitivity (x : ℝ) :
+    (chanceCalibratedPoint x).sensitivity = midpoint 1 x := rfl
+
+@[simp] theorem chanceCalibratedPoint_specificity (x : ℝ) :
+    (chanceCalibratedPoint x).specificity = midpoint 1 x := rfl
+
+/-- **At no discrimination the chance-calibrated law is the coin flip**, which is the
+anchor that makes it the law it claims to be rather than an arbitrary increasing map. -/
+theorem chanceCalibratedPoint_at_zero :
+    chanceCalibratedPoint 0 = OperatingPoint.chance := by
+  unfold chanceCalibratedPoint OperatingPoint.chance midpoint
+  norm_num
+
+/-- **At complete discrimination it is the perfect rule.** The other anchor. -/
+theorem chanceCalibratedPoint_at_one :
+    chanceCalibratedPoint 1 = OperatingPoint.perfect := by
+  unfold chanceCalibratedPoint OperatingPoint.perfect midpoint
+  norm_num
+
+namespace OperatingPointLaw
+
+/-- **The class is inhabited.** A theorem quantified over an uninhabited structure is true
+and empty, and every spine theorem below is quantified over this one.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
+noncomputable def witness : OperatingPointLaw where
+  point := chanceCalibratedPoint
+  sensitivity_strictMono := by
+    intro x y _ hxy _
+    simp only [chanceCalibratedPoint_sensitivity]
+    unfold midpoint
+    linarith
+  specificity_strictMono := by
+    intro x y _ hxy _
+    simp only [chanceCalibratedPoint_specificity]
+    unfold midpoint
+    linarith
+  point_admissible := by
+    intro x hx hx1
+    refine { sensitivity_nonneg := ?_, sensitivity_le_one := ?_,
+      specificity_nonneg := ?_, specificity_le_one := ?_ } <;>
+      simp only [chanceCalibratedPoint_sensitivity, chanceCalibratedPoint_specificity] <;>
+      unfold midpoint <;> linarith
+
+/-! ### Every clinical metric inherits `R²`'s ordering
+
+Four theorems, and they are what the rest of the file is built on: each says a strictly
+higher `R²` gives a strictly better clinical number, under any law. Everything after this
+is a composition of one of these with a fact about a demography. -/
+
+/-- **A better discriminating score has a higher predictive value.**
+
+Both coordinates improve, so the numerator of the share rises and the competing
+false-positive term falls; the two `share` lemmas take one step each. -/
+theorem positivePredictiveValue_lt_of_r2_lt (L : OperatingPointLaw) (prevalence x y : ℝ)
+    (hπ : 0 < prevalence) (hπ1 : prevalence < 1)
+    (hx : 0 ≤ x) (hxy : x < y) (hy : y ≤ 1) :
+    (L.point x).positivePredictiveValue prevalence
+      < (L.point y).positivePredictiveValue prevalence := by
+  have hx1 : x ≤ 1 := by linarith
+  have hy0 : (0:ℝ) ≤ y := by linarith
+  have hs1 := (L.point_admissible x hx hx1).sensitivity_nonneg
+  have hq2 := (L.point_admissible y hy0 hy).specificity_le_one
+  have hslt := L.sensitivity_strictMono x y hx hxy hy
+  have hqlt := L.specificity_strictMono x y hx hxy hy
+  have hq1 : (L.point x).specificity < 1 := lt_of_lt_of_le hqlt hq2
+  have hs2 : 0 < (L.point y).sensitivity := lt_of_le_of_lt hs1 hslt
+  have hB₁ : (0:ℝ) < (1 - (L.point x).specificity) * (1 - prevalence) :=
+    mul_pos (by linarith) (by linarith)
+  have hB₂ : (0:ℝ) ≤ (1 - (L.point y).specificity) * (1 - prevalence) :=
+    mul_nonneg (by linarith) (by linarith)
+  have hBlt : (1 - (L.point y).specificity) * (1 - prevalence)
+      < (1 - (L.point x).specificity) * (1 - prevalence) :=
+    mul_lt_mul_of_pos_right (by linarith) (by linarith)
+  have hnum : (L.point x).sensitivity * prevalence
+      < (L.point y).sensitivity * prevalence := mul_lt_mul_of_pos_right hslt hπ
+  have hden : (0:ℝ) < (L.point y).sensitivity * prevalence := mul_pos hs2 hπ
+  have step1 := share_lt_share_of_lt_left ((L.point x).sensitivity * prevalence)
+    ((L.point y).sensitivity * prevalence)
+    ((1 - (L.point x).specificity) * (1 - prevalence))
+    (mul_nonneg hs1 (le_of_lt hπ)) hB₁ hnum
+  have step2 := share_lt_share_of_lt_right ((L.point y).sensitivity * prevalence)
+    ((1 - (L.point x).specificity) * (1 - prevalence))
+    ((1 - (L.point y).specificity) * (1 - prevalence))
+    hden (by linarith) hBlt
+  unfold OperatingPoint.positivePredictiveValue
+  exact lt_trans step1 step2
+
+/-- **A better discriminating score has a higher negative predictive value.** The mirror
+theorem: the specificity carries the numerator here and the sensitivity the competing
+term, and both move the right way. -/
+theorem negativePredictiveValue_lt_of_r2_lt (L : OperatingPointLaw) (prevalence x y : ℝ)
+    (hπ : 0 < prevalence) (hπ1 : prevalence < 1)
+    (hx : 0 ≤ x) (hxy : x < y) (hy : y ≤ 1) :
+    (L.point x).negativePredictiveValue prevalence
+      < (L.point y).negativePredictiveValue prevalence := by
+  have hx1 : x ≤ 1 := by linarith
+  have hy0 : (0:ℝ) ≤ y := by linarith
+  have hq1 := (L.point_admissible x hx hx1).specificity_nonneg
+  have hs2 := (L.point_admissible y hy0 hy).sensitivity_le_one
+  have hslt := L.sensitivity_strictMono x y hx hxy hy
+  have hqlt := L.specificity_strictMono x y hx hxy hy
+  have hs1 : (L.point x).sensitivity < 1 := lt_of_lt_of_le hslt hs2
+  have hq2 : 0 < (L.point y).specificity := lt_of_le_of_lt hq1 hqlt
+  have hB₁ : (0:ℝ) < (1 - (L.point x).sensitivity) * prevalence :=
+    mul_pos (by linarith) hπ
+  have hB₂ : (0:ℝ) ≤ (1 - (L.point y).sensitivity) * prevalence :=
+    mul_nonneg (by linarith) (by linarith)
+  have hBlt : (1 - (L.point y).sensitivity) * prevalence
+      < (1 - (L.point x).sensitivity) * prevalence :=
+    mul_lt_mul_of_pos_right (by linarith) hπ
+  have hnum : (L.point x).specificity * (1 - prevalence)
+      < (L.point y).specificity * (1 - prevalence) :=
+    mul_lt_mul_of_pos_right hqlt (by linarith)
+  have hden : (0:ℝ) < (L.point y).specificity * (1 - prevalence) :=
+    mul_pos hq2 (by linarith)
+  have step1 := share_lt_share_of_lt_left ((L.point x).specificity * (1 - prevalence))
+    ((L.point y).specificity * (1 - prevalence))
+    ((1 - (L.point x).sensitivity) * prevalence)
+    (mul_nonneg hq1 (by linarith)) hB₁ hnum
+  have step2 := share_lt_share_of_lt_right ((L.point y).specificity * (1 - prevalence))
+    ((1 - (L.point x).sensitivity) * prevalence)
+    ((1 - (L.point y).sensitivity) * prevalence)
+    hden (by linarith) hBlt
+  unfold OperatingPoint.negativePredictiveValue
+  exact lt_trans step1 step2
+
+/-- **A better discriminating score has a higher net benefit**, at any threshold in the
+interior where a false positive costs something. -/
+theorem netBenefit_lt_of_r2_lt (L : OperatingPointLaw) (prevalence t x y : ℝ)
+    (hπ : 0 < prevalence) (hπ1 : prevalence < 1) (ht : 0 < t) (ht1 : t < 1)
+    (hx : 0 ≤ x) (hxy : x < y) (hy : y ≤ 1) :
+    (L.point x).netBenefit prevalence t < (L.point y).netBenefit prevalence t := by
+  have hslt := L.sensitivity_strictMono x y hx hxy hy
+  have hqlt := L.specificity_strictMono x y hx hxy hy
+  have hodds := OperatingPoint.thresholdOdds_pos t ht ht1
+  have hc : (0:ℝ) < (1 - prevalence) * OperatingPoint.thresholdOdds t :=
+    mul_pos (by linarith) hodds
+  have h1 : prevalence * (L.point x).sensitivity
+      < prevalence * (L.point y).sensitivity := mul_lt_mul_of_pos_left hslt hπ
+  unfold OperatingPoint.netBenefit
+  nlinarith [mul_pos hc (sub_pos.mpr hqlt)]
+
+/-- **Deploying a worse discriminating score reclassifies patients the wrong way.**
+
+The reclassification index between the two operating points is strictly negative: the
+rule loses cases AND gains false positives, so both halves of the index are negative and
+neither can offset the other. This is the statement a decision-curve paper makes and the
+one the corpus could not previously reach from a demography. -/
+theorem nri_neg_of_r2_lt (L : OperatingPointLaw) (x y : ℝ)
+    (hx : 0 ≤ x) (hxy : x < y) (hy : y ≤ 1) :
+    OperatingPoint.nriFromOperatingPoints (L.point y) (L.point x) < 0 :=
+  OperatingPoint.nriFromOperatingPoints_neg (L.point y) (L.point x)
+    (L.sensitivity_strictMono x y hx hxy hy)
+    (le_of_lt (L.specificity_strictMono x y hx hxy hy))
+
+end OperatingPointLaw
+
+/-! ### The moment tuple reaches the clinical metrics
+
+Two admissibility facts about `momentsUnderDrift`, restated here because every theorem in
+the rest of this file needs them and `Core.Moments` proves them inline at each use. -/
+
+/-- **The drift tuple is admissible below complete differentiation.** -/
+theorem momentsUnderDrift_admissible (V_A V_E f : ℝ) (hV : 0 < V_A) (hE : 0 < V_E)
+    (hf : f < 1) : (ScoreMoments.momentsUnderDrift V_A V_E f).Admissible := by
+  refine { scoreVariance_pos := ?_, outcomeVariance_pos := ?_, cauchy_schwarz := ?_ } <;>
+    unfold ScoreMoments.momentsUnderDrift retainedFraction <;> simp
+  · nlinarith
+  · nlinarith
+  · nlinarith [sq_nonneg ((1 - f) * V_A), mul_nonneg (le_of_lt hV) (le_of_lt hE)]
+
+/-- **And its `R²` is strictly below one**, on a trait with environmental variance. The
+strict bound the law's monotonicity fields need at the upper end. -/
+theorem r2_momentsUnderDrift_lt_one (V_A V_E f : ℝ) (hV : 0 < V_A) (hE : 0 < V_E)
+    (hf : f < 1) : (ScoreMoments.momentsUnderDrift V_A V_E f).r2 < 1 := by
+  rw [ScoreMoments.r2_momentsUnderDrift V_A V_E f hV (le_of_lt hE) hf]
+  unfold share retainedFraction
+  rw [div_lt_one (by nlinarith)]
+  linarith
+
+/-- **The `R²` of a drift tuple is non-negative.** -/
+theorem r2_momentsUnderDrift_nonneg (V_A V_E f : ℝ) (hV : 0 < V_A) (hE : 0 < V_E)
+    (hf : f < 1) : 0 ≤ (ScoreMoments.momentsUnderDrift V_A V_E f).r2 :=
+  (ScoreMoments.r2_mem_unit _ (momentsUnderDrift_admissible V_A V_E f hV hE hf)).1
+
+namespace OperatingPointLaw
+
+/-- **The predictive value a moment tuple produces**, at a law, a prevalence and the
+tuple's own discrimination. The clinical counterpart of `ScoreMoments.r2`.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
+noncomputable def momentPPV (L : OperatingPointLaw) (m : ScoreMoments) (prevalence : ℝ) : ℝ :=
+  (L.point m.r2).positivePredictiveValue prevalence
+
+/-- **The negative predictive value a moment tuple produces.**
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
+noncomputable def momentNPV (L : OperatingPointLaw) (m : ScoreMoments) (prevalence : ℝ) : ℝ :=
+  (L.point m.r2).negativePredictiveValue prevalence
+
+/-- **The net benefit a moment tuple produces**, at a decision threshold.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
+noncomputable def momentNetBenefit (L : OperatingPointLaw) (m : ScoreMoments)
+    (prevalence t : ℝ) : ℝ :=
+  (L.point m.r2).netBenefit prevalence t
+
+/-- **The precision a moment tuple produces.**
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
+noncomputable def momentPrecision (L : OperatingPointLaw) (m : ScoreMoments)
+    (prevalence : ℝ) : ℝ :=
+  (L.point m.r2).precision prevalence
+
+/-- **The recall a moment tuple produces**, which does not see the prevalence at all.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
+noncomputable def momentRecall (L : OperatingPointLaw) (m : ScoreMoments) : ℝ :=
+  (L.point m.r2).recallRate
+
+/-- **Precision at a tuple is the predictive value at that tuple.** -/
+@[simp] theorem momentPrecision_eq (L : OperatingPointLaw) (m : ScoreMoments)
+    (prevalence : ℝ) : L.momentPrecision m prevalence = L.momentPPV m prevalence := rfl
+
+/-- **Recall at a tuple is the sensitivity the law gives its `R²`.** -/
+@[simp] theorem momentRecall_eq (L : OperatingPointLaw) (m : ScoreMoments) :
+    L.momentRecall m = (L.point m.r2).sensitivity := rfl
+
+/-- **More differentiation, a lower predictive value.** The chain carried into the
+coordinate a patient is actually told, at the level of the tuple. -/
+theorem momentPPV_momentsUnderDrift_anti (L : OperatingPointLaw)
+    (V_A V_E f₁ f₂ prevalence : ℝ) (hπ : 0 < prevalence) (hπ1 : prevalence < 1)
+    (hV : 0 < V_A) (hE : 0 < V_E) (h1 : f₁ < f₂) (h2 : f₂ < 1) :
+    L.momentPPV (ScoreMoments.momentsUnderDrift V_A V_E f₂) prevalence
+      < L.momentPPV (ScoreMoments.momentsUnderDrift V_A V_E f₁) prevalence :=
+  L.positivePredictiveValue_lt_of_r2_lt prevalence _ _ hπ hπ1
+    (r2_momentsUnderDrift_nonneg V_A V_E f₂ hV hE h2)
+    (ScoreMoments.r2_momentsUnderDrift_anti V_A V_E f₁ f₂ hV hE h1 h2)
+    (le_of_lt (r2_momentsUnderDrift_lt_one V_A V_E f₁ hV hE (by linarith)))
+
+/-- **More differentiation, a lower negative predictive value.** -/
+theorem momentNPV_momentsUnderDrift_anti (L : OperatingPointLaw)
+    (V_A V_E f₁ f₂ prevalence : ℝ) (hπ : 0 < prevalence) (hπ1 : prevalence < 1)
+    (hV : 0 < V_A) (hE : 0 < V_E) (h1 : f₁ < f₂) (h2 : f₂ < 1) :
+    L.momentNPV (ScoreMoments.momentsUnderDrift V_A V_E f₂) prevalence
+      < L.momentNPV (ScoreMoments.momentsUnderDrift V_A V_E f₁) prevalence :=
+  L.negativePredictiveValue_lt_of_r2_lt prevalence _ _ hπ hπ1
+    (r2_momentsUnderDrift_nonneg V_A V_E f₂ hV hE h2)
+    (ScoreMoments.r2_momentsUnderDrift_anti V_A V_E f₁ f₂ hV hE h1 h2)
+    (le_of_lt (r2_momentsUnderDrift_lt_one V_A V_E f₁ hV hE (by linarith)))
+
+/-- **More differentiation, a lower net benefit.** The decision-curve coordinate, carried
+by the same chain. -/
+theorem momentNetBenefit_momentsUnderDrift_anti (L : OperatingPointLaw)
+    (V_A V_E f₁ f₂ prevalence t : ℝ) (hπ : 0 < prevalence) (hπ1 : prevalence < 1)
+    (ht : 0 < t) (ht1 : t < 1)
+    (hV : 0 < V_A) (hE : 0 < V_E) (h1 : f₁ < f₂) (h2 : f₂ < 1) :
+    L.momentNetBenefit (ScoreMoments.momentsUnderDrift V_A V_E f₂) prevalence t
+      < L.momentNetBenefit (ScoreMoments.momentsUnderDrift V_A V_E f₁) prevalence t :=
+  L.netBenefit_lt_of_r2_lt prevalence t _ _ hπ hπ1 ht ht1
+    (r2_momentsUnderDrift_nonneg V_A V_E f₂ hV hE h2)
+    (ScoreMoments.r2_momentsUnderDrift_anti V_A V_E f₁ f₂ hV hE h1 h2)
+    (le_of_lt (r2_momentsUnderDrift_lt_one V_A V_E f₁ hV hE (by linarith)))
+
+/-- **Recall falls with differentiation too**, which is the precision-recall curve moving
+as a whole rather than trading one axis against the other. A deployment that loses
+discrimination is not buying recall with precision; it is losing both. -/
+theorem momentRecall_momentsUnderDrift_anti (L : OperatingPointLaw) (V_A V_E f₁ f₂ : ℝ)
+    (hV : 0 < V_A) (hE : 0 < V_E) (h1 : f₁ < f₂) (h2 : f₂ < 1) :
+    L.momentRecall (ScoreMoments.momentsUnderDrift V_A V_E f₂)
+      < L.momentRecall (ScoreMoments.momentsUnderDrift V_A V_E f₁) :=
+  L.sensitivity_strictMono _ _
+    (r2_momentsUnderDrift_nonneg V_A V_E f₂ hV hE h2)
+    (ScoreMoments.r2_momentsUnderDrift_anti V_A V_E f₁ f₂ hV hE h1 h2)
+    (le_of_lt (r2_momentsUnderDrift_lt_one V_A V_E f₁ hV hE (by linarith)))
+
+/-- **Three metrics, three behaviours, one differentiation.**
+
+`Core.Moments.drift_moves_r2_alone` is the finding that the calibration slope and the mean
+squared error are blind to drift while `R²` collapses. This is the same statement with the
+clinical half attached: at a differentiation where the slope has not moved and the mean
+squared error has not moved, the predictive value HAS fallen, the net benefit HAS fallen,
+and the reclassification index is strictly negative.
+
+A deployment audited on calibration and error reports two perfectly stable numbers while
+patients are being told a materially worse predictive value. That conjunction is the
+claim, which is why it is one theorem. -/
+theorem drift_moves_the_clinic_and_not_the_calibration (L : OperatingPointLaw)
+    (V_A V_E f prevalence t : ℝ) (hπ : 0 < prevalence) (hπ1 : prevalence < 1)
+    (ht : 0 < t) (ht1 : t < 1) (hV : 0 < V_A) (hE : 0 < V_E) (hf0 : 0 < f) (hf : f < 1) :
+    (ScoreMoments.momentsUnderDrift V_A V_E f).calibrationSlope
+        = (ScoreMoments.momentsUnderDrift V_A V_E 0).calibrationSlope ∧
+    (ScoreMoments.momentsUnderDrift V_A V_E f).mse
+        = (ScoreMoments.momentsUnderDrift V_A V_E 0).mse ∧
+    L.momentPPV (ScoreMoments.momentsUnderDrift V_A V_E f) prevalence
+        < L.momentPPV (ScoreMoments.momentsUnderDrift V_A V_E 0) prevalence ∧
+    L.momentNetBenefit (ScoreMoments.momentsUnderDrift V_A V_E f) prevalence t
+        < L.momentNetBenefit (ScoreMoments.momentsUnderDrift V_A V_E 0) prevalence t := by
+  refine ⟨?_, ?_, ?_, ?_⟩
+  · rw [ScoreMoments.calibrationSlope_momentsUnderDrift V_A V_E f hV hf,
+      ScoreMoments.calibrationSlope_momentsUnderDrift V_A V_E 0 hV (by norm_num)]
+  · exact ScoreMoments.mse_momentsUnderDrift_const V_A V_E f 0
+  · exact momentPPV_momentsUnderDrift_anti L V_A V_E 0 f prevalence hπ hπ1 hV hE hf0 hf
+  · exact momentNetBenefit_momentsUnderDrift_anti L V_A V_E 0 f prevalence t hπ hπ1 ht ht1
+      hV hE hf0 hf
+
+/-! ### The full chain: a demographic history reaches the clinic
+
+`(Nₑ, m, μ) → F_ST → moments → R² → operating point → predictive value`. Six named maps.
+The corpus had the first four and stopped. -/
+
+/-- **The predictive value a demographic history produces.**
+
+The composition this whole file exists for: what a patient in the target population is
+told, as a function of the effective size, the migration rate and the mutation rate --
+rather than of a sensitivity, a specificity and a prevalence supplied by hand.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
+noncomputable def deployedPPV (L : OperatingPointLaw) (p : PopGenParameters)
+    (V_E prevalence : ℝ) : ℝ :=
+  (L.point (ScoreMoments.deployedR2 p V_E)).positivePredictiveValue prevalence
+
+/-- **The negative predictive value a demographic history produces.**
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
+noncomputable def deployedNPV (L : OperatingPointLaw) (p : PopGenParameters)
+    (V_E prevalence : ℝ) : ℝ :=
+  (L.point (ScoreMoments.deployedR2 p V_E)).negativePredictiveValue prevalence
+
+/-- **The net benefit a demographic history produces**, at a decision threshold.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
+noncomputable def deployedNetBenefit (L : OperatingPointLaw) (p : PopGenParameters)
+    (V_E prevalence t : ℝ) : ℝ :=
+  (L.point (ScoreMoments.deployedR2 p V_E)).netBenefit prevalence t
+
+/-- **The precision a demographic history produces.**
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
+noncomputable def deployedPrecision (L : OperatingPointLaw) (p : PopGenParameters)
+    (V_E prevalence : ℝ) : ℝ :=
+  (L.point (ScoreMoments.deployedR2 p V_E)).precision prevalence
+
+/-- **The recall a demographic history produces.**
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
+noncomputable def deployedRecall (L : OperatingPointLaw) (p : PopGenParameters)
+    (V_E : ℝ) : ℝ :=
+  (L.point (ScoreMoments.deployedR2 p V_E)).recallRate
+
+/-- **The reclassification index of deploying across a differentiation.**
+
+The source rule is the one the score's own population reaches -- the operating point at
+`F_ST = 0` -- and the deployed rule is the one the target reaches. The index is what a
+paper would report for the move from the first to the second, and the theorems below give
+its sign.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
+noncomputable def deployedNRI (L : OperatingPointLaw) (p : PopGenParameters)
+    (V_E : ℝ) : ℝ :=
+  OperatingPoint.nriFromOperatingPoints
+    (L.point (ScoreMoments.momentsUnderDrift p.V_A V_E 0).r2)
+    (L.point (ScoreMoments.deployedR2 p V_E))
+
+/-- **Deployed precision is the deployed predictive value.** -/
+@[simp] theorem deployedPrecision_eq (L : OperatingPointLaw) (p : PopGenParameters)
+    (V_E prevalence : ℝ) :
+    L.deployedPrecision p V_E prevalence = L.deployedPPV p V_E prevalence := rfl
+
+/-- **The single chaining lemma.**
+
+Every demographic monotonicity below is this composed with a fact about `deployedR2`.
+Stated separately so that a change in how `Core.Moments` proves those facts is a
+one-line repair at each call site rather than a rewrite of each proof. -/
+theorem deployedPPV_lt_of_deployedR2_lt (L : OperatingPointLaw) (p q : PopGenParameters)
+    (V_E prevalence : ℝ) (hπ : 0 < prevalence) (hπ1 : prevalence < 1) (hE : 0 ≤ V_E)
+    (hp : 0 < p.mu + p.mig) (hq : 0 < q.mu + q.mig)
+    (h : ScoreMoments.deployedR2 p V_E < ScoreMoments.deployedR2 q V_E) :
+    L.deployedPPV p V_E prevalence < L.deployedPPV q V_E prevalence :=
+  L.positivePredictiveValue_lt_of_r2_lt prevalence _ _ hπ hπ1
+    (ScoreMoments.deployedR2_mem_unit p V_E hE hp).1 h
+    (ScoreMoments.deployedR2_mem_unit q V_E hE hq).2
+
+/-- **The chaining lemma for the negative predictive value.** -/
+theorem deployedNPV_lt_of_deployedR2_lt (L : OperatingPointLaw) (p q : PopGenParameters)
+    (V_E prevalence : ℝ) (hπ : 0 < prevalence) (hπ1 : prevalence < 1) (hE : 0 ≤ V_E)
+    (hp : 0 < p.mu + p.mig) (hq : 0 < q.mu + q.mig)
+    (h : ScoreMoments.deployedR2 p V_E < ScoreMoments.deployedR2 q V_E) :
+    L.deployedNPV p V_E prevalence < L.deployedNPV q V_E prevalence :=
+  L.negativePredictiveValue_lt_of_r2_lt prevalence _ _ hπ hπ1
+    (ScoreMoments.deployedR2_mem_unit p V_E hE hp).1 h
+    (ScoreMoments.deployedR2_mem_unit q V_E hE hq).2
+
+/-- **The chaining lemma for net benefit.** -/
+theorem deployedNetBenefit_lt_of_deployedR2_lt (L : OperatingPointLaw)
+    (p q : PopGenParameters) (V_E prevalence t : ℝ)
+    (hπ : 0 < prevalence) (hπ1 : prevalence < 1) (ht : 0 < t) (ht1 : t < 1) (hE : 0 ≤ V_E)
+    (hp : 0 < p.mu + p.mig) (hq : 0 < q.mu + q.mig)
+    (h : ScoreMoments.deployedR2 p V_E < ScoreMoments.deployedR2 q V_E) :
+    L.deployedNetBenefit p V_E prevalence t < L.deployedNetBenefit q V_E prevalence t :=
+  L.netBenefit_lt_of_r2_lt prevalence t _ _ hπ hπ1 ht ht1
+    (ScoreMoments.deployedR2_mem_unit p V_E hE hp).1 h
+    (ScoreMoments.deployedR2_mem_unit q V_E hE hq).2
+
+/-- **The chaining lemma for recall.** -/
+theorem deployedRecall_lt_of_deployedR2_lt (L : OperatingPointLaw) (p q : PopGenParameters)
+    (V_E : ℝ) (hE : 0 ≤ V_E) (hp : 0 < p.mu + p.mig) (hq : 0 < q.mu + q.mig)
+    (h : ScoreMoments.deployedR2 p V_E < ScoreMoments.deployedR2 q V_E) :
+    L.deployedRecall p V_E < L.deployedRecall q V_E :=
+  L.sensitivity_strictMono _ _ (ScoreMoments.deployedR2_mem_unit p V_E hE hp).1 h
+    (ScoreMoments.deployedR2_mem_unit q V_E hE hq).2
+
+/-! ### The three demographic parameters, four metrics each -/
+
+/-- **More migration, a higher predictive value.** The end-to-end law in the coordinate a
+patient is told: raise the migration rate between the populations and the number on the
+report goes up, with every step -- equilibrium, moments, `R²`, operating point, Bayes --
+a named map rather than an assumption. -/
+theorem deployedPPV_mono_in_migration (L : OperatingPointLaw) (p q : PopGenParameters)
+    (V_E prevalence : ℝ) (hπ : 0 < prevalence) (hπ1 : prevalence < 1) (hE : 0 < V_E)
+    (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hV : p.V_A = q.V_A)
+    (hlt : p.mig < q.mig) (hflow : 0 < p.mu + p.mig) :
+    L.deployedPPV p V_E prevalence < L.deployedPPV q V_E prevalence := by
+  have hq : 0 < q.mu + q.mig := by rw [← hmu]; linarith
+  exact deployedPPV_lt_of_deployedR2_lt L p q V_E prevalence hπ hπ1 (le_of_lt hE) hflow hq
+    (ScoreMoments.deployedR2_mono_in_migration p q V_E hE hNe hmu hV hlt hflow)
+
+/-- **More mutation, a higher predictive value.** -/
+theorem deployedPPV_mono_in_mutation (L : OperatingPointLaw) (p q : PopGenParameters)
+    (V_E prevalence : ℝ) (hπ : 0 < prevalence) (hπ1 : prevalence < 1) (hE : 0 < V_E)
+    (hNe : p.Ne = q.Ne) (hmig : p.mig = q.mig) (hV : p.V_A = q.V_A)
+    (hlt : p.mu < q.mu) (hflow : 0 < p.mu + p.mig) :
+    L.deployedPPV p V_E prevalence < L.deployedPPV q V_E prevalence := by
+  have hq : 0 < q.mu + q.mig := by rw [← hmig]; linarith
+  exact deployedPPV_lt_of_deployedR2_lt L p q V_E prevalence hπ hπ1 (le_of_lt hE) hflow hq
+    (ScoreMoments.deployedR2_mono_in_mutation p q V_E hE hNe hmig hV hlt hflow)
+
+/-- **A larger effective size, a higher predictive value.** -/
+theorem deployedPPV_mono_in_Ne (L : OperatingPointLaw) (p q : PopGenParameters)
+    (V_E prevalence : ℝ) (hπ : 0 < prevalence) (hπ1 : prevalence < 1) (hE : 0 < V_E)
+    (hmu : p.mu = q.mu) (hmig : p.mig = q.mig) (hV : p.V_A = q.V_A)
+    (hlt : p.Ne < q.Ne) (hflow2 : 0 < p.mu + 2 * p.mig) (hflow : 0 < p.mu + p.mig) :
+    L.deployedPPV p V_E prevalence < L.deployedPPV q V_E prevalence := by
+  have hq : 0 < q.mu + q.mig := by rw [← hmu, ← hmig]; exact hflow
+  exact deployedPPV_lt_of_deployedR2_lt L p q V_E prevalence hπ hπ1 (le_of_lt hE) hflow hq
+    (ScoreMoments.deployedR2_mono_in_Ne p q V_E hE hmu hmig hV hlt hflow2 hflow)
+
+/-- **More migration, a higher negative predictive value.** -/
+theorem deployedNPV_mono_in_migration (L : OperatingPointLaw) (p q : PopGenParameters)
+    (V_E prevalence : ℝ) (hπ : 0 < prevalence) (hπ1 : prevalence < 1) (hE : 0 < V_E)
+    (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hV : p.V_A = q.V_A)
+    (hlt : p.mig < q.mig) (hflow : 0 < p.mu + p.mig) :
+    L.deployedNPV p V_E prevalence < L.deployedNPV q V_E prevalence := by
+  have hq : 0 < q.mu + q.mig := by rw [← hmu]; linarith
+  exact deployedNPV_lt_of_deployedR2_lt L p q V_E prevalence hπ hπ1 (le_of_lt hE) hflow hq
+    (ScoreMoments.deployedR2_mono_in_migration p q V_E hE hNe hmu hV hlt hflow)
+
+/-- **More mutation, a higher negative predictive value.** -/
+theorem deployedNPV_mono_in_mutation (L : OperatingPointLaw) (p q : PopGenParameters)
+    (V_E prevalence : ℝ) (hπ : 0 < prevalence) (hπ1 : prevalence < 1) (hE : 0 < V_E)
+    (hNe : p.Ne = q.Ne) (hmig : p.mig = q.mig) (hV : p.V_A = q.V_A)
+    (hlt : p.mu < q.mu) (hflow : 0 < p.mu + p.mig) :
+    L.deployedNPV p V_E prevalence < L.deployedNPV q V_E prevalence := by
+  have hq : 0 < q.mu + q.mig := by rw [← hmig]; linarith
+  exact deployedNPV_lt_of_deployedR2_lt L p q V_E prevalence hπ hπ1 (le_of_lt hE) hflow hq
+    (ScoreMoments.deployedR2_mono_in_mutation p q V_E hE hNe hmig hV hlt hflow)
+
+/-- **A larger effective size, a higher negative predictive value.** -/
+theorem deployedNPV_mono_in_Ne (L : OperatingPointLaw) (p q : PopGenParameters)
+    (V_E prevalence : ℝ) (hπ : 0 < prevalence) (hπ1 : prevalence < 1) (hE : 0 < V_E)
+    (hmu : p.mu = q.mu) (hmig : p.mig = q.mig) (hV : p.V_A = q.V_A)
+    (hlt : p.Ne < q.Ne) (hflow2 : 0 < p.mu + 2 * p.mig) (hflow : 0 < p.mu + p.mig) :
+    L.deployedNPV p V_E prevalence < L.deployedNPV q V_E prevalence := by
+  have hq : 0 < q.mu + q.mig := by rw [← hmu, ← hmig]; exact hflow
+  exact deployedNPV_lt_of_deployedR2_lt L p q V_E prevalence hπ hπ1 (le_of_lt hE) hflow hq
+    (ScoreMoments.deployedR2_mono_in_Ne p q V_E hE hmu hmig hV hlt hflow2 hflow)
+
+/-- **More migration, a higher net benefit.** The decision-curve coordinate moved by a
+demographic parameter: whether deploying the score is worth doing at a given threshold
+depends on the migration history of the two populations. -/
+theorem deployedNetBenefit_mono_in_migration (L : OperatingPointLaw)
+    (p q : PopGenParameters) (V_E prevalence t : ℝ)
+    (hπ : 0 < prevalence) (hπ1 : prevalence < 1) (ht : 0 < t) (ht1 : t < 1) (hE : 0 < V_E)
+    (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hV : p.V_A = q.V_A)
+    (hlt : p.mig < q.mig) (hflow : 0 < p.mu + p.mig) :
+    L.deployedNetBenefit p V_E prevalence t < L.deployedNetBenefit q V_E prevalence t := by
+  have hq : 0 < q.mu + q.mig := by rw [← hmu]; linarith
+  exact deployedNetBenefit_lt_of_deployedR2_lt L p q V_E prevalence t hπ hπ1 ht ht1
+    (le_of_lt hE) hflow hq
+    (ScoreMoments.deployedR2_mono_in_migration p q V_E hE hNe hmu hV hlt hflow)
+
+/-- **More mutation, a higher net benefit.** -/
+theorem deployedNetBenefit_mono_in_mutation (L : OperatingPointLaw)
+    (p q : PopGenParameters) (V_E prevalence t : ℝ)
+    (hπ : 0 < prevalence) (hπ1 : prevalence < 1) (ht : 0 < t) (ht1 : t < 1) (hE : 0 < V_E)
+    (hNe : p.Ne = q.Ne) (hmig : p.mig = q.mig) (hV : p.V_A = q.V_A)
+    (hlt : p.mu < q.mu) (hflow : 0 < p.mu + p.mig) :
+    L.deployedNetBenefit p V_E prevalence t < L.deployedNetBenefit q V_E prevalence t := by
+  have hq : 0 < q.mu + q.mig := by rw [← hmig]; linarith
+  exact deployedNetBenefit_lt_of_deployedR2_lt L p q V_E prevalence t hπ hπ1 ht ht1
+    (le_of_lt hE) hflow hq
+    (ScoreMoments.deployedR2_mono_in_mutation p q V_E hE hNe hmig hV hlt hflow)
+
+/-- **A larger effective size, a higher net benefit.** -/
+theorem deployedNetBenefit_mono_in_Ne (L : OperatingPointLaw) (p q : PopGenParameters)
+    (V_E prevalence t : ℝ)
+    (hπ : 0 < prevalence) (hπ1 : prevalence < 1) (ht : 0 < t) (ht1 : t < 1) (hE : 0 < V_E)
+    (hmu : p.mu = q.mu) (hmig : p.mig = q.mig) (hV : p.V_A = q.V_A)
+    (hlt : p.Ne < q.Ne) (hflow2 : 0 < p.mu + 2 * p.mig) (hflow : 0 < p.mu + p.mig) :
+    L.deployedNetBenefit p V_E prevalence t < L.deployedNetBenefit q V_E prevalence t := by
+  have hq : 0 < q.mu + q.mig := by rw [← hmu, ← hmig]; exact hflow
+  exact deployedNetBenefit_lt_of_deployedR2_lt L p q V_E prevalence t hπ hπ1 ht ht1
+    (le_of_lt hE) hflow hq
+    (ScoreMoments.deployedR2_mono_in_Ne p q V_E hE hmu hmig hV hlt hflow2 hflow)
+
+/-- **More migration, a higher recall.** -/
+theorem deployedRecall_mono_in_migration (L : OperatingPointLaw) (p q : PopGenParameters)
+    (V_E : ℝ) (hE : 0 < V_E) (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hV : p.V_A = q.V_A)
+    (hlt : p.mig < q.mig) (hflow : 0 < p.mu + p.mig) :
+    L.deployedRecall p V_E < L.deployedRecall q V_E := by
+  have hq : 0 < q.mu + q.mig := by rw [← hmu]; linarith
+  exact deployedRecall_lt_of_deployedR2_lt L p q V_E (le_of_lt hE) hflow hq
+    (ScoreMoments.deployedR2_mono_in_migration p q V_E hE hNe hmu hV hlt hflow)
+
+/-- **More mutation, a higher recall.** -/
+theorem deployedRecall_mono_in_mutation (L : OperatingPointLaw) (p q : PopGenParameters)
+    (V_E : ℝ) (hE : 0 < V_E) (hNe : p.Ne = q.Ne) (hmig : p.mig = q.mig)
+    (hV : p.V_A = q.V_A) (hlt : p.mu < q.mu) (hflow : 0 < p.mu + p.mig) :
+    L.deployedRecall p V_E < L.deployedRecall q V_E := by
+  have hq : 0 < q.mu + q.mig := by rw [← hmig]; linarith
+  exact deployedRecall_lt_of_deployedR2_lt L p q V_E (le_of_lt hE) hflow hq
+    (ScoreMoments.deployedR2_mono_in_mutation p q V_E hE hNe hmig hV hlt hflow)
+
+/-- **A larger effective size, a higher recall.** -/
+theorem deployedRecall_mono_in_Ne (L : OperatingPointLaw) (p q : PopGenParameters)
+    (V_E : ℝ) (hE : 0 < V_E) (hmu : p.mu = q.mu) (hmig : p.mig = q.mig)
+    (hV : p.V_A = q.V_A) (hlt : p.Ne < q.Ne) (hflow2 : 0 < p.mu + 2 * p.mig)
+    (hflow : 0 < p.mu + p.mig) :
+    L.deployedRecall p V_E < L.deployedRecall q V_E := by
+  have hq : 0 < q.mu + q.mig := by rw [← hmu, ← hmig]; exact hflow
+  exact deployedRecall_lt_of_deployedR2_lt L p q V_E (le_of_lt hE) hflow hq
+    (ScoreMoments.deployedR2_mono_in_Ne p q V_E hE hmu hmig hV hlt hflow2 hflow)
+
+/-! ### Bounds and boundaries -/
+
+/-- **The deployed predictive value lies in the unit interval at every history**, away
+from the degenerate denominator. -/
+theorem deployedPPV_mem_unit (L : OperatingPointLaw) (p : PopGenParameters)
+    (V_E prevalence : ℝ) (hE : 0 ≤ V_E) (hflow : 0 < p.mu + p.mig)
+    (hπ0 : 0 ≤ prevalence) (hπ1 : prevalence ≤ 1)
+    (hpos : 0 < (L.point (ScoreMoments.deployedR2 p V_E)).sensitivity * prevalence
+      + (1 - (L.point (ScoreMoments.deployedR2 p V_E)).specificity) * (1 - prevalence)) :
+    0 ≤ L.deployedPPV p V_E prevalence ∧ L.deployedPPV p V_E prevalence ≤ 1 :=
+  OperatingPoint.positivePredictiveValue_mem_unit _ prevalence
+    (L.point_admissible _ (ScoreMoments.deployedR2_mem_unit p V_E hE hflow).1
+      (ScoreMoments.deployedR2_mem_unit p V_E hE hflow).2) hπ0 hπ1 hpos
+
+/-- **And so does the deployed negative predictive value.** -/
+theorem deployedNPV_mem_unit (L : OperatingPointLaw) (p : PopGenParameters)
+    (V_E prevalence : ℝ) (hE : 0 ≤ V_E) (hflow : 0 < p.mu + p.mig)
+    (hπ0 : 0 ≤ prevalence) (hπ1 : prevalence ≤ 1)
+    (hpos : 0 < (L.point (ScoreMoments.deployedR2 p V_E)).specificity * (1 - prevalence)
+      + (1 - (L.point (ScoreMoments.deployedR2 p V_E)).sensitivity) * prevalence) :
+    0 ≤ L.deployedNPV p V_E prevalence ∧ L.deployedNPV p V_E prevalence ≤ 1 :=
+  OperatingPoint.negativePredictiveValue_mem_unit _ prevalence
+    (L.point_admissible _ (ScoreMoments.deployedR2_mem_unit p V_E hE hflow).1
+      (ScoreMoments.deployedR2_mem_unit p V_E hE hflow).2) hπ0 hπ1 hpos
+
+/-- **No history's net benefit exceeds the prevalence.** The ceiling, in the demographic
+coordinates: no demography makes deploying a score worth more than finding every case for
+free. -/
+theorem deployedNetBenefit_le_prevalence (L : OperatingPointLaw) (p : PopGenParameters)
+    (V_E prevalence t : ℝ) (hE : 0 ≤ V_E) (hflow : 0 < p.mu + p.mig)
+    (hπ0 : 0 ≤ prevalence) (hπ1 : prevalence ≤ 1) (ht : 0 ≤ t) (ht1 : t < 1) :
+    L.deployedNetBenefit p V_E prevalence t ≤ prevalence :=
+  OperatingPoint.netBenefit_le_prevalence _ prevalence t
+    (L.point_admissible _ (ScoreMoments.deployedR2_mem_unit p V_E hE hflow).1
+      (ScoreMoments.deployedR2_mem_unit p V_E hE hflow).2) hπ0 hπ1 ht ht1
+
+/-- **Deploying across a differentiation reclassifies patients the wrong way.**
+
+The sign of the reclassification index, from the demography alone. Any history with some
+flow and some differentiation gives a strictly negative index: the deployed rule finds
+fewer cases and clears fewer non-cases than the rule the source population's own score
+reaches, and neither half offsets the other.
+
+This is the clinically decisive statement the corpus could not previously make. Every
+existing NRI result in the corpus takes the reclassification counts as free reals; this
+one takes a demographic history. -/
+theorem deployedNRI_neg (L : OperatingPointLaw) (p : PopGenParameters) (V_E : ℝ)
+    (hE : 0 < V_E) (hflow : 0 < p.mu + p.mig) (hf0 : 0 < p.fstEquilibrium) :
+    L.deployedNRI p V_E < 0 := by
+  have hf1 := p.fstEquilibrium_lt_one hflow
+  have hlt : ScoreMoments.deployedR2 p V_E
+      < (ScoreMoments.momentsUnderDrift p.V_A V_E 0).r2 :=
+    ScoreMoments.r2_momentsUnderDrift_anti p.V_A V_E 0 p.fstEquilibrium p.V_A_pos hE
+      hf0 hf1
+  have hsrc1 : (ScoreMoments.momentsUnderDrift p.V_A V_E 0).r2 ≤ 1 :=
+    le_of_lt (r2_momentsUnderDrift_lt_one p.V_A V_E 0 p.V_A_pos hE (by norm_num))
+  have hdep0 : 0 ≤ ScoreMoments.deployedR2 p V_E :=
+    (ScoreMoments.deployedR2_mem_unit p V_E (le_of_lt hE) hflow).1
+  exact L.nri_neg_of_r2_lt _ _ hdep0 hlt hsrc1
+
+/-- **At the source there is nothing to reclassify.** The index is exactly zero when the
+deployed differentiation is zero, which is the anchor the negative values above are a
+departure from. -/
+theorem deployedNRI_at_source (L : OperatingPointLaw) (p : PopGenParameters) (V_E : ℝ)
+    (hf : p.fstEquilibrium = 0) : L.deployedNRI p V_E = 0 := by
+  unfold deployedNRI ScoreMoments.deployedR2
+  rw [hf]
+  exact OperatingPoint.nriFromOperatingPoints_self _
+
+/-- **A history with no flow tells every patient the prevalence and nothing more.**
+
+At zero migration and zero mutation the equilibrium is complete differentiation, the
+deployed `R²` is zero, and the operating point is whatever the law gives no
+discrimination. Stated as the conjunction because that is the claim: the worst demographic
+history there is drives `R²` to zero and the whole clinical report with it. -/
+theorem deployedReport_at_no_flow (L : OperatingPointLaw) (p : PopGenParameters)
+    (V_E prevalence t : ℝ) (hmu : p.mu = 0) (hmig : p.mig = 0) (hE : 0 < V_E) :
+    ScoreMoments.deployedR2 p V_E = 0 ∧
+    L.deployedPPV p V_E prevalence
+      = (L.point 0).positivePredictiveValue prevalence ∧
+    L.deployedNPV p V_E prevalence
+      = (L.point 0).negativePredictiveValue prevalence ∧
+    L.deployedNetBenefit p V_E prevalence t = (L.point 0).netBenefit prevalence t := by
+  have hz := ScoreMoments.deployedR2_at_no_flow p V_E hmu hmig hE
+  refine ⟨hz, ?_, ?_, ?_⟩ <;>
+    simp only [deployedPPV, deployedNPV, deployedNetBenefit, hz]
+
+end OperatingPointLaw
+
 end Descent.Core
