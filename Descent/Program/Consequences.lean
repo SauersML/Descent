@@ -12,6 +12,8 @@ import Descent.PopGen.HumanDemography
 import Descent.PopGen.DemographicCapacity
 import Descent.Portability.CorrectionBiology
 import Descent.PopGen.AdditiveInvariance
+import Descent.Portability.PCCorrectability.Nonidentifiability
+import Descent.Portability.PCCorrectability.Diagnostic
 
 /-!
 # What the separate results say when they are put together
@@ -296,5 +298,59 @@ theorem loss_is_not_in_the_weights
   ⟨additive_architecture_weights_agree_across_populations
       sigmaInvP sigmaInvQ EP EQ XP XQ β hP hQ,
    Descent.Core.ScoreMoments.deployedR2_mono_in_migration p q V_E hE hNe hmu hV hlt hflow⟩
+
+/-! ### `F_ST` determines the deployed metric and does NOT determine correctability -/
+
+/-- **The same aggregate differentiation that fixes the deployed `R²` leaves PC
+correctability undetermined. Two quantities, one input, opposite verdicts.**
+
+`Core.ScoreMoments.deployedR2` is a FUNCTION of the demographic history: fix
+`(Nₑ, m, μ)` and the deployed metric is determined.
+`PCCorrectability.fst_does_not_determine_pc_correctability` proves the opposite for
+correction: at fixed positive differentiation, sample size and marker count, two valid
+subgroup sizes sit on OPPOSITE sides of the spectral threshold whenever the balanced
+contrast is detectable.
+
+So an `F_ST` tells you what a score will lose and tells you nothing about whether
+principal-component correction can recover it. Reporting one differentiation number and
+concluding anything about correctability is unsound, and the unsoundness is not a matter
+of precision -- the counterexample is constructed, with both subgroup sizes admissible.
+
+Neither module can state this: one is about a metric law, the other about a spectral
+threshold, and nothing connected them. -/
+theorem fst_fixes_the_metric_but_not_correctability
+    (p : Descent.Core.PopGenParameters) (V_E : ℝ) (hE : 0 ≤ V_E)
+    (hflow : 0 < p.mu + p.mig)
+    (n M F : ℝ) (hn : 0 < n) (hM : 0 < M) (hF : 0 < F)
+    (hdetect : bbpProxyThreshold n M < F * n) :
+    (0 ≤ Descent.Core.ScoreMoments.deployedR2 p V_E ∧
+      Descent.Core.ScoreMoments.deployedR2 p V_E ≤ 1) ∧
+    ∃ mBelow mAbove : ℝ,
+      0 < mBelow ∧ mBelow < n ∧ 0 < mAbove ∧ mAbove < n ∧
+      demographicSpike n F mBelow < bbpProxyThreshold n M ∧
+      bbpProxyThreshold n M < demographicSpike n F mAbove :=
+  ⟨Descent.Core.ScoreMoments.deployedR2_mem_unit p V_E hE hflow,
+   fst_does_not_determine_pc_correctability n M F hn hM hF hdetect⟩
+
+/-- **And a correction diagnostic scores its own inapplicability as success.**
+
+`pcTargetAxisEfficacy_null_susceptibility_is_junk`: at zero uncorrected susceptibility the
+efficacy is `1` -- perfect correction, awarded for correcting something that was not
+there. Composed with the non-identifiability above, that is a reporting hazard with two
+independent parts: the differentiation does not tell you whether correction can work, and
+the diagnostic that would tell you returns its best possible score in the case where it
+does not apply.
+
+Both are stated in their own modules. That they compound is stated here. -/
+theorem correctability_reporting_has_two_independent_hazards
+    (residualSusceptibility n M F : ℝ) (hn : 0 < n) (hM : 0 < M) (hF : 0 < F)
+    (hdetect : bbpProxyThreshold n M < F * n) :
+    pcTargetAxisEfficacy 0 residualSusceptibility = 1 ∧
+    ∃ mBelow mAbove : ℝ,
+      0 < mBelow ∧ mBelow < n ∧ 0 < mAbove ∧ mAbove < n ∧
+      demographicSpike n F mBelow < bbpProxyThreshold n M ∧
+      bbpProxyThreshold n M < demographicSpike n F mAbove :=
+  ⟨pcTargetAxisEfficacy_null_susceptibility_is_junk residualSusceptibility,
+   fst_does_not_determine_pc_correctability n M F hn hM hF hdetect⟩
 
 end Descent
