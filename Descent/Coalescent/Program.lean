@@ -46,6 +46,27 @@ reads as a covered one.
 * Transit time, entrance boundary, absorption factor: `Rates`.  K-G (5.7)-(5.13), K-C p.239.
 * Ewens (3.8) normalises at `n = 2, 3`: `Mutation.ewensProb_two_total`, `.ewensProb_three_total`.
 
+## Beyond Kingman
+
+The two 1982 papers are not the whole of coalescent theory, and the group no longer stops
+there.  `Coalescent.Lambda` places Kingman inside Pitman's family (*Coalescents with multiple
+collisions*, Ann. Probab. 27, 1999; independently Sagitov, J. Appl. Prob. 36, 1999): any `k`
+of `b` blocks merge at rate `∫ x^{k-2}(1-x)^{b-k} Λ(dx)`, and Kingman is the `Λ = δ₀` fibre
+(`lambdaRate_dirac_zero`).  Pitman's consistency condition
+`λ_{b,k} = λ_{b+1,k} + λ_{b+1,k+1}` is what makes the family a family, and the integral form
+satisfies it (`lambdaRate_consistent`).  A consequence worth its own name: consistency FORCES
+the pair rate to be sample-size independent, so K-C (1.3)'s `1` is not a modelling choice
+(`eq_kingmanRate`).
+
+`Coalescent.MultiMerge` gives the state space the moves that family needs -- `mergeSet` folds
+any set of blocks onto one, and `blocks_mergeSet` says `|S|` blocks become one -- with
+`StateSpace.merge` recovered as the two-element case.  So `𝓔ₙ` now carries multiple-merger
+coalescents as well as Kingman's, and `Descent.Blindness.MultipleMergerBlindness`, which had
+the rates but no state space, has one.
+
+Still absent, and not claimed: `Ξ`-coalescents (Schweinsberg 2000, simultaneous multiple
+mergers), the ancestral recombination graph, and every model with selection.
+
 ## Verification status
 
 Every module in this group compiles against the pinned Mathlib
