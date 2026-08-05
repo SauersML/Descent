@@ -1,6 +1,10 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Portability.PGSCalibrationTheory.CalibrationDefinitions
+import Descent.Portability.PGSCalibrationTheory.CalibrationVsDiscrimination
+import Descent.Portability.PGSCalibrationTheory.PopulationCalibrationDrift
+import Descent.Portability.PGSCalibrationTheory.RecalibrationMethods
 import Descent.Portability.PGSCalibrationTheory.DecisionImplications
 
 /-!
