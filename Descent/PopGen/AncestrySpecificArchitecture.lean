@@ -445,7 +445,20 @@ causal variant.
     the variance a tag explains is `β_c² · r²`, and there the square belongs.
     It is the linear effect that takes `r`. The sign matters too and `r²`
     discards it: two tags in equal-magnitude but opposite-sign LD carry
-    apparent effects of opposite sign. -/
+    apparent effects of opposite sign.
+
+    LEDGER, read correctly. `simcov/ledger.json` carries a FALSIFIED record
+    against the NAME `taggedEffect` at 158.98 sems (`bulk22`). It is not a
+    falsification of the body below. Its `source` field reads
+    `causalEffect * tagR2`, which is the squared form this definition was
+    corrected AWAY from, and the same battery's other row -- `causalEffect * tagR`,
+    logged with role `competitor` because it was the challenger at the time --
+    is the MATCH at 0.61 sems and is what is written here now. The record is
+    stale with respect to the body, and marked so: its freshness field is
+    `UNVERIFIED (no recorded source hash)`, so nothing checked it against the
+    Lean when the correction landed. Cited here because a reader who greps the
+    ledger for this name and not for its `source` reaches the opposite
+    conclusion, and the ledger cannot say this about itself. -/
 noncomputable def taggedEffect (causalEffect tagR : ℝ) : ℝ :=
   causalEffect * tagR
 

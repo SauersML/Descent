@@ -1517,7 +1517,8 @@ theorem wrightFisherHeterozygosityLoss_eq_closedPopulation_measuredLoss
 /-- **The fourth proportional-reduction body, and the one that could not be reached from
 its siblings.**
 
-`PopulationGeneticsFoundations.fstFromHetRatio_eq_hudsonFst_eq_r2FromMSE` already relates
+`PopulationGeneticsFoundations.fstFromHetRatio_eq_hudsonFstFromCoalescenceTimes_eq_r2FromMSE`
+already relates
 three spellings of `1 - residual/baseline`: a heterozygosity ratio, a coalescence-time
 ratio, and an error-to-variance ratio.  `PCCorrectability.Diagnostic.pcTargetAxisEfficacy`
 is the fourth — the fraction of a target ancestry axis captured by correction, written in

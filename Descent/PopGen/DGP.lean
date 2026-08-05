@@ -450,7 +450,14 @@ noncomputable def SourceTaggedMoments.sigmaTagCausal {c t : ℕ}
     `sqrt(2 log 40) = 2.72`, and `8.07 / 2.72 = 2.97` was inside the gate before
     anything else is said. The 78 percent is the same artefact seen without the
     error bar -- it is the relative error of whichever coordinate happened to be
-    smallest in magnitude, and a small denominator is not a large discrepancy. -/
+    smallest in magnitude, and a small denominator is not a large discrepancy.
+
+    The retraction is recorded HERE and not in the ledger. `simcov/ledger.json`
+    still carries the `linalg` row against this name with verdict FALSIFIED at
+    8.07 sems and an empty `downgraded_because`, so the ledger and this docstring
+    disagree and the ledger does not know it. Cite this paragraph, not that row.
+    The row's freshness is `UNVERIFIED (no recorded source hash)`; the standing
+    measurement of this body is the `dis2` row above. -/
 noncomputable def sourceBestLinearWeightsFromLD {c t : ℕ}
     (mom : SourceTaggedMoments c t) (betaCausal : CausalVec c) : TagVec t :=
   mom.sigmaTagSource⁻¹.mulVec (mom.sigmaTagCausal.mulVec betaCausal)
@@ -3669,6 +3676,15 @@ chart is a derived algebraic identity.
     CONSUMERS. `PortabilityDrift.sourceCalibratedBrierFromSourceWeightsAtPrevalence` feeds
     this from PGS explained-signal variances at a prevalence, which is the liability-threshold
     setting, so it inherits the error at the sizes tabulated above.
+
+    LEDGER. The liability table above is the `bulk33` run, and it is logged in
+    `simcov/ledger.json` as a flat FALSIFIED at 298.89 sems -- the first row, `π = 0.50`.
+    That verdict is correct for the regime the battery ran and is NOT the status of this
+    body, which is the CONDITIONALLY VALID above; the ledger has one verdict field per
+    record and no way to name the regime split that the two runs establish together. Its
+    positive control, a prevalence-only predictor scoring `π(1-π)`, passed at 0.47 sems, so
+    the harness was live and 298.89 is a real distance and not a broken oracle. Read the
+    ledger row through this paragraph.
 
     Denotes: the reading its name carries. The same formula appears under
     names from 'rate', 'variance', and the formula alone does not fix which is meant. -/

@@ -2318,6 +2318,21 @@ theorem heterozygosityLossDerived_eq_fstFromDrift (Ne : ℝ) (t : ℕ) :
     the infinite-alleles oracle in the same battery and holds at 0.71 sems, so
     its status survives -- but it survives by re-measurement, not by inheritance.
 
+    A THIRD RECORD, and which oracle it ran against. `simcov/ledger.json` carries
+    a FALSIFIED verdict on this name at 65.48 sems, battery `traj`, regime "run
+    forward from H_0 for the full trajectory, no re-anchoring on the simulation at
+    intermediate generations". Compounding is not what fails it: the run tabulated
+    above also compounds, fifteen generations from a measured start, and reaches
+    1.01 sems. The oracle is what differs. `battery_traj.py` mutates by
+    `p = p (1 - mu) + (1 - p) mu`, which is BIALLELIC two-way mutation, so its
+    exact input term is the `2 mu (1 - 2 H)` derived two paragraphs up and not the
+    `2 mu (1 - H)` this body carries. The 65.48 is therefore a third measurement of
+    the SAME regime mismatch the 632-sems biallelic run found, taken over 50 to 200
+    generations where an O(mu) per-step error has room to accumulate -- it is not an
+    independent failure, and it is not a falsification of the infinite-alleles claim
+    the docstring above makes. Recorded here because the ledger row carries the
+    regime but not the mutation model, and the two readings are opposite.
+
     The engine runs about 1% hot against the known plateau (`H = 0.4489` and
     `0.5044` measured against `theta/(1+theta) = 0.4444` and `0.5000`), which is
     the same systematic `ia_engine.selftest` reports, so it is disclosed rather
@@ -2496,6 +2511,18 @@ noncomputable def hetDecayFactor (Ne θ : ℝ) : ℝ :=
     The battery reports that identity separately and labels it a SELF-TEST. What
     is measured here is the trajectory.
 
+    The `traj` FALSIFIED record, at 44.23 sems, is inherited and not separate.
+    `simcov/ledger.json` logs it under regime "lam and Hstar taken from the
+    drift-mutation process the affine form abstracts; run forward with no
+    re-anchoring" -- and the coefficients it takes are exactly the ones above,
+    `lam = 1 - 1/(2 Ne) - 2 mu` and `Hstar = 2 mu / (1/(2 Ne) + 2 mu)`, which are
+    the INFINITE-ALLELES coefficients. `battery_traj.py` then runs them against a
+    biallelic two-way-mutation oracle. So this row measures the same regime
+    mismatch recorded on `hetMutationDriftRecurrence` above, arriving here through
+    the coefficients rather than through the body: this affine map is an exact
+    reparametrisation and has no mutation model of its own to be wrong about. Feed
+    it a biallelic `lam` and `Hstar` and it tracks a biallelic trajectory.
+
     The engine runs about 1% hot against the known plateau (`H = 0.4489` and
     `0.5044` measured against `theta/(1+theta) = 0.4444` and `0.5000`), which is
     the same systematic `ia_engine.selftest` reports, so it is disclosed rather
@@ -2580,8 +2607,17 @@ diverged from the other two silently.
 A fourth instance, `PCCorrectability.Diagnostic.pcTargetAxisEfficacy`, is deliberately
 absent.  `Diagnostic` imports nothing from this corpus outside `PCCorrectability`, and no
 module imports both it and any of the three below, so **no file can currently state that
-identity at all.** Closing that one needs an import, not a theorem. -/
-theorem fstFromHetRatio_eq_hudsonFst_eq_r2FromMSE (a b : ℝ) :
+identity at all.** Closing that one needs an import, not a theorem.
+
+The name spells `hudsonFstFromCoalescenceTimes` out in full, and must keep doing so.  A
+DIFFERENT definition owns the short name `hudsonFst` — `Foundations.Conventions.hudsonFst`,
+the allele-frequency form `d² / (p₁ + p₂ - 2p₁p₂)` — and this theorem is false of it:
+`hudsonFst` is not `1 - a/b`.  An earlier name for this theorem abbreviated to
+`_eq_hudsonFst_`, so anyone grepping `hudsonFst` for what is known about it got this
+statement back as a hit that asserts an equality the named function does not satisfy.  That
+is the exact convention where `neiFst`'s docstring records paying a factor of two to four,
+so the abbreviation is not available here. -/
+theorem fstFromHetRatio_eq_hudsonFstFromCoalescenceTimes_eq_r2FromMSE (a b : ℝ) :
     fstFromHetRatio a b = hudsonFstFromCoalescenceTimes a b ∧
       fstFromHetRatio a b = r2FromMSE a b := by
   constructor <;> rfl

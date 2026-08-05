@@ -540,7 +540,19 @@ section AdmixtureModels
     body cannot even express.
 
     Empirical status: MIXED -- NUMERATOR VALIDATED (exactly `(1-α)²`), DENOMINATOR
-    OMITTED. Use `admixedFstExact` when the heterozygosity ratio is available. -/
+    OMITTED, and **FALSIFIED as a whole `F_ST`** at 14.16 sems
+    (`simcov/battery_max.py`, logged in `simcov/ledger.json` under battery `max`),
+    which is the omitted denominator measured rather than argued. Use
+    `admixedFstExact` when the heterozygosity ratio is available.
+
+    The number is worth carrying next to the body and not only in the ledger,
+    because it is the smaller of a pair and the pair is the finding: on the same
+    design `admixedFstExact` with the ratio applied UPSIDE DOWN reached 21.3 sems,
+    so a correction made the answer worse than omitting it. That comparison is
+    recorded on `admixedFstExact` below and is what fixes the ratio's orientation.
+    A reader who meets only this definition's 14.16 would take it for the cost of
+    the missing denominator; it is the cost of the missing denominator only when
+    the present one points the right way. -/
 noncomputable def admixedFst (α fst_AB : ℝ) : ℝ :=
   (1 - α) ^ 2 * fst_AB
 
