@@ -241,6 +241,124 @@ theorem r2_momentsUnderDrift_of_no_environment (V_A fst : ℝ) (hV : 0 < V_A)
   field_simp
   ring
 
+
+/-! ### The chain, link by link
+
+Each theorem below is one claim about how a demographic parameter reaches a deployed
+metric. They are separate rather than bundled because they fail separately: a corpus
+that proves only "R² decreases with F_ST" has not said which demographic parameters move
+F_ST, in which direction, or what the metric does at the boundaries. -/
+
+/-- **Source `R²` is the trait's heritability.** At no differentiation the score is
+deployed in the population it was fitted in, and the metric it reports is
+`V_A/(V_A + V_E)`. Every portability statement below is a departure from this. -/
+theorem r2_momentsUnderDrift_at_source (V_A V_E : ℝ) (hV : 0 < V_A) (hE : 0 ≤ V_E) :
+    (momentsUnderDrift V_A V_E 0).r2 = share V_A V_E := by
+  rw [r2_momentsUnderDrift V_A V_E 0 hV hE (by norm_num)]
+  unfold retainedFraction
+  ring_nf
+
+/-- **Complete differentiation transfers nothing.** At `F_ST = 1` the retained covariance
+is zero and the deployed `R²` is zero -- the score is uncorrelated with the outcome in a
+population sharing no allele frequencies with the one it was fitted in. -/
+theorem r2_momentsUnderDrift_at_complete (V_A V_E : ℝ) (hE : 0 < V_E) :
+    (momentsUnderDrift V_A V_E 1).r2 = 0 := by
+  unfold r2 momentsUnderDrift retainedFraction
+  simp
+
+/-- **The deployed metric never exceeds the source metric.** The one-sided statement:
+drift can only cost, and the corpus's portability results are all bounded by this. -/
+theorem r2_momentsUnderDrift_le_source (V_A V_E fst : ℝ) (hV : 0 < V_A) (hE : 0 ≤ V_E)
+    (hf0 : 0 ≤ fst) (hf : fst < 1) :
+    (momentsUnderDrift V_A V_E fst).r2 ≤ (momentsUnderDrift V_A V_E 0).r2 := by
+  rw [r2_momentsUnderDrift V_A V_E fst hV hE hf,
+    r2_momentsUnderDrift V_A V_E 0 hV hE (by norm_num)]
+  have hr : 0 < retainedFraction fst V_A := by unfold retainedFraction; nlinarith
+  have hr0 : retainedFraction fst V_A ≤ retainedFraction 0 V_A := by
+    unfold retainedFraction; nlinarith
+  unfold share
+  rw [div_le_div_iff₀ (by linarith) (by unfold retainedFraction; nlinarith)]
+  nlinarith
+
+/-- **The portability ratio.** Deployed `R²` against source `R²` -- the quantity the
+literature reports and the one this whole development is about. -/
+noncomputable def portabilityRatio (V_A V_E fst : ℝ) : ℝ :=
+  ratio (momentsUnderDrift V_A V_E fst).r2 (momentsUnderDrift V_A V_E 0).r2
+
+/-- **The portability ratio lies in the unit interval**, which is the content of the
+one-sided bound above transported to the ratio. -/
+theorem portabilityRatio_mem_unit (V_A V_E fst : ℝ) (hV : 0 < V_A) (hE : 0 ≤ V_E)
+    (hf0 : 0 ≤ fst) (hf : fst < 1) :
+    0 ≤ portabilityRatio V_A V_E fst ∧ portabilityRatio V_A V_E fst ≤ 1 := by
+  have hsrc : 0 < (momentsUnderDrift V_A V_E 0).r2 := by
+    rw [r2_momentsUnderDrift V_A V_E 0 hV hE (by norm_num)]
+    unfold share retainedFraction
+    have : (0:ℝ) < (1 - 0) * V_A := by nlinarith
+    positivity
+  have hdep : 0 ≤ (momentsUnderDrift V_A V_E fst).r2 :=
+    ((momentsUnderDrift V_A V_E fst).r2_mem_unit
+      { scoreVariance_pos := by unfold momentsUnderDrift retainedFraction; simp; nlinarith
+        outcomeVariance_pos := by
+          unfold momentsUnderDrift retainedFraction; simp; nlinarith
+        cauchy_schwarz := by
+          unfold momentsUnderDrift retainedFraction; simp
+          nlinarith [sq_nonneg ((1 - fst) * V_A), mul_nonneg (le_of_lt hV) hE] }).1
+  unfold portabilityRatio ratio
+  refine ⟨div_nonneg hdep (le_of_lt hsrc), ?_⟩
+  rw [div_le_one hsrc]
+  exact r2_momentsUnderDrift_le_source V_A V_E fst hV hE hf0 hf
+
+/-- **The portability ratio is one exactly at no differentiation** on a trait with
+environmental variance. A reported ratio below one is therefore evidence of
+differentiation and not of a measurement artefact. -/
+theorem portabilityRatio_at_source (V_A V_E : ℝ) (hV : 0 < V_A) (hE : 0 ≤ V_E) :
+    portabilityRatio V_A V_E 0 = 1 := by
+  have hsrc : (0:ℝ) < (momentsUnderDrift V_A V_E 0).r2 := by
+    rw [r2_momentsUnderDrift V_A V_E 0 hV hE (by norm_num)]
+    unfold share retainedFraction
+    have : (0:ℝ) < (1 - 0) * V_A := by nlinarith
+    positivity
+  unfold portabilityRatio ratio
+  exact div_self (ne_of_gt hsrc)
+
+/-! ### Which demographic parameters move the metric, and in which direction -/
+
+/-! ### The chain in split coordinates
+
+The other route into `F_ST`: a clean split at time `t`, read through `τ/(1 + τ)` rather
+than through a migration-mutation equilibrium. Both produce a differentiation, and the
+same moment tuple consumes either. -/
+
+/-- **Deployed `R²` after a clean split**, from the scaled coalescence time. Written
+through `fstFromTau` so that this and the equilibrium route cannot acquire different
+`F_ST` conventions: both are Hudson. -/
+noncomputable def deployedR2FromTau (V_A V_E tau : ℝ) : ℝ :=
+  (momentsUnderDrift V_A V_E (fstFromTau tau)).r2
+
+/-- **A longer split transfers less.** Monotone in the scaled coalescence time, which is
+monotone in the divergence time at fixed effective size -- so the deployed metric decays
+with time since the split. -/
+theorem deployedR2FromTau_anti (V_A V_E t₁ t₂ : ℝ) (hV : 0 < V_A) (hE : 0 < V_E)
+    (h0 : 0 ≤ t₁) (hlt : t₁ < t₂) :
+    deployedR2FromTau V_A V_E t₂ < deployedR2FromTau V_A V_E t₁ := by
+  have hf1 : fstFromTau t₁ < fstFromTau t₂ := by
+    unfold fstFromTau saturation
+    rw [div_lt_div_iff₀ (by linarith) (by linarith)]
+    nlinarith
+  have hlt2 : fstFromTau t₂ < 1 := by
+    unfold fstFromTau saturation
+    rw [div_lt_one (by linarith)]
+    linarith
+  exact r2_momentsUnderDrift_anti V_A V_E (fstFromTau t₁) (fstFromTau t₂) hV hE hf1 hlt2
+
+/-- **At the moment of the split nothing has been lost.** `τ = 0` gives `F_ST = 0` and
+the deployed metric is the heritability. -/
+theorem deployedR2FromTau_at_zero (V_A V_E : ℝ) (hV : 0 < V_A) (hE : 0 ≤ V_E) :
+    deployedR2FromTau V_A V_E 0 = share V_A V_E := by
+  unfold deployedR2FromTau fstFromTau saturation
+  norm_num
+  exact r2_momentsUnderDrift_at_source V_A V_E hV hE
+
 /-! ### The full chain
 
 `(Nₑ, m, μ) → F_ST → moments → R²`, as one composition. -/
@@ -265,6 +383,29 @@ theorem deployedR2_eq (p : PopGenParameters) (V_E : ℝ) (hE : 0 ≤ V_E)
   r2_momentsUnderDrift p.V_A V_E p.fstEquilibrium p.V_A_pos hE
     (p.fstEquilibrium_lt_one hflow)
 
+/-- **The two routes into the metric agree when they agree on `F_ST`.** Stated because
+the corpus computes `F_ST` two ways -- an equilibrium under migration and mutation, and a
+split law in coalescent time -- and a reader meeting both has no reason to assume the
+moment tuple treats them alike. It does: the tuple sees a differentiation and nothing
+about where it came from. -/
+theorem deployedR2_eq_deployedR2FromTau (p : PopGenParameters) (V_E tau : ℝ)
+    (h : p.fstEquilibrium = fstFromTau tau) :
+    deployedR2 p V_E = deployedR2FromTau p.V_A V_E tau := by
+  unfold deployedR2 deployedR2FromTau
+  rw [h]
+
+/-- **And that is a real constraint, not a tautology**: the two routes agree on `F_ST`
+exactly when the scaled coalescence time is the reciprocal of the total scaled flow.
+`τ = 1/x` is the conversion between the corpus's two `F_ST` coordinates, and it is
+recorded here rather than left for a reader to rediscover. -/
+theorem fstEquilibrium_eq_fstFromTau_iff (p : PopGenParameters) (tau : ℝ)
+    (hx : 1 + (p.theta + 2 * p.bigM) ≠ 0) (ht : 1 + tau ≠ 0) :
+    p.fstEquilibrium = fstFromTau tau ↔
+      1 = tau * (p.theta + 2 * p.bigM) := by
+  unfold PopGenParameters.fstEquilibrium fstFromFlow fstFromTau saturation
+  rw [div_eq_div_iff hx ht]
+  constructor <;> intro h <;> nlinarith [h]
+
 /-- **More migration, more transferable score.** The end-to-end monotone law: increase
 the migration rate in the demographic parameters and the deployed `R²` goes up, with
 every step -- equilibrium, moments, metric -- a named map rather than an assumption.
@@ -280,6 +421,65 @@ theorem deployedR2_mono_in_migration (p q : PopGenParameters) (V_E : ℝ) (hE : 
   rw [hV]
   exact r2_momentsUnderDrift_anti q.V_A V_E q.fstEquilibrium p.fstEquilibrium
     q.V_A_pos hE hfst (p.fstEquilibrium_lt_one hflow)
+
+/-- **More mutation, higher deployed `R²`** -- the second end-to-end law, and one the
+corpus could not previously state at all. -/
+theorem deployedR2_mono_in_mutation (p q : PopGenParameters) (V_E : ℝ) (hE : 0 < V_E)
+    (hNe : p.Ne = q.Ne) (hmig : p.mig = q.mig) (hV : p.V_A = q.V_A)
+    (hlt : p.mu < q.mu) (hflow : 0 < p.mu + p.mig) :
+    deployedR2 p V_E < deployedR2 q V_E := by
+  have hfst : q.fstEquilibrium < p.fstEquilibrium :=
+    PopGenParameters.fstEquilibrium_lt_of_mu_lt p q hNe hmig hlt
+  unfold deployedR2
+  rw [hV]
+  exact r2_momentsUnderDrift_anti q.V_A V_E q.fstEquilibrium p.fstEquilibrium
+    q.V_A_pos hE hfst (p.fstEquilibrium_lt_one hflow)
+
+/-- **Larger effective size, higher deployed `R²`** -- the third. -/
+theorem deployedR2_mono_in_Ne (p q : PopGenParameters) (V_E : ℝ) (hE : 0 < V_E)
+    (hmu : p.mu = q.mu) (hmig : p.mig = q.mig) (hV : p.V_A = q.V_A)
+    (hlt : p.Ne < q.Ne) (hflow2 : 0 < p.mu + 2 * p.mig) (hflow : 0 < p.mu + p.mig) :
+    deployedR2 p V_E < deployedR2 q V_E := by
+  have hfst : q.fstEquilibrium < p.fstEquilibrium :=
+    PopGenParameters.fstEquilibrium_lt_of_Ne_lt p q hmu hmig hflow2 hlt
+  unfold deployedR2
+  rw [hV]
+  exact r2_momentsUnderDrift_anti q.V_A V_E q.fstEquilibrium p.fstEquilibrium
+    q.V_A_pos hE hfst (p.fstEquilibrium_lt_one hflow)
+
+/-- **The deployed metric is in the unit interval for any admissible history.** -/
+theorem deployedR2_mem_unit (p : PopGenParameters) (V_E : ℝ) (hE : 0 ≤ V_E)
+    (hflow : 0 < p.mu + p.mig) :
+    0 ≤ deployedR2 p V_E ∧ deployedR2 p V_E ≤ 1 := by
+  have hlt := p.fstEquilibrium_lt_one hflow
+  have hge := p.fstEquilibrium_mem_unit.1
+  have hr : 0 < retainedFraction p.fstEquilibrium p.V_A := by
+    unfold retainedFraction
+    have := p.V_A_pos
+    nlinarith
+  rw [deployedR2_eq p V_E hE hflow]
+  unfold share
+  constructor
+  · positivity
+  · rw [div_le_one (by linarith)]; linarith
+
+/-- **The deployed metric never exceeds the heritability.** The ceiling every deployment
+is under, expressed in the demographic coordinates: no history makes a score explain more
+of the target's variance than the trait's own heritability in the source. -/
+theorem deployedR2_le_heritability (p : PopGenParameters) (V_E : ℝ) (hE : 0 ≤ V_E)
+    (hflow : 0 < p.mu + p.mig) :
+    deployedR2 p V_E ≤ share p.V_A V_E := by
+  have hlt := p.fstEquilibrium_lt_one hflow
+  have hge := p.fstEquilibrium_mem_unit.1
+  have hV := p.V_A_pos
+  rw [deployedR2_eq p V_E hE hflow]
+  unfold share retainedFraction
+  have hnum : 0 < (1 - p.fstEquilibrium) * p.V_A := by nlinarith
+  have hd1 : 0 < (1 - p.fstEquilibrium) * p.V_A + V_E := by linarith
+  have hd2 : 0 < p.V_A + V_E := by linarith
+  rw [div_le_div_iff₀ hd1 hd2]
+  nlinarith [mul_nonneg (mul_nonneg hge (le_of_lt hV)) hE]
+
 
 end ScoreMoments
 

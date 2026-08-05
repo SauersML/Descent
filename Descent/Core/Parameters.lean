@@ -220,6 +220,45 @@ theorem fstEquilibrium_lt_of_mig_lt (p q : PopGenParameters)
     linarith
   · nlinarith
 
+/-- **More mutation, more transferable score.** Mutation regenerates variation the demes
+would otherwise lose to drift, so it lowers the equilibrium differentiation exactly as
+migration does -- and the chain carries that all the way to the deployed metric. -/
+theorem fstEquilibrium_lt_of_mu_lt (p q : PopGenParameters)
+    (hNe : p.Ne = q.Ne) (hmig : p.mig = q.mig) (hlt : p.mu < q.mu) :
+    q.fstEquilibrium < p.fstEquilibrium := by
+  unfold PopGenParameters.fstEquilibrium PopGenParameters.theta PopGenParameters.bigM
+  rw [hNe, hmig]
+  simp only [scaledMutationRate_eq, scaledMigrationRate_eq]
+  have hNepos := q.Ne_pos
+  have hmu := p.mu_nonneg
+  have hmigq := q.mig_nonneg
+  apply fstFromFlow_lt_of_lt
+  · have h1 : 0 ≤ 4 * q.Ne * p.mu := by positivity
+    have h2 : 0 ≤ 2 * (4 * q.Ne * q.mig) := by positivity
+    linarith
+  · nlinarith
+
+/-- **Larger effective size, more transferable score.** `Nₑ` multiplies both scaled
+rates, so a bigger population reaches a lower equilibrium differentiation at the same
+per-generation rates: drift is what differentiates, and drift is weaker when there are
+more copies to sample from. -/
+theorem fstEquilibrium_lt_of_Ne_lt (p q : PopGenParameters)
+    (hmu : p.mu = q.mu) (hmig : p.mig = q.mig) (hflow : 0 < p.mu + 2 * p.mig)
+    (hlt : p.Ne < q.Ne) :
+    q.fstEquilibrium < p.fstEquilibrium := by
+  unfold PopGenParameters.fstEquilibrium PopGenParameters.theta PopGenParameters.bigM
+  rw [hmu, hmig]
+  simp only [scaledMutationRate_eq, scaledMigrationRate_eq]
+  have hNepos := p.Ne_pos
+  have hmuq := q.mu_nonneg
+  have hmigq := q.mig_nonneg
+  apply fstFromFlow_lt_of_lt
+  · have h1 : 0 ≤ 4 * p.Ne * q.mu := by positivity
+    have h2 : 0 ≤ 2 * (4 * p.Ne * q.mig) := by positivity
+    linarith
+  · rw [hmu, hmig] at hflow
+    nlinarith
+
 end PopGenParameters
 
 end Descent.Core
