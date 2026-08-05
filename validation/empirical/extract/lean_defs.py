@@ -390,9 +390,6 @@ def ldOrientationThirdInvariant(ld):
 def ldOrientationFourthInvariant(ld):
     return entryFourthSum(ld)
 
-def coalescentRate(m):
-    return Descent_Core_pairCount(m)
-
 def cauchyConditioningProfile(θ):
     return (2.0 * ((((_rt.rlog(((1.0 + _rt.lpow(θ, 2.0)))) + (((θ - 1.0)) * _rt.rlog(((1.0 - θ))))) - (((1.0 + θ)) * _rt.rlog(((1.0 + θ))))) + ((2.0 * θ) * _rt.arctan((_rt.rdiv(1.0, θ)))))))
 

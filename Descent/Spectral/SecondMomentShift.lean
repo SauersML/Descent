@@ -31,9 +31,9 @@ of its linear score times the outcome. -/
 theorem dot_rawCrossMoment
     (E : Foundations.ExpFunctional Ω) (X : Ω → ι → ℝ)
     (Y : Ω → ℝ) (u : ι → ℝ) :
-    dot u (rawCrossMoment E X Y) =
-      E (fun ω ↦ dot u (X ω) * Y ω) := by
-  unfold dot rawCrossMoment Descent.Core.innerSum
+    Foundations.dot u (rawCrossMoment E X Y) =
+      E (fun ω ↦ Foundations.dot u (X ω) * Y ω) := by
+  unfold Foundations.dot rawCrossMoment Descent.Core.innerSum
   have hexpand :
       (fun ω ↦ (∑ i, u i * X ω i) * Y ω) =
         ∑ i, (u i) • (fun ω ↦ X ω i * Y ω) := by
@@ -56,11 +56,11 @@ theorem rawCrossMoment_annihilates_secondMoment_kernel
     (hkernel : (Foundations.secondMomentMatrix E X).mulVec kernelDirection = 0)
     (hzeroProduct : ∀ f g : Ω → ℝ,
       E (fun ω ↦ f ω ^ 2) = 0 → E (fun ω ↦ f ω * g ω) = 0) :
-    dot kernelDirection (rawCrossMoment E X Y) = 0 := by
+    Foundations.dot kernelDirection (rawCrossMoment E X Y) = 0 := by
   rw [dot_rawCrossMoment]
   apply hzeroProduct
   rw [Foundations.secondMoment_quadratic_form, hkernel]
-  simp [dot,
+  simp [Foundations.dot,
       Descent.Core.innerSum]
 
 /-- Cauchy--Schwarz supplies the zero-product premise above.  Consequently the
@@ -71,7 +71,7 @@ theorem rawCrossMoment_annihilates_secondMoment_kernel_of_cauchySchwarz
     (Y : Ω → ℝ) (kernelDirection : ι → ℝ)
     (hkernel : (Foundations.secondMomentMatrix E X).mulVec kernelDirection = 0)
  :
-    dot kernelDirection (rawCrossMoment E X Y) = 0 := by
+    Foundations.dot kernelDirection (rawCrossMoment E X Y) = 0 := by
   apply rawCrossMoment_annihilates_secondMoment_kernel
     E X Y kernelDirection hkernel
   intro f g hf
@@ -83,7 +83,7 @@ theorem rawCrossMoment_annihilates_secondMoment_kernel_of_cauchySchwarz
 deployed linear coefficient. -/
 def residualScoreMoment (E : Foundations.ExpFunctional Ω) (X : Ω → ι → ℝ)
     (Y : Ω → ℝ) (w : ι → ℝ) : ι → ℝ :=
-  rawCrossMoment E X (fun ω ↦ Y ω - dot w (X ω))
+  rawCrossMoment E X (fun ω ↦ Y ω - Foundations.dot w (X ω))
 
 /-- Cross moments of a linear score are obtained by applying the second-moment
 matrix to its coefficient vector. -/
@@ -94,10 +94,10 @@ theorem rawCrossMoment_linScore
   ext i
   unfold rawCrossMoment Foundations.linScore Foundations.secondMomentMatrix
   have hexpand :
-      (fun ω ↦ X ω i * dot w (X ω)) =
+      (fun ω ↦ X ω i * Foundations.dot w (X ω)) =
         ∑ j, (w j) • (fun ω ↦ X ω i * X ω j) := by
     funext ω
-    simp [dot, Finset.mul_sum, smul_eq_mul, mul_left_comm, mul_comm,
+    simp [Foundations.dot, Finset.mul_sum, smul_eq_mul, mul_left_comm, mul_comm,
       Descent.Core.innerSum]
   rw [hexpand, Foundations.ExpFunctional.eval_sum]
   simp [Matrix.mulVec, dotProduct, E.smul_eval, mul_comm]
@@ -112,11 +112,11 @@ theorem residualScoreMoment_eq_cross_sub_secondMoment
   ext i
   unfold residualScoreMoment rawCrossMoment
   have hexpand :
-      (fun ω ↦ X ω i * (Y ω - dot w (X ω))) =
-        (fun ω ↦ X ω i * Y ω) - (fun ω ↦ X ω i * dot w (X ω)) := by
+      (fun ω ↦ X ω i * (Y ω - Foundations.dot w (X ω))) =
+        (fun ω ↦ X ω i * Y ω) - (fun ω ↦ X ω i * Foundations.dot w (X ω)) := by
     funext ω
-    change X ω i * (Y ω - dot w (X ω)) =
-      X ω i * Y ω - X ω i * dot w (X ω)
+    change X ω i * (Y ω - Foundations.dot w (X ω)) =
+      X ω i * Y ω - X ω i * Foundations.dot w (X ω)
     ring
   rw [hexpand, E.eval_sub]
   have hlinear := congrFun (rawCrossMoment_linScore E X w) i
@@ -172,12 +172,12 @@ theorem residualScoreMoment_outcome_change
   ext i
   unfold residualScoreMoment rawCrossMoment
   have hexpand :
-      (fun ω ↦ X ω i * (hNew ω - dot w (X ω))) =
-        (fun ω ↦ X ω i * (hOld ω - dot w (X ω))) +
+      (fun ω ↦ X ω i * (hNew ω - Foundations.dot w (X ω))) =
+        (fun ω ↦ X ω i * (hOld ω - Foundations.dot w (X ω))) +
           (fun ω ↦ X ω i * (hNew ω - hOld ω)) := by
     funext ω
-    change X ω i * (hNew ω - dot w (X ω)) =
-      X ω i * (hOld ω - dot w (X ω)) +
+    change X ω i * (hNew ω - Foundations.dot w (X ω)) =
+      X ω i * (hOld ω - Foundations.dot w (X ω)) +
         X ω i * (hNew ω - hOld ω)
     ring
   rw [hexpand, E.add_eval]
@@ -203,9 +203,9 @@ omit [DecidableEq ι] in
 nonlinear residual `η = m - vᵀx`. -/
 theorem nonlinear_conditional_excess_risk_identity
     (m : ℝ) (x w v : ι → ℝ) :
-    (m - dot w x) ^ 2 - (m - dot v x) ^ 2 =
-      dot (fun i ↦ w i - v i) x ^ 2 -
-        2 * dot (fun i ↦ w i - v i) x * (m - dot v x) := by
+    (m - Foundations.dot w x) ^ 2 - (m - Foundations.dot v x) ^ 2 =
+      Foundations.dot (fun i ↦ w i - v i) x ^ 2 -
+        2 * Foundations.dot (fun i ↦ w i - v i) x * (m - Foundations.dot v x) := by
   rw [Foundations.dot_sub_left]
   ring
 
@@ -216,22 +216,22 @@ theorem mean_nonlinear_conditional_excess_eq_quadratic
     (E : Foundations.ExpFunctional Ω) (X : Ω → ι → ℝ)
     (m : Ω → ℝ) (w v : ι → ℝ)
     (hnormal : ∀ i,
-      E (fun ω ↦ X ω i * (m ω - dot v (X ω))) = 0) :
+      E (fun ω ↦ X ω i * (m ω - Foundations.dot v (X ω))) = 0) :
     E (fun ω ↦
-        (m ω - dot w (X ω)) ^ 2 - (m ω - dot v (X ω)) ^ 2) =
-      E (fun ω ↦ (dot (fun i ↦ w i - v i) (X ω)) ^ 2) := by
+        (m ω - Foundations.dot w (X ω)) ^ 2 - (m ω - Foundations.dot v (X ω)) ^ 2) =
+      E (fun ω ↦ (Foundations.dot (fun i ↦ w i - v i) (X ω)) ^ 2) := by
   have horth :
       E (fun ω ↦
-        dot (fun i ↦ w i - v i) (X ω) * (m ω - dot v (X ω))) = 0 := by
+        Foundations.dot (fun i ↦ w i - v i) (X ω) * (m ω - Foundations.dot v (X ω))) = 0 := by
     simpa [mul_comm] using
       Foundations.normal_equations_orthogonality E X m v (fun i ↦ w i - v i) hnormal
   have hpointwise :
       (fun ω ↦
-        (m ω - dot w (X ω)) ^ 2 - (m ω - dot v (X ω)) ^ 2) =
-        (fun ω ↦ (dot (fun i ↦ w i - v i) (X ω)) ^ 2) +
+        (m ω - Foundations.dot w (X ω)) ^ 2 - (m ω - Foundations.dot v (X ω)) ^ 2) =
+        (fun ω ↦ (Foundations.dot (fun i ↦ w i - v i) (X ω)) ^ 2) +
           (-2 : ℝ) •
-            (fun ω ↦ dot (fun i ↦ w i - v i) (X ω) *
-              (m ω - dot v (X ω))) := by
+            (fun ω ↦ Foundations.dot (fun i ↦ w i - v i) (X ω) *
+              (m ω - Foundations.dot v (X ω))) := by
     funext ω
     rw [nonlinear_conditional_excess_risk_identity]
     simp [smul_eq_mul]

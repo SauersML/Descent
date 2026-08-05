@@ -243,8 +243,59 @@ class VecFn(list):
                 "dimensions; this value is not that many levels deep")
         return v
 
+    # ---- ARITHMETIC IS ELEMENTWISE, NOT CONCATENATION.
+    #
+    # `VecFn` subclasses `list` to get `len`, iteration and indexing for free,
+    # and inherited `list.__add__` with them -- so a translated body computing
+    # Lean's `A + B` on two `Fin p -> R` vectors got a vector of length 2p, and
+    # on two matrices a matrix with twice the rows.  Lean's `+` on `Pi` and on
+    # `Matrix` is elementwise at every level; concatenation is not a thing it
+    # can mean.
+    #
+    # It failed loudly only where a shape was checked downstream:
+    # `crossCovariance` summed four `Matrix (Fin p) (Fin q)` terms into a 16x4
+    # and two effect vectors into a length-8, and `mulVec` refused the pair --
+    # sixteen definitions, `mechanisticPortabilityRatio` and both Brier
+    # components among them, filed NOT-EXTRACTABLE for a shape the harness had
+    # built itself. Where nothing checked a length it was worse than an error:
+    # `sum` over a concatenation is the sum of both operands, so a body could
+    # return a plausible wrong number instead of raising.
+    #
+    # `*` is deliberately NOT overridden. Mathlib's `*` on `Matrix` is matrix
+    # multiplication and on `Pi` is elementwise, so a single operator cannot be
+    # right for both; the translator emits the explicit `_rt.mul`/`_rt.mulVec`
+    # helpers, and inherited `list.__mul__` raises `TypeError` on a float rather
+    # than inventing an answer.
+
+    def __add__(self, other):
+        return _vec(add(self, other))
+
+    __radd__ = __add__          # `sum(vs)` starts at the scalar 0; add() broadcasts it
+
+    def __sub__(self, other):
+        return _vec(sub(self, other))
+
+    def __rsub__(self, other):
+        return _vec(sub(other, self))
+
+    def __neg__(self):
+        return _vec(neg(self))
+
     def __repr__(self):
         return f"VecFn({list.__repr__(self)})"
+
+
+def _vec(x):
+    """Re-wrap a nested plain `list` as `VecFn`, so `v(i)` still works.
+
+    `add`/`sub`/`neg` build plain lists. A plain list indexes but does not
+    CALL, and a body that reads a summed field as `m.f P i` would raise
+    "'list' object is not callable" -- so the wrapping is what makes the
+    elementwise result usable in the same places the operands were.
+    """
+    if isinstance(x, (list, tuple)):
+        return VecFn(_vec(e) for e in x)
+    return x
 
 
 def _register_matrix_methods():
@@ -307,12 +358,8 @@ def mulVec(M, v):
     v = list(v)
     for r in M:
         if len(r) != len(v):
-            import traceback as _tb
-            _who = [f.name for f in _tb.extract_stack()[:-1]
-                    if f.name not in ("mulVec", "<module>")][-3:]
             raise ValueError(f"mulVec: matrix row width {len(r)} does not "
-                             f"match vector length {len(v)} "
-                             f"[shape {len(M)}x{len(r)}, via {'<'.join(reversed(_who))}]")
+                             f"match vector length {len(v)}")
     return VecFn(sum(a * b for a, b in zip(r, v)) for r in M)
 
 

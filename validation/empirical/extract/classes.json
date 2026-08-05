@@ -4790,9 +4790,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "TypeError(\"int() argument must be a string, a bytes-like object or a real number, not 'dict'\")"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": {
@@ -4857,8 +4857,8 @@
   }
  },
  "Descent.alleleFrequencyDivergence": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"int() argument must be a string, a bytes-like obj)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Blindness/DecoratedGeometryBlindness.lean",
   "line": 130,
   "short": "alleleFrequencyDivergence",
@@ -4872,9 +4872,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "TypeError(\"int() argument must be a string, a bytes-like object or a real number, not 'dict'\")"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": {
@@ -14077,74 +14077,11 @@
    }
   }
  },
- "Descent.SpectrumIdentifiability.coalescentRate": {
-  "class": "WRAPPER",
-  "note": "delegates to Descent.Core.pairCount",
-  "file": "Descent/Blindness/SpectrumIdentifiability.lean",
-  "line": 116,
-  "short": "coalescentRate",
-  "ret_type": "ℝ",
-  "empirical_status": "VALIDATED",
-  "python": "coalescentRate",
-  "args": [
-   "m"
-  ],
-  "box": {
-   "m": [
-    1.0,
-    20.0
-   ]
-  },
-  "selfcheck": {
-   "finite_points": 8,
-   "total_points": 8,
-   "error": null
-  },
-  "numeric_standins": null,
-  "vector_args": null,
-  "mentioned_by": [
-   "Descent.Coalescent.deathRate_eq_coalescentRate",
-   "Descent.Conditionals.kingmanSpectrum_identifiabilityBoundary",
-   "Descent.SpectrumIdentifiability.coalescentRate_add_two",
-   "Descent.SpectrumIdentifiability.coalescentRate_add_two_pos",
-   "Descent.SpectrumIdentifiability.coalescentRate_three",
-   "Descent.SpectrumIdentifiability.coalescentRate_two",
-   "Descent.SpectrumIdentifiability.hasSum_one_div_coalescentRate",
-   "Descent.SpectrumIdentifiability.muntzPartialSum",
-   "Descent.SpectrumIdentifiability.muntzPartialSum_lt_two",
-   "Descent.SpectrumIdentifiability.one_div_coalescentRate_add_two",
-   "Descent.SpectrumIdentifiability.summable_one_div_coalescentRate",
-   "Descent.SpectrumIdentifiability.tsum_one_div_coalescentRate",
-   "Descent.SpectrumIdentifiability.two_mul_add_one_le_coalescentRate"
-  ],
-  "constraints": {
-   "declared_kind": "probability",
-   "declared_lo": 0.0,
-   "declared_hi": 1.0,
-   "units": "generations",
-   "hypotheses": [],
-   "hypotheses_by_theorem": {
-    "Descent.SpectrumIdentifiability.coalescentRate_two": [],
-    "Descent.SpectrumIdentifiability.coalescentRate_three": [],
-    "Descent.SpectrumIdentifiability.coalescentRate_add_two": [],
-    "Descent.SpectrumIdentifiability.coalescentRate_add_two_pos": [],
-    "Descent.SpectrumIdentifiability.one_div_coalescentRate_add_two": [],
-    "Descent.SpectrumIdentifiability.muntzPartialSum": [],
-    "Descent.SpectrumIdentifiability.muntzPartialSum_lt_two": [],
-    "Descent.SpectrumIdentifiability.hasSum_one_div_coalescentRate": [],
-    "Descent.SpectrumIdentifiability.summable_one_div_coalescentRate": [],
-    "Descent.SpectrumIdentifiability.tsum_one_div_coalescentRate": [],
-    "Descent.SpectrumIdentifiability.two_mul_add_one_le_coalescentRate": [],
-    "Descent.Coalescent.deathRate_eq_coalescentRate": [],
-    "Descent.Conditionals.kingmanSpectrum_identifiabilityBoundary": []
-   }
-  }
- },
  "Descent.SpectrumIdentifiability.LinearTargetDeterminedByObservation": {
   "class": "STRUCTURAL",
   "note": "Prop-valued / set-valued",
   "file": "Descent/Blindness/SpectrumIdentifiability.lean",
-  "line": 296,
+  "line": 260,
   "short": "LinearTargetDeterminedByObservation",
   "ret_type": "Prop",
   "empirical_status": "",
@@ -14183,7 +14120,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "∑ over the Finset `Finset.range n`, not `Finset.univ`",
   "file": "Descent/Blindness/SpectrumIdentifiability.lean",
-  "line": 445,
+  "line": 409,
   "short": "spectrumAttenuation",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -14234,7 +14171,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Blindness/SpectrumIdentifiability.lean",
-  "line": 515,
+  "line": 479,
   "short": "cauchyConditioningProfile",
   "ret_type": "ℝ",
   "empirical_status": "NOT AN EMPIRICAL CLAIM",
@@ -14310,7 +14247,7 @@
   "class": "STRUCTURAL",
   "note": "Prop-valued / set-valued",
   "file": "Descent/Blindness/SpectrumIdentifiability.lean",
-  "line": 548,
+  "line": 512,
   "short": "CauchyConditioningStationary",
   "ret_type": "Prop",
   "empirical_status": "",
@@ -14376,7 +14313,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Blindness/SpectrumIdentifiability.lean",
-  "line": 680,
+  "line": 644,
   "short": "stableSieveDimension",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -24939,7 +24876,7 @@
    "Descent.Coalescent.coalescenceProb_le",
    "Descent.Coalescent.coalescenceProb_two",
    "Descent.Coalescent.comesDownFromInfinity_dichotomy",
-   "Descent.Coalescent.deathRate_eq_coalescentRate",
+   "Descent.Coalescent.deathRate_add_two_pos",
    "Descent.Coalescent.deathRate_le_asgEventRate",
    "Descent.Coalescent.deathRate_mul_deriv_timeChange",
    "Descent.Coalescent.deathRate_ne_zero",
@@ -24975,6 +24912,7 @@
    "Descent.Coalescent.lumping_rate_eq_deathRate",
    "Descent.Coalescent.moment_closure",
    "Descent.Coalescent.ohtaKimura_rate_balance",
+   "Descent.Coalescent.one_div_deathRate_add_two",
    "Descent.Coalescent.one_div_deathRate_eq",
    "Descent.Coalescent.one_div_deathRate_le_one",
    "Descent.Coalescent.one_le_deathRate_succ_succ",
@@ -24986,6 +24924,7 @@
    "Descent.Coalescent.stepLaw_prod",
    "Descent.Coalescent.stepLaw_time_marginal",
    "Descent.Coalescent.sum_jointDensity",
+   "Descent.Coalescent.sum_one_div_deathRate_range",
    "Descent.Coalescent.sum_one_div_deathRate_tail",
    "Descent.Coalescent.sum_range_div_eq_deathRate",
    "Descent.Coalescent.sum_range_neg_cast",
@@ -24997,7 +24936,13 @@
    "Descent.Coalescent.totalRate_kingman",
    "Descent.Coalescent.tsum_one_div_deathRate_tail",
    "Descent.Coalescent.varTransitTime_le_meanTransitTime",
-   "Descent.Coalescent.variance_holdTime_deathRate"
+   "Descent.Coalescent.variance_holdTime_deathRate",
+   "Descent.Conditionals.kingmanSpectrum_identifiabilityBoundary",
+   "Descent.SpectrumIdentifiability.hasSum_one_div_coalescentRate",
+   "Descent.SpectrumIdentifiability.muntzPartialSum_lt_two",
+   "Descent.SpectrumIdentifiability.summable_one_div_coalescentRate",
+   "Descent.SpectrumIdentifiability.tsum_one_div_coalescentRate",
+   "Descent.SpectrumIdentifiability.two_mul_add_one_le_coalescentRate"
   ],
   "constraints": {
    "declared_kind": "nonnegative",
@@ -25012,6 +24957,11 @@
     "k ≤ N"
    ],
    "hypotheses_by_theorem": {
+    "Descent.SpectrumIdentifiability.muntzPartialSum_lt_two": [],
+    "Descent.SpectrumIdentifiability.hasSum_one_div_coalescentRate": [],
+    "Descent.SpectrumIdentifiability.summable_one_div_coalescentRate": [],
+    "Descent.SpectrumIdentifiability.tsum_one_div_coalescentRate": [],
+    "Descent.SpectrumIdentifiability.two_mul_add_one_le_coalescentRate": [],
     "Descent.Coalescent.expectedSegmentLength_eq": [],
     "Descent.Coalescent.kingman_comesDownFromInfinity": [],
     "Descent.Coalescent.comesDownFromInfinity_dichotomy": [],
@@ -25061,7 +25011,6 @@
     "Descent.Coalescent.lumping_rate_eq_deathRate": [],
     "Descent.Coalescent.ohtaKimura_rate_balance": [],
     "Descent.Coalescent.jumpStep_apply_eq_jumpProb": [],
-    "Descent.Coalescent.deathRate_eq_coalescentRate": [],
     "Descent.Coalescent.deathRate_zero": [],
     "Descent.Coalescent.deathRate_one": [],
     "Descent.Coalescent.deathRate_two": [],
@@ -25070,9 +25019,12 @@
     "Descent.Coalescent.deathRate_pos": [
      "2 ≤ k"
     ],
+    "Descent.Coalescent.deathRate_add_two_pos": [],
     "Descent.Coalescent.deathRate_ne_zero": [
      "2 ≤ k"
     ],
+    "Descent.Coalescent.one_div_deathRate_add_two": [],
+    "Descent.Coalescent.sum_one_div_deathRate_range": [],
     "Descent.Coalescent.one_div_deathRate_eq": [],
     "Descent.Coalescent.sum_one_div_deathRate_tail": [
      "2 ≤ k"
@@ -25117,7 +25069,8 @@
     "Descent.Coalescent.le_coalescenceProb": [
      "k ≤ N"
     ],
-    "Descent.Coalescent.coalescenceProb_two": []
+    "Descent.Coalescent.coalescenceProb_two": [],
+    "Descent.Conditionals.kingmanSpectrum_identifiabilityBoundary": []
    },
    "range_lo_thm": [
     "Descent.Coalescent.deathRate_pos",
@@ -25130,7 +25083,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "∑ over the Finset `Finset.range ( n - 1 )`, not `Finset.univ`",
   "file": "Descent/Coalescent/Rates.lean",
-  "line": 128,
+  "line": 154,
   "short": "meanTransitTime",
   "ret_type": "ℝ",
   "empirical_status": "NOT AN EMPIRICAL CLAIM",
@@ -25204,7 +25157,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Coalescent/Rates.lean",
-  "line": 249,
+  "line": 275,
   "short": "survivalFactor",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -25280,7 +25233,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Coalescent/Rates.lean",
-  "line": 379,
+  "line": 405,
   "short": "transitDensityTerm",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -28299,7 +28252,6 @@
    "Descent.Coalescent.branchRate_lt_deathRate",
    "Descent.Coalescent.card_covers_eq_deathRate",
    "Descent.Coalescent.count_split",
-   "Descent.Coalescent.deathRate_eq_coalescentRate",
    "Descent.Coalescent.deathRate_one",
    "Descent.Coalescent.deathRate_succ_succ",
    "Descent.Coalescent.deathRate_three",
@@ -28315,10 +28267,7 @@
    "Descent.Coalescent.survivalFactor_partialProd",
    "Descent.Coalescent.varPairwiseFromTree_eq_tajima",
    "Descent.Core.pairCount_one",
-   "Descent.Core.pairCount_two",
-   "Descent.SpectrumIdentifiability.coalescentRate_add_two",
-   "Descent.SpectrumIdentifiability.coalescentRate_three",
-   "Descent.SpectrumIdentifiability.coalescentRate_two"
+   "Descent.Core.pairCount_two"
   ],
   "constraints": {
    "hypotheses": [
@@ -28326,9 +28275,6 @@
     "2 ≤ n"
    ],
    "hypotheses_by_theorem": {
-    "Descent.SpectrumIdentifiability.coalescentRate_two": [],
-    "Descent.SpectrumIdentifiability.coalescentRate_three": [],
-    "Descent.SpectrumIdentifiability.coalescentRate_add_two": [],
     "Descent.Coalescent.expectedSegmentLength_eq": [],
     "Descent.Coalescent.sum_range_neg_cast": [],
     "Descent.Coalescent.duality_identity": [],
@@ -28336,7 +28282,6 @@
     "Descent.Coalescent.jumpCoeff_recursion": [
      "k ≤ n"
     ],
-    "Descent.Coalescent.deathRate_eq_coalescentRate": [],
     "Descent.Coalescent.deathRate_zero": [],
     "Descent.Coalescent.deathRate_one": [],
     "Descent.Coalescent.deathRate_two": [],
@@ -28967,7 +28912,7 @@
    ]
   },
   "selfcheck": {
-   "finite_points": 3,
+   "finite_points": 6,
    "total_points": 8,
    "error": "OverflowError('math range error')"
   },
@@ -29292,7 +29237,9 @@
    "Descent.Coalescent.heterozygosityLossDerived_eq_pairCoalesced",
    "Descent.Coalescent.pairDistinct_eq_pow",
    "Descent.Coalescent.pairDistinct_nonneg",
-   "Descent.Coalescent.pairDistinct_one"
+   "Descent.Coalescent.pairDistinct_one",
+   "Descent.Coalescent.tsum_pairDistinct",
+   "Descent.Coalescent.tsum_pairDistinct_diploid"
   ],
   "constraints": {
    "declared_kind": "probability",
@@ -29312,6 +29259,10 @@
     "Descent.Coalescent.pairDistinct_one": [
      "0 < N"
     ],
+    "Descent.Coalescent.tsum_pairDistinct": [
+     "0 < N"
+    ],
+    "Descent.Coalescent.tsum_pairDistinct_diploid": [],
     "Descent.Coalescent.hetRecurrence_eq_pairDistinct": [],
     "Descent.Coalescent.heterozygosityLossDerived_eq_pairCoalesced": []
    },
@@ -33141,6 +33092,7 @@
    "Descent.Coalescent.prodUpTo_const",
    "Descent.Coalescent.prod_le_exp_neg_sum",
    "Descent.Coalescent.prod_le_one_sub_sum_add_sq",
+   "Descent.Coalescent.sum_one_div_deathRate_range",
    "Descent.Coalescent.sum_one_div_deathRate_tail",
    "Descent.Coalescent.sum_range_choose_add",
    "Descent.Coalescent.sum_range_div_eq_deathRate",
@@ -33158,7 +33110,6 @@
    "Descent.Core.hetRecurrence_closed_form",
    "Descent.Decision.CertificateGrading.GradedModulus.Δ_zero",
    "Descent.FactorsThroughObservation.zero",
-   "Descent.SpectrumIdentifiability.muntzPartialSum",
    "Descent.TrafficInvariantSeparation.biasedBinomialTypeWeight_firstMoment",
    "Descent.TrafficInvariantSeparation.mesoscopicGFOMIterate_succ_apply",
    "Descent.TrafficInvariantSeparation.mesoscopicGFOM_sum_exceptionalSlice",
@@ -33202,7 +33153,6 @@
     "Descent.speedTiltNonMergerFactor_neg_one_succ": [],
     "Descent.speedTiltNonMergerFactor_two_eq": [],
     "Descent.reciprocalDifference_sum": [],
-    "Descent.SpectrumIdentifiability.muntzPartialSum": [],
     "Descent.TrafficInvariantSeparation.biasedBinomialTypeWeight_firstMoment": [],
     "Descent.TrafficInvariantSeparation.mesoscopicGFOMIterate_succ_apply": [],
     "Descent.TrafficInvariantSeparation.mesoscopicGFOM_sum_exceptionalSlice": [],
@@ -33214,6 +33164,7 @@
     "Descent.Coalescent.binaryRate_eq_base": [],
     "Descent.Coalescent.one_add_smul_pow": [],
     "Descent.Coalescent.chain_antitone": [],
+    "Descent.Coalescent.sum_one_div_deathRate_range": [],
     "Descent.Coalescent.meanTransitTime_lt_two": [],
     "Descent.Coalescent.sum_one_div_deathRate_tail": [],
     "Descent.Coalescent.survivalFactor_partialProd": [],
@@ -39434,8 +39385,8 @@
   }
  },
  "Descent.Pop.withTarget": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"'dict' object is not callable\"))",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Core/Population.lean",
   "line": 72,
   "short": "withTarget",
@@ -39448,9 +39399,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "TypeError(\"'dict' object is not callable\")"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -42236,7 +42187,6 @@
    "Descent.Coalescent.branchRate_lt_deathRate",
    "Descent.Coalescent.card_covers_eq_deathRate",
    "Descent.Coalescent.count_split",
-   "Descent.Coalescent.deathRate_eq_coalescentRate",
    "Descent.Coalescent.deathRate_one",
    "Descent.Coalescent.deathRate_succ_succ",
    "Descent.Coalescent.deathRate_three",
@@ -42252,10 +42202,7 @@
    "Descent.Coalescent.survivalFactor_partialProd",
    "Descent.Coalescent.varPairwiseFromTree_eq_tajima",
    "Descent.Core.pairCount_one",
-   "Descent.Core.pairCount_two",
-   "Descent.SpectrumIdentifiability.coalescentRate_add_two",
-   "Descent.SpectrumIdentifiability.coalescentRate_three",
-   "Descent.SpectrumIdentifiability.coalescentRate_two"
+   "Descent.Core.pairCount_two"
   ],
   "constraints": {
    "hypotheses": [
@@ -42264,9 +42211,6 @@
     "sigma < (k : ℝ"
    ],
    "hypotheses_by_theorem": {
-    "Descent.SpectrumIdentifiability.coalescentRate_two": [],
-    "Descent.SpectrumIdentifiability.coalescentRate_three": [],
-    "Descent.SpectrumIdentifiability.coalescentRate_add_two": [],
     "Descent.Coalescent.expectedSegmentLength_eq": [],
     "Descent.Coalescent.sum_range_neg_cast": [],
     "Descent.Coalescent.duality_identity": [],
@@ -42277,7 +42221,6 @@
      "2 ≤ k",
      "k ≤ n"
     ],
-    "Descent.Coalescent.deathRate_eq_coalescentRate": [],
     "Descent.Coalescent.deathRate_zero": [],
     "Descent.Coalescent.deathRate_one": [],
     "Descent.Coalescent.deathRate_two": [],
@@ -43758,6 +43701,7 @@
    "Descent.Coalescent.prodUpTo_const",
    "Descent.Coalescent.prod_le_exp_neg_sum",
    "Descent.Coalescent.prod_le_one_sub_sum_add_sq",
+   "Descent.Coalescent.sum_one_div_deathRate_range",
    "Descent.Coalescent.sum_one_div_deathRate_tail",
    "Descent.Coalescent.sum_range_choose_add",
    "Descent.Coalescent.sum_range_div_eq_deathRate",
@@ -43775,7 +43719,6 @@
    "Descent.Core.hetRecurrence_closed_form",
    "Descent.Decision.CertificateGrading.GradedModulus.Δ_zero",
    "Descent.FactorsThroughObservation.zero",
-   "Descent.SpectrumIdentifiability.muntzPartialSum",
    "Descent.TrafficInvariantSeparation.biasedBinomialTypeWeight_firstMoment",
    "Descent.TrafficInvariantSeparation.mesoscopicGFOMIterate_succ_apply",
    "Descent.TrafficInvariantSeparation.mesoscopicGFOM_sum_exceptionalSlice",
@@ -43819,7 +43762,6 @@
     "Descent.speedTiltNonMergerFactor_neg_one_succ": [],
     "Descent.speedTiltNonMergerFactor_two_eq": [],
     "Descent.reciprocalDifference_sum": [],
-    "Descent.SpectrumIdentifiability.muntzPartialSum": [],
     "Descent.TrafficInvariantSeparation.biasedBinomialTypeWeight_firstMoment": [],
     "Descent.TrafficInvariantSeparation.mesoscopicGFOMIterate_succ_apply": [],
     "Descent.TrafficInvariantSeparation.mesoscopicGFOM_sum_exceptionalSlice": [],
@@ -43831,6 +43773,7 @@
     "Descent.Coalescent.binaryRate_eq_base": [],
     "Descent.Coalescent.one_add_smul_pow": [],
     "Descent.Coalescent.chain_antitone": [],
+    "Descent.Coalescent.sum_one_div_deathRate_range": [],
     "Descent.Coalescent.meanTransitTime_lt_two": [],
     "Descent.Coalescent.sum_one_div_deathRate_tail": [],
     "Descent.Coalescent.survivalFactor_partialProd": [],
@@ -47941,8 +47884,8 @@
   }
  },
  "Descent.Foundations.HardyWeinbergModel.centeredAltAlleleCount": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError('altAlleleCount: index {} is not a finite-type ind)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Foundations/Probability.lean",
   "line": 367,
   "short": "centeredAltAlleleCount",
@@ -47955,9 +47898,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "TypeError('altAlleleCount: index {} is not a finite-type index; refusing to invent one')"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -53435,9 +53378,11 @@
    "Descent.Coalescent.lambdaRate_consistent",
    "Descent.Coalescent.meanTimeActive_eq_of_ratio",
    "Descent.Coalescent.norm_prodUpTo_sub_le",
+   "Descent.Coalescent.one_div_deathRate_add_two",
    "Descent.Coalescent.restrict_restrict",
    "Descent.Coalescent.splitBy_rel_iff",
    "Descent.Coalescent.sum_choose_interior_eq_two_mul_cutCount",
+   "Descent.Coalescent.sum_one_div_deathRate_range",
    "Descent.Coalescent.sum_one_div_deathRate_tail",
    "Descent.Coalescent.survivalFactor_partialProd",
    "Descent.Coalescent.survivalFactor_partialProd_eq_mul",
@@ -53445,6 +53390,7 @@
    "Descent.Coalescent.tendsto_identityByDescent",
    "Descent.Coalescent.tendsto_restrictionFullProb_two",
    "Descent.Coalescent.tendsto_sum_inv_succ_atTop",
+   "Descent.Coalescent.tsum_pairDistinct_diploid",
    "Descent.Coalescent.varPairwise_two_eq",
    "Descent.Coalescent.varSegregatingSites_nonneg",
    "Descent.Coalescent.varWattersonEstimator_le",
@@ -53505,8 +53451,6 @@
    "Descent.Spectral.spectralCapture_pruneAllocation",
    "Descent.Spectral.stalePremium_neg_beyond_crossover",
    "Descent.Spectral.tridiagonalABAB_pathExpression_pos",
-   "Descent.SpectrumIdentifiability.muntzPartialSum",
-   "Descent.SpectrumIdentifiability.one_div_coalescentRate_add_two",
    "Descent.SpectrumIdentifiability.twoPoint_risk_lower_bound",
    "Descent.TrafficInvariantSeparation.curieWeiss_subcritical",
    "Descent.additive_misses_epistasis",
@@ -53630,8 +53574,6 @@
     "Descent.inflated_intensity_ne_of_injective": [],
     "Descent.lattice_observables_ne_gaussian": [],
     "Descent.isChameleonObservable_iff": [],
-    "Descent.SpectrumIdentifiability.one_div_coalescentRate_add_two": [],
-    "Descent.SpectrumIdentifiability.muntzPartialSum": [],
     "Descent.SpectrumIdentifiability.twoPoint_risk_lower_bound": [],
     "Descent.TrafficInvariantSeparation.curieWeiss_subcritical": [
      "|m| ≤ 1"
@@ -53666,6 +53608,8 @@
     "Descent.Coalescent.expected_disjoint_pairTime_product": [],
     "Descent.Coalescent.covariance_disjoint_pairTime": [],
     "Descent.Coalescent.sum_choose_interior_eq_two_mul_cutCount": [],
+    "Descent.Coalescent.one_div_deathRate_add_two": [],
+    "Descent.Coalescent.sum_one_div_deathRate_range": [],
     "Descent.Coalescent.sum_one_div_deathRate_tail": [],
     "Descent.Coalescent.survivalFactor_partialProd": [],
     "Descent.Coalescent.survivalFactor_partialProd_eq_mul": [],
@@ -53688,6 +53632,7 @@
     "Descent.Coalescent.tendsto_sum_inv_succ_atTop": [],
     "Descent.Coalescent.ae_totalDescentTime_eq_top": [],
     "Descent.Coalescent.isPiSystem_cylinders": [],
+    "Descent.Coalescent.tsum_pairDistinct_diploid": [],
     "Descent.Coalescent.hetRecurrence_factor_eq_mechanism": [],
     "Descent.Coalescent.hetRecurrence_eq_pairDistinct": [],
     "Descent.Coalescent.heterozygosityLossDerived_eq_pairCoalesced": [],
@@ -76601,7 +76546,7 @@
  },
  "Descent.thresholdDecision": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition false",
+  "note": "self-check: calls untranslated definition true",
   "file": "Descent/Portability/ContinuumCalibration.lean",
   "line": 525,
   "short": "thresholdDecision",
@@ -76625,7 +76570,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'false' is not defined\")"
+   "error": "NameError(\"name 'true' is not defined\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -80756,7 +80701,7 @@
  },
  "Descent.mechanisticPortabilityRatio": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: never finite (ValueError('mulVec: matrix row width 4 does not match vector length 8'))",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'V)",
   "file": "Descent/Portability/MechanisticPortabilityWitnesses.lean",
   "line": 93,
   "short": "mechanisticPortabilityRatio",
@@ -80770,7 +80715,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "ValueError('mulVec: matrix row width 4 does not match vector length 8')"
+   "error": "TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -82006,7 +81951,7 @@
  },
  "Descent.brierDiscriminationLoss": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: never finite (ValueError('mulVec: matrix row width 4 does not match vector length 8'))",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'V)",
   "file": "Descent/Portability/MetricSpecificPortability.lean",
   "line": 849,
   "short": "brierDiscriminationLoss",
@@ -82020,7 +81965,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "ValueError('mulVec: matrix row width 4 does not match vector length 8')"
+   "error": "TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -82060,7 +82005,7 @@
  },
  "Descent.brierCalibrationLoss": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: never finite (ValueError('mulVec: matrix row width 4 does not match vector length 8'))",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'V)",
   "file": "Descent/Portability/MetricSpecificPortability.lean",
   "line": 857,
   "short": "brierCalibrationLoss",
@@ -82080,7 +82025,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "ValueError('mulVec: matrix row width 4 does not match vector length 8')"
+   "error": "TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -91081,7 +91026,7 @@
  },
  "Descent.CrossPopulationMechanisticCalibrationModel.scoreMean": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError('VecFn: index {} is not a finite-type index; refus)",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'V)",
   "file": "Descent/Portability/PGSCalibrationTheory.lean",
   "line": 759,
   "short": "scoreMean",
@@ -91096,7 +91041,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "TypeError('VecFn: index {} is not a finite-type index; refusing to invent one')"
+   "error": "TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -91118,7 +91063,7 @@
  },
  "Descent.CrossPopulationMechanisticCalibrationModel.scoreMeanShift": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: never finite (ValueError('mulVec: matrix row width 4 does not match vector length 8'))",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'V)",
   "file": "Descent/Portability/PGSCalibrationTheory.lean",
   "line": 766,
   "short": "scoreMeanShift",
@@ -91132,7 +91077,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "ValueError('mulVec: matrix row width 4 does not match vector length 8')"
+   "error": "TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -91282,7 +91227,7 @@
  },
  "Descent.CrossPopulationMechanisticCalibrationModel.calibrationSlope": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: never finite (ValueError('mulVec: matrix row width 4 does not match vector length 8'))",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'V)",
   "file": "Descent/Portability/PGSCalibrationTheory.lean",
   "line": 782,
   "short": "calibrationSlope",
@@ -91297,7 +91242,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "ValueError('mulVec: matrix row width 4 does not match vector length 8')"
+   "error": "TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -97712,8 +97657,8 @@
   }
  },
  "Descent.sigmaTagCausalSourceAt": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError('VecFn: index {} is not a finite-type index; refus)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 2201,
   "short": "sigmaTagCausalSourceAt",
@@ -97726,9 +97671,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "TypeError('VecFn: index {} is not a finite-type index; refusing to invent one')"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -97770,8 +97715,8 @@
   }
  },
  "Descent.totalEffect": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError('VecFn: index {} is not a finite-type index; refus)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 2221,
   "short": "totalEffect",
@@ -97784,9 +97729,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "TypeError('VecFn: index {} is not a finite-type index; refusing to invent one')"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -97972,8 +97917,8 @@
   }
  },
  "Descent.crossCovariance": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError('VecFn: index {} is not a finite-type index; refus)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 2327,
   "short": "crossCovariance",
@@ -97986,9 +97931,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "TypeError('VecFn: index {} is not a finite-type index; refusing to invent one')"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -98031,7 +97976,7 @@
  },
  "Descent.sourceWeightsFromExplicitDrivers": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: never finite (ValueError('mulVec: matrix row width 4 does not match vector length 8'))",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'V)",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 2333,
   "short": "sourceWeightsFromExplicitDrivers",
@@ -98045,7 +97990,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "ValueError('mulVec: matrix row width 4 does not match vector length 8')"
+   "error": "TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -98082,7 +98027,7 @@
  },
  "Descent.sourceWeightedTagScore": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: never finite (ValueError('mulVec: matrix row width 4 does not match vector length 8'))",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'V)",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 2341,
   "short": "sourceWeightedTagScore",
@@ -98097,7 +98042,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "ValueError('mulVec: matrix row width 4 does not match vector length 8')"
+   "error": "TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\")"
   },
   "numeric_standins": null,
   "vector_args": {
@@ -98155,8 +98100,8 @@
   }
  },
  "Descent.taggingProjection": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError('VecFn: index {} is not a finite-type index; refus)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 2353,
   "short": "taggingProjection",
@@ -98169,9 +98114,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "TypeError('VecFn: index {} is not a finite-type index; refusing to invent one')"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -98196,8 +98141,8 @@
   }
  },
  "Descent.targetEffectHeterogeneity": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for -: 'list' and 'Ve)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 2373,
   "short": "targetEffectHeterogeneity",
@@ -98209,9 +98154,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "TypeError(\"unsupported operand type(s) for -: 'list' and 'VecFn'\")"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -98274,8 +98219,8 @@
   }
  },
  "Descent.targetEffectHeterogeneityProjection": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for -: 'list' and 'Ve)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 2453,
   "short": "targetEffectHeterogeneityProjection",
@@ -98287,9 +98232,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "TypeError(\"unsupported operand type(s) for -: 'list' and 'VecFn'\")"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -98354,8 +98299,8 @@
   }
  },
  "Descent.directCausalProjection": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError('VecFn: index {} is not a finite-type index; refus)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 2493,
   "short": "directCausalProjection",
@@ -98368,9 +98313,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "TypeError('VecFn: index {} is not a finite-type index; refusing to invent one')"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -98406,8 +98351,8 @@
   }
  },
  "Descent.proxyTaggingProjection": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError('VecFn: index {} is not a finite-type index; refus)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 2499,
   "short": "proxyTaggingProjection",
@@ -98420,9 +98365,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "TypeError('VecFn: index {} is not a finite-type index; refusing to invent one')"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -98459,7 +98404,7 @@
  },
  "Descent.scoreVarianceFromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: never finite (ValueError('mulVec: matrix row width 4 does not match vector length 8'))",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'V)",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 2590,
   "short": "scoreVarianceFromSourceWeights",
@@ -98474,7 +98419,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "ValueError('mulVec: matrix row width 4 does not match vector length 8')"
+   "error": "TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -98561,7 +98506,7 @@
  },
  "Descent.predictiveCovarianceFromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: never finite (ValueError('mulVec: matrix row width 4 does not match vector length 8'))",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'V)",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 2613,
   "short": "predictiveCovarianceFromSourceWeights",
@@ -98576,7 +98521,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "ValueError('mulVec: matrix row width 4 does not match vector length 8')"
+   "error": "TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -98649,7 +98594,7 @@
  },
  "Descent.calibrationSlopeFromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: never finite (ValueError('mulVec: matrix row width 4 does not match vector length 8'))",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'V)",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 2619,
   "short": "calibrationSlopeFromSourceWeights",
@@ -98664,7 +98609,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "ValueError('mulVec: matrix row width 4 does not match vector length 8')"
+   "error": "TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -98709,8 +98654,8 @@
   }
  },
  "Descent.brokenTaggingResidual": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for -: 'list' and 'li)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 2756,
   "short": "brokenTaggingResidual",
@@ -98722,9 +98667,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "TypeError(\"unsupported operand type(s) for -: 'list' and 'list'\")"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -98774,7 +98719,7 @@
  },
  "Descent.ancestrySpecificLDResidual": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: never finite (ValueError('mulVec: matrix row width 4 does not match vector length 8'))",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'V)",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 2793,
   "short": "ancestrySpecificLDResidual",
@@ -98788,7 +98733,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "ValueError('mulVec: matrix row width 4 does not match vector length 8')"
+   "error": "TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -98823,8 +98768,8 @@
   }
  },
  "Descent.sourceSpecificOverfitResidual": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for -: 'VecFn' and 'V)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 2810,
   "short": "sourceSpecificOverfitResidual",
@@ -98836,9 +98781,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "TypeError(\"unsupported operand type(s) for -: 'VecFn' and 'VecFn'\")"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -98924,7 +98869,7 @@
  },
  "Descent.irreducibleTargetResidualBurden": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for -: 'list' and 'li)",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'V)",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 2843,
   "short": "irreducibleTargetResidualBurden",
@@ -98938,7 +98883,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "TypeError(\"unsupported operand type(s) for -: 'list' and 'list'\")"
+   "error": "TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -99004,7 +98949,7 @@
  },
  "Descent.residualBurden": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for -: 'list' and 'li)",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'V)",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 2884,
   "short": "residualBurden",
@@ -99019,7 +98964,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "TypeError(\"unsupported operand type(s) for -: 'list' and 'list'\")"
+   "error": "TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -99040,7 +98985,7 @@
  },
  "Descent.effectiveOutcomeVariance": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError('VecFn: index {} is not a finite-type index; refus)",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'V)",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 2914,
   "short": "effectiveOutcomeVariance",
@@ -99055,7 +99000,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "TypeError('VecFn: index {} is not a finite-type index; refusing to invent one')"
+   "error": "TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -99138,7 +99083,7 @@
  },
  "Descent.explainedSignalVarianceFromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: never finite (ValueError('mulVec: matrix row width 4 does not match vector length 8'))",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'V)",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 2987,
   "short": "explainedSignalVarianceFromSourceWeights",
@@ -99153,7 +99098,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "ValueError('mulVec: matrix row width 4 does not match vector length 8')"
+   "error": "TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -99219,7 +99164,7 @@
  },
  "Descent.r2FromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: never finite (ValueError('mulVec: matrix row width 4 does not match vector length 8'))",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'V)",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 3019,
   "short": "r2FromSourceWeights",
@@ -99234,7 +99179,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "ValueError('mulVec: matrix row width 4 does not match vector length 8')"
+   "error": "TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -99387,7 +99332,7 @@
  },
  "Descent.residualVarianceFromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError('VecFn: index {} is not a finite-type index; refus)",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'V)",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 3037,
   "short": "residualVarianceFromSourceWeights",
@@ -99402,7 +99347,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "TypeError('VecFn: index {} is not a finite-type index; refusing to invent one')"
+   "error": "TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -99447,7 +99392,7 @@
  },
  "Descent.sourceCalibratedBrierFromSourceWeightsAtPrevalence": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: never finite (ValueError('mulVec: matrix row width 4 does not match vector length 8'))",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'V)",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 3062,
   "short": "sourceCalibratedBrierFromSourceWeightsAtPrevalence",
@@ -99467,7 +99412,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "ValueError('mulVec: matrix row width 4 does not match vector length 8')"
+   "error": "TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -99506,7 +99451,7 @@
  },
  "Descent.targetCalibratedBrierFromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: never finite (ValueError('mulVec: matrix row width 4 does not match vector length 8'))",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'V)",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 3146,
   "short": "targetCalibratedBrierFromSourceWeights",
@@ -99520,7 +99465,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "ValueError('mulVec: matrix row width 4 does not match vector length 8')"
+   "error": "TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -102199,7 +102144,7 @@
  },
  "Descent.equalVarianceGaussianAUCFromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: never finite (ValueError('mulVec: matrix row width 4 does not match vector length 8'))",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'V)",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 5552,
   "short": "equalVarianceGaussianAUCFromSourceWeights",
@@ -102214,7 +102159,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "ValueError('mulVec: matrix row width 4 does not match vector length 8')"
+   "error": "TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -127036,7 +126981,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "Matrix/vector literal (![…])",
   "file": "Descent.lean",
-  "line": 496,
+  "line": 497,
   "short": "sigmaS",
   "ret_type": "Matrix (Fin 2) (Fin 2) ℝ",
   "empirical_status": "",
@@ -127062,7 +127007,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "Matrix/vector literal (![…])",
   "file": "Descent.lean",
-  "line": 499,
+  "line": 500,
   "short": "sigmaT",
   "ret_type": "Matrix (Fin 2) (Fin 2) ℝ",
   "empirical_status": "",
@@ -127088,7 +127033,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "Matrix/vector literal (![…])",
   "file": "Descent.lean",
-  "line": 502,
+  "line": 503,
   "short": "crossS",
   "ret_type": "Fin 2 → ℝ",
   "empirical_status": "",
@@ -127121,7 +127066,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "Matrix/vector literal (![…])",
   "file": "Descent.lean",
-  "line": 519,
+  "line": 520,
   "short": "sigmaT2",
   "ret_type": "Matrix (Fin 2) (Fin 2) ℝ",
   "empirical_status": "",

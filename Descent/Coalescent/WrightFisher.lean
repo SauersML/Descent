@@ -374,11 +374,49 @@ theorem pairDistinct_nonneg {N : ℕ} (hN : 0 < N) (s : ℕ) : 0 ≤ pairDistinc
   rw [pairDistinct_eq_pow hN]
   positivity
 
-/-- The pair coalescence time is geometric, so the mean number of generations back to the
-common ancestor of two lineages is `N`.  In the time unit of K-G (2.15) -- `N` generations
--- that is `1`, which is `meanTransitTime 2`.  The unit and the mechanism agree. -/
 theorem pairDistinct_one {N : ℕ} (hN : 0 < N) : pairDistinct N 1 = 1 - 1 / (N : ℝ) := by
   rw [pairDistinct_eq_pow hN]
+  ring
+
+/-- **The mean pair-coalescence time is `N` generations.**
+
+The pair coalescence time is geometric with success probability `N⁻¹`, and the expectation
+of a `ℕ`-valued waiting time is the sum of its survival probabilities -- which is exactly
+`∑_s pairDistinct N s`, no separate probability space required.  The geometric series then
+gives `(1 - (1 - N⁻¹))⁻¹ = N`.
+
+This sentence was already in the corpus, as prose attached to `pairDistinct_one`: "the mean
+number of generations back to the common ancestor of two lineages is `N`".  Nothing stated
+it, so nothing could depend on it, and the `2·Nₑ` that converts coalescent time to
+generations was chosen independently in `Program.Conventions` under the name
+`coalescentTimeScale`.  Stated, it is what that convention now reads off -- see
+`Descent.Program.Conventions.coalescentTimeScale_eq_meanPairCoalescenceTime`. -/
+theorem tsum_pairDistinct {N : ℕ} (hN : 0 < N) :
+    ∑' s : ℕ, pairDistinct N s = (N : ℝ) := by
+  have hpos : (0 : ℝ) < (N : ℝ) := by exact_mod_cast hN
+  have hinv : (0 : ℝ) < 1 / (N : ℝ) := by positivity
+  have hone : 1 / (N : ℝ) ≤ 1 := by
+    rw [div_le_one hpos]
+    exact_mod_cast hN
+  have hnonneg : (0 : ℝ) ≤ 1 - 1 / (N : ℝ) := by linarith
+  have hlt : (1 : ℝ) - 1 / (N : ℝ) < 1 := by linarith
+  calc ∑' s : ℕ, pairDistinct N s
+      = ∑' s : ℕ, (1 - 1 / (N : ℝ)) ^ s := tsum_congr fun s ↦ pairDistinct_eq_pow hN s
+    _ = (1 - (1 - 1 / (N : ℝ)))⁻¹ := tsum_geometric_of_lt_one hnonneg hlt
+    _ = (N : ℝ) := by
+        rw [show (1 : ℝ) - (1 - 1 / (N : ℝ)) = 1 / (N : ℝ) by ring, one_div, inv_inv]
+
+/-- **In a diploid population of `Nₑ` individuals the mean is `2·Nₑ` generations.**
+
+The `2` is the ploidy: `Nₑ` individuals carry `2·Nₑ` gene copies, and it is gene copies
+that choose parents.  This is the `2·Nₑ` of `Program.Conventions.coalescentTimeScale`, and
+it is NOT the `4·Nₑ` of `θ = 4·Nₑ·μ` -- that one scales a RATE and picks up a further
+factor of two from the two lineages that can mutate. -/
+theorem tsum_pairDistinct_diploid {Ne : ℕ} (hNe : 0 < Ne) :
+    ∑' s : ℕ, pairDistinct (2 * Ne) s = 2 * (Ne : ℝ) := by
+  have h2 : 0 < 2 * Ne := by omega
+  rw [tsum_pairDistinct h2]
+  push_cast
   ring
 
 /-! ### The corpus's drift recurrence, derived

@@ -1,7 +1,7 @@
 {
  "_NOT_AUTHORITATIVE": "The committed copy of this file is STALE BY CONSTRUCTION: the Lean corpus moves every few minutes and this is a cache of it. Do not consume a committed copy -- run validation/extract/emit.py in your own worktree immediately before use, and call api.require_fresh(), which raises if the table does not describe the Lean on disk.",
- "source_digest": "sha256:21f4f92dbb1e1183603b99351d9584a8",
- "source_files": 220,
+ "source_digest": "sha256:2171979648d0bb6b09536a8ac19f8c31",
+ "source_files": 221,
  "collisions": {},
  "theorems": [
   {
@@ -8444,110 +8444,50 @@
    ]
   },
   {
-   "name": "Descent.SpectrumIdentifiability.coalescentRate_two",
-   "kind": "theorem",
-   "file": "Descent/Blindness/SpectrumIdentifiability.lean",
-   "line": 119,
-   "statement": ": coalescentRate 2 = 1",
-   "mentions": [
-    "coalescentRate"
-   ]
-  },
-  {
-   "name": "Descent.SpectrumIdentifiability.coalescentRate_three",
-   "kind": "theorem",
-   "file": "Descent/Blindness/SpectrumIdentifiability.lean",
-   "line": 123,
-   "statement": ": coalescentRate 3 = 3",
-   "mentions": [
-    "coalescentRate"
-   ]
-  },
-  {
-   "name": "Descent.SpectrumIdentifiability.coalescentRate_add_two",
-   "kind": "theorem",
-   "file": "Descent/Blindness/SpectrumIdentifiability.lean",
-   "line": 128,
-   "statement": "(k : ℕ) : coalescentRate (k + 2) = ((k : ℝ) + 2) * ((k : ℝ) + 1) / 2",
-   "mentions": [
-    "coalescentRate"
-   ]
-  },
-  {
-   "name": "Descent.SpectrumIdentifiability.coalescentRate_add_two_pos",
-   "kind": "theorem",
-   "file": "Descent/Blindness/SpectrumIdentifiability.lean",
-   "line": 134,
-   "statement": "(k : ℕ) : 0 < coalescentRate (k + 2)",
-   "mentions": [
-    "coalescentRate"
-   ]
-  },
-  {
-   "name": "Descent.SpectrumIdentifiability.one_div_coalescentRate_add_two",
-   "kind": "theorem",
-   "file": "Descent/Blindness/SpectrumIdentifiability.lean",
-   "line": 140,
-   "statement": "(k : ℕ) : 1 / coalescentRate (k + 2) = 2 * (1 / ((k : ℝ) + 1) - 1 / ((k : ℝ) + 2))",
-   "mentions": [
-    "coalescentRate"
-   ]
-  },
-  {
-   "name": "Descent.SpectrumIdentifiability.muntzPartialSum",
-   "kind": "theorem",
-   "file": "Descent/Blindness/SpectrumIdentifiability.lean",
-   "line": 149,
-   "statement": "(n : ℕ) : ∑ k ∈ Finset.range n, 1 / coalescentRate (k + 2) = 2 - 2 / ((n : ℝ) + 1)",
-   "mentions": [
-    "coalescentRate"
-   ]
-  },
-  {
    "name": "Descent.SpectrumIdentifiability.muntzPartialSum_lt_two",
    "kind": "theorem",
    "file": "Descent/Blindness/SpectrumIdentifiability.lean",
-   "line": 161,
-   "statement": "(n : ℕ) : ∑ k ∈ Finset.range n, 1 / coalescentRate (k + 2) < 2",
+   "line": 125,
+   "statement": "(n : ℕ) : ∑ k ∈ Finset.range n, 1 / Coalescent.deathRate (k + 2) < 2",
    "mentions": [
-    "coalescentRate"
+    "deathRate"
    ]
   },
   {
    "name": "Descent.SpectrumIdentifiability.hasSum_one_div_coalescentRate",
    "kind": "theorem",
    "file": "Descent/Blindness/SpectrumIdentifiability.lean",
-   "line": 169,
-   "statement": ": HasSum (fun k : ℕ ↦ 1 / coalescentRate (k + 2)) 2",
+   "line": 133,
+   "statement": ": HasSum (fun k : ℕ ↦ 1 / Coalescent.deathRate (k + 2)) 2",
    "mentions": [
-    "coalescentRate"
+    "deathRate"
    ]
   },
   {
    "name": "Descent.SpectrumIdentifiability.summable_one_div_coalescentRate",
    "kind": "theorem",
    "file": "Descent/Blindness/SpectrumIdentifiability.lean",
-   "line": 181,
-   "statement": ": Summable fun k : ℕ ↦ 1 / coalescentRate (k + 2)",
+   "line": 145,
+   "statement": ": Summable fun k : ℕ ↦ 1 / Coalescent.deathRate (k + 2)",
    "mentions": [
-    "coalescentRate"
+    "deathRate"
    ]
   },
   {
    "name": "Descent.SpectrumIdentifiability.tsum_one_div_coalescentRate",
    "kind": "theorem",
    "file": "Descent/Blindness/SpectrumIdentifiability.lean",
-   "line": 186,
-   "statement": ": ∑' k : ℕ, 1 / coalescentRate (k + 2) = 2",
+   "line": 150,
+   "statement": ": ∑' k : ℕ, 1 / Coalescent.deathRate (k + 2) = 2",
    "mentions": [
-    "coalescentRate"
+    "deathRate"
    ]
   },
   {
    "name": "Descent.SpectrumIdentifiability.not_summable_one_div_linearRate",
    "kind": "theorem",
    "file": "Descent/Blindness/SpectrumIdentifiability.lean",
-   "line": 192,
+   "line": 156,
    "statement": ": ¬ Summable fun k : ℕ ↦ 1 / ((k : ℝ) + 1)",
    "mentions": []
   },
@@ -8555,7 +8495,7 @@
    "name": "Descent.SpectrumIdentifiability.summable_one_div_of_scaled_natSucc_rpow_le_rate",
    "kind": "theorem",
    "file": "Descent/Blindness/SpectrumIdentifiability.lean",
-   "line": 203,
+   "line": 167,
    "statement": "(rate : ℕ → ℝ) (scale power : ℝ) (hscale : 0 < scale) (hpower : 1 < power) (hgrowth : ∀ n : ℕ, scale * ((n : ℝ) + 1) ^ power ≤ rate n) : Summable fun n ↦ 1 / rate n",
    "mentions": [
     "power",
@@ -8566,7 +8506,7 @@
    "name": "Descent.SpectrumIdentifiability.summable_one_div_scaled_natSucc_rpow_iff",
    "kind": "theorem",
    "file": "Descent/Blindness/SpectrumIdentifiability.lean",
-   "line": 233,
+   "line": 197,
    "statement": "(scale power : ℝ) (hscale : scale ≠ 0) : (Summable fun n : ℕ ↦ 1 / (scale * ((n : ℝ) + 1) ^ power)) ↔ 1 < power",
    "mentions": [
     "power",
@@ -8577,7 +8517,7 @@
    "name": "Descent.SpectrumIdentifiability.not_summable_one_div_scaled_natSucc_rpow_iff",
    "kind": "theorem",
    "file": "Descent/Blindness/SpectrumIdentifiability.lean",
-   "line": 254,
+   "line": 218,
    "statement": "(scale power : ℝ) (hscale : scale ≠ 0) : (¬ Summable fun n : ℕ ↦ 1 / (scale * ((n : ℝ) + 1) ^ power)) ↔ power ≤ 1",
    "mentions": [
     "power",
@@ -8588,7 +8528,7 @@
    "name": "Descent.SpectrumIdentifiability.exists_invisible_perturbation_of_lt",
    "kind": "theorem",
    "file": "Descent/Blindness/SpectrumIdentifiability.lean",
-   "line": 267,
+   "line": 231,
    "statement": "{inputCount outputCount : ℕ} (hcount : outputCount < inputCount) {𝕜 : Type*} [DivisionRing 𝕜] (obs : (Fin inputCount → 𝕜) →ₗ[𝕜] (Fin outputCount → 𝕜)) : ∃ v : Fin inputCount → 𝕜, v ≠ 0 ∧ obs v = 0",
    "mentions": []
   },
@@ -8596,7 +8536,7 @@
    "name": "Descent.SpectrumIdentifiability.exists_invisible_perturbation",
    "kind": "theorem",
    "file": "Descent/Blindness/SpectrumIdentifiability.lean",
-   "line": 285,
+   "line": 249,
    "statement": "{n : ℕ} {𝕜 : Type*} [DivisionRing 𝕜] (obs : (Fin (n + 1) → 𝕜) →ₗ[𝕜] (Fin n → 𝕜)) : ∃ v : Fin (n + 1) → 𝕜, v ≠ 0 ∧ obs v = 0",
    "mentions": []
   },
@@ -8604,7 +8544,7 @@
    "name": "Descent.SpectrumIdentifiability.linearTargetDeterminedByObservation_iff_ker_le",
    "kind": "theorem",
    "file": "Descent/Blindness/SpectrumIdentifiability.lean",
-   "line": 307,
+   "line": 271,
    "statement": "{R V W Z : Type*} [Ring R] [AddCommGroup V] [Module R V] [AddCommGroup W] [Module R W] [AddCommGroup Z] [Module R Z] (observation : V →ₗ[R] W) (target : V →ₗ[R] Z) : LinearTargetDeterminedByObservation observation target ↔ LinearMap.ker observation ≤ LinearMap.ker target",
    "mentions": [
     "LinearTargetDeterminedByObservation"
@@ -8614,7 +8554,7 @@
    "name": "Descent.SpectrumIdentifiability.linearTargetDeterminedByObservation_id_iff",
    "kind": "theorem",
    "file": "Descent/Blindness/SpectrumIdentifiability.lean",
-   "line": 328,
+   "line": 292,
    "statement": "{R V W : Type*} [Ring R] [AddCommGroup V] [Module R V] [AddCommGroup W] [Module R W] (observation : V →ₗ[R] W) : LinearTargetDeterminedByObservation observation LinearMap.id ↔ Function.Injective observation",
    "mentions": [
     "LinearTargetDeterminedByObservation"
@@ -8624,7 +8564,7 @@
    "name": "Descent.SpectrumIdentifiability.LinearTargetDeterminedByObservation.of_processedObservation",
    "kind": "theorem",
    "file": "Descent/Blindness/SpectrumIdentifiability.lean",
-   "line": 342,
+   "line": 306,
    "statement": "{R V W Y Z : Type*} [Ring R] [AddCommGroup V] [Module R V] [AddCommGroup W] [Module R W] [AddCommGroup Y] [Module R Y] [AddCommGroup Z] [Module R Z] (observation : V →ₗ[R] W) (processing : W →ₗ[R] Y) (target : V →ₗ[R] Z) (hdetermined : LinearTargetDeterminedByObservation (processing.comp observation) target) : LinearTargetDeterminedByObservation observation target",
    "mentions": [
     "LinearTargetDeterminedByObservation"
@@ -8634,7 +8574,7 @@
    "name": "Descent.SpectrumIdentifiability.LinearTargetDeterminedByObservation.postcomp",
    "kind": "theorem",
    "file": "Descent/Blindness/SpectrumIdentifiability.lean",
-   "line": 356,
+   "line": 320,
    "statement": "{R V W Y Z : Type*} [Ring R] [AddCommGroup V] [Module R V] [AddCommGroup W] [Module R W] [AddCommGroup Y] [Module R Y] [AddCommGroup Z] [Module R Z] {observation : V →ₗ[R] W} {target : V →ₗ[R] Y} (hdetermined : LinearTargetDeterminedByObservation observation target) (processing : Y →ₗ[R] Z) : LinearTargetDeterminedByObservation observation (processing.comp target)",
    "mentions": [
     "LinearTargetDeterminedByObservation"
@@ -8644,7 +8584,7 @@
    "name": "Descent.SpectrumIdentifiability.twoPoint_risk_lower_bound",
    "kind": "theorem",
    "file": "Descent/Blindness/SpectrumIdentifiability.lean",
-   "line": 377,
+   "line": 341,
    "statement": "{ι Θ : Type*} [Fintype ι] (d : Θ → Θ → ℝ) (htri : ∀ a b c, d a c ≤ d a b + d b c) (p : ι → ℝ) (hp : ∀ i, 0 ≤ p i) (hsum : ∑ i, p i = 1) (hi lo : Θ) (est : ι → Θ) : d hi lo / 2 ≤ max (∑ i, p i * d hi (est i)) (∑ i, p i * d (est i) lo)",
    "mentions": []
   },
@@ -8652,7 +8592,7 @@
    "name": "Descent.SpectrumIdentifiability.twoPoint_risk_lower_bound_sq",
    "kind": "theorem",
    "file": "Descent/Blindness/SpectrumIdentifiability.lean",
-   "line": 398,
+   "line": 362,
    "statement": "{ι Θ : Type*} [Fintype ι] (d : Θ → Θ → ℝ) (htri : ∀ a b c, d a c ≤ d a b + d b c) (hd : ∀ a b, 0 ≤ d a b) (p : ι → ℝ) (hp : ∀ i, 0 ≤ p i) (hsum : ∑ i, p i = 1) (hi lo : Θ) (est : ι → Θ) : (d hi lo / 2) ^ 2 ≤ max (∑ i, p i * d hi (est i) ^ 2) (∑ i, p i * d (est i) lo ^ 2)",
    "mentions": []
   },
@@ -8660,17 +8600,17 @@
    "name": "Descent.SpectrumIdentifiability.two_mul_add_one_le_coalescentRate",
    "kind": "theorem",
    "file": "Descent/Blindness/SpectrumIdentifiability.lean",
-   "line": 449,
-   "statement": "(k : ℕ) : 2 * (k : ℝ) + 1 ≤ coalescentRate (k + 2)",
+   "line": 413,
+   "statement": "(k : ℕ) : 2 * (k : ℝ) + 1 ≤ Coalescent.deathRate (k + 2)",
    "mentions": [
-    "coalescentRate"
+    "deathRate"
    ]
   },
   {
    "name": "Descent.SpectrumIdentifiability.spectrumAttenuation_le_geometric",
    "kind": "theorem",
    "file": "Descent/Blindness/SpectrumIdentifiability.lean",
-   "line": 462,
+   "line": 426,
    "statement": "(n : ℕ) (τ : ℝ) (hτ : 0 ≤ τ) : spectrumAttenuation n τ ≤ Real.exp (-(2 * τ)) * ∑ k ∈ Finset.range n, Real.exp (-(4 * τ)) ^ k",
    "mentions": [
     "spectrumAttenuation"
@@ -8680,7 +8620,7 @@
    "name": "Descent.SpectrumIdentifiability.spectrumAttenuation_le_closedForm",
    "kind": "theorem",
    "file": "Descent/Blindness/SpectrumIdentifiability.lean",
-   "line": 476,
+   "line": 440,
    "statement": "(n : ℕ) (τ : ℝ) (hτ : 0 < τ) : spectrumAttenuation n τ ≤ Real.exp (-(2 * τ)) / (1 - Real.exp (-(4 * τ)))",
    "mentions": [
     "spectrumAttenuation"
@@ -8690,7 +8630,7 @@
    "name": "Descent.SpectrumIdentifiability.cauchyConditioningProfile_log_at_one_is_junk",
    "kind": "theorem",
    "file": "Descent/Blindness/SpectrumIdentifiability.lean",
-   "line": 522,
+   "line": 486,
    "statement": ": Real.log (1 - (1 : ℝ)) = 0",
    "mentions": []
   },
@@ -8698,7 +8638,7 @@
    "name": "Descent.SpectrumIdentifiability.cauchyConditioningProfile_arctan_at_zero_is_junk",
    "kind": "theorem",
    "file": "Descent/Blindness/SpectrumIdentifiability.lean",
-   "line": 528,
+   "line": 492,
    "statement": ": Real.arctan (1 / (0 : ℝ)) = 0",
    "mentions": []
   },
@@ -8706,7 +8646,7 @@
    "name": "Descent.SpectrumIdentifiability.cauchyConditioningProfile_zero",
    "kind": "theorem",
    "file": "Descent/Blindness/SpectrumIdentifiability.lean",
-   "line": 532,
+   "line": 496,
    "statement": ": cauchyConditioningProfile 0 = 0",
    "mentions": [
     "cauchyConditioningProfile"
@@ -8716,7 +8656,7 @@
    "name": "Descent.SpectrumIdentifiability.cauchyConditioningProfile_one",
    "kind": "theorem",
    "file": "Descent/Blindness/SpectrumIdentifiability.lean",
-   "line": 538,
+   "line": 502,
    "statement": ": cauchyConditioningProfile 1 = Real.pi - 2 * Real.log 2",
    "mentions": [
     "cauchyConditioningProfile"
@@ -8726,7 +8666,7 @@
    "name": "Descent.SpectrumIdentifiability.cauchyConditioningStationary_unique",
    "kind": "theorem",
    "file": "Descent/Blindness/SpectrumIdentifiability.lean",
-   "line": 555,
+   "line": 519,
    "statement": "{θ₁ θ₂ : ℝ} (hθ₁0 : 0 < θ₁) (hθ₁1 : θ₁ < 1) (hθ₂0 : 0 < θ₂) (hθ₂1 : θ₂ < 1) (hθ₁ : CauchyConditioningStationary θ₁) (hθ₂ : CauchyConditioningStationary θ₂) : θ₁ = θ₂",
    "mentions": [
     "CauchyConditioningStationary"
@@ -8736,7 +8676,7 @@
    "name": "Descent.SpectrumIdentifiability.cauchyConditioningProfile_eq_integral_closedForm",
    "kind": "theorem",
    "file": "Descent/Blindness/SpectrumIdentifiability.lean",
-   "line": 584,
+   "line": 548,
    "statement": "(θ : ℝ) (hθ0 : 0 < θ) (hθ1 : θ < 1) : cauchyConditioningProfile θ = 2 * (Real.log ((1 + θ ^ 2) / (1 - θ ^ 2)) + 2 * θ * Real.arctan (1 / θ) - θ * Real.log ((1 + θ) / (1 - θ)))",
    "mentions": [
     "cauchyConditioningProfile"
@@ -8746,7 +8686,7 @@
    "name": "Descent.SpectrumIdentifiability.hasDerivAt_cauchyConditioningProfile",
    "kind": "theorem",
    "file": "Descent/Blindness/SpectrumIdentifiability.lean",
-   "line": 602,
+   "line": 566,
    "statement": "(θ : ℝ) (hθ0 : 0 < θ) (hθ1 : θ < 1) : HasDerivAt cauchyConditioningProfile (2 * (2 * Real.arctan (1 / θ) - Real.log ((1 + θ) / (1 - θ)))) θ",
    "mentions": [
     "cauchyConditioningProfile"
@@ -8756,7 +8696,7 @@
    "name": "Descent.SpectrumIdentifiability.cauchyConditioningProfile_derivative_zero_iff_stationary",
    "kind": "theorem",
    "file": "Descent/Blindness/SpectrumIdentifiability.lean",
-   "line": 641,
+   "line": 605,
    "statement": "(θ : ℝ) : 2 * (2 * Real.arctan (1 / θ) - Real.log ((1 + θ) / (1 - θ))) = 0 ↔ CauchyConditioningStationary θ",
    "mentions": [
     "CauchyConditioningStationary"
@@ -8766,7 +8706,7 @@
    "name": "Descent.SpectrumIdentifiability.cauchyConditioningProfile_at_stationary",
    "kind": "theorem",
    "file": "Descent/Blindness/SpectrumIdentifiability.lean",
-   "line": 651,
+   "line": 615,
    "statement": "(θ : ℝ) (hθ0 : 0 < θ) (hθ1 : θ < 1) (hstationary : CauchyConditioningStationary θ) : cauchyConditioningProfile θ = 2 * Real.log ((1 + θ ^ 2) / (1 - θ ^ 2))",
    "mentions": [
     "CauchyConditioningStationary",
@@ -8777,7 +8717,7 @@
    "name": "Descent.SpectrumIdentifiability.exp_half_cauchyConditioningProfile_at_stationary",
    "kind": "theorem",
    "file": "Descent/Blindness/SpectrumIdentifiability.lean",
-   "line": 664,
+   "line": 628,
    "statement": "(θ : ℝ) (hθ0 : 0 < θ) (hθ1 : θ < 1) (hstationary : CauchyConditioningStationary θ) : Real.exp (cauchyConditioningProfile θ / 2) = (1 + θ ^ 2) / (1 - θ ^ 2)",
    "mentions": [
     "CauchyConditioningStationary",
@@ -8788,7 +8728,7 @@
    "name": "Descent.SpectrumIdentifiability.stableSieveDimension_of_scaled",
    "kind": "theorem",
    "file": "Descent/Blindness/SpectrumIdentifiability.lean",
-   "line": 687,
+   "line": 651,
    "statement": "(kappa L added : ℝ) (hk : kappa ≠ 0) (hL : 0 < L) : stableSieveDimension kappa (Real.exp (kappa * added) * L) = stableSieveDimension kappa L + added",
    "mentions": [
     "kappa",
@@ -8799,7 +8739,7 @@
    "name": "Descent.SpectrumIdentifiability.le_stableSieveDimension_iff",
    "kind": "theorem",
    "file": "Descent/Blindness/SpectrumIdentifiability.lean",
-   "line": 699,
+   "line": 663,
    "statement": "(kappa L r : ℝ) (hk : 0 < kappa) (hL : 0 < L) : r ≤ stableSieveDimension kappa L ↔ Real.exp (kappa * r) ≤ L",
    "mentions": [
     "kappa",
@@ -8810,7 +8750,7 @@
    "name": "Descent.SpectrumIdentifiability.stableSieveDimension_le_iff",
    "kind": "theorem",
    "file": "Descent/Blindness/SpectrumIdentifiability.lean",
-   "line": 717,
+   "line": 681,
    "statement": "(kappa L r : ℝ) (hk : 0 < kappa) (hL : 0 < L) : stableSieveDimension kappa L ≤ r ↔ L ≤ Real.exp (kappa * r)",
    "mentions": [
     "kappa",
@@ -8821,7 +8761,7 @@
    "name": "Descent.SpectrumIdentifiability.spectrumAttenuation_at_zero",
    "kind": "theorem",
    "file": "Descent/Blindness/SpectrumIdentifiability.lean",
-   "line": 736,
+   "line": 700,
    "statement": "(n : ℕ) : spectrumAttenuation n 0 = n",
    "mentions": [
     "spectrumAttenuation"
@@ -8831,7 +8771,7 @@
    "name": "Descent.SpectrumIdentifiability.spectrumAttenuation_empty",
    "kind": "theorem",
    "file": "Descent/Blindness/SpectrumIdentifiability.lean",
-   "line": 741,
+   "line": 705,
    "statement": "(tau : ℝ) : spectrumAttenuation 0 tau = 0",
    "mentions": [
     "spectrumAttenuation",
@@ -8842,7 +8782,7 @@
    "name": "Descent.SpectrumIdentifiability.spectrumAttenuation_one",
    "kind": "theorem",
    "file": "Descent/Blindness/SpectrumIdentifiability.lean",
-   "line": 745,
+   "line": 709,
    "statement": "(tau : ℝ) : spectrumAttenuation 1 tau = Real.exp (-(2 * tau))",
    "mentions": [
     "spectrumAttenuation",
@@ -8853,7 +8793,7 @@
    "name": "Descent.SpectrumIdentifiability.stableSieveDimension_at_one",
    "kind": "theorem",
    "file": "Descent/Blindness/SpectrumIdentifiability.lean",
-   "line": 750,
+   "line": 714,
    "statement": "(kappa : ℝ) : stableSieveDimension kappa 1 = 0",
    "mentions": [
     "kappa",
@@ -8864,7 +8804,7 @@
    "name": "Descent.SpectrumIdentifiability.stableSieveDimension_at_exp",
    "kind": "theorem",
    "file": "Descent/Blindness/SpectrumIdentifiability.lean",
-   "line": 755,
+   "line": 719,
    "statement": "(kappa : ℝ) (hk : kappa ≠ 0) : stableSieveDimension kappa (Real.exp kappa) = 1",
    "mentions": [
     "kappa",
@@ -8875,7 +8815,7 @@
    "name": "Descent.SpectrumIdentifiability.stableSieveDimension_at_zero_exponent_is_junk",
    "kind": "theorem",
    "file": "Descent/Blindness/SpectrumIdentifiability.lean",
-   "line": 764,
+   "line": 728,
    "statement": "(L : ℝ) : stableSieveDimension 0 L = 0",
    "mentions": [
     "stableSieveDimension"
@@ -13798,6 +13738,30 @@
    ]
   },
   {
+   "name": "Descent.Coalescent.exp_sub_one_sub_self_eq_tsum",
+   "kind": "theorem",
+   "file": "Descent/Coalescent/ExpRemainder.lean",
+   "line": 51,
+   "statement": "(x : 𝔸) : exp ℝ x - 1 - x = ∑' n : ℕ, ((n + 2)! : ℝ)⁻¹ • x ^ (n + 2)",
+   "mentions": []
+  },
+  {
+   "name": "Descent.Coalescent.norm_exp_sub_one_sub_self_le",
+   "kind": "theorem",
+   "file": "Descent/Coalescent/ExpRemainder.lean",
+   "line": 71,
+   "statement": "(x : 𝔸) : ‖exp ℝ x - 1 - x‖ ≤ Real.exp ‖x‖ - 1 - ‖x‖",
+   "mentions": []
+  },
+  {
+   "name": "Descent.Coalescent.norm_exp_sub_one_sub_self_le_sq",
+   "kind": "theorem",
+   "file": "Descent/Coalescent/ExpRemainder.lean",
+   "line": 100,
+   "statement": "{x : 𝔸} (hx : ‖x‖ ≤ 1) : ‖exp ℝ x - 1 - x‖ ≤ ‖x‖ ^ 2",
+   "mentions": []
+  },
+  {
    "name": "Descent.Coalescent.extendMap_of_lt",
    "kind": "theorem",
    "file": "Descent/Coalescent/Extend.lean",
@@ -16270,21 +16234,10 @@
    ]
   },
   {
-   "name": "Descent.Coalescent.deathRate_eq_coalescentRate",
-   "kind": "theorem",
-   "file": "Descent/Coalescent/Rates.lean",
-   "line": 72,
-   "statement": "(k : ℕ) : deathRate k = SpectrumIdentifiability.coalescentRate k",
-   "mentions": [
-    "coalescentRate",
-    "deathRate"
-   ]
-  },
-  {
    "name": "Descent.Coalescent.deathRate_zero",
    "kind": "theorem",
    "file": "Descent/Coalescent/Rates.lean",
-   "line": 76,
+   "line": 69,
    "statement": ": deathRate 0 = 0",
    "mentions": [
     "deathRate"
@@ -16294,7 +16247,7 @@
    "name": "Descent.Coalescent.deathRate_one",
    "kind": "theorem",
    "file": "Descent/Coalescent/Rates.lean",
-   "line": 80,
+   "line": 73,
    "statement": ": deathRate 1 = 0",
    "mentions": [
     "deathRate"
@@ -16304,7 +16257,7 @@
    "name": "Descent.Coalescent.deathRate_two",
    "kind": "theorem",
    "file": "Descent/Coalescent/Rates.lean",
-   "line": 83,
+   "line": 76,
    "statement": ": deathRate 2 = 1",
    "mentions": [
     "deathRate"
@@ -16314,7 +16267,7 @@
    "name": "Descent.Coalescent.deathRate_three",
    "kind": "theorem",
    "file": "Descent/Coalescent/Rates.lean",
-   "line": 86,
+   "line": 79,
    "statement": ": deathRate 3 = 3",
    "mentions": [
     "deathRate"
@@ -16324,7 +16277,7 @@
    "name": "Descent.Coalescent.deathRate_succ_succ",
    "kind": "theorem",
    "file": "Descent/Coalescent/Rates.lean",
-   "line": 89,
+   "line": 82,
    "statement": "(k : ℕ) : deathRate (k + 2) = ((k : ℝ) + 2) * ((k : ℝ) + 1) / 2",
    "mentions": [
     "deathRate"
@@ -16334,8 +16287,18 @@
    "name": "Descent.Coalescent.deathRate_pos",
    "kind": "theorem",
    "file": "Descent/Coalescent/Rates.lean",
-   "line": 95,
+   "line": 88,
    "statement": "{k : ℕ} (hk : 2 ≤ k) : 0 < deathRate k",
+   "mentions": [
+    "deathRate"
+   ]
+  },
+  {
+   "name": "Descent.Coalescent.deathRate_add_two_pos",
+   "kind": "theorem",
+   "file": "Descent/Coalescent/Rates.lean",
+   "line": 95,
+   "statement": "(k : ℕ) : 0 < deathRate (k + 2)",
    "mentions": [
     "deathRate"
    ]
@@ -16344,8 +16307,28 @@
    "name": "Descent.Coalescent.deathRate_ne_zero",
    "kind": "theorem",
    "file": "Descent/Coalescent/Rates.lean",
-   "line": 100,
+   "line": 99,
    "statement": "{k : ℕ} (hk : 2 ≤ k) : deathRate k ≠ 0",
+   "mentions": [
+    "deathRate"
+   ]
+  },
+  {
+   "name": "Descent.Coalescent.one_div_deathRate_add_two",
+   "kind": "theorem",
+   "file": "Descent/Coalescent/Rates.lean",
+   "line": 109,
+   "statement": "(k : ℕ) : 1 / deathRate (k + 2) = 2 * (1 / ((k : ℝ) + 1) - 1 / ((k : ℝ) + 2))",
+   "mentions": [
+    "deathRate"
+   ]
+  },
+  {
+   "name": "Descent.Coalescent.sum_one_div_deathRate_range",
+   "kind": "theorem",
+   "file": "Descent/Coalescent/Rates.lean",
+   "line": 118,
+   "statement": "(n : ℕ) : ∑ k ∈ Finset.range n, 1 / deathRate (k + 2) = 2 - 2 / ((n : ℝ) + 1)",
    "mentions": [
     "deathRate"
    ]
@@ -16354,7 +16337,7 @@
    "name": "Descent.Coalescent.one_div_deathRate_eq",
    "kind": "theorem",
    "file": "Descent/Coalescent/Rates.lean",
-   "line": 105,
+   "line": 132,
    "statement": "{r : ℕ} (hr : 2 ≤ r) : 1 / deathRate r = 2 * (1 / ((r : ℝ) - 1) - 1 / (r : ℝ))",
    "mentions": [
     "deathRate"
@@ -16364,7 +16347,7 @@
    "name": "Descent.Coalescent.meanTransitTime_succ",
    "kind": "theorem",
    "file": "Descent/Coalescent/Rates.lean",
-   "line": 131,
+   "line": 157,
    "statement": "(n : ℕ) : meanTransitTime (n + 1) = 2 - 2 / ((n : ℝ) + 1)",
    "mentions": [
     "meanTransitTime"
@@ -16374,7 +16357,7 @@
    "name": "Descent.Coalescent.meanTransitTime_eq_two_sub",
    "kind": "theorem",
    "file": "Descent/Coalescent/Rates.lean",
-   "line": 143,
+   "line": 169,
    "statement": "{n : ℕ} (hn : 1 ≤ n) : meanTransitTime n = 2 - 2 / (n : ℝ)",
    "mentions": [
     "meanTransitTime"
@@ -16384,7 +16367,7 @@
    "name": "Descent.Coalescent.meanTransitTime_one",
    "kind": "theorem",
    "file": "Descent/Coalescent/Rates.lean",
-   "line": 151,
+   "line": 177,
    "statement": ": meanTransitTime 1 = 0",
    "mentions": [
     "meanTransitTime"
@@ -16394,7 +16377,7 @@
    "name": "Descent.Coalescent.meanTransitTime_two",
    "kind": "theorem",
    "file": "Descent/Coalescent/Rates.lean",
-   "line": 155,
+   "line": 181,
    "statement": ": meanTransitTime 2 = 1",
    "mentions": [
     "meanTransitTime"
@@ -16404,7 +16387,7 @@
    "name": "Descent.Coalescent.meanTransitTime_lt_two",
    "kind": "theorem",
    "file": "Descent/Coalescent/Rates.lean",
-   "line": 161,
+   "line": 187,
    "statement": "(n : ℕ) : meanTransitTime n < 2",
    "mentions": [
     "meanTransitTime"
@@ -16414,7 +16397,7 @@
    "name": "Descent.Coalescent.meanTransitTime_nonneg",
    "kind": "theorem",
    "file": "Descent/Coalescent/Rates.lean",
-   "line": 169,
+   "line": 195,
    "statement": "(n : ℕ) : 0 ≤ meanTransitTime n",
    "mentions": [
     "meanTransitTime"
@@ -16424,7 +16407,7 @@
    "name": "Descent.Coalescent.tendsto_meanTransitTime",
    "kind": "theorem",
    "file": "Descent/Coalescent/Rates.lean",
-   "line": 176,
+   "line": 202,
    "statement": ": Tendsto (fun n : ℕ => meanTransitTime (n + 1)) atTop (nhds 2)",
    "mentions": [
     "meanTransitTime"
@@ -16434,7 +16417,7 @@
    "name": "Descent.Coalescent.tendsto_two_div_shift",
    "kind": "theorem",
    "file": "Descent/Coalescent/Rates.lean",
-   "line": 191,
+   "line": 217,
    "statement": "{c : ℝ} (hc : 2 ≤ c) : Tendsto (fun m : ℕ => 2 / (c + (m : ℝ) - 1)) atTop (nhds 0)",
    "mentions": []
   },
@@ -16442,7 +16425,7 @@
    "name": "Descent.Coalescent.sum_one_div_deathRate_tail",
    "kind": "theorem",
    "file": "Descent/Coalescent/Rates.lean",
-   "line": 205,
+   "line": 231,
    "statement": "{k : ℕ} (hk : 2 ≤ k) (m : ℕ) : ∑ j ∈ Finset.range m, 1 / deathRate (k + j) = 2 / ((k : ℝ) - 1) - 2 / ((k : ℝ) + (m : ℝ) - 1)",
    "mentions": [
     "deathRate"
@@ -16452,7 +16435,7 @@
    "name": "Descent.Coalescent.hasSum_one_div_deathRate_tail",
    "kind": "theorem",
    "file": "Descent/Coalescent/Rates.lean",
-   "line": 224,
+   "line": 250,
    "statement": "{k : ℕ} (hk : 2 ≤ k) : HasSum (fun j : ℕ => 1 / deathRate (k + j)) (2 / ((k : ℝ) - 1))",
    "mentions": [
     "deathRate"
@@ -16462,7 +16445,7 @@
    "name": "Descent.Coalescent.summable_one_div_deathRate_tail",
    "kind": "theorem",
    "file": "Descent/Coalescent/Rates.lean",
-   "line": 232,
+   "line": 258,
    "statement": "{k : ℕ} (hk : 2 ≤ k) : Summable fun j : ℕ => 1 / deathRate (k + j)",
    "mentions": [
     "deathRate"
@@ -16472,7 +16455,7 @@
    "name": "Descent.Coalescent.tsum_one_div_deathRate_tail",
    "kind": "theorem",
    "file": "Descent/Coalescent/Rates.lean",
-   "line": 236,
+   "line": 262,
    "statement": "{k : ℕ} (hk : 2 ≤ k) : ∑' j : ℕ, 1 / deathRate (k + j) = 2 / ((k : ℝ) - 1)",
    "mentions": [
     "deathRate"
@@ -16482,7 +16465,7 @@
    "name": "Descent.Coalescent.survivalFactor_one",
    "kind": "theorem",
    "file": "Descent/Coalescent/Rates.lean",
-   "line": 251,
+   "line": 277,
    "statement": ": survivalFactor 1 = 0",
    "mentions": [
     "survivalFactor"
@@ -16492,7 +16475,7 @@
    "name": "Descent.Coalescent.survivalFactor_two",
    "kind": "theorem",
    "file": "Descent/Coalescent/Rates.lean",
-   "line": 253,
+   "line": 279,
    "statement": ": survivalFactor 2 = 1 / 3",
    "mentions": [
     "survivalFactor"
@@ -16502,7 +16485,7 @@
    "name": "Descent.Coalescent.survivalFactor_nonneg",
    "kind": "theorem",
    "file": "Descent/Coalescent/Rates.lean",
-   "line": 256,
+   "line": 282,
    "statement": "{x : ℕ} (hx : 1 ≤ x) : 0 ≤ survivalFactor x",
    "mentions": [
     "survivalFactor"
@@ -16512,7 +16495,7 @@
    "name": "Descent.Coalescent.survivalFactor_lt_one",
    "kind": "theorem",
    "file": "Descent/Coalescent/Rates.lean",
-   "line": 261,
+   "line": 287,
    "statement": "(x : ℕ) : survivalFactor x < 1",
    "mentions": [
     "survivalFactor"
@@ -16522,7 +16505,7 @@
    "name": "Descent.Coalescent.survivalFactor_partialProd",
    "kind": "theorem",
    "file": "Descent/Coalescent/Rates.lean",
-   "line": 271,
+   "line": 297,
    "statement": "{x : ℕ} (hx : 2 ≤ x) (m : ℕ) : ∏ j ∈ Finset.range m, (1 - 1 / deathRate (x + 1 + j)) = (((x : ℝ) - 1) * ((x : ℝ) + (m : ℝ) + 1)) / (((x : ℝ) + 1) * ((x : ℝ) + (m : ℝ) - 1))",
    "mentions": [
     "deathRate"
@@ -16532,7 +16515,7 @@
    "name": "Descent.Coalescent.survivalFactor_partialProd_eq_mul",
    "kind": "theorem",
    "file": "Descent/Coalescent/Rates.lean",
-   "line": 305,
+   "line": 331,
    "statement": "{x : ℕ} (hx : 2 ≤ x) (m : ℕ) : ∏ j ∈ Finset.range m, (1 - 1 / deathRate (x + 1 + j)) = survivalFactor x * (1 + 2 / ((x : ℝ) + (m : ℝ) - 1))",
    "mentions": [
     "deathRate",
@@ -16543,7 +16526,7 @@
    "name": "Descent.Coalescent.tendsto_survivalFactor_partialProd",
    "kind": "theorem",
    "file": "Descent/Coalescent/Rates.lean",
-   "line": 318,
+   "line": 344,
    "statement": "{x : ℕ} (hx : 2 ≤ x) : Tendsto (fun m : ℕ => ∏ j ∈ Finset.range m, (1 - 1 / deathRate (x + 1 + j))) atTop (nhds (survivalFactor x))",
    "mentions": [
     "deathRate",
@@ -16554,7 +16537,7 @@
    "name": "Descent.Coalescent.one_le_three_mul_survivalFactor",
    "kind": "theorem",
    "file": "Descent/Coalescent/Rates.lean",
-   "line": 332,
+   "line": 358,
    "statement": "{x : ℕ} (hx : 2 ≤ x) : 1 ≤ 3 * survivalFactor x",
    "mentions": [
     "survivalFactor"
@@ -16564,7 +16547,7 @@
    "name": "Descent.Coalescent.three_mul_survivalFactor_two",
    "kind": "theorem",
    "file": "Descent/Coalescent/Rates.lean",
-   "line": 344,
+   "line": 370,
    "statement": ": 3 * survivalFactor 2 = 1",
    "mentions": [
     "survivalFactor"
@@ -16574,7 +16557,7 @@
    "name": "Descent.Coalescent.measure_two_le_le_three_mul_integral",
    "kind": "theorem",
    "file": "Descent/Coalescent/Rates.lean",
-   "line": 355,
+   "line": 381,
    "statement": "{Ω : Type*} [MeasurableSpace Ω] (μ : Measure Ω) [IsFiniteMeasure μ] (K : Ω → ℕ) (hK : ∀ ω, 1 ≤ K ω) (hmeas : MeasurableSet {ω | 2 ≤ K ω}) (hint : Integrable (fun ω => survivalFactor (K ω)) μ) : (μ {ω | 2 ≤ K ω}).toReal ≤ 3 * ∫ ω, survivalFactor (K ω) ∂μ",
    "mentions": [
     "survivalFactor"
@@ -16584,7 +16567,7 @@
    "name": "Descent.Coalescent.transitDensityTerm_two",
    "kind": "theorem",
    "file": "Descent/Coalescent/Rates.lean",
-   "line": 387,
+   "line": 413,
    "statement": "(t : ℝ) : transitDensityTerm 2 t = 3 * Real.exp (-t)",
    "mentions": [
     "transitDensityTerm"
@@ -16594,7 +16577,7 @@
    "name": "Descent.Coalescent.transitDensityTerm_one",
    "kind": "theorem",
    "file": "Descent/Coalescent/Rates.lean",
-   "line": 392,
+   "line": 418,
    "statement": "(t : ℝ) : transitDensityTerm 1 t = 0",
    "mentions": [
     "transitDensityTerm"
@@ -18704,8 +18687,28 @@
    "name": "Descent.Coalescent.pairDistinct_one",
    "kind": "theorem",
    "file": "Descent/Coalescent/WrightFisher.lean",
-   "line": 380,
+   "line": 377,
    "statement": "{N : ℕ} (hN : 0 < N) : pairDistinct N 1 = 1 - 1 / (N : ℝ)",
+   "mentions": [
+    "pairDistinct"
+   ]
+  },
+  {
+   "name": "Descent.Coalescent.tsum_pairDistinct",
+   "kind": "theorem",
+   "file": "Descent/Coalescent/WrightFisher.lean",
+   "line": 394,
+   "statement": "{N : ℕ} (hN : 0 < N) : ∑' s : ℕ, pairDistinct N s = (N : ℝ)",
+   "mentions": [
+    "pairDistinct"
+   ]
+  },
+  {
+   "name": "Descent.Coalescent.tsum_pairDistinct_diploid",
+   "kind": "theorem",
+   "file": "Descent/Coalescent/WrightFisher.lean",
+   "line": 415,
+   "statement": "{Ne : ℕ} (hNe : 0 < Ne) : ∑' s : ℕ, pairDistinct (2 * Ne) s = 2 * (Ne : ℝ)",
    "mentions": [
     "pairDistinct"
    ]
@@ -18714,7 +18717,7 @@
    "name": "Descent.Coalescent.hetRecurrence_factor_eq_mechanism",
    "kind": "theorem",
    "file": "Descent/Coalescent/WrightFisher.lean",
-   "line": 396,
+   "line": 434,
    "statement": "{Ne : ℕ} (hNe : 0 < Ne) : noCoalescenceProb (2 * Ne) 2 = 1 - 1 / (2 * (Ne : ℝ))",
    "mentions": [
     "noCoalescenceProb"
@@ -18724,7 +18727,7 @@
    "name": "Descent.Coalescent.hetRecurrence_eq_pairDistinct",
    "kind": "theorem",
    "file": "Descent/Coalescent/WrightFisher.lean",
-   "line": 406,
+   "line": 444,
    "statement": "{Ne : ℕ} (hNe : 0 < Ne) (H₀ : ℝ) (t : ℕ) : Descent.Core.hetRecurrence (Ne : ℝ) H₀ t = pairDistinct (2 * Ne) t * H₀",
    "mentions": [
     "hetRecurrence",
@@ -18735,7 +18738,7 @@
    "name": "Descent.Coalescent.heterozygosityLossDerived_eq_pairCoalesced",
    "kind": "theorem",
    "file": "Descent/Coalescent/WrightFisher.lean",
-   "line": 415,
+   "line": 453,
    "statement": "{Ne : ℕ} (hNe : 0 < Ne) (t : ℕ) : Descent.Core.heterozygosityLoss (Ne : ℝ) t = 1 - pairDistinct (2 * Ne) t",
    "mentions": [
     "heterozygosityLoss",
@@ -21474,9 +21477,9 @@
    "kind": "theorem",
    "file": "Descent/Conditionals/DynamicsContrast.lean",
    "line": 199,
-   "statement": ": Summable (fun k : ℕ ↦ 1 / SpectrumIdentifiability.coalescentRate (k + 2)) ∧ ∀ n : ℕ, ∀ observation : (Fin (n + 1) → ℝ) →ₗ[ℝ] (Fin n → ℝ), ∃ direction : Fin (n + 1) → ℝ, direction ≠ 0 ∧ observation direction = 0",
+   "statement": ": Summable (fun k : ℕ ↦ 1 / Coalescent.deathRate (k + 2)) ∧ ∀ n : ℕ, ∀ observation : (Fin (n + 1) → ℝ) →ₗ[ℝ] (Fin n → ℝ), ∃ direction : Fin (n + 1) → ℝ, direction ≠ 0 ∧ observation direction = 0",
    "mentions": [
-    "coalescentRate"
+    "deathRate"
    ]
   },
   {
@@ -67608,7 +67611,7 @@
    "name": "Descent.pioneerWeightFraction_eq_fstFromTau",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 215,
+   "line": 216,
    "statement": "(w : ℝ) : XiFromMarks.pioneerWeightFraction w = fstFromTau w",
    "mentions": [
     "fstFromTau",
@@ -67619,7 +67622,7 @@
    "name": "Descent.pioneerWeightFraction_eq_sharedLDFromMigration",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 220,
+   "line": 221,
    "statement": "(w : ℝ) : XiFromMarks.pioneerWeightFraction w = sharedLDFromMigration w",
    "mentions": [
     "pioneerWeightFraction",
@@ -67630,7 +67633,7 @@
    "name": "Descent.ogpOverlapProfile_eq_populationOverlapProfile",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 241,
+   "line": 242,
    "statement": "(q x : ℝ) : ogpOverlapProfile q x = populationOverlapProfile q x",
    "mentions": [
     "ogpOverlapProfile",
@@ -67641,7 +67644,7 @@
    "name": "Descent.epochSampleSize_eq_epochLineageSampleSize",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 245,
+   "line": 246,
    "statement": "(K : ℕ) : epochSampleSize K = epochLineageSampleSize K",
    "mentions": [
     "epochLineageSampleSize",
@@ -67652,7 +67655,7 @@
    "name": "Descent.configurationOverlap_and_transplantSqNorm_are_dotProduct",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 255,
+   "line": 256,
    "statement": "(configuration : TwoCoordinateConfiguration) (displacement : Fin 3 → ℝ) : configurationOverlap configuration configuration = dotProduct configuration configuration ∧ transplantSqNorm displacement = dotProduct displacement displacement",
    "mentions": [
     "TwoCoordinateConfiguration",
@@ -67665,7 +67668,7 @@
    "name": "Descent.stayKernel_eq_oneHotWeight",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 263,
+   "line": 264,
    "statement": "(i j : Fin 2) : stayKernel i j = oneHotWeight (R := ℝ) i j",
    "mentions": [
     "oneHotWeight",
@@ -67676,7 +67679,7 @@
    "name": "Descent.persistentTransition_eq_oneHotWeight",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 271,
+   "line": 272,
    "statement": "(x y : Conditionals.BinaryBiologicalState) : Conditionals.persistentTransition x y = oneHotWeight (R := ℝ) x y",
    "mentions": [
     "BinaryBiologicalState",
@@ -67688,7 +67691,7 @@
    "name": "Descent.contextMatchQuality_eq_persistentTransition",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 279,
+   "line": 280,
    "statement": "(x y : Conditionals.BinaryBiologicalState) : Conditionals.contextMatchQuality x y = Conditionals.persistentTransition x y",
    "mentions": [
     "BinaryBiologicalState",
@@ -67700,7 +67703,7 @@
    "name": "Descent.contextMatchQuality_eq_oneHotWeight",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 283,
+   "line": 284,
    "statement": "(x y : Conditionals.BinaryBiologicalState) : Conditionals.contextMatchQuality x y = oneHotWeight (R := ℝ) x y",
    "mentions": [
     "BinaryBiologicalState",
@@ -67712,7 +67715,7 @@
    "name": "Descent.stableSieveDimension_eq_criticalDegree",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 289,
+   "line": 290,
    "statement": "(kappa L : ℝ) : SpectrumIdentifiability.stableSieveDimension kappa L = criticalDegree L kappa",
    "mentions": [
     "criticalDegree",
@@ -67724,7 +67727,7 @@
    "name": "Descent.two_le_two",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 441,
+   "line": 442,
    "statement": ": (2 : ℕ) ≤ 2",
    "mentions": []
   },
@@ -67732,7 +67735,7 @@
    "name": "Descent.twoLocusCoalescent_covariance_gap_lower_bound_dim_two",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 459,
+   "line": 460,
    "statement": "(ibdWeight recombRate : ℝ) (tSource tTarget : ℕ) (h_time : tSource ≤ tTarget) : 2 * (ibdWeight * discreteRecombinationSurvival recombRate tSource * (1 - discreteRecombinationSurvival recombRate (tTarget - tSource))) ^ 2 ≤ frobeniusNormSq (twoLocusCoalescentCovarianceMatrix two_le_two ibdWeight recombRate tSource - twoLocusCoalescentCovarianceMatrix two_le_two ibdWeight recombRate tTarget)",
    "mentions": [
     "discreteRecombinationSurvival",
@@ -67745,7 +67748,7 @@
    "name": "Descent.covariance_mismatch_pos_of_twoLocusCoalescent_dim_two",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 473,
+   "line": 474,
    "statement": "(ibdWeight recombRate : ℝ) (tSource tTarget : ℕ) (h_ibd_pos : 0 < ibdWeight) (h_recomb_pos : 0 < recombRate) (h_recomb_lt_one : recombRate < 1) (h_time : tSource < tTarget) : 0 < frobeniusNormSq (twoLocusCoalescentCovarianceMatrix two_le_two ibdWeight recombRate tSource - twoLocusCoalescentCovarianceMatrix two_le_two ibdWeight recombRate tTarget)",
    "mentions": [
     "frobeniusNormSq",
@@ -67757,7 +67760,7 @@
    "name": "Descent.expectedBrierScore_deriv_proved",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 491,
+   "line": 492,
    "statement": "(p π : ℝ) : deriv (fun x ↦ Program.expectedBrierScore x π) p = 2 * (p - π)",
    "mentions": [
     "expectedBrierScore"
@@ -67767,7 +67770,7 @@
    "name": "Descent.overlapEnergyTruth_eq_crossS",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 505,
+   "line": 506,
    "statement": ": overlapEnergyTruth = crossS",
    "mentions": [
     "crossS",
@@ -67778,7 +67781,7 @@
    "name": "Descent.overlapEnergyPositive_eq_reorderScore",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 508,
+   "line": 509,
    "statement": ": overlapEnergyPositive = reorderScore",
    "mentions": [
     "overlapEnergyPositive",
@@ -67789,7 +67792,7 @@
    "name": "Descent.overlapEnergyPositive_eq_twoAncestryConditional",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 511,
+   "line": 512,
    "statement": ": overlapEnergyPositive = twoAncestryConditional",
    "mentions": [
     "overlapEnergyPositive",
@@ -67800,7 +67803,7 @@
    "name": "Descent.sigmaT_mulVec_crossS_eq_ldWitnessTargetCross",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 532,
+   "line": 533,
    "statement": ": sigmaT.mulVec crossS = ldWitnessTargetCross",
    "mentions": [
     "crossS",
@@ -67811,7 +67814,7 @@
    "name": "Descent.source_erm_solves_source_not_target_normal_equations",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 541,
+   "line": 542,
    "statement": ": let wS : Fin 2 → ℝ",
    "mentions": []
   },
@@ -67819,7 +67822,7 @@
    "name": "Descent.source_target_erm_differ_proved",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 561,
+   "line": 562,
    "statement": ": let wS : Fin 2 → ℝ",
    "mentions": []
   },
@@ -67827,7 +67830,7 @@
    "name": "Descent.target_r2_drop_of_twoLocusCoalescent_dim_two",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 579,
+   "line": 580,
    "statement": "(mseSource mseTarget varY lam : ℝ) (ibdWeight recombRate : ℝ) (tSource tTarget : ℕ) (h_mse_gap_lb : lam * frobeniusNormSq (twoLocusCoalescentCovarianceMatrix two_le_two ibdWeight recombRate tSource - twoLocusCoalescentCovarianceMatrix two_le_two ibdWeight recombRate tTarget) ≤ mseTarget - mseSource) (h_lam_pos : 0 < lam) (h_varY_pos : 0 < varY) (h_ibd_pos : 0 < ibdWeight) (h_recomb_pos : 0 < recombRate) (h_recomb_lt_one : recombRate < 1) (h_time : tSource < tTarget) : r2FromMSE mseTarget varY < r2FromMSE mseSource varY",
    "mentions": [
     "frobeniusNormSq",
@@ -67840,7 +67843,7 @@
    "name": "Descent.ld_decay_implies_nonlinear_calibration_of_exp_tagging",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 648,
+   "line": 649,
    "statement": "{k : ℕ} [Fintype (Fin k)] (mech : LDDecayMechanism k) (lambda : ℝ) (h_lambda_pos : 0 < lambda) (h_tagging : mech.tagging_efficiency = fun d ↦ Real.exp (-lambda * d)) (c0 c1 c2 : Fin k → ℝ) (hd0 : mech.distance c0 = 0) (hd1 : mech.distance c1 = 1) (hd2 : mech.distance c2 = 2) : ∀ (beta0 beta1 : ℝ), (fun c ↦ beta0 + beta1 * mech.distance c) ≠ (fun c ↦ decaySlope mech c)",
    "mentions": [
     "decaySlope"
@@ -67850,7 +67853,7 @@
    "name": "Descent.additive_score_subcritical_at_balanced_locus_proved",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 738,
+   "line": 739,
    "statement": ": 1 < Spectral.maxSafeEpistaticOrder 1000000 (1 / 2)",
    "mentions": [
     "maxSafeEpistaticOrder"
@@ -67860,7 +67863,7 @@
    "name": "Descent.pairwise_epistasis_supercritical_proved",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 749,
+   "line": 750,
    "statement": ": ∃ q : ℝ, 0 < q ∧ q ≤ 1 / 8 ∧ Real.log 1000000 < 2 * Spectral.hweMellinDrift q",
    "mentions": [
     "hweMellinDrift"
@@ -67870,7 +67873,7 @@
    "name": "Descent.hardCall_lattice_inflation_proved",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 756,
+   "line": 757,
    "statement": ": 1 < latticeInflation Spectral.hardCallLatticeSpan",
    "mentions": [
     "hardCallLatticeSpan",
@@ -67881,7 +67884,7 @@
    "name": "Descent.frustration_floor_proved",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 763,
+   "line": 764,
    "statement": ": (0.127 : ℝ) < Conditionals.expanderAgreementFloor",
    "mentions": [
     "expanderAgreementFloor"
@@ -67891,7 +67894,7 @@
    "name": "Descent.chargedTuples_one_slot_iff",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 783,
+   "line": 784,
    "statement": "{T : Type*} [TopologicalSpace T] {d : ℕ} (F : BundleRigidity.ModulusFamily T d) (S : Set T) (v : ℝ) (t : Fin 1 → T) : t ∈ BundleRigidity.chargedTuples (fun j x ↦ F.curve j x) {u | u 0 ∈ S} (fun _ ↦ v) ↔ t 0 ∈ F.coverers S v",
    "mentions": [
     "S",
@@ -67903,7 +67906,7 @@
    "name": "Descent.singleModulus_atom_sq_eq_realizability_atom_sq",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 799,
+   "line": 800,
    "statement": "{d : ℕ} {v : ℝ} (S : BundleRigidity.SingleModulus d v) (hv : 0 ≤ v) (hv1 : v ≤ 1) (j : Fin d) : S.atom j ^ 2 = BundleRigidity.outerAtom v ^ 2 ∨ S.atom j ^ 2 = BundleRigidity.innerAtom v ^ 2",
    "mentions": [
     "S",
@@ -67915,7 +67918,7 @@
    "name": "Descent.sampleCost_eq_fixedGradeBenchmarkSampleSize",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 819,
+   "line": 820,
    "statement": "(η C : ℝ) (k : ℕ) (hη : 0 < η) (hC : 0 < C) : BundleRigidity.sampleCost η C k = Decision.fixedGradeBenchmarkSampleSize (η / C) ((2 * k : ℕ) : ℝ) 1",
    "mentions": [
     "fixedGradeBenchmarkSampleSize",
@@ -67926,7 +67929,7 @@
    "name": "Descent.intensity_eq_charFnSq",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 842,
+   "line": 843,
    "statement": "{n : ℕ} (P : Spectral.PhasePanel n) (s : ℝ) : P.intensity s = charFnSq P.weight P.phase s",
    "mentions": [
     "charFnSq",
@@ -84946,77 +84949,13 @@
    ]
   },
   {
-   "name": "Descent.SpectrumIdentifiability.coalescentRate",
-   "decl_name": "coalescentRate",
-   "short": "coalescentRate",
-   "kind": "def",
-   "noncomputable": true,
-   "file": "Descent/Blindness/SpectrumIdentifiability.lean",
-   "line": 116,
-   "signature": "(m : ℕ) : ℝ",
-   "args": [
-    {
-     "names": [
-      "m"
-     ],
-     "type": "ℕ",
-     "binder": "()",
-     "implicit": false
-    }
-   ],
-   "ret_type": "ℝ",
-   "body": "  Descent.Core.pairCount m",
-   "docstring": "Kingman pair-coalescence rate for `m` lineages, `m (m - 1) / 2`.\n\n    Empirical status: **VALIDATED**\n    (`validation/empirical/simcov/battery_bulk9.py`,\n    `test_coalescent_rate_by_ratio`). Measured as a RATIO of waiting times,\n    which no time-unit convention can enter:\n\n      ratio        this def   measured             sems\n      T(2)/T(3)     3.00000   2.96490±0.02614      1.34\n      T(2)/T(4)     6.00000   5.92983±0.04946      1.42\n      T(2)/T(6)    15.00000  14.87823±0.11851      1.03\n      T(2)/T(8)    28.00000  27.78241±0.21343      1.02\n\n    30000 independent genealogies per lineage count, first-coalescence time\n    only. The absolute value of `T(2)` against `Ne` generations is the positive\n    control and it passes.\n\n    The ratio form is deliberate. A first attempt compared the absolute rate and\n    reported a clean factor of two, which was `ploidy = 1` with\n    `population_size = Ne` making msprime measure time in units of `Ne` rather\n    than `2 Ne`. A ratio of two quantities measured the same way removes the\n    convention rather than requiring it to be got right -- the same move that\n    settled the stepping-stone exponent.\n\n    Power: the prediction spans 3 to 28, a factor of nine.\n\n    What is validated is the RATE LADDER, against genealogies simulated under the\n    Kingman model. Whether a given real population's genealogy is Kingman at all is a\n    different question, and it is the one the identifiability results below leave open.",
-   "empirical_status": "VALIDATED",
-   "namespace": "Descent.SpectrumIdentifiability",
-   "fields": [],
-   "equations": [],
-   "constraints": {
-    "declared_kind": "probability",
-    "declared_lo": 0.0,
-    "declared_hi": 1.0,
-    "units": "generations",
-    "hypotheses": [],
-    "hypotheses_by_theorem": {
-     "Descent.SpectrumIdentifiability.coalescentRate_two": [],
-     "Descent.SpectrumIdentifiability.coalescentRate_three": [],
-     "Descent.SpectrumIdentifiability.coalescentRate_add_two": [],
-     "Descent.SpectrumIdentifiability.coalescentRate_add_two_pos": [],
-     "Descent.SpectrumIdentifiability.one_div_coalescentRate_add_two": [],
-     "Descent.SpectrumIdentifiability.muntzPartialSum": [],
-     "Descent.SpectrumIdentifiability.muntzPartialSum_lt_two": [],
-     "Descent.SpectrumIdentifiability.hasSum_one_div_coalescentRate": [],
-     "Descent.SpectrumIdentifiability.summable_one_div_coalescentRate": [],
-     "Descent.SpectrumIdentifiability.tsum_one_div_coalescentRate": [],
-     "Descent.SpectrumIdentifiability.two_mul_add_one_le_coalescentRate": [],
-     "Descent.Coalescent.deathRate_eq_coalescentRate": [],
-     "Descent.Conditionals.kingmanSpectrum_identifiabilityBoundary": []
-    }
-   },
-   "mentioned_by": [
-    "Descent.Coalescent.deathRate_eq_coalescentRate",
-    "Descent.Conditionals.kingmanSpectrum_identifiabilityBoundary",
-    "Descent.SpectrumIdentifiability.coalescentRate_add_two",
-    "Descent.SpectrumIdentifiability.coalescentRate_add_two_pos",
-    "Descent.SpectrumIdentifiability.coalescentRate_three",
-    "Descent.SpectrumIdentifiability.coalescentRate_two",
-    "Descent.SpectrumIdentifiability.hasSum_one_div_coalescentRate",
-    "Descent.SpectrumIdentifiability.muntzPartialSum",
-    "Descent.SpectrumIdentifiability.muntzPartialSum_lt_two",
-    "Descent.SpectrumIdentifiability.one_div_coalescentRate_add_two",
-    "Descent.SpectrumIdentifiability.summable_one_div_coalescentRate",
-    "Descent.SpectrumIdentifiability.tsum_one_div_coalescentRate",
-    "Descent.SpectrumIdentifiability.two_mul_add_one_le_coalescentRate"
-   ]
-  },
-  {
    "name": "Descent.SpectrumIdentifiability.LinearTargetDeterminedByObservation",
    "decl_name": "LinearTargetDeterminedByObservation",
    "short": "LinearTargetDeterminedByObservation",
    "kind": "def",
    "noncomputable": false,
    "file": "Descent/Blindness/SpectrumIdentifiability.lean",
-   "line": 296,
+   "line": 260,
    "signature": "{R V W Z : Type*} [Ring R] [AddCommGroup V] [Module R V] [AddCommGroup W] [Module R W] [AddCommGroup Z] [Module R Z] (observation : V →ₗ[R] W) (target : V →ₗ[R] Z) : Prop",
    "args": [
     {
@@ -85152,7 +85091,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Blindness/SpectrumIdentifiability.lean",
-   "line": 445,
+   "line": 409,
    "signature": "(n : ℕ) (τ : ℝ) : ℝ",
    "args": [
     {
@@ -85173,7 +85112,7 @@
     }
    ],
    "ret_type": "ℝ",
-   "body": "  ∑ k ∈ Finset.range n, Real.exp (-(2 * coalescentRate (k + 2) * τ))",
+   "body": "  ∑ k ∈ Finset.range n, Real.exp (-(2 * Coalescent.deathRate (k + 2) * τ))",
    "docstring": "Squared spectral energy an epoch-localised perturbation can still deposit, when it is\nsupported after cumulative coalescent time `τ`.",
    "empirical_status": "",
    "namespace": "Descent.SpectrumIdentifiability",
@@ -85214,7 +85153,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Blindness/SpectrumIdentifiability.lean",
-   "line": 515,
+   "line": 479,
    "signature": "(θ : ℝ) : ℝ",
    "args": [
     {
@@ -85291,7 +85230,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Descent/Blindness/SpectrumIdentifiability.lean",
-   "line": 548,
+   "line": 512,
    "signature": "(θ : ℝ) : Prop",
    "args": [
     {
@@ -85358,7 +85297,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Blindness/SpectrumIdentifiability.lean",
-   "line": 680,
+   "line": 644,
    "signature": "(kappa L : ℝ) : ℝ",
    "args": [
     {
@@ -98573,6 +98512,11 @@
      "k ≤ N"
     ],
     "hypotheses_by_theorem": {
+     "Descent.SpectrumIdentifiability.muntzPartialSum_lt_two": [],
+     "Descent.SpectrumIdentifiability.hasSum_one_div_coalescentRate": [],
+     "Descent.SpectrumIdentifiability.summable_one_div_coalescentRate": [],
+     "Descent.SpectrumIdentifiability.tsum_one_div_coalescentRate": [],
+     "Descent.SpectrumIdentifiability.two_mul_add_one_le_coalescentRate": [],
      "Descent.Coalescent.expectedSegmentLength_eq": [],
      "Descent.Coalescent.kingman_comesDownFromInfinity": [],
      "Descent.Coalescent.comesDownFromInfinity_dichotomy": [],
@@ -98622,7 +98566,6 @@
      "Descent.Coalescent.lumping_rate_eq_deathRate": [],
      "Descent.Coalescent.ohtaKimura_rate_balance": [],
      "Descent.Coalescent.jumpStep_apply_eq_jumpProb": [],
-     "Descent.Coalescent.deathRate_eq_coalescentRate": [],
      "Descent.Coalescent.deathRate_zero": [],
      "Descent.Coalescent.deathRate_one": [],
      "Descent.Coalescent.deathRate_two": [],
@@ -98631,9 +98574,12 @@
      "Descent.Coalescent.deathRate_pos": [
       "2 ≤ k"
      ],
+     "Descent.Coalescent.deathRate_add_two_pos": [],
      "Descent.Coalescent.deathRate_ne_zero": [
       "2 ≤ k"
      ],
+     "Descent.Coalescent.one_div_deathRate_add_two": [],
+     "Descent.Coalescent.sum_one_div_deathRate_range": [],
      "Descent.Coalescent.one_div_deathRate_eq": [],
      "Descent.Coalescent.sum_one_div_deathRate_tail": [
       "2 ≤ k"
@@ -98678,7 +98624,8 @@
      "Descent.Coalescent.le_coalescenceProb": [
       "k ≤ N"
      ],
-     "Descent.Coalescent.coalescenceProb_two": []
+     "Descent.Coalescent.coalescenceProb_two": [],
+     "Descent.Conditionals.kingmanSpectrum_identifiabilityBoundary": []
     },
     "range_lo_thm": [
      "Descent.Coalescent.deathRate_pos",
@@ -98696,7 +98643,7 @@
     "Descent.Coalescent.coalescenceProb_le",
     "Descent.Coalescent.coalescenceProb_two",
     "Descent.Coalescent.comesDownFromInfinity_dichotomy",
-    "Descent.Coalescent.deathRate_eq_coalescentRate",
+    "Descent.Coalescent.deathRate_add_two_pos",
     "Descent.Coalescent.deathRate_le_asgEventRate",
     "Descent.Coalescent.deathRate_mul_deriv_timeChange",
     "Descent.Coalescent.deathRate_ne_zero",
@@ -98732,6 +98679,7 @@
     "Descent.Coalescent.lumping_rate_eq_deathRate",
     "Descent.Coalescent.moment_closure",
     "Descent.Coalescent.ohtaKimura_rate_balance",
+    "Descent.Coalescent.one_div_deathRate_add_two",
     "Descent.Coalescent.one_div_deathRate_eq",
     "Descent.Coalescent.one_div_deathRate_le_one",
     "Descent.Coalescent.one_le_deathRate_succ_succ",
@@ -98743,6 +98691,7 @@
     "Descent.Coalescent.stepLaw_prod",
     "Descent.Coalescent.stepLaw_time_marginal",
     "Descent.Coalescent.sum_jointDensity",
+    "Descent.Coalescent.sum_one_div_deathRate_range",
     "Descent.Coalescent.sum_one_div_deathRate_tail",
     "Descent.Coalescent.sum_range_div_eq_deathRate",
     "Descent.Coalescent.sum_range_neg_cast",
@@ -98754,7 +98703,13 @@
     "Descent.Coalescent.totalRate_kingman",
     "Descent.Coalescent.tsum_one_div_deathRate_tail",
     "Descent.Coalescent.varTransitTime_le_meanTransitTime",
-    "Descent.Coalescent.variance_holdTime_deathRate"
+    "Descent.Coalescent.variance_holdTime_deathRate",
+    "Descent.Conditionals.kingmanSpectrum_identifiabilityBoundary",
+    "Descent.SpectrumIdentifiability.hasSum_one_div_coalescentRate",
+    "Descent.SpectrumIdentifiability.muntzPartialSum_lt_two",
+    "Descent.SpectrumIdentifiability.summable_one_div_coalescentRate",
+    "Descent.SpectrumIdentifiability.tsum_one_div_coalescentRate",
+    "Descent.SpectrumIdentifiability.two_mul_add_one_le_coalescentRate"
    ]
   },
   {
@@ -98764,7 +98719,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Coalescent/Rates.lean",
-   "line": 128,
+   "line": 154,
    "signature": "(n : ℕ) : ℝ",
    "args": [
     {
@@ -98845,7 +98800,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Coalescent/Rates.lean",
-   "line": 249,
+   "line": 275,
    "signature": "(x : ℕ) : ℝ",
    "args": [
     {
@@ -98922,7 +98877,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Coalescent/Rates.lean",
-   "line": 379,
+   "line": 405,
    "signature": "(m : ℕ) (t : ℝ) : ℝ",
    "args": [
     {
@@ -102478,9 +102433,6 @@
      "2 ≤ n"
     ],
     "hypotheses_by_theorem": {
-     "Descent.SpectrumIdentifiability.coalescentRate_two": [],
-     "Descent.SpectrumIdentifiability.coalescentRate_three": [],
-     "Descent.SpectrumIdentifiability.coalescentRate_add_two": [],
      "Descent.Coalescent.expectedSegmentLength_eq": [],
      "Descent.Coalescent.sum_range_neg_cast": [],
      "Descent.Coalescent.duality_identity": [],
@@ -102488,7 +102440,6 @@
      "Descent.Coalescent.jumpCoeff_recursion": [
       "k ≤ n"
      ],
-     "Descent.Coalescent.deathRate_eq_coalescentRate": [],
      "Descent.Coalescent.deathRate_zero": [],
      "Descent.Coalescent.deathRate_one": [],
      "Descent.Coalescent.deathRate_two": [],
@@ -102513,7 +102464,6 @@
     "Descent.Coalescent.branchRate_lt_deathRate",
     "Descent.Coalescent.card_covers_eq_deathRate",
     "Descent.Coalescent.count_split",
-    "Descent.Coalescent.deathRate_eq_coalescentRate",
     "Descent.Coalescent.deathRate_one",
     "Descent.Coalescent.deathRate_succ_succ",
     "Descent.Coalescent.deathRate_three",
@@ -102529,10 +102479,7 @@
     "Descent.Coalescent.survivalFactor_partialProd",
     "Descent.Coalescent.varPairwiseFromTree_eq_tajima",
     "Descent.Core.pairCount_one",
-    "Descent.Core.pairCount_two",
-    "Descent.SpectrumIdentifiability.coalescentRate_add_two",
-    "Descent.SpectrumIdentifiability.coalescentRate_three",
-    "Descent.SpectrumIdentifiability.coalescentRate_two"
+    "Descent.Core.pairCount_two"
    ]
   },
   {
@@ -103638,6 +103585,10 @@
      "Descent.Coalescent.pairDistinct_one": [
       "0 < N"
      ],
+     "Descent.Coalescent.tsum_pairDistinct": [
+      "0 < N"
+     ],
+     "Descent.Coalescent.tsum_pairDistinct_diploid": [],
      "Descent.Coalescent.hetRecurrence_eq_pairDistinct": [],
      "Descent.Coalescent.heterozygosityLossDerived_eq_pairCoalesced": []
     },
@@ -103652,7 +103603,9 @@
     "Descent.Coalescent.heterozygosityLossDerived_eq_pairCoalesced",
     "Descent.Coalescent.pairDistinct_eq_pow",
     "Descent.Coalescent.pairDistinct_nonneg",
-    "Descent.Coalescent.pairDistinct_one"
+    "Descent.Coalescent.pairDistinct_one",
+    "Descent.Coalescent.tsum_pairDistinct",
+    "Descent.Coalescent.tsum_pairDistinct_diploid"
    ]
   },
   {
@@ -108156,7 +108109,6 @@
      "Descent.speedTiltNonMergerFactor_neg_one_succ": [],
      "Descent.speedTiltNonMergerFactor_two_eq": [],
      "Descent.reciprocalDifference_sum": [],
-     "Descent.SpectrumIdentifiability.muntzPartialSum": [],
      "Descent.TrafficInvariantSeparation.biasedBinomialTypeWeight_firstMoment": [],
      "Descent.TrafficInvariantSeparation.mesoscopicGFOMIterate_succ_apply": [],
      "Descent.TrafficInvariantSeparation.mesoscopicGFOM_sum_exceptionalSlice": [],
@@ -108168,6 +108120,7 @@
      "Descent.Coalescent.binaryRate_eq_base": [],
      "Descent.Coalescent.one_add_smul_pow": [],
      "Descent.Coalescent.chain_antitone": [],
+     "Descent.Coalescent.sum_one_div_deathRate_range": [],
      "Descent.Coalescent.meanTransitTime_lt_two": [],
      "Descent.Coalescent.sum_one_div_deathRate_tail": [],
      "Descent.Coalescent.survivalFactor_partialProd": [],
@@ -108224,6 +108177,7 @@
     "Descent.Coalescent.prodUpTo_const",
     "Descent.Coalescent.prod_le_exp_neg_sum",
     "Descent.Coalescent.prod_le_one_sub_sum_add_sq",
+    "Descent.Coalescent.sum_one_div_deathRate_range",
     "Descent.Coalescent.sum_one_div_deathRate_tail",
     "Descent.Coalescent.sum_range_choose_add",
     "Descent.Coalescent.sum_range_div_eq_deathRate",
@@ -108241,7 +108195,6 @@
     "Descent.Core.hetRecurrence_closed_form",
     "Descent.Decision.CertificateGrading.GradedModulus.Δ_zero",
     "Descent.FactorsThroughObservation.zero",
-    "Descent.SpectrumIdentifiability.muntzPartialSum",
     "Descent.TrafficInvariantSeparation.biasedBinomialTypeWeight_firstMoment",
     "Descent.TrafficInvariantSeparation.mesoscopicGFOMIterate_succ_apply",
     "Descent.TrafficInvariantSeparation.mesoscopicGFOM_sum_exceptionalSlice",
@@ -117780,9 +117733,6 @@
      "sigma < (k : ℝ"
     ],
     "hypotheses_by_theorem": {
-     "Descent.SpectrumIdentifiability.coalescentRate_two": [],
-     "Descent.SpectrumIdentifiability.coalescentRate_three": [],
-     "Descent.SpectrumIdentifiability.coalescentRate_add_two": [],
      "Descent.Coalescent.expectedSegmentLength_eq": [],
      "Descent.Coalescent.sum_range_neg_cast": [],
      "Descent.Coalescent.duality_identity": [],
@@ -117793,7 +117743,6 @@
       "2 ≤ k",
       "k ≤ n"
      ],
-     "Descent.Coalescent.deathRate_eq_coalescentRate": [],
      "Descent.Coalescent.deathRate_zero": [],
      "Descent.Coalescent.deathRate_one": [],
      "Descent.Coalescent.deathRate_two": [],
@@ -117821,7 +117770,6 @@
     "Descent.Coalescent.branchRate_lt_deathRate",
     "Descent.Coalescent.card_covers_eq_deathRate",
     "Descent.Coalescent.count_split",
-    "Descent.Coalescent.deathRate_eq_coalescentRate",
     "Descent.Coalescent.deathRate_one",
     "Descent.Coalescent.deathRate_succ_succ",
     "Descent.Coalescent.deathRate_three",
@@ -117837,10 +117785,7 @@
     "Descent.Coalescent.survivalFactor_partialProd",
     "Descent.Coalescent.varPairwiseFromTree_eq_tajima",
     "Descent.Core.pairCount_one",
-    "Descent.Core.pairCount_two",
-    "Descent.SpectrumIdentifiability.coalescentRate_add_two",
-    "Descent.SpectrumIdentifiability.coalescentRate_three",
-    "Descent.SpectrumIdentifiability.coalescentRate_two"
+    "Descent.Core.pairCount_two"
    ]
   },
   {
@@ -119642,7 +119587,6 @@
      "Descent.speedTiltNonMergerFactor_neg_one_succ": [],
      "Descent.speedTiltNonMergerFactor_two_eq": [],
      "Descent.reciprocalDifference_sum": [],
-     "Descent.SpectrumIdentifiability.muntzPartialSum": [],
      "Descent.TrafficInvariantSeparation.biasedBinomialTypeWeight_firstMoment": [],
      "Descent.TrafficInvariantSeparation.mesoscopicGFOMIterate_succ_apply": [],
      "Descent.TrafficInvariantSeparation.mesoscopicGFOM_sum_exceptionalSlice": [],
@@ -119654,6 +119598,7 @@
      "Descent.Coalescent.binaryRate_eq_base": [],
      "Descent.Coalescent.one_add_smul_pow": [],
      "Descent.Coalescent.chain_antitone": [],
+     "Descent.Coalescent.sum_one_div_deathRate_range": [],
      "Descent.Coalescent.meanTransitTime_lt_two": [],
      "Descent.Coalescent.sum_one_div_deathRate_tail": [],
      "Descent.Coalescent.survivalFactor_partialProd": [],
@@ -119710,6 +119655,7 @@
     "Descent.Coalescent.prodUpTo_const",
     "Descent.Coalescent.prod_le_exp_neg_sum",
     "Descent.Coalescent.prod_le_one_sub_sum_add_sq",
+    "Descent.Coalescent.sum_one_div_deathRate_range",
     "Descent.Coalescent.sum_one_div_deathRate_tail",
     "Descent.Coalescent.sum_range_choose_add",
     "Descent.Coalescent.sum_range_div_eq_deathRate",
@@ -119727,7 +119673,6 @@
     "Descent.Core.hetRecurrence_closed_form",
     "Descent.Decision.CertificateGrading.GradedModulus.Δ_zero",
     "Descent.FactorsThroughObservation.zero",
-    "Descent.SpectrumIdentifiability.muntzPartialSum",
     "Descent.TrafficInvariantSeparation.biasedBinomialTypeWeight_firstMoment",
     "Descent.TrafficInvariantSeparation.mesoscopicGFOMIterate_succ_apply",
     "Descent.TrafficInvariantSeparation.mesoscopicGFOM_sum_exceptionalSlice",
@@ -130947,8 +130892,6 @@
      "Descent.inflated_intensity_ne_of_injective": [],
      "Descent.lattice_observables_ne_gaussian": [],
      "Descent.isChameleonObservable_iff": [],
-     "Descent.SpectrumIdentifiability.one_div_coalescentRate_add_two": [],
-     "Descent.SpectrumIdentifiability.muntzPartialSum": [],
      "Descent.SpectrumIdentifiability.twoPoint_risk_lower_bound": [],
      "Descent.TrafficInvariantSeparation.curieWeiss_subcritical": [
       "|m| ≤ 1"
@@ -130983,6 +130926,8 @@
      "Descent.Coalescent.expected_disjoint_pairTime_product": [],
      "Descent.Coalescent.covariance_disjoint_pairTime": [],
      "Descent.Coalescent.sum_choose_interior_eq_two_mul_cutCount": [],
+     "Descent.Coalescent.one_div_deathRate_add_two": [],
+     "Descent.Coalescent.sum_one_div_deathRate_range": [],
      "Descent.Coalescent.sum_one_div_deathRate_tail": [],
      "Descent.Coalescent.survivalFactor_partialProd": [],
      "Descent.Coalescent.survivalFactor_partialProd_eq_mul": [],
@@ -131005,6 +130950,7 @@
      "Descent.Coalescent.tendsto_sum_inv_succ_atTop": [],
      "Descent.Coalescent.ae_totalDescentTime_eq_top": [],
      "Descent.Coalescent.isPiSystem_cylinders": [],
+     "Descent.Coalescent.tsum_pairDistinct_diploid": [],
      "Descent.Coalescent.hetRecurrence_factor_eq_mechanism": [],
      "Descent.Coalescent.hetRecurrence_eq_pairDistinct": [],
      "Descent.Coalescent.heterozygosityLossDerived_eq_pairCoalesced": [],
@@ -131236,9 +131182,11 @@
     "Descent.Coalescent.lambdaRate_consistent",
     "Descent.Coalescent.meanTimeActive_eq_of_ratio",
     "Descent.Coalescent.norm_prodUpTo_sub_le",
+    "Descent.Coalescent.one_div_deathRate_add_two",
     "Descent.Coalescent.restrict_restrict",
     "Descent.Coalescent.splitBy_rel_iff",
     "Descent.Coalescent.sum_choose_interior_eq_two_mul_cutCount",
+    "Descent.Coalescent.sum_one_div_deathRate_range",
     "Descent.Coalescent.sum_one_div_deathRate_tail",
     "Descent.Coalescent.survivalFactor_partialProd",
     "Descent.Coalescent.survivalFactor_partialProd_eq_mul",
@@ -131246,6 +131194,7 @@
     "Descent.Coalescent.tendsto_identityByDescent",
     "Descent.Coalescent.tendsto_restrictionFullProb_two",
     "Descent.Coalescent.tendsto_sum_inv_succ_atTop",
+    "Descent.Coalescent.tsum_pairDistinct_diploid",
     "Descent.Coalescent.varPairwise_two_eq",
     "Descent.Coalescent.varSegregatingSites_nonneg",
     "Descent.Coalescent.varWattersonEstimator_le",
@@ -131306,8 +131255,6 @@
     "Descent.Spectral.spectralCapture_pruneAllocation",
     "Descent.Spectral.stalePremium_neg_beyond_crossover",
     "Descent.Spectral.tridiagonalABAB_pathExpression_pos",
-    "Descent.SpectrumIdentifiability.muntzPartialSum",
-    "Descent.SpectrumIdentifiability.one_div_coalescentRate_add_two",
     "Descent.SpectrumIdentifiability.twoPoint_risk_lower_bound",
     "Descent.TrafficInvariantSeparation.curieWeiss_subcritical",
     "Descent.additive_misses_epistasis",
@@ -211944,7 +211891,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Descent.lean",
-   "line": 496,
+   "line": 497,
    "signature": ": Matrix (Fin 2) (Fin 2) ℝ",
    "args": [],
    "ret_type": "Matrix (Fin 2) (Fin 2) ℝ",
@@ -211973,7 +211920,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Descent.lean",
-   "line": 499,
+   "line": 500,
    "signature": ": Matrix (Fin 2) (Fin 2) ℝ",
    "args": [],
    "ret_type": "Matrix (Fin 2) (Fin 2) ℝ",
@@ -212002,7 +211949,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Descent.lean",
-   "line": 502,
+   "line": 503,
    "signature": ": Fin 2 → ℝ",
    "args": [],
    "ret_type": "Fin 2 → ℝ",
@@ -212038,7 +211985,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Descent.lean",
-   "line": 519,
+   "line": 520,
    "signature": ": Matrix (Fin 2) (Fin 2) ℝ",
    "args": [],
    "ret_type": "Matrix (Fin 2) (Fin 2) ℝ",
@@ -213699,9 +213646,9 @@
    "noncomputable": false,
    "file": "Descent/Conditionals/DynamicsContrast.lean",
    "line": 2291,
-   "signature": ": Prop where targetOnlyBlind : targetOnlyTransportPerformance binaryStateWeight persistentTransition targetAnnotation = targetOnlyTransportPerformance binaryStateWeight switchingTransition targetAnnotation crossStateSeparates : crossStatePerformance binaryStateWeight persistentTransition contextMatchQuality ≠ crossStatePerformance binaryStateWeight switchingTransition contextMatchQuality marginalsLoseDependence : (∀ omega : Bool, Spectral.coupledBinarySource omega 0 = Spectral.coupledBinarySource omega 1) ∧ (∀ omega : Bool, Spectral.coordinatewiseMarginalPreserver omega 0 ≠ Spectral.coordinatewiseMarginalPreserver omega 1) commutingAllocationConflict : (2 : ℝ) < 3 ∧ (3 : ℝ) / 10 < 2 / 1 sharedGeometryNotFree : 0 < 2 * (1 : ℝ) * 1 + 4 * (0 : ℝ) ^ 2 * 0 ^ 2 isospectralLDLosesOrientation : Isospectral2 (localizedCovarianceBlock (3 / 2)) (rotatedCovarianceBlock (3 / 2)) ∧ blockEntryCubeMean (localizedCovarianceBlock (3 / 2)) ≠ blockEntryCubeMean (rotatedCovarianceBlock (3 / 2)) skewedLDChangesLowSNRCoefficient : ∀ aspect m1 m2 m3 : ℝ, lowSNRThirdCoefficient aspect 2 2 m1 m2 m3 (blockEntryCubeMean (rotatedCovarianceBlock (3 / 2))) - lowSNRThirdCoefficient aspect 2 2 m1 m2 m3 (blockEntryCubeMean (localizedCovarianceBlock (3 / 2))) = 11 / 24 symmetricSparseLDLosesOrientation : Isospectral2 (localizedCovarianceBlock (3 / 2)) (rotatedCovarianceBlock (3 / 2)) ∧ blockEntryFourthMean (localizedCovarianceBlock (3 / 2)) ≠ blockEntryFourthMean (rotatedCovarianceBlock (3 / 2)) symmetricLDChangesLowSNRCoefficient : ∀ c m1 m2 m3 m4 : ℝ, lowSNRFourthCoefficient c 1 (-2) m1 m2 m3 m4 rotatedUniformFourthInvariant - lowSNRFourthCoefficient c 1 (-2) m1 m2 m3 m4 localizedUniformFourthInvariant = 49 / 96 environmentMixtureClosesPopulationGap : populationGapCertificate (4 / 5) < 0 ∧ populationGapCertificate (-(4 / 5)) < 0 ∧ populationGapCertificate (ancestryMixtureCorrelation (4 / 5) (1 / 2)) = 1 sameSignEnvironmentPoolingDoesNotMoveGapParameter : ∀ rho mix : ℝ, pooledEnvironmentCorrelation rho rho mix = rho fiveEpochDemographyIsSeverelyIllConditioned : fixedEpochSampleRateExponent 5 = 1 / 14 kingmanSpectrumHasIdentifiabilityBoundary : Summable (fun k : ℕ ↦ 1 / SpectrumIdentifiability.coalescentRate (k + 2)) ∧ ∀ n : ℕ, ∀ observation : (Fin (n + 1) → ℝ) →ₗ[ℝ] (Fin n → ℝ), ∃ direction : Fin (n + 1) → ℝ, direction ≠ 0 ∧ observation direction = 0 speedConditionedGenealogyNeedsThreeLineages : ∀ β : ℝ, speedTiltBetaMergerRate β 2 2 = 1 ∧ speedBiasParameterFromTripleRate (speedTiltBetaMergerRate β 3 3) = β markedSuccessfulFamilyMeasureDeterminesGenealogy : ∀ (ν : MeasureTheory.Measure SuccessfulFamilyMark) (b k : ℕ), 2 ≤ k → speedTiltedGenealogyMeasure 0 ν = genealogyMeasure ν ∧ markedEventMergerRate ν b k = markedLambdaMergerRate ν b k markedMassPartitionMeasureDeterminesXi : ∀ (n : ℕ) (ν : MeasureTheory.Measure MarkedMassPartition), HasFiniteCollisionIntensity ν → speedTiltedXiMeasure 0 ν = xiMeasure ν ∧ samplePartitionChangeRateBound n ν < ⊤ frontTrajectoryDoesNotDetermineXi : ∀ x : ℝ, x ≠ 0 → paintboxWeight ![x] ≠ paintboxWeight ![x / 2, x / 2] ∧ disjointPairMergeProbability ![x] = 0 ∧ 0 < disjointPairMergeProbability ![x / 2, x / 2] twoColourPioneerResponseIsExact : ∀ conversion gamma w : ℝ, conversion ≠ 0 → gamma ≠ 0 → -1 < w → conversion * w / (conversion * 1 + conversion * w) = pioneerWeightFraction w ∧ Real.exp (-(gamma * pioneerWeightDisplacement gamma w)) * (1 + w) = 1 branchingRandomWalkBoundaryTransformIsCritical : ∀ logMgf logMgfDerivative criticalParameter criticalSpeed : ℝ, criticalParameter * criticalSpeed - logMgf = Real.log 2 → criticalSpeed = logMgfDerivative → boundaryTiltMass logMgf criticalParameter criticalSpeed = 1 ∧ boundaryTiltCenteredFirstMoment logMgf logMgfDerivative criticalParameter criticalSpeed = 0 selectedDerivativeFluxControlsBreakouts : ∀ (Pioneer : Type) [Fintype Pioneer] [DecidableEq Pioneer] (tailConstant threshold blockScale fluxConstant : ℝ) (weight : Pioneer → ℝ), 0 ≤ tailConstant → 0 < threshold → (∀ pioneer, 0 ≤ weight pioneer) → selectedPioneerFlux weight = blockScale * fluxConstant → (∑ pioneer, paretoExceedanceMass tailConstant threshold (weight pioneer)) = blockScale * (tailConstant * fluxConstant / threshold) ∧ distinctPairExceedanceMass (fun pioneer ↦ paretoExceedanceMass tailConstant threshold (weight pioneer)) ≤ (blockScale * (tailConstant * fluxConstant / threshold)) ^ 2 selectedPioneerFluxFollowsFromNegligiblePruning : ∀ (fullTreeFlux selectedFlux prunedFlux : ℕ → ℝ) (fluxConstant : ℝ), IsSelectedFluxDecomposition fullTreeFlux selectedFlux prunedFlux → Filter.Tendsto fullTreeFlux Filter.atTop (nhds fluxConstant) → Filter.Tendsto prunedFlux Filter.atTop (nhds 0) → Filter.Tendsto selectedFlux Filter.atTop (nhds fluxConstant) uniquePioneerCommonProfileDeterminesMarkedResponse : ∀ conversion gamma w backgroundCount pioneerCount : ℝ, conversion ≠ 0 → backgroundCount + pioneerCount ≠ 0 → HasCommonProfileRelaxation conversion 1 w backgroundCount pioneerCount → (totalFamilyFraction ![pioneerWeightFraction w] = pioneerWeightFraction w ∧ paintboxWeight ![pioneerWeightFraction w] = pioneerWeightFraction w ^ 2 ∧ disjointPairMergeProbability ![pioneerWeightFraction w] = 0) ∧ pioneerCount / (backgroundCount + pioneerCount) = pioneerWeightFraction w ∧ amplitudeFront gamma (1 + w) - amplitudeFront gamma 1 = pioneerWeightDisplacement gamma w selectedGenealogyHasMuntzRateDichotomy : ∀ coefficient alpha : ℝ, 0 < coefficient → 1 < alpha → (¬Summable fun n : ℕ ↦ 1 / criticallyPulledLinearRateLadder coefficient n) ∧ Summable (fun n : ℕ ↦ 1 / stablePowerRateLadder alpha n) ∧ Summable (fun n : ℕ ↦ 1 / stablePowerRateLadder 2 n) genomicAlgorithmicRiskSignatureIsCoarsest : ∀ (Algorithm Design Model Loss : Type) (risk : Algorithm → Design → Model → Loss → ℝ), RiskSignaturesFactorThrough risk (algorithmicRiskSignature risk) ∧ ∀ (Invariant : Type) (invariant : Design → Invariant), RiskSignaturesFactorThrough risk invariant → ∀ left right, invariant left = invariant right → algorithmicRiskSignature risk left = algorithmicRiskSignature risk right genomicRankOneTrafficExpansionFollowsFromHandshake : ∀ (Term : Type) [Fintype Term] (coefficient : Term → ℝ) (hasOddDegree : Term → Bool) (vertices edges : Term → ℕ) (degree : ∀ term, Fin (vertices term) → ℕ), (∀ term, hasOddDegree term = false → ∀ vertex, 0 < degree term vertex) → (∀ term, hasOddDegree term = false → ∀ vertex, Even (degree term vertex)) → (∀ term, hasOddDegree term = false → ∑ vertex, degree term vertex = 2 * edges term) → Filter.Tendsto (fun population : ℕ ↦ finiteRankOneTrafficCorrection coefficient hasOddDegree vertices edges (population + 1)) Filter.atTop (nhds 0) positiveLDBalancedRankOneCovarianceHasFullWitness : ∀ (Term : Type) [Fintype Term] (coefficient : Term → ℝ) (hasOddDegree : Term → Bool) (vertices edges : Term → ℕ), (∀ term, hasOddDegree term = false → vertices term ≤ edges term) → ∀ baseline spikeStrength temperature : ℝ, 0 ≤ baseline → 0 < spikeStrength → 1 < temperature * spikeStrength → ConcreteBalancedPSDPressureWitness coefficient hasOddDegree vertices edges baseline spikeStrength temperature rareLDSubspaceEvadesFixedTrafficAtLogRuntime : FixedTrafficLogRuntimeSeparation rareLDSubspaceEvadesLimitingTrafficAtDegreeOne : ∀ baseline : ℝ, Filter.Tendsto (fun iteration ↦ diagonalTrafficCorrection baseline 1 iteration) Filter.atTop (nhds 0) ∧ ∀ iteration, amplifiedDegreeOneTrafficDifference baseline iteration = 2 rareLDSubspaceConcreteGFOMEvadesFixedTrafficAtLogRuntime : ConcreteGFOMLogRuntimeSeparation genomicBulkSpectralLawDoesNotDetermineExtremalSpectrumOrSDP : ∀ baseline spikeStrength : ℝ, 0 < spikeStrength → BulkSpectralLawExtremalSDPSeparation baseline spikeStrength positiveLDSpikeFixedTrafficInvisibleVariationalPressureVisible : ∀ (Term : Type) [Fintype Term] (coefficient : Term → ℝ) (hasOddDegree : Term → Bool) (vertices edges : Term → ℕ), (∀ term, hasOddDegree term = false → vertices term ≤ edges term) → ∀ tlam : ℝ, 1 < tlam → Filter.Tendsto (fun population : ℕ ↦ finiteRankOneTrafficCorrection coefficient hasOddDegree vertices edges (population + 1)) Filter.atTop (nhds 0) ∧ 0 < cwVariationalPressureGap tlam positiveLDSpikeFixedTrafficInvisibleFinitePressureVisible : ∀ (Term : Type) [Fintype Term] (coefficient : Term → ℝ) (hasOddDegree : Term → Bool) (vertices edges : Term → ℕ), (∀ term, hasOddDegree term = false → vertices term ≤ edges term) → ∀ tlam : ℝ, 1 < tlam → RankOneSpikeInvisibleWithFinitePressure coefficient hasOddDegree vertices edges tlam genomicFiniteCWPressureDominatesVariationalObjective : ∀ (population : ℕ) (tlam m : ℝ), 0 < population → 0 ≤ tlam → |m| < 1 → cwObjective tlam m ≤ finiteCWPressureGap population tlam genomicFiniteCWTypeMassLeOneOfSubcritical : ∀ (population upSpins : ℕ) (tlam : ℝ), tlam ≤ 1 → upSpins ∈ Finset.range (population + 1) → finiteCWTypeMass population tlam upSpins ≤ 1 genomicFiniteCWPressureHasExactCriticalPoint : ∀ tlam : ℝ, 0 ≤ tlam → (Filter.Tendsto (fun population : ℕ ↦ finiteCWPressureGap (population + 1) tlam) Filter.atTop (nhds 0) ↔ tlam ≤ 1) genomicFiniteCWPressureConvergesToVariational : ∀ tlam : ℝ, 0 ≤ tlam → Filter.Tendsto (fun population : ℕ ↦ finiteCWPressureGap (population + 1) tlam) Filter.atTop (nhds (cwVariationalPressureGap tlam)) genomicFiniteCWPressureConvergesUniformlyOnNonnegative : TendstoUniformlyOn (fun population : ℕ ↦ fun tlam : ℝ ↦ finiteCWPressureGap (population + 1) tlam) cwVariationalPressureGap Filter.atTop (Set.Ici 0) genomicFiniteCWPressureIsHalfLipschitz : ∀ population : ℕ, 0 < population → LipschitzWith (⟨1 / 2, by norm_num⟩ : NNReal) (finiteCWPressureGap population) genomicFiniteCWPressureIsMonotone : ∀ population : ℕ, 0 < population → Monotone (finiteCWPressureGap population) positiveLDSpikeFinitePressureExceedsBaseline : ∀ (baseline : ℝ) (population : ℕ) (temperature spikeStrength : ℝ), 0 < population → 1 < temperature * spikeStrength → finiteBaselineRademacherPressure baseline temperature < finiteRankOneRademacherPressure baseline population temperature spikeStrength positiveLDSpikePressureDifferenceHasExactCriticalPoint : ∀ baseline temperature spikeStrength : ℝ, 0 ≤ temperature * spikeStrength → FiniteRankOnePressureCriticalStatement baseline temperature spikeStrength positiveLDSpikePressureConvergesToVariational : ∀ baseline temperature spikeStrength : ℝ, 0 ≤ temperature * spikeStrength → FiniteRankOnePressureVariationalLimitStatement baseline temperature spikeStrength positiveLDSpikePressureConvergesUniformlyOnNonnegativeStrength : ∀ baseline temperature : ℝ, 0 ≤ temperature → FiniteRankOnePressureUniformLimitStatement baseline temperature positiveLDSpikeRefutesTrafficAndGroundStateDichotomies : ∀ (Term Genotype : Type) [Fintype Term] (coefficient : Term → ℝ) (hasOddDegree : Term → Bool) (vertices edges : Term → ℕ), (∀ term, hasOddDegree term = false → vertices term ≤ edges term) → ∀ (alignment : Genotype → ℝ) (orthogonal aligned : Genotype) (baseline spikeStrength population temperature : ℝ), 0 < spikeStrength → population ≠ 0 → alignment orthogonal = 0 → alignment aligned = population → 1 < temperature * spikeStrength → RankOneSpikeRefutesBothDichotomies coefficient hasOddDegree vertices edges alignment orthogonal aligned baseline spikeStrength population temperature positiveLDSpikeGroundStateDoesNotFixPressure : ∀ baseline spikeStrength population tlam : ℝ, 0 ≤ spikeStrength → 2 * Real.log 2 < tlam → ((∀ state : Bool, baseline ≤ rankOneEnergyDensity baseline spikeStrength population (if state = true then population else 0)) ∧ rankOneEnergyDensity baseline spikeStrength population (if false = true then population else 0) = baseline) ∧ 0 < cwObjective tlam 1 ldOverlapPressureHasExactCriticalPoint : ∀ tlam : ℝ, (tlam ≤ 1 → ∀ m : ℝ, |m| ≤ 1 → cwObjective tlam m ≤ 0) ∧ (1 < tlam → ∃ m : ℝ, |m| < 1 ∧ 0 < cwObjective tlam m) ldVariationalPressureGapHasExactCriticalPoint : ∀ tlam : ℝ, cwVariationalPressureGap tlam = 0 ↔ tlam ≤ 1 ldVariationalPressureGapHasGlobalRegularity : LipschitzWith (⟨1 / 2, by norm_num⟩ : NNReal) cwVariationalPressureGap ∧ Continuous cwVariationalPressureGap ∧ Monotone cwVariationalPressureGap ∧ ConvexOn ℝ Set.univ cwVariationalPressureGap matchedBayesRandomDesignAsymmetricReduction : ∀ scalarLeft scalarRight randomLeft randomRight leftError rightError delta : ℝ,",
+   "signature": ": Prop where targetOnlyBlind : targetOnlyTransportPerformance binaryStateWeight persistentTransition targetAnnotation = targetOnlyTransportPerformance binaryStateWeight switchingTransition targetAnnotation crossStateSeparates : crossStatePerformance binaryStateWeight persistentTransition contextMatchQuality ≠ crossStatePerformance binaryStateWeight switchingTransition contextMatchQuality marginalsLoseDependence : (∀ omega : Bool, Spectral.coupledBinarySource omega 0 = Spectral.coupledBinarySource omega 1) ∧ (∀ omega : Bool, Spectral.coordinatewiseMarginalPreserver omega 0 ≠ Spectral.coordinatewiseMarginalPreserver omega 1) commutingAllocationConflict : (2 : ℝ) < 3 ∧ (3 : ℝ) / 10 < 2 / 1 sharedGeometryNotFree : 0 < 2 * (1 : ℝ) * 1 + 4 * (0 : ℝ) ^ 2 * 0 ^ 2 isospectralLDLosesOrientation : Isospectral2 (localizedCovarianceBlock (3 / 2)) (rotatedCovarianceBlock (3 / 2)) ∧ blockEntryCubeMean (localizedCovarianceBlock (3 / 2)) ≠ blockEntryCubeMean (rotatedCovarianceBlock (3 / 2)) skewedLDChangesLowSNRCoefficient : ∀ aspect m1 m2 m3 : ℝ, lowSNRThirdCoefficient aspect 2 2 m1 m2 m3 (blockEntryCubeMean (rotatedCovarianceBlock (3 / 2))) - lowSNRThirdCoefficient aspect 2 2 m1 m2 m3 (blockEntryCubeMean (localizedCovarianceBlock (3 / 2))) = 11 / 24 symmetricSparseLDLosesOrientation : Isospectral2 (localizedCovarianceBlock (3 / 2)) (rotatedCovarianceBlock (3 / 2)) ∧ blockEntryFourthMean (localizedCovarianceBlock (3 / 2)) ≠ blockEntryFourthMean (rotatedCovarianceBlock (3 / 2)) symmetricLDChangesLowSNRCoefficient : ∀ c m1 m2 m3 m4 : ℝ, lowSNRFourthCoefficient c 1 (-2) m1 m2 m3 m4 rotatedUniformFourthInvariant - lowSNRFourthCoefficient c 1 (-2) m1 m2 m3 m4 localizedUniformFourthInvariant = 49 / 96 environmentMixtureClosesPopulationGap : populationGapCertificate (4 / 5) < 0 ∧ populationGapCertificate (-(4 / 5)) < 0 ∧ populationGapCertificate (ancestryMixtureCorrelation (4 / 5) (1 / 2)) = 1 sameSignEnvironmentPoolingDoesNotMoveGapParameter : ∀ rho mix : ℝ, pooledEnvironmentCorrelation rho rho mix = rho fiveEpochDemographyIsSeverelyIllConditioned : fixedEpochSampleRateExponent 5 = 1 / 14 kingmanSpectrumHasIdentifiabilityBoundary : Summable (fun k : ℕ ↦ 1 / Coalescent.deathRate (k + 2)) ∧ ∀ n : ℕ, ∀ observation : (Fin (n + 1) → ℝ) →ₗ[ℝ] (Fin n → ℝ), ∃ direction : Fin (n + 1) → ℝ, direction ≠ 0 ∧ observation direction = 0 speedConditionedGenealogyNeedsThreeLineages : ∀ β : ℝ, speedTiltBetaMergerRate β 2 2 = 1 ∧ speedBiasParameterFromTripleRate (speedTiltBetaMergerRate β 3 3) = β markedSuccessfulFamilyMeasureDeterminesGenealogy : ∀ (ν : MeasureTheory.Measure SuccessfulFamilyMark) (b k : ℕ), 2 ≤ k → speedTiltedGenealogyMeasure 0 ν = genealogyMeasure ν ∧ markedEventMergerRate ν b k = markedLambdaMergerRate ν b k markedMassPartitionMeasureDeterminesXi : ∀ (n : ℕ) (ν : MeasureTheory.Measure MarkedMassPartition), HasFiniteCollisionIntensity ν → speedTiltedXiMeasure 0 ν = xiMeasure ν ∧ samplePartitionChangeRateBound n ν < ⊤ frontTrajectoryDoesNotDetermineXi : ∀ x : ℝ, x ≠ 0 → paintboxWeight ![x] ≠ paintboxWeight ![x / 2, x / 2] ∧ disjointPairMergeProbability ![x] = 0 ∧ 0 < disjointPairMergeProbability ![x / 2, x / 2] twoColourPioneerResponseIsExact : ∀ conversion gamma w : ℝ, conversion ≠ 0 → gamma ≠ 0 → -1 < w → conversion * w / (conversion * 1 + conversion * w) = pioneerWeightFraction w ∧ Real.exp (-(gamma * pioneerWeightDisplacement gamma w)) * (1 + w) = 1 branchingRandomWalkBoundaryTransformIsCritical : ∀ logMgf logMgfDerivative criticalParameter criticalSpeed : ℝ, criticalParameter * criticalSpeed - logMgf = Real.log 2 → criticalSpeed = logMgfDerivative → boundaryTiltMass logMgf criticalParameter criticalSpeed = 1 ∧ boundaryTiltCenteredFirstMoment logMgf logMgfDerivative criticalParameter criticalSpeed = 0 selectedDerivativeFluxControlsBreakouts : ∀ (Pioneer : Type) [Fintype Pioneer] [DecidableEq Pioneer] (tailConstant threshold blockScale fluxConstant : ℝ) (weight : Pioneer → ℝ), 0 ≤ tailConstant → 0 < threshold → (∀ pioneer, 0 ≤ weight pioneer) → selectedPioneerFlux weight = blockScale * fluxConstant → (∑ pioneer, paretoExceedanceMass tailConstant threshold (weight pioneer)) = blockScale * (tailConstant * fluxConstant / threshold) ∧ distinctPairExceedanceMass (fun pioneer ↦ paretoExceedanceMass tailConstant threshold (weight pioneer)) ≤ (blockScale * (tailConstant * fluxConstant / threshold)) ^ 2 selectedPioneerFluxFollowsFromNegligiblePruning : ∀ (fullTreeFlux selectedFlux prunedFlux : ℕ → ℝ) (fluxConstant : ℝ), IsSelectedFluxDecomposition fullTreeFlux selectedFlux prunedFlux → Filter.Tendsto fullTreeFlux Filter.atTop (nhds fluxConstant) → Filter.Tendsto prunedFlux Filter.atTop (nhds 0) → Filter.Tendsto selectedFlux Filter.atTop (nhds fluxConstant) uniquePioneerCommonProfileDeterminesMarkedResponse : ∀ conversion gamma w backgroundCount pioneerCount : ℝ, conversion ≠ 0 → backgroundCount + pioneerCount ≠ 0 → HasCommonProfileRelaxation conversion 1 w backgroundCount pioneerCount → (totalFamilyFraction ![pioneerWeightFraction w] = pioneerWeightFraction w ∧ paintboxWeight ![pioneerWeightFraction w] = pioneerWeightFraction w ^ 2 ∧ disjointPairMergeProbability ![pioneerWeightFraction w] = 0) ∧ pioneerCount / (backgroundCount + pioneerCount) = pioneerWeightFraction w ∧ amplitudeFront gamma (1 + w) - amplitudeFront gamma 1 = pioneerWeightDisplacement gamma w selectedGenealogyHasMuntzRateDichotomy : ∀ coefficient alpha : ℝ, 0 < coefficient → 1 < alpha → (¬Summable fun n : ℕ ↦ 1 / criticallyPulledLinearRateLadder coefficient n) ∧ Summable (fun n : ℕ ↦ 1 / stablePowerRateLadder alpha n) ∧ Summable (fun n : ℕ ↦ 1 / stablePowerRateLadder 2 n) genomicAlgorithmicRiskSignatureIsCoarsest : ∀ (Algorithm Design Model Loss : Type) (risk : Algorithm → Design → Model → Loss → ℝ), RiskSignaturesFactorThrough risk (algorithmicRiskSignature risk) ∧ ∀ (Invariant : Type) (invariant : Design → Invariant), RiskSignaturesFactorThrough risk invariant → ∀ left right, invariant left = invariant right → algorithmicRiskSignature risk left = algorithmicRiskSignature risk right genomicRankOneTrafficExpansionFollowsFromHandshake : ∀ (Term : Type) [Fintype Term] (coefficient : Term → ℝ) (hasOddDegree : Term → Bool) (vertices edges : Term → ℕ) (degree : ∀ term, Fin (vertices term) → ℕ), (∀ term, hasOddDegree term = false → ∀ vertex, 0 < degree term vertex) → (∀ term, hasOddDegree term = false → ∀ vertex, Even (degree term vertex)) → (∀ term, hasOddDegree term = false → ∑ vertex, degree term vertex = 2 * edges term) → Filter.Tendsto (fun population : ℕ ↦ finiteRankOneTrafficCorrection coefficient hasOddDegree vertices edges (population + 1)) Filter.atTop (nhds 0) positiveLDBalancedRankOneCovarianceHasFullWitness : ∀ (Term : Type) [Fintype Term] (coefficient : Term → ℝ) (hasOddDegree : Term → Bool) (vertices edges : Term → ℕ), (∀ term, hasOddDegree term = false → vertices term ≤ edges term) → ∀ baseline spikeStrength temperature : ℝ, 0 ≤ baseline → 0 < spikeStrength → 1 < temperature * spikeStrength → ConcreteBalancedPSDPressureWitness coefficient hasOddDegree vertices edges baseline spikeStrength temperature rareLDSubspaceEvadesFixedTrafficAtLogRuntime : FixedTrafficLogRuntimeSeparation rareLDSubspaceEvadesLimitingTrafficAtDegreeOne : ∀ baseline : ℝ, Filter.Tendsto (fun iteration ↦ diagonalTrafficCorrection baseline 1 iteration) Filter.atTop (nhds 0) ∧ ∀ iteration, amplifiedDegreeOneTrafficDifference baseline iteration = 2 rareLDSubspaceConcreteGFOMEvadesFixedTrafficAtLogRuntime : ConcreteGFOMLogRuntimeSeparation genomicBulkSpectralLawDoesNotDetermineExtremalSpectrumOrSDP : ∀ baseline spikeStrength : ℝ, 0 < spikeStrength → BulkSpectralLawExtremalSDPSeparation baseline spikeStrength positiveLDSpikeFixedTrafficInvisibleVariationalPressureVisible : ∀ (Term : Type) [Fintype Term] (coefficient : Term → ℝ) (hasOddDegree : Term → Bool) (vertices edges : Term → ℕ), (∀ term, hasOddDegree term = false → vertices term ≤ edges term) → ∀ tlam : ℝ, 1 < tlam → Filter.Tendsto (fun population : ℕ ↦ finiteRankOneTrafficCorrection coefficient hasOddDegree vertices edges (population + 1)) Filter.atTop (nhds 0) ∧ 0 < cwVariationalPressureGap tlam positiveLDSpikeFixedTrafficInvisibleFinitePressureVisible : ∀ (Term : Type) [Fintype Term] (coefficient : Term → ℝ) (hasOddDegree : Term → Bool) (vertices edges : Term → ℕ), (∀ term, hasOddDegree term = false → vertices term ≤ edges term) → ∀ tlam : ℝ, 1 < tlam → RankOneSpikeInvisibleWithFinitePressure coefficient hasOddDegree vertices edges tlam genomicFiniteCWPressureDominatesVariationalObjective : ∀ (population : ℕ) (tlam m : ℝ), 0 < population → 0 ≤ tlam → |m| < 1 → cwObjective tlam m ≤ finiteCWPressureGap population tlam genomicFiniteCWTypeMassLeOneOfSubcritical : ∀ (population upSpins : ℕ) (tlam : ℝ), tlam ≤ 1 → upSpins ∈ Finset.range (population + 1) → finiteCWTypeMass population tlam upSpins ≤ 1 genomicFiniteCWPressureHasExactCriticalPoint : ∀ tlam : ℝ, 0 ≤ tlam → (Filter.Tendsto (fun population : ℕ ↦ finiteCWPressureGap (population + 1) tlam) Filter.atTop (nhds 0) ↔ tlam ≤ 1) genomicFiniteCWPressureConvergesToVariational : ∀ tlam : ℝ, 0 ≤ tlam → Filter.Tendsto (fun population : ℕ ↦ finiteCWPressureGap (population + 1) tlam) Filter.atTop (nhds (cwVariationalPressureGap tlam)) genomicFiniteCWPressureConvergesUniformlyOnNonnegative : TendstoUniformlyOn (fun population : ℕ ↦ fun tlam : ℝ ↦ finiteCWPressureGap (population + 1) tlam) cwVariationalPressureGap Filter.atTop (Set.Ici 0) genomicFiniteCWPressureIsHalfLipschitz : ∀ population : ℕ, 0 < population → LipschitzWith (⟨1 / 2, by norm_num⟩ : NNReal) (finiteCWPressureGap population) genomicFiniteCWPressureIsMonotone : ∀ population : ℕ, 0 < population → Monotone (finiteCWPressureGap population) positiveLDSpikeFinitePressureExceedsBaseline : ∀ (baseline : ℝ) (population : ℕ) (temperature spikeStrength : ℝ), 0 < population → 1 < temperature * spikeStrength → finiteBaselineRademacherPressure baseline temperature < finiteRankOneRademacherPressure baseline population temperature spikeStrength positiveLDSpikePressureDifferenceHasExactCriticalPoint : ∀ baseline temperature spikeStrength : ℝ, 0 ≤ temperature * spikeStrength → FiniteRankOnePressureCriticalStatement baseline temperature spikeStrength positiveLDSpikePressureConvergesToVariational : ∀ baseline temperature spikeStrength : ℝ, 0 ≤ temperature * spikeStrength → FiniteRankOnePressureVariationalLimitStatement baseline temperature spikeStrength positiveLDSpikePressureConvergesUniformlyOnNonnegativeStrength : ∀ baseline temperature : ℝ, 0 ≤ temperature → FiniteRankOnePressureUniformLimitStatement baseline temperature positiveLDSpikeRefutesTrafficAndGroundStateDichotomies : ∀ (Term Genotype : Type) [Fintype Term] (coefficient : Term → ℝ) (hasOddDegree : Term → Bool) (vertices edges : Term → ℕ), (∀ term, hasOddDegree term = false → vertices term ≤ edges term) → ∀ (alignment : Genotype → ℝ) (orthogonal aligned : Genotype) (baseline spikeStrength population temperature : ℝ), 0 < spikeStrength → population ≠ 0 → alignment orthogonal = 0 → alignment aligned = population → 1 < temperature * spikeStrength → RankOneSpikeRefutesBothDichotomies coefficient hasOddDegree vertices edges alignment orthogonal aligned baseline spikeStrength population temperature positiveLDSpikeGroundStateDoesNotFixPressure : ∀ baseline spikeStrength population tlam : ℝ, 0 ≤ spikeStrength → 2 * Real.log 2 < tlam → ((∀ state : Bool, baseline ≤ rankOneEnergyDensity baseline spikeStrength population (if state = true then population else 0)) ∧ rankOneEnergyDensity baseline spikeStrength population (if false = true then population else 0) = baseline) ∧ 0 < cwObjective tlam 1 ldOverlapPressureHasExactCriticalPoint : ∀ tlam : ℝ, (tlam ≤ 1 → ∀ m : ℝ, |m| ≤ 1 → cwObjective tlam m ≤ 0) ∧ (1 < tlam → ∃ m : ℝ, |m| < 1 ∧ 0 < cwObjective tlam m) ldVariationalPressureGapHasExactCriticalPoint : ∀ tlam : ℝ, cwVariationalPressureGap tlam = 0 ↔ tlam ≤ 1 ldVariationalPressureGapHasGlobalRegularity : LipschitzWith (⟨1 / 2, by norm_num⟩ : NNReal) cwVariationalPressureGap ∧ Continuous cwVariationalPressureGap ∧ Monotone cwVariationalPressureGap ∧ ConvexOn ℝ Set.univ cwVariationalPressureGap matchedBayesRandomDesignAsymmetricReduction : ∀ scalarLeft scalarRight randomLeft randomRight leftError rightError delta : ℝ,",
    "args": [],
-   "ret_type": "Prop where targetOnlyBlind : targetOnlyTransportPerformance binaryStateWeight persistentTransition targetAnnotation = targetOnlyTransportPerformance binaryStateWeight switchingTransition targetAnnotation crossStateSeparates : crossStatePerformance binaryStateWeight persistentTransition contextMatchQuality ≠ crossStatePerformance binaryStateWeight switchingTransition contextMatchQuality marginalsLoseDependence : (∀ omega : Bool, Spectral.coupledBinarySource omega 0 = Spectral.coupledBinarySource omega 1) ∧ (∀ omega : Bool, Spectral.coordinatewiseMarginalPreserver omega 0 ≠ Spectral.coordinatewiseMarginalPreserver omega 1) commutingAllocationConflict : (2 : ℝ) < 3 ∧ (3 : ℝ) / 10 < 2 / 1 sharedGeometryNotFree : 0 < 2 * (1 : ℝ) * 1 + 4 * (0 : ℝ) ^ 2 * 0 ^ 2 isospectralLDLosesOrientation : Isospectral2 (localizedCovarianceBlock (3 / 2)) (rotatedCovarianceBlock (3 / 2)) ∧ blockEntryCubeMean (localizedCovarianceBlock (3 / 2)) ≠ blockEntryCubeMean (rotatedCovarianceBlock (3 / 2)) skewedLDChangesLowSNRCoefficient : ∀ aspect m1 m2 m3 : ℝ, lowSNRThirdCoefficient aspect 2 2 m1 m2 m3 (blockEntryCubeMean (rotatedCovarianceBlock (3 / 2))) - lowSNRThirdCoefficient aspect 2 2 m1 m2 m3 (blockEntryCubeMean (localizedCovarianceBlock (3 / 2))) = 11 / 24 symmetricSparseLDLosesOrientation : Isospectral2 (localizedCovarianceBlock (3 / 2)) (rotatedCovarianceBlock (3 / 2)) ∧ blockEntryFourthMean (localizedCovarianceBlock (3 / 2)) ≠ blockEntryFourthMean (rotatedCovarianceBlock (3 / 2)) symmetricLDChangesLowSNRCoefficient : ∀ c m1 m2 m3 m4 : ℝ, lowSNRFourthCoefficient c 1 (-2) m1 m2 m3 m4 rotatedUniformFourthInvariant - lowSNRFourthCoefficient c 1 (-2) m1 m2 m3 m4 localizedUniformFourthInvariant = 49 / 96 environmentMixtureClosesPopulationGap : populationGapCertificate (4 / 5) < 0 ∧ populationGapCertificate (-(4 / 5)) < 0 ∧ populationGapCertificate (ancestryMixtureCorrelation (4 / 5) (1 / 2)) = 1 sameSignEnvironmentPoolingDoesNotMoveGapParameter : ∀ rho mix : ℝ, pooledEnvironmentCorrelation rho rho mix = rho fiveEpochDemographyIsSeverelyIllConditioned : fixedEpochSampleRateExponent 5 = 1 / 14 kingmanSpectrumHasIdentifiabilityBoundary : Summable (fun k : ℕ ↦ 1 / SpectrumIdentifiability.coalescentRate (k + 2)) ∧ ∀ n : ℕ, ∀ observation : (Fin (n + 1) → ℝ) →ₗ[ℝ] (Fin n → ℝ), ∃ direction : Fin (n + 1) → ℝ, direction ≠ 0 ∧ observation direction = 0 speedConditionedGenealogyNeedsThreeLineages : ∀ β : ℝ, speedTiltBetaMergerRate β 2 2 = 1 ∧ speedBiasParameterFromTripleRate (speedTiltBetaMergerRate β 3 3) = β markedSuccessfulFamilyMeasureDeterminesGenealogy : ∀ (ν : MeasureTheory.Measure SuccessfulFamilyMark) (b k : ℕ), 2 ≤ k → speedTiltedGenealogyMeasure 0 ν = genealogyMeasure ν ∧ markedEventMergerRate ν b k = markedLambdaMergerRate ν b k markedMassPartitionMeasureDeterminesXi : ∀ (n : ℕ) (ν : MeasureTheory.Measure MarkedMassPartition), HasFiniteCollisionIntensity ν → speedTiltedXiMeasure 0 ν = xiMeasure ν ∧ samplePartitionChangeRateBound n ν < ⊤ frontTrajectoryDoesNotDetermineXi : ∀ x : ℝ, x ≠ 0 → paintboxWeight ![x] ≠ paintboxWeight ![x / 2, x / 2] ∧ disjointPairMergeProbability ![x] = 0 ∧ 0 < disjointPairMergeProbability ![x / 2, x / 2] twoColourPioneerResponseIsExact : ∀ conversion gamma w : ℝ, conversion ≠ 0 → gamma ≠ 0 → -1 < w → conversion * w / (conversion * 1 + conversion * w) = pioneerWeightFraction w ∧ Real.exp (-(gamma * pioneerWeightDisplacement gamma w)) * (1 + w) = 1 branchingRandomWalkBoundaryTransformIsCritical : ∀ logMgf logMgfDerivative criticalParameter criticalSpeed : ℝ, criticalParameter * criticalSpeed - logMgf = Real.log 2 → criticalSpeed = logMgfDerivative → boundaryTiltMass logMgf criticalParameter criticalSpeed = 1 ∧ boundaryTiltCenteredFirstMoment logMgf logMgfDerivative criticalParameter criticalSpeed = 0 selectedDerivativeFluxControlsBreakouts : ∀ (Pioneer : Type) [Fintype Pioneer] [DecidableEq Pioneer] (tailConstant threshold blockScale fluxConstant : ℝ) (weight : Pioneer → ℝ), 0 ≤ tailConstant → 0 < threshold → (∀ pioneer, 0 ≤ weight pioneer) → selectedPioneerFlux weight = blockScale * fluxConstant → (∑ pioneer, paretoExceedanceMass tailConstant threshold (weight pioneer)) = blockScale * (tailConstant * fluxConstant / threshold) ∧ distinctPairExceedanceMass (fun pioneer ↦ paretoExceedanceMass tailConstant threshold (weight pioneer)) ≤ (blockScale * (tailConstant * fluxConstant / threshold)) ^ 2 selectedPioneerFluxFollowsFromNegligiblePruning : ∀ (fullTreeFlux selectedFlux prunedFlux : ℕ → ℝ) (fluxConstant : ℝ), IsSelectedFluxDecomposition fullTreeFlux selectedFlux prunedFlux → Filter.Tendsto fullTreeFlux Filter.atTop (nhds fluxConstant) → Filter.Tendsto prunedFlux Filter.atTop (nhds 0) → Filter.Tendsto selectedFlux Filter.atTop (nhds fluxConstant) uniquePioneerCommonProfileDeterminesMarkedResponse : ∀ conversion gamma w backgroundCount pioneerCount : ℝ, conversion ≠ 0 → backgroundCount + pioneerCount ≠ 0 → HasCommonProfileRelaxation conversion 1 w backgroundCount pioneerCount → (totalFamilyFraction ![pioneerWeightFraction w] = pioneerWeightFraction w ∧ paintboxWeight ![pioneerWeightFraction w] = pioneerWeightFraction w ^ 2 ∧ disjointPairMergeProbability ![pioneerWeightFraction w] = 0) ∧ pioneerCount / (backgroundCount + pioneerCount) = pioneerWeightFraction w ∧ amplitudeFront gamma (1 + w) - amplitudeFront gamma 1 = pioneerWeightDisplacement gamma w selectedGenealogyHasMuntzRateDichotomy : ∀ coefficient alpha : ℝ, 0 < coefficient → 1 < alpha → (¬Summable fun n : ℕ ↦ 1 / criticallyPulledLinearRateLadder coefficient n) ∧ Summable (fun n : ℕ ↦ 1 / stablePowerRateLadder alpha n) ∧ Summable (fun n : ℕ ↦ 1 / stablePowerRateLadder 2 n) genomicAlgorithmicRiskSignatureIsCoarsest : ∀ (Algorithm Design Model Loss : Type) (risk : Algorithm → Design → Model → Loss → ℝ), RiskSignaturesFactorThrough risk (algorithmicRiskSignature risk) ∧ ∀ (Invariant : Type) (invariant : Design → Invariant), RiskSignaturesFactorThrough risk invariant → ∀ left right, invariant left = invariant right → algorithmicRiskSignature risk left = algorithmicRiskSignature risk right genomicRankOneTrafficExpansionFollowsFromHandshake : ∀ (Term : Type) [Fintype Term] (coefficient : Term → ℝ) (hasOddDegree : Term → Bool) (vertices edges : Term → ℕ) (degree : ∀ term, Fin (vertices term) → ℕ), (∀ term, hasOddDegree term = false → ∀ vertex, 0 < degree term vertex) → (∀ term, hasOddDegree term = false → ∀ vertex, Even (degree term vertex)) → (∀ term, hasOddDegree term = false → ∑ vertex, degree term vertex = 2 * edges term) → Filter.Tendsto (fun population : ℕ ↦ finiteRankOneTrafficCorrection coefficient hasOddDegree vertices edges (population + 1)) Filter.atTop (nhds 0) positiveLDBalancedRankOneCovarianceHasFullWitness : ∀ (Term : Type) [Fintype Term] (coefficient : Term → ℝ) (hasOddDegree : Term → Bool) (vertices edges : Term → ℕ), (∀ term, hasOddDegree term = false → vertices term ≤ edges term) → ∀ baseline spikeStrength temperature : ℝ, 0 ≤ baseline → 0 < spikeStrength → 1 < temperature * spikeStrength → ConcreteBalancedPSDPressureWitness coefficient hasOddDegree vertices edges baseline spikeStrength temperature rareLDSubspaceEvadesFixedTrafficAtLogRuntime : FixedTrafficLogRuntimeSeparation rareLDSubspaceEvadesLimitingTrafficAtDegreeOne : ∀ baseline : ℝ, Filter.Tendsto (fun iteration ↦ diagonalTrafficCorrection baseline 1 iteration) Filter.atTop (nhds 0) ∧ ∀ iteration, amplifiedDegreeOneTrafficDifference baseline iteration = 2 rareLDSubspaceConcreteGFOMEvadesFixedTrafficAtLogRuntime : ConcreteGFOMLogRuntimeSeparation genomicBulkSpectralLawDoesNotDetermineExtremalSpectrumOrSDP : ∀ baseline spikeStrength : ℝ, 0 < spikeStrength → BulkSpectralLawExtremalSDPSeparation baseline spikeStrength positiveLDSpikeFixedTrafficInvisibleVariationalPressureVisible : ∀ (Term : Type) [Fintype Term] (coefficient : Term → ℝ) (hasOddDegree : Term → Bool) (vertices edges : Term → ℕ), (∀ term, hasOddDegree term = false → vertices term ≤ edges term) → ∀ tlam : ℝ, 1 < tlam → Filter.Tendsto (fun population : ℕ ↦ finiteRankOneTrafficCorrection coefficient hasOddDegree vertices edges (population + 1)) Filter.atTop (nhds 0) ∧ 0 < cwVariationalPressureGap tlam positiveLDSpikeFixedTrafficInvisibleFinitePressureVisible : ∀ (Term : Type) [Fintype Term] (coefficient : Term → ℝ) (hasOddDegree : Term → Bool) (vertices edges : Term → ℕ), (∀ term, hasOddDegree term = false → vertices term ≤ edges term) → ∀ tlam : ℝ, 1 < tlam → RankOneSpikeInvisibleWithFinitePressure coefficient hasOddDegree vertices edges tlam genomicFiniteCWPressureDominatesVariationalObjective : ∀ (population : ℕ) (tlam m : ℝ), 0 < population → 0 ≤ tlam → |m| < 1 → cwObjective tlam m ≤ finiteCWPressureGap population tlam genomicFiniteCWTypeMassLeOneOfSubcritical : ∀ (population upSpins : ℕ) (tlam : ℝ), tlam ≤ 1 → upSpins ∈ Finset.range (population + 1) → finiteCWTypeMass population tlam upSpins ≤ 1 genomicFiniteCWPressureHasExactCriticalPoint : ∀ tlam : ℝ, 0 ≤ tlam → (Filter.Tendsto (fun population : ℕ ↦ finiteCWPressureGap (population + 1) tlam) Filter.atTop (nhds 0) ↔ tlam ≤ 1) genomicFiniteCWPressureConvergesToVariational : ∀ tlam : ℝ, 0 ≤ tlam → Filter.Tendsto (fun population : ℕ ↦ finiteCWPressureGap (population + 1) tlam) Filter.atTop (nhds (cwVariationalPressureGap tlam)) genomicFiniteCWPressureConvergesUniformlyOnNonnegative : TendstoUniformlyOn (fun population : ℕ ↦ fun tlam : ℝ ↦ finiteCWPressureGap (population + 1) tlam) cwVariationalPressureGap Filter.atTop (Set.Ici 0) genomicFiniteCWPressureIsHalfLipschitz : ∀ population : ℕ, 0 < population → LipschitzWith (⟨1 / 2, by norm_num⟩ : NNReal) (finiteCWPressureGap population) genomicFiniteCWPressureIsMonotone : ∀ population : ℕ, 0 < population → Monotone (finiteCWPressureGap population) positiveLDSpikeFinitePressureExceedsBaseline : ∀ (baseline : ℝ) (population : ℕ) (temperature spikeStrength : ℝ), 0 < population → 1 < temperature * spikeStrength → finiteBaselineRademacherPressure baseline temperature < finiteRankOneRademacherPressure baseline population temperature spikeStrength positiveLDSpikePressureDifferenceHasExactCriticalPoint : ∀ baseline temperature spikeStrength : ℝ, 0 ≤ temperature * spikeStrength → FiniteRankOnePressureCriticalStatement baseline temperature spikeStrength positiveLDSpikePressureConvergesToVariational : ∀ baseline temperature spikeStrength : ℝ, 0 ≤ temperature * spikeStrength → FiniteRankOnePressureVariationalLimitStatement baseline temperature spikeStrength positiveLDSpikePressureConvergesUniformlyOnNonnegativeStrength : ∀ baseline temperature : ℝ, 0 ≤ temperature → FiniteRankOnePressureUniformLimitStatement baseline temperature positiveLDSpikeRefutesTrafficAndGroundStateDichotomies : ∀ (Term Genotype : Type) [Fintype Term] (coefficient : Term → ℝ) (hasOddDegree : Term → Bool) (vertices edges : Term → ℕ), (∀ term, hasOddDegree term = false → vertices term ≤ edges term) → ∀ (alignment : Genotype → ℝ) (orthogonal aligned : Genotype) (baseline spikeStrength population temperature : ℝ), 0 < spikeStrength → population ≠ 0 → alignment orthogonal = 0 → alignment aligned = population → 1 < temperature * spikeStrength → RankOneSpikeRefutesBothDichotomies coefficient hasOddDegree vertices edges alignment orthogonal aligned baseline spikeStrength population temperature positiveLDSpikeGroundStateDoesNotFixPressure : ∀ baseline spikeStrength population tlam : ℝ, 0 ≤ spikeStrength → 2 * Real.log 2 < tlam → ((∀ state : Bool, baseline ≤ rankOneEnergyDensity baseline spikeStrength population (if state = true then population else 0)) ∧ rankOneEnergyDensity baseline spikeStrength population (if false = true then population else 0) = baseline) ∧ 0 < cwObjective tlam 1 ldOverlapPressureHasExactCriticalPoint : ∀ tlam : ℝ, (tlam ≤ 1 → ∀ m : ℝ, |m| ≤ 1 → cwObjective tlam m ≤ 0) ∧ (1 < tlam → ∃ m : ℝ, |m| < 1 ∧ 0 < cwObjective tlam m) ldVariationalPressureGapHasExactCriticalPoint : ∀ tlam : ℝ, cwVariationalPressureGap tlam = 0 ↔ tlam ≤ 1 ldVariationalPressureGapHasGlobalRegularity : LipschitzWith (⟨1 / 2, by norm_num⟩ : NNReal) cwVariationalPressureGap ∧ Continuous cwVariationalPressureGap ∧ Monotone cwVariationalPressureGap ∧ ConvexOn ℝ Set.univ cwVariationalPressureGap matchedBayesRandomDesignAsymmetricReduction : ∀ scalarLeft scalarRight randomLeft randomRight leftError rightError delta : ℝ,",
+   "ret_type": "Prop where targetOnlyBlind : targetOnlyTransportPerformance binaryStateWeight persistentTransition targetAnnotation = targetOnlyTransportPerformance binaryStateWeight switchingTransition targetAnnotation crossStateSeparates : crossStatePerformance binaryStateWeight persistentTransition contextMatchQuality ≠ crossStatePerformance binaryStateWeight switchingTransition contextMatchQuality marginalsLoseDependence : (∀ omega : Bool, Spectral.coupledBinarySource omega 0 = Spectral.coupledBinarySource omega 1) ∧ (∀ omega : Bool, Spectral.coordinatewiseMarginalPreserver omega 0 ≠ Spectral.coordinatewiseMarginalPreserver omega 1) commutingAllocationConflict : (2 : ℝ) < 3 ∧ (3 : ℝ) / 10 < 2 / 1 sharedGeometryNotFree : 0 < 2 * (1 : ℝ) * 1 + 4 * (0 : ℝ) ^ 2 * 0 ^ 2 isospectralLDLosesOrientation : Isospectral2 (localizedCovarianceBlock (3 / 2)) (rotatedCovarianceBlock (3 / 2)) ∧ blockEntryCubeMean (localizedCovarianceBlock (3 / 2)) ≠ blockEntryCubeMean (rotatedCovarianceBlock (3 / 2)) skewedLDChangesLowSNRCoefficient : ∀ aspect m1 m2 m3 : ℝ, lowSNRThirdCoefficient aspect 2 2 m1 m2 m3 (blockEntryCubeMean (rotatedCovarianceBlock (3 / 2))) - lowSNRThirdCoefficient aspect 2 2 m1 m2 m3 (blockEntryCubeMean (localizedCovarianceBlock (3 / 2))) = 11 / 24 symmetricSparseLDLosesOrientation : Isospectral2 (localizedCovarianceBlock (3 / 2)) (rotatedCovarianceBlock (3 / 2)) ∧ blockEntryFourthMean (localizedCovarianceBlock (3 / 2)) ≠ blockEntryFourthMean (rotatedCovarianceBlock (3 / 2)) symmetricLDChangesLowSNRCoefficient : ∀ c m1 m2 m3 m4 : ℝ, lowSNRFourthCoefficient c 1 (-2) m1 m2 m3 m4 rotatedUniformFourthInvariant - lowSNRFourthCoefficient c 1 (-2) m1 m2 m3 m4 localizedUniformFourthInvariant = 49 / 96 environmentMixtureClosesPopulationGap : populationGapCertificate (4 / 5) < 0 ∧ populationGapCertificate (-(4 / 5)) < 0 ∧ populationGapCertificate (ancestryMixtureCorrelation (4 / 5) (1 / 2)) = 1 sameSignEnvironmentPoolingDoesNotMoveGapParameter : ∀ rho mix : ℝ, pooledEnvironmentCorrelation rho rho mix = rho fiveEpochDemographyIsSeverelyIllConditioned : fixedEpochSampleRateExponent 5 = 1 / 14 kingmanSpectrumHasIdentifiabilityBoundary : Summable (fun k : ℕ ↦ 1 / Coalescent.deathRate (k + 2)) ∧ ∀ n : ℕ, ∀ observation : (Fin (n + 1) → ℝ) →ₗ[ℝ] (Fin n → ℝ), ∃ direction : Fin (n + 1) → ℝ, direction ≠ 0 ∧ observation direction = 0 speedConditionedGenealogyNeedsThreeLineages : ∀ β : ℝ, speedTiltBetaMergerRate β 2 2 = 1 ∧ speedBiasParameterFromTripleRate (speedTiltBetaMergerRate β 3 3) = β markedSuccessfulFamilyMeasureDeterminesGenealogy : ∀ (ν : MeasureTheory.Measure SuccessfulFamilyMark) (b k : ℕ), 2 ≤ k → speedTiltedGenealogyMeasure 0 ν = genealogyMeasure ν ∧ markedEventMergerRate ν b k = markedLambdaMergerRate ν b k markedMassPartitionMeasureDeterminesXi : ∀ (n : ℕ) (ν : MeasureTheory.Measure MarkedMassPartition), HasFiniteCollisionIntensity ν → speedTiltedXiMeasure 0 ν = xiMeasure ν ∧ samplePartitionChangeRateBound n ν < ⊤ frontTrajectoryDoesNotDetermineXi : ∀ x : ℝ, x ≠ 0 → paintboxWeight ![x] ≠ paintboxWeight ![x / 2, x / 2] ∧ disjointPairMergeProbability ![x] = 0 ∧ 0 < disjointPairMergeProbability ![x / 2, x / 2] twoColourPioneerResponseIsExact : ∀ conversion gamma w : ℝ, conversion ≠ 0 → gamma ≠ 0 → -1 < w → conversion * w / (conversion * 1 + conversion * w) = pioneerWeightFraction w ∧ Real.exp (-(gamma * pioneerWeightDisplacement gamma w)) * (1 + w) = 1 branchingRandomWalkBoundaryTransformIsCritical : ∀ logMgf logMgfDerivative criticalParameter criticalSpeed : ℝ, criticalParameter * criticalSpeed - logMgf = Real.log 2 → criticalSpeed = logMgfDerivative → boundaryTiltMass logMgf criticalParameter criticalSpeed = 1 ∧ boundaryTiltCenteredFirstMoment logMgf logMgfDerivative criticalParameter criticalSpeed = 0 selectedDerivativeFluxControlsBreakouts : ∀ (Pioneer : Type) [Fintype Pioneer] [DecidableEq Pioneer] (tailConstant threshold blockScale fluxConstant : ℝ) (weight : Pioneer → ℝ), 0 ≤ tailConstant → 0 < threshold → (∀ pioneer, 0 ≤ weight pioneer) → selectedPioneerFlux weight = blockScale * fluxConstant → (∑ pioneer, paretoExceedanceMass tailConstant threshold (weight pioneer)) = blockScale * (tailConstant * fluxConstant / threshold) ∧ distinctPairExceedanceMass (fun pioneer ↦ paretoExceedanceMass tailConstant threshold (weight pioneer)) ≤ (blockScale * (tailConstant * fluxConstant / threshold)) ^ 2 selectedPioneerFluxFollowsFromNegligiblePruning : ∀ (fullTreeFlux selectedFlux prunedFlux : ℕ → ℝ) (fluxConstant : ℝ), IsSelectedFluxDecomposition fullTreeFlux selectedFlux prunedFlux → Filter.Tendsto fullTreeFlux Filter.atTop (nhds fluxConstant) → Filter.Tendsto prunedFlux Filter.atTop (nhds 0) → Filter.Tendsto selectedFlux Filter.atTop (nhds fluxConstant) uniquePioneerCommonProfileDeterminesMarkedResponse : ∀ conversion gamma w backgroundCount pioneerCount : ℝ, conversion ≠ 0 → backgroundCount + pioneerCount ≠ 0 → HasCommonProfileRelaxation conversion 1 w backgroundCount pioneerCount → (totalFamilyFraction ![pioneerWeightFraction w] = pioneerWeightFraction w ∧ paintboxWeight ![pioneerWeightFraction w] = pioneerWeightFraction w ^ 2 ∧ disjointPairMergeProbability ![pioneerWeightFraction w] = 0) ∧ pioneerCount / (backgroundCount + pioneerCount) = pioneerWeightFraction w ∧ amplitudeFront gamma (1 + w) - amplitudeFront gamma 1 = pioneerWeightDisplacement gamma w selectedGenealogyHasMuntzRateDichotomy : ∀ coefficient alpha : ℝ, 0 < coefficient → 1 < alpha → (¬Summable fun n : ℕ ↦ 1 / criticallyPulledLinearRateLadder coefficient n) ∧ Summable (fun n : ℕ ↦ 1 / stablePowerRateLadder alpha n) ∧ Summable (fun n : ℕ ↦ 1 / stablePowerRateLadder 2 n) genomicAlgorithmicRiskSignatureIsCoarsest : ∀ (Algorithm Design Model Loss : Type) (risk : Algorithm → Design → Model → Loss → ℝ), RiskSignaturesFactorThrough risk (algorithmicRiskSignature risk) ∧ ∀ (Invariant : Type) (invariant : Design → Invariant), RiskSignaturesFactorThrough risk invariant → ∀ left right, invariant left = invariant right → algorithmicRiskSignature risk left = algorithmicRiskSignature risk right genomicRankOneTrafficExpansionFollowsFromHandshake : ∀ (Term : Type) [Fintype Term] (coefficient : Term → ℝ) (hasOddDegree : Term → Bool) (vertices edges : Term → ℕ) (degree : ∀ term, Fin (vertices term) → ℕ), (∀ term, hasOddDegree term = false → ∀ vertex, 0 < degree term vertex) → (∀ term, hasOddDegree term = false → ∀ vertex, Even (degree term vertex)) → (∀ term, hasOddDegree term = false → ∑ vertex, degree term vertex = 2 * edges term) → Filter.Tendsto (fun population : ℕ ↦ finiteRankOneTrafficCorrection coefficient hasOddDegree vertices edges (population + 1)) Filter.atTop (nhds 0) positiveLDBalancedRankOneCovarianceHasFullWitness : ∀ (Term : Type) [Fintype Term] (coefficient : Term → ℝ) (hasOddDegree : Term → Bool) (vertices edges : Term → ℕ), (∀ term, hasOddDegree term = false → vertices term ≤ edges term) → ∀ baseline spikeStrength temperature : ℝ, 0 ≤ baseline → 0 < spikeStrength → 1 < temperature * spikeStrength → ConcreteBalancedPSDPressureWitness coefficient hasOddDegree vertices edges baseline spikeStrength temperature rareLDSubspaceEvadesFixedTrafficAtLogRuntime : FixedTrafficLogRuntimeSeparation rareLDSubspaceEvadesLimitingTrafficAtDegreeOne : ∀ baseline : ℝ, Filter.Tendsto (fun iteration ↦ diagonalTrafficCorrection baseline 1 iteration) Filter.atTop (nhds 0) ∧ ∀ iteration, amplifiedDegreeOneTrafficDifference baseline iteration = 2 rareLDSubspaceConcreteGFOMEvadesFixedTrafficAtLogRuntime : ConcreteGFOMLogRuntimeSeparation genomicBulkSpectralLawDoesNotDetermineExtremalSpectrumOrSDP : ∀ baseline spikeStrength : ℝ, 0 < spikeStrength → BulkSpectralLawExtremalSDPSeparation baseline spikeStrength positiveLDSpikeFixedTrafficInvisibleVariationalPressureVisible : ∀ (Term : Type) [Fintype Term] (coefficient : Term → ℝ) (hasOddDegree : Term → Bool) (vertices edges : Term → ℕ), (∀ term, hasOddDegree term = false → vertices term ≤ edges term) → ∀ tlam : ℝ, 1 < tlam → Filter.Tendsto (fun population : ℕ ↦ finiteRankOneTrafficCorrection coefficient hasOddDegree vertices edges (population + 1)) Filter.atTop (nhds 0) ∧ 0 < cwVariationalPressureGap tlam positiveLDSpikeFixedTrafficInvisibleFinitePressureVisible : ∀ (Term : Type) [Fintype Term] (coefficient : Term → ℝ) (hasOddDegree : Term → Bool) (vertices edges : Term → ℕ), (∀ term, hasOddDegree term = false → vertices term ≤ edges term) → ∀ tlam : ℝ, 1 < tlam → RankOneSpikeInvisibleWithFinitePressure coefficient hasOddDegree vertices edges tlam genomicFiniteCWPressureDominatesVariationalObjective : ∀ (population : ℕ) (tlam m : ℝ), 0 < population → 0 ≤ tlam → |m| < 1 → cwObjective tlam m ≤ finiteCWPressureGap population tlam genomicFiniteCWTypeMassLeOneOfSubcritical : ∀ (population upSpins : ℕ) (tlam : ℝ), tlam ≤ 1 → upSpins ∈ Finset.range (population + 1) → finiteCWTypeMass population tlam upSpins ≤ 1 genomicFiniteCWPressureHasExactCriticalPoint : ∀ tlam : ℝ, 0 ≤ tlam → (Filter.Tendsto (fun population : ℕ ↦ finiteCWPressureGap (population + 1) tlam) Filter.atTop (nhds 0) ↔ tlam ≤ 1) genomicFiniteCWPressureConvergesToVariational : ∀ tlam : ℝ, 0 ≤ tlam → Filter.Tendsto (fun population : ℕ ↦ finiteCWPressureGap (population + 1) tlam) Filter.atTop (nhds (cwVariationalPressureGap tlam)) genomicFiniteCWPressureConvergesUniformlyOnNonnegative : TendstoUniformlyOn (fun population : ℕ ↦ fun tlam : ℝ ↦ finiteCWPressureGap (population + 1) tlam) cwVariationalPressureGap Filter.atTop (Set.Ici 0) genomicFiniteCWPressureIsHalfLipschitz : ∀ population : ℕ, 0 < population → LipschitzWith (⟨1 / 2, by norm_num⟩ : NNReal) (finiteCWPressureGap population) genomicFiniteCWPressureIsMonotone : ∀ population : ℕ, 0 < population → Monotone (finiteCWPressureGap population) positiveLDSpikeFinitePressureExceedsBaseline : ∀ (baseline : ℝ) (population : ℕ) (temperature spikeStrength : ℝ), 0 < population → 1 < temperature * spikeStrength → finiteBaselineRademacherPressure baseline temperature < finiteRankOneRademacherPressure baseline population temperature spikeStrength positiveLDSpikePressureDifferenceHasExactCriticalPoint : ∀ baseline temperature spikeStrength : ℝ, 0 ≤ temperature * spikeStrength → FiniteRankOnePressureCriticalStatement baseline temperature spikeStrength positiveLDSpikePressureConvergesToVariational : ∀ baseline temperature spikeStrength : ℝ, 0 ≤ temperature * spikeStrength → FiniteRankOnePressureVariationalLimitStatement baseline temperature spikeStrength positiveLDSpikePressureConvergesUniformlyOnNonnegativeStrength : ∀ baseline temperature : ℝ, 0 ≤ temperature → FiniteRankOnePressureUniformLimitStatement baseline temperature positiveLDSpikeRefutesTrafficAndGroundStateDichotomies : ∀ (Term Genotype : Type) [Fintype Term] (coefficient : Term → ℝ) (hasOddDegree : Term → Bool) (vertices edges : Term → ℕ), (∀ term, hasOddDegree term = false → vertices term ≤ edges term) → ∀ (alignment : Genotype → ℝ) (orthogonal aligned : Genotype) (baseline spikeStrength population temperature : ℝ), 0 < spikeStrength → population ≠ 0 → alignment orthogonal = 0 → alignment aligned = population → 1 < temperature * spikeStrength → RankOneSpikeRefutesBothDichotomies coefficient hasOddDegree vertices edges alignment orthogonal aligned baseline spikeStrength population temperature positiveLDSpikeGroundStateDoesNotFixPressure : ∀ baseline spikeStrength population tlam : ℝ, 0 ≤ spikeStrength → 2 * Real.log 2 < tlam → ((∀ state : Bool, baseline ≤ rankOneEnergyDensity baseline spikeStrength population (if state = true then population else 0)) ∧ rankOneEnergyDensity baseline spikeStrength population (if false = true then population else 0) = baseline) ∧ 0 < cwObjective tlam 1 ldOverlapPressureHasExactCriticalPoint : ∀ tlam : ℝ, (tlam ≤ 1 → ∀ m : ℝ, |m| ≤ 1 → cwObjective tlam m ≤ 0) ∧ (1 < tlam → ∃ m : ℝ, |m| < 1 ∧ 0 < cwObjective tlam m) ldVariationalPressureGapHasExactCriticalPoint : ∀ tlam : ℝ, cwVariationalPressureGap tlam = 0 ↔ tlam ≤ 1 ldVariationalPressureGapHasGlobalRegularity : LipschitzWith (⟨1 / 2, by norm_num⟩ : NNReal) cwVariationalPressureGap ∧ Continuous cwVariationalPressureGap ∧ Monotone cwVariationalPressureGap ∧ ConvexOn ℝ Set.univ cwVariationalPressureGap matchedBayesRandomDesignAsymmetricReduction : ∀ scalarLeft scalarRight randomLeft randomRight leftError rightError delta : ℝ,",
    "body": "|randomLeft - scalarLeft| ≤ leftError →\n      |randomRight - scalarRight| ≤ rightError →\n      scalarRight - scalarLeft = delta →\n        delta - (leftError + rightError) ≤ randomRight - randomLeft\n                                                                                              \n                                   \n  matchedBayesRandomDesignReduction :\n    ∀ scalarLeft scalarRight randomLeft randomRight epsilon delta : ℝ,\n      |randomLeft - scalarLeft| ≤ epsilon →\n      |randomRight - scalarRight| ≤ epsilon →\n      scalarRight - scalarLeft = delta →\n        delta - 2 * epsilon ≤ randomRight - randomLeft\n                                                                            \n                                                    \n  matchedBayesRandomDesignEventuallySeparatesWithAsymmetricErrors :\n    ∀ (Index : Type) (regime : Filter Index)\n      (scalarLeft scalarRight delta : ℝ)\n      (randomLeft randomRight leftError rightError : Index → ℝ),\n      (∀ index, |randomLeft index - scalarLeft| ≤ leftError index) →\n      (∀ index, |randomRight index - scalarRight| ≤ rightError index) →\n      scalarRight - scalarLeft = delta → 0 < delta →\n      Filter.Tendsto leftError regime (nhds 0) →\n      Filter.Tendsto rightError regime (nhds 0) →\n        ∀ᶠ index in regime, randomLeft index < randomRight index\n                                                                            \n                                                          \n  matchedBayesRandomDesignEventuallySeparates :\n    ∀ (Index : Type) (regime : Filter Index)\n      (scalarLeft scalarRight delta : ℝ)\n      (randomLeft randomRight comparisonError : Index → ℝ),\n      (∀ index, |randomLeft index - scalarLeft| ≤ comparisonError index) →\n      (∀ index, |randomRight index - scalarRight| ≤ comparisonError index) →\n      scalarRight - scalarLeft = delta → 0 < delta →\n      Filter.Tendsto comparisonError regime (nhds 0) →\n        ∀ᶠ index in regime, randomLeft index < randomRight index\n                                                                            \n                                              \n  matchedBayesRandomDesignSeparatesAtLargeAspect :\n    ∀ scalarLeft scalarRight randomLeft randomRight aspectRatio constant delta : ℝ,\n      |randomLeft - scalarLeft| ≤ constant / Real.sqrt aspectRatio →\n      |randomRight - scalarRight| ≤ constant / Real.sqrt aspectRatio →\n      scalarRight - scalarLeft = delta →\n      2 * (constant / Real.sqrt aspectRatio) < delta →\n        randomLeft < randomRight\n                                                                            \n                                                                  \n  matchedBayesRandomDesignEventuallySeparatesAtDivergingAspect :\n    ∀ (Index : Type) (regime : Filter Index)\n      (scalarLeft scalarRight delta constant : ℝ)\n      (aspectRatio randomLeft randomRight : Index → ℝ),\n      (∀ index,\n        |randomLeft index - scalarLeft| ≤ constant / Real.sqrt (aspectRatio index)) →\n      (∀ index,\n        |randomRight index - scalarRight| ≤ constant / Real.sqrt (aspectRatio index)) →\n      scalarRight - scalarLeft = delta → 0 < delta →\n      Filter.Tendsto aspectRatio regime Filter.atTop →\n        ∀ᶠ index in regime, randomLeft index < randomRight index\n                                                                          \n                                                                         \n  matchedBayesAspectWishartRatioBridge :\n    ∀ (Index : Type) (regime : Filter Index)\n      (aspectRatio : Index → ℝ) (constant : ℝ),\n      (Filter.Tendsto aspectRatio regime Filter.atTop ↔\n        Filter.Tendsto (fun index ↦ (aspectRatio index)⁻¹) regime (𝓝[>] 0)) ∧\n      (∀ index, constant / Real.sqrt (aspectRatio index) =\n        constant * Real.sqrt ((aspectRatio index)⁻¹))\n                                                                            \n                            \n  matchedBayesWishartInformationErrorVanishes :\n    ∀ (Index : Type) (regime : Filter Index)\n      (informationError adjustedRatio : Index → ℝ) (constant : ℝ),\n      Filter.Tendsto adjustedRatio regime (nhds 0) →\n      (∀ index,\n        |informationError index| ≤ constant * Real.sqrt (adjustedRatio index)) →\n        Filter.Tendsto informationError regime (nhds 0)\n                                                                            \n                                                    \n  matchedBayesRandomDesignEventuallySeparatesAtAsymmetricWishartRatios :\n    ∀ (Index : Type) (regime : Filter Index)\n      (scalarLeft scalarRight delta leftConstant rightConstant : ℝ)\n      (leftRatio rightRatio randomLeft randomRight : Index → ℝ),\n      (∀ index, |randomLeft index - scalarLeft| ≤\n        leftConstant * Real.sqrt (leftRatio index)) →\n      (∀ index, |randomRight index - scalarRight| ≤\n        rightConstant * Real.sqrt (rightRatio index)) →\n      scalarRight - scalarLeft = delta → 0 < delta →\n      Filter.Tendsto leftRatio regime (nhds 0) →\n      Filter.Tendsto rightRatio regime (nhds 0) →\n        ∀ᶠ index in regime, randomLeft index < randomRight index\n                                                                           \n                                  \n  matchedBayesRandomDesignEventuallySeparatesAtWishartRatio :\n    ∀ (Index : Type) (regime : Filter Index)\n      (scalarLeft scalarRight delta constant : ℝ)\n      (adjustedRatio randomLeft randomRight : Index → ℝ),\n      (∀ index,\n        |randomLeft index - scalarLeft| ≤\n          constant * Real.sqrt (adjustedRatio index)) →\n      (∀ index,\n        |randomRight index - scalarRight| ≤\n          constant * Real.sqrt (adjustedRatio index)) →\n      scalarRight - scalarLeft = delta → 0 < delta →\n      Filter.Tendsto adjustedRatio regime (nhds 0) →\n        ∀ᶠ index in regime, randomLeft index < randomRight index\n                                                                         \n                                                    \n  matchedBayesSingularSpectrumHasNormalizedNuclearBound :\n    ∀ (Coordinate : Type) [Fintype Coordinate] [DecidableEq Coordinate]\n      (spectrum : FiniteLowRankSingularSpectrum Coordinate),\n      0 < Fintype.card Coordinate →\n        spectrum.normalizedNuclearDistance ≤\n          spectrum.operatorBound * spectrum.rankFraction\n                                                                     \n                                                    \n  matchedBayesCertifiedRankOnePerturbationIsAsymptoticallyInvisible :\n    ∀ (certificate : ℕ → MatchedInformationPathCertificate)\n      (varianceBound spikeStrength : ℝ) (hspike : 0 ≤ spikeStrength),\n      (∀ population, (certificate population).variance ≤ varianceBound) →\n      (∀ population,\n        (certificate population).nuclearDistance =\n          FiniteLowRankSingularSpectrum.normalizedNuclearDistance\n            (finiteRankOneSingularSpectrum population spikeStrength hspike)) →\n        Filter.Tendsto\n          (fun population ↦ (certificate population).informationPath 1 -\n            (certificate population).informationPath 0)\n          Filter.atTop (nhds 0)\n                                                                               \n                                        \n  matchedBayesInformationPathHasNuclearBound :\n    ∀ certificate : MatchedInformationPathCertificate,\n      |certificate.informationPath 1 - certificate.informationPath 0| ≤\n        certificate.variance / 2 * certificate.nuclearDistance\n                                                                         \n                                                    \n  matchedBayesHasWishartFrobeniusComparisonRate :\n    ∀ dimension sampleSize signal variance operatorBound informationError\n      nuclearError frobeniusError : ℝ,\n      0 < dimension → 0 < sampleSize → 0 ≤ signal → 0 ≤ variance →\n      |informationError| ≤ signal * variance / (2 * dimension) * nuclearError →\n      nuclearError ≤ Real.sqrt dimension * frobeniusError →\n      frobeniusError ≤ operatorBound *\n        Real.sqrt (dimension * ((dimension + 1) / sampleSize)) →\n        |informationError| ≤ signal * variance * operatorBound / 2 *\n          Real.sqrt ((dimension + 1) / sampleSize)\n                                                                           \n                                                    \n  matchedBayesHasWishartMomentIdentityComparisonRate :\n    ∀ dimension sampleSize signal variance operatorBound covarianceTrace\n      covarianceTraceSq frobeniusSecondMoment frobeniusError nuclearError\n      informationError : ℝ,\n      0 < dimension → 0 < sampleSize → 0 ≤ signal → 0 ≤ variance →\n      0 ≤ operatorBound →\n      |covarianceTrace| ≤ dimension * operatorBound →\n      covarianceTraceSq ≤ dimension * operatorBound ^ 2 →\n      frobeniusSecondMoment =\n        (covarianceTrace ^ 2 + covarianceTraceSq) / sampleSize →\n      frobeniusError ≤ Real.sqrt frobeniusSecondMoment →\n      nuclearError ≤ Real.sqrt dimension * frobeniusError →\n      |informationError| ≤ signal * variance / (2 * dimension) * nuclearError →\n        |informationError| ≤ signal * variance * operatorBound / 2 *\n          Real.sqrt ((dimension + 1) / sampleSize)\n                                                                         \n                                                                        \n  matchedBayesCertifiedSublinearRankIsInvisibleUnderVarianceBound :\n    ∀ (Index : Type) (regime : Filter Index)\n      (certificate : Index → MatchedInformationPathCertificate)\n      (varianceBound operatorBound : ℝ) (rankFraction : Index → ℝ),\n      (∀ index, (certificate index).variance ≤ varianceBound) →\n      Filter.Tendsto rankFraction regime (nhds 0) →\n      (∀ index,\n        (certificate index).nuclearDistance ≤ operatorBound * rankFraction index) →\n        MatchedInformationPathGapTendsToZero regime certificate\n                                                                             \n  matchedBayesCertifiedSublinearRankIsInvisible :\n    ∀ (Index : Type) (regime : Filter Index)\n      (certificate : Index → MatchedInformationPathCertificate)\n      (operatorBound : ℝ) (rankFraction : Index → ℝ),\n      (∃ variance : ℝ, ∀ index, (certificate index).variance = variance) →\n      Filter.Tendsto rankFraction regime (nhds 0) →\n      (∀ index,\n        (certificate index).nuclearDistance ≤ operatorBound * rankFraction index) →\n        MatchedInformationPathGapTendsToZero regime certificate\n                                                                              \n                                                                   \n  matchedBayesSublinearRankPerturbationsAreInvisible :\n    ∀ (densityGap rankFraction : ℕ → ℝ) (constant : ℝ),\n      Filter.Tendsto rankFraction Filter.atTop (nhds 0) →\n      (∀ index, |densityGap index| ≤ constant * rankFraction index) →\n        Filter.Tendsto densityGap Filter.atTop (nhds 0)\n                                                                             \n                                      \n  matchedBayesPositiveGapForcesExtensiveRank :\n    ∀ densityGap constant rankFraction delta : ℝ,\n      0 < constant → 0 < delta → delta ≤ |densityGap| →\n      |densityGap| ≤ constant * rankFraction →\n        0 < rankFraction ∧ delta / constant ≤ rankFraction\n                                                                            \n                                                                         \n  matchedBayesCertifiedPositiveGapForcesExtensiveRank :\n    ∀ (certificate : MatchedInformationPathCertificate)\n      (varianceBound operatorBound rankFraction delta : ℝ),\n      certificate.variance ≤ varianceBound →\n      0 < varianceBound → 0 < operatorBound → 0 < delta →\n      delta ≤ |certificate.informationPath 1 - certificate.informationPath 0| →\n      certificate.nuclearDistance ≤ operatorBound * rankFraction →\n        0 < rankFraction ∧\n          delta / (varianceBound * operatorBound / 2) ≤ rankFraction\n                                                                            \n                                                           \n  matchedBayesCertifiedPersistentGapRequiresExtensiveRank :\n    ∀ (Index : Type) (regime : Filter Index) [regime.NeBot]\n      (certificate : Index → MatchedInformationPathCertificate)\n      (varianceBound operatorBound delta : ℝ) (rankFraction : Index → ℝ),\n      0 < varianceBound → 0 < operatorBound → 0 < delta →\n      (∀ index, (certificate index).variance ≤ varianceBound) →\n      (∀ index,\n        (certificate index).nuclearDistance ≤ operatorBound * rankFraction index) →\n      (∀ᶠ index in regime, delta ≤\n        |(certificate index).informationPath 1 -\n          (certificate index).informationPath 0|) →\n        (∀ᶠ index in regime,\n          delta / (varianceBound * operatorBound / 2) ≤ rankFraction index) ∧\n          ¬ Filter.Tendsto rankFraction regime (nhds 0)\n                                                                       \n                                                         \n  matchedBayesPersistentGapRequiresExtensiveRank :\n    ∀ (Index : Type) (regime : Filter Index) [regime.NeBot]\n      (densityGap rankFraction : Index → ℝ) (constant delta : ℝ),\n      0 < constant → 0 < delta →\n      (∀ᶠ index in regime, delta ≤ |densityGap index|) →\n      (∀ index, |densityGap index| ≤ constant * rankFraction index) →\n        (∀ᶠ index in regime, delta / constant ≤ rankFraction index) ∧\n          ¬ Filter.Tendsto rankFraction regime (nhds 0)\n                                                                                               \n                                                               \n  degreeLimitedGenomicRiskHasFullGapHardness :\n    ∀ (Algorithm : Type) (D : ℕ) (risk : Algorithm → TruncatedTrafficRisk D)\n      (left right : Fin (D + 1) → ℝ), left = right →\n      ∀ bayesLeft bayesRight : ℝ,\n        (∀ algorithm, bayesRight ≤ (risk algorithm).evaluate right) →\n          ∀ algorithm,\n            bayesRight - bayesLeft ≤ (risk algorithm).evaluate left - bayesLeft\n                                                                      \n                                             \n  stableDegreeLimitedGenomicRiskHasQuantitativeTrafficBound :\n    ∀ (D : ℕ) (risk : TruncatedTrafficRisk D)\n      (left right : Fin (D + 1) → ℝ) (epsilon : ℝ),\n      (∀ graph, |left graph - right graph| ≤ epsilon) →\n        |risk.evaluate left - risk.evaluate right| ≤\n          (∑ graph, |risk.coefficient graph|) * epsilon\n                                                                     \n                                                              \n  stableDegreeLimitedGenomicRiskConvergesOfBoundedCoefficientMass :\n    ∀ (D : ℕ) (risk : ℕ → TruncatedTrafficRisk D)\n      (left right : ℕ → Fin (D + 1) → ℝ)\n      (discrepancy coefficientBound : ℝ),\n      (∀ index graph,\n        |left index graph - right index graph| ≤\n          discrepancy * (1 / 2 : ℝ) ^ index) →\n      (∀ index,\n        (∑ graph, |(risk index).coefficient graph|) ≤ coefficientBound) →\n      0 ≤ discrepancy →\n        Filter.Tendsto\n          (fun index ↦ (risk index).evaluate (left index) -\n            (risk index).evaluate (right index))\n          Filter.atTop (nhds 0)\n                                                                           \n                                                                    \n  highTemperatureGenomicTrafficDeterminesCertifiedPressure :\n    ∀ (leftLimit rightLimit C q : ℝ) (commonTruncation : ℕ → ℝ),\n      0 ≤ q → q < 1 →\n      (∀ depth,\n        |leftLimit - commonTruncation depth| ≤\n          C * q ^ (depth + 1) / (1 - q)) →\n      (∀ depth,\n        |rightLimit - commonTruncation depth| ≤\n          C * q ^ (depth + 1) / (1 - q)) →\n        leftLimit = rightLimit\n                                                                            \n                                                                 \n  genomicLDTrafficHierarchyIsStrictAtEveryDegree :\n    ∀ D : ℕ,\n      ∃ left right : Fin (D + 2) → ℝ,\n        IsMomentMatchedProbabilityPair D left right ∧\n          SeparatesAtNextDiagonalTraffic D left right\n                                                                             \n                                                                            \n  genomicLDTrafficHasCommonBlindPairAtEveryDegree :\n    ∀ D : ℕ,\n      ∃ left right : Fin (D + 2) → ℝ,\n        IsBlindPairForEveryTruncatedTrafficRisk D left right\n                                                                           \n                                                          \n  permutationInvariantGenomicPolynomialFactorsThroughLDGraphs :\n    ∀ (Slot Locus Graph : Type) [Fintype Slot] [DecidableEq Slot]\n      [Fintype Locus] [Fintype Graph] [DecidableEq Graph]\n      (shape : (Slot → Locus) → Graph)\n      (coefficient value : (Slot → Locus) → ℝ),\n      (∀ left right, shape left = shape right → SameEqualityPattern left right) →\n      (∀ (permutation : Equiv.Perm Locus) monomial,\n        coefficient (permutation ∘ monomial) = coefficient monomial) →\n        (∑ monomial, coefficient monomial * value monomial) =\n          ∑ graph, graphShapeCoefficient shape coefficient graph *\n            ∑ monomial, if shape monomial = graph then value monomial else 0\n                                                                       \n                                                                 \n  permutationInvariantGenomicPolynomialFactorsThroughCanonicalLDGraphs :\n    ∀ (Slot Locus : Type) [Fintype Slot] [DecidableEq Slot] [Fintype Locus]\n      (coefficient value : (Slot → Locus) → ℝ),\n      (∀ (permutation : Equiv.Perm Locus) monomial,\n        coefficient (permutation ∘ monomial) = coefficient monomial) →\n        CanonicalTrafficFactorizationStatement coefficient value\n                                                                        \n                                                \n  permutationEquivariantGenomicPolynomialFactorsThroughRootedLDGraphs :\n    ∀ (Slot Locus : Type) [Fintype Slot] [DecidableEq Slot] [Fintype Locus]\n      (coefficient value : (Option Slot → Locus) → ℝ),\n      (∀ (permutation : Equiv.Perm Locus) monomial,\n        coefficient (permutation ∘ monomial) = coefficient monomial) →\n        RootedCanonicalTrafficFactorizationStatement coefficient value\n                                                                          \n                                                                 \n  degreeLimitedGenomicPolynomialFactorsThroughCanonicalLDGraphs :\n    ∀ (D : ℕ) (Locus : Type) [Fintype Locus]\n      (coefficient value : (degree : Fin (D + 1)) →\n        ((Fin (degree : ℕ) × Bool → Locus) → ℝ)),\n      (∀ degree (permutation : Equiv.Perm Locus) monomial,\n        coefficient degree (permutation ∘ monomial) = coefficient degree monomial) →\n        DegreeAtMostTrafficFactorizationStatement coefficient value\n                                                                        \n                                                                        \n  degreeLimitedGenomicEquivariantPolynomialFactorsThroughRootedLDGraphs :\n    ∀ (D : ℕ) (Locus : Type) [Fintype Locus]\n      (coefficient value : (degree : Fin (D + 1)) →\n        ((Option (Fin (degree : ℕ) × Bool) → Locus) → ℝ)),\n      (∀ degree (permutation : Equiv.Perm Locus) monomial,\n        coefficient degree (permutation ∘ monomial) = coefficient degree monomial) →\n        DegreeAtMostRootedTrafficFactorizationStatement coefficient value\n                                                                              \n                                             \n  degreeLimitedGenomicPolynomialIsDeterminedByCanonicalLDProfile :\n    ∀ (D : ℕ) (Locus : Type) [Fintype Locus]\n      (coefficient leftValue rightValue : (degree : Fin (D + 1)) →\n        ((Fin (degree : ℕ) × Bool → Locus) → ℝ)),\n      (∀ degree (permutation : Equiv.Perm Locus) monomial,\n        coefficient degree (permutation ∘ monomial) = coefficient degree monomial) →\n      degreeAtMostCanonicalTrafficProfile leftValue =\n        degreeAtMostCanonicalTrafficProfile rightValue →\n        (∑ degree : Fin (D + 1),\n          ∑ monomial, coefficient degree monomial * leftValue degree monomial) =\n          ∑ degree : Fin (D + 1),\n            ∑ monomial, coefficient degree monomial * rightValue degree monomial\n                                                                         \n                                      \n  degreeLimitedGenomicEquivariantPolynomialIsDeterminedByRootedLDProfile :\n    ∀ (D : ℕ) (Locus : Type) [Fintype Locus]\n      (coefficient leftValue rightValue : (degree : Fin (D + 1)) →\n        ((Option (Fin (degree : ℕ) × Bool) → Locus) → ℝ)),\n      (∀ degree (permutation : Equiv.Perm Locus) monomial,\n        coefficient degree (permutation ∘ monomial) = coefficient degree monomial) →\n      degreeAtMostRootedCanonicalTrafficProfile leftValue =\n        degreeAtMostRootedCanonicalTrafficProfile rightValue →\n        (∑ degree : Fin (D + 1),\n          ∑ monomial, coefficient degree monomial * leftValue degree monomial) =\n          ∑ degree : Fin (D + 1),\n            ∑ monomial, coefficient degree monomial * rightValue degree monomial\n                                                                           \n                                                                   \n  degreeLimitedGenomicPolynomialHasDirectFullGapHardness :\n    ∀ (Algorithm : Type) (D : ℕ) (Locus : Type) [Fintype Locus]\n      (coefficient : Algorithm → (degree : Fin (D + 1)) →\n        ((Fin (degree : ℕ) × Bool → Locus) → ℝ))\n      (leftValue rightValue : (degree : Fin (D + 1)) →\n        ((Fin (degree : ℕ) × Bool → Locus) → ℝ)),\n      (∀ algorithm degree (permutation : Equiv.Perm Locus) monomial,\n        coefficient algorithm degree (permutation ∘ monomial) =\n          coefficient algorithm degree monomial) →\n      degreeAtMostCanonicalTrafficProfile leftValue =\n        degreeAtMostCanonicalTrafficProfile rightValue →\n      ∀ bayesLeft bayesRight : ℝ,\n        (∀ algorithm,\n          bayesRight ≤ ∑ degree : Fin (D + 1),\n            ∑ monomial,\n              coefficient algorithm degree monomial * rightValue degree monomial) →\n        ∀ algorithm,\n          bayesRight - bayesLeft ≤\n            (∑ degree : Fin (D + 1),\n              ∑ monomial,\n                coefficient algorithm degree monomial * leftValue degree monomial) -\n              bayesLeft\n                                                                        \n                                           \n  genomicPressureProfilesHaveQuantitativeTiltNetControl :\n    ∀ (Parameter : Type) [PseudoMetricSpace Parameter]\n      (K : NNReal) (left right : Parameter → ℝ),\n      LipschitzWith K left → LipschitzWith K right →\n      ∀ (net : Set Parameter) (radius coordinateError : ℝ),\n        (∀ parameter, ∃ representative ∈ net,\n          dist parameter representative ≤ radius) →\n        (∀ representative ∈ net,\n          dist (left representative) (right representative) ≤ coordinateError) →\n          ∀ parameter,\n            dist (left parameter) (right parameter) ≤\n              2 * (K : ℝ) * radius + coordinateError\n                                                                             \n                                        \n  genomicDenseTiltCoordinatesDeterminePressureProfile :\n    ∀ (Parameter : Type) [PseudoMetricSpace Parameter]\n      (K : NNReal) (left right : Parameter → ℝ),\n      LipschitzWith K left → LipschitzWith K right →\n      ∀ parameters : Set Parameter, Dense parameters →\n        Set.EqOn left right parameters → left = right\n                                                                            \n                                                                        \n  genomicDenseTiltConvergenceExtendsGlobally :\n    ∀ (Parameter : Type) [PseudoMetricSpace Parameter]\n      (K : NNReal) (profiles : ℕ → Parameter → ℝ) (limit : Parameter → ℝ),\n      (∀ index, LipschitzWith K (profiles index)) →\n      LipschitzWith K limit →\n      ∀ parameters : Set Parameter, Dense parameters →\n        (∀ parameter ∈ parameters,\n          Filter.Tendsto (fun index ↦ profiles index parameter)\n            Filter.atTop (nhds (limit parameter))) →\n          ∀ parameter,\n            Filter.Tendsto (fun index ↦ profiles index parameter)\n              Filter.atTop (nhds (limit parameter))\n                                                                             \n                                                          \n  genomicDenseTiltConvergenceIsUniformOnCompactDomains :\n    ∀ (Parameter : Type) [PseudoMetricSpace Parameter] [CompactSpace Parameter]\n      (K : NNReal) (profiles : ℕ → Parameter → ℝ) (limit : Parameter → ℝ),\n      (∀ index, LipschitzWith K (profiles index)) →\n      LipschitzWith K limit →\n      ∀ parameters : Set Parameter, Dense parameters →\n        (∀ parameter ∈ parameters,\n          Filter.Tendsto (fun index ↦ profiles index parameter)\n            Filter.atTop (nhds (limit parameter))) →\n          TendstoUniformly profiles limit Filter.atTop\n                                                                           \n                                                 \n  genomicBoundedLipschitzPressureProfilesAreCompact :\n    ∀ (Parameter : Type) [PseudoMetricSpace Parameter] [CompactSpace Parameter]\n      (K : NNReal) (bound : ℝ),\n      IsCompact (boundedLipschitzPressureFamily\n        (Parameter := Parameter) K bound)\n                                                                            \n                                                                           \n  genomicBoundedLipschitzPressureProfilesHaveCompactSubsequences :\n    ∀ (Parameter : Type) [PseudoMetricSpace Parameter] [CompactSpace Parameter]\n      (K : NNReal) (bound : ℝ)\n      (profiles : ℕ → BoundedContinuousFunction Parameter ℝ),\n      (∀ index, profiles index ∈ boundedLipschitzPressureFamily K bound) →\n        ∃ limit ∈ boundedLipschitzPressureFamily (Parameter := Parameter) K bound,\n          ∃ subsequence : ℕ → ℕ,\n            StrictMono subsequence ∧\n              Filter.Tendsto (profiles ∘ subsequence) Filter.atTop (nhds limit)\n                                                                             \n                                           \n  genomicExponentialProfileIsSequentiallyCompact :\n    ∀ (bound : ℝ) (profiles : ℕ → BoundedExponentialProfile bound),\n      ∃ limit : BoundedExponentialProfile bound, ∃ subsequence : ℕ → ℕ,\n        StrictMono subsequence ∧\n          ∀ coordinate : ℕ,\n            Filter.Tendsto (fun n ↦ profiles (subsequence n) coordinate)\n              Filter.atTop (nhds (limit coordinate))\n                                                                            \n                                               \n  genomicExponentialProfileDistanceSatisfiesMetricLaws :\n    ∀ (bound : ℝ) (left middle right : BoundedExponentialProfile bound),\n      0 ≤ exponentialProfileDistance left right ∧\n        exponentialProfileDistance left right = exponentialProfileDistance right left ∧\n        exponentialProfileDistance left right ≤\n        exponentialProfileDistance left middle + exponentialProfileDistance middle right ∧\n        (exponentialProfileDistance left right = 0 ↔ left = right)\n                                                                           \n                                                    \n  genomicExponentialProfilePointIsCompactMetricSpace :\n    ∀ bound : ℝ,\n      IsCompact (Set.univ : Set (ExponentialProfilePoint bound))\n                                                                      \n                                              \n  genomicExponentialProfilePointConvergenceIsCoordinatewise :\n    ∀ (bound : ℝ) (profiles : ℕ → ExponentialProfilePoint bound)\n      (limit : ExponentialProfilePoint bound),\n      Filter.Tendsto profiles Filter.atTop (nhds limit) ↔\n        ∀ coordinate : ℕ,\n          Filter.Tendsto (fun n ↦ profiles n coordinate)\n            Filter.atTop (nhds (limit coordinate))\n                                                                              \n                                                            \n  genomicExponentialProfileDistanceCharacterizesConvergence :\n    ∀ (bound : ℝ) (profiles : ℕ → BoundedExponentialProfile bound)\n      (limit : BoundedExponentialProfile bound),\n      Filter.Tendsto (fun n ↦ exponentialProfileDistance (profiles n) limit)\n          Filter.atTop (nhds 0) ↔\n        ∀ coordinate : ℕ,\n          Filter.Tendsto (fun n ↦ profiles n coordinate)\n            Filter.atTop (nhds (limit coordinate))\n                                                                           \n                                                                  \n  genomicExponentialProfileHasFiniteCoordinateApproximation :\n    ∀ (bound : ℝ) (left right : BoundedExponentialProfile bound)\n      (prefixLength : ℕ),\n      (∀ coordinate < prefixLength, left coordinate = right coordinate) →\n        exponentialProfileDistance left right ≤ 2 ∧\n          exponentialProfileDistance left right ≤\n            2 * (1 / 2 : ℝ) ^ prefixLength\n                                                                         \n                                           \n  genomicExponentialProfileIsCompactInExplicitDistance :\n    ∀ (bound : ℝ) (profiles : ℕ → BoundedExponentialProfile bound),\n      ∃ limit : BoundedExponentialProfile bound, ∃ subsequence : ℕ → ℕ,\n        StrictMono subsequence ∧\n          Filter.Tendsto\n            (fun n ↦ exponentialProfileDistance (profiles (subsequence n)) limit)\n            Filter.atTop (nhds 0)\n                                                                                           \n                                                                                          \n  speedConditionedGenealogyRetainsResponseMark :\n    MarkedBreakout.linearDisplacementTripleRate 1 ≠ speedTiltBetaMergerRate 1 3 3\n                                                                                               \n  pioneerSusceptibilitySetsClock :\n    ∀ width : ℝ, genealogicalTimescale width 3 = width ^ 3\n                                                                                                \n                                                         \n  crossStateDoesNotDescend :\n    ¬ DescendsAlong (fun g : TransportPair ↦ g.2) binaryTransportFamily\n      (conditionalSectionMean (fun g : TransportPair ↦ contextMatchQuality g.1 g.2))\n                                                                                                 \n                                                                           \n  marginalDescentDoesNotCompose :\n    DescendsAlong (fun g : TwoLociTrait ↦ g.1) admissibleInteractionTraitLaw\n        (conditionalSectionMean traitIndicator) ∧\n      DescendsAlong (fun g : TwoLociTrait ↦ g.2.1) admissibleInteractionTraitLaw\n        (conditionalSectionMean traitIndicator) ∧\n      ¬ DescendsAlong (fun g : TwoLociTrait ↦ (g.1, g.2.1)) admissibleInteractionTraitLaw\n        (conditionalSectionMean traitIndicator)\n                                                                                                 \n                            \n  crudeReportingLosesDescent :\n    DescendsAlong (fun g : ExposureStratum ↦ g.1) admissibleConfoundedExposureLaw\n        (conditionalSectionMean exposureIndicator) ∧\n      DescendsAlong (fun g : ExposureStratum ↦ g.2) admissibleConfoundedExposureLaw\n        (conditionalSectionMean exposureIndicator) ∧\n      ¬ DescendsAlong trivialLabel admissibleConfoundedExposureLaw\n        (conditionalSectionMean exposureIndicator)\n                                                                                              \n                                                                                           \n                                 \n  ancestryWeightedAnsatzFails : exampleComponentResidual = -1\n                                                                                         \n  conditionalDriftSurvivesPooling :\n    calibrationDriftDefectSq binaryStateWeight binaryDynamicsPosterior\n      binaryConditionalContextMatch = 1 / 4\n                                                                                        \n                              \n  zeroSupportSealsConditionalDrift :\n    calibrationDriftDefectSq binaryStateWeight persistentOnlyDynamicsPosterior\n      binaryConditionalContextMatch = 0\n                                                                                          \n                                                 \n  uniformCorrectionCannotRecoverContrast :\n    ∀ (k : ℕ) (C : (Bool → ℝ) →ₗ[ℝ] (Bool → ℝ)),\n      C ∈ UniformCorrectionFamily dynamicsPoolingObservation k → C dynamicsContrast = 0\n                                                                                         \n                 \n  adaptiveCorrectionCannotRecoverContrast :\n    ∀ (k : ℕ) (T : Fin k → ℝ →ₗ[ℝ] (Bool → ℝ)),\n      adaptiveCorrectionSet dynamicsPoolingObservation T dynamicsContrast = {0}\n                                                                                                \n                                                                         \n  observableModeIsAdaptivelyExact :\n    dynamicsCommonMode ∈ adaptiveCorrectionSet dynamicsPoolingObservation\n      (fun _ : Fin 1 ↦ dynamicsBroadcast) dynamicsCommonMode\n                                                                                               \n                                          \n  correctionContrastIsCalibrationDrift :\n    ∀ persists y, dynamicsContrast persists =\n      2 * posteriorDrift binaryDynamicsPosterior binaryConditionalContextMatch persists y",
    "docstring": "Twenty-four logically distinct failures and boundaries that a biological transport theory must\nnot collapse into one scalar \"portability\" parameter.  The final six fields make continuum\ncalibration and finite correction part of the core theorem rather than adjacent examples.",
    "empirical_status": "",

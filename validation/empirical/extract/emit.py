@@ -211,9 +211,9 @@ def selfcheck_reason(err):
     if err.startswith("IndexError"):
         return f"evaluated outside the sampled dimension: {err[:90]}"
     if err.startswith("AttributeError") or err.startswith("KeyError"):
-        return f"self-check: structure projection unavailable ({err[:60]})"
+        return f"self-check: structure projection unavailable ({err[:200]})"
     if err.startswith("TypeError"):
-        return f"self-check: arity/type mismatch ({err[:60]})"
+        return f"self-check: arity/type mismatch ({err[:200]})"
     if err.startswith("value is not a real"):
         return f"self-check: {err} (vector- or function-valued)"
     # 200, not 60.  At 60 the most common message in this file truncates to
@@ -544,6 +544,18 @@ def main():
                 continue
             head = a["type"].split()[0] if a["type"].split() else ""
             sd = by_struct.get(head.split(".")[-1])
+            # AN ENUMERATION IS AN INDEX, NOT A RECORD.  `Pop` is declared with
+            # constructors and no fields, so it appears in `structures` and used
+            # to be handed to `struct_value`, which returned the empty dict --
+            # every field it could refuse, it refused, because there are none.
+            # That `{}` then arrived where the body indexes a table (`m.beta P`)
+            # and raised "index {} is not a finite-type index", or worse landed
+            # in arithmetic as "unsupported operand type(s)".  `structval` wins
+            # over `argtypes` in `build_args`, so the correct inhabitant --
+            # `type_value`'s `randrange(2)`, an actual population -- was never
+            # reached.  Skipping the enumerations here is what lets it be.
+            if head.split(".")[-1] in admissible.enum_cards(_ALL_STRUCTS):
+                continue
             if sd is not None:
                 for n in a["names"]:
                     structval[pyname(n)] = sd

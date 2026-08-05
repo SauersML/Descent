@@ -180,7 +180,7 @@ namespace DeploymentPopulation
 variable (P : DeploymentPopulation Ω J L)
 
 /-- The realised phenotype, `Cᵀβ + h`. -/
-def phenotype : Ω → ℝ := fun ω ↦ causalSignal P.β P.C ω + P.h ω
+def phenotype : Ω → ℝ := fun ω ↦ Foundations.causalSignal P.β P.C ω + P.h ω
 
 /-- The deployed score `wᵀX`. -/
 def score (w : J → ℝ) : Ω → ℝ := Foundations.linScore w P.X
@@ -294,7 +294,7 @@ theorem predictiveCovariance_eq :
   unfold predictiveCovariance phenotype score
   rw [Foundations.covariance_linScore_eq_dot_crossCov]
   have hsplit : Foundations.contextCrossCovVector P.E P.X
-        (fun ω ↦ causalSignal P.β P.C ω + P.h ω)
+        (fun ω ↦ Foundations.causalSignal P.β P.C ω + P.h ω)
       = P.kappa.mulVec P.β + P.contextX := by
     have h := Foundations.crossCovVector_decomposition P.E P.X P.C P.β P.h
     simpa [Foundations.contextCrossCovVector, Foundations.crossCovVector, kappa, contextX] using h
@@ -312,8 +312,8 @@ omit [Fintype J] [DecidableEq J] in
 theorem eval_phenotype_eq :
     P.E P.phenotype = Foundations.dot P.β (fun l ↦ P.E (fun ω ↦ P.C ω l)) + P.E P.h := by
   unfold phenotype
-  have hsplit : (fun ω ↦ causalSignal P.β P.C ω + P.h ω)
-      = causalSignal P.β P.C + P.h := rfl
+  have hsplit : (fun ω ↦ Foundations.causalSignal P.β P.C ω + P.h ω)
+      = Foundations.causalSignal P.β P.C + P.h := rfl
   rw [hsplit, P.E.add_eval]
   congr 1
   exact Foundations.eval_linScore P.E P.C P.β
@@ -875,7 +875,7 @@ theorem twoContrast_predictiveCovariance (α γ δ : ℝ) :
   show Foundations.covariance (uniformExp (Fin 4)) _ _ = _
   rw [covariance_uniformExp_four]
   simp [DeploymentPopulation.score, DeploymentPopulation.phenotype, twoContrastPopulation,
-    Foundations.linScore, causalSignal, Foundations.dot, unitWeight, rad1, rad2,
+    Foundations.linScore, Foundations.causalSignal, Foundations.dot, unitWeight, rad1, rad2,
       Descent.Core.innerSum]
   ring
 
@@ -883,7 +883,7 @@ theorem twoContrast_outcomeVariance (α γ δ : ℝ) :
     (twoContrastPopulation α γ δ).outcomeVariance = γ ^ 2 + δ ^ 2 := by
   show Foundations.variance (uniformExp (Fin 4)) _ = _
   rw [variance_uniformExp_four]
-  simp [DeploymentPopulation.phenotype, twoContrastPopulation, causalSignal, Foundations.dot,
+  simp [DeploymentPopulation.phenotype, twoContrastPopulation, Foundations.causalSignal, Foundations.dot,
     rad1, rad2,
       Descent.Core.innerSum]
   ring
@@ -1604,7 +1604,7 @@ theorem oneContrast_statistic (v : Fin 4 → ℝ) :
       Descent.Core.innerSum]
   have hpheno : (oneContrastPopulation v).phenotype = v := by
     funext ω
-    simp [DeploymentPopulation.phenotype, oneContrastPopulation, causalSignal, Foundations.dot,
+    simp [DeploymentPopulation.phenotype, oneContrastPopulation, Foundations.causalSignal, Foundations.dot,
       Descent.Core.innerSum]
   unfold portabilityStatistic DeploymentPopulation.scoreVariance
     DeploymentPopulation.predictiveCovariance DeploymentPopulation.outcomeVariance

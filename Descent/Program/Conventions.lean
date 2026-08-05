@@ -1,6 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Coalescent.WrightFisher
 import Descent.PopGen.AncestrySpecificArchitecture
 import Descent.PopGen.AssortativeMatingPGS
 import Descent.Foundations.CovarianceStructure
@@ -156,6 +157,24 @@ noncomputable def coalescentTimeScale (Ne : ℝ) : ℝ := ploidy * Ne
 @[simp] theorem coalescentTimeScale_eq (Ne : ℝ) :
     coalescentTimeScale Ne = 2 * Ne := by
   unfold coalescentTimeScale ploidy Descent.Core.ploidy; ring
+
+/-- **The convention is the coalescent's own mean, not a second choice of `2`.**
+
+`coalescentTimeScale` says that one coalescent time unit is `2·Nₑ` generations.  Until this
+theorem existed that was a NUMBER SOMEONE WROTE DOWN, agreeing with the coalescent because
+both had been got right, with nothing forcing them to move together.  What it converts is
+the mean number of generations back to the common ancestor of two lineages, and the
+mechanism supplies that mean: `Coalescent.tsum_pairDistinct_diploid`, the sum of the
+Wright-Fisher pair-survival probabilities over all generations, which the geometric series
+evaluates to `2·Nₑ`.
+
+This is the corpus's first use of `Descent/Coalescent/` from outside it for a quantity
+rather than a lemma: the 12,000-line derivation now decides a constant the applied layer
+depends on, so a change to the mechanism reaches the convention instead of merely
+disagreeing with it. -/
+theorem coalescentTimeScale_eq_meanPairCoalescenceTime {Ne : ℕ} (hNe : 0 < Ne) :
+    coalescentTimeScale (Ne : ℝ) = ∑' s : ℕ, Coalescent.pairDistinct (2 * Ne) s := by
+  rw [Coalescent.tsum_pairDistinct_diploid hNe, coalescentTimeScale_eq]
 
 /-- **Cross-check: the scaled mutation rate in `PopulationGeneticsFoundations`
 is twice the coalescent time scale times the mutation rate**, rather than an
