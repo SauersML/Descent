@@ -21,7 +21,37 @@ import lean_parse                                                # noqa: E402
 PROOFS = lean_parse.find_proofs_root(HERE)
 
 BLOB = json.loads((HERE / "defs.json").read_text())
-BY_NAME = {d["name"]: d for d in BLOB["definitions"]}
+
+
+class _ByName(dict):
+    """Definitions by fully-qualified name, tolerant of a stale namespace.
+
+    The checks below were written against the flat `Descent` namespace and name
+    declarations as `Descent.neiFst`.  The corpus is being split per subsystem,
+    so that declaration is now `Descent.PopGen.neiFst` and every hand-written
+    lookup here raised `KeyError` at once -- which reads as "the parser lost a
+    declaration" when nothing was lost and one moved.
+
+    A missing qualified name is retried on its last component, and an ambiguous
+    short name still raises: a check must not be silently repointed at a
+    different declaration that happens to share a name.  This is the same rule
+    `api.resolve` applies, for the same reason.
+    """
+
+    def __missing__(self, key):
+        if "." not in key:
+            raise KeyError(key)
+        short = key.rsplit(".", 1)[-1]
+        hits = [v for k, v in self.items() if k.rsplit(".", 1)[-1] == short]
+        if len(hits) == 1:
+            return hits[0]
+        if len(hits) > 1:
+            raise KeyError(f"{key!r} is ambiguous after the namespace split: "
+                           f"{[h['name'] for h in hits]}")
+        raise KeyError(key)
+
+
+BY_NAME = _ByName((d["name"], d) for d in BLOB["definitions"])
 
 failures = []
 
@@ -87,8 +117,12 @@ check("neiFst body", d["body"].strip(), "(H_T - H_S) / H_T")
 # against a parser bug rather than against the corpus. Both are fixed; the
 # assertion now pins the parsed value, which is what it was for.
 check("neiFst empirical status", d["empirical_status"], "MEASURED")
+# REPOINTED: the corpus is being split out of the flat `Descent` namespace, so
+# this theorem is now `Descent.PopGen.nei_fst_in_unit`. The assertion is about
+# WHICH theorem cites `neiFst`, not about what it is called, so it follows the
+# rename rather than pinning a name the corpus no longer uses.
 check("neiFst dependents include the unit-interval theorem",
-      "Descent.nei_fst_in_unit" in d["mentioned_by"], True)
+      "Descent.PopGen.nei_fst_in_unit" in d["mentioned_by"], True)
 
 # RENAMED from `simpleFst` (PopulationGeneticsFoundations.lean:56 records why:
 # the old name asserted no estimator).  This gate is hand-read ground truth, so
@@ -103,7 +137,12 @@ check("neiGstFromFrequencies is mentioned by at least 4 theorems",
 
 d = BY_NAME["Descent.coalFst"]
 check("coalFst args", [n for a in d["args"] for n in a["names"]], ["t", "Ne"])
-check("coalFst body", d["body"].strip(), "t / (t + 2 * Ne)")
+# REPOINTED: `coalFst` now CALLS the shared kernel instead of restating its
+# arithmetic. `oddsLike t Ne = t / (t + 2 * Ne)` is the same quotient, and the
+# point of the move is that this body and the corpus's other odds-shaped
+# quantities can no longer drift apart by editing one of them. Pinning the
+# inlined text here would have made the deduplication look like a defect.
+check("coalFst body", d["body"].strip(), "Descent.Core.oddsLike t Ne")
 # REPOINTED: `0 < t` left this set when `coal_fst_approaches_one` dropped it as
 # a redundant premise -- it follows from `100 * Ne < t` with `0 < Ne`. The
 # mined set tracks the theorems that mention the definition, so a premise
@@ -118,7 +157,11 @@ check("expectedHeterozygosity docstring mentions mutation-drift",
       "mutation-drift balance" in d["docstring"], True)
 
 # equation-compiler definition (`def f : ℕ → ℝ | 0 => ... | t+1 => ...`)
-d = BY_NAME["Descent.hetRecurrence"]
+# NAMED IN FULL, because the short name is genuinely ambiguous: `PopGen`
+# keeps a `hetRecurrence` that delegates to this one so its consumers read
+# unchanged. The equations checked below are the recurrence's own, and only
+# the Core declaration has equations at all -- the wrapper has a body.
+d = BY_NAME["Descent.Core.hetRecurrence"]
 check("hetRecurrence equations", [e["pattern"] for e in d["equations"]],
       ["0", "t + 1"])
 check("hetRecurrence base case", d["equations"][0]["rhs"], "H₀")

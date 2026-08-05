@@ -6414,7 +6414,7 @@
   "vector_args": null,
   "mentioned_by": [
    "Descent.Blindness.singleLocus_tower_collapses",
-   "Descent.Spectral.Core.Panel.reflect_fold",
+   "Descent.Spectral._root_.Descent.Blindness.Panel.reflect_fold",
    "Descent.Spectral.foldedSpectrum_gauge",
    "Descent.Spectral.reflection_odd_in_kernel"
   ],
@@ -6435,7 +6435,7 @@
     ],
     "Descent.Spectral.foldedSpectrum_gauge": [],
     "Descent.Spectral.reflection_odd_in_kernel": [],
-    "Descent.Spectral.Core.Panel.reflect_fold": []
+    "Descent.Spectral._root_.Descent.Blindness.Panel.reflect_fold": []
    }
   }
  },
@@ -6455,7 +6455,7 @@
   "vector_args": null,
   "mentioned_by": [
    "Descent.Blindness.no_macroscopic_interaction_term_of_tilted_tail",
-   "Descent.PopGen.Blindness.GenotypeDesign.reModel_interactionOrder"
+   "Descent.PopGen._root_.Descent.Blindness.GenotypeDesign.reModel_interactionOrder"
   ],
   "constraints": {
    "hypotheses": [
@@ -6469,7 +6469,7 @@
      "∑ s, coefficient s ^ 2 = 1",
      "∀ s, jumpProbability s ≤ tiltConstant * coefficient s ^ 2 / (threshold ^ 2 * Real.sqrt (interactionOrder s"
     ],
-    "Descent.PopGen.Blindness.GenotypeDesign.reModel_interactionOrder": []
+    "Descent.PopGen._root_.Descent.Blindness.GenotypeDesign.reModel_interactionOrder": []
    }
   }
  },
@@ -52652,8 +52652,8 @@
    "Descent.Portability.ldPanelRetentionFraction_mem",
    "Descent.Portability.ldTightLinkage_le_ldBlockDetectionShare",
    "Descent.Portability.pruning_loses_detection_iff_whiteningGain_exceeds_one",
-   "Descent.Spectral.Core.Panel.fold_idempotent",
-   "Descent.Spectral.Core.Panel.reflect_fold",
+   "Descent.Spectral._root_.Descent.Blindness.Panel.fold_idempotent",
+   "Descent.Spectral._root_.Descent.Blindness.Panel.reflect_fold",
    "Descent.Spectral.fold_preserves_modulusLaw",
    "Descent.Spectral.fold_support_le_half",
    "Descent.Spectral.fold_support_nonneg",
@@ -52685,11 +52685,11 @@
     "Descent.Portability.ldTightLinkage_le_ldBlockDetectionShare": [],
     "Descent.Spectral.foldedSpectrum_gauge": [],
     "Descent.Spectral.reflection_odd_in_kernel": [],
-    "Descent.Spectral.Core.Panel.reflect_fold": [],
+    "Descent.Spectral._root_.Descent.Blindness.Panel.reflect_fold": [],
     "Descent.Spectral.fold_preserves_modulusLaw": [],
     "Descent.Spectral.fold_support_le_half": [],
     "Descent.Spectral.fold_support_nonneg": [],
-    "Descent.Spectral.Core.Panel.fold_idempotent": [],
+    "Descent.Spectral._root_.Descent.Blindness.Panel.fold_idempotent": [],
     "Descent.Spectral.not_separating_of_frequencyTie": [],
     "Descent.Spectral.frequencyTie_gives_kernel": [],
     "Descent.Spectral.readsThroughFunctionals_of_linearCombination": [],
@@ -72872,7 +72872,7 @@
    }
   }
  },
- "Descent.PopGen.Blindness.GenotypeDesign.reModel": {
+ "Descent.PopGen._root_.Descent.Blindness.GenotypeDesign.reModel": {
   "class": "STRUCTURAL",
   "note": "structure literal",
   "file": "Descent/PopGen/StandardizedGenotypeMoments.lean",
@@ -72894,7 +72894,7 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
-   "Descent.PopGen.Blindness.GenotypeDesign.reModel_interactionOrder"
+   "Descent.PopGen._root_.Descent.Blindness.GenotypeDesign.reModel_interactionOrder"
   ],
   "constraints": {
    "declared_kind": "frequency",
@@ -72902,7 +72902,7 @@
    "declared_hi": 1.0,
    "hypotheses": [],
    "hypotheses_by_theorem": {
-    "Descent.PopGen.Blindness.GenotypeDesign.reModel_interactionOrder": []
+    "Descent.PopGen._root_.Descent.Blindness.GenotypeDesign.reModel_interactionOrder": []
    }
   }
  },
@@ -121144,7 +121144,7 @@
    }
   }
  },
- "Descent.Spectral.Core.Panel.reflect": {
+ "Descent.Spectral._root_.Descent.Blindness.Panel.reflect": {
   "class": "STRUCTURAL",
   "note": "structure literal",
   "file": "Descent/Spectral/FoldedSpectrum.lean",
@@ -121160,7 +121160,7 @@
   "vector_args": null,
   "mentioned_by": [
    "Descent.Blindness.singleLocus_tower_collapses",
-   "Descent.Spectral.Core.Panel.reflect_fold",
+   "Descent.Spectral._root_.Descent.Blindness.Panel.reflect_fold",
    "Descent.Spectral.foldedSpectrum_gauge",
    "Descent.Spectral.reflection_odd_in_kernel"
   ],
@@ -121173,11 +121173,11 @@
     "Descent.Blindness.singleLocus_tower_collapses": [],
     "Descent.Spectral.foldedSpectrum_gauge": [],
     "Descent.Spectral.reflection_odd_in_kernel": [],
-    "Descent.Spectral.Core.Panel.reflect_fold": []
+    "Descent.Spectral._root_.Descent.Blindness.Panel.reflect_fold": []
    }
   }
  },
- "Descent.Spectral.Core.Panel.fold": {
+ "Descent.Spectral._root_.Descent.Blindness.Panel.fold": {
   "class": "STRUCTURAL",
   "note": "structure literal",
   "file": "Descent/Spectral/FoldedSpectrum.lean",
@@ -121192,8 +121192,8 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
-   "Descent.Spectral.Core.Panel.fold_idempotent",
-   "Descent.Spectral.Core.Panel.reflect_fold",
+   "Descent.Spectral._root_.Descent.Blindness.Panel.fold_idempotent",
+   "Descent.Spectral._root_.Descent.Blindness.Panel.reflect_fold",
    "Descent.Spectral.fold_preserves_modulusLaw",
    "Descent.Spectral.fold_support_le_half",
    "Descent.Spectral.fold_support_nonneg"
@@ -121209,14 +121209,14 @@
     "∀ i, panel.support i ≤ 1"
    ],
    "hypotheses_by_theorem": {
-    "Descent.Spectral.Core.Panel.reflect_fold": [],
+    "Descent.Spectral._root_.Descent.Blindness.Panel.reflect_fold": [],
     "Descent.Spectral.fold_preserves_modulusLaw": [],
     "Descent.Spectral.fold_support_le_half": [],
     "Descent.Spectral.fold_support_nonneg": [
      "0 ≤ panel.support i",
      "panel.support i ≤ 1"
     ],
-    "Descent.Spectral.Core.Panel.fold_idempotent": [
+    "Descent.Spectral._root_.Descent.Blindness.Panel.fold_idempotent": [
      "∀ i, 0 ≤ panel.support i",
      "∀ i, panel.support i ≤ 1"
     ]
