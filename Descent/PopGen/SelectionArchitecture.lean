@@ -986,6 +986,7 @@ theorem selectionCoefficient_self (w : ℝ) (hw : w ≠ 0) :
     selectionCoefficient w w = 0 := by
   unfold selectionCoefficient Descent.Core.proportionalReduction
   field_simp
+  ring
 
 /-- **selectionCoefficient at a zero reference fitness, named.** A reference genotype that
 leaves no offspring does not give a coefficient of one, but `w / 0` is junk-zero so Lean
@@ -1148,9 +1149,10 @@ theorem cross_trait_portability_bound
 end Pleiotropy
 
 theorem gwasNCP_uses_hwe (n : ℕ) (β p : ℝ) :
-    PopGen.gwasNCP n β p = n * β ^ 2 * genotypeVarianceHWE p := by
-  unfold PopGen.gwasNCP Portability.ncp Portability.effectiveFisherInformation Portability.fisherInformation genotypeVarianceHWE
-    genotypeVarianceHWE Descent.Core.product Descent.Core.hweHeterozygosity Descent.Core.ploidy
+    PopGen.gwasNCP n β p = n * β ^ 2 * Portability.genotypeVarianceHWE p := by
+  unfold PopGen.gwasNCP Portability.ncp Portability.effectiveFisherInformation
+    Portability.fisherInformation Portability.genotypeVarianceHWE
+    Descent.Core.product Descent.Core.hweHeterozygosity Descent.Core.ploidy
   ring_nf
 
 /-- **The two in the polygenic-adaptation shift is the ploidy.** The mean score is
