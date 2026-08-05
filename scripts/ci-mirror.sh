@@ -94,6 +94,7 @@ step "Differential battery"               validation/empirical/differential "$PY
 step "Calibrate the metamorphic gate"     .                                "$PY" validation/empirical/metamorphic/test_metamorphic.py
 step "Metamorphic relation gate"          .                                "$PY" validation/empirical/metamorphic/run.py
 step "Workflow-path guard"                .                                "$PY" validation/code/workflow_paths.py
+step "Architecture gates"                 .                                "$PY" validation/code/architecture.py --gate --verbose
 step "Vacuous reference evaluations"      .                                "$PY" validation/empirical/reference_eval/degenerate.py --gate
 
 echo

@@ -292,6 +292,19 @@ jobs:
       - name: Workflow-path guard (every run script is tracked)
         run: python3 validation/code/workflow_paths.py
 
+      # ARCHITECTURE. Soundness is not the corpus's failure mode -- there is no
+      # `sorry` and one custom axiom. Its failure mode is fragmentation: the
+      # same quantity re-derived under a fourth name, a reconciliation layer
+      # placed above the things it reconciles, a population-genetics layer and
+      # a portability layer that share a namespace and almost nothing else.
+      # None of that breaks a build, so none of it was ever caught by one.
+      #
+      # This is a RATCHET against validation/code/architecture_baseline.json:
+      # it fails on regression, and it fails on an unrecorded improvement, so
+      # the numbers cannot drift back down for free.
+      - name: Architecture gates (import depth, duplication, spine)
+        run: python3 validation/code/architecture.py --gate --verbose
+
       # WHAT IS NOT WIRED UP, and why. The steps above are all of
       # validation/code/ plus the subset of validation/empirical/
       # that is deterministic, dependency-free and about twenty seconds in

@@ -1,0 +1,10 @@
+{
+ "composition_theorems": 11,
+ "cross_module_reuse_pct": 8.74,
+ "duplicate_body_extras": 104,
+ "duplicate_body_groups": 49,
+ "foundation_position_offenders": 7,
+ "modules": 184,
+ "silent_falsifications": 0,
+ "theorems": 6010
+}
