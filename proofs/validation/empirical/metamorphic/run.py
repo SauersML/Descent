@@ -221,25 +221,55 @@ def in_scope_defs(table):
     return out
 
 
-def main(argv):
-    table = api.definition_table()
+def constant_on_grid(fn, argnames):
+    """True if `fn` returns the same value at every grid point.
+
+    A constant function satisfies EVERY invariance relation in this table --
+    allele swap, argument exchange, reciprocal scaling -- vacuously. A definition
+    declared only with invariances would therefore pass this gate even if its
+    transcription collapsed to a constant, which is exactly the failure a gate
+    exists to catch and exactly the one the relation check cannot see from the
+    inside. Scaling relations with a nonzero exponent would catch it; invariances
+    alone would not.
+    """
+    seen = []
+    for k in range(len(GRID_POINTS)):
+        point = _assign(argnames, k)
+        try:
+            seen.append(fn(*[float(point[a]) for a in argnames]))
+        except (ZeroDivisionError, ValueError, OverflowError):
+            continue
+    if len(seen) < 2:
+        return False                    # nothing evaluated; not this check's call
+    return all(_close(v, seen[0]) for v in seen)
+
+
+def analyse(table, callable_for, R_=None):
+    """All gate logic, over an INJECTED table and resolver.
+
+    Split out of `main` so the calibration can drive it with a BROKEN table.  A
+    gate whose only possible input is the real corpus can only ever be exercised
+    on the region the real corpus happens to occupy, and an empty or truncated
+    extraction is precisely the failure with no signature of its own: every
+    downstream check goes quiet because there is nothing left to disagree with.
+    """
+    R_ = R_ if R_ is not None else R
     scope = in_scope_defs(table)
     findings = []
+    checked = agreed = 0
 
-    if "--coverage" in argv:
-        swept = sum(len(scope.get(m, [])) for m in R.SWEPT_MODULES)
-        total = sum(len(v) for v in scope.values())
-        print(f"scalar real->real definitions in the corpus: {total}")
-        print(f"  in swept modules:  {swept}")
-        print(f"  visible debt:      {total - swept} in "
-              f"{len(scope) - len(R.SWEPT_MODULES)} unswept modules")
-        for m in sorted(scope, key=lambda k: -len(scope[k]))[:15]:
-            mark = "SWEPT" if m in R.SWEPT_MODULES else "     "
-            print(f"  {mark} {len(scope[m]):4d}  {m}")
-        return 0
+    # 0. The table itself must be plausible. The corpus has thousands of
+    #    definitions; an order-of-magnitude floor catches a table that failed to
+    #    build, without pinning a number that ordinary growth moves.
+    if len(table) < 500:
+        findings.append(
+            f"EXTRACTION COLLAPSED: the definition table has {len(table)} "
+            f"entries. The corpus has thousands. Every check below is reading an "
+            f"empty or truncated table, so their silence means nothing. Run "
+            f"extract/emit.py and check that it succeeded.")
 
-    declared = (set(R.RELATIONS) | set(R.NO_RELATIONS)
-                | set(R.NOT_EXTRACTABLE))
+    declared = (set(R_.RELATIONS) | set(R_.NO_RELATIONS)
+                | set(R_.NOT_EXTRACTABLE))
 
     # 1. every declared name must still exist -- catches renames and deletions
     #    without pinning a line number.
@@ -250,7 +280,7 @@ def main(argv):
                 f"exists in the corpus. Rename or remove the declaration.")
 
     # 2. every in-scope definition of a swept module must be declared.
-    for module in R.SWEPT_MODULES:
+    for module in R_.SWEPT_MODULES:
         if module not in scope:
             findings.append(
                 f"EMPTY SWEEP: {module} is listed as swept but contributes no "
@@ -264,29 +294,37 @@ def main(argv):
                     f"applies.")
 
     # 3. NOT_EXTRACTABLE must really be inextractable, or the excuse is stale.
-    for name in sorted(R.NOT_EXTRACTABLE):
+    for name in sorted(R_.NOT_EXTRACTABLE):
         if name not in table:
             continue
         try:
-            api.callable_for(name)
+            callable_for(name)
         except Exception:
             continue
         findings.append(
-            f"STALE EXCUSE: {name} is listed NOT_EXTRACTABLE but api.callable_for "
+            f"STALE EXCUSE: {name} is listed NOT_EXTRACTABLE but callable_for "
             f"now succeeds. Move it to RELATIONS and declare its relations.")
 
-    # 4. the relations themselves.
-    checked = 0
-    for fqn, rels in sorted(R.RELATIONS.items()):
+    # 4. the relations themselves, plus a non-degeneracy screen.
+    for fqn, rels in sorted(R_.RELATIONS.items()):
         if fqn not in table:
             continue                                    # already reported above
         try:
-            fn, argnames = api.callable_for(fqn)
+            fn, argnames = callable_for(fqn)
         except Exception as exc:
             findings.append(
-                f"NOT EXECUTABLE: {fqn} is in RELATIONS but api.callable_for "
+                f"NOT EXECUTABLE: {fqn} is in RELATIONS but callable_for "
                 f"raised {type(exc).__name__}: {exc}")
             continue
+
+        if constant_on_grid(fn, argnames):
+            findings.append(
+                f"VACUOUS: {fqn} returns the same value at every grid point, so "
+                f"every invariance relation declared for it holds for a reason "
+                f"having nothing to do with the definition. Either the "
+                f"transcription collapsed, or the grid never leaves a region "
+                f"where the body is flat and needs widening.")
+
         for rel in rels:
             key = (fqn, rel["id"])
             try:
@@ -295,13 +333,13 @@ def main(argv):
                 findings.append(f"BAD DECLARATION: {fqn}: {exc}")
                 continue
             checked += 1
-            if key in R.EXPECTED_VIOLATIONS:
+            if key in R_.EXPECTED_VIOLATIONS:
                 if not fails:
                     findings.append(
                         f"UNEXPECTED AGREEMENT: {fqn} now SATISFIES "
                         f"{rel['id']}, which is pinned as a deliberate "
                         f"violation. The body changed. Reason on record: "
-                        f"{R.EXPECTED_VIOLATIONS[key]}")
+                        f"{R_.EXPECTED_VIOLATIONS[key]}")
                 continue
             if fails:
                 findings.append(
@@ -311,8 +349,7 @@ def main(argv):
                        if len(fails) > 3 else ""))
 
     # 5. cross-body agreements: execute the equalities the corpus proves.
-    agreed = 0
-    for left, right, theorem, note in getattr(R, "AGREEMENTS", ()):
+    for left, right, theorem, note in getattr(R_, "AGREEMENTS", ()):
         missing = [n for n in (left, right) if n not in table]
         if missing:
             findings.append(
@@ -320,8 +357,8 @@ def main(argv):
                 f"{', '.join(missing)} no longer exists.")
             continue
         try:
-            fl, al = api.callable_for(left)
-            fr, ar = api.callable_for(right)
+            fl, al = callable_for(left)
+            fr, ar = callable_for(right)
         except Exception as exc:
             findings.append(
                 f"AGREEMENT NOT EXECUTABLE: {left} vs {right} "
@@ -348,6 +385,27 @@ def main(argv):
                     + f" they give {gl!r} and {gr!r}. Either a body changed "
                       f"without its partner, or a transcription is wrong.")
                 break
+
+    return findings, checked, agreed, scope
+
+
+def main(argv):
+    table = api.definition_table()
+    scope = in_scope_defs(table)
+
+    if "--coverage" in argv:
+        swept = sum(len(scope.get(m, [])) for m in R.SWEPT_MODULES)
+        total = sum(len(v) for v in scope.values())
+        print(f"scalar real->real definitions in the corpus: {total}")
+        print(f"  in swept modules:  {swept}")
+        print(f"  visible debt:      {total - swept} in "
+              f"{len(scope) - len(R.SWEPT_MODULES)} unswept modules")
+        for m in sorted(scope, key=lambda k: -len(scope[k]))[:15]:
+            mark = "SWEPT" if m in R.SWEPT_MODULES else "     "
+            print(f"  {mark} {len(scope[m]):4d}  {m}")
+        return 0
+
+    findings, checked, agreed, scope = analyse(table, api.callable_for)
 
     swept_n = sum(len(scope.get(m, [])) for m in R.SWEPT_MODULES)
     print(f"metamorphic gate: {checked} relations over {len(R.RELATIONS)} "

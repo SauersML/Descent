@@ -223,7 +223,14 @@ def workflow_run_paths(text):
 
 
 def _collect(command, workdir, out):
-    for tok in re.findall(r"[\w./-]+\.(?:py|sh|lean)\b", command):
+    # `.toml` is included for `cargo --manifest-path`, which is the LAST run:
+    # step in prover.yml and therefore the only path that sits after the
+    # "WHAT IS NOT WIRED UP" prose block. That placement is deliberate: it gives
+    # the CALIB-TAIL probe in test_metamorphic.py a real path at the end of the
+    # real file, so a parser that stopped early would be caught rather than
+    # merely suspected. It is also a genuine check -- a moved Cargo.toml breaks
+    # CI exactly as a moved script does.
+    for tok in re.findall(r"[\w./-]+\.(?:py|sh|lean|toml)\b", command):
         if "://" in command and tok in command.split()[-1:]:
             continue                       # curl <url> | sh, not a repo file
         if tok.startswith(("/", "-")) or "//" in tok:

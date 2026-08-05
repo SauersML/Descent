@@ -168,6 +168,104 @@ def specificity():
 # table actually declares, or the pin is decoration.
 # ---------------------------------------------------------------------------
 
+class _FakeRelations:
+    """A minimal stand-in for relations.py, so the gate's TABLE-level checks can
+    be driven with inputs the real corpus can never produce."""
+    SWEPT_MODULES = ("Fake/Mod.lean",)
+    RELATIONS = {"Fake.f": [R.scales("x", 2)]}
+    NO_RELATIONS = {}
+    NOT_EXTRACTABLE = {}
+    EXPECTED_VIOLATIONS = {}
+    AGREEMENTS = ()
+
+
+def _entry(module="Fake/Mod.lean", args=("x",)):
+    return {"ret_type": "ℝ", "file": module,
+            "args": [{"names": [a], "type": "ℝ", "implicit": False}
+                     for a in args]}
+
+
+def broken_table_is_not_silent():
+    """THE SAFE-REGION CHECK. Everything else in this file drives the gate with
+    stub BODIES, which exercises the relation arithmetic and nothing else. The
+    gate's real input is a generated definition table, and a table that failed to
+    build is the failure mode with no signature of its own: every downstream
+    check goes quiet because there is nothing left to disagree with. Silence
+    there is indistinguishable from a clean corpus, so it must be asserted
+    against directly."""
+    def never(_name):
+        raise AssertionError("callable_for must not be reached for a missing def")
+
+    findings, checked, agreed, _ = G.analyse({}, never, _FakeRelations)
+    expect(findings,
+           "AN EMPTY DEFINITION TABLE PRODUCED NO FINDINGS. A failed extraction "
+           "would pass this gate silently, and every number it prints would be "
+           "about a table that does not describe the corpus.")
+    expect(any("EXTRACTION COLLAPSED" in f for f in findings),
+           "an empty table was not diagnosed as a collapsed extraction; the "
+           "operator would chase the downstream symptoms instead")
+    expect(checked == 0,
+           "the gate reported checking relations against an empty table")
+
+    # A table that is plausible in size but has lost the declared definitions:
+    # the DANGLING check must carry it, not the size floor.
+    big = {f"Filler.d{i}": _entry("Other/Mod.lean") for i in range(600)}
+    findings2, _, _, _ = G.analyse(big, never, _FakeRelations)
+    expect(any("DANGLING" in f for f in findings2),
+           "a large table missing every declared definition produced no "
+           "DANGLING finding; a rename sweep would pass unnoticed")
+    expect(not any("EXTRACTION COLLAPSED" in f for f in findings2),
+           "the size floor fired on a plausibly sized table; it would mask the "
+           "more specific diagnosis")
+
+
+def coverage_check_fires():
+    """The coverage gate -- a new in-scope def in a swept module with no
+    declaration -- has only ever been exercised by real corpus data, which is to
+    say only on input where it happened not to fire. Drive it directly."""
+    def resolver(_name):
+        return (lambda x: x * x), ["x"]
+
+    table = {"Fake.f": _entry(), "Fake.newcomer": _entry()}
+    findings, _, _, _ = G.analyse(table, resolver, _FakeRelations)
+    expect(any("UNDECLARED" in f and "newcomer" in f for f in findings),
+           "COVERAGE CHECK DID NOT FIRE: a new in-scope definition in a swept "
+           "module with no declaration was accepted. The coverage claim is "
+           "unfounded.")
+    # ... and must NOT fire on the declared one.
+    expect(not any("UNDECLARED" in f and "Fake.f" in f for f in findings),
+           "the coverage check flagged a definition that IS declared")
+
+    # A swept module that contributes nothing must be reported, or a renamed
+    # module silently reduces coverage to zero while the gate stays green.
+    findings2, _, _, _ = G.analyse({"Other.g": _entry("Other/Mod.lean")},
+                                   resolver, _FakeRelations)
+    expect(any("EMPTY SWEEP" in f for f in findings2),
+           "a swept module contributing no definitions was not reported; a "
+           "module rename would silently empty the sweep")
+
+
+def vacuity_screen_fires():
+    """A constant transcription satisfies every INVARIANCE relation vacuously.
+    Without a non-degeneracy screen a definition declared only with invariances
+    passes even when its body has collapsed."""
+    class OnlyInvariances(_FakeRelations):
+        RELATIONS = {"Fake.f": [R.symmetric_in("x", "y")]}
+
+    table = {"Fake.f": _entry(args=("x", "y"))}
+    collapsed = (lambda x, y: 1.0), ["x", "y"]
+    findings, _, _, _ = G.analyse(table, lambda _n: collapsed, OnlyInvariances)
+    expect(any("VACUOUS" in f for f in findings),
+           "A COLLAPSED (CONSTANT) TRANSCRIPTION PASSED. Every invariance "
+           "relation holds for a constant, so without this screen the gate "
+           "certifies a body that computes nothing.")
+
+    live = (lambda x, y: x * y), ["x", "y"]
+    findings2, _, _, _ = G.analyse(table, lambda _n: live, OnlyInvariances)
+    expect(not any("VACUOUS" in f for f in findings2),
+           "the vacuity screen fired on a genuinely varying body")
+
+
 def workflow_path_extraction():
     """Both directions for the workflow-path guard in build_flags.py.
 
@@ -258,6 +356,74 @@ def table_integrity():
                f"'nobody looked' and 'none applies' must not be confusable")
 
 
+def calib_tail():
+    """CALIB-TAIL: a probe that must FAIL, run LAST and over the END of the real
+    inputs, so that silence here voids the run.
+
+    A calibration certifies an instrument only over the region it occupies. Every
+    other probe in this file sits at the head of its input -- small stub bodies,
+    short synthetic tables, a five-step sample workflow -- which is exactly where
+    truncation, output caps and early loop exits cannot reach. These two probes
+    live at the tail of the real inputs instead.
+    """
+    # (a) The real prover.yml. If the parser ever stopped early -- at the first
+    #     comment block, at a step limit, at the "WHAT IS NOT WIRED UP" prose --
+    #     the paths it names would vanish from the extraction and the guard would
+    #     report nothing. Assert that a path from the LAST run: step is present.
+    import build_flags as B
+    import os
+    wf = os.path.join(B.ROOT, ".github", "workflows", "prover.yml")
+    if os.path.exists(wf):
+        with open(wf, encoding="utf-8") as handle:
+            text = handle.read()
+        found = B.workflow_run_paths(text)
+        expect(found,
+               "CALIB-TAIL: the workflow-path parser extracted NOTHING from the "
+               "real prover.yml. It is structurally unable to see any break.")
+        # The last `run:` line in the file that names a repo script.
+        last = None
+        for raw in text.splitlines():
+            s = raw.strip()
+            if s.startswith("#") or "run:" not in s:
+                continue
+            for tok in B.re.findall(r"[\w./-]+\.(?:py|sh|lean|toml)\b", s):
+                if "/" in tok and "://" not in s:
+                    last = tok
+        expect(last is None or any(p.endswith(last) for p in found),
+               f"CALIB-TAIL: the LAST script named by a run: step in the real "
+               f"prover.yml ({last!r}) is missing from the parser's output, so "
+               f"the parser stops before the end of the file. Everything it "
+               f"reports is about the head of the workflow only.")
+
+    # (b) The relation table. A probe placed after every real declaration: if
+    #     anything ever iterates only a prefix of RELATIONS, this synthetic entry
+    #     appended conceptually at the end must still be reached. It is declared
+    #     to VIOLATE, so a silent skip reads as a pass and is caught here.
+    class TailProbe(_FakeRelations):
+        SWEPT_MODULES = ()
+        RELATIONS = dict(list(R.RELATIONS.items())
+                         + [("ZZZ.tailProbe", [R.scales("x", 2)])])
+        NO_RELATIONS = R.NO_RELATIONS
+        NOT_EXTRACTABLE = R.NOT_EXTRACTABLE
+        EXPECTED_VIOLATIONS = {}
+        AGREEMENTS = ()
+
+    table = {name: _entry("Fake/Mod.lean") for name in TailProbe.RELATIONS}
+    table.update({n: _entry("Fake/Mod.lean") for n in TailProbe.NO_RELATIONS})
+    table.update({n: _entry("Fake/Mod.lean") for n in TailProbe.NOT_EXTRACTABLE})
+    table.update({f"Filler.d{i}": _entry("Other/Mod.lean") for i in range(600)})
+
+    def linear(_name):
+        return (lambda *a: sum(a)), ["x"]          # linear: violates scale x^2
+
+    findings, _, _, _ = G.analyse(table, linear, TailProbe)
+    expect(any("ZZZ.tailProbe" in f for f in findings),
+           "CALIB-TAIL: the probe declared LAST in the relation table was not "
+           "reported, although it is declared to violate its relation. The gate "
+           "does not reach the end of the table, so every entry after the cut "
+           "is being scored as passing.")
+
+
 def main():
     negative_direction()
     positive_direction()
@@ -266,15 +432,23 @@ def main():
     agreements_integrity()
     no_stale_excuses()
     workflow_path_extraction()
+    broken_table_is_not_silent()
+    coverage_check_fires()
+    vacuity_screen_fires()
+    calib_tail()
     if FAILURES:
         print(f"metamorphic gate calibration FAILED ({len(FAILURES)}):\n")
         for f in FAILURES:
             print("  " + f)
         return 1
     print("metamorphic gate calibration passed: 6 planted defects all caught, "
-          "3 clean bodies all silent, specificity, table integrity, "
+          "3 clean bodies all silent, specificity holds, table integrity, "
           f"{len(getattr(R, 'AGREEMENTS', ()))} cross-body agreements "
-          "well-formed, no stale excuses.")
+          "well-formed, no stale excuses; and the table-level probes -- empty "
+          "extraction diagnosed rather than silent, coverage check fires on an "
+          "undeclared def, empty sweep reported, vacuity screen catches a "
+          "collapsed body, CALIB-TAIL reaches the end of both the relation "
+          "table and the real prover.yml.")
     return 0
 
 
